@@ -1,0 +1,1117 @@
+-- =================================================================
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-PPPoX-MIB
+-- Reference:
+-- Version: V2.14
+-- History:
+--     
+-- =================================================================
+
+    HUAWEI-BRAS-PPPoX-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwBRASMib            
+                FROM HUAWEI-MIB
+            IpAddress
+                FROM SNMPv2-SMI    
+            TruthValue            
+                FROM SNMPv2-TC    
+            InterfaceIndex 
+                FROM IF-MIB
+            OBJECT-GROUP,MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+            OBJECT-TYPE, MODULE-IDENTITY,Integer32,Counter64          
+                FROM SNMPv2-SMI;
+    
+        hwBRASPPPoX MODULE-IDENTITY 
+            LAST-UPDATED "201801121800Z"
+            ORGANIZATION 
+                 "Huawei Technologies Co.,Ltd."
+              CONTACT-INFO 
+		"Huawei Industrial Base
+		  Bantian, Longgang
+		   Shenzhen 518129
+		   People's Republic of China
+		   Website: http://www.huawei.com
+		   Email: support@huawei.com
+		 "    
+              DESCRIPTION 
+                    "Modify Description in English By l00397725."
+               REVISION     "201801121800Z"
+    
+              DESCRIPTION 
+                    "Modify hwPppPAPUserName and hwPppCHAPUserName."
+
+               REVISION     "201712181547Z"
+               DESCRIPTION 
+                  "Add hwPppProtocolStatTable."
+               REVISION     "201509191508Z" 
+
+                DESCRIPTION 
+                    "The MIB contains objects of module PPP."
+               REVISION     "200403031508Z" 
+               DESCRIPTION 
+                  "Add hwPppV6UrpfStrict."
+
+        ::= { hwBRASMib 2 }
+    
+        hwPPPoXMibObjects OBJECT IDENTIFIER ::= { hwBRASPPPoX 1 }
+        
+        hwPppConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "PPP configuration information table.
+                "
+            ::= { hwPPPoXMibObjects 1 }
+        
+        hwPppConfigEntry OBJECT-TYPE
+            SYNTAX HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwVtIndex }
+            ::= { hwPppConfigTable 1 }
+        
+        HwPppConfigEntry ::=
+            SEQUENCE { 
+                hwVtIndex
+                    Integer32,
+                hwPppAuthMode
+                    INTEGER,
+                hwPppNegTimeout
+                    Integer32,
+                hwPppKeepInterval
+                    Integer32,
+                hwPppKeepRetransmit                    
+                    Integer32,
+                hwPppCHAPUserName
+                    OCTET STRING,
+                hwPppCHAPUserPassword
+                    OCTET STRING,   
+                hwPppPAPUserName
+                        OCTET STRING, 
+                hwPppPAPUserPassword   
+                        OCTET STRING,                 
+                        hwPppServiceName1
+                            OCTET STRING,
+                        hwPppServiceName2
+                            OCTET STRING,
+                        hwPppServiceName3
+                            OCTET STRING,
+                        hwPppServiceName4
+                            OCTET STRING,
+                        hwPppServiceName5
+                            OCTET STRING,
+                        hwPppServiceName6
+                            OCTET STRING,
+                        hwPppServiceName7
+                            OCTET STRING,
+                        hwPppServiceName8
+                            OCTET STRING,
+                    hwPppServiceNameType
+                            INTEGER,
+                        hwPppAcName
+                            OCTET STRING,
+                       hwPppCHAPUserPasswordKeyType
+                            INTEGER,
+                       hwPppPAPUserPasswordKeyType
+                            INTEGER,
+                     hwPppV6UrpfStrict
+                           Integer32
+             }
+
+            hwVtIndex OBJECT-TYPE
+                SYNTAX Integer32 (0..1023)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "This object indicates a VT index. The value is an integer ranging from 0 to 1023.
+                    "
+                ::= { hwPppConfigEntry 1 }
+            
+        hwPppAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pap(0),
+                chap(1),
+                auto(2),
+                mschapv1(3),
+                mschapv2(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PPP user authentication mode.  0 (PAP): indicates PAP authentication. In this mode, the user name and password are transmitted in plaintext. 1 (CHAP): indicates CHAP authentication. In this mode, the user name and password are transmitted in ciphertext. 2 (Auto): indicates the autonegotiation mode. If the device and PPP dialer have different authentication modes, the authentication mode of the device is adjusted to be the same as that of the PPP dialer. 3 (mschapv1): indicates MSCHAPv1 authentication. In this mode, the user name and password are transmitted in ciphertext. 4 (mschapv2): indicates MSCHAPv2 authentication. In this mode, the user name and password are transmitted in ciphertext.
+                "
+            DEFVAL { 1 }
+            ::= { hwPppConfigEntry 2 }
+        
+        hwPppNegTimeout OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates a PPP negotiation timeout period. If PPP fails to receive a reply packet within the set timeout period, it resends the packet. The value is an integer ranging from 1s to 10s.  The default value is 3s.
+                "
+            DEFVAL { 3 }
+            ::= { hwPppConfigEntry 3 }
+        
+        hwPppKeepInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            UNITS "seconds"
+                MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the PPP detection packet transmission interval. The value is an integer ranging from 0 to 65535, in seconds. The default value is 20.
+                "
+            DEFVAL { 20 }
+            ::= { hwPppConfigEntry 4 }
+
+        hwPppKeepRetransmit OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the retransmission times. The value is an integer ranging from 1 to 10. The default value is 3."
+            DEFVAL { 3 }
+            ::= { hwPppConfigEntry 5 }
+
+        hwPppCHAPUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..253))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config CHAP authentication username.
+                "
+            ::= { hwPppConfigEntry 6 }
+                
+        hwPppCHAPUserPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..24|32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config CHAP authentication password(only support simple password).
+                "
+            ::= { hwPppConfigEntry 7 }
+
+        hwPppPAPUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..253))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config PAP authentication username.
+                "
+            ::= { hwPppConfigEntry 8 }
+                
+        hwPppPAPUserPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..24|32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config PAP authentication password(only support simple password).
+                "
+            ::= { hwPppConfigEntry 9 }
+        hwPppServiceName1 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name one .
+                "
+            ::= { hwPppConfigEntry 10 }
+        hwPppServiceName2 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name two .
+                "
+            ::= { hwPppConfigEntry 11 }
+        hwPppServiceName3 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name three .
+                "
+            ::= { hwPppConfigEntry 12 }
+        hwPppServiceName4 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name four .
+                "
+            ::= { hwPppConfigEntry 13 }
+        hwPppServiceName5 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name five .
+                "
+            ::= { hwPppConfigEntry 14 }
+        hwPppServiceName6 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name six .
+                "
+            ::= { hwPppConfigEntry 15 }
+        hwPppServiceName7 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name seven .
+                "
+            ::= { hwPppConfigEntry 16 }
+        hwPppServiceName8 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Service name eight .
+                "
+            ::= { hwPppConfigEntry 17 }
+        hwPppServiceNameType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                exactMatch(1),
+                normalMatch(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config servicename kind of match.
+                1 exact match.
+                2 fuzzy match(default).
+                "
+            DEFVAL { 2 }
+            ::= { hwPppConfigEntry 18 }
+        hwPppAcName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..31))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                AcName.
+                "
+            ::= { hwPppConfigEntry 19 }
+
+        hwPppCHAPUserPasswordKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+            {simple(1),cipher(2),none(3)
+            }            
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                ppp chap authentication password type, none indicates not configure password.
+                "
+            DEFVAL { 2 }
+            ::= { hwPppConfigEntry 20 }
+
+        hwPppPAPUserPasswordKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+            {simple(1),cipher(2),none(3)
+            }               
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                ppp pap authentication password type, none indicates not configure password.
+                "
+            DEFVAL { 2 }
+            ::= { hwPppConfigEntry 21 }
+   
+          hwPppV6UrpfStrict OBJECT-TYPE
+            SYNTAX Integer32 (0..2)             
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Config ipv6 urpf strict enable.
+                "
+            ::= { hwPppConfigEntry 22 }
+
+
+        hwPppVTBindTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppVTBindEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "PPP VT and interface binding configuration information table.
+                "
+            ::= { hwPPPoXMibObjects 2 }
+        
+        hwPppVTBindEntry OBJECT-TYPE
+            SYNTAX HwPppVTBindEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwPppVTBindIfIndex }
+            ::= { hwPppVTBindTable 1 }
+        
+        HwPppVTBindEntry ::=
+            SEQUENCE { 
+                hwPppVTBindIfIndex
+                    InterfaceIndex,
+                hwVtNumber
+                    Integer32
+                }
+    
+            hwPppVTBindIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface index.
+                "
+            ::= { hwPppVTBindEntry 1 }
+    
+        hwVtNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..1023|65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Vt index.
+                "
+            DEFVAL { 65535 }
+            ::= { hwPppVTBindEntry 2 }
+  --======
+        hwPPPoXStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPPPoXStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "PPPoX Statistic information table.
+                "
+            ::= { hwPPPoXMibObjects 3 }
+        
+        hwPPPoXStatEntry OBJECT-TYPE
+            SYNTAX HwPPPoXStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            INDEX { hwPPPoXStatIfIndex,hwPPPoXStatPevlan,hwPPPoXStatCevlan }
+            ::= { hwPPPoXStatTable 1 }
+        
+        HwPPPoXStatEntry ::=
+            SEQUENCE { 
+                hwPPPoXStatIfIndex   Integer32, 
+                hwPPPoXStatPevlan    Integer32, 
+                hwPPPoXStatCevlan    Integer32, 
+                hwPPPoXStatlastRateRefreshInterval    Counter64, 
+                hwPPPoXStatRateInPackets    Counter64, 
+                hwPPPoXStatlastOneMinuteRateInBytes   Counter64, 
+                hwPPPoXStatlastOneMinuteRateOutPackets    Counter64, 
+                hwPPPoXStatlastOneMinuteRateOutBytes   Counter64, 
+                hwPPPoXStatInPADIPackets   Counter64, 
+                hwPPPoXStatInPADRPackets    Counter64, 
+                hwPPPoXStatInPADTPackets     Counter64, 
+                hwPPPoXStatOutPADOPackets     Counter64, 
+                hwPPPoXStatOutPADSPackets     Counter64, 
+                hwPPPoXStatReset     INTEGER
+                                             
+                }
+    
+            hwPPPoXStatIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index.
+                "
+            ::= { hwPPPoXStatEntry 1 }
+    
+        hwPPPoXStatPevlan OBJECT-TYPE
+            SYNTAX Integer32 (1..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the outer VLAN tag.
+                "
+            ::= { hwPPPoXStatEntry 2 }         
+
+    
+        hwPPPoXStatCevlan OBJECT-TYPE
+            SYNTAX Integer32 (0..4094)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the inner VLAN ID.
+                "
+            ::= { hwPPPoXStatEntry 3 }
+    
+        hwPPPoXStatlastRateRefreshInterval OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interval at which data is updated.
+                "
+            ::= { hwPPPoXStatEntry 4 }
+    
+        hwPPPoXStatRateInPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of incoming packets per minute.
+                "
+            ::= { hwPPPoXStatEntry 5 }
+    
+        hwPPPoXStatlastOneMinuteRateInBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the bytes of incoming packets per minute.
+                "
+            ::= { hwPPPoXStatEntry 6 }
+    
+        hwPPPoXStatlastOneMinuteRateOutPackets OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of outgoing packets per minute.
+                "
+            ::= { hwPPPoXStatEntry 7 }
+    
+        hwPPPoXStatlastOneMinuteRateOutBytes OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of outgoing packets per minute.
+                "
+            ::= { hwPPPoXStatEntry 8 }
+    
+        hwPPPoXStatInPADIPackets OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of PADI packets.
+                "
+            ::= { hwPPPoXStatEntry 9 }
+    
+        hwPPPoXStatInPADRPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of PADR packets.
+                "
+            ::= { hwPPPoXStatEntry 10 }
+    
+        hwPPPoXStatInPADTPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of PADT packets.
+                "
+            ::= { hwPPPoXStatEntry 11 }
+    
+        hwPPPoXStatOutPADOPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of PADO packets.
+                "
+            ::= { hwPPPoXStatEntry 12 }
+    
+        hwPPPoXStatOutPADSPackets  OBJECT-TYPE
+            SYNTAX Counter64 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of PADS packets.
+                "
+            ::= { hwPPPoXStatEntry 13 }
+    
+        hwPPPoXStatReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                reset(1),
+                invalid(2)
+                }
+
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether statistics are reset.
+                "
+            DEFVAL { 2 }
+            ::= { hwPPPoXStatEntry 14 }
+            
+  --======
+            
+    --  ============== conformance information ==============
+        hwPppConformance OBJECT IDENTIFIER ::= { hwBRASPPPoX 2 }
+        
+        
+        hwPppCompliances OBJECT IDENTIFIER ::= { hwPppConformance 1 }
+        hwPppCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwPppConfigGroup, hwPppVTBindGroup }  
+                                               
+              ::= { hwPppCompliances 1 }  
+              
+  
+  
+  
+  
+          
+        --  ============== groups ==============  
+        hwPppGroups OBJECT IDENTIFIER ::= { hwPppConformance 2 } 
+        
+        hwPppConfigGroup OBJECT-GROUP
+            OBJECTS {
+                hwVtIndex,
+                hwPppAuthMode,
+                hwPppNegTimeout,
+                hwPppKeepInterval,
+                hwPppKeepRetransmit,
+                hwPppCHAPUserName,
+                hwPppCHAPUserPassword,   
+                hwPppPAPUserName, 
+                hwPppPAPUserPassword,                 
+                        hwPppServiceName1,
+                        hwPppServiceName2,
+                        hwPppServiceName3,
+                        hwPppServiceName4,
+                        hwPppServiceName5,
+                        hwPppServiceName6,
+                        hwPppServiceName7,
+                        hwPppServiceName8,
+                    hwPppServiceNameType,
+                    hwPppAcName
+             }       
+            STATUS current
+            DESCRIPTION 
+                "The ppp config group."
+            ::= { hwPppGroups 1 }
+
+
+        hwPppVTBindGroup OBJECT-GROUP
+            OBJECTS { hwPppVTBindIfIndex, hwVtNumber }            
+            STATUS current
+            DESCRIPTION 
+                "The ppp VT Bind group."
+            ::= { hwPppGroups 2 }
+             
+                    
+        --  ============== conformance information define end ==============
+    
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3
+        hwPppProtocolStatTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppProtocolStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "PPP Protocol Statistic information table.
+                "
+            ::= { hwPppConformance 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1
+        hwPppProtocolStatEntry OBJECT-TYPE
+            SYNTAX HwPppProtocolStatEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "PPP Protocol Statistic information entry.
+                "
+            INDEX { hwPppProtocolStatIfIndex }
+            ::= { hwPppProtocolStatTable 1 }
+
+        
+        HwPppProtocolStatEntry ::=
+            SEQUENCE { 
+                hwPppProtocolStatIfIndex
+                    Integer32,
+                hwPppRecvLcpConReqNum
+                    Counter64,
+                hwPppRecvLcpConAckNum
+                    Counter64,
+                hwPppSendLcpConReqNum
+                    Counter64,
+                hwPppSendLcpConAckNum
+                    Counter64,
+                hwPppRecvLcpConNakNum
+                    Counter64,
+                hwPppRecvLcpConRejNum
+                    Counter64,
+                hwPppSendLcpConNakNum
+                    Counter64,
+                hwPppSendLcpConRejNum
+                    Counter64,
+                hwPppRecvLcpTermReqNum
+                    Counter64,
+                hwPppRecvLcpTermAckNum
+                    Counter64,
+                hwPppSendLcpTermReqNum
+                    Counter64,
+                hwPppSendLcpTermAckNum
+                    Counter64,
+                hwPppRecvIpcpConReqNum
+                    Counter64,
+                hwPppRecvIpcpConAckNum
+                    Counter64,
+                hwPppSendIpcpConReqNum
+                    Counter64,
+                hwPppSendIpcpConAckNum
+                    Counter64,
+                hwPppRecvIpcpConNakNum
+                    Counter64,
+                hwPppRecvIpcpConRejNum
+                    Counter64,
+                hwPppSendIpcpConNakNum
+                    Counter64,
+                hwPppSendIpcpConRejNum
+                    Counter64,
+                hwPppRecvIpv6cpConReqNum
+                    Counter64,
+                hwPppRecvIpv6cpConAckNum
+                    Counter64,
+                hwPppSendIpv6cpConReqNum
+                    Counter64,
+                hwPppSendIpv6cpConAckNum
+                    Counter64,
+                hwPppRecvIpv6cpConNakNum
+                    Counter64,
+                hwPppRecvIpv6cpConRejNum
+                    Counter64,
+                hwPppSendIpv6cpConNakNum
+                    Counter64,
+                hwPppSendIpv6cpConRejNum
+                    Counter64,
+                hwPppRecvPapAuthReqNum
+                    Counter64,
+                hwPppSendPapAuthAckNum
+                    Counter64,
+                hwPppSendChapChallageNum
+                    Counter64,
+                hwPppRecvChapResponseNum
+                    Counter64,
+                hwPppSendChapAckNum
+                    Counter64,
+                hwPppStatReset
+                    INTEGER
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.1
+        hwPppProtocolStatIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface index.
+                "
+            ::= { hwPppProtocolStatEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.2
+        hwPppRecvLcpConReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Lcp Configure Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.3
+        hwPppRecvLcpConAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Lcp Configure Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.4
+        hwPppSendLcpConReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Lcp Configure Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.5
+        hwPppSendLcpConAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Lcp Configure Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.6
+        hwPppRecvLcpConNakNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Lcp Configure Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.7
+        hwPppRecvLcpConRejNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Lcp Configure Request Number.
+                
+                "
+            ::= { hwPppProtocolStatEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.8
+        hwPppSendLcpConNakNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended  Lcp Configure Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.9
+        hwPppSendLcpConRejNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended  Lcp Configure Reject Number.
+                
+                "
+            ::= { hwPppProtocolStatEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.10
+        hwPppRecvLcpTermReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Lcp Terminate Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 10 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.11
+        hwPppRecvLcpTermAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Lcp Terminate Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 11 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.12
+        hwPppSendLcpTermReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Lcp Terminate Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 12 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.13
+        hwPppSendLcpTermAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Lcp Terminate Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 13 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.14
+        hwPppRecvIpcpConReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipcp Configure Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 14 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.15
+        hwPppRecvIpcpConAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipcp Configure Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 15 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.16
+        hwPppSendIpcpConReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipcp Configure Request Number."
+            ::= { hwPppProtocolStatEntry 16 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.17
+        hwPppSendIpcpConAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipcp Configure Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 17 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.18
+        hwPppRecvIpcpConNakNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipcp Configure Nak Number.
+                "
+            ::= { hwPppProtocolStatEntry 18 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.19
+        hwPppRecvIpcpConRejNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipcp Configure Reject Number.
+                "
+            ::= { hwPppProtocolStatEntry 19 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.20
+        hwPppSendIpcpConNakNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipcp Configure Nak Number.
+                "
+            ::= { hwPppProtocolStatEntry 20 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.21
+        hwPppSendIpcpConRejNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipcp Configure Reject Number.
+                "
+            ::= { hwPppProtocolStatEntry 21 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.22
+        hwPppRecvIpv6cpConReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipv6cp Configure Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.23
+        hwPppRecvIpv6cpConAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipv6cp Configure Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 23 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.24
+        hwPppSendIpv6cpConReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipv6cp Configure Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 24 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.25
+        hwPppSendIpv6cpConAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipv6cp Configure Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 25 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.26
+        hwPppRecvIpv6cpConNakNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipv6cp Configure Nak Number.
+                "
+            ::= { hwPppProtocolStatEntry 26 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.27
+        hwPppRecvIpv6cpConRejNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Ipv6cp Configure Reject Number.
+                "
+            ::= { hwPppProtocolStatEntry 27 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.28
+        hwPppSendIpv6cpConNakNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipv6cp Configure Nak Number.
+                "
+            ::= { hwPppProtocolStatEntry 28 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.29
+        hwPppSendIpv6cpConRejNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended Ipv6cp Configure Reject Number.
+                "
+            ::= { hwPppProtocolStatEntry 29 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.30
+        hwPppRecvPapAuthReqNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Received Pap Auth Request Number.
+                "
+            ::= { hwPppProtocolStatEntry 30 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.31
+        hwPppSendPapAuthAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended  Pap Auth Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 31 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.32
+        hwPppSendChapChallageNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Sended  Chap Challage Number.
+                "
+            ::= { hwPppProtocolStatEntry 32 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.33
+        hwPppRecvChapResponseNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Recviverd Chap Response Number.
+                "
+            ::= { hwPppProtocolStatEntry 33 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.34
+        hwPppSendChapAckNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Send Chap Ack Number.
+                "
+            ::= { hwPppProtocolStatEntry 34 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.40.2.2.3.1.35
+        hwPppStatReset OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                reset(1),
+                invaild(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "PppStat Reset Flag.
+                "
+            DEFVAL { 2 }
+            ::= { hwPppProtocolStatEntry 35 }
+    
+    END

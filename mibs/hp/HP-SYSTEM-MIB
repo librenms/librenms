@@ -1,0 +1,537 @@
+HP-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Gauge32, IpAddress,
+	NOTIFICATION-TYPE, Unsigned32, 
+	Integer32					FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, TruthValue, 
+	DisplayString				FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  	FROM SNMPv2-CONF
+	hpProcurveCommon                  	    FROM HP-BASE-MIB;
+
+    hpProcurveSystem MODULE-IDENTITY
+	LAST-UPDATED 	"200502011455Z"
+	ORGANIZATION "Hewlett Packard Company,
+                     ProCurve Networking Business"
+	CONTACT-INFO "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+        DESCRIPTION  "This MIB module describes objects for basic
+		     management of  devices in the HP Procurve
+                     product line."
+    REVISION     "200502011455Z"  -- February 1, 2005
+    DESCRIPTION  "Modified to reflect new OID hierarchy for 
+                  HP J8162A XL Access Controller Module." 		
+                    
+	::= { hpProcurveCommon 1 }
+
+hpProcurveSysMib OBJECT IDENTIFIER ::= { hpProcurveSystem 1 }
+hpSystemMIBObjects OBJECT IDENTIFIER ::= { hpProcurveSystem 2 }
+    
+hpConfig OBJECT IDENTIFIER                ::= {  hpSystemMIBObjects 1 }
+hpStatus  OBJECT IDENTIFIER                ::= {  hpSystemMIBObjects 2 }
+hpNotificationsConfig  OBJECT IDENTIFIER  ::= {  hpSystemMIBObjects 3 }
+
+    
+-- System objects
+    hpProductDescription OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Textual Description of the HW product"
+	::= { hpProcurveSysMib 1 }
+
+    hpProductHWVersion OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"HW version of the product"
+	::= { hpProcurveSysMib 2 }
+      
+    hpProductSWVersion OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"SW version of the product"
+	::= { hpProcurveSysMib 3 }   
+
+    hpProductSerialNumber OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Serial Number of the product"
+	::= { hpProcurveSysMib 4 }
+
+
+    hpProductLastChange OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Date and time of last configuration change"
+	::= { hpProcurveSysMib 5 }
+
+-- Environmental 
+    hpCpuTemperature OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"Current temperature in degrees centigrade 
+			of the CPU."
+	::= { hpProcurveSysMib 6 }
+
+    hpPowerSupplyTemperature OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		deprecated
+	DESCRIPTION 	"Current temperature in degrees centigrade 
+			of the power supply."
+	::= { hpProcurveSysMib 7 }
+
+    hpChassisTemperature OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION 	"Current temperature in degrees centigrade 
+                        of the mother board. Note: this is not the
+                        ambient temperature of the box."
+	::= { hpProcurveSysMib 8 }
+
+    hpFanStatusTable OBJECT-TYPE
+	SYNTAX 		SEQUENCE OF HpFanStatusEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION 	"Table of operational status of all internal 
+			cooling fans."
+	::= { hpProcurveSysMib 9 }
+
+    hpFanStatusEntry OBJECT-TYPE
+	SYNTAX		HpFanStatusEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Entry in table of all internal cooling fans."
+	INDEX		{ hpFanNumber }
+	::= { hpFanStatusTable 1 }
+
+    HpFanStatusEntry ::=
+        SEQUENCE { 
+	    hpFanNumber 	INTEGER,
+	    hpFanOperational 	INTEGER,
+	    hpFanSpeed	 	Integer32
+	}
+
+    hpFanNumber OBJECT-TYPE
+	SYNTAX		INTEGER { cpu(1),power(2) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Identifier of cooling fan, numbered to represent what 
+			hardware the fan is supposed to be cooling."
+	::= { hpFanStatusEntry 1 }
+
+    hpFanOperational OBJECT-TYPE
+	SYNTAX		INTEGER { true(1),false(2) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Operational status of a cooling fan."
+	::= { hpFanStatusEntry 2 }
+
+    hpFanSpeed OBJECT-TYPE
+	SYNTAX		Integer32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Speed of the fan in RPM."
+	::= { hpFanStatusEntry 3 }
+
+	-- hpConfig group
+-- Additional information relating to the configuration of the HP ProCurve Networking 
+-- Business Device
+
+
+hpName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            device.  For instance, this string reflects the setting of
+            the HP J8162A XL Access Controller Module Name available on the Administrative 
+            Web based User Interface.  If no HP J8162A XL Access Controller Module name
+            is entered, this object contains a zero-length string."
+    ::= { hpConfig 2 }
+
+hpSystemID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique identifier for this device, as used by
+            this system, or a master controlling system.  For instance, an
+            HP J8162A XL Access Controller Module would report the systemID used by the
+	        Access Control Server 740wl to uniquely identify this device."
+    ::= { hpConfig 3 }
+
+
+hpState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                unknown(1),
+                up(2),       -- ready to pass packets
+                down(3),
+                primary(4),  -- for Failover operation    
+                secondary(5) -- for Failover operation 
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current state of the device. A HP ProCurve Networking Business 
+	    device can be configured for standalone operation, 
+	    Failover (ie with a redundant peer), or for Distribution 
+	    of configuration from a controlling central system to 
+	    remote entities. 
+                 unknown(1)    - system Configuration status unknown
+                 up(2)         - a standalone system is operational.
+                 down(3)       - a system is not operational.
+                 primary(4)    - system is running as the primary in
+                                 a Failover peer configuration.
+                 secondary(5)  - system is running as the backup in
+                                 a Failover peer configuration."
+    ::= { hpConfig 4 }
+
+hpDistributionType OBJECT-TYPE
+-- NOT CURRENTLY SUPPORTED - will report dummy values
+    SYNTAX  INTEGER {
+                unknown(1),
+                rightsPush(2)   -- push central rights to remote systems.
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The most recent distribution event type on a device.  
+             This object will change dynamically based on
+             the most recently triggered distribution event.
+                 unknown(1)    - the distribution event type
+                 none(2)       - no distribution event has occurred
+                 rightsPush(3) - the central Access Control Server 740wl 
+		 has triggered a rights push event to remote Access Control Server
+		 740wls."
+    ::= { hpConfig 5 }
+
+hpDistributionStatus OBJECT-TYPE
+-- NOT CURRENTLY SUPPORTED - will report dummy values
+    SYNTAX  INTEGER {
+                unknown(1),
+                succeeded(2),   
+                failed(3)   
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The most recent distribution event on a device.  
+             This object will change dynamically based on
+             the most recently triggered distribution event.
+                 unknown(1)    - the distribution event status unknown
+                 succeeded(2)  - no distribution event has succeeded
+                 failed(3) - the distribution event failed for some reason."
+    ::= { hpConfig 6 }
+
+hpIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The administratively assigned IP address associated with the 
+             device.  This can be assigned statically on the
+             device Console port, or configured via DHCP."
+    ::= { hpConfig 7 }
+
+hpPeerIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The administratively assigned IP address associated with a 
+            redundant peer device, configured to work with this device 
+            for failover purposes.  This can be assigned statically on the
+            device Console port, or configured via DHCP.  If the device 
+            does not support Failover configuration, or none has been 
+            configured, this object will report 0.0.0.0"
+    ::= { hpConfig 8 }
+
+hpTechSupportEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object contains the current setting for the technical
+             support access to the device.  A value of true(1) 
+             indicates the Technical Support Access has been enabled. A value
+             of false(2) indicates this access has been disabled.  Note 
+             this object should only report true(2) if HP ProCurve Networking 
+	     Business Technical Support staff have requested this access 
+	     to the HP J8162A XL Access Controller Module for troubleshooting purposes."
+    DEFVAL      { false }
+
+    ::= { hpConfig 9 }
+
+hpFailedAdminIpAddress OBJECT-TYPE
+-- NOT CURRENTLY SUPPORTED - will report dummy values
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address associated with the last failed
+	    authentication to the Administrative UI. If no Administrator
+             had failed authentication, this object will report 0.0.0.0"
+    ::= { hpConfig 10 }
+
+-- hpStatus
+
+hpNumAccessControllers  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of HP J8162A XL Access Controller Modules known to this system.  
+	    If this system is an HP J8162A XL Access Controller Module, this value will be 1.
+	    Otherwise, this value will be the number of HP J8162A XL Access Controller Modules
+	    this system is connected to (i.e. An Access Control Server 740wl
+	    connects to multiple HP J8162A XL Access Controller Module's)."
+    ::= { hpStatus 1 }
+
+hpNumClients  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of active authenticated or unauthenticated 
+            clients known to this system. If this device is an 
+            HP J8162A XL Access Controller Module, then this object reports 
+            the aggregated number of clients across all ports. If this device
+            is a Access Control Server 740wl, it reports all Clients aggregated
+            across all HP J8162A XL Access Controller Modules known to this system."
+    ::= { hpStatus 2 }
+
+
+-- hpNotificationsConfig group
+--  Configure system level notifications
+
+hpFailoverNotificationEnabled OBJECT-TYPE
+-- NOT CURRENTLY SUPPORTED - will report dummy values
+    SYNTAX 	TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object controls whether a hpFailover notification will 
+            be sent in the event of a failover occurrence between a primary
+	    and standby system. By default this object is set to false(2) 
+            for all systems."
+    ::= { hpNotificationsConfig 1 }
+
+hpDistributionNotificationEnabled OBJECT-TYPE
+-- NOT CURRENTLY SUPPORTED - will report dummy values
+    SYNTAX 	TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object controls whether a hpDistribution notification will 
+            be sent in the event of a distribution event between a central
+	    and remote systems. By default this object is set to false(2) 
+            for all systems."
+   DEFVAL      { false }
+    ::= { hpNotificationsConfig 2 }
+
+
+hpAdminAuthFailureNotificationEnabled OBJECT-TYPE
+-- NOT CURRENTLY SUPPORTED - will report dummy values
+   SYNTAX 	TruthValue
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+            "This object controls whether a hpAdminAuthFailure 
+	    notification will be sent in the event of a failed 
+	    authentication attempt at the administrator login."
+   DEFVAL      { false }
+    ::= { hpNotificationsConfig 3 }
+
+
+-- Traps
+    hpSystemTraps OBJECT IDENTIFIER ::= { hpProcurveSystem 0 }
+
+    fanDown	NOTIFICATION-TYPE
+	OBJECTS		{ hpFanNumber }
+	STATUS		current
+	DESCRIPTION	"A fanDown trap signifies that hpFanOperational has
+			detected an event where the fan is not operating."
+	::= { hpSystemTraps 1 }
+
+    fanUp NOTIFICATION-TYPE
+	OBJECTS		{ hpFanNumber }
+	STATUS		current
+	DESCRIPTION 	"A fanUp trap signifies that hpFanOperational has
+			detected an event where the fan is now operating."
+	::= { hpSystemTraps 2 }
+
+    temperatureAlarm NOTIFICATION-TYPE
+	OBJECTS		{ hpCpuTemperature }
+	STATUS		current
+	DESCRIPTION 	"A temperatureAlarm signifies that the SNMP 
+			entity, acting in an agent role, has detected that the 
+			hpCpuTemperature has a value that exceeds acceptable
+			tolerances (i.e. it is too hot or too cold)."
+	::= { hpSystemTraps 3 }
+	
+hpFailover NOTIFICATION-TYPE
+	OBJECTS		{ hpIpAddress}
+	STATUS		current
+	DESCRIPTION 
+		"A hpFailover signifies that the SNMP 
+		entity, acting in an agent role, has detected that the 
+		standby system in a primary, redundant operation has
+                become the primary system. This notification will only
+                be sent by what was formerly the standby system."  
+       ::= { hpSystemTraps 4 }
+
+hpDistributionEvent NOTIFICATION-TYPE
+-- NOT CURRENTLY SUPPORTED 
+	OBJECTS		{ hpDistributionType, hpDistributionStatus}
+	STATUS		current
+	DESCRIPTION 
+		"A hpDistributionEvent signifies that the SNMP 
+		entity, acting in an agent role, has detected that the 
+		central entity in a distributed system has triggered a
+                distribution event of hpDistributionType."
+       ::= { hpSystemTraps 5 }
+
+
+hpAdminAuthFailure NOTIFICATION-TYPE
+-- NOT CURRENTLY SUPPORTED 
+	OBJECTS		{ hpFailedAdminIpAddress}
+	STATUS		current
+	DESCRIPTION 
+		"A hpAdminAuthFailure signifies that the SNMP 
+		entity, acting in an agent role, has detected that 
+		someone at the address reported by hpAdminIpAddress
+                has failed to authenticate to the device via
+                the administrative interface."
+   
+	::= { hpSystemTraps 6 }
+
+
+-- conformance information
+
+hpSystemMIBConformance OBJECT IDENTIFIER ::= {  hpProcurveSystem 3 }
+hpCompliances OBJECT IDENTIFIER ::= { hpSystemMIBConformance 1 }
+hpGroups OBJECT IDENTIFIER ::=      { hpSystemMIBConformance 2 }
+
+
+hpSystemMIBCompliance1  MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the HP-SYSTEM-MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { hpSystemGroup, hpConfigGroup }
+
+        GROUP hpEnvGroup
+        DESCRIPTION
+                "The hpEnvGroup is optional for all entities."
+
+        GROUP hpStatusGroup
+        DESCRIPTION
+                "The hpStatusGroup is optional for all entities."
+
+
+        GROUP hpNotificationsConfigGroup
+        DESCRIPTION
+                "The hpNotificationsConfigGroup is optional for all entities."
+
+        GROUP hpNotificationsGroup
+        DESCRIPTION
+                "The hpNotificationsGroup is optional for all entities."
+
+        OBJECT          hpName
+        MIN-ACCESS      read-only
+        DESCRIPTION     "Write access is not required."
+
+        OBJECT          hpIpAddress
+        MIN-ACCESS      read-only
+        DESCRIPTION     "Write access is not required."
+
+        OBJECT          hpTechSupportEnabled
+        MIN-ACCESS      read-only
+        DESCRIPTION     "Write access is not required."
+
+        OBJECT          hpFailoverNotificationEnabled
+        MIN-ACCESS      read-only
+        DESCRIPTION     "Write access is not required."
+
+        OBJECT          hpDistributionNotificationEnabled
+        MIN-ACCESS      read-only
+        DESCRIPTION     "Write access is not required."
+
+        OBJECT          hpAdminAuthFailureNotificationEnabled
+        MIN-ACCESS      read-only
+        DESCRIPTION     "Write access is not required."
+
+        ::= { hpCompliances 1 }
+
+-- units of conformance
+
+hpSystemGroup    OBJECT-GROUP
+    OBJECTS { hpProductDescription, hpProductHWVersion, hpProductSWVersion,
+              hpProductSerialNumber, hpProductLastChange }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing system information 
+            applicable to all devices."
+    ::= { hpGroups 1 }
+
+hpEnvGroup    OBJECT-GROUP
+    OBJECTS { hpCpuTemperature, hpPowerSupplyTemperature, hpChassisTemperature,
+              hpFanNumber, hpFanOperational, hpFanSpeed } 
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing environmental information 
+            applicable to all devices."
+    ::= { hpGroups 2 }
+
+hpConfigGroup    OBJECT-GROUP
+    OBJECTS { hpName, hpSystemID, hpState, hpIpAddress, hpPeerIpAddress,
+              hpTechSupportEnabled, hpDistributionType, hpDistributionStatus,
+              hpFailedAdminIpAddress } 
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing configuration information 
+            applicable to all devices."
+    ::= { hpGroups 3 }
+
+
+hpStatusGroup    OBJECT-GROUP
+    OBJECTS { hpNumAccessControllers, hpNumClients }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing statistics
+            applicable to all HP J8162A XL Access Controller Module like devices."
+    ::= { hpGroups 4 }
+
+hpNotificationsConfigGroup    OBJECT-GROUP
+    OBJECTS { hpFailoverNotificationEnabled, 
+              hpDistributionNotificationEnabled,
+              hpAdminAuthFailureNotificationEnabled }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing notification configuration 
+            information applicable to all devices."
+    ::= { hpGroups 5 }
+
+hpNotificationsGroup    NOTIFICATION-GROUP
+    NOTIFICATIONS { fanDown, fanUp, temperatureAlarm,
+                    hpFailover, hpDistributionEvent, hpAdminAuthFailure }
+    STATUS  current
+    DESCRIPTION
+            "notifications for primary failover, and authorization failures,
+            applicable to all devices."
+    ::= { hpGroups 6 }
+
+
+		
+END

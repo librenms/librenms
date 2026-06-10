@@ -1,0 +1,72 @@
+--
+-- Eltex Enterprise Specific MIB: Structure of Management Information
+--
+-- Copyright (c) 2007-2011, Eltex Co
+--
+-- The contents of this document are subject to change without notice.
+--
+
+ELTEX-SMI-ACTUAL DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises,
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+	IpAddress,
+	Counter64
+                FROM SNMPv2-SMI
+        DisplayString,
+        TimeStamp
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF;
+
+eltexLtd MODULE-IDENTITY
+        LAST-UPDATED "201205290000Z"
+        ORGANIZATION "Eltex Enterprise, Ltd."
+        CONTACT-INFO
+                "www.eltex.nsk.ru"
+        DESCRIPTION
+                "The Structure of Management Information for Eltex Networks."
+        REVISION     "201205290000Z"
+		DESCRIPTION  "Severity level: 4. http://snmp.cs.utwente.nl/ietf/mibs/validate/"
+        ::= { enterprises 35265 }
+
+--
+-- Eltex MIB tree structure
+--
+
+elHardware OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of eltex hardware OIDs."
+        ::= { eltexLtd 1 }
+
+elSoftware OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of eltex software OIDs."
+        ::= { eltexLtd 2 }
+
+
+
+
+eltrapGroup OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The root of eltex traps objects."
+        ::= { eltexLtd 3 }
+
+--
+-- eltexOMS "The MIB for eltex devices, that support OMS" { eltexLtd 4 } defined in ELTEX-OMS
+--
+-- eltexFile "The MIB for file operations" { eltexLtd 5 } defined in ELTEX-FILE-MANAGER-MIB
+--
+
+
+END
+

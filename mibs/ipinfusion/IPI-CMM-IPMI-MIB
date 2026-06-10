@@ -1,0 +1,540 @@
+    IPI-CMM-IPMI-MIB DEFINITIONS ::= BEGIN
+
+    --  This module provides authoritative definitions for ipmi device
+    --  controlled by BMC
+    --
+    --  This module will be extended, as needed.
+    --
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,
+        Gauge32, Counter32, Unsigned32,
+        TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DateAndTime, DisplayString,
+        MacAddress, RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        enterprises,OBJECT-IDENTITY
+            FROM SNMPv2-SMI
+    ipi FROM IPI-MODULE-MIB
+    cmmChassisObject,
+    cmmStackUnitIndex FROM IPI-CMM-CHASSIS-MIB;
+
+	cmm  MODULE-IDENTITY
+	LAST-UPDATED "202008060000Z"   -- Jun 08, 2020 12:00:00 GMT
+  ORGANIZATION "IP Infusion"
+  CONTACT-INFO "support@ipinfusion.com"
+
+	DESCRIPTION
+	   "The Structure of CMM Management Information for
+	    the IPI enterprise."
+  REVISION "202008060000Z"
+  DESCRIPTION
+      "Complying to level 3 of SMILINT"
+::= { ipi 100 }
+
+
+    -- ### Groups ###
+
+    cmmIpmiDeviceObjects       OBJECT IDENTIFIER ::={ cmmChassisObject 5 }
+    cmmIpmiDeviceAlarmObjects       OBJECT IDENTIFIER ::={ cmmChassisObject 6 }
+
+  cmmIpmiDeviceSensorTable     OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CmmIpmiDeviceSensorEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "A list of entries containing sensor information
+        for BMC controlled devices."
+        ::= { cmmIpmiDeviceObjects 1 }
+
+    cmmIpmiDeviceSensorEntry    OBJECT-TYPE
+        SYNTAX        CmmIpmiDeviceSensorEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "A list of entries containing sensor information
+        for BMC controlled devices."
+        INDEX    { cmmIpmiDeviceSensorIndex }
+          ::= { cmmIpmiDeviceSensorTable 1 }
+
+    CmmIpmiDeviceSensorEntry    ::=
+          SEQUENCE {
+            cmmIpmiDeviceSensorIndex                INTEGER,
+            cmmIpmiDeviceSensorName                 DisplayString,
+            cmmIpmiDeviceSensorValue                INTEGER,
+            cmmIpmiDeviceSensorUnits                DisplayString,
+            cmmIpmiDeviceSensorState                DisplayString,
+            cmmIpmiDeviceSensorLowerNonRecover      INTEGER,
+            cmmIpmiDeviceSensorLowerCritical        INTEGER,
+            cmmIpmiDeviceSensorLowerNonCritical     INTEGER,
+            cmmIpmiDeviceSensorUpperNonCritical     INTEGER,
+            cmmIpmiDeviceSensorUpperCritical        INTEGER,
+            cmmIpmiDeviceSensorUpperNonRecover      INTEGER
+          }
+
+      cmmIpmiDeviceSensorIndex   OBJECT-TYPE
+        SYNTAX        INTEGER (1..65535)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "The unique sensor index number."
+        ::= { cmmIpmiDeviceSensorEntry 1 }
+
+      cmmIpmiDeviceSensorName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The name of IPMI device sensor.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceSensorEntry 2 }
+
+      cmmIpmiDeviceSensorValue  OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 unit"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The value read for IPMI device sensor.
+        Unit: Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        '-100002' indicates not applicable"
+        ::= { cmmIpmiDeviceSensorEntry 3 }
+
+      cmmIpmiDeviceSensorUnits   OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The unit of the value read for IPMI device sensor.
+        For Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceSensorEntry 4 }
+
+      cmmIpmiDeviceSensorState   OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The operating state of IPMI device sensor.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceSensorEntry 5 }
+
+      cmmIpmiDeviceSensorLowerNonRecover   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 unit"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The IPMI device sensor lower non recover value.
+        Unit: Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        '-100002' indicates not applicable"
+        ::= { cmmIpmiDeviceSensorEntry 6 }
+
+      cmmIpmiDeviceSensorLowerCritical   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 unit"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The IPMI device sensor lower critical value.
+        Unit: Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        '-100002' indicates not applicable"
+        ::= { cmmIpmiDeviceSensorEntry 7 }
+
+      cmmIpmiDeviceSensorLowerNonCritical   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 unit"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The IPMI device sensor lower non critical value.
+        Unit: Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        -100002' indicates not applicable"
+        ::= { cmmIpmiDeviceSensorEntry 8 }
+
+      cmmIpmiDeviceSensorUpperNonCritical   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 unit"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The IPMI device sensor upper non critical value.
+        Unit: Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        '-100002' indicates not applicable"
+        ::= { cmmIpmiDeviceSensorEntry 9 }
+
+      cmmIpmiDeviceSensorUpperCritical   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 unit"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The IPMI device sensor upper critical value.
+        Unit: Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        '-100002' indicates not applicable"
+        ::= { cmmIpmiDeviceSensorEntry 10 }
+
+      cmmIpmiDeviceSensorUpperNonRecover   OBJECT-TYPE
+        SYNTAX        INTEGER
+        UNITS         "0.001 unit"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The IPMI device sensor upper non recover value.
+        Unit: Temperature in degree C, Current in Amps,
+          Power in Watts, Voltage in Volts, Fan-Speed in RPM.
+        '-100002' indicates not applicable"
+        ::= { cmmIpmiDeviceSensorEntry 11 }
+
+  cmmIpmiDeviceFRUTable     OBJECT-TYPE
+     SYNTAX        SEQUENCE OF CmmIpmiDeviceFRUEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+     "A list of entries containing FRU information
+     for BMC controlled devices."
+     ::= { cmmIpmiDeviceObjects 2 }
+
+    cmmIpmiDeviceFRUEntry   OBJECT-TYPE
+      SYNTAX        CmmIpmiDeviceFRUEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+      "A list of entries containing FRU information
+      for BMC controlled devices."
+      INDEX    { cmmIpmiDeviceFRUIndex }
+        ::= { cmmIpmiDeviceFRUTable 1 }
+
+    CmmIpmiDeviceFRUEntry ::=
+      SEQUENCE {
+         cmmIpmiDeviceFRUIndex            INTEGER,
+         cmmIpmiDeviceBoardMfgDate        DateAndTime,
+         cmmIpmiDeviceBoardMfg            DisplayString,
+         cmmIpmiDeviceBoardProduct        DisplayString,
+         cmmIpmiDeviceBoardSerial         DisplayString,
+         cmmIpmiDeviceBoardPartNum        DisplayString,
+         cmmIpmiDeviceProductManufacturer DisplayString,
+         cmmIpmiDeviceProductName         DisplayString,
+         cmmIpmiDeviceProductPartNum      DisplayString,
+         cmmIpmiDeviceProductVersion      DisplayString,
+         cmmIpmiDeviceProductSerial       DisplayString,
+         cmmIpmiDeviceProductAssetTag     DisplayString,
+         cmmIpmiDeviceProductExtraInfo    DisplayString,
+         cmmIpmiDeviceProductExtraInfo2   DisplayString,
+         cmmIpmiDeviceDescription         DisplayString
+      }
+
+      cmmIpmiDeviceFRUIndex   OBJECT-TYPE
+        SYNTAX        INTEGER (1..65535)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "The unique FRU index number."
+        ::= { cmmIpmiDeviceFRUEntry 1 }
+
+      cmmIpmiDeviceBoardMfgDate OBJECT-TYPE
+        SYNTAX        DateAndTime
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Board manufacturing date.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 2 }
+
+      cmmIpmiDeviceBoardMfg OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Board manufacturer name.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 3 }
+
+      cmmIpmiDeviceBoardProduct OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Board product name.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 4 }
+
+      cmmIpmiDeviceBoardSerial  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Board Serial number.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 5 }
+
+      cmmIpmiDeviceBoardPartNum OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Board Part number.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 6 }
+
+      cmmIpmiDeviceProductManufacturer OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product manufacturer name.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 7 }
+
+      cmmIpmiDeviceProductName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product name.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 8 }
+
+      cmmIpmiDeviceProductPartNum OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product part number.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 9 }
+
+      cmmIpmiDeviceProductVersion OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product version number.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 10 }
+
+      cmmIpmiDeviceProductSerial OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product serial number.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 11 }
+
+      cmmIpmiDeviceProductAssetTag  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product asset tag number.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 12 }
+
+      cmmIpmiDeviceProductExtraInfo OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product extra information.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 13 }
+
+      cmmIpmiDeviceProductExtraInfo2  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Product extra information.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 14 }
+
+      cmmIpmiDeviceDescription  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Device Description.
+        Blank indicates unavailable"
+        ::= { cmmIpmiDeviceFRUEntry 15 }
+    --
+    -- ## Notifications
+    --
+
+    cmmIpmiDeviceAlarmNotifications             OBJECT IDENTIFIER ::= { cmmIpmiDeviceAlarmObjects 1 }
+
+    cmmIpmiDeviceLNC   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorLowerNonCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be below lower non critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 1 }
+
+    cmmIpmiDeviceLNCRecovery  NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorLowerNonCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be above lower non critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 2 }
+
+    cmmIpmiDeviceLC   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorLowerCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be below lower critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 3 }
+
+    cmmIpmiDeviceLCRecovery   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorLowerCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be above lower critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 4 }
+
+    cmmIpmiDeviceLNR   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorLowerNonRecover
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be below lower non recovery threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 5 }
+
+    cmmIpmiDeviceLNRRecovery   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorLowerNonRecover
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be above lower non recovery threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 6 }
+
+    cmmIpmiDeviceUNC   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorUpperNonCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be below upper non critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 7 }
+
+    cmmIpmiDeviceUNCRecovery   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorUpperNonCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be above upper non critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 8 }
+
+    cmmIpmiDeviceUC   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorUpperCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be below upper critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 9 }
+
+    cmmIpmiDeviceUCRecovery   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorUpperCritical
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be above upper critical threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 10 }
+
+    cmmIpmiDeviceUNR   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorUpperNonRecover
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be below upper non recovery threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 11 }
+
+    cmmIpmiDeviceUNRRecovery   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName,
+        cmmIpmiDeviceSensorValue,
+        cmmIpmiDeviceSensorUpperNonRecover
+    }
+    STATUS       current
+    DESCRIPTION
+    "Set when IPMI device sensor will be above upper non recovery threshold for sensor"
+    ::= { cmmIpmiDeviceAlarmNotifications 12 }
+
+    cmmIpmiDevicePresence   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName
+    }
+    STATUS       current
+    DESCRIPTION
+    "Notified when IPMI device inserted/removed"
+    ::= { cmmIpmiDeviceAlarmNotifications 13 }
+
+    cmmIpmiDeviceStatus   NOTIFICATION-TYPE
+    OBJECTS      {
+        cmmStackUnitIndex,
+        cmmIpmiDeviceSensorName
+    }
+    STATUS       current
+    DESCRIPTION
+    "Notifies IPMI device status"
+    ::= { cmmIpmiDeviceAlarmNotifications 14 }
+
+END

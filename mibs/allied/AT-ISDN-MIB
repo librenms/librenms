@@ -1,0 +1,1286 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: isdn Call Control
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-ISDN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex,
+	InterfaceIndexOrZero
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+cc MODULE-IDENTITY
+    LAST-UPDATED "200606281222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    CC module. "
+
+    REVISION "200606281222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 37 }
+
+-- The ISDN Call Control group. This group consists of:
+--   1. the call details table
+--   2. the CLI list table
+--   3. the active calls table
+--   4. the call log table
+--   5. the attachment table
+--   6. the B channel allocation table
+
+-- The ISDN call details table. This consists of a number of entries containing
+-- configuration information for ISDN calls.
+
+ccDetailsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CcDetailsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of call details parameters."
+    ::= { cc 1 }
+
+ccDetailsEntry OBJECT-TYPE
+    SYNTAX      CcDetailsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry of ISDN call details. This contains the
+            parameters of a single ISDN call details."
+    INDEX   { ccDetailsIndex }
+    ::= { ccDetailsTable 1 }
+
+CcDetailsEntry ::=
+    SEQUENCE {
+        ccDetailsIndex
+            INTEGER,
+        ccDetailsName
+            DisplayStringUnsized,
+        ccDetailsRemoteName
+            DisplayStringUnsized,
+        ccDetailsCalledNumber
+            DisplayStringUnsized,
+        ccDetailsCallingNumber
+            DisplayStringUnsized,
+        ccDetailsAlternateNumber
+            DisplayStringUnsized,
+        ccDetailsEnabled
+            INTEGER,
+        ccDetailsDirection
+            INTEGER,
+        ccDetailsPrecedence
+            INTEGER,
+        ccDetailsHoldupTime
+            INTEGER,
+        ccDetailsPreferredIfIndex
+            InterfaceIndexOrZero,
+        ccDetailsRequiredIfIndex
+            InterfaceIndexOrZero,
+        ccDetailsPriority
+            INTEGER,
+        ccDetailsRetryT1
+            INTEGER,
+        ccDetailsRetryN1
+            INTEGER,
+        ccDetailsRetryT2
+            INTEGER,
+        ccDetailsRetryN2
+            INTEGER,
+        ccDetailsKeepup
+            INTEGER,
+        ccDetailsOutSetupCli
+            INTEGER,
+        ccDetailsOutSetupUser
+            INTEGER,
+        ccDetailsOutSetupCalledSub
+            INTEGER,
+        ccDetailsOutSubaddress
+            DisplayStringUnsized,
+        ccDetailsCallback
+            INTEGER,
+        ccDetailsCallbackDelay
+            INTEGER,
+        ccDetailsInSetupCalledSubSearch
+            INTEGER,
+        ccDetailsInSetupUserSearch
+            INTEGER,
+        ccDetailsInSetupCliSearch
+            INTEGER,
+        ccDetailsInSetupCliSearchList
+            INTEGER,
+        ccDetailsInAnyFlag
+            INTEGER,
+        ccDetailsInSetupCalledSubCheck
+            INTEGER,
+        ccDetailsInSetupUserCheck
+            INTEGER,
+        ccDetailsInSetupCliCheck
+            INTEGER,
+        ccDetailsInSetupCliCheckList
+            INTEGER,
+        ccDetailsUserType
+            INTEGER,
+        ccDetailsLoginType
+            INTEGER,
+        ccDetailsUsername
+            INTEGER,
+        ccDetailsPassword
+            INTEGER,
+        ccDetailsBumpDelay
+            INTEGER,
+        ccDetailsDataRate
+            INTEGER,
+        ccDetailsPppTemplate
+            INTEGER,
+        ccDetailsUserModule
+            INTEGER,
+        ccDetailsNumberAttachments
+            INTEGER
+    }
+
+ccDetailsIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the call details entry in the call details table. When an entry is created in this table, the index
+            does not have to be written. However, to reference the values that are written, an unused index must be found by
+            reading the index values of the table until a no such object error is returned. Attempting to create a row by
+            using an already used index will result in simply changing the parameters of an existing call details entry."
+    ::= { ccDetailsEntry 1 }
+
+ccDetailsName OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The name of the ISDN call details. This must be unique for all ISDN call details, when comparisons are done
+            ignoring the case of letters. Valid characters in the ISDN call name include 0-9, a-z, A-Z and '_'. A name
+            consisting of all digits is not valid. Setting this object is current on row creation. However, this object
+            cannot be set for an existing call. This is because for the command line interface calls are identified by name.
+            There is one exception. Setting ccDetailsName to an empty string will cause the call details to be deleted."
+    ::= { ccDetailsEntry 2 }
+
+ccDetailsRemoteName OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The remote ISDN call name. This name can be referenced by certain other call details parameters related with
+            setting up the Q.931 SETUP message for outgoing calls, or searching for calls for incoming calls. Valid characters
+            in the ISDN remote call name include 0-9, a-z, A-Z and '_'. A remote name consisting of all digits is valid."
+    DEFVAL  { "" }
+    ::= { ccDetailsEntry 3 }
+
+ccDetailsCalledNumber OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number called when this call details is activated. The number should include all telephone network access
+            codes, country codes and area codes required to make a call from the particular ISDN interface. Setting this
+            object is current on row creation."
+    ::= { ccDetailsEntry 4 }
+
+ccDetailsCallingNumber OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number used as the calling number when this call is activated. The calling number can optionally be placed
+            in the outgoing SETUP message."
+    DEFVAL  { "" }
+    ::= { ccDetailsEntry 5 }
+
+ccDetailsAlternateNumber OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number called when all retries with the main called number have failed. In this event, the router tries
+            once with the alternate number, then checks the ccDetailsKeepup object to determine whether to try again with
+            the main number."
+    DEFVAL  { "" }
+    ::= { ccDetailsEntry 6 }
+
+ccDetailsEnabled OBJECT-TYPE
+    SYNTAX      INTEGER {
+                disabled (1),
+                enabled (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Whether this ISDN call is enabled or disabled for incoming and outgoing calls. If the call details entry is
+            disabled, all existing active calls based on this call details entry are left active."
+    DEFVAL  { enabled }
+    ::= { ccDetailsEntry 7 }
+
+ccDetailsDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                inOnly (1),
+                outOnly (2),
+                both (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The direction for which calls may be made or received using this call details entry."
+    DEFVAL  { both }
+    ::= { ccDetailsEntry 8 }
+
+ccDetailsPrecedence OBJECT-TYPE
+    SYNTAX      INTEGER {
+                in (1),
+                out (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The precedence of this call details entry in the event of call collision. Call collision occurs when an
+            incoming call for a given details entry is detected while an outgoing call is waiting to complete. This
+            object configures whether the router treats the incoming or outgoing call as having precedence. Since the
+            device at the other end will also probably be experiencing a call collision, the precedence should be
+            configured to the opposite value at the other end. Setting this object is current on row creation."
+    ::= { ccDetailsEntry 9 }
+
+ccDetailsHoldupTime OBJECT-TYPE
+    SYNTAX      INTEGER (0..7200)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The time, in seconds, that active calls created from this call details should be held up after initial
+            activation. The call will be held up for at least this time, unless cleared from the network. Thus, for example,
+            PPP idle timeouts will not bring the call down."
+    DEFVAL  { 0 }
+    ::= { ccDetailsEntry 10 }
+
+ccDetailsPreferredIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of an ISDN interface on this router which is the preferred ISDN interface on which to make an
+            outgoing call using this call details entry. The ifIndex, if not 0, should reference the ifEntry which contains
+            information about the entire ISDN interface, at the lowest layer. If a channel is not available on this interface,
+            the call can try other interfaces in order to make the call. This object is not used on incoming calls. If the
+            value of this object is set to 0, no interface will be preferred over any other. If the value of this object does
+            not reference the ifEntry for the entire ISDN interface, no interface will be preferred."
+    DEFVAL  { 0 }
+    ::= { ccDetailsEntry 11 }
+
+ccDetailsRequiredIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The ifIndex of an ISDN interface on this router which is the required ISDN interface on which to make an
+            outgoing call using this call details entry. The ifIndex, if not 0, must reference the ifEntry which contains
+            information about the entire ISDN interface, at the lowest layer. If a channel is not available on this interface,
+            the call fails. This object is not used on incoming calls. If the value of this object is set to 0, no interface
+            will be required. If the value of this object does not reference the ifEntry for the entire ISDN interface, no
+            interface will be required."
+    DEFVAL  { 0 }
+    ::= { ccDetailsEntry 12 }
+
+ccDetailsPriority OBJECT-TYPE
+    SYNTAX      INTEGER (0..99)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The priority of calls generated from this call details entry. The priority determines whether calls can be bumped
+            for higher priority calls. The value of priority falls into ranges:
+            0-19 - call bumped by incoming or outgoing, voice or data calls
+            20-39 - call bumped by outgoing voice and incoming or outgoing data calls
+            40-59 - call bumped by emergency voice calls or incoming or outgoing data calls
+            60-99 - call bumped by emergency voice calls or outgoing data calls.
+            Note that when the call is bumped by a data call, the data call must have higher
+            priority than the call being bumped."
+    DEFVAL { 50 }
+    ::= { ccDetailsEntry 13 }
+
+-- Retry parameters. ISDN calls can be automatically retries in the event of a failure to establish the call. Parameters
+-- exist to set up groups of retries (N1 retries with time T1 between each retry) and groups of groups of retries (N2 retry
+-- groups with time T2 between groups).
+
+ccDetailsRetryT1 OBJECT-TYPE
+    SYNTAX      INTEGER (5..120)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The time in seconds between retries of calls generated from this call details entry."
+    DEFVAL  { 30 }
+    ::= { ccDetailsEntry 14 }
+
+ccDetailsRetryN1 OBJECT-TYPE
+    SYNTAX      INTEGER (0..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number of retries in a retry group for calls generated from this call details entry. Note that the default
+            value means that by default the call will not be retried."
+    DEFVAL { 0 }
+    ::= { ccDetailsEntry 15 }
+
+ccDetailsRetryT2 OBJECT-TYPE
+    SYNTAX      INTEGER (300..1200)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The time in seconds between retry groups for retries of calls generated from this call details entry."
+    DEFVAL  { 600 }
+    ::= { ccDetailsEntry 16 }
+
+ccDetailsRetryN2 OBJECT-TYPE
+    SYNTAX      INTEGER (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number of retry groups for calls generated from this call details entry. Note that the default value means
+            that by default no retry groups will be attempted."
+    DEFVAL  { 0 }
+    ::= { ccDetailsEntry 17 }
+
+ccDetailsKeepup OBJECT-TYPE
+    SYNTAX      INTEGER {
+                no (1),
+                yes (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "A flag indicating whether calls generated from this call details entry should be kept up always. Inspection of
+            this flag takes place when a call is cleared from an external source. If set to 'yes', the call will be retried."
+    DEFVAL  { no }
+    ::= { ccDetailsEntry 18 }
+
+ccDetailsOutSetupCli OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                calling (2),
+                interface (3),
+                nonumber (4)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The CLI information placed into outgoing SETUP messages when this call details is used to generate an outgoing
+            call. The value 'off' means that no CLI information in placed in the SETUP message. The value 'calling' means that
+            the calling number from the call details entry is placed in the SETUP message. The value 'interface' means that
+            the Q.931 interface number for the interface and DLC on which the call is made is placed in the SETUP message. The
+            value 'nonumber' means that the CLI information element is placed in the SETUP message with no number information.
+            The network will fill the number in."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 19 }
+
+ccDetailsOutSetupUser OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                local (2),
+                remote (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The user-user information placed into outgoing SETUP messages when this call details is used to generate an
+            outgoing call. The value 'off' means that no user-user information in placed in the SETUP message. The value
+            'local' means that the call name from the call details entry is placed in the SETUP message. The value 'remote'
+            means that the remote call name from the call details entry is placed in the SETUP message."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 20 }
+
+ccDetailsOutSetupCalledSub OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                local (2),
+                remote (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The called subaddress information placed into outgoing SETUP messages when this call details is used to generate
+            an outgoing call. The value 'off' means that no called subaddress information in placed in the SETUP message. The
+            value 'local' means that the call name from the call details entry is placed in the SETUP message. The value
+            'remote' means that the remote call name from the call details entry is placed in the SETUP message. Note that
+            the action of this object is overridden by the value of the object ccDetailsOutSubaddress."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 21 }
+
+ccDetailsOutSubaddress OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object gives a way to override the called subaddress information placed into outgoing SETUP messages when
+            this call details is used to generate an outgoing call, as given by the ccDetailsOutSetupCalledSub object. The
+            object is an arbitrary string of ASCII characters, from 0 to 31 characters long."
+    DEFVAL  { "" }
+    ::= { ccDetailsEntry 22 }
+
+ccDetailsCallback OBJECT-TYPE
+    SYNTAX      INTEGER {
+                no (1),
+                yes (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "A flag indicating whether or not to call back the caller when an incoming call is generated from this call
+            details entry. If set to 'yes', the incoming call will be cleared, and after a short delay, an outgoing call will
+            be activated for this call details entry."
+    DEFVAL  { no }
+    ::= { ccDetailsEntry 23 }
+
+ccDetailsCallbackDelay OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The time, in tenths of a second, which the router will wait after clearing an incoming call whose call details
+            entry specified that the caller should be called back before making the return call. The purpose of this object
+            is to allow the user to specify a delay in callback which will allow the network to properly clear the call at
+            both this end and the remote end."
+    DEFVAL  { 41 }
+    ::= { ccDetailsEntry 24 }
+
+ccDetailsInSetupCalledSubSearch OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                local (2),
+                remote (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Determines whether this call details entry is used in a search of call details for an incoming call based on the
+            contents of the called subaddress information in the incoming SETUP message. The value 'off' means that this call
+            details entry is not used in the search. The value 'local' means that the call details entry is used in the search
+            and the called subaddress information is compared with the call details entry name. The value 'remote' means that
+            the call details entry is used in the search and the called subaddress information is compared with the call
+            details entry remote name. A number of searches are carried out until a matching call is found. First a search
+            against the called subaddress in the SETUP message, then a search against the user-user information in the SETUP
+            message, then a search against the calling number information in the SETUP message, then a search for any call
+            that is configured to respond to any incoming call."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 25 }
+
+ccDetailsInSetupUserSearch OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                local (2),
+                remote (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Determines whether this call details entry is used in a search of call details for an incoming call based on the
+            contents of the user-user information in the incoming SETUP message. The value 'off' means that this call details
+            entry is not used in the search. The value 'local' means that the call details entry is used in the search and
+            the user-user information is compared with the call details entry name. The value 'remote' means that the call
+            details entry is used in the search and the user-user information is compared with the call details entry remote
+            name. A number of searches are carried out until a matching call is found. First a search against the called
+            subaddress in the SETUP message, then a search against the user-user information in the SETUP message, then a
+            search against the calling number information in the SETUP message, then a search for any call that is configured
+            to respond to any incoming call."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 26 }
+
+ccDetailsInSetupCliSearch OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                on (2),
+                list (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Determines whether this call details entry is used in a search of call details for an incoming call based on the
+            contents of the calling number information in the incoming SETUP message. The value 'off' means that this call
+            details entry is not used in the search. The value 'on' means that the call details entry is used in the search
+            and the calling number information is compared with the call details entry called number. The value 'list' means
+            that the call details entry is used in the search and the calling number information is compared with the numbers
+            on the CLI list reference by the object ccDetailsInSetupCliSearchList. The value 'list' cannot be set by an SNMP
+            management entity. Rather the ccDetailsInSetupCliSearchList object should be set to a non-zero value, which will
+            automatically set this object to 'list'.
+            A number of searches are carried out until a matching call is found. First a search against the called subaddress
+            in the SETUP message, then a search against the user-user information in the SETUP message, then a search against
+            the calling number information in the SETUP message, then a search for any call that is configured to respond to
+            any incoming call."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 27 }
+
+ccDetailsInSetupCliSearchList OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "If the ccDetailsInSetupCliSearch object is set to 'list', this
+            object gives the index of the CLI list to search. The value of
+            CLI list indices is 1..100. The value 0 is returned when the
+            ccDetailsInSetupCliSearch object is not set to 'list'. If the
+            value of this object is set to 0 via SNMP, then the
+            ccDetailsInSetupCliSearch object will be internally set to 'off'.
+            Subsequently setting the value of this object to a non-zero
+            value will set the ccDetailsInSetupCliSearch object to 'list'.
+            Note that when using the command line interface, CLI list indices
+            range from 0 to 99, but when using SNMP they range from 1 to 100.
+            This is because SNMP will not allow a table index to have the
+            value 0, and the command line usage of indices from 0 to 99 is
+            too well established to change."
+    DEFVAL  { 0 }
+    ::= { ccDetailsEntry 28 }
+
+ccDetailsInAnyFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                no (1),
+                yes (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Determines whether this call details entry will match any incoming call. After all searched for incoming calls
+            have been carried out based on called subaddress, user-user information and calling number, a search is carried
+            out for the first call found with this flag set to 'yes'."
+    DEFVAL  { no }
+    ::= { ccDetailsEntry 29 }
+
+ccDetailsInSetupCalledSubCheck OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                local (2),
+                remote (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Determines whether to perform a check when an incoming call matches this call details entry based on the
+            contents of the called subaddress information in the incoming SETUP message. The value 'off' means that the check
+            is not carried out. The value 'local' means that the check is carried out and the called subaddress information
+            is compared with the call details entry name. The value 'remote' means that the check is carried out and the
+            called subaddress information is compared with the call details entry remote name. A number of checks are
+            optionally carried out once a matching call is found. The first check is against the called subaddress in the
+            SETUP message, then against the user-user information in the SETUP message, then against the calling number
+            information in the SETUP message."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 30 }
+
+ccDetailsInSetupUserCheck OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                local (2),
+                remote (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Determines whether to perform a check when an incoming call matches this call details entry based on the
+            contents of the user-user information in the incoming SETUP message. The value 'off' means that the check
+            is not carried out. The value 'local' means that the check is carried out and the user-user information
+            is compared with the call details entry name. The value 'remote' means that the check is carried out and the
+            user-user information is compared with the call details entry remote name. A number of checks are
+            optionally carried out once a matching call is found. The first check is against the called subaddress in the
+            SETUP message, then against the user-user information in the SETUP message, then against the calling number
+            information in the SETUP message."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 31 }
+
+ccDetailsInSetupCliCheck OBJECT-TYPE
+    SYNTAX      INTEGER {
+                off (1),
+                present (2),
+                required (3)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Determines whether to perform a check and which check to perform when an incoming call matches this call details
+            entry based on the contents of the calling number information in the incoming SETUP message. The value 'off' means
+            that the check is not carried out. The value 'present' means that the check is carried out only if calling number
+            information is present. The value 'required' means that the calling number must be present for the check to pass.
+            When the check is carried out, the calling number information is compared with the numbers in the CLI list
+            referenced by the object ccDetailsInSetupCliCheckList.
+            A number of checks are optionally carried out once a matching call is found. The first check is against the called
+            subaddress in the SETUP message, then against the user-user information in the SETUP message, then against the
+            calling number information in the SETUP message."
+    DEFVAL  { off }
+    ::= { ccDetailsEntry 32 }
+
+ccDetailsInSetupCliCheckList OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "If the ccDetailsInSetupCliCheck object is set to 'present' or
+            'required', this object gives the index of the CLI list to check
+            against. The value of CLI list indices is 1..100. The value 0
+            means that no list to check against is defined and the check
+            immediately fails. Note that when using the command line
+            interface, CLI list indices range from 0 to 99, but when using
+            SNMP they range from 1 to 100. This is because SNMP will not
+            allow a table index to have the value 0, and the command line
+            usage of indices from 0 to 99 is too well established to change."
+    DEFVAL  { 0 }
+    ::= { ccDetailsEntry 33 }
+
+ccDetailsUserType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                attach (1),
+                ppp (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The type of user of this call. The value 'attach' means that users have to attach to this call before the call
+            can be used for outgoing or incoming calls. The value 'ppp' means that for incoming calls only dynamic PPP
+            interfaces will be created whenever this call details entry is matched."
+    DEFVAL  { attach }
+    ::= { ccDetailsEntry 34 }
+
+ccDetailsLoginType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (1),
+                userdb (2),
+                radius (3),
+                papTacacs (4),
+                chap (5),
+                papRadius (6),
+                tacacs (7),
+                all (8)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The type of login for calls generated using this call details entry, for incoming calls only. Incoming calls
+            can be configured to go through a logging in phase before the call is brought up. This object defines which login
+            types are used. The value 'none' means don't do a login phase. The value 'userdb' means use the user database on
+            the router to check login parameters. The value 'radius' means use the router's configured RADIUS servers to
+            check the login parameters. The values 'pap-tacacs', 'chap' and 'pap-radius' apply only when the user is 'ppp' and
+            determine how the dynamic PPP interface are configured for authentication. The value 'pap-tacacs' means use PAP
+            to authenticate and use the TACACS server to check the login parameters. The value 'pap-radius' means use PAP
+            to authenticate and use the RADIUS server to check the login parameters. The value 'chap' means use CHAP to
+            authenticate. The value 'tacacs' means use the TACACS server to check login parameters. The value 'all' means use
+            the user database, TACACS and RADIUS to check the login parameters. The login parameters for values 'userdb',
+            'radius', 'tacacs' and 'all' are determined by the ccDetailsUsername and ccDetailsPassword objects."
+    DEFVAL  { none }
+    ::= { ccDetailsEntry 35 }
+
+ccDetailsUsername OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (1),
+                cli (2),
+                calledsub (3),
+                useruser (4),
+                callname (5)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The source of the username when the ccDetailsLoginType object has a value of 'userdb', 'radius', 'tacacs' or
+            'all'. The value 'none' means no username is defined. The value 'cli' means take the username from the 
+            calling number information in the SETUP message. The value 'calledsub' means take the username from the called
+            subaddress information in the SETUP message. The value 'useruser' means take the username from the user-user
+            information in the SETUP message. The value 'callname' means take the username from the call details entry name."
+    DEFVAL  { none }
+    ::= { ccDetailsEntry 36 }
+
+ccDetailsPassword OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none (1),
+                cli (2),
+                calledsub (3),
+                useruser (4),
+                callname (5)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The source of the password when the ccDetailsLoginType object has a value of 'userdb', 'radius', 'tacacs' or
+            'all'. The value 'none' means no password is defined. The value 'cli' means take the password from the 
+            calling number information in the SETUP message. The value 'calledsub' means take the password from the called
+            subaddress information in the SETUP message. The value 'useruser' means take the password from the user-user
+            information in the SETUP message. The value 'callname' means take the password from the call details entry name."
+    DEFVAL  { none }
+    ::= { ccDetailsEntry 37 }
+
+ccDetailsBumpDelay OBJECT-TYPE
+    SYNTAX      INTEGER (0..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The time, in tenths of a second, which the router will wait after clearing an existing call which has been bumped
+            to make way for a call based on this call details entry."
+    DEFVAL  { 5 }
+    ::= { ccDetailsEntry 38 }
+
+ccDetailsDataRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                rate_64k (1),
+                rate_56k (2)
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The data rate to use for active calls based on this call details entry. The actual data rate for outgoing calls
+            is determined by both this object and the data rate parameter for the Q.931 interface chosen for the call. If
+            either this object or the interface object specify a rate of 56k, then 56k will be the rate for the call.
+            Otherwise, the default rate of 64k will be used. This allows interoperability between ISDNs which only allow 56k
+            of data on a B channel."
+    DEFVAL  { rate_64k }
+    ::= { ccDetailsEntry 39 }
+
+ccDetailsPppTemplate OBJECT-TYPE
+    SYNTAX      INTEGER (1..33)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The PPP template to use when creating dynamic PPP interfaces
+            for calls generated from this call details entry. The value 33
+            represents a default PPP template, the values 1 to 32 represent
+            PPP templates that are currently defined in the router. Note
+            that when using the command line interface, PPP template indices
+            range from 0 to 31, but when using SNMP they range from 1 to 32.
+            This is because SNMP will not allow a table index to have the
+            value 0. While there is no PPP template table accessible via
+            SNMP, if there was, the indices of the table would have to range
+            from 1 to 32."
+    DEFVAL  { 33 }
+    ::= { ccDetailsEntry 40 }
+
+ccDetailsUserModule OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The module ID of the user module currently attached to this ISDN call details entry."
+    ::= { ccDetailsEntry 41 }
+
+ccDetailsNumberAttachments OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of attachments from the user module currently attached to this call details entry. The
+            ccAttachmentsTable gives the actual attachments for each call details entry."
+    ::= { ccDetailsEntry 42 }
+
+
+-- The ISDN CLI list table. This consists of a number of entries containing numbers for matching against CLI information.
+
+ccCliListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CcCliListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of CLI list entries."
+    ::= { cc 2 }
+
+ccCliListEntry OBJECT-TYPE
+    SYNTAX      CcCliListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the CLI list table. This contains a single number, as well as index information."
+    INDEX   { ccCliListListIndex, ccCliListEntryIndex }
+    ::= { ccCliListTable 1 }
+
+CcCliListEntry ::=
+    SEQUENCE {
+        ccCliListListIndex
+            INTEGER,
+        ccCliListEntryIndex
+            INTEGER,
+        ccCliListNumber
+            DisplayStringUnsized
+    }
+
+ccCliListListIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the CLI list. CLI lists from 1 to 100 are defined in the router."
+    ::= { ccCliListEntry 1 }
+
+ccCliListEntryIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the CLI list entry within the CLI list. The minimum CLI list entry is 1. CLI lists are unlimited in
+            length, although internal memory requirements could result in failure to create a given entry. When creating a row
+            in this table, the entry index should be set to index the first empty row. Only one CLI list row in a given list
+            should be created in any one SNMP message. Attempting to create more than one row will result in failure."
+    ::= { ccCliListEntry 2 }
+
+ccCliListNumber OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The number for this CLI list entry. Setting the number to a zero length string removes the entry from the CLI
+            list, with consequent reshuffling of CLI entry indices. Thus the easiest way to delete an entire CLI list is to
+            repeatedly set the first element in the list to a zero length string. A failure to SET will occur when this is
+            attempted on an empty list."
+    ::= { ccCliListEntry 3 }
+
+
+-- The active calls table. This consists of a number of entries containing details of actual active calls. Active calls are
+-- created by internal router processes, so this is a read-only table.
+
+ccActiveCallTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CcActiveCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of ISDN active calls."
+    ::= { cc 3 }
+
+ccActiveCallEntry OBJECT-TYPE
+    SYNTAX      CcActiveCallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the active call table."
+    INDEX   { ccActiveCallIndex }
+    ::= { ccActiveCallTable 1 }
+
+CcActiveCallEntry ::=
+    SEQUENCE {
+        ccActiveCallIndex
+            INTEGER,
+        ccActiveCallDetailsIndex
+            INTEGER,
+        ccActiveCallIfIndex
+            InterfaceIndexOrZero,
+        ccActiveCallDataRate
+            INTEGER,
+        ccActiveCallState
+            INTEGER,
+        ccActiveCallDirection
+            INTEGER,
+        ccActiveCallUserModule
+            INTEGER,
+        ccActiveCallUserInstance
+            INTEGER,
+        ccActiveCallBchannelIndex
+            INTEGER
+    }
+
+ccActiveCallIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the active call. There are 128 possible active calls in the router simultaneously."
+    ::= { ccActiveCallEntry 1 }
+
+ccActiveCallDetailsIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the call details entry which generated this active call. Thus the index into the ccDetailsTable for
+            this call."
+    ::= { ccActiveCallEntry 2 }
+
+ccActiveCallIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interface index of the interface on which this active call is being made or received. A value of zero
+            indicates that the active has not yet had an interface assigned to it. The ifEntry indexed by this object is the
+            ifEntry for the entire ISDN interface, not the ifEntry for the active call's B channel."
+    ::= { ccActiveCallEntry 3 }
+
+ccActiveCallDataRate OBJECT-TYPE
+    SYNTAX      INTEGER {
+                rate_64k (1),
+                rate_56k (2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The data rate in use for this active call. This is determined by the call details setting of data rate, the
+            ISDN interface setting for data rate, and the contents of the bearer capability information in the incoming
+            SETUP message."
+    ::= { ccActiveCallEntry 4 }
+
+ccActiveCallState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                null (1),
+                off (2),
+                try (3),
+                on (4),
+                wait (5),
+                await1 (6)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of this active call. The value 'null' indicates that this active call does not actually exist, in other
+            words it is in the process of being created or destroyed. The value 'off' means that the active call is just being
+            activated. The value 'try' means that the active call is attempting to establish. The value 'on' means that the
+            active call is established. The value 'wait' means that the active call is waiting to retry. The value 'await1'
+            means that the active call is waiting for authentication to succeed before becoming established."
+    ::= { ccActiveCallEntry 5 }
+
+ccActiveCallDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                in (1),
+                out (2),
+                undefined (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The direction of this active call. The value 'in' indicates that this active call is an incoming call, the value
+            'out' indicates that the active call is an outgoing call. The value 'undefined' indicates that the active call has
+            just been created and a direction has not been assigned to it yet."
+    ::= { ccActiveCallEntry 6 }
+
+ccActiveCallUserModule OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The module ID of the user module attached to this ISDN active call."
+    ::= { ccActiveCallEntry 7 }
+
+ccActiveCallUserInstance OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The instance of the user module attached to this ISDN active call."
+    ::= { ccActiveCallEntry 8 }
+
+ccActiveCallBchannelIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The B channel number for this active entry. BRI interfaces have B channels in the range 1..2, PRI interfaces
+            have B channels in the range 1..31, excluding a channel which is the D channel. A value of 0 for this entry means
+            that either a B channel is not currently allocated for this call, or that more than one B channel is allocated.
+            In the second case, the management client will have to walk the B channel allocation table looking for channels
+            with the same active call index as this call's."
+    ::= { ccActiveCallEntry 9 }
+
+-- The call log table. This consists of a number of entries containing log details of ISDN calls. This is a read-only table.
+
+ccCallLogTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CcCallLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of ISDN call log entries."
+    ::= { cc 4 }
+
+ccCallLogEntry OBJECT-TYPE
+    SYNTAX      CcCallLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the ISDN call log table."
+    INDEX   { ccCallLogIndex }
+    ::= { ccCallLogTable 1 }
+
+CcCallLogEntry ::=
+    SEQUENCE {
+        ccCallLogIndex
+            INTEGER,
+        ccCallLogName
+            DisplayString,
+        ccCallLogState
+            INTEGER,
+        ccCallLogTimeStarted
+            DisplayString,
+        ccCallLogDirection
+            INTEGER,
+        ccCallLogDuration
+            INTEGER,
+        ccCallLogRemoteNumber
+            DisplayString
+    }
+
+ccCallLogIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the call log entry. Since the call log table is dynamic, there is no guarantee that this index will
+            continue to refer to the same log entry over time."
+    ::= { ccCallLogEntry 1 }
+
+ccCallLogName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the call details entry which generated the active call for which this is the log entry."
+    ::= { ccCallLogEntry 2 }
+
+ccCallLogState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                initial (1),
+                active (2),
+                disconnected (3),
+                cleared (4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of the log entry. The value 'initial' means that the call is being established. The value 'active'
+            means that the call is currently established. The value 'disconnected' means that the call was disconnected after
+            being established for some time. The value 'cleared' means that the call was cleared abormally while in the
+            establishment phase."
+    ::= { ccCallLogEntry 3 }
+
+ccCallLogTimeStarted OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A string in the format 'dd-mmm-yyyy hh:mm:ss' which gives the start time of the call for which this is the log
+            entry. If the call never reached or has not yet reached the active state, this object will be a zero-length
+            string."
+    ::= { ccCallLogEntry 4 }
+
+ccCallLogDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                in (1),
+                out (2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The direction of the call for which this is the log entry."
+    ::= { ccCallLogEntry 5 }
+
+ccCallLogDuration OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The duration in seconds, of the call for which this is the log entry. A value of 0 in this field means either
+            that the call has just started, that the call was cleared before becoming established, or that the call is still
+            active. In other words, a non-zero value is present in this object only for calls which reach establishment and
+            have since been cleared."
+    ::= { ccCallLogEntry 6 }
+
+ccCallLogRemoteNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For incoming calls, the calling number, if this was made available in the SETUP message. For outgoing calls,
+            the number dialed. If the number was not available, this object is a zero length string."
+    ::= { ccCallLogEntry 7 }
+
+
+-- The call details attachment table. This is a table indexed by call detail index and list index of all the attachments from
+-- the user module. Since attachments are generated internally by other processes, this is a read-only table.
+
+ccAttachmentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CcAttachmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of call detail attachment entries."
+    ::= { cc 5 }
+
+ccAttachmentEntry OBJECT-TYPE
+    SYNTAX      CcAttachmentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the attachment table."
+    INDEX   { ccAttachmentDetailsIndex, ccAttachmentEntryIndex }
+    ::= { ccAttachmentTable 1 }
+
+CcAttachmentEntry ::=
+    SEQUENCE {
+        ccAttachmentDetailsIndex
+            INTEGER,
+        ccAttachmentEntryIndex
+            INTEGER,
+        ccAttachmentActiveCallIndex
+            INTEGER,
+        ccAttachmentUserInstance
+            INTEGER
+    }
+
+ccAttachmentDetailsIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the call details entry to which this attachment entry belongs."
+    ::= { ccAttachmentEntry 1 }
+
+ccAttachmentEntryIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the attachment entry within the attachment list."
+    ::= { ccAttachmentEntry 2 }
+
+ccAttachmentActiveCallIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the active call for this attachment. A value of 0 indicates that there is currently no active call
+            for this attachment. A value of 1 to 128 references the active call currently in place for this attachment."
+    ::= { ccAttachmentEntry 3 }
+
+ccAttachmentUserInstance OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The instance of the user module attached to the ISDN active call for this attachment. This object should return
+            the same value as the object ccActiveCallUserInstance for the active call indexed by ccAttachmentActiveCallIndex,
+            if this is not 0."
+    ::= { ccAttachmentEntry 4 }
+
+
+-- The B channel attachment table. This is a table indexed by ISDN interface ifIndex and B channel index of all the
+-- attachments to ISDN B channels. Since attachments are generated internally by other processes, this is a read-only table.
+
+ccBchannelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CcBchannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of B channel attachment entries."
+    ::= { cc 6 }
+
+ccBchannelEntry OBJECT-TYPE
+    SYNTAX      CcBchannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single entry in the B channel attachment table."
+    INDEX   { ccBchannelIfIndex, ccBchannelChannelIndex }
+    ::= { ccBchannelTable 1 }
+
+CcBchannelEntry ::=
+    SEQUENCE {
+        ccBchannelIfIndex
+            INTEGER,
+        ccBchannelChannelIndex
+            INTEGER,
+        ccBchannelAllocated
+            INTEGER,
+        ccBchannelCallType
+            INTEGER,
+        ccBchannelActiveCallIndex
+            INTEGER,
+        ccBchannelPriority
+            INTEGER,
+        ccBchannelDirection
+            INTEGER
+    }
+
+ccBchannelIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interface index of the interface which this B channel entry is on. The ifEntry indexed by this object is the
+            ifEntry for the entire ISDN interface, not the ifEntry for the active call's B channel."
+    ::= { ccBchannelEntry 1 }
+
+ccBchannelChannelIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..31)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The B channel number for this B channel entry. BRI interfaces have B channels in the range 1..2, PRI interfaces
+            have B channels in the range 1..31, excluding a channel which is the D channel."
+    ::= { ccBchannelEntry 2 }
+
+ccBchannelAllocated OBJECT-TYPE
+    SYNTAX      INTEGER {
+                no (1),
+                yes (2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A flag indicating whether this B channel is actually allocated to a call or not."
+    ::= { ccBchannelEntry 3 }
+
+ccBchannelCallType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                undefined (1),
+                data (2),
+                voice (3),
+                x25 (4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of call on this B channel. If the B channel is not allocated, the call type will be undefined."
+    ::= { ccBchannelEntry 4 }
+
+ccBchannelActiveCallIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of the active call which is currently attached to this B channel. If the value of this object is 0 the
+            channel is either not allocated, or is not allocated to a data call."
+    ::= { ccBchannelEntry 5 }
+
+ccBchannelPriority OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The priority of the call which has this B channel allocated to it. This is in the range 0..99 for data calls, 150
+            for voice calls and 200 for emergency voice calls. A B channel which is not allocated will have a priority of 0."
+    ::= { ccBchannelEntry 6 }
+
+ccBchannelDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                in (1),
+                out (2),
+                unallocated (3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The direction of the call which has this B channel allocated to it. If this B channel is not allocated the value
+            will be 'unallocated'."
+    ::= { ccBchannelEntry 7 }
+
+END

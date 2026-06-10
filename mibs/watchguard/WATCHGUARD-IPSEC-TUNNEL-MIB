@@ -1,0 +1,552 @@
+WATCHGUARD-IPSEC-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, 
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, TimeTicks               FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        watchguard                         FROM WATCHGUARD-SMI;
+        
+    wgInfoModule MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "  WatchGuard Technologies, Inc.
+                  
+                     505 Fifth Avenue South
+                     Suite 500
+                     Seattle, WA 98104
+                     United States
+
+                     +1.206.613.6600 " 
+
+        DESCRIPTION
+            "The MIB module describes various tunnel objects
+            of WatchGuard system."
+
+
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 6 }
+
+    wgIpsecTunnelMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all tunnel
+             branches."
+        ::= { wgInfoModule 5 }
+
+    wgIpsecTunnel OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all 
+            tunnel information."
+        ::= { wgIpsecTunnelMIB 1 }
+
+    wgIpsecTunnelNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of entries in the wgIpsecTunnelTable. "
+        ::= { wgIpsecTunnel 1 }
+
+    wgIpsecTunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the connection table describing all current
+             tunnels exist on this entity."
+        ::= { wgIpsecTunnel 2 }
+
+
+    wgIpsecTunnelEntry OBJECT-TYPE
+        SYNTAX      WGIpsecTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+             tunnel between two security gateways."
+        INDEX{ wgIpsecTunnelID }
+        ::= { wgIpsecTunnelTable 1 }
+
+    WGIpsecTunnelEntry ::= SEQUENCE {
+
+        wgIpsecTunnelID                      Integer32,
+
+        wgIpsecTunnelLocalAddr               IpAddress,
+        wgIpsecTunnelPeerAddr                IpAddress,
+
+
+        wgIpsecTunnelInSpi                   Unsigned32,
+        wgIpsecTunnelOutSpi                  Unsigned32,
+        wgIpsecTunnelCreateTime              DateAndTime,
+        wgIpsecTunnelDeviceID                Unsigned32,
+        wgIpsecTunnelEspEncryptAlg           INTEGER,
+        wgIpsecTunnelEspAuthAlg              INTEGER,
+        wgIpsecTunnelAhAuthAlg               INTEGER,
+        wgIpsecTunnelMode                    INTEGER,
+        wgIpsecTunnelKeyMode                 INTEGER,
+        wgIpsecTunnelLifeTime                TimeTicks,
+        wgIpsecTunnelLifeLength              Counter32,
+        wgIpsecTunnelInSaBytes               Counter32,
+        wgIpsecTunnelOutSaBytes              Counter32,
+        wgIpsecTunnelAccSecs                 Counter32,
+        wgIpsecTunnelSelectorProtocol        INTEGER,
+        wgIpsecTunnelSelectorRemoteIPType    INTEGER,
+        wgIpsecTunnelSelectorRemoteIPOne     IpAddress,
+        wgIpsecTunnelSelectorRemoteIPTwo     IpAddress,
+        wgIpsecTunnelSelectorRemotePort      INTEGER,
+        wgIpsecTunnelSelectorLocalIPType     INTEGER,
+        wgIpsecTunnelSelectorLocalIPOne      IpAddress,
+        wgIpsecTunnelSelectorLocalIPTwo      IpAddress,
+        wgIpsecTunnelSelectorLocalPort       INTEGER,
+        wgIpsecTunnelNumRekey                Counter32,
+        wgIpsecTunnelInKbytes                Counter32,
+        wgIpsecTunnelOutKbytes               Counter32,
+        wgIpsecTunnelInPackets               Counter32,
+        wgIpsecTunnelOutPackets              Counter32,
+        wgIpsecTunnelInDecryptErrors         Counter32,
+        wgIpsecTunnelInAuthErrors            Counter32,
+        wgIpsecTunnelInReplayErrors          Counter32,
+        wgIpsecTunnelInOtherErrors           Counter32,
+        wgIpsecTunnelOutDecryptErrors        Counter32,
+        wgIpsecTunnelOutAuthErrors           Counter32,
+        wgIpsecTunnelOutReplayErrors         Counter32,
+        wgIpsecTunnelOutOtherErrors          Counter32,
+        wgIpsecTunnelUdpEncap                INTEGER,
+        wgIpsecTunnelPeerUdpPort             INTEGER,
+        wgIpsecTunnelOrigPeerAddr            IpAddress
+    }
+
+    wgIpsecTunnelID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The running index of this tunnel."
+        ::= { wgIpsecTunnelEntry 1 }
+
+    wgIpsecTunnelLocalAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local gateway  IP address of the current tunnel."
+        ::= { wgIpsecTunnelEntry 2 }
+
+    wgIpsecTunnelPeerAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The remote gateway IP address of the current tunnel."
+        ::= { wgIpsecTunnelEntry 3 }
+
+    wgIpsecTunnelInSpi OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of inbound  SA's within this 
+             tunnel."
+        ::= { wgIpsecTunnelEntry 4 }
+
+    wgIpsecTunnelOutSpi OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of outbound  SA's within this 
+            tunnel."
+        ::= { wgIpsecTunnelEntry 5 }
+
+    wgIpsecTunnelCreateTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date and time when the tunnel is created."
+        ::= { wgIpsecTunnelEntry 6 }
+
+    wgIpsecTunnelDeviceID OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The identifier of target device where the SA resides."
+        ::= { wgIpsecTunnelEntry 7 }
+
+    wgIpsecTunnelEspEncryptAlg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        des(2),
+                        three-des(3),
+                        aes(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The encryption algorithm used in the tunnel. It's 0
+            if ESP is not used."
+        ::= { wgIpsecTunnelEntry 8 }
+
+    wgIpsecTunnelEspAuthAlg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        md5(2),
+                        sha(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The authentication algorithm used in the tunnel. It's
+            0 if ESP is not used."
+        ::= { wgIpsecTunnelEntry 9 }
+
+    wgIpsecTunnelAhAuthAlg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        md5(2),
+                        sha(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The AH authentication algorithm used in the tunnel.
+            It's 0 if AH is not used."
+        ::= { wgIpsecTunnelEntry 10 }
+        
+    wgIpsecTunnelMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        tunnel(1),
+                        transport(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel/transport mode of the tunnel."
+        ::= { wgIpsecTunnelEntry 11 }
+
+    wgIpsecTunnelKeyMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        manual(1),
+                        auto-ike(2),
+                        other(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The key mode of the tunnel."
+        ::= { wgIpsecTunnelEntry 12 }
+
+    wgIpsecTunnelLifeTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The life time (in hundredths of a second) of the tunnel."
+        ::= { wgIpsecTunnelEntry 13 }
+
+    wgIpsecTunnelLifeLength OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in bytes that the tunnel is allowed to support."
+        ::= { wgIpsecTunnelEntry 14 }
+
+    wgIpsecTunnelInSaBytes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current active inbound SA bytes of the tunnel."
+        ::= { wgIpsecTunnelEntry 15 }
+        
+    wgIpsecTunnelOutSaBytes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current active outbound SA bytes of the tunnel."
+        ::= { wgIpsecTunnelEntry 16 }
+        
+    wgIpsecTunnelAccSecs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds that the tunnel has existed."
+        ::= { wgIpsecTunnelEntry 17 }
+        
+    wgIpsecTunnelSelectorProtocol OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        any(0),
+                        icmp(1),
+                        igmp(2),
+                        ipip(4),
+                        tcp(6),
+                        egp(8),
+                        pup(12),
+                        udp(17),
+                        idp(22),
+                        tp(29),
+                        ipv6(41),
+                        ipv6-routing(43),
+                        ipv6-fragmentation(44),
+                        rsvp(46),
+                        gre(47),
+                        esp(50),
+                        ah(51),
+                        icmpv6(58),
+                        none(59),
+                        dstopts(60),
+                        mtp(92),
+                        encap(98),
+                        pim(103),
+                        raw(255)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ip protocol number that this SA(Tunnel) selector carries, or
+            0 if it carries any protocol."
+        ::= { wgIpsecTunnelEntry 18 }
+        
+    wgIpsecTunnelSelectorRemoteIPType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ip-addr-single(1),
+                        ip-addr-subnet(2),
+                        ip-addr-range(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of remote IP address of the SA(Tunnel) selector in 
+            the entity."
+        ::= { wgIpsecTunnelEntry 19 }
+
+    wgIpsecTunnelSelectorRemoteIPOne OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The first remote IP address of the SA(Tunnel) selector in the entity.
+            It's IP address if remote IP of this selector only has one address.
+            It's IP address of subnet if the remote IP of this selector is IP subnet.
+            It's the start IP address if the remote IP of this selector 
+            has a range of addresses."
+        ::= { wgIpsecTunnelEntry 20 }
+        
+    wgIpsecTunnelSelectorRemoteIPTwo OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The second remote IP address of the SA(Tunnel) selector in the entity.
+            It's 0 if remote IP of this selector only has one address.
+            It's netmask of subnet if the remote IP of this selector is IP subnet.
+            It's the end IP address if the remote IP of this selector 
+            has a range of addresses."
+        ::= { wgIpsecTunnelEntry 21 }
+
+    wgIpsecTunnelSelectorRemotePort OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The remote port used by the SA(Tunnel) selector in the entity."
+        ::= { wgIpsecTunnelEntry 22 }
+
+    wgIpsecTunnelSelectorLocalIPType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ip-addr-single(1),
+                        ip-addr-subnet(2),
+                        ip-addr-range(3)
+                           }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of local IP address of the SA(Tunnel) selector in 
+            the entity."
+        ::= { wgIpsecTunnelEntry 23 }
+
+    wgIpsecTunnelSelectorLocalIPOne OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The first local IP address of the SA(Tunnel) selector in the entity.
+            It's IP address if local IP of this selector only has one address.
+            It's IP address of subnet if the local IP of this selector is IP subnet.
+            It's the start IP address if the local IP of this selector 
+             has a range of IP addresses."
+        ::= { wgIpsecTunnelEntry 24 }
+        
+    wgIpsecTunnelSelectorLocalIPTwo OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The second local IP address of the SA(Tunnel) selector in the entity.
+            It's 0 if local IP of this selector only has one address.
+            It's netmask of subnet if the local IP of this selector is IP subnet.
+            It's the end IP address if the local IP of this selector 
+            has a range of IP addresses."
+        ::= { wgIpsecTunnelEntry 25 }
+
+    wgIpsecTunnelSelectorLocalPort OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local port used by the SA(Tunnel) selector in the entity."
+        ::= { wgIpsecTunnelEntry 26 }
+        
+    wgIpsecTunnelNumRekey OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of rekeys of the tunnel."
+        ::= { wgIpsecTunnelEntry 27 }
+        
+    wgIpsecTunnelInKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS            "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total inbound traffic in Kbytes since the establish of
+            this tunnel."
+        ::= { wgIpsecTunnelEntry 28 }
+
+    wgIpsecTunnelOutKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS            "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total outound traffic in Kbytes since the establish of
+            this connection."
+        ::= { wgIpsecTunnelEntry 29 }
+
+    wgIpsecTunnelInPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of inbound packets since the establish of
+            this connection."
+        ::= { wgIpsecTunnelEntry 30 }
+
+    wgIpsecTunnelOutPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of outound packets since the establish of
+            this connection."
+        ::= { wgIpsecTunnelEntry 31 }
+
+    wgIpsecTunnelInDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecTunnelEntry 32 }
+
+    wgIpsecTunnelInAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication
+            error since the establish of this connection."
+        ::= { wgIpsecTunnelEntry 33 }
+
+    wgIpsecTunnelInReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay
+            error since the establish of this connection."
+        ::= { wgIpsecTunnelEntry 34}
+
+    wgIpsecTunnelInOtherErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecTunnelEntry 35 }
+
+    wgIpsecTunnelOutDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecTunnelEntry 36 }
+
+    wgIpsecTunnelOutAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication
+            error since the establish of this connection."
+        ::= { wgIpsecTunnelEntry 37 }
+
+    wgIpsecTunnelOutReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay
+            error since the establish of this connection."
+        ::= { wgIpsecTunnelEntry 38 } 
+
+    wgIpsecTunnelOutOtherErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecTunnelEntry 39 }
+
+    wgIpsecTunnelUdpEncap  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecTunnelEntry 40 }
+
+    wgIpsecTunnelPeerUdpPort  OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecTunnelEntry 41 }
+
+    wgIpsecTunnelOrigPeerAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecTunnelEntry 42 }
+
+END

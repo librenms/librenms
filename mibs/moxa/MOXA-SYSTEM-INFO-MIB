@@ -1,0 +1,286 @@
+-- *****************************************************************
+-- *  Moxa General (System Management) - System Information PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-SYSTEM-INFO-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, MacAddress, TruthValue
+            FROM SNMPv2-TC
+        systemManagement
+            FROM MOXA-GENERAL-MIB;
+
+    mxSystemInfo MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "This MIB module defines settings for system information"
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { systemManagement 1 }
+
+    moxa               OBJECT IDENTIFIER ::= { enterprises 8691 }
+    general            OBJECT IDENTIFIER ::= { moxa 602 }
+    systemManagement   OBJECT IDENTIFIER ::= { general 1 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-SYSTEM-INFO-MIB MIB
+-- -------------------------------------------------------------
+
+    siNotification OBJECT IDENTIFIER ::= { mxSystemInfo 0 }
+    siConfiguration OBJECT IDENTIFIER ::= { mxSystemInfo 1 }
+    siStatus OBJECT IDENTIFIER ::= { mxSystemInfo 2 }
+    -- siExtension OBJECT IDENTIFIER ::= { mxSystemInfo 3 }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+
+    siConfigSystemDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "Description of device"
+        ::= { siConfiguration 1 }
+
+    siConfigConfigEncryption OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Configuration file export encryption is enabled or disabled."
+        ::= { siConfiguration 2 }
+
+-- -------------------------------------------------------------
+-- Status group
+-- -------------------------------------------------------------
+
+    siStatConfigChange OBJECT IDENTIFIER ::= { siStatus 1 }
+
+    siStatConfigChangeModules OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "List of modules whos config are being changed."
+        ::= { siStatConfigChange 1 }
+
+    siStatConfigChangeByUser OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "User accound changing config."
+        ::= { siStatConfigChange 2 }
+
+    siStatConfigChangeImportResult OBJECT-TYPE
+        SYNTAX      INTEGER { success (1), failed (2) }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Result of config import."
+        ::= { siStatConfigChange 3 }
+
+    --
+    siStatProductInfo OBJECT IDENTIFIER ::= { siStatus 2 }
+
+    siStatProductInfoFirmwareVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Firmware version of product"
+        ::= { siStatProductInfo 1 }
+
+    siStatProductInfoMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "MAC address of product"
+        ::= { siStatProductInfo 2 }
+
+    siStatProductInfoSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Serial number of product"
+        ::= { siStatProductInfo 3 }
+
+    siStatProductInfoProductRevision OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Revision of product"
+        ::= { siStatProductInfo 4 }
+
+    siStatProductInfoModelName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Model name of product"
+        ::= { siStatProductInfo 5 }
+
+    --
+    siStatEthernetModuleInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SiStatEthernetModuleInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Ethernet module information table."
+        ::= { siStatus 3 }
+
+    siStatEthernetModuleInfoEntry OBJECT-TYPE
+        SYNTAX        SiStatEthernetModuleInfoEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Ethernet module information entry."
+        INDEX        { siStatEthernetModuleInfoIndex }
+        ::= { siStatEthernetModuleInfoTable 1 }
+
+    SiStatEthernetModuleInfoEntry ::=
+        SEQUENCE {
+            siStatEthernetModuleInfoIndex           Integer32,
+            siStatEthernetModuleInfoSerialNumber    DisplayString,
+            siStatEthernetModuleInfoProductRevision DisplayString,
+            siStatEthernetModuleInfoModelName       DisplayString
+        }
+
+    siStatEthernetModuleInfoIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Module index"
+        ::= { siStatEthernetModuleInfoEntry 1 }
+
+    siStatEthernetModuleInfoSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Serial number of module"
+        ::= { siStatEthernetModuleInfoEntry 2 }
+
+    siStatEthernetModuleInfoProductRevision OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Product revision of module"
+        ::= { siStatEthernetModuleInfoEntry 3 }
+
+    siStatEthernetModuleInfoModelName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Model name of module"
+        ::= { siStatEthernetModuleInfoEntry 4 }
+
+    --
+    siStatPowerModuleInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SiStatPowerModuleInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Power module information table."
+        ::= { siStatus 4 }
+
+    siStatPowerModuleInfoEntry OBJECT-TYPE
+        SYNTAX        SiStatPowerModuleInfoEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Power module information entry."
+        INDEX        { siStatPowerModuleInfoIndex }
+        ::= { siStatPowerModuleInfoTable 1 }
+
+    SiStatPowerModuleInfoEntry ::=
+        SEQUENCE {
+            siStatPowerModuleInfoIndex           Integer32,
+            siStatPowerModuleInfoSerialNumber    DisplayString,
+            siStatPowerModuleInfoProductRevision DisplayString,
+            siStatPowerModuleInfoModelName       DisplayString
+        }
+
+    siStatPowerModuleInfoIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Module index"
+        ::= { siStatPowerModuleInfoEntry 1 }
+
+    siStatPowerModuleInfoSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Serial number of module"
+        ::= { siStatPowerModuleInfoEntry 2 }
+
+    siStatPowerModuleInfoProductRevision OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Product revision of module"
+        ::= { siStatPowerModuleInfoEntry 3 }
+
+    siStatPowerModuleInfoModelName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Model name of module"
+        ::= { siStatPowerModuleInfoEntry 4 }
+
+-- -------------------------------------------------------------
+-- Notification group
+-- -------------------------------------------------------------
+
+    siNotifyConfigChanged NOTIFICATION-TYPE
+        OBJECTS {
+            siStatConfigChangeModules,
+            siStatConfigChangeByUser
+        }
+        STATUS current
+        DESCRIPTION
+            "Notification for config change."
+        ::= { siNotification 1 }
+
+    siNotifyConfigImported NOTIFICATION-TYPE
+        OBJECTS {
+            siStatConfigChangeImportResult,
+            siStatConfigChangeByUser
+        }
+        STATUS current
+        DESCRIPTION
+            "Notification for config import."
+        ::= { siNotification 2 }
+
+END

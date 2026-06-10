@@ -1,0 +1,47 @@
+CISCOSB-SCT-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Switch Interfaces Private
+-- Version:    7.50
+-- Date:       16 Aug 2010
+
+IMPORTS
+    OBJECT-TYPE, Counter32                         FROM SNMPv2-SMI
+    TruthValue                                      FROM SNMPv2-TC
+    switch001                                       FROM CISCOSB-MIB;
+
+rlSctMib MODULE-IDENTITY
+        LAST-UPDATED "201008161234Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+            "The private MIB module definition for SCT MIB."
+        ::= { switch001 203 }
+
+--rlSctCpuRateEnabled
+rlSctCpuRateEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indication whether the counter CPU rate is enabled"
+    ::= { rlSctMib 1 }
+
+--rlSctCpuRate
+rlSctCpuRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the amount of packets per second the CPU is handling."
+    ::= { rlSctMib 2 }
+
+END
+

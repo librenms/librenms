@@ -1,0 +1,859 @@
+BTI8xx-SYSTEM-MIB
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    IpAddress,
+    Unsigned32,
+    Integer32,
+    Gauge32,
+    TimeTicks,
+    Counter32               FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    MacAddress,
+    TruthValue,
+    DateAndTime,
+    RowStatus               FROM SNMPv2-TC          -- [RFC2579]
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP            FROM SNMPv2-CONF
+    InterfaceIndex,
+    ifIndex                 FROM IF-MIB             -- [RFC2863]
+    PerfCurrentCount,
+    PerfIntervalCount,
+    PerfTotalCount          FROM PerfHist-TC-MIB    -- [RFC3593]
+    mainSystem              FROM BTI8xx-TC-MIB;
+
+    systemConfig   MODULE-IDENTITY
+
+    LAST-UPDATED "201511301200Z"  -- Monday, Nov 30, 12:00:00 KST 2015
+    ORGANIZATION "Actus Networks Ltd."
+    CONTACT-INFO "
+    Support:  +82-2-26535666
+    R&D:      +82-2-26535666
+    Fax:      +82-2-26534662
+    Email:    ymkim@actusnetworks.com
+    "
+
+    DESCRIPTION  "This is a top-level MIB for Actus whose purpose is to lay out
+    the top-level objects in the OID hierarchy from which
+    BTI8xx MIB OIDs descend."
+
+    REVISION     "201511301200Z"  -- Monday, Nov 30, 12:00:00 KST 2015
+    DESCRIPTION  "
+            *1. Change the Syntax(for silvercreek tool).
+              1.1. Change the syntax range. (1..32) -> (0..32)
+                ftpUserName
+                ftpUserPasswd
+        "
+
+    REVISION     "201511201200Z"  -- Friday, Nov 20, 12:00:00 KST 2015
+    DESCRIPTION  "
+            *1. Change the MAX-ACCESS(for silvercreek tool).
+              'not-accessible' -> 'read-only'
+                -imageInfoIndex
+
+            *2. Change the Syntax(for silver creek tool).
+              2.1. DisplayString -> OCTET STRING
+                systemName
+                systemHWVersion
+                systemSWVersion
+                systemSWDateAndTime
+                systemProductName
+                ftpUserName
+                ftpUserPasswd
+                cfgFileName
+                upgradeImageSWFileName
+                upgradeImageSWDateAndTime
+                imageInfoVersion
+                imageInfoCreated
+                timezone
+                systemTime
+
+              2.2. Delete the syntax value range
+                lastSaveTime
+
+            *3. MIB code sorting.
+            "
+    REVISION     "201509071300Z"  -- Monday, Sep 07, 13:00:00 KST 2015
+    DESCRIPTION  "
+        *1. Change the description attribute of 'miscellaneous'
+          timezone
+            - MET/IST/ACT/CNT : +30 minutes
+            - EAT : description
+          tempLowThreshold
+        "
+
+    REVISION     "201410291200Z"  -- Wednesday, Oct 29, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. Change the sytax size
+          DisplayString(SIZE(0..256)) -> DisplayString(SIZE(0..255))
+        "
+
+    REVISION     "201408111200Z"  -- Monday, Aug 11, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. This value option is changed.
+            upgradeImageSW
+              - upgradeByFtp(1) -> updateImageFile(1)
+              - upgradeByTftp(2)-> upgradeImage(2)
+        *2. Unused value
+            upgradeImageSWLocation
+        " 
+
+    REVISION     "201407151200Z"  -- Tuesday, Jul 15, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. Delete the bridgeConfig
+        " 
+
+    REVISION     "201406181200Z"  -- Wednesday, Jun 18, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. This value range is changed the 60 to 35791.
+          autoLogoutTime
+        *2. Update the timezone description
+        " 
+            
+    REVISION     "201312271200Z"  -- Monday, Dec 30, 12:00:00 KST 2013
+    DESCRIPTION  "Initial version of MIB."
+
+    ::= { mainSystem 1 }
+
+-- ==============================================================
+-- privateManagement:configManagement:mainSystem:systemConfig  ==
+-- ==============================================================
+systemManagement        OBJECT IDENTIFIER ::= { systemConfig 1 }
+accessInfo              OBJECT IDENTIFIER ::= { systemConfig 2 }
+consoleInformation      OBJECT IDENTIFIER ::= { systemConfig 3 }
+
+
+-- ===============================================================================
+-- privateManagement:configManagement:mainSystem:systemConfig:systemManagement  ==
+-- ===============================================================================
+systemInfo              OBJECT IDENTIFIER ::= { systemManagement 1 }
+configAndImageMgmt      OBJECT IDENTIFIER ::= { systemManagement 2 }
+miscellaneous           OBJECT IDENTIFIER ::= { systemManagement 3 }
+--bridgeConfig            OBJECT IDENTIFIER ::= { systemManagement 4 }
+mgmtVlanConfig          OBJECT IDENTIFIER ::= { systemManagement 5 }
+--ztpConfig               OBJECT IDENTIFIER ::= { systemManagement 6 }
+
+
+-- ==========================================================================================
+-- privateManagement:configManagement:mainSystem:systemConfig:systemManagement:systemInfo  ==
+-- ==========================================================================================
+systemName              OBJECT-TYPE
+  SYNTAX                  OCTET STRING(SIZE(0..40))
+  MAX-ACCESS              read-only
+  STATUS                  current
+  DESCRIPTION
+    "The System Name (Network Element Name)"
+  ::= { systemInfo 1 }
+
+autoLogoutTime          OBJECT-TYPE
+  SYNTAX                  Integer32 (0..35791)
+  MAX-ACCESS              read-write
+  STATUS                  current
+  DESCRIPTION
+    "The auto-logout timer in minute of console/telnet/web based managment.
+    0 means auto logout is disabled. 0~35791 are applicable."
+  ::= { systemInfo 2 }
+
+systemUpTime            OBJECT-TYPE
+  SYNTAX                  TimeTicks
+  MAX-ACCESS              read-only
+  STATUS                  current
+  DESCRIPTION
+    "On site time- time after the last power up
+     Second resolution (also year)
+     Format: YY-DDD-HH-MM-SS (Year, Day, HR, Minute,Second)"
+  ::= { systemInfo 3 }
+
+systemHWVersion         OBJECT-TYPE
+  SYNTAX                  OCTET STRING(SIZE(0..8))
+  MAX-ACCESS              read-only
+  STATUS                  current
+  DESCRIPTION
+    "H/W Version of Main System"
+  ::= { systemInfo 4 }
+
+systemSWVersion         OBJECT-TYPE
+  SYNTAX                  OCTET STRING(SIZE(0..8))
+  MAX-ACCESS              read-only
+  STATUS                  current
+  DESCRIPTION
+    "S/W Version of Main System"
+  ::= { systemInfo 5 }
+
+systemSWDateAndTime     OBJECT-TYPE
+  SYNTAX                  OCTET STRING(SIZE(0..30))
+  MAX-ACCESS              read-only
+  STATUS                  current
+  DESCRIPTION
+    "S/W Date and Time of Main System(ex. Apr 8 2010 14:00:01)"
+  ::= { systemInfo 6 }
+
+systemTemperature       OBJECT-TYPE
+  SYNTAX                  Integer32(0..1000)
+  MAX-ACCESS              read-only
+  STATUS                  current
+  DESCRIPTION
+    "System Temperature of Main System(Celsius)"
+  ::= { systemInfo 7 }
+
+systemProductName       OBJECT-TYPE
+  SYNTAX                  OCTET STRING(SIZE (0..40))
+  MAX-ACCESS              read-write
+  STATUS                  current
+  DESCRIPTION     
+    "The System Product Name"
+  ::= { systemInfo 8 }
+
+-- ===========================================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:systemManagement:configAndImageMgmt ==
+-- ===========================================================================================
+serverConfig                  OBJECT IDENTIFIER ::= { configAndImageMgmt 1 }
+configMgmt                    OBJECT IDENTIFIER ::= { configAndImageMgmt 2 }
+imageMgmt                     OBJECT IDENTIFIER ::= { configAndImageMgmt 3 }
+
+-- ========================================================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:systemManagement:configAndImageMgmt:serverConfig ==
+-- ========================================================================================================
+serverIpAddr          OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Ftp or Tftp Server Ip Address"
+  ::= { serverConfig 1 }
+
+ftpUserName      OBJECT-TYPE
+  SYNTAX          OCTET STRING(SIZE(0..32))
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "FtpUserName"
+  ::= { serverConfig 2 }
+
+ftpUserPasswd        OBJECT-TYPE
+  SYNTAX          OCTET STRING(SIZE(0..32))
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "FtpUserPasswd"
+  ::= { serverConfig 3 }
+
+serverInterfaceType OBJECT-TYPE
+  SYNTAX          INTEGER { oob(0), inBand(1) }
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Server type
+    oob    : Management Interface
+    inBand : In-band Interface"
+  ::= { serverConfig 4 }
+
+
+-- ======================================================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:systemManagement:configAndImageMgmt:configMgmt ==
+-- ======================================================================================================
+cfgFileName   OBJECT-TYPE
+  SYNTAX          OCTET STRING(SIZE(0..128))
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This Object is ConfigFile BackUp Name."
+  ::= { configMgmt 1 }
+  
+cfgFileControl   OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    none          (0),
+                    backUpByFtp   (1),
+                    restoreByFtp  (2),
+                    backupByTftp  (3),
+                    restoreByTftp (4)
+                  }
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This Object is Control Config File
+    BackUp: Configfile backup and upload to server.
+    Restore : Configfile download and restore."
+  ::= { configMgmt 2 }
+
+cfgFileStatus   OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    none            (0),
+                    backupSuccess   (1),
+                    restoreSuccess  (2),
+                    inProgress      (3),
+                    fileNotFound    (4),
+                    connnectionFail (5),
+                    logInFail       (6),
+                    diskFull        (7),
+                    otherError      (8)
+                  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This object represents the state of configfile backup and download."
+  ::= { configMgmt 3 }
+
+upgradeImageSWFileName  OBJECT-TYPE
+  SYNTAX          OCTET STRING(SIZE(0..128))
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Upgrade Image FileName wiht the remote path.
+    the remote path is different from window-based ftp-server and linux-based ftp-server.
+    Window-based ftp-server : folder classification is '\'. (\image\bti800_main.img)
+    Linux-based ftp-server : folder classification is '/'. (/image/bti800_main.img)
+    "
+  ::= { imageMgmt 1 }
+
+--  upgradeImageSWLocation  OBJECT-TYPE
+--    SYNTAX                  INTEGER{ primary(0), secondary(1) }
+--    MAX-ACCESS              read-write
+--    STATUS  current
+--    DESCRIPTION
+--      "The date and time when upgradeImageSWStatus happen. "
+--    DEFVAL { primary }
+--    ::= { imageMgmt 2 }
+
+upgradeImageSW    OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    none            (0),
+                    updateImageFile (1),   
+                    upgradeImage    (2)
+                  }
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "This object provides the operator the ability to upgrade the image to a file.
+    The initial value would be none(0).
+    Before starting update image, upgradeImageSWFilenName and ftpConfig or tftpConfig value should be set.
+    
+    updateImageFile(1) : Download the image file(by FTP server).
+    upgradeImage(2)    : Upgrade image file.
+
+    This operation need long period, so Please checked the upgradeImageSWStatus.
+    Reboot should be executed to finish upgrade procedure when load upgrade will be passed.
+    "
+  ::= { imageMgmt 3 }
+
+upgradeImageSWStatus OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    none           (0),
+                    success        (1),
+                    inProgress     (2),
+                    diskIsFull     (3),
+                    fileSizeError  (4),
+                    fileOpenError  (5),
+                    fileCRCError   (6),
+                    flashEraseError(7),
+                    flashWriteError(8),
+                    unknownError   (9),
+                    upgradeDeliveryInProgress(101),
+                    upgradeDeliveryFailed    (102),
+                    upgradeDeliverySuccess   (103),
+                    upgradeCheckInProgress   (104),
+                    upgradeCheckFailed       (105),
+                    upgradeCheckSuccess      (106),
+                    upgradeLoadInProgress    (107),
+                    upgradeLoadFailed        (108),
+                    upgradeLoadSuccess1stDone(109),
+                    upgradeInvokeInProgress  (110),
+                    upgradeInvokeFailed      (111),
+                    upgradeInvokeSuccess2ndDone (112),
+                    upgradeCommitInProgress  (113),
+                    upgradeCommitFailed      (114),
+                    upgradeImagelatestVersion(115)
+                  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    " The current status of the upgrade operation.
+    - fileSizeError : image file is not matched image bank
+
+    The initial value should be none(0) and also it should be none
+    when get the imageFpga file success from the server.
+
+    The valus inProgress(2) is returned while upgradeImage.
+    The valus diskIsFull(3) is returned when file System is full and imageSW file is not written.
+    The valus fileSizeError(4) is returned when expected file size is not match with downloaded file.
+    The valus fileOpenError(5) is returned when there is a problem on downloaded file.
+    The valus fileCRCError(6) is returned whne there is a checksum error on downloaded file.
+    The valus flashEraseError(7) is returned when there is a problem on erasing flash.
+    The valus flashWriteError(8) is returned when there is a problem on writing flash.
+    The valus unknownError(9) is returned when there is a problem with others.
+
+    For imageSW upgrade/backup, it follows below procedures.
+    1) The value UpgradeLoadSuccess1stDone(109) is returned when
+    the upgradeImage command executed successfully.
+    2) The value UpgradeInvokeSuccess2ndDone(112) is returned when
+    reboot after upgradeImage success.
+    3) The value success(1) is returned when
+    the backupImage command executed successfully.
+
+    For others, it is for retrieving the status of upgrade processing.
+    upgradeDeliveryInProgress(101)
+    upgradeDeliveryFailed    (102)
+    upgradeDeliverySuccess   (103)
+    Delivery stage is that imageSW file is downloaded.
+    upgradeCheckInProgress   (104)
+    upgradeCheckFailed       (105)
+    upgradeCheckSuccess      (106)
+    Check stage is that the downloaded file is checked for healthy.
+    upgradeLoadInProgress    (107)
+    upgradeLoadFailed        (108)
+    Load stage is that the downloaded imageSW is written on the primary bank.
+    upgradeInvokeInProgress  (110)
+    upgradeInvokeFailed      (111)
+    Invoke stage can be issued only when upgrade state is Load passed. The product is restarted from primary bank
+    with new load. If the primary bank load is corrupted, the product should start running from secondary bank.
+    upgradeCommitInProgress  (113)
+    upgradeCommitFailed      (114)
+    Commit stage is that it can be executed only after Invoke Upgrade stage when it is successfully completed
+    the image is copied from the primary to the secondary bank and only when the system started from primary bank.
+    The upgradeXXXX return codes are only for imageSW.
+    "
+  ::= { imageMgmt 4 }
+
+upgradeImageSWDateAndTime OBJECT-TYPE
+  SYNTAX          OCTET STRING(SIZE(0..32))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "The date and time when upgradeImageSWStatus happen. "
+  ::= { imageMgmt 5 }
+
+imageInfoTable   OBJECT-TYPE
+  SYNTAX      SEQUENCE OF ImageInfoEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "ImageInformation Table. It includes the information of the Primary bank and the Secondary bank "
+  ::= { imageMgmt 10 }
+
+  imageInfoEntry   OBJECT-TYPE
+    SYNTAX      ImageInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "ImageInfoTable Entry."
+    INDEX   { imageInfoIndex }
+    ::= { imageInfoTable 1 }
+
+  ImageInfoEntry ::=
+    SEQUENCE    {
+      imageInfoIndex          INTEGER,
+      imageInfoVersion        OCTET STRING,
+      imageInfoCreated        OCTET STRING,
+      imageInfoSize           Integer32,
+      imageInfoCurrent        INTEGER
+    }
+
+    imageInfoIndex      OBJECT-TYPE
+      SYNTAX          INTEGER{ primary(1), secondary(2) }
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "Index of the Image."
+      ::= { imageInfoEntry 1 }
+
+    imageInfoVersion        OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE(0.. 32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "Version of the Image."
+      ::= { imageInfoEntry 2 }
+
+    imageInfoCreated        OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE(0.. 128))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "Created of the Image."
+      ::= { imageInfoEntry 3 }
+
+    imageInfoSize       OBJECT-TYPE
+      SYNTAX          Integer32(0..2147483647)
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "Size of the Image.(bytes)"
+      ::= { imageInfoEntry 4 }
+
+    imageInfoCurrent        OBJECT-TYPE
+      SYNTAX          INTEGER{ none(0), active(1) }
+      MAX-ACCESS          read-write
+      STATUS              current
+      DESCRIPTION
+        "Show Current Image"
+      ::= {  imageInfoEntry 5 }
+
+
+-- ======================================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:systemManagement:miscellaneous ==
+-- ======================================================================================
+reboot                  OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    none  (0),
+                    reboot(1) 
+                  }
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Writing this object as other than none will make the software reboot.
+    reboot means slot1, slot2 and Main reboot simultaneously.
+    This process takes a few minutes."
+  ::= { miscellaneous 1 }
+
+save                OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    none(0),
+                    save(1)
+                  }
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Writing this object other than none will save the current running configuration to the non-volatile memory of main"
+  ::= { miscellaneous 2 }
+
+lastSaveTime        OBJECT-TYPE
+  SYNTAX          DisplayString
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "This value is shows the last save time of base system"
+  ::= { miscellaneous 3 }
+
+timezone            OBJECT-TYPE
+  SYNTAX          OCTET STRING(SIZE(0..16))
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "The timezone configuration of the device. The examples are kst, KST, cnt etc.
+      act  - ACT. Australia Central Time(GMT+9:30)
+      aet  - AET. Australia Eastern Time(GMT+10:00)
+      agt  - AGT. Argentina Standard Time(GMT-3:00)
+      art  - ART. (Arabic) Egypt Standard Time(GMT+2:00)
+      ast  - AST. Alaska Standard Time(GMT-9:00)
+      bet  - BET. Brazil Eastern Time(GMT-3:00)
+      bst  - BST. Bangladesh Standard Time(GMT+6:00)
+      cat  - CAT. Central African Time(GMT-1:00)
+      cnt  - CNT. Canada Newfoundland Time(GMT-3:30)
+      cst  - CST. Central Standard Time(GMT-6:00)
+      ctt  - CTT. China Taiwan Time(GMT+8:00)
+      eat  - EAT. Eastern African Time(GMT+3:00)
+      ect  - ECT. European Central Time(GMT+1:00)
+      edt  - EDT. Eastern Daylight Time(GMT-4:00)
+      eet  - EET. Eastern European Tim(GMT+2:00)
+      est  - EST. Eastern Standard Time(GMT-5:00)
+      gmt  - GMT. Greenwich Mean Time
+      hst  - HST. Hawaii Standard Time(GMT-10:00)
+      iet  - IET. Indiana Eastern Standard Time(GMT-5:00)
+      ist  - IST. India Standard Time(GMT+5:30)
+      jst  - JST. Japan Standard Time(GMT+9:00)
+      kst  - KST. Korea Standard Time(GMT+9:00)
+      met  - MET. Middle East Time(GMT+3:30)
+      mit  - MIT. Midway Islands Time(GMT-11:00)
+      mst  - MST. Mountain Standard Time(GMT-7:00)
+      net  - NET. Near East Time(GMT+4:00)
+      nst  - NST. New Zealand Standard Time(GMT+12:00)
+      plt  - PLT. Pakistan Lahore Time(GMT+5:00)
+      pnt  - PNT. Phoenix Standard Time(GMT-7:00)
+      prt  - PRT. Puerto Rico and US Virgin Islands Time(GMT-4:00)
+      pst  - PST. Pacific Standard Time(GMT-8:00)
+      sst  - SST. Solomon Standard Time(GMT+11:00)
+      utc  - UTC. Universal Coordinated Time
+      vst  - VST. Vietnam Standard Time(GMT+7:00)
+    "
+  ::= { miscellaneous 4 }
+
+systemTime          OBJECT-TYPE
+  SYNTAX          OCTET STRING(SIZE(0..32))
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "system Current Time
+    - Time Format : Nov 15 20:53:40 2009"
+  ::= { miscellaneous 5 }
+
+lastCommand         OBJECT-TYPE
+  SYNTAX          OCTET STRING (SIZE(0..512))
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+  	"Save the last command line and time."
+  ::= { miscellaneous 6 }
+
+fanCtrlStartTemp    OBJECT-TYPE
+  SYNTAX          Integer32(0..100)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Fan Start Temperature : between 0 and 100"
+  ::= { miscellaneous 7 }
+
+fanCtrlStopTemp     OBJECT-TYPE
+  SYNTAX          Integer32(-30..30)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Fan Stop Temperature : between -30 and 30"
+  ::= { miscellaneous 8 }
+
+fanRpmConfig        OBJECT-TYPE
+  SYNTAX          Integer32(5000..20000)
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "Fan Rpm : between 5000 and 20000"
+  ::= { miscellaneous 9 }
+
+fanLowTolerance     OBJECT-TYPE
+  SYNTAX          Integer32(10..80)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Fan Low Under Flow Tolerance : between 10% to 80%"
+  ::= { miscellaneous 10 }
+
+fanLowToleranceValue    OBJECT-TYPE
+  SYNTAX          Integer32
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "Fan Low Under Flow Tolerance RPM"
+  ::= { miscellaneous 11 }
+
+fanHighTolerance        OBJECT-TYPE
+  SYNTAX          Integer32(10..80)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Fan High Over Flow Tolerance : between 10% to 80%"
+  ::= { miscellaneous 12 }
+
+fanHighToleranceValue   OBJECT-TYPE
+  SYNTAX          Integer32
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "Fan HighOver Flow Tolerance RPM"
+  ::= { miscellaneous 13 }
+
+tempHighThreshold   OBJECT-TYPE
+  SYNTAX          Integer32(0..100)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "High temperature threshold(0 to 100)"
+  ::= { miscellaneous 14 }
+
+tempLowThreshold    OBJECT-TYPE
+  SYNTAX          Integer32(-30..-1)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "Low temperature threshold(-1 to -30)"
+  ::= { miscellaneous 15 }
+
+
+-- =====================================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:systemManagement:bridgeConfig ==
+-- =====================================================================================
+--    bridgeMode              OBJECT-TYPE
+--    SYNTAX                  INTEGER{ customer(1), provider(2), providerBackbone(3)}
+--    MAX-ACCESS              read-write
+--    STATUS                  current
+--    DESCRIPTION
+--        ""
+--    ::= { bridgeConfig 1 }
+
+--    bridgeageingTime        OBJECT-TYPE
+--    SYNTAX                  Integer32(10..1000000)
+--    MAX-ACCESS              read-write
+--    STATUS                  current
+--    DESCRIPTION
+--        ""
+--    ::= { bridgeConfig 2 }
+
+-- ========================================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:systemManagement:mgmtVlanConfig  ==
+-- ========================================================================================
+mgmtOuterVlan           OBJECT-TYPE
+  SYNTAX          Integer32(1..4094)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    " "
+  ::= { mgmtVlanConfig 1 }
+
+mgmtOuterVlanPriority   OBJECT-TYPE
+  SYNTAX          Integer32(0..7)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    " "
+  ::= { mgmtVlanConfig 2 }
+
+mgmtInnerVlan           OBJECT-TYPE
+  SYNTAX          Integer32(0..4094)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    "0 is untagged"
+  ::= { mgmtVlanConfig 3 }
+
+mgmtInnerVlanPriority   OBJECT-TYPE
+  SYNTAX          Integer32(0..7)
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION
+    " "
+  ::= { mgmtVlanConfig 4 }
+
+
+-- ==================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:accessInfo ==
+-- ==================================================================
+pInbandIPAddress            OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION               
+    "Ip Adddress of inband Primary management ETH port"
+  ::= { accessInfo 1 }
+
+pInbandNetMask              OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION               
+    "NetMask of inband Primary management ETH port"
+  ::= { accessInfo 2 }
+
+pInbandNetworkAddress       OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION               
+    "Network address of Inband Primary management ETH port"
+  ::= { accessInfo 3 }
+  
+pInbandMACAddress           OBJECT-TYPE
+  SYNTAX          MacAddress
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION               
+    "MAC address of inband Primary management ETH port"
+  ::= { accessInfo 4 }
+
+pOOBIPAddress               OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION               
+    "IP address of OOB(Out of Band) ETH port"
+  ::= { accessInfo 5 }
+
+pOOBNetMask                 OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION               
+    "NetMask of OOB(Out of band) ETH port"
+  ::= { accessInfo 6 }
+
+pOOBNetworkAddress           OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION              
+    "Network address of OOB(Out of band) ETH port"
+  ::= { accessInfo 7 }
+
+pOOBMACAddress               OBJECT-TYPE
+  SYNTAX          MacAddress
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION               
+    "MAC address of OOB(Out of band) port"
+  ::= { accessInfo 8 }
+
+pDefaultGateway              OBJECT-TYPE
+  SYNTAX          IpAddress
+  MAX-ACCESS      read-write
+  STATUS          current
+  DESCRIPTION               
+    "Default Gateway - 0.0.0.0 : disable"
+  ::= { accessInfo 9 }
+
+
+-- ==========================================================================
+-- pManagement:configManagement:mainSystem:systemConfig:consoleInformation ==
+-- ==========================================================================
+consoleBaudRate             OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    bps9600   (1),
+                    bps19200  (2),
+                    bps38400  (3),
+                    bps57600  (4),
+                    bps115200 (5)
+                  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "The baud rate of the console port."
+  ::= { consoleInformation 1 }
+
+consoleCharSize             OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    sevenBits(7),
+                    eightBits(8)
+                  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "The character size of the console port."
+  ::= { consoleInformation 2 }
+  
+consoleParityBits           OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    noParity  (1),
+                    evenParity(2),
+                    oddParity (3)
+                  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "The parity bits of the console port."
+  ::= { consoleInformation 3 }
+
+consoleStopBits             OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    one (1),
+                    two (2)
+                  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "The stop bits of the console port."
+  ::= { consoleInformation 4 }
+
+consoleFlowControl          OBJECT-TYPE
+  SYNTAX          INTEGER {
+                    none     (1),
+                    hardware (2),
+                    xonXoff  (3)
+                  }
+  MAX-ACCESS      read-only
+  STATUS          current
+  DESCRIPTION
+    "The flow control of the console port."
+  ::= { consoleInformation 5 }
+
+
+END

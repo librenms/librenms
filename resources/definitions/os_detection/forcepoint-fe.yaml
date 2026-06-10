@@ -1,0 +1,13 @@
+os: forcepoint-fe
+text: 'Forcepoint FlexEdge Secure SD-WAN'
+type: firewall
+icon: forcepoint
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+
+discovery:
+    - sysObjectID:
+          - .1.3.6.1.4.1.47565.1.1
+
+mib_dir: forcepoint

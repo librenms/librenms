@@ -1,0 +1,14 @@
+os: ees
+text: 'Emerson Energy System'
+type: power
+icon: emerson
+mib_dir: emerson
+over:
+  - { graph: device_current, text: Current }
+  - { graph: device_voltage, text: Voltage }
+  - { graph: device_state,  text: State }
+
+discovery:
+  - sysDescr:
+      - 'Linux ES_Controller'
+      - 'Linux AT9263'

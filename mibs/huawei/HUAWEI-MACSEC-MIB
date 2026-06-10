@@ -1,0 +1,375 @@
+--=================================================================
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description:HUAWEI MACSEC MIB
+-- Reference:
+-- Version: V1.06
+-- History:
+-- =================================================================
+
+	HUAWEI-MACSEC-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			hwDatacomm			
+				FROM HUAWEI-MIB			
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
+				FROM SNMPv2-CONF			
+			Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI;
+	
+	
+		hwMACsec MODULE-IDENTITY 
+			LAST-UPDATED "202207211521Z"		-- 07/21, 2022
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+				"Huawei Industrial Base
+				Bantian, Longgang
+				Shenzhen 518129
+				People's Republic of China
+				Website: http://www.huawei.com
+				Email: support@huawei.com"
+			DESCRIPTION 
+				"This MIB describes objects used for MACsec."  
+                        REVISION  "202207211521Z"
+															   DESCRIPTION 
+				                                                                 "Delete useless comments."
+			REVISION  "202202231521Z"
+															   DESCRIPTION 
+				                                                                 "Modify MAX-ACCESS of  hwMacsecRcvRspTimeoutIfIndex,hwMacsecRcvRspTimeoutRole,hwMacsecRcvRspTimeoutLocalPort."
+			REVISION  "202011232003Z"
+															   DESCRIPTION 
+				                                                                 "Add NOTIFICATION-TYPE of hwMACsecIfName, hwMACsecFailReason,hwMACsecFailNotify."
+
+			REVISION  "201804231622Z"
+															   DESCRIPTION 
+				                                                                 "Add NOTIFICATION-TYPE of hwMACsecPortCipherPeer, hwMACsecPortCipher,hwCipherSwitchFailAlarm,hwMACsecCipherSwitchReason, hwMACsecCipherSwitchFailReason."
+
+			REVISION  "201711031622Z"
+															   DESCRIPTION 
+				                                                                 "Add NOTIFICATION-TYPE of hwMacsecRcvRspTimeout, hwMacsecRcvRspTimeoutResume."
+				
+			REVISION  "201603101013Z"
+															   DESCRIPTION 
+				                                                                 "Modify MAX-ACCESS of  hwMACsecPortRole ,hwMACsecPortName,hwMACsecPortOldCKN,hwMACsecPortNewCKN."    
+
+			REVISION  "201603101013Z"
+																DESCRIPTION 
+				                                                                 "This MIB describes objects used for MACsec." 
+
+
+	
+			::= { hwDatacomm 347 }
+		   		    
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.2011.5.25.347.1
+		hwMACsecMibObjects OBJECT IDENTIFIER ::= { hwMACsec 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1
+		hwMACsecPortCfgTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwMACsecPortCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The port's MACsec configuration table."
+			::= { hwMACsecMibObjects 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1
+		hwMACsecPortCfgEntry OBJECT-TYPE
+			SYNTAX HwMACsecPortCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the MACsec configuration table."
+			INDEX { hwMACsecIfIndex }
+			::= { hwMACsecPortCfgTable 1 }
+		
+		HwMACsecPortCfgEntry ::=
+			SEQUENCE { 
+				hwMACsecIfIndex
+					Unsigned32,
+				hwMACsecPortRole
+					INTEGER,
+				hwMACsecPortName
+					OCTET STRING,
+				hwMACsecPortOldCKN
+					OCTET STRING,
+				hwMACsecPortNewCKN
+					OCTET STRING,
+				hwMACsecPortCipherPeer
+					OCTET STRING,
+				hwMACsecPortCipher
+					OCTET STRING,
+				hwMACsecIfName
+					OCTET STRING,
+				hwMACsecFailReason
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1.1
+		hwMACsecIfIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS  not-accessible
+			STATUS current
+			DESCRIPTION
+				"The interface index."
+			::= { hwMACsecPortCfgEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1.2
+		hwMACsecPortRole OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				nonkeyserver(1),
+				keyserver(2)
+				}
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"Indicates the MKA role of the port.
+				Options: 
+				1. nonkeyserver(1) -indicates the MKA role of the port is supplicant.
+				2. keyserver(2)    -indicates the MKA role of the port is key server. "
+			DEFVAL { nonkeyserver }
+			::= { hwMACsecPortCfgEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1.3
+		hwMACsecPortName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"The port name."
+			::= { hwMACsecPortCfgEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1.4
+		hwMACsecPortOldCKN OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"The using CKN of this port."
+			::= { hwMACsecPortCfgEntry 4 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1.5
+		hwMACsecPortNewCKN OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"The configed CKN of this port."
+			::= { hwMACsecPortCfgEntry 5 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.347.1.1.1.6
+		hwMACsecPortCipherPeer OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"The configed Cipher Suite of peer."
+			::= { hwMACsecPortCfgEntry 6 }
+
+        -- 1.3.6.1.4.1.2011.5.25.347.1.1.1.7
+		hwMACsecPortCipher OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"The configed Cipher Suite of this port."
+			::= { hwMACsecPortCfgEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1.8
+		hwMACsecIfName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"The interface name."
+			::= { hwMACsecPortCfgEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.5.25.347.1.1.1.9
+		hwMACsecFailReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify 
+			STATUS current
+			DESCRIPTION
+				"The reason that MACsec failed to run on an interface."
+			::= { hwMACsecPortCfgEntry 9 }
+		
+		--
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2
+		hwMacsecRcvRspTimeoutTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwMacsecRcvRspTimeoutEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"No heartbeat response alarm list."
+			::= { hwMACsecMibObjects 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1
+		hwMacsecRcvRspTimeoutEntry OBJECT-TYPE
+			SYNTAX HwMacsecRcvRspTimeoutEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the no heartbeat response alarm list."
+			INDEX { hwMacsecRcvRspTimeoutIfIndex, hwMacsecRcvRspTimeoutRole, hwMacsecRcvRspTimeoutLocalPort }
+			::= { hwMacsecRcvRspTimeoutTable 1 }
+		
+		HwMacsecRcvRspTimeoutEntry ::=
+			SEQUENCE {
+				hwMacsecRcvRspTimeoutIfIndex
+					Unsigned32,
+				hwMacsecRcvRspTimeoutRole
+					Unsigned32,
+				hwMacsecRcvRspTimeoutLocalPort
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1.1
+		hwMacsecRcvRspTimeoutIfIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS  accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Interface index."
+			::= { hwMacsecRcvRspTimeoutEntry 1 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1.2
+		hwMacsecRcvRspTimeoutRole OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS  accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Device role."
+			::= { hwMacsecRcvRspTimeoutEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.1.2.1.3
+		hwMacsecRcvRspTimeoutLocalPort OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS  accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Local port."
+			::= { hwMacsecRcvRspTimeoutEntry 3 }
+			
+
+		-- 1.3.6.1.4.1.2011.5.25.347.2
+		hwMACsecTraps OBJECT IDENTIFIER ::= { hwMACsec 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.2.1
+		hwMACsecTrapOID OBJECT IDENTIFIER ::= { hwMACsecTraps 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.2.1.1
+		hwMACsecCKNSwitchReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The reason of CKN switching."
+			::= { hwMACsecTrapOID 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.2.1.2
+		hwMACsecCKNSwitchFailReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The reason of CKN switching failed."
+			::= { hwMACsecTrapOID 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.347.2.1.3
+		hwMACsecCipherSwitchReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The reason of Cipher Suite switching."
+			::= { hwMACsecTrapOID 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.2.1.4
+		hwMACsecCipherSwitchFailReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The reason of Cipher Suite switching failed."
+			::= { hwMACsecTrapOID 4 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.2.2
+		hwCKNSwitchFailAlarm NOTIFICATION-TYPE
+			OBJECTS { hwMACsecPortRole, hwMACsecPortName, hwMACsecPortOldCKN, hwMACsecPortNewCKN, hwMACsecCKNSwitchReason, hwMACsecCKNSwitchFailReason }
+			STATUS current
+			DESCRIPTION 
+				"Failed to switch the CKN."
+			::= { hwMACsecTraps 2 }
+
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.2.3
+		hwMacsecRcvRspTimeout NOTIFICATION-TYPE
+			OBJECTS {hwMacsecRcvRspTimeoutIfIndex, hwMacsecRcvRspTimeoutRole, hwMacsecRcvRspTimeoutLocalPort}
+			STATUS current
+			DESCRIPTION 
+				"No heartbeat response alarm list."
+			::= { hwMACsecTraps 3 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.2.4
+		hwMacsecRcvRspTimeoutResume NOTIFICATION-TYPE
+			OBJECTS {hwMacsecRcvRspTimeoutIfIndex, hwMacsecRcvRspTimeoutRole, hwMacsecRcvRspTimeoutLocalPort}
+			STATUS current
+			DESCRIPTION 
+				"No heartbeat response alarm resume list."
+			::= { hwMACsecTraps 4 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.2.5
+		hwCipherSwitchFailAlarm NOTIFICATION-TYPE
+			OBJECTS { hwMACsecPortRole, hwMACsecPortName, hwMACsecPortCipherPeer, hwMACsecPortCipher, hwMACsecCipherSwitchReason, hwMACsecCipherSwitchFailReason }
+			STATUS current
+			DESCRIPTION 
+				"Failed to switch the cipher suite."
+			::= { hwMACsecTraps 5 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.347.2.6
+		hwMACsecFailNotify NOTIFICATION-TYPE
+			OBJECTS { hwMACsecIfName, hwMACsecFailReason }
+			STATUS current
+			DESCRIPTION 
+				"Failed to run on an interface."
+			::= { hwMACsecTraps 6 }
+
+		-- 1.3.6.1.4.1.2011.5.25.347.3
+		hwMACsecConformance OBJECT IDENTIFIER ::= { hwMACsec 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.3.1
+		hwMACsecMibGroups MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"The compliance statement for systems supporting this module."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwMACsecBindGroup, hwMACsecTrapGroup }
+			::= { hwMACsecConformance 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.3.1.1
+		hwMACsecBindGroup OBJECT-GROUP
+			OBJECTS { hwMACsecPortRole, hwMACsecCKNSwitchReason, hwMACsecPortName, hwMACsecPortNewCKN, hwMACsecPortOldCKN, 
+				hwMACsecCKNSwitchFailReason , hwMACsecPortCipherPeer, hwMACsecPortCipher, hwMACsecCipherSwitchReason, hwMACsecCipherSwitchFailReason}
+			STATUS current
+			DESCRIPTION 
+				"The MACsec module's Bind group."
+			::= { hwMACsecMibGroups 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.347.3.1.2
+		hwMACsecTrapGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwCKNSwitchFailAlarm,hwMacsecRcvRspTimeout,hwMacsecRcvRspTimeoutResume,hwCipherSwitchFailAlarm,hwMACsecFailNotify }
+			STATUS current
+			DESCRIPTION 
+				"The MACsec module's Notification group."
+			::= { hwMACsecMibGroups 2 }
+	END
+
+--
+-- HUAWEI-MACSEC-MIB.my
+--

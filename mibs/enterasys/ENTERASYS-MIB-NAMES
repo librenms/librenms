@@ -1,0 +1,131 @@
+ENTERASYS-MIB-NAMES DEFINITIONS ::= BEGIN
+
+--  enterasys-mib-names.txt
+--
+--  This module provides authoritative definitions for Enterasys
+--  Networks' MIB Names.  
+--
+--  This module will be extended, as needed.
+
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys
+--  Networks to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys Networks grants vendors, end-users, and other interested 
+--  parties a non-exclusive license to use this Specification in connection 
+--  with the management of Enterasys products.
+
+--  Copyright June, 2002 Enterasys Networks, Inc.
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+etsysModuleName  MODULE-IDENTITY
+    LAST-UPDATED "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+   
+    DESCRIPTION
+        "This MIB module defines a portion of the SNMP enterprise
+         MIBs under Enterasys Networks enterprise OID.
+
+         This module embodies the top level hierarchy of all
+         OIDs, MIBs, AGENT-CAPABILITIES statements, and X.509
+         PKI certificates for Enterasys Networks' products.
+
+         This leaf lexicographically falls under the etsysMibs branch
+         of the enterasys enterprise tree."
+
+    REVISION    "200311061515Z"  -- Thu Nov  6 15:15 GMT 2003
+    DESCRIPTION "Corrected the postal code in the CONTACT-INFO clause."
+
+    REVISION    "200310231719Z"  -- Thu Oct 23 17:19 GMT 2003
+    DESCRIPTION "Updated CONTACT-INFO and sections 2, 6, and 7."
+
+    REVISION    "200206141602Z"  -- Fri Jun 14 16:02 GMT 2002
+    DESCRIPTION "Minor change to the Applicability section."
+
+    REVISION    "200206141402Z"  -- Fri Jun 14 14:02 GMT 2002
+    DESCRIPTION "Updated the CONTACT-INFO clause.
+                 Added a branch for management of Enterasys specific 
+                 Internet X.509 Public Key Infrastructure Certificates."
+
+    REVISION    "200011132121Z"
+    DESCRIPTION "Imported OBJECT-IDENTITY from SNMPv2-SMI.
+                 Removed company address from the document header."
+
+    REVISION    "200010051300Z"
+    DESCRIPTION "Obsoleted etsysNamesMib, etsysConformance,
+                 etsysConformName, etsysConformOID.  This is the 
+                 first non-experimental version of this module."
+
+    REVISION    "200004070000Z"
+    DESCRIPTION "Fix many of the bugs in the first edit."
+
+    REVISION    "200003210000Z"
+    DESCRIPTION "The initial version of this MIB module."
+    ::= { enterprises 5624 1 2 1 } 
+
+-- Global definition for Enterasys tree
+enterasys OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Global definition of the enterasys enterprise branch
+         as provided by the Internet Assigned Numbers Authority
+         (IANA)."
+    ::= { enterprises 5624 }
+
+etsysMibs      OBJECT IDENTIFIER ::= { enterasys 1 }
+-- All MIBs are under this branch.
+
+etsysOids      OBJECT IDENTIFIER ::= { enterasys 2 }
+-- All OIDs are under this branch.
+
+etsysAgentCaps OBJECT IDENTIFIER ::= { enterasys 3 }
+-- All Agent Capabilities Statements are under this branch.
+
+etsysX509Pki   OBJECT IDENTIFIER ::= { enterasys 509 }
+-- All X.509 Public Key Infrastructure Certificates are under this branch.
+
+etsysModules   OBJECT IDENTIFIER ::= { etsysMibs 2 }
+-- All OIDs to be used for MODULE-IDENTITY macro invocation 
+-- are under this branch.  Further expansion of this branch is 
+-- detailed in the ENTERASYS-MIB-ORG module.
+
+etsysNamesMib OBJECT-IDENTITY 
+    STATUS      obsolete
+    DESCRIPTION "Obsolete."
+    ::= { etsysMibs 1 }
+
+etsysConformance OBJECT-IDENTITY 
+    STATUS      obsolete
+    DESCRIPTION "Obsolete."
+    ::= { etsysMibs 3 }
+
+etsysConformName OBJECT-IDENTITY 
+    STATUS      obsolete
+    DESCRIPTION "Obsolete"
+    ::= { etsysConformance 1 }
+
+etsysConformOID OBJECT-IDENTITY 
+    STATUS      obsolete
+    DESCRIPTION "Obsolete"
+    ::= { etsysConformance 2 }
+
+END

@@ -1,0 +1,589 @@
+-- **********************************************************
+-- Copyright 2015-2016 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-VCHA-MIB DEFINITIONS::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+        InetAddress, InetAddressType
+        FROM INET-ADDRESS-MIB
+        vmwVCHA
+        FROM VMWARE-ROOT-MIB
+        TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+    vmwVchaMIB MODULE-IDENTITY
+    LAST-UPDATED "201607190000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+     "This MIB module describes the vCenter High Availability Service (VCHA).
+     A VCHA cluster consists of three VMs identified by a single instance UUID.
+     One is the Active vCenter VM that serves client requests. Second is the
+     Passive VM that is identical to the Active vCenter VM in terms of database
+     and filesystem state. Passive VM constantly receives updates from Active
+     VM and takes over the role of Active vCenter VM in the event of a
+     failover. Third is the Witness VM that acts as a quorum VM in a VCHA
+     cluster. The sole purpose of Witness VM is to avoid classic split-brain
+     problem in a VCHA cluster.
+
+                             client
+                                +
+                                |
+                                |
+               +----------------v---+       +--------------------+
+               |            Public IP       |                    |
+               |                    |       |                    |
+               |   Active vCenter   |       |  Passive vCenter   |
+               |                    |       |                    |
+               +---Private-IP+------+       +------+Private-IP---+
+                        ^ <--------------------------> ^
+                        |    DB & File replication     |
+                         +                            +
+                          +                          +
+                           +                        +
+                            +------>    <----------+
+                              +----Private-IP----+
+                              |                  |
+                              |  Witness vCenter |
+                              |     (Quorum)     |
+                              |                  |
+                              +------------------+
+
+    All events will not be repeated for the duration of a given state entered.
+
+    It is highly recommended that the administrator links the SNMP trap receiver
+    to both public network and vCenter HA cluster network, so that the
+    monitoring system is able to get notified as long as one of the
+    networks is up.
+    "
+REVISION      "201607190000Z"
+DESCRIPTION
+     "Removed vmwVchaFileReplicationEventQueueOverflowed and cleaned up a few
+     descriptions. Fixed vCenter HA related terminologies and typos."
+REVISION      "201604060000Z"
+DESCRIPTION
+     "Aggregate vmwVchaFileWatchFailed, vmwVchaFileReplicationFailed and
+     vmwVchaFileResyncSucceeded into vmwVchaFileReplicationStateChanged
+     notification. Add three more notification for failover failure cases.
+     Combine syncPeerStarted and syncPeerCompleted into a single state: sync."
+REVISION      "201602030000Z"
+DESCRIPTION
+     "Add two more notifications vmwVchaFailoverSucceeded and
+     vmwVchaContinueAsActive to indicate whether a failover succeeds. Also add
+     one more parameter to vmwVchaNodeJoined and vmwVchaNodeLeft to distinguish
+     between the role of sender node and target node."
+REVISION      "201601270000Z"
+DESCRIPTION
+     "Change the terminology from DB replication mode to DB replication state
+     and add one more state to it. Also use past tense for all notification
+     names."
+REVISION      "201601150000Z"
+DESCRIPTION
+     "Add two more notifications vmwVchaClusterStateChange and
+     vmwVchaFileReplicationEventQueueOverflowed."
+REVISION      "201601040000Z"
+DESCRIPTION
+     "This is the first version of this MIB module."
+::= { vmwVCHA 1 }
+
+
+vmwVCHANotifications OBJECT IDENTIFIER ::= { vmwVCHA 0 }
+
+-- Definition of roles for VCHA, see RFC 4133 entLogicalType
+vmwVchaActive OBJECT IDENTIFIER ::= { vmwVCHA 250 }
+vmwVchaPassive OBJECT IDENTIFIER ::= { vmwVCHA 255 }
+vmwVchaWitness OBJECT IDENTIFIER ::= { vmwVCHA 260 }
+
+-- **********************************************************
+-- Enumerations for notification parameters
+-- **********************************************************
+
+VmwVchaNodeRoleType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represent the role each node in the cluster is running as.
+            active (1)      Active vCenter serves client requests.
+
+            passive (2)     Passive node is identical to the Active node in
+                            terms of database and filesystem state. Passive
+                            node constantly receives updates from the Active
+                            node and takes over the role of Active node in the
+                            event of a failover.
+
+            witness (3)     Witness node acts as a quorum node in a vCenter HA
+                            cluster. Sole purpose of Witness VM is to avoid
+                            the classic split-brain problem in a VCHA cluster.
+
+            unknown (4)     Node without any role assigned."
+    SYNTAX   INTEGER { active(1), passive(2), witness(3), unknown(4) }
+
+VmwVchaClusterModeType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represent VCHA cluster modes: enabled, disabled or maintenance:
+
+            enabled (1)     State replication between Active and Passive nodes
+                            is enabled and automatic failover happens if the
+                            Active node fails while the VCHA cluster is healthy.
+
+            disabled (2)    All three nodes are part of VCHA cluster but the
+                            state replication and automatic failover are
+                            disabled.
+
+            maintenance (3) All three nodes are part of VCHA cluster but
+                            automatic failover is disabled while state
+                            replication continues. The Active node continues to
+                            serve client requests even if Passive and Witness
+                            nodes are lost."
+    SYNTAX   INTEGER { enabled(1), disabled(2), maintenance(3) }
+
+VmwVchaClusterStateType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represent the health state of the vCenter HA cluster.
+
+            healthy (1)     All three nodes in a VCHA cluster are healthy and
+                            connected. State replication between the Active and
+                            Passive nodes is working and both nodes are in-sync.
+
+            degraded (2)    A VCHA cluster is said to be in degraded state when
+                            it has lost one of the three nodes. Node loss can
+                            be due to various reasons and as a result, the lost
+                            node is not visible to other two nodes. If the
+                            Active node is lost, the Passive node will take the
+                            role of the Active node. If the Passive or Witness
+                            node is lost, the Active node will continue to serve
+                            requests. A VCHA cluster can also be in degraded
+                            state if state replication fails between the Active
+                            and Passive nodes.
+
+            isolated (3)    All three nodes are isolated from each other. If
+                            this happens when VCHA cluster is in enabled mode,
+                            the Active node stops serving client requests. If
+                            nodes are isolated in a disabled VCHA cluster mode,
+                            the Active node continues to serve client requests."
+    SYNTAX   INTEGER { healthy(1), degraded(2), isolated(3) }
+
+VmwVchaDbReplicationStateType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represent DB replication states: sync, async or no replication.
+
+            noReplication (1)   There is no DB replication between the Active
+                                and Passive nodes. This could happen when
+                                vPostgres is not running on the Passive node.
+
+            sync (3)            In sync state, the Passive vCenter keeps the
+                                up-to-date state with the Active vCenter.
+
+            async (4)           Async state replication makes the state of
+                                Passive node fall behind the Active vCenter.
+                                This causes a data loss when an automatic
+                                failover happens."
+    SYNTAX   INTEGER { noReplication(1), sync(3), async(4) }
+
+VmwVchaFileReplicationProviderType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represent the file replication providers.
+
+            serviceConfig (1)   This provider maintains the replication of
+                                service configuration files, which are small in
+                                size.
+
+            serviceState (2)    This provider maintains the replication of
+                                service state files, which are large in size."
+    SYNTAX   INTEGER { serviceConfig(1), serviceState(2) }
+
+-- **********************************************************
+-- Notifications by an agent that implements this MIB module
+-- **********************************************************
+
+vmwVchaNodeJoined NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaPrivateAddressType,
+                vmwVchaPrivateAddressAddr,
+                vmwVchaTargetNodeRole
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent from the Active node when it
+        notices a peer node rejoin the cluster. It is sent only once."
+    ::= { vmwVCHANotifications 100 }
+
+vmwVchaNodeLeft NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaPrivateAddressType,
+                vmwVchaPrivateAddressAddr,
+                vmwVchaTargetNodeRole
+            }
+    STATUS      current
+    DESCRIPTION
+        "This warning notification is sent from the Active node when it notices
+        a peer node has left the cluster. This is sent only once. Operator
+        should check the liveness and connectivity of the departed node and try
+        to bring it back by either rebooting the appliance or resolving the
+        network problem."
+    ::= { vmwVCHANotifications 105 }
+
+vmwVchaNodeIsolated NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaPrivateAddressType,
+                vmwVchaPrivateAddressAddr,
+                vmwVchaTargetNodeRole
+            }
+    STATUS      current
+    DESCRIPTION
+        "This warning notification is sent when a node is network isolated from
+        the cluster. This notification can only be sent from the isolated node,
+        not by other nodes in the cluster. After being isolated, the node will
+        reboot itself trigging coldStart notification. In case of Active node
+        failure, the cluster will trigger a reelection and every slave node will
+        be declared as isolated temporarily before the cluster re-election
+        completes."
+    ::= { vmwVCHANotifications 110 }
+
+vmwVchaClusterStateChanged NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaClusterState
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent only once from the Active node when vCenter
+        HA cluster state changes to either healthy, degraded or isolated. Please
+        see VmwVchaClusterStateType for detailed description of each state. And
+        administrator should receive another notification describing the state
+        change of cluster subsystem (cluster membership, DB replication or file
+        replication) which is trigger of cluster state change."
+    ::= { vmwVCHANotifications 130 }
+
+vmwVchaClusterModeChanged NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaClusterMode
+            }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent only once from the Active node when vCenter
+        HA cluster mode changes to either enabled, maintenance or disabled."
+    ::= { vmwVCHANotifications 150 }
+
+vmwVchaPublicIpUp NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaPublicAddressType,
+                vmwVchaPublicAddressAddr
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent only once when the public IP
+        address is brought up on the Active node. At this time, the Active node
+        is reachable from the client and will be able to serve client requests
+        when services are up and running."
+    ::= { vmwVCHANotifications 205 }
+
+vmwVchaPublicIpDown NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaPublicAddressType,
+                vmwVchaPublicAddressAddr
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent only once when the public
+        network interface is brought down on the Active node. This can happen
+        when InitiateFailover is invoked on the Active node or vcha process
+        gracefully shuts down resulting in a reboot of the appliance (triggered
+        by network isolation). During this time, clients cannot connect to
+        vCenter Server and users will experience downtime until the public
+        network interface is brought up. In either case, users should not
+        expect more than five minutes of downtime. If VCHA cluster is still not
+        connectable, the operator should verify the reachability of each node
+        through the cluster network."
+    ::= { vmwVCHANotifications 206 }
+
+vmwVchaFailoverTriggered NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaIsPlannedFailover
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent only once when a failover is
+        triggered from the Active node to Passive node. Passive node should
+        take over the Active role if the cluster is in healthy state."
+    ::= { vmwVCHANotifications 210 }
+
+vmwVchaFailoverSucceeded NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent only once when the Passive node
+        takes over the Active role and brings up the public network interface."
+    ::= { vmwVCHANotifications 220 }
+
+vmwVchaFailoverFailedDisabledMode NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid
+            }
+    STATUS      current
+    DESCRIPTION
+        "This warning notification is sent only once when the Active node fails
+        to initiate a failover because the cluster is in disabled mode."
+    ::= { vmwVCHANotifications 225 }
+
+vmwVchaFailoverFailedNodeLost NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid
+            }
+    STATUS      current
+    DESCRIPTION
+        "This warning notification is sent only once when the Active node fails
+        to initiate a failover because the cluster does not have all three
+        nodes connected."
+    ::= { vmwVCHANotifications 226 }
+
+vmwVchaFailoverFailedPassiveNotReady NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid
+            }
+    STATUS      current
+    DESCRIPTION
+        "This warning notification is sent only once when the Active node fails
+        to initiate a failover because vPostgres service on the Passive node is
+        not ready to take over."
+    ::= { vmwVCHANotifications 227 }
+
+vmwVchaContinueAsActive NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent only once when the last Active
+        node continue as the Active node to servce client's request. This can
+        happen in many scenarios:
+        1. After triggering a planned failover, DB or file replicator failed to
+        flush data to the Passive node and failover didn't proceed because of
+        data loss.
+        2. After triggering a planned or forced failover, Passive node failed to
+        pick up the Active role for reasons like: auto failover cannot happen in
+        maintenance mode or cluster is in disabled mode."
+    ::= { vmwVCHANotifications 230 }
+
+vmwVchaDbReplicationStateChanged NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaDbReplicationState
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent only once from the Active node
+        when database replication state changes to sync, async or no
+        replication. Database replication is not healthy when it is in async or
+        no replication state. Reasons include large network delays or vPostgres
+        service becoming unresponsive on the Passive node."
+    ::= { vmwVCHANotifications 300 }
+
+vmwVchaFileReplicationStateChanged NOTIFICATION-TYPE
+    OBJECTS {
+                vmwVchaInstanceUuid,
+                vmwVchaFileReplicationProvider,
+                vmwVchaIsFileProviderInSync
+            }
+    STATUS      current
+    DESCRIPTION
+        "This informative notification is sent only once from the Active node
+        when file replication state changes to in-sync or out-of-sync. File
+        replication state is out-of-sync when VCHA fails to set a watch on a
+        file at the Active node or fails to replicate a file from the Active
+        node to Passive. Administrators should check the corresponding KB
+        article for recovery action."
+    ::= { vmwVCHANotifications 350 }
+
+-- **********************************************************
+-- Notification variables
+-- **********************************************************
+
+vmwVchaInstanceUuid OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+    "A string that uniquely identify the vCenter HA cluster. This is the same
+    as instance UUID of the active vCenter Server."
+    ::= { vmwVCHA 5 }
+
+vmwVchaPrivateAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+    "The type of cluster network interface: ipv4 or ipv6."
+    ::= { vmwVCHA 11 }
+
+vmwVchaPublicAddressType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The type of public network interface: ipv4 or ipv6."
+    ::= { vmwVCHA 12 }
+
+vmwVchaPrivateAddressAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+    "This is the IP address of each node in cluster network that is used to
+    communicate with other nodes in the cluster and transfer data between
+    the Active node and the Passive node."
+    ::= { vmwVCHA 15 }
+
+vmwVchaPublicAddressAddr   OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "The IP address of a node in public network that serves client's request."
+    ::= { vmwVCHA 16 }
+
+vmwVchaTargetNodeRole    OBJECT-TYPE
+    SYNTAX      VmwVchaNodeRoleType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Represents the role of node being affected by the given event. See MIB
+    module general description for detailed expalanation for each role."
+    ::= { vmwVCHA 20 }
+
+vmwVchaClusterState OBJECT-TYPE
+    SYNTAX      VmwVchaClusterStateType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "vCenter HA cluster states: healthy, degraded or isolated."
+    ::= { vmwVCHA 25 }
+
+vmwVchaClusterMode OBJECT-TYPE
+    SYNTAX      VmwVchaClusterModeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "vCenter HA cluster modes: enabled, maintenance or disabled."
+    ::= { vmwVCHA 30 }
+
+vmwVchaIsPlannedFailover OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "For planned failover, the Active node flushes all the state to the Passive
+     node, waits for the flush to complete before causing a failover.
+     After the failover, the Passive node starts without any data loss.
+     For unplanned failover, the failover is initiated immediately and may
+     result in data loss."
+    ::= { vmwVCHA 40 }
+
+vmwVchaDbReplicationState OBJECT-TYPE
+    SYNTAX      VmwVchaDbReplicationStateType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "Database replication states: sync, async or no replication."
+    ::= { vmwVCHA 50 }
+
+vmwVchaIsFileProviderInSync OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "This variable represents the file replication provider state. When it is
+    false, the service configuration and state files are out of sync between
+    the Passive and Active nodes. This could result from file replication
+    failures."
+    ::= { vmwVCHA 55 }
+
+vmwVchaFileReplicationProvider OBJECT-TYPE
+    SYNTAX      VmwVchaFileReplicationProviderType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+    "File replication providers: service-config or service-state."
+    ::= { vmwVCHA 60 }
+
+-- conformance information
+vmwVchaMIBConformance OBJECT IDENTIFIER ::= { vmwVchaMIB 2 }
+vmwVchaMIBCompliances OBJECT IDENTIFIER ::= { vmwVchaMIBConformance 1 }
+vmwVchaMIBGroups OBJECT IDENTIFIER ::= { vmwVchaMIBConformance 2 }
+
+vmwVchaMIBBasicComplianceRev2 MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+    "The compliance statement for entities which implement VMWARE-VCHA-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwVchaNotificationInfoGroup, vmwVchaNotificationGroup }
+    ::= { vmwVchaMIBCompliances 3 }
+
+vmwVchaNotificationInfoGroup OBJECT-GROUP
+    OBJECTS {
+        vmwVchaInstanceUuid,
+        vmwVchaPrivateAddressAddr,
+        vmwVchaPrivateAddressType,
+        vmwVchaPublicAddressAddr,
+        vmwVchaPublicAddressType,
+        vmwVchaTargetNodeRole,
+        vmwVchaClusterState,
+        vmwVchaClusterMode,
+        vmwVchaIsPlannedFailover,
+        vmwVchaDbReplicationState,
+        vmwVchaIsFileProviderInSync,
+        vmwVchaFileReplicationProvider
+    }
+    STATUS current
+    DESCRIPTION
+    "These objects provide notification details."
+    ::= { vmwVchaMIBGroups 1 }
+
+vmwVchaNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vmwVchaNodeJoined,
+        vmwVchaNodeLeft,
+        vmwVchaNodeIsolated,
+        vmwVchaClusterStateChanged,
+        vmwVchaClusterModeChanged,
+        vmwVchaPublicIpUp,
+        vmwVchaPublicIpDown,
+        vmwVchaFailoverTriggered,
+        vmwVchaFailoverSucceeded,
+        vmwVchaFailoverFailedDisabledMode,
+        vmwVchaFailoverFailedNodeLost,
+        vmwVchaFailoverFailedPassiveNotReady,
+        vmwVchaContinueAsActive,
+        vmwVchaDbReplicationStateChanged,
+        vmwVchaFileReplicationStateChanged
+    }
+    STATUS current
+    DESCRIPTION
+    "Group of objects describing notifications (traps)."
+    ::= { vmwVchaMIBGroups 2 }
+
+END -- end of VMWARE-VCHA-MIB.

@@ -1,0 +1,285 @@
+-- *****************************************************************
+-- Transition Networks Syslog MIB
+--
+-- Copyright (C) 2012  Transition Networks, Inc. All Rights Reserved.
+-- *****************************************************************
+
+TN-SYS-LOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString, RowStatus, TruthValue, TimeStamp, DateAndTime
+                FROM SNMPv2-TC
+        InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises, IpAddress FROM SNMPv2-SMI
+    entPhysicalIndex FROM ENTITY-MIB
+    tnDevMgmt FROM TN-MGMT-MIB;
+
+tnSyslogMIB MODULE-IDENTITY
+    LAST-UPDATED "201207230000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "   Transition Networks
+            Technical Support
+
+            10900 Red Circle Drive
+            Minnetonka, MN 55343 USA
+            Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for managing sys log."
+    ::= { tnDevMgmt 18 }
+
+--
+-- Textual Conventions
+--
+
+SyslogLevelValue ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Represents a syslog level."
+        SYNTAX INTEGER
+            {
+                emerg        (1),  -- emergency; system is unusable
+                alert        (2),  -- action must be taken immediately
+                crit         (3),  -- critical condition
+                err          (4),  -- error condition
+                warning      (5),  -- warning condition
+                notice       (6),  -- normal but significant condition
+                info         (7),  -- informational message
+                debug        (8)   -- debug-level messages
+            }
+
+SyslogLevelValueAll ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Represents a syslog level mainly for query and clear."
+        SYNTAX INTEGER
+            {
+                all          (0),  -- all; usually for query and clear operation
+                emerg        (1),  -- emergency; system is unusable
+                alert        (2),  -- action must be taken immediately
+                crit         (3),  -- critical condition
+                err          (4),  -- error condition
+                warning      (5),  -- warning condition
+                notice       (6),  -- normal but significant condition
+                info         (7),  -- informational message
+                debug        (8)   -- debug-level messages
+            }
+
+--
+-- Mib variables
+--
+
+
+--
+-- tnSyslogMgmtTable
+--
+
+tnSyslogMgmtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TNSyslogMgmtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TN Sys Log Mgmt Table"
+    ::= { tnSyslogMIB 1 }
+
+tnSyslogMgmtEntry OBJECT-TYPE
+    SYNTAX TNSyslogMgmtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents the syslog configuration on a device."
+    INDEX { entPhysicalIndex }
+    ::= { tnSyslogMgmtTable 1 }
+
+TNSyslogMgmtEntry ::= SEQUENCE {
+    tnSyslogServerAddrType   InetAddressType,
+    tnSyslogServerAddr       InetAddress,
+    tnSyslogServerPort       INTEGER,
+    tnSyslogLevel            SyslogLevelValue,
+    tnSyslogMode             INTEGER,
+    tnSyslogLocalFileName    DisplayString,
+    tnSyslogServerEnable     INTEGER
+}
+
+tnSyslogServerAddrType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Address type of Syslog Server.
+        For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnSyslogMgmtEntry 1 }
+
+tnSyslogServerAddr OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Address of Syslog Server.
+        For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnSyslogMgmtEntry 2 }
+
+tnSyslogServerPort OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Syslog server listening port. Its default value is 514."
+    ::= { tnSyslogMgmtEntry 3 }
+
+tnSyslogLevel OBJECT-TYPE
+    SYNTAX SyslogLevelValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The severity levels of syslog messages. The enumeration
+                  values are equal to the values that syslog uses + 1; The messages whose
+                      serverity level is lower than and equal to this level will be logged."
+    ::= { tnSyslogMgmtEntry 4 }
+
+tnSyslogMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    logLocal(1),
+                    logRemote(2),
+                    logLocalAndRemote(3),
+                    off(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Syslog operation mode.
+
+                 For the setting behavior:
+                 logLocal(1): syslog messages are only saved to local device;
+                 logRemote(2): syslog messages are only sent to remote server;
+                 logLocalAndRemote(3): syslog messages are saved to local
+                     device and sent to remote server;
+                 off(4): do not save syslog messages."
+    ::= { tnSyslogMgmtEntry 5 }
+
+tnSyslogLocalFileName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Absolute filename on the local file system for saving syslog messages.
+                 This is valid only when 'tnSyslogMode' is set to 'logLocal' and
+                 'logLocalAndRemote'."
+    ::= { tnSyslogMgmtEntry 6 }
+
+tnSyslogServerEnable OBJECT-TYPE
+    SYNTAX INTEGER { enable (1), disable (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Enable or Disable whether Syslog messages are sent to remote Syslog Server."
+    ::= { tnSyslogMgmtEntry 7 }
+
+--
+-- tnSyslogMessageTable
+--
+
+tnSyslogMessageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TNSyslogMessageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TN Syslog Message Table"
+    ::= { tnSyslogMIB 2 }
+
+tnSyslogMessageEntry OBJECT-TYPE
+    SYNTAX TNSyslogMessageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents a syslog message on a device."
+    INDEX { tnSyslogMessageId }
+    ::= { tnSyslogMessageTable 1 }
+
+TNSyslogMessageEntry ::= SEQUENCE {
+    tnSyslogMessageId INTEGER,
+    tnSyslogMessageTime DisplayString,
+    tnSyslogMessageLevel SyslogLevelValue,
+    tnSyslogMessage DisplayString
+}
+
+tnSyslogMessageId OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Id of a sys log."
+    ::= { tnSyslogMessageEntry 1 }
+
+tnSyslogMessageTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The date and time of the sys log."
+    ::= { tnSyslogMessageEntry 2 }
+
+tnSyslogMessageLevel OBJECT-TYPE
+    SYNTAX SyslogLevelValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The level of the sys log."
+    ::= { tnSyslogMessageEntry 3}
+
+tnSyslogMessage OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The message of the sys log."
+    ::= { tnSyslogMessageEntry 4}
+
+--
+-- tnSyslogExtTable
+--
+
+tnSyslogExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TNSyslogExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TN Syslog extension table"
+    ::= { tnSyslogMIB 3 }
+
+tnSyslogExtEntry OBJECT-TYPE
+    SYNTAX TNSyslogExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry represents a syslog extension info on a device."
+    INDEX { entPhysicalIndex }
+    ::= { tnSyslogExtTable 1 }
+
+TNSyslogExtEntry ::= SEQUENCE {
+    tnSyslogQueryLevel       SyslogLevelValueAll,
+    tnSyslogClearLevel       SyslogLevelValueAll,
+    tnSyslogClear            TruthValue
+}
+
+tnSyslogQueryLevel OBJECT-TYPE
+    SYNTAX SyslogLevelValueAll
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Syslog level for query."
+    ::= { tnSyslogExtEntry 1 }
+
+tnSyslogClearLevel OBJECT-TYPE
+    SYNTAX SyslogLevelValueAll
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Syslog level for clearing."
+    ::= { tnSyslogExtEntry 2 }
+
+tnSyslogClear OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "True for clearing the syslogs."
+    ::= { tnSyslogExtEntry 3 }
+
+END

@@ -1,0 +1,83 @@
+<?php
+
+use App\Models\Port;
+
+header('Content-type: application/json');
+
+if (Gate::denies('port.update')) {
+    $response = [
+        'status' => 'error',
+        'message' => 'You need permission',
+    ];
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$status = 'error';
+$message = 'Error with config';
+
+// enable/disable ports/interfaces on devices.
+$device_id = intval($_POST['device']);
+$rows_updated = 0;
+
+foreach ($_POST as $key => $val) {
+    if (str_starts_with((string) $key, 'oldign_')) {
+        // Interface identifier passed as part of the field name
+        $port_id = intval(substr((string) $key, 7));
+
+        $oldign = intval($val) ? 1 : 0;
+        $newign = $_POST['ignore_' . $port_id] ? 1 : 0;
+
+        // As checkboxes are not posted when unset - we effectively need to do a diff to work
+        // out a set->unset case.
+        if ($oldign == $newign) {
+            continue;
+        }
+
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['ignore' => $newign]);
+
+        if ($n < 0) {
+            $rows_updated = -1;
+            break;
+        }
+
+        $rows_updated += $n;
+    } elseif (str_starts_with((string) $key, 'olddis_')) {
+        // Interface identifier passed as part of the field name
+        $port_id = intval(substr((string) $key, 7));
+
+        $olddis = intval($val) ? 1 : 0;
+        $newdis = $_POST['disabled_' . $port_id] ? 1 : 0;
+
+        // As checkboxes are not posted when unset - we effectively need to do a diff to work
+        // out a set->unset case.
+        if ($olddis == $newdis) {
+            continue;
+        }
+
+        $n = Port::where('device_id', $device_id)->where('port_id', $port_id)->update(['disabled' => $newdis]);
+
+        if ($n < 0) {
+            $rows_updated = -1;
+            break;
+        }
+
+        $rows_updated += $n;
+    }//end if
+}//end foreach
+
+if ($rows_updated > 0) {
+    $message = $rows_updated . ' Port record(s) updated.';
+    $status = 'ok';
+} elseif ($rows_updated = '-1') {
+    $message = 'Port records unchanged. No update necessary.';
+    $status = 'ok';
+} else {
+    $message = 'Port record update error.';
+}
+
+$response = [
+    'status' => $status,
+    'message' => $message,
+];
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

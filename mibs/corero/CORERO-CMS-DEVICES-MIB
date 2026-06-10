@@ -1,0 +1,339 @@
+CORERO-CMS-DEVICES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    TimeTicks, Counter32, Unsigned32, Counter64, enterprises, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TestAndIncr, TimeStamp, RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    coreroCMSMIBObjects, coreroCMSMIBCompliances, coreroCMSMIBGroups
+        FROM CORERO-CMS-MIB;
+
+
+devices MODULE-IDENTITY
+    LAST-UPDATED "202009300000Z"
+    ORGANIZATION "Corero Network Security"
+    CONTACT-INFO
+            "info@corero.com"
+    DESCRIPTION
+            "Corero Management Server MIB."
+    REVISION      "201712050000Z"
+    DESCRIPTION
+            "Initial revision"
+    REVISION      "201712070000Z"
+    DESCRIPTION
+            "Rename of deviceDeploymentAction's 'not-in-progress to 'none'"
+    REVISION      "201712190000Z"
+    DESCRIPTION
+            "Updated to support revised operating-modes configuration"
+    REVISION      "201801090000Z"
+    DESCRIPTION
+            "Add invalid-modules-detected deploy-state"
+    REVISION      "201802050000Z"
+    DESCRIPTION
+            "Rename of deviceHealth object to deviceStatus"
+    REVISION      "201809250000Z"
+    DESCRIPTION
+            "Change deviceAdminState to use enabled/disabled"
+    REVISION      "201810020000Z"
+    DESCRIPTION
+            "Add redeploy-pending deploy-state"
+    REVISION      "201810080000Z"
+    DESCRIPTION
+            "Added unknown device type value"
+    REVISION      "202009030000Z"
+    DESCRIPTION
+            "Added deviceHardwareVersion object to deviceStatus"
+
+   ::= { coreroCMSMIBObjects 2 }
+
+-- devices
+
+deviceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of devices"
+    ::= { devices 1 }
+
+deviceEntry OBJECT-TYPE
+    SYNTAX      DeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry within the device table which represents a single device"
+    INDEX { deviceIndex }
+    ::= { deviceTable 1 }
+
+DeviceEntry ::= SEQUENCE {
+    deviceIndex                   INTEGER (1..2147483647),
+    deviceName                    OCTET STRING,
+    deviceAddress                 OCTET STRING,
+    deviceDescription             OCTET STRING,
+    deviceDefenseMode             INTEGER,
+    deviceAdminState              INTEGER,
+    deviceModel                   INTEGER,
+    deviceSerialNumber            OCTET STRING,
+    deviceConnectionState         INTEGER,
+    deviceDeploymentState         INTEGER,
+    deviceDeploymentAction        INTEGER,
+    deviceSXOSVersion             OCTET STRING,
+    deviceSoftwareVersion         OCTET STRING,
+    deviceUptime                  OCTET STRING,
+    deviceStatus                  OCTET STRING,
+    deviceType                    INTEGER,
+    deviceBypassMode              INTEGER,
+    deviceHardwareVersion        OCTET STRING
+}
+
+deviceIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of the device"
+    ::= { deviceEntry 1 }
+
+deviceName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the device"
+    ::= { deviceEntry 2 }
+
+deviceAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address which the CMS uses to look for the device"
+    ::= { deviceEntry 3 }
+
+deviceDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device description. If no description is entered, this is blank."
+    ::= { deviceEntry 4 }
+
+deviceDefenseMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    monitor(0),
+                    mitigate(1),
+                    pass-through(2),
+                    not-applicable(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Defense Mode for the device"
+    ::= { deviceEntry 5 }
+
+deviceAdminState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(1),
+                    enabled(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current admin-state of the device"
+    ::= { deviceEntry 6 }
+
+deviceModel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ntd-virtual-edition(0),
+                    ntd1100(1),
+                    ntd120(2),
+                    nba(3),
+                    unknown(4),
+                    ntd280(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of device"
+    ::= { deviceEntry 7 }
+
+deviceSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The serial number of the device"
+    ::= { deviceEntry 8 }
+
+deviceConnectionState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    connected(0),
+                    authentication-failed(1),
+                    connection-timed-out(2),
+                    connection-refused(3),
+                    unknown-connection-error(4),
+                    no-connection(5),
+                    locked-by-user(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the connection between the CMS and the device"
+    ::= { deviceEntry 9 }
+
+deviceDeploymentState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    in-sync(0),
+                    sync-required(1),
+                    force-sync-required(2),
+                    unknown(3),
+                    not-in-cluster(4),
+                    initial-sync-pending(5),
+                    not-licensed(6),
+                    unsupported-version(7),
+                    deploy-pending(8),
+                    unexpected-device-type(9),
+                    invalid-modules-detected(10),
+                    redeploy-pending(11)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device's current deployment state"
+    ::= { deviceEntry 10 }
+
+deviceDeploymentAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    deploy-in-progress(1),
+                    sync-to-in-progress(2),
+                    force-sync-in-progress(3),
+                    commit-in-progress(4),
+                    upgrade-in-progress(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The deployment action the device is currently performing"
+    ::= { deviceEntry 11 }
+
+deviceSXOSVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version number of the device's operating system (SXOS)"
+    ::= { deviceEntry 12 }
+
+deviceSoftwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device's current software version in '{MAJOR}.{MINOR}.{PATCH}.{BUILD}' format"
+    ::= { deviceEntry 13 }
+
+deviceUptime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The amount of time since the device was last rebooted in '{DAYS}d {HOURS}h {MINUTES}m {SECONDS}s' format"
+    ::= { deviceEntry 14 }
+
+deviceStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device status indicates whether traffic is running to the device (normal), or if there is an issue which may affect traffic or its connection to the CMS"
+    ::= { deviceEntry 15 }
+
+deviceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    defense(0),
+                    bypass(1),
+                    unknown(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The device type indicates whether this is a Defense (0) or Bypass (1) device"
+    ::= { deviceEntry 16 }
+
+deviceBypassMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    automatic(1),
+                    physical-bypass(2),
+                    switched-bypass(3),
+                    monitor-tap(4),
+                    not-applicable(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The configured Bypass Mode for this device."
+    ::= { deviceEntry 17 }
+
+deviceHardwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device's hardware revision in '{MAJOR}.{MINOR}' format or n/a if not applicable"
+    ::= { deviceEntry 18 }
+
+
+-- compliance statements
+
+coreroCMSMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMPv2 entities which
+            implement the SNMPv2 MIB."
+    MODULE  -- this module
+        -- MANDATORY-GROUPS { snmpGroup, snmpSetGroup, systemGroup,
+        --                   snmpBasicNotificationsGroup }
+
+        GROUP   coreroDeviceGroup
+        DESCRIPTION
+            "This group is mandatory for SNMPv2 entities which
+            support community-based authentication."
+
+    ::= { coreroCMSMIBCompliances 2 }
+
+
+-- units of conformance
+
+coreroDeviceGroup OBJECT-GROUP
+    OBJECTS {
+                deviceIndex,
+                deviceName,
+                deviceAddress,
+                deviceDescription,
+                deviceDefenseMode,
+                deviceAdminState,
+                deviceModel,
+                deviceSerialNumber,
+                deviceConnectionState,
+                deviceDeploymentState,
+                deviceDeploymentAction,
+                deviceSXOSVersion,
+                deviceSoftwareVersion,
+                deviceUptime,
+                deviceStatus,
+                deviceType,
+                deviceBypassMode,
+                deviceHardwareVersion
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing status and statistics for the site."
+    ::= { coreroCMSMIBGroups 2 }
+
+
+END

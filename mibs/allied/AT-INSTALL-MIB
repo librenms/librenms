@@ -1,0 +1,448 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: INSTALL
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-INSTALL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+install MODULE-IDENTITY
+    LAST-UPDATED "200606281222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    INSTALL module. "
+
+    REVISION "200606281222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 49 }
+
+-- The install group. This group contains information relating to the install module in the
+-- router.
+
+-- The install table. This table controls the software release and patch
+-- running in the router.
+
+installTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF InstallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The list of install configurations for the router."
+    ::= { install 1 }
+
+installEntry OBJECT-TYPE
+    SYNTAX      InstallEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the list of install configurations."
+    INDEX   { instIndex }
+    ::= { installTable 1 }
+
+InstallEntry ::=
+    SEQUENCE {
+        instIndex
+            INTEGER,
+        instRelDevice
+            INTEGER,
+        instRelName
+            DisplayString,
+        instRelMajor
+            INTEGER,
+        instRelMinor
+            INTEGER,
+        instPatDevice
+            INTEGER,
+        instPatName
+            DisplayString,
+        instRelInterim
+            INTEGER, 
+        instRelExists
+            INTEGER,
+        instPatExists
+            INTEGER                 
+    }
+
+instIndex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                temporary(1),
+                preferred(2),
+                default(3),
+                current(4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for the install table. There are four install
+            configurations defined in the router, default, preferred, 
+            temporary and current. The router will attempt to use these
+            in the order temporary, preferred, default when it boots. 
+            An install that is undefined will be skipped, an install 
+            which points to a file which is not present will be skipped.
+            When the temporary install is used, the information is deleted.
+            The current configuration shows what the router currently
+            has installed."
+    ::= { installEntry 1 }
+
+instRelDevice OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none(1),
+                eprom(2),
+                flash(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The device for the release in the install. If the device is
+            flash the file for the release is given in instRelName. Devices
+            none(1) or flash(3) are invalid for the default(3) release."
+    ::= { installEntry 2 }
+
+instRelName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The file name for the release in the install, if the
+            instRelDevice is flash(3). If the instRelDevice is none(1) or
+            eprom(2), this object should be a null string."
+    ::= { installEntry 3 }
+
+instRelMajor OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The major release number for this install. This information is
+            obtained by the router when the other elements in the row are
+            set and is thus not directly set by management. If the release number
+            is a.b.c, the major release number is a."
+    ::= { installEntry 4 }
+
+instRelMinor OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The minor release number for this install. This information is
+            obtained by the router when the other elements in the row are
+            set and is thus not directly set by management. If the release number
+            is a.b.c, the major release number is b."
+    ::= { installEntry 5 }
+
+instPatDevice OBJECT-TYPE
+    SYNTAX      INTEGER {
+                none(1),
+                flash(3),
+                nvs(4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The device for the patch in the install. The file for the
+            patch is given in instPatName unless the device is none(1)."
+    ::= { installEntry 6 }
+
+instPatName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The file name for the patch in the install."
+    ::= { installEntry 7 }
+
+instRelInterim OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interim release number for this install. This information is
+            obtained by the router when the other elements in the row are
+            set and is thus not directly set by management. If the release number
+            is a.b.c, the major release number is c. If the release number is a.b,
+            the interim release number is 0."
+    ::= { installEntry 8 }
+
+instRelExists OBJECT-TYPE
+    SYNTAX      INTEGER {
+                true(1),
+                false(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates if the release file exists or not. true(1) means it exists, false(2) means it doesn't."
+    ::= { installEntry 9 }
+    
+instPatExists OBJECT-TYPE
+    SYNTAX      INTEGER {
+                true(1),
+                false(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates if the patch file exists or not. true(1) means it exists, false(2) means it doesn't"
+
+    ::= { installEntry 10 }                  
+
+-- The install history table. Each element is a descriptive line that tells
+-- of part of the install history of the last router reboot.
+
+installHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF InstallHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The table of descriptions of events in the install history of
+            the router."
+    ::= { install 2 }
+
+installHistoryEntry OBJECT-TYPE
+    SYNTAX      InstallHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A single line describing part of the install history of the
+            router."
+    INDEX   { instHistIndex }
+    ::= { installHistoryTable 1 }
+
+InstallHistoryEntry ::=
+    SEQUENCE {
+        instHistIndex
+            INTEGER,
+        instHistLine
+            DisplayString
+    }
+
+instHistIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of this event in the install history. Indices run
+            from 1 to the maximum number. The maximum number is not
+            available as a managed object so this table will have to be
+            traversed in order to find out how large it is."
+    ::= { installHistoryEntry 1 }
+
+instHistLine OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A line of text describing a single event in the install
+            history of the router."
+    ::= { installHistoryEntry 2 }
+
+-- The configuration file
+
+configFile OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The name of the file that the router will configure from at
+            boot. The format of the name is the same as that for fileName
+            described above. If the configuration file name is a zero
+            length string, then there is no configuration file defined in
+            the router."
+    ::= { install 3 }
+
+-- The release licence table. This table contains licences for releases of
+-- router software stored in flash.
+
+licenceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LicenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The list of release licences in the router."
+    ::= { install 4 }
+
+licenceEntry OBJECT-TYPE
+    SYNTAX      LicenceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the list of release licences."
+    INDEX   { licenceIndex }
+    ::= { licenceTable 1 }
+
+LicenceEntry ::=
+    SEQUENCE {
+        licenceIndex
+            INTEGER,
+        licenceStatus
+            INTEGER,
+        licenceRelease
+            DisplayString,
+        licenceMajor
+            INTEGER,
+        licenceMinor
+            INTEGER,
+        licencePassword
+            DisplayStringUnsized,
+        licenceExpiry
+            DisplayString,
+        licenceInterim
+            INTEGER
+    }
+
+licenceIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique licence index. Licence indices are recalculated every
+            time the router reboots to reflect the current licences on the
+            router. As licences are added, new indices are allocated to the
+            new licences."
+    ::= { licenceEntry 1 }
+
+licenceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                ok(1),      -- file exists and is OK
+                deleting(2) -- delete the file when this value written
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of the file. When read, this object will always
+            return a value of ok(1), since the object will not exist if the
+            value is deleting(2). Write the value deleting(2) to this
+            object to delete the file."
+    ::= { licenceEntry 2 }
+
+licenceRelease OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The file name for the release whose licence this is."
+    ::= { licenceEntry 3 }
+
+licenceMajor OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The major release number for the release whose licence this is."
+    ::= { licenceEntry 4 }
+
+licenceMinor OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The minor release number for the release whose licence this is."
+    ::= { licenceEntry 5 }
+
+licencePassword OBJECT-TYPE
+    SYNTAX      DisplayStringUnsized (SIZE (12))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The password for this release. The password is a string of hex
+            digits."
+    ::= { licenceEntry 6 }
+
+licenceExpiry OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A human-readable string that gives the expiry date of this
+            licence."
+    ::= { licenceEntry 7 }
+
+licenceInterim OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The interim release number for the release whose licence this is."
+    ::= { licenceEntry 8 }
+
+-- The create configuration file
+
+createConfigFile OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The name of a file to create containing the current router configuration. A
+            read from this variable will return the same as the variable configFile. Thus
+            to save the current configuration in the current configuration file, read
+            createConfigFile first, then write the result back to createConfigFile. If
+            this variable is written with the name of an existing file, the file will be
+            replaced with the current configuration."
+    ::= { install 5 }
+
+-- configuration file exists?
+
+configFileExist OBJECT-TYPE
+    SYNTAX      INTEGER {
+                true(1),
+                false(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates if the boot configuration file exists or not. true(1) 
+            means it exists, false(2) means it doesn't"
+    ::= { install 6 } 
+
+installTrap		OBJECT IDENTIFIER ::= { install 0 }
+configFileExistTrap NOTIFICATION-TYPE
+    OBJECTS   	{ configFileExist }
+	STATUS 		current
+    DESCRIPTION
+                "This trap is generated when the boot file is detected as 
+                missing"
+    ::= { installTrap 1}
+
+-- The current configuration file
+
+currentConfigFile OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the file that the router is currently configured 
+            with. The format of the name is the same as that for fileName
+            described above. If the current configuration file name is a zero
+            length string, then there is no current configuration file defined in
+            the router."
+   ::= { install 7 }    
+END

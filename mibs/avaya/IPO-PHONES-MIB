@@ -1,0 +1,691 @@
+--========================================================
+--
+-- MIB      : IPO-PHONES  Avaya Inc.
+--
+-- Version  : 2.00.06   9 February 2011
+--
+--========================================================
+--
+-- Copyright (c) 2003 - 2011 Avaya Inc.
+-- All Rights Reserved.
+--
+--========================================================
+IPO-PHONES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, Integer32, Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, PhysAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    sysDescr
+        FROM SNMPv2-MIB
+    IndexInteger
+        FROM DIFFSERV-MIB
+    ipoGenMibs, ipoGTEventDateTime, ipoGTEventSeverity,
+    ipoGTEventStdSeverity, ipoGTEventDevID, ipoGTEventEntityName
+        FROM IPO-MIB
+	;
+
+ipoPhonesMIB  MODULE-IDENTITY
+    LAST-UPDATED    "201102091521Z" -- 9 February 2011
+    ORGANIZATION    "Avaya Inc."
+    CONTACT-INFO
+        "Avaya Customer Services
+         Postal: Avaya, Inc.
+                 211 Mt Airy Rd.
+                 Basking Ridge, NJ 07920
+                 USA
+         Tel:    +1 908 953 6000
+
+         WWW:    http://www.avaya.com"
+    DESCRIPTION
+        "Avaya IP Office Phones MIB
+
+         The MIB module for representing the phones present on a Avaya
+         IP Office stack."
+
+
+    REVISION    "201102091521Z" -- 9 February 2011
+    DESCRIPTION
+        "Rev 2.00.06
+        PhoneType: adding more original Nortel phone sets."
+    REVISION    "200902181309Z" -- 18 February 2009
+    DESCRIPTION
+        "Rev 2.00.05
+        PhoneType enumerations for a number of SIP phones,
+        the 1400 phones and PhoneManager IP SoftPhone added."
+    REVISION    "200806121506Z" -- 12 June 2008
+    DESCRIPTION
+        "Rev 2.00.04
+        PhoneType enumerations for the 1700 phones added."
+    REVISION    "200804171630Z" -- 17 April 2008
+    DESCRIPTION
+        "Rev 2.00.03
+        Added descriptions for new PhoneType enumerations
+        and corrected versioning."
+    REVISION    "200703281209Z" -- 28 March 2007
+    DESCRIPTION
+        "Rev 2.00.02
+        Added the port number, module number, ip address,
+        and physical address, to the ipoPhonesTable"
+    REVISION    "200702241209Z" -- 24 February 2007
+    DESCRIPTION
+        "Rev 2.00.01
+        Added descriptions for new PhoneType enumerations
+        and corrected versioning."
+    REVISION    "200606290000Z" -- 29 June 2006
+    DESCRIPTION
+        "Rev 2.00.00
+        Traps/notifications revised to provide more information about
+        the entity and device concerned."
+    REVISION 	"200601310000Z" -- 31 January 2006
+    DESCRIPTION
+        "Rev 1.00.08
+        Corrected enumeration for 5621 IP phones." 
+    REVISION 	"200511220000Z" -- 22 November 2005
+    DESCRIPTION
+        "Rev 1.00.07
+        Revised for 5621 IP phones." 
+    REVISION 	"200507211050Z" -- 21 July 2005
+    DESCRIPTION
+        "Rev 1.00.06
+        Revised for 4621 IP phones." 
+    REVISION 	"200507211030Z" -- 21 July 2005
+    DESCRIPTION
+        "Rev 1.00.05
+        Revised for 5601 and 5602 Phones"
+    REVISION 	"200503040000Z" -- 4 March 2005
+    DESCRIPTION
+        "Rev 1.00.04
+        Revised for IP Soft Phones"
+    REVISION 	"200501060000Z" -- 6 January 2005
+    DESCRIPTION
+        "Rev 1.00.03
+        Revised for 5610/5620 IP phones."
+    REVISION 	"200412200000Z" -- 20 December 2004
+    DESCRIPTION
+        "Rev 1.00.02
+        Revised for additional phone support."
+    REVISION 	"200403030000Z" -- 3 March 2004
+    DESCRIPTION
+        "Rev 1.00.01
+        Revised for external publication."
+    REVISION 	"200310100000Z" -- 10 October 2003
+    DESCRIPTION
+        "Rev 1.0.0
+        The first published version of this MIB module."
+    ::= {  ipoGenMibs 1 }
+
+ipoPhonesMibNotifications  OBJECT IDENTIFIER ::= { ipoPhonesMIB 0 }
+ipoPhonesMibObjects        OBJECT IDENTIFIER ::= { ipoPhonesMIB 1 }
+ipoPhonesConformance       OBJECT IDENTIFIER ::= { ipoPhonesMIB 2 }
+
+--********************************************************************
+-- IPOPhone Textual Conventions
+--********************************************************************
+
+PhoneType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This data type is used as the syntax of the ipoPhoneType
+        object in the ipoPhonesTable."
+    SYNTAX  INTEGER {
+       noPhone(1),              -- no phone actually connected
+       genericPhone(2),         -- for phone found that we can handle in
+                                -- some way but exact type not recognised
+                                -- may or may not be needed
+       potPhone(3),             -- Generic Analogue/POT Phone
+       dtPhone(4),              -- Generic DT Phone
+       a4406Dplus(5),           -- Avaya 4406D+ DCP Phone
+       a4412Dplus(6),           -- Avaya 4412D+ DCP Phone
+       a4424Dplus(7),           -- Avaya 4424D+ DCP Phone
+       a4424LDplus(8),          -- Avaya 4424LD+ DCP Phone
+       a9040TransTalk(9),       -- Avaya 9040 TransTalk
+       a6408Dplus(10),          -- Avaya 6408D+ DCP Phone
+       a6416Dplus(11),          -- Avaya 6416D+ DCP Phone
+       a6424Dplus(12),          -- Avaya 6424D+ DCP Phone
+       a4606ip(13),             -- Avaya 4606 IP Phone
+       a4612ip(14),             -- Avaya 4612 IP Phone
+       a4624ip(15),             -- Avaya 4624 IP Phone
+       a4620ip(16),             -- Avaya 4620 IP Phone
+       a4602ip(17),             -- Avaya 4602 IP Phone
+       a2420(18),               -- Avaya 2420 DCP Phone
+       a2010dt(19),             -- Avaya 2010 DT Phone
+       a2020dt(20),             -- Avaya 2020 DT Phone
+       a2030dt(21),             -- Avaya 2030 DT Phone
+       a2050dt(22),             -- Avaya 2050 DT Phone
+       act5(23),                -- Avaya CT5 Phone
+       att3(24),                -- Avaya TT3 Phone
+       att5(25),                -- Avaya TT5 Phone
+       a5420(26),               -- Avaya 5420 DCP Phone
+       a5410(27),               -- Avaya 5410 DCP Phone
+       a4601ip(28),             -- Avaya 4601 IP Phone
+       a4610ip(29),             -- Avaya 4610 IP Phone
+       ablf(30),                -- Avaya BLF Phone
+       a2402(31),               -- Avaya 2402 DCP Phone
+       a2410(32),               -- Avaya 2410 DCP Phone
+       a5610ip(33),             -- Avaya 5610 IP Phone
+       a5620ip(34),             -- Avaya 5620 IP Phone
+       softIPPhone(35),         -- Avaya IP Soft Phone
+       a5601ip(36),             -- Avaya 5601 IP Phone
+       a5602ip(37),             -- Avaya 5602 IP Phone
+       a4621ip(38),             -- Avaya 4621 IP Phone
+       a5621ip(39),             -- Avaya 5621 IP Phone
+       a4625ip(40),             -- Avaya 4625 IP Phone
+       a5402(41),               -- Avaya 5402 DCP Phone
+       h323Phone(42),           -- Generic H.323 Phone
+       sipPhone(43),            -- Generic SIP Phone
+       t3Compact(44),           -- Avaya T3 Compact Phone
+       t3Classic(45),           -- Avaya T3 Classic Phone
+       t3Comfort(46),           -- Avaya T3 Comfort Phone
+       t3Phone(47),             -- Avaya T3 Generic Phone
+       t3compactIP(48),         -- Avaya T3 Compact IP Phone
+       t3classicIP(49),         -- Avaya T3 Classic IP Phone
+       t3comfortIP(50),         -- Avaya T3 Comfort IP Phone
+       avayaSip(51),            -- Avaya Generic SIP Phone
+       admmPhone(52),           -- Avaya Generic ADMM (IP DECT) Phone
+       a9620ip(53),             -- Avaya 9620 IP Phone
+       a9630ip(54),             -- Avaya 9630 IP Phone
+       telecommuter(55),        -- Telecommuting homeworker
+       mobiletwin(56),          -- Mobile one-X phone
+       a9640ip(57),             -- Avaya 9640 IP Phone
+       a9650ip(58),             -- Avaya 9650 IP Phone
+       a9610ip(59),             -- Avaya 9610 IP Phone
+       a1603ip(60),             -- Avaya 1603 IP Phone
+       a1608ip(61),             -- Avaya 1608 IP Phone
+       a1616ip(62),             -- Avaya 1616 IP Phone
+       a1703ip(63),             -- Avaya 1703 IP Phone
+       a1708ip(64),             -- Avaya 1708 IP Phone
+       a1716ip(65),             -- Avaya 1716 IP Phone
+       s60Sip(66),              -- S60 SIP
+       sp320Sip(67),            -- SP320 SIP
+       sp601Sip(68),            -- SP601 SIP
+       a10ataSip(69),           -- A10ATA SIP
+       pmataSip(70),            -- Patton M-ATA SIP
+       ip22Sip(71),             -- Innovaphone IP22 SIP
+       ip24Sip(72),             -- Innovaphone IP24 SIP
+       gxp2000Sip(73),          -- Grandstream GXP2000 SIP
+       gxp2020Sip(74),          -- Grandstream GXP2000 SIP
+       eyebeamSip(75),          -- CounterPath eyeBeam SIP
+       a1403(76),               -- Avaya 1403 Phone
+       a1408(77),               -- Avaya 1408 Phone
+       a1416(78),               -- Avaya 1416 Phone
+       a1450(79),               -- Avaya 1450 Phone
+       ip28Sip(80),
+       phoneManagerIP(81),      -- Phone Manager IP
+       a1503(82),               -- Avaya 1503 Phone
+       a1508(83),               -- Avaya 1508 Phone
+       a1516(84),               -- Avaya 1516 Phone
+       a1550(85),               -- Avaya 1550 Phone
+       a1603Lip(86),            -- Avaya 1603L IP Phone
+       a1608Lip(87),            -- Avaya 1608L IP Phone
+       a1616Lip(88),            -- Avaya 1616L IP Phone
+       softPhoneSip(89),        -- SIP SoftPhone
+       etr34d(90),              -- ETR-34D
+       etr18d(91),              -- ETR-18D
+       etr6d(92),               -- ETR-6D
+       etr34(93),               -- ETR-34
+       etr18(94),               -- ETR-18
+       etr6(95),                -- ETR-6
+       etrpots(96),             -- ETR Pots
+       doorphone1(97),          -- Door phone 1
+       doorphone2(98),          -- Door phone 2
+       bstT7316e(99),           -- BST 7316E
+       a9620Sip(100),           -- Avaya 9620L/C SIP Phone
+       a9630Sip(101),           -- Avaya 9630G SIP Phone
+       a9640Sip(102),           -- Avaya 9640/G SIP Phone
+       a9650Sip(103),           -- Avaya 9650/C SIP Phone
+       a96xxSip(104),           -- Avaya 96xx SIP Phone
+       a1603Sip(105),           -- Avaya 1603 Blaze SIP Phone
+       a9404(106),              -- Avaya 9404 Phone
+       a9408(107),              -- Avaya 9408 Phone
+       a9504(108),              -- Avaya 9504 Phone
+       a9508(109),              -- Avaya 9508 Phone
+       a9608ip(110),            -- Avaya 9608 IP Phone
+       a9611ip(111),            -- Avaya 9611 IP Phone
+       a9621ip(112),            -- Avaya 9621 IP Phone
+       a9641ip(113),            -- Avaya 9641 IP Phone
+       a3720Admm(114),          -- Avaya 3720 ADMM (IP DECT) Phone
+       a3725Admm(115),          -- Avaya 3725 ADMM (IP DECT) Phone
+       a1010Sip(116),           -- Avaya 1010 SIP Video Phone
+       a1040Sip(117),           -- Avaya 1040 SIP Video Phone
+       a1120ESip(118),          -- Avaya 1120E SIP Phone
+       a1140ESip(119),          -- Avaya 1140E SIP Phone
+       a1220Sip(120),           -- Avaya 1220 SIP Phone
+       a1230Sip(121),           -- Avaya 1230 SIP Phone
+       a1692Sip(122),           -- Avaya 1692 SIP Phone
+       pvvxSip(123),            -- Polycom VVX SIP
+       gxv3140Sip(124),         -- Grandstream GXV3140 SIP
+       a3740Admm(125),          -- Avaya 3740 ADMM (IP DECT) Phone
+       a3749Admm(126),          -- Avaya 3749 ADMM (IP DECT) Phone
+       bstT7316(127),           -- Original Nortel T7316 BST Phone
+       bstT7208(128),           -- Original Nortel T7208 BST Phone
+       bstM7208(129),           -- Original Nortel M7208 BST Phone
+       bstM7310(130),           -- Original Nortel M7310 BST Phone
+       bstM7310blf(131),        -- Original Nortel M7310 BST Phone with BLF Module
+       bstM7324(132),           -- Original Nortel M7324 BST Phone with BLF Module
+       bstM7100(133),           -- Original Nortel M7100 BST Phone with BLF Module
+       bstT7100(134),           -- Original Nortel T7100 BST Phone with BLF Module
+       bstT7000(135),           -- Original Nortel T7000 BST Phone with BLF Module
+       bstDectA(136),           -- Original Nortel Dect handset model a
+       bstDectB(137),           -- Original Nortel Dect handset model b
+       bstDectC(138),           -- Original Nortel Dect handset model c
+       bstDoorphone(139),       -- Original Nortel Doorphone
+       bstT7406(140),           -- Original Nortel T7406 cordless phone
+       bstT7406E(141),          -- Original Nortel T7406E cordless phone
+       bstM7310N(142),          -- Original Nortel M7310N stimulus phone
+       bstAcu(143),             -- Original Nortel Audio Conferencing Unit
+       bstM7100N(144),          -- Original Nortel M7100N stimulus phone
+       bstM7324N (145),         -- Original Nortel M7324N stimulus phone
+       bstM7208N(146),          -- Original Nortel M7208N stimulus phone
+       aB179Sip(147),           -- Avaya B179 Sip Phone (Konftel 300IP)
+       bstAta(148),             -- Bst ATA
+       aA175Sip(149),           -- Avaya A175 Sip Phone
+       aOneXSip(150),           -- Avaya oneX Sip Phone
+       aFlareSip(151),          -- Avaya Flare Sip Phone
+       aD100(152),              -- Avaya D100 Sip Phone
+       aRadvisionXT1000(153),   -- Avaya RadvisionXT1000 Sip Phone
+       aRadvisionXT1200(154),   -- Avaya RadvisionXT1200 Sip Phone
+       aRadvisionXT4000(155),   -- Avaya RadvisionXT4000 Sip Phone
+       aRadvisionXT4200(156),   -- Avaya RadvisionXT4200 Sip Phone
+       aRadvisionXT5000(157),   -- Avaya RadvisionXT5000 Sip Phone
+       aRadvisionXTPiccolo(158),-- Avaya RadvisionXTPiccolo Sip Phone
+       aRadvisionScopiaMCU(159),-- Avaya RadvisionScopiaMCU Sip Phone
+       aRadvisionScopiaVC240(160),-- Avaya RadvisionScopiaVC240 Sip Phone
+       aOneXSipMobile(161),     -- Avaya OneX Sip Mobile Phone
+       aACCSServer(162),        -- Avaya Contact Center ACCS
+       aCIEServer(163),         -- Avaya Contact Center CIE
+       aE129SIP(164),           -- Avaya E129 SIP phone (Grandstream OEM)
+       aE159SIP(165),           -- Avaya E159 SIP phone (Invoxia OEM)
+       aE169SIP(166),           -- Avaya E169 SIP phone (Invoxia OEM)
+       aOneXMsiSIP(167),        -- Avaya Microsoft Lync SIP plugin
+       aRadvisionXT240(168),    -- Avaya Radvision XT240 Scopia SIP phone
+       aWebRTCSIP(169),         -- Avaya WebRTC Client
+       softPhoneSipMac(170)     -- SIP Mac SoftPhone
+    }
+
+--********************************************************************
+-- IPOPhone Objects
+--********************************************************************
+
+-- MIB contains a single group
+
+ipoPhones OBJECT IDENTIFIER ::= { ipoPhonesMibObjects 1 }
+
+ipoPhonesNumber  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of phone interfaces (regardless of their current
+        state) present on this system."
+    ::= { ipoPhones 1 }
+
+-- the Phones table
+
+-- The Phones table contains information on the phones connected to a
+-- IP Office stack entity.
+
+ipoPhonesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpoPhonesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of phone entries.  The number of entries is given by
+        the value of ipoPhonesNumber."
+    ::= { ipoPhones 2 }
+
+ipoPhonesEntry OBJECT-TYPE
+    SYNTAX      IpoPhonesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+        particular IP Office phone."
+    INDEX   { ipoPhonesIndex }
+    ::= { ipoPhonesTable 1 }
+
+IpoPhonesEntry ::=
+    SEQUENCE {
+        ipoPhonesIndex                 IndexInteger,
+        ipoPhonesExtID                 Integer32,
+        ipoPhonesExtNumber             Integer32,
+        ipoPhonesUserShort             DisplayString,
+        ipoPhonesUserLong              DisplayString,
+        ipoPhonesType                  PhoneType,
+        ipoPhonesPort                  Unsigned32,
+        ipoPhonesPortNumber            Unsigned32,
+        ipoPhonesModuleNumber          Unsigned32,
+        ipoPhonesIPAddress             IpAddress,
+        ipoPhonesPhysAddress           PhysAddress
+    }
+
+ipoPhonesIndex OBJECT-TYPE
+    SYNTAX      IndexInteger
+    MAX-ACCESS  read-only -- for SMIv1 compatability rather than not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique value, greater than zero, for each phone.  It is
+         recommended that values are assigned contiguously starting
+         from 1.  The value for each phone sub-layer must remain
+         constant at least from one re-initialization of the entity's
+         network management system to the next re- initialization."
+    ::= { ipoPhonesEntry 1 }
+
+ipoPhonesExtID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The numerical logical extension entity identifier assigned to
+         the phone on the IP Office entity."
+    ::= { ipoPhonesEntry 2 }
+
+ipoPhonesExtNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number that should be dialed to reach this phone on the
+        IP Office entity."
+    ::= { ipoPhonesEntry 3 }
+
+ipoPhonesUserShort OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The short form of the name of the user of this phone which is
+        used in caller display. This is quite often the forename of
+        the user."
+    ::= { ipoPhonesEntry 4 }
+
+ipoPhonesUserLong OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The long form of the name of the user of this phone. This is
+        normally the full name (forename and surname) of the user."
+    ::= { ipoPhonesEntry 5 }
+
+ipoPhonesType OBJECT-TYPE
+    SYNTAX      PhoneType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of phone that is connected to this IP Office logical
+        phone extension."
+    ::= { ipoPhonesEntry 6 }
+
+ipoPhonesPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference, by entPhysicalIndex value, to the
+        EntPhysicalEntry representing the physical port entity that
+        this phone entry is associated with in an entity MIB
+        instantiation within the IP Office agent. If no MIB
+        definitions specific to the particular media are available, or
+        the entry is for a IP phone which may not be connected to a
+        physical port on the IP Office, the value should be set to the
+        value 0."
+    ::= { ipoPhonesEntry 7 }
+
+ipoPhonesPortNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port number on the module that the operator uses to
+        identify the port.
+
+        The port numbers on the expansion modules will follow standard 
+        numbering, beginning at 1 and incrementing until the last port.
+        The phone ports on the base units, however, are numbered 
+        according to how they are collected into 'banks' on the unit.
+
+        IP Office IP500
+            The entire front of the product consists of 4 plug-in modules. 
+            Each module has its own numbering from 1..12.
+            So from the left: 101..112, 201..212, etc.
+
+        IP Office IP412 
+            There is no way to plug phones into the unit, so only 
+            expansion modules should be present. 
+
+        IP Office IP406v2
+            The leftmost bank of ports are Digital (DS/DT) and labeled 
+            as 1-8 on the product, and so are labelled ports 101..108 
+            in the mib.
+
+            The next bank of ports are Analogue and labeled as 1-2 
+            on the product and so are labelled ports 201..202 in the mib.
+
+            The next bank of phones are LAN and labeled as 1-8 on the 
+            product. Not phones, so not in this mib.
+
+        IP Office Small Office Edition
+            The leftmost bank of 4 ports are Trunk ports, and so are not 
+            available in this mib.
+
+            The next bank of 8 ports are Digital (DS/DT), and so are 
+            labelled ports 101..108 in the mib.
+
+            The next bank of 4 ports are Analogue, and so are labelled 
+            ports 201..204 in the mib.
+
+            The next bank of ports are LAN, and so are not available in 
+            this mib."
+    ::= { ipoPhonesEntry 8 }
+
+ipoPhonesModuleNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number that the operator uses to
+        identify the module.
+
+        The module numbers are assigned according to the expansion 
+        port number that it's plugged into on the Control unit.
+
+        Example: Module number '2' = Expansion unit plugged into 
+        expansion port 2 on the Control unit.
+
+        Module number '0' is reserved for the Control unit itself."
+    ::= { ipoPhonesEntry 9 }
+
+ipoPhonesIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP Address of the phone. In network-byte order. In the usual
+        IP Address format - xxx.xxx.xxx.xxx.
+
+        The IP address will only be present if the phone is an IP phone. If
+        it is not, it will contain zeros (0.0.0.0)."
+        
+    ::= { ipoPhonesEntry 10 }
+
+ipoPhonesPhysAddress OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Physical Address of the phone, such as the MAC Address.
+
+        The physical address will only be present if the phone is an IP 
+        phone. If it is not, it will contain zeros (00.00.00.00.00.00)."
+        
+    ::= { ipoPhonesEntry 11 }
+
+--********************************************************************
+-- IPOPhone Notifications
+--********************************************************************
+
+--
+-- Notifications
+--
+
+ipoPhonesChangeEvent NOTIFICATION-TYPE
+    OBJECTS {
+	ipoGTEventSeverity,
+	ipoGTEventDateTime,
+        ipoPhonesExtID,
+        ipoPhonesType,
+        ipoPhonesPort
+	}
+    STATUS deprecated
+    DESCRIPTION
+	"This notification is generated whenever the type of phone
+	connected to a logical extension entity is detected as having
+	changed after completion of normal start up of the Agent
+	entity.
+
+	Its purpose is to allow a management application to identify
+	the removal or switching of phone types on the IP Office
+	entity.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoPhonesChangeSvcEvent."
+    ::= { ipoPhonesMibNotifications 1 }
+
+ipoPhonesChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+	ipoGTEventStdSeverity,
+	ipoGTEventDateTime,
+	ipoGTEventDevID,
+	sysDescr,
+        ipoPhonesExtID,
+        ipoPhonesType,
+        ipoPhonesPort,
+        ipoGTEventEntityName
+	}
+    STATUS current
+    DESCRIPTION
+	"This notification is generated whenever the type of phone
+	connected to a logical extension entity is detected as having
+	changed after completion of normal start up of the Agent
+	entity.
+
+	Its purpose is to allow a management application to identify
+	the removal or switching of phone types on the IP Office
+	entity.
+
+        Newer implementations of this MIB should put in place this
+        event in favour of ipoPhonesChangeEvent."
+    ::= { ipoPhonesMibNotifications 2 }
+
+--********************************************************************
+-- IPO-PHONES compliance
+--********************************************************************
+
+ipoPhonesCompliances OBJECT IDENTIFIER ::= { ipoPhonesConformance 1 }
+ipoPhonesGroups      OBJECT IDENTIFIER ::= { ipoPhonesConformance 2 }
+
+--
+-- compliance statements
+--
+
+ipoPhonesCompliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+	"The compliance statement for the IP Office Phones MIB"
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoPhonesGroup,
+        ipoPhonesNotificationsGroup
+    }
+    ::= { ipoPhonesCompliances 1 }
+
+ipoPhonesv2Compliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+	"The compliance statement for the IP Office Phones MIB"
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoPhonesGroup,
+        ipoPhonesv2NotificationsGroup
+    }
+    ::= { ipoPhonesCompliances 2 }
+
+ipoPhonesv3Compliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+	"The compliance statement for the IP Office Phones MIB"
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoPhonesGroup,
+        ipoPhones2Group,
+        ipoPhonesv2NotificationsGroup
+    }
+    ::= { ipoPhonesCompliances 3 }
+
+--
+-- MIB groupings
+--
+
+ipoPhonesGroup OBJECT-GROUP
+    OBJECTS {
+        ipoPhonesNumber,
+        ipoPhonesIndex,
+        ipoPhonesExtID,
+        ipoPhonesExtNumber,
+        ipoPhonesUserShort,
+        ipoPhonesUserLong,
+        ipoPhonesType,
+        ipoPhonesPort
+    }
+    STATUS current
+    DESCRIPTION
+	"The collection of objects which are used to represent IP
+	Office phones, for which a single agent provides management
+	information."
+    ::= { ipoPhonesGroups 1 }
+
+ipoPhonesNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoPhonesChangeEvent
+    }
+    STATUS deprecated
+    DESCRIPTION
+	"The notifications which indicate specific changes in the
+	state of IP Office phones."
+    ::= { ipoPhonesGroups 2 }
+
+ipoPhonesv2NotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoPhonesChangeSvcEvent
+    }
+    STATUS current
+    DESCRIPTION
+	"The notifications which indicate specific changes in the
+	state of IP Office phones for newer implementations of this
+	MIB."
+    ::= { ipoPhonesGroups 3 }
+
+ipoPhones2Group OBJECT-GROUP
+    OBJECTS {
+        ipoPhonesPortNumber,
+        ipoPhonesModuleNumber,
+        ipoPhonesIPAddress,
+        ipoPhonesPhysAddress
+    }
+    STATUS current
+    DESCRIPTION
+	"Additional collection of objects which are used to represent
+	physical information about IP Office phones, for which a
+	single agent provides management information.  These objects
+	provide more information on where phones are directly
+	connected to an IP Office and further details on IP Phones for
+	their identification."
+    ::= { ipoPhonesGroups 4 }
+
+END

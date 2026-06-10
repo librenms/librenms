@@ -1,0 +1,1942 @@
+CORERO-CMS-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    TimeTicks, Counter32, Unsigned32, Counter64, enterprises, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, TestAndIncr, TimeStamp, RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    coreroCMSMIBObjects, coreroCMSMIBCompliances, coreroCMSMIBGroups
+        FROM CORERO-CMS-MIB;
+
+
+statistics MODULE-IDENTITY
+    LAST-UPDATED "202006160000Z"
+    ORGANIZATION "Corero Network Security"
+    CONTACT-INFO
+            "info@corero.com"
+    DESCRIPTION
+            "Corero Management Server MIB."
+    REVISION      "201710120000Z"
+    DESCRIPTION
+            "Initial revision"
+    REVISION      "201802020000Z"
+    DESCRIPTION
+            "Added support for ingress overload packets and bytes"
+    REVISION      "201803280000Z"
+    DESCRIPTION
+            "Added counter for FEC error packets under interface statistics"
+    REVISION      "201805280000Z"
+    DESCRIPTION
+            "Added flow based threat awareness statistics"
+    REVISION      "201806290000Z"
+    DESCRIPTION
+            "Updated advancedStatisticsStartTrackingFlow and advancedStatisticsStopTrackingFlow description"
+    REVISION      "201904290000Z"
+    DESCRIPTION
+            "Add egress action support"
+    REVISION      "201906240000Z"
+    DESCRIPTION
+            "Add l3 frame rule stats"
+    REVISION      "201912110000Z"
+    DESCRIPTION
+            "Add tunnel stats"
+    REVISION      "202002260000Z"
+    DESCRIPTION
+            "Add tunnel detect and egress stats"
+    REVISION      "202006160000Z"
+    DESCRIPTION
+            "Add DDoS scorecard stats"
+  ::= { coreroCMSMIBObjects 5 }
+
+--
+-- Textual Conventions
+--
+GroupType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Grouping of statistics to allow visibility at different levels.
+         Statistics can be view at the global level (all), per-Cluster (cluster),
+         per-device (device) and, for interface statistics, per-Segment (segment)."
+    SYNTAX      INTEGER {
+                    all(0),
+                    cluster(1),
+                    device(2),
+                    segment(3)
+                }
+
+--
+-- stat tables
+--
+-- Advanced Statistics
+advancedStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdvancedStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Advanced Statistics Information table"
+    ::= { statistics 1 }
+
+advancedStatisticsEntry OBJECT-TYPE
+    SYNTAX      AdvancedStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Advanced Statistics Information table"
+    INDEX       { advancedStatisticsGroup, advancedStatisticsGroupIndex }
+    ::= { advancedStatisticsTable 1 }
+
+AdvancedStatisticsEntry ::= SEQUENCE {
+    advancedStatisticsGroup                              GroupType,
+    advancedStatisticsGroupIndex                         INTEGER (1..2147483647),
+    advancedStatisticsStartTrustedAddresses              Counter64,
+    advancedStatisticsStartUnclassifiedAddresses         Counter64,
+    advancedStatisticsFinishTrustedAddresses             Counter64,
+    advancedStatisticsFinishUnclassifiedAddresses        Counter64,
+    advancedStatisticsTotalAddressAdds                   Counter64,
+    advancedStatisticsInputOverloadPackets               Counter64,
+    advancedStatisticsInputOverloadPacketRate            Counter32,
+    advancedStatisticsSetupOverloadPackets               Counter64,
+    advancedStatisticsSetupOverloadPacketRate            Counter32,
+    advancedStatisticsContextOverloadPackets             Counter64,
+    advancedStatisticsContextOverloadPacketRate          Counter32,
+    advancedStatisticsEgressDropPackets                  Counter64,
+    advancedStatisticsEgressDropPacketRate               Counter32,
+    advancedStatisticsIngressDropPackets                 Counter64,
+    advancedStatisticsIngressDropPacketRate              Counter32,
+    advancedStatisticsEgressOverloadPackets              Counter64,
+    advancedStatisticsEgressOverloadPacketRate           Counter32,
+    advancedStatisticsFlowOverloadPackets                Counter64,
+    advancedStatisticsFlowOverloadPacketRate             Counter32,
+    advancedStatisticsSmartRuleOverloadPackets           Counter64,
+    advancedStatisticsSmartRuleOverloadPacketRate        Counter32,
+    advancedStatisticsSourceSmartRuleOverloadPackets     Counter64,
+    advancedStatisticsSourceSmartRuleOverloadPacketRate  Counter32,
+    advancedStatisticsFragmentOverloadPackets            Counter64,
+    advancedStatisticsFragmentOverloadPacketRate         Counter32,
+    advancedStatisticsIpOverloadPackets                  Counter64,
+    advancedStatisticsIpOverloadPacketRate               Counter32,
+    advancedStatisticsFlexRuleOverloadPackets            Counter64,
+    advancedStatisticsFlexRuleOverloadPacketRate         Counter32,
+    advancedStatisticsIngressOverloadPackets             Counter64,
+    advancedStatisticsIngressOverloadPacketRate          Counter32,
+    advancedStatisticsIngressOverloadBytes               Counter64,
+    advancedStatisticsIngressOverloadBitRate             Counter32,
+    advancedStatisticsStartTrackingFlow                  Counter64,
+    advancedStatisticsStopTrackingFlow                   Counter64,
+    advancedStatisticsDDoSScorecardOverloadPackets       Counter64,
+    advancedStatisticsDDoSScorecardOverloadPacketRate    Counter32
+}
+
+advancedStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of Advanced statistics"
+    ::= { advancedStatisticsEntry 1 }
+
+advancedStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of each element within a grouping"
+    ::= { advancedStatisticsEntry 2 }
+
+advancedStatisticsStartTrustedAddresses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of trusted IP addresses"
+    ::= { advancedStatisticsEntry 3 }
+
+advancedStatisticsStartUnclassifiedAddresses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of unclassified IP addresses"
+    ::= { advancedStatisticsEntry 4 }
+
+advancedStatisticsFinishTrustedAddresses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of no-longer trusted IP addresses"
+    ::= { advancedStatisticsEntry 5 }
+
+advancedStatisticsFinishUnclassifiedAddresses OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of no-longer unclassified IP addresses"
+    ::= { advancedStatisticsEntry 6 }
+
+advancedStatisticsTotalAddressAdds OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of IP addresses added across the device"
+    ::= { advancedStatisticsEntry 7 }
+
+advancedStatisticsInputOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets received from input"
+    ::= { advancedStatisticsEntry 8 }
+
+advancedStatisticsInputOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets received from input (packets/sec)"
+    ::= { advancedStatisticsEntry 9 }
+
+advancedStatisticsSetupOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets received from setup"
+    ::= { advancedStatisticsEntry 10 }
+
+advancedStatisticsSetupOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets received from setup (packets/sec)"
+    ::= { advancedStatisticsEntry 11 }
+
+advancedStatisticsContextOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of context overload packets received"
+    ::= { advancedStatisticsEntry 12 }
+
+advancedStatisticsContextOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of context overload packets received (packets/sec)"
+    ::= { advancedStatisticsEntry 13 }
+
+advancedStatisticsEgressDropPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets dropped on egress"
+    ::= { advancedStatisticsEntry 14 }
+
+advancedStatisticsEgressDropPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of packets dropped on egress (packets/sec)"
+    ::= { advancedStatisticsEntry 15 }
+
+advancedStatisticsIngressDropPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets dropped on ingress"
+    ::= { advancedStatisticsEntry 16 }
+
+advancedStatisticsIngressDropPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of packets dropped on ingress (packets/sec)"
+    ::= { advancedStatisticsEntry 17 }
+
+advancedStatisticsEgressOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets from egress"
+    ::= { advancedStatisticsEntry 18 }
+
+advancedStatisticsEgressOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets from egress (packets/sec)"
+    ::= { advancedStatisticsEntry 19 }
+
+advancedStatisticsFlowOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets from flows"
+    ::= { advancedStatisticsEntry 20 }
+
+advancedStatisticsFlowOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets from flows (packets/sec)"
+    ::= { advancedStatisticsEntry 21 }
+
+advancedStatisticsSmartRuleOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets from Smart-Rules"
+    ::= { advancedStatisticsEntry 22 }
+
+advancedStatisticsSmartRuleOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets from Smart-Rules (packets/sec)"
+    ::= { advancedStatisticsEntry 23 }
+
+advancedStatisticsSourceSmartRuleOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets from source Smart-Rules"
+    ::= { advancedStatisticsEntry 24 }
+
+advancedStatisticsSourceSmartRuleOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets from source Smart-Rules (packets/sec)"
+    ::= { advancedStatisticsEntry 25 }
+
+advancedStatisticsFragmentOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets from fragments"
+    ::= { advancedStatisticsEntry 26 }
+
+advancedStatisticsFragmentOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets from fragments (packets/sec)"
+    ::= { advancedStatisticsEntry 27 }
+
+advancedStatisticsIpOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of IP overload packets"
+    ::= { advancedStatisticsEntry 28 }
+
+advancedStatisticsIpOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of IP overload packets (packets/sec)"
+    ::= { advancedStatisticsEntry 29 }
+
+advancedStatisticsFlexRuleOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets from Flex-Rules"
+    ::= { advancedStatisticsEntry 30 }
+
+advancedStatisticsFlexRuleOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets from Flex-Rules (packets/sec)"
+    ::= { advancedStatisticsEntry 31 }
+
+advancedStatisticsIngressOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of ingress packets protected with overload"
+    ::= { advancedStatisticsEntry 32 }
+
+advancedStatisticsIngressOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of ingress packets protected with overload (packets/sec)"
+    ::= { advancedStatisticsEntry 33 }
+
+advancedStatisticsIngressOverloadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of ingress bytes protected with overload"
+    ::= { advancedStatisticsEntry 34 }
+
+advancedStatisticsIngressOverloadBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of ingress bits protected with overload (Mbits per sec)"
+    ::= { advancedStatisticsEntry 35 }
+
+advancedStatisticsStartTrackingFlow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of flows which the devices started tracking during a DDoS attack"
+    ::= { advancedStatisticsEntry 36 }
+
+advancedStatisticsStopTrackingFlow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of flows which the devices stopped tracking during a DDoS attack"
+    ::= { advancedStatisticsEntry 37 }
+
+advancedStatisticsDDoSScorecardOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of overload packets from DDoS scorecard"
+    ::= { advancedStatisticsEntry 38 }
+
+advancedStatisticsDDoSScorecardOverloadPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of overload packets from DDoS scorecard (packets/sec)"
+    ::= { advancedStatisticsEntry 39 }
+
+--
+-- Block Rate Statistics
+blockRateStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BlockRateStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Defense Block Rate statistics table"
+    ::= { statistics 2 }
+
+blockRateStatisticsEntry OBJECT-TYPE
+    SYNTAX      BlockRateStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Defense Block Rate statistics table"
+    INDEX       { blockRateStatisticsGroup, blockRateStatisticsGroupIndex }
+    ::= { blockRateStatisticsTable 1 }
+
+BlockRateStatisticsEntry ::= SEQUENCE {
+    blockRateStatisticsGroup             GroupType,
+    blockRateStatisticsGroupIndex        INTEGER (1..2147483647),
+    blockRateStatisticsAllRulesBlockPackets        Counter64,
+    blockRateStatisticsAllRulesBlockPacketRate     Counter32,
+    blockRateStatisticsAllRulesBlockBytes          Counter64,
+    blockRateStatisticsAllRulesBlockBitRate        Counter32,
+    blockRateStatisticsAllRulesBlockFrameBytes     Counter64,
+    blockRateStatisticsAllRulesBlockFrameBitRate   Counter32
+}
+
+blockRateStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of Defense Block Rate statistics"
+    ::= { blockRateStatisticsEntry 1 }
+
+blockRateStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of each element within a grouping"
+    ::= { blockRateStatisticsEntry 2 }
+
+blockRateStatisticsAllRulesBlockPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregate number of blocked packet across all rules"
+    ::= { blockRateStatisticsEntry 3 }
+
+blockRateStatisticsAllRulesBlockPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregate blocked packet rate of all rules (packets per second)"
+    ::= { blockRateStatisticsEntry 4 }
+
+blockRateStatisticsAllRulesBlockBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregate number of blocked bytes across all rules"
+    ::= { blockRateStatisticsEntry 5 }
+
+blockRateStatisticsAllRulesBlockBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregate blocked bit rate of all rules (Mbits per second)"
+    ::= { blockRateStatisticsEntry 6 }
+
+blockRateStatisticsAllRulesBlockFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregate number of blocked layer 2 frame bytes across all rules"
+    ::= { blockRateStatisticsEntry 7 }
+
+blockRateStatisticsAllRulesBlockFrameBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Aggregate blocked layer 2 frame bit rate of all rules (Mbits per second)"
+    ::= { blockRateStatisticsEntry 8 }
+
+--
+-- Interface Statistics
+interfaceStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF InterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Interface Statistics table"
+    ::= { statistics 3 }
+
+interfaceStatisticsEntry OBJECT-TYPE
+    SYNTAX      InterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Interface Statistics table"
+    INDEX { interfaceStatisticsGroup, interfaceStatisticsGroupIndex }
+    ::= { interfaceStatisticsTable 1 }
+
+InterfaceStatisticsEntry ::= SEQUENCE {
+    interfaceStatisticsGroup                                 GroupType,
+    interfaceStatisticsGroupIndex                            INTEGER (1..2147483647),
+    interfaceStatisticsExternalPortBitReceiveRate            Counter32,
+    interfaceStatisticsExternalPortBitTransmitRate           Counter32,
+    interfaceStatisticsExternalPortEgressDroppedPackets      Counter64,
+    interfaceStatisticsExternalPortIngressDroppedPackets     Counter64,
+    interfaceStatisticsExternalPortPacketReceiveRate         Counter32,
+    interfaceStatisticsExternalPortPacketTransmitRate        Counter32,
+    interfaceStatisticsExternalPortReceivedBadCrcPackets     Counter64,
+    interfaceStatisticsExternalPortReceivedBytes             Counter64,
+    interfaceStatisticsExternalPortReceivedJabberPackets     Counter64,
+    interfaceStatisticsExternalPortReceivedOversizedPackets  Counter64,
+    interfaceStatisticsExternalPortReceivedPackets           Counter64,
+    interfaceStatisticsExternalPortTransmitErrorPackets      Counter64,
+    interfaceStatisticsExternalPortTransmittedBytes          Counter64,
+    interfaceStatisticsExternalPortTransmittedPackets        Counter64,
+    interfaceStatisticsInternalPortBitReceiveRate            Counter32,
+    interfaceStatisticsInternalPortBitTransmitRate           Counter32,
+    interfaceStatisticsInternalPortEgressDroppedPackets      Counter64,
+    interfaceStatisticsInternalPortIngressDroppedPackets     Counter64,
+    interfaceStatisticsInternalPortPacketReceiveRate         Counter32,
+    interfaceStatisticsInternalPortPacketTransmitRate        Counter32,
+    interfaceStatisticsInternalPortReceivedBadCrcPackets     Counter64,
+    interfaceStatisticsInternalPortReceivedBytes             Counter64,
+    interfaceStatisticsInternalPortReceivedJabberPackets     Counter64,
+    interfaceStatisticsInternalPortReceivedOversizedPackets  Counter64,
+    interfaceStatisticsInternalPortReceivedPackets           Counter64,
+    interfaceStatisticsInternalPortTransmitErrorPackets      Counter64,
+    interfaceStatisticsInternalPortTransmittedBytes          Counter64,
+    interfaceStatisticsInternalPortTransmittedPackets        Counter64,
+    interfaceStatisticsExternalPortIngressOverloadPackets    Counter64,
+    interfaceStatisticsExternalPortIngressOverloadBytes      Counter64,
+    interfaceStatisticsExternalPortReceivedFecErrorPackets   Counter64,
+    interfaceStatisticsInternalPortReceivedFecErrorPackets   Counter64
+}
+
+interfaceStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of Interface statistics"
+    ::= { interfaceStatisticsEntry 1 }
+
+interfaceStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of each element within a grouping"
+    ::= { interfaceStatisticsEntry 2 }
+
+interfaceStatisticsExternalPortBitReceiveRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receive rate on the external ports (Mbits per second)"
+    ::= { interfaceStatisticsEntry 3 }
+
+interfaceStatisticsExternalPortBitTransmitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit rate on the external ports (Mbits per second)"
+    ::= { interfaceStatisticsEntry 4 }
+
+interfaceStatisticsExternalPortEgressDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped egress packets from the external port"
+    ::= { interfaceStatisticsEntry 5 }
+
+interfaceStatisticsExternalPortIngressDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped ingress packets from the external port"
+    ::= { interfaceStatisticsEntry 6 }
+
+interfaceStatisticsExternalPortPacketReceiveRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receive rate on the external ports (packets per second)"
+    ::= { interfaceStatisticsEntry 7 }
+
+interfaceStatisticsExternalPortPacketTransmitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit rate on the external ports (packets per second)"
+    ::= { interfaceStatisticsEntry 8 }
+
+interfaceStatisticsExternalPortReceivedBadCrcPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received to the external port with an invalid CRC"
+    ::= { interfaceStatisticsEntry 9 }
+
+interfaceStatisticsExternalPortReceivedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes received to the external port"
+    ::= { interfaceStatisticsEntry 10 }
+
+interfaceStatisticsExternalPortReceivedJabberPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of jabber packets received to the external port"
+    ::= { interfaceStatisticsEntry 11 }
+
+interfaceStatisticsExternalPortReceivedOversizedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of oversized packets received to the external port"
+    ::= { interfaceStatisticsEntry 12 }
+
+interfaceStatisticsExternalPortReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received to the external port"
+    ::= { interfaceStatisticsEntry 13 }
+
+interfaceStatisticsExternalPortTransmitErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of errors transmitting packets from the external port"
+    ::= { interfaceStatisticsEntry 14 }
+
+interfaceStatisticsExternalPortTransmittedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes transmitted from external port"
+    ::= { interfaceStatisticsEntry 15 }
+
+interfaceStatisticsExternalPortTransmittedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets transmitted from the external port"
+    ::= { interfaceStatisticsEntry 16 }
+
+interfaceStatisticsInternalPortBitReceiveRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receive rate on the internal ports (Mbits per second)"
+    ::= { interfaceStatisticsEntry 17 }
+
+interfaceStatisticsInternalPortBitTransmitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit rate on the internal ports (Mbits per second)"
+    ::= { interfaceStatisticsEntry 18 }
+
+interfaceStatisticsInternalPortEgressDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped egress packets from the internal port"
+    ::= { interfaceStatisticsEntry 19 }
+
+interfaceStatisticsInternalPortIngressDroppedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of dropped ingress packets from the internal port"
+    ::= { interfaceStatisticsEntry 20 }
+
+interfaceStatisticsInternalPortPacketReceiveRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Receive rate on the internal ports (packets per second)"
+    ::= { interfaceStatisticsEntry 21 }
+
+interfaceStatisticsInternalPortPacketTransmitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit rate on the internal ports (packets per second)"
+    ::= { interfaceStatisticsEntry 22 }
+
+interfaceStatisticsInternalPortReceivedBadCrcPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received to the internal port with an invalid CRC"
+    ::= { interfaceStatisticsEntry 23 }
+
+interfaceStatisticsInternalPortReceivedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes received to the internal port"
+    ::= { interfaceStatisticsEntry 24 }
+
+interfaceStatisticsInternalPortReceivedJabberPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of jabber packets received to the internal port"
+    ::= { interfaceStatisticsEntry 25 }
+
+interfaceStatisticsInternalPortReceivedOversizedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of oversized packets received to the internal port"
+    ::= { interfaceStatisticsEntry 26 }
+
+interfaceStatisticsInternalPortReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received to the internal port"
+    ::= { interfaceStatisticsEntry 27 }
+
+interfaceStatisticsInternalPortTransmitErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of errors transmitting packets from the internal port"
+    ::= { interfaceStatisticsEntry 28 }
+
+interfaceStatisticsInternalPortTransmittedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes transmitted from the internal port"
+    ::= { interfaceStatisticsEntry 29 }
+
+interfaceStatisticsInternalPortTransmittedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets transmitted from the internal port"
+    ::= { interfaceStatisticsEntry 30 }
+
+interfaceStatisticsExternalPortIngressOverloadPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets transmitted to the external port protected with overload"
+    ::= { interfaceStatisticsEntry 31 }
+
+interfaceStatisticsExternalPortIngressOverloadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes transmitted to the external port protected with overload"
+    ::= { interfaceStatisticsEntry 32 }
+
+interfaceStatisticsExternalPortReceivedFecErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets to the external port with FEC errors"
+    ::= { interfaceStatisticsEntry 33 }
+
+interfaceStatisticsInternalPortReceivedFecErrorPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets to the internal port with FEC errors"
+    ::= { interfaceStatisticsEntry 34 }
+
+--
+-- IP Address Statistics
+ipAddressStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpAddressStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP addresses Statistics table, showing statistics for each classification of IP address"
+    ::= { statistics 4 }
+
+ipAddressStatisticsEntry OBJECT-TYPE
+    SYNTAX      IpAddressStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the IP Address Statistics table"
+    INDEX       { ipAddressStatisticsGroup, ipAddressStatisticsGroupIndex }
+    ::= { ipAddressStatisticsTable 1 }
+
+IpAddressStatisticsEntry ::= SEQUENCE {
+    ipAddressStatisticsGroup                         GroupType,
+    ipAddressStatisticsGroupIndex                    INTEGER (1..2147483647),
+    ipAddressStatisticsInUseAddresses                Counter32,
+    ipAddressStatisticsInUseTrustedAddresses         Counter32,
+    ipAddressStatisticsInUseUnclassifiedAddresses    Counter32,
+    ipAddressStatisticsPanicGood                     Counter64,
+    ipAddressStatisticsPanicGoodRate                 Counter32,
+    ipAddressStatisticsPanicBad                      Counter64,
+    ipAddressStatisticsPanicBadRate                  Counter32,
+    ipAddressStatisticsPanicTimedOut                 Counter64,
+    ipAddressStatisticsPanicTimedOutRate             Counter32,
+    ipAddressStatisticsPromotedToTrusted             Counter64,
+    ipAddressStatisticsPromotedToTrustedRate         Counter32,
+    ipAddressStatisticsTrackedTcpFlows               Counter64,
+    ipAddressStatisticsTrackedTcpFlowsSuccess        Counter64,
+    ipAddressStatisticsTrackedTcpFlowsSuccessRate    Counter32,
+    ipAddressStatisticsTrackedTcpFlowsTimedOut       Counter64,
+    ipAddressStatisticsTrackedTcpFlowsTimedOutRate   Counter32
+}
+
+ipAddressStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of IP Address statistics"
+    ::= { ipAddressStatisticsEntry 1 }
+
+ipAddressStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of an element within each grouping"
+    ::= { ipAddressStatisticsEntry 2 }
+
+ipAddressStatisticsInUseAddresses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of IP Address Statistics table entries in use"
+    ::= { ipAddressStatisticsEntry 3 }
+
+ipAddressStatisticsInUseTrustedAddresses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of trusted IP addresses across the devices"
+    ::= { ipAddressStatisticsEntry 4 }
+
+ipAddressStatisticsInUseUnclassifiedAddresses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of unclassified IP addresses across the devices"
+    ::= { ipAddressStatisticsEntry 5 }
+
+ipAddressStatisticsPanicGood OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of source IP addresses which were deemed good while in panic mode"
+    ::= { ipAddressStatisticsEntry 6 }
+
+ipAddressStatisticsPanicGoodRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of source IP addresses which were deemed good while in panic mode"
+    ::= { ipAddressStatisticsEntry 7 }
+
+ipAddressStatisticsPanicBad OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of source IP addresses which were deemed bad while in panic mode"
+    ::= { ipAddressStatisticsEntry 8 }
+
+ipAddressStatisticsPanicBadRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of source IP addresses which were deemed bad while in panic mode"
+    ::= { ipAddressStatisticsEntry 9 }
+
+ipAddressStatisticsPanicTimedOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of source IP addresses which timed out while in panic mode"
+    ::= { ipAddressStatisticsEntry 10 }
+
+ipAddressStatisticsPanicTimedOutRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of source IP addresses which were timed out while in panic mode"
+    ::= { ipAddressStatisticsEntry 11 }
+
+ipAddressStatisticsPromotedToTrusted OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of source IP addresses which were promoted to trusted"
+    ::= { ipAddressStatisticsEntry 12 }
+
+ipAddressStatisticsPromotedToTrustedRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of source IP addresses which were promoted to trusted"
+    ::= { ipAddressStatisticsEntry 13 }
+
+ipAddressStatisticsTrackedTcpFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of tracked TCP flows in flow based threat awareness"
+    ::= { ipAddressStatisticsEntry 14 }
+
+ipAddressStatisticsTrackedTcpFlowsSuccess OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of TCP flows successfully tracked by flow based threat awareness"
+    ::= { ipAddressStatisticsEntry 15 }
+
+ipAddressStatisticsTrackedTcpFlowsSuccessRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of TCP flows successfully tracked by flow based threat awareness"
+    ::= { ipAddressStatisticsEntry 16 }
+
+ipAddressStatisticsTrackedTcpFlowsTimedOut OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of TCP flows that timed out when tracked by flow based threat awareness"
+    ::= { ipAddressStatisticsEntry 17 }
+
+ipAddressStatisticsTrackedTcpFlowsTimedOutRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of TCP flows that timed out when tracked by flow based threat awareness"
+    ::= { ipAddressStatisticsEntry 18 }
+
+--
+-- Rule statistics
+ruleStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RuleStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Rule Statistics table, showing Egressed, Blocked, and Detected statistics per rule"
+    ::= { statistics 5 }
+
+ruleStatisticsEntry OBJECT-TYPE
+    SYNTAX      RuleStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Rule Statistics table"
+    INDEX       { ruleStatisticsGroup, ruleStatisticsGroupIndex, ruleStatisticsRuleIndex }
+    ::= { ruleStatisticsTable 1 }
+
+RuleStatisticsEntry ::= SEQUENCE {
+    ruleStatisticsGroup                 GroupType,
+    ruleStatisticsGroupIndex            INTEGER (1..2147483647),
+    ruleStatisticsRuleIndex             INTEGER,
+    ruleStatisticsRuleName              OCTET STRING,
+    ruleStatisticsRuleDescription       OCTET STRING,
+    ruleStatisticsBlockEventCount       Counter64,
+    ruleStatisticsBlockPacketCount      Counter64,
+    ruleStatisticsBlockByteCount        Counter64,
+    ruleStatisticsDetectEventCount      Counter64,
+    ruleStatisticsDetectPacketCount     Counter64,
+    ruleStatisticsDetectByteCount       Counter64,
+    ruleStatisticsBlockPacketRate       Counter32,
+    ruleStatisticsDetectPacketRate      Counter32,
+    ruleStatisticsBlockBitRate          Counter32,
+    ruleStatisticsDetectBitRate         Counter32,
+    ruleStatisticsEgressEventCount      Counter64,
+    ruleStatisticsEgressPacketCount     Counter64,
+    ruleStatisticsEgressByteCount       Counter64,
+    ruleStatisticsEgressPacketRate      Counter32,
+    ruleStatisticsEgressBitRate         Counter32,
+    ruleStatisticsBlockFrameByteCount   Counter64,
+    ruleStatisticsDetectFrameByteCount  Counter64,
+    ruleStatisticsEgressFrameByteCount  Counter64,
+    ruleStatisticsBlockFrameBitRate     Counter32,
+    ruleStatisticsDetectFrameBitRate    Counter32,
+    ruleStatisticsEgressFrameBitRate    Counter32
+}
+
+ruleStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of Rule statistics"
+    ::= { ruleStatisticsEntry 1 }
+
+ruleStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of an element within each grouping"
+    ::= { ruleStatisticsEntry 2 }
+
+ruleStatisticsRuleIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP integer representation of the rule - usually the rule name with 'cns-' omitted"
+    ::= { ruleStatisticsEntry 3 }
+
+ruleStatisticsRuleName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the rule for which these statistics belong"
+    ::= { ruleStatisticsEntry 4 }
+
+ruleStatisticsRuleDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The description of the rule"
+    ::= { ruleStatisticsEntry 5 }
+
+ruleStatisticsBlockEventCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of events blocked by this rule"
+    ::= { ruleStatisticsEntry 6 }
+
+ruleStatisticsBlockPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets blocked by this rule"
+    ::= { ruleStatisticsEntry 7 }
+
+ruleStatisticsBlockByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes blocked by this rule"
+    ::= { ruleStatisticsEntry 8 }
+
+ruleStatisticsDetectEventCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of events detected by this rule"
+    ::= { ruleStatisticsEntry 9 }
+
+ruleStatisticsDetectPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets detected by this rule"
+    ::= { ruleStatisticsEntry 10 }
+
+ruleStatisticsDetectByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes detected by this rule"
+    ::= { ruleStatisticsEntry 11 }
+
+ruleStatisticsBlockPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of packets blocked by this rule (packets per second)"
+    ::= { ruleStatisticsEntry 12 }
+
+ruleStatisticsDetectPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of packets detected by this rule (packets per second)"
+    ::= { ruleStatisticsEntry 13 }
+
+ruleStatisticsBlockBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of data blocked by this rule (Mbits per second)"
+    ::= { ruleStatisticsEntry 14 }
+
+ruleStatisticsDetectBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of data detected by this rule (Mbits per second)"
+    ::= { ruleStatisticsEntry 15 }
+
+ruleStatisticsEgressEventCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of events egressed by this rule"
+    ::= { ruleStatisticsEntry 16 }
+
+ruleStatisticsEgressPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets egressed by this rule"
+    ::= { ruleStatisticsEntry 17 }
+
+ruleStatisticsEgressByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of bytes egressed by this rule"
+    ::= { ruleStatisticsEntry 18 }
+
+ruleStatisticsEgressPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of packets egressed by this rule (packets per second)"
+    ::= { ruleStatisticsEntry 19 }
+
+ruleStatisticsEgressBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of data egressed by this rule (Mbits per second)"
+    ::= { ruleStatisticsEntry 20 }
+
+ruleStatisticsBlockFrameByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of layer 2 frame bytes blocked by this rule"
+    ::= { ruleStatisticsEntry 21 }
+
+ruleStatisticsDetectFrameByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of layer 2 frame bytes detected by this rule"
+    ::= { ruleStatisticsEntry 22 }
+
+ruleStatisticsEgressFrameByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of layer 2 frame bytes egressed by this rule"
+    ::= { ruleStatisticsEntry 23 }
+
+ruleStatisticsBlockFrameBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of layer 2 frame data blocked by this rule (Mbits per second)"
+    ::= { ruleStatisticsEntry 24 }
+
+ruleStatisticsDetectFrameBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of layer 2 frame data detected by this rule (Mbits per second)"
+    ::= { ruleStatisticsEntry 25 }
+
+ruleStatisticsEgressFrameBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of layer 2 frame data egressed by this rule (Mbits per second)"
+    ::= { ruleStatisticsEntry 26 }
+
+--
+-- Setup Rate Statistics
+setupRateStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SetupRateStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Setup Rate statistics table"
+    ::= { statistics 6 }
+
+setupRateStatisticsEntry OBJECT-TYPE
+    SYNTAX      SetupRateStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Setup Rate statistics table"
+    INDEX       { setupRateStatisticsGroup, setupRateStatisticsGroupIndex }
+    ::= { setupRateStatisticsTable 1 }
+
+SetupRateStatisticsEntry ::= SEQUENCE {
+    setupRateStatisticsGroup             GroupType,
+    setupRateStatisticsGroupIndex        INTEGER (1..2147483647),
+    setupRateStatisticsIcmpSetupRate     Counter32,
+    setupRateStatisticsNonTcpSetupRate   Counter32,
+    setupRateStatisticsOtherIPSetupRate  Counter32,
+    setupRateStatisticsTcpSetupRate      Counter32,
+    setupRateStatisticsUdpSetupRate      Counter32
+}
+
+setupRateStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of Setup Rate statistics"
+    ::= { setupRateStatisticsEntry 1 }
+
+setupRateStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of an element within each grouping"
+    ::= { setupRateStatisticsEntry 2 }
+
+setupRateStatisticsIcmpSetupRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ICMP flow setup rate (flows/sec)"
+    ::= { setupRateStatisticsEntry 3 }
+
+setupRateStatisticsNonTcpSetupRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Protocols other than TCP flow setup rate (flows/sec)"
+    ::= { setupRateStatisticsEntry 4 }
+
+setupRateStatisticsOtherIPSetupRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Protocols other than TCP and UDP setup rate (flows/sec)"
+    ::= { setupRateStatisticsEntry 5 }
+
+setupRateStatisticsTcpSetupRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TCP flows setup rate (flows/sec)"
+    ::= { setupRateStatisticsEntry 6 }
+
+setupRateStatisticsUdpSetupRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UDP flows setup rate (flows/sec)"
+    ::= { setupRateStatisticsEntry 7 }
+
+--
+-- Usage Statistics
+usageStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsageStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Usage Statistics table, which summarizes resource usage"
+    ::= { statistics 7 }
+
+usageStatisticsEntry OBJECT-TYPE
+    SYNTAX      UsageStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Usage Statistics table"
+    INDEX       { usageStatisticsGroup, usageStatisticsGroupIndex }
+    ::= { usageStatisticsTable 1 }
+
+UsageStatisticsEntry ::= SEQUENCE {
+    usageStatisticsGroup             GroupType,
+    usageStatisticsGroupIndex        INTEGER (1..2147483647),
+    usageStatisticsFinishIcmpFlows   Counter64,
+    usageStatisticsFinishOtherFlows  Counter64,
+    usageStatisticsFinishTcpFlows    Counter64,
+    usageStatisticsFinishUdpFlows    Counter64,
+    usageStatisticsInUseFlows        Counter32,
+    usageStatisticsInUseIcmpFlows    Counter32,
+    usageStatisticsInUseOtherFlows   Counter32,
+    usageStatisticsInUseTcpFlows     Counter32,
+    usageStatisticsInUseUdpFlows     Counter32,
+    usageStatisticsStartIcmpFlows    Counter64,
+    usageStatisticsStartOtherFlows   Counter64,
+    usageStatisticsStartTcpFlows     Counter64,
+    usageStatisticsStartUdpFlows     Counter64
+}
+
+usageStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of Usage statistics"
+    ::= { usageStatisticsEntry 1 }
+
+usageStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of an element within each grouping"
+    ::= { usageStatisticsEntry 2 }
+
+usageStatisticsFinishIcmpFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ICMP flows finished across the devices"
+    ::= { usageStatisticsEntry 3 }
+
+usageStatisticsFinishOtherFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Other IP flows finished across the devices"
+    ::= { usageStatisticsEntry 4 }
+
+usageStatisticsFinishTcpFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TCP flows finished across the devices"
+    ::= { usageStatisticsEntry 5 }
+
+usageStatisticsFinishUdpFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UDP flows finished across the devices"
+    ::= { usageStatisticsEntry 6 }
+
+usageStatisticsInUseFlows OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of flows in use across the devices"
+    ::= { usageStatisticsEntry 7 }
+
+usageStatisticsInUseIcmpFlows OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of ICMP flows in use across the devices"
+    ::= { usageStatisticsEntry 8 }
+
+usageStatisticsInUseOtherFlows OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of non-TCP, non-UDP, non-ICMP flows in use across the devices"
+    ::= { usageStatisticsEntry 9 }
+
+usageStatisticsInUseTcpFlows OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of TCP flows in use across the devices"
+    ::= { usageStatisticsEntry 10 }
+
+usageStatisticsInUseUdpFlows OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of UDP flows in use across the devices"
+    ::= { usageStatisticsEntry 11 }
+
+usageStatisticsStartIcmpFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ICMP flows started across the devices"
+    ::= { usageStatisticsEntry 12 }
+
+usageStatisticsStartOtherFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Other IP flows started across the devices"
+    ::= { usageStatisticsEntry 13 }
+
+usageStatisticsStartTcpFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TCP flows started across the devices"
+    ::= { usageStatisticsEntry 14 }
+
+usageStatisticsStartUdpFlows OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UDP flows started across the devices"
+    ::= { usageStatisticsEntry 15 }
+
+
+--
+-- Tunnel statistics
+tunnelStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TunnelStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Tunnel Statistics table"
+    ::= { statistics 8 }
+
+tunnelStatisticsEntry OBJECT-TYPE
+    SYNTAX      TunnelStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the Tunnel Statistics table"
+    INDEX       { tunnelStatisticsGroup, tunnelStatisticsGroupIndex, tunnelStatisticsTunnelName }
+    ::= { tunnelStatisticsTable 1 }
+
+TunnelStatisticsEntry ::= SEQUENCE {
+    tunnelStatisticsGroup               GroupType,
+    tunnelStatisticsGroupIndex          INTEGER (1..2147483647),
+    tunnelStatisticsTunnelName          OCTET STRING,
+    tunnelStatisticsReceivedPackets     Counter64,
+    tunnelStatisticsReceivedBytes       Counter64,
+    tunnelStatisticsDroppedFragments    Counter64,
+    tunnelStatisticsBlockPacketCount    Counter64,
+    tunnelStatisticsBlockByteCount      Counter64,
+    tunnelStatisticsDetectPacketCount   Counter64,
+    tunnelStatisticsDetectByteCount     Counter64,
+    tunnelStatisticsEgressPacketCount   Counter64,
+    tunnelStatisticsEgressByteCount     Counter64,
+    tunnelStatisticsPacketReceiveRate   Counter32,
+    tunnelStatisticsBitReceiveRate      Counter32,
+    tunnelStatisticsFragmentDropRate    Counter32,
+    tunnelStatisticsBlockPacketRate     Counter32,
+    tunnelStatisticsBlockBitRate        Counter32,
+    tunnelStatisticsDetectPacketRate    Counter32,
+    tunnelStatisticsDetectBitRate       Counter32,
+    tunnelStatisticsEgressPacketRate    Counter32,
+    tunnelStatisticsEgressBitRate       Counter32
+}
+
+tunnelStatisticsGroup OBJECT-TYPE
+    SYNTAX      GroupType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The grouping of Tunnel statistics"
+    ::= { tunnelStatisticsEntry 1 }
+
+tunnelStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SNMP index of an element within each grouping"
+    ::= { tunnelStatisticsEntry 2 }
+
+tunnelStatisticsTunnelName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel Name"
+    ::= { tunnelStatisticsEntry 3 }
+
+tunnelStatisticsReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received packets"
+    ::= { tunnelStatisticsEntry 4 }
+
+tunnelStatisticsReceivedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of received bytes"
+    ::= { tunnelStatisticsEntry 5 }
+
+tunnelStatisticsDroppedFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of fragments dropped"
+    ::= { tunnelStatisticsEntry 6 }
+
+tunnelStatisticsBlockPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of blocked packets"
+    ::= { tunnelStatisticsEntry 7 }
+
+tunnelStatisticsBlockByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of blocked bytes"
+    ::= { tunnelStatisticsEntry 8 }
+
+tunnelStatisticsDetectPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of detected packets"
+    ::= { tunnelStatisticsEntry 9 }
+
+tunnelStatisticsDetectByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of detected bytes"
+    ::= { tunnelStatisticsEntry 10 }
+
+tunnelStatisticsEgressPacketCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egressed packets"
+    ::= { tunnelStatisticsEntry 11 }
+
+tunnelStatisticsEgressByteCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of egressed bytes"
+    ::= { tunnelStatisticsEntry 12 }
+
+tunnelStatisticsPacketReceiveRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of packets received (in Packets/sec)"
+    ::= { tunnelStatisticsEntry 13 }
+
+tunnelStatisticsBitReceiveRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of bits received (in Mbit/sec)"
+    ::= { tunnelStatisticsEntry 14 }
+
+tunnelStatisticsFragmentDropRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of dropped fragments (in Fragments/sec)"
+    ::= { tunnelStatisticsEntry 15 }
+
+tunnelStatisticsBlockPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of blocked packets (in Packets/sec)"
+    ::= { tunnelStatisticsEntry 16 }
+
+tunnelStatisticsBlockBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of blocked bits (in Mbit/sec)"
+    ::= { tunnelStatisticsEntry 17 }
+
+tunnelStatisticsDetectPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of detected packets (in Packets/sec)"
+    ::= { tunnelStatisticsEntry 18 }
+
+tunnelStatisticsDetectBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of detected bits (in Mbit/sec)"
+    ::= { tunnelStatisticsEntry 19 }
+
+tunnelStatisticsEgressPacketRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of egressed packets (in Packets/sec)"
+    ::= { tunnelStatisticsEntry 20 }
+
+tunnelStatisticsEgressBitRate OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate of egressed bits (in Mbit/sec)"
+    ::= { tunnelStatisticsEntry 21 }
+
+-- compliance statements
+
+coreroCMSMIBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMPv2 entities which
+            implement the SNMPv2 MIB."
+    MODULE  -- this module
+        -- MANDATORY-GROUPS { snmpGroup, snmpSetGroup, systemGroup,
+        --                   snmpBasicNotificationsGroup }
+
+        GROUP   coreroStatisticsGroup
+        DESCRIPTION
+            "This group is mandatory for SNMPv2 entities which
+            support community-based authentication."
+
+    ::= { coreroCMSMIBCompliances 5 }
+
+
+-- units of conformance
+
+coreroStatisticsGroup OBJECT-GROUP
+    OBJECTS {
+                advancedStatisticsContextOverloadPacketRate,
+                advancedStatisticsContextOverloadPackets,
+                advancedStatisticsEgressDropPacketRate,
+                advancedStatisticsEgressDropPackets,
+                advancedStatisticsEgressOverloadPacketRate,
+                advancedStatisticsEgressOverloadPackets,
+                advancedStatisticsFinishTrustedAddresses,
+                advancedStatisticsFinishUnclassifiedAddresses,
+                advancedStatisticsFlexRuleOverloadPacketRate,
+                advancedStatisticsFlexRuleOverloadPackets,
+                advancedStatisticsFlowOverloadPacketRate,
+                advancedStatisticsFlowOverloadPackets,
+                advancedStatisticsFragmentOverloadPacketRate,
+                advancedStatisticsFragmentOverloadPackets,
+                advancedStatisticsIngressDropPacketRate,
+                advancedStatisticsIngressDropPackets,
+                advancedStatisticsInputOverloadPacketRate,
+                advancedStatisticsInputOverloadPackets,
+                advancedStatisticsIpOverloadPacketRate,
+                advancedStatisticsIpOverloadPackets,
+                advancedStatisticsSetupOverloadPacketRate,
+                advancedStatisticsSetupOverloadPackets,
+                advancedStatisticsSmartRuleOverloadPacketRate,
+                advancedStatisticsSmartRuleOverloadPackets,
+                advancedStatisticsSourceSmartRuleOverloadPacketRate,
+                advancedStatisticsSourceSmartRuleOverloadPackets,
+                advancedStatisticsIngressOverloadPacketRate,
+                advancedStatisticsIngressOverloadPackets,
+                advancedStatisticsIngressOverloadBitRate,
+                advancedStatisticsIngressOverloadBytes,
+                advancedStatisticsStartTrustedAddresses,
+                advancedStatisticsStartUnclassifiedAddresses,
+                advancedStatisticsTotalAddressAdds,
+                advancedStatisticsStartTrackingFlow,
+                advancedStatisticsStopTrackingFlow,
+                advancedStatisticsDDoSScorecardOverloadPackets,
+                advancedStatisticsDDoSScorecardOverloadPacketRate,
+                blockRateStatisticsAllRulesBlockPacketRate,
+                blockRateStatisticsAllRulesBlockBitRate,
+                blockRateStatisticsAllRulesBlockFrameBitRate,
+                blockRateStatisticsAllRulesBlockPackets,
+                blockRateStatisticsAllRulesBlockBytes,
+                blockRateStatisticsAllRulesBlockFrameBytes,
+                interfaceStatisticsExternalPortBitReceiveRate,
+                interfaceStatisticsExternalPortBitTransmitRate,
+                interfaceStatisticsExternalPortEgressDroppedPackets,
+                interfaceStatisticsExternalPortIngressDroppedPackets,
+                interfaceStatisticsExternalPortPacketReceiveRate,
+                interfaceStatisticsExternalPortPacketTransmitRate,
+                interfaceStatisticsExternalPortReceivedBadCrcPackets,
+                interfaceStatisticsExternalPortReceivedBytes,
+                interfaceStatisticsExternalPortReceivedJabberPackets,
+                interfaceStatisticsExternalPortReceivedOversizedPackets,
+                interfaceStatisticsExternalPortReceivedPackets,
+                interfaceStatisticsExternalPortTransmitErrorPackets,
+                interfaceStatisticsExternalPortTransmittedBytes,
+                interfaceStatisticsExternalPortTransmittedPackets,
+                interfaceStatisticsInternalPortBitReceiveRate,
+                interfaceStatisticsInternalPortBitTransmitRate,
+                interfaceStatisticsInternalPortEgressDroppedPackets,
+                interfaceStatisticsInternalPortIngressDroppedPackets,
+                interfaceStatisticsInternalPortPacketReceiveRate,
+                interfaceStatisticsInternalPortPacketTransmitRate,
+                interfaceStatisticsInternalPortReceivedBadCrcPackets,
+                interfaceStatisticsInternalPortReceivedBytes,
+                interfaceStatisticsInternalPortReceivedJabberPackets,
+                interfaceStatisticsInternalPortReceivedOversizedPackets,
+                interfaceStatisticsInternalPortReceivedPackets,
+                interfaceStatisticsInternalPortTransmitErrorPackets,
+                interfaceStatisticsInternalPortTransmittedBytes,
+                interfaceStatisticsInternalPortTransmittedPackets,
+                interfaceStatisticsExternalPortIngressOverloadPackets,
+                interfaceStatisticsExternalPortIngressOverloadBytes,
+                interfaceStatisticsExternalPortReceivedFecErrorPackets,
+                interfaceStatisticsInternalPortReceivedFecErrorPackets,
+                ipAddressStatisticsInUseAddresses,
+                ipAddressStatisticsInUseTrustedAddresses,
+                ipAddressStatisticsInUseUnclassifiedAddresses,
+                ipAddressStatisticsPanicGood,
+                ipAddressStatisticsPanicGoodRate,
+                ipAddressStatisticsPanicBad,
+                ipAddressStatisticsPanicBadRate,
+                ipAddressStatisticsPanicTimedOut,
+                ipAddressStatisticsPanicTimedOutRate,
+                ipAddressStatisticsPromotedToTrusted,
+                ipAddressStatisticsPromotedToTrustedRate,
+                ipAddressStatisticsTrackedTcpFlows,
+                ipAddressStatisticsTrackedTcpFlowsSuccess,
+                ipAddressStatisticsTrackedTcpFlowsSuccessRate,
+                ipAddressStatisticsTrackedTcpFlowsTimedOut,
+                ipAddressStatisticsTrackedTcpFlowsTimedOutRate,
+                ruleStatisticsBlockByteCount,
+                ruleStatisticsBlockFrameByteCount,
+                ruleStatisticsBlockBitRate,
+                ruleStatisticsBlockFrameBitRate,
+                ruleStatisticsBlockEventCount,
+                ruleStatisticsBlockPacketCount,
+                ruleStatisticsBlockPacketRate,
+                ruleStatisticsDetectByteCount,
+                ruleStatisticsDetectFrameByteCount,
+                ruleStatisticsDetectBitRate,
+                ruleStatisticsDetectFrameBitRate,
+                ruleStatisticsDetectEventCount,
+                ruleStatisticsDetectPacketCount,
+                ruleStatisticsDetectPacketRate,
+                ruleStatisticsEgressByteCount,
+                ruleStatisticsEgressFrameByteCount,
+                ruleStatisticsEgressBitRate,
+                ruleStatisticsEgressFrameBitRate,
+                ruleStatisticsEgressEventCount,
+                ruleStatisticsEgressPacketCount,
+                ruleStatisticsEgressPacketRate,
+                ruleStatisticsRuleDescription,
+                ruleStatisticsRuleName,
+                setupRateStatisticsIcmpSetupRate,
+                setupRateStatisticsNonTcpSetupRate,
+                setupRateStatisticsOtherIPSetupRate,
+                setupRateStatisticsTcpSetupRate,
+                setupRateStatisticsUdpSetupRate,
+                usageStatisticsFinishIcmpFlows,
+                usageStatisticsFinishOtherFlows,
+                usageStatisticsFinishTcpFlows,
+                usageStatisticsFinishUdpFlows,
+                usageStatisticsInUseFlows,
+                usageStatisticsInUseIcmpFlows,
+                usageStatisticsInUseOtherFlows,
+                usageStatisticsInUseTcpFlows,
+                usageStatisticsInUseUdpFlows,
+                usageStatisticsStartIcmpFlows,
+                usageStatisticsStartOtherFlows,
+                usageStatisticsStartTcpFlows,
+                usageStatisticsStartUdpFlows,
+                tunnelStatisticsTunnelName,
+                tunnelStatisticsReceivedPackets,
+                tunnelStatisticsReceivedBytes,
+                tunnelStatisticsDroppedFragments,
+                tunnelStatisticsBlockPacketCount,
+                tunnelStatisticsBlockByteCount,
+                tunnelStatisticsDetectPacketCount,
+                tunnelStatisticsDetectByteCount,
+                tunnelStatisticsEgressPacketCount,
+                tunnelStatisticsEgressByteCount,
+                tunnelStatisticsPacketReceiveRate,
+                tunnelStatisticsBitReceiveRate,
+                tunnelStatisticsFragmentDropRate,
+                tunnelStatisticsBlockPacketRate,
+                tunnelStatisticsBlockBitRate,
+                tunnelStatisticsDetectPacketRate,
+                tunnelStatisticsDetectBitRate,
+                tunnelStatisticsEgressPacketRate,
+                tunnelStatisticsEgressBitRate
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing status and statistics for the site."
+    ::= { coreroCMSMIBGroups 5 }
+
+
+END

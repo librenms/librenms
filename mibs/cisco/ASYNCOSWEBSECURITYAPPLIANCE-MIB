@@ -1,0 +1,1868 @@
+ASYNCOSWEBSECURITYAPPLIANCE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        TimeTicks, Counter32, Integer32
+            FROM SNMPv2-SMI
+
+        DisplayString
+            FROM SNMPv2-TC
+
+        asyncOSAppliances
+            FROM IRONPORT-SMI
+
+        connectionURL
+            FROM ASYNCOS-MAIL-MIB;
+
+asyncOSWebSecurityAppliance MODULE-IDENTITY
+    LAST-UPDATED "201308090000Z" -- August 9, 2013
+    ORGANIZATION "IronPort Systems"
+    CONTACT-INFO "Postal: 950 Elm Avenue
+                  San Bruno, CA 94066
+
+                  E-mail: tac-content-security@cisco.com"
+    DESCRIPTION
+                  "Enterprise MIB for IronPort Systems Web Security Appliances."
+    REVISION      "201308090000Z" -- August 9, 2013
+    DESCRIPTION
+                  "Add missing connectionURL import"
+    REVISION      "201004200000Z" -- April 20, 2010
+    DESCRIPTION
+                  "Add missing cacheMemoryBufferUsagePct, cacheClientReqMisses, cacheClientReqDenials."
+    REVISION      "201004150000Z" -- April 15, 2010
+    DESCRIPTION
+                  "Minor description tweaks"
+    REVISION      "200907130000Z" -- July 13, 2009
+    DESCRIPTION
+                  "Cleaning up integration with IRONPORT-SMI"
+    REVISION      "200703270000Z" -- March 27, 2007
+    DESCRIPTION
+                  "MIB Version 0.1"
+    ::= { asyncOSAppliances 2 }
+
+--
+-- OID Assignments
+--
+
+        proxySystem     OBJECT IDENTIFIER ::= { asyncOSWebSecurityAppliance 1 }
+        proxyConfig     OBJECT IDENTIFIER ::= { asyncOSWebSecurityAppliance 2 }
+        proxyPerf       OBJECT IDENTIFIER ::= { asyncOSWebSecurityAppliance 3 }
+        proxyHardware   OBJECT IDENTIFIER ::= { asyncOSWebSecurityAppliance 4 }
+        proxyTraps      OBJECT IDENTIFIER ::= { asyncOSWebSecurityAppliance 5 }
+
+--
+-- cacheSystem group { asyncOSWebSecurityAppliance 1 }
+--
+
+        cacheUptime  OBJECT-TYPE
+                SYNTAX TimeTicks
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The Uptime of the proxy in timeticks"
+        ::= { proxySystem 1 }
+
+        cacheMemory OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "System Memory size in KB"
+        ::= { proxySystem 2 }
+
+        cacheSysStorage OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Caching Storage size in KB"
+        ::= { proxySystem 3 }
+
+    -- end of proxySystem group
+
+--
+-- The Proxy Config group
+--
+        cacheAdmin OBJECT-TYPE
+                SYNTAX DisplayString
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The contact responsible for the administration of the proxy. Usually a name and email address."
+        ::= { proxyConfig 1 }
+
+        cacheSoftware OBJECT-TYPE
+                SYNTAX DisplayString
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Name of the proxy sofware."
+        ::= { proxyConfig 2 }
+
+        cacheVersion OBJECT-TYPE
+                SYNTAX DisplayString
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "Version of the proxy software."
+        ::= { proxyConfig 3 }
+
+        licenseExpiration OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "When does the license expire."
+        ::= { proxyConfig 4 }
+
+--
+-- The Proxy Performance group { asyncOSWebSecurityAppliance 3 }
+--
+
+        proxySysPerf              OBJECT IDENTIFIER ::= { proxyPerf 1 }
+        proxyClientSidePerf       OBJECT IDENTIFIER ::= { proxyPerf 2 }
+        proxyServerSidePerf       OBJECT IDENTIFIER ::= { proxyPerf 3 }
+        proxyCachePerf            OBJECT IDENTIFIER ::= { proxyPerf 4 }
+        proxyMedianSvcTime        OBJECT IDENTIFIER ::= { proxyPerf 5 }
+        proxyExecutiveSummary     OBJECT IDENTIFIER ::= { proxyPerf 6 }
+        proxyRecentPerf           OBJECT IDENTIFIER ::= { proxyPerf 7 }
+
+--
+-- The peformance of the proxy process
+--
+
+        cacheCpuTime OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Amount of CPU seconds consumed"
+        ::= { proxySysPerf 1 }
+
+        cacheCpuUsage OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Proxy CPU percent (0-100) used - measured every 10 seconds"
+        ::= { proxySysPerf 2 }
+
+        cacheMaxResSize OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Maximum Resident Size in KB"
+        ::= { proxySysPerf 3 }
+
+        cacheUsedStoragePct OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Percentage use of caching storage"
+        ::= { proxySysPerf 4 }
+
+        cacheBusyCPUPct OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Percentage busy time of CPU"
+        ::= { proxySysPerf 5 }
+
+        cacheMemoryBufferUsagePct OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Percentage of memory buffers in use."
+        ::= { proxySysPerf 6 }
+
+--
+-- Statistics for the Client side of the Proxy
+--
+
+        cacheClientSizeHistTable OBJECT-TYPE
+                SYNTAX            SEQUENCE OF CacheClientSizeHistEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "The table of median statistics serviced by the proxy indexed by the median time."
+        ::= { proxyClientSidePerf 1 }
+
+        cacheClientSizeHistEntry OBJECT-TYPE
+                SYNTAX            CacheClientSizeHistEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "An entry in the cacheCacheSizeHistTable."
+                INDEX { cacheClientSizeHistBinNumber }
+        ::= { cacheClientSizeHistTable 1 }
+
+        CacheClientSizeHistEntry ::= SEQUENCE {
+                cacheClientSizeHistBinNumber    Integer32,
+                cacheClientReqSize              Integer32
+        }
+
+        cacheClientSizeHistBinNumber OBJECT-TYPE
+                SYNTAX Integer32 (1..15)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The value used to index the table 1..15."
+        ::= { cacheClientSizeHistEntry 1 }
+
+        cacheClientReqSize OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The size distribution of requests from the clients."
+        ::= { cacheClientSizeHistEntry 2 }
+
+
+
+        cacheClientRequests OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of HTTP requests received from clients."
+        ::= { proxyClientSidePerf 2 }
+
+        cacheClientHits OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of HTTP hits that the proxy clients have produced."
+        ::= { proxyClientSidePerf 3 }
+
+        cacheClientErrors OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of HTTP errors caused by client connections."
+        ::= { proxyClientSidePerf 4 }
+
+        cacheClientInKb OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of KBs received from the clients by the proxy."
+        ::= { proxyClientSidePerf 5 }
+
+        cacheClientOutKb OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of KBs delivered to clients from the proxy."
+        ::= { proxyClientSidePerf 6 }
+
+        cacheClientIdleConns OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of connected but idle persistent client connections."
+        ::= { proxyClientSidePerf 7 }
+
+        cacheClientTotalConns OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The current number of active + idle client connections."
+        ::= { proxyClientSidePerf 8 }
+
+        cacheClientMaxConns OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The maximum number of simultaneous client connections that will be allowed."
+        ::= { proxyClientSidePerf 9 }
+
+        cacheClientAccepts OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of sockets accepted from the clients."
+        ::= { proxyClientSidePerf 10 }
+
+        cacheClientICPRequests OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP requests received from clients."
+        ::= { proxyClientSidePerf 11 }
+
+        cacheClientICPHits OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP hits that the proxy clients have produced."
+        ::= { proxyClientSidePerf 12 }
+
+        cacheClientICPMisses OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP misses that the proxy clients have produced."
+        ::= { proxyClientSidePerf 13 }
+
+        cacheClientICPErrors OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP errors that the proxy clients have produced."
+        ::= { proxyClientSidePerf 14 }
+
+        cacheClientICPDenials OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP denials that the proxy clients have produced."
+        ::= { proxyClientSidePerf 15 }
+
+        cacheClientReqMisses OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of misses that the proxy clients have produced."
+        ::= { proxyClientSidePerf 16 }
+
+        cacheClientReqDenials OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of responses blocked by access control."
+        ::= { proxyClientSidePerf 17 }
+
+--
+-- Statistics for the Server side of the Proxy
+--
+
+        cacheServerSizeHistTable OBJECT-TYPE
+                SYNTAX            SEQUENCE OF CacheServerSizeHistEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "The table of median statistics serviced by the proxy indexed by the median time."
+        ::= { proxyServerSidePerf 1 }
+
+        cacheServerSizeHistEntry OBJECT-TYPE
+                SYNTAX            CacheServerSizeHistEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "An entry in the cacheCacheSizeHistTable."
+                INDEX { cacheServerSizeHistBinNumber }
+        ::= { cacheServerSizeHistTable 1 }
+
+        CacheServerSizeHistEntry ::= SEQUENCE {
+                cacheServerSizeHistBinNumber    Integer32,
+                cacheServerReplySize            Integer32
+        }
+
+        cacheServerSizeHistBinNumber OBJECT-TYPE
+                SYNTAX Integer32 (1..15)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The value used to index the table 1..15."
+        ::= { cacheServerSizeHistEntry 1 }
+
+        cacheServerReplySize OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The size distribution of replies from the Servers."
+        ::= { cacheServerSizeHistEntry 2 }
+
+
+        cacheServerRequests OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of HTTP requests sent to servers."
+        ::= { proxyServerSidePerf 2 }
+
+        cacheServerSockets OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of sockets opened from the servers."
+        ::= { proxyServerSidePerf 3 }
+
+        cacheServerErrors OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of HTTP errors while fetching objects."
+        ::= { proxyServerSidePerf 4 }
+
+        cacheServerInKb OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of KBs received by the proxy from remote servers."
+        ::= { proxyServerSidePerf 5 }
+
+        cacheServerOutKb OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of KBs sent the proxy to remote servers."
+        ::= { proxyServerSidePerf 6 }
+
+        cacheServerIdleConns OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of connected but idle persistent server connections."
+        ::= { proxyServerSidePerf 7 }
+
+        cacheServerTotalConns OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The current number of active + idle server connections."
+        ::= { proxyServerSidePerf 8 }
+
+        cacheServerCloseIdleConns OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of server connections closed due to idle time limits."
+        ::= { proxyServerSidePerf 9 }
+
+        cacheServerLimitIdleConns OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of times the number of idle persistent connections hit the count limit and caused a connection to be closed."
+        ::= { proxyServerSidePerf 10 }
+
+        cacheServerConnsThresh OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The limit on the number of server connections."
+        ::= { proxyServerSidePerf 11 }
+
+        cacheServerPersisConnsRetries OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of retries on persistent connections."
+        ::= { proxyServerSidePerf 12 }
+
+        cacheServerRegConnsRetries OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of retries on regular connections."
+        ::= { proxyServerSidePerf 13 }
+
+        cacheServerRWErrorRetries OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of retries due to read/write errors."
+        ::= { proxyServerSidePerf 14 }
+
+        cacheServerEarlyCloseRetries OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of retries due to early closed connections."
+        ::= { proxyServerSidePerf 15 }
+
+        cacheServerICPRequests OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP requests sent to servers."
+        ::= { proxyServerSidePerf 16 }
+
+        cacheServerICPHits OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP hits that the proxy servers have produced."
+        ::= { proxyServerSidePerf 17 }
+
+        cacheServerICPMisses OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP misses that the proxy servers have produced."
+        ::= { proxyServerSidePerf 18 }
+
+        cacheServerICPErrors OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP errors that the proxy servers have produced."
+        ::= { proxyServerSidePerf 19 }
+
+        cacheServerICPDenials OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of ICP denials that the proxy servers have produced."
+        ::= { proxyServerSidePerf 20 }
+--
+-- Protocol Statistics for the Proxy
+--
+
+        cacheCacheSizeHistTable OBJECT-TYPE
+                SYNTAX            SEQUENCE OF CacheCacheSizeHistEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "The table of median statistics serviced by the proxy indexed by the median time."
+        ::= { proxyCachePerf 1 }
+
+        cacheCacheSizeHistEntry OBJECT-TYPE
+                SYNTAX            CacheCacheSizeHistEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "An entry in the cacheCacheSizeHistTable."
+                INDEX { cacheSizeHistBinNumber }
+        ::= { cacheCacheSizeHistTable 1 }
+
+        CacheCacheSizeHistEntry ::= SEQUENCE {
+                cacheSizeHistBinNumber          Integer32,
+                cacheCacheActiveObjs            Integer32,
+                cacheCacheAllObjs               Integer32
+        }
+
+        cacheSizeHistBinNumber OBJECT-TYPE
+                SYNTAX Integer32 (1..15)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The value used to index the table 1..15."
+        ::= { cacheCacheSizeHistEntry 1 }
+
+        cacheCacheActiveObjs OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The size distribution of currently cached objects."
+        ::= { cacheCacheSizeHistEntry 2 }
+
+        cacheCacheAllObjs OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The size distribution of all cached objects."
+        ::= { cacheCacheSizeHistEntry 3 }
+
+
+        cacheCacheLiveCachedObjs OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The number of objects currently cached."
+        ::= { proxyCachePerf 2 }
+
+        cacheCacheLiveCachedObjSizes OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The total size in KBs of currently cached objects."
+        ::= { proxyCachePerf 3 }
+
+        cacheCacheTotalCachedObjs OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The total number of cached objects written to disks."
+        ::= { proxyCachePerf 4 }
+
+        cacheCacheTotalCachedObjSizes OBJECT-TYPE
+                SYNTAX Counter32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The total size in KBs of all objects ever cached and written to disks."
+        ::= { proxyCachePerf 5 }
+
+--
+-- Median statistics served by the proxy.
+--
+        cacheMedianSvcTable OBJECT-TYPE
+                SYNTAX            SEQUENCE OF CacheMedianSvcEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "The table of median statistics serviced by the proxy indexed by the median time."
+        ::= { proxyMedianSvcTime 1 }
+
+        cacheMedianSvcEntry OBJECT-TYPE
+                SYNTAX            CacheMedianSvcEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "An entry in the proxyMedianSvcTable."
+                INDEX { cacheMedianTime }
+        ::= { cacheMedianSvcTable 1 }
+
+        CacheMedianSvcEntry ::= SEQUENCE {
+                cacheMedianTime         Integer32,
+                cacheHTTPCltSvcTime     Integer32,
+                cacheHTTPMissSvcTime    Integer32,
+                cacheHTTPHitSvcTime     Integer32,
+                cacheHTTPSrvSvcTime     Integer32,
+                cacheDnsSvcTime         Integer32,
+                cacheHTTPSrvSvcWaitTime Integer32
+        }
+
+        cacheMedianTime OBJECT-TYPE
+                SYNTAX Integer32 (1..60)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The value used to index the table 1/5/60"
+        ::= { cacheMedianSvcEntry 1 }
+
+        cacheHTTPCltSvcTime OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The service time for all HTTP requests."
+        ::= { cacheMedianSvcEntry 2 }
+
+        cacheHTTPMissSvcTime OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The service time for all HTTP misses."
+        ::= { cacheMedianSvcEntry 3 }
+
+        cacheHTTPHitSvcTime OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The service time for all HTTP hits."
+        ::= { cacheMedianSvcEntry 4 }
+
+        cacheHTTPSrvSvcTime OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The service time from servers."
+        ::= { cacheMedianSvcEntry 5 }
+
+        cacheDnsSvcTime OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The DNS service time."
+        ::= { cacheMedianSvcEntry 6 }
+
+        cacheHTTPSvcWaitTime OBJECT-TYPE
+                SYNTAX          Integer32
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION
+                        "The time waiting for first byte response from servers."
+        ::= { cacheMedianSvcEntry 7 }
+
+--
+-- The executive summary of the proxy performance
+--
+
+        cacheTotalHttpReqs OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Total number of HTTP requests from clients"
+        ::= { proxyExecutiveSummary 1 }
+
+        cacheMeanRespTime OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The HTTP mean response time"
+        ::= { proxyExecutiveSummary 2 }
+
+        cacheMeanMissRespTime OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The HTTP mean response time of Misses"
+        ::= { proxyExecutiveSummary 3 }
+
+        cacheMeanHitRespTime OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The HTTP mean response time of Hits"
+        ::= { proxyExecutiveSummary 4 }
+
+        cacheMeanHitRatio OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The HTTP hit ratio"
+        ::= { proxyExecutiveSummary 5 }
+
+        cacheMeanByteHitRatio OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The HTTP byte hit ratio"
+        ::= { proxyExecutiveSummary 6 }
+
+        cacheTotalBandwidthSaving OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The total bandwidth savings for HTTP in Mbits/sec"
+        ::= { proxyExecutiveSummary 7 }
+
+        cacheDuration OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The proxy up time"
+        ::= { proxyExecutiveSummary 8 }
+
+        cacheCltReplyErrPct OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "The percentage of errors in the HTTP replies to clients"
+        ::= { proxyExecutiveSummary 9 }
+
+--
+-- The summary of recent proxy performance
+--
+
+        proxyRecentThruputPerf           OBJECT IDENTIFIER ::= { proxyRecentPerf 1 }
+--
+--      The peformance of the proxy process
+--
+
+             cacheThruputNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Request throughput in the last minute"
+        ::= { proxyRecentThruputPerf 1 }
+
+             cacheThruput1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak request throughput in the last hour"
+        ::= { proxyRecentThruputPerf 2 }
+
+             cacheThruput1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average request throughput in the last hour"
+        ::= { proxyRecentThruputPerf 3 }
+
+             cacheThruput1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak request throughput in the last day"
+        ::= { proxyRecentThruputPerf 4 }
+
+             cacheThruput1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average request throughput in the last day"
+        ::= { proxyRecentThruputPerf 5 }
+
+             cacheThruput1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak request throughput in the last week"
+        ::= { proxyRecentThruputPerf 6 }
+
+             cacheThruput1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average request throughput in the last week"
+        ::= { proxyRecentThruputPerf 7 }
+
+             cacheThruputLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak request throughput in the cache lifetime"
+        ::= { proxyRecentThruputPerf 8 }
+
+             cacheThruputLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average request throughput in the cache lifetime"
+        ::= { proxyRecentThruputPerf 9 }
+
+        proxyRecentBandWSavPerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 2 }
+
+             cacheBwidthSavingNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Bandwidth savings in the last minute (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 1 }
+
+             cacheBwidthSaving1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth savings in the last hour (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 2 }
+
+             cacheBwidthSaving1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth savings in the last hour (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 3 }
+
+             cacheBwidthSaving1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth savings in the last day (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 4 }
+
+             cacheBwidthSaving1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth savings in the last day (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 5 }
+
+             cacheBwidthSaving1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth savings in the last week (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 6 }
+
+             cacheBwidthSaving1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth savings in the last week (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 7 }
+
+             cacheBwidthSavingLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth savings in the cache lifetime (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 8 }
+
+             cacheBwidthSavingLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth savings in the cache lifetime (in Kb/sec)"
+        ::= { proxyRecentBandWSavPerf 9 }
+
+        proxyRecentBandWSpntPerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 3 }
+
+             cacheBwidthSpentNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Bandwidth spent in the last minute (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 1 }
+
+             cacheBwidthSpent1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth spent in the last hour (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 2 }
+
+             cacheBwidthSpent1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth spent in the last hour (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 3 }
+
+             cacheBwidthSpent1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth spent in the last day (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 4 }
+
+             cacheBwidthSpent1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth spent in the last day (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 5 }
+
+             cacheBwidthSpent1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth spent in the last week (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 6 }
+
+             cacheBwidthSpent1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth spent in the last week (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 7 }
+
+             cacheBwidthSpentLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth spent in the cache lifetime (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 8 }
+
+             cacheBwidthSpentLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth spent in the cache lifetime (in Kb/sec)"
+        ::= { proxyRecentBandWSpntPerf 9 }
+
+        proxyRecentBandWTotPerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 4 }
+
+             cacheBwidthTotalNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Bandwidth total in the last minute (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 1 }
+
+             cacheBwidthTotal1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth total in the last hour (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 2 }
+
+             cacheBwidthTotal1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth total in the last hour (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 3 }
+
+             cacheBwidthTotal1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth total in the last day (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 4 }
+
+             cacheBwidthTotal1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth total in the last day (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 5 }
+
+             cacheBwidthTotal1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth total in the last week (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 6 }
+
+             cacheBwidthTotal1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth total in the last week (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 7 }
+
+             cacheBwidthTotalLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak Bandwidth total in the cache lifetime (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 8 }
+
+             cacheBwidthTotalLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average Bandwidth total in the cache lifetime (in Kb/sec)"
+        ::= { proxyRecentBandWTotPerf 9 }
+
+        proxyRecentHitsPerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 5 }
+
+             cacheHitsNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Hit throughput in the last minute"
+        ::= { proxyRecentHitsPerf 1 }
+
+             cacheHits1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak hit throughput in the last hour"
+        ::= { proxyRecentHitsPerf 2 }
+
+             cacheHits1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average hit throughput in the last hour"
+        ::= { proxyRecentHitsPerf 3 }
+
+             cacheHits1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak hit throughput in the last day"
+        ::= { proxyRecentHitsPerf 4 }
+
+             cacheHits1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average hit throughput in the last day"
+        ::= { proxyRecentHitsPerf 5 }
+
+             cacheHits1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak hit throughput in the last week"
+        ::= { proxyRecentHitsPerf 6 }
+
+             cacheHits1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average hit throughput in the last week"
+        ::= { proxyRecentHitsPerf 7 }
+
+             cacheHitsLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak hit throughput in the cache lifetime"
+        ::= { proxyRecentHitsPerf 8 }
+
+             cacheHitsLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average hit throughput in the cache lifetime"
+        ::= { proxyRecentHitsPerf 9 }
+
+        proxyRecentMissesPerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 6 }
+
+             cacheMissesNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Miss throughput in the last minute"
+        ::= { proxyRecentMissesPerf 1 }
+
+             cacheMisses1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak miss throughput in the last hour"
+        ::= { proxyRecentMissesPerf 2 }
+
+             cacheMisses1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average miss throughput in the last hour"
+        ::= { proxyRecentMissesPerf 3 }
+
+             cacheMisses1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak miss throughput in the last day"
+        ::= { proxyRecentMissesPerf 4 }
+
+             cacheMisses1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average miss throughput in the last day"
+        ::= { proxyRecentMissesPerf 5 }
+
+             cacheMisses1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak miss throughput in the last week"
+        ::= { proxyRecentMissesPerf 6 }
+
+             cacheMisses1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average miss throughput in the last week"
+        ::= { proxyRecentMissesPerf 7 }
+
+             cacheMissesLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak miss throughput in the cache lifetime"
+        ::= { proxyRecentMissesPerf 8 }
+
+             cacheMissesLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average miss throughput in the cache lifetime"
+        ::= { proxyRecentMissesPerf 9 }
+
+        proxyRecentHitRespTimePerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 7 }
+
+             cacheHitRespTimeNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Cache hit response time in the last minute"
+        ::= { proxyRecentHitRespTimePerf 1 }
+
+             cacheHitRespTime1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache hit response time in the last hour"
+        ::= { proxyRecentHitRespTimePerf 2 }
+
+             cacheHitRespTime1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache hit response time in the last hour"
+        ::= { proxyRecentHitRespTimePerf 3 }
+
+             cacheHitRespTime1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache hit response time in the last day"
+        ::= { proxyRecentHitRespTimePerf 4 }
+
+             cacheHitRespTime1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache hit response time in the last day"
+        ::= { proxyRecentHitRespTimePerf 5 }
+
+             cacheHitRespTime1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache hit response time in the last week"
+        ::= { proxyRecentHitRespTimePerf 6 }
+
+             cacheHitRespTime1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache hit response time in the last week"
+        ::= { proxyRecentHitRespTimePerf 7 }
+
+             cacheHitRespTimeLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache hit response time in the cache lifetime"
+        ::= { proxyRecentHitRespTimePerf 8 }
+
+             cacheHitRespTimeLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache hit response time in the cache lifetime"
+        ::= { proxyRecentHitRespTimePerf 9 }
+
+        proxyRecentMissRespTimePerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 8 }
+
+             cacheMissRespTimeNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Cache miss response time in the last minute"
+        ::= { proxyRecentMissRespTimePerf 1 }
+
+             cacheMissRespTime1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache miss response time in the last hour"
+        ::= { proxyRecentMissRespTimePerf 2 }
+
+             cacheMissRespTime1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache miss response time in the last hour"
+        ::= { proxyRecentMissRespTimePerf 3 }
+
+             cacheMissRespTime1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache miss response time in the last day"
+        ::= { proxyRecentMissRespTimePerf 4 }
+
+             cacheMissRespTime1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache miss response time in the last day"
+        ::= { proxyRecentMissRespTimePerf 5 }
+
+             cacheMissRespTime1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache miss response time in the last week"
+        ::= { proxyRecentMissRespTimePerf 6 }
+
+             cacheMissRespTime1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache miss response time in the last week"
+        ::= { proxyRecentMissRespTimePerf 7 }
+
+             cacheMissRespTimeLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache miss response time in the cache lifetime"
+        ::= { proxyRecentMissRespTimePerf 8 }
+
+             cacheMissRespTimeLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache miss response time in the cache lifetime"
+        ::= { proxyRecentMissRespTimePerf 9 }
+
+        proxyRecentTotalRespTimePerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 9 }
+
+             cacheTotalRespTimeNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Cache total response time in the last minute"
+        ::= { proxyRecentTotalRespTimePerf 1 }
+
+             cacheTotalRespTime1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache total response time in the last hour"
+        ::= { proxyRecentTotalRespTimePerf 2 }
+
+             cacheTotalRespTime1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache total response time in the last hour"
+        ::= { proxyRecentTotalRespTimePerf 3 }
+
+             cacheTotalRespTime1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache total response time in the last day"
+        ::= { proxyRecentTotalRespTimePerf 4 }
+
+             cacheTotalRespTime1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache total response time in the last day"
+        ::= { proxyRecentTotalRespTimePerf 5 }
+
+             cacheTotalRespTime1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache total response time in the last week"
+        ::= { proxyRecentTotalRespTimePerf 6 }
+
+             cacheTotalRespTime1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache total response time in the last week"
+        ::= { proxyRecentTotalRespTimePerf 7 }
+
+             cacheTotalRespTimeLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache total response time in the cache lifetime"
+        ::= { proxyRecentTotalRespTimePerf 8 }
+
+             cacheTotalRespTimeLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache total response time in the cache lifetime"
+        ::= { proxyRecentTotalRespTimePerf 9 }
+
+        proxyRecentErrsPerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 10 }
+
+             cacheErrsNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Cache error throughput time in the last minute"
+        ::= { proxyRecentErrsPerf 1 }
+
+             cacheErrs1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error throughput time in the last hour"
+        ::= { proxyRecentErrsPerf 2 }
+
+             cacheErrs1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error throughput time in the last hour"
+        ::= { proxyRecentErrsPerf 3 }
+
+             cacheErrs1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error throughput time in the last day"
+        ::= { proxyRecentErrsPerf 4 }
+
+             cacheErrs1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error throughput time in the last day"
+        ::= { proxyRecentErrsPerf 5 }
+
+             cacheErrs1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error throughput time in the last week"
+        ::= { proxyRecentErrsPerf 6 }
+
+             cacheErrs1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error throughput time in the last week"
+        ::= { proxyRecentErrsPerf 7 }
+
+             cacheErrsLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error throughput time in the cache lifetime"
+        ::= { proxyRecentErrsPerf 8 }
+
+             cacheErrsLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error throughput time in the cache lifetime"
+        ::= { proxyRecentErrsPerf 9 }
+
+
+        proxyRecentDeniedPerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 11 }
+
+             cacheDeniedNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Cache denial throughput time in the last minute"
+        ::= { proxyRecentDeniedPerf 1 }
+
+             cacheDenied1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial throughput time in the last hour"
+        ::= { proxyRecentDeniedPerf 2 }
+
+             cacheDenied1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial throughput time in the last hour"
+        ::= { proxyRecentDeniedPerf 3 }
+
+             cacheDenied1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial throughput time in the last day"
+        ::= { proxyRecentDeniedPerf 4 }
+
+             cacheDenied1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial throughput time in the last day"
+        ::= { proxyRecentDeniedPerf 5 }
+
+             cacheDenied1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial throughput time in the last week"
+        ::= { proxyRecentDeniedPerf 6 }
+
+             cacheDenied1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial throughput time in the last week"
+        ::= { proxyRecentDeniedPerf 7 }
+
+             cacheDeniedLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial throughput time in the cache lifetime"
+        ::= { proxyRecentDeniedPerf 8 }
+
+             cacheDeniedLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial throughput time in the cache lifetime"
+        ::= { proxyRecentDeniedPerf 9 }
+
+
+        proxyRecentErrRespTimePerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 12 }
+
+             cacheErrRespTimeNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Cache error response time in the last minute"
+        ::= { proxyRecentErrRespTimePerf 1 }
+
+             cacheErrRespTime1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error response time in the last hour"
+        ::= { proxyRecentErrRespTimePerf 2 }
+
+             cacheErrRespTime1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error response time in the last hour"
+        ::= { proxyRecentErrRespTimePerf 3 }
+
+             cacheErrRespTime1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error response time in the last day"
+        ::= { proxyRecentErrRespTimePerf 4 }
+
+             cacheErrRespTime1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error response time in the last day"
+        ::= { proxyRecentErrRespTimePerf 5 }
+
+             cacheErrRespTime1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error response time in the last week"
+        ::= { proxyRecentErrRespTimePerf 6 }
+
+             cacheErrRespTime1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error response time in the last week"
+        ::= { proxyRecentErrRespTimePerf 7 }
+
+             cacheErrRespTimeLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache error response time in the cache lifetime"
+        ::= { proxyRecentErrRespTimePerf 8 }
+
+             cacheErrRespTimeLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache error response time in the cache lifetime"
+        ::= { proxyRecentErrRespTimePerf 9 }
+
+
+        proxyRecentDeniedRespTimePerf          OBJECT IDENTIFIER ::= { proxyRecentPerf 13 }
+
+             cacheDeniedRespTimeNow OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Cache denial response time in the last minute"
+        ::= { proxyRecentDeniedRespTimePerf 1 }
+
+             cacheDeniedRespTime1hrPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial response time in the last hour"
+        ::= { proxyRecentDeniedRespTimePerf 2 }
+
+             cacheDeniedRespTime1hrMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial response time in the last hour"
+        ::= { proxyRecentDeniedRespTimePerf 3 }
+
+             cacheDeniedRespTime1dayPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial response time in the last day"
+        ::= { proxyRecentDeniedRespTimePerf 4 }
+
+             cacheDeniedRespTime1dayMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial response time in the last day"
+        ::= { proxyRecentDeniedRespTimePerf 5 }
+
+             cacheDeniedRespTime1weekPeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial response time in the last week"
+        ::= { proxyRecentDeniedRespTimePerf 6 }
+
+             cacheDeniedRespTime1weekMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial response time in the last week"
+        ::= { proxyRecentDeniedRespTimePerf 7 }
+
+             cacheDeniedRespTimeLifePeak OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Peak cache denial response time in the cache lifetime"
+        ::= { proxyRecentDeniedRespTimePerf 8 }
+
+             cacheDeniedRespTimeLifeMean OBJECT-TYPE
+                     SYNTAX Integer32
+                     MAX-ACCESS read-only
+                     STATUS  current
+                     DESCRIPTION
+                             "Average cache denial response time in the cache lifetime"
+        ::= { proxyRecentDeniedRespTimePerf 9 }
+
+    -- end of proxyPerf group
+
+--
+-- The Proxy Hardware Monitoring group { asyncOSWebSecurityAppliance 4 }
+--
+
+        proxyHardwareDisk       OBJECT IDENTIFIER ::= { proxyHardware 1 }
+
+        hardwareDiskStatTable OBJECT-TYPE
+                SYNTAX            SEQUENCE OF DiskStatEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "The table of disk activitity statistics."
+        ::= { proxyHardwareDisk 1 }
+
+        diskStatEntry OBJECT-TYPE
+                SYNTAX            DiskStatEntry
+                MAX-ACCESS        not-accessible
+                STATUS            current
+                DESCRIPTION
+                        "An entry in the hardwareDiskStatTable."
+                INDEX { diskStatEntryNumber }
+        ::= { hardwareDiskStatTable 1 }
+
+        DiskStatEntry ::= SEQUENCE {
+                diskStatEntryNumber             Integer32,
+                diskStatWrites                  Integer32,
+                diskStatWriteErrs               Integer32,
+                diskStatReads                   Integer32,
+                diskStatReadErrs                Integer32
+        }
+
+        diskStatEntryNumber OBJECT-TYPE
+                SYNTAX Integer32 (1..18)
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Disk Identifier 1..18"
+        ::= { diskStatEntry 1 }
+
+        diskStatWrites OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Number of writes to disk"
+        ::= { diskStatEntry 2 }
+
+        diskStatWriteErrs OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Number of write errors on disk"
+        ::= { diskStatEntry 3 }
+
+        diskStatReads OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Number of reads from disk"
+        ::= { diskStatEntry 4 }
+
+        diskStatReadErrs OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS  current
+                DESCRIPTION
+                        "Number of read errors on disk"
+        ::= { diskStatEntry 5 }
+
+--      cacheFanSpeed  OBJECT-TYPE
+--              SYNTAX Counter32
+--              MAX-ACCESS read-only
+--              STATUS current
+--              DESCRIPTION
+--                      "The speed of the CPU Fan in RPM"
+--      ::= { proxyHardware 2 }
+--
+--      cacheCPUTemp  OBJECT-TYPE
+--              SYNTAX Counter32
+--              MAX-ACCESS read-only
+--              STATUS current
+--              DESCRIPTION
+--                      "The temperature of the CPU in degrees Celsius"
+--      ::= { proxyHardware 3 }
+
+--
+-- The Proxy Traps group { asyncOSWebSecurityAppliance 5 }
+--
+
+        upstreamProxyFailure NOTIFICATION-TYPE
+                OBJECTS { connectionURL }
+                STATUS current
+                DESCRIPTION
+                        "The IP address of an unresponsive upstream proxy."
+        ::= { proxyTraps 1 }
+
+-- end of ASYNCOSWEBSECURITYAPPLIANCE-MIB
+
+END

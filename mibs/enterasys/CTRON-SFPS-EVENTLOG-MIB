@@ -1,0 +1,777 @@
+CTRON-SFPS-EVENTLOG-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-eventlog-mib.txt
+--  Revision: 0.0.04
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--  tcl    enterprises
+         IpAddress,
+--       Counter, Gauge
+         TimeTicks
+                FROM RFC1155-SMI
+ 
+--  These Objects are defined in the file sfps-inc.mib.txt
+        sfpsEventLogStats, sfpsEventLogGenConfig,
+        sfpsEventLogClientConfig, sfpsEventLogClientConfigAPI,
+        sfpsFragStats, sfpsTrapAPI, sfpsTrapTable
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+SfpsSwitchInstance ::= OCTET STRING (SIZE(4))
+--  this will map to chassis.module index value
+ 
+--SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+--SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+
+--  SFPS Event Logger Statistics Group (new event logger)
+
+sfpsEventLogStatsTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsEventLogStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the event information produced by the
+                Event Log Server object."
+        ::= { sfpsEventLogStats 1 }
+
+sfpsEventLogStatsEntry    OBJECT-TYPE
+        SYNTAX  SfpsEventLogStatsEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains event log data."
+        INDEX   { sfpsEventLogStatsSwInst, sfpsEventLogWindowStart }
+                ::= { sfpsEventLogStatsTable 1 }
+
+SfpsEventLogStatsEntry ::=
+        SEQUENCE {
+                sfpsEventLogStatsSwInst               SfpsSwitchInstance,  
+                sfpsEventLogWindowStart               INTEGER,  
+                sfpsEventLogIndex                             INTEGER,  
+                sfpsEventLogClientName                DisplayString,  
+                sfpsEventLogLevel                     DisplayString,  
+                sfpsEventLogMessageString             DisplayString,  
+                sfpsEventLogTime                          TimeTicks,  
+                sfpsEventLogCallTag                   HexInteger,  
+                sfpsEventLogInfo1                     HexInteger,  
+                sfpsEventLogInfo2                     HexInteger 
+        }  
+
+sfpsEventLogStatsSwInst   OBJECT-TYPE
+        SYNTAX  SfpsSwitchInstance
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The switch instance of this Event Logger."
+        ::= { sfpsEventLogStatsEntry 1 }
+
+sfpsEventLogWindowStart   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index into the event log window."
+        ::= { sfpsEventLogStatsEntry 2 }
+
+sfpsEventLogIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The absolutue index into the event log window."
+        ::= { sfpsEventLogStatsEntry 3 }
+
+sfpsEventLogClientName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The name of the client who logged the event."
+        ::= { sfpsEventLogStatsEntry 4 }
+
+sfpsEventLogLevel   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The log level of the logged event."
+        ::= { sfpsEventLogStatsEntry 5 }
+
+sfpsEventLogMessageString   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The logged event message."
+        ::= { sfpsEventLogStatsEntry 6 }
+
+sfpsEventLogTime        OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The time when the event was logged."
+        ::= { sfpsEventLogStatsEntry 7 }
+
+sfpsEventLogCallTag   OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The call tag of the logged event (if applicable)."
+        ::= { sfpsEventLogStatsEntry 8 }
+
+sfpsEventLogInfo1   OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A generic info field used to display information
+                 related to the logged event."
+        ::= { sfpsEventLogStatsEntry 9 }
+
+sfpsEventLogInfo2   OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "A generic info field used to display information
+                 related to the logged event."
+        ::= { sfpsEventLogStatsEntry 10 }
+
+
+
+--  SFPS Event Logger General Configuration Group (new event logger)
+
+sfpsEventLogGenConfigTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsEventLogGenConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the general configuration parameters for
+                 the Event Log Server object."
+        ::= { sfpsEventLogGenConfig 1 }
+
+sfpsEventLogGenConfigEntry    OBJECT-TYPE
+        SYNTAX  SfpsEventLogGenConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains event log configuration parameters."
+        INDEX   { sfpsEventLogGenConfigSwInst } 
+                      ::= { sfpsEventLogGenConfigTable 1 }
+
+SfpsEventLogGenConfigEntry ::=
+        SEQUENCE {
+                sfpsEventLogGenConfigSwInst                     SfpsSwitchInstance,  
+                sfpsEventLogGenConfigWindowStart                INTEGER (1..20000),  
+                sfpsEventLogGenConfigLoggingIndex               INTEGER (1..20000), 
+                sfpsEventLogGenConfigMessageFilter              DisplayString, 
+                sfpsEventLogGenConfigCallTagFilter              HexInteger, 
+                sfpsEventLogGenConfigAdminStatus                INTEGER, 
+                sfpsEventLogGenConfigOperStatus                 INTEGER, 
+                sfpsEventLogGenConfigOperTime                   TimeTicks, 
+                sfpsEventLogGenConfigAutoFreeze                 INTEGER, 
+                sfpsEventLogGenConfigDisplayWrapDetect          INTEGER,
+                sfpsEventLogGenConfigAdvertiseAddr              IpAddress
+        }  
+
+sfpsEventLogGenConfigSwInst   OBJECT-TYPE
+        SYNTAX  SfpsSwitchInstance
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The switch instance of this Event Logger table."
+        ::= { sfpsEventLogGenConfigEntry 1 }
+
+sfpsEventLogGenConfigWindowStart   OBJECT-TYPE
+        SYNTAX  INTEGER (1..20000)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the starting point of the Event Logger Window."
+        ::= { sfpsEventLogGenConfigEntry 2 }
+
+sfpsEventLogGenConfigLoggingIndex   OBJECT-TYPE
+        SYNTAX  INTEGER (1..20000)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Pointer to the next location where the event logger will log."
+        ::= { sfpsEventLogGenConfigEntry 3 }
+
+sfpsEventLogGenConfigMessageFilter   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A string filter which allows only matching messages to be
+                displayed."
+        ::= { sfpsEventLogGenConfigEntry 4 }
+
+sfpsEventLogGenConfigCallTagFilter   OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "A filter which allows only messages with matching call tags
+                to be displayed."
+        ::= { sfpsEventLogGenConfigEntry 5 }
+
+sfpsEventLogGenConfigAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3),
+                        reset(4),
+                        continue(5)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The administrative status of the event log."
+        ::= { sfpsEventLogGenConfigEntry 6 }
+
+sfpsEventLogGenConfigOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3),
+                        pending-disable(4),
+                        pending-enable(5)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The operational status of the event log."
+        ::= { sfpsEventLogGenConfigEntry 7 }
+
+sfpsEventLogGenConfigOperTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The amount of time that the event log has been
+                in its current operational state."
+        ::= { sfpsEventLogGenConfigEntry 8 }
+
+sfpsEventLogGenConfigAutoFreeze   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Allows events with the Freeze log level to
+                automatically disable the operational status of
+                the event log."
+        ::= { sfpsEventLogGenConfigEntry 9 }
+
+sfpsEventLogGenConfigDisplayWrapDetect   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Allows the event log to not advance past a
+                wrap-point determined by the event log's
+                current logging point."
+        ::= { sfpsEventLogGenConfigEntry 10 }
+
+sfpsEventLogGenConfigAdvertiseAddr   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The IP address of a remote event logging
+                 mechanism."
+        ::= { sfpsEventLogGenConfigEntry 11 }
+
+
+
+
+--  SFPS Event Logger Client Configuration Group (new event logger)
+
+sfpsEventLogClientConfigTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsEventLogClientConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains the client configuration parameters for the
+                 Event Log Server object."
+        ::= { sfpsEventLogClientConfig 1 }
+
+sfpsEventLogClientConfigEntry    OBJECT-TYPE
+        SYNTAX  SfpsEventLogClientConfigEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains event log client configuration parameters."
+        INDEX   { sfpsEventLogClientConfigId } 
+                      ::= { sfpsEventLogClientConfigTable 1 }
+
+SfpsEventLogClientConfigEntry ::=
+        SEQUENCE {
+                sfpsEventLogClientConfigId              INTEGER,  
+                sfpsEventLogClientConfigName            DisplayString,
+                sfpsEventLogClientLogStatus             INTEGER,
+                sfpsEventLogClientDisplayStatus         INTEGER,
+                sfpsEventLogClientFreezeLogStatus       INTEGER,
+                sfpsEventLogClientFreezeDisplayStatus   INTEGER,
+                sfpsEventLogClientErrorLogStatus        INTEGER,
+                sfpsEventLogClientErrorDisplayStatus    INTEGER,
+                sfpsEventLogClientCriticalLogStatus     INTEGER,
+                sfpsEventLogClientCriticalDisplayStatus INTEGER,
+                sfpsEventLogClientInfoLogStatus         INTEGER,
+                sfpsEventLogClientInfoDisplayStatus     INTEGER,
+                sfpsEventLogClientDebugLogStatus        INTEGER,
+                sfpsEventLogClientDebugDisplayStatus    INTEGER
+        }  
+
+sfpsEventLogClientConfigId   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the client ID of a client that is logging events."
+        ::= { sfpsEventLogClientConfigEntry 1 }
+
+sfpsEventLogClientConfigName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The name of the event log client."
+        ::= { sfpsEventLogClientConfigEntry 2 }
+
+sfpsEventLogClientLogStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the logging status for this event log client."
+        ::= { sfpsEventLogClientConfigEntry 3 }
+
+sfpsEventLogClientDisplayStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the display status for this event log client."
+        ::= { sfpsEventLogClientConfigEntry 4 }
+
+sfpsEventLogClientFreezeLogStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the log status for the log level Freeze of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 5 }
+
+sfpsEventLogClientFreezeDisplayStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the display status for the log level Freeze of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 6 }
+
+sfpsEventLogClientErrorLogStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the log status for the log level Error of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 7 }
+
+sfpsEventLogClientErrorDisplayStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the display status for the log level Error of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 8 }
+
+sfpsEventLogClientCriticalLogStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the log status for the log level Critical of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 9 }
+
+sfpsEventLogClientCriticalDisplayStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the display status for the log level Critical of
+                 this client."
+        ::= { sfpsEventLogClientConfigEntry 10 }
+
+sfpsEventLogClientInfoLogStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the log status for the log level Info of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 11 }
+
+sfpsEventLogClientInfoDisplayStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the display status for the log level Info of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 12 }
+
+sfpsEventLogClientDebugLogStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the log status for the log level Debug of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 13 }
+
+sfpsEventLogClientDebugDisplayStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disable(2),
+                        enable(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Represents the display status for the log level Debug of this
+                 client."
+        ::= { sfpsEventLogClientConfigEntry 14 }
+
+
+sfpsEventLogClientConfigAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER     {
+                freezeLog(1),
+                errorLog(2),
+                criticalLog(3),
+                infoLog(4),
+                debugLog(5),
+                allLogLevels(6),
+                allClients(7),
+                masterLog(8)
+        }  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsEventLogClientConfigAPI 1 }
+
+sfpsEventLogClientConfigAPIAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER   {
+                other(1),
+                disable(2),
+                enable(3)
+        }    
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsEventLogClientConfigAPI 2 }
+
+sfpsEventLogClientConfigAPIClientName   OBJECT-TYPE
+        SYNTAX  DisplayString       
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsEventLogClientConfigAPI 3 }
+
+sfpsEventLogClientConfigAPIClientID   OBJECT-TYPE
+        SYNTAX  INTEGER       
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsEventLogClientConfigAPI 4 }
+
+sfpsEventLogClientConfigAPILogDisplay   OBJECT-TYPE
+        SYNTAX  INTEGER     {
+                other(1),
+                logAndDisplay(2),
+                logOnly(3),
+                displayOnly(4)
+        }  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsEventLogClientConfigAPI 5 }
+
+
+--  Frag Stats
+
+sfpsFragStatsTotalFrags   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFragStats 1 }
+
+sfpsFragStatsNumLookupFail   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFragStats 2 }
+
+sfpsFragStatsAvgCompares   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFragStats 3 }
+
+sfpsFragStatsNumNodes   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFragStats 4 }
+
+sfpsFragStatsNumUsed   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFragStats 5 }
+
+sfpsFragStatsMaxNumUsed   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFragStats 6 }
+
+sfpsFragStatsNumStolen   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsFragStats 7 }
+
+
+--
+
+sfpsTrapAPIVerb      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                other(1),
+                enable(2),
+                disable(3),
+                resetTrapStats(4),
+                resetAllStats(5)
+        }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        ""
+    ::= { sfpsTrapAPI 1 }
+
+sfpsTrapAPITrapId      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                newUser(1400),
+                violation(1401),
+                srcBlock(1402),
+                dstBlock(1403),
+                portToStandby(1404),
+                portFromStandby(1405),
+                ageCnt(1406),
+                changeCount(1407),
+                foundNeighbor(1408),
+                lostNeighbor(1409),
+                agentIP(1410)
+        }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        ""
+    ::= { sfpsTrapAPI 2 }
+
+sfpsTrapAPITotalSent      OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        ""
+    ::= { sfpsTrapAPI 3 }
+
+
+--
+
+sfpsTrapTableTrapId      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                newUser(1400),
+                violation(1401),
+                srcBlock(1402),
+                dstBlock(1403),
+                portToStandby(1404),
+                portFromStandby(1405),
+                ageCnt(1406),
+                changeCount(1407),
+                foundNeighbor(1408),
+                lostNeighbor(1409),
+                agentIP(1410),
+                noSrcVlans(1411),
+                noDestVlans(1412),
+                noSrcVlansEnabled(1413),
+                noDestVlansEnabled(1414),
+                noCommonSecureVlan(1415),
+                incVlanUserCount(1416),
+                decVlanUserCount(1417),
+                vrrpPrimaryResign(1418),
+                vrrpPrimaryAged(1419),
+                vrrpSecondaryUp(1420),
+                hsrpPrimaryResign(1421),
+                hsrpSecondaryUp(1422)
+
+
+        }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        ""
+    ::= { sfpsTrapTable 1 }
+
+sfpsTrapTableAdminStatus      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+        }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        ""
+    ::= { sfpsTrapTable 2 }
+
+sfpsTrapTableNumSent      OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        ""
+    ::= { sfpsTrapTable 3 }
+
+sfpsTrapTableLastSent      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        ""
+    ::= { sfpsTrapTable 4 }
+
+END 

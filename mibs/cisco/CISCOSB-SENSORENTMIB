@@ -1,0 +1,100 @@
+CISCOSB-SENSORENTMIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        rlEnv
+                FROM CISCOSB-HWENVIROMENT
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32, mib-2
+                FROM SNMPv2-SMI
+        entPhySensorEntry
+                FROM ENTITY-SENSOR-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, TimeStamp
+                FROM SNMPv2-TC
+        entPhysicalIndex, entityPhysicalGroup
+                FROM ENTITY-MIB
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        EntitySensorValue
+                FROM ENTITY-SENSOR-MIB;
+
+rlSensor MODULE-IDENTITY
+    LAST-UPDATED "200309210000Z"
+    ORGANIZATION "Cisco Systems, Inc."
+
+    CONTACT-INFO
+    "Postal: 170 West Tasman Drive
+    San Jose , CA 95134-1706
+    USA
+
+    
+    Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+    DESCRIPTION
+            "The private MIB module definition for sensors in CISCOSB devices."
+    REVISION "200309210000Z"
+    DESCRIPTION
+            "ADDED this MODULE-IDENTITY clause."
+    ::= { rlEnv 4 }
+
+rlEntPhySensorTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF RlEntPhySensorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The addition to the table of sensors maintained by the environmental
+                monitor."
+        ::= { rlEnv 3 }
+
+rlEntPhySensorEntry OBJECT-TYPE
+        SYNTAX     RlEntPhySensorEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "An additon to the entry in the sensor table, representing the
+                maximum/minimum values for the sensor associated."
+        AUGMENTS     {entPhySensorEntry}
+        ::= { rlEntPhySensorTable 1 }
+
+RlEntPhySensorEntry ::=
+        SEQUENCE {
+                rlEnvPhySensorMinValue       EntitySensorValue,
+                rlEnvPhySensorMaxValue       EntitySensorValue,
+                rlEnvPhySensorTestValue      EntitySensorValue,
+                rlEnvPhySensorLocation       SnmpAdminString
+        }
+
+rlEnvPhySensorMinValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Minimum value for the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 1 }
+
+rlEnvPhySensorMaxValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Maximum value for the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 2 }
+
+rlEnvPhySensorTestValue OBJECT-TYPE
+        SYNTAX     EntitySensorValue
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Test/reference value for the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 3 }
+
+rlEnvPhySensorLocation OBJECT-TYPE
+        SYNTAX     SnmpAdminString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "A textual description for the Location where the Sensor being instrumented."
+        ::= { rlEntPhySensorEntry 4 }
+END
+

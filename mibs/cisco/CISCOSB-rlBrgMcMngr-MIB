@@ -1,0 +1,170 @@
+CISCOSB-rlBrgMcMngr-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    switch001                                   FROM CISCOSB-MIB
+    VlanIndex                                   FROM Q-BRIDGE-MIB
+    MODULE-IDENTITY, OBJECT-TYPE                FROM SNMPv2-SMI
+    InetAddressType                             FROM INET-ADDRESS-MIB;
+
+rlBrgMcMngr MODULE-IDENTITY
+              LAST-UPDATED "200602120000Z"
+              ORGANIZATION "Cisco Systems, Inc."
+
+              CONTACT-INFO
+              "Postal: 170 West Tasman Drive
+              San Jose , CA 95134-1706
+              USA
+
+              
+              Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+              DESCRIPTION
+                      "The private MIB module definition for Multicast support in CISCOSB devices."
+              REVISION "200602120000Z"
+              DESCRIPTION
+                       "Editorial changes to support new MIB compilers."
+               REVISION "200404190000Z"
+              DESCRIPTION
+                      "Initial version of this MIB."
+          ::= { switch001 117 }
+
+
+rlBrgMulticastManagerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlBrgMulticastManagerEntry
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "The table containing Multicast information for each VLAN."
+    ::= { rlBrgMcMngr  1}
+
+rlBrgMulticastManagerEntry OBJECT-TYPE
+SYNTAX  RlBrgMulticastManagerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry (conceptual row) in the rlBrgMulticastManagerTable."
+    INDEX  { rlBrgMulticastManagerVlanTag }
+    ::= { rlBrgMulticastManagerTable 1 }
+
+RlBrgMulticastManagerEntry ::=
+SEQUENCE {
+        rlBrgMulticastManagerVlanTag  VlanIndex,
+        rlBrgMulticastManagerAdminVlanMode INTEGER,
+        rlBrgMulticastManagerOperVlanMode  INTEGER
+}
+rlBrgMulticastManagerVlanTag OBJECT-TYPE
+    SYNTAX  VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    " The VLAN tag for which this entry is configured."
+    ::= { rlBrgMulticastManagerEntry 1 }
+
+rlBrgMulticastManagerAdminVlanMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mac-group(1),
+        ip-group(2),
+        ip-src-group(3)
+    }
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "The Bridge Multicast Admin Lookup Mode."
+    DEFVAL { mac-group }
+    ::= { rlBrgMulticastManagerEntry 2 }
+
+rlBrgMulticastManagerOperVlanMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mac-group(1),
+        ip-group(2),
+        ip-src-group(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS   current
+    DESCRIPTION
+        "The Bridge Multicast Oper Lookup Mode."
+    DEFVAL { mac-group }
+    ::= { rlBrgMulticastManagerEntry 3 }
+
+-- rlBrgMulticastInetManagerTable (replaced DEPRICATED rlBrgMulticastManagerTable)
+
+rlBrgMulticastInetManagerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlBrgMulticastInetManagerEntry
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "The table containing Multicast information for each VLAN."
+    ::= { rlBrgMcMngr  2}
+
+rlBrgMulticastInetManagerEntry OBJECT-TYPE
+SYNTAX  RlBrgMulticastInetManagerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry (conceptual row) in the rlBrgMulticastInetManagerTable."
+    INDEX  { rlBrgMulticastInetManagerIpType, rlBrgMulticastInetManagerVlanTag }
+    ::= { rlBrgMulticastInetManagerTable 1 }
+
+RlBrgMulticastInetManagerEntry ::=
+SEQUENCE {
+        rlBrgMulticastInetManagerIpType     INTEGER,
+        rlBrgMulticastInetManagerVlanTag  VlanIndex,
+        rlBrgMulticastInetManagerAdminVlanMode INTEGER,
+        rlBrgMulticastInetManagerOperVlanMode  INTEGER
+}
+
+rlBrgMulticastInetManagerIpType OBJECT-TYPE
+     SYNTAX      INTEGER {
+                     unknown(0),
+                     ipv4(1),    -- these named numbers are aligned
+                     ipv6(2),    -- with AddressFamilyNumbers from
+                     dns(16)     -- IANA-ADDRESS-FAMILY-NUMBERS-MIB
+                 }
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The address type of Vlan Mode."
+    ::= { rlBrgMulticastInetManagerEntry  1 }
+
+rlBrgMulticastInetManagerVlanTag OBJECT-TYPE
+    SYNTAX  VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    " The VLAN tag for which this entry is configured."
+    ::= { rlBrgMulticastInetManagerEntry 2 }
+
+rlBrgMulticastInetManagerAdminVlanMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mac-group(1),
+        ip-group(2),
+        ip-src-group(3)
+    }
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+        "The Bridge Multicast Admin Lookup Mode."
+    DEFVAL { mac-group }
+    ::= { rlBrgMulticastInetManagerEntry 3 }
+
+rlBrgMulticastInetManagerOperVlanMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        mac-group(1),
+        ip-group(2),
+        ip-src-group(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS   current
+    DESCRIPTION
+        "The Bridge Multicast Oper Lookup Mode."
+    DEFVAL { mac-group }
+    ::= { rlBrgMulticastInetManagerEntry 4 }
+
+
+END
+
+
+
+
+

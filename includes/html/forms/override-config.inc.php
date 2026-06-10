@@ -1,0 +1,51 @@
+<?php
+
+/*
+ * LibreNMS
+ *
+ * Copyright (c) 2014 Neil Lathwood <https://github.com/laf/ http://www.lathwood.co.uk>
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+*/
+
+use App\Facades\DeviceCache;
+use Illuminate\Support\Facades\Gate;
+
+header('Content-type: application/json');
+
+if (Gate::denies('device.update')) {
+    $response = [
+        'status' => 'error',
+        'message' => 'Need permission',
+    ];
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+$device = DeviceCache::get((int) $_POST['device_id']);
+$attrib = $_POST['attrib'];
+$state = $_POST['state'];
+$status = 'error';
+$message = 'Error with config';
+
+if ($device->exists == false) {
+    $message = 'No device passed';
+} else {
+    if ($state == true) {
+        $device->setAttrib($attrib, $state);
+    } else {
+        $device->forgetAttrib($attrib);
+    }
+    $status = 'ok';
+    $message = 'Config has been updated';
+}
+
+$response = [
+    'status' => $status,
+    'message' => $message,
+];
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

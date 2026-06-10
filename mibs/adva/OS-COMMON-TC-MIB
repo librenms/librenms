@@ -1,0 +1,296 @@
+OS-COMMON-TC-MIB DEFINITIONS ::= BEGIN
+
+-- *****************************************************************************
+-- TEXTUAL-CONVENTIONs MIB for all os... MIBs
+-- *****************************************************************************
+
+IMPORTS
+    MODULE-IDENTITY, enterprises, Integer32, Unsigned32
+        FROM SNMPv2-SMI         -- RFC 2578
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;         -- RFC 2579
+
+osCommonTcMib MODULE-IDENTITY
+    LAST-UPDATED "201801020000Z" -- 02 Jan. 2018
+    ORGANIZATION "MRV Communications, Inc."
+    CONTACT-INFO
+        "Alex Ruzin
+         ADVA Optical Networking SE
+         Email:  ARuzin@advaoptical.com"
+    DESCRIPTION
+       "This MIB module defines the textual conventions used 
+        throughout the all os... and nb...  MIB modules.
+        Copyright 2018 ADVA Optical Networking SE.
+        All rights reserved."   
+
+    REVISION    "201801020000Z" -- 02 Jan. 2018
+    DESCRIPTION
+       "Initial Version."
+    ::= { oaOptiSwitch 6400 }
+
+-- ************************************************************
+-- MIB place Definition
+-- ************************************************************
+nbase                  OBJECT IDENTIFIER ::= { enterprises 629 }
+oaccess                OBJECT IDENTIFIER ::= { enterprises 6926 }
+nbSwitchG1             OBJECT IDENTIFIER ::= { nbase 1 }
+adva                   OBJECT IDENTIFIER ::= { nbase 2544 }
+nbSwitchG1Il           OBJECT IDENTIFIER ::= { nbSwitchG1 50}
+oaOptiSwitch           OBJECT IDENTIFIER ::= { oaccess 2 }
+
+-- ************************************************************
+-- Textual converions
+-- ************************************************************
+
+OsCfmMepIdOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+       "Maintenance association End Point Identifier (MEPID): A small
+        integer, unique over a given Maintenance Association,
+        identifying a specific MEP.
+ 
+        The special value 0 is allowed to indicate special cases, for
+        example that no MEPID is configured.
+
+        Whenever an object is defined with this SYNTAX, then the
+        DESCRIPTION clause of such an object MUST specify what the
+        special value of 0 means.
+        
+        This object is different from Dot1agCfmMepIdOrZero that its upper limit 
+        is 4K instead of  8K."
+
+    REFERENCE
+       "802.1ag clause 19.2.1"
+    SYNTAX      Unsigned32 (0 | 1..4095)
+
+
+EntityName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION "An octet string containing administrative
+                 information in human-readable form.
+                 Represents textual information taken from the NVT ASCII
+                 character set, as defined in pages 4, 10-11 of RFC 854.
+                 Additional restrictions are:
+                 - NUL, LF, CR, BEL, BS, HT, VT and FF are prohibited   
+                 - SP (White space) and '?' (Question mark) are strictly forbidden."
+    SYNTAX       OCTET STRING (SIZE (1..30))
+
+EntityNameOrNone ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS       current
+    DESCRIPTION "Extends EntityName wth empty value."
+    SYNTAX       OCTET STRING (SIZE (0..30))
+
+BwAccountStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+      "Status of accounting for a service/flow.
+      An agent always returns value enabled(3) or value
+      disabled(4) as a response on GET operation. For SET
+      operation all 3 values are valid."
+    SYNTAX       INTEGER { 
+                   unknown     (1),
+                   clear       (2),
+                   enabled     (3),
+                   disabled    (4)
+                 }
+
+EntryValidator ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+      "Admin Status for controlling of the entry."
+    SYNTAX       INTEGER { 
+                   unknown    (1),
+                   nothing    (2),
+                   delete     (3),
+                   create     (4)
+                 }
+
+ProfileStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+      "Status of a profile, reported it's being busy: the profile is busy, it there is at least one
+      service, using it."
+    SYNTAX       INTEGER { 
+                   unknown          (1),
+                   busy             (5),
+                   free             (6),
+                   underProcessing  (9)
+                 }
+
+PortIndex         ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "d"
+   STATUS       current
+   DESCRIPTION
+      "A unique value, greater than zero, for each Port or
+       in the managed system.
+       The value for each Port must remain
+       constant at least from one re-initialization of the entity's
+       network management system to the next re-initialization.
+       Actual limit is SNMP object osPortCfgMaxNumberOfPort.
+       All Ports with PortIndex greater or equal osPortCfgBaseTrunkPortIndex are Ethernet Channels."
+   SYNTAX       Unsigned32 (1..2147483647)
+
+PortIndexOrNone   ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+      "See PortIndex, it is his extension for a case of <None>."
+    SYNTAX       Integer32 (0|1..2147483647)
+
+CfmMDLevel        ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+       "Is an extension of Dot1agCfmMDLevel - value -1 means undefined.
+        Integer identifying the Maintenance Domain Level (MD Level).
+        Higher numbers correspond to higher Maintenance Domains,
+        those with the greatest physical reach, with the highest
+        values for customers' CFM PDUs.  Lower numbers correspond
+        to lower Maintenance Domains, those with more limited
+        physical reach, with the lowest values for CFM PDUs
+        protecting single bridges or physical links.
+        The value '-1' means, that MD Level is undefined."
+    REFERENCE
+       "802.1ag clauses 18.3, 21.4.1"
+    SYNTAX      Integer32 (-1|0..7)
+
+
+CoS ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+       "The value of Class of Service (also referred to as of service level).
+       While in devices it also defines an egress queue, the upper limit may
+       be greater then 7. Actual upper limit may be read in osEthMaxSlValue."
+    SYNTAX           Unsigned32 (1..4294967295)
+
+ServFlowId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS           current
+    DESCRIPTION
+       "The value 0 means, that this entry corresponds to the service, not to to any flow."
+    SYNTAX           Unsigned32 (0|1..4294967295)
+
+PortList ::= TEXTUAL-CONVENTION
+    -- DISPLAY-HINT "1x"
+    STATUS       current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1',
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    REFERENCE
+      "Q-BRIDGE-MIB DEFINITIONS."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+TagList ::= TEXTUAL-CONVENTION
+    -- DISPLAY-HINT "1x"
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        tags, with the first octet specifying tags 1 through
+        8, the second octet specifying tags 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered tag, and the least significant bit
+        represents the highest numbered tag.  Thus, each tag
+        is represented by a single bit within the
+        value of this object.  If that bit has a value of '1',
+        then that tag is included in the set of tags; the tag
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING (SIZE(0..512))
+
+MepList ::= TEXTUAL-CONVENTION
+    -- DISPLAY-HINT "1x"
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        remote MEPs, with the first octet specifying remote
+        MEP IDs 1 through 8, the second octet specifying remote
+        MEP IDs 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered remote MEP Id, and the least significant bit
+        represents the highest numbered remote MEP Id.  Thus, each remote MEP Id
+        is represented by a single bit within the
+        value of this object.  If that bit has a value of '1',
+        then that remote MEP Id is included in the list; the remote MEP Id
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING (SIZE(0..512))
+
+ServiceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Type of the service per node.
+         portBasedUni(2) - port based UNI (epl, ep-lan)
+         vlanBasedUni(3) - vlan based UNI (evpl, evp-lan)
+         legacyEpLan (4) - for backward conpatibility, see below
+         legacyEvpLan(5) - for backward conpatibility, see below
+         vlanBasedINni(8) - vlan based internal NNI (former aggregation)
+         portBasedINni(9) - port based internal NNI
+         vlanBasedENni(8) - vlan based external NNI
+         portBasedENni(9) - port based external NNI
+        
+       There is at least one difference between internal NNI and external NNI: if a service
+       does not contain MEP and contains only MIP, then MA does not have c-ports in
+       an internal NNI."
+    REFERENCE
+      "MEF 6.1, Clauses 7.1 - 7.6."
+    SYNTAX           INTEGER {
+                       unknown     (1),
+                       portBasedUni(2),
+                       vlanBasedUni(3),
+                       legacyEpLan (4),
+                       legacyEvpLan(5),
+                       vlanBasedINni(8),
+                       portBasedINni(9),
+                       vlanBasedENni(10),
+                       portBasedENni(11)
+                    }
+
+StartTimeType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This enumeration data type indicates the type of start
+        time to indicate when a performance metric is 
+        initiated.
+
+        The valid enumerated values associated with this type are:
+
+        none(1)       The PM is never started
+        immediate(2)  The PM is to begin immediately
+        relative(3)   The PM is to begin a relative time from the current time
+        fixed(4)      The PM is to begin at the given UTC time/date"
+    REFERENCE
+       "[SOAM-PM] R2"
+    SYNTAX      INTEGER {
+                  none(1),
+                  immediate(2),
+                  relative(3),
+                  fixed(4)
+                }
+
+RespType        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the type of the responer:
+        - regular(1):    The test was run against regular loopback device.
+        - generic(2):    The test was run against generic loopback device."
+
+    REFERENCE
+       "RFC 2544, Clause 26."
+    SYNTAX      INTEGER {
+                  unknown      (0),
+                  regular      (1),
+                  generic      (2)
+                }
+
+
+END

@@ -1,0 +1,205 @@
+-- *****************************************************************
+-- TRELLIX CONFIDENTIAL
+-- TRELLIX-SENSOR-SMI:  
+-- Trellix Sensor Structure of Management Information
+--
+-- Copyright (c) 2022 MUSARUBRA US, LLC
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+TRELLIX-SENSOR-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, Integer32
+		FROM SNMPv2-SMI
+	ivProducts
+		FROM TRELLIX-INTRUVERT-SMI;
+
+ivSensor MODULE-IDENTITY
+LAST-UPDATED "200707090000Z"
+ORGANIZATION 
+"MUSARUBRA US LLC"
+CONTACT-INFO 
+"Trellix Customer Service Department
+
+Postal: 6220 American Center Drive
+        San Jose CA 95002-2563
+       
+
+Tel: +1 800 338 8754
+
+E-mail: support@mcafee.com"
+DESCRIPTION 
+"The Structure of Management Information for the Trellix enterprise."
+
+REVISION "200707090000Z"
+DESCRIPTION 
+"Initial version of this MIB module."
+::= { ivProducts 1 }
+
+
+--This group is defined to provide a common place fo the MIB objects that would be used as 
+--index keys into SNMP tables defined within the Sensor Configuration, Performance &Trap MIBs
+--
+
+ivIndex  OBJECT IDENTIFIER ::= { ivSensor 1 }
+
+slotIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..10)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Identifies the position (starting from 1) of a slot in the chassis."
+	::= { ivIndex 1 }
+
+processorIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..8)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Processor CPU core index (starting from 1) within a 
+		sensor card."
+	::= { ivIndex 2 }
+
+npIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..2)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"NP CPU core index (starting from 1) within a sensor card."
+	::= { ivIndex 3 }
+
+mgmtPortIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Management port index (starting from 1) on a Sensor management card.
+		Must not exceed a maximum count as specified by the mgmtPortMaxCount object in 
+		the vendor specified MIB specified for this mgmt card."
+	::= { ivIndex 4 }
+
+intfPortIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..32)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Interface port index (starting from 1) on a sensor analysis card.
+		These ports are also referred to as front-end ports."
+	::= { ivIndex 5 }
+
+respPortIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..33)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Response port index (starting from 1) on a sensor-analysis card."
+	::= { ivIndex 6 }
+
+bundleIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (0..10)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Trellix management system defined bundle number each sensor card belongs to.
+		Valid:1onwards
+		Note: Use cases may use the value '0' to interpret that the notion of 'bundle' is to be ignored."
+	::= { ivIndex 7 }
+
+qedIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"QED processor index (starting from 1) on a Sensor management card."
+	::= { ivIndex 8 }
+
+sibyteIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..4)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"SiByte processor index (starting from 1) on a Sensor management card."
+	::= { ivIndex 9 }
+
+rateLimitQueueIndex  OBJECT-TYPE
+	SYNTAX 	Integer32 (1..8)
+	MAX-ACCESS  read-only
+	STATUS	current
+	DESCRIPTION 
+		"Ratelimit Queue index (starting from 1). For FE ports the index value is between (1 to 6).
+		 For GE ports the index value is between (1 to 8)"
+	::= { ivIndex 10 }
+
+intfPhysicalPortIndex  OBJECT-TYPE
+    SYNTAX  Integer32 (1..32)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Interface physical port index (starting from 1) on a sensor analysis card.
+          These are applicable to the Load Balancer Solution only."
+    ::= { ivIndex 11 }
+
+ntpServerIndex  OBJECT-TYPE
+    SYNTAX  Integer32 (1..2)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Ntp Server index (starting from 1). Ntp Server Index value can be either 1 or 2."
+    ::= { ivIndex 12 }
+
+intfVirtualSlotIndex  OBJECT-TYPE
+    SYNTAX  Integer32 (1..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Identifies the position (starting from 1) of a slot in the virtual stack."
+    ::= { ivIndex 13 }
+
+intfVirtualPortIndex  OBJECT-TYPE
+    SYNTAX  Integer32 (1..1024)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         "Interface virtual port index (starting from 1) on a virtual stack analysis card.
+          These are applicable to the Stack Solution only."
+    ::= { ivIndex 14 }
+
+sslProbeIpv4Index  OBJECT-TYPE
+    SYNTAX  Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         " "
+    ::= { ivIndex 15 }
+
+processorNumIndex  OBJECT-TYPE
+    SYNTAX  Integer32 (1..1024) 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         " "
+    ::= { ivIndex 16 }
+
+sslProbeIpv6Index  OBJECT-TYPE
+    SYNTAX  Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+         " "
+    ::= { ivIndex 17 }	
+	
+ivSensorConfiguration  OBJECT IDENTIFIER ::= { ivSensor 2 }
+
+ivSensorPerformance  OBJECT IDENTIFIER ::= { ivSensor 3 }
+
+ivSensorTraps  OBJECT IDENTIFIER ::= { ivSensor 4 }
+
+ivFirewallConfiguration  OBJECT IDENTIFIER ::= { ivSensor 5 }
+
+ivFirewallPerformance  OBJECT IDENTIFIER ::= { ivSensor 6 }
+
+END
+
+

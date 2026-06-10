@@ -1,0 +1,56 @@
+ADTRAN-AOS-PORT-SECURITY-MIB    DEFINITIONS ::= BEGIN
+
+--  TITLE:      THE ADTRAN OPERATING SYSTEM PORT SECURITY MIB
+--  FILENAME:   AdGenAosPortSecurity.mib
+--  AUTHOR:     Jason Schock
+--  DATE:       10/15/04
+
+--  HISTORY
+--  10/15/04  First draft.
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+    ifIndex, ifName
+           FROM IF-MIB
+    adIdentity
+           FROM ADTRAN-MIB
+    adGenAOSSwitch
+           FROM ADTRAN-AOS;
+
+
+adGenAOSPortSecurityID    MODULE-IDENTITY
+        LAST-UPDATED "200410150000Z"
+        ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+                "Technical Support Dept.
+                 Postal: ADTRAN, Inc.
+                         901 Explorer Blvd.
+                         Huntsville, AL 35806
+
+                         Tel: +1 800 726-8663
+                         Fax: +1 256 963 6217
+                         E-mail: support@adtran.com"
+        DESCRIPTION
+                "The MIB module for general configuration of port security."
+        ::= { adIdentity 10000 53 4 1 }
+
+
+-- OBJECT IDENTIFIERS
+
+    adGenAOSPortSecurity         OBJECT IDENTIFIER ::= { adGenAOSSwitch 1 }
+    adGenAOSPortSecurityTraps    OBJECT IDENTIFIER ::= { adGenAOSPortSecurity 0 }
+
+
+--
+-- Port Security Traps
+--
+
+adGenAOSPortSecurityViolation NOTIFICATION-TYPE
+        OBJECTS  { ifIndex }
+        STATUS  current
+        DESCRIPTION
+            "This trap indicates a port security violation has occurred."
+        ::= { adGenAOSPortSecurityTraps 0 }
+
+END

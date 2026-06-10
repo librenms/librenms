@@ -1,0 +1,1906 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-QOS-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    serviceAccessSwitch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtQosMIB MODULE-IDENTITY
+    LAST-UPDATED "201401160000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The SNMP MIB module to manage the QoS parameters."
+    REVISION    "201401160000Z"
+    DESCRIPTION 
+        "added prvtQosSchedProfileDescription,
+         prvtQosMapProfExpToFcTable,prvtQosMapProfAnyExpToFcValue,
+         prvtQosMapProfAnyVptToFcColor,prvtQosRemarkProfFcToExpTable"
+    REVISION    "201401150000Z"
+    DESCRIPTION 
+        "added prvtQosWredProfTable,prvtQosPortEgrPolWredProf,
+         prvtQosPortEgrPolQueWredProf"
+    REVISION    "201312110000Z"
+    DESCRIPTION 
+        "added trustInnerPriority."
+    REVISION    "201003080000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { serviceAccessSwitch 1 }
+
+
+PrvtQosEncapType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "VLAN encapsulation value."
+    SYNTAX      Integer32 (0..4096)
+
+PrvtQosServShaperProfileIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The value of a service shaper profile identifier."
+    SYNTAX      Integer32 (1..48)
+
+PrvtQosProfileIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The value of a profile identifier."
+    SYNTAX      Integer32 (1..8)
+
+PrvtQosFcType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The name of a Forwarding Class."
+    SYNTAX      INTEGER { be(1), l2(2), af(3), l1(4), h2(5), ef(6), 
+                    h1(7), nc(8) }
+
+PrvtQosDscpType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "A Differential Services Code Point value."
+    SYNTAX      Integer32 (0..63)
+
+PrvtQosVptType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "VLAN priority"
+    SYNTAX      Integer32 (0..7)
+
+PrvtQosExpType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Exp"
+    SYNTAX      Unsigned32 (0..7)
+
+PrvtQosDescrType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "150a"
+    STATUS      current
+    DESCRIPTION 
+        "Description for an item."
+    SYNTAX      OCTET STRING (SIZE(1..150))
+
+PrvtQosQueueIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identification number of a queue."
+    SYNTAX      Integer32 (1..8)
+
+PrvtQosServiceIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The identification number of a service."
+    SYNTAX      Unsigned32 (1..4294967294)
+
+PrvtQosPolicyNameType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION 
+        "The name of a policy."
+    SYNTAX      OCTET STRING (SIZE(1..32))
+
+PrvtQosPolicyNameOrNoneType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION 
+        "Same as PrvtQosPolicyNameType except that a zero length string
+         indicates that no policy has been assigned."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+PrvtQosColorType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Traffic QOS colors."
+    SYNTAX      INTEGER { green(1), yellow(2) }
+
+PrvtQosSchedType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Scheduling profile type."
+    SYNTAX      INTEGER { sp(1), wrr(2), hybrid1(3), hybrid2(4), 
+                    hybrid3(5), hybrid4(6), hybrid5(7), hybrid6(8), 
+                    hybrid7(9), drr(10), mdrr1(11), mdrr2(12), mdrr3(13), 
+                    mdrr4(14), mdrr5(15), mdrr6(16), mdrr7(17) }
+
+PrvtQosTrustType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Trust mode values."
+    SYNTAX      INTEGER { untrust(0), trustPriority(1), 
+                    trustPreservePriority(2), trustDscp(3), 
+                    trustPriorityAndDscp(4), trustInnerPriority(5) }
+
+PrvtQosQueueWeight ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "The weight to assign to a queue."
+    SYNTAX      Integer32 (0..127)
+
+prvtQosMIBObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIB 1 }
+
+prvtQosSchedProfObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 1 }
+
+prvtQosSchedProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosSchedProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Scheduling profile table.
+         Each entry in this table defines a scheduling profile that may be assigned
+         to a QOS policy."
+    ::= { prvtQosSchedProfObjects 1 }
+
+prvtQosSchedProfileEntry OBJECT-TYPE
+    SYNTAX      PrvtQosSchedProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosSchedProfileTable."
+    INDEX       { prvtQosSchedProfileId }
+    ::= { prvtQosSchedProfileTable 1 }
+
+PrvtQosSchedProfileEntry ::= SEQUENCE {
+    prvtQosSchedProfileId               PrvtQosProfileIdType,
+    prvtQosSchedProfileRowStatus        RowStatus,
+    prvtQosSchedProfileType             PrvtQosSchedType,
+    prvtQosSchedProfileQueue1Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileQueue2Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileQueue3Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileQueue4Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileQueue5Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileQueue6Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileQueue7Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileQueue8Weight     PrvtQosQueueWeight,
+    prvtQosSchedProfileDescription      PrvtQosDescrType
+}
+
+prvtQosSchedProfileId OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a scheduling profile."
+    ::= { prvtQosSchedProfileEntry 1 }
+
+prvtQosSchedProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosSchedProfileEntry 2 }
+
+prvtQosSchedProfileType OBJECT-TYPE
+    SYNTAX      PrvtQosSchedType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Scheduling profile type."
+    ::= { prvtQosSchedProfileEntry 3 }
+
+prvtQosSchedProfileQueue1Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 1."
+    ::= { prvtQosSchedProfileEntry 4 }
+
+prvtQosSchedProfileQueue2Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 2."
+    ::= { prvtQosSchedProfileEntry 5 }
+
+prvtQosSchedProfileQueue3Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 3."
+    ::= { prvtQosSchedProfileEntry 6 }
+
+prvtQosSchedProfileQueue4Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 4."
+    ::= { prvtQosSchedProfileEntry 7 }
+
+prvtQosSchedProfileQueue5Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 5."
+    ::= { prvtQosSchedProfileEntry 8 }
+
+prvtQosSchedProfileQueue6Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 6."
+    ::= { prvtQosSchedProfileEntry 9 }
+
+prvtQosSchedProfileQueue7Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 7."
+    ::= { prvtQosSchedProfileEntry 10 }
+
+prvtQosSchedProfileQueue8Weight OBJECT-TYPE
+    SYNTAX      PrvtQosQueueWeight
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The weight assigned to queue 8."
+    ::= { prvtQosSchedProfileEntry 11 }
+
+prvtQosSchedProfileDescription OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Description of the policy"
+    ::= { prvtQosSchedProfileEntry 12 }
+
+prvtQosShaperProfObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 2 }
+
+prvtQosPortShaperProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosPortShaperProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Port Shaper Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on a port."
+    ::= { prvtQosShaperProfObjects 1 }
+
+prvtQosPortShaperProfEntry OBJECT-TYPE
+    SYNTAX      PrvtQosPortShaperProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosPortShaperProfTable."
+    INDEX       { prvtQosPortShaperProfId }
+    ::= { prvtQosPortShaperProfTable 1 }
+
+PrvtQosPortShaperProfEntry ::= SEQUENCE {
+    prvtQosPortShaperProfId         PrvtQosProfileIdType,
+    prvtQosPortShaperProfRowStatus  RowStatus,
+    prvtQosPortShaperProfDescr      PrvtQosDescrType,
+    prvtQosPortShaperProfCIR        Unsigned32,
+    prvtQosPortShaperProfCBS        Unsigned32
+}
+
+prvtQosPortShaperProfId OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a port shaper profile."
+    ::= { prvtQosPortShaperProfEntry 1 }
+
+prvtQosPortShaperProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosPortShaperProfEntry 2 }
+
+prvtQosPortShaperProfDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosPortShaperProfEntry 3 }
+
+prvtQosPortShaperProfCIR OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Commited Information Rate in kbps."
+    ::= { prvtQosPortShaperProfEntry 4 }
+
+prvtQosPortShaperProfCBS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Commited Burst Size allowed in kilobytes."
+    ::= { prvtQosPortShaperProfEntry 5 }
+
+prvtQosServShaperProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosServShaperProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Shaper Profile Table
+         Each entry in this table defines a set of shaping parameters that may be enforced
+         on a service."
+    ::= { prvtQosShaperProfObjects 2 }
+
+prvtQosServShaperProfEntry OBJECT-TYPE
+    SYNTAX      PrvtQosServShaperProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosServShaperProfTable."
+    INDEX       { prvtQosServShaperProfId }
+    ::= { prvtQosServShaperProfTable 1 }
+
+PrvtQosServShaperProfEntry ::= SEQUENCE {
+    prvtQosServShaperProfId         PrvtQosServShaperProfileIdType,
+    prvtQosServShaperProfRowStatus  RowStatus,
+    prvtQosServShaperProfDescr      PrvtQosDescrType,
+    prvtQosServShaperProfCIR        Unsigned32,
+    prvtQosServShaperProfCBS        Unsigned32
+}
+
+prvtQosServShaperProfId OBJECT-TYPE
+    SYNTAX      PrvtQosServShaperProfileIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a service shaper profile."
+    ::= { prvtQosServShaperProfEntry 1 }
+
+prvtQosServShaperProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosServShaperProfEntry 2 }
+
+prvtQosServShaperProfDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosServShaperProfEntry 3 }
+
+prvtQosServShaperProfCIR OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Commited Information Rate in kbps."
+    ::= { prvtQosServShaperProfEntry 4 }
+
+prvtQosServShaperProfCBS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Commited Burst Size allowed in kilobytes."
+    ::= { prvtQosServShaperProfEntry 5 }
+
+prvtQosCongAvoidProfObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 3 }
+
+prvtQosTailDropProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosTailDropProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Tail Drop Profile Table
+         Each entry in this table defines a set of tail-drop parameters that may be enforced
+         on a queue or a policy."
+    ::= { prvtQosCongAvoidProfObjects 1 }
+
+prvtQosTailDropProfEntry OBJECT-TYPE
+    SYNTAX      PrvtQosTailDropProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosTailDropProfTable."
+    INDEX       { prvtQosTailDropProfId }
+    ::= { prvtQosTailDropProfTable 1 }
+
+PrvtQosTailDropProfEntry ::= SEQUENCE {
+    prvtQosTailDropProfId               PrvtQosProfileIdType,
+    prvtQosTailDropProfRowStatus        RowStatus,
+    prvtQosTailDropProfDescr            PrvtQosDescrType,
+    prvtQosTailDropProfYellowThresh     Unsigned32,
+    prvtQosTailDropProfRedThresh        Unsigned32
+}
+
+prvtQosTailDropProfId OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a tail drop profile."
+    ::= { prvtQosTailDropProfEntry 1 }
+
+prvtQosTailDropProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosTailDropProfEntry 2 }
+
+prvtQosTailDropProfDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosTailDropProfEntry 3 }
+
+prvtQosTailDropProfYellowThresh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Drop start threshold for the yellow traffic in kilobytes."
+    ::= { prvtQosTailDropProfEntry 4 }
+
+prvtQosTailDropProfRedThresh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Drop start threshold for the red traffic in kilobytes."
+    ::= { prvtQosTailDropProfEntry 5 }
+
+prvtQosSredProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosSredProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "SRED Profile Table
+         Each entry in this table defines a set of SRED parameters that may be enforced
+         on a queue or a policy."
+    ::= { prvtQosCongAvoidProfObjects 2 }
+
+prvtQosSredProfEntry OBJECT-TYPE
+    SYNTAX      PrvtQosSredProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosSredProfTable."
+    INDEX       { prvtQosSredProfId }
+    ::= { prvtQosSredProfTable 1 }
+
+PrvtQosSredProfEntry ::= SEQUENCE {
+    prvtQosSredProfId                   PrvtQosProfileIdType,
+    prvtQosSredProfRowStatus            RowStatus,
+    prvtQosSredProfDescr                PrvtQosDescrType,
+    prvtQosSredProfYellowThreshold      Unsigned32,
+    prvtQosSredProfYellowProbability    Unsigned32,
+    prvtQosSredProfRedThreshold         Unsigned32,
+    prvtQosSredProfRedProbability       Unsigned32
+}
+
+prvtQosSredProfId OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a SRED profile."
+    ::= { prvtQosSredProfEntry 1 }
+
+prvtQosSredProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosSredProfEntry 2 }
+
+prvtQosSredProfDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosSredProfEntry 3 }
+
+prvtQosSredProfYellowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "SRED yellow treshold in per-cent."
+    ::= { prvtQosSredProfEntry 4 }
+
+prvtQosSredProfYellowProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..90)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "SRED yellow probability in per-cent."
+    ::= { prvtQosSredProfEntry 5 }
+
+prvtQosSredProfRedThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "SRED Red treshold in per-cent."
+    ::= { prvtQosSredProfEntry 6 }
+
+prvtQosSredProfRedProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..90)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "SRED Red probability in per-cent."
+    ::= { prvtQosSredProfEntry 7 }
+
+prvtQosWredProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosWredProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "WRED Profile Table
+         Each entry in this table defines a set of WRED parameters that may be enforced
+         on a queue or a policy."
+    ::= { prvtQosCongAvoidProfObjects 3 }
+
+prvtQosWredProfEntry OBJECT-TYPE
+    SYNTAX      PrvtQosWredProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosWredProfTable."
+    INDEX       { prvtQosWredProfId }
+    ::= { prvtQosWredProfTable 1 }
+
+PrvtQosWredProfEntry ::= SEQUENCE {
+    prvtQosWredProfId                   PrvtQosProfileIdType,
+    prvtQosWredProfRowStatus            RowStatus,
+    prvtQosWredProfDescr                PrvtQosDescrType,
+    prvtQosWredProfYellowThreshold      Unsigned32,
+    prvtQosWredProfYellowProbability    Unsigned32,
+    prvtQosWredProfRedThreshold         Unsigned32,
+    prvtQosWredProfRedProbability       Unsigned32
+}
+
+prvtQosWredProfId OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a WRED profile."
+    ::= { prvtQosWredProfEntry 1 }
+
+prvtQosWredProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosWredProfEntry 2 }
+
+prvtQosWredProfDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosWredProfEntry 3 }
+
+prvtQosWredProfYellowThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "WRED yellow treshold in per-cent."
+    ::= { prvtQosWredProfEntry 4 }
+
+prvtQosWredProfYellowProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..90)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "WRED yellow probability in per-cent."
+    ::= { prvtQosWredProfEntry 5 }
+
+prvtQosWredProfRedThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "WRED Red treshold in per-cent."
+    ::= { prvtQosWredProfEntry 6 }
+
+prvtQosWredProfRedProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..90)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "WRED Red probability in per-cent."
+    ::= { prvtQosWredProfEntry 7 }
+
+prvtQosMapProfObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 4 }
+
+prvtQosMapProfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosMapProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Mapping Profile Table
+         Each entry in this table defines a mapping profile that may be assigned to
+         a QOS policy."
+    ::= { prvtQosMapProfObjects 1 }
+
+prvtQosMapProfEntry OBJECT-TYPE
+    SYNTAX      PrvtQosMapProfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosMapProfTable."
+    INDEX       { prvtQosMapProfName }
+    ::= { prvtQosMapProfTable 1 }
+
+PrvtQosMapProfEntry ::= SEQUENCE {
+    prvtQosMapProfName              PrvtQosPolicyNameType,
+    prvtQosMapProfRowStatus         RowStatus,
+    prvtQosMapProfDescr             PrvtQosDescrType,
+    prvtQosMapProfAnyVptToFcValue   PrvtQosFcType,
+    prvtQosMapProfAnyVptToFcColor   PrvtQosColorType,
+    prvtQosMapProfAnyDscpToFcValue  PrvtQosFcType,
+    prvtQosMapProfAnyDscpToFcColor  PrvtQosColorType,
+    prvtQosMapProfAnyExpToFcValue   PrvtQosFcType,
+    prvtQosMapProfAnyExpToFcColor   PrvtQosColorType
+}
+
+prvtQosMapProfName OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a mapping profile."
+    ::= { prvtQosMapProfEntry 1 }
+
+prvtQosMapProfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosMapProfEntry 2 }
+
+prvtQosMapProfDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosMapProfEntry 3 }
+
+prvtQosMapProfAnyVptToFcValue OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to be assigned to matching traffic."
+    ::= { prvtQosMapProfEntry 4 }
+
+prvtQosMapProfAnyVptToFcColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color to be assigned to matching traffic."
+    ::= { prvtQosMapProfEntry 5 }
+
+prvtQosMapProfAnyDscpToFcValue OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to be assigned to matching traffic."
+    ::= { prvtQosMapProfEntry 6 }
+
+prvtQosMapProfAnyDscpToFcColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color to be assigned to matching traffic."
+    ::= { prvtQosMapProfEntry 7 }
+
+prvtQosMapProfAnyExpToFcValue OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to be assigned to untrusted ingress traffic."
+    ::= { prvtQosMapProfEntry 8 }
+
+prvtQosMapProfAnyExpToFcColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color to be assigned to all untrusted ingress traffic."
+    ::= { prvtQosMapProfEntry 9 }
+
+prvtQosMapProfVptToFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosMapProfVptToFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Mapping Profile VPT-to-FC Table
+         Each entry in this table defines how a mapping profile maps a specific VLAN priority to
+         a forwarding class "
+    ::= { prvtQosMapProfObjects 2 }
+
+prvtQosMapProfVptToFcEntry OBJECT-TYPE
+    SYNTAX      PrvtQosMapProfVptToFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosMapProfVptToFcTable."
+    INDEX       { prvtQosMapProfName, prvtQosMapProfVptToFcId }
+    ::= { prvtQosMapProfVptToFcTable 1 }
+
+PrvtQosMapProfVptToFcEntry ::= SEQUENCE {
+    prvtQosMapProfVptToFcId         PrvtQosVptType,
+    prvtQosMapProfVptToFcRowStatus  RowStatus,
+    prvtQosMapProfVptToFcValue      PrvtQosFcType,
+    prvtQosMapProfVptToFcColor      PrvtQosColorType
+}
+
+prvtQosMapProfVptToFcId OBJECT-TYPE
+    SYNTAX      PrvtQosVptType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Vlan priority to which this row applies."
+    ::= { prvtQosMapProfVptToFcEntry 1 }
+
+prvtQosMapProfVptToFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile's VLAN priority."
+    ::= { prvtQosMapProfVptToFcEntry 2 }
+
+prvtQosMapProfVptToFcValue OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to be assigned to traffic matching this profile's VLAN priority."
+    ::= { prvtQosMapProfVptToFcEntry 3 }
+
+prvtQosMapProfVptToFcColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color to be assigned to traffic matching this profile's VLAN priority."
+    ::= { prvtQosMapProfVptToFcEntry 4 }
+
+prvtQosMapProfDscpToFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosMapProfDscpToFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Mapping Profile DSCP-to-FC Table
+         Each entry in this table defines how a mapping profile maps a specific DiffServ Code Point
+         value to a forwarding class."
+    ::= { prvtQosMapProfObjects 3 }
+
+prvtQosMapProfDscpToFcEntry OBJECT-TYPE
+    SYNTAX      PrvtQosMapProfDscpToFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosMapProfDscpToFcTable."
+    INDEX       { prvtQosMapProfName, prvtQosMapProfDscpToFcId }
+    ::= { prvtQosMapProfDscpToFcTable 1 }
+
+PrvtQosMapProfDscpToFcEntry ::= SEQUENCE {
+    prvtQosMapProfDscpToFcId            PrvtQosDscpType,
+    prvtQosMapProfDscpToFcRowStatus     RowStatus,
+    prvtQosMapProfDscpToFcValue         PrvtQosFcType,
+    prvtQosMapProfDscpToFcColor         PrvtQosColorType
+}
+
+prvtQosMapProfDscpToFcId OBJECT-TYPE
+    SYNTAX      PrvtQosDscpType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The DiffServ Code Point value to which this row applies."
+    ::= { prvtQosMapProfDscpToFcEntry 1 }
+
+prvtQosMapProfDscpToFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile's DSCP value."
+    ::= { prvtQosMapProfDscpToFcEntry 2 }
+
+prvtQosMapProfDscpToFcValue OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to be assigned to traffic matching this profile's DSCP value."
+    ::= { prvtQosMapProfDscpToFcEntry 3 }
+
+prvtQosMapProfDscpToFcColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color to be assigned to traffic matching this profile's DSCP value."
+    ::= { prvtQosMapProfDscpToFcEntry 4 }
+
+prvtQosMapProfExpToFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosMapProfExpToFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Mapping Profile EXP-to-FC Table
+         Each entry in this table defines how a mapping profile maps a specific exp to
+         a forwarding class "
+    ::= { prvtQosMapProfObjects 4 }
+
+prvtQosMapProfExpToFcEntry OBJECT-TYPE
+    SYNTAX      PrvtQosMapProfExpToFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosMapProfExpToFcTable."
+    INDEX       { prvtQosMapProfName, prvtQosMapProfExpToFcId }
+    ::= { prvtQosMapProfExpToFcTable 1 }
+
+PrvtQosMapProfExpToFcEntry ::= SEQUENCE {
+    prvtQosMapProfExpToFcId         PrvtQosExpType,
+    prvtQosMapProfExpToFcRowStatus  RowStatus,
+    prvtQosMapProfExpToFcValue      PrvtQosFcType,
+    prvtQosMapProfExpToFcColor      PrvtQosColorType
+}
+
+prvtQosMapProfExpToFcId OBJECT-TYPE
+    SYNTAX      PrvtQosExpType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Vlan priority to which this row applies."
+    ::= { prvtQosMapProfExpToFcEntry 1 }
+
+prvtQosMapProfExpToFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile's VLAN priority."
+    ::= { prvtQosMapProfExpToFcEntry 2 }
+
+prvtQosMapProfExpToFcValue OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to be assigned to traffic matching this profile's VLAN priority."
+    ::= { prvtQosMapProfExpToFcEntry 3 }
+
+prvtQosMapProfExpToFcColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color to be assigned to traffic matching this profile's VLAN priority."
+    ::= { prvtQosMapProfExpToFcEntry 4 }
+
+prvtQosRemarkProfObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 5 }
+
+prvtQosRemarkProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosRemarkProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Remarking Profile Table
+         Each entry in this table defines a remarking profile."
+    ::= { prvtQosRemarkProfObjects 1 }
+
+prvtQosRemarkProfileEntry OBJECT-TYPE
+    SYNTAX      PrvtQosRemarkProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosRemarkProfileTable."
+    INDEX       { prvtQosRemarkProfileName }
+    ::= { prvtQosRemarkProfileTable 1 }
+
+PrvtQosRemarkProfileEntry ::= SEQUENCE {
+    prvtQosRemarkProfileName        PrvtQosPolicyNameType,
+    prvtQosRemarkProfileRowStatus   RowStatus,
+    prvtQosRemarkProfileDescr       PrvtQosDescrType
+}
+
+prvtQosRemarkProfileName OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a remarking profile."
+    ::= { prvtQosRemarkProfileEntry 1 }
+
+prvtQosRemarkProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosRemarkProfileEntry 2 }
+
+prvtQosRemarkProfileDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosRemarkProfileEntry 3 }
+
+prvtQosRemarkProfFcToVptTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosRemarkProfFcToVptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Remarking Profile FC-to-VPT Table
+         Each entry in this table defines how a remarking profile maps a specific forwarding
+         class to VLAN priority value."
+    ::= { prvtQosRemarkProfObjects 2 }
+
+prvtQosRemarkProfFcToVptEntry OBJECT-TYPE
+    SYNTAX      PrvtQosRemarkProfFcToVptEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosRemarkProfFcToVptTable."
+    INDEX       { prvtQosRemarkProfileName, prvtQosRemarkProfFcToVptId, 
+                  prvtQosRemarkProfFcToVptColor }
+    ::= { prvtQosRemarkProfFcToVptTable 1 }
+
+PrvtQosRemarkProfFcToVptEntry ::= SEQUENCE {
+    prvtQosRemarkProfFcToVptId      PrvtQosFcType,
+    prvtQosRemarkProfFcToVptColor   PrvtQosColorType,
+    prvtQosRemarkProfFcToVptRS      RowStatus,
+    prvtQosRemarkProfFcToVptValue   PrvtQosVptType
+}
+
+prvtQosRemarkProfFcToVptId OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to which this row applies."
+    ::= { prvtQosRemarkProfFcToVptEntry 1 }
+
+prvtQosRemarkProfFcToVptColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The color to which this row applies."
+    ::= { prvtQosRemarkProfFcToVptEntry 2 }
+
+prvtQosRemarkProfFcToVptRS OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile's forwarding class."
+    ::= { prvtQosRemarkProfFcToVptEntry 3 }
+
+prvtQosRemarkProfFcToVptValue OBJECT-TYPE
+    SYNTAX      PrvtQosVptType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The VLAN priority value to be assigned to traffic matching this profile's forwarding class."
+    ::= { prvtQosRemarkProfFcToVptEntry 4 }
+
+prvtQosRemarkProfFcToDscpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosRemarkProfFcToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Remarking Profile FC-to-DSCP Table
+         Each entry in this table defines how a remarking profile maps a specific forwarding
+         class to DiffServ Code Point value."
+    ::= { prvtQosRemarkProfObjects 3 }
+
+prvtQosRemarkProfFcToDscpEntry OBJECT-TYPE
+    SYNTAX      PrvtQosRemarkProfFcToDscpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosRemarkProfFcToDscpTable."
+    INDEX       { prvtQosRemarkProfileName, prvtQosRemarkProfFcToDscpId, 
+                  prvtQosRemarkProfFcToDscpColor }
+    ::= { prvtQosRemarkProfFcToDscpTable 1 }
+
+PrvtQosRemarkProfFcToDscpEntry ::= SEQUENCE {
+    prvtQosRemarkProfFcToDscpId     PrvtQosFcType,
+    prvtQosRemarkProfFcToDscpColor  PrvtQosColorType,
+    prvtQosRemarkProfFcToDscpRS     RowStatus,
+    prvtQosRemarkProfFcToDscpValue  PrvtQosDscpType
+}
+
+prvtQosRemarkProfFcToDscpId OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to which this row applies."
+    ::= { prvtQosRemarkProfFcToDscpEntry 1 }
+
+prvtQosRemarkProfFcToDscpColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The color to which this row applies."
+    ::= { prvtQosRemarkProfFcToDscpEntry 2 }
+
+prvtQosRemarkProfFcToDscpRS OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile's forwarding class."
+    ::= { prvtQosRemarkProfFcToDscpEntry 3 }
+
+prvtQosRemarkProfFcToDscpValue OBJECT-TYPE
+    SYNTAX      PrvtQosDscpType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The DiffServ Code Point value to be assigned to traffic matching this profile's forwarding class."
+    ::= { prvtQosRemarkProfFcToDscpEntry 4 }
+
+prvtQosRemarkProfFcToExpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosRemarkProfFcToExpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Remarking Profile FC-to-EXP Table
+         Each entry in this table defines how a remarking profile maps a specific forwarding
+         class to EXP."
+    ::= { prvtQosRemarkProfObjects 4 }
+
+prvtQosRemarkProfFcToExpEntry OBJECT-TYPE
+    SYNTAX      PrvtQosRemarkProfFcToExpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosRemarkProfFcToExpTable."
+    INDEX       { prvtQosRemarkProfileName, prvtQosRemarkProfFcToExpId, 
+                  prvtQosRemarkProfFcToExpColor }
+    ::= { prvtQosRemarkProfFcToExpTable 1 }
+
+PrvtQosRemarkProfFcToExpEntry ::= SEQUENCE {
+    prvtQosRemarkProfFcToExpId      PrvtQosFcType,
+    prvtQosRemarkProfFcToExpColor   PrvtQosColorType,
+    prvtQosRemarkProfFcToExpRS      RowStatus,
+    prvtQosRemarkProfFcToExpValue   PrvtQosExpType
+}
+
+prvtQosRemarkProfFcToExpId OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to which this row applies."
+    ::= { prvtQosRemarkProfFcToExpEntry 1 }
+
+prvtQosRemarkProfFcToExpColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The color to which this row applies."
+    ::= { prvtQosRemarkProfFcToExpEntry 2 }
+
+prvtQosRemarkProfFcToExpRS OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile's forwarding class."
+    ::= { prvtQosRemarkProfFcToExpEntry 3 }
+
+prvtQosRemarkProfFcToExpValue OBJECT-TYPE
+    SYNTAX      PrvtQosExpType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The VLAN priority value to be assigned to traffic matching this profile's forwarding class."
+    ::= { prvtQosRemarkProfFcToExpEntry 4 }
+
+prvtQosServPolObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 6 }
+
+prvtQosSvcIngPolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosSvcIngPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy Table
+         Each entry in this table defines an ingress policy which may be assigned
+         to a service."
+    ::= { prvtQosServPolObjects 1 }
+
+prvtQosSvcIngPolEntry OBJECT-TYPE
+    SYNTAX      PrvtQosSvcIngPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosSvcIngPolTable."
+    INDEX       { prvtQosSvcIngPolName }
+    ::= { prvtQosSvcIngPolTable 1 }
+
+PrvtQosSvcIngPolEntry ::= SEQUENCE {
+    prvtQosSvcIngPolName                PrvtQosPolicyNameType,
+    prvtQosSvcIngPolRowStatus           RowStatus,
+    prvtQosSvcIngPolDescr               PrvtQosDescrType,
+    prvtQosSvcIngPolShaperProfile       PrvtQosServShaperProfileIdType,
+    prvtQosSvcIngPolSchedProfile        PrvtQosProfileIdType,
+    prvtQosSvcIngPolTailDropProfile     PrvtQosProfileIdType
+}
+
+prvtQosSvcIngPolName OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Ingress service policy name."
+    ::= { prvtQosSvcIngPolEntry 1 }
+
+prvtQosSvcIngPolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this policy."
+    ::= { prvtQosSvcIngPolEntry 2 }
+
+prvtQosSvcIngPolDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the policy."
+    ::= { prvtQosSvcIngPolEntry 3 }
+
+prvtQosSvcIngPolShaperProfile OBJECT-TYPE
+    SYNTAX      PrvtQosServShaperProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaper profile used by this policy.
+         Sets to this object will fail if the specified shaper profile does not already exist."
+    ::= { prvtQosSvcIngPolEntry 4 }
+
+prvtQosSvcIngPolSchedProfile OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The scheduling profile used by this policy.
+         Sets to this object will fail if the specified scheduling profile does not already exist."
+    ::= { prvtQosSvcIngPolEntry 5 }
+
+prvtQosSvcIngPolTailDropProfile OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The tail drop profile used by this policy.
+         Sets to this object will fail if the specified tail drop profile does not already exist."
+    ::= { prvtQosSvcIngPolEntry 6 }
+
+prvtQosSvcIngPolQueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosSvcIngPolQueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Service Ingress Policy Queue Table
+         Each entry in this table defines the characteristics of a queue belonging to a
+         service ingress policy."
+    ::= { prvtQosServPolObjects 2 }
+
+prvtQosSvcIngPolQueEntry OBJECT-TYPE
+    SYNTAX      PrvtQosSvcIngPolQueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosSvcIngPolQueTable."
+    INDEX       { prvtQosSvcIngPolName, prvtQosSvcIngPolQueId }
+    ::= { prvtQosSvcIngPolQueTable 1 }
+
+PrvtQosSvcIngPolQueEntry ::= SEQUENCE {
+    prvtQosSvcIngPolQueId               PrvtQosQueueIdType,
+    prvtQosSvcIngPolQueRowStatus        RowStatus,
+    prvtQosSvcIngPolQueShaperProf       PrvtQosServShaperProfileIdType,
+    prvtQosSvcIngPolQueTailDropProf     PrvtQosProfileIdType
+}
+
+prvtQosSvcIngPolQueId OBJECT-TYPE
+    SYNTAX      PrvtQosQueueIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The queue ID to which this row applies."
+    ::= { prvtQosSvcIngPolQueEntry 1 }
+
+prvtQosSvcIngPolQueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this policy's queue."
+    ::= { prvtQosSvcIngPolQueEntry 2 }
+
+prvtQosSvcIngPolQueShaperProf OBJECT-TYPE
+    SYNTAX      PrvtQosServShaperProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaper profile used by this policy's queue.
+         Sets to this object will fail if the specified shaper profile does not already exist."
+    ::= { prvtQosSvcIngPolQueEntry 3 }
+
+prvtQosSvcIngPolQueTailDropProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The tail drop profile used by this policy's queue.
+         Sets to this object will fail if the specified tail drop profile does not already exist."
+    ::= { prvtQosSvcIngPolQueEntry 4 }
+
+prvtQosPortPolObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 7 }
+
+prvtQosPortIngPolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosPortIngPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Port Ingress Policy Table
+         Each entry in this table defines an ingress policy which may be assigned
+         to a port."
+    ::= { prvtQosPortPolObjects 1 }
+
+prvtQosPortIngPolEntry OBJECT-TYPE
+    SYNTAX      PrvtQosPortIngPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosPortIngPolTable."
+    INDEX       { prvtQosPortIngPolName }
+    ::= { prvtQosPortIngPolTable 1 }
+
+PrvtQosPortIngPolEntry ::= SEQUENCE {
+    prvtQosPortIngPolName           PrvtQosPolicyNameType,
+    prvtQosPortIngPolRowStatus      RowStatus,
+    prvtQosPortIngPolDescr          PrvtQosDescrType,
+    prvtQosPortIngPolMapProf        PrvtQosPolicyNameType,
+    prvtQosPortIngPolTrustMode      PrvtQosTrustType,
+    prvtQosPortIngPolUntrToFcValue  PrvtQosFcType,
+    prvtQosPortIngPolUntrToFcColor  PrvtQosColorType,
+    prvtQosPortIngPolFcToQueProf    PrvtQosPolicyNameType
+}
+
+prvtQosPortIngPolName OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Port ingress policy name."
+    ::= { prvtQosPortIngPolEntry 1 }
+
+prvtQosPortIngPolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this policy."
+    ::= { prvtQosPortIngPolEntry 2 }
+
+prvtQosPortIngPolDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the policy."
+    ::= { prvtQosPortIngPolEntry 3 }
+
+prvtQosPortIngPolMapProf OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The mapping profile used by this policy.
+         Sets to this object will fail if the specified mapping profile does not already exist."
+    ::= { prvtQosPortIngPolEntry 4 }
+
+prvtQosPortIngPolTrustMode OBJECT-TYPE
+    SYNTAX      PrvtQosTrustType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The trust mode used by this policy."
+    ::= { prvtQosPortIngPolEntry 5 }
+
+prvtQosPortIngPolUntrToFcValue OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to be assigned to untrusted traffic."
+    ::= { prvtQosPortIngPolEntry 6 }
+
+prvtQosPortIngPolUntrToFcColor OBJECT-TYPE
+    SYNTAX      PrvtQosColorType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The color to be assigned to untrusted traffic."
+    ::= { prvtQosPortIngPolEntry 7 }
+
+prvtQosPortIngPolFcToQueProf OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The fc-to-queue profile used by this policy.
+         Sets to this object will fail if the specified fc-to-queue profile does not already exist."
+    ::= { prvtQosPortIngPolEntry 8 }
+
+prvtQosPortEgrPolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosPortEgrPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Port Egress Policy Table
+         Each entry in this table defines an egress policy which may be assigned
+         to a port."
+    ::= { prvtQosPortPolObjects 2 }
+
+prvtQosPortEgrPolEntry OBJECT-TYPE
+    SYNTAX      PrvtQosPortEgrPolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosPortEgrPolTable."
+    INDEX       { prvtQosPortEgrPolName }
+    ::= { prvtQosPortEgrPolTable 1 }
+
+PrvtQosPortEgrPolEntry ::= SEQUENCE {
+    prvtQosPortEgrPolName           PrvtQosPolicyNameType,
+    prvtQosPortEgrPolRowStatus      RowStatus,
+    prvtQosPortEgrPolDescr          PrvtQosDescrType,
+    prvtQosPortEgrPolShaperProf     PrvtQosProfileIdType,
+    prvtQosPortEgrPolTailDropProf   PrvtQosProfileIdType,
+    prvtQosPortEgrPolSredProf       PrvtQosProfileIdType,
+    prvtQosPortEgrPolSchedProf      PrvtQosProfileIdType,
+    prvtQosPortEgrPolWredProf       PrvtQosProfileIdType
+}
+
+prvtQosPortEgrPolName OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Egress port policy name."
+    ::= { prvtQosPortEgrPolEntry 1 }
+
+prvtQosPortEgrPolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this policy."
+    ::= { prvtQosPortEgrPolEntry 2 }
+
+prvtQosPortEgrPolDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the policy."
+    ::= { prvtQosPortEgrPolEntry 3 }
+
+prvtQosPortEgrPolShaperProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaper profile used by this policy.
+         Sets to this object will fail if the specified shaper profile does not already exist."
+    ::= { prvtQosPortEgrPolEntry 4 }
+
+prvtQosPortEgrPolTailDropProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The tail drop profile used by this policy.
+         Sets to this object will fail if the specified tail drop profile does not already exist."
+    ::= { prvtQosPortEgrPolEntry 5 }
+
+prvtQosPortEgrPolSredProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The SRED profile used by this policy.
+         Sets to this object will fail if the specified SRED profile does not already exist."
+    ::= { prvtQosPortEgrPolEntry 6 }
+
+prvtQosPortEgrPolSchedProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The scheduling profile used by this policy.
+         Sets to this object will fail if the specified scheduling profile does not already exist."
+    ::= { prvtQosPortEgrPolEntry 7 }
+
+prvtQosPortEgrPolWredProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WRED profile used by this policy.
+         Sets to this object will fail if the specified WRED profile does not already exist."
+    ::= { prvtQosPortEgrPolEntry 8 }
+
+prvtQosPortEgrPolQueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosPortEgrPolQueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Port Egress Queue Policy Table
+         Each entry in this table defines the characteristics of a queue belonging to an
+         egress port policy."
+    ::= { prvtQosPortPolObjects 3 }
+
+prvtQosPortEgrPolQueEntry OBJECT-TYPE
+    SYNTAX      PrvtQosPortEgrPolQueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosPortEgrPolQueTable."
+    INDEX       { prvtQosPortEgrPolName, prvtQosPortEgrPolQueId }
+    ::= { prvtQosPortEgrPolQueTable 1 }
+
+PrvtQosPortEgrPolQueEntry ::= SEQUENCE {
+    prvtQosPortEgrPolQueId              PrvtQosQueueIdType,
+    prvtQosPortEgrPolQueRowStatus       RowStatus,
+    prvtQosPortEgrPolQueShaperProf      PrvtQosProfileIdType,
+    prvtQosPortEgrPolQueTailDropProf    PrvtQosProfileIdType,
+    prvtQosPortEgrPolQueSredProf        PrvtQosProfileIdType,
+    prvtQosPortEgrPolQueWredProf        PrvtQosProfileIdType
+}
+
+prvtQosPortEgrPolQueId OBJECT-TYPE
+    SYNTAX      PrvtQosQueueIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The queue ID to which this row applies."
+    ::= { prvtQosPortEgrPolQueEntry 1 }
+
+prvtQosPortEgrPolQueRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this policy's queue."
+    ::= { prvtQosPortEgrPolQueEntry 2 }
+
+prvtQosPortEgrPolQueShaperProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The shaper profile used by this policy's queue.
+         Sets to this object will fail if the specified shaper profile does not already exist."
+    ::= { prvtQosPortEgrPolQueEntry 3 }
+
+prvtQosPortEgrPolQueTailDropProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The tail drop profile used by this policy's queue.
+         Sets to this object will fail if the specified tail drop profile does not already exist."
+    ::= { prvtQosPortEgrPolQueEntry 4 }
+
+prvtQosPortEgrPolQueSredProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The SRED profile used by this policy's queue.
+         Sets to this object will fail if the specified SRED profile does not already exist."
+    ::= { prvtQosPortEgrPolQueEntry 5 }
+
+prvtQosPortEgrPolQueWredProf OBJECT-TYPE
+    SYNTAX      PrvtQosProfileIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The WRED profile used by this policy's queue.
+         Sets to this object will fail if the specified WRED profile does not already exist."
+    ::= { prvtQosPortEgrPolQueEntry 6 }
+
+prvtQosInterfaceObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 8 }
+
+prvtQosInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Qos Interface Table
+         Each entry in this table defines what QOS policies to assign to an interface."
+    ::= { prvtQosInterfaceObjects 1 }
+
+prvtQosInterfaceEntry OBJECT-TYPE
+    SYNTAX      PrvtQosInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosInterfaceTable."
+    INDEX       { ifIndex }
+    ::= { prvtQosInterfaceTable 1 }
+
+PrvtQosInterfaceEntry ::= SEQUENCE {
+    prvtQosInterfaceRowStatus   RowStatus,
+    prvtQosInterfaceIngPolicy   PrvtQosPolicyNameOrNoneType,
+    prvtQosInterfaceEgrPolicy   PrvtQosPolicyNameOrNoneType
+}
+
+prvtQosInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this port."
+    ::= { prvtQosInterfaceEntry 2 }
+
+prvtQosInterfaceIngPolicy OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameOrNoneType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The port ingress policy to be applied to this port.
+         The policy should be fully configured in advance before being applied to a port."
+    ::= { prvtQosInterfaceEntry 3 }
+
+prvtQosInterfaceEgrPolicy OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameOrNoneType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The port egress policy to be applied to this port.
+         The policy should be fully configured in advance before being applied to a port."
+    ::= { prvtQosInterfaceEntry 4 }
+
+prvtQosServiceObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 9 }
+
+prvtQosServiceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Qos Service Table
+         Each entry in this table defines the QOS characteristics to assign to an service."
+    ::= { prvtQosServiceObjects 1 }
+
+prvtQosServiceEntry OBJECT-TYPE
+    SYNTAX      PrvtQosServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosServiceTable."
+    INDEX       { prvtQosServiceId }
+    ::= { prvtQosServiceTable 1 }
+
+PrvtQosServiceEntry ::= SEQUENCE {
+    prvtQosServiceId                PrvtQosServiceIdType,
+    prvtQosServiceRowStatus         RowStatus,
+    prvtQosServiceIngressPolicy     PrvtQosPolicyNameType
+}
+
+prvtQosServiceId OBJECT-TYPE
+    SYNTAX      PrvtQosServiceIdType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The ID of a service to which this row applies."
+    ::= { prvtQosServiceEntry 1 }
+
+prvtQosServiceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service.
+         Creation of a new row will fail if the service specified in prvtQosServiceId does not exist."
+    ::= { prvtQosServiceEntry 2 }
+
+prvtQosServiceIngressPolicy OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The service ingress policy to be applied on a service.
+         The policy should be fully configured in advance before being applied to a service."
+    ::= { prvtQosServiceEntry 3 }
+
+prvtQosServSapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosServSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Qos Sap Table
+         Each entry in this table defines the QOS characteristics to assign to a specific
+         SAP within a service."
+    ::= { prvtQosServiceObjects 2 }
+
+prvtQosServSapEntry OBJECT-TYPE
+    SYNTAX      PrvtQosServSapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosServSapTable."
+    INDEX       { prvtQosServiceId, ifIndex, prvtQosServSapEncapValue }
+    ::= { prvtQosServSapTable 1 }
+
+PrvtQosServSapEntry ::= SEQUENCE {
+    prvtQosServSapEncapValue    PrvtQosEncapType,
+    prvtQosServSapRowStatus     RowStatus,
+    prvtQosServSapPolicyEnable  TruthValue
+}
+
+prvtQosServSapEncapValue OBJECT-TYPE
+    SYNTAX      PrvtQosEncapType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The value of the encapsulation label to which this row applies."
+    ::= { prvtQosServSapEntry 2 }
+
+prvtQosServSapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this service's SAP.
+         Creation of a new row will fail if the SAP specified
+         does not exist for the service specified by prvtQosServiceId."
+    ::= { prvtQosServSapEntry 3 }
+
+prvtQosServSapPolicyEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Apply the policy specified in prvtQosServiceIngressPolicy to this service's SAP."
+    ::= { prvtQosServSapEntry 4 }
+
+prvtQosFcToQueueProfObjects OBJECT IDENTIFIER
+    ::= { prvtQosMIBObjects 10 }
+
+prvtQosFcToQueueProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosFcToQueueProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Fc-to-queue Profile Table
+         Each entry in this table defines a fc-to-queue profile."
+    ::= { prvtQosFcToQueueProfObjects 1 }
+
+prvtQosFcToQueueProfileEntry OBJECT-TYPE
+    SYNTAX      PrvtQosFcToQueueProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosFcToQueueProfileTable."
+    INDEX       { prvtQosFcToQueueProfileName }
+    ::= { prvtQosFcToQueueProfileTable 1 }
+
+PrvtQosFcToQueueProfileEntry ::= SEQUENCE {
+    prvtQosFcToQueueProfileName         PrvtQosPolicyNameType,
+    prvtQosFcToQueueProfileRowStatus    RowStatus,
+    prvtQosFcToQueueProfileDescr        PrvtQosDescrType
+}
+
+prvtQosFcToQueueProfileName OBJECT-TYPE
+    SYNTAX      PrvtQosPolicyNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a fc-to-queue profile."
+    ::= { prvtQosFcToQueueProfileEntry 1 }
+
+prvtQosFcToQueueProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile."
+    ::= { prvtQosFcToQueueProfileEntry 2 }
+
+prvtQosFcToQueueProfileDescr OBJECT-TYPE
+    SYNTAX      PrvtQosDescrType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "User-provided description of the profile."
+    ::= { prvtQosFcToQueueProfileEntry 3 }
+
+prvtQosFcToQueueProfFcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtQosFcToQueueProfFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Fc-to-queue Profile FC-to-queue Table
+         Each entry in this table defines how a fc-to-queue-profile maps a specific forwarding
+         class to queue value."
+    ::= { prvtQosFcToQueueProfObjects 2 }
+
+prvtQosFcToQueueProfFcEntry OBJECT-TYPE
+    SYNTAX      PrvtQosFcToQueueProfFcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtQosFcToQueueProfFcTable."
+    INDEX       { prvtQosFcToQueueProfileName, 
+                  prvtQosRemarkProfFcToVptId, 
+                  prvtQosRemarkProfFcToVptColor }
+    ::= { prvtQosFcToQueueProfFcTable 1 }
+
+PrvtQosFcToQueueProfFcEntry ::= SEQUENCE {
+    prvtQosFcToQueueProfFcName          PrvtQosFcType,
+    prvtQosFcToQueueProfFcRowStatus     RowStatus,
+    prvtQosFcToQueueProfFcUniQueId      PrvtQosQueueIdType,
+    prvtQosFcToQueueProfFcMulQueId      PrvtQosQueueIdType
+}
+
+prvtQosFcToQueueProfFcName OBJECT-TYPE
+    SYNTAX      PrvtQosFcType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Forwarding Class to which this row applies."
+    ::= { prvtQosFcToQueueProfFcEntry 1 }
+
+prvtQosFcToQueueProfFcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this profile's forwarding class."
+    ::= { prvtQosFcToQueueProfFcEntry 2 }
+
+prvtQosFcToQueueProfFcUniQueId OBJECT-TYPE
+    SYNTAX      PrvtQosQueueIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The unicast queue ID which is mapped to the fc to which this row applies.UC queue range 1-8."
+    ::= { prvtQosFcToQueueProfFcEntry 3 }
+
+prvtQosFcToQueueProfFcMulQueId OBJECT-TYPE
+    SYNTAX      PrvtQosQueueIdType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The multicast queue ID which is mapped to the fc to which this row applies.MC queue range 1-2 7-8"
+    ::= { prvtQosFcToQueueProfFcEntry 4 }
+
+END -- end of module PRVT-QOS-MIB.

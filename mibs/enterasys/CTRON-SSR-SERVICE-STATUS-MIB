@@ -1,0 +1,230 @@
+CTRON-SSR-SERVICE-STATUS-MIB DEFINITIONS ::= BEGIN
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific schema for accessing the
+--  Smart Switch Router subsystems.
+--
+--  This module will be extended, as required.
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright June 1998-2000 Cabletron Systems
+
+IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE
+       FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION        
+       FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP
+       FROM SNMPv2-CONF
+       ssrMibs
+       FROM CTRON-SSR-SMI-MIB;
+
+serviceStatusMIB MODULE-IDENTITY
+   LAST-UPDATED "200007150000Z"  -- July 15, 2000
+   ORGANIZATION
+     "Cabletron Systems, Inc."
+   CONTACT-INFO
+    "Enterasys Networks
+     35 Industrial Way, P.O. Box 5005
+     Rochester, NH 03867-0505
+     (603) 332-9400
+     support@enterasys.com
+     http://www.enterasys.com"
+ 
+   DESCRIPTION
+     "This module describes a schema for accessing the
+      Smart Switch Router subsystems."
+
+    REVISION     "200007150000Z"
+    DESCRIPTION
+         "Revision 2.0 Update contact information for Enterasys Networks as this mib
+          is found on the Riverstione RS product line as well as Enterasys SSR product line."
+
+    REVISION    "9808040000Z"
+    DESCRIPTION
+         "Revision 1.1 Flow Accounting Function and RMON visible."
+
+    REVISION    "9804081200Z"
+    DESCRIPTION
+         "Revision 1.0 Initial mib revision."
+
+        ::= { ssrMibs 700 }
+
+   serviceStatusGroup  OBJECT IDENTIFIER   ::= { ssrMibs 4 }
+
+   ServiceStatus ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+       "The current state of the service: started indicates 
+        the service is configured and running. Stopped indicates
+        the service is administratively down. notWorking indicates
+        the service has failed."
+       SYNTAX       INTEGER {
+           started(1),
+           stopped(2),
+           notWorking(3)
+       }
+
+   serviceStatusRip  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+      "The current status of RIP in the switch."
+       ::= { serviceStatusGroup 1 }
+
+   serviceStatusOspf  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of OSPF in the switch."
+       ::= { serviceStatusGroup 2 }
+
+   serviceStatusBgp  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of BGP in the switch."
+       ::= { serviceStatusGroup 3 }
+
+   serviceStatusDvmrp  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of DVMRP in the switch."
+       ::= { serviceStatusGroup 4 }
+
+   serviceStatusIgmp  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of IGMP in the switch."
+       ::= { serviceStatusGroup 5 }
+
+   serviceStatusPim  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of PIM in the switch."
+       ::= { serviceStatusGroup 6 }
+
+   serviceStatusStp  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of STP in the switch."
+       ::= { serviceStatusGroup 7 }
+
+   serviceStatusIpxRip  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of IPX in the switch."
+       ::= { serviceStatusGroup 8 }
+
+   serviceStatusIpxSap  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of IPX in the switch."
+       ::= { serviceStatusGroup 9 }
+
+   serviceStatusLfap  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of Lightweight Flow Accounting Protocol."
+       ::= { serviceStatusGroup 10 }
+
+   serviceStatusRmon  OBJECT-TYPE
+       SYNTAX      ServiceStatus
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+       "The current status of RMON."
+       ::= { serviceStatusGroup 11 }
+
+-- ### Compliance ###
+ 
+ssConformance OBJECT IDENTIFIER ::= { serviceStatusMIB 2 }
+ssCompliances OBJECT IDENTIFIER ::= { ssConformance 1 }
+ssGroups OBJECT IDENTIFIER ::= { ssConformance 2 }
+ 
+ssComplianceV10 MODULE-COMPLIANCE
+    STATUS obsolete
+    DESCRIPTION
+            "The compliance statement for the CTRON-SSR-SERVICE-STATUS-MIB."
+    MODULE  -- this module
+    ::= { ssConfGroupV10 1 }
+
+ssComplianceV11 MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+            "The compliance statement for the CTRON-SSR-SERVICE-STATUS-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { ssConfGroupV11 }
+    ::= { ssConfGroupV10 2 }
+
+-- first release, now historic
+ssConfGroupV10  OBJECT-GROUP
+   OBJECTS {
+        serviceStatusRip,
+        serviceStatusOspf,
+        serviceStatusBgp,
+        serviceStatusDvmrp,
+        serviceStatusIgmp,
+        serviceStatusPim,
+        serviceStatusStp,
+        serviceStatusIpxRip,
+        serviceStatusIpxSap
+}
+STATUS obsolete
+DESCRIPTION
+  "A set of managed objects that make up version 1.0 of the SSR Service Status mib."
+   ::= { ssGroups 1 }
+ 
+ssConfGroupV11  OBJECT-GROUP
+   OBJECTS {
+        serviceStatusRip,
+        serviceStatusOspf,
+        serviceStatusBgp,
+        serviceStatusDvmrp,
+        serviceStatusIgmp,
+        serviceStatusPim,
+        serviceStatusStp,
+        serviceStatusIpxRip,
+        serviceStatusIpxSap,
+        serviceStatusLfap,
+        serviceStatusRmon  
+}
+STATUS current
+DESCRIPTION
+  "A set of managed objects that make up version 1.1 of the SSR Service Status mib."
+   ::= { ssGroups 2 }
+
+END

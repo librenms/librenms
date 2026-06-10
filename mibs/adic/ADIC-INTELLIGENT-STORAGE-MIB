@@ -1,0 +1,1386 @@
+-- Name:	ADIC Enterprise Intelligent Storage MIB
+-- Version:	1.25
+--
+--             **********************************************************
+--             *                                                        *
+--             *                   SMI v1 version                       *
+--             *                                                        *
+--             **********************************************************
+--
+-- Copyright (c) 2002-2014 Quantum Corporation
+-- 
+-- Revision History:
+--      $Log: ADIC_INTELLIGENT_STORAGE_MIB.mib  $
+--      Revision 1.25 2015/12/07 10:26:49MST Bob Ackerman (backerman)
+--      Add module identify so we can support dynamic module loading
+--      Revision 1.24 2015/01/22 10:26:49MST Bob Ackerman (backerman)
+--      Add power consumption to the power supply table
+--      Revision 1.23 2014/03/06 10:26:49MST Carsten Prigge (cprigge) 
+--      Clean up MIB files and add power supply status
+--      Revision 1.22 2013/09/16 10:26:49MST Carsten Prigge (cprigge) 
+--      Clean up MIB files to reduce errors from various MIB browsers
+--      Revision 1.21 2006/11/01 10:13:06MST Darrel Somer (dsomer) 
+--      
+--      Revision 1.20 2006/11/01 10:12:08MST Darrel Somer (dsomer) 
+--      Add states to doorstatus to match master in mib project.
+--      Revision 1.19 2004/12/09 15:26:29MST ihamadi 
+--      Removed extra double dashes from comments that turned off comment blocks
+--      Revision 1.18 2004/12/06 13:10:34MST ihamadi 
+--      Updated Variable trapIntendedUsage has been added
+--      Revision 1.32 2004/12/03 15:07:14MST dhawthorne 
+--      Added trapIntendedUsage to trap payload table
+--      Revision 1.31 2004/03/04 17:22:59EST dhawthorne 
+--      Change unimplemented tables/variables to status "optional" 
+--      Comment out unimplemented traps 
+--      Revision 1.30 2004/01/08 17:40:38EST dhawthorne 
+--      Added componentIpAddress
+--      Revision 1.29 2003/07/29 11:25:29EDT dhawthorne 
+--      Added virtual(10) to productLibraryClass enumeration
+--      Revision 1.28 2003/05/22 15:59:12EDT dhawthorne 
+--      Change AdicGlobalId SIZE to 8 octets
+--      Revision 1.27 2003/05/04 14:59:56EDT dhawthorne 
+--      Updated productVersion description clause.
+--      Revision 1.26 2003/05/02 11:17:47EDT dhawthorne 
+--      Added libraryClassChange trap (#504)
+--      Revision 1.25 2003/04/30 16:58:13EDT dhawthorne 
+--      Added componentAdded and componentRemoved traps.
+--      Added AdicDriveStatus enumeration.
+--      Revision 1.24 2003/04/08 14:07:08EDT dhawthorne 
+--      Add noData(7) to AdicSensorStatus
+--      Revision 1.23 2003/04/03 19:04:07EST dhawthorne 
+--      Added notInstalled(6) to AdicSensorStatus enum.
+--      Revision 1.22 2003/02/19 12:20:19EST dhawthorne 
+--      Changed componentId access to read-only.  Removed "Persistent across boots" from description clause.
+--      Revision 1.21 2003/02/19 11:38:34EST dhawthorne 
+--      Added componentGeoAddr objects to component table.
+--      Revision 1.20 2003/01/07 12:34:33EST dhawthorne 
+--      Import TRAP-TYP from RFC-1215
+--      Revision 1.19 2002/12/18 19:11:43EST dhawthorne 
+--      Added trapSummaryText field.
+--      Revision 1.17 2002/12/18 16:02:31EST dhawthorne 
+--      Remove "Sensor" part from cooling fan trap definition.
+--      Revision 1.16 2002/12/16 15:49:59EST dhawthorne 
+--      Added trap payload table
+--      Added voltage, fan and temperature change traps
+--      Revision 1.15 2002/12/12 11:05:26EST dhawthorne 
+--      Fixed syntax error - tried to check this into the main trunk, but 
+--                           MKS created a branch instead (1.13.1.1)
+--      Revision 1.13.1.1 2002/12/12 08:59:48MST dhawthorne 
+--      Fixed syntax error: missing comma in componentControl enumeration
+--      Revision 1.13 2002/11/25 16:44:29MST dhawthorne 
+--      Added componentFirmwareVersion to componentTable.
+--      Revision 1.12 2002/11/20 19:19:08EST dhawthorne 
+--      Removed "unknown" and "invalid" from componentControl enum
+--      Shifted the remaining values to start at 1
+--      Revision 1.11 2002/11/20 19:08:08EST dhawthorne 
+--      Added powerSupplyRatedVoltage and powerSupplyLocation
+--      Revision 1.10 2002/11/20 18:03:16EST dhawthorne 
+--      Added AdicEnable Type Assignment
+--      Revision 1.9 2002/11/20 15:53:41EST dhawthorne 
+--      added productSerialNumber
+--      Revision 1.8 2002/10/28 18:07:38EST dhawthorne 
+--      Added RED identifier
+--      Removed fan speed control
+--      Revision 1.7 2002/10/08 16:42:18EDT dhawthorne 
+--      Renumbered temperature sensosr and cooling fan OIDs to remove gap (column 5 was missing)
+--      Revision 1.6 2002/10/04 18:34:48EDT dhawthorne 
+--      Removed all enum or SIZE definitions from SEQUENCE clauses to satisfy jMIBc compiler
+--      Revision 1.5 2002/09/25 17:41:15EDT dhawthorne 
+--      Commented out some Imports to quiet compiler warnings.
+--      Revision 1.4 2002/09/25 17:16:06EDT dhawthorne 
+--      Corrected coolingFanVariableSpeed SYNTAX clause
+--      Revision 1.3 2002/09/16 11:28:59EDT dhawthorne 
+--      In AdicComponentType enumeration, change dmcb(2) to cmb(2)
+--      Revision 1.2 2002/08/19 12:33:01EDT dhawthorne 
+--      Re-wrote ADIC-ROBOTICS-MIB as a result of our 8/15/2002 design review
+--      Revision 1.1 2002/08/12 09:53:03EDT jbruegger 
+--      Initial revision
+--      Member imported to project e:/mks/projects/mib/mib.pj
+--
+--
+
+ADIC-INTELLIGENT-STORAGE-MIB
+--
+-- **********************************************************
+-- *                                                        *
+-- * This MIB defines the ADIC OID tree hierarchy and the   *
+-- * set of all ADIC MIBs components may import as needed.  *
+-- * Of particular importance is the inventory group and    *
+-- * componentTable which provide a global way to list all  *
+-- * of the components in the product.  Each component is   *
+-- * given a unique value of the componentId index;         *
+-- * componentId is imported by other ADIC MIBs and used as *
+-- * an index, allowing management of multiple like         *
+-- * components through by a single proxy agent.            *
+-- *                                                        *
+-- **********************************************************   
+DEFINITIONS ::= BEGIN
+
+IMPORTS                          
+	enterprises, Counter, IpAddress
+                FROM RFC1155-SMI
+    OBJECT-TYPE                 
+                FROM RFC-1212
+    DisplayString               
+                FROM RFC1213-MIB
+    TRAP-TYPE
+                FROM RFC-1215; 
+
+-- **********************************************************
+-- *                                                        *
+-- * ADIC Specific Object Identifiers                       *
+-- *                                                        *
+-- **********************************************************
+-- Quantum (formerly ADIC) enterprises ID
+   quantum OBJECT IDENTIFIER    ::= { enterprises 3764 }        
+
+-- The following are from "ADIC Storage MIB Design Document"
+-- Version 1.0  2/16/2001 by Paul Rutherford
+   storage           OBJECT IDENTIFIER    ::= { quantum 1 } -- Paul mentions the storage OID but does not define it
+   -- Dean made up the iPenguin Product Identifier OID as per Paul's document
+   intelligent MODULE-IDENTITY
+   LAST-UPDATED "201509240000Z"
+   ORGANIZATION "Quantum Corporation"
+   CONTACT-INFO
+          " Quantum Corporation
+            224 Airport Parkway, Suite 300
+            San Jose, CA 95110
+            Tel: +1 800 284-5101
+
+            E-mail: support@quantum.com"
+   DESCRIPTION
+       "This MIB provides Tape Library product information."
+   REVISION    "201509240000Z"
+   DESCRIPTION
+       "MIB update as of September 2015"
+   ::= { storage 1 }
+   -- Standard product info for all products
+   productAgentInfo  OBJECT IDENTIFIER    ::= { intelligent 10 }
+   -- Global data that pertains to the iPenguin as a whole
+   globalData        OBJECT IDENTIFIER    ::= { intelligent 20 }
+   -- iPenguin components         
+   components        OBJECT IDENTIFIER    ::= { intelligent  30 }
+   software          OBJECT IDENTIFIER    ::= { intelligent 100 }
+   hardware          OBJECT IDENTIFIER    ::= { intelligent 200 }
+   powerAndCooling   OBJECT IDENTIFIER    ::= { hardware 200 }
+   sml               OBJECT IDENTIFIER    ::= { intelligent 300 }
+   network           OBJECT IDENTIFIER    ::= { intelligent 400 }     
+   notification      OBJECT IDENTIFIER    ::= { intelligent 500 } 
+                                                               
+--Type assignments    
+	
+-- Current MIB version
+  AdicMibVersion ::= DisplayString (SIZE(0..40))
+                                           
+-- a truth value
+  Boolean ::=   INTEGER { true(1), false(2) } 
+	
+-- Runtime Error Detection Identifier
+  AdicREDIdentifier ::= Counter                   
+	
+  AdicEnable ::= INTEGER { enabled(1), disabled(2) }
+  AdicAgentStatus ::= INTEGER { other(1), unknown(2), ok(3), non-critical(4), critical(5), non-recoverable(6) }
+  AdicOnlineStatus ::= INTEGER { online(1), offline(2), shutdown(3) }
+  AdicVaryStatus ::= INTEGER { variedOn(1), variedOff(2), inTransition(3) }
+
+  AdicGlobalId ::= OCTET STRING (SIZE(8))  
+  AdicComponentType ::= INTEGER { mcb(1), cmb(2), fcIoBlade(3), scsiIoBlade(4), rcu(5), networkChassis(6), 
+	                          libaryModule(7), powerSupply(8), eeb(9), hdc(10) }
+  AdicInterfaceType ::= INTEGER { parallelSCSI(1), fibreChannel(2), Other(3), mixedScsiAndFc(4) }  
+	                                                            
+-- Power and Cooling related type definitions  
+-- These describe sensor voltage, temperature, fan RPMs, etc. properties and states
+  AdicSensorStatus ::= INTEGER { nominal(1), warningLow(2), warningHigh(3), alarmLow(4), alarmHigh(5), notInstalled(6), noData(7) }
+  AdicVoltageType ::= INTEGER { dc(1), ac(2) }
+  AdicPowerSupplyStatus ::= INTEGER { unknown(1), notInstalled(2), ok(3), poweredOff(4), failed(5) }   
+
+  AdicTrapSeverity ::= INTEGER { emergency(1), alarm(2), warning(3), notice(4), informational(5) }
+  AdicDoorStatus   ::= INTEGER { open(1), closed(2), closedAndLocked(3), closedAndUnlocked(4), controllerFailed(5), notInstalled(6), noData(7) }
+   
+  AdicDriveStatus  ::= INTEGER { idle(1), loading(2), ejecting(3), inserted(4), removed(5), notInstalled(6), noData(7) }
+  AdicTowerStatus  ::= INTEGER { open(1), closed(2), closedAndVariedOn(3), closedAndVariedOff(4), controllerFailed(5), notInstalled(6), noData(7) }
+      
+-- Row Status Object
+   RowStatus ::= INTEGER { active(1),        -- See RFC 2579
+                           notInService(2),  -- for complete
+                           notReady(3),      -- description
+                           createAndGo(4),   -- of RowStatus 
+                           createAndWait(5), -- Syntax
+                           destroy(6) }	
+      
+	
+-- AdicDateAndTime is identical to the SMIv2 DateAndTime Textual Convention
+-- It is defined here because we maintain compatibility with strict SMIv1
+-- MIB compilers, which may not allow the DateAndTime Textual Convention
+-- to be imported  
+	-- Octet  1 and 2 - Year ( 0 ... 65536 ) in network byte order
+	-- Octet  3 - Month ( 1 ... 12 )
+	-- Octet  4 - Day ( 1 ... 31 )
+	-- Octet  5 - Hour (0 ... 23 )
+	-- Octet  6 - Minute ( 0 ... 59 )
+	-- Octet  7 - Seconds ( 0 ... 60 ) [ Use 60 for leap second ]
+	-- Octet  8 - Deci-seconds ( 0 ... 9 )
+	-- Octet  9 - Direction from UTC ( '+' or '-' )
+	-- Octet 10 - Hours from UTC ( 0 ... 11 )
+	-- Octet 11 - Minutes from UTC ( 0 ... 59 )
+	AdicDateAndTime ::= OCTET STRING (SIZE(8|11))
+    
+-- **********************************************************
+-- *                                                        *
+-- * ADIC Standard productAgentInfo Group Objects           *
+-- *                                                        *
+-- **********************************************************
+    productMibVersion  OBJECT-TYPE
+       SYNTAX AdicMibVersion
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "MIB version identifier."
+       ::= { productAgentInfo 1 }
+
+    productSnmpAgentVersion  OBJECT-TYPE
+       SYNTAX DisplayString
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "SNMP agent version identifier."
+       ::= { productAgentInfo 2 }
+     
+    productName  OBJECT-TYPE
+       SYNTAX DisplayString
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Name of ADIC branded product.  Uniquely identifies 
+            the product, independent of OEM."
+       ::= { productAgentInfo 3 }
+     
+    productDisplayName  OBJECT-TYPE
+       SYNTAX DisplayString
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Name of this agent for display purposes.  May
+            be customized for OEM."
+       ::= { productAgentInfo 4 }
+
+    productDescription  OBJECT-TYPE
+       SYNTAX DisplayString
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "A short description of this SNMP agent."
+       ::= { productAgentInfo 5 }
+  
+    productVendor  OBJECT-TYPE
+       SYNTAX DisplayString
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Name of the product vendor or OEM."
+       ::= { productAgentInfo 6 }
+ 
+    productVersion  OBJECT-TYPE
+       SYNTAX DisplayString
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "String Format: MNNO.TVBBBPP
+            Examples
+               1.  091a.TR054
+                      Version 0.91, build 54 of the RCS test code for ADIC
+               2.  100A.GM052
+                      Version 1.00, build 52 of the MCB GA candidate code for ADIC
+
+               M   Major version number
+               NN  Minor version number
+               O   OEM (Uppercase when release candidate, otherwise lowercase)
+                   A/a - ADIC
+                   Others - Reserved)
+               T   Target
+                   G - GA Candidate Release (labeled build that is a release candidate)
+                   T - Test build (labeled build used for formal testing)
+                   D - Dev build (labeled build used for unit testing)
+                   (lower case) - specifies developer of a local build
+               V   Variant
+                   S - System 
+                   R - RCS
+                   M  - MCB 
+               BBB Build number (3 digit sequential number specifying exact build)
+               PP  Patch Number (Optional alphanumeric characters denoting patch 
+                                 level of this build if necessary)"
+       ::= { productAgentInfo 7 }
+
+    productDisplayVersion  OBJECT-TYPE
+       SYNTAX DisplayString
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "The version identifier according to the vendor or OEM."
+       ::= { productAgentInfo 8 }
+
+    productLibraryClass  OBJECT-TYPE
+       SYNTAX INTEGER { basic(1), intelligent(2), virtual(10) }
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Basic library includes minimal connectivity hardware.
+            Intelligent library includes SAN appliances and value-added
+            features."
+       ::= { productAgentInfo 9 }
+
+    productSerialNumber  OBJECT-TYPE
+       SYNTAX DisplayString 
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "The serial number of the physical library."
+       ::= { productAgentInfo 10 }       
+       
+-- **********************************************************
+-- *                                                        *
+-- * ADIC Standard globalData Group Objects                 *
+-- *                                                        *
+-- **********************************************************
+    agentGlobalStatus  OBJECT-TYPE
+       SYNTAX AdicAgentStatus
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Current overall status of the agent."
+       ::= { globalData 1 }
+
+    agentLastGlobalStatus  OBJECT-TYPE
+       SYNTAX AdicAgentStatus
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "The status before the current status which
+            induced an initiative to issue a global status
+            change trap."
+       ::= { globalData 2 }
+
+    agentTimeStamp  OBJECT-TYPE
+       SYNTAX INTEGER
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "The last time that the agent values have been updated.
+            Universal time in seconds since UTC 1/1/70."
+       ::= { globalData 3 }
+
+    agentGetTimeOut  OBJECT-TYPE
+       SYNTAX INTEGER
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Suggested time out in milliseconds for how long
+            an SNMP management application should wait while
+            attempting to poll the SNMP agent."
+       ::= { globalData 4 }
+
+    agentModifiers  OBJECT-TYPE
+       SYNTAX INTEGER
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Agent functional modifiers, when set the modifier is 
+            active. 
+            -----------------------------------------------------
+            Bit 3 => Agent in debug mode.
+            -----------------------------------------------------
+            All other bits are product specific."
+       ::= { globalData 5 }
+
+    agentRefreshRate  OBJECT-TYPE
+       SYNTAX INTEGER
+       ACCESS read-only
+       STATUS mandatory
+       DESCRIPTION
+            "Rate in seconds at which the agent cached data is
+            being updated."
+       ::= { globalData 6 }
+
+    -- The Component table contains general information on the iPenguin's
+    -- components, particularly the unique identifier used to identify each
+    -- component in this MIB.
+    componentTable OBJECT-TYPE 
+        SYNTAX SEQUENCE OF ComponentEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "General information about the system's components, including the
+            unique identifiers. The structure this table is based on the 
+            Fibre Alliance MIB connUnitEntry."
+        ::= { components 10 }
+
+    componentEntry OBJECT-TYPE 
+        SYNTAX ComponentEntry 
+        ACCESS not-accessible 
+        STATUS mandatory 
+        DESCRIPTION 
+            "A component entry containing objects for a 
+             particular component." 
+        INDEX { componentId } 
+        ::= { componentTable 1 } 
+
+        ComponentEntry ::= 
+            SEQUENCE {  
+                componentId             AdicGlobalId,
+                componentType           AdicComponentType,
+                componentDisplayName    DisplayString,
+                componentInfo           DisplayString, 
+                componentLocation       DisplayString,
+                componentVendor         DisplayString,
+                componentSn             DisplayString,
+                componentStatus         INTEGER,
+                componentControl        INTEGER,
+		componentREDId		AdicREDIdentifier,
+		componentFirmwareVersion DisplayString,
+		componentGeoAddrAisle   INTEGER,
+		componentGeoAddrFrame   INTEGER,
+		componentGeoAddrRack    INTEGER,
+		componentGeoAddrChassis INTEGER,
+		componentGeoAddrBlade   INTEGER,
+		componentIpAddress      IpAddress 
+            }
+
+        componentId OBJECT-TYPE 
+            SYNTAX AdicGlobalId
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                        "The unique identification for this component
+                        among those within this proxy domain."
+            ::= { componentEntry 1 }     
+            
+        componentType OBJECT-TYPE 
+            SYNTAX AdicComponentType 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The type of this component." 
+            ::= { componentEntry 2 } 
+
+        componentDisplayName OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Name of this component for display purposes.
+                Different OEMs may have different display names for
+                the same ADIC product." 
+            ::= { componentEntry 3 } 
+
+         componentInfo OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION     
+                "A display string containing information
+                about this component."
+            ::= { componentEntry 4 }
+
+         componentLocation OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-only
+            STATUS mandatory 
+            DESCRIPTION 
+                "Location information for this component."
+            ::= { componentEntry 5 } 
+
+        componentVendor OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Name vendor of this component."
+            ::= { componentEntry 6 } 
+
+        componentSn OBJECT-TYPE 
+            SYNTAX DisplayString (SIZE (0..79)) 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "The serial number for this component." 
+            ::= { componentEntry 7 } 
+
+        componentStatus OBJECT-TYPE 
+            SYNTAX INTEGER { 
+                unknown(1),
+                unused(2), -- cannot report status
+                ok(3), -- available for meaningful work
+                warning(4), -- something needs attention
+                failed(5) -- something has failed
+            } 
+            ACCESS read-only 
+            STATUS mandatory 
+            DESCRIPTION 
+                "Overall status of the component."
+            ::= { componentEntry 8 } 
+
+        componentControl OBJECT-TYPE
+            SYNTAX INTEGER {
+                resetColdStart(1),
+                resetWarmStart(2),
+                offline(3),
+                online(4)
+            }
+            ACCESS read-write
+            STATUS mandatory
+            DESCRIPTION
+                "This object is used to control the addressed
+                connUnit. 
+                
+                NOTE: 'Cold Start' and 'Warm Start'
+                are as defined in MIB II and are not meant
+                to be a factory reset.
+
+                resetColdStart: 
+                    the addressed unit performs
+                    a 'Cold Start' reset.
+
+                resetWarmStart: 
+                    the addressed unit performs
+                    a 'Warm Start' reset.
+
+                offline: 
+                    the addressed unit puts itself into
+                    an implementation dependant 'offline' state. 
+
+                online: 
+                    the addressed unit puts itself into an 
+                    implementation dependant 'online' state."
+                    
+            ::= { componentEntry 9 }
+
+		componentREDId	OBJECT-TYPE 
+    		SYNTAX AdicREDIdentifier
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"Runtime Error Detection identifier for this component."
+        	::= { componentEntry 10 }              
+
+		componentFirmwareVersion	OBJECT-TYPE 
+    		SYNTAX DisplayString
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"Firmware version (or level) for this component."
+        	::= { componentEntry 11 }
+
+		componentGeoAddrAisle       OBJECT-TYPE 
+    		SYNTAX INTEGER
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"The aisle number where this component is located.
+        		A negative value indicates that an aisle number
+        		is not applicable to this component."
+        	::= { componentEntry 12 }
+
+		componentGeoAddrFrame       OBJECT-TYPE 
+    		SYNTAX INTEGER
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"The frame number where this component is located.
+        		A negative value indicates that a frame number is
+        		not applicable to this component."
+        	::= { componentEntry 13 }
+
+		componentGeoAddrRack       OBJECT-TYPE 
+    		SYNTAX INTEGER
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"The rack number where this component is located.
+        		A negative value indicates that a rack number is
+        		not applicable to this component."
+           ::= { componentEntry 14 }
+
+		componentGeoAddrChassis     OBJECT-TYPE 
+    		SYNTAX INTEGER
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"The chassis number where this component is located.
+        		A negative value indicates that a chassis number is
+        		not applicable to this component."        		
+        	::= { componentEntry 15 }
+
+		componentGeoAddrBlade       OBJECT-TYPE 
+    		SYNTAX INTEGER
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"The blade number within the network chasis where 
+        		this component is located.  A negative value
+        		indicates that a blade number is not applicable 
+        		to this component."        		
+        	::= { componentEntry 16 }   
+                                     
+        componentIpAddress          OBJECT-TYPE 
+    		SYNTAX IpAddress
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+        		"IP address of this component.  If the component
+        		has no IP address, this object returns 0.0.0.0.  
+        		The address may refer to an internal network not 
+        		accessible to an external management application."        		
+        	::= { componentEntry 17 }   
+        	
+	-- **********************************************************
+	-- *                                                        *
+	-- *            Power and Cooling Group                     *
+	-- *                                                        *
+	-- *   This group and the objects defined within it are     *
+	-- *   intended to aggregate Power and Cooling information  *
+	-- *   from all sub-components in the library.              *
+	-- *                                                        *
+	-- ********************************************************** 
+
+    -- The Power Supply table contains one entry for every power supply in
+    -- the library
+    powerSupplyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PowerSupplyEntry
+        ACCESS not-accessible
+        STATUS mandatory 
+        DESCRIPTION
+            "This table provides power supply information."
+        ::= { powerAndCooling 10 }
+
+    powerSupplyEntry OBJECT-TYPE
+        SYNTAX PowerSupplyEntry
+        ACCESS not-accessible
+        STATUS mandatory 
+        DESCRIPTION
+            "Each entry contains the information for a
+            specific power supply."
+        INDEX { componentId, powerSupplyIndex }
+            ::= { powerSupplyTable 1 }
+
+        PowerSupplyEntry ::=
+            SEQUENCE { powerSupplyIndex 		INTEGER,
+                       powerSupplyName     		DisplayString,
+                       powerSupplyWattage		INTEGER,
+                       powerSupplyType	        	AdicVoltageType,
+                       powerSupplyREDId			AdicREDIdentifier,
+                       powerSupplyRatedVoltage  	INTEGER,
+                       powerSupplyLocation		DisplayString,        
+                       powerSupplyStatus 		AdicPowerSupplyStatus,
+                       powerSupplyPowerConsumption	INTEGER
+            }
+
+        powerSupplyIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..1024)
+            ACCESS read-only
+            STATUS mandatory 
+            DESCRIPTION
+                "Index of this power supply within the 
+                component specified by componentId."
+            ::= { powerSupplyEntry 1 }
+
+        powerSupplyName OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS mandatory 
+            DESCRIPTION
+                "Display name of this power supply."
+            ::= { powerSupplyEntry 2 }
+
+        powerSupplyWattage OBJECT-TYPE
+            SYNTAX INTEGER
+            ACCESS read-only
+            STATUS mandatory 
+            DESCRIPTION
+                "Maximum power output of this power supply.  
+                Units are in Watts."
+            ::= { powerSupplyEntry 3 } 
+
+   	powerSupplyType OBJECT-TYPE
+            SYNTAX AdicVoltageType
+            ACCESS read-only
+            STATUS mandatory 
+            DESCRIPTION
+                "Power supply type, AC or DC."
+            ::= { powerSupplyEntry 4 }
+
+	powerSupplyREDId OBJECT-TYPE 
+    		SYNTAX AdicREDIdentifier
+        	ACCESS read-only 
+        	STATUS mandatory  
+        	DESCRIPTION 
+        		"Runtime Error Detection identifier for this 
+            	power supply."
+        ::= { powerSupplyEntry 5 } 
+
+	powerSupplyRatedVoltage	OBJECT-TYPE 
+    		SYNTAX INTEGER
+        	ACCESS read-only 
+        	STATUS mandatory  
+        	DESCRIPTION 
+        		"Rated output voltage of this power supply. Units are in in millivolts."
+        ::= { powerSupplyEntry 6 }        
+
+	powerSupplyLocation OBJECT-TYPE 
+    		SYNTAX DisplayString
+        	ACCESS read-only 
+        	STATUS mandatory  
+        	DESCRIPTION 
+        		"Power supply location in the library."
+        ::= { powerSupplyEntry 7 }
+                     
+	powerSupplyStatus OBJECT-TYPE 
+        	SYNTAX AdicPowerSupplyStatus
+        	ACCESS read-only 
+        	STATUS mandatory 
+        	DESCRIPTION 
+                	"Power Supply operational status."
+        ::= { powerSupplyEntry 8 } 
+
+	powerSupplyPowerConsumption OBJECT-TYPE 
+    		SYNTAX INTEGER
+        	ACCESS read-only 
+        	STATUS mandatory  
+        	DESCRIPTION 
+        		"Power consumption of this power supply. Units are in watts."
+        ::= { powerSupplyEntry 9 }        
+
+                            
+    -- The Voltage Sensor table contains one entry for every voltage sensor in
+    -- the library.  A power supply may have multiple voltage sensors in various 
+    -- locations
+    voltageSensorTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VoltageSensorEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "This table provides voltage sensor information."
+        ::= { powerAndCooling 20 }
+
+    voltageSensorEntry OBJECT-TYPE
+        SYNTAX VoltageSensorEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "Each entry contains the information for a
+            specific voltage sensor."
+        INDEX { componentId, powerSupplyIndex, voltageSensorIndex }
+            ::= { voltageSensorTable 1 }
+
+        VoltageSensorEntry ::=
+            SEQUENCE {
+                voltageSensorIndex 	INTEGER,
+                voltageSensorName     	DisplayString,
+                voltageSensorStatus	AdicSensorStatus,
+                voltageSensorMillivolts	INTEGER,
+                voltageSensorType	AdicVoltageType,
+                voltageSensorNominalLo	INTEGER,
+                voltageSensorNominalHi	INTEGER,
+                voltageSensorWarningLo	INTEGER,
+                voltageSensorWarningHi	INTEGER,
+                voltageSensorLocation	DisplayString,
+		voltageSensorREDId	AdicREDIdentifier                
+            }
+
+        voltageSensorIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..1024)
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Index of this voltage sensor within the 
+                component specified by componentId."
+            ::= { voltageSensorEntry 1 }
+
+        voltageSensorName OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Display name of this voltage sensor."
+            ::= { voltageSensorEntry 2 }
+
+        voltageSensorStatus OBJECT-TYPE
+            SYNTAX AdicSensorStatus
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Voltage sensor state; - nominal, warning or alarm."
+            ::= { voltageSensorEntry 3 }  
+
+        voltageSensorMillivolts OBJECT-TYPE
+            SYNTAX INTEGER
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Voltage sensor voltage. units are in millivolts."
+            ::= { voltageSensorEntry 4 }            
+            
+        voltageSensorType OBJECT-TYPE
+            SYNTAX AdicVoltageType
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Voltage sensor type; - DC or AC."
+            ::= { voltageSensorEntry 5 }   
+
+        voltageSensorNominalLo OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Lower voltage limit of the nominal state 
+                for this voltage sensor. Units are in millivolts."
+            ::= { voltageSensorEntry 6 }
+
+        voltageSensorNominalHi OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Upper voltage limit of the nominal state 
+                for this voltage sensor. Units are in millivolts."
+            ::= { voltageSensorEntry 7 } 
+
+        voltageSensorWarningLo OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Lower voltage limit of the warning state 
+                for this voltage sensor. Units are in millivolts.
+                If the voltage falls below this limit, the
+                sensor enters the alarm state."
+            ::= { voltageSensorEntry 8 }
+
+        voltageSensorWarningHi OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Upper voltage limit of the warning state 
+                for this voltage sensor. Units are in millivolts.
+		If the voltage rises above this limit, the
+                sensor enters the alarm state."
+            ::= { voltageSensorEntry 9 }
+
+        voltageSensorLocation OBJECT-TYPE
+            SYNTAX DisplayString 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Physical location of the voltage sensor."
+            ::= { voltageSensorEntry 10 }  
+
+		voltageSensorREDId	OBJECT-TYPE 
+    		SYNTAX AdicREDIdentifier
+        	ACCESS read-only 
+        	STATUS optional 
+        	DESCRIPTION 
+        		"Runtime Error Detection identifier for this 
+            	voltage sensor."
+        ::= { voltageSensorEntry 11 }            
+            
+             
+    -- The Temperature Sensor table contains one entry for each temperature
+    -- sensor in the library
+    temperatureSensorTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TemperatureSensorEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "This table provides temperature sensor information"
+        ::= { powerAndCooling 30 }
+
+    temperatureSensorEntry OBJECT-TYPE
+        SYNTAX TemperatureSensorEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "Each entry contains the information for a
+            specific sensor of a specifc component id."
+        INDEX { componentId, temperatureSensorIndex }
+            ::= { temperatureSensorTable 1 }
+
+        TemperatureSensorEntry ::=
+            SEQUENCE {
+                temperatureSensorIndex 		INTEGER,
+                temperatureSensorName     	DisplayString,
+                temperatureSensorStatus		AdicSensorStatus,
+                temperatureSensorDegreesCelsius	INTEGER,
+                temperatureSensorNominalLo	INTEGER,
+                temperatureSensorNominalHi	INTEGER,
+                temperatureSensorWarningLo	INTEGER,
+                temperatureSensorWarningHi	INTEGER,
+                temperatureSensorLocation	DisplayString,
+		temperatureSensorREDId		AdicREDIdentifier                
+            }
+
+        temperatureSensorIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..1024)
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Index of this temperature sensor within the 
+                component specified by componentId."
+            ::= { temperatureSensorEntry 1 }
+
+        temperatureSensorName OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Display name of this temperature sensor."
+            ::= { temperatureSensorEntry 2 }
+
+        temperatureSensorStatus OBJECT-TYPE
+            SYNTAX AdicSensorStatus
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Current state of the temperature sensor; - Nominal, warning or alarm."
+            ::= { temperatureSensorEntry 3 }  
+
+        temperatureSensorDegreesCelsius OBJECT-TYPE
+            SYNTAX INTEGER
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "The temperature in degrees Celsius for this
+                temperature sensor."
+            ::= { temperatureSensorEntry 4 }            
+            
+        temperatureSensorNominalLo OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Lower temperature limit of the nominal state 
+                for this temperature sensor. Units are in degrees Celsius."
+            ::= { temperatureSensorEntry 5 }
+
+        temperatureSensorNominalHi OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Upper temperature limit of the nominal state 
+                for this temperature sensor. Units are in degrees Celsius."
+            ::= { temperatureSensorEntry 6 } 
+
+        temperatureSensorWarningLo OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Lower temperature limit of the warning state 
+                for this temperature sensor. Units are in degrees Celsius.  
+                If the temperature falls below this limit, 
+                the sensor enters the alarm state."
+            ::= { temperatureSensorEntry 7 }
+
+        temperatureSensorWarningHi OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Upper temperature limit of the warning state 
+                for this temperature sensor. Units are in degrees Celsius.
+                If the temperature rises above this 
+		limit, the sensor enters the alarm state."
+            ::= { temperatureSensorEntry 8 }
+
+        temperatureSensorLocation OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Physical location of this temperature sensor."
+            ::= { temperatureSensorEntry 9 }    
+
+		temperatureSensorREDId	OBJECT-TYPE 
+    		SYNTAX AdicREDIdentifier
+        	ACCESS read-only 
+        	STATUS optional 
+        	DESCRIPTION 
+        		"Runtime Error Detection identifier for this 
+            	temperature sensor."
+        ::= { temperatureSensorEntry 10 }            
+                 
+                 
+    -- The Cooling Fan table contains one entry for each temperature
+    -- sensor in the library
+    coolingFanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CoolingFanEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "This table provides library (not drive) cooling fan information."
+        ::= { powerAndCooling 40 }
+
+    coolingFanEntry OBJECT-TYPE
+        SYNTAX CoolingFanEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "Each entry contains the information for a
+            specific cooling fan."
+        INDEX { componentId, coolingFanIndex }
+            ::= { coolingFanTable 1 }
+
+        CoolingFanEntry ::=
+            SEQUENCE {
+                coolingFanIndex 	INTEGER,
+                coolingFanName     	DisplayString,
+                coolingFanStatus	AdicSensorStatus,
+                coolingFanRPM		INTEGER,
+                coolingFanNominalLo	INTEGER,
+                coolingFanNominalHi	INTEGER,
+                coolingFanWarningLo	INTEGER,
+                coolingFanWarningHi	INTEGER,
+                coolingFanLocation	DisplayString,
+		coolingFanREDId		AdicREDIdentifier
+            }
+
+        coolingFanIndex OBJECT-TYPE
+            SYNTAX INTEGER (0..1024)
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Index of this cooling fan within the 
+                component specified by componentId."
+            ::= { coolingFanEntry 1 }
+
+        coolingFanName OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Display name of this cooling fan."
+            ::= { coolingFanEntry 2 }
+
+        coolingFanStatus OBJECT-TYPE
+            SYNTAX AdicSensorStatus
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Cooling fan state; - nominal, warning or alarm."
+            ::= { coolingFanEntry 3 }  
+
+        coolingFanRPM OBJECT-TYPE
+            SYNTAX INTEGER
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "The fan speed in revolutions per minute."
+            ::= { coolingFanEntry 4 }            
+            
+        coolingFanNominalLo OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Lower fan speed limit of the nominal state 
+                for this fan.  Units are in RPM."
+            ::= { coolingFanEntry 5 }
+
+        coolingFanNominalHi OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Upper fan speed limit of the nominal state 
+                for this fan.  Units are in RPM."
+            ::= { coolingFanEntry 6 } 
+
+        coolingFanWarningLo OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Lower fan speed limit of the warning state 
+                for this fan.  Units are in RPM.  If the speed
+                falls below this limit, the fan enters the 
+                alarm state."
+            ::= { coolingFanEntry 7 }
+
+        coolingFanWarningHi OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Upper fan speed limit of the warning state 
+                for this fan.  Units are in RPM.  If the speed
+                rises above this limit, the fan enters the 
+                alarm state."
+            ::= { coolingFanEntry 8 }
+
+        coolingFanLocation OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS optional
+            DESCRIPTION
+                "Physical location of this fan."
+            ::= { coolingFanEntry 9 }            
+
+ 	coolingFanREDId	OBJECT-TYPE 
+    	    SYNTAX AdicREDIdentifier
+            ACCESS read-only 
+            STATUS optional 
+            DESCRIPTION 
+        	"Runtime Error Detection identifier for this fan."
+        ::= { coolingFanEntry 10 }  
+
+	-- **********************************************************
+	-- *                                                        *
+	-- *                Notification Group                      *
+	-- *                                                        *
+	-- *          Trap-related object definitions.              *
+	-- *                                                        *
+	-- ********************************************************** 
+	--
+    -- The Trap Header Table
+    -- Defines common objects used in trap payloads
+    -- These objects exist only for the purpose of
+    -- describing trap payloads according to the
+    -- RFC 1215 TRAP-TYPE con struct.  The table
+    -- may appear empty when traversed with GET or
+    -- GET-NEXT
+    trapPayloadTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TrapPayloadEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Defines objects common to all trap payloads."
+        ::= { notification 10 }
+
+    trapPayloadEntry OBJECT-TYPE
+        SYNTAX TrapPayloadEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Each entry contains the information for a
+            specific cooling fan."
+        INDEX { trapSequenceNumber }
+            ::= { trapPayloadTable 1 }
+
+        TrapPayloadEntry ::=
+            SEQUENCE {
+                trapSequenceNumber 	INTEGER,
+                trapSeverity            AdicTrapSeverity,
+                trapSummaryText         DisplayString,
+                trapIntendedUsage       INTEGER,
+                trapInstance            INTEGER,
+                trapInstanceValue       INTEGER
+            }
+
+        trapSequenceNumber OBJECT-TYPE
+            SYNTAX INTEGER (0 .. 65535) 
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The incrementing trap notification sequence number associated with this trap."
+            ::= { trapPayloadEntry 1 }
+
+        trapSeverity OBJECT-TYPE
+            SYNTAX AdicTrapSeverity 
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The TRAP notification severity."
+            ::= { trapPayloadEntry 2 }
+
+        trapSummaryText OBJECT-TYPE
+            SYNTAX DisplayString
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The TRAP information summary."
+            ::= { trapPayloadEntry 3 }            
+
+        trapIntendedUsage OBJECT-TYPE
+            SYNTAX INTEGER { public(1), triggerRefresh(2) }
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The value of this qualifier aids the
+                management application in determining 
+                how to respond to the trap.  If the 
+                value is public(1), the information is 
+                intended to be propagated to external 
+                observers, such as sending email.  If
+                the value is triggerRefresh(2), the 
+                information is intended to update the 
+                management application's data model, 
+                but not necessarily propagated to external 
+                observers."
+            ::= { trapPayloadEntry 4 }
+
+        trapInstance OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "The specifc TRAP instance for this TRAP."
+            ::= { trapPayloadEntry 5 }
+
+        trapInstanceValue OBJECT-TYPE
+            SYNTAX INTEGER 
+            ACCESS read-only
+            STATUS mandatory
+            DESCRIPTION
+                "A management application specifc TRAP instance value 
+                to further TRAP response processing."
+            ::= { trapPayloadEntry 6 }
+
+    -- 
+    -- Intelligent Storage MIB Trap Definitions  
+    --   (Additional ones definbed in ADIC Managment MIB)
+    -- 
+    -- Group traps according to trap "specific" number as follows:
+	--
+	--   1 -  99 Power and Cooling Traps
+	-- 100 - 199 Physical Library Traps
+	-- 200 - 299 Logical Library Traps
+	-- 300 - 399 Connectivity Traps
+	-- 400 - 499 RAS
+	-- 500 - 599 System Level Traps	
+	--    
+	--
+    -- Note: Not all TRAPs are reported to an external receiver 
+    --       and used internally by the library only.
+    
+    
+-- THE VOLTAGE SENSOR STATUS CHANGE TRAP HAS BEEN 
+-- SUPERCEDED BY THE RAS POWER STATUS GROUP TRAP    
+--
+--    voltageSensorStatusChange TRAP-TYPE 
+--        ENTERPRISE intelligent  
+--        VARIABLES 
+--        {
+--           componentId,
+--           trapSequenceNumber,
+--           trapSeverity, 
+--           trapSummaryText,
+--           powerSupplyIndex, 
+--           voltageSensorIndex,
+--           voltageSensorStatus
+--        }
+--        DESCRIPTION 
+--            "" 
+--        ::= 1
+                 
+-- THE TEMPERATURE SENSOR STATUS CHANGE TRAP HAS BEEN
+-- SUPERCEDED BY THE RAS COOLING STATUS GROUP TRAP    
+--
+--    temperatureSensorStatusChange TRAP-TYPE 
+--        ENTERPRISE intelligent  
+--        VARIABLES 
+--        { 
+--           componentId,
+--           trapSequenceNumber,
+--           trapSeverity,  
+--           trapSummaryText,
+--           temperatureSensorIndex,
+--           temperatureSensorStatus
+--        }
+--        DESCRIPTION 
+--            "" 
+--        ::= 2
+
+-- THE COOLING FAN STATUS CHANGE TRAP HAS BEEN
+-- SUPERCEDED BY THE RAS COOLING STATUS GROUP TRAP    
+--
+--    coolingFanStatusChange TRAP-TYPE 
+--        ENTERPRISE intelligent  
+--        VARIABLES 
+--        {
+--           componentId, 
+--           trapSequenceNumber,
+--           trapSeverity,   
+--           trapSummaryText,
+--           coolingFanIndex,
+--           coolingFanStatus
+--        }
+--        DESCRIPTION 
+--            "" 
+--        ::= 3
+         
+-- TRAP 500 - external TRAP         
+    startupSequenceComplete TRAP-TYPE 
+        ENTERPRISE intelligent  
+        VARIABLES 
+        {
+           componentId,
+           trapSummaryText
+        }
+        DESCRIPTION 
+             "The physical library completed a library initialization sequence:
+              componentId - identifies reporting controller 
+              trapSummaryText - identifies completion of library initialization sequence     
+             "
+       ::= 500
+
+-- TRAP 501 - external TRAP   
+    shutdownSequenceInitiated TRAP-TYPE 
+        ENTERPRISE intelligent  
+        VARIABLES 
+        {
+           componentId,
+           trapSummaryText
+        }
+        DESCRIPTION 
+             "The physical library initiated a shutdown operation:
+              componentId - identifies reporting controller 
+              trapSummaryText - identifies library shutdown operation     
+             "
+   ::= 501
+
+-- TRAP 502 - internal TRAP only  
+    componentAdded TRAP-TYPE 
+        ENTERPRISE intelligent  
+        VARIABLES 
+        {
+           componentId, -- ID of new component added (i.e. blade)
+           componentType
+        }
+        DESCRIPTION 
+            "The component indicated by the value
+            of componentId has been added to the
+            library." 
+        ::= 502
+        
+-- TRAP 503 - internal TRAP only  
+    componentRemoved TRAP-TYPE 
+        ENTERPRISE intelligent  
+        VARIABLES 
+        {
+           componentId, -- ID of component removed (i.e. blade)
+           componentType
+        }
+        DESCRIPTION 
+            "The component indicated by the value
+            of componentId has been removed from the
+            library." 
+        ::= 503
+
+-- TRAP 504 - internal TRAP only  
+    productLibraryClassChange TRAP-TYPE 
+        ENTERPRISE intelligent  
+        VARIABLES 
+        {
+           productLibraryClass, -- Before change
+           productLibraryClass   -- After change
+        }
+        DESCRIPTION 
+            "The product library class has changed.
+            This occurs when connectivity hardware 
+            is added or removed.  The payload contains 
+            the productLibraryClass before and after 
+            the change." 
+        ::= 504
+        
+    END

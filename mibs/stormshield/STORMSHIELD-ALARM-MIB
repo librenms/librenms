@@ -1,0 +1,282 @@
+STORMSHIELD-ALARM-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, MODULE-IDENTITY   FROM SNMPv2-SMI
+      SnmpAdminString                                              FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB, snsNotifications                             FROM STORMSHIELD-SMI-MIB;
+
+   snsAlarm MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield alarm MIBs"
+      REVISION      "202206280000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 19 }
+
+   snsATable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF SnsAEntry
+      MAX-ACCESS  not-accessible
+      STATUS     current
+      DESCRIPTION
+         "Alarm Table"
+      ::= { snsAlarm 1 }
+
+   snsAEntry OBJECT-TYPE
+      SYNTAX  SnsAEntry
+      MAX-ACCESS  not-accessible
+      STATUS     current
+      DESCRIPTION
+         "Alarm table entry"
+      INDEX   { snsAIndex }
+      ::= { snsATable 1 }
+
+   SnsAEntry ::= SEQUENCE {
+      snsAIndex             Integer32,
+      snsATime              OCTET STRING,
+      snsASif               OCTET STRING,
+      snsADif               OCTET STRING,
+      snsAProto             OCTET STRING,
+      snsASaddr             OCTET STRING,
+      snsADaddr             OCTET STRING,
+      snsASport             Integer32,
+      snsADport             Integer32,
+      snsASname             OCTET STRING,
+      snsADname             OCTET STRING,
+      snsAMessage           SnmpAdminString
+   }
+
+   snsAIndex OBJECT-TYPE
+      SYNTAX Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS     current
+      DESCRIPTION
+         "Index of each line in table"
+      ::= { snsAEntry 1 }
+
+   snsATime OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "alarm date"
+      ::= { snsAEntry 2 }
+
+   snsASif OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "source interface"
+      ::= { snsAEntry 3 }
+
+   snsADif OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "destination interface"
+      ::= { snsAEntry 4 }
+
+   snsAProto OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "IP protocol"
+      ::= { snsAEntry 5 }
+
+   snsASaddr OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "source IP address"
+      ::= { snsAEntry 6 }
+
+   snsADaddr OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "destination IP address"
+      ::= { snsAEntry 7 }
+
+   snsASport OBJECT-TYPE
+      SYNTAX     Integer32
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Source port"
+      ::= { snsAEntry 8 }
+
+   snsADport OBJECT-TYPE
+      SYNTAX     Integer32
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Destination port"
+      ::= { snsAEntry 9 }
+
+   snsASname OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "IP source name"
+      ::= { snsAEntry 10 }
+
+   snsADname OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "IP destination name"
+      ::= { snsAEntry 11 }
+
+   snsAMessage OBJECT-TYPE
+      SYNTAX     SnmpAdminString
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Alarm Message"
+      ::= { snsAEntry 12 }
+
+   snsAicmpTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsAicmpEntry
+      MAX-ACCESS  not-accessible
+      STATUS     current
+      DESCRIPTION
+         "ICMP alarm table"
+      ::= { snsAlarm 2 }
+
+   snsAicmpEntry OBJECT-TYPE
+      SYNTAX  SnsAicmpEntry
+      MAX-ACCESS  not-accessible
+      STATUS     current
+      DESCRIPTION
+         "Entry in the snsAicmpTable."
+      INDEX   { snsAicmpIndex }
+      ::= { snsAicmpTable 1 }
+
+   SnsAicmpEntry ::= SEQUENCE {
+      snsAicmpIndex     Integer32,
+      snsAicmpTime      OCTET STRING,
+      snsAicmpSif       OCTET STRING,
+      snsAicmpDif       OCTET STRING,
+      snsAicmpSaddr     OCTET STRING,
+      snsAicmpDaddr     OCTET STRING,
+      snsAicmpType      Integer32,
+      snsAicmpCode      Integer32,
+      snsAicmpSname     OCTET STRING,
+      snsAicmpDname     OCTET STRING,
+      snsAicmpMessage   SnmpAdminString
+   }
+
+   snsAicmpIndex OBJECT-TYPE
+      SYNTAX  Integer32 (1..2147483647)
+      MAX-ACCESS  not-accessible
+      STATUS     current
+      DESCRIPTION
+         "A unique value for phase one table.  Its value
+         ranges between 1 and 65535 and may not be contigous.
+         the index has no other meaning but a pure index"
+      ::= { snsAicmpEntry 1 }
+
+   snsAicmpTime OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Alarm date"
+      ::= { snsAicmpEntry 2 }
+
+   snsAicmpSif OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "source interface"
+      ::= { snsAicmpEntry 3 }
+
+   snsAicmpDif OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "destination interface"
+      ::= { snsAicmpEntry 4 }
+
+   snsAicmpSaddr OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "IP source address"
+      ::= { snsAicmpEntry 5 }
+
+   snsAicmpDaddr OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "IP destination address"
+      ::= { snsAicmpEntry 6 }
+
+   snsAicmpType OBJECT-TYPE
+      SYNTAX     Integer32
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "ICMP type"
+      ::= { snsAicmpEntry 7 }
+
+   snsAicmpCode OBJECT-TYPE
+      SYNTAX     Integer32
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "ICMP code"
+      ::= { snsAicmpEntry 8 }
+
+   snsAicmpSname OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "IP source name"
+      ::= { snsAicmpEntry 9 }
+
+   snsAicmpDname OBJECT-TYPE
+      SYNTAX     OCTET STRING
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "IP destination name"
+      ::= { snsAicmpEntry 10 }
+
+   snsAicmpMessage OBJECT-TYPE
+      SYNTAX     SnmpAdminString
+      MAX-ACCESS  read-only
+      STATUS     current
+      DESCRIPTION
+         "Alarm message"
+      ::= { snsAicmpEntry 11 }
+
+   snsNotification NOTIFICATION-TYPE
+   OBJECTS { snsATime, snsASif, snsASaddr, snsADaddr, snsAMessage }
+   STATUS current
+   DESCRIPTION
+      "notification"
+   ::= { snsNotifications 1 }
+
+END

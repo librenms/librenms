@@ -1,0 +1,181 @@
+POWERSUPPLY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32
+        FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    hpSwitch 
+        FROM HP-ICF-OID; 
+
+hpicfPsMIB MODULE-IDENTITY
+    LAST-UPDATED "200808271000Z" --August 27, 2008 10:00 GMT
+    ORGANIZATION "HP Networking"
+    CONTACT-INFO "Hewlett-Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION  "This MIB module is for representing 
+                  switch power supply entity."
+    REVISION     "200808271000Z" --August 27, 2008 10:00 GMT
+    DESCRIPTION  "Initial Version of Power Supply MIB, Version 1"
+    ::= { hpSwitch 55 }
+
+hpicfEntityPs OBJECT IDENTIFIER ::= { hpicfPsMIB 1 }
+
+-- ********************************************************************
+--  POWER SUPPLY Textual Conventions
+-- ********************************************************************
+
+HpicfDcPsIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d"
+    STATUS        current
+    DESCRIPTION   "A unique value that serves as index to identify the power supply."  
+    SYNTAX        Unsigned32
+
+HpicfDcPsState ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "An enumerated value which provides the state of the 
+                  switch power supply entity."
+    SYNTAX        INTEGER  {
+       psNotPresent(1),
+       psNotPlugged(2),
+       psPowered(3),
+       psFailed(4),
+       psPermFailure(5),    
+       psMax(6)
+    }
+
+hpicfPsTable     OBJECT-TYPE
+    SYNTAX       SEQUENCE OF HpicfPsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION  "This table contains one row per switch power supply entity."
+    ::= { hpicfEntityPs 1 }
+
+hpicfPsEntry    OBJECT-TYPE
+    SYNTAX      HpicfPsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information about the power supply physical entity
+                table."
+    INDEX   { hpicfPsBayNum }
+    ::= { hpicfPsTable 1 }
+
+HpicfPsEntry ::= SEQUENCE {
+      hpicfPsBayNum              HpicfDcPsIndex,
+      hpicfPsState               HpicfDcPsState,
+      hpicfPsFailures            Counter32, 
+      hpicfPsTemp                Integer32,
+      hpicfPsVoltageInfo         SnmpAdminString,
+      hpicfPsWattageCur          Integer32,
+      hpicfPsWattageMax          Integer32,
+      hpicfPsLastCall            Counter32
+}
+
+hpicfPsBayNum        OBJECT-TYPE
+    SYNTAX           HpicfDcPsIndex
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION      "The index of switch power supply entity."
+    ::= { hpicfPsEntry 1 }
+
+hpicfPsState         OBJECT-TYPE
+    SYNTAX           HpicfDcPsState 
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "The physical state of the switch power supply entity."
+    ::= { hpicfPsEntry 2 }
+
+hpicfPsFailures      OBJECT-TYPE
+    SYNTAX           Counter32 
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "Number of times power supply has failed."
+    ::= { hpicfPsEntry 3 }
+
+hpicfPsTemp          OBJECT-TYPE
+    SYNTAX           Integer32
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "The temperature of the power supply in Celsius"
+    ::= { hpicfPsEntry 4 }
+
+hpicfPsVoltageInfo   OBJECT-TYPE
+    SYNTAX           SnmpAdminString (SIZE(0..32)) 
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION      "The voltage info and max current of power supply.
+                      e.g. AC 120V/220V. "
+    ::= { hpicfPsEntry 5 }
+
+hpicfPsWattageCur   OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The present power supply wattage information"
+    ::= { hpicfPsEntry 6 }
+
+hpicfPsWattageMax   OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The maximum wattage of the power supply."
+    ::= { hpicfPsEntry 7 }
+
+hpicfPsLastCall  OBJECT-TYPE
+    SYNTAX       Counter32 
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The number of seconds since the switch power supply is up."
+    ::= { hpicfPsEntry 8 }
+
+-- ********************************************************************
+-- POWER SUPPLY Conformance
+--* *******************************************************************
+   hpicfPsConformance OBJECT IDENTIFIER ::= { hpicfPsMIB 2 }
+   hpicfPsCompliance  OBJECT IDENTIFIER ::= { hpicfPsConformance 1 }
+   hpicfPsGroups      OBJECT IDENTIFIER ::= { hpicfPsConformance 2 }
+
+-- ********************************************************************
+-- POWER SUPPLY Complicance
+-- ********************************************************************
+   hpicfDcPsCompliance MODULE-COMPLIANCE
+      STATUS       current
+      DESCRIPTION
+         "The compliance statement for entries which implement the
+          POWER SUPPLY MIB."
+      MODULE
+      MANDATORY-GROUPS
+      {
+         hpicfPsGroup
+      }
+      GROUP        hpicfPsGroup
+      DESCRIPTION  "Objects associated with Entity POWER SUPPLY."
+      ::= { hpicfPsCompliance 1 } 
+
+--
+-- POWER SUPPLY Groups
+--
+   hpicfPsGroup OBJECT-GROUP
+      OBJECTS
+      {
+         hpicfPsState,
+         hpicfPsFailures,
+         hpicfPsTemp,
+         hpicfPsVoltageInfo,
+         hpicfPsWattageCur,
+         hpicfPsWattageMax,
+         hpicfPsLastCall
+      }
+      STATUS      current
+      DESCRIPTION "POWER SUPPLY parameters "
+      ::= { hpicfPsGroups 1 }
+END

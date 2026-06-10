@@ -1,0 +1,578 @@
+--  *****************************************************************
+--  DLINKSW-L2FDB-MIB.mib : L2 FDB MIB
+--
+--  Copyright (c) 2012 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-L2FDB-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+   		MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,Unsigned32,
+   		Integer32
+       		FROM SNMPv2-SMI
+   		RowStatus,DisplayString,TruthValue,MacAddress
+       		FROM SNMPv2-TC
+   		MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+       		FROM SNMPv2-CONF
+       	ifIndex, InterfaceIndex, InterfaceIndexOrZero
+            FROM IF-MIB  
+        dot1qFdbId, dot1qStaticUnicastAddress, 
+        VlanId, PortList			
+    		FROM Q-BRIDGE-MIB    		
+        dlinkIndustrialCommon		
+            FROM DLINK-ID-REC-MIB;
+   
+    dlinkSwL2FdbMIB	MODULE-IDENTITY
+   		LAST-UPDATED "201212260000Z"
+   		ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for L2FDB."
+            
+        REVISION "201212260000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'L2FDB'
+            functionality."
+      ::= { dlinkIndustrialCommon 3 } 
+
+-- 
+--	MIB OBJECTS     
+--      
+	dL2FdbMIBNotifications 		OBJECT IDENTIFIER ::= { dlinkSwL2FdbMIB 0 }
+	dL2FdbMIBObjects 			OBJECT IDENTIFIER ::= { dlinkSwL2FdbMIB 1 }
+	dL2FdbMIBConformance		OBJECT IDENTIFIER ::= { dlinkSwL2FdbMIB 2 }
+
+
+-- -----------------------------------------------------------------------------     
+    dL2FdbGblCtrl			OBJECT IDENTIFIER ::= { dL2FdbMIBObjects 1 }
+    
+    dL2FdbClearCtrl			OBJECT IDENTIFIER ::= { dL2FdbGblCtrl 1 }
+    dL2FdbClearMacAddrByMacAddr 	OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies a MAC address which will be cleared.
+            When read, a value of '000000000000'H is returned."  
+        ::= { dL2FdbClearCtrl 1 }
+         
+    dL2FdbClearMacAddrByIf 	OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the physical 
+            port/port-channel/vlan interface on which
+            the dynamic MAC address(es) will be cleared.            
+            When read, a value of 0 is returned."                      
+        ::= { dL2FdbClearCtrl 2 }
+    
+    dL2FdbClearAllMacAddr OBJECT-TYPE
+        SYNTAX  INTEGER{
+                clear(1),
+                noOp(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object clears all of the dynamic FDB entries, when set to 'clear'. 
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dL2FdbClearCtrl 3 }  
+                         	    
+    dL2FdbAgingTime		OBJECT-TYPE
+    	SYNTAX			    Unsigned32 ( 0 | 5..1000000 )
+    	UNITS				"second"
+    	MAX-ACCESS			read-write
+    	STATUS				current
+    	DESCRIPTION
+    		"Specify the aging time in seconds. 
+    		 The valid range is 5 to 1000000 seconds.
+    		 The special valie of 0 indicates the ging out function is disabled.
+    		 "
+    	DEFVAL { 300 }
+    	::= {  dL2FdbGblCtrl 2 }
+    	    
+    dL2FdbMacChangeEnabled	OBJECT-TYPE
+    	SYNTAX			    TruthValue
+    	MAX-ACCESS			read-write
+    	STATUS				current
+    	DESCRIPTION
+    		"This object indicates the status of  MAC address notification feature  
+    		on the Switch."
+    	DEFVAL { false }
+    	::= {  dL2FdbGblCtrl 3 }
+
+    dL2FdbMacChangeNotifInterval		OBJECT-TYPE
+    	SYNTAX			    Unsigned32 ( 1..2147483647 )
+    	UNITS				"second"
+    	MAX-ACCESS			read-write
+    	STATUS				current
+    	DESCRIPTION 
+    		"Specifies the interval between two consecutive MAC address change notifications."    		 
+    	DEFVAL { 1 }
+    	::= {  dL2FdbGblCtrl 4 }
+   
+    dL2FdbMacChangeNotifyEnabled	OBJECT-TYPE
+    	SYNTAX			    TruthValue
+    	MAX-ACCESS			read-write
+    	STATUS				current
+    	DESCRIPTION
+    	  "Indicates whether cmnMacChangedNotification notifications
+          will or will not be sent when there are MAC addresses
+          learnt or removed from the forwarding table. 
+          "
+    	DEFVAL { false }
+    	::= {  dL2FdbGblCtrl 5 }
+    	 	
+    dL2FdbMacChangeHistorySize	OBJECT-TYPE
+    	SYNTAX			    Unsigned32 ( 0..500 )
+    	MAX-ACCESS			read-write
+    	STATUS				current
+    	DESCRIPTION
+    		"Specifies the maximum number of the entries in the MAC history
+    		notification table."    		
+    	DEFVAL { 1 }
+    	::= {  dL2FdbGblCtrl 6 }
+      
+    dL2FdbDestHitEnabled		OBJECT-TYPE
+    	SYNTAX			    TruthValue
+    	MAX-ACCESS			read-write
+    	STATUS				current
+    	DESCRIPTION
+    		"This object indicates the state whether the destination MAC
+    		address will trigger update function."
+    	DEFVAL {false }    	
+    	::= {  dL2FdbGblCtrl 7 }
+  
+-- -----------------------------------------------------------------------------  	
+	dL2FdbStaticUnicastTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DL2FdbStaticUnicastEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of configuration for 
+            static unicast MAC addresses."
+        ::= { dL2FdbMIBObjects 2 }
+
+    dL2FdbStaticUnicastEntry OBJECT-TYPE
+        SYNTAX          DL2FdbStaticUnicastEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table entry represents configuration for a static
+            unicast MAC address information."
+        INDEX    {         
+            dL2FdbStaticUnicastVlanID,
+            dL2FdbStaticUnicastMacAddr                             
+        }
+        ::= { dL2FdbStaticUnicastTable 1 }
+
+    DL2FdbStaticUnicastEntry ::= SEQUENCE {        
+        dL2FdbStaticUnicastVlanID       VlanId,
+        dL2FdbStaticUnicastMacAddr      MacAddress,               
+        dL2FdbStaticUnicastType     	INTEGER,     
+        dL2FdbStaticUnicastPortNum      Integer32,
+        dL2FdbStaticUnicastRowStatus    RowStatus
+    }
+                                            
+    dL2FdbStaticUnicastVlanID           OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The VLAN ID of the entry."
+        ::= { dL2FdbStaticUnicastEntry 1 }
+                        
+    dL2FdbStaticUnicastMacAddr            OBJECT-TYPE
+        SYNTAX          MacAddress 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The MAC address of the entry."
+        ::= { dL2FdbStaticUnicastEntry 2 }  
+                                     
+    dL2FdbStaticUnicastType            OBJECT-TYPE
+        SYNTAX      INTEGER {
+        	self(1),
+            permanent(2),
+			permanentDrop(3)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of this entry.
+            		
+            self(1) - This entry is currently in use by the device's
+                      MAC address.
+                                  		            		
+            permanent(2) - This entry is currently in use and will remain so
+                     until after the next reset of the device.
+                     
+            permanentDrop(3) - This entry will filter the packet with the specified
+                    MAC address as the source MAC or as the destination MAC.
+		            The entry is currently in use and will remain so after the 
+		            next reboot of the device. 
+            		         
+                The value of this object MUST be retained across
+                reinitializations of the management system."
+        ::= { dL2FdbStaticUnicastEntry 3 }
+                
+    dL2FdbStaticUnicastPortNum            OBJECT-TYPE
+        SYNTAX          Integer32 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The port number of the static unicast address. 
+            The value of 0 indicates the CPU port.
+            The value of -1 indicates mac filter entry with permanentDrop type."
+        ::= { dL2FdbStaticUnicastEntry 4 }
+            
+    dL2FdbStaticUnicastRowStatus            OBJECT-TYPE
+        SYNTAX          RowStatus 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the RowStatus of this entry."
+        ::= { dL2FdbStaticUnicastEntry 5 }
+                       	   
+-- -----------------------------------------------------------------------------
+	dL2FdbIfCtrlTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DL2FdbIfCtrlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of interface-specific configuration for 
+            L2 FDB."
+        ::= { dL2FdbMIBObjects 3 }
+
+    dL2FdbIfCtrlEntry OBJECT-TYPE
+        SYNTAX          DL2FdbIfCtrlEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry represents interface L2 FDB configuration."
+        INDEX    { ifIndex }
+        ::= { dL2FdbIfCtrlTable 1 }
+
+    DL2FdbIfCtrlEntry ::= SEQUENCE {            
+        dL2FdbIfCtrlNotifyEnable 	    BITS,           
+        dL2FdbIfMacLearningEnabled      TruthValue               
+    }
+            
+    dL2FdbIfCtrlNotifyEnable OBJECT-TYPE
+        SYNTAX          BITS {
+            added(0),
+            removed(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object indicates whether a specified notification is enabled or not.
+            If a bit corresponding to a notification is set to 1, then 
+            the specified notification can be generated.
+
+            added(0)   - the MAC change notification when a MAC address is added
+                         on the interface.
+            removed(1) - the MAC change notification when a MAC address is removed
+                         from the interface.               
+            "
+    ::= { dL2FdbIfCtrlEntry 1 }
+    
+  
+	dL2FdbIfMacLearningEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write 
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the MAC-address learning is enabled or not
+            on the physical interface."
+        ::= { dL2FdbIfCtrlEntry 2 }        
+                
+
+-- -----------------------------------------------------------------------------         
+	dL2FdbMulticastFilterModeTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DL2FdbMulticastFilterModeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of multicast filter mode configuration  
+            of interfaces.
+            Only applicable interfaces will present on this table.
+            "
+        ::= { dL2FdbMIBObjects 4 }
+
+    dL2FdbMulticastFilterModeEntry OBJECT-TYPE
+        SYNTAX          DL2FdbMulticastFilterModeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry represents multicast filter mode on an interface."
+        INDEX    { dL2FdbMcastFilterModeIfIndex }
+        ::= { dL2FdbMulticastFilterModeTable 1 }
+
+    DL2FdbMulticastFilterModeEntry ::= SEQUENCE {    
+        dL2FdbMcastFilterModeIfIndex        InterfaceIndex,             
+        dL2FdbMcastFilterMode               INTEGER               
+    }
+            
+    dL2FdbMcastFilterModeIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface.
+            If support vlan-based filtering mode: The valid interfaces are VLANs.
+            If support port-based filtering mode: The valid interfaces are physical
+            port.           
+            "
+    ::= { dL2FdbMulticastFilterModeEntry 1 }
+    
+  
+	dL2FdbMcastFilterMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+             forwardAll(1),
+             forwardUnregistered(2),
+             filterUnregistered(3)
+        }
+        MAX-ACCESS      read-write 
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the handling method for multicast packets 
+            on the corresponding interface."
+        ::= { dL2FdbMulticastFilterModeEntry 2 }        
+                
+
+-- -----------------------------------------------------------------------------           
+    dL2FdbMacChangeHistoryTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DL2FdbMacChangeHistoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of MAC address change history."
+        ::= { dL2FdbMIBObjects 5 }
+
+    dL2FdbMacChangeHistoryEntry OBJECT-TYPE
+        SYNTAX          DL2FdbMacChangeHistoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry represents a MAC address change."
+        INDEX    { dL2FdbMacChangeHistoryIndex }
+        ::= { dL2FdbMacChangeHistoryTable 1 }
+
+    DL2FdbMacChangeHistoryEntry ::= SEQUENCE {            
+        dL2FdbMacChangeHistoryIndex 	    Unsigned32,           
+        dL2FdbMacChangeHistoryOp            INTEGER,
+        dL2FdbMacChangeHistoryVlanID        VlanId,               
+        dL2FdbMacChangeHistoryMacAddr       MacAddress,           
+        dL2FdbMacChangeHistoryPortNum       Integer32
+    } 
+    
+    dL2FdbMacChangeHistoryIndex   OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 1..500 )
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object is history index."
+        ::= { dL2FdbMacChangeHistoryEntry 1 }
+        
+    dL2FdbMacChangeHistoryOp   OBJECT-TYPE
+        SYNTAX          INTEGER {
+            added(1),
+            removed(2)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+             "mac notify change operation
+            1 - learned a new MAC address
+            2 - deleted an old MAC address
+            "
+        ::= { dL2FdbMacChangeHistoryEntry 2 }
+        
+    dL2FdbMacChangeHistoryVlanID           OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The VLAN ID of the entry."
+        ::= { dL2FdbMacChangeHistoryEntry 3 }
+        
+    dL2FdbMacChangeHistoryMacAddr            OBJECT-TYPE
+        SYNTAX          MacAddress 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The MAC address of the entry."
+        ::= { dL2FdbMacChangeHistoryEntry 4 }  
+        
+    dL2FdbMacChangeHistoryPortNum            OBJECT-TYPE
+        SYNTAX          Integer32 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The port number of the unicast address."
+        ::= { dL2FdbMacChangeHistoryEntry 5 }
+   
+-- ----------------------------------------------------------------------------- 
+    dL2FdbNotifyInfo  OBJECT IDENTIFIER ::= {  dL2FdbMIBObjects 6 } 
+
+    dL2FdbMacChangeNotifyInfo   OBJECT-TYPE
+        SYNTAX          OCTET STRING(SIZE (1..1024))
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the information for the device MAC address
+            changes. And the detailed information include:
+            Operation Code + MAC address + Box ID (or slot ID) + Port Number + Zero...
+		
+            Operation Code: 1, 2
+                 1 means learned a new MAC address
+                 2 means deleted an old MAC address.
+            Box ID: The switch box ID, for standalone device, it always 1.
+            Port Number: The hysical port/port-channellearned or deleted for
+                 the box,if port-channel, the box id is invalid
+            Zero: Used to separate each message(Operate Code + MAC address + 
+                 Box ID + Port Number)."
+        ::= { dL2FdbNotifyInfo 1 }
+
+
+   
+--  ***************************************************************************	
+--  Notifications
+--  ***************************************************************************        
+     dL2FdbMacNotification NOTIFICATION-TYPE
+        OBJECTS { dL2FdbMacChangeNotifyInfo }
+        STATUS  current        		
+        DESCRIPTION
+            "This trap indicates a MAC address is added to or removed from the
+            address table. "            
+        ::= { dL2FdbMIBNotifications 1 }	
+            
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dL2FdbCompliances OBJECT IDENTIFIER ::= { dL2FdbMIBConformance 1 }
+		
+	dL2FdbCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-L2FDB-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dL2FdbGlobalGroup,
+		    dL2FdbMacAddrTableGroup, 
+		    dL2FdbInterfaceGroup,
+		    dL2FdbMcastFilterModeCfgGroup		   
+		}
+		GROUP       dL2FdbMacChangeNotifyCfgGroup 
+           DESCRIPTION 
+              "This group is required only if the MAC change notification is
+              implemented by the agent."
+              
+        GROUP       dL2FdbMacChangeNotifyGroup 
+           DESCRIPTION 
+              "This group is required only if the MAC change notification is
+              implemented by the agent."
+        GROUP       dL2FdbMacChgNotificationGroup 
+           DESCRIPTION 
+              "This group is required only if the MAC change notification is
+              implemented by the agent."      
+		::= { dL2FdbCompliances 1 }
+		
+	dL2FdbGroups OBJECT IDENTIFIER ::= { dL2FdbMIBConformance 2 }
+		
+	dL2FdbGlobalGroup OBJECT-GROUP
+		OBJECTS {
+		    dL2FdbClearMacAddrByMacAddr,
+		    dL2FdbClearMacAddrByIf,		   
+		    dL2FdbClearAllMacAddr, 
+		    dL2FdbAgingTime,		   
+		    dL2FdbDestHitEnabled
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing the gloal configuration for L2FDB"
+		::= { dL2FdbGroups 1 }
+
+	dL2FdbMacAddrTableGroup OBJECT-GROUP
+		OBJECTS {
+		    dL2FdbStaticUnicastType,
+		    dL2FdbStaticUnicastPortNum,
+		    dL2FdbStaticUnicastRowStatus		   		     	   
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing the information of MAC-Address-Table for L2FDB"
+		::= { dL2FdbGroups 2 }
+	        
+	dL2FdbInterfaceGroup OBJECT-GROUP
+		OBJECTS {		        
+		        dL2FdbIfMacLearningEnabled  		        		        		        		        
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing the information of Interface Table for L2FDB"
+		::= { dL2FdbGroups 3 }	        
+		
+	dL2FdbMacChangeNotifyCfgGroup OBJECT-GROUP
+		OBJECTS {   
+		    dL2FdbMacChangeEnabled, 
+            dL2FdbMacChangeNotifInterval,
+            dL2FdbMacChangeNotifyEnabled,
+            dL2FdbMacChangeHistorySize,
+		    dL2FdbMacChangeNotifyInfo,
+		    dL2FdbIfCtrlNotifyEnable
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects about the information for L2FDB notification. 
+			"
+		::= { dL2FdbGroups 4 }
+		
+	dL2FdbMcastFilterModeCfgGroup OBJECT-GROUP
+		OBJECTS {   
+		    dL2FdbMcastFilterMode
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects about the configuration for multicast
+			filter mode. 
+			"
+		::= { dL2FdbGroups 5 }
+			
+    dL2FdbMacChangeNotifyGroup OBJECT-GROUP
+            OBJECTS {   
+            dL2FdbMacChangeHistoryOp, 
+            dL2FdbMacChangeHistoryVlanID,
+            dL2FdbMacChangeHistoryMacAddr,
+            dL2FdbMacChangeHistoryPortNum
+		}
+		STATUS current
+		DESCRIPTION 
+			"The notifications information used for the change of 
+            MAC address table. 
+			"
+		::= { dL2FdbGroups 6 }
+		
+    dL2FdbMacChgNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+           dL2FdbMacNotification
+        }
+        STATUS current
+        DESCRIPTION
+            "The collection of notifications used for monitoring the change of 
+            MAC address table."
+        ::= { dL2FdbGroups 7 }   
+        	
+END
+

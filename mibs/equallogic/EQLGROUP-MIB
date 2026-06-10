@@ -1,0 +1,4576 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLGROUP-MIB DEFINITIONS  ::= BEGIN
+IMPORTS
+    DisplayString , TruthValue, RowStatus, RowPointer, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, enterprises, IpAddress, TimeTicks, Counter32, Counter64
+            FROM SNMPv2-SMI
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB;      -- RFC2851
+
+eqlgroupModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION
+        "Equallogic Inc. group information
+
+        Copyright (c) 2002-2013 by Dell Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell Inc.  This software embodies proprietary information 
+        and trade secrets of Dell Inc. 
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION    "200209060000Z"         -- 02-Sep-06
+    DESCRIPTION "Initial revision"
+    ::= { enterprises equalLogic(12740) 1 }
+
+
+eqlgroupObjects OBJECT IDENTIFIER ::=  { eqlgroupModule 1 }
+eqlgroupNotifications OBJECT IDENTIFIER ::= { eqlgroupModule 2 }
+eqlgroupConformance OBJECT IDENTIFIER ::=  { eqlgroupModule 3 }
+
+
+
+
+
+--*********************************************************************************
+--***********************************************************************************
+-- Textual conventions
+--
+-- If adding entries here, also update the file mibconv.c !!!
+
+UTFString ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT     "t"
+       STATUS           current
+       DESCRIPTION  "An octet string containing administrative
+                    information, preferably in human-readable form.
+
+                    To facilitate internationalization, this
+                    information is represented using the ISO/IEC
+                    IS 10646-1 character set, encoded as an octet
+                    string using the UTF-8 transformation format
+                    described in [RFC2279].
+
+                    Since additional code points are added by
+                    amendments to the 10646 standard from time
+                    to time, implementations must be prepared to
+                    encounter any code point from 0x00000000 to
+                    0x7fffffff.  Byte sequences that do not
+                    correspond to the valid UTF-8 encoding of a
+                    code point or are outside this range are
+                    prohibited.
+
+                    The use of control codes should be avoided.
+
+                    When it is necessary to represent a newline,
+                    the control code sequence CR LF should be used.
+
+                    The use of leading or trailing white space should
+                    be avoided.
+
+                    For code points not directly supported by user
+                    interface hardware or software, an alternative
+                    means of entry and display, such as hexadecimal,
+                    may be provided.
+
+                    For information encoded in 7-bit US-ASCII,
+                    the UTF-8 encoding is identical to the
+                    US-ASCII encoding.
+
+                    UTF-8 may require multiple bytes to represent a
+                    single character / code point; thus the length
+                    of this object in octets may be different from
+                    the number of characters encoded.  Similarly,
+                    size constraints refer to the number of encoded
+                    octets, not the number of characters represented
+                    by an encoding.
+
+                    Note that when this TC is used for an object that
+                    is used or envisioned to be used as an index, then
+                    a SIZE restriction MUST be specified so that the
+                    number of sub-identifiers for any object instance
+                    does not exceed the limit of 128, as defined by
+                    [RFC1905].
+
+                    Note that the size of an SnmpAdminString object is
+                    measured in octets, not characters.
+                   "
+         SYNTAX       OCTET STRING (SIZE (0..255))
+
+
+AdminAccountPrivilegeType ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT       "d"
+       STATUS              current
+       DESCRIPTION        "This field specifies the privilege level of the account.
+                           The default is global-admin.  global-admin grants full
+                           access to the administrator.  pool-admin designates the
+                           administrator to have access only to one or more pools,
+                           and does not have access to global and group-level
+                           administrator.  volume-admin designates the administrator to
+                           have access to specific volumes within specific storage pools."
+
+       SYNTAX              INTEGER  {
+                            global-admin (0),
+                            pool-admin  (1),
+                            pool-admin-group-read  (2),
+                            volume-admin (3)
+                            }
+
+AdminAccountType ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT       "d"
+       STATUS              current
+       DESCRIPTION        "This field specifies the type of account. The read-write 
+                           account type allows the user to modify any group settings. 
+                           The read-only account allows only read-only access to
+                           group configuration data. The default is read-write. 
+                           Changing this value will come into affect only for new 
+                           login of the user. Currently logged in sessions will not
+                           be affected. Read-only account is only applicable for group admin 
+                           accounts/pool-admin accounts. Group-admins with read-only set 
+                           cannot modify any settings."
+
+       SYNTAX              INTEGER  {
+                             read-write (1),
+                             read-only  (2)
+			    }
+
+--*******************************
+
+
+eqlStorageGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group Table"
+    ::=  {  eqlgroupObjects  1}
+
+eqlStorageGroupEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing storage group information."
+    INDEX           { eqlGroupId}
+::=    { eqlStorageGroupTable 1 }
+
+EqlStorageGroupEntry ::=
+    SEQUENCE {
+        eqlGroupId                               Integer32,
+        eqlGroupIsSingleSubnet                   INTEGER,
+        eqlGroupDefaultGatewayIpAddress          INTEGER,
+        eqlGroupDefaultMask                      IpAddress,
+        eqlGroupDefaultRoutingProtocol           INTEGER,
+--**********change type of var                   
+        eqlGroupIsStorageOptimization            INTEGER,
+        eqlGroupDiskAddWaitTime                  Integer32,
+        eqlGroupDefaultLanguage                  INTEGER,
+        eqlGroupDefaultSnapshotSize              Integer32,
+        eqlGroupDefaultSnapshotWarningLevel      Integer32,
+        eqlGroupDefaultSnapshotDeletePolicy      INTEGER,
+        eqlGroupTimeZone                         INTEGER,
+        eqlGroupLogLevel                         Integer32,
+        eqlGroupDefaultAliasToVolumeName         TruthValue,
+--******change      eqlGroupContactName          DisplayString,
+--******change      eqlGroupContactPhone         DisplayString,
+--***change         eqlGroupContactEmail         DisplayString,
+        eqlGroupDescription                      UTFString,
+        eqlGroupIscsiNamePrefix                  DisplayString,
+        eqlGroupEmailSrcDomain                   DisplayString,
+        eqlGroupName                             DisplayString,
+        eqlGroupIpAddr                           IpAddress,
+        eqlGroupEnableWebAccessSSL               TruthValue,
+        eqlGroupEnableWebAccessUnsecure          TruthValue,
+        eqlGroupEnableCliAccessSSH               TruthValue,
+        eqlGroupEnableCliAccessUnsecure          TruthValue,
+        eqlGroupEnableEmailNotifications         TruthValue,
+        eqlGroupEnableSNMPTraps                  TruthValue,
+        eqlGroupEnableSyslog                     TruthValue,
+        eqlGroupEmailPriorityMask                INTEGER,
+        eqlGroupSNMPPriorityMask                 INTEGER ,
+        eqlGroupSysLogPriorityMask               INTEGER,
+        eqlGroupDefaultSite                      DisplayString,
+        eqlGroupPasswd1                          OCTET STRING,  -- was DisplayString
+        eqlGroupPasswd2                          DisplayString,
+        eqlGroupRowStatus                        RowStatus,
+        eqlGroupObjectReuseScrub                 INTEGER,    
+        eqlGroupEnableSSH                        TruthValue, 
+        eqlGroupEnableTelnet                     TruthValue, 
+        eqlGroupEnableFTP                        TruthValue,
+        eqlGroupEmailSrcUserName                 DisplayString,
+        eqlGroupSyslogFacility                   INTEGER,
+        eqlGroupEnableCLB                        TruthValue,
+        eqlGroupEnableVolBal                     TruthValue,
+        eqlGroupDiscoveryFilter                  TruthValue,
+        eqlGroupEmailSupportContact              DisplayString,
+        eqlGroupReplicationWindowSize            Unsigned32,
+        eqlGroupConfigurationFlags               BITS,
+        eqlGroupISCSIPortalGrpTag                INTEGER,
+        eqlGroupMaxConcurrentReplicas            Integer32,
+        eqlGroupDefaultThinWarn                  Unsigned32,
+        eqlGroupDefaultThinMaxGrow               Unsigned32,
+        eqlGroupDefaultMgmtGatewayIpAddressType  InetAddressType,
+        eqlGroupDefaultMgmtGatewayIpAddress      InetAddress,
+        eqlGroupInet6AddrType                    InetAddressType,
+        eqlGroupInet6Addr                        InetAddress,
+        eqlGroupInetAddrType                     InetAddressType,
+        eqlGroupInetAddr                         InetAddress,
+        eqlGroupSupportSlowSwitch                INTEGER,
+        eqlGroupProfileIndex                     Unsigned32,
+        eqlGroupEnableSSHProtocolV1              TruthValue,
+        eqlGroupEnableStandbyButton              TruthValue,
+        eqlGroupLDAPLoginAuthEnable              TruthValue,
+        eqlGroupApplianceDiscovery               INTEGER,
+        eqlGroupDefaultDcbVlanId                 Unsigned32,
+        eqlGroupThermalShutdownOverride          INTEGER,
+        eqlGroupEnableLegacyCryptos              INTEGER,
+        eqlGroupMaxReplSegments                  Integer32,
+        eqlGroupEnableVolumeRecovery             TruthValue,
+        eqlGroupSessionIdleTimeout               Integer32,
+        eqlGroupSessionIdleTimeoutEnable         INTEGER,
+        eqlGroupSessionBannerEnable              INTEGER,
+        eqlGroupDefaultVolSnapshotBorrowEnabled  TruthValue,
+        eqlGroupRecoveryLifeTimeEnable           TruthValue,
+        eqlGroupRecoveryLifeTime                 Integer32,
+        eqlGroupTimeProtocol                     INTEGER,
+        eqlGroupRecoveryTrimmerFreq              Integer32,
+        eqlGroupUpdateEnable                     INTEGER,
+        eqlGroupUpdateLast                       Unsigned32,
+        eqlGroupDefaultSectorSize                INTEGER,
+        eqlGroupCompressionScanFreq              Integer32,
+        eqlGroupRunCompressionScan               INTEGER,
+        eqlGroupMonitorReminderTimestamp         Unsigned32
+        }
+
+
+    eqlGroupId OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This index uniquely identifies the group. This index should always be 1."
+    ::=  {  eqlStorageGroupEntry 1 }
+
+
+    eqlGroupIsSingleSubnet  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        single-subnet(1),
+                        multi-subnet(2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to indicate whether or not all the arrays
+                     within a group are located in the same subset. The default is single-subnet."
+    DEFVAL          { single-subnet }
+    ::=  {  eqlStorageGroupEntry 2 }
+
+    eqlGroupDefaultGatewayIpAddress OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION     "This field is deprecated."
+    ::=  {  eqlStorageGroupEntry 3 }
+
+    eqlGroupDefaultMask OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is deprecated."
+    ::=  {  eqlStorageGroupEntry 4 }
+
+    eqlGroupDefaultRoutingProtocol  OBJECT-TYPE
+    SYNTAX          INTEGER   {
+                        none(1),
+                        rip(2),
+                        ospf(3)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to indicate the routing protocol use when a group
+                     spans multiple subnets. The support protocols are RIP and OFPS. The default value is none."
+    DEFVAL          { none }
+    ::=  {  eqlStorageGroupEntry 5 }
+
+    eqlGroupIsStorageOptimization   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        capacity(1),
+                        performance(2),
+                        raid5(3)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to indicate whether the Storage Pool is optimized for
+                     capacity (RAID 5/50) or performance (RAID 10). The default is capacity."
+    DEFVAL          { capacity }
+    ::=  {  eqlStorageGroupEntry 6 }
+
+    eqlGroupDiskAddWaitTime OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to indicated how long to wait in minutes before including newly
+                     inserted drives into the RAID set. The delay allows for multiple drives to be
+                     inserted before the expansion begins. The default is 2 minutes."
+    DEFVAL          { 2 }
+    ::=  {  eqlStorageGroupEntry 7 }
+
+    eqlGroupDefaultLanguage OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION     "This field is deprecated."
+    ::=  {  eqlStorageGroupEntry 8 }
+
+    eqlGroupDefaultSnapshotSize OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to specify by default what percentage of a volume is reserved for SnapShots.
+                     The default is 100%. It can be overriden on a per volume basis.
+                     If a volume, testvol, is 100MB, and the GroupDefaultSnapshotsize is 100%,
+                     than 100MB will reserved for SnapShots of testvol."
+    DEFVAL          { 100 }
+    ::=  {  eqlStorageGroupEntry 9 }
+
+    eqlGroupDefaultSnapshotWarningLevel OBJECT-TYPE
+    SYNTAX          Integer32 (0..100)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to specify by default when the administrator is warned that
+                     the space used for SnapShots close to being exhausted. The default is 20%.
+                     It can be overriden on a per volume basis."
+        DEFVAL      { 20 }
+    ::=  {  eqlStorageGroupEntry 10 }
+
+    eqlGroupDefaultSnapshotDeletePolicy OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                        make-volume-offline(1),
+                        delete-oldest (2),
+                        stop-snapshots (3)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies what should happen when the space reserved for SnapShots is exhuasted.
+                     The default is delete-oldest SnapShot."
+    DEFVAL          { delete-oldest }
+    ::=  {  eqlStorageGroupEntry 11 }
+
+-- NOTE: The eqlGroupTimeZone column is generated by the updatezonedata.py
+-- script.  Do not edit it directly.
+
+    eqlGroupTimeZone    OBJECT-TYPE
+    SYNTAX          INTEGER  {
+		hst(1),
+		ast(2),
+		pst(3),
+		pnt(4),
+		mst(5),
+		cst(6),
+		est(7),
+		iet(8),
+		prt(9),
+		gmt(10),
+		ect(11),
+		eet(12),
+		eat(13),
+		met(14),
+		net(15),
+		plt(16),
+		ist(17),
+		bst(18),
+		vst(19),
+		ctt(20),
+		jst(21),
+		act(22),
+		aet(23),
+		sst(24),
+		nst(25),
+		mit(26),
+		cnt(27),
+		agt(28),
+		bet(29),
+		cat(30),
+		europe-Andorra(31),
+		asia-Dubai(32),
+		asia-Kabul(33),
+		america-Antigua(34),
+		america-Anguilla(35),
+		europe-Tirane(36),
+		asia-Yerevan(37),
+		america-Curacao(38),
+		africa-Luanda(39),
+		antarctica-McMurdo(40),
+		antarctica-South-Pole(41),
+		antarctica-Rothera(42),
+		antarctica-Palmer(43),
+		antarctica-Mawson(44),
+		antarctica-Davis(45),
+		antarctica-Casey(46),
+		antarctica-Vostok(47),
+		antarctica-DumontDUrville(48),
+		antarctica-Syowa(49),
+		america-Argentina-Buenos-Aires(50),
+		america-Argentina-Cordoba(51),
+		america-Argentina-Jujuy(52),
+		america-Argentina-Tucuman(53),
+		america-Argentina-Catamarca(54),
+		america-Argentina-La-Rioja(55),
+		america-Argentina-San-Juan(56),
+		america-Argentina-Mendoza(57),
+		america-Argentina-Rio-Gallegos(58),
+		america-Argentina-Ushuaia(59),
+		pacific-Pago-Pago(60),
+		europe-Vienna(61),
+		australia-Lord-Howe(62),
+		australia-Hobart(63),
+		australia-Currie(64),
+		australia-Melbourne(65),
+		australia-Sydney(66),
+		australia-Broken-Hill(67),
+		australia-Brisbane(68),
+		australia-Lindeman(69),
+		australia-Adelaide(70),
+		australia-Darwin(71),
+		australia-Perth(72),
+		america-Aruba(73),
+		europe-Mariehamn(74),
+		asia-Baku(75),
+		europe-Sarajevo(76),
+		america-Barbados(77),
+		asia-Dhaka(78),
+		europe-Brussels(79),
+		africa-Ouagadougou(80),
+		europe-Sofia(81),
+		asia-Bahrain(82),
+		africa-Bujumbura(83),
+		africa-Porto-Novo(84),
+		atlantic-Bermuda(85),
+		asia-Brunei(86),
+		america-La-Paz(87),
+		america-Noronha(88),
+		america-Belem(89),
+		america-Fortaleza(90),
+		america-Recife(91),
+		america-Araguaina(92),
+		america-Maceio(93),
+		america-Bahia(94),
+		america-Sao-Paulo(95),
+		america-Campo-Grande(96),
+		america-Cuiaba(97),
+		america-Porto-Velho(98),
+		america-Boa-Vista(99),
+		america-Manaus(100),
+		america-Eirunepe(101),
+		america-Rio-Branco(102),
+		america-Nassau(103),
+		asia-Thimphu(104),
+		africa-Gaborone(105),
+		europe-Minsk(106),
+		america-Belize(107),
+		america-St-Johns(108),
+		america-Halifax(109),
+		america-Glace-Bay(110),
+		america-Moncton(111),
+		america-Goose-Bay(112),
+		america-Blanc-Sablon(113),
+		america-Montreal(114),
+		america-Toronto(115),
+		america-Nipigon(116),
+		america-Thunder-Bay(117),
+		america-Pangnirtung(118),
+		america-Iqaluit(119),
+		america-Atikokan(120),
+		america-Rankin-Inlet(121),
+		america-Winnipeg(122),
+		america-Rainy-River(123),
+		america-Cambridge-Bay(124),
+		america-Regina(125),
+		america-Swift-Current(126),
+		america-Edmonton(127),
+		america-Yellowknife(128),
+		america-Inuvik(129),
+		america-Dawson-Creek(130),
+		america-Vancouver(131),
+		america-Whitehorse(132),
+		america-Dawson(133),
+		indian-Cocos(134),
+		africa-Kinshasa(135),
+		africa-Lubumbashi(136),
+		africa-Bangui(137),
+		africa-Brazzaville(138),
+		europe-Zurich(139),
+		africa-Abidjan(140),
+		pacific-Rarotonga(141),
+		america-Santiago(142),
+		pacific-Easter(143),
+		africa-Douala(144),
+		asia-Shanghai(145),
+		asia-Harbin(146),
+		asia-Chongqing(147),
+		asia-Urumqi(148),
+		asia-Kashgar(149),
+		america-Bogota(150),
+		america-Costa-Rica(151),
+		america-Havana(152),
+		atlantic-Cape-Verde(153),
+		indian-Christmas(154),
+		asia-Nicosia(155),
+		europe-Prague(156),
+		europe-Berlin(157),
+		africa-Djibouti(158),
+		europe-Copenhagen(159),
+		america-Dominica(160),
+		america-Santo-Domingo(161),
+		africa-Algiers(162),
+		america-Guayaquil(163),
+		pacific-Galapagos(164),
+		europe-Tallinn(165),
+		africa-Cairo(166),
+		africa-El-Aaiun(167),
+		africa-Asmara(168),
+		europe-Madrid(169),
+		africa-Ceuta(170),
+		atlantic-Canary(171),
+		africa-Addis-Ababa(172),
+		europe-Helsinki(173),
+		pacific-Fiji(174),
+		atlantic-Stanley(175),
+		pacific-Truk(176),
+		pacific-Ponape(177),
+		pacific-Kosrae(178),
+		atlantic-Faroe(179),
+		europe-Paris(180),
+		africa-Libreville(181),
+		europe-London(182),
+		america-Grenada(183),
+		asia-Tbilisi(184),
+		america-Cayenne(185),
+		europe-Guernsey(186),
+		africa-Accra(187),
+		europe-Gibraltar(188),
+		america-Godthab(189),
+		america-Danmarkshavn(190),
+		america-Scoresbysund(191),
+		america-Thule(192),
+		africa-Banjul(193),
+		africa-Conakry(194),
+		america-Guadeloupe(195),
+		africa-Malabo(196),
+		europe-Athens(197),
+		atlantic-South-Georgia(198),
+		america-Guatemala(199),
+		pacific-Guam(200),
+		africa-Bissau(201),
+		america-Guyana(202),
+		asia-Hong-Kong(203),
+		america-Tegucigalpa(204),
+		europe-Zagreb(205),
+		america-Port-au-Prince(206),
+		europe-Budapest(207),
+		asia-Jakarta(208),
+		asia-Pontianak(209),
+		asia-Makassar(210),
+		asia-Jayapura(211),
+		europe-Dublin(212),
+		asia-Jerusalem(213),
+		europe-Isle-of-Man(214),
+		asia-Calcutta(215),
+		indian-Chagos(216),
+		asia-Baghdad(217),
+		asia-Tehran(218),
+		atlantic-Reykjavik(219),
+		europe-Rome(220),
+		europe-Jersey(221),
+		america-Jamaica(222),
+		asia-Amman(223),
+		asia-Tokyo(224),
+		africa-Nairobi(225),
+		asia-Bishkek(226),
+		asia-Phnom-Penh(227),
+		pacific-Tarawa(228),
+		pacific-Enderbury(229),
+		pacific-Kiritimati(230),
+		indian-Comoro(231),
+		america-St-Kitts(232),
+		asia-Pyongyang(233),
+		asia-Seoul(234),
+		asia-Kuwait(235),
+		america-Cayman(236),
+		asia-Almaty(237),
+		asia-Qyzylorda(238),
+		asia-Aqtobe(239),
+		asia-Aqtau(240),
+		asia-Oral(241),
+		asia-Vientiane(242),
+		asia-Beirut(243),
+		america-St-Lucia(244),
+		europe-Vaduz(245),
+		asia-Colombo(246),
+		africa-Monrovia(247),
+		africa-Maseru(248),
+		europe-Vilnius(249),
+		europe-Luxembourg(250),
+		europe-Riga(251),
+		africa-Tripoli(252),
+		africa-Casablanca(253),
+		europe-Monaco(254),
+		europe-Chisinau(255),
+		europe-Podgorica(256),
+		indian-Antananarivo(257),
+		pacific-Majuro(258),
+		pacific-Kwajalein(259),
+		europe-Skopje(260),
+		africa-Bamako(261),
+		asia-Rangoon(262),
+		asia-Ulaanbaatar(263),
+		asia-Hovd(264),
+		asia-Choibalsan(265),
+		asia-Macau(266),
+		pacific-Saipan(267),
+		america-Martinique(268),
+		africa-Nouakchott(269),
+		america-Montserrat(270),
+		europe-Malta(271),
+		indian-Mauritius(272),
+		indian-Maldives(273),
+		africa-Blantyre(274),
+		america-Mexico-City(275),
+		america-Cancun(276),
+		america-Merida(277),
+		america-Monterrey(278),
+		america-Mazatlan(279),
+		america-Chihuahua(280),
+		america-Hermosillo(281),
+		america-Tijuana(282),
+		asia-Kuala-Lumpur(283),
+		asia-Kuching(284),
+		africa-Maputo(285),
+		africa-Windhoek(286),
+		pacific-Noumea(287),
+		africa-Niamey(288),
+		pacific-Norfolk(289),
+		africa-Lagos(290),
+		america-Managua(291),
+		europe-Amsterdam(292),
+		europe-Oslo(293),
+		asia-Katmandu(294),
+		pacific-Nauru(295),
+		pacific-Niue(296),
+		pacific-Auckland(297),
+		pacific-Chatham(298),
+		asia-Muscat(299),
+		america-Panama(300),
+		america-Lima(301),
+		pacific-Tahiti(302),
+		pacific-Marquesas(303),
+		pacific-Gambier(304),
+		pacific-Port-Moresby(305),
+		asia-Manila(306),
+		asia-Karachi(307),
+		europe-Warsaw(308),
+		america-Miquelon(309),
+		pacific-Pitcairn(310),
+		america-Puerto-Rico(311),
+		asia-Gaza(312),
+		europe-Lisbon(313),
+		atlantic-Madeira(314),
+		atlantic-Azores(315),
+		pacific-Palau(316),
+		america-Asuncion(317),
+		asia-Qatar(318),
+		indian-Reunion(319),
+		europe-Bucharest(320),
+		europe-Belgrade(321),
+		europe-Kaliningrad(322),
+		europe-Moscow(323),
+		europe-Volgograd(324),
+		europe-Samara(325),
+		asia-Yekaterinburg(326),
+		asia-Omsk(327),
+		asia-Novosibirsk(328),
+		asia-Krasnoyarsk(329),
+		asia-Irkutsk(330),
+		asia-Yakutsk(331),
+		asia-Vladivostok(332),
+		asia-Sakhalin(333),
+		asia-Magadan(334),
+		asia-Kamchatka(335),
+		asia-Anadyr(336),
+		africa-Kigali(337),
+		asia-Riyadh(338),
+		pacific-Guadalcanal(339),
+		indian-Mahe(340),
+		africa-Khartoum(341),
+		europe-Stockholm(342),
+		asia-Singapore(343),
+		atlantic-St-Helena(344),
+		europe-Ljubljana(345),
+		arctic-Longyearbyen(346),
+		atlantic-Jan-Mayen(347),
+		europe-Bratislava(348),
+		africa-Freetown(349),
+		europe-San-Marino(350),
+		africa-Dakar(351),
+		africa-Mogadishu(352),
+		america-Paramaribo(353),
+		africa-Sao-Tome(354),
+		america-El-Salvador(355),
+		asia-Damascus(356),
+		africa-Mbabane(357),
+		america-Grand-Turk(358),
+		africa-Ndjamena(359),
+		indian-Kerguelen(360),
+		africa-Lome(361),
+		asia-Bangkok(362),
+		asia-Dushanbe(363),
+		pacific-Fakaofo(364),
+		asia-Dili(365),
+		asia-Ashgabat(366),
+		africa-Tunis(367),
+		pacific-Tongatapu(368),
+		europe-Istanbul(369),
+		america-Port-of-Spain(370),
+		pacific-Funafuti(371),
+		asia-Taipei(372),
+		africa-Dar-es-Salaam(373),
+		europe-Kiev(374),
+		europe-Uzhgorod(375),
+		europe-Zaporozhye(376),
+		europe-Simferopol(377),
+		africa-Kampala(378),
+		pacific-Johnston(379),
+		pacific-Midway(380),
+		pacific-Wake(381),
+		america-New-York(382),
+		america-Detroit(383),
+		america-Kentucky-Louisville(384),
+		america-Kentucky-Monticello(385),
+		america-Indiana-Indianapolis(386),
+		america-Indiana-Marengo(387),
+		america-Indiana-Knox(388),
+		america-Indiana-Vevay(389),
+		america-Chicago(390),
+		america-Indiana-Vincennes(391),
+		america-Indiana-Petersburg(392),
+		america-Menominee(393),
+		america-North-Dakota-Center(394),
+		america-North-Dakota-New-Salem(395),
+		america-Denver(396),
+		america-Boise(397),
+		america-Shiprock(398),
+		america-Phoenix(399),
+		america-Los-Angeles(400),
+		america-Anchorage(401),
+		america-Juneau(402),
+		america-Yakutat(403),
+		america-Nome(404),
+		america-Adak(405),
+		pacific-Honolulu(406),
+		america-Montevideo(407),
+		asia-Samarkand(408),
+		asia-Tashkent(409),
+		europe-Vatican(410),
+		america-St-Vincent(411),
+		america-Caracas(412),
+		america-Tortola(413),
+		america-St-Thomas(414),
+		asia-Saigon(415),
+		pacific-Efate(416),
+		pacific-Wallis(417),
+		pacific-Apia(418),
+		asia-Aden(419),
+		indian-Mayotte(420),
+		africa-Johannesburg(421),
+		africa-Lusaka(422),
+		africa-Harare(423),
+		australia-Eucla(424),
+		america-Indiana-Tell-City(425),
+		america-Indiana-Winamac(426),
+		america-Resolute(427),
+		america-Marigot(428),
+		asia-Kolkata(429),
+		asia-Ho-Chi-Minh(430),
+		america-St-Barthelemy(431),
+		america-Argentina-San-Luis(432),
+		america-Santarem(433),
+		america-Argentina-Salta(434),
+		asia-Kathmandu(435),
+		america-Ojinaga(436),
+		america-Santa-Isabel(437),
+		asia-Novokuznetsk(438),
+		america-Matamoros(439),
+		antarctica-Macquarie(440),
+		america-Bahia-Banderas(441),
+		pacific-Pohnpei(442),
+		pacific-Chuuk(443),
+		america-North-Dakota-Beulah(444),
+		america-Metlakatla(445),
+		america-Sitka(446),
+		america-Kralendijk(447),
+		america-Lower-Princes(448),
+		africa-Juba(449),
+		asia-Hebron(450),
+		europe-Tiraspol(451),
+		america-Creston(452),
+		asia-Khandyga(453),
+		europe-Busingen(454),
+		asia-Ust-Nera(455)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     
+                    "
+                     The field specifies the default timezone for the group
+
+		HST (GMT-10:00) Hawaiian Standard Time: Pacific/Honolulu,
+		AST (GMT-09:00) Alaskan Standard Time: America/Anchorage,
+		PST (GMT-08:00) Pacific  Standard Time: America/Los_Angeles,
+		PNT (GMT-07:00) America/Phoenix,
+		MST (GMT-07:00) US Mountain Standard Time: America/Denver,
+		CST (GMT-06:00) Central  Standard Time: America/Chicago,
+		EST (GMT-05:00) Eastern  Standard Time: America/New_York,
+		IET (GMT-05:00) America/Indiana/Indianapolis,
+		PRT (GMT-04:00) Atlantic Standard Time: America/Halifax,
+		GMT (GMT-00:00) Greenwich Mean Time: GMT,
+		ECT (GMT+01:00) Romance Standard Time: Europe/Paris,
+		EET (GMT+02:00) Egypt Standard Time: Africa/Cairo,
+		EAT (GMT+03:00) Saudi Arabia Standard Time: Asia/Riyadh,
+		MET (GMT+03:30) Iran Standard Time: Asia/Tehran,
+		NET (GMT+04:00) Arabian Standard Time: Asia/Yerevan,
+		PLT (GMT+05:00) West Asia Standard Time: Asia/Karachi,
+		IST (GMT+05:30) India Standard Time: Asia/Calcutta,
+		BST (GMT+06:00) Central Asia Standard Time: Asia/Dacca,
+		VST (GMT+07:00) Bangkok Standard Time: Asia/Bangkok,
+		CTT (GMT+08:00) China Standard Time: Asia/Shanghai,
+		JST (GMT+09:00) Tokyo Standard Time: Asia/Tokyo,
+		ACT (GMT+09:30) Cen. Australia Standard Time: Australia/Darwin,
+		AET (GMT+10:00) Sydney Standard Time: Australia/Sydney,
+		SST (GMT+11:00) Central Pacific Standard Time: Pacific/Guadalcanal,
+		NST (GMT+12:00) New Zealand Standard Time: Pacific/Fiji,
+		MIT (GMT+13:00) Samoa Standard Time: Pacific/Apia,
+		CNT (GMT-03:30) Newfoundland Standard Time: America/St_Johns,
+		AGT (GMT-03:00) SA Eastern Standard Time: America/Buenos_Aires,
+		BET (GMT-03:00) E South America Standard Time: America/Sao_Paulo,
+		CAT (GMT-01:00) Azores Standard Time: Atlantic/Cape_Verde,
+		Europe/Andorra,
+		Asia/Dubai,
+		Asia/Kabul,
+		America/Antigua,
+		America/Anguilla,
+		Europe/Tirane,
+		Asia/Yerevan,
+		America/Curacao,
+		Africa/Luanda,
+		Antarctica/McMurdo,
+		Antarctica/South_Pole,
+		Antarctica/Rothera,
+		Antarctica/Palmer,
+		Antarctica/Mawson,
+		Antarctica/Davis,
+		Antarctica/Casey,
+		Antarctica/Vostok,
+		Antarctica/DumontDUrville,
+		Antarctica/Syowa,
+		America/Argentina/Buenos_Aires,
+		America/Argentina/Cordoba,
+		America/Argentina/Jujuy,
+		America/Argentina/Tucuman,
+		America/Argentina/Catamarca,
+		America/Argentina/La_Rioja,
+		America/Argentina/San_Juan,
+		America/Argentina/Mendoza,
+		America/Argentina/Rio_Gallegos,
+		America/Argentina/Ushuaia,
+		Pacific/Pago_Pago,
+		Europe/Vienna,
+		Australia/Lord_Howe,
+		Australia/Hobart,
+		Australia/Currie,
+		Australia/Melbourne,
+		Australia/Sydney,
+		Australia/Broken_Hill,
+		Australia/Brisbane,
+		Australia/Lindeman,
+		Australia/Adelaide,
+		Australia/Darwin,
+		Australia/Perth,
+		America/Aruba,
+		Europe/Mariehamn,
+		Asia/Baku,
+		Europe/Sarajevo,
+		America/Barbados,
+		Asia/Dhaka,
+		Europe/Brussels,
+		Africa/Ouagadougou,
+		Europe/Sofia,
+		Asia/Bahrain,
+		Africa/Bujumbura,
+		Africa/Porto-Novo,
+		Atlantic/Bermuda,
+		Asia/Brunei,
+		America/La_Paz,
+		America/Noronha,
+		America/Belem,
+		America/Fortaleza,
+		America/Recife,
+		America/Araguaina,
+		America/Maceio,
+		America/Bahia,
+		America/Sao_Paulo,
+		America/Campo_Grande,
+		America/Cuiaba,
+		America/Porto_Velho,
+		America/Boa_Vista,
+		America/Manaus,
+		America/Eirunepe,
+		America/Rio_Branco,
+		America/Nassau,
+		Asia/Thimphu,
+		Africa/Gaborone,
+		Europe/Minsk,
+		America/Belize,
+		America/St_Johns,
+		America/Halifax,
+		America/Glace_Bay,
+		America/Moncton,
+		America/Goose_Bay,
+		America/Blanc-Sablon,
+		America/Montreal,
+		America/Toronto,
+		America/Nipigon,
+		America/Thunder_Bay,
+		America/Pangnirtung,
+		America/Iqaluit,
+		America/Atikokan,
+		America/Rankin_Inlet,
+		America/Winnipeg,
+		America/Rainy_River,
+		America/Cambridge_Bay,
+		America/Regina,
+		America/Swift_Current,
+		America/Edmonton,
+		America/Yellowknife,
+		America/Inuvik,
+		America/Dawson_Creek,
+		America/Vancouver,
+		America/Whitehorse,
+		America/Dawson,
+		Indian/Cocos,
+		Africa/Kinshasa,
+		Africa/Lubumbashi,
+		Africa/Bangui,
+		Africa/Brazzaville,
+		Europe/Zurich,
+		Africa/Abidjan,
+		Pacific/Rarotonga,
+		America/Santiago,
+		Pacific/Easter,
+		Africa/Douala,
+		Asia/Shanghai,
+		Asia/Harbin,
+		Asia/Chongqing,
+		Asia/Urumqi,
+		Asia/Kashgar,
+		America/Bogota,
+		America/Costa_Rica,
+		America/Havana,
+		Atlantic/Cape_Verde,
+		Indian/Christmas,
+		Asia/Nicosia,
+		Europe/Prague,
+		Europe/Berlin,
+		Africa/Djibouti,
+		Europe/Copenhagen,
+		America/Dominica,
+		America/Santo_Domingo,
+		Africa/Algiers,
+		America/Guayaquil,
+		Pacific/Galapagos,
+		Europe/Tallinn,
+		Africa/Cairo,
+		Africa/El_Aaiun,
+		Africa/Asmara,
+		Europe/Madrid,
+		Africa/Ceuta,
+		Atlantic/Canary,
+		Africa/Addis_Ababa,
+		Europe/Helsinki,
+		Pacific/Fiji,
+		Atlantic/Stanley,
+		Pacific/Truk,
+		Pacific/Ponape,
+		Pacific/Kosrae,
+		Atlantic/Faroe,
+		Europe/Paris,
+		Africa/Libreville,
+		Europe/London,
+		America/Grenada,
+		Asia/Tbilisi,
+		America/Cayenne,
+		Europe/Guernsey,
+		Africa/Accra,
+		Europe/Gibraltar,
+		America/Godthab,
+		America/Danmarkshavn,
+		America/Scoresbysund,
+		America/Thule,
+		Africa/Banjul,
+		Africa/Conakry,
+		America/Guadeloupe,
+		Africa/Malabo,
+		Europe/Athens,
+		Atlantic/South_Georgia,
+		America/Guatemala,
+		Pacific/Guam,
+		Africa/Bissau,
+		America/Guyana,
+		Asia/Hong_Kong,
+		America/Tegucigalpa,
+		Europe/Zagreb,
+		America/Port-au-Prince,
+		Europe/Budapest,
+		Asia/Jakarta,
+		Asia/Pontianak,
+		Asia/Makassar,
+		Asia/Jayapura,
+		Europe/Dublin,
+		Asia/Jerusalem,
+		Europe/Isle_of_Man,
+		Asia/Calcutta,
+		Indian/Chagos,
+		Asia/Baghdad,
+		Asia/Tehran,
+		Atlantic/Reykjavik,
+		Europe/Rome,
+		Europe/Jersey,
+		America/Jamaica,
+		Asia/Amman,
+		Asia/Tokyo,
+		Africa/Nairobi,
+		Asia/Bishkek,
+		Asia/Phnom_Penh,
+		Pacific/Tarawa,
+		Pacific/Enderbury,
+		Pacific/Kiritimati,
+		Indian/Comoro,
+		America/St_Kitts,
+		Asia/Pyongyang,
+		Asia/Seoul,
+		Asia/Kuwait,
+		America/Cayman,
+		Asia/Almaty,
+		Asia/Qyzylorda,
+		Asia/Aqtobe,
+		Asia/Aqtau,
+		Asia/Oral,
+		Asia/Vientiane,
+		Asia/Beirut,
+		America/St_Lucia,
+		Europe/Vaduz,
+		Asia/Colombo,
+		Africa/Monrovia,
+		Africa/Maseru,
+		Europe/Vilnius,
+		Europe/Luxembourg,
+		Europe/Riga,
+		Africa/Tripoli,
+		Africa/Casablanca,
+		Europe/Monaco,
+		Europe/Chisinau,
+		Europe/Podgorica,
+		Indian/Antananarivo,
+		Pacific/Majuro,
+		Pacific/Kwajalein,
+		Europe/Skopje,
+		Africa/Bamako,
+		Asia/Rangoon,
+		Asia/Ulaanbaatar,
+		Asia/Hovd,
+		Asia/Choibalsan,
+		Asia/Macau,
+		Pacific/Saipan,
+		America/Martinique,
+		Africa/Nouakchott,
+		America/Montserrat,
+		Europe/Malta,
+		Indian/Mauritius,
+		Indian/Maldives,
+		Africa/Blantyre,
+		America/Mexico_City,
+		America/Cancun,
+		America/Merida,
+		America/Monterrey,
+		America/Mazatlan,
+		America/Chihuahua,
+		America/Hermosillo,
+		America/Tijuana,
+		Asia/Kuala_Lumpur,
+		Asia/Kuching,
+		Africa/Maputo,
+		Africa/Windhoek,
+		Pacific/Noumea,
+		Africa/Niamey,
+		Pacific/Norfolk,
+		Africa/Lagos,
+		America/Managua,
+		Europe/Amsterdam,
+		Europe/Oslo,
+		Asia/Katmandu,
+		Pacific/Nauru,
+		Pacific/Niue,
+		Pacific/Auckland,
+		Pacific/Chatham,
+		Asia/Muscat,
+		America/Panama,
+		America/Lima,
+		Pacific/Tahiti,
+		Pacific/Marquesas,
+		Pacific/Gambier,
+		Pacific/Port_Moresby,
+		Asia/Manila,
+		Asia/Karachi,
+		Europe/Warsaw,
+		America/Miquelon,
+		Pacific/Pitcairn,
+		America/Puerto_Rico,
+		Asia/Gaza,
+		Europe/Lisbon,
+		Atlantic/Madeira,
+		Atlantic/Azores,
+		Pacific/Palau,
+		America/Asuncion,
+		Asia/Qatar,
+		Indian/Reunion,
+		Europe/Bucharest,
+		Europe/Belgrade,
+		Europe/Kaliningrad,
+		Europe/Moscow,
+		Europe/Volgograd,
+		Europe/Samara,
+		Asia/Yekaterinburg,
+		Asia/Omsk,
+		Asia/Novosibirsk,
+		Asia/Krasnoyarsk,
+		Asia/Irkutsk,
+		Asia/Yakutsk,
+		Asia/Vladivostok,
+		Asia/Sakhalin,
+		Asia/Magadan,
+		Asia/Kamchatka,
+		Asia/Anadyr,
+		Africa/Kigali,
+		Asia/Riyadh,
+		Pacific/Guadalcanal,
+		Indian/Mahe,
+		Africa/Khartoum,
+		Europe/Stockholm,
+		Asia/Singapore,
+		Atlantic/St_Helena,
+		Europe/Ljubljana,
+		Arctic/Longyearbyen,
+		Atlantic/Jan_Mayen,
+		Europe/Bratislava,
+		Africa/Freetown,
+		Europe/San_Marino,
+		Africa/Dakar,
+		Africa/Mogadishu,
+		America/Paramaribo,
+		Africa/Sao_Tome,
+		America/El_Salvador,
+		Asia/Damascus,
+		Africa/Mbabane,
+		America/Grand_Turk,
+		Africa/Ndjamena,
+		Indian/Kerguelen,
+		Africa/Lome,
+		Asia/Bangkok,
+		Asia/Dushanbe,
+		Pacific/Fakaofo,
+		Asia/Dili,
+		Asia/Ashgabat,
+		Africa/Tunis,
+		Pacific/Tongatapu,
+		Europe/Istanbul,
+		America/Port_of_Spain,
+		Pacific/Funafuti,
+		Asia/Taipei,
+		Africa/Dar_es_Salaam,
+		Europe/Kiev,
+		Europe/Uzhgorod,
+		Europe/Zaporozhye,
+		Europe/Simferopol,
+		Africa/Kampala,
+		Pacific/Johnston,
+		Pacific/Midway,
+		Pacific/Wake,
+		America/New_York,
+		America/Detroit,
+		America/Kentucky/Louisville,
+		America/Kentucky/Monticello,
+		America/Indiana/Indianapolis,
+		America/Indiana/Marengo,
+		America/Indiana/Knox,
+		America/Indiana/Vevay,
+		America/Chicago,
+		America/Indiana/Vincennes,
+		America/Indiana/Petersburg,
+		America/Menominee,
+		America/North_Dakota/Center,
+		America/North_Dakota/New_Salem,
+		America/Denver,
+		America/Boise,
+		America/Shiprock,
+		America/Phoenix,
+		America/Los_Angeles,
+		America/Anchorage,
+		America/Juneau,
+		America/Yakutat,
+		America/Nome,
+		America/Adak,
+		Pacific/Honolulu,
+		America/Montevideo,
+		Asia/Samarkand,
+		Asia/Tashkent,
+		Europe/Vatican,
+		America/St_Vincent,
+		America/Caracas,
+		America/Tortola,
+		America/St_Thomas,
+		Asia/Saigon,
+		Pacific/Efate,
+		Pacific/Wallis,
+		Pacific/Apia,
+		Asia/Aden,
+		Indian/Mayotte,
+		Africa/Johannesburg,
+		Africa/Lusaka,
+		Africa/Harare,
+		Australia/Eucla,
+		America/Indiana/Tell_City,
+		America/Indiana/Winamac,
+		America/Resolute,
+		America/Marigot,
+		Asia/Kolkata,
+		Asia/Ho_Chi_Minh,
+		America/St_Barthelemy,
+		America/Argentina/San_Luis,
+		America/Santarem,
+		America/Argentina/Salta,
+		Asia/Kathmandu,
+		America/Ojinaga,
+		America/Santa_Isabel,
+		Asia/Novokuznetsk,
+		America/Matamoros,
+		Antarctica/Macquarie,
+		America/Bahia_Banderas,
+		Pacific/Pohnpei,
+		Pacific/Chuuk,
+		America/North_Dakota/Beulah,
+		America/Metlakatla,
+		America/Sitka,
+		America/Kralendijk,
+		America/Lower_Princes,
+		Africa/Juba,
+		Asia/Hebron,
+		Europe/Tiraspol,
+		America/Creston,
+		Asia/Khandyga,
+		Europe/Busingen,
+		Asia/Ust-Nera "
+    
+    DEFVAL          { est }
+    ::=  {  eqlStorageGroupEntry 13 }
+
+    eqlGroupLogLevel    OBJECT-TYPE
+    SYNTAX              Integer32   
+    MAX-ACCESS          read-write
+    STATUS              current
+    DESCRIPTION         "This field specifies the loglevel for the group.  The log level 
+                         determines which messages are written to the console.
+                         The following levels are supported. The value of 
+                         this object will be an OR of the values associated
+                         with each level.
+                           
+                            LEVEL                VALUE
+                           -------              -------
+                            INFO                  0x04
+                            WARNING               0x08
+                            ERROR                 0x10
+                            FATAL                 0x20
+			    DIAG                  0x40
+                            AUDIT                 0x80
+                        Default value is 
+                              INFO|WARNING|ERROR|FATAL 
+                             = 0x04|0x08|0x10|0x20| = 0x3c = 60
+                        "
+    DEFVAL              { 60 }
+    ::=  {  eqlStorageGroupEntry 14 }
+
+    eqlGroupDescription OBJECT-TYPE
+    SYNTAX          UTFString(SIZE(0..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field contains a use supplied description for the group. There is no default. "
+    ::=  {  eqlStorageGroupEntry 15 }
+
+    eqlGroupIscsiNamePrefix     OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the prefix for the iSCSI target names.
+                     The default is iqn.2001-04.com.equallogic. This can be overriden on a per volume basis.
+                     However the name must conform to the iSCSI Specification."
+    DEFVAL          { "iqn.2001-04.com.equallogic." }
+    ::=  {  eqlStorageGroupEntry 16 }
+
+    eqlGroupDefaultAliasToVolumeName    OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to default the iSCSI alias to the name of the volume.
+                     This can be overriden on a per volume basis.
+                     The default is to set the iSCSI alias to the volume name."
+    DEFVAL           { true }
+    ::=  {  eqlStorageGroupEntry 17 }
+
+    eqlGroupEmailSrcDomain   OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the SNMP domain name used in the FROM email address in 
+                     generated email. e.g., everything after @ in foo@equallogic.com ."
+    ::=  {  eqlStorageGroupEntry 18 }
+
+    eqlGroupName OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the Well Known Name for the group.
+                     It must be a name which is resolvable by DNS. There is no default for Group Name."
+    ::=  {  eqlStorageGroupEntry 19 }
+
+    eqlGroupIpAddr  OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStorageGroupEntry 20 }
+
+    eqlGroupEnableWebAccessSSL      OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to allow web access to the group using https.
+                     The default is TRUE."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 21 }
+
+    eqlGroupEnableWebAccessUnsecure OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to allow web access to the group using http.
+                     The default is TRUE."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 22 }
+
+    eqlGroupEnableCliAccessSSH  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to allow ssh access to the group.
+                     The default is TRUE."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 23 }
+
+    eqlGroupEnableCliAccessUnsecure OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to allow telnet access to the group.
+                     The default is FALSE."
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 24 }
+
+    eqlGroupEnableEmailNotifications OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to specify whether to notify administrators on alarms via email.
+                     The default is FALSE."
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 25 }
+
+    eqlGroupEnableSNMPTraps  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to specify whether to notify administrators on alarms via SNMP TRAPS.
+                     The default is FALSE."
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 26 }
+
+    eqlGroupEnableSyslog OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to specify whether to notify administrators on alarms via syslog.
+                     The default is FALSE."
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 27 }
+
+    eqlGroupEmailPriorityMask  OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to configure the type of events to be sent in email notifications.
+                     The following type of events are supported.
+                            info(4),
+                            warning(8),
+                            error(16),
+                            fatal(32)
+                     More than one type of event can be specified by adding the correspodning values.
+                     Ex: To specify warning,error,fatal the value can be set to 8+16+32 = 56.
+                     Setting this field to zero results in sending no events using email notification.
+                     "
+    ::=  {  eqlStorageGroupEntry 28}
+
+    eqlGroupSNMPPriorityMask  OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION     "This field is currently not being used."
+    ::=  {  eqlStorageGroupEntry 29}
+
+    eqlGroupSysLogPriorityMask OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to configure the type of events to be sent in syslog notifications.
+                     The following type of events are supported.
+                            info(4),
+                            warning(8),
+                            error(16),
+                            fatal(32)
+                     More than one type of event can be specified by adding the correspodning values.
+                     Ex: To specify warning,error,fatal the value can be set to 8+16+32 = 56.
+                     Setting this field to zero results in sending no events using syslog notification.
+                     "
+    ::=  {  eqlStorageGroupEntry 30}
+
+    eqlGroupDefaultSite     OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-write
+    STATUS          current
+     DESCRIPTION    "This field specifies the site where the volume resides.
+                     Sites are defined on a per array basis.
+                     Sites are used to define where primary and secondary copies of volume mirror reside.
+                     The default is the default site. This means that the location of the volume is unrestricted."
+        DEFVAL       { "default" }
+    ::=  {  eqlStorageGroupEntry 31 }
+
+    eqlGroupPasswd1     OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(1..64)) -- was DisplayString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     " An octet string containing the password to authenticate
+                      members joining the group.
+                      If written, it changes the password for
+                      the account.  If read, it returns a zero-length string."
+    --DEFAULT       cookie "secure"
+    ::=  {  eqlStorageGroupEntry 32 }
+
+
+    eqlGroupPasswd2     OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field is deprecated."
+    ::=  {  eqlStorageGroupEntry 33 }
+
+    eqlGroupRowStatus   OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Rowstatus"
+    ::=  {  eqlStorageGroupEntry 34 }
+
+    eqlGroupObjectReuseScrub   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    disabled(0),
+                    enabled(1)
+     }
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     "If enabled, an object is zeroed out before reuse so that the new entity using the object will not be aware of the old contents of the object.
+                     This field is deprecated and is unsupported from 7.0." 
+    DEFVAL          {enabled}
+    ::=  {  eqlStorageGroupEntry 35 }
+
+    eqlGroupEnableSSH      OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 36 }
+
+    eqlGroupEnableTelnet      OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 37 }
+
+    eqlGroupEnableFTP      OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to allow ftp access to the group.
+                     The default is TRUE."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 38 }
+
+    eqlGroupEmailSrcUserName   OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies user portion of the FROM email address used in generated
+                     email. e.g., everything before @ in foo@equallogic.com ."
+    ::=  {  eqlStorageGroupEntry 39 }
+
+    eqlGroupSyslogFacility   OBJECT-TYPE
+    SYNTAX          INTEGER {
+-- Actual facility values are these values minus 1. This is to enable a value of 0 to
+-- mean "default" and not "kern"
+                        default(0),
+                        kern(1),
+                        user(2),
+                        mail(3),
+                        daemon(4),
+                        auth(5),
+                        syslog(6),
+                        lpr(7),
+                        news(8),
+                        uucp(9),
+                        cron(10),
+                        authpriv(11),
+                        ftp(12),
+                        local0(17),
+                        local1(18),
+                        local2(19),
+                        local3(20),
+                        local4(21),
+                        local5(22),
+                        local6(23),
+                        local7(24)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the facility code which you would like applied
+                     to all eqllog messages that are targeted at syslog."
+    ::=  {  eqlStorageGroupEntry 40 }
+
+
+    eqlGroupEnableCLB      OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to turn on Connection Load balancer.
+                     The default is TRUE."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 41 }
+
+    eqlGroupEnableVolBal   OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to turn on volume balancing.
+                     The default is TRUE."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 42 }
+
+    eqlGroupDiscoveryFilter   OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "If set to true,  the list of volumes returned 
+                     during discovery is filtered based on 
+                     chap configuration in volume ACLs.
+                     The default is FALSE."
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 43 }
+
+    eqlGroupEmailSupportContact OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..255))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the customer email address for support
+                     to contact in the event of a system failure.  Configuring
+                     this field will enable each member to send an e-mail to
+                     this address and customer support in the event of a critical
+                     hardware failure."
+    ::=  {  eqlStorageGroupEntry 44 }
+
+    eqlGroupReplicationWindowSize OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    UNITS           "KB"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the receiving window size of the tcp connection established to secondary site
+                     during replication data transfer. Minimum value is 72KB.Maximum value is 2048KB."
+    DEFVAL          { 72 }
+    ::=  {  eqlStorageGroupEntry 45 }
+
+    eqlGroupConfigurationFlags OBJECT-TYPE
+    SYNTAX          BITS { 
+                        cluster-pr-flag(0), -- use SPC-3 draft 9 for persistent reservation
+                        ignore-group-conn(1), -- ignore the limit on groupwide iSCSI connections
+                        array-restart-flag(2), -- array restart flag
+                        repl-use-jumbos(3), -- use jumbo frames for replication 0-yes 1-no
+                        force-SCSI-QErr-OldBehavior(4), -- deprecated by per-volume QErr settings
+                        dcb-disable(5), -- set to disable the switch from Data Center Bridging Mode
+                        lldp-vlanidneg-disable(6), -- set to disable vlan id negotiation via LLDP
+                        mpio-dynamic-scaling-mask0(7), -- Set in combination with -mask1...
+                        unmap-disable(8), -- set to disable the unmap feature
+                        mpio-dynamic-scaling-mask1(9), -- ...to enable/disable/minimize mpio dyn scaling
+                        volume-fix-run(10), -- volume fix algorithm has run
+                        sacl-disable(11), -- Super-ACLs disable (V13 only)
+                        flag12(12),
+                        flag13(13),
+                        flag14(14),
+                        flag15(15),
+                        flag16(16),
+                        flag17(17),
+                        flag18(18),
+                        flag19(19),
+                        flag20(20),
+                        flag21(21),
+                        flag22(22),
+                        flag23(23),
+                        flag24(24),
+                        flag25(25),
+                        flag26(26),
+                        flag27(27),
+                        flag28(28),
+                        flag29(29),
+                        flag30(30),
+                        flag31(31)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field defines the common place holder for group wide configuration flag. The flags must be of type
+                     enable(1) or disable(0). and the default value will always be disable(0)."
+    ::=  {  eqlStorageGroupEntry 46 }
+
+   eqlGroupISCSIPortalGrpTag       OBJECT-TYPE
+    SYNTAX          INTEGER {
+               notConfigured(0),
+               configuredAndSetToZero(8),
+               configuredAndSetToOne(9)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A flag used internally by the iSCSI subsystem to determine the upgrade
+                     history of this storage group and infer the default iSCSI Target Portal
+                     Group ID. This value is changed internally by the group management daemon
+                     as members are added or upgraded such that the value is non zero if any
+                     group member has been previously configured with firmware prior to 2.3.6"
+    DEFVAL          { notConfigured }
+    ::=  {  eqlStorageGroupEntry 47 }
+
+   eqlGroupMaxConcurrentReplicas OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of replications that are transferring data at one time.  The minimum
+    value is 1, the maximum value is 16, and the default value is 16."
+    DEFVAL          { 16 }
+    ::=  {  eqlStorageGroupEntry 48 }
+
+
+   eqlGroupDefaultThinWarn OBJECT-TYPE
+    SYNTAX          Unsigned32(1..100)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The default eqliscsiVolumeThinWarnPercentage value used when creating thin provisoned volumes."
+    DEFVAL          { 60 }
+    ::=  {  eqlStorageGroupEntry 49 }
+
+   eqlGroupDefaultThinMaxGrow OBJECT-TYPE
+    SYNTAX          Unsigned32(1..100)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The default eqliscsiVolumeThinMaxGrowPercentage value used when creating thin provisoned volumes."
+    DEFVAL          { 100 }
+    ::=  {  eqlStorageGroupEntry 50 }
+
+    eqlGroupDefaultMgmtGatewayIpAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to indicate the default gateway for the management network.
+                     This field contains the address of the local router used to forward network
+                     traffic beyond the local management subnet.
+                     Gateways are used to connect multiple subnets. There is no default value for this entry."
+
+    ::=  {  eqlStorageGroupEntry 51 }
+
+    eqlGroupDefaultMgmtGatewayIpAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to indicate the default gateway for the management network.
+                     This field contains the address of the local router used to forward network
+                     traffic beyond the local management subnet.
+                     Gateways are used to connect multiple subnets. There is no default value for this entry."
+    ::=  {  eqlStorageGroupEntry 52 }
+
+    eqlGroupInet6AddrType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the type of the IPv6 Well Known Address for the group.
+                     This is the IPv6 address iSCSI Initiators will used to connect to the group."
+    DEFVAL          { 2 }
+    ::=  {  eqlStorageGroupEntry 53 }
+
+    eqlGroupInet6Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the IPv6 Well Known Address for the group.
+                     This is the IPv6 address iSCSI Initiators will used to connect to the group.
+                     There is no default value for this field."
+    ::=  {  eqlStorageGroupEntry 54 }
+
+
+    eqlGroupInetAddrType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the type of the IPv4 Well Known Address for the group.
+                     This is the IPv4 address iSCSI Initiators will used to connect to the group."
+    DEFVAL          { 1 }
+    ::=  {  eqlStorageGroupEntry 55 }
+
+    eqlGroupInetAddr  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the IPv4 Well Known Address for the group.
+                     This is the IPv4 address iSCSI Initiators will used to connect to the group.
+                     There is no default value for this field."
+    ::=  {  eqlStorageGroupEntry 56 }
+
+
+    eqlGroupSupportSlowSwitch  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        off (0),
+                        automatic (1),
+                        on (2)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is used to indicate 
+                     the slow switch support for the group."
+    DEFVAL          { off }
+    ::=  {  eqlStorageGroupEntry 57 }
+
+    eqlGroupProfileIndex  OBJECT-TYPE
+    SYNTAX          Unsigned32(1..4294967295)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field represents the profile identifier."
+    DEFVAL          { 1 }
+    ::=  {  eqlStorageGroupEntry 58 }
+
+    eqlGroupEnableSSHProtocolV1  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not the SSH service should support the V1 Protocol.
+                     The default is TRUE."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 59 }
+
+    eqlGroupEnableStandbyButton  OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies if the standby button on the Pirates/Porfidio 
+                     enclosures will be enabled/disabled. The default is FALSE."
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 60 }
+
+    eqlGroupLDAPLoginAuthEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables LDAP login authentication."
+    DEFVAL          { false }
+    ::=  {  eqlStorageGroupEntry 61 }
+
+    eqlGroupApplianceDiscovery   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        discover (0)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     ""
+    DEFVAL          { discover }
+    ::=  {  eqlStorageGroupEntry 62 }
+
+    eqlGroupDefaultDcbVlanId   OBJECT-TYPE
+    SYNTAX          Unsigned32(0..4095) 
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Default VLAN ID for DCB control packets on interfaces."
+    DEFVAL          { 2 }
+    ::=  {  eqlStorageGroupEntry 63 }
+
+    eqlGroupThermalShutdownOverride OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        disabled (0),
+			enabled  (1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether thermal shutdownn override is enabled or disabled."
+    DEFVAL          { disabled }
+    ::=  {  eqlStorageGroupEntry 64 }
+
+    eqlGroupEnableLegacyCryptos OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enabled   (0),
+                        disabled  (1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether legacy crypto protocols should be enabled or not.  This affects what protocols should be supported by applications such as SSH server, HTTPS server, LDAP client, SNMPv3 agent, etc."
+    DEFVAL          { enabled }
+    ::=  {  eqlStorageGroupEntry 65 }
+
+    eqlGroupMaxReplSegments OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of replica segments of 256K size per volume that are transferring data at one time.  The minimum value is 1, the maximum value is 60, and the default value is 60."
+    DEFVAL          { 60 }
+    ::=  {  eqlStorageGroupEntry 66 }
+
+    eqlGroupEnableVolumeRecovery OBJECT-TYPE
+    SYNTAX           TruthValue
+    MAX-ACCESS       read-write
+    STATUS           current
+    DESCRIPTION      "This field specifies whether or not the recoverable volume feature is enabled.
+                      The default value is enabled."
+    DEFVAL           { true }
+    ::=  {  eqlStorageGroupEntry 67 }
+
+    eqlGroupSessionIdleTimeout OBJECT-TYPE
+    SYNTAX          Integer32(1..1440)
+    UNITS           "minutes"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This is the number of minutes a session may remain idle before being logged out for inactivty. The maximum timeout value is 24 hours or 1440 minutes. The minimum value is 1 minute. The default value is 30 minutes."
+    DEFVAL          { 30 }
+    ::=  {  eqlStorageGroupEntry 68 }
+
+    eqlGroupSessionIdleTimeoutEnable OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        disabled  (0),
+                        enabled   (1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/disable the idle session timeout feature. The default is disabled."
+    DEFVAL          { disabled }
+    ::=  {  eqlStorageGroupEntry 69 }
+
+    eqlGroupSessionBannerEnable OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        disabled  (0),
+                        enabled   (1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/disable the session banner feature. The default is disabled."
+    DEFVAL          { disabled }
+    ::=  {  eqlStorageGroupEntry 70 }
+
+    eqlGroupDefaultVolSnapshotBorrowEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field allows the user a way to change the default behavior of snapshot borrowing on new volume creates across the group."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 71 }
+
+    eqlGroupRecoveryLifeTimeEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables or disables the lifetime that a deleted volume can remain in the recovery bin.
+                     When enabled, a volume will be permanently deleted after the recovery lifetime in the recovery bin."
+    DEFVAL          { true }
+    ::=  {  eqlStorageGroupEntry 72 }
+
+    eqlGroupRecoveryLifeTime OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field defines the amount of time (in seconds) that a deleted volume can remain in the
+                     recovery bin before being permanently deleted by the system.  The default value (0) is
+                     one week."
+    DEFVAL          { 0 }
+    ::=  {  eqlStorageGroupEntry 73 }
+
+    eqlGroupTimeProtocol OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the active network time protocol.  The value may be ntp(0) or sntp(1) with a default value of ntp(0)."
+    DEFVAL          { 0 }
+    ::=  {  eqlStorageGroupEntry 74 }
+
+    eqlGroupRecoveryTrimmerFreq OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field defines the frequency (in seconds) that the system will scan for volumes that have
+                     been in the recovery bin past their lifetime.  The default value is one scan every 24 hours."
+    DEFVAL          { 86400 }
+    ::=  {  eqlStorageGroupEntry 75 }
+
+    eqlGroupUpdateEnable OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enabled     (0),
+                        disabled    (1)
+    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/disable update available checking."
+    DEFVAL          { disabled }
+    ::=  {  eqlStorageGroupEntry 76 }
+
+    eqlGroupUpdateLast OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The time of last update performed  represented as the number of
+                     seconds since the epoch."
+    ::=  {  eqlStorageGroupEntry 77 }
+
+    eqlGroupDefaultSectorSize OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                        sector-size-512-bytes(0),
+                        sector-size-4096-bytes(1)
+    }         
+    MAX-ACCESS      read-create      
+    STATUS          current   
+    DESCRIPTION     "This field specifies, in bytes, the default volume sector size for this group." 
+    DEFVAL          { sector-size-512-bytes }
+    ::=   { eqlStorageGroupEntry 78 } 
+
+    eqlGroupCompressionScanFreq OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This index is the last assigned index value associated with VVol Volumes."
+    DEFVAL          { 60 }
+    ::=  {  eqlStorageGroupEntry 80 }
+
+    eqlGroupRunCompressionScan OBJECT-TYPE
+    SYNTAX          INTEGER { enabled (0), disabled(1) }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable/Disable the snapshot compression scanner."
+    DEFVAL          { enabled }
+    ::=  {  eqlStorageGroupEntry 81 }
+
+    eqlGroupMonitorReminderTimestamp OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "UTC timestamp when to display the monitoring connection reminder. 0 to
+                     display immediately.  0x7fffffff to never display."
+    DEFVAL          { 0 }
+    ::=  {  eqlStorageGroupEntry 82 }
+                       
+--***********************************************************************************
+eqlStorageGroupStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Group Status Table"
+    ::=  {  eqlgroupObjects  2}
+
+eqlStorageGroupStatusEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing Group status information."
+    INDEX           { eqlGroupId}
+    ::=    { eqlStorageGroupStatusTable 1 }
+
+EqlStorageGroupStatusEntry ::=
+    SEQUENCE {
+        eqlStorageGroupStatusPoolSpace              Integer32,
+        eqlStorageGroupStatusPoolSpaceUsed          Integer32,
+        eqlStorageGroupStatusTotalMembersOnLine     Integer32,
+        eqlStorageGroupStatusPoolSpaceReserved      Integer32,
+        eqlStorageGroupStatusReservedSpaceInUse     Integer32,
+        eqlStorageGroupStatusDateAndTime            Unsigned32,
+        eqlStorageGroupStatusSnapshotsInUse         Integer32,
+        eqlStorageGroupStatusVolumesInUse           Integer32,
+        eqlStorageGroupStatusSnapshotsOnline        Integer32,
+        eqlStorageGroupStatusVolumesOnline          Integer32,
+        eqlStorageGroupStatusSnapshotCount          Integer32,
+        eqlStorageGroupStatusVolumeCount            Integer32,
+        eqlStorageGroupStatusMemberCount            Integer32,
+        eqlStorageGroupStatusMembersInUse           Integer32,
+        eqlStorageGroupStatusFreeSpace              Integer32,
+        eqlStorageGroupStatusPoolSpaceDelegated     Integer32,
+        eqlStorageGroupStatusDelegatedUsedSpace     Integer32,
+        eqlStorageGroupStatusReplReserveSpace       Unsigned32,
+        eqlStorageGroupStatusReplReserveInUse       Unsigned32,
+        eqlStorageGroupStatusVolumeSpaceSubscribed  Unsigned32,
+        eqlStorageGroupStatusVolumeSpaceAllocated   Unsigned32,
+        eqlStorageGroupStatusFailbackSpace          Unsigned32,
+        eqlStorageGroupStatusThinProvFreeSpace      Integer32,
+        eqlStorageGroupStatusConnectionCount        Integer32,
+        eqlStorageGroupStatusSnapReserveSpaceFree   Unsigned32,
+        eqlStorageGroupStatusReplReserveSpaceFree   Unsigned32,
+        eqlStorageGroupStatusGroupId                OCTET STRING,
+        eqlStorageGroupStatusVirtualVolumeCount     Unsigned32,
+        eqlStorageGroupStatusVirtualVolumesOnline   Unsigned32,
+        eqlStorageGroupStatusVirtualVolumesInUse    Unsigned32,
+        eqlStorageGroupStatusVirtualVolumeSpaceSubscribed  Unsigned32,
+        eqlStorageGroupStatsTotalSpaceBorrowing     Unsigned32,
+        eqlStorageGroupStatusStorageContainerCount         Integer32, 
+        eqlStorageGroupStatusStorageContainerVolumeCount   Unsigned32,
+        eqlStorageGroupStatusStorageContainerSnapCount     Unsigned32,
+        eqlStorageGroupStatusStorageContainerVolumesOnline Integer32,
+        eqlStorageGroupStatusStorageContainerSpaceReserved Counter64,
+        eqlStorageGroupStatusCompressedSpaceUsed      Counter64,
+        eqlStorageGroupStatusVirtualSpaceSize         Counter64,
+        eqlStorageGroupStatusReplicationSnapCount   Unsigned32,
+        eqlStorageGroupStatusStorageContainerVolumesBound Integer32
+        }
+
+eqlStorageGroupStatusPoolSpace OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total size of the Storage Pool in MBs."
+    ::=  {  eqlStorageGroupStatusEntry 1 }
+
+    eqlStorageGroupStatusPoolSpaceUsed OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total space reserved for volume data within the Storage Pool in MBs. Note that this value does not include space reserved for snapshots or replication."
+    ::=  {  eqlStorageGroupStatusEntry 2 }
+
+eqlStorageGroupStatusTotalMembersOnLine OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the number of group members which are online."
+    ::=  {  eqlStorageGroupStatusEntry 3 }
+
+eqlStorageGroupStatusPoolSpaceReserved OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total space reserved for SnapShot data within the Storage Pool in MBs."
+    ::=  {  eqlStorageGroupStatusEntry 4 }
+
+eqlStorageGroupStatusReservedSpaceInUse OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total reserved space in use by snapshots in the storage pool . This will be equal to sum of eqlMemberSnapStorage for all members."
+    ::=  {  eqlStorageGroupStatusEntry 5 }
+
+eqlStorageGroupStatusDateAndTime OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the current time in group represented
+                     as number of seconds since epoch."
+    ::=  {  eqlStorageGroupStatusEntry 6 }
+
+eqlStorageGroupStatusSnapshotsInUse OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of snapshots within the group that currently have active iSCSI connections."
+    ::=  {  eqlStorageGroupStatusEntry 7 }
+
+eqlStorageGroupStatusVolumesInUse OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of snapshotsvolumes within the group that currently have active iSCSI connections."
+    ::=  {  eqlStorageGroupStatusEntry 8 }
+
+eqlStorageGroupStatusSnapshotsOnline OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of snapshots available for iSCSI connections."
+    ::=  {  eqlStorageGroupStatusEntry 9 }
+
+eqlStorageGroupStatusVolumesOnline OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of volumes available for iSCSI connections."
+    ::=  {  eqlStorageGroupStatusEntry 10 }
+
+eqlStorageGroupStatusSnapshotCount OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of snapshots in this group."
+    ::=  {  eqlStorageGroupStatusEntry 11 }
+
+eqlStorageGroupStatusVolumeCount OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of volumes in this group."
+    ::=  {  eqlStorageGroupStatusEntry 12 }
+
+
+eqlStorageGroupStatusMemberCount OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of members in this group irrelevant of current member state."
+    ::=  {  eqlStorageGroupStatusEntry 13 }
+
+
+eqlStorageGroupStatusMembersInUse OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of online+offline members in this group."
+    ::=  {  eqlStorageGroupStatusEntry 14 }
+
+eqlStorageGroupStatusFreeSpace OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total free space of the Storage Pool in Mega Bytes."
+    ::=  {  eqlStorageGroupStatusEntry 15 }
+
+eqlStorageGroupStatusPoolSpaceDelegated OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the amount of free space of the Storage Pool 
+                     which has been partitioned for use by external services such as 
+                     remote replication. This space is reserved and
+                     can be controlled  by the users of these services.
+
+                     This sum represents total space reserved by all of the entries in 
+                     the replicant site table"
+    ::=  {  eqlStorageGroupStatusEntry 16 }
+
+eqlStorageGroupStatusDelegatedUsedSpace OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the amount of space used by 
+                     external services such as remote replication. 
+                     This sum represents total space used by all of the entries in 
+                     the replicant site table"
+    ::=  {  eqlStorageGroupStatusEntry 17 }
+
+
+eqlStorageGroupStatusReplReserveSpace OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "
+                     This sum represents total space reserved for all volumes for replication
+                     purposes. "
+    ::=  {  eqlStorageGroupStatusEntry 18 }
+
+ eqlStorageGroupStatusReplReserveInUse OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "
+                     This sum represents total space in use for all volumes for replication
+                     purposes. This value will be equal to sum of eqlMemberReplStorage for all members."
+    ::=  {  eqlStorageGroupStatusEntry 19 }
+
+ eqlStorageGroupStatusVolumeSpaceSubscribed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total subscribed space for all volumes in the group. For a thin provisioned volume, 
+                     subscribed space is the advertised space. For a regular volume, subscribed space is the volume size.
+                     The value of this field will be equal to sum of eqliscsiVolumeSize field in volume mib."
+    ::=  {  eqlStorageGroupStatusEntry 20 }
+
+ eqlStorageGroupStatusVolumeSpaceAllocated OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The value of this object represents the sum of actual materialized pages for all volumes in the group."
+    ::=  {  eqlStorageGroupStatusEntry 21 }
+
+ eqlStorageGroupStatusFailbackSpace OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field represents the amount of space consumed by fail-back replicasets in this storage group."
+    ::=  {  eqlStorageGroupStatusEntry 22 }
+
+ eqlStorageGroupStatusThinProvFreeSpace OBJECT-TYPE
+    SYNTAX          Integer32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field represents the amount of space available for Thin Provisioned Volumes in this storage group."
+    ::=  {  eqlStorageGroupStatusEntry 23 }
+
+ eqlStorageGroupStatusConnectionCount OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field gives the number of iSCSI connections that are currently connected to volumes in this group."
+    ::=  {  eqlStorageGroupStatusEntry 24 }
+
+ eqlStorageGroupStatusSnapReserveSpaceFree OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This represents the total space still available for Snapshot usage."
+    ::=  {  eqlStorageGroupStatusEntry 25 }
+
+ eqlStorageGroupStatusReplReserveSpaceFree OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This represents the total space still available for Replica Snapshot usage."
+    ::=  {  eqlStorageGroupStatusEntry 26 }
+
+ eqlStorageGroupStatusGroupId OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (16))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This represents an ID uniquely representing a group."
+    ::=  {  eqlStorageGroupStatusEntry 27 }
+
+eqlStorageGroupStatusVirtualVolumeCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of volumes in this group, adjusted to remove
+                     volumes not typically visible such as synchronous replication standbys."
+    ::=  {  eqlStorageGroupStatusEntry 28 }
+
+eqlStorageGroupStatusVirtualVolumesOnline OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of volumes available for iSCSI connections,
+                     excluding synchronous replication standbys."
+    ::=  {  eqlStorageGroupStatusEntry 29 }
+
+eqlStorageGroupStatusVirtualVolumesInUse OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of volumes within the group that currently 
+                     have active iSCSI connections excluding synchronous replication standbys."
+    ::=  {  eqlStorageGroupStatusEntry 30 }
+
+ eqlStorageGroupStatusVirtualVolumeSpaceSubscribed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "MB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total subscribed space for all volumes in the group. For a thin provisioned volume, 
+                     subscribed space is the advertised space. For a regular volume, subscribed space is the volume size.
+                     The value of this field will be equal to sum of eqliscsiVolumeSize field in volume mib.  This value
+                     is adjusted to exclude subscribed space for synchronous replication standby volumes."
+    ::=  {  eqlStorageGroupStatusEntry 31 }
+    
+ eqlStorageGroupStatsTotalSpaceBorrowing OBJECT-TYPE      
+    SYNTAX          Unsigned32   
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of borrowing against other volume's free snapshot reserve
+                     and pool free space. This includes snapshots and recoverable volumes."
+    ::=  { eqlStorageGroupStatusEntry 32 }
+
+ eqlStorageGroupStatusStorageContainerCount OBJECT-TYPE      
+    SYNTAX          Integer32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total number of storage containers within the group."
+    ::=  { eqlStorageGroupStatusEntry 34 }
+
+ eqlStorageGroupStatusStorageContainerVolumeCount OBJECT-TYPE      
+    SYNTAX          Unsigned32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total number of volume resources that are being
+                     consumed within all storage containers."
+    ::=  { eqlStorageGroupStatusEntry 35 }
+
+ eqlStorageGroupStatusStorageContainerSnapCount OBJECT-TYPE      
+    SYNTAX          Unsigned32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total number of snapshot resources that are being
+                     consumed within all storage containers."
+    ::=  { eqlStorageGroupStatusEntry 36 }
+
+eqlStorageGroupStatusStorageContainerVolumesOnline OBJECT-TYPE      
+    SYNTAX          Integer32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total number of online volume resources that are being
+                     consumed within all storage containers."
+    ::=  { eqlStorageGroupStatusEntry 37 }
+
+ eqlStorageGroupStatusStorageContainerSpaceReserved OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of storage that is being
+                     consumed within all storage containers."
+    ::=  { eqlStorageGroupStatusEntry 38 }
+
+eqlStorageGroupStatusCompressedSpaceUsed OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of space in MB that is currently utilized for compressed pages.   This is a dynamic value and cannot be set."
+    ::=  { eqlStorageGroupStatusEntry 39 }
+
+eqlStorageGroupStatusVirtualSpaceSize OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of space in MB that would be utilized by compressed pages if there was no compression."
+    ::=  { eqlStorageGroupStatusEntry 40 }
+
+ eqlStorageGroupStatusReplicationSnapCount OBJECT-TYPE      
+    SYNTAX          Unsigned32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total number of snapshot resources that are being
+                     consumed for replication. This includes inbound replicas, and
+                     temporary snapshots used for in-progress outbound replication."
+    ::=  { eqlStorageGroupStatusEntry 41 }
+
+eqlStorageGroupStatusStorageContainerVolumesBound OBJECT-TYPE      
+    SYNTAX          Integer32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total number of bound volume across all storage containers."
+    ::=  { eqlStorageGroupStatusEntry 42 }
+
+--**********************************************************************************
+
+eqlStorageGroupSiteTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupSiteEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group Site Table"
+    ::=  {  eqlgroupObjects  3}
+
+eqlStorageGroupSiteEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupSiteEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing storage group site information."
+    INDEX  { eqlGroupId, eqlGroupSiteIndex}
+    ::=    { eqlStorageGroupSiteTable 1 }
+
+EqlStorageGroupSiteEntry ::=
+    SEQUENCE {
+        eqlGroupSiteIndex           Integer32,
+        eqlGroupSiteName            UTFString,
+        eqlGroupSiteDescription     UTFString,
+        eqlGroupSiteContactEmail    DisplayString,
+        eqlGroupSiteContactPhone    DisplayString,
+        eqlGroupSiteContactMobile   DisplayString,
+        eqlGroupSiteRowStatus       RowStatus
+        }
+eqlGroupSiteIndex   OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies the unique index used to identify a site."
+    ::=  {  eqlStorageGroupSiteEntry 1 }
+
+eqlGroupSiteName    OBJECT-TYPE
+    SYNTAX          UTFString (SIZE(1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the name of the site default site for the group."
+    DEFVAL          { "default" }
+    ::=  {  eqlStorageGroupSiteEntry 2 }
+
+eqlGroupSiteDescription OBJECT-TYPE
+    SYNTAX          UTFString(SIZE(1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains a description of the site.
+                     For example the phsyical address of the site. There is no default."
+    ::=  {  eqlStorageGroupSiteEntry 3 }
+
+eqlGroupSiteContactEmail    OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the email address of the Administrators responsible for this site."
+    ::=  {  eqlStorageGroupSiteEntry 4 }
+
+eqlGroupSiteContactPhone    OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the phone number of the Administrator responsible for this site."
+    ::=  {  eqlStorageGroupSiteEntry 5 }
+
+eqlGroupSiteContactMobile       OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the cell phone number of the Administrator responsible for this site."
+    ::=  {  eqlStorageGroupSiteEntry 6 }
+
+eqlGroupSiteRowStatus   OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Row status"
+    ::= { eqlStorageGroupSiteEntry 7 }
+
+
+--********************************************************************************
+eqlStorageGroupDnsServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupDnsServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group DNS Server Table
+                     TimeoutAll:600"
+    ::=  {  eqlgroupObjects  4}
+
+eqlStorageGroupDnsServerEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupDnsServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group dns server information."
+    INDEX           { eqlGroupId, eqlGroupDnsServerIndex}
+    ::=    { eqlStorageGroupDnsServerTable 1 }
+
+EqlStorageGroupDnsServerEntry ::=
+    SEQUENCE {
+        eqlGroupDnsServerIndex      Integer32,
+        eqlGroupDnsServerIpAddress  IpAddress,
+        eqlGroupDnsServerRowStatus  RowStatus,
+        eqlGroupDnsServerInetAddressType  InetAddressType,
+        eqlGroupDnsServerInetAddress  InetAddress,
+        eqlGroupDnsServerConfigState  INTEGER
+        
+        }
+eqlGroupDnsServerIndex  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the DNS server entry."
+    ::=  {  eqlStorageGroupDnsServerEntry 1 }
+
+eqlGroupDnsServerIpAddress  OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStorageGroupDnsServerEntry 2 }
+
+eqlGroupDnsServerRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlStorageGroupDnsServerEntry 3 }
+
+eqlGroupDnsServerInetAddressType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the DNS server."
+	DEFVAL { ipv4 }
+    ::=  {  eqlStorageGroupDnsServerEntry 4 }
+
+eqlGroupDnsServerInetAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the DNS server."
+    ::=  {  eqlStorageGroupDnsServerEntry 5 }
+
+eqlGroupDnsServerConfigState OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                    startConfig (0),
+                    inProgress  (1),
+                    endConfig   (2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current 
+    DESCRIPTION     "This field denotes the transaction state of the eqlStorageGroupDnsServerTable."
+    DEFVAL          {startConfig}
+    ::=  {  eqlStorageGroupDnsServerEntry 6 }
+
+
+--****************************************************************************************
+
+eqlStorageGroupNtpServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupNtpServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group NTP Server Table"
+    ::=  {  eqlgroupObjects  5}
+
+eqlStorageGroupNtpServerEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupNtpServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group ntp server information."
+    INDEX           { eqlGroupId, eqlGroupNtpServerIndex}
+    ::=    { eqlStorageGroupNtpServerTable 1 }
+
+EqlStorageGroupNtpServerEntry ::=
+    SEQUENCE {
+        eqlGroupNtpServerIndex      Integer32,
+        eqlGroupNtpServerIpAddress  IpAddress,
+        eqlGroupNtpServerRowStatus  RowStatus,
+        eqlGroupNtpServerPort       INTEGER,
+        eqlGroupNtpServerInetAddressType  InetAddressType,
+        eqlGroupNtpServerInetAddress  InetAddress
+        }
+
+eqlGroupNtpServerIndex  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the NTP server entry."
+    ::=  {  eqlStorageGroupNtpServerEntry 1 }
+
+eqlGroupNtpServerIpAddress  OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStorageGroupNtpServerEntry 2 }
+
+eqlGroupNtpServerRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlStorageGroupNtpServerEntry 3 }
+
+eqlGroupNtpServerPort  OBJECT-TYPE
+    SYNTAX          INTEGER ( 0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The listening port number of the ntp server.Default value implies well known ntp port number ( 123 ) assigned by the IANA."
+    DEFVAL          { 0 }
+    ::= { eqlStorageGroupNtpServerEntry 4 }
+
+eqlGroupNtpServerInetAddressType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the NTP server."
+    ::=  {  eqlStorageGroupNtpServerEntry 5 }
+
+eqlGroupNtpServerInetAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the NTP server."
+    ::=  {  eqlStorageGroupNtpServerEntry 6 }
+
+--******************************************************************
+
+eqlStorageGroupChapServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupChapServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group Chap Server Table"
+    ::=  {  eqlgroupObjects  6}
+
+eqlStorageGroupChapServerEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupChapServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing storage group chap server information."
+    INDEX           { eqlGroupId, eqlGroupChapServerIndex}
+    ::=    { eqlStorageGroupChapServerTable 1 }
+
+EqlStorageGroupChapServerEntry ::=
+    SEQUENCE {
+        eqlGroupChapServerIndex         Integer32,
+        eqlGroupChapServerIpAddress     IpAddress,
+        eqlGroupChapServerRowStatus     RowStatus,
+        eqlGroupChapServerPort          INTEGER,
+        eqlGroupChapServerRADIUSSecret  OCTET STRING,  -- was DisplayString
+        eqlGroupChapServerInetAddressType InetAddressType,
+        eqlGroupChapServerInetAddress     InetAddress
+        }
+
+eqlGroupChapServerIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the CHAP server entry."
+    ::=  {  eqlStorageGroupChapServerEntry 1 }
+
+eqlGroupChapServerIpAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStorageGroupChapServerEntry 2 }
+
+eqlGroupChapServerRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlStorageGroupChapServerEntry 3 }
+
+eqlGroupChapServerPort OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The listening port number of chap server at the specified ipaddress. The default value of zero implies that the authentication request will be forwarded to the default radius port(port number 1812). The value of this object is irrelevant if eqlGroupChapServerInetAddress is the loopback ipaddress."
+    DEFVAL          { 0 }
+    ::= { eqlStorageGroupChapServerEntry 4 }
+
+eqlGroupChapServerRADIUSSecret OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..64)) -- was DisplayString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field contains the RADIUS secret for this client. It can be set
+                     but it returns a zero-length string upon read."
+    --DEFAULT       cookie "secure"
+    ::=  {  eqlStorageGroupChapServerEntry 5 }
+
+eqlGroupChapServerInetAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the CHAP server."
+    ::=  {  eqlStorageGroupChapServerEntry 6 }
+
+eqlGroupChapServerInetAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the CHAP server."
+    ::=  {  eqlStorageGroupChapServerEntry 7 }
+
+--******************************************************************
+eqlStorageGroupSMTPServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupSMTPServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group SMTP Server Table"
+    ::=  {  eqlgroupObjects  7}
+
+eqlStorageGroupSMTPServerEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupSMTPServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group smtp sever information."
+    INDEX           { eqlGroupId, eqlGroupSMTPServerIndex}
+    ::=    { eqlStorageGroupSMTPServerTable 1 }
+
+EqlStorageGroupSMTPServerEntry ::=
+    SEQUENCE {
+        eqlGroupSMTPServerIndex     Integer32,
+        eqlGroupSMTPServerIpAddress IpAddress,
+        eqlGroupSMTPServerRowStatus RowStatus,
+        eqlGroupSMTPServerPort      INTEGER,
+        eqlGroupSMTPServerInetAddressType InetAddressType,
+        eqlGroupSMTPServerInetAddress InetAddress
+ 
+        }
+
+eqlGroupSMTPServerIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the SMTP server entry."
+    ::=  {  eqlStorageGroupSMTPServerEntry 1 }
+
+eqlGroupSMTPServerIpAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStorageGroupSMTPServerEntry 2 }
+
+eqlGroupSMTPServerRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlStorageGroupSMTPServerEntry 3 }
+
+eqlGroupSMTPServerPort OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The listening port number of the SMTP server. The default
+value of zero implies that the server is listening on wellknown port number ( 25 ) for SMTP asssigned by the IANA."
+    DEFVAL          { 0 }
+    ::= { eqlStorageGroupSMTPServerEntry 4 }
+
+eqlGroupSMTPServerInetAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the SMTP server."
+    ::=  {  eqlStorageGroupSMTPServerEntry 5 }
+
+eqlGroupSMTPServerInetAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the SMTP server."
+    ::=  {  eqlStorageGroupSMTPServerEntry 6 }
+
+--**************************************************************************************
+
+eqlStorageGroupSysLogServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupSysLogServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group SysLog Server Table"
+    ::=  {  eqlgroupObjects  8}
+
+eqlStorageGroupSysLogServerEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupSysLogServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group syslog server info."
+    INDEX           { eqlGroupId, eqlGroupSysLogServerIndex}
+    ::=    { eqlStorageGroupSysLogServerTable 1 }
+
+EqlStorageGroupSysLogServerEntry ::=
+    SEQUENCE {
+        eqlGroupSysLogServerIndex       Integer32,
+        eqlGroupSysLogServerIpAddress   IpAddress,
+        eqlGroupSysLogServerRowStatus   RowStatus,
+        eqlGroupSysLogServerInetAddressType   InetAddressType,
+        eqlGroupSysLogServerInetAddress   InetAddress
+        }
+
+eqlGroupSysLogServerIndex   OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the syslog server entry."
+    ::=  {  eqlStorageGroupSysLogServerEntry 1 }
+
+eqlGroupSysLogServerIpAddress   OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStorageGroupSysLogServerEntry 2 }
+
+eqlGroupSysLogServerRowStatus   OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlStorageGroupSysLogServerEntry 3 }
+
+eqlGroupSysLogServerInetAddressType   OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the syslog server."
+    ::=  {  eqlStorageGroupSysLogServerEntry 4 }
+
+eqlGroupSysLogServerInetAddress   OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the syslog server."
+    ::=  {  eqlStorageGroupSysLogServerEntry 5 }
+
+--******************************************************************************************
+
+ eqlStorageGroupAlertEmailTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupAlertEmailEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group Email Alert Table"
+    ::=  {  eqlgroupObjects  9}
+
+eqlStorageGroupAlertEmailEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupAlertEmailEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group alert email info."
+    INDEX           { eqlGroupId, eqlGroupAlertEmailIndex}
+    ::=    { eqlStorageGroupAlertEmailTable 1 }
+
+ EqlStorageGroupAlertEmailEntry ::=
+    SEQUENCE {
+        eqlGroupAlertEmailIndex     Integer32,
+        eqlGroupAlertEmailAddress   DisplayString,
+        eqlGroupAlertEmailRowStatus RowStatus
+        }
+
+eqlGroupAlertEmailIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the email user to alert."
+    ::=  {  eqlStorageGroupAlertEmailEntry 1 }
+
+eqlGroupAlertEmailAddress   OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE(0..255))        -- jpmfix - note displaystrings are only 255 chars, we might need more here for a fully qualified name..
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the email address of the Adminstrator targeted
+                     to recieve the email the email alerts."
+    ::=  {  eqlStorageGroupAlertEmailEntry 2 }
+
+eqlGroupAlertEmailRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlStorageGroupAlertEmailEntry 3 }
+
+--*************************************************************************************
+
+eqlStorageGroupAdminAccountTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlStorageGroupAdminAccountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group Administration account table.
+                     This table contains a collection of administration account records.
+                     It is indexed by group id and administration account record index."
+    ::= { eqlgroupObjects 10 }
+
+eqlStorageGroupAdminAccountEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupAdminAccountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing administration account settings."
+    INDEX           {  eqlGroupId, eqlStorageGroupAdminAccountIndex }
+    ::=   { eqlStorageGroupAdminAccountTable 1 }
+
+EqlStorageGroupAdminAccountEntry ::=
+    SEQUENCE {
+        eqlStorageGroupAdminAccountIndex         Integer32,
+        eqlStorageGroupAdminAccountRowStatus     RowStatus,
+        eqlStorageGroupAdminAccountName          DisplayString,
+        eqlStorageGroupAdminAccountPassword      OCTET STRING, -- was DisplayString
+        eqlStorageGroupAdminAccountDescription   UTFString,
+        eqlStorageGroupAdminAccountType          AdminAccountType,
+        eqlStorageGroupAdminAccountContact       DisplayString,
+        eqlStorageGroupAdminAccountEmail         DisplayString,
+        eqlStorageGroupAdminAccountPhone         DisplayString,
+        eqlStorageGroupAdminAccountMobile        DisplayString,
+        eqlStorageGroupAdminAccountStatus        INTEGER,
+        eqlStorageGroupAdminAccountCliFlags      Integer32,
+        eqlStorageGroupAdminAccountGuiFlags      Integer32,
+        eqlStorageGroupAdminAccountPollInterval  Integer32,
+        eqlStorageGroupAdminAccountAuthType      INTEGER,
+        eqlStorageGroupAdminAccountRecentLogin   Counter32,
+        eqlStorageGroupAdminAccountClass         DisplayString,
+        eqlStorageGroupAdminAccountPrivilege     AdminAccountPrivilegeType,
+        eqlStorageGroupAdminAccountSnmpKey       OCTET STRING,
+        eqlStorageGroupAdminAccountSnmpKey2      OCTET STRING,
+        eqlStorageGroupAdminAccountCHAPPassword  OCTET STRING,  -- was DisplayString
+        eqlStorageGroupAdminAccountKey           Unsigned32,
+        eqlStorageGroupAdminAccountAdGroupName   DisplayString,
+        eqlStorageGroupAdminAccountSNMPPrivProt  INTEGER
+    }
+
+eqlStorageGroupAdminAccountIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The index value that uniquely identifies the administration account record."
+    ::=   { eqlStorageGroupAdminAccountEntry 1 }
+
+eqlStorageGroupAdminAccountRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlStorageGroupAdminAccountEntry 2 }
+
+eqlStorageGroupAdminAccountName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     The name of the administration account. This name must be used for user authentication."
+    ::=   { eqlStorageGroupAdminAccountEntry 3 }
+
+eqlStorageGroupAdminAccountPassword OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (1..64))  -- was DisplayString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     " An octet string containing the (crypt cipher) password for this
+                      account.  If written, it changes the password for
+                      the account.  If read, it returns a zero-length string."
+    --DEFAULT       cookie "secure"
+    ::=   { eqlStorageGroupAdminAccountEntry 4 }
+
+eqlStorageGroupAdminAccountDescription OBJECT-TYPE
+    SYNTAX          UTFString (SIZE(0..128))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains a description of the administration account."
+    ::=   { eqlStorageGroupAdminAccountEntry 5 }
+
+eqlStorageGroupAdminAccountType OBJECT-TYPE
+    SYNTAX          AdminAccountType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the type of account. The read-write 
+                     account type allows the user to modify any group settings. 
+                     The read-only account allows only read-only access to
+                     group configuration data. The default is read-write. 
+                     Changing this value will come into affect only for new 
+                     login of the user. Currently logged in sessions will not
+                     be affected."
+    DEFVAL          { read-write }
+    ::=   { eqlStorageGroupAdminAccountEntry 6 }
+
+eqlStorageGroupAdminAccountContact OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE(0..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the full name of the owner of this administration account."
+    ::=   { eqlStorageGroupAdminAccountEntry 7 }
+
+eqlStorageGroupAdminAccountEmail OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE(0..32))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the email address of the owner of this administration account."
+    ::=   { eqlStorageGroupAdminAccountEntry 8 }
+
+eqlStorageGroupAdminAccountPhone OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE(0..32))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the phone number of the owner of this administration account."
+    ::=   { eqlStorageGroupAdminAccountEntry 9 }
+
+eqlStorageGroupAdminAccountMobile OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE(0..32))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the cell phone number of the owner of this administration account."
+    ::=   { eqlStorageGroupAdminAccountEntry 10 }
+
+eqlStorageGroupAdminAccountStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        enabled (1),
+                        disabled (2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field represents the administration status of the 
+                     account. Disabling the account will prevent the user from
+                     logging into CLI and GUI. Currently logged-in sessions
+                     will not be affected.
+                    "
+    DEFVAL          { enabled }
+    ::=   { eqlStorageGroupAdminAccountEntry 11 }
+
+eqlStorageGroupAdminAccountCliFlags OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the set of configuration flags used by the CLI. These flags
+                    allow the administrator to save CLI configuration settings between the CLI sessions.
+                    The meaning of individual bits is not defined yet. TBD"
+    DEFVAL          {0}
+    ::=   { eqlStorageGroupAdminAccountEntry 12 }
+
+eqlStorageGroupAdminAccountGuiFlags OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the set of configuration flags used by the GUI. These flags
+                    allow the administrator to save GUI configuration settings between the GUI sessions.
+                    The meaning of individual bits is not defined yet. TBD"
+    ::=   { eqlStorageGroupAdminAccountEntry 13 }
+
+eqlStorageGroupAdminAccountPollInterval OBJECT-TYPE
+    SYNTAX          Integer32 (5..3600)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The value of this field specifies how often the group configuration data
+                    must be repolled by the GUI. This value is expressed in seconds.
+                    The minimum is 5 seconds; the maximum is 1 hour. The default is 30 seconds."
+    DEFVAL          { 30 }
+    ::=   { eqlStorageGroupAdminAccountEntry 14 }
+
+eqlStorageGroupAdminAccountAuthType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        local (0),
+                        radius (1),
+                        ldap (2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field represents the type of authentication for the administrator.
+                     Note that RADIUS/LDAP type users will only appear in the table after a
+                     successful login.
+                    "
+    DEFVAL          { local }
+    ::=   { eqlStorageGroupAdminAccountEntry 15 }
+
+eqlStorageGroupAdminAccountRecentLogin OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field represents a timestamp of the most recent time this
+                     admin account has logged in.  Currently only applies to radius
+                     auth type users.
+                    "
+    ::=   { eqlStorageGroupAdminAccountEntry 16 }
+
+eqlStorageGroupAdminAccountClass OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (0..255))    
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field contains the contents of the class attribute
+                     received in the RADIUS Access-Request and must be reflected
+                     in the RADIUS Accounting-Request if accounting is enabled."
+    ::=  {  eqlStorageGroupAdminAccountEntry 17 }  
+
+eqlStorageGroupAdminAccountPrivilege OBJECT-TYPE
+    SYNTAX          AdminAccountPrivilegeType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the privilege level of the account.
+                     The default is global-admin.  global-admin grants full
+                     access to the administrator.  pool-admin designates the
+                     administrator to have access only to one or more pools,
+                     and does not have access to global and group-level
+                     administrator.  volume-admin designates the administrator to
+                     have access to specific volumes within specific storage pools."
+    DEFVAL          { global-admin }
+    ::=   { eqlStorageGroupAdminAccountEntry 18 }
+
+eqlStorageGroupAdminAccountSnmpKey OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (20))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contain part of the SNMP key for this account."
+    --DEFAULT       cookie "secure"
+    ::=   { eqlStorageGroupAdminAccountEntry 19 }
+
+eqlStorageGroupAdminAccountSnmpKey2 OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (20))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contain part of the SNMP second key for this account."
+    --DEFAULT       cookie "secure"
+    ::=   { eqlStorageGroupAdminAccountEntry 20 }
+
+eqlStorageGroupAdminAccountCHAPPassword OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (1..64)) -- was DisplayString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     " An octet string containing the (cleartext) password for this
+                      account.  If written, it changes the password for
+                      the account.  If read, it returns a zero-length string."
+    --DEFAULT       cookie "secure"
+    ::=   { eqlStorageGroupAdminAccountEntry 21 }
+
+eqlStorageGroupAdminAccountKey OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "A value to uniquely identify this account.  The MIB attribute
+                     eqliscsiVolumeAdminAccountKey uses this value to associate
+                     a volume with an account.  No two accounts can have the same
+                     value."
+    ::=   { eqlStorageGroupAdminAccountEntry 22 }
+
+eqlStorageGroupAdminAccountAdGroupName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..65))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The name of the Active Directory group, valid only when auth type is LDAP.
+                     Same as cn attribute of the AD group."
+    ::=   { eqlStorageGroupAdminAccountEntry 23 }
+
+eqlStorageGroupAdminAccountSNMPPrivProt OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    des(0),
+                    aes128(1)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "An enum field used by the Agent to determine which privacy
+                     protocol is used to encrypt external SNMP messages for this user."
+    DEFVAL          { des}
+    ::=    { eqlStorageGroupAdminAccountEntry 24 }
+
+--**********************************************************************************
+eqlStorageGroupiSNSServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupiSNSServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group iSNS Server Table"
+    ::=  {  eqlgroupObjects  11}
+
+eqlStorageGroupiSNSServerEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupiSNSServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group iSNS server information."
+    INDEX           { eqlGroupId, eqlGroupiSNSServerIndex}
+    ::=    { eqlStorageGroupiSNSServerTable 1 }
+
+EqlStorageGroupiSNSServerEntry ::=
+    SEQUENCE {
+        eqlGroupiSNSServerIndex      Integer32,
+        eqlGroupiSNSServerRowStatus  RowStatus,
+        eqlGroupiSNSServerIpAddress  IpAddress,
+        eqlGroupiSNSServerPort       INTEGER,
+        eqlGroupiSNSServerInetAddressType  InetAddressType,
+        eqlGroupiSNSServerInetAddress  InetAddress
+        }
+eqlGroupiSNSServerIndex  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the iSNS server entry."
+    ::=  {  eqlStorageGroupiSNSServerEntry 1 }
+
+eqlGroupiSNSServerRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Used to manage conceptual row."
+    ::= { eqlStorageGroupiSNSServerEntry 2 }
+
+eqlGroupiSNSServerIpAddress  OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStorageGroupiSNSServerEntry 3 }
+
+eqlGroupiSNSServerPort  OBJECT-TYPE
+    SYNTAX          INTEGER (0..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     
+          "
+          Indicates the port the iSNS server is accepting iSNSP messages 
+          on, generally the iSNS well known port.The well known port 
+          for iSNSP is 3205. The default value implies to use well known port.
+          " 
+    DEFVAL          { 0 }
+    ::=  {  eqlStorageGroupiSNSServerEntry 4 }
+
+eqlGroupiSNSServerInetAddressType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the iSNS server."
+    ::=  {  eqlStorageGroupiSNSServerEntry 5 }
+
+eqlGroupiSNSServerInetAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the iSNS server."
+    ::=  {  eqlStorageGroupiSNSServerEntry 6 }
+
+--**********************************************************************************
+
+eqlGroupCompatibilityTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlGroupCompatibilityEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Group Compatibility Table"
+    ::=  {  eqlgroupObjects  12}
+
+
+eqlGroupCompatibilityEntry OBJECT-TYPE
+    SYNTAX          EqlGroupCompatibilityEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group compatibility information."
+    AUGMENTS        { eqlStorageGroupEntry }
+    ::=    { eqlGroupCompatibilityTable 1 }
+
+
+EqlGroupCompatibilityEntry ::=
+    SEQUENCE {
+          eqlGroupCurrentCompLevel  Unsigned32
+    }
+
+eqlGroupCurrentCompLevel  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field represents the current compatibility level of the group."
+    ::=  { eqlGroupCompatibilityEntry  1 }
+
+--**********************************************************************************
+eqlStorageGroupCollectionTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupCollectionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "
+                     EqualLogic-Dynamic Group Collection Table. This table maintains overall 
+                     number of volume collections and snap collection in a group.
+                    "
+    ::=  {  eqlgroupObjects  13}
+
+eqlStorageGroupCollectionEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupCollectionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing volume/snap collections information in a group."
+    INDEX           { eqlGroupId}
+    ::=    { eqlStorageGroupCollectionTable 1 }
+
+EqlStorageGroupCollectionEntry ::=
+    SEQUENCE {
+        eqlGrpNoofVolCollections          Unsigned32,
+        eqlGrpNoofSnapCollections         Unsigned32,
+        eqlGrpNoofOrphanSnapCollections   Unsigned32
+        }
+eqlGrpNoofVolCollections OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of volume collections in the group ie 
+                     number of rows in eqliscsiVolCollectionTable."
+    DEFVAL          {0}
+    ::=  {  eqlStorageGroupCollectionEntry 1 }
+eqlGrpNoofSnapCollections OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of snapshot collections in the group ie
+                     number of rows in eqliscsiSnapCollectionTable."
+    DEFVAL          {0}
+    ::=  {  eqlStorageGroupCollectionEntry 2 }
+eqlGrpNoofOrphanSnapCollections OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the total number of snapshot collections in the group that dont
+                     have a corresponding volume set ie number of rows in eqliscsiSnapCollectionTable 
+                     with eqliscsiSnapCollectionVolIndex set to zero."
+    DEFVAL          {0}
+    ::=  {  eqlStorageGroupCollectionEntry 3 }
+
+--**********************************************************************************
+eqlRADIUSTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlRADIUSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "
+                     EqualLogic-Persistent Group RADIUS Configuration Table. This table maintains
+                     the configuration for the RADIUS implementation.
+                    "
+    ::=  {  eqlgroupObjects  14}
+
+eqlRADIUSEntry OBJECT-TYPE
+    SYNTAX          EqlRADIUSEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing RADIUS information in a group."
+    INDEX           { eqlGroupId}
+    ::=    { eqlRADIUSTable 1 }
+
+EqlRADIUSEntry ::=
+    SEQUENCE {
+    eqlRADIUSSecret          OCTET STRING, -- was DisplayString
+    eqlRADIUSLoginAuthEnable TruthValue,
+    eqlRADIUSAuthRecvTimeout Unsigned32,
+    eqlRADIUSAuthMaxRetries  Unsigned32,
+    eqlRADIUSLoginAcctEnable TruthValue,
+    eqlRADIUSAcctRecvTimeout Unsigned32,
+    eqlRADIUSAcctMaxRetries  Unsigned32,
+    eqlRADIUSiscsiAuthEnable TruthValue,
+    eqlLocaliscsiAuthEnable  TruthValue,
+    eqlRADIUSRequireAdminAttrEnable TruthValue
+    }
+
+eqlRADIUSSecret OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..64))  -- was DisplayString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field contains the RADIUS secret for this client. It can be set
+                     but it returns a zero-length string upon read."
+    --DEFAULT       cookie "secure"
+    ::=  {  eqlRADIUSEntry 1 }
+
+eqlRADIUSLoginAuthEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables RADIUS login authentication."
+    DEFVAL          { false }
+    ::=  {  eqlRADIUSEntry 2 }
+
+eqlRADIUSAuthRecvTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32(1..30)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field configures the RADIUS authentication message receive timeout in seconds."
+    DEFVAL          { 2 }
+    ::=  {  eqlRADIUSEntry 3 }
+
+eqlRADIUSAuthMaxRetries OBJECT-TYPE
+    SYNTAX          Unsigned32(0..10)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field configures the number of RADIUS authentication retries."
+    DEFVAL          { 1 }
+    ::=  {  eqlRADIUSEntry 4 }
+
+eqlRADIUSLoginAcctEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables RADIUS accounting for login administrators."
+    DEFVAL          { false }
+    ::=  {  eqlRADIUSEntry 5 }
+
+eqlRADIUSAcctRecvTimeout OBJECT-TYPE
+    SYNTAX          Unsigned32(1..30)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field configures the RADIUS accounting message receive timeout in seconds."
+    DEFVAL          { 2 }
+    ::=  {  eqlRADIUSEntry 6 }
+
+eqlRADIUSAcctMaxRetries OBJECT-TYPE
+    SYNTAX          Unsigned32(0..10)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field configures the number of RADIUS accounting retries."
+    DEFVAL          { 1 }
+    ::=  {  eqlRADIUSEntry 7 }
+
+eqlRADIUSiscsiAuthEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables RADIUS authentication for ISCSI initiators."
+    DEFVAL          { false }
+    ::=  {  eqlRADIUSEntry 8 }
+
+eqlLocaliscsiAuthEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables Local authentication for ISCSI initiators."
+    DEFVAL          { false }
+    ::=  {  eqlRADIUSEntry 9 }
+
+eqlRADIUSRequireAdminAttrEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field enables requiring the EQL-Admin RADIUS return attribute."
+    DEFVAL          { true }
+    ::=  {  eqlRADIUSEntry 10 }
+
+--******************************************************************
+
+eqlRADIUSAcctServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlRADIUSAcctServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Group RADIUS Accounting server table."
+    ::=  {  eqlgroupObjects  15}
+
+eqlRADIUSAcctServerEntry OBJECT-TYPE
+    SYNTAX          EqlRADIUSAcctServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the configuration for a RADIUS accounting server."
+    INDEX           { eqlGroupId, eqlRADIUSAcctServerIndex }
+    ::=    { eqlRADIUSAcctServerTable 1 }
+
+EqlRADIUSAcctServerEntry ::=
+    SEQUENCE {
+        eqlRADIUSAcctServerIndex         Integer32,
+        eqlRADIUSAcctServerIpAddress IpAddress,
+        eqlRADIUSAcctServerPort          INTEGER,
+        eqlRADIUSAcctServerRowStatus     RowStatus,
+        eqlRADIUSAcctServerSecret          OCTET STRING, -- was DisplayString
+        eqlRADIUSAcctServerInetAddressType InetAddressType,
+        eqlRADIUSAcctServerInetAddress     InetAddress
+        }
+
+eqlRADIUSAcctServerIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the RADIUS Accounting server entry."
+    ::=  {  eqlRADIUSAcctServerEntry 1 }
+
+eqlRADIUSAcctServerIpAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlRADIUSAcctServerEntry 2 }
+
+eqlRADIUSAcctServerPort OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The listening port number of the RADIUS Accounting server at the specified ipaddress. The default value of zero implies that the accounting request will be forwarded to the default RADIUS Accounting port(port number 1813)."
+    DEFVAL          { 0 }
+    ::= { eqlRADIUSAcctServerEntry 3 }
+
+eqlRADIUSAcctServerRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlRADIUSAcctServerEntry 4 }
+
+eqlRADIUSAcctServerSecret OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..64)) -- was DisplayString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field contains the RADIUS secret for this client. It can be set
+                     but it returns a zero-length string upon read."
+    --DEFAULT       cookie "secure"
+    ::=  {  eqlRADIUSAcctServerEntry 5 }
+
+eqlRADIUSAcctServerInetAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the RADIUS Accounting server."
+    ::=  {  eqlRADIUSAcctServerEntry 6 }
+
+eqlRADIUSAcctServerInetAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the RADIUS Accounting server."
+    ::=  {  eqlRADIUSAcctServerEntry 7 }
+
+--******************************************************************
+
+eqlUserSessionTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlUserSessionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic user session table."
+    ::=  {  eqlgroupObjects  16}
+
+eqlUserSessionEntry OBJECT-TYPE
+    SYNTAX          EqlUserSessionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing an active user administrative session."
+    INDEX           { eqlGroupId, eqlUserSessionIndex }
+    ::=    { eqlUserSessionTable 1 }
+
+EqlUserSessionEntry ::=
+    SEQUENCE {
+        eqlUserSessionIndex                 Unsigned32,
+        eqlUserSessionAdminAccountIndex     Integer32,
+        eqlUserSessionStart                 Counter32,
+        eqlUserSessionProtocol              INTEGER,
+        eqlUserSessionRemoteAddress         IpAddress,
+        eqlUserSessionLocalAddress          IpAddress,
+        eqlUserSessionRemoteInetAddressType InetAddressType,
+        eqlUserSessionRemoteInetAddress     InetAddress,
+        eqlUserSessionLocalInetAddressType  InetAddressType,
+        eqlUserSessionLocalInetAddress      InetAddress
+        }
+
+eqlUserSessionIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the user session entry."
+    ::=  {  eqlUserSessionEntry 1 }
+
+eqlUserSessionAdminAccountIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies a storage group admin account entry."
+    ::=  {  eqlUserSessionEntry 2 }
+
+eqlUserSessionStart OBJECT-TYPE
+    SYNTAX          Counter32 
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The timestamp from the start of the administrative session."
+    ::= { eqlUserSessionEntry 3 }
+
+eqlUserSessionProtocol OBJECT-TYPE
+    SYNTAX          INTEGER {
+                         root (0),
+                         console (1),
+                         telnet (2),
+                         ssh (3),
+                         gui (4),
+                         gui-ssl (5)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The incoming protocol through which the administrator is connecting to the array."
+    ::= { eqlUserSessionEntry 4 }
+
+eqlUserSessionRemoteAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::= { eqlUserSessionEntry 5 }
+
+eqlUserSessionLocalAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::= { eqlUserSessionEntry 6 }
+
+eqlUserSessionRemoteInetAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The remote IP address type, if applicable, from which the administrator is connecting."
+    ::= { eqlUserSessionEntry 7 }
+
+eqlUserSessionRemoteInetAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The remote IP address, if applicable, from which the administrator is connecting."
+    ::= { eqlUserSessionEntry 8 }
+
+eqlUserSessionLocalInetAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The local interface IP address type, if applicable, at which the administrator is connecting."
+    ::= { eqlUserSessionEntry 9 }
+
+eqlUserSessionLocalInetAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "The local interface IP address, if applicable, at which the administrator is connecting."
+    ::= { eqlUserSessionEntry 10 }
+
+--******************************************************************
+
+eqlRecordVersionTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlRecordVersionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic record version table."
+    ::=  {  eqlgroupObjects  17}
+
+eqlRecordVersionEntry OBJECT-TYPE
+    SYNTAX          EqlRecordVersionEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing min and max record version."
+    INDEX           { eqlGroupId, eqlRecordVersionTableType }
+    ::=    { eqlRecordVersionTable 1 }
+
+EqlRecordVersionEntry ::=
+    SEQUENCE {
+        eqlRecordVersionTableType       Unsigned32,
+        eqlRecordVersionMin             Unsigned32,
+        eqlRecordVersionMax             Unsigned32
+        }
+
+eqlRecordVersionTableType OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field identifies a specific MIB table by tableType_t (see tableTypes.h)."
+    ::=  {  eqlRecordVersionEntry 1 }
+
+eqlRecordVersionMin OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the lowest REC_HDR::major value found in any record of this table."
+    ::=  {  eqlRecordVersionEntry 2 }
+
+eqlRecordVersionMax OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the current REC_HDR::major value for records of this table."
+    ::= { eqlRecordVersionEntry 3 }
+
+--******************************************************************
+
+eqlGroupTaskTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlGroupTaskEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent task table. 
+                     A row in this table represents a task currently executing in the group."
+    ::=  {  eqlgroupObjects  18}
+
+eqlGroupTaskEntry OBJECT-TYPE
+    SYNTAX          EqlGroupTaskEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A row in the table represents a task. Any given task will have multiple sub tasks. Each sub task involves executing a management operation.  The system will execute each sub task one after another until the task is completed."
+    INDEX           { eqlGroupId, eqlGroupTaskIndex }
+    ::=    { eqlGroupTaskTable 1 }
+
+EqlGroupTaskEntry ::=
+    SEQUENCE {
+        eqlGroupTaskIndex             Unsigned32,
+        eqlGroupTaskRowStatus         RowStatus,
+        eqlGroupTaskType              INTEGER,
+        eqlGroupTaskContext           RowPointer,
+        eqlGroupTaskNumSubTasks       Unsigned32,
+        eqlGroupTaskSubTaskInProgress INTEGER,
+        eqlGroupTaskSubtaskStatus     Unsigned32,
+        eqlGroupTaskStatus            INTEGER,
+        eqlGroupTaskUserAction        INTEGER,
+        eqlGroupTaskStartTime         Counter32,
+        eqlGroupTaskReplication       INTEGER
+        }
+
+eqlGroupTaskIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies a task."
+    ::=  {  eqlGroupTaskEntry 1 }
+
+eqlGroupTaskRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used to manage the conceptual row."
+    ::=  {  eqlGroupTaskEntry 2 }
+eqlGroupTaskType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    resync(1),
+                    failback(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field represents the type of the task."
+    ::=  {  eqlGroupTaskEntry 3 }
+
+eqlGroupTaskContext OBJECT-TYPE
+    SYNTAX          RowPointer
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Context associated with the task. For ex: a volume or replicaset."
+    ::= { eqlGroupTaskEntry 4 }
+
+eqlGroupTaskNumSubTasks OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Number of subtasks in this task."
+    ::= { eqlGroupTaskEntry 5 }
+
+eqlGroupTaskSubTaskInProgress OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    none(0),
+                    primaryVolumeOffline(10001),
+                    primaryVolumeReplicationCancel(10002),
+                    primaryVolumeDemote(10003),
+                    recoveryVolumeReplicationConfigure(10004),
+                    recoveryVolumeCreateReplica(10005),
+                    recoveryVolumeDisableSchedules(20001),
+                    recoveryVolumeOffline(20002),
+                    recoveryVolumeFinalReplication(20003),
+                    recoveryVolumeDemote(20004),
+                    primaryVolumePromote(20005)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Subtask that is currently in progress for this task."
+    ::= { eqlGroupTaskEntry 6 }
+
+eqlGroupTaskSubtaskStatus OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Status of currently executing subtask."
+    ::= { eqlGroupTaskEntry 7 }
+
+eqlGroupTaskStatus OBJECT-TYPE
+    SYNTAX          INTEGER {
+            user-action-required(1),
+            in-progress(2),
+            complete(3)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "set to true if user action is required for the task to proceed further."
+    ::= { eqlGroupTaskEntry 8 }
+
+eqlGroupTaskUserAction OBJECT-TYPE
+    SYNTAX          INTEGER{
+                    retry(1)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "user action on the task."
+    ::= { eqlGroupTaskEntry 9 }
+
+eqlGroupTaskStartTime OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "time at which this task started represented as number of seconds since epoch."
+    ::= { eqlGroupTaskEntry 10 }
+
+
+eqlGroupTaskReplication OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    manual(1),
+                    network(2),
+                    noreplication(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "If set to true, a manual replica will be created when performing replication."
+    DEFVAL          {network}
+    ::= { eqlGroupTaskEntry 11 }
+
+--***********************************************************************************
+eqlStorageGroupProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupProfileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Group Profile Table"
+    ::=  {  eqlgroupObjects  20 }
+
+eqlStorageGroupProfileEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupProfileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the profile limits and configuration information."
+    INDEX           { eqlGroupId, eqlGroupProfileIndex }
+    ::=    { eqlStorageGroupProfileTable 1 }
+
+EqlStorageGroupProfileEntry ::=
+    SEQUENCE {
+        eqlStorageGroupProfileVersion               Unsigned32,
+        eqlStorageGroupProfileWeight                Unsigned32,
+        eqlStorageGroupProfileMaxMembers            Unsigned32,
+        eqlStorageGroupProfileMaxVolumes            Unsigned32,
+        eqlStorageGroupProfileMaxSnapsPerGroup      Unsigned32,
+        eqlStorageGroupProfileMaxSnapsPerVolume     Unsigned32,
+        eqlStorageGroupProfileMaxReplicasPerVolume  Unsigned32,
+        eqlStorageGroupProfileMaxReplVolumes        Unsigned32,
+        eqlStorageGroupProfileMaxConnections        Unsigned32,
+        eqlStorageGroupProfileMaxPartners           Unsigned32,
+        eqlStorageGroupProfileMaxConnWarning        Unsigned32,
+        eqlStorageGroupProfileMaxSyncReplVolumes    Unsigned32
+
+        }
+
+eqlStorageGroupProfileVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the current version of the Profile.  The most significant 16 bits are the compat level, the least significant 16 bits are the profile version. "
+    ::=  {  eqlStorageGroupProfileEntry 1 }
+
+
+eqlStorageGroupProfileWeight OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the current weight of the Profile "
+    ::=  {  eqlStorageGroupProfileEntry 2 }
+
+eqlStorageGroupProfileMaxMembers OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum members that can exist in the group with this profile id."
+    ::=  {  eqlStorageGroupProfileEntry 3 }
+
+eqlStorageGroupProfileMaxVolumes OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of volumes in group."
+    ::=  {  eqlStorageGroupProfileEntry 4 }
+
+eqlStorageGroupProfileMaxSnapsPerGroup OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of snaps in group."
+    ::=  {  eqlStorageGroupProfileEntry 5 }
+eqlStorageGroupProfileMaxSnapsPerVolume OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of snaps per volume."
+    ::=  {  eqlStorageGroupProfileEntry 6 }
+
+eqlStorageGroupProfileMaxReplicasPerVolume OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of Replicas per volume."
+    ::=  {  eqlStorageGroupProfileEntry 7 }
+
+eqlStorageGroupProfileMaxReplVolumes OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of replication volumes in group."
+    ::=  {  eqlStorageGroupProfileEntry 8 }
+
+eqlStorageGroupProfileMaxConnections OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of connections allowed per pool."
+    ::=  {  eqlStorageGroupProfileEntry 9 }
+
+eqlStorageGroupProfileMaxPartners OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of partners in group."
+    ::=  {  eqlStorageGroupProfileEntry 10 }
+eqlStorageGroupProfileMaxConnWarning OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies when will warning be issued for connection limit."
+    ::=  {  eqlStorageGroupProfileEntry 11 }
+
+eqlStorageGroupProfileMaxSyncReplVolumes OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the maximum number of Sync Repl volumes allowed in the group."
+    ::=  {  eqlStorageGroupProfileEntry 12 }
+
+--******************************************************************
+
+eqlStorageGroupAdminAccountKeyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlStorageGroupAdminAccountKeyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic table converting a eqlStorageGroupAdminAccountKey to a 
+                     eqlStorageGroupAdminAccountIndex."
+    ::=  {  eqlgroupObjects  21 }
+
+eqlStorageGroupAdminAccountKeyEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupAdminAccountKeyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the value of the account index."
+    INDEX           { eqlGroupId, eqlStorageGroupAdminAccountKey }
+    ::=   { eqlStorageGroupAdminAccountKeyTable 1 }
+
+EqlStorageGroupAdminAccountKeyEntry ::=
+    SEQUENCE {
+        eqlStorageGroupAdminAccountIndexValue     INTEGER
+    }
+
+eqlStorageGroupAdminAccountIndexValue OBJECT-TYPE
+    SYNTAX          INTEGER 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The index to use to access the group admin account 
+                     associated with the key specified. "
+    ::=   { eqlStorageGroupAdminAccountKeyEntry 1 }
+
+--*************************************************************************************
+
+eqlStorageGroupChapAccountTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlStorageGroupChapAccountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group CHAP account table.
+                     This table contains a collection of CHAP account records,
+                     each containing Equallogic specific CHAP account information.
+                     It is indexed by group id and CHAP account record index.
+                     There should be a row in this table for every row with index 
+                     1.1.X in table ipsAuthCredChapAttributesTable.  Also, chapIndex
+                     is equal to ipsAuthCredIndex."
+    ::= { eqlgroupObjects 22 }
+
+eqlStorageGroupChapAccountEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupChapAccountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing administration account settings."
+    INDEX           { eqlGroupId, eqlStorageGroupChapAccountIndex }
+    ::=   { eqlStorageGroupChapAccountTable 1 }
+
+EqlStorageGroupChapAccountEntry ::=
+    SEQUENCE {
+        eqlStorageGroupChapAccountIndex           Integer32,
+        eqlStorageGroupChapAccountRowStatus       RowStatus,
+        eqlStorageGroupChapAccountAdminAccountKey Unsigned32,
+        eqlStorageGroupChapAccountPublic          TruthValue
+    }
+
+eqlStorageGroupChapAccountIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "The index value that uniquely identifies the CHAP account record."
+    ::=   { eqlStorageGroupChapAccountEntry 1 }
+
+eqlStorageGroupChapAccountRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlStorageGroupChapAccountEntry 2 }
+
+eqlStorageGroupChapAccountAdminAccountKey OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "A value to uniquely identify this administrative account that created
+                     this CHAP account.  This value matches the eqlStorageGroupAdminAccountKey
+                     of the creating account.  If no account exists with a matching account key,
+                     then the administrative account that created this CHAP account has
+                     been deleted."
+    ::=   { eqlStorageGroupChapAccountEntry 3 }
+
+eqlStorageGroupChapAccountPublic OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "If true, the name of the associated CHAP account is viewable by all 
+                     admin accounts.  If false, the name of the associated CHAP account 
+                     is not viewable by volume administrator accounts that did not create
+                     the associated CHAP account"
+    DEFVAL          { false }
+    ::=   { eqlStorageGroupChapAccountEntry 4 }
+
+--*************************************************************************************
+
+eqlLDAPServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlLDAPServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Group LDAP Accounting server table."
+    ::=  {  eqlgroupObjects  24}
+
+eqlLDAPServerEntry OBJECT-TYPE
+    SYNTAX          EqlLDAPServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the configuration for a LDAP server."
+    INDEX           { eqlGroupId, eqlLDAPServerIndex }
+    ::=    { eqlLDAPServerTable 1 }
+
+EqlLDAPServerEntry ::=
+    SEQUENCE {
+        eqlLDAPServerIndex           Integer32,
+        eqlLDAPServerBaseDN          OCTET STRING,
+        eqlLDAPServerSecureProtocol  INTEGER,
+        eqlLDAPServerInetAddressType InetAddressType,
+        eqlLDAPServerInetAddress     InetAddress,
+        eqlLDAPServerPort            INTEGER,
+        eqlLDAPServerAnonymousAccess TruthValue,
+        eqlLDAPServerBindDN          OCTET STRING,
+        eqlLDAPServerBindPassword    OCTET STRING,
+        eqlLDAPServerRowStatus       RowStatus
+        }
+
+eqlLDAPServerIndex OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the LDAP  server entry."
+    ::=  {  eqlLDAPServerEntry 1 }
+
+eqlLDAPServerBaseDN OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..512))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the LDAP server BASE DN used for ldapsearch queries."
+    ::=  {  eqlLDAPServerEntry 2 }
+
+eqlLDAPServerSecureProtocol OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        none (0),
+                        tls  (1)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field represent the security protocol between PS Group and 
+                     the LDAP server. Default value is none meaning that the user 
+                     credentials will be sent over the network in plain text."
+    DEFVAL          { none}
+    ::=   { eqlLDAPServerEntry 3 }
+
+eqlLDAPServerInetAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the LDAP Accounting server."
+    ::=  {  eqlLDAPServerEntry 4 }
+
+eqlLDAPServerInetAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the LDAP Accounting server."
+    ::=  {  eqlLDAPServerEntry 5 }
+
+eqlLDAPServerPort OBJECT-TYPE
+    SYNTAX          INTEGER(0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The listening port number of the LDAP Accounting server at the 
+                     specified ipaddress. The default value of zero implies that the 
+                     accounting request will be forwarded to the default LDAP Accounting 
+                     port (389)."
+    DEFVAL          { 0 }
+    ::= { eqlLDAPServerEntry 6 }
+
+eqlLDAPServerAnonymousAccess    OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies whether an anonymous bind can be done, in which
+                     case the bind DN and the bind password are not needed.
+                     The default is no anonymous access."
+    DEFVAL           { false }
+    ::=  {  eqlLDAPServerEntry 7 }
+
+eqlLDAPServerBindDN OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..512))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the LDAP bind DN (username) for this client. 
+                     It can be set but it returns a zero-length string upon read."    
+    ::=  {  eqlLDAPServerEntry 8 }
+
+eqlLDAPServerBindPassword OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the LDAP bind password for this client. It can be set
+                     but it returns a zero-length string upon read."
+    --DEFAULT       cookie "secure"
+    ::=  {  eqlLDAPServerEntry 9 }
+
+eqlLDAPServerRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= {  eqlLDAPServerEntry 10 }
+
+--*************************************************************************************
+eqlLdapLoginAccessTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlLdapLoginAccessEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Group Active directory group table. Stores 
+                     the access that an AD group or account receives when logging in 
+                     through an entry in this table."
+    ::=  {  eqlgroupObjects  25}
+
+eqlLdapLoginAccessEntry OBJECT-TYPE
+    SYNTAX          EqlLdapLoginAccessEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the configuration for the LDAP 
+                     object access details."
+    INDEX           { eqlGroupId, eqlLdapLoginAccessType, eqlLdapLoginAccessName }
+    ::=    { eqlLdapLoginAccessTable 1 }
+
+EqlLdapLoginAccessEntry ::=
+    SEQUENCE {
+        eqlLdapLoginAccessName                   DisplayString,
+        eqlLdapLoginAccessType                   INTEGER,
+        eqlLdapLoginAccessAccountPrivilege       AdminAccountPrivilegeType,
+        eqlLdapLoginAccessAccountType            AdminAccountType,
+        eqlLdapLoginAccessRowStatus              RowStatus,
+        eqlLdapLoginAccessAdDomainName           DisplayString
+        }
+
+eqlLdapLoginAccessName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..65))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The name of the LDAP object access description.
+                     For AD groups, it is the same as cn attribute of the AD group.
+                     For LDAP accounts, it is the same as the account name.
+                     Length allows for terminating null terminating character."
+    ::=   { eqlLdapLoginAccessEntry 1 }
+
+eqlLdapLoginAccessType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        adGroup (1),
+                        ldapUser (2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field represents the type of LDAP object that this 
+                     entry grants access to."
+    DEFVAL          { adGroup }
+    ::=   { eqlLdapLoginAccessEntry 2 }
+
+eqlLdapLoginAccessAccountPrivilege OBJECT-TYPE    
+    SYNTAX          AdminAccountPrivilegeType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the privilege level of the account that 
+                     logs in through this LDAP object access.
+                     The default is global-admin.  Global-admin grants full
+                     access to the administrator.  Pool-admin designates the
+                     administrator to have access only to one or more pools,
+                     and does not have access to global and group-level
+                     administrator.  Volume-admin designates the administrator to
+                     have access to specific volumes within specific storage pools"
+    ::=   { eqlLdapLoginAccessEntry 3 }
+
+eqlLdapLoginAccessAccountType OBJECT-TYPE
+    SYNTAX          AdminAccountType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the type of account. The read-write 
+                     account type allows the user to modify any group settings. 
+                     The read-only account allows only read-only access to
+                     group configuration data. The default is read-write. 
+                     Changing this value will come into affect only for new 
+                     login of the user. Currently logged in sessions will not
+                     be affected. Read-only account is only applicable for group admin 
+                     accounts/pool-admin accounts. Group-admins with read-only set 
+                     cannot modify any settings." 
+    ::=   { eqlLdapLoginAccessEntry 4 }
+
+eqlLdapLoginAccessRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the status of this entry."  
+    ::= { eqlLdapLoginAccessEntry 5 }  
+
+eqlLdapLoginAccessAdDomainName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..65))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The name of the AD Domain associated with this LDAP object.
+                     Length allows for terminating null terminating character."
+    ::=   { eqlLdapLoginAccessEntry 6 }
+
+--
+
+eqlStorageGroupDnsSuffixTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupDnsSuffixEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group DNS Suffix Table
+                     TimeoutAll:600"
+    ::=  {  eqlgroupObjects  26}
+
+eqlStorageGroupDnsSuffixEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupDnsSuffixEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group dns suffix information."
+    INDEX           { eqlGroupId, eqlGroupDnsSuffixIndex}
+    ::=    { eqlStorageGroupDnsSuffixTable 1 }
+
+EqlStorageGroupDnsSuffixEntry ::=
+    SEQUENCE {
+        eqlGroupDnsSuffixIndex         Integer32,
+        eqlGroupDnsSuffixRowStatus     RowStatus,
+        eqlGroupDnsSuffixString        DisplayString,
+        eqlGroupDnsSuffixConfigState   INTEGER
+        }
+
+eqlGroupDnsSuffixIndex  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the DNS suffix entry."
+    ::=  {  eqlStorageGroupDnsSuffixEntry 1 }
+
+eqlGroupDnsSuffixRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlStorageGroupDnsSuffixEntry 2 }
+
+eqlGroupDnsSuffixString         OBJECT-TYPE
+    SYNTAX          DisplayString  (SIZE (0..127))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains a suffix string."
+    ::=  {  eqlStorageGroupDnsSuffixEntry 3 }
+
+eqlGroupDnsSuffixConfigState OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                    startConfig (0),
+                    inProgress  (1),
+                    endConfig   (2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current 
+    DESCRIPTION     "This field denotes the transaction state of the eqlStorageGroupDnsSuffixTable."
+    DEFVAL          {startConfig}
+    ::=  {  eqlStorageGroupDnsSuffixEntry 4 }
+
+
+--
+
+eqlStorageGroupSnmpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupSnmpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Storage Group Snmp Table. Used solely to communicate Group Snmp params to the Appliance."
+    ::=  {  eqlgroupObjects 27}
+
+
+eqlStorageGroupSnmpEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupSnmpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing snmp information."
+    INDEX           { eqlGroupId}
+    ::=    { eqlStorageGroupSnmpTable 1 }
+
+EqlStorageGroupSnmpEntry ::=
+    SEQUENCE {
+        eqlStorageGroupSnmpRowStatus           RowStatus,
+        eqlStorageGroupSnmpManagersList        OCTET STRING,
+        eqlStorageGroupSnmpTrapCommunity        OCTET STRING
+        }
+
+eqlStorageGroupSnmpRowStatus   OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Rowstatus"
+    ::=  {  eqlStorageGroupSnmpEntry 1 }
+
+eqlStorageGroupSnmpManagersList OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..255))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Specifies a list of SNMP managers that can receive SNMP traps. Contains Max of 5 comma separated IP addresses."
+    ::=   { eqlStorageGroupSnmpEntry 2 }
+
+
+eqlStorageGroupSnmpTrapCommunity OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..255))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Specifies the trap read-only community string."
+    ::=   { eqlStorageGroupSnmpEntry 3 }
+
+--
+
+eqlGroupSessionBannerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlGroupSessionBannerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Storage Group Session Banner Table"
+    ::=  {  eqlgroupObjects 28}
+
+
+eqlGroupSessionBannerEntry OBJECT-TYPE
+    SYNTAX          EqlGroupSessionBannerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing session banner information."
+    INDEX           { eqlGroupId}
+    ::=    { eqlGroupSessionBannerTable 1 }
+
+EqlGroupSessionBannerEntry ::=
+    SEQUENCE {
+        eqlGroupSessionBannerRowStatus   RowStatus,
+        eqlGroupSessionBannerText        OCTET STRING
+        }
+
+eqlGroupSessionBannerRowStatus   OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Rowstatus"
+    ::=  {  eqlGroupSessionBannerEntry 1 }
+
+eqlGroupSessionBannerText OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..1000))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Up to 1000 bytes of UTF-8 string to display at the beginning of any session"
+    ::=   { eqlGroupSessionBannerEntry 2 }
+
+--
+
+
+eqlGroupSingleSignOnStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlGroupSingleSignOnStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Single Sign on status table"
+    ::=  {  eqlgroupObjects 29}
+
+
+eqlGroupSingleSignOnStatusEntry OBJECT-TYPE
+    SYNTAX          EqlGroupSingleSignOnStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing session Single Sign on status information."
+    INDEX           { eqlGroupId }
+    ::=    { eqlGroupSingleSignOnStatusTable 1 }
+
+EqlGroupSingleSignOnStatusEntry ::=
+    SEQUENCE {        
+        eqlGroupSingleSignOnStatus        INTEGER,
+        eqlGroupSingleSignOnRegGroupName  DisplayString,
+        eqlGroupSingleSignOnKrbRealm      OCTET STRING
+        }
+
+
+eqlGroupSingleSignOnStatus OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    not-ready(0),
+                    ready(1)               
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current     
+    DESCRIPTION     "This field specifies the local status for signle sign on as maintained by the PS group
+                     It will be set to Ready if an attempt to join the AD server had succeeded 
+                     with the current group name and current AD domain (as set setup in eqlLDAPServerTable)"
+    DEFVAL          { 0 }
+    ::=  { eqlGroupSingleSignOnStatusEntry 1 }
+
+eqlGroupSingleSignOnRegGroupName OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the group name that was registered with the AD server"
+    ::=  {  eqlGroupSingleSignOnStatusEntry 2 }
+
+eqlGroupSingleSignOnKrbRealm OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE(0..512))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field contains kerberos relam or the domain name expressed using a dot notation.
+                     This field should match the dc part of the BASE DN in the eqlLDAPServerTable." 
+    ::=  {  eqlGroupSingleSignOnStatusEntry 3 }
+
+eqlNextAvailableIndexTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlNextAvailableIndexEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Next Available Index Table
+                     This table tracks the next available index for
+                     a specified table type."
+    ::=  { eqlgroupObjects 30 }
+
+eqlNextAvailableIndexEntry OBJECT-TYPE
+    SYNTAX          EqlNextAvailableIndexEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) which tracks an available
+                     index for the specified table type."
+    INDEX           { eqlNextAvailableIndexTableType }
+    ::=  { eqlNextAvailableIndexTable 1 }
+
+EqlNextAvailableIndexEntry ::=
+    SEQUENCE {                                                                                                              
+        eqlNextAvailableIndexTableType   Unsigned32,
+        eqlNextAvailableIndexValue       Unsigned32
+    }
+
+eqlNextAvailableIndexTableType OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field indicates the table for which this index is
+                     maintained (from tableTypes.h)."
+    ::=  { eqlNextAvailableIndexEntry 1 }
+
+eqlNextAvailableIndexValue OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field maintains the last db index value used for 
+                     the specified table."
+    ::=  { eqlNextAvailableIndexEntry 2 }
+
+--
+
+eqlStorageGroupSnmpReadOnlyCommunityTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStorageGroupSnmpReadOnlyCommunityEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Storage Group Snmp Read Only Community Table. Used solely to manage the Group SNMP read only community string."
+    ::=  {  eqlgroupObjects 31 }
+
+
+eqlStorageGroupSnmpReadOnlyCommunityEntry OBJECT-TYPE
+    SYNTAX          EqlStorageGroupSnmpReadOnlyCommunityEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing snmp community information."
+    INDEX           { eqlGroupId}
+    ::=    { eqlStorageGroupSnmpReadOnlyCommunityTable 1 }
+
+EqlStorageGroupSnmpReadOnlyCommunityEntry ::=
+    SEQUENCE {
+        eqlStorageGroupSnmpReadOnlyCommunity            DisplayString
+        }
+
+eqlStorageGroupSnmpReadOnlyCommunity OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE(0..255)) 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Specifies SNMP read only community string."
+    ::=   { eqlStorageGroupSnmpReadOnlyCommunityEntry 1 }
+
+--
+
+--*************************************************************************************
+
+eqlEULAAcceptInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlEULAAcceptInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent EULA acceptance information table.
+                     This table contains a single record that stores information
+                     associated with the most recent EULA accepted."
+    ::= { eqlgroupObjects 32 }
+
+eqlEULAAcceptInfoEntry OBJECT-TYPE
+    SYNTAX          EqlEULAAcceptInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing EULA acceptance information."
+    INDEX           {  eqlGroupId, eqlEULAAcceptInfoFirmwareType }
+    ::=   { eqlEULAAcceptInfoTable 1 }
+
+EqlEULAAcceptInfoEntry ::=
+    SEQUENCE {
+        eqlEULAAcceptInfoFirmwareType            INTEGER,
+        eqlEULAAcceptInfoRowStatus               RowStatus,
+        eqlEULAAcceptInfoAccountName             DisplayString,
+        eqlEULAAcceptInfoEULAVersion             Unsigned32,
+        eqlEULAAcceptInfoTimestamp               Unsigned32
+    }
+
+eqlEULAAcceptInfoFirmwareType OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                    peer-storage-array(1),
+                    fluidfs-nas       (2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The firmware type of the accepted EULA."
+    ::=   { eqlEULAAcceptInfoEntry 1 }
+
+eqlEULAAcceptInfoRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlEULAAcceptInfoEntry 2 }
+
+eqlEULAAcceptInfoAccountName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The name of the administration account used to accept the EULA."
+    ::=   { eqlEULAAcceptInfoEntry 3 }
+
+eqlEULAAcceptInfoEULAVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The version of the accepted EULA."
+    ::=   { eqlEULAAcceptInfoEntry 4 }
+
+eqlEULAAcceptInfoTimestamp OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The timestamp when the EULA was accepted.."
+    ::= { eqlEULAAcceptInfoEntry 5 }
+
+--
+
+END
+

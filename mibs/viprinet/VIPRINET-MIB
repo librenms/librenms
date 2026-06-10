@@ -1,0 +1,831 @@
+VIPRINET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, enterprises, TimeTicks
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+;
+
+viprinet MODULE-IDENTITY 
+    LAST-UPDATED "201509281620Z" -- 28 September 2015
+    ORGANIZATION "Viprinet" 
+    CONTACT-INFO "Viprinet" 
+    DESCRIPTION "This MIB complements the ViprinetMIB." 
+    REVISION     "201509281620Z" -- 28 September 2015
+    DESCRIPTION  "Seventh revision."
+    ::= { enterprises 35424 }
+
+vpnRouter                    OBJECT IDENTIFIER ::= { viprinet 1 }
+
+vpnRouterInfo                OBJECT IDENTIFIER ::= { vpnRouter 1 }
+vpnRouterHealth              OBJECT IDENTIFIER ::= { vpnRouter 2 }
+vpnRouterFans                OBJECT IDENTIFIER ::= { vpnRouter 3 }
+vpnRouterInterfaces          OBJECT IDENTIFIER ::= { vpnRouter 4 }
+vpnRouterTunnels             OBJECT IDENTIFIER ::= { vpnRouter 5 }
+vpnRouterTunnelChannels      OBJECT IDENTIFIER ::= { vpnRouter 6 }
+
+
+vpnRouterName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A short descriptive name of the router."
+    ::= { vpnRouterInfo 1 }
+
+vpnRouterSerial OBJECT-TYPE
+    SYNTAX OCTET STRING  (SIZE (19))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number of this router."
+    ::= { vpnRouterInfo 2 }
+
+vpnRouterModel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (6))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Router Model"
+    ::= { vpnRouterInfo 3 }
+
+vpnRouterFirmware OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (22))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Firmware Version currently running on this router."
+    ::= { vpnRouterInfo 4 }
+
+vpnRouterMode OBJECT-TYPE
+    SYNTAX Integer32 (0..3)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current mode that the router is running in. Possible values are:
+        0 - Node
+        1 - Hub
+        2 - Hub running as HotSpare
+        3 - Hotspare-Hub replacing another router"
+    ::= { vpnRouterInfo 5 }
+
+vpnRouteruptime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Elapsed time since the router has booted."
+    ::= { vpnRouterInfo 6 }
+
+vpnRouterFirmwareStatus OBJECT-TYPE
+    SYNTAX Integer32 (0..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current Status of the Update System. Possible values are:
+        0 - Idle / No new firmware available
+        1 - Updates Available
+        2 - Checking for Updates
+        3 - Downloading Update
+        4 - Installing Update"
+    ::= { vpnRouterInfo 7 }
+
+
+vpnRouterCPULoad OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (3))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Load average on this router"
+    ::= { vpnRouterHealth 1 }
+
+vpnRouterMemoryUsage OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current total memory usage (in KByte)."
+    ::= { vpnRouterHealth 2 }
+
+vpnRouterSystemTemperature OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current system temperature (in degree Celsius)."
+    ::= { vpnRouterHealth 3 }
+
+vpnRouterCPUTemperature OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current CPU temperature (in degree Celsius)"
+    ::= { vpnRouterHealth 4 }
+
+vpnRouterPowerSupplyFailure OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Information about the PSU
+        Possible Values are:
+        0 = no failure
+        1 = a single PSU is out of order"
+    ::= { vpnRouterHealth 5 }
+
+vpnRouterFanCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of Fans."
+    ::= { vpnRouterFans 1 }
+
+vpnRouterFanTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VpnRouterFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table holding information to each fan."
+    ::= { vpnRouterFans 2 }
+
+vpnRouterFanEntry OBJECT-TYPE
+    SYNTAX VpnRouterFanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry associated with each fan."
+    INDEX {vpnRouterFanIndex}
+    ::= { vpnRouterFanTable 1 }
+
+VpnRouterFanEntry ::= SEQUENCE {
+    vpnRouterFanIndex           Integer32,
+    vpnRouterFanAdminStatus     Integer32,
+    vpnRouterFanOperativeStatus Integer32,
+    vpnRouterFanRPM             Integer32
+}
+
+vpnRouterFanIndex OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ID-Number of the fan"
+    ::= { vpnRouterFanEntry 1 }
+
+vpnRouterFanAdminStatus OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Desired state of this Fan
+         Possible Values:
+         0 = off
+         1 = on"
+    ::= { vpnRouterFanEntry 2 }
+
+vpnRouterFanOperativeStatus OBJECT-TYPE
+    SYNTAX Integer32(0..2)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operative status of this fan
+          0 = Disabled
+          1 = OK
+          2 = Faulty"
+    ::= { vpnRouterFanEntry 3 }
+
+vpnRouterFanRPM OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current RPM of this fan.  Note that not all models supply this info."
+    ::= { vpnRouterFanEntry 4 }
+
+vpnRouterInterfaceCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of Interfaces."
+    ::= { vpnRouterInterfaces 1 }
+
+vpnRouterInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VpnRouterInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table holding information to each interface."
+    ::= { vpnRouterInterfaces 2 }
+
+vpnRouterInterfaceEntry OBJECT-TYPE
+    SYNTAX VpnRouterInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry associated with each interface."
+    INDEX {vpnRouterInterfaceIndex}
+    ::= { vpnRouterInterfaceTable 1 }
+
+VpnRouterInterfaceEntry ::= SEQUENCE {
+    vpnRouterInterfaceIndex           Integer32,
+    vpnRouterInterfaceName            DisplayString,
+    vpnRouterInterfaceAdminStatus     Integer32,
+    vpnRouterInterfaceOperativeStatus Integer32,
+    vpnRouterInterfaceBandwidthToWan   Integer32,
+    vpnRouterInterfaceBandwidthFromWan Integer32,
+    vpnRouterInterfaceTrafficUp       Counter32,
+    vpnRouterInterfaceTrafficDown     Counter32,
+    vpnRouterInterfaceSignalStrength  Integer32,
+    vpnRouterInterfaceServiceType     DisplayString,
+    vpnRouterInterfaceServiceStatus   DisplayString,
+    vpnRouterInterfaceRoaming         Integer32,
+    vpnRouterInterfaceServiceStatus   DisplayString,
+    vpnRouterInterfaceNetworkName     DisplayString,
+    vpnRouterInterfaceBandInfo        DisplayString,
+    vpnRouterInterfaceIMSI            DisplayString,
+    vpnRouterInterfaceIMEI            DisplayString,
+    vpnRouterInterfacePINStatus       DisplayString,
+    vpnRouterInterfaceRFBand          Integer32,
+    vpnRouterInterfaceRFChannel       Integer32,
+    vpnRouterInterfaceSyncrateUpstream Counter32,
+    vpnRouterInterfaceSyncrateDownstream Counter32
+}
+
+vpnRouterInterfaceIndex OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ID-Number of the interface."
+    ::= { vpnRouterInterfaceEntry 1 }
+    
+vpnRouterInterfaceName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A short descriptive name of  the interface"
+    ::= { vpnRouterInterfaceEntry 2 }
+    
+vpnRouterInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Desired state of the interface.
+        possible values: 0 = disconnected, 1 = connected"
+    ::= { vpnRouterInterfaceEntry 3 }
+    
+vpnRouterInterfaceOperativeStatus OBJECT-TYPE
+    SYNTAX Integer32(0..3)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current state of the interface.
+         possible values: 
+         0 = disconnected,
+         1 = connected,
+         2 = connecting,
+         3 = disconnecting"
+    ::= { vpnRouterInterfaceEntry 4 }
+
+vpnRouterInterfaceBandwidthToWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Theoretical maximum upstream (in KBit). Might be illusional."
+    ::= { vpnRouterInterfaceEntry 5 }
+
+vpnRouterInterfaceBandwidthFromWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Theoretical maximum downstream (in KBit)."
+    ::= { vpnRouterInterfaceEntry 6 }
+
+vpnRouterInterfaceTrafficUp OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total upstream traffic made (in Byte) since router boot."
+    ::= { vpnRouterInterfaceEntry 7 }
+
+vpnRouterInterfaceTrafficDown OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total downstream traffic made (in Byte) since router boot."
+    ::= { vpnRouterInterfaceEntry 8 }
+
+vpnRouterInterfaceSignalStrength OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Signal Strength (in percent)."
+    ::= { vpnRouterInterfaceEntry 9 }
+
+vpnRouterInterfaceServiceType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface Service Type."
+    ::= { vpnRouterInterfaceEntry 10 }
+
+vpnRouterInterfaceServiceStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Service Status."
+    ::= { vpnRouterInterfaceEntry 11 }
+
+vpnRouterInterfaceRoaming OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface Roaming.
+         possible values: 
+         0 = off,
+         1 = on"
+    ::= { vpnRouterInterfaceEntry 12 }
+
+vpnRouterInterfaceNetworkName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface Network Name."
+    ::= { vpnRouterInterfaceEntry 13 }
+
+vpnRouterInterfaceBandInfo OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface Band Info."
+    ::= { vpnRouterInterfaceEntry 14 }
+
+vpnRouterInterfaceIMSI OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface IMSI."
+    ::= { vpnRouterInterfaceEntry 15 }
+
+vpnRouterInterfaceIMEI OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface IMEI."
+    ::= { vpnRouterInterfaceEntry 16 }
+
+vpnRouterInterfacePINStatus OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface PIN Status."
+    ::= { vpnRouterInterfaceEntry 17 }
+
+vpnRouterInterfaceRFBand OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface RF Band."
+    ::= { vpnRouterInterfaceEntry 18 }
+
+vpnRouterInterfaceRFChannel OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface RF Channel."
+    ::= { vpnRouterInterfaceEntry 19 }
+
+vpnRouterInterfaceSyncrateUpstream OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface Syncrate Upstream."
+    ::= { vpnRouterInterfaceEntry 20 }
+
+vpnRouterInterfaceSyncrateDownstream OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interface Syncrate Downstream."
+    ::= { vpnRouterInterfaceEntry 21 }
+
+vpnRouterTunnelCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of Tunnels."
+    ::= { vpnRouterTunnels 1 }
+
+vpnRouterTunnelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VpnRouterTunnelEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table holding information to each tunnel."
+    ::=  { vpnRouterTunnels 2 }
+
+vpnRouterTunnelEntry OBJECT-TYPE
+    SYNTAX VpnRouterTunnelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry associated with each tunnel."
+    INDEX  {vpnRouterTunnelIndex}
+    ::= { vpnRouterTunnelTable 1 }
+
+VpnRouterTunnelEntry ::= SEQUENCE {
+     vpnRouterTunnelIndex                           Integer32,
+     vpnRouterTunnelName                            DisplayString,
+     vpnRouterTunnelAdminStatus                     Integer32,
+     vpnRouterTunnelOperativeStatus                 Integer32,
+     vpnRouterTunnelCumulatedBandwidthToWan          Integer32,
+     vpnRouterTunnelCumulatedBandwidthFromWan        Integer32,
+     vpnRouterTunnelCurrentCumulatedBandwidthToWan   Integer32,
+     vpnRouterTunnelCurrentCumulatedBandwidthFromWan Integer32,
+     vpnRouterTunnelTrafficUp                       Counter32,
+     vpnRouterTunnelTrafficDown                     Counter32,
+     vpnRouterTunnelRemoteRouterSerial              DisplayString
+}
+
+vpnRouterTunnelIndex OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ID-Number of the tunnel."
+    ::= { vpnRouterTunnelEntry 1 }
+    
+vpnRouterTunnelName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of VPN tunnel"
+    ::= { vpnRouterTunnelEntry 2 }
+    
+vpnRouterTunnelAdminStatus OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Desired state of the tunnel.
+        possible values: 0 = disconnected,  1 = connected"
+    ::= { vpnRouterTunnelEntry 3 }
+    
+vpnRouterTunnelOperativeStatus OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current state of the tunnel.
+         possible values: 
+         0 = disconnected,
+         1 = connected"
+    ::= { vpnRouterTunnelEntry 4 }
+
+vpnRouterTunnelCumulatedBandwidthToWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Theoretical maximum cumulated downstream (in KBit), considering all active channels."
+    ::= { vpnRouterTunnelEntry 5 }
+
+vpnRouterTunnelCumulatedBandwidthFromWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Theoretical maximum cumulated upstream (in KBit), considering all active channels."
+    ::= { vpnRouterTunnelEntry 6 }
+
+vpnRouterTunnelCurrentCumulatedBandwidthToWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current cumulated upstream (in KBit)."
+    ::= { vpnRouterTunnelEntry 7 }
+
+vpnRouterTunnelCurrentCumulatedBandwidthFromWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current cumulated downstream (in KBit)."
+    ::= { vpnRouterTunnelEntry 8 }
+
+vpnRouterTunnelTrafficUp OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total upstream traffic made (in Byte) since router boot."
+    ::= { vpnRouterTunnelEntry 9 }
+
+vpnRouterTunnelTrafficDown OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total downstream traffic made (in Byte) since router boot."
+    ::= { vpnRouterTunnelEntry 10 }
+
+vpnRouterTunnelRemoteRouterSerial OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial of the remote router."
+    ::= { vpnRouterTunnelEntry 11 }
+
+vpnRouterTunnelChannelCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of TunnelChannel."
+    ::= { vpnRouterTunnelChannels 1 }
+
+vpnRouterTunnelChannelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF VpnRouterTunnelChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table holding information to each tunnelchannel."
+    ::= { vpnRouterTunnelChannels 2 }
+
+vpnRouterTunnelChannelEntry OBJECT-TYPE
+    SYNTAX VpnRouterTunnelChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry associated with each tunnelchannel."
+    INDEX  {vpnRouterTunnelChannelIndex}
+    ::= { vpnRouterTunnelChannelTable 1 }
+
+VpnRouterTunnelChannelEntry ::= SEQUENCE {
+    vpnRouterTunnelChannelIndex                  Integer32,
+    vpnRouterTunnelChannelName                   DisplayString,
+    vpnRouterTunnelChannelAdminStatus            Integer32,
+    vpnRouterTunnelChannelOperativeStatus        Integer32,
+    vpnRouterTunnelChannelMaxBandwidthToWan       Integer32,
+    vpnRouterTunnelChannelMaxBandwidthFromWan     Integer32,
+    vpnRouterTunnelChannelCurrentBandwidthToWan   Integer32,
+    vpnRouterTunnelChannelCurrentBandwidthFromWan Integer32,
+    vpnRouterTunnelChannelTrafficUp              Counter32,
+    vpnRouterTunnelChannelTrafficDown            Counter32,
+    vpnRouterTunnelChannelReferencedTunnel       Integer32,
+    vpnRouterTunnelChannelIsBackup               Integer32,
+    vpnRouterTunnelChannelModuleSlot             Integer32,
+    vpnRouterTunnelChannelPacketLoss             Integer32,
+    vpnRouterTunnelChannelLinkStability          Integer32
+}
+
+vpnRouterTunnelChannelIndex OBJECT-TYPE
+    SYNTAX Integer32(0..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ID-Number of the tunnelchannel."
+    ::= { vpnRouterTunnelChannelEntry 1 }
+    
+vpnRouterTunnelChannelName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of tunnelchannel. It will be in the form tunnel.tunnelname"
+    ::= { vpnRouterTunnelChannelEntry 2 }
+    
+vpnRouterTunnelChannelAdminStatus OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Desired state of the tunnelchannel.
+        possible values: 0 = disconnected,  1 = connected"
+    ::= { vpnRouterTunnelChannelEntry 3 }
+    
+vpnRouterTunnelChannelOperativeStatus OBJECT-TYPE
+    SYNTAX Integer32(0..8)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current state of the tunnelchannel.
+         possible values: 
+         0 = disconnected,
+         1 = connected,
+         2 = connecting,
+         3 = disconnecting,
+         4 = connectedpingtest,
+         5 = connectedpingtestwait,
+         6 = connectedtooslow,
+         7 = connectedstalled,
+         8 = error"
+    ::= { vpnRouterTunnelChannelEntry 4 }
+
+vpnRouterTunnelChannelMaxBandwidthToWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximum possible bandwidth to WAN (in KBit/sec)."
+    ::= { vpnRouterTunnelChannelEntry 5 }
+
+vpnRouterTunnelChannelMaxBandwidthFromWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Maximum possible bandwidth from WAN (in KBit/sec)."
+    ::= { vpnRouterTunnelChannelEntry 6 }
+
+vpnRouterTunnelChannelCurrentBandwidthToWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current bandwidth to WAN (in KBit/sec)."
+    ::= { vpnRouterTunnelChannelEntry 7 }
+
+vpnRouterTunnelChannelCurrentBandwidthFromWan OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current bandwidth from WAN (in KBit/sec)."
+    ::= { vpnRouterTunnelChannelEntry 8 }
+
+vpnRouterTunnelChannelTrafficUp OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total upstream traffic made (in Byte) since router boot."
+    ::= { vpnRouterTunnelChannelEntry 9 }
+
+vpnRouterTunnelChannelTrafficDown OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total downstream traffic made (in Byte) since router boot."
+    ::= { vpnRouterTunnelChannelEntry 10 }
+
+vpnRouterTunnelChannelReferencedTunnel OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The OID of the tunnel that this channel is referencing to."
+    ::= { vpnRouterTunnelChannelEntry 11 }
+
+vpnRouterTunnelChannelIsBackup OBJECT-TYPE
+    SYNTAX Integer32(0..1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Is this channel configured as fallback? Possible Values:
+         0 = no,
+         1 = yes"
+    ::= { vpnRouterTunnelChannelEntry 12 }
+
+vpnRouterTunnelChannelModuleSlot OBJECT-TYPE
+    SYNTAX Integer32(0..6)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Module that the channel is using.
+         Possible Values:
+         0 = Hub WAN-Interface,
+         1 = Module in Slot 1,
+         2 = Module in Slot 2,
+         3 = Module in Slot 3,
+         4 = Module in Slot 4,
+         5 = Module in Slot 5,
+         6 = Module in Slot 6"
+    ::= { vpnRouterTunnelChannelEntry 13 }
+
+vpnRouterTunnelChannelPacketLoss OBJECT-TYPE
+    SYNTAX Integer32(0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Overall packetloss experienced (in %) on the channel-connection."
+    ::= { vpnRouterTunnelChannelEntry 14 }
+
+vpnRouterTunnelChannelLinkStability OBJECT-TYPE
+    SYNTAX Integer32(0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Estimated Link Stability (in %) of  the channel-connection."
+    ::= { vpnRouterTunnelChannelEntry 15 }
+
+
+--  Conformance information
+
+vpnRouterConformance OBJECT IDENTIFIER ::= { vpnRouter 7 }
+vpnRouterGroups      OBJECT IDENTIFIER ::= { vpnRouterConformance 1 }
+vpnRouterCompliances OBJECT IDENTIFIER ::= { vpnRouterConformance 2 }
+
+--  Compliance statements
+
+vpnRouterReadOnlyCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "When this MIB is implemented without support for read-
+         create (i.e., in read-only mode), the implementation can
+         claim read-only compliance."
+    MODULE -- this module
+    MANDATORY-GROUPS { vpnRouterObjects }
+    ::= { vpnRouterCompliances 1 }
+
+
+ -- units of conformance
+   
+vpnRouterObjects OBJECT-GROUP
+    OBJECTS { vpnRouterTunnelChannelName,
+              vpnRouterTunnelChannelAdminStatus,
+              vpnRouterTunnelChannelOperativeStatus,
+              vpnRouterTunnelChannelMaxBandwidthToWan,
+              vpnRouterTunnelChannelMaxBandwidthFromWan,
+              vpnRouterTunnelChannelCurrentBandwidthToWan,
+              vpnRouterTunnelChannelCurrentBandwidthFromWan,
+              vpnRouterTunnelChannelTrafficUp,
+              vpnRouterTunnelChannelTrafficDown,
+              vpnRouterTunnelChannelReferencedTunnel,
+              vpnRouterTunnelChannelIsBackup,
+              vpnRouterTunnelChannelModuleSlot,
+              vpnRouterTunnelChannelPacketLoss,
+              vpnRouterTunnelChannelLinkStability,
+              vpnRouterTunnelName,
+              vpnRouterTunnelAdminStatus,
+              vpnRouterTunnelOperativeStatus,
+              vpnRouterTunnelCumulatedBandwidthToWan,
+              vpnRouterTunnelCumulatedBandwidthFromWan,
+              vpnRouterTunnelCurrentCumulatedBandwidthToWan,
+              vpnRouterTunnelCurrentCumulatedBandwidthFromWan,
+              vpnRouterTunnelTrafficUp,
+              vpnRouterTunnelTrafficDown,
+              vpnRouterTunnelRemoteRouterSerial,
+              vpnRouterInterfaceName,
+              vpnRouterInterfaceAdminStatus,
+              vpnRouterInterfaceOperativeStatus,
+              vpnRouterInterfaceBandwidthToWan,
+              vpnRouterInterfaceBandwidthFromWan,
+              vpnRouterInterfaceTrafficUp,
+              vpnRouterInterfaceTrafficDown,
+              vpnRouterFanAdminStatus,
+              vpnRouterFanOperativeStatus,
+              vpnRouterFanRPM,
+              vpnRouterName,
+              vpnRouterSerial,
+              vpnRouterModel,
+              vpnRouterFirmware,
+              vpnRouterMode,
+              vpnRouteruptime,
+              vpnRouterFirmwareStatus,
+              vpnRouterCPULoad,
+              vpnRouterMemoryUsage,
+              vpnRouterSystemTemperature,
+              vpnRouterCPUTemperature,
+              vpnRouterPowerSupplyFailure,
+              vpnRouterFanCount,
+              vpnRouterInterfaceCount,
+              vpnRouterTunnelCount,
+              vpnRouterTunnelChannelCount
+           }
+    STATUS current
+    DESCRIPTION
+        "The Objects of the vpnRouter."
+    ::= { vpnRouterGroups 1 }
+
+END

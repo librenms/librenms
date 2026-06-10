@@ -1,0 +1,450 @@
+-- This file was automatically generated from ciena-ws-blade.yang. Do not edit.
+
+CIENA-WS-BLADE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    MacString, ModuleTypeEnum, StringMaxl32, StringMaxl64
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsBladeMIB MODULE-IDENTITY
+    LAST-UPDATED "201702280000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines Blade data for the Waveserver."
+    REVISION "201702280000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revision."
+    REVISION "201606120000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.  
+Restructuring of the module."
+    REVISION "201604060000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.  
+leaf 'num-of-phy-line-ports' changed to 'num-of-physical-line-ports' for consistency.
+leaf 'admin-state' enum value updated"
+    REVISION "201507250000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 5 }
+
+DeviceTypeBit ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX BITS { pluggable(0), fixed(1) }
+
+cwsBladeBladeidentificationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsBladeBladeidentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsBladeMIB 3 }
+
+cwsBladeBladeidentificationEntry OBJECT-TYPE
+    SYNTAX CwsBladeBladeidentificationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsBladeBladeidentificationTable."
+    INDEX { cwsBladeBladeidentificationTableSnmpKey }
+    ::= { cwsBladeBladeidentificationTable 1 }
+
+CwsBladeBladeidentificationEntry ::= SEQUENCE { 
+    cwsBladeBladeidentificationTableSnmpKey Integer32,
+    cwsBladeBladeidentificationName StringMaxl32,
+    cwsBladeBladeidentificationModel StringMaxl32,
+    cwsBladeBladeidentificationDescription StringMaxl64,
+    cwsBladeBladeidentificationType Unsigned32,
+    cwsBladeBladeidentificationUserDescription OCTET STRING,
+    cwsBladeBladeidentificationBasemacaddress MacString,
+    cwsBladeBladeidentificationPortbasemacaddress MacString 
+}
+
+cwsBladeBladeidentificationTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsBladeBladeidentification"
+    ::= { cwsBladeBladeidentificationEntry 1 }
+
+cwsBladeBladeidentificationName OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the Blade. Read only attribute."
+    ::= { cwsBladeBladeidentificationEntry 2 }
+
+cwsBladeBladeidentificationModel OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Board Type. Max string length of 32 characters."
+    ::= { cwsBladeBladeidentificationEntry 3 }
+
+cwsBladeBladeidentificationDescription OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Board Description. Max string length of 64 characters."
+    ::= { cwsBladeBladeidentificationEntry 4 }
+
+cwsBladeBladeidentificationType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Blade Board type enum value."
+    ::= { cwsBladeBladeidentificationEntry 5 }
+
+cwsBladeBladeidentificationUserDescription OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..130))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "User Description."
+    ::= { cwsBladeBladeidentificationEntry 6 }
+
+cwsBladeBladeidentificationBasemacaddress OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Base MAC address."
+    ::= { cwsBladeBladeidentificationEntry 7 }
+
+cwsBladeBladeidentificationPortbasemacaddress OBJECT-TYPE
+    SYNTAX MacString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Port base MAC address."
+    ::= { cwsBladeBladeidentificationEntry 8 }
+
+cwsBladeBladestateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsBladeBladestateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsBladeMIB 4 }
+
+cwsBladeBladestateEntry OBJECT-TYPE
+    SYNTAX CwsBladeBladestateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsBladeBladestateTable."
+    INDEX { cwsBladeBladestateTableSnmpKey }
+    ::= { cwsBladeBladestateTable 1 }
+
+CwsBladeBladestateEntry ::= SEQUENCE { 
+    cwsBladeBladestateTableSnmpKey Integer32,
+    cwsBladeBladestateAdminState INTEGER,
+    cwsBladeBladestateOperationalState INTEGER,
+    cwsBladeBladestateLastRestart StringMaxl32,
+    cwsBladeBladestateLastRestartReason INTEGER,
+    cwsBladeBladestateUptime StringMaxl32 
+}
+
+cwsBladeBladestateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsBladeBladestate"
+    ::= { cwsBladeBladestateEntry 1 }
+
+cwsBladeBladestateAdminState OBJECT-TYPE
+    SYNTAX INTEGER { enabled(0), disabled(1), shutdown(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Administrative state of the Blade."
+    ::= { cwsBladeBladestateEntry 2 }
+
+cwsBladeBladestateOperationalState OBJECT-TYPE
+    SYNTAX INTEGER { up(0), down(1), faulted(2), lowpowermode(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Operational state of the Blade."
+    ::= { cwsBladeBladestateEntry 3 }
+
+cwsBladeBladestateLastRestart OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The date and time of last restart in the format of a human readable string. e.g 'Wed Jun 30 21:49:08 2015'"
+    ::= { cwsBladeBladestateEntry 4 }
+
+cwsBladeBladestateLastRestartReason OBJECT-TYPE
+    SYNTAX INTEGER { userwarm(0), usercold(1), systemwarm(2), systemcold(3), poweron(4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Cause for the last restart."
+    ::= { cwsBladeBladestateEntry 5 }
+
+cwsBladeBladestateUptime OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The time since last reboot, in the format of a human readable string. e.g '041d 11h 29m 53s'"
+    ::= { cwsBladeBladestateEntry 6 }
+
+cwsBladeBladecapabilitiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsBladeBladecapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsBladeMIB 5 }
+
+cwsBladeBladecapabilitiesEntry OBJECT-TYPE
+    SYNTAX CwsBladeBladecapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsBladeBladecapabilitiesTable."
+    INDEX { cwsBladeBladecapabilitiesTableSnmpKey }
+    ::= { cwsBladeBladecapabilitiesTable 1 }
+
+CwsBladeBladecapabilitiesEntry ::= SEQUENCE { 
+    cwsBladeBladecapabilitiesTableSnmpKey Integer32,
+    cwsBladeBladecapabilitiesModuleType ModuleTypeEnum,
+    cwsBladeBladecapabilitiesNumOfPorts Unsigned32,
+    cwsBladeBladecapabilitiesNumOfChannels Unsigned32 
+}
+
+cwsBladeBladecapabilitiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsBladeBladecapabilities"
+    ::= { cwsBladeBladecapabilitiesEntry 1 }
+
+cwsBladeBladecapabilitiesModuleType OBJECT-TYPE
+    SYNTAX ModuleTypeEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "module type of the Waveserver Blade."
+    ::= { cwsBladeBladecapabilitiesEntry 2 }
+
+cwsBladeBladecapabilitiesNumOfPorts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Ports. There are 44 physical ports on the Waveserver chassis across the 12 faceplate holes."
+    ::= { cwsBladeBladecapabilitiesEntry 3 }
+
+cwsBladeBladecapabilitiesNumOfChannels OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Channels on the Blade."
+    ::= { cwsBladeBladecapabilitiesEntry 4 }
+
+cwsBladeClientcapabilitiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsBladeClientcapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsBladeMIB 6 }
+
+cwsBladeClientcapabilitiesEntry OBJECT-TYPE
+    SYNTAX CwsBladeClientcapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsBladeClientcapabilitiesTable."
+    INDEX { cwsBladeClientcapabilitiesTableSnmpKey }
+    ::= { cwsBladeClientcapabilitiesTable 1 }
+
+CwsBladeClientcapabilitiesEntry ::= SEQUENCE { 
+    cwsBladeClientcapabilitiesTableSnmpKey Integer32,
+    cwsBladeClientcapabilitiesNumOfPhysicalClientPorts Unsigned32,
+    cwsBladeClientcapabilitiesNumOfChannelPerClientPort Unsigned32,
+    cwsBladeClientcapabilitiesCapacity StringMaxl64,
+    cwsBladeClientcapabilitiesDeviceType DeviceTypeBit,
+    cwsBladeClientcapabilitiesDeviceSupport BITS,
+    cwsBladeClientcapabilitiesProtocolSupport BITS 
+}
+
+cwsBladeClientcapabilitiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsBladeClientcapabilities"
+    ::= { cwsBladeClientcapabilitiesEntry 1 }
+
+cwsBladeClientcapabilitiesNumOfPhysicalClientPorts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Physical Client Ports."
+    ::= { cwsBladeClientcapabilitiesEntry 2 }
+
+cwsBladeClientcapabilitiesNumOfChannelPerClientPort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Physical Channels Per Client Port."
+    ::= { cwsBladeClientcapabilitiesEntry 3 }
+
+cwsBladeClientcapabilitiesCapacity OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Client Capacity as a human readable string. e.g '400 Gbps'."
+    ::= { cwsBladeClientcapabilitiesEntry 4 }
+
+cwsBladeClientcapabilitiesDeviceType OBJECT-TYPE
+    SYNTAX DeviceTypeBit
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Bit field indicating the Client Device Type."
+    ::= { cwsBladeClientcapabilitiesEntry 5 }
+
+cwsBladeClientcapabilitiesDeviceSupport OBJECT-TYPE
+    SYNTAX BITS { qsfpplus(0), qsfp28(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Bit field indicating the supported client devices."
+    ::= { cwsBladeClientcapabilitiesEntry 6 }
+
+cwsBladeClientcapabilitiesProtocolSupport OBJECT-TYPE
+    SYNTAX BITS { ethernet(0) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Bit field indicating the supported client protocols."
+    ::= { cwsBladeClientcapabilitiesEntry 7 }
+
+cwsBladeLinecapabilitiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsBladeLinecapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsBladeMIB 7 }
+
+cwsBladeLinecapabilitiesEntry OBJECT-TYPE
+    SYNTAX CwsBladeLinecapabilitiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsBladeLinecapabilitiesTable."
+    INDEX { cwsBladeLinecapabilitiesTableSnmpKey }
+    ::= { cwsBladeLinecapabilitiesTable 1 }
+
+CwsBladeLinecapabilitiesEntry ::= SEQUENCE { 
+    cwsBladeLinecapabilitiesTableSnmpKey Integer32,
+    cwsBladeLinecapabilitiesNumOfPhysicalLinePorts Unsigned32,
+    cwsBladeLinecapabilitiesNumOfChannelPerLinePort Unsigned32,
+    cwsBladeLinecapabilitiesCapacity StringMaxl64,
+    cwsBladeLinecapabilitiesDeviceType DeviceTypeBit,
+    cwsBladeLinecapabilitiesDeviceSupport BITS,
+    cwsBladeLinecapabilitiesProtocolSupport BITS 
+}
+
+cwsBladeLinecapabilitiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsBladeLinecapabilities"
+    ::= { cwsBladeLinecapabilitiesEntry 1 }
+
+cwsBladeLinecapabilitiesNumOfPhysicalLinePorts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Physical Line Ports."
+    ::= { cwsBladeLinecapabilitiesEntry 2 }
+
+cwsBladeLinecapabilitiesNumOfChannelPerLinePort OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of Physical Channels Per Line Port."
+    ::= { cwsBladeLinecapabilitiesEntry 3 }
+
+cwsBladeLinecapabilitiesCapacity OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Line Capacity as a human readable string. e.g '400 Gbps'."
+    ::= { cwsBladeLinecapabilitiesEntry 4 }
+
+cwsBladeLinecapabilitiesDeviceType OBJECT-TYPE
+    SYNTAX DeviceTypeBit
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Bit field indicating the Line Device Type."
+    ::= { cwsBladeLinecapabilitiesEntry 5 }
+
+cwsBladeLinecapabilitiesDeviceSupport OBJECT-TYPE
+    SYNTAX BITS { cienawl3extreme(0) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Bit field indicating the supported line devices."
+    ::= { cwsBladeLinecapabilitiesEntry 6 }
+
+cwsBladeLinecapabilitiesProtocolSupport OBJECT-TYPE
+    SYNTAX BITS { nolineprotocol(0), modulation200g16qam(1), modulation100gqpsk(2), modulation150g8qam(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Bit field indicating the supported line protocols."
+    ::= { cwsBladeLinecapabilitiesEntry 7 }
+
+
+
+-- Conformance statements
+cienaWsBladeObjects OBJECT IDENTIFIER
+    ::= { cienaWsBladeMIB 1 }
+
+cienaWsBladeConformance OBJECT IDENTIFIER
+    ::= { cienaWsBladeMIB 2 }
+
+cienaWsBladeGroups OBJECT IDENTIFIER
+    ::= { cienaWsBladeConformance 1 }
+
+cienaWsBladeGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsBladeBladeidentificationName,
+        cwsBladeBladeidentificationModel,
+        cwsBladeBladeidentificationDescription,
+        cwsBladeBladeidentificationType,
+        cwsBladeBladeidentificationUserDescription,
+        cwsBladeBladeidentificationBasemacaddress,
+        cwsBladeBladeidentificationPortbasemacaddress,
+        cwsBladeBladestateAdminState,
+        cwsBladeBladestateOperationalState,
+        cwsBladeBladestateLastRestart,
+        cwsBladeBladestateLastRestartReason,
+        cwsBladeBladestateUptime,
+        cwsBladeBladecapabilitiesModuleType,
+        cwsBladeBladecapabilitiesNumOfPorts,
+        cwsBladeBladecapabilitiesNumOfChannels,
+        cwsBladeClientcapabilitiesNumOfPhysicalClientPorts,
+        cwsBladeClientcapabilitiesNumOfChannelPerClientPort,
+        cwsBladeClientcapabilitiesCapacity,
+        cwsBladeClientcapabilitiesDeviceType,
+        cwsBladeClientcapabilitiesDeviceSupport,
+        cwsBladeClientcapabilitiesProtocolSupport,
+        cwsBladeLinecapabilitiesNumOfPhysicalLinePorts,
+        cwsBladeLinecapabilitiesNumOfChannelPerLinePort,
+        cwsBladeLinecapabilitiesCapacity,
+        cwsBladeLinecapabilitiesDeviceType,
+        cwsBladeLinecapabilitiesDeviceSupport,
+        cwsBladeLinecapabilitiesProtocolSupport
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsBladeGroups 1 }
+
+cienaWsBladeCompliances OBJECT IDENTIFIER
+    ::= { cienaWsBladeConformance 2 }
+
+cienaWsBladeCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsBladeGroup }
+    ::= { cienaWsBladeCompliances 1 }
+
+END -- End module

@@ -1,0 +1,1084 @@
+-- ==================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Lan Switch VLAN MIB
+-- Reference:
+-- Version: V2.3
+-- History:
+-- (1) Created by Zhangshilin, 2001.06.29
+-- (2) Revised by Qi Zhenglin, 2002.01.08
+--   V1.1 2004-09-08 modify STATUS of hh3cLswVlanProtoObject from mandatory to current by gaolong.
+--   V1.2 2004-09-23 add ifEntry IMPORT clause by gaolong
+--   V1.3 2004-10-12 updated by gaolong
+--        Import TEXTUAL-CONVENTION and OBJECT-IDENTITY.
+--        Relocate hh3cLswVlan MODULE-IDENTITY.
+--        Change MAX-ACCESS clause value of hh3cVLANMibSwitchGarpStatClear to read-write.
+--   V1.4 2004-12-28 modified by jiaoyi
+--          Add hh3cdot1qVlanMulticast in hh3cdot1qVlanMIBTable
+--        2005-01-22 update by wangyingxia
+--          Add all objects of hh3cLswVlanMngObject from HH3C-LswINF-MIB into this MIB
+--          Add TruthValue, RowStatus, TimeTicks, IpAddress, SnmpAdminString, VlanIndex, PortList
+--          Remove InterfaceIndex and import it from HH3C-LswINF-MIB
+--   V1.5 2005-01-22
+--        Add superVlan to hh3cdot1qVlanType by sunqiang
+--   V1.6 2005-05-18
+--        Add hh3cDot1qVlanBatchMIBTable by lipei
+--   V1.7 2005-08-08
+--        Add Hh3cVlanIndex and modified all VlanIndex to Hh3cVlanIndex by longyin
+--   V1.8 2006-02-14
+--        Modify description of hh3cVlanInterfaceID, hh3cifIsolateSecondaryVlanlistLow
+--        and hh3cifIsolateSecondaryVlanlistHigh by wangyong
+--        Adjust the format of the file by wangyong
+--        Add the object hh3cdot1qVlanTaggedPorts, hh3cdot1qVlanUntaggedPorts by jiliyan
+--        Add hh3cifSuperVlanMappingTable, hh3cifSuperVlanMappingEntry, hh3cifSuperVlanID,
+--        hh3cifSubVlanlistLow, hh3cifSubVlanlistHigh by hejunwei
+--        Add hh3cdot1qVlanBatchSetOperate, change the description of
+--        hh3cDot1qVlanBatchMIBTable and hh3cDot1qVlanBatchMIBEntry by hejunwei
+--   V1.9 2007-12-18 Add enmu 'vrrp' for hh3cVlanInterfaceIpType by Zhangyinfei
+--   V2.0 2010-01-18 Add hh3cdot1qVlanPortIndexs and hh3cVlanInterfaceIfIndex by duyanbing
+--   V2.1 2012-06-11 Modify hh3cVlanInterfaceIpAddr, hh3cVlanInterfaceIpMask and hh3cVlanInterfaceIpType by liuxibo
+--        2012-08-13
+--        Add hh3cPrivateVlanMappingTable by chenkaiping
+--        Add primaryVlan for hh3cdot1qVlanType by xiedong
+--   V2.2 2015-11-12 Modify hh3cdot1qVlanName by yuhaiyan
+--   V2.3 2016-08-29 Modify hh3cdot1qVlanMIBTable,add VLAN statistics related entries by niuchuanzheng
+-- ==================================================================
+HH3C-LswVLAN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    TimeInterval, TEXTUAL-CONVENTION, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32, OBJECT-IDENTITY, TimeTicks, IpAddress, Counter64
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    hh3clswCommon
+        FROM HH3C-OID-MIB
+    ifEntry
+        FROM RFC1213-MIB
+    hh3cifVLANTrunkStatusEntry, PortList
+        FROM HH3C-LswINF-MIB;
+
+    hh3cLswVlan MODULE-IDENTITY
+            LAST-UPDATED "201608310000Z"
+            ORGANIZATION
+                "New H3C Technologies Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Technologies Co., Ltd.
+                 Hai-Dian District Beijing P.R. China
+                 http://www.h3c.com
+                 Zip:100085"
+            DESCRIPTION ""
+            REVISION        "201608310000Z"
+            DESCRIPTION
+                "To modify size of hh3cdot1qVlanName."
+            ::= { hh3clswCommon 2 }
+
+    Hh3cVlanIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value used to index per-VLAN tables: values of 0 and
+        4095 are not permitted; if the value is between 1 and
+        4094 inclusive, it represents an IEEE 802.1Q VLAN-ID with
+        global scope within a given bridged domain (see VlanId
+        textual convention).  If the value is greater than 4095
+        then it represents a VLAN with scope local to the
+        particular agent, i.e. one without a global VLAN-ID
+        assigned to it. Such VLANs are outside the scope of
+        IEEE 802.1Q but it is convenient to be able to manage them
+        in the same way using this MIB."
+    SYNTAX      Integer32(0..2147483647)
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hh3cLswVlanMngObject OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Description."
+            ::= { hh3cLswVlan 1 }
+
+    hh3cdot1qVlanMIBTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDot1qVlanMIBEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "VLAN MIB table"
+        ::= { hh3cLswVlanMngObject  1 }
+
+
+    hh3cdot1qVlanMIBEntry OBJECT-TYPE
+        SYNTAX Hh3cDot1qVlanMIBEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entries of VLAN MIB table"
+        INDEX   { hh3cdot1qVlanIndex }
+        ::= { hh3cdot1qVlanMIBTable 1}
+
+    Hh3cDot1qVlanMIBEntry ::=
+    SEQUENCE {
+        hh3cdot1qVlanIndex    Hh3cVlanIndex,
+        hh3cdot1qVlanName     SnmpAdminString,
+        hh3cdot1qVlanPorts    PortList,
+        hh3cdot1qVlanType     INTEGER,
+        hh3cdot1qVlanMacFilter    TruthValue,
+        hh3cdot1qVlanMcastUnknownProtos   TruthValue,
+        hh3cExistInterface    TruthValue,
+        hh3cVlanInterfaceIndex    INTEGER,
+        hh3cdot1qVlanMacLearn TruthValue,
+        hh3cdot1qVlanStatus   INTEGER,
+        hh3cdot1qVlanCreationTime TimeTicks,
+        hh3cdot1qVlanPriority INTEGER,
+        hh3cdot1qVlanRowStatus    RowStatus,
+        hh3cdot1qVlanBroadcastSuppression INTEGER,
+        hh3cdot1qVlanBcastSuppressionPPS   INTEGER,
+        hh3cdot1qVlanMulticast INTEGER,
+        hh3cdot1qVlanTaggedPorts    PortList,
+        hh3cdot1qVlanUntaggedPorts    PortList,
+        hh3cdot1qVlanPortIndexs    OCTET STRING,
+        hh3cdot1qVlanStatisticStatus    TruthValue,
+        hh3cdot1qVlanStatisticClear    INTEGER,
+        hh3cdot1qVlanStatisticInTotalPkts    Counter64,
+        hh3cdot1qVlanStatisticInTotalBytes    Counter64,
+        hh3cdot1qVlanStatisticInPPS    Counter64,
+        hh3cdot1qVlanStatisticInBPS    Counter64,
+        hh3cdot1qVlanStatisticOutTotalPkts    Counter64,
+        hh3cdot1qVlanStatisticOutTotalBytes    Counter64,
+        hh3cdot1qVlanStatisticOutPPS    Counter64,
+        hh3cdot1qVlanStatisticOutBPS    Counter64
+        }
+
+
+
+    hh3cdot1qVlanIndex OBJECT-TYPE
+        SYNTAX  Hh3cVlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The VLAN-ID."
+        ::= { hh3cdot1qVlanMIBEntry 1 }
+
+
+    hh3cdot1qVlanName  OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..80))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Name of the VLAN."
+        ::= { hh3cdot1qVlanMIBEntry 2 }
+
+
+    hh3cdot1qVlanPorts OBJECT-TYPE
+        SYNTAX  PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Port list of the VLAN."
+        ::= { hh3cdot1qVlanMIBEntry 3 }
+
+
+    hh3cdot1qVlanType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        superVlan   (1),
+        common-vlan (2),
+        sub-vlan    (3),
+        isolate-user-vlan(4),
+        secondary-vlan(5),
+        primaryVlan(6)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Vlan types: SuperVlan(1), Common vlan(2), and Sub-vlan(3)."
+        ::= { hh3cdot1qVlanMIBEntry 4 }
+
+
+    hh3cdot1qVlanMacFilter OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Whether to filter MAC addresses."
+        ::= { hh3cdot1qVlanMIBEntry 5 }
+
+
+    hh3cdot1qVlanMcastUnknownProtos OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Whether to broadcast the unknown packets."
+        ::= { hh3cdot1qVlanMIBEntry 6 }
+
+
+    hh3cExistInterface OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Whether there is virtual interface."
+        ::= { hh3cdot1qVlanMIBEntry 7 }
+
+
+    hh3cVlanInterfaceIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Whether vlan interface is configured on vlan. If vlan interface is
+            configured, the value of the node is vlan id, else the value is 0."
+        ::= { hh3cdot1qVlanMIBEntry 8 }
+
+
+    hh3cdot1qVlanMacLearn OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "MAC address learning identity. (common vlan/Sub-vlan)"
+        ::= { hh3cdot1qVlanMIBEntry 9 }
+
+
+    hh3cdot1qVlanStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        other       (1),
+        static   (2),
+        dynamic (3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Status of the VLAN."
+        ::= { hh3cdot1qVlanMIBEntry 10 }
+
+
+    hh3cdot1qVlanCreationTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The sysUPTime when the VLAN is created."
+        ::= { hh3cdot1qVlanMIBEntry 11 }
+
+
+    hh3cdot1qVlanPriority OBJECT-TYPE
+        SYNTAX  INTEGER (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Priority of the VLAN."
+        DEFVAL  {0}
+        ::= { hh3cdot1qVlanMIBEntry 12 }
+
+
+    hh3cdot1qVlanRowStatus  OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Operation status."
+        ::= { hh3cdot1qVlanMIBEntry 13 }
+
+    hh3cdot1qVlanBroadcastSuppression  OBJECT-TYPE
+        SYNTAX  INTEGER (0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Whether broadcast suppression of vlan be supported pro rata.
+            The vlaue of 100 indicates no broadcast suppression. If the
+            function is not supported, this object cannot be written,
+            and 100 will be returned when reading"
+        DEFVAL { 100 }
+        ::= { hh3cdot1qVlanMIBEntry 14 }
+
+    hh3cdot1qVlanBcastSuppressionPPS   OBJECT-TYPE
+        SYNTAX  INTEGER (0..148800)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "If the broadcast can be controlled with pps(packet per second)type,
+            the value of 0 indicates no suppression. This node is conflicted
+            with hh3cdot1qVlanBroadcastSuppression. If the mode is set,
+            hh3cdot1qVlanBroadcastSuppression is unavailable. And vice versa."
+        ::= { hh3cdot1qVlanMIBEntry 15 }
+
+    hh3cdot1qVlanMulticast  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        disable  (0),
+        enable   (1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Multicast vlan. The default value is disable(0)."
+        ::= { hh3cdot1qVlanMIBEntry 16 }
+
+    hh3cdot1qVlanTaggedPorts OBJECT-TYPE
+        SYNTAX  PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Tagged port list of the VLAN."
+        ::= { hh3cdot1qVlanMIBEntry 17 }
+
+    hh3cdot1qVlanUntaggedPorts OBJECT-TYPE
+        SYNTAX  PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Untagged port list of the VLAN."
+        ::= { hh3cdot1qVlanMIBEntry 18 }
+
+    hh3cdot1qVlanPortIndexs OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "PortIndex list of the VLAN, that delimited by comma, such as 1,3,4,7."
+        ::= { hh3cdot1qVlanMIBEntry 19 }
+
+    hh3cdot1qVlanStatisticStatus OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "VLAN traffic statistics switch.
+            The default value is false, which means the switch is off."
+        ::= { hh3cdot1qVlanMIBEntry 20 }
+
+    hh3cdot1qVlanStatisticClear  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            clear(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear statistics for the specified VLANs. Operation read is not supported."
+        ::= { hh3cdot1qVlanMIBEntry 21 }
+
+    hh3cdot1qVlanStatisticInTotalPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound packets."
+        ::= { hh3cdot1qVlanMIBEntry 22 }
+
+    hh3cdot1qVlanStatisticInTotalBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of inbound bytes."
+        ::= { hh3cdot1qVlanMIBEntry 23 }
+
+    hh3cdot1qVlanStatisticInPPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound packets per second."
+        ::= { hh3cdot1qVlanMIBEntry 24 }
+
+    hh3cdot1qVlanStatisticInBPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound bytes per second."
+        ::= { hh3cdot1qVlanMIBEntry 25 }
+
+    hh3cdot1qVlanStatisticOutTotalPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound packets."
+        ::= { hh3cdot1qVlanMIBEntry 26 }
+
+    hh3cdot1qVlanStatisticOutTotalBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of outbound bytes."
+        ::= { hh3cdot1qVlanMIBEntry 27 }
+
+    hh3cdot1qVlanStatisticOutPPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound packets per second."
+        ::= { hh3cdot1qVlanMIBEntry 28 }
+
+    hh3cdot1qVlanStatisticOutBPS OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound bytes per second."
+        ::= { hh3cdot1qVlanMIBEntry 29 }
+
+    hh3cVlanInterfaceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cVlanInterfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Virtual interface configuration table"
+        ::= { hh3cLswVlanMngObject  2}
+
+
+    hh3cVlanInterfaceEntry OBJECT-TYPE
+        SYNTAX Hh3cVlanInterfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entries of virtual interface configuration table"
+        INDEX   { hh3cVlanInterfaceID }
+        ::= {hh3cVlanInterfaceTable 1}
+
+    Hh3cVlanInterfaceEntry    ::=
+    SEQUENCE {
+        hh3cVlanInterfaceID       INTEGER,
+        hh3cdot1qVlanID       Hh3cVlanIndex,
+        hh3cdot1qVlanIpAddress        IpAddress,
+        hh3cdot1qVlanIpAddressMask    IpAddress,
+        hh3cVlanInterfaceAdminStatus  INTEGER,
+        hh3cVlanInterfaceFrameType    INTEGER,
+        hh3cInterfaceRowStatus        RowStatus,
+        hh3cVlanInterfaceIpMethod     INTEGER,
+        hh3cVlanInterfaceIfIndex      INTEGER
+        }
+
+    hh3cVlanInterfaceID OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of the vlan interface table."
+        ::= { hh3cVlanInterfaceEntry 1 }
+
+
+    hh3cdot1qVlanID OBJECT-TYPE
+        SYNTAX  Hh3cVlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "VLAN-ID"
+        ::= { hh3cVlanInterfaceEntry 2 }
+
+
+    hh3cdot1qVlanIpAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "IP address of interface."
+        ::= { hh3cVlanInterfaceEntry 3 }
+
+
+    hh3cdot1qVlanIpAddressMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "IP address mask of interface."
+        ::= { hh3cVlanInterfaceEntry 4 }
+
+    hh3cVlanInterfaceAdminStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        up      (1),
+        down    (2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Status of VLAN virtual interfaces."
+        ::= { hh3cVlanInterfaceEntry 5 }
+
+    hh3cVlanInterfaceFrameType OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        ethernet-ii     (1),
+        ethernet-snap   (2),
+        ethernet-8022   (3),
+        ethernet-8023   (4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Frame type accepted by VLAN virtual interfaces."
+        ::= { hh3cVlanInterfaceEntry 6 }
+
+
+    hh3cInterfaceRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Operation status."
+        ::= { hh3cVlanInterfaceEntry 7 }
+
+
+    hh3cVlanInterfaceIpMethod OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        assigned-ip    (1),
+        dhcp-ip        (2),
+        bootp-ip       (3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Vlan interface ip address acquiring method which is manual, dhcp or bootp."
+        ::= { hh3cVlanInterfaceEntry 8 }
+
+    hh3cVlanInterfaceIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "IfIndex of VLAN interface."
+        ::= { hh3cVlanInterfaceEntry 9 }
+
+    hh3cifIsolateMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifIsolateMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Secondary vlan lists of Isolate-VLANs."
+        ::= { hh3cLswVlanMngObject  4 }
+
+
+    hh3cifIsolateMappingEntry OBJECT-TYPE
+        SYNTAX Hh3cifIsolateMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+             "Secondary vlan lists of Isolate-VLANs."
+        INDEX   { hh3cifIsolatePrimaryVlanID }
+        ::= { hh3cifIsolateMappingTable 1}
+
+    Hh3cifIsolateMappingEntry   ::=
+    SEQUENCE {
+        hh3cifIsolatePrimaryVlanID  Hh3cVlanIndex,
+        hh3cifIsolateSecondaryVlanlistLow   OCTET STRING,
+        hh3cifIsolateSecondaryVlanlistHigh OCTET STRING
+        }
+
+    hh3cifIsolatePrimaryVlanID OBJECT-TYPE
+        SYNTAX  Hh3cVlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Primary VLAN-ID."
+        ::= { hh3cifIsolateMappingEntry 1 }
+
+
+    hh3cifIsolateSecondaryVlanlistLow OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 1 through
+            8, the second octet specifying VLANs 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN. Thus, each secondary
+            VLAN of the primary VLAN is represented by a single bit
+            within the value of this object. If that bit has a value
+            of '1' then that VLAN is secondary VLAN in the set of VLANs;
+            the VLAN is not secondary VLAN if its bit has a value of
+            '0'."
+        ::= { hh3cifIsolateMappingEntry 2 }
+
+    hh3cifIsolateSecondaryVlanlistHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 2049 through
+            2056, the second octet specifying VLANs 2057 through 2064,
+            etc. Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN. Thus, each secondary
+            VLAN of the primary VLAN is represented by a single bit
+            within the value of this object. If that bit has a value
+            of '1' then that VLAN is secondary VLAN in the set of VLANs;
+            the VLAN is not secondary VLAN if its bit has a value of
+            '0'."
+        ::= { hh3cifIsolateMappingEntry 3 }
+
+    hh3cVlanInterfaceAddrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cVlanInterfaceAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "VLAN interface IP address configuration table"
+        ::= { hh3cLswVlanMngObject 5 }
+
+    hh3cVlanInterfaceAddrEntry OBJECT-TYPE
+        SYNTAX Hh3cVlanInterfaceAddrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entries of VLAN interface IP address configuration table"
+        INDEX   { hh3cVlanInterfaceIpIfIndex, hh3cVlanInterfaceIpAddr }
+        ::= { hh3cVlanInterfaceAddrTable 1 }
+
+    Hh3cVlanInterfaceAddrEntry ::=
+    SEQUENCE {
+        hh3cVlanInterfaceIpIfIndex     INTEGER,
+        hh3cVlanInterfaceIpAddr        IpAddress,
+        hh3cVlanInterfaceIpMask        IpAddress,
+        hh3cVlanInterfaceIpType        INTEGER,
+        hh3cVlanInterfaceIpRowStatus   RowStatus
+        }
+
+    hh3cVlanInterfaceIpIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of VLAN interfaces."
+        ::= { hh3cVlanInterfaceAddrEntry 1 }
+
+    hh3cVlanInterfaceIpAddr OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "IP address of VLAN interface."
+        ::= { hh3cVlanInterfaceAddrEntry 2 }
+
+    hh3cVlanInterfaceIpMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "IP address mask of VLAN interface. When destory single IP address,
+            you must set it correct to relative IP address."
+        ::= { hh3cVlanInterfaceAddrEntry 3 }
+
+    hh3cVlanInterfaceIpType OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        primary     (1),
+        sub         (2),
+        cluster     (3),
+        vrrp        (4)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "IP address type."
+        ::= { hh3cVlanInterfaceAddrEntry 4 }
+
+    hh3cVlanInterfaceIpRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Operation status. active(1) will only be set when taking GET or
+            GET NEXT operation. createAndGo(4) and destory(6) is valid when
+            taking SET operation."
+        ::= { hh3cVlanInterfaceAddrEntry 5 }
+
+
+    hh3cDot1qVlanBatchMIBTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cDot1qVlanBatchMIBEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "VLAN batch configuration table.
+            In the case of VLAN batch creation, hh3cdot1qVlanBatchSetOperate should
+            be set to 1.
+            For example, if creating a row is for creating VLANs 2 to 4, the value
+            of the objects should be set as follows:
+            hh3cdot1qVlanBatchStartIndex 2,
+            hh3cdot1qVlanBatchEndIndex 4,
+            hh3cdot1qVlanBatchSetOperate create(1),
+            hh3cdot1qVlanBatchRowStatus createAndGo(4).
+
+            In the case of VLAN batch deletion, hh3cdot1qVlanBatchSetOperate should
+            be set to 2.
+            For example, if creating a row is for deleting VLANs 10 to 20, the value
+            of the objects should be set as follows:
+            hh3cdot1qVlanBatchStartIndex 10,
+            hh3cdot1qVlanBatchEndIndex 20,
+            hh3cdot1qVlanBatchSetOperate delete(2),
+            hh3cdot1qVlanBatchRowStatus createAndGo(4).
+
+            When the action of batch VLANs deleting or creating is done, one row
+            will be existent until it is deleted manually or ages out, but the VLANs
+            of it won't disappear with the deletion of the row."
+        ::= { hh3cLswVlanMngObject  6 }
+
+    hh3cDot1qVlanBatchMIBEntry OBJECT-TYPE
+        SYNTAX Hh3cDot1qVlanBatchMIBEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "VLAN batch configuration entry."
+        INDEX   { hh3cdot1qVlanBatchOperIndex }
+        ::= { hh3cDot1qVlanBatchMIBTable 1}
+
+    Hh3cDot1qVlanBatchMIBEntry ::=
+        SEQUENCE {
+            hh3cdot1qVlanBatchOperIndex
+                Integer32,
+            hh3cdot1qVlanBatchStartIndex
+                Hh3cVlanIndex,
+            hh3cdot1qVlanBatchEndIndex
+                Hh3cVlanIndex,
+            hh3cdot1qVlanBatchOperStatus
+                INTEGER,
+            hh3cdot1qVlanBatchRowStatus
+                RowStatus,
+            hh3cdot1qVlanBatchSetOperate
+                INTEGER
+        }
+
+    hh3cdot1qVlanBatchOperIndex OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The consequence of operation."
+        ::= { hh3cDot1qVlanBatchMIBEntry 1 }
+
+    hh3cdot1qVlanBatchStartIndex OBJECT-TYPE
+        SYNTAX  Hh3cVlanIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The value of start VLAN-ID."
+        ::= { hh3cDot1qVlanBatchMIBEntry 2 }
+
+    hh3cdot1qVlanBatchEndIndex OBJECT-TYPE
+        SYNTAX  Hh3cVlanIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The value of end VLAN-ID."
+        ::= { hh3cDot1qVlanBatchMIBEntry 3 }
+
+    hh3cdot1qVlanBatchOperStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            opInprogress      (1), -- If the operation is running, the system
+                                   -- will return OpInprogress.
+            opfailure         (2), -- If the operation is failure, the system
+                                   -- will return Opfailure.
+            opsuccess         (3), -- If the operation is success, the system
+                                   -- will return Opsuccess.
+            opsuccesspartial  (4)  -- If the operation is success partially,
+                                   -- the system will return Opsuccesspartial.
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of operation."
+        ::= { hh3cDot1qVlanBatchMIBEntry 4 }
+
+    hh3cdot1qVlanBatchRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The row status of Hh3cDot1qVlanBatchMIBEntry."
+        ::= { hh3cDot1qVlanBatchMIBEntry 5 }
+
+    hh3cdot1qVlanBatchSetOperate OBJECT-TYPE
+         SYNTAX  INTEGER
+         {
+            create(1),
+            delete(2)
+         }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "VLAN batch creation or deletion."
+        ::= { hh3cDot1qVlanBatchMIBEntry 6 }
+
+    hh3cifSuperVlanMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cifSuperVlanMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Sub VLAN lists of super-VLANs."
+        ::= { hh3cLswVlanMngObject  7 }
+
+    hh3cifSuperVlanMappingEntry OBJECT-TYPE
+        SYNTAX Hh3cifSuperVlanMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Sub VLAN lists of super-VLANs."
+        INDEX   { hh3cifSuperVlanID }
+        ::= { hh3cifSuperVlanMappingTable 1}
+
+    Hh3cifSuperVlanMappingEntry   ::=
+    SEQUENCE {
+        hh3cifSuperVlanID  Hh3cVlanIndex,
+        hh3cifSubVlanlistLow   OCTET STRING,
+        hh3cifSubVlanlistHigh  OCTET STRING
+        }
+
+    hh3cifSuperVlanID OBJECT-TYPE
+        SYNTAX  Hh3cVlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Super VLAN ID."
+        ::= { hh3cifSuperVlanMappingEntry 1 }
+
+    hh3cifSubVlanlistLow OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 1 through
+            8, the second octet specifying VLANs 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN. Thus, each sub
+            VLAN of the super VLAN is represented by a single bit
+            within the value of this object. If that bit has a value
+            of '1' then that VLAN is a sub VLAN of the super VLAN; the
+            VLAN is not a sub VLAN of the super VLAN if its bit has
+            a value of '0'."
+        ::= { hh3cifSuperVlanMappingEntry 2 }
+
+    hh3cifSubVlanlistHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 2049 through
+            2056, the second octet specifying VLANs 2057 through 2064,
+            etc. Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN. Thus, each sub
+            VLAN of the super VLAN is represented by a single bit
+            within the value of this object. If that bit has a value of
+            '1' then that VLAN is a sub VLAN of the super VLAN; the
+            VLAN is not a sub VLAN of the super VLAN if its bit has
+            a value of '0'."
+        ::= { hh3cifSuperVlanMappingEntry 3 }
+
+    hh3cPrivateVlanMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cPrivateVlanMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Secondary vlan lists of Primary-VLANs."
+        ::= { hh3cLswVlanMngObject  8 }
+
+    hh3cPrivateVlanMappingEntry OBJECT-TYPE
+        SYNTAX Hh3cPrivateVlanMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+             "Secondary vlan lists of Primary-VLANs."
+        INDEX   { hh3cPrimaryVlanID }
+        ::= { hh3cPrivateVlanMappingTable 1}
+
+    Hh3cPrivateVlanMappingEntry   ::=
+    SEQUENCE {
+        hh3cPrimaryVlanID  Hh3cVlanIndex,
+        hh3cSecondaryVlanlistLow   OCTET STRING,
+        hh3cSecondaryVlanlistHigh OCTET STRING
+        }
+
+    hh3cPrimaryVlanID OBJECT-TYPE
+        SYNTAX  Hh3cVlanIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Primary VLAN-ID."
+        ::= { hh3cPrivateVlanMappingEntry 1 }
+
+    hh3cSecondaryVlanlistLow OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 1 through
+            8, the second octet specifying VLANs 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN.  Thus, each secondary
+            VLAN of the primary VLAN is represented by a single bit
+            within the value of this object.  If that bit has a value
+            of '1' then that VLAN is secondary VLAN in the set of VLANs;
+            the VLAN is not secondary VLAN if its bit has a value of
+            '0'."
+        ::= { hh3cPrivateVlanMappingEntry 2 }
+
+    hh3cSecondaryVlanlistHigh OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(0..256))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            VLANs, with the first octet specifying VLANs 2049 through
+            2056, the second octet specifying VLANs 2057 through 2064,
+            etc.  Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN.  Thus, each secondary
+            VLAN of the primary VLAN is represented by a single bit
+            within the value of this object.  If that bit has a value
+            of '1' then that VLAN is secondary VLAN in the set of VLANs;
+            the VLAN is not secondary VLAN if its bit has a value of
+            '0'."
+        ::= { hh3cPrivateVlanMappingEntry 3 }
+
+    hh3cLswVlanProtoObject OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Description."
+            ::= { hh3cLswVlan 2 }
+
+     hh3cVLANMibGarpLeaveAllTime OBJECT-TYPE
+        SYNTAX      TimeInterval
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The GARP LeaveAll time, in centiseconds."
+        DEFVAL      { 1000 }
+        ::= { hh3cLswVlanProtoObject 14 }
+
+     hh3cvLANMibSwitchCountTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cVLANMibSwitchCountEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION
+            "A table containing the information various statistics of switch."
+        ::= {hh3cLswVlanProtoObject 15 }
+
+
+     hh3cvLANMibSwitchCountEntry OBJECT-TYPE
+        SYNTAX  Hh3cVLANMibSwitchCountEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table containing the information various statistics of switch."
+        AUGMENTS    {hh3cifVLANTrunkStatusEntry  }
+        ::= {hh3cvLANMibSwitchCountTable 1}
+
+    Hh3cVLANMibSwitchCountEntry   ::=
+    SEQUENCE {
+        hh3cVLANMibSwitchGMRPRXPkt    Counter32,
+        hh3cVLANMibSwitchGVRPRXPkt    Counter32,
+        hh3cVLANMibSwitchGMRPTXPkt    Counter32,
+        hh3cVLANMibSwitchGVRPTXPkt    Counter32,
+        hh3cVLANMibSwitchDiscardedPkt Counter32,
+        hh3cVLANMibSwitchGarpStatClear INTEGER
+        }
+
+
+
+     hh3cVLANMibSwitchGMRPRXPkt OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of GMRP frames received."
+        ::= { hh3cvLANMibSwitchCountEntry 1 }
+
+
+     hh3cVLANMibSwitchGVRPRXPkt OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of GVRP frames received."
+        ::= { hh3cvLANMibSwitchCountEntry 2 }
+
+
+     hh3cVLANMibSwitchGMRPTXPkt OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of GMRP frames transmitted."
+        ::= { hh3cvLANMibSwitchCountEntry 3 }
+
+
+     hh3cVLANMibSwitchGVRPTXPkt  OBJECT-TYPE
+         SYNTAX  Counter32
+         MAX-ACCESS read-only
+         STATUS current
+        DESCRIPTION
+            "Number of GVRP frames transmitted."
+         ::= { hh3cvLANMibSwitchCountEntry 4 }
+
+     hh3cVLANMibSwitchDiscardedPkt  OBJECT-TYPE
+         SYNTAX  Counter32
+         MAX-ACCESS read-only
+         STATUS current
+        DESCRIPTION
+            "Number of discarded frames."
+         ::= { hh3cvLANMibSwitchCountEntry 5 }
+
+
+     hh3cVLANMibSwitchGarpStatClear OBJECT-TYPE
+        SYNTAX  INTEGER {clear(1)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Clear various Statistics viz. read operation not supported."
+        ::= { hh3cvLANMibSwitchCountEntry 6 }
+
+
+     hh3cvLANMibHoldTimeTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cVLANMibHoldTimeEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION
+            "A table for setting/getting the Hold Time for a particular port."
+        ::= {hh3cLswVlanProtoObject 16 }
+
+
+     hh3cvLANMibHoldTimeEntry OBJECT-TYPE
+        SYNTAX Hh3cVLANMibHoldTimeEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION
+            "A table for setting/getting the HoldTime of the port."
+         AUGMENTS    { ifEntry }
+        ::= {hh3cvLANMibHoldTimeTable 1 }
+
+
+    Hh3cVLANMibHoldTimeEntry  ::=
+    SEQUENCE {
+        hh3cVLANMibHoldTime   INTEGER
+        }
+
+
+     hh3cVLANMibHoldTime OBJECT-TYPE
+        SYNTAX  INTEGER  (10..32765)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "HoldTime of the port."
+        DEFVAL  {10}
+        ::= { hh3cvLANMibHoldTimeEntry 1 }
+
+
+END

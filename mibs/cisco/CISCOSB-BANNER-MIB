@@ -1,0 +1,192 @@
+CISCOSB-BANNER-MIB DEFINITIONS ::= BEGIN
+
+
+-- -------------------------------------------------------------
+-- Banner MIB
+-- Title:      Cisco Banner Private MIB
+--             This Private MIB manages Banner display messages
+-- Version:    7.46_01
+-- Date:       16 Mach 2008
+--
+-- -------------------------------------------------------------
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    TEXTUAL-CONVENTION, RowStatus           FROM SNMPv2-TC
+    SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+    EnabledStatus                           FROM P-BRIDGE-MIB
+    OBJECT-TYPE                             FROM SNMPv2-SMI;
+
+
+ rlBanner MODULE-IDENTITY
+          LAST-UPDATED "200803160000Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "The private MIB module definition for Banner displays messages in Cisco switching devices.
+                  Banner allows users to configure display messages which are displayed on various authentication events.
+                  Banner Messages can hold dynamic data such as $(hostname) or $(domain) etc, and display instructions such as: bold, inverse, or blink.
+                  Banner Messages can be displayed or hidden with respect to the connection type: via Telnet, SSH or the Console."
+          REVISION "200712160000Z"
+          DESCRIPTION
+                "Initial revision."
+          ::= { switch001 133 }
+          --133 specifies the placement in switch001 (private MIBS) MIB tree
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+
+BannerMessageType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "Banner message type."
+    SYNTAX INTEGER {
+        rlBannerMOTD(1),
+        rlBannerLogin(2),
+        rlBannerExec(3)
+}
+
+-- -------------------------------------------------------------
+-- ---------   Tables     --------------------------------------
+-- -------------------------------------------------------------
+
+
+ rlBannerMessageTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBannerMessageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table listing the Banner content."
+    ::= {rlBanner 1 }
+
+    rlBannerMessageEntry  OBJECT-TYPE
+    SYNTAX      RlBannerMessageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlBannerMessageTable."
+    INDEX    { rlBannerMessageType,rlBannerMessageIndex}
+    ::= {rlBannerMessageTable  1 }
+
+    RlBannerMessageEntry ::= SEQUENCE {
+    rlBannerMessageType       BannerMessageType,
+    rlBannerMessageIndex      INTEGER (1..13),
+    rlBannerMessageText       SnmpAdminString
+    }
+
+
+    rlBannerMessageType OBJECT-TYPE
+    SYNTAX      BannerMessageType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies the Banner type. There are three types: MOTD, Login and Exec."
+    ::= { rlBannerMessageEntry 1 }
+
+    rlBannerMessageIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..13)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies a Banner string section in the Banner content.
+        The Banner content is limited to 2000 characters. Content is divided into 13 indexed sections. Each section contains 160 octets, except the last used section which can contain less than 160 octets. Once a section of the Banner string contains 160 octets of data, the user can write to the next index. Overwriting is not supported. To delete all Banner content, use the rlBannerMessageClear MIB."
+
+    ::= { rlBannerMessageEntry 2 }
+
+
+    rlBannerMessageText OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This variable identifies the MIB which holds a section of the Banner content in the table."
+    ::= { rlBannerMessageEntry 3 }
+
+
+   rlBannerManageTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBannerManageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table listing specifying for each connection type which Banner should, or should not be displayed."
+    ::= {rlBanner 2 }
+
+    rlBannerManageEntry  OBJECT-TYPE
+    SYNTAX      RlBannerManageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlBannerManageTable."
+    INDEX    { rlBannerMessageType}
+    ::= {rlBannerManageTable  1 }
+
+    RlBannerManageEntry ::= SEQUENCE {
+    rlBannerManageSSH               EnabledStatus,
+    rlBannerManageTelnet            EnabledStatus,
+    rlBannerManageConsole           EnabledStatus
+    }
+
+
+    rlBannerManageSSH OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies whether the banner type specified
+        in the key should or should not be displayed when a user accesses the device via SSH."
+--    DEFVAL      { disabled }
+    ::= { rlBannerManageEntry 1 }
+
+
+    rlBannerManageTelnet OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This variable specifies whether the banner type specified
+        in the key should or should not be displayed when a user accesses the device via Telnet."
+
+--    DEFVAL      { disabled }
+    ::= { rlBannerManageEntry 2 }
+
+    rlBannerManageConsole OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies whether the banner type specified
+ in the key should or should not be displayed when a user accesses the device via Console."
+
+--    DEFVAL      { disabled }
+    ::= { rlBannerManageEntry 3 }
+
+-- -------------------------------------------------------------
+-- ---------   Scalars    --------------------------------------
+-- -------------------------------------------------------------
+
+ rlBannerMessageClear OBJECT-TYPE
+    SYNTAX      BannerMessageType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value, when set, clears the selected Banner type.
+        Clearing the Banner type means that
+                  the related entry from rlBannerMessageTable is removed."
+    ::= { rlBanner 3 }
+
+
+
+
+END
+
+

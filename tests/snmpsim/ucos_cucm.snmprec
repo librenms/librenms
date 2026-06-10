@@ -1,0 +1,58 @@
+1.3.6.1.2.1.1.1.0|4|Linux release:2.6.32-573.18.1.el6.x86_64 machine:x86_64
+1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.9.1.1348
+1.3.6.1.2.1.1.3.0|67|10409439
+1.3.6.1.2.1.1.4.0|4|<private>
+1.3.6.1.2.1.1.5.0|4|<private>
+1.3.6.1.2.1.1.6.0|4|<private>
+1.3.6.1.2.1.25.1.1.0|67|201260341
+1.3.6.1.2.1.54.1.1.1.1.3.1|4|Cisco Serviceability Reporter
+1.3.6.1.2.1.54.1.1.1.1.3.2|4|Cisco DirSync
+1.3.6.1.2.1.54.1.1.1.1.3.3|4|Cisco CallManager
+1.3.6.1.2.1.54.1.1.1.1.3.4|4|Cisco IP Voice Media Streaming App
+1.3.6.1.2.1.54.1.1.1.1.3.5|4|Cisco CTIManager
+1.3.6.1.2.1.54.1.1.1.1.3.6|4|Cisco Extended Functions
+1.3.6.1.2.1.54.1.1.1.1.3.7|4|Cisco Bulk Provisioning Service
+1.3.6.1.2.1.54.1.1.1.1.3.8|4|Cisco CallManager SNMP Service
+1.3.6.1.2.1.54.1.1.1.1.3.9|4|Cisco DHCP Monitor Service
+1.3.6.1.2.1.54.1.1.1.1.3.10|4|Cisco Intercluster Lookup Service
+1.3.6.1.2.1.54.1.1.1.1.3.11|4|Cisco Location Bandwidth Manager
+1.3.6.1.2.1.54.1.1.1.1.3.12|4|Cisco Directory Number Alias Sync
+1.3.6.1.2.1.54.1.1.1.1.3.13|4|Self Provisioning IVR
+1.3.6.1.2.1.54.1.1.1.1.3.14|4|Cisco Wireless Controller Synchronization Service
+1.3.6.1.2.1.54.1.1.1.1.3.15|4|Cisco Dialed Number Analyzer Server
+1.3.6.1.2.1.54.1.1.1.1.3.16|4|Cisco Tftp
+1.3.6.1.2.1.54.1.1.1.1.3.17|4|Cisco TAPS Service
+1.3.6.1.2.1.54.1.1.1.1.3.18|4|Cisco CTL Provider
+1.3.6.1.2.1.54.1.1.1.1.3.19|4|Cisco Certificate Authority Proxy Function
+1.3.6.1.2.1.54.1.1.1.1.3.20|4|A Cisco DB
+1.3.6.1.2.1.54.1.1.1.1.3.21|4|A Cisco DB Replicator
+1.3.6.1.2.1.54.1.1.1.1.3.22|4|SNMP Master Agent
+1.3.6.1.2.1.54.1.1.1.1.3.23|4|Cisco Database Layer Monitor
+1.3.6.1.2.1.54.1.1.1.1.3.24|4|MIB2 Agent
+1.3.6.1.2.1.54.1.1.1.1.3.25|4|Host Resources Agent
+1.3.6.1.2.1.54.1.1.1.1.3.26|4|System Application Agent
+1.3.6.1.2.1.54.1.1.1.1.3.27|4|Cisco CDP Agent
+1.3.6.1.2.1.54.1.1.1.1.3.28|4|Cisco Syslog Agent
+1.3.6.1.2.1.54.1.1.1.1.3.29|4|Cisco Log Partition Monitoring Tool
+1.3.6.1.2.1.54.1.1.1.1.3.30|4|Cisco CDP
+1.3.6.1.2.1.54.1.1.1.1.3.31|4|Cisco DRF Local
+1.3.6.1.2.1.54.1.1.1.1.3.32|4|Cisco Certificate Expiry Monitor
+1.3.6.1.2.1.54.1.1.1.1.3.33|4|Cisco Certificate Change Notification
+1.3.6.1.2.1.54.1.1.1.1.3.34|4|Cisco Trace Collection Service
+1.3.6.1.2.1.54.1.1.1.1.3.35|4|Cisco RIS Data Collector
+1.3.6.1.2.1.54.1.1.1.1.3.36|4|Cisco AMC Service
+1.3.6.1.2.1.54.1.1.1.1.3.37|4|Cisco Audit Event Service
+1.3.6.1.2.1.54.1.1.1.1.3.38|4|Cisco DRF Master
+1.3.6.1.2.1.54.1.1.1.1.3.39|4|Cisco Tomcat
+1.3.6.1.2.1.54.1.1.1.1.3.40|4|Cisco CDR Repository Manager
+1.3.6.1.2.1.54.1.1.1.1.3.41|4|Cisco License Manager
+1.3.6.1.2.1.54.1.1.1.1.3.42|4|Cisco CDR Agent
+1.3.6.1.2.1.54.1.1.1.1.3.43|4|Cisco Trust Verification Service
+1.3.6.1.2.1.54.1.1.1.1.3.44|4|Cisco CAR Scheduler
+1.3.6.1.2.1.54.1.1.1.1.3.45|4|Cisco Management Agent Service
+1.3.6.1.2.1.54.1.1.1.1.3.46|4|Cisco Push Notification Service
+1.3.6.1.2.1.54.1.1.1.1.3.47|4|Cisco CAR DB
+1.3.6.1.2.1.54.1.1.1.1.3.48|4|Cisco Prime LM DB
+1.3.6.1.2.1.54.1.1.1.1.3.49|4|Cisco Prime LM Server
+1.3.6.1.2.1.54.1.1.1.1.4.1|4|11.5.1.15900-18
+1.3.6.1.6.3.10.2.1.3.0|2|104094

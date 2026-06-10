@@ -1,0 +1,62 @@
+modules:
+    os:
+        hardware: CHECKPOINT-MIB::svnApplianceProductName.0
+        serial: CHECKPOINT-MIB::svnApplianceSerialNumber.0
+        version: CHECKPOINT-MIB::svnVersion.0
+    processors:
+        data:
+            -
+                oid: CHECKPOINT-MIB::procUsage
+                num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
+                type: splat-cpu
+    sensors:
+        fanspeed:
+            data:
+                -
+                    oid: CHECKPOINT-MIB::fanSpeedSensorTable
+                    value: CHECKPOINT-MIB::fanSpeedSensorValue
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.3.{{ $index }}'
+                    descr: '{{ CHECKPOINT-MIB::fanSpeedSensorName }}'
+                    index: 'fanSpeedSensorValue.{{ $index }}'
+        load:
+            data:
+                -
+                    oid: CHECKPOINT-MIB::procUsage
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
+                    descr: Overall CPU utilization
+                -
+                    oid: CHECKPOINT-MIB::multiProcUsage
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.5.1.5.{{ $index }}'
+                    descr: CPU {{ $index }}
+                    index: 'multiProcUsage.{{ $index }}.0'
+
+        state:
+            data:
+                -
+                    oid: CHECKPOINT-MIB::fanSpeedSensorTable
+                    value: CHECKPOINT-MIB::fanSpeedSensorStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.6.{{ $index }}'
+                    descr: '{{ CHECKPOINT-MIB::fanSpeedSensorName }}'
+                    index: 'fanSpeedSensorValue.{{ $index }}'
+                    state_name: fanSpeedSensor
+                    states:
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 1, descr: Warning }
+                        - { value: 2, generic: 3, descr: Unknown }
+                -
+                    oid: CHECKPOINT-MIB::haStatCode
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
+                    descr: HA Status
+                    state_name: haSensor
+                    states:
+                        - { value: 0, generic: 0, descr: OK }
+                        - { value: 1, generic: 1, descr: 'Needs Atention' }
+                        - { value: 2, generic: 2, descr: 'HA Down' }
+        temperature:
+            data:
+                -
+                    oid: CHECKPOINT-MIB::tempertureSensorTable
+                    value: CHECKPOINT-MIB::tempertureSensorValue
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.1.1.3.{{ $index }}'
+                    descr: '{{ CHECKPOINT-MIB::tempertureSensorName }}'
+                    index: 'tempertureSensorValue.{{ $index }}'

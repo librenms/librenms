@@ -1,0 +1,98 @@
+-- =================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: OSPF (Open Shortest Path First) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2014-12-17 Created by Xu Jing
+-- =================================================================
+HH3C-OSPF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+
+hh3cOspf MODULE-IDENTITY
+    LAST-UPDATED "201412171700Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB file provides information about OSPF."
+    REVISION "201412171700Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 161 }
+
+hh3cOspfNetworkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cOspfNetworkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the configured parameters of OSPF networks."
+    ::= { hh3cOspf 1 }
+
+hh3cOspfNetworkEntry OBJECT-TYPE
+    SYNTAX Hh3cOspfNetworkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each configured network."
+    INDEX { hh3cOspfProcessId, hh3cOspfAreaId, hh3cOspfNetworkIpAddr }
+    ::= { hh3cOspfNetworkTable 1 }
+
+Hh3cOspfNetworkEntry ::=
+    SEQUENCE {
+        hh3cOspfProcessId
+            Integer32,
+        hh3cOspfAreaId
+            IpAddress,
+        hh3cOspfNetworkIpAddr
+            IpAddress,
+        hh3cOspfNetworkIpMask
+            IpAddress
+     }
+
+hh3cOspfProcessId OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The process ID field indicates the OSPF process number."
+    ::= { hh3cOspfNetworkEntry 1 }
+
+hh3cOspfAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A 32-bit integer uniquely identifying an area.
+        Area ID 0.0.0.0 is used for the OSPF backbone."
+    ::= { hh3cOspfNetworkEntry 2 }
+
+hh3cOspfNetworkIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This field is the address of the network."
+    ::= { hh3cOspfNetworkEntry 3 }
+
+hh3cOspfNetworkIpMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the wildcard mask of the network."
+    ::= { hh3cOspfNetworkEntry 4 }
+
+END

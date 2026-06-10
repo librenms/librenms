@@ -1,0 +1,2218 @@
+-- *****************************************************************
+-- CISCO-ENTITY-DIAG-MIB
+-- Definitions of managed objects supporting the Online
+-- Diagnostic Feature
+--   
+-- November 2002, Patrick Gili
+-- October  2005, Jayakumar Kadirvelu
+--   
+-- Copyright (c) 2002-2010, 2016 by Cisco Systems Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+CISCO-ENTITY-DIAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    Unsigned32,
+    Gauge32,
+    Integer32,
+    Counter32,
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    entPhysicalIndex,
+    PhysicalIndex,
+    entPhysicalDescr
+        FROM ENTITY-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    DateAndTime,
+    TruthValue,
+    RowStatus
+        FROM SNMPv2-TC
+    EntPhysicalIndexOrZero
+        FROM CISCO-TC
+    CeDiagDiagnosticLevel,
+    CeDiagDiagnosticMethod,
+    CeDiagTestIdentifier,
+    CeDiagErrorIdentifier,
+    CeDiagErrorIdentifierOrZero,
+    CeDiagJobIdentifier,
+    CeDiagPortList,
+    CeDiagTestList,
+    CeDiagJobSuite
+        FROM CISCO-ENTITY-DIAG-TC-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoEntityDiagMIB MODULE-IDENTITY
+    LAST-UPDATED    "201603110000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA 95134
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "This MIB module defines the managed objects that describe the
+        online diagnostics capabilities supported by the
+        physical entities contained by the system, including chassis,
+        modules, ports, power supplies, fans, and sensors.  In order to
+        manage the online diagnostic capabilities supported by
+        a physical entity, it must be represented by a conceptual row
+        in the entPhysicalTable of the ENTITY-MIB (RFC-2737).
+
+        GLOSSARY
+
+        Boot-up Diagnostic - a diagnostic consisting of tests intended
+        to be executed in a reasonable timeframe when a physical entity
+        boots.
+
+        Diagnostic - a suite of tests intended to exercise the
+        functional integrity of a physical entity.
+
+        Diagnostic Level - the degree of completeness that a diagnostic
+        will exercise a physical entity.
+
+        Field Diagnostic - a special suite of tests intended to
+        exercise the functional integrity of a physical entity in a
+        manner that is possible when a physical entity is
+        operational or running an operational image.
+
+        Field Diagnostic Image - an image supporting field diagnostics.
+        A physical entity has to be loaded with a field diagnostic
+        image before field diagnostics can be executed on the physical
+        entity.
+
+        Health Monitoring - the process of running special
+        non-intrusive online tests periodically on a physical entity
+        for the purpose of tracking the overall condition of a physical
+        entity.
+
+        On-Demand Diagnostic - a diagnostic intended to be executed
+        immediately upon request.
+
+        Offline Diagnostic - a diagnostic that consists of tests that
+        are disruptive in nature, and thus requires the physical entity
+        being evaluated to be taken offline for the duration.
+
+        Online Diagnostic - a diagnostic that consists of tests that
+        are not disruptive in nature, and thus can be done without
+        taking the physical entity offline.
+
+        Physical Entity - an identifiable physical resource, such as a
+        chassis, line card, power supply, or communication port.  See
+        RFC-2737, 'Entity MIB (Version 2)', K. McCloghrie and A.
+        Bierman.
+
+        Scheduled Diagnostic - a diagnostic intended to execute at some
+        time in the future.  There exist two types of scheduled
+        diagnostics: 1) one-shot, which execute only once; and 2)
+        periodic, which executes at a specific interval.
+
+        Test - an exercise intended to determine the functional
+        integrity of a component comprising a physical entity (e.g., a
+        port might support an internal loopback test).
+
+        Diagnostic Job - Consists of a diagnostic suite 
+        (i.e., a collection of tests) to be executed by a physical
+        entity."
+    REVISION        "201603110000Z"
+    DESCRIPTION
+        "Added one new enumaration value disruptive(15)
+        to ceDiagTestAttributes"
+    REVISION        "201005260000Z"
+    DESCRIPTION
+        "Added ceDiagHMTestThreshWindowGroup."
+    REVISION        "200906300000Z"
+    DESCRIPTION
+        "Added ceDiagTestPerfLastTestMethodGroup.
+        Updated Description of ceDiagTestPerfLastErrorID object."
+    REVISION        "200803120000Z"
+    DESCRIPTION
+        "Added ceDiagNotifControlGroup, ceDiagNotifErrorMsgGroup
+        and ceDiagNotificationGroup."
+    REVISION        "200701090000Z"
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { ciscoMgmt 350 }
+
+
+ciscoEntityDiagMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIB 0 }
+
+ciscoEntityDiagMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIB 1 }
+
+ciscoEntityDiagMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIB 2 }
+
+ceDiagDescriptions  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 1 }
+
+ceDiagGlobalConfig  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 2 }
+
+ceDiagEntity  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 3 }
+
+ceDiagOnDemand  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 4 }
+
+ceDiagScheduled  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 5 }
+
+ceDiagTest  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 6 }
+
+ceDiagHealthMonitor  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 7 }
+
+ceDiagEvents  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 8 }
+
+ceDiagNotificationControl  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBObjects 9 }
+
+-- DiagDescriptions
+
+ceDiagTestInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagTestInfoEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table describes the tests supported by each physical
+        entity supporting online diagnostics.  The table
+        organizes tests into sets associated with the physical entity
+        supporting those tests.
+
+        The SNMP entity adds a set of tests corresponding to a physical
+        entity upon detection of a physical entity supporting
+        online diagnostics.
+
+        The SNMP entity deletes a set of tests corresponding to a
+        physical entity upon removal of the physical entity.
+
+        The SNMP entity replaces a set of tests corresponding to a
+        physical entity when the physical entity has been successfully
+        loaded with a different image (e.g., the field diagnostic
+        image)."
+    ::= { ceDiagDescriptions 1 }
+
+ceDiagTestInfoEntry OBJECT-TYPE
+    SYNTAX          CeDiagTestInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The description of a single test supported by a corresponding
+        physical entity."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDiagTestId
+                    } 
+    ::= { ceDiagTestInfoTable 1 }
+
+CeDiagTestInfoEntry ::= SEQUENCE {
+        ceDiagTestId         CeDiagTestIdentifier,
+        ceDiagTestText       SnmpAdminString,
+        ceDiagTestAttributes BITS
+}
+
+ceDiagTestId OBJECT-TYPE
+    SYNTAX          CeDiagTestIdentifier
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates an arbitrary positive integer
+        arbitrarily identifying the test." 
+    ::= { ceDiagTestInfoEntry 1 }
+
+ceDiagTestText OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates a human-readable description of the
+        test.  Examples include:
+
+        'Marching Pattern DRAM Test'
+
+        'Data Pins DRAM Test'
+
+        'Internal Loopback Test'
+
+        'External Loopback Test'" 
+    ::= { ceDiagTestInfoEntry 2 }
+
+ceDiagTestAttributes OBJECT-TYPE
+    SYNTAX          BITS {
+                        minimal(0),
+                        complete(1),
+                        perPort(2),
+                        fatal(3),
+                        basicOnDemand(4),
+                        standby(5),
+                        parallel(6),
+                        nonDisruptive(7),
+                        hmAlwaysEnable(8),
+                        hmFixedInterval(9),
+                        nonHM(10),
+                        proxy(11),
+                        activeToStandby(12),
+                        offline(13),
+                        perDevice(14),
+                        disruptive(15)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates a set of attributes characterizing the
+        test:
+
+        'minimal'         - indicates that this test will be executed
+                            during boot-up if ceDiagBootupLevel is set
+                            to 'minimal' or 'complete'. This test is 
+                            also included in the minimal or complete
+                            test suites.
+
+        'complete'        - indicates that this test will be executed
+                            during boot-up if ceDiagBootupLevel is set
+                            to 'complete'. This test is also included
+                            in the complete test suites.
+
+        'perPort'         - indicates that this test is a executed for
+                            each port contained by the module. This
+                            test is also included in the perPort test
+                            suites.
+
+        'fatal'           - indicates that if this test fails, then the
+                            diagnostic should fail indicating that a
+                            major error occurred.
+
+        'basicOnDemand'   - indicates that this test will be
+                            run during the basic on demand job is run.
+
+        'standby'         - indicates that this test can only be run
+                            if the physical entity is a standby unit
+                            and can only be executed from the standby
+                            unit.
+
+        'parallel'        - indicates that this test can be executed in
+                            parallel with other tests without checking
+                            for resource availability.
+
+        'nonDisruptive'   - indicates this test can be executed without
+                            disrupting the physical entity's normal
+                            operation. This test is also included in 
+                            the nonDisruptive test suites.
+
+        'hmAlwaysEnabled' - indicates that a management application can
+                            not disable the use of this test for the
+                            purpose of health monitoring.
+
+        'hmFixedInterval' - indicates that a management application can
+                            not change the interval at which health
+                            monitoring executes this test.
+
+        'nonHM'           - indicates that this test can not be used for
+                            health monitoring.
+
+        'proxy'           - indicates that the test must be executed
+                            through a proxy.
+
+        'activeToStandby' - indicates that this test can only be run if
+                            the physical entity is a standby unit and
+                            can only be executed from the active unit.
+
+        'offline'         - indicates that this test will not get a user
+                            confirmation when it is run.
+
+        'perDevice'       - indicates that this test is a per device test.
+
+        'disruptive'      - indicates that this test can be executed with
+                            disrupting the physical entity's normal
+                            operation. This test is also included in 
+                            the disruptive test suites." 
+    ::= { ceDiagTestInfoEntry 3 }
+ 
+
+
+ceDiagTestCustomAttributeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagTestCustomAttributeEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table describes the additional custom based attributes
+        of the tests listed in ceDiagTestInfoTable. These are attributes
+        which have been customized by the platform supporting the tests."
+    ::= { ceDiagDescriptions 2 }
+
+ceDiagTestCustomAttributeEntry OBJECT-TYPE
+    SYNTAX          CeDiagTestCustomAttributeEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The description of a single custom based attribute for a test
+        supported by a corresponding physical entity."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDiagTestId,
+                        ceDiagTestCustomAttributeIndex
+                    } 
+    ::= { ceDiagTestCustomAttributeTable 1 }
+
+CeDiagTestCustomAttributeEntry ::= SEQUENCE {
+        ceDiagTestCustomAttributeIndex Unsigned32,
+        ceDiagTestCustomAttributeDesc  SnmpAdminString
+}
+
+ceDiagTestCustomAttributeIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An arbitrary integer which identifies the custom based attribute
+        of a test." 
+    ::= { ceDiagTestCustomAttributeEntry 1 }
+
+ceDiagTestCustomAttributeDesc OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object provides a textual description of the custom based
+        attribute of this test." 
+    ::= { ceDiagTestCustomAttributeEntry 2 }
+ 
+
+
+ceDiagErrorInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagErrorInfoEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table describes the errors indicated by a system
+        supporting online diagnostics."
+    ::= { ceDiagDescriptions 3 }
+
+ceDiagErrorInfoEntry OBJECT-TYPE
+    SYNTAX          CeDiagErrorInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The description of a single online error."
+    INDEX           { ceDiagErrorId } 
+    ::= { ceDiagErrorInfoTable 1 }
+
+CeDiagErrorInfoEntry ::= SEQUENCE {
+        ceDiagErrorId   CeDiagErrorIdentifier,
+        ceDiagErrorText SnmpAdminString
+}
+
+ceDiagErrorId OBJECT-TYPE
+    SYNTAX          CeDiagErrorIdentifier
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates an arbitrary positive integer
+        arbitrarily identifying the error." 
+    ::= { ceDiagErrorInfoEntry 1 }
+
+ceDiagErrorText OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates a human-readable description of the
+        error.  Examples include:
+
+        'DIAG_SUCCESS'
+
+        'DIAG_FAILURE'
+
+        'DIAG_NOT_SUPPORT'
+
+        'DIAG_SKIPPED'" 
+    ::= { ceDiagErrorInfoEntry 2 }
+ 
+
+
+-- DiagGlobalConfig
+
+ceDiagBootupLevel OBJECT-TYPE
+    SYNTAX          CeDiagDiagnosticLevel
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the level that physical entities will
+        execute their boot-up diagnostic."
+    DEFVAL          { minimal } 
+    ::= { ceDiagGlobalConfig 1 }
+-- DiagEntity
+
+ceDiagEntityTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagEntityEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table supports online diagnostic control and
+        status for each physical entity that supporting the feature.
+
+        The SNMP entity adds a conceptual row to this table
+        corresponding to a physical entity upon detection of a physical
+        entity supporting online diagnostics.
+
+        The SNMP entity deletes a conceptual row from this table
+        corresponding to a physical entity upon removal of the physical
+        entity."
+    ::= { ceDiagEntity 1 }
+
+ceDiagEntityEntry OBJECT-TYPE
+    SYNTAX          CeDiagEntityEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Online diagnostic control and status for a single
+        physical entity supporting the feature.  Observe that this data
+        may not be accurate if the corresponding cefcModuleOperStatus
+        (see the CISCO-ENTITY-FRU-CONTROL-MIB for further details) has
+        a value of 'boot'."
+    INDEX           { entPhysicalIndex } 
+    ::= { ceDiagEntityTable 1 }
+
+CeDiagEntityEntry ::= SEQUENCE {
+        ceDiagEntityBootLevel          CeDiagDiagnosticLevel,
+        ceDiagEntityImageAdminStatus   INTEGER,
+        ceDiagEntityImageOperStatus    INTEGER,
+        ceDiagEntityFieldDiagnosticUrl SnmpAdminString
+}
+
+ceDiagEntityBootLevel OBJECT-TYPE
+    SYNTAX          CeDiagDiagnosticLevel
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the level that the physical entity
+        executed its boot-up diagnostic." 
+    ::= { ceDiagEntityEntry 1 }
+
+ceDiagEntityImageAdminStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        operational(1),
+                        fieldDiagnostic(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the desired image the physical entity
+        should be running:
+
+        'operational'     - the physical entity should be running the
+                            operational image.
+
+        'fieldDiagnostic' - the physical entity should be running the
+                            field diagnostic image."
+    DEFVAL          { operational } 
+    ::= { ceDiagEntityEntry 2 }
+
+ceDiagEntityImageOperStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        operational(1),
+                        fieldDiagnostic(2),
+                        booting(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the actual image the physical entity is
+        running:
+
+        'operational'     - the physical entity is running the
+                            operational image.
+
+        'fieldDiagnostic' - the physical entity is running the field
+                            diagnostic image.
+
+        'booting'         - the physical entity is booting; that is,
+                            there is no way of determining what image
+                            the physical entity is running because it
+                            is currently booting." 
+    ::= { ceDiagEntityEntry 3 }
+
+ceDiagEntityFieldDiagnosticUrl OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies a URL (see RFC-1630) that specifies the
+        location of the field diagnostic image.  The following list
+        provides some examples of URLs for the field diagnostic:
+
+        file://disk0:/images/fd001
+            Describes a file with the path '/images/fd001' on 'disk0:'
+            accessed locally.
+
+        ftp://pop-server/usr/bin/fd001
+            Describes a file with the path '/usr/bin/fd001' on the host
+           'pop-server' accessed via FTP.
+
+        tftp://pop-server/tftpout/fd001
+            Describes a file with the path '/tftpout/fd001' on the host
+            'pop-server' accessed via TFTP."
+    REFERENCE
+        "RFC-1630, 'Universal Resource Identifiers in WWW', T.
+        Berners-Lee." 
+    ::= { ceDiagEntityEntry 4 }
+ 
+
+
+ceDiagEntityCurrentTestTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagEntityCurrentTestEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the information about the current test
+        executing on a physical entity."
+    ::= { ceDiagEntity 2 }
+
+ceDiagEntityCurrentTestEntry OBJECT-TYPE
+    SYNTAX          CeDiagEntityCurrentTestEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A test which is currently executing on a particular physical
+        entity."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDiagTestId
+                    } 
+    ::= { ceDiagEntityCurrentTestTable 1 }
+
+CeDiagEntityCurrentTestEntry ::= SEQUENCE {
+        ceDiagEntityCurrentTestMethod CeDiagDiagnosticMethod
+}
+
+ceDiagEntityCurrentTestMethod OBJECT-TYPE
+    SYNTAX          CeDiagDiagnosticMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the method used to invoke the diagnostic
+        that is executing this test." 
+    ::= { ceDiagEntityCurrentTestEntry 1 }
+ 
+
+
+-- DiagOnDemand
+
+ceDiagOnDemandErrorAllowed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the number of errors the physical
+        entities will allow before aborting an on demand diagnostic job.
+        A value of '0' indicates that the an unlimited number of
+        errors are allowed for the on demand diagnostic job." 
+    ::= { ceDiagOnDemand 1 }
+
+ceDiagOnDemandErrorAction OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        continue(1),
+                        stop(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies how the physical entities in the
+        system are to proceed when they encounter an error during
+        an on demand diagnostic job.
+
+        'continue' - indicates that the physical entities will continue
+                     executing the on demand job.
+
+        'stop'     - indicates that the physical entities will abort
+                     the on demand job." 
+    ::= { ceDiagOnDemand 2 }
+
+ceDiagOnDemandIterations OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the maximum number of iterations of an
+        on demand job." 
+    ::= { ceDiagOnDemand 3 }
+
+ceDiagOnDemandJobTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagOnDemandJobEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains a list of on demand jobs currently in the
+        system.
+
+        A row in this table can be created by setting the corresponding
+        instance of ceDiagOnDemandJobRowStatus to 'createAndGo'.
+        A row can be deleted by setting the corresponding instance of
+        ceDiagOnDemandJobRowStatus to 'destroy'.  Once the job is
+        completed the corresponding row is deleted from the table.
+
+        The individual results of the tests executed by this job are
+        updated in ceDiagTestPerfTable."
+    ::= { ceDiagOnDemand 4 }
+
+ceDiagOnDemandJobEntry OBJECT-TYPE
+    SYNTAX          CeDiagOnDemandJobEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A on demand job currently executing on a particular physical
+        entity which supports on demand diagnostics."
+    INDEX           { entPhysicalIndex } 
+    ::= { ceDiagOnDemandJobTable 1 }
+
+CeDiagOnDemandJobEntry ::= SEQUENCE {
+        ceDiagOnDemandJobSuite     CeDiagJobSuite,
+        ceDiagOnDemandJobTestList  CeDiagTestList,
+        ceDiagOnDemandJobPortList  CeDiagPortList,
+        ceDiagOnDemandJobRowStatus RowStatus
+}
+
+ceDiagOnDemandJobSuite OBJECT-TYPE
+    SYNTAX          CeDiagJobSuite
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the various system predefined test
+        suites the on demand job can choose from. 
+
+        If the value of this object is 'none', this job will run
+        the tests specified by ceDiagOnDemandJobTestList.
+        If the value of this object is 'complete', 'minimal', 
+        'nonDisruptive' or 'perPort' the value of  
+        ceDiagOnDemandJobTestList is ignored." 
+    ::= { ceDiagOnDemandJobEntry 1 }
+
+ceDiagOnDemandJobTestList OBJECT-TYPE
+    SYNTAX          CeDiagTestList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the user specified diagnostic suite
+        (i.e., a set of tests) to be executed by the corresponding
+        physical entity.
+
+        The set of tests supported by this physical entity are
+        specified in ceDiagTestInfoTable." 
+    ::= { ceDiagOnDemandJobEntry 2 }
+
+ceDiagOnDemandJobPortList OBJECT-TYPE
+    SYNTAX          CeDiagPortList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the list of ports to be exercised by the
+        corresponding physical entity when executing the diagnostic
+        suite specified for the job." 
+    ::= { ceDiagOnDemandJobEntry 3 }
+
+ceDiagOnDemandJobRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status object used to manage the rows in this table.
+        When set to active(1) the on demand job is submitted.
+        When set to destroy(6) the on demand job is stopped.
+        When the value of this object is 'active', values within
+        this row cannot be modified, except by deleting and 
+        re-creating the row." 
+    ::= { ceDiagOnDemandJobEntry 4 }
+ 
+
+-- DiagScheduled
+
+ceDiagScheduledJobTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagScheduledJobEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains a list of scheduled jobs on the system.
+        A row in this table can be created by setting the corresponding
+        instance of ceDiagScheduledJobRowStatus to 'createAndGo'.
+        A row can be deleted by setting the corresponding instance of
+        ceDiagScheduledJobRowStatus to 'destroy'.  Once the job is
+        completed the corresponding row is deleted from the table.
+        The individual results of the tests executed by this job are
+        updated in ceDiagTestPerfTable."
+    ::= { ceDiagScheduled 1 }
+
+ceDiagScheduledJobEntry OBJECT-TYPE
+    SYNTAX          CeDiagScheduledJobEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A job currently scheduled on a particular physical
+        entity."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDiagScheduledJobIndex
+                    } 
+    ::= { ceDiagScheduledJobTable 1 }
+
+CeDiagScheduledJobEntry ::= SEQUENCE {
+        ceDiagScheduledJobIndex     CeDiagJobIdentifier,
+        ceDiagScheduledJobType      INTEGER,
+        ceDiagScheduledJobStart     DateAndTime,
+        ceDiagScheduledJobDayOfWeek INTEGER,
+        ceDiagScheduledJobTestList  CeDiagTestList,
+        ceDiagScheduledJobPortList  CeDiagPortList,
+        ceDiagScheduledJobRowStatus RowStatus,
+        ceDiagScheduledJobSuite     CeDiagJobSuite
+}
+
+ceDiagScheduledJobIndex OBJECT-TYPE
+    SYNTAX          CeDiagJobIdentifier
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An arbitrary non-zero integer value that uniquely identifies a
+        single scheduled job with respect to a physical entity." 
+    ::= { ceDiagScheduledJobEntry 1 }
+
+ceDiagScheduledJobType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        scheduledOneShot(1),
+                        scheduledPeriodicDaily(2),
+                        scheduledPeriodicWeekly(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the type of the scheduled job.
+
+        'scheduledOneShot'        - the physical entity will invoke
+                                    this job at the time specified
+                                    by ceDiagScheduledJobStart.
+
+        'scheduledPeriodicDaily'  - the physical entity will
+                                    first invoke this job at the time
+                                    specified by 
+                                    ceDiagScheduledJobStart and 
+                                    continue invoking it daily at the
+                                    same time.
+
+        'scheduledPeriodicWeekly' - the corresponding physical entity 
+                                    will first invoke this job at the
+                                    time and day of the week specified 
+                                    by ceDiagScheduledJobStart and
+                                    ceDiagScheduledJobDayOfWeek, and
+                                    continue to invoke it weekly at
+                                    the same time and day." 
+    ::= { ceDiagScheduledJobEntry 2 }
+
+ceDiagScheduledJobStart OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies when a scheduled job will be executed.
+
+        If the value of ceDiagScheduledJobType is 'scheduledOneShot',
+        then this object only applies to the first execution of the job.
+
+        If the value of ceDiagScheduledJobType is
+        'scheduledPeriodicDaily' or 'scheduledPeriodicWeekly', then the
+         first four octets of this objects should be zero.
+
+        If the physical entity's job queue already contains a job
+        scheduled for execution at this time, then the process of
+        submitting the job will fail." 
+    ::= { ceDiagScheduledJobEntry 3 }
+
+ceDiagScheduledJobDayOfWeek OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        sunday(1),
+                        monday(2),
+                        tuesday(3),
+                        wednesday(4),
+                        thursday(5),
+                        friday(6),
+                        saturday(7),
+                        notApplicable(8)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the day of the week for a
+        weekly periodic scheduled job.  The value of
+        of this object must be specified if the value of
+        ceDiagScheduledJobType is 'scheduledPeriodicWeekly'. 
+
+        This value of this object is set to 'notApplicable' 
+        if the value of ceDiagScheduledJobType is 'scheduledOneShot'
+        or  'scheduledPeriodicDaily'." 
+    ::= { ceDiagScheduledJobEntry 4 }
+
+ceDiagScheduledJobTestList OBJECT-TYPE
+    SYNTAX          CeDiagTestList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the diagnostic suite (i.e., a set of
+        tests) to be executed by the corresponding physical entity.
+
+        The set of tests supported by this physical entity are
+        specified in ceDiagTestInfoTable." 
+    ::= { ceDiagScheduledJobEntry 5 }
+
+ceDiagScheduledJobPortList OBJECT-TYPE
+    SYNTAX          CeDiagPortList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the list of ports to be tested by the
+        corresponding physical entity when executing the diagnostic
+        suite specified for the job." 
+    ::= { ceDiagScheduledJobEntry 6 }
+
+ceDiagScheduledJobRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status object used to manage the rows in this table.
+        When set to 'active' the scheduled job is submitted.
+        When set to destroy(6) the scheduled job is cleared.
+        When the value of this object is 'active', values within
+        this row cannot be modified, except by deleting and 
+        re-creating the row." 
+    ::= { ceDiagScheduledJobEntry 7 }
+
+ceDiagScheduledJobSuite OBJECT-TYPE
+    SYNTAX          CeDiagJobSuite
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the various system predefined test
+        suites the on scheduled job can choose from. 
+
+        If the value of this object is 'none', this job will run
+        the tests specified by ceDiagScheduledJobTestList.
+        If the value of this object is 'complete', 'minimal', 
+        'nonDisruptive' or 'perPort' the value of  
+        ceDiagScheduledJobTestList is ignored." 
+    ::= { ceDiagScheduledJobEntry 8 }
+ 
+
+-- DiagTest
+
+ceDiagTestPerfTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagTestPerfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table maintains data concerning the performance of tests
+        executed by each physical entity supporting the online
+        diagnostic feature.  The table organizes tests into sets
+        associated with the physical entity supporting those tests.
+
+        The SNMP entity adds a set of tests corresponding to a physical
+        entity upon detection of a physical entity supporting
+        online diagnostics.
+
+        The SNMP entity deletes a set of tests corresponding to a
+        physical entity upon removal of the physical entity.
+
+        The SNMP entity replaces a set of tests corresponding to a
+        physical entity when the physical entity has been successfully
+        loaded with a different image (e.g., the field diagnostic
+        image)."
+    ::= { ceDiagTest 1 }
+
+ceDiagTestPerfEntry OBJECT-TYPE
+    SYNTAX          CeDiagTestPerfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Data concerning the performance of a single test."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDiagTestId
+                    } 
+    ::= { ceDiagTestPerfTable 1 }
+
+CeDiagTestPerfEntry ::= SEQUENCE {
+        ceDiagTestPerfLastResult       INTEGER,
+        ceDiagTestPerfLastErrorID      CeDiagErrorIdentifierOrZero,
+        ceDiagTestPerfLastRun          DateAndTime,
+        ceDiagTestPerfFirstFail        DateAndTime,
+        ceDiagTestPerfLastSuccess      DateAndTime,
+        ceDiagTestPeffLastFail         DateAndTime,
+        ceDiagTestPerfTotalRuns        Counter32,
+        ceDiagTestPerfTotalFails       Counter32,
+        ceDiagTestPerfConsecutiveFails Gauge32,
+        ceDiagTestPerfLastTestMethod   CeDiagDiagnosticMethod
+}
+
+ceDiagTestPerfLastResult OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        fail(2),
+                        pass(3),
+                        skipped(4)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the result the last time this test was
+        executed by the corresponding physical entity:
+
+        'unknown' - the corresponding physical entity has not executed
+                    the test.
+
+        'fail'    - the test executed and detected at least one
+                    failure.
+
+        'pass'    - the test executed without detecting a failure.
+
+        'skipped' - the test was skipped due to insufficient resources." 
+    ::= { ceDiagTestPerfEntry 1 }
+
+ceDiagTestPerfLastErrorID OBJECT-TYPE
+    SYNTAX          CeDiagErrorIdentifierOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the last error code of this test.
+        Details of the non-zero error code can be found in the
+        corresponding entry in ceDiagErrorInfoTable." 
+    ::= { ceDiagTestPerfEntry 2 }
+
+ceDiagTestPerfLastRun OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the last time the
+        corresponding physical entity executed this test.  If the value
+        of ceDiagTestPerfLastResult is 'unknown', then the value of
+        this object is irrelevant." 
+    ::= { ceDiagTestPerfEntry 3 }
+
+ceDiagTestPerfFirstFail OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the first time
+        the corresponding physical entity executed this test and it
+        failed.  The value of this object is irrelevant if the value of 
+        ceDiagTestPerfTotalFails is 0." 
+    ::= { ceDiagTestPerfEntry 4 }
+
+ceDiagTestPerfLastSuccess OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the last time the
+        corresponding physical entity executed this test and 
+        it passed. The value 0x0000010100000000 indicates 
+        that the corresponding physical entity has not 
+        passed this test yet." 
+    ::= { ceDiagTestPerfEntry 5 }
+
+ceDiagTestPeffLastFail OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the last time the
+        corresponding physical entity executed this test and it failed.
+        If the value of ceDiagTestPerfTotalFails is 0, then the value 
+        of this object is irrelevant." 
+    ::= { ceDiagTestPerfEntry 6 }
+
+ceDiagTestPerfTotalRuns OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of times the
+        corresponding physical entity has executed the test." 
+    ::= { ceDiagTestPerfEntry 7 }
+
+ceDiagTestPerfTotalFails OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of times the
+        corresponding physical entity has executed the test and the
+        test resulted with a failure." 
+    ::= { ceDiagTestPerfEntry 8 }
+
+ceDiagTestPerfConsecutiveFails OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the consecutive number of times the
+        corresponding physical entity has executed the test and it has
+        failed.  The value of this object will be reset to '0' when the
+        physical entity executes the test and it succeeds." 
+    ::= { ceDiagTestPerfEntry 9 }
+
+ceDiagTestPerfLastTestMethod OBJECT-TYPE
+    SYNTAX          CeDiagDiagnosticMethod
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the testing method used for the
+        last time this test was executed by the corresponding 
+        physical entity." 
+    ::= { ceDiagTestPerfEntry 10 }
+ 
+
+
+-- DiagHealthMonitor
+
+ceDiagHMSyslogEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether the system will generate
+        syslog messages due to the tests run by health
+        monitor." 
+    ::= { ceDiagHealthMonitor 1 }
+
+ceDiagHMTestTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagHMTestEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table describes attributes specific to the health monitor
+        for tests supported by a physical entity."
+    ::= { ceDiagHealthMonitor 2 }
+
+ceDiagHMTestEntry OBJECT-TYPE
+    SYNTAX          CeDiagHMTestEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The attributes of a single test specific to the health
+        monitor."
+    INDEX           {
+                        entPhysicalIndex,
+                        ceDiagTestId
+                    } 
+    ::= { ceDiagHMTestTable 1 }
+
+CeDiagHMTestEntry ::= SEQUENCE {
+        ceDiagHMTestEnabled           TruthValue,
+        ceDiagHMTestIntervalMin       Unsigned32,
+        ceDiagHMTestIntervalDefault   Unsigned32,
+        ceDiagHMTestInterval          Unsigned32,
+        ceDiagHMTestThresholdDefault  Unsigned32,
+        ceDiagHMTestThreshold         Unsigned32,
+        ceDiagHMTestThreshWindowSuite INTEGER,
+        ceDiagHMTestThreshWindowSize  Unsigned32
+}
+
+ceDiagHMTestEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies whether this test is enabled for
+        health monitor." 
+    ::= { ceDiagHMTestEntry 1 }
+
+ceDiagHMTestIntervalMin OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the minimum interval which the health
+        monitor can periodically invoke this test." 
+    ::= { ceDiagHMTestEntry 2 }
+
+ceDiagHMTestIntervalDefault OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the default interval which the health
+        monitor will periodically invoke this test.  A value of '0'
+        indicates that the health monitor will not invoke the test." 
+    ::= { ceDiagHMTestEntry 3 }
+
+ceDiagHMTestInterval OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the interval at which the health monitor
+        periodically invokes this test.  A value of '0' indicates that
+        the health monitor will not invoke the test.  A value of '0'
+        cannot be set." 
+    ::= { ceDiagHMTestEntry 4 }
+
+ceDiagHMTestThresholdDefault OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the default consecutive failure
+        count threshold.  When the specified failure count threshold
+        is reached, the diagnostic test result is set to failure. 
+        A value of '0' indicates that the health monitor will not
+        invoke this test." 
+    ::= { ceDiagHMTestEntry 5 }
+
+ceDiagHMTestThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the consecutive failure count threshold
+        for this test.  When the specified failure count threshold is
+        reached, the diagnostic test result is set to failure.
+
+        A value of '0' indicates that there is no failure count
+        threshold for this test.
+
+        This object is used in combination with
+        ceDiagHMTestThreshWindowSuite and ceDiagHMTestThreshWindowSize
+        to specify a sliding history window for which the threshold
+        is monitored. 
+
+        When the value of ceDiagHMTestThreshWindowSuite is
+        'default', the sliding history window is in number of test
+        runs, with a window size the same as the value of this
+        object.
+
+        If ceDiagHMTestThreshWindowSuite and 
+        ceDiagHMTestThreshWindowSize are not supported, the failure
+        count threshold will be the consecutive failure count threshold." 
+    ::= { ceDiagHMTestEntry 6 }
+
+ceDiagHMTestThreshWindowSuite OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        default(1),
+                        milliseconds(2),
+                        seconds(3),
+                        minutes(4),
+                        hours(5),
+                        days(6),
+                        runs(7)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies a sliding history window
+        parameter which is used in combination with 
+        ceDiagHMTestThreshold. When the specified failure count
+        threshold is reached in this sliding history window, 
+        the diagnostic test result is set to failure.
+
+        'default'      - The sliding history window is in number
+                         of test runs or executions, with a window
+                         size the same as ceDiagHMTestThreshold.
+
+        'milliseconds' - The sliding history window is in milli-seconds
+                         specified by ceDiagHMTestThreshWindowSize.
+
+        'seconds'      - The sliding history window is in seconds
+                         specified by ceDiagHMTestThreshWindowSize.
+
+        'minutes'      - The sliding history window is in minutes
+                         specified by ceDiagHMTestThreshWindowSize.
+
+        'hours'        - The sliding history window is in hours
+                         specified by ceDiagHMTestThreshWindowSize.
+
+        'days'         - The sliding history window is in days
+                         specified by ceDiagHMTestThreshWindowSize.
+
+        'runs'         - The sliding history window is in number
+                         of test runs or executions specified by
+                         ceDiagHMTestThreshWindowSize.
+
+        When the value of this object is 'default' the user cannot set
+        any value for ceDiagHMTestThreshWindowSize.
+        When the value of this object is not 'default', 
+        then the value of ceDiagHMTestThreshWindowSize cannot be zero (0)." 
+    ::= { ceDiagHMTestEntry 7 }
+
+ceDiagHMTestThreshWindowSize OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the sliding history window size.
+
+        When the value of ceDiagHMTestThreshWindowSuite is 'default', the
+        user cannot set any value for this object.
+
+        The value of zero (0) cannot be set." 
+    ::= { ceDiagHMTestEntry 8 }
+ 
+
+
+-- DiagEvents
+
+ceDiagEventLogSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the maximum number of entries which the
+        event log buffer can contain." 
+    ::= { ceDiagEvents 1 }
+
+ceDiagEventCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the number of entries currently stored
+        in the event log buffer." 
+    ::= { ceDiagEvents 2 }
+
+ceDiagEventMaxQueries OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Maximum number of query entries allowed in the
+        ceDiagEventQueryTable." 
+    ::= { ceDiagEvents 3 }
+
+ceDiagEventQueryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagEventQueryEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A control table used to query the event log buffer. Each row
+        instance in the table represents a query with its parameters.
+        The resulting data for each instance of a query in this table
+        is stored in the ceDiagEventResultTable.
+
+        A row in this table can be created by setting the corresponding
+        instance of ceDiagEventQueryStatus to 'createAndGo'.
+        A row can be deleted by setting the corresponding instance of
+        ceDiagEventQueryStatus to 'destroy'."
+    ::= { ceDiagEvents 4 }
+
+ceDiagEventQueryEntry OBJECT-TYPE
+    SYNTAX          CeDiagEventQueryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row of the ceDiagEventQueryTable used to setup
+        a event log buffer query to search for diagnostic events.
+        The actual search is started by when the value of
+        ceDiagEventQueryStatus is set to 'active'."
+    INDEX           { ceDiagEventQueryIndex } 
+    ::= { ceDiagEventQueryTable 1 }
+
+CeDiagEventQueryEntry ::= SEQUENCE {
+        ceDiagEventQueryIndex         Unsigned32,
+        ceDiagEventQueryPhysicalIndex EntPhysicalIndexOrZero,
+        ceDiagEventQuerySeverity      INTEGER,
+        ceDiagEventQueryOwner         SnmpAdminString,
+        ceDiagEventQueryResultingRows Integer32,
+        ceDiagEventQueryStatus        RowStatus
+}
+
+ceDiagEventQueryIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An arbitrary integer in the range of 1 to
+        ceDiagEventMaxQueries to identify this control query." 
+    ::= { ceDiagEventQueryEntry 1 }
+
+ceDiagEventQueryPhysicalIndex OBJECT-TYPE
+    SYNTAX          EntPhysicalIndexOrZero
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the physical entity for the event
+        log buffer query. A value of zero indicates that the 
+        query will return events of all physical entities." 
+    ::= { ceDiagEventQueryEntry 2 }
+
+ceDiagEventQuerySeverity OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        all(0),
+                        info(1),
+                        warning(2),
+                        error(3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the severity of the event log buffer
+        query. A value of 'all' indicates that the search will return
+        events of all severities." 
+    ::= { ceDiagEventQueryEntry 3 }
+
+ceDiagEventQueryOwner OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The manager entity that configured this entry and is therefore
+        using the resources assigned to it.  It is used to model an
+        administratively assigned name of the owner of a resource.
+        It is recommended that this object have one or more the following
+        information: IP address, management station name, network
+        manager's name, location, or phone number." 
+    ::= { ceDiagEventQueryEntry 4 }
+
+ceDiagEventQueryResultingRows OBJECT-TYPE
+    SYNTAX          Integer32 (-1..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The result status of the query. Possible values are:
+
+        -1            - Either the query has not been initiated or 
+                        the agent is busy processing this query instance.
+                        Time to completion of the query processing
+                        depends on the complexity of the query and
+                        the number of matches that satisfy this query.
+
+        0..2147483647 - The search has ended and this is the number of 
+                        rows in the ceDiagEventResultTable, resulting 
+                        from this query." 
+    ::= { ceDiagEventQueryEntry 5 }
+
+ceDiagEventQueryStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status object used to manage rows in this table.
+        When set to 'active', the query to search for diagnostic 
+        events is initiated. Once a row becomes active, values
+        within the row cannot be modified, except by deleting
+        and re-creating the row." 
+    ::= { ceDiagEventQueryEntry 6 }
+ 
+
+
+ceDiagEventResultTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CeDiagEventResultEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table containing event log information corresponding
+        to all the completed queries set up in ceDiagEventQueryTable.
+        The query result will not become available until the current
+        search is completed."
+    ::= { ceDiagEvents 5 }
+
+ceDiagEventResultEntry OBJECT-TYPE
+    SYNTAX          CeDiagEventResultEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A conceptual row in ceDiagEventResultTable, containing
+        information about an event that matches the search criteria
+        set in the corresponding row of ceDiagEventQueryTable."
+    INDEX           {
+                        ceDiagEventQueryIndex,
+                        ceDiagEventResultIndex
+                    } 
+    ::= { ceDiagEventResultTable 1 }
+
+CeDiagEventResultEntry ::= SEQUENCE {
+        ceDiagEventResultIndex         Unsigned32,
+        ceDiagEventResultPhysicalIndex PhysicalIndex,
+        ceDiagEventResultPhysicalDescr SnmpAdminString,
+        ceDiagEventResultTime          DateAndTime,
+        ceDiagEventResultSeverity      INTEGER,
+        ceDiagEventResultLogText       SnmpAdminString
+}
+
+ceDiagEventResultIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A positive integer which uniquely identifies a result
+        entry matching a particular query." 
+    ::= { ceDiagEventResultEntry 1 }
+
+ceDiagEventResultPhysicalIndex OBJECT-TYPE
+    SYNTAX          PhysicalIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the physical entity corresponding
+        to this event." 
+    ::= { ceDiagEventResultEntry 2 }
+
+ceDiagEventResultPhysicalDescr OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies a textual description of physical
+        entity corresponding to this event." 
+    ::= { ceDiagEventResultEntry 3 }
+
+ceDiagEventResultTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the time at which this event occurred." 
+    ::= { ceDiagEventResultEntry 4 }
+
+ceDiagEventResultSeverity OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        info(1),
+                        warning(2),
+                        error(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the severity of this event." 
+    ::= { ceDiagEventResultEntry 5 }
+
+ceDiagEventResultLogText OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The text message of this event." 
+    ::= { ceDiagEventResultEntry 6 }
+ 
+
+
+ceDiagEventErrorMsg OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "The error message related to the notification." 
+    ::= { ceDiagEvents 6 }
+
+-- Notification Control
+
+ceDiagEnableBootUpFailedNotif OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This variable specifies whether the system produces the
+        ceDiagBootUpFailedNotif.  A 'false' value will prevent
+        ceDiagBootUpFailedNotif notifications from being
+        generated by this system." 
+    ::= { ceDiagNotificationControl 1 }
+
+ceDiagEnableHMThreshReachedNotif OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This variable specifies whether the system produces the
+        ceDiagHMThresholdReachedNotif.  A 'false' value will prevent
+        ceDiagHMThresholdReachedNotif notifications from being
+        generated by this system." 
+    ::= { ceDiagNotificationControl 2 }
+
+ceDiagEnableHMTestRecoverNotif OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This variable specifies whether the system produces the
+        ceDiagHMTestRecoverNotif.  A 'false' value will prevent
+        ceDiagHMTestRecoverNotif notifications from being
+        generated by this system." 
+    ::= { ceDiagNotificationControl 3 }
+
+ceDiagEnableSchedTestFailedNotif OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This variable specifies whether the system produces the
+        ceDiagScheduledTestFailedNotif.  A 'false' value will prevent
+        ceDiagScheduledTestFailedNotif notifications from being
+        generated by this system." 
+    ::= { ceDiagNotificationControl 4 }
+
+-- Notifications
+
+ceDiagBootUpFailedNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalDescr,
+                        ceDiagEntityBootLevel,
+                        ceDiagEventErrorMsg
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ceDiagBootUpFailedNotif is sent if the online diagnostic
+        discovers a boot up failure for a physical entity."
+   ::= { ciscoEntityDiagMIBNotifs 1 }
+
+ceDiagHMThresholdReachedNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalDescr,
+                        ceDiagHMTestThreshold,
+                        ceDiagTestText,
+                        ceDiagTestAttributes
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ceDiagHMThresholdReachedNotif is sent if the number of
+        consecutive failure of a Health Monitoring test reaches
+        the configured threshold."
+   ::= { ciscoEntityDiagMIBNotifs 2 }
+
+ceDiagHMTestRecoverNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalDescr,
+                        ceDiagTestText,
+                        ceDiagTestAttributes
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ceDiagHMTestRecoverNotif is sent when no error is
+        detected for the first time on the same Health Monitoring test 
+        which previously triggered ceDiagHMThresholdReachedNotif."
+   ::= { ciscoEntityDiagMIBNotifs 3 }
+
+ceDiagScheduledTestFailedNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalDescr,
+                        ceDiagTestText,
+                        ceDiagEventErrorMsg
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A ceDiagScheduledTestFailedNotif is sent if a scheduled
+        test failed."
+   ::= { ciscoEntityDiagMIBNotifs 4 }
+-- Conformance
+
+ciscoEntityDiagMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBConform 1 }
+
+ciscoEntityDiagMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoEntityDiagMIBConform 2 }
+
+
+ciscoEntityDiagMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for SNMP entities that implement the
+        CISCO-ENTITY-DIAG-MIB.  Implementation of this MIB module is
+        strongly recommended for any platform implementing the
+        online diagnostic feature."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ceDiagDescrGroup,
+                        ceDiagGlobalConfigGroup,
+                        ceDiagEntityGroup,
+                        ceDiagOnDemandGroup,
+                        ceDiagScheduledGroup,
+                        ceDiagTestPerfGroup,
+                        ceDiagEventGroup
+                    }
+
+    GROUP           ceDiagEntityImageGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the physical entities in the system
+        are capable of running their own diagnostic image."
+
+    GROUP           ceDiagHealthMonitorGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports a health monitor."
+
+    GROUP           ceDiagScheduledJobSuiteGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports scheduled job test suites."
+    ::= { ciscoEntityDiagMIBCompliances 1 }
+
+ciscoEntityDiagMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for SNMP entities that implement the
+        CISCO-ENTITY-DIAG-MIB.  Implementation of this MIB module is
+        strongly recommended for any platform implementing the
+        online diagnostic feature.
+
+        This statement is deprecated and superceded by 
+        ciscoEntityDiagMIBComplianceRev3."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ceDiagDescrGroup,
+                        ceDiagGlobalConfigGroup,
+                        ceDiagEntityGroup,
+                        ceDiagOnDemandGroup,
+                        ceDiagScheduledGroup,
+                        ceDiagTestPerfGroup,
+                        ceDiagEventGroup
+                    }
+
+    GROUP           ceDiagEntityImageGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the physical entities in the system
+        are capable of running their own diagnostic image."
+
+    GROUP           ceDiagHealthMonitorGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports a health monitor."
+
+    GROUP           ceDiagScheduledJobSuiteGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports scheduled job test suites."
+
+    GROUP           ceDiagNotifControlGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagNotifErrorMsgGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagNotificationGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+    ::= { ciscoEntityDiagMIBCompliances 2 }
+
+ciscoEntityDiagMIBComplianceRev3 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for SNMP entities that implement the
+        CISCO-ENTITY-DIAG-MIB.  Implementation of this MIB module is
+        strongly recommended for any platform implementing the
+        online diagnostic feature.
+
+        This statement is deprecated and superceded by 
+        ciscoEntityDiagMIBComplianceRev4."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ceDiagDescrGroup,
+                        ceDiagGlobalConfigGroup,
+                        ceDiagEntityGroup,
+                        ceDiagOnDemandGroup,
+                        ceDiagScheduledGroup,
+                        ceDiagTestPerfGroup,
+                        ceDiagEventGroup
+                    }
+
+    GROUP           ceDiagEntityImageGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the physical entities in the system
+        are capable of running their own diagnostic image."
+
+    GROUP           ceDiagHealthMonitorGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports a health monitor."
+
+    GROUP           ceDiagScheduledJobSuiteGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports scheduled job test suites."
+
+    GROUP           ceDiagNotifControlGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagNotifErrorMsgGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagNotificationGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagTestPerfLastTestMethodGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        the last testing method for a diagnostic test."
+    ::= { ciscoEntityDiagMIBCompliances 3 }
+
+ciscoEntityDiagMIBComplianceRev4 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for SNMP entities that implement the
+        CISCO-ENTITY-DIAG-MIB.  Implementation of this MIB module is
+        strongly recommended for any platform implementing the
+        online diagnostic feature."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ceDiagDescrGroup,
+                        ceDiagGlobalConfigGroup,
+                        ceDiagEntityGroup,
+                        ceDiagOnDemandGroup,
+                        ceDiagScheduledGroup,
+                        ceDiagTestPerfGroup,
+                        ceDiagEventGroup
+                    }
+
+    GROUP           ceDiagEntityImageGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the physical entities in the system
+        are capable of running their own diagnostic image."
+
+    GROUP           ceDiagHealthMonitorGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports a health monitor."
+
+    GROUP           ceDiagScheduledJobSuiteGroup
+    DESCRIPTION
+        "The objects defined by this group only need to be
+        implemented if the online diagnostic feature
+        supports scheduled job test suites."
+
+    GROUP           ceDiagNotifControlGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagNotifErrorMsgGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagNotificationGroup
+    DESCRIPTION
+        "This group is mandatory for devices which can provide
+        online diagnostic notifications."
+
+    GROUP           ceDiagTestPerfLastTestMethodGroup
+    DESCRIPTION
+        "This group is mandatory for devices which support sliding
+        history window parameters for Health Monitor diagnostic test."
+
+    GROUP           ceDiagHMTestThreshWindowGroup
+    DESCRIPTION
+        "This group is mandatory for devices which support
+        sliding window parameters for health monitor tests."
+
+    OBJECT          ceDiagBootupLevel
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEntityImageAdminStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEntityFieldDiagnosticUrl
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagOnDemandErrorAllowed
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagOnDemandErrorAction
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagOnDemandIterations
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagOnDemandJobSuite
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagOnDemandJobTestList
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagOnDemandJobPortList
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagOnDemandJobRowStatus
+    SYNTAX          INTEGER  {
+                        active(1)
+                    }
+    WRITE-SYNTAX    INTEGER  {
+                        createAndGo(4),
+                        destroy(6)
+                    }
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagScheduledJobType
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagScheduledJobStart
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagScheduledJobDayOfWeek
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagScheduledJobTestList
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagScheduledJobPortList
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagScheduledJobRowStatus
+    SYNTAX          INTEGER  {
+                        active(1)
+                    }
+    WRITE-SYNTAX    INTEGER  {
+                        createAndGo(4),
+                        destroy(6)
+                    }
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagScheduledJobSuite
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagHMSyslogEnabled
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagHMTestEnabled
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagHMTestInterval
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagHMTestThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagHMTestThreshWindowSuite
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagHMTestThreshWindowSize
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEventLogSize
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEventQueryPhysicalIndex
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEventQuerySeverity
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEventQueryOwner
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEventQueryStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEnableBootUpFailedNotif
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEnableHMThreshReachedNotif
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEnableHMTestRecoverNotif
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          ceDiagEnableSchedTestFailedNotif
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { ciscoEntityDiagMIBCompliances 4 }
+
+-- Units of Conformance
+
+ceDiagDescrGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagTestText,
+                        ceDiagTestAttributes,
+                        ceDiagTestCustomAttributeDesc,
+                        ceDiagErrorText
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe tests and errors
+        supported by each physical entity."
+    ::= { ciscoEntityDiagMIBGroups 1 }
+
+ceDiagGlobalConfigGroup OBJECT-GROUP
+    OBJECTS         { ceDiagBootupLevel }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe global
+        configuration of the online diagnostic feature."
+    ::= { ciscoEntityDiagMIBGroups 2 }
+
+ceDiagEntityGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagEntityBootLevel,
+                        ceDiagEntityCurrentTestMethod
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the state of a
+        physical entity with respect ot the online diagnostic
+        feature."
+    ::= { ciscoEntityDiagMIBGroups 3 }
+
+ceDiagEntityImageGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagEntityImageAdminStatus,
+                        ceDiagEntityImageOperStatus,
+                        ceDiagEntityFieldDiagnosticUrl
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the diagnostic
+        image which the physical entity is running."
+    ::= { ciscoEntityDiagMIBGroups 4 }
+
+ceDiagOnDemandGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagOnDemandErrorAllowed,
+                        ceDiagOnDemandErrorAction,
+                        ceDiagOnDemandIterations,
+                        ceDiagOnDemandJobSuite,
+                        ceDiagOnDemandJobTestList,
+                        ceDiagOnDemandJobPortList,
+                        ceDiagOnDemandJobRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the diagnostic
+        on demand diagnostic jobs on the system."
+    ::= { ciscoEntityDiagMIBGroups 5 }
+
+ceDiagScheduledGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagScheduledJobType,
+                        ceDiagScheduledJobStart,
+                        ceDiagScheduledJobDayOfWeek,
+                        ceDiagScheduledJobTestList,
+                        ceDiagScheduledJobPortList,
+                        ceDiagScheduledJobRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the diagnostic
+        on demand diagnostic jobs on the system."
+    ::= { ciscoEntityDiagMIBGroups 6 }
+
+ceDiagTestPerfGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagTestPerfLastResult,
+                        ceDiagTestPerfLastErrorID,
+                        ceDiagTestPerfLastRun,
+                        ceDiagTestPerfFirstFail,
+                        ceDiagTestPerfLastSuccess,
+                        ceDiagTestPeffLastFail,
+                        ceDiagTestPerfTotalRuns,
+                        ceDiagTestPerfTotalFails,
+                        ceDiagTestPerfConsecutiveFails
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the performance
+        of tests supported by each physical entity."
+    ::= { ciscoEntityDiagMIBGroups 7 }
+
+ceDiagHealthMonitorGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagHMSyslogEnabled,
+                        ceDiagHMTestEnabled,
+                        ceDiagHMTestIntervalMin,
+                        ceDiagHMTestInterval,
+                        ceDiagHMTestIntervalDefault,
+                        ceDiagHMTestThresholdDefault,
+                        ceDiagHMTestThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe tests and test
+        configuration with relating to the health monitor."
+    ::= { ciscoEntityDiagMIBGroups 8 }
+
+ceDiagEventGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagEventLogSize,
+                        ceDiagEventCount,
+                        ceDiagEventMaxQueries,
+                        ceDiagEventQueryPhysicalIndex,
+                        ceDiagEventQuerySeverity,
+                        ceDiagEventQueryOwner,
+                        ceDiagEventQueryResultingRows,
+                        ceDiagEventQueryStatus,
+                        ceDiagEventResultPhysicalIndex,
+                        ceDiagEventResultPhysicalDescr,
+                        ceDiagEventResultTime,
+                        ceDiagEventResultSeverity,
+                        ceDiagEventResultLogText
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe online
+        diagnostic event history."
+    ::= { ciscoEntityDiagMIBGroups 9 }
+
+ceDiagScheduledJobSuiteGroup OBJECT-GROUP
+    OBJECTS         { ceDiagScheduledJobSuite }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the test suite information
+        for a diagnostic scheduled job."
+    ::= { ciscoEntityDiagMIBGroups 10 }
+
+ceDiagNotifControlGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagEnableBootUpFailedNotif,
+                        ceDiagEnableHMThreshReachedNotif,
+                        ceDiagEnableHMTestRecoverNotif,
+                        ceDiagEnableSchedTestFailedNotif
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing enabling/disabling
+        of the boot up failed, health monitoring, and 
+        scheduled job notifications for online diagnostics."
+    ::= { ciscoEntityDiagMIBGroups 11 }
+
+ceDiagNotifErrorMsgGroup OBJECT-GROUP
+    OBJECTS         { ceDiagEventErrorMsg }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing error message used by
+        various notifications."
+    ::= { ciscoEntityDiagMIBGroups 12 }
+
+ceDiagNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        ceDiagBootUpFailedNotif,
+                        ceDiagHMThresholdReachedNotif,
+                        ceDiagHMTestRecoverNotif,
+                        ceDiagScheduledTestFailedNotif
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of notifications providing for boot up failed, health
+        monitoring, and scheduled job within online diagnostics."
+    ::= { ciscoEntityDiagMIBGroups 13 }
+
+ceDiagTestPerfLastTestMethodGroup OBJECT-GROUP
+    OBJECTS         { ceDiagTestPerfLastTestMethod }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the last testing method
+        for a diagnostic test."
+    ::= { ciscoEntityDiagMIBGroups 14 }
+
+ceDiagHMTestThreshWindowGroup OBJECT-GROUP
+    OBJECTS         {
+                        ceDiagHMTestThreshWindowSuite,
+                        ceDiagHMTestThreshWindowSize
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of managed objects that describe the sliding
+        history window parameters for a Health Monitor diagnostic test."
+    ::= { ciscoEntityDiagMIBGroups 15 }
+
+END
+
+
+

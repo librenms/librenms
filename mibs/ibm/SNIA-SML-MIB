@@ -1,0 +1,3421 @@
+-- SML MIB Rev 1.21  
+--      Added subChassisGroup to support multiple Chassis.
+-- SML MIB Rev 1.20  
+--      Added trapGroup and *Alert traps.
+--      Deprecated mediaAccessDevice-Status in favor of
+--          mediaAccessDevice-operationalStatus to be consistent
+--          with other Groups.
+--      Fixed some typos in scsiProtocolControllerGroup,
+--          limitedAccessPortGroup, storageMediaLocationGroup,
+--          and fcPortGroup Description fields.
+--      Add EOLs throughout to hard-wrap to 80 char display.
+-- SML MIB Rev 1.19  
+--      Added fCPortGroup
+--      Fixed OperationalStatus enumeration to match CIM 2.9.1 and
+--          include a value for stopped and VendorReserved
+--      Fixed SecurityBreach to match the MOF
+-- SML MIB Rev 1.18
+--      Changed physicalMedia to be flat under storageMediaLocation to allow
+--          operation with MIB compilers
+--      Broke compatibility with 1.16
+-- SML MIB Rev 1.16
+--      Updated to comply with CIM 2.8 and SMI-S 1.1
+--      Added storageMediaLocation, changerDevice, limitedAccessPort,
+--          scsiProtocolController, computerSystem
+--
+-- Art Colvig
+-- IBM
+-- SML MIB Rev 1.12
+-- ASN.1 code created using dot2asn
+-- by Jeff Bain
+-- Hewlett Packard, Storage Systems Division
+-- Greeley, CO
+-- jeff_bain@hp.com
+-- Michael Kearney
+-- Qualstar
+-- mkearney@qualstar-boulder.com
+
+SNIA-SML-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                OBJECT-TYPE
+                        FROM RFC-1212
+                enterprises
+                        FROM RFC1155-SMI
+                DisplayString
+                        FROM RFC1213-MIB
+                ;
+
+-- Textual Conventions
+
+UShortReal ::= INTEGER (0..'ffff'h)
+-- This textual convention can be used to represent short
+-- unsigned 'real' numbers.  Using this variable type,
+-- a 3 digit number with 2 decimal places (xxx.xx)
+-- can be represented.  For example, 321.45 would be
+-- represented as "32145"
+
+CimDateTime ::= OCTET STRING (SIZE (24))
+-- This textual convention can be used to represent a date
+-- and time using the CIM DateTime convention.  The bytes are
+-- as follows:
+
+--      octets  contents                range
+--      ======  ========                =====
+--      1-4     year                    0000-9999
+--      5-6     month                   01-12
+--      7-8     day                     01-31
+--      9-10    hour                    00-23
+--      11-12   minute                  00-59
+--      13-14   second                  00-59
+--      15-20   microseconds            000000-999999
+--      21      sign                    '+' or '-'
+--      22-24   UTC offset in minutes   000-839
+
+-- For example, Monday, May 25, 1998, at 1:30:15 PM EST would be
+-- represented as  19980525133015000000-300
+
+-- Note that values must be zero-padded so that the entire
+-- string is always the same 25-character length.  Fields that
+-- are not significant can be replaced with asterisk characters
+
+UINT64 ::= OCTET STRING (SIZE (8))
+-- This textual convention can be used to represent 64-bit
+-- numbers using the OCTET STRING type.  SNMPv2 supports a
+-- Counter64 type, but there is no C-language mapping for a
+-- 64-bit variable that's much better than an array of 8 bytes
+
+UINT32 ::= INTEGER (0..'7fffffff'h)
+UINT16 ::= INTEGER (0..'ffff'h)
+-- MIB Fields
+snia OBJECT IDENTIFIER ::= { enterprises 14851 }
+
+experimental OBJECT IDENTIFIER ::= { snia 1 }
+
+common OBJECT IDENTIFIER ::= { snia 2 }
+
+libraries OBJECT IDENTIFIER ::= { snia 3 }
+
+
+smlRoot OBJECT IDENTIFIER ::= { libraries 1 }
+
+
+smlMibVersion   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 4  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "This string contains version information for the MIB file"
+    ::=  {  smlRoot  1  }
+
+smlCimVersion   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 4  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This string contains information about the 
+        CIM version that corresponds to the MIB. 
+        The decriptions in this MIB file are based on CIM version 2.8"
+    ::=  {  smlRoot  2  }
+
+
+    
+    
+productGroup    OBJECT IDENTIFIER
+    ::=  {  smlRoot  3  }
+
+product-Name    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Commonly used Product name."
+    ::=  {  productGroup  1  }
+
+product-IdentifyingNumber   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Product identification such as a serial number on
+        software, a die number on a hardware chip, or (for
+        non-commercial Products) a project number."
+    ::=  {  productGroup  2  }
+
+product-Vendor  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name of the Product's supplier, or entity 
+        selling the Product (the manufacturer, reseller, OEM, etc.).
+        Corresponds to the Vendor property in the Product object 
+        in the DMTF Solution Exchange Standard."
+    ::=  {  productGroup  3  }
+
+product-Version OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Product version information. Corresponds to the
+        Version property in the Product object in the DMTF Solution
+        Exchange Standard."
+    ::=  {  productGroup  4  }
+
+product-ElementName OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+       "A user-friendly name for the object. This property
+       allows each instance to define a user-friendly name IN
+       ADDITION TO its key properties/identity data, and
+       description information.
+       Note that ManagedSystemElement's Name property is also
+       defined as a user-friendly name. But, it is often
+       subclassed to be a Key. It is not reasonable that the same
+       property can convey both identity and a user friendly name,
+       without inconsistencies. Where Name exists and is not a Key
+       (such as for instances of LogicalDevice), the same
+       information MAY be present in both the Name and ElementName
+       properties."
+    ::=  {  productGroup  5  }
+
+
+    
+chassisGroup    OBJECT IDENTIFIER
+    ::=  {  smlRoot  4  }
+
+chassis-Manufacturer    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name of the organization responsible for
+        producing the PhysicalElement. This may be the entity from
+        whom the Element is purchased, but this is not
+        necessarily true. The latter information is contained in 
+        the Vendor property
+        of CIM_Product."
+    ::=  {  chassisGroup  1  }
+
+chassis-Model   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name by which the PhysicalElement is generally known."
+    ::=  {  chassisGroup  2  }
+
+chassis-SerialNumber    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A manufacturer-allocated number used to identify the Physical Element."
+    ::=  {  chassisGroup  3  }
+
+chassis-LockPresent OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean indicating whether the Frame is protected with a lock."
+    ::=  {  chassisGroup  4  }
+
+chassis-SecurityBreach  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (1),
+                            other (2),
+                            noBreach (3),
+                            breachAttempted (4),
+                            breachSuccessful (5) }
+
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "SecurityBreach is an enumerated, integer-valued
+        property indicating whether a physical breach of the Frame
+        was attempted but unsuccessful (value=4) or attempted and
+        successful (5). Also, the values, 'Unknown', 'Other' or 'No
+        Breach', can be specified."
+    ::=  {  chassisGroup  5  }
+
+chassis-IsLocked    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean indicating that the Frame is currently locked."
+    ::=  {  chassisGroup  6  }
+
+chassis-Tag OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+         "An arbitrary string that uniquely identifies the
+         Physical Element and serves as the Element's key. The Tag
+         property can contain information such as asset tag or serial
+         number data. The key for PhysicalElement is placed very high in
+         the object hierarchy in order to independently identify the
+         hardware/entity, regardless of physical placement in or on
+         Cabinets, Adapters, etc. For example, a hotswappable or
+         removeable component may be taken from its containing
+         (scoping) Package and be temporarily unused. The object
+         still continues to exist - and may even be inserted into a
+         different scoping container. Therefore, the key for
+         Physical Element is an arbitrary string and is defined
+         independently of any placement or location-oriented
+         hierarchy."
+    ::=  {  chassisGroup  7  }
+
+chassis-ElementName OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A user-friendly name for the object. This property
+        allows each instance to define a user-friendly name IN
+        ADDITION TO its key properties/identity data, and description
+        information.
+        Note that ManagedSystemElement's Name property is also
+        defined as a user-friendly name. But, it is often
+        subclassed to be a Key. It is not reasonable that the same
+        property can convey both identity and a user friendly name,
+        without inconsistencies. Where Name exists and is not a Key
+        (such as for instances of LogicalDevice), the same
+        information MAY be present in both the Name and ElementName
+        properties."
+    ::=  {  chassisGroup  8  }
+
+
+numberOfsubChassis OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of sub Chassis that are
+        present."
+    ::=  {  chassisGroup  9  }
+
+subChassisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  SubChassis-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "The SubChassis class represents the physical frames in the library"
+    ::=  { chassisGroup    10 }
+
+subChassisEntry OBJECT-TYPE
+    SYNTAX      SubChassis-Table-Info 
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        frame that is present in the library."
+    INDEX       {  subChassisIndex  }
+    ::=  { subChassisTable 1 }
+
+SubChassis-Table-Info  ::=  SEQUENCE {
+    subChassisIndex                 UINT32,
+    subChassis-Manufacturer         DisplayString,
+    subChassis-Model                DisplayString,
+    subChassis-SerialNumber         DisplayString,
+    subChassis-LockPresent          INTEGER,
+    subChassis-SecurityBreach       INTEGER,
+    subChassis-IsLocked             INTEGER,
+    subChassis-Tag                  DisplayString, 
+    subChassis-ElementName          DisplayString,
+    subChassis-OperationalStatus    INTEGER,
+    subChassis-PackageType          INTEGER
+    }
+
+subChassisIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the subChassis."
+    ::=  {  subChassisEntry  1  }
+
+subChassis-Manufacturer    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name of the organization responsible for
+        producing the PhysicalElement. This may be the entity from
+        whom the Element is purchased, but this is not
+        necessarily true. The latter information is contained in 
+        the Vendor property
+        of CIM_Product."
+    ::=  {  subChassisEntry  2  }
+
+subChassis-Model   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name by which the PhysicalElement is generally known."
+    ::=  {  subChassisEntry  3  }
+
+subChassis-SerialNumber    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A manufacturer-allocated number used to identify the Physical Element."
+    ::=  {  subChassisEntry  4  }
+
+subChassis-LockPresent OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean indicating whether the Frame is protected with a lock."
+    ::=  {  subChassisEntry  5  }
+
+subChassis-SecurityBreach  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (1),
+                            other (2),
+                            noBreach (3),
+                            breachAttempted (4),
+                            breachSuccessful (5) }
+
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "SecurityBreach is an enumerated, integer-valued
+        property indicating whether a physical breach of the Frame
+        was attempted but unsuccessful (value=4) or attempted and
+        successful (5). Also, the values, 'Unknown', 'Other' or 'No
+        Breach', can be specified."
+    ::=  {  subChassisEntry  6  }
+
+subChassis-IsLocked    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean indicating that the Frame is currently locked."
+    ::=  {  subChassisEntry  7  }
+
+subChassis-Tag OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+         "An arbitrary string that uniquely identifies the
+         Physical Element and serves as the Element's key. The Tag
+         property can contain information such as asset tag or serial
+         number data. The key for PhysicalElement is placed very high in
+         the object hierarchy in order to independently identify the
+         hardware/entity, regardless of physical placement in or on
+         Cabinets, Adapters, etc. For example, a hotswappable or
+         removeable component may be taken from its containing
+         (scoping) Package and be temporarily unused. The object
+         still continues to exist - and may even be inserted into a
+         different scoping container. Therefore, the key for
+         Physical Element is an arbitrary string and is defined
+         independently of any placement or location-oriented
+         hierarchy."
+    ::=  {  subChassisEntry  8  }
+
+subChassis-ElementName OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A user-friendly name for the object. This property
+        allows each instance to define a user-friendly name IN
+        ADDITION TO its key properties/identity data, and description
+        information.
+        Note that ManagedSystemElement's Name property is also
+        defined as a user-friendly name. But, it is often
+        subclassed to be a Key. It is not reasonable that the same
+        property can convey both identity and a user friendly name,
+        without inconsistencies. Where Name exists and is not a Key
+        (such as for instances of LogicalDevice), the same
+        information MAY be present in both the Name and ElementName
+        properties."
+    ::=  {  subChassisEntry  9  }
+
+subChassis-OperationalStatus OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Indicates the current status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element."
+    ::=  {  subChassisEntry  10  }
+
+
+subChassis-PackageType OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            mainSystemChassis(17),
+                            expansionChassis(18),
+                            subChassis(19),
+                            serviceBay(32769) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Package type of the subChassis. The enumeration values for this variable
+         should be the same as the DMTF CIM_Chassis.ChassisPackageType 
+         property. Use the Vendor reserved values for vendor-specific types."
+    ::=  {  subChassisEntry  11  }
+    
+    
+storageLibraryGroup OBJECT IDENTIFIER
+    ::=  {  smlRoot  5  }
+
+storageLibrary-Name OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "The inherited Name serves as key of a System 
+        instance in an enterprise environment."
+    ::=  {  storageLibraryGroup  1  }
+
+storageLibrary-Description  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "The Description property provides a textual
+        description of the object."
+    ::=  {  storageLibraryGroup  2  }
+
+storageLibrary-Caption  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "The Caption property is a short textual description
+        (one- line string) of the object."
+    ::=  {  storageLibraryGroup  3  }
+
+storageLibrary-Status   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 10  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "A string indicating the current status of the object.
+        Various operational and non-operational statuses are defined.
+        This property is deprecated in lieu of OperationalStatus, which
+        includes the same semantics in its enumeration. This change is
+        made for three reasons:
+        1) Status is more correctly defined as an array property. This
+        overcomes the limitation of describing status via a single
+        value, when it is really a multi-valued property (for example,
+        an element may be OK AND Stopped.
+        2) A MaxLen of 10 is too restrictive and leads to unclear
+        enumerated values. And,
+        3) The change to a uint16 data type was discussed when CIM V2.0
+        was defined.
+        However, existing V1.0 implementations used the string property
+        and did not want to modify their code. Therefore, Status was
+        grandfathered into the Schema. Use of the Deprecated qualifier
+        allows the maintenance of the existing property, but
+        also permits an improved definition using OperationalStatus."
+    ::=  {  storageLibraryGroup  4  }
+
+storageLibrary-InstallDate  OBJECT-TYPE 
+    SYNTAX          CimDateTime
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "A datetime value indicating when the object was
+        installed. A lack of a value does not indicate that the object
+        is not installed."
+    ::=  {  storageLibraryGroup  5  }
+
+
+    
+--       "A MediaAccessDevice represents the ability to access one or "
+--       "more media and use this media to store and retrieve data."
+--       class CIM_MediaAccessDevice : CIM_LogicalDevice {
+mediaAccessDeviceGroup
+    OBJECT IDENTIFIER
+    ::= { smlRoot 6 }
+
+numberOfMediaAccessDevices  OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of MediaAccessDevices
+        that are present."
+    ::=  {  mediaAccessDeviceGroup  1  }
+
+mediaAccessDeviceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  Media-Access-Device-Table
+    MAX-ACCESS  not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "A MediaAccessDevice represents the ability to access one
+        or more media and use this media to store and retrieve data."
+    ::=  { mediaAccessDeviceGroup  2 }
+
+mediaAccessDeviceEntry  OBJECT-TYPE
+    SYNTAX      Media-Access-Device-Table
+    MAX-ACCESS  not-accessible
+    STATUS      mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        MediaAccessDevice that is present in the library."
+    INDEX       {  mediaAccessDeviceIndex  }
+    ::=  { mediaAccessDeviceTable 1 }
+
+Media-Access-Device-Table  ::=  SEQUENCE {
+    mediaAccessDeviceIndex  UINT32,
+    mediaAccessDeviceObjectType  INTEGER,
+    mediaAccessDevice-Name  DisplayString,
+    mediaAccessDevice-Status  DisplayString,
+    mediaAccessDevice-Availability  INTEGER,
+    mediaAccessDevice-NeedsCleaning  INTEGER,
+    mediaAccessDevice-MountCount  UINT64,
+    mediaAccessDevice-DeviceID  DisplayString,
+    mediaAccessDevice-PowerOnHours  UINT64,
+    mediaAccessDevice-TotalPowerOnHours  UINT64,
+    mediaAccessDevice-OperationalStatus  INTEGER,
+    mediaAccessDevice-Realizes-StorageLocationIndex  UINT32,
+    mediaAccessDevice-Realizes-softwareElementIndex  UINT32
+    }
+
+
+mediaAccessDeviceIndex  OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the MediaAccessDevice."
+    ::=  {  mediaAccessDeviceEntry  1  }
+
+
+mediaAccessDeviceObjectType OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            wormDrive (1),
+                            magnetoOpticalDrive (2),
+                            tapeDrive (3),
+                            dvdDrive (4),
+                            cdromDrive (5) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "In the 2.7 CIM Schema a Type property is no longer
+        associated with MediaAccessDevice. However, it can be used
+        here to specify the type of drive that is present."
+    ::=  {  mediaAccessDeviceEntry  2  }
+
+
+mediaAccessDevice-Name  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "Deprecated"
+    ::=  {  mediaAccessDeviceEntry  3  }
+
+
+mediaAccessDevice-Status    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 10  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "A string indicating the current status of the object.
+        Various operational and non-operational statuses are defined.
+        This property is deprecated in lieu of OperationalStatus, which
+        includes the same semantics in its enumeration. This change
+        is made for three reasons:
+        1) Status is more correctly defined
+        as an array property. This overcomes the limitation of
+        describing status via a single value, when it is really a
+        multi-valued property (for example, an element may be OK AND
+        Stopped.
+        2) A MaxLen of 10 is too restrictive and leads to unclear
+        enumerated values. And,
+        3) The change to a uint16 data type was discussed when CIM V2.0
+        was defined. However, existing V1.0 implementations used the
+        string property and did not want to modify their code.
+        Therefore, Status was grandfathered into the Schema. 
+        Use of the Deprecated qualifier allows the maintenance
+        of the existing property, but also permits an improved
+        definition using OperationalStatus."
+            
+    ::=  {  mediaAccessDeviceEntry  4  }
+
+
+mediaAccessDevice-Availability  OBJECT-TYPE 
+    SYNTAX          INTEGER { other (1),
+                            unknown (2),
+                            runningFullPower (3),
+                            warning (4),
+                            inTest (5),
+                            notApplicable (6),
+                            powerOff (7),
+                            offLine (8),
+                            offDuty (9),
+                            degraded (10),
+                            notInstalled (11),
+                            installError (12),
+                            powerSaveUnknown (13),
+                            powerSaveLowPowerMode (14),
+                            powerSaveStandby (15),
+                            powerCycle (16),
+                            powerSaveWarning (17),
+                            paused (18),
+                            notReady (19),
+                            notConfigured (20),
+                            quiesced (21) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Inherited from CIM_LogicalDevice
+
+        The primary availability and status of the Device.
+        (Additional status information can be specified using the
+        Additional Availability array property.) For example, the
+        Availability property indicates that the Device is running
+        and has full power (value=3), or is in a warning (4), test
+        (5), degraded (10) or power save state (values 13-15 and
+        17). Regarding the Power Save states, these are defined as
+        follows: Value 13 (Power Save - Unknown) indicates that
+        the Device is known to be in a power save mode, but its
+        exact status in this mode is unknown; 14 (Power Save -
+        Low Power Mode) indicates that the Device is in a power
+        save state but still functioning, and may exhibit degraded
+        performance; 15 (Power Save - Standby) describes that
+        the Device is not functioning but could be brought to full
+        power 'quickly'; and value 17 (Power Save - Warning)
+        indicates that the Device is in a warning state, though
+        also in a power save mode."
+    ::=  {  mediaAccessDeviceEntry  5  }
+
+
+mediaAccessDevice-NeedsCleaning OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean indicating that the MediaAccessDevice needs
+        cleaning. Whether manual or automatic cleaning is possible 
+        is indicated in the Capabilities array property. "
+    ::=  {  mediaAccessDeviceEntry  6  }
+
+
+mediaAccessDevice-MountCount    OBJECT-TYPE 
+    SYNTAX          UINT64
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "For a MediaAccessDevice that supports removable
+         Media, the number of times that Media have been mounted for
+         data transfer or to clean the Device. For Devices accessing
+         nonremovable Media, such as hard disks, this property is
+         not applicable and should be set to 0."
+    ::=  {  mediaAccessDeviceEntry  7  }
+
+
+mediaAccessDevice-DeviceID  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An address or other identifying information to
+         uniquely name the LogicalDevice."
+    ::=  {  mediaAccessDeviceEntry  8  }
+
+
+mediaAccessDevice-PowerOnHours  OBJECT-TYPE 
+    SYNTAX          UINT64
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The number of consecutive hours that this Device has
+        been powered, since its last power cycle."
+    ::=  {  mediaAccessDeviceEntry  9  }
+
+
+mediaAccessDevice-TotalPowerOnHours OBJECT-TYPE 
+    SYNTAX          UINT64
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The total number of hours that this Device has been powered."
+    ::=  {  mediaAccessDeviceEntry  10  }
+
+
+mediaAccessDevice-OperationalStatus OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Indicates the current status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element."
+    ::=  {  mediaAccessDeviceEntry  11  }
+
+
+mediaAccessDevice-Realizes-StorageLocationIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the
+        storageMediaLocationIndex that this MediaAccessDevice is 
+        associated with.
+        If no association exists an index of 0 may be returned."
+    ::=  {  mediaAccessDeviceEntry  12  }
+
+
+mediaAccessDevice-Realizes-softwareElementIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the softwareElementIndex
+        that this MediaAccessDevice is associated with.
+        If no association exists an index of 0 may be returned."
+    ::=  {  mediaAccessDeviceEntry  13  }
+
+
+    
+physicalPackageGroup    OBJECT IDENTIFIER
+    ::=  {  smlRoot  8  }
+
+numberOfPhysicalPackages    OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of PhysicalPackages
+        that are present."
+    ::=  {  physicalPackageGroup  1  }
+
+physicalPackageTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  PhysicalPackage-Table
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "The PhysicalPackage class represents PhysicalElements
+        that contain or host other components. Examples are a Rack
+        enclosure or an adapter Card. (also a tape magazine inside 
+        an auto-loader)"
+    ::=  { physicalPackageGroup  2 }
+
+physicalPackageEntry    OBJECT-TYPE
+    SYNTAX      PhysicalPackage-Table
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        PhysicalPackage that is present in the library."
+    INDEX       {  physicalPackageIndex  }
+    ::=  { physicalPackageTable 1 }
+
+PhysicalPackage-Table  ::=  SEQUENCE {
+    physicalPackageIndex  UINT32,
+    physicalPackage-Manufacturer  DisplayString,
+    physicalPackage-Model  DisplayString,
+    physicalPackage-SerialNumber  DisplayString,
+    physicalPackage-Realizes-MediaAccessDeviceIndex  Integer32,
+    physicalPackage-Tag  DisplayString
+    }
+
+
+physicalPackageIndex    OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the PhysicalPackage."
+    ::=  {  physicalPackageEntry  1  }
+
+
+physicalPackage-Manufacturer    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name of the organization responsible for
+        producing the PhysicalElement.
+        This may be the entity from whom the Element is purchased, 
+        but this is not necessarily true. The latter information is
+        contained in the Vendor property of CIM_Product."
+    ::=  {  physicalPackageEntry  2  }
+
+
+physicalPackage-Model   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name by which the PhysicalElement is generally known."
+    ::=  {  physicalPackageEntry  3  }
+
+
+physicalPackage-SerialNumber    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A manufacturer-allocated number used to identify the
+        Physical Element."
+    ::=  {  physicalPackageEntry  4  }
+
+
+physicalPackage-Realizes-MediaAccessDeviceIndex OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+            "The index value of the the MediaAccess device that
+            is associated with this physical package.'"
+    ::=  {  physicalPackageEntry  5  }
+
+
+physicalPackage-Tag OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An arbitrary string that uniquely identifies the
+         Physical Element and serves as the Element's key. The Tag
+         property can contain information such as asset tag or serial
+         number data. The key for PhysicalElement is placed very high in
+         the object hierarchy in order to independently identify the
+         hardware/entity, regardless of physical placement in or on
+         Cabinets, Adapters, etc. For example, a hotswappable or
+         removeable component may be taken from its containing
+         (scoping) Package and be temporarily unused. The object
+         still continues to exist - and may even be inserted into a
+         different scoping container. Therefore, the key for
+         Physical Element is an arbitrary string and is defined
+         independently of any placement or location-oriented
+         hierarchy."
+    ::=  {  physicalPackageEntry  6  }
+
+
+
+    
+    
+softwareElementGroup    OBJECT IDENTIFIER
+    ::=  {  smlRoot  9  }
+
+numberOfSoftwareElements    OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of SoftwareElements
+        that are present."
+    ::=  {  softwareElementGroup  1  }
+
+softwareElementTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  SoftwareElement-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "The CIM_SoftwareElement class is used to decompose a
+        CIM_SoftwareFeature object into a set of individually manageable
+        or deployable parts for a particular platform. A software
+        element's platform is uniquely identified
+        by its underlying hardware architecture and operating system
+        (for example Sun Solaris on Sun Sparc or Windows NT on Intel).
+        As such, to understand the details of how the functionality of 
+        a particular software feature is provided on a particular
+        platform, the CIM_SoftwareElement objects referenced
+        by CIM_SoftwareFeatureSoftwareElement associations are
+        organized in disjoint sets based on the TargetOperatingSystem
+        property. A CIM_SoftwareElement object captures the management
+        details of a part or component in one of four
+        states characterized by the SoftwareElementState property. "
+    ::=  { softwareElementGroup  2 }
+
+softwareElementEntry    OBJECT-TYPE
+    SYNTAX      SoftwareElement-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        SoftwareElement that is present in the library."
+    INDEX       {  softwareElementIndex  }
+    ::=  { softwareElementTable 1 }
+
+SoftwareElement-Table-Info  ::=  SEQUENCE {
+    softwareElementIndex  UINT32,
+    softwareElement-Name  DisplayString,
+    softwareElement-Version  DisplayString,
+    softwareElement-SoftwareElementID  DisplayString,
+    softwareElement-Manufacturer  DisplayString,
+    softwareElement-BuildNumber  DisplayString,
+    softwareElement-SerialNumber  DisplayString,
+    softwareElement-CodeSet  DisplayString,
+    softwareElement-IdentificationCode  DisplayString,
+    softwareElement-LanguageEdition  DisplayString,
+    softwareElement-InstanceID  DisplayString
+    }
+
+
+softwareElementIndex    OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the SoftwareElement."
+    ::=  {  softwareElementEntry  1  }
+
+
+softwareElement-Name    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "deprecated"
+    ::=  {  softwareElementEntry  2  }
+
+
+softwareElement-Version OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Version should be in the form .. or . "
+    ::=  {  softwareElementEntry  3  }
+
+
+softwareElement-SoftwareElementID   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "SoftwareIdentity represents software, viewed as an
+        asset and/or individually identifiable entity (similar to 
+        Physical Element). It does NOT indicate whether the software
+        is installed, executing, etc. (The latter is the role of the
+        SoftwareFeature/ SoftwareElement classes and the Application
+        Model.) Since software may be acquired, SoftwareIdentity can
+        be associated with a Product using the
+        ProductSoftwareComponent relationship.
+        Note that the Application Model manages the deployment and
+        installation of software via the classes, SoftwareFeatures and
+        SoftwareElements. The deployment/installation concepts are
+        related to the asset/identity one. In fact, a SoftwareIdentity
+        may correspond to a Product, or to one or more
+        SoftwareFeatures or SoftwareElements - depending on the
+        granularity of these classes and the deployment model. The
+        correspondence of Software Identity to Product,
+        SoftwareFeature or SoftwareElement is indicated using the
+        ConcreteIdentity association. Note that there may not be
+        sufficient detail or instrumentation to instantiate
+        ConcreteIdentity. And, if the association is instantiated,
+        some duplication of information may result. For example, the
+        Vendor described in the instances of Product and
+        SoftwareIdentity MAY be the same. However, this is not
+        necessarily true, and it is why vendor and similar information
+        are duplicated in this class.
+        Note that ConcreteIdentity can also be used to describe the
+        relationship of the software to any LogicalFiles that result
+        from installing it. As above, there may not be sufficient
+        detail or instrumentation to instantiate this association."
+    ::=  {  softwareElementEntry  4  }
+
+
+softwareElement-Manufacturer    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Manufacturer of this software element"
+    ::=  {  softwareElementEntry  5  }
+
+
+softwareElement-BuildNumber OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The internal identifier for this compilation of this
+        software element."
+    ::=  {  softwareElementEntry  6  }
+
+
+softwareElement-SerialNumber    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The assigned serial number of this software element."
+    ::=  {  softwareElementEntry  7  }
+
+
+softwareElement-CodeSet OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "The code set used by this software element. "
+    ::=  {  softwareElementEntry  8  }
+
+
+softwareElement-IdentificationCode  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "The value of this property is the manufacturer's
+        identifier for this software element. Often this will be a 
+        stock keeping unit (SKU) or a part number."
+    ::=  {  softwareElementEntry  9  }
+
+
+softwareElement-LanguageEdition OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 32  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     
+        "The value of this property identifies the language
+        edition of this software element. The language codes defined in
+        ISO 639 should be used. Where the software element represents
+        multi-lingual or international version of a
+        product, the string multilingual should be used."
+    ::=  {  softwareElementEntry  10  }
+
+
+softwareElement-InstanceID  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Within the scope of the instantiating Namespace, 
+        InstanceID opaquely and uniquely identifies an instance of this
+        class. In order to ensure uniqueness within the NameSpace, the
+        value of InstanceID SHOULD be constructed using the
+        following 'preferred' algorithm:
+        <OrgID>:<LocalID>
+        Where <OrgID> and <LocalID> are separated by a colon ':',
+        and where <OrgID> MUST include a copyrighted, trademarked
+        or otherwise unique name that is owned by the business
+        entity creating/defining the InstanceID, or is a registered
+        ID that is assigned to the business entity by a recognized
+        global authority (This is similar to the <Schema
+        Name>_<Class Name> structure of Schema class names.) In
+        addition, to ensure uniqueness <OrgID> MUST NOT contain a
+        colon (':'). When using this algorithm, the first colon to
+        appear in InstanceID MUST appear between <OrgID> and
+        <LocalID>.
+        <LocalID> is chosen by the business entity and SHOULD not
+        be re-used to identify different underlying (real-world)
+        elements. If the above 'preferred' algorithm is not used,
+        the defining entity MUST assure that the resultant
+        InstanceID is not re-used across any InstanceIDs produced
+        by this or other providers for this instance's NameSpace.
+        For DMTF defined instances, the 'preferred' algorithm MUST
+        be used with the <OrgID> set to 'CIM'."
+    ::=  {  softwareElementEntry  11  }
+
+
+    
+computerSystemGroup OBJECT IDENTIFIER
+    ::=  {  smlRoot  10  }
+
+computerSystem-ElementName  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A user-friendly name for the object. This property 
+        allows each instance to define a user-friendly name IN ADDITION
+        TO its key properties/identity data, and description
+        information. \n
+        Note that ManagedSystemElement's Name property is also
+        defined as a user-friendly name. But, it is often
+        subclassed to be a Key. It is not reasonable that the same
+        property can convey both identity and a user friendly name,
+        without inconsistencies. Where Name exists and is not a Key
+        (such as for instances of LogicalDevice), the same
+        information MAY be present in both the Name and ElementName
+        properties."
+    ::=  {  computerSystemGroup  1  }
+
+computerSystem-OperationalStatus    OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Indicates the current status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element."
+    ::=  {  computerSystemGroup  2  }
+
+computerSystem-Name OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     "The Name property defines the label by which the
+           object is known. When subclassed, the Name property can be
+           overridden to be a Key property."
+    ::=  {  computerSystemGroup  3  }
+
+computerSystem-NameFormat   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The ComputerSystem object and its derivatives are
+        Top Level Objects of CIM. They provide the scope for numerous
+        components. Having unique System keys is required. The
+        NameFormat property identifies how the ComputerSystem Name
+        is generated. The NameFormat ValueMap qualifier defines the
+        various mechanisms for assigning the name. Note that
+        another name can be assigned and used for the
+        ComputerSystem that better suit a business, using the
+        inherited ElementName property. Possible values include
+        'Other', 'IP', 'Dial', 'HID', 'NWA', 'HWA', 'X25',
+        'ISDN', 'IPX', 'DCC', 'ICD', 'E.164', 'SNA', 'OID/OSI',
+        'WWN', 'NAA'"
+    ::=  {  computerSystemGroup  4  }
+
+computerSystem-Dedicated    OBJECT-TYPE 
+    SYNTAX          INTEGER {  notDedicated (0),
+                               unknown (1),
+                               other (2),
+                               storage (3),
+                               router (4),
+                               switch (5),
+                               layer3switch (6),
+                               centralOfficeSwitch (7),
+                               hub (8),
+                               accessServer (9),
+                               firewall (10),
+                               print (11),
+                               io (12),
+                               webCaching (13),
+                               management (14),
+                               blockServer (15),
+                               fileServer (16),
+                               mobileUserDevice (17),
+                               repeater (18),
+                               bridgeExtender (19),
+                               gateway (20) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION    
+        "Enumeration indicating whether the ComputerSystem is
+        a special-purpose System (ie, dedicated to a particular use),
+        versus being 'general purpose'. For example, one could
+        specify that the System is dedicated to 'Print'
+        (value=11) or acts as a 'Hub' (value=8). \n
+        A clarification is needed with respect to the value 17
+        ('Mobile User Device'). An example of a dedicated user
+        device is a mobile phone or a barcode scanner in a store
+        that communicates via radio frequency. These systems are
+        quite limited in functionality and programmability, and are
+        not considered 'general purpose' computing platforms.
+        Alternately, an example of a mobile system that is 'general
+        purpose' (i.e., is NOT dedicated) is a hand-held computer.
+        Although limited in its programmability, new software can
+        be downloaded and its functionality expanded by the user."
+    ::=  {  computerSystemGroup  5  }
+
+computerSystem-PrimaryOwnerContact  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A string that provides information on how the primary
+        system owner can be reached (e.g. phone number, email
+        address, ...)"
+    ::=  {  computerSystemGroup  6  }
+
+computerSystem-PrimaryOwnerName OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The name of the primary system owner. The system 
+        owner is the primary user of the system."
+    ::=  {  computerSystemGroup  7  }
+
+computerSystem-Description  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Description property provides a textual
+        description of the object."
+    ::=  {  computerSystemGroup  8  }
+
+computerSystem-Caption  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Caption property is a short textual description
+        (one- line string) of the object."
+    ::=  {  computerSystemGroup  9  }
+
+computerSystem-Realizes-softwareElementIndex    OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the softwareElementIndex
+        that this computerSystem is associated with.
+        If no association exists an index of 0 may be returned."
+    ::=  {  computerSystemGroup  10  }
+
+
+    
+    
+changerDeviceGroup  OBJECT IDENTIFIER
+    ::=  {  smlRoot  11  }
+
+numberOfChangerDevices  OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of ChangerDevices
+        that are present."
+    ::=  {  changerDeviceGroup  1  }
+
+changerDeviceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  ChangerDevice-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "The changerDevice class represents changerDevices in the library"
+    ::=  { changerDeviceGroup  2 }
+
+changerDeviceEntry  OBJECT-TYPE
+    SYNTAX      ChangerDevice-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        changerDevice that is present in the library."
+    INDEX       {  changerDeviceIndex  }
+    ::=  { changerDeviceTable 1 }
+
+ChangerDevice-Table-Info  ::=  SEQUENCE {
+    changerDeviceIndex  UINT32,
+    changerDevice-DeviceID  DisplayString,
+    changerDevice-MediaFlipSupported  INTEGER,
+    changerDevice-ElementName  DisplayString,
+    changerDevice-Caption  DisplayString,
+    changerDevice-Description  DisplayString,
+    changerDevice-Availability  INTEGER,
+    changerDevice-OperationalStatus  INTEGER,
+    changerDevice-Realizes-StorageLocationIndex  UINT32
+    }
+
+
+changerDeviceIndex  OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the changerDevice."
+    ::=  {  changerDeviceEntry  1  }
+
+
+changerDevice-DeviceID  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An address or other identifying information to
+         uniquely name the LogicalDevice."
+    ::=  {  changerDeviceEntry  2  }
+
+
+changerDevice-MediaFlipSupported    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean set to TRUE if the Changer supports media
+         flipping. Media needs to be flipped when multi-sided
+         PhysicalMedia are placed into a MediaAccessDevice that does
+         NOT support dual sided access."
+    ::=  {  changerDeviceEntry  3  }
+
+
+changerDevice-ElementName   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A user-friendly name for the object. This property
+        allows each instance to define a user-friendly name IN ADDITION
+        TO its key properties/identity data, and description
+        information.
+        Note that ManagedSystemElement's Name property is also
+        defined as a user-friendly name. But, it is often
+        subclassed to be a Key. It is not reasonable that the same
+        property can convey both identity and a user friendly name,
+        without inconsistencies. Where Name exists and is not a Key
+        (such as for instances of LogicalDevice), the same
+        information MAY be present in both the Name and ElementName
+        properties."
+    ::=  {  changerDeviceEntry  4  }
+
+
+changerDevice-Caption   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Caption property is a short textual description
+        (one- line string) of the object."
+    ::=  {  changerDeviceEntry  5  }
+
+
+changerDevice-Description   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Description property provides a textual
+        description of the object."
+    ::=  {  changerDeviceEntry  6  }
+
+
+changerDevice-Availability  OBJECT-TYPE 
+    SYNTAX          INTEGER { other (1),
+                            unknown (2),
+                            runningFullPower (3),
+                            warning (4),
+                            inTest (5),
+                            notApplicable (6),
+                            powerOff (7),
+                            offLine (8),
+                            offDuty (9),
+                            degraded (10),
+                            notInstalled (11),
+                            installError (12),
+                            powerSaveUnknown (13),
+                            powerSaveLowPowerMode (14),
+                            powerSaveStandby (15),
+                            powerCycle (16),
+                            powerSaveWarning (17),
+                            paused (18),
+                            notReady (19),
+                            notConfigured (20),
+                            quiesced (21) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The primary availability and status of the Device.
+         (Additional status information can be specified using the
+         Additional Availability array property.) For example, the
+         Availability property indicates that the Device is running
+         and has full power (value=3), or is in a warning (4), test
+         (5), degraded (10) or power save state (values 13-15 and
+         17). Regarding the Power Save states, these are defined as
+         follows Value 13 (\'Power Save - Unknown\') indicates that
+         the Device is known to be in a power save mode, but its
+         exact status in this mode is unknown; 14 (\'Power Save -
+         Low Power Mode\') indicates that the Device is in a power
+         save state but still functioning, and may exhibit degraded
+         performance 15 (\'Power Save - Standby\') describes that
+         the Device is not functioning but could be brought to full
+         power 'quickly'; and value 17 (\'Power Save - Warning\')
+         indicates that the Device is in a warning state, though
+         also in a power save mode."
+    ::=  {  changerDeviceEntry  8  }
+
+
+changerDevice-OperationalStatus OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+         "Indicates the current status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element."
+    ::=  {  changerDeviceEntry  9  }
+
+
+changerDevice-Realizes-StorageLocationIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the storageMediaLocationIndex
+         that this changerDevice is associated with.
+         If no association exists an index of 0 may be returned."
+    ::=  {  changerDeviceEntry  10  }
+
+
+    
+    
+scsiProtocolControllerGroup OBJECT IDENTIFIER
+    ::=  {  smlRoot  12  }
+
+numberOfSCSIProtocolControllers OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of
+        SCSIProtocolControllers that are present."
+    ::=  {  scsiProtocolControllerGroup  1  }
+
+scsiProtocolControllerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  ScsiProtocolController-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "The scsiProtocolController class represents
+        SCSIProtocolControllers in the library"
+    ::=  { scsiProtocolControllerGroup  2 }
+
+scsiProtocolControllerEntry OBJECT-TYPE
+    SYNTAX      ScsiProtocolController-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        SCSIProtocolController that is present in the library."
+    INDEX       {  scsiProtocolControllerIndex  }
+    ::=  { scsiProtocolControllerTable 1 }
+
+ScsiProtocolController-Table-Info  ::=  SEQUENCE {
+    scsiProtocolControllerIndex  UINT32,
+    scsiProtocolController-DeviceID  DisplayString,
+    scsiProtocolController-ElementName  DisplayString,
+    scsiProtocolController-OperationalStatus  INTEGER,
+    scsiProtocolController-Description  DisplayString,
+    scsiProtocolController-Availability  INTEGER,
+    scsiProtocolController-Realizes-ChangerDeviceIndex  UINT32,
+    scsiProtocolController-Realizes-MediaAccessDeviceIndex  UINT32
+    }
+
+
+scsiProtocolControllerIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the scsiProtocolController."
+    ::=  {  scsiProtocolControllerEntry  1  }
+
+
+scsiProtocolController-DeviceID OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An address or other identifying information to
+         uniquely name the LogicalDevice."
+    ::=  {  scsiProtocolControllerEntry  2  }
+
+
+scsiProtocolController-ElementName  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A user-friendly name for the object. This property
+        allows each instance to define a user-friendly name IN ADDITION
+        TO its key properties/identity data, and description
+        information.
+        Note that ManagedSystemElement's Name property is also
+        defined as a user-friendly name. But, it is often
+        subclassed to be a Key. It is not reasonable that the same
+        property can convey both identity and a user friendly name,
+        without inconsistencies. Where Name exists and is not a Key
+        (such as for instances of LogicalDevice), the same
+        information MAY be present in both the Name and ElementName
+        properties."
+    ::=  {  scsiProtocolControllerEntry  3  }
+
+
+scsiProtocolController-OperationalStatus    OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+         "Indicates the current status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element."
+    ::=  {  scsiProtocolControllerEntry  4  }
+
+
+scsiProtocolController-Description  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Description property provides a textual
+        description of the object."
+    ::=  {  scsiProtocolControllerEntry  5  }
+
+
+scsiProtocolController-Availability OBJECT-TYPE 
+    SYNTAX          INTEGER { other (1),
+                            unknown (2),
+                            runningFullPower (3),
+                            warning (4),
+                            inTest (5),
+                            notApplicable (6),
+                            powerOff (7),
+                            offLine (8),
+                            offDuty (9),
+                            degraded (10),
+                            notInstalled (11),
+                            installError (12),
+                            powerSaveUnknown (13),
+                            powerSaveLowPowerMode (14),
+                            powerSaveStandby (15),
+                            powerCycle (16),
+                            powerSaveWarning (17),
+                            paused (18),
+                            notReady (19),
+                            notConfigured (20),
+                            quiesced (21) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+         "The primary availability and status of the Device.
+         (Additional status information can be specified using the
+         Additional Availability array property.) For example, the
+         Availability property indicates that the Device is running
+         and has full power (value=3), or is in a warning (4), test
+         (5), degraded (10) or power save state (values 13-15 and
+         17). Regarding the Power Save states, these are defined as
+         follows: Value 13 (\'Power Save - Unknown\') indicates that
+         the Device is known to be in a power save mode, but its
+         exact status in this mode is unknown; 14 (\'Power Save -
+         Low Power Mode\') indicates that the Device is in a power
+         save state but still functioning, and may exhibit degraded
+         performance; 15 (\'Power Save - Standby\') describes that
+         the Device is not functioning but could be brought to full
+         power 'quickly'; and value 17 (\'Power Save - Warning\')
+         indicates that the Device is in a warning state, though
+         also in a power save mode."
+    ::=  {  scsiProtocolControllerEntry  6  }
+
+
+scsiProtocolController-Realizes-ChangerDeviceIndex  OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the ChangerDeviceIndex
+        that this scsiProtocolController is associated with.
+        If no association exists an index of 0 may be returned."
+    ::=  {  scsiProtocolControllerEntry  7  }
+
+
+scsiProtocolController-Realizes-MediaAccessDeviceIndex  OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the
+        MediaAccessDeviceIndex that this scsiProtocolController is
+        associated with.
+        If no association exists an index of 0 may be returned."
+    ::=  {  scsiProtocolControllerEntry  8  }
+
+
+    
+    
+storageMediaLocationGroup   OBJECT IDENTIFIER
+    ::=  {  smlRoot  13  }
+
+numberOfStorageMediaLocations   OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of StorageMediaLocations 
+        that are present."
+    ::=  {  storageMediaLocationGroup  1  }
+
+numberOfPhysicalMedias  OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of PhysicalMedia 
+        that are present."
+    ::=  {  storageMediaLocationGroup  2  }
+
+storageMediaLocationTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  StorageMediaLocation-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "StorageMediaLocation represents a possible location for an
+        instance of PhysicalMedia. PhysicalMedia represents any type of
+        documentation or storage medium, such as tapes, CDROMs, etc.
+        This class is typically used to locate and manage Removable
+        Media (versus Media sealed with the MediaAccessDevice,
+        as a single Package, as is the case with hard disks). However,
+        'sealed' Media can also be modeled using this class, where the
+        Media would then be associated with the PhysicalPackage 
+        using the PackagedComponent relationship. "
+    ::=  { storageMediaLocationGroup  3 }
+
+storageMediaLocationEntry   OBJECT-TYPE
+    SYNTAX      StorageMediaLocation-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        StorageMediaLocation that is present in the library."
+    INDEX       {  storageMediaLocationIndex  }
+    ::=  { storageMediaLocationTable 1 }
+
+StorageMediaLocation-Table-Info  ::=  SEQUENCE {
+    storageMediaLocationIndex  UINT32,
+    storageMediaLocation-Tag  DisplayString,
+    storageMediaLocation-LocationType  INTEGER,
+    storageMediaLocation-LocationCoordinates  DisplayString,
+    storageMediaLocation-MediaTypesSupported  INTEGER,
+    storageMediaLocation-MediaCapacity  UINT32,
+    storageMediaLocation-Association-ChangerDeviceIndex  UINT32,
+    storageMediaLocation-PhysicalMediaPresent  INTEGER,
+    storageMediaLocation-PhysicalMedia-Removable  INTEGER,
+    storageMediaLocation-PhysicalMedia-Replaceable  INTEGER,
+    storageMediaLocation-PhysicalMedia-HotSwappable  INTEGER,
+    storageMediaLocation-PhysicalMedia-Capacity  UINT64,
+    storageMediaLocation-PhysicalMedia-MediaType  INTEGER,
+    storageMediaLocation-PhysicalMedia-MediaDescription  DisplayString,
+    storageMediaLocation-PhysicalMedia-CleanerMedia  INTEGER,
+    storageMediaLocation-PhysicalMedia-DualSided  INTEGER,
+    storageMediaLocation-PhysicalMedia-PhysicalLabel  DisplayString,
+    storageMediaLocation-PhysicalMedia-Tag  DisplayString
+    }
+
+
+storageMediaLocationIndex   OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the StorageMediaLocation."
+    ::=  {  storageMediaLocationEntry  1  }
+
+
+storageMediaLocation-Tag    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An arbitrary string that uniquely identifies the
+         Physical Element and serves as the Element's key. The Tag
+         property can contain information such as asset tag or serial
+         number data. The key for PhysicalElement is placed very high in
+         the object hierarchy in order to independently identify the
+         hardware/entity, regardless of physical placement in or on
+         Cabinets, Adapters, etc. For example, a hotswappable or
+         removeable component may be taken from its containing
+         (scoping) Package and be temporarily unused. The object
+         still continues to exist - and may even be inserted into a
+         different scoping container. Therefore, the key for
+         Physical Element is an arbitrary string and is defined
+         independently of any placement or location-oriented
+         hierarchy."
+    ::=  {  storageMediaLocationEntry  2  }
+
+
+storageMediaLocation-LocationType   OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                            other (1),
+                            slot (2),
+                            magazine (3),
+                            mediaAccessDevice (4),
+                            interLibraryPort (5),
+                            limitedAccessPort (6),
+                            door (7),
+                            shelf (8),
+                            vault (9) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The type of Location. For example, whether this is an
+        individual Media \'Slot\' (value=2), a MediaAccessDevice
+        (value=4) or a \'Magazine\' (value=3) is indicated in this
+        property."
+    ::=  {  storageMediaLocationEntry  3  }
+
+
+storageMediaLocation-LocationCoordinates    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "LocationCoordinates represent the physical location
+        of the the FrameSlot instance. The property is defined as a
+        free-form string to allow the location information to be
+        described in vendor-unique terminology."
+    ::=  {  storageMediaLocationEntry  4  }
+
+
+storageMediaLocation-MediaTypesSupported    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            other (1),
+                            tape (2),
+                            qic (3),
+                            ait (4),
+                            dtf (5),
+                            dat (6),
+                            eightmmTape (7),
+                            nineteenmmTape (8),
+                            dlt (9),
+                            halfInchMO (10),
+                            catridgeDisk (11),
+                            jazDisk (12),
+                            zipDisk (13),
+                            syQuestDisk (14),
+                            winchesterDisk (15),
+                            cdRom (16),
+                            cdRomXA (17),
+                            cdI (18),
+                            cdRecordable (19),
+                            wORM (20),
+                            magneto-Optical (21),
+                            dvd (22),
+                            dvdRWPlus (23),
+                            dvdRAM (24),
+                            dvdROM (25),
+                            dvdVideo (26),
+                            divx (27),
+                            floppyDiskette (28),
+                            hardDisk (29),
+                            memoryCard (30),
+                            hardCopy (31),
+                            clikDisk (32),
+                            cdRW (33),
+                            cdDA (34),
+                            cdPlus (35),
+                            dvdRecordable (36),
+                            dvdRW (37),
+                            dvdAudio (38),
+                            dvd5 (39),
+                            dvd9 (40),
+                            dvd10 (41),
+                            dvd18 (42),
+                            moRewriteable (43),
+                            moWriteOnce (44),
+                            moLIMDOW (45),
+                            phaseChangeWO (46),
+                            phaseChangeRewriteable (47),
+                            phaseChangeDualRewriteable (48),
+                            ablativeWriteOnce (49),
+                            nearField (50),
+                            miniQic (51),
+                            travan (52),
+                            eightmmMetal (53),
+                            eightmmAdvanced (54),
+                            nctp (55),
+                            ltoUltrium (56),
+                            ltoAccelis (57),
+                            tape9Track (58),
+                            tape18Track (59),
+                            tape36Track (60),
+                            magstar3590 (61),
+                            magstarMP (62),
+                            d2Tape (63),
+                            dstSmall (64),
+                            dstMedium (65),
+                            dstLarge (66) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Certain StorageMediaLocations may only be able to
+        accept a limited set of PhysicalMedia MediaTypes. This property
+        defines an array containing the types of Media that are
+        acceptable for placement in the Location. Additional
+        information and description of the contained MediaTypes can
+        be provided using the TypesDescription array. Also, size
+        data (for example, DVD disc diameter) can be specified
+        using the MediaSizesSupported array. \n
+        \n
+        Values defined here correspond to those in the CIM_Physical
+        Media.MediaType property. This allows quick comparisons
+        using value equivalence calculations. It is understood that
+        there is no external physical difference between (for
+        example) DVD- Video and DVD-RAM. But, equivalent values in
+        both the Physical Media and StorageMediaLocation
+        enumerations allows for one for one comparisons with no
+        additional processing logic (i.e., the following is not
+        required ... if \'DVD-Video\' then value=\'DVD\')."
+    ::=  {  storageMediaLocationEntry  5  }
+
+
+storageMediaLocation-MediaCapacity  OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A StorageMediaLocation may hold more than one
+        PhysicalMedia - for example, a Magazine. This property
+        indicates the Physical Media capacity of the Location."
+    ::=  {  storageMediaLocationEntry  6  }
+
+
+storageMediaLocation-Association-ChangerDeviceIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Experimental: The current index value for the
+        ChangerDeviceIndex that this storageMediaLocation is
+        associated with.
+        If no association exists an index of 0 may be returned.  
+        This association allows a representation of the experimental
+        "
+    ::=  {  storageMediaLocationEntry  7  }
+
+
+storageMediaLocation-PhysicalMediaPresent   OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "'true' when Physical Media is present in this 
+        storage location.
+        When this is 'false' -physicalMedia- entries are undefined"
+    ::=  {  storageMediaLocationEntry  10  }
+
+
+storageMediaLocation-PhysicalMedia-Removable    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A PhysicalComponent is Removable if it is designed
+        to be taken in and out of the physical container in which it is
+        normally found, without impairing the function of the overall
+        packaging. A Component can still be Removable if power must be 
+        'off' in order to perform the removal. If power can be
+        'on' and the Component removed, then the Element is both Removable
+        and HotSwappable. For example, an upgradeable Processor chip is
+        Removable."
+    ::=  {  storageMediaLocationEntry  11  }
+
+
+storageMediaLocation-PhysicalMedia-Replaceable  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A PhysicalComponent is Replaceable if it is possible
+        to replace (FRU or upgrade) the Element with a physically
+        different one. For example, some ComputerSystems allow the main
+        Processor chip to be upgraded to one of a higher clock rating.
+        In this case, the Processor is said to be Replaceable.
+        All Removable Components are inherently Replaceable."
+    ::=  {  storageMediaLocationEntry  12  }
+
+
+storageMediaLocation-PhysicalMedia-HotSwappable OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A PhysicalComponent is HotSwappable if it is
+        possible to replace the Element with a physically different but
+        equivalent one while the containing Package
+        has power applied to it (ie, is 'on'). For example, a fan
+        Component may be designed to be HotSwappable. All HotSwappable
+        Components are inherently Removable and Replaceable."
+    ::=  {  storageMediaLocationEntry  13  }
+
+
+storageMediaLocation-PhysicalMedia-Capacity OBJECT-TYPE 
+    SYNTAX          UINT64
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The number of bytes that can be read from or written
+        to a Media. This property is not applicable to 'Hard Copy'
+        (documentation) or cleaner Media.
+        Data compression should not be assumed, as it would increase 
+        the value in this property. For tapes, it should be assumed 
+        that no filemarks or blank space areas are recorded on the
+        Media."
+    ::=  {  storageMediaLocationEntry  14  }
+
+
+storageMediaLocation-PhysicalMedia-MediaType    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            other (1),
+                            tape (2),
+                            qic (3),
+                            ait (4),
+                            dtf (5),
+                            dat (6),
+                            eightmmTape (7),
+                            nineteenmmTape (8),
+                            dlt (9),
+                            halfInchMO (10),
+                            catridgeDisk (11),
+                            jazDisk (12),
+                            zipDisk (13),
+                            syQuestDisk (14),
+                            winchesterDisk (15),
+                            cdRom (16),
+                            cdRomXA (17),
+                            cdI (18),
+                            cdRecordable (19),
+                            wORM (20),
+                            magneto-Optical (21),
+                            dvd (22),
+                            dvdRWPlus (23),
+                            dvdRAM (24),
+                            dvdROM (25),
+                            dvdVideo (26),
+                            divx (27),
+                            floppyDiskette (28),
+                            hardDisk (29),
+                            memoryCard (30),
+                            hardCopy (31),
+                            clikDisk (32),
+                            cdRW (33),
+                            cdDA (34),
+                            cdPlus (35),
+                            dvdRecordable (36),
+                            dvdRW (37),
+                            dvdAudio (38),
+                            dvd5 (39),
+                            dvd9 (40),
+                            dvd10 (41),
+                            dvd18 (42),
+                            moRewriteable (43),
+                            moWriteOnce (44),
+                            moLIMDOW (45),
+                            phaseChangeWO (46),
+                            phaseChangeRewriteable (47),
+                            phaseChangeDualRewriteable (48),
+                            ablativeWriteOnce (49),
+                            nearField (50),
+                            miniQic (51),
+                            travan (52),
+                            eightmmMetal (53),
+                            eightmmAdvanced (54),
+                            nctp (55),
+                            ltoUltrium (56),
+                            ltoAccelis (57),
+                            tape9Track (58),
+                            tape18Track (59),
+                            tape36Track (60),
+                            magstar3590 (61),
+                            magstarMP (62),
+                            d2Tape (63),
+                            dstSmall (64),
+                            dstMedium (65),
+                            dstLarge (66) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Specifies the type of the PhysicalMedia, as an
+        enumerated integer. The MediaDescription property is used to
+        provide more explicit definition of the Media type, whether it
+        is pre-formatted, compatability features, etc."
+    ::=  {  storageMediaLocationEntry  15  }
+
+
+storageMediaLocation-PhysicalMedia-MediaDescription OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Additional detail related to the MediaType
+        enumeration. For example, if value 3 ('QIC Cartridge') is
+        specified, this property could indicate whether
+        the tape is wide or 1/4 inch, whether it is pre-formatted,
+        whether it is Travan compatible, etc."
+    ::=  {  storageMediaLocationEntry  16  }
+
+
+storageMediaLocation-PhysicalMedia-CleanerMedia OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean indicating that the PhysicalMedia is used 
+        for cleaning purposes and not data storage."
+    ::=  {  storageMediaLocationEntry  17  }
+
+
+storageMediaLocation-PhysicalMedia-DualSided    OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            unknown (0),
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Boolean indicating that the Media has two recording
+        sides (TRUE) or only a single side (FALSE). Examples of dual
+        sided Media include DVD-ROM and some optical disks. Examples of
+        single sided Media are tapes and CD-ROM."
+    ::=  {  storageMediaLocationEntry  18  }
+
+
+storageMediaLocation-PhysicalMedia-PhysicalLabel    OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "One or more strings on 'labels' on the PhysicalMedia. 
+        The format of the labels and their state (readable, unreadable,
+        upside-down) are indicated in the LabelFormats and LabelStates
+        array properties."
+    ::=  {  storageMediaLocationEntry  19  }
+
+
+storageMediaLocation-PhysicalMedia-Tag  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+         "An arbitrary string that uniquely identifies the
+         Physical Element and serves as the Element's key. The Tag
+         property can contain information such as asset tag or serial
+         data. The key for PhysicalElement is placed very high in
+         number the object hierarchy in order to independently identify
+         the hardware/entity, regardless of physical placement in or on
+         Cabinets, Adapters, etc. For example, a hotswappable or
+         removeable component may be taken from its containing
+         (scoping) Package and be temporarily unused. The object
+         still continues to exist - and may even be inserted into a
+         different scoping container. Therefore, the key for
+         Physical Element is an arbitrary string and is defined
+         independently of any placement or location-oriented
+         hierarchy."
+    ::=  {  storageMediaLocationEntry  20  }
+
+
+    
+    
+limitedAccessPortGroup  OBJECT IDENTIFIER
+    ::=  {  smlRoot  14  }
+
+numberOflimitedAccessPorts  OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of limitedAccessPorts that are
+        present."
+    ::=  {  limitedAccessPortGroup  1  }
+
+limitedAccessPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  LimitedAccessPort-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "The limitedAccessPort class represents limitedAccessPorts in the
+        library"
+    ::=  { limitedAccessPortGroup  2 }
+
+limitedAccessPortEntry  OBJECT-TYPE
+    SYNTAX      LimitedAccessPort-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about a
+        limitedAccessPort that is present in the library."
+    INDEX       {  limitedAccessPortIndex  }
+    ::=  { limitedAccessPortTable 1 }
+
+LimitedAccessPort-Table-Info  ::=  SEQUENCE {
+    limitedAccessPortIndex  UINT32,
+    limitedAccessPort-DeviceID  DisplayString,
+    limitedAccessPort-Extended  INTEGER,
+    limitedAccessPort-ElementName  DisplayString,
+    limitedAccessPort-Caption  DisplayString,
+    limitedAccessPort-Description  DisplayString,
+    limitedAccessPort-Realizes-StorageLocationIndex  UINT32
+    }
+
+
+limitedAccessPortIndex  OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the limitedAccessPort."
+    ::=  {  limitedAccessPortEntry  1  }
+
+
+limitedAccessPort-DeviceID  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An address or other identifying information to
+         uniquely name the LogicalDevice."
+    ::=  {  limitedAccessPortEntry  2  }
+
+
+limitedAccessPort-Extended  OBJECT-TYPE 
+    SYNTAX          INTEGER {
+                            true (1),
+                            false (2) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "When a Port is 'Extended' or 'open' (value=TRUE), its
+        Storage MediaLocations are accessible to a human operator.
+        If not extended (value=FALSE), the Locations are accessible
+        to a PickerElement."
+    ::=  {  limitedAccessPortEntry  3  }
+
+
+limitedAccessPort-ElementName   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A user-friendly name for the object. This property
+        allows each instance to define a user-friendly name IN ADDITION
+        TO its key properties/identity data, and description
+        information.
+        Note that ManagedSystemElement's Name property is also
+        defined as a user-friendly name. But, it is often
+        subclassed to be a Key. It is not reasonable that the same
+        property can convey both identity and a user friendly name,
+        without inconsistencies. Where Name exists and is not a Key
+        (such as for instances of LogicalDevice), the same
+        information MAY be present in both the Name and ElementName
+        properties."
+    ::=  {  limitedAccessPortEntry  4  }
+
+
+limitedAccessPort-Caption   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Caption property is a short textual description
+        (one- line string) of the object."
+    ::=  {  limitedAccessPortEntry  5  }
+
+
+limitedAccessPort-Description   OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Description property provides a textual
+        description of the object."
+    ::=  {  limitedAccessPortEntry  6  }
+
+
+limitedAccessPort-Realizes-StorageLocationIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the
+        storageMediaLocationIndex that this limitedAccessPort is 
+        associated with.
+        If no association exists an index of 0 may be returned."
+    ::=  {  limitedAccessPortEntry  7  }
+
+
+    
+    
+fCPortGroup OBJECT IDENTIFIER
+    ::=  {  smlRoot  15  }
+
+numberOffCPorts OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of fcPorts that are
+        present."
+    ::=  {  fCPortGroup  1  }
+
+fCPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  FCPortPort-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "The fcPort class represents Fibre Channel Ports in the library"
+    ::=  { fCPortGroup  2 }
+
+fCPortEntry OBJECT-TYPE
+    SYNTAX      FCPortPort-Table-Info
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Each entry in the table contains information about an
+        fcPort that is present in the library."
+    INDEX       {  fCPortIndex  }
+    ::=  { fCPortTable 1 }
+
+FCPortPort-Table-Info  ::=  SEQUENCE {
+    fCPortIndex  UINT32,
+    fCPort-DeviceID  DisplayString,
+    fCPort-ElementName  DisplayString,
+    fCPort-Caption  DisplayString,
+    fCPort-Description  DisplayString,
+    fCPortController-OperationalStatus  INTEGER,
+    fCPort-PermanentAddress  DisplayString,
+    fCPort-Realizes-scsiProtocolControllerIndex  UINT32
+    }
+
+
+fCPortIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the fCPort."
+    ::=  {  fCPortEntry  1  }
+
+
+fCPort-DeviceID OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An address or other identifying information to
+        uniquely name the LogicalDevice."
+    ::=  {  fCPortEntry  2  }
+
+
+fCPort-ElementName  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "A user-friendly name for the object. This property
+        allows each instance to define a user-friendly name IN ADDITION
+        TO its key properties/identity data, and description
+        information.
+        Note that ManagedSystemElement's Name property is also
+        defined as a user-friendly name. But, it is often
+        subclassed to be a Key. It is not reasonable that the same
+        property can convey both identity and a user friendly name,
+        without inconsistencies. Where Name exists and is not a Key
+        (such as for instances of LogicalDevice), the same
+        information MAY be present in both the Name and ElementName
+        properties."
+    ::=  {  fCPortEntry  3  }
+
+
+fCPort-Caption  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Caption property is a short textual description
+        (one- line string) of the object."
+    ::=  {  fCPortEntry  4  }
+
+
+fCPort-Description  OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 255  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The Description property provides a textual
+        description of the object."
+    ::=  {  fCPortEntry  5  }
+
+
+fCPortController-OperationalStatus  OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+         "Indicates the current status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element.
+         
+         SMI-S 1.1 Section 8.1.2.2.3 additional description for FC Ports
+         OK        -  Port is online
+         Error     -  Port has a failure
+         Stopped   -  Port is disabled
+         InService -  Port is in Self Test
+         Unknown"
+    ::=  {  fCPortEntry  6  }
+
+
+fCPort-PermanentAddress OBJECT-TYPE 
+    SYNTAX          DisplayString  ( SIZE ( 0 .. 64  ) ) 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "PermanentAddress defines the network address
+        hardcoded into  a port. This 'hardcoded' address may be changed
+        via firmware upgrade or software configuration. If so, this 
+        field should be updated when the change is made. 
+        PermanentAddress should be left blank if no 'hardcoded' 
+        address exists for the NetworkAdapter.
+        
+        In SMI-S 1.1 table 1304 FCPorts are defined to use the port WWN
+        as described in table 7.2.4.5.2 
+        
+        World Wide Name (i.e. FC Name_Identifier) FCPort 
+        Permanent Address property; no corresponding 
+        format property 16 un-separated upper case hex 
+        digits (e.g. '21000020372D3C73')"
+    ::=  {  fCPortEntry  7  }
+
+
+fCPort-Realizes-scsiProtocolControllerIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the
+        scsiProtocolControllerIndex that this fCPort is associated with.
+        If no association exists an index of 0 may be returned."
+    ::=  {  fCPortEntry  8  }
+
+
+    
+-- Traps are based on the T10 Tape Alert Specification v3 (w/SSC-3 Enhancements)
+-- and SMI-S 1.1 section 8.1.8.25 LibraryAlert Events/Indications
+
+trapGroup   OBJECT IDENTIFIER
+    ::=  {  smlRoot  16  }
+
+trapsEnabled    OBJECT-TYPE 
+    SYNTAX          INTEGER  { enabled ( 1 ) , disabled ( 2 ) } 
+    MAX-ACCESS      read-write
+    STATUS          mandatory
+    DESCRIPTION     
+        "Set to enable sending traps"
+    ::=  {  trapGroup  1  }
+
+trapDriveAlertSummary   OBJECT-TYPE 
+    SYNTAX          INTEGER  { 
+                        readWarning ( 1 ) , 
+                        writeWarning ( 2 ) ,
+                        hardError ( 3 ) , media ( 4 ) , readFailure ( 5 ) , 
+                        writeFailure ( 6 ) , 
+                        mediaLife ( 7 ) , 
+                        notDataGrade ( 8 ) ,
+                        writeProtect ( 9 ) , 
+                        noRemoval ( 10 ) , 
+                        cleaningMedia ( 11 ) ,
+                        unsupportedFormat ( 12 ) , 
+                        recoverableSnappedTape ( 13 ) ,
+                        unrecoverableSnappedTape ( 14 ) , 
+                        memoryChipInCartridgeFailure ( 15 ) , 
+                        forcedEject ( 16 ) ,
+                        readOnlyFormat ( 17 ) , 
+                        directoryCorruptedOnLoad ( 18 ) ,
+                        nearingMediaLife ( 19 ) , 
+                        cleanNow ( 20 ) , 
+                        cleanPeriodic ( 21 ) ,
+                        expiredCleaningMedia ( 22 ) , 
+                        invalidCleaningMedia ( 23 ) ,
+                        retentionRequested ( 24 ) , 
+                        dualPortInterfaceError ( 25 ) ,
+                        coolingFanError ( 26 ) , 
+                        powerSupplyFailure ( 27 ) ,
+                        powerConsumption ( 28 ) , 
+                        driveMaintenance ( 29 ) , 
+                        hardwareA ( 30 ) , 
+                        hardwareB ( 31 ) , 
+                        interface ( 32 ) , 
+                        ejectMedia ( 33 ) , 
+                        downloadFailure ( 34 ) , 
+                        driveHumidity ( 35 ) ,
+                        driveTemperature ( 36 ) , 
+                        driveVoltage ( 37 ) , 
+                        predictiveFailure ( 38 ) , 
+                        diagnosticsRequired ( 39 ) ,
+                        lostStatistics ( 50 ) , 
+                        mediaDirectoryInvalidAtUnload ( 51 ) ,
+                        mediaSystemAreaWriteFailure ( 52 ) , 
+                        mediaSystemAreaReadFailure ( 53 ) , 
+                        noStartOfData ( 54 ) ,
+                        loadingFailure ( 55 ) , 
+                        unrecoverableUnloadFailure ( 56 ) ,
+                        automationInterfaceFailure ( 57 ) , 
+                        firmwareFailure ( 58 ) ,
+                        wormMediumIntegrityCheckFailed ( 59 ) , 
+                        wormMediumOverwriteAttempted ( 60 ) } 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Short summary of a media (tape, optical, etc.) driveAlert trap.
+        Corresponds to the Number/Flag property of
+        drive/autoloader alerts in the T10 TapeAlert Specification v3
+        (w/SSC-3 Enhancements)  as modified by the EventSummary property in
+        the SMI-S 1.1 section 8.1.8.25 LibraryAlert Events/Indications for
+        Library Devices. In particular, all occurances of 'tape' have been
+        replaced with 'media'. (This summary property has a 1 to 1
+        relationship to the CIM_AlertIndication.OtherAlertType property, 
+        and might be stored in the CIM_AlertIndication.Message property.)"
+    ::=  {  trapGroup  2  }
+
+trap-Association-MediaAccessDeviceIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the MediaAccessDeviceIndex
+        that this changerAlert trap is  associated with.
+        If no association exists an index of 0 may be returned. "
+    ::=  {  trapGroup  3  }
+
+
+trapChangerAlertSummary OBJECT-TYPE 
+    SYNTAX          INTEGER  { 
+                        libraryHardwareA ( 1 ) , 
+                        libraryHardwareB ( 2 ) , 
+                        libraryHardwareC ( 3 ) , 
+                        libraryHardwareD ( 4 ) , 
+                        libraryDiagnosticsRequired ( 5 ) ,
+                        libraryInterface ( 6 ) , 
+                        failurePrediction ( 7 ) ,
+                        libraryMaintenance ( 8 ) , 
+                        libraryHumidityLimits ( 9 ) ,
+                        libraryTemperatureLimits ( 10 ) , 
+                        libraryVoltageLimits ( 11 ) ,
+                        libraryStrayMedia ( 12 ) , 
+                        libraryPickRetry ( 13 ) ,
+                        libraryPlaceRetry ( 14 ) , 
+                        libraryLoadRetry ( 15 ) , 
+                        libraryDoor ( 16 ) , 
+                        libraryMailslot ( 17 ) , 
+                        libraryMagazine ( 18 ) , 
+                        librarySecurity ( 19 ) ,
+                        librarySecurityMode ( 20 ) , 
+                        libraryOffline ( 21 ) ,
+                        libraryDriveOffline ( 22 ) , 
+                        libraryScanRetry ( 23 ) ,
+                        libraryInventory ( 24 ) , 
+                        libraryIllegalOperation ( 25 ) ,
+                        dualPortInterfaceError ( 26 ) , 
+                        coolingFanFailure ( 27 ) ,
+                        powerSupply ( 28 ) , 
+                        powerConsumption ( 29 ) ,
+                        passThroughMechanismFailure ( 30 ) , 
+                        cartridgeInPassThroughMechanism ( 31 ) , 
+                        unreadableBarCodeLabels ( 32 ) } 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Short summary of a changer (eg. robot) changerAlert trap.
+        Corresponds to the Number/Flag property of stand-alone 
+        changer alerts in the T10 TapeAlert Specification v3 (w/SSC-3
+        Enhancements)  as modified by the EventSummary property in the 
+        SMI-S 1.1 section 8.1.8.25 LibraryAlert Events/Indications for
+        Library Devices. In particular, all occurances of 'tape' have been
+        replaced with 'media'. (This summary property has a 1 to 1
+        relationship to the CIM_AlertIndication.OtherAlertType property, 
+        and might be stored in the CIM_AlertIndication.Message property.)"
+    ::=  {  trapGroup  4  }
+
+trap-Association-ChangerDeviceIndex OBJECT-TYPE 
+    SYNTAX          UINT32
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "The current index value for the ChangerDeviceIndex
+        that this changerAlert trap is associated with.
+        If no association exists an index of 0 may be returned. "
+    ::=  {  trapGroup  5  }
+
+
+trapPerceivedSeverity   OBJECT-TYPE 
+    SYNTAX          INTEGER  { 
+                        unknown ( 0 ) , 
+                        other ( 1 ) , 
+                        information ( 2 ) , 
+                        degradedWarning ( 3 ) , 
+                        minor ( 4 ) , 
+                        major ( 5 ) , 
+                        critical ( 6 ) , 
+                        fatalNonRecoverable ( 7 ) } 
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "An enumerated value that describes the severity of
+        the Alert Indication from the notifier's point of view: 1 - Other,
+        by CIM convention, is used to indicate that the Severity's value 
+        can be found in the OtherSeverity property. 3 - Degraded/Warning
+        should be used when its appropriate to let the user decide if 
+        action is needed. 4 - Minor should be used to indicate action is
+        needed, but the situation is not serious at this time. 5 - Major
+        should be used to indicate action is needed NOW. 6 - Critical 
+        should be used to indicate action is needed NOW and the scope is
+        broad (perhaps an imminent outage to a critical resource will
+        result). 7 - Fatal/NonRecoverable should be used to indicate an
+        error occurred, but it's too late to take remedial action. 
+        2 and 0 - Information and Unknown (respectively) follow common
+        usage. Literally, the AlertIndication is purely informational 
+        or its severity is simply unknown. This would have values 
+        described in SMI-S 1.1 section 8.1.8.25 LibraryAlert
+        Events/Indications for Library Devices, the PerceivedSeverity
+        column. These values are a superset of the Info/Warning/Critical
+        values in the T10 TapeAlert Specification v3 (w/SSC-3 Enhancements)
+        , and an SNMP agent may choose to only specify those if that's all
+        that's available. (This corresponds to the
+        CIM_AlertIndication.PerceivedSeverity property.)"
+    ::=  {  trapGroup  6  }
+
+trapDestinationTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF  TrapDestinationEntry
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Table of client/manager desitinations which will receive
+        traps"
+    ::=  { trapGroup  7 }
+
+trapDestinationEntry    OBJECT-TYPE
+    SYNTAX      TrapDestinationEntry
+    MAX-ACCESS  not-accessible
+    STATUS          mandatory
+    DESCRIPTION 
+        "Entry containing information needed to send traps to an
+        SNMP client/manager"
+    INDEX       {  numberOfTrapDestinations  }
+    ::=  { trapDestinationTable 1 }
+
+TrapDestinationEntry  ::=  SEQUENCE {
+    numberOfTrapDestinations  Integer32,
+    trapDestinationHostType  INTEGER,
+    trapDestinationHostAddr  DisplayString,
+    trapDestinationPort  Integer32
+    }
+
+
+numberOfTrapDestinations    OBJECT-TYPE 
+    SYNTAX          Integer32
+    MAX-ACCESS      read-write
+    STATUS          mandatory
+    DESCRIPTION     
+        "This value specifies the number of trap destination
+        SNMP clients/managers."
+    ::=  {  trapDestinationEntry  1  }
+
+
+trapDestinationHostType OBJECT-TYPE 
+    SYNTAX          INTEGER  { iPv4 ( 1 ) , iPv6 ( 2 ) } 
+    MAX-ACCESS      read-write
+    STATUS          mandatory
+    DESCRIPTION     
+        "The type of addressing model to represent the 
+        network address (IPv4/IPv6)"
+    ::=  {  trapDestinationEntry  2  }
+
+
+trapDestinationHostAddr OBJECT-TYPE 
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-write
+    STATUS          mandatory
+    DESCRIPTION     
+        "The network address of this client/manager, to 
+        which the trap should be sent"
+    ::=  {  trapDestinationEntry  3  }
+
+
+trapDestinationPort OBJECT-TYPE 
+    SYNTAX          Integer32  ( 0 .. 65535  ) 
+    MAX-ACCESS      read-write
+    STATUS          mandatory
+    DESCRIPTION     
+        "The port number where this client/manager is
+        listening for traps."
+    ::=  {  trapDestinationEntry  4  }
+
+
+driveAlert TRAP-TYPE
+    ENTERPRISE smlRoot
+    VARIABLES {
+        trapDriveAlertSummary, 
+        trap-Association-MediaAccessDeviceIndex,
+        trapPerceivedSeverity }
+    DESCRIPTION
+        "A Drive/Autoloader Alert trap, based on the T10 TapeAlert
+        Specification v3 (w/SSC-3 Enhancements) and SMI-S 1.1 section 
+        8.1.8.25 LibraryAlert Events/Indications."
+    ::= 0
+
+changerAlert TRAP-TYPE
+    ENTERPRISE smlRoot
+    VARIABLES {
+        trapChangerAlertSummary, 
+        trap-Association-ChangerDeviceIndex, 
+        trapPerceivedSeverity }
+    DESCRIPTION
+        "A Changer Device (eg. robot) Alert trap, based on the T10 TapeAlert
+        Specification v3 (w/SSC-3 Enhancements)  and SMI-S 1.1 section
+         8.1.8.25 LibraryAlert Events/Indications."
+    ::= 1
+
+trapObjects OBJECT IDENTIFIER   ::= { trapGroup 8 }
+
+currentOperationalStatus    OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Indicates the previous status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element."
+    ::=  {  trapObjects   1  }
+
+oldOperationalStatus    OBJECT-TYPE 
+    SYNTAX          INTEGER { unknown (0),
+                              other (1),
+                              ok (2),
+                              degraded (3),
+                              stressed (4),
+                              predictiveFailure (5),
+                              error (6),
+                              non-RecoverableError (7),
+                              starting (8),
+                              stopping (9),
+                              stopped  (10),
+                              inService (11),
+                              noContact (12),
+                              lostCommunication (13),
+                              aborted (14),
+                              dormant (15),
+                              supportingEntityInError (16),
+                              completed (17),
+                              powerMode (18),
+                              dMTFReserved (19),
+                              vendorReserved (32768) }
+    MAX-ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION     
+        "Indicates the previous status(es) of the element.
+         Various health and operational statuses are defined. Many of
+         the enumeration's values are self- explanatory. However, a few
+         are not and are described in more detail. \n
+         'Stressed' indicates that the element is functioning, but
+         needs attention. Examples of 'Stressed' states are
+         overload, overheated, etc. \n
+         'Predictive Failure' indicates that an element is
+         functioning nominally but predicting a failure in the near
+         future. \n
+         'In Service' describes an element being configured,
+         maintained, cleaned, or otherwise administered. \n
+         'No Contact' indicates that the monitoring system has
+         knowledge of this element, but has never been able to
+         establish communications with it. \n
+         'Lost Communication' indicates that the ManagedSystem
+         Element is known to exist and has been contacted
+         successfully in the past, but is currently unreachable. \n
+         'Stopped' and 'Aborted' are similar, although the
+         former implies a clean and orderly stop, while the latter
+         implies an abrupt stop where the element's state and
+         configuration may need to be updated. \n
+         'Dormant' indicates that the element is inactive or
+         quiesced. \n
+         'Supporting Entity in Error' describes that this element
+         may be 'OK' but that another element, on which it is
+         dependent, is in error. An example is a network service or
+         endpoint that cannot function due to lower layer networking
+         problems. \n
+         'Completed' indicates the element has completed its
+         operation. This value should be combined with either OK,
+         Error, or Degraded so that a client can till if the
+         complete operation passed (Completed with OK), and failure
+         (Completed with Error). Completed with Degraded would imply
+         the operation finished, but did not complete OK or report
+         an error. \n
+         'Power Mode' indicates the element has additional power
+         model information contained in the Associated
+         PowerManagementService association. \n
+         OperationalStatus replaces the Status property on
+         ManagedSystemElement to provide a consistent approach to
+         enumerations, to address implementation needs for an array
+         property, and to provide a migration path from today's
+         environment to the future. This change was not made earlier
+         since it required the DEPRECATED qualifier. Due to the
+         widespread use of the existing Status property in
+         management applications, it is strongly RECOMMENDED that
+         providers/instrumentation provide BOTH the Status and
+         OperationalStatus properties. Further, the first value of
+         OperationalStatus SHOULD contain the primary status for the
+         element. When instrumented, Status (since it is
+         single-valued) SHOULD also provide the primary status of
+         the element."
+    ::=  {  trapObjects   2  }
+
+libraryAddedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name
+        }
+    DESCRIPTION
+        "A library is added to the SMI-S agent.
+         This trap is to support the SMI-S 1.1 section 8.1.8.23 InstCreation
+         indication."
+    ::= 3
+    
+libraryDeletedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name
+        }
+    DESCRIPTION
+        "A library is deleted in the SMI-S agent.
+         This trap is to support the SMI-S 1.1 section 8.1.8.23 InstDeletion
+         indication."
+    ::= 4
+    
+libraryOpStatusChangedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name,
+        currentOperationalStatus, 
+        oldOperationalStatus 
+        }
+    DESCRIPTION
+        "A library OperationalStatus has changed in the SMI-S agent.
+         This trap is to support the SMI-S 1.1 section 8.1.8.23 InstModification
+         indication."
+    ::= 5
+    
+driveAddedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name,
+        mediaAccessDevice-DeviceID
+        }
+    DESCRIPTION
+        "A media access device (trap drive) is added to the library. 
+         This trap is to support the SMI-S 1.1 section 8.1.8.25 InstCreation
+         indication."
+    ::= 6
+    
+driveDeletedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name,
+        mediaAccessDevice-DeviceID
+        }
+    DESCRIPTION
+        "A media access device (trap drive) is deleted from the library. 
+         This trap is to support the SMI-S 1.1 section 8.1.8.25 InstDeletion
+         indication."
+    ::= 7
+    
+driveOpStatusChangedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name,
+        mediaAccessDevice-DeviceID,
+        currentOperationalStatus,
+        oldOperationalStatus
+        }
+    DESCRIPTION
+        "A drive OperationalStatus has changed in the SMI-S agent.
+         This trap is to support the SMI-S 1.1 section 8.1.8.23 InstModification
+         indication."
+    ::= 8
+    
+changerAddedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name,
+        changerDevice-DeviceID
+        }
+    DESCRIPTION
+        "A changer device is added to the library. 
+         This trap is to support the SMI-S 1.1 section 8.1.8.25 InstCreation
+         indication."
+    ::= 9
+    
+changerDeletedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name,
+        changerDevice-DeviceID
+        }
+    DESCRIPTION
+        "A changer device is deleted from the library. 
+         This trap is to support the SMI-S 1.1 section 8.1.8.25 InstDeletion
+         indication."
+    ::= 10
+    
+changerOpStatusChangedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageLibrary-Name,
+        changerDevice-DeviceID,
+        currentOperationalStatus,
+        oldOperationalStatus
+        }
+    DESCRIPTION
+        "A changer OperationalStatus has changed in the SMI-S agent.
+         This trap is to support the SMI-S 1.1 section 8.1.8.23 InstModification
+         indication."
+    ::= 11
+    
+physicalMediaAddedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageMediaLocation-PhysicalMedia-Tag
+        }
+    DESCRIPTION
+        "A physical media is added to the library. 
+         This trap is to support the SMI-S 1.1 section 8.1.8.25 InstCreation
+         indication."
+    ::= 12
+    
+physicalMediaDeletedTrap TRAP-TYPE
+    ENTERPRISE trapGroup
+    VARIABLES {
+        storageMediaLocation-PhysicalMedia-Tag
+        }
+    DESCRIPTION
+        "A physical media is deleted from the library. 
+         This trap is to support the SMI-S 1.1 section 8.1.8.25 InstDeletion
+         indication."
+    ::= 13
+    
+endOfSmlMib OBJECT-TYPE 
+    SYNTAX          OBJECT IDENTIFIER
+    MAX-ACCESS      not-accessible
+    STATUS          mandatory
+    DESCRIPTION     
+        "Description here"
+    ::=  {  smlRoot  17  }
+    
+END

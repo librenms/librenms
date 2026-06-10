@@ -1,0 +1,457 @@
+-- ################################################################################
+
+EXTREME-FDB-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+                MODULE-IDENTITY         FROM SNMPv2-SMI
+                OBJECT-TYPE             FROM SNMPv2-SMI
+                IpAddress               FROM SNMPv2-SMI
+                Counter64               FROM SNMPv2-SMI
+                Integer32               FROM SNMPv2-SMI         
+                DisplayString, MacAddress, RowStatus       FROM SNMPv2-TC
+                extremeAgent, PortList      FROM EXTREME-BASE-MIB;
+
+
+        extremeFdb MODULE-IDENTITY
+                LAST-UPDATED "200903171234Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme FDB and IP FDB tables."
+        ::= { extremeAgent 16 }
+
+        extremeFdbMacFdbTable   OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeFdbMacFdbEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table that contains information about the hardware MAC
+                         FDB table. Supported only for switches running on Extremeware."
+
+                ::= { extremeFdb 1 }
+
+        extremeFdbMacFdbEntry   OBJECT-TYPE
+                SYNTAX  ExtremeFdbMacFdbEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "An entry in the table of MAC FDB information."
+                INDEX { extremeFdbMacFdbVlanIfIndex, extremeFdbMacFdbSequenceNumber }
+                ::= {extremeFdbMacFdbTable 1}
+
+        ExtremeFdbMacFdbEntry ::= SEQUENCE {
+                 extremeFdbMacFdbVlanIfIndex     Integer32,     
+                 extremeFdbMacFdbSequenceNumber  Integer32,
+                 extremeFdbMacFdbMacAddress      MacAddress,
+                 extremeFdbMacFdbPortIfIndex     Integer32,
+                 extremeFdbMacFdbStatus          INTEGER
+              }
+
+          extremeFdbMacFdbVlanIfIndex OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "The ifIndex of the Vlan on which this mac is learned."
+              ::= { extremeFdbMacFdbEntry 1 }
+
+        extremeFdbMacFdbSequenceNumber OBJECT-TYPE
+                SYNTAX  Integer32
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "The sequence number of this FDB entry in the forwarding database."
+                ::= { extremeFdbMacFdbEntry 2 }
+
+          extremeFdbMacFdbMacAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "A MAC address for which the bridge has
+                      forwarding and/or filtering information."
+              ::= { extremeFdbMacFdbEntry 3 }
+
+          extremeFdbMacFdbPortIfIndex OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Either the value '0', or the IfIndex of the
+                      port on which a frame having a source address
+                      equal to the value of the corresponding instance
+                      of dot1dTpFdbAddress has been seen.  A value of
+                      '0' indicates that the port IfIndex has not been
+                      learned but that the bridge does have some
+                      forwarding/filtering information about this
+                      address (e.g. in the dot1dStaticTable)."
+              ::= { extremeFdbMacFdbEntry 4 }
+
+          extremeFdbMacFdbStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),
+                          invalid(2),
+                          learned(3),
+                          self(4),
+                          mgmt(5)
+                      }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The status of this entry.  
+                      This is the value of dot1dTpFdbStatus in RFC1493."
+              ::= { extremeFdbMacFdbEntry 5 }
+
+
+        extremeFdbIpFdbTable    OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeFdbIpFdbEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "A table that contains information about the hardware IP
+                         FDB table."
+                ::= { extremeFdb 2 }
+
+        extremeFdbIpFdbEntry    OBJECT-TYPE
+                SYNTAX  ExtremeFdbIpFdbEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        "An entry in the table of IP FDB information."
+                INDEX { extremeFdbIpFdbSequenceNumber }
+                ::= {extremeFdbIpFdbTable 1}
+
+        ExtremeFdbIpFdbEntry ::= SEQUENCE {
+                  extremeFdbIpFdbSequenceNumber  Integer32,
+                  extremeFdbIpFdbIPAddress       IpAddress,
+                  extremeFdbIpFdbMacAddress      MacAddress,
+                  extremeFdbIpFdbVlanIfIndex     Integer32,
+                  extremeFdbIpFdbPortIfIndex     Integer32
+              }
+
+
+        extremeFdbIpFdbSequenceNumber OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "The sequence number of this entry in the IP FDB"
+              ::= { extremeFdbIpFdbEntry 1 }
+
+        extremeFdbIpFdbIPAddress OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The IP Address of the IP FDB entry"
+                ::= { extremeFdbIpFdbEntry 2 }
+
+          extremeFdbIpFdbMacAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The MAC address corresponding to the IP Address."
+              ::= { extremeFdbIpFdbEntry 3 }
+
+        extremeFdbIpFdbVlanIfIndex OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The ifIndex of the Vlan on which this ip is learned"
+              ::= { extremeFdbIpFdbEntry 4 }
+
+          extremeFdbIpFdbPortIfIndex OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The IfIndex of the port on which this entry was learned"
+              ::= { extremeFdbIpFdbEntry 5 }
+
+          extremeFdbPermFdbTable        OBJECT-TYPE
+                SYNTAX                  SEQUENCE OF ExtremeFdbPermFdbEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION
+                "This table contains information on the secure-mac permanent FDB entries.
+                It may later be extended to display other types of permanent FDB entries."
+
+                ::= { extremeFdb 3 }
+          
+          extremeFdbPermFdbEntry        OBJECT-TYPE
+                SYNTAX                  ExtremeFdbPermFdbEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION
+                "An entry in the table of secure-mac permanent FDB information."
+
+                INDEX { extremeFdbPermFdbFilterNum, 
+                extremeFdbPermFdbMacAddress, extremeFdbPermFdbVlanId }
+                ::= { extremeFdbPermFdbTable 1 }
+
+          ExtremeFdbPermFdbEntry ::= SEQUENCE {
+                extremeFdbPermFdbFilterNum      Integer32,
+                extremeFdbPermFdbMacAddress     MacAddress,
+                extremeFdbPermFdbVlanId         Integer32,
+                extremeFdbPermFdbPortList       PortList,
+                extremeFdbPermFdbFlags          BITS,
+                extremeFdbPermFdbStatus         RowStatus
+              }
+
+        extremeFdbPermFdbFilterNum      OBJECT-TYPE
+                SYNTAX                  Integer32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION
+                      "This object always returns 1. In future, it may be used to 
+                      provide additional capability."
+                ::= { extremeFdbPermFdbEntry 1 }
+
+
+        extremeFdbPermFdbMacAddress     OBJECT-TYPE
+                SYNTAX                  MacAddress
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION
+                      "The is the MAC Address to which this FDB entry pertains."
+                ::= { extremeFdbPermFdbEntry 2 }
+
+        extremeFdbPermFdbVlanId         OBJECT-TYPE
+              SYNTAX                    Integer32
+              MAX-ACCESS                read-only
+              STATUS                    current
+              DESCRIPTION
+                      "The VLAN ID of the VLAN to which this FDB entry pertains."
+              ::= { extremeFdbPermFdbEntry 3 }
+
+        extremeFdbPermFdbPortList       OBJECT-TYPE
+              SYNTAX                    PortList
+              MAX-ACCESS                read-create
+              STATUS                    current
+              DESCRIPTION
+                      "This is the list of port(s) on which the given MAC Address is configured
+                      Note that this port list is constructed assuming there are as many ports 
+                      per slot as given in the object extremeChassisPortsPerSlot. 
+                      Thus, if extremeChassisPortsPerSlot is 128, then the 129th bit in the port 
+                      list (reading left to right) indicates port 2:1. Similarly, the 256th bit 
+                      would indicate port 2:128 while the 257th bit would indicate port 3:1. Note 
+                      especially that the bit positions in port list do not depend on the actual 
+                      physical presence or absence of the given ports on the blade or of any 
+                      blade itself."
+                      
+              ::= { extremeFdbPermFdbEntry 4 }
+
+
+       extremeFdbPermFdbFlags           OBJECT-TYPE
+            SYNTAX  BITS {
+                        isSecure(0)
+                 }                
+                        
+           MAX-ACCESS                   read-create
+           STATUS                       current
+           DESCRIPTION 
+                "This object contains the flags associated with the FDB entry. The flags 
+                are similar to those displayed on the device Command Line Interface. 
+                At present, only the isSecure bit i.e. bit 0 will be supported and it will 
+                always be ON since only secure-mac entries are configurable and displayed 
+                in this table."
+            ::= { extremeFdbPermFdbEntry 5 }
+
+       extremeFdbPermFdbStatus          OBJECT-TYPE
+              SYNTAX                    RowStatus                      
+              MAX-ACCESS                read-create
+              STATUS                    current
+              DESCRIPTION
+                      "The status of this entry as per standard RowStatus conventions. 
+                      Note however, that createAndWait and notInService states are not 
+                      supported."
+
+              ::= { extremeFdbPermFdbEntry 6 }
+
+    extremeFdbMacExosFdbTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ExtremeFdbMacExosFdbEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table that contains information about the hardware MAC
+             FDB table. Supported only for switches running on EXOS."
+
+        ::= { extremeFdb 4 }
+
+    extremeFdbMacExosFdbEntry  OBJECT-TYPE
+        SYNTAX  ExtremeFdbMacExosFdbEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in the table of MAC FDB information."
+        INDEX { extremeFdbMacExosFdbMacAddress, extremeFdbMacExosFdbVlanIfIndex }
+        ::= {extremeFdbMacExosFdbTable 1}
+
+    ExtremeFdbMacExosFdbEntry ::= SEQUENCE {
+                 extremeFdbMacExosFdbMacAddress     MacAddress,
+                 extremeFdbMacExosFdbVlanIfIndex    Integer32,
+                 extremeFdbMacExosFdbPortIfIndex    Integer32,
+                 extremeFdbMacExosFdbStatus         INTEGER
+              }
+
+          extremeFdbMacExosFdbMacAddress OBJECT-TYPE
+              SYNTAX  MacAddress
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "A MAC address for which the bridge has
+                      forwarding and/or filtering information."
+              ::= { extremeFdbMacExosFdbEntry 1 }
+
+          extremeFdbMacExosFdbVlanIfIndex OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS read-only 
+              STATUS  current
+              DESCRIPTION
+                      "The ifIndex of the Vlan on which this mac is learned."
+              ::= { extremeFdbMacExosFdbEntry 2 }
+
+          extremeFdbMacExosFdbPortIfIndex OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Either the value '0', or the IfIndex of the
+                      port on which a frame having a source address
+                      equal to the value of the corresponding instance
+                      of dot1dTpFdbAddress has been seen.  A value of
+                      '0' indicates that the port IfIndex has not been
+                      learned but that the bridge does have some
+                      forwarding/filtering information about this
+                      address (e.g. in the dot1dStaticTable)."
+              ::= { extremeFdbMacExosFdbEntry 3 }
+
+          extremeFdbMacExosFdbStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                          other(1),
+                          invalid(2),
+                          learned(3),
+                          self(4),
+                          mgmt(5)
+                      }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "The status of this entry.  
+                      This is the value of dot1dTpFdbStatus in RFC1493."
+              ::= { extremeFdbMacExosFdbEntry 4 }
+
+        extremeFdbMacFdbCounterTable    OBJECT-TYPE
+              SYNTAX    SEQUENCE OF ExtremeFdbMacFdbCounterEntry
+              MAX-ACCESS  not-accessible
+              STATUS current
+              DESCRIPTION
+            "A table that contains change counters for the Operational FDB and ARP.
+                       Each entry in the table corresponds to an individual port.  Whenever
+                       a change occurs to the operational FDB (MAC learned, aged out or
+                       removed) or in the IP ARP table (learned, aged out or removed) , the
+                       counter associated with the port is incremented by one.
+
+                       The counters are reset at agent startup and when the port is down.
+                       They are not cleared when the port is enabled or disabled."
+
+              ::= { extremeFdb 5 }
+
+        extremeFdbMacFdbCounterEntry    OBJECT-TYPE
+              SYNTAX    ExtremeFdbMacFdbCounterEntry
+              MAX-ACCESS    not-accessible
+              STATUS    current
+              DESCRIPTION
+                   "An entry in the table of MAC FDB change counters."
+              INDEX { extremeFdbMacFdbCounterPortIfIndex }
+              ::= {extremeFdbMacFdbCounterTable 1}
+
+        ExtremeFdbMacFdbCounterEntry ::= SEQUENCE {
+              extremeFdbMacFdbCounterPortIfIndex     Integer32,
+              extremeFdbMacFdbCounterValue           Counter64
+        }
+
+        extremeFdbMacFdbCounterPortIfIndex OBJECT-TYPE
+              SYNTAX                     Integer32 
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                  "The ifIndex of the Port for which the counte applies."
+              ::= { extremeFdbMacFdbCounterEntry 1 }
+
+        extremeFdbMacFdbCounterValue OBJECT-TYPE
+              SYNTAX  Counter64
+              MAX-ACCESS read-only 
+              STATUS  current
+              DESCRIPTION
+                      "The count of the number of FDB changes for the given port
+                       since the counter was last reset."
+              ::= { extremeFdbMacFdbCounterEntry 2 }
+    
+
+    -- MAC address tracking trap definition
+    --
+    extremeMacTrackingTraps OBJECT IDENTIFIER
+        ::= { extremeFdb 6 }
+
+    extremeMacTrackingTrapsPrefix     OBJECT IDENTIFIER
+        ::= { extremeMacTrackingTraps 0 }
+
+    extremeMacTrackingMacAddress  OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "The MAC Address being tracked."
+        ::= { extremeMacTrackingTraps 1 }
+
+    extremeMacTrackingPortIfIndex  OBJECT-TYPE
+        SYNTAX       Integer32 
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION "The ifIndex of the port on which the MAC address was
+                     added/moved to, or deleted from."
+        ::= { extremeMacTrackingTraps 2 }
+
+    extremeMacTrackingPrevPortIfIndex  OBJECT-TYPE
+        SYNTAX       Integer32 
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION "The ifIndex of the port the MAC address was moved from."
+        ::= { extremeMacTrackingTraps 3 }
+
+    extremeMacTrackingVlanIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "The ifIndex of the VLAN on which the MAC address was received."
+        ::= { extremeMacTrackingTraps 4 }
+
+    extremeMACTrackingAdd NOTIFICATION-TYPE
+        OBJECTS     { extremeMacTrackingMacAddress,
+                      extremeMacTrackingVlanIfIndex,
+                      extremeMacTrackingPortIfIndex }
+        STATUS      current
+        DESCRIPTION "The specified MAC address was added to the FDB on the 
+                     mentioned port and VLAN."
+        ::= { extremeMacTrackingTrapsPrefix 1 }
+
+    extremeMACTrackingDel NOTIFICATION-TYPE
+        OBJECTS     { extremeMacTrackingMacAddress,
+                      extremeMacTrackingVlanIfIndex,
+                      extremeMacTrackingPortIfIndex }
+        STATUS      current
+        DESCRIPTION "The specified MAC address was deleted from the FDB on the
+                     mentioned port and VLAN."
+            ::= { extremeMacTrackingTrapsPrefix 2 }
+
+    extremeMACTrackingMove NOTIFICATION-TYPE
+        OBJECTS     { extremeMacTrackingMacAddress,
+                      extremeMacTrackingVlanIfIndex,
+                      extremeMacTrackingPrevPortIfIndex,
+                      extremeMacTrackingPortIfIndex }
+       STATUS      current
+       DESCRIPTION "The specified MAC address was moved from the previous port 
+                    to the new port on the specified VLAN."
+       ::= { extremeMacTrackingTrapsPrefix 3 }
+END

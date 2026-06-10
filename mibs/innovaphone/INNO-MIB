@@ -1,0 +1,576 @@
+INNO-MIB   DEFINITIONS ::= BEGIN
+
+    -- Innovaphone AG
+    -- Boeblinger Straße 76
+    -- D-71065 Sindelfingen
+    -- info@innovaphone.com
+
+    IMPORTS
+        Counter,TimeTicks,enterprises,IpAddress,Gauge
+            FROM RFC1155-SMI
+        OBJECT-TYPE
+            FROM RFC-1212
+        ifIndex
+            FROM RFC1213-MIB
+        TRAP-TYPE
+            FROM RFC-1215;
+
+
+    DisplayString ::= OCTET STRING
+
+    innovaphone OBJECT IDENTIFIER ::= { enterprises 6666 }
+        
+    isdn OBJECT IDENTIFIER ::= { innovaphone 1 }
+    
+--  **********************************
+--             LAPD table
+--  **********************************
+
+    l2Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF L2
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "ISDN layer2 table"
+        ::= { isdn 1 }
+        
+    l2Entry OBJECT-TYPE
+        SYNTAX      L2
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Layer 2 Entry"
+        INDEX       { l2Label }
+        ::= { l2Table 1 }
+        
+    L2 ::= SEQUENCE {
+        l2Label           DisplayString,
+        l2State           INTEGER,
+        l2Mode            INTEGER,
+        l1Label           DisplayString
+    }
+    
+    l2Label OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..8))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Name of this Layer 2 instance"
+        ::= { l2Entry 1 }
+
+    l2State OBJECT-TYPE
+        SYNTAX      INTEGER {
+            down(1),
+            up(2)
+        }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Indication whether the LAPD layer is active"
+        ::= { l2Entry 2   }
+        
+        
+    l2Mode OBJECT-TYPE
+        SYNTAX      INTEGER {
+            te(1),
+            nt(2)
+        }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Interface mode, either NT or TE"
+        ::= { l2Entry 3   }
+        
+    l1Label OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..8))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Name of Layer 1 (physical) instance this Layer 2
+             instance is working on"
+        ::= { l2Entry 4 }
+                
+        
+--  **********************************
+--             L1 PRI table
+--  **********************************
+
+    l1PriTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF L1Pri
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Layer1 table (primary rate interface)"
+        ::= { isdn 2 }
+        
+    l1PriEntry OBJECT-TYPE
+        SYNTAX      L1Pri
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Layer 1 Entry (primary rate interface)"
+        INDEX       { l1PriLabel }
+        ::= { l1PriTable 1 }
+        
+    L1Pri ::= SEQUENCE {
+        l1PriLabel              DisplayString,
+        l1PriState              INTEGER,
+        l1PriErrCrc4                 Counter,
+        l1PriErrRemAlarmInd          Counter,
+        l1PriErrSigLoss              Counter,
+        l1PriErrAlarmInd             Counter,
+        l1PriErrFrameAlignmentTOut   Counter,
+        l1PriErrFrameAlignmentLoss   Counter,
+        l1PriErrSlip                 Counter,
+        l1PriTest                    INTEGER
+    }
+
+    l1PriLabel OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..8))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Name of this Layer 1 instance"
+        ::= {  l1PriEntry 1  }
+        
+    l1PriState OBJECT-TYPE
+        SYNTAX      INTEGER {
+            down(1),
+            up(2)
+        }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Indication whether the physical layer is active"
+        ::= { l1PriEntry 2   }
+        
+    l1PriErrCrc4 OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "The CRC4 check of a received submultiframe failed."
+        ::= {  l1PriEntry 3  }
+                
+    l1PriErrRemAlarmInd OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Remote Alarm"
+        ::= {  l1PriEntry 4  }
+        
+    l1PriErrSigLoss OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Loss of signal"
+        ::= {  l1PriEntry 5  }
+        
+    l1PriErrAlarmInd OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Alarm Indication Signal"
+        ::= {  l1PriEntry 6  }
+        
+    l1PriErrFrameAlignmentTOut OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Receive Time Out 400 msec"
+        ::= {  l1PriEntry 7  }
+        
+    l1PriErrFrameAlignmentLoss OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Loss of Frame Alignment"
+        ::= {  l1PriEntry 8  }
+                    
+    l1PriErrSlip OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Receive SLIP detected"
+        ::= {  l1PriEntry 9  }
+
+    l1PriTest OBJECT-TYPE
+        SYNTAX      INTEGER {
+            noTest(0),
+            simAlarm(1),
+            resetAlarms(2)
+        }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION 
+            "Triggers,resets some hardware alarm counters "
+        ::= { l1PriEntry 10   }
+        
+--  **********************************
+--             L1 BRI table
+--  **********************************
+
+    l1BriTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF L1Bri
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Layer1 table (basic rate interface)"
+        ::= { isdn 3 }
+        
+    l1BriEntry OBJECT-TYPE
+        SYNTAX      L1Bri
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Layer 1 Entry (basic rate rate interface)"
+        INDEX       { l1BriLabel }
+        ::= { l1BriTable 1 }
+        
+    L1Bri ::= SEQUENCE {
+        l1BriLabel              DisplayString,
+        l1BriState              INTEGER
+    }
+
+    l1BriLabel OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..8))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Name of this Layer 1 instance"
+        ::= {  l1BriEntry 1  }
+        
+    l1BriState OBJECT-TYPE
+        SYNTAX      INTEGER {
+            down(1),
+            up(2)
+        }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Indication whether the physical layer is active"
+        ::= { l1BriEntry 2   }
+        
+--  **********************************
+--             L3 table
+--  **********************************
+
+    l3Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF L3
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Layer3 table"
+        ::= { isdn 4 }
+        
+    l3Entry OBJECT-TYPE
+        SYNTAX      L3
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Layer 3 Entry"
+        INDEX       { l3Label }
+        ::= { l3Table 1 }
+        
+    L3 ::= SEQUENCE {
+        l3Label              DisplayString,
+        l3Protocol           INTEGER,
+        l3NumBchan           INTEGER,
+        l3NumBchanActive     Gauge,
+        l3CallsBoot          Counter
+    }
+
+    l3Label OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(1..8))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Name of this Layer 3 instance"
+        ::= {  l3Entry 1  }
+        
+    l3Protocol OBJECT-TYPE
+        SYNTAX      INTEGER {
+            none(0),
+            other(1),
+            etsi(3),
+            qsig(23)
+        }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "The Isdn signalling protocol on this interface"
+        ::= { l3Entry 2   }
+        
+    l3NumBchan OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Number of B-channels available"
+        ::= { l3Entry 3   }
+
+    l3NumBchanActive OBJECT-TYPE
+        SYNTAX      Gauge
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Number of B-channels currently active.
+            May also be understood as number of calls
+            currently active on this interface."
+        ::= { l3Entry 4   }
+
+    l3CallsBoot OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Accumulated Number of Calls on this interface
+            since last Boot"
+        ::= { l3Entry 5   }
+
+--  **********************************
+--             Gateway group
+--  **********************************
+
+    gateway OBJECT IDENTIFIER ::= { innovaphone 2 }
+        
+--  **********************************
+--             gatekeeper
+--  **********************************
+
+    gatekeeper OBJECT IDENTIFIER ::= { gateway 1 }
+    
+--  **********************************
+--          Voice Interfaces
+--  **********************************
+
+    voiceIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF VoiceIf
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Voice Interfaces Table. Features either
+            physical interfaces or aliases."
+        ::= { gatekeeper 1 }
+        
+    voiceIfEntry OBJECT-TYPE
+        SYNTAX      VoiceIf
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION 
+            "Voice Interfaces Entry.Features either
+            physical interfaces or aliases."
+        INDEX       { voiceIfIndex,     
+                      voiceIfAliasIndex  }
+        ::= { voiceIfTable 1 }
+        
+    VoiceIf ::= SEQUENCE {
+        voiceIfGwName           DisplayString,
+        voiceIfType             INTEGER,
+        voiceIfAddr             IpAddress,
+        voiceIfState            INTEGER,
+        voiceIfNumber           DisplayString,
+        voiceIfName             DisplayString,
+        voiceIfProduct          DisplayString,
+        voiceIfIndex            INTEGER,
+        voiceIfAliasIndex       INTEGER
+    }
+
+    voiceIfGwName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Only of interest for aliases to show at which GWxx
+            an alias has been/will be registered"
+        ::= { voiceIfEntry 1   }
+
+    voiceIfType OBJECT-TYPE
+        SYNTAX      INTEGER {
+            unkown(0), --e.g. if interface>1 is down
+            if(1),     --interface (physical)
+            ep(2),     --endpoint
+            gk(3),     --gatekeeper
+            gw(4)      --gateway
+        }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "The type of the interface"
+        ::= { voiceIfEntry 2   }
+
+    voiceIfAddr OBJECT-TYPE
+        SYNTAX      IpAddress 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "ip address, only of interest if interface state 
+             is up"
+        ::= { voiceIfEntry 3   }
+
+    voiceIfState OBJECT-TYPE
+        SYNTAX      INTEGER {
+            down(0),
+            up(1)
+        } 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "Interface state"
+        ::= { voiceIfEntry 4   }
+
+    voiceIfNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "The E.164 number registered by this interface"
+        ::= { voiceIfEntry 5   }
+
+    voiceIfName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "The H.323 Name registered by this interface"
+        ::= { voiceIfEntry 6   }
+
+    voiceIfProduct OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "If available the description of the registering
+            product"
+        ::= { voiceIfEntry 7   }
+        
+    voiceIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER(1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Increasing index of an interface,
+            utilized as first suboid of entry index."
+        ::= { voiceIfEntry 8   }
+
+    voiceIfAliasIndex OBJECT-TYPE
+        SYNTAX      INTEGER(1..65535)
+        ACCESS      read-only
+        STATUS      optional
+        DESCRIPTION
+        "If interface is an alias, this is the
+        increasing index of alias at an interface. 
+        Otherwise -1 will be returned.
+        Utilized as second suboid of entry index."
+        ::= { voiceIfEntry 9   }
+        
+--  **********************************
+--             Traps
+--  **********************************
+
+--     trapDummyGroup doesn't really exist
+    trapDummyGroup OBJECT IDENTIFIER ::= { innovaphone 3 }
+
+    trapDisplayStringParm OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..255))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "This variable doesn't exist. Its purpose is to
+             be syntactically referenced as a variable within 
+             a trap."
+        ::= { trapDummyGroup 1   }
+
+    trapIntegerParm OBJECT-TYPE
+        SYNTAX      INTEGER(1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "This variable doesn't exist. Its purpose is to
+             be syntactically referenced as a variable within 
+             a trap."
+        ::= { trapDummyGroup 2   }
+
+    trapGaugeParm OBJECT-TYPE
+        SYNTAX      Gauge
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION 
+            "This variable doesn't exist. Its purpose is to
+             be syntactically referenced as a variable within 
+             a trap."
+        ::= { trapDummyGroup 3   }
+
+    innoColdStart TRAP-TYPE
+        ENTERPRISE innovaphone
+        DESCRIPTION
+        "An unexpected restart happened."
+        ::= 0
+    
+    innoWarmStart TRAP-TYPE
+        ENTERPRISE  innovaphone
+        DESCRIPTION
+        "The device has been reset administratively."
+        ::= 1
+
+    innoLinkDown TRAP-TYPE
+        ENTERPRISE  innovaphone
+        VARIABLES   { ifIndex }
+        DESCRIPTION
+        "An interface link went down (PPP)."
+        ::= 2
+
+    innoLinkUp TRAP-TYPE
+        ENTERPRISE  innovaphone
+        VARIABLES   { ifIndex }
+        DESCRIPTION
+        "An interface link went up."
+        ::= 3
+
+    innoAuthenticationFailure TRAP-TYPE
+        ENTERPRISE  innovaphone
+        DESCRIPTION
+        "An Snmp PDU with a wrong community string has
+        been received."
+        ::= 4
+
+    innoIsdnFailure TRAP-TYPE
+        ENTERPRISE  innovaphone
+        VARIABLES   { 
+              trapDisplayStringParm,  -- Name of originating interface
+              trapIntegerParm         -- interface is down(0) or up(1)
+        }
+        DESCRIPTION
+        "Obsoleted: This SNMP trap is no longer necessary. Meanwhile it is covered more consistently by innoDiagAlarm and innoDiagAlarmClear.
+         Removed from on v9hf16."
+        ::= 5
+
+    innoDiagAlarm TRAP-TYPE
+        ENTERPRISE  innovaphone
+        VARIABLES   { 
+              trapGaugeParm,          -- Alarm Code
+              trapDisplayStringParm,  -- Alarm Source
+              trapGaugeParm,          -- Severity: indeterminate(0),major(1),critical(2)
+              trapDisplayStringParm   -- Alarm Text
+        }
+        DESCRIPTION
+        "This trap corresponds to an alarm under Administration/Diagnostics/Alarms"
+        ::= 6
+
+    innoDiagAlarmClear TRAP-TYPE
+        ENTERPRISE  innovaphone
+        VARIABLES   { 
+              trapGaugeParm,          -- Alarm Code
+              trapDisplayStringParm   -- Alarm Source
+        }
+        DESCRIPTION
+        "This trap corresponds to an alarm clearing under Administration/Diagnostics/Alarms"
+        ::= 7
+        
+END -- Module

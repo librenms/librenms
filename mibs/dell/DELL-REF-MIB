@@ -1,0 +1,248 @@
+DELL-REF-MIB DEFINITIONS ::= BEGIN
+
+-- DELL NETWORKING OS Reference MIB
+-- Copyright 2016-2020 Broadcom.
+-- This SNMP Management Information Specification
+-- embodies Broadcom's confidential and proprietary
+-- intellectual property.  Broadcom retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Broadcom
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY                     FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                  FROM SNMPv2-TC
+    dellLanExtension                    FROM Dell-Vendor-MIB
+    dellLan                             FROM Dell-Vendor-MIB;
+
+    lvl7 MODULE-IDENTITY
+        LAST-UPDATED "201812270000Z" -- 27 Dec 2018 12:00:00 GMT
+        ORGANIZATION            "Dell Inc."
+        CONTACT-INFO            "support.dell.com"
+        DESCRIPTION
+          ""
+
+        -- Revision history.
+        REVISION
+          "201812270000Z" -- 27 Dec 2018 12:00:00 GMT
+        DESCRIPTION
+          "New Object added for Albion N1108EP-ON Model."
+        REVISION
+          "201304120000Z" -- 12 Apr 2013 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+        "201303270000Z" -- 27 Mar 2013 12:00:00 GMT
+        DESCRIPTION
+          "Updated for new release."
+        REVISION
+        "201104140000Z" -- 14 Apr 2011 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200302061200Z" -- 6 February 2003 12:00:00 GMT
+        DESCRIPTION
+          "Updated for release"
+        REVISION
+          "201307080000Z" -- 8 July 2013 12:00:00 GMT
+        DESCRIPTION
+          "Updated for new release"
+
+    ::= {  dellLanExtension 6132 }
+
+
+-- New definitions
+ lvl7Products             OBJECT IDENTIFIER ::= { lvl7 1 }
+ dnOS                 OBJECT IDENTIFIER ::= { lvl7Products 1 }
+
+-- These OID to be used in sysObjId to identify the specific switch type:
+
+-- sysObjId for 6224
+ dell6224Switch   OBJECT IDENTIFIER   ::= { dellLan 3010 }
+-- sysObjId for 6248
+ dell6248Switch   OBJECT IDENTIFIER   ::= { dellLan 3011 }
+-- sysObjId for 6224P
+ dell6224PSwitch   OBJECT IDENTIFIER  ::= { dellLan 3012 }
+-- sysObjId for 6248P
+ dell6248PSwitch   OBJECT IDENTIFIER  ::= { dellLan 3013 }
+-- sysObjId for 6224F
+ dell6224FSwitch   OBJECT IDENTIFIER  ::= { dellLan 3014 }
+-- sysObjId for M6220
+ dellM6220Switch  OBJECT IDENTIFIER   ::= { dellLan 3015 }
+
+-- sysObjId for M8024
+ dellM8024Switch  OBJECT IDENTIFIER   ::= { dellLan 3022 }
+-- sysObjId for 8024
+ dell8024Switch  OBJECT IDENTIFIER    ::= { dellLan 3023 }
+-- sysObjId for 8024F
+ dell8024FSwitch  OBJECT IDENTIFIER   ::= { dellLan 3024 }
+-- sysObjId for M6384
+ dellM6384Switch  OBJECT IDENTIFIER   ::= { dellLan 3025 }
+
+-- sysObjId for 7024
+ dell7024Switch  OBJECT IDENTIFIER    ::= { dellLan 3034 }
+-- sysObjId for 7048
+ dell7048Switch  OBJECT IDENTIFIER    ::= { dellLan 3035 }
+-- sysObjId for 7024P
+ dell7024PSwitch  OBJECT IDENTIFIER   ::= { dellLan 3036 }
+-- sysObjId for 7048P
+ dell7048PSwitch  OBJECT IDENTIFIER   ::= { dellLan 3037 }
+-- sysObjId for 7024F
+ dell7024FSwitch  OBJECT IDENTIFIER   ::= { dellLan 3038 }
+-- sysObjId for 7048R
+ dell7048RSwitch  OBJECT IDENTIFIER   ::= { dellLan 3039 }
+-- sysObjId for 7048R-RA
+ dell7048RRASwitch  OBJECT IDENTIFIER ::= { dellLan 3040 }
+-- sysObjId for M8024-k
+ dellM8024KSwitch  OBJECT IDENTIFIER  ::= { dellLan 3041 }
+
+-- sysObjId for 4032
+ dellN4032Switch     OBJECT IDENTIFIER ::= { dellLan 3042 }
+-- sysObjId for 4032F
+ dellN4032FSwitch    OBJECT IDENTIFIER ::= { dellLan 3044 }
+-- sysObjId for 4064
+ dellN4064Switch     OBJECT IDENTIFIER ::= { dellLan 3045 }
+-- sysObjId for 4064F
+ dellN4064FSwitch    OBJECT IDENTIFIER ::= { dellLan 3046 }
+
+-- sysObjId for 2024
+ dellN2024Switch      OBJECT IDENTIFIER ::= { dellLan 3053 }
+-- sysObjId for 2048
+ dellN2048Switch      OBJECT IDENTIFIER ::= { dellLan 3054 }
+-- sysObjId for 2024P
+ dellN2024PSwitch     OBJECT IDENTIFIER ::= { dellLan 3055 }
+-- sysObjId for 2048P
+ dellN2048PSwitch     OBJECT IDENTIFIER ::= { dellLan 3056 }
+
+-- sysObjId for 3024
+ dellN3024Switch      OBJECT IDENTIFIER ::= { dellLan 3057 }
+-- sysObjId for 3048
+ dellN3048Switch      OBJECT IDENTIFIER ::= { dellLan 3058 }
+-- sysObjId for 3024P
+ dellN3024PSwitch     OBJECT IDENTIFIER ::= { dellLan 3059 }
+-- sysObjId for 3048P
+ dellN3048PSwitch     OBJECT IDENTIFIER ::= { dellLan 3060 }
+-- sysObjId for 3024F
+ dellN3024FSwitch     OBJECT IDENTIFIER ::= { dellLan 3061 }
+
+-- sysObjId for 3048EP-ON
+ dellN3048EP-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3084 }
+-- sysObjId for 3048ET-ON
+ dellN3048ET-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3085 }
+-- sysObjId for 3024EP-ON
+ dellN3024EP-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3086 }
+-- sysObjId for 3024EF-ON
+ dellN3024EF-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3087 }
+-- sysObjId for 3024ET-ON
+ dellN3024ET-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3088 }
+
+
+-- sysObjId for 1608X-ON
+ dellN1608X-ONSwitch OBJECT IDENTIFIER  ::= { dellLan 3089 }
+-- sysObjId for 1608PX-ON
+ dellN1608PX-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3090 }
+-- sysObjId for 1616X-ON
+ dellN1616X-ONSwitch OBJECT IDENTIFIER  ::= { dellLan 3091 }
+-- sysObjId for 1616PX-ON
+ dellN1616PX-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3092 }
+-- sysObjId for 1624X-ON
+ dellN1624X-ONSwitch OBJECT IDENTIFIER  ::= { dellLan 3093 }
+-- sysObjId for 1624PX-ON
+ dellN1624PX-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3094 }
+-- sysObjId for 1648X-ON
+ dellN1648X-ONSwitch OBJECT IDENTIFIER  ::= { dellLan 3095 }
+-- sysObjId for 1648PX-ON
+ dellN1648PX-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3096 }
+
+-- sysObjId for 2224-ON
+ dellN2224X-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3097 }
+-- sysObjId for 2224PX-ON
+ dellN2224PX-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3098 }
+-- sysObjId for 2248X-ON
+ dellN2248X-ONSwitch OBJECT IDENTIFIER  ::= { dellLan 3099 }
+-- sysObjId for 2248PX-ON
+ dellN2248PX-ONSwitch OBJECT IDENTIFIER ::= { dellLan 3100 }
+
+-- sysObjId for N3248PXE-ON
+ dellN3248PXE-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3109 }
+-- sysObjId for N3248TE-ON
+ dellN3248TE-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3113 }
+-- sysObjId for N3224T-ON
+ dellN3224T-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3110 }
+-- sysObjId for N3248X-ON
+ dellN3248X-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3107 }
+-- sysObjId for N3224PX-ON
+ dellN3224PX-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3106 }
+-- sysObjId for N3224X-ON
+ dellN3224X-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3105 }
+-- sysObjId for N3248P-ON
+ dellN3248P-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3114 }
+-- sysObjId for N3224P-ON
+ dellN3224P-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3112 }
+-- sysObjId for N3224F-ON
+ dellN3224F-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3111 }
+-- sysObjId for N3208PX-ON
+ dellNN3208PX-ONSwitch OBJECT IDENTIFIER   ::= { dellLan 3104 }
+
+-- sysObjId for 1524
+ dellN1524Switch      OBJECT IDENTIFIER ::= { dellLan 3063 }
+-- sysObjId for 1524P
+ dellN1524PSwitch     OBJECT IDENTIFIER ::= { dellLan 3064 }
+-- sysObjId for 1548
+ dellN1548Switch      OBJECT IDENTIFIER ::= { dellLan 3065 }
+-- sysObjId for 1548P
+ dellN1548PSwitch     OBJECT IDENTIFIER ::= { dellLan 3066 }
+
+-- sysObjId for N3132PX
+ dellN3132PXSwitch    OBJECT IDENTIFIER ::= { dellLan 3076 }
+-- sysObjId for N2128PX
+ dellN2128PXSwitch    OBJECT IDENTIFIER ::= { dellLan 3077 }
+
+-- sysObjId for N1108T-ON
+ dellN1108T-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3078 }
+-- sysObjId for N1108P-ON
+ dellN1108P-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3079 }
+-- sysObjId for N1124T-ON
+ dellN1124T-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3080 }
+-- sysObjId for N1124P-ON
+ dellN1124P-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3081 }
+-- sysObjId for N1148T-ON
+ dellN1148T-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3082 }
+-- sysObjId for N1148P-ON
+ dellN1148P-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3083 }
+-- sysObjId for N1108EP-ON
+ dellN1108EP-ONSwitch    OBJECT IDENTIFIER ::= { dellLan 3115 }
+
+AgentPortMask ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "255x"
+   STATUS  current
+   DESCRIPTION
+       "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'
+
+        When setting this value, the system will ignore
+        configuration for ports not between the first and last
+        valid ports.  Configuration of any port numbers between
+        this range that are not valid ports return a failure
+        message, but will still apply configuration for valid
+        ports."
+   SYNTAX  OCTET STRING (SIZE (1..255))
+
+
+END

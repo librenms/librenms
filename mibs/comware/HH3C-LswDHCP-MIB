@@ -1,0 +1,219 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: DHCP MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--(1) Created by Zhang Shilin, 2001.6.29
+--(2) Revised by Qi Zhenglin, 2002.01.08
+-- ==================================================================
+
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+
+HH3C-LswDHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    RowStatus, MacAddress
+        FROM SNMPv2-TC
+
+    MODULE-IDENTITY,OBJECT-TYPE, IpAddress
+        FROM SNMPv2-SMI
+
+    hh3clswCommon
+        FROM HH3C-OID-MIB;
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+hh3cLswDhcpMib MODULE-IDENTITY
+            LAST-UPDATED "200106290000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            ""
+            REVISION "200106290000Z"
+            DESCRIPTION
+            ""
+            ::= { hh3clswCommon  8 }
+
+    hh3cLswDhcpMibObject OBJECT IDENTIFIER ::= {  hh3cLswDhcpMib 1  }
+
+    hh3cDhcpGroupTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDhcpGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "A table containing the information of dhcp group "
+        ::= { hh3cLswDhcpMibObject 1 }
+
+
+     hh3cDhcpGroupEntry OBJECT-TYPE
+        SYNTAX  Hh3cDhcpGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "A table entry containing the information of dhcp group "
+        INDEX   { hh3cDhcpGroupID }
+        ::= { hh3cDhcpGroupTable 1 }
+
+    Hh3cDhcpGroupEntry    ::=
+    SEQUENCE {
+        hh3cDhcpGroupID           INTEGER ,
+        hh3cIpDhcpServerAddress1  IpAddress ,
+        hh3cIpDhcpServerAddress2  IpAddress ,
+        hh3cDhcpRowStatus         RowStatus
+        }
+
+    hh3cDhcpGroupID OBJECT-TYPE
+        SYNTAX  INTEGER  (0..19)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION " DHCP group identifier "
+        ::= { hh3cDhcpGroupEntry 1 }
+
+    hh3cIpDhcpServerAddress1 OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " The first IP address of DHCP server group "
+        ::= { hh3cDhcpGroupEntry 2 }
+
+    hh3cIpDhcpServerAddress2 OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " The second IP address of DHCP server group "
+        ::= { hh3cDhcpGroupEntry 3 }
+
+    hh3cDhcpRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION " Operation status of this table entry     "
+        ::= { hh3cDhcpGroupEntry 4 }
+
+    hh3cDhcpSecurityTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDhcpSecurityEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "A table containing the information of dhcp security "
+        ::= { hh3cLswDhcpMibObject 2 }
+
+
+     hh3cDhcpSecurityEntry OBJECT-TYPE
+        SYNTAX  Hh3cDhcpSecurityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "A table containing the information of dhcp security "
+        INDEX   { hh3cDhcpClientIpAddress }
+        ::= { hh3cDhcpSecurityTable 1 }
+
+    Hh3cDhcpSecurityEntry    ::=
+    SEQUENCE {
+        hh3cDhcpClientIpAddress   IpAddress ,
+        hh3cDhcpClientMacAddress  MacAddress,
+        hh3cDhcpClientProperty    INTEGER ,
+        hh3cDhcpClientRowStatus   RowStatus
+        }
+
+    hh3cDhcpClientIpAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " DHCP client's net ip address "
+        ::= { hh3cDhcpSecurityEntry 1 }
+
+    hh3cDhcpClientMacAddress OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " DHCP client's mac address     "
+        ::= { hh3cDhcpSecurityEntry 2 }
+
+    hh3cDhcpClientProperty OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            static(1),
+            dynamic(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Property of client address     "
+        ::= { hh3cDhcpSecurityEntry 3 }
+
+    hh3cDhcpClientRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION " status of this table's entry.     "
+        ::= { hh3cDhcpSecurityEntry 4 }
+
+
+    hh3cDhcpToL3IfTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cDhcpToL3IfEntry
+        MAX-ACCESS not-accessible
+        STATUS   current
+        DESCRIPTION "A table configuring dhcp for layer 3 interface"
+        ::= { hh3cLswDhcpMibObject 3 }
+
+
+    hh3cDhcpToL3IfEntry OBJECT-TYPE
+        SYNTAX  Hh3cDhcpToL3IfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "A table configuring dhcp for layer 3 interface "
+        INDEX   { hh3cDhcpToL3VlanIfIndex }
+        ::= { hh3cDhcpToL3IfTable 1 }
+
+    Hh3cDhcpToL3IfEntry    ::=
+    SEQUENCE {
+        hh3cDhcpToL3VlanIfIndex  INTEGER ,
+        hh3cDhcpToL3GroupId      INTEGER,
+        hh3cDhcpToL3AddressCheck INTEGER ,
+        hh3cDhcpToL3RowStatus    RowStatus
+        }
+
+    hh3cDhcpToL3VlanIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " vlan virtual interface index "
+        ::= { hh3cDhcpToL3IfEntry 1 }
+
+    hh3cDhcpToL3GroupId OBJECT-TYPE
+        SYNTAX  INTEGER  (0..19)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " DHCP group id for this vlan virtual interface"
+        ::= { hh3cDhcpToL3IfEntry 2 }
+
+    hh3cDhcpToL3AddressCheck OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " If dhcp security check enabled for this vlan virtual interface "
+        ::= { hh3cDhcpToL3IfEntry 3 }
+
+    hh3cDhcpToL3RowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION " status of this table's entry.     "
+        ::= { hh3cDhcpToL3IfEntry 4 }
+END

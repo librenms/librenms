@@ -1,0 +1,187 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "powerdns",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "powerdns",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "corruptPackets",
+                    "value": 263986,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "def_cacheInserts",
+                    "value": 103618,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "def_cacheLookup",
+                    "value": 46903,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "latency",
+                    "value": 77,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "pc_hit",
+                    "value": 26752411,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "pc_miss",
+                    "value": 56237088,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "pc_size",
+                    "value": 10144,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_tcpAnswers",
+                    "value": 342297,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_tcpQueries",
+                    "value": 342337,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_timedout",
+                    "value": 101,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_udp4Answers",
+                    "value": 69162533,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_udp4Queries",
+                    "value": 69139691,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_udp6Answers",
+                    "value": 13642112,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_udp6Queries",
+                    "value": 13618995,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_udpAnswers",
+                    "value": 82804645,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "q_udpQueries",
+                    "value": 82758686,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "qc_hit",
+                    "value": 116318482,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "qc_miss",
+                    "value": 132904846,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "qsize",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "rec_answers",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "rec_questions",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                },
+                {
+                    "metric": "servfailPackets",
+                    "value": 263453,
+                    "value_prev": null,
+                    "app_type": "powerdns"
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64",
+                    "sysContact": "<private>",
+                    "version": "3.10.0-693.5.2.el7.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

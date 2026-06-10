@@ -1,0 +1,2856 @@
+ALU-MICROWAVE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        NOTIFICATION-TYPE, Counter64, IpAddress,
+        Unsigned32, Integer32
+                                                FROM SNMPv2-SMI
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, 
+        NOTIFICATION-GROUP                      FROM SNMPv2-CONF
+
+        TEXTUAL-CONVENTION, DateAndTime, TimeStamp,
+        TruthValue, RowStatus, DisplayString    FROM SNMPv2-TC
+                
+		tmnxChassisIndex                        FROM TIMETRA-CHASSIS-MIB
+		
+		TmnxPortID, TNamedItemOrEmpty,
+		TmnxActionType,
+		TmnxDisplayStringURL                    FROM TIMETRA-TC-MIB
+		
+		TmnxPortOperStatus                      FROM TIMETRA-PORT-MIB
+		
+        aluSARMIBModules, aluSARObjs,
+        aluSARConfs, aluSARNotifyPrefix         FROM ALU-SAR-GLOBAL-MIB
+
+        SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+        ;
+
+
+aluMwMIBModule MODULE-IDENTITY
+        LAST-UPDATED    "0809100000Z"
+        ORGANIZATION    "Nokia"
+        CONTACT-INFO    
+            "Nokia 7x50 Support
+             Web: http://www.nokia.com/comps/pages/carrier_support.jhtml"
+        DESCRIPTION
+        "This document is the SNMP MIB module to manage and provision the 
+        microwave components on the Nokia 7xxx device.
+        
+        Copyright 2012-2014 Nokia.  All rights reserved.
+        Reproduction of this document is authorized on the condition that
+        the foregoing copyright notice is included.
+
+        This SNMP MIB module (Specification) embodies Nokia's
+        proprietary intellectual property.  Nokia retains 
+        all title and ownership in the Specification, including any 
+        revisions.
+
+        Nokia grants all interested parties a non-exclusive 
+        license to use and distribute an unmodified copy of this 
+        Specification in connection with management of Nokia 
+        products, and without fee, provided this copyright notice and 
+        license appear on all copies.
+
+        This Specification is supplied 'as is', and Nokia 
+        makes no warranty, either express or implied, as to the use, 
+        operation, condition, or performance of the Specification."
+
+--
+--  Revision History
+--
+        REVISION        "0801090000Z"
+        DESCRIPTION     "Rev 1.0                09 Jan 2008 00:00 
+                         1.0 release of the ALU-MICROWAVE-MIB."
+                         
+        ::= { aluSARMIBModules 6 }
+
+
+aluMwObjPrefix               OBJECT IDENTIFIER ::= { aluSARObjs 7 }
+  aluMwObjs                    OBJECT IDENTIFIER ::= { aluMwObjPrefix 1 }       
+  aluMwNotifyObjs              OBJECT IDENTIFIER ::= { aluMwObjPrefix 2 }       
+
+aluMwMIBConformance          OBJECT IDENTIFIER ::= { aluSARConfs 7 }
+aluMwConformance             OBJECT IDENTIFIER ::= { aluMwMIBConformance 1 }
+
+aluMwNotifyPrefix OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 10 } 
+  aluMwNotification OBJECT IDENTIFIER ::= { aluMwNotifyPrefix 0 } 
+
+--
+--      ALU-MICROWAVE-MIB at a glance
+-- 
+--  timetra (enterprises 6527)
+--    timetraBasedProducts (6)
+--		aluServiceAggrRouters (1)
+--        aluSARObjects (2)
+--        	aluSARMIB (1)
+--                aluSARConfs (1)
+--                aluSARObjs (2)
+--                      aluMwObjs (aluSARObjs 7)
+--                aluSARNotifyPrefix (3)
+--
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--      ALU-MICROWAVE-MIB textual conventions
+--
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--     AluMwLinkID
+--
+AluMwLinkID ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "A AluMwLinkID is an unique 32 bit number identifying a
+        Packet Microwave Link encoded as shown below.
+
+            |32 30| 29 26 | 25 22 | 21 16 | 15     13 | 12   1|
+            +-----+-------+-------+-------+-----------+-------+
+            |011  |  all zeros    |  id   |  all zeros        |
+            +-----+-------+-------+-------+-----------+-------+
+
+         There may be multiple MW Links on each system."
+    SYNTAX  Unsigned32
+
+--
+--      AluMwLinkRadioActivity
+--
+AluMwLinkRadioActivity ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The AluMwLinkRadioActivity data type is an enumerated integer that 
+         describes which radio (main or spare) is active in a particular
+         protection scheme."
+    SYNTAX  INTEGER {
+                notApplicable         (1),
+                mainRadio             (2),
+                spareRadio            (3),
+                bothActive            (4)
+            }
+
+--
+--      AluMwLinkRevertiveness
+--
+AluMwLinkRevertiveness ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The AluMwLinkRevertiveness data type is an enumerated integer that 
+         describes the revertiveness of a particular protection scheme."
+    SYNTAX  INTEGER {
+                notApplicable         (1),
+                revertive             (2),
+                nonRevertive          (3)
+            }
+
+--
+--      AluMwLinkRadioMaintenanceOp
+--
+AluMwLinkMaintenanceOp ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "The AluMwLinkMaintenanceOp data type is an enumerated integer that 
+         describes the maintentance operation is active in a particular
+         protection scheme."
+    SYNTAX  INTEGER {
+                none                  (0),
+                lockout               (1),
+                forced                (2),
+                manual                (3)
+            }
+
+--
+--      AluMwRadioSwState
+--
+AluMwRadioSwState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "AluMwRadioSwState describes the state of software on 
+        the MPT.
+              unknown            - Indicates s/w version is unknown. 
+              dwnldRequested     - Software Download Requested
+              dwnldForced        - Forced Software Download Requested
+              inProgress         - Software download in progress
+              ready              - Software is downloaded and ready for upgrade
+              ok                 - Software is correct and running on MPT
+              mismatch           - Radio software is mismatched with running software
+              dwnldFailed        - Download of software failed"
+    SYNTAX      INTEGER {
+                    unknown            (0),
+                    dwnldRequested     (1),
+                    dwnldForced        (2),
+                    inProgress         (3),
+                    ready              (4),                
+                    ok                 (5),
+                    mismatch           (6),
+                    dwnldFailed        (7)
+                }
+
+AluMwPerfMonSection ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "$[OBJECT] is used to select the particular
+        performance monitoring point from which to receive statistics.
+            radioHop        - Selects the stats for this radio in a 1+1,
+                              or the only possible selection in 1+0.
+            radioLink       - Selects the stats for the radio link, combining
+                              the main and spare in a 1+1."
+    SYNTAX  INTEGER {
+                radioHop  (0),
+                radioLink (1)
+            }
+
+AluMwPerfMonPeriod ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "$[OBJECT] is used to choose the elapsed time period
+        from which to receive statistics."
+    SYNTAX  INTEGER {
+                fifteenMinute    (0),
+                twentyFourHour   (1)
+            }
+
+AluMwPerfMonBin ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "$[OBJECT] is used to select a specific performance monitoring bin.
+        - 0     Selects the current data, and actively retrieves the stats
+                from the radio.
+        - 1..96 Selects one of the historic data bins, from most recent
+                to oldest. Only bins 1 through 8 are available for period
+                twentyFourHour."
+    SYNTAX  INTEGER (0 | 1..96)
+
+AluMwPerfMonEPSState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "$[OBJECT] is the EPS state at the time the performance
+        monitoring was recorded. notRelevant is returned if the radio is
+        in a 1+0 configuration."
+    SYNTAX  INTEGER {
+                notActive   (0),
+                active      (1),
+                notRelevant (2)
+            }
+
+--
+-- MW Link Table
+--
+aluMwLinkTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluMwLinkTable has an entry for each Packet Microwave Link in the system."
+    ::= { aluMwObjs 1 }
+aluMwLinkEntry       OBJECT-TYPE
+    SYNTAX      AluMwLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Packet Microwave Link that is provisioned on the system.   
+                  
+         Entries can be created and deleted on the system via SNMP SET operations
+         operations using the aluMwLinkRowStatus object. Creation of this entry enables 
+         management of Packet Microwave (MW) Links that contain Microwave Radios. The 
+         operational state of the link is based on the state of the contained radios and 
+         protection scheme provisioned."
+    INDEX       { tmnxChassisIndex, aluMwLinkID }
+    ::= { aluMwLinkTable 1 }
+
+AluMwLinkEntry ::=
+    SEQUENCE {
+        aluMwLinkID                  AluMwLinkID,
+        aluMwLinkRowStatus           RowStatus,
+        aluMwLinkOperFlags           BITS,
+        aluMwLinkRadioScheme         INTEGER,
+        aluMwLinkAlarmState          INTEGER,
+        aluMwLinkAlarmsCritical      INTEGER,
+        aluMwLinkAlarmsMajor         INTEGER,
+        aluMwLinkAlarmsMinor         INTEGER,
+        aluMwLinkAlarmsWarning       INTEGER,
+        aluMwLinkAlarmsInd           INTEGER,
+        aluMwLinkAlarmsCommunication INTEGER,
+        aluMwLinkAlarmsEquipment     INTEGER,
+        aluMwLinkEPSActivity         AluMwLinkRadioActivity,
+        aluMwLinkTPSActivity         AluMwLinkRadioActivity,
+        aluMwLinkRPSActivity         AluMwLinkRadioActivity,
+        aluMwLinkEPSRevertiveness    AluMwLinkRevertiveness,
+        aluMwLinkTPSRevertiveness    AluMwLinkRevertiveness,
+        aluMwLinkRPSRevertiveness    AluMwLinkRevertiveness,
+        aluMwLinkEPSMainMaintOp      AluMwLinkMaintenanceOp,
+        aluMwLinkEPSSpareMaintOp     AluMwLinkMaintenanceOp,
+        aluMwLinkTPSMainMaintOp      AluMwLinkMaintenanceOp,
+        aluMwLinkTPSSpareMaintOp     AluMwLinkMaintenanceOp,
+        aluMwLinkRPSMainMaintOp      AluMwLinkMaintenanceOp,
+        aluMwLinkRPSSpareMaintOp     AluMwLinkMaintenanceOp,
+        aluMwLinkPeerID              AluMwLinkID,
+        aluMwLinkPeerNEIpAddress     IpAddress,
+        aluMwLinkClearStatistics     TmnxActionType,
+        aluMwLinkPeerDiscovery       TruthValue
+    }
+
+aluMwLinkID    OBJECT-TYPE
+    SYNTAX      AluMwLinkID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkID identifies this Packet Microwave Link. The value of this object is 
+        calculated using the TiMOS encoding scheme described in AluMwLinkID."
+    ::= { aluMwLinkEntry 1 }
+
+aluMwLinkRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkRowStatus controls the creation and deletion of
+         row entries in the aluMwLinkTable. 
+
+         The manager has to first calculate the aluMwLinkID 
+         based on the TiMOS encoding."
+    ::= { aluMwLinkEntry 2 }
+
+aluMwLinkOperFlags OBJECT-TYPE
+    SYNTAX          BITS {
+                        noRadioCfg           (0), -- Link has no radios configured
+                        linkAdminDown        (1), -- Link is admin down
+                        noRadiosPresent      (2), -- No Radios detected
+                        noRadiosReady        (3), -- No Radios are ready
+                        incompatibleConfig   (4), -- Radio configuration is incompatible
+                        radioFailure         (5), -- Radio equipment has failure
+                        receptionFailure     (6), -- Radio reception failure
+                        di                   (7), -- Defect Indication
+                        txMuted              (8)  -- No Radios transmitting
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object specifies all the conditions that
+                     affect the operating status of this Packet Microwave
+                     Link."
+    ::= { aluMwLinkEntry 3 }
+    
+aluMwLinkRadioScheme    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown         (0),
+                    onePlusZero     (1),
+                    onePlusOneHSB   (2)                 
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkRadioScheme specifies the scheme all the radios contained in 
+        this link are operating in."
+    DEFVAL      { onePlusZero }
+    ::= { aluMwLinkEntry 4 }
+
+aluMwLinkAlarmState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ok          (0),
+                    critical    (1),
+                    major       (2),
+                    minor       (3),
+                    warning     (4),
+                    inderminate (5),
+                    notSupported (6),
+                    unknown      (7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmState summarizes the alarm state of the link.
+         A value of 'notSupported' indicates the link does not support alarm management."
+    ::= { aluMwLinkEntry 5 }
+
+aluMwLinkAlarmsCritical    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmsCritical indicates the number of critical alarms
+        that are raised on this microwave link."
+    ::= { aluMwLinkEntry 6 }
+
+aluMwLinkAlarmsMajor    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmsMajor indicates the number of major alarms
+        that are raised on this microwave link."
+    ::= { aluMwLinkEntry 7 }
+
+aluMwLinkAlarmsMinor    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmsMinor indicates the number of minor alarms
+        that are raised on this microwave link."
+    ::= { aluMwLinkEntry 8 }
+
+aluMwLinkAlarmsWarning    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmsWarning indicates the number of warning alarms
+        that are raised on this microwave link."
+    ::= { aluMwLinkEntry 9 }
+
+aluMwLinkAlarmsInd    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmsInd indicates the number of 
+        indeterminate alarms that are raised on this microwave link."
+    ::= { aluMwLinkEntry 10 }
+
+aluMwLinkAlarmsCommunication    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmsCommunication indicates the number of alarms
+        related to radio communications that are raised on this microwave link."
+    ::= { aluMwLinkEntry 11 }
+
+aluMwLinkAlarmsEquipment    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAlarmsEquipment indicates the number of alarms
+        related to equipment that are raised on this microwave link."
+    ::= { aluMwLinkEntry 12 }
+
+aluMwLinkEPSActivity    OBJECT-TYPE
+    SYNTAX      AluMwLinkRadioActivity 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkEPSActivity indicates the current activity of the equipment
+        protection scheme"
+    DEFVAL      { notApplicable }
+    ::= { aluMwLinkEntry 13 }
+
+aluMwLinkTPSActivity    OBJECT-TYPE
+    SYNTAX      AluMwLinkRadioActivity 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkTPSActivity indicates the current activity of the transport
+        protection scheme"
+    DEFVAL      { notApplicable }
+    ::= { aluMwLinkEntry 14 }
+
+aluMwLinkRPSActivity    OBJECT-TYPE
+    SYNTAX      AluMwLinkRadioActivity 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkRPSActivity indicates the current activity of the radio
+        protection scheme"
+    DEFVAL      { notApplicable }
+    ::= { aluMwLinkEntry 15 }
+
+aluMwLinkEPSRevertiveness   OBJECT-TYPE
+    SYNTAX      AluMwLinkRevertiveness 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkEPSRevertiveness configures the revertiveness of the 
+        equipment protection scheme"
+    DEFVAL      { notApplicable }
+    ::= { aluMwLinkEntry 16 }
+
+aluMwLinkTPSRevertiveness   OBJECT-TYPE
+    SYNTAX      AluMwLinkRevertiveness 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkTPSRevertiveness indicates the revertiveness of the 
+        transport protection scheme.  This is inherited from the 
+        aluMwLinkEPSRevertiveness"
+    DEFVAL      { notApplicable }
+    ::= { aluMwLinkEntry 17 }
+
+aluMwLinkRPSRevertiveness   OBJECT-TYPE
+    SYNTAX      AluMwLinkRevertiveness 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkRPSRevertiveness configures the revertiveness of the 
+        radio protection scheme"
+    DEFVAL      { notApplicable }
+    ::= { aluMwLinkEntry 18 }
+
+aluMwLinkEPSMainMaintOp   OBJECT-TYPE
+    SYNTAX      AluMwLinkMaintenanceOp 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkEPSMainMaintOp applies maintenance operations to the 
+        main radio in the equipment protection scheme"
+    DEFVAL      { none }
+    ::= { aluMwLinkEntry 19 }
+
+aluMwLinkEPSSpareMaintOp   OBJECT-TYPE
+    SYNTAX      AluMwLinkMaintenanceOp 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkEPSSpareMaintOp applies maintenance operations to the 
+        spare radio in the equipment protection scheme"
+    DEFVAL      { none }
+    ::= { aluMwLinkEntry 20 }
+
+aluMwLinkTPSMainMaintOp   OBJECT-TYPE
+    SYNTAX      AluMwLinkMaintenanceOp 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkTPSMainMaintOp applies maintenance operations to the 
+        main radio in the transport protection scheme"
+    DEFVAL      { none }
+    ::= { aluMwLinkEntry 21 }
+
+aluMwLinkTPSSpareMaintOp   OBJECT-TYPE
+    SYNTAX      AluMwLinkMaintenanceOp 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkTPSSpareMaintOp applies maintenance operations to the 
+        spare radio in the transport protection scheme"
+    DEFVAL      { none }
+    ::= { aluMwLinkEntry 22 }
+
+aluMwLinkRPSMainMaintOp   OBJECT-TYPE
+    SYNTAX      AluMwLinkMaintenanceOp 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkRPSMainMaintOp applies maintenance operations to the 
+        main radio in the radio protection scheme"
+    DEFVAL      { none }
+    ::= { aluMwLinkEntry 23 }
+
+aluMwLinkRPSSpareMaintOp   OBJECT-TYPE
+    SYNTAX      AluMwLinkMaintenanceOp 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkRPSSpareMaintOp applies maintenance operations to the 
+        spare radio in the radio protection scheme"
+    DEFVAL      { none }
+    ::= { aluMwLinkEntry 24 }
+
+aluMwLinkPeerID    OBJECT-TYPE
+    SYNTAX      AluMwLinkID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkPeerID identifies the peer Microwave Link. The value of this object is 
+        calculated using the TiMOS encoding scheme described in AluMwLinkID when connected
+        to 7705 SAR systems and based on peer encoding scheme for other peer types."
+    ::= { aluMwLinkEntry 25 }
+
+aluMwLinkPeerNEIpAddress    OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkPeerNEIpAddress identifies the peer NE IPv4 address. "
+    ::= { aluMwLinkEntry 26 }
+
+aluMwLinkClearStatistics    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkClearStatistics clears all link level statistics."
+    DEFVAL      { notApplicable }
+    ::= { aluMwLinkEntry 27 }
+
+aluMwLinkPeerDiscovery    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkPeerDiscovery enables and disables discovery of peer information
+        on managed microwave links.  The value of aluMwLinkPeerDiscovery is not used
+        for standalone microwave links."
+    DEFVAL      { true }
+    ::= { aluMwLinkEntry 28 }
+   
+--
+-- Microwave Radio Table
+--
+aluMwRadioTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluMwRadioTable has an entry for each Microwave Radio in the system."
+    ::= { aluMwObjs 2 }
+aluMwRadioEntry       OBJECT-TYPE
+    SYNTAX      AluMwRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Microwave Radio that is connected off a physical port
+         on the system. The aluMwRadioPortID contains this port encoded in it.  
+                  
+         Entries can be created and deleted on microwave-aware ports via SNMP SET 
+         operations using the aluMwRadioRowStatus object. Creation of this entry enables 
+         management of connected Microwave (MW) Packet Transport Radios. The
+         operational state of the connected radio and it's Microwave Link is represented
+         in the operational state of this entry.
+         
+         Microwave Radios may only be created on ports that support microwave-awareness.
+         There can be only one Microwave Radio on each port."
+    INDEX       { tmnxChassisIndex, aluMwRadioPortID }
+    ::= { aluMwRadioTable 1 }
+
+AluMwRadioEntry ::=
+    SEQUENCE {
+        aluMwRadioPortID            TmnxPortID,
+        aluMwRadioRowStatus         RowStatus,
+        aluMwRadioMode              INTEGER,
+        aluMwRadioMwLinkID          AluMwLinkID,
+        aluMwRadioOperStatus        TmnxPortOperStatus,
+        aluMwRadioOperFlags         BITS,
+        aluMwRadioStandalone        TruthValue,
+        aluMwRadioName              TNamedItemOrEmpty,
+        aluMwRadioDatabaseFilename  TNamedItemOrEmpty,
+        aluMwRadioType              INTEGER,
+        aluMwRadioFrequency         INTEGER,
+        aluMwRadioAlarmState        INTEGER,
+        aluMwRadioAlarmsCritical    INTEGER,
+        aluMwRadioAlarmsMajor       INTEGER,
+        aluMwRadioAlarmsMinor       INTEGER,
+        aluMwRadioAlarmsWarning     INTEGER,
+        aluMwRadioAlarmsInd         INTEGER,
+        aluMwRadioAlarmsCommunication INTEGER,
+        aluMwRadioAlarmsEquipment   INTEGER,
+        aluMwRadioTxMuted           INTEGER,
+        aluMwRadioReboot            TmnxActionType,
+        aluMwRadioLastStateChange   TimeStamp,
+        aluMwRadioCommEstablished   TimeStamp,
+        aluMwRadioCommLost          TimeStamp,
+        aluMwRadioSwState           AluMwRadioSwState,
+        aluMwRadioSwDnldProgress    INTEGER,
+        aluMwRadioRslHistoryUrl     TmnxDisplayStringURL,
+        aluMwRadioRslHistoryClear   TmnxActionType,
+        aluMwRadioFfdSuppressFlags  BITS,
+        aluMwRadioPMG826Enable      TruthValue,
+        aluMwRadioPMG826OperStatus  TruthValue,
+        aluMwRadioPMG826Clear       TmnxActionType,
+        aluMwRadioPMACMEnable       TruthValue,
+        aluMwRadioPMACMOperStatus   TruthValue,
+        aluMwRadioPMACMClear        TmnxActionType,
+        aluMwRadioPMPowerEnable     TruthValue,
+        aluMwRadioPMPowerOperStatus TruthValue,
+        aluMwRadioPMPowerClear      TmnxActionType
+   }
+
+aluMwRadioPortID    OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioPortID identifies the port of this microwave radio. The value of
+         this object is calculated using the TiMOS encoding scheme described
+         in TmnxPortID."
+    ::= { aluMwRadioEntry 1 }
+
+aluMwRadioRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioRowStatus controls the creation and deletion of
+         row entries in the aluMwRadioTable. 
+
+         The manager has to first calculate the aluMwRadioPortID 
+         based on the TiMOS encoding.
+         
+         Setting aluMwRadioRowStatus to 'createAndGo(4)', 'createAndWait(5)'
+         or 'destroy(6)' will be rejected if aluMwRadioPortID is set to a 
+         TmnxPortID that is the same as either
+         TIMETRA-CHASSIS-MIB::tmnxSyncIfTimingRef1SrcPort or 
+         TIMETRA-CHASSIS-MIB::tmnxSyncIfTimingRef2SrcPort."
+    ::= { aluMwRadioEntry 2 }
+
+aluMwRadioMode    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown      (0),
+                    onePlusZero  (1),
+                    main         (2),
+                    spare        (3)                 
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioMode specifies the role this microwave radio is 
+         operating with respect to the 'mw-link' that it is part of.  
+         This radio will be a 'main (1)' or 'spare (2)' radio in an mw-link.
+         
+         This object can only be set with aluMwRadioRowStatus during the 
+         creation of the mw-link."
+    DEFVAL      { onePlusZero }
+    ::= { aluMwRadioEntry 3 }
+
+aluMwRadioMwLinkID    OBJECT-TYPE
+    SYNTAX      AluMwLinkID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioMwLinkID indicates the AluMwLinkID of the mw-link that this 
+         radio is part of. This object must be set during conjunction with 
+         aluMwRadioRowStatus during mw-link creation."
+    ::= { aluMwRadioEntry 4 }
+
+aluMwRadioOperStatus   OBJECT-TYPE
+    SYNTAX      TmnxPortOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational status of this microwave radio."
+    ::= { aluMwRadioEntry 5 }
+
+aluMwRadioOperFlags OBJECT-TYPE
+    SYNTAX          BITS {
+                        portNotPresent       (0),  -- IDU Port is not present
+                        portOperDown         (1),  -- IDU Port is oper down
+                        radioNotPresent      (2),  -- Radio is not present
+                        radioCommError       (3),  -- Radio communication error
+                        radioInit            (4),  -- IDU is initializing radio
+                        softwareDownload     (5),  -- Radio is downloading software
+                        txMuted              (6),  -- Radio is not transmitting
+                        radioNotReady        (7),  -- Radio not ready
+                        radioEqFailure       (8),  -- Radio equipment failure
+                        incompatibleShifter  (9),  -- Radio incompatible with shifter config
+                        incompatibleFreq     (10), -- Radio incompatible with frequency cfg
+                        incompatiblePower    (11), -- Radio incompatible with power config
+                        incompatibleModParms (12), -- Radio incompatible with modulation parms
+                        di                   (13), -- Radio Defect Indication
+                        radioLinkDown        (14), -- Radio Link Down
+                        rslThresholdFail     (15), -- RSL Threshold Crossed
+                        lof                  (16), -- Loss of Radio Frame
+                        protectionFail       (17), -- Protection Failure
+                        proxyActive          (18), -- Proxy Session to radio Active
+                        noDbFile             (19), -- Radio Database File is Missing
+                        dbSyncInProgress     (20), -- Radio Database Sync In Progress
+                        noDbConfig           (21), -- Radio Database config is missing
+                        tpsTxMuted           (22), -- Radio is Muted due to TPS activity
+                        noSoftware           (23), -- IDU did not detect any software
+                        softwareMismatch     (24), -- Radio does not contain correct software
+                        issu                 (25), -- Radio is in In-service software upgrade
+                        highBer              (26)  -- High bit error rate
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object specifies all the conditions that
+                     affect the operating status of this radio.
+                     
+                     Only 'portOperDown' is applicable to radios operating as
+                     standalone devices as indicated by aluMwRadioStandalone."
+    ::= { aluMwRadioEntry 6 }
+
+aluMwRadioStandalone   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies whether the radio is operating as a standalone
+         network element or if it is managed by this router.
+         A value of 'true' indicates it is operating as a standalone device."
+    DEFVAL      { false }
+    ::= { aluMwRadioEntry 7 }
+
+aluMwRadioName OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The textual name of the radio."
+    ::= { aluMwRadioEntry 8 }
+
+aluMwRadioDatabaseFilename OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioDatabaseFilename specifies the filename of the radio's database.
+        This file must be located at the same path as the system configuration file."
+    ::= { aluMwRadioEntry 9 }
+
+aluMwRadioType    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioType specifies the device type of microwave radio.
+         
+         The type of radio is only available when the microwave radio is
+         managed and is present. aluMwRadioType returns a value of '0' when
+         the radio type is unknown."
+    ::= { aluMwRadioEntry 10 }
+
+aluMwRadioFrequency  OBJECT-TYPE
+    SYNTAX      INTEGER
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioType specifies the frequency of the microwave radio.
+         
+         The frequency of the radio is only available when the microwave radio is
+         managed and is present."
+    ::= { aluMwRadioEntry 11 }
+
+aluMwRadioAlarmState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ok          (0),
+                    critical    (1),
+                    major       (2),
+                    minor       (3),
+                    warning     (4),
+                    inderminate (5),
+                    notSupported (6),
+                    unknown      (7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmState summarizes the alarm state of the radio."
+    ::= { aluMwRadioEntry 12 }
+
+aluMwRadioAlarmsCritical    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmsCritical indicates the number of critical alarms
+        that are raised on this microwave radio."
+    ::= { aluMwRadioEntry 13 }
+
+aluMwRadioAlarmsMajor    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmsMajor indicates the number of major alarms
+        that are raised on this microwave radio."
+    ::= { aluMwRadioEntry 14 }
+
+aluMwRadioAlarmsMinor    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmsMinor indicates the number of minor alarms
+        that are raised on this microwave radio."
+    ::= { aluMwRadioEntry 15 }
+
+aluMwRadioAlarmsWarning    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmsWarning indicates the number of warning alarms
+        that are raised on this microwave radio."
+    ::= { aluMwRadioEntry 16 }
+
+aluMwRadioAlarmsInd    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmsInd indicates the number of 
+        indeterminate alarms that are raised on this microwave radio."
+    ::= { aluMwRadioEntry 17 }
+
+aluMwRadioAlarmsCommunication    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmsCommunication indicates the number of alarms
+        related to radio communications that are raised on this microwave radio."
+    ::= { aluMwRadioEntry 18 }
+
+aluMwRadioAlarmsEquipment    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioAlarmsEquipment indicates the number of alarms
+        related to equipment that are raised on this microwave radio."
+    ::= { aluMwRadioEntry 19 }
+
+aluMwRadioTxMuted    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown   (0),
+                    none      (1),
+                    manual    (2),
+                    auto      (3)                 
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioTxMuted indicates the current state of the transmitter."
+    DEFVAL      { none }
+    ::= { aluMwRadioEntry 20 }
+
+aluMwRadioReboot    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioReboot performs a reset of the radio device."
+    DEFVAL      { notApplicable }
+    ::= { aluMwRadioEntry 21 }
+
+aluMwRadioLastStateChange       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The aluMwRadioLastStateChange variable contains the 
+         value of the sysUpTime the last time the operational status 
+         of the radio link changed state."
+    ::= { aluMwRadioEntry 22 }
+
+aluMwRadioCommEstablished       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The aluMwRadioCommEstablished variable contains the 
+         value of the sysUpTime the last time the radio managment 
+         communications was established."
+    ::= { aluMwRadioEntry 23 }
+
+aluMwRadioCommLost       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The aluMwRadioCommLost variable contains the 
+         value of the sysUpTime the last time the radio managment 
+         communications was lost."
+    ::= { aluMwRadioEntry 24 }
+
+aluMwRadioSwState    OBJECT-TYPE
+    SYNTAX      AluMwRadioSwState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioSwState indicates the state of software on 
+        the MPT."
+    ::= { aluMwRadioEntry 25 }
+
+aluMwRadioSwDnldProgress    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioSwDnldProgress indicates the progress percentage of an in-progress 
+        software download to the MPT."
+    ::= { aluMwRadioEntry 26 }
+
+aluMwRadioRslHistoryUrl OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioRslHistoryUrl specifies the URL of the radio's RSL history.
+        This file must be located on the local compact flash."
+    ::= { aluMwRadioEntry 27 }
+   
+aluMwRadioRslHistoryClear    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioRslHistoryClear performs a clear of the MPT RSL history."
+    DEFVAL      { notApplicable }
+    ::= { aluMwRadioEntry 28 }
+     
+aluMwRadioFfdSuppressFlags OBJECT-TYPE
+    SYNTAX          BITS {
+                        allfaults            (0),  -- All Mpt faults
+                        highBer              (1),  -- High bit error rate
+                        di                   (2),  -- DI
+                        rslThreshold         (3)  -- RSL Threshold
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This object specifies the MPT radio fault conditions which can 
+                     be suppressed."
+    ::= { aluMwRadioEntry 29 }
+
+aluMwRadioPMG826Enable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object enables normalized G.826 performance monitoring statistics
+         to be collected."
+    DEFVAL     { false }
+    ::= { aluMwRadioEntry 30 }
+
+aluMwRadioPMG826OperStatus OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current operational status of normalized G.826 performance monitoring
+        statistics."
+    DEFVAL     { false }
+    ::= { aluMwRadioEntry 31 }
+
+aluMwRadioPMG826Clear OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Clears the recorded current and historical normalized G.826 statistics."
+    DEFVAL      { notApplicable }
+    ::= { aluMwRadioEntry 32 }
+
+aluMwRadioPMACMEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object enables Adaptive Coding and Modulation performance monitoring
+         statistics to be collected."
+    DEFVAL     { false }
+    ::= { aluMwRadioEntry 33 }
+
+aluMwRadioPMACMOperStatus OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current operational status of Adaptive Coding and Modulation performance
+        monitoring statistics."
+    DEFVAL     { false }
+    ::= { aluMwRadioEntry 34 }
+
+aluMwRadioPMACMClear OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Clears the recorded current and historical Adaptive Coding and Modulation
+        statistics."
+    DEFVAL      { notApplicable }
+    ::= { aluMwRadioEntry 35 }
+
+aluMwRadioPMPowerEnable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object enables RX and TX power performance monitoring statistics
+         to be collected."
+    DEFVAL     { false }
+    ::= { aluMwRadioEntry 36 }
+
+aluMwRadioPMPowerOperStatus OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current operational status of RX and TX power performance monitoring
+        statistics."
+    DEFVAL     { false }
+    ::= { aluMwRadioEntry 37 }
+
+aluMwRadioPMPowerClear OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Clears the recorded current and historical RX and TX power statistics."
+    DEFVAL      { notApplicable }
+    ::= { aluMwRadioEntry 38 }
+
+--
+-- Microwave Radio Power Measures Table
+--
+aluMwRadioPowerMeasuresTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    AluMwRadioPowerMeasuresEntry
+     MAX-ACCESS            not-accessible
+     STATUS                current
+     DESCRIPTION
+          " This table contains the radio analogue measurements. "
+     ::= { aluMwObjs 3 }
+
+aluMwRadioPowerMeasuresEntry OBJECT-TYPE
+     SYNTAX                      AluMwRadioPowerMeasuresEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " An entry of the analogue measurements table. Each entry corresponds to a Radio 
+            Synchronous or Plesiochronous Physical Interface (RSPI or RPPI). "
+     INDEX   { tmnxChassisIndex, aluMwRadioPortID }
+     ::= { aluMwRadioPowerMeasuresTable 1 } 
+
+AluMwRadioPowerMeasuresEntry ::= SEQUENCE {
+   aluMwRadioLocalTxPower             Integer32,
+   aluMwRadioLocalRxMainPower         Integer32,
+   aluMwRadioRemoteTxPower            Integer32,
+   aluMwRadioRemoteRxMainPower        Integer32,
+   aluMwRadioLocalDiversityPower      Integer32,
+   aluMwRadioRemoteDiversityPower     Integer32
+   }
+
+aluMwRadioLocalTxPower OBJECT-TYPE
+     SYNTAX				Integer32 (-1000..1000)
+     MAX-ACCESS			read-only
+     STATUS				current
+     DESCRIPTION
+          "This object represents the local transmitted power level. 
+           It is an integer with associated measure unit expressed in decade of dBm. "
+     ::= { aluMwRadioPowerMeasuresEntry 1 }
+
+aluMwRadioLocalRxMainPower  OBJECT-TYPE
+     SYNTAX				Integer32 (-1000..0)
+     MAX-ACCESS			read-only
+     STATUS				current
+     DESCRIPTION
+          " This object represents the local received power level. In case of space diversity  configuration 
+            with combiner function in base band it is used to represent the power at the input of the local 
+            main receiver.
+            It is a negative integer with associated measure unit expressed in decade of dBm.  "
+     ::= { aluMwRadioPowerMeasuresEntry 2 }
+
+aluMwRadioRemoteTxPower OBJECT-TYPE 
+     SYNTAX				Integer32 (-1000..1000)
+     MAX-ACCESS			read-only
+     STATUS				current
+     DESCRIPTION
+          "This object represents the remote transmitted power level. 
+           It is an integer with associated measure unit expressed in decade of dBm. "
+     ::= { aluMwRadioPowerMeasuresEntry 3 }
+
+aluMwRadioRemoteRxMainPower OBJECT-TYPE
+     SYNTAX				Integer32 (-1000..0)
+     MAX-ACCESS			read-only
+     STATUS				current
+     DESCRIPTION
+          "This object represents the remote received power level. In case of space diversity configuration 
+           with combiner function in base band it is used to represent the power at the input of the remote 
+           main receiver.
+           It is a negative integer with associated measure unit expressed in decade of dBm. "
+     ::= { aluMwRadioPowerMeasuresEntry 4 }
+
+aluMwRadioLocalDiversityPower OBJECT-TYPE 
+     SYNTAX             Integer32 (-1000..1000)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+          "This object represents the local RSL power for SD (combiner) module input.
+            It is an integer with associated measure unit expressed in decade of dBm."
+     ::= { aluMwRadioPowerMeasuresEntry 5 }
+
+aluMwRadioRemoteDiversityPower OBJECT-TYPE
+     SYNTAX             Integer32 (-1000..0)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+          "This object represents the remote RSL power for SD (combiner) module input.
+           It is a negative integer with associated measure unit expressed in decade of dBm."
+     ::= { aluMwRadioPowerMeasuresEntry 6 }
+     
+--
+-- Microwave Radio Alarms Table
+--
+aluMwRadioAlarmsTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    AluMwRadioAlarmsEntry
+     MAX-ACCESS            not-accessible
+     STATUS                current
+     DESCRIPTION
+          " This table contains the radio alarm conditions. "
+     ::= { aluMwObjs 4 }
+
+aluMwRadioAlarmsEntry OBJECT-TYPE
+     SYNTAX                      AluMwRadioAlarmsEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " An entry of the alarms table. Each entry corresponds to a Radio 
+            alarm conditions that is currently raised or cleared."
+     INDEX   { tmnxChassisIndex, aluMwRadioPortID, aluMwRadioAlarmID }
+     ::= { aluMwRadioAlarmsTable 1 } 
+
+AluMwRadioAlarmsEntry ::= SEQUENCE {
+     aluMwRadioAlarmID            INTEGER,
+     aluMwRadioAlarmTime          DateAndTime,
+     aluMwRadioAlarmName          DisplayString,
+     aluMwRadioAlarmSeverity      INTEGER,
+     aluMwRadioAlarmSpecProblem   DisplayString,
+     aluMwRadioAlarmType          INTEGER,
+     aluMwRadioAlarmObject        DisplayString,
+     aluMwRadioAlarmSubObject     DisplayString
+   }
+
+aluMwRadioAlarmID    OBJECT-TYPE
+    SYNTAX      INTEGER  
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         identifier of an alarm condition on the radio device."
+    ::= { aluMwRadioAlarmsEntry 1 }
+
+aluMwRadioAlarmTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         time at which the event occured on the radio device."
+    ::= { aluMwRadioAlarmsEntry 2 }
+
+aluMwRadioAlarmName   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object contains the alarm name of the condition."
+    ::= { aluMwRadioAlarmsEntry 3 }
+    
+aluMwRadioAlarmSeverity    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        critical(1),
+        major(2),
+        minor(3),
+        warning(4),
+        indeterminate(5),
+        cleared(6) 
+    }        
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         severity of an alarm condition on the radio device."
+    ::= { aluMwRadioAlarmsEntry 4 }
+    
+aluMwRadioAlarmSpecProblem    OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object contains the alarm specific problem description. 
+          Indicates further refinements to the problem identified 
+          by the alarm type.  If more than one specific problem 
+          is described in this object, the problem descriptions are 
+          separated by <;> characters. The format of the DisplayString 
+          is defined as follow: 
+          String | OID | ({String;}((OID | Integer);)*)"
+    ::= { aluMwRadioAlarmsEntry 5 }
+
+aluMwRadioAlarmType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        communication  (1),
+        qos            (2),
+        processing     (3),
+        equipment      (4),
+        environment    (5)
+    }        
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         type of alarm condition on the radio device."
+    ::= { aluMwRadioAlarmsEntry 6 }
+    
+aluMwRadioAlarmObject    OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         object on the radio device that has the alarm condition."
+    ::= { aluMwRadioAlarmsEntry 7 }
+    
+aluMwRadioAlarmSubObject    OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         sub-object on the radio device that has the alarm condition."
+    ::= { aluMwRadioAlarmsEntry 8 }
+
+--
+-- MW Link Statistics Table
+--
+aluMwLinkStatisticsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwLinkStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluMwLinkStatisticsTable has an entry for each Packet Microwave Link in the system."
+    ::= { aluMwObjs 5 }
+aluMwLinkStatisticsEntry       OBJECT-TYPE
+    SYNTAX      AluMwLinkStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Packet Microwave Link that is provisioned on the system."   
+    INDEX       { tmnxChassisIndex, aluMwLinkID }
+    ::= { aluMwLinkStatisticsTable 1 }
+
+AluMwLinkStatisticsEntry ::=
+    SEQUENCE {
+        aluMwLinkAggrFramesTx            Counter64,
+        aluMwLinkAggrOctetsTx            Counter64,
+        aluMwLinkAggrDiscardedTx         Counter64,
+        aluMwLinkQueue1FramesTx          Counter64,
+        aluMwLinkQueue1OctetsTx          Counter64,
+        aluMwLinkQueue1DiscardedTx       Counter64,
+        aluMwLinkQueue2FramesTx          Counter64,
+        aluMwLinkQueue2OctetsTx          Counter64,
+        aluMwLinkQueue2DiscardedTx       Counter64,
+        aluMwLinkQueue3FramesTx          Counter64,
+        aluMwLinkQueue3OctetsTx          Counter64,
+        aluMwLinkQueue3DiscardedTx       Counter64,
+        aluMwLinkQueue4FramesTx          Counter64,
+        aluMwLinkQueue4OctetsTx          Counter64,
+        aluMwLinkQueue4DiscardedTx       Counter64,
+        aluMwLinkQueue5FramesTx          Counter64,
+        aluMwLinkQueue5OctetsTx          Counter64,
+        aluMwLinkQueue5DiscardedTx       Counter64
+    }
+
+aluMwLinkAggrFramesTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAggrFramesTx specifies the number of ethernet
+         frames to be transmitted over radio link."
+    ::= { aluMwLinkStatisticsEntry 1 }
+
+aluMwLinkAggrOctetsTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAggrOctetsTx specifies the number of octets
+         to be transmitted over radio link."
+    ::= { aluMwLinkStatisticsEntry 2 }
+
+aluMwLinkAggrDiscardedTx  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkAggrDiscardedTx specifies the number of frames
+         discarded on the radio before transmission."
+    ::= { aluMwLinkStatisticsEntry 3 }
+
+aluMwLinkQueue1FramesTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue1FramesTx specifies the number of ethernet
+         frames to be transmitted from queue 1 over radio link."
+    ::= { aluMwLinkStatisticsEntry 4 }
+
+aluMwLinkQueue1OctetsTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue1OctetsTx specifies the number of octets
+         to be transmitted from queue 1 over radio link."
+    ::= { aluMwLinkStatisticsEntry 5 }
+
+aluMwLinkQueue1DiscardedTx   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue1DiscardedTx specifies the number of frames
+         discarded on the radio from queue 1 before transmission."
+    ::= { aluMwLinkStatisticsEntry 6 }
+
+aluMwLinkQueue2FramesTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue2FramesTx specifies the number of ethernet
+         frames to be transmitted from queue 2 over radio link."
+    ::= { aluMwLinkStatisticsEntry 7 }
+
+aluMwLinkQueue2OctetsTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue2OctetsTx specifies the number of octets
+         transmitted to be from queue 2 over radio link."
+    ::= { aluMwLinkStatisticsEntry 8 }
+
+aluMwLinkQueue2DiscardedTx   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue2DiscardedTx specifies the number of frames
+         discarded on the radio from queue 2 before transmission."
+    ::= { aluMwLinkStatisticsEntry 9 }
+
+aluMwLinkQueue3FramesTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue3FramesTx specifies the number of ethernet
+         frames to be transmitted from queue 3 over radio link."
+    ::= { aluMwLinkStatisticsEntry 10 }
+
+aluMwLinkQueue3OctetsTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue3OctetsTx specifies the number of octets
+         to be transmitted from queue 3 over radio link."
+    ::= { aluMwLinkStatisticsEntry 11 }
+
+aluMwLinkQueue3DiscardedTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue3DiscardedTx specifies the number of frames
+         discarded on the radio from queue 3 before transmission."
+    ::= { aluMwLinkStatisticsEntry 12 }
+
+aluMwLinkQueue4FramesTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue4FramesTx specifies the number of ethernet
+         frames to be transmitted from queue 4 over radio link."
+    ::= { aluMwLinkStatisticsEntry 13 }
+
+aluMwLinkQueue4OctetsTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue4OctetsTx specifies the number of octets
+         to be transmitted from queue 4 over radio link."
+    ::= { aluMwLinkStatisticsEntry 14 }
+
+aluMwLinkQueue4DiscardedTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue4DiscardedTx specifies the number of frames
+         discarded on the radio from queue 4 before transmission."
+    ::= { aluMwLinkStatisticsEntry 15 }
+
+aluMwLinkQueue5FramesTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue5FramesTx specifies the number of ethernet
+         frames to be transmitted from queue 5 over radio link."
+    ::= { aluMwLinkStatisticsEntry 16 }
+
+aluMwLinkQueue5OctetsTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue5OctetsTx specifies the number of octets
+         to be transmitted from queue 5 over radio link."
+    ::= { aluMwLinkStatisticsEntry 17 }
+
+aluMwLinkQueue5DiscardedTx    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkQueue5DiscardedTx specifies the number of frames
+         discarded on the radio from queue 5 before transmission."
+    ::= { aluMwLinkStatisticsEntry 18 }
+
+--
+-- Microwave Radio Info Table
+--
+aluMwRadioInfoTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwRadioInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluMwRadioInfoTable has an entry for each Microwave Radio in the system."
+    ::= { aluMwObjs 6 }
+aluMwRadioInfoEntry       OBJECT-TYPE
+    SYNTAX      AluMwRadioInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Microwave Radio that is connected off a physical port
+         on the system. The aluMwRadioPortID contains this port encoded in it."                  
+    INDEX       { tmnxChassisIndex, aluMwRadioPortID }
+    ::= { aluMwRadioInfoTable 1 }
+
+AluMwRadioInfoEntry ::=
+    SEQUENCE {
+        aluMwRadioInfoValid         TruthValue,
+        aluMwRadioCompanyId         SnmpAdminString,
+        aluMwRadioMnemonic          SnmpAdminString,
+        aluMwRadioCLEI              SnmpAdminString,
+        aluMwRadioHwPartNumber      SnmpAdminString,
+        aluMwRadioSwPartNumber      SnmpAdminString,
+        aluMwRadioFactoryId         SnmpAdminString,
+        aluMwRadioSerialNumber      SnmpAdminString,
+        aluMwRadioMfgDateId         SnmpAdminString,
+        aluMwRadioMfgDate           SnmpAdminString,
+        aluMwRadioCustomerField     SnmpAdminString,
+        aluMwRadioTemperature       INTEGER
+   }
+
+aluMwRadioInfoValid    OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioInfoValid indicates whether the info of the MPT is valid."
+    ::= { aluMwRadioInfoEntry 1 }
+
+aluMwRadioCompanyId        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory company identifier for the microwave radio."
+    ::= { aluMwRadioInfoEntry 2 }
+
+aluMwRadioMnemonic        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mnemonic inventory value for the microwave radio."
+    ::= { aluMwRadioInfoEntry 3 }
+
+aluMwRadioCLEI        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory CLEI value for the microwave radio."
+    ::= { aluMwRadioInfoEntry 4 }
+
+aluMwRadioHwPartNumber        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory Hardware Part + ICS value for the microwave radio."
+    ::= { aluMwRadioInfoEntry 5 }
+
+aluMwRadioSwPartNumber        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..14))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory Software Part number for the microwave radio."
+    ::= { aluMwRadioInfoEntry 6 }
+
+aluMwRadioFactoryId        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory factory identifier for the microwave radio."
+    ::= { aluMwRadioInfoEntry 7 }
+
+aluMwRadioSerialNumber        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique inventory serial number for the microwave radio."
+    ::= { aluMwRadioInfoEntry 8 }
+
+aluMwRadioMfgDateId        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..2))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory manufacturing date identifier for the microwave radio."
+    ::= { aluMwRadioInfoEntry 9 }
+
+aluMwRadioMfgDate        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory manufacturing date for the microwave radio."
+    ::= { aluMwRadioInfoEntry 10 }
+
+aluMwRadioCustomerField        OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..46))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The inventory customer field for the microwave radio."
+    ::= { aluMwRadioInfoEntry 11 }
+
+aluMwRadioTemperature    OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwRadioTemperature indicates the temperature of the MPT."
+    ::= { aluMwRadioInfoEntry 12 }
+
+--
+-- Microwave (System) Table
+--
+aluMwTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aluMwTable has system information for microwave."
+    ::= { aluMwObjs 7 }
+aluMwEntry       OBJECT-TYPE
+    SYNTAX      AluMwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a Microwave System."                  
+    INDEX       { tmnxChassisIndex }
+    ::= { aluMwTable 1 }
+
+AluMwEntry ::=
+    SEQUENCE {
+        aluMwSwPackageValid         TruthValue,
+        aluMwSwDownloadTool         INTEGER,
+        aluMwSwDownloadState        INTEGER
+    }
+
+aluMwSwPackageValid    OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwSwPackageValid indicates whether SAR has detected a valid
+        Software package for managed radios."
+    ::= { aluMwEntry 1 }
+
+aluMwSwDownloadTool    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable              (0),
+        startDownload              (1),
+        startForcedDownload        (2)
+    }        
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "aluMwSwDownloadTool is used to initiate a software download
+         of radio software to all managed radios."
+    ::= { aluMwEntry 2 }
+
+aluMwSwDownloadState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable              (0),
+        noSoftwarePackage          (1),
+        ready                      (2),
+        downloadInProgress         (3),
+        downloadFailed             (5)
+    }        
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwSwDownloadState is used to indicate the state of the
+         of radio software to all managed radios.
+            noSoftwarePackage       - No Valid Software Package Found
+            ready                   - Software is Ready
+            downloadInProgress      - Software Tool Download
+            downloadFailed          - Software Tool Failed"
+    ::= { aluMwEntry 3 }
+     
+--
+-- Microwave Link TDA Status
+--
+aluMwLinkTdaStatusTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF    AluMwLinkTdaStatusEntry
+     MAX-ACCESS            not-accessible
+     STATUS                current
+     DESCRIPTION
+          " This table contains the MW link Transmit Diversity Antenna status. "
+     ::= { aluMwObjs 8 }
+
+aluMwLinkTdaStatusEntry OBJECT-TYPE
+     SYNTAX                      AluMwLinkTdaStatusEntry
+     MAX-ACCESS                  not-accessible
+     STATUS                      current
+     DESCRIPTION
+          " An entry of the Transmit Diversity Antenna status table."
+     INDEX   { tmnxChassisIndex, aluMwLinkID }
+     ::= { aluMwLinkTdaStatusTable 1 } 
+
+AluMwLinkTdaStatusEntry ::= SEQUENCE {
+       aluMwLinkTdaCmdState         INTEGER,
+       aluMwLinkTdaManualCmdStatus  INTEGER,
+       aluMwLinkTdaSwitchPosition   INTEGER
+   }
+
+aluMwLinkTdaCmdState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled        (0),
+                    enabled         (1),
+                    error           (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkTdaCmdState is used to get the TDA command state."
+    ::= { aluMwLinkTdaStatusEntry 1 }
+    
+aluMwLinkTdaManualCmdStatus    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notForced    (0),
+                    main         (1),
+                    diversity    (2),
+                    error        (3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkTdaManualCmdStatus is used to get the TDA manual command status."
+    ::= { aluMwLinkTdaStatusEntry 2 }
+    
+aluMwLinkTdaSwitchPosition    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    main         (0),
+                    diversity    (1),
+                    error        (2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "aluMwLinkTdaSwitchPosition is used to get the TDA switch position."
+    ::= { aluMwLinkTdaStatusEntry 3 }
+
+aluMwRadioPMG826Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwRadioPMG826Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the current and historic normalized G.826
+        performance monitoring statistics for the given radio."
+    ::= { aluMwObjs 9 }
+
+aluMwRadioPMG826Entry OBJECT-TYPE
+    SYNTAX      AluMwRadioPMG826Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the microwave radio G.826 performance monitoring table."
+    INDEX       { tmnxChassisIndex, aluMwRadioPortID, aluMwPMG826Section,
+                  aluMwPMG826Period, aluMwPMG826Bin }
+    ::= { aluMwRadioPMG826Table 1 }
+
+AluMwRadioPMG826Entry ::= SEQUENCE {
+    aluMwPMG826Section     AluMwPerfMonSection,
+    aluMwPMG826Period      AluMwPerfMonPeriod,
+    aluMwPMG826Bin         AluMwPerfMonBin,
+    aluMwPMG826Date        INTEGER,
+    aluMwPMG826Duration    INTEGER,
+    aluMwPMG826EPSState    AluMwPerfMonEPSState,
+    aluMwPMG826Suspect     TruthValue,
+    aluMwPMG826ES          Unsigned32,
+    aluMwPMG826SES         Unsigned32,
+    aluMwPMG826BBE         Unsigned32,
+    aluMwPMG826UAS         Unsigned32
+}
+
+aluMwPMG826Section OBJECT-TYPE
+    SYNTAX      AluMwPerfMonSection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the radio link or radio hop."
+    ::= { aluMwRadioPMG826Entry 1 }
+
+aluMwPMG826Period OBJECT-TYPE
+    SYNTAX      AluMwPerfMonPeriod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the 15 minute or 24 hour counters."
+    ::= { aluMwRadioPMG826Entry 2 }
+
+aluMwPMG826Bin OBJECT-TYPE
+    SYNTAX      AluMwPerfMonBin
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the current (0) or historic counters."
+    ::= { aluMwRadioPMG826Entry 3 }
+
+aluMwPMG826Date OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds since midnight, January 1st 1970
+        to the start of this counting period (even 15 minutes or
+        beginning of day, depending on selected period)."
+    ::= { aluMwRadioPMG826Entry 4 }
+
+aluMwPMG826Duration OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds recorded in this period."
+    ::= { aluMwRadioPMG826Entry 5 }
+
+aluMwPMG826EPSState OBJECT-TYPE
+    SYNTAX      AluMwPerfMonEPSState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The EPS state at the time of recording this period."
+    ::= { aluMwRadioPMG826Entry 6 }
+
+aluMwPMG826Suspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the stats are incomplete for this period, they
+        will be considered suspect."
+    ::= { aluMwRadioPMG826Entry 7 }
+
+aluMwPMG826ES OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of errored seconds."
+    ::= { aluMwRadioPMG826Entry 8 }
+
+aluMwPMG826SES OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number severely errored seconds."
+    ::= { aluMwRadioPMG826Entry 9 }
+
+aluMwPMG826BBE OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of background block errors."
+    ::= { aluMwRadioPMG826Entry 10 }
+
+aluMwPMG826UAS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unavailable seconds."
+    ::= { aluMwRadioPMG826Entry 11 }
+
+aluMwRadioPMACMTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwRadioPMACMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the current and historic adaptive coding
+        and modulation performance monitoring statistics for the given
+        radio."
+    ::= { aluMwObjs 10 }
+
+aluMwRadioPMACMEntry OBJECT-TYPE
+    SYNTAX      AluMwRadioPMACMEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the microwave ACM performance monitoring table."
+    INDEX       { tmnxChassisIndex, aluMwRadioPortID, aluMwPMACMPeriod,
+                  aluMwPMACMBin, aluMwPMACMModulation }
+    ::= { aluMwRadioPMACMTable 1 }
+
+AluMwRadioPMACMEntry ::= SEQUENCE {
+    aluMwPMACMPeriod      AluMwPerfMonPeriod,
+    aluMwPMACMBin         AluMwPerfMonBin,
+    aluMwPMACMModulation  INTEGER,
+    aluMwPMACMDate        INTEGER,
+    aluMwPMACMDuration    INTEGER,
+    aluMwPMACMSuspect     TruthValue,
+    aluMwPMACMTimeSpent   Unsigned32
+}
+
+aluMwPMACMPeriod OBJECT-TYPE
+    SYNTAX      AluMwPerfMonPeriod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the 15 minute or 24 hour counters."
+    ::= { aluMwRadioPMACMEntry 1 }
+
+aluMwPMACMBin OBJECT-TYPE
+    SYNTAX      AluMwPerfMonBin
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the current (0) or historic counters."
+    ::= { aluMwRadioPMACMEntry 2 }
+
+aluMwPMACMModulation OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the modulation ID."
+    ::= { aluMwRadioPMACMEntry 3}
+
+aluMwPMACMDate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds since midnight, January 1st 1970
+        to the start of this counting period (even 15 minutes or
+        beginning of day, depending on selected period)."
+    ::= { aluMwRadioPMACMEntry 4 }
+
+aluMwPMACMDuration OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds recorded in this period."
+    ::= { aluMwRadioPMACMEntry 5 }
+
+aluMwPMACMSuspect OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "If the stats are incomplete for this period, they
+        will be considered suspect."
+    ::= { aluMwRadioPMACMEntry 6 }
+
+aluMwPMACMTimeSpent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of milliseconds spent at this modulation."
+    ::= { aluMwRadioPMACMEntry 7 }
+
+aluMwRadioPMPowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AluMwRadioPMPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the current and historic RX and TX power
+        performance monitoring statistics for the given radio."
+    ::= { aluMwObjs 11 }
+
+aluMwRadioPMPowerEntry OBJECT-TYPE
+    SYNTAX      AluMwRadioPMPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the microwave Power performance monitoring table."
+    INDEX       { tmnxChassisIndex, aluMwRadioPortID, aluMwPMPowerDirection,
+                  aluMwPMPowerSection, aluMwPMPowerPeriod, aluMwPMPowerBin }
+    ::= { aluMwRadioPMPowerTable 1 }
+
+AluMwRadioPMPowerEntry ::= SEQUENCE {
+    aluMwPMPowerDirection           INTEGER,
+    aluMwPMPowerSection             AluMwPerfMonSection,
+    aluMwPMPowerPeriod              AluMwPerfMonPeriod,
+    aluMwPMPowerBin                 AluMwPerfMonBin,
+    aluMwPMPowerDate                INTEGER,
+    aluMwPMPowerDuration            INTEGER,
+    aluMwPMPowerEPSState            AluMwPerfMonEPSState,
+    aluMwPMPowerSuspect             TruthValue,
+    aluMwPMPowerMinPowerLevel       Integer32,
+    aluMwPMPowerMaxPowerLevel       Integer32,
+    aluMwPMPowerMeanPowerLevel      Integer32
+}
+
+aluMwPMPowerDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+        rx (0),
+        tx (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the received or transmitted power levels."
+    ::= { aluMwRadioPMPowerEntry 1 }
+
+aluMwPMPowerSection OBJECT-TYPE
+    SYNTAX      AluMwPerfMonSection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the radio link or radio hop. Radio link
+        is not applicable when the direction is tx."
+    ::= { aluMwRadioPMPowerEntry 2 }
+
+aluMwPMPowerPeriod OBJECT-TYPE
+    SYNTAX      AluMwPerfMonPeriod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the 15 minute or 24 hour counters."
+    ::= { aluMwRadioPMPowerEntry 3 }
+
+aluMwPMPowerBin OBJECT-TYPE
+    SYNTAX      AluMwPerfMonBin
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index to select the current (0) or historic counters."
+    ::= { aluMwRadioPMPowerEntry 4 }
+
+aluMwPMPowerDate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds since midnight, January 1st 1970
+        to the start of this counting period (even 15 minutes or
+        beginning of day, depending on selected period)."
+    ::= { aluMwRadioPMPowerEntry 5 }
+
+aluMwPMPowerDuration OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds recorded in this period."
+    ::= { aluMwRadioPMPowerEntry 6 }
+
+aluMwPMPowerEPSState OBJECT-TYPE
+    SYNTAX      AluMwPerfMonEPSState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The EPS state at the time of recording this period. If
+        the direction is tx, EPS state is always notRelevant."
+    ::= { aluMwRadioPMPowerEntry 7 }
+
+aluMwPMPowerSuspect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If the stats are incomplete for this period, they
+        will be considered suspect."
+    ::= { aluMwRadioPMPowerEntry 8 }
+
+aluMwPMPowerMinPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum power level."
+    ::= { aluMwRadioPMPowerEntry 9 }
+
+aluMwPMPowerMaxPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum power level."
+    ::= { aluMwRadioPMPowerEntry 10 }
+
+aluMwPMPowerMeanPowerLevel OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average power level."
+    ::= { aluMwRadioPMPowerEntry 11 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+ --
+ --     Notification Definition section
+ --
+ --                     Notification Objects
+ --
+aluMwNotifyRadioPortID  OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         port id where a radio is connected."
+    ::= { aluMwNotifyObjs 1 }
+
+aluMwNotifyAlarmTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         time at which the event occured on the radio device."
+    ::= { aluMwNotifyObjs 2 }
+
+aluMwNotifyAlarmId    OBJECT-TYPE
+    SYNTAX      INTEGER  
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         identifier of an alarm condition on the radio device."
+    ::= { aluMwNotifyObjs 3 }
+
+aluMwNotifyAlarmName   OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "This object contains the alarm name of the condition."
+    ::= { aluMwNotifyObjs 4 }
+    
+aluMwNotifyAlarmSpecProblem    OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+         "This object contains the alarm specific problem description. 
+          Indicates further refinements to the problem identified 
+          by the alarm type.  If more than one specific problem 
+          is described in this object, the problem descriptions are 
+          separated by <;> characters. The format of the DisplayString 
+          is defined as follow: 
+          String | OID | ({String;}((OID | Integer);)*)"
+    ::= { aluMwNotifyObjs 5 }
+
+aluMwNotifyAlarmType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        communication  (1),
+        qos            (2),
+        processing     (3),
+        equipment      (4),
+        environment    (5)
+    }        
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         type of alarm condition on the radio device."
+    ::= { aluMwNotifyObjs 6 }
+    
+aluMwNotifyAlarmObject    OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         object on the radio device that has the alarm condition."
+    ::= { aluMwNotifyObjs 7 }
+    
+aluMwNotifyAlarmSubObject    OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         sub-object on the radio device that has the alarm condition."
+    ::= { aluMwNotifyObjs 8 }
+
+aluMwNotifyTxMute    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noMute         (1),
+        mute           (2)
+    }        
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         type of mute on the radio transmitter."
+    ::= { aluMwNotifyObjs 9 }
+
+aluMwNotifyLinkPortID  OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         port id where a microwave link."
+    ::= { aluMwNotifyObjs 10 }
+
+aluMwNotifyLinkActivity    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        main          (1),
+        spare         (2),
+        both          (3)
+    }        
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         the activity of the link of a protection scheme."
+    ::= { aluMwNotifyObjs 11 }
+
+aluMwNotifyLinkProtectionType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        eps          (1),
+        tps          (2),
+        rps          (3)
+    }        
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         the type of protection."
+    ::= { aluMwNotifyObjs 12 }
+
+aluMwNotifyRadioSwState  OBJECT-TYPE
+    SYNTAX      AluMwRadioSwState 
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by Microwave notifications, the OID indicates the
+         the state of radio software."
+    ::= { aluMwNotifyObjs 13 }
+
+aluMwRadioLinkUp        NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave radio link goes up."
+    ::= { aluMwNotification 1 }
+
+aluMwRadioLinkDown        NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave radio link goes down."
+    ::= { aluMwNotification 2 }
+
+aluMwRadioPresent       NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave radio device is detected."
+    ::= { aluMwNotification 3 }
+
+aluMwRadioNotPresent    NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave radio device is no longer detected."
+    ::= { aluMwNotification 4 }
+    
+aluMwRadioSwPackageMissing        NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Generated when a valid microwave radio software package is not present at startup."
+    ::= { aluMwNotification 5 }
+
+aluMwRadioDatabaseUpdated   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave radio database has been updated."
+    ::= { aluMwNotification 6 }
+    
+aluMwRadioCriticalAlarmRaise NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports the critical radio defect raise."
+    ::= { aluMwNotification 7 }
+    
+aluMwRadioCriticalAlarmClear NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports critical defect radio clear."
+    ::= { aluMwNotification 8 }
+
+aluMwRadioMajorAlarmRaise NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports the major radio defect raise."
+    ::= { aluMwNotification 9 }
+    
+aluMwRadioMajorAlarmClear NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports major defect radio clear."
+    ::= { aluMwNotification 10 }
+
+aluMwRadioMinorAlarmRaise NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports the minor radio defect raise."
+    ::= { aluMwNotification 11 }
+    
+aluMwRadioMinorAlarmClear NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports minor defect radio clear."
+    ::= { aluMwNotification 12 }
+
+aluMwRadioWarningAlarmRaise NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports the warning radio defect raise."
+    ::= { aluMwNotification 13 }
+    
+aluMwRadioWarningAlarmClear NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports warning defect radio clear."
+    ::= { aluMwNotification 14 }
+
+aluMwRadioIndetermAlarmRaise NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports the indeterminate radio 
+        defect raise."
+    ::= { aluMwNotification 15 }
+    
+aluMwRadioIndetermAlarmClear NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyAlarmId,
+        aluMwNotifyAlarmTime,
+        aluMwNotifyAlarmName,
+        aluMwNotifyAlarmSpecProblem,
+        aluMwNotifyAlarmType,
+        aluMwNotifyAlarmObject,
+        aluMwNotifyAlarmSubObject
+    }
+    STATUS  current
+    DESCRIPTION
+        "This notification reports indeterminate defect radio 
+        clear."
+    ::= { aluMwNotification 16 }
+
+aluMwRadioTxChange       NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyTxMute
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave radio transmitter changes state."
+    ::= { aluMwNotification 17 }
+
+aluMwLinkEPSActivityChange   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyLinkPortID,
+        aluMwNotifyLinkActivity
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave link changes activity for EPS."
+    ::= { aluMwNotification 18 }
+
+aluMwLinkTPSActivityChange   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyLinkPortID,
+        aluMwNotifyLinkActivity
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave link changes activity for TPS."
+    ::= { aluMwNotification 19 }
+
+aluMwLinkRPSActivityChange   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyLinkPortID,
+        aluMwNotifyLinkActivity
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave link changes activity for RPS."
+    ::= { aluMwNotification 20 }
+
+aluMwLinkMaintenanceChange   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyLinkPortID,
+        aluMwNotifyLinkProtectionType
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave link maintenance command changes."
+    ::= { aluMwNotification 21 }
+
+aluMwLinkPeerChange   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyLinkPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when a microwave link discovered peer changes."
+    ::= { aluMwNotification 22 }
+
+aluMwRadioSwStateChange   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID,
+        aluMwNotifyRadioSwState
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when on microwave radio software state changes."
+    ::= { aluMwNotification 23 }
+    
+aluMwRadioRslHistoryUploadFail   NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio RSL History upload fails."
+    ::= { aluMwNotification 24 }
+    
+aluMwMptSwReconcileFail   NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave MPT sw reconcile fails."
+    ::= { aluMwNotification 25 }
+    
+aluMwRadioRslHistoryCleared   NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio RSL History is cleared."
+    ::= { aluMwNotification 26 }
+
+aluMwRadioPMG826OperUp NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio G826 PM becomes operationally up."
+    ::= { aluMwNotification 27 }
+
+aluMwRadioPMG826OperDown NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio G826 PM becomes operationally down."
+    ::= { aluMwNotification 28 }
+
+aluMwRadioPMACMOperUp NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio ACM PM becomes operationally up."
+    ::= { aluMwNotification 29 }
+
+aluMwRadioPMACMOperDown NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio ACM PM becomes operationally down."
+    ::= { aluMwNotification 30 }
+
+aluMwRadioPMPowerOperUp NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio power PM becomes operationally up."
+    ::= { aluMwNotification 31 }
+
+aluMwRadioPMPowerOperDown NOTIFICATION-TYPE
+    OBJECTS {
+        aluMwNotifyRadioPortID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Generated when microwave radio power PM becomes operationally down."
+    ::= { aluMwNotification 32 }
+
+--%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+--
+--      The compliance specifications.
+--
+
+aluMwCompliances     OBJECT IDENTIFIER ::= { aluMwConformance 1 }
+aluMwGroups          OBJECT IDENTIFIER ::= { aluMwConformance 2 }
+
+aluMwComp7705        OBJECT IDENTIFIER ::= { aluMwCompliances 1 }
+--  aluMwComp7705V1v0  OBJECT IDENTIFIER ::= { aluMwComp7705 1}
+
+aluMwComp7705V1v0  MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for revision 1.0 of ALU-MICROWAVE-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { 
+            aluMwGroup,
+            aluMwNotificationGroup,
+            aluMwPeerDiscoveryGroup,
+            aluMwAlarmGroup
+        }
+    ::= { aluMwComp7705 1 }
+
+
+-- units of conformance
+
+aluMwGroup     OBJECT-GROUP
+    OBJECTS {   aluMwRadioRowStatus,
+                aluMwRadioMode,
+                aluMwRadioMwLinkID,
+                aluMwRadioOperStatus,
+                aluMwRadioOperFlags,
+                aluMwLinkRowStatus,
+                aluMwLinkOperFlags,
+                aluMwLinkRadioScheme,
+                aluMwLinkEPSActivity,
+                aluMwLinkRPSActivity,
+                aluMwLinkTPSActivity,
+                aluMwLinkEPSRevertiveness,
+                aluMwLinkTPSRevertiveness,
+                aluMwLinkRPSRevertiveness,
+                aluMwLinkEPSMainMaintOp,
+                aluMwLinkEPSSpareMaintOp,
+                aluMwLinkTPSMainMaintOp,
+                aluMwLinkTPSSpareMaintOp,
+                aluMwLinkRPSMainMaintOp,
+                aluMwLinkRPSSpareMaintOp,
+                aluMwLinkPeerID,
+                aluMwLinkPeerNEIpAddress,
+                aluMwLinkClearStatistics,
+                aluMwRadioStandalone,
+                aluMwRadioName,
+                aluMwRadioDatabaseFilename,
+                aluMwRadioType,
+                aluMwRadioFrequency,
+                aluMwRadioCompanyId,
+                aluMwRadioMnemonic,
+                aluMwRadioCLEI,
+                aluMwRadioHwPartNumber,
+                aluMwRadioSwPartNumber,
+                aluMwRadioFactoryId,
+                aluMwRadioSerialNumber,
+                aluMwRadioMfgDateId,
+                aluMwRadioMfgDate,
+                aluMwRadioCustomerField,
+                aluMwRadioAlarmState,
+                aluMwRadioAlarmsCritical,
+                aluMwRadioAlarmsMajor,
+                aluMwRadioAlarmsMinor,
+                aluMwRadioAlarmsWarning,
+                aluMwRadioAlarmsInd,
+                aluMwRadioAlarmsCommunication,
+                aluMwRadioAlarmsEquipment,
+                aluMwRadioTxMuted,
+                aluMwRadioReboot,
+                aluMwRadioLastStateChange,
+                aluMwRadioInfoValid,
+                aluMwRadioTemperature,
+                aluMwRadioCommEstablished,
+                aluMwRadioLocalTxPower,
+                aluMwRadioLocalRxMainPower,
+                aluMwRadioRemoteTxPower,
+                aluMwRadioRemoteRxMainPower,
+                aluMwLinkAggrFramesTx,
+                aluMwLinkAggrOctetsTx,
+                aluMwLinkAggrDiscardedTx,
+                aluMwLinkQueue1FramesTx,
+                aluMwLinkQueue1OctetsTx,
+                aluMwLinkQueue1DiscardedTx,
+                aluMwLinkQueue2FramesTx,
+                aluMwLinkQueue2OctetsTx,
+                aluMwLinkQueue2DiscardedTx,
+                aluMwLinkQueue3FramesTx,
+                aluMwLinkQueue3OctetsTx,
+                aluMwLinkQueue3DiscardedTx,
+                aluMwLinkQueue4FramesTx,
+                aluMwLinkQueue4OctetsTx,
+                aluMwLinkQueue4DiscardedTx,
+                aluMwLinkQueue5FramesTx,
+                aluMwLinkQueue5OctetsTx,
+                aluMwLinkQueue5DiscardedTx,
+                aluMwSwPackageValid,
+                aluMwSwDownloadTool,
+                aluMwRadioSwState,
+                aluMwRadioSwDnldProgress,
+                aluMwSwDownloadState,
+                aluMwRadioRslHistoryUrl,
+                aluMwRadioRslHistoryClear,
+                aluMwLinkTdaCmdState,
+                aluMwLinkTdaManualCmdStatus,
+                aluMwLinkTdaSwitchPosition,
+                aluMwRadioLocalDiversityPower,
+                aluMwRadioRemoteDiversityPower,
+                aluMwRadioFfdSuppressFlags,
+                aluMwRadioPMG826Enable,
+                aluMwRadioPMG826OperStatus,
+                aluMwRadioPMG826Clear,
+                aluMwRadioPMACMEnable,
+                aluMwRadioPMACMOperStatus,
+                aluMwRadioPMACMClear,
+                aluMwRadioPMPowerEnable,
+                aluMwRadioPMPowerOperStatus,
+                aluMwRadioPMPowerClear,
+                aluMwPMG826Section,
+                aluMwPMG826Period,
+                aluMwPMG826Bin,
+                aluMwPMG826Date,
+                aluMwPMG826Duration,
+                aluMwPMG826EPSState,
+                aluMwPMG826Suspect,
+                aluMwPMG826ES,
+                aluMwPMG826SES,
+                aluMwPMG826BBE,
+                aluMwPMG826UAS,
+                aluMwPMACMPeriod,
+                aluMwPMACMBin,
+                aluMwPMACMModulation,
+                aluMwPMACMDate,
+                aluMwPMACMDuration,
+                aluMwPMACMSuspect,
+                aluMwPMACMTimeSpent,
+                aluMwPMPowerDirection,
+                aluMwPMPowerSection,
+                aluMwPMPowerPeriod,
+                aluMwPMPowerBin,
+                aluMwPMPowerDate,
+                aluMwPMPowerDuration,
+                aluMwPMPowerEPSState,
+                aluMwPMPowerSuspect,
+                aluMwPMPowerMinPowerLevel,
+                aluMwPMPowerMaxPowerLevel,
+                aluMwPMPowerMeanPowerLevel
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the microwave
+         aware ports for the remote management of Microwave Awareness
+         on Nokia SAR series systems."
+    ::= { aluMwGroups 1 }
+
+aluMwNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {   aluMwRadioLinkUp,
+                        aluMwRadioLinkDown,
+                        aluMwRadioPresent,
+                        aluMwRadioNotPresent,
+                        aluMwRadioSwPackageMissing,
+                        aluMwRadioDatabaseUpdated,
+                        aluMwRadioCriticalAlarmRaise,
+                        aluMwRadioCriticalAlarmClear,
+                        aluMwRadioMajorAlarmRaise,
+                        aluMwRadioMajorAlarmClear,
+                        aluMwRadioMinorAlarmRaise,
+                        aluMwRadioMinorAlarmClear,
+                        aluMwRadioWarningAlarmRaise,
+                        aluMwRadioWarningAlarmClear,
+                        aluMwRadioIndetermAlarmRaise,
+                        aluMwRadioIndetermAlarmClear,
+                        aluMwRadioTxChange,
+                        aluMwLinkEPSActivityChange,
+                        aluMwLinkTPSActivityChange,
+                        aluMwLinkRPSActivityChange,
+                        aluMwLinkMaintenanceChange,
+                        aluMwLinkPeerChange,
+                        aluMwRadioSwStateChange,
+                        aluMwRadioRslHistoryUploadFail,
+                        aluMwMptSwReconcileFail,
+                        aluMwRadioRslHistoryCleared,
+                        aluMwRadioPMG826OperUp,
+                        aluMwRadioPMG826OperDown,
+                        aluMwRadioPMACMOperUp,
+                        aluMwRadioPMACMOperDown,
+                        aluMwRadioPMPowerOperUp,
+                        aluMwRadioPMPowerOperDown
+                    }
+    STATUS        current
+    DESCRIPTION
+        "The group of notifications supporting the management of 
+        microwave awareness on Nokia SAR series systems."
+    ::= { aluMwGroups 2 }
+
+aluMwNotificationObjsGroup OBJECT-GROUP
+    OBJECTS         {   aluMwNotifyRadioPortID,
+                        aluMwNotifyAlarmId,
+                        aluMwNotifyAlarmTime,
+                        aluMwNotifyAlarmName,
+                        aluMwNotifyAlarmSpecProblem,
+                        aluMwNotifyAlarmType,
+                        aluMwNotifyAlarmObject,
+                        aluMwNotifyAlarmSubObject,
+                        aluMwNotifyTxMute,
+                        aluMwNotifyLinkPortID,
+                        aluMwNotifyLinkActivity,
+                        aluMwNotifyLinkProtectionType,
+                        aluMwNotifyRadioSwState
+                    }
+    STATUS        current
+    DESCRIPTION
+        "The group of notifications objs supporting the management of 
+         microwave awareness on Nokia SAR series systems."
+    ::= { aluMwGroups 3 }
+
+aluMwPeerDiscoveryGroup     OBJECT-GROUP
+    OBJECTS {   aluMwLinkPeerDiscovery
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the peer discovery
+         management of Microwave Awareness on Nokia SAR series systems."
+    ::= { aluMwGroups 4 }
+
+aluMwAlarmGroup     OBJECT-GROUP
+    OBJECTS {   
+                aluMwLinkAlarmState,
+                aluMwLinkAlarmsCommunication,
+                aluMwLinkAlarmsCritical,
+                aluMwLinkAlarmsEquipment,
+                aluMwLinkAlarmsInd,
+                aluMwLinkAlarmsMajor,
+                aluMwLinkAlarmsMinor,
+                aluMwLinkAlarmsWarning,
+                aluMwRadioAlarmName,
+                aluMwRadioAlarmObject,
+                aluMwRadioAlarmSeverity,
+                aluMwRadioAlarmSpecProblem,
+                aluMwRadioAlarmSubObject,
+                aluMwRadioAlarmTime,
+                aluMwRadioAlarmType,
+                aluMwRadioCommLost
+            }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the alarm
+         management of Microwave Awareness on Nokia SAR series systems."
+    ::= { aluMwGroups 5 }
+
+END

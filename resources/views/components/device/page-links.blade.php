@@ -1,0 +1,32 @@
+<div class="tw:ml-auto tw:flex tw:items-center tw:gap-1" role="group">
+    <a href="{{ $primaryDeviceLink['url'] }}"
+       class="btn"
+       type="button"
+       @if(isset($primaryDeviceLink['onclick']))onclick="{{ $primaryDeviceLink['onclick'] }}" @endif
+       @if($primaryDeviceLink['external'])target="_blank" rel="noopener" @endif
+       title="{{ $primaryDeviceLink['title'] }}"
+    ><i class="fa {{ $primaryDeviceLink['icon'] }} fa-lg icon-theme"></i>
+    </a>
+    <div class="btn-group" role="group">
+        <button type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fa fa-ellipsis-v fa-lg fa-fw icon-theme"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-right">
+            @foreach($deviceLinks as $link)
+                <li><a href="{{ $link['url'] }}"
+                       @if(isset($link['onclick']))onclick="{{ $link['onclick'] }}" @endif
+                       @if($link['external'])target="_blank" rel="noopener" @endif
+                    ><i class="fa {{ $link['icon'] }} fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ $link['title'] }}</a></li>
+            @endforeach
+            @if($dropdownLinks)
+                <li role="presentation" class="divider"></li>
+                @foreach($dropdownLinks as $link)
+                    <li><a href="{{ $link['url'] }}"
+                           @if(isset($link['onclick']))onclick="{{ $link['onclick'] }}" @endif
+                           @if($link['external'])target="_blank" rel="noopener" @endif
+                        ><i class="fa {{ $link['icon'] }} fa-lg fa-fw icon-theme" aria-hidden="true"></i> {{ $link['title'] }}</a></li>
+                @endforeach
+            @endif
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,1412 @@
+-- ***********************************************************************
+-- Module:    hpicfDownload.mib
+-- 
+-- Copyright (C) 2015 Hewlett Packard Enterprise Development LP
+-- All Rights Reserved.
+--  
+-- The contents of this software are proprietary and confidential to
+-- the Hewlett Packard Enterprise Development LP. No part of this
+-- program may be photocopied, reproduced, or translated into another
+-- programming language without prior written consent of the
+-- Hewlett Packard Enterprise Development LP.
+--
+-- Purpose: This file contains MIB definition of HP-ICF-DOWNLOAD MIB 
+--
+-- ***********************************************************************
+
+       HP-ICF-DOWNLOAD DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           DisplayString, RowStatus, TDomain, TAddress, TruthValue
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           hpicfObjectModules, hpicfCommon
+               FROM HP-ICF-OID
+           PhysicalIndex
+               FROM ENTITY-MIB
+           InetAddressType, InetAddress
+               FROM INET-ADDRESS-MIB;           -- RFC2851(-> 3291)
+
+
+       hpicfDownloadMib MODULE-IDENTITY
+            LAST-UPDATED "201510140000Z"  -- October 14, 2015
+            ORGANIZATION "HP Networking" 
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module manages the network download
+                    capabilities for devices in the HP Integrated
+                    Communication Facility product line."
+
+            REVISION     "201510140000Z"  -- October 14, 2015
+            DESCRIPTION  "Added a new object hpicfDownloadTftpClientBlkSize"
+            
+            REVISION     "201306210000Z"  -- June 21, 2013
+            DESCRIPTION  "Added a new object hpicfDownloadTftpClientConfig and
+                          deprecated the object hpicfDownloadTftpConfig"
+
+            REVISION     "201005110000Z"  -- May 11, 2010
+            DESCRIPTION  "Added new option coreDump to 
+                          hpicfDownloadInetFileType and new scalar 
+                          mib object hpicfDownloadInetCoreDumpModule"
+
+            REVISION     "200812100000Z"  -- December 10, 2008
+            DESCRIPTION  "Added hpicfDownloadAutoTftpTable" 
+
+            REVISION     "200804040000Z"  -- April 04, 2008
+            DESCRIPTION  "Objects hpicfDownloadTftp6Config & 
+                          hpicfDownloadTftp6SeverConfig are deprecated."
+
+            REVISION     "200711051616Z"  -- November 5, 2007
+            DESCRIPTION  "Added scalar object hpicfDownloadConfigFileUpdateEnabled."
+
+            REVISION     "200011032216Z"  -- November 3, 2000
+            DESCRIPTION  "Updated division name."
+
+            REVISION     "9703060336Z"  -- March 6, 1997
+            DESCRIPTION
+                    "Added some ranges that were missing."
+            REVISION     "9609100225Z"  -- September 10, 1996
+            DESCRIPTION
+                    "Updated division name in ORGANIZATION clause."
+            REVISION     "9601250356Z"  -- January 25, 1996
+            DESCRIPTION
+                    "Split this MIB module from the former monolithic
+                    hp-icf MIB."
+            REVISION     "9507130000Z"  -- July 13, 1995
+            DESCRIPTION
+                    "Version of MIB module that added support for
+                    specifying the download destination, and
+                    tracking progress using octet count and passes
+                    remaining."
+            REVISION     "9411200000Z"  -- November 20, 1994
+            DESCRIPTION
+                    "Version of MIB module that expanded the error
+                    codes for download status."
+            REVISION    "9402250000Z"  -- February 25, 1994
+            DESCRIPTION
+                    "Initial version of this MIB module."
+            ::= { hpicfObjectModules 4 }
+
+
+       hpicfDownload
+           OBJECT IDENTIFIER ::= { hpicfCommon 3 }
+
+--
+
+-- Deprecated Download Table 
+
+--
+
+       hpicfDownloadTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfDownloadEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "A table of firmware downloads to this device.  
+                   There will at any time be either 0 or 1 rows in 
+                   this table, and the only valid index for this 
+                   table is 1.  It is only a table so that we may 
+                   take advantage of the RowStatus textual convention
+                   for configuring the download parameters.
+                   Since this table does not support IPv6, it is
+                   deprecated in favor of hpicfDownloadInetTable."
+           ::= { hpicfDownload 1 }
+
+       hpicfDownloadEntry OBJECT-TYPE
+           SYNTAX     HpicfDownloadEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated 
+           DESCRIPTION
+                   "The row in the hpicfDownloadTable containing the 
+                   download parameters.
+
+                   Since this table does not support IPv6,
+                   it is deprecated in favor of hpicfDownloadInetEntry."
+           INDEX      { hpicfDownloadIndex }
+           ::= { hpicfDownloadTable 1 }
+
+       HpicfDownloadEntry ::=
+           SEQUENCE {
+               hpicfDownloadIndex              INTEGER,
+               hpicfDownloadOwnerAddress       TAddress,
+               hpicfDownloadOwnerDomain        TDomain,
+               hpicfDownloadTAddress           TAddress,
+               hpicfDownloadTDomain            TDomain,
+               hpicfDownloadFilename           DisplayString,
+               hpicfDownloadResetType          INTEGER,
+               hpicfDownloadErrorStatus        INTEGER,
+               hpicfDownloadErrorText          DisplayString,
+               hpicfDownloadStatus             RowStatus,
+               hpicfDownloadPassesLeft         Integer32,
+               hpicfDownloadOctetCount         Integer32,
+               hpicfDownloadDestination        DisplayString
+           }
+
+
+       hpicfDownloadIndex OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          dlInstance(1)
+                      }
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "The index which uniquely identifies this row.  
+                   The only legal value for this object is 1."
+           ::= { hpicfDownloadEntry 1 }
+
+       hpicfDownloadOwnerAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "The transport address of the management station 
+                   that initiated this download attempt, formatted 
+                   according to the value of the associated instance 
+                   of hpicfDownloadOwnerDomain."
+           ::= { hpicfDownloadEntry 2 }
+
+       hpicfDownloadOwnerDomain  OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "The kind of transport service used by the 
+                   management station that initiated this download 
+                   attempt."
+           ::= { hpicfDownloadEntry 3 }
+
+       hpicfDownloadTAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "The transport address of the node to download 
+                   firmware from, formatted according to the value of
+                   the associated instance of hpicfDownloadTDomain.
+
+                   An attempt to modify this value will fail if the 
+                   associated hpicfDownloadStatus object would be 
+                   equal to 'active' both before and after the 
+                   modification attempt."
+           ::= { hpicfDownloadEntry 4 }
+
+       hpicfDownloadTDomain OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "The kind of transport service to be used for the 
+                   download.  Currently supports snmpUDPDomain and 
+                   snmpIPXDomain.
+
+                   An attempt to modify this value will fail if the 
+                   associated hpicfDownloadStatus object would be 
+                   equal to 'active' both before and after the 
+                   modification attempt."
+           ::= { hpicfDownloadEntry 5 }
+
+       hpicfDownloadFilename OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "Filename and path of file to download (maximum 
+                   length of 63 characters + NULL).
+
+                   An attempt to modify this value will fail if the 
+                   associated hpicfDownloadStatus object would be 
+                   equal to 'active' both before and after the 
+                   modification attempt."
+           ::= { hpicfDownloadEntry 6 }
+
+       hpicfDownloadResetType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noReset(1),
+                          warmReset(2),
+                          factoryReset(3)
+                      }
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "The type of reset to perform after completion of
+                   the firmware download.  Note that not all agents
+                   will support all possible values, and there may
+                   be other agent-specific values for this object."
+           ::= { hpicfDownloadEntry 7 }
+
+       hpicfDownloadErrorStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          fileNotFound(1),
+                          accessViolation(2),
+                          diskFull(3),
+                          illegalOperation(4),
+                          unknownTID(5),
+                          fileExists(6),
+                          noSuchUser(7),
+                          notDefined(8),
+                          corruptFile(9),
+                          noServer(10),
+                          tftpTimeout(11),
+                          hardwareError(12),
+                          success(13),
+                          aborted(14),
+                          inProgress(15),
+                          idle(16),
+                          erasingEeprom(17),
+                          incompleteFirmware(18),
+                          requirePowerCycle(19),
+                          cannotUpgrade(20),
+                          cannotDowngrade(21)
+                      }
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "Status of download.  The first seven codes are 
+                   equal to the codes defined by the TFTP protocol.
+                   'notDefined' is the same as TFTP protocol error 0.
+                   The following are the other possible values for this
+                   object:
+
+                     corruptFile        - the agent detected a problem
+                                          with the download file format.
+                     noServer           - the TFTP server at
+                                          hpicfDownloadTAddress did not
+                                          respond to the TFTP request.
+                     tftpTimeout        - the download was aborted due
+                                          to excessive timeouts. 
+                     hardwareError      - there was a hardware problem
+                                          on the agent that forced an
+                                          abort of the download (see
+                                          hpicfDownloadErrorText for
+                                          more detailed information).
+                     success            - the download has completed
+                                          successfully.
+                     aborted            - the download was aborted by
+                                          setting the
+                                          hpicfDownloadStatus to
+                                          'notInService' or 'delete'.
+                     inProgress         - the TFTP transfer is currently
+                                          active.
+                     idle               - means that the download has
+                                          not yet started (i.e. the
+                                          value of hpicfDownloadStatus
+                                          has not yet been set to
+                                          'active').
+                     erasingEeprom      - the agent is currently erasing
+                                          the EEPROM device.  Currently
+                                          only used on JetDirect agents.
+                     incompleteFirmware - the agent is running an
+                                          incomplete version of firmware
+                                          and requires a download.
+                                          Currently only used on
+                                          JetDirect agents.
+                     requirePowerCycle  - the agent must be power cycled
+                                          to run the newly downloaded
+                                          firmware.  Currently only used
+                                          on JetDirect agents.
+                     cannotUpgrade      - the agent's current firmware
+                                          revision cannot be upgraded to
+                                          the revision in the download
+                                          file.
+                     cannotDowngrade    - the agent's current firmware
+                                          revision cannot be downgraded
+                                          to the revision in the
+                                          download file."
+           ::= { hpicfDownloadEntry 8 }
+
+       hpicfDownloadErrorText OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "A textual description of the current error status
+                   of the firmware download."
+           ::= { hpicfDownloadEntry 9 }
+
+       hpicfDownloadStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "The status of this download entry.  This object
+                   may not be set to 'active' unless the following 
+                   columnar objects exist in this row: 
+                   hpicfDownloadTAddress, hpicfDownloadTDomain,
+                   hpicfDownloadFilename, and 
+                   hpicfDownloadResetType."
+           ::= { hpicfDownloadEntry 10 }
+
+       hpicfDownloadPassesLeft OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "The number of passes remaining in the current
+                   download attempt.  Some agents (currently JetDirect
+                   agents) require multiple passes through the download
+                   file in order to download a firmware image.  This
+                   object indicates the number of passes remaining,
+                   including the current pass.  The object is
+                   initialized by the agent to the number of passes
+                   required to complete the download when the
+                   corresponding instance of hpicfDownloadStatus is set
+                   to 'active'.  It is decremented by one each time a
+                   pass completes."
+           ::= { hpicfDownloadEntry 11 }
+
+       hpicfDownloadOctetCount OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "The number of octets that have been transferred
+                   during the current pass.  This object is initialized
+                   to zero by the agent when the corresponding instance
+                   of hpicfDownloadStatus is set to 'active', and
+                   reinitialized to zero at the beginning of each pass."
+           ::= { hpicfDownloadEntry 12 }
+
+       hpicfDownloadDestination OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "The destination of the download file on the agent.
+                   The allowable destination names depend on the type
+                   of agent being downloaded.  In all cases, a
+                   destination of '/os/primary' or '/os/secondary'
+                   indicates that this is a download of the agent's
+                   firmware image.  The agent will use '/os/primary' 
+                   as the default value for this object when the row
+                   is created. 
+
+                   ICF router agents also allow a download of a config
+                   file.  Currently, the name of the config file on the
+                   agent is '/config'.
+
+                   An agent should reject an attempt to set this object
+                   to a destination name that does not make sense for
+                   this type of agent."
+           DEFVAL  { "/os/primary" } -- public
+           ::= { hpicfDownloadEntry 13 }
+
+       hpicfDownloadLogMaxSize OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The maximum number of the download log entries
+                   supported by this agent.  Note that 0 is a 
+                   legal value for this variable."
+           ::= { hpicfDownload 2 }
+
+       hpicfDownloadLogSize OBJECT-TYPE
+           SYNTAX     Gauge32 (0..65535)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of download log entries currently in
+                   the hpicfDownloadLogTable."
+           ::= { hpicfDownload 3 }
+
+       hpicfDownloadLogTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfDownloadLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A log of the hpicfDownloadSize most recent 
+                   download attempts to this device.  The first entry
+                   in the table is the oldest."
+           ::= { hpicfDownload 4 }
+
+       hpicfDownloadLogEntry OBJECT-TYPE
+           SYNTAX     HpicfDownloadLogEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the hpicfDownloadLogTable containing
+                   information about a single download attempt."
+           INDEX      { hpicfDlLogIndex }
+           ::= { hpicfDownloadLogTable 1 }
+
+       HpicfDownloadLogEntry ::=
+           SEQUENCE {
+               hpicfDlLogIndex                 Integer32,
+               hpicfDlLogOwnerAddress          TAddress,
+               hpicfDlLogOwnerDomain           TDomain,
+               hpicfDlLogTAddress              TAddress,
+               hpicfDlLogTDomain               TDomain,
+               hpicfDlLogFilename              DisplayString,
+               hpicfDlLogResetType             INTEGER,
+               hpicfDlLogErrorStatus           INTEGER,
+               hpicfDlLogErrorText             DisplayString
+           }
+
+       hpicfDlLogIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The index of this entry in the download log 
+                   table.  Index 1 will always contain the oldest
+                   entry.  If the table is full when a download
+                   attempt is made, the new entry becomes the last
+                   entry (hpicfDownloadLogMaxSize), and all earlier
+                   entries are shifted down by one entry, removing
+                   the old index 1."
+           ::= { hpicfDownloadLogEntry 1 }
+
+       hpicfDlLogOwnerAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the management station 
+                   that attempted to initiate a download of this
+                   device, formatted according to the value of 
+                   hpicfDlLastOwnerDomain."
+           ::= { hpicfDownloadLogEntry 2 }
+
+       hpicfDlLogOwnerDomain OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The kind of transport service used by the 
+                   management station that attempted to initiate a 
+                   download of this device."
+           ::= { hpicfDownloadLogEntry 3 }
+
+       hpicfDlLogTAddress OBJECT-TYPE
+           SYNTAX     TAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the node from which this
+                   device attempted to download firmware, formatted 
+                   according to the value of hpicfDlLastTDomain."
+           ::= { hpicfDownloadLogEntry 4 }
+
+       hpicfDlLogTDomain OBJECT-TYPE
+           SYNTAX     TDomain
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The kind of transport service which was used for 
+                   the attempt to download firmware to this device."
+           ::= { hpicfDownloadLogEntry 5 }
+
+       hpicfDlLogFilename OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The filename from which this device attempted to
+                   download firmware."
+           ::= { hpicfDownloadLogEntry 6 }
+
+       hpicfDlLogResetType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noReset(1),
+                          warmReset(2),
+                          factoryReset(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The type of reset requested to be  performed
+                   after completion of the firmware download 
+                   attempt."
+           ::= { hpicfDownloadLogEntry 7 }
+
+       hpicfDlLogErrorStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          fileNotFound(1),
+                          accessViolation(2),
+                          diskFull(3),
+                          illegalOperation(4),
+                          unknownTID(5),
+                          fileExists(6),
+                          noSuchUser(7),
+                          notDefined(8),
+                          corruptFile(9),
+                          noServer(10),
+                          tftpTimeout(11),
+                          hardwareError(12),
+                          success(13),
+                          aborted(14)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The result of the attempt to download firmware to
+                   this device.  The values are the same as the 
+                   corresponding values of hpicfDownloadErrorStatus."
+           ::= { hpicfDownloadLogEntry 8 }
+
+       hpicfDlLogErrorText OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A textual description of the final error status 
+                   of the attempt to download firmware to this 
+                   device."
+           ::= { hpicfDownloadLogEntry 9 }
+
+       hpicfDownloadTftpConfig OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(1),
+                        enabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION "This object allows switch to enable or disable
+                     tftp. Default value is 2. Cannot be enabled if
+                     sftp is enabled."
+        ::= { hpicfDownload 5 }
+
+        hpicfDownloadTftpServerConfig OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When this is true(1), the TFTP server is enabled
+                     and will process incoming requests. When this is 
+                     false(2), the TFTP server will be shut down and 
+                     will not accept incoming connections."
+        ::= { hpicfDownload 6 }
+
+        hpicfDownloadTftp6Config OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(1),
+                        enabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      deprecated 
+        DESCRIPTION "********* THIS OBJECT IS DEPRECATED ********
+                     This object allows switch to enable or disable
+                     tftp. Default value is 2. Cannot be enabled if
+                     sftp is enabled."
+        ::= { hpicfDownload 7 }
+
+        hpicfDownloadTftp6ServerConfig OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION "********* THIS OBJECT IS DEPRECATED ********
+                     When this is true(1), the TFTP server is enabled
+                     and will process incoming requests. When this is 
+                     false(2), the TFTP server will be shut down and 
+                     will not accept incoming connections."
+        ::= { hpicfDownload 8 }
+
+        hpicfDownloadConfigFileUpdateEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object facilitates enabling/disabling
+                     configuration file update through DHCP. By default,
+                     this is enabled."
+        ::= { hpicfDownload 10 }
+
+
+-----------------------------------------------------------------------
+-- MIB for auto-tftp 
+-----------------------------------------------------------------------
+        hpicfDownloadAutoTftpTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfDownloadAutoTftpEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table for automatic firmware download to the
+                   device via TFTP during boot. The firmware image
+                   will be downloaded if it has a different
+                   version from the firmware running on the switch. 
+                   There will be only one row at any time for this  
+                   table, and the only valid index for this 
+                   table is 1."
+           ::= { hpicfDownload 11 }
+
+       hpicfDownloadAutoTftpEntry OBJECT-TYPE
+           SYNTAX     HpicfDownloadAutoTftpEntry
+           MAX-ACCESS not-accessible
+           STATUS     current 
+           DESCRIPTION
+                     "The row in the hpicfDownloadAutoTftpTable
+                      containing the auto-tftp download parameters."
+           INDEX      { hpicfDownloadAutoTftpIndex }
+           ::= { hpicfDownloadAutoTftpTable 1 }
+
+       HpicfDownloadAutoTftpEntry ::=
+           SEQUENCE {
+               hpicfDownloadAutoTftpIndex          Integer32,
+               hpicfDownloadAutoTftpAddressType    InetAddressType,
+               hpicfDownloadAutoTftpAddress        InetAddress,
+               hpicfDownloadAutoTftpRemoteFilename DisplayString,
+               hpicfDownloadAutoTftpAdminStatus    INTEGER
+               }
+     hpicfDownloadAutoTftpIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS not-accessible
+           STATUS     current 
+           DESCRIPTION
+                   "The index which uniquely identifies this row."  
+           ::= { hpicfDownloadAutoTftpEntry 1 }
+ 
+      hpicfDownloadAutoTftpAddressType OBJECT-TYPE
+           SYNTAX     InetAddressType
+           MAX-ACCESS read-write 
+           STATUS     current
+           DESCRIPTION
+                   "The type of address in the corresponding
+                    hpicfDownloadAutoTftpAddress object." 
+           ::= { hpicfDownloadAutoTftpEntry 2 }
+
+       hpicfDownloadAutoTftpAddress OBJECT-TYPE
+           SYNTAX     InetAddress
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The tftp server address to download firmware from,
+                   formatted according to the value of the associated
+                   instance of hpicfDownloadAutoTftpAddressType."
+           ::= { hpicfDownloadAutoTftpEntry 3 }
+           
+       hpicfDownloadAutoTftpRemoteFilename OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..255))
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The firmware image name to download from tftp-server.
+                    It can be upto 255 characters."
+           ::= { hpicfDownloadAutoTftpEntry 4 }
+    
+      hpicfDownloadAutoTftpAdminStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enable(1),
+                          disable(2)
+                      }
+           MAX-ACCESS read-write 
+           STATUS     current
+           DESCRIPTION
+                   "This object enables/disables auto-tftp.
+                    The value of hpicfDownloadAutoTftpAddress, 
+                    hpicfDownloadAutoTftpRemoteFilename can not be empty
+                    when hpicfDownloadAutoTftpAdminStatus is enabled."
+           ::= { hpicfDownloadAutoTftpEntry 5}
+
+--
+
+-- Download Table 
+
+--
+       hpicfDownloadInetTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF HpicfDownloadInetEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table of firmware downloads to this device.  
+                   There will at any time be either 0 or 1 rows in 
+                   this table, and the only valid index for this 
+                   table is 1.  It is only a table so that we may 
+                   take advantage of the RowStatus textual convention
+                   for configuring the download parameters."
+           ::= { hpicfDownload 9 }
+
+       hpicfDownloadInetEntry OBJECT-TYPE
+           SYNTAX     HpicfDownloadInetEntry
+           MAX-ACCESS not-accessible
+           STATUS     current 
+           DESCRIPTION
+                   "The row in the hpicfDownloadInetTable containing the download parameters."
+           INDEX      { hpicfDownloadInetIndex }
+           ::= { hpicfDownloadInetTable 1 }
+
+       HpicfDownloadInetEntry ::=
+           SEQUENCE {
+               hpicfDownloadInetIndex              Integer32,
+               hpicfDownloadInetTAddressType       InetAddressType,
+               hpicfDownloadInetTAddress           InetAddress,
+               hpicfDownloadInetFilename           DisplayString,
+               hpicfDownloadInetOwnerAddressType   InetAddressType,
+               hpicfDownloadInetOwnerAddress       InetAddress,
+               hpicfDownloadInetSourcePort         Integer32,
+               hpicfDownloadInetDestinationPort    Integer32,
+               hpicfDownloadInetFileTransferType   INTEGER,
+               hpicfDownloadInetResetType          INTEGER,
+               hpicfDownloadInetErrorStatus        INTEGER,
+               hpicfDownloadInetErrorText          DisplayString,
+               hpicfDownloadInetStatus             RowStatus,
+               hpicfDownloadInetPassesLeft         Integer32,
+               hpicfDownloadInetOctetCount         Integer32,
+               hpicfDownloadInetDestination        DisplayString,
+               hpicfDownloadInetOpType             INTEGER,
+               hpicfDownloadInetFileType           INTEGER,
+               hpicfDownloadInetFileModeType       INTEGER,
+               hpicfDownloadInetCoreDumpModule     PhysicalIndex
+           }
+     hpicfDownloadInetIndex OBJECT-TYPE
+           SYNTAX     Integer32 (0..2147483647)
+           MAX-ACCESS read-only
+           STATUS     current 
+           DESCRIPTION
+                   "The index which uniquely identifies this row."  
+           ::= { hpicfDownloadInetEntry 1 }
+ 
+      hpicfDownloadInetTAddressType OBJECT-TYPE
+           SYNTAX     InetAddressType
+           MAX-ACCESS read-write 
+           STATUS     current
+           DESCRIPTION
+                   "The type of address in the corresponding
+                    hpicfDownloadTAddress object. An attempt to 
+                    modify this value will fail if the  associated 
+                    hpicfDownloadInetStatus object would be equal to
+                    'active' both before and after the  modification attempt."
+           ::= { hpicfDownloadInetEntry 2 }
+
+       hpicfDownloadInetTAddress OBJECT-TYPE
+           SYNTAX     InetAddress
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the node to download 
+                   firmware from, formatted according to the value of
+                   the associated instance of hpicfDownloadInetTAddressType.
+                   An attempt to modify this value will fail if the 
+                   associated hpicfDownloadInetStatus object would be 
+                   equal to 'active' both before and after the 
+                   modification attempt."
+           ::= { hpicfDownloadInetEntry 3 }
+           
+       hpicfDownloadInetFilename OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "Filename and path of file to download (maximum 
+                   length of 63 characters + NULL).
+                   An attempt to modify this value will fail if the 
+                   associated hpicfDownloadInetStatus object would be 
+                   equal to 'active' both before and after the 
+                   modification attempt."
+           ::= { hpicfDownloadInetEntry 4 }
+    
+       hpicfDownloadInetOwnerAddressType OBJECT-TYPE
+           SYNTAX     InetAddressType
+           MAX-ACCESS read-write 
+           STATUS     current
+           DESCRIPTION
+                   "The type of address in the corresponding
+                    hpicfDownloadInetOwnerAddress object."
+           ::= { hpicfDownloadInetEntry 5 }
+      
+       hpicfDownloadInetOwnerAddress OBJECT-TYPE
+           SYNTAX     InetAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The transport address of the management station 
+                   that initiated this download attempt, formatted 
+                   according to the value of the associated instance 
+                   of hpicfDownloadInetOwnerAddressType."
+           ::= { hpicfDownloadInetEntry 6 }
+                                            
+       hpicfDownloadInetSourcePort OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-write 
+           STATUS     current
+           DESCRIPTION
+                   "The port of the management station 
+                   that initiated this download attempt."
+           ::= { hpicfDownloadInetEntry 7 }
+
+       hpicfDownloadInetDestinationPort OBJECT-TYPE
+           SYNTAX     Integer32 (0..65535)
+           MAX-ACCESS read-write 
+           STATUS     current
+           DESCRIPTION
+                   "The port of the management station 
+                   that initiated this download attempt."
+           ::= { hpicfDownloadInetEntry 8 }
+                                            
+       hpicfDownloadInetFileTransferType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          usb(1),
+                          tftp(2),
+                          xmodem(3)
+                      }
+           MAX-ACCESS read-write 
+           STATUS     current
+           DESCRIPTION
+                   "The FileTransfer Method used by the management station
+                    to initiate the download attempt."
+           ::= { hpicfDownloadInetEntry 9 }
+
+
+       hpicfDownloadInetResetType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noReset(1),
+                          warmReset(2),
+                          factoryReset(3)
+                      }
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The type of reset to perform after completion of
+                   the firmware download.  Note that not all agents
+                   will support all possible values, and there may
+                   be other agent-specific values for this object."
+           ::= { hpicfDownloadInetEntry 10 }
+
+       hpicfDownloadInetErrorStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          fileNotFound(1),
+                          accessViolation(2),
+                          diskFull(3),
+                          illegalOperation(4),
+                          unknownTID(5),
+                          fileExists(6),
+                          noSuchUser(7),
+                          notDefined(8),
+                          corruptFile(9),
+                          noServer(10),
+                          tftpTimeout(11),
+                          hardwareError(12),
+                          success(13),
+                          aborted(14),
+                          inProgress(15),
+                          idle(16),
+                          erasingEeprom(17),
+                          incompleteFirmware(18),
+                          requirePowerCycle(19),
+                          cannotUpgrade(20),
+                          cannotDowngrade(21)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "Status of download.  The first seven codes are 
+                   equal to the codes defined by the TFTP protocol.
+                   'notDefined' is the same as TFTP protocol error 0.
+                   The following are the other possible values for this
+                   object:
+
+                     corruptFile        - the agent detected a problem
+                                          with the download file format.
+                     noServer           - the TFTP server at
+                                          hpicfDownloadTAddress did not
+                                          respond to the TFTP request.
+                     tftpTimeout        - the download was aborted due
+                                          to excessive timeouts. 
+                     hardwareError      - there was a hardware problem
+                                          on the agent that forced an
+                                          abort of the download (see
+                                          hpicfDownloadErrorText for
+                                          more detailed information).
+                     success            - the download has completed
+                                          successfully.
+                     aborted            - the download was aborted by
+                                          setting the
+                                          hpicfDownloadStatus to
+                                          'notInService' or 'delete'.
+                     inProgress         - the TFTP transfer is currently
+                                          active.
+                     idle               - means that the download has
+                                          not yet started (i.e. the
+                                          value of hpicfDownloadStatus
+                                          has not yet been set to
+                                          'active').
+                     erasingEeprom      - the agent is currently erasing
+                                          the EEPROM device.  Currently
+                                          only used on JetDirect agents.
+                     incompleteFirmware - the agent is running an
+                                          incomplete version of firmware
+                                          and requires a download.
+                                          Currently only used on
+                                          JetDirect agents.
+                     requirePowerCycle  - the agent must be power cycled
+                                          to run the newly downloaded
+                                          firmware.  Currently only used
+                                          on JetDirect agents.
+                     cannotUpgrade      - the agent's current firmware
+                                          revision cannot be upgraded to
+                                          the revision in the download
+                                          file.
+                     cannotDowngrade    - the agent's current firmware
+                                          revision cannot be downgraded
+                                          to the revision in the
+                                          download file."
+           ::= { hpicfDownloadInetEntry 11 }
+
+       hpicfDownloadInetErrorText OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A textual description of the current error status
+                   of the firmware download."
+           ::= { hpicfDownloadInetEntry 12 }
+
+       hpicfDownloadInetStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The status of this download entry.  This object
+                   may not be set to 'active' unless the following 
+                   columnar objects exist in this row: 
+                   hpicfDownloadInetTAddress, hpicfDownloadInetTAddressType,
+                   hpicfDownloadInetFilename, and 
+                   hpicfDownloadInetResetType."
+           ::= { hpicfDownloadInetEntry 13 }
+
+       hpicfDownloadInetPassesLeft OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of passes remaining in the current
+                   download attempt.  Some agents (currently JetDirect
+                   agents) require multiple passes through the download
+                   file in order to download a firmware image.  This
+                   object indicates the number of passes remaining,
+                   including the current pass.  The object is
+                   initialized by the agent to the number of passes
+                   required to complete the download when the
+                   corresponding instance of hpicfDownloadStatus is set
+                   to 'active'.  It is decremented by one each time a
+                   pass completes."
+           ::= { hpicfDownloadInetEntry 14 }
+
+       hpicfDownloadInetOctetCount OBJECT-TYPE
+           SYNTAX     Integer32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The number of octets that have been transferred
+                   during the current pass.  This object is initialized
+                   to zero by the agent when the corresponding instance
+                   of hpicfDownloadStatus is set to 'active', and
+                   reinitialized to zero at the beginning of each pass."
+           ::= { hpicfDownloadInetEntry 15 }
+
+       hpicfDownloadInetDestination OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..63))
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The destination of the download file on the agent.
+                   The allowable destination names depend on the type
+                   of agent being downloaded. 
+                   In case of firmware download,destination can be
+                   '/os/primary' or '/os/secondary'
+                   The agent will use '/os/primary' as the default 
+                   value for this object when the row is created.
+                   In case of downloading a config file, this object
+                   is set to the name of the config file on the switch
+                   to where it should be downloaded.
+                   In case of downloading the startup config, this
+                   object is nullified as it is not used.
+
+                   ICF router agents also allow a download of a config
+                   file.  Currently, the name of the config file on the
+                   agent is '/config'.
+   
+                   If the hpicfDownloadInetOpType is set to ftget, 
+                   an agent should reject an attempt to set this object
+                   to a destination name that does not make sense for
+                   this type of agent.
+   
+                   If hpicfDownloadInetOpType is ftput this can be set 
+                   to a filename present in the tftp server."
+           DEFVAL  { "/os/primary" } -- public
+           ::= { hpicfDownloadInetEntry 16 }
+                                            
+      hpicfDownloadInetOpType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                               ftget(1),
+                               ftput(2)
+                              }
+           MAX-ACCESS read-write 
+           STATUS     current 
+           DESCRIPTION
+                   "The OpType which is used for Getting or Putting
+                   firmware, coreDump and config from/to the TFTP 
+                   server."  
+           ::= { hpicfDownloadInetEntry 17 }
+
+
+       hpicfDownloadInetFileType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          flash(1),
+                          startUpConfig(2),
+                          runningConfig(3),
+                          config(4),
+                          coreDump(5)
+                      }
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The FileType used by the management station
+                    to initiate the upload/download attempt.
+                    OpType-ftput is not supported for flash.
+                    OpType-ftget is not supported for 
+                    runningConfig and coreDump"
+           ::= { hpicfDownloadInetEntry 18}
+
+   
+       hpicfDownloadInetFileModeType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                        unix(1),
+                        pc(2)
+                      }
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "The FileModeType used by the management station
+                    to initiate the download attempt."
+           ::= { hpicfDownloadInetEntry 19}
+
+       hpicfDownloadInetCoreDumpModule  OBJECT-TYPE
+           SYNTAX     PhysicalIndex
+           MAX-ACCESS read-create
+           STATUS     current
+           DESCRIPTION
+                   "This object can be updated if the 
+                    hpicfDownloadInetFileType is set to coreDump. 
+                    Valid  entPhysicalIndex  for this object are
+                    management-modules and interface-modules."
+           ::= { hpicfDownloadInetEntry 20}
+
+       hpicfDownloadTftpClientConfig OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object enables or disables the TFTP client on the switch. 
+                     The TFTP client is disabled when SFTP and SCP file transfer 
+                     modes are enabled.
+                     A value of (1) indicates that TFTP client is enabled on the switch.
+                     A value of (2) indicates that TFTP client is disabled on the switch."
+        DEFVAL	     { enabled}
+        ::= { hpicfDownload 12 }
+
+       hpicfDownloadTftpClientBlkSize OBJECT-TYPE
+        SYNTAX       Integer32 (512..8192)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "The size of the TFTP Client block size in bytes.
+                      This value can be set only when
+                      hpicfDownloadTftpClientConfig is enabled.
+                      When hpicfDownloadTftpClientConfig is disabled,
+                      this value is reset to its default value.
+                      The actual range of the supported block size depends 
+                      on the implementation."
+        DEFVAL        {1416}
+        ::= { hpicfDownload 13 }
+
+       -- conformance information
+
+       hpicfDownloadConformance
+           OBJECT IDENTIFIER ::= { hpicfDownloadMib 1 }
+
+       hpicfDownloadCompliances
+           OBJECT IDENTIFIER ::= { hpicfDownloadConformance 1 }
+       hpicfDownloadGroups
+           OBJECT IDENTIFIER ::= { hpicfDownloadConformance 2 }
+
+
+       -- compliance statements
+
+       hpicfDownloadCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********
+
+                   The compliance statement for HP ICF network
+                   downloadable devices."
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadGroup }
+
+               GROUP    hpicfDownloadLogGroup
+               DESCRIPTION
+                       "This group should be implemented by devices
+                       that are able to keep log of network download
+                       attempts."
+
+               ::= { hpicfDownloadCompliances 1 }
+
+       hpicfDownloadConfigCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "New version of the compliance statement for
+                   HP ICF network downloadable devices that allows
+                   for monitoring in-progress downloads and for
+                   directing a download to different destinations
+                   on the device."
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadConfigGroup }
+
+               GROUP    hpicfDownloadLogGroup
+               DESCRIPTION
+                       "This group should be implemented by devices
+                       that are able to keep log of network download
+                       attempts."
+
+               ::= { hpicfDownloadCompliances 2 }
+
+       hpicfDownloadConfigInetCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "New version of the compliance statement for
+                   HP ICF network downloadable devices that allows
+                   for monitoring in-progress downloads and for
+                   directing a download to different destinations
+                   on the device."
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadConfigInetGroup }
+
+               GROUP    hpicfDownloadLogGroup
+               DESCRIPTION
+                       "This group should be implemented by devices
+                       that are able to keep log of network download
+                       attempts."
+
+               ::= { hpicfDownloadCompliances 3 }
+
+
+        hpicfDownloadAutoTftpCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for HP ICF network 
+                   downloadable devices that allows automatic
+                   download of a firmware-image on boot."
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadAutoTftpGroup }
+
+               ::= { hpicfDownloadCompliances 4 }
+
+        hpicfDownloadConfigInetCompliance1 MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                  "New version of the compliance statement for
+                   HP ICF network downloadable devices that allows
+                   for monitoring in-progress downloads and for
+                   directing a download to different destinations
+                   on the device."
+     
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadConfigOtherGroup }
+
+               ::= { hpicfDownloadCompliances 5 }
+
+        hpicfDownloadConfigInetCompliance2 MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                  "New version of the compliance statement for
+                   HP ICF network downloadable devices that allows
+                   for monitoring in-progress downloads and for
+                   directing a download to different destinations
+                   on the device."
+
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadConfigOtherGroup1 }
+
+               ::= { hpicfDownloadCompliances 6 }
+
+        hpicfDownloadConfigInetCompliance3 MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                  "A New version of the compliance statement for
+                   HP ICF network downloadable devices that allows
+                   monitoring of downloads in progress and
+                   directing a download to different destinations
+                   on the device."
+
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadConfigOtherGroup2 }
+
+               ::= { hpicfDownloadCompliances 7 }
+
+        hpicfDownloadConfigInetCompliance4 MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                  "A New version of the compliance statement for
+                   HP ICF network downloadable devices that allows
+                   monitoring of downloads in progress and
+                   directing a download to different destinations
+                   on the device."
+
+           MODULE
+               MANDATORY-GROUPS { hpicfDownloadConfigOtherGroup3 }
+
+               ::= { hpicfDownloadCompliances 8 }
+
+       -- units of conformance
+
+       hpicfDownloadGroup OBJECT-GROUP
+           OBJECTS    { hpicfDownloadIndex,
+                        hpicfDownloadOwnerAddress,
+                        hpicfDownloadOwnerDomain,
+                        hpicfDownloadTAddress,
+                        hpicfDownloadTDomain,
+                        hpicfDownloadFilename,
+                        hpicfDownloadResetType,
+                        hpicfDownloadErrorStatus,
+                        hpicfDownloadErrorText,
+                        hpicfDownloadStatus,
+                        hpicfDownloadLogMaxSize,
+                        hpicfDownloadLogSize
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+
+                   A collection of objects for controlling network
+                   download of device firmware to ICF devices."
+           ::= { hpicfDownloadGroups 1 }
+
+       hpicfDownloadLogGroup OBJECT-GROUP
+           OBJECTS    { hpicfDlLogIndex,
+                        hpicfDlLogOwnerAddress,
+                        hpicfDlLogOwnerDomain,
+                        hpicfDlLogTAddress,
+                        hpicfDlLogTDomain,
+                        hpicfDlLogFilename,
+                        hpicfDlLogResetType,
+                        hpicfDlLogErrorStatus,
+                        hpicfDlLogErrorText
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for maintaining a log of
+                   network download attempts to ICF devices."
+           ::= { hpicfDownloadGroups 2 }
+
+       hpicfDownloadConfigGroup OBJECT-GROUP
+           OBJECTS    { hpicfDownloadIndex,
+                        hpicfDownloadOwnerAddress,
+                        hpicfDownloadOwnerDomain,
+                        hpicfDownloadTAddress,
+                        hpicfDownloadTDomain,
+                        hpicfDownloadFilename,
+                        hpicfDownloadResetType,
+                        hpicfDownloadErrorStatus,
+                        hpicfDownloadErrorText,
+                        hpicfDownloadStatus,
+                        hpicfDownloadPassesLeft,
+                        hpicfDownloadOctetCount,
+                        hpicfDownloadDestination,
+                        hpicfDownloadLogMaxSize,
+                        hpicfDownloadLogSize
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "A collection of objects for controlling and
+                   monitoring network download of device firmware to
+                   ICF devices."
+           ::= { hpicfDownloadGroups 3 }
+
+       hpicfDownloadConfigInetGroup OBJECT-GROUP
+           OBJECTS    { 
+                        hpicfDownloadLogMaxSize,
+                        hpicfDownloadLogSize,
+                        hpicfDownloadInetIndex,
+                        hpicfDownloadInetTAddressType,
+                        hpicfDownloadInetTAddress,
+                        hpicfDownloadInetFilename,
+                        hpicfDownloadInetOwnerAddressType,
+                        hpicfDownloadInetOwnerAddress,
+                        hpicfDownloadInetSourcePort,
+                        hpicfDownloadInetDestinationPort,
+                        hpicfDownloadInetFileTransferType,
+                        hpicfDownloadInetResetType,
+                        hpicfDownloadInetErrorStatus,
+                        hpicfDownloadInetErrorText,
+                        hpicfDownloadInetStatus,
+                        hpicfDownloadInetPassesLeft,
+                        hpicfDownloadInetOctetCount,
+                        hpicfDownloadInetDestination,
+                        hpicfDownloadInetOpType,
+                        hpicfDownloadInetFileType,
+                        hpicfDownloadInetFileModeType,
+                        hpicfDownloadInetCoreDumpModule
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for controlling and
+                   monitoring network download of device firmware to
+                   ICF devices."
+           ::= { hpicfDownloadGroups 4 }
+
+      hpicfDownloadAutoTftpGroup OBJECT-GROUP
+           OBJECTS    { 
+                        hpicfDownloadAutoTftpAddressType,
+                        hpicfDownloadAutoTftpAddress,
+                        hpicfDownloadAutoTftpRemoteFilename,
+                        hpicfDownloadAutoTftpAdminStatus
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for controlling automatic
+                   download of a firmware image to the device."
+           ::= { hpicfDownloadGroups 5 }
+
+      hpicfDownloadConfigOtherGroup OBJECT-GROUP
+           OBJECTS    { 
+                        hpicfDownloadAutoTftpAdminStatus,
+                        hpicfDownloadTftpConfig,
+                        hpicfDownloadTftpServerConfig,
+                        hpicfDownloadConfigFileUpdateEnabled
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "A collection of objects for controlling automatic
+                   download of a firmware image to the device."
+           ::= { hpicfDownloadGroups 6 }
+
+      hpicfDownloadConfigOtherGroup1 OBJECT-GROUP
+           OBJECTS    {
+                        hpicfDownloadTftp6Config,
+                        hpicfDownloadTftp6ServerConfig
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "A collection of objects for controlling automatic
+                   download of a firmware image to the device."
+           ::= { hpicfDownloadGroups 7 }
+
+      hpicfDownloadConfigOtherGroup2 OBJECT-GROUP
+           OBJECTS    { 
+                        hpicfDownloadAutoTftpAdminStatus,
+                        hpicfDownloadTftpClientConfig,
+                        hpicfDownloadTftpServerConfig,
+                        hpicfDownloadConfigFileUpdateEnabled
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for controlling the automatic
+                   download of a firmware on the device."
+           ::= { hpicfDownloadGroups 8 }
+
+      hpicfDownloadConfigOtherGroup3 OBJECT-GROUP
+           OBJECTS    {
+                        hpicfDownloadTftpClientBlkSize
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for controlling the automatic
+                   download of a firmware on the device."
+           ::= { hpicfDownloadGroups 9 }
+      
+       END
+

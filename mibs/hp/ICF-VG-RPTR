@@ -1,0 +1,1625 @@
+       ICF-VG-RPTR DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, Counter32, Counter64, 
+           OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+               FROM SNMPv2-SMI
+           DisplayString, MacAddress, TruthValue, TimeStamp
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           hpicfObjectModules, icfVgRepeater
+               FROM HP-ICF-OID;
+
+       icfVgRepeaterMib MODULE-IDENTITY
+            LAST-UPDATED "200011032225Z"  -- November 3, 2000
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO
+                    "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+            DESCRIPTION
+                    "This MIB module contains objects for managing
+                    HP AdvanceStack 100VG-AnyLAN repeaters.  It is
+                    expected that this module will be superceded by
+                    a standard 802.12 Repeater MIB."
+
+            REVISION     "200011032225Z"  -- November 3, 2000
+            DESCRIPTION  "Updated division name."
+
+            REVISION     "9703060347Z"  -- March 6, 1997
+            DESCRIPTION
+                    "Added NOTIFICATION-GROUP information."
+            REVISION     "9609100203Z"  -- September 10, 1996
+            DESCRIPTION
+                    "Updated division name and STATUS info."
+            REVISION     "9601250356Z"  -- January 25, 1996
+            DESCRIPTION
+                    "Split this MIB module from the former monolithic
+                    hp-icf MIB.  Added support for and full 802.12
+                    compliance."
+            REVISION     "9501180000Z"  -- January 18, 1995
+            DESCRIPTION
+                    "Initial version of this MIB module.  Released with
+                    the HPJ2414A agent card for the HPJ2410A 100VG
+                    repeater."
+            ::= { hpicfObjectModules 10 }
+
+
+
+       icfVgBasic         OBJECT IDENTIFIER ::= { icfVgRepeater 1 }
+       icfVgBasicRptr     OBJECT IDENTIFIER ::= { icfVgBasic 1 }
+
+       icfVgMACAddress OBJECT-TYPE
+           SYNTAX     MacAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The MAC address used by the repeater when it
+                   initiates training on the uplink port.  Repeaters
+                   are allowed to train with an assigned MAC address or
+                   a null (all zeroes) MAC address."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aMACAddress."
+           ::= { icfVgBasicRptr 1 }
+
+       icfVgCurrentFramingType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          frameType88023(1),
+                          frameType88025(2)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The type of framing (802.3 or 802.5) currently in
+                   use by the repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aCurrentFramingType."
+           ::= { icfVgBasicRptr 2 }
+
+       icfVgDesiredFramingType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          frameType88023(1),
+                          frameType88025(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "The type of framing which will be used by the
+                   repeater after the next time it is reset.  The value
+                   of this object should be preserved across repeater
+                   resets and power failures"
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aDesiredFramingType."
+           ::= { icfVgBasicRptr 3 }
+
+       icfVgFramingCapability OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          frameType88023(1),
+                          frameType88025(2),
+                          frameTypeEither(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The type of framing this repeater is capable of
+                   supporting."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aFramingCapability."
+           ::= { icfVgBasicRptr 4 }
+
+       icfVgTrainingVersion OBJECT-TYPE
+           SYNTAX     Integer32 (0..7)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The highest version bits (vvv bits) supported by the
+                   repeater during training."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aRMACVersion."
+           ::= { icfVgBasicRptr 5 }
+
+       icfVgRepeaterGroupCapacity OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The icfVgGroupCapacity is the number of groups that
+                   can be contained within the repeater.  Within each
+                   managed repeater, the groups are uniquely numbered in
+                   the range from 1 to icfVgRepeaterGroupCapacity.
+
+                   Some groups may not be present in the repeater, in
+                   which case the actual number of groups present will
+                   be less than icfVgRepeaterGroupCapacity.  The number
+                   of groups present is never greater than
+                   icfVgRepeaterGroupCapacity."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aRepeaterGroupCapacity."
+           ::= { icfVgBasicRptr 6 }
+
+       icfVgRepeaterHealthState OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          other(1),
+                          ok(2),
+                          rptrFailure(3),
+                          groupFailure(4),
+                          portFailure(5),
+                          generalFailure(6)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The icfVgRepeaterHealthState object indicates the
+                   operational state of the repeater.  The
+                   icfVgRepeaterHealthText may be consulted for more
+                   specific information about the state of the 
+                   repeater's health.
+
+                   In the case of multiple kinds of failures (e.g.,
+                   repeater failure and port failure), the value of this
+                   attribute shall reflect the highest priority failure
+                   in the following order, listed highest priority 
+                   first:
+
+                       rptrFailure(3)
+                       groupFailure(4)
+                       portFailure(5)
+                       generalFailure(6)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aRepeaterHealthState."
+           ::= { icfVgBasicRptr 7 }
+
+       icfVgRepeaterHealthText OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE(0..255))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The health text object is a text string that 
+                   provides information relevant to the operational 
+                   state of the repeater.  Agents may use this string to
+                   provide detailed information on current failures,
+                   including how they were detected, and/or instructions
+                   for problem resolution.  The contents are agent
+                   specific."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.1, aRepeaterHealthText."
+           ::= { icfVgBasicRptr 8 }
+
+       icfVgRepeaterReset OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noReset(1),
+                          reset(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "Setting this object to reset(2) causes the repeater
+                   to transition to its initial state as specified in
+                   clause 12 [IEEE Draft Std 802.12].
+
+                   Setting this object to noReset(1) has no effect.  The
+                   agent will always return the value noReset(1) when
+                   this object is read.
+
+                   After receiving a request to set this variable to
+                   reset(2), the agent is allowed to delay the reset for
+                   a short period.  For example, the implementor may
+                   choose to delay the reset long enough to allow the
+                   SNMP response to be transmitted.  In any event, the
+                   SNMP response must be transmitted.
+
+                   This action does not reset the management counters
+                   defined in this document nor does it affect the
+                   icfVgPortAdminStatus parameters.  Included in this
+                   action is the execution of a disruptive Self-Test
+                   with the following characteristics:  a) The nature
+                   of the tests is not specified.  b) The test resets
+                   the repeater but without affecting management
+                   information about the repeater.  c) The test does not
+                   inject packets onto any segment.  d) Packets received
+                   during the test may or may not be transferred.
+                   e) The test does not interfere with management
+                   functions.
+
+                   After performing this self-test, the agent will
+                   update the repeater health information (including
+                   icfVgRepeaterHealthState and
+                   icfVgRepeaterHealthText)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.2, acResetRepeater."
+           ::= { icfVgBasicRptr 9 }
+
+       icfVgRepeaterNonDisruptTest OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          noSelfTest(1),
+                          selfTest(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "Setting this object to selfTest(2) causes the
+                   repeater to perform an agent-specific, non-disruptive
+                   self-test that has the following characteristics:
+                   a) The nature of the tests is not specified.  b) The
+                   test does not change the state of the repeater or
+                   management information about the repeater.  c) The
+                   test does not inject packets onto any segment. 
+                   d) The test does not prevent the relay of any
+                   packets.  e) The test does not interfere with
+                   management functions.
+
+                   After performing this test, the agent will update the
+                   repeater health information (including
+                   icfVgRepeaterHealthState and
+                   icfVgRepeaterHealthText).
+
+                   Note that this definition allows returning an 'okay'
+                   result after doing a trivial test.
+
+                   Setting this object to noSelfTest(1) has no effect.
+                   The agent will always return the value noSelfTest(1)
+                   when this object is read."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.2, acExecuteNonDisruptiveSelfTest."
+           ::= { icfVgBasicRptr 10 }
+
+       icfVgBasicGroup    OBJECT IDENTIFIER ::= { icfVgBasic 2 }
+
+       icfVgBasicGroupTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfVgBasicGroupEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table containing information about groups of
+                   ports."
+           ::= { icfVgBasicGroup 1 }
+
+       icfVgBasicGroupEntry OBJECT-TYPE
+           SYNTAX     IcfVgBasicGroupEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the icfVgBasicGroupTable, containing
+                   information about a single group of ports."
+           INDEX      { icfVgGroupIndex }
+           ::= { icfVgBasicGroupTable 1 }
+
+       IcfVgBasicGroupEntry ::=
+           SEQUENCE {
+               icfVgGroupIndex                 Integer32,
+               icfVgGroupDescr                 DisplayString,
+               icfVgGroupObjectID              OBJECT IDENTIFIER,
+               icfVgGroupOperStatus            INTEGER,
+               icfVgGroupLastOperStatusChange  TimeStamp,
+               icfVgGroupPortCapacity          Integer32,
+               icfVgGroupCablesBundled         INTEGER
+           }
+
+       icfVgGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the group within the repeater
+                   for which this entry contains information.  This
+                   value is never greater than
+                   icfVgRepeaterGroupCapacity."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.4.1, aGroupID."
+           ::= { icfVgBasicGroupEntry 1 }
+
+       icfVgGroupDescr OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..255))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "A textual description of the group.  This value
+                   should include the full name and version
+                   identification of the group's hardware type and
+                   indicate how the group is differentiated from other
+                   types of groups in the repeater.  'Plug-in Module,
+                   Rev A' or 'Barney Rubble 100BaseVG 4-port socket
+                   Version 2.1' are examples of valid group
+                   descriptions.
+
+                   It is mandatory that this only contain printable
+                   ASCII characters."
+           ::= { icfVgBasicGroupEntry 2 }
+
+       icfVgGroupObjectID OBJECT-TYPE
+           SYNTAX     OBJECT IDENTIFIER
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The vendor's authoritative identification of the
+                   group.  This value may be allocated within the SMI
+                   enterprises subtree (1.3.6.1.4.1) and provides a
+                   straight-forward and unambiguous means for
+                   determining what kind of group is being managed.
+
+                   For example, this object could take the value
+                   1.3.6.1.4.1.4242.1.2.14 if vendor 'Flintstones, Inc.'
+                   was assigned the subtree 1.3.6.1.4.1.4242, and had
+                   assigned the identifier 1.3.6.1.4.1.4242.1.2.14 to
+                   its 'Wilma Flintstone 6-Port Plug-in Module.'"
+           ::= { icfVgBasicGroupEntry 3 }
+
+       icfVgGroupOperStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          other(1),
+                          operational(2),
+                          malfunctioning(3),
+                          notPresent(4),
+                          underTest(5),
+                          resetInProgress(6)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "An object that indicates the operational status of
+                   the group.
+
+                   A status of notPresent(4) indicates that the group is
+                   temporarily or permanently physically and/or
+                   logically not a part of the repeater.  It is an
+                   implementation-specific matter as to whether the
+                   agent effectively removes notPresent entries from the
+                   table.
+
+                   A status of operational(2) indicates that the group
+                   is functioning, and a status of malfunctioning(3)
+                   indicates that the group is malfunctioning in some
+                   way."
+           ::= { icfVgBasicGroupEntry 4 }
+
+       icfVgGroupLastOperStatusChange OBJECT-TYPE
+           SYNTAX     TimeStamp
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "An object that contains the value of sysUpTime at
+                   the time that the value of the icfVgGroupOperStatus
+                   object for this group last changed.
+
+                   A value of zero indicates that the group's
+                   operational status has not changed since the agent
+                   last restarted."
+           ::= { icfVgBasicGroupEntry 5 }
+
+       icfVgGroupPortCapacity OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The icfVgGroupPortCapacity is the number of ports
+                   that can be contained within the group.  Valid range
+                   is 1-1024.  Within each group, the ports are uniquely
+                   numbered in the range from 1 to
+                   icfVgGroupPortCapacity.  Some ports may not be
+                   present in a given group instance, in which case the
+                   actual number of ports present is less than
+                   icfVgGroupPortCapacity.  The number of ports present
+                   is never greater than icfVgGroupPortCapacity."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.4.1, aGroupPortCapacity."
+           ::= { icfVgBasicGroupEntry 6 }
+
+       icfVgGroupCablesBundled OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          someCablesBundled(1),
+                          noCablesBundled(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This configuration flag is used to select either
+                   bundled or unbundled cabling.  When this flag is
+                   'someCablesBundled(1)' and the port is not
+                   promiscuous or cascaded, frames received from ports
+                   on this group and destined to go out multiple ports
+                   on this group will be buffered completely before
+                   being repeated out ports on this group.  When this
+                   flag is 'noCablesBundled(2)' or the port is
+                   promiscuous or cascaded, these frames will be
+                   repeated out ports on this group as the frame is
+                   being received.
+
+                   Note that the value 'someCablesBundled(1)' will work
+                   in the vast majority of installations, regardless of
+                   whether or not any cables are physically in a bundle,
+                   since promiscuous and cascaded ports automatically
+                   avoid the store and forward.  The main situation in
+                   which 'noCablesBundled(2)' is beneficial is when
+                   there is a large amount of multicast traffic and the
+                   cables are not in a bundle.  The value of this
+                   object should be preserved across repeater resets
+                   and power failures."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.4.1, aGroupCablesBundled."
+           ::= { icfVgBasicGroupEntry 7 }
+
+       icfVgBasicPort     OBJECT IDENTIFIER ::= { icfVgBasic 3 }
+
+       icfVgBasicPortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfVgBasicPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table containing information about ports."
+           ::= { icfVgBasicPort 1 }
+
+       icfVgBasicPortEntry OBJECT-TYPE
+           SYNTAX     IcfVgBasicPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the icfVgBasicPortTable, containing
+                   information about a single port."
+           INDEX      { icfVgPortGroupIndex, icfVgPortIndex }
+           ::= { icfVgBasicPortTable 1 }
+
+       IcfVgBasicPortEntry ::=
+           SEQUENCE {
+               icfVgPortGroupIndex             Integer32,
+               icfVgPortIndex                  Integer32,
+               icfVgPortType                   INTEGER,
+               icfVgPortAdminStatus            INTEGER,
+               icfVgPortStatus                 INTEGER,
+               icfVgPortSupportedPromiscMode   INTEGER,
+               icfVgPortSupportedCascadeMode   INTEGER,
+               icfVgPortAllowedTrainType       INTEGER,
+               icfVgPortLastTrainConfig        OCTET STRING,
+               icfVgPortTrainingResult         OCTET STRING,
+               icfVgPortPriorityEnable         TruthValue,
+               icfVgPortMediaType              INTEGER
+           }
+
+       icfVgPortGroupIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the group containing the port
+                   for which this entry contains information."
+           ::= { icfVgBasicPortEntry 1 }
+
+       icfVgPortIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..1024)
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "This object identifies the port within the group for
+                   which this entry contains information.  This value
+                   can never be greater than icfVgGroupPortCapacity for
+                   the associated group."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aPortID."
+           ::= { icfVgBasicPortEntry 2 }
+
+       icfVgPortType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          cascadeExternal(1),
+                          cascadeInternal(2),
+                          localExternal(3),
+                          localInternal(4)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "Describes the type of port.  One of the following:
+
+                       cascadeExternal - Port is an uplink with physical
+                                         connections which are 
+                                         externally visible
+                       cascadeInternal - Port is an uplink with physical
+                                         connections which are not
+                                         externally visible, such as a
+                                         connection to an internal
+                                         backplane in a chassis
+                       localExternal   - Port is a downlink or local
+                                         port with externally visible
+                                         connections
+                       localInternal   - Port is a downlink or local
+                                         port with connections which are
+                                         not externally visible, such as
+                                         a connection to an internal
+                                         agent
+
+                   'internal' is used to identify ports which place
+                   traffic into the repeater, but do not have any
+                   external connections.  Note that both DTE and
+                   cascaded repeater downlinks are considered 'local'
+                   ports."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aPortType."
+           ::= { icfVgBasicPortEntry 3 }
+
+       icfVgPortAdminStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "Port enable/disable function.  Enabling a disabled
+                   port will cause training to be initiated.  Setting
+                   this object to disabled(2) disables the port.  A
+                   disabled port neither transmits nor receives.  Once
+                   disabled, a port must be explicitly enabled to
+                   restore operation.  A port which is disabled when
+                   power is lost or when a reset is exerted shall remain
+                   disabled when normal operation resumes."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aPortAdministrativeState."
+           ::= { icfVgBasicPortEntry 4 }
+
+       icfVgPortStatus OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          active(1),
+                          inactive(2),
+                          training(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "Current status for the port as specified by the
+                   PORT_META_STATE in the port process module of clause
+                   12 [IEEE Draft Std 802.12].
+
+                   During initialization or any link warning conditions,
+                   icfVgPortStatus will be 'inactive(2)'.
+
+                   When Training_Up is received by the repeater on a
+                   local port (or when Training_Down is received on
+                   a cascade port), icfVgPortStatus will change to
+                   'training(3)' and icfVgTrainingResult can be
+                   monitored to see the detailed status regarding
+                   training.
+
+                   When 24 consecutive good FCS packets are received and
+                   the configuration bits are OK, icfVgPortStatus will
+                   change to 'active(1)'.
+
+                   A disabled port shall have a port status of
+                   'inactive(2)'."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aPortStatus."
+           ::= { icfVgBasicPortEntry 5 }
+
+       icfVgPortSupportedPromiscMode OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          singleModeOnly(1),
+                          singleOrPromiscMode(2),
+                          promiscModeOnly(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object describes whether the port hardware is
+                   capable of supporting promiscuous mode, single
+                   address mode (i.e., repeater filters unicasts not
+                   addressed to the end station attached to this port),
+                   or both.  A port for which icfVgPortType is equal to
+                   'cascadeInternal' or 'cascadeExternal' will always
+                   have a value of 'promiscModeOnly' for this object."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aSupportedPromiscMode."
+           ::= { icfVgBasicPortEntry 6 }
+
+       icfVgPortSupportedCascadeMode OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          endNodesOnly(1),
+                          endNodesOrRepeaters(2),
+                          cascadePort(3)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object describes whether the port hardware is
+                   capable of supporting cascaded repeaters, end nodes,
+                   or both.  A port for which icfVgPortType is equal to
+                   'cascadeInternal' or 'cascadeExternal' will always
+                   have a value of 'cascadePort' for this object."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aSupportedCascadeMode."
+           ::= { icfVgBasicPortEntry 7 }
+
+       icfVgPortAllowedTrainType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          allowEndNodesOnly(1),
+                          allowPromiscuousEndNodes(2),
+                          allowEndNodesOrRepeaters(3),
+                          allowAnything(4)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This security object is set by the network manager
+                   to configure what type of device is permitted to
+                   connect to the port.  One of the following values:
+
+                       allowEndNodesOnly        - only non-promiscuous
+                                                  end nodes permitted.
+                       allowPromiscuousEndNodes - promiscuous or non-
+                                                  promiscuous end nodes
+                                                  permitted
+                       allowEndNodesOrRepeaters - repeaters or non-
+                                                  promiscuous end nodes
+                                                  permitted
+                       allowAnything            - repeaters, promiscuous
+                                                  or non-promiscuous end
+                                                  nodes permitted
+
+                   For a port for which icfVgPortType is equal to
+                   'cascadeInternal' or 'cascadeExternal', the
+                   corresponding instance of this object may not be set
+                   to 'allowEndNodesOnly' or 'allowPromiscuousEndNodes'.
+
+                   The agent must reject a SET of this object if the
+                   value includes no capabilities that are supported by
+                   this port's hardware, as defined by the values of the
+                   corresponding instances of
+                   icfVgPortSupportedPromiscMode and
+                   icfVgPortSupportedCascadeMode."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aAllowableTrainingType."
+           ::= { icfVgBasicPortEntry 8 }
+
+       icfVgPortLastTrainConfig OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(2))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This 16 bit field contains the most recent training
+                   configuration in an error-free training frame
+                   sent by the end node connected to the port.  For
+                   cascade ports, this is the responder's configuration
+                   field from the most recent error-free training
+                   response frame received in response to training
+                   initiated by this repeater.  This object is formatted
+                   as follows:
+
+                       First Octet:       Second Octet:
+
+                        7 6 5 4 3 2 1 0    7 6 5 4 3 2 1 0
+                       +-+-+-+-+-+-+-+-+  +-+-+-+-+-+-+-+-+
+                       |v|v|v|0|0|0|0|0|  |0|0|0|F|F|P|P|R|
+                       +-+-+-+-+-+-+-+-+  +-+-+-+-+-+-+-+-+
+
+                       vvv: The version of the 802.12 training protocol
+                            with which the training initiator is
+                            compliant
+                       FF:  00 = frameType88023 is requested
+                            01 = frameType88025 is requested
+                            10 = reserved
+                            11 = either frameType88023 or frameType88025
+                                 is acceptable
+                       PP:  00 = request singleAddressMode
+                            01 = request promiscuousMode
+                            10 = reserved
+                            11 = reserved
+                       R:   0  = request is from an end node
+                            1  = request is from a repeater"
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aLastTrainingConfig."
+           ::= { icfVgBasicPortEntry 9 }
+
+       icfVgPortTrainingResult OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(3))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This 18 bit field is used to indicate the result of
+                   training.  It contains two bits which indicate if
+                   error-free training frames have been received, and it
+                   also contains the 16 bits of the most recent valid
+                   training response frame on the port.
+
+                 First Octet:       Second Octet:      Third Octet:
+
+                  7 6 5 4 3 2 1 0    7 6 5 4 3 2 1 0    7 6 5 4 3 2 1 0
+                 +-+-+-+-+-+-+-+-+  +-+-+-+-+-+-+-+-+  +-+-+-+-+-+-+-+-+
+                 |0|0|0|0|0|0|V|G|  |v|v|v|D|C|N|0|0|  |0|0|0|F|F|P|P|R|
+                 +-+-+-+-+-+-+-+-+  +-+-+-+-+-+-+-+-+  +-+-+-+-+-+-+-+-+
+
+                       V:   Valid: set when at least one error-free
+                            training frame has been received.  Indicates
+                            the 16 training configuration bits in
+                            icfVgPortLastTrainConfig and
+                            icfVgPortTrainingResult contain valid
+                            information.  This bit is cleared when
+                            icfVgPortStatus transitions to the 
+                            'inactive' or 'training' state.
+                       G:   LinkGood: indicates the link hardware is OK.
+                            Set if 24 consecutive error-free training
+                            packets have been received.  Cleared when a
+                            training packet with errors is received, and
+                            when icfVgPortStatus transitions to the
+                            'inactive' or 'training' state.
+                       vvv: The version of the 802.12 training protocol
+                            with which the training responder is
+                            compliant
+                       D:   0  = no duplicate address has been detected
+                            1  = duplicate address has been detected
+                       C:   0  = the requested configuration is
+                                 compatible with the port
+                            1  = the requested configuration is not
+                                 compatible with the port.  The FF, PP
+                                 and R bits indicate the configuration
+                                 which would be allowed (providing 
+                                 N = 0).
+                       N:   0  = access will be allowed, providing the
+                                 configuration is compatible (C = 0).
+                            1  = access not allowed because of security
+                                 restrictions
+                       FF:  00 = frameType88023 will be used
+                            01 = frameType88025 will be used
+                            10 = reserved
+                            11 = reserved
+                       PP:  00 = singleAddressMode will be used
+                            01 = promiscuousMode will be used
+                            10 = reserved
+                            11 = reserved
+                       R:   0  = requested access as an end node is
+                                 allowed
+                            1  = requested access as a repeater is
+                                 allowed
+
+                   If the port is in training, a management station can
+                   examine this object to see if any training packets
+                   have been passed successfully.  If there have been
+                   any good training packets, the Valid bit will be set
+                   and the management station can examine the 16
+                   training response bits to see if there is a duplicate
+                   address, configuration, or security problem.
+
+                   Note that on a repeater local port, this repeater
+                   generates the training response bits, while on the
+                   cascade port, the higher level repeater originated
+                   the training response bits."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aTrainingResult."
+           ::= { icfVgBasicPortEntry 10 }
+
+       icfVgPortPriorityEnable OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "A configuration flag used to determine whether the
+                   repeater will service high priority requests received
+                   on the port as high priority or normal priority.
+                   When 'false', high priority requests on this port
+                   will be serviced as normal priority.  The value of
+                   this object should be preserved across repeater
+                   resets and power failures.  The setting of this
+                   object has no effect on a cascade port."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aPriorityEnable."
+           ::= { icfVgBasicPortEntry 11 }
+
+       icfVgPortMediaType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          other(1),
+                          unknown(2),
+                          pmdMissing(3),
+                          utp4(4),
+                          stp2(5),
+                          fibre(6)
+                      }
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The type of physical media in use.  One of the
+                   following values:
+
+                          other       undefined
+                          unknown     true state not known
+                          pmdMissing  PMD device not attached
+                          utp4        4-pair unshielded twisted pair
+                          stp2        2-pair shielded twisted pair
+                          fibre       802.12 fibre optic cabling
+
+                   This object may be 'unknown' if the implementation is
+                   not capable of identifying the PMD media type, or
+                   whether or not the PMD is even present."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aMediaType."
+           ::= { icfVgBasicPortEntry 12 }
+
+       icfVgMonitor       OBJECT IDENTIFIER ::= { icfVgRepeater 2 }
+
+       icfVgMonRptr       OBJECT IDENTIFIER ::= { icfVgMonitor 1 }
+       -- Currently unused
+
+       icfVgMonGroup      OBJECT IDENTIFIER ::= { icfVgMonitor 2 }
+       -- Currently unused
+
+       icfVgMonPort       OBJECT IDENTIFIER ::= { icfVgMonitor 3 }
+
+       icfVgMonPortTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfVgMonPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "A table of performance and error statistics for the
+                   ports."
+           ::= { icfVgMonPort 1 }
+
+       icfVgMonPortEntry OBJECT-TYPE
+           SYNTAX     IcfVgMonPortEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                   "An entry in the icfVgMonPortTable, containing
+                   performance and error statistics for a single port."
+           INDEX      { icfVgPortGroupIndex, icfVgPortIndex }
+           ::= { icfVgMonPortTable 1 }
+
+
+       IcfVgMonPortEntry ::=
+           SEQUENCE {
+               icfVgPortReadableFrames         Counter32,
+               icfVgPortReadableOctets         Counter32,
+               icfVgPortUnreadableOctets       Counter32,
+               icfVgPortHighPriorityFrames     Counter32,
+               icfVgPortHighPriorityOctets     Counter32,
+               icfVgPortBroadcastFrames        Counter32,
+               icfVgPortMulticastFrames        Counter32,
+               icfVgPortIPMFrames              Counter32,
+               icfVgPortDataErrorFrames        Counter32,
+               icfVgPortPriorityPromotions     Counter32,
+               icfVgPortHCReadableOctets       Counter64,
+               icfVgPortHCUnreadableOctets     Counter64,
+               icfVgPortHCHighPriorityOctets   Counter64,
+               icfVgPortHCNormPriorityOctets   Counter64,
+               icfVgPortNormPriorityFrames     Counter32,
+               icfVgPortNormPriorityOctets     Counter32,
+               icfVgPortNullAddressedFrames    Counter32,
+               icfVgPortOversizeFrames         Counter32,
+               icfVgPortTransitionToTrainings  Counter32
+
+           }
+
+       icfVgPortReadableFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is the number of good frames of valid
+                   frame length that have been received on this port.
+                   This counter is incremented by one for each frame
+                   received on the port which is not counted by
+                   icfVgPortIPMFrames or icfVgPortDataErrorFrames."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aReadableFramesReceived."
+           ::= { icfVgMonPortEntry 1 }
+
+       icfVgPortReadableOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in good frames that have been received on
+                   this port.  This counter is incremented by OctetCount
+                   for each frame received on this port which has been
+                   determined to be a readable frame (i.e. each frame
+                   counted by icfVgPortReadableFrames).
+
+                   Note that this counter will roll over very quickly.
+                   It is provided for backward compatibility for Network
+                   Management protocols that do not support 64 bit
+                   counters (e.g. SNMP version 1)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aReadableOctetsReceived."
+           ::= { icfVgMonPortEntry 2 }
+
+       icfVgPortUnreadableOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in invalid frames that have been received
+                   on this port.  This counter is incremented by
+                   OctetCount for each frame received on this port which
+                   is counted by icfVgPortIPMFrames or
+                   icfVgPortDataErrorFrames.  This counter can be
+                   combined with icfVgPortReadableOctets to calculate
+                   network utilization.
+
+                   Note that this counter will roll over very quickly.
+                   It is provided for backward compatibility for Network
+                   Management protocols that do not support 64 bit
+                   counters (e.g. SNMP version 1)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aOctetsInUnreadableFramesRcvd."
+           ::= { icfVgMonPortEntry 3 }
+
+       icfVgPortHighPriorityFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of high priority frames
+                   that have been received on this port.  This counter
+                   is incremented by one for each high priority frame
+                   received on this port, including readable, invalid,
+                   and training frames.  This counter does not include
+                   normal priority frames which were priority promoted."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aHighPriorityFramesReceived."
+           ::= { icfVgMonPortEntry 4 }
+
+       icfVgPortHighPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in high priority frames that have been
+                   received on this port.  This counter is incremented
+                   by OctetCount for each frame received on this port
+                   which is counted by icfVgPortHighPriorityFrames.
+
+                   Note that this counter will roll over very quickly.
+                   It is provided for backward compatibility for Network
+                   Management protocols that do not support 64 bit
+                   counters (e.g. SNMP version 1)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aHighPriorityOctetsReceived."
+           ::= { icfVgMonPortEntry 5 }
+
+       icfVgPortBroadcastFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of broadcast packets that
+                   have been received on this port.  This counter is
+                   incremented by one for each readable frame received
+                   on this port whose destination MAC address is the
+                   broadcast address.  Frames counted by this counter
+                   are also counted by icfVgPortReadableFrames."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aBroadcastFramesReceived."
+           ::= { icfVgMonPortEntry 6 }
+
+       icfVgPortMulticastFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of multicast packets that
+                   have been received on this port.  This counter is
+                   incremented by one for each readable frame received
+                   on this port whose destination MAC address has the
+                   group address bit set, but is not the broadcast
+                   address.  Frames counted by this counter are also
+                   counted by icfVgPortReadableFrames, but not by
+                   icfVgPortBroadcastFrames"
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aMulticastFramesReceived."
+           ::= { icfVgMonPortEntry 7 }
+
+       icfVgPortIPMFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of frames that
+                   have been received on this port with an invalid
+                   packet marker and no PMI errors.  A repeater will
+                   write an invalid packet marker to the end of a frame
+                   containing errors as it is forwarded through the
+                   repeater to the other ports.  This counter is
+                   incremented by one for each frame received on this
+                   port which has had an invalid packet marker added to
+                   the end of the frame.  This counter indicates
+                   problems with remote cable segments, as opposed to
+                   problems with cables directly attached to this
+                   repeater."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aIPMFramesReceived."
+           ::= { icfVgMonPortEntry 8 }
+
+       icfVgPortDataErrorFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of errored frames received on
+                   this port.  This counter is incremented by one for
+                   each frame received on this port with any of the
+                   following errors: bad FCS (with no IPM), PMI errors
+                   (excluding frames with an IPM error as the only PMI
+                   error), or undersize (with no IPM).  Does not include
+                   packets counted by icfVgPortIPMFrames,
+                   icfVgPortOversizeFrames, or
+                   icfVgPortNullAddressedFrames.
+
+                   This counter indicates problems with the cable
+                   directly attached to this repeater, while
+                   icfVgPortIPMFrames indicates problems with remote
+                   cables attached to other repeaters."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aDataErrorFramesReceived."
+           ::= { icfVgMonPortEntry 9 }
+
+       icfVgPortPriorityPromotions OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This counter is incremented by one each time the
+                   priority promotion timer has expired on this port and
+                   a normal priority frame was priority promoted."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aPriorityPromotions."
+           ::= { icfVgMonPortEntry 10 }
+
+       icfVgPortHCReadableOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in good frames that have been received on
+                   this port.  This counter is incremented by OctetCount
+                   for each frame received on this port which has been
+                   determined to be a readable frame (i.e. each frame
+                   counted by icfVgPortReadableFrames).
+
+                   This counter is a 64 bit version of
+                   icfVgPortReadableOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aReadableOctetsReceived."
+           ::= { icfVgMonPortEntry 11 }
+
+       icfVgPortHCUnreadableOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in invalid frames that have been received
+                   on this port.  This counter is incremented by
+                   OctetCount for each frame received on this port which
+                   is counted by icfVgPortIPMFrames or
+                   icfVgPortDataErrorFrames.  This counter can be
+                   combined with icfVgPortHCReadableOctets to calculate
+                   network utilization.
+
+                   This counter is a 64 bit version of
+                   icfVgPortUnReadableOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aOctetsInUnreadableFramesRcvd."
+           ::= { icfVgMonPortEntry 12 }
+
+       icfVgPortHCHighPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in high priority frames that have been
+                   received on this port.  This counter is incremented
+                   by OctetCount for each frame received on this port
+                   which is counted by icfVgPortHighPriorityFrames.
+
+                   This counter is a 64 bit version of
+                   icfVgPortHighPriorityOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aHighPriorityOctetsReceived."
+           ::= { icfVgMonPortEntry 13 }
+
+       icfVgPortHCNormPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter64
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in normal  priority frames that have been
+                   received on this port.  This counter is incremented
+                   by OctetCount for each frame received on this port
+                   which is counted by icfVgPortNormPriorityFrames.
+
+                   This counter is a 64 bit version of
+                   icfVgPortNormPriorityOctets.  It should be used by
+                   Network Management protocols which support 64 bit
+                   counters (e.g. SNMPv2)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNormalPriorityOctetsReceived."
+           ::= { icfVgMonPortEntry 14 }
+
+       icfVgPortNormPriorityFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of normal priority frames
+                   that have been received on this port.  This counter
+                   is incremented by one for each normal priority frame
+                   received on this port. This counter includes both
+                   good and bad normal priority frames, as well as
+                   normal priority training frames and normal priority
+                   frames which were priority promoted."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNormalPriorityFramesReceived."
+           ::= { icfVgMonPortEntry 15 }
+
+       icfVgPortNormPriorityOctets OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of the number of octets
+                   contained in normal priority frames that have been
+                   received on this port.  This counter is incremented
+                   by OctetCount for each frame received on this port
+                   which is counted by icfVgPortNormPriorityFrames.
+
+                   Note that this counter will roll over very quickly.
+                   It is provided for backward compatibility for Network
+                   Management protocols that do not support 64 bit
+                   counters (e.g. SNMP version 1)."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNormalPriorityOctetsReceived."
+           ::= { icfVgMonPortEntry 16 }
+
+       icfVgPortNullAddressedFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of null addressed packets
+                   that have been received on this port.  This counter
+                   is incremented by one for each frame received on this
+                   port with a destination MAC address consisting of all
+                   zero bits.  Both void and training frames are
+                   included in this counter."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aNullAddressedFramesReceived."
+           ::= { icfVgMonPortEntry 17 }
+
+       icfVgPortOversizeFrames OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is a count of oversize frames received
+                   on this port.  This counter is incremented by one for
+                   each frame received on this port whose OctetCount is
+                   larger than the maximum legal frame size.
+
+                   The frame size which causes this counter to increment
+                   is dependent on the current value of
+                   icfVgCurrentFramingType.  When
+                   icfVgCurrentFramingType is equal to frameType88023
+                   this counter will increment for frames that are 1519
+                   octets or larger.  When icfVgCurrentFramingType is
+                   equal to frameType88025 this counter will increment
+                   for frames that are 4521 octets or larger."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aOversizeFramesReceived."
+           ::= { icfVgMonPortEntry 18 }
+
+       icfVgPortTransitionToTrainings OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This counter is incremented by one each time the
+                   icfVgPortStatus object for this port transitions into
+                   the 'training' state."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aTransitionsIntoTraining."
+           ::= { icfVgMonPortEntry 19 }
+
+       icfVgAddrTrack      OBJECT IDENTIFIER ::= { icfVgRepeater 3 }
+
+       icfVgAddrTrackRptr  OBJECT IDENTIFIER ::= { icfVgAddrTrack 1 }
+       -- Currently unused
+
+       icfVgAddrTrackGroup OBJECT IDENTIFIER ::= { icfVgAddrTrack 2 }
+       -- Currently unused
+
+       icfVgAddrTrackPort  OBJECT IDENTIFIER ::= { icfVgAddrTrack 3 }
+
+       icfVgAddrTrackTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfVgAddrTrackEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+               "Table of address mapping information about the
+               ports."
+           ::= { icfVgAddrTrackPort 1 }
+
+       icfVgAddrTrackEntry OBJECT-TYPE
+           SYNTAX     IcfVgAddrTrackEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+               "An entry in the table, containing address mapping
+               information about a single port."
+           INDEX      { icfVgPortGroupIndex, icfVgPortIndex }
+           ::= { icfVgAddrTrackTable 1 }
+
+       IcfVgAddrTrackEntry ::=
+           SEQUENCE {
+               icfVgAddrLastTrainedAddress     OCTET STRING,
+               icfVgAddrTrainedAddrChanges     Counter32,
+               icfVgRptrDetectedDupAddress     TruthValue,
+               icfVgMgrDetectedDupAddress      TruthValue
+           }
+
+       icfVgAddrLastTrainedAddress OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(0 | 6))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is the MAC address of the last station
+                   which succeeded in training on this port.  A
+                   cascaded repeater may train using the null address.
+                   If no stations have succeeded in training on this
+                   port since the agent began monitoring the port
+                   activity, the agent shall return a string of length
+                   zero."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aLastTrainedAddress."
+           ::= { icfVgAddrTrackEntry 1 }
+
+       icfVgAddrTrainedAddrChanges OBJECT-TYPE
+           SYNTAX     Counter32
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This counter is incremented by one for each time
+                   that the icfVgAddrLastTrainedAddress object for this
+                   port has changed."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aTrainedAddressChanges."
+           ::= { icfVgAddrTrackEntry 2 }
+
+       icfVgRptrDetectedDupAddress OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "This object is used to indicate that the repeater
+                   detected an error-free training frame on this port
+                   with a source MAC address which matches the value of
+                   icfVgAddrLastTrainedAddress of another active port.
+                   This is reset to 'false' when an error-free training
+                   frame is received with a source MAC address which
+                   does not match icfVgAddrLastTrainedAddress of another
+                   port which is active.  For the cascade port, this
+                   object will be 'true' if the 'D' bit in the most
+                   recently received error-free training response frame
+                   was set."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aLocalRptrDetectedDupAddr."
+           ::= { icfVgAddrTrackEntry 3 }
+
+       icfVgMgrDetectedDupAddress OBJECT-TYPE
+           SYNTAX     TruthValue
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "This object can be set by a management station when
+                   it detects that there is a duplicate MAC address.
+                   This object is OR'd with icfVgRptrDetectedDupAddress
+                   to form the value of the 'D' bit in training response
+                   frames on this port.
+
+                   The purpose of this object is to provide a means for
+                   network management software to inform an end station
+                   that it is using a duplicate station address.
+                   Setting this object does not affect the current state
+                   of the link; the end station will not be informed of
+                   the duplicate address until it retrains for some
+                   reason.  Note that regardless of its station address,
+                   the end station will not be able to train
+                   successfully until the network management software
+                   has set this object back to 'false'.  Although this
+                   object exists on cascade ports, it does not perform
+                   any function since this repeater is the initiator of
+                   training on a cascade port."
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.5.1, aCentralMgmtDetectedDupAddr."
+           ::= { icfVgAddrTrackEntry 4 }
+
+
+
+       icfVgRptrTraps       OBJECT IDENTIFIER ::= { icfVgRepeater 4 }
+       icfVgRptrTrapsPrefix OBJECT IDENTIFIER ::= { icfVgRptrTraps 0 }
+
+       icfVgRptrHealth NOTIFICATION-TYPE
+           OBJECTS     { icfVgRepeaterHealthState }
+           STATUS      current
+           DESCRIPTION
+                   "A icfVgRptrHealth trap conveys information related
+                   to the operational state of the repeater.  This trap
+                   is sent either when the value of
+                   icfVgRepeaterHealthState changes, or upon completion
+                   of a non-disruptive test.  The icfVgRptrHealth trap
+                   is not sent as a result of powering up a repeater.
+
+                   The icfVgRptrHealth trap must contain the
+                   icfVgRepeaterHealthState object.  The agent may
+                   optionally include the icfVgRepeaterHealthText object
+                   in the varBind list.  See the
+                   icfVgRepeaterHealthState and icfVgRepeaterHealthText
+                   objects for descriptions of the information that is
+                   sent.
+
+                   The agent must throttle the generation of consecutive
+                   icfVgRptrHealth traps so that there is at least a
+                   five-second gap between traps of this type.  When
+                   traps are throttled, they are dropped, not queued for
+                   sending at a future time.  (Note that 'generating' a
+                   trap means sending to all configured recipients.)"
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.3, nRepeaterHealth."
+           ::= { icfVgRptrTrapsPrefix 1 }
+
+       icfVgRptrResetEvent NOTIFICATION-TYPE
+           OBJECTS        { icfVgRepeaterHealthState }
+           STATUS         current
+           DESCRIPTION
+                   "An icfVgRptrResetEvent trap conveys information
+                   related to the operational state of the repeater.
+                   This trap is sent on completion of a repeater reset
+                   action.  A repeater reset action is defined as a
+                   transition to its initial state as specified in
+                   clause 12 [IEEE Draft Std 802.12] when triggered by a
+                   management command.
+
+                   The icfVgRptrResetEvent trap is not sent when the
+                   agent restarts and sends an SNMP coldStart or
+                   warmStart trap.  However, it is recommended that an
+                   802.12 repeater agent send the
+                   icfVgRepeaterHealthState object as an optional object
+                   with its coldStart and warmStart trap PDUs.
+
+                   The icfVgRptrResetEvent trap must contain the
+                   icfVgRepeaterHealthState object.  The agent may
+                   optionally include the icfVgRepeaterHealthText object
+                   in the varBind list.  See the
+                   icfVgRepeaterHealthState and icfVgRepeaterHealthText
+                   objects for descriptions of the information that is
+                   sent.
+
+                   The agent must throttle the generation of consecutive
+                   icfVgRptrResetEvent traps so that there is at least a
+                   five-second gap between traps of this type.  When
+                   traps are throttled, they are dropped, not queued for
+                   sending at a future time.  (Note that 'generating' a
+                   trap means sending to all configured recipients.)"
+           REFERENCE
+                   "IEEE Draft Std. 802.12, Draft 6, 23 November, 1994,
+                   13.2.4.2.3, nRepeaterReset."
+           ::= { icfVgRptrTrapsPrefix 3 }
+
+
+       -- conformance information
+
+       icfVgRepeaterConformance
+           OBJECT IDENTIFIER ::= { icfVgRepeaterMib 1 }
+
+       icfVgRepeaterCompliances
+           OBJECT IDENTIFIER ::= { icfVgRepeaterConformance 1 }
+       icfVgRepeaterGroups
+           OBJECT IDENTIFIER ::= { icfVgRepeaterConformance 2 }
+
+
+       -- Compliance statements
+
+       icfVgRptrPreStdCompliance MODULE-COMPLIANCE
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS OBSOLETE *********
+
+                   The compliance statement for pre-standard 802.12
+                   repeater management."
+           MODULE
+               MANDATORY-GROUPS { icfVgRptrBasicGroup,
+                                  icfVgRptrPreStdMonitorGroup,
+                                  icfVgRptrPreStdAddrTrackGroup,
+                                  icfVgRptrNotificationsGroup }
+
+           ::= { icfVgRepeaterCompliances 1 }
+
+       icfVgRptrCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for 802.12 repeater
+                   management."
+           MODULE
+               MANDATORY-GROUPS { icfVgRptrBasicGroup,
+                                  icfVgRptrMonitorGroup,
+                                  icfVgRptrAddrTrackGroup,
+                                  icfVgRptrNotificationsGroup }
+
+           ::= { icfVgRepeaterCompliances 2 }
+
+
+       -- Units of conformance
+
+       icfVgRptrBasicGroup OBJECT-GROUP
+           OBJECTS    { icfVgMACAddress,
+                        icfVgCurrentFramingType,
+                        icfVgDesiredFramingType,
+                        icfVgFramingCapability,
+                        icfVgTrainingVersion,
+                        icfVgRepeaterGroupCapacity,
+                        icfVgRepeaterHealthState,
+                        icfVgRepeaterHealthText,
+                        icfVgRepeaterReset,
+                        icfVgRepeaterNonDisruptTest,
+                        icfVgGroupDescr,
+                        icfVgGroupObjectID,
+                        icfVgGroupOperStatus,
+                        icfVgGroupLastOperStatusChange,
+                        icfVgGroupPortCapacity,
+                        icfVgGroupCablesBundled,
+                        icfVgPortType,
+                        icfVgPortAdminStatus,
+                        icfVgPortStatus,
+                        icfVgPortSupportedPromiscMode,
+                        icfVgPortSupportedCascadeMode,
+                        icfVgPortAllowedTrainType,
+                        icfVgPortLastTrainConfig,
+                        icfVgPortTrainingResult,
+                        icfVgPortPriorityEnable,
+                        icfVgPortMediaType
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for managing the status
+                   and configuration of IEEE 802.12 repeaters."
+           ::= { icfVgRepeaterGroups 1 }
+
+       icfVgRptrPreStdMonitorGroup OBJECT-GROUP
+           OBJECTS    { icfVgPortReadableFrames,
+                        icfVgPortReadableOctets,
+                        icfVgPortUnreadableOctets,
+                        icfVgPortHighPriorityFrames,
+                        icfVgPortHighPriorityOctets,
+                        icfVgPortBroadcastFrames,
+                        icfVgPortMulticastFrames,
+                        icfVgPortIPMFrames,
+                        icfVgPortDataErrorFrames,
+                        icfVgPortPriorityPromotions,
+                        icfVgPortHCReadableOctets,
+                        icfVgPortHCUnreadableOctets,
+                        icfVgPortHCHighPriorityOctets
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for providing statistics
+                   for pre-standard IEEE 802.12 repeaters."
+           ::= { icfVgRepeaterGroups 2 }
+
+       icfVgRptrPreStdAddrTrackGroup OBJECT-GROUP
+           OBJECTS    { icfVgAddrLastTrainedAddress,
+                        icfVgAddrTrainedAddrChanges
+                      }
+           STATUS     obsolete
+           DESCRIPTION
+                   "********* THIS GROUP IS OBSOLETE *********
+
+                   A collection of objects for tracking addresses
+                   on pre-standard IEEE 802.12 repeaters."
+           ::= { icfVgRepeaterGroups 3 }
+
+       icfVgRptrMonitorGroup OBJECT-GROUP
+           OBJECTS    { icfVgPortReadableFrames,
+                        icfVgPortReadableOctets,
+                        icfVgPortUnreadableOctets,
+                        icfVgPortHighPriorityFrames,
+                        icfVgPortHighPriorityOctets,
+                        icfVgPortBroadcastFrames,
+                        icfVgPortMulticastFrames,
+                        icfVgPortIPMFrames,
+                        icfVgPortDataErrorFrames,
+                        icfVgPortPriorityPromotions,
+                        icfVgPortHCReadableOctets,
+                        icfVgPortHCUnreadableOctets,
+                        icfVgPortHCHighPriorityOctets,
+                        icfVgPortHCNormPriorityOctets,
+                        icfVgPortNormPriorityFrames,
+                        icfVgPortNormPriorityOctets,
+                        icfVgPortNullAddressedFrames,
+                        icfVgPortOversizeFrames,
+                        icfVgPortTransitionToTrainings
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for providing statistics
+                   for IEEE 802.12 repeaters."
+           ::= { icfVgRepeaterGroups 4 }
+
+       icfVgRptrAddrTrackGroup OBJECT-GROUP
+           OBJECTS    { icfVgAddrLastTrainedAddress,
+                        icfVgAddrTrainedAddrChanges,
+                        icfVgRptrDetectedDupAddress,
+                        icfVgMgrDetectedDupAddress
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for tracking addresses
+                   on IEEE 802.12 repeaters."
+           ::= { icfVgRepeaterGroups 5 }
+
+       icfVgRptrNotificationsGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { icfVgRptrHealth,
+                           icfVgRptrResetEvent
+                         }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of notifications used to indicate
+                   802.12 repeater general status changes."
+           ::= { icfVgRepeaterGroups 6 }
+
+       END

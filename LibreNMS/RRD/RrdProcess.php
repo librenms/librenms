@@ -1,0 +1,120 @@
+<?php
+
+namespace LibreNMS\RRD;
+
+use App\Facades\LibrenmsConfig;
+use Illuminate\Support\Str;
+use LibreNMS\Exceptions\RrdException;
+use LibreNMS\Exceptions\RrdNotFoundException;
+use LibreNMS\Exceptions\RrdUpdateTooFrequentException;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Process\InputStream;
+use Symfony\Component\Process\Process;
+
+class RrdProcess
+{
+    const COMMAND_COMPLETE = 'OK u:';
+
+    private readonly string $rrdcached;
+    private readonly string $rrd_dir;
+    private readonly string $rrdtool_exec;
+    private array $env = [];
+    private readonly InputStream $input;
+
+    private ?Process $process = null;
+
+    public function __construct(private readonly LoggerInterface $logger, private readonly int $timeout = 300)
+    {
+        $this->rrdtool_exec = LibrenmsConfig::get('rrdtool', 'rrdtool');
+        $this->rrdcached = (string) LibrenmsConfig::get('rrdcached', '');
+        $this->rrd_dir = Str::finish(LibrenmsConfig::get('rrd_dir', LibrenmsConfig::get('install_dir') . '/rrd'), '/');
+        $this->input = new InputStream();
+
+        if ($this->rrdcached) {
+            $this->env['RRDCACHED_ADDRESS'] = $this->rrdcached;
+        }
+
+        if (session('preferences.timezone')) {
+            $this->env['TZ'] = session('preferences.timezone');
+        }
+    }
+
+    public function start(): void
+    {
+        if ($this->process === null) {
+            $this->process = new Process(
+                command: [$this->rrdtool_exec, '-'],
+                cwd: $this->rrd_dir,
+                env: $this->env,
+            );
+            $this->process->setInput($this->input);
+            $this->process->setTimeout($this->timeout);
+            $this->process->setIdleTimeout($this->timeout);
+            $this->process->start();
+        }
+    }
+
+    public function stop(): void
+    {
+        if ($this->process) {
+            $this->input->write("quit\n");
+            $this->process->stop();
+            $this->process = null;
+        }
+    }
+
+    /**
+     * @throws RrdException
+     */
+    public function run(string $command, string $waitFor = self::COMMAND_COMPLETE): string
+    {
+        $this->runAsync($command);
+
+        $this->process->waitUntil(function ($type, $buffer) use ($waitFor) {
+            if ($type === Process::ERR) {
+                throw new RrdException($buffer);
+            }
+
+            if (str_contains($buffer, 'ERROR: ')) {
+                preg_match('/ERROR: (.*)/', $buffer, $matches);
+                $error = $matches[1];
+                if (str_contains($error, 'No such file')) {
+                    throw new RrdNotFoundException($error);
+                }
+                if (str_contains($error, 'illegal attempt to update using time')) {
+                    throw new RrdUpdateTooFrequentException($error);
+                }
+                throw new RrdException($error);
+            }
+
+            return str_contains($buffer, $waitFor);
+        });
+
+        $output = $this->process->getOutput();
+
+        if ($waitFor === self::COMMAND_COMPLETE) {
+            $output = substr($output, 0, strrpos($output, $waitFor)); // remove OK line
+        }
+
+        return rtrim($output);
+    }
+
+    private function runAsync(string $command): void
+    {
+        $this->start();
+
+        // clean directory path when using rrdcached
+        if ($this->rrdcached) {
+            $command = str_replace($this->rrd_dir, '', $command);
+        }
+
+        $this->logger->debug("RRD[%g$command%n]", ['color' => true]);
+        $this->process->clearOutput();
+        $this->input->write("$command\n");
+    }
+
+    public function __destruct()
+    {
+        $this->stop();
+    }
+}

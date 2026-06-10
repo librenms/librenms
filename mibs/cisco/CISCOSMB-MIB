@@ -1,0 +1,30 @@
+CISCOSMB-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        enterprises FROM RFC1155-SMI;
+
+cisco MODULE-IDENTITY
+        LAST-UPDATED "201010310000Z"
+		ORGANIZATION "Cisco Systems, Inc."
+
+		CONTACT-INFO
+		"Postal: 170 West Tasman Drive
+		San Jose , CA 95134-1706
+		USA
+
+		
+		Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+             "The private MIB module definition for CISCOSB private MIB tree."
+        REVISION "201010310000Z"
+        DESCRIPTION
+             "Initial revision."
+        ::= { enterprises 9 }
+
+--cisco            OBJECT IDENTIFIER ::= { enterprises 9 }
+otherEnterprises OBJECT IDENTIFIER ::= { cisco 6 }
+ciscosb          OBJECT IDENTIFIER ::= {otherEnterprises 1}
+switch001        OBJECT IDENTIFIER ::= { ciscosb 101 }
+rndMib           OBJECT IDENTIFIER ::= { ciscosb 101 }
+
+END

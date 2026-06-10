@@ -1,0 +1,4 @@
+modules:
+  os:
+    serial: .1.3.6.1.4.1.367.3.2.1.2.1.4.0
+    sysDescr_regex: '/NRG (?<hardware>.*) (?<version>[\d.]+)/'

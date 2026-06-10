@@ -1,0 +1,754 @@
+--
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-ZD-WLAN-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusZDWLANModule
+        FROM RUCKUS-ROOT-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusZDWLANConfigMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus ZD WLAN Configuration mib"
+    ::= { ruckusZDWLANModule 2 }
+
+ruckusZDWLANConfigObjects OBJECT IDENTIFIER     ::= { ruckusZDWLANConfigMIB 1 }
+
+ruckusZDWLANConfig OBJECT IDENTIFIER    ::= { ruckusZDWLANConfigObjects 1 }
+
+
+ruckusZDWLANConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN table."
+    ::= { ruckusZDWLANConfig 1 }
+
+ruckusZDWLANConfigEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN configuration entry."
+    INDEX {
+        ruckusZDWLANID }
+    ::= { ruckusZDWLANConfigTable 1 }
+
+RuckusZDWLANConfigEntry ::= SEQUENCE {
+  ruckusZDWLANID								INTEGER,
+  ruckusZDWLANConfigSSID						OCTET STRING,
+  ruckusZDWLANConfigDescription         		DisplayString,
+  ruckusZDWLANConfigName						OCTET STRING,
+  ruckusZDWLANConfigWLANServiceType            	INTEGER,
+  ruckusZDWLANConfigAuthentication      		INTEGER,
+  ruckusZDWLANConfigEncryption          		INTEGER,
+  ruckusZDWLANConfigWEPKeyIndex         		INTEGER,
+  ruckusZDWLANConfigWEPKey              		OCTET STRING,
+  ruckusZDWLANConfigWPACipherType				INTEGER,
+  ruckusZDWLANConfigWPAKey              		OCTET STRING,
+  ruckusZDWLANConfigAuthenticationServerID      INTEGER,
+  ruckusZDWLANConfigWirelessClientIsolation     INTEGER,
+  ruckusZDWLANConfigWirelessWhiteListID			INTEGER,
+  ruckusZDWLANConfigZeroITActivation       		INTEGER,
+  ruckusZDWLANConfigWLANHotspotID        		INTEGER,
+  ruckusZDWLANConfigWLANServicePriority 		INTEGER,
+  ruckusZDWLANConfigAccountingServerID      	INTEGER,
+  ruckusZDWLANConfigAccountingUpdateInterval    INTEGER,
+  ruckusZDWLANConfigUplinkRate          		OCTET STRING,
+  ruckusZDWLANConfigDownlinkRate        		OCTET STRING,
+  ruckusZDWLANConfigIGMPSnooping        		INTEGER,
+  ruckusZDWLANConfigVlanID              		INTEGER,
+  ruckusZDWLANConfigDynamicVLAN         		INTEGER,
+  ruckusZDWLANConfigHideSSID            		TruthValue,
+  ruckusZDWLANConfigTunnelMode        	        TruthValue,
+  ruckusZDWLANConfigBackgroundScanning  		TruthValue,
+  ruckusZDWLANConfigMaxClients     				INTEGER,
+  ruckusZDWLANConfigWebAuthentication   		INTEGER,
+  ruckusZDWLANConfigRowStatus           		RowStatus
+}
+
+ruckusZDWLANID OBJECT-TYPE
+    SYNTAX  INTEGER (1..2048)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "this Wireless LAN(WLAN) ID.Max value:for zd1000 zd1100,128;for zd3000,1024;for 
+        zd5000,2048"
+    ::= { ruckusZDWLANConfigEntry 1 }
+
+ruckusZDWLANConfigSSID OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2..32)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "SSID for this Wireless LAN. It can't be modified after creating it."
+    ::= { ruckusZDWLANConfigEntry 2 }
+
+ruckusZDWLANConfigDescription OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description for this Wireless LAN."
+    ::= { ruckusZDWLANConfigEntry 3 }
+    
+ruckusZDWLANConfigName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (2..32)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Name for this Wireless LAN"
+    ::= { ruckusZDWLANConfigEntry 4 }    
+
+ruckusZDWLANConfigWLANServiceType OBJECT-TYPE
+    SYNTAX  INTEGER {
+            standardUsage(1),
+            guestAccess(2),
+            hotSpotService(3) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select The the Service type for the Wireless LAN.
+        for hotSpotService,only read-only"
+        DEFVAL {standardUsage}
+    ::= { ruckusZDWLANConfigEntry 8 }
+
+ruckusZDWLANConfigAuthentication OBJECT-TYPE
+    SYNTAX  INTEGER {
+            open(1),
+            shared(2),
+            eap(3),
+            mac-address(4),
+            eap-mac-mix(5) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Authentication method choosen for this Wireless LAN."
+        DEFVAL {open}
+    ::= { ruckusZDWLANConfigEntry 10 }
+
+ruckusZDWLANConfigEncryption OBJECT-TYPE
+    SYNTAX  INTEGER {
+            wpa(1),
+            wpa2(2),
+            wpa-Mixed(3),
+            wep-64(4),
+            wep-128(5),
+            none-enc(6) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Encryption method choosen for this Wireless LAN."
+        DEFVAL {none-enc}
+    ::= { ruckusZDWLANConfigEntry 12 }
+
+ruckusZDWLANConfigWEPKeyIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..4)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the WEP key index for the WEP encryption."
+        DEFVAL {1}
+    ::= { ruckusZDWLANConfigEntry 15 }
+
+ruckusZDWLANConfigWEPKey OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (10 | 26)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter the Pass-phrase for the WEP encryption method.
+        Only 10 or 26 Hex character.such as: 1122334455"
+    ::= { ruckusZDWLANConfigEntry 16 }
+
+ruckusZDWLANConfigWPACipherType OBJECT-TYPE
+    SYNTAX  INTEGER {
+            tkip(1),
+            aes(2),
+            auto(3),
+            none(0) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter the encryption cipher method for the WPA encryption."
+        DEFVAL {none}
+    ::= { ruckusZDWLANConfigEntry 20 }
+
+ruckusZDWLANConfigWPAKey OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (8..63 | 64)) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter the Pass-phrase for the WPA encryption.
+        Specifies the WPA PSK (Wi-Fi Protected Access
+        Pre Shared key)
+        If the key length is 64 then all 64 characters should be in hex,
+        otherwise the key assumed to be ascii."
+    ::= { ruckusZDWLANConfigEntry 21 }
+
+ruckusZDWLANConfigAuthenticationServerID OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the Authentication Server by the registered Server ID.
+        This server id must exist in table: ruckusZDAAAConfigTable(aaa-authentication) or local."
+    ::= { ruckusZDWLANConfigEntry 25 }
+
+ruckusZDWLANConfigWirelessClientIsolation OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "set Wireless Client Isolation, clients will be unable to communicate with each other, or access any of the restricted subnet."
+    DEFVAL{2}
+    ::= { ruckusZDWLANConfigEntry 28 }
+
+ruckusZDWLANConfigWirelessWhiteListID OBJECT-TYPE
+    SYNTAX  INTEGER (0..1024)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "make sure client isolation is enabled and then choose one id."
+    DEFVAL{none}
+    ::= { ruckusZDWLANConfigEntry 29 }
+
+ruckusZDWLANConfigZeroITActivation OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the Zero IT Activation Service of the Wireless LAN or not."
+        DEFVAL{disable}
+    ::= { ruckusZDWLANConfigEntry 30 }
+
+ruckusZDWLANConfigWLANHotspotID OBJECT-TYPE
+    SYNTAX  INTEGER (0..32) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the Hotspot Server for the Wireless LAN.
+         0, no hotspot server;
+         1-32,hotspot server must exist."
+    ::= { ruckusZDWLANConfigEntry 31 }
+
+ruckusZDWLANConfigWLANServicePriority OBJECT-TYPE
+    SYNTAX  INTEGER {
+            high(1),
+            low(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the QOS service priority for the Wireless LAN."
+        DEFVAL{high}
+    ::= { ruckusZDWLANConfigEntry 32 }
+
+ruckusZDWLANConfigAccountingServerID OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the (RADIUS) Accounting Server by the registered Server ID.
+        0,disable;
+        This server id must exist in table: ruckusZDAAAConfigTable(aaa-accounting)"
+        DEFVAL{0}
+    ::= { ruckusZDWLANConfigEntry 35 }
+
+ruckusZDWLANConfigAccountingUpdateInterval OBJECT-TYPE
+    SYNTAX  INTEGER (1..60)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enter interval in minutes to update Accounting Server."
+    ::= { ruckusZDWLANConfigEntry 36 }
+
+
+ruckusZDWLANConfigUplinkRate OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (1..10))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Disable or Set the Speed/Rate limiting of uplink. Valid range is 0.10mbps or between 0.25mbps~20.00mbps in 0.25mbps step.
+        Such as: 'disable', '0.10mbps', '0.25mbps', '0.5mbps',...,'19.75mbps','20.00mbps'"
+        DEFVAL{"disable"}
+    ::= { ruckusZDWLANConfigEntry 40 }
+
+ruckusZDWLANConfigDownlinkRate OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (1..10))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Disable or Set the Speed/Rate limiting of downlink. Valid range is 0.10mbps or between 0.25mbps~20.00mbps in 0.25mbps step.
+        Such as: 'disable', '0.10mbps', '0.25mbps', '0.5mbps',...,'19.75mbps','20.00mbps'"
+        DEFVAL{"disable"}
+    ::= { ruckusZDWLANConfigEntry 41 }
+
+ruckusZDWLANConfigIGMPSnooping OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IGMP Snooping state of the WLAN."
+    ::= { ruckusZDWLANConfigEntry 42 }
+    
+ruckusZDWLANConfigVlanID OBJECT-TYPE
+    SYNTAX  INTEGER  ( 1..4094 )
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the VLAN ID of the WLAN.  If VLAN ID is 1, packets from this WLAN will be untagged."
+        DEFVAL{1}
+    ::= { ruckusZDWLANConfigEntry 45 }
+
+ruckusZDWLANConfigDynamicVLAN OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the Service of the dynamic Wireless LAN or not.
+         For 802.1x EAP + MAC Address model,'set' is not supported."
+        DEFVAL{disable}
+    ::= { ruckusZDWLANConfigEntry 46 }
+
+ruckusZDWLANConfigHideSSID OBJECT-TYPE
+    SYNTAX  TruthValue 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Hide SSID, not to broadcast it SSID."
+        DEFVAL{false}
+    ::= { ruckusZDWLANConfigEntry 50 }
+
+ruckusZDWLANConfigTunnelMode OBJECT-TYPE
+    SYNTAX  TruthValue 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable Tunnel support capability for the Wireless LAN."
+        DEFVAL{false}
+    ::= { ruckusZDWLANConfigEntry 52 }
+
+ruckusZDWLANConfigBackgroundScanning OBJECT-TYPE
+    SYNTAX  TruthValue 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select Background Scanning support capability for the Wireless LAN."
+        DEFVAL{false}
+    ::= { ruckusZDWLANConfigEntry 53 }
+
+ruckusZDWLANConfigMaxClients OBJECT-TYPE
+    SYNTAX  INTEGER (1..100)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Select the Number of client devices the AP can service for the Wireless LAN."
+        DEFVAL{100}
+    ::= { ruckusZDWLANConfigEntry 55 }
+
+ruckusZDWLANConfigWebAuthentication OBJECT-TYPE
+    SYNTAX  INTEGER {
+            enable(1),
+            disable(2) } 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable the Wep Authentication or not."
+        DEFVAL{disable}
+    ::= { ruckusZDWLANConfigEntry 60 }
+
+ruckusZDWLANConfigRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Wireless LAN.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDWLANConfigEntry 63 }
+
+
+ruckusZDWLANGroupConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN Group table."
+    ::= { ruckusZDWLANConfig 2 }
+
+ruckusZDWLANGroupConfigEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN Group configuration entry."
+    INDEX {
+        ruckusZDWLANGroupID }
+    ::= { ruckusZDWLANGroupConfigTable 1 }
+
+RuckusZDWLANGroupConfigEntry ::= SEQUENCE {
+  ruckusZDWLANGroupID                        	INTEGER,
+  ruckusZDWLANGroupConfigName                	DisplayString,
+  ruckusZDWLANGroupConfigDescription         	DisplayString,  
+  ruckusZDWLANGroupVlanOverrideStatus           TruthValue,
+  ruckusZDWLANGroupConfigRowStatus           	RowStatus
+}
+
+ruckusZDWLANGroupID OBJECT-TYPE
+    SYNTAX  INTEGER (1..2048)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "WLAN Group ID. It can't be modified after creating it.
+        Max value:for zd1000 zd1100,128;for zd3000,1024;for zd5000,2048"
+    ::= { ruckusZDWLANGroupConfigEntry 1 }
+
+ruckusZDWLANGroupConfigName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Name for this Wireless LAN Group"
+    ::= { ruckusZDWLANGroupConfigEntry 5 }
+
+ruckusZDWLANGroupConfigDescription OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description for this Wireless LAN Group."
+    ::= { ruckusZDWLANGroupConfigEntry 6 }
+
+ruckusZDWLANGroupVlanOverrideStatus OBJECT-TYPE
+    SYNTAX  TruthValue 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable Vlan Override for the Wireless LAN Group."
+    ::= { ruckusZDWLANGroupConfigEntry 8 }
+
+ruckusZDWLANGroupConfigRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Wireless LAN Group.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDWLANGroupConfigEntry 15 }
+
+
+ruckusZDWLANGroupCfgAttrTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANGroupCfgAttrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN table in WLAN group."
+    ::= { ruckusZDWLANConfig 3 }
+
+ruckusZDWLANGroupCfgAttrEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANGroupCfgAttrEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN configuration entry."
+    INDEX {
+        ruckusZDWLANGroupID,
+        ruckusZDWLANID }
+    ::= { ruckusZDWLANGroupCfgAttrTable 1 }
+
+RuckusZDWLANGroupCfgAttrEntry ::= SEQUENCE { 
+  ruckusZDWLANGroupCfgAttrOverrideType    INTEGER,
+  ruckusZDWLANGroupCfgAttrWGVlanTag       INTEGER,
+  ruckusZDWLANGroupCfgAttrRowStatus       RowStatus
+}
+
+ruckusZDWLANGroupCfgAttrOverrideType OBJECT-TYPE
+    SYNTAX  INTEGER { nochange(1), tag(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WLAN group vlan Override Type."
+    DEFVAL { nochange }
+    ::= { ruckusZDWLANGroupCfgAttrEntry 3 }
+
+ruckusZDWLANGroupCfgAttrWGVlanTag OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "WLAN group vlan tag. 
+        for set , range is :1-4094.
+        for get , range is :0-4094:
+                 1: If VLAN ID is 1, packets from this WLAN will be untagged;
+                 0: for node ruckusZDWLANGroupCfgAttrOverrideType is nochange"
+    DEFVAL { 2 }
+    ::= { ruckusZDWLANGroupCfgAttrEntry 4 }
+    
+ruckusZDWLANGroupCfgAttrRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Wireless LAN group attr.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDWLANGroupCfgAttrEntry 10 }
+
+
+-- add hotspot table basicly for KT 
+ruckusZDHotspotConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDHotspotConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Hotspot table."
+    ::= { ruckusZDWLANConfig 8 }
+
+ruckusZDHotspotConfigEntry OBJECT-TYPE
+    SYNTAX  RuckusZDHotspotConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Hotspot configuration entry."
+    INDEX {
+        ruckusZDHotspotID }
+    ::= { ruckusZDHotspotConfigTable 1 }
+
+RuckusZDHotspotConfigEntry ::= SEQUENCE {
+  ruckusZDHotspotID                            INTEGER,
+  ruckusZDHotspotName                	         DisplayString,
+  ruckusZDHotspotRedirectLoginPage         	   DisplayString, 
+  ruckusZDHotspotRedirectStartURL              DisplayString,
+  ruckusZDHotspotRedirectType                  INTEGER,
+  ruckusZDHotspotRowStatus                     RowStatus
+}
+
+ruckusZDHotspotID OBJECT-TYPE
+    SYNTAX  INTEGER (1..32)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Hotspot ID."
+    ::= { ruckusZDHotspotConfigEntry 1 }
+
+ruckusZDHotspotName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Name for this Hotspot.Can't be modified if created."
+    ::= { ruckusZDHotspotConfigEntry 2 }
+
+ruckusZDHotspotRedirectLoginPage OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Redirect unauthenticated user to this for authentication. It is URL or IPaddress."
+    ::= { ruckusZDHotspotConfigEntry 3 }
+
+ruckusZDHotspotRedirectStartURL OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "After user is authenticated, redirect to this URL if the redirect type is url."
+    ::= { ruckusZDHotspotConfigEntry 4 }
+
+ruckusZDHotspotRedirectType OBJECT-TYPE
+    SYNTAX  INTEGER { user(1), url(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To decide the redirect target. If it is user, redirect to the user intends to visit."
+    ::= { ruckusZDHotspotConfigEntry 6 }
+    
+ruckusZDHotspotRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Hotspot."
+    ::= { ruckusZDHotspotConfigEntry 15 }
+
+
+ruckusZDClientIsolationWhiteListTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDClientIsolationWhiteListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Client Isolation White List table."
+    ::= { ruckusZDWLANConfig 15 }
+
+ruckusZDClientIsolationWhiteListEntry OBJECT-TYPE
+    SYNTAX  RuckusZDClientIsolationWhiteListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Client Isolation White List entry."
+    INDEX { ruckusZDClientIsolationWhiteListID }
+    ::= { ruckusZDClientIsolationWhiteListTable 1 }
+
+RuckusZDClientIsolationWhiteListEntry ::= SEQUENCE {
+  ruckusZDClientIsolationWhiteListID				INTEGER,
+  ruckusZDClientIsolationWhiteListName				DisplayString,
+  ruckusZDClientIsolationWhiteListDescription		DisplayString,
+  ruckusZDClientIsolationWhiteListRowStatus			RowStatus
+}
+
+ruckusZDClientIsolationWhiteListID OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Client Isolation White List ID. It can't be modified after creating it."
+    ::= { ruckusZDClientIsolationWhiteListEntry 1 }
+
+ruckusZDClientIsolationWhiteListName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Name for this Client Isolation White List."
+    ::= { ruckusZDClientIsolationWhiteListEntry 5 }
+
+ruckusZDClientIsolationWhiteListDescription OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description for this Client Isolation White List."
+    ::= { ruckusZDClientIsolationWhiteListEntry 6 }
+
+ruckusZDClientIsolationWhiteListRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Client Isolation White List.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDClientIsolationWhiteListEntry 15 }
+
+
+ruckusZDClientIsolationWhiteListRuleTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDClientIsolationWhiteListRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Client Isolation White List Attribute in Client Isolation White 
+        List table."
+    ::= { ruckusZDWLANConfig 16 }
+
+ruckusZDClientIsolationWhiteListRuleEntry OBJECT-TYPE
+    SYNTAX  RuckusZDClientIsolationWhiteListRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Client Isolation White List entry."
+    INDEX { ruckusZDClientIsolationWhiteListID,
+        	ruckusZDClientIsolationWhiteListRuleID }
+    ::= { ruckusZDClientIsolationWhiteListRuleTable 1 }
+
+RuckusZDClientIsolationWhiteListRuleEntry ::= SEQUENCE {
+  ruckusZDClientIsolationWhiteListRuleID				INTEGER,
+  ruckusZDClientIsolationWhiteListRuleDescription		DisplayString,
+  ruckusZDClientIsolationWhiteListRuleMac				DisplayString,
+  ruckusZDClientIsolationWhiteListRuleDesAddr			DisplayString,
+  ruckusZDClientIsolationWhiteListRuleRowStatus			RowStatus
+}
+
+ruckusZDClientIsolationWhiteListRuleID OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "WLAN Client Isolation White List Rule ID."
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 1 }
+
+ruckusZDClientIsolationWhiteListRuleDescription OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Description for this Client Isolation White List Rule."
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 3 }
+
+ruckusZDClientIsolationWhiteListRuleMac OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..46))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 5 }
+
+ruckusZDClientIsolationWhiteListRuleDesAddr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..46))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 6 }
+    
+ruckusZDClientIsolationWhiteListRuleRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Create, Delete Administration control for this Wireless LAN group attr.
+        1,ACTIVE state,only for read;
+        4,CREATEANDGO, create a new table;
+        6,DESTROY, delete a existing table."
+    ::= { ruckusZDClientIsolationWhiteListRuleEntry 10 }
+            
+END

@@ -1,0 +1,138 @@
+-- MIB created 10/11/99 20:28:39, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBM-FRAMERELAY-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmframerelay.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Counter32, Integer32, IpAddress, Gauge32
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    DisplayString
+            FROM SNMPv2-TC-v1
+    enterprises
+            FROM RFC1155-SMI
+    ifIndex
+            FROM RFC1213-MIB
+    frCircuitIfIndex, frCircuitDlci
+            FROM RFC1315-MIB;
+
+ibmIROCfrcircuit OBJECT IDENTIFIER ::= { enterprises ibm(2) ibmProd(6) ibmIROC(119) ibmIROCrouting(4) ibmIROCroutingfr(4) 5 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9902171200Z
+--  OrgName
+--    IBM
+--  ContactInfo
+--    Randy Worzella
+--     IBM Corporation
+--     800 Park Offices Drive
+--     FBWA/664
+--     P.O. Box 12195
+--     Research Triangle Park, NC 27709, USA
+--     Tel:    1 919 254 2202
+--     E-mail: worzella@us.ibm.com
+--  Descr
+--    This MIB module contains enterprise specific definitions for
+--     frame relay circuit management.
+
+ibmframerelayPVCTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmframerelayPVCEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A table providing PVC information and the capabiilty
+         to clear counters."
+    ::= { ibmIROCfrcircuit 1 }
+
+ibmframerelayPVCEntry OBJECT-TYPE
+    SYNTAX IbmframerelayPVCEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Entry identifying a particular permanent virtual circuit."
+    INDEX { frCircuitIfIndex, frCircuitDlci }
+    ::= { ibmframerelayPVCTable 1 }
+
+IbmframerelayPVCEntry ::= SEQUENCE {
+    ibmframerelayPVCCircName DisplayString,
+    ibmframerelayPVCTimesActive Counter32,
+    ibmframerelayPVCTimesInactive Counter32,
+    ibmframerelayPVCTimesCongested Counter32,
+    ibmframerelayPVCTxQueued Gauge32,
+    ibmframerelayPVCTxDropped Counter32,
+    ibmframerelayPVCClearAll Integer32
+    }
+
+ibmframerelayPVCCircName OBJECT-TYPE
+    SYNTAX DisplayString
+--    Rsyntax OCTET STRING(SIZE(0..255))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The name string assigned to this PVC."
+    ::= { ibmframerelayPVCEntry 1 }
+
+ibmframerelayPVCTimesActive OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The times this PVC entered active state as
+         reported by frCircuitState."
+    ::= { ibmframerelayPVCEntry 2 }
+
+ibmframerelayPVCTimesInactive OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The times this PVC entered inactive state as
+         reported by frCircuitState."
+    ::= { ibmframerelayPVCEntry 3 }
+
+ibmframerelayPVCTimesCongested OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The times this PVC has become congested."
+    ::= { ibmframerelayPVCEntry 4 }
+
+ibmframerelayPVCTxQueued OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The current number of frames queued for transmission
+         and waiting for space on the device transmit queue."
+    ::= { ibmframerelayPVCEntry 5 }
+
+ibmframerelayPVCTxDropped OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of frames discarded because they could
+         not be transmitted due to output queue overflow."
+    ::= { ibmframerelayPVCEntry 6 }
+
+ibmframerelayPVCClearAll OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "When SET to a value of 0, all the frame relay
+         counters for this PVC are cleared.
+        
+         When READ, this object always returns a value of 0,
+         since this object is intended as a trigger, rather than
+         providing information."
+    ::= { ibmframerelayPVCEntry 7 }
+
+
+END
+

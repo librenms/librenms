@@ -1,0 +1,14 @@
+os: lenovoemc
+type: storage
+group: storage
+text: LenovoEMC
+icon: lenovo
+mib_dir: lenovo
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysDescr:
+            - 'EMC SOHO-NAS Storage.'

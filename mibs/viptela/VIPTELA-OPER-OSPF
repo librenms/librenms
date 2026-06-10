@@ -1,0 +1,1900 @@
+-- Namespace: http://viptela.com/oper-ospf
+
+VIPTELA-OPER-OSPF DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-oper-ospf MODULE-IDENTITY
+    LAST-UPDATED "201608100000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for OSPF operational data"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 13 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+Ipv4Prefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/1d"
+    STATUS      current
+    DESCRIPTION "confd:ipv4Prefix"
+    SYNTAX      OCTET STRING (SIZE (5))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+OspfNeighborOptions ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      BITS {t(0),e(1),mc(2),np(3),ea(4),dc(5),o(6),dn(7)}
+
+OspfDbRlsaFlags ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      BITS {abr(0),asbr(1),vl(2),type-7(4),shortcut-abr(5)}
+
+-- OSPF information
+-- tagpath /ospf
+ospf OBJECT IDENTIFIER ::= { viptela-oper-ospf 1 }
+
+-- tagpath /ospf/neighbor
+ospfNeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of neighbors"
+    ::= { viptela-oper-ospf 2 }
+
+-- tagpath /ospf/neighbor
+ospfNeighborEntry OBJECT-TYPE
+    SYNTAX      OspfNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfNeighborVpnId, ospfNeighborSource, ospfNeighborIfIndex }
+        ::= { ospfNeighborTable 1 }
+
+OspfNeighborEntry ::=
+    SEQUENCE {
+        ospfNeighborVpnId Unsigned32,
+        ospfNeighborSource IpAddress,
+        ospfNeighborIfIndex Unsigned32,
+        ospfNeighborIfName String,
+        ospfNeighborRouterId IpAddress,
+        ospfNeighborIfAddress IpAddress,
+        ospfNeighborArea Unsigned32,
+        ospfNeighborAreaType INTEGER,
+        ospfNeighborNeighborState INTEGER,
+        ospfNeighborInterfaceState INTEGER,
+        ospfNeighborPriority Unsigned32,
+        ospfNeighborStateChanges Unsigned32,
+        ospfNeighborProgressiveChangeTime Unsigned32,
+        ospfNeighborRegressiveChangeTime Unsigned32,
+        ospfNeighborRegressiveChangeReason String,
+        ospfNeighborDesignatedRouterId IpAddress,
+        ospfNeighborBackupDesignatedRouterId IpAddress,
+        ospfNeighborDeadTimer Unsigned32,
+        ospfNeighborDbSummaryList Unsigned32,
+        ospfNeighborLinkStateReqList Counter64,
+        ospfNeighborLinkStateRetransList Counter64,
+        ospfNeighborOptions OspfNeighborOptions
+    }
+
+-- tagpath /ospf/neighbor/vpn-id
+ospfNeighborVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ospfNeighborEntry 1 }
+
+-- tagpath /ospf/neighbor/source
+ospfNeighborSource OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Neighbor address"
+    ::= { ospfNeighborEntry 2 }
+
+-- tagpath /ospf/neighbor/if-index
+ospfNeighborIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface index"
+    ::= { ospfNeighborEntry 3 }
+
+-- tagpath /ospf/neighbor/if-name
+ospfNeighborIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { ospfNeighborEntry 4 }
+
+-- tagpath /ospf/neighbor/router-id
+ospfNeighborRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor ID"
+    ::= { ospfNeighborEntry 5 }
+
+-- tagpath /ospf/neighbor/if-address
+ospfNeighborIfAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface address"
+    ::= { ospfNeighborEntry 6 }
+
+-- tagpath /ospf/neighbor/area
+ospfNeighborArea OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Area"
+    ::= { ospfNeighborEntry 7 }
+
+-- tagpath /ospf/neighbor/area-type
+ospfNeighborAreaType OBJECT-TYPE
+    SYNTAX      INTEGER {regular(0),stub(1),nssa(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Area type"
+    ::= { ospfNeighborEntry 8 }
+
+-- tagpath /ospf/neighbor/neighbor-state
+ospfNeighborNeighborState OBJECT-TYPE
+    SYNTAX      INTEGER {full(0),deleted(1),depend-upon(2),down(3),attempt(4),init(5),two-way(6),exstart(7),exchange(8),loading(9)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor state"
+    ::= { ospfNeighborEntry 9 }
+
+-- tagpath /ospf/neighbor/interface-state
+ospfNeighborInterfaceState OBJECT-TYPE
+    SYNTAX      INTEGER {if-depend-upon(0),if-down(1),if-loopback(2),if-waiting(3),if-point-to-point(4),if-dr-other(5),if-backup(6),if-dr(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface state"
+    ::= { ospfNeighborEntry 10 }
+
+-- tagpath /ospf/neighbor/priority
+ospfNeighborPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Priority"
+    ::= { ospfNeighborEntry 11 }
+
+-- tagpath /ospf/neighbor/state-changes
+ospfNeighborStateChanges OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of state changes"
+    ::= { ospfNeighborEntry 12 }
+
+-- tagpath /ospf/neighbor/progressive-change-time
+ospfNeighborProgressiveChangeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Progressive change time, in seconds"
+    ::= { ospfNeighborEntry 13 }
+
+-- tagpath /ospf/neighbor/regressive-change-time
+ospfNeighborRegressiveChangeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Regressive change time, in seconds"
+    ::= { ospfNeighborEntry 14 }
+
+-- tagpath /ospf/neighbor/regressive-change-reason
+ospfNeighborRegressiveChangeReason OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Regressive change reason"
+    ::= { ospfNeighborEntry 15 }
+
+-- tagpath /ospf/neighbor/designated-router-id
+ospfNeighborDesignatedRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Designated router ID"
+    ::= { ospfNeighborEntry 16 }
+
+-- tagpath /ospf/neighbor/backup-designated-router-id
+ospfNeighborBackupDesignatedRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Backup designated router ID"
+    ::= { ospfNeighborEntry 17 }
+
+-- tagpath /ospf/neighbor/dead-timer
+ospfNeighborDeadTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Dead timer, in seconds"
+    ::= { ospfNeighborEntry 18 }
+
+-- tagpath /ospf/neighbor/db-summary-list
+ospfNeighborDbSummaryList OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Database summary list"
+    ::= { ospfNeighborEntry 19 }
+
+-- tagpath /ospf/neighbor/link-state-req-list
+ospfNeighborLinkStateReqList OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link state request list"
+    ::= { ospfNeighborEntry 20 }
+
+-- tagpath /ospf/neighbor/link-state-retrans-list
+ospfNeighborLinkStateRetransList OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link-state retransmission list"
+    ::= { ospfNeighborEntry 21 }
+
+-- tagpath /ospf/neighbor/options
+ospfNeighborOptions OBJECT-TYPE
+    SYNTAX      OspfNeighborOptions
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSPF neighbor options (DN|DC|E|EA|MC|NP|O|T)"
+    ::= { ospfNeighborEntry 22 }
+
+-- tagpath /ospf/interface
+ospfInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of interfaces"
+    ::= { viptela-oper-ospf 3 }
+
+-- tagpath /ospf/interface
+ospfInterfaceEntry OBJECT-TYPE
+    SYNTAX      OspfInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfInterfaceVpnId, ospfInterfaceIfAddr, ospfInterfaceIfIndex }
+        ::= { ospfInterfaceTable 1 }
+
+OspfInterfaceEntry ::=
+    SEQUENCE {
+        ospfInterfaceVpnId Unsigned32,
+        ospfInterfaceIfAddr OCTET STRING,
+        ospfInterfaceIfIndex Unsigned32,
+        ospfInterfaceIfName String,
+        ospfInterfaceMtu Unsigned32,
+        ospfInterfaceBandwidth Unsigned32,
+        ospfInterfaceBroadcastAddr IpAddress,
+        ospfInterfaceAreaAddr Unsigned32,
+        ospfInterfaceMtuMismatch TruthValue,
+        ospfInterfaceRouterId IpAddress,
+        ospfInterfaceIfType INTEGER,
+        ospfInterfaceCost Unsigned32,
+        ospfInterfaceDelay Unsigned32,
+        ospfInterfaceOspfIfState INTEGER,
+        ospfInterfacePriority Unsigned32,
+        ospfInterfaceDesignatedRouterId IpAddress,
+        ospfInterfaceBackupDesignatedRouterId IpAddress,
+        ospfInterfaceDesignatedRouterIp IpAddress,
+        ospfInterfaceBackupDesignatedRouterIp IpAddress,
+        ospfInterfaceLsaSeqnum Unsigned32,
+        ospfInterfaceMembers INTEGER,
+        ospfInterfaceHelloTimer Unsigned32,
+        ospfInterfaceDeadInterval Unsigned32,
+        ospfInterfaceRetransmitTimer Unsigned32,
+        ospfInterfaceNeighborCount Unsigned32,
+        ospfInterfaceAdjNeighborCount Unsigned32,
+        ospfInterfaceHelloDueTime Unsigned32,
+        ospfInterfaceOperState TruthValue,
+        ospfInterfaceMd5KeyId UnsignedByte,
+        ospfInterfaceMd5Key String
+    }
+
+-- tagpath /ospf/interface/vpn-id
+ospfInterfaceVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ospfInterfaceEntry 1 }
+
+-- tagpath /ospf/interface/if-addr
+ospfInterfaceIfAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface address"
+    ::= { ospfInterfaceEntry 2 }
+
+-- tagpath /ospf/interface/if-index
+ospfInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface index"
+    ::= { ospfInterfaceEntry 3 }
+
+-- tagpath /ospf/interface/if-name
+ospfInterfaceIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { ospfInterfaceEntry 4 }
+
+-- tagpath /ospf/interface/mtu
+ospfInterfaceMtu OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MTU, in bytes"
+    ::= { ospfInterfaceEntry 5 }
+
+-- tagpath /ospf/interface/bandwidth
+ospfInterfaceBandwidth OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Bandwidth, in kilobits"
+    ::= { ospfInterfaceEntry 6 }
+
+-- tagpath /ospf/interface/broadcast-addr
+ospfInterfaceBroadcastAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Broadcast address"
+    ::= { ospfInterfaceEntry 7 }
+
+-- tagpath /ospf/interface/area-addr
+ospfInterfaceAreaAddr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Area address"
+    ::= { ospfInterfaceEntry 8 }
+
+-- tagpath /ospf/interface/mtu-mismatch
+ospfInterfaceMtuMismatch OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MTU mismatch detection"
+    ::= { ospfInterfaceEntry 9 }
+
+-- tagpath /ospf/interface/router-id
+ospfInterfaceRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router ID"
+    ::= { ospfInterfaceEntry 10 }
+
+-- tagpath /ospf/interface/if-type
+ospfInterfaceIfType OBJECT-TYPE
+    SYNTAX      INTEGER {none(0),point-to-point(1),broadcast(2),nbma(3),point-to-multipoint(4),loopback(5)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface type"
+    ::= { ospfInterfaceEntry 11 }
+
+-- tagpath /ospf/interface/cost
+ospfInterfaceCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Cost"
+    ::= { ospfInterfaceEntry 12 }
+
+-- tagpath /ospf/interface/delay
+ospfInterfaceDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Delay"
+    ::= { ospfInterfaceEntry 13 }
+
+-- tagpath /ospf/interface/ospf-if-state
+ospfInterfaceOspfIfState OBJECT-TYPE
+    SYNTAX      INTEGER {if-depend-upon(0),if-down(1),if-loopback(2),if-waiting(3),if-point-to-point(4),if-dr-other(5),if-backup(6),if-dr(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State"
+    ::= { ospfInterfaceEntry 14 }
+
+-- tagpath /ospf/interface/priority
+ospfInterfacePriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Priority"
+    ::= { ospfInterfaceEntry 15 }
+
+-- tagpath /ospf/interface/designated-router-id
+ospfInterfaceDesignatedRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Designated router ID"
+    ::= { ospfInterfaceEntry 16 }
+
+-- tagpath /ospf/interface/backup-designated-router-id
+ospfInterfaceBackupDesignatedRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Backup designated router ID"
+    ::= { ospfInterfaceEntry 17 }
+
+-- tagpath /ospf/interface/designated-router-ip
+ospfInterfaceDesignatedRouterIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Designated router address"
+    ::= { ospfInterfaceEntry 18 }
+
+-- tagpath /ospf/interface/backup-designated-router-ip
+ospfInterfaceBackupDesignatedRouterIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Backup designated router address"
+    ::= { ospfInterfaceEntry 19 }
+
+-- tagpath /ospf/interface/lsa-seqnum
+ospfInterfaceLsaSeqnum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "LSA sequence number"
+    ::= { ospfInterfaceEntry 20 }
+
+-- tagpath /ospf/interface/members
+ospfInterfaceMembers OBJECT-TYPE
+    SYNTAX      INTEGER {all(0),designated(1),both(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Members"
+    ::= { ospfInterfaceEntry 21 }
+
+-- tagpath /ospf/interface/hello-timer
+ospfInterfaceHelloTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello timer, in seconds"
+    ::= { ospfInterfaceEntry 22 }
+
+-- tagpath /ospf/interface/dead-interval
+ospfInterfaceDeadInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Dead interval, in seconds"
+    ::= { ospfInterfaceEntry 23 }
+
+-- tagpath /ospf/interface/retransmit-timer
+ospfInterfaceRetransmitTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Retransmit timer, in seconds"
+    ::= { ospfInterfaceEntry 24 }
+
+-- tagpath /ospf/interface/neighbor-count
+ospfInterfaceNeighborCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor count"
+    ::= { ospfInterfaceEntry 25 }
+
+-- tagpath /ospf/interface/adj-neighbor-count
+ospfInterfaceAdjNeighborCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Adjacent neighbor count"
+    ::= { ospfInterfaceEntry 26 }
+
+-- tagpath /ospf/interface/hello-due-time
+ospfInterfaceHelloDueTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hello due time, in seconds"
+    ::= { ospfInterfaceEntry 27 }
+
+-- tagpath /ospf/interface/oper-state
+ospfInterfaceOperState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Up or down"
+    ::= { ospfInterfaceEntry 28 }
+
+-- tagpath /ospf/interface/md5-key-id
+ospfInterfaceMd5KeyId OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MD5 key ID"
+    ::= { ospfInterfaceEntry 29 }
+
+-- tagpath /ospf/interface/md5-key
+ospfInterfaceMd5Key OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MD5 key (hashed)"
+    ::= { ospfInterfaceEntry 30 }
+
+-- tagpath /ospf/database
+ospfDatabaseTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfDatabaseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "LSA database"
+    ::= { viptela-oper-ospf 4 }
+
+-- tagpath /ospf/database
+ospfDatabaseEntry OBJECT-TYPE
+    SYNTAX      OspfDatabaseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfDatabaseVpnId, ospfDatabaseArea, ospfDatabaseLsaType, ospfDatabaseLinkId, ospfDatabaseAdvRouter }
+        ::= { ospfDatabaseTable 1 }
+
+OspfDatabaseEntry ::=
+    SEQUENCE {
+        ospfDatabaseVpnId Unsigned32,
+        ospfDatabaseArea Unsigned32,
+        ospfDatabaseLsaType INTEGER,
+        ospfDatabaseLinkId IpAddress,
+        ospfDatabaseAdvRouter IpAddress,
+        ospfDatabaseChecksum Unsigned32,
+        ospfDatabaseAge Unsigned32,
+        ospfDatabaseSequence Unsigned32,
+        ospfDatabaseLength Unsigned32,
+        ospfDatabaseOptions Unsigned32,
+        ospfDatabaseOptionsFlags OspfNeighborOptions,
+        ospfDatabaseFlags Unsigned32,
+        ospfDatabaseRlsaFlags OspfDbRlsaFlags,
+        ospfDatabaseRlsaFlagsValue Unsigned32,
+        ospfDatabasePrefix Ipv4Prefix,
+        ospfDatabaseTag Unsigned32,
+        ospfDatabaseMetricType INTEGER,
+        ospfDatabaseMask IpAddress,
+        ospfDatabaseMetric Unsigned32,
+        ospfDatabaseForwardingAddr IpAddress,
+        ospfDatabaseLinkCount Unsigned32
+    }
+
+-- tagpath /ospf/database/vpn-id
+ospfDatabaseVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ospfDatabaseEntry 1 }
+
+-- tagpath /ospf/database/area
+ospfDatabaseArea OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Area"
+    ::= { ospfDatabaseEntry 2 }
+
+-- tagpath /ospf/database/lsa-type
+ospfDatabaseLsaType OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),router(1),network(2),summary(3),asbr-summary(4),external(5),group-member(6),nssa-external(7),type-ext-attributes(8),link-local-opaque(9),area-local-opaque(10),as-external-opaque(11)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Link type"
+    ::= { ospfDatabaseEntry 3 }
+
+-- tagpath /ospf/database/link-id
+ospfDatabaseLinkId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Link state ID"
+    ::= { ospfDatabaseEntry 4 }
+
+-- tagpath /ospf/database/adv-router
+ospfDatabaseAdvRouter OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Advertising router"
+    ::= { ospfDatabaseEntry 5 }
+
+-- tagpath /ospf/database/checksum
+ospfDatabaseChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Checksum"
+    ::= { ospfDatabaseEntry 6 }
+
+-- tagpath /ospf/database/age
+ospfDatabaseAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Age"
+    ::= { ospfDatabaseEntry 7 }
+
+-- tagpath /ospf/database/sequence
+ospfDatabaseSequence OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sequence"
+    ::= { ospfDatabaseEntry 8 }
+
+-- tagpath /ospf/database/length
+ospfDatabaseLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Length"
+    ::= { ospfDatabaseEntry 9 }
+
+-- tagpath /ospf/database/options
+ospfDatabaseOptions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Options"
+    ::= { ospfDatabaseEntry 10 }
+
+-- tagpath /ospf/database/options-flags
+ospfDatabaseOptionsFlags OBJECT-TYPE
+    SYNTAX      OspfNeighborOptions
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Options flags"
+    ::= { ospfDatabaseEntry 11 }
+
+-- tagpath /ospf/database/flags
+ospfDatabaseFlags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flags"
+    ::= { ospfDatabaseEntry 12 }
+
+-- tagpath /ospf/database/rlsa-flags
+ospfDatabaseRlsaFlags OBJECT-TYPE
+    SYNTAX      OspfDbRlsaFlags
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router LSA flags (valid for router) (ABR, ASBR, NT, shortcut ABR, Type-7, Virtual"
+    ::= { ospfDatabaseEntry 13 }
+
+-- tagpath /ospf/database/rlsa-flags-value
+ospfDatabaseRlsaFlagsValue OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router LSA flags value (valid for router)"
+    ::= { ospfDatabaseEntry 14 }
+
+-- tagpath /ospf/database/prefix
+ospfDatabasePrefix OBJECT-TYPE
+    SYNTAX      Ipv4Prefix
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Prefix"
+    ::= { ospfDatabaseEntry 15 }
+
+-- tagpath /ospf/database/tag
+ospfDatabaseTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tag"
+    ::= { ospfDatabaseEntry 16 }
+
+-- tagpath /ospf/database/metric-type
+ospfDatabaseMetricType OBJECT-TYPE
+    SYNTAX      INTEGER {type1(0),type2(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Metric type"
+    ::= { ospfDatabaseEntry 17 }
+
+-- tagpath /ospf/database/mask
+ospfDatabaseMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Mask"
+    ::= { ospfDatabaseEntry 18 }
+
+-- tagpath /ospf/database/metric
+ospfDatabaseMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Metric"
+    ::= { ospfDatabaseEntry 19 }
+
+-- tagpath /ospf/database/forwarding-addr
+ospfDatabaseForwardingAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Forwarding address"
+    ::= { ospfDatabaseEntry 20 }
+
+-- tagpath /ospf/database/link-count
+ospfDatabaseLinkCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router links"
+    ::= { ospfDatabaseEntry 21 }
+
+-- tagpath /ospf/database/router-link
+ospfDatabaseRouterLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfDatabaseRouterLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of router links"
+    ::= { viptela-oper-ospf 5 }
+
+-- tagpath /ospf/database/router-link
+ospfDatabaseRouterLinkEntry OBJECT-TYPE
+    SYNTAX      OspfDatabaseRouterLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfDatabaseVpnId, ospfDatabaseArea, ospfDatabaseLsaType, ospfDatabaseLinkId, ospfDatabaseAdvRouter, ospfDatabaseRouterLinkLinkIndex }
+        ::= { ospfDatabaseRouterLinkTable 1 }
+
+OspfDatabaseRouterLinkEntry ::=
+    SEQUENCE {
+        ospfDatabaseRouterLinkLinkIndex Unsigned32,
+        ospfDatabaseRouterLinkRouterLinkId IpAddress,
+        ospfDatabaseRouterLinkData IpAddress,
+        ospfDatabaseRouterLinkTosMetric Unsigned32,
+        ospfDatabaseRouterLinkRouterLinkType INTEGER
+    }
+
+-- tagpath /ospf/database/router-link/link-index
+ospfDatabaseRouterLinkLinkIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Link Index"
+    ::= { ospfDatabaseRouterLinkEntry 1 }
+
+-- tagpath /ospf/database/router-link/router-link-id
+ospfDatabaseRouterLinkRouterLinkId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link ID"
+    ::= { ospfDatabaseRouterLinkEntry 2 }
+
+-- tagpath /ospf/database/router-link/data
+ospfDatabaseRouterLinkData OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link Data"
+    ::= { ospfDatabaseRouterLinkEntry 3 }
+
+-- tagpath /ospf/database/router-link/tos-metric
+ospfDatabaseRouterLinkTosMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "TOS metric"
+    ::= { ospfDatabaseRouterLinkEntry 4 }
+
+-- tagpath /ospf/database/router-link/router-link-type
+ospfDatabaseRouterLinkRouterLinkType OBJECT-TYPE
+    SYNTAX      INTEGER {point-to-point(0),transit(1),stub(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link type"
+    ::= { ospfDatabaseRouterLinkEntry 5 }
+
+-- tagpath /ospf/database/network-link
+ospfDatabaseNetworkLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfDatabaseNetworkLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of network links"
+    ::= { viptela-oper-ospf 6 }
+
+-- tagpath /ospf/database/network-link
+ospfDatabaseNetworkLinkEntry OBJECT-TYPE
+    SYNTAX      OspfDatabaseNetworkLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfDatabaseVpnId, ospfDatabaseArea, ospfDatabaseLsaType, ospfDatabaseLinkId, ospfDatabaseAdvRouter, ospfDatabaseNetworkLinkLinkIndex }
+        ::= { ospfDatabaseNetworkLinkTable 1 }
+
+OspfDatabaseNetworkLinkEntry ::=
+    SEQUENCE {
+        ospfDatabaseNetworkLinkLinkIndex Unsigned32,
+        ospfDatabaseNetworkLinkNetworkLinkId IpAddress
+    }
+
+-- tagpath /ospf/database/network-link/link-index
+ospfDatabaseNetworkLinkLinkIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Link Index"
+    ::= { ospfDatabaseNetworkLinkEntry 1 }
+
+-- tagpath /ospf/database/network-link/network-link-id
+ospfDatabaseNetworkLinkNetworkLinkId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link ID"
+    ::= { ospfDatabaseNetworkLinkEntry 2 }
+
+-- tagpath /ospf/external-database
+ospfExternalDatabaseTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfExternalDatabaseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "External LSA database"
+    ::= { viptela-oper-ospf 7 }
+
+-- tagpath /ospf/external-database
+ospfExternalDatabaseEntry OBJECT-TYPE
+    SYNTAX      OspfExternalDatabaseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfExternalDatabaseVpnId, ospfExternalDatabaseLinkId, ospfExternalDatabaseAdvRouter }
+        ::= { ospfExternalDatabaseTable 1 }
+
+OspfExternalDatabaseEntry ::=
+    SEQUENCE {
+        ospfExternalDatabaseVpnId Unsigned32,
+        ospfExternalDatabaseLinkId IpAddress,
+        ospfExternalDatabaseAdvRouter IpAddress,
+        ospfExternalDatabaseChecksum Unsigned32,
+        ospfExternalDatabaseAge Unsigned32,
+        ospfExternalDatabaseSequence Unsigned32,
+        ospfExternalDatabaseLength Unsigned32,
+        ospfExternalDatabaseOptions Unsigned32,
+        ospfExternalDatabaseOptionsFlags OspfNeighborOptions,
+        ospfExternalDatabaseFlags Unsigned32,
+        ospfExternalDatabasePrefix Ipv4Prefix,
+        ospfExternalDatabaseTag Unsigned32,
+        ospfExternalDatabaseMetricType INTEGER,
+        ospfExternalDatabaseMask IpAddress,
+        ospfExternalDatabaseMetric Unsigned32,
+        ospfExternalDatabaseForwardingAddr IpAddress
+    }
+
+-- tagpath /ospf/external-database/vpn-id
+ospfExternalDatabaseVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ospfExternalDatabaseEntry 1 }
+
+-- tagpath /ospf/external-database/link-id
+ospfExternalDatabaseLinkId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Link-state ID"
+    ::= { ospfExternalDatabaseEntry 2 }
+
+-- tagpath /ospf/external-database/adv-router
+ospfExternalDatabaseAdvRouter OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Advertising router"
+    ::= { ospfExternalDatabaseEntry 3 }
+
+-- tagpath /ospf/external-database/checksum
+ospfExternalDatabaseChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Checksum"
+    ::= { ospfExternalDatabaseEntry 4 }
+
+-- tagpath /ospf/external-database/age
+ospfExternalDatabaseAge OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Age"
+    ::= { ospfExternalDatabaseEntry 5 }
+
+-- tagpath /ospf/external-database/sequence
+ospfExternalDatabaseSequence OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sequence"
+    ::= { ospfExternalDatabaseEntry 6 }
+
+-- tagpath /ospf/external-database/length
+ospfExternalDatabaseLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Length"
+    ::= { ospfExternalDatabaseEntry 7 }
+
+-- tagpath /ospf/external-database/options
+ospfExternalDatabaseOptions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Options"
+    ::= { ospfExternalDatabaseEntry 8 }
+
+-- tagpath /ospf/external-database/options-flags
+ospfExternalDatabaseOptionsFlags OBJECT-TYPE
+    SYNTAX      OspfNeighborOptions
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Options flags"
+    ::= { ospfExternalDatabaseEntry 9 }
+
+-- tagpath /ospf/external-database/flags
+ospfExternalDatabaseFlags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flags"
+    ::= { ospfExternalDatabaseEntry 10 }
+
+-- tagpath /ospf/external-database/prefix
+ospfExternalDatabasePrefix OBJECT-TYPE
+    SYNTAX      Ipv4Prefix
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Prefix"
+    ::= { ospfExternalDatabaseEntry 11 }
+
+-- tagpath /ospf/external-database/tag
+ospfExternalDatabaseTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tag"
+    ::= { ospfExternalDatabaseEntry 12 }
+
+-- tagpath /ospf/external-database/metric-type
+ospfExternalDatabaseMetricType OBJECT-TYPE
+    SYNTAX      INTEGER {type1(0),type2(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Metric type"
+    ::= { ospfExternalDatabaseEntry 13 }
+
+-- tagpath /ospf/external-database/mask
+ospfExternalDatabaseMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Mask"
+    ::= { ospfExternalDatabaseEntry 14 }
+
+-- tagpath /ospf/external-database/metric
+ospfExternalDatabaseMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Metric"
+    ::= { ospfExternalDatabaseEntry 15 }
+
+-- tagpath /ospf/external-database/forwarding-addr
+ospfExternalDatabaseForwardingAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Forwarding address"
+    ::= { ospfExternalDatabaseEntry 16 }
+
+-- tagpath /ospf/routes-table
+ospfRoutesTableTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfRoutesTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of routes"
+    ::= { viptela-oper-ospf 8 }
+
+-- tagpath /ospf/routes-table
+ospfRoutesTableEntry OBJECT-TYPE
+    SYNTAX      OspfRoutesTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfRoutesTableVpnId, ospfRoutesTableRouteType, ospfRoutesTablePrefix }
+        ::= { ospfRoutesTableTable 1 }
+
+OspfRoutesTableEntry ::=
+    SEQUENCE {
+        ospfRoutesTableVpnId Unsigned32,
+        ospfRoutesTableRouteType INTEGER,
+        ospfRoutesTablePrefix Ipv4Prefix
+    }
+
+-- tagpath /ospf/routes-table/vpn-id
+ospfRoutesTableVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ospfRoutesTableEntry 1 }
+
+-- tagpath /ospf/routes-table/route-type
+ospfRoutesTableRouteType OBJECT-TYPE
+    SYNTAX      INTEGER {router(0),network(1),external(2)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Route type"
+    ::= { ospfRoutesTableEntry 2 }
+
+-- tagpath /ospf/routes-table/prefix
+ospfRoutesTablePrefix OBJECT-TYPE
+    SYNTAX      Ipv4Prefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Route"
+    ::= { ospfRoutesTableEntry 3 }
+
+-- tagpath /ospf/routes-table/info
+ospfRoutesTableInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfRoutesTableInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of route information"
+    ::= { viptela-oper-ospf 9 }
+
+-- tagpath /ospf/routes-table/info
+ospfRoutesTableInfoEntry OBJECT-TYPE
+    SYNTAX      OspfRoutesTableInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfRoutesTableVpnId, ospfRoutesTableRouteType, ospfRoutesTablePrefix, ospfRoutesTableInfoInfoId }
+        ::= { ospfRoutesTableInfoTable 1 }
+
+OspfRoutesTableInfoEntry ::=
+    SEQUENCE {
+        ospfRoutesTableInfoInfoId Unsigned32,
+        ospfRoutesTableInfoAreaId Unsigned32,
+        ospfRoutesTableInfoCost Unsigned32,
+        ospfRoutesTableInfoFlags Unsigned32,
+        ospfRoutesTableInfoPathType INTEGER,
+        ospfRoutesTableInfoDestType INTEGER,
+        ospfRoutesTableInfoTag Unsigned32,
+        ospfRoutesTableInfoType2Cost Unsigned32,
+        ospfRoutesTableInfoNextHop IpAddress,
+        ospfRoutesTableInfoIfName String
+    }
+
+-- tagpath /ospf/routes-table/info/info-id
+ospfRoutesTableInfoInfoId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Info ID"
+    ::= { ospfRoutesTableInfoEntry 1 }
+
+-- tagpath /ospf/routes-table/info/area-id
+ospfRoutesTableInfoAreaId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Area ID"
+    ::= { ospfRoutesTableInfoEntry 2 }
+
+-- tagpath /ospf/routes-table/info/cost
+ospfRoutesTableInfoCost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Cost"
+    ::= { ospfRoutesTableInfoEntry 3 }
+
+-- tagpath /ospf/routes-table/info/flags
+ospfRoutesTableInfoFlags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flags"
+    ::= { ospfRoutesTableInfoEntry 4 }
+
+-- tagpath /ospf/routes-table/info/path-type
+ospfRoutesTableInfoPathType OBJECT-TYPE
+    SYNTAX      INTEGER {intra-area(0),inter-area(1),external1(2),external2(3),nssa-external1(4),nssa-external2(5)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Path type"
+    ::= { ospfRoutesTableInfoEntry 5 }
+
+-- tagpath /ospf/routes-table/info/dest-type
+ospfRoutesTableInfoDestType OBJECT-TYPE
+    SYNTAX      INTEGER {router(0),network(1),discard(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Destination type"
+    ::= { ospfRoutesTableInfoEntry 6 }
+
+-- tagpath /ospf/routes-table/info/tag
+ospfRoutesTableInfoTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tag"
+    ::= { ospfRoutesTableInfoEntry 7 }
+
+-- tagpath /ospf/routes-table/info/type2-cost
+ospfRoutesTableInfoType2Cost OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type 2 cost"
+    ::= { ospfRoutesTableInfoEntry 8 }
+
+-- tagpath /ospf/routes-table/info/next-hop
+ospfRoutesTableInfoNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next hop"
+    ::= { ospfRoutesTableInfoEntry 9 }
+
+-- tagpath /ospf/routes-table/info/if-name
+ospfRoutesTableInfoIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { ospfRoutesTableInfoEntry 10 }
+
+-- tagpath /ospf/database-summary
+ospfDatabaseSummaryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfDatabaseSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "OSPF database summary"
+    ::= { viptela-oper-ospf 10 }
+
+-- tagpath /ospf/database-summary
+ospfDatabaseSummaryEntry OBJECT-TYPE
+    SYNTAX      OspfDatabaseSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfDatabaseSummaryVpnId, ospfDatabaseSummaryAreaId }
+        ::= { ospfDatabaseSummaryTable 1 }
+
+OspfDatabaseSummaryEntry ::=
+    SEQUENCE {
+        ospfDatabaseSummaryVpnId Unsigned32,
+        ospfDatabaseSummaryAreaId Unsigned32,
+        ospfDatabaseSummaryRouterLsa Unsigned32,
+        ospfDatabaseSummaryNetworkLsa Unsigned32,
+        ospfDatabaseSummarySummaryLsa Unsigned32,
+        ospfDatabaseSummaryAsExternalLsa Unsigned32,
+        ospfDatabaseSummaryNssaLsa Unsigned32,
+        ospfDatabaseSummaryTotalLsa Unsigned32
+    }
+
+-- tagpath /ospf/database-summary/vpn-id
+ospfDatabaseSummaryVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ospfDatabaseSummaryEntry 1 }
+
+-- tagpath /ospf/database-summary/area-id
+ospfDatabaseSummaryAreaId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Area ID"
+    ::= { ospfDatabaseSummaryEntry 2 }
+
+-- tagpath /ospf/database-summary/router-lsa
+ospfDatabaseSummaryRouterLsa OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router LSA count"
+    ::= { ospfDatabaseSummaryEntry 3 }
+
+-- tagpath /ospf/database-summary/network-lsa
+ospfDatabaseSummaryNetworkLsa OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Network LSA count"
+    ::= { ospfDatabaseSummaryEntry 4 }
+
+-- tagpath /ospf/database-summary/summary-lsa
+ospfDatabaseSummarySummaryLsa OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Summary LSA count"
+    ::= { ospfDatabaseSummaryEntry 5 }
+
+-- tagpath /ospf/database-summary/as-external-lsa
+ospfDatabaseSummaryAsExternalLsa OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "AS external LSA count"
+    ::= { ospfDatabaseSummaryEntry 6 }
+
+-- tagpath /ospf/database-summary/nssa-lsa
+ospfDatabaseSummaryNssaLsa OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NSSA LSA count"
+    ::= { ospfDatabaseSummaryEntry 7 }
+
+-- tagpath /ospf/database-summary/total-lsa
+ospfDatabaseSummaryTotalLsa OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total LSA count"
+    ::= { ospfDatabaseSummaryEntry 8 }
+
+-- tagpath /ospf/process
+ospfProcessTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfProcessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "OSPF process"
+    ::= { viptela-oper-ospf 11 }
+
+-- tagpath /ospf/process
+ospfProcessEntry OBJECT-TYPE
+    SYNTAX      OspfProcessEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfProcessVpnId }
+        ::= { ospfProcessTable 1 }
+
+OspfProcessEntry ::=
+    SEQUENCE {
+        ospfProcessVpnId Unsigned32,
+        ospfProcessRouterId IpAddress,
+        ospfProcessDeferredShutdown TruthValue,
+        ospfProcessRfc1583Compatible TruthValue,
+        ospfProcessStubRouterAdv TruthValue,
+        ospfProcessStubRouterStart Unsigned32,
+        ospfProcessStubRouterShut Unsigned32,
+        ospfProcessSpfDelay Unsigned32,
+        ospfProcessSpfHoldtime Unsigned32,
+        ospfProcessSpfMaxHoldtime Unsigned32,
+        ospfProcessSpfHoldMultiplier Unsigned32,
+        ospfProcessSpfLastExecTime Unsigned32,
+        ospfProcessSpfNextDueTime Unsigned32,
+        ospfProcessLsaRefreshInterval Unsigned32,
+        ospfProcessAsbrRouter TruthValue,
+        ospfProcessExternalLsaCount Unsigned32,
+        ospfProcessExternalLsaChecksum Unsigned32,
+        ospfProcessNumberAreas Unsigned32,
+        ospfProcessLogAdjChanges TruthValue,
+        ospfProcessIgnoreDownBit TruthValue,
+        ospfProcessHelloReceived Unsigned32,
+        ospfProcessHelloSent Unsigned32,
+        ospfProcessDbdReceived Unsigned32,
+        ospfProcessDbdSent Unsigned32,
+        ospfProcessLsReqReceived Unsigned32,
+        ospfProcessLsReqSent Unsigned32,
+        ospfProcessLsUpdReceived Unsigned32,
+        ospfProcessLsUpdSent Unsigned32,
+        ospfProcessLsAckReceived Unsigned32,
+        ospfProcessLsAckSent Unsigned32
+    }
+
+-- tagpath /ospf/process/vpn-id
+ospfProcessVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { ospfProcessEntry 1 }
+
+-- tagpath /ospf/process/router-id
+ospfProcessRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router ID"
+    ::= { ospfProcessEntry 2 }
+
+-- tagpath /ospf/process/deferred-shutdown
+ospfProcessDeferredShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Deferred shutdown"
+    ::= { ospfProcessEntry 3 }
+
+-- tagpath /ospf/process/rfc1583-compatible
+ospfProcessRfc1583Compatible OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RFC 1583 compatible"
+    ::= { ospfProcessEntry 4 }
+
+-- tagpath /ospf/process/stub-router-adv
+ospfProcessStubRouterAdv OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stub router advertisement"
+    ::= { ospfProcessEntry 5 }
+
+-- tagpath /ospf/process/stub-router-start
+ospfProcessStubRouterStart OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stub router advertisement after startup, in seconds"
+    ::= { ospfProcessEntry 6 }
+
+-- tagpath /ospf/process/stub-router-shut
+ospfProcessStubRouterShut OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stub router advertisement before shutdown, in seconds"
+    ::= { ospfProcessEntry 7 }
+
+-- tagpath /ospf/process/spf-delay
+ospfProcessSpfDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPF delay, in milliseconds"
+    ::= { ospfProcessEntry 8 }
+
+-- tagpath /ospf/process/spf-holdtime
+ospfProcessSpfHoldtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPF hold time, in milliseconds"
+    ::= { ospfProcessEntry 9 }
+
+-- tagpath /ospf/process/spf-max-holdtime
+ospfProcessSpfMaxHoldtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPF maximum hold time, milliseconds"
+    ::= { ospfProcessEntry 10 }
+
+-- tagpath /ospf/process/spf-hold-multiplier
+ospfProcessSpfHoldMultiplier OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPF hold multiplier"
+    ::= { ospfProcessEntry 11 }
+
+-- tagpath /ospf/process/spf-last-exec-time
+ospfProcessSpfLastExecTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPF last executed time, in seconds"
+    ::= { ospfProcessEntry 12 }
+
+-- tagpath /ospf/process/spf-next-due-time
+ospfProcessSpfNextDueTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPF next due time, in seconds"
+    ::= { ospfProcessEntry 13 }
+
+-- tagpath /ospf/process/lsa-refresh-interval
+ospfProcessLsaRefreshInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "LSA refresh interval, in seconds"
+    ::= { ospfProcessEntry 14 }
+
+-- tagpath /ospf/process/asbr-router
+ospfProcessAsbrRouter OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ASBR router"
+    ::= { ospfProcessEntry 15 }
+
+-- tagpath /ospf/process/external-lsa-count
+ospfProcessExternalLsaCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "External LSA count"
+    ::= { ospfProcessEntry 16 }
+
+-- tagpath /ospf/process/external-lsa-checksum
+ospfProcessExternalLsaChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "External LSA checksum"
+    ::= { ospfProcessEntry 17 }
+
+-- tagpath /ospf/process/number-areas
+ospfProcessNumberAreas OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of areas"
+    ::= { ospfProcessEntry 18 }
+
+-- tagpath /ospf/process/log-adj-changes
+ospfProcessLogAdjChanges OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Log adjacency changes"
+    ::= { ospfProcessEntry 19 }
+
+-- tagpath /ospf/process/ignore-down-bit
+ospfProcessIgnoreDownBit OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ignore down bit during SPF calculation"
+    ::= { ospfProcessEntry 20 }
+
+-- tagpath /ospf/process/hello-received
+ospfProcessHelloReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of hello packets received"
+    ::= { ospfProcessEntry 21 }
+
+-- tagpath /ospf/process/hello-sent
+ospfProcessHelloSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of hello packets sent"
+    ::= { ospfProcessEntry 22 }
+
+-- tagpath /ospf/process/dbd-received
+ospfProcessDbdReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of database description packets received"
+    ::= { ospfProcessEntry 23 }
+
+-- tagpath /ospf/process/dbd-sent
+ospfProcessDbdSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of databse description packets sent"
+    ::= { ospfProcessEntry 24 }
+
+-- tagpath /ospf/process/ls-req-received
+ospfProcessLsReqReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of link-state request packets received"
+    ::= { ospfProcessEntry 25 }
+
+-- tagpath /ospf/process/ls-req-sent
+ospfProcessLsReqSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of link-state request packets sent"
+    ::= { ospfProcessEntry 26 }
+
+-- tagpath /ospf/process/ls-upd-received
+ospfProcessLsUpdReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of link-state update packets received"
+    ::= { ospfProcessEntry 27 }
+
+-- tagpath /ospf/process/ls-upd-sent
+ospfProcessLsUpdSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of link-state update packets sent"
+    ::= { ospfProcessEntry 28 }
+
+-- tagpath /ospf/process/ls-ack-received
+ospfProcessLsAckReceived OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of link-state acknowledgement packets received"
+    ::= { ospfProcessEntry 29 }
+
+-- tagpath /ospf/process/ls-ack-sent
+ospfProcessLsAckSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of link-state acknowledgement packets sent"
+    ::= { ospfProcessEntry 30 }
+
+-- tagpath /ospf/process/area
+ospfProcessAreaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OspfProcessAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of areas"
+    ::= { viptela-oper-ospf 12 }
+
+-- tagpath /ospf/process/area
+ospfProcessAreaEntry OBJECT-TYPE
+    SYNTAX      OspfProcessAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ospfProcessVpnId, ospfProcessAreaAreaId }
+        ::= { ospfProcessAreaTable 1 }
+
+OspfProcessAreaEntry ::=
+    SEQUENCE {
+        ospfProcessAreaAreaId Unsigned32,
+        ospfProcessAreaBackboneArea TruthValue,
+        ospfProcessAreaRoutingType INTEGER,
+        ospfProcessAreaNoSumm TruthValue,
+        ospfProcessAreaShortcutConfigured TruthValue,
+        ospfProcessAreaShortcutMode INTEGER,
+        ospfProcessAreaShortcutCapability TruthValue,
+        ospfProcessAreaNumInterfaces Unsigned32,
+        ospfProcessAreaAbr TruthValue,
+        ospfProcessAreaNssaTranslate TruthValue,
+        ospfProcessAreaTranslateRole INTEGER,
+        ospfProcessAreaStubRoute TruthValue,
+        ospfProcessAreaStubRouteAdmin TruthValue,
+        ospfProcessAreaStubRouteTimer Unsigned32,
+        ospfProcessAreaNumFullAdjRouters Unsigned32,
+        ospfProcessAreaAuthentication INTEGER,
+        ospfProcessAreaNumVirtualAdjRouters Unsigned32,
+        ospfProcessAreaSpfExecCount Unsigned32,
+        ospfProcessAreaLsaCount Unsigned32,
+        ospfProcessAreaRouterLsaCount Unsigned32,
+        ospfProcessAreaRouterLsaChecksum Unsigned32,
+        ospfProcessAreaNetworkLsaCount Unsigned32,
+        ospfProcessAreaNetworkLsaChecksum Unsigned32,
+        ospfProcessAreaSummaryLsaCount Unsigned32,
+        ospfProcessAreaSummaryLsaChecksum Unsigned32,
+        ospfProcessAreaAsbrLsaCount Unsigned32,
+        ospfProcessAreaAsbrLsaChecksum Unsigned32,
+        ospfProcessAreaNssaLsaCount Unsigned32,
+        ospfProcessAreaNssaLsaChecksum Unsigned32
+    }
+
+-- tagpath /ospf/process/area/area-id
+ospfProcessAreaAreaId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Area ID"
+    ::= { ospfProcessAreaEntry 1 }
+
+-- tagpath /ospf/process/area/backbone-area
+ospfProcessAreaBackboneArea OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Backbone area"
+    ::= { ospfProcessAreaEntry 2 }
+
+-- tagpath /ospf/process/area/routing-type
+ospfProcessAreaRoutingType OBJECT-TYPE
+    SYNTAX      INTEGER {default(0),stub(1),nssa(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Routing type"
+    ::= { ospfProcessAreaEntry 3 }
+
+-- tagpath /ospf/process/area/no-summ
+ospfProcessAreaNoSumm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "No summary"
+    ::= { ospfProcessAreaEntry 4 }
+
+-- tagpath /ospf/process/area/shortcut-configured
+ospfProcessAreaShortcutConfigured OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shortcut configuration"
+    ::= { ospfProcessAreaEntry 5 }
+
+-- tagpath /ospf/process/area/shortcut-mode
+ospfProcessAreaShortcutMode OBJECT-TYPE
+    SYNTAX      INTEGER {default(0),enable(1),disable(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shortcut mode"
+    ::= { ospfProcessAreaEntry 6 }
+
+-- tagpath /ospf/process/area/shortcut-capability
+ospfProcessAreaShortcutCapability OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Shortcut capability"
+    ::= { ospfProcessAreaEntry 7 }
+
+-- tagpath /ospf/process/area/num-interfaces
+ospfProcessAreaNumInterfaces OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of interfaces"
+    ::= { ospfProcessAreaEntry 8 }
+
+-- tagpath /ospf/process/area/abr
+ospfProcessAreaAbr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Area border router"
+    ::= { ospfProcessAreaEntry 9 }
+
+-- tagpath /ospf/process/area/nssa-translate
+ospfProcessAreaNssaTranslate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NSSA translate"
+    ::= { ospfProcessAreaEntry 10 }
+
+-- tagpath /ospf/process/area/translate-role
+ospfProcessAreaTranslateRole OBJECT-TYPE
+    SYNTAX      INTEGER {candidate(0),never(1),always(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Translate role"
+    ::= { ospfProcessAreaEntry 11 }
+
+-- tagpath /ospf/process/area/stub-route
+ospfProcessAreaStubRoute OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stub route"
+    ::= { ospfProcessAreaEntry 12 }
+
+-- tagpath /ospf/process/area/stub-route-admin
+ospfProcessAreaStubRouteAdmin OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stub route administratively enabled"
+    ::= { ospfProcessAreaEntry 13 }
+
+-- tagpath /ospf/process/area/stub-route-timer
+ospfProcessAreaStubRouteTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stub route time left, in seconds"
+    ::= { ospfProcessAreaEntry 14 }
+
+-- tagpath /ospf/process/area/num-full-adj-routers
+ospfProcessAreaNumFullAdjRouters OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of fully adjacent routers"
+    ::= { ospfProcessAreaEntry 15 }
+
+-- tagpath /ospf/process/area/authentication
+ospfProcessAreaAuthentication OBJECT-TYPE
+    SYNTAX      INTEGER {null(0),simple(1),message-digest(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authertication type"
+    ::= { ospfProcessAreaEntry 16 }
+
+-- tagpath /ospf/process/area/num-virtual-adj-routers
+ospfProcessAreaNumVirtualAdjRouters OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of full virtual adjacencies"
+    ::= { ospfProcessAreaEntry 17 }
+
+-- tagpath /ospf/process/area/spf-exec-count
+ospfProcessAreaSpfExecCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "SPF algorithm executed count"
+    ::= { ospfProcessAreaEntry 18 }
+
+-- tagpath /ospf/process/area/lsa-count
+ospfProcessAreaLsaCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of LSAs"
+    ::= { ospfProcessAreaEntry 19 }
+
+-- tagpath /ospf/process/area/router-lsa-count
+ospfProcessAreaRouterLsaCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of router LSAs"
+    ::= { ospfProcessAreaEntry 20 }
+
+-- tagpath /ospf/process/area/router-lsa-checksum
+ospfProcessAreaRouterLsaChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router LSA checksum"
+    ::= { ospfProcessAreaEntry 21 }
+
+-- tagpath /ospf/process/area/network-lsa-count
+ospfProcessAreaNetworkLsaCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of network LSAs"
+    ::= { ospfProcessAreaEntry 22 }
+
+-- tagpath /ospf/process/area/network-lsa-checksum
+ospfProcessAreaNetworkLsaChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Network LSA checksum"
+    ::= { ospfProcessAreaEntry 23 }
+
+-- tagpath /ospf/process/area/summary-lsa-count
+ospfProcessAreaSummaryLsaCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of summary LSAs"
+    ::= { ospfProcessAreaEntry 24 }
+
+-- tagpath /ospf/process/area/summary-lsa-checksum
+ospfProcessAreaSummaryLsaChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Summary LSA checksum"
+    ::= { ospfProcessAreaEntry 25 }
+
+-- tagpath /ospf/process/area/asbr-lsa-count
+ospfProcessAreaAsbrLsaCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of ASBR LSAs"
+    ::= { ospfProcessAreaEntry 26 }
+
+-- tagpath /ospf/process/area/asbr-lsa-checksum
+ospfProcessAreaAsbrLsaChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ASBR LSA checksum"
+    ::= { ospfProcessAreaEntry 27 }
+
+-- tagpath /ospf/process/area/nssa-lsa-count
+ospfProcessAreaNssaLsaCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of NSSA LSAs"
+    ::= { ospfProcessAreaEntry 28 }
+
+-- tagpath /ospf/process/area/nssa-lsa-checksum
+ospfProcessAreaNssaLsaChecksum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NSSA LSA checksum"
+    ::= { ospfProcessAreaEntry 29 }
+
+END

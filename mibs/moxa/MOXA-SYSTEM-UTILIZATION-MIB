@@ -1,0 +1,87 @@
+-- ****************************************************************
+-- *  Moxa General (System Management) - System Utilization PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-SYSTEM-UTILIZATION-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Unsigned32, enterprises
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DateAndTime, MacAddress, DisplayString, TruthValue
+            --FROM SNMPv2-TC
+            FROM SNMPv2-TC;
+
+    mxSysUtilSvr MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "This MIB module defines system utilization status"
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { systemManagement 3 }
+
+    moxa               OBJECT IDENTIFIER ::= { enterprises 8691 }
+    general            OBJECT IDENTIFIER ::= { moxa 602 }
+    systemManagement   OBJECT IDENTIFIER ::= { general 1 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-SYSTEM-UTILIZATION-MIB MIB
+-- -------------------------------------------------------------
+
+    -- usNotification OBJECT IDENTIFIER ::= { mxSysUtilSvr 0 }
+    -- usConfiguration OBJECT IDENTIFIER ::= { mxSysUtilSvr 1 }
+    usStatus OBJECT IDENTIFIER ::= { mxSysUtilSvr 2 }
+    -- usExtensions OBJECT IDENTIFIER ::= { mxSysUtilSvr 3 }
+
+-- -------------------------------------------------------------
+-- Status group
+-- -------------------------------------------------------------
+
+    usStatCPUUtilization OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU Utilization."
+         ::= { usStatus 1 }
+
+    usStatMemorySize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Memory Size."
+         ::= { usStatus 2 }
+
+    usStatMemoryUtilization OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Memory Utilization."
+         ::= { usStatus 3 }
+
+    usStatPowerConsumption OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power Consumption."
+         ::= { usStatus 4 }
+END

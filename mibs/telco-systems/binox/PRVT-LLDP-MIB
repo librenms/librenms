@@ -1,0 +1,763 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-LLDP-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-LLDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    PhysAddress, RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+prvtLldpMIB MODULE-IDENTITY
+    LAST-UPDATED "200907280000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Management Information Base module for LLDP configuration"
+    REVISION    "200907280000Z"
+    DESCRIPTION 
+        "Initial revision."
+    ::= { switch 145 }
+
+
+prvtlldpNotifications OBJECT IDENTIFIER
+    ::= { prvtLldpMIB 0 }
+
+prvtLldpObjects OBJECT IDENTIFIER
+    ::= { prvtLldpMIB 1 }
+
+prvtLldpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable/disable the LLDP on the device"
+    ::= { prvtLldpObjects 1 }
+
+prvtLldpReinitDelay OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the time interval (in [s]) at
+         which the interface is checked if is enabled
+         again so that the port can be reinitialized"
+    ::= { prvtLldpObjects 2 }
+
+prvtLldpSnmpNotifyInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..3600)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set the SNMP notification interval (in [s])"
+    ::= { prvtLldpObjects 3 }
+
+prvtLldpTransmitDelay OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8192)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the minimum transmint delay interval (in [s])"
+    ::= { prvtLldpObjects 4 }
+
+prvtLldpTransmitHold OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the transmit-hold parameter"
+    ::= { prvtLldpObjects 5 }
+
+prvtLldpTransmitInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..32768)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify the minimum transmint interval (in [s])"
+    ::= { prvtLldpObjects 6 }
+
+prvtLldpStatisticsObjects OBJECT IDENTIFIER
+    ::= { prvtLldpObjects 7 }
+
+prvtLldpStatsRemTablesLastChange OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time from last remote table change."
+    ::= { prvtLldpStatisticsObjects 1 }
+
+prvtLldpStatsRemTablesInserts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of entries insterted in remote table"
+    ::= { prvtLldpStatisticsObjects 2 }
+
+prvtLldpStatsRemTablesDeletes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of entries deleted in remote table"
+    ::= { prvtLldpStatisticsObjects 3 }
+
+prvtLldpStatsRemTablesDrops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of entries dropped from remote table"
+    ::= { prvtLldpStatisticsObjects 4 }
+
+prvtLldpStatsRemTablesAgeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of entries dropped from remote table"
+    ::= { prvtLldpStatisticsObjects 5 }
+
+prvtLldpStatsTxPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLldpStatsTxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing send LLDPDU from all ports."
+    ::= { prvtLldpObjects 8 }
+
+prvtLldpStatsTxPortEntry OBJECT-TYPE
+    SYNTAX      PrvtLldpStatsTxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry for send LLDPDU from given port."
+    INDEX       { prvtLldpStatsTxIfNum }
+    ::= { prvtLldpStatsTxPortTable 1 }
+
+PrvtLldpStatsTxPortEntry ::= SEQUENCE {
+    prvtLldpStatsTxIfNum                OCTET STRING,
+    prvtLldpStatsTxPortFramesTotal      Unsigned32,
+    prvtLldpStatsTxPortFramesMalformed  Unsigned32
+}
+
+prvtLldpStatsTxIfNum OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface name."
+    ::= { prvtLldpStatsTxPortEntry 1 }
+
+prvtLldpStatsTxPortFramesTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total LLDPDUs send from this interface"
+    ::= { prvtLldpStatsTxPortEntry 2 }
+
+prvtLldpStatsTxPortFramesMalformed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Malformed LLDPDUs send from this interface"
+    ::= { prvtLldpStatsTxPortEntry 3 }
+
+prvtLldpStatsRxPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLldpStatsRxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing received LLDPDU from all ports."
+    ::= { prvtLldpObjects 9 }
+
+prvtLldpStatsRxPortEntry OBJECT-TYPE
+    SYNTAX      PrvtLldpStatsRxPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry for received LLDPDU from given port."
+    INDEX       { prvtLldpStatsRxIfNum }
+    ::= { prvtLldpStatsRxPortTable 1 }
+
+PrvtLldpStatsRxPortEntry ::= SEQUENCE {
+    prvtLldpStatsRxIfNum                        OCTET STRING,
+    prvtLldpStatsRxPortFramesDiscardedTotal     Unsigned32,
+    prvtLldpStatsRxPortFramesErrors             Unsigned32,
+    prvtLldpStatsRxPortFramesTotal              Unsigned32,
+    prvtLldpStatsRxPortTLVsDiscardedTotal       Unsigned32,
+    prvtLldpStatsRxPortTLVsUnrecognizedTotal    Unsigned32,
+    prvtLldpStatsRxPortAgeoutsTotal             Unsigned32
+}
+
+prvtLldpStatsRxIfNum OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface name."
+    ::= { prvtLldpStatsRxPortEntry 1 }
+
+prvtLldpStatsRxPortFramesDiscardedTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of discarded frames from port."
+    ::= { prvtLldpStatsRxPortEntry 2 }
+
+prvtLldpStatsRxPortFramesErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of frame errors on port."
+    ::= { prvtLldpStatsRxPortEntry 3 }
+
+prvtLldpStatsRxPortFramesTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of received frames from port."
+    ::= { prvtLldpStatsRxPortEntry 4 }
+
+prvtLldpStatsRxPortTLVsDiscardedTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of discarded TLVs from port"
+    ::= { prvtLldpStatsRxPortEntry 5 }
+
+prvtLldpStatsRxPortTLVsUnrecognizedTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of unrecognized TLVs from port."
+    ::= { prvtLldpStatsRxPortEntry 6 }
+
+prvtLldpStatsRxPortAgeoutsTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Total number of age outs on port."
+    ::= { prvtLldpStatsRxPortEntry 7 }
+
+prvtLldpLocalSystemDataObjects OBJECT IDENTIFIER
+    ::= { prvtLldpObjects 10 }
+
+prvtLldpLocChassisIdSubtype OBJECT-TYPE
+    SYNTAX      INTEGER { chassisComponent(1), interfaceAlias(2), 
+                    portComponent(3), macAddress(4), networkAddress(5), 
+                    interfaceName(6), local(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Subtype of the local Chasis"
+    ::= { prvtLldpLocalSystemDataObjects 1 }
+
+prvtLldpLocChassisId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "MAC address of the local chassis."
+    ::= { prvtLldpLocalSystemDataObjects 2 }
+
+prvtLldpLocSysName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local system name."
+    ::= { prvtLldpLocalSystemDataObjects 3 }
+
+prvtLldpLocSysDesc OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local system description."
+    ::= { prvtLldpLocalSystemDataObjects 4 }
+
+prvtLldpLocSysCapSupported OBJECT-TYPE
+    SYNTAX      BITS { other(0), bridge(2), wlanAccessPoint(3), 
+                    router(4), telephone(5), docsisCableDevice(6), 
+                    stationOnly(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local system supported capabilities."
+    ::= { prvtLldpLocalSystemDataObjects 5 }
+
+prvtLldpLocSysCapEnabled OBJECT-TYPE
+    SYNTAX      BITS { other(0), bridge(2), wlanAccessPoint(3), 
+                    router(4), telephone(5), docsisCableDevice(6), 
+                    stationOnly(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local system enabled capabilities."
+    ::= { prvtLldpLocalSystemDataObjects 6 }
+
+prvtLldpLocManAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLldpLocManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table of local management addresses."
+    ::= { prvtLldpObjects 11 }
+
+prvtLldpLocManAddrEntry OBJECT-TYPE
+    SYNTAX      PrvtLldpLocManAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Local management address entry"
+    INDEX       { prvtLldpLocManAddrSubtype, prvtLldpLocManAddress }
+    ::= { prvtLldpLocManAddrTable 1 }
+
+PrvtLldpLocManAddrEntry ::= SEQUENCE {
+    prvtLldpLocManAddrSubtype       INTEGER,
+    prvtLldpLocManAddress           OCTET STRING,
+    prvtLldpLocManAddrLen           Integer32,
+    prvtLldpLocManAddrIfSubtype     INTEGER,
+    prvtLldpLocManAddrIfId          Integer32,
+    prvtLldpLocManAddrOID           OBJECT IDENTIFIER
+}
+
+prvtLldpLocManAddrSubtype OBJECT-TYPE
+    SYNTAX      INTEGER { other(0), ipV4(1), ipV6(2), nsap(3), hldc(4), 
+                    bbn1822(5), all802(6), e163(7), e164(8), f69(9), 
+                    x121(10), ipx(11), appletalk(12), decnetIV(13), 
+                    banyanVines(14), e164withNsap(15), dns(16), 
+                    distinguishedname(17), asnumber(18), xtpoveripv4(19), 
+                    xtpoveripv6(20), xtpnativemodextp(21), 
+                    reserved(65535) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Subtype of local management address"
+    ::= { prvtLldpLocManAddrEntry 1 }
+
+prvtLldpLocManAddress OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Local management address"
+    ::= { prvtLldpLocManAddrEntry 2 }
+
+prvtLldpLocManAddrLen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Lenght of local managemet address"
+    ::= { prvtLldpLocManAddrEntry 3 }
+
+prvtLldpLocManAddrIfSubtype OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), ifIndex(2), systemPortNumber(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local management addres interface subtype"
+    ::= { prvtLldpLocManAddrEntry 4 }
+
+prvtLldpLocManAddrIfId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Interface index of local management address"
+    ::= { prvtLldpLocManAddrEntry 5 }
+
+prvtLldpLocManAddrOID OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtLldpLocManAddrEntry 6 }
+
+prvtLldpPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLldpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Table of LLDP ports"
+    ::= { prvtLldpObjects 12 }
+
+prvtLldpPortEntry OBJECT-TYPE
+    SYNTAX      PrvtLldpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Entry for LLDP ports"
+    INDEX       { prvtLldpCfgPortName }
+    ::= { prvtLldpPortTable 1 }
+
+PrvtLldpPortEntry ::= SEQUENCE {
+    prvtLldpCfgPortName             OCTET STRING,
+    prvtLldpCfgPortRowStatus        RowStatus,
+    prvtLldpCfgPortMode             INTEGER,
+    prvtLldpCfgPortSnmpNotify       TruthValue,
+    prvtLldpAdvBasicPortManAddr     TruthValue,
+    prvtLldpAdvBasicPortDescr       TruthValue,
+    prvtLldpAdvBasicPortSysCap      TruthValue,
+    prvtLldpAdvBasicPortSysDescr    TruthValue,
+    prvtLldpAdvBasicPortSysName     TruthValue,
+    prvtLldpDot1PortVlanId          TruthValue,
+    prvtLldpDot1PortProtoIdentity   TruthValue,
+    prvtLldpDot1PortVlanName        TruthValue,
+    prvtLldpDot1PortProtoVlanId     TruthValue,
+    prvtLldpDot3PortLAG             TruthValue,
+    prvtLldpDot3PortMacPhy          TruthValue,
+    prvtLldpDot3PortMaxFrameSize    TruthValue,
+    prvtLldpDot3PortPowerViaMdi     TruthValue
+}
+
+prvtLldpCfgPortName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface name."
+    ::= { prvtLldpPortEntry 1 }
+
+prvtLldpCfgPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this interface."
+    ::= { prvtLldpPortEntry 2 }
+
+prvtLldpCfgPortMode OBJECT-TYPE
+    SYNTAX      INTEGER { txOnly(1), rxOnly(2), rxTx(3), disabled(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set port admin status"
+    ::= { prvtLldpPortEntry 3 }
+
+prvtLldpCfgPortSnmpNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure sending of LLDP SNMP notifications"
+    ::= { prvtLldpPortEntry 4 }
+
+prvtLldpAdvBasicPortManAddr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify if LLDP will advertise the management addresses."
+    ::= { prvtLldpPortEntry 5 }
+
+prvtLldpAdvBasicPortDescr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify if the description of the configured interface will be advertised by LLDP."
+    ::= { prvtLldpPortEntry 6 }
+
+prvtLldpAdvBasicPortSysCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify if system capabilities information (bitmap) will be sent to the interface being configured."
+    ::= { prvtLldpPortEntry 7 }
+
+prvtLldpAdvBasicPortSysDescr OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify if the system description will be sent to the interface being configured."
+    ::= { prvtLldpPortEntry 8 }
+
+prvtLldpAdvBasicPortSysName OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify if the system name will be sent to the interface being configured"
+    ::= { prvtLldpPortEntry 9 }
+
+prvtLldpDot1PortVlanId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Port VLAN-Id TLVs."
+    ::= { prvtLldpPortEntry 10 }
+
+prvtLldpDot1PortProtoIdentity OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Protocol Identity TLVs."
+    ::= { prvtLldpPortEntry 11 }
+
+prvtLldpDot1PortVlanName OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "VLAN Name TLVs."
+    ::= { prvtLldpPortEntry 12 }
+
+prvtLldpDot1PortProtoVlanId OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "VLAN ID TLVs."
+    ::= { prvtLldpPortEntry 13 }
+
+prvtLldpDot3PortLAG OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Link-aggregation TLVs."
+    ::= { prvtLldpPortEntry 14 }
+
+prvtLldpDot3PortMacPhy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Mac-phy TLVs."
+    ::= { prvtLldpPortEntry 15 }
+
+prvtLldpDot3PortMaxFrameSize OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Maximum Frame Size TLV."
+    ::= { prvtLldpPortEntry 16 }
+
+prvtLldpDot3PortPowerViaMdi OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Power-via-mdi TLV."
+    ::= { prvtLldpPortEntry 17 }
+
+prvtLldpRemDbPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtLldpRemDbPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing remote Db."
+    ::= { prvtLldpObjects 13 }
+
+prvtLldpRemDbPortEntry OBJECT-TYPE
+    SYNTAX      PrvtLldpRemDbPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry for received LLDPDU from given port."
+    INDEX       { prvtLldpRemDbIfNum }
+    ::= { prvtLldpRemDbPortTable 1 }
+
+PrvtLldpRemDbPortEntry ::= SEQUENCE {
+    prvtLldpRemDbIfNum                  OCTET STRING,
+    prvtLldpRemDbPortDataTTL            Integer32,
+    prvtLldpRemDbPortDataAge            Integer32,
+    prvtLldpRemDbPortChasIdSub          INTEGER,
+    prvtLldpRemDbPortChasId             OCTET STRING,
+    prvtLldpRemDbPortIdSub              INTEGER,
+    prvtLldpRemDbPortId                 PhysAddress,
+    prvtLldpRemDbPortSysName            OCTET STRING,
+    prvtLldpRemDbPortSysDescr           OCTET STRING,
+    prvtLldpRemDbPortDescr              OCTET STRING,
+    prvtLldpRemDbPortSysCapSupported    BITS,
+    prvtLldpRemDbPortSysCapEnabled      BITS,
+    prvtLldpRemDbPortManAddr            OCTET STRING
+}
+
+prvtLldpRemDbIfNum OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface name."
+    ::= { prvtLldpRemDbPortEntry 1 }
+
+prvtLldpRemDbPortDataTTL OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote Data TTL"
+    ::= { prvtLldpRemDbPortEntry 2 }
+
+prvtLldpRemDbPortDataAge OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote Data Age"
+    ::= { prvtLldpRemDbPortEntry 3 }
+
+prvtLldpRemDbPortChasIdSub OBJECT-TYPE
+    SYNTAX      INTEGER { chassisComponent(1), interfaceAlias(2), 
+                    portComponent(3), macAddress(4), networkAddress(5), 
+                    interfaceName(6), local(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Subtype of the Remote Chasis"
+    ::= { prvtLldpRemDbPortEntry 4 }
+
+prvtLldpRemDbPortChasId OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote Chassis ID"
+    ::= { prvtLldpRemDbPortEntry 5 }
+
+prvtLldpRemDbPortIdSub OBJECT-TYPE
+    SYNTAX      INTEGER { interfaceAlias(1), portComponent(2), 
+                    macAddress(3), networkAddress(4), interfaceName(5), 
+                    agentCircuitId(6), local(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Subtype of the Remote Port"
+    ::= { prvtLldpRemDbPortEntry 6 }
+
+prvtLldpRemDbPortId OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote Port ID"
+    ::= { prvtLldpRemDbPortEntry 7 }
+
+prvtLldpRemDbPortSysName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote system name."
+    ::= { prvtLldpRemDbPortEntry 8 }
+
+prvtLldpRemDbPortSysDescr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote system description."
+    ::= { prvtLldpRemDbPortEntry 9 }
+
+prvtLldpRemDbPortDescr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote port description."
+    ::= { prvtLldpRemDbPortEntry 10 }
+
+prvtLldpRemDbPortSysCapSupported OBJECT-TYPE
+    SYNTAX      BITS { other(0), bridge(2), wlanAccessPoint(3), 
+                    router(4), telephone(5), docsisCableDevice(6), 
+                    stationOnly(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote System supported capabilities."
+    ::= { prvtLldpRemDbPortEntry 11 }
+
+prvtLldpRemDbPortSysCapEnabled OBJECT-TYPE
+    SYNTAX      BITS { other(0), bridge(2), wlanAccessPoint(3), 
+                    router(4), telephone(5), docsisCableDevice(6), 
+                    stationOnly(7) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote System enabled capabilities."
+    ::= { prvtLldpRemDbPortEntry 12 }
+
+prvtLldpRemDbPortManAddr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Remote management address."
+    ::= { prvtLldpRemDbPortEntry 13 }
+
+lldpNewRemoteInfo NOTIFICATION-TYPE
+    OBJECTS     { prvtLldpStatsRemTablesInserts, 
+                  prvtLldpStatsRemTablesDeletes, 
+                  prvtLldpStatsRemTablesDrops, 
+                  prvtLldpStatsRemTablesAgeouts }
+    STATUS      current
+    DESCRIPTION 
+        "New Remote Info"
+    ::= { prvtlldpNotifications 1 }
+
+END -- end of module PRVT-LLDP-MIB.

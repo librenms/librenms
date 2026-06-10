@@ -1,0 +1,59 @@
+-- *********************************************************************
+-- BROCADE-IEEE8023-LAG-CAPABILITY-MIB.mib: 
+--     IEEE8023-LAG-MIB AGENT-CAPABILITIES
+--   
+-- June 2012, Balachandar Mani
+--   
+-- Copyright (c) 2012 by Brocade Communications Systems, Inc.
+-- All rights reserved.
+-- *********************************************************************
+BROCADE-IEEE8023-LAG-CAPABILITY-MIB    DEFINITIONS ::= BEGIN
+IMPORTS
+    brocadeAgentCapability
+        FROM Brocade-REG-MIB
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+brocadeIeee8023LagCapability    MODULE-IDENTITY
+    LAST-UPDATED       "201206060000Z"
+    ORGANIZATION       "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO
+            "Customer Support Group
+            Brocade Communications Systems, Inc.
+            Postal: 130 Holger Way
+            San Jose, CA 95134
+            U.S.A
+            Tel: +1-408-333-8000
+            E-mail: support@Brocade.com
+            web: www.brocade.com."
+
+    DESCRIPTION        
+        "Agent capabilities for IEEE8023-LAG-MIB implementation."
+        
+    REVISION           "201206060000Z"
+    DESCRIPTION        
+        "The initial version of this MIB module."
+    ::=  {  brocadeAgentCapability  3  }
+
+--
+-- Agent capability for NOS 3.0.0 (VDX Platform)
+--    
+brocadeIeee8023LagVdx300R1    AGENT-CAPABILITIES
+    PRODUCT-RELEASE    "NOS3.0.0"
+    STATUS             current
+    DESCRIPTION        "IEEE8023-LAG-MIB capabilities."
+
+    SUPPORTS        IEEE8023-LAG-MIB
+    INCLUDES        { 
+                        dot3adAggGroup,
+                        dot3adAggPortListGroup,
+                        dot3adAggPortGroup,
+                        dot3adAggPortStatsGroup,
+                        dot3adTablesLastChangedGroup
+                    }
+
+    ::=  {  brocadeIeee8023LagCapability  1  }
+
+END

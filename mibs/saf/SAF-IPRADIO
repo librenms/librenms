@@ -1,0 +1,1693 @@
+SAF-IPRADIO DEFINITIONS ::= BEGIN
+-- old name: SAF-IPFODU
+--
+-- Mib for:   SAF CFIP FODU v1.3x, v1.4x and SAF CFIP FODU GE (Lumina) v1.4x
+--                  released after 2009.07.20
+--            SAF CFIP IDU (Phoenix)
+--                  released after 2010.02.20
+--            FreeMile
+-- Version:         1.1.9
+-- Date/Time:       2014.01.16 13:20
+-- Version:         1.1.89
+-- Date/Time:       2013.03.14 14:00
+-- Version:         1.1.88
+-- Date/Time:       2012.09.25 11:37
+-- Version:         1.1.87
+-- Date/Time:       2012.07.19 11:22
+-- Version:         1.1.7
+-- Date/Time:       2012.06.25 18:28
+-- Version:         1.1.6
+-- Date/Time:       2012.03.30 11:59
+-- Version:         1.1.5
+-- Date/Time:       2011.05.05 13:23
+-- Version:         1.1.4
+-- Date/Time:       2010.10.27 16:17
+-- Version:         1.1.3
+-- Date/Time:       2010.09.27 14:05
+-- Version:         1.1.2
+-- Date/Time:       2009.09.20 15:10
+-- Customer suport: <techsupport@saftehnika.com>
+-- Author:          Andris Kluga
+--
+-- Additional modules supported by device --
+-- SAF-ALARM-MIB  ( OID 1.3.6.1.4.1.7571.100.118 )
+--
+-- History --
+-- 2008.07.11  initial release 1.0.0 (originally named 1.00)
+-- 2008.10.21  removed loopbacks: rf,far,ethernet (unsupported by hardware)
+-- 2008.11.04  added vlan 1.3.6.1.4.1.7571.100.1.1.5.1.1.1.13,14
+-- 2009.01.09  changes in comments
+-- 2009.01.22  changed e1 to e1t1 to use with both etsi and ansi modems
+-- 2009.03.18  temperature in degrees C (no more *10)
+-- 2009.05.11  e1 mask
+-- 2009.07.14  e1t1ChannelNr
+-- 2010.02.17  one mib for all IP products
+-- 2010.09.27  FreeMile (added qpsklimited modulation)
+-- 2010.10.13  for Lumina w/o duplexer radioSide read-write
+-- 2010.10.27  add comment at radioTxPower: to turn power off SET the value -100
+-- 2012.03.28  apsk16 apsk32 modulations changed to qam16 qam32; location length string set to 16
+-- 2012.03.30  minor changes
+-- 2012.06.25  added new QAM modulations to "replace" old PSK modulations.
+-- 2012.07.10  minor syntax changes.
+-- 2012.09.25  reset descripotion change. 1 - cold 2 - warm.
+-- 2013.03.14  minor changes for mib validation
+-- 2014.01.16  add license status
+
+
+IMPORTS
+        enterprises,  NetworkAddress, IpAddress,
+        Counter, Gauge, TimeTicks    FROM RFC1155-SMI
+        OBJECT-TYPE              FROM RFC-1212
+        DisplayString, ifEntry        FROM RFC1213-MIB
+        DateAndTime      FROM SNMPv2-TC
+        TRAP-TYPE    FROM RFC-1215;
+
+
+saf                 OBJECT IDENTIFIER ::=   { enterprises 7571 }
+tehnika             OBJECT IDENTIFIER ::=   { saf 100 }
+microwaveRadio      OBJECT IDENTIFIER ::=   { tehnika  1}
+pointToPoint        OBJECT IDENTIFIER ::=   { microwaveRadio 1 }
+
+safip           OBJECT IDENTIFIER ::=   { pointToPoint 5 }
+ipRadio		OBJECT IDENTIFIER ::=   { safip 1 }
+
+ipRadioCfg			OBJECT IDENTIFIER ::=   { ipRadio 1 }
+ipRadioMgmt			OBJECT IDENTIFIER ::=   { ipRadio 2 }
+ipRadioStat			OBJECT IDENTIFIER ::=   { ipRadio 3 }
+ipRadioCfgGeneral		OBJECT IDENTIFIER ::=   { ipRadioCfg 1 }
+ipRadioCfgNetwork		OBJECT IDENTIFIER ::=   { ipRadioCfg 2 }
+ipRadioStatEth                   OBJECT IDENTIFIER ::=   { ipRadioStat 2 }
+modemStatistics  OBJECT IDENTIFIER ::= { ipRadioStat 4 } -- 2011.05.05
+
+
+product OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Name of the model."
+        ::= { ipRadioCfgGeneral 1 }
+
+description OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Description of the model."
+        ::= { ipRadioCfgGeneral 2 }
+
+hostname OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..16))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "The name of the host."
+        ::= { ipRadioCfgGeneral 3 }
+
+sysDateAndTime OBJECT-TYPE
+        SYNTAX  DateAndTime
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Current date and time set.
+              For SET tenths of seconds ignored."
+        ::= { ipRadioCfgGeneral 4 }
+
+sysTemperature OBJECT-TYPE
+         SYNTAX  INTEGER 
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+                 "Unit temperature in degrees by Celsius.
+                 NB - sw before 2009.03.18 shows in *10 degrees"
+         ::= { ipRadioCfgGeneral 5 }
+
+license OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "To set license information. Read allways 'OK'."
+        ::= { ipRadioCfgGeneral 6 }
+
+licenseMask OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Read license mask."
+        ::= { ipRadioCfgGeneral 7 }
+
+licenseUpdateStatus OBJECT-TYPE
+--  starting from v 1.64.25
+        SYNTAX  INTEGER {
+                 ok(1),
+                 error(2)
+              }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Status of last license update operation
+                     by setting license using snmp."
+        ::= { ipRadioCfgGeneral 8 }
+
+writeConfig OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  write-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Write Config"
+        ::= { ipRadioMgmt 1 }
+
+restartcpu OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  write-only
+        STATUS  mandatory
+        DESCRIPTION "Restart of Mng CPU. Values: 
+		      1 - 'cold' restart; 
+			  3 - sw"
+        ::= { ipRadioMgmt 2 }
+
+loopbacks OBJECT-TYPE
+        SYNTAX  INTEGER {
+           error(1),
+           off(2),
+--           rf(3),        2008.10.21
+           if(4),
+           modem(5),
+--           far(6),       2008.10.21
+--           ethernet(7),  2008.10.21
+--           e1t1-1(8),    use tributary mask
+--           e1t1-2(9),
+--           e1t1-3(10),
+--           e1t1-4(11),
+             multi(12)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Set loopback for 1 minute. value error(1) is not writable.
+                     Status of loopbacks.
+			  Values:
+			  1 - 'error' (not writable);
+			  2 - 'off';
+			  3 - 'rf' (radio frequency loopback); N/A 2008.10.21
+			  4 - 'if' (intermediate frequency loopback);
+			  5 - 'modem' (modem loopback);
+			  6 - 'far' (far end loopback); N/A 2008.10.21
+			  7 - 'ethernet' (Ethernet loopback); N/A 2008.10.21
+			  8 - 'e1t1-1' (E1/T1 channel 1 loopback); N/A from firmware 1.51
+			  9 - 'e1t1-2' (E1/T1 channel 2 loopback); N/A from firmware 1.51
+			  10 - 'e1t1-3' (E1/T1 channel 3 loopback); N/A from firmware 1.51
+			  11 - 'e1t1-4' (E1/T1 channel 4 loopback);  N/A from firmware 1.51
+			  12 - 'multi'  (E1/T1 multi - look channel tributary mask)"
+        ::= { ipRadioMgmt 3 }
+
+loopback-tributary-mask OBJECT-TYPE
+-- starting from firmware version 1.51
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS  mandatory
+        DESCRIPTION "Loopback mask for E1/T1 channels"
+        ::= { ipRadioMgmt 4 }
+
+--loopbacks-text OBJECT-TYPE
+-- starting from firmware version 1.51
+--        SYNTAX  DisplayString (SIZE(0..255))
+--        ACCESS  read-only
+--        STATUS  mandatory
+--        DESCRIPTION "This string gives the same information as loopbacks and loopback-tributary-mask
+--                    as a text string"
+--        ::= { ipRadioMgmt 5 }
+
+localIp OBJECT-TYPE
+-- added 2008.09.22
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "IPv4 Ethernet address of the local 
+		      unit in a number format(XXX.XXX.XXX.XXX)"
+        ::= { ipRadioCfgNetwork 1 }
+localIpMask OBJECT-TYPE
+-- added 2008.09.22
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "IPv4 Ethernet mask of the local 
+		      unit in a number format (XXX.XXX.XXX.XXX)"
+        ::= { ipRadioCfgNetwork 2 }
+remoteIp OBJECT-TYPE
+-- added 2008.09.22
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "IPv4 Ethernet address of the remote 
+		      unit in a number format (XXX.XXX.XXX.XXX)."
+        ::= { ipRadioCfgNetwork 3 }
+
+--
+
+radioTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RadioEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Radio table."
+        ::= { ipRadioCfgGeneral 10 }
+
+radioEntry OBJECT-TYPE
+              SYNTAX  RadioEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing objects in radio table."
+              INDEX   { radioIndex }
+              ::= { radioTable 1 }
+RadioEntry ::=
+              SEQUENCE {
+                  radioIndex
+                      INTEGER,
+                  radioGenStatus
+                      INTEGER,
+                  radioSide
+                      INTEGER,
+                  radioTxPower
+                      INTEGER,
+                  radioRxLevel
+                      INTEGER,
+                  radioDuplexShift
+                      INTEGER,
+                  radioLoopback
+                      INTEGER,
+                  radioTxMute
+                      INTEGER,
+                  radioTxFrequency
+                      INTEGER,
+                  radioRxFrequency
+                      INTEGER
+
+              }
+
+radioIndex OBJECT-TYPE
+              SYNTAX  INTEGER {
+                  local(1),
+                  remote(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each radio.
+                       Its value represents UNIT:
+                       1 - for 'local';
+                       2 - for 'remote'"
+              ::= { radioEntry 1 }
+
+radioGenStatus OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A General status of each radio:
+                       1 - 'OK';
+                       2 - 'error'"
+              ::= { radioEntry 2 }
+
+radioSide      OBJECT-TYPE
+              SYNTAX  INTEGER{
+                  high(1),
+                  low(2)
+              }
+              ACCESS  read-write
+-- warning!!!  This value writable only on devices w/o hw duplexer.
+--             In all other cases this is read-only.
+              STATUS  mandatory
+              DESCRIPTION
+                      "Side for duplex communication."
+              ::= { radioEntry 3 }
+
+radioTxPower  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Tx power of radio transmitter in dBm."
+-- to turn power off SET the value -100
+              ::= { radioEntry 4 }
+
+radioRxLevel  OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Received signal level in dBm."
+              ::= { radioEntry 5 }
+
+radioDuplexShift OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Utilized duplex shift in KHz."
+              ::= { radioEntry 6 }
+
+radioLoopback OBJECT-TYPE
+              SYNTAX  INTEGER{
+                 on(1),
+                 off(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Radio loopback on/off. To set use 
+					  loopback command."
+              ::= { radioEntry 7 }
+
+radioTxMute   OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 on(1),
+                 off(2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Status of 'Tx mute':
+					  1 - Tx is muted;
+					  2 - Tx is not muted."
+              ::= { radioEntry 8 }
+
+radioTxFrequency OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Tx frequency in kHz."
+              ::= { radioEntry 9 }
+
+radioRxFrequency OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Rx frequency in kHz."
+              ::= { radioEntry 10 }
+
+--
+
+-- ATPC
+
+
+aTPCTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ATPCEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "ATPC table"
+        ::= { ipRadioCfgGeneral 11 }
+
+aTPCEntry OBJECT-TYPE
+              SYNTAX  ATPCEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing objects in ATPC table."
+              INDEX   { atpcIndex }
+              ::= { aTPCTable 1 }
+
+ATPCEntry ::=
+              SEQUENCE {
+                  atpcIndex
+                      INTEGER,
+                  atpcEnabled
+                      INTEGER,
+                  atpcTxPowerCorrection
+                      INTEGER
+--                  atpcTxPowerWithCorrection
+--                      INTEGER
+              }
+
+atpcIndex OBJECT-TYPE
+              SYNTAX  INTEGER {
+                  local(1),
+                  remote(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Its value represents UNIT
+                       1 for 'local';
+                       2 for 'remote'."
+              ::= { aTPCEntry 1 }
+
+atpcEnabled OBJECT-TYPE
+              SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "ATPC status:
+			         1 for 'on';
+					 2 for 'off'."
+              ::= { aTPCEntry 2 }
+
+atpcTxPowerCorrection OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "ATPC Tx power correction in dBm."
+              ::= { aTPCEntry 3 }
+
+--atpcTxPowerWithCorrection OBJECT-TYPE
+--              SYNTAX  INTEGER
+--              ACCESS  read-only
+--              STATUS  mandatory
+--              DESCRIPTION "Tx power together with ATPC correction in dBm."
+--              ::= { aTPCEntry 4 }
+
+-- modem
+
+modemTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF ModemEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "CFIP modem table."
+        ::= { ipRadioCfgGeneral 12 }
+
+modemEntry OBJECT-TYPE
+              SYNTAX  ModemEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing objects in modem table."
+              INDEX   { modemIndex }
+              ::= { modemTable 1 }
+
+ModemEntry ::=
+              SEQUENCE {
+                  modemIndex
+                      INTEGER,
+                  modemGeneralStatus
+                      INTEGER,
+                  modemBandwith
+                      INTEGER,
+                  modemE1T1Channels
+                      INTEGER,
+                  modemModulation
+                      INTEGER,
+                  modemTotalCapacity
+                      INTEGER,
+                  modemEthernetCapacity
+                      INTEGER,
+                  modemAcqStatus
+                      INTEGER,
+                  modemLastAcqError
+                      INTEGER,
+                  modemRadialMSE
+                      INTEGER,
+                  modemInternalAGCgain
+                      INTEGER,
+                  modemCarrierOffset
+                      INTEGER,
+                  modemSymbolRateTx
+                      INTEGER,
+                  modemSymbolRateRx
+                      INTEGER,
+                  modemLDPCdecoderStress
+                      DisplayString,
+                  modemACMengine
+                      INTEGER,
+                  modemACMmodulationMin
+                      INTEGER,
+                  modemACMtotalCapacity
+                      INTEGER,
+                  modemACMethernetCapacity
+                      INTEGER,
+                  modemStandard  -- only starting from v 2.20
+                      INTEGER,
+                  modemE1T1ChannelMask
+                      INTEGER,
+                  modemACMmodulationMax
+                      INTEGER,
+                  modemRowStatus
+                      INTEGER
+              }
+
+modemIndex OBJECT-TYPE
+              SYNTAX  INTEGER {
+                  local(1),
+                  remote(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "Value represents UNIT:
+                       1 for local;
+                       2 for remote."
+              ::= { modemEntry 1 }
+
+modemGeneralStatus OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "A General status of each modem:
+                       1 - 'OK';
+                       2 - 'error'"
+              ::= { modemEntry 2 }
+
+modemBandwith OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "Modem bandwidth set in KHz."
+              ::= { modemEntry 3 }
+
+modemE1T1Channels OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "Number of E1 or T1 channels set."
+              ::= { modemEntry 4 }
+
+
+modemModulation OBJECT-TYPE
+              SYNTAX  INTEGER {
+                qpsk(1),
+                psk8(2),
+                qam16(3),
+                qam32(4),
+                qam64(5),
+                qam128(6),
+                qam256(7),
+                qpsklimited(8),
+                wqpsk(9),
+                wpsk8(10),
+                wqam16(11),
+                wqam32(12),
+                wqam64(13),
+                wqam128(14),
+                wqam256(15),
+                acmqpsk(17),
+                acmpsk8(18),
+                acmqam16(19),
+                acmqam32(20),
+                acmqam64(21),
+                acmqam128(22),
+                acmqam256(23),
+                acmwqpsk(25),
+                acmwpsk8(26),
+                acmwqam16(27),
+                acmwqam32(28),
+                acmwqam64(29),
+                acmwqam128(30),
+                acmwqam256(31),
+                qam4(33),
+                qam8(34),
+                qam4limited(40),
+                wqam4(41),
+                wqam8(42),
+                acmqam4(49),
+                acmqam8(50),
+                acmwqam4(57),
+                acmwqam8(58)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Modem modulation set.
+              Modulution values are
+			  following: QPSK - 1, 8PSK - 2, 16QAM - 3, 
+			  32QAM - 4, 64QAM - 5, 128QAM - 6,
+			  256QAM - 7.
+			  The combination of wide band and ACM calculates as
+			  (modulation + 8*is_wide + 16*is_ACM).
+			  Note: not all of listed modulations supported by hardware.
+			  Plese check manual."
+              ::= { modemEntry 5 }
+
+modemTotalCapacity OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Total capacity set in Kbps."
+              ::= { modemEntry 6 }
+
+modemEthernetCapacity OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Ethernet capacity set in Kbps."
+              ::= { modemEntry 7 }
+
+modemAcqStatus OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION " "
+              ::= { modemEntry 8 }
+
+modemLastAcqError OBJECT-TYPE
+              SYNTAX  INTEGER{
+              success(1),     
+              erragc(2),
+              errtiming(3),
+              errfreqsweep(4),
+              errmse(5),
+              errbit(6),
+              errservice(7),
+              errblind(8),
+              errtimeout(9),
+              errstopped(10),
+              errfatal(11)
+              }
+              
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION " "
+              ::= { modemEntry 9 }
+              
+modemRadialMSE OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Radial mean square error value *10 in dB.
+                    Radial MSE is a method for estimating the 
+					signal to noise ratio. ACM engine uses 
+					normalized MSE, which is the inverse of SNR. 
+					It is calculated by dividing the estimated 
+					MSE level with the energy of the received 
+					constellation. Radial MSE peak value threshold 
+					is dependent on modulation used and LDPC 
+					code rate.
+                    In case of QPSK it is -8 dB (-10.5 for 'wide'), 
+					16APSK - -13 dB (-18 for 'wide') and 
+					32APSK - -15.5 dB (-21.5 for 'wide'). If the 
+					value trespasses this threshold, BER at the 
+					output of LDPC decoder will reach the value 
+					of 1.0e-06."
+              ::= { modemEntry 10 }
+
+modemInternalAGCgain OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION " dBm "
+              ::= { modemEntry 11 }
+
+modemCarrierOffset OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Carrier frequency offset in Hz."
+              ::= { modemEntry 12 }
+
+modemSymbolRateTx OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION " kHz "
+              ::= { modemEntry 13 }
+
+modemSymbolRateRx OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION " kHz "
+              ::= { modemEntry 14 }
+
+modemLDPCdecoderStress OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "The load of LDPC (low-density 
+			        parity-check code) decoder.
+                    The LDPC is monitored for the number 
+					of errors being corrected on the input 
+					of LDPC decoder.
+                    LDPC stress value thresholds @ BER 1.0e-06: 
+					- for standard settings ~4.0e-02; 
+					- for 'wide' option ~ 1.0e-03.
+                    As long as LDPC stress value is under the 
+					specified thresholds, amount of errors (and 
+					BER itself) on the output of LDPC remains 
+					at zero level."
+              ::= { modemEntry 15 }
+
+modemACMengine OBJECT-TYPE
+              SYNTAX  INTEGER {
+                on(1),
+                off(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Status of ACM engine. When 'on', 
+			        value '1' is shown, when 'off' - value is '2'."
+              ::= { modemEntry 16 }
+
+modemACMmodulationMin OBJECT-TYPE
+              SYNTAX  INTEGER {
+                qpsk(1),
+                psk8(2),
+                qam16(3),
+                qam32(4),
+                qam64(5),
+                qam128(6),
+                qam256(7),
+                qpsklimited(8),
+                wqpsk(9),
+                wpsk8(10),
+                wqam16(11),
+                wqam32(12),
+                wqam64(13),
+                wqam128(14),
+                wqam256(15),
+                acmqpsk(17),
+                acmpsk8(18),
+                acmqam16(19),
+                acmqam32(20),
+                acmqam64(21),
+                acmqam128(22),
+                acmqam256(23),
+                acmwqpsk(25),
+                acmwpsk8(26),
+                acmwqam16(27),
+                acmwqam32(28),
+                acmwqam64(29),
+                acmwqam128(30),
+                acmwqam256(31),
+                qam4(33),
+                qam8(34),
+                qam4limited(40),
+                wqam4(41),
+                wqam8(42),
+                acmqam4(49),
+                acmqam8(50),
+                acmwqam4(57),
+                acmwqam8(58)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "Modem modulation set.
+              Modulution values are
+			  following: QPSK - 1, 8PSK - 2, 16QAM - 3, 
+			  32QAM - 4, 64QAM - 5, 128QAM - 6,
+			  256QAM - 7.
+			  The combination of wide band and ACM calculates as
+			  (modulation + 8*is_wide + 16*is_ACM).
+			  Note: not all of listed modulations supported by hardware.
+			  Plese check manual."
+              ::= { modemEntry 17}
+--modemACMmodulationMin OBJECT-TYPE
+--              SYNTAX  INTEGER
+--              ACCESS  read-only
+--              STATUS  mandatory
+--              DESCRIPTION "Modulation set by ACM."
+--              ::= { modemEntry 17 }
+
+modemACMtotalCapacity OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Total capacity in Kbps set by ACM."
+              ::= { modemEntry 18 }
+
+modemACMethernetCapacity OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION "Ethernet capacity in Kbps set by ACM."
+              ::= { modemEntry 19 }
+
+modemStandard OBJECT-TYPE  -- from version 1.20
+              SYNTAX INTEGER{
+               etsi(1),
+               ansi(2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "Modem operational standard ETSI or ANSI"
+              ::= { modemEntry 20 }
+
+modemE1T1ChannelMask OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "E1 or T1 channel mask 0x00 - 0x0f"
+              ::= { modemEntry 21 }
+
+modemACMmodulationMax OBJECT-TYPE
+              SYNTAX  INTEGER {
+                qpsk(1),
+                psk8(2),
+                qam16(3),
+                qam32(4),
+                qam64(5),
+                qam128(6),
+                qam256(7),
+                qpsklimited(8),
+                wqpsk(9),
+                wpsk8(10),
+                wqam16(11),
+                wqam32(12),
+                wqam64(13),
+                wqam128(14),
+                wqam256(15),
+                acmqpsk(17),
+                acmpsk8(18),
+                acmqam16(19),
+                acmqam32(20),
+                acmqam64(21),
+                acmqam128(22),
+                acmqam256(23),
+                acmwqpsk(25),
+                acmwpsk8(26),
+                acmwqam16(27),
+                acmwqam32(28),
+                acmwqam64(29),
+                acmwqam128(30),
+                acmwqam256(31),
+                qam4(33),
+                qam8(34),
+                qam4limited(40),
+                wqam4(41),
+                wqam8(42),
+                acmqam4(49),
+                acmqam8(50),
+                acmwqam4(57),
+                acmwqam8(58)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "Modem modulation set.
+              Modulution values are
+			  following: QPSK - 1, 8PSK - 2, 16QAM - 3, 
+			  32QAM - 4, 64QAM - 5, 128QAM - 6,
+			  256QAM - 7.
+			  The combination of wide band and ACM calculates as
+			  (modulation + 8*is_wide + 16*is_ACM).
+			  Note: as PSK modulations are now physicaly deprecated,
+              theese are replased with QAM, so for new QAM modulations
+              there are modificatior +32.
+			  Note: not all of listed modulations supported by hardware.
+			  Plese check manual."
+              ::= { modemEntry 22}
+
+
+modemRowStatus OBJECT-TYPE
+              SYNTAX      INTEGER {
+                active(1),
+                notReady(3),
+                undo(4)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION "Row status - to update written data for
+              modemBandwith,
+              modemACMmodulationMin,
+              modemACMmodulationMax,
+              modemE1T1ChannelMask. "
+              ::= { modemEntry 23 }
+
+--modemACMprofileTx OBJECT-TYPE
+--              SYNTAX  INTEGER
+--              ACCESS  read-only
+--              STATUS  optional
+--              DESCRIPTION "Tx ACM profile."
+--              ::= { modemEntry 21 }
+
+--modemACMprofileRx OBJECT-TYPE
+--              SYNTAX  INTEGER
+--              ACCESS  read-only
+--              STATUS  optional
+--              DESCRIPTION "Rx ACM profile."
+--              ::= { modemEntry 22 }
+
+--modemRxFrequencyOffset OBJECT-TYPE
+--              SYNTAX  INTEGER
+--              ACCESS  read-only
+--              STATUS  optional
+--              DESCRIPTION "Rx frequency offset in KHz."
+--              ::= { modemEntry 23 }
+
+--modemTxFrequencyOffset OBJECT-TYPE
+--            SYNTAX  INTEGER
+--            ACCESS  read-only
+--            STATUS  optional
+--            DESCRIPTION "Tx frequency offset in KHz."
+--            ::= { modemEntry 24 }
+-- vlan 2008.10.04
+
+vlansEnabled OBJECT-TYPE
+         SYNTAX  INTEGER {
+           enabled(1),
+           disabled(2),
+           reset(3)
+         }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+                 "unit temperature *10 degrees Celsius"
+         ::= { ipRadioCfgGeneral 13 }
+
+--
+vlanTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF VlanEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Vlan table"
+        ::= { ipRadioCfgGeneral 14 }
+
+vlanEntry OBJECT-TYPE
+              SYNTAX  VlanEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "entry containing vlan objects"
+              AUGMENTS    { ifEntry }
+              ::= { vlanTable 1 }
+
+VlanEntry ::=
+              SEQUENCE {
+                 vlanNumber    INTEGER,
+                 vlanPortType  INTEGER,
+                 vlanPortmap   INTEGER,
+                 vlanFid       INTEGER,
+                 vlanCfgStat   INTEGER,
+                 vlanRowStatus INTEGER
+    }
+
+            vlanNumber   OBJECT-TYPE
+              SYNTAX      INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A unique value for each vlan. "
+              ::= { vlanEntry 1 }
+
+            vlanPortType  OBJECT-TYPE
+              SYNTAX      INTEGER {
+                management(1),
+                none(2),
+                traffic(3),
+                endpoint(4)
+
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "VLAN port type
+                      management, traffic or endpoint 
+                       "
+              ::= { vlanEntry 2 }
+
+            vlanPortmap  OBJECT-TYPE
+              SYNTAX      INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "display port bindings
+                       bitfield 111(bin)
+                       "
+              ::= { vlanEntry 3 }
+
+            vlanFid      OBJECT-TYPE
+              SYNTAX      INTEGER
+              ACCESS  read-only
+              STATUS  optional
+              DESCRIPTION
+                      "a filtering identifier (assigned automagically)"
+              ::= { vlanEntry 4 }
+
+            vlanCfgStat OBJECT-TYPE
+              SYNTAX      INTEGER {
+                enable(1),
+                disable(2),
+                clear(3)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "enable/disable vlan # or clear row data"
+              ::= { vlanEntry 5 }
+
+            vlanRowStatus OBJECT-TYPE
+              SYNTAX      INTEGER {
+                active(1),
+                notReady(3),
+                undo(4)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Row status (execute configuration on active)
+                       Changing any table value sets this value into
+                       state notReady. To update row status write value
+                       active(1) into this variable."
+              ::= { vlanEntry 6 }
+
+
+--
+-- Eth
+--
+ethRXTruncatedFrames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of truncated received frames since 
+		             unit start or statistics reset. "
+        ::= { ipRadioStatEth 1 }
+
+ethRXLongEvents OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames having byte count greater 
+		             than MAXIMUM FRAME SIZE parameter (1518, 
+					 1536 or 1916 bytes) since unit start or 
+					 statistics reset."
+        ::= { ipRadioStatEth 2 }
+
+ethRXVlanTagsDetected OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of VLAN Tags detected since unit 
+		             start or statistics reset."
+        ::= { ipRadioStatEth 3 }
+
+ethRXUnsupOpcodes OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames recognized as control frames 
+		             but contained an Unknown Opcode since unit 
+					 start or statistics reset."
+        ::= { ipRadioStatEth 4 }
+
+ethRXPauseFrames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames received as control frames 
+		             with valid PAUSE opcodes since unit start or 
+					 statistics reset."
+        ::= { ipRadioStatEth 5 }
+
+ethRXControlFrames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames received as control frames 
+		             since unit start or statistics reset."
+        ::= { ipRadioStatEth 6 }
+
+ethRXDribleNibbles OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Indicates that following the end of the 
+		             packet additional 1 to 7 bits are received. 
+                     A single nibble, named the  dribble nibble, 
+					 is formed but not sent to the system;"
+        ::= { ipRadioStatEth 7 }
+
+ethRXBroadcasts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of packets, which destination 
+		             address contained broadcast address, 
+					 since unit start or statiistics reset."
+        ::= { ipRadioStatEth 8 }
+
+ethRXMulticasts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of packets, which destination 
+		             address contained multicast address since
+                     unit start or statistics reset."
+        ::= { ipRadioStatEth 9 }
+
+ethRXDones OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Reception of packets successfully 
+		             completed. Number of completed packets 
+					 since unit start or statistics reset."
+        ::= { ipRadioStatEth 10 }
+
+ethRXOutOfRangeErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames where Type/Length field 
+		             larger than 1518 (Type Field) bytes since
+                     unit start or statistics reset."
+        ::= { ipRadioStatEth 11 }
+
+ethRXLengthCheckerrorsErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames where frame length field 
+		             in the packet does not match the actual data 
+					 byte length and is not a Type Field since 
+					 unit start or statistics reset."
+        ::= { ipRadioStatEth 12 }
+
+ethRXCRCErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames where frame CRC do not 
+		             match the internally generated CRC since 
+                     unit start or statistics reset"
+        ::= { ipRadioStatEth 13 }
+
+ethRXCodeErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of packets where one or more nibbles 
+		             are signalled as errors during reception of 
+					 the packet since unit start or statistics 
+					 reset."
+        ::= { ipRadioStatEth 14 }
+
+ethRXFalseCarrierErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Indicates that following the last receive 
+		             statistics vector, a false carrier was 
+                     detected, noted and reported with this the 
+					 next receive statistics. The false carrier 
+					 is not associated with this packet. False 
+					 carrier is activated on the receive channel 
+					 that does not result in a packet receive 
+					 attempt being made;"
+        ::= { ipRadioStatEth 15 }
+
+ethRXDvEvent OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of the last receive (Rx) events seen 
+		             being too short to be valid packets since the 
+                     last unit (re)start or purification of 
+					 statistics."
+        ::= { ipRadioStatEth 16 }
+
+ethRXPrevPktDropped OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Indicates that since the last receive (Rx), 
+		             a packet is dropped (i.e. interframe gap 
+					 too small)."
+        ::= { ipRadioStatEth 17 }
+
+ethRXByteCounterHi OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Total number of bytes received (Rx) on the 
+		             wire since the last unit (re)start or 
+					 purification of statistics, not counting 
+					 collided bytes (bits 31:0)."
+        ::= { ipRadioStatEth 18 }
+
+ethRXByteCounterLow OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Total number of bytes received (Rx) on the 
+		             wire since the last unit (re)start or 
+					 purification of statistics, not counting 
+					 collided bytes (bits 62:32)."
+        ::= { ipRadioStatEth 19 }
+
+--Counter64 data type is unsupported by SMIv1. Not expected
+--ethRXByteCounter64b OBJECT-TYPE
+--        SYNTAX  Counter64
+--        ACCESS  read-only
+--        STATUS  optional
+--        DESCRIPTION "Total number of bytes received (Rx) on the 
+--		             wire since the last unit (re)start or 
+--					 purification of statistics, not counting 
+--					 collided bytes."
+--        ::= { ipRadioStatEth 20 }
+
+ethTXVlanTags OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of VLAN tagged Tx packets since the 
+		             last unit (re)start or purification of 
+					 statistics. 32-bit counter."
+        ::= { ipRadioStatEth 21 }
+
+ethTXBackpresEvents OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of times Tx carrier-sense-method 
+		             backpressure was previously applied since the 
+					 last unit (re)start or purification of 
+					 statistics."
+        ::= { ipRadioStatEth 22 }
+
+ethTXPauseFrames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames transmitted (Tx) as control 
+		             frames with valid PAUSE opcodes since the last  
+                     unit (re)start or purification of statistics."
+        ::= { ipRadioStatEth 23 }
+
+ethTXControlFrames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames transmitted (Tx) as control 
+		             frames since the last unit (re)start or 
+                     purification of statistics."
+        ::= { ipRadioStatEth 24 }
+
+ethTXWireByteCounterHi OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Total number of bytes transmitted (Tx) 
+		             on the wire since the last unit (re)start 
+					 or purification of statistics, including 
+					 all bytes from collided attempts 
+					 (bits 31:0)."
+        ::= { ipRadioStatEth 25 }
+
+ethTXWireByteCounterLow OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Total number of bytes transmitted (Tx) 
+		             on the wire since the last unit (re)start 
+					 or purification of statistics, including 
+					 all bytes from collided attempts 
+					 (bits 62:32)."
+        ::= { ipRadioStatEth 26 }
+
+--Counter64 data type is unsupported by SMIv1. Not expected
+--ethTXWireByteCounter64b OBJECT-TYPE
+--        SYNTAX  Counter64
+--        ACCESS  read-only
+--        STATUS  optional
+--        DESCRIPTION "Total number of bytes transmitted (Tx) 
+--		             on the wire since the last unit (re)start 
+--					 or purification of statistics, including 
+--					 all bytes from collided attempts."
+--        ::= { ipRadioStatEth 27 }
+
+ethTXUnderruns OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of underruns occured during frame 
+		             transmission (Tx) since the last unit 
+					 (re)start or purification of statistics."
+        ::= { ipRadioStatEth 28 }
+
+ethTXGiants OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx frames having byte count 
+		             greater than the MAXIMUM FRAME SIZE 
+                     parameter (1516, 1536 or 1916 bytes) 
+					 since the last unit (re)start or 
+					 purification of statistics."
+        ::= { ipRadioStatEth 29 }
+
+ethTXLateCollisions OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx collisions occurred beyond 
+		             the collision window (512 bit times) since 
+					 the last unit (re)start or purification 
+					 of statistics."
+        ::= { ipRadioStatEth 30 }
+
+ethTXMaxCollisions OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx packets aborted after number 
+		             of collisions exceeded the RETRANSMISSION 
+					 MAXIMUM parameter since the last unit 
+					 (re)start or purification of statistics."
+        ::= { ipRadioStatEth 31 }
+
+ethTXExcessiveDefers OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx packets deferred in excess 
+		             of 6,071 nibble times in 100 Mbps mode, 
+					 or 24,287 bit-times in 10 Mbps mode since 
+					 the last unit (re)start or purification 
+					 of statistics."
+        ::= { ipRadioStatEth 32 }
+
+ethTXNonExcessiveDefers OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx packets deferred for at 
+		             least one attempt, but less than an 
+					 excessive defer since the last unit 
+					 (re)start or purification of statistics."
+        ::= { ipRadioStatEth 33 }
+
+ethTXBroadcasts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx packets since the last unit 
+		             (re)start or purification of statistics, 
+					 which destination address contained 
+					 broadcast address."
+        ::= { ipRadioStatEth 34 }
+
+ethTXMulticasts OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx packets since the last unit 
+		             (re)start or purification of statistics, 
+					 which destination address contained 
+					 multicast address."
+        ::= { ipRadioStatEth 35 }
+
+ethTXDones OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of packets successfully transmitted 
+		             (Tx) since the last unit (re)start or 
+					 purification of statistics."
+        ::= { ipRadioStatEth 36 }
+
+-- ethTXOutOfRangeErrors OBJECT-TYPE
+--        SYNTAX  Counter
+--        ACCESS  read-only
+--        STATUS  obsolete
+--        DESCRIPTION "Number of Tx frames since the last unit 
+--                     (re)start or purification of statistics 
+--                     where Type/Length field larger than 1518 
+--          		   (Type Field) bytes."
+--        ::= { ipRadioStatEth 37 }
+
+ethTXLengthCheckErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx frames since the last unit 
+		             (re)start or purification of statistics, 
+					 where length field in the packet does not 
+					 match the actual data byte length and is 
+					 not a Type Field"
+        ::= { ipRadioStatEth 38 }
+
+ethTXCRCErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of Tx frames since the last unit 
+		             (re)start or purification of statistics, 
+					 where CRC does not match the internally 
+					 generated CRC."
+        ::= { ipRadioStatEth 39 }
+
+ethTXCollisions OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of collisions the current packet 
+		             incurred during transmission (Tx) attempts. 
+					 Note: Bits 19 through 16 are the collision 
+					 count on any successfully transmitted packet 
+					 and as such will not show the possible maximum 
+                     count of 16 collisions."
+        ::= { ipRadioStatEth 40 }
+
+ethTXByteCounterHi OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Total count of bytes transmitted (Tx) 
+		             on the wire not including collided bytes 
+					 (bits 31:0) since the last unit (re)start 
+					 or purification of statistics."
+        ::= { ipRadioStatEth 41 }
+
+ethTXByteCounterLow OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Total count of bytes transmitted (Tx) 
+		             on the wire not including collided bytes 
+					 (bits 62:32) since the last unit (re)start 
+					 or purification of statistics."
+        ::= { ipRadioStatEth 42 }
+
+--Counter64 data type is unsupported by SMIv1. Not expected
+--ethTXByteCounter64b OBJECT-TYPE
+--        SYNTAX  Counter64
+--        ACCESS  read-only
+--        STATUS  optional
+--        DESCRIPTION "Total count of bytes transmitted (Tx) on 
+--		             the wire not including collided bytes 
+--					 since the last unit (re)start or 
+--                     purification of statistics."
+--        ::= { ipRadioStatEth 43 }
+
+ethGFPFCSErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of generic framing procedure (GFP) 
+		             frames with CRC errors received by the 
+					 de-encapsulation block since the last unit 
+					 (re)start or purification of statistics."
+        ::= { ipRadioStatEth 44 }
+
+ethGFPCHECErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of generic framing procedure (GFP) 
+		             frames with CHEC errors received by the 
+					 de-encapsulation block since the last unit 
+					 (re)start or purification of statistics."
+        ::= { ipRadioStatEth 45 }
+
+ethGFPDropedFrames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of generic framing procedure (GFP) 
+		             frames that were dropped in the de-encapsulation 
+					 block since the last unit (re)start or 
+					 purification of statistics."
+        ::= { ipRadioStatEth 46 }
+
+ethGFPDelineationErrors OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of 'lost of synchronization' events since 
+		             the last unit (re)start or purification of 
+					 statistics."
+        ::= { ipRadioStatEth 47 }
+
+ethQOSRXQ1Frames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames received on Q1 since the last unit 
+                    (re)start or purification of statistics."
+        ::= { ipRadioStatEth 48 }
+
+ethQOSRXQ1Dropped OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames dropped on Q1 since the last unit 
+                    (re)start or purification of statistics."
+        ::= { ipRadioStatEth 49 }
+
+ethQOSRXQ2Frames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames received on Q2 since the last unit 
+                    (re)start or purification of statistics."
+        ::= { ipRadioStatEth 50 }
+
+ethQOSRXQ2Dropped OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames dropped on Q2 since the last unit 
+                    (re)start or purification of statistics."
+        ::= { ipRadioStatEth 51 }
+
+ethQOSTXFrames OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames passed through TX FIFO since the 
+                     last unit (re)start or purification of statistics."
+        ::= { ipRadioStatEth 52 }
+
+ethQOSTXDropped OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of frames dropped in TX FIFO since the last 
+                     unit (re)start or purification of statistics."
+        ::= { ipRadioStatEth 53 }
+
+e1t1StatTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF E1t1StatEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "E1 (T1) status Table."
+        ::= { ipRadioStat 3 }
+
+e1t1StatEntry OBJECT-TYPE
+              SYNTAX  E1t1StatEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "Entry containing objects in E1 (T1) table"
+              AUGMENTS    { ifEntry }
+              ::= { e1t1StatTable 1 }
+E1t1StatEntry ::=
+              SEQUENCE {
+                 e1t1LOS  INTEGER,
+                 e1t1AIS  INTEGER,
+                 e1t1ChannelNr INTEGER -- 2009.07.13.
+              }
+
+           e1t1LOS    OBJECT-TYPE
+              SYNTAX  INTEGER {
+               on(1),
+               off(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "if signal loss present"
+              ::= { e1t1StatEntry 1 }
+
+           e1t1AIS    OBJECT-TYPE
+              SYNTAX  INTEGER {
+               on(1),
+               off(2)
+              }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "if AIS present"
+              ::= { e1t1StatEntry 2 }
+
+            e1t1ChannelNr    OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "e1 channel number (it is not associated with interface number - ifEntry)"
+              ::= { e1t1StatEntry 3 }
+
+--modemStatistics
+
+-- Modem_Count_Time
+modemCountTime  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Count time in seconds"
+        ::= { modemStatistics 1 }
+
+modemErroredBlock  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Errored block"
+        ::= { modemStatistics 2 }
+
+modemErroredSecond  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Errored second"
+        ::= { modemStatistics 3 }
+
+modemSeverelyErroredSecond  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Severely errored second"
+        ::= { modemStatistics 4 }
+
+modemBackgroundBlockErrror  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Background Block Error"
+        ::= { modemStatistics 5 }
+
+modemTotalBlockNumber  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Total Block Number"
+        ::= { modemStatistics 6 }
+
+
+modemErroredSecondRatio  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Errored Second Ratio"
+        ::= { modemStatistics 7 }
+
+modemSeverelyErroredSecondRatio  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Severely Errored Second Ratio"
+        ::= { modemStatistics 8 }
+
+modemBackgroundBlockErrorRatio OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Background Block Error Ratio"
+        ::= { modemStatistics 9 }
+
+modemUptime  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Uptime (s)"
+        ::= { modemStatistics 10 }
+
+modemUnavailtime  OBJECT-TYPE
+        SYNTAX  Counter
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Unavailtime (s)"
+        ::= { modemStatistics 11 }
+
+--
+END

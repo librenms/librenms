@@ -1,0 +1,1007 @@
+-- **MOD-***********************************************************************
+-- * Module:    hpicfFf.mib
+-- *
+-- * Copyright (C) 2014-2015, 2017 Hewlett Packard Enterprise Development LP
+-- * All Rights Reserved.
+-- * 
+-- * The contents of this software are proprietary and confidential
+-- * to the Hewlett Packard Enterprise Development LP.  No part of this
+-- * program may be photocopied, reproduced, or translated into another
+-- * programming language without prior written consent of the
+-- * Hewlett Packard Enterprise Development LP.
+-- *
+-- * Purpose:   To define MIBS related to the fault-finder feature
+-- *
+-- **MOD-***********************************************************************
+
+       HP-ICF-FAULT-FINDER-MIB DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+           Unsigned32
+               FROM SNMPv2-SMI
+           TimeStamp, TEXTUAL-CONVENTION
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF
+           ifIndex, InterfaceIndex
+               FROM IF-MIB
+           PhysicalIndex, PhysicalClass
+               FROM ENTITY-MIB
+           hpicfObjectModules, hpicfCommon, hpicfCommonTrapsPrefix
+               FROM HP-ICF-OID;
+
+
+       hpicfFaultFinderMib MODULE-IDENTITY
+           LAST-UPDATED "201711201412Z"  -- Nov 20, 2017	   
+           ORGANIZATION "HP Networking"
+           CONTACT-INFO "Hewlett-Packard Company
+                        8000 Foothills Blvd.
+                        Roseville, CA 95747"
+           DESCRIPTION  "This MIB module contains object definitions for
+                        managing the Fault Finder feature in web-capable
+                        HP devices."
+
+           REVISION     "201711201412Z"  -- Nov 20, 2017
+           DESCRIPTION  "Added hpicfFfMcastStormPortConfig to 
+                         hpicfFaultFinder."
+
+           REVISION     "201508041412Z"  -- Aug 04, 2015
+           DESCRIPTION  "Added hpicfFfLinkFlapControlPortConfig to 
+                         hpicfFaultFinder."
+
+           REVISION     "201308210000Z"  -- Aug 21, 2013
+           DESCRIPTION  "Added hpicfFfBcastStormControlPortConfig to 
+                         hpicfFaultFinder."
+
+           REVISION     "201001252024Z"  -- Jan 25, 2010
+           DESCRIPTION  "Added hpicfFfFaultLightStatus to return the
+                                   fault light status."
+
+           REVISION     "200905220000Z"  -- May 22, 2009
+           DESCRIPTION  "Added intel82566dmportprotect to hpicfFaultType."
+
+           REVISION     "200902251331Z"  -- Febuary 25, 2009
+           DESCRIPTION  "Added link-flap fault-id in the existing 
+                         fault-id's.
+                         The maximum tolerance value is 10,6 and 3 for low,
+                         medium and high sensitivity."
+
+           REVISION     "200701091456Z"  -- January 9, 2007
+           DESCRIPTION  "Added hpicfFfLogPhysEntity to hpicfFaultFinderTrap."
+	   
+           REVISION     "200505021934Z"  -- May 2, 2005
+           DESCRIPTION  "Added 3 new Transceiver related fault messages."
+	   
+           REVISION     "200503221130Z"  -- March 22, 2005
+           DESCRIPTION  "Added Transceiver related fault messages, 
+                                   jumbos/flow control fault.  Also added 
+                                   Connection-Rate-Filtering fault type to 
+                                   extend support for virus throttling."
+
+           REVISION     "200307280707Z"  -- July 28, 2003
+           DESCRIPTION  "Add duplexMismatch type. Update division name."
+           
+           REVISION     "200011030707Z"  -- November 3, 2000
+           DESCRIPTION  "Add lossOfStackMember and hotSwapReboot fault
+                        types.  Update division name."
+
+           REVISION     "9811202350Z"  -- November 20, 1998
+           DESCRIPTION  "Added several fault types, and the ability to
+                        reduce a port's speed as one of the actions to
+                        take on a fault."
+
+           REVISION     "9710210249Z"  -- October 21, 1997
+           DESCRIPTION  "Initial version of this MIB module."
+           ::= { hpicfObjectModules 12 }
+
+       hpicfFaultFinder OBJECT IDENTIFIER ::= { hpicfCommon 7 }
+
+       HpicfFaultType ::= TEXTUAL-CONVENTION
+           STATUS      current
+           DESCRIPTION "An enumerated value which indicates a type of
+                       fault which is monitored by the agent."
+           SYNTAX      INTEGER {
+                           badDriver(1),
+                           badXcvr(2),
+                           badCable(3),
+                           tooLongCable(4),
+                           overBandwidth(5),
+                           bcastStorm(6),
+                           partition(7),
+                           misconfiguredSQE(8),
+                           polarityReversal(9),
+                           networkLoop(10),
+                           lossOfLink(11),
+                           portSecurityViolation(12),
+                           backupLinkTransition(13),
+                           meshingFault(14),
+                           fanFault(15),
+                           rpsFault(16),
+                           stuck10MbFault(17),
+                           lossOfStackMember(18),
+                           hotSwapReboot(19),
+                           duplexMismatchHDX(20),
+                           duplexMismatchFDX(21),
+                           flowcntlJumbosFault(22),
+                           portSelftestFailure(23),
+                           xcvrUnidentified(24),
+                           xcvrUnsupported(25),
+                           crfNotify(26),
+                           crfThrottled(27),
+                           crfBlocked(28),
+                           xcvrNotYetSupported(29),
+                           xcvrBRevOnly(30),
+                           xcvrNotSupportedOnPort(31),
+                           phyReadFailure(32),
+                           linkFlap(33),
+                           intel82566dmportprotect(34),
+			   xcvrExceedQty(35),
+			   xcvrClone(36),
+			   xcvrCloneReminder(37),
+                           bcastStormPerPort(38),
+                           linkFlapPerPort(39),
+                           rxNonStdPreamble(40),
+                           mcastStorm(41),
+                           mcastStormPerPort(42)
+                           } 
+
+       HpicfFaultTolerance ::= TEXTUAL-CONVENTION
+           DISPLAY-HINT "d"
+           STATUS      current
+           DESCRIPTION "Objects of this type are used to scale internal
+                       fault thresholds between hard-coded minimum and
+                       maximum threshold values as follows:
+
+                       actual = min + ((max - min) * tol)/maxTol
+
+                       where:
+                         actual - actual threshold used by Fault Finder
+                         min    - minimum threshold for this fault
+                         max    - maximum threshold for this fault
+                         tol    - configured tolerance for this fault
+                         maxTol - maximum tolerance value (255)"
+           SYNTAX      Integer32 (0..255)
+
+       HpicfFaultAction ::= TEXTUAL-CONVENTION
+           STATUS      current
+           DESCRIPTION "Objects of this type are used to indicate
+                       actions taken on detection of a fault."
+           SYNTAX      INTEGER {
+                           none(1),
+                           warn(2),
+                           warnAndDisable(3),
+                           warnAndSpeedReduce(4),
+                           warnAndSpeedReduceAndDisable(5)
+                       }
+
+       HpicfUrlString ::= TEXTUAL-CONVENTION
+           DISPLAY-HINT "255a"
+           STATUS      current
+           DESCRIPTION "This TC describes an object which holds a
+                       reference to a (remote) resource by using the
+                       Uniform Resource Locator (URL) notation as
+                       defined in RFC 1738. The allowed character set
+                       and the encoding rules for this textual
+                       convention are defined in RFC 1738 section 2.2."
+           SYNTAX      OCTET STRING (SIZE(0..255))
+
+       hpicfFfControlTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF HpicfFfControlEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This table contains one entry per fault type
+                       that this agent is capable of monitoring."
+           ::= { hpicfFaultFinder 1 }
+
+       hpicfFfControlEntry OBJECT-TYPE
+           SYNTAX      HpicfFfControlEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "Configuration information for a particular fault
+                       type."
+           INDEX       { hpicfFfControlIndex }
+           ::= { hpicfFfControlTable 1 }
+
+       HpicfFfControlEntry ::=
+           SEQUENCE {
+               hpicfFfControlIndex            HpicfFaultType,
+               hpicfFfAction                  HpicfFaultAction,
+               hpicfFfWarnTolerance           HpicfFaultTolerance,
+               hpicfFfDisablePortTolerance    HpicfFaultTolerance,
+               hpicfFfSpeedReduceTolerance    HpicfFaultTolerance
+           }
+
+       hpicfFfControlIndex OBJECT-TYPE
+           SYNTAX      HpicfFaultType
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "The type of fault for which this entry contains
+                       configuration information."
+           ::= { hpicfFfControlEntry 1 }
+
+       hpicfFfAction OBJECT-TYPE
+           SYNTAX      HpicfFaultAction
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "This object is used to configure the action,
+                       if any, to be taken if a fault of this type is
+                       detected by the agent. Setting an instance of
+                       this object to 'none' will clear any previous
+                       state of the associated fault on all ports.
+
+                       This object is used to enable or disable  the
+                       port disable feature for this fault type.
+                       Setting this object to 'warnAndDisable' will
+                       enable the port disable feature for this fault
+                       type.  This feature is intended to allow an agent
+                       to disable ports that are being disruptive to the
+                       rest of the network.
+
+                       Note that not all agents will support setting
+                       this object to 'warnAndDisable'.  The agent
+                       may choose not to disable a particular port for a
+                       particular fault based on its knowledge of if/how
+                       that fault disrupts the network."
+           ::= { hpicfFfControlEntry 2 }
+
+       hpicfFfWarnTolerance OBJECT-TYPE
+           SYNTAX      HpicfFaultTolerance
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "The tolerance level used to calculate the
+                       fault warning threshold for this fault type.
+
+                       The agent will periodically check relevant
+                       statistics for each port for each type of fault.
+                       If the warning threshold has been exceeded, and
+                       fault warning action is enabled for that fault
+                       type, an hpicfFaultFinderTrap notification will
+                       be sent. In addition, an entry will be made in
+                       the hpicfFfLogTable for the fault.  Once a fault
+                       warning has fired, a hysteresis mechanism assures
+                       that another warning will not be fired until the
+                       relevant counter drops below a hysteresis
+                       threshold value."
+           ::= { hpicfFfControlEntry 3 }
+
+       hpicfFfDisablePortTolerance OBJECT-TYPE
+           SYNTAX      HpicfFaultTolerance
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "The tolerance level used to calculate the
+                       port disable threshold for this fault type.
+                       The value of an instance of this object MUST be
+                       greater than the value of the corresponding
+                       instance of the hpicfFfWarnTolerance.
+
+                       The agent will periodically check relevant
+                       statistics for each port for each type of fault.
+                       If the port disable threshold has been exceeded,
+                       and port disable is enabled for that fault type,
+                       an hpicfFaultFinderTrap notification will be
+                       sent. In addition, an entry will be made in the
+                       hpicfFfLogTable for the fault.
+
+                       Ports will not be disabled until at least one
+                       polling interval after a warning has fired.  In
+                       addition, the agent may further delay disabling
+                       a port in certain situations.  For example, it
+                       may choose to delay disabling a cascade port to
+                       give the cascaded device a chance to correct the
+                       problem."
+           ::= { hpicfFfControlEntry 4 }
+
+       hpicfFfSpeedReduceTolerance OBJECT-TYPE
+           SYNTAX      HpicfFaultTolerance
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "The tolerance level used to calculate the
+                       speed reduction threshold for this fault type.
+                       The value of an instance of this object MUST be
+                       greater than the value of the corresponding
+                       instance of the hpicfFfWarnTolerance, and 
+                       less than or equal to the corresponding instance 
+                       of hpicfFfDisablePortTolerance.
+
+                       The agent will only reduce speed on a port if
+                       auto-negotiation has been performed, and the 
+                       partners link abilities allow operation at a 
+                       slower media speed.
+
+                       The agent will periodically check relevant
+                       statistics for each port for each type of fault.
+                       If the speed reduction threshold has been exceeded,
+                       and speed reduction option is enabled for that
+                       fault type, an hpicfFaultFinderTrap notification 
+                       will be sent. In addition, an entry will be made 
+                       in the hpicfFfLogTable for the fault.
+
+                       The agent may elect not to reduce speed or
+                       delay speed reduction of certain ports.
+                       For example, it may choose to delay taking
+                       action on a cascade port to give the cascaded
+                       device a chance to correct the problem."
+           ::= { hpicfFfControlEntry 5 }
+
+
+       hpicfFfLogTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF HpicfFfLogEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "A log of fault warnings and ports disabled by
+                       the Fault Finder."
+           ::= { hpicfFaultFinder 2 }
+
+       hpicfFfLogEntry OBJECT-TYPE
+           SYNTAX      HpicfFfLogEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "An entry in the Fault Finder log, containing
+                       information about a single fault."
+           INDEX       { hpicfFfLogIndex }
+           ::= { hpicfFfLogTable 1 }
+
+       HpicfFfLogEntry ::=
+           SEQUENCE {
+               hpicfFfLogIndex                Integer32,
+               hpicfFfLogCreateTime           TimeStamp,
+               hpicfFfLogPhysEntity           PhysicalIndex,
+               hpicfFfLogFaultType            HpicfFaultType,
+               hpicfFfLogAction               HpicfFaultAction,
+               hpicfFfLogSeverity             INTEGER,
+               hpicfFfLogStatus               INTEGER,
+               hpicfFfLogPhysClass            PhysicalClass,
+               hpicfFfLogInfoType             INTEGER,
+               hpicfFfLogInfo                 OCTET STRING
+           }
+
+       hpicfFfLogIndex OBJECT-TYPE
+           SYNTAX      Integer32 (1..2147483647)
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "An arbitrary value which uniquely identifies
+                       this log entry.  The index for a particular log
+                       entry must not change, even though entries with
+                       lower valued indices have been deleted."
+           ::= { hpicfFfLogEntry 1 }
+
+       hpicfFfLogCreateTime OBJECT-TYPE
+           SYNTAX      TimeStamp
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "The value of sysUpTime when this log entry was
+                       added to the hpicfFfLogTable."
+           ::= { hpicfFfLogEntry 2 }
+
+       hpicfFfLogPhysEntity OBJECT-TYPE
+           SYNTAX      PhysicalIndex
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "The entPhysicalIndex of the device port or other
+                       physical component on which the fault was
+                       detected.  On agents which do not implement the
+                       Entity MIB, this will contain the ifIndex of the
+                       offending port."
+           ::= { hpicfFfLogEntry 3 }
+
+       hpicfFfLogFaultType OBJECT-TYPE
+           SYNTAX      HpicfFaultType
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "The type of fault which was detected on the
+                       physical entity indicated by
+                       hpicfFfLogPhysEntity."
+           ::= { hpicfFfLogEntry 4 }
+
+       hpicfFfLogAction OBJECT-TYPE
+           SYNTAX      HpicfFaultAction
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "The action, if any, that was taken by the agent
+                       when this fault was detected."
+           ::= { hpicfFfLogEntry 5 }
+
+       hpicfFfLogSeverity OBJECT-TYPE
+           SYNTAX      INTEGER {
+                           informational(1),
+                           medium(2),
+                           critical(3)
+                       }
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "The severity level of the fault.  Port disables
+                       will always be logged as 'critical'.
+
+                       An agent may need to remove faults from the fault
+                       log in order to reclaim resources.  If so, it
+                       must remove lower severity faults before removing
+                       higher severity faults.  Faults at the same
+                       severity level should be removed from oldest to
+                       newest."
+           ::= { hpicfFfLogEntry 6 }
+
+       hpicfFfLogStatus OBJECT-TYPE
+           SYNTAX      INTEGER {
+                           new(1),
+                           active(2),
+                           old(3)
+                       }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "Log entries will initially be created with the
+                       value 'new'.  A manager cannot set this object to
+                       'new'.  Setting this object to 'active' indicates
+                       that the fault has been displayed to a user.
+                       Setting this object to 'old' indicates that the
+                       agent should remove this fault from the log."
+           ::= { hpicfFfLogEntry 7 }
+
+       hpicfFfLogPhysClass OBJECT-TYPE
+           SYNTAX      PhysicalClass
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "The PhysicalClass as defined by Entity MIB to 
+	                which this hpicfFfLogPhysIndex belongs. " 
+           ::= { hpicfFfLogEntry 8 }
+
+       hpicfFfLogInfoType OBJECT-TYPE
+           SYNTAX      INTEGER {
+                          ipv4Address(1),
+			  displayString(2) 
+	               }
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "This field can be used to indicate the class of 
+	                information that 'hpicfFfLogInfo' holds" 
+           ::= { hpicfFfLogEntry 9 }
+
+       hpicfFfLogInfo  OBJECT-TYPE
+           SYNTAX      OCTET STRING (SIZE (0..255))
+           MAX-ACCESS  read-only
+           STATUS      current
+           DESCRIPTION "This can be used to hold any relevant information 
+	                about the current fault" 
+           ::= { hpicfFfLogEntry 10 }
+
+       hpicfFfFaultInfoURL OBJECT-TYPE
+           SYNTAX      HpicfUrlString
+           MAX-ACCESS  accessible-for-notify
+           STATUS      current
+           DESCRIPTION "A URL which a management station can use to
+                       access additional information about the fault
+                       which triggered the notification in which this
+                       object was sent."
+           ::= { hpicfFaultFinder 3 }
+
+       hpicfFfFaultLightStatus OBJECT-TYPE
+           SYNTAX      INTEGER {
+                           faultLightOff(1),
+                           faultLightOn(2)
+                       } 
+           MAX-ACCESS  read-only 
+           STATUS      current
+           DESCRIPTION "This indicates the current state of the
+                       switch fault light. Examples of faults
+                       that could cause the LED to be turned on include
+                       fan, power supply, and port link failures."
+           ::= { hpicfFaultFinder 4 }
+
+       hpicfFfBcastStormControlPortConfig OBJECT IDENTIFIER ::=
+                                  { hpicfFaultFinder 5 }
+   
+   
+       hpicfFfBcastStormControlPortConfigTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF HpicfFfBcastStormControlPortConfigEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This table provides information about Broadcast Storm 
+                       control configuration of all ports."
+           ::= { hpicfFfBcastStormControlPortConfig 1 }
+   
+       hpicfFfBcastStormControlPortConfigEntry OBJECT-TYPE
+           SYNTAX      HpicfFfBcastStormControlPortConfigEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This object provides information about Broadcast Storm 
+                       Control configuration of each port."
+           INDEX       { hpicfFfBcastStormControlPortIndex }
+           ::= { hpicfFfBcastStormControlPortConfigTable 1 }
+
+       HpicfFfBcastStormControlPortConfigEntry ::=
+           SEQUENCE {
+               hpicfFfBcastStormControlPortIndex             InterfaceIndex,
+               hpicfFfBcastStormControlMode                  INTEGER,
+               hpicfFfBcastStormControlRisingpercent         Integer32,
+               hpicfFfBcastStormControlRisingpps             Integer32,
+               hpicfFfBcastStormControlAction                INTEGER,
+               hpicfFfBcastStormControlPortDisableTimer      Unsigned32
+           }
+   
+       hpicfFfBcastStormControlPortIndex  OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "The ifIndex value which uniquely identifies a row in
+                       the Interfaces Table."
+           ::= { hpicfFfBcastStormControlPortConfigEntry 1 }
+   
+       hpicfFfBcastStormControlMode  OBJECT-TYPE
+       SYNTAX INTEGER {
+           disabled(1),
+           bcastRisingLevelpercent(2),
+           bcastRisingLevelpps(3)
+       }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "The Broadcast Storm Control mode of a port. 
+                        A value of disable (1) indicates that no rising
+                        threshold value is set for broadcast storm traffic on
+                        this port. A value of bcastRisingLevelpercent (2)
+                        indicates that the rising threshold rate for broadcast
+                        storm traffic is configured in percentage of port
+                        bandwidth. A value of bcastRisinglevelpps(3) indicates
+                        that the rising threshold rate for broadcast storm
+                        traffic is configured in packets per second." 
+           DEFVAL      { disabled }
+       ::= { hpicfFfBcastStormControlPortConfigEntry 2}
+   
+       hpicfFfBcastStormControlRisingpercent OBJECT-TYPE
+               SYNTAX      Integer32 (1..100)
+               MAX-ACCESS  read-write
+               STATUS      current
+               DESCRIPTION "This is the rising threshold Level
+                            in percent of bandwidth of the port.
+                            hpicfFfBcastStormControlAction occurs when
+                            broadcast traffic reaches this level."
+        ::= { hpicfFfBcastStormControlPortConfigEntry 3}
+       
+       hpicfFfBcastStormControlRisingpps OBJECT-TYPE
+            SYNTAX      Integer32 (1..10000000)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION "This object indicates the rising threshold for Broadcast 
+                        Storm Control. This value is in packets-per-second of 
+                        received broadcast traffic.
+                        hpicfFfBcastStormControlAction object takes action when
+                        broadcast traffic reaches this level."
+           ::= { hpicfFfBcastStormControlPortConfigEntry 4}
+   
+       hpicfFfBcastStormControlAction OBJECT-TYPE
+           SYNTAX INTEGER {
+               none(1),
+               warn(2),
+               warnAndDisable(3)
+           }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "This object defines the action taken by the switch  when
+                        a broadcast storm occurs on a port.
+                        A value of none (1) indicates that no action is performed.
+                        A value of warn (2) indicates that an event is logged when
+                        broadcast traffic crosses the threshold value set on that
+                        port. A value of warnAndDisable (3) indicates that the 
+                        port is disabled and an event is logged as soon as the 
+                        broadcast traffic reaches the threshold value set on that
+                        port."
+           DEFVAL      { none }
+           ::= { hpicfFfBcastStormControlPortConfigEntry 5}
+   
+       hpicfFfBcastStormControlPortDisableTimer OBJECT-TYPE
+            SYNTAX     Unsigned32 (0..604800)
+            UNITS      "seconds"
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION "This object specifies the time period for which the port
+                         remains in disabled state. A port is disabled when 
+                         broadcast traffic reaches the threshold value set on that
+                         port. This time period is specified in seconds. The 
+                         default value is zero which means that the port remains 
+                         disabled and is not enabled again."
+          DEFVAL      { 0 }
+          ::= { hpicfFfBcastStormControlPortConfigEntry 6 } 
+
+       hpicfFfLinkFlapControlPortConfig OBJECT IDENTIFIER ::=
+                                  { hpicfFaultFinder 6 }
+   
+   
+       hpicfFfLinkFlapControlPortConfigTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF HpicfFfLinkFlapControlPortConfigEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This table provides information about Link Flapping 
+                       control configuration of all ports."
+           ::= { hpicfFfLinkFlapControlPortConfig 1 }
+   
+       hpicfFfLinkFlapControlPortConfigEntry OBJECT-TYPE
+           SYNTAX      HpicfFfLinkFlapControlPortConfigEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This object provides information about Link Flapping 
+                       Control configuration of each port."
+           INDEX       { hpicfFfLinkFlapControlPortIndex }
+           ::= { hpicfFfLinkFlapControlPortConfigTable 1 }
+
+       HpicfFfLinkFlapControlPortConfigEntry ::=
+           SEQUENCE {
+               hpicfFfLinkFlapControlPortIndex             InterfaceIndex,
+               hpicfFfLinkFlapControlSensitivity           INTEGER,
+               hpicfFfLinkFlapControlAction                INTEGER,
+               hpicfFfLinkFlapControlPortDisableTimer      Unsigned32
+           }
+   
+       hpicfFfLinkFlapControlPortIndex  OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "The ifIndex value which uniquely identifies a row in
+                       the Interfaces Table."
+           ::= { hpicfFfLinkFlapControlPortConfigEntry 1 }
+   
+       hpicfFfLinkFlapControlSensitivity  OBJECT-TYPE
+       SYNTAX INTEGER {
+           none(0),
+           high(3),
+           medium(6),
+           low(10)
+       }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "The Link Flapping Control sensitivity of a port. A value 
+                        of low (1) indicates that the sensitivity of the link flap 
+                        threshold is set to 10 link flaps per 10 second interval.
+                        A value of medium (2) indicates that the sensitivity of the 
+                        link flap threshold is set to 6 link flaps per 10 second 
+                        interval. A value of high (3) indicates that the sensitivity 
+                        of the link flap threshold is set to 3 link flaps per 10 second 
+                        interval." 
+           DEFVAL      { none }
+       ::= { hpicfFfLinkFlapControlPortConfigEntry 2}
+   
+       hpicfFfLinkFlapControlAction OBJECT-TYPE
+           SYNTAX INTEGER {
+               none(1),
+               warn(2),
+               warnAndDisable(3)
+           }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "This object defines the action taken by the switch  when
+                        link flaps occurs on a port.
+                        A value of none (1) indicates that no action is performed.
+                        A value of warn (2) indicates that an event is logged when
+                        the number of link flaps crosses the threshold rate set on
+                        that port. A value of warnAndDisable (3) indicates that the 
+                        port is disabled and an event is logged as soon as the number 
+                        of link flaps reaches the threshold rate set on that port."
+           DEFVAL      { none }
+           ::= { hpicfFfLinkFlapControlPortConfigEntry 3}
+   
+       hpicfFfLinkFlapControlPortDisableTimer OBJECT-TYPE
+            SYNTAX     Unsigned32 (0..604800)
+            UNITS      "seconds"
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION "This object specifies the time period for which the port
+                         remains in disabled state. A port is disabled when 
+                         the number of link flaps reaches the threshold rate set 
+                         on that port. This time period is specified in seconds. The 
+                         default value is zero which means that the port remains 
+                         disabled and is not enabled again."
+          DEFVAL      { 0 }
+          ::= { hpicfFfLinkFlapControlPortConfigEntry 4 } 
+       
+       hpicfFfMcastStormPortConfig OBJECT IDENTIFIER ::=
+                                          { hpicfFaultFinder 7 }
+
+       hpicfFfMcastStormPortConfigTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF HpicfFfMcastStormPortConfigEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This table provides information about Multicast Storm 
+                        Control configuration of all ports."
+           ::= { hpicfFfMcastStormPortConfig 1 }
+   
+       hpicfFfMcastStormPortConfigEntry OBJECT-TYPE
+           SYNTAX      HpicfFfMcastStormPortConfigEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This object provides information about Multicast Storm 
+                       Control configuration of each port."
+           INDEX       { hpicfFfMcastStormPortIndex }
+           ::= { hpicfFfMcastStormPortConfigTable 1 }
+
+       HpicfFfMcastStormPortConfigEntry ::=
+           SEQUENCE {
+               hpicfFfMcastStormPortIndex           InterfaceIndex,
+               hpicfFfMcastStormMode                INTEGER,
+               hpicfFfMcastStormRisingpercent       Integer32,
+               hpicfFfMcastStormRisingpps           Integer32,
+               hpicfFfMcastStormAction              INTEGER,
+               hpicfFfMcastStormPortDisablTimer     Unsigned32                    
+           }
+      
+        hpicfFfMcastStormPortIndex  OBJECT-TYPE
+           SYNTAX      InterfaceIndex
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "The ifIndex value which uniquely identifies a row in
+                       the Interfaces Table."
+           ::= { hpicfFfMcastStormPortConfigEntry 1 }
+   
+       hpicfFfMcastStormMode  OBJECT-TYPE
+           SYNTAX INTEGER {
+                 disabled(1),
+                 mcastRisingLevelpercent(2),
+                 mcastRisingLevelpps(3)
+           }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "The Mroadcast Storm Control mode of a port. 
+                        A value of disable (1) indicates that no rising
+                        threshold value is set for multicast storm traffic on
+                        this port. A value of mcastRisingLevelpercent (2)
+                        indicates that the rising threshold rate for multicast
+                        storm traffic is configured in percentage of port
+                        bandwidth. A value of mcastRisinglevelpps(3) indicates
+                        that the rising threshold rate for multicast storm
+                        traffic is configured in packets per second." 
+           DEFVAL      { disabled }
+       ::= { hpicfFfMcastStormPortConfigEntry 2}
+   
+       hpicfFfMcastStormRisingpercent OBJECT-TYPE
+            SYNTAX      Integer32 (1..100)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION "This is the rising threshold Level
+                         in percent of bandwidth of the port.
+                         hpicfFfMcastStormControlAction occurs when
+                         multicast traffic reaches this level."
+        ::= { hpicfFfMcastStormPortConfigEntry 3}
+       
+       hpicfFfMcastStormRisingpps OBJECT-TYPE
+            SYNTAX      Integer32 (1..10000000)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION "This object indicates the rising threshold for Multicast 
+                        Storm Control. This value is in packets-per-second of 
+                        received multicast traffic.
+                        hpicfFfMcastStormControlAction object takes action when
+                        multicast traffic reaches this level."
+           ::= { hpicfFfMcastStormPortConfigEntry 4}
+   
+       hpicfFfMcastStormAction OBJECT-TYPE
+           SYNTAX INTEGER {
+               none(1),
+               warn(2),
+               warnAndDisable(3)
+           }
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION "This object defines the action taken by the switch  when
+                        a multicast storm occurs on a port.
+                        A value of none (1) indicates that no action is performed.
+                        A value of warn (2) indicates that an event is logged when
+                        multicast traffic crosses the threshold value set on that
+                        port. A value of warnAndDisable (3) indicates that the 
+                        port is disabled and an event is logged as soon as the 
+                        multicast traffic reaches the threshold value set on that
+                        port."
+           DEFVAL      { none }
+           ::= { hpicfFfMcastStormPortConfigEntry 5}
+   
+       hpicfFfMcastStormPortDisablTimer OBJECT-TYPE
+            SYNTAX     Unsigned32 (0..604800)
+            UNITS      "seconds"
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION "This object specifies the time period for which the port
+                         remains in disabled state. A port is disabled when 
+                         multicast traffic reaches the threshold value set on that
+                         port. This time period is specified in seconds. The 
+                         default value is zero which means that the port remains 
+                         disabled and is not enabled again."
+          DEFVAL      { 0 }
+          ::= { hpicfFfMcastStormPortConfigEntry 6 } 
+   
+
+       hpicfFaultFinderTrap NOTIFICATION-TYPE
+           OBJECTS     { hpicfFfLogFaultType,
+                         hpicfFfLogAction,
+                         hpicfFfLogSeverity,
+                         hpicfFfFaultInfoURL,
+                         hpicfFfLogPhysEntity
+                       }
+           STATUS      current
+           DESCRIPTION "This notification is sent whenever the Fault
+                       Finder creates an entry in the hpicfFfLogTable."
+           ::= { hpicfCommonTrapsPrefix 5 }
+
+       hpicfFaultFinderConformance
+           OBJECT IDENTIFIER ::= { hpicfFaultFinderMib 1 }
+
+       hpicfFaultFinderCompliances
+           OBJECT IDENTIFIER ::= { hpicfFaultFinderConformance 1 }
+       hpicfFaultFinderGroups
+           OBJECT IDENTIFIER ::= { hpicfFaultFinderConformance 2 }
+
+       hpicfFaultFinderCompliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION "The compliance statement for devices
+                       implementing the HP Fault Finder capability."
+           MODULE
+               MANDATORY-GROUPS { hpicfFaultConfigGroup,
+                                  hpicfFaultLogGroup,
+                                  hpicfFaultNotifyGroup }
+
+               OBJECT      hpicfFfAction
+               DESCRIPTION "Support for 'warnAndDisable' is not required
+                           on devices that do not support the optional
+                           port disable capability."
+
+               OBJECT      hpicfFfDisablePortTolerance
+               MIN-ACCESS  read-only
+               DESCRIPTION "Write access to this object is not required
+                           on devices that do not support the optional
+                           port disable capability."
+
+           ::= { hpicfFaultFinderCompliances 1 }
+
+       hpicfFaultFinder2Compliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION "The compliance statement for devices
+                       implementing the HP Fault Finder capability."
+           MODULE
+               MANDATORY-GROUPS { hpicfFaultConfig2Group,
+                                  hpicfFaultLogGroup,
+                                  hpicfFaultNotifyGroup }
+
+               OBJECT      hpicfFfAction
+               DESCRIPTION "Support for 'warnAndDisable' is not required
+                           on devices that do not support the optional
+                           port disable capability."
+
+               OBJECT      hpicfFfDisablePortTolerance
+               MIN-ACCESS  read-only
+               DESCRIPTION "Write access to this object is not required
+                           on devices that do not support the optional
+                           port disable capability."
+
+               OBJECT      hpicfFfSpeedReduceTolerance
+               MIN-ACCESS  read-only
+               DESCRIPTION "Write access to this object is not required
+                           on devices that do not support the optional
+                           speed reduction capability."
+
+           ::= { hpicfFaultFinderCompliances 2 }
+
+       hpicfFaultStatusCompliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION "The compliance statement for devices
+                       implementing the switch fault status."
+           MODULE
+               MANDATORY-GROUPS { hpicfFaultStatusGroup }
+           ::= { hpicfFaultFinderCompliances 3 }
+
+       hpicfFaultFinder3Compliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION "The compliance statement for devices
+                       implementing the HP Fault Finder capability."
+           MODULE
+               MANDATORY-GROUPS {  hpicfFaultConfig3Group }
+
+           ::= { hpicfFaultFinderCompliances 4 }           
+
+       hpicfFaultFinder4Compliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION "The compliance statement for devices
+                       implementing the HP Fault Finder capability."
+           MODULE
+               MANDATORY-GROUPS {  hpicfFaultConfig4Group }
+
+           ::= { hpicfFaultFinderCompliances 5 } 
+
+       hpicfFaultFinder5Compliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION "The compliance statement for devices
+                       implementing the HP Fault Finder capability."
+           MODULE
+               MANDATORY-GROUPS {  hpicfFaultConfig5Group }
+
+           ::= { hpicfFaultFinderCompliances 6 } 
+
+       hpicfFaultConfigGroup OBJECT-GROUP
+           OBJECTS     { hpicfFfAction,
+                         hpicfFfWarnTolerance,
+                         hpicfFfDisablePortTolerance
+                       }
+           STATUS      current
+           DESCRIPTION "A collection of objects for configuring the
+                       Fault Finder feature."
+           ::= { hpicfFaultFinderGroups 1 }
+
+       hpicfFaultLogGroup OBJECT-GROUP
+           OBJECTS     { hpicfFfLogCreateTime,
+                         hpicfFfLogPhysEntity,
+                         hpicfFfLogFaultType,
+                         hpicfFfLogAction,
+                         hpicfFfLogSeverity,
+                         hpicfFfLogStatus,
+                         hpicfFfFaultInfoURL,
+                         hpicfFfLogPhysClass,
+                         hpicfFfLogInfoType,
+                         hpicfFfLogInfo
+                       }
+           STATUS      current
+           DESCRIPTION "A collection of objects for accessing the log of
+                       discovered faults."
+           ::= { hpicfFaultFinderGroups 2 }
+
+       hpicfFaultNotifyGroup NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfFaultFinderTrap }
+           STATUS      current
+           DESCRIPTION "A collection of notifications used to indicate
+                       the discovery of a network fault."
+           ::= { hpicfFaultFinderGroups 3 }
+
+       hpicfFaultConfig2Group OBJECT-GROUP
+           OBJECTS     { hpicfFfAction,
+                         hpicfFfWarnTolerance,
+                         hpicfFfDisablePortTolerance,
+                         hpicfFfSpeedReduceTolerance
+                       }
+           STATUS      current
+           DESCRIPTION "A collection of objects for configuring the
+                       Fault Finder feature, including the ability
+                       to reduce a port's media speed in the event
+                       of a fault."
+           ::= { hpicfFaultFinderGroups 4 }
+
+       hpicfFaultStatusGroup OBJECT-GROUP
+           OBJECTS     { hpicfFfFaultLightStatus }
+           STATUS      current
+           DESCRIPTION "A collection of objects used to indicate
+                       fault status."
+           ::= { hpicfFaultFinderGroups 5 }
+
+       hpicfFaultConfig3Group OBJECT-GROUP
+           OBJECTS     { hpicfFfBcastStormControlMode,
+                         hpicfFfBcastStormControlRisingpercent,
+                         hpicfFfBcastStormControlRisingpps,
+                         hpicfFfBcastStormControlAction,
+                         hpicfFfBcastStormControlPortDisableTimer 
+                       }
+           STATUS      current
+           DESCRIPTION "A collection of objects for configuring the
+                       Fault Finder broadcast storm feature on a per
+                       per port basis, including the ability
+                       to disable a port in the  event of a fault."
+           ::= { hpicfFaultFinderGroups 6 }
+
+       hpicfFaultConfig4Group OBJECT-GROUP
+           OBJECTS     { hpicfFfLinkFlapControlSensitivity,
+                         hpicfFfLinkFlapControlAction,
+                         hpicfFfLinkFlapControlPortDisableTimer 
+                       }
+           STATUS      current
+           DESCRIPTION "A collection of objects for configuring the
+                       Fault Finder Link Flap feature on a per
+                       per port basis, including the ability
+                       to disable a port in the  event of a fault."
+           ::= { hpicfFaultFinderGroups 7 }
+
+       hpicfFaultConfig5Group OBJECT-GROUP
+           OBJECTS     { hpicfFfMcastStormMode,
+                         hpicfFfMcastStormRisingpercent,
+                         hpicfFfMcastStormRisingpps,
+                         hpicfFfMcastStormAction,
+                         hpicfFfMcastStormPortDisablTimer 
+                       }
+           STATUS      current
+           DESCRIPTION "A collection of objects for configuring the
+                       Fault Finder multicast storm feature on a per
+                       per port basis, including the ability
+                       to disable a port in the event of a fault."
+           ::= { hpicfFaultFinderGroups 8 }
+       END
+       

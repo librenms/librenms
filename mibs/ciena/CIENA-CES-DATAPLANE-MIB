@@ -1,0 +1,11581 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+
+
+ -- CIENA-CES-DATAPLANE-MIB.my
+
+
+ --
+
+
+ --
+
+
+
+
+
+  CIENA-CES-DATAPLANE-MIB DEFINITIONS ::= BEGIN               
+
+
+                                                              
+
+
+ IMPORTS 		                                   
+
+
+   Integer32, Unsigned32, IpAddress, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY			
+
+
+	FROM SNMPv2-SMI			
+
+
+   DisplayString, MacAddress, TEXTUAL-CONVENTION, TruthValue			
+
+
+	FROM SNMPv2-TC
+
+
+    cienaGlobalSeverity, cienaGlobalMacAddress
+
+
+   		FROM CIENA-GLOBAL-MIB
+
+
+   CienaGlobalState
+
+
+   		FROM CIENA-TC
+
+
+   cienaCesNotifications, cienaCesConfig
+
+
+        FROM CIENA-SMI
+
+  cienaCesPortPgIdMappingNotifChassisIndex, cienaCesPortPgIdMappingNotifShelfIndex, cienaCesPortPgIdMappingNotifSlotIndex,
+
+  cienaCesPortPgIdMappingNotifPortNumber, cienaCesLogicalPortConfigPortName
+
+        FROM CIENA-CES-PORT-MIB;
+
+
+
+
+	
+
+
+ cienaCesDataplaneMIB MODULE-IDENTITY
+
+            LAST-UPDATED "201706070000Z"
+            ORGANIZATION "Ciena Corp."
+            CONTACT-INFO
+            "   Mib Meister
+                7035 Ridge Road
+                Hanover, Maryland 21076
+                USA
+                Phone:  +1 800 921 1144
+                Email:  support@ciena.com"   
+
+
+            DESCRIPTION
+
+
+                        "This MIB module is the Dataplane Management for CN5410."
+            REVISION 
+                        "201706070000Z"
+            DESCRIPTION 
+                        "Updated contact info."
+            REVISION
+                        "201704110000Z"
+            DESCRIPTION
+                        "Added the following traps:
+                            cienaCesDpTsMeterFloodContainerTotalThresholdExceeded
+                            cienaCesDpTsMeterFloodContainerTotalThresholdNormal
+                         Added the following objects:
+                            cienaCesDpTsMeterFloodContainerAttachmentTotalRateState"
+            REVISION
+                        "201603060000Z"
+            DESCRIPTION
+                        "Added cienaCesDpPortShapingSubscriptionExceedsOperSpeed and  cienaCesDpPortShapingSubscriptionWithinOperSpeed traps"
+            REVISION
+                        "201511030000Z"
+            DESCRIPTION
+                        "Added Queue-Group-Instance identifer for Sub Port"
+            REVISION
+                        "201510270000Z"
+            DESCRIPTION
+                        "Added l2pt mac translation attribute for Access Flow"
+            REVISION
+                        "201510100000Z"
+            DESCRIPTION
+                        "Updated name of cir to controlPlaneUsedCir in Scheduler Instance"
+            REVISION
+                        "201509220000Z"
+            DESCRIPTION
+                        "Converted cirWeight to cirPercent and added eirPercent"
+            REVISION
+                        "201508210000Z"
+            DESCRIPTION
+                        "Added tap-point attribute to scheduler-instance.
+                         Added cir-policy, eir-policy, cirWeight to scheduler-profile
+                         Added cirWeight to queues of queue-group-profile
+                         Added cir to scheduler-instance"
+            REVISION
+                        "201506250000Z"
+            DESCRIPTION
+                        "Added object - cienaCesDpSubPortEgressGeneratorMac for generator MAC address of the egress reflector"
+            REVISION
+                        "201505080000Z"
+            DESCRIPTION
+                        "Adding variable for learn limit in virtual-switch Rlan table as cienaCesDpVirtualSwitchRlanLearnLimit."
+            REVISION
+                        "201408280000Z"
+            DESCRIPTION
+                        "Added root-scheduler shaper overspeed attribute"
+            REVISION
+                        "201406030000Z"
+            DESCRIPTION
+                        "Adjusted range for cienaCesDpVirtualSwitchRlanIndex object to allow value 0."
+
+            REVISION
+                        "201404140000Z"
+            DESCRIPTION
+                        "Defined cienaCesDpTsMeterProfileColorMode at cienaCesDpTsMeterProfileEntry 7.
+                         Defined cienaCesDpTsQCAProfileWREDMaxQueueSize at cienaCesDpTsQCAProfileWREDEntry 4.
+                         Defined cienaCesDpTsQCAProfileWREDMinQueueGuarantee at cienaCesDpTsQCAProfileWREDEntry 5.
+                         Defined enumeration l2Rcos(26) under cienaCesDpTrafficClassTermPresentType."
+            REVISION
+                        "201402070000Z"
+            DESCRIPTION
+		   	"Add new shaper-compensation for Queue-Group-Profile"
+            REVISION
+                        "201309130000Z"
+            DESCRIPTION
+		   	"Add new rcosPolicy for Dscp+Mpls-TC, add new l4-application traffic-class-term"
+            REVISION
+                        "201309040000Z"
+            DESCRIPTION
+		   	"Add missing liAttach Types"
+            REVISION
+                        "201308120000Z"
+            DESCRIPTION
+		   	"New L2-CFT Profile table added. Also reference to L2-CFT profile table entry from VS-table.
+                         Also new per-L2-CFT-Profile L2-CFT-Protocol table added which is analaguous to old per-VS L2-CFT Protocol table"
+
+            REVISION
+
+                        "201308070000Z"
+
+            DESCRIPTION
+
+		   	"Fixed MIB errors"
+
+            REVISION
+
+
+                        "201308060000Z"
+
+
+
+
+
+            DESCRIPTION
+
+		   	"New PFG Profile table added. Also reference to PFG profile table entry from VS-table."
+
+            REVISION
+
+
+                        "201307260000Z"
+
+
+
+
+
+            DESCRIPTION
+
+
+		   	"New MEF Coupling Flag object added to cienaCesDpTsMeterProfile."
+
+
+            REVISION
+
+
+                        "201307250000Z"
+
+
+            DESCRIPTION
+
+
+		   		 "New objects are added to cienaCesDpTsMeterFloodContainerNotifAttrs. New tables are added
+
+
+		   		  for traffic services namely cienaCesDpTsMeterProfile,cienaCesDpTsCosMapRcos, cienaCesDpTsCosMapFcos,
+
+
+		   		  cienaCesDpTsShaperProfile, cienaCesDpTsQCongestionAvoidanceProfile,cienaCesDpTsQRCOSQMap,
+
+
+		   		  cienaCesDpTsQGroupProfile,cienaCesDpTsQGroupInstance, cienaCesDpTsQSchedulerProfile and 
+
+
+		   		  cienaCesDpTsQSchedulerInstance under. cienaCesDpSubPort, cienaCesDpVirtualSwitch,
+
+
+		   		  cienaCesDpTrafficClassTerm,cienaCesDpQosFlow, cienaCesDpAccessFlow ,cienaCesDpPbtTransit
+
+
+		   		  and cienaCesDpCpuSubInterface are added as new nodes under cienaCesDpMIBObjects."
+
+
+		   		  
+
+
+		    REVISION    "201101060000Z"
+
+
+            DESCRIPTION
+
+
+		       "Initial creation."
+
+
+	    ::= { cienaCesConfig 7 }
+
+
+
+
+
+
+
+
+ --
+
+
+ -- Node Definitions
+
+
+ --
+
+
+ cienaCesDpMIBObjects OBJECT IDENTIFIER ::= { cienaCesDataplaneMIB 1 } 
+
+
+
+
+
+ --
+
+
+ -- Traffic Services
+
+
+ --
+
+
+ 
+
+
+ --Flood container
+
+
+ cienaCesDpTsMeterFloodContainerNotifAttrs      OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 1}
+
+
+ 
+
+
+ --Metering
+
+
+ cienaCesDpTsMeter		      					OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 2}
+
+
+ cienaCesDpTsMeterProfile                       OBJECT IDENTIFIER ::= {cienaCesDpTsMeter 1}
+
+
+ 
+
+
+ --Cos Map  
+
+
+ cienaCesDpTsCosMap                             OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 3}
+
+
+ cienaCesDpTsCosMapRcos               			OBJECT IDENTIFIER ::= {cienaCesDpTsCosMap 1}
+
+
+ cienaCesDpTsCosMapFcos               			OBJECT IDENTIFIER ::= {cienaCesDpTsCosMap 2}
+
+
+  
+
+
+ --Shaper
+
+
+ cienaCesDpTsShaper                   			OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 4}
+
+
+ cienaCesDpTsShaperProfile                      OBJECT IDENTIFIER ::= {cienaCesDpTsShaper 1}
+
+
+ 
+
+
+ --Queue
+
+
+ cienaCesDpTsQ                       			OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 5}
+
+
+ cienaCesDpTsQCongestionAvoidanceProfile 		OBJECT IDENTIFIER ::= {cienaCesDpTsQ 1}
+
+
+ cienaCesDpTsQRCOSQMap                			OBJECT IDENTIFIER ::= {cienaCesDpTsQ 2}
+
+
+ cienaCesDpTsQGroupProfile           			OBJECT IDENTIFIER ::= {cienaCesDpTsQ 3}
+
+
+ cienaCesDpTsQGroupInstance         			OBJECT IDENTIFIER ::= {cienaCesDpTsQ 4}
+
+
+ cienaCesDpTsQSchedulerProfile       			OBJECT IDENTIFIER ::= {cienaCesDpTsQ 5}
+
+
+ cienaCesDpTsQSchedulerInstance       			OBJECT IDENTIFIER ::= {cienaCesDpTsQ 6}
+
+
+ 
+
+
+ --
+
+
+ -- Traffic Class Term
+
+
+ --
+
+
+ cienaCesDpTrafficClassTerm        				OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 6}
+
+
+
+
+
+ --
+
+
+ -- Sub Port
+
+
+ --
+
+
+ cienaCesDpSubPort                				OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 7}     
+
+
+ 
+
+
+ --
+
+
+ -- Virtual Switch
+
+
+ --
+
+
+ cienaCesDpVirtualSwitch           				OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 8}
+
+
+ 
+
+
+  -- 
+
+
+ -- QoS Flow
+
+
+ --
+
+
+ cienaCesDpQosFlow                 				OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 9}
+
+
+ -- 
+
+
+ -- Access Flow
+
+
+ --
+
+
+ cienaCesDpAccessFlow             				OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 10}
+
+
+ 
+
+
+ -- 
+
+
+ -- PBT Transit
+
+
+ --
+
+
+ cienaCesDpPbtTransit              				OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 11}
+
+
+ 
+
+
+ --
+
+
+ -- CPU Sub-Interface 
+
+
+ --                 
+
+
+ cienaCesDpCpuSubInterface 						OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 12}
+
+
+--
+
+-- PFG Profiles
+
+--
+
+cienaCesDpPfgProfile           				OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 13}
+
+
+--
+-- L2-CFT Profiles
+--
+cienaCesDpL2CftProfile                                  OBJECT IDENTIFIER ::= {cienaCesDpMIBObjects 14}
+
+ --
+
+
+ -- Notifications 
+
+
+ --
+
+
+
+
+
+ cienaCesDpMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 7 }
+
+
+ cienaCesDpMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesDpMIBNotificationPrefix 0 } 
+
+
+
+
+
+ --
+
+
+ -- Textual convention
+
+
+ --
+
+
+ DpTsAttachType ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION  "Logical Interface Attachment Types."
+     SYNTAX       INTEGER {
+                    port(1),
+                    tunnelEncapPbt(2),
+                    tunnelDecapPbt(3),
+                    tunnelGroupPbt(4),
+                    transitPbt(5), 
+                    tunnelEncapMpls(6),
+                    tunnelDecapMpls(7),
+                    tunnelGroupMpls(8),
+                    transitMpls(9),
+                    subPort(10),
+                    qosFlow(11),
+                    accessFlow(12),
+                    servicePbt(13),
+                    servicePbb(14),
+                    vcMpls(15),
+                    serviceMplsMesh(16),
+                    cpuInterface(17),
+                    cpuSubInterface(18),
+                    ettp(19),
+                    lspEncapMpls(20),
+                    lspDecapMpls(21),
+                    l3Interface(22),
+                    l3Adjacency(23),
+                    unknown(99)
+                  }
+
+
+  PrivateForwardGroupPolicy ::= TEXTUAL-CONVENTION
+
+
+     STATUS       current
+
+
+     DESCRIPTION  "Private Forward Group Policies."
+
+
+     SYNTAX       INTEGER {
+
+
+                        talkToA(1),
+
+
+                        talkToB(2),
+
+
+                        talkToC(3),
+
+
+                        talkToAB(4),
+
+
+                        talkToAC(5),
+
+
+                        talkToBC(6),
+
+
+                        talkToABC(7)
+
+
+                    }
+
+
+ 
+
+
+  DpCouplingFlag ::= TEXTUAL-CONVENTION
+
+
+     STATUS       current
+
+
+     DESCRIPTION  "Coupling Flag."
+
+
+     SYNTAX       INTEGER {
+
+
+                                off(0),
+
+
+                                on(1)
+
+
+                          }
+
+
+ 
+
+
+  DpIngressMeterPolicy ::= TEXTUAL-CONVENTION
+
+
+ 	STATUS current
+
+
+ 	DESCRIPTION "Ingress Metering Policy."
+
+
+ 	SYNTAX INTEGER {
+
+
+ 					nonhierarchical(1),
+
+
+ 					hierarchical(2)
+
+
+ 				}
+
+
+  
+
+
+  DpSchedulingType  ::= TEXTUAL-CONVENTION
+
+
+     STATUS       current
+
+
+     DESCRIPTION  "Scheduling types."
+
+
+     SYNTAX       INTEGER {   
+
+
+     				strict(1),
+
+
+     				mdrr(2)
+
+
+     			  }
+
+
+
+
+
+ --
+
+
+ -- Dataplane Traffic Services Flood Container Profile table
+
+
+ --
+
+
+  
+
+
+ cienaCesDpTsMeterFloodContainerProfileTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsMeterFloodContainerProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of flood containment configuration profiles."
+
+
+     ::= { cienaCesDpTsMeterFloodContainerNotifAttrs 1 }
+
+
+ 		
+
+
+ cienaCesDpTsMeterFloodContainerProfileEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsMeterFloodContainerProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Flood containment entry in the flood container profile table.
+
+
+	      Flood traffic is caused when the ingress frame is one of the 
+
+
+	      three types - unknown unicast frame, broadcast frame 
+
+
+	      or unknown multicast frame.Using the flood containment feature
+
+
+	      the flood causing ingress traffic can be contained to configured
+
+
+	      rates. Flood causing traffic is traffic that ingresses a 
+
+
+	      virtual switch and egresses multiple logical interfaces attached 
+
+
+	      to the virtual switch (but not the logical interface that the 
+
+
+	      traffic ingresses on)."
+
+
+     INDEX { cienaCesDpTsMeterFloodContainerProfileIndex}
+
+
+     ::= { cienaCesDpTsMeterFloodContainerProfileTable 1 } 
+
+
+
+
+
+ CienaCesDpTsMeterFloodContainerProfileEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsMeterFloodContainerProfileIndex                      INTEGER,
+
+
+     cienaCesDpTsMeterFloodContainerProfileName                       DisplayString,
+
+
+     cienaCesDpTsMeterFloodContainerNotifProfileIndex                 INTEGER,
+
+
+     cienaCesDpTsMeterFloodContainerProfileRate1                      Unsigned32,
+
+
+     cienaCesDpTsMeterFloodContainerProfileRate2                      Unsigned32,
+
+
+     cienaCesDpTsMeterFloodContainerProfileRate3                      Unsigned32,
+
+
+     cienaCesDpTsMeterFloodContainerProfileUnknownUnicastRateId       INTEGER,
+
+
+     cienaCesDpTsMeterFloodContainerProfileL2BroadcastRateId          INTEGER,
+
+
+     cienaCesDpTsMeterFloodContainerProfileL2UnknownMulticastRateId   INTEGER
+
+
+
+
+
+    }
+
+
+ cienaCesDpTsMeterFloodContainerProfileIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object is a unique index into the table."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 1 }
+
+
+ 
+
+
+ cienaCesDpTsMeterFloodContainerProfileName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique profile name for the meter flood container."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 2 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerNotifProfileIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    accessible-for-notify
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table used in the trap definition."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 3 }
+
+
+ 
+
+
+ cienaCesDpTsMeterFloodContainerProfileRate1 OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS		 	"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the rate limit for 'Containment Rate 1'."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 4 }
+
+
+ 
+
+
+ cienaCesDpTsMeterFloodContainerProfileRate2 OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS		 	"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the rate limit for 'Containment Rate 2'."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 5 }
+
+
+ 
+
+
+ cienaCesDpTsMeterFloodContainerProfileRate3 OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS		 	"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the rate limit for 'Containment Rate 3'."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 6 }
+
+
+ 
+
+
+ cienaCesDpTsMeterFloodContainerProfileUnknownUnicastRateId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER {
+
+
+                       noLimit(1),
+
+
+                       rateId1(2),
+
+
+                       rateId2(3),
+
+
+                       rateId3(4)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the RateId to use for the unknown unicast
+
+
+           traffic. Traffic is allowed untouched upto this RateId (Rate1,
+
+
+           Rate2 or Rate3) and dropped when exceeded."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 7 }
+
+
+ 
+
+
+ cienaCesDpTsMeterFloodContainerProfileL2BroadcastRateId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER {
+
+
+                       noLimit(1),
+
+
+                       rateId1(2),
+
+
+                       rateId2(3),
+
+
+                       rateId3(4)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the RateId to use for the L2 broadcast
+
+
+           traffic.Traffic is allowed untouched upto this RateId (Rate1,
+
+
+           Rate2 or Rate3) and dropped when exceeded."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 8 }
+
+
+ 
+
+
+ cienaCesDpTsMeterFloodContainerProfileL2UnknownMulticastRateId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER {
+
+
+                       noLimit(1),
+
+
+                       rateId1(2),
+
+
+                       rateId2(3),
+
+
+                       rateId3(4)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the RateId to use for the unknown 
+
+
+	       L2 multicast traffic. Traffic is allowed untouched upto
+
+
+	       this RateId (Rate1, Rate2 or Rate3) and dropped when exceeded."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerProfileEntry 9 }
+
+
+ 
+
+
+ 
+
+
+--
+
+
+-- Flood Container Attachment
+
+
+-- 
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsMeterFloodContainerAttachmentEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of flood container attachments."
+
+
+     ::= { cienaCesDpTsMeterFloodContainerNotifAttrs 2 }
+
+
+ 		
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsMeterFloodContainerAttachmentEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Flood containment entry in the flood container attachment table.
+
+
+	     This object is populated as soon as the flood container profile is 
+
+
+	     attached to a logical interface."
+
+
+     INDEX { cienaCesDpTsMeterFloodContainerProfileIndex, 
+
+
+             cienaCesDpTsMeterFloodContainerAttachmentLiType,
+
+
+             cienaCesDpTsMeterFloodContainerAttachmentLiIndex }
+
+
+     ::= { cienaCesDpTsMeterFloodContainerAttachmentTable 1 } 
+
+
+
+
+
+ CienaCesDpTsMeterFloodContainerAttachmentEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentLiType             DpTsAttachType,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentLiIndex            INTEGER,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentInterfaceName      DisplayString,
+
+
+     cienaCesDpTsMeterFloodContainerNotifAttachmentLiType        DpTsAttachType,
+
+
+     cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex       INTEGER,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentUcastRateState     CienaGlobalState,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentL2BcastRateState   CienaGlobalState,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentL2McastRateState   CienaGlobalState,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentTotalBandwidth     Unsigned32,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentUsedBandwidth      Unsigned32,
+
+
+     cienaCesDpTsMeterFloodContainerAttachmentTotalRateState     CienaGlobalState
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentLiType OBJECT-TYPE
+
+
+      SYNTAX        DpTsAttachType
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the logical interface type with which this
+
+
+	       flood container is associated."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 1 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  (0..16777215) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the index of the logical interface with which this
+
+	       flood container is associated. The type of the interface is 
+
+
+	       identified by the object cienaCesDpTsMeterFloodContainerAttachmentLiType. "
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 2 }
+
+
+
+
+
+  cienaCesDpTsMeterFloodContainerAttachmentInterfaceName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the logical interface with which this
+
+
+	       flood container is associated. The type of the interface is
+
+	       identified by the object cienaCesDpTsMeterFloodContainerAttachmentLiType."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 3 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerNotifAttachmentLiType OBJECT-TYPE
+
+
+      SYNTAX        DpTsAttachType
+
+
+      MAX-ACCESS    accessible-for-notify
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the logical interface type with which this
+
+
+	       flood container is associated. This object is used in
+
+	       the trap definitions."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 4 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    accessible-for-notify
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the index of the logical interface with which this
+
+
+	       flood container is associated. The type of the interface is 
+
+
+	       identified by the object cienaCesDpTsMeterFloodContainerNotifAttachmentLiType.
+
+
+	       This object is used in the trap definitions."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 5 }
+
+
+ 
+
+
+  cienaCesDpTsMeterFloodContainerAttachmentUcastRateState OBJECT-TYPE
+
+
+      SYNTAX        CienaGlobalState
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the current containment state of the  
+
+
+	      unknown unicast traffic for this flood container instance."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 6 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentL2BcastRateState OBJECT-TYPE
+
+
+      SYNTAX        CienaGlobalState
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the current containment state of the 
+
+
+	      layer 2 broadcast traffic for this flood container instance."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 7 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentL2McastRateState OBJECT-TYPE
+
+
+      SYNTAX        CienaGlobalState
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the current containment state of the 
+
+
+	      unknown layer 2 multicast traffic for this flood container instance."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 8 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentTotalBandwidth OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the total bandwidth allocated for this
+
+
+           flood container instance."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 9 }
+
+
+
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentUsedBandwidth OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the total bandwidth in use by the 
+
+
+	       child objects of the logical interface associated with this 
+
+
+	       flood container. "
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 10 }
+
+
+ cienaCesDpTsMeterFloodContainerAttachmentTotalRateState OBJECT-TYPE
+
+
+      SYNTAX        CienaGlobalState
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the current containment state of all 
+
+
+	      received traffic for this flood container instance."
+
+
+      ::= { cienaCesDpTsMeterFloodContainerAttachmentEntry 11 }
+
+
+
+
+
+ --
+
+
+ -- Dataplane Traffic Services Metering Profile table
+
+
+ --
+
+
+  
+
+
+ cienaCesDpTsMeterProfileTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsMeterProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of meter profiles."
+
+
+     ::= { cienaCesDpTsMeterProfile 1 }
+
+
+ 		
+
+
+ cienaCesDpTsMeterProfileEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsMeterProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Meter Profile entry in the meter profile table. Metering is 
+
+
+	      implemented using a dual leaky bucket mechanism. Conceptually,  
+
+
+	      this can be viewed as a green token bucket which can hold a
+
+
+	      maximum of CBS tokens and a yellow token bucket which can hold
+
+
+	      a maximum of EBS tokens. The CIR determines the rate at which the
+
+
+	      green token bucket is refilled and the EIR determines the rate at 
+
+
+	      which the yellow token bucket is refilled (regardless of CBS and EBS)."
+
+
+     INDEX { cienaCesDpTsMeterProfileIndex }
+
+
+     ::= { cienaCesDpTsMeterProfileTable 1 } 
+
+
+
+
+
+ CienaCesDpTsMeterProfileEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsMeterProfileIndex           INTEGER,
+
+
+     cienaCesDpTsMeterProfileName            DisplayString,
+
+
+     cienaCesDpTsMeterProfileCIR             Unsigned32,
+
+
+     cienaCesDpTsMeterProfileCBS             Unsigned32,
+
+
+     cienaCesDpTsMeterProfileEIR             Unsigned32,
+
+
+     cienaCesDpTsMeterProfileEBS             Unsigned32,
+     cienaCesDpTsMeterProfileColorMode       INTEGER,
+     cienaCesDpTsMeterProfileCouplingFlag    DpCouplingFlag
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsMeterProfileIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpTsMeterProfileEntry 1 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique name for the meter profile."
+
+
+      ::= { cienaCesDpTsMeterProfileEntry 2 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileCIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec" 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the Committed Information Rate (CIR), which is the 
+
+
+	       average rate in kbps for which ingressing traffic is considered green.
+
+
+	       If the traffic flow rate is at or below the CIR, the system allows
+
+
+	       the traffic without any change."
+
+
+      ::= { cienaCesDpTsMeterProfileEntry 3 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileCBS OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobytes"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the Committed Burst Size (CBS), which is the  
+
+
+	      maximum number of kbytes that can ingress at the maximum interface speed 
+
+
+	      in order to remain CIR conformant."
+
+
+      ::= { cienaCesDpTsMeterProfileEntry 4 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileEIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the Excess Information Rate (EIR), which is the
+
+
+	       average rate in kbps, above CIR, for which ingressing traffic is 
+
+           considered yellow and is allowed."
+
+
+      ::= { cienaCesDpTsMeterProfileEntry 5 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileEBS OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobytes"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the Excess Burst Size(EBS), which is the 
+
+
+	      maximum number of kbytes that can ingress at the maximum interface speed 
+
+
+	      in order to remain EIR-conformant."
+
+
+      ::= { cienaCesDpTsMeterProfileEntry 6 }
+
+
+
+cienaCesDpTsMeterProfileColorMode OBJECT-TYPE
+ 	SYNTAX		INTEGER	{
+ 					color-mode-none(0),
+ 					color-blind(1),
+					color-aware(2)
+ 				}
+ 	MAX-ACCESS	read-only
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"Type of color mode"
+ 	DEFVAL		{color-aware}
+ 	::= { cienaCesDpTsMeterProfileEntry 7 }    
+
+
+ cienaCesDpTsMeterProfileCouplingFlag OBJECT-TYPE
+
+
+      SYNTAX        DpCouplingFlag
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies whether or not overflow tokens not 
+
+
+           used for ingressing traffic declared Green can be used as 
+
+
+           Yellow tokens."
+
+
+      DEFVAL        {off}
+
+
+      ::= { cienaCesDpTsMeterProfileEntry 8 }
+
+
+
+
+
+ --
+
+
+ -- Dataplane Traffic Services Metering Profile Attachment table 
+
+
+ --
+
+
+
+
+
+ cienaCesDpTsMeterProfileAttachmentTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsMeterProfileAttachmentEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of meter profile attachments."
+
+
+     ::= { cienaCesDpTsMeterProfile 2 }
+
+
+ 		
+
+
+ cienaCesDpTsMeterProfileAttachmentEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsMeterProfileAttachmentEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Meter profile entry in the meter profile attachment table.
+
+	     this object gets populated as soon as the metering profile is 
+
+
+	     attached to a logical interface."
+
+
+     INDEX { cienaCesDpTsMeterProfileIndex, 
+
+
+             cienaCesDpTsMeterProfileAttachmentLiType,
+
+
+             cienaCesDpTsMeterProfileAttachmentLiIndex }
+
+
+     ::= { cienaCesDpTsMeterProfileAttachmentTable 1 } 
+
+
+
+
+
+ CienaCesDpTsMeterProfileAttachmentEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsMeterProfileAttachmentLiType          DpTsAttachType,
+
+
+     cienaCesDpTsMeterProfileAttachmentLiIndex         INTEGER,
+
+
+     cienaCesDpTsMeterProfileAttachmentTotalCIR        Unsigned32,
+
+
+     cienaCesDpTsMeterProfileAttachmentTotalEIR        Unsigned32,
+
+
+     cienaCesDpTsMeterProfileAttachmentUsedCIR         Unsigned32,
+
+
+     cienaCesDpTsMeterProfileAttachmentMaxUsedEIR      Unsigned32
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsMeterProfileAttachmentLiType OBJECT-TYPE
+
+
+      SYNTAX        DpTsAttachType
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the local interface type which is 
+
+
+	      a unique index into the table."
+
+
+      ::= { cienaCesDpTsMeterProfileAttachmentEntry 1 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileAttachmentLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (0..16777215) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the logical interface index, which is a 
+
+
+	      unique index into the table."
+
+
+      ::= { cienaCesDpTsMeterProfileAttachmentEntry 2 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileAttachmentTotalCIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the Committed Information Rate (CIR)
+
+
+	       available to child objects of the associated logical interface.
+
+
+	       CIR is the average rate in kbps for which ingressing traffic 
+
+	       is considered green. If the traffic flow rate is at or below the 
+
+	       CIR, the system allows the traffic without any change."
+
+
+      ::= { cienaCesDpTsMeterProfileAttachmentEntry 3 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileAttachmentTotalEIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the Excess Information Rate (EIR)
+
+
+	       that can be shared among child objects of the associated
+
+
+	       logical interface. EIR is the average rate in kbps, above CIR, 
+
+	       for which ingressing traffic is considered yellow and is allowed."
+
+
+      ::= { cienaCesDpTsMeterProfileAttachmentEntry 4 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileAttachmentUsedCIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the total Committed Information Rate(CIR)
+
+
+	       in use by the child objects associated with the logical interface.
+
+
+	       CIR is the average rate in kbps for which ingressing traffic is 
+
+	       considered green. If the traffic flow rate is at or below the CIR, 
+
+	       the system allows the traffic without any change."
+
+
+      ::= { cienaCesDpTsMeterProfileAttachmentEntry 5 }
+
+
+
+
+
+ cienaCesDpTsMeterProfileAttachmentMaxUsedEIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the maximum amount of Excess Information Rate (EIR)
+
+
+	       in use by child objects associated with the logical interface. 
+EIR is the
+
+	       average rate in kbps, above CIR, for which ingressing traffic is considered
+ 
+
+	       yellow and is allowed."
+
+
+      ::= { cienaCesDpTsMeterProfileAttachmentEntry 6 }
+
+
+ 
+
+
+ 
+
+
+ --
+
+
+ -- Dataplane Traffic Services Resolved CoS Profile Table
+
+
+ --
+
+
+ cienaCesDpTsCosMapRcosProfileTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsCosMapRcosProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of Resolved CoS profiles."
+
+
+     ::= { cienaCesDpTsCosMapRcos 1 }
+
+
+ 		
+
+
+ cienaCesDpTsCosMapRcosProfileEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsCosMapRcosProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Resolved CoS (RCoS) profile entry in the RCoS profile table.
+
+
+	     The Resolved CoS policy of a logical interface determines how the 
+
+
+	     RCoS and RCOLOR of a frame are derived. The Resolved Cos Policy 
+
+
+	     is set to either map the RCoS and RCOLOR from the frame or to use a 
+
+	     fixed RCoS and RCOLOR."
+
+
+     INDEX { cienaCesDpTsCosMapRcosProfileId }
+
+
+     ::= { cienaCesDpTsCosMapRcosProfileTable 1 } 
+
+
+
+
+
+ CienaCesDpTsCosMapRcosProfileEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsCosMapRcosProfileId              INTEGER,
+
+
+     cienaCesDpTsCosMapRcosProfileName            DisplayString,
+
+
+     cienaCesDpTsCosMapRcosFixedRCoSValue         INTEGER,
+
+
+     cienaCesDpTsCosMapRcosFixedRcolour           INTEGER,
+
+
+     cienaCesDpTsCosMapRcosCosMapId          	  INTEGER,
+
+
+     cienaCesDpTsCosMapRcosCosMapName             OCTET STRING
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosProfileId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpTsCosMapRcosProfileEntry 1 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosProfileName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique profile name
+
+
+           representing the Resolved CoS profile table entry."
+
+
+      ::= { cienaCesDpTsCosMapRcosProfileEntry 2 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosFixedRCoSValue OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the fixed Resolved CoS value."
+
+
+      ::= { cienaCesDpTsCosMapRcosProfileEntry 3 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosFixedRcolour OBJECT-TYPE
+
+
+      SYNTAX        INTEGER {
+
+
+                        green(1),
+
+
+                        yellow(2)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the fixed Resolved CoS color."
+
+
+      ::= { cienaCesDpTsCosMapRcosProfileEntry 4 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosCosMapId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the associated Resolved CoS map table."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpTsCosMapRcosProfileEntry 5 }
+
+
+  
+
+
+ cienaCesDpTsCosMapRcosCosMapName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the associated Resolved CoS map. "
+
+
+      ::= { cienaCesDpTsCosMapRcosProfileEntry 6 }
+
+
+
+
+
+ --
+
+
+ -- Dataplane Traffic Services Resolved CoS Map Table
+
+
+ --
+
+
+ cienaCesDpTsCosMapRcosMapTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsCosMapRcosMapEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of Resolved CoS maps. "
+
+
+     ::= { cienaCesDpTsCosMapRcos 2 }
+
+
+ 		
+
+
+ cienaCesDpTsCosMapRcosMapEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsCosMapRcosMapEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Resolved CoS Map entry in the Resolved CoS map table."
+
+
+     INDEX { cienaCesDpTsCosMapRcosMapId }
+
+
+     ::= { cienaCesDpTsCosMapRcosMapTable 1 } 
+
+
+
+
+
+ CienaCesDpTsCosMapRcosMapEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsCosMapRcosMapId              INTEGER,
+
+
+     cienaCesDpTsCosMapRcosMapName            DisplayString,
+
+
+     cienaCesDpTsCosMapRcosMapL2RCoS          OCTET STRING,
+
+
+     cienaCesDpTsCosMapRcosMapL2RColour       OCTET STRING,
+
+
+     cienaCesDpTsCosMapRcosMapL3DscpRCoS      OCTET STRING,
+
+
+     cienaCesDpTsCosMapRcosMapL3DscpRColour   OCTET STRING,
+
+
+     cienaCesDpTsCosMapRcosMapExpRCoS         OCTET STRING,
+
+
+     cienaCesDpTsCosMapRcosMapExpRColour      OCTET STRING
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosMapId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique RCoS map index into the table."
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 1 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosMapName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique RCoS map name."
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 2 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosMapL2RCoS OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the RCoS <0..63> mapping for a given L2-CoS <0..7>
+
+
+         and Dei bit value <0..1>.
+
+
+           Octet 1: RCoS for L2-COS 0 with DEI of 0
+
+
+           Octet 2: RCoS for L2-COS 0 with DEI of 1
+
+
+           Octet 3: RCoS for L2-COS 1 with DEI of 0
+
+
+           Octet 4: RCoS for L2-COS 1 with DEI of 1
+
+
+           ...
+
+
+           Octet 15: RCoS for L2-COS 7 with DEI of 0
+
+
+           Octet 16: RCoS for L2-COS 7 with DEI of 1"
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 3 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosMapL2RColour OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the RCOLOR <Green-1/Yellow-2> mapping for a given L2-CoS <0..7>
+
+
+         and DEI bit value <0..1>.
+
+
+           Octet 1: RCOLOR for L2-COS 0 with DEI of 0
+
+
+           Octet 2: RCOLOR for L2-COS 0 with DEI of 1
+
+
+           Octet 3: RCOLOR for L2-COS 1 with DEI of 0
+
+
+           Octet 4: RCOLOR for L2-COS 1 with DEI of 1
+
+
+           ...
+
+
+           Octet 15: RCoS for L2-COS 7 with DEI of 0
+
+
+           Octet 16: RCoS for L2-COS 7 with DEI of 1"
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 4 }
+
+
+
+
+
+  cienaCesDpTsCosMapRcosMapL3DscpRCoS OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the RCoS <0..63> mapping for a given DSCP-CoS <0..63>.
+
+
+           Octet 1: RCoS for DSCP-COS 0
+
+
+           Octet 2: RCoS for DSCP-COS 1
+
+
+           ...
+
+
+           Octet 63: RCoS for DSCP-COS 63"
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 5 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosMapL3DscpRColour OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the RCOLOR <Green-1/Yellow-2> mapping for a
+
+
+         given DSCP-COS <0..63>.
+
+
+           Octet 1: RCOLOR for DSCP-COS 0
+
+
+           Octet 2: RCOLOR for DSCP-COS 1
+
+
+           ...
+
+
+           Octet 63: RCOLOR for DSCP-COS 63"
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 6 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosMapExpRCoS OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the RCoS <0..63> mapping for a given EXP-COS <0..7>.
+
+
+           Octet 1: RCoS for EXP-COS 0
+
+
+           Octet 2: RCoS for EXP-COS 1
+
+
+           ...
+
+
+           Octet 8: RCoS for EXP-COS 7"
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 7 }
+
+
+
+
+
+ cienaCesDpTsCosMapRcosMapExpRColour OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the RCOLOR <Green-1/Yellow-2> mapping
+
+
+         for a given EXP-COS <0..7>.
+
+
+           Octet 1: RCOLOR for EXP-COS 0
+
+
+           Octet 2: RCOLOR for EXP-COS 1
+
+
+           ...
+
+
+           Octet 8: RCOLOR for EXP-COS 7"
+
+
+      ::= { cienaCesDpTsCosMapRcosMapEntry 8 }
+
+
+  
+
+
+ --
+
+
+ -- Dataplane Traffic Services Frame CoS Map Table
+
+
+ --
+
+
+ cienaCesDpTsCosMapFcosMapTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsCosMapFcosMapEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of Frame CoS Map."
+
+
+     ::= { cienaCesDpTsCosMapFcos 1 }
+
+
+ 		
+
+
+ cienaCesDpTsCosMapFcosMapEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsCosMapFcosMapEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Frame CoS Map entry in the Frame CoS Map Table."
+
+
+     INDEX { cienaCesDpTsCosMapFcosMapId }
+
+
+     ::= { cienaCesDpTsCosMapFcosMapTable 1 } 
+
+
+
+
+
+ CienaCesDpTsCosMapFcosMapEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsCosMapFcosMapId              INTEGER,
+
+
+     cienaCesDpTsCosMapFcosMapName            DisplayString,
+
+
+     cienaCesDpTsCosMapFcosL2CoS              OCTET STRING,
+
+
+     cienaCesDpTsCosMapFcosL2Dei              OCTET STRING,
+
+
+     cienaCesDpTsCosMapFcosL3Dscp             OCTET STRING,
+
+
+     cienaCesDpTsCosMapFcosExp                OCTET STRING
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsCosMapFcosMapId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table FCoS map table."
+
+
+      ::= { cienaCesDpTsCosMapFcosMapEntry 1 }
+
+
+
+
+
+ cienaCesDpTsCosMapFcosMapName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique map name for the FCoS map."
+
+
+      ::= { cienaCesDpTsCosMapFcosMapEntry 2 }
+
+
+
+
+
+ cienaCesDpTsCosMapFcosL2CoS OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the l2Cos <0..7> mapping for a given RCoS
+
+
+         and RCOLOR value.
+
+
+           Octet 1: l2Cos for RCoS 0 with RCOLOR of Green
+
+
+           Octet 2: l2Cos for RCoS 0 with RCOLOR of Yellow
+
+
+           Octet 3: l2Cos for RCoS 1 with RCOLOR of Green
+
+
+           Octet 4: l2Cos for RCoS 1 with RCOLOR of Yellow
+
+
+           ...
+
+
+           Octet 126: l2Cos for RCoS 63 with RCOLOR of Green
+
+
+           Octet 127: l2Cos for RCoS 63 with RCOLOR of Yellow"
+
+
+      ::= { cienaCesDpTsCosMapFcosMapEntry 3 }
+
+
+
+
+
+ cienaCesDpTsCosMapFcosL2Dei OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the L2-Dei <0..1> mapping for a given RCoS
+
+
+         and RCOLOR value.
+
+
+           Octet 1: l2-dei for RCoS 0 with RCOLOR of Green
+
+
+           Octet 2: l2-dei for RCoS 0 with RCOLOR of Yellow
+
+
+           Octet 3: l2-dei for RCoS 1 with RCOLOR of Green
+
+
+           Octet 4: l2-dei for RCoS 1 with RCOLOR of Yellow
+
+
+           ...
+
+
+           Octet 126: l2-dei for RCoS 63 with RCOLOR of Green
+
+
+           Octet 127: l2-dei for RCoS 63 with RCOLOR of Yellow"
+
+
+      ::= { cienaCesDpTsCosMapFcosMapEntry 4 }
+
+
+
+
+
+ cienaCesDpTsCosMapFcosL3Dscp OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the L3-DSCP <0..63> mapping for a given RCoS
+
+
+         and RCOLOR value.
+
+
+           Octet 1: l3-dscp for RCoS 0 with RCOLOR of Green
+
+
+           Octet 2: l3-dscp for RCoS 0 with RCOLOR of Yellow
+
+
+           Octet 3: l3-dscp for RCoS 1 with RCOLOR of Green
+
+
+           Octet 4: l3-dscp for RCoS 1 with RCOLOR of Yellow
+
+
+           ...
+
+
+           Octet 126: l3-dscp for RCoS 63 with RCOLOR of Green
+
+
+           Octet 127: l3-dscp for RCoS 63 with RCOLOR of Yellow"
+
+
+      ::= { cienaCesDpTsCosMapFcosMapEntry 5 }
+
+
+
+
+
+
+
+
+ cienaCesDpTsCosMapFcosExp OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+        "This object specifies the exp <0..7> mapping for a given RCoS 
+
+
+        and RCOLOR value.
+
+
+           Octet 1: exp for RCoS 0 with RCOLOR of Green
+
+
+           Octet 2: exp for RCoS 0 with RCOLOR of Yellow
+
+
+           Octet 3: exp for RCoS 1 with RCOLOR of Green
+
+
+           Octet 4: exp for RCoS 1 with RCOLOR of Yellow
+
+
+           ...
+
+
+           Octet 126: exp for RCoS 63 with RCOLOR of Green
+
+
+           Octet 127: exp for RCoS 63 with RCOLOR of Yellow"
+
+
+      ::= { cienaCesDpTsCosMapFcosMapEntry 6 }
+
+
+ 
+
+
+ --
+
+
+ -- Dataplane Traffic Services Shaping Profile table 
+
+
+ --
+
+
+ cienaCesDpTsShaperProfileTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsShaperProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of Shaper Profiles."
+
+
+     ::= { cienaCesDpTsShaperProfile 1 }
+
+
+ 		
+
+
+ cienaCesDpTsShaperProfileEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsShaperProfileEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Shaper Profile entry in the Shaper Profile Table."
+
+
+     INDEX { cienaCesDpTsShaperProfileIndex }
+
+
+     ::= { cienaCesDpTsShaperProfileTable 1 } 
+
+
+
+
+
+ CienaCesDpTsShaperProfileEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsShaperProfileIndex           INTEGER,
+
+
+     cienaCesDpTsShaperProfileName            DisplayString,
+
+
+     cienaCesDpTsShaperProfileCIR             Unsigned32,
+
+
+     cienaCesDpTsShaperProfileCBS             Unsigned32
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsShaperProfileIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535)
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the shaper profile table."
+
+
+      ::= { cienaCesDpTsShaperProfileEntry 1 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique name for the shaper profile."
+
+
+      ::= { cienaCesDpTsShaperProfileEntry 2 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileCIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32 
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the Committed Information Rate (CIR)
+
+
+	       in kbps for which egressing traffic is considered green."
+
+
+      ::= { cienaCesDpTsShaperProfileEntry 3 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileCBS OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobytes" 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the Committed Burst Size (CBS) which is the 
+
+
+	      maximum number of kbytes that can egress at the maximum interface 
+
+
+	      speed in order to remain CIR conformant."
+
+
+      ::= { cienaCesDpTsShaperProfileEntry 4 }
+
+
+
+
+
+--
+
+
+ -- Dataplane Traffic Services Shaping Profile Attachment table 
+
+
+ --
+
+
+
+
+
+ cienaCesDpTsShaperProfileAttachmentTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsShaperProfileAttachmentEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of shaper profile attachments."
+
+
+     ::= { cienaCesDpTsShaperProfile 2 }
+
+
+ 		
+
+
+ cienaCesDpTsShaperProfileAttachmentEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsShaperProfileAttachmentEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Meter profile entry in the shaper profile attachment table."
+
+
+     INDEX { cienaCesDpTsShaperProfileIndex, 
+
+
+             cienaCesDpTsShaperProfileAttachmentLiType,
+
+
+             cienaCesDpTsShaperProfileAttachmentLiIndex }
+
+
+     ::= { cienaCesDpTsShaperProfileAttachmentTable 1 } 
+
+
+
+
+
+ CienaCesDpTsShaperProfileAttachmentEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsShaperProfileAttachmentLiType          DpTsAttachType,
+
+
+     cienaCesDpTsShaperProfileAttachmentLiIndex         INTEGER,
+
+
+     cienaCesDpTsShaperProfileAttachmentTotalCIR        Unsigned32,
+
+
+     cienaCesDpTsShaperProfileAttachmentTotalEIR        Unsigned32,
+
+
+     cienaCesDpTsShaperProfileAttachmentUsedCIR         Unsigned32,
+
+
+     cienaCesDpTsShaperProfileAttachmentMaxUsedEIR      Unsigned32
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsShaperProfileAttachmentLiType OBJECT-TYPE
+
+
+      SYNTAX        DpTsAttachType
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpTsShaperProfileAttachmentEntry 1 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileAttachmentLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (0..16777215) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpTsShaperProfileAttachmentEntry 2 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileAttachmentTotalCIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the Committed Information Rate (CIR)
+
+
+	       available to child objects associated with the logical interface.
+
+
+	       CIR is the average rate in kbps for which ingressing traffic is 
+
+	       considered green. If the traffic flow rate is at or below the CIR, 
+
+	       the system allows the traffic without any change."
+
+
+      ::= { cienaCesDpTsShaperProfileAttachmentEntry 3 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileAttachmentTotalEIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the total Excess Information Rate (EIR)
+
+
+	       that can be shared among child objects associated with the logical interface.
+
+	       EIR is the average rate in kbps, above CIR, for which ingressing traffic is 
+
+
+           considered yellow and is allowed."
+
+
+      ::= { cienaCesDpTsShaperProfileAttachmentEntry 4 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileAttachmentUsedCIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"                                                    
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the used Committed Information Rate (CIR)
+
+
+		   in use by child objects associated with the logical interface."
+
+
+      ::= { cienaCesDpTsShaperProfileAttachmentEntry 5 }
+
+
+
+
+
+ cienaCesDpTsShaperProfileAttachmentMaxUsedEIR OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      UNITS			"kilobits/sec"
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object indicates the maximum used Excess Information Rate (EIR)
+
+
+	       in use by child objects associated with the logical interface. EIR 
+
+	       is the average rate in kbps, above CIR, for which ingressing traffic is 
+
+
+           considered yellow and is allowed."
+
+
+      ::= { cienaCesDpTsShaperProfileAttachmentEntry 6 }
+
+
+  
+
+
+  
+
+
+ --
+
+
+ -- Dataplane Traffic Services Congestion Avoidance Profile table 
+
+
+ --          
+
+
+ 
+
+
+ cienaCesDpTsQCAProfileWREDTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsQCAProfileWREDEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of congestion avoidance profile for congestion avoidance type WRED."
+
+
+     ::= { cienaCesDpTsQCongestionAvoidanceProfile 1 }
+
+
+ 		
+
+
+ cienaCesDpTsQCAProfileWREDEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsQCAProfileWREDEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "An entry in the WRED congestion avoidance profile table."
+
+
+     INDEX { cienaCesDpTsQCAProfileWREDId} 
+
+
+     ::= { cienaCesDpTsQCAProfileWREDTable 1 } 
+
+
+
+
+
+ CienaCesDpTsQCAProfileWREDEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsQCAProfileWREDId 	         		INTEGER,
+
+
+     cienaCesDpTsQCAProfileWREDName   				DisplayString,
+
+
+     cienaCesDpTsQCAProfileWREDDropRateExponent 	Unsigned32,
+     cienaCesDpTsQCAProfileWREDMaxQueueSize             Integer32,
+     cienaCesDpTsQCAProfileWREDMinQueueGuarantee        Integer32
+
+ }
+
+
+     
+
+
+ cienaCesDpTsQCAProfileWREDId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpTsQCAProfileWREDEntry 1 }
+
+
+
+
+
+ cienaCesDpTsQCAProfileWREDName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique WRED profile name."
+
+
+      ::= { cienaCesDpTsQCAProfileWREDEntry 2 }
+
+
+      
+
+
+ cienaCesDpTsQCAProfileWREDDropRateExponent OBJECT-TYPE
+
+
+ 	 SYNTAX			Unsigned32
+
+
+ 	 MAX-ACCESS 	read-only
+
+
+ 	 STATUS			current
+
+
+ 	 DESCRIPTION
+
+
+ 	 	 "This object specifies the exponential drop-rate exponent of this
+
+
+ 	 	 WRED curve when the average queue size is between the
+
+
+ 	 	 Upper and Lower threshold."
+
+
+ 	 ::= { cienaCesDpTsQCAProfileWREDEntry 3 }
+
+
+ 	 
+ cienaCesDpTsQCAProfileWREDMaxQueueSize OBJECT-TYPE
+ 	 SYNTAX		Integer32
+ 	 MAX-ACCESS 	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	 "Maximum Size of Queue. Its unit is in KBytes"
+ 	 ::= { cienaCesDpTsQCAProfileWREDEntry 4 }
+ 	
+ cienaCesDpTsQCAProfileWREDMinQueueGuarantee OBJECT-TYPE
+ 	 SYNTAX		Integer32
+ 	 MAX-ACCESS 	read-only
+ 	 STATUS		current
+ 	 DESCRIPTION
+ 	 	 "Minimum Guarantee Size of queue. Its unit is in KBytes"
+ 	 ::= { cienaCesDpTsQCAProfileWREDEntry 5 }
+  
+
+
+ --
+
+
+ -- Dataplane Traffic Services Congestion Avoidance Curve profile table 
+
+
+ --          
+
+
+ 
+
+
+ cienaCesDpTsQCAProfileWREDCurveTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTsQCAProfileWREDCurveEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of congestion avoidance curve profile for congestion avoidance type WRED."
+
+
+     ::= { cienaCesDpTsQCongestionAvoidanceProfile 2 }
+
+
+ 		
+
+
+ cienaCesDpTsQCAProfileWREDCurveEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTsQCAProfileWREDCurveEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "An entry in the WRED congestion avoidance curve profile table.
+
+
+	      Congestion avoidance allows frames to be dropped during congestion
+
+	      before they are enqueued (thus avoiding further congestion).
+
+
+	      The RCOLOR of a frame as it arrives at the egress enqueuing stage 
+
+
+	      determines which WRED curve of the congestion avoidance profile 
+
+
+	      to use (Green or Yellow). A congestion profile has two configurable 
+
+
+	      WRED curves (Curve-1 and Curve-2). By default Green frames map 
+
+
+	      to Curve-1 and Yellow frames map to Curve-2.
+
+
+	      If no congestion avoidance profile is referenced by a queue within a 
+
+
+	      queue group, this signifies that no congestion avoidance is in 
+
+	      effect (Tail Drop) and frames are enqueued only if there is space
+
+
+	      in the queue; otherwise they are dropped. "
+
+
+     INDEX { cienaCesDpTsQCAProfileWREDId, cienaCesDpTsQCAProfileWREDCurveId} 
+
+
+     ::= { cienaCesDpTsQCAProfileWREDCurveTable 1 } 
+
+
+
+
+
+ CienaCesDpTsQCAProfileWREDCurveEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTsQCAProfileWREDCurveId 	         		INTEGER,
+
+
+     cienaCesDpTsQCAProfileWREDCurveLowerThreshold			Unsigned32,
+
+
+     cienaCesDpTsQCAProfileWREDCurveUpperThreshold			Unsigned32,
+
+
+     cienaCesDpTsQCAProfileWREDCurveMaxDropProbability		Unsigned32
+
+
+ }
+
+
+ 
+
+
+ cienaCesDpTsQCAProfileWREDCurveId		OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER (0..3)
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies a unique WRED curve ID."
+
+
+ 	::= { cienaCesDpTsQCAProfileWREDCurveEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQCAProfileWREDCurveLowerThreshold 	OBJECT-TYPE
+
+
+ 	  SYNTAX		Unsigned32
+
+
+ 	  MAX-ACCESS	read-only
+
+
+ 	  STATUS		current
+
+
+ 	  DESCRIPTION
+
+
+ 	  	  "This object specifies the threshold to begin dropping for this WRED curve.
+
+
+ 	  	  If the average queue size is below this value, frames are enqueued 
+
+
+ 	  	  and not dropped due to WRED. "
+
+
+ 	  ::= { cienaCesDpTsQCAProfileWREDCurveEntry 2 }
+
+
+ 	   
+
+
+ cienaCesDpTsQCAProfileWREDCurveUpperThreshold 	OBJECT-TYPE
+
+
+  	  SYNTAX		Unsigned32
+
+
+  	  MAX-ACCESS	read-only
+
+
+  	  STATUS		current
+
+
+  	  DESCRIPTION
+
+
+  	  	"This object specifies the threshold above which all the frames for this WRED 
+
+
+  	  	 curve are dropped. If the average queue size is above this value,
+
+
+  	  	 frames are dropped and not enqueued due to WRED."
+
+
+  	  ::= { cienaCesDpTsQCAProfileWREDCurveEntry 3 }
+
+
+  	  
+
+
+ cienaCesDpTsQCAProfileWREDCurveMaxDropProbability	OBJECT-TYPE
+
+
+  	  SYNTAX		Unsigned32
+
+
+  	  MAX-ACCESS	read-only
+
+
+  	  STATUS		current
+
+
+  	  DESCRIPTION
+
+
+  	  	"This object specifies the drop probability when average queue size reaches the
+
+
+  	  	 upper threshold value."
+
+
+  	  ::= {cienaCesDpTsQCAProfileWREDCurveEntry 4 } 
+
+
+
+
+
+ --
+
+
+ -- RCoS to Queue Map Table
+
+
+ --
+
+
+    
+
+
+ cienaCesDpTsQRCOSQMapTable		OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQRCOSQMapEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Table representing RCoS to queue map."
+
+
+ 	::= { cienaCesDpTsQRCOSQMap 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapEntry	OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQRCOSQMapEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"An entry in the RCoS to queue map table. "
+
+
+ 	INDEX { cienaCesDpTsQRCOSQMapId }
+
+
+ 	::= { cienaCesDpTsQRCOSQMapTable 1 }
+
+
+ 	
+
+
+ CienaCesDpTsQRCOSQMapEntry ::= SEQUENCE {
+
+
+ 	 cienaCesDpTsQRCOSQMapId		INTEGER,
+
+
+ 	 cienaCesDpTsQRCOSQMapName		DisplayString
+
+
+ }   
+
+
+ 
+
+
+ cienaCesDpTsQRCOSQMapId    	OBJECT-TYPE  
+
+
+ 	SYNTAX		INTEGER (1..65535)
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies an unique ID in the RCoS to queue map table."
+
+
+ 	::= { cienaCesDpTsQRCOSQMapEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapName   OBJECT-TYPE
+
+
+ 	SYNTAX		DisplayString
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the name of the RCoS to queue map."
+
+
+ 	::= { cienaCesDpTsQRCOSQMapEntry 2 }
+
+
+ 	
+
+
+ 
+
+
+ --
+
+
+ -- RCOS to Queue Map Queue table
+
+
+ -- 
+
+
+ 
+
+
+ cienaCesDpTsQRCOSQMapQueueTable		OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQRCOSQMapQueueEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Table representing RCoS to queue map."
+
+
+ 	::= { cienaCesDpTsQRCOSQMap 2 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapQueueEntry	OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQRCOSQMapQueueEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"An entry in the RCoS to queue map table.
+
+
+ 		Frames ingressing the device will be assigned an RCoS and RCOLOR
+
+
+ 		by the Resolved CoS mapping stage. The RCoS is used at the 
+
+
+ 		egress enqueuing stage to determine which queue in the 
+
+
+ 		default port queue group the frame should be enqueued to. 
+
+
+ 		This is known as RCoS to Queue Mapping."
+
+
+ 	INDEX { cienaCesDpTsQRCOSQMapId, cienaCesDpTsQRCOSQMapQueueId }
+
+
+ 	::= { cienaCesDpTsQRCOSQMapQueueTable 1 }
+
+
+ 	
+
+
+ CienaCesDpTsQRCOSQMapQueueEntry ::= SEQUENCE {
+
+
+ 	 cienaCesDpTsQRCOSQMapQueueId		INTEGER,
+
+
+ 	 cienaCesDpTsQRCOSQMapQueueNumber	INTEGER
+
+
+ }
+
+
+ 
+
+
+ cienaCesDpTsQRCOSQMapQueueId		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER (1..65535)
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies a unique index in the RCoS to queue map table."
+
+
+ 	::= { cienaCesDpTsQRCOSQMapQueueEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapQueueNumber		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER	{
+
+
+ 						queue-0(0),
+
+
+ 						queue-1(1),
+
+
+ 						queue-2(2),
+
+
+ 						queue-3(3),
+
+
+ 						queue-4(4),
+
+
+ 						queue-5(5),
+
+
+ 						queue-6(6),
+
+
+ 						queue-7(7)
+
+
+ 					}
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the queue number to which the queue ID of RCoS maps."
+
+
+ 	::= { cienaCesDpTsQRCOSQMapQueueEntry 2 }
+
+
+
+
+
+ 
+
+
+ --
+
+
+ -- RCOS to Queue Map Green Curve Table
+
+
+ -- 
+
+
+ 
+
+
+ cienaCesDpTsQRCOSQMapGreenCurveTable		OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQRCOSQMapGreenCurveEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Table representing RCoS to queue map green curve map."
+
+
+ 	::= { cienaCesDpTsQRCOSQMap 3 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapGreenCurveEntry	OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQRCOSQMapGreenCurveEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"An entry in the RCoS to queue green curve map table.
+
+
+ 		 The RCOLOR for an RCoS value is mapped to a WRED curve.
+
+
+ 		 The WRED-curve is the WRED-curve in the Congestion Avoidance Profile 
+
+
+ 		 referenced by the Queue that the R-COS maps to. By default, there is an 
+
+
+ 		 RCoS-To-Queue Map which all Egress Port Queue Groups reference. "
+
+
+ 	INDEX { cienaCesDpTsQRCOSQMapId, cienaCesDpTsQRCOSQMapGreenCurveId }
+
+
+ 	::= { cienaCesDpTsQRCOSQMapGreenCurveTable 1 }
+
+
+ 	
+
+
+ CienaCesDpTsQRCOSQMapGreenCurveEntry ::= SEQUENCE {
+
+
+ 	 cienaCesDpTsQRCOSQMapGreenCurveId		INTEGER,
+
+
+ 	 cienaCesDpTsQRCOSQMapGreenCurveNumber	INTEGER
+
+
+ }
+
+
+ 
+
+
+ cienaCesDpTsQRCOSQMapGreenCurveId		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER (0..63)
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the unique index in the table."
+
+
+ 	::= { cienaCesDpTsQRCOSQMapGreenCurveEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapGreenCurveNumber		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER	{
+
+
+ 							wred-curve-1(1),
+
+
+ 							wred-curve-2(2)
+
+
+ 					}
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"The WRED green curve number to which the RCoS Queue green curve ID maps."
+
+
+ 	DEFVAL		{wred-curve-1}
+
+
+ 	::= { cienaCesDpTsQRCOSQMapGreenCurveEntry 2 }    
+
+
+
+
+
+ --
+
+
+ -- RCoS to Q Map yellow Curve Table
+
+
+ -- 
+
+
+ 
+
+
+ cienaCesDpTsQRCOSQMapYellowCurveTable		OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQRCOSQMapYellowCurveEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Table representing RCoS to queue map yellow curve map."
+
+
+ 	::= { cienaCesDpTsQRCOSQMap 4 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapYellowCurveEntry	OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQRCOSQMapYellowCurveEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"An entry in the RCoS to queue yellow curve map table.
+
+
+ 		 The RCOLOR for an RCoS value is mapped to a WRED curve.
+
+
+ 		 The WRED curve is the WRED curve in the congestion avoidance profile 
+
+
+ 		 referenced by the queue to which the RCoS maps. By default, there is an 
+
+
+ 		 RCoS-To-Queue Map which all egress port queue groups reference."
+
+
+ 	INDEX { cienaCesDpTsQRCOSQMapId, 
+
+
+ 			cienaCesDpTsQRCOSQMapYellowCurveId }
+
+
+ 	::= { cienaCesDpTsQRCOSQMapYellowCurveTable 1 }
+
+
+ 	
+
+
+ CienaCesDpTsQRCOSQMapYellowCurveEntry ::= SEQUENCE {
+
+
+ 	 cienaCesDpTsQRCOSQMapYellowCurveId		INTEGER,
+
+
+ 	 cienaCesDpTsQRCOSQMapYellowCurveNumber	INTEGER
+
+
+ }
+
+
+ 
+
+
+ cienaCesDpTsQRCOSQMapYellowCurveId		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER (0..63)
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Unique index in the table."
+
+
+ 	::= { cienaCesDpTsQRCOSQMapYellowCurveEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQRCOSQMapYellowCurveNumber		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER	{
+
+
+ 							wred-curve-1(1),
+
+
+ 							wred-curve-2(2)
+
+
+ 					}
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"The WRED yellow curve number to which the RCoS Queue yellow curve ID maps." 
+
+
+ 	DEFVAL		{wred-curve-2}
+
+
+ 	::= { cienaCesDpTsQRCOSQMapYellowCurveEntry 2 } 
+
+
+
+
+
+
+
+
+--
+
+
+-- Queue Group Profile Table
+
+
+--  	
+
+
+ cienaCesDpTsQGroupProfileTable     OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQGroupProfileEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current       
+
+
+ 	DESCRIPTION
+
+
+ 		"Table of queue group profiles."
+
+
+ 	::= { cienaCesDpTsQGroupProfile 1} 
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileEntry		OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQGroupProfileEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Each entry represents a queue group profile."
+
+
+ 	INDEX	{ cienaCesDpTsQGroupProfileId }		
+
+
+ 	::= { cienaCesDpTsQGroupProfileTable 1 }      
+
+
+
+ CienaCesDpTsQGroupProfileEntry ::= SEQUENCE{
+ 	 cienaCesDpTsQGroupProfileId 	  		INTEGER,
+ 	 cienaCesDpTsQGroupProfileName			DisplayString,
+ 	 cienaCesDpTsQGroupProfileQueueCount	        INTEGER,
+ 	 cienaCesDpTsQGroupProfileRCOSQMapId	        Unsigned32,
+ 	 cienaCesDpTsQGroupProfileShaperCompensation	Integer32
+ } 
+
+
+ cienaCesDpTsQGroupProfileId OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER (1..65535)
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"A unique index in the queue group profile table."
+
+
+ ::= { cienaCesDpTsQGroupProfileEntry 1 }
+
+
+ 
+
+
+ cienaCesDpTsQGroupProfileName OBJECT-TYPE
+
+
+ 	SYNTAX			DisplayString
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the queue group profile name."
+
+
+ ::= { cienaCesDpTsQGroupProfileEntry 2 }
+
+
+ 
+
+
+ cienaCesDpTsQGroupProfileQueueCount OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER
+
+
+ 	MAX-ACCESS		read-only    
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the number of queues per queue group. 
+
+
+ 		Maximum number of queues per queue group is 8."
+
+
+ 	::= { cienaCesDpTsQGroupProfileEntry 3 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileRCOSQMapId OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the RCoS to Queue Map ID for this group.
+
+
+ 		A queue group profile will reference a queue map profile 
+
+
+ 		to obtain the mapping of frames to a queue within the
+
+
+ 		egress port queuing instance. For the 5410 platform this mapping 
+
+
+ 		is based on R-COS to Queue mapping."
+
+
+ 	::= { cienaCesDpTsQGroupProfileEntry 4 }
+
+
+
+ cienaCesDpTsQGroupProfileShaperCompensation OBJECT-TYPE
+ 	SYNTAX			Integer32
+ 	MAX-ACCESS		read-only
+ 	STATUS			current
+ 	DESCRIPTION
+ 		"This object specifies the Shaper Compensation for all queues of this group.
+ 		A queue group profile will have shaper compensation set dependent on the
+                expected mix of traffic type being enqueued"
+ 	::= { cienaCesDpTsQGroupProfileEntry 5 }
+
+
+
+
+ --
+
+
+ -- Egress Port Queue Group table
+
+
+ -- 
+
+
+ cienaCesDpTsQGroupProfileQueueTable    OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQGroupProfileQueueEntry
+
+
+ 	MAX-ACCESS 	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Table of queues for every queue group profile."
+
+
+ 	::= { cienaCesDpTsQGroupProfile 2 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileQueueEntry		OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQGroupProfileQueueEntry
+
+
+ 	MAX-ACCESS	not-accessible  
+
+
+ 	STATUS		current                     
+
+
+ 	DESCRIPTION
+
+
+ 		"Each entry represents an individual queue belonging to a queue group. The  
+
+
+ 		number of entries per group is decided by the cienaCesDpTsQGroupProfileQueueCount  
+
+
+ 		object. An Egress Port Queue Group is instantiated for every port when the port 
+
+
+ 		is created. The egress port queue group defines the set of queues that are
+
+
+ 		instanced on a port, and the individual CIR/EIR shaping rates for each queue.
+
+
+ 		There is one egress port queue group per port (identified by 
+
+
+ 		cienaCesDpTsQGroupProfileId)."
+
+
+ 	INDEX { cienaCesDpTsQGroupProfileId, 
+
+
+ 			cienaCesDpTsQGroupProfileQueueIndex } 
+
+
+ 	::= { cienaCesDpTsQGroupProfileQueueTable 1 }
+
+
+ 	
+
+
+ CienaCesDpTsQGroupProfileQueueEntry ::= SEQUENCE {
+     cienaCesDpTsQGroupProfileQueueIndex        INTEGER,
+     cienaCesDpTsQGroupProfileQueueCAPId        Unsigned32,
+     cienaCesDpTsQGroupProfileQueueCIR	        Unsigned32,
+     cienaCesDpTsQGroupProfileQueueCBS	        Unsigned32,
+     cienaCesDpTsQGroupProfileQueueEIR	        Unsigned32,
+     cienaCesDpTsQGroupProfileQueueEBS	        Unsigned32,
+     cienaCesDpTsQGroupProfileQueueCirPercent   Unsigned32,
+     cienaCesDpTsQGroupProfileQueueEirPercent   Unsigned32
+ }
+
+
+  
+
+
+ cienaCesDpTsQGroupProfileQueueIndex   	OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER (1..65535)
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates a unique index for every queue
+
+
+ 		 in the queue group."
+
+
+ 	::= { cienaCesDpTsQGroupProfileQueueEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileQueueCAPId       OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Congestion Avoidance Profile (CAP)ID
+
+
+ 		associated with the queue. If a queue does not reference a CAP,  
+
+
+ 		no congestion avoidance occurs for the queue and frames will 
+
+
+ 		no longer enqueue when the queue is full."
+
+
+ 	::= { cienaCesDpTsQGroupProfileQueueEntry 2 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileQueueCIR 		 OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32   
+
+
+ 	UNITS			"kilobits/sec"
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Commmitted Information Rate (CIR)
+
+
+ 		 value for the queue. CIR is the average rate in kbps 
+
+
+ 		 for which ingressing traffic is considered green. If the
+
+
+ 		 traffic flow rate is at or below the CIR, the system allows
+
+
+	     the traffic without any change."
+
+
+ 	::= { cienaCesDpTsQGroupProfileQueueEntry 3 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileQueueCBS  		OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32  
+
+
+ 	UNITS			"kilobytes"
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Committed Burst Size (CBS)in kbytes
+
+
+ 		for the queue. CBS is the maximum number of kbytes 
+
+ 		that can ingress at the maximum interface speed in order
+
+ 		to remain CIR conformant."
+
+
+ 	::= { cienaCesDpTsQGroupProfileQueueEntry 4 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileQueueEIR		OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32 
+
+
+ 	UNITS			"kilobits/sec"
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Excess Information Rate (EIR)
+
+
+ 		 value for the queue. EIR is the average rate in kbps,
+
+
+ 		 above CIR, for which ingressing traffic is
+
+ 		 considered yellow and is allowed."
+
+
+ 	::= { cienaCesDpTsQGroupProfileQueueEntry 5 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupProfileQueueEBS		OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32  
+
+
+ 	UNITS			"kilobytes"
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Excess Burst Size (EBS) in kbytes
+
+
+ 		for the queue. EBS is the maximum number of kbytes that 
+
+
+ 		can ingress at the maximum interface speed in order to 
+
+
+ 		remain EIR conformant."
+
+
+ 	::= { cienaCesDpTsQGroupProfileQueueEntry 6 }
+
+
+  cienaCesDpTsQGroupProfileQueueCirPercent       OBJECT-TYPE
+        SYNTAX			Unsigned32   
+        UNITS			"percent"
+        MAX-ACCESS		read-only
+        STATUS			current
+        DESCRIPTION
+             "This object specifies the cir-percent associated with the queue.
+              The cir-percent allows for the CIR value to be determined as a percentage of the parent scheduler CIR."
+            ::= { cienaCesDpTsQGroupProfileQueueEntry 7 }
+
+  cienaCesDpTsQGroupProfileQueueEirPercent       OBJECT-TYPE
+        SYNTAX			Unsigned32   
+        UNITS			"percent"
+        MAX-ACCESS		read-only
+        STATUS			current
+        DESCRIPTION
+             "This object specifies the eir-percent associated with the queue.
+              The eir-percent allows for the EIR value to be determined as a percentage of the parent scheduler EIR."
+            ::= { cienaCesDpTsQGroupProfileQueueEntry 8 }
+ --
+
+
+ -- Queue Group Instance Table
+
+
+ --
+
+
+ cienaCesDpTsQGroupInstanceTable    OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQGroupInstanceEntry
+
+
+ 	MAX-ACCESS 	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Table of group instances."
+
+
+ 	::= { cienaCesDpTsQGroupInstance 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupInstanceEntry		OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQGroupInstanceEntry
+
+
+ 	MAX-ACCESS	not-accessible  
+
+
+ 	STATUS		current                     
+
+
+ 	DESCRIPTION
+
+
+ 		"Each entry represents a group instance."
+
+
+ 	INDEX { cienaCesDpTsQGroupInstancePgid, 
+
+
+ 			cienaCesDpTsQGroupProfileId,
+
+
+ 			cienaCesDpTsQGroupInstanceIndex } 
+
+
+ 	::= { cienaCesDpTsQGroupInstanceTable 1 }
+
+
+ 	
+
+
+ CienaCesDpTsQGroupInstanceEntry ::= SEQUENCE {
+
+
+     cienaCesDpTsQGroupInstancePgid					Unsigned32,
+
+
+     cienaCesDpTsQGroupInstanceIndex				INTEGER,
+
+
+     cienaCesDpTsQGroupInstanceParentSchedId	    INTEGER,
+
+
+     cienaCesDpTsQGroupInstanceParentInstanceId		INTEGER
+
+
+ }
+
+
+
+
+
+ cienaCesDpTsQGroupInstancePgid   	OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the PGID of the port to which
+
+
+ 		 the queue group resolves."
+
+
+ ::= { cienaCesDpTsQGroupInstanceEntry 1 }
+
+
+ 
+
+
+ cienaCesDpTsQGroupInstanceIndex   	OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER (1..65535)
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the queue group profile instance ID."
+
+
+ ::= { cienaCesDpTsQGroupInstanceEntry 2 }
+
+
+
+
+
+ cienaCesDpTsQGroupInstanceParentSchedId		OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the profile ID of the parent scheduler
+
+
+ 		 to which this queue group instance is attached." 
+
+
+ 	::= {  cienaCesDpTsQGroupInstanceEntry 3 }
+
+
+ 	
+
+
+ cienaCesDpTsQGroupInstanceParentInstanceId		OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the instance ID of the parent scheduler
+
+
+ 		 to which this queue group instance is attached." 
+
+
+ 	::= {  cienaCesDpTsQGroupInstanceEntry 4 }
+
+
+ 
+
+
+ 
+
+
+ --
+
+
+ --Scheduler Profile Config Data
+
+
+ --
+
+
+ cienaCesDpTsQSchedulerProfileTable 	OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQSchedulerProfileEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Scheduler profile configuration data."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfile 1 }  
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileEntry	OBJECT-TYPE
+
+
+ 	SYNTAX			CienaCesDpTsQSchedulerProfileEntry
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"An entry in the scheduler profile configuration table."
+
+
+ 	INDEX	{ cienaCesDpTsQSchedulerProfileId }
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileTable 1 } 
+
+
+ 	
+
+
+ CienaCesDpTsQSchedulerProfileEntry ::=  SEQUENCE {
+        cienaCesDpTsQSchedulerProfileId                     INTEGER,
+        cienaCesDpTsQSchedulerProfileName                   DisplayString,
+        cienaCesDpTsQSchedulerProfileSchedulerAlgorithm     INTEGER,
+        cienaCesDpTsQSchedulerProfileCIR                    Unsigned32,
+        cienaCesDpTsQSchedulerProfileCBS                    Unsigned32,
+        cienaCesDpTsQSchedulerProfileEIR                    Unsigned32,
+        cienaCesDpTsQSchedulerProfileEBS                    Unsigned32,
+        cienaCesDpTsQSchedulerProfileScheduledUcastWt       INTEGER,
+        cienaCesDpTsQSchedulerProfileScheduledMcastWt       INTEGER,
+        cienaCesDpTsQSchedulerProfileTapPointCount          INTEGER,
+        cienaCesDpTsQSchedulerProfileShaperOverSpeed        INTEGER,
+        cienaCesDpTsQSchedulerProfileCirPolicy              INTEGER,
+        cienaCesDpTsQSchedulerProfileEirPolicy              INTEGER,
+        cienaCesDpTsQSchedulerProfileCirPercent             Unsigned32,
+        cienaCesDpTsQSchedulerProfileEirPercent             Unsigned32
+ }  
+
+
+ 
+
+
+ cienaCesDpTsQSchedulerProfileId		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER (1..65535)
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the unique index for the scheduler profile."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileName	OBJECT-TYPE
+
+
+ 	SYNTAX		DisplayString
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the name for the scheduler profile."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 2 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileSchedulerAlgorithm 	OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER	{
+
+
+ 							unknown(0),
+
+
+ 							strictPriority(1),
+
+
+ 							weightedFairQueuing(2),
+
+
+ 							roundRobin(3)
+
+
+ 						}
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the scheduler algorithm associated 
+
+
+ 		with the scheduler profile."
+
+
+ 	DEFVAL	{strictPriority}
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 3 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileCIR		OBJECT-TYPE
+
+
+ 	SYNTAX		Unsigned32
+
+
+ 	UNITS		"kilobits/sec"
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Committed Information Rate (CIR)
+
+
+ 		 for the scheduler profile. CIR is the average rate
+
+
+ 		 in kbps for which ingressing traffic is considered green. 
+
+
+	     If the traffic flow rate is at or below the CIR, the system will 
+
+
+	     allow the traffic without any change."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 4 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileCBS		OBJECT-TYPE
+
+
+ 	SYNTAX		Unsigned32
+
+
+ 	UNITS		"kilobytes"
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Committed Burst Size (CBS) for the
+
+
+ 		 scheduler profile. CBS is the maximum number of kbytes
+
+
+ 		 that can ingress at the maximum interface speed in order
+
+
+ 		 to remain CIR conformant."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 5 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileEIR		OBJECT-TYPE
+
+
+ 	SYNTAX		Unsigned32
+
+
+ 	UNITS		"kilobits/sec"
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Excess Information Rate (EIR)
+
+
+ 		 for the scheduler profile. EIR is the average rate in kbps,
+
+
+ 		 above CIR, for which ingressing traffic is considered
+
+
+ 		 yellow and is allowed."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 6 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileEBS		OBJECT-TYPE
+
+
+ 	SYNTAX		Unsigned32
+
+
+ 	UNITS		"kilobytes"
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object indicates the Excess Burst Size (EBS) 
+
+
+ 		for the scheduler profile. EBS is the maximum number
+
+
+ 		of kbytes that can ingress at the maximum interface  
+
+
+ 		speed in order to remain EIR conformant."
+
+
+ 	DEFVAL { 32 }      
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 7 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileScheduledUcastWt	OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Scheduled-unicast weight is applicable for the port
+
+
+ 		 root scheduler only, and which defines the weight given 
+
+
+ 		 at the egress port to scheduled-unicast traffic."		
+
+
+ 	DEFVAL { 80 }
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 8 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileScheduledMcastWt	OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Scheduled-multicast weight is applicable for the port
+
+
+ 		root scheduler only, and which defines the weight given at
+
+
+ 		the egress port to scheduled-multicast traffic."
+
+
+ 	DEFVAL { 20 }
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 9 }  
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerProfileTapPointCount		OBJECT-TYPE
+
+
+ 	SYNTAX		INTEGER
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the number of tap points for the scheduler."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 10 }
+
+
+cienaCesDpTsQSchedulerProfileShaperOverSpeed          OBJECT-TYPE
+ 	SYNTAX		INTEGER
+ 	MAX-ACCESS	read-only
+ 	STATUS		current
+ 	DESCRIPTION
+ 		"This object specifies the shaper overspeed in percentage for the (root) scheduler."
+ 	::= { cienaCesDpTsQSchedulerProfileEntry 11 }
+
+ cienaCesDpTsQSchedulerProfileCirPolicy       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            none(0),
+                            autoAdjustDisabled(1),
+                            cirAsPercent(2),
+                            childCirAsPercent(3),
+                            childCirSum(4)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+               "This object specifies the cir-policy associated with the scheduler profile.
+                A policy of autoAdjustDisabled means that CIR is configured based on the CIR value in Kbps of this scheduler
+                profile. Additionally, the child schedulers/queues will configure their respective CIRs based on the configured
+                CIR values in the respective child schedulers/queues.
+                A policy of cirAsPercent means that CIR is configured based on the CIR-percent of this scheduler
+                profile/instance, where cir-percent is the percentage of the parent CIR. Additionally, the child schedulers/queues will 
+                configure their respective CIRs based on the configured CIR percents in the respective child schedulers/queues relative
+                to the CIR configured in this scheduler profile/instance.
+                A policy of childCirAsPercent means that CIR is configured based on the CIR value in Kbps of this scheduler
+                profile/instance. Additionally, the child schedulers/queues will configure their respective CIRs based on the configured
+                CIR percents in the respective child schedulers/queues relative to the CIR configured in this scheduler profile/instance.
+                A policy of childCirSum means that CIR is configured based on the sum of CIR values in the child schedulers/queues
+                relative to this scheduler/instance."
+        DEFVAL  {autoAdjustDisabled}
+        ::= { cienaCesDpTsQSchedulerProfileEntry 12 }
+
+ cienaCesDpTsQSchedulerProfileEirPolicy       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            none(0),
+                            autoAdjustDisabled(1),
+                            eirAsPercent(2),
+                            childEirAsPercent(3)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+               "This object specifies the eir-policy associated with the scheduler profile.
+                A policy of autoAdjustDisabled means that EIR is configured based on the EIR value in Kbps of this scheduler
+                profile. Additionally, the child schedulers/queues will configure their respective EIRs based on the configured
+                EIR values in the respective child schedulers/queues.
+                A policy of eirAsPercent means that EIR is configured based on the EIR-percent of this scheduler
+                profile/instance, where eir-percent is the percentage of the parent EIR. Additionally, the child schedulers/queues will 
+                configure their respective EIRs based on the configured EIR percents in the respective child schedulers/queues relative
+                to the EIR configured in this scheduler profile/instance.
+                A policy of childEirAsPercent means that EIR is configured based on the EIR value in Kbps of this scheduler
+                profile/instance. Additionally, the child schedulers/queues will configure their respective EIRs based on the configured
+                EIR percents in the respective child schedulers/queues relative to the EIR configured in this scheduler profile/instance."
+        DEFVAL  {autoAdjustDisabled}
+        ::= { cienaCesDpTsQSchedulerProfileEntry 13 }
+
+ cienaCesDpTsQSchedulerProfileCirPercent       OBJECT-TYPE
+        SYNTAX          Unsigned32
+ 	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+               "This object specifies the cir-percent associated with the scheduler profile.
+               The cir-percent allows for the CIR value on a scheduler instance to be determined as a percentage of the parent scheduler CIR."
+        ::= { cienaCesDpTsQSchedulerProfileEntry 14 }
+
+ cienaCesDpTsQSchedulerProfileEirPercent       OBJECT-TYPE
+        SYNTAX          Unsigned32
+ 	UNITS		"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+               "This object specifies the eir-percent associated with the scheduler profile.
+               The eir-percent allows for the EIR value on a scheduler instance to be determined as a percentage of the parent scheduler EIR."
+        ::= { cienaCesDpTsQSchedulerProfileEntry 15 }
+
+--
+
+
+-- Tap-Point Entry for the Scheduler
+
+
+-- 	
+
+
+ cienaCesDpTsQSchedulerTapPointTable	OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF  CienaCesDpTsQSchedulerTapPointEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Tap point configuration data for a scheduler."
+
+
+ 	::= { cienaCesDpTsQSchedulerProfile 2 }
+
+
+ 
+
+
+ cienaCesDpTsQSchedulerTapPointEntry	OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQSchedulerTapPointEntry
+
+
+ 	MAX-ACCESS	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"An entry in the tap point configuration table. A scheduler tap 
+
+ 		point is the connection point on the scheduler between a queue 
+
+ 		and the parent scheduler." 
+
+
+ 	INDEX { cienaCesDpTsQSchedulerProfileId, 
+
+
+ 			cienaCesDpTsQSchedulerTapPointIndex }
+
+
+ 	::= { cienaCesDpTsQSchedulerTapPointTable 1 }     
+
+
+ 	
+
+
+ CienaCesDpTsQSchedulerTapPointEntry::=	SEQUENCE {
+
+
+   cienaCesDpTsQSchedulerTapPointIndex		INTEGER,
+
+
+   cienaCesDpTsQSchedulerTapPointPriority	INTEGER,
+
+
+   cienaCesDpTsQSchedulerTapPointWeight		INTEGER
+
+
+ }                                                 
+
+
+ 
+
+
+ cienaCesDpTsQSchedulerTapPointIndex	OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER (0..7)
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the unique index for the tap point  
+
+
+ 		configuration entry." 
+
+
+ 	::= { cienaCesDpTsQSchedulerTapPointEntry 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerTapPointPriority	OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the priority of a tap point relative
+
+
+ 		 to other tap points in the scheduler when the scheduler
+
+
+ 		 algorithm is 'Strict Priority'. "
+
+
+ 	::= {  cienaCesDpTsQSchedulerTapPointEntry 2 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerTapPointWeight		OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER
+
+
+ 	MAX-ACCESS		read-only
+
+
+	STATUS			current
+
+
+	DESCRIPTION
+
+
+		"This object specifies the weight of the tap point in the  
+
+
+		 scheduler when the scheduler algorithm is 'Weighted Fair Queuing'."
+
+
+	::= { cienaCesDpTsQSchedulerTapPointEntry 3 }     
+
+
+	
+
+
+ --
+
+
+ -- Scheduler Instance Table
+
+
+ --
+
+
+  cienaCesDpTsQSchedulerInstanceTable    OBJECT-TYPE
+
+
+ 	SYNTAX		SEQUENCE OF CienaCesDpTsQSchedulerInstanceEntry
+
+
+ 	MAX-ACCESS 	not-accessible
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"Table of scheduler instances."
+
+
+ 	::= { cienaCesDpTsQSchedulerInstance 1 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerInstanceEntry		OBJECT-TYPE
+
+
+ 	SYNTAX		CienaCesDpTsQSchedulerInstanceEntry
+
+
+ 	MAX-ACCESS	not-accessible  
+
+
+ 	STATUS		current                     
+
+
+ 	DESCRIPTION
+
+
+ 		"Each entry represents a scheduler instance."
+
+
+ 	INDEX { cienaCesDpTsQSchedulerInstancePgid, 
+
+
+ 			cienaCesDpTsQSchedulerProfileId,
+
+
+ 	 		cienaCesDpTsQSchedulerInstanceIndex } 
+
+
+ 	::= { cienaCesDpTsQSchedulerInstanceTable 1 }
+
+
+ 	
+
+
+ CienaCesDpTsQSchedulerInstanceEntry ::= SEQUENCE {
+     cienaCesDpTsQSchedulerInstancePgid                      Unsigned32,
+     cienaCesDpTsQSchedulerInstanceIndex                     INTEGER,
+     cienaCesDpTsQSchedulerInstanceParentSchedId             INTEGER,
+     cienaCesDpTsQSchedulerInstanceParentInstanceId          INTEGER,
+     cienaCesDpTsQSchedulerInstanceParentTapPoint            INTEGER,
+     cienaCesDpTsQSchedulerInstanceControlPlaneUsedCir       Unsigned32
+ }
+
+
+
+
+
+ cienaCesDpTsQSchedulerInstancePgid   	OBJECT-TYPE
+
+
+ 	SYNTAX			Unsigned32
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the PGID of the port to which the
+
+
+ 		 scheduler resolves."
+
+
+ ::= { cienaCesDpTsQSchedulerInstanceEntry 1 }
+
+
+ 
+
+
+ cienaCesDpTsQSchedulerInstanceIndex   	OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER (1..65535)
+
+
+ 	MAX-ACCESS		not-accessible
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the scheduler profile instance ID."
+
+
+ ::= { cienaCesDpTsQSchedulerInstanceEntry 2 }
+
+
+
+
+
+ cienaCesDpTsQSchedulerInstanceParentSchedId		OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the profile ID of the parent scheduler
+
+
+ 		 to which this scheduler is attached." 
+
+
+ 	::= {  cienaCesDpTsQSchedulerInstanceEntry 3 }
+
+
+ 	
+
+
+ cienaCesDpTsQSchedulerInstanceParentInstanceId		OBJECT-TYPE
+
+
+ 	SYNTAX			INTEGER
+
+
+ 	MAX-ACCESS		read-only
+
+
+ 	STATUS			current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the instance ID of the parent scheduler 
+
+
+ 		to which this scheduler is attached." 
+
+
+ 	::= {  cienaCesDpTsQSchedulerInstanceEntry 4 }
+
+
+ cienaCesDpTsQSchedulerInstanceParentTapPoint         OBJECT-TYPE
+ 	SYNTAX                  INTEGER
+ 	MAX-ACCESS              read-only
+ 	STATUS                  current
+ 	DESCRIPTION
+               "This object specifies the tap point of the parent scheduler 
+                to which this scheduler is attached." 
+        ::= {  cienaCesDpTsQSchedulerInstanceEntry 5 }
+
+ cienaCesDpTsQSchedulerInstanceControlPlaneUsedCir       OBJECT-TYPE
+        SYNTAX          Unsigned32
+ 	UNITS		"kilobits/sec"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+               "This object specifies the control-plane-used-cir associated with the scheduler instance.
+               It allows validation of dataplane CIR changes relative to control-plane usage"
+        ::= { cienaCesDpTsQSchedulerInstanceEntry 6 }
+
+ --
+
+
+ -- Dataplane Sub Port tables
+
+
+ --
+
+
+ cienaCesDpSubPortTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpSubPortEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of sub-ports."
+
+
+     ::= { cienaCesDpSubPort 1 }
+
+
+ 		
+
+
+ cienaCesDpSubPortEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpSubPortEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Sub-port entry in the sub-port Table.
+
+
+	     A sub-port is a logical interface and is always a child object  
+
+
+	     of a logical port."
+
+
+     INDEX { cienaCesDpSubPortLiIndex }
+
+
+     ::= { cienaCesDpSubPortTable 1 } 
+
+
+
+
+
+ CienaCesDpSubPortEntry ::= SEQUENCE {
+
+
+     cienaCesDpSubPortLiIndex                     INTEGER,
+
+
+     cienaCesDpSubPortName                        DisplayString,
+
+
+     cienaCesDpSubPortClassifierPrecedence        Unsigned32,
+
+
+     cienaCesDpSubPortParentIfId                  INTEGER,
+
+
+     cienaCesDpSubPortVirtualSwitchIndex          INTEGER,
+
+
+     cienaCesDpSubPortRlanIndex                   INTEGER,
+
+
+     cienaCesDpSubPortVirtualSwitchName           OCTET STRING,
+
+
+     cienaCesDpSubPortIngressMeterProfileId       INTEGER,
+
+
+     cienaCesDpSubPortIngressMeterProfileName	  OCTET STRING,
+
+
+     cienaCesDpSubportIngressMeterPolicy	      DpIngressMeterPolicy,
+
+
+     cienaCesDpSubPortIngressFloodContainerId     INTEGER,
+
+
+     cienaCesDpSubPortIngressFloodContainerName	  OCTET STRING,
+
+
+     cienaCesDpSubPortIngressRcosProfileId        INTEGER,
+
+
+     cienaCesDpSubPortIngressRcosProfileName      OCTET STRING,
+
+
+     cienaCesDpSubPortIngressRcosPolicy           INTEGER,
+
+
+     cienaCesDpSubPortIngressFcosMapId            INTEGER,
+
+
+     cienaCesDpSubPortIngressFcosMapName          OCTET STRING,
+
+
+     cienaCesDpSubPortEgressFcosMapId             INTEGER,
+
+
+     cienaCesDpSubPortEgressFcosMapName			  OCTET STRING,
+
+
+     cienaCesDpSubPortEgressL2PtTransform         TruthValue,
+
+
+     cienaCesDpSubPortIngressL2Transform		  OCTET STRING,
+
+
+     cienaCesDpSubPortEgressL2Transform		      OCTET STRING,
+
+
+     cienaCesDpSubPortIngressL3TransformPolicy    INTEGER,
+
+
+     cienaCesDpSubPortEgressL3TransformPolicy     INTEGER,
+
+
+     cienaCesDpSubPortPrivateFwdGroup             INTEGER,
+
+
+     cienaCesDpSubPortFilterPolicy                INTEGER,
+
+
+     cienaCesDpSubPortLogicalRingIndex			  INTEGER,
+
+
+     cienaCesDpSubPortVirtualRingIndex			  INTEGER,
+
+
+     cienaCesDpSubPortEgressReflectorMac	  MacAddress,
+     cienaCesDpSubPortEgressGeneratorMac	  MacAddress,
+     cienaCesDpSubPortQueueGroupProfileId         INTEGER,
+     cienaCesDpSubPortQueueGroupProfileName       OCTET STRING,
+     cienaCesDpSubPortQueueGroupInstanceId        INTEGER
+  }
+
+
+
+
+
+ cienaCesDpSubPortLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (0..16777215) 
+
+
+      MAX-ACCESS    accessible-for-notify
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object represents a unique index into the table."
+
+
+      ::= { cienaCesDpSubPortEntry 1 }
+
+
+
+
+
+ cienaCesDpSubPortName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object represents a unique name of the sub-port."
+
+
+      ::= { cienaCesDpSubPortEntry 2 }
+
+
+
+
+
+ cienaCesDpSubPortClassifierPrecedence OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object represents the classifier precedence relative to other sub-ports 
+
+
+	      sharing the same parent interface."
+
+
+      ::= { cienaCesDpSubPortEntry 3 }
+
+
+
+
+
+ cienaCesDpSubPortParentIfId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object represents the parent port PGID."
+
+
+      ::= { cienaCesDpSubPortEntry 4 }
+
+
+ 
+
+
+ cienaCesDpSubPortVirtualSwitchIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object represents the index of the attached virtual switch."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpSubPortEntry 5 } 
+
+
+
+
+
+ cienaCesDpSubPortRlanIndex  OBJECT-TYPE
+
+
+     SYNTAX          INTEGER 
+
+
+     MAX-ACCESS      read-only
+
+
+     STATUS          current
+
+
+     DESCRIPTION
+
+
+	      "This object represents the index of the RLAN of the
+
+
+	       attached virtual switch."
+
+
+     DEFVAL          {0}
+
+
+     ::= { cienaCesDpSubPortEntry 6 }
+
+
+ 
+
+
+ cienaCesDpSubPortVirtualSwitchName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object represents the name of the attached virtual switch."
+
+
+      ::= { cienaCesDpSubPortEntry 7 } 
+
+
+ 
+
+
+ cienaCesDpSubPortIngressMeterProfileId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress meter profile."
+
+
+      ::= { cienaCesDpSubPortEntry 8}
+
+
+ 
+
+
+ cienaCesDpSubPortIngressMeterProfileName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress meter profile."
+
+
+      ::= { cienaCesDpSubPortEntry 9 }
+
+
+       
+
+
+ cienaCesDpSubportIngressMeterPolicy OBJECT-TYPE
+
+
+ 	SYNTAX 		  DpIngressMeterPolicy
+
+
+ 	MAX-ACCESS    read-only
+
+
+    STATUS        current
+
+
+    DESCRIPTION
+
+
+	      "This object specifies the ingress meter policy.
+
+
+	      The ingress meter policy has no effect when there is no meter profile
+
+
+	      attached to this sub-port.
+
+
+	      - Non-Hierarchical: Denotes that frames which classify to the Meter
+
+
+	        instantiated via an attached Meter Profile will be Metered according 
+
+
+	        to the bandwidth parameters of the attached Meter Profile. 
+
+
+	        The resultant color of the frame is determined by the
+
+
+	        single meter instance of the logical interface. The frame is
+
+
+	        processed by a single ingress meter. Resultant Red frames
+
+
+	        will be dropped.
+
+
+		 -	Hierarchical: Denotes that frames which classify to the Meter
+
+
+		    instantiated via an attached Meter Profile will first be Metered
+
+
+		    according to the bandwidth parameters of the attached Meter Profile, 
+
+
+		    then subsequently those frames will be Metered according to the
+
+
+		    bandwidth parameters of the first Parent Logical Interface
+
+
+		    that has a Meter Profile attached. If no parent logical interface
+
+
+		    has an attached ingress meter profile, the behavior for frames
+
+
+		    that classify to the logical interface is the same as the
+
+
+		    Non-Hierarchical policy. The resultant color of frames which
+
+
+		    are metered by the attached meter profile are fed into the parent
+
+
+		    meter. If the resultant color of a frame is Red after being 
+
+
+		    processed by a meter at any hierarchical level, the frame is
+
+
+		    dropped and not fed into a parent meter."
+
+
+    DEFVAL        {nonhierarchical}         
+
+
+    ::= { cienaCesDpSubPortEntry 10 }
+
+
+    
+
+
+ cienaCesDpSubPortIngressFloodContainerId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress flood container profile.
+
+
+	      Flood containment for sub-ports is based on the destination MAC address
+
+
+	      of the frame."
+
+
+      ::= { cienaCesDpSubPortEntry 11 }    
+
+
+      
+
+
+ cienaCesDpSubPortIngressFloodContainerName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress flood container profile."
+
+
+      ::= { cienaCesDpSubPortEntry 12 }
+
+
+
+
+
+ cienaCesDpSubPortIngressRcosProfileId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress resolved CoS profile."
+
+
+      ::= { cienaCesDpSubPortEntry 13 }
+
+
+  
+
+
+ cienaCesDpSubPortIngressRcosProfileName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress resolved CoS profile."
+
+
+      ::= { cienaCesDpSubPortEntry 14 }
+
+
+
+
+
+ cienaCesDpSubPortIngressRcosPolicy OBJECT-TYPE
+      SYNTAX        INTEGER  {
+                        ignore(1),
+                        fixed(2),
+                        dot1dToRcosTag1(3),
+                        dot1dToRcosTag2(4),
+                        dscpToRcos(5),
+                        dscpMplsTcToRcos(6)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the ingress resolved CoS policy."
+      DEFVAL        {dot1dToRcosTag1}
+      ::= { cienaCesDpSubPortEntry 15 }      
+
+
+
+ cienaCesDpSubPortIngressFcosMapId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress frame CoS map."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpSubPortEntry 16 }
+
+
+  
+
+
+ cienaCesDpSubPortIngressFcosMapName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress frame CoS map."
+
+
+      ::= { cienaCesDpSubPortEntry 17 }
+
+
+ 
+
+
+ cienaCesDpSubPortEgressFcosMapId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the egress frame CoS map."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpSubPortEntry 18 }
+
+
+ 
+
+
+ cienaCesDpSubPortEgressFcosMapName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the egress frame CoS map."
+
+
+      ::= { cienaCesDpSubPortEntry 19 }
+
+
+
+
+
+ cienaCesDpSubPortEgressL2PtTransform OBJECT-TYPE
+
+
+      SYNTAX        TruthValue
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies whether an L2PT transform is performed on 
+
+
+           L2PT transform eligible frames at egress."
+
+
+      DEFVAL        {false}
+
+
+      ::= { cienaCesDpSubPortEntry 20 }
+
+
+ 
+
+
+  cienaCesDpSubPortIngressL2Transform OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies sub-port L2 ingress transform policy ."
+
+
+      ::= { cienaCesDpSubPortEntry 21 }  
+
+
+
+
+
+ cienaCesDpSubPortEgressL2Transform OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies sub-port L2 egress transform policy ."
+
+
+      ::= { cienaCesDpSubPortEntry 22 }
+
+
+
+
+
+ cienaCesDpSubPortIngressL3TransformPolicy OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  {
+
+
+                        leave(1),
+
+
+                        mappedDscp(2) 
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies sub-port L3 ingress transform policy type."
+
+
+      DEFVAL        {leave}
+
+
+      ::= { cienaCesDpSubPortEntry 23 }  
+
+
+
+
+
+ cienaCesDpSubPortEgressL3TransformPolicy OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  {
+
+
+                        leave(1),
+
+
+                        mappedDscp(2) 
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies sub-port L3 egress transform policy type."
+
+
+      DEFVAL        {leave}
+
+
+      ::= { cienaCesDpSubPortEntry 24 }
+
+
+ 
+
+
+ cienaCesDpSubPortPrivateFwdGroup OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  {
+
+
+                        groupA(1),
+
+
+                        groupB(2),
+
+
+                        groupC(3)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specified the private forwarding group."
+
+
+      DEFVAL        {groupA}
+
+
+      ::= { cienaCesDpSubPortEntry 25 }
+
+
+
+
+
+ cienaCesDpSubPortFilterPolicy OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  {
+
+
+                        allow(1),
+
+
+                        deny(2)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the access filter policy."
+
+
+      DEFVAL        {allow}
+
+
+      ::= { cienaCesDpSubPortEntry 26 } 
+
+
+ 
+
+
+  cienaCesDpSubPortLogicalRingIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the logical ring index."
+
+
+      ::= { cienaCesDpSubPortEntry 27 } 
+
+
+ 
+
+
+   cienaCesDpSubPortVirtualRingIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the virtual ring index."
+
+
+      ::= { cienaCesDpSubPortEntry 28 } 
+
+
+
+
+
+   cienaCesDpSubPortEgressReflectorMac OBJECT-TYPE
+
+
+      SYNTAX        MacAddress  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the MAC address of the egress reflector when enabled."
+
+
+      ::= { cienaCesDpSubPortEntry 29 } 
+
+   cienaCesDpSubPortEgressGeneratorMac OBJECT-TYPE
+      SYNTAX        MacAddress  
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the generator MAC address of the egress reflector when enabled."
+      ::= { cienaCesDpSubPortEntry 30 } 
+
+   cienaCesDpSubPortQueueGroupProfileId OBJECT-TYPE
+      SYNTAX        INTEGER  
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the Queue-Group-Profile-Id portion of a Queue-Group-Instance tuple.
+               The complete tuple is Queue-Group-Profile-Id + Queue-Group-Instance-Id + parent-interface"
+      ::= { cienaCesDpSubPortEntry 31 } 
+
+ cienaCesDpSubPortQueueGroupProfileName OBJECT-TYPE
+      SYNTAX        OCTET STRING 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the Queue-Group-Profile-Name for the Queue-Group-Profile-Id portion of a 
+               Queue-Group-Instance tuple.
+               The complete tuple is Queue-Group-Profile-Id + Queue-Group-Instance-Id + parent-interface"
+      ::= { cienaCesDpSubPortEntry 32 }
+
+   cienaCesDpSubPortQueueGroupInstanceId OBJECT-TYPE
+      SYNTAX        INTEGER  
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the Queue-Group-Instance-Id portion of a Queue-Group-Instance tuple.
+               The complete tuple is Queue-Group-Profile-Id + Queue-Group-Instance-Id + parent-interface"
+      ::= { cienaCesDpSubPortEntry 33 } 
+
+
+ 
+
+
+ --
+
+
+ -- Dataplane Virtual Switch table
+
+
+ --
+
+
+ cienaCesDpVirtualSwitchTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpVirtualSwitchEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of Virtual Switches. This table is a place holder for future  
+
+
+	     extension where multiple RLANs are supported in a Virtual Switch.
+
+
+	     Reading this table returns NULL."
+
+
+     ::= { cienaCesDpVirtualSwitch 1 }
+
+
+ 		
+
+
+ cienaCesDpVirtualSwitchEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpVirtualSwitchEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Virtual Switch entry in the Virtual Switch Table."
+
+
+     INDEX { cienaCesDpVirtualSwitchIndex}
+
+
+     ::= { cienaCesDpVirtualSwitchTable 1 } 
+
+
+
+
+
+ CienaCesDpVirtualSwitchEntry ::= SEQUENCE {
+
+
+     cienaCesDpVirtualSwitchIndex                        INTEGER,
+
+
+     cienaCesDpVirtualSwitchRlanIndex                    INTEGER
+
+
+ }
+
+
+
+
+
+ cienaCesDpVirtualSwitchIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..1048575)  
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpVirtualSwitchEntry 1 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanIndex  OBJECT-TYPE
+
+
+     SYNTAX          INTEGER (0..4095) 
+
+
+     MAX-ACCESS      read-only
+
+
+     STATUS          current
+
+
+     DESCRIPTION
+
+
+	      "This object specifies a unique virtual switch RLAN index to the table.
+
+
+         Supporting value of ZERO only at this time."
+
+
+      ::= { cienaCesDpVirtualSwitchEntry 2 }
+
+
+
+
+
+
+
+
+ --
+
+
+ -- Dataplane Virtual Switch RLAN table
+
+
+ --
+
+
+ cienaCesDpVirtualSwitchRlanTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpVirtualSwitchRlanEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of Virtual Switches RLAN."
+
+
+     ::= { cienaCesDpVirtualSwitch 2 }
+
+
+ 		
+
+
+ cienaCesDpVirtualSwitchRlanEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpVirtualSwitchRlanEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Virtual Switch entry in the Virtual Switch RLAN table."
+
+
+     INDEX { cienaCesDpVirtualSwitchIndex, 
+
+
+     		 cienaCesDpVirtualSwitchRlanIndex }
+
+
+     ::= { cienaCesDpVirtualSwitchRlanTable 1 } 
+
+
+
+
+
+ CienaCesDpVirtualSwitchRlanEntry ::= SEQUENCE {
+
+
+     cienaCesDpVirtualSwitchRlanName                     DisplayString,
+
+
+     cienaCesDpVirtualSwitchRlanMcastForwardingMode      INTEGER,
+
+
+     cienaCesDpVirtualSwitchRlanL2CftStatus              CienaGlobalState,
+
+
+     cienaCesDpVirtualSwitchRlanL2CftL2ControlRcos       INTEGER,
+
+
+     cienaCesDpVirtualSwitchRlanMacLearningStatus        CienaGlobalState,
+
+
+     cienaCesDpVirtualSwitchRlanPrivateFwdGroupStatus    CienaGlobalState,
+
+
+     cienaCesDpVirtualSwitchRlanPrivateFwdGroupAPolicy   PrivateForwardGroupPolicy,
+
+
+     cienaCesDpVirtualSwitchRlanPrivateFwdGroupBPolicy   PrivateForwardGroupPolicy,
+
+
+     cienaCesDpVirtualSwitchRlanPrivateFwdGroupCPolicy   PrivateForwardGroupPolicy,
+
+     cienaCesDpVirtualSwitchRlanDescription              DisplayString,
+
+     cienaCesDpVirtualSwitchRlanPfgProfileId             Integer32,
+
+     cienaCesDpVirtualSwitchRlanPfgProfileName           OCTET STRING,
+     cienaCesDpVirtualSwitchRlanL2CftProfileId           Integer32,
+     cienaCesDpVirtualSwitchRlanL2CftProfileName         OCTET STRING,
+     cienaCesDpVirtualSwitchRlanLearnLimit               INTEGER
+ }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique name of a Virtual Switch + RLAN."
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 1 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanMcastForwardingMode OBJECT-TYPE
+
+
+      SYNTAX        INTEGER {
+
+
+                        default(1),
+
+
+                        l2Enhanced(2)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the virtual switch MCAST forwarding mode.
+
+
+	      -'Default' follows  a normal flooding path through the data-plane. 
+
+
+	      In this mode, frames with an  L2 DA most-significant-byte equal to
+
+
+	      0x01 are treated as all other ucast-flood and broadcast
+
+
+	      traffic on the virtual switch.
+
+
+          -'l2Enhanced' provides increased performance for multicast L2 DAs
+
+
+         that have a most-significant-byte equal to 0x01, e.g., 01-??-??-??-??-??"
+
+
+      DEFVAL        {default}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 2 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanL2CftStatus OBJECT-TYPE
+
+
+      SYNTAX        CienaGlobalState
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the virtual switch L2 control frame
+
+
+	       tunneling status. When the L2CFT status is disabled, then
+
+
+	       the Untagged L2CF(L2 Control Frame) is handled using
+
+
+	       the ingress port's default disposition, while Transparent 
+
+
+	       and L2PT L2CF forms are handled as normal data frames. "
+
+
+      DEFVAL        {disabled}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 3 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanL2CftL2ControlRcos  OBJECT-TYPE
+
+
+     SYNTAX          INTEGER  
+
+
+     MAX-ACCESS      read-only
+
+
+     STATUS          current
+
+
+     DESCRIPTION
+
+
+	      "This object specifies the RCoS to use for control frames 
+
+
+	       An L2CF that is processed with an L2CFT disposition of 
+
+
+	       forwarding is flooded to all logical-interfaces in the
+
+
+	       virtual switch/RLAN forwarding-domain, and is subject 
+
+
+	       to the same egress restrictions as normal data frames.
+
+
+		   A frame that is classified as an Untagged L2CF is 
+
+
+		   forwarded by an L2CFT Instance using the RCoS value 
+
+
+		   specified by this object. The object does not apply 
+
+
+		   to a tagged L2CF frame that is  classified as a 
+
+
+		   Transparent or L2PT form of a L2CF. Such frames are
+
+
+		   given the same internal treatment as data frames
+
+
+		   that are classified to the same logical-interface."
+
+
+     DEFVAL          {48}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 4 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanMacLearningStatus OBJECT-TYPE
+
+
+      SYNTAX        CienaGlobalState
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the virtual switch learning mode. 
+
+
+	       Default value of L2 MAC learning is enabled."
+
+
+      DEFVAL        {enabled}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 5 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanPrivateFwdGroupStatus OBJECT-TYPE
+
+
+      SYNTAX        CienaGlobalState
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the virtual switch private forwarding groups status.
+
+
+         Default value is disabled. When enabled, group A,B,C policies are enforced.
+
+
+         The purpose of Private Forwarding Groups is to provide a set of group-based 
+
+
+         associations and forwarding rules among interfaces of a virtual switch [and RLAN]."
+
+
+      DEFVAL        {disabled}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 6 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanPrivateFwdGroupAPolicy OBJECT-TYPE
+
+
+      SYNTAX        PrivateForwardGroupPolicy
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the policy for private forwarding group A 
+
+
+	      of the virtual switch + RLAN.
+
+
+          This policy is active when private forwardd group status is set to enabled."
+
+
+      DEFVAL        {talkToABC}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 7 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanPrivateFwdGroupBPolicy OBJECT-TYPE
+
+
+      SYNTAX        PrivateForwardGroupPolicy
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the policy for private forwarding group B 
+
+
+	      of the virtual switch + RLAN.
+
+
+          This policy is active when private forward group status is set to enabled."
+
+
+      DEFVAL        {talkToABC}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 8 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanPrivateFwdGroupCPolicy OBJECT-TYPE
+
+
+      SYNTAX        PrivateForwardGroupPolicy
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the policy for private forwarding group C 
+
+
+	      of the virtual switch + RLAN.
+
+
+          This policy is active when private forward group status is set to enabled."
+
+
+      DEFVAL        {talkToABC}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 9 }
+
+
+
+ cienaCesDpVirtualSwitchRlanDescription OBJECT-TYPE
+
+
+      SYNTAX        DisplayString
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a description for the virtual switch."
+
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 10 }
+
+
+ cienaCesDpVirtualSwitchRlanPfgProfileId OBJECT-TYPE
+
+      SYNTAX        Integer32
+
+      MAX-ACCESS    read-only
+
+      STATUS        current
+
+      DESCRIPTION
+
+	      "This object specifies a pfg-profile ID associated with a virtual switch."
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 11 }
+
+
+ cienaCesDpVirtualSwitchRlanPfgProfileName OBJECT-TYPE
+
+      SYNTAX        OCTET STRING
+
+      MAX-ACCESS    read-only
+
+      STATUS        current
+
+      DESCRIPTION
+
+	      "This object specifies a pfg-profile Name associated with a virtual switch."
+
+      ::= { cienaCesDpVirtualSwitchRlanEntry 12 }
+
+ cienaCesDpVirtualSwitchRlanL2CftProfileId OBJECT-TYPE
+      SYNTAX        Integer32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies an l2-cft-profile ID associated with a virtual switch."
+      ::= { cienaCesDpVirtualSwitchRlanEntry 13 }
+
+ cienaCesDpVirtualSwitchRlanL2CftProfileName OBJECT-TYPE
+      SYNTAX        OCTET STRING
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies an l2-cft-profile Name associated with a virtual switch."
+      ::= { cienaCesDpVirtualSwitchRlanEntry 14 }
+
+ cienaCesDpVirtualSwitchRlanLearnLimit OBJECT-TYPE
+      SYNTAX        INTEGER
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies learn limit count for the virtual switch."
+      DEFVAL        {64000}
+      ::= { cienaCesDpVirtualSwitchRlanEntry 15 }
+ 
+
+ --
+
+
+ -- Dataplane Virtual Switch Interface Attachments table
+
+
+ --
+
+
+ cienaCesDpVirtualSwitchRlanIfTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpVirtualSwitchRlanIfEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of virtual switch interfaces."
+
+
+     ::= { cienaCesDpVirtualSwitch 3 }
+
+
+ 		
+
+
+ cienaCesDpVirtualSwitchRlanIfEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpVirtualSwitchRlanIfEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Virtual Switch Interface entry in the virtual switch interfaces table."
+
+
+     INDEX { cienaCesDpVirtualSwitchIndex, 
+
+
+     		 cienaCesDpVirtualSwitchRlanIndex, 
+
+
+             cienaCesDpVirtualSwitchRlanIfLiType,
+
+
+             cienaCesDpVirtualSwitchRlanIfLiIndex }
+
+
+     ::= { cienaCesDpVirtualSwitchRlanIfTable 1 } 
+
+
+
+
+
+ CienaCesDpVirtualSwitchRlanIfEntry ::= SEQUENCE {
+
+
+     cienaCesDpVirtualSwitchRlanIfLiType                      DpTsAttachType, 
+
+
+     cienaCesDpVirtualSwitchRlanIfLiIndex                     INTEGER, 
+
+
+     cienaCesDpVirtualSwitchRlanIfLportIngress                INTEGER,
+
+
+     cienaCesDpVirtualSwitchRlanIfLportEgress                 INTEGER
+
+
+ }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanIfLiType OBJECT-TYPE
+
+
+      SYNTAX        DpTsAttachType
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique virtual switch index into the table."
+
+
+      ::= { cienaCesDpVirtualSwitchRlanIfEntry 1 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanIfLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (0..16777215) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique RLAN index into the table."
+
+
+      ::= { cienaCesDpVirtualSwitchRlanIfEntry 2 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanIfLportIngress OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the resolved ingress port PGID.
+
+
+           A value of 0 means that the ingress port PGID is unknown at this time."
+
+
+      ::= { cienaCesDpVirtualSwitchRlanIfEntry 3 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanIfLportEgress OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the resolved egress port PGID.
+
+
+           A value of 0 means that the egress port PGID is unknown at this time."
+
+
+      ::= { cienaCesDpVirtualSwitchRlanIfEntry 4 }
+
+
+
+
+
+ --
+
+
+ -- Dataplane Virtual Switch L2CFT Protocols
+
+
+ --
+
+
+ cienaCesDpVirtualSwitchRlanL2CftProtocolTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpVirtualSwitchRlanL2CftProtocolEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of virtual switch Layer 2 Control Frame Tunneling (L2CFT) protocols."
+
+
+     ::= { cienaCesDpVirtualSwitch 4 }
+
+
+ 		
+
+
+ cienaCesDpVirtualSwitchRlanL2CftProtocolEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpVirtualSwitchRlanL2CftProtocolEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Virtual switch L2CFT protocol entry in the virtual switch L2CFT 
+
+
+	     protocol table. Each virtual switch or RLAN in the system is 
+
+
+	     implicitly associated with an L2CFT instance, whether or not it 
+
+
+	     has been given an explicit L2CFT configuration.
+
+
+	     Normally, Layer 2 Control Frames(L2CFs) received on a NPU 
+
+
+	     are either sent to the CPU to be handled or discarded. L2CFT modifies 
+
+
+	     this default behavior, so that the L2CFs for certain protocols can
+
+
+	     be transformed and forwarded as data frames."
+
+
+     INDEX { cienaCesDpVirtualSwitchIndex, 
+
+
+     		 cienaCesDpVirtualSwitchRlanIndex,
+
+
+             cienaCesDpVirtualSwitchRlanL2CftProtocolType }
+
+
+     ::= { cienaCesDpVirtualSwitchRlanL2CftProtocolTable 1 } 
+
+
+
+
+
+ CienaCesDpVirtualSwitchRlanL2CftProtocolEntry ::= SEQUENCE {
+
+
+     cienaCesDpVirtualSwitchRlanL2CftProtocolType               INTEGER, 
+
+
+     cienaCesDpVirtualSwitchRlanL2CftProtocolDisposition        INTEGER
+
+
+ }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanL2CftProtocolType OBJECT-TYPE
+
+
+      SYNTAX        INTEGER { 
+
+
+      						  unknown(0),
+
+
+                              ciscoCdp(1),
+
+
+                              ciscoDtp(2),
+
+
+                              ciscoPagp(3),
+
+
+                              ciscoUdld(4),
+
+
+                              ciscoVtp(5),
+
+
+                              ciscoPvst(6),
+
+
+                              ciscoStpUplinkFast(7),
+
+
+                              vlanBridge(8),
+
+
+                              rstp(9),
+
+
+                              lacp(10),
+
+
+                              lacpMarker(11),
+
+
+                              oam(12),
+
+
+                              lldp(13),
+
+
+                              i8021x(14),
+
+
+                              gmrp(15),
+
+
+                              gvrp(16),
+
+
+                              brigeBlock(17),
+
+
+                              allBridgesBlock(18),
+                              garpBlock(19),
+                              elmi(20),
+                              ptpPeerDelay(21)
+
+                    }
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique protocol type index into the table."
+
+
+      ::= { cienaCesDpVirtualSwitchRlanL2CftProtocolEntry 1 }
+
+
+
+
+
+ cienaCesDpVirtualSwitchRlanL2CftProtocolDisposition OBJECT-TYPE
+
+
+      SYNTAX        INTEGER {
+
+
+                        forward(1),
+
+
+                        discard(2)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the virtual switch L2CFT protocol action.
+
+
+	      There are 2 cases : 
+
+
+	      - When 'cienaCesDpVirtualSwitchRlanL2CftStatus = disabled' or the protocol 
+
+
+	      is not in the Disposition List, then an Untagged L2CF is handled using 
+
+
+	      the ingress logical port's Default Disposition for the protocol, 
+
+
+	      while Transparent and L2PT L2CF forms are handled as normal data frames.
+
+
+	      - When 'cienaCesDpVirtualSwitchRlanL2CftStatus = enabled' and L2CF protocol
+
+
+	       is in the Disposition List, the L2CF is either discarded or forwarded
+
+
+	       depending on the value of this object. An L2CF that is processed with an
+
+
+	       L2CFT disposition of 'forward' is flooded to all logical-interfaces
+
+
+	       in the virtual switch/RLAN forwarding-domain, and is subject to 
+
+
+	       the same egress restrictions as normal data frames."
+
+
+      DEFVAL        {forward}
+
+
+      ::= { cienaCesDpVirtualSwitchRlanL2CftProtocolEntry 2 }
+
+
+ 
+
+
+   
+
+
+ -- 
+
+
+ -- Dataplane Traffic Class Term table
+
+
+ --
+
+
+ -- 
+
+
+  cienaCesDpTrafficClassTermTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpTrafficClassTermEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+ 	     "Table of Traffic Classes."
+
+
+     ::= { cienaCesDpTrafficClassTerm 1 }
+
+
+ 		
+
+
+ cienaCesDpTrafficClassTermEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpTrafficClassTermEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+ 	     "Traffic Class entry in the Traffic Classes table."
+
+
+     INDEX { cienaCesDpTrafficClassType, 
+
+
+             cienaCesDpTrafficClassId, 
+
+
+             cienaCesDpTrafficClassElemId, 
+
+
+             cienaCesDpTrafficClassTermPresentType }
+
+
+     ::= { cienaCesDpTrafficClassTermTable 1 } 
+
+
+
+
+
+ CienaCesDpTrafficClassTermEntry ::= SEQUENCE { 
+
+
+     cienaCesDpTrafficClassType                               INTEGER,
+
+
+     cienaCesDpTrafficClassId                                 INTEGER,
+
+
+     cienaCesDpTrafficClassElemId                             INTEGER,
+
+
+     cienaCesDpTrafficClassTermPresentType                    INTEGER,
+
+
+     cienaCesDpTrafficClassTermStartValue32                   Unsigned32,
+
+
+     cienaCesDpTrafficClassTermEndOrMaskValue32               Unsigned32,
+
+
+     cienaCesDpTrafficClassTermStartValueMac                  MacAddress,
+
+
+     cienaCesDpTrafficClassTermMaskValueMac                   MacAddress,
+
+
+     cienaCesDpTrafficClassTermStartValueIp                   IpAddress,
+
+
+     cienaCesDpTrafficClassTermMaskValueIp                    IpAddress
+
+
+    }
+
+
+
+
+
+ cienaCesDpTrafficClassType OBJECT-TYPE
+
+
+      SYNTAX        INTEGER { 
+
+
+      					unknown(0),
+
+
+                        subPort(1),
+
+
+                        qosFlow(2),
+
+
+                        accessFlow(3),
+
+
+                        transitPbt(4),
+
+
+                        servicePbt(5),
+
+
+						tunnelDecapPbt(6),
+
+
+						vcMpls(7),
+
+
+						named(8)
+
+
+                        }
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies the Traffic Class Term Type."
+
+
+      ::= { cienaCesDpTrafficClassTermEntry 1 }
+
+
+
+
+
+ cienaCesDpTrafficClassId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (1..65535) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies the traffic class ID to which this Traffic Class Term belongs.
+
+
+ 	      A traffic class ID is unique within a traffic class type. "
+
+
+      ::= { cienaCesDpTrafficClassTermEntry 2 }
+
+
+
+ cienaCesDpTrafficClassElemId OBJECT-TYPE
+      SYNTAX        INTEGER (1..65535)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+ 	      "This object specifies the Traffic Class Element ID of the Traffic Class ID to which this
+           Traffic Class Term belongs. A traffic class element ID is unique within
+           a class element ID."
+      ::= { cienaCesDpTrafficClassTermEntry 3 }
+
+ cienaCesDpTrafficClassTermPresentType OBJECT-TYPE
+      SYNTAX        INTEGER {
+                        unknown(0),
+                        trafficClassElement(1),
+                        vid1(2),
+                        l2Pcp1(3),
+                        vid2(4),
+                        l2Pcp2(5),
+                        vlanUntaggedData(6),
+                        l2Control(7),
+                        cMacSa(8),
+                        cMacDa(9),
+                        ipSrcIp(10),
+                        ipDstIp(11),
+                        ipProtoType(12),
+                        ipDscp(13),
+                        ipL4SrcPort(14),
+                        ipL4DstPort(15),
+                        mplsVcLabel(16),
+                        mplsVcExp(17),
+                        mplsTunLabel(18),
+                        mplsTunExp(19),
+                        baseEtype(20),
+                        bvid(21),
+                        bPcp(22), 
+                        isid(23),
+                        isidPcp(24),
+                        any(25),
+                        l2Rcos(26),
+                        ipL4Application(27)
+                        }
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+ 	      "	This object specifies the type of term contained in the term value and mask fields.
+ 	        The traffic classification is explained as below with the associated logical interface.
+                    unknown
+                    trafficClassElement		- Traffic class element
+                    vid1			- VLAN ID1  			            - Sub-Port, Qos-Flow, Access-Flow
+                    l2Pcp1			- L2 PCP priority 			    - Sub-Port, Qos-Flow, Access-Flow
+            					  for VLAN Tag1(VID1)
+                    vid2			- VLAN ID2 			            - Sub-Port, Qos-Flow, Access-Flow
+                    l2Pcp2			- L2 PCP priority 	                    - Sub-Port, Qos-Flow, Access-Flow
+            					  for VLAN Tag2(VID2)
+                    vlanUntaggedData		- VLAN untagged data frames 	            - Sub-Port
+                    l2Control			- VLAN L2 control frames                    - Sub-Port
+                    cMacSa			- Customer source MAC address               - Sub-Port, Qos-Flow, Access-Flow
+                                                 (with optional mask)
+                    cMacDa			- Customer destination MAC 		    - Sub-Port, Qos-Flow, Access-Flow
+                                                 (with optional mask)
+                    ipSrcIp			- IPv4 source address 			    - Sub-Port, Qos-Flow, Access-Flow
+            					  (with optional mask)
+		    ipDstIp			- IPv4 destination address		    - Sub-Port, Qos-Flow, Access-Flow	
+		                                  (with optional mask)
+		    ipProtoType			- IP generic protocol type		    - Qos-Flow, Access-Flow
+						  (like ICMP,IGMP,TCP,UDP)
+		    ipDscp			- DSCP field of IP frame		    - Sub-Port, Qos-Flow, Access-Flow 
+						  (with optional mask)   
+	            ipL4SrcPort                 - Layer-4 UDP/TCP source port	            - Qos-Flow, Access-Flow
+		    ipL4DstPort                 - Layer-4 UDP/TCP destination               - Qos-Flow, Access-Flow
+						  port
+		    mplsVcLabel                 - MPLS virtual circuit label	            - vcMPLS
+		    mplsVcExp                   - MPLS virtual circuit exp		    - vcMPLS
+		    mplsTunLabel		- MPLS tunnel label			    - vcMPLS
+		    mplsTunExp                  - MPLS tunnel exp			    - vcMPLS
+		    baseEtype			- Base e-type                	            - Sub-Port, Qos-Flow, Access-Flow
+		    bvid                        - B-VID Tag				    - PBB-TE
+		    bPcp                        - B-VID PCP				    - PBB-TE
+		    isid                        - ISID                                      - PBB-TE
+		    isidPcp                     - ISID PCP 				    - PBB-TE
+						  (with optional mask)
+		    any			        - Any traffic type	                    - QoS Flow	
+	            ipL4Application             - Layer-4 application      	            - Qos-Flow, Access-Flow
+                "
+      ::= { cienaCesDpTrafficClassTermEntry 4 }
+
+
+ cienaCesDpTrafficClassTermStartValue32 OBJECT-TYPE
+      SYNTAX        Unsigned32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+ 	      "This object specifies the Traffic Class Term start value dependent on
+           cienaCesDpTrafficClassTermPresentType."
+
+      DEFVAL        {0}
+      ::= { cienaCesDpTrafficClassTermEntry 5 }
+
+
+
+ cienaCesDpTrafficClassTermEndOrMaskValue32 OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies the Traffic Class Term end or mask value dependent on
+
+
+           cienaCesDpTrafficClassTermPresentType."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpTrafficClassTermEntry 6 }
+
+
+
+
+
+ cienaCesDpTrafficClassTermStartValueMac OBJECT-TYPE
+
+
+      SYNTAX        MacAddress
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies the Traffic Class Term MAC address value dependent on
+
+
+           cienaCesDpTrafficClassTermPresentType."
+
+
+      DEFVAL {'000000000000'H}
+
+
+      ::= { cienaCesDpTrafficClassTermEntry 7 }
+
+
+
+
+
+ cienaCesDpTrafficClassTermMaskValueMac OBJECT-TYPE
+
+
+      SYNTAX        MacAddress
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies the Traffic Class Term MAC address Mask value dependent on
+
+
+           cienaCesDpTrafficClassTermPresentType."
+
+
+      DEFVAL {'000000000000'H}
+
+
+      ::= { cienaCesDpTrafficClassTermEntry 8 }
+
+
+
+
+
+ cienaCesDpTrafficClassTermStartValueIp OBJECT-TYPE
+
+
+      SYNTAX        IpAddress
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies the Traffic Class Term IP address value dependent on
+
+
+           cienaCesDpTrafficClassTermPresentType."
+
+
+      DEFVAL {'00000000'H}
+
+
+      ::= { cienaCesDpTrafficClassTermEntry 9 }
+
+
+
+
+
+ cienaCesDpTrafficClassTermMaskValueIp OBJECT-TYPE
+
+
+      SYNTAX        IpAddress
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+ 	      "This object specifies the Traffic Class Term IP address mask value dependent on
+
+
+           cienaCesDpTrafficClassTermPresentType."
+
+
+      DEFVAL {'00000000'H}
+
+
+      ::= { cienaCesDpTrafficClassTermEntry 10 }
+
+
+
+
+
+ --
+
+
+ -- Dataplane Qos Flow tables
+
+
+ --
+
+
+ cienaCesDpQosFlowTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpQosFlowEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of QoS flows."
+
+
+     ::= { cienaCesDpQosFlow 1 }
+
+
+ 		
+
+
+ cienaCesDpQosFlowEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpQosFlowEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "QoS flow entry in the QoS flow table.
+
+
+	      QoS flow is a logical interface and is always a child object  
+
+
+	      of another logical interface.  A QoS flow is realized primarily
+
+
+	      in the ingress direction and is not associated with a 
+
+
+	      virtual switch."
+
+
+     INDEX { cienaCesDpQosFlowLiIndex }
+
+
+     ::= { cienaCesDpQosFlowTable 1 } 
+
+
+
+
+
+ CienaCesDpQosFlowEntry ::= SEQUENCE {
+
+
+     cienaCesDpQosFlowLiIndex                     INTEGER,
+
+
+     cienaCesDpQosFlowName                        DisplayString,
+
+
+     cienaCesDpQosFlowClassifierPrecedence        Unsigned32,
+
+
+     cienaCesDpQosFlowParentIfId                  INTEGER,
+
+
+     cienaCesDpQosFlowParentIfType                DpTsAttachType,
+
+
+     cienaCesDpQosFlowIngressMeterProfileId       INTEGER,
+
+
+     cienaCesDpQosFlowIngressMeterProfileName     OCTET STRING,
+
+
+     cienaCesDpQosFlowIngressMeterPolicy	      DpIngressMeterPolicy,
+
+
+     cienaCesDpQosFlowIngressRcosProfileId        INTEGER,
+
+
+     cienaCesDpQosFlowIngressRcosProfileName      OCTET STRING,
+
+
+     cienaCesDpQosFlowIngressRcosPolicy           INTEGER
+
+
+ }
+
+
+
+
+
+ cienaCesDpQosFlowLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (0..16777215) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpQosFlowEntry 1 }
+
+
+
+
+
+ cienaCesDpQosFlowName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique name of a QoS flow. "
+
+
+      ::= { cienaCesDpQosFlowEntry 2 }
+
+
+
+
+
+ cienaCesDpQosFlowClassifierPrecedence OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies classifier precedence relative to 
+
+
+	      other QoS flows sharing the same parent interface."
+
+
+      ::= { cienaCesDpQosFlowEntry 3 }
+
+
+
+
+
+ cienaCesDpQosFlowParentIfId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the parent interface PGID. 
+
+
+	       This object specifies an existing logical interface ID."
+
+
+      ::= { cienaCesDpQosFlowEntry 4 }
+
+
+
+
+
+ cienaCesDpQosFlowParentIfType OBJECT-TYPE
+
+
+      SYNTAX        DpTsAttachType
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the parent interface type.
+
+
+	      Currently a QoS flow can be associated with sub-port 
+
+
+	      or PBB-TE service type logical interfaces only."
+
+
+      ::= { cienaCesDpQosFlowEntry 5 }
+
+
+
+
+
+ cienaCesDpQosFlowIngressMeterProfileId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress meter profile."
+
+
+      ::= { cienaCesDpQosFlowEntry 6 }
+
+
+ 
+
+
+ cienaCesDpQosFlowIngressMeterProfileName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress meter profile."
+
+
+      ::= { cienaCesDpQosFlowEntry 7 }
+
+
+ 
+
+
+  cienaCesDpQosFlowIngressMeterPolicy OBJECT-TYPE
+
+
+ 	  SYNTAX        DpIngressMeterPolicy
+
+
+ 	  MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ingress meter policy.
+
+
+	      The ingress meter policy has no effect when there is no meter profile
+
+
+	      attached to this QoS flow..
+
+
+	      - Non-Hierarchical: Denotes that frames which classify to the Meter
+
+
+	        instantiated via an attached Meter Profile will be Metered according 
+
+
+	        to the bandwidth parameters of the attached Meter Profile. 
+
+
+	        The resultant colour of the frame will be determined by the
+
+
+	        single meter instance of the logical interface. The frame is
+
+
+	        processed by a single ingress meter. Resultant Red frames
+
+
+	        are dropped.
+
+
+		 -	Hierarchical: Denotes that frames which classify to the Meter
+
+
+		    instantiated via an attached Meter Profile will first be Metered
+
+
+		    according to the bandwidth parameters of the attached Meter Profile, 
+
+
+		    then subsequently those frames will be Metered according to the
+
+
+		    bandwidth parameters of the first parent logical interface (identifie
+d
+
+		    by the object cienaCesDpQosFlowParentIfType) that has a 
+
+
+		    Meter Profile attached. If no parent logical interface
+
+
+		    has an attached ingress meter profile, the behavior for frames
+
+
+		    which classify to the logical interface is the same as the
+
+
+		    Non-Hierarchical policy. The resultant colour of frames that
+
+
+		    are metered by the attached meter profile are fed into the parent
+
+
+		    meter. If the resultant color of a frame is Red after being 
+
+
+		    processed by a meter at any hierarchical level, the frame is 
+
+
+		    dropped and not fed into a parent meter."
+
+
+      DEFVAL        {nonhierarchical}
+
+
+      ::= { cienaCesDpQosFlowEntry 8 } 
+
+
+
+
+
+ cienaCesDpQosFlowIngressRcosProfileId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress Resolved CoS profile.
+
+
+           When this objects indicates a 0 , then this QoS-flow does not have
+
+
+           any RCoS profile attached to it."
+
+
+      ::= { cienaCesDpQosFlowEntry 9 }
+
+
+  
+
+
+  cienaCesDpQosFlowIngressRcosProfileName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress Resolved CoS profile."
+
+
+      ::= { cienaCesDpQosFlowEntry 10 }
+
+
+ cienaCesDpQosFlowIngressRcosPolicy OBJECT-TYPE
+      SYNTAX        INTEGER  {
+                        ignore(1),
+                        fixed(2),
+                        dot1dToRcosTag1(3),
+                        dot1dToRcosTag2(4),
+                        dscpToRcos(5),
+                        dscpMplsTcToRcos(6)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the ingress Resolved CoS policy.
+	      When the ingress RCoS policy is fixed, dot1dToRcosTag1, dot1dToRcosTag2
+	      or dscpToRcos , then  the RCoS profile attached to the Qos Flow is used. 
+	      When the ingress RCoS policy is 'ignore' then the parent interface's 
+	      RCoS profile is used."
+      DEFVAL        {dot1dToRcosTag1}
+      ::= { cienaCesDpQosFlowEntry 11 } 
+
+
+ --
+
+
+ -- Dataplane Access Flow tables
+
+
+ --
+
+
+ cienaCesDpAccessFlowTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpAccessFlowEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of access flows."
+
+
+     ::= { cienaCesDpAccessFlow 1 }
+
+
+ 		
+
+
+ cienaCesDpAccessFlowEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpAccessFlowEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Access flow entry in the access flow table."
+
+
+     INDEX { cienaCesDpAccessFlowLiIndex }
+
+
+     ::= { cienaCesDpAccessFlowTable 1 } 
+
+
+
+
+
+ CienaCesDpAccessFlowEntry ::= SEQUENCE {
+     cienaCesDpAccessFlowLiIndex                     INTEGER,
+     cienaCesDpAccessFlowName                        DisplayString,
+     cienaCesDpAccessFlowClassifierPrecedence        Unsigned32,
+     cienaCesDpAccessFlowParentIfId                  INTEGER,
+     cienaCesDpAccessFlowParentIfType                DpTsAttachType,
+     cienaCesDpAccessFlowFilterPolicy                INTEGER
+ }
+
+
+
+
+
+ cienaCesDpAccessFlowLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (0..16777215) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpAccessFlowEntry 1 }
+
+
+
+
+
+ cienaCesDpAccessFlowName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique name of the access flow."
+
+
+      ::= { cienaCesDpAccessFlowEntry 2 }
+
+
+
+
+
+ cienaCesDpAccessFlowClassifierPrecedence OBJECT-TYPE
+
+
+      SYNTAX        Unsigned32 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies classifier precedence relative 
+
+
+	      to other access flows sharing the same parent interface."
+
+
+      ::= { cienaCesDpAccessFlowEntry 3 }
+
+
+
+
+
+ cienaCesDpAccessFlowParentIfId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the parent interface PGID.
+
+
+	       This object must specify an existing logical interface ID."
+
+
+      ::= { cienaCesDpAccessFlowEntry 4 }
+
+
+
+
+
+ cienaCesDpAccessFlowParentIfType OBJECT-TYPE
+
+
+      SYNTAX        DpTsAttachType
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the parent interface type.
+
+
+	      Currently an access flow can be associated only with a sub-port type
+
+
+	      logical interface only. "
+
+
+      ::= { cienaCesDpAccessFlowEntry 5 }
+
+
+
+
+
+ cienaCesDpAccessFlowFilterPolicy OBJECT-TYPE
+      SYNTAX        INTEGER  {
+                        allow(1),
+                        deny(2),
+                        l2ptmactranslation(3)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the access filter action for the current access flow.
+              l2pt-mac-translation means that a frame which classifies will be allowed and potentially undergo a translation
+              of outer mac to/from L2PT"
+      DEFVAL        {deny}
+      ::= { cienaCesDpAccessFlowEntry 6 }
+
+ 
+
+ --
+
+
+ -- PBT Transit tables
+
+
+ --
+
+
+ cienaCesDpPbtTransitTable OBJECT-TYPE
+
+
+     SYNTAX       SEQUENCE OF CienaCesDpPbtTransitEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "Table of PBB-TE transit interfaces."
+
+
+     ::= { cienaCesDpPbtTransit 1 }
+
+
+ 		
+
+
+ cienaCesDpPbtTransitEntry OBJECT-TYPE
+
+
+     SYNTAX       CienaCesDpPbtTransitEntry
+
+
+     MAX-ACCESS   not-accessible
+
+
+     STATUS       current
+
+
+     DESCRIPTION
+
+
+	     "PBB-TE transit entry in the PBB-TE transit table."
+
+
+     INDEX { cienaCesDpPbtTransitLiIndex }
+
+
+     ::= { cienaCesDpPbtTransitTable 1 } 
+
+
+
+
+
+ CienaCesDpPbtTransitEntry ::= SEQUENCE {
+
+
+     cienaCesDpPbtTransitLiIndex                           INTEGER,
+
+
+     cienaCesDpPbtTransitName                              DisplayString,
+
+
+     cienaCesDpPbtTransitParentIfId                        INTEGER,
+
+
+     cienaCesDpPbtTransitIngressMeterProfileId             INTEGER,
+
+
+     cienaCesDpPbtTransitIngressMeterProfileName           OCTET STRING,
+
+
+     cienaCesDpPbtTransitIngressFloodContainerId           INTEGER,
+
+
+     cienaCesDpPbtTransitIngressFloodContainerName         OCTET STRING,  
+
+
+     cienaCesDpPbtTransitIngressRcosProfileId              INTEGER,
+
+
+     cienaCesDpPbtTransitIngressRcosProfileName            OCTET STRING,
+
+
+     cienaCesDpPbtTransitIngressRcosPolicy                 INTEGER,
+
+
+     cienaCesDpPbtTransitIngressFcosMapId                  INTEGER,
+
+
+     cienaCesDpPbtTransitIngressFcosMapName                OCTET STRING,
+
+
+     cienaCesDpPbtTransitEgressFcosMapId                   INTEGER,
+
+
+     cienaCesDpPbtTransitEgressFcosMapName                 OCTET STRING,
+
+
+     cienaCesDpPbtTransitIngressBvidTransform 		       OCTET STRING,
+
+
+     cienaCesDpPbtTransitEgressBvidTransform         	   OCTET STRING,
+
+
+     cienaCesDpPbtTransitVirtualSwitchId                   INTEGER,
+
+
+     cienaCesDpPbtTransitRlanId                            INTEGER,
+
+
+     cienaCesDpPbtTransitVirtualSwitchName				   OCTET STRING,	
+
+
+     cienaCesDpPbtTransitPrivateFwdGroup                   INTEGER, 
+
+
+     cienaCesDpPbtTransitIngressMeterPolicy		    	   DpIngressMeterPolicy
+
+
+     
+
+
+ }
+
+
+
+
+
+ cienaCesDpPbtTransitLiIndex OBJECT-TYPE
+
+
+      SYNTAX        INTEGER (0..16777215) 
+
+
+      MAX-ACCESS    not-accessible
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique index into the table."
+
+
+      ::= { cienaCesDpPbtTransitEntry 1 }
+
+
+
+
+
+ cienaCesDpPbtTransitName OBJECT-TYPE
+
+
+      SYNTAX        DisplayString
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies a unique name of an PBB-TE transit."
+
+
+      ::= { cienaCesDpPbtTransitEntry 2 }
+
+
+
+
+
+ cienaCesDpPbtTransitParentIfId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the parent interface PGID. This object
+
+
+	       must specify an existing logical port ID."
+
+
+      ::= { cienaCesDpPbtTransitEntry 3 }
+
+
+
+
+
+ cienaCesDpPbtTransitIngressMeterProfileId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress meter profile.
+
+
+           When this object indicates a value of 0, it has no ingress meter
+
+
+           profile attached to it."
+
+
+      ::= { cienaCesDpPbtTransitEntry 4 }
+
+
+ 
+
+
+  cienaCesDpPbtTransitIngressMeterProfileName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress meter profile."
+
+
+      ::= { cienaCesDpPbtTransitEntry 5 }
+
+
+
+
+
+ cienaCesDpPbtTransitIngressFloodContainerId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress flood container.
+
+
+           When this object indicates a value of 0, it has no ingress flood 
+
+
+           container attached to it."
+
+
+      ::= { cienaCesDpPbtTransitEntry 6 }
+
+
+ 
+
+
+  cienaCesDpPbtTransitIngressFloodContainerName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress flood container."
+
+
+      ::= { cienaCesDpPbtTransitEntry 7 }
+
+
+
+
+
+ cienaCesDpPbtTransitIngressRcosProfileId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress Resolved CoS profile.
+
+
+           When this object indicates a value of 0, it has no RCoS profile
+
+
+           attached to it ."
+
+
+         ::= { cienaCesDpPbtTransitEntry 8 } 
+
+
+         
+
+
+ cienaCesDpPbtTransitIngressRcosProfileName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress Resolved CoS profile."
+
+
+         ::= { cienaCesDpPbtTransitEntry 9 }  
+
+
+         
+
+
+ cienaCesDpPbtTransitIngressRcosPolicy OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  {
+
+
+                        ignore(1),
+
+
+                        fixed(2),
+
+
+                        bvidPcpToRcos(3)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ingress Resolved CoS policy."
+
+
+      DEFVAL        {bvidPcpToRcos}
+
+
+      ::= { cienaCesDpPbtTransitEntry 10 }
+
+
+
+
+
+ cienaCesDpPbtTransitIngressFcosMapId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached ingress Frame CoS Map.
+
+
+           When this object indicates a value of 0, it has no ingress FCoS Map 
+
+
+           attached to it ."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpPbtTransitEntry 11 }
+
+
+ 
+
+
+  cienaCesDpPbtTransitIngressFcosMapName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached ingress Frame CoS Map."
+
+
+      ::= { cienaCesDpPbtTransitEntry 12 }
+
+
+
+
+
+ cienaCesDpPbtTransitEgressFcosMapId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the egress Frame CoS Map.
+
+
+	      When this object indicates a value of 0, it has no eggress FCoS Map 
+
+
+          attached to it ."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpPbtTransitEntry 13 }
+
+
+  
+
+
+   cienaCesDpPbtTransitEgressFcosMapName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING 
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the egress Frame CoS Map."
+
+
+	  ::= { cienaCesDpPbtTransitEntry 14 }
+
+
+
+
+
+ cienaCesDpPbtTransitIngressBvidTransform OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies PBB-TE transit BVID ingress transform."
+
+
+      ::= { cienaCesDpPbtTransitEntry 15 }
+
+
+ 
+
+
+ cienaCesDpPbtTransitEgressBvidTransform OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies PBB-TE transit BVID egress transform."
+
+
+      ::= { cienaCesDpPbtTransitEntry 16 }
+
+
+
+
+
+ cienaCesDpPbtTransitVirtualSwitchId OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ID of the attached virtual switch.
+
+
+           When this object indicates a value of 0, it has no virtual
+
+
+           switch associated with it."
+
+
+      DEFVAL        {0}
+
+
+      ::= { cienaCesDpPbtTransitEntry 17 }
+
+
+
+
+
+ cienaCesDpPbtTransitRlanId  OBJECT-TYPE
+
+
+     SYNTAX          INTEGER  
+
+
+     MAX-ACCESS      read-only
+
+
+     STATUS          current
+
+
+     DESCRIPTION
+
+
+	      "This object specifies the ID of the RLAN of the attached virtual switch.
+
+
+           Only the default RLAN of 0 is supported."
+
+
+     DEFVAL          {0}
+
+
+      ::= { cienaCesDpPbtTransitEntry 18 } 
+
+
+      
+
+
+   cienaCesDpPbtTransitVirtualSwitchName OBJECT-TYPE
+
+
+      SYNTAX        OCTET STRING  
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the name of the attached virtual switch."
+
+
+      ::= { cienaCesDpPbtTransitEntry 19 }
+
+
+
+
+
+ cienaCesDpPbtTransitPrivateFwdGroup OBJECT-TYPE
+
+
+      SYNTAX        INTEGER  {
+
+
+                        groupA(1),
+
+
+                        groupB(2),
+
+
+                        groupC(3)
+
+
+                    }
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the private forwarding group."
+
+
+      DEFVAL        {groupA}
+
+
+      ::= { cienaCesDpPbtTransitEntry 20 }
+
+
+
+
+
+ cienaCesDpPbtTransitIngressMeterPolicy  OBJECT-TYPE     
+
+
+      SYNTAX        DpIngressMeterPolicy
+
+
+      MAX-ACCESS    read-only
+
+
+      STATUS        current
+
+
+      DESCRIPTION
+
+
+	      "This object specifies the ingress meter policy.
+
+
+	      The ingress meter policy has no effect when there is no meter profile
+
+
+	      attached to this PBB-TE transit .
+
+
+	      - Non-Hierarchical: Denotes that frames which classify to the Meter
+
+
+	        instantiated via an attached Meter Profile will be Metered according 
+
+
+	        to the bandwidth parameters of the attached Meter Profile. 
+
+
+	        The resultant colour of the frame is determined by the
+
+
+	        single meter instance of the logical interface. The frame is
+
+
+	        processed by a single ingress meter. Resultant Red frames
+
+
+	        are dropped.
+
+
+		 -	Hierarchical: Denotes that frames which classify to the Meter
+
+
+		    instantiated via an attached Meter Profile will first be Metered
+
+
+		    according to the bandwidth parameters of the attached Meter Profile, 
+
+
+		    then subsequently those frames will be Metered according to the
+
+
+		    bandwidth parameters of the first parent logical interface that has a 
+
+
+		    Meter Profile attached. If no parent logical interface
+
+
+		    has an attached ingress meter profile, the behaviour for frames
+
+
+		    that classify to the logical interface is the same as the
+
+
+		    Non-Hierarchical policy. The resultant color of frames that
+
+
+		    are metered by the attached meter profile are fed into the parent
+
+
+		    meter. If the resultant colour of a frame is Red after being 
+
+
+		    processed by a meter at any hierarchical level, the frame is 
+
+
+		    dropped and not fed into a parent meter."
+
+
+
+
+
+      DEFVAL        {nonhierarchical} 
+
+
+      ::= {cienaCesDpPbtTransitEntry 21}
+
+
+
+
+
+ --
+
+
+ -- CPS Sub-Interface table
+
+
+ --
+
+
+ cienaCesDpCpuSubInterfaceTable OBJECT-TYPE
+
+
+ 	SYNTAX  SEQUENCE OF   CienaCesDpCpuSubInterfaceEntry
+
+
+ 	MAX-ACCESS not-accessible
+
+
+ 	STATUS current 
+
+
+ 	DESCRIPTION 
+
+
+ 			"CPU sub-interface table."
+
+
+ 		::= {cienaCesDpCpuSubInterface 1} 
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceEntry OBJECT-TYPE
+
+
+ 	SYNTAX     CienaCesDpCpuSubInterfaceEntry
+
+
+ 	MAX-ACCESS  not-accessible
+
+
+ 	STATUS      current
+
+
+ 	DESCRIPTION "CPU sub-interface entry."
+
+
+ 	INDEX   {cienaCesDpCpuSubInterfaceIndex}
+
+
+ 		::= { cienaCesDpCpuSubInterfaceTable 1} 
+
+
+ 
+
+
+ CienaCesDpCpuSubInterfaceEntry  ::= SEQUENCE { 
+
+
+     cienaCesDpCpuSubInterfaceIndex		 					Unsigned32,
+
+
+     cienaCesDpCpuSubInterfaceName	 						OCTET STRING,
+
+
+     cienaCesDpCpuSubInterfaceEgressL2Transform 			OCTET STRING,
+
+
+     cienaCesDpCpuSubInterfaceIngressL2Transform  			OCTET STRING,
+
+
+     cienaCesDpCpuSubInterfaceEgressL3TransformPolicy  		INTEGER,
+
+
+     cienaCesDpCpuSubInterfaceEgressRCosPolicy				INTEGER,
+
+
+     cienaCesDpCpuSubInterfaceEgressRCosProfileIndex		Unsigned32,
+
+
+     cienaCesDpCpuSubInterfaceEgressRCosProfile				OCTET STRING,
+
+
+     cienaCesDpCpuSubInterfaceVirtualSwitchIndex			Unsigned32,
+
+
+     cienaCesDpCpuSubInterfaceRlanIndex						Unsigned32,
+
+
+     cienaCesDpCpuSubInterfaceVirtualSwitchName				OCTET STRING
+
+
+   }          
+
+
+ cienaCesDpCpuSubInterfaceIndex OBJECT-TYPE
+
+
+ 	SYNTAX 		Unsigned32
+
+
+ 	MAX-ACCESS 	not-accessible
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION 
+
+
+ 		"This object specifies the logical ID for the CPU sub-interface."
+
+
+ ::= {cienaCesDpCpuSubInterfaceEntry 1}
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceName OBJECT-TYPE
+
+
+ 	SYNTAX 		OCTET STRING 
+
+
+ 	MAX-ACCESS 	read-only
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION 
+
+
+ 		"This object specifies the CPU sub-interface name."
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 2}
+
+
+
+
+
+ cienaCesDpCpuSubInterfaceEgressL2Transform OBJECT-TYPE
+
+
+ 	SYNTAX 		OCTET STRING
+
+
+ 	MAX-ACCESS 	read-only
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION 
+
+
+ 		"This object specifies the egress L2 transform for this CPU sub-interface. 
+
+
+ 		Format: push-ethtype.vid.pcp"
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 3 }
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceIngressL2Transform OBJECT-TYPE
+
+
+ 	SYNTAX 		OCTET STRING
+
+
+ 	MAX-ACCESS 	read-only
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION 
+
+
+ 		"This object specifies ingress L2 transform for this CPU sub-interface."
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 4}
+
+
+ 
+
+
+  cienaCesDpCpuSubInterfaceEgressL3TransformPolicy OBJECT-TYPE
+
+
+ 	SYNTAX	INTEGER {
+
+
+ 					 leave(1),
+
+
+ 					 mappedDscp(2)
+
+
+ 					}
+
+
+ 	MAX-ACCESS	read-only
+
+
+ 	STATUS		current
+
+
+ 	DESCRIPTION
+
+
+ 		"This object specifies the egress L3 transform policy type
+
+
+ 		 for this CPU sub-interface."
+
+
+ 	DEFVAL {leave}
+
+
+ 	::= { cienaCesDpCpuSubInterfaceEntry 5 }
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceEgressRCosPolicy OBJECT-TYPE
+
+
+ 	SYNTAX 		INTEGER
+
+
+ 				{    
+
+
+ 				fixed-cos(1),
+
+
+ 				none(99) 
+
+
+ 				}
+
+
+ 	MAX-ACCESS read-only
+
+
+ 	STATUS		 current
+
+
+ 	DESCRIPTION 
+
+
+ 		"This object specifies the egress RCoS policy for this CPU sub-interface. "
+
+
+ 	DEFVAL {fixed-cos}
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 6}
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceEgressRCosProfileIndex OBJECT-TYPE
+
+
+ 	SYNTAX 		 Unsigned32
+
+
+ 	MAX-ACCESS	 read-only
+
+
+ 	STATUS		 current
+
+
+ 	DESCRIPTION
+
+
+ 		 "This object specifies the egress RCoS profile index for this CPU sub-interface. "
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 7}
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceEgressRCosProfile OBJECT-TYPE
+
+
+ 	SYNTAX 		OCTET STRING
+
+
+ 	MAX-ACCESS 	read-only
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION
+
+
+ 		 "This object specifies the egress RCoS profile name for this CPU sub-interface. "
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 8}
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceVirtualSwitchIndex OBJECT-TYPE
+
+
+ 	SYNTAX 		Unsigned32
+
+
+ 	MAX-ACCESS 	read-only
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION
+
+
+ 		 "This object specifies the index of the virtual switch associated with
+
+
+ 		 this CPU sub-interface. " 
+
+
+ 	DEFVAL {0}
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 9} 
+
+
+ 
+
+
+ cienaCesDpCpuSubInterfaceRlanIndex OBJECT-TYPE
+
+
+ 	SYNTAX 		Unsigned32
+
+
+ 	MAX-ACCESS	 read-only
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION
+
+
+ 		 "This object specifies the RLAN index of the virtual switch associated with
+
+
+ 		 this CPU sub-interface."
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 10}
+
+
+
+
+
+ cienaCesDpCpuSubInterfaceVirtualSwitchName OBJECT-TYPE
+
+
+ 	SYNTAX 		OCTET STRING
+
+
+ 	MAX-ACCESS 	read-only
+
+
+ 	STATUS 		current
+
+
+ 	DESCRIPTION 
+
+
+ 		"This object specifies the name of the virtual switch associated with this 
+
+
+ 		CPU sub-interface."
+
+
+ ::= { cienaCesDpCpuSubInterfaceEntry 11} 
+
+
+
+
+
+ --
+
+ -- Dataplane Private Forwarding Group table
+
+ --
+
+ cienaCesDpPfgProfileTable OBJECT-TYPE
+
+     SYNTAX       SEQUENCE OF CienaCesDpPfgProfileEntry
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+	     "Table of pfg profiles."
+
+     ::= { cienaCesDpPfgProfile 1 }
+
+
+ cienaCesDpPfgProfileEntry OBJECT-TYPE
+
+     SYNTAX       CienaCesDpPfgProfileEntry
+
+     MAX-ACCESS   not-accessible
+
+     STATUS       current
+
+     DESCRIPTION
+
+	     "Private Forwarding Group Profile entry in the private forwarding group profile table."
+
+     INDEX { cienaCesDpPfgProfileIndex }
+
+     ::= { cienaCesDpPfgProfileTable 1 } 
+
+
+ CienaCesDpPfgProfileEntry ::= SEQUENCE { 
+
+     cienaCesDpPfgProfileIndex           Integer32,
+
+     cienaCesDpPfgProfileName            DisplayString,
+
+     cienaCesDpPfgProfileAPolicy         PrivateForwardGroupPolicy,
+
+     cienaCesDpPfgProfileBPolicy         PrivateForwardGroupPolicy,
+
+     cienaCesDpPfgProfileCPolicy         PrivateForwardGroupPolicy
+
+ }
+
+
+ cienaCesDpPfgProfileIndex OBJECT-TYPE
+
+      SYNTAX        Integer32 (1..255) 
+
+      MAX-ACCESS    not-accessible
+
+      STATUS        current
+
+      DESCRIPTION
+
+	      "This object specifies a unique index into the table."
+
+      ::= { cienaCesDpPfgProfileEntry 1 }
+
+
+ cienaCesDpPfgProfileName OBJECT-TYPE
+
+      SYNTAX        DisplayString 
+
+      MAX-ACCESS    read-only
+
+      STATUS        current
+
+      DESCRIPTION
+
+	      "This object specifies a unique name for the pfg profile."
+
+      ::= { cienaCesDpPfgProfileEntry 2 }
+
+
+ cienaCesDpPfgProfileAPolicy OBJECT-TYPE
+
+      SYNTAX        PrivateForwardGroupPolicy
+
+      MAX-ACCESS    read-only
+
+      STATUS        current
+
+      DESCRIPTION
+
+	      "This object specifies the policy for private forwarding group A 
+
+	      of the Private Forwarding Group profile.
+
+          This policy is active when private forward group status is set to enabled."
+
+      DEFVAL        {talkToABC}
+
+      ::= { cienaCesDpPfgProfileEntry 3 }
+
+
+ cienaCesDpPfgProfileBPolicy OBJECT-TYPE
+
+      SYNTAX        PrivateForwardGroupPolicy
+
+      MAX-ACCESS    read-only
+
+      STATUS        current
+
+      DESCRIPTION
+
+	      "This object specifies the policy for private forwarding group B 
+
+	      of the Private Forwarding Group profile.
+
+          This policy is active when private forward group status is set to enabled."
+
+      DEFVAL        {talkToABC}
+
+      ::= { cienaCesDpPfgProfileEntry 4 }
+
+
+ cienaCesDpPfgProfileCPolicy OBJECT-TYPE
+
+      SYNTAX        PrivateForwardGroupPolicy
+
+      MAX-ACCESS    read-only
+
+      STATUS        current
+
+      DESCRIPTION
+
+	      "This object specifies the policy for private forwarding group C 
+
+	      of the Private Forwarding Group profile.
+
+          This policy is active when private forward group status is set to enabled."
+
+      DEFVAL        {talkToABC}
+
+      ::= { cienaCesDpPfgProfileEntry 5 }
+
+
+ --
+ -- Dataplane Layer 2 Control Frame Tunnelling table
+ --
+
+ cienaCesDpL2CftProfileTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDpL2CftProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of l2-cft profiles."
+     ::= { cienaCesDpL2CftProfile 1 }
+
+ cienaCesDpL2CftProfileEntry OBJECT-TYPE
+     SYNTAX       CienaCesDpL2CftProfileEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Layer 2 Control Frame Tunnelling Profile entry in the private forwarding group profile table."
+     INDEX { cienaCesDpL2CftProfileIndex }
+     ::= { cienaCesDpL2CftProfileTable 1 } 
+
+ CienaCesDpL2CftProfileEntry ::= SEQUENCE { 
+     cienaCesDpL2CftProfileIndex           Integer32,
+     cienaCesDpL2CftProfileName            DisplayString,
+     cienaCesDpL2CftProfileL2ControlRcos   Integer32
+ }
+
+ cienaCesDpL2CftProfileIndex OBJECT-TYPE
+      SYNTAX        Integer32 
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies a unique index into the table."
+      ::= { cienaCesDpL2CftProfileEntry 1 }
+
+ cienaCesDpL2CftProfileName OBJECT-TYPE
+      SYNTAX        DisplayString 
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies a unique name for the l2-cft profile."
+      ::= { cienaCesDpL2CftProfileEntry 2 }
+
+ cienaCesDpL2CftProfileL2ControlRcos  OBJECT-TYPE
+     SYNTAX          Integer32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+	      "This object specifies the RCoS to use for control frames 
+	       An L2CF that is processed with an L2CFT disposition of 
+	       forwarding is flooded to all logical-interfaces in the
+	       virtual switch/RLAN forwarding-domain, and is subject 
+	       to the same egress restrictions as normal data frames.
+		   A frame that is classified as an Untagged L2CF is 
+		   forwarded by an L2CFT Instance using the RCoS value 
+		   specified by this object. The object does not apply 
+		   to a tagged L2CF frame that is  classified as a 
+		   Transparent or L2PT form of a L2CF. Such frames are
+		   given the same internal treatment as data frames
+		   that are classified to the same logical-interface."
+     DEFVAL          {48}
+      ::= { cienaCesDpL2CftProfileEntry 3 }
+
+ --
+ -- Dataplane L2-CFT Profile L2CFT Protocols
+ --
+ cienaCesDpL2CftProfileL2CftProtocolTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDpL2CftProfileL2CftProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "Table of L2-Cft profile Layer 2 Control Frame Tunneling (L2CFT) protocols."
+     ::= { cienaCesDpL2CftProfile 2 }
+
+ cienaCesDpL2CftProfileL2CftProtocolEntry OBJECT-TYPE
+     SYNTAX       CienaCesDpL2CftProfileL2CftProtocolEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+	     "L2 CFT Profile L2CFT protocol entry in the L2 CFT Profile L2CFT 
+	     protocol table. Each virtual switch or RLAN in the system is 
+	     implicitly associated with an L2CFT instance, whether or not it 
+	     has been given an explicit L2CFT configuration.
+	     Normally, Layer 2 Control Frames(L2CFs) received in hardware 
+	     are either sent to the CPU to be handled or discarded. L2CFT modifies 
+	     this default behavior, so that the L2CFs for certain protocols can
+	     be transformed and forwarded as data frames."
+     INDEX { cienaCesDpL2CftProfileIndex, 
+             cienaCesDpL2CftProfileL2CftProtocolType }
+     ::= { cienaCesDpL2CftProfileL2CftProtocolTable 1 } 
+
+ CienaCesDpL2CftProfileL2CftProtocolEntry ::= SEQUENCE {
+     cienaCesDpL2CftProfileL2CftProtocolType               INTEGER, 
+     cienaCesDpL2CftProfileL2CftProtocolDisposition        INTEGER
+ }
+
+ cienaCesDpL2CftProfileL2CftProtocolType OBJECT-TYPE
+      SYNTAX        INTEGER { 
+                              unknown(0),
+                              ciscoCdp(1),
+                              ciscoDtp(2),
+                              ciscoPagp(3),
+                              ciscoUdld(4),
+                              ciscoVtp(5),
+                              ciscoPvst(6),
+                              ciscoStpUplinkFast(7),
+                              vlanBridge(8),
+                              rstp(9),
+                              lacp(10),
+                              lacpMarker(11),
+                              oam(12),
+                              lldp(13),
+                              i8021x(14),
+                              gmrp(15),
+                              gvrp(16),
+                              isis(17),
+                              esmc(18),
+                              bridgeReserved0C0D(19),
+                              bridgeReserved0B0F(20),
+                              brigeBlock(21),
+                              allBridgesBlock(22),
+                              garpBlock(23)
+                    }
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies a unique protocol type index into the table."
+      ::= { cienaCesDpL2CftProfileL2CftProtocolEntry 1 }
+
+ cienaCesDpL2CftProfileL2CftProtocolDisposition OBJECT-TYPE
+      SYNTAX        INTEGER {
+                        forward(1),
+                        discard(2)
+                    }
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+	      "This object specifies the L2CFT Profile L2CFT protocol action.
+	      There are 2 cases : 
+	      - When 'cienaCesDpVirtualSwitchRlanL2CftStatus = disabled' or the protocol 
+	      is not in the Disposition List, then an Untagged L2CF is handled using 
+	      the ingress logical port's Default Disposition for the protocol, 
+	      while Transparent and L2PT L2CF forms are handled as normal data frames.
+	      - When 'cienaCesDpVirtualSwitchRlanL2CftStatus = enabled' and L2CF protocol
+	       is in the Disposition List, the L2CF is either discarded or forwarded
+	       depending on the value of this object. An L2CF that is processed with an
+	       L2CFT disposition of 'forward' is flooded to all logical-interfaces
+	       in the virtual switch/RLAN forwarding-domain, and is subject to 
+	       the same egress restrictions as normal data frames."
+      DEFVAL        {forward}
+      ::= { cienaCesDpL2CftProfileL2CftProtocolEntry 2 }
+
+ --
+
+
+ -- Notifications
+
+
+ --
+
+
+
+
+
+  cienaCesDpTsMeterFloodContainerUcastThresholdExceeded  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity,  
+
+
+        	 cienaGlobalMacAddress, 
+
+
+        	 cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+
+
+             cienaCesDpTsMeterFloodContainerProfileName,
+
+
+             cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+ 		"A cienaCesDpTsMeterFloodContainerUcastThresholdExceeded is sent 
+
+
+ 		when for a given container profile, the number of unknown unicast 
+
+
+ 		packets received becomes greater than or equal to the 
+
+
+ 		configuration packet limit, and the value of unknown unicast packet 
+
+
+ 		received at the last sampling interval was less than 
+
+
+ 		the configuration packet limit. To enable the device to send this notificatio,
+
+ 		cienaCesDataplaneUcastTrapState needs to be set to enabled. The  
+
+
+        cienaCesDataplaneUcastTrapState is set to enabled by default. Variable bindings include
+
+        cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+
+        cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+
+        cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+
+        cienaCesDpTsMeterFloodContainerProfileName, and 
+
+        cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+
+
+ 	::= { cienaCesDpMIBNotifications 1 }
+
+
+	
+
+
+  cienaCesDpTsMeterFloodContainerUcastThresholdNormal  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity,
+
+
+        	 cienaGlobalMacAddress,                     
+
+
+        	 cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+
+
+             cienaCesDpTsMeterFloodContainerProfileName,
+
+
+             cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+	    "A cienaCesDpTsMeterFloodContainerUcastThresholdNormal is sent 
+
+
+		when for a given container profile, the total number of 
+
+
+	    unknown unicast packet received becomes less than the 
+
+
+		configured packet limit, and the value of unknown unicast 
+
+
+		packets received at the last sampling interval 
+
+
+		was greater than or equal to the configured packet limit. 
+
+
+        To enable the device to send this notification, cienaCesDataplaneUcastTrapState 
+
+        needs to be set to enabled. The cienaCesDataplaneUcastTrapState is set to 
+
+        enabled by default. Variable bindings include: cienaGlobalSeverity, 
+
+        cienaGlobalMacAddress, cienaCesDpTsMeterFloodContainerNotifProfileIndex, 
+
+        cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+
+        cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+
+        cienaCesDpTsMeterFloodContainerProfileName, and 
+
+        cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+
+
+ 	::= { cienaCesDpMIBNotifications 2 }
+
+
+	
+
+
+  cienaCesDpTsMeterFloodContainerBcastThresholdExceeded  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity, 
+
+
+        	 cienaGlobalMacAddress,  
+
+
+        	 cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+
+
+             cienaCesDpTsMeterFloodContainerProfileName,
+
+
+             cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+ 		"A cienaCesDpTsMeterFloodContainerBcastThresholdExceeded is sent 
+
+
+ 		when for a given container profile, the number of broadcast 
+
+
+ 		packets received becomes greater than or equal to the 
+
+
+ 		configured packet limit, and the value of broadcast packets 
+
+
+ 		received at the last sampling interval is less than 
+
+
+ 		the configured packet limit. To enable the device to send this notification, 
+
+ 		cienaCesDataplaneBcastTrapState needs to be set to enabled. The 
+
+ 		cienaCesDataplaneBcastTrapState is set to enabled by default. Variable 
+
+ 		bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+
+ 		cienaCesDpTsMeterFloodContainerNotifProfileIndex, 
+
+ 		cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+
+ 		cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+
+ 		cienaCesDpTsMeterFloodContainerProfileName, and 
+
+ 		cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+
+
+ 	::= { cienaCesDpMIBNotifications 3 }
+
+
+	
+
+
+  cienaCesDpTsMeterFloodContainerBcastThresholdNormal  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity, 
+
+
+        	 cienaGlobalMacAddress,              
+
+
+        	 cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+
+
+            cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+
+
+            cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+
+
+             cienaCesDpTsMeterFloodContainerProfileName,
+
+
+            cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+	    "A cienaCesDpTsMeterFloodContainerBcastThresholdNormal is sent 
+
+
+		when for a given container profile, the total number of 
+
+
+	    broadcast packets received becomes less than the 
+
+
+		configured packet limit, and the value of  broadcast
+
+
+		packets received at the last sampling interval 
+
+
+		is greater than or equal to the configured packet limit. 
+
+
+        To enable the device to send this notification, cienaCesDataplaneBcastTrapState 
+
+        needs to be set to enabled. The cienaCesDataplaneBcastTrapState is set to 
+
+        enabled by default. Variable bindings include: cienaGlobalSeverity,
+
+        cienaGlobalMacAddress, cienaCesDpTsMeterFloodContainerNotifProfileIndex, 
+
+        cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+
+        cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+
+        cienaCesDpTsMeterFloodContainerProfileName, and
+
+        cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+
+
+ 	::= { cienaCesDpMIBNotifications 4 }
+
+
+	
+
+
+
+
+
+  cienaCesDpTsMeterFloodContainerL2McastThresholdExceeded  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity,
+
+
+        	 cienaGlobalMacAddress,              
+
+
+        	 cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+
+
+             cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+
+
+             cienaCesDpTsMeterFloodContainerProfileName,
+
+
+             cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+ 		"A cienaCesDpTsMeterFloodContainerL2McastThresholdExceeded is sent 
+
+
+ 		when for a given container profile, the number of L2 multicast
+
+
+ 		packets received becomes greater than or equal to the 
+
+
+ 		configured packet limit, and the value of L2 multicast packets 
+
+
+ 		received at the last sampling interval is less than 
+
+
+ 		the configured packet limit. To enable the device to send this 
+
+ 		notification, cienaCesDataplaneMcastTrapState needs to be set to enabled. 
+
+ 		The cienaCesDataplaneMcastTrapState is set to enabled by default. Variable 
+
+ 		bindings include: cienaGlobalSeverity, cienaGlobalMacAddress,
+
+ 		cienaCesDpTsMeterFloodContainerNotifProfileIndex, 
+
+ 		cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+
+ 		cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+
+ 		cienaCesDpTsMeterFloodContainerProfileName, and 
+
+ 		cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+
+
+ 	::= { cienaCesDpMIBNotifications 5 }
+
+
+	
+
+
+  cienaCesDpTsMeterFloodContainerL2McastThresholdNormal  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity,
+
+
+        	 cienaGlobalMacAddress,              
+
+
+        	 cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+
+
+            cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+
+
+            cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+
+
+             cienaCesDpTsMeterFloodContainerProfileName,
+
+
+            cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+	    "A cienaCesDpTsMeterFloodContainerL2McastThresholdNormal is sent 
+
+
+		when for a given container profile, the total number of 
+
+
+	    L2 multicast packets received becomes less than the 
+
+
+		configured packet limit, and the value of L2 multicast
+
+
+		packets received at the last sampling interval 
+
+
+		is greater than or equal to the configured packet limit. 
+
+		
+To enable the device to send this notification ,cienaCesDataplaneMcastTrapState
+
+		needs to be set to enabled. The cienaCesDataplaneMcastTrapState is set to 
+
+		enabled by default. Variable bindings include: cienaGlobalSeverity, 
+
+		cienaGlobalMacAddress, cienaCesDpTsMeterFloodContainerNotifProfileIndex, 
+
+		cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+
+		cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+
+		cienaCesDpTsMeterFloodContainerProfileName, and 
+
+		cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+
+
+ 	::= { cienaCesDpMIBNotifications 6 }
+
+
+	
+
+
+
+
+
+  cienaCesDataplaneEgressReflectorEnabled  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity,
+
+
+        	 cienaGlobalMacAddress,
+
+
+        	 cienaCesDpSubPortName,
+
+
+        	 cienaCesDpSubPortLiIndex,
+
+
+        	 cienaCesDpSubPortEgressReflectorMac,
+
+
+        	 cienaCesDpSubPortEgressGeneratorMac
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+	    "A cienaCesDataplaneEgressReflectorEnabled is sent 
+
+
+	    when the egress reflector feature is enabled for the
+
+
+	    given sub-port."
+
+
+	    ::= { cienaCesDpMIBNotifications 7 }
+
+
+
+
+  cienaCesDataplaneEgressReflectorDisabled  NOTIFICATION-TYPE
+
+
+	OBJECTS	{ 
+
+
+        	 cienaGlobalSeverity,
+
+
+        	 cienaGlobalMacAddress,
+
+
+        	 cienaCesDpSubPortName,
+
+
+        	 cienaCesDpSubPortLiIndex
+
+
+ 	}
+
+
+    STATUS	   current
+
+
+ 	DESCRIPTION
+
+
+	    "A cienaCesDataplaneEgressReflectorDisabled is sent 
+
+
+	    when the egress reflector feature is disabled for the
+
+
+	    given sub-port."
+
+
+	    ::= { cienaCesDpMIBNotifications 8 }
+
+
+	
+  cienaCesDpPortShapingSubscriptionExceedsOperSpeed  NOTIFICATION-TYPE
+      OBJECTS  {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesPortPgIdMappingNotifChassisIndex,
+          cienaCesPortPgIdMappingNotifShelfIndex,
+          cienaCesPortPgIdMappingNotifSlotIndex,
+          cienaCesPortPgIdMappingNotifPortNumber,
+          cienaCesLogicalPortConfigPortName
+      }
+      STATUS     current
+
+      DESCRIPTION
+         "A cienaCesDpPortShapingSubscriptionExceedsOperSpeed is sent when
+          when ports operational speed becomes lesser than port scheduler 
+          cir value. To enable the device to send this notification, 
+          cienaCesDataplanePortShapingSubscriptionTrapState needs to be set to enabled. The 
+          cienaCesDataplanePortShapingSubscriptionTrapState is set to enabled by default. Variable 
+          bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+          cienaCesPortPgIdMappingNotifChassisIndex, cienaCesPortPgIdMappingNotifShelfIndex, 
+          cienaCesPortPgIdMappingNotifSlotIndex cienaCesPortPgIdMappingNotifPortNumber and 
+          cienaCesLogicalPortConfigPortName"
+   ::= { cienaCesDpMIBNotifications 9 }
+
+  cienaCesDpPortShapingSubscriptionWithinOperSpeed  NOTIFICATION-TYPE
+      OBJECTS  {
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,
+          cienaCesPortPgIdMappingNotifChassisIndex,
+          cienaCesPortPgIdMappingNotifShelfIndex,
+          cienaCesPortPgIdMappingNotifSlotIndex,
+          cienaCesPortPgIdMappingNotifPortNumber,
+          cienaCesLogicalPortConfigPortName
+      }
+      STATUS     current
+      
+      DESCRIPTION
+         "A cienaCesDpPortShapingSubscriptionWithinOperSpeed is sent
+          when ports operational speed becomes equal or greater than port scheduler 
+          cir value. To enable the device to send this notification, 
+          cienaCesDataplanePortShapingSubscriptionTrapState needs to be set to enabled. The 
+          cienaCesDataplanePortShapingSubscriptionTrapState is set to enabled by default. Variable 
+          bindings include: cienaGlobalSeverity, cienaGlobalMacAddress, 
+          cienaCesPortPgIdMappingNotifChassisIndex, cienaCesPortPgIdMappingNotifShelfIndex, 
+          cienaCesPortPgIdMappingNotifSlotIndex cienaCesPortPgIdMappingNotifPortNumber and 
+          cienaCesLogicalPortConfigPortName"
+   ::= { cienaCesDpMIBNotifications 10 }
+
+  cienaCesDpTsMeterFloodContainerTotalThresholdExceeded  NOTIFICATION-TYPE
+      OBJECTS  { 
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,              
+          cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+          cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+          cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+          cienaCesDpTsMeterFloodContainerProfileName,
+          cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+      }
+      STATUS     current
+
+      DESCRIPTION
+         "A cienaCesDpTsMeterFloodContainerTotalThresholdExceeded is sent 
+ 	  when for a given container profile, the total number of packets 
+          received becomes greater than or equal to the aggregate of all 
+          packet limits configured for the container profile, and the 
+          value of received packets at the last sampling interval is less 
+          than the aggregate of configured packet limits. To enable the 
+          device to send this notification, cienaCesDataplaneXcastTrapState 
+          needs to be set to enabled. The cienaCesDataplaneXcastTrapState 
+          is set to enabled by default. Variable bindings include: 
+          cienaGlobalSeverity, cienaGlobalMacAddress,
+ 	  cienaCesDpTsMeterFloodContainerNotifProfileIndex, 
+ 	  cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+ 	  cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+ 	  cienaCesDpTsMeterFloodContainerProfileName, and 
+ 	  cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+   ::= { cienaCesDpMIBNotifications 11 }
+
+  cienaCesDpTsMeterFloodContainerTotalThresholdNormal  NOTIFICATION-TYPE
+      OBJECTS  { 
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress,              
+          cienaCesDpTsMeterFloodContainerNotifProfileIndex,
+          cienaCesDpTsMeterFloodContainerNotifAttachmentLiType,
+          cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex,
+          cienaCesDpTsMeterFloodContainerProfileName,
+          cienaCesDpTsMeterFloodContainerAttachmentInterfaceName
+      }
+      STATUS     current
+
+      DESCRIPTION
+         "A cienaCesDpTsMeterFloodContainerTotalThresholdNormal is sent 
+          when for a given container profile, the total number of packets
+          received becomes less than the aggregate of all packet limits 
+          configured for the container profile, and the value of received 
+          packets at the last sampling interval is greater than or equal 
+          to the aggregate of configured packet limits. To enable the 
+          device to send this notification ,cienaCesDataplaneXcastTrapState
+          needs to be set to enabled. The cienaCesDataplaneXcastTrapState 
+          is set to enabled by default. Variable bindings include: 
+          cienaGlobalSeverity, cienaGlobalMacAddress, 
+          cienaCesDpTsMeterFloodContainerNotifProfileIndex, 
+          cienaCesDpTsMeterFloodContainerNotifAttachmentLiType, 
+          cienaCesDpTsMeterFloodContainerNotifAttachmentLiIndex, 
+          cienaCesDpTsMeterFloodContainerProfileName, and 
+          cienaCesDpTsMeterFloodContainerAttachmentInterfaceName."
+   ::= { cienaCesDpMIBNotifications 12 }
+
+ END
+
+
+ 
+
+

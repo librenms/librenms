@@ -1,0 +1,1066 @@
+------------------------------------------------------------------------------
+-- Copyright(c) 2009-2014 N-Tron Corporation.  All rights reserved.
+------------------------------------------------------------------------------
+--
+--   Creator: Richard Poser
+--   Created: 11/16/2009	15:15
+--
+-- $Revision: 10 $
+--     $Date: 7/23/14 12:33p $
+--   $Author: Rposer $
+--  $Archive: /700Series/Projects/700Series/700Series/ntron714fx6.mib $
+--
+-- Description:
+-- ------------
+--
+------------------------------------------------------------------------------
+NTRON714FX6-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+        Counter32, Integer32, IpAddress, enterprises FROM SNMPv2-SMI
+        DisplayString FROM SNMPv2-TC;
+
+ntron714fx6 MODULE-IDENTITY
+    LAST-UPDATED "201407222000Z"	-- July 22, 2014 8:00PM
+    ORGANIZATION "N-Tron Corporation"
+    CONTACT-INFO "Internet:	http://www.n-tron.com
+                  E-Mail:   N-TRON_Support@n-tron.com"
+    DESCRIPTION "Added ntron and series specific identifiers, fixed port Sequence and changed TRAP-TYPE to NOTIFICATION-TYPE"
+    REVISION "201407222000Z"	-- July 22, 2014 8:00PM
+    DESCRIPTION "Updated to include all previous changes as well as TFTPAction flags and ntronBlVersion"
+    REVISION "201407141900Z"	-- July 14, 2014 7:00PM
+    DESCRIPTION "Fixed Character Problems"
+    REVISION "201105261500Z"	-- May 26, 2011 03:00PM
+    DESCRIPTION "Added Port Crossover value and MIB Flags for TFTPConfig and ConfigErase"
+    REVISION "201105101900Z"	-- May 10, 2011 07:00PM
+    DESCRIPTION "Added Model Switch MIB Value"
+    REVISION "201102071500Z"		-- Feb 7, 2011 03:00PM
+    DESCRIPTION "Enterprises MIB for N-Tron 714FX6 Product"
+    REVISION "200911171915Z"		-- Nov 17, 2009 07:15PM
+    DESCRIPTION "Initial Version"
+    ::= {enterprises 28381 700 7}
+
+------------------------------------------------------------------------------
+--
+--                 NTRON 700 Series - Object Identifiers
+--
+------------------------------------------------------------------------------
+ntron    OBJECT IDENTIFIER ::= { enterprises 28381 }
+ntron7xx OBJECT IDENTIFIER ::= { ntron 700 }
+
+------------------------------------------------------------------------------
+--
+--                   NTRON 714FX6 - Private MIB Groups
+--
+------------------------------------------------------------------------------
+
+ntronSysGroup             OBJECT IDENTIFIER ::= { ntron714fx6 1}
+ntronNViewGroup           OBJECT IDENTIFIER ::= { ntron714fx6 2} 
+ntronTFTPGroup            OBJECT IDENTIFIER ::= { ntron714fx6 3}
+ntronPortMirroringGroup   OBJECT IDENTIFIER ::= { ntron714fx6 7}
+ntronPortConfigGroup      OBJECT IDENTIFIER ::= { ntron714fx6 8}
+ntronIgmpGroup            OBJECT IDENTIFIER ::= { ntron714fx6 9}
+ntronBroadcastGroup       OBJECT IDENTIFIER ::= { ntron714fx6 13}	
+ntronConfigGroup          OBJECT IDENTIFIER ::= { ntron714fx6 14}
+ntronSnmpGroup            OBJECT IDENTIFIER ::= { ntron714fx6 15}
+ntronNRingGroup           OBJECT IDENTIFIER ::= { ntron714fx6 16}
+ntronTrapGroup            OBJECT IDENTIFIER ::= { ntron714fx6 18}
+
+--  ----------------------------------------------------------------------------------
+--
+--                       SYSTEM GROUP
+--
+--  ----------------------------------------------------------------------------------
+
+ntronSysReset           	OBJECT-TYPE
+	SYNTAX              	INTEGER {
+                           		switchNoReset (1),
+                           		switchReset   (2)
+                                	}
+	MAX-ACCESS          	read-write
+	STATUS              	current
+	DESCRIPTION 
+                      		"Setting this object to 'switchReset' will cause the switch to
+                        	perform a hardware reset within approximately 4-6 seconds.Setting
+                        	this object to 'switchNoReset ' will have no effect.The value
+                       		'switchNoReset' will be returned whenever this object is retrieved ."
+                ::= { ntronSysGroup 1 }
+               
+ntronSwVersion          	OBJECT-TYPE
+    	SYNTAX              	DisplayString(SIZE(0..255))
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION     
+                       		"This object identifies the Version Number of Current Release."
+               	::= {ntronSysGroup 2 }
+               
+ntronBuildDateAndTime OBJECT-TYPE 
+    	SYNTAX              	DisplayString(SIZE(0..100))
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION 
+                       		"This object will hold the image build date and time."
+               	::= { ntronSysGroup 3 }
+
+ntronTotalRam        		OBJECT-TYPE
+    	SYNTAX              	Integer32
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION
+                       		"This object will give the total RAM available in the system."
+               	::= {  ntronSysGroup 4 }
+
+ntronTotalFlash     		OBJECT-TYPE
+    	SYNTAX             	Integer32
+    	MAX-ACCESS         	read-only
+    	STATUS             	current
+    	DESCRIPTION
+                      		"This object will give the total Flash available in system."
+               	::= { ntronSysGroup 5 }
+         
+ntronEthernetPortCount 		OBJECT-TYPE
+    	SYNTAX             	Integer32 
+    	MAX-ACCESS         	read-only
+    	STATUS             	current
+    	DESCRIPTION
+                      		"This object will return the number of 10/100 Mbps Ethernet ports
+                       		on the switch."
+               	::= { ntronSysGroup 6 }
+
+ntronCurrentIpAddress  		OBJECT-TYPE
+    	SYNTAX             	IpAddress
+    	MAX-ACCESS         	read-only
+    	STATUS             	current
+    	DESCRIPTION
+                       		"The Current IP address is the one which is currently used 
+                       		and is obtained dynamically through protocol interaction.( DHCP )
+                       		This address is NULL if the Address is Statically configured."
+              	::= { ntronSysGroup 7 }
+
+ntronConfiguredIpAddress 	OBJECT-TYPE
+    	SYNTAX              	IpAddress
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION
+                        	"The Configured IP address of the device. This is the address
+                        	configured through Network or cli.  "
+              	::= { ntronSysGroup 8 }
+
+ntronConfiguredSubnetMask 	OBJECT-TYPE
+    	SYNTAX               	IpAddress
+    	MAX-ACCESS           	read-write
+    	STATUS               	current
+    	DESCRIPTION
+                         	"The Configured Subnet Mask of the device."
+              	::= { ntronSysGroup 9 }
+
+ntronConfiguredGateway   	OBJECT-TYPE
+    	SYNTAX               	IpAddress
+    	MAX-ACCESS           	read-write
+    	STATUS               	current
+    	DESCRIPTION
+                         	"The Configured Gateway/Router address of the device"
+              	::= { ntronSysGroup 10 }
+
+ntronUpdateConfiguredIpAddr   OBJECT-TYPE
+    	SYNTAX               	INTEGER{
+                            		disable (1),
+                            		enable  (2)
+                                	}
+    	MAX-ACCESS           	read-write
+    	STATUS               	current
+    	DESCRIPTION			
+                         	"By setting this object to enable will update the ipaddress,
+                         	subnetmask and the router ip address. "
+             	::= { ntronSysGroup 11 }
+			
+ntronIPAddressStatus    	OBJECT-TYPE
+    	SYNTAX     	        	INTEGER{
+                        	   	fromCli(1),
+                           		fromDhcp(2)
+                                	}
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION
+        	               	"The IP Address can be obtained/configured by any of the above 
+                	       	different ways. This object specifies how IP address currently
+                       		on the switch , was configured/obtained."
+              	::= { ntronSysGroup 12 }
+
+ntronTotalNoOfPorts  		OBJECT-TYPE
+    	SYNTAX              	Integer32
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION     
+                        	"This object will give the total number of ports available in 
+                        	the device ."
+              	::= { ntronSysGroup 13 }      
+
+ntronMacAddress      		OBJECT-TYPE
+    	SYNTAX              	DisplayString(SIZE(0..40))
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION
+                        	"The mac address of the system ."
+              	::= { ntronSysGroup 14 }
+
+ntronContactStatus			OBJECT-TYPE
+		SYNTAX					INTEGER{
+                            		open		(1),
+                            		closed		(2),
+                                	unsupported	(3)
+                                	}
+		MAX-ACCESS				read-only
+		STATUS					current
+		DESCRIPTION
+							"The status of the switch contact ."
+				::= { ntronSysGroup 15 }
+
+ntronPowerFault				OBJECT-TYPE
+		SYNTAX					INTEGER{
+									faultNone	(1),
+									faultPower1 (2),
+									faultPower2 (3)
+									}
+		MAX-ACCESS				read-only
+		STATUS					current
+		DESCRIPTION
+							"The power fault status ."
+				::= { ntronSysGroup 16 }				
+
+ntronModelString			OBJECT-TYPE 
+    	SYNTAX              	DisplayString(SIZE(0..100))
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION 
+                       		"This object will hold the switch model string."
+               	::= { ntronSysGroup 17 }
+
+ntronBlVersion          	OBJECT-TYPE
+    	SYNTAX              	DisplayString(SIZE(0..255))
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION     
+                       		"This object identifies the Version Number of Current Bootloader Release."
+               	::= {ntronSysGroup 18 }
+               
+--  ----------------------------------------------------------------------------------
+--
+--                       NVIEW GROUP
+--
+--  ----------------------------------------------------------------------------------
+
+ntronNViewState           	OBJECT-TYPE
+    	SYNTAX               	INTEGER{
+                            		disable (1),
+                            		enable  (2)
+                                	}
+	MAX-ACCESS          	read-write
+	STATUS              	current
+	DESCRIPTION 
+					"Global status of NView broadcasts."
+                ::= { ntronNViewGroup 1 }
+
+ntronNViewInterval           	OBJECT-TYPE
+    	SYNTAX               	Integer32(5..500)
+	MAX-ACCESS          	read-write
+	STATUS              	current
+	DESCRIPTION 
+					"Global interval between NView broadcasts."
+                ::= { ntronNViewGroup 2 }
+
+ntronNViewTable     		OBJECT-TYPE
+    	SYNTAX                 	SEQUENCE OF NtronNViewEntry
+	MAX-ACCESS             	not-accessible
+    	STATUS                 	current
+    	DESCRIPTION
+                           	"The table that contains the information about the per port NView status."
+            	::= { ntronNViewGroup 3 }
+
+ntronNViewEntry    		OBJECT-TYPE
+    	SYNTAX                	NtronNViewEntry
+    	MAX-ACCESS            	not-accessible
+    	STATUS                	current
+    	DESCRIPTION	
+                          	"An entry in the ntronNViewTable."
+	INDEX      		{ ntronNViewPortNumber }
+         	::= { ntronNViewTable 1 }
+
+NtronNViewEntry ::= SEQUENCE {	
+          	ntronNViewPortNumber  	Integer32,
+          	ntronNViewMulticast		INTEGER,
+			ntronNViewStats			INTEGER
+            }
+
+ntronNViewPortNumber	OBJECT-TYPE
+    	SYNTAX                	Integer32
+    	MAX-ACCESS            	read-only
+    	STATUS                	current
+    	DESCRIPTION
+                          	"The unique identifier to identify the entry in the ntronNViewTable."
+           	::= { ntronNViewEntry 1}
+
+ntronNViewMulticast        	OBJECT-TYPE
+    	SYNTAX               	INTEGER{
+                            		disable (1),
+                            		enable  (2)
+                                	}
+    	MAX-ACCESS            	read-write
+    	STATUS                	current
+    	DESCRIPTION
+                          	"The status of a port for transmitting NView packets."
+          	::= { ntronNViewEntry 2}
+
+ntronNViewStats        		OBJECT-TYPE
+    	SYNTAX               	INTEGER{
+                            		disable (1),
+                            		enable  (2)
+                                	}
+    	MAX-ACCESS            	read-write
+    	STATUS                	current
+    	DESCRIPTION
+                          	"The status of a port for having its stats sent as NView packets."
+          	::= { ntronNViewEntry 3}
+
+--  ----------------------------------------------------------------------------------
+--
+--                       TFTP GROUP
+--
+--  ----------------------------------------------------------------------------------
+				
+ntronTFTPServerIpAddress  	OBJECT-TYPE
+    	SYNTAX              	IpAddress	
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION
+                        	"The ipaddress of the Tftp server."
+           	::= { ntronTFTPGroup 1 }
+
+ntronTFTPRemoteFileName  	OBJECT-TYPE
+	SYNTAX              	DisplayString(SIZE(0..32))
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION			
+                       		"The field gives the file name to be downloaded. "
+           	::= { ntronTFTPGroup 2 }
+
+ntronTFTPAction             OBJECT-TYPE
+        SYNTAX              INTEGER{
+                               noAction (1),
+                               downloadImage (2),
+                               configUpload(3),
+                               configDownload (4),
+                               downloadBootImage (6)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION             
+                            "Setting this object to the value mentioned above will cause the specific
+                            function to be called. When performing config actions either the config flags
+                            below or the same defaults as on the web will be used if not set as below."
+            ::= {ntronTFTPGroup 3}
+
+ntronTFTPConfigFlags        OBJECT-TYPE
+        SYNTAX              INTEGER{
+                               main (1),
+                               snmp (2),
+                               dhcp (4),
+                               macSec (8),
+                               macSecManualOnly (16),
+                               keepCurrentIp (32)
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION             
+                            "If not manually set by the user the web default values will be used in the above
+                            action. Flags are reset to use the default values when ntronTFTPAction is complete"
+            ::= {ntronTFTPGroup 4}
+		
+--  ----------------------------------------------------------------------------------
+--
+--                       PORT MIRRORING GROUP
+--
+--  ----------------------------------------------------------------------------------
+
+ntronMirroringState          	OBJECT-TYPE
+    	SYNTAX                  INTEGER{
+                              	enable (1),
+                              	disable(2)					
+                                	}
+    	MAX-ACCESS              read-write
+    	STATUS                  current
+    	DESCRIPTION			
+                            	"This Field gives the current state of the mirror.
+                            	Setting this object to an value enable the mirror .If disabled, 
+                            	port operation works normally. No Traffic gets routed from 
+                            	MirroringSourcePort to Destination Mirrored Port."
+            	::= { ntronPortMirroringGroup 1}
+
+ntronMirroringDestinationPort	OBJECT-TYPE
+    	SYNTAX                	Integer32
+    	MAX-ACCESS            	read-write
+    	STATUS                	current
+    	DESCRIPTION					
+                              "This is the Destination port number for which there is another
+                              mirror port.If the ntronMirroringState is Enabled then
+                              the mirror port gets routed with all the packets going in and 
+                              out of Destination port. This arrangement is to put an RMON Probe 
+                              on mirrored port to Probe the traffic on the Destination port.
+                              One of the port is dedicated to this so that for any port as 
+                              destination port, this dedicated port can be a mirrored port.
+                              This object will return a '0' if the MirrorState is not enabled."
+           	::= { ntronPortMirroringGroup 2}			
+
+ntronPortMirroringTable 	OBJECT-TYPE
+    	SYNTAX              	SEQUENCE OF NtronPortMirroringEntry
+    	MAX-ACCESS          	not-accessible
+    	STATUS              	current
+    	DESCRIPTION
+                        	"The table which contains the mirroring information of the ports ."
+            	::= { ntronPortMirroringGroup 3 }
+
+ntronPortMirroringEntry 	OBJECT-TYPE
+    	SYNTAX              	NtronPortMirroringEntry
+    	MAX-ACCESS          	not-accessible
+    	STATUS              	current
+    	DESCRIPTION
+                        	"An entry in the ntronPortMirroringTable."	
+    	INDEX               	{ ntronPortMirroringNo }
+            	::= { ntronPortMirroringTable 1 }
+
+NtronPortMirroringEntry ::= 
+     	SEQUENCE {
+        	ntronPortMirroringNo	Integer32,
+        	ntronPortMirroringTx	Integer32,
+        	ntronPortMirroringRx	Integer32
+     		}
+
+ntronPortMirroringNo    	OBJECT-TYPE
+    	SYNTAX              	Integer32
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION		
+                        	"This object identifies the port of the switch."
+           	::= { ntronPortMirroringEntry 1 }
+
+ntronPortMirroringTx    	OBJECT-TYPE
+    	SYNTAX              	Integer32
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION		
+                        	"This object shows the mirror Tx status of the port."
+           	::= { ntronPortMirroringEntry 2 }
+
+ntronPortMirroringRx    	OBJECT-TYPE
+    	SYNTAX              	Integer32
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION		
+                        	"This object shows the mirror Rx status of the port."
+           	::= { ntronPortMirroringEntry 3 }
+
+--  ----------------------------------------------------------------------------------
+--
+--                       PORT CONFIG GROUP
+--
+--  ----------------------------------------------------------------------------------
+							
+ntronPortConfigTable     	OBJECT-TYPE
+    	SYNTAX              	SEQUENCE OF NtronPortConfigEntry
+    	MAX-ACCESS          	not-accessible
+    	STATUS              	current
+    	DESCRIPTION
+                        	"The table which contains the statistics information of the ports."
+             	::= { ntronPortConfigGroup 1 }
+
+ntronPortConfigEntry     	OBJECT-TYPE
+    	SYNTAX              	NtronPortConfigEntry
+    	MAX-ACCESS          	not-accessible
+    	STATUS              	current
+    	DESCRIPTION
+                        	"An entry in the ntronPortStatisticsTable."	
+    	INDEX               	{ ntronPortNo }
+            	::= { ntronPortConfigTable 1 }
+
+NtronPortConfigEntry ::= 
+     SEQUENCE {
+		ntronPortNo          		Integer32,
+        	ntronPortName        		DisplayString,
+        	ntronPortAdminState  		INTEGER,
+        	ntronPortSpeed       		INTEGER,
+        	ntronPortDuplexStatus 		INTEGER,
+        	ntronPortLinkState   		INTEGER,
+        	ntronPortPriority    		Integer32,
+        	ntronPortFlowControl 		INTEGER,
+        	ntronPortBackPressure 		INTEGER,
+        	ntronPortAutonegotiation 	INTEGER,
+        	ntronPortOverWritePriority 	INTEGER,
+        	ntronPortPVID 			Integer32,
+        	ntronPortCrossover 			INTEGER
+     		}
+
+ntronPortNo              	OBJECT-TYPE
+    	SYNTAX              	Integer32
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION		
+                        	"This object identifies the port of the switch."
+           	::= { ntronPortConfigEntry 1 }
+
+ntronPortName            	OBJECT-TYPE
+    	SYNTAX              	DisplayString
+    	MAX-ACCESS          	read-only
+    	STATUS              	current
+    	DESCRIPTION	
+                       		"This attribute associates a user defined string name with the port."
+           	::= { ntronPortConfigEntry 2 }
+
+ntronPortAdminState      	OBJECT-TYPE
+    	SYNTAX              	INTEGER {
+                           		disabled (1),
+                           		enabled (2)
+                                	}		
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION		
+                        	" This attribute allows an administrative request to 
+                        	disable or enable communications on this port."
+          	::= { ntronPortConfigEntry 3}
+
+ntronPortSpeed           	OBJECT-TYPE
+    	SYNTAX              	INTEGER {
+                          		tenMbps (1),
+                          		hundredMbps (2),
+                          		thousandMbps (3)
+                                	}
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION		
+                       		"This attribute allows an administrative request to
+                       		read/write the speed of this port."
+           	::= { ntronPortConfigEntry 4}
+
+ntronPortDuplexStatus   	OBJECT-TYPE
+    	SYNTAX             	INTEGER{
+                          		half (1),
+                          		full (2)
+                              	}		
+    	MAX-ACCESS         	read-write
+    	STATUS             	current
+    	DESCRIPTION
+                      		"This attribute allows an administrative request to read the status
+				 	of Duplex on this port."
+           	::= {ntronPortConfigEntry 5}
+
+ntronPortLinkState     		OBJECT-TYPE
+    	SYNTAX            	INTEGER{
+                         		down (1),
+                         		up (2)
+                             		}		
+    	MAX-ACCESS        	read-only
+    	STATUS            	current
+    	DESCRIPTION
+                     		"This attribute allows an administrative request to read the status 
+                     		of link state on this port."
+           	::= {ntronPortConfigEntry 6}
+
+ntronPortPriority     		OBJECT-TYPE
+    	SYNTAX           		Integer32(0..7)	
+    	MAX-ACCESS       		read-write
+    	STATUS           		current
+    	DESCRIPTION	
+                    		"This attribute allows an administrative request to read/write the
+                    		Priority of the port."
+           	::= {ntronPortConfigEntry 7}								
+
+ntronPortFlowControl  		OBJECT-TYPE
+    	SYNTAX           		INTEGER{
+                         		enable (2),
+                         		disable(1)
+                            		}		
+    	MAX-ACCESS       		read-write
+    	STATUS           		current
+    	DESCRIPTION		
+                    		"This per-port attribute describes whether the port identified has 
+                    		flow Control Enabled or not. Flow Control on Full Duplex and Half Duplex 
+                    		is detected and Automatically, flow control accordingly is taken care of.
+                    		BY Default, Flow Control is Disabled."
+          	::= {ntronPortConfigEntry 8}
+
+ntronPortBackPressure 		OBJECT-TYPE
+    	SYNTAX           		INTEGER{
+                         		enable (2),
+                         		disable (1)
+                            		}	
+    	MAX-ACCESS       		read-write
+    	STATUS           		current
+    	DESCRIPTION	
+                     		"This per-port attribute describes whether the port identified has
+                     		BackPressure Enabled or not. BY Default, BackPressure is Disabled."
+        	::= {ntronPortConfigEntry 9}
+
+ntronPortAutonegotiation 	OBJECT-TYPE
+    	SYNTAX               	INTEGER{
+                              	enable (2),
+                              	disable (1)
+                              	}	
+    	MAX-ACCESS           	read-write
+    	STATUS               	current
+    	DESCRIPTION		
+                         	"This per-port attribute describes whether the port identified has
+                          	AutoNegotiation  Enabled or not. BY Default, BackPressure is Disabled."
+             	::= {ntronPortConfigEntry 10}
+
+ntronPortOverWritePriority  	OBJECT-TYPE
+    	SYNTAX                 	INTEGER{
+                               	enable (2),
+                                 	disable (1)
+                             		}	
+    	MAX-ACCESS             	read-write
+    	STATUS                 	current
+    	DESCRIPTION
+                           	"This per-port attribute describes whether the port identified has
+                           	OverWritePriority Enabled or not. BY Default, BackPressure is Disabled."
+            	::= {ntronPortConfigEntry 11}
+
+ntronPortPVID           	OBJECT-TYPE
+    	SYNTAX              	Integer32
+    	MAX-ACCESS          	read-write
+    	STATUS              	current
+    	DESCRIPTION		
+                        	"This is the port VLAN ID."
+           	::= { ntronPortConfigEntry 12 }
+
+ntronPortCrossover              OBJECT-TYPE
+    	SYNTAX                 	INTEGER{
+                               	   auto (1),
+                                   yes (2),
+                                   no (3)
+                             	}	
+    	MAX-ACCESS             	read-write
+    	STATUS                 	current
+    	DESCRIPTION
+                           	"This is the port setting for Crossover."
+            	::= {ntronPortConfigEntry 13}
+
+--  ----------------------------------------------------------------------------------
+--
+--                       IGMP GROUP
+--
+--  ----------------------------------------------------------------------------------
+
+ntronIgmpState			OBJECT-TYPE
+    	SYNTAX			INTEGER{
+			      		enable (2),
+			      		disable (1)
+			      		}
+    	MAX-ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION	
+					"This object holds the current state of the igmp. By configuring this to
+                        	Enable, the igmp will be enabled."
+	   	::= {ntronIgmpGroup 1 }
+
+ntronQueryMode      		OBJECT-TYPE
+    	SYNTAX			INTEGER{
+			      		on (3),
+			      		auto (2),
+						off (1)
+			      		}
+    	MAX-ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION	
+					"To set the switch's query mode."
+           	::= {ntronIgmpGroup 2}
+
+ntronRouterMode      		OBJECT-TYPE
+    	SYNTAX			INTEGER{
+			      		manual (3),
+			      		auto (2),
+						none (1)
+			      		}
+    	MAX-ACCESS			read-write
+    	STATUS			current
+    	DESCRIPTION	
+					"To set the switch's router mode."
+           	::= {ntronIgmpGroup 3}
+
+ntronIgmpMemberTable		OBJECT-TYPE
+    	SYNTAX			SEQUENCE OF NtronIgmpMemberEntry
+    	MAX-ACCESS			not-accessible
+    	STATUS			current
+    	DESCRIPTION
+					"The table that contains the information about the igmp members."
+  	   	::= { ntronIgmpGroup 4 }
+
+ntronIgmpMemberEntry		OBJECT-TYPE
+    	SYNTAX			NtronIgmpMemberEntry
+    	MAX-ACCESS			not-accessible
+    	STATUS			current
+    	DESCRIPTION	
+					"An entry in the igmp member table."
+    	INDEX				{ ntronIgmpMemberTableIndex }
+	   	::= { ntronIgmpMemberTable 1 }
+
+NtronIgmpMemberEntry ::= 
+
+    	SEQUENCE {
+		ntronIgmpMemberTableIndex	Integer32,
+		ntronIgmpGroupIpAddress		IpAddress,
+		ntronIgmpPortNumber		Integer32,
+		ntronIgmpVlanId			Integer32
+		}
+
+ntronIgmpMemberTableIndex	OBJECT-TYPE
+    	SYNTAX			Integer32
+    	MAX-ACCESS			read-only
+    	STATUS			current
+    	DESCRIPTION			
+					"The unique identifier to identify the igmp member."
+	   	::= { ntronIgmpMemberEntry 1 }
+
+ntronIgmpGroupIpAddress		OBJECT-TYPE
+    	SYNTAX			IpAddress
+    	MAX-ACCESS			read-only
+    	STATUS			current
+    	DESCRIPTION			
+					"The IpAddress of the Multicast Group."
+	   	::= { ntronIgmpMemberEntry 2 }
+
+ntronIgmpPortNumber		OBJECT-TYPE
+    	SYNTAX			Integer32
+    	MAX-ACCESS			read-only
+    	STATUS			current
+    	DESCRIPTION			
+					"The port number from which the multicast Ip is received."
+	   	::= { ntronIgmpMemberEntry 3}
+
+ntronIgmpVlanId			OBJECT-TYPE
+    	SYNTAX			Integer32
+    	MAX-ACCESS			read-only
+    	STATUS			current
+    	DESCRIPTION			
+					"The Vlan Id to which the igmpPortNumber belongs."
+   	   	::= { ntronIgmpMemberEntry 4 }
+
+ntronIgmpRouterTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF NtronIgmpRouterEntry
+	MAX-ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION
+					"The table that contains the information about the igmp routers."
+		::= { ntronIgmpGroup 5 }
+
+ntronIgmpRouterEntry		OBJECT-TYPE
+	SYNTAX			NtronIgmpRouterEntry
+	MAX-ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION	
+					"An entry in the igmp router table."
+	INDEX				{ ntronIgmpRouterTableIndex }
+		::= { ntronIgmpRouterTable 1 }
+
+NtronIgmpRouterEntry ::= 
+
+	SEQUENCE {
+		ntronIgmpRouterTableIndex	Integer32,
+		ntronIgmpRouterIpAddress	IpAddress,
+		ntronIgmpRouterPortNumber	Integer32
+		}
+
+ntronIgmpRouterTableIndex	OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS			read-only
+	STATUS			current
+	DESCRIPTION			
+					"The unique identifier to identify the igmp router."
+		::= { ntronIgmpRouterEntry 1 }
+
+ntronIgmpRouterIpAddress	OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS			read-only
+	STATUS			current
+	DESCRIPTION			
+					"The IpAddress of the Router."
+		::= { ntronIgmpRouterEntry 2 }
+
+ntronIgmpRouterPortNumber	OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS			read-only
+	STATUS			current
+	DESCRIPTION			
+					"The port no from which the router query has been received."
+		::= { ntronIgmpRouterEntry 3}
+
+ntronIgmpPortTable		OBJECT-TYPE
+	SYNTAX			SEQUENCE OF NtronIgmpPortEntry
+	MAX-ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION
+					"The table that contains the information about the igmp port status."
+		::= { ntronIgmpGroup 6 }
+
+ntronIgmpPortEntry		OBJECT-TYPE
+	SYNTAX			NtronIgmpPortEntry
+	MAX-ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION	
+					"An entry in the igmp port table."
+	INDEX				{ ntronIgmpPortTableIndex }
+		::= { ntronIgmpPortTable 1 }
+
+NtronIgmpPortEntry ::= 
+
+	SEQUENCE {
+		ntronIgmpPortTableIndex		Integer32,
+		ntronIgmpPortManRouter		INTEGER,
+		ntronIgmpPortRFilter		INTEGER
+		}
+
+ntronIgmpPortTableIndex		OBJECT-TYPE
+	SYNTAX			Integer32
+	MAX-ACCESS			read-only
+	STATUS			current
+	DESCRIPTION			
+					"The unique identifier to identify the igmp port."
+		::= { ntronIgmpPortEntry 1 }
+
+ntronIgmpPortManRouter		OBJECT-TYPE
+	SYNTAX			INTEGER{
+			      		enable (2),
+			      		disable (1)
+			      		}
+	MAX-ACCESS			read-write
+	STATUS			current
+	DESCRIPTION			
+					"Per-Port Attribute for if the port is a Manual Router Port"
+		::= { ntronIgmpPortEntry 2 }
+
+ntronIgmpPortRFilter		OBJECT-TYPE
+	SYNTAX			INTEGER{
+			      		enable (2),
+			      		disable (1)
+			      		}
+	MAX-ACCESS			read-write
+	STATUS			current
+	DESCRIPTION			
+					"Per-Port Attribute for if the port has RFilter enabled"
+		::= { ntronIgmpPortEntry 3}
+
+--  ----------------------------------------------------------------------------------
+--
+--                       BROADCAST GROUP
+--
+--  ----------------------------------------------------------------------------------
+
+ntronBroadcastBPCLTable     	OBJECT-TYPE
+    	SYNTAX                 	SEQUENCE OF NtronBroadcastBPCLEntry
+    	MAX-ACCESS             	not-accessible
+    	STATUS                 	current
+    	DESCRIPTION
+                           	"The table that contains the information about the best packet 
+				count limit."
+            	::= { ntronBroadcastGroup 1 }
+
+ntronBroadcastBPCLEntry    	OBJECT-TYPE
+    	SYNTAX                	NtronBroadcastBPCLEntry
+    	MAX-ACCESS            	not-accessible
+    	STATUS                	current
+    	DESCRIPTION	
+                          	"An entry in the ntronBroadcastBPCLTable."
+	INDEX      		{ ntronBroadcastPortNumber }
+         	::= { ntronBroadcastBPCLTable 1 }
+
+NtronBroadcastBPCLEntry ::= 
+    	SEQUENCE {	
+          	ntronBroadcastPortNumber  Integer32,
+          	ntronBroadcastPercentage  Integer32
+             	}
+
+ntronBroadcastPortNumber   	OBJECT-TYPE
+    	SYNTAX                	Integer32
+    	MAX-ACCESS            	read-only
+    	STATUS                	current
+    	DESCRIPTION
+                          	"The unique identifier to identify the entry in the ntronBroadcastBPCLTable."
+           	::= {ntronBroadcastBPCLEntry 1}
+
+ntronBroadcastPercentage        OBJECT-TYPE
+    	SYNTAX                	Integer32(0..100)
+    	MAX-ACCESS            	read-write
+    	STATUS                	current
+    	DESCRIPTION
+                          	"The percentage of broadcast packets that can be allowed."
+          	::= {ntronBroadcastBPCLEntry 2}
+
+--  ----------------------------------------------------------------------------------
+--
+--                       CONFIG GROUP
+--
+--  ----------------------------------------------------------------------------------
+
+ntronConfigSave             	OBJECT-TYPE
+    	SYNTAX                 	INTEGER {
+                             		disable (1),
+                             		enable (2)
+                                   	}
+    	MAX-ACCESS             	read-write
+    	STATUS                 	current
+    	DESCRIPTION
+                           	"If this configurable object is set to enable then all the 
+				 Configured data of the all the modules is written into flash."
+		::= { ntronConfigGroup 1}
+
+ntronConfigErase              OBJECT-TYPE
+        SYNTAX                INTEGER {
+                                 disable (1),
+                                 enable (2),
+                                 keepip (3),
+                                 keepusers (4),
+                                 keepipandusers (5)
+                              }
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+                              "Setting this object to the value mentioned above will cause the specific
+                              function to be called. When performing the enable action either the config
+                              flags below or the same defaults as on the web will be used if not set as
+                              below. Any of the other options will ignore the below flags and do as they
+                              are described"
+            ::= { ntronConfigGroup 2}
+
+ntronConfigEraseFlags         OBJECT-TYPE
+        SYNTAX                INTEGER {
+                                 keepIp (1),
+                                 keepUsers (2),
+                                 keepSNMP (4),
+                                 keepDHCPS (8),
+                                 keepMacSec (16)
+                              }
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+                              "If not manually set by the user the web default values will be used in the above
+                              action. Flags are reset to use the default values when ntronConfigErase is complete"
+            ::= { ntronConfigGroup 3}
+
+--  ----------------------------------------------------------------------------------
+--
+--                       SNMP GROUP
+--
+--  ----------------------------------------------------------------------------------
+
+ntronSnmpGetCommunityName    	OBJECT-TYPE
+    	SYNTAX                  DisplayString(SIZE(3..15))
+    	MAX-ACCESS              read-write	
+    	STATUS                  current	
+    	DESCRIPTION
+                            	"The community name used to authenticate the get/getnext
+				 request from snmp Manager."
+           	::= {ntronSnmpGroup 1}
+
+ntronSnmpTrapCommunityName    	OBJECT-TYPE
+    	SYNTAX                  DisplayString(SIZE(3..15))
+    	MAX-ACCESS              read-write	
+    	STATUS                  current	
+    	DESCRIPTION	             
+				"The community name used to authenticate the Trap
+				 request to snmp Manager."
+           	::= {ntronSnmpGroup 2}
+
+ntronSnmpManagerIpAddressTable 	OBJECT-TYPE
+    	SYNTAX                  SEQUENCE OF NtronSnmpManagerIpAddressEntry
+    	MAX-ACCESS              not-accessible
+    	STATUS                  current
+    	DESCRIPTION
+                              	"The ip address table of the snmp managers."
+           	::= { ntronSnmpGroup 3 }
+
+ntronSnmpManagerIpAddressEntry 	OBJECT-TYPE
+    	SYNTAX                  NtronSnmpManagerIpAddressEntry
+    	MAX-ACCESS              not-accessible
+    	STATUS                  current
+    	DESCRIPTION	
+                              	"An entry in the ntronSnmpManagerIpAddressTable"
+    	INDEX                   { ntronSnmpManagerTableIndex }
+		::= { ntronSnmpManagerIpAddressTable 1 }
+
+NtronSnmpManagerIpAddressEntry ::=
+      	SEQUENCE {
+          	ntronSnmpManagerTableIndex   Integer32,
+          	ntronSnmpManagerIpAddress    IpAddress
+               	}
+
+ntronSnmpManagerTableIndex  	OBJECT-TYPE
+    	SYNTAX                 	Integer32
+    	MAX-ACCESS             	read-only
+    	STATUS                 	current
+    	DESCRIPTION
+                           	"The index of the snmp manager."
+         	::= {ntronSnmpManagerIpAddressEntry 1 }
+
+ntronSnmpManagerIpAddress   	OBJECT-TYPE
+    	SYNTAX                 	IpAddress	
+    	MAX-ACCESS             	read-write
+    	STATUS                 	current
+    	DESCRIPTION					
+                           	"The Ip Address of the snmp Manager."
+          	::= {ntronSnmpManagerIpAddressEntry 2 }
+
+--  ----------------------------------------------------------------------------------
+--
+--                       NRING GROUP
+--
+--  ----------------------------------------------------------------------------------
+ntronNRingMode           	OBJECT-TYPE
+    SYNTAX               	INTEGER{
+                               		disabled(1),
+                               		automember(2),
+                               		activemember(3),
+                               		manager(4),
+                               		multimember(5)
+                               		}
+	MAX-ACCESS          	read-only
+	STATUS              	current
+	DESCRIPTION 
+                           	"Operational mode of NRing system."
+                ::= { ntronNRingGroup 1 }
+
+ntronNRingState           	OBJECT-TYPE
+    SYNTAX               	INTEGER{
+                               		healthy(1),
+                               		broken-lo(2),
+                               		broken-hi(3),
+                               		broken(4)
+                               		}
+	MAX-ACCESS          	read-only
+	STATUS              	current
+	DESCRIPTION 
+                           	"Status of NRing system."
+                ::= { ntronNRingGroup 2 }
+
+ntronNRingVersion          	OBJECT-TYPE
+    SYNTAX               	Integer32
+	MAX-ACCESS          	read-only
+	STATUS              	current
+	DESCRIPTION 
+                           	"Version of NRing system."
+                ::= { ntronNRingGroup 3 }
+
+--  ----------------------------------------------------------------------------------
+--
+--                       TRAP GROUP
+--
+--  ----------------------------------------------------------------------------------
+ntronPowerChange	        NOTIFICATION-TYPE
+    OBJECTS                 { ntronPowerFault }
+    STATUS                  current
+    DESCRIPTION
+                            "An ntronPowerChange trap signifies that the sending
+                            SNMP application entity recognizes a change in the
+                            power fault variable either from a power failure or a
+                            restoration of power."
+              ::= { ntronTrapGroup 1 }
+
+END

@@ -1,0 +1,738 @@
+-- *****************************************************************
+-- OTDR-MIB:  Vitesse private MIB
+--
+-- Copyright (c) 2002-2013 Vitesse Semiconductor Corporation "Vitesse".
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+TN-OTDR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC   
+    ifIndex FROM IF-MIB
+    tnProducts FROM TRANSITION-SMI 
+    TruthValue FROM SNMPv2-TC
+    TNDisplayString FROM TN-TC
+    TNInterfaceIndex FROM TN-TC
+    TNSfpTransceiver FROM TN-TC
+    ;
+
+tnOTDRMib MODULE-IDENTITY
+    LAST-UPDATED "201407010000Z"
+    ORGANIZATION
+        "Vitesse Semiconductor Corporation"
+    CONTACT-INFO
+        "Application support <application_support@vitesse.com>"
+    DESCRIPTION
+        "This is a private version of the OTDR MIB"
+    REVISION    "201407010000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { tnProducts 155  }
+
+      
+      
+--
+-- main body
+--
+tnPortMibObjects        OBJECT IDENTIFIER ::= { tnOTDRMib 1 }
+tnOTDRBirthCertificate  OBJECT IDENTIFIER ::= { tnOTDRMib 2 }
+tnOTDRPortCaptures      OBJECT IDENTIFIER ::= { tnOTDRMib 3 }
+tnOTDRCommand           OBJECT IDENTIFIER ::= { tnOTDRMib 4 }
+tnOTDRReport            OBJECT IDENTIFIER ::= { tnOTDRMib 5 }
+      
+      
+      
+tnOTDRPortInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnOTDRConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the OTDR interface parameters"
+    ::= { tnPortMibObjects 1 }
+
+tnOTDRConfigEntry OBJECT-TYPE
+    SYNTAX      TnOTDRConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each OTDR interface has a set of parameters"
+    INDEX { ifIndex }
+           ::= { tnOTDRPortInfoTable 1 }
+
+TnOTDRConfigEntry ::= SEQUENCE {
+--    tnOTDRPortInfoInterfaceIfIndex      TNInterfaceIndex,
+    tnOTDRPortInfoInterfaceA0Vendor     TNDisplayString,
+    tnOTDRPortInfoInterfaceA0PartNumber     TNDisplayString,
+    tnOTDRPortInfoInterfaceA0SerialNumber   TNDisplayString,
+    tnOTDRPortInfoInterfaceA0Revision   TNDisplayString,
+    tnOTDRPortInfoInterfaceA0DateCode   TNDisplayString,
+    tnOTDRPortInfoInterfaceA0SfpType    TNSfpTransceiver
+}
+
+--tnOTDRConfigIfIndex OBJECT-TYPE
+--    SYNTAX      TNInterfaceIndex
+--    MAX-ACCESS  not-accessible
+--    STATUS      current
+--    DESCRIPTION 
+--        "Logical interface number."
+--    ::= { tnOTDREntry 1 }
+
+tnOTDRPortInfoInterfaceA0Vendor OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Vendor name."
+    ::= { tnOTDRConfigEntry 1 }
+
+tnOTDRPortInfoInterfaceA0PartNumber OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Part number."
+    ::= { tnOTDRConfigEntry 2 }
+
+tnOTDRPortInfoInterfaceA0SerialNumber OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+       "Serial number."
+    ::= { tnOTDRConfigEntry 3 }
+
+tnOTDRPortInfoInterfaceA0Revision OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Revision."
+    ::= { tnOTDRConfigEntry 4 }
+
+tnOTDRPortInfoInterfaceA0DateCode OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DateCode."
+    ::= { tnOTDRConfigEntry 5 }
+
+tnOTDRPortInfoInterfaceA0SfpType OBJECT-TYPE
+    SYNTAX      TNSfpTransceiver 
+        MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Type."
+    ::= { tnOTDRConfigEntry 6 }
+      
+      
+-- --------------------------------------------------------------------------      
+ 
+-- TnOTDRReflections ::=
+--    SEQUENCE {
+--        tnLen1           Unsigned32,
+  --      tnLen2           Unsigned32,
+--        tnLen3           Unsigned32,
+--        tnLen4           Unsigned32,
+--        tnLen5           Unsigned32,
+--        tnLen6           Unsigned32,
+--        tnLen7           Unsigned32,
+--        tnLen8           Unsigned32,
+--        tnLen9           Unsigned32,
+--        tnLen10           Unsigned32,
+--        tnLen11           Unsigned32,
+--        tnLen12           Unsigned32,
+--        tnLen13           Unsigned32,
+--        tnLen14           Unsigned32,
+--        tnLen15           Unsigned32,
+--        tnLen16           Unsigned32,
+--    }
+
+ 
+      
+tnOTDRCertInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnOTDRCertEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the OTDR interface parameters"
+    ::= { tnOTDRBirthCertificate 1 }
+      
+      
+tnOTDRCertEntry OBJECT-TYPE
+    SYNTAX      TnOTDRCertEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each OTDR interface has a set of parameters"
+    INDEX { ifIndex }
+           ::= { tnOTDRCertInfoTable 1 }
+
+TnOTDRCertEntry ::= SEQUENCE {
+    tnOTDRCertName     TNDisplayString,
+    tnOTDRCertPartNbr  TNDisplayString,
+    tnOTDRCertSerial   TNDisplayString,
+    tnOTDRCertRevision TNDisplayString,
+    tnOTDRCertDateCode TNDisplayString,
+    tnOTDRCertTransciever TNDisplayString,
+    tnOTDRCertDate TNDisplayString,
+    tnOTDRCertTime TNDisplayString,   
+    tnOTDRCertReflection1  INTEGER,
+    tnOTDRCertReflection2  INTEGER,
+    tnOTDRCertReflection3  INTEGER,
+    tnOTDRCertReflection4  INTEGER,
+    tnOTDRCertReflection5  INTEGER,
+    tnOTDRCertReflection6  INTEGER,
+    tnOTDRCertReflection7  INTEGER,
+    tnOTDRCertReflection8  INTEGER,
+    tnOTDRCertReflection9  INTEGER,
+    tnOTDRCertReflection10  INTEGER,
+    tnOTDRCertReflection11  INTEGER,
+    tnOTDRCertReflection12  INTEGER,
+    tnOTDRCertReflection13  INTEGER,
+    tnOTDRCertReflection14  INTEGER,
+    tnOTDRCertReflection15  INTEGER,
+    tnOTDRCertReflection16  INTEGER
+--    tnOTDRCertReflections TnOTDRReflections
+    
+    
+}
+      
+tnOTDRCertName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Vendor name."
+    ::= { tnOTDRCertEntry 1 }
+
+tnOTDRCertPartNbr OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Part number."
+    ::= { tnOTDRCertEntry 2 }
+
+tnOTDRCertSerial OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+       "Serial number."
+    ::= { tnOTDRCertEntry 3 }
+
+tnOTDRCertRevision OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Revision."
+    ::= { tnOTDRCertEntry 4 }
+
+tnOTDRCertDateCode OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "DateCode."
+    ::= { tnOTDRCertEntry 5 }
+
+tnOTDRCertTransciever OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16)) 
+        MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Type."
+    ::= { tnOTDRCertEntry 6 }
+
+
+tnOTDRCertDate OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Date."
+    ::= { tnOTDRCertEntry 7 }
+
+tnOTDRCertTime OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time."
+    ::= { tnOTDRCertEntry 8 }    
+    
+    
+tnOTDRCertReflection1 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 1."
+    ::= { tnOTDRCertEntry 9 }
+
+tnOTDRCertReflection2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 2."
+    ::= { tnOTDRCertEntry 10 }
+
+tnOTDRCertReflection3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 3."
+    ::= { tnOTDRCertEntry 11 }
+
+tnOTDRCertReflection4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 4."
+    ::= { tnOTDRCertEntry 12 }        
+    
+tnOTDRCertReflection5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 5."
+    ::= { tnOTDRCertEntry 13 }
+tnOTDRCertReflection6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 6."
+    ::= { tnOTDRCertEntry 14 }         
+    
+tnOTDRCertReflection7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 7."
+    ::= { tnOTDRCertEntry 15 }     
+    
+tnOTDRCertReflection8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 8."
+    ::= { tnOTDRCertEntry 16 }      
+    
+tnOTDRCertReflection9 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 9."
+    ::= { tnOTDRCertEntry 17 }     
+    
+tnOTDRCertReflection10 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 10."
+    ::= { tnOTDRCertEntry 18 }
+
+tnOTDRCertReflection11 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 11."
+    ::= { tnOTDRCertEntry 19 }
+
+tnOTDRCertReflection12 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 12."
+    ::= { tnOTDRCertEntry 20 }
+
+tnOTDRCertReflection13 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 13."
+    ::= { tnOTDRCertEntry 21 }
+
+tnOTDRCertReflection14 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 14."
+    ::= { tnOTDRCertEntry 22 }
+
+tnOTDRCertReflection15 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 15."
+    ::= { tnOTDRCertEntry 23 }
+
+tnOTDRCertReflection16 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 16."
+    ::= { tnOTDRCertEntry 24 }
+    
+
+--tnOTDRCertReflections OBJECT-TYPE
+--    SYNTAX      TnOTDRReflections
+--    MAX-ACCESS  read-only
+--    STATUS      current
+--    DESCRIPTION 
+--        "Time."
+--    ::= { tnOTDRCertEntry 8 }
+
+
+ -- --------------------------------------------------------------------------      
+
+tnOTDRPortCaptureTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnOTDRPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the OTDR interface parameters"
+    ::= { tnOTDRPortCaptures 1 }
+      
+      
+tnOTDRPortEntry OBJECT-TYPE
+    SYNTAX      TnOTDRPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each OTDR interface has a set of parameters"
+    INDEX { ifIndex , tnOTDRPortCaptureId}
+           ::= { tnOTDRPortCaptureTable 1 }
+
+TnOTDRPortEntry ::= SEQUENCE {
+    tnOTDRPortCaptureId    INTEGER,
+
+    tnOTDRPortReflection1  INTEGER,
+    tnOTDRPortReflection2  INTEGER,
+    tnOTDRPortReflection3  INTEGER,
+    tnOTDRPortReflection4  INTEGER,
+    tnOTDRPortReflection5  INTEGER,
+    tnOTDRPortReflection6  INTEGER,
+    tnOTDRPortReflection7  INTEGER,
+    tnOTDRPortReflection8  INTEGER,
+    tnOTDRPortReflection9  INTEGER,
+    tnOTDRPortReflection10  INTEGER,
+    tnOTDRPortReflection11  INTEGER,
+    tnOTDRPortReflection12  INTEGER,
+    tnOTDRPortReflection13  INTEGER,
+    tnOTDRPortReflection14  INTEGER,
+    tnOTDRPortReflection15  INTEGER,
+    tnOTDRPortReflection16  INTEGER,
+    tnOTDRPortDate TNDisplayString,
+    tnOTDRPortTime TNDisplayString,  
+	tnOTDRPortAction INTEGER  
+    
+}
+      
+tnOTDRPortCaptureId OBJECT-TYPE
+--   SYNTAX INTEGER (1..10)
+   SYNTAX INTEGER
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Capture number."
+    ::= { tnOTDRPortEntry 1}
+
+
+    
+    
+tnOTDRPortReflection1 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 1."
+    ::= { tnOTDRPortEntry 2 }
+
+tnOTDRPortReflection2 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 2."
+    ::= { tnOTDRPortEntry 3 }
+
+tnOTDRPortReflection3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 3."
+    ::= { tnOTDRPortEntry 4 }
+
+tnOTDRPortReflection4 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 4."
+    ::= { tnOTDRPortEntry 5 }        
+    
+tnOTDRPortReflection5 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 5."
+    ::= { tnOTDRPortEntry 6 }   
+    
+tnOTDRPortReflection6 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 6."
+    ::= { tnOTDRPortEntry 7 }         
+    
+tnOTDRPortReflection7 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 7."
+    ::= { tnOTDRPortEntry 8 }     
+    
+tnOTDRPortReflection8 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 8."
+    ::= { tnOTDRPortEntry 9 }      
+    
+tnOTDRPortReflection9 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 9."
+    ::= { tnOTDRPortEntry 10 }     
+    
+tnOTDRPortReflection10 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 10."
+    ::= { tnOTDRPortEntry 11 }
+
+tnOTDRPortReflection11 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 11."
+    ::= { tnOTDRPortEntry 12 }
+
+tnOTDRPortReflection12 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 12."
+    ::= { tnOTDRPortEntry 13 }
+
+tnOTDRPortReflection13 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 13."
+    ::= { tnOTDRPortEntry 14 }
+
+tnOTDRPortReflection14 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 14."
+    ::= { tnOTDRPortEntry 15 }
+
+tnOTDRPortReflection15 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 15."
+    ::= { tnOTDRPortEntry 16 }
+
+tnOTDRPortReflection16 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Reflection 16."
+    ::= { tnOTDRPortEntry 17 }
+      
+tnOTDRPortDate OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Date."
+    ::= { tnOTDRPortEntry 18 }
+
+tnOTDRPortTime OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time."
+    ::= { tnOTDRPortEntry 19 }    
+
+
+tnOTDRPortAction OBJECT-TYPE 
+    SYNTAX      INTEGER{
+                   noAction     (0),              
+                   setAsCert    (1),
+                   delete       (2)
+                }
+    MAX-ACCESS      read-create    STATUS          current
+    DESCRIPTION
+        "  - 'noAction', Do nothing.
+
+           - 'setAsCert', save as birth certificate.
+
+           - 'delete', delete the capture."
+
+    ::= { tnOTDRPortEntry 20 }
+
+
+ 
+---------------------------------------------------------------
+
+
+
+ 
+
+tnOTDRCommandTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnOTDRCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the OTDR commands"
+    ::= { tnOTDRCommand 1 }
+      
+      
+tnOTDRCommandEntry OBJECT-TYPE
+    SYNTAX      TnOTDRCommandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each OTDR interface has a set of commands"
+    INDEX { ifIndex }
+           ::= { tnOTDRCommandTable 1 }
+
+TnOTDRCommandEntry ::= SEQUENCE {
+  	tnOTDRCommandAction INTEGER  
+    
+}
+    
+    
+tnOTDRCommandAction OBJECT-TYPE 
+    SYNTAX      INTEGER{
+                   noAction     (0),              
+                   capture    (1)
+                }
+    MAX-ACCESS      read-create    STATUS          current
+    DESCRIPTION
+        "  - 'noAction', Do nothing.
+
+           - 'capture', Capture reflections for this port."
+    ::= { tnOTDRCommandEntry 1 }
+
+  
+ tnOTDRReportTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnOTDRReportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of the OTDR interface parameters"
+    ::= { tnOTDRReport 1 }
+      
+      
+tnOTDRReportEntry OBJECT-TYPE
+    SYNTAX      TnOTDRReportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each OTDR interface has a set of parameters"
+--    INDEX { ifIndex}
+    INDEX { 1  }
+           ::= { tnOTDRReportTable 1 }
+
+TnOTDRReportEntry ::= SEQUENCE {
+    tnOTDRDownloadTFTPServer  TNDisplayString,
+  	tnOTDRActivePortsOnly INTEGER,  
+  	tnOTDRReportAction INTEGER  
+    
+}
+      
+tnOTDRDownloadTFTPServer  OBJECT-TYPE
+    SYNTAX     TNDisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "TFTP server URL on the form tftp://server[:port]/path-to-file
+        to place the report when a save report is next requested via this MIB.
+        This value is set to zero length when no address has been
+        specified. The report name will be used as the filename"
+    ::= { tnOTDRReportEntry 1 }
+
+tnOTDRActivePortsOnly OBJECT-TYPE 
+    SYNTAX      INTEGER{
+                   all    (0),              
+                   active (1)
+                }
+    MAX-ACCESS      read-create    STATUS          current
+    DESCRIPTION
+        "  - 'all', Display all ports.
+
+           - 'active', Only display ports with OTDR SFP's"
+    ::= { tnOTDRReportEntry 2 }
+
+
+tnOTDRReportAction OBJECT-TYPE 
+    SYNTAX      INTEGER{
+                   noAction     (0),              
+                   save    (1)
+                }
+    MAX-ACCESS      read-create    STATUS          current
+    DESCRIPTION
+        "  - 'noAction', Do nothing.
+
+           - 'save', save report to TFTP server."
+
+
+    ::= { tnOTDRReportEntry 3 }
+
+END

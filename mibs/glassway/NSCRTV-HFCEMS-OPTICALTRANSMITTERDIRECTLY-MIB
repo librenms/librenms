@@ -1,0 +1,373 @@
+NSCRTV-HFCEMS-OPTICALTRANSMITTERDIRECTLY-MIB DEFINITIONS ::= BEGIN
+-- *****************************************************************************
+--                           附录H 直接调制光发射机MIB
+-- *****************************************************************************
+
+IMPORTS
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB
+    otdIdent
+        FROM NSCRTV-ROOT;
+
+    otdVendorOID OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "此对象提供厂商对直接调制光发送机MIB的扩充，无扩充时此对象应指向直接调制光发送
+            机节点otdIdent。"
+        ::= { otdIdent 1 }
+    
+    otdSlotNumber OBJECT-TYPE
+        SYNTAX INTEGER ( 0..32767 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "下行光发送机数量或机架插槽数量。"
+        ::= { otdIdent 2 }
+    
+    otdOptDeviceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OtdOptDeviceEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "下行光发送机信息表。"
+        ::= { otdIdent 3 }
+    
+    otdOptDeviceEntry OBJECT-TYPE
+        SYNTAX OtdOptDeviceEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "下行光发送机信息表目。"
+        INDEX { otdIndex }
+        ::= { otdOptDeviceTable 1 }
+    
+    OtdOptDeviceEntry ::= SEQUENCE
+        {
+        otdIndex
+            INTEGER,
+        otdLaserWavelength
+            DisplayString,
+        otdLaserType
+            DisplayString,
+        otdDriveLevel
+            INTEGER,
+        otdInputRFLevel
+            INTEGER,
+        otdInputRFAttenuationRange
+            INTEGER,
+        otdInputRFAttenuation
+            INTEGER,
+        otdLaserTemp
+            INTEGER,
+        otdLaserCurrent
+            INTEGER,
+        otdOpicalOutputPower
+            INTEGER,
+        otdTecCurrent
+            INTEGER,
+        otdAGCControl
+            INTEGER, 
+        otdConfigurationDriveLevel
+            INTEGER,
+        otdConfigurationRFAttenuation
+            INTEGER,
+        otdConfigurationRFChannels
+            INTEGER
+        }
+        
+        
+    otdIndex OBJECT-TYPE
+        SYNTAX INTEGER ( 0..32767 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "下行光发送机索引,可以是光发送机编号或机架插槽号。"
+        ::= { otdOptDeviceEntry 1 }
+    
+    otdLaserWavelength OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "激光器波长。"
+        ::= { otdOptDeviceEntry 2 }
+    
+    otdLaserType OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "激光器类型，有效值为unisolated FP, isolated FP, uncooled DFB, cooled DFB,ITU
+            等。"
+        ::= { otdOptDeviceEntry 3 }
+    
+    otdDriveLevel OBJECT-TYPE
+        SYNTAX INTEGER (0..127 )
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "光模块激励电平,单位为dBuV/ch。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdOptDeviceEntry 4 }
+    
+    otdInputRFLevel OBJECT-TYPE
+        SYNTAX INTEGER (0..127 )
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "输入射频信号电平,单位为dBuV/ch。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdOptDeviceEntry 5 }
+    
+    otdInputRFAttenuationRange OBJECT-TYPE
+        SYNTAX INTEGER ( 0..32767 )
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "输入射频信号衰减量范围,单位为0.1dB。"
+        ::= { otdOptDeviceEntry 6 }
+    
+    otdInputRFAttenuation OBJECT-TYPE
+        SYNTAX INTEGER ( -32768..32767 )
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "输入射频信号衰减量,单位为0.1dB。"
+        ::= { otdOptDeviceEntry 7 }
+    
+    otdLaserTemp OBJECT-TYPE
+        SYNTAX INTEGER ( -32768..32767 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "激光器工作温度,单位为0.1摄氏度。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdOptDeviceEntry 8 }
+    
+    otdLaserCurrent OBJECT-TYPE
+        SYNTAX INTEGER (-32768..32767 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "激光器工作电流,单位为0.1mA。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdOptDeviceEntry 9 }
+    
+    otdOpicalOutputPower OBJECT-TYPE
+        SYNTAX INTEGER ( 0..32767 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "输出光功率,单位为0.1mW。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdOptDeviceEntry 10 }
+    
+    otdTecCurrent OBJECT-TYPE
+        SYNTAX INTEGER ( -32768..32767 )
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "激光器制冷电流,单位为0.01A。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdOptDeviceEntry 11 }
+    
+    otdAGCControl OBJECT-TYPE
+        SYNTAX INTEGER {off(1),on(2)}
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "AGC控制使能。"
+        ::= { otdOptDeviceEntry 12 }
+    
+    otdConfigurationDriveLevel OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "设定激光器RF驱动电平偏移量，单位为0.1dB。该参数仅在AGC模式为打开时起作用。
+            系统根据该设定自动调整RF增益（衰减），从而达到设定的激光器RF驱动电平偏移量。
+            "
+        ::= { otdOptDeviceEntry 13 }
+    
+    otdConfigurationRFAttenuation OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "设定激光器RF驱动信号增益（衰减）的偏移量，单位为0.1dB。该参数仅在AGC模式为
+            关闭时起作用（MGC）。系统根据该设定调整RF信道的增益（衰减），从而达到手动
+            控制激光器RF驱动电平的目的。"
+        ::= { otdOptDeviceEntry 14 }
+    
+    otdConfigurationRFChannels OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "RF信号中输入的电视信号频道数。"
+        ::= { otdOptDeviceEntry 15 }
+    
+    otdFansNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "表示内部散热风扇的数量，'0'表示设备不支持散热风扇的监测或没有散热风扇。"
+        ::= { otdIdent 4 }
+    
+    otdFansTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OtdFansEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "散热风扇信息表。"
+        ::= { otdIdent 5 }
+    
+    otdFansEntry OBJECT-TYPE
+        SYNTAX OtdFansEntry
+        ACCESS not-accessible
+        STATUS optional
+        DESCRIPTION
+            "散热风扇信息表目。"
+        INDEX { otdFansIndex }
+        ::= { otdFansTable 1 }
+    
+    OtdFansEntry ::= SEQUENCE {
+        otdFansIndex
+            INTEGER,
+        otdFansState
+            INTEGER,
+        otdFansSpeed
+            INTEGER,
+        otdFansControl
+            INTEGER,
+        otdFansName
+            DisplayString
+        }
+        
+        
+    otdFansIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "散热风扇信息表索引。"
+        ::= { otdFansEntry 1 }
+    
+    otdFansState OBJECT-TYPE
+        SYNTAX INTEGER {normal (1), fault (2), off (3) }
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "散热风扇工作状态，normal 表示正常，fault表示失效，off表示关闭。此对象要求在离散属性MIB中登
+            记一个条目。"
+        ::= { otdFansEntry 2 }
+    
+    otdFansSpeed OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "散热风扇工作时的转速，单位为转/分，不支持转速检测时可置为'0'。此对象要求在
+            离散属性MIB中登记一个条目。"
+        ::= { otdFansEntry 3 }
+    
+    otdFansControl OBJECT-TYPE
+        SYNTAX INTEGER { on(1), off(2) }
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "散热风扇工作控制。 "
+        ::= { otdFansEntry 4 }
+    
+    otdFansName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "散热风扇名称。"
+        ::= { otdFansEntry 5 }
+
+--*
+--*   直流电源
+--*
+    otdNumberDCPowerSupply OBJECT-TYPE
+        SYNTAX INTEGER ( 0..16 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "直流电源数量，'0'表示应答器不支持此功能。"
+        ::= { otdIdent 6 }
+    
+    otdDCPowerSupplyMode OBJECT-TYPE
+        SYNTAX INTEGER { loadsharing(1), switchedredundant(2),alonesupply(3) }
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "供电电源工作模式。"
+        ::= { otdIdent 7 }
+    
+    otdDCPowerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OtdDCPowerEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "直流电源信息表。"
+        ::= { otdIdent 8 }
+    
+    otdDCPowerEntry OBJECT-TYPE
+        SYNTAX OtdDCPowerEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "直流电源信息表目。"
+        INDEX { otdDCPowerIndex }
+        ::= { otdDCPowerTable 1 }
+    
+    OtdDCPowerEntry ::= SEQUENCE
+        {
+        otdDCPowerIndex
+            INTEGER,
+        otdDCPowerVoltage
+            INTEGER,
+        otdDCPowerCurrent
+            INTEGER,
+        otdDCPowerName
+            DisplayString
+        }
+    
+    otdDCPowerIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "直流电源索引。"
+        ::= { otdDCPowerEntry 1 }
+    
+    otdDCPowerVoltage OBJECT-TYPE
+        SYNTAX INTEGER (-32768..32767 )
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "电源电压，单位为0.1V。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdDCPowerEntry 2 }
+    
+    otdDCPowerCurrent OBJECT-TYPE
+        SYNTAX INTEGER ( 0..65535 )
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "电源电流，单位为0.1A。此对象要求在属性MIB中登记一个条目。"
+        ::= { otdDCPowerEntry 3 }
+    
+    otdDCPowerName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "标明电源的名称，例如：24V直流电源。
+            此字段值由用户规定，至少应标明工作电压并将多个电源相互区分开。
+            当表中的对象产生告警时，此对象名称应放进hfcAlarmEvent陷阱的alarmText对象里（见
+            附录D）。"
+        ::= { otdDCPowerEntry 4 }
+
+-- *****************************************************************************
+END

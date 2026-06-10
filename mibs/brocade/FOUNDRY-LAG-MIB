@@ -1,0 +1,400 @@
+FOUNDRY-LAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+      FROM SNMPv2-SMI			-- [RFC2578]
+    InterfaceIndex, ifIndex, InterfaceIndexOrZero
+      FROM IF-MIB				-- [RFC2863]
+    DisplayString, RowStatus, MacAddress
+      FROM SNMPv2-TC			-- [RFC2579]
+    snSwitch
+      FROM FOUNDRY-SN-ROOT-MIB
+    PhysAddress
+      FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
+
+fdryLinkAggregationGroupMIB MODULE-IDENTITY
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+            "Technical Support Center, Ruckus Wireless, Inc,
+            350 West Java Drive,
+            Sunnyvale, CA 94089, USA
+            Support URL: https://support.ruckuswireless.com
+            Phone: +1-855-782-5871"
+    DESCRIPTION
+			"
+			Management Information Base module for link aggregate group
+            configuration and statistics. Link aggregation group is a new concept
+            of trunk and this MIB is replacing FOUNDRY-SN-LAG-MIB in MLX/XMR products
+			starting release 4.1.0.
+			
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.            
+			
+			"
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
+			"convert from SMIv1 to SMIv2" 
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+        	     "Modified contact Info, Organization and Decscription"      
+
+   ::= { snSwitch 33 }
+
+fdryLinkAggregationGroupTableObjects  OBJECT IDENTIFIER ::= { fdryLinkAggregationGroupMIB 1 }
+fdryLinkAggregationGroupPortTableObjects  OBJECT IDENTIFIER ::= { fdryLinkAggregationGroupMIB 2 }
+fdryLinkAggregationGroupLacpPortTableObjects  OBJECT IDENTIFIER ::= { fdryLinkAggregationGroupMIB 3 }
+
+-- LinkAggregationGroup Global Scalar Object Section
+
+-- LinkAggregationGroup Table Object Section
+
+--
+-- LinkAggregationGroup Table
+--
+
+fdryLinkAggregationGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FdryLinkAggregationGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "LinkAggregationGroup table."
+    ::= { fdryLinkAggregationGroupTableObjects 1 }
+
+fdryLinkAggregationGroupEntry OBJECT-TYPE
+    SYNTAX     FdryLinkAggregationGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry of the Link Aggregate Group table."
+    INDEX { fdryLinkAggregationGroupName }
+    ::= { fdryLinkAggregationGroupTable 1 }
+
+FdryLinkAggregationGroupEntry ::= SEQUENCE {
+	fdryLinkAggregationGroupName                 DisplayString,
+    fdryLinkAggregationGroupType                  INTEGER,
+    fdryLinkAggregationGroupAdminStatus       INTEGER,
+    fdryLinkAggregationGroupIfList                  OCTET STRING,
+    fdryLinkAggregationGroupPrimaryPort        InterfaceIndexOrZero,
+    fdryLinkAggregationGroupTrunkType          INTEGER,
+    fdryLinkAggregationGroupTrunkThreshold   Unsigned32,
+    fdryLinkAggregationGroupLacpTimeout       INTEGER,
+    fdryLinkAggregationGroupIfIndex              InterfaceIndexOrZero,
+    fdryLinkAggregationGroupPortCount           Unsigned32,
+    fdryLinkAggregationGroupRowStatus          RowStatus,
+    fdryLinkAggregationGroupId                      Unsigned32,
+    fdryLinkAggregationGroupLacpMode           Unsigned32,
+    fdryLinkAggregationGroupLagMac             MacAddress
+}
+
+fdryLinkAggregationGroupName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Name of a LinkAggregationGroup."
+    ::= { fdryLinkAggregationGroupEntry 1 }
+
+fdryLinkAggregationGroupType OBJECT-TYPE
+    SYNTAX     INTEGER { static(1), dynamic(2), keepalive(3), auto(4), spx(5) }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "LinkAggregationGroup type."
+    ::= { fdryLinkAggregationGroupEntry 2 }
+
+fdryLinkAggregationGroupAdminStatus OBJECT-TYPE
+    SYNTAX     INTEGER { deploy(1), deployPassive(2), undeploy(3), undeployForced(4),other(5) }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "The desired deplyed state of this LinkAggregationGroup entry. 
+         This is not the operational status. Refer to ifTable for the 
+         operational status.
+         deploy(1).............deploy the LAG and set to LACP active if dynamic LAG.
+         deployPassive(2)..deploy the LAG and set to LACP passive if dynamic LAG.
+         undeploy(3).........undeploy the LAG if no more than 2 ports are enabled.
+         undeployForced(4)..undeploy the LAG regardless number of ports enabled.
+                                      This is a write-only value.
+         other(5)..................FI products will not support LAG deploy option.
+                                      This is a write-only value.
+         In particular, a row cannot be deployed until the corresponding 
+         instances of fdryLinkAggregationGroupIfList has been set."
+    ::= { fdryLinkAggregationGroupEntry 3 }
+
+fdryLinkAggregationGroupIfList OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "A list of interface indices which are the port membership
+            of a trunk group. Each interface index is a 32-bit integer
+            in big endian order."
+    ::= { fdryLinkAggregationGroupEntry 4 }
+
+fdryLinkAggregationGroupPrimaryPort OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The primary port for the Link Aggregation Group. This must
+            be set before deploying the LinkAggregateGroup unless this is
+            a keepalive LinkAggregateGroup.  Zero will be returned 
+            for primary ports not set. This object will not be used in FI 
+	    products from 8.0.61 onwards"
+    ::= { fdryLinkAggregationGroupEntry 5 }
+
+fdryLinkAggregationGroupTrunkType OBJECT-TYPE
+    SYNTAX     INTEGER { hashBased(1), perPacket(2) }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The trunk connection type which specifies what the scheme
+            of load-sharing among the trunk ports is."
+    ::= { fdryLinkAggregationGroupEntry 6 }
+
+fdryLinkAggregationGroupTrunkThreshold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The number of UP ports needed to keep the trunk up.
+            Not applicable for keepalive LAG."
+    ::= { fdryLinkAggregationGroupEntry 7 }
+
+fdryLinkAggregationGroupLacpTimeout OBJECT-TYPE
+    SYNTAX     INTEGER { default(1), long(2), short(3) }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The LACP timeout value this LACP LAG will use. Applicable for
+            dynamic and keepalive LAG only."
+    ::= { fdryLinkAggregationGroupEntry 8 }
+
+fdryLinkAggregationGroupIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "After deployment the operation information of a LAG entry will be
+            represented in an entry in ifTable. Use this variable as the ifIndex
+            to access the entry in ifTable and ifXTable. Zero will be returned 
+            for LAGs not yet deployed."
+    ::= { fdryLinkAggregationGroupEntry 9 }
+
+fdryLinkAggregationGroupPortCount OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of member ports belong to this LAG."
+    ::= { fdryLinkAggregationGroupEntry 10 }
+
+fdryLinkAggregationGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this conceptual row.
+
+        createAndWait(5) is not supported.
+
+        To create a row in this table, a manager must
+        set this object to createAndGo(4) together with the setting of
+        fdryLinkAggregationGroupType. After that the row status becomes
+        active(1) regardless the LAG entry is deployed or not.
+
+        To deploy the LAG entry, set the corresponding instance of
+        fdryLinkAggregationGroupAdminStatus to deployActive or deployPassive."
+    ::= { fdryLinkAggregationGroupEntry 11 }
+
+--modified as part of VALG enhancement
+
+fdryLinkAggregationGroupId OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The numeric identifier assigned to this LAG."
+    ::= { fdryLinkAggregationGroupEntry 12 }
+
+-- folloing two objects are added as part of VLAG enhancement
+fdryLinkAggregationGroupLacpMode OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The LACP mode value this LAG will use. Applicable for
+            dynamic and keepalive LAG only.
+            0 - lacp mode not supported
+            1- lacp mode active
+            2- lacp mode passive
+            for static and spx lag lacp mode will be 0"
+    ::= { fdryLinkAggregationGroupEntry 13 }
+
+fdryLinkAggregationGroupLagMac OBJECT-TYPE
+        SYNTAX     MacAddress
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "MAC Address assigned for LAG interface.
+                 Format of mac address will be HHHH.HHHH.HHHH."
+        ::= { fdryLinkAggregationGroupEntry 14 }
+--
+-- LinkAggregationGroupPort Table
+--
+
+fdryLinkAggregationGroupPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FdryLinkAggregationGroupPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A table that contains Link Aggregation Control
+            configuration information about every
+            Aggregation Port associated with this device.
+            A row appears in this table for each physical port."
+    ::= { fdryLinkAggregationGroupPortTableObjects 1 }
+
+fdryLinkAggregationGroupPortEntry OBJECT-TYPE
+    SYNTAX     FdryLinkAggregationGroupPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry of the Link Aggregate Group Port table."
+    INDEX { fdryLinkAggregationGroupName, ifIndex }
+    ::= { fdryLinkAggregationGroupPortTable 1 }
+
+FdryLinkAggregationGroupPortEntry ::= SEQUENCE {
+    fdryLinkAggregationGroupPortLacpPriority   INTEGER
+}
+
+fdryLinkAggregationGroupPortLacpPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The LACP priority value assigned to this link aggregation port. Applicable 
+            for dynamic and keepalive LAG only."
+    DEFVAL { 1 }
+    ::= { fdryLinkAggregationGroupPortEntry 1 }
+
+--
+-- LinkAggregationGroupLacpPort Table
+--
+
+fdryLinkAggregationGroupLacpPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF FdryLinkAggregationGroupLacpPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A table that contains Link Aggregation Control
+             information about every LACP port associated with this device.
+            A row appears in this table for each physical port."
+    ::= { fdryLinkAggregationGroupLacpPortTableObjects 1 }
+
+fdryLinkAggregationGroupLacpPortEntry OBJECT-TYPE
+    SYNTAX     FdryLinkAggregationGroupLacpPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry of the Link Aggregate Group LACP Port table.
+            Applicable for dynamic and keepalive LAG only."
+    INDEX { fdryLinkAggregationGroupName, ifIndex }
+    ::= { fdryLinkAggregationGroupLacpPortTable 1 }
+
+FdryLinkAggregationGroupLacpPortEntry ::= SEQUENCE {
+    fdryLinkAggregationGroupLacpPortAdminStatus             INTEGER,
+    fdryLinkAggregationGroupLacpPortLinkStatus                INTEGER,
+    fdryLinkAggregationGroupLacpPortLacpStatus               INTEGER,
+    fdryLinkAggregationGroupLacpPortLacpSysID                 PhysAddress,
+    fdryLinkAggregationGroupLacpPortLacpKey                    INTEGER,
+    fdryLinkAggregationGroupLacpPortLacpRemoteSysID     PhysAddress,
+    fdryLinkAggregationGroupLacpPortLacpRemoteKey        INTEGER
+}
+
+fdryLinkAggregationGroupLacpPortAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+				up(1),       -- ready to pass packets
+				down(2),
+				testing(3)   -- in some test mode
+			}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current admin state of the interface.
+            The testing(3) state indicates that no operational
+	    packets can be passed. 
+	    (same as ifAdminStatus in MIB-II)"
+    ::= { fdryLinkAggregationGroupLacpPortEntry 1 }
+
+fdryLinkAggregationGroupLacpPortLinkStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+				up(1),       -- ready to pass packets
+				down(2),
+				testing(3)   -- in some test mode
+			}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current operational state of the interface.
+            The testing(3) state indicates that no operational
+	    packets can be passed. 
+	    (same as ifOperStatus in MIB-II)"
+    ::= { fdryLinkAggregationGroupLacpPortEntry 2 }
+
+ fdryLinkAggregationGroupLacpPortLacpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+				operation(1),     
+				down(2),
+				blocked(3),
+				inactive(4),
+				pexforceup(5)				
+			}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current LACP state of the interface."
+    ::= { fdryLinkAggregationGroupLacpPortEntry 3 }
+
+ fdryLinkAggregationGroupLacpPortLacpSysID OBJECT-TYPE
+    SYNTAX  PhysAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The LACP system ID of the LAG."
+    ::= { fdryLinkAggregationGroupLacpPortEntry 4 }
+
+ fdryLinkAggregationGroupLacpPortLacpKey OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The LACP key ID of the interface."
+    ::= { fdryLinkAggregationGroupLacpPortEntry 5 }
+
+ fdryLinkAggregationGroupLacpPortLacpRemoteSysID OBJECT-TYPE
+    SYNTAX  PhysAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The LACP remote system ID of the LAG."
+    ::= { fdryLinkAggregationGroupLacpPortEntry 6 }
+
+ fdryLinkAggregationGroupLacpPortLacpRemoteKey OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The LACP remote key ID of the interface."
+    ::= { fdryLinkAggregationGroupLacpPortEntry 7 }
+
+END

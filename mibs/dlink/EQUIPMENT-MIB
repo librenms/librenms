@@ -1,0 +1,1370 @@
+EQUIPMENT-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        DateAndTime, TruthValue ,DisplayString,RowStatus
+            FROM SNMPv2-TC
+        PortList FROM Q-BRIDGE-MIB
+        swTimeRangeMgmtRangeName FROM TIMERANGE-MIB    
+		AgentNotifyLevel, dlink-common-mgmt
+		    FROM DLINK-ID-REC-MIB;
+
+
+     swEquipmentMIB MODULE-IDENTITY
+          LAST-UPDATED "201104200000Z"
+          ORGANIZATION "D-Link Corp."
+          CONTACT-INFO
+            "http://support.dlink.com"
+          DESCRIPTION
+            " equipments MIB."
+          ::= { dlink-common-mgmt 11 }
+
+	MacAddress ::= OCTET STRING (SIZE (6))    -- a 6 octet address
+                                                  -- in the
+                                                  -- "canonical"
+                                                  -- order, copy from RFC1493
+
+
+
+-- -----------------------------------------------------------------------------
+-- OID Tree Allocation
+-- -----------------------------------------------------------------------------
+    swEquipment         OBJECT IDENTIFIER ::= { swEquipmentMIB 1 }
+    swEquipmentNotify   OBJECT IDENTIFIER ::= { swEquipmentMIB 2 }
+
+-- -----------------------------------------------------------------------------
+-- Object Definition
+-- -----------------------------------------------------------------------------
+    swEquipmentCapacity OBJECT-TYPE
+    SYNTAX      BITS {
+                    fanCapable(0),
+                        --
+                    redundantPowerCapable(1),
+                        --
+                    tempteratureDetection(2),
+                    stackingCapable(3),
+                    chassisCapable(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the equipment capability supported in the system."
+
+    ::= { swEquipment 1 }
+
+-- -----------------------------------------------------------------------------
+     swFanTrapState OBJECT-TYPE
+        SYNTAX  INTEGER {
+               enabled(1),
+              disabled(2)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicate the fan warning event trap state."
+        ::= { swEquipment 4 }    
+        
+     swPowerTrapState OBJECT-TYPE
+        SYNTAX  INTEGER {
+               enabled(1),
+              disabled(2)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicate the power warning event trap state."
+        ::= { swEquipment 5 }
+        
+    swPowerTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SwPowerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A list of power information values."
+        ::= { swEquipment 6 }
+
+    swPowerEntry OBJECT-TYPE
+        SYNTAX          SwPowerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry of power information values."
+        INDEX           { swPowerUnitIndex , swPowerID}
+        ::= { swPowerTable 1 }
+ 
+    SwPowerEntry ::= SEQUENCE {
+    			swPowerUnitIndex		      INTEGER,
+                swPowerID	                  INTEGER,
+                swPowerStatus   			  INTEGER
+                }
+
+    swPowerUnitIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the unit ID in the System."
+        ::= { swPowerEntry 1 }
+    swPowerID OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates ID of the power
+            1 : main power
+            2 : redundant power ."
+
+
+        ::= { swPowerEntry 2 }
+
+    swPowerStatus OBJECT-TYPE
+           SYNTAX  INTEGER {
+              other(0),
+              lowVoltage(1),
+              overCurrent(2),
+              working(3),
+              fail(4),
+              connect(5),
+              disconnect(6)
+     }
+
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the current power status.
+             lowVoltage : The voltage of the power unit is too low.
+             overCurrent: The current of the power unit is too high.
+             working    : The power unit is working normally.
+             fail       : The power unit has failed.
+             connect    : The power unit is connected but not powered on.
+             disconnect : The power unit is not connected."
+        ::= { swPowerEntry 3 }
+
+-- -----------------------------------------------------------------------------
+    swFanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SwFanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A list of fan information values."
+        ::= { swEquipment 7 }
+
+    swFanEntry OBJECT-TYPE
+        SYNTAX          SwFanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry of fan information values."
+        INDEX           { swFanUnitIndex, swFanID}
+        ::= { swFanTable 1 }
+
+    SwFanEntry ::= SEQUENCE {
+    			swFanUnitIndex		      INTEGER,
+                swFanID	                  INTEGER,
+					swFanStatus				  INTEGER,
+					swFanPostion				INTEGER,
+					swFanNumber					INTEGER,
+					swFanSpeed					INTEGER					
+                }
+
+    swFanUnitIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the unit ID in the System."
+        ::= { swFanEntry 1 }
+    swFanID OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the unit ID."
+        ::= { swFanEntry 2 }
+
+    swFanStatus OBJECT-TYPE
+           SYNTAX  INTEGER {
+              other(0),
+              working(1),
+              fail(2),
+              speed-0(3),
+	          speed-low(4),
+              speed-middle(5),
+              speed-high(6)
+     }
+
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the current fan status.
+             speed-0     : If the fan function is normal and the fan does not spin 
+	                       due to the temperature not  reaching the threshold,
+                           the status of the fan is speed 0.
+             speed-low   : Fan spin using the lowest speed.	
+             speed-middle: Fan spin using the middle speed.	     		   
+             speed-high  : Fan spin using the highest speed."		          
+        ::= { swFanEntry 3 }
+        
+    swFanPostion OBJECT-TYPE
+        SYNTAX INTEGER {
+        other(1),
+        left(2),
+        right(3),
+        back(4),
+        cpu(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the position of the fan."
+        ::= { swFanEntry 4 }
+     swFanNumber OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the fan number."
+        ::= { swFanEntry 5 }
+
+     swFanSpeed OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the fan work speed(RPM)."
+        ::= { swFanEntry 6 }
+
+-- -----------------------------------------------------------------------------
+    swTemperatureTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SwTemperatureEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A list of temperature values."
+        ::= { swEquipment 8 }
+
+    swTemperatureEntry OBJECT-TYPE
+        SYNTAX          SwTemperatureEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry of temperature values."
+        INDEX           { swTemperatureUnitIndex }
+        ::= { swTemperatureTable 1 }
+
+    SwTemperatureEntry ::= SEQUENCE {
+    			swTemperatureUnitIndex	      INTEGER,
+                swTemperatureCurrent          INTEGER,
+                swTemperatureHighThresh       INTEGER,
+                swTemperatureLowThresh        INTEGER
+                }
+
+    swTemperatureUnitIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+            "Indicates the unit ID in the System."
+        ::= { swTemperatureEntry 1 }
+
+    swTemperatureCurrent OBJECT-TYPE
+        SYNTAX          INTEGER(-500..500)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The shelf current temperature."
+        ::= { swTemperatureEntry 2 }
+
+    swTemperatureHighThresh OBJECT-TYPE
+        SYNTAX          INTEGER (-500..500)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The high threshold of shelf temperature."
+        ::= { swTemperatureEntry 3 }
+
+    swTemperatureLowThresh OBJECT-TYPE
+        SYNTAX          INTEGER(-500..500)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The low threshold of shelf temperature."
+        ::= { swTemperatureEntry 4 }
+        
+        
+-- -----------------------------------------------------------------------------
+    swUnitMgmt            OBJECT IDENTIFIER ::= { swEquipment 9 }
+
+    swUnitStackingVersion OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the version of this stacking system."
+        ::= { swUnitMgmt 1 }
+
+    swUnitMaxSupportedUnits OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The maximum number of units that are supported in the system."
+        ::= { swUnitMgmt 2 }
+
+    swUnitNumOfUnit OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current number of units."
+        ::= { swUnitMgmt 3 }
+
+    swUnitMgmtTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwUnitMgmtEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table contains the unit information."
+        ::= { swUnitMgmt 4 }
+
+    swUnitMgmtEntry OBJECT-TYPE
+        SYNTAX  SwUnitMgmtEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of management information for each unit in the system."
+        INDEX  { swUnitMgmtId }
+        ::= { swUnitMgmtTable 1 }
+
+    SwUnitMgmtEntry ::=
+        SEQUENCE {
+            swUnitMgmtId
+                INTEGER,
+            swUnitMgmtMacAddr
+                MacAddress,
+            swUnitMgmtStartPort
+                INTEGER,
+            swUnitMgmtPortRange
+                INTEGER,
+			swUnitMgmtFrontPanelLedStatus
+				OCTET STRING,
+            swUnitMgmtCtrlMode
+                INTEGER,
+            swUnitMgmtCurrentMode
+                INTEGER,
+            swUnitMgmtVersion
+                DisplayString,
+            swUnitMgmtModuleName
+            	DisplayString,
+            swUnitMgmtPromVersion
+                DisplayString,
+            swUnitMgmtFirmwareVersion
+                DisplayString,
+            swUnitMgmtHardwareVersion
+                DisplayString,
+            swUnitMgmtPriority
+                INTEGER,
+            swUnitMgmtUserSetState
+                INTEGER,
+            swUnitMgmtExistState
+            	INTEGER,
+            swUnitMgmtBoxId
+                INTEGER,
+            swUnitMgmtSerialNumber
+                DisplayString
+            }
+
+    swUnitMgmtId OBJECT-TYPE
+        SYNTAX  INTEGER (1..13)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the specific entry in the stacking/chassis
+            table."
+        ::= { swUnitMgmtEntry 1 }
+
+    swUnitMgmtMacAddr OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The MAC address of this unit."
+        ::= { swUnitMgmtEntry 2 }
+
+    swUnitMgmtStartPort OBJECT-TYPE
+        SYNTAX  INTEGER (1..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the starting port of this unit."
+        ::= { swUnitMgmtEntry 3 }
+
+    swUnitMgmtPortRange OBJECT-TYPE
+        SYNTAX  INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the total ports of this unit."
+        ::= { swUnitMgmtEntry 4 }
+
+    swUnitMgmtFrontPanelLedStatus OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object is a set of system LED indicators. The first four
+             octets are defined as a system LED. The first LED is a power LED.
+             The second LED in the stacking module is a master LED but in the chassis is
+             a status LED. The third LED is a console LED. The fourth LED is
+             an RPS (Redundancy Power Supply) LED. The other octets are the
+             logical port LED (following dot1dBasePort ordering). Every two
+             bytes are presented to a port. The first byte is presented as the
+             link/activity LED. The second byte is presented as the speed LED.
+
+        	 system LED:
+             01 = fail/error/non existence.
+             02 = work normal.
+
+
+             link/activity LED :
+             The most significant bit is used for blinking/solid:
+                8 = The LED blinks.
+
+             The second most significant bit is used for link status:
+             	1 = link fail.
+             	2 = link pass.
+
+             speed LED :
+             	01 = 10Mbps.
+             	02 = 100Mbps.
+             	03 = 1000Mbps.
+
+            The four remaining bits are currently unused and must be set to 0.
+
+            Note:
+             For the DGS-3700, the first five octets are defined as the system LED.
+             The first LED is the power LED. The second LED is the console LED.
+             The third LED is the RPS (Redundancy Power Supply) LED. The fourth
+             LED is the management port LED. The fifth LED is the fan LED.
+             
+             For the DGS-3200-10 and DGS-3200-16, the first three octets are defined 
+             as the system LED. The first LED is the power LED. The second LED is the console LED.
+             The third LED is the RPS (Redundancy Power Supply) LED.
+             For the DGS-3200-24, the first three octets are defined as the system LED,
+             the definition of the first three octets is the same as the DGS-3200-10 and DGS-3200-16,
+             the fourth LED is the SD card LED. The following description is for the SD card LED:
+             01 = SD card is not present.
+             02 = SD card is present.
+             03 = fails to read/write SD card.
+             04 = read/write SD card successfully."
+             
+        ::= { swUnitMgmtEntry 5 }
+
+
+    swUnitMgmtCtrlMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    auto(2),
+                    stand-alone(3),
+                    master(4),
+                    slave(5)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the stacking mode the user configured for
+            the unit.  This object can only be configured when the device is
+            in standalone mode.
+
+            other (1) - This object indicates the stacking mode that the user
+                has configured for the unit. This object can only be configured
+                when the device is in standalone mode.
+            auto (2) - The system will auto-assign a stacking role to this
+                unit to be: standalone(3), master(4), or slave(5).
+            standalone (3) - The unit is forced to be in standalone mode.
+            master (4) - The unit is forced to be in master mode. If this unit is
+                selected to be a master, the unit can modify the configuration of the stacking system.
+            slave (5) - The unit is forced to be in slave mode. If this unit is
+                selected to be a slave, it can only view the configuration of
+                the stacking system."
+        ::= { swUnitMgmtEntry 6 }
+
+    swUnitMgmtCurrentMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    auto(2),
+                    stand-alone(3),
+                    master(4),
+                    slave(5),
+                    backup-master(6)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The current stacking role of this unit."
+        ::= { swUnitMgmtEntry 7 }
+
+    swUnitMgmtVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the version of this stacking unit."
+        ::= { swUnitMgmtEntry 8 }
+
+	swUnitMgmtModuleName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "A textual string containing the stacking unit module name. "
+        ::= { swUnitMgmtEntry 9 }
+
+        swUnitMgmtPromVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "A textual string containing the PROM version of the
+                stacking unit. "
+        ::= { swUnitMgmtEntry 10 }
+
+    swUnitMgmtFirmwareVersion  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "A textual string containing the firmware version of the
+               stacking unit. "
+        ::= { swUnitMgmtEntry 11 }
+
+    swUnitMgmtHardwareVersion  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "A textual string containing the hardware version of the
+               stacking unit. "
+        ::= { swUnitMgmtEntry 12 }
+
+    swUnitMgmtPriority  OBJECT-TYPE
+        SYNTAX      INTEGER(1..63)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "The Priority of the  stacking unit. "
+        ::= { swUnitMgmtEntry 13 }
+
+    swUnitMgmtUserSetState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    other(1),
+                    auto(2),
+                    user(3)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the user set state of this unit."
+        ::= { swUnitMgmtEntry 14 }
+
+    swUnitMgmtExistState OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    exist(1),
+                    no-exist(2)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The state of existence of this unit."
+        ::= { swUnitMgmtEntry 15 }
+
+     swUnitMgmtBoxId  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    box-1(1),
+                    box-2(2),
+                    box-3(3),
+                    box-4(4),
+                    box-5(5),
+                    box-6(6),
+                    box-7(7),
+                    box-8(8),
+                    box-9(9),
+                    box-10(10),
+                    box-11(11),
+                    box-12(12),
+                    auto(13)
+                }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+               "The box ID of the stacking unit.
+                When show, it shows the current box ID of this unit;
+                When set, it sets the new box ID, and the new box ID will
+                take effect after the next boot."
+        ::= { swUnitMgmtEntry 16 }
+
+     swUnitMgmtSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A text string containing the serial number of the stacking unit."
+        ::= { swUnitMgmtEntry 17 }
+
+    swUnitTopology OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    stand-alone(1),
+                    duplex-chain(2),
+                    duplex-ring(3),
+                    star(4),
+                    unstable(5)
+                }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The stacking topology state."
+        ::= { swUnitMgmt 5 }
+
+   swUnitStackMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+              enabled(1),
+              disabled(2)
+    	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the stacking mode supported in the system."
+    ::= { swUnitMgmt 6 }
+
+   swUnitStackForceMasterRole OBJECT-TYPE
+        SYNTAX  INTEGER {
+              enabled(1),
+              disabled(2)
+    	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the stack force master role mode supported in the system."
+    ::= { swUnitMgmt 7 }
+ 
+   swUnitStackTrapState OBJECT-TYPE
+        SYNTAX  INTEGER {
+              enabled(1),
+              disabled(2)
+    	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the stacking trap state."
+    DEFVAL {enabled}
+    ::= { swUnitMgmt 8 }
+ 
+   swUnitStackLogState OBJECT-TYPE
+        SYNTAX  INTEGER {
+              enabled(1),
+              disabled(2)
+    	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the stacking log state."
+    DEFVAL {enabled}
+    ::= { swUnitMgmt 9 }     
+     
+-- -----------------------------------------------------------------------------
+--  swExternalAlarmMgmt
+-- -----------------------------------------------------------------------------
+
+    swExternalAlarmTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwExternalAlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of the status of each of the alarm channels by this agent."
+        ::= { swEquipment 10 }
+
+    swExternalAlarmEntry OBJECT-TYPE
+        SYNTAX  SwExternalAlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry containing objects with the status of each alarm channel."
+        INDEX   { swExternalAlarmChannel }
+        ::= { swExternalAlarmTable 1 }
+
+    SwExternalAlarmEntry ::=
+        SEQUENCE {
+            swExternalAlarmChannel
+                INTEGER,
+            swExternalAlarmMessage
+                DisplayString,
+            swExternalAlarmStatus
+                INTEGER
+        }
+
+    swExternalAlarmChannel OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The number of the alarm channel."
+        ::= { swExternalAlarmEntry 1 }
+
+    swExternalAlarmMessage OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..128))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to configure the alarm message when an alarm occurs on this channel.
+             If no alarm message is configured on this channel, a default alarm message will be generated."
+        ::= { swExternalAlarmEntry 2 }
+
+    swExternalAlarmStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+              alarming(1),
+              normal(2)
+    	}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Shows the current status of each alarm channel."
+        ::= { swExternalAlarmEntry 3 }
+        
+-- --------------------------------------------------------------------------------
+-- swEquipmentPowerSaving
+-- --------------------------------------------------------------------------------
+	swEquipmentPowerSaving OBJECT IDENTIFIER ::= { swEquipment 11 }
+	 
+   		swEquipPowerSavingLinkDetectState OBJECT-TYPE
+       		 SYNTAX  INTEGER {
+              		enabled(1),
+              		disabled(2)
+     			}
+    		MAX-ACCESS  read-write
+    		STATUS      current
+    		DESCRIPTION  "Indicates the equipment reduced power consumption state."
+    		::= { swEquipmentPowerSaving 1 }
+    		
+    	swEquipPowerSavingLenDetect OBJECT-TYPE
+       		 SYNTAX  INTEGER {
+              		enabled(1),
+              		disabled(2)
+     			}
+    		MAX-ACCESS  read-write
+    		STATUS      current
+    		DESCRIPTION  "Indicates the equipment reduced power consumption state with a link partner."
+    		::= { swEquipmentPowerSaving 2 }
+ 
+		swEquipPowerSavingHiberState OBJECT-TYPE
+				SYNTAX  INTEGER {
+				enabled(1),
+				disabled(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+				"This object indicates the power saving state of system hibernation."
+				DEFVAL {disabled}    
+				::= { swEquipmentPowerSaving 3 }
+		
+		swEquipPowerSavingPortLEDState OBJECT-TYPE
+				SYNTAX  INTEGER {
+				enabled(1),
+				disabled(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+				"This object indicates the power saving state of port LED."
+				DEFVAL {disabled}    
+				::= { swEquipmentPowerSaving 4 }        
+				
+		swEquipPowerSavingPortState OBJECT-TYPE
+				SYNTAX  INTEGER {
+				enabled(1),
+				disabled(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+				"This object indicates the power saving state of port."
+				DEFVAL {disabled}    
+				::= { swEquipmentPowerSaving 5 }  
+    		
+-- -----------------------------------------------------------------------------  	
+		swEquipPowerSavingScheduleCtrl OBJECT IDENTIFIER ::= { swEquipmentPowerSaving 6 }
+-- -----------------------------------------------------------------------------  
+		swEquipPowerSavingHibernationTable OBJECT-TYPE
+				SYNTAX  SEQUENCE OF SwEquipPowerSavingHibernationEntry
+				MAX-ACCESS  not-accessible
+				STATUS  current
+				DESCRIPTION
+				"A list of the system hibernation configurations of the power saving."
+				::= { swEquipPowerSavingScheduleCtrl 1 }
+
+		swEquipPowerSavingHibernationEntry OBJECT-TYPE
+				SYNTAX  SwEquipPowerSavingHibernationEntry
+				MAX-ACCESS  not-accessible
+				STATUS  current
+				DESCRIPTION
+				"An entry containing the system hibernation configurations of the power saving."
+				INDEX   { swTimeRangeMgmtRangeName }
+				::= { swEquipPowerSavingHibernationTable 1 }
+
+		SwEquipPowerSavingHibernationEntry ::=
+				SEQUENCE {
+				swEquipPowerSavingHiberRowStatus
+						RowStatus
+				}		
+
+		swEquipPowerSavingHiberRowStatus OBJECT-TYPE
+				SYNTAX  RowStatus
+				MAX-ACCESS  read-create
+				STATUS  current
+				DESCRIPTION
+				"This object indicates the status of this entry."
+				::= { swEquipPowerSavingHibernationEntry 100 }		
+				
+-- -----------------------------------------------------------------------------    		    	
+		swEquipPowerSavingPortLedTable OBJECT-TYPE
+				SYNTAX  SEQUENCE OF SwEquipPowerSavingPortLedEntry
+				MAX-ACCESS  not-accessible
+				STATUS  current
+				DESCRIPTION
+				"A list of the port LED configurations of the power saving."
+				::= { swEquipPowerSavingScheduleCtrl 2 }
+
+		swEquipPowerSavingPortLedEntry OBJECT-TYPE
+				SYNTAX  SwEquipPowerSavingPortLedEntry
+				MAX-ACCESS  not-accessible
+				STATUS  current
+				DESCRIPTION
+				"An entry containing the port LED configurations of the power saving."
+				INDEX   { swTimeRangeMgmtRangeName}
+				::= { swEquipPowerSavingPortLedTable 1 }
+
+		SwEquipPowerSavingPortLedEntry ::=
+				SEQUENCE {
+				swEquipPowerSavingPortLedRowStatus
+						RowStatus				
+				}
+
+		swEquipPowerSavingPortLedRowStatus OBJECT-TYPE
+				SYNTAX  RowStatus
+				MAX-ACCESS  read-create
+				STATUS  current
+				DESCRIPTION
+				"This object indicates the status of this entry."
+				::= { swEquipPowerSavingPortLedEntry 100 }	
+
+-- -----------------------------------------------------------------------------    
+		swEquipPowerSavingPortTable OBJECT-TYPE
+				SYNTAX  SEQUENCE OF SwEquipPowerSavingPortEntry
+				MAX-ACCESS  not-accessible
+				STATUS  current
+				DESCRIPTION
+				"A list of the port configurations of the power saving."
+				::= { swEquipPowerSavingScheduleCtrl 3 }
+
+		swEquipPowerSavingPortEntry OBJECT-TYPE
+				SYNTAX  SwEquipPowerSavingPortEntry
+				MAX-ACCESS  not-accessible
+				STATUS  current
+				DESCRIPTION
+				"An entry containing the port configurations of the power saving."
+				INDEX   { swEquipPowerSavingPortIndex, swTimeRangeMgmtRangeName }
+				::= { swEquipPowerSavingPortTable 1 }
+
+		SwEquipPowerSavingPortEntry ::=
+				SEQUENCE {
+				swEquipPowerSavingPortIndex
+						INTEGER,			
+				swEquipPowerSavingPortRowStatus
+						RowStatus				
+				} 
+
+		swEquipPowerSavingPortIndex OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  not-accessible
+				STATUS  current
+				DESCRIPTION
+				"Indicates the module's port number.(1..Max port number in
+				the module)."
+				::= { swEquipPowerSavingPortEntry 1 }
+				
+		swEquipPowerSavingPortRowStatus OBJECT-TYPE
+				SYNTAX  RowStatus
+				MAX-ACCESS  read-create
+				STATUS  current
+				DESCRIPTION
+				"This object indicates the status of this entry."
+				::= { swEquipPowerSavingPortEntry 100 }	
+
+-- --------------------------------------------------------------------------------
+-- swEquipEeeMgmt 
+-- --------------------------------------------------------------------------------
+		swEquipEeeMgmt  OBJECT IDENTIFIER ::= { swEquipmentPowerSaving 20 }		
+		 
+		swEquipEeeState OBJECT-TYPE
+				SYNTAX  PortList
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+					"This object indicates the EEE state of all ports.
+					
+					Note:
+					If the port's bit has a value of '1', specifies the EEE (Energy Efficient Ethernet) 
+					state of this port is 'Enabled',
+					otherwise, if the port's bit has a value of '0', specifies the EEE 
+					state of this port is 'Disabled'."
+				::= { swEquipEeeMgmt 1 }	
+    		
+-- --------------------------------------------------------------------------------
+-- swEquipmentTemperatureCtrl
+-- --------------------------------------------------------------------------------
+     swEquipmentTemperatureCtrl OBJECT IDENTIFIER ::= { swEquipment 12 }
+     
+     swTemperatureTrapState OBJECT-TYPE
+        SYNTAX  INTEGER {
+               enabled(1),
+              disabled(2)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object can enable or disable the warning temperature trap."
+        ::= { swEquipmentTemperatureCtrl 1 }
+
+     swTemperatureLogState OBJECT-TYPE
+        SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object can enable or disable the warning temperature log."
+        ::= { swEquipmentTemperatureCtrl 2 }
+        
+-- -----------------------------------------------------------------------------    
+--	swEquipmentLEDCtrl OBJECT IDENTIFIER ::= { swEquipment 13 }
+-- -----------------------------------------------------------------------------        
+	swEquipmentLEDCtrl OBJECT IDENTIFIER ::= { swEquipment 13 }
+	
+	swEquipmentPortLEDState	OBJECT-TYPE
+        SYNTAX  INTEGER {
+               enabled(1),
+               disabled(2)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the LED admin state of all ports."
+        DEFVAL {enabled}    
+        ::= { swEquipmentLEDCtrl 1 }
+
+-- -----------------------------------------------------------------------------
+--  swExternalAlarmStackingMgmt
+-- -----------------------------------------------------------------------------
+
+    swExternalAlarmStackingTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwExternalAlarmStackingEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of the status of each of the alarm channels by this agent."
+        ::= { swEquipment 15 }
+
+    swExternalAlarmStackingEntry OBJECT-TYPE
+        SYNTAX  SwExternalAlarmStackingEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry containing objects with the status of each alarm channel."
+        INDEX   { swExternalAlarmStackingUnitIndex, swExternalAlarmStackingChannel }
+        ::= { swExternalAlarmStackingTable 1 }
+
+    SwExternalAlarmStackingEntry ::=
+        SEQUENCE {
+            swExternalAlarmStackingUnitIndex
+                INTEGER,
+            swExternalAlarmStackingChannel
+                INTEGER,
+            swExternalAlarmStackingMessage
+                DisplayString,
+            swExternalAlarmStackingStatus
+                INTEGER
+        }
+
+    swExternalAlarmStackingUnitIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Indicates the unit ID in the System.."
+        ::= { swExternalAlarmStackingEntry 1 }
+
+    swExternalAlarmStackingChannel OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The number of the alarm channel."
+        ::= { swExternalAlarmStackingEntry 2 }
+
+    swExternalAlarmStackingMessage OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE (0..128))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to configure the alarm message when an alarm occurs on this channel.
+             If no alarm message is configured on this channel, a default alarm message will be generated."
+        ::= { swExternalAlarmStackingEntry 3 }
+
+    swExternalAlarmStackingStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+              alarming(1),
+              normal(2)
+    	}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Shows the current status of each alarm channel."
+        ::= { swExternalAlarmStackingEntry 4 }
+        
+-- -----------------------------------------------------------------------------
+	swEquipmentNotifyMgmt           OBJECT IDENTIFIER ::= { swEquipmentNotify 1 }
+	swEquipmentNotification         OBJECT IDENTIFIER ::= { swEquipmentNotify 2 }
+
+
+	swEquipUnitNotification         OBJECT IDENTIFIER ::= { swEquipmentNotification 1 }
+	swEquipPowerNotification        OBJECT IDENTIFIER ::= { swEquipmentNotification 2 }
+	swEquipFanNotification          OBJECT IDENTIFIER ::= { swEquipmentNotification 3 }
+	swEquipTemperatureNotification  OBJECT IDENTIFIER ::= { swEquipmentNotification 4 }
+        swEquipExternalAlarmNotification  OBJECT IDENTIFIER ::= { swEquipmentNotification 5 }
+
+	swEquipUnitNotifyMgmt           OBJECT IDENTIFIER ::= { swEquipmentNotifyMgmt 1 }
+	swEquipPowerNotifyMgmt          OBJECT IDENTIFIER ::= { swEquipmentNotifyMgmt 2 }
+	swEquipFanNotifyMgmt            OBJECT IDENTIFIER ::= { swEquipmentNotifyMgmt 3 }
+	swEquipTemperatureNotifyMgmt    OBJECT IDENTIFIER ::= { swEquipmentNotifyMgmt 4 }
+
+-- -----------------------------------------------------------------------------
+    swUnitInsertSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swUnitInsert detection level."
+        ::= { swEquipUnitNotifyMgmt 1 }
+
+    swUnitRemoveSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swUnitRemove detection level."
+        ::= { swEquipUnitNotifyMgmt 2 }
+
+    swUnitFailureSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swUnitFailure detection level."
+        ::= { swEquipUnitNotifyMgmt 3 }
+
+-- -----------------------------------------------------------------------------
+    swPowerStatusChgSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swPowerStatusChg detection level."
+        ::= { swEquipPowerNotifyMgmt 1 }
+
+    swPowerFailureSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swPowerFailure detection level."
+        ::= { swEquipPowerNotifyMgmt 2 }
+
+    swPowerRecoverSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swPowerRecover detection level."
+        ::= { swEquipPowerNotifyMgmt 3 }
+
+-- -----------------------------------------------------------------------------
+    swFanFailureSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swFanFailure detection level."
+        ::= { swEquipFanNotifyMgmt 1 }
+
+    swFanRecoverSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swFanRecover detection level."
+        ::= { swEquipFanNotifyMgmt 2 }
+
+-- -----------------------------------------------------------------------------
+    swHighTemperatureSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swHighTemperature detection level."
+        ::= { swEquipTemperatureNotifyMgmt 1 }
+
+    swHighTemperatureRecoverSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swHighTemperatureRecover detection level."
+        ::= { swEquipTemperatureNotifyMgmt 2 }
+
+   swLowTemperatureSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swLowTemperature detection level."
+        ::= { swEquipTemperatureNotifyMgmt 3 }
+
+    swLowTemperatureRecoverSeverity OBJECT-TYPE
+        SYNTAX  AgentNotifyLevel
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the swLowTemperatureRecover detection level."
+        ::= { swEquipTemperatureNotifyMgmt 4 }
+
+
+-- -----------------------------------------------------------------------------
+	swEquipUnitNotifyPrefix 	 OBJECT IDENTIFIER ::= { swEquipUnitNotification 0 }
+
+    swUnitInsert NOTIFICATION-TYPE
+        OBJECTS         { swUnitMgmtId,
+						swUnitMgmtMacAddr
+                        }
+        STATUS          current
+        DESCRIPTION     "Unit Hot Insert notification."
+        ::= { swEquipUnitNotifyPrefix 1 }
+
+    swUnitRemove NOTIFICATION-TYPE
+        OBJECTS         { swUnitMgmtId,
+						swUnitMgmtMacAddr
+                        }
+        STATUS          current
+        DESCRIPTION     "Unit Hot Remove notification."
+        ::= { swEquipUnitNotifyPrefix 2 }
+
+    swUnitFailure NOTIFICATION-TYPE
+        OBJECTS         { swUnitMgmtId
+                        }
+        STATUS          current
+        DESCRIPTION     "Unit Failure notification."
+        ::= { swEquipUnitNotifyPrefix 3 }
+
+    swUnitTPChange NOTIFICATION-TYPE
+        OBJECTS         { swStackTopologyType,
+        									swUnitMgmtId,
+        									swUnitMgmtMacAddr
+                        }
+        STATUS          current
+        DESCRIPTION     "The stacking topology change notification."
+        ::= { swEquipUnitNotifyPrefix 4 }
+
+    swUnitRoleChange NOTIFICATION-TYPE
+        OBJECTS         { swStackRoleChangeType,
+							swUnitMgmtId
+						}
+        STATUS          current
+        DESCRIPTION     "The stacking unit role change notification."
+        ::= { swEquipUnitNotifyPrefix 5 }
+
+-- -----------------------------------------------------------------------------
+	swEquipPowerNotifyPerfix 	 OBJECT IDENTIFIER ::= { swEquipPowerNotification 0 }
+
+    swPowerStatusChg  NOTIFICATION-TYPE
+        OBJECTS         { swPowerUnitIndex,
+        					swPowerID,
+        					swPowerStatus
+                        }
+        STATUS          current
+        DESCRIPTION     "Power Status change notification. The notification is issued 
+                         when the swPowerStatus changes in the following cases:
+                         lowVoltage  -> overCurrent. 
+                         lowVoltage  -> working. 
+                         lowVoltage  -> disconnect. 
+                         lowVoltage  -> connect. 
+                         overCurrent -> lowVoltage. 
+                         overCurrent -> working. 
+                         overCurrent -> disconnect. 
+                         overCurrent -> connect. 
+                         working     -> lowVoltage. 
+                         working     -> overCurrent. 
+                         working     -> connect. 
+                         working     -> disconnect. 
+                         fail        -> connect. 
+                         fail        -> disconnect. 
+                         connect     -> lowVoltage. 
+                         connect     -> overCurrent. 
+                         connect     -> working. 
+                         connect     -> disconnect. 
+                         disconnect  -> lowVoltage. 
+                         disconnect  -> overCurrent. 
+                         disconnect  -> working. 
+                         disconnect  -> connect."
+        ::= { swEquipPowerNotifyPerfix  1 }
+
+
+    swPowerFailure  NOTIFICATION-TYPE
+        OBJECTS         { swPowerUnitIndex,
+        					swPowerID,
+        					swPowerStatus
+                        }
+        STATUS          current
+        DESCRIPTION     "Power Failure notification. The notification is issued 
+                         when the swPowerStatus changes in the following cases:
+                         lowVoltage  -> fail. 
+   						 overCurrent -> fail. 
+                         working     -> fail. 
+                         connect     -> fail. 
+                         disconnect  -> fail."
+        ::= { swEquipPowerNotifyPerfix  2 }
+
+    swPowerRecover NOTIFICATION-TYPE
+        OBJECTS         {swPowerUnitIndex,
+        					 swPowerID,
+        					 swPowerStatus
+                        }
+        STATUS          current
+        DESCRIPTION     "Power Recover notification. The notification is issued
+                         when the swPowerStatus changes in the following cases:
+                         fail -> lowVoltage.  
+                         fail -> overCurrent. 
+                         fail -> working."
+        ::= { swEquipPowerNotifyPerfix  3 }
+
+-- -----------------------------------------------------------------------------
+    swEquipFanNotifyPrefix 	 OBJECT IDENTIFIER ::= { swEquipFanNotification 0 }
+
+    swFanFailure NOTIFICATION-TYPE
+        OBJECTS         { swFanUnitIndex,
+        					swFanID
+
+                        }
+        STATUS          current
+        DESCRIPTION     "Fan Failure notification."
+        ::= { swEquipFanNotifyPrefix 1 }
+
+    swFanRecover NOTIFICATION-TYPE
+        OBJECTS         { swFanUnitIndex,
+        					swFanID
+                        }
+        STATUS          current
+        DESCRIPTION     "Fan Recover notification."
+        ::= { swEquipFanNotifyPrefix 2 }
+
+-- -----------------------------------------------------------------------------
+    swEquipTemperatureNotifyPrefix 	 OBJECT IDENTIFIER ::= { swEquipTemperatureNotification 0 }
+
+    swHighTemperature NOTIFICATION-TYPE
+        OBJECTS         { swTemperatureUnitIndex,
+                          swTemperSensorID,
+        				  swTemperatureCurrent
+                        }
+        STATUS          current
+        DESCRIPTION     "High Temperature notification."
+        ::= { swEquipTemperatureNotifyPrefix 1 }
+
+    swHighTemperatureRecover NOTIFICATION-TYPE
+        OBJECTS         { swTemperatureUnitIndex,
+                          swTemperSensorID,
+        				  swTemperatureCurrent
+                        }
+        STATUS          current
+        DESCRIPTION     "High Temperature notification."
+        ::= { swEquipTemperatureNotifyPrefix 2 }
+
+    swLowTemperature NOTIFICATION-TYPE
+        OBJECTS         { swTemperatureUnitIndex,
+                          swTemperSensorID,
+        				  swTemperatureCurrent
+                        }
+        STATUS          current
+        DESCRIPTION     "Low Temperature notification."
+        ::= { swEquipTemperatureNotifyPrefix 3 }
+
+    swLowTemperatureRecover NOTIFICATION-TYPE
+        OBJECTS         { swTemperatureUnitIndex,
+                          swTemperSensorID,
+        				  swTemperatureCurrent
+                        }
+        STATUS          current
+        DESCRIPTION     "Low Temperature notification."
+        ::= { swEquipTemperatureNotifyPrefix 4 }
+
+-- -----------------------------------------------------------------------------
+    swEquipExternalAlarmNotifyPrefix 	 OBJECT IDENTIFIER ::= { swEquipExternalAlarmNotification 0 }
+    
+    swExternalAlarm NOTIFICATION-TYPE
+        OBJECTS         { swExternalAlarmChannel,
+                          swExternalAlarmMessage
+                        }
+        STATUS          current
+        DESCRIPTION     "The notice of an Alarm in the specified channel."
+
+        ::= { swEquipExternalAlarmNotifyPrefix 1 }
+
+    swExternalAlarmStacking NOTIFICATION-TYPE
+        OBJECTS         { swExternalAlarmStackingUnitIndex, 
+                          swExternalAlarmStackingChannel,
+                          swExternalAlarmStackingMessage
+                        }
+        STATUS          current
+        DESCRIPTION     "The notice of an Alarm in the specified channel."
+        ::= { swEquipExternalAlarmNotifyPrefix 2 }
+--- -----------------------------------------------------------------------------
+    swNotificationBindings OBJECT IDENTIFIER ::= { swEquipmentNotify 3 }
+
+
+--- -----------------------------------------------------------------------------
+    swEquipTemperNotifyBindings  OBJECT IDENTIFIER ::= { swNotificationBindings 1 }
+
+    swTemperSensorID OBJECT-TYPE
+        SYNTAX     INTEGER
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "This object indicates the ID of the temperature sensor in the unit."
+        ::= { swEquipTemperNotifyBindings 1 }
+
+    swEquipUnitNotifyBindings  OBJECT IDENTIFIER ::= { swNotificationBindings 2 }
+
+    	swStackTopologyType OBJECT-TYPE
+    	SYNTAX  INTEGER	{	
+    						chain(1),
+    					 	ring(2)
+    					}
+       	MAX-ACCESS  accessible-for-notify
+       	STATUS  current
+       	DESCRIPTION
+            "This object indicates the MAC address of the switch."
+       	    ::= { swEquipUnitNotifyBindings 1 }
+
+    	swStackRoleChangeType OBJECT-TYPE
+    	SYNTAX  INTEGER {
+    						backup-to-master(1),
+    						slave-to-master(2)
+    					}
+       	MAX-ACCESS  accessible-for-notify
+       	STATUS  current
+       	DESCRIPTION
+            "This object indicates the role information of the switch."
+       	    ::= { swEquipUnitNotifyBindings 2 }
+
+
+END

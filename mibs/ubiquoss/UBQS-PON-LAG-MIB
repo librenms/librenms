@@ -1,0 +1,263 @@
+-- *****************************************************************
+-- UBQS-LAG-MIB.: Ubiquoss LAG MIB      
+--
+-- Dec 2010,   Park Hyung Eun
+--   
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-PON-LAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP,
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    RowStatus,
+        FROM SNMPv2-TC
+    ifIndex, InterfaceIndex,
+        FROM IF-MIB   
+	DisplayString, 		
+		FROM RFC1213-MIB 
+    UbiPortList,
+  FROM UBQS-TC           
+    ubiPonCommonGroupMIB
+        FROM UBQS-SMI;                                     
+  
+
+ubiPonLagMIB MODULE-IDENTITY
+    LAST-UPDATED    "201301151117Z"
+    ORGANIZATION  "Ubiquoss Corp."
+    CONTACT-INFO
+    " Ubiquoss
+      Customer Service
+
+      Postal: 24F Milennium B/D,
+      467-12, Dogok-Dong,
+      GangNam-Gu, Seoul 135-270
+      Korea
+
+      Tel: 82-2-2190-3100"     
+ DESCRIPTION
+        "Link Aggregation MIB module for managing 802.3ad"
+    ::= { ubiPonCommonGroupMIB 16 }
+
+ 
+-- *****************************************************************
+-- ubiPonLagMIBObjects
+-- *****************************************************************
+
+ubiPonLagMIBNotificationsPrefix   OBJECT IDENTIFIER  ::= { ubiPonLagMIB 0 }
+ubiPonLagMIBObjects      OBJECT IDENTIFIER  ::= { ubiPonLagMIB 1 }        
+ubiPonLagMIBConformance     OBJECT IDENTIFIER  ::= { ubiPonLagMIB 2 }
+                                                                       
+                                                                       
+ubiPonRedundancyPort OBJECT IDENTIFIER ::= { ubiPonLagMIBObjects 1 } 
+
+-- *****************************************************************
+-- ubiPonRedundancyPortTable
+-- *****************************************************************
+    ubiPonRedundancyPortTable OBJECT-TYPE
+  SYNTAX          SEQUENCE OF UbiPonRedundancyPortEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A table that contains the redundancy pon port 
+         information."
+     ::= { ubiPonRedundancyPort 1 }
+
+     
+     ubiPonRedundancyPortEntry OBJECT-TYPE
+     SYNTAX          UbiPonRedundancyPortEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of information for redundancy pon prot."
+        INDEX           { ubiReduIfIndex } 
+     ::= { ubiPonRedundancyPortTable 1 }
+
+   UbiPonRedundancyPortEntry ::= SEQUENCE {
+     ubiPonReduIfIndex    		InterfaceIndex,
+     ubiPonReduPeerIfIndex    	InterfaceIndex,
+     ubiPonReduIfName    		DisplayString,
+     ubiPonReduPeerIfName    	DisplayString,  
+     ubiPonReduAggIfIndex    	InterfaceIndex,
+     ubiPonReduAggIfName      	DisplayString,  
+     ubiPonReduHoldoff			INTEGER,
+     ubiPonReduWtr				INTEGER,
+     ubiPonReduActive    		INTEGER,
+     ubiPonReduRowStatus   		RowStatus
+   }
+ 
+   ubiPonReduIfIndex  OBJECT-TYPE
+     SYNTAX   InterfaceIndex
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "interface index of redundancy pon port "
+     ::= { ubiPonRedundancyPortEntry 1 }
+
+   ubiPonReduPeerIfIndex  OBJECT-TYPE
+     SYNTAX   InterfaceIndex
+     MAX-ACCESS  read-write
+     STATUS   current
+     DESCRIPTION
+      "peer interface index of redundancy pon port"
+     ::= { ubiPonRedundancyPortEntry 2 }
+
+   ubiPonReduIfName   OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "interface name of redundancy pon port"
+     ::= { ubiPonRedundancyPortEntry 3 }
+  
+   ubiPonReduPeerIfName   OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "peer interface name of redundancy pon port"
+     ::= { ubiPonRedundancyPortEntry 4 }     
+     
+   ubiPonReduAggIfIndex   OBJECT-TYPE
+     SYNTAX   InterfaceIndex
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "aggregation interface index of redundancy pon port"
+     ::= { ubiPonRedundancyPortEntry 5 }     
+     
+   ubiPonReduAggIfName  OBJECT-TYPE
+     SYNTAX   DisplayString
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "aggregation interface name of redundancy pon port"
+     ::= { ubiPonRedundancyPortEntry 6 }   
+     
+    ubiPonReduHoldoff  OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-write
+     STATUS   current
+     DESCRIPTION
+      "pon holdoff of redundancy pon port"
+     ::= { ubiPonRedundancyPortEntry 7 } 
+     
+   ubiPonReduWtr  OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-write
+     STATUS   current
+     DESCRIPTION
+      "pon wtr of redundancy pon port"
+     ::= { ubiPonRedundancyPortEntry 8 }
+
+     
+   ubiPonReduActive  OBJECT-TYPE
+     SYNTAX   INTEGER
+     MAX-ACCESS  read-only
+     STATUS   current
+     DESCRIPTION
+      "pon activation status of redundancy pon port
+      0 : none
+      1 : left
+      2 : right
+      "
+     ::= { ubiPonRedundancyPortEntry 9 }
+                                                    
+  ubiPonReduRowStatus  OBJECT-TYPE
+     SYNTAX   RowStatus
+     MAX-ACCESS  read-create
+     STATUS   current
+     DESCRIPTION
+      "The status of redundancy pon port row.
+       The createAndGo(4) can create the redundancy pon port and 
+       set the particular port to that redundancy pon port.
+       The destroy(6) can unset the particular port from the redundancy pon port.
+       If you want to remove the redundancy pon port, set redundancy pon port Delete."
+     ::= { ubiPonRedundancyPortEntry 10 }
+
+    ubiPonRedundancyPortSwitchoverTable OBJECT-TYPE
+     SYNTAX          SEQUENCE OF UbiPonRedundancyPortSwitchoverEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A table that contains the redundancy pon port Switchover 
+         information."
+     ::= { ubiPonRedundancyPort 2 }
+
+     
+     ubiPonRedundancyPortSwitchoverEntry OBJECT-TYPE
+     SYNTAX          UbiPonRedundancyPortSwitchoverEntry
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+         "A list of information for redundancy pon prot Switchover."
+        INDEX           { ubiReduIfIndex } 
+     ::= { ubiPonRedundancyPortSwitchoverTable 1 }
+
+   UbiPonRedundancyPortSwitchoverEntry ::= SEQUENCE {
+     ubiPonReduSwitchover    		InterfaceIndex,
+   }
+ 
+   ubiPonReduSwitchover  OBJECT-TYPE
+     SYNTAX   InterfaceIndex
+     MAX-ACCESS  read-write
+     STATUS   current
+     DESCRIPTION
+      "Active's peer interface index of redundancy pon port Switchover
+      Work on only write. 1.
+      "
+     ::= { ubiPonRedundancyPortSwitchoverEntry 1 }   
+-- *****************************************************************
+-- ubiPonLagMIBConformance
+-- *****************************************************************
+
+-- Conformance Information
+ubiPonLagMIBCompliances   OBJECT IDENTIFIER  ::= { ubiPonLagMIBConformance 1 }
+ubiPonLagMIBGroups    OBJECT IDENTIFIER  ::= { ubiPonLagMIBConformance 2 }
+
+
+-- compliance statements
+
+ ubiPonLagMIBCompliance MODULE-COMPLIANCE
+     STATUS          current
+     DESCRIPTION
+         "The compliance statement for Pon Lag implementations."
+     MODULE          -- this module
+     MANDATORY-GROUPS {      
+        ubiAggGroup       
+        }
+     ::= { ubiPonLagMIBCompliances 1 }
+
+-- units of conformance
+
+ ubiPonLagGroup OBJECT-GROUP
+     OBJECTS         {     
+		ubiPonReduIfIndex,
+		ubiPonReduPeerIfIndex,
+		ubiPonReduIfName,
+		ubiPonReduPeerIfName,
+		ubiPonReduAggIfIndex,
+		ubiPonReduAggIfName,
+		ubiPonReduActive,
+     }
+     STATUS          current
+     DESCRIPTION
+         "A collection of objects that provide redundancy port 
+          creation or deletion."
+     ::= { ubiPonLagMIBGroups 1 }     
+
+END
+
+ 
+
+

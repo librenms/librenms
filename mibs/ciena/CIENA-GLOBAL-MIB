@@ -1,0 +1,65 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-06-00-5005
+--
+-- CIENA-GLOBAL-MIB.my
+--
+--
+
+	CIENA-GLOBAL-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI  
+   MacAddress
+   		FROM SNMPv2-TC               
+   cienaCommon
+        FROM CIENA-SMI
+   CienaGlobalSeverity
+   		FROM CIENA-TC;
+
+	
+   cienaGlobal MODULE-IDENTITY
+	      LAST-UPDATED "201706070000Z"
+	      ORGANIZATION "Ciena Corp."
+	      CONTACT-INFO
+	      "   Mib Meister
+	          7035 Ridge Road
+	          Hanover, Maryland 21076
+	          USA
+	          Phone:  +1 800 921 1144
+	          Email:  support@ciena.com"
+	      DESCRIPTION
+		       "This module defines the object identifiers that are
+		       common across all 5410 modules."
+
+	      REVISION "201706070000Z"
+	      DESCRIPTION
+		       "Updated contact info."
+
+	      REVISION "201003280000Z"
+	      DESCRIPTION
+		       "Initial creation."
+			::= { cienaCommon 3 }
+		
+  
+--
+-- Node definitions
+--
+	
+  cienaGlobalSeverity	OBJECT-TYPE
+ 	 SYNTAX		CienaGlobalSeverity
+	 MAX-ACCESS	accessible-for-notify
+	 STATUS		current
+	 DESCRIPTION
+		"This object defines the severity of a trap and is a part of every trap defined in the system."        
+	 ::= { cienaGlobal 1 } 
+
+
+  cienaGlobalMacAddress    OBJECT-TYPE
+     SYNTAX           MacAddress
+     MAX-ACCESS       accessible-for-notify
+     STATUS           current
+     DESCRIPTION
+	     "This object indicates the chassis MAC address."     
+     ::= { cienaGlobal 2 }
+			
+  END

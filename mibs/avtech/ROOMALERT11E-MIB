@@ -1,0 +1,693 @@
+--
+--defines ROOMALERT11E-MIB for SNMP agent extension of Room Alert 11E
+--Contents:	Global Registration Module
+--		Room Alert OIDs - Enterprise 20916
+--Version:	1.1.3 
+--Date:		9 January 2014
+--Developed By: AVTECH Software, Inc.
+
+--
+--Copyright (c) 2014 AVTECH Software, Inc.
+--
+
+ROOMALERT11E-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress, Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE 
+		FROM RFC-1215;
+
+
+avtech      OBJECT IDENTIFIER ::= { enterprises 20916 }
+products      OBJECT IDENTIFIER ::= { avtech 1 }
+roomalert11E      OBJECT IDENTIFIER ::= { products 3 }
+sensors       OBJECT IDENTIFIER ::= { roomalert11E 1 }
+traps	      OBJECT IDENTIFIER ::= { roomalert11E 2 }
+thresholds    OBJECT IDENTIFIER ::= { roomalert11E 3 }
+channel1   OBJECT IDENTIFIER ::= { sensors 1 }
+channel2   OBJECT IDENTIFIER ::= { sensors 2 }
+channel3   OBJECT IDENTIFIER ::= { sensors 3 }
+channel4   OBJECT IDENTIFIER ::= { sensors 4 }
+channels   OBJECT IDENTIFIER ::= { thresholds 1 }
+channels1   OBJECT IDENTIFIER ::= { channels 1 }
+channels2   OBJECT IDENTIFIER ::= { channels 2 }
+channels3   OBJECT IDENTIFIER ::= { channels 3 }
+channels4   OBJECT IDENTIFIER ::= { channels 4 }
+ 
+-- Room Alert 11E MIB
+-- Parameters 
+
+sensor1-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 1 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 1 }
+
+sensor1-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 2 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 2 }
+
+sensor1-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 3 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 3 }
+
+sensor1-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 4 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 4 }
+
+sensor1-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 5 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 5 }
+
+sensor1-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 6 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 6 }
+
+sensor1-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 7 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 7 }
+
+sensor1-8 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..1)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for internal switch sensor 8 (0 = OPEN, 1 = CLOSED)."
+::= { channel1 8 }
+
+switch-label-1 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 1"
+::= { channel1 9 }
+
+switch-label-2 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 2"
+::= { channel1 10 }
+
+switch-label-3 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 3"
+::= { channel1 11 }
+
+switch-label-4 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 4"
+::= { channel1 12 }
+
+switch-label-5 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 5"
+::= { channel1 13 }
+
+switch-label-6 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 6"
+::= { channel1 14 }
+
+switch-label-7 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 7"
+::= { channel1 15 }
+
+switch-label-8 OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label for switch sensor 8"
+::= { channel1 16 }
+
+sensor2-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 2-1. If a temp or temp/humidity sensor is connected, value will be current temperature in Celsius."
+::= { channel2 1 }
+
+sensor2-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 2-2. If a temp or temp/humidity sensor is connected, value will be current temperature in Fahrenheit."
+::= { channel2 2 }
+
+sensor2-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 2-3. If temp/humidity sensor is connected, value will be current %RH."
+::= { channel2 3 }
+
+sensor2-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 2-4. If temp/humidity sensor is connected, value will be current Heat Index in Fahrenheit."
+::= { channel2 4 }
+
+sensor2-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 2-5. If temp/humidity sensor is connected, value will be current Heat Index in Celsius."
+::= { channel2 5 }
+
+sensor2-6-label OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label of this sensor"
+::= { channel2 6}
+
+sensor3-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 3-1. If a temp or temp/humidity sensor is connected, value will be current temperature in Celsius."
+::= { channel3 1 }
+
+sensor3-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 3-2. If a temp or temp/humidity sensor is connected, value will be current temperature in Fahrenheit."
+::= { channel3 2 }
+
+sensor3-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 3-3. If temp/humidity sensor is connected, value will be current %RH."
+::= { channel3 3 }
+
+sensor3-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 3-4. If temp/humidity sensor is connected, value will be current Heat Index in Fahrenheit."
+::= { channel3 4 }
+
+sensor3-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 3-5. If temp/humidity sensor is connected, value will be current Heat Index in Celsius."
+::= { channel3 5 }
+
+sensor3-6-label OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label of this sensor"
+::= { channel3 6}
+
+sensor4-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 4-1. If a temp or temp/humidity sensor is connected, value will be current temperature in Celsius."
+::= { channel4 1 }
+
+sensor4-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 4-2. If a temp or temp/humidity sensor is connected, value will be current temperature in Fahrenheit."
+::= { channel4 2 }
+
+sensor4-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 4-3. If temp/humidity sensor is connected, value will be current %RH."
+::= { channel4 3 }
+
+sensor4-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 4-4. If temp/humidity sensor is connected, value will be current Heat Index in Fahrenheit."
+::= { channel4 4 }
+
+sensor4-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"The reading for sensor 4-5. If temp/humidity sensor is connected, value will be current Heat Index in Celsius."
+::= { channel4 5 }
+
+sensor4-6-label OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "The label of this sensor"
+::= { channel4 6}
+
+alarm1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..255)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for sensor channel 1. The binary equivalent of the decimal number displayed will indicate which switch sensors are currently in an alarm state (0 = sensor ok, 1 = sensor in alarm state). For example, if switch sensors 1 and 4 are in alarm state, the value displayed will be 9, which equals 00001001 in binary."
+::= { traps 1 }
+	
+alarm2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..255)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for sensor channel 2. If a digital temperature/humidity or digital temperature sensor is connected to this channel, 0 = sensor ok, 1 = high temp alarm, 2 = low temp alarm, 3 = humidity alarm. If a Switch Sensor Expansion box is connected, the binary equivalent of the decimal number displayed will indicate which switch sensors are currently in an alarm state (0 = sensor ok, 1 = sensor in alarm state). For example, if switch sensors 1 and 4 are in alarm state, the value displayed will be 9, which equals 00001001 in binary."
+::= { traps 2 }
+	
+alarm3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..255)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for sensor channel 3. If a digital temperature/humidity or digital temperature sensor is connected to this channel, 0 = sensor ok, 1 = high temp alarm, 2 = low temp alarm, 3 = humidity alarm. If a Switch Sensor Expansion box is connected, the binary equivalent of the decimal number displayed will indicate which switch sensors are currently in an alarm state (0 = sensor ok, 1 = sensor in alarm state). For example, if switch sensors 1 and 4 are in alarm state, the value displayed will be 9, which equals 00001001 in binary."
+::= { traps 3 }
+	
+alarm4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..255)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for sensor channel 4. If a digital temperature/humidity or digital temperature sensor is connected to this channel, 0 = sensor ok, 1 = high temp alarm, 2 = low temp alarm, 3 = humidity alarm. If a Switch Sensor Expansion box is connected, the binary equivalent of the decimal number displayed will indicate which switch sensors are currently in an alarm state (0 = sensor ok, 1 = sensor in alarm state). For example, if switch sensors 1 and 4 are in alarm state, the value displayed will be 9, which equals 00001001 in binary."
+::= { traps 4 }	
+	
+alarmMessage1 OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm Message from sensor channel 1 (Internal)"
+::= { traps 5 }	
+	
+alarmMessage2 OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm Message from sensor channel 2 (External)"
+::= { traps 6 }	
+	
+alarmMessage3 OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm Message from sensor channel 3 (External)"
+::= { traps 7 }	
+	
+alarmMessage4 OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm Message from sensor channel 4 (External)"
+::= { traps 8 }	
+	
+threshold1-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 1 defined for Channel 1"
+::= { channels1 1 }		
+	
+threshold1-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 2 defined for Channel 1"
+::= { channels1 2 }
+	
+threshold1-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 3 defined for Channel 1"
+::= { channels1 3 }		
+	
+threshold1-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 4 defined for Channel 1"
+::= { channels1 4 }
+	
+threshold1-5 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 5 defined for Channel 1"
+::= { channels1 5 }
+	
+threshold1-6 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 6 defined for Channel 1"
+::= { channels1 6 }
+	
+threshold1-7 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 7 defined for Channel 1"
+::= { channels1 7 }
+	
+threshold1-8 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 8 defined for Channel 1"
+::= { channels1 8 }
+	
+threshold2-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 1 defined for Channel 2"
+::= { channels2 1 }		
+	
+threshold2-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 2 defined for Channel 2"
+::= { channels2 2 }
+	
+threshold2-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 3 defined for Channel 2"
+::= { channels2 3 }		
+	
+threshold2-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 4 defined for Channel 2"
+::= { channels2 4 }
+	
+threshold3-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 1 defined for Channel 3"
+::= { channels3 1 }		
+	
+threshold3-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 2 defined for Channel 3"
+::= { channels3 2 }
+	
+threshold3-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 3 defined for Channel 3"
+::= { channels3 3 }		
+	
+threshold3-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 4 defined for Channel 3"
+::= { channels3 4 }
+	
+threshold4-1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 1 defined for Channel 4"
+::= { channels4 1 }		
+	
+threshold4-2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 2 defined for Channel 4"
+::= { channels4 2 }
+	
+threshold4-3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 3 defined for Channel 4"
+::= { channels4 3 }		
+	
+threshold4-4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Threshold 4 defined for Channel 4"
+::= { channels4 4 }
+	
+	
+-- ROOMALERT11E TRAPS
+
+tempAlarm1-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage2, sensor2-1, sensor2-2, sensor2-1 }
+	DESCRIPTION	"A tempAlarm1 trap signifies that the current
+			temperature on external sensor 1 is outside the 
+			defined high or low threshold."
+::= 1
+	
+room-alert-11E-SNMP-trap TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1,alarmMessage2,alarmMessage3,alarmMessage4 }
+	DESCRIPTION	"A Room Alert 11E SNMP Trap indicates that an alarm
+			condition has occurred on the sensor inidcated
+			by the alarmMessage variable."
+::= 2	
+	
+tempAlarm2-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage3, sensor3-1, sensor3-2, sensor3-1 }
+	DESCRIPTION	"A tempAlarm2 trap signifies that the current
+			temperature on external sensor 2 is outside the 
+			defined high or low threshold."
+::= 3
+	
+tempClear2-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage3, sensor3-1, sensor3-2, sensor3-1 }
+	DESCRIPTION	"A tempClear2 trap signifies that the current
+			temperature on external sensor 2 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 4	
+
+tempAlarm3-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage4, sensor4-1, sensor4-2, sensor4-1 }
+	DESCRIPTION	"A tempAlarm3 trap signifies that the current
+			temperature on external sensor 3 is outside the 
+			defined high or low threshold."
+::= 5
+	
+tempClear3-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage4, sensor4-1, sensor4-2, sensor4-1 }
+	DESCRIPTION	"A tempClear3 trap signifies that the current
+			temperature on external sensor 3 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 6
+	
+humidityAlarm1-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage2, sensor2-1, sensor2-2, sensor2-3 }
+	DESCRIPTION	"A humidityAlarm1 trap signifies that the current
+			humidity on external sensor 1 is outside the 
+			defined high or low threshold."
+::= 7
+	
+humidityClear1-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage2, sensor2-1, sensor2-2, sensor2-3 }
+	DESCRIPTION	"A humidityClear1 trap signifies that the current
+			humidity on external sensor 1 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 8	
+	
+humidityAlarm2-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage3, sensor3-1, sensor3-2, sensor3-3 }
+	DESCRIPTION	"A humidityAlarm2 trap signifies that the current
+			humidity on external sensor 2 is outside the 
+			defined high or low threshold."
+::= 9
+	
+humidityClear2-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage3, sensor3-1, sensor3-2, sensor3-3 }
+	DESCRIPTION	"A humidityClear2 trap signifies that the current
+			humidity on external sensor 2 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 10	
+
+humidityAlarm3-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage4, sensor4-1, sensor4-2, sensor4-3 }
+	DESCRIPTION	"A humidityAlarm3 trap signifies that the current
+			humidity on external sensor 3 is outside the 
+			defined high or low threshold."
+::= 11
+	
+humidityClear3-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage4, sensor4-1, sensor4-2, sensor4-3 }
+	DESCRIPTION	"A humidityClear3 trap signifies that the current
+			humidity on external sensor 3 has returned to
+			a normal condition and is within the defined 
+			high or low threshold."
+::= 12	
+	
+switchAlarm1-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-1, sensor1-1, sensor1-1 }
+	DESCRIPTION	"A switchAlarm1 trap signifies that switch sensor 1
+			is in an alarm state."
+::= 13
+	
+switchClear1-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-1, sensor1-1, sensor1-1 }
+	DESCRIPTION	"A switchClear1 trap signifies that the switch sensor 1
+			has returned to a normal state."
+::= 14	
+	
+switchAlarm2-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-2, sensor1-2, sensor1-2 }
+	DESCRIPTION	"A switchAlarm2 trap signifies that switch sensor 2
+			is in an alarm state."
+::= 15
+	
+switchClear2-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-2, sensor1-2, sensor1-2 }
+	DESCRIPTION	"A switchClear2 trap signifies that the switch sensor 2
+			has returned to a normal state."
+::= 16	
+	
+switchAlarm3-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-3, sensor1-3, sensor1-3 }
+	DESCRIPTION	"A switchAlarm1 trap signifies that switch sensor 1
+			is in an alarm state."
+::= 17
+	
+switchClear3-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-3, sensor1-3, sensor1-3 }
+	DESCRIPTION	"A switchClear3 trap signifies that the switch sensor 3
+			has returned to a normal state."
+::= 18	
+	
+switchAlarm4-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-4, sensor1-4, sensor1-4 }
+	DESCRIPTION	"A switchAlarm4 trap signifies that switch sensor 4
+			is in an alarm state."
+::= 19
+	
+switchClear4-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-4, sensor1-4, sensor1-4 }
+	DESCRIPTION	"A switchClear4 trap signifies that the switch sensor 4
+			has returned to a normal state."
+::= 20	
+	
+switchAlarm5-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-5, sensor1-5, sensor1-5 }
+	DESCRIPTION	"A switchAlarm5 trap signifies that switch sensor 5
+			is in an alarm state."
+::= 21
+	
+switchClear5-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-5, sensor1-5, sensor1-5 }
+	DESCRIPTION	"A switchClear5 trap signifies that the switch sensor 5
+			has returned to a normal state."
+::= 22	
+	
+switchAlarm6-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-6, sensor1-6, sensor1-6 }
+	DESCRIPTION	"A switchAlarm6 trap signifies that switch sensor 6
+			is in an alarm state."
+::= 23
+	
+switchClear6-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-6, sensor1-6, sensor1-6 }
+	DESCRIPTION	"A switchClear6 trap signifies that the switch sensor 6
+			has returned to a normal state."
+::= 24	
+	
+switchAlarm7-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-7, sensor1-7, sensor1-7 }
+	DESCRIPTION	"A switchAlarm7 trap signifies that switch sensor 7
+			is in an alarm state."
+::= 25
+	
+switchClear7-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-7, sensor1-7, sensor1-7 }
+	DESCRIPTION	"A switchClear7 trap signifies that the switch sensor 7
+			has returned to a normal state."
+::= 26	
+	
+switchAlarm8-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-8, sensor1-8, sensor1-8 }
+	DESCRIPTION	"A switchAlarm8 trap signifies that switch sensor 8
+			is in an alarm state."
+::= 27
+	
+switchClear8-11e TRAP-TYPE
+	ENTERPRISE	roomalert11E
+	VARIABLES	{ alarmMessage1, sensor1-8, sensor1-8, sensor1-8 }
+	DESCRIPTION	"A switchClear8 trap signifies that the switch sensor 8
+			has returned to a normal state."
+::= 28		
+END

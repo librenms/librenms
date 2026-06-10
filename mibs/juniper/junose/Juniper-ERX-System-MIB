@@ -1,0 +1,2031 @@
+
+-- *****************************************************************************
+-- Juniper-ERX-System-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   ERX System MIB
+--
+-- Copyright (c) 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ERX-System-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Unsigned32,
+    TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue, DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable
+        FROM Juniper-TC;
+
+juniERXSysMIB  MODULE-IDENTITY
+    LAST-UPDATED "200311242101Z"  -- 24-Nov-03 04:01 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "Deprecated MIB objects for managing ERX Edge Router system elements.
+        See the generic E-series system MIB (Juniper-System-MIB) for the
+        preferred definitions.  If both MIBs are supported, using the
+        corresponding varbinds from both MIBs to set the same object in a single
+        PDU is not supported."
+    -- Revision History
+    REVISION    "200311242101Z"  -- 24-Nov-03 04:01 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added Hybrid Line Modules and Hybrid IOA modules.
+         Added GE2 Line Module and GE2 IOA module. "
+    REVISION    "200311241426Z"  -- 24-Nov-03 09:26 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200311182206Z"  -- 18-Nov-03 05:06 PM EST  - JUNOSe 4.1
+    DESCRIPTION
+        "Deprecated this MIB in favor of the generic E-series system MIB,
+         Juniper-System-MIB.
+         Added a general trap control object.
+         Added new line card types: vts, oc48, ut3Atm4."
+    REVISION    "200210141740Z"  -- 14-Oct-02 01:40 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added new line card types: X.21/V.35, Ut3f12, Ue3f12, Cocx-F3."
+    REVISION    "200204122057Z"  -- 12-Apr-02 04:57 PM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "Modified the following objects:
+             juniERXSysTempFanStatus
+             juniERXSysTempStatus
+         Added the following objects:
+             juniERXSysTempProtectionStatus
+             juniERXSysTempProtectionHoldOffTime
+             juniERXSysTempProtectionHoldOffTimeRemaining
+         Added the following notification:
+             juniERXSysTempProtectionStatusChange "
+    REVISION    "200105211927Z"  -- 21-May-01 03:27 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Added the following objects:
+             juniERXSysMemUtilPct
+             juniERXSysMemCapacity
+             juniERXSysHighMemUtilThreshold
+             juniERXSysAbatedMemUtilThreshold
+             juniERXSysMemUtilTrapEnable
+         Added the following notifications:
+             juniERXSysHighMemUtil
+             juniERXSysAbatedMemUtil "
+    REVISION    "200105151827Z"  -- 15-May-01 02:27 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Added support for system timing parameters.
+         Added juniERXSysSlotDescr to juniERXSysSlotOperStatusChange trap."
+    REVISION    "200004251844Z"  -- 25-Apr-00  2:44 PM EDT  - JUNOSe 2.0
+    DESCRIPTION
+        "Added board serial number, assembly number and assembly revision."
+    REVISION    "200001200000Z"  -- 20-Jan-00               - JUNOSe 1.3
+    DESCRIPTION
+        "Added OC-12 card and Dual FE card support.
+         Added redundancy/reversion and boot record configuration support."
+    REVISION      "9902100000Z"  -- 10-Feb-99               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 17 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniTimingSelector ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+        "The system timing selector.
+         A value of 1 corresponds to the primary timing selector.
+         A value of 2 corresponds to the secondary timing selector.
+         A value of 3 corresponds to the tertiary timing selector.
+         A value of 4 indicates an error with the timing selector."
+    SYNTAX      Integer32 (1..4)
+
+JuniTimingSourceType ::= TEXTUAL-CONVENTION
+    STATUS       deprecated
+    DESCRIPTION
+        "The set of selectable timing source types.  The timing source type
+        determines the timing source parameters."
+    SYNTAX      INTEGER {
+                    timingInterfaceIfIndex(1),
+                    timingInternal(2),
+                    timingLine(3) }
+
+JuniTimingSourceLineType ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+        "The set of choices for line type timing."
+    SYNTAX      INTEGER {
+                    timingSourceLineUndefined(0),
+                    timingSourceLineE1PortA(1),  -- e1:a
+                        --  External SC E1 line input, port A
+                    timingSourceLineE1PortB(2),  -- e1:b
+                        --  External SC E1 line input, port B
+                    timingSourceLineT1PortA(3),  -- t1:a
+                        --  External SC T1 line input, port A
+                    timingSourceLineT1PortB(4) } -- t1:b
+                        --  External SC T1 line input, port B
+
+JuniSysCardType ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+        "The type of card in a system slot:
+            unknown     Unknown type.
+            srp         Switch/Route Processor.
+            ct3         Channelized T3.
+            oc3         OC-3 (SONET/SDH).
+            ut3Atm      Unchannelized T3 (ATM service).
+            ut3Frame    Unchannelized T3 (Frame service).
+            ue3Atm      Unchannelized E3 (ATM service).
+            ue3Frame    Uncahnnelized E3 (Frame service).
+            ce1         Channelized   E1.
+            ct1         Channelized   T1.
+            dpfe        Dual Port Fast Ethernet.
+            oc12Pos     OC-12 (POS/SDH).
+            oc12Atm     OC-12 (ATM service).
+            oc3Pos      Quad OC-3 (POS/SDH).
+            oc3Atm      Quad OC-3 (ATM service).
+            ge          Gigabit Ethernet.
+            fe8         Fast Ethernet 8-port.
+            oc3oc12Pos  Generic OC3/OC12 POS (multi-personality).
+            oc3oc12Atm  Generic OC3/OC12 ATM (multi-personality).
+            coc3oc12    Channelized generic OC3/OC12 (multi-personality).
+            coc3        Channelized OC3.
+            coc12       Channelized OC12.
+            oc12Server  OC-12 Rate Server Card.
+            hssi        High Speed Serial Interface.
+            geFe        Generic GE/FE (multi-personality).
+            ct3P12      Channelized T3 12-port.
+            v35         X.21/V.35 Card.
+            ut3f12      Unchannelized T3 12-port.
+            ue3f12      Unchannelized E3 12-port.
+            coc3F3      OC-3 channelized to T3.
+            coc12F3     OC-12 channelized to T3.
+            cocxF3      12-port T3/E3 or OC3/OC12 (multi-personality).
+            vts         Virtual Tunnel Server.
+            oc48        OC-48 (SONET/SDH).
+            ut3Atm4     4-port Unchannelized T3 ATM.
+            hybrid      Generic ATM/POS/GE Hybrid (multi-personality).
+            oc3AtmGe    OC3 ATM 2-port Gigabit Ethernet 1-port.
+            oc3AtmPos   OC3 ATM 2-port OC3 POS  2-port.
+            ge2         Gigabit Ethernet 2-port."
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    srp(1),
+                    ct3(2),
+                    oc3(3),
+                    ut3Atm(4),
+                    ut3Frame(5),
+                    ue3Atm(6),
+                    ue3Frame(7),
+                    ce1(8),
+                    ct1(9),
+                    dpfe(10),
+                    oc12Pos(11),
+                    oc12Atm(12),
+                    oc3Pos(13),
+                    oc3Atm(14),
+                    ge(15),
+                    fe8(16),
+                    oc3oc12Pos(17),
+                    oc3oc12Atm(18),
+                    coc3oc12(19),
+                    coc3(20),
+                    coc12(21),
+                    oc12Server(22),
+                    hssi(23),
+                    geFe(24),
+                    ct3P12(25),
+                    v35(26),
+                    ut3f12(27),
+                    ue3f12(28),
+                    coc12F3(29),
+                    coc3F3(30),
+                    cocxF3(31),
+                    vts(32),
+                    oc48(33),
+                    ut3Atm4(34),
+                    hybrid(35),
+                    oc3AtmGe(36),
+                    oc3AtmPos(37),
+                    ge2(38) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Structure
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysTrap          OBJECT IDENTIFIER ::= { juniERXSysMIB 0 }
+juniERXSysObjects       OBJECT IDENTIFIER ::= { juniERXSysMIB 1 }
+juniERXSysConformance   OBJECT IDENTIFIER ::= { juniERXSysMIB 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Object Groups
+--
+juniERXSysGeneral       OBJECT IDENTIFIER ::= { juniERXSysObjects 1 }
+juniERXSysFabric        OBJECT IDENTIFIER ::= { juniERXSysObjects 2 }
+juniERXSysNvs           OBJECT IDENTIFIER ::= { juniERXSysObjects 3 }
+juniERXSysSlot          OBJECT IDENTIFIER ::= { juniERXSysObjects 4 }
+juniERXSysPort          OBJECT IDENTIFIER ::= { juniERXSysObjects 5 }
+juniERXSysPower         OBJECT IDENTIFIER ::= { juniERXSysObjects 6 }
+juniERXSysTemperature   OBJECT IDENTIFIER ::= { juniERXSysObjects 7 }
+juniERXSysSubsystem     OBJECT IDENTIFIER ::= { juniERXSysObjects 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Chassis objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysChassisRev OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Chassis revision number.  If unknown, the value 255 is reported."
+    ::= { juniERXSysGeneral 1 }
+
+juniERXSysSwVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Currently executing operational software version."
+    ::= { juniERXSysGeneral 2 }
+
+juniERXSysSwBuildDate OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Build date of currently executing operational software version."
+    ::= { juniERXSysGeneral 3 }
+
+juniERXSysRevertControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    immediate(1),
+                    timeOfDay(2) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Global revert control:
+            off             Disable global revert.
+            immediate       All slots are to revert immediately (asap).
+            timeOfDay       All slots are to revert at time specified by
+                            juniRxSysRevertTimeOfDay.  This object/value must
+                            be set concurrently with juniERXSysRevertTimeOfDay."
+    ::= { juniERXSysGeneral 4 }
+
+juniERXSysRevertTimeOfDay OBJECT-TYPE
+    SYNTAX      Integer32 (0..86399)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of seconds past midnight on any given day at which time
+        reverts are allowed to occur.  This object must be set concurrently with
+        juniERXSysRevertControl."
+    ::= { juniERXSysGeneral 5 }
+
+juniERXSysBootConfigControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    file(0),
+                    fileOnce(1),
+                    factoryDefaults(2),
+                    runningConfiguration(3) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "System boot configuration control:
+            file                  Revert to configuration settings specified by
+                                  juniERXSysBootConfigFile.  The
+                                  juniERXSysBootConfigControl and
+                                  juniERXSysBootConfigFile must be specified
+                                  together in the same set request PDU.
+            fileOnce              Revert to configuration settings specified by
+                                  juniERXSysBootConfigFile.  Do not continue to
+                                  use file after using it once.  The
+                                  juniERXSysBootConfigControl and
+                                  juniERXSysBootConfigFile must be specified
+                                  together in the same set request PDU.
+            factoryDefaults       Revert to factory default settings.
+            runningConfiguration  Revert to current settings."
+    ::= { juniERXSysGeneral 6 }
+
+juniERXSysBootBackupConfigControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    file(0),
+                    factoryDefaults(1),
+                    none(2) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "System boot backup configuration control:
+            file                  Revert to backup configuration settings
+                                  specified by juniERXSysBootBackupConfigFile.
+                                  The juniERXSysBootBackupConfigControl and
+                                  juniERXSysBootBackupConfigFile must be
+                                  specified together in the same set request
+                                  PDU.
+            factoryDefaults       Revert to factory default settings.
+            none                  Specify no backup."
+    ::= { juniERXSysGeneral 7 }
+
+juniERXSysBootForceBackupControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    on(1) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "System boot force backup control:
+            off      Do not force revert to backup settings.
+            on       Do force revert to backup settings."
+    ::= { juniERXSysGeneral 8 }
+
+juniERXSysBootAutoRevertControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    default(0),
+                    never(1),
+                    set(2) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "System boot auto revert control:
+            default  Use default auto-revert tolerances.
+            never    Never auto-revert to backup.
+            set      Set auto-revert settings at specified tolerances."
+    ::= { juniERXSysGeneral 9 }
+
+juniERXSysBootAutoRevertCountTolerance OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967294)
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The auto-revert reboot count tolerance.  This object cannot be set to
+        zero, but may contain a zero value when the control is set to never(1)."
+    ::= { juniERXSysGeneral 10 }
+
+juniERXSysBootAutoRevertTimeTolerance OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967294)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The auto-revert reboot time tolerance.  This object cannot be set to
+        zero, but will contain a zero value when the control is set to
+        never(1)."
+    ::= { juniERXSysGeneral 11 }
+
+juniERXSysBootReleaseFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local boot release file name, with extension .rel."
+    DEFVAL    { "" }
+    ::= { juniERXSysGeneral 12 }
+
+juniERXSysBootConfigFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local boot configuration file name, with extension .cnf.  The
+        juniERXSysBootConfigControl and juniERXSysBootConfigFile must be
+        specified together in the same set request PDU."
+    DEFVAL    { "" }
+    ::= { juniERXSysGeneral 13 }
+
+juniERXSysBootBackupReleaseFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local backup boot release file name, with extension .rel."
+    DEFVAL    { "" }
+    ::= { juniERXSysGeneral 14 }
+
+juniERXSysBootBackupConfigFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local backup boot configuration file name, with extension .cnf.
+        The juniERXSysBootBackupConfigControl and juniERXSysBootBackupConfigFile
+        must be specified together in the same set request PDU."
+    DEFVAL    { "" }
+    ::= { juniERXSysGeneral 15 }
+
+juniERXSysAdminTimingSource OBJECT-TYPE
+    SYNTAX      JuniTimingSelector
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The administrative timing source for the ERX system.  The ERX
+        periodically monitors the status of three timing sources, primary,
+        secondary and tertiary.  If the systems current timing source fails, the
+        system will automatically downgrade to the next timing source.  If the
+        system is configured to automatically upgrade
+        (juniERXSysTimingDisableAutoUpgrade is set to false(2)) the system will
+        switch back to the higher timing source when it becomes available.
+
+        A timing source failure can be detected by comparing the operational and
+        admin timing sources.  If they are not equal, the system has swapped
+        timing sources because the administratively set value is in the error
+        state."
+    ::= { juniERXSysGeneral 16 }
+
+juniERXSysOperTimingSource OBJECT-TYPE
+    SYNTAX      JuniTimingSelector
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The operations timing source for the ERX system.  The ERX periodically
+        monitors the status of three timing sources, primary, secondary and
+        tertiary.  If the systems current timing source fails, the system will
+        automatically downgrade to the next timing source.  If the system is
+        configured to automatically upgrade (juniERXSysTimingDisableAutoUpgrade
+        is set to false(2)) the system will switch back to the higher timing
+        source when it becomes available."
+    ::= { juniERXSysGeneral 17 }
+
+juniERXSysTimingDisableAutoUpgrade OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "This object controls the automatic timing selector upgrade.  Setting
+        this object to true(1) will prevent automatic upgrade to the next
+        highest timing selector.  Setting this object to false(2) will enable
+        the automatic upgrade of timing selectors."
+    DEFVAL    { false }
+    ::= { juniERXSysGeneral 18 }
+
+juniERXSysTimingSelectorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniERXSysTimingSelectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of system timing selectors."
+    ::= { juniERXSysGeneral 19 }
+
+juniERXSysTimingSelectorEntry OBJECT-TYPE
+    SYNTAX      JuniERXSysTimingSelectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table entry describing a system timing selector."
+    INDEX     { juniERXSysTimingSelectorIndex }
+    ::= { juniERXSysTimingSelectorTable 1 }
+
+JuniERXSysTimingSelectorEntry ::= SEQUENCE {
+    juniERXSysTimingSelectorIndex JuniTimingSelector,
+    juniERXSysTimingSourceType    JuniTimingSourceType,
+    juniERXSysTimingSourceIfIndex InterfaceIndexOrZero,
+    juniERXSysTimingSourceLine    JuniTimingSourceLineType,
+    juniERXSysTimingStatus        INTEGER }
+
+juniERXSysTimingSelectorIndex OBJECT-TYPE
+    SYNTAX      JuniTimingSelector
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "The system timing selector index associated with this entry."
+    ::= { juniERXSysTimingSelectorEntry 1 }
+
+juniERXSysTimingSourceType OBJECT-TYPE
+    SYNTAX      JuniTimingSourceType
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The system timing source type for this entry.  This object must be
+        present when setting either the juniERXSysTimingSourceIfIndex or
+        juniERXSysTimingSourceLine objects.  Also, if the value of this object
+        is set to timingInternal(2), no other objects should be simultanously
+        set, otherwise the agent will return an error."
+    ::= { juniERXSysTimingSelectorEntry 2 }
+
+juniERXSysTimingSourceIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifIndex of the interface selected as the system timing source.  The
+        juniERXSysTimingSourceType object must be set to
+        timingInterfaceIfIndex(1) otherwise setting this object will fail."
+    ::= { juniERXSysTimingSelectorEntry 3 }
+
+juniERXSysTimingSourceLine OBJECT-TYPE
+    SYNTAX      JuniTimingSourceLineType
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The line type timing source for this entry.  The
+        juniRxSysTimingSourceType object must be set to timingLine(3) for the
+        agent to accept a set to this object."
+    DEFVAL    { timingSourceLineUndefined }
+    ::= { juniERXSysTimingSelectorEntry 4 }
+
+juniERXSysTimingStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    timingStatusOk(1),
+                    timingStatusError(2),
+                    timingStatusUnknown(3) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The status associated with this system timing selector."
+    ::= { juniERXSysTimingSelectorEntry 5 }
+
+juniERXSysMemUtilPct OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Percentage of system memory utilization.  A value of -1 indicates the
+        utilization is unknown."
+    ::= { juniERXSysGeneral 20 }
+
+juniERXSysMemCapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The total memory capacity of the system.  Negative values are returned
+        when the capacity exceeds 2147483647; interpret the negative 32-bit
+        integer as an unsigned 32-bit integer value."
+    ::= { juniERXSysGeneral 21 }
+
+juniERXSysHighMemUtilThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The value of system memory utilization, where if reached for the first
+        time will generate a high memory utilization event to the management
+        entity on this system.
+
+        The value of this object must be greated than the value of
+        juniERXSysAbatedMemUtilThreshold."
+    DEFVAL    { 85 }
+    ::= { juniERXSysGeneral 22 }
+
+juniERXSysAbatedMemUtilThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..99)
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The value of system memory utilization that is used to determine when
+        to generate an abated memory utilization event notification to the
+        management entity on this system.
+
+        The value of this object must be less than the value of
+        juniERXSysHighMemUtilThreshold.
+
+        The abated memory utilization trap is sent once if the high memory
+        threshold was reached, and memory utilization falls to the value of this
+        object."
+    DEFVAL    { 75 }
+    ::= { juniERXSysGeneral 23 }
+
+juniERXSysMemUtilTrapEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls the sending of system memory utilization events.  Setting the
+        value of this object to true(1) will cause system memory utilization
+        event notification, if they occur, to be sent to the management entity
+        on this system.  Setting the value of this object to false(2) will
+        disable event notifications."
+    DEFVAL    { false }
+    ::= { juniERXSysGeneral 24 }
+
+juniERXSysGeneralTrapEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls whether a member of the set of ERX system notifications
+        (traps) defined in this MIB or the counterpart notifications defined in
+        the generic E-series system MIB (Juniper-System-MIB) will be initiated
+        when the appropriate system event occures.  Setting the value of this
+        object to true(1) will enable the event notifications from this MIB, if
+        they occur, to be sent to the management entity on this system, provided
+        no other restrictions are in effect, instead of the counterparts from
+        the generic system MIB.  Setting the value of this object to false(2)
+        will disable all event notifications defined in this MIB, enabling the
+        ones from the generic system MIB."
+    DEFVAL    { false }
+    ::= { juniERXSysGeneral 25 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Fabric objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysFabricSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "gigabits per second"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Speed of switching fabric, in gigabits per second."
+    ::= { juniERXSysFabric 1 }
+
+juniERXSysFabricRev OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Fabric revision number.  If unknown, the value 255 is reported."
+    ::= { juniERXSysFabric 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Nvs objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysNvsStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notPresent(0),
+                    writeProtected(1),
+                    volumeError(2),
+                    nearCapacity(3),
+                    ok(4),
+                    nearConfigCapacity(5) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Status of non-volatile storage (NVS):
+            notPresent          NVS is not installed.
+            writeProtected      NVS is write-protected.
+            volumeError         Status poll of NVS failed.
+            nearCapacity        Utilization exceeds 85% of NVS capacity.
+            ok                  NVS is operational, none of the preceding
+                                conditions apply.
+            nearConfigCapacity  Utilization exceeds the ability to save the
+                                running configuration."
+    ::= { juniERXSysNvs 1 }
+
+juniERXSysNvsCapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "megabytes"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Capacity of NVS storage in megabytes."
+    ::= { juniERXSysNvs 2 }
+
+juniERXSysNvsUtilPct OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Percentage of NVS storage used.  A value of -1 indicates NVS
+        utilization is unknown."
+    ::= { juniERXSysNvs 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Slot objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysSlotCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The number of slots in the system."
+    ::= { juniERXSysSlot 1 }
+
+juniERXSysSlotTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniERXSysSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of system slots."
+    ::= { juniERXSysSlot 2 }
+
+juniERXSysSlotEntry OBJECT-TYPE
+    SYNTAX      JuniERXSysSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table entry describing contents of a system slot."
+    INDEX     { juniERXSysSlotIndex }
+    ::= { juniERXSysSlotTable 1 }
+
+JuniERXSysSlotEntry ::= SEQUENCE {
+    juniERXSysSlotIndex                   Integer32,
+    juniERXSysSlotDescr                   DisplayString,
+    juniERXSysSlotCurrentCardType         JuniSysCardType,
+    juniERXSysSlotRev                     Integer32,
+    juniERXSysSlotAdminStatus             JuniEnable,
+    juniERXSysSlotOperStatus              INTEGER,
+    juniERXSysSlotDisableReason           INTEGER,
+    juniERXSysSlotExpectedCardType        JuniSysCardType,
+    juniERXSysSlotControl                 INTEGER,
+    juniERXSysSlotCpuUtilPct              Integer32,
+    juniERXSysSlotMemUtilPct              Integer32,
+    juniERXSysSlotIoaPresent              TruthValue,
+    juniERXSysSlotPortCount               Integer32,
+    juniERXSysSlotLastChange              TimeTicks,
+    juniERXSysSlotRedundancyLockout       JuniEnable,
+    juniERXSysSlotRedundancyGroupId       Unsigned32,
+    juniERXSysSlotSpareServer             TruthValue,
+    juniERXSysSlotAssociatedSlot          Integer32,
+    juniERXSysSlotRevertControl           INTEGER,
+    juniERXSysSlotRedundancyRevertTime    DateAndTime,
+    juniERXSysSlotBootReleaseFile         DisplayString,
+    juniERXSysSlotBootBackupReleaseFile   DisplayString,
+    juniERXSysSlotSerialNumber            DisplayString,
+    juniERXSysSlotAssemblyPartNumber      DisplayString,
+    juniERXSysSlotAssemblyRev             DisplayString,
+    juniERXSysSlotIoaSerialNumber         DisplayString,
+    juniERXSysSlotIoaAssemblyPartNumber   DisplayString,
+    juniERXSysSlotIoaAssemblyRev          DisplayString }
+
+juniERXSysSlotIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Slot number.
+
+        NOTE: Slot numbers are zero-based."
+    ::= { juniERXSysSlotEntry 1 }
+
+juniERXSysSlotDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Textual description of the card."
+    ::= { juniERXSysSlotEntry 2 }
+
+juniERXSysSlotCurrentCardType OBJECT-TYPE
+    SYNTAX      JuniSysCardType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Type of card actually in the slot.  This could be different from the
+        type reported in juniERXSysSlotExpectedCardType, in which case it may be
+        necessary to set juniERXSysSlotControl to 'flush' before this card can
+        be made operational."
+    ::= { juniERXSysSlotEntry 3 }
+
+juniERXSysSlotRev OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Revision number of the card.  If unknown, the value 255 is reported."
+    ::= { juniERXSysSlotEntry 4 }
+
+juniERXSysSlotAdminStatus OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Exerts administrative control to enable/disable the slot."
+    ::= { juniERXSysSlotEntry 5 }
+
+juniERXSysSlotOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    empty(1),
+                    disabled(2),
+                    failed(3),
+                    booting(4),
+                    initializing(5),
+                    online(6),
+                    standby(7),
+                    inactive(8) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Status of the card."
+    ::= { juniERXSysSlotEntry 6 }
+
+juniERXSysSlotDisableReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    unknown(1),
+                    assessing(2),
+                    admin(3),
+                    cardMismatch(4),
+                    fabricLimit(5),
+                    imageError(6) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates the condition causing the slot to be disabled:
+            none            Value when card is not disabled.
+            unknown         Unknown reason for disablement.
+            assessing       The slot content is being assessed (transient
+                            initialization state).
+            admin           The slot is administratively disabled.
+            cardMismatch    The current card type conflicts with configuration
+                            associated with a different card type that
+                            previously occupied the slot.
+            fabricLimit     Card resource requirements exceed available fabric
+                            capacity.
+            imageError      Software image for card is missing or invalid."
+    ::= { juniERXSysSlotEntry 7 }
+
+juniERXSysSlotExpectedCardType OBJECT-TYPE
+    SYNTAX      JuniSysCardType
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Type of card associated with this slot through prior presence.  After
+        the card is removed, this association persists (and inhibits operation
+        of a different card type in this slot, if one is inserted) until
+        juniERXSysSlotControl is set to 'flush'."
+    ::= { juniERXSysSlotEntry 8 }
+
+juniERXSysSlotControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noOperation(0),
+                    flush(1),
+                    reset(2),
+                    forceFailover(3),
+                    noBoot(4),
+                    noBootBackup(5) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Administrative control of this slot:
+            noOperation     Setting this value has no effect.
+            flush           Flushes configuration associated with a
+                            card type that previously occupied this slot.
+                            Used to explicitly confirm that the slot is
+                            now empty, or contains a different card type.
+                            Card must be disabled when this value is asserted.
+                            See description for juniERXSysSlotDisableReason.
+            reset           Resets the slot.
+            forceFailover   Forces the slot to failover to backup.
+            noBoot          Deconfigure primary release file for the slot.
+            noBootBackup    Deconfigure backup release file for the slot."
+    ::= { juniERXSysSlotEntry 9 }
+
+juniERXSysSlotCpuUtilPct OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Percentage of CPU utilization.  A value of -1 indicates the utilization
+        is unknown."
+    ::= { juniERXSysSlotEntry 10 }
+
+juniERXSysSlotMemUtilPct OBJECT-TYPE
+    SYNTAX      Integer32 (-1..100)
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Percentage of memory utilization.  A value of -1 indicates the
+        utilization is unknown."
+    ::= { juniERXSysSlotEntry 11 }
+
+juniERXSysSlotIoaPresent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Indicates whether the card's corresponding I/O adapter is present."
+    ::= { juniERXSysSlotEntry 12 }
+
+juniERXSysSlotPortCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of physical ports for the EXPECTED card type for this slot.
+
+        NOTE: In event of a card mismatch in this slot, the port count for the
+        CURRENT card in this slot is not recognized/reported until the
+        configuration for the EXPECTED card is explicitly flushed via
+        juniERXSysSlotControl."
+    ::= { juniERXSysSlotEntry 13 }
+
+juniERXSysSlotLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The value of sysUpTime when the value of juniERXSysSlotOperStatus
+        last changed."
+    ::= { juniERXSysSlotEntry 14 }
+
+juniERXSysSlotRedundancyLockout OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Exerts administrative control to enable/disable Redundancy protection
+        for the slot."
+    ::= { juniERXSysSlotEntry 15 }
+
+juniERXSysSlotRedundancyGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Identifies the Redundancy group as derived from hardware settings."
+    ::= { juniERXSysSlotEntry 16 }
+
+juniERXSysSlotSpareServer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "True only if the line card in slot is a spare redundant server."
+    ::= { juniERXSysSlotEntry 17 }
+
+juniERXSysSlotAssociatedSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "If the module is a primary card and the spare is acting on its behalf,
+        then the value of this object is the slot number of the associated
+        spare.
+
+        If the module is a primary card and is active (not spared), then the
+        value of this object is the cards actual slot number.
+
+        If the module is a spare card and it is active, then the value of this
+        object is the slot number of the primary card that is being spared for.
+
+        If the module is a spare and it is inactive, then the value of this
+        object is the its own slot number.
+
+        If module is not part of a redundancy group, or the slot is empty, the
+        value of this object is 255."
+    ::= { juniERXSysSlotEntry 18 }
+
+juniERXSysSlotRevertControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off(0),
+                    immediate(1),
+                    timeAndDate(2) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Per-slot revert control:
+            off             Disable slot revert.
+            immediate       Slot is to revert immediately (asap).
+            timeAndDate     Slot is to revert at time specified by
+                            juniRxSysSlotRedundancyRevertTime."
+    ::= { juniERXSysSlotEntry 19 }
+
+juniERXSysSlotRedundancyRevertTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The date and time associated with the timeAndDate (delayed) revert
+        operation."
+    ::= { juniERXSysSlotEntry 20 }
+
+juniERXSysSlotBootReleaseFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local boot release file name for this slot, with extension .rel."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 21 }
+
+juniERXSysSlotBootBackupReleaseFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local backup boot release file name for this slot, with extension
+        .rel."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 22 }
+
+juniERXSysSlotSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The serial number of the card in this slot."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 23 }
+
+juniERXSysSlotAssemblyPartNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The part number of the card in this slot."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 24 }
+
+juniERXSysSlotAssemblyRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..3))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The revision number of the card assembly in this slot."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 25 }
+
+juniERXSysSlotIoaSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The serial number of the I/O adaptor on the card in this slot."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 26 }
+
+juniERXSysSlotIoaAssemblyPartNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The part number of the I/O adaptor on the card in this slot."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 27 }
+
+juniERXSysSlotIoaAssemblyRev OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..3))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The revision number of the I/O adaptor assembly on the card in this
+        slot."
+    DEFVAL    { "" }
+    ::= { juniERXSysSlotEntry 28 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- System Port objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniERXSysPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of system physical ports.
+
+        The information in this table reflects the ports for the EXPECTED card
+        type in each slot; in event of a card mismatch, this table permits
+        navigation of the existing configuration of the expected card type."
+    ::= { juniERXSysPort 1 }
+
+juniERXSysPortEntry OBJECT-TYPE
+    SYNTAX      JuniERXSysPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table entry describing a physical port of the system."
+    INDEX     { juniERXSysSlotIndex,
+                juniERXSysPortIndex }
+    ::= { juniERXSysPortTable 1 }
+
+JuniERXSysPortEntry ::= SEQUENCE {
+    juniERXSysPortIndex   Integer32,
+    juniERXSysPortDescr   DisplayString,
+    juniERXSysPortType    INTEGER,
+    juniERXSysPortIfIndex InterfaceIndexOrZero }
+
+juniERXSysPortIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Port number of this physical port, relative to the slot in which it
+        resides.  Each physical port is uniquely distinguished by its slot/port
+        pair.
+
+        NOTE: Port numbers are zero-based."
+    ::= { juniERXSysPortEntry 1 }
+
+juniERXSysPortDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Textual description of this port."
+    ::= { juniERXSysPortEntry 2 }
+
+juniERXSysPortType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    eth(1),
+                    ct3(2),
+                    oc3c(3),
+                    ut3Atm(4),
+                    ut3Frame(5),
+                    ue3Atm(6),
+                    ue3Frame(7),
+                    ce1(8),
+                    ct1(9),
+                    oc12cPos(10),
+                    oc12cAtm(11),
+                    oc3cPos(12),
+                    oc3cAtm(13),
+                    coc3(14),
+                    coc12(15),
+                    server(16),
+                    hssi(17),
+                    v35(18),
+                    oc48cPos(19) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Type of the physical port:
+            unknown     Unknown port type.
+            eth         Ethernet.
+            ct3         Channelized T3.
+            oc3c        OC-3c (SONET/SDH).
+            ut3Atm      Unchannelized T3 (ATM service).
+            ut3Frame    Unchannelized T3 (Frame service).
+            ue3Atm      Unchannelized E3 (ATM service).
+            ue3Frame    Unchannelized E3 (Frame service).
+            ce1         Channelized   E1.
+            ct1         Channelized   T1.
+            oc12cPos    OC-12c (POS/SDH).
+            oc12cAtm    OC-12c (ATM service).
+            oc3cPos     OC-3c (POS/SDH).
+            oc3cAtm     OC-3c (ATM service).
+            coc3        Channelized OC-3.
+            coc12       Channelized OC-12.
+            server      Tunnel Server (no physical ports).
+            hssi        High Speed Serial Interface.
+            v35         X.21/V.35.
+            oc48cPos    OC-48c (POS/SDH)."
+    ::= { juniERXSysPortEntry 3 }
+
+juniERXSysPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifIndex of the Interfaces MIB ifTable entry corresponding to this
+        physical port; if zero, the ifIndex is unknown or does not exist."
+    ::= { juniERXSysPortEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- System Power objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysPowerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniERXSysPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of system power elements."
+    ::= { juniERXSysPower 1 }
+
+juniERXSysPowerEntry OBJECT-TYPE
+    SYNTAX      JuniERXSysPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table entry describing status of a system power element."
+    INDEX     { juniERXSysPowerIndex }
+    ::= { juniERXSysPowerTable 1 }
+
+JuniERXSysPowerEntry ::= SEQUENCE {
+    juniERXSysPowerIndex  Integer32,
+    juniERXSysPowerDescr  DisplayString,
+    juniERXSysPowerStatus INTEGER }
+
+juniERXSysPowerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Arbitrary integer index to distinguish entries in this table."
+    ::= { juniERXSysPowerEntry 1 }
+
+juniERXSysPowerDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Textual description of this power element."
+    ::= { juniERXSysPowerEntry 2 }
+
+juniERXSysPowerStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    inactive(0),
+                    active(1) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The status of the power element:
+            inactive    No power available from this element.
+            active      Power available from this element."
+    ::= { juniERXSysPowerEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- System Temp objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysTempFanStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    failed(0),
+                    ok(1),
+                    warning(2) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Status of fan subsystem.
+            ok          All components operational
+            warning     The fan subsystem has a non-critical failure.
+            failed      The fan subsystem has a critical failure, or has been
+                        removed, and is now non-operational."
+    ::= { juniERXSysTemperature 1 }
+
+
+juniERXSysTempTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniERXSysTempEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of system temperature sensors.
+
+        Sensors are distributed across the chassis, at least one sensor per
+        populated slot."
+    ::= { juniERXSysTemperature 2 }
+
+juniERXSysTempEntry OBJECT-TYPE
+    SYNTAX      JuniERXSysTempEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table entry describing status of a temperature sensor."
+    INDEX     { juniERXSysSlotIndex,
+                juniERXSysTempIndex }
+    ::= { juniERXSysTempTable 1 }
+
+JuniERXSysTempEntry ::= SEQUENCE {
+    juniERXSysTempIndex   Integer32,
+    juniERXSysTempDescr   DisplayString,
+    juniERXSysTempStatus  INTEGER,
+    juniERXSysTempValue   Integer32 }
+
+juniERXSysTempIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Arbitrary integer index to distinguish sensors associated with the same
+        chassis slot."
+    ::= { juniERXSysTempEntry 1 }
+
+juniERXSysTempDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Textual description of this sensor."
+    ::= { juniERXSysTempEntry 2 }
+
+juniERXSysTempStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    failed(1),
+                    tooLow(2),
+                    nominal(3),
+                    tooHigh(4),
+                    tooLowWarning(5),
+                    tooHighWarning(6) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The status of a temperature sensor:
+            unknown         unknown
+            failed          failed
+            tooLow          below nominal range
+            nominal         within nominal range
+            tooHigh         above nominal range
+            tooLowWarning   near lower limit
+            tooHighWarning  near upper limit"
+    ::= { juniERXSysTempEntry 3 }
+
+juniERXSysTempValue OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The temperature measured by this sensor in degrees Celsius.  This
+        measurement is valid only if the value of the corresponding
+        juniERXSysTempStatus is nominal."
+    ::= { juniERXSysTempEntry 4 }
+
+juniERXSysTempProtectionStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    monitoring(1),
+                    inHoldOff(2),
+                    activatedHoldOffExpired(3),
+                    activatedTempTooHigh(4) }
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Thermal protection status:
+            monitoring                  monitoring
+            inHoldOff                   hold off time has begun
+            activatedHoldOffExpired     hold off time has expired, the system
+                                        is in thermal protection mode
+            activatedTempTooHigh        temperature too high, the system is in
+                                        thermal protection mode "
+    ::= { juniERXSysTemperature 3 }
+
+juniERXSysTempProtectionHoldOffTime OBJECT-TYPE
+    SYNTAX      Integer32 (0..1200)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The time, in seconds, before the system enters thermal protection mode
+        after a critical fan subsystem failure is detected."
+    DEFVAL    { 150 }
+    ::= { juniERXSysTemperature 4 }
+
+juniERXSysTempProtectionHoldOffTimeRemaining OBJECT-TYPE
+    SYNTAX      Integer32 (0..1200)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The time remaining, in seconds, before the system enters thermal
+        protection mode while the thermal protection status is set to inHoldOff.
+        The value decrements every second until it reaches zero, and the status
+        changes to activatedHoldOffExpired.  When the thermal protection status
+        is not inHoldOff or activatedHoldOffExpired, the value is set to the
+        hold off time."
+    DEFVAL    { 150 }
+    ::= { juniERXSysTemperature 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Subsystem objects
+--
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysSubsystemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniERXSysSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Table of subsystems."
+    ::= { juniERXSysSubsystem 1 }
+
+juniERXSysSubsystemEntry OBJECT-TYPE
+    SYNTAX      JuniERXSysSubsystemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "A table entry containing information pertaining to a subsystem."
+    INDEX     { juniERXSysSubsystemIndex }
+    ::= { juniERXSysSubsystemTable 1 }
+
+JuniERXSysSubsystemEntry ::= SEQUENCE {
+    juniERXSysSubsystemIndex                  Integer32,
+    juniERXSysSubsystemName                   DisplayString,
+    juniERXSysSubsystemControl                INTEGER,
+    juniERXSysSubsystemBootReleaseFile        DisplayString,
+    juniERXSysSubsystemBootBackupReleaseFile  DisplayString }
+
+juniERXSysSubsystemIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+        "Subsystem number."
+    ::= { juniERXSysSubsystemEntry 1 }
+
+juniERXSysSubsystemName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The name of the subsystem."
+    ::= { juniERXSysSubsystemEntry 2 }
+
+juniERXSysSubsystemControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    noOperation(0),
+                    noBoot(1),
+                    noBootBackup(2) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Administrative control of this subsystem:
+            noOperation     Setting this value has no effect.
+            noBoot          Deconfigure primary release file for the subsystem.
+            noBootBackup    Deconfigure backup release file for the subsystem."
+    ::= { juniERXSysSubsystemEntry 3 }
+
+juniERXSysSubsystemBootReleaseFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local boot release file name for this subsystem, with extension
+        .rel."
+    DEFVAL    { "" }
+    ::= { juniERXSysSubsystemEntry 4 }
+
+juniERXSysSubsystemBootBackupReleaseFile OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "The local backup boot release file name for this subsystem, with
+        extension .rel."
+    DEFVAL    { "" }
+    ::= { juniERXSysSubsystemEntry 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Traps & Trap Control
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The juniERXSysTrap OBJECT IDENTIFIER is used to define SNMPv2
+-- Notifications that are easily translated into SNMPv1 Traps.
+
+juniERXSysSlotOperStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        juniERXSysSlotCurrentCardType,
+        juniERXSysSlotAdminStatus,
+        juniERXSysSlotOperStatus,
+        juniERXSysSlotDisableReason,
+        juniERXSysSlotSpareServer,
+        juniERXSysSlotAssociatedSlot,
+        juniERXSysSlotDescr }
+    STATUS      deprecated
+    DESCRIPTION
+        "Reports a status change for a slot.
+
+        This trap is generated on a transition into a stable state (online or
+        disabled) or on a transition out of online."
+    ::= { juniERXSysTrap 1 }
+
+juniERXSysPowerStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        juniERXSysPowerStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "Reports a change in the status of a power element."
+    ::= { juniERXSysTrap 2 }
+
+juniERXSysTempFanStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        juniERXSysTempFanStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "Reports a transition between the three states of the fan subsystem.
+        When the fan subsystem transitions to the failed state the thermal
+        protection hold off time begins."
+    ::= { juniERXSysTrap 3 }
+
+juniERXSysTempStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        juniERXSysTempStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "Reports a change in the temperature status.  When the status
+        transitions to the tooHigh state the system enters thermal protection
+        mode."
+    ::= { juniERXSysTrap 4 }
+
+juniERXSysHighMemUtil NOTIFICATION-TYPE
+    OBJECTS {
+        juniERXSysMemCapacity,
+        juniERXSysMemUtilPct,
+        juniERXSysAbatedMemUtilThreshold,
+        juniERXSysHighMemUtilThreshold }
+    STATUS      deprecated
+    DESCRIPTION
+        "Report system memory utilization has met the conditions of
+        juniERXSysHighMemUtilThreshold."
+    ::= { juniERXSysTrap 5 }
+
+juniERXSysAbatedMemUtil NOTIFICATION-TYPE
+    OBJECTS {
+        juniERXSysMemCapacity,
+        juniERXSysMemUtilPct,
+        juniERXSysAbatedMemUtilThreshold,
+        juniERXSysHighMemUtilThreshold }
+    STATUS      deprecated
+    DESCRIPTION
+        "Reports system memory utilization has met the conditions of
+        juniERXSysAbatedMemUtilThreshold."
+    ::= { juniERXSysTrap 6 }
+
+juniERXSysTempProtectionStatusChange NOTIFICATION-TYPE
+    OBJECTS {
+        juniERXSysTempProtectionStatus,
+        juniERXSysTempProtectionHoldOffTimeRemaining }
+    STATUS      deprecated
+    DESCRIPTION
+        "Notification about changes in the state of Thermal Protection.  This
+        notification is sent when the tempProtectionStatus changes.  It is also
+        sent when the holdOffTimeRemaining is 50% of the holdOffTime."
+    ::= { juniERXSysTrap 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniERXSysCompliances OBJECT IDENTIFIER ::= { juniERXSysConformance 1 }
+juniERXSysGroups      OBJECT IDENTIFIER ::= { juniERXSysConformance 2 }
+
+--
+-- compliance statements
+--
+juniERXSysCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the ERX
+        System MIB.  This compliance statement became obsolete when new slot
+        information objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniERXSysGroup,
+            juniERXSysNotifyGroup }
+    ::= { juniERXSysCompliances 1 }                                -- JUNOSe 1.3
+
+juniERXSysCompliance1  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the ERX
+        System MIB.  This compliance statement became obsolete when the timing
+        group was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniERXSysGeneralGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup }
+    ::= { juniERXSysCompliances 2 }                                -- JUNOSe 2.0
+
+juniERXSysCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the ERX
+        System MIB.  This compliance statement became obsolete when new memory
+        information objects and notifications were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniERXSysGeneralGroup,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup }
+    ::= { juniERXSysCompliances 3 }                                -- JUNOSe 3.0
+
+juniERXSysCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the ERX
+        System MIB.  This compliance statement became obsolete when new system
+        temperature information objects and notifications were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniERXSysGeneralGroup2,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup2 }
+    ::= { juniERXSysCompliances 4 }                                -- JUNOSe 3.2
+
+juniERXSysCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the ERX
+        System MIB.  This compliance statement became obsolete when the general
+        trap control object was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniERXSysGeneralGroup2,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup2,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup3 }
+    ::= { juniERXSysCompliances 5 }                                -- JUNOSe 3.3
+
+juniERXSysCompliance5  MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement the ERX System
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniERXSysGeneralGroup3,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup2,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup3 }
+    ::= { juniERXSysCompliances 6 }                                -- JUNOSe 4.1
+
+
+--
+-- units of conformance
+--
+juniERXSysGroup OBJECT-GROUP
+    OBJECTS {
+        -- General chassis objects
+        juniERXSysChassisRev,
+        juniERXSysSwVersion,
+        juniERXSysSwBuildDate,
+        juniERXSysRevertControl,
+        juniERXSysRevertTimeOfDay,
+        juniERXSysBootConfigControl,
+        juniERXSysBootBackupConfigControl,
+        juniERXSysBootForceBackupControl,
+        juniERXSysBootAutoRevertControl,
+        juniERXSysBootAutoRevertCountTolerance,
+        juniERXSysBootAutoRevertTimeTolerance,
+        juniERXSysBootReleaseFile,
+        juniERXSysBootConfigFile,
+        juniERXSysBootBackupReleaseFile,
+        juniERXSysBootBackupConfigFile,
+
+        -- Fabric objects
+        juniERXSysFabricSpeed,
+        juniERXSysFabricRev,
+
+        -- NVS objects
+        juniERXSysNvsStatus,
+        juniERXSysNvsCapacity,
+        juniERXSysNvsUtilPct,
+
+        -- Slot objects
+        juniERXSysSlotCount,
+        juniERXSysSlotDescr,
+        juniERXSysSlotCurrentCardType,
+        juniERXSysSlotRev,
+        juniERXSysSlotAdminStatus,
+        juniERXSysSlotOperStatus,
+        juniERXSysSlotDisableReason,
+        juniERXSysSlotExpectedCardType,
+        juniERXSysSlotControl,
+        juniERXSysSlotCpuUtilPct,
+        juniERXSysSlotMemUtilPct,
+        juniERXSysSlotIoaPresent,
+        juniERXSysSlotPortCount,
+        juniERXSysSlotLastChange,
+        juniERXSysSlotRedundancyLockout,
+        juniERXSysSlotRedundancyGroupId,
+        juniERXSysSlotSpareServer,
+        juniERXSysSlotAssociatedSlot,
+        juniERXSysSlotRevertControl,
+        juniERXSysSlotRedundancyRevertTime,
+        juniERXSysSlotBootReleaseFile,
+        juniERXSysSlotBootBackupReleaseFile,
+
+        -- Port objects
+        juniERXSysPortDescr,
+        juniERXSysPortType,
+        juniERXSysPortIfIndex,
+
+        -- Power objects
+        juniERXSysPowerDescr,
+        juniERXSysPowerStatus,
+
+        -- Temperature objects
+        juniERXSysTempFanStatus,
+        juniERXSysTempDescr,
+        juniERXSysTempStatus,
+        juniERXSysTempValue,
+
+        -- Subsystem objects
+        juniERXSysSubsystemName,
+        juniERXSysSubsystemControl,
+        juniERXSysSubsystemBootReleaseFile,
+        juniERXSysSubsystemBootBackupReleaseFile }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects pertaining to system
+        capabilities in a Juniper product.  This group became obsolete when new
+        slot information objects were added."
+    ::= { juniERXSysGroups 1 }                                     -- JUNOSe 1.3
+
+juniERXSysNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniERXSysSlotOperStatusChange,
+        juniERXSysPowerStatusChange,
+        juniERXSysTempFanStatusChange,
+        juniERXSysTempStatusChange }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management notifications pertaining to system
+        operations in a Juniper product.  This group became obsolete when new
+        memory threshold notificaitons were added."
+    ::= { juniERXSysGroups 2 }                                     -- JUNOSe 1.3
+
+juniERXSysGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysChassisRev,
+        juniERXSysSwVersion,
+        juniERXSysSwBuildDate,
+        juniERXSysRevertControl,
+        juniERXSysRevertTimeOfDay,
+        juniERXSysBootConfigControl,
+        juniERXSysBootBackupConfigControl,
+        juniERXSysBootForceBackupControl,
+        juniERXSysBootAutoRevertControl,
+        juniERXSysBootAutoRevertCountTolerance,
+        juniERXSysBootAutoRevertTimeTolerance,
+        juniERXSysBootReleaseFile,
+        juniERXSysBootConfigFile,
+        juniERXSysBootBackupReleaseFile,
+        juniERXSysBootBackupConfigFile }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects pertaining to general system
+        capabilities in a Juniper product.  This group became obsolete when new
+        memory management objects were added."
+    ::= { juniERXSysGroups 3 }                                     -- JUNOSe 2.0
+
+juniERXSysFabricGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysFabricSpeed,
+        juniERXSysFabricRev }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to system fabric
+        capabilities in a Juniper product."
+    ::= { juniERXSysGroups 4 }                                     -- JUNOSe 2.0
+
+juniERXSysNvsGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysNvsStatus,
+        juniERXSysNvsCapacity,
+        juniERXSysNvsUtilPct }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to non-volitile storage
+        subsystem capabilities in a Juniper product."
+    ::= { juniERXSysGroups 5 }                                     -- JUNOSe 2.0
+
+juniERXSysSlotGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysSlotCount,
+        juniERXSysSlotDescr,
+        juniERXSysSlotCurrentCardType,
+        juniERXSysSlotRev,
+        juniERXSysSlotAdminStatus,
+        juniERXSysSlotOperStatus,
+        juniERXSysSlotDisableReason,
+        juniERXSysSlotExpectedCardType,
+        juniERXSysSlotControl,
+        juniERXSysSlotCpuUtilPct,
+        juniERXSysSlotMemUtilPct,
+        juniERXSysSlotIoaPresent,
+        juniERXSysSlotPortCount,
+        juniERXSysSlotLastChange,
+        juniERXSysSlotRedundancyLockout,
+        juniERXSysSlotRedundancyGroupId,
+        juniERXSysSlotSpareServer,
+        juniERXSysSlotAssociatedSlot,
+        juniERXSysSlotRevertControl,
+        juniERXSysSlotRedundancyRevertTime,
+        juniERXSysSlotBootReleaseFile,
+        juniERXSysSlotBootBackupReleaseFile,
+        juniERXSysSlotSerialNumber,
+        juniERXSysSlotAssemblyPartNumber,
+        juniERXSysSlotAssemblyRev,
+        juniERXSysSlotIoaSerialNumber,
+        juniERXSysSlotIoaAssemblyPartNumber,
+        juniERXSysSlotIoaAssemblyRev }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to slot-specific system
+        capabilities in a Juniper product."
+    ::= { juniERXSysGroups 6 }                                     -- JUNOSe 2.0
+
+juniERXSysPortGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysPortDescr,
+        juniERXSysPortType,
+        juniERXSysPortIfIndex }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to port-related system
+        capabilities in a Juniper product."
+    ::= { juniERXSysGroups 7 }                                     -- JUNOSe 2.0
+
+juniERXSysPowerGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysPowerDescr,
+        juniERXSysPowerStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to the power subsystem
+        capabilities in a Juniper product."
+    ::= { juniERXSysGroups 8 }                                     -- JUNOSe 2.0
+
+juniERXSysTemperatureGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysTempFanStatus,
+        juniERXSysTempDescr,
+        juniERXSysTempStatus,
+        juniERXSysTempValue }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects pertaining to system
+        temperature monitoring capabilities in a Juniper product.  This group
+        became obsolete when temperature shutdown parameters were added."
+    ::= { juniERXSysGroups 9 }                                     -- JUNOSe 2.0
+
+juniERXSysSubsystemGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysSubsystemName,
+        juniERXSysSubsystemControl,
+        juniERXSysSubsystemBootReleaseFile,
+        juniERXSysSubsystemBootBackupReleaseFile }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to subsystem capabilities
+        in a Juniper product."
+    ::= { juniERXSysGroups 10 }                                    -- JUNOSe 2.0
+
+juniERXSysTimingGroup OBJECT-GROUP
+    OBJECTS {
+        juniERXSysAdminTimingSource,
+        juniERXSysOperTimingSource,
+        juniERXSysTimingDisableAutoUpgrade,
+
+        juniERXSysTimingSourceType,
+        juniERXSysTimingSourceIfIndex,
+        juniERXSysTimingSourceLine,
+        juniERXSysTimingStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to system timing
+        capabilities in a Juniper product."
+    ::= { juniERXSysGroups 11 }                                    -- JUNOSe 3.0
+
+juniERXSysGeneralGroup2 OBJECT-GROUP
+    OBJECTS {
+        juniERXSysChassisRev,
+        juniERXSysSwVersion,
+        juniERXSysSwBuildDate,
+        juniERXSysRevertControl,
+        juniERXSysRevertTimeOfDay,
+        juniERXSysBootConfigControl,
+        juniERXSysBootBackupConfigControl,
+        juniERXSysBootForceBackupControl,
+        juniERXSysBootAutoRevertControl,
+        juniERXSysBootAutoRevertCountTolerance,
+        juniERXSysBootAutoRevertTimeTolerance,
+        juniERXSysBootReleaseFile,
+        juniERXSysBootConfigFile,
+        juniERXSysBootBackupReleaseFile,
+        juniERXSysBootBackupConfigFile,
+        juniERXSysMemUtilPct,
+        juniERXSysMemCapacity,
+        juniERXSysHighMemUtilThreshold,
+        juniERXSysAbatedMemUtilThreshold,
+        juniERXSysMemUtilTrapEnable }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects pertaining to general system
+        capabilities in a Juniper product.  This group became obsolete when the
+        general trap control object was added."
+    ::= { juniERXSysGroups 12 }                                    -- JUNOSe 3.2
+
+juniERXSysNotifyGroup2 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniERXSysSlotOperStatusChange,
+        juniERXSysPowerStatusChange,
+        juniERXSysTempFanStatusChange,
+        juniERXSysTempStatusChange,
+        juniERXSysHighMemUtil,
+        juniERXSysAbatedMemUtil }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management notifications pertaining to system
+        operations in a Juniper product.  This group became obsolete when the
+        tempProtectionStatusChange notification was added."
+    ::= { juniERXSysGroups 13 }                                    -- JUNOSe 3.2
+
+juniERXSysTemperatureGroup2 OBJECT-GROUP
+    OBJECTS {
+        juniERXSysTempFanStatus,
+        juniERXSysTempDescr,
+        juniERXSysTempStatus,
+        juniERXSysTempValue,
+        juniERXSysTempProtectionStatus,
+        juniERXSysTempProtectionHoldOffTime,
+        juniERXSysTempProtectionHoldOffTimeRemaining }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to system temperature
+        monitoring capabilities in a Juniper product."
+    ::= { juniERXSysGroups 14 }                                    -- JUNOSe 3.3
+
+juniERXSysNotifyGroup3 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniERXSysSlotOperStatusChange,
+        juniERXSysPowerStatusChange,
+        juniERXSysTempFanStatusChange,
+        juniERXSysTempStatusChange,
+        juniERXSysHighMemUtil,
+        juniERXSysAbatedMemUtil,
+        juniERXSysTempProtectionStatusChange }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management notifications pertaining to system
+        operations in a Juniper product."
+    ::= { juniERXSysGroups 15 }                                    -- JUNOSe 3.3
+
+juniERXSysGeneralGroup3 OBJECT-GROUP
+    OBJECTS {
+        juniERXSysChassisRev,
+        juniERXSysSwVersion,
+        juniERXSysSwBuildDate,
+        juniERXSysRevertControl,
+        juniERXSysRevertTimeOfDay,
+        juniERXSysBootConfigControl,
+        juniERXSysBootBackupConfigControl,
+        juniERXSysBootForceBackupControl,
+        juniERXSysBootAutoRevertControl,
+        juniERXSysBootAutoRevertCountTolerance,
+        juniERXSysBootAutoRevertTimeTolerance,
+        juniERXSysBootReleaseFile,
+        juniERXSysBootConfigFile,
+        juniERXSysBootBackupReleaseFile,
+        juniERXSysBootBackupConfigFile,
+        juniERXSysMemUtilPct,
+        juniERXSysMemCapacity,
+        juniERXSysHighMemUtilThreshold,
+        juniERXSysAbatedMemUtilThreshold,
+        juniERXSysMemUtilTrapEnable,
+        juniERXSysGeneralTrapEnable }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of management objects pertaining to general system
+        capabilities in a Juniper product."
+   ::= { juniERXSysGroups 16 }                                     -- JUNOSe 4.1
+
+END

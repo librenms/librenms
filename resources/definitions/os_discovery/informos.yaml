@@ -1,0 +1,3 @@
+modules:
+  os:
+    sysDescr_regex: '/(HPE?_)?(?<hardware>(3PAR|InServ) .*), (?<features>ID: .*), Serial number: (?<serial>.*), InForm OS version: (?<version>.*)/'

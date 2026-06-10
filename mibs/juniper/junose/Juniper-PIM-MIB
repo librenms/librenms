@@ -1,0 +1,1745 @@
+
+-- *****************************************************************************
+-- Juniper-PIM-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Protocol Independent Multicast (PIM) MIB
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-PIM-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    pimInterfaceIfIndex, pimRPSetComponent, pimRPSetGroupAddress,
+    pimRPSetGroupMask, pimRPSetAddress
+        FROM PIM-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniPimMIB  MODULE-IDENTITY
+    LAST-UPDATED "200209162144Z"  -- 16-Sep-02 05:44 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The enterprise MIB module for management of PIM routers."
+    -- Revision History
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200103191537Z"  -- 19-Mar-01 10:37 AM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial enterprise version."
+    ::= { juniMibs 43 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniPimType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This data type is used do identify Sparse mode and Dense mode PIM
+        protocol."
+    SYNTAX      INTEGER {
+                    invalid(0),         -- not valid value
+                    dense(1),           -- dense mode PIM
+                    sparse(2),          -- sparse mode PIM
+                    sparseAndDense(3) } -- both sparse and dense mode PIM
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimMIBObjects OBJECT IDENTIFIER ::= { juniPimMIB 1 }
+juniPimTraps      OBJECT IDENTIFIER ::= { juniPimMIBObjects 0 }
+juniPimGlobal     OBJECT IDENTIFIER ::= { juniPimMIBObjects 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Pim General Group
+--
+-- NOTE: RowStatus rowStatus.  This needs to go into virtual-router
+--       MIB table so that we can create/destroy PIM
+--
+-- PimPktStats: these actually augment the general group of standard MIB
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimNumHelloRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Hellos received by PIM on this router."
+    ::= { juniPimGlobal 1 }
+
+juniPimNumJoinPruneRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of JoinPrunes received by PIM on this router."
+    ::= { juniPimGlobal 2 }
+
+juniPimNumAssertRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Asserts received by PIM on this router."
+    ::= { juniPimGlobal 3 }
+
+juniPimNumGraftRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Grafts received by PIM on this router."
+    ::= { juniPimGlobal 4 }
+
+juniPimNumGraftAckRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Graft Acks received by PIM on this router."
+    ::= { juniPimGlobal 5 }
+
+juniPimNumHelloSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Hellos sent by PIM on this router."
+    ::= { juniPimGlobal 6 }
+
+juniPimNumJoinPruneSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of JoinPrunes sent by PIM on this router."
+    ::= { juniPimGlobal 7 }
+
+juniPimNumAssertSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Asserts sent by PIM on this router."
+    ::= { juniPimGlobal 8 }
+
+juniPimNumGraftSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Grafts sent by PIM on this router."
+    ::= { juniPimGlobal 9 }
+
+juniPimNumGraftAckSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of Graft Acks sent by PIM on this router."
+    ::= { juniPimGlobal 10 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Pim Interface Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimInterfaceTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing enterprise specific information on a
+        subset of the rows of the pimInterfaceTable defined in the standard PIM
+        MIB."
+    ::= { juniPimGlobal 11 }
+
+juniPimInterfaceEntry  OBJECT-TYPE
+    SYNTAX      JuniPimInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimInterfaceTable.  There is one
+        entry per entry in the pimInterfaceTable."
+    INDEX     { pimInterfaceIfIndex }
+    ::= { juniPimInterfaceTable 1 }
+
+JuniPimInterfaceEntry ::= SEQUENCE {
+    juniPimIntfNumHelloRcvd         Integer32,
+    juniPimIntfNumJoinPruneRcvd     Integer32,
+    juniPimIntfNumAssertRcvd        Integer32,
+    juniPimIntfNumGraftRcvd         Integer32,
+    juniPimIntfNumGraftAckRcvd      Integer32,
+    juniPimIntfNumHelloSent         Integer32,
+    juniPimIntfNumJoinPruneSent     Integer32,
+    juniPimIntfNumAssertSent        Integer32,
+    juniPimIntfNumGraftSent         Integer32,
+    juniPimIntfNumGraftAckSent      Integer32,
+    juniPimIntfVersion              INTEGER,
+    juniPimIntfNumNbrs              Integer32 }
+
+juniPimIntfNumHelloRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Hellos received by PIM on this interface.  It can only
+        be cleared to 0 when doing set.  Setting this also sets counters for
+        other types of packets to 0."
+    ::= { juniPimInterfaceEntry 1 }
+
+juniPimIntfNumJoinPruneRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of JoinPrunes received by PIM on this interface.  It can
+        only be cleared to 0 when doing set.  Setting this also sets counters
+        for other types of packets to 0."
+    ::= { juniPimInterfaceEntry 2 }
+
+juniPimIntfNumAssertRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Asserts received by PIM on this interface.  It can only
+        be cleared to 0 when doing set.  Setting this also sets counters for
+        other types of packets to 0."
+    ::= { juniPimInterfaceEntry 3 }
+
+juniPimIntfNumGraftRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Grafts received by PIM on this interface.  It can only
+        be cleared to 0 when doing set.  Setting this also sets counters for
+        other types of packets to 0."
+    ::= { juniPimInterfaceEntry 4 }
+
+juniPimIntfNumGraftAckRcvd  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Graft Acks received by PIM on this interface.  It can
+        only be cleared to 0 when doing set.  Setting this also sets counters
+        for other types of packets to 0."
+    ::= { juniPimInterfaceEntry 5 }
+
+juniPimIntfNumHelloSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Hellos sent by PIM on this interface.  It can only be
+        cleared to 0 when doing set.  Setting this also sets counters for other
+        types of packets to 0."
+    ::= { juniPimInterfaceEntry 6 }
+
+juniPimIntfNumJoinPruneSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of JoinPrunes sent by PIM on this interface.  It can only
+        be cleared to 0 when doing set.  Setting this also sets counters for
+        other types of packets to 0."
+    ::= { juniPimInterfaceEntry 7 }
+
+juniPimIntfNumAssertSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Asserts sent by PIM on this interface.  It can only be
+        cleared to 0 when doing set.  Setting this also sets counters for other
+        types of packets to 0."
+    ::= { juniPimInterfaceEntry 8 }
+
+juniPimIntfNumGraftSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Grafts sent by PIM on this interface.  It can only be
+        cleared to 0 when doing set.  Setting this also sets counters for other
+        types of packets to 0."
+    ::= { juniPimInterfaceEntry 9 }
+
+juniPimIntfNumGraftAckSent  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Total number of Graft Acks sent by PIM on this interface.  It can only
+        be cleared to 0 when doing set.  Setting this also sets counters for
+        other types of packets to 0."
+    ::= { juniPimInterfaceEntry 10 }
+
+juniPimIntfVersion  OBJECT-TYPE
+    SYNTAX      INTEGER (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of PIM running on this interface."
+    ::= { juniPimInterfaceEntry 11 }
+
+juniPimIntfNumNbrs  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of PIM neighbors detected on this interface."
+    ::= { juniPimInterfaceEntry 12 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM Multicast Route Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimMRouteTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimMRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing PIM multicast routing information
+        describing its <*, *, RP>/ <*, G>/ <S, G> states."
+    ::= { juniPimGlobal 12 }
+
+juniPimMRouteEntry  OBJECT-TYPE
+    SYNTAX      JuniPimMRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimMRouteTable."
+    INDEX     { juniPimMRouteGroup,
+                juniPimMRouteSource,
+                juniPimMRouteSourceMask,
+                juniPimMRouteRPAddress }
+    ::= { juniPimMRouteTable 1 }
+
+JuniPimMRouteEntry ::= SEQUENCE {
+    juniPimMRouteGroup                         IpAddress,
+    juniPimMRouteSource                        IpAddress,
+    juniPimMRouteSourceMask                    IpAddress,
+    juniPimMRouteRPAddress                     IpAddress,
+    juniPimMRouteUpstreamAssertTimer           TimeTicks,
+    juniPimMRouteAssertMetric                  Integer32,
+    juniPimMRouteAssertPref                    Integer32,
+    juniPimMRouteAssertRPTBit                  TruthValue,
+    juniPimMRouteBits                          BITS,
+    juniPimMRouteRPAddrInUse                   IpAddress,
+    juniPimMRouteUpstreamNbr                   IpAddress,
+    juniPimMRouteIifAddr                       IpAddress,
+    juniPimMRouteIsWaitingToSwitchToSPT        TruthValue,
+    juniPimMRouteEntryExpiryTimer              TimeTicks,
+    juniPimMRouteSenderDRAddr                  IpAddress,
+    juniPimMRouteRouteAddr                     IpAddress,
+    juniPimMRouteRouteMask                     IpAddress,
+    juniPimMRouteGRPAddr                       IpAddress,
+    juniPimMRouteGRPMask                       IpAddress,
+    juniPimMRouteOtherProtoOifJoinTypeAll      TruthValue,
+    juniPimMRouteOtherProtoOifJoinTypeG        TruthValue,
+    juniPimMRouteOtherProtoOifJoinTypeSG       TruthValue,
+    juniPimMRoutePimType                       JuniPimType }
+
+juniPimMRouteGroup  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The group address.  Specified as 224.0.0.0 for <*, *, RP> entries."
+    ::= { juniPimMRouteEntry 1 }
+
+juniPimMRouteSource  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The source address. Specified as 0.0.0.0 for <*, *, RP> and <*, G>
+        entries."
+    ::= { juniPimMRouteEntry 2 }
+
+juniPimMRouteSourceMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The source address mask. Specified as 255.255.255.255 for <S, G>
+        entries and 0.0.0.0 for <*, *, RP> and <*, G> entries."
+    ::= { juniPimMRouteEntry 3 }
+
+juniPimMRouteRPAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The RP address used for <*, *, RP>.  Specified as 0.0.0.0 for <S, G>
+        and <*, G> entries."
+    ::= { juniPimMRouteEntry 4 }
+
+juniPimMRouteUpstreamAssertTimer  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining before the router changes its upstream neighbor back
+        to its RPF neighbor.  This timer is called the Assert timer in the PIM
+        Sparse and Dense mode specification.  A value of 0 indicates that no
+        Assert has changed the upstream neighbor away from the RPF neighbor."
+    ::= { juniPimMRouteEntry 5 }
+
+juniPimMRouteAssertMetric  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The metric advertised by the assert winner on the upstream interface,
+        or 0 if no such assert is in received."
+    ::= { juniPimMRouteEntry 6 }
+
+juniPimMRouteAssertPref  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The preference advertised by the assert winner on the upstream
+        interface, or 0 if no such assert is in effect."
+    ::= { juniPimMRouteEntry 7 }
+
+juniPimMRouteAssertRPTBit  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the RPT-bit advertised by the assert winner on the
+        upstream interface, or false if no such assert is in effect."
+    ::= { juniPimMRouteEntry 8 }
+
+juniPimMRouteBits  OBJECT-TYPE
+    SYNTAX      BITS {
+                    rpt(0),
+                    spt(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes whether the entry is on shared tree (RPT) or
+        shortest path tree (SPT)."
+    ::= { juniPimMRouteEntry 9 }
+
+juniPimMRouteRPAddrInUse  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RP Address being used for the <S, G>RPT/<*, G>/<*, *, RP> entries.
+        Set to 0.0.0.0 for <S, G> entries on shortest path tree."
+    ::= { juniPimMRouteEntry 10 }
+
+juniPimMRouteUpstreamNbr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of upstream neighbor being used for the entry.  Its set to
+        0.0.0.0 if the router is directly attached to source on one of its
+        interface. "
+    ::= { juniPimMRouteEntry 11 }
+
+juniPimMRouteIifAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of incoming interface for this entry."
+    ::= { juniPimMRouteEntry 12 }
+
+juniPimMRouteIsWaitingToSwitchToSPT  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+
+        "This object describes whether the entry is still waiting to switch
+        completely to shortest path tree in case of <S, G> entries.  It waits to
+        do this till it receives first packet from incoming interface towards
+        shortest path tree."
+    ::= { juniPimMRouteEntry 13 }
+
+juniPimMRouteEntryExpiryTimer  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time after which the entry timer expires for this entry.  Set to 0
+        if entry timer is not active."
+    ::= { juniPimMRouteEntry 14 }
+
+juniPimMRouteSenderDRAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the designated router on the sender's subnet in case of
+        <S, G> entries.  The sender designated router register encapsulates data
+        to RP.  Set to 0.0.0.0 for <*, G> and <*, *, RP> entries."
+    ::= { juniPimMRouteEntry 15 }
+
+juniPimMRouteRouteAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the route being used to do RPF check for this entry.  It
+        is set to 0.0.0.0 (with juniPimMRouteRouteMask set to 255.255.255.255)
+        if there is no route available."
+    ::= { juniPimMRouteEntry 16 }
+
+juniPimMRouteRouteMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mask of the route being used to do RPF check for this entry.  It is
+        set to 255.255.255.255 (with juniPimMRouteRoute set to 0.0.0.0) if there
+        is no route available."
+    ::= { juniPimMRouteEntry 17 }
+
+juniPimMRouteGRPAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The address of the group-to-RP mapping being used to get the RP for
+        this entry.  It is set to 0.0.0.0 (with juniPimMRouteGRPMask set to
+        0.0.0.0) if there is no group-to-RP mapping available or if entry is <*,
+        *, RP>."
+    ::= { juniPimMRouteEntry 18 }
+
+juniPimMRouteGRPMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mask of the group-to-RP mapping being used to get the RP for this
+        entry.  It is set to 255.255.255.255 (with juniPimMRouteGRPAddr set to
+        0.0.0.0) if there is no group-to-RP mapping available or if entry is <*,
+        *, RP>."
+    ::= { juniPimMRouteEntry 19 }
+
+juniPimMRouteOtherProtoOifJoinTypeAll  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if some other multicast protocol is also
+        interested in receiving data for this entry as a result of its interest
+        in receiving all data.  This will be particularly true for dense mode
+        protocols which would want all data (<*, *>) from PIM sparse mode
+        protocol."
+    ::= { juniPimMRouteEntry 20 }
+
+juniPimMRouteOtherProtoOifJoinTypeG  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if some other multicast protocol is also
+        interested in receiving data for this entry as a result of its interest
+        in receiving data for a given group.  This will be particularly true for
+        IGMP which would want data for a given group (<*, G>) from PIM
+        protocol."
+    ::= { juniPimMRouteEntry 21 }
+
+juniPimMRouteOtherProtoOifJoinTypeSG  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if some other multicast protocol is also
+        interested in receiving data for this entry as a result of its interest
+        in receiving data for a given <source, group>.  This will be
+        particularly true for IGMPv3 which would want data for a given <source,
+        group (<S, G>) from PIM sparse-mode protocol."
+    ::= { juniPimMRouteEntry 22 }
+
+juniPimMRoutePimType  OBJECT-TYPE
+    SYNTAX      JuniPimType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates if the owner of this entry is Sparse mode or
+        Dense mode PIM.  Owner is usually determined by the protocol running on
+        the incoming interface of the entry.  In case sparse-dense mode PIM is
+        running on the incoming interface, sparse-mode is the owner if RP for
+        the group is known, else dense mode is the owner."
+    ::= { juniPimMRouteEntry 23 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM Next Hop Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimMRouteNextHopTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimMRouteNextHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing PIM multicast routing information
+        describing its <*, *, RP>/ <*, G>/ <S, G> outgoing interfaces."
+    ::= { juniPimGlobal 13 }
+
+juniPimMRouteNextHopEntry  OBJECT-TYPE
+    SYNTAX      JuniPimMRouteNextHopEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimMRouteNextHopTable."
+    INDEX     { juniPimMRouteNextHopGroupAddr,
+                juniPimMRouteNextHopSrcAddr,
+                juniPimMRouteNextHopSrcMask,
+                juniPimMRouteNextHopRPAddr,
+                juniPimMRouteNextHopIfId,
+                juniPimMRouteNextHopAddress }
+    ::= { juniPimMRouteNextHopTable 1 }
+
+JuniPimMRouteNextHopEntry ::= SEQUENCE {
+    juniPimMRouteNextHopGroupAddr                   IpAddress,
+    juniPimMRouteNextHopSrcAddr                     IpAddress,
+    juniPimMRouteNextHopSrcMask                     IpAddress,
+    juniPimMRouteNextHopRPAddr                      IpAddress,
+    juniPimMRouteNextHopIfId                        InterfaceIndex,
+    juniPimMRouteNextHopAddress                     IpAddress,
+    juniPimMRouteNextHopPruneReason                 INTEGER,
+    juniPimMRouteNextHopJoinTypeSSRP                TruthValue,
+    juniPimMRouteNextHopJoinTypeG                   TruthValue,
+    juniPimMRouteNextHopJoinTypeSG                  TruthValue,
+    juniPimMRouteNextHopHasLGM                      TruthValue,
+    juniPimMRouteNextHopHasOifAW                    TruthValue,
+    juniPimMRouteNextHopHasOifSendAssert            TruthValue,
+    juniPimMRouteNextHopHasOifRegister              TruthValue,
+    juniPimMRouteNextHopHasOifBorderBit             TruthValue,
+    juniPimMRouteNextHopHasOifNullEncapsBit         TruthValue,
+    juniPimMRouteNextHopJoinEndTimer                TimeTicks,
+    juniPimMRouteNextHopAssertEndTimer              TimeTicks,
+    juniPimMRouteNextHopNextAssertTimer             TimeTicks,
+    juniPimMRouteNextHopAssertSrcAddress            IpAddress,
+    juniPimMRouteNextHopRegisterSuppressionTimer    TimeTicks,
+    juniPimMRouteNextHopPimType                     JuniPimType,
+    juniPimMRouteNextHopPruneTimeLeft               TimeTicks,
+    juniPimMRouteNextHopsendingIpAddress            IpAddress }
+
+juniPimMRouteNextHopGroupAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The group address. Specified as 224.0.0.0 for <*, *, RP> entries."
+    ::= { juniPimMRouteNextHopEntry 2 }
+
+juniPimMRouteNextHopSrcAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The source address. Specified as 0.0.0.0 for <*, *, RP> and <*, G>
+        entries."
+    ::= { juniPimMRouteNextHopEntry 3 }
+
+juniPimMRouteNextHopSrcMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The source address mask. Specified as 255.255.255.255 for <S, G>
+        entries and 0.0.0.0 for <*, *, RP> and <*, G> entries."
+    ::= { juniPimMRouteNextHopEntry 4 }
+
+juniPimMRouteNextHopRPAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The RP address used for <*, *, RP>. Specified as 0.0.0.0 for <S, G> and
+        <*, G> entries."
+    ::= { juniPimMRouteNextHopEntry 5 }
+
+juniPimMRouteNextHopIfId  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the outgoing interface (next hop).  Specified as
+        0 for register outgoing interface.  Register outgoing interfaces are
+        created by DR on the source subnet to send PIM register encapsulated
+        data (as unicast) to RP.  It is also used by PIM boundary routers
+        (PMBRs) to register data to RP."
+    ::= { juniPimMRouteNextHopEntry 6 }
+
+juniPimMRouteNextHopAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object takes following different values based on the type of next
+        hop.  It should be set to the address of RP in case the next hop
+        interface is register interface i.e. juniPimMRouteNextHopIfId object is
+        set to 0.  It should be set to the address of neighbor in case the
+        interface is an NBMA interface.  In all other cases it should be set to
+        the group address itself."
+    ::= { juniPimMRouteNextHopEntry 7 }
+
+juniPimMRouteNextHopPruneReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    other(1),
+                    prune(2),
+                    assert(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates why the downstream interface was pruned, whether
+        in response to a PIM prune message or due to PIM Assert processing."
+    ::= { juniPimMRouteNextHopEntry 8 }
+
+juniPimMRouteNextHopJoinTypeSSRP  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not the interface was added as a
+        result of receiving <*, *, RP> join in case of <*, *, RP> entry OR
+        inherited as outgoing interface from corresponding <*, *, RP> entry in
+        case of <*, G> entry."
+    ::= { juniPimMRouteNextHopEntry 9 }
+
+juniPimMRouteNextHopJoinTypeG  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not the interface was added as a
+        result of receiving <*, G> join in case of <*, G> entry OR inherited as
+        outgoing interface from corresponding <*, G> entry in case of <S, G>
+        entry."
+    ::= { juniPimMRouteNextHopEntry 10 }
+
+juniPimMRouteNextHopJoinTypeSG  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not the interface was added as a
+        result of receiving <S, G> join in case of <S, G> entry."
+    ::= { juniPimMRouteNextHopEntry 11 }
+
+juniPimMRouteNextHopHasLGM  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not the interface has local group
+        membership (as indicated by IGMP) in case of <*, G> and <S, G> entries."
+    ::= { juniPimMRouteNextHopEntry 12 }
+
+juniPimMRouteNextHopHasOifAW  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not this interface is the winner of
+        assert for corresponding <*, G>/<S, G> entry."
+    ::= { juniPimMRouteNextHopEntry 13 }
+
+juniPimMRouteNextHopHasOifSendAssert  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not this interface is going to send an
+        assert at the end of assert suppression interval.  Assert suppression is
+        used to prevent a flood of assert to be generated in response to data or
+        other asserts."
+    ::= { juniPimMRouteNextHopEntry 14 }
+
+juniPimMRouteNextHopHasOifRegister  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether or not this next hop is a register
+        outgoing interface."
+    ::= { juniPimMRouteNextHopEntry 15 }
+
+juniPimMRouteNextHopHasOifBorderBit  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to describe a register outgoing interface.  It
+        indicates whether or not the border bit is set in the register packet
+        when the packet is sent over the register interface.  For all other
+        (non-register) interfaces its set to false."
+    ::= { juniPimMRouteNextHopEntry 16 }
+
+juniPimMRouteNextHopHasOifNullEncapsBit  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to describe a register outgoing interface.  It
+        indicates whether or not the NULL encapsulation bit is set
+        (periodically) in the register packet when the packet is sent over the
+        register interface.  For all other (non-register) interfaces its set to
+        false."
+    ::= { juniPimMRouteNextHopEntry 17 }
+
+juniPimMRouteNextHopJoinEndTimer  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the time (in seconds) left when the join timer
+        expires for the outgoing interface.  Join timer for an outgoing
+        interface of <S, G> entry indicates when the <S, G> join expires, for a
+        <*, G> entry indicates when the <*, G> join expires and for a <*, *, RP>
+        entry indicates when the <*, *, RP> join expires.  Inherited joins (like
+        <S, G> inheriting from <*, G> AND <*, G> inheriting from <*, *, RP>)
+        expire when the corresponding parent join expires."
+    ::= { juniPimMRouteNextHopEntry 18 }
+
+juniPimMRouteNextHopAssertEndTimer  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the time (in seconds) left when the assert timer
+        expires on this outgoing inteface."
+    ::= { juniPimMRouteNextHopEntry 19 }
+
+juniPimMRouteNextHopNextAssertTimer  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the duration (in seconds) left for which sending
+        an assert has been suppressed on this outgoing interface."
+    ::= { juniPimMRouteNextHopEntry 20 }
+
+juniPimMRouteNextHopAssertSrcAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the source address which will be used in the
+        assert packet to send an assert out for the entry on this outgoing
+        interface.  For <S, G> entries it is the address of the source S itself.
+        For <*, G> entries it is the address of the source whose data was
+        forwarded using this <*, G> and caused the assert situation to happen."
+    ::= { juniPimMRouteNextHopEntry 21 }
+
+juniPimMRouteNextHopRegisterSuppressionTimer  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used for register outgoing interfaces.  It indicates the
+        duration (in seconds) left for which sending a register packet has been
+        suppressed on the register outgoing interface as a result of receiving
+        register-stop from the RP."
+    ::= { juniPimMRouteNextHopEntry 22 }
+
+juniPimMRouteNextHopPimType  OBJECT-TYPE
+    SYNTAX      JuniPimType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the outgoing interface was contributed by
+        sparse-mode or dense-mode PIM."
+    ::= { juniPimMRouteNextHopEntry 23 }
+
+juniPimMRouteNextHopPruneTimeLeft  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the time (in seconds) left when the prune timer
+        expires on an outgoing inteface.  Its used for pruned outgoing
+        interfaces contributed by dense-mode PIM."
+    ::= { juniPimMRouteNextHopEntry 24 }
+
+juniPimMRouteNextHopsendingIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the source IP address used by this interface to
+        send PIM packets out on this outgoing interface."
+    ::= { juniPimMRouteNextHopEntry 25 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM RP-Set Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimRPSetTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimRPSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing enterprise specific information on a
+        subset of the rows of the pimRPSetTable defined in the standard PIM
+        MIB."
+    ::= { juniPimGlobal 14 }
+
+juniPimRPSetEntry  OBJECT-TYPE
+    SYNTAX      JuniPimRPSetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimRPSetTable."
+    INDEX     { pimRPSetComponent,
+                pimRPSetGroupAddress,
+                pimRPSetGroupMask,
+                pimRPSetAddress }
+    ::= { juniPimRPSetTable 1 }
+
+JuniPimRPSetEntry ::= SEQUENCE {
+    juniPimRPSetPriority        Integer32,
+    juniPimRPSetTypeInfo        INTEGER,
+    juniPimRPSetAccessListName  OCTET STRING }
+
+juniPimRPSetPriority  OBJECT-TYPE
+    SYNTAX      Integer32 (1..'FFFF'h)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the priority of the RP for this group-to-RP
+        mapping."
+    ::= { juniPimRPSetEntry 1 }
+
+juniPimRPSetTypeInfo  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    pimRPTypeInvalid(0),
+                    pimRPTypeStatic(1),
+                    pimRPTypeStaticOverride(2),
+                    pimRPTypeAutoRP(3),
+                    pimRPTypeBSR(4),
+                    pimRPTypeStaticNegative(5),
+                    pimRPTypeStaticOverrideNegative(6),
+                    pimRPTypeAutoRPNegative(7),
+                    pimRPTypeBSRNegative(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the mechanism by which this group to RP mapping
+        has been learnt, i.e. whether its statically configured, AutoRP learnt
+        or BSR learnt.  It also indicates whether the mapping is positive or
+        negative.  Negative mappings force the groups in that range to fall into
+        dense-mode category if sparse-dense mode is configured or no RP if its
+        purely sparse mode configuration."
+    ::= { juniPimRPSetEntry 2 }
+
+juniPimRPSetAccessListName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object lists the name of the access list from which this
+         group-to-RP mapping was picked up in case of statically configured
+         RPs."
+    ::= { juniPimRPSetEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM Static RP configuration table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimStaticRPConfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimStaticRPConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing statically configured PIM RPs."
+    ::= { juniPimGlobal 15 }
+
+juniPimStaticRPConfEntry  OBJECT-TYPE
+    SYNTAX      JuniPimStaticRPConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimStaticRPConfTable."
+    INDEX     { juniPimStaticRPConfComponentIndex,
+                juniPimStaticRPConfRPAddr,
+                juniPimStaticRPConfAccessListName }
+    ::= { juniPimStaticRPConfTable 1 }
+
+JuniPimStaticRPConfEntry ::= SEQUENCE {
+    juniPimStaticRPConfComponentIndex   Integer32,
+    juniPimStaticRPConfRPAddr           IpAddress,
+    juniPimStaticRPConfAccessListName   OCTET STRING,
+    juniPimStaticRPConfRowStatus        RowStatus,
+    juniPimStaticRPConfOverride         TruthValue }
+
+juniPimStaticRPConfComponentIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number uniquely identifying the component.  Each protocol instance
+        connected to a separate domain should have a different index value."
+    ::= { juniPimStaticRPConfEntry 1 }
+
+juniPimStaticRPConfRPAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Ip address of the RP which for the group-to-RP mapping being
+        configured."
+    ::= { juniPimStaticRPConfEntry 2 }
+
+juniPimStaticRPConfAccessListName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Name of the access list from which group-ranges are picked up for this
+        group-ro-RP mapping.  Every deny component in the list is added as
+        negative group-ro-RP mapping."
+    ::= { juniPimStaticRPConfEntry 3 }
+
+juniPimStaticRPConfRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this row, by which new entries may be created, or old
+        entries deleted from this table."
+    ::= { juniPimStaticRPConfEntry 4 }
+
+juniPimStaticRPConfOverride  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object indicates whether or not this statically configured
+        group-to-RP mapping should override the group-to-RP mapping learnt via
+        AutoRP for the component group-ranges in the access list.  By default
+        AutoRP learnt group-to-RP mappings are preferred over statically
+        configured ones.  While setting the rowStatus to create a static RP,
+        this field should be assigned to true if the override property is
+        desired."
+    DEFVAL    { false }
+    ::= { juniPimStaticRPConfEntry 5 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM AutoRP Candidate RP configuration table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimAutoRPConfTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimAutoRPConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table allowing AutoRP configuration of candidate RPs
+        (advertisement agents)."
+    ::= { juniPimGlobal 16 }
+
+juniPimAutoRPConfEntry  OBJECT-TYPE
+    SYNTAX      JuniPimAutoRPConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimAutoRPConfTable."
+    INDEX     { juniPimAutoRPConfComponentIndex,
+                juniPimAutoRPConfCandRPAddr,
+                juniPimAutoRPConfGroupAccessListName }
+    ::= { juniPimAutoRPConfTable 1 }
+
+JuniPimAutoRPConfEntry ::= SEQUENCE {
+    juniPimAutoRPConfComponentIndex         Integer32,
+    juniPimAutoRPConfCandRPAddr             IpAddress,
+    juniPimAutoRPConfGroupAccessListName    OCTET STRING,
+    juniPimAutoRPConfRowStatus              RowStatus,
+    juniPimAutoRPConfTTL                    Integer32,
+    juniPimAutoRPConfAncmntIntvl            TimeTicks,
+    juniPimAutoRPConfifId                   InterfaceIndex }
+
+juniPimAutoRPConfComponentIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number uniquely identifying the component.  Each protocol instance
+        connected to a separate domain should have a different index value."
+    ::= { juniPimAutoRPConfEntry 1 }
+
+juniPimAutoRPConfCandRPAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the candidate RP for this advertising agent
+        configuration."
+    ::= { juniPimAutoRPConfEntry 2 }
+
+juniPimAutoRPConfGroupAccessListName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The access list name from which group ranges are picked up for
+        advertising agent configuration."
+    ::= { juniPimAutoRPConfEntry 3 }
+
+juniPimAutoRPConfRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this row, by which new entries may be created, or old
+        entries deleted from this table."
+    ::= { juniPimAutoRPConfEntry 4 }
+
+juniPimAutoRPConfTTL  OBJECT-TYPE
+    SYNTAX      Integer32 (1..'FFFF'h)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The time-to-live value used while sending AutoRP advertisement out for
+        this group-to-RP mappings created as a result of this configuration.
+        This should be set along with juniPimAutoRPConfRowStatus while creating
+        an AutoRP advertising agent to denote the TTL value to be used."
+    DEFVAL    { 64 }
+    ::= { juniPimAutoRPConfEntry 5 }
+
+juniPimAutoRPConfAncmntIntvl  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The time interval at which AutoRP advertisements are sent out for the
+        group-to-RP mappings created as a result of this configuration.  This
+        should be set along with juniPimAutoRPConfRowStatus while creating an
+        AutoRP advertising agent to denote the announcement interval to be
+        used."
+    DEFVAL    { 60 }
+    ::= { juniPimAutoRPConfEntry 6 }
+
+juniPimAutoRPConfifId  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the interface for the candidate RP if an
+        interface with that address exists else it is set to 0."
+    ::= { juniPimAutoRPConfEntry 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM AutoRP candidate RP table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimAutoRPCandTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimAutoRPCandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing AutoRP candidate RPS (advertising
+        agents)."
+    ::= { juniPimGlobal 17 }
+
+juniPimAutoRPCandEntry  OBJECT-TYPE
+    SYNTAX      JuniPimAutoRPCandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimAutoRPCandTable."
+    INDEX     { juniPimAutoRPCandComponentIndex,
+                juniPimAutoRPCandRPAddr,
+                juniPimAutoRPCandGroupAddr,
+                juniPimAutoRPCandGroupMask }
+    ::= { juniPimAutoRPCandTable 1 }
+
+JuniPimAutoRPCandEntry ::= SEQUENCE {
+    juniPimAutoRPCandComponentIndex     Integer32,
+    juniPimAutoRPCandRPAddr             IpAddress,
+    juniPimAutoRPCandGroupAddr          IpAddress,
+    juniPimAutoRPCandGroupMask          IpAddress,
+    juniPimAutoRPCandRowStatus          RowStatus,
+    juniPimAutoRPCandAccessListName     OCTET STRING,
+    juniPimAutoRPCandAutoRPTTL          Integer32,
+    juniPimAutoRPCandAutoRPAncmntIntvl  TimeTicks,
+    juniPimAutoRPCandIfId               InterfaceIndex }
+
+juniPimAutoRPCandComponentIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number uniquely identifying the component.  Each protocol instance
+        connected to a separate domain should have a different index value."
+    ::= { juniPimAutoRPCandEntry 1 }
+
+juniPimAutoRPCandRPAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the candidate RP for this group-to-RP mapping."
+    ::= { juniPimAutoRPCandEntry 2 }
+
+juniPimAutoRPCandGroupAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The group address of the candidate RP for this group-to-RP mapping."
+    ::= { juniPimAutoRPCandEntry 3 }
+
+juniPimAutoRPCandGroupMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The group mask of the candidate RP for this group-to-RP mapping."
+    ::= { juniPimAutoRPCandEntry 4 }
+
+juniPimAutoRPCandRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of this row."
+    ::= { juniPimAutoRPCandEntry 5 }
+
+juniPimAutoRPCandAccessListName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the group list using which this AutoRP group-to-RP
+        candidate RP mapping was configured."
+    ::= { juniPimAutoRPCandEntry 6 }
+
+juniPimAutoRPCandAutoRPTTL  OBJECT-TYPE
+    SYNTAX      Integer32(1..'FFFF'h)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time-to-live value used while sending AutoRP advertisement out for
+        this group-to-RP mapping."
+    ::= { juniPimAutoRPCandEntry 7 }
+
+juniPimAutoRPCandAutoRPAncmntIntvl  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time interval at which AutoRP advertisements are sent out for this
+        group-to-RP mapping."
+    ::= { juniPimAutoRPCandEntry 8 }
+
+juniPimAutoRPCandIfId  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the interface for this AutoRP group-to-RP
+        candidate RP mapping if an interface for RP address exists else it is
+        set to 0."
+    ::= { juniPimAutoRPCandEntry 9 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM Component Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimComponentTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimComponentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing each component (domain) in PIM."
+    ::= { juniPimGlobal 18 }
+
+juniPimComponentEntry  OBJECT-TYPE
+    SYNTAX      JuniPimComponentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimComponentTable."
+    INDEX     { juniPimComponentIndex }
+    ::= { juniPimComponentTable 1 }
+
+JuniPimComponentEntry ::= SEQUENCE {
+    juniPimComponentIndex                               Integer32,
+    juniPimComponentAutoRPMappingAgentRowStatus         RowStatus,
+    juniPimComponentConfiguredAutoRPMappingAgentIfId    InterfaceIndex,
+    juniPimComponentAutoRPMappingAgentInterval          TimeTicks,
+    juniPimComponentAutoRPMappingTTL                    Integer32,
+    juniPimComponentAutoRPMappingAgentIntfAddr          IpAddress,
+    juniPimComponentAutoRPMappingAgentWinnerAddr        IpAddress,
+    juniPimComponentAutoRPMappingAgentWinnerLastHeard   TimeTicks }
+
+juniPimComponentIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A number uniquely identifying the component.  Each protocol instance
+        connected to a separate domain should have a different index value."
+    ::= { juniPimComponentEntry 1 }
+
+juniPimComponentAutoRPMappingAgentRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of AutoRP mapping agent by which this router can be made an
+        AutoRP mapping agent or removed from being an AutoRP mapping agent in
+        this component."
+    ::= { juniPimComponentEntry 2 }
+
+juniPimComponentConfiguredAutoRPMappingAgentIfId  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interface index of the interface which mapping agent should use to
+        send AutoRP mapping messages.  If not specified, the interface with
+        highest IP address in this domain is picked up for this purpose."
+    ::= { juniPimComponentEntry 3 }
+
+juniPimComponentAutoRPMappingAgentInterval  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The time interval at which AutoRP mapping messages are sent out in this
+        component.  The default value is 60 seconds."
+    DEFVAL    { 60 }
+    ::= { juniPimComponentEntry 4 }
+
+juniPimComponentAutoRPMappingTTL  OBJECT-TYPE
+    SYNTAX      Integer32 (1..'FFFF'h)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The time-to-live value used while sending AutoRP mapping messages out
+        in this component."
+    DEFVAL    { 64 }
+    ::= { juniPimComponentEntry 5 }
+
+juniPimComponentAutoRPMappingAgentIntfAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the interface which mapping agent is using to send
+        AutoRP mapping messages."
+    ::= { juniPimComponentEntry 6 }
+
+juniPimComponentAutoRPMappingAgentWinnerAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the winner AutoRP mapping agent.  There can be
+        multiple mapping agents configured in a given PIM domain(component).
+        The mapping agent with highest IP address is chosen as the winner and it
+        continues to send AutoRP mapping messages.  If the router itself is the
+        winner, then this is set to 0.0.0.0."
+    ::= { juniPimComponentEntry 7 }
+
+juniPimComponentAutoRPMappingAgentWinnerLastHeard  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time (in seconds) that has past since an AutoRP mapping message was
+        receieved from the winner AutoRP mapping agent.  If the router itself is
+        the winner, then this is set to 0."
+    ::= { juniPimComponentEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM Unicast Route Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimUnicastRouteTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimUnicastRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing all the unicast routes currently in use
+        by PIM for diong RPF checking."
+    ::= { juniPimGlobal 19 }
+
+juniPimUnicastRouteEntry  OBJECT-TYPE
+    SYNTAX      JuniPimUnicastRouteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimUnicastRouteTable."
+    INDEX     { juniPimUnicastRouteEntryAddr,
+                juniPimUnicastRouteEntryMask }
+    ::= { juniPimUnicastRouteTable 1 }
+
+JuniPimUnicastRouteEntry ::= SEQUENCE {
+    juniPimUnicastRouteEntryAddr        IpAddress,
+    juniPimUnicastRouteEntryMask        IpAddress,
+    juniPimUnicastRouteEntryRpfNbr      IpAddress,
+    juniPimUnicastRouteEntryIifId       InterfaceIndex,
+    juniPimUnicastRouteEntryIifAddr     IpAddress,
+    juniPimUnicastRouteEntryPref        Integer32,
+    juniPimUnicastRouteEntryMetric      Integer32,
+    juniPimUnicastRouteEntryPimType     JuniPimType }
+
+juniPimUnicastRouteEntryAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address of route in use."
+    ::= { juniPimUnicastRouteEntry 1 }
+
+juniPimUnicastRouteEntryMask  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The mask of route in use."
+    ::= { juniPimUnicastRouteEntry 2 }
+
+juniPimUnicastRouteEntryRpfNbr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RPF neighbor (next-hop) to reach the route of this entry.  It is
+        set to 0.0.0.0 for directly connected routes."
+    ::= { juniPimUnicastRouteEntry 3 }
+
+juniPimUnicastRouteEntryIifId  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface index (next-hop) to reach the route of this entry."
+    ::= { juniPimUnicastRouteEntry 4 }
+
+juniPimUnicastRouteEntryIifAddr  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The interface address (next-hop) to reach the route of this entry."
+    ::= { juniPimUnicastRouteEntry 5 }
+
+juniPimUnicastRouteEntryPref  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The preference of the route of this entry."
+    ::= { juniPimUnicastRouteEntry 6 }
+
+juniPimUnicastRouteEntryMetric  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The metric of the route of this entry."
+    ::= { juniPimUnicastRouteEntry 7 }
+
+juniPimUnicastRouteEntryPimType  OBJECT-TYPE
+    SYNTAX      JuniPimType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the route specified in this entry is
+        being used by sparse-mode and/or dense-mode PIM."
+    ::= { juniPimUnicastRouteEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The PIM Shortest Path Tree Threshold Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimSPTThresholdTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPimSPTThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing threshold values set for switching from
+        shared tree to shortest path tree and vice versa for data forwarded by
+        PIM sparse-mode."
+    ::= { juniPimGlobal 20 }
+
+juniPimSPTThresholdEntry  OBJECT-TYPE
+    SYNTAX      JuniPimSPTThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the juniPimSPTThresholdTable."
+    INDEX     { juniPimSPTThresholdAccessListName }
+    ::= { juniPimSPTThresholdTable 1 }
+
+JuniPimSPTThresholdEntry ::= SEQUENCE {
+    juniPimSPTThresholdAccessListName   OCTET STRING,
+    juniPimSPTThresholdRowStatus        RowStatus,
+    juniPimSPTThresholdKbps             Integer32 }
+
+juniPimSPTThresholdAccessListName  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the access list from which group ranges are picked up for
+        setting SPT threshold in this entry."
+    ::= { juniPimSPTThresholdEntry 1 }
+
+juniPimSPTThresholdRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of this row, by which new entries may be created, or old
+        entries deleted from this table."
+    ::= { juniPimSPTThresholdEntry 2 }
+
+juniPimSPTThresholdKbps  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of SPT threshold in kilobits per second.  Default value is
+        0."
+    DEFVAL    { 0 }
+    ::= { juniPimSPTThresholdEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPimConformance     OBJECT IDENTIFIER ::= { juniPimMIB 2 }
+juniPimCompliances     OBJECT IDENTIFIER ::= { juniPimConformance 1 }
+juniPimGroups          OBJECT IDENTIFIER ::= { juniPimConformance 2 }
+
+--
+-- compliance statements
+--
+juniPimCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PIM
+        MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            juniPimGeneralGroup,
+            juniPimInterfaceGroup,
+            juniPimMRouteConfGroup,
+            juniPimMRouteNextHopGroup,
+            juniPimRPSetGroup,
+            juniPimStaticRPConfGroup,
+            juniPimAutoRPConfGroup,
+            juniPimAutoRPCandGroup,
+            juniPimComponentGroup,
+            juniPimUnicastRouteGroup,
+            juniPimSPTThresholdGroup }
+    ::= { juniPimCompliances 1 }
+
+-- units of conformance
+
+juniPimGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimNumHelloRcvd,
+        juniPimNumJoinPruneRcvd,
+        juniPimNumAssertRcvd,
+        juniPimNumGraftRcvd,
+        juniPimNumGraftAckRcvd,
+        juniPimNumHelloSent,
+        juniPimNumJoinPruneSent,
+        juniPimNumAssertSent,
+        juniPimNumGraftSent,
+        juniPimNumGraftAckSent }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing general PIM capabilities in a
+        Juniper product."
+    ::= { juniPimGroups 1 }                                        -- JUNOSe 3.0
+
+juniPimInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimIntfNumHelloRcvd,
+        juniPimIntfNumJoinPruneRcvd,
+        juniPimIntfNumAssertRcvd,
+        juniPimIntfNumGraftRcvd,
+        juniPimIntfNumGraftAckRcvd,
+        juniPimIntfNumHelloSent,
+        juniPimIntfNumJoinPruneSent,
+        juniPimIntfNumAssertSent,
+        juniPimIntfNumGraftSent,
+        juniPimIntfNumGraftAckSent,
+        juniPimIntfVersion,
+        juniPimIntfNumNbrs }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM interface capabilities in a
+        Juniper product."
+    ::= { juniPimGroups 2 }
+
+juniPimMRouteConfGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimMRouteUpstreamAssertTimer,
+        juniPimMRouteAssertMetric,
+        juniPimMRouteAssertPref,
+        juniPimMRouteAssertRPTBit,
+        juniPimMRouteBits,
+        juniPimMRouteRPAddrInUse,
+        juniPimMRouteUpstreamNbr,
+        juniPimMRouteIifAddr,
+        juniPimMRouteIsWaitingToSwitchToSPT,
+        juniPimMRouteEntryExpiryTimer,
+        juniPimMRouteSenderDRAddr,
+        juniPimMRouteRouteAddr,
+        juniPimMRouteRouteMask,
+        juniPimMRouteGRPAddr,
+        juniPimMRouteGRPMask,
+        juniPimMRouteOtherProtoOifJoinTypeAll,
+        juniPimMRouteOtherProtoOifJoinTypeG,
+        juniPimMRouteOtherProtoOifJoinTypeSG,
+        juniPimMRoutePimType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM multicast route capabilities
+        in a Juniper product."
+    ::= { juniPimGroups 3 }
+
+juniPimMRouteNextHopGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimMRouteNextHopPruneReason,
+        juniPimMRouteNextHopJoinTypeSSRP,
+        juniPimMRouteNextHopJoinTypeG,
+        juniPimMRouteNextHopJoinTypeSG,
+        juniPimMRouteNextHopHasLGM,
+        juniPimMRouteNextHopHasOifAW,
+        juniPimMRouteNextHopHasOifSendAssert,
+        juniPimMRouteNextHopHasOifRegister,
+        juniPimMRouteNextHopHasOifBorderBit,
+        juniPimMRouteNextHopHasOifNullEncapsBit,
+        juniPimMRouteNextHopJoinEndTimer,
+        juniPimMRouteNextHopAssertEndTimer,
+        juniPimMRouteNextHopNextAssertTimer,
+        juniPimMRouteNextHopAssertSrcAddress,
+        juniPimMRouteNextHopRegisterSuppressionTimer,
+        juniPimMRouteNextHopPimType,
+        juniPimMRouteNextHopPruneTimeLeft,
+        juniPimMRouteNextHopsendingIpAddress }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM multicast route next hop
+        capabilities in a Juniper product."
+    ::= { juniPimGroups 4 }
+
+juniPimRPSetGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimRPSetPriority,
+        juniPimRPSetTypeInfo,
+        juniPimRPSetAccessListName }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM RP-Set capabilities in a
+        Juniper product."
+    ::= { juniPimGroups 5 }
+
+juniPimStaticRPConfGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimStaticRPConfRowStatus,
+        juniPimStaticRPConfOverride }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing statically configured PIM RPs
+        capabilities in a Juniper product."
+    ::= { juniPimGroups 6 }
+
+juniPimAutoRPConfGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimAutoRPConfRowStatus,
+        juniPimAutoRPConfTTL,
+        juniPimAutoRPConfAncmntIntvl,
+        juniPimAutoRPConfifId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM AutoRP candidate advertisment
+        agent RP capabilities in a Juniper product."
+    ::= { juniPimGroups 7 }
+
+juniPimAutoRPCandGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimAutoRPCandRowStatus,
+        juniPimAutoRPCandAccessListName,
+        juniPimAutoRPCandAutoRPTTL,
+        juniPimAutoRPCandAutoRPAncmntIntvl,
+        juniPimAutoRPCandIfId }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM AutoRP candidate advertising
+        agent RP capabilities in a Juniper product."
+    ::= { juniPimGroups 8 }
+
+juniPimComponentGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimComponentAutoRPMappingAgentRowStatus,
+        juniPimComponentConfiguredAutoRPMappingAgentIfId,
+        juniPimComponentAutoRPMappingAgentInterval,
+        juniPimComponentAutoRPMappingTTL,
+        juniPimComponentAutoRPMappingAgentIntfAddr,
+        juniPimComponentAutoRPMappingAgentWinnerAddr,
+        juniPimComponentAutoRPMappingAgentWinnerLastHeard }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM component (domain)
+        capabilities in a Juniper product."
+    ::= { juniPimGroups 9 }
+
+juniPimUnicastRouteGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimUnicastRouteEntryRpfNbr,
+        juniPimUnicastRouteEntryIifId,
+        juniPimUnicastRouteEntryIifAddr,
+        juniPimUnicastRouteEntryPref,
+        juniPimUnicastRouteEntryMetric,
+        juniPimUnicastRouteEntryPimType }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM unicast route capabilities in
+        a Juniper product."
+    ::= { juniPimGroups 10 }
+
+juniPimSPTThresholdGroup OBJECT-GROUP
+    OBJECTS {
+        juniPimSPTThresholdRowStatus,
+        juniPimSPTThresholdKbps }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for managing PIM shortest path tree threshold
+        capabilities in a Juniper product."
+    ::= { juniPimGroups 11 }
+
+END

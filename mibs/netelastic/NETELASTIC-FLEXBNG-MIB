@@ -1,0 +1,26 @@
+NETELASTIC-FLEXBNG-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the NETELASTIC enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY, enterprises FROM SNMPv2-SMI;
+
+netelastic MODULE-IDENTITY
+    LAST-UPDATED "201606070000Z"
+    ORGANIZATION "www.netelastic.com"
+    CONTACT-INFO    
+	 "  email:    sales@netelastic.com"
+    DESCRIPTION
+	"Top-level infrastructure of the netelastic enterprise MIB tree"
+    REVISION     "201606070000Z"
+    DESCRIPTION
+	"First draft"
+    ::= { enterprises 54268 }
+
+
+flexbng              OBJECT IDENTIFIER ::= { netelastic 1 }
+bras                 OBJECT IDENTIFIER ::= { flexbng 1 }
+
+END

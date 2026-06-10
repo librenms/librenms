@@ -1,0 +1,1394 @@
+ -- extracted from pw-tdm-draft-08
+
+ JUNIPER-PW-TDM-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+     MODULE-IDENTITY, OBJECT-TYPE,
+     Integer32, Counter32, Unsigned32, transmission
+        FROM SNMPv2-SMI
+
+     MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+
+     TEXTUAL-CONVENTION, TruthValue,  RowStatus, StorageType,
+      TimeStamp
+        FROM SNMPv2-TC
+
+     InterfaceIndexOrZero
+        FROM IF-MIB                 -- [IFMIB]
+
+     SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB     -- [RFC3411]
+
+     PerfCurrentCount, PerfIntervalCount
+        FROM PerfHist-TC-MIB
+
+     -- Juniper Specific TDM MIB
+     jnxMibs
+        FROM JUNIPER-SMI                       -- *** JNX ***
+
+
+     jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex
+        FROM JUNIPER-VPN-MIB
+
+    jnxPwTdmMibRoot
+        FROM JUNIPER-SMI;
+
+
+
+
+     jnxPWTdmMIB MODULE-IDENTITY
+
+     LAST-UPDATED "200704030000Z"
+     ORGANIZATION "Pseudo-Wire Emulation Edge-to-Edge (PWE3)
+                   Working Group"
+     CONTACT-INFO
+         "        Orly Nicklass
+          Postal: RAD Data Communications
+                  24 Raoul Wallenberg St., Bldg C
+                  Tel Aviv 69719, Israel
+                  Email: orly_n@rad.com
+
+          The PWE3 Working Group (email distribution pwe3@ietf.org,
+          http://www.ietf.org/html.charters/pwe3-charter.html)
+          "
+
+     DESCRIPTION
+         "This MIB contains managed object definitions for
+          encapsulating TDM (T1,E1, T3, E3, NxDS0) as
+          pseudo-wires over packet-switching networks (PSN).
+
+          This MIB supplements the PW-STD-MIB as in: Zelig, D.,
+          Nadeau,T. 'Pseudo Wire (PW) Management Information Base'.
+          The PW-STD-MIB contains structures and MIB associations
+          generic to Pseudo-Wire (PW) emulation. PW-specific
+          MIBs (such as this) contain config and stats for specific
+          PW types.
+
+          Copyright (C) The IETF Trust (2007). This version
+          of this MIB module is part of RFC yyyy; see the RFC
+          itself for full legal notices.
+   -- RFC Ed.: replace yyyy with actual RFC number & remove this
+          note"
+
+     REVISION  "200704030000Z"  -- April 2007
+     DESCRIPTION
+         "Initial version published as part of RFC YYYY."
+   -- RFC Editor: please replace YYYY with IANA assigned value, and
+   -- delete this note.
+
+     ::= {jnxPwTdmMibRoot 1}                    --** JNX **
+
+   -- Local Textual conventions
+      JnxPwTDMCfgIndex ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+             "Index into the relevant pwXXXCfgTable."
+        SYNTAX Unsigned32 (1..4294967295)
+
+
+      JnxPwCfgIndexOrzero ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "d"
+      STATUS      current
+      DESCRIPTION
+           "Index in any of the relevant configuration tables for
+           supplement information regarding configuration of the
+           specific technology. Value 0 implies no additional
+           configuration information is applicable."
+      SYNTAX  Unsigned32 (0..4294967295)
+
+
+
+   -- Tables, Scalars
+   jnxpwTDMObjects       OBJECT IDENTIFIER ::= { jnxPWTdmMIB 1 }
+   -- Notifications
+   jnxpwTDMNotifications OBJECT IDENTIFIER ::= { jnxPWTdmMIB 2 }
+   -- Conformance
+   jnxpwTDMConformance   OBJECT IDENTIFIER ::= { jnxPWTdmMIB 3 }
+
+   -- TDM PW table
+
+   jnxpwTDMTable OBJECT-TYPE
+     SYNTAX        SEQUENCE OF JnxPwTDMEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table contains basic information including ifIndex,
+          and pointers to entries in the relevant TDM config
+          tables for this TDM PW."
+     ::= { jnxpwTDMObjects 1 }
+
+   jnxpwTDMEntry OBJECT-TYPE
+     SYNTAX        JnxPwTDMEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table is indexed by the same index that was
+          created for the associated entry in the PW Table
+          (in the PW-STD-MIB).
+
+            - The PwIndex.
+
+          An entry is created in this table by the agent for every
+          entry in the pwTable with a pwType equal to one of the
+          following:
+          e1Satop(17), t1Satop(18), e3Satop(19), t3Satop(20),
+          basicCesPsn(21), basicTdmIp(22),  tdmCasCesPsn(23),
+          tdmCasTdmIp(24).
+          Unless otherwise specified, all RW objects in this table
+          MUST NOT be changed after row activation (see [PWMIB])
+          and should remain unchanged after reboot."
+
+     INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+
+        ::= { jnxpwTDMTable 1 }
+
+   JnxPwTDMEntry ::= SEQUENCE {
+
+        jnxpwTDMRate                      Integer32,
+        jnxpwTDMIfIndex                   InterfaceIndexOrZero,
+        jnxpwGenTDMCfgIndex               JnxPwCfgIndexOrzero,
+        jnxpwRelTDMCfgIndex               JnxPwCfgIndexOrzero,
+
+        jnxpwTDMConfigError               BITS,
+        jnxpwTDMTimeElapsed               Integer32,
+        jnxpwTDMValidIntervals            Integer32,
+        jnxpwTDMValidDayIntervals         Integer32,
+        jnxpwTDMLastEsTimeStamp           TimeStamp
+        }
+
+   jnxpwTDMRate OBJECT-TYPE
+     SYNTAX     Integer32
+ --    MAX-ACCESS    read-write
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The parameter represents the bit-rate of the TDM service
+          in multiples of the 'basic' 64 Kbit/s rate [TDMCP-EXT].
+          It complements the definition of pwType used in
+          PW-STD-MIB.
+          For structure-agnostic the following should be used:
+          a) Satop E1 - 32
+          b) Satop T1 emulation:
+             i)   MUST be set to 24 in the basic emulation mode
+             ii)  MUST be set to 25 for the 'Octet-aligned T1'
+                  emulation mode
+          c) Satop E3 - 535
+          d) Satop T3 - 699
+          For all kinds of structure-aware emulation, this parameter
+          MUST be set to N where N is the number of DS0 channels
+          in the corresponding attachment circuit."
+     REFERENCE
+      "TDMCP-EXT"
+     DEFVAL { 32 }
+     ::= { jnxpwTDMEntry 1 }
+
+   jnxpwTDMIfIndex OBJECT-TYPE
+     SYNTAX        InterfaceIndexOrZero
+ --    MAX-ACCESS    read-write
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This is a unique index within the ifTable. It represents
+          the interface index of the full link or the interface
+          index for the bundle holding the group of
+          time slots to be transmitted via this PW connection.
+
+          A value of zero indicates an interface index that has yet
+          to be determined.
+          Once set, if the TDM ifIndex is (for some reason) later
+          removed, the agent SHOULD delete the associated PW rows
+          (e.g., this pwTDMTable entry). If the agent does not
+          delete the rows,  the agent MUST set this object to
+          zero."
+     ::= { jnxpwTDMEntry 2 }
+
+   jnxpwGenTDMCfgIndex OBJECT-TYPE
+     SYNTAX        JnxPwCfgIndexOrzero
+ --    MAX-ACCESS    read-write
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Index to the generic parameters in the TDM configuration
+          table that appears in this MIB module. It is likely that
+          multiple TDM PWs of the same characteristic will share
+          a single TDM Cfg entry."
+     ::= { jnxpwTDMEntry 3 }
+
+   jnxpwRelTDMCfgIndex OBJECT-TYPE
+     SYNTAX        JnxPwCfgIndexOrzero
+ --    MAX-ACCESS    read-write
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Index to the relevant TDM configuration table entry
+          that appears in one of the related MIB modules
+          such as TDMoIP or CESoPSN. It is likely that
+          multiple TDM PWs of the same characteristic will share
+          a single configuration entry of the relevant type.
+          The value 0 implies no entry in other related MIB"
+     ::= { jnxpwTDMEntry 4 }
+
+   jnxpwTDMConfigError OBJECT-TYPE
+     SYNTAX BITS {
+           notApplicable                 ( 0),
+           tdmTypeIncompatible           ( 1),
+           peerRtpIncompatible           ( 2),
+           peerPayloadSizeIncompatible   ( 3)
+           }
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Any of the bits are set if the local configuration is
+          not compatible with the peer configuration as available
+          from the various parameters options. Setting is done based
+          on signaling, or else value (0) will be set.
+
+          -tdmTypeIncompatible bit is set if the local configuration
+          is not carrying the same TDM type as the peer configuration.
+
+          -peerRtpIncompatible bit is set if the local configuration
+          is configured to send RTP packets for this PW, and the
+          remote is not capable of accepting RTP packets.
+
+          -peerPayloadSizeIncompatible bit is set if the local
+          configuration is not carrying the same Payload Size as the
+          peer configuration.  "
+     ::= { jnxpwTDMEntry 5}
+
+   jnxpwTDMTimeElapsed OBJECT-TYPE
+      SYNTAX  Integer32 (1..900)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+          "The number of seconds, including partial seconds,
+           that have elapsed since the beginning of the current
+           measurement period. If, for some reason, such as an
+           adjustment in the system's time-of-day clock, the
+           current interval exceeds the maximum value, the
+           agent will return the maximum value."
+      ::= { jnxpwTDMEntry 6}
+
+   jnxpwTDMValidIntervals OBJECT-TYPE
+      SYNTAX  Integer32 (0..96)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+          "The number of previous 15-minute intervals for which data
+           was collected.
+           An agent with TDM capability must be capable of supporting
+           at least n intervals. The minimum value of n is 4, The
+           default of n is 32 and the maximum value of n is 96.
+           The value will be n unless the measurement was (re-)
+           started within the last (n*15) minutes, in which case
+           the value will be the number of complete 15 minute
+           intervals for which the agent has at least some data.
+           In certain cases(e.g., in the case where the agent is
+           a proxy) it is possible that some intervals are unavailable.
+           In this case, this interval is the maximum interval number
+           for which data is available. "
+      ::= { jnxpwTDMEntry 7}
+
+   jnxpwTDMValidDayIntervals OBJECT-TYPE
+      SYNTAX  Integer32 (0..30)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+          "The number of previous days for which data
+           was collected.
+           An agent with TDM capability must be capable of supporting
+           at least n intervals. The minimum value of n is 1, The
+           default of n is 1 and the maximum value of n is 30."
+      ::= { jnxpwTDMEntry 8}
+
+   jnxpwTDMLastEsTimeStamp OBJECT-TYPE
+     SYNTAX      TimeStamp
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "The value of sysUpTime at the most recent occasion at
+          which the TDM PW entered the ES or SES state."
+     ::= { jnxpwTDMEntry 11}
+
+
+   -- End of TDM PW table
+
+   -- PW Generic TDM PW Configuration Table
+
+   jnxpwTDMCfgIndexNext OBJECT-TYPE
+     SYNTAX            Unsigned32
+     MAX-ACCESS        read-only
+     STATUS            current
+     DESCRIPTION
+         "This object contains the value to be used for
+          pwTDMCfgIndex when creating entries in the
+          pwTDMCfgTable. The value 0 indicates that no
+          unassigned entries are available.  To obtain the
+          value of pwTDMCfgIndexNext for a new entry in the
+          pwTDMCfgTable, the manager issues a management
+          protocol retrieval operation. The agent will
+          determine through its local policy when this
+          index value will be made available for reuse."
+
+     ::= { jnxpwTDMObjects 2 }
+
+   jnxpwTDMCfgTable   OBJECT-TYPE
+     SYNTAX                  SEQUENCE OF JnxPwTDMCfgEntry
+     MAX-ACCESS              not-accessible
+     STATUS                  current
+     DESCRIPTION
+         "This table contains a set of parameters that may be
+          referenced by one or more TDM PWs in pwTDMTable."
+
+     ::= { jnxpwTDMObjects 3 }
+
+   jnxpwTDMCfgEntry   OBJECT-TYPE
+     SYNTAX            JnxPwTDMCfgEntry
+     MAX-ACCESS        not-accessible
+     STATUS            current
+     DESCRIPTION
+         "These parameters define the characteristics of a
+          TDM PW. They are grouped here to ease NMS burden.
+          Once an entry is created here it may be re-used
+          by many PWs.
+          Unless otherwise specified, all objects in this table
+          MUST NOT be changed after row activation (see [PWMIB])
+          if the row index is in used by an entry in pwTDMTable.
+          Rows should remain unchanged after reboot."
+
+     --INDEX  { jnxpwTDMCfgIndex }
+     INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+
+        ::= { jnxpwTDMCfgTable 1 }
+
+   JnxPwTDMCfgEntry ::= SEQUENCE {
+        jnxpwTDMCfgIndex                    JnxPwTDMCfgIndex,
+        jnxpwTDMCfgRowStatus                RowStatus,
+        jnxpwTDMCfgPayloadSize              Unsigned32,
+        jnxpwTDMCfgPktReorder               TruthValue,
+        jnxpwTDMCfgRtpHdrUsed               TruthValue,
+        jnxpwTDMCfgJtrBfrDepth              Unsigned32,
+        jnxpwTDMCfgPayloadSuppression       INTEGER,
+
+        jnxpwTDMCfgConsecPktsInSynch        Unsigned32,
+        jnxpwTDMCfgConsecMissPktsOutSynch   Unsigned32,
+        jnxpwTDMCfgSetUp2SynchTimeOut       Unsigned32,
+
+        jnxpwTDMCfgPktReplacePolicy         INTEGER,
+
+        jnxpwTDMCfgAvePktLossTimeWindow     Integer32,
+        jnxpwTDMCfgExcessivePktLossThreshold   Unsigned32,
+
+        jnxpwTDMCfgAlarmThreshold           Unsigned32,
+        jnxpwTDMCfgClearAlarmThreshold      Unsigned32,
+
+        jnxpwTDMCfgMissingPktsToSes         Unsigned32,
+
+        jnxpwTDMCfgTimestampMode            INTEGER,
+        jnxpwTDMCfgStorageType              StorageType,
+        jnxpwTDMCfgPktFiller                Unsigned32,
+        jnxpwTDMCfgName                     SnmpAdminString
+        }
+
+   jnxpwTDMCfgIndex   OBJECT-TYPE
+     SYNTAX        JnxPwTDMCfgIndex
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "Index to an entry in this table. The value is a copy of the
+          assigned pwTDMCfgIndexNext"
+     ::= { jnxpwTDMCfgEntry 1 }
+
+   jnxpwTDMCfgRowStatus    OBJECT-TYPE
+     SYNTAX               RowStatus
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS               current
+     DESCRIPTION
+         "Object used for creating, modifying, and deleting
+          a row from this table. The following objects should not be
+          modified if the entry is in used and the status is active:
+          pwTDMCfgPayloadSize, pwTDMCfgRtpHdrUsed,
+          pwTDMCfgJtrBfrDepth, and pwTDMCfgPayloadSuppression.
+          The row should not be deleted if the entry is in used"
+     ::= { jnxpwTDMCfgEntry 2 }
+
+   jnxpwTDMCfgPayloadSize OBJECT-TYPE
+     SYNTAX        Unsigned32
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The value of this object indicates the PayLoad Size (in bytes)
+          to be defined during the PW setUp. Upon TX, implementation
+          must be capable of carrying that amount of bytes.
+          Upon RX, when the LEN field is set to 0, the payload of
+          packet  MUST assume this size, and if the actual
+          packet size is inconsistent with this length,
+          the packet MUST be considered to be malformed. "
+     ::= { jnxpwTDMCfgEntry 4 }
+
+   jnxpwTDMCfgPktReorder OBJECT-TYPE
+     SYNTAX        TruthValue
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "If set True: as CE bound packets are queued in the
+          jitter buffer, out of order packets are re-ordered. The
+          maximum sequence number differential (i.e., the range in
+          which re-sequencing can occur) is dependant on the depth
+          of the jitter buffer. See pwTDMCfgJtrBfrDepth.
+
+          NOTE: Some implementations may not support this feature.
+          The agent is then required to set this to False."
+     ::= { jnxpwTDMCfgEntry 5 }
+
+   jnxpwTDMCfgRtpHdrUsed OBJECT-TYPE
+     SYNTAX        TruthValue
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "If set to False: an RTP header is not pre-pended to the
+          TDM packet."
+     REFERENCE
+      "SATOP"
+     DEFVAL { false }
+     ::= { jnxpwTDMCfgEntry 6 }
+
+   jnxpwTDMCfgJtrBfrDepth OBJECT-TYPE
+     SYNTAX        Unsigned32
+     UNITS         "microsecond"
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The size of this buffer SHOULD be locally
+          configured to allow accommodation to the PSN-specific packet
+          delay variation.
+
+          If configured to a value not supported by the
+          implementation, the agent MUST return an error code
+          'jtrBfrDepth' in 'pwTDMConfigError '
+
+          NOTE: jitter buffers are a limited resource to
+          be managed. The actual size should be at least twice as big
+          as the value of pwTDMCfgJtrBfrDepth "
+     DEFVAL { 3000 }
+
+     ::= { jnxpwTDMCfgEntry 7 }
+
+   jnxpwTDMCfgPayloadSuppression  OBJECT-TYPE
+     SYNTAX        INTEGER
+                    {
+                       enable  ( 1),
+                       disable ( 2)
+                    }
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Selecting 'enable' means: Payload suppression is allowed.
+          Payload MAY be omitted in order to conserve bandwidth.
+          Selecting 'disable' means: no suppresion under any
+          condition.
+          Object  MAY be changed at any time."
+    DEFVAL { disable }
+
+     ::= { jnxpwTDMCfgEntry 8 }
+
+   jnxpwTDMCfgConsecPktsInSynch          OBJECT-TYPE
+     SYNTAX        Unsigned32
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The number of consecutive packets with sequential
+          sequence numbers that are required to exit the
+          LOPS state.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     REFERENCE
+         "SATOP"
+     DEFVAL { 2 }
+     ::= { jnxpwTDMCfgEntry 9 }
+
+   jnxpwTDMCfgConsecMissPktsOutSynch  OBJECT-TYPE
+     SYNTAX        Unsigned32
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The number of consecutive missing packets that are
+          required to enter the LOPS state.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     REFERENCE
+         "SATOP"
+     DEFVAL { 10 }
+     ::= { jnxpwTDMCfgEntry 10 }
+
+   jnxpwTDMCfgSetUp2SynchTimeOut OBJECT-TYPE
+     SYNTAX        Unsigned32
+     UNITS         "millisecond"
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The amount of time the host should wait before declaring the
+          pseudo wire in down state,  if the number of consecutive
+          TDM packets that have been received after changing the
+          adminstrative status to up and after finalization of
+          signaling (if supported) between the two PEs is smaller
+          than pwTDMCfgConsecPktsInSynch. Once the the pw has
+          OperStatus of 'up' this parameter is no longer valid. This
+          parameter is defined to ensure that the host does not
+          prematurely inform failure of the pw. In particular pw 'down'
+          notifications should not be sent before expiration of this
+          timer. This parameter is valid only after adminisrative
+          changes of the status of the pw. If the pw fails due to
+          network impairments a 'down' notification should be sent.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     DEFVAL {5000}
+     ::= { jnxpwTDMCfgEntry 11 }
+
+   jnxpwTDMCfgPktReplacePolicy OBJECT-TYPE
+     SYNTAX        INTEGER
+                         {
+                          allOnes (1),
+                          implementationSpecific(2),
+                          filler (3)  --user defined
+                          }
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This parameter determines the value to be played when CE bound
+          packets have over/underflow the jitter buffer, or are missing
+          for any reason. This byte pattern is sent(played)on
+          the TDM line. Selecting implementationSpecific(2) implies
+          agent specific algorithm. Selecting filler(3) requires setting
+          of pwTDMCfgPktFiller.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     DEFVAL { allOnes } -- Play AIS
+     ::= { jnxpwTDMCfgEntry 12 }
+
+   jnxpwTDMCfgAvePktLossTimeWindow OBJECT-TYPE
+     SYNTAX        Integer32
+     UNITS         "millisecond"
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The length of time over which the average packet
+          loss rate should be computed to detect Excessive packet
+          loss rate.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     ::= { jnxpwTDMCfgEntry 13}
+
+   jnxpwTDMCfgExcessivePktLossThreshold OBJECT-TYPE
+     SYNTAX        Unsigned32
+     UNITS         "Percent"
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Excessive packet loss rate is detected by computing the
+          average packetloss rate over a pwTDMCfgAvePktLossTimeWindow
+          amount of time and comparing it with this threshold value.
+          The rate is expressed in precentage.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     ::= { jnxpwTDMCfgEntry 14 }
+
+
+   jnxpwTDMCfgAlarmThreshold OBJECT-TYPE
+     SYNTAX        Unsigned32
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Alarms are only reported when the defect state persists
+          for the length of time specified by this object.
+          The object's unit is millisec.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     DEFVAL { 2500 }
+     ::= { jnxpwTDMCfgEntry 15 }
+
+   jnxpwTDMCfgClearAlarmThreshold OBJECT-TYPE
+     SYNTAX        Unsigned32
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Alarm MUST be cleared after the corresponding defect is
+          undetected for the amount of time specified by this object.
+          The object's unit is millisec.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     DEFVAL { 10000 }
+     ::= { jnxpwTDMCfgEntry 16 }
+
+   jnxpwTDMCfgMissingPktsToSes OBJECT-TYPE
+     SYNTAX        Unsigned32
+     UNITS         "Percent"
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Percent of missing packets detected (consecutive or not)
+          within a 1 second window to cause a Severely Error
+          Second (SES) to be counted.
+          Object  MAY be changed when the related PW is
+          defined as not active."
+     DEFVAL { 30 }
+     ::= { jnxpwTDMCfgEntry 17 }
+
+   jnxpwTDMCfgTimestampMode  OBJECT-TYPE
+     SYNTAX        INTEGER
+                    {
+                     notApplicable (1),
+                     absolute      (2),
+                     differential  (3)
+                    }
+
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Timestamp generation MAY be used in one of the following
+          modes:
+          1. Absolute mode: the PSN-bound IWF sets timestamps
+           using the clock recovered from the incoming TDM attachment
+           circuit. As a consequence, the timestamps are closely
+           correlated with the sequence numbers. All TDM implementations
+           that support usage of the RTP header MUST support this mode.
+          2. Differential mode: Both IWFs have access to a common high-
+           quality timing source, and this source is used for timestamp
+           generation. Support of this mode is OPTIONAL.
+           Object  MAY be changed when the related PW is
+           defined as not active."
+
+     ::= { jnxpwTDMCfgEntry 18 }
+
+   jnxpwTDMCfgStorageType  OBJECT-TYPE
+     SYNTAX            StorageType
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS            current
+     DESCRIPTION
+         "This variable indicates the storage type for this
+          row."
+     ::= { jnxpwTDMCfgEntry 19 }
+
+   jnxpwTDMCfgPktFiller OBJECT-TYPE
+      SYNTAX        Unsigned32 (0..255)
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "Filler byte pattern played out on the TDM
+          interface if pwTDMCfgPktReplacePolicy
+          was set to filler(3).
+          Object  MAY be changed when the related PW is
+          defined as not active."
+      DEFVAL
+          { 255 } -- Play all ones, equal to AIS indications.
+      ::= { jnxpwTDMCfgEntry 20 }
+
+
+   jnxpwTDMCfgName OBJECT-TYPE
+     SYNTAX        SnmpAdminString
+--     MAX-ACCESS           read-create
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "A descriptive string, prefereably unique name, to an entry
+         in this table.
+         Object  MAY be changed at any time."
+     ::= { jnxpwTDMCfgEntry 21 }
+
+   -- END of Table
+
+   -- The following counters work together to integrate
+   -- errors and the lack of errors on the TDM PW. An error is
+   -- caused by a missing packet. Missing packet can be a result
+   -- of: packet loss in the network, (uncorrectable) packet out
+   -- of sequence, packet length error, jitter buffer overflow,
+   -- and jitter buffer underflow. The result is declaring whether
+   -- or not the TDM PW is in Loss of Packet (LOPS) state.
+
+   -- TDM PW Performance Current Table.
+
+   jnxpwTDMPerfCurrentTable OBJECT-TYPE
+     SYNTAX        SEQUENCE OF JnxPwTDMPerfCurrentEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "The current 15 minute interval counts are in
+          this table.
+
+          This table provides per TDM PW performance information."
+
+     ::= { jnxpwTDMObjects 5 }
+
+   jnxpwTDMPerfCurrentEntry OBJECT-TYPE
+     SYNTAX        JnxPwTDMPerfCurrentEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "An entry in this table is created by the agent for every
+          pwTDMTable entry. After 15 minutes, the contents of this
+          table entry are copied to a new entry in the
+          pwTDMPerfInterval table and the counts in this entry
+          are reset to zero."
+
+     -- INDEX  { jnxpwIndex }
+     INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex }
+
+     ::= { jnxpwTDMPerfCurrentTable 1 }
+
+   JnxPwTDMPerfCurrentEntry ::= SEQUENCE {
+
+        jnxpwTDMPerfCurrentMissingPkts         PerfCurrentCount,
+        jnxpwTDMPerfCurrentPktsReOrder         PerfCurrentCount,
+        jnxpwTDMPerfCurrentJtrBfrUnderruns     PerfCurrentCount,
+        jnxpwTDMPerfCurrentMisOrderDropped     PerfCurrentCount,
+        jnxpwTDMPerfCurrentMalformedPkt        PerfCurrentCount,
+
+        jnxpwTDMPerfCurrentESs                 PerfCurrentCount,
+        jnxpwTDMPerfCurrentSESs                PerfCurrentCount,
+        jnxpwTDMPerfCurrentUASs                PerfCurrentCount,
+        jnxpwTDMPerfCurrentFC                  PerfCurrentCount
+     }
+
+   jnxpwTDMPerfCurrentMissingPkts OBJECT-TYPE
+     SYNTAX        PerfCurrentCount
+     MAX-ACCESS    read-only
+     STATUS       current
+     DESCRIPTION
+         "Number of missing packets (as detected via control word
+          sequence number gaps)."
+     ::= { jnxpwTDMPerfCurrentEntry 1 }
+
+   jnxpwTDMPerfCurrentPktsReOrder OBJECT-TYPE
+     SYNTAX        PerfCurrentCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected out of sequence (via control
+          word sequence number), but successfully re-ordered.
+          Note: some implementations may not support this Feature."
+     ::= { jnxpwTDMPerfCurrentEntry 2 }
+
+
+   jnxpwTDMPerfCurrentJtrBfrUnderruns OBJECT-TYPE
+     SYNTAX        PerfCurrentCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of times a packet needed to be played
+          out and the jitter buffer was empty."
+     ::= { jnxpwTDMPerfCurrentEntry 3 }
+
+   jnxpwTDMPerfCurrentMisOrderDropped OBJECT-TYPE
+     SYNTAX        PerfCurrentCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected out of order(via control word
+          sequence numbers), and could not be re-ordered, or could
+          not fit in the jitter buffer."
+      ::= { jnxpwTDMPerfCurrentEntry 4 }
+
+   jnxpwTDMPerfCurrentMalformedPkt OBJECT-TYPE
+     SYNTAX        PerfCurrentCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected with unexpected size, or
+          bad headers' stack"
+     ::= { jnxpwTDMPerfCurrentEntry 5 }
+
+   jnxpwTDMPerfCurrentESs OBJECT-TYPE
+      SYNTAX       PerfCurrentCount
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+          "The counter associated with the number of Error
+           Seconds encountered. Any malformed packet, seq. error, LOPS
+           and similar are considered as error second"
+      ::= { jnxpwTDMPerfCurrentEntry 6 }
+
+   jnxpwTDMPerfCurrentSESs OBJECT-TYPE
+      SYNTAX        PerfCurrentCount
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "The counter associated with the number of
+           Severely Error Seconds encountered. "
+      ::= { jnxpwTDMPerfCurrentEntry 7 }
+
+   jnxpwTDMPerfCurrentUASs OBJECT-TYPE
+      SYNTAX        PerfCurrentCount
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "The counter associated with the number of
+           Unavailable Seconds encountered. Any consequtive
+           ten seconds of SES are counted as one UAS"
+      ::= { jnxpwTDMPerfCurrentEntry 8 }
+
+   jnxpwTDMPerfCurrentFC OBJECT-TYPE
+      SYNTAX        PerfCurrentCount
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "TDM Failure Counts (FC-TDM). The number of TDM failure
+           events. A failure event begins when the LOPS failure
+           is declared, and ends when the failure is cleared. A
+           failure event that begins in one period and ends in
+           another period is counted only in the period in which
+           it begins."
+      ::= { jnxpwTDMPerfCurrentEntry 9 }
+
+   -- End TDM PW Performance Current Interval Table
+
+
+   -- TDM PW Performance Interval Table.
+
+   jnxpwTDMPerfIntervalTable OBJECT-TYPE
+     SYNTAX        SEQUENCE OF JnxPwTDMPerfIntervalEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table provides performance information per TDM PW
+          similar to the pwTDMPerfCurrentTable above. However,
+          these counts represent historical 15 minute intervals.
+          Typically, this table will have a maximum of 96 entries
+          for a 24 hour period, but is not limited to this. "
+     ::= { jnxpwTDMObjects 6 }
+
+   jnxpwTDMPerfIntervalEntry OBJECT-TYPE
+     SYNTAX        JnxPwTDMPerfIntervalEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "An entry in this table is created by the agent for
+          every pwTDMPerfCurrentEntry that is 15 minutes old.
+          The contents of the Current entry are copied to the new
+          entry here. The Current entry, then resets its counts
+          to zero for the next current 15 minute interval. "
+
+     -- INDEX  { jnxpwIndex, jnxpwTDMPerfIntervalNumber }
+      INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex , jnxpwTDMPerfIntervalNumber }
+
+     ::= { jnxpwTDMPerfIntervalTable 1 }
+
+   JnxPwTDMPerfIntervalEntry ::= SEQUENCE {
+        jnxpwTDMPerfIntervalNumber           Unsigned32,
+        jnxpwTDMPerfIntervalValidData        TruthValue,
+        jnxpwTDMPerfIntervalDuration         Unsigned32,
+
+        jnxpwTDMPerfIntervalMissingPkts      PerfIntervalCount,
+        jnxpwTDMPerfIntervalPktsReOrder      PerfIntervalCount,
+        jnxpwTDMPerfIntervalJtrBfrUnderruns  PerfIntervalCount,
+        jnxpwTDMPerfIntervalMisOrderDropped  PerfIntervalCount,
+        jnxpwTDMPerfIntervalMalformedPkt     PerfIntervalCount,
+
+        jnxpwTDMPerfIntervalESs              PerfIntervalCount,
+        jnxpwTDMPerfIntervalSESs             PerfIntervalCount,
+        jnxpwTDMPerfIntervalUASs             PerfIntervalCount,
+        jnxpwTDMPerfIntervalFC               PerfIntervalCount
+        }
+
+   jnxpwTDMPerfIntervalNumber OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "A number (normally between 1 and 96 to cover a 24 hour
+          period) which identifies the interval for which the set
+          of statistics is available. The interval identified by 1
+          is the most recently completed 15 minute interval, and
+          the interval identified by N is the interval immediately
+          preceding the one identified by N-1. The minimum range of
+          N is 1 through 4. The default range is 1 through 32. The
+          maximum value of N is 1 through 96."
+     ::= { jnxpwTDMPerfIntervalEntry 1 }
+
+   jnxpwTDMPerfIntervalValidData OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This variable indicates if the data for this interval
+          is valid."
+     ::= { jnxpwTDMPerfIntervalEntry 2 }
+
+   jnxpwTDMPerfIntervalDuration OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The duration of a particular interval in seconds,
+         Adjustments in the system's time-of-day clock, may
+         cause the interval to be greater or less than, the
+         normal value. Therefore this actual interval value
+         is provided."
+      ::= { jnxpwTDMPerfIntervalEntry 3 }
+
+   jnxpwTDMPerfIntervalMissingPkts OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of missing packets (as detected via control
+          word sequence number gaps)."
+     ::= { jnxpwTDMPerfIntervalEntry 4 }
+
+   jnxpwTDMPerfIntervalPktsReOrder OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected out of sequence (via control
+          word sequence number), but successfully re-ordered.
+          Note: some implementations may not support this
+          Feature."
+     ::= { jnxpwTDMPerfIntervalEntry 5 }
+
+   jnxpwTDMPerfIntervalJtrBfrUnderruns OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of times a packet needed to be played
+          out and the jitter buffer was empty."
+     ::= { jnxpwTDMPerfIntervalEntry 6 }
+
+   jnxpwTDMPerfIntervalMisOrderDropped OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected out of order(via control word
+          sequence numbers), and could not be re-ordered, or could
+          not fit in the jitter buffer."
+     ::= { jnxpwTDMPerfIntervalEntry 7 }
+
+   jnxpwTDMPerfIntervalMalformedPkt OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected with unexpected size, or
+          bad headers' stack"
+     ::= { jnxpwTDMPerfIntervalEntry 8 }
+
+
+   jnxpwTDMPerfIntervalESs OBJECT-TYPE
+     SYNTAX       PerfIntervalCount
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The counter associated with the number of Error
+          Seconds encountered."
+     ::= { jnxpwTDMPerfIntervalEntry 9 }
+
+   jnxpwTDMPerfIntervalSESs OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The counter associated with the number of
+          Severely Error Seconds encountered."
+     ::= { jnxpwTDMPerfIntervalEntry 10 }
+
+   jnxpwTDMPerfIntervalUASs OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The counter associated with the number of
+          Unavailable Seconds encountered."
+     ::= { jnxpwTDMPerfIntervalEntry 11 }
+
+   jnxpwTDMPerfIntervalFC OBJECT-TYPE
+     SYNTAX        PerfIntervalCount
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "TDM Failure Counts (FC-TDM). The number of TDM failure
+          events. A failure event begins when the LOPS failure
+          is declared, and ends when the failure is cleared. A
+          failure event that begins in one period and ends in
+          another period is counted only in the period in which
+          it begins."
+     ::= { jnxpwTDMPerfIntervalEntry 12 }
+
+   -- End TDM PW Performance Interval Table
+
+
+   -- TDM PW 1day Performance Table
+
+   jnxpwTDMPerf1DayIntervalTable OBJECT-TYPE
+     SYNTAX        SEQUENCE OF JnxPwTDMPerf1DayIntervalEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "This table provides performance information per TDM PW
+          similar to the pwTDMPerfIntervalTable above. However,
+          these counters represent historical 1 day intervals up to
+          one full month. The table consists of real time data, as
+          such it is not persistence across re-boot."
+     ::= { jnxpwTDMObjects 7 }
+
+   jnxpwTDMPerf1DayIntervalEntry OBJECT-TYPE
+     SYNTAX        JnxPwTDMPerf1DayIntervalEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "An entry is created in this table by the agent
+          for every entry in the pwTDMTable table."
+
+     INDEX  { jnxVpnPwVpnType, jnxVpnPwVpnName, jnxVpnPwIndex, jnxpwTDMPerf1DayIntervalNumber }
+
+        ::= { jnxpwTDMPerf1DayIntervalTable 1 }
+
+   JnxPwTDMPerf1DayIntervalEntry ::= SEQUENCE {
+        jnxpwTDMPerf1DayIntervalNumber                Unsigned32,
+        jnxpwTDMPerf1DayIntervalValidData             TruthValue,
+        jnxpwTDMPerf1DayIntervalDuration              Unsigned32,
+        jnxpwTDMPerf1DayIntervalMissingPkts           Counter32,
+        jnxpwTDMPerf1DayIntervalPktsReOrder           Counter32,
+        jnxpwTDMPerf1DayIntervalJtrBfrUnderruns       Counter32,
+        jnxpwTDMPerf1DayIntervalMisOrderDropped       Counter32,
+        jnxpwTDMPerf1DayIntervalMalformedPkt          Counter32,
+
+        jnxpwTDMPerf1DayIntervalESs                   Counter32,
+        jnxpwTDMPerf1DayIntervalSESs                  Counter32,
+        jnxpwTDMPerf1DayIntervalUASs                  Counter32,
+        jnxpwTDMPerf1DayIntervalFC                    Counter32
+        }
+
+
+   jnxpwTDMPerf1DayIntervalNumber OBJECT-TYPE
+     SYNTAX        Unsigned32
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "The number of interval, where 1 indicates current day
+          measured period and 2 and above indicate previous days
+          respectively"
+     ::= { jnxpwTDMPerf1DayIntervalEntry 1 }
+
+   jnxpwTDMPerf1DayIntervalValidData OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "This variable indicates if the data for this interval
+          is valid."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 2 }
+
+   jnxpwTDMPerf1DayIntervalDuration OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+       "The duration of a particular interval in seconds,
+        Adjustments in the system's time-of-day clock, may
+        cause the interval to be greater or less than, the
+        normal value. Therefore this actual interval value
+        is provided."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 3 }
+
+   jnxpwTDMPerf1DayIntervalMissingPkts OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+       "Number of missing packets (as detected via control word
+        sequence number gaps)."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 4 }
+
+   jnxpwTDMPerf1DayIntervalPktsReOrder OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected out of sequence (via control
+          word sequence number), but successfully re-ordered.
+          Note: some implementations may not support this
+          feature."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 5 }
+
+   jnxpwTDMPerf1DayIntervalJtrBfrUnderruns OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of times a packet needed to be played
+          out and the jitter buffer was empty."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 6 }
+
+   jnxpwTDMPerf1DayIntervalMisOrderDropped OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected out of order(via control word
+          sequence numbers), and could not be re-ordered, or could
+          not fit in the jitter buffer."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 7 }
+
+   jnxpwTDMPerf1DayIntervalMalformedPkt OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "Number of packets detected with unexpected size, or
+          bad headers' stack."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 8 }
+
+
+   jnxpwTDMPerf1DayIntervalESs OBJECT-TYPE
+     SYNTAX       Counter32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The counter associated with the number of Error
+          Seconds encountered."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 9 }
+
+   jnxpwTDMPerf1DayIntervalSESs OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The counter associated with the number of Severely
+          Error Seconds."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 10 }
+
+   jnxpwTDMPerf1DayIntervalUASs OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "The counter associated with the number of
+          UnAvailable Seconds.
+
+          NOTE: When first entering the UAS state, the number
+          of SES To UAS is added to this object, then as each
+          additional UAS occurs, this object increments by one."
+
+     ::= { jnxpwTDMPerf1DayIntervalEntry 11 }
+
+   jnxpwTDMPerf1DayIntervalFC OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only
+     STATUS        current
+     DESCRIPTION
+         "TDM Failure Counts (FC-TDM). The number of TDM failure
+          events. A failure event begins when the LOPS failure
+          is declared, and ends when the failure is cleared."
+     ::= { jnxpwTDMPerf1DayIntervalEntry 12 }
+
+   -- End of PW TDM Performance table
+
+   -- Conformance Information
+
+
+   jnxpwTDMGroups      OBJECT IDENTIFIER ::= { jnxpwTDMConformance 1 }
+   jnxpwTDMCompliances OBJECT IDENTIFIER ::= { jnxpwTDMConformance 2 }
+
+
+   jnxpwTDMModuleCompliance MODULE-COMPLIANCE
+      STATUS  current
+      DESCRIPTION
+          "The compliance statement for agent that support TDM PW
+           over  PSN operation."
+
+      MODULE  -- this module
+          MANDATORY-GROUPS { jnxpwTDMGroup,
+                             jnxpwTDMPerfCurrentGroup,
+                             jnxpwTDMPerfIntervalGroup,
+                             jnxpwTDMPerf1DayIntervalGroup
+                           }
+
+
+                     OBJECT jnxpwGenTDMCfgIndex
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set the an index pointer
+                         is not required."
+
+                     OBJECT jnxpwRelTDMCfgIndex
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set the an index pointer
+                         is not required."
+
+                     OBJECT jnxpwTDMCfgPktReorder
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set the packet reordering
+                         is not required."
+
+                     OBJECT jnxpwTDMCfgRtpHdrUsed
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set whether to use the
+                          RTP header or not is not required."
+
+                     OBJECT jnxpwTDMCfgPayloadSuppression
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set this object is not
+                          required."
+
+                     OBJECT jnxpwTDMCfgPktReplacePolicy
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set the replace policy
+                         is not required."
+
+                     OBJECT jnxpwTDMCfgStorageType
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set the storage type is
+                         not required."
+
+                     OBJECT jnxpwTDMCfgPktFiller
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set the Filler pattern
+                         is not required."
+                     OBJECT jnxpwTDMCfgName
+                     MIN-ACCESS read-only
+                     DESCRIPTION
+                         "The ability to set the an Aliase
+                         is not required."
+
+      ::= { jnxpwTDMCompliances 1 }
+
+   -- Units of conformance.
+
+   jnxpwTDMGroup OBJECT-GROUP
+     OBJECTS {
+              jnxpwTDMRate,
+              jnxpwTDMIfIndex,
+              jnxpwGenTDMCfgIndex,
+              jnxpwRelTDMCfgIndex,
+              jnxpwTDMConfigError,
+              jnxpwTDMTimeElapsed,
+              jnxpwTDMValidIntervals,
+              jnxpwTDMValidDayIntervals,
+
+              jnxpwTDMLastEsTimeStamp,
+
+              jnxpwTDMCfgIndexNext,
+
+              jnxpwTDMCfgRowStatus,
+
+              jnxpwTDMCfgPayloadSize,
+              jnxpwTDMCfgPktReorder,
+              jnxpwTDMCfgRtpHdrUsed,
+              jnxpwTDMCfgJtrBfrDepth,
+              jnxpwTDMCfgPayloadSuppression,
+              jnxpwTDMCfgConsecPktsInSynch,
+              jnxpwTDMCfgConsecMissPktsOutSynch,
+              jnxpwTDMCfgSetUp2SynchTimeOut,
+
+              jnxpwTDMCfgPktReplacePolicy,
+
+              jnxpwTDMCfgAvePktLossTimeWindow ,
+              jnxpwTDMCfgExcessivePktLossThreshold,
+
+              jnxpwTDMCfgAlarmThreshold ,
+              jnxpwTDMCfgClearAlarmThreshold,
+              jnxpwTDMCfgMissingPktsToSes,
+
+              jnxpwTDMCfgTimestampMode,
+              jnxpwTDMCfgStorageType,
+              jnxpwTDMCfgPktFiller,
+
+              jnxpwTDMCfgName
+              }
+     STATUS  current
+     DESCRIPTION
+         "Collection of objects for basic TDM PW config and
+          status."
+     ::= { jnxpwTDMGroups 1 }
+
+   jnxpwTDMPerfCurrentGroup OBJECT-GROUP
+     OBJECTS {
+              jnxpwTDMPerfCurrentMissingPkts,
+              jnxpwTDMPerfCurrentPktsReOrder,
+              jnxpwTDMPerfCurrentJtrBfrUnderruns,
+              jnxpwTDMPerfCurrentMisOrderDropped,
+              jnxpwTDMPerfCurrentMalformedPkt,
+
+              jnxpwTDMPerfCurrentESs,
+              jnxpwTDMPerfCurrentSESs,
+              jnxpwTDMPerfCurrentUASs,
+              jnxpwTDMPerfCurrentFC
+              }
+     STATUS  current
+     DESCRIPTION
+         "Collection of current statistics objects for TDM PWs."
+     ::= { jnxpwTDMGroups 2 }
+
+
+   jnxpwTDMPerfIntervalGroup OBJECT-GROUP
+     OBJECTS {
+              jnxpwTDMPerfIntervalValidData,
+              jnxpwTDMPerfIntervalDuration,
+
+              jnxpwTDMPerfIntervalMissingPkts,
+              jnxpwTDMPerfIntervalPktsReOrder,
+              jnxpwTDMPerfIntervalJtrBfrUnderruns,
+              jnxpwTDMPerfIntervalMisOrderDropped,
+              jnxpwTDMPerfIntervalMalformedPkt,
+
+              jnxpwTDMPerfIntervalESs,
+              jnxpwTDMPerfIntervalSESs,
+              jnxpwTDMPerfIntervalUASs,
+              jnxpwTDMPerfIntervalFC
+
+     }
+     STATUS  current
+     DESCRIPTION
+            "Collection of Interval statistics objects for TDM PWs."
+     ::= { jnxpwTDMGroups 3 }
+
+
+   jnxpwTDMPerf1DayIntervalGroup OBJECT-GROUP
+     OBJECTS {
+              jnxpwTDMPerf1DayIntervalValidData,
+              jnxpwTDMPerf1DayIntervalDuration,
+              jnxpwTDMPerf1DayIntervalMissingPkts,
+              jnxpwTDMPerf1DayIntervalPktsReOrder,
+              jnxpwTDMPerf1DayIntervalJtrBfrUnderruns,
+              jnxpwTDMPerf1DayIntervalMisOrderDropped,
+              jnxpwTDMPerf1DayIntervalMalformedPkt,
+
+              jnxpwTDMPerf1DayIntervalESs,
+              jnxpwTDMPerf1DayIntervalSESs,
+              jnxpwTDMPerf1DayIntervalUASs,
+              jnxpwTDMPerf1DayIntervalFC
+              }
+     STATUS  current
+     DESCRIPTION
+            "Collection of Daily statistics objects for TDM PWs."
+     ::= { jnxpwTDMGroups 4 }
+
+
+
+   END

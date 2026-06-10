@@ -1,0 +1,603 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: Huawei Attack defence MIB, this MIB is for firewall and router
+-- Reference:
+-- Version:     V1.0
+-- History:
+--  
+--  V1.20 2005-05-30 Wei Rixi(22510) added mplsVpnVrfName as table index,
+--              Added DEFVAL to hwAtkIcmpLength, hwAtkIPSynFloodSynSpeed.
+--  V1.10 2004-06-30 Xin Jianfeng(37631) altered the region of 
+--              hwAtkZoneSynFloodSynSpeed, hwAtkIPSynFloodHalfMax to 0~1000000, 
+--              hwAtkZoneSynFloodHalfAge to 0~65535
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =================================================================
+
+HUAWEI-ATK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue, RowStatus            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwATKComm MODULE-IDENTITY 
+        LAST-UPDATED "200304110900Z"        -- April 11, 2003 at 09:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The HUAWEI-ATK-MIB contains objects to
+            manage the ATCKDF(Attack Defence)
+            configuration for all products.
+            "
+        ::= { hwATK 1 }
+
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.10
+    hwATK OBJECT IDENTIFIER ::= { hwDatacomm 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1
+    hwAtkGlobalMibObjects OBJECT IDENTIFIER ::= { hwATKComm 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.1
+    hwAtkIpSpoofingSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting IP spoofing attack."
+        ::= { hwAtkGlobalMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.2
+    hwAtkLandSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting Land attack."
+        ::= { hwAtkGlobalMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.3
+    hwAtkSmurfSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting Smurf attack."
+        ::= { hwAtkGlobalMibObjects 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.4
+    hwAtkFraggleSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting Fraggle attack."
+        ::= { hwAtkGlobalMibObjects 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.5
+    hwAtkWinNukeSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting WinNuke attack."
+        ::= { hwAtkGlobalMibObjects 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.6
+    hwAtkIcmpRedirectSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether blocking ICMP re-direction packets."
+        ::= { hwAtkGlobalMibObjects 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.7
+    hwAtkIcmpUnReachSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether blocking ICMP unreachable packets."
+        ::= { hwAtkGlobalMibObjects 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.8
+    hwAtkSourceRouteSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether blocking packets with source route option."
+        ::= { hwAtkGlobalMibObjects 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.9
+    hwAtkRouteRecordSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether blocking packets with route record option."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.10
+    hwAtkTracertSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether blocking packets of tracert."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.11
+    hwAtkTcpFlagSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting the flag of TCP packets."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.12
+    hwAtkPingOfDeathSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting ping-of-death attack."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 12 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.13
+    hwAtkTeardropSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting teardrop attack."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 13 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.14
+    hwAtkFragFlagSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting the flag for fragment."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 14 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.15
+    hwAtkIPSweepSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting IP sweep attack."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 15 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.16
+    hwAtkIpSweepSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..10000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum speed of IP sweeping."
+        ::= { hwAtkGlobalMibObjects 16 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.17
+    hwAtkIPSweepBlsTime OBJECT-TYPE
+        SYNTAX Integer32 (0..1000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time to add a host to blacklist when find it is sweeping."
+        ::= { hwAtkGlobalMibObjects 17 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.18
+    hwAtkPortScanSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting port scan attack."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 18 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.19
+    hwAtkPortScanSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..10000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum speed of port scanning."
+        ::= { hwAtkGlobalMibObjects 19 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.20
+    hwAtkPortScanBlsTime OBJECT-TYPE
+        SYNTAX Integer32 (0..1000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time to add a host to blacklist when find it is scanning port."
+        ::= { hwAtkGlobalMibObjects 20 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.21
+    hwAtkLargeIcmpSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether blocking large icmp packets."
+        DEFVAL { 0 }
+        ::= { hwAtkGlobalMibObjects 21 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.22
+    hwAtkIcmpLength OBJECT-TYPE
+        SYNTAX Integer32 (8..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum length of ICMP packets allowed to pass the system."
+        DEFVAL { 4000 }
+        ::= { hwAtkGlobalMibObjects 22 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.23
+    hwAtkSynFloodSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting SYN flooding attack."
+        DEFVAL { false }
+        ::= { hwAtkGlobalMibObjects 23 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.24
+    hwAtkUdpFloodSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting UDP flooding attack."
+        DEFVAL { false }
+        ::= { hwAtkGlobalMibObjects 24 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.1.25
+    hwAtkIcmpFloodSw OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch indicates whether inspecting ICMP flooding attack."
+        DEFVAL { false }
+        ::= { hwAtkGlobalMibObjects 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2
+    hwAtkIPMibObjects OBJECT IDENTIFIER ::= { hwATKComm 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1
+    hwAtkSynFloodIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtkSynFloodIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table define the parameters of SYN flood defence for hosts."
+        ::= { hwAtkIPMibObjects 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1.1
+    hwAtkSynFloodIPEntry OBJECT-TYPE
+        SYNTAX HwAtkSynFloodIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " "
+        INDEX { mplsVpnVrfName,  hwAtkSynFloodIP }
+        ::= { hwAtkSynFloodIPTable 1 }
+    
+    HwAtkSynFloodIPEntry ::=
+        SEQUENCE { 
+            hwAtkSynFloodIP
+                IpAddress,
+            hwAtkIPSynFloodSynSpeed
+                Integer32,
+            hwAtkIPSynFloodHalfMax
+                Integer32,
+            hwAtkIPSynFloodHalfAge
+                Integer32,
+            hwAtkIPSynFloodProxy
+                INTEGER,
+            hwAtkIPSynFloodStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1.1.1
+    hwAtkSynFloodIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP address of host to be protected."
+        ::= { hwAtkSynFloodIPEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1.1.2
+    hwAtkIPSynFloodSynSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The maximum speed of SYN packets to the host.
+            when the speed of SYN packets to the host reach the maximum,
+            system will start the TCP proxy."
+        DEFVAL { 1000 }
+        ::= { hwAtkSynFloodIPEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1.1.3
+    hwAtkIPSynFloodHalfMax OBJECT-TYPE
+        SYNTAX Integer32 (0..10000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The maximum incomplete connection for the host."
+        ::= { hwAtkSynFloodIPEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1.1.4
+    hwAtkIPSynFloodHalfAge OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The age of TCP incomplete connections."
+        DEFVAL { 20 }
+        ::= { hwAtkSynFloodIPEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1.1.5
+    hwAtkIPSynFloodProxy OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            auto(1),
+            on(2),
+            off(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The switch of TCP proxy, this switch decides the action of proxy.
+            The switch has three status: auto, on, off."
+        DEFVAL { auto }
+        ::= { hwAtkSynFloodIPEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.1.1.6
+    hwAtkIPSynFloodStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of a row, can be CreateAndGo or Destroy currently."
+        ::= { hwAtkSynFloodIPEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.2
+    hwAtkUdpFloodIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtkUdpFloodIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table define the parameters of UDP flood defence for hosts."
+        ::= { hwAtkIPMibObjects 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.2.1
+    hwAtkUdpFloodIPEntry OBJECT-TYPE
+        SYNTAX HwAtkUdpFloodIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " "
+        INDEX { mplsVpnVrfName, hwAtkUdpFloodIP }
+        ::= { hwAtkUdpFloodIPTable 1 }
+    
+    HwAtkUdpFloodIPEntry ::=
+        SEQUENCE { 
+            hwAtkUdpFloodIP
+                IpAddress,
+            hwAtkIPUdpFloodSpeed
+                Integer32,
+            hwAtkIPUdpFloodStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.2.1.1
+    hwAtkUdpFloodIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP address of host to be protected."
+        ::= { hwAtkUdpFloodIPEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.2.1.2
+    hwAtkIPUdpFloodSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The maximum speed of UDP packets to the host.
+            when the speed of UDP packets to the host reach the maximum,
+            system will drop the subsequent UDP packets to this host,
+            until the speed decline to 80 percent of the maximum.
+            "
+        DEFVAL { 1000 }
+        ::= { hwAtkUdpFloodIPEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.2.1.3
+    hwAtkIPUdpFloodStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of a row, can be CreateAndGo or Destroy currently."
+        ::= { hwAtkUdpFloodIPEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.3
+    hwAtkIcmpFloodIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtkIcmpFloodIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table define the parameters of ICMP flood defence for hosts."
+        ::= { hwAtkIPMibObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.3.1
+    hwAtkIcmpFloodIPEntry OBJECT-TYPE
+        SYNTAX HwAtkIcmpFloodIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " "
+        INDEX { mplsVpnVrfName, hwAtkIcmpFloodIP }
+        ::= { hwAtkIcmpFloodIPTable 1 }
+    
+    HwAtkIcmpFloodIPEntry ::=
+        SEQUENCE { 
+            hwAtkIcmpFloodIP
+                IpAddress,
+            hwAtkIPIcmpFloodSpeed
+                Integer32,
+            hwAtkIPIcmpFloodStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.3.1.1
+    hwAtkIcmpFloodIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP address of host to be protected."
+        ::= { hwAtkIcmpFloodIPEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.3.1.2
+    hwAtkIPIcmpFloodSpeed OBJECT-TYPE
+        SYNTAX Integer32 (0..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The maximum speed of ICMP packets to the host.
+            when the speed of ICMP packets to the host reach the maximum,
+            system will drop the subsequent ICMP packets to this host,
+            until the speed decline to 80 percent of the maximum.
+            "
+        DEFVAL { 1000 }
+        ::= { hwAtkIcmpFloodIPEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.2.3.1.3
+    hwAtkIPIcmpFloodStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of a row, can be CreateAndGo or Destroy currently."
+        ::= { hwAtkIcmpFloodIPEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.3
+    hwAtkCommConformance OBJECT IDENTIFIER ::= { hwATKComm 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.3.1
+    hwAtkCommCompliance OBJECT IDENTIFIER ::= { hwAtkCommConformance 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.3.2
+    hwAtkCommMibGroups OBJECT IDENTIFIER ::= { hwAtkCommConformance 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.3.2.1
+    hwAtkGlobalCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            hwAtkIpSpoofingSw, 
+            hwAtkLandSw, 
+            hwAtkSmurfSw, 
+            hwAtkFraggleSw, 
+            hwAtkWinNukeSw, 
+            hwAtkIcmpRedirectSw, 
+            hwAtkIcmpUnReachSw, 
+            hwAtkSourceRouteSw, 
+            hwAtkRouteRecordSw, 
+            hwAtkTracertSw, 
+            hwAtkTcpFlagSw, 
+            hwAtkPingOfDeathSw, 
+            hwAtkTeardropSw, 
+            hwAtkFragFlagSw, 
+            hwAtkIPSweepSw, 
+            hwAtkIpSweepSpeed, 
+            hwAtkIPSweepBlsTime, 
+            hwAtkPortScanSw, 
+            hwAtkPortScanSpeed, 
+            hwAtkPortScanBlsTime, 
+            hwAtkLargeIcmpSw, 
+            hwAtkIcmpLength, 
+            hwAtkSynFloodSw, 
+            hwAtkUdpFloodSw, 
+            hwAtkIcmpFloodSw
+             }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwAtkCommMibGroups 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.3.2.2
+    hwAtkCommSynFloodGroup OBJECT-GROUP
+        OBJECTS { 
+            hwAtkIPSynFloodSynSpeed, 
+            hwAtkIPSynFloodHalfMax, 
+            hwAtkIPSynFloodHalfAge, 
+            hwAtkIPSynFloodProxy, 
+            hwAtkIPSynFloodStatus
+            }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwAtkCommMibGroups 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.3.2.3
+    hwAtkCommUdpFloodGroup OBJECT-GROUP
+        OBJECTS { 
+            hwAtkIPUdpFloodSpeed, 
+            hwAtkIPUdpFloodStatus }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwAtkCommMibGroups 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.10.1.3.2.4
+    hwAtkCommIcmpFloodGroup OBJECT-GROUP
+        OBJECTS { hwAtkIPIcmpFloodSpeed, hwAtkIPIcmpFloodStatus }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwAtkCommMibGroups 4 }
+ 
+END

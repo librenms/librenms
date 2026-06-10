@@ -1,0 +1,2669 @@
+-- *********************************************************************
+-- CISCO-UNIFIED-COMPUTING-MEMORY-MIB.my
+-- 
+-- MIB representation of the Cisco Unified Computing System
+-- MEMORY management information model package
+-- 
+-- Created July 2018 by Charles Bullis
+-- 
+-- Copyright (c) 2005-2018 Cisco Systems, Inc. All rights reserved.
+-- 
+-- *********************************************************************
+
+CISCO-UNIFIED-COMPUTING-MEMORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Gauge32,
+    TimeTicks,
+    Counter64,
+    Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    RowPointer,
+    DateAndTime,
+    DisplayString,
+    MacAddress,
+    TimeInterval,
+    TimeStamp,
+    TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InetAddressIPv4,
+    InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+    ciscoMgmt
+        FROM CISCO-SMI
+    CiscoNetworkAddress,
+    Unsigned64,
+    CiscoInetAddressMask,
+    CiscoAlarmSeverity,
+    TimeIntervalSec
+        FROM CISCO-TC
+    ciscoUnifiedComputingMIBObjects,
+    CucsManagedObjectId,
+    CucsManagedObjectDn
+        FROM CISCO-UNIFIED-COMPUTING-MIB
+    CucsEquipmentOperability,
+    CucsEquipmentPowerState,
+    CucsEquipmentPresence,
+    CucsEquipmentSensorThresholdStatus,
+    CucsMemoryAdminState,
+    CucsMemoryArrayEnvStatsHistThresholded,
+    CucsMemoryArrayEnvStatsThresholded,
+    CucsMemoryArrayId,
+    CucsMemoryBufferUnitEnvStatsHistThresholded,
+    CucsMemoryBufferUnitEnvStatsThresholded,
+    CucsMemoryBufferUnitId,
+    CucsMemoryErrorCorrection,
+    CucsMemoryErrorStatsThresholded,
+    CucsMemoryFormFactor,
+    CucsMemoryIssues,
+    CucsMemoryRuntimeHistThresholded,
+    CucsMemoryRuntimeThresholded,
+    CucsMemoryRuntimeType,
+    CucsMemoryType,
+    CucsMemoryUnitEnvStatsHistThresholded,
+    CucsMemoryUnitEnvStatsThresholded,
+    CucsMemoryUnitId,
+    CucsMemoryUnitOperability,
+    CucsMemoryVisibility
+        FROM CISCO-UNIFIED-COMPUTING-TC-MIB;
+
+cucsMemoryObjects MODULE-IDENTITY
+    LAST-UPDATED    "201807260000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+        "Cisco Systems
+        Customer Service
+        
+        Postal: 170 W Tasman Drive
+        San Jose, CA  95134
+        USA
+        
+        Tel: +1 800 553 -NETS
+        
+        E-mail: cs-san@cisco.com, cs-lan-switch-snmp@cisco.com"
+    DESCRIPTION
+        "MIB representation of the Cisco Unified Computing System
+        MEMORY management information model package"
+    ::= { ciscoUnifiedComputingMIBObjects 30 }
+
+cucsMemoryArrayTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryArrayEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:Array managed object table"
+    ::= { cucsMemoryObjects 1 }
+
+cucsMemoryArrayEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryArrayEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryArrayTable table."
+    INDEX { cucsMemoryArrayInstanceId }
+    ::= { cucsMemoryArrayTable 1 }
+
+CucsMemoryArrayEntry ::= SEQUENCE {
+    cucsMemoryArrayInstanceId                                        CucsManagedObjectId,
+    cucsMemoryArrayDn                                                CucsManagedObjectDn,
+    cucsMemoryArrayRn                                                SnmpAdminString,
+    cucsMemoryArrayCpuId                                             Gauge32,
+    cucsMemoryArrayCurrCapacity                                      Gauge32,
+    cucsMemoryArrayErrorCorrection                                   CucsMemoryErrorCorrection,
+    cucsMemoryArrayId                                                CucsMemoryArrayId,
+    cucsMemoryArrayMaxCapacity                                       Gauge32,
+    cucsMemoryArrayMaxDevices                                        Gauge32,
+    cucsMemoryArrayModel                                             SnmpAdminString,
+    cucsMemoryArrayOperState                                         CucsEquipmentOperability,
+    cucsMemoryArrayOperability                                       CucsEquipmentOperability,
+    cucsMemoryArrayPerf                                              CucsEquipmentSensorThresholdStatus,
+    cucsMemoryArrayPopulated                                         Gauge32,
+    cucsMemoryArrayPower                                             CucsEquipmentPowerState,
+    cucsMemoryArrayPresence                                          CucsEquipmentPresence,
+    cucsMemoryArrayRevision                                          SnmpAdminString,
+    cucsMemoryArraySerial                                            SnmpAdminString,
+    cucsMemoryArrayThermal                                           CucsEquipmentSensorThresholdStatus,
+    cucsMemoryArrayVendor                                            SnmpAdminString,
+    cucsMemoryArrayVoltage                                           CucsEquipmentSensorThresholdStatus,
+    cucsMemoryArrayOperQualifierReason                               SnmpAdminString,
+    cucsMemoryArrayLocationDn                                        SnmpAdminString
+}
+
+cucsMemoryArrayInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryArrayEntry 1 }
+
+cucsMemoryArrayDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:dn managed object property"
+    ::= { cucsMemoryArrayEntry 2 }
+
+cucsMemoryArrayRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:rn managed object property"
+    ::= { cucsMemoryArrayEntry 3 }
+
+cucsMemoryArrayCpuId OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:cpuId managed object property"
+    ::= { cucsMemoryArrayEntry 4 }
+
+cucsMemoryArrayCurrCapacity OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:currCapacity managed object property"
+    ::= { cucsMemoryArrayEntry 5 }
+
+cucsMemoryArrayErrorCorrection OBJECT-TYPE
+    SYNTAX       CucsMemoryErrorCorrection
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:errorCorrection managed object property"
+    ::= { cucsMemoryArrayEntry 6 }
+
+cucsMemoryArrayId OBJECT-TYPE
+    SYNTAX       CucsMemoryArrayId
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:id managed object property"
+    ::= { cucsMemoryArrayEntry 7 }
+
+cucsMemoryArrayMaxCapacity OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:maxCapacity managed object property"
+    ::= { cucsMemoryArrayEntry 8 }
+
+cucsMemoryArrayMaxDevices OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:maxDevices managed object property"
+    ::= { cucsMemoryArrayEntry 9 }
+
+cucsMemoryArrayModel OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:model managed object property"
+    ::= { cucsMemoryArrayEntry 10 }
+
+cucsMemoryArrayOperState OBJECT-TYPE
+    SYNTAX       CucsEquipmentOperability
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:operState managed object property"
+    ::= { cucsMemoryArrayEntry 11 }
+
+cucsMemoryArrayOperability OBJECT-TYPE
+    SYNTAX       CucsEquipmentOperability
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:operability managed object property"
+    ::= { cucsMemoryArrayEntry 12 }
+
+cucsMemoryArrayPerf OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:perf managed object property"
+    ::= { cucsMemoryArrayEntry 13 }
+
+cucsMemoryArrayPopulated OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:populated managed object property"
+    ::= { cucsMemoryArrayEntry 14 }
+
+cucsMemoryArrayPower OBJECT-TYPE
+    SYNTAX       CucsEquipmentPowerState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:power managed object property"
+    ::= { cucsMemoryArrayEntry 15 }
+
+cucsMemoryArrayPresence OBJECT-TYPE
+    SYNTAX       CucsEquipmentPresence
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:presence managed object property"
+    ::= { cucsMemoryArrayEntry 16 }
+
+cucsMemoryArrayRevision OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:revision managed object property"
+    ::= { cucsMemoryArrayEntry 17 }
+
+cucsMemoryArraySerial OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:serial managed object property"
+    ::= { cucsMemoryArrayEntry 18 }
+
+cucsMemoryArrayThermal OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:thermal managed object property"
+    ::= { cucsMemoryArrayEntry 19 }
+
+cucsMemoryArrayVendor OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:vendor managed object property"
+    ::= { cucsMemoryArrayEntry 20 }
+
+cucsMemoryArrayVoltage OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:voltage managed object property"
+    ::= { cucsMemoryArrayEntry 21 }
+
+cucsMemoryArrayOperQualifierReason OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:operQualifierReason managed
+        object property"
+    ::= { cucsMemoryArrayEntry 22 }
+
+cucsMemoryArrayLocationDn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Array:locationDn managed object property"
+    ::= { cucsMemoryArrayEntry 23 }
+
+cucsMemoryArrayEnvStatsTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryArrayEnvStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats managed object table"
+    ::= { cucsMemoryObjects 2 }
+
+cucsMemoryArrayEnvStatsEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryArrayEnvStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryArrayEnvStatsTable table."
+    INDEX { cucsMemoryArrayEnvStatsInstanceId }
+    ::= { cucsMemoryArrayEnvStatsTable 1 }
+
+CucsMemoryArrayEnvStatsEntry ::= SEQUENCE {
+    cucsMemoryArrayEnvStatsInstanceId                                CucsManagedObjectId,
+    cucsMemoryArrayEnvStatsDn                                        CucsManagedObjectDn,
+    cucsMemoryArrayEnvStatsRn                                        SnmpAdminString,
+    cucsMemoryArrayEnvStatsInputCurrent                              INTEGER,
+    cucsMemoryArrayEnvStatsInputCurrentAvg                           INTEGER,
+    cucsMemoryArrayEnvStatsInputCurrentMax                           INTEGER,
+    cucsMemoryArrayEnvStatsInputCurrentMin                           INTEGER,
+    cucsMemoryArrayEnvStatsIntervals                                 Gauge32,
+    cucsMemoryArrayEnvStatsSuspect                                   TruthValue,
+    cucsMemoryArrayEnvStatsThresholded                               CucsMemoryArrayEnvStatsThresholded,
+    cucsMemoryArrayEnvStatsTimeCollected                             DateAndTime,
+    cucsMemoryArrayEnvStatsUpdate                                    Gauge32
+}
+
+cucsMemoryArrayEnvStatsInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryArrayEnvStatsEntry 1 }
+
+cucsMemoryArrayEnvStatsDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:dn managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 2 }
+
+cucsMemoryArrayEnvStatsRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:rn managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 3 }
+
+cucsMemoryArrayEnvStatsInputCurrent OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:inputCurrent managed
+        object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 4 }
+
+cucsMemoryArrayEnvStatsInputCurrentAvg OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:inputCurrentAvg
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 5 }
+
+cucsMemoryArrayEnvStatsInputCurrentMax OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:inputCurrentMax
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 6 }
+
+cucsMemoryArrayEnvStatsInputCurrentMin OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:inputCurrentMin
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 7 }
+
+cucsMemoryArrayEnvStatsIntervals OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:intervals managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 8 }
+
+cucsMemoryArrayEnvStatsSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:suspect managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 9 }
+
+cucsMemoryArrayEnvStatsThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryArrayEnvStatsThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:thresholded managed
+        object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 10 }
+
+cucsMemoryArrayEnvStatsTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:timeCollected managed
+        object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 11 }
+
+cucsMemoryArrayEnvStatsUpdate OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStats:update managed object property"
+    ::= { cucsMemoryArrayEnvStatsEntry 12 }
+
+cucsMemoryArrayEnvStatsHistTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryArrayEnvStatsHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist managed object table"
+    ::= { cucsMemoryObjects 3 }
+
+cucsMemoryArrayEnvStatsHistEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryArrayEnvStatsHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryArrayEnvStatsHistTable table."
+    INDEX { cucsMemoryArrayEnvStatsHistInstanceId }
+    ::= { cucsMemoryArrayEnvStatsHistTable 1 }
+
+CucsMemoryArrayEnvStatsHistEntry ::= SEQUENCE {
+    cucsMemoryArrayEnvStatsHistInstanceId                            CucsManagedObjectId,
+    cucsMemoryArrayEnvStatsHistDn                                    CucsManagedObjectDn,
+    cucsMemoryArrayEnvStatsHistRn                                    SnmpAdminString,
+    cucsMemoryArrayEnvStatsHistId                                    Unsigned64,
+    cucsMemoryArrayEnvStatsHistInputCurrent                          INTEGER,
+    cucsMemoryArrayEnvStatsHistInputCurrentAvg                       INTEGER,
+    cucsMemoryArrayEnvStatsHistInputCurrentMax                       INTEGER,
+    cucsMemoryArrayEnvStatsHistInputCurrentMin                       INTEGER,
+    cucsMemoryArrayEnvStatsHistMostRecent                            TruthValue,
+    cucsMemoryArrayEnvStatsHistSuspect                               TruthValue,
+    cucsMemoryArrayEnvStatsHistThresholded                           CucsMemoryArrayEnvStatsHistThresholded,
+    cucsMemoryArrayEnvStatsHistTimeCollected                         DateAndTime
+}
+
+cucsMemoryArrayEnvStatsHistInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryArrayEnvStatsHistEntry 1 }
+
+cucsMemoryArrayEnvStatsHistDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:dn managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 2 }
+
+cucsMemoryArrayEnvStatsHistRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:rn managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 3 }
+
+cucsMemoryArrayEnvStatsHistId OBJECT-TYPE
+    SYNTAX       Unsigned64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:id managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 4 }
+
+cucsMemoryArrayEnvStatsHistInputCurrent OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:inputCurrent
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 5 }
+
+cucsMemoryArrayEnvStatsHistInputCurrentAvg OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:inputCurrentAvg
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 6 }
+
+cucsMemoryArrayEnvStatsHistInputCurrentMax OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:inputCurrentMax
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 7 }
+
+cucsMemoryArrayEnvStatsHistInputCurrentMin OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:inputCurrentMin
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 8 }
+
+cucsMemoryArrayEnvStatsHistMostRecent OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:mostRecent
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 9 }
+
+cucsMemoryArrayEnvStatsHistSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:suspect managed
+        object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 10 }
+
+cucsMemoryArrayEnvStatsHistThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryArrayEnvStatsHistThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:thresholded
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 11 }
+
+cucsMemoryArrayEnvStatsHistTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ArrayEnvStatsHist:timeCollected
+        managed object property"
+    ::= { cucsMemoryArrayEnvStatsHistEntry 12 }
+
+cucsMemoryBufferUnitTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryBufferUnitEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit managed object table"
+    ::= { cucsMemoryObjects 4 }
+
+cucsMemoryBufferUnitEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryBufferUnitEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryBufferUnitTable table."
+    INDEX { cucsMemoryBufferUnitInstanceId }
+    ::= { cucsMemoryBufferUnitTable 1 }
+
+CucsMemoryBufferUnitEntry ::= SEQUENCE {
+    cucsMemoryBufferUnitInstanceId                                   CucsManagedObjectId,
+    cucsMemoryBufferUnitDn                                           CucsManagedObjectDn,
+    cucsMemoryBufferUnitRn                                           SnmpAdminString,
+    cucsMemoryBufferUnitId                                           CucsMemoryBufferUnitId,
+    cucsMemoryBufferUnitModel                                        SnmpAdminString,
+    cucsMemoryBufferUnitOperState                                    CucsEquipmentOperability,
+    cucsMemoryBufferUnitOperability                                  CucsEquipmentOperability,
+    cucsMemoryBufferUnitPerf                                         CucsEquipmentSensorThresholdStatus,
+    cucsMemoryBufferUnitPower                                        CucsEquipmentPowerState,
+    cucsMemoryBufferUnitPresence                                     CucsEquipmentPresence,
+    cucsMemoryBufferUnitRevision                                     SnmpAdminString,
+    cucsMemoryBufferUnitSerial                                       SnmpAdminString,
+    cucsMemoryBufferUnitThermal                                      CucsEquipmentSensorThresholdStatus,
+    cucsMemoryBufferUnitVendor                                       SnmpAdminString,
+    cucsMemoryBufferUnitVoltage                                      CucsEquipmentSensorThresholdStatus,
+    cucsMemoryBufferUnitOperQualifierReason                          SnmpAdminString,
+    cucsMemoryBufferUnitLocationDn                                   SnmpAdminString
+}
+
+cucsMemoryBufferUnitInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryBufferUnitEntry 1 }
+
+cucsMemoryBufferUnitDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:dn managed object property"
+    ::= { cucsMemoryBufferUnitEntry 2 }
+
+cucsMemoryBufferUnitRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:rn managed object property"
+    ::= { cucsMemoryBufferUnitEntry 3 }
+
+cucsMemoryBufferUnitId OBJECT-TYPE
+    SYNTAX       CucsMemoryBufferUnitId
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:id managed object property"
+    ::= { cucsMemoryBufferUnitEntry 4 }
+
+cucsMemoryBufferUnitModel OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:model managed object property"
+    ::= { cucsMemoryBufferUnitEntry 5 }
+
+cucsMemoryBufferUnitOperState OBJECT-TYPE
+    SYNTAX       CucsEquipmentOperability
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:operState managed object property"
+    ::= { cucsMemoryBufferUnitEntry 6 }
+
+cucsMemoryBufferUnitOperability OBJECT-TYPE
+    SYNTAX       CucsEquipmentOperability
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:operability managed object property"
+    ::= { cucsMemoryBufferUnitEntry 7 }
+
+cucsMemoryBufferUnitPerf OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:perf managed object property"
+    ::= { cucsMemoryBufferUnitEntry 8 }
+
+cucsMemoryBufferUnitPower OBJECT-TYPE
+    SYNTAX       CucsEquipmentPowerState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:power managed object property"
+    ::= { cucsMemoryBufferUnitEntry 9 }
+
+cucsMemoryBufferUnitPresence OBJECT-TYPE
+    SYNTAX       CucsEquipmentPresence
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:presence managed object property"
+    ::= { cucsMemoryBufferUnitEntry 10 }
+
+cucsMemoryBufferUnitRevision OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:revision managed object property"
+    ::= { cucsMemoryBufferUnitEntry 11 }
+
+cucsMemoryBufferUnitSerial OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:serial managed object property"
+    ::= { cucsMemoryBufferUnitEntry 12 }
+
+cucsMemoryBufferUnitThermal OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:thermal managed object property"
+    ::= { cucsMemoryBufferUnitEntry 13 }
+
+cucsMemoryBufferUnitVendor OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:vendor managed object property"
+    ::= { cucsMemoryBufferUnitEntry 14 }
+
+cucsMemoryBufferUnitVoltage OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:voltage managed object property"
+    ::= { cucsMemoryBufferUnitEntry 15 }
+
+cucsMemoryBufferUnitOperQualifierReason OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:operQualifierReason
+        managed object property"
+    ::= { cucsMemoryBufferUnitEntry 16 }
+
+cucsMemoryBufferUnitLocationDn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnit:locationDn managed object property"
+    ::= { cucsMemoryBufferUnitEntry 17 }
+
+cucsMemoryBufferUnitEnvStatsTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryBufferUnitEnvStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats managed object table"
+    ::= { cucsMemoryObjects 5 }
+
+cucsMemoryBufferUnitEnvStatsEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryBufferUnitEnvStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryBufferUnitEnvStatsTable table."
+    INDEX { cucsMemoryBufferUnitEnvStatsInstanceId }
+    ::= { cucsMemoryBufferUnitEnvStatsTable 1 }
+
+CucsMemoryBufferUnitEnvStatsEntry ::= SEQUENCE {
+    cucsMemoryBufferUnitEnvStatsInstanceId                           CucsManagedObjectId,
+    cucsMemoryBufferUnitEnvStatsDn                                   CucsManagedObjectDn,
+    cucsMemoryBufferUnitEnvStatsRn                                   SnmpAdminString,
+    cucsMemoryBufferUnitEnvStatsIntervals                            Gauge32,
+    cucsMemoryBufferUnitEnvStatsSuspect                              TruthValue,
+    cucsMemoryBufferUnitEnvStatsTemperature                          INTEGER,
+    cucsMemoryBufferUnitEnvStatsTemperatureAvg                       INTEGER,
+    cucsMemoryBufferUnitEnvStatsTemperatureMax                       INTEGER,
+    cucsMemoryBufferUnitEnvStatsTemperatureMin                       INTEGER,
+    cucsMemoryBufferUnitEnvStatsThresholded                          CucsMemoryBufferUnitEnvStatsThresholded,
+    cucsMemoryBufferUnitEnvStatsTimeCollected                        DateAndTime,
+    cucsMemoryBufferUnitEnvStatsUpdate                               Gauge32
+}
+
+cucsMemoryBufferUnitEnvStatsInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 1 }
+
+cucsMemoryBufferUnitEnvStatsDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:dn managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 2 }
+
+cucsMemoryBufferUnitEnvStatsRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:rn managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 3 }
+
+cucsMemoryBufferUnitEnvStatsIntervals OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:intervals
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 4 }
+
+cucsMemoryBufferUnitEnvStatsSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:suspect managed
+        object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 5 }
+
+cucsMemoryBufferUnitEnvStatsTemperature OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:temperature
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 6 }
+
+cucsMemoryBufferUnitEnvStatsTemperatureAvg OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:temperatureAvg
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 7 }
+
+cucsMemoryBufferUnitEnvStatsTemperatureMax OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:temperatureMax
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 8 }
+
+cucsMemoryBufferUnitEnvStatsTemperatureMin OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:temperatureMin
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 9 }
+
+cucsMemoryBufferUnitEnvStatsThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryBufferUnitEnvStatsThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:thresholded
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 10 }
+
+cucsMemoryBufferUnitEnvStatsTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:timeCollected
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 11 }
+
+cucsMemoryBufferUnitEnvStatsUpdate OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStats:update managed
+        object property"
+    ::= { cucsMemoryBufferUnitEnvStatsEntry 12 }
+
+cucsMemoryBufferUnitEnvStatsHistTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryBufferUnitEnvStatsHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist managed object table"
+    ::= { cucsMemoryObjects 6 }
+
+cucsMemoryBufferUnitEnvStatsHistEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryBufferUnitEnvStatsHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryBufferUnitEnvStatsHistTable table."
+    INDEX { cucsMemoryBufferUnitEnvStatsHistInstanceId }
+    ::= { cucsMemoryBufferUnitEnvStatsHistTable 1 }
+
+CucsMemoryBufferUnitEnvStatsHistEntry ::= SEQUENCE {
+    cucsMemoryBufferUnitEnvStatsHistInstanceId                       CucsManagedObjectId,
+    cucsMemoryBufferUnitEnvStatsHistDn                               CucsManagedObjectDn,
+    cucsMemoryBufferUnitEnvStatsHistRn                               SnmpAdminString,
+    cucsMemoryBufferUnitEnvStatsHistId                               Unsigned64,
+    cucsMemoryBufferUnitEnvStatsHistMostRecent                       TruthValue,
+    cucsMemoryBufferUnitEnvStatsHistSuspect                          TruthValue,
+    cucsMemoryBufferUnitEnvStatsHistTemperature                      INTEGER,
+    cucsMemoryBufferUnitEnvStatsHistTemperatureAvg                   INTEGER,
+    cucsMemoryBufferUnitEnvStatsHistTemperatureMax                   INTEGER,
+    cucsMemoryBufferUnitEnvStatsHistTemperatureMin                   INTEGER,
+    cucsMemoryBufferUnitEnvStatsHistThresholded                      CucsMemoryBufferUnitEnvStatsHistThresholded,
+    cucsMemoryBufferUnitEnvStatsHistTimeCollected                    DateAndTime
+}
+
+cucsMemoryBufferUnitEnvStatsHistInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 1 }
+
+cucsMemoryBufferUnitEnvStatsHistDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:dn managed
+        object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 2 }
+
+cucsMemoryBufferUnitEnvStatsHistRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:rn managed
+        object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 3 }
+
+cucsMemoryBufferUnitEnvStatsHistId OBJECT-TYPE
+    SYNTAX       Unsigned64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:id managed
+        object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 4 }
+
+cucsMemoryBufferUnitEnvStatsHistMostRecent OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:mostRecent
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 5 }
+
+cucsMemoryBufferUnitEnvStatsHistSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:suspect
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 6 }
+
+cucsMemoryBufferUnitEnvStatsHistTemperature OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:temperature
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 7 }
+
+cucsMemoryBufferUnitEnvStatsHistTemperatureAvg OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:temperatureAvg
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 8 }
+
+cucsMemoryBufferUnitEnvStatsHistTemperatureMax OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:temperatureMax
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 9 }
+
+cucsMemoryBufferUnitEnvStatsHistTemperatureMin OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:temperatureMin
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 10 }
+
+cucsMemoryBufferUnitEnvStatsHistThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryBufferUnitEnvStatsHistThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:thresholded
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 11 }
+
+cucsMemoryBufferUnitEnvStatsHistTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:BufferUnitEnvStatsHist:timeCollected
+        managed object property"
+    ::= { cucsMemoryBufferUnitEnvStatsHistEntry 12 }
+
+cucsMemoryErrorStatsTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryErrorStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats managed object table"
+    ::= { cucsMemoryObjects 7 }
+
+cucsMemoryErrorStatsEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryErrorStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryErrorStatsTable table."
+    INDEX { cucsMemoryErrorStatsInstanceId }
+    ::= { cucsMemoryErrorStatsTable 1 }
+
+CucsMemoryErrorStatsEntry ::= SEQUENCE {
+    cucsMemoryErrorStatsInstanceId                                   CucsManagedObjectId,
+    cucsMemoryErrorStatsDn                                           CucsManagedObjectDn,
+    cucsMemoryErrorStatsRn                                           SnmpAdminString,
+    cucsMemoryErrorStatsAddressParityErrors                          Counter32,
+    cucsMemoryErrorStatsAddressParityErrors15Min                     Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors15MinH                    Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors1Day                      Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors1DayH                     Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors1Hour                     Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors1HourH                    Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors1Week                     Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors1WeekH                    Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors                            Counter32,
+    cucsMemoryErrorStatsEccMultibitErrors15Min                       Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors15MinH                      Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors1Day                        Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors1DayH                       Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors1Hour                       Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors1HourH                      Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors1Week                       Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors1WeekH                      Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors                           Counter32,
+    cucsMemoryErrorStatsEccSinglebitErrors15Min                      Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors15MinH                     Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors1Day                       Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors1DayH                      Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors1Hour                      Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors1HourH                     Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors1Week                      Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors1WeekH                     Gauge32,
+    cucsMemoryErrorStatsIntervals                                    Gauge32,
+    cucsMemoryErrorStatsMismatchErrors                               Counter32,
+    cucsMemoryErrorStatsMismatchErrors15Min                          Gauge32,
+    cucsMemoryErrorStatsMismatchErrors15MinH                         Gauge32,
+    cucsMemoryErrorStatsMismatchErrors1Day                           Gauge32,
+    cucsMemoryErrorStatsMismatchErrors1DayH                          Gauge32,
+    cucsMemoryErrorStatsMismatchErrors1Hour                          Gauge32,
+    cucsMemoryErrorStatsMismatchErrors1HourH                         Gauge32,
+    cucsMemoryErrorStatsMismatchErrors1Week                          Gauge32,
+    cucsMemoryErrorStatsMismatchErrors1WeekH                         Gauge32,
+    cucsMemoryErrorStatsSuspect                                      TruthValue,
+    cucsMemoryErrorStatsThresholded                                  CucsMemoryErrorStatsThresholded,
+    cucsMemoryErrorStatsTimeCollected                                DateAndTime,
+    cucsMemoryErrorStatsUpdate                                       Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors2Weeks                    Gauge32,
+    cucsMemoryErrorStatsAddressParityErrors2WeeksH                   Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors2Weeks                      Gauge32,
+    cucsMemoryErrorStatsEccMultibitErrors2WeeksH                     Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors2Weeks                     Gauge32,
+    cucsMemoryErrorStatsEccSinglebitErrors2WeeksH                    Gauge32,
+    cucsMemoryErrorStatsMismatchErrors2Weeks                         Gauge32,
+    cucsMemoryErrorStatsMismatchErrors2WeeksH                        Gauge32
+}
+
+cucsMemoryErrorStatsInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryErrorStatsEntry 1 }
+
+cucsMemoryErrorStatsDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:dn managed object property"
+    ::= { cucsMemoryErrorStatsEntry 2 }
+
+cucsMemoryErrorStatsRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:rn managed object property"
+    ::= { cucsMemoryErrorStatsEntry 3 }
+
+cucsMemoryErrorStatsAddressParityErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 4 }
+
+cucsMemoryErrorStatsAddressParityErrors15Min OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors15Min
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 5 }
+
+cucsMemoryErrorStatsAddressParityErrors15MinH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors15MinH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 6 }
+
+cucsMemoryErrorStatsAddressParityErrors1Day OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors1Day
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 7 }
+
+cucsMemoryErrorStatsAddressParityErrors1DayH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors1DayH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 8 }
+
+cucsMemoryErrorStatsAddressParityErrors1Hour OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors1Hour
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 9 }
+
+cucsMemoryErrorStatsAddressParityErrors1HourH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors1HourH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 10 }
+
+cucsMemoryErrorStatsAddressParityErrors1Week OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors1Week
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 11 }
+
+cucsMemoryErrorStatsAddressParityErrors1WeekH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors1WeekH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 12 }
+
+cucsMemoryErrorStatsEccMultibitErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 13 }
+
+cucsMemoryErrorStatsEccMultibitErrors15Min OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors15Min
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 14 }
+
+cucsMemoryErrorStatsEccMultibitErrors15MinH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors15MinH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 15 }
+
+cucsMemoryErrorStatsEccMultibitErrors1Day OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors1Day
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 16 }
+
+cucsMemoryErrorStatsEccMultibitErrors1DayH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors1DayH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 17 }
+
+cucsMemoryErrorStatsEccMultibitErrors1Hour OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors1Hour
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 18 }
+
+cucsMemoryErrorStatsEccMultibitErrors1HourH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors1HourH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 19 }
+
+cucsMemoryErrorStatsEccMultibitErrors1Week OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors1Week
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 20 }
+
+cucsMemoryErrorStatsEccMultibitErrors1WeekH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors1WeekH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 21 }
+
+cucsMemoryErrorStatsEccSinglebitErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 22 }
+
+cucsMemoryErrorStatsEccSinglebitErrors15Min OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors15Min
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 23 }
+
+cucsMemoryErrorStatsEccSinglebitErrors15MinH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors15MinH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 24 }
+
+cucsMemoryErrorStatsEccSinglebitErrors1Day OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors1Day
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 25 }
+
+cucsMemoryErrorStatsEccSinglebitErrors1DayH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors1DayH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 26 }
+
+cucsMemoryErrorStatsEccSinglebitErrors1Hour OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors1Hour
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 27 }
+
+cucsMemoryErrorStatsEccSinglebitErrors1HourH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors1HourH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 28 }
+
+cucsMemoryErrorStatsEccSinglebitErrors1Week OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors1Week
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 29 }
+
+cucsMemoryErrorStatsEccSinglebitErrors1WeekH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors1WeekH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 30 }
+
+cucsMemoryErrorStatsIntervals OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:intervals managed object property"
+    ::= { cucsMemoryErrorStatsEntry 31 }
+
+cucsMemoryErrorStatsMismatchErrors OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors managed
+        object property"
+    ::= { cucsMemoryErrorStatsEntry 32 }
+
+cucsMemoryErrorStatsMismatchErrors15Min OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors15Min
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 33 }
+
+cucsMemoryErrorStatsMismatchErrors15MinH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors15MinH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 34 }
+
+cucsMemoryErrorStatsMismatchErrors1Day OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors1Day
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 35 }
+
+cucsMemoryErrorStatsMismatchErrors1DayH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors1DayH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 36 }
+
+cucsMemoryErrorStatsMismatchErrors1Hour OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors1Hour
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 37 }
+
+cucsMemoryErrorStatsMismatchErrors1HourH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors1HourH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 38 }
+
+cucsMemoryErrorStatsMismatchErrors1Week OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors1Week
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 39 }
+
+cucsMemoryErrorStatsMismatchErrors1WeekH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors1WeekH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 40 }
+
+cucsMemoryErrorStatsSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:suspect managed object property"
+    ::= { cucsMemoryErrorStatsEntry 41 }
+
+cucsMemoryErrorStatsThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryErrorStatsThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:thresholded managed object property"
+    ::= { cucsMemoryErrorStatsEntry 42 }
+
+cucsMemoryErrorStatsTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:timeCollected managed
+        object property"
+    ::= { cucsMemoryErrorStatsEntry 43 }
+
+cucsMemoryErrorStatsUpdate OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:update managed object property"
+    ::= { cucsMemoryErrorStatsEntry 44 }
+
+cucsMemoryErrorStatsAddressParityErrors2Weeks OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors2Weeks
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 45 }
+
+cucsMemoryErrorStatsAddressParityErrors2WeeksH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:addressParityErrors2WeeksH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 46 }
+
+cucsMemoryErrorStatsEccMultibitErrors2Weeks OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors2Weeks
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 47 }
+
+cucsMemoryErrorStatsEccMultibitErrors2WeeksH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccMultibitErrors2WeeksH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 48 }
+
+cucsMemoryErrorStatsEccSinglebitErrors2Weeks OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors2Weeks
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 49 }
+
+cucsMemoryErrorStatsEccSinglebitErrors2WeeksH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:eccSinglebitErrors2WeeksH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 50 }
+
+cucsMemoryErrorStatsMismatchErrors2Weeks OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors2Weeks
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 51 }
+
+cucsMemoryErrorStatsMismatchErrors2WeeksH OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:ErrorStats:mismatchErrors2WeeksH
+        managed object property"
+    ::= { cucsMemoryErrorStatsEntry 52 }
+
+cucsMemoryQualTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryQualEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:Qual managed object table"
+    ::= { cucsMemoryObjects 8 }
+
+cucsMemoryQualEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryQualEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryQualTable table."
+    INDEX { cucsMemoryQualInstanceId }
+    ::= { cucsMemoryQualTable 1 }
+
+CucsMemoryQualEntry ::= SEQUENCE {
+    cucsMemoryQualInstanceId                                         CucsManagedObjectId,
+    cucsMemoryQualDn                                                 CucsManagedObjectDn,
+    cucsMemoryQualRn                                                 SnmpAdminString,
+    cucsMemoryQualClock                                              Gauge32,
+    cucsMemoryQualLatency                                            INTEGER,
+    cucsMemoryQualMaxCap                                             Gauge32,
+    cucsMemoryQualMinCap                                             Gauge32,
+    cucsMemoryQualSpeed                                              Gauge32,
+    cucsMemoryQualUnits                                              Gauge32,
+    cucsMemoryQualWidth                                              Gauge32
+}
+
+cucsMemoryQualInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryQualEntry 1 }
+
+cucsMemoryQualDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:dn managed object property"
+    ::= { cucsMemoryQualEntry 2 }
+
+cucsMemoryQualRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:rn managed object property"
+    ::= { cucsMemoryQualEntry 3 }
+
+cucsMemoryQualClock OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:clock managed object property"
+    ::= { cucsMemoryQualEntry 4 }
+
+cucsMemoryQualLatency OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:latency managed object property"
+    ::= { cucsMemoryQualEntry 5 }
+
+cucsMemoryQualMaxCap OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:maxCap managed object property"
+    ::= { cucsMemoryQualEntry 6 }
+
+cucsMemoryQualMinCap OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:minCap managed object property"
+    ::= { cucsMemoryQualEntry 7 }
+
+cucsMemoryQualSpeed OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:speed managed object property"
+    ::= { cucsMemoryQualEntry 8 }
+
+cucsMemoryQualUnits OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:units managed object property"
+    ::= { cucsMemoryQualEntry 9 }
+
+cucsMemoryQualWidth OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Qual:width managed object property"
+    ::= { cucsMemoryQualEntry 10 }
+
+cucsMemoryRuntimeTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryRuntimeEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime managed object table"
+    ::= { cucsMemoryObjects 9 }
+
+cucsMemoryRuntimeEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryRuntimeEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryRuntimeTable table."
+    INDEX { cucsMemoryRuntimeInstanceId }
+    ::= { cucsMemoryRuntimeTable 1 }
+
+CucsMemoryRuntimeEntry ::= SEQUENCE {
+    cucsMemoryRuntimeInstanceId                                      CucsManagedObjectId,
+    cucsMemoryRuntimeDn                                              CucsManagedObjectDn,
+    cucsMemoryRuntimeRn                                              SnmpAdminString,
+    cucsMemoryRuntimeAvailable                                       Gauge32,
+    cucsMemoryRuntimeAvailableAvg                                    Gauge32,
+    cucsMemoryRuntimeAvailableMax                                    Gauge32,
+    cucsMemoryRuntimeAvailableMin                                    Gauge32,
+    cucsMemoryRuntimeCached                                          Gauge32,
+    cucsMemoryRuntimeCachedAvg                                       Gauge32,
+    cucsMemoryRuntimeCachedMax                                       Gauge32,
+    cucsMemoryRuntimeCachedMin                                       Gauge32,
+    cucsMemoryRuntimeIntervals                                       Gauge32,
+    cucsMemoryRuntimeSuspect                                         TruthValue,
+    cucsMemoryRuntimeThresholded                                     CucsMemoryRuntimeThresholded,
+    cucsMemoryRuntimeTimeCollected                                   DateAndTime,
+    cucsMemoryRuntimeTotal                                           Gauge32,
+    cucsMemoryRuntimeTotalAvg                                        Gauge32,
+    cucsMemoryRuntimeTotalMax                                        Gauge32,
+    cucsMemoryRuntimeTotalMin                                        Gauge32,
+    cucsMemoryRuntimeType                                            CucsMemoryRuntimeType,
+    cucsMemoryRuntimeUpdate                                          Gauge32
+}
+
+cucsMemoryRuntimeInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryRuntimeEntry 1 }
+
+cucsMemoryRuntimeDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:dn managed object property"
+    ::= { cucsMemoryRuntimeEntry 2 }
+
+cucsMemoryRuntimeRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:rn managed object property"
+    ::= { cucsMemoryRuntimeEntry 3 }
+
+cucsMemoryRuntimeAvailable OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:available managed object property"
+    ::= { cucsMemoryRuntimeEntry 4 }
+
+cucsMemoryRuntimeAvailableAvg OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:availableAvg managed object property"
+    ::= { cucsMemoryRuntimeEntry 5 }
+
+cucsMemoryRuntimeAvailableMax OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:availableMax managed object property"
+    ::= { cucsMemoryRuntimeEntry 6 }
+
+cucsMemoryRuntimeAvailableMin OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:availableMin managed object property"
+    ::= { cucsMemoryRuntimeEntry 7 }
+
+cucsMemoryRuntimeCached OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:cached managed object property"
+    ::= { cucsMemoryRuntimeEntry 8 }
+
+cucsMemoryRuntimeCachedAvg OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:cachedAvg managed object property"
+    ::= { cucsMemoryRuntimeEntry 9 }
+
+cucsMemoryRuntimeCachedMax OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:cachedMax managed object property"
+    ::= { cucsMemoryRuntimeEntry 10 }
+
+cucsMemoryRuntimeCachedMin OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:cachedMin managed object property"
+    ::= { cucsMemoryRuntimeEntry 11 }
+
+cucsMemoryRuntimeIntervals OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:intervals managed object property"
+    ::= { cucsMemoryRuntimeEntry 12 }
+
+cucsMemoryRuntimeSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:suspect managed object property"
+    ::= { cucsMemoryRuntimeEntry 13 }
+
+cucsMemoryRuntimeThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryRuntimeThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:thresholded managed object property"
+    ::= { cucsMemoryRuntimeEntry 14 }
+
+cucsMemoryRuntimeTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:timeCollected managed object property"
+    ::= { cucsMemoryRuntimeEntry 15 }
+
+cucsMemoryRuntimeTotal OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:total managed object property"
+    ::= { cucsMemoryRuntimeEntry 16 }
+
+cucsMemoryRuntimeTotalAvg OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:totalAvg managed object property"
+    ::= { cucsMemoryRuntimeEntry 17 }
+
+cucsMemoryRuntimeTotalMax OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:totalMax managed object property"
+    ::= { cucsMemoryRuntimeEntry 18 }
+
+cucsMemoryRuntimeTotalMin OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:totalMin managed object property"
+    ::= { cucsMemoryRuntimeEntry 19 }
+
+cucsMemoryRuntimeType OBJECT-TYPE
+    SYNTAX       CucsMemoryRuntimeType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:type managed object property"
+    ::= { cucsMemoryRuntimeEntry 20 }
+
+cucsMemoryRuntimeUpdate OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Runtime:update managed object property"
+    ::= { cucsMemoryRuntimeEntry 21 }
+
+cucsMemoryRuntimeHistTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryRuntimeHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist managed object table"
+    ::= { cucsMemoryObjects 10 }
+
+cucsMemoryRuntimeHistEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryRuntimeHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryRuntimeHistTable table."
+    INDEX { cucsMemoryRuntimeHistInstanceId }
+    ::= { cucsMemoryRuntimeHistTable 1 }
+
+CucsMemoryRuntimeHistEntry ::= SEQUENCE {
+    cucsMemoryRuntimeHistInstanceId                                  CucsManagedObjectId,
+    cucsMemoryRuntimeHistDn                                          CucsManagedObjectDn,
+    cucsMemoryRuntimeHistRn                                          SnmpAdminString,
+    cucsMemoryRuntimeHistAvailable                                   Gauge32,
+    cucsMemoryRuntimeHistAvailableAvg                                Gauge32,
+    cucsMemoryRuntimeHistAvailableMax                                Gauge32,
+    cucsMemoryRuntimeHistAvailableMin                                Gauge32,
+    cucsMemoryRuntimeHistCached                                      Gauge32,
+    cucsMemoryRuntimeHistCachedAvg                                   Gauge32,
+    cucsMemoryRuntimeHistCachedMax                                   Gauge32,
+    cucsMemoryRuntimeHistCachedMin                                   Gauge32,
+    cucsMemoryRuntimeHistId                                          Unsigned64,
+    cucsMemoryRuntimeHistMostRecent                                  TruthValue,
+    cucsMemoryRuntimeHistSuspect                                     TruthValue,
+    cucsMemoryRuntimeHistThresholded                                 CucsMemoryRuntimeHistThresholded,
+    cucsMemoryRuntimeHistTimeCollected                               DateAndTime,
+    cucsMemoryRuntimeHistTotal                                       Gauge32,
+    cucsMemoryRuntimeHistTotalAvg                                    Gauge32,
+    cucsMemoryRuntimeHistTotalMax                                    Gauge32,
+    cucsMemoryRuntimeHistTotalMin                                    Gauge32
+}
+
+cucsMemoryRuntimeHistInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryRuntimeHistEntry 1 }
+
+cucsMemoryRuntimeHistDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:dn managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 2 }
+
+cucsMemoryRuntimeHistRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:rn managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 3 }
+
+cucsMemoryRuntimeHistAvailable OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:available managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 4 }
+
+cucsMemoryRuntimeHistAvailableAvg OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:availableAvg managed
+        object property"
+    ::= { cucsMemoryRuntimeHistEntry 5 }
+
+cucsMemoryRuntimeHistAvailableMax OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:availableMax managed
+        object property"
+    ::= { cucsMemoryRuntimeHistEntry 6 }
+
+cucsMemoryRuntimeHistAvailableMin OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:availableMin managed
+        object property"
+    ::= { cucsMemoryRuntimeHistEntry 7 }
+
+cucsMemoryRuntimeHistCached OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:cached managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 8 }
+
+cucsMemoryRuntimeHistCachedAvg OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:cachedAvg managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 9 }
+
+cucsMemoryRuntimeHistCachedMax OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:cachedMax managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 10 }
+
+cucsMemoryRuntimeHistCachedMin OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:cachedMin managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 11 }
+
+cucsMemoryRuntimeHistId OBJECT-TYPE
+    SYNTAX       Unsigned64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:id managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 12 }
+
+cucsMemoryRuntimeHistMostRecent OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:mostRecent managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 13 }
+
+cucsMemoryRuntimeHistSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:suspect managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 14 }
+
+cucsMemoryRuntimeHistThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryRuntimeHistThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:thresholded managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 15 }
+
+cucsMemoryRuntimeHistTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:timeCollected managed
+        object property"
+    ::= { cucsMemoryRuntimeHistEntry 16 }
+
+cucsMemoryRuntimeHistTotal OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:total managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 17 }
+
+cucsMemoryRuntimeHistTotalAvg OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:totalAvg managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 18 }
+
+cucsMemoryRuntimeHistTotalMax OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:totalMax managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 19 }
+
+cucsMemoryRuntimeHistTotalMin OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:RuntimeHist:totalMin managed object property"
+    ::= { cucsMemoryRuntimeHistEntry 20 }
+
+cucsMemoryUnitTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryUnitEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:Unit managed object table"
+    ::= { cucsMemoryObjects 11 }
+
+cucsMemoryUnitEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryUnitEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryUnitTable table."
+    INDEX { cucsMemoryUnitInstanceId }
+    ::= { cucsMemoryUnitTable 1 }
+
+CucsMemoryUnitEntry ::= SEQUENCE {
+    cucsMemoryUnitInstanceId                                         CucsManagedObjectId,
+    cucsMemoryUnitDn                                                 CucsManagedObjectDn,
+    cucsMemoryUnitRn                                                 SnmpAdminString,
+    cucsMemoryUnitArray                                              Gauge32,
+    cucsMemoryUnitBank                                               Gauge32,
+    cucsMemoryUnitCapacity                                           Gauge32,
+    cucsMemoryUnitClock                                              Gauge32,
+    cucsMemoryUnitFormFactor                                         CucsMemoryFormFactor,
+    cucsMemoryUnitId                                                 CucsMemoryUnitId,
+    cucsMemoryUnitLatency                                            INTEGER,
+    cucsMemoryUnitLocation                                           SnmpAdminString,
+    cucsMemoryUnitModel                                              SnmpAdminString,
+    cucsMemoryUnitOperState                                          CucsEquipmentOperability,
+    cucsMemoryUnitOperability                                        CucsMemoryUnitOperability,
+    cucsMemoryUnitPerf                                               CucsEquipmentSensorThresholdStatus,
+    cucsMemoryUnitPower                                              CucsEquipmentPowerState,
+    cucsMemoryUnitPresence                                           CucsEquipmentPresence,
+    cucsMemoryUnitRevision                                           SnmpAdminString,
+    cucsMemoryUnitSerial                                             SnmpAdminString,
+    cucsMemoryUnitSet                                                Gauge32,
+    cucsMemoryUnitSpeed                                              Gauge32,
+    cucsMemoryUnitThermal                                            CucsEquipmentSensorThresholdStatus,
+    cucsMemoryUnitType                                               CucsMemoryType,
+    cucsMemoryUnitVendor                                             SnmpAdminString,
+    cucsMemoryUnitVisibility                                         CucsMemoryVisibility,
+    cucsMemoryUnitVoltage                                            CucsEquipmentSensorThresholdStatus,
+    cucsMemoryUnitWidth                                              Gauge32,
+    cucsMemoryUnitAdminState                                         CucsMemoryAdminState,
+    cucsMemoryUnitOperQualifier                                      CucsMemoryIssues,
+    cucsMemoryUnitOperQualifierReason                                SnmpAdminString,
+    cucsMemoryUnitLocationDn                                         SnmpAdminString
+}
+
+cucsMemoryUnitInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryUnitEntry 1 }
+
+cucsMemoryUnitDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:dn managed object property"
+    ::= { cucsMemoryUnitEntry 2 }
+
+cucsMemoryUnitRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:rn managed object property"
+    ::= { cucsMemoryUnitEntry 3 }
+
+cucsMemoryUnitArray OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:array managed object property"
+    ::= { cucsMemoryUnitEntry 4 }
+
+cucsMemoryUnitBank OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:bank managed object property"
+    ::= { cucsMemoryUnitEntry 5 }
+
+cucsMemoryUnitCapacity OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:capacity managed object property"
+    ::= { cucsMemoryUnitEntry 6 }
+
+cucsMemoryUnitClock OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:clock managed object property"
+    ::= { cucsMemoryUnitEntry 7 }
+
+cucsMemoryUnitFormFactor OBJECT-TYPE
+    SYNTAX       CucsMemoryFormFactor
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:formFactor managed object property"
+    ::= { cucsMemoryUnitEntry 8 }
+
+cucsMemoryUnitId OBJECT-TYPE
+    SYNTAX       CucsMemoryUnitId
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:id managed object property"
+    ::= { cucsMemoryUnitEntry 9 }
+
+cucsMemoryUnitLatency OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:latency managed object property"
+    ::= { cucsMemoryUnitEntry 10 }
+
+cucsMemoryUnitLocation OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:location managed object property"
+    ::= { cucsMemoryUnitEntry 11 }
+
+cucsMemoryUnitModel OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:model managed object property"
+    ::= { cucsMemoryUnitEntry 12 }
+
+cucsMemoryUnitOperState OBJECT-TYPE
+    SYNTAX       CucsEquipmentOperability
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:operState managed object property"
+    ::= { cucsMemoryUnitEntry 13 }
+
+cucsMemoryUnitOperability OBJECT-TYPE
+    SYNTAX       CucsMemoryUnitOperability
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:operability managed object property"
+    ::= { cucsMemoryUnitEntry 14 }
+
+cucsMemoryUnitPerf OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:perf managed object property"
+    ::= { cucsMemoryUnitEntry 15 }
+
+cucsMemoryUnitPower OBJECT-TYPE
+    SYNTAX       CucsEquipmentPowerState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:power managed object property"
+    ::= { cucsMemoryUnitEntry 16 }
+
+cucsMemoryUnitPresence OBJECT-TYPE
+    SYNTAX       CucsEquipmentPresence
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:presence managed object property"
+    ::= { cucsMemoryUnitEntry 17 }
+
+cucsMemoryUnitRevision OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:revision managed object property"
+    ::= { cucsMemoryUnitEntry 18 }
+
+cucsMemoryUnitSerial OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:serial managed object property"
+    ::= { cucsMemoryUnitEntry 19 }
+
+cucsMemoryUnitSet OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:set managed object property"
+    ::= { cucsMemoryUnitEntry 20 }
+
+cucsMemoryUnitSpeed OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:speed managed object property"
+    ::= { cucsMemoryUnitEntry 21 }
+
+cucsMemoryUnitThermal OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:thermal managed object property"
+    ::= { cucsMemoryUnitEntry 22 }
+
+cucsMemoryUnitType OBJECT-TYPE
+    SYNTAX       CucsMemoryType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:type managed object property"
+    ::= { cucsMemoryUnitEntry 23 }
+
+cucsMemoryUnitVendor OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:vendor managed object property"
+    ::= { cucsMemoryUnitEntry 24 }
+
+cucsMemoryUnitVisibility OBJECT-TYPE
+    SYNTAX       CucsMemoryVisibility
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:visibility managed object property"
+    ::= { cucsMemoryUnitEntry 25 }
+
+cucsMemoryUnitVoltage OBJECT-TYPE
+    SYNTAX       CucsEquipmentSensorThresholdStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:voltage managed object property"
+    ::= { cucsMemoryUnitEntry 26 }
+
+cucsMemoryUnitWidth OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:width managed object property"
+    ::= { cucsMemoryUnitEntry 27 }
+
+cucsMemoryUnitAdminState OBJECT-TYPE
+    SYNTAX       CucsMemoryAdminState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:adminState managed object property"
+    ::= { cucsMemoryUnitEntry 28 }
+
+cucsMemoryUnitOperQualifier OBJECT-TYPE
+    SYNTAX       CucsMemoryIssues
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:operQualifier managed object property"
+    ::= { cucsMemoryUnitEntry 29 }
+
+cucsMemoryUnitOperQualifierReason OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:operQualifierReason managed
+        object property"
+    ::= { cucsMemoryUnitEntry 30 }
+
+cucsMemoryUnitLocationDn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:Unit:locationDn managed object property"
+    ::= { cucsMemoryUnitEntry 31 }
+
+cucsMemoryUnitEnvStatsTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryUnitEnvStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats managed object table"
+    ::= { cucsMemoryObjects 12 }
+
+cucsMemoryUnitEnvStatsEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryUnitEnvStatsEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryUnitEnvStatsTable table."
+    INDEX { cucsMemoryUnitEnvStatsInstanceId }
+    ::= { cucsMemoryUnitEnvStatsTable 1 }
+
+CucsMemoryUnitEnvStatsEntry ::= SEQUENCE {
+    cucsMemoryUnitEnvStatsInstanceId                                 CucsManagedObjectId,
+    cucsMemoryUnitEnvStatsDn                                         CucsManagedObjectDn,
+    cucsMemoryUnitEnvStatsRn                                         SnmpAdminString,
+    cucsMemoryUnitEnvStatsIntervals                                  Gauge32,
+    cucsMemoryUnitEnvStatsSuspect                                    TruthValue,
+    cucsMemoryUnitEnvStatsTemperature                                INTEGER,
+    cucsMemoryUnitEnvStatsTemperatureAvg                             INTEGER,
+    cucsMemoryUnitEnvStatsTemperatureMax                             INTEGER,
+    cucsMemoryUnitEnvStatsTemperatureMin                             INTEGER,
+    cucsMemoryUnitEnvStatsThresholded                                CucsMemoryUnitEnvStatsThresholded,
+    cucsMemoryUnitEnvStatsTimeCollected                              DateAndTime,
+    cucsMemoryUnitEnvStatsUpdate                                     Gauge32
+}
+
+cucsMemoryUnitEnvStatsInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryUnitEnvStatsEntry 1 }
+
+cucsMemoryUnitEnvStatsDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:dn managed object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 2 }
+
+cucsMemoryUnitEnvStatsRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:rn managed object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 3 }
+
+cucsMemoryUnitEnvStatsIntervals OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:intervals managed object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 4 }
+
+cucsMemoryUnitEnvStatsSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:suspect managed object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 5 }
+
+cucsMemoryUnitEnvStatsTemperature OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:temperature managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 6 }
+
+cucsMemoryUnitEnvStatsTemperatureAvg OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:temperatureAvg managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 7 }
+
+cucsMemoryUnitEnvStatsTemperatureMax OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:temperatureMax managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 8 }
+
+cucsMemoryUnitEnvStatsTemperatureMin OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:temperatureMin managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 9 }
+
+cucsMemoryUnitEnvStatsThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryUnitEnvStatsThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:thresholded managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 10 }
+
+cucsMemoryUnitEnvStatsTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:timeCollected managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 11 }
+
+cucsMemoryUnitEnvStatsUpdate OBJECT-TYPE
+    SYNTAX       Gauge32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStats:update managed object property"
+    ::= { cucsMemoryUnitEnvStatsEntry 12 }
+
+cucsMemoryUnitEnvStatsHistTable OBJECT-TYPE
+    SYNTAX           SEQUENCE OF CucsMemoryUnitEnvStatsHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist managed object table"
+    ::= { cucsMemoryObjects 13 }
+
+cucsMemoryUnitEnvStatsHistEntry OBJECT-TYPE
+    SYNTAX           CucsMemoryUnitEnvStatsHistEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+        "Entry for the cucsMemoryUnitEnvStatsHistTable table."
+    INDEX { cucsMemoryUnitEnvStatsHistInstanceId }
+    ::= { cucsMemoryUnitEnvStatsHistTable 1 }
+
+CucsMemoryUnitEnvStatsHistEntry ::= SEQUENCE {
+    cucsMemoryUnitEnvStatsHistInstanceId                             CucsManagedObjectId,
+    cucsMemoryUnitEnvStatsHistDn                                     CucsManagedObjectDn,
+    cucsMemoryUnitEnvStatsHistRn                                     SnmpAdminString,
+    cucsMemoryUnitEnvStatsHistId                                     Unsigned64,
+    cucsMemoryUnitEnvStatsHistMostRecent                             TruthValue,
+    cucsMemoryUnitEnvStatsHistSuspect                                TruthValue,
+    cucsMemoryUnitEnvStatsHistTemperature                            INTEGER,
+    cucsMemoryUnitEnvStatsHistTemperatureAvg                         INTEGER,
+    cucsMemoryUnitEnvStatsHistTemperatureMax                         INTEGER,
+    cucsMemoryUnitEnvStatsHistTemperatureMin                         INTEGER,
+    cucsMemoryUnitEnvStatsHistThresholded                            CucsMemoryUnitEnvStatsHistThresholded,
+    cucsMemoryUnitEnvStatsHistTimeCollected                          DateAndTime
+}
+
+cucsMemoryUnitEnvStatsHistInstanceId OBJECT-TYPE
+    SYNTAX       CucsManagedObjectId
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Instance identifier of the managed object."
+    ::= { cucsMemoryUnitEnvStatsHistEntry 1 }
+
+cucsMemoryUnitEnvStatsHistDn OBJECT-TYPE
+    SYNTAX       CucsManagedObjectDn
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:dn managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 2 }
+
+cucsMemoryUnitEnvStatsHistRn OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:rn managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 3 }
+
+cucsMemoryUnitEnvStatsHistId OBJECT-TYPE
+    SYNTAX       Unsigned64
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:id managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 4 }
+
+cucsMemoryUnitEnvStatsHistMostRecent OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:mostRecent managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 5 }
+
+cucsMemoryUnitEnvStatsHistSuspect OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:suspect managed
+        object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 6 }
+
+cucsMemoryUnitEnvStatsHistTemperature OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:temperature
+        managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 7 }
+
+cucsMemoryUnitEnvStatsHistTemperatureAvg OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:temperatureAvg
+        managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 8 }
+
+cucsMemoryUnitEnvStatsHistTemperatureMax OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:temperatureMax
+        managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 9 }
+
+cucsMemoryUnitEnvStatsHistTemperatureMin OBJECT-TYPE
+    SYNTAX       INTEGER
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:temperatureMin
+        managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 10 }
+
+cucsMemoryUnitEnvStatsHistThresholded OBJECT-TYPE
+    SYNTAX       CucsMemoryUnitEnvStatsHistThresholded
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:thresholded
+        managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 11 }
+
+cucsMemoryUnitEnvStatsHistTimeCollected OBJECT-TYPE
+    SYNTAX       DateAndTime
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Cisco UCS memory:UnitEnvStatsHist:timeCollected
+        managed object property"
+    ::= { cucsMemoryUnitEnvStatsHistEntry 12 }
+
+END

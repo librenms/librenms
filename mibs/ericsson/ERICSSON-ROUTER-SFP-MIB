@@ -1,0 +1,269 @@
+-- %DNP% $Id: ERICSSON-ROUTER-SFP-MIB.my,v 1.1.12.4 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/ERICSSON-ROUTER-SFP-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-SFP-MIB              Small Form-factor Pluggable MIB
+--
+-- Copyright (c) 2008,  2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+--
+-- *****************************************************************
+
+ERICSSON-ROUTER-SFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Unsigned32
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        DateAndTime
+                FROM SNMPv2-TC
+        EriRouterSlot,
+        EriRouterPort
+                FROM ERICSSON-ROUTER-TC
+        EriRouterAlarmId,
+        EriRouterAlarmServiceAffecting
+                FROM ERICSSON-ROUTER-ALARM-TC
+        IANAItuProbableCause,
+        IANAItuEventType
+                FROM IANA-ITU-ALARM-TC-MIB
+        ItuPerceivedSeverity
+                FROM ITU-ALARM-TC-MIB
+        eriRouterMgmt
+                FROM ERICSSON-ROUTER-SMI;
+
+eriRouterSfpMonMIB MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB"
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+
+                "
+        DESCRIPTION
+                "The MIB used to manage the SFP (Small Form Factor Pluggable) 
+                 devices."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201003020000Z" -- March 2, 2010 
+        DESCRIPTION
+                "Update CONTACT-INFO, add Unsigned32 to IMPORTS clause."
+
+        REVISION        "200808200000Z" -- August 20, 2008 
+        DESCRIPTION
+                "Initial version."
+        ::= { eriRouterMgmt 49 }
+
+eriRouterSfpMonMIBNotifications OBJECT IDENTIFIER
+        ::= { eriRouterSfpMonMIB 0 }
+
+eriRouterSfpMonMIBObjects OBJECT IDENTIFIER
+        ::= { eriRouterSfpMonMIB 1 }
+
+eriRouterSfpMonMIBConformance OBJECT IDENTIFIER
+        ::= { eriRouterSfpMonMIB 2 }
+
+
+-- MIB Objects
+
+eriRouterSfpAlarmActiveTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterSfpAlarmActiveEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "This table contains the SFP alarms currently
+                 active on the SFP."
+        ::= { eriRouterSfpMonMIBObjects 1 }
+
+eriRouterSfpAlarmActiveEntry OBJECT-TYPE
+        SYNTAX      EriRouterSfpAlarmActiveEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Entries appear in this table when alarms are
+                raised. They are removed when the alarms are cleared."
+        INDEX   {eriRouterSfpActiveAlarmIndex }
+        ::= { eriRouterSfpAlarmActiveTable 1 }
+
+EriRouterSfpAlarmActiveEntry ::= SEQUENCE {
+        eriRouterSfpActiveAlarmIndex         Unsigned32,
+        eriRouterSfpAlarmCardSlot            EriRouterSlot,
+        eriRouterSfpAlarmPort                EriRouterPort,
+        eriRouterSfpAlarmId                  EriRouterAlarmId,
+        eriRouterSfpAlarmSeverity            ItuPerceivedSeverity,
+        eriRouterSfpAlarmType                IANAItuEventType,
+        eriRouterSfpAlarmDateAndTime         DateAndTime,
+        eriRouterSfpAlarmDescription         SnmpAdminString,
+        eriRouterSfpAlarmProbableCause       IANAItuProbableCause,
+        eriRouterSfpAlarmServiceAffecting    EriRouterAlarmServiceAffecting
+}
+
+eriRouterSfpActiveAlarmIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A monotonically increasing integer index. It wraps
+                back to 1 after it reaches its maximum value."
+        ::= { eriRouterSfpAlarmActiveEntry 1 }
+
+eriRouterSfpAlarmCardSlot OBJECT-TYPE
+        SYNTAX      EriRouterSlot
+        MAX-ACCESS   read-only 
+        STATUS      current
+        DESCRIPTION
+                "The chassis slot number in which the card is present where the SFP plugged in."
+        ::= { eriRouterSfpAlarmActiveEntry 2 }
+
+eriRouterSfpAlarmPort OBJECT-TYPE
+        SYNTAX      EriRouterPort
+        MAX-ACCESS   read-only
+        STATUS      current
+        DESCRIPTION
+                "The port number where the SFP plugged in."
+        ::= { eriRouterSfpAlarmActiveEntry 3 }
+
+eriRouterSfpAlarmId OBJECT-TYPE 
+        SYNTAX      EriRouterAlarmId
+        MAX-ACCESS   read-only
+        STATUS      current
+        DESCRIPTION
+                "An identifier for the alarm."
+        ::= { eriRouterSfpAlarmActiveEntry 4 }
+
+eriRouterSfpAlarmSeverity OBJECT-TYPE 
+        SYNTAX      ItuPerceivedSeverity
+        MAX-ACCESS   read-only
+        STATUS      current
+        DESCRIPTION
+                "The perceived severity of the alarm."
+        ::= { eriRouterSfpAlarmActiveEntry 5 }
+
+eriRouterSfpAlarmType OBJECT-TYPE 
+        SYNTAX      IANAItuEventType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The type of the alarm."
+        ::= { eriRouterSfpAlarmActiveEntry 6 }
+
+eriRouterSfpAlarmDateAndTime OBJECT-TYPE 
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The local date and time when the alarm was raised"
+        ::= { eriRouterSfpAlarmActiveEntry 7 }
+
+eriRouterSfpAlarmDescription OBJECT-TYPE 
+        SYNTAX      SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "A text string which conveys additional information
+                about the alarm."
+        ::= { eriRouterSfpAlarmActiveEntry 8 }
+
+eriRouterSfpAlarmProbableCause OBJECT-TYPE 
+        SYNTAX      IANAItuProbableCause
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The probable cause for this alarm."
+        ::= { eriRouterSfpAlarmActiveEntry 9 }
+
+eriRouterSfpAlarmServiceAffecting OBJECT-TYPE
+        SYNTAX      EriRouterAlarmServiceAffecting
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Indicates whether the alarm is perceived to be
+                service impacting."
+        ::= { eriRouterSfpAlarmActiveEntry 10 }
+
+-- Notifications
+
+eriRouterSfpAlarm NOTIFICATION-TYPE
+        OBJECTS     {
+                      eriRouterSfpAlarmCardSlot,
+                      eriRouterSfpAlarmPort,
+                      eriRouterSfpAlarmId,
+                      eriRouterSfpAlarmSeverity,
+                      eriRouterSfpAlarmType,
+                      eriRouterSfpAlarmDateAndTime,
+                      eriRouterSfpAlarmDescription,
+                      eriRouterSfpAlarmProbableCause
+                    }
+        STATUS      current
+        DESCRIPTION
+                "An eriRouterSfpAlarm notification signifies that an
+                alarm has been raised or cleared on a SFP"
+        ::= { eriRouterSfpMonMIBNotifications 1 }
+
+
+-- Conformance Statements
+
+eriRouterSfpMonMIBGroups OBJECT IDENTIFIER
+        ::= { eriRouterSfpMonMIBConformance 1 }
+
+eriRouterSfpMonMIBCompliances OBJECT IDENTIFIER
+        ::= { eriRouterSfpMonMIBConformance 2 }
+
+eriRouterSfpMonMIBObjectGroup OBJECT-GROUP
+      OBJECTS     {  	eriRouterSfpAlarmCardSlot,
+        		eriRouterSfpAlarmPort,
+		        eriRouterSfpAlarmId,
+		        eriRouterSfpAlarmType,
+		        eriRouterSfpAlarmDateAndTime,
+		        eriRouterSfpAlarmDescription,
+		        eriRouterSfpAlarmProbableCause,
+		        eriRouterSfpAlarmSeverity,
+		        eriRouterSfpAlarmServiceAffecting  
+                  }
+      STATUS      current
+      DESCRIPTION
+              "A collection of objects providing active SFP Alarm information"
+      ::= { eriRouterSfpMonMIBGroups 1 }
+
+eriRouterSfpMonMIBNotificationGroup NOTIFICATION-GROUP
+      NOTIFICATIONS   {   eriRouterSfpAlarm
+                      }
+      STATUS      current
+      DESCRIPTION
+              "A collection of notifications providing  SFP fault condition"
+      ::= {eriRouterSfpMonMIBGroups 2 }
+
+eriRouterSfpMonMIBCompliance MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+              "The compliance statement for the Sfp active alarm MIB"
+      MODULE      -- this module
+      GROUP       eriRouterSfpMonMIBObjectGroup
+      DESCRIPTION
+              "This group is mandatory for devices which contain Ericsson Approved SFP/XFP" -- Sept 28, 2008 
+      GROUP      eriRouterSfpMonMIBNotificationGroup
+      DESCRIPTION
+              "This group is mandatory for devices which contain SFP/XFP Alarmmonitoring capabilities"
+
+      ::= { eriRouterSfpMonMIBCompliances 1 }
+
+
+
+
+END

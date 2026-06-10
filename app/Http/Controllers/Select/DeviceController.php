@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * DeviceController.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace App\Http\Controllers\Select;
+
+use App\Models\Device;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+
+/**
+ * @extends SelectController<Device>
+ */
+class DeviceController extends SelectController
+{
+    private string $id = 'device_id';
+
+    protected function rules(): array
+    {
+        return [
+            'access' => 'nullable|in:normal,inverted',
+            'user' => 'nullable|int',
+            'key' => 'nullable|in:device_id,hostname',
+            'exclude' => 'nullable|int',
+        ];
+    }
+
+    protected function searchFields($request): array
+    {
+        return ['hostname', 'sysName'];
+    }
+
+    protected function baseQuery(Request $request): Builder
+    {
+        $this->authorize('viewAny', Device::class);
+
+        $this->id = $request->input('key', 'device_id');
+        $user_id = $request->input('user');
+
+        // list devices the user does not have access to
+        if ($request->input('access') == 'inverted' && $user_id && $request->user()->can('viewAll', Device::class)) {
+            return Device::query()
+                ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
+                ->whereNotIn('device_id', function ($query) use ($user_id): void {
+                    $query->select('device_id')
+                        ->from('devices_perms')
+                        ->where('user_id', $user_id);
+                })
+                ->orderBy('hostname');
+        }
+
+        return Device::hasAccess($request->user())
+            ->when($request->input('exclude'), fn ($query, $exclude) => $query->where('device_id', '!=', $exclude))
+            ->select(['device_id', 'hostname', 'sysName', 'display', 'icon'])
+            ->orderBy('hostname');
+    }
+
+    /**
+     * @param  Device  $model
+     * @return array{id: int|string, text: string, icon?: string}
+     */
+    public function formatItem(Model $model): array
+    {
+        /** @var Device $model */
+        return [
+            'id' => $model->{$this->id},
+            'text' => $model->displayName(),
+            'icon' => $model->icon,
+        ];
+    }
+}

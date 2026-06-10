@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use LibreNMS\Util\DynamicConfig;
+
+class SettingsController
+{
+    use AuthorizesRequests;
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param  DynamicConfig  $dynamicConfig
+     * @param  string  $tab
+     * @param  string  $section
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
+     */
+    public function index(DynamicConfig $dynamicConfig, $tab = 'alerting', $section = '')
+    {
+        $this->authorize('settings.view');
+
+        $data = [
+            'active_tab' => $tab,
+            'active_section' => $section,
+            'groups' => $dynamicConfig->getGroups()->reject(fn ($group) => $group == 'global')->values(),
+        ];
+
+        return view('settings.index', $data);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  DynamicConfig  $config
+     * @param  Request  $request
+     * @param  string  $id
+     * @return JsonResponse
+     */
+    public function update(DynamicConfig $config, Request $request, $id)
+    {
+        $this->authorize('settings.update');
+
+        $value = $request->input('value');
+
+        if (! $config->isValidSetting($id)) {
+            return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
+        }
+
+        $current = \App\Facades\LibrenmsConfig::get($id);
+        $config_item = $config->get($id);
+
+        if (! $config_item->checkValue($value)) {
+            return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
+        }
+
+        if (\App\Facades\LibrenmsConfig::persist($id, $value)) {
+            return $this->jsonResponse($id, "Successfully set $id", $value);
+        }
+
+        return $this->jsonResponse($id, 'Failed to update :id', $current, 400);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  DynamicConfig  $config
+     * @param  string  $id
+     * @return JsonResponse
+     */
+    public function destroy(DynamicConfig $config, $id)
+    {
+        $this->authorize('settings.update');
+
+        if (! $config->isValidSetting($id)) {
+            return $this->jsonResponse($id, ':id is not a valid setting', null, 400);
+        }
+
+        $dbConfig = \App\Models\Config::withChildren($id)->get();
+        if ($dbConfig->isEmpty()) {
+            return $this->jsonResponse($id, ':id is not set', $config->get($id)->default, 400);
+        }
+
+        $dbConfig->each->delete();
+
+        return $this->jsonResponse($id, ':id reset to default', $config->get($id)->default);
+    }
+
+    /**
+     * List all settings (excluding hidden ones and ones that don't have metadata)
+     *
+     * @param  DynamicConfig  $config
+     * @return JsonResponse
+     */
+    public function listAll(DynamicConfig $config)
+    {
+        $this->authorize('settings.view');
+
+        return response()->json($config->all()->filter->isValid());
+    }
+
+    /**
+     * @param  string  $id
+     * @param  string  $message
+     * @param  mixed  $value
+     * @param  int  $status
+     * @return JsonResponse
+     */
+    protected function jsonResponse($id, $message, $value = null, $status = 200)
+    {
+        return new JsonResponse([
+            'message' => __($message, ['id' => $id]),
+            'value' => $value,
+        ], $status);
+    }
+}

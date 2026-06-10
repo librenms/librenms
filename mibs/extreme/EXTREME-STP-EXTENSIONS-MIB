@@ -1,0 +1,492 @@
+-- ################################################################################
+
+EXTREME-STP-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE        FROM SNMPv2-SMI
+    TruthValue        FROM SNMPv2-TC
+    DisplayString        FROM RFC1213-MIB
+    Integer32, Counter32, TimeTicks    FROM SNMPv2-SMI
+    RowStatus               FROM SNMPv2-TC
+    extremeVlanIfIndex    FROM EXTREME-VLAN-MIB
+    extremeAgent, PortList	FROM EXTREME-BASE-MIB
+    extremeSlotNumber       FROM EXTREME-SYSTEM-MIB;
+
+    extremeStp MODULE-IDENTITY        
+	        LAST-UPDATED "201702200000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme STP extensions"
+        ::= { extremeAgent 17 }
+
+    BridgeId ::= OCTET STRING (SIZE (8))   -- the
+    Timeout ::= Integer32 -- a STP timer in units of 1/100 seconds
+
+    extremeStpDomainTable    OBJECT-TYPE
+        SYNTAX                        SEQUENCE OF ExtremeStpDomainEntry
+        MAX-ACCESS                    not-accessible
+        STATUS                        current
+        DESCRIPTION
+        "This table contains STP information per STP domain."
+        ::= { extremeStp 1 }
+
+    extremeStpDomainEntry    OBJECT-TYPE
+        SYNTAX                        ExtremeStpDomainEntry
+        MAX-ACCESS                    not-accessible
+        STATUS                        current
+        DESCRIPTION
+        "An entry in the extremeStpDomain Table."
+        INDEX        { extremeStpDomainStpdInstance }
+        ::= { extremeStpDomainTable 1 }
+
+    ExtremeStpDomainEntry ::= SEQUENCE {
+        extremeStpDomainStpdInstance            Integer32,
+        extremeStpDomainStpdName            DisplayString,
+        extremeStpDomainStpEnabled            TruthValue,
+        extremeStpDomainRstpEnabled            TruthValue,
+        extremeStpDomainStpdTag                INTEGER,
+        extremeStpDomainNumPorts            Integer32,
+        extremeStpDomainBridgeId            BridgeId,
+        extremeStpDomainBridgePriority            INTEGER,
+        extremeStpDomainDesignatedRoot            BridgeId,
+        extremeStpDomainRootPortIfIndex            Integer32,
+        extremeStpDomainRootCost            Integer32,    
+        extremeStpDomainRRFailoverEnabled        TruthValue,    
+        extremeStpDomainMaxAge                Timeout,        
+        extremeStpDomainHelloTime            Timeout,
+        extremeStpDomainForwardDelay            Timeout,
+        extremeStpDomainBridgeMaxAge            Timeout,
+        extremeStpDomainBridgeHelloTime            Timeout,
+        extremeStpDomainBridgeForwardDelay        Timeout,
+        extremeStpDomainHoldTime            Timeout,
+        extremeStpDomainTopChanges            Counter32,
+        extremeStpDomainTimeSinceTopologyChange        TimeTicks,
+        extremeStpDomainRowStatus            RowStatus,
+        extremeStpDomainPortInstance         Integer32,
+        extremeStpDomainStpdDescription      DisplayString
+        }
+
+        extremeStpDomainStpdInstance            OBJECT-TYPE
+		SYNTAX			 Integer32
+        MAX-ACCESS                    accessible-for-notify
+        STATUS                        current
+        DESCRIPTION
+        "The unique identifier of this STP domain."
+        ::= { extremeStpDomainEntry 1 }
+
+        extremeStpDomainStpdName            OBJECT-TYPE
+        SYNTAX                        DisplayString (SIZE(1..31))
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The name associated with this STP domain."
+        ::= { extremeStpDomainEntry 2 }
+
+        extremeStpDomainStpEnabled            OBJECT-TYPE
+        SYNTAX                        TruthValue
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The Enabled/Disabled state of STP on this STP domain."
+        ::= { extremeStpDomainEntry 3 }
+
+
+        extremeStpDomainRstpEnabled            OBJECT-TYPE
+        SYNTAX                        TruthValue
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The Enabled/Disabled state of Rapid STP on this STP domain."
+        ::= { extremeStpDomainEntry 4 }
+
+
+        extremeStpDomainStpdTag                OBJECT-TYPE
+        SYNTAX                        INTEGER (0..4095)
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The StpdId of this STP domain which appears as the 802.1Q tag. Therefore, 
+        it must be the VLAN tag of one of the wholly-contained VLANs of this STP
+        domain (i.e., the Carrier VLAN).  A value of 0 is returned if the STP domain
+        has no Carrier VLAN defined yet or is a completely native 802.1D domain."
+        ::= { extremeStpDomainEntry 5 }
+
+        extremeStpDomainNumPorts            OBJECT-TYPE
+		SYNTAX			Integer32
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The number of physical ports belonging to this STP domain."
+        ::= { extremeStpDomainEntry 6 }
+
+        extremeStpDomainBridgeId            OBJECT-TYPE
+        SYNTAX                        BridgeId
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The bridge identifier of this bridge for this STP domain."
+        ::= { extremeStpDomainEntry 7 }
+
+        extremeStpDomainBridgePriority            OBJECT-TYPE
+        SYNTAX                        INTEGER (0..65535)
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The bridge priority of this bridge for this STP domain."
+        ::= { extremeStpDomainEntry 8 }
+
+        extremeStpDomainDesignatedRoot            OBJECT-TYPE
+        SYNTAX                        BridgeId
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The root bridge identifier for this STP domain as determined by the STP
+        running on this bridge for this STP domain"
+        ::= { extremeStpDomainEntry 9 }
+
+        extremeStpDomainRootPortIfIndex            OBJECT-TYPE
+		SYNTAX			Integer32
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The port ifIndex of the root port of this bridge for this STP domain."
+        ::= { extremeStpDomainEntry 10 }
+
+        extremeStpDomainRootCost            OBJECT-TYPE
+		SYNTAX			Integer32
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The cost of the path from this bridge to the root bridge of this STP domain"
+        ::= { extremeStpDomainEntry 11 }
+
+        extremeStpDomainRRFailoverEnabled        OBJECT-TYPE
+        SYNTAX                        TruthValue
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The Enabled/Disabled state of Rapid Root Failover for this bridge on 
+        this STP domain."
+        ::= { extremeStpDomainEntry 12 }
+
+        extremeStpDomainMaxAge                OBJECT-TYPE
+        SYNTAX                        Timeout
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The maximum allowable age, in units of hundredths of a second, of STP 
+        information learned by this bridge for this STP domain, after which it 
+        is discarded. This is the value currently being used by the bridge."
+        ::= { extremeStpDomainEntry 13 }
+
+        extremeStpDomainHelloTime            OBJECT-TYPE
+        SYNTAX                        Timeout
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The time, in hundredths of a second, between successive transmissions
+        of Configuration BPDUs when this bridge is(or is trying to become) the 
+        root bridge for this STP domain. This is the value currently being used
+        by this bridge."
+        ::= { extremeStpDomainEntry 14 }
+
+        extremeStpDomainForwardDelay            OBJECT-TYPE
+        SYNTAX                        Timeout
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The forward delay time, in hundredths of a second, currently
+        being used by this bridge on this STP domain."
+        ::= { extremeStpDomainEntry 15 }
+
+        extremeStpDomainBridgeMaxAge            OBJECT-TYPE
+        SYNTAX                        Timeout (600..4000)
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "This is the value of MaxAge used by all other bridges in 
+        this STP domain when this bridge is the root bridge."
+        ::= { extremeStpDomainEntry 16 }
+
+        extremeStpDomainBridgeHelloTime            OBJECT-TYPE
+        SYNTAX                        Timeout (100..1000)
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "This is the value of HelloTime used by all other bridges in
+        this STP domain when this bridge is the root bridge."
+        ::= { extremeStpDomainEntry 17 }
+
+        extremeStpDomainBridgeForwardDelay        OBJECT-TYPE
+        SYNTAX                        Timeout (400..3000)
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "This is the value of ForwardDelay used by all other bridges in
+        this STP domain when this bridge is the root bridge."
+
+        ::= { extremeStpDomainEntry 18 }
+
+        extremeStpDomainHoldTime            OBJECT-TYPE
+        SYNTAX                        Timeout
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "This is the Hold Time, in hundredths of a second, for this
+        STP domain."
+        ::= { extremeStpDomainEntry 19 }
+
+        extremeStpDomainTopChanges            OBJECT-TYPE
+        SYNTAX                        Counter32
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The number of topology changes detected by this bridge for
+        this STP domain since the management entity was initialized
+        or reset."
+        ::= { extremeStpDomainEntry 20 }
+
+        extremeStpDomainTimeSinceTopologyChange        OBJECT-TYPE
+        SYNTAX                        TimeTicks
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The time, in hundredths of a second, since a topology change
+        was last detected by this bridge for this STP domain."
+        ::= { extremeStpDomainEntry 21 }
+
+        extremeStpDomainRowStatus            OBJECT-TYPE
+        SYNTAX                        RowStatus
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The status of this entry, as per standard RowStatus conventions."
+        ::= { extremeStpDomainEntry 22 }
+
+        extremeStpDomainPortInstance       OBJECT-TYPE
+	SYNTAX			Integer32
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The port ifIndex of the port disabled in STP domain."
+        ::= { extremeStpDomainEntry 23 }
+
+        extremeStpDomainStpdDescription            OBJECT-TYPE
+        SYNTAX                        DisplayString (SIZE(0..180))
+        MAX-ACCESS                    read-only
+        STATUS                        current
+        DESCRIPTION
+        "The description associated with this STP domain."
+        ::= { extremeStpDomainEntry 24 }
+        
+    extremeStpPortTable            OBJECT-TYPE
+        SYNTAX                SEQUENCE OF ExtremeStpPortEntry
+        MAX-ACCESS            not-accessible
+        STATUS                current
+        DESCRIPTION
+        "This table contains port-specific information per STP domain."
+    ::= { extremeStp 2 }
+
+    extremeStpPortEntry            OBJECT-TYPE
+        SYNTAX                ExtremeStpPortEntry
+        MAX-ACCESS            not-accessible
+        STATUS                current
+        DESCRIPTION
+        "An entry in the extremeStpPort table."
+        INDEX        { extremeStpDomainStpdInstance, extremeStpPortPortIfIndex }
+        ::= { extremeStpPortTable 1 }    
+
+    ExtremeStpPortEntry ::= SEQUENCE {
+        extremeStpPortPortIfIndex    Integer32,
+                extremeStpPortStpEnabled        TruthValue,
+        extremeStpPortPortMode        INTEGER,
+        extremeStpPortPortState        INTEGER,
+        extremeStpPortPortPriority    INTEGER,
+        extremeStpPortPortId        OCTET STRING,
+        extremeStpPortPathCost        INTEGER,
+        extremeStpPortDesignatedCost    Integer32,
+                extremeStpPortDesignatedRoot    BridgeId,
+        extremeStpPortDesignatedBridge    BridgeId,
+        extremeStpPortDesignatedPort    OCTET STRING,
+        extremeStpPortRowStatus        RowStatus        
+        }
+
+    extremeStpPortPortIfIndex        OBJECT-TYPE
+		SYNTAX		Integer32
+        MAX-ACCESS                not-accessible
+        STATUS                current
+        DESCRIPTION
+        "The ifIndex of the physical port for which this entry contains STP information."
+        ::= { extremeStpPortEntry 1 }
+
+    extremeStpPortStpEnabled        OBJECT-TYPE
+        SYNTAX                TruthValue
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The enabled/disabled state of this STP instance on this port."
+        ::= { extremeStpPortEntry 2 }
+
+
+    extremeStpPortPortMode            OBJECT-TYPE
+        SYNTAX                INTEGER { 
+                            dot1d(1), 
+                            emistp(2), 
+                            pvstp(3), 
+                            dot1w(4)
+                            }
+        MAX-ACCESS                read-only
+        STATUS                    current
+        DESCRIPTION
+        "The port mode of this port in this STP domain."
+        ::= { extremeStpPortEntry 3 }
+
+    extremeStpPortPortState            OBJECT-TYPE
+        SYNTAX                INTEGER { 
+                            disabled(1),
+                            blocking(2),
+                            listening(3),
+                            learning(4),
+                            forwarding(5)
+                        }
+                                     
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The port state of this port in this STP domain."
+        ::= { extremeStpPortEntry 4 }
+
+    extremeStpPortPortPriority        OBJECT-TYPE
+        SYNTAX                INTEGER (0..31)
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The port priority of this port in this STP domain."
+        ::= { extremeStpPortEntry 5 }
+
+    extremeStpPortPortId            OBJECT-TYPE
+        SYNTAX                OCTET STRING (SIZE(2))
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The port identifier of this port in this STP domain."
+        ::= { extremeStpPortEntry 6 }
+
+    extremeStpPortPathCost            OBJECT-TYPE
+        SYNTAX                INTEGER (1..65535)
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The path cost of this port for this STP domain."
+        ::= { extremeStpPortEntry 7 }
+
+    extremeStpPortDesignatedCost        OBJECT-TYPE
+		SYNTAX		Integer32
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The path cost, for this STP domain, of the Designated Port of the 
+        segment connected to this port."
+        ::= { extremeStpPortEntry 8 }
+
+        extremeStpPortDesignatedRoot            OBJECT-TYPE
+                SYNTAX                          BridgeId
+                MAX-ACCESS                      read-only
+                STATUS                          current
+                DESCRIPTION
+                    "The root bridge identifier, for this STP domain, that is sent in the 
+                    Configuration BPDUs transmitted by the Designated Bridge for the segment
+                    to which this port is attached."
+                ::= { extremeStpPortEntry 9 }
+
+    extremeStpPortDesignatedBridge        OBJECT-TYPE
+        SYNTAX                BridgeId
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The bridge identifier for the bridge considered to be the Designated Bridge,
+        in this STP domain, for the segment connected to this port."
+        ::= { extremeStpPortEntry 10 }
+
+    extremeStpPortDesignatedPort        OBJECT-TYPE
+        SYNTAX                OCTET STRING(SIZE(2))
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The port identifier of the Designated Port on this port's segment, for this
+        STP domain."
+        ::= { extremeStpPortEntry 11 }
+
+    extremeStpPortRowStatus            OBJECT-TYPE
+        SYNTAX                RowStatus
+        MAX-ACCESS            read-only
+        STATUS                current
+        DESCRIPTION
+        "The status of this entry, as per standard RowStatus conventions."
+        ::= { extremeStpPortEntry 12 }
+
+
+    extremeStpVlanPortTable        OBJECT-TYPE
+        SYNTAX            SEQUENCE OF ExtremeStpVlanPortEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION
+        "This table contains information of the ports belonging to a STP domain on a per VLAN basis."
+        ::= { extremeStp 3 }
+
+    extremeStpVlanPortEntry        OBJECT-TYPE
+        SYNTAX            ExtremeStpVlanPortEntry
+        MAX-ACCESS        not-accessible
+        STATUS            current
+        DESCRIPTION
+        "An entry in the extremeStpVlanPort table."
+        INDEX        { extremeVlanIfIndex, extremeStpDomainStpdInstance }
+    ::= { extremeStpVlanPortTable 1 }
+
+    ExtremeStpVlanPortEntry ::= SEQUENCE {
+        extremeStpVlanPortPortMask        PortList,
+        extremeStpVlanPortRowStatus        RowStatus
+        }
+
+    extremeStpVlanPortPortMask    OBJECT-TYPE
+    SYNTAX                PortList
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION
+    "The list of ports in this STP domain and in this VLAN."
+    ::= { extremeStpVlanPortEntry 1 }
+
+    extremeStpVlanPortRowStatus    OBJECT-TYPE
+    SYNTAX                RowStatus
+    MAX-ACCESS            read-only
+    STATUS                current
+    DESCRIPTION
+    "The status of this entry, as per standard RowStatus conventions."
+    ::= { extremeStpVlanPortEntry 2 }
+
+    extremeStpNotifications    OBJECT IDENTIFIER
+     ::=  { extremeStp 4 }
+
+    extremeStpNotificationsPrefix OBJECT IDENTIFIER
+     ::= { extremeStpNotifications 0}
+  
+
+    extremeStpEdgePortLoopDetected NOTIFICATION-TYPE
+        OBJECTS  { extremeStpDomainStpdInstance,
+                   extremeStpDomainPortInstance
+                 }
+        STATUS  current
+        DESCRIPTION
+        "A Loop has been detected and the port will be disabled."
+        ::= { extremeStpNotificationsPrefix 1}
+
+    extremeStpPortLoopProtectEventDetected NOTIFICATION-TYPE
+        OBJECTS  {
+                   extremeStpDomainPortInstance
+                 }
+        STATUS  current
+        DESCRIPTION
+        "A Loop protect event has been detected."
+        ::= { extremeStpNotificationsPrefix 2}
+
+END

@@ -1,0 +1,54 @@
+--*******************************************************************
+--*    SAGEM, IONOS 	 							  				*
+--*******************************************************************
+--*******************************************************************
+--
+--  Filename: adr2500c
+--
+--  File type: .mib    
+-- 
+--  Description:	SNMP source Mib file.        
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Version: MIB-P0-301199	Date: 30 11 1999 
+-- 
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: ADR2500C-MIB
+--*******************************************************************
+ADR2500C-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+   sagemDr			FROM SAGEM-DR-MIB
+   MODULE-IDENTITY		FROM SNMPv2-SMI ;
+   
+   adr2500c	MODULE-IDENTITY
+      LAST-UPDATED "0211150000Z"
+      ORGANIZATION "SAGEM-Tolbiac drd/ddp/tmhd"
+      CONTACT-INFO
+	"    "
+      DESCRIPTION 
+        "The MIB module specific for ARD2500c equipment"
+   ::= { sagemDr 17 }
+
+   
+   
+   
+END
+

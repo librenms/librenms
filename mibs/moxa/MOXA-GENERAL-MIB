@@ -1,0 +1,52 @@
+-- *****************************************************************
+-- *  Moxa General Function PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-GENERAL-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC;
+
+    general MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module for Moxa General Feature Group."
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "201906300000Z"
+        DESCRIPTION "Initial Revision"
+
+        ::= { moxa 602 }
+
+    moxa OBJECT IDENTIFIER ::= { enterprises 8691 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-GENERAL-MIB MIB
+-- -------------------------------------------------------------
+    systemManagement        OBJECT IDENTIFIER ::= { general 1 }
+    networkConfiguration    OBJECT IDENTIFIER ::= { general 2 }
+    time                    OBJECT IDENTIFIER ::= { general 3 }
+    networkManagement       OBJECT IDENTIFIER ::= { general 4 }
+    deviceSecurity          OBJECT IDENTIFIER ::= { general 5 }
+    authentication          OBJECT IDENTIFIER ::= { general 6 }
+    eventNotification       OBJECT IDENTIFIER ::= { general 7 }
+    deviceDiagnostics       OBJECT IDENTIFIER ::= { general 8 }
+
+END

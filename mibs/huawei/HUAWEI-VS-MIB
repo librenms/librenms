@@ -1,0 +1,245 @@
+--==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI VS MIB
+-- Reference:
+-- Version: V1.05
+-- History:
+-- <author>,  <date>,  <contents>
+-- xuzhen   2011-6-17
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Varibles and types are imported
+--
+-- ==================================================================
+    HUAWEI-VS-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            DisplayString         
+                FROM SNMPv2-TC
+            OBJECT-GROUP, MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI;
+     
+    
+
+        hwVsMIB MODULE-IDENTITY 
+            LAST-UPDATED "201709251541Z"        
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "The HUAWEI-VS-MIB which contains objects manages virtual system name and virtual system id. 
+                "
+
+       REVISION "201709251541Z"    
+         DESCRIPTION 
+            "The permission on the hwVSVsId object is changed from not-accessible to read-only."  
+       REVISION "201708301023Z"    
+         DESCRIPTION 
+            "The hwVSPhysicalResTable was added, and objects hwVSCPUUsage, hwVSMemoryUsedSize, and hwVSMemoryTotalSize were added to the hwVSPhysicalResTable.
+			 hwVSSlot was added."   
+       REVISION "201708171841Z"    
+         DESCRIPTION 
+            "Modify the description."   
+         REVISION "201705181000Z"    
+         DESCRIPTION 
+            "HwVSEntry MIB objects hwVSStatus, hwVSCPUUsage, hwVSMemoryUsedSize, and hwVSMemoryTotalSize were added."   
+         REVISION "201410211000Z"    
+         DESCRIPTION 
+            "Modify the Index of hwVSTable."       
+
+            ::= { hwDatacomm 255 }
+
+    
+    
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ==================================================================       
+        hwVSObjects OBJECT IDENTIFIER ::= { hwVsMIB 1 }
+
+        
+        hwVSTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table about the id and name of virtual system."
+            ::= { hwVSObjects 1 }
+
+        
+        hwVSEntry OBJECT-TYPE
+            SYNTAX HwVSEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about the id and name of virtual system."
+            INDEX { hwVSVsId }
+            ::= { hwVSTable 1 }
+
+        
+        HwVSEntry ::=
+            SEQUENCE {
+                hwVSVsId
+                    Integer32, 
+                hwVSVsName
+                    DisplayString,
+                hwVSStatus
+                    INTEGER
+             }
+
+        hwVSVsId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of a VS. The index is unique in the related physical system (PS)."
+            ::= { hwVSEntry 1 }
+            
+            
+        hwVSVsName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the VS. The VS name must be unique in the entire system. It is a string of 1 to 31 characters."
+            ::= { hwVSEntry 2 }
+
+	hwVSStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                running(1),
+                stop(2),
+                restoring(3),
+                shutdowning(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object specifies the virtual system state.
+			    1. running(1): The virtual system is running.
+			    2. stop(2): The virtual system is stopped.
+			    3. restoring (3): The virtual system is being restored.
+			    4. shutdowning(4): The virtual system is being stopped."
+	    ::= { hwVSEntry 3 }
+		
+	hwVSPhysicalResTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVSPhysicalResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table about the physical resources of virtual system."
+            ::= { hwVSObjects 2 }
+        
+        hwVSPhysicalResEntry OBJECT-TYPE
+            SYNTAX HwVSPhysicalResEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about the physical resources of virtual system."
+            INDEX { hwVSVsId, hwVSSlot }
+            ::= { hwVSPhysicalResTable 1 }
+			
+	HwVSPhysicalResEntry ::=
+            SEQUENCE {
+        hwVSSlot
+                DisplayString,
+		hwVSCPUUsage
+	            Unsigned32, 
+		hwVSMemoryUsedSize
+		    Unsigned32, 
+		hwVSMemoryTotalSize
+	    	    Unsigned32
+             }
+			 
+		hwVSSlot OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The object specifies the slot information about the main control board of the virtual system."
+            ::= { hwVSPhysicalResEntry 1 }
+
+        hwVSCPUUsage OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object specifies the CPU usage of the virtual system."
+            ::= { hwVSPhysicalResEntry 2 }
+
+		hwVSMemoryUsedSize OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object specifies the size of the memory used by the virtual system."
+            ::= { hwVSPhysicalResEntry 3 }	
+
+		hwVSMemoryTotalSize OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object specifies the total size of memory available to the virtual system."
+            ::= { hwVSPhysicalResEntry 4 }	
+   
+   -- conformance information
+
+   hwVSConformance OBJECT IDENTIFIER ::= { hwVsMIB 2 }
+
+   hwVSGroups      OBJECT IDENTIFIER ::= { hwVSConformance 1 }
+   hwVSCompliances OBJECT IDENTIFIER ::= { hwVSConformance 2 }
+
+
+      hwVSConformance2 MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting the HUAWEI-VS-MIB."
+            MODULE HUAWEI-VS-MIB
+                MANDATORY-GROUPS { hwVSBasicGroup }
+            ::= { hwVSCompliances 1 }
+
+        
+        
+        hwVSBasicGroup OBJECT-GROUP
+            OBJECTS { hwVSVsName, hwVSStatus, hwVSCPUUsage, hwVSMemoryUsedSize, hwVSMemoryTotalSize, hwVSType }
+            STATUS current
+            DESCRIPTION 
+                "The virtual system attribute group."
+            ::= { hwVSGroups 1 }
+
+
+   -- compliance statements
+       hwVSType  OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The single-node scalar table hwVSType contains only one field: hwVSType. This field indicates whether the current device supports VS. If the device does not support VS and a GET operation is performed, noSuchObject/noSuchInstance is returned. If the device supports VS and a GET operation is performed: hwVSType = 1, indicating that the device is an admin-VS device; hwVSType = 2, indicating that the device is a common VS device."
+
+       ::= { hwVsMIB 3 }
+   
+    END
+
+--
+-- HUAWEI-VS-MIB.mib
+--

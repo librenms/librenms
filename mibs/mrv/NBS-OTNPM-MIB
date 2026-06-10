@@ -1,0 +1,1641 @@
+NBS-OTNPM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, Unsigned32, Counter32, Counter64, OBJECT-TYPE,
+    MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    ifAlias, InterfaceIndex
+        FROM IF-MIB
+
+    nbs, WritableU64
+        FROM NBS-MIB;
+
+nbsOtnpmMib  MODULE-IDENTITY
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+       "For technical support, please contact your service channel"
+    DESCRIPTION
+       "OTN Performance Monitoring and user-controlled statistics"
+    ::= { nbs 222 }
+
+-- *******************************************************************
+-- NBS-OTNPM-MIB local defines
+-- *******************************************************************
+
+nbsOtnpmThresholdsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Maximum considered safe by user"
+    ::= { nbsOtnpmMib 1 }
+
+nbsOtnpmCurrentGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Subtotals and statistics for sample now underway"
+    ::= { nbsOtnpmMib 2 }
+
+nbsOtnpmHistoricGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Totals and final statistics for a previous sample"
+    ::= { nbsOtnpmMib 3 }
+
+nbsOtnpmRunningGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Totals and statistics since (boot-up) protocol configuration"
+    ::= { nbsOtnpmMib 4 }
+
+nbsOtnAlarmsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "OTN alarms"
+    ::= { nbsOtnpmMib 80 }
+
+nbsOtnStatsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "User-controlled OTN alarms and statistics"
+    ::= { nbsOtnpmMib 90 }
+
+nbsOtnpmEventsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Threshold crossing events"
+    ::= { nbsOtnpmMib 100 }
+
+nbsOtnpmTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Threshold crossing Traps or Notifications"
+    ::= { nbsOtnpmEventsGrp 0 }
+
+-- *******************************************************************
+
+NbsOtnAlarmId  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "OTN alarm id, also used to identify a mask bit"
+    SYNTAX      INTEGER {
+        aLOS        (1),  -- Loss of Signal
+        aLOF        (2),  -- Loss of Frame
+        aOOF        (3),  -- Out of Frame
+        aLOM        (4),  -- Loss of Multiframe
+        aOOM        (5),  -- Out of Multiframe
+
+        aRxLOL      (6),  -- Loss of lock on receive
+        aTxLOL      (7),  -- Loss of lock on transmit
+
+        aOtuAIS     (8),  -- Alarm Indication Signal at OTU level
+        aSectBDI    (9),  -- Backward Defect Indication (OTU SM)
+        aSectBIAE   (10), -- Backward Incoming Alignment Error (OTU SM)
+        aSectIAE    (11), -- Incoming Alignment Error (OTU SM)
+        aSectTIM    (12), -- Trace Identifier Mismatch (OTU SM)
+
+        aOduAIS     (13), -- Alarm Indication Signal (ODU PM STAT=111)
+        aOduOCI     (14), -- Open Connection Indication (ODU PM STAT=110)
+        aOduLCK     (15), -- Locked connection (ODU PM STAT=101)
+        aPathBDI    (16), -- Backward Defect Indication (ODU PM)
+        aPathTIM    (17), -- Trace Identifier Mismatch (ODU PM)
+
+        aTcm1BDI    (18), -- Backward Defect Indication (ODU TCM1)
+        aTcm2BDI    (19), -- Backward Defect Indication (ODU TCM2)
+        aTcm3BDI    (20), -- Backward Defect Indication (ODU TCM3)
+        aTcm4BDI    (21), -- Backward Defect Indication (ODU TCM4)
+        aTcm5BDI    (22), -- Backward Defect Indication (ODU TCM5)
+        aTcm6BDI    (23), -- Backward Defect Indication (ODU TCM6)
+
+        aTcm1BIAE   (24), -- Backward Incoming Alignment Error (ODU TCM1)
+        aTcm2BIAE   (25), -- Backward Incoming Alignment Error (ODU TCM2)
+        aTcm3BIAE   (26), -- Backward Incoming Alignment Error (ODU TCM3)
+        aTcm4BIAE   (27), -- Backward Incoming Alignment Error (ODU TCM4)
+        aTcm5BIAE   (28), -- Backward Incoming Alignment Error (ODU TCM5)
+        aTcm6BIAE   (29), -- Backward Incoming Alignment Error (ODU TCM6)
+
+        aTcm1IAE    (30), -- Incoming Alignment Error (ODU TCM1 STAT=010)
+        aTcm2IAE    (31), -- Incoming Alignment Error (ODU TCM2 STAT=010)
+        aTcm3IAE    (32), -- Incoming Alignment Error (ODU TCM3 STAT=010)
+        aTcm4IAE    (33), -- Incoming Alignment Error (ODU TCM4 STAT=010)
+        aTcm5IAE    (34), -- Incoming Alignment Error (ODU TCM5 STAT=010)
+        aTcm6IAE    (35), -- Incoming Alignment Error (ODU TCM6 STAT=010)
+
+        aTcm1LTC    (36), -- Loss of Tandem Connection (ODU TCM1 STAT=000)
+        aTcm2LTC    (37), -- Loss of Tandem Connection (ODU TCM2 STAT=000)
+        aTcm3LTC    (38), -- Loss of Tandem Connection (ODU TCM3 STAT=000)
+        aTcm4LTC    (39), -- Loss of Tandem Connection (ODU TCM4 STAT=000)
+        aTcm5LTC    (40), -- Loss of Tandem Connection (ODU TCM5 STAT=000)
+        aTcm6LTC    (41), -- Loss of Tandem Connection (ODU TCM6 STAT=000)
+
+        aTcm1TIM    (42), -- Trace Identifier Mismatch (ODU TCM1)
+        aTcm2TIM    (43), -- Trace Identifier Mismatch (ODU TCM2)
+        aTcm3TIM    (44), -- Trace Identifier Mismatch (ODU TCM3)
+        aTcm4TIM    (45), -- Trace Identifier Mismatch (ODU TCM4)
+        aTcm5TIM    (46), -- Trace Identifier Mismatch (ODU TCM5)
+        aTcm6TIM    (47), -- Trace Identifier Mismatch (ODU TCM6)
+
+        aFwdSF      (48), -- Forward Signal Fail (ODU FTFL)
+        aFwdSD      (49), -- Forward Signal Degrade (ODU FTFL)
+        aBwdSF      (50), -- Backward Signal Fail (ODU FTFL)
+        aBwdSD      (51), -- Backward Signal Degrade (ODU FTFL)
+
+        aPTM        (52), -- Payload Type Mismatch (OPU PSI)
+        aCSF        (53)  -- Client Signal Fail (OPU PSI)
+    }
+
+NbsOtnAlarmMask  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "OTN alarm mask, encoded within an octet string. The bit assigned
+        to a particular alarm (id from NbsOtnAlarmId) is calculated by:
+            index = id/8; bit = id%8;
+        where the leftmost bit (msb) is deemed as bit 0.
+        The mask length is either full-size or zero if not supported."
+    SYNTAX      OCTET STRING (SIZE(0..7))
+
+
+-- *******************************************************************
+--
+-- the nbsOtnpmThresholdsGrp
+--
+-- *******************************************************************
+
+nbsOtnpmThresholdsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsOtnpmThresholdsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "OTN Performance Monitoring thresholds"
+    ::= { nbsOtnpmThresholdsGrp 1 }
+
+nbsOtnpmThresholdsEntry OBJECT-TYPE
+    SYNTAX          NbsOtnpmThresholdsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Performance monitoring thresholds for a particular interface"
+    INDEX {
+        nbsOtnpmThresholdsIfIndex,
+        nbsOtnpmThresholdsInterval,
+        nbsOtnpmThresholdsScope
+    }
+    ::= { nbsOtnpmThresholdsTable 1 }
+
+NbsOtnpmThresholdsEntry ::= SEQUENCE {
+    nbsOtnpmThresholdsIfIndex    InterfaceIndex,
+    nbsOtnpmThresholdsInterval   INTEGER,
+    nbsOtnpmThresholdsScope      INTEGER,
+    nbsOtnpmThresholdsEs         Unsigned32,
+    nbsOtnpmThresholdsEsrSig     INTEGER,
+    nbsOtnpmThresholdsEsrExp     Integer32,
+    nbsOtnpmThresholdsSes        Unsigned32,
+    nbsOtnpmThresholdsSesrSig    INTEGER,
+    nbsOtnpmThresholdsSesrExp    Integer32,
+    nbsOtnpmThresholdsBbe        WritableU64,
+    nbsOtnpmThresholdsBberSig    INTEGER,
+    nbsOtnpmThresholdsBberExp    Integer32,
+    nbsOtnpmThresholdsUas        Unsigned32,
+    nbsOtnpmThresholdsFc         WritableU64
+}
+
+nbsOtnpmThresholdsIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsOtnpmThresholdsEntry 1 }
+
+nbsOtnpmThresholdsInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Indicates the sampling period to which these thresholds apply"
+    ::= { nbsOtnpmThresholdsEntry 2 }
+
+nbsOtnpmThresholdsScope OBJECT-TYPE
+    SYNTAX          INTEGER {
+        tcm1    (1),
+        tcm2    (2),
+        tcm3    (3),
+        tcm4    (4),
+        tcm5    (5),
+        tcm6    (6),
+        section (7),
+        path    (8)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "This object specifies the network segment to which these
+        thresholds apply."
+    ::= { nbsOtnpmThresholdsEntry 3 }
+
+nbsOtnpmThresholdsEs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Errored Seconds (ES) which, if met
+        or exceeded at the end of the nbsOtnpmThresholdsInterval
+        period, should trigger the nbsOtnpmTrapsEs event notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 10 }
+
+nbsOtnpmThresholdsEsrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The significand of the Errored Seconds Ratio (ESR)
+        threshold, which is calculated by:
+           nbsOtnpmThresholdsEsrSig x 10^nbsOtnpmThresholdsEsrExp
+
+        An ESR that meets or exceeds this threshold at the end of the
+        nbsOtnpmThresholdsInterval period triggers the nbsOtnpmTrapsEsr
+        event notification.
+
+        The reserved value 0 disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 11 }
+
+nbsOtnpmThresholdsEsrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The exponent of the Errored Seconds Ratio (ESR)
+        threshold; see nbsOtnpmThresholdsEsrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 12 }
+
+nbsOtnpmThresholdsSes  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Severely Errored Seconds (SES)
+        which, if met or exceeded at the end of the
+        nbsOtnpmThresholdsInterval period, should trigger the
+        nbsOtnpmTrapsSes event notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 13 }
+
+nbsOtnpmThresholdsSesrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The significand of the Severely Errored Seconds
+        Ratio (SESR) threshold, which is calculated by:
+           nbsOtnpmThresholdsSesrSig x 10^nbsOtnpmThresholdsSesrExp
+
+        A SESR that meets or exceeds this threshold at the end of the
+        nbsOtnpmThresholdsInterval period triggers the nbsOtnpmTrapsSesr
+        notification.
+
+        The reserved value 0 disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 14 }
+
+nbsOtnpmThresholdsSesrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The exponent of the Severely Errored Seconds
+        Ratio (SESR) threshold; see nbsOtnpmThresholdsSesrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 15 }
+
+nbsOtnpmThresholdsBbe   OBJECT-TYPE
+    SYNTAX          WritableU64
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Background Block Errors (BBE) which,
+        if met or exceeded at the end of the nbsOtnpmThresholdsInterval
+        period, should trigger the nbsOtnpmTrapsBbe event notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 16 }
+
+nbsOtnpmThresholdsBberSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The significand of the Background Block Errors
+        Ratio (BBER) threshold, which is calculated by:
+           nbsOtnpmThresholdsBberSig x 10^nbsOtnpmThresholdsBberExp
+
+        A BBER that meets or exceeds this threshold at the end of the
+        nbsOtnpmThresholdsInterval period triggers the nbsOtnpmTrapsBber
+        notification.
+
+        The reserved value 0 disables notifications for this event."
+    DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 17 }
+
+nbsOtnpmThresholdsBberExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The exponent of the Background Block Errors
+        Ratio (BBER) threshold; see nbsOtnpmThresholdsBberSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 18 }
+
+nbsOtnpmThresholdsUas  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Unavailable Seconds (UAS) which,
+        if met or exceeded at the end of the nbsOtnpmThresholdsInterval
+        period, should trigger the nbsOtnpmTrapsUas event notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 19 }
+
+nbsOtnpmThresholdsFc   OBJECT-TYPE
+    SYNTAX          WritableU64
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Failure Counts (FC) which, if met or
+        exceeded at the end of the nbsOtnpmThresholdsInterval period,
+        should trigger the nbsOtnpmTrapsFc event notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmThresholdsEntry 20 }
+
+
+-- *******************************************************************
+--
+-- the nbsOtnpmCurrentGroup
+--
+-- *******************************************************************
+
+nbsOtnpmCurrentTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsOtnpmCurrentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All OTN Performance Monitoring statistics for the
+        nbsOtnpmCurrentInterval now underway."
+    ::= { nbsOtnpmCurrentGrp 3 }
+
+nbsOtnpmCurrentEntry OBJECT-TYPE
+    SYNTAX          NbsOtnpmCurrentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "OTN Performance Monitoring statistics for a specific port/
+        interface and nbsOtnpmCurrentInterval."
+    INDEX {
+        nbsOtnpmCurrentIfIndex,
+        nbsOtnpmCurrentInterval,
+        nbsOtnpmCurrentScope
+    }
+    ::= { nbsOtnpmCurrentTable 1 }
+
+NbsOtnpmCurrentEntry ::= SEQUENCE {
+    nbsOtnpmCurrentIfIndex          InterfaceIndex,
+    nbsOtnpmCurrentInterval         INTEGER,
+    nbsOtnpmCurrentScope            INTEGER,
+    nbsOtnpmCurrentDate             INTEGER,
+    nbsOtnpmCurrentTime             INTEGER,
+    nbsOtnpmCurrentEs               Unsigned32,
+    nbsOtnpmCurrentEsrSig           INTEGER,
+    nbsOtnpmCurrentEsrExp           Integer32,
+    nbsOtnpmCurrentSes              Unsigned32,
+    nbsOtnpmCurrentSesrSig          INTEGER,
+    nbsOtnpmCurrentSesrExp          Integer32,
+    nbsOtnpmCurrentBbe              Counter64,
+    nbsOtnpmCurrentBberSig          INTEGER,
+    nbsOtnpmCurrentBberExp          Integer32,
+    nbsOtnpmCurrentUas              Unsigned32,
+    nbsOtnpmCurrentFc               Counter64,
+    nbsOtnpmCurrentAlarmsSupported  NbsOtnAlarmMask,
+    nbsOtnpmCurrentAlarmsRaised     NbsOtnAlarmMask,
+    nbsOtnpmCurrentAlarmsChanged    NbsOtnAlarmMask
+}
+
+nbsOtnpmCurrentIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsOtnpmCurrentEntry 1 }
+
+nbsOtnpmCurrentInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Indicates the sampling period of statistic"
+    ::= { nbsOtnpmCurrentEntry 2 }
+
+nbsOtnpmCurrentScope OBJECT-TYPE
+    SYNTAX          INTEGER {
+        tcm1    (1),
+        tcm2    (2),
+        tcm3    (3),
+        tcm4    (4),
+        tcm5    (5),
+        tcm6    (6),
+        section (7),
+        path    (8)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Indicates statistic's network segment"
+    ::= { nbsOtnpmCurrentEntry 3 }
+
+nbsOtnpmCurrentDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) this interval began, represented by an eight
+        digit decimal number: yyyymmdd"
+    ::= { nbsOtnpmCurrentEntry 5 }
+
+nbsOtnpmCurrentTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) this interval began, represented by a six
+        digit decimal number: hhmmss"
+    ::= { nbsOtnpmCurrentEntry 6 }
+
+nbsOtnpmCurrentEs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Errored Seconds (ES) in this interval so far."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 10 }
+
+nbsOtnpmCurrentEsrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the current Errored Seconds Ratio (ESR),
+        which is calculated by:
+           nbsOtnpmCurrentEsrSig x 10^nbsOtnpmCurrentEsrExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 11 }
+
+nbsOtnpmCurrentEsrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the current Errored Seconds Ratio (ESR);
+        see nbsOtnpmCurrentEsrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 12 }
+
+nbsOtnpmCurrentSes  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Severely Errored Seconds (SES) in this interval
+        so far"
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 13 }
+
+nbsOtnpmCurrentSesrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the current Severely Errored Seconds
+        Ratio (SESR), which is calculated by:
+           nbsOtnpmCurrentSesrSig x 10^nbsOtnpmCurrentSesrExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 14 }
+
+nbsOtnpmCurrentSesrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the current Severely Errored Seconds
+        Ratio (SESR); see nbsOtnpmCurrentSesrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 15 }
+
+nbsOtnpmCurrentBbe   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Background Block Errors (BBE) so far,
+        i.e. the count of Bit Interleave Parity (BIP8) errors."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 16 }
+
+nbsOtnpmCurrentBberSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the current Background Block Errors (BBER),
+        which is calculated by:
+           nbsOtnpmCurrentBberSig x 10^nbsOtnpmCurrentBberExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 17 }
+
+nbsOtnpmCurrentBberExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the current Background Block Errors Ratio (BBER);
+        see nbsOtnpmCurrentBberSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 18 }
+
+nbsOtnpmCurrentUas  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Unavailable Seconds (UAS) so far"
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 19 }
+
+nbsOtnpmCurrentFc   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Failure Counts (FC) so far, i.e. the count of
+        Backward Error Indication (BEI) errors."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmCurrentEntry 20 }
+
+nbsOtnpmCurrentAlarmsSupported OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are supported."
+    ::= { nbsOtnpmCurrentEntry 100 }
+
+nbsOtnpmCurrentAlarmsRaised OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are currently raised."
+    ::= { nbsOtnpmCurrentEntry 101 }
+
+nbsOtnpmCurrentAlarmsChanged OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that have changed so far, i.e. alarms that
+        have transitioned at least once from clear to raised or from
+        raised to clear."
+    ::= { nbsOtnpmCurrentEntry 102 }
+
+
+-- *******************************************************************
+--
+-- the nbsOtnpmHistoricGrp
+--
+-- *******************************************************************
+
+nbsOtnpmHistoricTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsOtnpmHistoricEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All OTN Performance Monitoring statistics for past
+        nbsOtnpmHistoricInterval periods."
+    ::= { nbsOtnpmHistoricGrp 3 }
+
+nbsOtnpmHistoricEntry OBJECT-TYPE
+    SYNTAX          NbsOtnpmHistoricEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "OTN Performance Monitoring statistics for a specific port/
+        interface and nbsOtnpmHistoricInterval."
+    INDEX {
+        nbsOtnpmHistoricIfIndex,
+        nbsOtnpmHistoricInterval,
+        nbsOtnpmHistoricScope,
+        nbsOtnpmHistoricSample
+    }
+    ::= { nbsOtnpmHistoricTable 1 }
+
+NbsOtnpmHistoricEntry ::= SEQUENCE {
+    nbsOtnpmHistoricIfIndex         InterfaceIndex,
+    nbsOtnpmHistoricInterval        INTEGER,
+    nbsOtnpmHistoricScope           INTEGER,
+    nbsOtnpmHistoricSample          INTEGER,
+    nbsOtnpmHistoricDate            INTEGER,
+    nbsOtnpmHistoricTime            INTEGER,
+    nbsOtnpmHistoricEs              Unsigned32,
+    nbsOtnpmHistoricEsrSig          INTEGER,
+    nbsOtnpmHistoricEsrExp          Integer32,
+    nbsOtnpmHistoricSes             Unsigned32,
+    nbsOtnpmHistoricSesrSig         INTEGER,
+    nbsOtnpmHistoricSesrExp         Integer32,
+    nbsOtnpmHistoricBbe             Counter64,
+    nbsOtnpmHistoricBberSig         INTEGER,
+    nbsOtnpmHistoricBberExp         Integer32,
+    nbsOtnpmHistoricUas             Unsigned32,
+    nbsOtnpmHistoricFc              Counter64,
+    nbsOtnpmHistoricAlarmsSupported NbsOtnAlarmMask,
+    nbsOtnpmHistoricAlarmsRaised    NbsOtnAlarmMask,
+    nbsOtnpmHistoricAlarmsChanged   NbsOtnAlarmMask
+}
+
+nbsOtnpmHistoricIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsOtnpmHistoricEntry 1 }
+
+nbsOtnpmHistoricInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates the sampling period of statistic"
+    ::= { nbsOtnpmHistoricEntry 2 }
+
+nbsOtnpmHistoricScope OBJECT-TYPE
+    SYNTAX          INTEGER {
+        tcm1    (1),
+        tcm2    (2),
+        tcm3    (3),
+        tcm4    (4),
+        tcm5    (5),
+        tcm6    (6),
+        section (7),
+        path    (8)
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates statistic's network segment"
+    ::= { nbsOtnpmHistoricEntry 3 }
+
+nbsOtnpmHistoricSample OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates the sample number of this statistic.  The most
+        recent sample is numbered 1, the next previous 2, and so on
+        until the oldest sample."
+    ::= { nbsOtnpmHistoricEntry 4 }
+
+nbsOtnpmHistoricDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) the interval began, represented by an eight
+        digit decimal number: yyyymmdd"
+    ::= { nbsOtnpmHistoricEntry 5 }
+
+nbsOtnpmHistoricTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) the interval began, represented by a six
+        digit decimal number: hhmmss"
+    ::= { nbsOtnpmHistoricEntry 6 }
+
+nbsOtnpmHistoricEs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of Errored Seconds (ES) for this interval"
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 10 }
+
+nbsOtnpmHistoricEsrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the final Errored Seconds Ratio (ESR)
+        for this interval, which is calculated by:
+           nbsOtnpmHistoricEsrSig x 10^nbsOtnpmHistoricEsrExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 11 }
+
+nbsOtnpmHistoricEsrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the final Errored Seconds Ratio (ESR)
+        for this interval; see nbsOtnpmHistoricEsrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 12 }
+
+nbsOtnpmHistoricSes  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of Severely Errored Seconds (SES) in this interval"
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 13 }
+
+nbsOtnpmHistoricSesrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the final Severely Errored Seconds
+        Ratio (SESR) for this interval, which is calculated by:
+           nbsOtnpmHistoricSesrSig x 10^nbsOtnpmHistoricSesrExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 14 }
+
+nbsOtnpmHistoricSesrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the final Severely Errored Seconds
+        Ratio (SESR) for this interval; see nbsOtnpmHistoricSesrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 15 }
+
+nbsOtnpmHistoricBbe   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of Background Block Errors (BBE),
+        i.e. the count of Bit Interleave Parity (BIP8) errors."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 16 }
+
+nbsOtnpmHistoricBberSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the final Background Block Errors
+        Ratio (BBER) for this interval, which is calculated by:
+        nbsOtnpmHistoricBberSig x 10^nbsOtnpmHistoricBberExp)"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 17 }
+
+nbsOtnpmHistoricBberExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the final Background Block Errors
+        Ratio (BBER) for this interval; see nbsOtnpmHistoricBberSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 18 }
+
+nbsOtnpmHistoricUas  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of Unavailable Seconds (UAS)"
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 19 }
+
+nbsOtnpmHistoricFc   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final number of Failure Counts (FC), i.e. the count of
+        Backward Error Indication (BEI) errors."
+--  DEFVAL { 0 }
+    ::= { nbsOtnpmHistoricEntry 20 }
+
+nbsOtnpmHistoricAlarmsSupported OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that were supported."
+    ::= { nbsOtnpmHistoricEntry 100 }
+
+nbsOtnpmHistoricAlarmsRaised OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that were raised at the end of this interval."
+    ::= { nbsOtnpmHistoricEntry 101 }
+
+nbsOtnpmHistoricAlarmsChanged OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that changed in this interval, i.e. alarms
+        that transitioned at least once from clear to raised or from
+        raised to clear."
+    ::= { nbsOtnpmHistoricEntry 102 }
+
+
+-- *******************************************************************
+--
+-- the nbsOtnpmRunningGroup
+--
+-- *******************************************************************
+
+nbsOtnpmRunningTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsOtnpmRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All OTN Performance Monitoring statistics since (boot-up) protocol
+        configuration."
+    ::= { nbsOtnpmRunningGrp 3 }
+
+nbsOtnpmRunningEntry OBJECT-TYPE
+    SYNTAX          NbsOtnpmRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "OTN Performance Monitoring statistics for a specific port/
+        interface."
+    INDEX {
+        nbsOtnpmRunningIfIndex,
+        nbsOtnpmRunningScope
+    }
+    ::= { nbsOtnpmRunningTable 1 }
+
+NbsOtnpmRunningEntry ::= SEQUENCE {
+    nbsOtnpmRunningIfIndex          InterfaceIndex,
+    nbsOtnpmRunningScope            INTEGER,
+    nbsOtnpmRunningDate             INTEGER,
+    nbsOtnpmRunningTime             INTEGER,
+    nbsOtnpmRunningEs               Counter32,
+    nbsOtnpmRunningEsrSig           INTEGER,
+    nbsOtnpmRunningEsrExp           Integer32,
+    nbsOtnpmRunningSes              Counter32,
+    nbsOtnpmRunningSesrSig          INTEGER,
+    nbsOtnpmRunningSesrExp          Integer32,
+    nbsOtnpmRunningBbe              Counter64,
+    nbsOtnpmRunningBberSig          INTEGER,
+    nbsOtnpmRunningBberExp          Integer32,
+    nbsOtnpmRunningUas              Counter32,
+    nbsOtnpmRunningFc               Counter64,
+    nbsOtnpmRunningAlarmsSupported  NbsOtnAlarmMask,
+    nbsOtnpmRunningAlarmsRaised     NbsOtnAlarmMask,
+    nbsOtnpmRunningAlarmsChanged    NbsOtnAlarmMask
+}
+
+nbsOtnpmRunningIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsOtnpmRunningEntry 1 }
+
+nbsOtnpmRunningScope OBJECT-TYPE
+    SYNTAX          INTEGER {
+        tcm1    (1),
+        tcm2    (2),
+        tcm3    (3),
+        tcm4    (4),
+        tcm5    (5),
+        tcm6    (6),
+        section (7),
+        path    (8)
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates statistic's network segment"
+    ::= { nbsOtnpmRunningEntry 3 }
+
+nbsOtnpmRunningDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) of protocol configuration, represented by an
+        eight digit decimal number: yyyymmdd"
+    ::= { nbsOtnpmRunningEntry 5 }
+
+nbsOtnpmRunningTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) of protocol configuration, represented by a
+        six digit decimal number: hhmmss"
+    ::= { nbsOtnpmRunningEntry 6 }
+
+nbsOtnpmRunningEs OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Errored Seconds (ES) since protocol configuration."
+    ::= { nbsOtnpmRunningEntry 10 }
+
+nbsOtnpmRunningEsrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the running Errored Seconds Ratio (ESR),
+        which is calculated by:
+           nbsOtnpmRunningEsrSig x 10^nbsOtnpmRunningEsrExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmRunningEntry 11 }
+
+nbsOtnpmRunningEsrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the running Errored Seconds Ratio (ESR);
+        see nbsOtnpmRunningEsrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmRunningEntry 12 }
+
+nbsOtnpmRunningSes  OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Severely Errored Seconds (SES) since protocol configuration"
+    ::= { nbsOtnpmRunningEntry 13 }
+
+nbsOtnpmRunningSesrSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the running Severely Errored Seconds
+        Ratio (SESR), which is calculated by:
+           nbsOtnpmRunningSesrSig x 10^nbsOtnpmRunningSesrExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmRunningEntry 14 }
+
+nbsOtnpmRunningSesrExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the running Severely Errored Seconds
+        Ratio (SESR); see nbsOtnpmRunningSesrSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmRunningEntry 15 }
+
+nbsOtnpmRunningBbe   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Background Block Errors (BBE) since protocol configuration,
+        i.e. the count of Bit Interleave Parity (BIP8) errors."
+    ::= { nbsOtnpmRunningEntry 16 }
+
+nbsOtnpmRunningBberSig OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The significand of the running Background Block Errors (BBER),
+        which is calculated by:
+           nbsOtnpmRunningBberSig x 10^nbsOtnpmRunningBberExp"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmRunningEntry 17 }
+
+nbsOtnpmRunningBberExp OBJECT-TYPE
+    SYNTAX          Integer32 (-2147483648..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The exponent of the running Background Block Errors Ratio (BBER);
+        see nbsOtnpmRunningBberSig.
+
+        Not supported value: 0x80000000"
+    DEFVAL { 0 }
+    ::= { nbsOtnpmRunningEntry 18 }
+
+nbsOtnpmRunningUas  OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Unavailable Seconds (UAS) since protocol configuration"
+    ::= { nbsOtnpmRunningEntry 19 }
+
+nbsOtnpmRunningFc   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Failure Counts (FC) since protocol configuration,
+        i.e. the count of Backward Error Indication (BEI) errors."
+    ::= { nbsOtnpmRunningEntry 20 }
+
+nbsOtnpmRunningAlarmsSupported OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are supported."
+    ::= { nbsOtnpmRunningEntry 100 }
+
+nbsOtnpmRunningAlarmsRaised OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are currently raised."
+    ::= { nbsOtnpmRunningEntry 101 }
+
+nbsOtnpmRunningAlarmsChanged OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that changed since protocol configuration,
+        i.e. alarms that transitioned at least once from clear to raised or
+        from raised to clear."
+    ::= { nbsOtnpmRunningEntry 102 }
+
+
+-- *******************************************************************
+--
+-- the nbsOtnAlarmsGroup
+--
+-- *******************************************************************
+
+nbsOtnAlarmsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsOtnAlarmsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "OTN alarm monitoring scoreboard, showing for each possible alarm
+        if it is currently raised and if it has changed since monitoring
+        began (or was cleared). The latter indicator may be cleared at
+        anytime without affecting normal performance monitoring activity."
+    ::= { nbsOtnAlarmsGrp 3 }
+
+nbsOtnAlarmsEntry OBJECT-TYPE
+    SYNTAX          NbsOtnAlarmsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "OTN alarm monitoring scoreboard for a specific port/interface."
+    INDEX {
+        nbsOtnAlarmsIfIndex
+    }
+    ::= { nbsOtnAlarmsTable 1 }
+
+NbsOtnAlarmsEntry ::= SEQUENCE {
+    nbsOtnAlarmsIfIndex         InterfaceIndex,
+    nbsOtnAlarmsDate            INTEGER,
+    nbsOtnAlarmsTime            INTEGER,
+    nbsOtnAlarmsSpan            INTEGER,
+    nbsOtnAlarmsState           INTEGER,
+    nbsOtnAlarmsSupported       NbsOtnAlarmMask,
+    nbsOtnAlarmsRaised          NbsOtnAlarmMask,
+    nbsOtnAlarmsChanged         NbsOtnAlarmMask,
+    nbsOtnAlarmsRcvdFTFL        OCTET STRING
+}
+
+nbsOtnAlarmsIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsOtnAlarmsEntry 1 }
+
+nbsOtnAlarmsDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) OTN alarm monitoring began (was cleared), represented
+        by an eight digit decimal number: yyyymmdd"
+    ::= { nbsOtnAlarmsEntry 5 }
+
+nbsOtnAlarmsTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) OTN alarm monitoring began (was cleared), represented
+        by a six digit decimal number: hhmmss"
+    ::= { nbsOtnAlarmsEntry 6 }
+
+nbsOtnAlarmsSpan OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The amount of time (deci-sec) since nbsOtnAlarmsDate and
+        nbsOtnAlarmsTime."
+    ::= { nbsOtnAlarmsEntry 7 }
+
+nbsOtnAlarmsState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        monitoring   (2),
+        clearing     (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object reads 'notSupported' if the port is not configured with
+        an OTN protocol. Otherwise it reads 'monitoring' to indicate that
+        supported OTN alarms are actively reported in nbsOtnAlarmsRaised
+        and nbsOtnAlarmsChanged.
+
+        Writing 'clearing' to this object clears nbsOtnAlarmsChanged."
+    ::= { nbsOtnAlarmsEntry 8 }
+
+nbsOtnAlarmsSupported OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are supported on this port."
+    ::= { nbsOtnAlarmsEntry 100 }
+
+nbsOtnAlarmsRaised OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are currently raised."
+    ::= { nbsOtnAlarmsEntry 101 }
+
+nbsOtnAlarmsChanged OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that have changed since nbsOtnAlarmsDate and
+        AlarmsTime, i.e. alarms that have transitioned at least once from
+        clear to raised or from raised to clear."
+    ::= { nbsOtnAlarmsEntry 102 }
+
+nbsOtnAlarmsRcvdFTFL OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The current Fault Type Fault Location information received on the
+        given port. The length will be zero when there is a no fault code
+        in both the forward and backward fields. Otherwise, the full 256
+        bytes will be provided; see ITU-T G.709, section 15.8.2.5."
+    ::= { nbsOtnAlarmsEntry 110 }
+
+
+-- *******************************************************************
+--
+-- the nbsOtnStatsGroup
+--
+-- *******************************************************************
+
+nbsOtnStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsOtnStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "OTN alarms and statistics monitoring managed per user discretion.
+        This monitoring may be started, stopped, and cleared as desired
+        without affecting the normal performance monitoring activity."
+    ::= { nbsOtnStatsGrp 3 }
+
+nbsOtnStatsEntry OBJECT-TYPE
+    SYNTAX          NbsOtnStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "User-controlled OTN monitoring for a specific port/interface."
+    INDEX {
+        nbsOtnStatsIfIndex
+    }
+    ::= { nbsOtnStatsTable 1 }
+
+NbsOtnStatsEntry ::= SEQUENCE {
+    nbsOtnStatsIfIndex          InterfaceIndex,
+    nbsOtnStatsDate             INTEGER,
+    nbsOtnStatsTime             INTEGER,
+    nbsOtnStatsSpan             INTEGER,
+    nbsOtnStatsState            INTEGER,
+    nbsOtnStatsErrCntSectBEI    Counter64,
+    nbsOtnStatsErrCntPathBEI    Counter64,
+    nbsOtnStatsErrCntTcm1BEI    Counter64,
+    nbsOtnStatsErrCntTcm2BEI    Counter64,
+    nbsOtnStatsErrCntTcm3BEI    Counter64,
+    nbsOtnStatsErrCntTcm4BEI    Counter64,
+    nbsOtnStatsErrCntTcm5BEI    Counter64,
+    nbsOtnStatsErrCntTcm6BEI    Counter64,
+    nbsOtnStatsErrCntSectBIP8   Counter64,
+    nbsOtnStatsErrCntPathBIP8   Counter64,
+    nbsOtnStatsErrCntTcm1BIP8   Counter64,
+    nbsOtnStatsErrCntTcm2BIP8   Counter64,
+    nbsOtnStatsErrCntTcm3BIP8   Counter64,
+    nbsOtnStatsErrCntTcm4BIP8   Counter64,
+    nbsOtnStatsErrCntTcm5BIP8   Counter64,
+    nbsOtnStatsErrCntTcm6BIP8   Counter64,
+    nbsOtnStatsAlarmsSupported  NbsOtnAlarmMask,
+    nbsOtnStatsAlarmsRaised     NbsOtnAlarmMask,
+    nbsOtnStatsAlarmsChanged    NbsOtnAlarmMask
+}
+
+nbsOtnStatsIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsOtnStatsEntry 1 }
+
+nbsOtnStatsDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) OTN statistics collection began, represented by an
+        eight digit decimal number: yyyymmdd"
+    ::= { nbsOtnStatsEntry 5 }
+
+nbsOtnStatsTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) OTN statistics collection began, represented by a
+        six digit decimal number: hhmmss"
+    ::= { nbsOtnStatsEntry 6 }
+
+nbsOtnStatsSpan OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The amount of time (deci-sec) statistics collection has been underway
+        since nbsOtnStatsDate and nbsOtnStatsTime, or if stopped, the duration
+        of the prior collection."
+    ::= { nbsOtnStatsEntry 7 }
+
+nbsOtnStatsState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        counting     (2),
+        clearing     (3),
+        stopped      (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Writing 'stopped' to this object stops (pauses) OTN statistics
+        collection. Re-configuring this port to a non-OTN protocol sets
+        this object to 'stopped' automatically.
+
+        Writing 'counting' to this object starts (resumes) OTN statistics
+        collection if this port is configured with an OTN protocol.
+
+        Writing 'clearing' to this object clears all statistical counters."
+    ::= { nbsOtnStatsEntry 8 }
+
+nbsOtnStatsErrCntSectBEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of section Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 21 }
+
+nbsOtnStatsErrCntPathBEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of path Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 22 }
+
+nbsOtnStatsErrCntTcm1BEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM1 Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 23 }
+
+nbsOtnStatsErrCntTcm2BEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM2 Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 24 }
+
+nbsOtnStatsErrCntTcm3BEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM3 Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 25 }
+
+nbsOtnStatsErrCntTcm4BEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM4 Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 26 }
+
+nbsOtnStatsErrCntTcm5BEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM5 Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 27 }
+
+nbsOtnStatsErrCntTcm6BEI OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM6 Backward Error Indication errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 28 }
+
+nbsOtnStatsErrCntSectBIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of section Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 31 }
+
+nbsOtnStatsErrCntPathBIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of path Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 32 }
+
+nbsOtnStatsErrCntTcm1BIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM1 Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 33 }
+
+nbsOtnStatsErrCntTcm2BIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM2 Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 34 }
+
+nbsOtnStatsErrCntTcm3BIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM3 Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 35 }
+
+nbsOtnStatsErrCntTcm4BIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM4 Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 36 }
+
+nbsOtnStatsErrCntTcm5BIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM5 Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 37 }
+
+nbsOtnStatsErrCntTcm6BIP8 OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The count of TCM6 Bit Interleave Parity errors detected since
+        OTN statistics collection began."
+    ::= { nbsOtnStatsEntry 38 }
+
+nbsOtnStatsAlarmsSupported OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are supported."
+    ::= { nbsOtnStatsEntry 100 }
+
+nbsOtnStatsAlarmsRaised OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that are currently raised."
+    ::= { nbsOtnStatsEntry 101 }
+
+nbsOtnStatsAlarmsChanged OBJECT-TYPE
+    SYNTAX      NbsOtnAlarmMask
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The mask of OTN alarms that have changed since OTN statistics
+        collection began, i.e. alarms that have transitioned at least
+        once from clear to raised or from raised to clear."
+    ::= { nbsOtnStatsEntry 102 }
+
+
+-- *******************************************************************
+--
+-- the nbsOtnpmEventsGrp
+--
+-- *******************************************************************
+
+nbsOtnpmTrapsEs  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentEs }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsEs is non-zero and less than or equal to
+        nbsOtnpmCurrentEs."
+    ::= { nbsOtnpmTraps 10 }
+
+nbsOtnpmTrapsEsr  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentEsrSig, nbsOtnpmCurrentEsrExp }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsEsr is non-zero and less than or equal to
+        nbsOtnpmCurrentEsr."
+    ::= { nbsOtnpmTraps 11 }
+
+nbsOtnpmTrapsSes  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentSes }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsSes is non-zero and less than or equal to
+        nbsOtnpmCurrentSes."
+    ::= { nbsOtnpmTraps 12 }
+
+nbsOtnpmTrapsSesr  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentSesrSig, nbsOtnpmCurrentSesrExp }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsSesr is non-zero and less than or equal to
+        nbsOtnpmCurrentSesr."
+    ::= { nbsOtnpmTraps 13 }
+
+nbsOtnpmTrapsBbe  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentBbe }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsBbe is non-zero and less than or equal to
+        nbsOtnpmCurrentBbe."
+    ::= { nbsOtnpmTraps 14 }
+
+nbsOtnpmTrapsBber  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentBberSig, nbsOtnpmCurrentBberExp}
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsBber is non-zero and less than or equal to
+        nbsOtnpmCurrentBber."
+    ::= { nbsOtnpmTraps 15 }
+
+nbsOtnpmTrapsUas  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentUas }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsUas is non-zero and less than or equal to
+        nbsOtnpmCurrentUas."
+    ::= { nbsOtnpmTraps 16 }
+
+nbsOtnpmTrapsFc  NOTIFICATION-TYPE
+    OBJECTS   { nbsOtnpmCurrentIfIndex, ifAlias,
+                nbsOtnpmCurrentInterval, nbsOtnpmCurrentScope,
+                nbsOtnpmCurrentFc }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsOtnpmThresholdsInterval if
+        nbsOtnpmThresholdsFc is non-zero and less than or equal to
+        nbsOtnpmCurrentFc."
+    ::= { nbsOtnpmTraps 17 }
+
+
+END

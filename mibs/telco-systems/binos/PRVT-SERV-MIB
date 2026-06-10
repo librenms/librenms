@@ -1,0 +1,2180 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-SERV-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-SERV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+NOTIFICATION-TYPE,
+Integer32,
+Unsigned32,
+IpAddress,
+Counter32
+FROM SNMPv2-SMI
+
+MODULE-COMPLIANCE,
+OBJECT-GROUP,
+NOTIFICATION-GROUP
+FROM SNMPv2-CONF
+
+TEXTUAL-CONVENTION,
+DisplayString,
+RowStatus,
+TimeStamp,
+TruthValue
+FROM SNMPv2-TC
+
+TNamedItemOrEmpty,
+TNetworkPolicyIdOrNone,
+TSapIngressPolicyIdOrNone,
+TSapEgressPolicyIdOrNone,
+TNamedItem,
+serviceAccessSwitch
+FROM PRVT-QOS-MIB;
+
+
+prvtServicesMIB MODULE-IDENTITY
+LAST-UPDATED "200908070000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email: 
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"This document is the SNMP MIB module to manage and provision
+the various services of the T-Metro system."
+
+-- 
+-- Revision History
+--
+REVISION "200908070000Z"
+DESCRIPTION "Added prefix prvt to Services' traps."
+REVISION "200903260000Z"
+DESCRIPTION "Added object for Revert timer"
+REVISION "200903240000Z"
+DESCRIPTION "Changed svcVPLSUplinkTable. Corrected various descriptions. Corrected types for some HQOS objects."
+REVISION "200902170000Z"
+DESCRIPTION "Removed references to undefined OBJECT-GROUPs."
+REVISION "200810090000Z"
+DESCRIPTION "Fixed the range of sdpGroupIdentifier."
+REVISION "200804100000Z"
+DESCRIPTION "changed svcVplsMode values. Added sapLearnMode."
+REVISION "200803060000Z"
+DESCRIPTION "changed description of svcAdminStatus."
+REVISION "200801110000Z"
+DESCRIPTION "changed sdpOperStatus values."
+REVISION "200801090000Z"
+DESCRIPTION "added sdpBindVlanTag."
+REVISION "200801070000Z"
+DESCRIPTION "Fixed the range of sdpGroupIdentifier."
+REVISION "200706280000Z" 
+DESCRIPTION "Returned for backward compatibility svcMtu; Clarified few attributes descripton."
+REVISION "200609020000Z" 
+DESCRIPTION "Lots of changes:
+1. Index for the service table is changed.
+2. Few objects from the service tables are moved in sdp
+3. svcVCId is have now more generic usage. so it's name is changed to svcVPNId
+4. The descriptions for some objects are enhanced"
+REVISION "200607020000Z" 
+DESCRIPTION "Fixed the range of sdpGroupIdentifier."
+REVISION "200602040000Z" 
+DESCRIPTION "Fixed the range of the svcMtu object and changed the description of svcRowStatus."
+REVISION "200511090000Z" 
+DESCRIPTION "Initial version."
+
+
+::= { serviceAccessSwitch 2 }
+
+
+-- --------------------------------------------------------------------
+-- PRVT-SERV-MIB organisation
+-- --------------------------------------------------------------------
+
+prvtTMServObjs OBJECT IDENTIFIER ::= { prvtServicesMIB 1}
+prvtTMCustObjs OBJECT IDENTIFIER ::= { prvtTMServObjs 1 }
+prvtTMSvcObjs OBJECT IDENTIFIER ::= { prvtTMServObjs 2 }
+prvtTMSapObjs OBJECT IDENTIFIER ::= { prvtTMServObjs 3 }
+prvtTMSdpObjs OBJECT IDENTIFIER ::= { prvtTMServObjs 4 } 
+
+prvtTMServVPLSGlobals OBJECT IDENTIFIER ::= { prvtTMSvcObjs 3 } 
+
+prvtServNotifications OBJECT IDENTIFIER ::= { prvtServicesMIB 2 }
+prvtCustNotif OBJECT IDENTIFIER ::= { prvtServNotifications 1 }
+prvtSvcNotif OBJECT IDENTIFIER ::= { prvtServNotifications 2 }
+prvtSapNotif OBJECT IDENTIFIER ::= { prvtServNotifications 3 }
+prvtSdpNotif OBJECT IDENTIFIER ::= { prvtServNotifications 4 }
+
+prvtCustTraps OBJECT IDENTIFIER ::= { prvtCustNotif 0 }
+prvtSvcTraps OBJECT IDENTIFIER ::= { prvtSvcNotif 0 }
+prvtSapTraps OBJECT IDENTIFIER ::= { prvtSapNotif 0 }
+prvtSdpTraps OBJECT IDENTIFIER ::= { prvtSdpNotif 0 }
+
+
+prvtTMServConformance OBJECT IDENTIFIER ::= { prvtServicesMIB 3 }
+prvtTMCustConformance OBJECT IDENTIFIER ::= { prvtTMServConformance 1 }
+prvtTMSvcConformance OBJECT IDENTIFIER ::= { prvtTMServConformance 2 }
+prvtTMSapConformance OBJECT IDENTIFIER ::= { prvtTMServConformance 3 }
+prvtTMSdpConformance OBJECT IDENTIFIER ::= { prvtTMServConformance 4 }
+prvtTMTstpConformance OBJECT IDENTIFIER ::= { prvtTMServConformance 5 }
+
+-- --------------------------------------------------------------------
+-- BETM-SERV-MIB Textual Conventions
+-- --------------------------------------------------------------------
+
+ServiceAdminStatus ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "ServiceAdminStatus data type is an enumerated integer that
+describes the values used to identify the administrative
+state of a service."
+REFERENCE "Administrative Status"
+SYNTAX INTEGER {
+up(1),
+down(2)
+}
+
+ServiceOperStatus ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "ServiceOperStatus data type is an enumerated integer that
+describes the values used to identify the current operational
+state of a service."
+REFERENCE "Operational status"
+SYNTAX INTEGER {
+up(1),
+down(2)
+}
+ServObjName ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "ASCII string used to name various service
+objects."
+SYNTAX OCTET STRING (SIZE (0..32))
+
+ServObjDesc ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "ASCII string used to describe various service
+objects."
+SYNTAX OCTET STRING (SIZE (0..256)) 
+
+ServType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "This textual convention is used to specify the
+type of a given service."
+SYNTAX INTEGER {
+epipe(1), -- Ethernet pipe
+p3pipe(2), -- POS pipe
+tls(3), -- Virtual private LAN service
+vprn(4), -- Virtual private routed network
+ies(5), -- Internet enhanced service
+mirror(6), -- Mirror service
+apipe(7), -- ATM pipe service
+fpipe(8), -- FR pipe service 
+vpws(9), -- VPWS service
+vpls-pe(10), -- VPLS service Provider Edge 
+vpls-mtu(11) -- VPLS service Multitenant Unit 
+}
+
+VpnId ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "A number used to identify a VPN. In general
+each service corresponds to a single VPN, but
+under some circumstances a VPN may be composed
+of multiple services."
+SYNTAX Unsigned32 (0|1..4294967295)
+
+SdpIdType ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "A 16-bit number used to identify a Service
+Distribution Point. This ID must be unique only
+within the ESR where it is defined. The value 0
+is used as the null ID."
+SYNTAX Unsigned32 (0|1..17407)
+
+TMEncapVal ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"A valid Vlan ID in the range 1-4093, or 65535."
+SYNTAX Unsigned32
+
+TSapEgrQueueId ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "The value used to uniquely identify a SAP egress queue.
+The actual valid values are those defined in the given
+SAP egress QoS policy."
+SYNTAX Unsigned32 (1..8) 
+
+TSapIngQueueId ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "The value used to uniquely identify a SAP ingress queue.
+The actual valid values are those defined in the given
+SAP ingress QoS policy."
+SYNTAX Unsigned32 (1..32) 
+
+-- --------------------------------------------------------------------
+-- Objects in the PRVT-SERV-MIB
+-- --------------------------------------------------------------------
+
+custNumEntries OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The current number of customer records configured
+in this device."
+::= { prvtTMCustObjs 1 }
+
+--
+-- Customer Table
+--
+
+custInfoTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CustInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains customer information."
+::= { prvtTMCustObjs 2 }
+
+custInfoEntry OBJECT-TYPE
+SYNTAX CustInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Information about a specific customer."
+INDEX { custName }
+::= { custInfoTable 1 }
+
+CustInfoEntry ::= SEQUENCE { 
+custName ServObjName,
+custRowStatus RowStatus,
+custContact ServObjDesc,
+custPhone ServObjDesc,
+custLastMgmtChange TimeStamp
+}
+
+custName OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The name of this customer."
+DEFVAL { "" }
+::= { custInfoEntry 1 }
+
+custRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "This object indicates the status of this row."
+::= { custInfoEntry 2 }
+
+custContact OBJECT-TYPE
+SYNTAX ServObjDesc
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The name of the primary contact person for
+this customer."
+DEFVAL { "" }
+::= { custInfoEntry 3 }
+
+custPhone OBJECT-TYPE
+SYNTAX ServObjDesc
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The phone/pager number used to reach the
+primary contact person."
+DEFVAL { "" }
+::= { custInfoEntry 4 }
+
+custLastMgmtChange OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of sysUpTime at the time of the
+most recent management-initiated change to
+this customer."
+::= { custInfoEntry 5 }
+
+
+custMultiServiceSiteTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CustMultiServiceSiteEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Customer-multi-service-site-table."
+::= { prvtTMCustObjs 3 }
+
+custMultiServiceSiteEntry OBJECT-TYPE
+SYNTAX CustMultiServiceSiteEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Information about a specific customer's
+multi-service site."
+INDEX { custMultSvcSiteName }
+::= { custMultiServiceSiteTable 1 }
+
+CustMultiServiceSiteEntry ::= SEQUENCE {
+custMultSvcSiteName DisplayString,
+custMultSvcSiteRowStatus RowStatus,
+custMultSvcSiteDescription ServObjDesc,
+custMultSvcSiteIngressSchedulerPolicy ServObjName,
+custMultSvcSiteEgressSchedulerPolicy ServObjName,
+custMultSvcSiteLastMgmtChange TimeStamp
+}
+
+custMultSvcSiteName OBJECT-TYPE
+SYNTAX DisplayString (SIZE (1..9))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "Customer-multi-service-site-name."
+::= { custMultiServiceSiteEntry 1 }
+
+custMultSvcSiteRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Customer-multi-service-site rowStatus."
+::= { custMultiServiceSiteEntry 2 }
+
+custMultSvcSiteDescription OBJECT-TYPE
+SYNTAX ServObjDesc
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Generic information about this customer's
+Multi-Service Site."
+DEFVAL { ''H }
+::= { custMultiServiceSiteEntry 3 }
+
+
+custMultSvcSiteIngressSchedulerPolicy OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The ingress QoS scheduler policy assigned
+to this Multi-Service Site."
+DEFVAL { ''H }
+::= { custMultiServiceSiteEntry 4 }
+
+custMultSvcSiteEgressSchedulerPolicy OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The egress QoS scheduler policy assigned
+to this Multi-Service Site."
+DEFVAL { ''H }
+::= { custMultiServiceSiteEntry 5 }
+
+custMultSvcSiteLastMgmtChange OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of sysUpTime at the time of the
+most recent management-initiated change to
+this multi-service site."
+::= { custMultiServiceSiteEntry 6 }
+
+--
+-- Customer Multi-Service Site Ingress Statistics Table
+--
+
+custMultiSvcSiteIngQosSchedStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CustMultiSvcSiteIngQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains ingress QoS scheduler
+statistics for the customer multi service site."
+::= { prvtTMCustObjs 4 }
+
+custMultiSvcSiteIngQosSchedStatsEntry OBJECT-TYPE
+SYNTAX CustMultiSvcSiteIngQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Ingress statistics about a specific customer
+multi service site ingress scheduler."
+INDEX {custMultSvcSiteName, IMPLIED custIngQosSchedName }
+::= { custMultiSvcSiteIngQosSchedStatsTable 1 }
+
+CustMultiSvcSiteIngQosSchedStatsEntry ::= SEQUENCE {
+custIngQosSchedName TNamedItem,
+custIngQosSchedStatsForwardedPackets Counter32,
+custIngQosSchedStatsForwardedOctets Counter32
+}
+
+custIngQosSchedName OBJECT-TYPE
+SYNTAX TNamedItem
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "The index of the ingress QoS scheduler of
+this customer multi service site."
+::= { custMultiSvcSiteIngQosSchedStatsEntry 1 }
+
+custIngQosSchedStatsForwardedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded packets, as
+determined by the customer multi service
+site ingress scheduler policy."
+::= { custMultiSvcSiteIngQosSchedStatsEntry 2 }
+
+custIngQosSchedStatsForwardedOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded octets, as
+determined by the customer multi service
+site ingress scheduler policy."
+::= { custMultiSvcSiteIngQosSchedStatsEntry 3 }
+
+--
+-- Customer Multi-Service Site Egress Statistics Table
+--
+
+custMultiSvcSiteEgrQosSchedStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CustMultiSvcSiteEgrQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains egress QoS scheduler
+statistics for the customer multi service site."
+::= { prvtTMCustObjs 5 }
+
+custMultiSvcSiteEgrQosSchedStatsEntry OBJECT-TYPE
+SYNTAX CustMultiSvcSiteEgrQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Egress statistics about a specific customer
+multi service site egress scheduler."
+INDEX { custMultSvcSiteName, IMPLIED custEgrQosSchedName }
+::= { custMultiSvcSiteEgrQosSchedStatsTable 1 }
+
+CustMultiSvcSiteEgrQosSchedStatsEntry ::= SEQUENCE {
+custEgrQosSchedName TNamedItem,
+custEgrQosSchedStatsForwardedPackets Counter32,
+custEgrQosSchedStatsForwardedOctets Counter32
+}
+
+custEgrQosSchedName OBJECT-TYPE
+SYNTAX TNamedItem
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "The index of the egress QoS scheduler of
+this customer multi service site."
+::= { custMultiSvcSiteEgrQosSchedStatsEntry 1 }
+
+custEgrQosSchedStatsForwardedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded packets, as
+determined by the customer multi service
+site egress scheduler policy."
+::= { custMultiSvcSiteEgrQosSchedStatsEntry 2 }
+
+custEgrQosSchedStatsForwardedOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded octets, as
+determined by the customer multi service
+site egress scheduler policy."
+::= { custMultiSvcSiteEgrQosSchedStatsEntry 3 }
+
+--
+-- Customer Multi-Service Site Ingress Statistics Table
+-- with specific portId
+--
+
+custIngQosPortIdSchedStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CustIngQosPortIdSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"The custIngQosPortIdSchedStatsTable contains ingress QoS scheduler
+statistics for the customer multi service site."
+::= { prvtTMCustObjs 6 }
+
+custIngQosPortIdSchedStatsEntry OBJECT-TYPE
+SYNTAX CustIngQosPortIdSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"Each entry represents the ingress statistics about a specific customer
+multi service site ingress scheduler. Entries are created when 
+a scheduler policy is applied to an MSS."
+INDEX { custMultSvcSiteName,
+custIngQosPortIdSchedName, custIngQosAssignmentPortId }
+::= { custIngQosPortIdSchedStatsTable 1 }
+
+CustIngQosPortIdSchedStatsEntry ::= SEQUENCE {
+custIngQosPortIdSchedName TNamedItem,
+custIngQosAssignmentPortId Integer32,
+custIngQosPortSchedFwdPkts Counter32,
+custIngQosPortSchedFwdOctets Counter32
+}
+
+custIngQosPortIdSchedName OBJECT-TYPE
+SYNTAX TNamedItem
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"The value of custIngQosPortIdSchedName is used as an index 
+of the ingress QoS scheduler of this customer multi service site."
+::= { custIngQosPortIdSchedStatsEntry 1 }
+
+custIngQosAssignmentPortId OBJECT-TYPE
+SYNTAX Integer32 (0..2147483647)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"The value of custIngQosAssignmentPortId is used as an index
+of the ingress QoS scheduler of this customer multi service site.
+When an MSS assignment is an aps/ccag/lag in 'link' mode, each 
+member-port of the aps/ccag/lag has its own scheduler. This object
+refers to the portId of these member-ports."
+::= {custIngQosPortIdSchedStatsEntry 2}
+
+custIngQosPortSchedFwdPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION 
+"The value of custIngQosPortSchedStatsFwdPkts represents the
+number of forwarded packets, as determined by the customer multi service
+site ingress scheduler policy."
+::= { custIngQosPortIdSchedStatsEntry 3 }
+
+custIngQosPortSchedFwdOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION 
+"The value of custIngQosPortSchedStatsFwdOctets represents the
+number of forwarded octets, as determined by the customer multi service
+site ingress scheduler policy."
+::= { custIngQosPortIdSchedStatsEntry 4 }
+
+--
+-- Customer Multi-Service Site Egress Statistics Table
+-- with specific portId
+--
+
+custEgrQosPortIdSchedStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CustEgrQosPortIdSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The custEgrQosPortIdSchedStatsTable contains egress QoS scheduler
+statistics for the customer multi service site."
+::= { prvtTMCustObjs 7 }
+
+custEgrQosPortIdSchedStatsEntry OBJECT-TYPE
+SYNTAX CustEgrQosPortIdSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"Each row entry represents the egress statistics for a customer
+multi-service-site egress scheduler. Entries are created when 
+a scheduler policy is applied to an MSS."
+INDEX { custMultSvcSiteName,
+custEgrQosPortIdSchedName, custEgrQosAssignmentPortId }
+::= { custEgrQosPortIdSchedStatsTable 1 }
+
+CustEgrQosPortIdSchedStatsEntry ::= SEQUENCE {
+custEgrQosPortIdSchedName TNamedItem,
+custEgrQosAssignmentPortId Integer32,
+custEgrQosPortSchedFwdPkts Counter32,
+custEgrQosPortSchedFwdOctets Counter32
+}
+
+custEgrQosPortIdSchedName OBJECT-TYPE
+SYNTAX TNamedItem
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"The value of custEgrQosPortIdSchedName is used as an index 
+of the egress QoS scheduler of this customer multi service site."
+::= { custEgrQosPortIdSchedStatsEntry 1}
+
+custEgrQosAssignmentPortId OBJECT-TYPE
+SYNTAX Integer32 (0..2147483647)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION 
+"The value of custEgrQosAssignmentPortId is used as an index
+of the egress QoS scheduler of this customer multi service site.
+When an MSS assignment is an aps/ccag/lag in 'link' mode, each 
+member-port of the aps/ccag/lag has its own scheduler. This object
+refers to the portId of these member-ports."
+::= { custEgrQosPortIdSchedStatsEntry 2}
+
+custEgrQosPortSchedFwdPkts OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION 
+"The value of custEgrQosPortSchedStatsFwdPkts represents the
+number of forwarded packets, as determined by the customer multi service
+site egress scheduler policy."
+::= { custEgrQosPortIdSchedStatsEntry 3 }
+
+custEgrQosPortSchedFwdOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of custEgrQosPortSchedStatsFwdOctets represents the
+number of forwarded octets, as determined by the customer multi service
+site egress scheduler policy."
+::= { custEgrQosPortIdSchedStatsEntry 4 }
+
+--
+-- Customer traps
+--
+
+prvtCustCreated NOTIFICATION-TYPE
+OBJECTS {
+custName
+}
+STATUS current
+DESCRIPTION "This trap is sent when a new row is created
+in the custInfoTable."
+::= { prvtCustTraps 1 }
+
+prvtCustDeleted NOTIFICATION-TYPE
+OBJECTS {
+custName
+}
+STATUS current
+DESCRIPTION "This trap is sent when an existing row is
+deleted from the custInfoTable."
+::= { prvtCustTraps 2 }
+
+-- --------------------------------------------------------------------
+-- prvtTMSvcObjs group
+-- --------------------------------------------------------------------
+
+svcNumEntries OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The current number of services configured on
+this node."
+::= { prvtTMSvcObjs 1 }
+
+--
+-- Base Service Table
+--
+
+svcBaseInfoTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SvcBaseInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains basic service information."
+::= { prvtTMSvcObjs 2 }
+
+svcBaseInfoEntry OBJECT-TYPE
+SYNTAX SvcBaseInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Basic information about a specific service."
+INDEX { svcId }
+::= { svcBaseInfoTable 1 }
+
+SvcBaseInfoEntry ::= SEQUENCE { 
+svcId Integer32,
+svcVpnId VpnId,
+svcRowStatus RowStatus,
+svcType ServType,
+svcDescription ServObjDesc, 
+svcMtu Integer32,
+svcAdminStatus ServiceAdminStatus,
+svcOperStatus ServiceOperStatus,
+svcNumSaps Integer32,
+svcNumSdps Integer32,
+svcLastMgmtChange TimeStamp,
+svcLastStatusChange TimeStamp,
+svcEnableSecureSaps TruthValue,
+svcCustName ServObjName,
+svcRevertTimer Unsigned32
+}
+svcId OBJECT-TYPE
+SYNTAX Integer32 (0..2147483647)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The service ID."
+DEFVAL { 0 }
+::= { svcBaseInfoEntry 1 }
+
+svcVpnId OBJECT-TYPE
+SYNTAX VpnId
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "This object specifies the ID used by Service Provider(SP). 
+It will have different format according to the type of 
+service. 
+This filed is mandatory. If all mandatory fields are 
+set, the row status object is automatically changed from notReady(3)
+to notInService(2) state
+"
+::= { svcBaseInfoEntry 2}
+
+svcRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "This object indicates the status of this row. The
+values supported during a set operation are 
+createAndWait(5), destroy(6), active(1), notInSertvice(2). 
+Service can be deleted any time. The transition between
+svcRowStatus active(1) and notInService(2) states 
+are rejected if svcAdminStatus is up(1). "
+::= { svcBaseInfoEntry 3 } 
+
+svcType OBJECT-TYPE
+SYNTAX ServType
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The service type: e.g. EtherPipe, TLS, etc. Currently only 
+vpls-pe(11), vpls-mtu(12), vpws-pe(9) and vpws-mtu(10) types 
+are supported. 
+This field is mandatory. 
+Note: For VPLS service, vpls-mtu is supported only."
+::= { svcBaseInfoEntry 4 }
+
+svcDescription OBJECT-TYPE
+SYNTAX ServObjDesc
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Generic information about this service."
+DEFVAL { "" }
+::= { svcBaseInfoEntry 5 } 
+
+svcMtu OBJECT-TYPE
+SYNTAX Integer32 (512..9216)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Not supported object"
+::= { svcBaseInfoEntry 6 }
+
+svcAdminStatus OBJECT-TYPE
+SYNTAX ServiceAdminStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The desired state of this service. 
+1. The transition from down(2) state to up(1) state can 
+be done only if svcRowStatus is either active(1) or 
+notInSercvice(2). 
+2. The transition from up(1) to down(2) state has to be 
+done in order to modify svcRowStatus object. "
+DEFVAL { down }
+::= { svcBaseInfoEntry 7 }
+
+svcOperStatus OBJECT-TYPE
+SYNTAX ServiceOperStatus
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The operating state of this service."
+::= { svcBaseInfoEntry 8 }
+
+svcNumSaps OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of SAPs defined on this service."
+::= { svcBaseInfoEntry 9 }
+
+svcNumSdps OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of SDPs bound to this service."
+::= { svcBaseInfoEntry 10 }
+
+svcLastMgmtChange OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of sysUpTime at the time of the
+most recent management-initiated change to
+this service."
+::= { svcBaseInfoEntry 11}
+
+svcLastStatusChange OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of sysUpTime at the time of the
+most recent operating status change to his
+service."
+::= { svcBaseInfoEntry 12 } 
+
+svcEnableSecureSaps OBJECT-TYPE 
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Used to configure the SAPs to forward only traffic from the uplink ports." 
+DEFVAL { false } 
+::= { svcBaseInfoEntry 13 } 
+
+svcCustName OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The name of the customer this service belongs to."
+DEFVAL { "" }
+::= { svcBaseInfoEntry 14 }
+
+svcRevertTimer OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Delay before switching to primary pseudowire in seconds" 
+::= { svcBaseInfoEntry 15 }
+
+--
+-- VPLS Global parameters
+--
+
+svcVplsMode OBJECT-TYPE
+SYNTAX INTEGER {
+disable ( 0 ),
+qualified ( 1 ),
+unqualified ( 2 ),
+enable ( 3 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "This object is used to configure whether VPLS operates in 
+qualified or unqualified mode. Qualified and unqualified are not supported,
+when having per port qualified/unqualified." 
+DEFVAL { unqualified } 
+::= { prvtTMServVPLSGlobals 1 } 
+
+svcVPLSUplinkTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SvcVPLSUplinkEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains information about the VPLS uplink ports."
+::= { prvtTMServVPLSGlobals 2 }
+
+svcVPLSUplinkEntry OBJECT-TYPE
+SYNTAX SvcVPLSUplinkEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A particular VPLS uplink port."
+INDEX { svcVPLSUplinkPortID }
+::= { svcVPLSUplinkTable 1 }
+
+SvcVPLSUplinkEntry ::= SEQUENCE {
+svcVPLSUplinkPortID Integer32,
+svcVPLSUplinkIfIndex Integer32,
+svcVPLSUplinkNetworkPolicy TNetworkPolicyIdOrNone,
+svcVPLSUplinkNetworkQueueEgressPolicy TNamedItemOrEmpty,
+svcVPLSUplinkShaperProfile Integer32
+}
+
+svcVPLSUplinkPortID OBJECT-TYPE
+SYNTAX Integer32 (0..2147483647) 
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Unique uplink port index."
+::= { svcVPLSUplinkEntry 1 } 
+
+svcVPLSUplinkIfIndex OBJECT-TYPE
+SYNTAX Integer32 (0..2147483647)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The ifIndex of the uplink port."
+::= { svcVPLSUplinkEntry 2 } 
+
+svcVPLSUplinkNetworkPolicy OBJECT-TYPE
+SYNTAX TNetworkPolicyIdOrNone
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The network scheduler policy applied to the port."
+::= { svcVPLSUplinkEntry 3 }
+
+svcVPLSUplinkNetworkQueueEgressPolicy OBJECT-TYPE
+SYNTAX TNamedItemOrEmpty
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The network egress queue applied to the port."
+::= { svcVPLSUplinkEntry 4 }
+
+svcVPLSUplinkShaperProfile OBJECT-TYPE
+SYNTAX Integer32 (0..2)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The ID of the shaping profile applied to the port.
+0 indicates no shaping profile."
+::= { svcVPLSUplinkEntry 5 }
+
+--
+-- Service traps
+--
+
+prvtSvcCreated NOTIFICATION-TYPE
+OBJECTS {
+svcId
+}
+STATUS current
+DESCRIPTION "This trap is sent when a new row is created
+in the svcBaseInfoTable."
+::= { prvtSvcTraps 1 }
+
+prvtSvcDeleted NOTIFICATION-TYPE
+OBJECTS {
+svcId 
+}
+STATUS current
+DESCRIPTION "This trap is sent when an existing row is
+deleted from the svcBaseInfoTable."
+::= { prvtSvcTraps 2 }
+
+prvtSvcStatusChanged NOTIFICATION-TYPE
+OBJECTS { 
+svcId,
+svcVpnId,
+svcAdminStatus,
+svcOperStatus
+}
+STATUS current
+DESCRIPTION "The scvStatusChanged notification is generated when
+there is a change in the administrative or operating
+status of a service."
+::= { prvtSvcTraps 3 }
+
+-- --------------------------------------------------------------------
+-- prvtTMSapObjs group
+-- --------------------------------------------------------------------
+
+sapNumEntries OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The current number of SAPs configured in this
+device."
+::= { prvtTMSapObjs 1 }
+
+--
+-- Base SAP Table
+--
+
+sapBaseInfoTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SapBaseInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains basic SAP information."
+::= { prvtTMSapObjs 2 }
+
+sapBaseInfoEntry OBJECT-TYPE
+SYNTAX SapBaseInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Information about a specific SAP."
+INDEX { svcId, sapPortId, sapEncapValue }
+::= { sapBaseInfoTable 1 }
+
+SapBaseInfoEntry ::= SEQUENCE {
+sapPortId INTEGER,
+sapEncapValue TMEncapVal,
+sapRowStatus RowStatus,
+sapType ServType,
+sapDescription ServObjDesc,
+sapAdminStatus ServiceAdminStatus,
+sapOperStatus INTEGER,
+sapLastMgmtChange TimeStamp,
+sapOperFlags BITS, 
+sapCustMultSvcSiteName DisplayString,
+sapIngressQosPolicyId TSapIngressPolicyIdOrNone,
+sapEgressQosPolicyId TSapEgressPolicyIdOrNone,
+sapIngressQosSchedulerPolicy TNamedItemOrEmpty,
+sapEgressQosSchedulerPolicy TNamedItemOrEmpty,
+sapLearnMode INTEGER
+}
+
+sapPortId OBJECT-TYPE
+SYNTAX INTEGER (0..2147483647)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The ID of the access port where this SAP
+is defined."
+::= { sapBaseInfoEntry 1 }
+
+sapEncapValue OBJECT-TYPE
+SYNTAX TMEncapVal
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of the label used to identify this
+SAP on the access port specified by sapPortId."
+::= { sapBaseInfoEntry 2 }
+
+sapRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "This object indicates the status of this row. The
+values supported during a set operation are createAndGo(4) 
+active(1), notInService(2) and destroy(6).
+Saps can be deleted any time. The transition between
+svcRowStatus active(1) and notInService(2) states 
+are rejected if sapAdminStatus is up(1). 
+"
+::= { sapBaseInfoEntry 3 }
+
+sapType OBJECT-TYPE
+SYNTAX ServType 
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "This object indicates the type of service where
+this SAP is defined."
+::= { sapBaseInfoEntry 4 }
+
+sapDescription OBJECT-TYPE
+SYNTAX ServObjDesc
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Generic information about this SAP."
+DEFVAL { "" }
+::= { sapBaseInfoEntry 5 }
+
+sapAdminStatus OBJECT-TYPE
+SYNTAX ServiceAdminStatus
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The desired state of this SAP. 
+1. The value of this object depends on the value of svcAdminStatus 
+for the service this sap belongs to. If the sap is created and 
+its service has svcAdminStatus set to down(2), its own admin status 
+will be down(2), otherwise sapAdminStatus will be up(1).
+2. If sapRowStatus is in notInService state, the sapAdminStatus 
+transition from down(2) to up(1) state will automaticaly change the 
+value of the sapRowStatus object to active(1)"
+DEFVAL { up }
+::= { sapBaseInfoEntry 6 }
+
+sapOperStatus OBJECT-TYPE
+SYNTAX INTEGER {
+up(1),
+down(2),
+ingressQosMismatch(3),
+egressQosMismatch(4),
+svcAdminDown(5),
+portMtuTooSmall(6)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The operating state of this SAP, showing also the reason for the
+current operation state
+
+Values ingressQosMismatch(3),egressQosMismatch(4),svcAdminDown(5) 
+and portMtuTooSmall(6) are not supported"
+::= { sapBaseInfoEntry 7 }
+
+sapLastMgmtChange OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of sysUpTime at the time of the
+most recent management-initiated change to
+this SAP."
+::= { sapBaseInfoEntry 8 }
+
+sapOperFlags OBJECT-TYPE
+SYNTAX BITS {
+sapAdminDown(0), -- SAP is admin down
+svcAdminDown(1), -- Service is admin down
+portOperDown(2) -- Access port is oper down
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "This object specifies all the conditions that
+affect the operating status of this SAP."
+::= { sapBaseInfoEntry 9 } 
+
+sapCustMultSvcSiteName OBJECT-TYPE
+SYNTAX DisplayString (SIZE(0..9))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The value of this object, when not null, indicates
+the Multi-Service Site this SAP is a member of. This
+information is used to configure the ingress and
+egress QoS schedulers for this SAP."
+DEFVAL { ''H }
+::= { sapBaseInfoEntry 11 }
+
+sapIngressQosPolicyId OBJECT-TYPE
+SYNTAX TSapIngressPolicyIdOrNone
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The row index in the hqosSapIngressTable
+corresponding to this ingress QoS
+policy, or zero if no policy is specified."
+DEFVAL { 0 }
+::= { sapBaseInfoEntry 12 }
+
+sapEgressQosPolicyId OBJECT-TYPE
+SYNTAX TSapEgressPolicyIdOrNone
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The row index in the hqosSapEgressTable
+corresponding to this egress QoS policy,
+or zero if no policy is specified."
+DEFVAL { 0 }
+::= { sapBaseInfoEntry 13 }
+
+sapIngressQosSchedulerPolicy OBJECT-TYPE
+SYNTAX TNamedItemOrEmpty
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "This object can be set only when sapCustMultSvcSite
+is null. It indicates the ingress QoS scheduler for
+this SAP."
+DEFVAL { ''H }
+::= { sapBaseInfoEntry 14 }
+
+sapEgressQosSchedulerPolicy OBJECT-TYPE
+SYNTAX TNamedItemOrEmpty
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "This object can be set only when sapCustMultSvcSite
+is null. It indicates the egress QoS scheduler for
+this SAP."
+DEFVAL { ''H }
+::= { sapBaseInfoEntry 15 }
+
+sapLearnMode OBJECT-TYPE
+SYNTAX INTEGER {
+qualified ( 1 ),
+unqualified ( 2 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Sap learning mode. Currently supported as read-only."
+::= { sapBaseInfoEntry 16 }
+
+prvtSapCreated NOTIFICATION-TYPE
+OBJECTS {
+svcId,
+sapPortId,
+sapEncapValue
+}
+STATUS current
+DESCRIPTION "This trap is sent when a new row is created
+in the sapBaseInfoTable."
+::= { prvtSapTraps 1 }
+
+prvtSapDeleted NOTIFICATION-TYPE
+OBJECTS {
+svcId,
+sapPortId,
+sapEncapValue
+}
+STATUS current
+DESCRIPTION "This trap is sent when an existing row is
+deleted from the sapBaseInfoTable."
+::= { prvtSapTraps 2 }
+
+prvtSapStatusChanged NOTIFICATION-TYPE
+OBJECTS {
+svcId,
+sapPortId,
+sapEncapValue,
+sapAdminStatus,
+sapOperStatus
+}
+STATUS current
+DESCRIPTION "The sapStatusChanged notification is generated
+when there is a change in the administrative or
+operating status of an SAP."
+::= { prvtSapTraps 3 } 
+
+--
+-- Ingress QoS Queue SAP Statistics Table
+--
+
+sapIngQosQueueStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SapIngQosQueueStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains ingress QoS queue SAP
+statistics."
+::= { prvtTMSapObjs 3 }
+
+sapIngQosQueueStatsEntry OBJECT-TYPE
+SYNTAX SapIngQosQueueStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Ingress statistics about a specific SAP's
+QoS queue."
+INDEX { svcId, sapPortId, sapEncapValue, sapIngQosQueueId }
+::= { sapIngQosQueueStatsTable 1 }
+
+SapIngQosQueueStatsEntry ::= SEQUENCE {
+sapIngQosQueueId TSapIngQueueId,
+sapIngQosQueueStatsOfferedHiPrioPackets Counter32,
+sapIngQosQueueStatsOfferedLoPrioPackets Counter32,
+sapIngQosQueueStatsOfferedHiPrioOctets Counter32,
+sapIngQosQueueStatsOfferedLoPrioOctets Counter32,
+sapIngQosQueueStatsForwardedInProfPackets Counter32,
+sapIngQosQueueStatsForwardedOutProfPackets Counter32,
+sapIngQosQueueStatsForwardedInProfOctets Counter32,
+sapIngQosQueueStatsForwardedOutProfOctets Counter32,
+sapIngQosQueueStatsDroppedPackets Counter32,
+sapIngQosQueueStatsDroppedOctets Counter32,
+sapIngQosCustName ServObjName
+}
+
+sapIngQosQueueId OBJECT-TYPE
+SYNTAX TSapIngQueueId
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The index of the ingress QoS queue of
+this SAP."
+::= { sapIngQosQueueStatsEntry 1 }
+
+sapIngQosQueueStatsOfferedHiPrioPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of high priority packets,
+as determined by the SAP ingress QoS
+policy, offered by the service queue."
+::= { sapIngQosQueueStatsEntry 2 }
+
+sapIngQosQueueStatsOfferedLoPrioPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of low priority packets,
+as determined by the SAP ingress QoS
+policy, offered by the service queue."
+::= { sapIngQosQueueStatsEntry 3 }
+
+sapIngQosQueueStatsOfferedHiPrioOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of high priority octets,
+as determined by the SAP ingress QoS
+policy, offered by the service queue."
+::= { sapIngQosQueueStatsEntry 4 }
+
+sapIngQosQueueStatsOfferedLoPrioOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of low priority octets,
+as determined by the SAP ingress QoS
+policy, offered by the service queue."
+::= { sapIngQosQueueStatsEntry 5 }
+
+sapIngQosQueueStatsForwardedInProfPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of in-profile packets
+(rate below CIR) forwarded by the
+ingress service queue."
+::= { sapIngQosQueueStatsEntry 6 }
+
+sapIngQosQueueStatsForwardedOutProfPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of out-of-profile packets
+(rate above CIR) forwarded by the
+ingress service queue."
+::= { sapIngQosQueueStatsEntry 7 }
+
+sapIngQosQueueStatsForwardedInProfOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of in-profile octets
+(rate below CIR) forwarded by the
+ingress service queue."
+::= { sapIngQosQueueStatsEntry 8 }
+
+sapIngQosQueueStatsForwardedOutProfOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of out-of-profile octets
+(rate above CIR) forwarded by the
+ingress service queue."
+::= { sapIngQosQueueStatsEntry 9 }
+
+sapIngQosQueueStatsDroppedOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of octets
+discarded in the egress queue."
+::= { sapIngQosQueueStatsEntry 10 }
+
+sapIngQosQueueStatsDroppedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of in-profile packets
+discarded by the Ingess queue."
+::= { sapIngQosQueueStatsEntry 11 }
+
+sapIngQosCustName OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The Customer Name of the site this SAP belongs to."
+::= { sapIngQosQueueStatsEntry 12 }
+
+--
+-- Egress QoS Queue SAP Statistics Table
+--
+
+sapEgrQosQueueStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SapEgrQosQueueStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains egress QoS queue SAP
+statistics."
+::= { prvtTMSapObjs 4 }
+
+sapEgrQosQueueStatsEntry OBJECT-TYPE
+SYNTAX SapEgrQosQueueStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Egress statistics about a specific SAP's
+QoS queue."
+INDEX { svcId, sapPortId, sapEncapValue, sapEgrQosQueueId }
+::= { sapEgrQosQueueStatsTable 1 }
+
+SapEgrQosQueueStatsEntry ::= SEQUENCE {
+sapEgrQosQueueId TSapEgrQueueId,
+sapEgrQosQueueStatsForwardedInProfPackets Counter32,
+sapEgrQosQueueStatsForwardedOutProfPackets Counter32,
+sapEgrQosQueueStatsForwardedInProfOctets Counter32,
+sapEgrQosQueueStatsForwardedOutProfOctets Counter32,
+sapEgrQosQueueStatsDroppedPackets Counter32,
+sapEgrQosQueueStatsDroppedOctets Counter32,
+sapEgrQosCustName ServObjName
+}
+
+sapEgrQosQueueId OBJECT-TYPE
+SYNTAX TSapEgrQueueId
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The index of the egress QoS queue of
+this SAP."
+::= { sapEgrQosQueueStatsEntry 1 }
+
+sapEgrQosQueueStatsForwardedInProfPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of in-profile packets
+(rate below CIR) forwarded by the
+egress queue."
+::= { sapEgrQosQueueStatsEntry 2 }
+
+sapEgrQosQueueStatsForwardedOutProfPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of out-of-profile packets
+(rate above CIR) forwarded by the
+egress queue."
+::= { sapEgrQosQueueStatsEntry 3 }
+
+sapEgrQosQueueStatsForwardedInProfOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of in-profile octets
+(rate below CIR) forwarded by the
+egress queue."
+::= { sapEgrQosQueueStatsEntry 4 }
+
+sapEgrQosQueueStatsForwardedOutProfOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of out-of-profile octets
+(rate above CIR) forwarded by the
+egress queue."
+::= { sapEgrQosQueueStatsEntry 5 }
+
+sapEgrQosQueueStatsDroppedOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of octets
+discarded in the egress queue."
+::= { sapEgrQosQueueStatsEntry 6 }
+
+sapEgrQosQueueStatsDroppedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of in-profile packets
+discarded by the egress queue."
+::= { sapEgrQosQueueStatsEntry 7 }
+
+sapEgrQosCustName OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The Customer Name of the site this SAP belongs to."
+::= { sapEgrQosQueueStatsEntry 8 }
+
+--
+-- Ingress QoS Scheduler SAP Statistics Table
+--
+
+sapIngQosSchedStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SapIngQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains ingress QoS queue SAP
+statistics."
+::= { prvtTMSapObjs 5 }
+
+sapIngQosSchedStatsEntry OBJECT-TYPE
+SYNTAX SapIngQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Ingress statistics about a specific SAP's
+QoS queue."
+INDEX { svcId, sapPortId, sapEncapValue,
+IMPLIED sapIngQosSchedName }
+::= { sapIngQosSchedStatsTable 1 }
+
+SapIngQosSchedStatsEntry ::= SEQUENCE {
+sapIngQosSchedName TNamedItem,
+sapIngQosSchedStatsForwardedPackets Counter32,
+sapIngQosSchedStatsForwardedOctets Counter32,
+sapIngQosSchedCustName ServObjName
+}
+
+sapIngQosSchedName OBJECT-TYPE
+SYNTAX TNamedItem
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "The index of the ingress QoS scheduler of
+this SAP."
+::= { sapIngQosSchedStatsEntry 1 }
+
+sapIngQosSchedStatsForwardedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded packets, as
+determined by the SAP ingress scheduler
+policy, offered by the Pchip to the
+Qchip."
+::= { sapIngQosSchedStatsEntry 2 }
+
+sapIngQosSchedStatsForwardedOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded octets,as
+determined by the SAP ingress schduler
+policy, offered by the Pchip to the
+Qchip."
+::= { sapIngQosSchedStatsEntry 3 }
+
+sapIngQosSchedCustName OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The Customer Name of the site this SAP belongs to."
+::= { sapIngQosSchedStatsEntry 4 }
+
+--
+-- Egress QoS Scheduler SAP Statistics Table
+--
+
+sapEgrQosSchedStatsTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SapEgrQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains ingress QoS queue SAP
+statistics."
+::= { prvtTMSapObjs 6 }
+
+sapEgrQosSchedStatsEntry OBJECT-TYPE
+SYNTAX SapEgrQosSchedStatsEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Egress statistics about a specific SAP's
+QoS queue."
+INDEX { svcId, sapPortId, sapEncapValue,
+IMPLIED sapEgrQosSchedName }
+::= { sapEgrQosSchedStatsTable 1 }
+
+SapEgrQosSchedStatsEntry ::= SEQUENCE {
+sapEgrQosSchedName TNamedItem,
+sapEgrQosSchedStatsForwardedPackets Counter32,
+sapEgrQosSchedStatsForwardedOctets Counter32,
+sapEgrQosSchedCustName ServObjName
+}
+
+sapEgrQosSchedName OBJECT-TYPE
+SYNTAX TNamedItem
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "The index of the egress QoS scheduler of
+this SAP."
+::= { sapEgrQosSchedStatsEntry 1 }
+
+sapEgrQosSchedStatsForwardedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded packets by the
+egress Qchip, as determined by the SAP
+egress scheduler policy."
+::= { sapEgrQosSchedStatsEntry 2 }
+
+sapEgrQosSchedStatsForwardedOctets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The number of forwarded octets by the
+egress Qchip, as determined by the SAP
+egress scheduler policy."
+::= { sapEgrQosSchedStatsEntry 3 }
+
+sapEgrQosSchedCustName OBJECT-TYPE
+SYNTAX ServObjName
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The Customer Name of the site this SAP belongs to."
+::= { sapEgrQosSchedStatsEntry 4 }
+
+-- --------------------------------------------------------------------
+-- prvtTMSdpObjs group
+-- --------------------------------------------------------------------
+
+sdpNumEntries OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The current number of SDPs configured in this
+device."
+::= { prvtTMSdpObjs 1 }
+
+sdpNextFreeId OBJECT-TYPE
+SYNTAX SdpIdType
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The next available value for sdpId."
+::= { prvtTMSdpObjs 2 }
+
+--
+-- SDP Table
+--
+
+sdpInfoTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SdpInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "A table that contains SDP information."
+::= { prvtTMSdpObjs 3 }
+
+sdpInfoEntry OBJECT-TYPE
+SYNTAX SdpInfoEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Information about a specific SDP."
+INDEX { svcId, sdpId }
+::= { sdpInfoTable 1 }
+
+SdpInfoEntry ::= SEQUENCE {
+sdpId SdpIdType,
+sdpRowStatus RowStatus,
+sdpDelivery INTEGER,
+sdpFarEndIpAddress IpAddress,
+sdpDescription ServObjDesc,
+sdpLabelSignaling INTEGER,
+sdpAdminStatus ServiceAdminStatus,
+sdpOperStatus INTEGER,
+sdpLastMgmtChange TimeStamp,
+sdpLdpEnabled TruthValue,
+sdpOperFlags BITS,
+sdpLastStatusChange TimeStamp,
+sdpAdminIngressLabel Unsigned32,
+sdpAdminEgressLabel Unsigned32,
+sdpAdminIsBackup TruthValue,
+sdpOperIsBackup TruthValue,
+sdpOutInterface Integer32,
+sdpGroupIdentifier Unsigned32,
+sdpTransportTunnelName DisplayString ,
+sdpVCType INTEGER,
+sdpType INTEGER,
+sdpMtu Integer32,
+sdpBindVlanTag Unsigned32,
+sdpIsPwStatusSignalingEnable TruthValue,
+sdpEpsAdminIsPrimary TruthValue,
+sdpEpsAdminIsSecondary TruthValue
+}
+
+sdpId OBJECT-TYPE
+SYNTAX SdpIdType
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "SDP identifier."
+::= { sdpInfoEntry 1 }
+
+sdpRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "This object indicates the status of this row. 
+1. The values supported during a set operation are 
+createAndWait(5), destroy(6), active(1), notInSertvice(2). 
+Sdps can be deleted any time. The transition between
+active(1) and notInService(2) states are rejected if 
+sdpAdminStatus is up(1). 
+"
+::= { sdpInfoEntry 2 }
+
+sdpDelivery OBJECT-TYPE
+SYNTAX INTEGER {
+gre(1),
+mpls(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "This object specifies the type of delivery used
+by this SDP.
+NOTE! Currently we support only mpls. The modification 
+of this obect will be rejected. " 
+DEFVAL { mpls }
+::= { sdpInfoEntry 3 }
+
+sdpFarEndIpAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "This object specifies the IP address of the
+remote end of the GRE or MPLS tunnel defined
+by this SDP. 
+
+This field is mandatory. If all mandatory fields are set, the 
+row status object is automatically changed from notReady(3)
+to notInService(2) state.
+"
+::= { sdpInfoEntry 4 }
+
+sdpDescription OBJECT-TYPE
+SYNTAX ServObjDesc
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Generic information about this SDP."
+DEFVAL { "" }
+::= { sdpInfoEntry 5 }
+
+sdpLabelSignaling OBJECT-TYPE
+SYNTAX INTEGER {
+none(1),
+tldp(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "This object specifies the signaling protocol
+used to obtain the ingress and egress labels
+used in frames transmitted and received on
+this SDP. When the value of this object is
+none(1) then the labels are manually assigned
+at the time the SDP is configured. The
+value of this object can only be changed while
+the admin status of the SDP is down(2).
+
+This field is mandatory. If all mandatory fields are set, the 
+row status object is automatically changed from notReady(3)
+to notInService(2) state
+"
+DEFVAL { tldp }
+::= { sdpInfoEntry 6 }
+
+sdpAdminStatus OBJECT-TYPE
+SYNTAX ServiceAdminStatus
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The desired state of this SDP.
+1. The value of this object depends on the value of svcAdminStatus. 
+It will be rejected to set sdpAdminStatus to up(1), when svcAdminStatus
+is set to down(2).
+2. If sdpRowStatus is in notInService state, the transition of sdpAdminStatus 
+from down(2) to up(1) state will also automaticaly change the 
+value of the sdpRowStatus object to active(1)
+"
+DEFVAL { down }
+::= { sdpInfoEntry 7 }
+
+sdpOperStatus OBJECT-TYPE
+SYNTAX INTEGER {
+up(1),
+down(2),
+goingUp (3),
+tunnelDown (4),
+transportSelected (5),
+supressed (6)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The operating state of this SDP. 
+1. Sdp is up and running.
+2. Initial state. Entry is inactive.
+3. Peers are ready to select transport.
+4. There is no suitable transport.
+5. SDP is not operational due to local/remote SAP down or remote SDP has no transport.
+6. Sdp is up and ready to carry user traffic but it is not used at the moment (backup).
+"
+::= { sdpInfoEntry 8 }
+
+sdpLastMgmtChange OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of sysUpTime at the time of the
+most recent management-initiated change to
+this SDP."
+::= { sdpInfoEntry 9 }
+
+sdpLdpEnabled OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "When the value of this object is true(1)
+the transport LSP's are signalled by LDP,
+as opposed to being provisioned static or
+RSVP-signalled LSP's. This object applies
+only to MPLS SDP's."
+DEFVAL { false }
+::= { sdpInfoEntry 10 }
+
+sdpOperFlags OBJECT-TYPE
+SYNTAX BITS {
+sdpAdminDown(0),
+signalingSessionDown(1),
+transportTunnelDown(2),
+invalidEgressInterface(3),
+noSystemIpAddress(4)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "This object specifies all the conditions that
+affect the operating status of this SDP."
+::= { sdpInfoEntry 11 }
+
+sdpLastStatusChange OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "The value of sysUpTime at the time of the
+most recent operating status change to this
+SDP."
+::= { sdpInfoEntry 12 }
+
+sdpAdminIngressLabel OBJECT-TYPE
+SYNTAX Unsigned32 (0 | 1 | 2048..18431)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The static MPLS VC label used by the far-end device
+to send packets to this device in this service via
+this SDP."
+DEFVAL { 0 }
+::= { sdpInfoEntry 13 }
+
+sdpAdminEgressLabel OBJECT-TYPE
+SYNTAX Unsigned32 (0 | 16..1048575)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "The static MPLS VC label used by this device to send
+packets to the far-end device in this service via
+this SDP."
+DEFVAL { 0 }
+::= { sdpInfoEntry 14 }
+
+sdpAdminIsBackup OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "This object is used in administratively to specify the preferred primary or backup state of this SDP.
+A value of false means this is the primary SDP.
+This field is mandatory if svcType is set to vpls-mtu(12) or vpws-mtu(10). 
+The sdpType must be set to spoke(2). If all mandatory fields are 
+set, the row status object is automatically changed from notReady(3) to 
+notInService(2) state."
+DEFVAL { false }
+::= { sdpInfoEntry 15 }
+
+sdpOperIsBackup OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION "It represents the current operational state of this SDP as either active or backup. 
+A value of false means this is the active SDP. A value of true means that this SDP is
+in backup suppressed state."
+DEFVAL { false }
+::= { sdpInfoEntry 16 }
+
+sdpOutInterface OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "This object is valid only if the type of service is tls(3). 
+The ifIndex of the desired outbound interface for this SDP.
+
+This field is currently not supported. Its modification 
+will be rejected. 
+
+The default value is 0
+"
+DEFVAL { 0 }
+::= { sdpInfoEntry 17 } 
+
+sdpGroupIdentifier OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "This object is valid only if the type of service is tls(3). 
+The Group ID for this SDP. SDP's bound to the same service must have the same Group ID's."
+DEFVAL { 0 }
+::= { sdpInfoEntry 18 } 
+
+sdpTransportTunnelName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Optional transport tunnel name. For the SDP to be operational an entry must exist in 
+mplsTunnelTable with this name."
+DEFVAL { "" }
+::= { sdpInfoEntry 19 } 
+
+sdpVCType OBJECT-TYPE
+SYNTAX INTEGER
+{ 
+ethernet-vlan(4),
+ethernet(5)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "VC Type of the service."
+::= { sdpInfoEntry 20} 
+
+sdpType OBJECT-TYPE
+SYNTAX INTEGER
+{
+invalidType(0),
+generic(1),
+spoke(2),
+mesh(3),
+hub(4)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The type of this SDP.
+
+Currently the only supported sdp types are spoke(2) and mesh(3)
+
+This field is mandatory. If svcType is set to vpls-mtu(12) or vpws-mtu(10), 
+trying to set sdpType to mesh(3) will be rejected(Wring configuration). 
+If all mandatory fields are set, the row status object is automatically 
+changed from notReady(3) to notInService(2) state.
+"
+::= { sdpInfoEntry 21}
+
+sdpMtu OBJECT-TYPE
+SYNTAX Integer32 (512..9216)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "The largest frame size (in octets) that this
+SDP can handle"
+::= { sdpInfoEntry 22}
+
+sdpBindVlanTag OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-write 
+
+STATUS current
+DESCRIPTION "Outgoing vlan."
+::= { sdpInfoEntry 23}
+
+sdpIsPwStatusSignalingEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION "Specifies if PW-status signalling is enabled per given SDP."
+::= { sdpInfoEntry 24}
+
+sdpEpsAdminIsPrimary OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Administrative primary status if the specified SDP. If set to true, the SDP is the primary-link of the protection."
+    DEFVAL { false }
+::= { sdpInfoEntry 25 }
+
+sdpEpsAdminIsSecondary OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Administrative secondary status if the specified SDP. If set to true, the SDP is the secondary-link of the protection."
+    DEFVAL { false }
+::= { sdpInfoEntry 26 }
+
+---notifications
+
+prvtSdpCreated NOTIFICATION-TYPE
+OBJECTS {
+svcId, sdpId
+}
+STATUS current
+DESCRIPTION "This trap is sent when a new row is created
+in the sdpInfoTable."
+::= { prvtSdpTraps 1 }
+
+prvtSdpDeleted NOTIFICATION-TYPE
+OBJECTS {
+svcId, sdpId
+}
+STATUS current
+DESCRIPTION "This trap is sent when an existing row is
+deleted from the sdpInfoTable."
+::= { prvtSdpTraps 2 }
+
+prvtSdpStatusChanged NOTIFICATION-TYPE
+OBJECTS {
+svcId,
+sdpId,
+sdpAdminStatus,
+sdpOperStatus
+}
+STATUS current
+DESCRIPTION "The sdpStatusChanged notification is generated
+when there is a change in the administrative or
+operating status of an SDP."
+::= { prvtSdpTraps 3 }
+
+-- ----------------------------------------------------------------------------
+-- Conformance Information
+-- ----------------------------------------------------------------------------
+
+prvtTMCustCompliances OBJECT IDENTIFIER ::= { prvtTMCustConformance 1 }
+prvtTMCustGroups OBJECT IDENTIFIER ::= { prvtTMCustConformance 2 }
+
+prvtTMSvcCompliances OBJECT IDENTIFIER ::= { prvtTMSvcConformance 1 }
+prvtTMSvcGroups OBJECT IDENTIFIER ::= { prvtTMSvcConformance 2 }
+
+prvtTMSapCompliances OBJECT IDENTIFIER ::= { prvtTMSapConformance 1 }
+prvtTMSapGroups OBJECT IDENTIFIER ::= { prvtTMSapConformance 2 }
+
+prvtTMSdpCompliances OBJECT IDENTIFIER ::= { prvtTMSdpConformance 1 }
+prvtTMSdpGroups OBJECT IDENTIFIER ::= { prvtTMSdpConformance 2 }
+
+-- ----------------------------------------------
+-- Compliance Statements
+-- ----------------------------------------------
+
+prvtTMCustCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement for management of services customers
+on T-Metro series systems."
+MODULE -- this module
+MANDATORY-GROUPS
+{
+prvtTMCustGlobalGroup 
+}
+::= { prvtTMCustCompliances 1 }
+
+prvtTMSvcCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement for management of services
+on T-Metro series systems."
+MODULE -- this module
+MANDATORY-GROUPS
+{
+prvtTMSvcGlobalGroup,
+prvtTMSvcNotificationGroup
+}
+::= { prvtTMSvcCompliances 1 }
+
+prvtTMSapCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement for management of services SAPs
+on T-Metro series systems."
+MODULE -- this module
+MANDATORY-GROUPS {
+prvtTMSapGlobalGroup,
+prvtTMSapNotificationGroup
+}
+::= { prvtTMSapCompliances 1 }
+
+prvtTMSdpCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement for management of services SDPs
+on T-Metro series systems."
+MODULE -- this module
+MANDATORY-GROUPS {
+prvtTMSdpGlobalGroup
+}
+::= { prvtTMSdpCompliances 1 }
+
+-- ----------------------------------------------
+-- customer OBJECT-GROUPs
+-- ----------------------------------------------
+
+prvtTMCustGlobalGroup OBJECT-GROUP
+OBJECTS {
+custNumEntries,
+custName,
+custRowStatus,
+custContact,
+custPhone,
+custLastMgmtChange
+}
+STATUS current
+DESCRIPTION
+"The group of objects supporting management of Services customers
+general capabilities on T-Metro series systems."
+::= { prvtTMCustGroups 1 }
+
+-- ----------------------------------------------
+-- Services OBJECT-GROUPs
+-- ----------------------------------------------
+
+prvtTMSvcGlobalGroup OBJECT-GROUP
+OBJECTS {
+svcNumEntries,
+svcId,
+svcRowStatus,
+svcType,
+svcDescription,
+svcAdminStatus,
+svcOperStatus,
+svcNumSaps,
+svcNumSdps,
+svcLastMgmtChange,
+svcVpnId
+}
+STATUS current
+DESCRIPTION
+"The group of objects supporting management of Svc general
+capabilities on T-Metro series systems."
+::= { prvtTMSvcGroups 1 }
+
+prvtTMSvcNotificationGroup NOTIFICATION-GROUP
+NOTIFICATIONS {
+prvtSvcCreated,
+prvtSvcDeleted
+}
+STATUS current
+DESCRIPTION
+"The group of notifications supporting the Services
+on T-Metro series systems."
+::= { prvtTMSvcGroups 2 }
+
+-- ----------------------------------------------
+-- Service SAP OBJECT-GROUPs
+-- ----------------------------------------------
+
+prvtTMSapGlobalGroup OBJECT-GROUP
+OBJECTS {
+sapNumEntries,
+sapPortId,
+sapEncapValue,
+sapRowStatus,
+sapType,
+sapDescription,
+sapAdminStatus,
+sapOperStatus,
+sapIngressQosPolicyId,
+sapEgressQosPolicyId,
+sapLastMgmtChange
+}
+STATUS current
+DESCRIPTION
+"The group of objects supporting management of Services SAP general
+capabilities on T-Metro series systems."
+::= { prvtTMSapGroups 1 }
+
+prvtTMSapNotificationGroup NOTIFICATION-GROUP
+NOTIFICATIONS {
+prvtSapStatusChanged,
+prvtSapCreated,
+prvtSapDeleted
+}
+STATUS current
+DESCRIPTION
+"The group of notifications supporting the Sap feature
+on T-Metro series systems."
+::= { prvtTMSapGroups 2 }
+
+-- ----------------------------------------------
+-- Service SDP OBJECT-GROUPs
+-- ----------------------------------------------
+
+prvtTMSdpGlobalGroup OBJECT-GROUP
+OBJECTS {
+sdpNumEntries,
+sdpId,
+sdpNextFreeId,
+sdpRowStatus,
+sdpDelivery,
+sdpFarEndIpAddress,
+sdpDescription,
+sdpLabelSignaling,
+sdpAdminStatus,
+sdpOperStatus,
+sdpLastMgmtChange,
+sdpLdpEnabled 
+}
+STATUS current
+DESCRIPTION
+"The group of objects supporting management of Services SDP general
+capabilities on T-Metro series systems."
+::= { prvtTMSdpGroups 1 }
+
+END

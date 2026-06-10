@@ -1,0 +1,64 @@
+-- *****************************************************************
+-- GAM-PRODUCTS-MIB:  GAM Product Object Identifier Assignments
+-- *****************************************************************
+
+GAM-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY
+      FROM SNMPv2-SMI
+   gamProducts
+      FROM POSITRON-SMI;
+
+gamProductsMIB MODULE-IDENTITY
+   LAST-UPDATED   "202107070000Z"
+    ORGANIZATION   "Positron Access Solutions Corp."
+    CONTACT-INFO   "Positron Access Solutions Corp.
+                    Customer Service
+
+                    Postal:    5101 Buchan Street, Suite 220
+                               Montreal, QC
+                               H4P 2R9
+                               CANADA
+
+                    Phone:     +1-514-345-2220
+                    Toll Free: +1-888-577-5254
+                    Fax:       +1-514-345-2271
+
+                    E-mail:    info@positronaccess.com"
+   DESCRIPTION    "This module defines the object identifiers that are
+                   assigned to various hardware platforms, and hence are
+                   returned as values for sysObjectID"
+   REVISION       "201707070000Z"
+   DESCRIPTION    "Initial release."
+   ::= { gamProducts 1 }
+
+gam4MRX      OBJECT IDENTIFIER ::= { gamProductsMIB 1 }
+gam4CRX      OBJECT IDENTIFIER ::= { gamProductsMIB 2 }
+gam4CRXLC    OBJECT IDENTIFIER ::= { gamProductsMIB 3 }
+gam4CRXOPTI  OBJECT IDENTIFIER ::= { gamProductsMIB 4 }
+gam4MRXLC    OBJECT IDENTIFIER ::= { gamProductsMIB 5 }
+gam4MRXOPTI  OBJECT IDENTIFIER ::= { gamProductsMIB 6 }
+gam8MRX      OBJECT IDENTIFIER ::= { gamProductsMIB 7 }
+gam8MRXLC    OBJECT IDENTIFIER ::= { gamProductsMIB 8 }
+gam8MRXOPTI  OBJECT IDENTIFIER ::= { gamProductsMIB 9 }
+gam8CRX      OBJECT IDENTIFIER ::= { gamProductsMIB 10 }
+gam8CRXLC    OBJECT IDENTIFIER ::= { gamProductsMIB 11 }
+gam8CRXOPTI  OBJECT IDENTIFIER ::= { gamProductsMIB 12 }
+gam12M       OBJECT IDENTIFIER ::= { gamProductsMIB 13 }
+gam12C       OBJECT IDENTIFIER ::= { gamProductsMIB 14 }
+gam24M       OBJECT IDENTIFIER ::= { gamProductsMIB 15 }
+gam24C       OBJECT IDENTIFIER ::= { gamProductsMIB 16 }
+gam4MX       OBJECT IDENTIFIER ::= { gamProductsMIB 17 }
+gam4CX       OBJECT IDENTIFIER ::= { gamProductsMIB 18 }
+gam8MX       OBJECT IDENTIFIER ::= { gamProductsMIB 19 }
+gam8CX       OBJECT IDENTIFIER ::= { gamProductsMIB 20 }
+gam8MVXA     OBJECT IDENTIFIER ::= { gamProductsMIB 21 }
+gam8MVXG     OBJECT IDENTIFIER ::= { gamProductsMIB 22 }
+gam8MDVXA    OBJECT IDENTIFIER ::= { gamProductsMIB 23 }
+gam8MDVXG    OBJECT IDENTIFIER ::= { gamProductsMIB 24 }
+gam4MRXLBE   OBJECT IDENTIFIER ::= { gamProductsMIB 25 }
+gam8MRXLBE   OBJECT IDENTIFIER ::= { gamProductsMIB 26 }
+gam12MLBE   OBJECT IDENTIFIER ::= { gamProductsMIB 27 }
+
+END

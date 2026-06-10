@@ -1,0 +1,202 @@
+STORMSHIELD-VPNSP-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+         Unsigned32, Counter64                FROM SNMPv2-SMI
+      DisplayString                           FROM RFC1213-MIB
+      snsVPN                                  FROM STORMSHIELD-VPN-MIB;
+
+   snsVPNSPTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsVPNSPEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "List of Security Policy"
+      ::= { snsVPN 3 }
+
+   snsVPNSPEntry OBJECT-TYPE
+      SYNTAX  SnsVPNSPEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "Each entry in the snsVPNSPTable holds a set of parameters."
+      INDEX   { snsVPNSPIndex }
+      ::= { snsVPNSPTable 1 }
+
+   SnsVPNSPEntry ::= SEQUENCE {
+      snsVPNSPIndex        INTEGER,
+      snsVPNSPIKERulename  DisplayString,
+      snsVPNSPRulename     DisplayString,
+      snsVPNSPVersion      INTEGER,
+      snsVPNSPIPSrc        DisplayString,
+      snsVPNSPIPDst        DisplayString,
+      snsVPNSPTSSrc        DisplayString,
+      snsVPNSPTSDst        DisplayString,
+      snsVPNSPLocalid      DisplayString,
+      snsVPNSPRemoteid     DisplayString,
+      snsVPNSPPolicy       DisplayString,
+      snsVPNSPEnc          INTEGER,
+      snsVPNSPType         INTEGER,
+      snsVPNSPMaxLifetime  Counter64,
+      snsVPNSPGlobal       INTEGER,
+      snsVPNSPPPKID        DisplayString,
+      snsVPNSPPPKRequired  INTEGER
+   }
+
+   snsVPNSPIndex OBJECT-TYPE
+      SYNTAX  INTEGER  (1..65535)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "A unique value for phase one table. Its value
+         may not be contigous. The index has no other
+         meaning but a pure index"
+      ::= { snsVPNSPEntry 1 }
+
+   snsVPNSPIKERulename OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Phase one rulename"
+      ::= { snsVPNSPEntry 2 }
+
+   snsVPNSPRulename OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Phase two rulename"
+      ::= { snsVPNSPEntry 3 }
+
+   snsVPNSPVersion OBJECT-TYPE
+      SYNTAX INTEGER {
+         both(0),
+         ikev1(1),
+         ikev2(2)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IKE version"
+      ::= {snsVPNSPEntry 4 }
+
+   snsVPNSPIPSrc OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP source"
+      ::= { snsVPNSPEntry 5 }
+
+   snsVPNSPIPDst OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP destination"
+      ::= { snsVPNSPEntry 6 }
+
+   snsVPNSPTSSrc OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Traffic Selector source"
+      ::= { snsVPNSPEntry 7 }
+
+   snsVPNSPTSDst OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Traffic Selector destination"
+      ::= { snsVPNSPEntry 8 }
+
+   snsVPNSPLocalid OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Local identifier"
+      ::= { snsVPNSPEntry 9 }
+
+   snsVPNSPRemoteid OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Remote identifier"
+      ::= { snsVPNSPEntry 10 }
+
+   snsVPNSPPolicy OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Policy"
+      ::= { snsVPNSPEntry 11 }
+
+   snsVPNSPEnc OBJECT-TYPE
+      SYNTAX INTEGER {
+         unspec(0),
+         unknown(1),
+         ah(2),
+         esp(3),
+         rsvp(4),
+         ospfv2(5),
+         ripv2(6),
+         mip(7),
+         ipcomp(8)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Enc"
+      ::= { snsVPNSPEntry 12 }
+
+   snsVPNSPType OBJECT-TYPE
+      SYNTAX INTEGER {
+         unknown(0),
+         gateway(1),
+         mobile(2)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Type"
+      ::= { snsVPNSPEntry 13 }
+
+   snsVPNSPMaxLifetime OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "MaxLifetime"
+      ::= { snsVPNSPEntry 14 }
+
+   snsVPNSPGlobal OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Global"
+      ::= { snsVPNSPEntry 15 }
+
+   snsVPNSPPPKID OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "PPK ID"
+      ::= { snsVPNSPEntry 16 }
+
+   snsVPNSPPPKRequired OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "PPKRequired"
+      ::= { snsVPNSPEntry 17 }
+
+END

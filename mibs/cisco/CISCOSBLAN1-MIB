@@ -1,0 +1,395 @@
+CISCOSBLAN1-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress, TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+    switch001
+        FROM CISCOSB-MIB
+    VlanId
+        FROM Q-BRIDGE-MIB;
+
+rlLan1 MODULE-IDENTITY
+    LAST-UPDATED "201506300000Z"
+    ORGANIZATION "Cisco Systems, Inc."
+    CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+	
+    DESCRIPTION
+        "The Lan1 MIB module for supporting Lan1 fetaure."
+    REVISION     "201506300000Z"
+    DESCRIPTION
+         "Initial version."
+    ::= { switch001 224 }
+
+-- TEXTUAL-CONVENTION
+GroupId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "group id."
+    SYNTAX  INTEGER (0..1279)
+
+GroupIdList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        groups, with the first octet specifying groups 1 through
+        8, the second octet specifying groups 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered group, and the least significant bit
+        represents the highest numbered group.  Thus, each group
+        is represented by a single bit within the value of this
+        object.  If that bit has a value of '1' then that group
+        is included in the set of groups; the group is not
+        included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+
+VlanIdOrNone ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "group id."
+    SYNTAX  INTEGER (0..4094)
+
+-- Scalars
+rlLan1STagEtherType OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (2))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the Ethernet type identifying the S-VLAN tag."
+    DEFVAL      { '0000'H }
+    ::= { rlLan1 1 }
+
+rlLan1CPVlanId OBJECT-TYPE
+    SYNTAX      VlanIdOrNone
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the CP VLAN ID.
+         0 indicateds no CP vlan."
+    DEFVAL      { 0 }
+    ::= { rlLan1 2 }
+
+rlLan1CPVlanCos OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the cos assigned to ingress traffic on module ports into
+        the CP VLAN."
+    DEFVAL      { 0 }
+    ::= { rlLan1 3 }
+
+rlLan1x86Port OBJECT-TYPE
+    SYNTAX      INTEGER (0..1000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the interface-id of the Ethernet port connecting LAN1 to the
+        x86 environment implementing  Virtual Functions (VFs).
+         0 indicateds no x86 port defined."
+    DEFVAL      { 0 }
+    ::= { rlLan1 4 }
+
+----------------------------
+-- rlLan1x86VlanMappingTable
+----------------------------
+
+rlLan1x86VlanMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLan1x86VlanMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information mapping s-tag to group id."
+    ::= { rlLan1 5 }
+
+rlLan1x86VlanMappingEntry OBJECT-TYPE
+    SYNTAX      RlLan1x86VlanMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping of incoming s-tag to a group."
+    INDEX   { rlLan1x86VlanMappingVlanId  }
+    ::= { rlLan1x86VlanMappingTable 1 }
+
+RlLan1x86VlanMappingEntry ::=
+    SEQUENCE {
+        rlLan1x86VlanMappingVlanId
+            VlanId,
+        rlLan1x86VlanMappingGroupId
+            GroupId,
+        rlLan1x86VlanMappingRowStatus
+            RowStatus
+    }
+
+rlLan1x86VlanMappingVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The s-tag to mapped to group"
+    ::= { rlLan1x86VlanMappingEntry 1 }
+
+rlLan1x86VlanMappingGroupId OBJECT-TYPE
+    SYNTAX      GroupId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "group for filtering traffic"
+    ::= { rlLan1x86VlanMappingEntry 2 }
+
+
+rlLan1x86VlanMappingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { rlLan1x86VlanMappingEntry 3 }
+
+----------------------------
+-- rlLan1VfMacMappingTable
+----------------------------
+
+rlLan1VfMacMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLan1VfMacMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information mapping Mac to s-tag."
+    ::= { rlLan1 6 }
+
+rlLan1VfMacMappingEntry OBJECT-TYPE
+    SYNTAX      RlLan1VfMacMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping of incoming s-tag to a group."
+    INDEX   { rlLan1VfMacMappingDstMacAddress  }
+    ::= { rlLan1VfMacMappingTable 1 }
+
+RlLan1VfMacMappingEntry ::=
+    SEQUENCE {
+        rlLan1VfMacMappingDstMacAddress
+            MacAddress,
+        rlLan1VfMacMappingVlanId
+            VlanId,
+        rlLan1VfMacMappingMulticast
+            INTEGER,
+        rlLan1VfMacMappingRowStatus
+            RowStatus
+    }
+
+rlLan1VfMacMappingDstMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "destination mac address"
+    ::= { rlLan1VfMacMappingEntry 1 }
+
+rlLan1VfMacMappingVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The s-tag"
+    ::= { rlLan1VfMacMappingEntry 2 }
+
+rlLan1VfMacMappingMulticast OBJECT-TYPE
+    SYNTAX INTEGER {
+               none(1),
+               cp(2),
+               noncp(3)
+           }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " cp - Specifies the VF which S-VLAN-ID is assigned to multicast/broadcast traffic bridged into the CP VLAN from modules to x86
+          noncp - Specifies the VF which S-VLAN-ID is assigned to multicast/broadcast traffic "
+    DEFVAL      { none }
+    ::= { rlLan1VfMacMappingEntry 3 }
+
+rlLan1VfMacMappingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { rlLan1VfMacMappingEntry 4 }
+
+----------------------------
+-- rlLan1ModulePortTable
+----------------------------
+
+rlLan1ModulePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLan1ModulePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information on a LAN1 module port."
+    ::= { rlLan1 7 }
+
+rlLan1ModulePortEntry OBJECT-TYPE
+    SYNTAX      RlLan1ModulePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A mapping of incoming s-tag to a group."
+    INDEX   { rlLan1ModulePortIfIndex  }
+    ::= { rlLan1ModulePortTable 1 }
+
+RlLan1ModulePortEntry ::=
+    SEQUENCE {
+        rlLan1ModulePortIfIndex
+            INTEGER,
+        rlLan1ModulePortCPAllowed
+             TruthValue,
+        rlLan1ModulePortMulticastBroadcastAllowedVlan
+             INTEGER,
+        rlLan1ModulePortIngressGroupId
+            GroupId,
+        rlLan1ModulePortEgressGroupIdList
+            GroupIdList,
+        rlLan1ModulePortRowStatus
+            RowStatus
+    }
+
+rlLan1ModulePortIfIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..1000)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies the interface-id."
+    DEFVAL      { 0 }
+    ::= { rlLan1ModulePortEntry 1 }
+
+rlLan1ModulePortCPAllowed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies that CP traffic is allowed on the port, it is used to
+        allow CP multicast/broadcast traffic."
+    DEFVAL      { false }
+    ::= { rlLan1ModulePortEntry 2 }
+
+rlLan1ModulePortMulticastBroadcastAllowedVlan OBJECT-TYPE
+    SYNTAX INTEGER {
+               none(1),
+               cp(2),
+               noncp(3)
+           }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies that multicast/broadcast traffic is allowed on the CP VLAN
+        or on non-CP VLAN.
+        If the parameter is not configured then only unicast traffic is allowed."
+    DEFVAL      { none }
+    ::= { rlLan1ModulePortEntry 3 }
+
+
+rlLan1ModulePortIngressGroupId OBJECT-TYPE
+    SYNTAX      GroupId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the group number assigned to the input frame on the interface"
+    DEFVAL      { 0 }
+    ::= { rlLan1ModulePortEntry 4 }
+
+rlLan1ModulePortEgressGroupIdList OBJECT-TYPE
+    SYNTAX      GroupIdList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the list of egress group numbers"
+    DEFVAL      { ''H }
+    ::= { rlLan1ModulePortEntry 5 }
+
+rlLan1ModulePortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { rlLan1ModulePortEntry 6 }
+
+----------------------------
+-- rlLan1x86PfcTable
+----------------------------
+
+rlLan1x86PfcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlLan1x86PfcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information on a LAN1 x86 port PFC configuration per priority."
+    ::= { rlLan1 8 }
+
+rlLan1x86PfcEntry OBJECT-TYPE
+    SYNTAX      RlLan1x86PfcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PFC information per priority"
+    INDEX   { rlLan1x86PriorityIndex  }
+    ::= { rlLan1x86PfcTable 1 }
+
+RlLan1x86PfcEntry ::=
+    SEQUENCE {
+        rlLan1x86PriorityIndex
+            INTEGER,
+		rlLan1x86PriorityIsLossy
+			TruthValue,
+        rlLan1x86PriorityXoffThreshold
+            INTEGER,
+        rlLan1x86PriorityXonThreshold
+            INTEGER
+    }
+
+rlLan1x86PriorityIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies the priority index."
+    DEFVAL      { 0 }
+    ::= { rlLan1x86PfcEntry 1 }
+
+	rlLan1x86PriorityIsLossy OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies if priority is lossy or lossless"
+	DEFVAL      { true }
+    ::= { rlLan1x86PfcEntry 2 }
+	
+rlLan1x86PriorityXoffThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value of triggering pause frames when crossing over the threshold"
+    ::= { rlLan1x86PfcEntry 3 }
+
+rlLan1x86PriorityXonThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value of triggering continue frames when crossing under the threshold"
+    ::= { rlLan1x86PfcEntry 4 }
+
+
+END
+

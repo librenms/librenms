@@ -1,0 +1,303 @@
+
+-- *****************************************************************************
+-- Juniper-ERX-System-CONF
+--
+-- SNMP Agent Capabilities definitions for the ERX JUNOSe.System MIBs.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-ERX-System-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniSystemAgents
+        FROM Juniper-Agents;
+
+juniErxSystemAgent  MODULE-IDENTITY
+    LAST-UPDATED "200311241953Z"  -- 24-Nov-03 02:53 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the System component of the SNMP
+        agent in the Juniper ERX (E-series) family of products."
+    -- Revision History
+    REVISION    "200311241953Z"  -- 24-Nov-03 02:53 PM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "Juniper-System-MIB:
+         Added resource utilization notification enable/disable.
+         Added KByte memory capacilty object."
+    REVISION    "200301282148Z"  -- 28-Jan-03 04:48 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-System-MIB:
+         Replaced Unisphere names with Juniper names.
+         Added resoure utilization support."
+    REVISION    "200208191317Z"  -- 19-Aug-02 09:17 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added support for the Juniper generic system MIB."
+    REVISION    "200204012232Z"  -- 01-Apr-02 05:32 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Added thermal protection support."
+    REVISION    "200104131303Z"  -- 13-Apr-01 09:03 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniSystemAgents 1 }
+
+
+-- *****************************************************************************
+-- ERX System SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniErxSystemAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component was supported in the JUNOSe 1.3
+        system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe.  These capabilities became obsolete when
+        new slot information objects were added."
+    SUPPORTS    Juniper-ERX-System-MIB
+        INCLUDES {
+            juniERXSysGroup,
+            juniERXSysNotifyGroup }
+    ::= { juniErxSystemAgent 1 }
+
+juniErxSystemAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component was supported in the JUNOSe 2.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe.  These capabilities became obsolete when
+        the timing group was added."
+    SUPPORTS    Juniper-ERX-System-MIB
+        INCLUDES {
+            juniERXSysGeneralGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup }
+    ::= { juniErxSystemAgent 2 }
+
+juniErxSystemAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component was supported in the JUNOSe 3.0 and
+        3.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe.  These capabilities became obsolete when
+        memory management objects and notifications were added."
+    SUPPORTS    Juniper-ERX-System-MIB
+        INCLUDES {
+            juniERXSysGeneralGroup,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup }
+    ::= { juniErxSystemAgent 3 }
+
+juniErxSystemAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component was supported in the JUNOSe 3.2
+        system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe.  These capabilities became obsolete when
+        thermal protection support was added."
+    SUPPORTS    Juniper-ERX-System-MIB
+        INCLUDES {
+            juniERXSysGeneralGroup2,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup2 }
+    ::= { juniErxSystemAgent 4 }
+
+juniErxSystemAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component is supported in the JUNOSe 3.3 thru
+        4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe.  These capabilities became obsolete when
+        the generic system MIB support was added."
+    SUPPORTS    Juniper-ERX-System-MIB
+        INCLUDES {
+            juniERXSysGeneralGroup2,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup2,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup3 }
+    ::= { juniErxSystemAgent 5 }
+
+juniErxSystemAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component was supported in the JUNOSe 4.1 and
+        subsequent 4.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe.  These capabilities became obsolete when
+        resource utilization support was added to Juniper-System-MIB."
+    SUPPORTS    Juniper-ERX-System-MIB
+        -- This MIB has been deprecated in favor of Juniper-System-MIB.
+        INCLUDES {
+            juniERXSysGeneralGroup3,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup2,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup3 }
+    SUPPORTS    Juniper-System-MIB
+        INCLUDES {
+            juniSystemGeneralGroup,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup }
+    ::= { juniErxSystemAgent 6 }
+
+juniErxSystemAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component was supported in the JUNOSe 5.0 and
+        5.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe.  These capabilities became obsolete when
+        the resource utilization trap enabled and KByte memory capacilty objects
+        were added to Juniper-System-MIB."
+    SUPPORTS    Juniper-ERX-System-MIB
+        -- This MIB has been deprecated in favor of Juniper-System-MIB.
+        INCLUDES {
+            juniERXSysGeneralGroup3,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup2,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup3 }
+    SUPPORTS    Juniper-System-MIB
+        INCLUDES {
+            juniSystemGeneralGroup,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup2 }
+        VARIATION   juniSystemUtilizationThresholdRising
+            ACCESS      read-only
+            DESCRIPTION
+                "The juniSystemUtilizationTable is read-only in this
+                implementation."
+        VARIATION   juniSystemUtilizationThresholdFalling
+            ACCESS      read-only
+            DESCRIPTION
+                "The juniSystemUtilizationTable is read-only in this
+                implementation."
+        VARIATION   juniSystemUtilizationHoldDownTime
+            ACCESS      read-only
+            DESCRIPTION
+                "The juniSystemUtilizationTable is read-only in this
+                implementation."
+    ::= { juniErxSystemAgent 7 }
+
+juniErxSystemAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the System component of the JUNOSe SNMP agent.  This
+        version of the ERX System component is supported in the JUNOSe 5.2 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ERX (platform-specific)
+        System application in JUNOSe."
+    SUPPORTS    Juniper-ERX-System-MIB
+        -- This MIB has been deprecated in favor of Juniper-System-MIB.
+        INCLUDES {
+            juniERXSysGeneralGroup3,
+            juniERXSysTimingGroup,
+            juniERXSysFabricGroup,
+            juniERXSysNvsGroup,
+            juniERXSysSlotGroup,
+            juniERXSysPortGroup,
+            juniERXSysPowerGroup,
+            juniERXSysTemperatureGroup2,
+            juniERXSysSubsystemGroup,
+            juniERXSysNotifyGroup3 }
+    SUPPORTS    Juniper-System-MIB
+        INCLUDES {
+            juniSystemGeneralGroup2,
+            juniSystemSubsystemGroup,
+            juniSystemModuleGroup,
+            juniSystemPortGroup,
+            juniSystemTimingGroup,
+            juniSystemFabricGroup,
+            juniSystemNvsGroup,
+            juniSystemPowerGroup,
+            juniSystemTemperatureGroup,
+            juniSystemUtilizationGroup,
+            juniSystemNotificationObjectsGroup,
+            juniSystemNotificationGroup2 }
+    ::= { juniErxSystemAgent 8 }
+
+END

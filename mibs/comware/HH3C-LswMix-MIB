@@ -1,0 +1,159 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Dual Main Control MIB
+--
+-- Version: V1.2
+-- History:
+-- Revise History: 1) 2003-03-27 Fuzhenyu created
+-- V1.1 2004-10-12 updated by gaolong
+--      Import NOTIFICATION-TYPE.
+--      MAX-ACCESS clause value from write-only to read-write.
+--      Substitute hh3csMixTrapMib MODULE-IDENTITY with hh3csMixTrapMib OBJECT IDENTIFIER.
+-- V1.2 2005-11-14
+--      updated by Chen Xi
+--      Modify description of all objects except hh3cLswXSlotTable and hh3cLswXSlotEntry.
+--      updated by Yu Lan
+--      Add process(3) value for hh3cLswMainCardBoardStatus.
+--      Add hh3cLswCrossBarStatus.
+-- ------------------------------------------------------------------
+--
+-- ------------------------------------------------------------------
+--
+-- Variable imported
+--
+-- ------------------------------------------------------------------
+HH3C-LswMix-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    hh3cLswFrameIndex,hh3cLswSlotIndex
+        FROM HH3C-LSW-DEV-ADM-MIB
+    hh3clswCommon
+        FROM HH3C-OID-MIB;
+
+--  the document include the private data about device
+-- ******************************beginning  ******************************
+--
+-- ------------------------------------------------------------------
+    hh3cLswMix MODULE-IDENTITY
+            LAST-UPDATED "200106290000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            ""
+            REVISION "200106290000Z"
+            DESCRIPTION
+            ""
+            ::= { hh3clswCommon  17 }
+
+
+--  the document include the private data about device mix
+
+hh3cLswLastSwitchDate OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the date of the most recent change
+    to the mpu(Main Processing Unit). "
+    ::= { hh3cLswMix 1 }
+
+hh3cLswLastSwitchTime OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the time of the most recent change
+    to the mpu. "
+    ::= { hh3cLswMix 2 }
+
+hh3cLswMpuSwitchsNum OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "This object indicates the total times of the mpu switched
+    since the system start up. "
+    ::= { hh3cLswMix 3 }
+
+hh3cLswMpuSwitch OBJECT-TYPE
+    SYNTAX INTEGER{
+        switch(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Setting this object will immediately switch the standby mpu
+    to master mpu. Read is not supported. "
+    ::= { hh3cLswMix 4 }
+
+--  the document include the private data about main card
+hh3cLswXSlotTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cLswXSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "The source main table."
+     ::= { hh3cLswMix 5 }
+
+hh3cLswXSlotEntry OBJECT-TYPE
+    SYNTAX  Hh3cLswXSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+    "An entry in the source main table."
+    INDEX   { hh3cLswFrameIndex, hh3cLswSlotIndex }
+     ::= { hh3cLswXSlotTable 1 }
+
+Hh3cLswXSlotEntry ::=
+    SEQUENCE {
+        hh3cLswMainCardBoardStatus        INTEGER,
+        hh3cLswCrossBarStatus            INTEGER
+    }
+
+hh3cLswMainCardBoardStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+      master(1),
+      standby(2),
+      process(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The value describes whether the board is master, standby or process.
+       master and standby are the possible states for the mpu, while process
+       indicates the state of lpu(Line Processing Unit)"
+     ::= { hh3cLswXSlotEntry 1 }
+
+hh3cLswCrossBarStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+       master(1),
+       standby(2)
+       }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+       "The value describes whether the crossbar is master or standby. It is
+       master when it's in the master mpu board, standby when in the standby mpu.
+       But both crossbars in mpus are master when the device in load-balance mode."
+    ::= { hh3cLswXSlotEntry 2 }
+
+   hh3csMixTrapMib OBJECT IDENTIFIER        ::= { hh3cLswMix  10 }
+
+   hh3cSlaveSwitchOver NOTIFICATION-TYPE
+      STATUS  current
+      DESCRIPTION
+      "An hh3cSlaveSwitchOver trap signifies that the action of
+      standby mpu switching to master has completed. "
+      ::= { hh3csMixTrapMib 1 }
+
+END

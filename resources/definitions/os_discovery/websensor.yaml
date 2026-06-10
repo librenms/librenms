@@ -1,0 +1,4 @@
+modules:
+  os:
+    serial: T3610-MIB::serialNumber.0
+    sysDescr_regex: '/( fw|Version) (?<version>.*)/'

@@ -1,0 +1,263 @@
+-- ============================================================================
+-- AT-LOG.MIB, Allied Telesis enterprise MIB:
+-- Log MIB for the AlliedWare Plus(tm) operating system
+--
+-- Copyright (c) 2011 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-LOG-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+
+        log MODULE-IDENTITY
+            LAST-UPDATED "201606230000Z"
+            ORGANIZATION
+                "Allied Telesis Labs New Zealand"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "Added logProcessKilledNotify and MIB variable logProcessKilled."
+            REVISION "201606230000Z"
+            DESCRIPTION
+                "The AT Log MIB, for listing log entries from the buffered and permament logs."
+            REVISION "201206080000Z"
+            DESCRIPTION
+                "Change OCTET STRING to DisplayString for all MIBs."
+            REVISION "201206070000Z"
+            DESCRIPTION
+                "Change the MAX-ACCESS for the logIndex to not-accessible."
+            REVISION "201105300000Z"
+            DESCRIPTION
+                "Updated enumeration type to use INTEGER."
+            REVISION "201104180000Z"
+            DESCRIPTION
+                "Reformatted MIB file."
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006140511Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200810080000Z"
+            DESCRIPTION
+                "Initial revision."
+            ::= { modules 601 }
+
+
+
+--
+-- Node definitions
+--
+
+        logNotifications OBJECT IDENTIFIER ::= { log 0 }
+
+
+        logProcessKilledNotify NOTIFICATION-TYPE
+            OBJECTS { logProcessKilled }
+            STATUS current
+            DESCRIPTION
+                "A notification is generated when a process is killed."
+            ::= { logNotifications 1 }
+
+-- ---------------------------------------------------------- --
+-- The log table
+-- ---------------------------------------------------------- --
+        logTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF LogEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of log entries from the source specified in the
+                logSource object. The list is ordered from oldest entry to
+                newest entry."
+            ::= { log 1 }
+
+
+        logEntry OBJECT-TYPE
+            SYNTAX LogEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A log entry from the source specified in the logSource object."
+            INDEX { logIndex }
+            ::= { logTable 1 }
+
+
+        LogEntry ::=
+            SEQUENCE {
+                logIndex
+                    Unsigned32,
+                logDate
+                    DisplayString,
+                logTime
+                    DisplayString,
+                logFacility
+                    DisplayString,
+                logSeverity
+                    DisplayString,
+                logProgram
+                    DisplayString,
+                logMessage
+                    DisplayString
+             }
+
+        logIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An index value. This index is not directly tied to any
+                specific log entry. Over time, the log will grow larger and
+                eventually older entries will be removed."
+            ::= { logEntry 1 }
+
+
+        logDate OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date that the log was generated, in the form YYYY MMM DD,
+                eg: 2008 Oct  9."
+            ::= { logEntry 2 }
+
+
+        logTime OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time that the log was generated, in the form HH:MM:SS,
+                eg: 07:15:04."
+            ::= { logEntry 3 }
+
+
+        logFacility OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The syslog facility that generated the log entry. See the
+                Software Reference Manual for more information."
+            ::= { logEntry 4 }
+
+
+        logSeverity OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The severity level of the log entry:
+
+                  emerg     Emergency, system is unusable
+                  alert     Action must be taken immediately
+                  crit      Critical conditions
+                  err       Error conditions
+                  warning   Warning conditions
+                  notice    Normal, but significant, conditions
+                  info      Informational messages
+                  debug     Debug-level messages"
+            ::= { logEntry 5 }
+
+
+        logProgram OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The program that generated the log entry. See the Software
+                Reference Manual for more information."
+            ::= { logEntry 6 }
+
+
+        logMessage OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The log message."
+            ::= { logEntry 7 }
+
+
+-- ---------------------------------------------------------- --
+-- The log options
+-- ---------------------------------------------------------- --
+        logOptions OBJECT IDENTIFIER ::= { log 2 }
+
+
+        logSource OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            	bufferedLog(1),
+            	permanentLog(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The source to retrieve the log entries from. Valid values are:
+
+                  1 - Buffered log
+                  2 - Permanent log
+
+                This source is used when retrieving the logTable objects, and
+                also specifies the log to be cleared when the clearLog object
+                is set."
+            ::= { logOptions 1 }
+
+
+        logAll OBJECT-TYPE
+            SYNTAX Integer32 (0..1)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Determines the quantity of logs to be retrieved. Valid values
+                are:
+
+                  0 - Display only recent log messages
+                  1 - Show all available log entries.
+
+                Note: Choosing to retrieve all log entries may result in a
+                delay of several seconds before they may be viewed via SNMP."
+            ::= { logOptions 2 }
+
+
+        clearLog OBJECT-TYPE
+            SYNTAX Integer32 (0..1)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set with a value of 1 to clear the log that is specified by
+                the logSource object."
+            ::= { logOptions 3 }
+
+-- ---------------------------------------------------------- --
+-- The date and time when syslog-ng was restarted
+-- ---------------------------------------------------------- --
+
+        logProcessKilled OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The process name that a process daemon was killed. This MIB variable is a
+                placeholder for the logProcessKilledNotify, but can be read independently if required.
+                A new process killed event can update this variable. No message will be displayed if
+                the specified process has not been killed after the device was first booted."
+            ::= { log 3 }
+
+
+    END
+
+--
+-- at-log.mib
+--
+

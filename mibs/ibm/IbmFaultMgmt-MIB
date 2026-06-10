@@ -1,0 +1,1430 @@
+
+IbmFaultMgmt-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       enterprises, Counter
+                    FROM RFC1155-SMI
+       DisplayString
+                    FROM RFC1213-MIB
+       OBJECT-TYPE
+                    FROM RFC-1212;
+
+-- High-level nodes under enterprises
+ibm                 OBJECT IDENTIFIER ::= { enterprises 2 }
+ ibmArchitecture    OBJECT IDENTIFIER ::= { ibm 5 }
+  alert             OBJECT IDENTIFIER ::= { ibmArchitecture 1 }
+
+-- This MIB defines fault management objects to be transported in an IBM
+-- enterprise specific trap.  The objects are compatible with IBM SNA
+-- Management Services Generic Alert architecture.  References to
+-- subvectors and subfields are provided to facilitate mapping to the
+-- architecture if desired.  For additional information on IBM SNA
+-- Management Services, refer to "IBM SNA Formats" (GA27-3136), and "IBM
+-- SNA/Management Services Reference (SC30-3346).
+--
+-- Traps containing these objects have been designed to enable a
+-- management station receiving such a trap to provide a network operator
+-- with a notification of the problem or impending problem, the problem
+-- type, description and probable cause,  and recommended action for
+-- problem resolution.  The design also facilitates the conversion of the
+-- trap to an SNA Alert that can be forwarded to a SNA focal point.  It
+-- should be noted that much of the fault management data is transported
+-- in the form of code points that correspond to strings of text stored
+-- at the trap reciever and Alert receiver.
+
+-- Groups in Fault Management MIB
+product-Set-ID        OBJECT IDENTIFIER ::= { alert 3  } -- x10 subvector
+supporting-Data-Correl OBJECT IDENTIFIER ::= { alert 7 } -- x48 subvector
+generic-Alert-Data    OBJECT IDENTIFIER ::= { alert 11 } -- x92 subvector
+probable-Causes       OBJECT IDENTIFIER ::= { alert 12 } -- x93 subvector
+user-Causes           OBJECT IDENTIFIER ::= { alert 13 } -- x94 subvector
+install-Causes        OBJECT IDENTIFIER ::= { alert 14 } -- x95 subvector
+failure-Causes        OBJECT IDENTIFIER ::= { alert 15 } -- x96 subvector
+detailed-Data-SV      OBJECT IDENTIFIER ::= { alert 17 } -- x98 subvector
+
+
+------------------------------------------------------------------------
+-- The product-Set-ID group { alert 3 }  (X'10' MS Common Subvector)
+--
+-- This group is always present in a trap to describe the product
+-- encountering the condition being reported.
+--
+-----------------------------------------------------------------------
+
+
+------------------------------------------------------------------------
+-- hwProductInstallSpecificInfoTable (X'11' MS Common Subvector)
+------------------------------------------------------------------------
+hwProductInstallSpecificInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HwProductEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+        "A table containing information to identify hardware or
+        microcode products.  One or more entries in this table
+        will be present in a trap."
+    ::= { product-Set-ID 1 }
+
+hwProductEntry OBJECT-TYPE
+    SYNTAX HwProductEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "The information required to identify a single hardware product.
+        The index is the product being reported.  The first entry
+        identifies the product sending the trap.  A second entry will be
+        present in those traps reporting a condition in a product other
+        than the trap sender."
+    ::= { hwProductInstallSpecificInfoTable 1 }
+
+HwProductEntry  ::=
+    SEQUENCE  {
+       productClassificationHW      INTEGER,
+       formatType                   INTEGER,
+       machineType                  DisplayString,
+       modelNum                     DisplayString,
+       plantOfManufacture           DisplayString,
+       seqNum                       DisplayString,
+       microcodeECLevel             DisplayString,
+       hardwareProdCommonName       DisplayString,
+       vendorIDhw                   DisplayString
+}
+productClassificationHW OBJECT-TYPE
+    SYNTAX INTEGER {
+       hwIBM(1),        -- (X'1') IBM hardware
+       hwIBM-NonIBM(3), -- (X'3') IBM or non-IBM hardware
+                        -- (not distinguished)
+       hwNonIBM(9)     -- (X'9') non-IBM hardware
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "A code identifying the general classification of a product."
+    ::= { hwProductEntry 1 }
+
+------------------------------------------------------------------------
+-- Hardware Product ID (X'00' Product ID Subfield)
+------------------------------------------------------------------------
+formatType OBJECT-TYPE
+    SYNTAX INTEGER {
+       form11(17) -- (X'11') prod. instance identified by plant of mfg.
+                  -- and sequence # (unique by machine type and model #)
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "A code identifying the format type of a product instance."
+    ::= { hwProductEntry 2 }
+
+machineType OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (4)) -- numeric characters only
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "The machine type."
+    ::= { hwProductEntry 3 }
+
+modelNum OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (3))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Machine model number."
+    ::= { hwProductEntry 4 }
+
+plantOfManufacture OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (2))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Plant of manufacture."
+    ::= { hwProductEntry 5 }
+
+seqNum OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (7))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Sequence number: right justified, with ASCII 0's fill on left."
+    ::= { hwProductEntry 6}
+
+
+------------------------------------------------------------------------
+-- microcodeECLevel (X'0B' Product ID Subfield)
+------------------------------------------------------------------------
+microcodeECLevel OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..8))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "The Engineering Change (EC) level of the failing microcode
+       component.  This object is included in a trap only when the
+       reported problem is most probably caused by a microcode failure.
+
+       This object continues to exist in the MIB even at times when it
+       is not included in a trap, but a get will result in the object
+       being returned with a length of 0."
+    ::= { hwProductEntry 7 }
+
+------------------------------------------------------------------------
+-- hardwareProdCommonName (X'0E' Product ID Subfield)
+------------------------------------------------------------------------
+hardwareProdCommonName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..15))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "The name commonly used to identify the product."
+    ::= { hwProductEntry 8 }
+
+------------------------------------------------------------------------
+-- vendorIDhw (X'0F' Product ID Subfield)
+------------------------------------------------------------------------
+vendorIDhw OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..16))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "The name of the product vendor.  This object is included in a
+       trap only when the productClassificationHW object is set to
+       'hwNonIBM' or 'hwIBM-NonIBM'.
+
+       This object continues to exist in the MIB even at times when it
+       is not included in a trap, but a get will result in the object
+       being returned with a length of 0."
+    ::= { hwProductEntry 9 }
+
+
+------------------------------------------------------------------------
+-- swProductInstallSpecificInfoTable (X'11' MS Common Subvector)
+------------------------------------------------------------------------
+swProductInstallSpecificInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SwProductEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+        "A table containing information to identify software products.
+        This table is present in a trap when the condition being reported
+        is in a software product or set of software products."
+    ::= { product-Set-ID 2 }
+
+swProductEntry OBJECT-TYPE
+    SYNTAX SwProductEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "The information required to identify a single software product.
+        The index is the instnce of product being identified."
+    ::= { swProductInstallSpecificInfoTable 1 }
+
+SwProductEntry  ::=
+    SEQUENCE  {
+        productClassificationSW         INTEGER (0..15),
+        commonVerID                     DisplayString (SIZE (0..2)),
+        commonRelID                     DisplayString (SIZE (0..2)),
+        commonModID                     DisplayString (SIZE (0..2)),
+        softwareProdCommonName          DisplayString (SIZE (1..30)),
+        softwareProdProgNmbr            DisplayString (SIZE (0..7)),
+        vendorIDsw                      DisplayString (SIZE (1..16))
+    }
+
+productClassificationSW OBJECT-TYPE
+    SYNTAX INTEGER {
+       swIBM(4),        -- (X'4') IBM software
+       swNonIBM(12),    -- (X'C') non-IBM software
+       swIBM-NonIBM(14) -- (X'E') IBM or non-IBM software
+                        --        (not distinguished)
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "A code identifying the general classification of a product."
+    ::= { swProductEntry 1 }
+
+------------------------------------------------------------------------
+-- Software Product Common Level (X'04' Product ID Subfield)
+------------------------------------------------------------------------
+commonVerID OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..2))  -- Numeric characters only
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Common version ID: right justified, with ASCII 0 fill on left."
+    ::= { swProductEntry 2 }
+
+commonRelID OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..2))  -- Numeric characters only
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Common release ID: right justified, with ASCII 0 fill on left."
+    ::= { swProductEntry 3 }
+
+commonModID OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..2))  -- Numeric characters only
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Common modification ID: right justified, with ASCII 0 fill on
+       left."
+    ::= { swProductEntry 4 }
+
+------------------------------------------------------------------------
+-- softwareProdCommonName (X'06' Product ID Subfield)
+------------------------------------------------------------------------
+softwareProdCommonName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..30))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "The name commonly used to identify the product."
+    ::= { swProductEntry 5 }
+
+------------------------------------------------------------------------
+-- softwareProdProgNmbr (X'08' Product ID Subfield)
+------------------------------------------------------------------------
+softwareProdProgNmbr OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..7))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "The program product number as assigned by distribution personnel,
+       or a substitute value supplied by a user-written software
+       program."
+    ::= { swProductEntry 6 }
+
+------------------------------------------------------------------------
+-- vendorIDsw (X'0F' Product ID Subfield)
+------------------------------------------------------------------------
+vendorIDsw OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..16))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "The name of the product vendor.  This object is included in a
+       trap only when the productClassificationSW object is set to
+       'swNonIBM' or 'swIBM-NonIBM'.
+
+       This object continues to exist in the MIB even at times when it
+       is not included in a trap, but a get will result in the object
+       being returned with a length of 0."
+    ::= { swProductEntry 7 }
+
+
+------------------------------------------------------------------------
+-- The supporting-Data-Correl group { alert 7 } (X'48' MS Common Subvector)
+-- This group is present in a trap when additional data is available
+-- that relates to the problem being reported.
+------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------
+-- detailedDataSD (X'85' Supporting Data Correlation Subfield)
+------------------------------------------------------------------------
+detailedDataSDTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DetailedDataSDEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of information correlation data."
+::= { supporting-Data-Correl 2 }
+
+detailedDataSDEntry OBJECT-TYPE
+    SYNTAX DetailedDataSDEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "The information required  by the trap receiver to
+       correlate/retrieve additional data.  All objects in this entry
+       will be provided.  The index is the instance/number of the
+       correlator.  Multiple entries will be provided when multiple sets
+       of data are available."
+::= { detailedDataSDTable 1 }
+
+DetailedDataSDEntry  ::=
+    SEQUENCE  {
+       productIDCodeSD  INTEGER,
+       dataIDCodeSD     INTEGER,
+       dataEncodingSD   INTEGER,
+       dataSD           OCTET STRING
+}
+
+productIDCodeSD OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayNone(0),      -- X'00'
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating what product identification, if any is
+        to displayed in conjunction with the data-type and data.
+
+            displayNone     - Do not display any product identification
+                              data in conjunction with the data-type and
+                              data.
+
+            displayFirstHW  - display machine type or product common name
+                              from the first entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displaySecondHW - display machine type or product common name
+                              from the second entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { detailedDataSDEntry 1 }
+
+dataIDCodeSD OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Detailed Data Code Point (Data ID code point)
+        (described in IBM document GA27-3136) indicating the type of data
+        provided.  The English text associated with each code point or
+        its national language equivalent is displayed with the
+        correlation data."
+   ::= { detailedDataSDEntry 2 }
+
+dataEncodingSD OBJECT-TYPE
+    SYNTAX INTEGER {
+        hex(0),    -- (X'00') encoded/displayed as hexadecimal digits
+        binary(1), -- (X'01') encoded as an unsigned integer value, the
+                   -- decimal equivalent is displayed
+        ascii(17)  -- (X'11') data is to be decoded as ASCII characters
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating how the accompanying correlation data is
+        encoded, and thus how it is to be decoded and displayed."
+    ::= { detailedDataSDEntry 3 }
+
+dataSD OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..44))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Correlation data encoded as specified by the dataEncodingSD
+       object."
+    ::= { detailedDataSDEntry 4}
+
+------------------------------------------------------------------------
+-- The generic-Alert-Data group { alert 11 } (X'92' Alert MS Subvector)
+--
+-- This group is always provided in a trap to describe the problem being
+-- reported.
+------------------------------------------------------------------------
+flags OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is always set to the value 0.  It may be used
+        in the future to further indicate why/when the trap was
+        sent."
+    ::= { generic-Alert-Data 1 }
+
+alertType OBJECT-TYPE
+    SYNTAX INTEGER {
+       perm(1),  -- (X'01') permanent loss of availability
+       temp(2),  -- (X'02') temporary loss of availability
+       perf(3),  -- (X'03') performance is below an acceptable level
+       pend(17), -- (X'11') impending loss of availability
+       unkn(18)  -- (X'12') the severity of the problem is not known
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+       "A code indicating the severity of the condition being reported."
+    ::= { generic-Alert-Data 2 }
+
+alertDescriptionCode OBJECT-TYPE
+    SYNTAX INTEGER  (0..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "An Alert Description Code Point (described in IBM document
+        GA27-3136) denoting the problem being reported."
+    ::= { generic-Alert-Data 3 }
+
+------------------------------------------------------------------------
+-- The probable-Causes group { alert 12 }  (X'93' Alert MS Subvector)
+--
+-- This group is always present in a trap to provide the probable
+-- cause(s) of the condition being reported.
+------------------------------------------------------------------------
+probableCausesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ProbableCausesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "A table of probable cause data."
+    ::= { probable-Causes 1 }
+
+probableCausesEntry OBJECT-TYPE
+    SYNTAX ProbableCausesEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+       "An entry of probable cause data.  The index is the
+       number/instance of the probable cause."
+    ::= { probableCausesTable 1 }
+
+ProbableCausesEntry ::=  SEQUENCE { probableCause INTEGER }
+
+probableCause OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "A Probable Cause Code Point (described in IBM document
+        GA27-3136) denoting the probable cause of the reported problem.
+        From one to four instances of this object (in order of decreasing
+        probability) are provided in a trap."
+    ::= { probableCausesEntry 1 }
+
+------------------------------------------------------------------------
+-- The user-Causes group { alert 13 } (X'94' Alert MS Subvector)
+--
+-- This group provides data detailing the probable user causes of the
+-- problem and the recommended actions to be taken in connection with
+-- these causes.  It may also provide additional detailed data to be
+-- inserted into the text indexed by the user cause and/or recommended
+-- action code points.
+--
+-- This group is present in a trap if it possible that the problem could
+-- have been caused by a user/customer.
+------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------
+-- userCause (X'01' User Causes Subfield)
+------------------------------------------------------------------------
+userCausesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UserCausesEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of user cause data."
+    ::= { user-Causes 1 }
+
+userCausesEntry OBJECT-TYPE
+    SYNTAX UserCausesEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An entry of user cause data.  The index is the number/instance
+       of the user cause."
+    ::= { userCausesTable 1}
+
+UserCausesEntry ::=  SEQUENCE { userCause  INTEGER }
+
+userCause OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A User Cause Code Point (described in IBM document GA27-3136)
+        denoting the probable user cause of the reported problem.  From
+        From 0 to 4 instances of this object (in order of decreasing
+        probability) are provided in a trap."
+    ::= { userCausesEntry 1}
+
+------------------------------------------------------------------------
+-- recommendedActionsUC (X'81' Network Alert Common Subfield)
+------------------------------------------------------------------------
+recommendedActionsUCTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RecommendedActionsUCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of recommended action data."
+    ::= { user-Causes 2 }
+
+recommendedActionsUCEntry OBJECT-TYPE
+    SYNTAX RecommendedActionsUCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An entry of recommended action data.  The index is the
+       number/instance of the recommended action."
+    ::= { recommendedActionsUCTable 1}
+
+RecommendedActionsUCEntry ::= SEQUENCE { recommendedActionUC INTEGER }
+
+recommendedActionUC OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Recommended Action Code Point (described in IBM document
+        GA27-3136) denoting the recommended action to take to resolve the
+        problem.  From 0 to 4 instances of this object (in order of
+        decreasing probability) are provided in a trap.  If an instance
+        of the userCause object is present, at least one instance of this
+        object will be present."
+    ::= { recommendedActionsUCEntry 1 }
+
+------------------------------------------------------------------------
+-- detailedDataUC (X'85' Network Alert Common Subfield)
+--
+-- This subgroup is provided in a trap whenever detailed data is to be
+-- inserted into the text indexed by the user cause and/or recommended
+-- action code points.
+------------------------------------------------------------------------
+detailedDataUCTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DetailedDataUCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of data to be inserted into the text indexed by
+       the user cause and/or recommended action code points."
+::= { user-Causes 3 }
+
+detailedDataUCEntry OBJECT-TYPE
+    SYNTAX DetailedDataUCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "The information required  to display product identification, data
+       type, and detailed data.  The index is the instance/number of the
+       detailed data.  The following rules are used for providing
+       entries:
+
+       * An entry is provided for each instance of the userCause object
+         and/or recommendedActionUC object containing a codepoint whose
+         third character is 'A' or 'B'.
+
+       * Two entries are provided for each instance of the userCause
+         object and/or recommendedActionUC object containing a codepoint
+         whose third character is 'C'.
+
+       * Three entries are provided for each instance of the userCause
+         object and/or recommendedActionUC object containing a
+         codepoint whose third character is 'D'.
+
+       Entries are provided in the order of the occurrance of the code
+       points requiring them."
+::= { detailedDataUCTable 1 }
+
+DetailedDataUCEntry  ::=
+    SEQUENCE  {
+       productIDCodeUC  INTEGER,
+       dataIDCodeUC     INTEGER,
+       dataEncodingUC   INTEGER,
+       dataUC           OCTET STRING
+}
+
+productIDCodeUC OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayNone(0),      -- X'00'
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating what product identification, if any is
+        to displayed in conjunction with the data-type and data.
+
+            displayNone     - Do not display any product identification
+                              data in conjunction with the data-type and
+                              data.
+
+            displayFirstHW  - display machine type or product common name
+                              from the first entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displaySecondHW - display machine type or product common name
+                              from the second entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { detailedDataUCEntry 1 }
+
+dataIDCodeUC OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Detailed Data Code Point (Data ID code point)
+        (described in IBM document GA27-3136) indicating the type of data
+        provided.  The English text associated with each code point or
+        its national language equivalent is displayed with the
+        detailed data."
+   ::= { detailedDataUCEntry 2 }
+
+dataEncodingUC OBJECT-TYPE
+    SYNTAX INTEGER {
+        hex(0),    -- (X'00') encoded/displayed as hexadecimal digits
+        binary(1), -- (X'01') encoded as an unsigned integer value, the
+                   -- decimal equivalent is displayed
+        ascii(17)  -- (X'11') data is to be decoded as ASCII characters
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating how the accompanying detailed data is
+        encoded, and thus how it is to be decoded and displayed."
+    ::= { detailedDataUCEntry 3 }
+
+dataUC OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..44))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Detailed data encoded as specified by the dataEncodingUC
+       object."
+    ::= { detailedDataUCEntry 4}
+
+------------------------------------------------------------------------
+-- productSetIDIndexUC (X'83' Network Alert Common Subfield)
+--
+-- This subgroup is provided in a trap whenever product  identification
+-- data is to be inserted into the text indexed by the user cause and/or
+-- recommended action code points.
+------------------------------------------------------------------------
+productSetIDIndexUCTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ProductSetIDIndexUCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table a describing how product identification data will be
+       inserted into the text indexed by the user cause or recommended
+       action code points."
+::= { user-Causes 4 }
+
+productSetIDIndexUCEntry OBJECT-TYPE
+    SYNTAX ProductSetIDIndexUCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An instance of information required to display product
+       identification data.  The index is the instance of the Product Set
+       ID Index.  An entry is provided for each instance of the userCause
+       object and/or recommendedActionUC  object containing a codepoint
+       whose third character is  'E'.  Entries are provided in the order
+       of the occurrance of the code points  requiring them."
+::= { productSetIDIndexUCTable 1 }
+
+ProductSetIDIndexUCEntry ::= SEQUENCE { productSetIDIndexUC INTEGER }
+
+
+productSetIDIndexUC OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "This object provides a code indicating how product
+        identification data is to be inserted into the text
+        indexed by the user cause and/or recommended action code
+        points.
+
+            displayFirstHW - display machine type or product common name
+                             from the first instance of the machineType
+                             or hardwareProdCommonName objects.
+
+            displaySecondHW - display machine type or product common name
+                              from the second instance of the machineType
+                              or hardwareProdCommonName objects.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { productSetIDIndexUCEntry 1}
+
+------------------------------------------------------------------------
+-- The install-Causes group { alert 14 } (X'95' Alert MS Subvector)
+--
+-- This group provides data detailing the probable install causes of the
+-- problem and the recommended actions to be taken in connection with
+-- these causes.  It may also provide additional detailed data to be
+-- inserted into the text indexed by the install cause and/or recommended
+-- action code points.
+--
+-- This group is present in a trap if it possible that the problem could
+-- have been caused by an improper installation.
+------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------
+-- installCause (X'01' Install Causes Subfield)
+------------------------------------------------------------------------
+installCausesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF InstallCausesEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of install cause data."
+    ::= { install-Causes 1 }
+
+installCausesEntry OBJECT-TYPE
+    SYNTAX InstallCausesEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An entry of install cause data.  The index is the number/instance
+       of the install cause."
+    ::= { installCausesTable 1}
+
+InstallCausesEntry ::=  SEQUENCE { installCause  INTEGER }
+
+installCause OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "An Install Cause Code Point (described in IBM document GA27-3136)
+        denoting the probable install cause of the reported problem.  From
+        From 0 to 4 instances of this object (in order of decreasing
+        probability) are provided in a trap."
+    ::= { installCausesEntry 1}
+
+------------------------------------------------------------------------
+-- recommendedActionsIC (X'81' Network Alert Common Subfield)
+------------------------------------------------------------------------
+recommendedActionsICTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RecommendedActionsICEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of recommended action data."
+    ::= { install-Causes 2 }
+
+recommendedActionsICEntry OBJECT-TYPE
+    SYNTAX RecommendedActionsICEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An entry of recommended action data.  The index is the
+       number/instance of the recommended action."
+    ::= { recommendedActionsICTable 1}
+
+RecommendedActionsICEntry ::= SEQUENCE { recommendedActionIC INTEGER }
+
+recommendedActionIC OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Recommended Action Code Point (described in IBM document
+        GA27-3136) denoting the recommended action to take to resolve the
+        problem.  From 0 to 4 instances of this object (in order of
+        decreasing probability) are provided in a trap.  If an instance
+        of the installCause object is present, at least one instance of this
+        object will be present."
+    ::= { recommendedActionsICEntry 1 }
+
+------------------------------------------------------------------------
+-- detailedDataIC (X'85' Network Alert Common Subfield)
+--
+-- This subgroup is provided in a trap whenever detailed data is to be
+-- inserted into the text indexed by the install cause and/or recommended
+-- action code points.
+------------------------------------------------------------------------
+detailedDataICTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DetailedDataICEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of data to be inserted into the text indexed by
+       the install cause and/or recommended action code points."
+::= { install-Causes 3 }
+
+detailedDataICEntry OBJECT-TYPE
+    SYNTAX DetailedDataICEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "The information required  to display product identification, data
+       type, and detailed data.  The index is the instance/number of the
+       detailed data.  The following rules are used for providing
+       entries:
+
+       * An entry is provided for each instance of the installCause object
+         and/or recommendedActionIC object containing a codepoint whose
+         third character is 'A' or 'B'.
+
+       * Two entries are provided for each instance of the installCause
+         object and/or recommendedActionIC object containing a codepoint
+         whose third character is 'C'.
+
+       * Three entries are provided for each instance of the installCause
+         object and/or recommendedActionIC object containing a
+         codepoint whose third character is 'D'.
+
+       Entries are provided in the order of the occurrance of the code
+       points requiring them."
+::= { detailedDataICTable 1 }
+
+DetailedDataICEntry  ::=
+    SEQUENCE  {
+       productIDCodeIC  INTEGER,
+       dataIDCodeIC     INTEGER,
+       dataEncodingIC   INTEGER,
+       dataIC           OCTET STRING
+}
+
+productIDCodeIC OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayNone(0),      -- X'00'
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating what product identification, if any is
+        to displayed in conjunction with the data-type and data.
+
+            displayNone     - Do not display any product identification
+                              data in conjunction with the data-type and
+                              data.
+
+            displayFirstHW  - display machine type or product common name
+                              from the first entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displaySecondHW - display machine type or product common name
+                              from the second entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { detailedDataICEntry 1 }
+
+dataIDCodeIC OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Detailed Data Code Point (Data ID code point)
+        (described in IBM document GA27-3136) indicating the type of data
+        provided.  The English text associated with each code point or
+        its national language equivalent is displayed with the
+        detailed data."
+   ::= { detailedDataICEntry 2 }
+
+dataEncodingIC OBJECT-TYPE
+    SYNTAX INTEGER {
+        hex(0),    -- (X'00') encoded/displayed as hexadecimal digits
+        binary(1), -- (X'01') encoded as an unsigned integer value, the
+                   -- decimal equivalent is displayed
+        ascii(17)  -- (X'11') data is to be decoded as ASCII characters
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating how the accompanying detailed data is
+        encoded, and thus how it is to be decoded and displayed."
+    ::= { detailedDataICEntry 3 }
+
+dataIC OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..44))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Detailed data encoded as specified by the dataEncodingIC
+       object."
+    ::= { detailedDataICEntry 4}
+
+------------------------------------------------------------------------
+-- productSetIDIndexIC (X'83' Network Alert Common Subfield)
+--
+-- This subgroup is provided in a trap whenever product  identification
+-- data is to be inserted into the text indexed by the install cause and/or
+-- recommended action code points.
+------------------------------------------------------------------------
+productSetIDIndexICTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ProductSetIDIndexICEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table a describing how product identification data will be
+       inserted into the text indexed by the install cause or recommended
+       action code points."
+::= { install-Causes 4 }
+
+productSetIDIndexICEntry OBJECT-TYPE
+    SYNTAX ProductSetIDIndexICEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An instance of information required to display product
+       identification data.  The index is the instance of the Product Set
+       ID Index.  An entry is provided for each instance of the installCause
+       object and/or recommendedActionIC  object containing a codepoint
+       whose third character is  'E'.  Entries are provided in the order
+       of the occurrance of the code points  requiring them."
+::= { productSetIDIndexICTable 1 }
+
+ProductSetIDIndexICEntry ::= SEQUENCE { productSetIDIndexIC INTEGER }
+
+
+productSetIDIndexIC OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "This object provides a code indicating how product
+        identification data is to be inserted into the text
+        indexed by the install cause and/or recommended action code
+        points.
+
+            displayFirstHW - display machine type or product common name
+                             from the first instance of the machineType
+                             or hardwareProdCommonName objects.
+
+            displaySecondHW - display machine type or product common name
+                              from the second instance of the machineType
+                              or hardwareProdCommonName objects.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { productSetIDIndexICEntry 1}
+
+------------------------------------------------------------------------
+-- The failure-Causes group { alert 15 } (X'96' Alert MS Subvector)
+--
+-- This group provides data detailing the probable failure causes of the
+-- problem and the recommended actions to be taken in connection with
+-- these causes.  It may also provide additional detailed data to be
+-- inserted into the text indexed by the install cause and/or recommended
+-- action code points.
+--
+-- This group is present in a trap if it possible that the problem could
+-- have been caused by the failure of a hardware or software component.
+------------------------------------------------------------------------
+--
+--
+------------------------------------------------------------------------
+-- failureCause (X'01' Install Causes Subfield)
+------------------------------------------------------------------------
+failureCausesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FailureCausesEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of failure cause data."
+    ::= { failure-Causes 1 }
+
+failureCausesEntry OBJECT-TYPE
+    SYNTAX FailureCausesEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An entry of failure cause data.  The index is the number/instance
+       of the failure cause."
+    ::= { failureCausesTable 1}
+
+FailureCausesEntry ::=  SEQUENCE { failureCause  INTEGER }
+
+failureCause OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Failure Cause Code Point (described in IBM document GA27-3136)
+        denoting the probable failure cause of the reported problem.
+        From 0 to 4 instances of this object (in order of decreasing
+        probability) are provided in a trap."
+    ::= { failureCausesEntry 1}
+
+------------------------------------------------------------------------
+-- recommendedActionsFC (X'81' Network Alert Common Subfield)
+------------------------------------------------------------------------
+recommendedActionsFCTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RecommendedActionsFCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of recommended action data."
+    ::= { failure-Causes 2 }
+
+recommendedActionsFCEntry OBJECT-TYPE
+    SYNTAX RecommendedActionsFCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An entry of recommended action data.  The index is the
+       number/instance of the recommended action."
+    ::= { recommendedActionsFCTable 1}
+
+RecommendedActionsFCEntry ::= SEQUENCE { recommendedActionFC INTEGER }
+
+recommendedActionFC OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Recommended Action Code Point (described in IBM document
+        GA27-3136) denoting the recommended action to take to resolve the
+        problem.  From 0 to 4 instances of this object (in order of
+        decreasing probability) are provided in a trap.  If an instance
+        of the failureCause object is present, at least one instance of this
+        object will be present."
+    ::= { recommendedActionsFCEntry 1 }
+
+------------------------------------------------------------------------
+-- detailedDataFC (X'85' Network Alert Common Subfield)
+--
+-- This subgroup is provided in a trap whenever detailed data is to be
+-- inserted into the text indexed by the failure cause and/or recommended
+-- action code points.
+------------------------------------------------------------------------
+detailedDataFCTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DetailedDataFCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of data to be inserted into the text indexed by
+       the failure cause and/or recommended action code points."
+::= { failure-Causes 3 }
+
+detailedDataFCEntry OBJECT-TYPE
+    SYNTAX DetailedDataFCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "The information required  to display product identification, data
+       type, and detailed data.  The index is the instance/number of the
+       detailed data.  The following rules are used for providing
+       entries:
+
+       * An entry is provided for each instance of the failureCause object
+         and/or recommendedActionFC object containing a codepoint whose
+         third character is 'A' or 'B'.
+
+       * Two entries are provided for each instance of the failureCause
+         object and/or recommendedActionFC object containing a codepoint
+         whose third character is 'C'.
+
+       * Three entries are provided for each instance of the failureCause
+         object and/or recommendedActionFC object containing a
+         codepoint whose third character is 'D'.
+
+       Entries are provided in the order of the occurrance of the code
+       points requiring them."
+::= { detailedDataFCTable 1 }
+
+DetailedDataFCEntry  ::=
+    SEQUENCE  {
+       productIDCodeFC  INTEGER,
+       dataIDCodeFC     INTEGER,
+       dataEncodingFC   INTEGER,
+       dataFC           OCTET STRING
+}
+
+productIDCodeFC OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayNone(0),      -- X'00'
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating what product identification, if any is
+        to displayed in conjunction with the data-type and data.
+
+            displayNone     - Do not display any product identification
+                              data in conjunction with the data-type and
+                              data.
+
+            displayFirstHW  - display machine type or product common name
+                              from the first entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displaySecondHW - display machine type or product common name
+                              from the second entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { detailedDataFCEntry 1 }
+
+dataIDCodeFC OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Detailed Data Code Point (Data ID code point)
+        (described in IBM document GA27-3136) indicating the type of data
+        provided.  The English text associated with each code point or
+        its national language equivalent is displayed with the
+        detailed data."
+   ::= { detailedDataFCEntry 2 }
+
+dataEncodingFC OBJECT-TYPE
+    SYNTAX INTEGER {
+        hex(0),    -- (X'00') encoded/displayed as hexadecimal digits
+        binary(1), -- (X'01') encoded as an unsigned integer value, the
+                   -- decimal equivalent is displayed
+        ascii(17)  -- (X'11') data is to be decoded as ASCII characters
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating how the accompanying detailed data is
+        encoded, and thus how it is to be decoded and displayed."
+    ::= { detailedDataFCEntry 3 }
+
+dataFC OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..44))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Detailed data encoded as specified by the dataEncodingFC
+       object."
+    ::= { detailedDataFCEntry 4}
+
+------------------------------------------------------------------------
+-- productSetIDIndexFC (X'83' Network Alert Common Subfield)
+--
+-- This subgroup is provided in a trap whenever product  identification
+-- data is to be inserted into the text indexed by the failure cause and/or
+-- recommended action code points.
+------------------------------------------------------------------------
+productSetIDIndexFCTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ProductSetIDIndexFCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table a describing how product identification data will be
+       inserted into the text indexed by the failure cause or recommended
+       action code points."
+::= { failure-Causes 4 }
+
+productSetIDIndexFCEntry OBJECT-TYPE
+    SYNTAX ProductSetIDIndexFCEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "An instance of information required to display product
+       identification data.  The index is the instance of the Product Set
+       ID Index.  An entry is provided for each instance of the failureCause
+       object and/or recommendedActionFC  object containing a codepoint
+       whose third character is  'E'.  Entries are provided in the order
+       of the occurrance of the code points  requiring them."
+::= { productSetIDIndexFCTable 1 }
+
+ProductSetIDIndexFCEntry ::= SEQUENCE { productSetIDIndexFC INTEGER }
+
+
+productSetIDIndexFC OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "This object provides a code indicating how product
+        identification data is to be inserted into the text
+        indexed by the failure cause and/or recommended action code
+        points.
+
+            displayFirstHW  - display machine type or product common name
+                              from the first instance of the machineType
+                              or hardwareProdCommonName objects.
+
+            displaySecondHW - display machine type or product common name
+                              from the second instance of the machineType
+                              or hardwareProdCommonName objects.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { productSetIDIndexFCEntry 1}
+
+------------------------------------------------------------------------
+-- The detailed-Data-SV group { alert 17 }  (X'98' Alert MS Subvector)
+--
+-- This group is provided in a trap when there is product-specific
+-- detailed data to be reported.
+------------------------------------------------------------------------
+--
+------------------------------------------------------------------------
+-- detailedDataDD (X'85' Network Alert Common Subfield)
+------------------------------------------------------------------------
+detailedDataDDTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DetailedDataDDEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "A table of product-specific detailed data."
+::= { detailed-Data-SV 1 }
+
+detailedDataDDEntry OBJECT-TYPE
+    SYNTAX DetailedDataDDEntry
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+       "The information required  to display product identification, data
+       type, and detailed data.  The index is the instance/number of the
+       detailed data."
+::= { detailedDataDDTable 1 }
+
+DetailedDataDDEntry  ::=
+    SEQUENCE  {
+       productIDCodeDD  INTEGER,
+       dataIDCodeDD     INTEGER,
+       dataEncodingDD   INTEGER,
+       dataDD           OCTET STRING
+}
+
+productIDCodeDD OBJECT-TYPE
+    SYNTAX INTEGER {
+       displayNone(0),      -- X'00'
+       displayFirstHW(41),  -- X'29'
+       displaySecondHW(42), -- X'2A'
+       displayFirstSW(153), -- X'99'
+       displaySecondSW(154) -- X'9A'
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating what product identification, if any is
+        to displayed in conjunction with the data-type and data.
+
+            displayNone     - Do not display any product identification
+                              data in conjunction with the data-type and
+                              data.
+
+            displayFirstHW  - display machine type or product common name
+                              from the first entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displaySecondHW - display machine type or product common name
+                              from the second entry of the machineType
+                              or hardwareProdCommonName objects in the
+                              hwProductInstallSpecificInfoTable.
+
+            displayFirstSW  - display software product common name
+                              from the first entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable.
+
+            displaySecondSW - display software product common name
+                              from the second entry of the
+                              softwareProdCommonName object in the
+                              swProductInstallSpecificInfoTable."
+    ::= { detailedDataDDEntry 1 }
+
+dataIDCodeDD OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A Detailed Data Code Point (Data ID code point)
+        (described in IBM document GA27-3136) indicating the type of data
+        provided.  The English text associated with each code point or
+        its national language equivalent is displayed with the
+        detailed data."
+   ::= { detailedDataDDEntry 2 }
+
+dataEncodingDD OBJECT-TYPE
+    SYNTAX INTEGER {
+        hex(0),    -- (X'00') encoded/displayed as hexadecimal digits
+        binary(1), -- (X'01') encoded as an unsigned integer value, the
+                   -- decimal equivalent is displayed
+        ascii(17)  -- (X'11') data is to be decoded as ASCII characters
+    }
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+        "A code indicating how the accompanying detailed data is
+        encoded, and thus how it is to be decoded and displayed."
+    ::= { detailedDataDDEntry 3 }
+
+dataDD OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..44))
+    ACCESS read-only
+    STATUS optional
+    DESCRIPTION
+       "Detailed data encoded as specified by the dataEncodingUC
+       object."
+    ::= { detailedDataDDEntry 4}
+
+END

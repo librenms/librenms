@@ -1,0 +1,939 @@
+
+--
+-- IBM-3200-MIB.mib
+--
+
+--
+--	Version 1.0 - 24-Jan-2006
+--	Initial release
+--
+--	Version 1.1 - 02-Feb-2006
+--	Re-definedibm3200 root OID;
+--  Added comments in notifications to add directives for trap classification
+--
+--	Version 1.2 - 14-March-2007
+--	library fault OIDs added
+--
+--	Version 1.3 - 14-Dec-2007
+--	Change the ibm3200MIB OBJECT IDENTIFIER from "{ ibm3200 1 }" to "{ ibm3200 0 }";
+--
+--	Version 1.4 - 14-Jan-2008
+--	changes done for SNMPv2 implementation:
+--  Added SNMPv1 trap definitions to MIB to decode v1 traps correct
+--
+--	Version 1.5 - 29-April-2009
+--	trap eventLoaderPasswordChange for Library password change added
+--  
+--	Version 1.6 - 16-September-2009
+--	trap eventEncryptionConfigChange for Library password change added
+--
+--	Version 1.7 - 25-March-2010
+--	trap eventLoaderConfigChange added
+--	trap eventBrowserLogin added
+--	trap eventBrowserLogout added
+--
+
+  IBM-3200-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS 
+      OBJECT-TYPE      
+        FROM RFC-1212      
+      TRAP-TYPE      
+        FROM RFC-1215      
+      enterprises      
+        FROM RFC1155-SMI      
+      DisplayString      
+        FROM RFC1213-MIB;
+
+--
+-- Node definitions
+--
+  
+        ibm OBJECT IDENTIFIER
+                ::= { enterprises 2 }
+        
+        ibmProd OBJECT IDENTIFIER
+                ::= { ibm 6 }
+        
+        ibm3200 OBJECT IDENTIFIER
+                ::= { ibmProd 211 }
+        
+        ibm3200MIB OBJECT IDENTIFIER
+                ::= { ibm3200 0 }
+        
+        ibm3200MIBTraps OBJECT IDENTIFIER
+                ::= { ibm3200MIB 0 }
+        
+        ibm3200MIBAdmin OBJECT IDENTIFIER
+                ::= { ibm3200MIB 1 }
+        
+        ibm3200MIBObjects OBJECT IDENTIFIER
+                ::= { ibm3200MIB 2 }
+        
+        ibm3200MIBConformance OBJECT IDENTIFIER
+                ::= { ibm3200MIB 3 }    
+    
+---
+---	Product ID Group
+---
+   ibm3200Id OBJECT IDENTIFIER ::= {ibm3200 1 }
+    
+   ibm3200IdDisplayName OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Name of this product for display purposes."
+      ::= {ibm3200Id 1 }
+    
+   ibm3200IdDescription OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "A short description of this product such as <LTO Tape Library>."
+      ::= {ibm3200Id 2 }
+    
+   ibm3200AgentVendor OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The name of the product manufacturer."
+      ::= {ibm3200Id 3 }
+    
+   ibm3200IdAgentVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The version of this product."
+      ::= {ibm3200Id 4 }
+    
+   ibm3200IdBuildNumber OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The software build number of the product."
+      ::= {ibm3200Id 5 }
+
+   ibm3200IdURL OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The URL of the web-based application to manage this product."
+      ::= {ibm3200Id 6 }
+
+---
+---	Product Status Group
+---
+   ibm3200Status OBJECT IDENTIFIER ::= {ibm3200 2 }
+    
+   ibm3200StatusGlobalStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        other(1),
+        unknown(2),
+        ok(3),
+        non-critical(4),
+        critical(5),
+        non-Recoverable(6)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Current status of the product. 
+        This is a rollup for the entire agent including any 
+        monitored devices. The status is intended to give 
+        initiative to a snmp monitor to get further data when 
+        this status is abnormal."
+      ::= {ibm3200Status 1 }
+    
+   ibm3200StatusLastGlobalStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        other(1),
+        unknown(2),
+        ok(3),
+        non-critical(4),
+        critical(5),
+        non-recoverable(6)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The status before the current status which induced an initiative 
+        to issue a global status change trap."
+      ::= {ibm3200Status 2 }
+    
+   ibm3200StatusTimeStamp OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "The last time that the agent values have been updated.
+        The time shoule be in a relative timestamp, such as SysUpTime."
+      ::= {ibm3200Status 3 }
+    
+   ibm3200StatusGetTimeOut OBJECT-TYPE
+      SYNTAX INTEGER (1..10000)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Suggested time out value in milleseconds for how long the SNMP getter
+        should wait while attempting to poll the product SNMP service."
+      ::= {ibm3200Status 4 }
+    
+   ibm3200StatusRefreshRate OBJECT-TYPE
+      SYNTAX INTEGER (-1..1000000000)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Rate in seconds at which the agent cached data is being updated. If the
+        value is 0 then the data is not cached. If the value is -1 then the value does
+        not apply."
+      ::= {ibm3200Status 5 }
+    
+   ibm3200StatusGeneratingTrapFlag OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        true(1),
+        false(2),
+        disabled(3)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Indicates id this SNMP agent is capable of and/or is generating SNMP traps."
+      ::= {ibm3200Status 6 }
+    
+---
+---	Physical Group
+---
+   ibm3200Physical OBJECT IDENTIFIER ::= {ibm3200 3 }
+
+    libraryTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF LibraryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+        "A table of library status."
+      ::= {ibm3200Physical 1 }
+    
+    libraryEntry OBJECT-TYPE
+      SYNTAX LibraryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+        "Entry in the library Table. Each entry contains
+        an index (libraryEntryId), and the values associated 
+        with the device."
+      INDEX { libraryEntryId }
+      ::= { libraryTable 1 }
+    
+    LibraryEntry ::=
+      SEQUENCE { 
+        libraryEntryId
+          INTEGER,
+        libraryState
+          INTEGER,
+        libraryTimeStamp
+          INTEGER,
+        libraryType
+          INTEGER,
+        libraryScsiId
+          INTEGER,
+	    libraryScsiLun
+          INTEGER,
+        libraryVendorId
+          DisplayString,
+        libraryProductId
+          DisplayString,
+        libraryFwLevel
+          DisplayString,
+        librarySerNum
+          DisplayString,
+        libraryDrvCnt
+          INTEGER,
+        librarySlotCnt
+          INTEGER,
+        libraryImpExpCnt
+          INTEGER,
+        libraryTranspCnt
+          INTEGER,
+        libraryMoves
+          INTEGER,
+        librarySlotFetchRetries
+          INTEGER,
+        librarySlotStowRetries
+          INTEGER,
+        libraryDrvFetchRetries
+          INTEGER,
+        libraryDrvStowRetries
+          INTEGER,
+        libraryDoorState
+          INTEGER,
+        libraryImpExpState
+          INTEGER,
+        libraryFaultFSC
+          INTEGER,
+        libraryFaultSev
+          INTEGER,
+        libraryFaultDescr
+          DisplayString
+       }
+
+    libraryEntryId OBJECT-TYPE
+      SYNTAX INTEGER (1..256)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Table entry index value. Each unique physical device has a unique libraryEntryId."
+      ::= { libraryEntry 1 }
+    
+    libraryState OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Device state."
+      ::= { libraryEntry 2 }
+    
+    libraryTimeStamp OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Relative time in sec from power-up."
+      ::= { libraryEntry 3 }
+    
+    libraryType OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Device type."
+      ::= { libraryEntry 4 }
+    
+    libraryScsiId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "SCSI ID of the device."
+      ::= { libraryEntry 5}
+    
+    libraryScsiLun OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "SCSI Lun of the device."
+      ::= { libraryEntry 6 }
+    
+    libraryVendorId OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Library Vendor ID string as reported in a SCSI Inquiry command."
+      ::= { libraryEntry 7 }
+    
+    libraryProductId OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Library Product Id string as reported in a SCSI Inquiry command."
+      ::= { libraryEntry 8 }
+    
+    libraryFwLevel OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Library Firmware level as reported in a SCSI Inquiry command."
+      ::= { libraryEntry 9 }
+    
+    librarySerNum OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Library serial number as reported in SCSI Inquiry command, page 0x80."
+      ::= { libraryEntry 10 }
+    
+    libraryDrvCnt OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Number of drives contained in this library."
+      ::= { libraryEntry 11 }
+    
+    librarySlotCnt OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Number of cartridge slots contained in this library"
+      ::= { libraryEntry 12 }
+    
+    libraryImpExpCnt OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Number of import/export elements (mail slots) contained in this library"
+      ::= { libraryEntry 13 }
+    
+    libraryTranspCnt OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Number of transport elements (robots) contained in this library."
+      ::= { libraryEntry 14 }
+    
+    libraryMoves OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Total number of move operations done by this library."
+      ::= { libraryEntry 15 }
+    
+    librarySlotFetchRetries OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+        "Total number of slot fetch retries by this library."
+      ::= { libraryEntry 16 }
+    
+    librarySlotStowRetries OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+        "Total number of slot stow retries by this library."
+      ::= { libraryEntry 17 }
+    
+    libraryDrvFetchRetries OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+        "Total number of drive fetch retries by this library."
+      ::= { libraryEntry 18 }
+    
+    libraryDrvStowRetries OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+        "Total number of drive stow retries by this library."
+      ::= { libraryEntry 19 }
+    
+    libraryDoorState OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        unknown(1),
+        open(2),
+        closed(3),
+        locked(4)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "State of the door(s) pf this library. The interpretation of this value is vendor specific."
+      ::= { libraryEntry 20 }
+    
+    libraryImpExpState OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        unknown(1),
+        open(2),
+        closed(3),
+        locked(4)
+        }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "State of the Import/Export element(s) of this library. The interpretation of this value is vendor specific."
+      ::= { libraryEntry 21 }      
+      
+    libraryFaultFSC OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+        "The library Fault error code."
+      ::= { libraryEntry 22 }
+
+    libraryFaultSev OBJECT-TYPE
+      SYNTAX INTEGER   
+        {
+        informational(1),
+        minor(2),
+        major(3),
+        critical(4)
+        }      
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+        "The library Fault severity."
+      ::= { libraryEntry 23 }
+                               
+    libraryFaultDescr OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+        "The library Fault description."
+      ::= { libraryEntry 24 }      
+    
+    driveTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF DriveEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+        "A table of all tape drive devices in this library."
+      ::= {ibm3200Physical 2 }
+    
+    driveEntry OBJECT-TYPE
+      SYNTAX DriveEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+        "Entry in the device Table. Each entry contains
+        an index (driveEntryId), and the values associated 
+        with the device."
+      INDEX { driveEntryId }
+      ::= { driveTable 1 }
+    
+    DriveEntry ::=
+      SEQUENCE { 
+        driveEntryId
+          INTEGER,
+        driveState
+          INTEGER,
+        driveTimeStamp
+          INTEGER,
+        driveType
+          INTEGER,
+        driveScsiId
+          INTEGER,
+        driveScsiLun
+          INTEGER,
+        driveVendorId
+          DisplayString,
+        driveProductId
+          DisplayString,
+        driveFwlevel
+          DisplayString,
+        driveSerNum
+          DisplayString,
+        driveLibrarySN
+          DisplayString,
+        driveTpHrs
+          INTEGER,
+        driveClean
+          INTEGER,
+        driveLoads
+          INTEGER,
+        driveSoftWrtErrors
+          INTEGER,
+        driveHardWrtErrors
+          INTEGER,
+        driveSoftReadErrors
+          INTEGER,
+        driveHardReadErrors
+          INTEGER
+       }
+
+    driveEntryId OBJECT-TYPE
+      SYNTAX INTEGER (1..512)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Table entry index value. Each unique physical device has a unique driveEntryId."
+      ::= { driveEntry 1 }
+    
+    driveState OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Device SCSI State."
+      ::= { driveEntry 2 }
+    
+    driveTimeStamp OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Universal time in sec since UTC 1/1/70 when the device data was last updated."
+      ::= { driveEntry 3 }
+    
+    driveType OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "SCSI device type."
+      ::= { driveEntry 4 }
+    
+    driveScsiId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "SCSI ID of the device."
+      ::= { driveEntry 5 }
+    
+    driveScsiLun OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "SCSI Lun of the device."
+      ::= { driveEntry 6 }
+
+    driveVendorId OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Device Vendor as would be reported in a SCSI Inquiry command."
+      ::= { driveEntry 7 }
+    
+    driveProductId OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Device Model as would be reported in a SCSI Inquiry command."
+      ::= { driveEntry 8 }
+    
+    driveFwlevel OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Device firmware level as would be reported in a SCSI Inquiry command."
+      ::= { driveEntry 9 }
+    
+    driveSerNum OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Device serial number as reported in SCSI Inquiry command, page 0x80."
+      ::= { driveEntry 10 }
+       
+    driveLibrarySN OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Serial Number of the library that this drive is in as reported in SCSI Inquiry command, page 0x80, for the media mover device."
+      ::= { driveEntry 11 }
+    
+    driveTpHrs OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Total drive motion hours of this device."
+      ::= { driveEntry 12 }
+    
+    driveClean OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Cleaning State of the device. The interpretation of this value is vendor specific."
+      ::= { driveEntry 13 }
+    
+    driveLoads OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Total cartridge loads for the drive."
+      ::= { driveEntry 14 }
+    
+    driveSoftWrtErrors OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Recovered soft write error count for current cartridge"
+      ::= { driveEntry 15 }
+    
+    driveHardWrtErrors OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Hard write error count for current cartridge"
+      ::= { driveEntry 16 }
+    
+    driveSoftReadErrors OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Recovered soft read error count for current cartridge"
+      ::= { driveEntry 17 }
+    
+    driveHardReadErrors OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+        "Hard read error count for current cartridge"
+      ::= { driveEntry 18 }
+ 
+--
+-- Trap definitions
+--
+   ibm3200Event OBJECT IDENTIFIER ::= {ibm3200 4 }
+    
+	eventStatusChange NOTIFICATION-TYPE
+		STATUS current
+		DESCRIPTION 
+			"The library status has changed."
+		--#TYPE "Library Status Change"
+		--#SUMMARY "The library %s (Serial Number %s) status has changed from %s to %s"
+		--#ARGUMENTS {0,1,2,3}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 1}
+
+	eventDoorOpen NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"The library door has been opened."
+		--#TYPE "Library Door Opened"
+		--#SUMMARY "The library %s (Serial Number %s) door has been opened."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 2}
+	
+	eventMailSlotAccessed NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"The library mail slot has been accessed."
+		--#TYPE "Library Mail Slot Accessed"
+		--#SUMMARY "The library %s (Serial Number %s) mail slot has been accessed."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 3}
+	
+	eventFaultPosted NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"The library has posted a hard fault."
+		--#TYPE "Library Hard Fault Posted"
+		--#SUMMARY "The library %s (Serial Number %s) has posted a hard fault. Severity = %s, FSC = %s, Description = %s."
+		--#ARGUMENTS {0,1,2,3,4}
+		--#SEVERITY CRITICAL
+		::= {ibm3200Event 4}
+	
+	eventRequestDriveClean NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"One of the library tape drives has requested a cleaning cycle to ensure continued
+            data reliability."
+		--#TYPE "Tape Drive Requested Cleaning"
+		--#SUMMARY "One of the library %s (Serial Number %s) tape drives has requested a cleaning cycle."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 5}
+	
+	eventDriveError NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"One of the library tape drives has reported an error condition."
+		--#TYPE "Tape Drive Reported Error"
+		--#SUMMARY "One of the library %s (Serial Number %s) tape drives has reported an error condition."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY MAJOR
+		::= {ibm3200Event 6}
+	
+	eventLoaderRetriesExcessive NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"The library has detected excessive loader retries."
+		--#TYPE "Excessive loader retries"
+		--#SUMMARY "The library %s (Serial Number %s) has detected excessive loader retries."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY MINOR
+		::= {ibm3200Event 7}
+	
+	eventLoaderOK NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"The library has reverted to normal operation."
+		--#TYPE "Library reverted to normal operation"
+		--#SUMMARY "The library %s (Serial Number %s) has reverted to normal operation."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 8}    
+	
+	eventLoaderPasswordChange NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"Library password has changed"
+		--#TYPE "Password Change"
+		--#SUMMARY "An account password in library %s (Serial Number %s) has changed."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 9}   
+
+ 	eventLoaderConfigChange NOTIFICATION-TYPE    
+		STATUS  current
+		DESCRIPTION
+			"A logical library configuration has been changed."
+		--#TYPE "Configuration Change"
+		--#SUMMARY "A logical library configuration has been changed."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 10}   
+	
+	eventBrowserLogin NOTIFICATION-TYPE    
+		STATUS  current
+		DESCRIPTION
+			"Someone logged in via Web Browser."
+		--#TYPE "Web Access"
+		--#SUMMARY "Someone logged in via Web Browser."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 11}   
+	
+	eventBrowserLogout NOTIFICATION-TYPE    
+		STATUS  current
+		DESCRIPTION
+			"Someone logged from Web Browser."
+		--#TYPE "Web Access"
+		--#SUMMARY "Someone logged from Web Browser."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY INFORMATIONAL
+		::= {ibm3200Event 12}
+
+	
+	--OLD Style Trap definitions      
+	
+	eventStatusChange TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum, 
+        			  ibm3200StatusLastGlobalStatus,
+        			  ibm3200StatusGlobalStatus	 }		
+    	DESCRIPTION 
+			"The library status has changed."	
+		::=  1
+		
+	eventDoorOpen  TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }		
+		DESCRIPTION
+			"The library door has been opened."		
+		::= 2
+	
+	eventMailSlotAccessed TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+   		DESCRIPTION
+			"The library mail slot has been accessed."	
+		::= 3
+	
+	eventFaultPosted TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum,
+        			  libraryFaultSev,
+        			  libraryFaultFSC,
+        			  libraryFaultDescr	 }
+   		DESCRIPTION
+			"The library has posted a hard fault."		
+		::= 4
+			
+	eventRequestDriveClean TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"One of the library tape drives has requested a cleaning cycle to ensure continued
+            data reliability."		
+        ::= 5
+	
+	eventDriveError TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"One of the library tape drives has reported an error condition."
+		::= 6
+	
+	eventLoaderRetriesExcessive TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"The library has detected excessive loader retries."
+		::= 7
+	
+	eventLoaderOK TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"The library has reverted to normal operation."
+		::= 8	
+	
+	eventLoaderPasswordChange TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"An account password in the library has changed."
+		::= 9	 	
+  
+  	eventLoaderConfigChange TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"A logical library configuration has been changed."
+		::= 10
+
+  	eventBrowserLogin TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"Someone logged in via Web Browser"
+		::= 11
+
+  	eventBrowserLogout TRAP-TYPE    
+    	ENTERPRISE  ibm3200Event
+        VARIABLES   { libraryProductId,
+        			  librarySerNum	 }
+		DESCRIPTION
+			"Someone logged out from Web Browser"
+		::= 12
+		
+  END
+
+--
+-- IBM-3200-MIB.mib
+--
+
+
+

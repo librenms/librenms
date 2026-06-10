@@ -1,0 +1,565 @@
+-- *****************************************************************
+-- CISCO-IETF-PW-FR-MIB.my: Pseudo Wire Frame Relay MIB file
+--
+-- December 2003, Danny Lee,
+--                George Wilkie
+--
+-- Copyright (c) 2003-2004 by Cisco Systems, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+CISCO-IETF-PW-FR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+      MODULE-IDENTITY,
+      OBJECT-TYPE
+              FROM SNMPv2-SMI
+
+      ciscoExperiment
+              FROM CISCO-SMI
+              
+      MODULE-COMPLIANCE,
+      OBJECT-GROUP
+              FROM SNMPv2-CONF
+
+      TEXTUAL-CONVENTION,
+      StorageType,
+      RowStatus
+              FROM SNMPv2-TC
+
+      CpwVcIndexType
+              FROM CISCO-IETF-PW-TC-MIB
+                                
+      InterfaceIndexOrZero
+              FROM IF-MIB
+              
+      DlciNumber
+              FROM CISCO-FRAME-RELAY-MIB;
+      
+cpwVcFrMIB MODULE-IDENTITY
+      LAST-UPDATED      "200312160000Z"
+      ORGANIZATION      "Cisco Systems, Inc."
+      CONTACT-INFO
+            "Cisco Systems
+             Customer Service
+
+             Postal: 170 W. Tasman Drive
+                   San Jose, CA  95134
+                   SA
+
+             Tel: +1 800 553-NETS
+
+             Email: cs-framerelay@cisco.com"
+      DESCRIPTION
+             "Cisco Pseudo Wire Frame Relay MIB
+             
+             This MIB describes network management objects defined
+             for FRoPW services over a Packet Switched Network (PSN).
+             
+             As described in the IETF Frame Relay over
+             Pseudowire (FRoPW) draft,
+             draft-ietf-pwe3-frame-relay-01.txt,
+             FR VCs and PW can be mapped in 2 modes:
+         
+             One-to-one mapping mode: a FR VC is mapped
+             to a PW.  This mode is described by cpwVcFrTable.
+         
+             Many-to-one mapping mode (a.k.a. port mode):
+             multiple FR VCs assigned to a port are mapped to a PW.
+             This mode is addressed by cpwVcFrPortModeTable.
+             In this mode, all data frames are directed to the
+             associated PSN tunnel regardless of DLCI."
+
+      REVISION      "200312160000Z"
+      DESCRIPTION
+            "Initial version of this MIB module."
+
+      ::= { ciscoExperiment 112 }
+
+
+-- Top-level components of this MIB
+
+cpwVcFrNotifications    OBJECT IDENTIFIER ::= { cpwVcFrMIB 0 }
+cpwVcFrObjects          OBJECT IDENTIFIER ::= { cpwVcFrMIB 1 }
+cpwVcFrConformance      OBJECT IDENTIFIER ::= { cpwVcFrMIB 2 }
+
+
+--
+--
+-- PW-FR VC Table
+
+cpwVcFrTable            OBJECT-TYPE
+      SYNTAX            SEQUENCE OF CpwVcFrEntry   
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+        "The PW-FR connection table.
+        
+         Each entry in this table represents a FRoPW
+         connection operating in one-to-one mapping mode.
+         
+         This table uses the same index as the generic
+         PW MIB's VC table.  Therefore, each entry in
+         cpwVcFrTable has a mapping entry to the
+         generic PW MIB VC table associated by the
+         PW VC index.
+
+         An entry is created in this table by the agent
+         for every entry in the generic PW MIB VC table
+         with a VcType of 'frameRelay'."
+         
+      ::= { cpwVcFrObjects 1 }
+
+cpwVcFrEntry            OBJECT-TYPE
+      SYNTAX            CpwVcFrEntry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+        "An entry in cpwVcFrTable."
+         
+      INDEX { cpwVcFrPwVcIndex }
+              
+      ::= { cpwVcFrTable 1 }
+
+CpwVcFrEntry ::= SEQUENCE {
+      cpwVcFrPwVcIndex          CpwVcIndexType,
+      cpwVcFrIfIndex            InterfaceIndexOrZero,
+      cpwVcFrDlci               DlciNumber,
+      cpwVcFrAdminStatus        INTEGER,
+      cpwVcFrOperStatus         INTEGER,
+      cpwVcFrPw2FrOperStatus    INTEGER,
+      cpwVcFrRowStatus          RowStatus,
+      cpwVcFrStorageType        StorageType
+      }
+
+cpwVcFrPwVcIndex        OBJECT-TYPE
+        SYNTAX          CpwVcIndexType
+        MAX-ACCESS      not-accessible 
+        STATUS          current
+        DESCRIPTION
+          "This object identifies the index to an entry
+           in the generic PW table."
+        ::= { cpwVcFrEntry 1 }
+
+cpwVcFrIfIndex          OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create 
+        STATUS          current
+        DESCRIPTION
+          "This object identifies the index to an entry
+           in the IF-MIB table.  In this case, it holds
+           the ifIndex value of the Frame Relay interface
+           associating with the PW connection.
+           
+           The value of zero means that the InterfaceIndex is
+           not known yet."
+        DEFVAL { 0 }
+        ::= { cpwVcFrEntry 2 }
+
+cpwVcFrDlci             OBJECT-TYPE
+        SYNTAX          DlciNumber
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+          "This object identifies the FR DLCI associating
+           with this entry in cpwVcFrTable.
+           
+           This object can be used together with cpwVcFrIfIndex
+           to lookup FR VC specific information for the FR PVC
+           segment of a FRoPW connection."
+           
+        ::= { cpwVcFrEntry 3 }
+        
+cpwVcFrAdminStatus      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                           up (1),
+                           down (2)
+                        }                           
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+          "This value of this object indicates the
+           administrative status of the FRoPW connection.
+           
+           The values mean:
+           up(1)   - connection is administratively set to
+                     the 'up' state for handling traffic.
+           down(2) - connection is administratively set to
+                     the 'down' state. No traffic is processed
+                     at this state."
+                     
+        ::= { cpwVcFrEntry 4 }
+
+cpwVcFrOperStatus       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                           active (1),
+                           inactive (2),
+                           unknown (3)
+                        }                           
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+          "This is actual operational status of the logical
+           FRoPW connection, which is derived from combining
+           the following 2 operational status:
+           
+           cpwVcFrPw2FrOperStatus
+             Operational status of the FR segment on the FRoPW
+             connection.
+             
+           PW Operation Status
+             Operational status of the PW segment of the FRoPW
+             connection.  The associated object is cpwVcOperStatus
+             from the generic PW MIB."
+        ::= { cpwVcFrEntry 5 }
+
+cpwVcFrPw2FrOperStatus  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                           active (1),
+                           inactive (2),
+                           unknown (3)
+                        }                           
+        MAX-ACCESS      read-only 
+        STATUS          current
+        DESCRIPTION
+          "The value of the object identifies the current
+           operational status of the FR PVC segment of a
+           FRoPW connection.
+           
+           The values mean:
+           
+           active(1)   - segment is currently operational.
+           inactive(2) - segment in currently not operational.
+           unknown(3)  - segment current status cannot be
+                         determined."
+        ::= { cpwVcFrEntry 6 }
+        
+cpwVcFrRowStatus        OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create 
+        STATUS          current
+        DESCRIPTION
+          "For creating, modifying, and deleting this row."
+        ::= { cpwVcFrEntry 7 }
+        
+cpwVcFrStorageType      OBJECT-TYPE
+        SYNTAX          StorageType
+        MAX-ACCESS      read-create 
+        STATUS          current
+        DESCRIPTION
+          "Indicates the storage type of this row."
+        ::= { cpwVcFrEntry 8 }
+        
+
+-- (End of cpwVcFrTable)
+--
+--
+
+--
+--
+-- PW-FR Port Mode VC Table
+
+cpwVcFrPMTable          OBJECT-TYPE
+      SYNTAX            SEQUENCE OF CpwVcFrPMEntry   
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+        "The PW-FR port mode connection table.
+        
+         Each entry in this table represents a FRoPW
+         connection operating in the port mode.
+         
+         This table uses the same index as the generic
+         PW MIB's VC table.  Therefore, each entry in
+         cpwVcFrTable has a mapping entry to the
+         generic PW MIB VC table associated by the
+         PW VC index.
+
+         An entry is created in this table by the agent
+         for every entry in the generic PW MIB VC table
+         with a VcType of 'frameRelayPortMode'."
+         
+      ::= { cpwVcFrObjects 2 }
+
+cpwVcFrPMEntry          OBJECT-TYPE
+      SYNTAX            CpwVcFrPMEntry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+        "An entry in cpwVcFrPMTable."
+         
+      INDEX { cpwVcFrPMPwVcIndex }
+              
+      ::= { cpwVcFrPMTable 1 }
+
+CpwVcFrPMEntry ::= SEQUENCE {
+      cpwVcFrPMPwVcIndex          CpwVcIndexType,
+      cpwVcFrPMIfIndex            InterfaceIndexOrZero,
+      cpwVcFrPMAdminStatus        INTEGER,
+      cpwVcFrPMOperStatus         INTEGER,
+      cpwVcFrPMPw2FrOperStatus    INTEGER,
+      cpwVcFrPMRowStatus          RowStatus,
+      cpwVcFrPMStorageType        StorageType
+      }
+
+cpwVcFrPMPwVcIndex      OBJECT-TYPE
+        SYNTAX          CpwVcIndexType
+        MAX-ACCESS      not-accessible 
+        STATUS          current
+        DESCRIPTION
+          "This object identifies the index to an entry
+           in the generic PW table."
+        ::= { cpwVcFrPMEntry 1 }
+
+cpwVcFrPMIfIndex        OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+          "This object represents the FR port associating with
+           the FRoPW connection operating in port mode.
+          
+           The value in the index identifies an entry in the
+           IF-MIB table.
+           
+           The value of zero means that the InterfaceIndex is
+           not known yet."
+        ::= { cpwVcFrPMEntry 2 }
+
+cpwVcFrPMAdminStatus    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                           up (1),
+                           down (2)
+                        }                           
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+          "This value of this object indicates the
+           administrative status of the FRoPW connection.
+           
+           The values mean:
+           up(1)   - connection is administratively set to
+                     the 'up' state for handling traffic.
+           down(2) - connection is administratively set to
+                     the 'down' state. No traffic is processed
+                     at this state."
+        ::= { cpwVcFrPMEntry 3 }
+
+cpwVcFrPMOperStatus     OBJECT-TYPE
+        SYNTAX          INTEGER {
+                           active (1),
+                           inactive (2),
+                           unknown (3)
+                        }                           
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+          "This is actual operational status of the logical
+           FRoPW connection in port mode, which is derived
+           from combining the following 2 operational status:
+           
+           cpwVcFrPMPw2FrOperStatus
+             Operational status of the FR segment on the FRoPW
+             connection.
+             
+           PW Operation Status
+             Operational status of the PW segment of the FRoPW
+             connection.  The associated object is cpwVcOperStatus
+             from the generic PW MIB."
+        ::= { cpwVcFrPMEntry 4 }
+
+cpwVcFrPMPw2FrOperStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+                           active (1),
+                           inactive (2),
+                           unknown (3)
+                        }                           
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+          "The value of the object identifies the current
+           operational status of the associate FR port.
+           
+           The values mean:
+           
+           active(1)   - segment is currently operational.
+           inactive(2) - segment in currently not operational.
+           unknown(3)  - segment current status cannot be
+                         determined."
+        ::= { cpwVcFrPMEntry 5 }
+        
+cpwVcFrPMRowStatus      OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+          "For creating, modifying, and deleting this row."
+        ::= { cpwVcFrPMEntry 6 }
+
+cpwVcFrPMStorageType    OBJECT-TYPE
+        SYNTAX          StorageType
+        MAX-ACCESS      read-create 
+        STATUS          current
+        DESCRIPTION
+          "Indicates the storage type of this row."
+        ::= { cpwVcFrPMEntry 7 }
+
+-- (End of cpwVcFrPMTable)
+--
+--
+
+
+-- Conformance Information
+ 
+cpwVcFrCompliances OBJECT IDENTIFIER 
+                                 ::= { cpwVcFrConformance 1 }
+cpwVcFrGroups      OBJECT IDENTIFIER
+                                 ::= { cpwVcFrConformance 2 }
+
+
+-- Compliance requirement for read-write implementations.
+
+cpwVcFrFullCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for agents that provide
+                 full support for the PW-FR-MIB module."
+        MODULE  -- this module
+        MANDATORY-GROUPS { cpwVcFrGroup
+                         }
+                         
+        GROUP   cpwVcFrPMGroup
+        DESCRIPTION
+            "This group is mandatory only for the software
+             which supports Pseudowire Frame Relay Port Mode."
+                         
+        OBJECT  cpwVcFrRowStatus
+        SYNTAX  RowStatus
+        DESCRIPTION
+            "Support for notReady(3) and createAndWait(5) is
+             not required."
+             
+        OBJECT  cpwVcFrPMRowStatus
+        SYNTAX  RowStatus
+        DESCRIPTION
+            "Support for notReady(3) and createAndWait(5) is
+             not required."
+
+        ::= { cpwVcFrCompliances 1 }
+
+-- Compliance requirement for read-only implementations.
+
+cpwVcFrReadOnlyCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for agents that only
+                 provide read-only support for the PW-FR-MIB module."
+        MODULE  -- this module
+        MANDATORY-GROUPS { cpwVcFrGroup
+                         }
+                         
+        GROUP   cpwVcFrPMGroup
+        DESCRIPTION
+            "This group is mandatory only for the software
+             which supports Pseudowire Frame Relay Port Mode."
+                         
+        OBJECT  cpwVcFrIfIndex
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrDlci
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrAdminStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrOperStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrPw2FrOperStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrRowStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrStorageType
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrPMIfIndex
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrPMAdminStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrPMOperStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrPMPw2FrOperStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrPMRowStatus
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        OBJECT  cpwVcFrPMStorageType
+        MIN-ACCESS read-only
+        DESCRIPTION
+            "Write access is not required."
+
+        ::= { cpwVcFrCompliances 2 }
+
+-- units of conformance:
+ 
+cpwVcFrGroup OBJECT-GROUP
+        OBJECTS {
+                  cpwVcFrIfIndex,
+                  cpwVcFrDlci,
+                  cpwVcFrAdminStatus,
+                  cpwVcFrOperStatus,
+                  cpwVcFrPw2FrOperStatus,
+                  cpwVcFrRowStatus,
+                  cpwVcFrStorageType
+        }
+        STATUS  current
+        DESCRIPTION
+                "Objects to support cpwVcFrTable." 
+        ::= { cpwVcFrGroups 1 }
+       
+cpwVcFrPMGroup OBJECT-GROUP
+        OBJECTS {
+                  cpwVcFrPMIfIndex,
+                  cpwVcFrPMAdminStatus,
+                  cpwVcFrPMOperStatus,
+                  cpwVcFrPMPw2FrOperStatus,
+                  cpwVcFrPMRowStatus,
+                  cpwVcFrPMStorageType
+        }
+        STATUS  current
+        DESCRIPTION
+                "Objects to support cpwVcFrPMTable." 
+        ::= { cpwVcFrGroups 2 }
+        
+END

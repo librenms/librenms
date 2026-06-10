@@ -1,0 +1,1619 @@
+E7-Calix-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the Calix E7 enterprise MIB tree
+--
+
+IMPORTS
+    Integer32,
+    Counter64,
+    IpAddress,
+    mib-2
+                    FROM SNMPv2-SMI
+    RowStatus,
+    DisplayString,
+    MacAddress
+                    FROM SNMPv2-TC
+    InterfaceIndex,
+    ifIndex         FROM IF-MIB
+    e7, e7Modules
+                    FROM CALIX-PRODUCT-MIB
+    E7AdminStatus,
+    E7CardType,
+    E7PowerLevel,
+    E7SnmpVers,
+    E7EtherType,
+    E7Pbit,
+    E7BondedInterfaceIndex
+    E7OperStatus
+    E7XdslGrpOperStatus 
+                    FROM E7-TC;
+
+    e7ResourceModule MODULE-IDENTITY
+    LAST-UPDATED "201304030000Z"
+    ORGANIZATION "Calix Network, Inc."
+    CONTACT-INFO
+        "       Calix Networks, Inc.
+
+        Postal: 1035 North McDowell Boulevard
+                Petaluma, CA  94954-1173
+                USA
+
+         Phone: +1 707 766 3000
+           Fax: +1 707 766 3100
+
+        E-mail: tech.support@calix.com"
+    DESCRIPTION
+        "Top-level infrastructure for the Calix E7, E5-400, and E5-312 products,
+         except for Fault Management."
+    ::= { e7Modules 1 }
+
+-- really old regions (E5-8 era) can be reused
+    e7Resource             OBJECT IDENTIFIER ::= { e7 2 }
+    e7NodeResource         OBJECT IDENTIFIER ::= { e7Resource 1 }
+    e7CraftGroup           OBJECT IDENTIFIER ::= { e7NodeResource 4 }
+    e7CraftUserGroup       OBJECT IDENTIFIER ::= { e7NodeResource 5 }
+    e7CardGroup            OBJECT IDENTIFIER ::= { e7NodeResource 6 }
+    e7SystemGroup          OBJECT IDENTIFIER ::= { e7NodeResource 7 }
+    e7PortGroup            OBJECT IDENTIFIER ::= { e7NodeResource 9 }
+    e7OntGroup             OBJECT IDENTIFIER ::= { e7NodeResource 10 }
+    e7LaserGroup           OBJECT IDENTIFIER ::= { e7NodeResource 14 }
+
+
+--
+--  Calix enterprise-specific management objects
+--
+
+--
+-- Card data
+--
+
+e7CardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Card entries"
+    ::= { e7CardGroup 1 }
+
+e7CardEntry OBJECT-TYPE
+    SYNTAX      E7CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Card"
+    INDEX { e7CardBank, e7CardIndex }
+    ::= { e7CardTable 1 }
+
+E7CardEntry ::= SEQUENCE {
+    e7CardBank                   Integer32,
+    e7CardIndex                  Integer32,
+    e7CardRowStatus              RowStatus,
+	e7CardAdminStatus            E7AdminStatus,
+	e7CardProvType               E7CardType,
+	e7CardActualType             E7CardType,
+	e7CardSoftwareVersion        OCTET STRING,
+	e7CardSerialNumber			  DisplayString,
+	e7CardCurrentPowerLevel		 E7PowerLevel,
+	e7CardCleiCode				 OCTET STRING,
+	e7CardPartNumber			 OCTET STRING,
+	e7CardStartMacRange			 OCTET STRING,
+	e7CardEndMacRange            OCTET STRING,
+    }
+
+e7CardBank OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Bank number"
+    ::= { e7CardEntry 1 }
+
+e7CardIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot number"
+    ::= { e7CardEntry 2 }
+
+e7CardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Controls creation & deletion of table entries.  Only
+                 active(get), createAndGo(set), and destroy(set) are
+                 supported."
+    ::= { e7CardEntry 3 }
+
+e7CardAdminStatus OBJECT-TYPE
+    SYNTAX      E7AdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { e7CardEntry 4 }
+
+e7CardProvType OBJECT-TYPE
+    SYNTAX      E7CardType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Provisioned card type"
+    ::= { e7CardEntry 5 }
+
+e7CardActualType OBJECT-TYPE
+    SYNTAX      E7CardType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Actual card type"
+    ::= { e7CardEntry 6 }
+
+e7CardSoftwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Running software version, dotted string notation"
+    ::= { e7CardEntry 7 }
+
+e7CardSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ascii Serial number for card"
+    ::= { e7CardEntry 8 }
+
+e7CardCurrentPowerLevel OBJECT-TYPE
+    SYNTAX      E7PowerLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current power level for card"
+    ::= { e7CardEntry 9 }
+
+e7CardCleiCode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ascii CLEI code for card"
+    ::= { e7CardEntry 10 }
+
+e7CardPartNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ascii part number"
+    ::= { e7CardEntry 11 }
+
+e7CardStartMacRange OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Start of MAC range (ascii)"
+    ::= { e7CardEntry 12 }
+
+e7CardEndMacRange OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "End of MAC range (ascii)"
+    ::= { e7CardEntry 13 }
+
+--
+-- Card ODN status 
+--
+
+e7OltPonPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7OltPonPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains OLT ODN port entries"
+    ::= { e7CardGroup 2 }
+
+e7OltPonPortEntry OBJECT-TYPE
+    SYNTAX      E7OltPonPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to OLT ODN port"
+    INDEX { e7OltPonPortShelf, e7OltPonPortSlot, e7OltPonPortId }
+    ::= { e7OltPonPortTable 1 }
+
+E7OltPonPortEntry ::= SEQUENCE {
+        e7OltPonPortShelf                Integer32,
+        e7OltPonPortSlot                 Integer32,
+        e7OltPonPortId                   Integer32,
+        e7OltPonPortStatus               INTEGER,
+        e7OltPonPortTemperature          Integer32,
+        e7OltPonPortTxBias               Integer32,
+        e7OltPonPortTxPower              Integer32,
+        e7OltPonPortRxPower              Integer32,
+        e7OltPonPortVoltage              Integer32
+    }
+e7OltPonPortShelf OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Shelf number"
+    ::= { e7OltPonPortEntry 1 }
+
+e7OltPonPortSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Slot number"
+    ::= { e7OltPonPortEntry 2 }
+
+e7OltPonPortId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Port number"
+    ::= { e7OltPonPortEntry 3 }
+
+e7OltPonPortStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    linkUp(1),
+                    linkDown(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I operational status"
+    ::= { e7OltPonPortEntry 4 }
+
+e7OltPonPortTemperature OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I laser temperature (degrees Celsius) "
+    ::= { e7OltPonPortEntry 5 }
+
+e7OltPonPortTxBias OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I laser bias current (muA) "
+    ::= { e7OltPonPortEntry 6 }
+
+e7OltPonPortTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I Tx signal level ((value / 10000) = mW) "
+    ::= { e7OltPonPortEntry 7 }
+
+e7OltPonPortRxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I Rx signal level ((value / 10000) = mW) "
+    ::= { e7OltPonPortEntry 8 }
+
+e7OltPonPortVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ODN-I voltage in mV "
+    ::= { e7OltPonPortEntry 9 }
+
+--
+-- ONT data
+--
+
+e7OntTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7OntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains ONT entries"
+    ::= { e7OntGroup 1 }
+
+e7OntEntry OBJECT-TYPE
+    SYNTAX      E7OntEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to ONT"
+    INDEX { e7OntUnitId }
+    ::= { e7OntTable 1 }
+
+E7OntEntry ::= SEQUENCE {
+        e7OntUnitId                  Integer32,
+        e7OntRowStatus               RowStatus,
+        e7OntAdminStatus             E7AdminStatus,
+        e7OntOperStatus              INTEGER,
+        e7OntDyingGasp               INTEGER,
+        e7OntRxOpticalLevel          Integer32,
+        e7OntTxOpticalLevel          Integer32,
+        e7OntFarEndRxOpticalLevel    Integer32,
+        e7OntSoftwareVersion         OCTET STRING,
+        e7OntCleiCode                OCTET STRING
+    }
+
+e7OntUnitId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Unit identifier "
+    ::= { e7OntEntry 1 }
+
+e7OntRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Controls creation & deletion of table entries.  Only
+                 active(get), createAndGo(set), and destroy(set) are
+                 supported."
+    ::= { e7OntEntry 2 }
+
+e7OntAdminStatus OBJECT-TYPE
+    SYNTAX      E7AdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { e7OntEntry 3 }
+
+e7OntOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    enabled(1),
+                    degraded(2),
+                    systemDisabled(3),
+                    userDisabled(4),
+                    waitRegistration(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational status"
+    ::= { e7OntEntry 4 }
+
+e7OntDyingGasp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no(0),
+                    yes(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ont dying gasp status "
+    ::= { e7OntEntry 5 }
+
+e7OntRxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+        UNITS           "0.002 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT Rx signal level (mW) "
+    ::= { e7OntEntry 6 }
+
+e7OntTxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+        UNITS           "0.002 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "ONT Tx signal level (mW) "
+    ::= { e7OntEntry 7 }
+
+e7OntFarEndRxOpticalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+        UNITS           "0.002 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OLT Rx signal level (mW) "
+    ::= { e7OntEntry 8 }
+
+e7OntSoftwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Running software version, dotted string notation"
+    ::= { e7OntEntry 9 }
+
+e7OntCleiCode OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hardware CLEI code "
+    ::= { e7OntEntry 10 }
+
+--
+--system
+--
+
+e7SystemId OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Unique name of the system"
+   ::= {e7SystemGroup 1}
+
+e7SystemLocation OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Location of the system"
+   ::= {e7SystemGroup 2}
+
+e7SystemAutoUpgrade OBJECT-TYPE
+   SYNTAX      INTEGER {
+               		no(0),
+                   	yes(1)
+					}
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Auto upgrade out-of-rev cards on arrival"
+   ::= {e7SystemGroup 3}
+
+e7SystemTelnetServer OBJECT-TYPE
+   SYNTAX      INTEGER {
+               		no(0),
+                   	yes(1)
+					}
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Enable CLI access via telnet (in addition to ssh)"
+   ::= {e7SystemGroup 4}
+
+e7SystemUnsecuredWeb OBJECT-TYPE
+   SYNTAX      INTEGER {
+               		no(0),
+                   	yes(1)
+					}
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Enable unsecured web-access (non-ssh)"
+   ::= {e7SystemGroup 5}
+
+e7SystemPasswordExpiry OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Craft user password expiry, in days"
+   ::= {e7SystemGroup 6}
+
+e7SystemDnsPrimary OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "IP address of primary DNS server"
+   ::= {e7SystemGroup 7}
+
+e7SystemDnsSecondary OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "IP address of secondary DNS server"
+   ::= {e7SystemGroup 8}
+
+e7SystemTimezone OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Timezone for system"
+   ::= {e7SystemGroup 9}
+
+e7SystemChassisSerialNumber OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Chassis serial number"
+   ::= {e7SystemGroup 10}
+
+e7SystemChassisMacAddress OBJECT-TYPE
+   SYNTAX      MacAddress
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "Chassis MAC address"
+   ::= {e7SystemGroup 11}
+
+e7SystemTime OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "system time"
+   ::= {e7SystemGroup 12}
+
+e7SystemDate OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION "system date"
+   ::= {e7SystemGroup 13}
+
+--
+--e7PortGroup
+--
+
+e7VdslPortGroup OBJECT IDENTIFIER ::= { e7PortGroup 1 }
+
+e7VdslPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Vdsl port entries"
+    ::= { e7VdslPortGroup 1 }
+
+e7VdslPortEntry OBJECT-TYPE
+    SYNTAX      E7VdslPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Vdsl Port entries"
+    INDEX { ifIndex }
+    ::= { e7VdslPortTable 1 }
+
+E7VdslPortEntry ::= SEQUENCE {
+        e7VdslPortRowStatus          RowStatus,
+	e7VdslPortAdminStatus        E7AdminStatus,
+	e7VdslPortCurrTxRate         Integer32,
+	e7VdslPortCurrRxRate         Integer32,
+	e7VdslPortStatsProtocol      INTEGER,
+	e7VdslPortLineState          INTEGER
+    }
+
+e7VdslPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Controls creation & deletion of table entries.  Only
+                 active(get), createAndGo(set), and destroy(set) are
+                 supported."
+    ::= { e7VdslPortEntry 1 }
+
+e7VdslPortAdminStatus OBJECT-TYPE
+    SYNTAX      E7AdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { e7VdslPortEntry 2 }
+
+e7VdslPortCurrTxRate OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Actual transmit data rate this port "
+    ::= { e7VdslPortEntry 3 }
+
+e7VdslPortCurrRxRate OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Actual receive data rate this port "
+    ::= { e7VdslPortEntry 4 }
+
+e7VdslPortStatsProtocol OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        none(1),
+                        vdsl8a(2),
+                        vdsl8b(3),
+                        vdsl8c(4),
+                        vdsl8d(5),
+                        vdsl12a(6),
+                        vdsl12b(7),
+                        vdsl17a(8),
+                        gdmt(9),
+                        glite(10),
+                        adsl2(11),
+                        adsl2plus(12),
+                        t1413(13)
+		}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { e7VdslPortEntry 5 }
+
+e7VdslPortLineState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        idleNotConfigured(1),
+                        idleConfigured(2),
+                        initialization(3),
+                        training(4),
+                        showtime(5),
+                        showtimeL2(6),
+                        ldInit(7),
+                        ldFetch(8),
+                        ldDone(9),
+                        ldFailed(10)
+		}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Line operational status"
+    ::= { e7VdslPortEntry 6 }
+
+e7VdslRateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Vdsl data rate entries"
+    ::= { e7VdslPortGroup 2 }
+
+e7VdslRateEntry OBJECT-TYPE
+    SYNTAX      E7VdslRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Vdsl Rate entries"
+    INDEX { ifIndex }
+    ::= { e7VdslRateTable 1 }
+
+E7VdslRateEntry ::= SEQUENCE {
+        e7VdslRateRowStatus          RowStatus,
+	e7VdslRateAdminStatus        E7AdminStatus,
+	e7VdslRateProvDataRateUs     Integer32,
+	e7VdslRateProvDataRateDs     Integer32
+    }
+
+e7VdslRateRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Controls creation & deletion of table entries.  Only
+                 active(get), createAndGo(set), and destroy(set) are
+                 supported."
+    ::= { e7VdslRateEntry 1 }
+
+e7VdslRateAdminStatus OBJECT-TYPE
+    SYNTAX      E7AdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Administrative status"
+    ::= { e7VdslRateEntry 2 }
+
+e7VdslRateProvDataRateUs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Provisioned data rate upstream "
+    ::= { e7VdslRateEntry 3 }
+
+e7VdslRateProvDataRateDs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Provisioned data rate downstream "
+    ::= { e7VdslRateEntry 4 }
+
+e7VdslPhysTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslPhysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Vdsl physical entries"
+    ::= { e7VdslPortGroup 3 }
+
+e7VdslPhysEntry OBJECT-TYPE
+    SYNTAX      E7VdslPhysEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Vdsl physical entries"
+    INDEX { ifIndex, e7VdslPhysSide }
+    ::= { e7VdslPhysTable 1 }
+
+E7VdslPhysEntry ::= SEQUENCE {
+        e7VdslPhysSide                          INTEGER,
+	e7VdslPhysCurrSnrMargin                 Integer32,
+	e7VdslPhysCurrAtn                       Integer32,
+	e7VdslPhysCurrOutputPwr                 Integer32,
+	e7VdslPhysInterleaveDelay               Integer32,
+	e7VdslPhysImpulseNoiseProtection        Integer32,
+        e7VdslPhysTransmissionMode              INTEGER
+    }
+
+e7VdslPhysSide OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    downstream(1),
+                    upstream(2)
+                 }
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+           "Identifies whether the transceiver is downstream or upstream."
+    ::= { e7VdslPhysEntry 1 }
+
+e7VdslPhysCurrSnrMargin OBJECT-TYPE
+       SYNTAX       Integer32 (-640..630)
+       UNITS        "0.1dBm"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Noise Margin as seen by this Vtu with respect to its
+           received signal. " 
+        ::= { e7VdslPhysEntry 2 }
+
+e7VdslPhysCurrAtn OBJECT-TYPE
+       SYNTAX       Integer32 (0..1280)
+       UNITS        "0.1dBm"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Measured difference in the total power transmitted by
+           the peer Vtu and the total power received by this Vtu."
+        ::= { e7VdslPhysEntry 3 }
+
+e7VdslPhysCurrOutputPwr OBJECT-TYPE
+       SYNTAX       Integer32 (-310..310)
+       UNITS        "0.1dBm"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Measured total output power transmitted by this VTU.
+           This is the measurement that was reported during
+           the last activation sequence."
+       ::= { e7VdslPhysEntry 4 }
+
+e7VdslPhysInterleaveDelay OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Actual interleaving delay (in milliseconds)."
+       ::= { e7VdslPhysEntry 5 }
+
+e7VdslPhysImpulseNoiseProtection OBJECT-TYPE
+       SYNTAX       Integer32
+       UNITS        "0.1 symbol"
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Actual impulse noise protection."
+       ::= { e7VdslPhysEntry 6 }
+
+e7VdslPhysTransmissionMode OBJECT-TYPE
+       SYNTAX       INTEGER {
+                        none(0),
+                        t1413(1),
+                        vdsl2a(2),
+                        gdmt(3),
+                        adsl2m(4),
+                        adsl2plusm(5),
+                        glite(6),
+                        vdsl2b(7),
+                        vdsl2c(8),
+                        vdsl2(9),
+                        readsl12(10),
+                        adsl2plus(11),
+                        adsl2(12)
+                    }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+           "Actual transmission mode."
+       ::= { e7VdslPhysEntry 7 }
+
+
+
+e7VdslPortCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslPortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Vdsl port configuration entries"
+    ::= { e7VdslPortGroup 4 }
+
+e7VdslPortCfgEntry OBJECT-TYPE
+    SYNTAX      E7VdslPortCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Vdsl Port configuration entries"
+    INDEX { ifIndex }
+    ::= { e7VdslPortCfgTable 1 }
+
+E7VdslPortCfgEntry ::= SEQUENCE {
+        e7VdslPortCfgServiceType                    INTEGER,
+        e7VdslPortCfgPathLatency                    INTEGER,
+        e7VdslPortCfgVdslProfile                    INTEGER,
+        e7VdslPortCfgDsMinRate                      Integer32,
+        e7VdslPortCfgDsMaxRate                      Integer32,
+        e7VdslPortCfgUsMinRate                      Integer32,
+        e7VdslPortCfgUsMaxRate                      Integer32,
+        e7VdslPortCfgDsMinInp                       INTEGER,
+        e7VdslPortCfgUsMinInp                       INTEGER,
+        e7VdslPortCfgDsInterleaveMaxLatency         Integer32,
+        e7VdslPortCfgUsInterleaveMaxLatency         Integer32,
+        e7VdslPortCfgDsMinSnr                       Integer32,
+        e7VdslPortCfgDsMaxSnr                       Integer32,
+        e7VdslPortCfgDsTargetSnr                    Integer32,
+        e7VdslPortCfgUsMinSnr                       Integer32,
+        e7VdslPortCfgUsMaxSnr                       Integer32,
+        e7VdslPortCfgUsTargetSnr                    Integer32,
+        e7VdslPortCfgPsdMask                        INTEGER,
+        e7VdslPortCfgLastTemplate                   DisplayString,
+        e7VdslPortCfgBondedInterface                E7BondedInterfaceIndex
+    }
+
+e7VdslPortCfgServiceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    auto(1),
+                    mm(2),
+                    mm2plus(3),
+                    t1413(4),
+                    gdmt(5),
+                    glite(6),
+                    adsl2(7),
+                    adsl2plus(8),
+                    readsl2(9),
+                    annexm(10),
+                    vdsl2(11), 
+                    vdsl2mm(12)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured service type. "
+    ::= { e7VdslPortCfgEntry 1 }
+
+e7VdslPortCfgPathLatency OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    fast(1),
+                    interleaved(2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured latency. "
+    ::= { e7VdslPortCfgEntry 2 }
+
+e7VdslPortCfgVdslProfile OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    auto(1),
+                    vdsl8a(2),
+                    vdsl8b(3),
+                    vdsl8c(4),
+                    vdsl8d(5),
+                    vdsl12a(6),
+                    vdsl12b(7),
+                    vdsl17a(8),
+                    vdsl30a(9)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured profile. "
+    ::= { e7VdslPortCfgEntry 3 }
+
+e7VdslPortCfgDsMinRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream minimum rate. "
+    ::= { e7VdslPortCfgEntry 4 }
+
+e7VdslPortCfgDsMaxRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream maximum rate. "
+    ::= { e7VdslPortCfgEntry 5 }
+
+e7VdslPortCfgUsMinRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream minimum rate. "
+    ::= { e7VdslPortCfgEntry 6 }
+
+e7VdslPortCfgUsMaxRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream maximum rate. "
+    ::= { e7VdslPortCfgEntry 7 }
+
+e7VdslPortCfgDsMinInp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    none(1),
+                    halfSym(2),
+                    oneSym(3),
+                    twoSym(4),
+                    threeSym(5),
+                    fourSym(6),
+                    fiveSym(7),
+                    sixSym(8),
+                    sevenSym(9),
+                    eightSym(10),
+                    nineSym(11),
+                    tenSym(12),
+                    elevenSym(13),
+                    twelveSym(14),
+                    thirteenSym(15),
+                    fourteenSym(16),
+                    fifteenSym(17),
+                    sixteenSym(18)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream minimum impulse noise protection. "
+    ::= { e7VdslPortCfgEntry 8 }
+
+e7VdslPortCfgUsMinInp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    none(1),
+                    halfSym(2),
+                    oneSym(3),
+                    twoSym(4),
+                    threeSym(5),
+                    fourSym(6),
+                    fiveSym(7),
+                    sixSym(8),
+                    sevenSym(9),
+                    eightSym(10),
+                    nineSym(11),
+                    tenSym(12),
+                    elevenSym(13),
+                    twelveSym(14),
+                    thirteenSym(15),
+                    fourteenSym(16),
+                    fifteenSym(17),
+                    sixteenSym(18)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream minimum impulse noise protection. "
+    ::= { e7VdslPortCfgEntry 9 }
+
+e7VdslPortCfgDsInterleaveMaxLatency OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream interleave maximum latency. A
+value of 0x7FFFFFFF (2147483647) indicates the setting equal to 'auto'. "
+    ::= { e7VdslPortCfgEntry 10 }
+
+e7VdslPortCfgUsInterleaveMaxLatency OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream interleave maximum latency. "
+    ::= { e7VdslPortCfgEntry 11 }
+
+e7VdslPortCfgDsMinSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream minimum SNR. "
+    ::= { e7VdslPortCfgEntry 12 }
+
+e7VdslPortCfgDsMaxSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream maximum SNR. "
+    ::= { e7VdslPortCfgEntry 13 }
+
+e7VdslPortCfgDsTargetSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream target SNR. "
+    ::= { e7VdslPortCfgEntry 14 }
+
+e7VdslPortCfgUsMinSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream minimum SNR. "
+    ::= { e7VdslPortCfgEntry 15 }
+
+e7VdslPortCfgUsMaxSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream maximum SNR. "
+    ::= { e7VdslPortCfgEntry 16 }
+
+e7VdslPortCfgUsTargetSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream target SNR. "
+    ::= { e7VdslPortCfgEntry 17 }
+
+e7VdslPortCfgPsdMask OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     anus0(1),
+                     aeu32(2),
+                     aeu36(3),
+                     aeu40(4),
+                     aeu44(5),
+                     aeu48(6),
+                     aeu52(7),
+                     aeu56(8),
+                     aeu60(9),
+                     aeu64(10),
+                     aeu128(11),
+                     aadlu32(12),
+                     aadlu36(13),
+                     aadlu40(14),
+                     aadlu44(15),
+                     aadlu48(16),
+                     aadlu52(17),
+                     aadlu56(18),
+                     aadlu60(19),
+                     aadlu64(20),
+                     aadlu128(21),
+                     b81(22),
+                     b82(23),
+                     b83(24),
+                     b84(25),
+                     b85(26),
+                     b86(27),
+                     b87(28),
+                     b88(29),
+                     b89(30),
+                     b810(31),
+                     b811(32),
+                     b812(33),
+                     b813(34),
+                     b814(35),
+                     b815(36),
+                     b816(37),
+                     b71(38),
+                     b72(39),
+                     b73(40),
+                     b74(41),
+                     b75(42),
+                     b76(43),
+                     b77(44),
+                     b78(45),
+                     b79(46),
+                     b710(47),
+                     c138b(48),
+                     c276b(49),
+                     c138co(50),
+                     c276co(51),
+                     ctcmisdn(52),
+                     vdsl1qamcompatible(53)
+                 } 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured PSD mask. "
+    ::= { e7VdslPortCfgEntry 18 }
+
+e7VdslPortCfgLastTemplate OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION 
+           "VDSL port configured last template name. "
+    ::= { e7VdslPortCfgEntry 19 }
+
+e7VdslPortCfgBondedInterface OBJECT-TYPE
+    SYNTAX      E7BondedInterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "VDSL port configured as a member of a DSL bonded interface.
+If the DSL bonded interface attribute is not set, value reported will be 0."
+    ::= { e7VdslPortCfgEntry 20 }
+
+e7VdslPortCfgTemplateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslPortCfgTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Vdsl port configuration template entries"
+    ::= { e7VdslPortGroup 5 }
+
+e7VdslPortCfgTemplateEntry OBJECT-TYPE
+    SYNTAX      E7VdslPortCfgTemplateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Vdsl Port configuration template entries"
+    INDEX { e7VdslPortCfgTemplateIndex }
+    ::= { e7VdslPortCfgTemplateTable 1 }
+
+E7VdslPortCfgTemplateEntry ::= SEQUENCE {
+        e7VdslPortCfgTemplateIndex                          Integer32,
+        e7VdslPortCfgTemplateName                           DisplayString,
+        e7VdslPortCfgTemplateServiceType                    INTEGER,
+        e7VdslPortCfgTemplatePathLatency                    INTEGER,
+        e7VdslPortCfgTemplateVdslProfile                    INTEGER,
+        e7VdslPortCfgTemplateDsMinRate                      Integer32,
+        e7VdslPortCfgTemplateDsMaxRate                      Integer32,
+        e7VdslPortCfgTemplateUsMinRate                      Integer32,
+        e7VdslPortCfgTemplateUsMaxRate                      Integer32,
+        e7VdslPortCfgTemplateDsMinInp                       INTEGER,
+        e7VdslPortCfgTemplateUsMinInp                       INTEGER,
+        e7VdslPortCfgTemplateDsInterleaveMaxLatency         Integer32,
+        e7VdslPortCfgTemplateUsInterleaveMaxLatency         Integer32,
+        e7VdslPortCfgTemplateDsMinSnr                       Integer32,
+        e7VdslPortCfgTemplateDsMaxSnr                       Integer32,
+        e7VdslPortCfgTemplateDsTargetSnr                    Integer32,
+        e7VdslPortCfgTemplateUsMinSnr                       Integer32,
+        e7VdslPortCfgTemplateUsMaxSnr                       Integer32,
+        e7VdslPortCfgTemplateUsTargetSnr                    Integer32,
+        e7VdslPortCfgTemplatePsdMask                        INTEGER
+    }
+
+e7VdslPortCfgTemplateIndex OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured template index. "
+    ::= { e7VdslPortCfgTemplateEntry 1 }
+
+e7VdslPortCfgTemplateName OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION 
+           "VDSL port configured template name. "
+    ::= { e7VdslPortCfgTemplateEntry 2 }
+
+e7VdslPortCfgTemplateServiceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    auto(1),
+                    mm(2),
+                    mm2plus(3),
+                    t1413(4),
+                    gdmt(5),
+                    glite(6),
+                    adsl2(7),
+                    adsl2plus(8),
+                    readsl2(9),
+                    annexm(10),
+                    vdsl2(11), 
+                    vdsl2mm(12)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured service type. If template attribute is not
+set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 3 }
+
+e7VdslPortCfgTemplatePathLatency OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    fast(1),
+                    interleaved(2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured latency. If template attribute is not set,
+value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 4 }
+
+e7VdslPortCfgTemplateVdslProfile OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    auto(1),
+                    vdsl8a(2),
+                    vdsl8b(3),
+                    vdsl8c(4),
+                    vdsl8d(5),
+                    vdsl12a(6),
+                    vdsl12b(7),
+                    vdsl17a(8),
+                    vdsl30a(9)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured profile. If template attribute is not set,
+value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 5 }
+
+e7VdslPortCfgTemplateDsMinRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream minimum rate. If template
+attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 6 }
+
+e7VdslPortCfgTemplateDsMaxRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream maximum rate. If template
+attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 7 }
+
+e7VdslPortCfgTemplateUsMinRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream minimum rate. If template attribute
+is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 8 }
+
+e7VdslPortCfgTemplateUsMaxRate OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream maximum rate. If template attribute
+is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 9 }
+
+e7VdslPortCfgTemplateDsMinInp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    none(1),
+                    halfSym(2),
+                    oneSym(3),
+                    twoSym(4),
+                    threeSym(5),
+                    fourSym(6),
+                    fiveSym(7),
+                    sixSym(8),
+                    sevenSym(9),
+                    eightSym(10),
+                    nineSym(11),
+                    tenSym(12),
+                    elevenSym(13),
+                    twelveSym(14),
+                    thirteenSym(15),
+                    fourteenSym(16),
+                    fifteenSym(17),
+                    sixteenSym(18)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream minimum impulse noise protection. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 10 }
+
+e7VdslPortCfgTemplateUsMinInp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    invalid(0),
+                    none(1),
+                    halfSym(2),
+                    oneSym(3),
+                    twoSym(4),
+                    threeSym(5),
+                    fourSym(6),
+                    fiveSym(7),
+                    sixSym(8),
+                    sevenSym(9),
+                    eightSym(10),
+                    nineSym(11),
+                    tenSym(12),
+                    elevenSym(13),
+                    twelveSym(14),
+                    thirteenSym(15),
+                    fourteenSym(16),
+                    fifteenSym(17),
+                    sixteenSym(18)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream minimum impulse noise protection. If
+template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 11 }
+
+e7VdslPortCfgTemplateDsInterleaveMaxLatency OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream interleave maximum latency. A
+value of 0x7FFFFFFF (2147483647) indicates the setting equal to 'auto'. "
+    ::= { e7VdslPortCfgTemplateEntry 12 }
+
+e7VdslPortCfgTemplateUsInterleaveMaxLatency OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream interleave maximum latency. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 13 }
+
+e7VdslPortCfgTemplateDsMinSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream minimum SNR. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 14 }
+
+e7VdslPortCfgTemplateDsMaxSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream maximum SNR. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 15 }
+
+e7VdslPortCfgTemplateDsTargetSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured downstream target SNR. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 16 }
+
+e7VdslPortCfgTemplateUsMinSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream minimum SNR. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647). "
+    ::= { e7VdslPortCfgTemplateEntry 17 }
+
+e7VdslPortCfgTemplateUsMaxSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream maximum SNR. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 18 }
+
+e7VdslPortCfgTemplateUsTargetSnr OBJECT-TYPE
+    SYNTAX       Integer32 
+    UNITS        "0.1 dB"
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured upstream target SNR. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647)."
+    ::= { e7VdslPortCfgTemplateEntry 19 }
+
+e7VdslPortCfgTemplatePsdMask OBJECT-TYPE
+    SYNTAX       INTEGER {
+                     anus0(1),
+                     aeu32(2),
+                     aeu36(3),
+                     aeu40(4),
+                     aeu44(5),
+                     aeu48(6),
+                     aeu52(7),
+                     aeu56(8),
+                     aeu60(9),
+                     aeu64(10),
+                     aeu128(11),
+                     aadlu32(12),
+                     aadlu36(13),
+                     aadlu40(14),
+                     aadlu44(15),
+                     aadlu48(16),
+                     aadlu52(17),
+                     aadlu56(18),
+                     aadlu60(19),
+                     aadlu64(20),
+                     aadlu128(21),
+                     b81(22),
+                     b82(23),
+                     b83(24),
+                     b84(25),
+                     b85(26),
+                     b86(27),
+                     b87(28),
+                     b88(29),
+                     b89(30),
+                     b810(31),
+                     b811(32),
+                     b812(33),
+                     b813(34),
+                     b814(35),
+                     b815(36),
+                     b816(37),
+                     b71(38),
+                     b72(39),
+                     b73(40),
+                     b74(41),
+                     b75(42),
+                     b76(43),
+                     b77(44),
+                     b78(45),
+                     b79(46),
+                     b710(47),
+                     c138b(48),
+                     c276b(49),
+                     c138co(50),
+                     c276co(51),
+                     ctcmisdn(52),
+                     vdsl1qamcompatible(53)
+                 } 
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+           "VDSL port configured PSD mask. If template attribute is not set, value reported will be 0x7FFFFFFF (2147483647). "
+    ::= { e7VdslPortCfgTemplateEntry 20 }
+
+e7VdslPortPerfIntervalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslPortPerfIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains Vdsl port performance monitoring entries"
+    ::= { e7VdslPortGroup 6 }
+
+e7VdslPortPerfIntervalEntry OBJECT-TYPE
+    SYNTAX      E7VdslPortPerfIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to Vdsl Port performance
+monitoring entries"
+    INDEX { ifIndex, e7VdslPortPerfIntervalPhysSide,
+e7VdslPortPerfIntervalNumber }
+    ::= { e7VdslPortPerfIntervalTable 1 }
+
+E7VdslPortPerfIntervalEntry ::= SEQUENCE {
+        e7VdslPortPerfIntervalPhysSide                           Integer32,
+        e7VdslPortPerfIntervalNumber                             Integer32,
+        e7VdslPortPerfIntervalUAS                                Integer32
+    }
+
+e7VdslPortPerfIntervalPhysSide OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+           "VDSL port performance interval phyical side. "
+    ::= { e7VdslPortPerfIntervalEntry 1 }
+
+e7VdslPortPerfIntervalNumber OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+           "VDSL port performance interval number. "
+    ::= { e7VdslPortPerfIntervalEntry 2 }
+
+e7VdslPortPerfIntervalUAS OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION 
+           "VDSL port performance interval unavailable seconds. "
+    ::= { e7VdslPortPerfIntervalEntry 3 }
+
+e7VdslBondedInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslBondedInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains DSL bonded interface entries"
+    ::= { e7VdslPortGroup 7 }
+
+e7VdslBondedInterfaceEntry OBJECT-TYPE
+    SYNTAX      E7VdslBondedInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to DSL bonded interface entries"
+    INDEX { e7VdslBondedInterfaceIndex }
+    ::= { e7VdslBondedInterfaceTable 1 }
+
+E7VdslBondedInterfaceEntry ::= SEQUENCE {
+    e7VdslBondedInterfaceIndex        E7BondedInterfaceIndex,
+    e7VdslBondedInterfaceName         DisplayString
+    e7VdslBondedInterfaceAdminStatus  E7AdminStatus 
+    e7VdslBondedInterfaceOperStatus   E7OperStatus
+    e7VdslBondedInterfaceBondState    E7XdslGrpOperStatus
+    e7VdslBondedInterfaceDSRate       Integer32
+    e7VdslBondedInterfaceUSRate       Integer32
+    e7VdslBondedInterfaceActPorts     DisplayString 
+    e7VdslBondedInterfaceInActPorts   DisplayString 
+    
+    }
+
+e7VdslBondedInterfaceIndex OBJECT-TYPE
+    SYNTAX      E7BondedInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "DSL bonded interface index."
+    ::= { e7VdslBondedInterfaceEntry 1 }
+
+e7VdslBondedInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The textual name of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 2 }
+
+e7VdslBondedInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX      E7AdminStatus 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The admin status of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 3 }
+
+e7VdslBondedInterfaceOperStatus OBJECT-TYPE
+    SYNTAX      E7OperStatus 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The operator status of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 4 }
+
+e7VdslBondedInterfaceBondState OBJECT-TYPE
+    SYNTAX      E7XdslGrpOperStatus 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The bonding status of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 5 }
+
+e7VdslBondedInterfaceDSRate OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Downstream rate of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 6 }
+
+e7VdslBondedInterfaceUSRate OBJECT-TYPE
+    SYNTAX      Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Upstream rate of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 7 }
+
+e7VdslBondedInterfaceActPorts OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The active ports of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 8 }
+
+e7VdslBondedInterfaceInActPorts OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The inactive ports of the DSL bonded interface."
+    ::= { e7VdslBondedInterfaceEntry 9 }
+
+e7VdslStackTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF E7VdslStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Contains DSL bonded interface member entries"
+    ::= { e7VdslPortGroup 8 }
+
+e7VdslStackEntry OBJECT-TYPE
+    SYNTAX      E7VdslStackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of attributes related to DSL bonded interface member entries"
+    INDEX { e7VdslStackBondedInterfaceIndex, e7VdslStackVdslPort }
+    ::= { e7VdslStackTable 1 }
+
+E7VdslStackEntry ::= SEQUENCE {
+    e7VdslStackBondedInterfaceIndex    E7BondedInterfaceIndex,
+    e7VdslStackVdslPort           InterfaceIndex,
+    e7VdslStackStatus             RowStatus
+    }
+
+e7VdslStackBondedInterfaceIndex OBJECT-TYPE
+    SYNTAX      E7BondedInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "DSL bonded interface index."
+    ::= { e7VdslStackEntry 1 }
+
+e7VdslStackVdslPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The ifIndex of VDSL Port."
+    ::= { e7VdslStackEntry 2 }
+
+e7VdslStackStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the relationship between a DSL bonded interface and a VDSL port.
+        Only 'active' is appropriate for this object."
+    ::= { e7VdslStackEntry 3 }
+
+END

@@ -1,0 +1,129 @@
+<?php
+
+/* Copyright (C) 2014 Daniel Preussker <f0o@devilcode.org>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
+
+/**
+ * Alert Templates
+ *
+ * @author f0o <f0o@devilcode.org>
+ * @copyright 2014 f0o, LibreNMS
+ * @license GPL
+ */
+
+use App\Models\AlertTemplate;
+use App\Models\Device;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Alert\AlertData;
+
+$status = 'error';
+
+if (Gate::none(['alert-template.create', 'alert-template.update'])) {
+    header('Content-Type: application/json');
+    $response = ['status' => $status, 'message' => 'You need permission'];
+    exit(json_encode($response));
+}
+
+$rules = explode(',', $vars['rules'] ?? '');
+
+try {
+    // create some test data to check the template
+    $test_data = [
+        'id' => 0,
+        'rule' => 'test',
+        'name' => 'Test Rule',
+        'severity' => 'critical',
+        'extra' => '',
+        'disabled' => 0,
+        'query' => '',
+        'builder' => [],
+        'proc' => '',
+        'invert_map' => 0,
+        'notes' => '',
+    ];
+    $test_device = new Device(['hostname' => 'test']);
+    $test_device->device_id = 0;
+    $test_data['alert'] = new AlertData(AlertData::testData($test_device));
+
+    Blade::render($vars['template'], $test_data);
+    Blade::render($vars['title'], $test_data);
+    Blade::render($vars['title_rec'], $test_data);
+
+    $template_id = 0;
+    $template_newid = 0;
+    $create = true;
+
+    $name = strip_tags((string) $vars['name']);
+    if (! empty($name)) {
+        if ($vars['template'] && is_numeric($vars['template_id'])) {
+            // Update template
+            $template = AlertTemplate::findOrFail($vars['template_id']);
+            Gate::authorize('update', $template);
+            $template->template = $vars['template'];
+            $template->name = $name;
+            $template->title = $vars['title'];
+            $template->title_rec = $vars['title_rec'];
+            $create = false;
+            $template_id = $template->id;
+            if ($template->save()) {
+                $status = 'ok';
+            } else {
+                $message = 'Failed to update the template';
+            }
+        } elseif ($vars['template']) {
+            // Create template
+            Gate::authorize('create', AlertTemplate::class);
+            if ($name != 'Default Alert Template') {
+                $template_newid = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates');
+                if ($template_newid != false) {
+                    $template_id = $template_newid;
+                    $status = 'ok';
+                } else {
+                    $message = 'Could not create alert template';
+                }
+            } else {
+                $message = 'This template name is reserved!';
+            }
+        } else {
+            $message = 'We could not work out what you wanted to do!';
+        }
+        if ($status == 'ok') {
+            $alertRulesOk = true;
+            \App\Models\AlertTemplateMap::where('alert_templates_id', $template_id)->delete();
+
+            foreach ($rules as $rule_id) {
+                if (! dbInsert(['alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id], 'alert_template_map')) {
+                    $alertRulesOk = false;
+                }
+            }
+
+            if ($alertRulesOk) {
+                $status = 'ok';
+                $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' and attached rules have been updated.';
+            } else {
+                $status = 'warning';
+                $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' but some attached rules have not been updated.';
+            }
+        }
+    } else {
+        $message = "You haven't given name to your template";
+    }
+} catch (Exception $e) {
+    $message = 'Template failed to be parsed, please check the syntax. ';
+    $message .= $e->getMessage();
+}
+
+$response = ['status' => htmlentities($status), 'message' => htmlentities((string) $message), 'newid' => $template_newid ?? null];
+
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

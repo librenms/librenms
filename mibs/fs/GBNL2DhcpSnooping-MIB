@@ -1,0 +1,192 @@
+    GBNL2DhcpSnooping-MIB  DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter32,
+        TimeTicks, IpAddress                    FROM SNMPv2-SMI
+        DisplayString, TruthValue,RowStatus     FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+
+        gbnL2                                   FROM ADMIN-MASTER-MIB;
+
+    gbnL2DhcpSnooping  MODULE-IDENTITY
+        LAST-UPDATED    "0105030000Z"  -- May 03,2001
+        ORGANIZATION    "New admin Co., Ltd."
+        CONTACT-INFO    "New admin Co., Ltd.
+                         E-mail: support@newzyxel.com"
+
+        DESCRIPTION     "ADMIN Enterprise MIB definition."
+
+        REVISION        "0105030000Z"  -- May 03,2001
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL2 8 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+    dhcpsnoopingOnOff OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "start/stop dhcpsnooping.Default is off。"
+            --开启关闭Dhcpsnooping功能。
+        ::= { gbnL2DhcpSnooping 1 }
+
+    dhcpsnoopingPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DhcpsnoopingPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains port informations of dhcpsnooping."
+            --DHCPSnooping的端口信息表。
+        ::= { gbnL2DhcpSnooping 2 }
+
+    dhcpsnoopingPortEntry OBJECT-TYPE
+        SYNTAX      DhcpsnoopingPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Port informations of dhcpsnooping. This is indexed
+            by the port number."
+            --DHCPSnooping的端口信息表，以端口号为索引。
+        INDEX { portIndex }
+        ::= { dhcpsnoopingPortTable 1 }
+
+    DhcpsnoopingPortEntry ::=
+    SEQUENCE {
+        portIndex
+           INTEGER,
+        portTrustMode
+           INTEGER,
+        portMaxNum
+           INTEGER,
+        portIpSourceGuardMode
+           INTEGER
+    }
+
+    portIndex OBJECT-TYPE
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Index of the port."
+            --端口索引，也就是端口号
+        ::= { dhcpsnoopingPortEntry 1 }
+
+    portTrustMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        trust(1),
+        untrust(2)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Port mode of dhcpsnooping.Default is untrust."
+        --端口模式，默认为untrust。
+    ::= { dhcpsnoopingPortEntry 2 }
+
+    portMaxNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max clients in this port.Range is from 0 to 2048.Default is 2048."
+            --端口最多可以学习到的DHCP客户端，取值范围为0~2048。默认为2048。
+        ::= { dhcpsnoopingPortEntry 3 }
+
+    portIpSourceGuardMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        ip(1),
+        ipMac(2),
+        ipMacVlan(3),
+        off(4)
+    }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Port IP source guard mode .Default is off."
+        --端口IP地址保护模式，默认为关闭。
+    ::= { dhcpsnoopingPortEntry 4 }
+
+    dhcpsnoopingVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DhcpsnoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table that contains vlan informations of dhcpsnooping."
+            --DHCPSnooping的VLAN信息表。
+        ::= { gbnL2DhcpSnooping 3 }
+
+    dhcpsnoopingVlanEntry OBJECT-TYPE
+        SYNTAX      DhcpsnoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "VLAN informations of dhcpsnooping. This is indexed
+            by the vlan number."
+            --DHCPSnooping的VLAN信息表，以VLAN号为索引。
+        INDEX { vlanIndex }
+        ::= { dhcpsnoopingVlanTable 1 }
+
+    DhcpsnoopingVlanEntry ::=
+    SEQUENCE {
+        vlanIndex
+           INTEGER,
+        vlanMaxNum
+           INTEGER,
+        vlandhcpsnoopingOnOff
+           TruthValue
+    }
+
+    vlanIndex OBJECT-TYPE
+        SYNTAX       INTEGER (1..4094)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "The Index of the vlan."
+            --VLAN索引，也就是VLAN号
+        ::= { dhcpsnoopingVlanEntry 1 }    
+        
+    vlanMaxNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Max clients in this vlan.Range is from 0 to 2048.Default is 2048."
+            --VLAN最多可以学习到的DHCP客户端，取值范围为0~2048。默认为2048。
+        ::= { dhcpsnoopingVlanEntry 2 }
+
+    vlandhcpsnoopingOnOff OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "start/stop dhcpsnooping of this vlan.Default is on。" 
+            --开启关闭VLAN Dhcpsnooping功能。
+        ::= { dhcpsnoopingVlanEntry 3 }
+        
+    dhcpsnoopingNto1VlanOnOff OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "start/stop N:1 vlan.Default is off." 
+            --开启关闭N:1 vlan功能。
+        ::= { gbnL2DhcpSnooping 4 }
+        
+    dhcpsnoopingPortDownAction OBJECT-TYPE
+        SYNTAX     INTEGER {
+            fastRemove(1),
+            autoAging(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When port moves to down state, if fast-remove is enabled, switch will remove entries immediately,
+             if auto-aging is enabled, switch will wait until lease time expires and remove entries." 
+        ::= { gbnL2DhcpSnooping 5 }
+        
+END

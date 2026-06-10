@@ -1,0 +1,1199 @@
+-- *****************************************************************
+-- CISCO-PRIVATE-VLAN-MIB - Cisco Private Vlan MIB
+--
+-- June 2001, Liwei Wang 
+-- June 2002, Prasanna Parthasarathy 
+--
+-- Copyright (c) 2001-2002, 2005-2006 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-PRIVATE-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI
+    vtpVlanEntry, vtpVlanEditEntry        
+        FROM CISCO-VTP-MIB
+    ifIndex
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF;
+
+ciscoPrivateVlanMIB MODULE-IDENTITY
+    LAST-UPDATED "200509080000Z"
+    ORGANIZATION "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+             Customer Service
+
+             Postal: 170 W Tasman Drive
+             San Jose, CA  95134
+             USA
+
+             Tel: +1 800 553-NETS
+
+             E-mail: cs-wbu@cisco.com"
+    DESCRIPTION
+             "The MIB module to support Private VLAN feature on
+             Cisco's switching devices."
+    REVISION "200509080000Z"
+    DESCRIPTION
+             "Added support for Private VLAN Promiscuous Trunk Ports. 
+             by adding a new mode type"
+
+    REVISION "200207240000Z"
+    DESCRIPTION
+             "Added support for Private VLAN Trunk Ports. Added the
+             TCs for VlanIndex Bitmaps"
+    REVISION "200105230000Z"
+    DESCRIPTION 
+            "Added support for Private VLAN port mode and SVI 
+            mapping." 
+    REVISION "200104170000Z"
+    DESCRIPTION
+            " The Initial version of this MIB module."
+    ::= { ciscoMgmt 173 } 
+
+
+-- 
+-- Textual Conventions
+--
+
+PrivateVlanType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "The VLAN type as defined for Private VLAN feature.
+
+            'normal' -- this VLAN is a normal VLAN (i.e., not a 
+                        private VLAN or private group).
+
+            'primary' -- this VLAN is the primary VLAN as defined for
+                         Private VLAN feature.
+
+            'isolated' -- this VLAN is the isolated VLAN as
+                          defined for Private VLAN feature. All the 
+                          ports in the isolated VLAN can only talk 
+                          to the specifically designated ports 
+                          configured as promiscuous ports, i.e., 
+                          the ports even in the same isolated VLAN 
+                          can not talk to each other. 
+
+                          Promiscuous ports are the ports that
+                          are performing the L2 mapping of the 
+                          secondary VLANs (isolated, community, 
+                          twoWayCommunity VLANs)  to their 
+                          associated primary VLANs. Promiscuous 
+                          ports with cpvlanPromPortTwoWayRemapCapable 
+                          values of true(1) can also perform the L2 
+                          mapping of primary VLANS to the 
+                          twoWayCommunity (5) VLANs associated with 
+                          them.
+            
+             'community' -- this VLAN is the community VLAN as
+                           defined for Private VLAN feature. All the 
+                           ports in this community VLAN can behave 
+                           like ports in normal VLAN type except 
+                           that they can also receive egress packets 
+                           tagged with its associated primary VLAN 
+                           ID. 
+
+             'twoWayCommunity' -- this VLAN is the twoWayCommunity
+                           VLAN as defined for Private VLAN feature.
+                           All the ports in this twoWayCommunity VLAN
+                           behave the same as ports in community(4)
+                           VLAN. Promiscuous ports with  
+                           cpvlanPromPortTwoWayRemapCapable value
+                           of true can also perform the L2 mapping 
+                           from primary VLANs to the twoWayCommunity
+                           VLANs associated with them.  
+                           
+             A VLAN of isolated(3), community(4) or twoWayCommunity(5)
+             type is also called a secondary VLAN."
+    SYNTAX     INTEGER {
+                       normal(1),
+                       primary(2),
+                       isolated(3),
+                       community(4),
+                       twoWayCommunity(5)
+               }
+
+VlanIndexOrZero ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+            "The VLAN ID or zero as defined for Private VLAN
+            feature. If the value is between 1 and 4095
+            inclusive, it represents an IEEE 802.1Q VLAN-ID.
+            If the value is zero, it is object-specific and
+            must therefore be defined as part of the
+            description of any object which uses this syntax."
+    SYNTAX    INTEGER(0..4095)
+                 
+VlanIndexBitmap ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for a 
+            total of 1024 VLANs in the management domain.  
+            The most significant bit of the octet string is the 
+            lowest value VLAN of 1024 VLANs.
+
+            Refer to the description on the MIB object that
+            uses this textual convention to determine the meaning
+            of bits that are set ('1') or cleared ('0').
+
+            The most significant bit of the bitmap is transmitted 
+            first. Note that if the length of this string is less than
+            128 octets, any 'missing' octets are assumed to contain
+            the value zero. An NMS may omit any zero-valued octets
+            from the end of this string in order to reduce SetPDU
+            size, and the agent may also omit zero-valued trailing
+            octets, to reduce the size of GetResponse PDUs."
+
+    SYNTAX    OCTET STRING (SIZE (0..128))
+
+
+cpvlanMIBObjects OBJECT IDENTIFIER ::= { ciscoPrivateVlanMIB 1 }
+ 
+cpvlanVlanObjects OBJECT IDENTIFIER ::= { cpvlanMIBObjects 1 }
+
+cpvlanPortObjects OBJECT IDENTIFIER ::= { cpvlanMIBObjects 2 }
+
+cpvlanSVIObjects  OBJECT IDENTIFIER ::= { cpvlanMIBObjects 3 }
+
+--
+-- VLAN tables for Private VLAN feature
+--
+
+cpvlanVlanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpvlanVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+            "A table containing Private VLAN information on the 
+            VLANs which currently exist."
+    ::= { cpvlanVlanObjects 1 }
+ 
+cpvlanVlanEntry OBJECT-TYPE
+    SYNTAX      CpvlanVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row containing the Private VLAN 
+            information on the VLANs for a particular management 
+            domain."
+    AUGMENTS   { vtpVlanEntry }
+    ::= { cpvlanVlanTable 1 }
+
+CpvlanVlanEntry ::= SEQUENCE {
+    cpvlanVlanPrivateVlanType PrivateVlanType,
+    cpvlanVlanAssociatedPrimaryVlan VlanIndexOrZero 
+}     
+
+cpvlanVlanPrivateVlanType OBJECT-TYPE
+    SYNTAX     PrivateVlanType 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+            "Indicated the VLAN type as defined for Private VLAN 
+            feature."
+    ::= { cpvlanVlanEntry 1 }
+
+cpvlanVlanAssociatedPrimaryVlan OBJECT-TYPE
+    SYNTAX     VlanIndexOrZero 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION 
+            "The VLAN ID of The associated primary VLAN used for 
+            the Private VLAN feature if cpvlanVlanPrivateVlanType 
+            has the value of isolated(3), community(4) or 
+            twoWayCommunity(5). If cpvlanVlanPrivateVlanType 
+            has the value of normal(1) or primary(2), then this 
+            object has the value of 0.
+
+            Note that one isolated VLAN can only be associated with 
+            one unique primary VLAN. One primary VLAN can only be 
+            associated with one isolated VLAN.
+
+            One primary VLAN can be associated with multiple VLANs 
+            of community or twoWayCommunity type; one community
+            or twoWayCommunity VLAN can only be associated with one 
+            unique primary VLAN."
+     ::= { cpvlanVlanEntry 2 }
+
+cpvlanVlanEditTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpvlanVlanEditEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing Private VLAN information on the VLANs 
+            in the VLAN Edit Buffer for a particular management 
+            domain." 
+    ::= { cpvlanVlanObjects 2 }
+
+cpvlanVlanEditEntry OBJECT-TYPE
+    SYNTAX      CpvlanVlanEditEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row containing the Private VLAN information 
+            on the VLANs in the VLAN Edit Buffer for a particular 
+            management domain."
+    AUGMENTS   { vtpVlanEditEntry }
+    ::= { cpvlanVlanEditTable 1 }
+
+CpvlanVlanEditEntry ::= SEQUENCE {
+    cpvlanVlanEditPrivateVlanType PrivateVlanType,
+    cpvlanVlanEditAssocPrimaryVlan VlanIndexOrZero 
+}
+
+cpvlanVlanEditPrivateVlanType OBJECT-TYPE
+    SYNTAX     PrivateVlanType 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The VLAN type as defined for Private VLAN feature.
+
+            Note that a VLAN's Private VLAN type can not be 
+            changed once it already has any ports in it."  
+    DEFVAL     { normal }
+    ::= { cpvlanVlanEditEntry 1 }
+
+cpvlanVlanEditAssocPrimaryVlan OBJECT-TYPE
+    SYNTAX     VlanIndexOrZero 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The VLAN ID of the associated primary VLAN used for 
+            the Private VLAN feature if 
+            cpvlanVlanEditPrivateVlanType has the value of 
+            isolated(3), community(4), twoWayCommunity(5). If 
+            cpvlanVlanEditPrivateVlanType has the value of normal(1) 
+            or primary(2), then this object has the value of 0.
+
+            Note that one isolated VLAN can only be associated 
+            with one unique primary VLAN. One primary VLAN can only 
+            be associated with one isolated VLAN.
+
+            One primary VLAN can be associated with multiple VLANs 
+            of community or twoWayCommunity type; one community 
+            or twoWayCommunity VLAN can only be associated with one 
+            unique primary VLAN."
+     DEFVAL   { 0 }
+     ::= { cpvlanVlanEditEntry 2 }
+
+--
+-- Table for configuring secondary VLAN on private ports
+--
+
+cpvlanPrivatePortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CpvlanPrivatePortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A table containing information of the configuration of 
+            secondary VLAN on the ports of the device."
+    ::= { cpvlanPortObjects 1 }
+
+cpvlanPrivatePortEntry OBJECT-TYPE
+    SYNTAX     CpvlanPrivatePortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A conceptual row containing information of the 
+            configuration of secondary VLAN for each port. An entry 
+            is created by the managed system for each interface which
+            can be configured as a private port for Private VLAN 
+            feature."
+    INDEX      { ifIndex }
+    ::= { cpvlanPrivatePortTable 1 }
+
+CpvlanPrivatePortEntry ::= SEQUENCE {
+    cpvlanPrivatePortSecondaryVlan  VlanIndexOrZero
+}
+
+cpvlanPrivatePortSecondaryVlan OBJECT-TYPE
+    SYNTAX     VlanIndexOrZero
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The VLAN ID of the secondary VLAN configured on this 
+            private port. A private port is a port that allows 
+            the ingress traffic of the secondary VLAN as well as 
+            egress traffic of its associated primary VLAN, but 
+            blocks the egress traffic of the isolated VLAN while 
+            allowing the egress traffic of the community 
+            or twoWayCommunity VLAN depending on the type of the 
+            secondary VLAN. 
+
+            Note that a port can join a secondary VLAN only after 
+            this secondary VLAN has been associated with a primary 
+            VLAN, i.e., the cpvlanVlanAssociatedPrimaryVlan has a 
+            non-zero value.  The default value of 0 for this object 
+            means this port has not joined any secondary VLAN yet."
+    DEFVAL     { 0 }
+    ::= { cpvlanPrivatePortEntry 1 }    
+
+--
+-- Table for remapping secondary VLAN to primary VLAN on promiscuous 
+-- ports for Private VLAN feature 
+--
+
+cpvlanPromPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CpvlanPromPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A table containing information of secondary VLAN to 
+            primary VLAN remapping on ports of the device."
+    ::= { cpvlanPortObjects 2 }
+
+cpvlanPromPortEntry OBJECT-TYPE
+    SYNTAX     CpvlanPromPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A conceptual row containing information of secondary 
+            VLAN to primary VLAN remapping for each port. An entry 
+            is created by the managed system for each interface
+            which can be configured as a promiscuous port for 
+            Private VLAN feature."
+    INDEX      { ifIndex }
+    ::= { cpvlanPromPortTable 1 }
+ 
+CpvlanPromPortEntry ::= SEQUENCE {
+    cpvlanPromPortMultiPrimaryVlan     TruthValue,
+    cpvlanPromPortSecondaryRemap       OCTET STRING,
+    cpvlanPromPortSecondaryRemap2k     OCTET STRING,
+    cpvlanPromPortSecondaryRemap3k     OCTET STRING,
+    cpvlanPromPortSecondaryRemap4k     OCTET STRING,
+    cpvlanPromPortTwoWayRemapCapable TruthValue
+} 
+
+cpvlanPromPortMultiPrimaryVlan OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates whether all the bits set as secondary VLANs
+            in the corresponding remapping objects (i.e.
+            cpvlanPromPortSecondaryRemap,
+            cpvlanPromPortSecondaryRemap2k,
+            cpvlanPromPortSecondaryRemap3k,
+            cpvlanPromPortSecondaryRemap4k) can belong to multiple
+            primary VLANs or not for this port. If this object value
+            is false(2), then the object values of 
+            cpvlanVlanAssociatedPrimaryVlan for the secondary VLANs 
+            with their bits turned on as '1' in those remapping 
+            objects must be the same. If this object value is 
+            true(1), then the object values of 
+            cpvlanVlanAssociatedPrimaryVlan for the secondary VLANs 
+            with their bits turned on as '1' in those remapping 
+            objects need not be the same. 
+    
+            A promiscuous port can remap a secondary VLAN to its 
+            associated primary VLAN for egress traffic on the fly 
+            as defined for Private VLAN feature."
+    ::= { cpvlanPromPortEntry 1 } 
+
+cpvlanPromPortSecondaryRemap OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN in the
+            management domain on this port.  The first octet
+            corresponds to VLANs with VlanIndexOrZero values of 0 
+            through 7; the second octet to VLANs 8 through 15; etc.  
+            The most significant bit of each octet corresponds to 
+            the lowest value VlanIndexOrZero in that octet.
+
+            A bit can only be set to '1' when the bit is 
+            corresponding to a VLAN of Private VLAN isolated, 
+            community or twoWayCommunity type which has already 
+            been associated with a primary VLAN. Setting this bit 
+            to '1' makes this promiscuous port remap the secondary 
+            VLAN to its associated primary VLAN for egress traffic 
+            on the fly, or remap the associated primary VLAN to
+            the secondary VLAN if the secondary VLAN is of 
+            twoWayCommunity type and the object value of 
+            cpvlanPromPortTwoWayRemapCapable for this promiscuous 
+            port is true(1).  
+        
+            Note that if the length of this string is less than
+            128 octets, any 'missing' octets are assumed to contain
+            the value zero. An NMS may omit any zero-valued octets
+            from the end of this string in order to reduce SetPDU 
+            size, and the agent may also omit zero-valued trailing 
+            octets, to reduce the size of GetResponse PDUs."
+    ::= { cpvlanPromPortEntry 2 }
+
+cpvlanPromPortSecondaryRemap2k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+            "A string of octets containing one bit per VLAN  for 
+            VLANs with VlanIndexOrZero values of 1024 through 2047 
+            in the management domain on this port.  The first octet 
+            corresponds to VLANs with VlanIndexOrZero values of 1024 
+            through 1031; the second octet to VLANs 1032 through 
+            1039; etc.  The most significant bit of each octet 
+            corresponds to the lowest value VlanIndexOrZero in 
+            that octet. 
+
+            A bit can only be set to '1' when the bit is 
+            corresponding to a VLAN of Private VLAN isolated or 
+            community type which has already been associated with a 
+            primary VLAN. Setting this bit to '1' makes this 
+            promiscuous port remap the secondary VLAN to its 
+            associated primary VLAN for egress traffic on the fly,
+            or remap the associated primary VLAN to the secondary 
+            VLAN if the secondary VLAN is of twoWayCommunity type 
+            and the object value of cpvlanPromPortTwoWayRemapCapable 
+            for this promiscuous port is true(1). 
+ 
+            Note that if the length of this string is less than
+            128 octets, any 'missing' octets are assumed to contain
+            the value zero. An NMS may omit any zero-valued octets
+            from the end of this string in order to reduce SetPDU 
+            size, and the agent may also omit zero-valued trailing 
+            octets, to reduce the size of GetResponse PDUs.
+
+            This object is only instantiated on devices which support
+            the range of VlanIndexOrZero up to 4095."
+    ::= { cpvlanPromPortEntry 3 }
+
+cpvlanPromPortSecondaryRemap3k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN  for 
+            VLANs with VlanIndexOrZero values of 2048 through 3071 
+            in the management domain on this port.  The first octet 
+            corresponds to VLANs with VlanIndexOrZero values of 2048 
+            through 2055; the second octet to VLANs 2056 through 
+            2063; etc.  The most significant bit of each octet 
+            corresponds to the lowest value VlanIndexOrZero in 
+            that octet.
+
+            A bit can only be set to '1' when the bit is 
+            corresponding to a VLAN of Private VLAN isolated or 
+            community type which has already been associated with a 
+            primary VLAN. Setting this bit to '1' makes this 
+            promiscuous port remap the secondary VLAN to its 
+            associated primary VLAN for egress traffic on the fly, 
+            or remap the associated primary VLAN to the secondary 
+            VLAN if the secondary VLAN is of twoWayCommunity type 
+            and the object value of cpvlanPromPortTwoWayRemapCapable 
+            for this promiscuous port is true(1). 
+
+            Note that if the length of this string is less than
+            128 octets, any 'missing' octets are assumed to contain
+            the value zero. An NMS may omit any zero-valued octets
+            from the end of this string in order to reduce SetPDU 
+            size, and the agent may also omit zero-valued trailing 
+            octets, to reduce the size of GetResponse PDUs.
+
+            This object is only instantiated on devices which support
+            the range of VlanIndexOrZero up to 4095."
+    ::= { cpvlanPromPortEntry 4 }
+
+cpvlanPromPortSecondaryRemap4k OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN  for 
+            VLANs with VlanIndexOrZero values of 3072 through 4095 
+            in the management domain on this port.  The first octet 
+            corresponds to VLANs with VlanIndexOrZero values of 3072 
+            through 3079; the second octet to VLANs 3080 through 
+            3087; etc.  The most significant bit of each octet 
+            corresponds to the lowest value VlanIndexOrZero in 
+            that octet.
+
+            A bit can only be set to '1' when the bit is 
+            corresponding to a VLAN of Private VLAN isolated or 
+            community type which has already been associated with a 
+            primary VLAN. Setting this bit to '1' makes this 
+            promiscuous port remap the secondary VLAN to its 
+            associated primary VLAN for egress traffic on the fly, 
+            or remap the associated primary VLAN to the secondary 
+            VLAN if the secondary VLAN is of twoWayCommunity type 
+            and the object value of cpvlanPromPortTwoWayRemapCapable 
+            for this promiscuous port is true(1). 
+
+            Note that if the length of this string is less than
+            128 octets, any 'missing' octets are assumed to contain
+            the value zero. An NMS may omit any zero-valued octets
+            from the end of this string in order to reduce SetPDU 
+            size, and the agent may also omit zero-valued trailing 
+            octets, to reduce the size of GetResponse PDUs.
+
+            This object is only instantiated on devices which support
+            the range of VlanIndexOrZero up to 4095."
+    ::= { cpvlanPromPortEntry 5 }
+
+cpvlanPromPortTwoWayRemapCapable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates whether the port is capable to perform
+            remapping from primary VLANs to the twoWayCommunity VLANs
+            associated with them for the Private VLAN feature. A 
+            promiscuous port with this object value of false(2) can 
+            only perform one-way remapping from secondary VLANs to 
+            their associated primary VLANs, while a promiscuous port 
+            with this object value of true(1) can also perform 
+            remapping from primary VLANs to the twoWayCommunity VLANs 
+            associated with them in addition to that."
+    ::= { cpvlanPromPortEntry 6 } 
+
+
+--
+-- Table for configuring port mode for Private VLAN feature
+--
+
+cpvlanPortModeTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CpvlanPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A table containing information of the configuration of
+            port mode for the Private VLAN feature."
+    ::= { cpvlanPortObjects 3 }
+
+cpvlanPortModeEntry OBJECT-TYPE
+    SYNTAX     CpvlanPortModeEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A conceptual row containing information of the
+            configuration of port mode on each port for the 
+            Private VLAN feature. An entry of this table is 
+            created by the managed system when the capability
+            to be a Private VLAN port is detected on an 
+            interface." 
+    INDEX      { ifIndex }
+    ::= { cpvlanPortModeTable 1 }
+
+CpvlanPortModeEntry ::= SEQUENCE {
+    cpvlanPortMode INTEGER 
+}
+
+cpvlanPortMode OBJECT-TYPE
+    SYNTAX     INTEGER {
+                       nonPrivateVlan(1), 
+                       host(2),
+                       promiscuous(3),
+                       secondaryTrunk(4),
+                       promiscuousTrunk(5)
+               }        
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The Private VLAN port mode on this port.  
+
+            nonPrivateVlan(1) -- this port is configured to be a
+                                 non-Private-VLAN port.
+
+            host(2) -- this port is configured to be 
+                       a Private-VLAN host port, i.e., private 
+                       port.
+
+            promiscuous(3) -- this port is configured to be
+                              a Private-VLAN promiscuous port.
+
+            secondaryTrunk(4) -- this port is configured to be a
+                        Private-VLAN isolated trunk port or community 
+                        trunk port.
+
+            promiscuousTrunk(5) -- this port is configured to be a
+                        Private-VLAN promiscuous trunk port."
+
+    DEFVAL     { nonPrivateVlan }
+    ::= { cpvlanPortModeEntry 1 }
+
+--
+-- Table for configuring private VLAN trunk ports
+--
+
+cpvlanTrunkPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CpvlanTrunkPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A table containing information of the configuration of 
+             a private vlan trunk port in the device. This includes 
+             secondary and normal allowed VLAN, encapsulation type,
+             trunk native vlan (as applied to private vlan trunks)."
+    ::= { cpvlanPortObjects 4 }
+
+cpvlanTrunkPortEntry OBJECT-TYPE
+    SYNTAX     CpvlanTrunkPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A conceptual row containing information of the 
+            configuration of one private vlan trunk port. An entry 
+            is created by the managed system for each interface which
+            can be configured as a private vlan trunk port"
+    INDEX      { ifIndex }
+    ::= { cpvlanTrunkPortTable 1 }
+
+CpvlanTrunkPortEntry ::= SEQUENCE {
+    cpvlanTrunkPortDynamicState          INTEGER,
+    cpvlanTrunkPortEncapType             INTEGER,
+    cpvlanTrunkPortNativeVlan            VlanIndexOrZero,
+    cpvlanTrunkPortSecondaryVlans        VlanIndexBitmap,
+    cpvlanTrunkPortSecondaryVlans2k      VlanIndexBitmap,
+    cpvlanTrunkPortSecondaryVlans3k      VlanIndexBitmap,
+    cpvlanTrunkPortSecondaryVlans4k      VlanIndexBitmap,
+    cpvlanTrunkPortNormalVlans           VlanIndexBitmap,
+    cpvlanTrunkPortNormalVlans2k         VlanIndexBitmap,
+    cpvlanTrunkPortNormalVlans3k         VlanIndexBitmap,
+    cpvlanTrunkPortNormalVlans4k         VlanIndexBitmap,
+    cpvlanTrunkPortDynamicStatus         INTEGER,
+    cpvlanTrunkPortEncapOperType         INTEGER
+}
+
+cpvlanTrunkPortDynamicState OBJECT-TYPE
+    SYNTAX     INTEGER { on(1), onNoNegotiate(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "For private VLAN trunk ports, this object allows the
+            operator to mandate the trunking behavior of the port
+
+            on(1) dictates that the private VLAN port will always be a
+            trunk. If the negotiation is supported on this port, 
+            negotiation will take place with the far end to attempt to
+            bring the far end into trunking state.
+
+            onNoNegotiate(2) is used to indicate that the interface is
+            permanently set to be a trunk, and no negotiation takes
+            place with the far end on the link to ensure consistent
+            operation. This is similar to on(1) except no negotiation
+            takes place with the far end.
+
+            If a port does not support negotiation, the value of on(1)
+            is not allowed. If the port's cpvlanTrunkPortEncapType is 
+            set to negotiate(3), onNoNegotiate(2) is not allowed."
+
+       ::= { cpvlanTrunkPortEntry 1 }
+
+cpvlanTrunkPortEncapType OBJECT-TYPE
+    SYNTAX     INTEGER { dot1Q(1), isl(2), negotiate(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The type of VLAN encapsulation desired to be used on this
+             private vlan trunk port. 
+
+             It is either a particular type, or 'negotiate'  meaning 
+             whatever type results from the negotiation.
+
+             dot1Q(1) indicates that the port should accept and transmit
+             packets with IEEE 802.1q VLAN encapsulation
+
+             isl(2) indicates that the port should accept and transmit 
+             packets with Inter Switch Link (ISL) VLAN encapsulation
+
+             negotiate(3) indicates that the VLAN encapsulation is
+             negotiated with the far end. The negotiated VLAN 
+             encapsulation can be dot1Q or  isl. negotiate(2) is not 
+             allowed if the port does not support negotiation of 
+             VLAN encapsulation type or if its 
+             cpvlanTrunkPortDynamicState is set to onNoNegotiate(2)"
+
+    ::= { cpvlanTrunkPortEntry 2 }
+
+cpvlanTrunkPortNativeVlan OBJECT-TYPE
+    SYNTAX     VlanIndexOrZero
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The VlanIndex of the VLAN which is represented by native
+             frames on this private vlan trunk port. For private vlan 
+             trunk ports that need to drop untagged frames or not
+             supporting the sending and receiving of native frames, 
+             this value should be set to zero"
+    ::= { cpvlanTrunkPortEntry 3 }
+
+cpvlanTrunkPortSecondaryVlans OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for VLANs
+            with values of 0 through 1023 in the management domain
+            on this port. 
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a secondary VLAN that has already been 
+            associated with a primary VLAN, it allows this private
+            VLAN trunk port to remap the secondary VLAN to its primary
+            VLAN for ingress traffic and to remap its associated primary
+            VLAN to the secondary VLAN for egress traffic.
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a secondary VLAN, then the local
+            system is enabled to transmit and receive frames with 
+            proper VLAN remapping via this Private VLAN trunk port.
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a normal VLAN,
+            then the system is disabled from sending and receiving 
+            frames on that VLAN via this Private VLAN trunk port."
+ 
+    ::= { cpvlanTrunkPortEntry 4 }
+
+cpvlanTrunkPortSecondaryVlans2k OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+            "A string of octets containing one bit per VLAN for VLANs 
+            with values of 1024 through 2047 in the management domain
+            on this port. 
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a secondary VLAN that has already been 
+            associated with a primary VLAN, it allows this private
+            VLAN trunk port to remap the secondary VLAN to its primary
+            VLAN for ingress traffic and to remap its associated primary
+            VLAN to the secondary VLAN for egress traffic.
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a secondary VLAN, then the local
+            system is enabled to transmit and receive frames with 
+            proper VLAN remapping via this Private VLAN trunk port.
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a normal VLAN,
+            then the system is disabled from sending and receiving 
+            frames on that VLAN via this Private VLAN trunk port.
+
+            This object is only instantiated on devices which support
+            the range of VLANs up to 4095."
+
+    ::= { cpvlanTrunkPortEntry 5 }
+
+cpvlanTrunkPortSecondaryVlans3k OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for VLANs 
+            with values of 2048 through 3071 in the management domain 
+            on this port. 
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a secondary VLAN that has already been 
+            associated with a primary VLAN, it allows this private
+            VLAN trunk port to remap the secondary VLAN to its primary
+            VLAN for ingress traffic and to remap its associated primary
+            VLAN to the secondary VLAN for egress traffic.
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a secondary VLAN, then the local
+            system is enabled to transmit and receive frames with 
+            proper VLAN remapping via this Private VLAN trunk port.
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a normal VLAN,
+            then the system is disabled from sending and receiving 
+            frames on that VLAN via this Private VLAN trunk port.
+
+            This object is only instantiated on devices which support
+            the range of up to 4095."
+
+    ::= { cpvlanTrunkPortEntry 6 }
+
+cpvlanTrunkPortSecondaryVlans4k OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for VLANs 
+            with values of 3072 through 4095 in the management domain
+            on this port. 
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a secondary VLAN that has already been 
+            associated with a primary VLAN, it allows this private
+            VLAN trunk port to remap the secondary VLAN to its primary
+            VLAN for ingress traffic and to remap its associated primary
+            VLAN to the secondary VLAN for egress traffic.
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a secondary VLAN, then the local
+            system is enabled to transmit and receive frames with 
+            proper VLAN remapping via this Private VLAN trunk port.
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a normal VLAN,
+            then the system is disabled from sending and receiving 
+            frames on that VLAN via this Private VLAN trunk port.
+
+            This object is only instantiated on devices which support
+            the range of up to 4095."
+
+    ::= { cpvlanTrunkPortEntry 7 }
+
+cpvlanTrunkPortNormalVlans OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for VLANs 
+            with values of 0 through 1023 in the management domain 
+            on this port.
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a normal VLAN, it allows packets belonging to
+            this vlan on this Private VLAN trunk port. 
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a normal VLAN, then the local
+            system is enabled to transmit and receive frames as
+            normal VLAN
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a secondary 
+            VLAN, then the system is disabled from sending and receiving
+            frames on that VLAN via this Private VLAN trunk port."
+
+    ::= { cpvlanTrunkPortEntry 8 }
+
+cpvlanTrunkPortNormalVlans2k OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION 
+            "A string of octets containing one bit per VLAN for VLANs 
+            with values of 1024 through 2047 in the management domain
+            on this port. 
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a normal VLAN, it allows packets belonging to
+            this vlan on this Private VLAN trunk port. 
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a normal VLAN, then the local
+            system is enabled to transmit and receive frames as
+            normal VLAN
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a secondary 
+            VLAN, then the system is disabled from sending and receiving
+            frames on that VLAN via this Private VLAN trunk port. 
+
+            This object is only instantiated on devices which support
+            the range of VlanIndexOrZero up to 4095."
+
+    ::= { cpvlanTrunkPortEntry 9 }
+
+cpvlanTrunkPortNormalVlans3k OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for VLANs 
+            with values of 2048 through 3071 in the management domain
+            on this port. 
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a normal VLAN, it allows packets belonging to
+            this vlan on this Private VLAN trunk port. 
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a normal VLAN, then the local
+            system is enabled to transmit and receive frames as
+            normal VLAN
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a secondary 
+            VLAN, then the system is disabled from sending and receiving
+            frames on that VLAN via this Private VLAN trunk port. 
+
+            This object is only instantiated on devices which support
+            the range of VlanIndexOrZero up to 4095."
+
+    ::= { cpvlanTrunkPortEntry 10 }
+
+cpvlanTrunkPortNormalVlans4k OBJECT-TYPE
+    SYNTAX     VlanIndexBitmap
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "A string of octets containing one bit per VLAN for VLANs
+            with values of 3072 through 4095 in the management domain
+            on this port. 
+
+            If the VLAN represented by setting a bit to '1' in the 
+            bitmap is a normal VLAN, it allows packets belonging to
+            this vlan on this Private VLAN trunk port. 
+
+            If the bit corresponding to a VLAN is set to '1' and if 
+            the corresponding VLAN is a normal VLAN, then the local
+            system is enabled to transmit and receive frames as
+            normal VLAN
+
+            If the bit corresponding to a VLAN is set to '0', and if
+            the corresponding VLAN is not configured as a secondary 
+            VLAN, then the system is disabled from sending and receiving
+            frames on that VLAN via this Private VLAN trunk port. 
+
+            This object is only instantiated on devices which support
+            the range of VlanIndexOrZero up to 4095."
+
+    ::= { cpvlanTrunkPortEntry 11 }
+
+cpvlanTrunkPortDynamicStatus OBJECT-TYPE
+    SYNTAX     INTEGER { trunking(1), notTrunking(2) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "Indicates the current dynamic trunking status of the 
+            specified private VLAN port.
+
+            trunking(1) indicates that the private VLAN port is 
+            currently operating as a private VLAN trunk port
+
+            notTrunking(2) indicates that the private VLAN port
+            is currently not trunking but is operating as an 
+            access port."
+
+ 
+    ::= { cpvlanTrunkPortEntry 12 }
+
+cpvlanTrunkPortEncapOperType OBJECT-TYPE
+    SYNTAX     INTEGER { dot1Q(1), isl(2), notApplicable(3) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The type of VLAN encapsulation in use on this private 
+            vlan trunk port. 
+ 
+            dot1Q(1) indicates that the port accepts and transmits
+            packets with IEEE 802.1q VLAN encapsulation
+
+            isl(2) indicates that the port accepts and transmits 
+            packets with Inter Switch Link (ISL) VLAN encapsulation
+
+            If the cpvlanTrunkPortDynamicStatus is notTrunking(2) or
+            if the encapsulation type negotiation has not been 
+            completed, the object is set to notApplicable(3)."
+      
+
+    ::= { cpvlanTrunkPortEntry 13 }
+
+--
+-- Private VLAN mapping for the Switch Virtual Interfaces  
+--
+
+cpvlanSVIMappingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CpvlanSVIMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing the configuration of 
+            primary VLAN SVI (Switch Virtual Interfaces) 
+            mapping for the secondary VLANs for the Private 
+            VLAN feature."
+    ::= { cpvlanSVIObjects 1 }
+
+cpvlanSVIMappingEntry OBJECT-TYPE
+    SYNTAX      CpvlanSVIMappingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row containing the Primary VLAN 
+            SVI mapping configuration for the existing 
+            secondary VLANs. An entry is created by the managed 
+            system for each VLAN with corresponding VLAN's 
+            cpvlanVlanPrivateVlanType of isolated(3), 
+            community(4), and twoWayCommunity(5)."
+   INDEX      { cpvlanSVIMappingVlanIndex } 
+    ::= { cpvlanSVIMappingTable 1 }
+
+CpvlanSVIMappingEntry ::= SEQUENCE {
+    cpvlanSVIMappingVlanIndex VlanIndexOrZero, 
+    cpvlanSVIMappingPrimarySVI VlanIndexOrZero 
+}
+
+cpvlanSVIMappingVlanIndex OBJECT-TYPE
+    SYNTAX        VlanIndexOrZero
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION 
+            "An index value that uniquely identifies the
+            Virtual LAN associated with this information."
+    ::= { cpvlanSVIMappingEntry 1 }
+
+cpvlanSVIMappingPrimarySVI OBJECT-TYPE
+    SYNTAX     VlanIndexOrZero 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The Vlan ID of the primary VLAN SVI this secondary
+            VLAN is mapped to for the Private VLAN feature. 
+            This object has the value of zero if this secondary 
+            VLAN is not mapped to any primary VLAN SVI."  
+     DEFVAL { 0 }
+     ::= { cpvlanSVIMappingEntry 2 }
+
+--
+-- Conformance Information
+--
+
+cpvlanMIBConformance OBJECT IDENTIFIER ::= { ciscoPrivateVlanMIB 2 }
+cpvlanMIBCompliances OBJECT IDENTIFIER ::= { cpvlanMIBConformance 1 }
+cpvlanMIBGroups      OBJECT IDENTIFIER ::= { cpvlanMIBConformance 2}
+
+--
+-- compliance statements
+--
+
+cpvlanMIBCompliance MODULE-COMPLIANCE
+    STATUS  current 
+    DESCRIPTION
+            "The compliance statement for Private VLAN feature 
+            implementation."
+    MODULE  -- this module
+             -- no MANDATORY-GROUPS
+
+        OBJECT       cpvlanTrunkPortEncapType
+        SYNTAX       INTEGER { dot1Q(1) }
+        MIN-ACCESS   read-only
+        DESCRIPTION  
+                "Write access is not required and only one of the
+                 3 enumerated values for the Private Trunk port 
+                 encapsulation types need to be supported, 
+                 specifically: dot1Q(1)."
+
+        GROUP cpvlanVlanGroup
+        DESCRIPTION 
+                "This group must be implemented on devices which has 
+                Private VLAN feature support."
+        GROUP cpvlanPrivatePortGroup
+        DESCRIPTION 
+                "This group must be implemented on devices which has 
+                Private VLAN feature support."
+        GROUP cpvlanPromPortGroup
+        DESCRIPTION
+                "This group must be implemented on devices which has 
+                support for promiscuous port of Private VLAN feature."
+        GROUP cpvlanPromPort4kGroup
+        DESCRIPTION
+                "This group must be implemented on devices which has 
+                support for promiscuous port of Private VLAN feature 
+                for VlanIndexOrZero range of up to 4095."
+        GROUP cpvlanTrunkPortGroup
+        DESCRIPTION 
+                "This group is mandatory for a managed system which has
+                Private VLAN trunk ports support."
+
+    ::= { cpvlanMIBCompliances 1 }                             
+
+--
+-- units of conformance
+--
+cpvlanVlanGroup OBJECT-GROUP
+    OBJECTS { cpvlanVlanPrivateVlanType,
+              cpvlanVlanAssociatedPrimaryVlan,
+              cpvlanVlanEditPrivateVlanType,
+              cpvlanVlanEditAssocPrimaryVlan 
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic VLAN 
+            configuration for Private VLAN feature."
+    ::= { cpvlanMIBGroups 1 }
+
+cpvlanPrivatePortGroup OBJECT-GROUP
+    OBJECTS { cpvlanPrivatePortSecondaryVlan 
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic 
+            private port configuration for Private VLAN 
+            feature."
+    ::= { cpvlanMIBGroups 2 }
+
+
+cpvlanPromPortGroup OBJECT-GROUP
+    OBJECTS { cpvlanPromPortMultiPrimaryVlan,
+              cpvlanPromPortSecondaryRemap, 
+              cpvlanPromPortTwoWayRemapCapable 
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic 
+            promiscuous port configuration for Private 
+            VLAN feature."
+    ::= { cpvlanMIBGroups 3 }  
+
+cpvlanPromPort4kGroup OBJECT-GROUP
+    OBJECTS { cpvlanPromPortSecondaryRemap2k,
+              cpvlanPromPortSecondaryRemap3k,
+              cpvlanPromPortSecondaryRemap4k
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic promiscuous 
+            port configuration for Private VLAN feature on 
+            devices with VlanIndexOrZero range of up to 4095."   
+    ::= { cpvlanMIBGroups 4 }
+
+cpvlanPortModeGroup OBJECT-GROUP
+    OBJECTS { cpvlanPortMode }
+    STATUS  current
+    DESCRIPTION
+            "This is an optional group with a collection of 
+            objects providing basic port mode configuration for 
+            Private VLAN feature on devices which support 
+            Private VLAN port mode feature."
+    ::= { cpvlanMIBGroups 5 }
+
+cpvlanSVIMappingGroup OBJECT-GROUP
+    OBJECTS { cpvlanSVIMappingPrimarySVI }
+    STATUS  current
+    DESCRIPTION
+            "This is an optional group with a collection of 
+            objects providing primary VLAN SVI mapping
+            configuration for the Private VLAN feature on 
+            devices which support Primary VLAN SVI mapping 
+            feature."
+    ::= { cpvlanMIBGroups 6 }
+
+cpvlanTrunkPortGroup OBJECT-GROUP
+    OBJECTS { cpvlanTrunkPortDynamicState,
+              cpvlanTrunkPortEncapType,
+              cpvlanTrunkPortNativeVlan,
+              cpvlanTrunkPortSecondaryVlans,
+              cpvlanTrunkPortSecondaryVlans2k,
+              cpvlanTrunkPortSecondaryVlans3k,
+              cpvlanTrunkPortSecondaryVlans4k,
+              cpvlanTrunkPortNormalVlans,
+              cpvlanTrunkPortNormalVlans2k,
+              cpvlanTrunkPortNormalVlans3k,
+              cpvlanTrunkPortNormalVlans4k,
+              cpvlanTrunkPortDynamicStatus,
+              cpvlanTrunkPortEncapOperType
+            }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic private VLAN
+            trunk port configuration for Private VLAN feature."
+    ::= { cpvlanMIBGroups 7 }
+
+END 
+

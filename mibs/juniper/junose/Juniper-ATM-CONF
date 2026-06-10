@@ -1,0 +1,1825 @@
+
+-- *****************************************************************************
+-- Juniper-ATM-CONF
+--
+-- SNMP Agent Capabilities definitions for the ATM MIBs.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2005 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-ATM-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniAtmAgent  MODULE-IDENTITY
+    LAST-UPDATED "200508171726Z"  -- 17-Aug-05 01:26 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         The agent capabilities definitions for the ATM component of the SNMP
+         agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200508171726Z"  -- 17-Aug-05 01:26 PM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         Removed SVC support.
+         ATM2-MIB:
+         Removed SVC support."
+    REVISION    "200502172315Z"  -- 17-Feb-05 06:15 PM EST  - JUNOSe 7.1
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         Added circuit OAM support to the ATM VCC end point agent capabilities."
+    REVISION    "200401061953Z"  -- 06-Jan-04 02:53 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added support to export the subinterface description to the line
+         cards."
+    REVISION    "200311071457Z"  -- 07-Nov-03 09:57 AM EST  - JUNOSe 5.2
+    DESCRIPTION
+        "ATM2-MIB:
+         Updated from an Internet Draft to a Proposed Standard (RFC 3606).
+         Juniper-UNI-ATM-MIB:
+         Added ATM sub-interface location support."
+    REVISION    "200305081757Z"  -- 08-May-03 01:57 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         Added ATM F4 OAM circuits management and ATM VP description support."
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200208091415Z"  -- 09-Aug-02 10:15 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "ATM2-MIB:
+         Added support for the atmSigStatTable, the atmAal5VclStatTable and the
+         atmInterfaceExtTable.
+         Juniper-UNI-ATM-MIB:
+         Added receive bandwith support to CAC.
+         Added E164 public addressing support."
+    REVISION    "200201291518Z"  -- 29-Jan-02 10:18 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         Added ATM switched virtual connection (SVC) support to the VCC end
+         point capabilities."
+    REVISION    "200201241416Z"  -- 24-Jan-02 09:16 AM EST  - JUNOSe 3.4
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         Added support for ATM connection admission control (CAC) to the VCC end
+         point capabilities."
+    REVISION    "200112141951Z"  -- 14-Dec-01 02:51 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Juniper-UNI-ATM-MIB:
+         Added ATM traffic shaping capabilities."
+    REVISION    "200105231612Z"  -- 23-May-01 12:12 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 3 }
+
+
+-- *****************************************************************************
+-- ATM VCC end point agent capabilities
+-- *****************************************************************************
+juniAtmVccEndPointAgent  OBJECT IDENTIFIER ::= { juniAtmAgent 1 }
+
+juniAtmVccEndPointAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was
+        supported in JUNOSe 3.0 and 3.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in JUNOSe.
+        These capabilities became obsolete when new objects were added to the
+        juniAtmSubIfGroup and support for the atmfM4IfLoopbackLocationCode
+        object was added."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup }
+    ::= { juniAtmVccEndPointAgent 1 }
+
+juniAtmVccEndPointAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was
+        supported in JUNOSe 3.2 and JUNOSe 3.3 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-UNI-ATM-MIB for connection admission control (CAC)."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup2,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup2,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup }
+    ::= { juniAtmVccEndPointAgent 2 }
+
+juniAtmVccEndPointAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was
+        supported in JUNOSe 3.4 and subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in JUNOSe.
+        These capabilities became obsolete when support was added to the
+        Juniper-UNI-ATM-MIB for switched virtual connection (SVC)."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup3,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup2,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup }
+    ::= { juniAtmVccEndPointAgent 3 }
+
+juniAtmVccEndPointAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was
+        supported in JUNOSe 4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in JUNOSe.
+        These capabilitie became obsolete when CAC recieve bandwith and E164
+        public addressing objects were added."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup4,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup3,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup }
+    ::= { juniAtmVccEndPointAgent 4 }
+
+juniAtmVccEndPointAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was
+        supported in JUNOSe 4.1 thru 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in JUNOSe.
+        These capabilitie became obsolete when F4 flow OAM circuits and ATM VP
+        description objects were added to the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup5,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup4,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2 }
+    ::= { juniAtmVccEndPointAgent 5 }
+
+juniAtmVccEndPointAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was
+        supported in JUNOSe 5.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in JUNOSe.
+        These capabilitie became obsolete when ATM sub-interface location
+        support was added to the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup6,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup4,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2,
+            juniAtmF4OamCircuitGroup }
+    ::= { juniAtmVccEndPointAgent 6 }
+
+juniAtmVccEndPointAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was supported
+        in JUNOSe 5.2 system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in JUNOSe.
+        These capabilitie became obsolete when support was added to export
+        ATM sub-interface descriptions to the line cards."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup6,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup4,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2,
+            juniAtmF4OamCircuitGroup,
+            juniAtmLocationGroup }
+    ::= { juniAtmVccEndPointAgent 7 }
+
+juniAtmVccEndPointAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was supported
+        in JUNOSe 5.3 and 6.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in
+        JUNOSe.  These capabilities became obsolete when ATM bulk configuration
+        profile override was introduced."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup6,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup5,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2,
+            juniAtmF4OamCircuitGroup,
+            juniAtmLocationGroup }
+    ::= { juniAtmVccEndPointAgent 8 }
+
+juniAtmVccEndPointAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent was supported
+        in JUNOSe 6.1 system release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in
+        JUNOSe.  These capabilities became obsolete when ATM bulk configuration
+        profile override was introduced."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup7,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup5,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2,
+            juniAtmF4OamCircuitGroup,
+            juniAtmLocationGroup }
+    ::= { juniAtmVccEndPointAgent 9 }
+
+juniAtmVccEndPointAgentV10  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 10 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent is supported
+        in JUNOSe 7.0 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in
+        JUNOSe.These capabilities became obsolete when ATM VP Statistics
+        was introduced."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup8,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup5,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2,
+            juniAtmF4OamCircuitGroup,
+            juniAtmLocationGroup }
+    ::= { juniAtmVccEndPointAgent 10 }
+
+juniAtmVccEndPointAgentV11  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 11 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent is supported
+        in JUNOSe 7.1 and 7.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in
+        JUNOSe. These capabilities became obsolete when SVC support
+        was removed."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup8,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup6,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2,
+            juniAtmF4OamCircuitGroup2,
+            juniAtmLocationGroup,
+            juniAtmVpStatsGroup }
+    ::= { juniAtmVccEndPointAgent 11 }
+
+juniAtmVccEndPointAgentV12  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 12 of the ATM VCC end point agent subcomponent of the JUNOSe
+        SNMP agent.  This version of the ATM end point subcomponent is supported
+        in JUNOSe 7.3 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the ATM application in
+        JUNOSe."
+    SUPPORTS    ATM-MIB
+        INCLUDES {
+            atmInterfaceTCGroup,
+            aal5VccGroup,
+            atmInterfaceConfGroup2,
+            atmVccTerminationGroup2 }
+        VARIATION   atmVclAdminStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclReceiveTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclTransmitTrafficDescrIndex
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVccAalType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclRowStatus
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclCastType
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+        VARIATION   atmVclConnKind
+            ACCESS      read-only
+            DESCRIPTION
+                "The atmVccTerminationGroup2 is not used for configuring VCCs.
+                Use the Juniper-UNI-ATM-MIB."
+    SUPPORTS    ATM2-MIB
+        INCLUDES {
+            atmCommonGroup,
+            atmHostGroup }
+        VARIATION   atmSigSSCOPConEvents
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigSSCOPErrdPdus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectSetupAttempts
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitSetupAttempts
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectUnavailRoutes
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitUnavailRoutes
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectUnavailResrcs
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitUnavailResrcs
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectCldPtyEvents
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitCldPtyEvents
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectMsgErrors
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitMsgErrors
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectClgPtyEvents
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitClgPtyEvents
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectTimerExpireds
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitTimerExpireds
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigDetectRestarts
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigEmitRestarts
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigInEstabls
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmSigOutEstabls
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmSigStatTable is not supported."
+        VARIATION   atmVplLogicalPortDef
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmVplLogicalPortIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVplLogicalPortTable is not supported."
+        VARIATION   atmInterfaceConfMaxSvpcVpi
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmInterfaceConfMaxSvpcVpi is not supported."
+        VARIATION   atmInterfaceCurrentMaxSvpcVpi
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmInterfaceCurrentMaxSvpcVpi is not supported."
+        VARIATION   atmInterfaceConfMaxSvccVpi
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmInterfaceConfMaxSvccVpi is not supported."
+        VARIATION   atmInterfaceCurrentMaxSvccVpi
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmInterfaceCurrentMaxSvccVpi is not supported."
+        VARIATION   atmInterfaceConfMinSvccVci
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmInterfaceConfMinSvccVci is not supported."
+        VARIATION   atmInterfaceCurrentMinSvccVci
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmInterfaceCurrentMinSvccVci is not supported."
+        VARIATION   atmIntfSigVccRxTrafficDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmIntfSigVccRxTrafficDescrIndex is not supported."
+        VARIATION   atmIntfSigVccTxTrafficDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmIntfSigVccTxTrafficDescrIndex is not supported."
+        VARIATION   atmIntfLeafSetupFailures
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmIntfLeafSetupFailures is not supported."
+        VARIATION   atmIntfLeafSetupRequests
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmIntfLeafSetupRequests is not supported."
+        VARIATION   atmCurrentlyFailingPVplTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVplTable is not supported."
+        VARIATION   atmCurrentlyFailingPVclTimeStamp
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmCurrentlyFailingPVclTable is not supported."
+        VARIATION   atmVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmVclAddrRowStatus
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclAddrTable is not supported."
+        VARIATION   atmAddrVclAddrType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmAddrVclTable is not supported."
+        VARIATION   atmVclGenSigDescrIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmVclGenTable is not supported."
+    SUPPORTS    ATM-FORUM-SNMP-M4-MIB
+        INCLUDES {
+            atmfM4General,
+            atmfM4AtmLayerGroup,
+            atmfM4VpTestGroup,
+            atmfM4VcTestGroup }
+        VARIATION   atmfM4NeVersion
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeVersion object is not supported."
+        VARIATION   atmfM4NeStartTime
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeStartTime object is not supported."
+        VARIATION   atmfM4NeAlarmSeverityIndex
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeAlarmSeverityIndex is not supported."
+        VARIATION   atmfM4NeSuppressZeroStats
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4NeSuppressZeroStats object is not supported."
+        VARIATION   atmfM4IfType
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfType object is not supported."
+        VARIATION   atmfM4IfSubscriberAddress
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfSubscriberAddress object is not supported."
+        VARIATION   atmfM4IfPreferredCarrier
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The atmfM4IfPreferredCarrier object is not supported."
+        VARIATION   atmfM4IfFarEndCarrierNetwork
+            ACCESS      not-implemented
+            DESCRIPTION
+                "The IfFarEndCarrierNetwork object is not supported."
+        VARIATION   atmfM4VclSegEndPt
+            ACCESS      read-only
+            DESCRIPTION
+                "An atmfM4VclEntry cannot be created/modified via SNMP."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmGroup8,
+            juniAtmAal5Group,
+            juniAtmSubIfGroup7,
+            juniAtmVpPingControlGroup,
+            juniAtmVcPingControlGroup,
+            juniAtmPingTrapGroup,
+            juniAtmSvcGroup2,
+            juniAtmF4OamCircuitGroup2,
+            juniAtmLocationGroup,
+            juniAtmVpStatsGroup }
+    ::= { juniAtmVccEndPointAgent 12 }
+
+-- *****************************************************************************
+-- ATM VP tunnel agent capabilities
+-- *****************************************************************************
+juniAtmVpTunnelAgent  OBJECT IDENTIFIER ::= { juniAtmAgent 2 }
+
+juniAtmVpTunnelAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the ATM VP tunnel subcomponent of the JUNOSe SNMP agent.
+        This version of the ATM tunnel subcomponent is supported in JUNOSe 3.0
+        and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ATM application in JUNOSe."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmVpTunnelGroup }
+    ::= { juniAtmVpTunnelAgent 1 }
+
+
+-- *****************************************************************************
+-- ATM NBMA interface agent capabilities
+-- *****************************************************************************
+juniAtmNbmaAgent  OBJECT IDENTIFIER ::= { juniAtmAgent 3 }
+
+juniAtmNbmaAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the ATM NBMA interface subcomponent of the JUNOSe SNMP
+        agent.  This version of the ATM NBMA subcomponent is supported in JUNOSe
+        3.2 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ATM application in JUNOSe."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmNbmaMapGroup }
+    ::= { juniAtmNbmaAgent 1 }
+
+
+-- *****************************************************************************
+-- ATM Switch agent capabilities
+--
+-- This is a placeholder for the agent capabilities for the ATM switch (cross
+-- connect) subcomponent of the JUNOSe SNMP agent.
+-- The ATM switch subcomponent has not been supported in a released product.
+-- *****************************************************************************
+juniAtmSwitchAgent    OBJECT IDENTIFIER ::= { juniAtmAgent 4 }
+juniAtmSwitchAgentV1  OBJECT IDENTIFIER ::= { juniAtmSwitchAgent 1 } -- Obsolete
+juniAtmSwitchAgentV2  OBJECT IDENTIFIER ::= { juniAtmSwitchAgent 2 } -- Obsolete
+
+
+-- *****************************************************************************
+-- ATM traffic shaping agent capabilities
+-- *****************************************************************************
+juniAtmTrafficShapingAgent  OBJECT IDENTIFIER ::= { juniAtmAgent 5 }
+
+juniAtmTrafficShapingAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the ATM traffic shaping subcomponent of the JUNOSe SNMP
+        agent.  This version of the ATM traffic shaping subcomponent is
+        supported in JUNOSe 3.3 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the ATM application in JUNOSe."
+    SUPPORTS    Juniper-UNI-ATM-MIB
+        INCLUDES {
+            juniAtmTrafficShapingGroup }
+    ::= { juniAtmTrafficShapingAgent 1 }
+
+END

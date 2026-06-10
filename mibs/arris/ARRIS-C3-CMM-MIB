@@ -1,0 +1,311 @@
+ARRIS-C3-CMM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    docsIfCmtsCmStatusEntry,
+    docsIfCmtsCmStatusMacAddress,
+    docsIfCmtsCmStatusIpAddress,
+    docsIfCmtsCmStatusDocsisRegMode,
+    TenthdBmV
+        FROM DOCS-IF-MIB  -- RFC2670
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime,
+    MacAddress,
+    TruthValue,
+    DisplayString
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3CMMMIB  MODULE-IDENTITY
+        LAST-UPDATED "200502020000Z" -- 2nd Feb 2005
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the Cable Modem Manager (CMM)
+            software on the Arris CMTS C3"
+        REVISION "200502020000Z"
+        DESCRIPTION
+            "Added dcxCMMTrapGroup objects."
+        ::= { cmtsC3 5 }
+
+    dcxCMMObjects OBJECT IDENTIFIER ::= { cmtsC3CMMMIB 1 }
+
+
+    dcxCMMCmtsCmStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DcxCMMCmtsCmStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Additional columns for docsIfCmtsCmStatusTable."
+        ::= { dcxCMMObjects 1 }
+    
+    dcxCMMCmtsCmStatusEntry OBJECT-TYPE
+            SYNTAX      DcxCMMCmtsCmStatusEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "A row in the dcxCMMCmtsCmStatusEntry.
+                 An entry in this table exists for each Cable Modem
+                 that is known to the CMTS."
+            AUGMENTS { docsIfCmtsCmStatusEntry }
+            ::= { dcxCMMCmtsCmStatusTable 1 }
+    
+    DcxCMMCmtsCmStatusEntry ::= SEQUENCE {
+                dcxCMMCmDebugLevel  Unsigned32,
+                dcxCMMUpDisable Unsigned32,
+                dcxCMMResetCm INTEGER,
+                dcxCMMResetCounters TruthValue,
+                dcxCMMCmBpiState    INTEGER,
+                dcxCMMCmPrimaryUsSf Unsigned32,
+                dcxCMMCmPrimaryDsSf Unsigned32
+            }
+    
+    dcxCMMCmDebugLevel OBJECT-TYPE
+           SYNTAX      Unsigned32
+           MAX-ACCESS  read-write
+           STATUS      current
+           DESCRIPTION
+                "a 32-bit unsigned integer representing the Debug Level
+         setting for the modem.  Used by 'debug cable mac-address <M.M.M>'
+         and variants to control debug output"
+        ::= { dcxCMMCmtsCmStatusEntry 1 }
+        
+    dcxCMMUpDisable OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "a 32-bit unsigned integer representing the disable timeout
+         interval in milliseconds. There are two special values defined:
+         00000000 permanently disables the upstream of the modem and
+         FFFFFFFF remotely reintializes the MAC, which resumes normal
+         operation of the modem."
+        ::= { dcxCMMCmtsCmStatusEntry 2 }
+        
+    dcxCMMResetCm OBJECT-TYPE
+            SYNTAX      INTEGER { reset (1), delete (2), none(3) }
+            MAX-ACCESS  read-write 
+            STATUS      current
+            DESCRIPTION
+                "Use to implement the 'clear cable modem xxx reset|delete' command;
+                 setting to 'reset' sends a RNG-RSP(abort) the CM and removes it
+                 from the station maintenance list causing it to reboot, setting to
+                 'delete' causes the cable modem to reboot and be removed from the
+                 CMTS database. Reading this entry always returns 'none'."
+        ::= { dcxCMMCmtsCmStatusEntry 3 }
+    
+    dcxCMMResetCounters OBJECT-TYPE
+            SYNTAX      TruthValue
+            MAX-ACCESS  read-write 
+            STATUS      current
+            DESCRIPTION
+                "Use to implement the 'clear cable modem xxx counters' command;
+                 this command sets the CM's counters to zero."
+        ::= { dcxCMMCmtsCmStatusEntry 4 }
+        
+    dcxCMMCmBpiState OBJECT-TYPE
+        SYNTAX     INTEGER
+            {
+                cmBPI2NotManagedByBPI2 (0),
+                cmBPI2InBPI2Progress   (1),
+                cmBPI2NotAuthorized    (2),
+                cmBPI2KeyIssued        (3),
+                cmBPI2IsRunning        (4)  
+            
+            }
+        MAX-ACCESS  read-only 
+        STATUS      current
+            DESCRIPTION
+                " if sytem support security mechanism,if cmBPI2NotManagedByBPI2, no security support, 
+                  otherwise,this state indicates cm's BPI2 state only this state is cmBPI2NotManagedByBPI2
+                  or cmBPI2IsRunning which means cm is online and could foward traffic"
+        ::= { dcxCMMCmtsCmStatusEntry 5 }
+    
+    dcxCMMCmPrimaryUsSf OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only 
+        STATUS      current
+            DESCRIPTION
+                " contains the Primary SID, primary upstream service flow, for the modem"
+        ::= { dcxCMMCmtsCmStatusEntry 6 }
+    
+    dcxCMMCmPrimaryDsSf OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only 
+        STATUS      current
+            DESCRIPTION
+                " contains the Primary downstream service flow, for the modem"
+        ::= { dcxCMMCmtsCmStatusEntry 7 }
+    
+    dcxCMMIpToCmTable OBJECT-TYPE
+            SYNTAX      SEQUENCE OF DcxCMMIpToCmEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "Same as docsIfCmtsMacToCmTable but indexed by IP address, not MAC."
+        ::= { dcxCMMObjects 2 }
+    
+    dcxCMMIpToCmEntry OBJECT-TYPE
+            SYNTAX      DcxCMMIpToCmEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "A row in the dcxCMMIpToCmTable.
+                 An entry in this table exists for each Cable Modem
+                 that is connected to the CMTS implementing this table."
+            INDEX   { dcxCMMCmIp }
+            ::= { dcxCMMIpToCmTable 1 }
+    
+    DcxCMMIpToCmEntry ::= SEQUENCE {
+                    dcxCMMCmIp    IpAddress,
+                    dcxCMMCmPtr   Integer32
+            }
+    
+    dcxCMMCmIp OBJECT-TYPE
+            SYNTAX      IpAddress
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "The CM IP address."
+        ::= { dcxCMMIpToCmEntry 1 }
+    
+    dcxCMMCmPtr OBJECT-TYPE
+            SYNTAX      Integer32 (1..2147483647)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "An row index into docsIfCmtsCmStatusTable. When queried
+                 with the correct instance value (e.g. a CM's IP address),
+                 returns the index in docsIfCmtsCmStatusTable which
+                 represents that CM."
+        ::= { dcxCMMIpToCmEntry 2 }
+
+    dcxCMMFlapTable OBJECT-TYPE
+            SYNTAX      SEQUENCE OF DcxCMMCmFlapEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "Table of currently-active (ie, meets flap criteria and
+                 not yet aged out) flapping modems."
+        ::= { dcxCMMObjects 3 }
+
+    dcxCMMCmFlapEntry OBJECT-TYPE
+            SYNTAX      DcxCMMCmFlapEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "Flap table entry - encapsulates all needed flap status
+                 fields for a single flapping modem."
+            INDEX   { dcxCMMFlapMacAddr }
+            ::= { dcxCMMFlapTable 1 }
+    
+    DcxCMMCmFlapEntry ::= SEQUENCE {
+                dcxCMMFlapMacAddr MacAddress,
+                dcxCMMFlapUpstreamID Unsigned32,
+                dcxCMMFlapInsertions Unsigned32,
+                dcxCMMFlapHits Unsigned32,
+                dcxCMMFlapMisses Unsigned32,
+                dcxCMMFlapCRC Unsigned32,
+                dcxCMMFlapCount Unsigned32,
+                dcxCMMFlapTimeStamp Unsigned32
+            }
+
+    dcxCMMFlapMacAddr OBJECT-TYPE
+            SYNTAX      MacAddress
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The CM MAC address."
+        ::= { dcxCMMCmFlapEntry 2 }
+    
+    dcxCMMFlapUpstreamID OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The Upstream ID of the CM's current upstream."
+        ::= { dcxCMMCmFlapEntry 3 }
+    
+    dcxCMMFlapInsertions OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The current number of re-insertion flaps for modem."
+        ::= { dcxCMMCmFlapEntry 4 }
+    
+    dcxCMMFlapHits OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The number of successful re-ranges at time of last flap."
+        ::= { dcxCMMCmFlapEntry 5 }
+   
+    dcxCMMFlapMisses OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The number of re-range failures at time of last flap."
+        ::= { dcxCMMCmFlapEntry 6 }
+
+    dcxCMMFlapCRC OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The number of CRC errors at time of last flap."
+        ::= { dcxCMMCmFlapEntry 7 }
+
+    dcxCMMFlapCount OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The total number of flaps from all causes (reinsertions,
+                power adjustments, and sequential misses)."
+        ::= { dcxCMMCmFlapEntry 9 }
+
+    dcxCMMFlapTimeStamp OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "The VxWorks format time stamp of latest flap."
+        ::= { dcxCMMCmFlapEntry 10 }
+
+    dcxCMMTrapGroup OBJECT IDENTIFIER ::= { dcxCMMObjects 4 }
+    
+    dcxCMMTrapReason OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE(0..255))
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+                "Placeholder for the user readable text in the CMM trap."
+        ::= { dcxCMMTrapGroup 1 }
+
+	dcxCMMTrap NOTIFICATION-TYPE
+        OBJECTS {
+              dcxCMMTrapReason
+        }
+	    STATUS current
+		DESCRIPTION 
+		    "General CMM trap. The reason for the trap are described
+		     in dcxCMMTrapReason."
+    ::= { dcxCMMTrapGroup 2 }
+
+END

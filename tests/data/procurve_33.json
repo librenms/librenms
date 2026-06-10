@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.33.4.1.1",
+                    "sysDescr": "GbE2c L2/L3 Ethernet Blade Switch for HP c-Class BladeSystem",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "GbE2c",
+                    "features": null,
+                    "location": null,
+                    "os": "procurve",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hpe.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

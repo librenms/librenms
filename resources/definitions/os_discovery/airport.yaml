@@ -1,0 +1,3 @@
+modules:
+    os:
+        version: AIRPORT-BASESTATION-3-MIB::sysConfFirmwareVersion.0

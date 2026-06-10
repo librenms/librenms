@@ -1,0 +1,628 @@
+--  =======================================================================
+--  File              : FIBROLAN-MIB-MCM1xx.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MCM1xx
+--  By                : Shamir Stein
+--  MIB Version       : 1.2
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  =======================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+
+
+FIBROLAN-MIB-MCM1xx     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY		  FROM SNMPv2-SMI
+		DisplayString						              FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP					  FROM SNMPv2-CONF
+		flMsChassisModuleMvEntry						  FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvLinkEntry, flMsModuleMvChannelEntry   FROM FIBROLAN-MIB-MSMODULE;
+
+
+  flMcm1xxMv  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MCM1XX interface objects.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30 100}
+
+
+    -- conformance information
+     flMsMcm1xxMIBConformance
+                   OBJECT IDENTIFIER ::= { flMcm1xxMv  1 }
+
+     flMsMcm1xxMIBCompliances
+						  OBJECT IDENTIFIER ::= { flMsMcm1xxMIBConformance 1 }
+     flMsMcm1xxMIBGroups  OBJECT IDENTIFIER ::= { flMsMcm1xxMIBConformance 2 }
+
+
+	-- compliance statements
+     flMsMcm1xxMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the flMcm1xxMv MIB."
+			  MODULE FIBROLAN-MIB-METRO-STAR-MV
+				  MANDATORY-GROUPS{ flMsChassisGroup, flMsChassisModulesGroup }
+			  MODULE FIBROLAN-MIB-MSMODULE
+				  MANDATORY-GROUPS{ flMsModuleMvChannelsGroup, flMsModuleMvLinksGroup}
+              MODULE  -- this module
+                  MANDATORY-GROUPS { flMsMcm1xxMvGroup,
+									 flMsMcm1xxMvChannelsGroup, flMsMcm1xxMvLinksGroup }
+              ::= { flMsMcm1xxMIBCompliances 1 }
+
+
+     flMsMcm1xxMvGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1xxModuleExtMvRedundantMod }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar module entity, used only for mcm100-RL."
+            ::= { flMsMcm1xxMIBGroups 1 }
+
+     flMsMcm1xxMvChannelsGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1xxChannelExtMvTpLink, 
+						  flMcm1xxChannelExtMvFoLink,
+						  flMcm1xxChannelExtMvPortDescription,
+						  flMcm1xxChannelExtMvDuplex,
+						  flMcm1xxChannelExtMvEnableTpPort,
+						  flMcm1xxChannelExtMvTp2FoFp,
+						  flMcm1xxChannelExtMvFo2TpFp,
+						  flMcm1xxChannelExtMvAutoNego,
+						  flMcm1xxChannelExtMvDatarate,
+						  flMcm1xxChannelExtMvTpBckp2Main,  --Mcm100-RL only
+						  flMcm1xxChannelExtMvFoBckp2Main,  --Mcm100-RL only
+						  flMcm1xxChannelExtMvForceTp,	    --Mcm100-RL only
+						  flMcm1xxChannelExtMvForceFo,      --Mcm100-RL only
+						  flMcm1xxChannelExtMvBckpTpUnused, --Mcm100-RL only
+						  flMcm1xxChannelExtMvBckpFoUnused, --Mcm100-RL only
+						  flMcm1xxChannelExtMvActiveTpLink, --Mcm100-RL only
+						  flMcm1xxChannelExtMvActiveFoLink, --Mcm100-RL only
+						  flMcm1xxChannelExtMvStbyTpLink,   --Mcm100-RL only
+						  flMcm1xxChannelExtMvStbyFoLink }  --Mcm100-RL only
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar extended channel entity."
+            ::= { flMsMcm1xxMIBGroups 2 }
+
+     flMsMcm1xxMvLinksGroup	OBJECT-GROUP
+	        OBJECTS		{ flMcm1xxLinkExtMvPause,
+						  flMcm1xxLinkExtMvUpstreamBw,
+						  flMcm1xxLinkExtMvDownstreamBw,
+						  flMcm1xxLinkExtMvUpSle,
+						  flMcm1xxLinkExtMvDnSle,
+						  flMcm1xxLinkExtMvRemoteTpLink,
+						  flMcm1xxLinkExtMvRlRemote } --Mcm100-RL only
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar extended link entity."
+            ::= { flMsMcm1xxMIBGroups 3 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+--flMcm1xxMv			OBJECT IDENTIFIER ::=  { flMsModuleMv      100 }
+
+flMcm1xxModuleMv		    OBJECT IDENTIFIER ::= { flMcm1xxMv	    10 }
+flMcm1xxChannelsMv		    OBJECT IDENTIFIER ::= { flMcm1xxMv	    20 }
+flMcm1xxLinksMv				OBJECT IDENTIFIER ::= { flMcm1xxMv	    30 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Module extended table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1xxModuleExtMvTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1xxModuleExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the module's status"
+     ::= { flMcm1xxModuleMv  1 }
+
+     flMcm1xxModuleExtMvEntry       OBJECT-TYPE
+         SYNTAX  FlMcm1xxModuleExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         AUGMENTS { flMsChassisModuleMvEntry }
+     ::= { flMcm1xxModuleExtMvTable   1 }
+
+		FlMcm1xxModuleExtMvEntry ::= SEQUENCE
+		{
+			 flMcm1xxModuleExtMvRedundantMod	        INTEGER  --only for MCM100-RL
+		}
+
+    flMcm1xxModuleExtMvRedundantMod				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "MCM100-RL redundant mode status"
+    ::= { flMcm1xxModuleExtMvEntry  1 }
+
+
+-- ************************************************************
+-- ************************************************************
+--   Channel extended table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1xxChannelExtMvTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1xxChannelExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the chassis' channel status"
+     ::= { flMcm1xxChannelsMv  1 }
+
+     flMcm1xxChannelExtMvEntry       OBJECT-TYPE
+         SYNTAX  FlMcm1xxChannelExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         AUGMENTS { flMsModuleMvChannelEntry}
+     ::= { flMcm1xxChannelExtMvTable   1 }
+
+		FlMcm1xxChannelExtMvEntry ::= SEQUENCE
+		{
+			 flMcm1xxChannelExtMvTpLink			        INTEGER,
+			 flMcm1xxChannelExtMvFoLink			        INTEGER,
+			 flMcm1xxChannelExtMvPortDescription	    DisplayString,
+			 flMcm1xxChannelExtMvDuplex	                INTEGER,
+			 flMcm1xxChannelExtMvEnableTpPort	        INTEGER,
+			 flMcm1xxChannelExtMvTp2FoFp		        INTEGER,
+			 flMcm1xxChannelExtMvFo2TpFp		        INTEGER,
+  			 flMcm1xxChannelExtMvAutoNego		        INTEGER, --only for MCM110-01/02
+			 flMcm1xxChannelExtMvDatarate		        INTEGER, --only for MCM110-01/02
+			 flMcm1xxChannelExtMvTpBckp2Main	        INTEGER, --only for MCM100-RL
+			 flMcm1xxChannelExtMvFoBckp2Main	        INTEGER, --only for MCM100-RL
+			 flMcm1xxChannelExtMvForceTp		        INTEGER, --only for MCM100-RL
+			 flMcm1xxChannelExtMvForceFo		        INTEGER, --only for MCM100-RL
+ 			 flMcm1xxChannelExtMvBckpTpUnused	        INTEGER, --only for MCM100-RL
+			 flMcm1xxChannelExtMvBckpFoUnused	        INTEGER, --only for MCM100-RL
+ 			 flMcm1xxChannelExtMvActiveTpLink			INTEGER, --only for MCM100-RL
+ 			 flMcm1xxChannelExtMvActiveFoLink			INTEGER,  --only for MCM100-RL
+			 flMcm1xxChannelExtMvStbyTpLink				INTEGER,  --only for MCM100-RL
+ 			 flMcm1xxChannelExtMvStbyFoLink				INTEGER  --only for MCM100-RL
+		}
+
+    flMcm1xxChannelExtMvTpLink				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2),
+							 killed	 (3)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "TP link status"
+    ::= { flMcm1xxChannelExtMvEntry  1 }
+
+    flMcm1xxChannelExtMvFoLink				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+         	                 off     (1),
+							 on      (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "FO link status"
+    ::= { flMcm1xxChannelExtMvEntry  2 }
+
+    flMcm1xxChannelExtMvPortDescription			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+    ::= { flMcm1xxChannelExtMvEntry  3 }
+
+    flMcm1xxChannelExtMvDuplex				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+							  hdx	 (1),
+							  fdx	 (2),
+							  n-a	 (3)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's duplex mode"
+    ::= { flMcm1xxChannelExtMvEntry  4 }
+
+    flMcm1xxChannelExtMvEnableTpPort		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             disable   (1),
+						     enable    (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Disable/Enable TP port"
+    ::= { flMcm1xxChannelExtMvEntry  5 }
+
+    flMcm1xxChannelExtMvTp2FoFp			    OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off (1),
+							  on  (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"TP to FO Fp Mode"
+    ::= { flMcm1xxChannelExtMvEntry  6 }
+
+    flMcm1xxChannelExtMvFo2TpFp     		OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                     off  (1),
+							 on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"FO to TP Fp Mode"
+    ::= { flMcm1xxChannelExtMvEntry  7 }
+
+	--only for MCM110-01/02
+	flMcm1xxChannelExtMvAutoNego				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      disable  (1),
+							  enable   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Port's Auto-Negotiation Mode"
+    ::= { flMcm1xxChannelExtMvEntry  8 }
+
+	--only for MCM110-01/02
+	flMcm1xxChannelExtMvDatarate				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      m10    (1),
+							  m100   (2),
+							  n-a	 (3)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Port's data rate mode - 10/100Mbps"
+    ::= { flMcm1xxChannelExtMvEntry  9 }
+
+	--only for MCM100-RL
+	 flMcm1xxChannelExtMvTpBckp2Main	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      sec0    (1),
+							  sec1    (2),
+							  sec5    (3),
+							  sec10   (4),
+							  sec20   (5),
+							  never	  (7)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"TP port Bckp 2 Main time"
+    ::= { flMcm1xxChannelExtMvEntry  10 }
+
+	--only for MCM100-RL
+	 flMcm1xxChannelExtMvFoBckp2Main	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      sec0    (1),
+							  sec1    (2),
+							  sec5    (3),
+							  sec10   (4),
+							  sec20   (5),
+							  never	  (7)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"FO port Bckp 2 Main time"
+    ::= { flMcm1xxChannelExtMvEntry  11 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvForceTp	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Force backup TP"
+    ::= { flMcm1xxChannelExtMvEntry  12 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvForceFo	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Force backup FO"
+    ::= { flMcm1xxChannelExtMvEntry  13 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvBckpTpUnused	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Backup Tp unused"
+    ::= { flMcm1xxChannelExtMvEntry  14 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvBckpFoUnused	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                      off    (1),
+							  on     (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"Backup Tp unused"
+    ::= { flMcm1xxChannelExtMvEntry  15 }
+
+ 	--only for MCM100-RL
+	-- flMcm1xxChannelExtMvRlLink	        OBJECT-TYPE
+	--	SYNTAX	  INTEGER {
+	--	                      standby    (1),
+	--						  active     (2)
+	--					  }
+    --   MAX-ACCESS    read-only
+	--	 STATUS    current
+	--	 DESCRIPTION
+	--	"Active/standby channel"
+    --::= { flMcm1xxChannelExtMvEntry  16 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvActiveTpLink	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+							  down		 (1),
+							  killed     (2),
+							  bckp		 (3),
+							  fBckp      (4),
+							  main       (5)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		"Active TP link status"
+     ::= { flMcm1xxChannelExtMvEntry  16 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvActiveFoLink	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+							  down		 (1),
+							  bckp		 (2),
+							  fBckp      (3),
+							  main       (4)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		"Active FO link status"
+     ::= { flMcm1xxChannelExtMvEntry  17 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvStbyTpLink	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+							  mainDown		 (1),
+							  bckpDown		 (2),
+							  mainUnused     (3),
+							  bckpUnused     (4),
+							  mainUp		 (5),
+							  bckpUp		 (6)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		"Standby TP link status"
+     ::= { flMcm1xxChannelExtMvEntry  18 }
+
+ 	--only for MCM100-RL
+	 flMcm1xxChannelExtMvStbyFoLink	        OBJECT-TYPE
+		SYNTAX	  INTEGER {
+							  mainDown		 (1),
+							  bckpDown		 (2),
+							  mainUnused     (3),
+							  bckpUnused     (4),
+							  mainUp		 (5),
+							  bckpUp		 (6)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		"Standby FO link status"
+     ::= { flMcm1xxChannelExtMvEntry  19 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+--   Link extended table 
+-- ************************************************************
+-- ************************************************************
+     flMcm1xxLinkExtMvTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm1xxLinkExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the link's configuration"
+     ::= { flMcm1xxLinksMv  1 }
+
+     flMcm1xxLinkExtMvEntry				OBJECT-TYPE
+         SYNTAX  FlMcm1xxLinkExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the link table"
+         AUGMENTS { flMsModuleMvLinkEntry }
+     ::= { flMcm1xxLinkExtMvTable 1 }
+
+		FlMcm1xxLinkExtMvEntry ::= SEQUENCE
+		{
+			 flMcm1xxLinkExtMvPause			        INTEGER,
+			 flMcm1xxLinkExtMvUpstreamBw			INTEGER,
+			 flMcm1xxLinkExtMvDownstreamBw  		INTEGER,
+			 flMcm1xxLinkExtMvUpSle					INTEGER,
+			 flMcm1xxLinkExtMvDnSle					INTEGER,
+			 flMcm1xxLinkExtMvRemoteTpLink          INTEGER,
+ 			 flMcm1xxLinkExtMvRlRemote              INTEGER  --for MCM100-RL only
+		}
+
+
+   flMcm1xxLinkExtMvPause				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+							  off  (1),
+							  on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Turn Pause Mode on/off"
+    ::= { flMcm1xxLinkExtMvEntry  1 }
+
+	flMcm1xxLinkExtMvUpstreamBw				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's upstream Bandwidth "
+    ::= { flMcm1xxLinkExtMvEntry  2 }
+
+    flMcm1xxLinkExtMvDownstreamBw			 OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256		(129),
+								k512		(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100		(100)
+						   }
+         MAX-ACCESS    read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's down stream Bandwidth "
+    ::= { flMcm1xxLinkExtMvEntry  3 }
+
+	flMcm1xxLinkExtMvUpSle				OBJECT-TYPE  
+		SYNTAX	  INTEGER {
+		                     off (1),
+							 on  (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"SLE up Mode"
+    ::= { flMcm1xxLinkExtMvEntry  4 }
+
+	flMcm1xxLinkExtMvDnSle				OBJECT-TYPE
+		SYNTAX	  INTEGER {
+		                     off  (1),
+							 on   (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+		"SLE down Mode"
+    ::= { flMcm1xxLinkExtMvEntry  5 }
+
+	 flMcm1xxLinkExtMvRemoteTpLink         OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								off	 (1),
+								on	 (2)
+							}
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Remote device's TP link status" 
+	 ::= { flMcm1xxLinkExtMvEntry  6 }
+
+	-- for MCM100-RL only
+  	 flMcm1xxLinkExtMvRlRemote         OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+								bckp	 (1),
+								main	 (2)
+							}
+		 MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Remote device's status - main/backup" 
+	 ::= { flMcm1xxLinkExtMvEntry  7 }
+
+
+END
+
+

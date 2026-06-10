@@ -1,0 +1,809 @@
+NBS-FECPM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Counter64,
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    ifAlias, InterfaceIndex
+        FROM IF-MIB
+    nbs, WritableU64
+        FROM NBS-MIB;
+
+nbsFecpmMib  MODULE-IDENTITY
+    LAST-UPDATED "201610190000Z" -- October 19, 2016
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+       "For technical support, please contact your service channel"
+    DESCRIPTION
+       "OTN Forward Error Correction (FEC) Performance Monitoring and
+        user-controlled statistics"
+    ::= { nbs 223 }
+
+-- *******************************************************************
+-- NBS-FECPM-MIB local defines
+-- *******************************************************************
+
+nbsFecpmThresholdsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Maximum considered safe by user"
+    ::= { nbsFecpmMib 1 }
+
+nbsFecpmCurrentGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Subtotals and statistics for sample now underway"
+    ::= { nbsFecpmMib 2 }
+
+nbsFecpmHistoricGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Totals and final statistics for a previous sample"
+    ::= { nbsFecpmMib 3 }
+
+nbsFecpmRunningGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Counter values since boot-up"
+    ::= { nbsFecpmMib 4 }
+
+nbsFecStatsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "User-controlled statistics"
+    ::= { nbsFecpmMib 90 }
+
+nbsFecpmEventsGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "Threshold crossing events"
+    ::= { nbsFecpmMib 100 }
+
+nbsFecpmTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Threshold crossing Traps or Notifications"
+    ::= { nbsFecpmEventsGrp 0 }
+
+
+-- *******************************************************************
+--
+-- the nbsFecpmThresholdsGrp
+--
+-- *******************************************************************
+
+
+nbsFecpmThresholdsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsFecpmThresholdsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "FEC Performance Monitoring thresholds"
+    ::= { nbsFecpmThresholdsGrp 1 }
+
+nbsFecpmThresholdsEntry OBJECT-TYPE
+    SYNTAX          NbsFecpmThresholdsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Performance monitoring thresholds for a particular interface"
+    INDEX {
+        nbsFecpmThresholdsIfIndex,
+        nbsFecpmThresholdsInterval
+    }
+    ::= { nbsFecpmThresholdsTable 1 }
+
+NbsFecpmThresholdsEntry ::= SEQUENCE {
+    nbsFecpmThresholdsIfIndex    InterfaceIndex,
+    nbsFecpmThresholdsInterval   INTEGER,
+    nbsFecpmThresholdsBitErrCor  WritableU64,
+    nbsFecpmThresholdsByteErrCor WritableU64,
+    nbsFecpmThresholdsCorBit0to1 WritableU64,
+    nbsFecpmThresholdsCorBit1to0 WritableU64,
+    nbsFecpmThresholdsUncorWords WritableU64
+}
+
+nbsFecpmThresholdsIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsFecpmThresholdsEntry 1 }
+
+nbsFecpmThresholdsInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Indicates the periodicity to which these thresholds apply"
+    ::= { nbsFecpmThresholdsEntry 2 }
+
+nbsFecpmThresholdsBitErrCor OBJECT-TYPE
+    SYNTAX          WritableU64
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Bit Errors Corrected which, if met
+        or exceeded at the end of the nbsFecpmThresholdsInterval
+        period, should trigger the nbsFecpmTrapsBitErrCor event
+        notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmThresholdsEntry 10 }
+
+nbsFecpmThresholdsByteErrCor  OBJECT-TYPE
+    SYNTAX          WritableU64
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Byte Errors Corrected
+        which, if met or exceeded at the end of the
+        nbsFecpmThresholdsInterval period, should trigger the
+        nbsFecpmTrapsByteErrCor event notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmThresholdsEntry 12 }
+
+nbsFecpmThresholdsCorBit0to1   OBJECT-TYPE
+    SYNTAX          WritableU64
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of '0' bits corrected to '1' which,
+        if met or exceeded at the end of the nbsFecpmThresholdsInterval
+        period, should trigger the nbsFecpmTrapsCorBit0to1 event
+        notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmThresholdsEntry 14 }
+
+nbsFecpmThresholdsCorBit1to0   OBJECT-TYPE
+    SYNTAX          WritableU64
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of '1' bits corrected to '0' which,
+        if met or exceeded at the end of the nbsFecpmThresholdsInterval
+        period, should trigger the nbsFecpmTrapsCorBit1to0 event
+        notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmThresholdsEntry 16 }
+
+nbsFecpmThresholdsUncorWords   OBJECT-TYPE
+    SYNTAX          WritableU64
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+       "Persistent.  The number of Uncorrectable Words which, if met or
+        exceeded at the end of the nbsFecpmThresholdsInterval period,
+        should trigger the nbsFecpmTrapsUncorWords event notification.
+
+        The reserved value 0 disables notifications for this event."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmThresholdsEntry 18 }
+
+
+-- *******************************************************************
+--
+-- the nbsFecpmCurrentGroup
+--
+-- *******************************************************************
+
+nbsFecpmCurrentSysDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The current (today's) UTC date, represented by an eight
+        digit decimal number: yyyymmdd"
+    ::= { nbsFecpmCurrentGrp 1 }
+
+
+nbsFecpmCurrentSysTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The current (now's) UTC time, represented by a six
+        digit decimal number in the format hhmmss"
+    ::= { nbsFecpmCurrentGrp 2 }
+
+
+nbsFecpmCurrentTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsFecpmCurrentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All FEC Performance Monitoring statistics for the
+        nbsFecpmCurrentInterval now underway."
+    ::= { nbsFecpmCurrentGrp 3 }
+
+nbsFecpmCurrentEntry OBJECT-TYPE
+    SYNTAX          NbsFecpmCurrentEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "FEC Performance Monitoring statistics for a specific port/
+        interface and nbsFecpmCurrentInterval."
+    INDEX {
+        nbsFecpmCurrentIfIndex,
+        nbsFecpmCurrentInterval
+    }
+    ::= { nbsFecpmCurrentTable 1 }
+
+NbsFecpmCurrentEntry ::= SEQUENCE {
+    nbsFecpmCurrentIfIndex    InterfaceIndex,
+    nbsFecpmCurrentInterval   INTEGER,
+    nbsFecpmCurrentDate       INTEGER,
+    nbsFecpmCurrentTime       INTEGER,
+    nbsFecpmCurrentBitErrCor  Counter64,
+    nbsFecpmCurrentByteErrCor Counter64,
+    nbsFecpmCurrentCorBit0to1 Counter64,
+    nbsFecpmCurrentCorBit1to0 Counter64,
+    nbsFecpmCurrentUncorWords Counter64
+}
+
+nbsFecpmCurrentIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsFecpmCurrentEntry 1 }
+
+nbsFecpmCurrentInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "Indicates the periodicity of statistic"
+    ::= { nbsFecpmCurrentEntry 2 }
+
+nbsFecpmCurrentDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) this interval began, represented by an eight
+        digit decimal number: yyyymmdd"
+    ::= { nbsFecpmCurrentEntry 5 }
+
+nbsFecpmCurrentTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) this interval began, represented by a six
+        digit decimal number: hhmmss"
+    ::= { nbsFecpmCurrentEntry 6 }
+
+nbsFecpmCurrentBitErrCor OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Bit Errors Corrected in this interval so far;
+        it may be the sum of nbsFecpmCurrentCorBit0to1 and
+        nbsFecpmCurrentCorBit1to0."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmCurrentEntry 10 }
+
+nbsFecpmCurrentByteErrCor  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Byte Errors Corrected in this interval so far.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates not supported."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmCurrentEntry 12 }
+
+nbsFecpmCurrentCorBit0to1   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of '0' bits corrected to '1' so far.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecpmCurrentBitErrCor."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmCurrentEntry 14 }
+
+nbsFecpmCurrentCorBit1to0   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of '1' bits corrected to '0' so far.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecpmCurrentBitErrCor."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmCurrentEntry 16 }
+
+nbsFecpmCurrentUncorWords   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The number of Uncorrectable Words so far"
+--  DEFVAL { 0 }
+    ::= { nbsFecpmCurrentEntry 18 }
+
+
+-- *******************************************************************
+--
+-- the nbsFecpmHistoricGrp
+--
+-- *******************************************************************
+
+
+nbsFecpmHistoricTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsFecpmHistoricEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All FEC Performance Monitoring statistics for past
+        nbsFecpmHistoricInterval periods."
+    ::= { nbsFecpmHistoricGrp 3 }
+
+nbsFecpmHistoricEntry OBJECT-TYPE
+    SYNTAX          NbsFecpmHistoricEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "FEC Performance Monitoring statistics for a specific port/
+        interface and nbsFecpmHistoricInterval."
+    INDEX {
+        nbsFecpmHistoricIfIndex,
+        nbsFecpmHistoricInterval,
+        nbsFecpmHistoricSample
+    }
+    ::= { nbsFecpmHistoricTable 1 }
+
+NbsFecpmHistoricEntry ::= SEQUENCE {
+    nbsFecpmHistoricIfIndex    InterfaceIndex,
+    nbsFecpmHistoricInterval   INTEGER,
+    nbsFecpmHistoricSample     INTEGER,
+    nbsFecpmHistoricDate       INTEGER,
+    nbsFecpmHistoricTime       INTEGER,
+    nbsFecpmHistoricBitErrCor  Counter64,
+    nbsFecpmHistoricByteErrCor Counter64,
+    nbsFecpmHistoricCorBit0to1 Counter64,
+    nbsFecpmHistoricCorBit1to0 Counter64,
+    nbsFecpmHistoricUncorWords Counter64
+}
+
+nbsFecpmHistoricIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsFecpmHistoricEntry 1 }
+
+nbsFecpmHistoricInterval OBJECT-TYPE
+    SYNTAX          INTEGER {
+        quarterHour    (1),
+        twentyfourHour (2)
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates the sampling period of statistic"
+    ::= { nbsFecpmHistoricEntry 2 }
+
+nbsFecpmHistoricSample OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "Indicates the sample number of this statistic.  The most
+        recent sample is numbered 1, the next previous 2, and so on
+        until the oldest sample."
+    ::= { nbsFecpmHistoricEntry 4 }
+
+nbsFecpmHistoricDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) the interval began, represented by an eight
+        digit decimal number: yyyymmdd"
+    ::= { nbsFecpmHistoricEntry 5 }
+
+nbsFecpmHistoricTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) the interval began, represented by a six
+        digit decimal number: hhmmss"
+    ::= { nbsFecpmHistoricEntry 6 }
+
+nbsFecpmHistoricBitErrCor OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of Bit Errors Corrected for this interval;
+        it may be the sum of nbsFecpmHistoricCorBit0to1 and
+        nbsFecpmHistoricCorBit1to0."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmHistoricEntry 10 }
+
+nbsFecpmHistoricByteErrCor  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of Byte Errors Corrected in this interval.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates not supported."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmHistoricEntry 12 }
+
+nbsFecpmHistoricCorBit0to1   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of '0' bits corrected to '1' in this interval.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecpmHistoricBitErrCor."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmHistoricEntry 14 }
+
+nbsFecpmHistoricCorBit1to0   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final count of '1' bits corrected to '0' in this interval.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecpmHistoricBitErrCor."
+--  DEFVAL { 0 }
+    ::= { nbsFecpmHistoricEntry 16 }
+
+nbsFecpmHistoricUncorWords   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The final number of Uncorrectable Words in this interval"
+--  DEFVAL { 0 }
+    ::= { nbsFecpmHistoricEntry 18 }
+
+
+-- *******************************************************************
+--
+-- the nbsFecpmRunningGrp
+--
+-- *******************************************************************
+
+
+nbsFecpmRunningTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsFecpmRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "All FEC Performance Monitoring statistics since boot-up."
+    ::= { nbsFecpmRunningGrp 3 }
+
+nbsFecpmRunningEntry OBJECT-TYPE
+    SYNTAX          NbsFecpmRunningEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "FEC Performance Monitoring statistics for a specific port/
+         interface."
+    INDEX {
+        nbsFecpmRunningIfIndex
+    }
+    ::= { nbsFecpmRunningTable 1 }
+
+NbsFecpmRunningEntry ::= SEQUENCE {
+    nbsFecpmRunningIfIndex    InterfaceIndex,
+    nbsFecpmRunningDate       INTEGER,
+    nbsFecpmRunningTime       INTEGER,
+    nbsFecpmRunningBitErrCor  Counter64,
+    nbsFecpmRunningByteErrCor Counter64,
+    nbsFecpmRunningCorBit0to1 Counter64,
+    nbsFecpmRunningCorBit1to0 Counter64,
+    nbsFecpmRunningUncorWords Counter64
+}
+
+nbsFecpmRunningIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsFecpmRunningEntry 1 }
+
+nbsFecpmRunningDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The date (UTC) of boot-up, represented by an eight digit
+        decimal number: yyyymmdd"
+    ::= { nbsFecpmRunningEntry 5 }
+
+nbsFecpmRunningTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The time (UTC) of boot-up, represented by a six digit
+        decimal number: hhmmss"
+    ::= { nbsFecpmRunningEntry 6 }
+
+nbsFecpmRunningBitErrCor OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of Bit Errors Corrected since boot-up;
+        it may be the sum of nbsFecpmRunningCorBit0to1 and
+        nbsFecpmRunningCorBit1to0."
+    ::= { nbsFecpmRunningEntry 10 }
+
+nbsFecpmRunningByteErrCor  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of Byte Errors Corrected since boot-up.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates not supported."
+    ::= { nbsFecpmRunningEntry 12 }
+
+nbsFecpmRunningCorBit0to1   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of '0' bits corrected to '1' since boot-up.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecpmRunningBitErrCor."
+    ::= { nbsFecpmRunningEntry 14 }
+
+nbsFecpmRunningCorBit1to0   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of '1' bits corrected to '0' since boot-up.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecpmRunningBitErrCor."
+    ::= { nbsFecpmRunningEntry 16 }
+
+nbsFecpmRunningUncorWords   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total number of Uncorrectable Words since boot-up"
+    ::= { nbsFecpmRunningEntry 18 }
+
+
+-- *******************************************************************
+--
+-- the nbsFecStatsGrp
+--
+-- *******************************************************************
+
+
+nbsFecStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NbsFecStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "FEC statistics managed at the user's discretion. These statistics
+        may be started, stopped, and cleared whenever the user desires
+        without affecting the normal performance monitoring activity."
+    ::= { nbsFecStatsGrp 3 }
+
+nbsFecStatsEntry OBJECT-TYPE
+    SYNTAX          NbsFecStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "User-controlled FEC statistics for a specific port/interface."
+    INDEX {
+        nbsFecStatsIfIndex
+    }
+    ::= { nbsFecStatsTable 1 }
+
+NbsFecStatsEntry ::= SEQUENCE {
+    nbsFecStatsIfIndex        InterfaceIndex,
+    nbsFecStatsDate           INTEGER,
+    nbsFecStatsTime           INTEGER,
+    nbsFecStatsSpan           INTEGER,
+    nbsFecStatsState          INTEGER,
+    nbsFecStatsBitErrCor      Counter64,
+    nbsFecStatsByteErrCor     Counter64,
+    nbsFecStatsCorBit0to1     Counter64,
+    nbsFecStatsCorBit1to0     Counter64,
+    nbsFecStatsUncorWords     Counter64
+}
+
+nbsFecStatsIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The mib2 ifIndex"
+    ::= { nbsFecStatsEntry 1 }
+
+nbsFecStatsDate OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The (UTC) date the user began statistics collection, represented
+        by an eight digit decimal number: yyyymmdd"
+    ::= { nbsFecStatsEntry 5 }
+
+nbsFecStatsTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The (UTC) time the user began statistics collection, represented
+        by a six digit decimal number: hhmmss"
+    ::= { nbsFecStatsEntry 6 }
+
+nbsFecStatsSpan OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The amount of time (deci-sec) statistics collection has been underway
+        since nbsFecStatsDate and nbsFecStatsTime, or if stopped, the duration
+        of the prior collection."
+    ::= { nbsFecStatsEntry 7 }
+
+nbsFecStatsState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        counting     (2),
+        clearing     (3),
+        stopped      (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Writing 'stopped' to this object stops (pauses) FEC statistics
+        collection.
+
+        Writing 'counting' to this object starts (resumes) FEC statistics
+        collection.
+
+        Writing 'clearing' to this object clears all statistical counters."
+    ::= { nbsFecStatsEntry 8 }
+
+nbsFecStatsBitErrCor OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of Bit Errors Corrected since boot-up;
+        it may be the sum of nbsFecStatsCorBit0to1 and
+        nbsFecStatsCorBit1to0."
+    ::= { nbsFecStatsEntry 10 }
+
+nbsFecStatsByteErrCor  OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of Byte Errors Corrected since boot-up.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates not supported."
+    ::= { nbsFecStatsEntry 12 }
+
+nbsFecStatsCorBit0to1   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of '0' bits corrected to '1' since boot-up.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecStatsBitErrCor."
+    ::= { nbsFecStatsEntry 14 }
+
+nbsFecStatsCorBit1to0   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total count of '1' bits corrected to '0' since boot-up.
+        The reserved value 0xFFFFFFFFFFFFFFFF indicates there is a
+        single number for all bit corrections combined, see
+        nbsFecStatsBitErrCor."
+    ::= { nbsFecStatsEntry 16 }
+
+nbsFecStatsUncorWords   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+       "The total number of Uncorrectable Words since boot-up"
+    ::= { nbsFecStatsEntry 18 }
+
+
+-- *******************************************************************
+--
+-- the nbsFecpmEventsGrp
+--
+-- *******************************************************************
+
+nbsFecpmTrapsBitErrCor  NOTIFICATION-TYPE
+    OBJECTS   { nbsFecpmCurrentIfIndex, ifAlias, nbsFecpmCurrentInterval,
+                nbsFecpmCurrentBitErrCor }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsFecpmThresholdsInterval if
+        nbsFecpmThresholdsBitErrCor is non-zero and less than or equal
+        to nbsFecpmCurrentBitErrCor."
+    ::= { nbsFecpmTraps 10 }
+
+nbsFecpmTrapsByteErrCor  NOTIFICATION-TYPE
+    OBJECTS   { nbsFecpmCurrentIfIndex, ifAlias, nbsFecpmCurrentInterval,
+                nbsFecpmCurrentByteErrCor }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsFecpmThresholdsInterval if
+        nbsFecpmThresholdsByteErrCor is non-zero and less than or equal
+        to nbsFecpmCurrentByteErrCor."
+    ::= { nbsFecpmTraps 12 }
+
+nbsFecpmTrapsCorBit0to1  NOTIFICATION-TYPE
+    OBJECTS   { nbsFecpmCurrentIfIndex, ifAlias, nbsFecpmCurrentInterval,
+                nbsFecpmCurrentCorBit0to1 }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsFecpmThresholdsInterval if
+        nbsFecpmThresholdsCorBit0to1 is non-zero and less than or equal
+        to nbsFecpmCurrentCorBit0to1."
+    ::= { nbsFecpmTraps 14 }
+
+nbsFecpmTrapsCorBit1to0  NOTIFICATION-TYPE
+    OBJECTS   { nbsFecpmCurrentIfIndex, ifAlias, nbsFecpmCurrentInterval,
+                nbsFecpmCurrentCorBit1to0 }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsFecpmThresholdsInterval if
+        nbsFecpmThresholdsCorBit1to0 is non-zero and less than or equal
+        to nbsFecpmCurrentCorBit1to0."
+    ::= { nbsFecpmTraps 16 }
+
+nbsFecpmTrapsUncorWords  NOTIFICATION-TYPE
+    OBJECTS   { nbsFecpmCurrentIfIndex, ifAlias, nbsFecpmCurrentInterval,
+                nbsFecpmCurrentUncorWords }
+    STATUS      current
+    DESCRIPTION
+       "Sent at the conclusion of an nbsFecpmThresholdsInterval if
+        nbsFecpmThresholdsUncorWords is non-zero and less than or equal
+        to nbsFecpmCurrentUncorWords."
+    ::= { nbsFecpmTraps 18 }
+
+
+END

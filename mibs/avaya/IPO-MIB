@@ -1,0 +1,2499 @@
+--========================================================
+--
+-- MIB      : IPO  Avaya Inc.
+--
+-- Version  : 2.00.25   04 July 2014
+--
+--========================================================
+--
+-- Copyright (c) 2003 - 2014 Avaya Inc.
+-- All Rights Reserved.
+--
+--========================================================
+IPO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, Unsigned32, Integer32,
+    IpAddress
+        FROM SNMPv2-SMI
+    DateAndTime
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    sysDescr
+        FROM SNMPv2-MIB
+    ItuPerceivedSeverity
+        FROM ITU-ALARM-TC-MIB
+    ifIndex
+        FROM IF-MIB
+    mibs
+        FROM AVAYAGEN-MIB
+;
+
+ipoMIB MODULE-IDENTITY
+    LAST-UPDATED    "201407040000Z" -- 04 July 2014
+    ORGANIZATION    "Avaya Inc."
+    CONTACT-INFO
+        "Avaya Customer Services
+         Postal: Avaya, Inc.
+                 211 Mt Airy Rd.
+                 Basking Ridge, NJ 07920
+                 USA
+         Tel:    +1 908 953 6000
+
+         WWW:    http://www.avaya.com"
+    DESCRIPTION
+        "Avaya IP Office MIBs OID tree.
+
+         This MIB module defines the root items for MIBs for
+         use with Avaya IP Office family of telephone switches."
+    REVISION    "201407040000Z" -- 04 July 2014
+    DESCRIPTION
+        "Rev 2.00.25
+         Added new value serviceAMServerNotAvailable"
+    REVISION    "201406250000Z" -- 25 June 2014
+    DESCRIPTION
+        "Rev 2.00.24
+         Added new value serviceCCRNotSupported"
+    REVISION    "201406250000Z" -- 25 June 2014
+    DESCRIPTION
+        "Rev 2.00.23
+         Added new value serviceNonSelectAlarm"
+    REVISION    "201406160000Z" -- 16 June 2014
+    DESCRIPTION
+        "Rev 2.00.22
+         Added new values serviceGeneralAlarm and serviceSystemInfo"
+    REVISION    "201406040000Z" -- 04 June 2014
+    DESCRIPTION
+        "Rev 2.00.21
+         Added new value serviceIPDECTSystemError "
+    REVISION    "201405230000Z" -- 23 May 2014
+    DESCRIPTION
+        "Rev 2.00.20
+         Added new value monitorLogStamped "
+    REVISION    "201405080000Z" -- 08 May 2014
+    DESCRIPTION
+        "Rev 2.00.19
+         Added new values trunkSIPDNSInvalidConfig and trunkSIPDNSTransportError "
+    REVISION    "201401060000Z" -- 06 January 2014
+    DESCRIPTION
+        "Rev 2.00.18
+         Added oneXPortal values for ipoGTEventAppEntity"
+    REVISION    "201310080000Z" -- 08 October 2013
+    DESCRIPTION
+        "Rev 2.00.17
+         Added new values serviceSystemHardDriveAlarm and serviceAdditionalHardDriveAlarm "
+    REVISION    "201308060000Z" -- 06 August 2013
+    DESCRIPTION
+        "Rev 2.00.16
+        Added new values of serviceACCSAlarm for
+        ipoGTEventReason object"
+    REVISION    "201304241900Z" -- 24 April 2013
+    DESCRIPTION
+        "Rev 2.00.15
+        Added new values for ipoGTEventReason object
+        serviceCpuAlarm, serviceCpuIOAlarm, serviceMemoryAlarm"
+    REVISION    "201304241518Z" -- 24 April 2013
+    DESCRIPTION
+        "Rev 2.00.14
+        Added new value of serviceLocalBackup for
+        ipoGTEventReason object"
+    REVISION    "201211171511Z" --  17 November 2012
+    DESCRIPTION
+        "Rev 2.00.13
+        Added new notification: ipoGenEmergencyCallSvcEvent
+        Added new value of serviceEmergencyCall to the ipoGTEventReason object."        
+    REVISION    "201202281300Z" --  28 February 2012
+    DESCRIPTION
+        "Rev 2.00.12
+        Added new values for ipoGTEventReason object from
+        servicePortRangeExhausted to serviceWebservicesUWSError."
+    REVISION    "201111012200Z" --  1 November 2011
+    DESCRIPTION
+        "Rev 2.00.11
+        Added new values for ipoGTEventReason object from
+        servicePlannedMaintenance to serviceSslVpnServerReportedError."
+    REVISION    "201109271130Z" --  27 September 2011
+    DESCRIPTION
+        "Rev 2.00.10
+        Added new value of testAlarm for ipoGTEventReason object."
+    REVISION    "201103151517Z" -- 15 March 2011
+    DESCRIPTION
+        "Rev 2.00.09
+        Added new value of securityError for
+        ipoGTEventReason object"
+    REVISION    "201010131417Z" -- 13 October 2010
+    DESCRIPTION
+        "Rev 2.00.08
+        Added new value of serviceLicenseFileInvalid for
+        ipoGTEventReason object"
+    REVISION    "201007121345Z" -- 12 July 2010
+    DESCRIPTION
+        "Rev 2.00.07
+        Introduced new notifications, see ipoGenSvcMiscNotificationsGroup
+        and new objects, see ipoGenSvcMiscNotificationObjectsGroup"
+    REVISION    "200910190735Z" -- 19 October 2009
+    DESCRIPTION
+        "Rev 2.00.06
+        System Running Backup, Invalid Memory Card, No Licence Key Dongle
+        Notifications added.  Corrections to MIB syntax for System
+        Shutdown Notification."
+    REVISION    "200910091347Z" -- 09 October 2009
+    DESCRIPTION
+        "Rev 2.00.05
+        System shutdown Notification added."
+    REVISION    "200909110950Z" -- 11 September 2009
+    DESCRIPTION
+        "Rev 2.00.04
+        QOS Monitoring Notification added."
+    REVISION    "200909071620Z" -- 07 September 2009
+    DESCRIPTION
+        "Rev 2.00.03
+        smallBusinessContactCenter(3) value for
+        ipoGTEventAppEntity changed to customerCallReporter."
+    REVISION    "200804281640Z" -- 28 April 2008
+    DESCRIPTION
+        "Rev 2.00.02
+        Added smallBusinessContactCenter(3) value to
+        ipoGTEventAppEntity."
+    REVISION    "200804181450Z" -- 18 April 2008
+    DESCRIPTION
+        "Rev 2.00.01
+        Added traps related to Universal PRI licensing."
+    REVISION    "200606290000Z" -- 29 June 2006
+    DESCRIPTION
+        "Rev 2.00.00
+        Traps/notifications revised to provide more information about
+        the entity and device concerned."
+    REVISION    "200410060000Z" -- 06 October 2004
+    DESCRIPTION
+        "Rev 1.00.08
+        Corrected description of event severities for physical
+        entities."
+    REVISION    "200408270000Z" -- 27 August 2004
+    DESCRIPTION
+        "Rev 1.00.07
+        Corrected mandatory groups after addition of SOG event
+        related objects and notifications."
+    REVISION    "200408060000Z" -- 06 August 2004
+    DESCRIPTION
+        "Rev 1.00.06
+        Added SOG event related object and notifications."
+    REVISION     "200407100000Z" -- 10 July 2004
+    DESCRIPTION
+        "Rev 1.00.05
+        Added application event related object and notifications.
+        Corrected description of ipoGenLKSCommsOperationalEvent."
+    REVISION     "200405280000Z" -- 28 May 2004
+    DESCRIPTION
+        "Rev 1.00.04
+        Revised usage description for ipoGTEventSeverity."
+    REVISION     "200403030000Z" -- 03 March 2004
+    DESCRIPTION
+        "Rev 1.00.03
+        Revised for external publication."
+    REVISION     "200312150000Z" -- 15 December 2003
+    DESCRIPTION
+        "Rev 1.00.02
+        Added loopback object and notification."
+    REVISION     "200311110000Z" -- 11 November 2003
+    DESCRIPTION
+        "Rev 1.00.01
+        Corrected ipoGTEventEntity MAX-ACCESS."
+    REVISION     "200310100000Z" -- 10 October 2003
+    DESCRIPTION
+        "Rev 1.00.00
+        The first published version of this MIB module."
+    ::= { mibs 2 }
+
+-- sub-tree for IP Office wide objects and events irrespective of function
+ipoGeneric         OBJECT IDENTIFIER ::= { ipoMIB 1 }
+
+-- sub-tree for IP Office functional MIBs
+ipoGenMibs         OBJECT IDENTIFIER ::= { ipoGeneric 1 }
+
+-- sub-tree for IP Office wide traps/notifications
+ipoGenTraps        OBJECT IDENTIFIER ::= { ipoGeneric 2 }
+
+-- sub-tree for IP Office wide conformance information
+ipoGenConformance  OBJECT IDENTIFIER ::= { ipoGeneric 3 }
+
+--********************************************************************
+-- IP Office wide traps/notifications
+--********************************************************************
+
+ipoGTEvents  OBJECT IDENTIFIER ::= { ipoGenTraps 0 }
+ipoGTObjects OBJECT IDENTIFIER ::= { ipoGenTraps 1 }
+
+--
+-- trap objects
+--
+
+ipoGTEventSeverity OBJECT-TYPE
+    SYNTAX      INTEGER {
+        critical(1),
+        major(2),
+        minor(3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      deprecated
+    DESCRIPTION
+        "Severity of the event that has occurred.
+
+        The event severity depends upon the type of
+        entity/notification that the operational state change event
+        relates to:
+
+        GenEntityEvents:
+
+        Type of physical   Severity
+        entity
+        container          critical
+        module             major
+        port               major
+
+        Known transient errors for entities have a severity of minor.
+
+        LKSCommsEvents:
+        Severity is major
+
+        GenLoopbackEvent:
+        Severity is major
+
+        GenAppEvents:
+        Severity depends on sub-event
+        Failure/Operational - severity is major
+        Event               - severity depends on event condition
+
+        ipoGenSogEvents:
+        Severity depends on sub-event
+        HostFailure         - severity is Major
+        ModeChange:
+          - Mode survivable: severity is Major
+          - Mode subTending: severity is Minor
+
+        PhoneChangeEvents:
+        Severity is minor
+
+        **NOTE: This object is deprecated and replaced by
+          ipoGTEventStdSeverity."
+    ::= { ipoGTObjects 1 }
+
+ipoGTEventDateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Date and time of the occurence of the event."
+    ::= { ipoGTObjects 2 }
+
+ipoGTEventEntity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A reference, by entPhysicalIndex value, to the
+        EntPhysicalEntry representing the physical entity that an
+        event is associated with in an entity MIB instantiation within
+        the IP Office agent."
+    ::= { ipoGTObjects 3 }
+
+ipoGTEventLoopbackStatus OBJECT-TYPE
+    SYNTAX      Integer32 (1..127)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      deprecated
+    DESCRIPTION
+        "This variable represents the current state of the
+         loopback on the DS1 interface.  It contains
+         information about loopbacks established by a
+         manager and remotely from the far end.
+
+         The ipoGTEventLoopbackStatus is a bit map represented as
+         a sum, therefore is can represent multiple
+         loopbacks simultaneously.
+
+         The various bit positions are:
+          1  noLoopback
+          2  nearEndPayloadLoopback
+          4  nearEndLineLoopback
+          8  nearEndOtherLoopback
+         16  nearEndInwardLoopback
+         32  farEndPayloadLoopback
+         64  farEndLineLoopback"
+    ::= { ipoGTObjects 4 }
+
+ipoGTEventAppEntity OBJECT-TYPE
+    SYNTAX      INTEGER {
+          voiceMail(1),
+          deltaServer(2),
+          customerCallReporter(3),
+          oneXPortal(4)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The IP Office application to which a notification/trap
+        relates."
+    ::= { ipoGTObjects 5 }
+
+ipoGTEventAppEvent OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   storageFull(1), -- severity: Critical
+             storageNearlyFull(2), -- severity: Major
+                   storageOkay(3), -- severity: Minor
+      backupCommunicationError(4), -- severity: Major
+               backupFileError(5), -- severity: Major
+                   httpFailure(6), -- severity: Major
+          httpSslAcceptFailure(7), -- severity: Major
+             httpSslConnection(8), -- severity: Major
+                httpSslFailure(9), -- severity: Major
+           httpSslPortFailure(10), -- severity: Major
+              ignoringRequest(11), -- severity: Major
+     imapInitializationFailed(12), -- severity: Major
+             imapInvalidMsgNr(13), -- severity: Major
+          imapMailboxNotExist(14), -- severity: Major
+           imapMessageInvalid(15), -- severity: Major
+          imapMessageNotExist(16), -- severity: Major
+        imapMessageNrNotExist(17), -- severity: Major
+        imapMissingConnection(18), -- severity: Major
+          imapMissingSettings(19), -- severity: Major
+                imapNoLicence(20), -- severity: Major
+            imapNotConfigured(21), -- severity: Major
+          imapShiftConnection(22), -- severity: Major
+     mapiInitializationFailed(23), -- severity: Major
+          mapiMissingSettings(24), -- severity: Major
+         mapiConnectionFailed(25), -- severity: Major
+          mapiShiftConnection(26), -- severity: Major
+                      licence(27), -- severity: Major
+           licenceDistributed(28), -- severity: Major
+               licenceExpired(29), -- severity: Major
+                   licenceSOG(30), -- severity: Major
+                 loginFailure(31), -- severity: Major
+   loginFailureInvalidMailbox(32), -- severity: Major
+              mailboxNotFound(33), -- severity: Major
+           makeLiveFileAccess(34), -- severity: Major
+          makeLiveMissingFile(35), -- severity: Major
+              offlineMakeLive(36), -- severity: Major
+                    onexError(37), -- severity: Major
+            pbxConnectionLost(38), -- severity: Major
+           pbxIncompatibility(39), -- severity: Major
+            smgrSettingsError(40), -- severity: Major
+         smtpConnectionFailed(41), -- severity: Major
+        smtpConnectionTimeout(42), -- severity: Major
+                    smtpError(43), -- severity: Major
+   smtpSecureConnectionFailed(44), -- severity: Major
+           smtpUnexpectedData(45), -- severity: Major
+           smtpUnsuportedData(46), -- severity: Major
+          socketAbortingError(47), -- severity: Major
+              socketBindError(48), -- severity: Major
+socketClientDisconnectedError(49), -- severity: Major
+        socketConnectionError(50), -- severity: Major
+        socketNoresponseError(51), -- severity: Major
+            socketOptionError(52), -- severity: Major
+           socketReceiveError(53), -- severity: Major
+        socketRecvFailedError(54), -- severity: Major
+        socketSendFailedError(55), -- severity: Major
+            socketSelectError(56), -- severity: Major
+          socketTimedOutError(57), -- severity: Major
+            switchedToPrimary(58), -- severity: Major
+          switchedToSecondary(59), -- severity: Major
+               tcpAcceptError(60), -- severity: Major
+               tcpListenError(61), -- severity: Major
+               tcpSelectError(62), -- severity: Major
+                     tcpError(63), -- severity: Major
+              testTimeExpired(64), -- severity: Major
+          tftpConnectionError(65), -- severity: Major
+          tftpMonitoringError(66), -- severity: Major
+             tftpReadingError(67), -- severity: Major
+           tftpReceivingError(68), -- severity: Major
+            tftpWrittingError(69), -- severity: Major
+               tooManyClients(70), -- severity: Major
+                 updateEerror(71), -- severity: Major
+                updateSuccess(72), -- severity: Major
+                     vmScript(73)  -- severity: Major
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office application event states.  The associated event
+        severity of the notification/trap the object is carried in
+        varies depending upon the event condition. The appropriate
+        severity is detailed against event enumeration."
+    ::= { ipoGTObjects 6 }
+
+ipoGTEventHostAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Address of an IP Office Small Office Gateway Subtending Host."
+    ::= { ipoGTObjects 7 }
+
+ipoGTEventSOGMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                survivable(1), -- severity: Major
+                subTending(2)  -- severity: Minor
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office Small Office Gateway operating modes.  
+        survivable(1) indicates the control unit has no current host, 
+        either through confguration error or communication failure.  
+        subTending(2) indicates normal operation to a valid Sub-
+        tending Host."
+    ::= { ipoGTObjects 8 }
+
+ipoGTEventStdSeverity OBJECT-TYPE
+    SYNTAX      ItuPerceivedSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Severity of the event that has occurred.
+
+        The event severity depends upon the type of
+        entity/notification that the operational state change event
+        relates to. The severity values that are normally used are
+        detailed below:
+
+        The enterprise versions of standard SNMP traps all have a
+        severity of major (4).
+
+        Operational events which notify the transition back to an
+        operational state from a failure state have a severity of
+        cleared (1).
+
+
+        GenEntityEvents:
+          Operational - severity is cleared (1)
+
+          Failure event severity levels
+            Type of physical   Severity for failure
+            entity
+            container          critical (3)
+            module             major (4)
+            port               major (4)
+
+          Error
+            Known transient errors for entities have a severity of
+            warning (6).
+
+          Change - severity is major (4)
+
+        LKSCommsSvcEvents:
+          Operational - severity is cleared (1)
+          Failure -     severity is major (4)
+
+        GenLoopbackSvcEvent:
+          Severity is major (4)
+
+        GenAppSvcEvents:
+          Severity depends on sub-event
+          Operational - severity is cleared (1)
+          Failure -     severity is major (4)
+          Event -       severity depends on event condition
+            For voicemail storage conditions the severity is as
+            follows:
+              storageOkay       - severity is cleared (1)
+              storageNearlyFull - severity is warning (6)
+                (Only warning severity as it could be transitory.)
+              storageFull       - severity is critical (3)
+
+        GenSogSvcEvents:
+          Severity depends on sub-event
+          HostFailure         - severity is Major (4)
+          ModeChange:
+            - Mode survivable: severity is Major (4)
+            - Mode subTending: severity is Minor (5)
+
+        GenUPriLicSvcEvents:
+          Severity depends on sub-event
+          ChansReduced        - severity is Major (4)
+          CallRejected        - severity is Minor (5)
+
+        GenQoSMonSvcEvent:
+          QoSWarning        - severity is Warning (6)
+
+        PhoneChangeSvcEvents:
+          Severity is minor (5)
+
+        ipoGenSystemRunningBackupEvent:
+          Severity is cleared (1)
+          Severity is critical (3)
+                
+        ipoGenInvalidMemoryCardEvent:
+          Severity is cleared (1)
+          Severity is Major (4)
+
+        ipoGenNoLicenceKeyDongleEvent:
+          Severity is cleared (1)
+          Severity is warning (6)
+          Severity is critical (3)
+
+        ipoGenMemoryCardCapacityEvent:
+          Severity depends on sub-event
+              storageOkay       - severity is cleared (1)
+              storageNearlyFull - severity is warning (6)
+              storageFull       - severity is critical (3)"
+    ::= { ipoGTObjects 9 }
+
+ipoGTEventDevID OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (10))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A unique textual identifier of the alarming device."
+    ::= { ipoGTObjects 10 }
+
+ipoGTEventEntityName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..64))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The textual name of the alarming physical entity. The
+        contents of this object is made of concatenated
+        entPhysicalName values that fully identify the object with the
+        overall IP Office entity. Examples values are:
+
+        Controller, Trunk Slot B, Trunk Module, T1 PRI 2
+          = T1 PRI Port 2, on a dual T1 Trunk Module, in Trunk Slot B,
+            on the IP Office Controller Unit
+
+        Controller, VCM Slot 1, VCM 1
+          = VCM Card, in VCM Slot 1, on the IP Office Controller Unit
+
+        Controller, EXP 1, DS EXP 16, DS 12
+          = DS Phone Port 12, on a DS16 Expansion Module, attached to
+          Expansion Port 1, on the IP Office Controller Unit"
+    ::= { ipoGTObjects 11 }
+
+ipoGTEventLoopbackStatusBits OBJECT-TYPE
+    SYNTAX      BITS {
+        noLoopback(0),
+        nearEndPayloadLoopback(1),
+        nearEndLineLoopback(2),
+        nearEndOtherLoopback(3),
+        nearEndInwardLoopback(4),
+        farEndPayloadLoopback(5),
+        farEndLineLoopback(6)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the current state of the loopback on
+         the DS1 interface.  It contains information about loopbacks
+         established by a manager and remotely from the far end.
+
+         The ipoGTEventLoopbackStatus is a bit map therefore is can
+         represent multiple loopbacks simultaneously."
+    ::= { ipoGTObjects 12 }
+
+ipoGTEventQoSMonJitter OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office QoS monitoring Received Jitter time in milliseconds."
+    ::= { ipoGTObjects 13 }
+
+ipoGTEventQoSMonRndTrip OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office QoS monitoring Round Trip Delay time in milliseconds."
+    ::= { ipoGTObjects 14 }
+
+ipoGTEventQoSMonPktLoss OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office QoS monitoring Received Packet Loss."
+    ::= { ipoGTObjects 15 }
+
+ipoGTEventQoSMonCallId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office QoS monitoring Call Identifier."
+    ::= { ipoGTObjects 16 }
+
+ipoGTEventQoSMonDevType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                line(1),
+                extn(2)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office QoS monitoring Device Type."
+    ::= { ipoGTObjects 17 }
+
+ipoGTEventQoSMonDevId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office QoS monitoring Device Identifier."
+    ::= { ipoGTObjects 18 }
+
+ipoGTEventQoSMonExtnNo OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "IP Office QoS monitoring Extension Number."
+    ::= { ipoGTObjects 19 }
+
+ipoGTEventSystemShutdownSource OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the source from where the system
+        shutdown was performed.
+        
+        Possible values are:
+        
+        DTE-Port
+            - if the system shutdown is performed using the DTE,
+        AUX-Button
+            - if the system shutdown is performed using the AUX
+            button (available only for IP500v2),
+        Phone <user name>
+            - if the system shutdown is performed from a phone,
+        Manager <security user name>
+            - if the system shutdown is performed from Manager,
+        SSA <security user name>
+            - if the system shutdown is performed from SSA."
+    ::= { ipoGTObjects 20 }
+
+ipoGTEventSystemShutdownTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable represents the period of time the system will be in
+        the shutdown state for. Possible values are in the 5 to 1440 minutes
+        range, 0 meaning infinite."
+    ::= { ipoGTObjects 21 }
+
+ipoGTEventMemoryCardSlotId OBJECT-TYPE
+    SYNTAX      INTEGER {
+                compactFlash(1),
+                systemSD(2),
+                optionalSD(3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates a memory card physical position identifier.
+        System(2) and Optional(3) are valid for the IP500 V2.  CF(1) valid 
+        for the IP500."
+    ::= { ipoGTObjects 22 }
+
+ipoGTEventNoValidKeyReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                noReason(1),
+                notPresent(2),
+                noRegisterAccess(3),
+                invalidRegisters(4),
+                invalidWatermark(5),
+                invalidClusterSize(6),
+                invalidVolume(7),
+                invalidHeaderFiles(8),
+                nonSpecificError(9)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the reason no valid licence feature key is 
+        assumed.  This is also the order of importance and check precedence.
+                noReason(1) - cleared condition
+                notPresent(2) - license feature key no present
+                noRegisterAccess(3) - license feature key present, but no access
+                invalidRegisters(4) - invalid register values
+                invalidWatermark(5) - watermark invalid or not present
+                invalidClusterSize(6) - filesystem not as expected"
+    ::= { ipoGTObjects 23 }
+
+ipoGTEventReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                configurationAgentNotTargeted(1),
+                configurationSCNDialPlanConflict(2),
+                configurationNoIncomingCallRoute(3),
+                configurationHWTypeFailure(4),
+                serviceFeatureLicenseMissing(5),
+                serviceAllLicensesInUse(6),
+                serviceClockSourceChanged(7),
+                serviceLogonFailed(8),
+                serviceNoFreeChannelsAvail(9),
+                serviceHoldMusicFileFailure(10),
+                serviceAllResourcesInUse(11),
+                serviceAlarm(12),
+                serviceNetworkInterconnectFailure(13),
+                trunkSeizeFailure(14),
+                trunkIncomingCallOutgoingTrunk(15),
+                trunkCLINotDelivered(16),
+                trunkDDIIncomplete(17),
+                trunkLOS(18),
+                trunkOOS(19),
+                trunkRedAlarm(20),
+                trunkBlueAlarm(21),
+                trunkYellowAlarm(22),
+                trunkIPConnectFail(23),
+                trunkSCNInvalidConnection(24),
+                linkDeviceChanged(25),
+                linkLDAPServerCommFailure(26),
+                linkResourceDown(27),
+                linkSMTPServerCommFailure(28),
+                linkVMProConnFailure(29),
+                serviceTimeServerAlarm(30),
+                serviceLicenseFileInvalid(31),
+                serviceLicenseError(32),
+                securityError(33),
+                codecError(34),
+                scepNoRespError(35),
+                configAppsProcAlarm(36),
+                serviceAppsProcAlarm(37),
+                serviceLicenseServerError(38),
+                testAlarm(39),
+                servicePlannedMaintenance(40),
+                serviceNetworkDisconnection(41), 
+                serviceFailedTlsNegotiation(42), 
+                serviceFailedTlsRenegotiation(43),
+                serviceLackOfResources(44),
+                serviceInternalError(45),
+                serviceTooManyMissedHeartbeats(46),
+                serviceFailedDnsResolution(47),
+                serviceDuplicateIpAddress(48),
+                serviceAuthenticationFailure(49),
+                serviceSslVpnStackProtocolError(50),
+                serviceSslVpnServerReportedError(51),
+                servicePortRangeExhausted(52),
+                serviceWebservicesUWSError(53),
+                trunkNoFreeVoIPChannel(54),
+                serviceEmergencyCall(55),
+                serviceLocationCongestion(56),
+                serviceCpuAlarm(57),
+                serviceCpuIOAlarm(58),
+                serviceMemoryAlarm(59),
+                serviceLocalBackup(60),
+                trunkSMConnectAsSIP(61),
+                trunkSIPConnectAsSM(62),
+                serviceSipRxPacketSizeError(63),
+                serviceACCSAlarm(64),
+                serviceSystemHardDriveAlarm(65),
+                serviceAdditionalHardDriveAlarm(66),
+                linkDialerConnFailure(67),
+                trunkSIPDNSInvalidConfig(68),
+                trunkSIPDNSTransportError(69),
+                monitorLogStamped(70),
+                trunkSCNInvalidSubOperMode(71),
+                serviceIPDECTSystemError(72),
+                serviceIPOCCAlarm(73),
+                serviceGeneralAlarm(74),
+                serviceSystemInfo(75),
+                serviceNonSelectAlarm(76),
+                serviceCCRNotSupported(77),
+                serviceAMServerNotAvailable(78),
+                trunkMediaSecuritySettingsIncompatible(79)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates what event took place within Configuration, Service, Trunk
+        or Link category alarm"
+    ::= { ipoGTObjects 24 }
+
+ipoGTEventData OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable contains opaque data that can be used to provide additional information
+        when the ipoGTEventReason value is not sufficient."
+    ::= { ipoGTObjects 25 }
+
+ipoGTEventAlarmDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable describes the alarm"
+    ::= { ipoGTObjects 26 }
+
+ipoGTEventAlarmRemedialAction OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable describes the remedial action of the alarm"
+    ::= { ipoGTObjects 27 }
+
+
+
+--
+-- traps
+--
+
+ipoGenEntityFailureEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventEntity
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenEntityFailureEvent notification is generated whenever a
+        physical entity on the IP Office fails in its operation. It
+        signifies that the SNMP entity, acting in an agent role, has
+        detected that the state of a physical entity of the system has
+        transitioned from the operational to the failed state
+
+        **NOTE: This notification is deprecated and replaced by 
+        ipoGenEntityFailureSvcEvent"
+    ::= { ipoGTEvents 1 }
+
+ipoGenEntityOperationalEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventEntity
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenEntityOperationalEvent notification is generated whenever
+        a physical entity on the IP Office becomes operational again
+        after having failed. It signifies that the SNMP entity, acting
+        in an agent role, has detected that the state of a physical
+        entity of the system has transitioned from the failed to the
+        operational state
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenEntityOperationalSvcEvent."
+    ::= { ipoGTEvents 2 }
+
+ipoGenEntityErrorEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventEntity
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenEntityErrorEvent notification is generated whenever a
+        physical entity on the IP Office experiences a temporary
+        error. It signifies that the SNMP entity, acting in an agent
+        role, has detected a transitory error on a physical entity of
+        the system.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenEntityErrorSvcEvent."
+    ::= { ipoGTEvents 3 }
+
+ipoGenEntityChangeEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventEntity
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenEntityChangeEvent notification is generated whenever
+        a physical entity on the IP Office experiences a change itself
+        or with other entities associated with it. It signifies that
+        the SNMP entity, acting in an agent role, has detected a non
+        error/failure change for a physical entity on the system.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenEntityChangeSvcEvent."
+   ::= { ipoGTEvents 4 }
+
+ipoGenLKSCommsFailureEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenLKSCommsFailureEvent notification is generated
+        whenever communication with a Licence Key Server fails.  It
+        signifies that the SNMP entity, acting in an agent role, has
+        detected that the state of the communications between the
+        Licence Key Server has transitioned from the operational to
+        the failed state.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenLKSCommsFailureSvcEvent."
+    ::= { ipoGTEvents 5 }
+
+ipoGenLKSCommsOperationalEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenLKSCommsOperationalEvent notification is generated
+        whenever communication with a Licence Key Server becomes
+        operational again after having failed.  It signifies that the
+        SNMP entity, acting in an agent role, has detected that the
+        state of the communications between the Licence Key Server has
+        transitioned from the failed to the operational state.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenLKSCommsOperationalSvcEvent."
+    ::= { ipoGTEvents 6 }
+
+ipoGenLKSCommsErrorEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenLKSCommsErrorEvent notification is generated whenever
+         a IP Office experiences a temporary error with License Key
+         Server communication. It signifies that the SNMP entity,
+         acting in an agent role, has detected a transitory error with
+         the communication between the License Key Server and Client
+         on the system.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenLKSCommsErrorSvcEvent."
+    ::= { ipoGTEvents 7 }
+
+ipoGenLKSCommsChangeEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenLKSCommsChangeEvent notification is generated
+        whenever a IP Office experiences a change a non error change
+        License Key Server communication operation.  It signifies that
+        the SNMP entity, acting in an agent role, has detected a non
+        error/failure change with the License Key Server and Client
+        operation on the system.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenLKSCommsChangeSvcEvent."
+   ::= { ipoGTEvents 8 }
+
+ipoGenLoopbackEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventEntity,
+        ipoGTEventLoopbackStatus
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenLoopbackEvent notification is generated whenever a IP
+        Office T1 (DS1) interface operating as a CSU actions a loopback
+        status change.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenLoopbackSvcEvent."
+   ::= { ipoGTEvents 9 }
+
+ipoGenAppFailureEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventAppEntity
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenAppFailureEvent notification is generated whenever
+        communication between a IP Office switch and a IP Office
+        application fails.  It signifies that the SNMP entity, acting
+        in an agent role, has detected that the state of the
+        communications between the IP Office switch and a IP Office
+        application has transitioned from the operational to the
+        failed state.  The IP Office application between which
+        communication has been lost is identified by the value of
+        ipoGTEventAppEntity.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenAppFailureSvcEvent."
+    ::= { ipoGTEvents 10 }
+
+ipoGenAppOperationalEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventAppEntity
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenAppOperationalEvent notification is generated
+        whenever communication between a IP Office switch and a IP
+        Office application becomes operational again after having
+        failed.  It signifies that the SNMP entity, acting in an agent
+        role, has detected that the state of the communications
+        between the IP Office switch and a IP Office application has
+        transitioned from the failed to the operational state.  The IP
+        Office application between which communication has been lost
+        is identified by the value of ipoGTEventAppEntity.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenAppOperationalSvcEvent."
+    ::= { ipoGTEvents 11 }
+
+ipoGenAppEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventAppEntity,
+        ipoGTEventAppEvent
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "A ipoGenAppEvent notification is generated whenever a
+        application entity of the IP Office system experiences an event.
+        It signifies that the SNMP entity, acting as a proxy for
+        the application, has detected an event on the application
+        entity of the overall IP Office system.
+        The event severity varies dependent upon the event condition.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenAppSvcEvent."
+    ::= { ipoGTEvents 12 }
+
+ipoGenSogHostFailureEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventHostAddress
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "An ipoGenSogFailureEvent notification is generated whenever a
+        previously valid Sub-tending host fails during Small Office 
+        Gateway operation.
+        The ipAddress field indicates the address of the failed host.
+        The event severity will always indicate Major.
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenSogHostFailureSvcEvent."
+    ::= { ipoGTEvents 13 }
+
+ipoGenSogModeChangeEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventSOGMode
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "An ipoGenSogModeChangeEvent notification is generated whenever 
+        the Small Office Gateway operating mode changes. This also
+        includes entry to the initial mode.
+        The ipoGTEventSOGMode field indicates the new operating mode.
+        The event severity will be major(2) for a ipoGTEventSOGMode value
+        of survivable(1), and minor(3) for a ipoGTEventSOGMode value of
+        subTending(2).
+
+        **NOTE: This notification is deprecated and replaced by
+          ipoGenSogModeChangeSvcEvent."
+    ::= { ipoGTEvents 14 }
+
+ipoGenColdStartSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard coldstart trap featuring
+         device identification information.  A coldStart trap
+         signifies that the sending protocol entity is reinitializing
+         itself such that the agent's configuration or the protocol
+         entity implementation may be altered."
+    ::= { ipoGTEvents 15 }
+
+ipoGenWarmStartSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard warmstart trap featuring
+         device identification information.  A warmStart trap
+         signifies that the sending protocol entity is reinitializing
+         that neither the agent configuration nor the protocol entity
+         implementation is altered."
+    ::= { ipoGTEvents 16 }
+
+ipoGenLinkDownSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ifIndex
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard linkDown trap featuring device
+         identification information.  A linkDown trap signifies that
+         the sending protocol entity recognizes a failure in one of
+         the communication links represented in the agent's
+         configuration."
+    ::= { ipoGTEvents 17 }
+
+ipoGenLinkUpSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ifIndex
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard linkUp trap featuring device
+         identification information.  A linkUp trap signifies that the
+         sending protocol entity recognizes that one of the
+         communication links represented in the agent's configuration
+         has come up."
+    ::= { ipoGTEvents 18 }
+
+ipoGenAuthFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "Enterprise version of standard authenticationFailure trap
+         featuring device identification information.  An
+         authenticationFailure trap signifies that the sending
+         protocol entity is the addressee of a protocol message that
+         is not properly authenticated.  While implementations of the
+         SNMP must be capable of generating this trap, they must also
+         be capable of suppressing the emission of such traps via an
+         implementation- specific mechanism."
+    ::= { ipoGTEvents 19 }
+
+ipoGenEntityFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventEntity,
+        ipoGTEventEntityName
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenEntityFailureSvcEvent notification is generated
+        whenever a physical entity on the IP Office fails in its
+        operation. It signifies that the SNMP entity, acting in an
+        agent role, has detected that the state of a physical entity
+        of the system has transitioned from the operational to the
+        failed state"
+    ::= { ipoGTEvents 20 }
+
+ipoGenEntityOperationalSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventEntity,
+        ipoGTEventEntityName
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenEntityOperationalSvcEvent notification is generated
+        whenever a physical entity on the IP Office becomes
+        operational again after having failed. It signifies that the
+        SNMP entity, acting in an agent role, has detected that the
+        state of a physical entity of the system has transitioned from
+        the failed to the operational state"
+    ::= { ipoGTEvents 21 }
+
+ipoGenEntityErrorSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventEntity,
+        ipoGTEventEntityName
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenEntityErrorSvcEvent notification is generated
+        whenever a physical entity on the IP Office experiences a
+        temporary error. It signifies that the SNMP entity, acting in
+        an agent role, has detected a transitory error on a physical
+        entity of the system."
+    ::= { ipoGTEvents 22 }
+
+ipoGenEntityChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventEntity,
+        ipoGTEventEntityName
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenEntityChangeSvcEvent notification is generated
+        whenever a physical entity on the IP Office experiences a
+        change itself or with other entities associated with it. It
+        signifies that the SNMP entity, acting in an agent role, has
+        detected a non error/failure change for a physical entity on
+        the system."
+    ::= { ipoGTEvents 23 }
+
+ipoGenLKSCommsFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLKSCommsFailureSvcEvent notification is generated
+        whenever communication with a Licence Key Server fails.  It
+        signifies that the SNMP entity, acting in an agent role, has
+        detected that the state of the communications between the
+        Licence Key Server has transitioned from the operational to
+        the failed state."
+    ::= { ipoGTEvents 24 }
+
+ipoGenLKSCommsOperationalSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLKSCommsOperationalSvcEvent notification is generated
+        whenever communication with a Licence Key Server becomes
+        operational again after having failed.  It signifies that the
+        SNMP entity, acting in an agent role, has detected that the
+        state of the communications between the Licence Key Server has
+        transitioned from the failed to the operational state."
+    ::= { ipoGTEvents 25 }
+
+ipoGenLKSCommsErrorSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLKSCommsErrorSvcEvent notification is generated
+         whenever a IP Office experiences a temporary error with
+         License Key Server communication. It signifies that the SNMP
+         entity, acting in an agent role, has detected a transitory
+         error with the communication between the License Key Server
+         and Client on the system."
+    ::= { ipoGTEvents 26 }
+
+ipoGenLKSCommsChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLKSCommsChangeSvcEvent notification is generated
+        whenever a IP Office experiences a change a non error change
+        License Key Server communication operation.  It signifies that
+        the SNMP entity, acting in an agent role, has detected a non
+        error/failure change with the License Key Server and Client
+        operation on the system."
+    ::= { ipoGTEvents 27 }
+
+ipoGenLoopbackSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventEntity,
+        ipoGTEventEntityName,
+        ipoGTEventLoopbackStatusBits
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLoopbackSvcEvent notification is generated whenever a
+        IP Office T1 (DS1) interface operating as a CSU actions a
+        loopback status change."
+   ::= { ipoGTEvents 28 }
+
+ipoGenAppFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventAppEntity
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenAppFailureSvcEvent notification is generated whenever
+        communication between a IP Office switch and a IP Office
+        application fails.  It signifies that the SNMP entity, acting
+        in an agent role, has detected that the state of the
+        communications between the IP Office switch and a IP Office
+        application has transitioned from the operational to the
+        failed state.  The IP Office application between which
+        communication has been lost is identified by the value of
+        ipoGTEventAppEntity."
+    ::= { ipoGTEvents 29 }
+
+ipoGenAppOperationalSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventAppEntity
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenAppOperationalSvcEvent notification is generated
+        whenever communication between a IP Office switch and a IP
+        Office application becomes operational again after having
+        failed.  It signifies that the SNMP entity, acting in an agent
+        role, has detected that the state of the communications
+        between the IP Office switch and a IP Office application has
+        transitioned from the failed to the operational state.  The IP
+        Office application between which communication has been lost
+        is identified by the value of ipoGTEventAppEntity."
+    ::= { ipoGTEvents 30 }
+
+ipoGenAppSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventAppEntity,
+        ipoGTEventAppEvent,
+        ipoGTEventAlarmDescription
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenAppSvcEvent notification is generated whenever a
+        application entity of the IP Office system experiences an
+        event.  It signifies that the SNMP entity, acting as a proxy
+        for the application, has detected an event on the application
+        entity of the overall IP Office system.
+
+        The event severity varies dependent upon the event condition."
+    ::= { ipoGTEvents 31 }
+
+ipoGenSogHostFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventHostAddress
+    }
+    STATUS current
+    DESCRIPTION
+        "An ipoGenSogFailureSvcEvent notification is generated
+        whenever a previously valid Sub-tending host fails during
+        Small Office Gateway operation.
+
+        The ipAddress field indicates the address of the failed host.
+        The event severity will always indicate major(4)."
+    ::= { ipoGTEvents 32 }
+
+ipoGenSogModeChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventSOGMode
+    }
+    STATUS current
+    DESCRIPTION
+        "An ipoGenSogModeChangeSvcEvent notification is generated
+        whenever the Small Office Gateway operating mode changes. This
+        also includes entry to the initial mode.
+
+        The ipoGTEventSOGMode field indicates the new operating mode.
+        The event severity will be major(4) for a ipoGTEventSOGMode
+        value of survivable(1), and minor(5) for a ipoGTEventSOGMode
+        value of subTending(2)."
+    ::= { ipoGTEvents 33 }
+
+ipoGenUPriLicChansReducedSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenUPriLicChansReducedSvcEvent notification is generated
+        whenever the number of Universal PRI Licensed channels has
+        been reduced. It signifies that the SNMP entity, acting in an
+        agent role, has detected a reduction in the licensed channels
+        on a Univeral PRI trunk."
+    ::= { ipoGTEvents 34 }
+
+ipoGenUPriLicCallRejectedSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenUPriLicCallRejectedSvcEvent notification is generated
+        whenever a call on a Universal PRI is rejected due to a
+        licensed channel not being available.  It signifies that the
+        SNMP entity, acting in an agent role, has detected a licensed
+        channel not available in order to make a call on a Univeral
+        PRI trunk."
+    ::= { ipoGTEvents 35 }
+
+ipoGenQoSMonSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventQoSMonJitter,
+        ipoGTEventQoSMonRndTrip,
+        ipoGTEventQoSMonPktLoss,
+        ipoGTEventQoSMonCallId,
+        ipoGTEventQoSMonDevType,
+        ipoGTEventQoSMonDevId,
+        ipoGTEventQoSMonExtnNo
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenQoSMonSvcEvent notification is generated when one of
+        the monitored QoS parameters (e.g. round trip delay, jitter,
+        packet loss, etc) exceeds its pre-selected threshold during
+        the duration of the call. It signifies that the SNMP entity,
+        acting in an agent role, has detected a state that one of the
+        monitored QoS parameters for the call exceeded its
+        pre-selected threshold.
+
+        The ipoGTEventQOSMonExtnNo value is only valid when the device
+        monitored is an extension rather than a line."
+    ::= { ipoGTEvents 36 }
+
+ipoGenSystemShutdownSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventSystemShutdownSource,
+        ipoGTEventSystemShutdownTimeout
+    }
+    STATUS current
+    DESCRIPTION
+        "An ipoGenSystemShutdownSvcEvent notification is generated when a
+        system shutdown is performed. It signifies that the
+        SNMP entity has detected a system shutdown."
+    ::= { ipoGTEvents 37 }
+
+ipoGenSystemRunningBackupEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr
+    }
+    STATUS current
+    DESCRIPTION
+        "An ipoGenSystemRunningBackup notification is generated when a
+        system is running partially or wholly from alternate/backup 
+        software and/or configuration data.
+        In the case of an IP500 V2, it indicates that the current boot location
+        is not the System SD card slot, \system\primary."
+    ::= { ipoGTEvents 38 }
+
+ipoGenInvalidMemoryCardEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventMemoryCardSlotId
+    }
+    STATUS current
+    DESCRIPTION
+        "An ipoGenInvalidMemoryCard notification is generated when a memory
+        card is detected present but cannot be used due to failure in the 
+        filesystem or card type checks.
+        The checks are carried out on startup and whenever a memory card is
+        inserted."
+    ::= { ipoGTEvents 39 }
+
+ipoGenNoLicenceKeyDongleEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventNoValidKeyReason
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenNoLicenceKeyDongle notification is generated if a system
+        either does not detect presence, or fails to validate a Licence Feature
+        Key Dongle.
+        In the case of an IP500 V2, it indicates that either the System SD card
+        is not present, or that one of the validation checks has failed.  Note
+        that removing the System SD card will cause this event immediately,
+        however the licences will remain valid for approximately 2 hours.
+
+        ipoGTEventStdSeverity will indicate the events state:
+          Severity is cleared(1): license dongle OK
+          Severity is warning(6): license dongle not OK, in grace period
+          Severity is critical(3): license dongle not OK, grace period expired
+        
+        The first check to fail is contained within ipoGTEventNoKeyReason."
+    ::= { ipoGTEvents 40 }
+
+ipoGenMemoryCardCapacityEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventMemoryCardSlotId,
+        ipoGTEventAppEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenMemoryCardCapacityEvent notification is generated if a memory
+        card passes one of the preset capacity thresholds.
+        In the case of an IP500 V2, the thresholds shall be
+            storageFull(1) - greater than  99% of nominal capacity
+            storageNearlyFull(2) - greater than 90% of nominal capacity
+            storageOkay(3) - less than 90% of nominal capacity."
+    ::= { ipoGTEvents 41 }
+
+
+
+ipoGenConfigFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenConfigFailureSvcEvent notification is generated
+        whenever a configuration component fails in its operation. It signifies
+        that the SNMP entity,acting in an agent role,has detected that
+        the state of a configuration component has transitioned from the
+        operational to the failed state. 
+        
+        This notification event is associated with a configuration 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 42}
+
+ipoGenConfigOperationalSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenConfigOperationalSvcEvent notification is generated
+        whenever a configuration component becomes operational again
+        after having failed.It signifies that the SNMP entity,acting in an
+        agent role,has detected that the state of a configuration component 
+        of thesystem has transitioned from the failed to the operational state.
+
+        This notification event is associated with a configuration 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 43}
+
+ipoGenConfigErrorSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenConfigErrorSvcEvent notification is generated
+        whenever a configuration component experiences a
+        temporary error.It signifies that the SNMP entity, acting
+        in an agent role,has detected a transitory error on a
+        configuration component of the system.
+        
+        This notification event is associated with a configuration 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 44}
+
+ipoGenConfigChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenConfigChangeSvcEvent notification is generated
+        whenever a configuration component experiences a change
+        or a non error change event.It signifies that the SNMP entity, acting
+        in an agent role,has detected a non error/failure change on a
+        configuration component of the system.
+        
+        This notification event is associated with a configuration 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 45}
+
+
+ipoGenServiceFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenServiceFailureSvcEvent notification is generated
+        whenever a Service component fails in its operation. It signifies
+        that the SNMP entity,acting in an agent role,has detected that
+        the state of a Service component has transitioned from the
+        operational to the failed state. 
+        
+        This notification event is associated with a service 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 46}
+
+ipoGenServiceOperationalSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenServiceOperationalSvcEvent notificationis generated
+        whenever a service component becomes operational again
+        after having failed.It signifiest hat the SNMP entity, acting in an
+        agent role, has detected that the state of a service component 
+        of the system has transitioned from the failed to the operational state.
+        
+        This notification event is associated with a service 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 47}
+
+ipoGenServiceErrorSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenServiceErrorSvcEvent notification is generated
+        whenever a service component experiences a
+        temporary error. It signifiest hat the SNMP entity, acting
+        in an agent role,has detected a transitory error on a
+        service component of the system.
+        
+        This notification event is associated with a service 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 48}
+
+ipoGenServiceChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenServiceChangeSvcEvent notification is generated
+        whenever a service component experiences a change
+        or a non error change event. It signifies that the SNMP entity, acting
+        in an agent role,has detected a non error/failure change on a
+        service component of the system.
+        
+        This notification event is associated with a service 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 49}
+
+ipoGenTrunkFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenTrunkFailureSvcEvent notification is generated
+        whenever a trunk component fails in its operation. It signifies
+        that the SNMP entity,acting in an agent role,has detected that
+        the state of a Trunk component has transitioned from the
+        operational to the failed state. 
+        
+        This notification event is associated with a trunk 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 50}
+
+ipoGenTrunkOperationalSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenTrunkOperationalSvcEvent notificationis generated
+        whenever a trunk component becomes operational again
+        after having failed. It signifies that the SNMP entity, acting in an
+        agent role,has detected that the state of a trunk component 
+        of the system has transitioned from the failed to the operational state.
+
+        This notification event is associated with a trunk 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 51}
+
+ipoGenTrunkErrorSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenTrunkErrorSvcEvent notification is generated
+        whenever a trunk component experiences a
+        temporary error. It signifies that the SNMP entity, acting
+        in an agent role, has detected a transitory error on a
+        trunk component of the system.
+        
+        This notification event is associated with a trunk 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 52}
+
+ipoGenTrunkChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenTrunkChangeSvcEvent notification is generated
+        whenever a trunk component experiences a change
+        or a non error change event. It signifies that the SNMP entity, acting
+        in an agent role, has detected a non error/failure change on a
+        trunk component of the system.
+        
+        This notification event is associated with a trunk 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 53}
+
+ipoGenLinkFailureSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLinkFailureSvcEvent notification is generated
+        whenever a Link component fails in its operation. It signifies
+        that the SNMP entity,acting in an agent role,has detected that
+        the state of a Link component has transitioned from the
+        operational to the failed state. 
+        
+        This notification event is associated with a link 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 54}
+
+ipoGenLinkOperationalSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLinkOperationalSvcEvent notification is generated
+        whenever a link component becomes operational again
+        after having failed. It signifies that the SNMP entity, acting in an
+        agent role, hasdetected that the state of a link component 
+        of the system has transitioned from the failed to the operational state.
+
+        This notification event is associated with a link 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 55}
+
+ipoGenLinkErrorSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLinkErrorSvcEvent notification is generated
+        whenever a link component experiences a
+        temporary error. It signifies that the SNMP entity, acting
+        in an agent role,has detected a transitory error on a
+        link component of thesystem.
+        
+        This notification event is associated with a link 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 56}
+
+ipoGenLinkChangeSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenLinkChangeSvcEvent notification is generated
+        whenever a link component experiences a change
+        or a non error change event. It signifies that the SNMP entity, acting
+        in an agent role,has detected a non error/failure change on a
+        link component of the system.
+        
+        This notification event is associated with a link 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 57}
+
+    ipoGenEmergencyCallSvcEvent NOTIFICATION-TYPE
+    OBJECTS {
+        ipoGTEventStdSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventDevID,
+        sysDescr,
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "A ipoGenEmergencyCallSvcEvent notification is generated
+        whenever an emergency call is made, regardless whether successfully or not.
+        It signifies that the SNMP entity, acting
+        in an agent role, has detected an emergency call attempt on the system.
+        
+        This notification event is associated with a service 
+        system status category alarm. Details about the alarm are 
+        provided in the included object variables."
+    ::= { ipoGTEvents 58}
+
+
+--********************************************************************
+-- IP Office wide compliance
+--********************************************************************
+
+ipoGenCompliances OBJECT IDENTIFIER ::= { ipoGenConformance 1 }
+ipoGenGroups      OBJECT IDENTIFIER ::= { ipoGenConformance 2 }
+
+--
+-- compliance statements
+--
+
+ipoGenCompliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for IP Office agents which implement
+         up to and including version 1.00.05 of this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoGenNotificationObjectsGroup,
+        ipoGenNotificationsGroup
+    }
+    ::= { ipoGenCompliances 1 }
+
+ipoGen2Compliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for IP Office agents which implement
+         version 1.00.06 and later versions of this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoGenNotificationObjectsGroup,
+        ipoGenNotificationsGroup
+    }
+    GROUP ipoGenSOGNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+        GROUP ipoGenSOGNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    ::= { ipoGenCompliances 2 }
+
+ipoGen3Compliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for IP Office agents which implement
+         version 1.01.01 and later versions of this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoGenv2NotificationObjectsGroup,
+        ipoGenEntGenNotificationsGroup,
+        ipoGenSvcNotificationsGroup
+    }
+    GROUP ipoGenSOGNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenSvcSOGNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    ::= { ipoGenCompliances 3 }
+
+ipoGen4Compliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for IP Office agents which implement
+         version 2.00.01 and later versions of this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoGenv2NotificationObjectsGroup,
+        ipoGenEntGenNotificationsGroup,
+        ipoGenSvcNotificationsGroup
+    }
+    GROUP ipoGenSOGNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenSvcSOGNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenUPriLicSvcNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the Universal PRI trunk module such as
+         the IP500."
+    ::= { ipoGenCompliances 4 }
+
+ipoGen5Compliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for IP Office agents which implement
+        version 2.00.04 and later versions of this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoGenv2NotificationObjectsGroup,
+        ipoGenEntGenNotificationsGroup,
+        ipoGenSvcNotificationsGroup
+    }
+    GROUP ipoGenSOGNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenSvcSOGNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenUPriLicSvcNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the Universal PRI trunk module such as
+         the IP500."
+    GROUP ipoGenQosMonNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the QoS monitoring such as the IP500."
+    GROUP ipoGenSvcQoSMonNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the QoS monitoring such as the IP500."
+    ::= { ipoGenCompliances 5 }
+    
+ipoGen6Compliance MODULE-COMPLIANCE
+    STATUS deprecated
+    DESCRIPTION
+        "The compliance statement for IP Office agents which implement
+         version 2.00.03 and later versions of this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoGenv2NotificationObjectsGroup,
+        ipoGenEntGenNotificationsGroup,
+        ipoGenSvcNotificationsGroup
+    }
+    GROUP ipoGenSOGNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenSvcSOGNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenUPriLicSvcNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the Universal PRI trunk module such as
+         the IP500."
+    GROUP ipoGenSvcQoSMonNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the QoS monitoring such as the IP500."
+    GROUP ipoGenSvcSystemShutdownNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the system shutdown such as the IP406v2,
+         IP412, IP500 and IP500v2."
+    GROUP ipoGenSvcSystemShutdownObjectGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the system shutdown such as the IP406v2,
+         IP412, IP500 and IP500v2."
+    GROUP ipoGenSDcardNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support an SD Card for primary operation"
+    GROUP ipoGenSDcardNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support an SD Card for primary operation"
+    ::= { ipoGenCompliances 6 }
+
+ipoGen7Compliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for IP Office agents which implement
+         version 2.00.07 and later versions of this MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS {
+        ipoGenv2NotificationObjectsGroup,
+        ipoGenEntGenNotificationsGroup,
+        ipoGenSvcNotificationsGroup,
+        ipoGenSvcMiscNotificationsGroup,
+        ipoGenSvcMiscNotificationObjectsGroup
+    }
+    GROUP ipoGenSOGNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenSvcSOGNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         SOG devices."
+    GROUP ipoGenUPriLicSvcNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the Universal PRI trunk module such as
+         the IP500."
+    GROUP ipoGenSvcQoSMonNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the QoS monitoring such as the IP500."
+    GROUP ipoGenSvcSystemShutdownNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the system shutdown such as the IP406v2,
+         IP412, IP500 and IP500v2."
+    GROUP ipoGenSvcSystemShutdownObjectGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support the system shutdown such as the IP406v2,
+         IP412, IP500 and IP500v2."
+    GROUP ipoGenSDcardNotificationsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support an SD Card for primary operation"
+    GROUP ipoGenSDcardNotificationObjectsGroup
+    DESCRIPTION
+        "Implementation of this group is only mandatory for IP Office
+         systems that support an SD Card for primary operation"
+    ::= { ipoGenCompliances 7 }
+
+--
+-- MIB groupings
+--
+
+ipoGenNotificationObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        ipoGTEventSeverity,
+        ipoGTEventDateTime,
+        ipoGTEventEntity,
+        ipoGTEventLoopbackStatus,
+        ipoGTEventAppEntity,
+        ipoGTEventAppEvent
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "Objects that are contained in IP Office wide notifications.
+
+        **NOTE: This group is deprecated and replaced by
+          ipoGenv2NotificationObjectsGroup."
+    ::= { ipoGenGroups 1 }
+
+ipoGenNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenEntityFailureEvent,
+        ipoGenEntityOperationalEvent,
+        ipoGenEntityErrorEvent,
+        ipoGenEntityChangeEvent,
+        ipoGenLKSCommsFailureEvent,
+        ipoGenLKSCommsOperationalEvent,
+        ipoGenLKSCommsErrorEvent,
+        ipoGenLKSCommsChangeEvent,
+        ipoGenLoopbackEvent,
+        ipoGenAppOperationalEvent,
+        ipoGenAppFailureEvent,
+        ipoGenAppEvent
+   }
+    STATUS deprecated
+    DESCRIPTION
+        "The notifications which indicate specific changes in the
+        state of the IP Office system.
+
+        **NOTE: This group is deprecated and replaced by
+          ipoGenSvcNotificationsGroup."
+    ::= { ipoGenGroups 2 }
+
+ipoGenSOGNotificationObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        ipoGTEventHostAddress,
+        ipoGTEventSOGMode
+    }
+    STATUS current
+    DESCRIPTION
+        "Objects that are contained in IP Office SOG notifications."
+    ::= { ipoGenGroups 3 }
+
+ipoGenSOGNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenSogHostFailureEvent,
+        ipoGenSogModeChangeEvent
+    }
+    STATUS deprecated
+    DESCRIPTION
+        "The notifications which indicate specific changes in the
+        state of the IP Office SOG system.
+
+        **NOTE: This group is deprecated and replaced by
+          ipoGenSvcNotificationsGroup."
+    ::= { ipoGenGroups 4 }
+
+ipoGenv2NotificationObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        ipoGTEventDateTime,
+        ipoGTEventEntity,
+        ipoGTEventAppEntity,
+        ipoGTEventAppEvent,
+        ipoGTEventStdSeverity,
+        ipoGTEventDevID,
+        ipoGTEventEntityName,
+        ipoGTEventLoopbackStatusBits
+    }
+    STATUS current
+    DESCRIPTION
+        "Objects that are contained in IP Office wide notifications."
+    ::= { ipoGenGroups 5 }
+
+ipoGenEntGenNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenColdStartSvcEvent,
+        ipoGenWarmStartSvcEvent,
+        ipoGenLinkDownSvcEvent,
+        ipoGenLinkUpSvcEvent,
+        ipoGenAuthFailureSvcEvent
+   }
+    STATUS current
+    DESCRIPTION
+        "IP Office Enterpise versions of the generic traps as defined
+        RFC1215 that provide more identification of the entity
+        concerned."
+    ::= { ipoGenGroups 6 }
+
+ipoGenSvcNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenEntityFailureSvcEvent,
+        ipoGenEntityOperationalSvcEvent,
+        ipoGenEntityErrorSvcEvent,
+        ipoGenEntityChangeSvcEvent,
+        ipoGenLKSCommsFailureSvcEvent,
+        ipoGenLKSCommsOperationalSvcEvent,
+        ipoGenLKSCommsErrorSvcEvent,
+        ipoGenLKSCommsChangeSvcEvent,
+        ipoGenLoopbackSvcEvent,
+        ipoGenAppOperationalSvcEvent,
+        ipoGenAppFailureSvcEvent,
+        ipoGenAppSvcEvent
+   }
+    STATUS current
+    DESCRIPTION
+        "The service notifications which indicate specific changes in
+        the state of the IP Office system."
+    ::= { ipoGenGroups 7 }
+
+ipoGenSvcSOGNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenSogHostFailureSvcEvent,
+        ipoGenSogModeChangeSvcEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "The service notifications which indicate specific changes in
+        the state of the IP Office SOG system."
+    ::= { ipoGenGroups 8 }
+
+ipoGenUPriLicSvcNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenUPriLicChansReducedSvcEvent,
+        ipoGenUPriLicCallRejectedSvcEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "The service notifications which indicate specific changes
+        related to the state licensing and Universal PRI trunks on the
+        IP Office system."
+    ::= { ipoGenGroups 9 }
+
+ipoGenQosMonNotificationObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        ipoGTEventQoSMonJitter,
+        ipoGTEventQoSMonRndTrip,
+        ipoGTEventQoSMonPktLoss,
+        ipoGTEventQoSMonCallId,
+        ipoGTEventQoSMonDevType,
+        ipoGTEventQoSMonDevId,
+        ipoGTEventQoSMonExtnNo
+    }
+    STATUS current
+    DESCRIPTION
+        "Additional objects that are contained in IP Office QOS
+        Monitoring notifications."
+    ::= { ipoGenGroups 10 }
+
+ipoGenSvcQoSMonNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenQoSMonSvcEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "The service notifications which indicate specific changes
+        related to the value of QoS parameters for a call on a physical
+        entity on the IP Office system."
+    ::= { ipoGenGroups 11 }
+
+ipoGenSvcSystemShutdownObjectGroup OBJECT-GROUP
+    OBJECTS {
+        ipoGTEventSystemShutdownSource,
+        ipoGTEventSystemShutdownTimeout
+    }
+    STATUS current
+    DESCRIPTION
+        "Additional objects that are contained in the system shutdown 
+        notification"
+    ::= { ipoGenGroups 12 }    
+    
+ipoGenSvcSystemShutdownNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenSystemShutdownSvcEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "The service notifications which indicate specific changes
+        related to the system shutdown performed on the IP Office system."
+    ::= { ipoGenGroups 13 }    
+
+
+ipoGenSDcardNotificationObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        ipoGTEventMemoryCardSlotId,
+        ipoGTEventNoValidKeyReason
+    }
+    STATUS current
+    DESCRIPTION
+        "Additional objects that are contained in IP Office SD card
+        notifications."
+    ::= { ipoGenGroups 14 }
+
+ipoGenSDcardNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenAppOperationalSvcEvent,
+        ipoGenAppFailureSvcEvent,
+        ipoGenAppSvcEvent,
+        ipoGenSystemRunningBackupEvent,
+        ipoGenInvalidMemoryCardEvent,
+        ipoGenNoLicenceKeyDongleEvent,
+        ipoGenMemoryCardCapacityEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "The notifications associated with IP Office SD card usage."
+    ::= { ipoGenGroups 15 }    
+
+ipoGenSvcMiscNotificationObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        ipoGTEventReason,
+        ipoGTEventData,
+        ipoGTEventAlarmDescription,
+        ipoGTEventAlarmRemedialAction
+    }
+    STATUS current
+    DESCRIPTION
+        "Additional objects that are contained in IP Office
+        notifications to provide additional information to
+        end user"
+    ::= { ipoGenGroups 16 }
+
+ipoGenSvcMiscNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        ipoGenConfigFailureSvcEvent,
+        ipoGenConfigOperationalSvcEvent,
+        ipoGenConfigErrorSvcEvent,
+        ipoGenConfigChangeSvcEvent,
+        ipoGenServiceFailureSvcEvent,
+        ipoGenServiceOperationalSvcEvent,
+        ipoGenServiceErrorSvcEvent,
+        ipoGenServiceChangeSvcEvent,
+        ipoGenTrunkFailureSvcEvent,
+        ipoGenTrunkOperationalSvcEvent,
+        ipoGenTrunkErrorSvcEvent,
+        ipoGenTrunkChangeSvcEvent,
+        ipoGenLinkFailureSvcEvent,
+        ipoGenLinkOperationalSvcEvent,
+        ipoGenLinkErrorSvcEvent,
+        ipoGenLinkChangeSvcEvent,
+        ipoGenEmergencyCallSvcEvent
+    }
+    STATUS current
+    DESCRIPTION
+        "The notifications indicating change in status
+        related to four areas: Configuration, Sevice,
+        Trunk and Link"
+    ::= { ipoGenGroups 17 }
+
+
+
+
+END

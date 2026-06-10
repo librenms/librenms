@@ -1,0 +1,125 @@
+
+-- ===========================================================================
+
+EXTREME-SLB-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY		FROM SNMPv2-SMI
+		OBJECT-TYPE		FROM SNMPv2-SMI
+		IpAddress		FROM SNMPv2-SMI
+		TruthValue		FROM SNMPv2-TC
+		extremeAgent		FROM EXTREME-BASE-MIB;
+
+
+	extremeSlb MODULE-IDENTITY
+		LAST-UPDATED "0003080000Z"
+		ORGANIZATION "Extreme Networks, Inc."
+		CONTACT-INFO "www.extremenetworks.com"
+		DESCRIPTION "Extreme Server Load Balancing information"
+	::= { extremeAgent 14 }
+
+
+	extremeSlbRealServerTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeSlbRealServerEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains information about a real server.
+			It currently indicates only whether the server is up."
+		::= { extremeSlb 1 }
+
+	extremeSlbRealServerEntry	OBJECT-TYPE
+		SYNTAX	ExtremeSlbRealServerEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An entry in the table of real server information."
+		INDEX {extremeSlbRealServerIpAddress}
+		::= {extremeSlbRealServerTable 1}
+
+	ExtremeSlbRealServerEntry ::= SEQUENCE {
+		extremeSlbRealServerIpAddress	IpAddress,
+		extremeSlbRealServerUp		TruthValue
+	}
+
+	extremeSlbRealServerIpAddress	OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS 	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"The IP address of the real server."
+		::= { extremeSlbRealServerEntry 1 }
+
+	extremeSlbRealServerUp		OBJECT-TYPE
+		SYNTAX	TruthValue
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Indicates whether the server is operational.
+			If the server is up, the load balancer may send
+			traffic to applications on the server.  If the
+			server is not up, the load balancer will send no
+			traffic to the server.  This status may be written
+			by an external device that knows the state of the
+			server."
+		::= { extremeSlbRealServerEntry 2 }
+
+
+	extremeSlbRealAppTable		OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeSlbRealAppEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains information about an application
+			on a particular TCP or UDP port of a real server.
+			It currently indicates only whether the application is
+			up."
+		::= { extremeSlb 2 }
+
+	extremeSlbRealAppEntry		OBJECT-TYPE
+		SYNTAX	ExtremeSlbRealAppEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An entry in the table of real server application information."
+		INDEX {extremeSlbRealAppIpAddress,
+		       extremeSlbRealAppPort}
+		::= {extremeSlbRealAppTable 1}
+
+	ExtremeSlbRealAppEntry ::= SEQUENCE {
+		extremeSlbRealAppIpAddress	IpAddress,
+		extremeSlbRealAppPort		INTEGER (0..65535),
+		extremeSlbRealAppUp		TruthValue
+	}
+
+	extremeSlbRealAppIpAddress	OBJECT-TYPE
+		SYNTAX	IpAddress
+		MAX-ACCESS 	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"The IP address of the real server."
+		::= { extremeSlbRealAppEntry 1 }
+
+	extremeSlbRealAppPort		OBJECT-TYPE
+		SYNTAX	INTEGER (0..65535)
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"The TCP or UDP port on the real server that the
+			application is using."
+		::= { extremeSlbRealAppEntry 2 }
+
+	extremeSlbRealAppUp		OBJECT-TYPE
+		SYNTAX	TruthValue
+		MAX-ACCESS	read-write
+		STATUS	current
+		DESCRIPTION
+			"Indicates whether the application is operational.
+			If the application is up, the load balancer may
+			send traffic to it.  If the application is not up,
+			the load balancer will send no traffic to it, but
+			the load balancer may send traffic to other
+			applications on the same server."
+		::= { extremeSlbRealAppEntry 3 }
+
+END

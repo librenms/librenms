@@ -1,0 +1,344 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-PORTPROFILE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlProfileOwner,
+    MwlEnableDisableOption,
+    MwlDataplaneMode,
+    MwlBridgedVlanType,
+    MwlOnOffSwitch,
+    MwlIfAdministrativeState,
+    MwlOperationalState
+        FROM MERU-TC;
+
+  mwConfigPortProfile  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Port Profile Configuration infrastructure"
+    ::= { mwConfiguration 19 } 
+  
+    
+  
+  mwPortProfileTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwPortProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Port Table "
+    ::= { mwConfigPortProfile 1 }
+
+  mwPortProfileEntry  OBJECT-TYPE
+    SYNTAX MwPortProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Port Table "
+    INDEX {  mwPortProfileTableIndex  }
+    ::= { mwPortProfileTable 1 }
+
+  MwPortProfileEntry  ::=  SEQUENCE { 
+       mwPortProfileTableIndex                                     Integer32, 
+       mwPortProfileName                                           DisplayString(SIZE (1..32)),
+       mwPortProfileState                                          MwlEnableDisableOption,
+       mwPortProfileVlanName                                       DisplayString(SIZE (0..32)),
+       mwPortProfileVlanTrunk                                      MwlEnableDisableOption,
+       mwPortProfileIPv6Bridging                                   MwlOnOffSwitch,
+       mwPortProfileDataplaneMode                                  MwlDataplaneMode,
+       mwPortProfilePortApVlanTag                                  Unsigned32,
+       mwPortProfileAllowMulticast                                 MwlOnOffSwitch,
+       mwPortProfileIpPrefixLookup                                 MwlOnOffSwitch,
+       mwPortProfilePortApVlanPolicy                               MwlBridgedVlanType,
+       mwPortProfileSecurityProfileName                            DisplayString(SIZE (0..32)),
+       mwPortProfileReconnectPrimaryServer                         Integer32(5..60),
+       mwPortProfileAccountingInterimInterval                      Unsigned32,
+       mwPortProfilePrimaryAccountingRadiusName                    DisplayString,
+       mwPortProfileSecondaryAccountingRadiusName                  DisplayString,
+       mwPortProfileOwner                                          MwlProfileOwner,
+       mwPortProfileRowStatus                                      RowStatus 
+  }
+   
+   
+  mwPortProfileTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwPortProfileEntry 1 }
+
+  mwPortProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Port Profile Name"
+    ::= { mwPortProfileEntry    2 }
+
+  mwPortProfileState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enable/Disable"
+    ::= { mwPortProfileEntry    3 }
+
+  mwPortProfileDataplaneMode  OBJECT-TYPE
+    SYNTAX MwlDataplaneMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Dataplane Mode"
+    ::= { mwPortProfileEntry    4 }
+
+  mwPortProfileVlanName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Name"
+    ::= { mwPortProfileEntry    6 }
+
+  mwPortProfileAllowMulticast  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Allow Multicast Flag"
+    ::= { mwPortProfileEntry    7 }
+
+  mwPortProfileIPv6Bridging  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IPv6 Bridging"
+    ::= { mwPortProfileEntry    8 }
+
+  mwPortProfileSecurityProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Security Profile Name"
+    ::= { mwPortProfileEntry   10 }
+
+  mwPortProfilePrimaryAccountingRadiusName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary RADIUS Accounting Server"
+    ::= { mwPortProfileEntry   11 }
+
+  mwPortProfileSecondaryAccountingRadiusName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary RADIUS Accounting Server"
+    ::= { mwPortProfileEntry   12 }
+
+  mwPortProfileAccountingInterimInterval  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Accounting Interim Interval (seconds)"
+    ::= { mwPortProfileEntry   13 }
+
+  mwPortProfileIpPrefixLookup  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Prefix Validation"
+    ::= { mwPortProfileEntry   14 }
+
+  mwPortProfilePortApVlanPolicy  OBJECT-TYPE
+    SYNTAX MwlBridgedVlanType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VLAN Policy"
+    ::= { mwPortProfileEntry   15 }
+
+  mwPortProfilePortApVlanTag  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VLAN Tag"
+    ::= { mwPortProfileEntry   16 }
+
+  mwPortProfileVlanTrunk  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VlanTrunk"
+    ::= { mwPortProfileEntry   17 }
+
+  mwPortProfileOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwPortProfileEntry   18 }
+
+  mwPortProfileReconnectPrimaryServer  OBJECT-TYPE
+    SYNTAX Integer32(5..60)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Reconnect Primary Server (minutes)"
+    ::= { mwPortProfileEntry   19 }
+
+  mwPortProfileRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwPortProfileEntry 27 }
+
+  mwPortApTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwPortApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Port-AP member table "
+    ::= { mwConfigPortProfile 2 }
+
+  mwPortApEntry  OBJECT-TYPE
+    SYNTAX MwPortApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Port-AP member table "
+    INDEX {  mwPortApTableIndex  }
+    ::= { mwPortApTable 1 }
+
+  MwPortApEntry  ::=  SEQUENCE { 
+       mwPortApTableIndex                                          Integer32, 
+       mwPortApName                                                DisplayString(SIZE (1..32)),
+       mwPortApNodeId                                              Unsigned32,
+       mwPortApIfIndex                                             Integer32,
+       mwPortApApName                                              DisplayString,
+       mwPortApMacAddress                                          MacAddress,
+       mwPortApIfOperStatus                                        MwlOperationalState,
+       mwPortApIfAdminStatus                                       MwlIfAdministrativeState,
+       mwPortApRowStatus                                           RowStatus 
+  }
+   
+   
+  mwPortApTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwPortApEntry 1 }
+
+  mwPortApName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Port Profile Name"
+    ::= { mwPortApEntry    2 }
+
+  mwPortApNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwPortApEntry    3 }
+
+  mwPortApIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Ethernet Interface Index"
+    ::= { mwPortApEntry    4 }
+
+  mwPortApApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwPortApEntry    5 }
+
+  mwPortApMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwPortApEntry    6 }
+
+  mwPortApIfAdminStatus  OBJECT-TYPE
+    SYNTAX MwlIfAdministrativeState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Administrative State"
+    ::= { mwPortApEntry    7 }
+
+  mwPortApIfOperStatus  OBJECT-TYPE
+    SYNTAX MwlOperationalState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operational Status"
+    ::= { mwPortApEntry    8 }
+
+  mwPortApRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwPortApEntry 9 }
+
+  
+END
+   

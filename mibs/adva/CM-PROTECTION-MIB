@@ -1,0 +1,675 @@
+CM-PROTECTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+             FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus, StorageType, VariablePointer,
+    MacAddress, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    fsp150cm
+             FROM  ADVA-MIB;
+
+cmProtectionMIB MODULE-IDENTITY
+    LAST-UPDATED    "201006230000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Protection MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201006230000Z"
+    DESCRIPTION
+            "Notes from release 201006230000Z,
+             (1)Added universalring as CmProtSwitchMode for R4.4CC. 
+
+            Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM 3.1." 
+    ::= {fsp150cm 7}    
+
+-- 
+-- OID definitions
+-- 
+cmProtObjects       OBJECT IDENTIFIER ::= {cmProtectionMIB 1}
+cmProtNotifications OBJECT IDENTIFIER ::= {cmProtectionMIB 2}
+cmProtConformance   OBJECT IDENTIFIER ::= {cmProtectionMIB 3}
+
+-- 
+-- Textual Conventions 
+-- 
+CmProtSwitchMode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Protection Switch Mode.
+             oneplusone   - 1+1, this is the NPCUP mode,
+             dualactiverx - In this mode, traffic is bridged in A2N
+                            direction (same as 1+1), however
+                            both network ports receive customer traffic in
+                            N2A direction. In this mode, both network
+                            ports are working, i.e. there is no
+                            protection.
+             universalring - In this mode, traffic is bridged in A2N
+                             direction (same as 1+1), both
+                             network ports receive customer traffic in
+                             N2A direction.  In this mode, both network
+                             ports are working, i.e. no protection.
+                             The main difference w.r.t dualactiverx is that
+                             traffic in N2A direction, which does not match
+                             the service definition is steered to the other
+                             network port, i.e. non-service matching traffic
+                             from N1 goes to N2 and vice versa."
+    SYNTAX       INTEGER {
+                   oneplusone (1),
+                   dualactiverx(2),
+                   universalring(3)
+                 }
+
+CmProtSwitchDirection ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Protection Switch Direction.
+             unidirectional - Unidirectional Protection Switching,
+             bidirectional  - Bidirectional Protection Switching."
+    SYNTAX       INTEGER {
+                   unidirectional (1),
+                   bidirectional (2)
+                 }
+
+CmProtSwitchAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for User initiated Protection Switch Action.
+             manualfromworking  - Manual Switch from Working,
+             forcedfromworking  - Forced Switch from Working,
+             manualfromprotect  - Manual Switch from Protect,
+             forcedfromprotect  - Forced Switch from Protect,
+             lockoutfromprotect - Lockout from Protect"
+    SYNTAX       INTEGER {
+                   none (1),
+                   releaseprotswitch (2),
+                   manualfromworking (3),
+                   forcedfromworking (4),
+                   manualfromprotect (5),
+                   forcedfromprotect (6),
+                   lockoutfromprotect(7)
+                 }
+
+CmProtUnitType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Protection Unit Type.
+             working - Working Protection Unit,
+             protect - Protect Protection Unit."
+    SYNTAX       INTEGER {
+                   working (1),
+                   protect (2)
+                 }
+
+CmProtUnitState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Protection Unit State.
+             active  - Active Protection Unit,
+             standby - Standby Protection Unit."
+    SYNTAX       INTEGER {
+                   active (1),
+                   standby (2)
+                 }
+
+CmProtGroupStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enumerations for Protection Status.
+             nooutstandingreq - No oustanding request,
+             sf-protect       - Signal failure on protect,
+             sf-working       - Signal failure on working,
+             sd-protect       - Signal degrade on protect,
+             sd-working       - Signal degrade on working,
+             manual-protect   - Manual on protect 
+             manual-working   - Manual on working 
+             forced-working   - Forced on working 
+             forced-protect   - Forced on protect 
+             lockout-protect  - Lockout on protect 
+             waitToRestore    - Wait to restore"
+    SYNTAX       INTEGER {
+                   nooutstandingreq  (1),
+                   sf-protect        (2),
+                   sf-working        (3),
+                   sd-protect        (4),
+                   sd-working        (5),
+                   manual-protect    (6),
+                   manual-working    (7),
+                   forced-protect    (8),
+                   forced-working    (9),
+                   lockout-protect   (10),
+                   waitToRestore     (11)
+                 }
+
+--
+-- Facility Protection Group Table 
+--
+cmFacProtGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmFacProtGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the Facility Protection Groups.
+             Entries can be created/deleted in this table by management
+             application action."
+    ::= { cmProtObjects 1 }
+
+cmFacProtGroupEntry OBJECT-TYPE
+    SYNTAX     CmFacProtGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             Protection Group."
+    INDEX { neIndex, shelfIndex, slotIndex, cmFacProtGroupIndex }
+    ::= { cmFacProtGroupTable 1 }
+
+CmFacProtGroupEntry ::= SEQUENCE {
+    cmFacProtGroupIndex           Integer32,
+    cmFacProtGroupUserLabel       DisplayString,
+    cmFacProtGroupSwitchMode      CmProtSwitchMode,
+    cmFacProtGroupRevertive       TruthValue,
+    cmFacProtGroupWaitToRestore   Integer32,
+    cmFacProtGroupDirection       CmProtSwitchDirection,
+    cmFacProtGroupWorkPort        VariablePointer,
+    cmFacProtGroupProtPort        VariablePointer,
+    cmFacProtGroupStatus          CmProtGroupStatus,
+    cmFacProtGroupAction          CmProtSwitchAction,
+    cmFacProtGroupStorageType     StorageType,
+    cmFacProtGroupRowStatus       RowStatus,
+    cmFacProtGroupMacAddress      MacAddress
+}
+
+cmFacProtGroupIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Facility Protection Group."
+     ::= { cmFacProtGroupEntry 1 }
+
+cmFacProtGroupUserLabel OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "User Label associated with the Facility Protection Group."
+     ::= { cmFacProtGroupEntry 2 }
+
+cmFacProtGroupSwitchMode OBJECT-TYPE
+    SYNTAX     CmProtSwitchMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Facility Protection Group's Protection Switch Mode."
+     ::= { cmFacProtGroupEntry 3 }
+
+cmFacProtGroupRevertive OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Whether the Facility Protection is revertive or not.
+          This object is not applicable for cmFacProtGroupSwitchMode 'dualactiverx'."
+     ::= { cmFacProtGroupEntry 4 }
+
+cmFacProtGroupWaitToRestore OBJECT-TYPE
+    SYNTAX     Integer32 (1..60|0)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Time in minutes to wait before reverting to Working facility
+          in case of cmFacProtGroupRevertive set to revertive.
+          This object is not applicable for cmFacProtGroupSwitchMode 'dualactiverx'."
+     ::= { cmFacProtGroupEntry 5 }
+
+cmFacProtGroupDirection OBJECT-TYPE
+    SYNTAX     CmProtSwitchDirection 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Supported Protection Group Switch direction.
+          This object is not applicable for cmFacProtGroupSwitchMode 'dualactiverx'."
+     ::= { cmFacProtGroupEntry 6 }
+
+cmFacProtGroupWorkPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Facility Protection Group exists between 2 facilities (ports). 
+          This object represents the WORKING facility Port."
+     ::= { cmFacProtGroupEntry 7 }
+
+cmFacProtGroupProtPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object
+          represents the PROTECT facility Network Element Port when
+          cmFacProtGroupSwitchMode is oneplusone.  In the case of
+          dualactiverx, this represents the second active port."
+     ::= { cmFacProtGroupEntry 8 }
+
+cmFacProtGroupStatus   OBJECT-TYPE
+    SYNTAX    CmProtGroupStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents the PROTECTION group status."
+     ::= { cmFacProtGroupEntry 9 }
+
+cmFacProtGroupAction OBJECT-TYPE
+    SYNTAX     CmProtSwitchAction
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "User initiated protection switch action."
+    ::= { cmFacProtGroupEntry 10 }
+
+cmFacProtGroupStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmFacProtGroupEntry 11 }
+
+cmFacProtGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of cmFacProtGroupRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            cmFacProtGroupRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The cmFacProtGroupRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { cmFacProtGroupEntry 12 }
+
+cmFacProtGroupMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "This object allows retrieval of the Mac Address of the PROTECTION group."
+     ::= { cmFacProtGroupEntry 13 }
+
+
+--
+-- Facility Protection Unit Table 
+--
+cmFacProtUnitTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmFacProtUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the Facility Protection 
+             Units."
+    ::= { cmProtObjects 2 }
+
+cmFacProtUnitEntry OBJECT-TYPE
+    SYNTAX     CmFacProtUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             Protection Unit."
+    INDEX { neIndex, shelfIndex, slotIndex, cmFacProtGroupIndex, cmFacProtUnitIndex }
+    ::= { cmFacProtUnitTable 1 }
+
+CmFacProtUnitEntry ::= SEQUENCE {
+    cmFacProtUnitIndex    Integer32,
+    cmFacProtUnitType     CmProtUnitType,
+    cmFacProtUnitState    CmProtUnitState,
+    cmFacProtUnitPort     VariablePointer
+}
+
+cmFacProtUnitIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Facility Protection Unit."
+     ::= { cmFacProtUnitEntry 1 }
+
+cmFacProtUnitType OBJECT-TYPE
+    SYNTAX     CmProtUnitType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Facility Protection Unit's Type, i.e. whether working or protect."
+     ::= { cmFacProtUnitEntry 2 }
+
+cmFacProtUnitState OBJECT-TYPE
+    SYNTAX     CmProtUnitState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Facility Protection Unit's State, i.e. whether active or standby."
+     ::= { cmFacProtUnitEntry 3 }
+
+cmFacProtUnitPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Facility Protection Unit's points to a facility (port). 
+          This object represents the facility Network Element port."
+     ::= { cmFacProtUnitEntry 4 }
+
+
+--
+-- Multiplex Section Protection Group Table 
+--
+cmMSPGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmMSPGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the Multiplex Section Protection Groups.
+             Entries can be created/deleted in this table by management
+             application action."
+    ::= { cmProtObjects 3 }
+
+cmMSPGroupEntry OBJECT-TYPE
+    SYNTAX     CmMSPGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             Protection Group."
+    INDEX { neIndex, cmMSPGroupIndex }
+    ::= { cmMSPGroupTable 1 }
+
+CmMSPGroupEntry ::= SEQUENCE {
+    cmMSPGroupIndex           Integer32,
+    cmMSPGroupUserLabel       DisplayString,
+    cmMSPGroupSwitchMode      CmProtSwitchMode,
+    cmMSPGroupRevertive       TruthValue,
+    cmMSPGroupWaitToRestore   Integer32,
+    cmMSPGroupB2DEGTrigger    TruthValue,
+    cmMSPGroupDirection       CmProtSwitchDirection,
+    cmMSPGroupWorkPort        VariablePointer,
+    cmMSPGroupProtPort        VariablePointer,
+    cmMSPGroupStatus          CmProtGroupStatus,
+    cmMSPGroupAction          CmProtSwitchAction,
+    cmMSPGroupStorageType     StorageType,
+    cmMSPGroupRowStatus       RowStatus,
+    cmMSPGroupMacAddress      MacAddress
+}
+
+cmMSPGroupIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Multiplex Section Protection Group."
+     ::= { cmMSPGroupEntry 1 }
+
+cmMSPGroupUserLabel OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "User Label associated with the Multiplex Section Protection Group."
+     ::= { cmMSPGroupEntry 2 }
+
+cmMSPGroupSwitchMode OBJECT-TYPE
+    SYNTAX     CmProtSwitchMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Multiplex Section Protection Group's Protection Switch Mode."
+     ::= { cmMSPGroupEntry 3 }
+
+cmMSPGroupRevertive OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Whether the Multiplex Section Protection is revertive or not.
+          This object is not applicable for cmMSPGroupSwitchMode 'dualactiverx'."
+     ::= { cmMSPGroupEntry 4 }
+
+cmMSPGroupWaitToRestore OBJECT-TYPE
+    SYNTAX     Integer32 (1..60|0)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Time in minutes to wait before reverting to Working facility
+          in case of cmMSPGroupRevertive set to revertive.
+          This object is not applicable for cmMSPGroupSwitchMode 'dualactiverx'."
+     ::= { cmMSPGroupEntry 5 }
+
+cmMSPGroupB2DEGTrigger OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "B2DEG is trigger of MSP or not."
+     ::= { cmMSPGroupEntry 6 }
+
+cmMSPGroupDirection OBJECT-TYPE
+    SYNTAX     CmProtSwitchDirection 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Supported Protection Group Switch direction.
+          This object is not applicable for cmMSPGroupSwitchMode 'dualactiverx'."
+     ::= { cmMSPGroupEntry 7 }
+
+cmMSPGroupWorkPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "Multiplex Section Protection Group exists between 2 facilities (ports). 
+          This object represents the WORKING facility Port."
+     ::= { cmMSPGroupEntry 8 }
+
+cmMSPGroupProtPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object
+          represents the PROTECT facility Network Element Port when
+          cmMSPGroupSwitchMode is oneplusone.  In the case of
+          dualactiverx, this represents the second active port."
+     ::= { cmMSPGroupEntry 9 }
+
+cmMSPGroupStatus   OBJECT-TYPE
+    SYNTAX    CmProtGroupStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents the PROTECTION group status."
+     ::= { cmMSPGroupEntry 10 }
+
+cmMSPGroupAction OBJECT-TYPE
+    SYNTAX     CmProtSwitchAction
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "User initiated protection switch action."
+    ::= { cmMSPGroupEntry 11 }
+
+cmMSPGroupStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { cmMSPGroupEntry 12 }
+
+cmMSPGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of cmMSPGroupRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            cmMSPGroupRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The cmMSPGroupRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { cmMSPGroupEntry 13 }
+
+cmMSPGroupMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+             "This object allows retrieval of the Mac Address of the PROTECTION group."
+     ::= { cmMSPGroupEntry 14 }
+
+
+--
+-- Multiplex Section Protection Unit Table 
+--
+cmMSPUnitTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmMSPUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the Multiplex Section Protection 
+             Units."
+    ::= { cmProtObjects 4 }
+
+cmMSPUnitEntry OBJECT-TYPE
+    SYNTAX     CmMSPUnitEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             Protection Unit."
+    INDEX { neIndex, cmMSPGroupIndex, cmMSPUnitIndex }
+    ::= { cmMSPUnitTable 1 }
+
+CmMSPUnitEntry ::= SEQUENCE {
+    cmMSPUnitIndex    Integer32,
+    cmMSPUnitType     CmProtUnitType,
+    cmMSPUnitState    CmProtUnitState,
+    cmMSPUnitPort     VariablePointer
+}
+
+cmMSPUnitIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Multiplex Section Protection Unit."
+     ::= { cmMSPUnitEntry 1 }
+
+cmMSPUnitType OBJECT-TYPE
+    SYNTAX     CmProtUnitType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Multiplex Section Protection Unit's Type, i.e. whether working or protect."
+     ::= { cmMSPUnitEntry 2 }
+
+cmMSPUnitState OBJECT-TYPE
+    SYNTAX     CmProtUnitState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Multiplex Section Protection Unit's State, i.e. whether active or standby."
+     ::= { cmMSPUnitEntry 3 }
+
+cmMSPUnitPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Facility Protection Unit's points to a facility (port). 
+          This object represents the facility Network Element port."
+     ::= { cmMSPUnitEntry 4 }
+
+
+--
+-- Conformance
+--
+cmProtCompliances OBJECT IDENTIFIER ::= {cmProtConformance 1}
+cmProtGroups      OBJECT IDENTIFIER ::= {cmProtConformance 2}
+
+cmProtCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM Prot
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmProtObjectGroup, cmMSProtObjectGroup
+        }
+    ::= { cmProtCompliances 1 }
+
+cmProtObjectGroup OBJECT-GROUP
+    OBJECTS {
+        cmFacProtGroupIndex, cmFacProtGroupUserLabel, cmFacProtGroupSwitchMode,
+        cmFacProtGroupRevertive, cmFacProtGroupWaitToRestore,
+        cmFacProtGroupDirection, cmFacProtGroupWorkPort,
+        cmFacProtGroupProtPort, cmFacProtGroupStatus, cmFacProtGroupAction,
+        cmFacProtGroupStorageType, cmFacProtGroupRowStatus,
+        cmFacProtGroupMacAddress,
+    
+        cmFacProtUnitIndex, cmFacProtUnitType, cmFacProtUnitState,
+        cmFacProtUnitPort
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the Protection Object group."
+    ::= { cmProtGroups 1 }
+
+cmMSProtObjectGroup OBJECT-GROUP
+    OBJECTS {
+        cmMSPGroupIndex, cmMSPGroupUserLabel,
+        cmMSPGroupSwitchMode, cmMSPGroupRevertive,
+        cmMSPGroupWaitToRestore, cmMSPGroupB2DEGTrigger,
+        cmMSPGroupDirection, cmMSPGroupWorkPort,
+        cmMSPGroupProtPort, cmMSPGroupStatus,
+        cmMSPGroupAction, cmMSPGroupStorageType,
+        cmMSPGroupRowStatus, cmMSPGroupMacAddress,
+        
+        cmMSPUnitIndex, cmMSPUnitType,
+        cmMSPUnitState, cmMSPUnitPort
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the Multiplex 
+              Section Protection Object group."
+    ::= { cmProtGroups 2 }
+
+END

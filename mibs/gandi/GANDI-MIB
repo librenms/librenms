@@ -1,0 +1,137 @@
+GANDI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter64
+		FROM SNMPv2-SMI
+	enterprises
+		FROM RFC1155-SMI	
+	DisplayString
+		FROM SNMPv2-TC;
+
+gandiMIB MODULE-IDENTITY
+	LAST-UPDATED "201510301800Z"
+	ORGANIZATION "Gandi SAS - www.gandi.net"
+	CONTACT-INFO
+		"63-65 Boulevard Massena
+		 75013 PARIS
+		 FRANCE
+
+		 noc@gandi.net"
+	DESCRIPTION
+		"The MIB module describe our SNMP Objects"
+	::= { enterprises 26384 }
+
+pktjTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF pktjTable
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The Packet Journey table OID."
+	::= { gandiMIB 1 }
+
+statTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF statTable
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Packet Journey statistics OID."
+	::= { pktjTable 1 }
+
+totalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF totalTable
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Total counters"
+	::= { statTable 1 }
+
+packetsCounters OBJECT-TYPE
+	SYNTAX		SEQUENCE OF packetsCounters
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"RX and TX counters passed into DPDK"
+	::= { totalTable 1 }
+
+rxCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RX packets"
+	::= { packetsCounters 0 }
+
+txCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"TX packets"
+	::= { packetsCounters 1 }
+
+	
+dropCounters OBJECT-TYPE
+	SYNTAX		SEQUENCE OF dropCounters
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Dropped packets counters passed into DPDK"
+	::= { totalTable 2 }
+
+dropCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Dropped counter"
+	::= { dropCounters 0 }
+
+acldropCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"ACL Dropped counter"
+	::= { dropCounters 1 }
+
+ratedropCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Rate Dropped counter"
+	::= { dropCounters 2 }
+
+kniCounters OBJECT-TYPE
+	SYNTAX		SEQUENCE OF kniCounters
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"KNI counters"
+	::= { totalTable 3 }
+
+KNIrxCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"KNI RX counter"
+	::= { kniCounters 0 }
+
+KNItxCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"KNI TX counter"
+	::= { kniCounters 1 }
+
+KNIdropCounter OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"KNI DROP counter"
+	::= { kniCounters 2 }
+
+END

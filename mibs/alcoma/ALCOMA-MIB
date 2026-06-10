@@ -1,0 +1,2379 @@
+--
+--defines ALCOMA-MIB for SNMP agent extension
+--Contents:	Global Registration Module
+--		ALCOMA OIDs - Enterprise 12140
+--Version:	4.8
+--Date:		31 August, 2016
+--Developed By: ing.Václav VACEK
+--              SW engineer
+--              ALCOMA a.s.
+
+--
+--Copyright (c)2012 By ALCOMA a.s.
+--
+
+ALCOMA-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	DisplayString
+		FROM RFC1213-MIB;
+
+
+alcoma               OBJECT IDENTIFIER ::= { enterprises 12140 }
+products             OBJECT IDENTIFIER ::= { alcoma 1 }
+alMP                 OBJECT IDENTIFIER ::= { alcoma 2 }
+alRADIO-RELAY-LINK   OBJECT IDENTIFIER ::= { products 1 }
+alNMS                OBJECT IDENTIFIER ::= { products 2 }
+
+-- Power Source MIB
+-- Parameters (Prefix Par)    
+
+alStatusLED     OBJECT IDENTIFIER ::= { alRADIO-RELAY-LINK 1 }
+
+alEHW OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Hardware error."
+::= { alStatusLED 1 }
+     
+alESR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal error in radio."
+::= { alStatusLED 2 }
+
+alESL OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal error on lines."
+::= { alStatusLED 3 }
+
+alCA OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Non-standard command activate."
+::= { alStatusLED 4 }
+
+local-station     OBJECT IDENTIFIER ::= { alRADIO-RELAY-LINK 2 }
+
+alL-General     OBJECT IDENTIFIER ::= { local-station 1 }
+
+alLSupervisor OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),none(0),terminal(1),local(2),network(3),service(4),alcoma(5) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Active supervisor."
+::= { alL-General 1 }
+
+alLConfiguration OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),undefined(0),cf2xE1(1),cf4xE1(2),cf1xE2(3),cf1xE1-Ethernet(4),cf1xE3-E1(7),cf1xEthernet(8),
+                            cf1xEthF-E1(9),
+                            cf1xEthF-E1-1xE1(10),cf1xEthF-E1-2xE1(11),cf1xEthF-E1-3xE1(12),cf1xEthF-E1-4xE1(13),
+                            cf1xEthF-E1-5xE1(14),cf1xEthF-E1-6xE1(15),cf1xEthF-E1-7xE1(16),cf1xEthF-E1-8xE1(17),
+                            cf1xEthF(18),
+                            cf1xEthF-1xE1(19),cf1xEthF-2xE1(20),cf1xEthF-3xE1(21),cf1xEthF-4xE1(22),
+                            cf1xEthF-5xE1(23),cf1xEthF-6xE1(24),cf1xEthF-7xE1(25),cf1xEthF-8xE1(26),
+                            cf2xFEth(27),cf2xFEth-1xE1(28),
+                            cf4xFEth-2xE1(29),
+                            cf2xGEth(30),cf2xGEth-SFP100(31),cf2xGEth-SFP1000(32),cf2xGEth-SFPSG(33) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IDU configuration."
+::= { alL-General 2 }
+
+alLStatus OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(0),ok(1),warning(2),error(3) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Station alarm status."
+::= { alL-General 3 }
+
+alLHistory OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"History alarm status."
+::= { alL-General 4 }
+
+alLIAISL OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Automatic AIS ignored."
+::= { alL-General 5 }
+
+alLILEVPWR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low RX or TX level alarms ignored."
+::= { alL-General 6 }
+
+
+
+alL-ODU     OBJECT IDENTIFIER ::= { local-station 2 }
+
+alLRX-Level OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal receiver level."
+::= { alL-ODU 1 }
+
+alLTX-PWR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitter power level."
+::= { alL-ODU 2 }
+
+alLMode-TX OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),manual(1),atpc(2) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Mode of power control."
+::= { alL-ODU 3 }
+
+alLODU-LB OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ODU line-loopback."
+::= { alL-ODU 4 }
+
+alL-Modem     OBJECT IDENTIFIER ::= { local-station 3 }
+
+alLQuality OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),out(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Quality of 4-level modulation."
+::= { alL-Modem 1 }
+
+alL-Supply     OBJECT IDENTIFIER ::= { local-station 4 }
+
+alLVoltage-5V OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),high(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Voltage 5V high."
+::= { alL-Supply 1 }
+
+alLVoltage-5Vor15V OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Voltage 5V or 15V low."
+::= { alL-Supply 2 }
+
+alLVoltage-24V OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Voltage 24V low."
+::= { alL-Supply 3 }
+
+alLCurrent-ODU OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),out(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ODU current range."
+::= { alL-Supply 4 }
+
+alLInput OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input voltage low."
+::= { alL-Supply 5 }
+
+alL-IDU     OBJECT IDENTIFIER ::= { local-station 5 }
+
+alLEEPROM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"EEPROM memory status."
+::= { alL-IDU 1 }
+
+alLRAM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"RAM memory status."
+::= { alL-IDU 2 }
+
+alLBattery OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"RAM backup battery voltage."
+::= { alL-IDU 3 }
+
+alLCommIDU OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication status with blocks of IDU."
+::= { alL-IDU 4 }
+
+alLCommRMT OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication status with remote station."
+::= { alL-IDU 5 }
+
+alL-MUX     OBJECT IDENTIFIER ::= { local-station 6 }
+
+alLBER-10E6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"BER > 10E-6."
+::= { alL-MUX 1 }
+
+alLBER-10E4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"BER > 10E-4."
+::= { alL-MUX 2 }
+
+alLFrame OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),loss(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Frame LOSS."
+::= { alL-MUX 3 }
+
+alL-PDH1    OBJECT IDENTIFIER ::= { local-station 7 }
+
+alLPDHFrame OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),loss(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"PDH1 frame LOSS."
+::= { alL-PDH1 1 }
+
+alLAISPDH OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to PDH1 frame."
+::= { alL-PDH1 2 }
+
+alLLLBPDH OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on PDH1 frame."
+::= { alL-PDH1 3 }
+
+alLRLBPDH OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on PDH1 frame."
+::= { alL-PDH1 4 }
+
+alL-Line1     OBJECT IDENTIFIER ::= { local-station 9 }
+
+alLOSS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 1."
+::= { alL-Line1 1 }
+
+alILOSS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 1."
+::= { alL-Line1 2 }
+
+alAIS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 1."
+::= { alL-Line1 3 }
+
+alAISL1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 1."
+::= { alL-Line1 4 }
+
+alLLB1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 1."
+::= { alL-Line1 5 }
+
+alRLB1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 1."
+::= { alL-Line1 6 }
+
+alL-Line2     OBJECT IDENTIFIER ::= { local-station 10 }
+
+alLLOSS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 2."
+::= { alL-Line2 1 }
+
+alLILOSS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 2."
+::= { alL-Line2 2 }
+
+alLAIS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 2."
+::= { alL-Line2 3 }
+
+alLAISL2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 2."
+::= { alL-Line2 4 }
+
+alLLLB2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 2."
+::= { alL-Line2 5 }
+
+alLRLB2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 2."
+::= { alL-Line2 6 }
+
+alL-Line3     OBJECT IDENTIFIER ::= { local-station 11 }
+
+alLLOSS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 3."
+::= { alL-Line3 1 }
+
+alLILOSS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 3."
+::= { alL-Line3 2 }
+
+alLAIS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 3."
+::= { alL-Line3 3 }
+
+alLAISL3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 3."
+::= { alL-Line3 4 }
+
+alLLLB3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 3."
+::= { alL-Line3 5 }
+
+alLRLB3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 3."
+::= { alL-Line3 6 }
+
+alL-Line4     OBJECT IDENTIFIER ::= { local-station 12 }
+
+alLLOSS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 4."
+::= { alL-Line4 1 }
+
+alLILOSS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 4."
+::= { alL-Line4 2 }
+
+alLAIS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 4."
+::= { alL-Line4 3 }
+
+alLAISL4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 4."
+::= { alL-Line4 4 }
+
+alLLLB4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 4."
+::= { alL-Line4 5 }
+
+alLRLB4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 4."
+::= { alL-Line4 6 }
+
+alL-Line5     OBJECT IDENTIFIER ::= { local-station 13 }
+
+alLLOSS5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 5."
+::= { alL-Line5 1 }
+
+alLILOSS5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 5."
+::= { alL-Line5 2 }
+
+alLAIS5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 5."
+::= { alL-Line5 3 }
+
+alLAISL5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 5."
+::= { alL-Line5 4 }
+
+alLLLB5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 5."
+::= { alL-Line5 5 }
+
+alLRLB5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 5."
+::= { alL-Line5 6 }
+
+alL-Line6     OBJECT IDENTIFIER ::= { local-station 14 }
+
+alLLOSS6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 6."
+::= { alL-Line6 1 }
+
+alLILOSS6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 6."
+::= { alL-Line6 2 }
+
+alLAIS6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 6."
+::= { alL-Line6 3 }
+
+alLAISL6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 6."
+::= { alL-Line6 4 }
+
+alLLLB6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 6."
+::= { alL-Line6 5 }
+
+alLRLB6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 6."
+::= { alL-Line6 6 }
+
+alL-Line7     OBJECT IDENTIFIER ::= { local-station 15 }
+
+alLLOSS7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 7."
+::= { alL-Line7 1 }
+
+alLILOSS7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 7."
+::= { alL-Line7 2 }
+
+alLAIS7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 7."
+::= { alL-Line7 3 }
+
+alLAISL7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 7."
+::= { alL-Line7 4 }
+
+alLLLB7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 7."
+::= { alL-Line7 5 }
+
+alLRLB7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 7."
+::= { alL-Line7 6 }
+
+alL-Line8     OBJECT IDENTIFIER ::= { local-station 16 }
+
+alLLOSS8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 8."
+::= { alL-Line8 1 }
+
+alLILOSS8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 8."
+::= { alL-Line8 2 }
+
+alLAIS8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 8."
+::= { alL-Line8 3 }
+
+alLAISL8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 8."
+::= { alL-Line8 4 }
+
+alLLLB8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 8."
+::= { alL-Line8 5 }
+
+alLRLB8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 8."
+::= { alL-Line8 6 }
+
+alL-Line9     OBJECT IDENTIFIER ::= { local-station 17 }
+
+alLLOSS9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 9."
+::= { alL-Line9 1 }
+
+alLILOSS9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 9."
+::= { alL-Line9 2 }
+
+alLAIS9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 9."
+::= { alL-Line9 3 }
+
+alLAISL9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 9."
+::= { alL-Line9 4 }
+
+alLLLB9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 9."
+::= { alL-Line9 5 }
+
+alLRLB9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 9."
+::= { alL-Line9 6 }
+
+alL-Line10    OBJECT IDENTIFIER ::= { local-station 18 }
+
+alLLOSS10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 10."
+::= { alL-Line10 1 }
+
+alLILOSS10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 10."
+::= { alL-Line10 2 }
+
+alLAIS10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 10."
+::= { alL-Line10 3 }
+
+alLAISL10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 10."
+::= { alL-Line10 4 }
+
+alLLLB10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 10."
+::= { alL-Line10 5 }
+
+alLRLB10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 10."
+::= { alL-Line10 6 }
+
+alL-Line11    OBJECT IDENTIFIER ::= { local-station 19 }
+
+alLLOSS11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 11."
+::= { alL-Line11 1 }
+
+alLILOSS11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 11."
+::= { alL-Line11 2 }
+
+alLAIS11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 11."
+::= { alL-Line11 3 }
+
+alLAISL11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 11."
+::= { alL-Line11 4 }
+
+alLLLB11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 11."
+::= { alL-Line11 5 }
+
+alLRLB11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 11."
+::= { alL-Line11 6 }
+
+alL-Line12    OBJECT IDENTIFIER ::= { local-station 20 }
+
+alLLOSS12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 12."
+::= { alL-Line12 1 }
+
+alLILOSS12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 12."
+::= { alL-Line12 2 }
+
+alLAIS12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 12."
+::= { alL-Line12 3 }
+
+alLAISL12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 12."
+::= { alL-Line12 4 }
+
+alLLLB12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 12."
+::= { alL-Line12 5 }
+
+alLRLB12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 12."
+::= { alL-Line12 6 }
+
+remote-station     OBJECT IDENTIFIER ::= { alRADIO-RELAY-LINK 3 }
+
+alR-General     OBJECT IDENTIFIER ::= { remote-station 1 }
+
+alRSupervisor OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),none(0),terminal(1),local(2),network(3),service(4),alcoma(5) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Active supervisor."
+::= { alR-General 1 }
+
+alRConfiguration OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),undefined(0),cf2xE1(1),cf4xE1(2),cf1xE2(3),cf1xE1-Ethernet(4),cf1xE3-E1(7),cf1xEthernet(8),
+                            cf1xEthF-E1(9),
+                            cf1xEthF-E1-1xE1(10),cf1xEthF-E1-2xE1(11),cf1xEthF-E1-3xE1(12),cf1xEthF-E1-4xE1(13),
+                            cf1xEthF-E1-5xE1(14),cf1xEthF-E1-6xE1(15),cf1xEthF-E1-7xE1(16),cf1xEthF-E1-8xE1(17),
+                            cf1xEthF(18),
+                            cf1xEthF-1xE1(19),cf1xEthF-2xE1(20),cf1xEthF-3xE1(21),cf1xEthF-4xE1(22),
+                            cf1xEthF-5xE1(23),cf1xEthF-6xE1(24),cf1xEthF-7xE1(25),cf1xEthF-8xE1(26),
+                            cf2xFEth(27),cf2xFEth-1xE1(28),
+                            cf4xFEth-2xE1(29),
+                            cf2xGEth(30),cf2xGEth-SFP100(31),cf2xGEth-SFP1000(32),cf2xGEth-SFPSG(33) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IDU configuration."
+::= { alR-General 2 }
+
+alRStatus OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(0),ok(1),warning(2),error(3) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Station alarm status."
+::= { alR-General 3 }
+
+alRHistory OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"History alarm status."
+::= { alR-General 4 }
+
+alRIAISL OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Automatic AIS ignored."
+::= { alR-General 5 }
+
+alRILEVPWR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low RX or TX level alarms ignored."
+::= { alR-General 6 }
+
+alR-ODU     OBJECT IDENTIFIER ::= { remote-station 2 }
+
+alRRX-Level OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal receiver level."
+::= { alR-ODU 1 }
+
+alRTX-PWR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitter power level."
+::= { alR-ODU 2 }
+
+alRMode-TX OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),manual(1),atpc(2) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Mode of power control."
+::= { alR-ODU 3 }
+
+alRODU-LB OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ODU line-loopback."
+::= { alR-ODU 4 }
+
+alR-Modem     OBJECT IDENTIFIER ::= { remote-station 3 }
+
+alRQuality OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),out(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Quality of 4-level modulation."
+::= { alR-Modem 1 }
+
+alR-Supply     OBJECT IDENTIFIER ::= { remote-station 4 }
+
+alRVoltage-5V OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),high(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Voltage 5V high."
+::= { alR-Supply 1 }
+
+alRVoltage-5Vor15V OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Voltage 5V or 15V low."
+::= { alR-Supply 2 }
+
+alRVoltage-24V OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Voltage 24V low."
+::= { alR-Supply 3 }
+
+alRCurrent-ODU OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),out(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ODU current range."
+::= { alR-Supply 4 }
+
+alRInput OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input voltage low."
+::= { alR-Supply 5 }
+
+alR-IDU     OBJECT IDENTIFIER ::= { remote-station 5 }
+
+alREEPROM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"EEPROM memory status."
+::= { alR-IDU 1 }
+
+alRRAM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"RAM memory status."
+::= { alR-IDU 2 }
+
+alRBattery OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"RAM backup battery voltage."
+::= { alR-IDU 3 }
+
+alRCommIDU OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication status with blocks of IDU."
+::= { alR-IDU 4 }
+
+alRCommRMT OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication status with remote station."
+::= { alR-IDU 5 }
+
+alR-MUX     OBJECT IDENTIFIER ::= { remote-station 6 }
+
+alRBER-10E6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"BER > 10E-6."
+::= { alR-MUX 1 }
+
+alRBER-10E4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"BER > 10E-4."
+::= { alR-MUX 2 }
+
+alRFrame OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),loss(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Frame LOSS."
+::= { alR-MUX 3 }
+
+alR-PDH1    OBJECT IDENTIFIER ::= { remote-station 7 }
+
+alRPDHFrame OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),loss(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"PDH1 frame LOSS."
+::= { alR-PDH1 1 }
+
+alRAISPDH OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to frame PDH1."
+::= { alR-PDH1 2 }
+
+alRLLBPDH OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on PDH1 frame."
+::= { alR-PDH1 3 }
+
+alRRLBPDH OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on PDH1 frame."
+::= { alR-PDH1 4 }
+
+alR-Line1     OBJECT IDENTIFIER ::= { remote-station 9 }
+
+alRLOSS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 1."
+::= { alR-Line1 1 }
+
+alRILOSS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 1."
+::= { alR-Line1 2 }
+
+alRAIS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 1."
+::= { alR-Line1 3 }
+
+alRAISL1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 1."
+::= { alR-Line1 4 }
+
+alRLLB1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 1."
+::= { alR-Line1 5 }
+
+alRRLB1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 1."
+::= { alR-Line1 6 }
+
+alR-Line2     OBJECT IDENTIFIER ::= { remote-station 10 }
+
+alRLOSS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 2."
+::= { alR-Line2 1 }
+
+alRILOSS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 2."
+::= { alR-Line2 2 }
+
+alRAIS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 2."
+::= { alR-Line2 3 }
+
+alRAISL2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 2."
+::= { alR-Line2 4 }
+
+alRLLB2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 2."
+::= { alR-Line2 5 }
+
+alRRLB2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 2."
+::= { alR-Line2 6 }
+
+alR-Line3     OBJECT IDENTIFIER ::= { remote-station 11 }
+
+alRLOSS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 3."
+::= { alR-Line3 1 }
+
+alRILOSS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 3."
+::= { alR-Line3 2 }
+
+alRAIS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 3."
+::= { alR-Line3 3 }
+
+alRAISL3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 3."
+::= { alR-Line3 4 }
+
+alRLLB3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 3."
+::= { alR-Line3 5 }
+
+alRRLB3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 3."
+::= { alR-Line3 6 }
+
+alR-Line4     OBJECT IDENTIFIER ::= { remote-station 12 }
+
+alRLOSS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 4."
+::= { alR-Line4 1 }
+
+alRILOSS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 4."
+::= { alR-Line4 2 }
+
+alRAIS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 4."
+::= { alR-Line4 3 }
+
+alRAISL4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 4."
+::= { alR-Line4 4 }
+
+alRLLB4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 4."
+::= { alR-Line4 5 }
+
+alRRLB4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 4."
+::= { alR-Line4 6 }
+
+alR-Line5     OBJECT IDENTIFIER ::= { remote-station 13 }
+
+alRLOSS5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 5."
+::= { alR-Line5 1 }
+
+alRILOSS5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 5."
+::= { alR-Line5 2 }
+
+alRAIS5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 5."
+::= { alR-Line5 3 }
+
+alRAISL5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 5."
+::= { alR-Line5 4 }
+
+alRLLB5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 5."
+::= { alR-Line5 5 }
+
+alRRLB5 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 5."
+::= { alR-Line5 6 }
+
+alR-Line6     OBJECT IDENTIFIER ::= { remote-station 14 }
+
+alRLOSS6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 6."
+::= { alR-Line6 1 }
+
+alRILOSS6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 6."
+::= { alR-Line6 2 }
+
+alRAIS6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 6."
+::= { alR-Line6 3 }
+
+alRAISL6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 6."
+::= { alR-Line6 4 }
+
+alRLLB6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 6."
+::= { alR-Line6 5 }
+
+alRRLB6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 6."
+::= { alR-Line6 6 }
+
+alR-Line7     OBJECT IDENTIFIER ::= { remote-station 15 }
+
+alRLOSS7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 7."
+::= { alR-Line7 1 }
+
+alRILOSS7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 7."
+::= { alR-Line7 2 }
+
+alRAIS7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 7."
+::= { alR-Line7 3 }
+
+alRAISL7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 7."
+::= { alR-Line7 4 }
+
+alRLLB7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 7."
+::= { alR-Line7 5 }
+
+alRRLB7 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 7."
+::= { alR-Line7 6 }
+
+alR-Line8     OBJECT IDENTIFIER ::= { remote-station 16 }
+
+alRLOSS8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 8."
+::= { alR-Line8 1 }
+
+alRILOSS8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 8."
+::= { alR-Line8 2 }
+
+alRAIS8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 8."
+::= { alR-Line8 3 }
+
+alRAISL8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 8."
+::= { alR-Line8 4 }
+
+alRLLB8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 8."
+::= { alR-Line8 5 }
+
+alRRLB8 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 8."
+::= { alR-Line8 6 }
+
+alR-Line9     OBJECT IDENTIFIER ::= { remote-station 17 }
+
+alRLOSS9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 9."
+::= { alR-Line9 1 }
+
+alRILOSS9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 9."
+::= { alR-Line9 2 }
+
+alRAIS9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 9."
+::= { alR-Line9 3 }
+
+alRAISL9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 9."
+::= { alR-Line9 4 }
+
+alRLLB9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 9."
+::= { alR-Line9 5 }
+
+alRRLB9 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 9."
+::= { alR-Line9 6 }
+
+alR-Line10    OBJECT IDENTIFIER ::= { remote-station 18 }
+
+alRLOSS10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 10."
+::= { alR-Line10 1 }
+
+alRILOSS10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 10."
+::= { alR-Line10 2 }
+
+alRAIS10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 10."
+::= { alR-Line10 3 }
+
+alRAISL10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 10."
+::= { alR-Line10 4 }
+
+alRLLB10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 10."
+::= { alR-Line10 5 }
+
+alRRLB10 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 10."
+::= { alR-Line10 6 }
+
+alR-Line11    OBJECT IDENTIFIER ::= { remote-station 19 }
+
+alRLOSS11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 11."
+::= { alR-Line11 1 }
+
+alRILOSS11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 11."
+::= { alR-Line11 2 }
+
+alRAIS11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 11."
+::= { alR-Line11 3 }
+
+alRAISL11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 11."
+::= { alR-Line11 4 }
+
+alRLLB11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 11."
+::= { alR-Line11 5 }
+
+alRRLB11 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 11."
+::= { alR-Line11 6 }
+
+alR-Line12    OBJECT IDENTIFIER ::= { remote-station 20 }
+
+alRLOSS12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 12."
+::= { alR-Line12 1 }
+
+alRILOSS12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 12."
+::= { alR-Line12 2 }
+
+alRAIS12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 12."
+::= { alR-Line12 3 }
+
+alRAISL12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 12."
+::= { alR-Line12 4 }
+
+alRLLB12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 12."
+::= { alR-Line12 5 }
+
+alRRLB12 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 12."
+::= { alR-Line12 6 }
+
+alRRLTrap     OBJECT IDENTIFIER ::= { alRADIO-RELAY-LINK 4 }
+
+alLast-Message OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Message giving more detailed information on change of alarms status."
+::= { alRRLTrap 1 } 
+
+traps                   OBJECT IDENTIFIER ::= { alcoma 0 }
+
+generalOFF              OBJECT IDENTIFIER ::= { traps 1 }
+generalOK               OBJECT IDENTIFIER ::= { traps 2 }
+generalWAR              OBJECT IDENTIFIER ::= { traps 3 }
+generalERR              OBJECT IDENTIFIER ::= { traps 4 }
+receiverLowAlarmOn      OBJECT IDENTIFIER ::= { traps 5 }
+receiverLowAlarmOff     OBJECT IDENTIFIER ::= { traps 6 }
+transmitterLowAlarmOn   OBJECT IDENTIFIER ::= { traps 7 }
+transmitterLowAlarmOff  OBJECT IDENTIFIER ::= { traps 8 }
+signalQualityAlarmOn    OBJECT IDENTIFIER ::= { traps 9 }
+signalQualityAlarmOff   OBJECT IDENTIFIER ::= { traps 10 }
+ber6EAlarmOn            OBJECT IDENTIFIER ::= { traps 11 }
+ber6EAlarmOff           OBJECT IDENTIFIER ::= { traps 12 }
+ber4EAlarmOn            OBJECT IDENTIFIER ::= { traps 13 }
+ber4EAlarmOff           OBJECT IDENTIFIER ::= { traps 14 }
+inputSupplyAlarmOn      OBJECT IDENTIFIER ::= { traps 15 }
+inputSupplyAlarmOff     OBJECT IDENTIFIER ::= { traps 16 }
+aisFromLineAlarmOn      OBJECT IDENTIFIER ::= { traps 17 }
+aisFromLineAlarmOff     OBJECT IDENTIFIER ::= { traps 18 }
+aisToLineAlarmOn        OBJECT IDENTIFIER ::= { traps 19 }
+aisToLineAlarmOff       OBJECT IDENTIFIER ::= { traps 20 }
+aisToPdhAlarmOn         OBJECT IDENTIFIER ::= { traps 21 }
+aisToPdhAlarmOff        OBJECT IDENTIFIER ::= { traps 22 }
+lossAtLineAlarmOn       OBJECT IDENTIFIER ::= { traps 23 }
+lossAtLineAlarmOff      OBJECT IDENTIFIER ::= { traps 24 }
+lossAtPdhAlarmOn        OBJECT IDENTIFIER ::= { traps 25 }
+lossAtPdhAlarmOff       OBJECT IDENTIFIER ::= { traps 26 }
+lossAtFrameAlarmOn      OBJECT IDENTIFIER ::= { traps 27 }
+lossAtFrameAlarmOff     OBJECT IDENTIFIER ::= { traps 28 }
+
+trapParam               OBJECT IDENTIFIER ::= { alNMS 1 }
+
+nmsTrapTime OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Time of alarms scan."
+::= { trapParam 1 } 
+
+trapSequence OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Number of trap sequence."
+::= { trapParam 2 } 
+
+mwRouteID OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Identification of microwave route."
+::= { trapParam 3 } 
+
+stationID OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Identification of Radio Relay Link station."
+::= { trapParam 4 } 
+
+stationName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Name of Radio Relay Link station."
+::= { trapParam 5 } 
+
+mgmtGWaddr OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IP address of Management Gateway."
+::= { trapParam 6 }
+
+lineID OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line ID number."
+::= { trapParam 7 }
+
+-- MIB pro spoje rady MPx
+
+alMPStatusLED     OBJECT IDENTIFIER ::= { alMP 1 }
+
+alMPEHW OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Hardware error."
+::= { alMPStatusLED 1 }
+     
+alMPESR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal error in radio."
+::= { alMPStatusLED 2 }
+
+alMPESL OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal error on lines."
+::= { alMPStatusLED 3 }
+
+alMPCA OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Non-standard command activate."
+::= { alMPStatusLED 4 }
+
+alMPGeneral     OBJECT IDENTIFIER ::= { alMP 2 }
+
+alMPSupervisor OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),none(0),terminal(1),local(2),network(3),service(4),alcoma(5) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Active supervisor."
+::= { alMPGeneral 1 }
+
+alMPConfiguration OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),undefined(0),cf2xE1(1),cf4xE1(2),cf1xE2(3),cf1xE1-Ethernet(4),cf1xE3-E1(7),cf1xEthernet(8),
+                            cf1xEthF-E1(9),
+                            cf1xEthF-E1-1xE1(10),cf1xEthF-E1-2xE1(11),cf1xEthF-E1-3xE1(12),cf1xEthF-E1-4xE1(13),
+                            cf1xEthF-E1-5xE1(14),cf1xEthF-E1-6xE1(15),cf1xEthF-E1-7xE1(16),cf1xEthF-E1-8xE1(17),
+                            cf1xEthF(18),
+                            cf1xEthF-1xE1(19),cf1xEthF-2xE1(20),cf1xEthF-3xE1(21),cf1xEthF-4xE1(22),
+                            cf1xEthF-5xE1(23),cf1xEthF-6xE1(24),cf1xEthF-7xE1(25),cf1xEthF-8xE1(26),
+                            cf2xFEth(27),cf2xFEth-1xE1(28),
+                            cf4xFEth-2xE1(29),
+                            cf2xGEth(30),cf2xGEth-SFP100(31),cf2xGEth-SFP1000(32),cf2xGEth-SFPSG(33) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IDU configuration."
+::= { alMPGeneral 2 }
+
+alMPStatus OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(0),ok(1),warning(2),error(3) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Station alarm status."
+::= { alMPGeneral 3 }
+
+alMPHistory OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"History alarm status."
+::= { alMPGeneral 4 }
+
+alMPIAISL OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Automatic AIS ignored."
+::= { alMPGeneral 5 }
+
+alMPILEVPWR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low RX or TX level alarms ignored."
+::= { alMPGeneral 6 }
+
+alMPExpiration OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..100))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Expiration status."
+::= { alMPGeneral 7 }
+
+alMPDevType OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..100))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Device type."
+::= { alMPGeneral 8 }
+
+alMPModel OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..100))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Terminal model."
+::= { alMPGeneral 9 }
+
+alMPVersionSW OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..100))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Firmware version."
+::= { alMPGeneral 10 }
+
+alMPODU     OBJECT IDENTIFIER ::= { alMP 3 }
+
+alMPTuneTX OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitter frequency [MHz]."
+::= { alMPODU 1 }
+
+alMPTuneRX OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Receiver frequency [MHz]."
+::= { alMPODU 2 }
+
+alMPTX-PWR OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-128) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitter power level [dB]."
+::= { alMPODU 3 }
+
+alMPRX-Level OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-128) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal receiver level [dB]."
+::= { alMPODU 4 }
+
+alMPTX-PWRAlrm OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),out(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm transmitter power level."
+::= { alMPODU 5 }
+
+alMPRX-LevelAlrm OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm signal receiver level."
+::= { alMPODU 6 }
+
+alMPMode-TX OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),manual(1),atpc(2) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Mode of power control."
+::= { alMPODU 7 }
+
+alMPODU-LB OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"ODU line-loopback."
+::= { alMPODU 8 }
+
+alMPTemperature OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature ODU."
+::= { alMPODU 9 }
+
+alMPVerSwMW OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..50))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"MW Circuits version."
+::= { alMPODU 10 }
+
+alMPSerNumMW OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..50))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"MW Serial Number."
+::= { alMPODU 11 }
+
+alMPTypeODU OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),oduA(0),oduB(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Type of ODU."
+::= { alMPODU 12 }
+
+alMPPTX OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Set power of transmitter."
+::= { alMPODU 13 }
+
+alMPModem     OBJECT IDENTIFIER ::= { alMP 4 }
+
+alMPQuality OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Quality of signal."
+::= { alMPModem 1 }
+
+alMPSNR OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Signal noise ratio."
+::= { alMPModem 2 }
+
+alMPQualityAlrm OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),out(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm quality of signal."
+::= { alMPModem 3 }
+
+alMPSNRAlrm OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm signal noise ratio."
+::= { alMPModem 4 }
+
+alMPRate OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ndef(0),r300Mbps(1),r200Mbps(2),r16Mbps1(3),r282Mbps(4),r40Mbps1(5),r20Mbps1(6),r10Mbps1(7),r5Mbps1(8),r179Mbps(9),r230Mbps(10),
+                            r14Mbps(11),r32Mbps2(12),r44Mbps(13),r22Mbps(14),r11Mbps(15),r5Mbps(16),r66Mbps(17),r33Mbps(18),
+                            r16Mbps(19),r8Mbps(20),r80Mbps(21),r333Mbps(22),r355Mbps(23),r384Mbps(24),r50Mbps(25),r72Mbps(26),
+                            r100Mbps(27),r123Mbps(28),r158Mbps(29),r168Mbps(30),r77Mbps(31),r35Mbps(32),r25Mbps(33),r165Mbps(34),
+                            r61Mbps(35),r39Mbps(36),r19Mbps(37),r17Mbps(38),r30Mbps(39),r34Mbps(40),r60Mbps(41),r178Mbps(42),
+                            r186Mbps(43),r1250Mbps(44),r70Mbps(45),r58Mbps(46),r116Mbps(47),r149Mbps(48),r183Mbps(49),
+                            r216Mbps(50),r249Mbps(51),r31Mbps(52),r41Mbps(53),r59Mbps(54),r64Mbps(55),r69Mbps(56),
+                            r83Mbps(57),r102Mbps(58),r119Mbps(59),r127Mbps(60),r137Mbps(61),r89Mbps(62) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmision rate of link."
+::= { alMPModem 5 }
+
+alMPQAM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ndef(0),mp4FSK(1),mpQPSK(2),mp4QAM1(3),mp8QAM(4),mp16QAM1(5),mp4QAM2(6),mp16QAM2(7),mp32QAM(8),mp64QAM(9),mp128QAM(10),mp256QAM(11) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low transnission rate of link."
+::= { alMPModem 6 }
+
+alMPActiveACM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Activation ACM."
+::= { alMPModem 7 }
+
+alMPStatusACM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),normal(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Actual ACM status."
+::= { alMPModem 8 }
+
+alMPBW OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ndef(0),
+                                  bw3-5MHz(1),bw5MHz(2),bw7MHz(3),bw7-5MHz(4),bw10MHz(5),bw13-75MHz(6),bw14MHz(7),bw20MHz(8),bw20MHzETSI(9),bw27-5MHz(10),
+                                  bw28MHz(11),bw28MHzACAP(12),bw30MHz(13),bw40MHz(14),bw50MHz(15),bw55MHz(16),bw56MHz(17),bw56ACAPMHz(18),bw80MHz(19),bw110MHz(20),
+                                  bw112MHz(21) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Actual bandwidth."
+::= { alMPModem 9 }
+
+alMPMaxRate OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ndef(0),r300Mbps(1),r200Mbps(2),r16Mbps1(3),r282Mbps(4),r40Mbps1(5),r20Mbps1(6),r10Mbps1(7),r5Mbps1(8),r179Mbps(9),r230Mbps(10),
+                            r14Mbps(11),r32Mbps2(12),r44Mbps(13),r22Mbps(14),r11Mbps(15),r5Mbps(16),r66Mbps(17),r33Mbps(18),
+                            r16Mbps(19),r8Mbps(20),r80Mbps(21),r333Mbps(22),r355Mbps(23),r384Mbps(24),r50Mbps(25),r72Mbps(26),
+                            r100Mbps(27),r123Mbps(28),r158Mbps(29),r168Mbps(30),r77Mbps(31),r35Mbps(32),r25Mbps(33),r165Mbps(34),
+                            r61Mbps(35),r39Mbps(36),r19Mbps(37),r17Mbps(38),r30Mbps(39),r34Mbps(40),r60Mbps(41),r178Mbps(42),
+                            r186Mbps(43),r1250Mbps(44),r70Mbps(45),r58Mbps(46),r116Mbps(47),r149Mbps(48),r183Mbps(49),
+                            r216Mbps(50),r249Mbps(51),r31Mbps(52),r41Mbps(53),r59Mbps(54),r64Mbps(55),r69Mbps(56),
+                            r83Mbps(57),r102Mbps(58),r119Mbps(59),r127Mbps(60),r137Mbps(61),r89Mbps(62) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Maximal Transmision rate of link."
+::= { alMPModem 10 }
+
+alMPSupply     OBJECT IDENTIFIER ::= { alMP 5 }
+
+alMPInput OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),low(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input voltage low."
+::= { alMPSupply 1 }
+
+alMPRDG        OBJECT IDENTIFIER ::= { alMP 6 }
+
+alMPEEPROM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"EEPROM memory status."
+::= { alMPRDG 1 }
+
+alMPRAM OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),bad(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"RAM memory status."
+::= { alMPRDG 2 }
+
+alMPCommRMT OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),error(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication status with remote station."
+::= { alMPRDG 3 }
+
+alMPMUX        OBJECT IDENTIFIER ::= { alMP 7 }
+
+alMPBER OBJECT-TYPE
+	SYNTAX  	DisplayString (SIZE (0..30))
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Value of BER."
+::= { alMPMUX 1 }
+
+alMPBER-10E6 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"BER > 10E-6."
+::= { alMPMUX 2 }
+
+alMPBER-10E4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),no(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"BER > 10E-4."
+::= { alMPMUX 3 }
+
+alMPFrame OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),ok(0),loss(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Frame LOSS."
+::= { alMPMUX 4 }
+
+alMPLine1     OBJECT IDENTIFIER ::= { alMP 8 }
+
+alMPLOSS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 1."
+::= { alMPLine1 1 }
+
+alMPILOSS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 1."
+::= { alMPLine1 2 }
+
+alMPAIS1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS to line 1."
+::= { alMPLine1 3 }
+
+alMPAISL1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"AIS from line 1."
+::= { alMPLine1 4 }
+
+alMPLLB1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Line loopback on line 1."
+::= { alMPLine1 5 }
+
+alMPRLB1 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Radio loopback on line 1."
+::= { alMPLine1 6 }
+
+alMPLine2     OBJECT IDENTIFIER ::= { alMP 9 }
+
+alMPLOSS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 2."
+::= { alMPLine2 1 }
+
+alMPILOSS2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 2."
+::= { alMPLine2 2 }
+
+alMPLink2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),down(0),up(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Link status line 2."
+::= { alMPLine2 3 }
+
+alMPSpeed2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),e10Mbps(0),e100Mbps(1),e1000Mbps(2) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Speed of line 2."
+::= { alMPLine2 4 }
+
+alMPType2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),halfduplex(0),fullduplex(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication type of line 2."
+::= { alMPLine2 5 }
+
+alMPFlow2 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Flow control of line 2."
+::= { alMPLine2 6 }
+
+alMPPktRX2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Received packets count of line 2."
+::= { alMPLine2 7 }
+
+alMPByteRX2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Received bytes count of line 2."
+::= { alMPLine2 8 }
+
+alMPPktTX2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitted packets count of line 2."
+::= { alMPLine2 9 }
+
+alMPByteTX2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitted bytes count of line 2."
+::= { alMPLine2 10 }
+
+alMPError2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Error count of line 2."
+::= { alMPLine2 11 }
+
+alMPCollision2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Collision count of line 2."
+::= { alMPLine2 12 }
+
+alMPPauseIn2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input Pause count of line 2."
+::= { alMPLine2 13 }
+
+alMPPauseOut2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Output Pause count of line 2."
+::= { alMPLine2 14 }
+
+alMPDiscardsIn2 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input Discards pactets count of line 2."
+::= { alMPLine2 15 }
+
+alMPLine3     OBJECT IDENTIFIER ::= { alMP 10 }
+
+alMPLOSS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 3."
+::= { alMPLine3 1 }
+
+alMPILOSS3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 3."
+::= { alMPLine3 2 }
+
+alMPLink3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),down(0),up(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Link status line 3."
+::= { alMPLine3 3 }
+
+alMPSpeed3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),e10Mbps(0),e100Mbps(1),e1000Mbps(2) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Speed of line 3."
+::= { alMPLine3 4 }
+
+alMPType3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),halfduplex(0),fullduplex(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication type of line 3."
+::= { alMPLine3 5 }
+
+alMPFlow3 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Flow control of line 3."
+::= { alMPLine3 6 }
+
+alMPPktRX3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Received packets count of line 3."
+::= { alMPLine3 7 }
+
+alMPByteRX3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Received bytes count of line 3."
+::= { alMPLine3 8 }
+
+alMPPktTX3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitted packets count of line 3."
+::= { alMPLine3 9 }
+
+alMPByteTX3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitted bytes count of line 3."
+::= { alMPLine3 10 }
+
+alMPError3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Error count of line 3."
+::= { alMPLine3 11 }
+
+alMPCollision3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Collision count of line 3."
+::= { alMPLine3 12 }
+
+alMPPauseIn3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input Pause count of line 3."
+::= { alMPLine3 13 }
+
+alMPPauseOut3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Output Pause count of line 3."
+::= { alMPLine3 14 }
+
+alMPDiscardsIn3 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input Discards pactets count of line 3."
+::= { alMPLine3 15 }
+
+alMPLine4     OBJECT IDENTIFIER ::= { alMP 11 }
+
+alMPLOSS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),not(0),yes(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"LOSS on line 4."
+::= { alMPLine4 1 }
+
+alMPILOSS4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ignore LOSS on line 4."
+::= { alMPLine4 2 }
+
+alMPLink4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),down(0),up(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Link status line 4."
+::= { alMPLine4 3 }
+
+alMPSpeed4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),e10Mbps(0),e100Mbps(1),e1000Mbps(2) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Speed of line 4."
+::= { alMPLine4 4 }
+
+alMPType4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),halfduplex(0),fullduplex(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Communication type of line 4."
+::= { alMPLine4 5 }
+
+alMPFlow4 OBJECT-TYPE
+	SYNTAX  	INTEGER { offline(-1),off(0),on(1) }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Flow control of line 4."
+::= { alMPLine4 6 }
+
+alMPPktRX4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Received packets count of line 4."
+::= { alMPLine4 7 }
+
+alMPByteRX4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Received bytes count of line 4."
+::= { alMPLine4 8 }
+
+alMPPktTX4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitted packets count of line 4."
+::= { alMPLine4 9 }
+
+alMPByteTX4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Transmitted bytes count of line 4."
+::= { alMPLine4 10 }
+
+alMPError4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Error count of line 4."
+::= { alMPLine4 11 }
+
+alMPCollision4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Collision count of line 4."
+::= { alMPLine4 12 }
+
+alMPPauseIn4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input Pause count of line 4."
+::= { alMPLine4 13 }
+
+alMPPauseOut4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Output Pause count of line 4."
+::= { alMPLine4 14 }
+
+alMPDiscardsIn4 OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input Discards pactets count of line 4."
+::= { alMPLine4 15 }
+
+END

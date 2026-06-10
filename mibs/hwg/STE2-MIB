@@ -1,0 +1,231 @@
+--	STE2 MIB 1.01
+--		History:
+--
+--		1.00	 8.9.2015 Marek Hummel  - Created
+--		1.01	 20.3.2017 Marek Hummel  - FIX.    STE-MIB DEFINITIONS => STE2-MIB DEFINITIONS
+
+
+STE2-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	OBJECT-TYPE				FROM RFC-1212
+	enterprises				FROM RFC1155-SMI
+	DisplayString			FROM RFC1213-MIB;
+
+--
+-- Type Definitions
+--
+PositiveInteger ::= INTEGER (1..2147483647)	-- 0x7FFF FFFF
+
+UnitType ::= INTEGER {
+		none (0),
+		celsius (1),
+		fahrenheit (2),
+		kelvin (3),
+		percent(4)
+	}
+
+OnOff ::= INTEGER {
+		off (0),
+		on (1)
+	}
+
+InputAlarmState ::= INTEGER {
+		normal (0),
+		alarm (1)
+	}
+
+IOName ::= DisplayString (SIZE (0..16))
+
+SensorState ::= INTEGER {
+		invalid (0),
+		normal (1),
+		outofrangelo (2),
+		outofrangehi (3),
+		alarmlo (4),
+		alarmhi (5)
+	}
+
+SensorSN ::= DisplayString (SIZE (0..16))
+SensorName ::= DisplayString (SIZE (0..16))
+SensorValue ::= INTEGER
+SensorID ::= INTEGER
+SensorString ::= DisplayString (SIZE (0..10))
+
+--
+-- Node Definitions
+--
+
+hwgroup		OBJECT IDENTIFIER ::= { enterprises 21796 }
+x390		OBJECT IDENTIFIER ::= { hwgroup 4 }
+ste2		OBJECT IDENTIFIER ::= { x390 9 }
+
+-- Application Info ------------------------------------------------------------
+
+info		OBJECT IDENTIFIER ::= { ste2 70 }
+
+infoAddressMAC OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE (0..17))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"MAC address in text form.
+		It is here to distinguish devices in trap messages."
+	::= { info 1 }
+
+-- Input Dry Contacts ----------------------------------------------------------
+
+inpTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF InpEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A list of binary input entries."
+	::= { ste2 1 }
+
+inpEntry OBJECT-TYPE
+	SYNTAX	InpEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry containing information applicable
+		to a particular binary input."
+	INDEX { inpIndex }
+	::= { inpTable 1 }
+
+InpEntry ::= SEQUENCE {
+	inpIndex	PositiveInteger,
+	inpValue	OnOff,
+	inpName		IOName,
+	inpAlarmState	InputAlarmState
+}
+
+inpIndex OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The binary input index."
+	::= { inpEntry 1 }
+
+inpValue OBJECT-TYPE
+	SYNTAX	OnOff
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The binary input value."
+	::= { inpEntry 2 }
+
+inpName OBJECT-TYPE
+	SYNTAX	IOName
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The binary input name."
+	::= { inpEntry 3 }
+
+inpAlarmState OBJECT-TYPE
+	SYNTAX	InputAlarmState
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The binary input alarm state."
+	::= { inpEntry 4 }
+
+-- Sensors ---------------------------------------------------------------------
+
+sensTable OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SensEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A list of sensor table entries. The number
+		of entries corresponds with number of detected sensors."
+	::= { ste2 3 }
+
+sensEntry OBJECT-TYPE
+	SYNTAX	SensEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"An entry containing information applicable to a
+		particular sensor."
+	INDEX { sensIndex }
+	::= { sensTable 1 }
+
+SensEntry ::= SEQUENCE {
+	sensIndex	PositiveInteger,
+	sensName	SensorName,
+	sensState	SensorState,
+	sensString	SensorString,
+	sensValue	SensorValue,
+	sensSN		SensorSN,
+	sensUnit	UnitType,
+	sensID		SensorID
+}
+
+sensIndex OBJECT-TYPE
+	SYNTAX	PositiveInteger
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor index."
+	::= { sensEntry 1 }
+
+sensName OBJECT-TYPE
+	SYNTAX	SensorName
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor name."
+	::= { sensEntry 2 }
+
+sensState OBJECT-TYPE
+	SYNTAX	SensorState
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor state."
+	::= { sensEntry 3 }
+
+sensString OBJECT-TYPE
+	SYNTAX	SensorString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The string representation of sensor value."
+	::= { sensEntry 4 }
+
+sensValue OBJECT-TYPE
+	SYNTAX	SensorValue
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The integer (decimal * 10) representation
+		of sensor value."
+	::= { sensEntry 5 }
+
+sensSN OBJECT-TYPE
+	SYNTAX	SensorSN
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor Serial number."
+	::= { sensEntry 6 }
+
+sensUnit OBJECT-TYPE
+	SYNTAX	UnitType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor unit."
+	::= { sensEntry 7 }
+
+sensID OBJECT-TYPE
+	SYNTAX	UnitType
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The sensor ID."
+	::= { sensEntry 8 }
+
+END

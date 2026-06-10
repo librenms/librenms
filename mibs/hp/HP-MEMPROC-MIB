@@ -1,0 +1,285 @@
+HP-MEMPROC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Gauge32,
+	NOTIFICATION-TYPE, Unsigned32, Integer32,
+	Opaque					FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, TruthValue,
+	DisplayString				FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  	FROM SNMPv2-CONF
+	hpProcurveCommon                  	    FROM HP-BASE-MIB;
+
+hpMemprocMIB MODULE-IDENTITY
+	LAST-UPDATED 	"200502011455Z"
+	ORGANIZATION 	"Hewlett Packard Company,
+	                 ProCurve Networking Business"
+		CONTACT-INFO "Hewlett Packard Company
+	                  8000 Foothills Blvd.
+	                  Roseville, CA 95747"		
+	DESCRIPTION
+			"Memory and Process information  for HP Procurve product line."
+    REVISION     "200502011455Z"  -- February 1, 2005
+    DESCRIPTION  "Modified to reflect new OID hierarchy for 
+                  HP J8162A XL Access Controller Module." 		
+
+	::= { hpProcurveCommon 5 }
+
+
+-- This MIB displays memory and process information common to most
+-- HP Procurve product line devices.  
+
+hpMemprocMIBObjects OBJECT IDENTIFIER ::= { hpMemprocMIB 1 }
+hpMemprocNotificationsPrefix OBJECT IDENTIFIER ::= { hpMemprocMIB 2 }
+hpMemprocMIBConformance OBJECT IDENTIFIER ::= {  hpMemprocMIB 3 }
+
+
+hpmpCPU  OBJECT IDENTIFIER ::= {  hpMemprocMIBObjects 1 }
+hpmpMemory  OBJECT IDENTIFIER ::= {  hpMemprocMIBObjects 2 }
+
+
+-- Textual Conventions
+-- Define the Float Textual Convention
+--   This definition was written by David Perkins.
+--
+
+Float ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A single precision floating-point number.  The semantics
+         and encoding are identical for type 'single' defined in
+         IEEE Standard for Binary Floating-Point,
+         ANSI/IEEE Std 754-1985.
+         The value is restricted to the BER serialization of
+         the following ASN.1 type:
+             FLOATTYPE ::= [120] IMPLICIT FloatType
+         (note: the value 120 is the sum of '30'h and '48'h)
+         The BER serialization of the length for values of
+         this type must use the definite length, short
+         encoding form.
+
+         For example, the BER serialization of value 123
+         of type FLOATTYPE is '9f780442f60000'h.  (The tag
+         is '9f78'h; the length is '04'h; and the value is
+         '42f60000'h.) The BER serialization of value
+         '9f780442f60000'h of data type Opaque is
+         '44079f780442f60000'h. (The tag is '44'h; the length
+         is '07'h; and the value is '9f780442f60000'h."
+    SYNTAX Opaque (SIZE (7))
+
+
+-- hpmpCPU
+-- hpmpCPUTable
+
+-- the CPU table
+-- The CPU table contains load averages per CPU. The load averages indicate 
+-- the number of processes which are ready to run, but are waiting due to 
+-- a busy CPU. These values should be used with the CPU percent utilization 
+-- statistics to determine if the device is overloaded.
+
+
+hpmpCPUTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF HpmpCPUEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "A table of per CPU load averages and utilization statistics."
+        ::= { hpmpCPU 1 }
+
+hpmpCPUEntry OBJECT-TYPE
+        SYNTAX          HpmpCPUEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Information relating to CPU load and utilization."  
+        INDEX   { hpmpCPUIndex }
+        ::= { hpmpCPUTable 1 }
+
+HpmpCPUEntry ::=
+        SEQUENCE {
+                hpmpCPUIndex                Unsigned32,
+                hpmpCPULoad1min             Integer32,
+                hpmpCPULoad5min             Integer32,
+                hpmpCPULoad15min            Integer32,
+				hpmpCPUPctBusy              Gauge32
+        }
+
+hpmpCPUIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1.. 4294967295)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An index that uniquely represents a CPU on this device. This 
+                index is assigned arbitrarily by the engine and is not 
+                saved over reboots."
+        ::= { hpmpCPUEntry 1 }
+
+
+hpmpCPULoad1min OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of processes in the CPU run queue, averaged 
+                over the past 1 minute. This is computed by taking the 
+                floating point load average value and multiplying by 100,
+                then converting the value to an integer."
+        ::= { hpmpCPUEntry 2 }
+
+hpmpCPULoad5min OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of processes in the CPU run queue, averaged 
+                over the past 5 minutes. This is computed by taking the 
+                floating point load average value and multiplying by 100,
+                then converting the value to an integer."
+        ::= { hpmpCPUEntry 3 }
+
+hpmpCPULoad15min OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of processes in the CPU run queue, averaged 
+                over the past 15 minutes. This is computed by taking the 
+                floating point load average value and multiplying by 100,
+                then converting the value to an integer."
+        ::= { hpmpCPUEntry 4 }
+
+hpmpCPUPctBusy OBJECT-TYPE
+        SYNTAX          Gauge32
+		UNITS			"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object reports the percentage time the CPU was actively
+                 engaged during the last interval."
+        ::= { hpmpCPUEntry 5 }
+
+
+-- hpmpMemory
+-- hpmpMemTable
+-- entries for unique memory pools with the device.
+
+hpmpMemTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF HpmpMemEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "A table of memory utilization per unique memory pool." 
+        ::= { hpmpMemory 1 }
+
+hpmpMemEntry OBJECT-TYPE
+        SYNTAX          HpmpMemEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Information relating to memory size and utilization."
+        INDEX   { hpmpMemIndex }
+        ::= { hpmpMemTable 1 }
+
+HpmpMemEntry ::=
+        SEQUENCE {
+            hpmpMemIndex           Unsigned32,
+			hpmpMemDescr		   DisplayString,
+            hpmpMemInUse		   Unsigned32,
+            hpmpMemTotal		   Unsigned32,
+			hpmpMemPctInUse		   Gauge32
+        }
+
+hpmpMemIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1.. 4294967295)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An index that uniquely represents a Memory pool on this device. This 
+                index is assigned arbitrarily by the engine and is not 
+                saved over reboots."
+        ::= { hpmpMemEntry 1 }
+
+hpmpMemDescr OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object describes the memory pool reported by hpmpMemIndex."
+        ::= { hpmpMemEntry 2}
+
+hpmpMemInUse OBJECT-TYPE
+        SYNTAX          Unsigned32
+		UNITS			"Kbytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object reports the amount of physical memory in use
+                 by this memory pool."
+        ::= { hpmpMemEntry 3}
+
+
+hpmpMemTotal OBJECT-TYPE
+        SYNTAX          Unsigned32
+		UNITS			"Kbytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object reports the total amount of physical memory 
+                available to this memory pool."
+        ::= { hpmpMemEntry 4 }
+
+
+hpmpMemPctInUse OBJECT-TYPE
+        SYNTAX          Gauge32
+		UNITS			"percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object reports the percent of physical memory in use
+                 by this memory pool."
+        ::= { hpmpMemEntry 5 }
+	
+
+-- notifications
+-- (no notifications are currently defined)
+hpMemprocNotifications OBJECT IDENTIFIER ::= { hpMemprocNotificationsPrefix 0 }
+
+
+-- conformance information
+
+hpmpCompliances OBJECT IDENTIFIER ::= { hpMemprocMIBConformance 1 }
+hpmpGroups OBJECT IDENTIFIER ::=      { hpMemprocMIBConformance 2 }
+
+
+hpMemprocMIBCompliance1  MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the HP-MEMPROC-MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { hpmpCPUGroup, hpmpMemoryGroup }
+
+        ::= { hpmpCompliances 1 }
+
+
+-- units of conformance
+
+hpmpCPUGroup    OBJECT-GROUP
+    OBJECTS { hpmpCPULoad1min, hpmpCPULoad5min, hpmpCPULoad15min, 
+              hpmpCPUPctBusy }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing CPU utilization and load 
+            information applicable to all devices."
+    ::= { hpmpGroups 1 }
+
+hpmpMemoryGroup    OBJECT-GROUP
+    OBJECTS { hpmpMemDescr, hpmpMemInUse, hpmpMemTotal, hpmpMemPctInUse }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing memory usage information
+            applicable to all devices."
+    ::= { hpmpGroups 2 }
+
+
+END

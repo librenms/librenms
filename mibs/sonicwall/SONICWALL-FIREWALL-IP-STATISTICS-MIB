@@ -1,0 +1,2058 @@
+-- ****************************************************************************
+-- SONICWALL-FIREWALL-IP-STATISTICS
+--
+-- June 2002  Initial Version                                  Srikanth Nayani
+-- Apr  2003  Change Postal                                    Susan Yan
+-- Nov 2005   Add CPU and RAM Utilizations                     GM Anderson
+-- 03-10-08 - Removed Imports that are not used to 
+--            prevent warnings in MIB compilation              Mike Uy 
+-- 04-17-09 - Updated E-mail CONTACT-INFO                      Rosalea Real
+-- 11-11-09 - Renamed this file from sonic_stats.mib to
+--            SONICWALL-FIREWALL-IP-STATISTICS-MIB.MIB         Mike Uy
+-- 11-11-09 - Updated SonicWall company address                Mike Uy
+-- 01-25-12 - Modified the data types for FwStatsModule
+--            entries to Gauge and Integer                     Ajit Nair
+-- 06-01-12 - Add dynamic NAT count, management/forward CPU,
+--            interface statistics.                            Thomas Tang
+-- 07-23-12 - Updated company copyright and organization       Mike Uy
+-- 02-18-14 - Add Sensor Table for hardware health monitoring  Thomas Tang
+-- 02-28-14 - Add Syslog Module for syslog configuration and
+--            syslog statistic info exposing                   Thomas Tang
+-- 01-08-15 - Update Postal
+--            Add DPI-SSL Connection Counts                    Thomas Tang
+-- 01-07-16 - Added SonicWall wireless and zone OIDs           Thomas Tang
+-- 01-06-17 - Updated company copyright and
+--            organization,                                    Thomas Tang
+-- 01-03-19 - Deprecate sonicZoneCFS and create sonicCFS       Thomas Tang
+--
+-- Copyright (c) 2017 SonicWall Inc.
+-- All rights reserved.
+-- ****************************************************************************
+
+SONICWALL-FIREWALL-IP-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    DisplayString,TruthValue,
+    PhysAddress                 FROM SNMPv2-TC
+    IpAddress,
+    Integer32,
+    Counter64,
+    Unsigned32,
+    Gauge32,
+    TimeTicks,
+    Counter32,
+    OBJECT-TYPE,
+	MODULE-IDENTITY             FROM SNMPv2-SMI
+	Counter, Gauge				FROM RFC1155-SMI
+    sonicwallFw           		FROM SONICWALL-SMI;
+
+sonicwallFwStatsModule MODULE-IDENTITY
+	LAST-UPDATED "201903010000Z"
+	ORGANIZATION "SonicWall"
+	CONTACT-INFO
+		"	SonicWall Inc.
+
+		   Postal: 5455 Great America Parkway
+                   Santa Clara, CA 95054
+                   USA
+
+		   Tel: +1 408 745 9600
+		   Fax: +1 408 745 9300
+
+		E-mail: support@sonicwall.com"
+	DESCRIPTION
+		"The Generic MIB Module for SonicWall Firewall."
+
+	REVISION      "201903010000Z"
+	DESCRIPTION   "Deprecate sonicZoneCFS and create sonicCFS."
+
+	REVISION      "201701060000Z"
+	DESCRIPTION   "Updated company copyright and organization."
+
+    REVISION      "201607010000Z"
+    DESCRIPTION   "Added SonicWall wireless and zone OIDs"
+
+    REVISION      "201501080000Z"
+    DESCRIPTION   "Update Postal, Tel, Fax
+                   Add DPI-SSL Connection Counts"
+
+	REVISION      "201402280000Z"  -- Feb 28, 2014
+	DESCRIPTION   "Add Syslog Module for syslog configuration and syslog statistic info exposing"
+
+	REVISION      "201402180000Z"  -- Feb 18, 2014
+	DESCRIPTION   "Add Sensor Table for hardware health monitoring"
+
+	REVISION      "200511090000Z"
+	DESCRIPTION   "Initial Version"
+    ::= { sonicwallFw 3 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+SyslogFacility  ::=  TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    		"The Syslog standard facilities defined by RFC 3164."
+	REFERENCE "The Syslog Protocol (RFC 3164): Section 4."
+ 	SYNTAX  INTEGER {
+			kern            (0), -- kernel messages
+			user            (1), -- user-level messages
+			mail            (2), -- mail system
+			daemon          (3), -- system daemons
+			auth            (4), -- security/authorization messages
+			syslog          (5), -- messages generated internally by syslogd
+			lpr             (6), -- line printer subsystem
+			news            (7), -- network news subsystem
+			uucp            (8), -- UUCP subsystem
+			cron            (9), -- clock daemon
+			authpriv        (10),-- security/authorization messages
+			ftp             (11),-- FTP daemon
+			ntp             (12),-- NTP subsystem
+			audit           (13),-- log audit
+			alert           (14),-- log alert
+			cron2           (15),-- clock daemon
+			local0          (16),-- local use 0
+			local1          (17),-- local use 1
+			local2          (18),-- local use 2
+			local3          (19),-- local use 3
+			local4          (20),-- local use 4
+			local5          (21),-- local use 5
+			local6          (22),-- local use 6
+			local7          (23) -- local use 7
+		}
+
+SwSpRadioType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+            "Enumerated types for SonicPoint radio.
+             The following enumerated values are supported:
+                other(0)                    - radio type is unkonwn n/a
+                dot11n-only-24 (1)          - 2.4GHz n Only
+                dot11n-mixed-24 (2)         - 2.4GHz n/g/b
+                dot11g-only-24 (3)          - 2.4GHz g Only
+                dot11n-only-50 (4)          - 5GHz n Only
+                dot11n-mixed-50 (5)         - 5GHz n/a
+                dot11a-only-50 (6)          - 5GHz a Only
+                dot11ac-mixed-50(7)         - 5GHz n/a/ac
+                dot11ac-only-50 (8)         - 5GHz ac Only"
+    SYNTAX  INTEGER {
+                other           (0),
+	            dot11n-only-24  (1),
+	            dot11n-mixed-24 (2),
+	            dot11g-only-24  (3),
+	            dot11n-only-50  (4),
+	            dot11n-mixed-50 (5),
+	            dot11a-only-50  (6),
+	            dot11ac-mixed-50(7),
+	            dot11ac-only-50 (8) }
+
+SwSpChannelWidthType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerated type for SonicPoint radio channel width:
+                auto(0)             -auto
+                width20MHz(1)       -standard 20MHz channel
+                width40MHz(2)       -wide 40MHz channel
+                width80MHz(3)       -wide 80MHz channle"
+    SYNTAX  INTEGER {
+                auto(0),
+                width20MHz(1),
+                width40MHz(2),
+                width80MHz(3) }
+
+SwSpWorkState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerated type for SonicPoint work state"
+    SYNTAX      INTEGER {
+                  safemode(0),
+                  unprovisioned(1),
+                  provisioning(2),
+                  operational(3),
+                  unresponse(4),
+                  updatingfirmware(5),
+                  initializing(6),
+                  overlimit(7),
+                  rebooting(8),
+                  failedprovision(9),
+                  failedfirmware(10),
+                  scanning(11),
+                  manufacturing(12),
+                  disable(13),
+                  downloadingfirmware(14),
+                  nofirmware(15),
+                  failedscan(16),
+                  widp(17),
+                  widpto(18),
+                  writingfirmware(19),
+                  failedgetcrashlog(20),
+                  autoshutoff(21),
+                  gettingfirmware(22),
+                  unregistered(23) }
+
+SwStationStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Current station status"
+    SYNTAX  INTEGER {
+                none(0),
+                authenticated(1),
+                associated(2),
+                joined(3),
+                connected(4),
+                up(5),
+                down(6) }
+
+SwSpRadioChannelNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "Channel number of a SonicPoint radio"
+    SYNTAX      Integer32 (0..200)
+
+SwSpRadioTxPower ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+                "Transmit Power of a SonicPoint radio:
+                 fullpower(0)      -0db
+                 half(1)           -3db
+                 quarter(2)        -6db
+                 eighth(3)         -9db
+                 minimum(4)"
+    SYNTAX      INTEGER {
+                  fullpower(0),
+                  half(1),
+                  quarter(2),
+                  eighth(3),
+                  minimum(4) }
+
+SwZoneSecurityType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerated type for zone security types"
+    SYNTAX      INTEGER {
+                  untrusted1(0),
+                  trusted(1),
+                  public(2),
+                  other1(3),
+                  wireless(4),
+                  encrypted(5),
+                  untrusted2(6),
+                  other2(7),
+                  sslvpn(8),
+                  management(9) }
+
+SwBoolState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Boolean data type representing enabled/disabled"
+    SYNTAX      INTEGER {
+        disabled (1),
+        enabled (2)
+    }
+
+SwWlanAuthenticationType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerated type for WLAN authentication methods"
+    SYNTAX      INTEGER {
+                  other(0),
+                  wep-both(1),
+                  wep-open(2),
+                  wep-shared(3),
+                  wpa-psk(4),
+                  wpa-eap(5),
+                  wpa2-psk(6),
+                  wpa2-eap(7),
+                  wpa2-auto-psk(8),
+                  wpa2-auto-eap(9) }
+
+SwWlanCipherType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enumerated type for WLAN encryption methods"
+    SYNTAX      INTEGER {
+                  none(0),
+                  open(1),
+                  wep(2),
+                  tkip(3),
+                  aes(4),
+                  auto(5) }
+
+
+-- =======================
+-- sonic Firewall Statistics
+-- =======================
+
+
+sonicwallFwStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 1}
+
+sonicMaxConnCacheEntries OBJECT-TYPE
+	SYNTAX INTEGER (1..2147483647)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Maximum number of connection cache entries allowed through the firewall"
+	::= { sonicwallFwStats 1 }
+
+sonicCurrentConnCacheEntries OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Number of active connection cache entries through the firewall"
+	::= { sonicwallFwStats 2 }
+
+sonicCurrentCPUUtil OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Instantaneous CPU Utilization in percent"
+	::= { sonicwallFwStats 3 }
+
+sonicCurrentRAMUtil OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Instantaneous RAM Utilization in percent"
+	::= { sonicwallFwStats 4 }
+
+sonicNatTranslationCount OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Current number of dynamic NAT translations being performed."
+	::= { sonicwallFwStats 5 }
+
+sonicCurrentManagementCPUUtil OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Instantaneous management CPU Utilization in percent."
+	::= { sonicwallFwStats 6 }
+
+sonicCurrentFwdAndInspectCPUUtil OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Instantaneous Forwarding/Inspection CPU Utilization in percent."
+	::= { sonicwallFwStats 7 }
+
+-- =======================
+-- sonic Interface Statistics Table
+-- =======================
+
+sonicIfStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SonicIfStatEntry 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"List of physical interfaces and their current usage in percentage."
+	::= { sonicwallFwStats 8 }
+
+sonicIfStatEntry OBJECT-TYPE
+	SYNTAX SonicIfStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Interface status entry."
+	INDEX { sonicIfIndex }
+	::= { sonicIfStatTable 1 }
+
+SonicIfStatEntry ::= SEQUENCE {
+	sonicIfIndex		INTEGER,
+	sonicIfUsage		INTEGER,
+	sonicIfThroughput	INTEGER
+	}
+
+sonicIfIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A unique value for each interface.  Its value
+		ranges between 1 and the value of ifNumber.  The
+		value for each interface must remain constant at
+ 		least from one re-initialization of the entity's
+		network management system to the next re-
+		initialization."
+	::= { sonicIfStatEntry 1 }
+
+sonicIfUsage OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Interface bandwidth usage value in percentage."
+	::= { sonicIfStatEntry 2 }
+
+sonicIfThroughput OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Interface throughput value in bits per second."
+	::= { sonicIfStatEntry 3 }
+
+sonicCFS OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether Content Filtering Service is enabled."
+    ::= { sonicwallFwStats 9 }
+
+sonicwallFwVPNStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 2}
+
+sonicwallFwVpnIPSecStats OBJECT IDENTIFIER ::= {sonicwallFwVPNStats 1}
+
+
+-- =======================
+-- sonic IPsec Statistics Table
+-- =======================
+
+sonicSAStatTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SonicSAStatEntry 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table provides statistics for each Security Association."
+	::= { sonicwallFwVpnIPSecStats 1 }
+
+sonicSAStatEntry OBJECT-TYPE
+	SYNTAX SonicSAStatEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Entries in table cannot be added or deleted. This table is
+		completely controlled by the agent. Each SA statistics will be
+		represented by an entry in this table. "
+	INDEX { sonicIpsecSaIndex}
+	::= { sonicSAStatTable 1 }
+
+SonicSAStatEntry ::= SEQUENCE {
+	sonicIpsecSaIndex			   Counter,
+	sonicSAStatPeerGateway         IpAddress,
+	sonicSAStatSrcAddrBegin        IpAddress,
+	sonicSAStatSrcAddrEnd	       IpAddress,
+	sonicSAStatDstAddrBegin        IpAddress,
+	sonicSAStatDstAddrEnd	       IpAddress,
+	sonicSAStatCreateTime          DisplayString,
+	sonicSAStatEncryptPktCount     Counter,
+	sonicSAStatEncryptByteCount    Counter,
+	sonicSAStatDecryptPktCount     Counter,
+	sonicSAStatDecryptByteCount    Counter,
+	sonicSAStatInFragPktCount      Counter,
+	sonicSAStatOutFragPktCount     Counter,
+    sonicSAStatUserName            DisplayString
+	}
+
+
+sonicIpsecSaIndex OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		" Phase2  SA index."
+	::= { sonicSAStatEntry 1 }
+
+sonicSAStatPeerGateway OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Peer gateway address where the tunnel gets terminated ."
+	::= { sonicSAStatEntry 2 }
+
+sonicSAStatSrcAddrBegin OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"First address of the Source network for the phase2 SA ."
+	::= { sonicSAStatEntry 3 }
+
+sonicSAStatSrcAddrEnd OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Last address of the Source network for the phase2 SA ."
+	::= { sonicSAStatEntry 4 }
+
+sonicSAStatDstAddrBegin OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"First address of the destination network for the phase2 SA ."
+	::= { sonicSAStatEntry 5 }
+
+sonicSAStatDstAddrEnd OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Last address of the destination network for the phase2 SA ."
+	::= { sonicSAStatEntry 6 }
+
+sonicSAStatCreateTime OBJECT-TYPE
+	SYNTAX DisplayString
+    MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Time this phase2 SA was actually created in GMT."
+	::= { sonicSAStatEntry 7 }
+
+sonicSAStatEncryptPktCount OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total encrypted packet count for this phase2 SA."
+	::= { sonicSAStatEntry 8 }
+
+sonicSAStatEncryptByteCount OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total encrypted byte count for this phase2 SA."
+	::= { sonicSAStatEntry 9 }
+
+sonicSAStatDecryptPktCount OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total decrypted packet count for this phase2 SA."
+	::= { sonicSAStatEntry  10}
+
+sonicSAStatDecryptByteCount OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Total decrypted byte count for this phase2 SA."
+	::= { sonicSAStatEntry  11 }
+
+sonicSAStatInFragPktCount OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Incoming Fragmented packet count for this phase2 SA"
+	::= { sonicSAStatEntry 12 }
+
+sonicSAStatOutFragPktCount OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Outgoing Fragmented packet count for this phase2 SA"
+	::= { sonicSAStatEntry 13 }
+
+
+sonicSAStatUserName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Name of the security policy used for creating this phase2 SA."
+	::= { sonicSAStatEntry 14 }
+
+sonicwallFwHWStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 3}
+
+-- =======================================================================
+-- Sensor Stats
+-- =======================================================================
+sonicwallFwHWSensorStats OBJECT IDENTIFIER ::= {sonicwallFwHWStats 3}
+
+-- =======================================================================
+-- Sensor Table
+-- =======================================================================
+
+sonicwallSensorsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonicwallSensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This lists all the sensors and their value in SonicWall firewall device."
+    ::= { sonicwallFwHWSensorStats 1 }
+
+sonicwallSensorsEntry OBJECT-TYPE
+    SYNTAX      SonicwallSensorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SonicWall sensor entry"
+    INDEX       { sonicwallSensorsIndex }
+    ::= { sonicwallSensorsTable 1 }
+
+SonicwallSensorsEntry ::= 
+	SEQUENCE {
+	    sonicwallSensorsIndex    Integer32,
+	    sonicwallSensorsId		 Integer32,
+	    sonicwallSensorsDevice   DisplayString,
+	    sonicwallSensorsValue    Integer32,
+	    sonicwallSensorsUnit	 DisplayString
+	}
+
+sonicwallSensorsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index that identifies the sensor"
+    ::= { sonicwallSensorsEntry 1 }
+
+sonicwallSensorsId OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index that identifies the sensor ID"
+    ::= { sonicwallSensorsEntry 2 }
+
+sonicwallSensorsDevice OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor descriptive name"
+    ::= { sonicwallSensorsEntry 3 }
+
+sonicwallSensorsValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor value"
+    ::= { sonicwallSensorsEntry 4 }
+
+sonicwallSensorsUnit OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sensor unit"
+    ::= { sonicwallSensorsEntry 5 }
+
+sonicwallFwSyslogStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 4}
+
+-- =======================================================================
+-- Syslog Stats
+-- =======================================================================
+
+-- Subgroups
+
+sonicwallFwSyslogSetting OBJECT IDENTIFIER ::= {sonicwallFwSyslogStats 1}
+sonicwallFwSyslogServer OBJECT IDENTIFIER ::= {sonicwallFwSyslogStats 2}
+sonicwallFwSyslogStatistic OBJECT IDENTIFIER ::= {sonicwallFwSyslogStats 3}
+
+-- Syslog setting objects
+
+sonicSyslogFacility OBJECT-TYPE
+    SYNTAX     SyslogFacility
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION                
+        "Syslog facility configured on firewall."
+    ::= { sonicwallFwSyslogSetting 1 }
+
+sonicSyslogOverrideSetting OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"When using SonicWall ViewPoint for reporting solution,
+		 this object indicates whether the appliance overrides Syslog
+		 settings with reporting software settings."
+    ::= { sonicwallFwSyslogSetting 2 }
+
+sonicSyslogFormat OBJECT-TYPE
+    SYNTAX     INTEGER {
+    				default(0),
+        			webTrends(1),
+        			enhSyslog(2),
+        			arcSight(3)
+        		}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION                
+        "Syslog format configured on firewall.
+         The following Syslog formats can be specified:
+         Default - Use the default SonicWall Syslog format.
+         WebTrends - Use the WebTrends Syslog format. You must have WebTrends software
+		 installed on your system.
+		 Enhanced Syslog - Use the Enhanced SonicWall Syslog format.
+		 ArcSight - Use the ArcSight Syslog format. A Syslog server must be configured with
+		 the ArcSight Logger application to decode the ArcSight messages."
+    ::= { sonicwallFwSyslogSetting 3 }
+
+sonicSyslogID OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Syslog ID field is included in all generated syslog messages, prefixed by id=.
+		 The Syslog ID field is disabled when the Override Syslog Settings with Reporting Software Settings option is enabled."
+    ::= { sonicwallFwSyslogSetting 4 }
+
+sonicSyslogEventRateLimitEnable OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"This object indicates whether the appliance enables rate limiting of events to prevent the
+		 internal or external logging mechanism from being overwhelmed by log events."
+    ::= { sonicwallFwSyslogSetting 5 }
+
+sonicSyslogEventRateLimit OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Event rate limiting: Maximum Events Per Second."
+	::= { sonicwallFwSyslogSetting 6 }
+
+sonicSyslogDataRateLimitEnable OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"This object indicates whether the appliance enables rate limiting of data to prevent the
+		 internal or external logging mechanism from being overwhelmed by log events."
+    ::= { sonicwallFwSyslogSetting 7 }
+
+sonicSyslogDataRateLimit OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Data rate limiting: Maximum Bytes Per Second."
+	::= { sonicwallFwSyslogSetting 8 }
+
+sonicSyslogNDPPEnable OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"This object indicates whether the appliance enables NDPP Enforcement for Syslog Server."
+    ::= { sonicwallFwSyslogSetting 9 }
+
+-- Syslog server objects
+
+sonicSyslogMaxServers OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION                
+        "The maximum number of syslog servers that can be configured for the system in sonicSyslogTable."
+    ::= { sonicwallFwSyslogServer 1 }
+
+sonicSyslogServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SonicSyslogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries of syslog servers for the appliance.
+ 		 The maximum number of entries is indicated by the object sonicwallSyslogMaxServers."
+    ::= { sonicwallFwSyslogServer 2 }
+
+sonicSyslogServerEntry OBJECT-TYPE
+    SYNTAX      SonicSyslogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing info about syslog server configured by SonicWall firewall appliance"
+    INDEX       { sonicSyslogServerIndex }
+    ::= { sonicSyslogServerTable 1 }
+
+SonicSyslogEntry ::= 
+	SEQUENCE {
+	    sonicSyslogServerIndex    INTEGER,
+	    sonicSyslogServerAddr     IpAddress,
+	    sonicSyslogServerPort     INTEGER
+	}
+
+sonicSyslogServerIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index that identifies the syslog server"
+    ::= { sonicSyslogServerEntry 1 }
+
+sonicSyslogServerAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Syslog server address."
+    ::= { sonicSyslogServerEntry 2 }
+
+sonicSyslogServerPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Syslog server port."
+    ::= { sonicSyslogServerEntry 3 }
+
+-- Syslog statistics objects
+
+sonicSyslogMessage OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Running total of syslog message generated since startup."
+    ::= { sonicwallFwSyslogStatistic 1 }
+
+
+sonicSyslogStreamData OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Running total of syslog stream data generated since startup."
+    ::= { sonicwallFwSyslogStatistic 2 }
+
+-- =======================================================================
+-- sonic DPI-SSL Stats
+-- =======================================================================
+
+sonicwallFwDpiSslStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 5}
+
+sonicDpiSslConnCountCur OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current SSL-inspected connections through the firewall."
+	::= { sonicwallFwDpiSslStats 1 }
+
+sonicDpiSslConnCountHighWater OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Highwater SSL-inspected connections through the firewall."
+	::= { sonicwallFwDpiSslStats 2 }
+
+sonicDpiSslConnCountMax OBJECT-TYPE
+	SYNTAX Gauge
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Maximum SSL-inspected connections through the firewall."
+	::= { sonicwallFwDpiSslStats 3 }
+
+-- =======================================================================
+-- sonic Firewall Wireless Statistics
+-- =======================================================================
+
+sonicwallFwWirelessStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 6}
+
+sonicWirelessSpInfo OBJECT IDENTIFIER ::= {sonicwallFwWirelessStats 1}
+
+sonicWirelessSpVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of onboard SonicPoint"
+    ::= { sonicWirelessSpInfo 1 }
+
+sonicWirelessSpNVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of onboard SonicPoint-N"
+    ::= { sonicWirelessSpInfo 2 }
+
+sonicWirelessSpNvVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of onboard SonicPoint-Ni/Ne"
+    ::= { sonicWirelessSpInfo 3 }
+
+sonicWirelessSpNdrVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of onboard SonicPoint-NDR"
+    ::= { sonicWirelessSpInfo 4 }
+
+sonicWirelessSpAcVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Firmware version of onboard SonicPoint-ACe/ACi/N2"
+    ::= { sonicWirelessSpInfo 5 }
+
+sonicWirelessApNumber OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Number of onboard SonicPoints"
+    ::= { sonicWirelessSpInfo 6 }
+
+sonicWirelessApTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SonicWirelessApEntry 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table of objects that display the configuration of SonicPoints." 
+	::= { sonicwallFwWirelessStats 2 }
+
+sonicWirelessApEntry OBJECT-TYPE
+	SYNTAX SonicWirelessApEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A set of objects that display the configuration of a SonicPoint." 
+	INDEX { sonicApIndex}
+	::= { sonicWirelessApTable 1 }
+
+SonicWirelessApEntry ::= SEQUENCE {
+	sonicApIndex			       INTEGER,
+	sonicApName                    DisplayString,
+	sonicApModel                   DisplayString,
+    sonicApCountryCode	           INTEGER,
+    sonicApRetainSetting           SwBoolState,
+    sonicApRfManagement            SwBoolState,
+	sonicApInterface               INTEGER,
+	sonicApIpAddr    	           IpAddress,
+	sonicApNetMask                 IpAddress,
+	sonicApPhysicalAddress         PhysAddress,
+	sonicApMgmt	                   INTEGER,
+	sonicApStatus                  SwSpWorkState,
+	sonicApProfile                 DisplayString,
+	sonicApUpTime                  TimeTicks,
+	sonicApRadio0Bssid             PhysAddress,
+	sonicApRadio0SSID              DisplayString,
+	sonicApRadio0Enable            SwBoolState,
+	sonicApRadio0Status            INTEGER,
+	sonicApRadio0Mode              SwSpRadioType,
+	sonicApRadio0ChannelWidth      SwSpChannelWidthType,
+	sonicApRadio0Channel           DisplayString,
+	sonicApRadio0ShortGuardInt     SwBoolState,
+	sonicApRadio0Aggregation       SwBoolState,
+	sonicApRadio0Mimo              SwBoolState,
+    sonicApRadio0AuthType	       SwWlanAuthenticationType,
+    sonicApRadio0WpaCipher	       SwWlanCipherType,
+	sonicApRadio0WpaPsk            DisplayString,
+	sonicApRadio0Acl               SwBoolState,
+    sonicApRadio0BroadcastSsid     SwBoolState,
+	sonicApRadio0TxPowerLevel      SwSpRadioTxPower,
+	sonicApRadio0StaTimeout        Gauge32,
+	sonicApRadio1Bssid             PhysAddress,
+	sonicApRadio1SSID              DisplayString,
+	sonicApRadio1Enable            SwBoolState,
+	sonicApRadio1Status            INTEGER,
+	sonicApRadio1Mode              SwSpRadioType,
+	sonicApRadio1ChannelWidth      SwSpChannelWidthType,
+	sonicApRadio1Channel           DisplayString,
+	sonicApRadio1ShortGuardInt     SwBoolState,
+	sonicApRadio1Aggregation       SwBoolState,
+	sonicApRadio1Mimo              SwBoolState,
+    sonicApRadio1AuthType	       SwWlanAuthenticationType,
+    sonicApRadio1WpaCipher	       SwWlanCipherType,
+	sonicApRadio1WpaPsk            DisplayString,
+	sonicApRadio1Acl               SwBoolState,
+    sonicApRadio1BroadcastSsid     SwBoolState,
+	sonicApRadio1TxPowerLevel      SwSpRadioTxPower,
+	sonicApRadio1StaTimeout        Gauge32,
+	sonicApRadiusServerIp1         IpAddress,
+	sonicApRadiusServerPort1       Unsigned32,
+	sonicApRadiusServerSecret1     DisplayString,
+	sonicApRadiusServerIp2         IpAddress,
+	sonicApRadiusServerPort2       Unsigned32,
+	sonicApRadiusServerSecret2     DisplayString
+	}
+
+sonicApIndex OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Represents the unique identifier of a SonicPoint." 
+	::= { sonicWirelessApEntry 1 }
+
+sonicApName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the name configured for this SonicPoint." 
+	::= { sonicWirelessApEntry 2 }
+
+sonicApModel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Ap model."
+	::= { sonicWirelessApEntry 3 }
+
+sonicApCountryCode OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the current operating country code."
+	::= { sonicWirelessApEntry 4 }
+
+sonicApRetainSetting OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether retain customized setting is enabled on this SonicPoint."
+	::= { sonicWirelessApEntry 5 }
+
+sonicApRfManagement OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether wireless RF threat real time monitoring and management is enabled on this SonicPoint."
+	::= { sonicWirelessApEntry 6 }
+
+sonicApInterface OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP Interface."
+	::= { sonicWirelessApEntry 7 }
+
+sonicApIpAddr OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP IpAddress."
+	::= { sonicWirelessApEntry 8 }
+
+sonicApNetMask OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP subnet mask."
+	::= { sonicWirelessApEntry 9 }
+
+sonicApPhysicalAddress OBJECT-TYPE
+	SYNTAX PhysAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP PhysAddress."
+	::= { sonicWirelessApEntry 10 }
+
+sonicApMgmt OBJECT-TYPE
+	SYNTAX INTEGER {
+	            layer-2 (1),
+	            layer-3 (2),
+	            sslvpn  (3)
+	       }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP management type."
+	::= { sonicWirelessApEntry 11 }
+
+sonicApStatus OBJECT-TYPE
+	SYNTAX SwSpWorkState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the SonicPoint status."
+	::= { sonicWirelessApEntry 12 }
+
+sonicApProfile OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the default SonicPoint profile configured for this SonicPoint."
+    ::= { sonicWirelessApEntry 13 }
+
+sonicApUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time since the SonicPoint boots."
+    ::= { sonicWirelessApEntry 14 }
+
+sonicApRadio0Bssid  OBJECT-TYPE
+    SYNTAX      PhysAddress (SIZE(6|8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents bssid of radio 0."
+    ::= { sonicWirelessApEntry 15}
+
+sonicApRadio0SSID OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP Radio0 SSID."
+	::= { sonicWirelessApEntry 16 }
+
+sonicApRadio0Enable OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether radio 0 of this SonicPoint is enabled."
+	::= { sonicWirelessApEntry 17 }
+
+sonicApRadio0Status OBJECT-TYPE
+	SYNTAX INTEGER {
+	            inactive(1),
+	            active(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether radio 0 of this SonicPoint is active."
+	::= { sonicWirelessApEntry 18 }
+
+sonicApRadio0Mode OBJECT-TYPE
+	SYNTAX SwSpRadioType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP Radio0 Mode."
+	::= { sonicWirelessApEntry 19 }
+
+sonicApRadio0ChannelWidth OBJECT-TYPE
+	SYNTAX SwSpChannelWidthType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the channel width of radio 0 on this SonicPoint."
+	::= { sonicWirelessApEntry 20 }
+
+sonicApRadio0Channel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP Radio0 Channel."
+	::= { sonicWirelessApEntry 21 }
+
+sonicApRadio0ShortGuardInt OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether Short Guard Interval is enabled on radio 0 of this SonicPoint ."
+	::= { sonicWirelessApEntry 22 }
+
+sonicApRadio0Aggregation OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether Aggregation (sending multiple data frames in a single transmission) is enabled on radio 0 of this SonicPoint ."
+	::= { sonicWirelessApEntry 23 }
+
+sonicApRadio0Mimo OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether MIMO (multiple-input multiple-output antennas) is enabled on radio 0 of this SonicPoint ."
+	::= { sonicWirelessApEntry 24 }
+
+sonicApRadio0AuthType OBJECT-TYPE
+    SYNTAX      SwWlanAuthenticationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication method of radio 0."
+    ::= { sonicWirelessApEntry 25 }
+
+sonicApRadio0WpaCipher OBJECT-TYPE
+    SYNTAX      SwWlanCipherType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the wpa cipher type of radio 0."
+    ::= { sonicWirelessApEntry 26 }
+
+sonicApRadio0WpaPsk OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the wpa preshared key of radio 0."
+    ::= { sonicWirelessApEntry 27 }
+
+sonicApRadio0Acl OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether ACL enforcement is enabled on radio 0 of this SonicPoint ."
+	::= { sonicWirelessApEntry 28 }
+
+sonicApRadio0BroadcastSsid OBJECT-TYPE
+    SYNTAX      SwBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether SSID broadcast is enabled on radio 0."
+    ::= { sonicWirelessApEntry 29 }
+
+sonicApRadio0TxPowerLevel OBJECT-TYPE
+    SYNTAX      SwSpRadioTxPower
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the radio 0 TX power setting configured for this SoniPoint."
+    ::= { sonicWirelessApEntry 30 }
+
+sonicApRadio0StaTimeout  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radio 0 station inactivity timeout in seconds."
+    ::= { sonicWirelessApEntry 31}
+
+sonicApRadio1Bssid  OBJECT-TYPE
+    SYNTAX      PhysAddress (SIZE(6|8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents bssid of radio 1."
+    ::= { sonicWirelessApEntry 32 }
+
+sonicApRadio1SSID OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP Radio1 SSID."
+	::= { sonicWirelessApEntry 33 }
+
+sonicApRadio1Enable OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether radio 1 of this SonicPoint is enabled."
+	::= { sonicWirelessApEntry 34 }
+
+sonicApRadio1Status OBJECT-TYPE
+	SYNTAX INTEGER {
+	            inactive(1),
+	            active(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether radio 1 of this SonicPoint is active."
+	::= { sonicWirelessApEntry 35 }
+
+sonicApRadio1Mode OBJECT-TYPE
+	SYNTAX SwSpRadioType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP Radio1 Mode."
+	::= { sonicWirelessApEntry 36 }
+
+sonicApRadio1ChannelWidth OBJECT-TYPE
+	SYNTAX SwSpChannelWidthType
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the channel width of radio 1 on this SonicPoint."
+	::= { sonicWirelessApEntry 37 }
+
+sonicApRadio1Channel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"AP Radio1 Channel."
+	::= { sonicWirelessApEntry 38 }
+
+sonicApRadio1ShortGuardInt OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether Short Guard Interval is enabled on radio 1 of this SonicPoint ."
+	::= { sonicWirelessApEntry 39 }
+
+sonicApRadio1Aggregation OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether Aggregation (sending multiple data frames in a single transmission) is enabled on radio 1 of this SonicPoint ."
+	::= { sonicWirelessApEntry 40 }
+
+sonicApRadio1Mimo OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether MIMO (multiple-input multiple-output antennas) is enabled on radio 1 of this SonicPoint ."
+	::= { sonicWirelessApEntry 41 }
+
+sonicApRadio1AuthType OBJECT-TYPE
+    SYNTAX      SwWlanAuthenticationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication method of radio 1."
+    ::= { sonicWirelessApEntry 42 }
+
+sonicApRadio1WpaCipher OBJECT-TYPE
+    SYNTAX      SwWlanCipherType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the wpa cipher type of radio 1."
+    ::= { sonicWirelessApEntry 43 }
+
+sonicApRadio1WpaPsk OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the wpa preshared key of radio 1."
+    ::= { sonicWirelessApEntry 44 }
+
+sonicApRadio1Acl OBJECT-TYPE
+	SYNTAX SwBoolState
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Whether ACL enforcement is enabled on radio 1 of this SonicPoint ."
+	::= { sonicWirelessApEntry 45 }
+
+sonicApRadio1BroadcastSsid OBJECT-TYPE
+    SYNTAX      SwBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether SSID broadcast is enabled on radio 1."
+    ::= { sonicWirelessApEntry 46 }
+
+sonicApRadio1TxPowerLevel OBJECT-TYPE
+    SYNTAX      SwSpRadioTxPower
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the radio 1 TX power setting configured for this SoniPoint."
+    ::= { sonicWirelessApEntry 47 }
+
+sonicApRadio1StaTimeout  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Radio 1 station inactivity timeout in seconds."
+    ::= { sonicWirelessApEntry 48}
+
+sonicApRadiusServerIp1 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Radius Server 1 IP"
+	::= { sonicWirelessApEntry 49 }
+
+sonicApRadiusServerPort1 OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Radius Server 1 Port"
+	::= { sonicWirelessApEntry 50 }
+
+sonicApRadiusServerSecret1 OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Radius Server 1 Secret"
+	::= { sonicWirelessApEntry 51 }
+
+sonicApRadiusServerIp2 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Radius Server 2 IP"
+	::= { sonicWirelessApEntry 52 }
+
+sonicApRadiusServerPort2 OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Radius Server 2 Port"
+	::= { sonicWirelessApEntry 53 }
+
+sonicApRadiusServerSecret2 OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Radius Server 2 Secret"
+	::= { sonicWirelessApEntry 54 }
+
+sonicWirelessVapTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SonicWirelessVapEntry 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table of objects that display the status of VAPs in SonicPoint sessions.
+		 A VAP represents an SSID that is assigned on a SonicPoint radio." 
+	::= { sonicwallFwWirelessStats 3 }
+
+sonicWirelessVapEntry OBJECT-TYPE
+	SYNTAX SonicWirelessVapEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A set of objects that display the status of a VAP in a SonicPoint session." 
+	INDEX { sonicWirelessVapIndex }
+	::= { sonicWirelessVapTable 1 }
+
+SonicWirelessVapEntry ::= SEQUENCE {
+	sonicWirelessVapIndex		    INTEGER,
+	sonicWirelessVapName            DisplayString,
+	sonicWirelessVapStatus          SwBoolState,
+	sonicWirelessVapSsid            OCTET STRING,
+	sonicWirelessVapBroadcastSsid   SwBoolState,
+	sonicWirelessVapVlanId          Integer32,
+	sonicWirelessVapAuthentication  SwWlanAuthenticationType,
+	sonicWirelessVapCipher          SwWlanCipherType,
+	sonicWirelessVapPassPhrase      DisplayString,
+	sonicWirelessVapRadiusServerIp1          IpAddress,
+	sonicWirelessVapRadiusServerPort1        Unsigned32,
+	sonicWirelessVapRadiusServerSecret1      DisplayString,
+	sonicWirelessVapRadiusServerIp2          IpAddress,
+	sonicWirelessVapRadiusServerPort2        Unsigned32,
+	sonicWirelessVapRadiusServerSecret2      DisplayString,
+	sonicWirelessVapReference       DisplayString,
+	sonicWirelessVapMaxClient       Gauge32,
+	sonicWirelessVapCurClient       Gauge32
+	}
+
+sonicWirelessVapIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index of this VAP object."
+    ::= { sonicWirelessVapEntry 1 }
+
+sonicWirelessVapName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of the VAP object."
+    ::= { sonicWirelessVapEntry 2 }
+
+sonicWirelessVapStatus OBJECT-TYPE
+    SYNTAX      SwBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of this VAP object."
+    ::= { sonicWirelessVapEntry 3 }
+
+sonicWirelessVapSsid OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Service set ID of this VAP object."
+    ::= { sonicWirelessVapEntry 4 }
+
+sonicWirelessVapBroadcastSsid OBJECT-TYPE
+    SYNTAX      SwBoolState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Whether SSID broadcast is enabled on this VAP object."
+    ::= { sonicWirelessVapEntry 5 }
+
+sonicWirelessVapVlanId OBJECT-TYPE
+    SYNTAX      Integer32 (0 | 1..4094 | 4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the VLAN ID of the VAP object."
+    ::= { sonicWirelessVapEntry 6}
+
+sonicWirelessVapAuthentication OBJECT-TYPE
+    SYNTAX      SwWlanAuthenticationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication method of the VAP object."
+    ::= { sonicWirelessVapEntry 7 }
+
+sonicWirelessVapCipher OBJECT-TYPE
+    SYNTAX      SwWlanCipherType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the cipher type of the VAP object."
+    ::= { sonicWirelessVapEntry 8 }
+
+sonicWirelessVapPassPhrase OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the wpa pass phrase of the VAP object."
+    ::= { sonicWirelessVapEntry 9 }
+
+sonicWirelessVapRadiusServerIp1 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Vap Radius Server 1 IP"
+	::= { sonicWirelessVapEntry 10 }
+
+sonicWirelessVapRadiusServerPort1 OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Vap Radius Server 1 Port"
+	::= { sonicWirelessVapEntry 11 }
+
+sonicWirelessVapRadiusServerSecret1 OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Vap Radius Server 1 Secret"
+	::= { sonicWirelessVapEntry 12 }
+
+sonicWirelessVapRadiusServerIp2 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Vap Radius Server 2 IP"
+	::= { sonicWirelessVapEntry 13 }
+
+sonicWirelessVapRadiusServerPort2 OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Vap Radius Server 2 Port"
+	::= { sonicWirelessVapEntry 14 }
+
+sonicWirelessVapRadiusServerSecret2 OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Vap Radius Server 2 Secret"
+	::= { sonicWirelessVapEntry 15 }
+
+sonicWirelessVapReference OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the reference of the VAP object."
+    ::= { sonicWirelessVapEntry 16 }
+
+sonicWirelessVapMaxClient OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the max clients of the VAP object."
+    ::= { sonicWirelessVapEntry 17 }
+
+sonicWirelessVapCurClient OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current clients of the VAP object."
+    ::= { sonicWirelessVapEntry 18 }
+
+sonicWirelessStaTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SonicWirelessStaEntry 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table provides info for each Station."
+	::= { sonicwallFwWirelessStats 4 }
+
+sonicWirelessStaEntry OBJECT-TYPE
+	SYNTAX SonicWirelessStaEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A set of objects that display information of a wireless station." 
+	INDEX { sonicStaPhysAddress}
+	::= { sonicWirelessStaTable 1 }
+
+SonicWirelessStaEntry ::= SEQUENCE {
+	sonicStaPhysAddress   	    PhysAddress,
+	sonicStaApName			    DisplayString,
+	sonicStaChannel             SwSpRadioChannelNumber,
+	sonicStaAid                 INTEGER,
+	sonicStaIpAddress           IpAddress,
+	sonicStaStatus              SwStationStatus,
+	sonicStaRadioType           INTEGER,
+	sonicStaSsid                DisplayString,
+    sonicStaVlanId              Integer32,
+	sonicStaConnRate            Gauge32,
+	sonicStaTxRate              Gauge32,
+	sonicStaSignalStrength      Gauge32,
+	sonicStaAssociations   	    Counter,
+	sonicStaDisassociations     Counter,
+	sonicStaReassociations      Counter,
+	sonicStaAuthentications     Counter,
+	sonicStaDeauthentications   Counter,
+	sonicStaDiscardPkts         Counter,
+	sonicStaGoodPktsRx          Counter,
+	sonicStaBadPktsRx           Counter,
+	sonicStaGoodBytesRx         Counter,
+	sonicStaMgmtPktsRx          Counter,
+	sonicStaCtrlPktsRx          Counter,
+	sonicStaDataPktsRx          Counter,
+	sonicStaGoodPktsTx          Counter,
+	sonicStaBadPktsTx           Counter,
+	sonicStaGoodBytesTx         Counter,
+	sonicStaMgmtPktsTx          Counter,
+	sonicStaCtrlPktsTx          Counter,
+	sonicStaDataPktsTx          Counter,
+	sonicStaConnSta             Gauge32
+    }
+
+sonicStaPhysAddress OBJECT-TYPE
+	SYNTAX PhysAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the MAC address of a wireless station."
+	::= { sonicWirelessStaEntry 1 }
+
+sonicStaApName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Name of the SonicPoint that a wireless station is connected to."
+	::= { sonicWirelessStaEntry 2 }
+
+sonicStaChannel OBJECT-TYPE
+	SYNTAX SwSpRadioChannelNumber
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the frequency channel that a wireless station is using." 
+	::= { sonicWirelessStaEntry 3 }
+
+sonicStaAid OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Station associated identifier."
+	::= { sonicWirelessStaEntry 4 }
+
+sonicStaIpAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the station Ip Address."
+	::= { sonicWirelessStaEntry 5 }
+
+sonicStaStatus OBJECT-TYPE
+	SYNTAX SwStationStatus
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the station status."
+	::= { sonicWirelessStaEntry 6 }
+
+sonicStaRadioType OBJECT-TYPE
+	SYNTAX INTEGER {
+                radio0(0),
+                radio1(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the radio type of a wireless station."
+	::= { sonicWirelessStaEntry 7 }
+
+sonicStaSsid OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "Represents the Ssid a wireless station is connected to."
+	::= { sonicWirelessStaEntry 8 }
+
+sonicStaVlanId OBJECT-TYPE
+    SYNTAX Integer32 (0 | 1..4094 | 4095)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the VLAN ID that is assigned to a wireless station."  
+	::= { sonicWirelessStaEntry 9 }
+
+sonicStaConnRate OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the connection bandwidth of a wireless station, in kbps."
+	::= { sonicWirelessStaEntry 10 }
+
+sonicStaTxRate OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the TX bandwidth of a wireless station, in kbps."
+	::= { sonicWirelessStaEntry 11 }
+
+sonicStaSignalStrength OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the signal strengh of a wireless station, in dBm." 
+	::= { sonicWirelessStaEntry 12 }
+
+sonicStaAssociations OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Station Associations."
+	::= { sonicWirelessStaEntry 13 }
+
+sonicStaDisassociations OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Station Disassociations."
+	::= { sonicWirelessStaEntry 14 }
+
+sonicStaReassociations OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Station Reassociations."
+	::= { sonicWirelessStaEntry 15 }
+
+sonicStaAuthentications OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Station Authentications."
+	::= { sonicWirelessStaEntry 16 }
+
+sonicStaDeauthentications OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Station Deauthentications."
+	::= { sonicWirelessStaEntry 17 }
+
+sonicStaDiscardPkts OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Station Discards Packets."
+	::= { sonicWirelessStaEntry 18 }
+
+sonicStaGoodPktsRx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of good packets received by this station." 
+	::= { sonicWirelessStaEntry 19 }
+
+sonicStaBadPktsRx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of bad packets received by this station."
+	::= { sonicWirelessStaEntry 20 }
+
+sonicStaGoodBytesRx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of good bytes received by this station."
+	::= { sonicWirelessStaEntry 21 }
+
+sonicStaMgmtPktsRx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of management packets received by this station."
+	::= { sonicWirelessStaEntry 22 }
+
+sonicStaCtrlPktsRx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of control packets received by this station."
+	::= { sonicWirelessStaEntry 23 }
+
+sonicStaDataPktsRx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of data packets received by this station."
+	::= { sonicWirelessStaEntry 24 }
+
+sonicStaGoodPktsTx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of good packets transmitted by this station." 
+	::= { sonicWirelessStaEntry 25 }
+
+sonicStaBadPktsTx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of bad packets transmitted by this station."
+	::= { sonicWirelessStaEntry 26 }
+
+sonicStaGoodBytesTx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of good bytes transmitted by this station."
+	::= { sonicWirelessStaEntry 27 }
+
+sonicStaMgmtPktsTx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of management packets transmitted by this station."
+	::= { sonicWirelessStaEntry 28 }
+
+sonicStaCtrlPktsTx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of control packets transmitted by this station."
+	::= { sonicWirelessStaEntry 29 }
+
+sonicStaDataPktsTx OBJECT-TYPE
+	SYNTAX Counter
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of data packets transmitted by this station."
+	::= { sonicWirelessStaEntry 30 }
+
+sonicStaConnSta OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Represents the number of connected stations."
+	::= { sonicWirelessStaEntry 31 }
+
+-- =======================================================================
+-- sonic Zone Stats
+-- =======================================================================
+
+sonicwallFwZoneStats OBJECT IDENTIFIER ::= {sonicwallFwStatsModule 7}
+
+sonicwallFwZoneTables OBJECT IDENTIFIER ::= { sonicwallFwZoneStats 1 }
+
+sonicwallFwZoneTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SonicwallFwZoneEntry 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A table of objects that display the zone objects of Sonicwall Firewall." 
+	::= { sonicwallFwZoneTables 1 }
+
+sonicwallFwZoneEntry OBJECT-TYPE
+	SYNTAX SonicwallFwZoneEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"A set of objects that display the configuration of a zone object." 
+	INDEX { sonicZoneName }
+	::= { sonicwallFwZoneTable 1 }
+
+SonicwallFwZoneEntry ::= SEQUENCE {
+	sonicZoneName                  DisplayString,
+	sonicZoneSecurity              SwZoneSecurityType,
+	sonicZoneInterfaces            DisplayString,
+	sonicZoneIfTrust               SwBoolState,
+	sonicZoneCFS    	           SwBoolState,
+	sonicZoneClientAv              SwBoolState,
+	sonicZoneClientCf              SwBoolState,
+	sonicZoneGwAv	               SwBoolState,
+	sonicZoneAntiSpyware           SwBoolState,
+	sonicZoneIps                   SwBoolState,
+	sonicZoneAppControl            SwBoolState,
+	sonicZoneSslControl            SwBoolState,
+	sonicZoneSslvpnAccess          SwBoolState
+    }
+
+sonicZoneName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A textual name of this zone object."
+    ::= { sonicwallFwZoneEntry 1 }
+
+sonicZoneSecurity OBJECT-TYPE
+    SYNTAX SwZoneSecurityType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the security type of this zone object."
+    ::= { sonicwallFwZoneEntry 2 }
+
+sonicZoneInterfaces OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A textual name list of member interfaces of this zone object."
+    ::= { sonicwallFwZoneEntry 3 }
+
+sonicZoneIfTrust OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether interface trust is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 4 }
+
+sonicZoneCFS OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+        "Whether Enforce Content Filtering Service is enabled on this zone object.
+        CFS has been reimplemented since 6.2.6, which is policy based, no zone based anymore.
+        So this oid is deprecated."
+    ::= { sonicwallFwZoneEntry 5 }
+
+sonicZoneClientAv OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether Client AV Enforcement Service is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 6 }
+
+sonicZoneClientCf OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether Client CF Enforcement Service is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 7 }
+
+sonicZoneGwAv OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether Gateway Anti-Virus Service is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 8 }
+
+sonicZoneAntiSpyware OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether Anti-Spyware Service is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 9 }
+
+sonicZoneIps OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether IPS Service is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 10 }
+
+sonicZoneAppControl OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether App Control Service is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 11 }
+
+sonicZoneSslControl OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether SSL Control Service is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 12 }
+
+sonicZoneSslvpnAccess OBJECT-TYPE
+    SYNTAX SwBoolState
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Whether SSLVPN Access is enabled on this zone object."
+    ::= { sonicwallFwZoneEntry 13 }
+
+END

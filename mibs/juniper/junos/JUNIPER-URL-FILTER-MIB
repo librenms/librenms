@@ -1,0 +1,785 @@
+
+-- *******************************************************************
+-- Juniper URL Filtering daemon MIB.
+--
+-- Copyright (c) 2017, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-URL-FILTER-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        NOTIFICATION-TYPE,MODULE-IDENTITY,OBJECT-TYPE,OBJECT-IDENTITY, Counter64
+            FROM SNMPv2-SMI
+
+        InterfaceIndex
+            FROM IF-MIB
+
+        DateAndTime, DisplayString
+            FROM SNMPv2-TC
+
+        InetAddressType, InetAddress, InetAddressIPv4
+            FROM INET-ADDRESS-MIB
+
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+        sysName, sysLocation, sysContact
+            FROM SNMPv2-MIB
+
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+
+        jnxURLFMibRoot
+            FROM JUNIPER-SMI;
+
+    jnxURLFMIB MODULE-IDENTITY
+        LAST-UPDATED  "201704032022Z" -- Apr 03, 2017"
+        ORGANIZATION  "Juniper Networks, Inc."
+        CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1133 Innovation Way
+             Sunnyvale, CA
+
+             E-mail: support@juniper.net
+             HTTP://www.juniper.net"
+
+        DESCRIPTION
+           "This module defines the object that are used to monitor
+             traffic load balancer attributes."
+
+    REVISION  "201411202022Z" -- Nov 20, 2014"
+    DESCRIPTION     "Creation Date"
+
+    ::= { jnxURLFMibRoot 1 }
+
+    jnxURLFilterStatistics        OBJECT IDENTIFIER ::= { jnxURLFMIB 1 }
+
+-- ***************************************************************
+--  jnx URL Filtering profile statistics table
+-- ***************************************************************
+
+    jnxURLFilterStatisticsProfTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxURLFilterProfStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+           " This table lists URL filtering statistics per profile"
+        ::= { jnxURLFilterStatistics 1 }
+
+    jnxURLFilterProfStatsEntryObj OBJECT-TYPE
+       SYNTAX        JnxURLFilterProfStatsEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+        "URL filter stats entry.It is indexed by profile name and template name."
+
+       INDEX   { jnxURLFilterProfileName }
+       ::= { jnxURLFilterStatisticsProfTable 1 }
+
+    JnxURLFilterProfStatsEntry ::= SEQUENCE
+    {
+        jnxURLFilterProfileName                             DisplayString,
+        jnxURLFilterActionAccept                            Counter64,
+        jnxURLFilterActionAcceptULPktCount                  Counter64,
+        jnxURLFilterActionAcceptDLPktCount                  Counter64,
+        jnxURLFilterActionAcceptULBytes                     Counter64,
+        jnxURLFilterActionAcceptDLBytes                     Counter64,
+        jnxURLFilterActionCustomPage                        Counter64,
+        jnxURLFilterActionCustomPageULPktCount              Counter64,
+        jnxURLFilterActionCustomPageDLPktCount              Counter64,
+        jnxURLFilterActionCustomPageULBytes                 Counter64,
+        jnxURLFilterActionCustomPageDLBytes                 Counter64,
+        jnxURLFilterActionHTTPStatusCode                    Counter64,
+        jnxURLFilterActionHTTPStatusCodeULPktCount          Counter64,
+        jnxURLFilterActionHTTPStatusCodeDLPktCount          Counter64,
+        jnxURLFilterActionHTTPStatusCodeULBytes             Counter64,
+        jnxURLFilterActionHTTPStatusCodeDLBytes             Counter64,
+        jnxURLFilterActionRedirect                          Counter64,
+        jnxURLFilterActionRedirectULPktCount                Counter64,
+        jnxURLFilterActionRedirectDLPktCount                Counter64,
+        jnxURLFilterActionRedirectULBytes                   Counter64,
+        jnxURLFilterActionRedirectDLBytes                   Counter64,
+        jnxURLFilterActionTCPReset                          Counter64,
+        jnxURLFilterActionTCPResetULPktCount                Counter64,
+        jnxURLFilterActionTCPResetDLPktCount                Counter64,
+        jnxURLFilterActionTCPResetULBytes                   Counter64,
+        jnxURLFilterActionTCPResetDLBytes                   Counter64,
+        jnxURLFilterActionBypass                            Counter64,
+        jnxURLFilterActionDUIFV4Accepted                     Counter64,
+        jnxURLFilterActionDUIFV4ULPktCount                   Counter64,
+        jnxURLFilterActionDUIFV4DLPktCount                   Counter64,
+        jnxURLFilterActionDUIFV4ULBytes                      Counter64,
+        jnxURLFilterActionDUIFV4DLBytes                      Counter64,
+        jnxURLFilterActionDUIFV6Accepted                     Counter64,
+        jnxURLFilterActionDUIFV6ULPktCount                   Counter64,
+        jnxURLFilterActionDUIFV6DLPktCount                   Counter64,
+        jnxURLFilterActionDUIFV6ULBytes                      Counter64,
+        jnxURLFilterActionDUIFV6DLBytes                      Counter64
+    }
+
+    jnxURLFilterProfileName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of Profile."
+        ::= { jnxURLFilterProfStatsEntryObj 1 }
+
+    jnxURLFilterActionAccept OBJECT-TYPE
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Number of accept action hit."
+       ::= { jnxURLFilterProfStatsEntryObj 2 }
+
+    jnxURLFilterActionAcceptULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept uplink packet count"
+        ::= { jnxURLFilterProfStatsEntryObj 3 }
+
+    jnxURLFilterActionAcceptDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept down link packet count."
+        ::= { jnxURLFilterProfStatsEntryObj 4 }
+
+    jnxURLFilterActionAcceptULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept action uplink bytes"
+        ::= { jnxURLFilterProfStatsEntryObj 5 }
+
+    jnxURLFilterActionAcceptDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept action down link bytes"
+        ::= { jnxURLFilterProfStatsEntryObj 6 }
+
+    jnxURLFilterActionCustomPage OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Number of custom page action hit."
+        ::= { jnxURLFilterProfStatsEntryObj 7 }
+
+    jnxURLFilterActionCustomPageULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page uplink count."
+        ::= { jnxURLFilterProfStatsEntryObj 8 }
+
+    jnxURLFilterActionCustomPageDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page down link count"
+        ::= { jnxURLFilterProfStatsEntryObj 9 }
+
+    jnxURLFilterActionCustomPageULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page action uplink bytes."
+        ::= { jnxURLFilterProfStatsEntryObj 10 }
+
+    jnxURLFilterActionCustomPageDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page action down link bytes."
+        ::= { jnxURLFilterProfStatsEntryObj 11 }
+
+    jnxURLFilterActionHTTPStatusCode  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code action hit count."
+        ::= { jnxURLFilterProfStatsEntryObj 12 }
+
+    jnxURLFilterActionHTTPStatusCodeULPktCount  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code action uplink packet count"
+        ::= { jnxURLFilterProfStatsEntryObj 13 }
+
+    jnxURLFilterActionHTTPStatusCodeDLPktCount  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code action down link packet count"
+        ::= { jnxURLFilterProfStatsEntryObj 14 }
+
+    jnxURLFilterActionHTTPStatusCodeULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code uplink bytes."
+        ::= { jnxURLFilterProfStatsEntryObj 15 }
+
+    jnxURLFilterActionHTTPStatusCodeDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code down link bytes."
+        ::= { jnxURLFilterProfStatsEntryObj 16 }
+
+
+    jnxURLFilterActionRedirect OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Redirect action hit count"
+        ::= { jnxURLFilterProfStatsEntryObj 17 }
+
+    jnxURLFilterActionRedirectULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Redirect action up link packet count."
+        ::= { jnxURLFilterProfStatsEntryObj 18 }
+
+    jnxURLFilterActionRedirectDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+           "Redirect action down link packet count"
+       ::= { jnxURLFilterProfStatsEntryObj 19 }
+
+    jnxURLFilterActionRedirectULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Redirect action uplink bytes"
+        ::= { jnxURLFilterProfStatsEntryObj 20 }
+
+    jnxURLFilterActionRedirectDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+           "Redirect action down link bytes"
+        ::= { jnxURLFilterProfStatsEntryObj 21 }
+
+    jnxURLFilterActionTCPReset OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Tcp reset action count."
+        ::= { jnxURLFilterProfStatsEntryObj 22 }
+
+    jnxURLFilterActionTCPResetULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TCP reset action uplink packet count"
+        ::= { jnxURLFilterProfStatsEntryObj 23 }
+
+    jnxURLFilterActionTCPResetDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TCP reset action uplink packet count"
+        ::= { jnxURLFilterProfStatsEntryObj 24 }
+
+    jnxURLFilterActionTCPResetULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+           "TCP reset  action uplink bytes."
+        ::= { jnxURLFilterProfStatsEntryObj 25 }
+
+    jnxURLFilterActionTCPResetDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TCP reset action down link bytes."
+        ::= { jnxURLFilterProfStatsEntryObj 26 }
+
+    jnxURLFilterActionBypass OBJECT-TYPE
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Number of sessions bypassed."
+       ::= { jnxURLFilterProfStatsEntryObj 27 }
+
+    jnxURLFilterActionDUIFV4Accepted   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Number of IPv4 sessions accepted due to disable URL IP filtering feature."
+       ::= { jnxURLFilterProfStatsEntryObj 28 }
+
+    jnxURLFilterActionDUIFV4ULPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 uplink packets."
+       ::= { jnxURLFilterProfStatsEntryObj 29 }
+
+    jnxURLFilterActionDUIFV4DLPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 downlink packets."
+       ::= { jnxURLFilterProfStatsEntryObj 30 }
+
+    jnxURLFilterActionDUIFV4ULBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 uplink bytes."
+       ::= { jnxURLFilterProfStatsEntryObj 31 }
+
+    jnxURLFilterActionDUIFV4DLBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 downlink bytes."
+       ::= { jnxURLFilterProfStatsEntryObj 32 }
+
+    jnxURLFilterActionDUIFV6Accepted   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Number of IPv6 sessions accepted due to disable IP blocking feature."
+       ::= { jnxURLFilterProfStatsEntryObj 33 }
+
+    jnxURLFilterActionDUIFV6ULPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 uplink packets."
+       ::= { jnxURLFilterProfStatsEntryObj 34 }
+
+    jnxURLFilterActionDUIFV6DLPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 downlink packets."
+       ::= { jnxURLFilterProfStatsEntryObj 35 }
+
+    jnxURLFilterActionDUIFV6ULBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 uplink bytes."
+       ::= { jnxURLFilterProfStatsEntryObj 36 }
+
+    jnxURLFilterActionDUIFV6DLBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 downlink bytes."
+       ::= { jnxURLFilterProfStatsEntryObj 37 }
+
+-- ***************************************************************
+--  jnx URL Filtering template statistics table
+-- ***************************************************************
+
+    jnxURLFilterStatisticsTempTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxURLFilterTempStatsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+           "This table lists URL filtering statistics per template"
+        ::= { jnxURLFilterStatistics 2 }
+
+    jnxURLFilterTempStatsEntryObj OBJECT-TYPE
+       SYNTAX        JnxURLFilterTempStatsEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+        "URL filter stats entry.It is indexed by profile name and template name."
+
+       INDEX   { jnxURLFilterTempProfileName,jnxURLFilterTemplateName }
+       ::= { jnxURLFilterStatisticsTempTable 1 }
+
+    JnxURLFilterTempStatsEntry ::= SEQUENCE
+    {
+        jnxURLFilterTempProfileName                             DisplayString,
+        jnxURLFilterTemplateName                                DisplayString,
+        jnxURLFilterTempActionAccept                            Counter64,
+        jnxURLFilterTempActionAcceptULPktCount                  Counter64,
+        jnxURLFilterTempActionAcceptDLPktCount                  Counter64,
+        jnxURLFilterTempActionAcceptULBytes                     Counter64,
+        jnxURLFilterTempActionAcceptDLBytes                     Counter64,
+        jnxURLFilterTempActionCustomPage                        Counter64,
+        jnxURLFilterTempActionCustomPageULPktCount              Counter64,
+        jnxURLFilterTempActionCustomPageDLPktCount              Counter64,
+        jnxURLFilterTempActionCustomPageULBytes                 Counter64,
+        jnxURLFilterTempActionCustomPageDLBytes                 Counter64,
+        jnxURLFilterTempActionHTTPStatusCode                    Counter64,
+        jnxURLFilterTempActionHTTPStatusCodeULPktCount          Counter64,
+        jnxURLFilterTempActionHTTPStatusCodeDLPktCount          Counter64,
+        jnxURLFilterTempActionHTTPStatusCodeULBytes             Counter64,
+        jnxURLFilterTempActionHTTPStatusCodeDLBytes             Counter64,
+        jnxURLFilterTempActionRedirect                          Counter64,
+        jnxURLFilterTempActionRedirectULPktCount                Counter64,
+        jnxURLFilterTempActionRedirectDLPktCount                Counter64,
+        jnxURLFilterTempActionRedirectULBytes                   Counter64,
+        jnxURLFilterTempActionRedirectDLBytes                   Counter64,
+        jnxURLFilterTempActionTCPReset                          Counter64,
+        jnxURLFilterTempActionTCPResetULPktCount                Counter64,
+        jnxURLFilterTempActionTCPResetDLPktCount                Counter64,
+        jnxURLFilterTempActionTCPResetULBytes                   Counter64,
+        jnxURLFilterTempActionTCPResetDLBytes                   Counter64,
+        jnxURLFilterTempActionDUIFV4Accepted                     Counter64,
+        jnxURLFilterTempActionDUIFV4ULPktCount                   Counter64,
+        jnxURLFilterTempActionDUIFV4DLPktCount                   Counter64,
+        jnxURLFilterTempActionDUIFV4ULBytes                      Counter64,
+        jnxURLFilterTempActionDUIFV4DLBytes                      Counter64,
+        jnxURLFilterTempActionDUIFV6Accepted                     Counter64,
+        jnxURLFilterTempActionDUIFV6ULPktCount                   Counter64,
+        jnxURLFilterTempActionDUIFV6DLPktCount                   Counter64,
+        jnxURLFilterTempActionDUIFV6ULBytes                      Counter64,
+        jnxURLFilterTempActionDUIFV6DLBytes                      Counter64
+    }
+
+    jnxURLFilterTempProfileName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of Profile."
+        ::= { jnxURLFilterTempStatsEntryObj 1 }
+
+    jnxURLFilterTemplateName OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of template."
+        ::= { jnxURLFilterTempStatsEntryObj 2 }
+
+    jnxURLFilterTempActionAccept OBJECT-TYPE
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Accept action hit count."
+       ::= { jnxURLFilterTempStatsEntryObj 3}
+
+    jnxURLFilterTempActionAcceptULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept action uplink count."
+        ::= { jnxURLFilterTempStatsEntryObj 4 }
+
+    jnxURLFilterTempActionAcceptDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept action downlink count."
+        ::= { jnxURLFilterTempStatsEntryObj 5 }
+
+    jnxURLFilterTempActionAcceptULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept uplink action uplink bytes"
+        ::= { jnxURLFilterTempStatsEntryObj 6 }
+
+    jnxURLFilterTempActionAcceptDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Accept uplink action downlink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 7 }
+
+
+    jnxURLFilterTempActionCustomPage OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page action hit count."
+        ::= { jnxURLFilterTempStatsEntryObj 8 }
+
+    jnxURLFilterTempActionCustomPageULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page action uplink count"
+        ::= { jnxURLFilterTempStatsEntryObj 9 }
+
+    jnxURLFilterTempActionCustomPageDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page action downlink count"
+        ::= { jnxURLFilterTempStatsEntryObj 10 }
+
+    jnxURLFilterTempActionCustomPageULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page uplink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 11 }
+
+    jnxURLFilterTempActionCustomPageDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Custom page down link bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 12 }
+
+
+    jnxURLFilterTempActionHTTPStatusCode  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code action hit count"
+        ::= { jnxURLFilterTempStatsEntryObj 13 }
+
+    jnxURLFilterTempActionHTTPStatusCodeULPktCount  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code uplink packet count."
+        ::= { jnxURLFilterTempStatsEntryObj 14 }
+
+    jnxURLFilterTempActionHTTPStatusCodeDLPktCount  OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code downlink packet count."
+        ::= { jnxURLFilterTempStatsEntryObj 15 }
+
+    jnxURLFilterTempActionHTTPStatusCodeULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code uplink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 16 }
+
+    jnxURLFilterTempActionHTTPStatusCodeDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "HTTP status code downlink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 17 }
+
+
+    jnxURLFilterTempActionRedirect OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Redirect action hit count."
+        ::= { jnxURLFilterTempStatsEntryObj 18 }
+
+    jnxURLFilterTempActionRedirectULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Redirect action uplink packet count."
+        ::= { jnxURLFilterTempStatsEntryObj 19 }
+
+    jnxURLFilterTempActionRedirectDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+           "Rediect action downlink packet count."
+       ::= { jnxURLFilterTempStatsEntryObj 20 }
+
+    jnxURLFilterTempActionRedirectULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Redirect uplink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 21 }
+
+    jnxURLFilterTempActionRedirectDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+           "Redirect downlink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 22 }
+
+    jnxURLFilterTempActionTCPReset OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TCP reset action hit count."
+        ::= { jnxURLFilterTempStatsEntryObj 23 }
+
+    jnxURLFilterTempActionTCPResetULPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TCP reset action uplink packet count."
+        ::= { jnxURLFilterTempStatsEntryObj 24 }
+
+    jnxURLFilterTempActionTCPResetDLPktCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TCP reset action uplink packet count."
+        ::= { jnxURLFilterTempStatsEntryObj 25 }
+
+    jnxURLFilterTempActionTCPResetULBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+           "TCP reset uplink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 26 }
+
+    jnxURLFilterTempActionTCPResetDLBytes OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "TCP reset downlink bytes."
+        ::= { jnxURLFilterTempStatsEntryObj 27 }
+
+     jnxURLFilterTempActionDUIFV4Accepted   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Number of IPv4 sessions accepted due to disable IP blocking feature."
+       ::= { jnxURLFilterTempStatsEntryObj 28 }
+
+    jnxURLFilterTempActionDUIFV4ULPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 uplink packets."
+       ::= { jnxURLFilterTempStatsEntryObj 29 }
+
+    jnxURLFilterTempActionDUIFV4DLPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 downlink packets."
+       ::= { jnxURLFilterTempStatsEntryObj 30 }
+
+    jnxURLFilterTempActionDUIFV4ULBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 uplink bytes."
+       ::= { jnxURLFilterTempStatsEntryObj 31 }
+
+    jnxURLFilterTempActionDUIFV4DLBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv4 downlink bytes."
+       ::= { jnxURLFilterTempStatsEntryObj 32 }
+
+    jnxURLFilterTempActionDUIFV6Accepted   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Number of IPv6 sessions accepted due to disable IP blocking feature."
+       ::= { jnxURLFilterTempStatsEntryObj 33 }
+
+    jnxURLFilterTempActionDUIFV6ULPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 uplink packets."
+       ::= { jnxURLFilterTempStatsEntryObj 34 }
+
+    jnxURLFilterTempActionDUIFV6DLPktCount   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 downlink packets."
+       ::= { jnxURLFilterTempStatsEntryObj 35 }
+
+    jnxURLFilterTempActionDUIFV6ULBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 uplink bytes."
+       ::= { jnxURLFilterTempStatsEntryObj 36 }
+
+    jnxURLFilterTempActionDUIFV6DLBytes   OBJECT-TYPE                 
+       SYNTAX        Counter64
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "Disable URL IP filtering action IPv6 downlink bytes."
+       ::= { jnxURLFilterTempStatsEntryObj 37 }
+
+END

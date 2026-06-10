@@ -1,0 +1,3118 @@
+LUM-REG DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+lumRegModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201908300000Z" -- August 30th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The Transmode global OID registrations.
+
+"
+    REVISION
+        "201908300000Z" -- August 30th 2019
+    DESCRIPTION
+        "Changes made for release r33.1:
+        - Add CO2xOTDR filter
+        - Add CO-D4 filter series"
+    REVISION
+        "201906280000Z" -- June 28th 2019
+    DESCRIPTION
+         "Changes made for release r33.0:
+         - Added oa1x21dBmVgEC board.
+         - Added oa2x21dBmVgEC board."
+    REVISION
+        "201806290000Z" -- June 29th 2018
+    DESCRIPTION
+         "Changes made for release r31.0:
+         - Added otdr8p board.
+         - Added LUM-IFOTDR-MIB."
+    REVISION
+        "201709010000Z" -- September 1st 2017
+    DESCRIPTION
+        "Changes made for release r30.0:
+         - Added emxp440 board.
+         - Added oaraed20lg board.
+         - Added ad1c2fotdr board."
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+        - Added tp100gotnii board."
+    REVISION
+        "201601140000Z" -- January 14th 2016
+    DESCRIPTION
+        "Changes made for release r27:
+        - Added fhau1 board
+        - Added fha1u1 board
+        - Added LUM-LLDPV2-MIB
+        - Added oa1x20dBmVg2 board
+        - Added oa2x20dBmVg2 board"
+    REVISION
+       "201509300000Z" -- September 30th 2015
+    DESCRIPTION
+        "Changes made for release r26:
+        - Added fpu board.
+        - Added oaraed21hghyb board
+        - Added dcDk652km100 board
+        - Added dcDk652km120 board
+        - Added dcP652km20 board"
+    REVISION
+       "201509150000Z" -- September 15th 2015
+    DESCRIPTION
+        "Changes made for release r25.1:
+        - Added tpmrHL16GUni board."
+    REVISION
+        "201501130000Z" -- January 13th 2015
+    DESCRIPTION
+        "Changes made for release r25:
+        - Added emxp240iie board.
+        - Added IFIWDM Mib."
+    REVISION
+        "201409300000Z" -- September 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+        - Added mxp100gotn board."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Added emxp220iie board.
+        - Added tpmrHL16G board.
+        - Changed board name from tp10gotn to tphex10gotn."
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Added tp10gotn board.
+        - Added tp100gotn board.
+        - Added SoamPmMib."
+
+    REVISION
+        "201305010000Z" -- May 1st 2013
+    DESCRIPTION
+        "Changes made for release r21:
+        - Added tpq10gfeci board.
+        - Added tpq10gfecregi board."
+    REVISION
+        "201212200000Z" -- Dec 20th 2012
+    DESCRIPTION
+        "Changes made for r20
+         - Added msTp40G.
+         - Added msMxp40G.
+         - Added mxp10gotn.
+         - Added ocudq.
+         - Added ocuseed2p.
+         - Added emxp62Giie.
+         - Added emxp120Giie.
+         - Added IFPERF MIB."
+
+    REVISION
+        "201212100000Z" -- Dec 10th 2012
+    DESCRIPTION
+        "Added IFBASIC, IFPHYSICAL and IFOPTICAL MIB."
+    REVISION
+        "201201200000Z" -- Jan 20th 2012
+    DESCRIPTION
+        "Changes made for r19
+         - Added PSR MIB.
+         - Added MPLS OAM MIB."
+    REVISION
+        "201112200000Z" --  December 20th 2011
+    DESCRIPTION
+        "Changes made for release r18:
+        - Added MPLS MIB.
+        - Added PW MIB.
+        - Added SITE MIB."
+    REVISION
+        "201110120000Z" -- October 12th 2011
+    DESCRIPTION
+        "Added TM4700 and TM4011."
+    REVISION
+        "201104130000Z" -- April 13th 2011
+    DESCRIPTION
+        "Added passive subracks."
+    REVISION
+        "200704160000Z" -- April 16th 2007
+    DESCRIPTION
+        "Added ROADM MIB."
+    REVISION
+        "200612150000Z" -- Dec 15th 2006
+    DESCRIPTION
+        "Added circuit MIB."
+    REVISION
+        "200211260000Z" -- Nov 26th 2002
+    DESCRIPTION
+        "Added MEM MIB"
+    REVISION
+        "200211150000Z" -- Nov 15th 2002
+    DESCRIPTION
+        "Added DCN MIB"
+    REVISION
+        "200211110000Z" -- Nov 11th 2002
+    DESCRIPTION
+        "TP Light -> TP Lite"
+    REVISION
+        "200211080000Z" -- Nov 8th 2002
+    DESCRIPTION
+        "Added the TP Light."
+    REVISION
+        "200210210000Z" -- Oct 21st 2002
+    DESCRIPTION
+        "Added the 10 G transponder."
+    REVISION
+        "200205300000Z" -- May 30th 2002
+    DESCRIPTION
+        "Added snmp MIB."
+    REVISION
+        "200205160000Z" -- May 16th 2002
+    DESCRIPTION
+        "Added sync MIB."
+    REVISION
+        "200204050000Z" -- April 5th 2002
+    DESCRIPTION
+        "Updated the names of the boards.
+        Removed the separate traffic slot definitions."
+    REVISION
+        "200203080000Z" -- March 8th 2002
+    DESCRIPTION
+        "Added 4 channel AD boards and the dual gigabit ethernet board.
+        Fixed the name of the multi-rate transponder board."
+    REVISION
+        "200111200000Z" -- November 20th 2001
+    DESCRIPTION
+        "Added the IP-mib."
+    REVISION
+        "200110100000Z" -- October 10th 2001
+    DESCRIPTION
+        "Deprecated the LAMBDA- and the TRANSPONDER-mib.
+        Added the EQUIPMENT- and the MULTIRATE-mib."
+    REVISION
+        "200109050000Z" -- September 5th 2001
+    DESCRIPTION
+        "Updated the product definitions with the proper product names."
+    REVISION
+        "200108090000Z" -- August 9th 2001
+    DESCRIPTION
+        "Added lambda, wdm, transponder and topology modules."
+    REVISION
+        "200108010000Z" -- August 1st 2001
+    DESCRIPTION
+        "Added backup module."
+    REVISION
+        "200104260000Z" -- April 26th 2001
+    DESCRIPTION
+        "Changed name of the entity MIB to inventory MIB.
+        Assigned dummy product names. Added system and WDM
+        MIB."
+    REVISION
+        "200103120000Z" -- March 12th 2001
+    DESCRIPTION
+        "Changed naming convention from 'lumemtis' to 'lum'."
+    REVISION
+        "200103090000Z" -- March 9th 2001
+    DESCRIPTION
+        "Assigned the proper enterprise OID."
+    REVISION
+        "200103010000Z" -- March 1st 2001
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 1 }
+
+
+-- ----------------------------------------------------
+-- Object definitions
+-- ----------------------------------------------------
+
+lumentis OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The root of the OID sub-tree assigned to Lumentis
+         by IANA."
+    ::= { enterprises 8708 }
+
+lumReg OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Sub-tree for registrations."
+    ::= { lumentis 1 }
+
+lumModules OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Sub-tree for module registrations."
+    ::= { lumReg 1 }
+
+-- MIB module overview:
+
+-- LUM-REG              lumRegModule :: = { lumModules 1 }
+--                                      Common OID definitions
+
+-- LUM-TC               lumTcModule :: = { lumModules 2 }
+--                                      Common textual conventions
+
+-- LUM-ALARM-MIB        lumAlarmMIBModule :: = { lumModules 3 }
+--                                      Alarm list and log.
+
+-- LUM-SYSTEM-MIB       lumSystemMIBModule :: = { lumModules 4 }
+--                                      Node and operating system configuration.
+
+-- LUM-INVENTORY-MIB    lumInventoryMIBModule ::= { lumModules 5 }
+--                                      Physical inventory
+
+-- LUM-WDM-MIB          lumWdmMIBModule ::= { lumModules 6 }
+--                                      WDM interfaces and protection configuration
+--      wdmGeneral
+--      wdmtIfEntry                     WDM trunk i/f
+--      wdmProtEntry                    Protection definitions
+--      wdmPassiveIfEntry               Passive WDM i/f (filters etc.)
+
+-- LUM-BACKUP-MIB       lumBackupMIBModule ::= { lumModules 7 }
+--                                      Configuration file handling
+--      backupGeneral
+--      backupFileEntry
+--      backupCommand
+
+-- LUM-LAMBDA-MIB       lumLambdaMIBModule ::= { lumModules 8 }
+--                                      Replaced by LUM-EQUIPMENT-MIB.
+
+-- LUM-TRANSPONDER-MIB  lumTransponderMIBModule ::= { lumModules 9 }
+--                                      Replaced by LUM-MULTIRATE-MIB.
+
+-- LUM-TOPOLOGY-MIB     lumTopologyMIBModule ::= { lumModules 10 }
+--                                      Topology configuration
+--      topoGeneral
+--      topoInternalEntry               Connections within the network element
+--      topoPeerEntry                   Connections between network elements
+--      topoClientEntry                 Connections between the network element and a client
+
+-- LUM-OXC-MIB          lumOxcMIBModule ::= { lumModules 11 }
+--                                      Optical cross-connect configuration
+--      oxcGeneral
+--      oxcIfEntry                      Cross-connection i/f
+--      oxcConfEntry                    Cross-connection definitions
+
+-- LUM-EQUIPMENT-MIB    lumEquipmentMIBModule ::= { lumModules 12 }
+--                                      Equipment configuration
+--      equipmentGeneral
+--      equpmentSubrackEntry            Subrack information
+--      equipmentBoardEntry             Board definitions
+--      equipmentFanEntry               Fan information
+--      equipmentPowerEntry             Power information
+--      equipmentSlotEntry              Slot information
+--      EquipmentCageEntry              Cage information
+
+-- LUM-MULTIRATE-MIB    lumMultirateMIBModule ::= { lumModules 13 }
+--                                      Multi-bit rate configuration
+--      mrtGeneral
+--      mrtIfEntry                      Multi bit rate client interfaces
+
+-- LUM-MUX-MIB          lumMuxMIBModule ::= { lumModules 14 }
+--                                      Muxed SDH/Sonet trunk configuration
+--      muxGeneral
+--      muxIfEntry                      Mux trunk interfaces
+--      muxAu4Entry                     AU4 in STM16
+
+-- LUM-IP-MIB           lumIpMIBModule ::= { lumModules 15 }
+--                                      IP networking related configuration.
+--      ipGeneral                       MIB general and mgmt interface parameters.
+--      ipIfEntry                       IP interface configuration
+--      ospf                            OSPF general parameters
+--      ospfIfEntry                     Enabled/disable OSPF per interface
+
+-- LUM-PM-MIB           lumPmMIBModule ::= { lumModules 16 }
+--                                      Performance measurement.
+--      pmGeneral                       tbd
+--      tbd
+
+-- LUM-SYNC-MIB         lumSyncMIBModule ::= { lumModules 17 }
+--                                      Sync control.
+--      tbd
+
+-- LUM-SNMP-MIB         lumSnmpMIBModule ::= { lumModules 18 }
+--                                      SNMP parameters.
+--      tbd
+
+-- LUM-ETH-MIB          lumEthMIBModule ::= { lumModules 19 }
+--                                      tbd description
+--      tbd
+
+-- LUM-OA-MIB           lumOaMIBModule ::= { lumModules 20 }
+--                                      tbd description
+--      tbd
+
+-- LUM-DCN-MIB          lumDcnMIBModule ::= { lumModules 21 }
+--                                      tbd description
+--      tbd
+
+-- LUM-MEM-MIB          lumMemMIBModule ::= { lumModules 22 }
+--                                      tbd description
+--      tbd
+
+-- LUM-FC-MIB           lumFcMIBModule ::= { lumModules 23 }
+--                                      tbd description
+--      tbd
+
+-- LUM-SWU-MIB          lumSwuMIBModule ::= { lumModules 24 }
+--                                      tbd description
+--      tbd
+
+-- LUM-GMPLS-MIB        lumGmplsMIBModule ::= { lumModules 25 }
+--                                      tbd description
+--      tbd
+
+-- LUM-CONN-MIB lumConnectionMIBModule ::= { lumModules 26 }
+--                                      tbd description
+--      tbd
+
+-- LUM-CLIENT-MIB       lumClientMIBModule ::= { lumModules 27 }
+--                                      tbd description
+--      tbd
+
+-- LUM-SOFTWARE-MIB     lumSoftwareMIBModule ::= { lumModules 28 }
+--                                      tbd description
+--      tbd
+
+-- LUM-AUX-MIB  lumAuxMIBModule ::= { lumModules 29 }
+--                                      tbd description
+--      tbd
+
+-- LUM-CIRCUIT-MIB        lumCirctuitMIBModule ::= { lumModules 30 }
+--                                      tbd description
+--      tbd
+
+-- LUM-ROADM-MIB        lumRoadmMIBModule ::= { lumModules 31 }
+--                                      tbd description
+--      tbd
+
+-- LUM-MES-MIB        lumMesMIBModule ::= { lumModules 32 }
+--                                      tbd description
+--      tbd
+
+-- LUM-OCM-MIB        lumOcmMIBModule ::= { lumModules 33 }
+--                                      tbd description
+--      tbd
+
+-- LUM-OTN-MIB        lumOtnMIBModule ::= { lumModules 34 }
+--                                      tbd description
+--      otnGeneral
+--      otnSmTcmPmEntry                 OTN interfaces
+
+-- LUM-SDHPDH-MIB     lumSdhpdhMIBModule ::= { lumModules 35 }
+--                                      tbd description
+--      tbd
+
+-- LUM-SATELLITE-MIB  lumSatelliteMIBModule ::= { lumModules 36 }
+--                                      tbd description
+--      tbd
+
+-- LUM-MULTICAST-MIB  lumMulticastMIBModule ::= { lumModules 37 }
+--                                      tbd description
+--      tbd
+
+-- LUM-TRAIL-MIB lumTrailMIBModule ::= { lumModules 38 }
+--                                  tbd description
+--      tbd
+
+-- LUM-NC-MIB lumNcMIBModule ::= { lumModules 39 }
+--                            tbd description
+--      tbd
+
+-- LUM-MPLS-MIB  lumMplsMIBModule ::= { lumModules 40 }
+--                                      tbd description
+--      tbd
+
+-- LUM-PW-MIB  lumPwMIBModule ::= { lumModules 41 }
+--                                      tbd description
+--      tbd
+
+-- LUM-SITE-MIB  lumSiteMIBModule ::= { lumModules 42 }
+--                                    tbd description
+--      tbd
+
+-- LUM-PSR-MIB  lumPsrMIBModule ::= { lumModules 43 }
+--                                    tbd description
+--      tbd
+
+-- LUM-MPLSOAM-MIB  lumMplsOamMIBModule ::= { lumModules 44 }
+--                                    tbd description
+--      tbd
+
+-- LUM-LINKLOSS-MIB lumLinkLossMIBModule ::= { lumModules 45 }
+--                                  tbd description
+--      tbd
+
+-- LUM-IFBASIC-MIB  lumIfBasicMIBModule ::= { lumModules 46 }
+--                                            tbd description
+--      tbd
+
+-- LUM-IFPHYSICAL-MIB  lumIfPhysicalMIBModule ::= { lumModules 47 }
+--                                                  tbd description
+--      tbd
+
+-- LUM-IFOPTICAL-MIB  lumIfOpticalMIBModule ::= { lumModules 48 }
+--                                                tbd description
+--      tbd
+
+-- LUM-PMSERVER-MIB lumPmServerMIBModule ::= { lumModules 49 }
+--                                  tbd description
+--      tbd
+
+-- LUM-IFOTN-MIB  lumIfOtnMIBModule ::= { lumModules 50 }
+--                                        tbd description
+--      tbd
+
+-- LUM-IFXC-MIB  lumIfXcMIBModule ::= { lumModules 51 }
+--                                      tbd description
+--      tbd
+
+-- LUM-IFSDH-MIB  lumIfSdhMIBModule ::= { lumModules 52 }
+--                                        tbd description
+--      tbd
+
+-- LUM-IFSONET-MIB  lumIfSonetMIBModule ::= { lumModules 53 }
+--                                            tbd description
+--      tbd
+
+-- LUM-IFETH-MIB  lumIfEthMIBModule ::= { lumModules 54 }
+--                                        tbd description
+--      tbd
+
+-- LUM-IFOTNMON-MIB  lumIfOtnMonMIBModule ::= { lumModules 55 }
+--                                          tbd description
+--      tbd
+
+-- LUM-IFPERF-MIB  lumIfPerfMIBModule ::= { lumModules 56 }
+--                                          tbd description
+--      tbd
+
+-- LUM-PORTDEVICE-MIB  lumPortdeviceMIBModule ::= { lumModules 57 }
+--                                    tbd description
+--      tbd
+
+-- LUM-PORTDEVICEIF-MIB  lumPortdeviceIfMIBModule ::= { lumModules 58 }
+--                                    tbd description
+--      tbd
+
+-- LUM-IFFC-MIB  lumIfFcMIBModule ::= { lumModules 59 }
+--                                    tbd description
+--      tbd
+
+-- LUM-SOAM-PM-MIB  lumSoamPmMIBModule ::= { lumModules 60 }
+--                                          tbd description
+--      tbd
+
+-- LUM-ICCP-MIB  lumIccpMIBModule ::= { lumModules 61 }
+--                                          tbd description
+--      tbd
+
+-- LUM-MCLAG-MIB  lumMclagMIBModule ::= { lumModules 62 }
+--                                          tbd description
+--      tbd
+
+-- LUM-IFIWDM-MIB  lumIfIwdmMIBModule ::= { lumModules 63 }
+--                                          tbd description
+--      tbd
+
+-- LUM-IFMC-MIB  lumIfMcMIBModule ::= { lumModules 64 }
+--                                          tbd description
+--      tbd
+
+-- LUM-IFAMPLIFIER-MIB  lumIfAmplifierMIBModule ::= { lumModules 65 }
+--                                          tbd description
+--      tbd
+
+-- LUM-FPU-MIB  lumFpuMIBModule ::= { lumModules 66 }
+--                                          tbd description
+--      tbd
+
+-- LUM-LLDP-V2-MIB  lumLldpV2MIBModule ::= { lumModules 67 }
+--                                          tbd description
+--      tbd
+
+-- LUM-IFFH-MIB  lumIfFhMIBModule ::= { lumModules 68 }
+--                                      tbd description
+--      tbd
+
+-- LUM-OPENFLOW-MIB  lumOpenflowMIBModule ::= { lumModules 69 }
+--                                              tbd description
+--      tbd
+
+-- LUM-IFXCFLEX-MIB  lumIfXcFlexMIBModule ::= { lumModules 70 }
+--                                              tbd description
+--      tbd
+-- LUM-SYSINFO-MIB  lumSysinfoMIBModule ::= { lumModules 71 }
+--                                              tbd description
+--      tbd
+
+-- LUM-IFOTDR-MIB  lumIfOtdrMIBModule ::= { lumModules 72 }
+
+-- LUM-CRYPTO-MIB  lumCryptoMIBModule ::= { lumModules 73 }
+--                                          tbd description
+--      tbd
+
+-- LUM-COMMLINK-MIB  lumCommlinkMIBModule ::= { lumModules 74 }
+--                                          tbd description
+--      tbd
+
+
+lumGeneric OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Sub-tree for common object and event definitions."
+    ::= { lumentis 2 }
+
+
+-- ----------------------------------------------------
+-- MIB root oids
+-- ----------------------------------------------------
+lumAlarmMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The alarm MIB."
+    ::= { lumGeneric 1 }
+
+lumSystemMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The system MIB."
+    ::= { lumGeneric 2 }
+
+lumInventoryMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The inventory MIB."
+    ::= { lumGeneric 3 }
+
+lumWdmMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The WDM trunk MIB."
+    ::= { lumGeneric 4 }
+
+lumBackupMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The backup MIB."
+    ::= { lumGeneric 5 }
+
+lumLambdaMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The common WDM MIB.
+
+        Was Replaced by LUM-EQUIPMENT-MIB.
+        Now resused for other purposes"
+    ::= { lumGeneric 6 }
+
+lumTransponderMIB OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The multi-bit-rate client MIB.
+
+        Replaced by LUM-MULTIRATE-MIB."
+    ::= { lumGeneric 7 }
+
+lumTopologyMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The topology information MIB."
+    ::= { lumGeneric 8 }
+
+lumPowerMIB OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION
+        "The power and fans information MIB.
+        Included in the LUM-EQUIPMENT-MIB."
+    ::= { lumGeneric 9 }
+
+lumOxcMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The OXC MIB."
+    ::= { lumGeneric 10 }
+
+lumEquipmentMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The equipment MIB."
+    ::= { lumGeneric 11 }
+
+lumMultirateMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The multirate client MIB."
+    ::= { lumGeneric 12 }
+
+lumMuxMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The muxponder trunk MIB."
+    ::= { lumGeneric 13 }
+
+lumIpMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The IP networking MIB."
+    ::= { lumGeneric 14 }
+
+lumPmMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The performance measurement MIB."
+    ::= { lumGeneric 15 }
+
+lumSyncMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The sync control MIB."
+    ::= { lumGeneric 16 }
+
+lumSnmpMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The SNMP configuration MIB."
+    ::= { lumGeneric 17 }
+
+lumEthMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The Ethernet interface MIB."
+    ::= { lumGeneric 18 }
+
+lumOaMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The optical amplifier interface MIB."
+    ::= { lumGeneric 19 }
+
+lumDcnMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The DCN MIB."
+    ::= { lumGeneric 20 }
+
+lumMemMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The MEM MIB."
+    ::= { lumGeneric 21 }
+
+lumFcMIB OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The FC MIB."
+    ::= { lumGeneric 22 }
+
+lumSwuMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The SWU MIB."
+    ::= { lumGeneric 23 }
+
+lumGmplsMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The GMPLS MIB."
+    ::= { lumGeneric 24 }
+
+lumGmplsStdMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The GMPLS STD MIB."
+    ::= { lumGeneric 25 }
+
+lumConnMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The Connection MIB."
+    ::= { lumGeneric 26 }
+
+lumClientMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for client interfaces."
+    ::= { lumGeneric 27 }
+
+lumSoftwareMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for software information."
+    ::= { lumGeneric 28 }
+
+lumAuxMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for aux equipment."
+    ::= { lumGeneric 29 }
+
+lumCircuitMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for circuit information."
+    ::= { lumGeneric 30 }
+
+lumRoadmMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for ROADM equipment."
+    ::= { lumGeneric 31 }
+
+lumMesMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for Metro Ethernet Services information."
+    ::= { lumGeneric 32 }
+
+ lumOcmMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for Optical Control Manager."
+    ::= { lumGeneric 33 }
+
+ lumOtnMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for OTN."
+    ::= { lumGeneric 34 }
+
+ lumSdhpdhMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for E1/T1 objects."
+    ::= { lumGeneric 35 }
+
+ lumSatelliteMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for satellite objects."
+    ::= { lumGeneric 36 }
+
+ lumMulticastMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for multicast objects."
+    ::= { lumGeneric 37 }
+
+lumTrailMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for trail information."
+    ::= { lumGeneric 38 }
+
+lumNcMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for network connection information"
+    ::= { lumGeneric 39 }
+
+lumMplsMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for mpls objects."
+    ::= { lumGeneric 40 }
+
+lumPwMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for pseudowire objects."
+    ::= { lumGeneric 41 }
+
+lumSiteMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for customer site information"
+    ::= { lumGeneric 42 }
+
+lumPsrMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for customer site information"
+    ::= { lumGeneric 43 }
+
+lumMplsOamMIB OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The generic MIB for MPLS OAM objects"
+    ::= { lumGeneric 44 }
+
+lumLinkLossMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for link loss information."
+    ::= { lumGeneric 45 }
+
+lumIfBasicMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for basic port information"
+    ::= { lumGeneric 46 }
+
+lumIfPhysicalMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for physical port information"
+    ::= { lumGeneric 47 }
+
+lumIfOpticalMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for optical port information"
+    ::= { lumGeneric 48 }
+
+lumPmServerMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for PM server information."
+    ::= { lumGeneric 49 }
+
+lumIfOtnMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for otn G.709 information"
+    ::= { lumGeneric 50 }
+
+lumIfXcMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for cross-connect (XC) information"
+    ::= { lumGeneric 51 }
+
+lumIfSdhMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for SDH information"
+    ::= { lumGeneric 52 }
+
+lumIfSonetMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for SONET information"
+    ::= { lumGeneric 53 }
+
+lumIfEthMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for ethernet information"
+    ::= { lumGeneric 54 }
+
+lumIfOtnMonMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for OTN Monitor obejcts
+    (SM, TCM, PM)"
+    ::= { lumGeneric 55 }
+
+lumIfPerfMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for Performance objects"
+    ::= { lumGeneric 56 }
+
+lumPortdeviceMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for port device information"
+    ::= { lumGeneric 57 }
+
+lumPortdeviceIfMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for port device interface information"
+    ::= { lumGeneric 58 }
+
+lumIfFcMIB OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The generic MIB for FC (Fiber Channel) information"
+    ::= { lumGeneric 59 }
+
+lumSoamPmMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "This MIB module contains the management objects for the
+            management of Ethernet Services Operations, Administration
+            and Maintenance for Performance Monitoring."
+    ::= { lumGeneric 60 }
+
+lumIccpMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "Emxp ICCP"
+    ::= { lumGeneric 61 }
+
+lumMclagMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "Emxp MC-LAG"
+    ::= { lumGeneric 62 }
+
+lumIfIwdmMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "Iwdm MIB"
+    ::= { lumGeneric 63 }
+
+lumIfMcMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "The MIB module for management of multi-fiber connection objects."
+    ::= { lumGeneric 64 }
+
+lumIfAmplifierMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "The MIB module for management of amplifier objects."
+    ::= { lumGeneric 65 }
+
+lumFpuMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "The MIB module for management of fpu objects."
+    ::= { lumGeneric 66 }
+
+lumLldpV2MIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "The MIB module for management of LLDP V2 objects."
+    ::= { lumGeneric 67 }
+
+lumIfFhMIB OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The generic MIB for fh protocol"
+    ::= { lumGeneric 68 }
+
+lumOpenflowMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+            "The MIB module for management and configuration of OpenFlow switches."
+    ::= { lumGeneric 69 }
+
+lumIfXcFlexMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The generic MIB for flexible cross-connect (XC) information"
+    ::= { lumGeneric 70 }
+
+lumSysinfoMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The MIB containing information about cpu and memory usage"
+    ::= { lumGeneric 71 }
+
+lumIfOtdrMIB OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "The MIB module for OTDR information"
+    ::= { lumGeneric 72 }
+
+lumCryptoMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for encryption information"
+    ::= { lumGeneric 73 }
+
+lumCommlinkMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The generic MIB for communication link information"
+    ::= { lumGeneric 74 }
+
+lumAcfMIB OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The MIB module for ACF"
+    ::= { lumGeneric 75 }
+
+-- ----------------------------------------------------
+-- Product definitions
+-- ----------------------------------------------------
+
+lumProducts OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Sub-tree for product specific object
+        and event definitions."
+    ::= { lumentis 3 }
+
+lumProductsGeneric OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Generic definitions."
+    ::= { lumProducts 1 }
+
+
+-- Generic product definitions
+-- ===========================
+
+mentis OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "A stack of mentis network elements.
+        Also the top oid for the generic product registrations."
+    ::= { lumProductsGeneric 1 }
+
+mentisControlSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Control board slot."
+    ::= { mentis 1 }
+
+mentisTrafficSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Traffic board slot."
+    ::= { mentis 2 }
+
+-- Note: mentis 3 and mentis 4 are free for use.
+
+mentisControlUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The control board."
+    ::= { mentis 5 }
+
+mentisMultirate2500TransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The multi bit-rate 2500 transponder board."
+    ::= { mentis 6 }
+
+mentisMuxponder028Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2 STM-4/OC-12 and 8 STM-1/OC-3 muxponder board."
+    ::= { mentis 7 }
+
+mentisOpticalCrossConnect8Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 port optical cross-connect board."
+    ::= { mentis 8 }
+
+mentisOpticalCrossConnect16Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "16 port optical cross-connect board."
+    ::= { mentis 9 }
+
+mentisSingleAddDropABUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1 channel add/drop filter type A/B board."
+    ::= { mentis 10 }
+
+mentisSingleAddDropBAUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1 channel add/drop filter type B/A board."
+    ::= { mentis 11 }
+
+mentisDualAddDropABUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2 channel add/drop filter type A/B board."
+    ::= { mentis 12 }
+
+mentisDualAddDropBAUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2 channel add/drop filter type B/A board."
+    ::= { mentis 13 }
+
+mentisDualOpticalCirculationUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual optical coupler 2x(1:2) board."
+    ::= { mentis 14 }
+
+mentis4ChAddDropABUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 channel add/drop filter type A/B board."
+    ::= { mentis 15 }
+
+mentis4ChAddDropBAUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 channel add/drop filter type B/A board."
+    ::= { mentis 16 }
+
+mentisDualGbETransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual gigabit Ethernet transponder board."
+    ::= { mentis 17 }
+
+mentisOpticalAmplifierUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical amplifier board."
+    ::= { mentis 18 }
+
+mentis8chMuxDemuxExtensionUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 channel mux/demux board, extension type."
+    ::= { mentis 19 }
+
+mentis8chMuxDemuxTerminalUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 channel mux/demux board, terminal type."
+    ::= { mentis 20 }
+
+mentisQuadOpticalCouplerUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Quad optical coupler 4x(1:2) board."
+    ::= { mentis 21 }
+
+mentisMuxponder004Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 STM-1/OC-3 muxponder board"
+    ::= { mentis 22 }
+
+mentis2chOpticalAmplifierAddDropABUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2 channel add-drop board, type A/B, for use with optical amplifier"
+    ::= { mentis 23 }
+
+mentis2chOpticalAmplifierAddDropBAUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2 channel add-drop board, type B/A, for use with optical amplifier"
+    ::= { mentis 24 }
+
+mentisDualOpticalAmplifierUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual Optical amplifier board."
+    ::= { mentis 25 }
+
+mentisCwdmAddDropUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1 channel add/drop filter board, for use with OSC."
+    ::= { mentis 26 }
+
+mentisSingleSpurAddDropUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1 channel add/drop filter board."
+    ::= { mentis 27 }
+
+mentis10GTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 10 G transponder board."
+    ::= { mentis 28 }
+
+mentisLiteMr2500TransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 'lite' multirate 2500 transponder board."
+    ::= { mentis 29 }
+
+mentisControlOscUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The control board with one OSC i/f."
+    ::= { mentis 30 }
+
+mentisControlDualOscUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The control board with two OSC i/fs."
+    ::= { mentis 31 }
+
+mentisOpticalBandUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The optical band unit."
+    ::= { mentis 32 }
+
+mentisSync2MHzUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 2 MHz synchronization unit."
+    ::= { mentis 33 }
+
+mentisMxp8Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 8 tributary muxponder unit."
+    ::= { mentis 34 }
+
+mentisMxp16Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 16 tributary muxponder unit."
+    ::= { mentis 35 }
+
+mentisDualGbEDwdmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual giga-bit ethernet unit for DWDM."
+    ::= { mentis 36 }
+
+mentisDualGbECwdmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual giga-bit ethernet unit for CWDM."
+    ::= { mentis 37 }
+
+mentisDualFiberChannelDwdmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual fiber channel unit for DWDM."
+    ::= { mentis 38 }
+
+mentisDualFiberChannelCwdmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual fiber channel unit for CWDM."
+    ::= { mentis 39 }
+
+mentisFiberChannelGbEDwdmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The fiber channel and giga-bit ethernet unit for DWDM ."
+    ::= { mentis 40 }
+
+mentisFiberChannelGbECwdmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The fiber channel and giga-bit ethernet unit for CWDM ."
+    ::= { mentis 41 }
+
+mentisTrippleFiberChannelDwdmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The tripple fiber channel unit for Dwdm."
+    ::= { mentis 42 }
+
+mentisQuadMultirateTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The quad multirate transponder unit."
+    ::= { mentis 43 }
+
+mentis4chMuxDemuxTerminalABUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 channel mux/demux board, terminal, type A/B."
+    ::= { mentis 44 }
+
+mentis4chMuxDemuxTerminalBAUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 channel mux/demux board, terminal, type B/A."
+    ::= { mentis 45 }
+
+mentisSingleCwdmAddDropUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1 channel add/drop filter board, for use with CWDM."
+    ::= { mentis 46 }
+
+mentisDualCwdmAddDropUnit OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+        "2 channel add/drop filter board, for use with CWDM."
+    ::= { mentis 47 }
+
+mentis10GLANTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 10 G LAN transponder board."
+    ::= { mentis 48 }
+
+mentis10GRCTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 10 G rate conserving transponder board."
+    ::= { mentis 49 }
+
+mentisEsconMxp8Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 8 channel ESCON muxponder unit."
+    ::= { mentis 50 }
+
+mentisOpticalAmplifier15dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical amplifier board with 15 dBm output power."
+    ::= { mentis 51 }
+
+mentisDualOpticalAmplifier15dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual optical amplifier board with 15 dBm output power."
+    ::= { mentis 52 }
+
+mentisGxpD2500Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "10 x Any DWDM unit."
+    ::= { mentis 53 }
+
+mentisGxpC2500Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "10 x Any CWDM unit."
+    ::= { mentis 54 }
+
+mentisGxpD10GUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "10 x Any 10 Gb DWDM unit."
+    ::= { mentis 55 }
+
+mentisDualGbEDwdmV2Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual giga-bit ethernet unit for DWDM V2."
+    ::= { mentis 56 }
+
+mentisDualGbECwdmV2Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual giga-bit ethernet unit for CWDM V2."
+    ::= { mentis 57 }
+
+mentisDualFiberChannelDwdmV2Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual fiber channel unit for DWDM V2."
+    ::= { mentis 58 }
+
+mentisDualFiberChannelCwdmV2Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The dual fiber channel unit for CWDM V2."
+    ::= { mentis 59 }
+
+mentis2xSingleCwdmAddDropUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2 x 1 channel add/drop filter board, for use with CWDM."
+    ::= { mentis 60 }
+
+mentis2xDualCwdmAddDropUnit OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+        "2 x 2 channel add/drop filter board, for use with CWDM."
+    ::= { mentis 61 }
+
+mentis8chMuxDemuxTerminal2Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Type 2, 8 channel mux/demux board, terminal type.
+         Different set of lambdas compared to the other type."
+    ::= { mentis 62 }
+
+mentisDoubleDualGbETransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Double Dual gigabit Ethernet transponder board."
+    ::= { mentis 63 }
+
+mentisFpuOas2824Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "External fiber protection unit: OAS 2824."
+    ::= { mentis 64 }
+
+mentis2Fiber8chCwdmMuxUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 channel CWDM mux for 2 fiber solution"
+    ::= { mentis 65 }
+
+mentis2Fiber8chCwdmDemuxUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 channel CWDM demux for 2 fiber solution"
+    ::= { mentis 66 }
+
+mentisDouble10GLiteTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Double 10G Lite transponder."
+    ::= { mentis 67 }
+
+mentis10GBuTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 10 G transponder board with XFP on client and line"
+    ::= { mentis 68 }
+
+mentis10GLANBuTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 10 G LAN transponder board with XFP on client and line"
+    ::= { mentis 69 }
+
+mentis10GClBuTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 10 G transponder board with XFP on client side"
+    ::= { mentis 70 }
+
+mentis10GLANClBuTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 10 G LAN transponder board with XFP on client side"
+    ::= { mentis 71 }
+
+mentis8chMuxDemuxEvenExtensionUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 channel mux/demux board for even channels, extension type."
+    ::= { mentis 72 }
+
+mentis8chMuxDemuxEvenTerminalUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 channel mux/demux board for even channels, terminal type."
+    ::= { mentis 73 }
+
+mentisOpticalPreAmplifier17dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical pre-amplifier board with 17 dBm output power."
+    ::= { mentis 74 }
+
+mentisDualOpticalAmplifier17dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual optical line amplifier board with 17 dBm output power."
+    ::= { mentis 75 }
+
+mentisOpticalInterleaverUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical interleaver unit, 100/200 GHz."
+    ::= { mentis 76 }
+
+mentisOpticalPowAmplifier17dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical power amplifier board with 17 dBm output power."
+    ::= { mentis 77 }
+
+mentisSingleOpticalAmplifier17dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single optical line amplifier board with 17 dBm output power."
+    ::= { mentis 78 }
+
+mentis9xGbEMuxponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "9xGbE/10Gb MuxPonder"
+    ::= { mentis 79 }
+
+mentis1chAddDropDwdm2FiberUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1ch/2 fiber DWDM add/drop"
+    ::= { mentis 80 }
+
+mentis1chAddDropCwdm2FiberUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1ch/2 fiber CWDM add/drop"
+    ::= { mentis 81 }
+
+mentisMdu4chExtendable2FiberUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4ch CWDM Mux, 2 fiber, extendable"
+    ::= { mentis 82 }
+
+mentisMdu4chTerminal2FiberUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4ch CWDM Mux, 2 fiber, terminal"
+    ::= { mentis 83 }
+
+mentis8chVoltageControlledAttenuatorUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8ch Voltage controlled attenuator unit"
+    ::= { mentis 84 }
+
+mentisSingleOpticalAmplifier20dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single optical line amplifier board with 20 dBm output power."
+    ::= { mentis 85 }
+
+mentisDualOpticalAmplifier20dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual optical line amplifier board with 20 dBm output power."
+    ::= { mentis 86 }
+
+mentisFpuYm235Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "External fiber protection unit: YM 235."
+    ::= { mentis 87 }
+
+mentis4chAddDropDwdm2FiberUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 ch/2 fiber DWDM add/drop"
+    ::= { mentis 88 }
+
+mentisQuadMultirateTransponder2Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The quad multirate transponder unit version 2."
+    ::= { mentis 89 }
+
+mentisRamanOar450CUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical RAMAN amplifier 450."
+    ::= { mentis 90 }
+
+mentisControlSfpUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The control board with two SFP ports."
+    ::= { mentis 91 }
+
+mentisMultirate2500TransponderV2Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The multi bit-rate 2500 transponder board version 2."
+    ::= { mentis 92 }
+
+mentisDouble10GbeUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The double 10GbE Transponder basic unit."
+    ::= { mentis 93 }
+
+mentis4chMuxDemuxExtensionABUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 channel mux/demux board, extension, type A/B."
+    ::= { mentis 94 }
+
+mentis4chMuxDemuxExtensionBAUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4 channel mux/demux board, extension, type B/A."
+    ::= { mentis 95 }
+
+mentisOpticalInterleaver50100Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical interleaver unit, 50/100 GHz."
+    ::= { mentis 96 }
+
+mentisReconfigurableOpticalAddDropUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Reconfigurable optical add/drop multiplexer unit."
+    ::= { mentis 97 }
+
+mentis6pGbeEthernetDemarcationUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "6 port GbE Ethernet Demarcation Unit."
+    ::= { mentis 98 }
+
+mentis10GClTcTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "10Gb/s C-band Tunable Transponder, Client XFP."
+    ::= { mentis 99 }
+
+mentis4xSTM16MuxponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4x2,5G/10Gb muxponder"
+    ::= { mentis 100 }
+
+mentisMroadm1p800Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Reconfigurable optical add/drop multiplexer"
+    ::= { mentis 101 }
+
+mentisSingleOpticalLowGainAmplifier20dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single optical line amplifier board with 20 dBm output power."
+    ::= { mentis 102 }
+
+mentisDualOpticalLowGainAmplifier20dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual optical line amplifier board with 20 dBm output power."
+    ::= { mentis 103 }
+
+mentisSingleOpticalFlatGainAmplifier10dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single optical flat gain line amplifier board with 10 dBm output power."
+    ::= { mentis 104 }
+
+mentisDualOpticalFlatGainAmplifier10dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual optical flat gain line amplifier board with 10 dBm output power."
+    ::= { mentis 105 }
+
+mentis10GOtnTcTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "10Gb/s C-band Tunable OTN Transponder."
+    ::= { mentis 106 }
+
+mentis40channelMuxDemuxEven50GHzDWDMUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "40 channel mux demux unit, even 50 GHz."
+    ::= { mentis 107 }
+
+mentis40channelMuxDemuxOdd50GHzDWDMUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "40 channel mux demux unit, odd 50 GHz."
+    ::= { mentis 108 }
+
+mentis8channelMuxDemuxExtEvenUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "8 channel 50 GHz mux demux unit, extention, even, 100 GHz spacing."
+    ::= { mentis 109 }
+
+mentis8channelMuxDemuxExtOddUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "8 channel 50 GHz mux demux unit, extention, odd, 100 GHz spacing."
+    ::= { mentis 110 }
+
+mentis2portOpticalChannelMonitor OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "2 port optical channel monitor."
+    ::= { mentis 111 }
+
+mentisMultiServiceMuxPonder OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MultiService MuxPonder."
+    ::= { mentis 112 }
+
+mentis8chVariableOpticalAttenuatorII OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "8ch Variable Optical Attenuator - II"
+    ::= { mentis 113 }
+
+mentisMultiServiceDoubleQuadGbEMuxPonder OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "Double Quad MuxPonder."
+    ::= { mentis 114 }
+
+mentis10GTcErTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "10Gb/s C-band Tunable Ext Reach Transponder."
+    ::= {mentis 115 }
+
+mentis10xEthernetMuxPonder OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "10xGbE/10GbE Ethernet MuxPonder."
+    ::= { mentis 116 }
+
+mentis12pGbeEthernetDemarcationUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "12 port GbE Ethernet Demarcation Unit."
+    ::= { mentis 117 }
+
+mentisGbeMxp10GFecUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "10xGbE/10G with FEC MuxPonder."
+    ::= { mentis 118 }
+
+mentisRoadm1x4G100Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4-port reconfigurable optical add/drop multiplexer"
+    ::= { mentis 119 }
+
+mentisQuadMultiServiceTransponder OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+    "MultiService Transponder"
+    ::= { mentis 120 }
+
+mentis22xEthernetMuxPonder OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "22xGbE/10GbE Ethernet MuxPonder."
+    ::= { mentis 121 }
+
+mentisPEOa1x26dBmUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical Power Extender amplifier."
+    ::= { mentis 122 }
+
+mentis2PortProtectionControlUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical Power Extender amplifier."
+    ::= { mentis 123 }
+
+mentis2chVariableOpticalAttenuator OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "2ch Variable Optical Attenuator"
+    ::= { mentis 124 }
+
+mentisMultiServiceMuxPonder10GTCEr OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MultiService MuxPonder Tunable 10G Er."
+    ::= { mentis 125 }
+
+mentisMultiServiceMuxPonder10G OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MultiService MuxPonder Tunable 10G."
+    ::= { mentis 126 }
+
+mentisMultiServiceQuad2G5Transponder OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MultiService Transponder 2.5G."
+    ::= { mentis 127 }
+
+mentis4x2G510GOcMuxponder OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "4x2.5G/10Gb Muxponder in SONET mode."
+    ::= { mentis 128 }
+
+mentis22xEthernetMuxPonderII OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "22xGbE/10GbE Ethernet MuxPonder Next Generation."
+    ::= { mentis 129 }
+
+mentisBandSplitterUnit1x5Even OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "1x5 Band Splitter Unit Even 50 GhZ"
+    ::= { mentis 130 }
+
+mentisBandSplitterUnit1x5Odd OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "1x5 Band Splitter Unit Odd 50 GhZ"
+    ::= { mentis 131 }
+
+mentis10xEthernetMuxPonderII OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "10xGbE/10GbE Ethernet MuxPonder Next Generation."
+    ::= { mentis 132 }
+
+mentisMSAccessCollector8xE1T1-2xEth OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MS Access Collector 8xE1/T1+2xEth."
+    ::= { mentis 133 }
+
+mentisMSAccessCollector16xE1T1-4xEth OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MS Access Collector 16xE1/T1+4xEth."
+    ::= { mentis 134 }
+
+mentisMSAccessHub4xSTM-1-16xEth  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MS Access Hub 4xSTM-1+16xEth."
+    ::= { mentis 135 }
+
+mentisMSAccessHub4xOC-3-16xEth OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MS Access Hub 4xOC-3+16xEth."
+    ::= { mentis 136 }
+
+mentisRoadm1x8G50Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8-port reconfigurable optical add/drop multiplexer"
+    ::= { mentis 137 }
+
+mentis4ChAddDropDwdmEven50G OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4-port optical DWDM add/drop Even 50Ghz"
+    ::= { mentis 138 }
+
+mentis4ChAddDropDwdmOdd50G OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4-port optical DWDM add/drop Odd 50GHz"
+    ::= { mentis 139 }
+
+mentis8x10EthernetMuxPonderII OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "8x10GbE Ethernet MuxPonder Next Generation."
+    ::= { mentis 140 }
+
+mentisMxp8iiSdhUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 8 tributary muxponder ii unit, SDH mode."
+    ::= { mentis 141 }
+
+mentisMxp8iiSonetUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The 8 tributary muxponder ii unit, Sonet mode."
+    ::= { mentis 142 }
+
+mentisMSAccessCollector16xE1T1-4xEthTempHardend OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "MS Access Collector 16xE1/T1+4xEth. Temp hardend"
+    ::= { mentis 143 }
+
+mentisMdu40EvenL OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "40ch MDU-Lite, even 50GHz DWDM"
+    ::= { mentis 144 }
+
+mentisMdu40OddL OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "40ch MDU-Lite, odd 50GHz DWDM"
+    ::= { mentis 145 }
+
+mentisOa1x20dBmVg OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Variable Gain Opt Ampl 20dBm C-band"
+    ::= { mentis 146 }
+
+mentisOa2x20dBmVg OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual Var Gain Opt Ampl 20dBm C-band"
+    ::= { mentis 147 }
+
+mentisRoadm1x2G100 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1x2 ROADM 100GHz"
+    ::= { mentis 148 }
+
+mentisRoadm1x2G50 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1x2 ROADM 50GHz"
+    ::= { mentis 149 }
+
+mentisTpq10GfecUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Quad MultiService 10G FEC Transponder"
+    ::= { mentis 150 }
+
+mentisControlSfpiiUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The control board with four SFP ports."
+    ::= { mentis 151 }
+
+mentisCoD40evUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 40 even channels, 50GHz spacing."
+    ::= { mentis 152 }
+
+mentisCoD40eveUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter with 1310 port, 40 even channels, 50 GHz spacing."
+    ::= { mentis 153 }
+
+mentisCoD40odUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 40 odd channels, 50GHz spacing."
+    ::= { mentis 154 }
+
+mentisCoD40odeUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter with 1310 port, 40 odd channels, 50 GHz spacing."
+    ::= { mentis 155 }
+
+mentisDcDk652km20Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 20 km."
+    ::= { mentis 156 }
+
+mentisDcDk652km40Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 40 km."
+    ::= { mentis 157 }
+
+mentisDcDk652km60Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 60 km."
+    ::= { mentis 158 }
+
+mentisDcDk652km80Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 80 km."
+    ::= { mentis 159 }
+
+mentisDcP652km40Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 40 km."
+    ::= { mentis 160 }
+
+mentisDcP652km60Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 60 km."
+    ::= { mentis 161 }
+
+mentisDcP652km80Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 80 km."
+    ::= { mentis 162 }
+
+mentisDcP652km100Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 100 km."
+    ::= { mentis 163 }
+
+mentisDcP652km120Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 120 km."
+    ::= { mentis 164 }
+
+mentisEmxp40GiiUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "4x10GbE Ethernet MuxPonder-II"
+    ::= { mentis 165 }
+
+mentisQuadMultiProtocolTransponderUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Quad MultiProtocol Transponder"
+    ::= { mentis 166 }
+
+mentisTpq10GfecRegUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Quad MultiService 10G FEC Regenerator"
+    ::= { mentis 167 }
+
+mentisColorlessMuxDemuxUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Colorless Mux/Demux Unit"
+    ::= { mentis 168 }
+
+mentis8chSfpBasedVoaUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8ch SFP-based VOA unit"
+    ::= { mentis 169 }
+
+mentisMsTp40GUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "MultiService Transponder 40G"
+    ::= { mentis 170 }
+
+mentisMsMxp40GUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "MultiService Muxponder 40G"
+    ::= { mentis 171 }
+
+mentisMXP10GOTN OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "10 Gb/s OTN Muxponder"
+    ::= { mentis 172 }
+
+mentisOpticalCouplerUnitDualQuad OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical coupler unit, Dual Quad 2x(1:4) board."
+    ::= { mentis 173 }
+
+mentisTm4700Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TM2000 Shelf Controller"
+    ::= { mentis 174 }
+
+mentisTm4011Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TM2000 40Gb/s Muxponder"
+    ::= { mentis 175 }
+
+mentisTm100MxpUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TM2000 100Gb/s Muxponder"
+    ::= { mentis 176 }
+
+mentisTm100TpUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TM2000 100Gb/s Transponder"
+    ::= { mentis 177 }
+
+mentisTm100RegUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "TM2000 100Gb/s Regenerator"
+    ::= { mentis 178 }
+
+mentis2PSeedLightCouplerUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2-Port Seed Light coupler Unit board."
+    ::= { mentis 179 }
+
+mentisDual21dBmSeedLightUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual 21 dBm Seed Light unit with 21 dBm output power."
+    ::= { mentis 180 }
+
+mentisEmxp62GiieUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "22xGbE/4x10GbE Ethernet MuxPonder-IIe."
+    ::= { mentis 181 }
+
+mentisEmxp120GiieUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "12x10GbE Ethernet MuxPonder-IIe."
+    ::= { mentis 182 }
+
+mentisOYPatchCordUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical Y-patch cord"
+    ::= { mentis 183 }
+
+mentisTpq10gfeciUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Quad 10G FEC Transponder 1-slot"
+    ::= { mentis 184 }
+
+mentisTpq10gfecregiUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Quad MultiService 10G FEC Regenerator  1-slot"
+    ::= { mentis 185 }
+
+mentisTphex10gotn OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "Hex 10 Gb/s OTN Transponder"
+    ::= { mentis 186 }
+
+mentisEmxp48GiieUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8xGbE/4x10GbE Ethernet MuxPonder-IIe."
+    ::= { mentis 187 }
+
+mentisTp100gotn OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "100 Gb/s OTN Transponder"
+    ::= { mentis 188 }
+
+mentisEmxp220GiieUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1x100GbE Ethernet MuxPonder-IIe."
+    ::= { mentis 189 }
+
+mentisTpmrHL16GUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Hex MultiRate 16G Lite Transponder."
+    ::= { mentis 190 }
+
+mentisFronthaulMuxPonder10G OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "Fronthaul MuxPonder 10G."
+    ::= { mentis 191 }
+
+mentisMxp100gotn OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+    "100 Gb/s OTN Muxponder"
+    ::= { mentis 192 }
+
+mentisEmxp240GiieUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "24x10GbE Ethernet MuxPonder-IIe."
+    ::= { mentis 193 }
+
+mentisEmxp3Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8x100GbE Ethernet MuxPonder-III."
+    ::= { mentis 194 }
+
+mentisBoardTypeAUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Board (A) used for testing 'the board' concept."
+    ::= { mentis 195 }
+
+mentisBoardTypeBUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Board (B) used for testing 'the board' concept."
+    ::= { mentis 196 }
+
+mentisFpu1Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Fiber Protection Unit."
+    ::= { mentis 197 }
+
+mentisOaraed21hghybUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Raman Edfa 21Hg OA board"
+    ::= { mentis 198 }
+
+mentisTpmrHL16GUniUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Hex MultiRate 16G Lite Transponder - Unidirectional."
+    ::= { mentis 199 }
+
+mentisDcDk652km100Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 100 km."
+    ::= { mentis 200 }
+
+mentisDcDk652km120Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 120 km."
+    ::= { mentis 201 }
+
+mentisDcP652km20Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Module 20 km."
+    ::= { mentis 202 }
+
+mentisFhau1Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Fronthaul Access Unit FHAU/1."
+    ::= { mentis 203 }
+
+mentisFha1u1Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Hardened Fronthaul Access Unit."
+    ::= { mentis 204 }
+
+mentisOa1x20dBmVg2Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Variable Gain EDFA 20dBm v2"
+    ::= { mentis 205 }
+
+mentisOa2x20dBmVg2Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual Variable Gain EDFA 20dBm v2"
+    ::= { mentis 206 }
+
+mentisPtio10GUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "PT-Fabric I/O Unit 10G."
+    ::= { mentis 207 }
+
+mentisFxp400gotnUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "400G OTN Flexponder."
+    ::= { mentis 208 }
+
+mentisCompo24Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "CO_MPO24 Cassette"
+    ::= { mentis 209 }
+
+mentisTp100gotnii OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "100 Gb/s OTN Transponder-II"
+    ::= { mentis 210 }
+
+mentisPtio100GUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "PT-Fabric I/O Unit 100G."
+    ::= { mentis 211 }
+
+mentisRfu1Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Remote Fronthaul Unit."
+    ::= { mentis 212 }
+
+mentisCoD919926Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing"
+    ::= { mentis 213 }
+
+mentisCoD927934Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing"
+    ::= { mentis 214 }
+
+mentisCoD935942Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing"
+    ::= { mentis 215 }
+
+mentisCoD943950Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing"
+    ::= { mentis 216 }
+
+mentisCoD951958Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing"
+    ::= { mentis 217 }
+
+mentisCoD919926eUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing"
+    ::= { mentis 218 }
+
+mentisCoD927934eUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing"
+    ::= { mentis 219 }
+
+mentisCoD935942eUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing"
+    ::= { mentis 220 }
+
+mentisCoD943950eUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing"
+    ::= { mentis 221 }
+
+mentisCoD951958eUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing"
+    ::= { mentis 222 }
+
+mentisCo4Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber CWDM Mux/Demux filter, 8 channels"
+    ::= { mentis 223 }
+
+mentisCo5Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber CWDM Mux/Demux filter, 8 channels"
+    ::= { mentis 224 }
+
+mentisCodsf20evaUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter, even channels, a-side"
+    ::= { mentis 225 }
+
+mentisCodsf20evbUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter, even channels, b-side"
+    ::= { mentis 226 }
+
+mentisCodsf4919Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 227 }
+
+    mentisCodsf4926Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 228 }
+
+    mentisCodsf4927Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 229 }
+
+    mentisCodsf4934Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 230 }
+
+    mentisCodsf4935Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 231 }
+
+    mentisCodsf4942Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 232 }
+
+    mentisCodsf4943Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 233 }
+
+    mentisCodsf4950Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 234 }
+
+    mentisCodsf4951Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 235 }
+
+    mentisCodsf4958Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 236 }
+
+    mentisCodsf2919Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 237 }
+
+    mentisCodsf2922Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 238 }
+
+    mentisCodsf2923Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 239 }
+
+    mentisCodsf2926Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 240 }
+
+    mentisCodsf2927Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 241 }
+
+    mentisCodsf2930Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 242 }
+
+    mentisCodsf2931Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 243 }
+
+    mentisCodsf2934Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 244 }
+
+    mentisCodsf2935Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 245 }
+
+    mentisCodsf2938Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 246 }
+
+    mentisCodsf2939Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 247 }
+
+    mentisCodsf2942Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 248 }
+
+    mentisCodsf2943Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 249 }
+
+    mentisCodsf2946Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 250 }
+
+    mentisCodsf2947Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 251 }
+
+    mentisCodsf2950Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 252 }
+
+    mentisCodsf2951Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 253 }
+
+    mentisCodsf2954Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 254 }
+
+    mentisCodsf2955Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 255 }
+
+    mentisCodsf2958Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 256 }
+
+mentisOadm2chUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "2ch DWDM OADM"
+    ::= { mentis 257 }
+
+mentisMxp200gotnUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "200G OTN Muxponder."
+    ::= { mentis 258 }
+
+mentisEmxp440Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8x10GbE, 2x100GbE, MPO Ethernet MuxPonder-III."
+    ::= { mentis 259 }
+
+mentisOaraed20lghybUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Raman Edfa 20Lg OA board"
+    ::= { mentis 260 }
+
+mentisAd1c2fotdrUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "1ch CWDM add/drop filter with 1610nm OTDR"
+    ::= { mentis 261 }
+
+mentisCodsf243xMPOUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Single fiber DWDM Mux/Demux filter"
+    ::= { mentis 262 }
+
+mentisOtdr8pUnit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "8 Port Optical Time Domain Reflectometer"
+    ::= { mentis 263 }
+
+mentisOa1x21dBmVgEC OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Variable Gain Opt Ampl 21dBm Extended C-band"
+    ::= { mentis 264 }
+
+mentisOa2x21dBmVgEC OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual Variable Gain Opt Ampl 21dBm Extended C-band"
+    ::= { mentis 265 }
+
+mentisCo10Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber CWDM Mux/Demux filter, 4 channels"
+    ::= { mentis 266 }
+
+mentisCoD48evUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 48ch MDU DWDM 50GHz Even"
+    ::= { mentis 267 }
+
+entisCoD48odUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM Mux/Demux filter, 48ch MDU DWDM 50GHz Odd"
+    ::= { mentis 268 }
+
+entisCoOcuD4x4Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical Coupler Unit Dual 4:4"
+    ::= { mentis 269 }
+
+entisCoocuD4x8Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical Coupler Unit Dual 4:8"
+    ::= { mentis 270 }
+
+mentisCoOiu50100Unit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Optical interleaver unit, 50/100 GHz."
+    ::= { mentis 271 }
+
+mentisCo2xOTDR1611Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual OTDR filter 1611nm"
+    ::= { mentis 272 }
+
+mentisCoD4919Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 273 }
+
+mentisCoD4923Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 274 }
+
+mentisCoD4927Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 275 }
+
+mentisCoD4931Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 276 }
+
+mentisCoD4935Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 277 }
+
+mentisCoD4939Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 278 }
+
+mentisCoD4943Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 279 }
+
+mentisCoD4947Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 280 }
+
+mentisCoD4951Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 281 }
+
+mentisCoD4955Unit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Dual fiber DWDM add/drop filter, 4 channels"
+    ::= { mentis 282 }
+
+-- Mentis 300 specific product definitions
+-- =======================================
+
+mentis300 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box chassis."
+    ::= { lumProducts 2 }
+
+mentis300Backplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box backplane."
+    ::= { mentis300 1 }
+
+mentis300PowerSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply slot."
+    ::= { mentis300 2 }
+
+mentis300FanSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan slot."
+    ::= { mentis300 3 }
+
+mentis300PowerSupply OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply."
+    ::= { mentis300 4 }
+
+mentis300Fan OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan."
+    ::= { mentis300 5 }
+
+
+-- Mentis 3000 specific product definitions
+-- ========================================
+
+mentis3000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box chassis (sub-rack)."
+    ::= { lumProducts 3 }
+
+mentis3000Backplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box backplane."
+    ::= { mentis3000 1 }
+
+mentis3000PowerSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box power supply slot."
+    ::= { mentis3000 2 }
+
+mentis3000FanSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box fan slot."
+    ::= { mentis3000 3 }
+
+mentis3000PowerSupply OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box power supply."
+    ::= { mentis3000 4 }
+
+mentis3000Fan OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box fan."
+    ::= { mentis3000 5 }
+
+
+-- Mentis 301 specific product definitions
+-- =======================================
+
+mentis301 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box chassis."
+    ::= { lumProducts 4 }
+
+mentis301Backplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box backplane."
+    ::= { mentis301 1 }
+
+mentis301PowerSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply slot."
+    ::= { mentis301 2 }
+
+mentis301FanSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan slot."
+    ::= { mentis301 3 }
+
+mentis301PowerSupply OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply."
+    ::= { mentis301 4 }
+
+mentis301Fan OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan."
+    ::= { mentis301 5 }
+
+-- Mentis 101 specific product definitions
+-- =======================================
+
+mentis101 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box chassis."
+    ::= { lumProducts 5 }
+
+mentis101Backplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box backplane."
+    ::= { mentis101 1 }
+
+mentis101PowerSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply slot."
+    ::= { mentis101 2 }
+
+mentis101FanSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan slot."
+    ::= { mentis101 3 }
+
+mentis101PowerSupply OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply."
+    ::= { mentis101 4 }
+
+mentis101Fan OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan."
+    ::= { mentis101 5 }
+
+-- Subrack Aux specific product definitions
+-- =======================================
+
+mentisAux OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual subrack for external eqiupment."
+    ::= { lumProducts 6 }
+
+mentisAuxBackplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual backplane."
+    ::= { mentisAux 1 }
+
+-- Transmode Network Manager
+-- =========================
+
+transmodeNetworkManager OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Transmode Network Manager."
+    ::= { lumProducts 7 }
+
+-- Mentis 102 specific product definitions
+-- =======================================
+
+mentis102 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box chassis."
+    ::= { lumProducts 8 }
+
+mentis102Backplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box backplane."
+    ::= { mentis102 1 }
+
+mentis102PowerSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply slot."
+    ::= { mentis102 2 }
+
+mentis102FanSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan slot."
+    ::= { mentis102 3 }
+
+mentis102PowerSupply OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box power supply."
+    ::= { mentis102 4 }
+
+mentis102Fan OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The small box fan."
+    ::= { mentis102 5 }
+
+-- Mentis MAB1 specific product definitions
+-- =======================================
+mentisMba1 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Monolith for mobile access."
+    ::= { lumProducts 9 }
+
+-- Mentis MAB2 specific product definitions
+-- =======================================
+mentisMba2 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Monolith for mobile access."
+    ::= { lumProducts 10 }
+
+-- Mentis MAB2E specific product definitions
+-- =======================================
+mentisMba2E OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Monolith for mobile access temp hardened."
+    ::= { lumProducts 11 }
+
+-- Subrack 102Pas3 specific product definitions
+-- =======================================
+mentis102Pas3 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual subrack for 102pas3 equipment."
+    ::= { lumProducts 12 }
+
+mentis102Pas3Backplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual backplane."
+    ::= { mentis102Pas3 1 }
+
+-- Subrack 102Pas specific product definitions
+-- =======================================
+mentis102Pas OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual subrack for 102pas equipment."
+    ::= { lumProducts 13 }
+
+mentis102PasBackplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual backplane."
+    ::= { mentis102Pas 1 }
+
+-- Subrack 101P specific product definitions
+-- =======================================
+mentis101P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual subrack for tm101p equipment."
+    ::= { lumProducts 14 }
+
+
+-- Mentis 2000 specific product definitions
+-- ========================================
+
+mentis2000 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box chassis (sub-rack)."
+    ::= { lumProducts 15 }
+
+mentis2000Backplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box backplane."
+    ::= { mentis2000 1 }
+
+mentis2000PowerSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box power supply slot."
+    ::= { mentis2000 2 }
+
+mentis2000FanSlot OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box fan slot."
+    ::= { mentis2000 3 }
+
+mentis2000PowerSupply OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box power supply."
+    ::= { mentis2000 4 }
+
+mentis2000Fan OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The big box fan."
+    ::= { mentis2000 5 }
+
+
+mentis101PBackplane OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual backplane."
+    ::= { mentis101P 1 }
+
+-- Subrack fha1u specific product definitions
+-- =======================================
+mentisFha1u OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual subrack for fha1u equipment."
+    ::= { lumProducts 16 }
+
+-- Subrack rfuac1 specific product definitions
+-- =======================================
+mentisRfuAc1 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Virtual subrack for rfuac1 equipment."
+    ::= { lumProducts 17 }
+
+-- ----------------------------------------------------
+-- Sub-tree for capabilities and conformance and
+-- experimental definitions
+-- ----------------------------------------------------
+
+lumCaps OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Sub-tree for agent profiles."
+    ::= { lumentis 4 }
+
+lumReqs OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Sub-tree for management applications requirements."
+    ::= { lumentis 5 }
+
+lumExpr OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Sub-tree for experimental definitions."
+    ::= { lumentis  6 }
+
+END
+

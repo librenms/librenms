@@ -1,0 +1,6 @@
+modules:
+    os:
+        hardware: .1.3.6.1.2.1.1.5.0
+        hardware_regex: '/Sensor Gateway: (?<hardware>.*)/'
+        version: ServersCheck::product.productversion.0
+        version_regex: '/Release (?<version>.*)/'

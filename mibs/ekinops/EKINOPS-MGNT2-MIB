@@ -1,0 +1,4783 @@
+-- *****************************************************************
+-- MGNT2.TXT:  MIB
+--
+--MIB Part Number:3MI01002CABA
+--MIB Version:01
+--
+-- Copyright (c) 2017 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-MGNT2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ekinops,
+	EkiState,
+	EkiOnOff,
+	EkiProtocol,
+	EkiApiState,
+	EkiLoadGWSW,
+	EkiLoadState,
+	EkiLoadPermutMethod,
+	EkiSynchroMode,
+	EkiLoadPermutMode	 
+			FROM EKINOPS-MIB
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32,
+	IpAddress                
+        		FROM SNMPv2-SMI
+ 	TEXTUAL-CONVENTION,
+	DisplayString,
+	RowStatus
+                FROM SNMPv2-TC;
+
+mgnt2 MODULE-IDENTITY
+        LAST-UPDATED "201701100000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.net"
+        DESCRIPTION
+          "MIB for Ekinops 360 management."
+	REVISION "200511240000Z"
+	DESCRIPTION
+	  "Initial version."
+	REVISION "200601240000Z"
+	DESCRIPTION
+	  "Add the ekicraft package table."
+	REVISION "200603100000Z"
+	DESCRIPTION
+	  "Change Rack full to Rack Not Full"
+	REVISION "200605100000Z"
+	DESCRIPTION
+	  "Gateways are managed by a table"
+	REVISION "200605230000Z"
+	DESCRIPTION
+	  "Replace PBU by PM"
+	REVISION "200609280000Z"
+	DESCRIPTION
+	  "CRAFT/LINUX Inventory Insertion"
+	REVISION "200612130000Z"
+	DESCRIPTION
+	  "Plug-in inventory table insertion"
+        REVISION "200702090000Z"
+	DESCRIPTION
+	  "Add Backpanel ,Fan inventory and error counters"
+        REVISION "200704240000Z"
+	DESCRIPTION
+	  "Add detailed traps"
+        REVISION "200706190000Z"
+	DESCRIPTION
+	  "Add ABS3 objects"
+        REVISION "200708270000Z"
+	DESCRIPTION
+	  "Add Groups number in board table for pm1008dc"
+        REVISION "200711270000Z"
+	DESCRIPTION
+	  "Update Ekinops Address,Helps on objects,Add Dcc management"
+        REVISION "200805200000Z"
+	DESCRIPTION
+	  "Add syslog and ntp servers ip addresses"
+        REVISION "200806180000Z"
+	DESCRIPTION
+	  "Add Inactivity Time out"
+        REVISION "200808180000Z"
+	DESCRIPTION
+	  "Add Cli access, create a textual convention for DCC access.Add Craft Access"
+	REVISION "200810070000Z"
+	DESCRIPTION
+	  "Invert code on DCC mode"
+	REVISION "200811190000Z"
+	DESCRIPTION
+	  "Insert Chassis Ethernet Split"
+	REVISION "200901050000Z"
+	DESCRIPTION
+	  "Insert Chassis Global Conf"
+	REVISION "200912150000Z"
+	DESCRIPTION
+	  "Correction on traps"
+	REVISION "201001040000Z"
+	DESCRIPTION
+	  "Insert CRIT/URG/NURG/Acknowledge"
+	REVISION "201002160000Z"
+	DESCRIPTION
+	  "Add CondType and NMS parameters"
+	REVISION "201007160000Z"
+	DESCRIPTION
+	  "Add perf management for the NMS"
+	REVISION "201010270000Z"
+	DESCRIPTION
+	  "Add new filters for traps"
+
+	REVISION "201103170000Z"
+	DESCRIPTION
+	  "Add new filters for traps"
+	REVISION "201104070000Z"
+	DESCRIPTION
+	  "New mode on new ehternet input"
+	REVISION "201104130000Z"
+	DESCRIPTION
+	  "Polling Manager fail insertion"
+	REVISION "201105270000Z"
+	DESCRIPTION
+	  "Rajout AlarmType sur Extraction Fan"
+	REVISION "201106080000Z"
+	DESCRIPTION
+	  "Rajout Cold Reset"
+	REVISION "201106300000Z"
+	DESCRIPTION
+	  "PerfCapStatus new type"
+	REVISION "201109120000Z"
+	DESCRIPTION
+	  "New data for Atom"
+	REVISION "201202080000Z"
+	DESCRIPTION
+	  "PM labelling removal"
+	REVISION "201203190000Z"
+	DESCRIPTION
+	  "Add mgnt2SubFunctionLabel for 100G"
+	REVISION "201207160000Z"
+	DESCRIPTION
+	  "Minor cosmetic updates"
+	REVISION "201305280000Z"
+	DESCRIPTION
+	  "RSTP configuration object"
+	REVISION "201305300000Z"
+	DESCRIPTION
+	  "Dust filter insertion, CPU Temp warning"
+	REVISION "201308290000Z"
+	DESCRIPTION
+	  "LLDP configuration object"
+	REVISION "201309040000Z"
+	DESCRIPTION
+	  "MGNT Shutdown adding"
+	REVISION "201309110000Z"
+	DESCRIPTION
+	  "Log file mode insertion"
+	REVISION "201311060000Z"
+	DESCRIPTION
+	  "RADIUS objects"
+	REVISION "201407300000Z"
+	DESCRIPTION
+	  "Node Controller objects"
+	REVISION "201409010000Z"
+	DESCRIPTION
+	  "Probcause,AlarmType - NMS completion"
+	REVISION "201502110000Z"
+	DESCRIPTION
+	  "HTTP configuration"
+	REVISION "201504010000Z"
+	DESCRIPTION
+	  "Add bindings for Node Controller"
+	REVISION "201504140000Z"
+	DESCRIPTION
+	  "RSTP Thresholds"
+	REVISION "201504140000Z"
+	DESCRIPTION
+	  "Users privilege"
+	REVISION "201510090000Z"
+	DESCRIPTION
+	  "Add in mgnt2SlotStatus"
+	REVISION "201511050000Z"
+	DESCRIPTION
+	  "Appropriate Limits on SYNTAX of some OBJECT-TYPE "
+	REVISION "201605270000Z"
+	DESCRIPTION
+	  "Add objects for fail login attemps"
+	REVISION "201606150000Z"
+	DESCRIPTION
+	  "Removable Fan modules handling"
+	REVISION "201610120000Z"
+	DESCRIPTION
+	  "Modification of numbering of the fans"
+	REVISION "201701100000Z"
+	DESCRIPTION
+	  "FTP, TFTP enable disable"
+        ::= { ekinops 7 }
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     TEXTUAL-CONVENTION
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+Mgnt2CliAccessValues ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different type of access by ethernet for the CLI"
+    SYNTAX INTEGER {
+		noCliByEthernet(0),
+		cliBySSH(1),
+		cliByTelnet(2)
+           }
+
+Mgnt2CraftAccessValues ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "enables access to the CRAFT"
+    SYNTAX INTEGER {
+		noCraftAccess(0),
+		craftEnable(1),
+		craftEnableHttps(2)
+           }
+
+Mgnt2DccAccessValues ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes for the Dcc access"
+    SYNTAX INTEGER {
+		mode1Slots2s4s6s8s10(0),
+		mode2Slots2s6s10s14s18(1)
+    }
+
+Mgnt2TrapModeValues ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes for the trap generation"
+    SYNTAX INTEGER {
+		syntheticTrap(0),
+		detailedTrap(1),
+		nmsTrap(2)
+    }
+
+Mgnt2AckMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes to acknowledge alarms"
+    SYNTAX INTEGER {
+		modeA(1),
+		modeB(2)
+    }
+
+Mgnt2PerfResyncValues ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes for the trap generation"
+    SYNTAX INTEGER {
+		perfResyncIdle(1),
+		perfResyncSync(2),
+		perfResyncReady(3),
+		perfResyncDelete(4)
+    }
+ 
+Mgnt2NetMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes for the network management"
+    SYNTAX INTEGER {
+		switch(1),
+		gateway(2)
+    }
+
+Mgnt2MasterEthMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes for the Master"
+    SYNTAX INTEGER {
+		static(1),
+		dhcp(2)
+    }
+
+Mgnt2SubnetEthMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes for the Subnet"
+    SYNTAX INTEGER {
+		static(1),
+		dhcp(2)
+    }
+
+Mgnt2AuthTypeValues ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Various types of authentication processes"
+    SYNTAX INTEGER {
+		authLocal(0),
+		authRADIUS(1),
+		authLDAP(2)
+    }
+
+Mgnt2LogFileMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "different modes for the log files"
+    SYNTAX INTEGER {
+		disabled (0),
+		linear(1),
+		rotary(2)
+    }
+
+
+Mgnt2SlotStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Status of the slot"
+    SYNTAX INTEGER {
+		slotEmpty(0),
+		pmReady(1),
+		pmReset(2),
+		pmLoad(3),
+		pmPassive(4),
+		pmUnknown(5),
+		pmNotReady(6)
+    }
+
+
+
+
+   
+-- *****************************************************************
+--
+-- MGNT2 MIB root mapping
+--
+-- *****************************************************************
+mgnt2SNMPAgentData OBJECT IDENTIFIER ::= { mgnt2 1 }
+mgnt2Hardware OBJECT IDENTIFIER ::= { mgnt2 2}
+mgnt2Traps OBJECT IDENTIFIER ::= { mgnt2 3}
+mgnt2SoftwareManagement OBJECT IDENTIFIER ::= { mgnt2 4}
+mgnt2ConfigManagement OBJECT IDENTIFIER ::= { mgnt2 5}
+mgnt2RemoteInventory OBJECT IDENTIFIER ::= { mgnt2 6}
+mgnt2ErrorCounters OBJECT IDENTIFIER ::= { mgnt2 7}
+mgnt2Perf OBJECT IDENTIFIER ::= { mgnt2 8}
+
+-- *****************************************************************
+--
+-- MGNT2 SNMP Agent informations
+--
+-- *****************************************************************
+
+mgnt2IPmanagment OBJECT IDENTIFIER ::= { mgnt2SNMPAgentData 1 }
+
+
+mgnt2GigmManagerIpAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Mgnt2GigmManagerIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Manager IP address Table."
+    ::= { mgnt2IPmanagment 1 }
+
+mgnt2GigmManagerIpAddressEntry OBJECT-TYPE
+    SYNTAX      Mgnt2GigmManagerIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	""
+    INDEX   { mgnt2GigmManagerIpIndex }
+    ::= { mgnt2GigmManagerIpAddressTable 1 }
+
+Mgnt2GigmManagerIpAddressEntry ::= SEQUENCE {
+    mgnt2GigmManagerIpIndex         Integer32,
+    mgnt2GigmManagerIpAddress	   IpAddress,
+    mgnt2GigmManagerIpAddressTableRowStatus    RowStatus,
+    mgnt2GigmManagerTrapPort	   Integer32,
+    mgnt2GigmManagerEnableCtrl     EkiOnOff,
+    mgnt2GigmManagerEnableConfig   EkiOnOff,
+    mgnt2GigmManagerEnableEvent    EkiOnOff,
+    mgnt2GigmManagerEnableAlarmCrit EkiOnOff,
+    mgnt2GigmManagerEnableAlarmMajor EkiOnOff,
+    mgnt2GigmManagerEnableAlarmMinor EkiOnOff,
+    mgnt2GigmManagerRegistrationTimeout Integer32,
+    mgnt2GigmManagerEnableAlarmWarning EkiOnOff,
+    mgnt2GigmManagerEnableAlarmIndeterminate EkiOnOff
+}
+
+mgnt2GigmManagerIpIndex OBJECT-TYPE
+  SYNTAX Integer32(1..32)
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Index of the IP address of the manager"
+  ::= { mgnt2GigmManagerIpAddressEntry 1 }
+  
+mgnt2GigmManagerIpAddress OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "IP address of the manager:This OID defines the IP
+         address of the SNMP Manager attached to the Mgnt2"
+  ::= { mgnt2GigmManagerIpAddressEntry 2 }
+
+mgnt2GigmManagerIpAddressTableRowStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "The status of this row."
+  ::= { mgnt2GigmManagerIpAddressEntry 3 } 
+   
+mgnt2GigmManagerTrapPort OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Manager UDP port."
+  ::= { mgnt2GigmManagerIpAddressEntry 4 } 
+
+mgnt2GigmManagerEnableCtrl OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of Ctrl."
+  ::= { mgnt2GigmManagerIpAddressEntry 5 } 
+
+mgnt2GigmManagerEnableConfig OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of config."
+  ::= { mgnt2GigmManagerIpAddressEntry 6 } 
+
+mgnt2GigmManagerEnableEvent OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of event."
+  ::= { mgnt2GigmManagerIpAddressEntry 7 } 
+
+mgnt2GigmManagerEnableAlarmCrit OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of crit alarm."
+  ::= { mgnt2GigmManagerIpAddressEntry 8 } 
+
+mgnt2GigmManagerEnableAlarmMajor OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of major alarm."
+  ::= { mgnt2GigmManagerIpAddressEntry 9 } 
+
+mgnt2GigmManagerEnableAlarmMinor OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of minor alarm."
+  ::= { mgnt2GigmManagerIpAddressEntry 10 } 
+
+
+mgnt2GigmManagerRegistrationTimeout OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Time-out for manager activities."
+  ::= { mgnt2GigmManagerIpAddressEntry 11 } 
+
+mgnt2GigmManagerEnableAlarmWarning OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of warning alarm."
+  ::= { mgnt2GigmManagerIpAddressEntry 12 } 
+
+mgnt2GigmManagerEnableAlarmIndeterminate OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Enabling trap of indeterminate alarm."
+  ::= { mgnt2GigmManagerIpAddressEntry 13 } 
+
+
+mgnt2GigmBoardIpAddress OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "IP address of the Chassis:This OID defines the IP
+        address of the Mgnt2"
+  ::= { mgnt2IPmanagment 2 }
+  
+mgnt2GigmIPAddresByDHCP OBJECT-TYPE
+  SYNTAX EkiState
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "IP address retrieved by DHCP:If enabled, the IP
+        address is retrieved by DHCP, in which case changes
+        take effect after a board reset. If disabled the
+        object, mgnt2GigmBoardIpAddress defines the address"
+  ::= { mgnt2IPmanagment 3 }  
+
+
+mgnt2GigmNetmask OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Netmask for the board IP address:This OID defined
+        the IP Subnet mask of the Mgnt2"
+  ::= { mgnt2IPmanagment 4 }
+
+mgnt2GigmGatewayAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Mgnt2GigmGatewayAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Gateway IP address Table: This table contains all
+	the gateway IP addresses."
+    ::= { mgnt2IPmanagment 5 }
+
+mgnt2GigmGatewayAddressEntry OBJECT-TYPE
+    SYNTAX      Mgnt2GigmGatewayAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	""
+    INDEX   { mgnt2GigmGatewayIndex }
+    ::= { mgnt2GigmGatewayAddressTable 1 }
+
+Mgnt2GigmGatewayAddressEntry ::= SEQUENCE {
+    mgnt2GigmGatewayIndex         Integer32,
+    mgnt2GigmGatewayAddress	     IpAddress,
+    mgnt2GigmGatewayOrder         Integer32
+}
+
+mgnt2GigmGatewayIndex OBJECT-TYPE
+  SYNTAX Integer32(0..1)
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Index of the IP address of the gateway"
+  ::= { mgnt2GigmGatewayAddressEntry 1 }
+  
+mgnt2GigmGatewayAddress OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "IP address of the gateway :This OID defines the IP
+         address of the gateway attached to the Chassis"
+  ::= { mgnt2GigmGatewayAddressEntry 2 }
+
+mgnt2GigmGatewayOrder OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-create
+  STATUS current
+  DESCRIPTION
+        "Gateway priority: This OID defines the priority of 
+	the gateway (lower number for higher priority)"
+  ::= { mgnt2GigmGatewayAddressEntry 3 }
+
+mgnt2GigmSyslog OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "IP address of the syslog server:This OID defines
+        the IP address of the syslog of the Mgnt2"
+  ::= { mgnt2IPmanagment 6 }
+
+mgnt2GigmNtpServer OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "IP address of the ntp server:This OID defines
+        the IP address of the ntp server for the Mgnt2"
+  ::= { mgnt2IPmanagment 7 }
+
+
+mgnt2GigmNodeIpAddress OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+         "Node IP address :This OID defines
+          the Node IP address in node controller mode for the Mgnt2"
+  ::= { mgnt2IPmanagment 8 }
+
+
+mgnt2ModulesManagement OBJECT IDENTIFIER ::= { mgnt2SNMPAgentData 2 }
+
+mgnt2GigmBoardTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2GigmBoardEntry 
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of PMs plugged in the Chassis"
+      ::= { mgnt2ModulesManagement 1 }
+
+mgnt2GigmBoardEntry OBJECT-TYPE
+        SYNTAX  Mgnt2GigmBoardEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row Definition for the PMs table"
+        INDEX   { mgnt2IndexBoards }
+        ::= { mgnt2GigmBoardTable 1 }
+    
+
+
+Mgnt2GigmBoardEntry ::=
+        SEQUENCE {
+          mgnt2IndexBoards 
+              Integer32,
+	  mgnt2Position
+              Integer32,
+          mgnt2Name
+              DisplayString,
+	  mgnt2PortNumber
+              Integer32,
+	  mgnt2LineNumber
+              Integer32,
+	  mgnt2GroupNumber
+              Integer32,
+    	  mgnt2RootOIDInventory
+              OBJECT IDENTIFIER,
+    	  mgnt2SlotOcc
+              DisplayString,      
+    	  mgnt2SubFunctionLabel
+              DisplayString,
+   	  mgnt2SlotStatus
+              Mgnt2SlotStatus
+        }
+
+
+    mgnt2IndexBoards OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for PMs table"
+        ::= { mgnt2GigmBoardEntry 1 }
+
+    mgnt2Position OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "PM Slot number:This OID gives the slot number in
+              which the PM is plugged"
+        ::= { mgnt2GigmBoardEntry 2 }
+
+    mgnt2Name OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "PM name:This OID gives the name of the PM plugged
+              in the Mgnt2"
+        ::= { mgnt2GigmBoardEntry 3 }
+
+    mgnt2PortNumber OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Number of Client Ports:This OID gives the number of
+              client ports on the PM plugged in the Mgnt2"
+        ::= { mgnt2GigmBoardEntry 4 }
+
+    mgnt2LineNumber OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Number of Line Ports:This OID gives the number of line
+              ports on the PM plugged in the Mgnt2"
+        ::= { mgnt2GigmBoardEntry 5 }
+
+    mgnt2GroupNumber OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Number of Groups:This OID gives the number of group
+              of clients on the PM plugged in the Mgnt2"
+        ::= { mgnt2GigmBoardEntry 6 }
+
+    mgnt2RootOIDInventory OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "root oid of the inventory leaf of the corresponding PM"
+        ::= { mgnt2GigmBoardEntry 7 }
+
+    mgnt2SlotOcc OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "PM Slot occupied:This OID gives the slots taken
+               by this PM"
+        ::= { mgnt2GigmBoardEntry 8 }
+
+
+    mgnt2SubFunctionLabel OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Sub Function Label: This OID gives the name of the sub
+                 function embedded on the Chassis. (applied only on the
+                 100G Chassis)"
+        ::= { mgnt2GigmBoardEntry 9 }
+
+
+
+    mgnt2SlotStatus OBJECT-TYPE
+        SYNTAX  Mgnt2SlotStatus
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Slot Status: This OID gives the status of the slot 
+                 in the Chassis: See Textual COnvention"
+        ::= { mgnt2GigmBoardEntry 10 }
+
+
+
+mgnt2GigmSelectedBoard OBJECT-TYPE
+  SYNTAX INTEGER(1..256)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "PM Slot number selected:PM selected for further
+        operations in the Ekinops module board tree. This
+        number is the slot number."
+  ::= { mgnt2ModulesManagement 7 }
+
+
+
+
+mgnt2GigmMibsTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2GigmMibsEntry 
+      MAX-ACCESS  not-accessible
+      STATUS  obsolete
+      DESCRIPTION
+              "List of MIBs supported by the Chassis SNMPAgent"
+      ::= { mgnt2SNMPAgentData 4 }
+
+mgnt2GigmMibsEntry OBJECT-TYPE
+        SYNTAX  Mgnt2GigmMibsEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  obsolete
+        DESCRIPTION
+              "Row definition for MIBs table"
+        INDEX   { mgnt2IndexMibs }
+        ::= { mgnt2GigmMibsTable 1 }
+    
+
+
+Mgnt2GigmMibsEntry ::=
+        SEQUENCE {
+          mgnt2IndexMibs 
+              Integer32,
+          mgnt2MibName
+              DisplayString,
+          mgnt2MibPartNumber
+              DisplayString
+        }
+
+
+    mgnt2IndexMibs OBJECT-TYPE
+        SYNTAX  Integer32(1..100)
+        MAX-ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+              "Index for MIBs table"
+        ::= { mgnt2GigmMibsEntry 1 }
+
+    mgnt2MibName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+              "MIB name:This OID gives the name of the MIBs
+              supported by the SNMP Agent"
+        ::= { mgnt2GigmMibsEntry 2 }
+
+    mgnt2MibPartNumber OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  obsolete
+        DESCRIPTION
+              "MIB Part Number:This OID gives the part number of the MIBs
+              supported by the SNMP Agent"
+        ::= { mgnt2GigmMibsEntry 3 }
+
+mgnt2GigmLogicalName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Mgnt2 name:This OID defines the name of the Mgnt2"
+  ::= { mgnt2SNMPAgentData 5 }
+
+mgnt2GigmEqptType OBJECT-TYPE
+  SYNTAX Integer32(1..128)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Equipment type:This OID defines the type of the Equipment"
+  ::= { mgnt2SNMPAgentData 6 }
+
+mgnt2GigmTrapCount OBJECT IDENTIFIER ::= { mgnt2SNMPAgentData 7 }
+
+mgnt2GigmTrapCounter OBJECT-TYPE
+  SYNTAX Integer32(1..65535)
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+        "Trap counter:This OID counts the number of trap sent"
+  ::= { mgnt2GigmTrapCount 1 }
+
+mgnt2GigmResetTrapCounter OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reset trap counter:This OID reset the trap counter to 0"
+  ::= { mgnt2GigmTrapCount 2 }
+
+
+mgnt2GigmSecurity OBJECT IDENTIFIER ::= { mgnt2SNMPAgentData 8 }
+
+mgnt2GigmRoCommunity OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "SNMP Get community:This OID defines the community for the 
+	SNMP Get function"
+  ::= { mgnt2GigmSecurity 1 }
+
+mgnt2GigmRwCommunity OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "SNMP Set community:This OID defines the community for the 
+	SNMP Set function"
+  ::= { mgnt2GigmSecurity 2 }
+
+
+mgnt2GigmTrapCommunity OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "SNMP Trap community:This OID defines the community for the 
+	SNMP Trap function"
+  ::= { mgnt2GigmSecurity 3 }
+
+
+mgnt2GigmTime OBJECT IDENTIFIER ::= { mgnt2SNMPAgentData 9 }
+
+mgnt2GigmCurrentHour OBJECT-TYPE
+  SYNTAX INTEGER(0..23)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Hour time:This OID defines the hour of the chassis' time" 
+  ::= { mgnt2GigmTime 1 }
+
+mgnt2GigmCurrentMinute OBJECT-TYPE
+  SYNTAX INTEGER(0..59)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Minute time:This OID defines the minute of the chassis' time" 
+  ::= { mgnt2GigmTime 2 }
+
+mgnt2GigmCurrentYear OBJECT-TYPE
+  SYNTAX INTEGER(1970..3000)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis year date:This OID defines the year of the chassis' date" 
+  ::= { mgnt2GigmTime 3 }
+
+mgnt2GigmCurrentMonth OBJECT-TYPE
+  SYNTAX INTEGER(1..12)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis month date:This OID defines the month of the chassis' date"
+  ::= { mgnt2GigmTime 4 }
+
+mgnt2GigmCurrentDay OBJECT-TYPE
+  SYNTAX INTEGER(1..31)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis day date:This OID defines the day of the chassis' date" 
+  ::= { mgnt2GigmTime 5 }
+
+
+
+mgnt2Authentication OBJECT IDENTIFIER ::= { mgnt2SNMPAgentData 10 }
+
+mgnt2GigmRadiusServer OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "IP address of the RADIUS server:This OID defines
+        the IP address of the external RADIUS server for authentication"
+  ::= { mgnt2Authentication 1 }
+
+mgnt2GigmRadiusPort OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "TCP port number of the RADIUS server:This OID defines
+        the TCP port number of the external RADIUS server for
+ 	authentication"
+  ::= { mgnt2Authentication 2 }
+
+mgnt2GigmRadiusSecret OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Shared secret of the RADIUS server:This OID defines
+        the shared secret password of the RADIUS server for
+ 	authentication"
+ ::= { mgnt2Authentication 3 }
+
+
+mgnt2GigmLdapHost OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-write
+  STATUS deprecated
+  DESCRIPTION
+        "IP address of the LDAP host:This OID defines
+        the IP address of the external LDAP server for authentication"
+  ::= { mgnt2Authentication 4 }
+
+mgnt2GigmLdapPort OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS deprecated
+  DESCRIPTION
+        "TCP port number of the LDAP server:This OID defines
+        the TCP port number of the external LDAP server for
+ 	authentication"
+  ::= { mgnt2Authentication 5 }
+
+
+mgnt2GigmLdapBase OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS deprecated
+  DESCRIPTION
+        "LDAP base:This OID defines the name of the search 
+        base of the LDAP server for
+ 	authentication<Help>LDAP base name spelled as follows:
+	'ou=users,ou=network,dc=yourcompany,dc=net'"
+ ::= { mgnt2Authentication 6 }
+
+mgnt2GigmLdapVersion OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS deprecated
+  DESCRIPTION
+        "Protocol number in use by the LDAP server:This OID defines
+        the protocol version used by the external LDAP server for
+ 	authentication<Help>Protocol version used by the external LDAP
+	server for authentication"
+  ::= { mgnt2Authentication 7 }
+
+mgnt2GigmLdapBindDn OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS deprecated
+  DESCRIPTION
+        "LDAP Bind DN:This OID defines the login name used to connect 
+        into the LDAP server base for
+ 	authentication<Help>LDAP binddn spelled as follows:
+	'cn=ldap_admin,dc=yourcompany,dc=net'"
+ ::= { mgnt2Authentication 8 }
+
+mgnt2GigmLdapBindPw OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-write
+   STATUS deprecated
+   DESCRIPTION
+         "Credentials to bind the LDAP server with:This OID defines
+         the credentials to bind the LDAP server with for
+  	authentication<Help>Credentials for LDAP access (bindpw)"
+  ::= { mgnt2Authentication 9 }
+
+
+mgnt2GigmLdapScope OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS deprecated
+  DESCRIPTION
+        "Scope for LDAP base search:This OID defines
+        the search scope for an LDAP base search
+	<Help>LDAP search scope"
+ ::= { mgnt2Authentication 10 }
+
+mgnt2GigmLdapPamPasswd OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS deprecated
+  DESCRIPTION
+        "PAM password handling:This OID defines
+        the way the PAM password is handled for LDAP authentication
+	<Help>The 'pam_password' option sould be one of the following:
+	'clear', 'crypt', 'md5', 'racf', 'exop'"
+ ::= { mgnt2Authentication 11 }
+
+mgnt2GigmAuthenticationType OBJECT-TYPE
+  SYNTAX Mgnt2AuthTypeValues
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Authentication type in use"
+  ::= { mgnt2Authentication 12 }
+
+
+-- *****************************************************************
+--
+-- MGNT2 Software Management tables
+--
+-- *****************************************************************
+
+mgnt2DwlUploadingTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2DwlUploadingEntry
+      MAX-ACCESS  not-accessible
+      STATUS  deprecated
+      DESCRIPTION
+              "SNMP Agent SW packages in ram: List of the SNMP
+              agent software packages available in /ram for
+              download on the Chassis managment module flash"
+      ::= { mgnt2SoftwareManagement 1 }
+
+mgnt2DwlUploadingEntry OBJECT-TYPE
+        SYNTAX  Mgnt2DwlUploadingEntry
+        MAX-ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+              "Row definition for the package uploading table"
+        INDEX   { mgnt2IndexUpload }
+        ::= { mgnt2DwlUploadingTable 1 }
+
+Mgnt2DwlUploadingEntry::=
+        SEQUENCE {
+          mgnt2IndexUpload
+              Integer32,
+          mgnt2DwlUploadFileName
+              DisplayString,
+          mgnt2ImmediateReplacement
+              EkiState,
+          mgnt2FileUpload
+	      	  EkiOnOff,
+          mgnt2DeletePackageFromRam
+              EkiOnOff,
+          mgnt2FlashingInProgress
+              EkiOnOff
+        }
+
+    mgnt2IndexUpload OBJECT-TYPE
+        SYNTAX  Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Index for uploading table"
+        ::= { mgnt2DwlUploadingEntry 1 }
+
+    mgnt2DwlUploadFileName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Package filename in RAM:This OID gives the name of
+              the SNMP agent software packages in RAM"
+        ::= { mgnt2DwlUploadingEntry 2 }
+
+    mgnt2ImmediateReplacement OBJECT-TYPE
+        SYNTAX  EkiState
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Immediat Agent Replacement:This OID indicates to
+              switch to selected SNMP agent immediately or after
+              reset of the MGNT2"
+        ::= { mgnt2DwlUploadingEntry 3 }
+
+    mgnt2FileUpload OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Agent File Upload:This OID validates the upload of
+              the SNMP agent from RAM to FLASH"
+        ::= { mgnt2DwlUploadingEntry 4 }
+
+    mgnt2DeletePackageFromRam OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Delete Package from RAM:This OID requests to delete
+              the SNMP Agent SW package from RAM"
+        ::= { mgnt2DwlUploadingEntry 5 }
+
+    mgnt2FlashingInProgress OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Flashing in Progress:This OID indicates whether there
+              is a file upload to FLASH in progress"
+        ::= { mgnt2DwlUploadingEntry 6 }
+
+
+
+mgnt2DwlPackageTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2DwlPackageEntry
+      MAX-ACCESS  not-accessible
+      STATUS  deprecated
+      DESCRIPTION
+              "List of SNMP agent software packages 
+               present in flash memory"
+      ::= { mgnt2SoftwareManagement 2 }
+
+mgnt2DwlPackageEntry OBJECT-TYPE
+        SYNTAX  Mgnt2DwlPackageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+              "Row definition for the package management table"
+        INDEX   { mgnt2IndexPackage }
+        ::= { mgnt2DwlPackageTable 1 }
+
+Mgnt2DwlPackageEntry::=
+        SEQUENCE {
+          mgnt2IndexPackage
+              Integer32,
+          mgnt2DwlPackageFileName
+              DisplayString,
+          mgnt2ExtractedPack 
+              EkiOnOff,
+          mgnt2SwitchTo
+              EkiOnOff,
+          mgnt2Immediate
+              EkiOnOff,
+          mgnt2DeletePackageFromFlash
+              EkiOnOff,
+          mgnt2PackageExtractionInProgress
+              EkiOnOff
+        }
+
+    mgnt2IndexPackage OBJECT-TYPE
+        SYNTAX  Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Index for package management table"
+        ::= { mgnt2DwlPackageEntry 1 }
+
+    mgnt2DwlPackageFileName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Package File name in FLASH:This OID gives the name
+              of the SNMP agent software package in FLASH"
+        ::= { mgnt2DwlPackageEntry 2 }
+
+    mgnt2ExtractedPack OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Extracted SNMP agent software pack.: Indicates
+              whether the package is currently extracted in the FLASH.
+              If it is, it must not be deleted"
+        ::= { mgnt2DwlPackageEntry 3 }
+
+    mgnt2SwitchTo OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Switch to package:This OID activates the SNMP Agent
+              Software package"
+        ::= { mgnt2DwlPackageEntry 4 }
+
+    mgnt2Immediate OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Immediate SNMP agent activation: This OID indicates
+              whether the package is scheduled for immediate
+              activation or activation will take place following the
+              next reset"
+        ::= { mgnt2DwlPackageEntry 5 }
+
+    mgnt2DeletePackageFromFlash OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Delete package from FLASH:This OID deletes the SNMP
+              agent software package from the FLASH"
+        ::= { mgnt2DwlPackageEntry 6 }
+
+    mgnt2PackageExtractionInProgress OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Package extraction in progress:This OID indicates that
+              a SNMP agent software activation is in progress"
+        ::= { mgnt2DwlPackageEntry 7 }
+
+mgnt2DwlUploadingTableUpdate OBJECT-TYPE
+      SYNTAX  EkiOnOff
+      MAX-ACCESS  read-write
+      STATUS  deprecated
+      DESCRIPTION
+              "Uploading Table update:This OID updates the contents of
+              the uploading table"
+      ::= { mgnt2SoftwareManagement 3 }
+      
+      
+
+
+mgnt2LoadPMTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2LoadPMEntry
+      MAX-ACCESS  not-accessible
+      STATUS  deprecated
+      DESCRIPTION
+              "List of the PM module software files (GW/SW)
+              present on the repository"
+      ::= { mgnt2SoftwareManagement 4 }
+
+
+mgnt2LoadPMEntry OBJECT-TYPE
+        SYNTAX  Mgnt2LoadPMEntry
+        MAX-ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+              "Row definition for the LOAD article table"
+        INDEX   { mgnt2LoadPMIndex }
+        ::= { mgnt2LoadPMTable 1 }
+
+Mgnt2LoadPMEntry::=
+        SEQUENCE {
+          mgnt2LoadPMIndex 
+              Integer32,
+          mgnt2LoadFileName
+              DisplayString,
+          mgnt2LoadFileType
+              EkiLoadGWSW,
+          mgnt2LoadState
+              EkiLoadState,
+          mgnt2LoadModuleNumber
+              Integer32,
+          mgnt2LoadResetMethod
+              EkiLoadPermutMethod,
+          mgnt2LoadResetMode
+              EkiLoadPermutMode,
+          mgnt2LoadBankNumber
+              Integer32,
+          mgnt2LoadDownloadProgress
+              Integer32,
+          mgnt2LoadTransfer
+              EkiOnOff,
+          mgnt2LoadDelete
+              EkiOnOff
+        }
+
+    mgnt2LoadPMIndex OBJECT-TYPE
+        SYNTAX  Integer32(0..32)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Index for Load article table"
+        ::= { mgnt2LoadPMEntry 1 }
+
+    mgnt2LoadFileName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "PM Upgrade filename:This OID gives the name of
+              the file"
+        ::= { mgnt2LoadPMEntry 2 }
+
+    mgnt2LoadFileType OBJECT-TYPE
+        SYNTAX  EkiLoadGWSW
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade file type:This OID gives the type of
+              file (gateware or software)"
+        ::= { mgnt2LoadPMEntry 3 }
+
+    mgnt2LoadState OBJECT-TYPE
+        SYNTAX  EkiLoadState
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade status:This OID gives the status of the
+              selected Load file"
+        ::= { mgnt2LoadPMEntry 4 }
+
+    mgnt2LoadModuleNumber OBJECT-TYPE
+        SYNTAX  Integer32(1..8)
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "PM ugprade target:This OID defines the slot number
+              of the PM to upgrade"
+        ::= { mgnt2LoadPMEntry 5 }
+
+    mgnt2LoadResetMethod OBJECT-TYPE
+        SYNTAX  EkiLoadPermutMethod
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade reset method:This OID defines the reset
+              method (manual, immediate or scheduled)"
+        ::= { mgnt2LoadPMEntry 6 }
+
+    mgnt2LoadResetMode OBJECT-TYPE
+        SYNTAX  EkiLoadPermutMode
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade reset mode:This OID defines the type of
+              reset (cold or warm)"
+        ::= { mgnt2LoadPMEntry 7 }
+
+    mgnt2LoadBankNumber OBJECT-TYPE
+        SYNTAX  Integer32(0..4)
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade bank number:This OID defines the target
+               bank number in the PM's flash"
+        ::= { mgnt2LoadPMEntry 8 }
+
+    mgnt2LoadDownloadProgress OBJECT-TYPE
+        SYNTAX  Integer32(0..100)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade progress:This OID gives the upgrade
+              progress (percentage)"
+        ::= { mgnt2LoadPMEntry 9 }
+        
+    mgnt2LoadTransfer OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade transfer:This OID launchs the transfer
+              of the associated file to the selected PM's flash"
+        ::= { mgnt2LoadPMEntry 10 }
+
+    mgnt2LoadDelete OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "PM upgrade delete file:This OID deletes the
+              associated file from the RAM of the management board"
+        ::= { mgnt2LoadPMEntry 11 }
+
+
+mgnt2LoadPMTableUpdate OBJECT-TYPE
+      SYNTAX  EkiOnOff
+      MAX-ACCESS  read-write
+      STATUS  deprecated
+      DESCRIPTION
+              "Load PM Table update:This OID updates the contents
+              of the Load table"
+      ::= { mgnt2SoftwareManagement 5 }
+
+
+
+mgnt2DwlEkicraftPkgTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2DwlEkicraftPkgEntry
+      MAX-ACCESS  not-accessible
+      STATUS  deprecated
+      DESCRIPTION
+              "List of Ekicraft software packages 
+               present in flash memory"
+      ::= { mgnt2SoftwareManagement 6 }
+
+mgnt2DwlEkicraftPkgEntry OBJECT-TYPE
+        SYNTAX  Mgnt2DwlEkicraftPkgEntry
+        MAX-ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+              "Row definition for the package management table"
+        INDEX   { mgnt2IndexEkicraftPkg }
+        ::= { mgnt2DwlEkicraftPkgTable 1 }
+
+Mgnt2DwlEkicraftPkgEntry::=
+        SEQUENCE {
+          mgnt2IndexEkicraftPkg
+              Integer32,
+          mgnt2DwlEkicraftPkgFileName
+              DisplayString,
+          mgnt2DwlEkicraftExtractedPack 
+              EkiOnOff,
+          mgnt2DwlEkicraftSwitchTo
+              EkiOnOff,
+          mgnt2DwlEkicraftImmediate
+              EkiOnOff,
+          mgnt2DeleteEkicraftPkgFromFlash
+              EkiOnOff,
+          mgnt2EkicraftPkgExtractionInProgress
+              EkiOnOff
+        }
+
+    mgnt2IndexEkicraftPkg OBJECT-TYPE
+        SYNTAX  Integer32(0..4)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Index for Ekicraft package management table"
+        ::= { mgnt2DwlEkicraftPkgEntry 1 }
+
+    mgnt2DwlEkicraftPkgFileName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Package File name in FLASH:This OID gives the name
+              of the Ekicraft software package in FLASH"
+        ::= { mgnt2DwlEkicraftPkgEntry 2 }
+
+    mgnt2DwlEkicraftExtractedPack OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Extracted Ekicraft software pack.: Indicates
+              whether the package is currently extracted in the FLASH.
+              If it is, it must not be deleted"
+        ::= { mgnt2DwlEkicraftPkgEntry 3 }
+
+    mgnt2DwlEkicraftSwitchTo OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Switch to package:This OID activates the Ekicraft
+              Software package"
+        ::= { mgnt2DwlEkicraftPkgEntry 4 }
+
+    mgnt2DwlEkicraftImmediate OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Immediate Ekicraft activation: This OID indicates
+              whether the package is scheduled for immediate
+              activation or activation will take place following the
+              next reset"
+        ::= { mgnt2DwlEkicraftPkgEntry 5 }
+
+    mgnt2DeleteEkicraftPkgFromFlash OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Delete package from FLASH:This OID deletes the Ekicraft
+              software package from the FLASH"
+        ::= { mgnt2DwlEkicraftPkgEntry 6 }
+
+    mgnt2EkicraftPkgExtractionInProgress OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Package extraction in progress:This OID indicates that
+              an Ekicraft activation is in progress"
+        ::= { mgnt2DwlEkicraftPkgEntry 7 }
+
+      
+-- *****************************************************************
+--
+-- Config management tables
+--
+-- *****************************************************************
+
+mgnt2CnfUploadConfigFilesTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2CnfUploadConfigFilesEntry
+      MAX-ACCESS  not-accessible
+      STATUS  deprecated
+      DESCRIPTION
+              "List of configuration files uploaded to RAM"
+      ::= { mgnt2ConfigManagement 1 }
+
+mgnt2CnfUploadConfigFilesEntry OBJECT-TYPE
+        SYNTAX  Mgnt2CnfUploadConfigFilesEntry
+        MAX-ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+              "Row definition for the package uploading table"
+        INDEX   { mgnt2CnfUploadConfigIndex }
+        ::= { mgnt2CnfUploadConfigFilesTable 1 }
+
+Mgnt2CnfUploadConfigFilesEntry::=
+        SEQUENCE {
+          mgnt2CnfUploadConfigIndex
+              Integer32,
+          mgnt2CnfConfigFileName
+              DisplayString,
+          mgnt2CnfConfigSlot
+              Integer32,
+          mgnt2CnfConfigUpload
+	      	  EkiOnOff,
+          mgnt2CnfDeleteConfigFile
+              EkiOnOff
+        }
+
+    mgnt2CnfUploadConfigIndex OBJECT-TYPE
+        SYNTAX  Integer32(0..16)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Index of config files"
+        ::= { mgnt2CnfUploadConfigFilesEntry 1 }
+
+    mgnt2CnfConfigFileName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration filename in RAM:This OID gives the
+              name of the configuration file in RAM"
+        ::= { mgnt2CnfUploadConfigFilesEntry 2 }
+
+    mgnt2CnfConfigSlot OBJECT-TYPE
+        SYNTAX  Integer32(0..3)
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration target:This OID defines the target
+              slot number for the configuration file"
+        ::= { mgnt2CnfUploadConfigFilesEntry 3 }
+
+    mgnt2CnfConfigUpload OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration Upload:This OID uploads the
+              configuration file to the specified slot number
+              in the PM FLASH"
+        ::= { mgnt2CnfUploadConfigFilesEntry 4 }
+
+    mgnt2CnfDeleteConfigFile OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration delete from RAM:This OID deletes the
+              configuration file from RAM"
+        ::= { mgnt2CnfUploadConfigFilesEntry 5 }
+
+
+
+
+mgnt2CnfManageConfigFilesTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2CnfManageConfigFilesEntry
+      MAX-ACCESS  not-accessible
+      STATUS  deprecated
+      DESCRIPTION
+              "List of configuration files uploaded to RAM"
+      ::= { mgnt2ConfigManagement 2 }
+
+mgnt2CnfManageConfigFilesEntry OBJECT-TYPE
+        SYNTAX  Mgnt2CnfManageConfigFilesEntry
+        MAX-ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+              "Row definition for the package uploading table"
+        INDEX   { mgnt2CnfManageConfigIndex }
+        ::= { mgnt2CnfManageConfigFilesTable 1 }
+
+Mgnt2CnfManageConfigFilesEntry::=
+        SEQUENCE {
+          mgnt2CnfManageConfigIndex
+              Integer32,
+          mgnt2CnfManageConfigFileID
+              DisplayString,
+          mgnt2CnfManageConfigFileName
+              DisplayString,
+          mgnt2CnfModuleSlotNumber
+              Integer32,
+          mgnt2CnfBackupConfig
+	      	  EkiOnOff,
+          mgnt2CnfRestoreConfig
+              EkiOnOff,
+          mgnt2CnfExportConfig
+              EkiOnOff,
+	  mgnt2CnfDeleteConfig
+              EkiOnOff
+        }
+
+    mgnt2CnfManageConfigIndex OBJECT-TYPE
+        SYNTAX  Integer32(0..16)
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+              "Index of config file slots"
+        ::= { mgnt2CnfManageConfigFilesEntry 1 }
+
+    mgnt2CnfManageConfigFileID OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration file ID in FLASH:This OID gives the
+              ID of the configuration file in MGNT2 FLASH"
+        ::= { mgnt2CnfManageConfigFilesEntry 2 }
+
+    mgnt2CnfManageConfigFileName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration file name in FLASH:This OID gives the
+              name of the configuration file in MGNT2 FLASH"
+        ::= { mgnt2CnfManageConfigFilesEntry 3 }
+
+    mgnt2CnfModuleSlotNumber OBJECT-TYPE
+        SYNTAX  Integer32(3..6)
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration target:This OID defines the target
+              module slot number for the configuration file"
+        ::= { mgnt2CnfManageConfigFilesEntry 4 }
+
+    mgnt2CnfBackupConfig OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration backup:This OID backups the
+              configuration of the specified module to the
+              selected file in MGNT2 FLASH"
+        ::= { mgnt2CnfManageConfigFilesEntry 5 }
+
+    mgnt2CnfRestoreConfig OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration Restore:This OID restores the
+              configuration of the specified module from the
+              selected file in MGNT2 FLASH"
+        ::= { mgnt2CnfManageConfigFilesEntry 6 }
+
+    mgnt2CnfExportConfig OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration Export:This OID exports the selected
+              file in MGNT2 FLASH to a file in RAM"
+        ::= { mgnt2CnfManageConfigFilesEntry 7 }
+
+
+    mgnt2CnfDeleteConfig OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+              "Configuration delete from FLASH:This OID deletes the
+              configuration file from the MGNT2 FLASH"
+        ::= { mgnt2CnfManageConfigFilesEntry 8 }
+
+      
+-- *****************************************************************
+--
+-- MGNT2 Remote inventory
+--
+-- *****************************************************************
+
+mgnt2RinvHwPlatform OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Hardware inventory:This OID gives the
+        Hardware inventory of the Mgnt2 management module"
+  ::= { mgnt2RemoteInventory 1 }
+
+mgnt2RinvSoftwarePackage OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Software package inventory:this OID gives
+        the Software package inventory of the Mgnt2
+        management module"
+  ::= { mgnt2RemoteInventory 2 }
+
+mgnt2RinvGateware OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Gateware inventory:This OID gives the
+        gateware inventory of the Mgnt2 management module"
+  ::= { mgnt2RemoteInventory 3 }
+
+
+mgnt2RinvAgent OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Software inventory:This OID gives the
+        software inventory of the Mgnt2 management module"
+  ::= { mgnt2RemoteInventory 4 }
+
+mgnt2RinvCraft OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Craft inventory:This OID gives the
+        craft inventory of the Mgnt2 management module"
+  ::= { mgnt2RemoteInventory 5 }
+
+mgnt2RinvLinux OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Chassis Linux inventory:This OID gives the
+        linux inventory of the Mgnt2 management module"
+  ::= { mgnt2RemoteInventory 6 }
+
+EkiPlugInState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Plug-in state"
+    SYNTAX INTEGER {
+		absent(0),
+		loaded(1),
+		versionError(2),
+		symbolError(3)
+        }  
+
+mgnt2GigmPlugInTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2GigmPlugInEntry 
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of Plug-ins present"
+      ::= { mgnt2RemoteInventory 7 }
+
+mgnt2GigmPlugInEntry OBJECT-TYPE
+        SYNTAX  Mgnt2GigmPlugInEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row Definition for the Plug-ins table"
+        INDEX   { mgnt2IndexPlugIns }
+        ::= { mgnt2GigmPlugInTable 1 }
+
+Mgnt2GigmPlugInEntry ::=
+        SEQUENCE {
+          mgnt2IndexPlugIns 
+              Integer32,
+          mgnt2PlugInRinv
+              DisplayString,
+	  mgnt2PollingPresent
+              EkiPlugInState,
+	  mgnt2SnmpPresent
+              EkiPlugInState  
+        }
+
+    mgnt2IndexPlugIns OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for PMs table"
+        ::= { mgnt2GigmPlugInEntry 1 }
+
+
+    mgnt2PlugInRinv OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Plug-in RI:This OID gives the remote inventory of the plug-in"
+        ::= { mgnt2GigmPlugInEntry 2 }
+
+    mgnt2PollingPresent OBJECT-TYPE
+        SYNTAX  EkiPlugInState
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Polling present:This OID gives the presence of the polling plug-in"
+        ::= { mgnt2GigmPlugInEntry 3 }
+
+    mgnt2SnmpPresent OBJECT-TYPE
+        SYNTAX  EkiPlugInState
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Snmp present:This OID gives the presence of the snmp plug-in"
+        ::= { mgnt2GigmPlugInEntry 4 }
+
+mgnt2RinvBackpanel OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Backpanel inventory:This OID gives the
+        Backpanel inventory of the chassis"
+  ::= { mgnt2RemoteInventory 8 }
+
+mgnt2RinvFan OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Fan inventory:This OID gives the
+        fan inventory of the chassis"
+  ::= { mgnt2RemoteInventory 9 }
+
+mgnt2RinvUboot OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "U-Boot inventory:This OID gives the
+        U-Boot inventory"
+  ::= { mgnt2RemoteInventory 10 }
+
+-- *****************************************************************
+--
+-- MGNT2 Error counters
+--
+-- *****************************************************************
+
+
+mgnt2GigmErrorCounterTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2GigmErrorCounterEntry 
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of error counters"
+      ::= { mgnt2ErrorCounters 1 }
+
+mgnt2GigmErrorCounterEntry OBJECT-TYPE
+        SYNTAX  Mgnt2GigmErrorCounterEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row Definition for the error counters table"
+        INDEX   { mgnt2IndexErrorCounter }
+        ::= { mgnt2GigmErrorCounterTable 1 }
+
+Mgnt2GigmErrorCounterEntry ::=
+        SEQUENCE {
+          mgnt2IndexErrorCounter 
+              Integer32,
+          mgnt2ErrorCounterSlotNumber
+              Integer32,
+	  mgnt2ErrorCounterValue
+              Integer32
+        }
+
+    mgnt2IndexErrorCounter OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for error counters table"
+        ::= { mgnt2GigmErrorCounterEntry 1 }
+
+
+    mgnt2ErrorCounterSlotNumber OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Slot number:This OID gives the slot number for the corresponding counter"
+        ::= { mgnt2GigmErrorCounterEntry 2 }
+
+    mgnt2ErrorCounterValue OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Count value:This OID gives the value of the error counter"
+        ::= { mgnt2GigmErrorCounterEntry 3 }
+
+
+mgnt2GigmResetErrorCounters OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Reset error counters:This OID reset the error counters to 0"
+  ::= { mgnt2ErrorCounters 2 }
+
+
+-- *****************************************************************
+--
+-- MGNT2 Perf objects
+--
+-- *****************************************************************
+
+mgnt2PerfCapabilityTable OBJECT-TYPE
+      SYNTAX  SEQUENCE OF Mgnt2PerfCapabilityEntry 
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+              "List of Perf capability of PMs plugged in the Chassis"
+      ::= { mgnt2Perf 1 }
+
+mgnt2PerfCapabilityEntry OBJECT-TYPE
+        SYNTAX  Mgnt2PerfCapabilityEntry 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+              "Row Definition for the Perf capability table"
+        INDEX   { mgnt2PerfCapIndexBoards }
+        ::= { mgnt2PerfCapabilityTable 1 }
+    
+
+
+Mgnt2PerfCapabilityEntry ::=
+        SEQUENCE {
+          mgnt2PerfCapIndexBoards 
+              Integer32,
+	        mgnt2PerfCapPosition
+              Integer32,
+          mgnt2PerfCapName
+              DisplayString,
+	        mgnt2PerfCapStatus
+              EkiOnOff,
+	        mgnt2PerfCapOidEnable
+              OBJECT IDENTIFIER
+        }
+
+
+    mgnt2PerfCapIndexBoards OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Index for Perf cap table"
+        ::= { mgnt2PerfCapabilityEntry 1 }
+
+    mgnt2PerfCapPosition OBJECT-TYPE
+        SYNTAX  Integer32(1..32)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "PM Slot number:This OID gives the slot number in
+              which the PM is plugged"
+        ::= { mgnt2PerfCapabilityEntry 2 }
+
+    mgnt2PerfCapName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "PM name:This OID gives the name of the PM plugged
+              in the Mgnt2"
+        ::= { mgnt2PerfCapabilityEntry 3 }
+
+    mgnt2PerfCapStatus OBJECT-TYPE
+        SYNTAX  EkiOnOff
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "Status of the perf cap:This OID gives the capability
+              of the pm to do performance"
+        ::= { mgnt2PerfCapabilityEntry 4 }
+
+    mgnt2PerfCapOidEnable OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "OID of the object perf enable:This OID gives the OID of 
+               the perf enable object of the correspondind mib of the module"
+        ::= { mgnt2PerfCapabilityEntry 5 }
+
+
+
+
+
+mgnt2GigmPerf15minSync OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "15 min sync perf : this oid send a 15min sync to all modules"
+  ::= { mgnt2Perf 2 }
+
+mgnt2GigmPerf24hSync OBJECT-TYPE
+  SYNTAX EkiOnOff
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "15 min sync perf : this oid send a 24h sync to all modules"
+  ::= { mgnt2Perf 3 }
+
+mgnt2PerfResyncNMS OBJECT-TYPE
+  SYNTAX Mgnt2PerfResyncValues
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+        "Resync Perf : this oid allows to create an historical perf file for all modules"
+  ::= { mgnt2Perf 4 }
+
+
+-- *****************************************************************
+--
+-- MGNT2 Board management
+--
+-- *****************************************************************
+
+mgnt2alarms OBJECT IDENTIFIER ::= { mgnt2Hardware 1}
+mgnt2controls OBJECT IDENTIFIER ::= { mgnt2Hardware 2}
+mgnt2config OBJECT IDENTIFIER ::= { mgnt2Hardware 3}
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     ALARMS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm0 article
+--- *****************************************************
+mgnt2AlmsynthAlm0 OBJECT IDENTIFIER ::= { mgnt2alarms 0 }
+
+
+
+
+mgnt2AlmMgntDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Mgnt Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition on the Management 
+        board  <Help>  Status of the MGNT 
+        Fuse B <Condtype> MGNT_DEF_FUSE_B 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmsynthAlm0 16 }
+
+
+
+mgnt2AlmMgntDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Mgnt Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition on the Management 
+        board  <Help>  Status of the MGNT 
+        Fuse A <Condtype> MGNT_DEF_FUSE_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmsynthAlm0 15 }
+
+
+
+mgnt2AlmDef48b OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input B Present :This OID 
+        indicates that there is not input 
+        power on the right power connector 
+        (B)  <Help>  This alarm indicates 
+        if the power input B is present 
+        (right power connector) <Condtype> 
+        DEF_48B <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm0 12 }
+
+
+
+mgnt2AlmDef48a OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Power Input A Present :This OID 
+        indicates that there is not input 
+        power on the right power connector 
+        (A)  <Help>  This alarm indicates 
+        if the power input B is present 
+        (left power connector) <Condtype> 
+        DEF_48A <Probcause> powerProblem 
+        (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm0 11 }
+
+
+
+mgnt2AlmFansFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Fan Module Failure :This 
+        OID indicates that at least one 
+        of the three FAN unit of the FAN 
+        module is in fail condition <Condtype> 
+        FANS_FAILURE <Probcause> other(1) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm0 10 }
+
+
+
+mgnt2AlmAbsFailure OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Management Module Failure 
+        :This OID indicates that the Chassis 
+        Management module is in fail condition 
+        <Condtype> ABS_FAILURE <Probcause> 
+        other(1) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm0 9 }
+
+
+
+--- *****************************************************
+---     LEAF for the synthAlm1 article
+--- *****************************************************
+mgnt2AlmsynthAlm1 OBJECT IDENTIFIER ::= { mgnt2alarms 1 }
+
+
+
+
+mgnt2AlmAcknowledge OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm Ack.  :This OID indicates 
+        the alarms have been acknowledged 
+        by the user (locally or remotely) 
+          <Help>  This status indicates 
+        the alarms have been acknowledged 
+        by the user (locally or remotely) 
+        <Condtype> ACKNOWLEDGE <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm1 16 }
+
+
+
+mgnt2AlmCritVisual OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Critical Chassis Alarm :This OID 
+        indicates at least one Critical 
+        alarm is active on the complete 
+        chassis (including TR-FAN, MGNT 
+        and PM)  <Help>  This alarm indicates 
+        at least one Critical alarm is
+         active on the complete chassis 
+        (including TR-FAN, MGNT and PM)
+ 
+        <Condtype> CRIT_VISUAL <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm1 3 }
+
+
+
+mgnt2AlmUrgVisual OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Major Chassis Alarm  :This OID 
+        indicates at least one Major alarm 
+        is active on the complete chassis 
+        (including TR-FAN, MGNT and PM) 
+          <Help>  This alarm indicates
+         at least one Major alarm is active 
+        on the complete chassis (including 
+        TR-FAN, MGNT and PM) <Condtype> 
+        URG_VISUAL <Probcause> other(1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm1 2 }
+
+
+
+mgnt2AlmNurgVisual OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Minor Chassis Alarm  :This OID 
+        indicates at least one Minor alarm 
+        is active on the complete chassis 
+        (including TR-FAN, MGNT and PM) 
+         <Help>  This alarm indicates at 
+        least one Minor alarm is active 
+        on the complete chassis (including 
+        TR-FAN, MGNT and PM) <Condtype> 
+        NURG_VISUAL <Probcause> other(1) 
+        <Alarmtype> other (1) <Polarity> 
+        (2) 
+        "
+	  ::= { mgnt2AlmsynthAlm1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the boardMgmntSet1 article
+--- *****************************************************
+mgnt2AlmboardMgmntSet1 OBJECT IDENTIFIER ::= { mgnt2alarms 16 }
+
+
+
+
+mgnt2AlmPmFanAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN module present in Chassis
+         :This OID indicates the presence 
+        of the FAN module in the Chassis. 
+         <Help>  This alarm indicates if 
+        the FAN module is detected in the 
+        chassis. <Condtype> PM_FAN_ABSENT 
+        <Probcause> other(1) <Alarmtype> 
+        equipmentAlarm (5)  <Polarity>
+         (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 14 }
+
+
+
+mgnt2AlmPmSlot11Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 11
+         :This OID indicates the presence 
+        of a PM in Slot 11 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 11
+         <Condtype> PM_SLOT11_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 12 }
+
+
+
+mgnt2AlmPmSlot10Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 10
+         :This OID indicates the presence 
+        of a PM in Slot 10 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 10
+         <Condtype> PM_SLOT10_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 11 }
+
+
+
+mgnt2AlmPmSlot9Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 9 :This 
+        OID indicates the presence of a 
+        PM in Slot 9 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 9
+         <Condtype> PM_SLOT9_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 10 }
+
+
+
+mgnt2AlmPmSlot8Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 8 :This 
+        OID indicates the presence of a 
+        PM in Slot 8 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 8
+         <Condtype> PM_SLOT8_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 9 }
+
+
+
+mgnt2AlmPmSlot7Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 7 :This 
+        OID indicates the presence of a 
+        PM in Slot 7 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 7
+         <Condtype> PM_SLOT7_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 8 }
+
+
+
+mgnt2AlmPmSlot6Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 6 :This 
+        OID indicates the presence of a 
+        PM in Slot 6 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 6
+         <Condtype> PM_SLOT6_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 7 }
+
+
+
+mgnt2AlmPmSlot5Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 5 :This 
+        OID indicates the presence of a 
+        PM in Slot 5 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 5
+         <Condtype> PM_SLOT5_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 6 }
+
+
+
+mgnt2AlmPmSlot4Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 4 :This 
+        OID indicates the presence of a 
+        PM in Slot 4 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 4
+         <Condtype> PM_SLOT4_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 5 }
+
+
+
+mgnt2AlmPmSlot3Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 3 :This 
+        OID indicates the presence of a 
+        PM in Slot 3 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 3
+         <Condtype> PM_SLOT3_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 4 }
+
+
+
+mgnt2AlmPmSlot2Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 2 :This 
+        OID indicates the presence of a 
+        PM in Slot 2 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 2
+         <Condtype> PM_SLOT2_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 3 }
+
+
+
+mgnt2AlmPmSlot1Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 1 :This 
+        OID indicates the presence of a 
+        PM in Slot 1 of the Chassis . 
+         <Help>  This status indicates
+         if a PM is detected in slot 1
+         <Condtype> PM_SLOT1_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet1 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the boardMgmntSet2 article
+--- *****************************************************
+mgnt2AlmboardMgmntSet2 OBJECT IDENTIFIER ::= { mgnt2alarms 17 }
+
+
+
+
+mgnt2AlmPmSlot20Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 20
+         :This OID indicates the presence 
+        of a PM in Slot 20 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 20
+         <Condtype> PM_SLOT20_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 9 }
+
+
+
+mgnt2AlmPmSlot19Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 19
+         :This OID indicates the presence 
+        of a PM in Slot 19 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 19
+         <Condtype> PM_SLOT19_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 8 }
+
+
+
+mgnt2AlmPmSlot18Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 18
+         :This OID indicates the presence 
+        of a PM in Slot 18 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 18
+         <Condtype> PM_SLOT18_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 7 }
+
+
+
+mgnt2AlmPmSlot17Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 17
+         :This OID indicates the presence 
+        of a PM in Slot 17 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 17
+         <Condtype> PM_SLOT17_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 6 }
+
+
+
+mgnt2AlmPmSlot16Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 16
+         :This OID indicates the presence 
+        of a PM in Slot 16 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 16
+         <Condtype> PM_SLOT16_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 5 }
+
+
+
+mgnt2AlmPmSlot15Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 15
+         :This OID indicates the presence 
+        of a PM in Slot 15 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 15
+         <Condtype> PM_SLOT15_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 4 }
+
+
+
+mgnt2AlmPmSlot14Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 14
+         :This OID indicates the presence 
+        of a PM in Slot 14 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 14
+         <Condtype> PM_SLOT14_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 3 }
+
+
+
+mgnt2AlmPmSlot13Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 13
+         :This OID indicates the presence 
+        of a PM in Slot 13 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 13
+         <Condtype> PM_SLOT13_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 2 }
+
+
+
+mgnt2AlmPmSlot12Absent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        PM present in Chassis slot 12
+         :This OID indicates the presence 
+        of a PM in Slot 12 of the Chassis 
+        .  <Help>  This status indicates 
+        if a PM is detected in slot 12
+         <Condtype> PM_SLOT12_ABSENT <Probcause> 
+        other(1) <Alarmtype> other (1)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmboardMgmntSet2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the fanMgmnt article
+--- *****************************************************
+mgnt2AlmfanMgmnt OBJECT IDENTIFIER ::= { mgnt2alarms 20 }
+
+
+
+
+mgnt2AlmFanFilterAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Dust Filter Presence :This OID 
+        indicates that the dust filter
+         is not present<Help>  This alarm 
+        indicates if the Dust Filter is 
+        detected in the chassis. <Condtype> 
+        FAN_FILTER_ABSENT <Probcause> other(1) 
+        <Alarmtype> equipmentAlarm (5)
+         <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanMgmnt 16 }
+
+
+
+mgnt2AlmPbFan6Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #6 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 6. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN #6 is in fail condition 
+        <Condtype> PB_FAN6_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanMgmnt 7 }
+
+
+
+mgnt2AlmPbFan5Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #5 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 5. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN #5 is in fail condition 
+        <Condtype> PB_FAN5_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanMgmnt 6 }
+
+
+
+mgnt2AlmPbFan4Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #4 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 4. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN #4 is in fail condition 
+        <Condtype> PB_FAN4_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanMgmnt 5 }
+
+
+
+mgnt2AlmPbFan3Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #3 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 3. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN #3 is in fail condition 
+        <Condtype> PB_FAN3_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanMgmnt 4 }
+
+
+
+mgnt2AlmPbFan2Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #2 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 2. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN #2 is in fail condition 
+        <Condtype> PB_FAN2_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanMgmnt 3 }
+
+
+
+mgnt2AlmPbFan1Fail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Unit #1 Failed On Fan Module 
+        :This OID indicates a failure on 
+        fan 1. Removal of the fan unit
+         or no rotation sets the OID. 
+         <Help>  This alarm indicates if 
+        the FAN #1 is in fail condition 
+        <Condtype> PB_FAN1_FAIL <Probcause> 
+        heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanMgmnt 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the fanPwrMgmnt article
+--- *****************************************************
+mgnt2AlmfanPwrMgmnt OBJECT IDENTIFIER ::= { mgnt2alarms 24 }
+
+
+
+
+mgnt2AlmFanDefFuseB OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Fuse B Fail :This OID indicates 
+        that the fuse of the power input 
+        B is in fail condition on the Fan 
+        board  <Help>  Status of the FAN 
+        Fuse B <Condtype> FAN_DEF_FUSE_B 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmfanPwrMgmnt 16 }
+
+
+
+mgnt2AlmFanDefFuseA OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Fuse A Fail :This OID indicates 
+        that the fuse of the power input 
+        A is in fail condition on the Fan 
+        board  <Help>  Status of the FAN 
+        Fuse A <Condtype> FAN_DEF_FUSE_A 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmfanPwrMgmnt 15 }
+
+
+
+mgnt2AlmFanPwrFail1 OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Main Power :This OID indicates 
+        a failure on the main power of
+          the FAN module  <Help>  This
+         alarm indicates if one of the
+         tow main power convert of the
+         FAN module is in fail condition 
+        <Condtype> FAN_PWR_FAIL_1 <Probcause> 
+        powerProblem (36) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmfanPwrMgmnt 13 }
+
+
+
+mgnt2AlmFanPwrProtOn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fan Backup Power :This OID indicates 
+        the backup power on the FAN module 
+        is switched on <Condtype> FAN_PWR_PROT_ON 
+        <Probcause> powerProblem (36) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmfanPwrMgmnt 12 }
+
+
+
+--- *****************************************************
+---     LEAF for the removeablefanModuleFail article
+--- *****************************************************
+mgnt2AlmremoveablefanModuleFail OBJECT IDENTIFIER ::= { mgnt2alarms 25 }
+
+
+
+
+mgnt2AlmFan4ModuleAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #4 Present In Chassis 
+        :This OID indicates the presence 
+        of the FAN module #4 in the Chassis.<Help> 
+         This alarm indicates if the FAN 
+        module #4 is detected in the chassis. 
+        <Condtype> FAN4_MODULE_ABSENT <Probcause> 
+        other(1) <Alarmtype> equipmentAlarm 
+        (5)  <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveablefanModuleFail 4 }
+
+
+
+mgnt2AlmFan3ModuleAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #3 Present In Chassis 
+        :This OID indicates the presence 
+        of the FAN module #3 in the Chassis.<Help> 
+         This alarm indicates if the FAN 
+        module #3 is detected in the chassis. 
+        <Condtype> FAN3_MODULE_ABSENT <Probcause> 
+        other(1) <Alarmtype> equipmentAlarm 
+        (5)  <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveablefanModuleFail 3 }
+
+
+
+mgnt2AlmFan2ModuleAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #2 Present In Chassis 
+        :This OID indicates the presence 
+        of the FAN module #2 in the Chassis.<Help> 
+         This alarm indicates if the FAN 
+        module #2 is detected in the chassis. 
+        <Condtype> FAN2_MODULE_ABSENT <Probcause> 
+        other(1) <Alarmtype> equipmentAlarm 
+        (5)  <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveablefanModuleFail 2 }
+
+
+
+mgnt2AlmFan1ModuleAbsent OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #1 Present In Chassis 
+        :This OID indicates the presence 
+        of the FAN module #1 in the Chassis.<Help> 
+         This alarm indicates if the FAN 
+        module #1 is detected in the chassis. 
+        <Condtype> FAN1_MODULE_ABSENT <Probcause> 
+        other(1) <Alarmtype> equipmentAlarm 
+        (5)  <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveablefanModuleFail 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the removeableFanModuleMgmnt article
+--- *****************************************************
+mgnt2AlmremoveableFanModuleMgmnt OBJECT IDENTIFIER ::= { mgnt2alarms 26 }
+
+
+
+
+mgnt2AlmFan4ModuleFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #4 Failure :This OID 
+        indicates a failure on FAN module 
+        #4 <Help>  This alarm indicates 
+        if the FAN module #4 is in fail 
+        condition <Condtype> FAN4_MODULE_FAIL 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveableFanModuleMgmnt 4 }
+
+
+
+mgnt2AlmFan3ModuleFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #3 Failure :This OID 
+        indicates a failure on FAN module 
+        #3 <Help>  This alarm indicates 
+        if the FAN module #3 is in fail 
+        condition <Condtype> FAN3_MODULE_FAIL 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveableFanModuleMgmnt 3 }
+
+
+
+mgnt2AlmFan2ModuleFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #2 Failure :This OID 
+        indicates a failure on FAN module 
+        #2 <Help>  This alarm indicates 
+        if the FAN module #2 is in fail 
+        condition <Condtype> FAN2_MODULE_FAIL 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveableFanModuleMgmnt 2 }
+
+
+
+mgnt2AlmFan1ModuleFail OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        FAN Module #1 Failure :This OID 
+        indicates a failure on FAN module 
+        #1 <Help>  This alarm indicates 
+        if the FAN module #1 is in fail 
+        condition <Condtype> FAN1_MODULE_FAIL 
+        <Probcause> heatingVentCoolingSystemProblem 
+        (22) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmremoveableFanModuleMgmnt 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the swAlarm1 article
+--- *****************************************************
+mgnt2AlmswAlarm1 OBJECT IDENTIFIER ::= { mgnt2alarms 32 }
+
+
+
+
+mgnt2AlmPollingManagerError OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Polling Manager fail :This OID 
+        indicates a failure on the Manager 
+        polling the PM's     <Help>   
+         <Help>  This alarm indicates if 
+        there is a polling manager failure 
+        between the MGNT and the Pm's <Condtype> 
+        POLLING_MANAGER_ERROR <Probcause> 
+        adapterError (2) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmswAlarm1 3 }
+
+
+
+mgnt2AlmFifoCmdError OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        SNMP Agent to Transport comm FIFO 
+        fail :This OID indicates a failure 
+        inside the FIFO stack. The FIFO 
+        containing     the messages from 
+        the agent (write) to the PMs is 
+        full      <Help>  This alarm indicates 
+        if there is a communication mismatch 
+        between the MGNT board and all
+         PM <Condtype> FIFO_CMD_ERROR <Probcause> 
+        adapterError (2) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmswAlarm1 2 }
+
+
+
+mgnt2AlmApiError OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Comm fail between Agent and Transport 
+        :This OID indicates a failure detected 
+        on the Agent.The failure    is
+         located on a communication process 
+        with the modules.     <Help>  This 
+        alarm indicates if there is a communication 
+        mismatch between the MGNT board 
+        and a single PM <Condtype> API_ERROR 
+        <Probcause> adapterError (2) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmswAlarm1 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the apiErrorCode article
+--- *****************************************************
+
+mgnt2AlmapiErrorCode OBJECT-TYPE
+	  SYNTAX INTEGER (0..255)
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        API Error Identification :Error 
+        number and description of the abs1AlmApiError 
+        object <Condtype> API_ERROR_CODE_1 
+        <Probcause>  <Alarmtype>
+        "
+	  ::= { mgnt2alarms 33 }
+
+
+
+--- *****************************************************
+---     LEAF for the logMgmnt article
+--- *****************************************************
+mgnt2AlmlogMgmnt OBJECT IDENTIFIER ::= { mgnt2alarms 34 }
+
+
+
+
+mgnt2AlmLog80Full OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Log File Full Warning :This OID 
+        indicates that a log file is 80% 
+        full.  <Help>  This alarm indicates 
+        that one of the log file is 80% 
+        Full <Condtype> LOG_80_FULL <Probcause> 
+        fileError (18) <Alarmtype> equipmentAlarm 
+        (5) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmlogMgmnt 2 }
+
+
+
+mgnt2AlmLogFileFull OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        Log File Full Alarm :This OID
+         indicates that a log file is full. 
+        This file must be cleared to insure 
+        correct log function  <Help>  This 
+        alarm indicates that one of the 
+        log file is Full <Condtype> LOG_FILE_FULL 
+        <Probcause> fileError (18) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmlogMgmnt 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ntpSyncLoss article
+--- *****************************************************
+mgnt2AlmntpSyncLoss OBJECT IDENTIFIER ::= { mgnt2alarms 35 }
+
+
+
+
+mgnt2AlmCpuTempOverRange OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        CPU HighTemperature Warning :This 
+        OID indicates a temperature over 
+        the expected range on the CPU<Help> 
+         This warning indicates that the 
+        temperature of the CPU is reaching 
+        its internal limit <Condtype> CPU_TEMP_OVER_RANGE 
+        <Probcause> other(1) <Alarmtype> 
+        equipmentAlarm (5) <Polarity> (2)
+        "
+	  ::= { mgnt2AlmntpSyncLoss 2 }
+
+
+
+mgnt2AlmNtpSyncLoss OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-only
+	  STATUS current
+	  DESCRIPTION
+        "
+        NTP Sync Loss  :This OID indicates 
+        a loss of synchronisation with
+         the NTP Server.  <Help>  This
+         alarm indicates a loss of synchronisation 
+        with the NTP Server. <Condtype> 
+        NTP_SYNC_LOSS <Probcause> timingProblem 
+        (53) <Alarmtype> timeDomainViolation 
+        (11) <Polarity> (2) 
+        "
+	  ::= { mgnt2AlmntpSyncLoss 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONTROLS
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the synth5 article
+--- *****************************************************
+mgnt2Ctrlsynth5 OBJECT IDENTIFIER ::= { mgnt2controls 5 }
+
+
+
+
+mgnt2CtrlChassisColdReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Cold Reset of the Management Module 
+        :This oid triggers a 'cold' reset 
+        of the Chassis . This type of reset 
+        is not traffic affecting and the 
+        modules configuration  remains
+         unchanged.   <Help>  This control 
+        initiates a cold reset of the MGNT 
+        board,
+        "
+	  ::= { mgnt2Ctrlsynth5 4 }
+
+
+
+mgnt2CtrlChassisWarmReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Reset of the Management Module 
+        :This oid triggers a 'warm' reset 
+        of the Chassis . This type of reset 
+        is not traffic affecting and the 
+        modules configuration  remains
+         unchanged.   <Help>  This control 
+        initiates a warm reset of the MGNT 
+        board,
+        "
+	  ::= { mgnt2Ctrlsynth5 3 }
+
+
+
+mgnt2CtrlChassisShutdown OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Shut Down of the Management Module 
+        :This OID shall be set before shutting 
+        down the Chassis power. A delay 
+        of 5 sec is necessary between this 
+        OID is set and power is shut down. 
+         <Help>  This control initiates 
+        a shutdown of the MGNT board,
+        "
+	  ::= { mgnt2Ctrlsynth5 2 }
+
+
+
+--- *****************************************************
+---     LEAF for the testLed article
+--- *****************************************************
+mgnt2CtrltestLed OBJECT IDENTIFIER ::= { mgnt2controls 18 }
+
+
+
+
+mgnt2CtrlLedOff OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Switch off Leds Test :This OID 
+        switches off all the Leds as a
+         test feature  <Help>  This control 
+        initiates a test leds turning all 
+        the LEDs of the complete chassis 
+        to OFF
+        "
+	  ::= { mgnt2CtrltestLed 3 }
+
+
+
+mgnt2CtrlRedLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Red Leds Test :This OID switches 
+        on all the red Leds as a test feature 
+         <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        of the chassis to red
+        "
+	  ::= { mgnt2CtrltestLed 2 }
+
+
+
+mgnt2CtrlGreenLed OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Green Leds Test :This OID switches 
+        on all the green Leds as a test 
+        feature  <Help>  This control initiates 
+        a test leds turning all the LEDs 
+        of the chassis to green
+        "
+	  ::= { mgnt2CtrltestLed 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the logFile article
+--- *****************************************************
+mgnt2CtrllogFile OBJECT IDENTIFIER ::= { mgnt2controls 19 }
+
+
+
+
+mgnt2CtrlLogFileReset OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Log File Reset :This OID clears 
+        all the log files
+        "
+	  ::= { mgnt2CtrllogFile 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the mgntSaveConfig article
+--- *****************************************************
+mgnt2CtrlmgntSaveConfig OBJECT IDENTIFIER ::= { mgnt2controls 23 }
+
+
+
+
+mgnt2CtrlSaveConfig OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Save Configuration :This OID is 
+        used save the configuration related 
+        to the enable and mode traps objects 
+         <Help>  This control saves the 
+        customer configuration on the MGNT 
+        board
+        "
+	  ::= { mgnt2CtrlmgntSaveConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the mgntGetGlobalConfig article
+--- *****************************************************
+mgnt2CtrlmgntGetGlobalConfig OBJECT IDENTIFIER ::= { mgnt2controls 24 }
+
+
+
+
+mgnt2CtrlGetGlobalConfig OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Get Global Chassis Config :This 
+        OID is used to create a global
+         configuration file of the chassis 
+         <Help>  This control creates a 
+        single configuration file from
+         PM's and MGNT configuration file 
+        into the RAM
+        "
+	  ::= { mgnt2CtrlmgntGetGlobalConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the mgntPutGlobalConfig article
+--- *****************************************************
+mgnt2CtrlmgntPutGlobalConfig OBJECT IDENTIFIER ::= { mgnt2controls 25 }
+
+
+
+
+mgnt2CtrlPutGlobalConfig OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Put Global Chassis Config :This 
+        OID is used to extract a global 
+        configuration file of the chassis 
+         <Help>  This control creates configuration 
+        files  to PM's and MGNT from a
+         single configuration file in the 
+        RAM
+        "
+	  ::= { mgnt2CtrlmgntPutGlobalConfig 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the mgntAcknowledge article
+--- *****************************************************
+mgnt2CtrlmgntAcknowledge OBJECT IDENTIFIER ::= { mgnt2controls 26 }
+
+
+
+
+mgnt2CtrlAcknowledge OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Alarm Ack. :This OID is used to 
+        acknowledge the current active
+         alarms of the chassis    <Help> 
+          This control is used to acknowledge 
+        the current active alarms of the 
+        chassis
+        "
+	  ::= { mgnt2CtrlmgntAcknowledge 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+---     CONFIG
+--- $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+--- *****************************************************
+
+
+
+--- *****************************************************
+---     LEAF for the ethPort2 article
+--- *****************************************************
+mgnt2CfgethPort2 OBJECT IDENTIFIER ::= { mgnt2config 17 }
+
+
+
+
+mgnt2CfgChassisEthernetSplit OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Chassis Ethernet Split  :This
+         OID enables the split between
+         the two kendings.  <Help>  Enable/Disable 
+         the switch between the two kendings
+        "
+	  ::= { mgnt2CfgethPort2 2 }
+
+
+
+mgnt2CfgEthPort2Disable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        2nd Ethernet Port Disable :This 
+        OID disables  'Ethernet Port 2' 
+        .When  not required, this port
+         must be disabled  in order to
+         prevent unwanted access.  <Help> 
+         Disable the second Ethernet port
+        "
+	  ::= { mgnt2CfgethPort2 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the mgntDccEnable article
+--- *****************************************************
+
+mgnt2CfgmgntDccEnable OBJECT-TYPE
+	  SYNTAX Mgnt2DccAccessValues
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        DCC Access :This OID selects 
+         the mode to enable the DCC on
+         the slots. This Mode enables the 
+        Slots 2-4-6-8-10 , or the Slots 
+        2-6-10-14-18.  <Help>  Defines
+         the DCC access on the backplane 
+        of the chassis (Slots 2-4-6-8-10 
+        or Slots 2-6-10-14-18)
+        "
+	  ::= { mgnt2config 18 }
+
+
+
+--- *****************************************************
+---     LEAF for the pmTrapEnable article
+--- *****************************************************
+mgnt2CfgpmTrapEnable OBJECT IDENTIFIER ::= { mgnt2config 20 }
+
+
+
+
+mgnt2CfgPmConfigTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Config Traps Enable :This OID, 
+        when set, enables the generation 
+        of a trap when the configuration 
+        of a PM plugged in the chassis
+         is modified  <Help>  In detailed 
+        traps mechanism, enable the trap 
+        emission on PM configuration modificatio
+        "
+	  ::= { mgnt2CfgpmTrapEnable 6 }
+
+
+
+mgnt2CfgPmControlTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Control Traps Enable :This OID, 
+        when set, enables the generation 
+        of a trap when a control is sent 
+        to a PM plugged in the chassis
+           
+  <Help>  In detailed traps 
+        mechanism, enable the trap emission 
+        on control sent to PM
+        "
+	  ::= { mgnt2CfgpmTrapEnable 5 }
+
+
+
+mgnt2CfgPmMinorTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Minor Alarm Traps Enable :This 
+        OID, when set, enables the generation 
+        of the minor alarm trap for all 
+        the PM plugged in the chassis 
+         <Help>  In detailed traps mechanism, 
+        enable the trap emission on minor 
+        alarm detected on PM
+        "
+	  ::= { mgnt2CfgpmTrapEnable 3 }
+
+
+
+mgnt2CfgPmMajorTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Major Alarm Traps Enable :This 
+        OID, when set, enables the generation 
+        of the major alarm trap for all 
+        the PM plugged in the chassis 
+         <Help>  In detailed traps mechanism, 
+        enable the trap emission on major 
+        alarm detected on PM
+        "
+	  ::= { mgnt2CfgpmTrapEnable 2 }
+
+
+
+mgnt2CfgPmCriticalTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Critical Alarm Traps Enable :This 
+        OID, when set, enables the generation 
+        of the critical alarm trap for
+         all the PM plugged in the chassis 
+         <Help>  In detailed traps mechanism, 
+        enable the trap emission on critical 
+        alarm detected on PM
+        "
+	  ::= { mgnt2CfgpmTrapEnable 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the mgntTrapEnable article
+--- *****************************************************
+mgnt2CfgmgntTrapEnable OBJECT IDENTIFIER ::= { mgnt2config 21 }
+
+
+
+
+mgnt2CfgMgntEventTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        MGNT Event Traps Enable :This
+         OID, when set, enables the generation 
+        of a trap when an event occurs
+         on the chassis  <Help>  In detailed 
+        traps mechanism, enable the trap 
+        emission on event detected in the 
+        chassis
+        "
+	  ::= { mgnt2CfgmgntTrapEnable 7 }
+
+
+
+mgnt2CfgMgntConfigTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        MGNT Config Traps Enable :This 
+        OID, when set, enables the generation 
+        of a trap when the configuration 
+        of a MGNT plugged in the chassis 
+        is modified  <Help>  In detailed 
+        traps mechanism, enable the trap 
+        emission on MGNT configuration
+         modification
+        "
+	  ::= { mgnt2CfgmgntTrapEnable 6 }
+
+
+
+mgnt2CfgMgntControlTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        MGNT Control Traps Enable :This 
+        OID, when set, enables the generation 
+        of a trap when a control is sent 
+        to a MGNT plugged in the chassis 
+          
+  <Help>  In detailed traps
+         mechanism, enable the trap emission 
+        on control sent to MGNT
+        "
+	  ::= { mgnt2CfgmgntTrapEnable 5 }
+
+
+
+mgnt2CfgMgntMinorTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        MGNT Minor Alarm Traps Enable
+         :This OID, when set, enables the 
+        generation of the minor alarm trap 
+        for the MGNT and FAN board  <Help> 
+         In detailed traps mechanism, enable 
+        the trap emission on minor alarm 
+        detected on MGNT and FAN
+        "
+	  ::= { mgnt2CfgmgntTrapEnable 3 }
+
+
+
+mgnt2CfgMgntMajorTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        MGNT Major Traps Enable :This
+         OID, when set, enables the generation 
+        of the major alarm trap for the 
+        MGNT and FAN board  <Help>  In
+         detailed traps mechanism, enable 
+        the trap emission on major alarm 
+        detected on MGNT and FAN
+        "
+	  ::= { mgnt2CfgmgntTrapEnable 2 }
+
+
+
+mgnt2CfgMgntCriticalTrapEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        MGNT Critical Alarm Traps Enable 
+        :This OID, when set, enables the 
+        generation of the critical alarm 
+        trap for the MGNT and FAN board 
+         <Help>  In detailed traps mechanism, 
+        enable the trap emission on critical 
+        alarm detected on MGNT and FAN
+        "
+	  ::= { mgnt2CfgmgntTrapEnable 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the mgntTrapMode article
+--- *****************************************************
+
+mgnt2CfgmgntTrapMode OBJECT-TYPE
+	  SYNTAX Mgnt2TrapModeValues
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Traps Mode :This OID is used to 
+        define the trap mode (synthetic 
+        or detailed mode)  <Help>  Selects 
+        the traps mechanism
+        "
+	  ::= { mgnt2config 22 }
+
+
+
+--- *****************************************************
+---     LEAF for the syslogEnable article
+--- *****************************************************
+mgnt2CfgsyslogEnable OBJECT IDENTIFIER ::= { mgnt2config 23 }
+
+
+
+
+mgnt2CfgSyslogAlarmEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Syslog Alarm Enable :This OID, 
+        when set, enables the generation 
+        of a syslog, when an alarm occurs 
+         <Help>  Enable a syslog emission 
+        on an alarm detected on the chassi
+        "
+	  ::= { mgnt2CfgsyslogEnable 4 }
+
+
+
+mgnt2CfgSyslogCtrlEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Syslog Control Enable :This OID, 
+        when set, enables the generation 
+        of a syslog, when a control is
+         set   <Help>  Enable a syslog
+         emission on a control operated 
+        on the chassis
+        "
+	  ::= { mgnt2CfgsyslogEnable 3 }
+
+
+
+mgnt2CfgSyslogConfigEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Syslog Config Enable :This OID, 
+        when set, enables the generation 
+        of a syslog, when the configuration 
+        has been changed.   <Help>  Enable 
+        a syslog emission on a configuration 
+        change detected on the chassis
+        "
+	  ::= { mgnt2CfgsyslogEnable 2 }
+
+
+
+mgnt2CfgSyslogEventEn OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Syslog Event Enable :This OID, 
+        when set, enables the generation 
+        of a syslog, when an event has
+         been detected  <Help>  Enable
+         a syslog emission on event detected 
+        on the chassis
+        "
+	  ::= { mgnt2CfgsyslogEnable 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the ntpTimeZone article
+--- *****************************************************
+
+mgnt2CfgntpTimeZone OBJECT-TYPE
+	  SYNTAX INTEGER (-12..12)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        NTP Time Zone  :This OID defines 
+        the time zone of the MGNT board 
+        for the NTP server  <Help>  This 
+        object defines the time zone of 
+        the MGNT board (from -12 to +12 
+        hours from the GMT).
+        "
+	  ::= { mgnt2config 24 }
+
+
+
+--- *****************************************************
+---     LEAF for the pmConfEnable article
+--- *****************************************************
+mgnt2CfgpmConfEnable OBJECT IDENTIFIER ::= { mgnt2config 25 }
+
+
+
+
+mgnt2CfgPmRestoreEnable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Automatic Config Restore :This 
+        OID enables the automatic PM configuration 
+        restore mechanism on PM insertion 
+         <Help>  This parameter enables 
+        the automatic PM configuration
+         restore mechanism on PM insertio
+        "
+	  ::= { mgnt2CfgpmConfEnable 2 }
+
+
+
+mgnt2CfgPmBackupEnable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Automatic Config Backup :This
+         OID enables the automatic PM configuration 
+        backup mechanism on PM insertion 
+        or PM configuration modification. 
+         <Help>  This parameter enables 
+        the automatic PM configuration
+         backup mechanism on PM insertion 
+        or PM configuration modificatio
+        "
+	  ::= { mgnt2CfgpmConfEnable 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the inactivityTimeout article
+--- *****************************************************
+
+mgnt2CfginactivityTimeout OBJECT-TYPE
+	  SYNTAX INTEGER (-1..255)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Idle Timeout  :This OID defines 
+        the idle timeout (in minutes) to 
+        automatically logout from the craft 
+        and from the CLI.  <Help>  This 
+        object defines the idle timeout 
+        (in minutes) to automatically logout 
+        from the craft and from the CLI
+        "
+	  ::= { mgnt2config 26 }
+
+
+
+--- *****************************************************
+---     LEAF for the cliAccess article
+--- *****************************************************
+
+mgnt2CfgcliAccess OBJECT-TYPE
+	  SYNTAX Mgnt2CliAccessValues
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        CLI access  :This OID selects
+         the protocol for the remote access 
+        to a CLI user.  <Help>  This object 
+        defines the protocol used for a 
+        remote CLI.
+        "
+	  ::= { mgnt2config 27 }
+
+
+
+--- *****************************************************
+---     LEAF for the craftAccess article
+--- *****************************************************
+
+mgnt2CfgcraftAccess OBJECT-TYPE
+	  SYNTAX Mgnt2CraftAccessValues
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        CRAFT access :This OID selects 
+        the remote access to a CRAFT user. 
+         <Help>  This object defines the 
+        access for a remote CRAFT.
+        "
+	  ::= { mgnt2config 28 }
+
+
+
+--- *****************************************************
+---     LEAF for the perfModes1 article
+--- *****************************************************
+
+mgnt2CfgperfModes1 OBJECT-TYPE
+	  SYNTAX EkiSynchroMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        PERF Synchro Source :This OID
+         selects the source of the synchronisation 
+        (Internal/External).  <Help>  This 
+        object defines the source of the 
+        synchronization to operate performance 
+        monitoring.
+        "
+	  ::= { mgnt2config 29 }
+
+
+
+--- *****************************************************
+---     LEAF for the alarmModelActiv article
+--- *****************************************************
+
+mgnt2CfgalarmModelActiv OBJECT-TYPE
+	  SYNTAX Mgnt2AckMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Acknowledge mode  :This OID defines 
+        the alarms akcnowledge mode   <Help> 
+         This configuration defines the 
+        alarms akcnowledge mode
+        "
+	  ::= { mgnt2config 30 }
+
+
+
+--- *****************************************************
+---     LEAF for the networkInput article
+--- *****************************************************
+
+mgnt2CfgnetworkInput OBJECT-TYPE
+	  SYNTAX Mgnt2NetMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Network input :This OID selects 
+        the connection of the Ethernet
+         Network input to either the switches 
+        (2) or the daughter board (1) , 
+        in this case the MGNT can act as 
+        a router  <Help>   This configuration 
+        defines the use of the Network
+         input of the front panel
+        "
+	  ::= { mgnt2config 31 }
+
+
+
+--- *****************************************************
+---     LEAF for the masterEthMode article
+--- *****************************************************
+
+mgnt2CfgmasterEthMode OBJECT-TYPE
+	  SYNTAX Mgnt2MasterEthMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        DHCP Master Ethernet Mode :This 
+        OID selects the mode of the Master 
+        Ethernet  in DHCP mode (2) or in 
+        Static Mode(1)  <Help>  This configuration 
+        defines the use of the Master Ethernet 
+        Mode
+        "
+	  ::= { mgnt2config 32 }
+
+
+
+--- *****************************************************
+---     LEAF for the subnetMode article
+--- *****************************************************
+
+mgnt2CfgsubnetMode OBJECT-TYPE
+	  SYNTAX Mgnt2SubnetEthMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        DHCP Subnet Mode :This OID selects 
+        the mode of the Subnet in DHCP
+         mode (2) or in Static Mode(1)
+         <Help>  This configuration defines 
+        the use of the Subnet Mode
+        "
+	  ::= { mgnt2config 33 }
+
+
+
+--- *****************************************************
+---     LEAF for the rstpMode article
+--- *****************************************************
+mgnt2CfgrstpMode OBJECT IDENTIFIER ::= { mgnt2config 34 }
+
+
+
+
+mgnt2CfgRstpEnable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        RSTP Enable :This OID enables
+         the RSTP algorythm <Help>  This 
+        configuration defines the use of 
+         RSTP
+        "
+	  ::= { mgnt2CfgrstpMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the lldpMode article
+--- *****************************************************
+mgnt2CfglldpMode OBJECT IDENTIFIER ::= { mgnt2config 35 }
+
+
+
+
+mgnt2CfgLldpEnable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        LLDP Enable :This OID enables
+         the LLDP algorythm <Help>  This 
+        configuration defines the use of 
+         LLDP
+        "
+	  ::= { mgnt2CfglldpMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the logMode article
+--- *****************************************************
+
+mgnt2CfglogMode OBJECT-TYPE
+	  SYNTAX Mgnt2LogFileMode
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Log Mode :This OID enables the 
+        log file mode<Help>  This configuration 
+        defines the use of  the log mod
+        "
+	  ::= { mgnt2config 36 }
+
+
+
+--- *****************************************************
+---     LEAF for the nodeMode article
+--- *****************************************************
+mgnt2CfgnodeMode OBJECT IDENTIFIER ::= { mgnt2config 37 }
+
+
+
+
+mgnt2CfgNodeControllerEnable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Node Controller Mode :This OID 
+        enables the node controller mode<Help> 
+         This configuration defines the 
+        use of  the node controller mod
+        "
+	  ::= { mgnt2CfgnodeMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the unprivilegedUsersMode article
+--- *****************************************************
+mgnt2CfgunprivilegedUsersMode OBJECT IDENTIFIER ::= { mgnt2config 38 }
+
+
+
+
+mgnt2CfgRestrictUnprivilegeUsers OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Restrict Unprivileged Users Rights 
+        :This OID enables the restriction 
+        of unprivileged user rights to
+         modify their own password <Help> 
+        This parameter enables the restriction 
+        of unprivileged user rights to
+         modify their own password
+        "
+	  ::= { mgnt2CfgunprivilegedUsersMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the oscDccLinkUpThreshold article
+--- *****************************************************
+
+mgnt2CfgoscDccLinkUpThreshold OBJECT-TYPE
+	  SYNTAX INTEGER (0..255)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OSC/DCC Link Up Thresh. [10-30]s 
+        :This OID defines the confirmation 
+        threshold to consider an OSC/DCC 
+        link as up <Help> This parameter 
+        defines the confirmation threshold 
+        to consider an OSC/DCC link as
+         up
+        "
+	  ::= { mgnt2config 39 }
+
+
+
+--- *****************************************************
+---     LEAF for the oscDccLinkDownThreshold article
+--- *****************************************************
+
+mgnt2CfgoscDccLinkDownThreshold OBJECT-TYPE
+	  SYNTAX INTEGER (0..255)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        OSC/DCC Link Down Thresh. [2-3]s 
+        :This OID defines the confirmation 
+        threshold to consider an OSC/DCC 
+        link as down <Help> This parameter 
+        defines the confirmation threshold 
+        to consider an OSC/DCC link as
+         down.
+        "
+	  ::= { mgnt2config 40 }
+
+
+
+--- *****************************************************
+---     LEAF for the accountAutoLock article
+--- *****************************************************
+
+mgnt2CfgaccountAutoLock OBJECT-TYPE
+	  SYNTAX INTEGER (-1..255)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Account Auto-Lock [-1 / 1-10]
+         err :This OID defines the number 
+        of error password to lock an account. 
+        This counter is reset on successful 
+        login or after an administrator 
+        defined period (see Fail count
+         reset) Set to -1 to disables the 
+        feature.<Help> This parameter defines 
+        the number of error password to 
+        lock an account. This counter is 
+        reset on successful login or after 
+        an administrator defined period 
+        (see Fail count reset) Set to -1 
+        to disables the feature.
+        "
+	  ::= { mgnt2config 41 }
+
+
+
+--- *****************************************************
+---     LEAF for the failCountReset article
+--- *****************************************************
+
+mgnt2CfgfailCountReset OBJECT-TYPE
+	  SYNTAX INTEGER (-1..255)
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        Fail Count Reset [-1 / 1-10] hrs 
+        :This OID defines the minimum time 
+        (in hours) to reset the failed
+         login counter. This counter is 
+        also reset on successful login. 
+        Set to -1 to disable the feature.<Help> 
+        This parameter defines the minimum 
+        time (in hours) to reset the failed 
+        login counter. This counter is
+         also reset on successful login. 
+        Set to -1 to disable the feature
+        "
+	  ::= { mgnt2config 42 }
+
+
+
+--- *****************************************************
+---     LEAF for the ftpMode article
+--- *****************************************************
+mgnt2CfgftpMode OBJECT IDENTIFIER ::= { mgnt2config 44 }
+
+
+
+
+mgnt2CfgFtpEnable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        FTP Enable :This OID enables the 
+        FTP protocol  <Help>  This configuration 
+        enables the FTP protocol 
+        "
+	  ::= { mgnt2CfgftpMode 1 }
+
+
+
+--- *****************************************************
+---     LEAF for the tftpMode article
+--- *****************************************************
+mgnt2CfgtftpMode OBJECT IDENTIFIER ::= { mgnt2config 45 }
+
+
+
+
+mgnt2CfgTftpEnable OBJECT-TYPE
+	  SYNTAX EkiOnOff
+	  MAX-ACCESS read-write
+	  STATUS current
+	  DESCRIPTION
+        "
+        TFTP Enable :This OID enables
+         the TFTP protocol  <Help>  This 
+        configuration enables the TFTP
+         protocol  
+        "
+	  ::= { mgnt2CfgtftpMode 1 }
+
+
+
+
+
+
+
+
+--- *****************************************************
+---     TRAPS 
+--- *****************************************************
+
+mgnt2TrapBoardNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..16)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the slot number of the PM that sent the last trap"
+	::= { mgnt2Traps 50 }
+
+mgnt2TrapSeverity OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the trap severity"
+	::= { mgnt2Traps 51 }
+
+mgnt2TrapSourcePm OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the mnemonic of the pm who sent a trap"
+	::= { mgnt2Traps 52 }
+
+mgnt2TrapSourcePortType OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the type of the port who sent a trap"
+	::= { mgnt2Traps 53 }
+
+mgnt2TrapSourcePortNumber OBJECT-TYPE
+	SYNTAX INTEGER(1..16)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the port number of the PM that sent the last trap"
+	::= { mgnt2Traps 54 }
+
+mgnt2TrapSourceLabel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the label of the alarm who sent a trap"
+	::= { mgnt2Traps 55 }
+
+mgnt2TrapSourceValue OBJECT-TYPE
+	SYNTAX EkiOnOff
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the value of the alarm who sent a trap"
+	::= { mgnt2Traps 56 }
+
+mgnt2TrapEventLabel OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the label of the event"
+	::= { mgnt2Traps 57 }
+
+mgnt2TrapNodeControllerIpAddress OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the IP address of the Node Controller"
+	::= { mgnt2Traps 58 }
+
+mgnt2TrapChassisId OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This OID gives the chassis ID "
+	::= { mgnt2Traps 59 }
+
+mgnt2TrapApi NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapBoardNumber,mgnt2AlmapiErrorCode}
+	STATUS current
+	--&FILTNAME    "API Error"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { mgnt2TrapBoardNumber "$1", mgnt2AlmapiErrorCode "$2"}
+	--&MESG        "API Error number $2 received from Board in slot $1 ($A)"
+	DESCRIPTION "Api error trap with its number"
+	::= { mgnt2Traps 1 }
+
+mgnt2TrapSwError NOTIFICATION-TYPE
+	OBJECTS {mgnt2AlmFifoCmdError}
+	STATUS current
+	--&FILTNAME    "SW Error"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { mgnt2AlmFifoCmdError "$1"}
+	--&MESG        "Software Error detected"
+	DESCRIPTION "Chassis software error other API"
+	::= { mgnt2Traps 2 }
+
+mgnt2TrapBoardInserted NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "Board Inserted"
+	--&ACTIONS     { log, info }
+	--&MATCH       { mgnt2TrapBoardNumber "$1"}
+	--&MESG        "Board Inserted in Slot $1 ($A)"
+	DESCRIPTION "A board has been plugged in"
+	::= { mgnt2Traps 4}
+
+mgnt2TrapBoardRemoved NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "Board Removed"
+	--&ACTIONS     { log, info }
+	--&MATCH       { mgnt2TrapBoardNumber "$1"}
+	--&MESG        "Board Removed from Slot $1 ($A)"
+	DESCRIPTION "A board has been plugged out"
+	::= { mgnt2Traps 5 }
+
+mgnt2TrapRestoreConfDone NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapBoardNumber}
+	STATUS current
+	--&FILTNAME    "Config Restored"
+	--&ACTIONS     { log, info }
+	--&MATCH       { mgnt2TrapBoardNumber "$1"}
+	--&MESG        "The Configuration of Board in Slot $1 has been restored ($A)"
+	DESCRIPTION "The Configuration has been restored from the management board"
+	::= { mgnt2Traps 6 }
+
+mgnt2TrapGlobalPowerFail NOTIFICATION-TYPE
+	OBJECTS {mgnt2AlmDef48b, mgnt2AlmDef48a}
+	STATUS current
+	--&FILTNAME    "Power A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmDef48b "off", mgnt2AlmDef48a "on"}
+	--&MESG        "Power Input A Fail on Chassis ($A)"
+	
+	--&FILTNAME    "Power B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmDef48b "on", mgnt2AlmDef48a "off"}
+	--&MESG        "Power Input B Fail on Chassis ($A)"
+	
+	--&FILTNAME    "Power A and B Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "Power A Fail ON", "Power B Fail ON"}
+	--&MATCH       { mgnt2AlmDef48b "off", mgnt2AlmDef48a "off"}
+	--&MESG        "Power Input A and B Present on Chassis ($A)"
+	
+	DESCRIPTION "A global power supply failure has been detected"
+	::= { mgnt2Traps 8 }
+
+mgnt2TrapFanPowerFail NOTIFICATION-TYPE
+	OBJECTS {mgnt2AlmFanDefFuseB , mgnt2AlmFanDefFuseA, mgnt2AlmFanPwrFail1}
+	STATUS current
+	--&FILTNAME    "FAN Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmFanDefFuseB "off", mgnt2AlmFanDefFuseA "on", mgnt2AlmFanPwrFail1 "*"}
+	--&MESG        "Power Input A Fail on FAN ($A)"
+	
+	--&FILTNAME    "FAN Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmFanDefFuseB "on", mgnt2AlmFanDefFuseA "off", mgnt2AlmFanPwrFail1 "*"}
+	--&MESG        "Power Input B Fail on FAN ($A)"
+
+	--&FILTNAME    "FAN Fuse A and B Fail ON"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { mgnt2AlmFanDefFuseB "on", mgnt2AlmFanDefFuseA "on", mgnt2AlmFanPwrFail1 "*"}
+	--&MESG        "Power Input A and B Fail on FAN ($A)"
+
+	--&FILTNAME    "FAN Fuse A and B Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "FAN Fuse A Fail ON", "FAN Fuse B Fail ON", "FAN Fuse A and B Fail ON"}
+	--&MATCH       { mgnt2AlmFanDefFuseB "off", mgnt2AlmFanDefFuseA "off", mgnt2AlmFanPwrFail1 "off"}
+	--&MESG        "Power Input A and B Present on FAN ($A)"
+
+	--&FILTNAME    "FAN Power Fail"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmFanDefFuseB "off", mgnt2AlmFanDefFuseA "off", mgnt2AlmFanPwrFail1 "on"}
+	--&MESG        "Power Converter Fail on FAN ($A)"
+
+	DESCRIPTION "A Fan power supply failure has been detected"
+	::= { mgnt2Traps 9 }
+
+mgnt2TrapGigmPowerFail NOTIFICATION-TYPE
+	OBJECTS {mgnt2AlmMgntDefFuseA, mgnt2AlmMgntDefFuseB}
+	STATUS current
+	--&FILTNAME    "Fuse B Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmMgntDefFuseA "off", mgnt2AlmMgntDefFuseB "on"}
+	--&MESG        "Power Input B Fail on MGNT ($A)"
+	
+	--&FILTNAME    "Fuse A Fail ON"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmMgntDefFuseA "on", mgnt2AlmMgntDefFuseB "off"}
+	--&MESG        "Power Input A Fail on MGNT ($A)"
+	
+	--&FILTNAME    "Fuse A and B Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "Fuse B Fail ON", "Fuse A Fail ON"}
+	--&MATCH       { mgnt2AlmMgntDefFuseA "off", mgnt2AlmMgntDefFuseB "off"}
+	--&MESG        "Power Input A and B Present on MGNT ($A)"
+	
+	DESCRIPTION "A power supply default has been detected in the management board"
+	::= { mgnt2Traps 10 }
+
+mgnt2TrapFanFail NOTIFICATION-TYPE
+	OBJECTS {mgnt2AlmPbFan1Fail, mgnt2AlmPbFan2Fail, mgnt2AlmPbFan3Fail, mgnt2AlmPbFan4Fail, mgnt2AlmPbFan5Fail, mgnt2AlmPbFan6Fail}
+	STATUS current
+	--&FILTNAME    "All trap Fail"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { mgnt2AlmPbFan1Fail "on", mgnt2AlmPbFan2Fail "on", mgnt2AlmPbFan3Fail "on", mgnt2AlmPbFan4Fail "on", mgnt2AlmPbFan5Fail "on", mgnt2AlmPbFan6Fail "on"}
+	--&MESG        "The FAN tray is in Failure condition (all FAN fail) ($A)"
+
+	--&FILTNAME    "FAN 1 Fail"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmPbFan1Fail "on", mgnt2AlmPbFan2Fail "*", mgnt2AlmPbFan3Fail "*", mgnt2AlmPbFan4Fail "*", mgnt2AlmPbFan5Fail "*", mgnt2AlmPbFan6Fail "*"}
+	--&MESG        "Fan number 1 Fail on FAN Module ($A)"
+
+	--&FILTNAME    "FAN 2 Fail"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmPbFan1Fail "*", mgnt2AlmPbFan2Fail "on", mgnt2AlmPbFan3Fail "*", mgnt2AlmPbFan4Fail "*", mgnt2AlmPbFan5Fail "*", mgnt2AlmPbFan6Fail "*"}
+	--&MESG        "Fan number 2 Fail on FAN Module ($A)"
+
+	--&FILTNAME    "FAN 3 Fail"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmPbFan1Fail "*", mgnt2AlmPbFan2Fail "*", mgnt2AlmPbFan3Fail "on", mgnt2AlmPbFan4Fail "*", mgnt2AlmPbFan5Fail "*", mgnt2AlmPbFan6Fail "*"}
+	--&MESG        "Fan number 3 Fail on FAN Module ($A)"
+
+	--&FILTNAME    "FAN 4 Fail"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmPbFan1Fail "*", mgnt2AlmPbFan2Fail "*", mgnt2AlmPbFan3Fail "*", mgnt2AlmPbFan4Fail "on", mgnt2AlmPbFan5Fail "*", mgnt2AlmPbFan6Fail "*"}
+	--&MESG        "Fan number 4 Fail on FAN Module ($A)"
+
+	--&FILTNAME    "FAN 5 Fail"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmPbFan1Fail "*", mgnt2AlmPbFan2Fail "*", mgnt2AlmPbFan3Fail "*", mgnt2AlmPbFan4Fail "*", mgnt2AlmPbFan5Fail "on", mgnt2AlmPbFan6Fail "*"}
+	--&MESG        "Fan number 5 Fail on FAN Module ($A)"
+
+	--&FILTNAME    "FAN 6 Fail"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmPbFan1Fail "*", mgnt2AlmPbFan2Fail "*", mgnt2AlmPbFan3Fail "*", mgnt2AlmPbFan4Fail "*", mgnt2AlmPbFan5Fail "*", mgnt2AlmPbFan6Fail "on"}
+	--&MESG        "Fan number 6 Fail on FAN Module ($A)"
+
+	--&FILTNAME    "FAN Fail OFF"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "All trap Fail"}
+	--&MATCH       { mgnt2AlmPbFan1Fail "off", mgnt2AlmPbFan2Fail "off", mgnt2AlmPbFan3Fail "off", mgnt2AlmPbFan4Fail "off", mgnt2AlmPbFan5Fail "off", mgnt2AlmPbFan6Fail "off"}
+	--&MESG        "The FAN tray is fully operational (no FAN fail)"
+
+	DESCRIPTION "A Fan failure has been detected"
+	::= { mgnt2Traps 11 }
+
+mgnt2TrapLogFileFull  NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapBoardNumber, mgnt2AlmLog80Full, mgnt2AlmLogFileFull}
+	STATUS current
+	--&FILTNAME    "Log almost full"
+	--&ACTIONS     { log, warning }
+	--&MATCH       { mgnt2TrapBoardNumber "$1", mgnt2AlmLog80Full "on", mgnt2AlmLogFileFull "off"}
+	--&MESG        "The log of Board in slot $1 is 80% full ($A)"
+	
+	--&FILTNAME    "Log Full"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2TrapBoardNumber "$1", mgnt2AlmLog80Full "*", mgnt2AlmLogFileFull "on"}
+	--&MESG        "The log of Board in slot $1 is Full ($A)"
+	DESCRIPTION "Indicates that the corresponding log file is almost full"
+	::= { mgnt2Traps 20 }
+
+mgnt2TrapAlarm  NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapSeverity, mgnt2TrapSourcePm, mgnt2TrapBoardNumber, mgnt2TrapSourcePortType, mgnt2TrapSourcePortNumber, mgnt2TrapSourceLabel, mgnt2TrapSourceValue, mgnt2TrapNodeControllerIpAddress,mgnt2TrapChassisId}
+	STATUS current
+	--&FILTNAME    "critical clear"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "critical detect" }
+	--&MATCH       { mgnt2TrapSeverity "Critical", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "off" }
+	--&MESG        "$1 Alarms ($6) cleared on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "critical detect"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { mgnt2TrapSeverity "Critical", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "on" }
+	--&MESG        "$1 Alarms ($6) detected on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "major clear"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "major detect" }
+	--&MATCH       { mgnt2TrapSeverity "Major", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "off" }
+	--&MESG        "$1 Alarms ($6) cleared on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "major detect"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2TrapSeverity "Major", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "on" }
+	--&MESG        "$1 Alarms ($6) detected on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "minor clear"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "minor detect" }
+	--&MATCH       { mgnt2TrapSeverity "Minor", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "off" }
+	--&MESG        "$1 Alarms ($6) cleared on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "minor detect"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { mgnt2TrapSeverity "Minor", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "on" }
+	--&MESG        "$1 Alarms ($6) detected on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "warning clear"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "warning detect" }
+	--&MATCH       { mgnt2TrapSeverity "Warning", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "off" }
+	--&MESG        "$1 Alarms ($6) cleared on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "warning detect"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { mgnt2TrapSeverity "Warning", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "on" }
+	--&MESG        "$1 Alarms ($6) detected on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "indeterminate clear"
+	--&ACTIONS     { log, normal }
+	--&CLEARS      { "indeterminate detect" }
+	--&MATCH       { mgnt2TrapSeverity "Indeterminate", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "off" }
+	--&MESG        "$1 Alarms ($6) cleared on $2 (Slot $3) on $4 ($A)"
+
+	--&FILTNAME    "indeterminate detect"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { mgnt2TrapSeverity "Indeterminate", mgnt2TrapSourcePm "$2", mgnt2TrapBoardNumber "$3", mgnt2TrapSourcePortType "$4", mgnt2TrapSourcePortNumber "$5", mgnt2TrapSourceLabel "$6", mgnt2TrapSourceValue "on" }
+	--&MESG        "$1 Alarms ($6) detected on $2 (Slot $3) on $4 ($A)"
+	DESCRIPTION "Indicates that an alarm state has changed"
+	::= { mgnt2Traps 30 }
+
+mgnt2TrapEvent  NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapBoardNumber, mgnt2TrapEventLabel, mgnt2TrapNodeControllerIpAddress,mgnt2TrapChassisId}
+	STATUS current
+	--&FILTNAME    "event"
+	--&ACTIONS     { log, info }
+	--&CLEARS      { "critical detect" }
+	--&MATCH       {mgnt2TrapBoardNumber "$1", mgnt2TrapEventLabel "$2" }
+	--&MESG        "$2 (Slot $1) ($A)"
+	DESCRIPTION "Indicates that an event has occured"
+	::= { mgnt2Traps 31 }
+
+mgnt2TrapControl NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapSourcePm, mgnt2TrapBoardNumber, mgnt2TrapSourcePortType, mgnt2TrapSourcePortNumber, mgnt2TrapSourceLabel, mgnt2TrapSourceValue, mgnt2TrapNodeControllerIpAddress,mgnt2TrapChassisId}
+	STATUS current
+	--&FILTNAME    "control sent"
+	--&ACTIONS     { log, info }
+	--&MATCH       { mgnt2TrapSourcePm "$1", mgnt2TrapBoardNumber "$2", mgnt2TrapSourcePortType "$3", mgnt2TrapSourcePortNumber "$4", mgnt2TrapSourceLabel "$5" }
+	--&MESG        "Controls ($5) has been set to $6 on $1 (Slot $2) on $3 ($A)"
+
+	DESCRIPTION "Indicates that a control has been set to the module"
+	::= { mgnt2Traps 32 }
+
+mgnt2TrapConfig NOTIFICATION-TYPE
+	OBJECTS {mgnt2TrapSourcePm, mgnt2TrapBoardNumber, mgnt2TrapSourcePortType, mgnt2TrapSourcePortNumber, mgnt2TrapSourceLabel, mgnt2TrapSourceValue, mgnt2TrapNodeControllerIpAddress,mgnt2TrapChassisId}
+	STATUS current
+	--&FILTNAME    "config sent"
+	--&ACTIONS     { log, info }
+	--&MATCH       { mgnt2TrapSourcePm "$1", mgnt2TrapBoardNumber "$2", mgnt2TrapSourcePortType "$3", mgnt2TrapSourcePortNumber "$4", mgnt2TrapSourceLabel "$5"}
+	--&MESG        "Config Word ($5) has been set to $6 on $1 (Slot $2) on $3 ($A)"
+
+	DESCRIPTION "Indicates that a config word has been changed"
+	::= { mgnt2Traps 33 }
+
+
+
+
+
+
+END

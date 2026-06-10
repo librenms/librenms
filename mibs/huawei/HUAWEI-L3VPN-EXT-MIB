@@ -1,0 +1,867 @@
+--  ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI L3VPN Statistics Management MIB
+-- Reference:
+-- Version:     V2.05
+-- History:
+--              V1.0 qiyanqing, 2007-04-12, publish
+--              V1.1 rengaofeng, 2009-02-13, add qos statistics table
+--              V1.2 rengaofeng, 2009-12-18, add vpn mapping table 
+-- ==================================================================
+    HUAWEI-L3VPN-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm          
+                FROM HUAWEI-MIB         
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         
+                FROM SNMPv2-CONF            
+            IpAddress,TimeTicks,Integer32,Gauge32, Unsigned32,Counter32,Counter64, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE          
+                FROM SNMPv2-SMI         
+            DisplayString, TimeStamp, RowStatus, DateAndTime         
+                FROM SNMPv2-TC 
+            EnabledStatus
+                FROM  P-BRIDGE-MIB
+            InterfaceIndex          
+                FROM IF-MIB  ;
+                
+                
+                
+        hwL3vpn MODULE-IDENTITY 
+            LAST-UPDATED "201712201100Z"        -- Dem 20, 2017 at 1100 GMT
+            ORGANIZATION
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION
+                "The HUAWEI-L3VPN-EXT-MIB contains objects to statistic L3VPN's traffic."
+
+            REVISION "201712201100Z" 
+            DESCRIPTION
+            "Modify syntax ,include'hwL3vpnStatEnable' 'hwL3vpnPeerStatEnable'"
+            
+            REVISION "201708171556Z" 
+            DESCRIPTION
+            "Modify description of MIB nodes"
+
+            REVISION "201706220928Z"
+            DESCRIPTION
+            "add 'hwL3vpnVrfV6VpnName' 'hwL3vpnVrfV6IfName' 'hwL3vpnVrfV6Up' 'hwL3vpnVrfV6Down'"
+
+            REVISION "201706220928Z"
+            DESCRIPTION
+            "Modify syntax ,include'hwL3vpnStatInTrafficRate' 'hwL3vpnStatOutTrafficRate' 'hwL3vpnStatInPacketsRate' 'hwL3vpnStatOutPacketsRate'"
+
+            REVISION "201701131445Z"
+            DESCRIPTION
+            "Add an enumeration value to a variable,include'HwL3vpnEnhancedStastic'"
+
+            ::= { hwDatacomm 150 }
+                
+                
+                
+--
+-- Node definitions
+--
+
+        hwL3vpnStatMibObjects OBJECT IDENTIFIER ::= { hwL3vpn 1 }               
+
+
+
+     
+-- The L3VPN Statistic Table
+-- 
+        hwL3vpnStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL3vpnStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the L3VPN's Traffic Statistic."
+            ::= { hwL3vpnStatMibObjects 1 }
+        
+        hwL3vpnStatisticsEntry OBJECT-TYPE
+            SYNTAX HwL3vpnStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the L3VPN's Traffic Statistic."
+            INDEX { hwL3vpnVrfIndex }
+            ::= { hwL3vpnStatisticsTable 1 }
+        
+        HwL3vpnStatisticsEntry ::=
+            SEQUENCE {
+                hwL3vpnVrfIndex           
+                    Unsigned32, 
+                hwL3vpnStatEnable
+                    EnabledStatus,    
+                hwL3vpnVrfName
+                    DisplayString,             
+                hwL3vpnStatInTrafficRate
+                    Counter64,
+                hwL3vpnStatOutTrafficRate
+                    Counter64,
+                hwL3vpnStatInPacketsRate
+                    Counter64,
+                hwL3vpnStatOutPacketsRate
+                    Counter64,
+                hwL3vpnStatInBytes
+                    Counter64,
+                hwL3vpnStatOutBytes
+                    Counter64,
+                hwL3vpnStatInPackets
+                    Counter64,
+                hwL3vpnStatOutPackets
+                    Counter64,
+                hwL3vpnStatInUnicastPackets
+                    Counter64,
+                hwL3vpnStatOutUnicastPackets
+                    Counter64,
+                hwL3vpnStatInMulticastPackets
+                    Counter64,
+                hwL3vpnStatOutMulticastPackets
+                    Counter64,
+                hwL3vpnStatInBroadcastPackets
+                    Counter64,
+                hwL3vpnStatOutBroadcastPackets
+                    Counter64,
+                hwL3vpnStatResetTime
+                    DateAndTime,
+                hwL3vpnStatResetStatistic
+                    INTEGER 
+             }
+        
+            hwL3vpnVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of L3vpn instance."
+            ::= { hwL3vpnStatisticsEntry 1 } 
+            
+            hwL3vpnStatEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether statistics collection is enabled or not. 1 indicates enable, and 0 indicates disable."
+            DEFVAL { disabled }
+            ::= { hwL3vpnStatisticsEntry 2 }
+ 
+            
+            hwL3vpnVrfName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VRF's name."
+            ::= { hwL3vpnStatisticsEntry 3 }  
+                        
+    
+
+        hwL3vpnStatInTrafficRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the rate for incoming bytes in the past 300s. The unit is bit/s."
+            ::= { hwL3vpnStatisticsEntry 4 }
+        
+        hwL3vpnStatOutTrafficRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the rate (in bps) for outgoing bytes in the past 300s."
+            ::= { hwL3vpnStatisticsEntry 5 }
+        
+        hwL3vpnStatInPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the rate (in pps) for incoming packets in the past 300s."
+            ::= { hwL3vpnStatisticsEntry 6 }
+        
+        hwL3vpnStatOutPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the rate (in pps) for outgoing packets in the past 300s."
+            ::= { hwL3vpnStatisticsEntry 7 } 
+            
+        hwL3vpnStatInBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received."
+            ::= { hwL3vpnStatisticsEntry 8 }
+            
+        hwL3vpnStatOutBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes transmitted out."
+            ::= { hwL3vpnStatisticsEntry 9 }
+            
+        hwL3vpnStatInPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Packets received."
+            ::= { hwL3vpnStatisticsEntry 10 }
+            
+        hwL3vpnStatOutPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Packets transmitted out."
+            ::= { hwL3vpnStatisticsEntry 11 } 
+            
+        hwL3vpnStatInUnicastPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast Packets received."
+            ::= { hwL3vpnStatisticsEntry 12 }
+            
+        hwL3vpnStatOutUnicastPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of unicast Packets transmitted out."
+            ::= { hwL3vpnStatisticsEntry 13 } 
+            
+        hwL3vpnStatInMulticastPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast Packets received."
+            ::= { hwL3vpnStatisticsEntry 14 }
+            
+        hwL3vpnStatOutMulticastPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of multicast Packets transmitted out."
+            ::= { hwL3vpnStatisticsEntry 15 }   
+            
+        hwL3vpnStatInBroadcastPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast Packets received."
+            ::= { hwL3vpnStatisticsEntry 16 } 
+            
+        hwL3vpnStatOutBroadcastPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of broadcast Packets transmitted out."
+            ::= { hwL3vpnStatisticsEntry 17 }
+            
+        hwL3vpnStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwL3vpnStatisticsEntry 18 } 
+             
+       hwL3vpnStatResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                resetstatistic(0) ,
+                resetStatistic(1)                           
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates a writable field, which is used to clear statistics. The value is 1."
+            ::= { hwL3vpnStatisticsEntry 19 }
+            
+-- The L3VPN Qos Statistic Table
+-- 
+        hwL3vpnQosStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL3vpnQosStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the L3VPN's Qos traffic statistics."
+            ::= { hwL3vpnStatMibObjects 2 }
+        
+        hwL3vpnQosStatisticsEntry OBJECT-TYPE
+            SYNTAX HwL3vpnQosStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the L3VPN's Qos traffic statistics."
+            INDEX { hwL3vpnQosStatVrfIndex, hwL3vpnQosStatQueueID }
+            ::= { hwL3vpnQosStatisticsTable 1 }
+        
+        HwL3vpnQosStatisticsEntry ::=
+            SEQUENCE {
+                hwL3vpnQosStatVrfIndex           
+                    Unsigned32,     
+                hwL3vpnQosStatQueueID
+                    INTEGER,
+                hwL3vpnQosStatPassPackets
+                    Counter64,
+                hwL3vpnQosStatPassBytes
+                    Counter64,
+                hwL3vpnQosStatDiscardPackets
+                    Counter64,
+                hwL3vpnQosStatDiscardBytes
+                    Counter64,
+                hwL3vpnQosStatPassPacketsRate
+                    Counter64,
+                hwL3vpnQosStatPassBytesRate
+                    Counter64,
+                hwL3vpnQosStatDiscardPacketsRate
+                    Counter64,
+                hwL3vpnQosStatDiscardBytesRate
+                    Counter64
+            } 
+            
+        hwL3vpnQosStatVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of the vpn instance."
+            ::= { hwL3vpnQosStatisticsEntry 1 }  
+            
+        hwL3vpnQosStatQueueID OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the queue's ID. The value must be 
+                be,af1,af2,af3,af4,ef,cs6,cs7."
+            ::= { hwL3vpnQosStatisticsEntry 2 }
+        
+        
+        hwL3vpnQosStatPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed packets, based on the vpn instance."
+            ::= { hwL3vpnQosStatisticsEntry 3 }
+
+
+        hwL3vpnQosStatPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed bytes, based on the vpn instance."
+            ::= { hwL3vpnQosStatisticsEntry 4 }
+
+
+        hwL3vpnQosStatDiscardPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded packets, based on the vpn instance."
+            ::= { hwL3vpnQosStatisticsEntry 5 }
+
+
+        hwL3vpnQosStatDiscardBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded bytes, based on the vpn instance."
+            ::= { hwL3vpnQosStatisticsEntry 6 }
+
+
+        hwL3vpnQosStatPassPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed packets for the past 30 seconds, based on the vpn instance. Unit: pps"
+            ::= { hwL3vpnQosStatisticsEntry 7 }
+
+
+        hwL3vpnQosStatPassBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed bytes for the past 30 seconds, based on the vpn instance. Unit: bps"
+            ::= { hwL3vpnQosStatisticsEntry 8 }
+
+
+        hwL3vpnQosStatDiscardPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded packets for the past 30 seconds, based on the vpn instance. Unit: pps"
+            ::= { hwL3vpnQosStatisticsEntry 9 }
+
+
+        hwL3vpnQosStatDiscardBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded bytes for the past 30 seconds, based on the vpn instance. Unit: bps"
+            ::= { hwL3vpnQosStatisticsEntry 10 }
+
+
+-- The L3VPN Peer Statistic Table
+-- 
+        hwL3vpnPeerStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL3vpnPeerStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the L3VPN's Traffic Statistic."
+            ::= { hwL3vpnStatMibObjects 3 }
+        
+        hwL3vpnPeerStatisticsEntry OBJECT-TYPE
+            SYNTAX HwL3vpnPeerStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the L3VPN Peer's Traffic Statistic."
+            INDEX { hwL3vpnPeerVrfIndex, hwL3vpnPeerStatPeerAddress }
+            ::= { hwL3vpnPeerStatisticsTable 1 }
+        
+        HwL3vpnPeerStatisticsEntry ::=
+            SEQUENCE {
+                hwL3vpnPeerVrfIndex           
+                    Unsigned32,
+                hwL3vpnPeerStatPeerAddress           
+                    IpAddress,     
+                hwL3vpnPeerStatEnable
+                    EnabledStatus,
+                hwL3vpnPeerStatResetStatistic
+                    INTEGER,        
+                hwL3vpnPeerVrfName
+                    DisplayString,
+                hwL3vpnPeerStatResetTime
+                    DateAndTime,                                     
+                hwL3vpnPeerStatQosPacketsRate
+                    Counter64,
+                hwL3vpnPeerStatQosBytesRate 
+                    Counter64,    
+                hwL3vpnPeerStatQosPackets
+                    Counter64,
+                hwL3vpnPeerStatQosBytes
+                    Counter64                    
+             }
+        
+        hwL3vpnPeerVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of L3vpn instance."
+            ::= { hwL3vpnPeerStatisticsEntry 1 } 
+        
+        hwL3vpnPeerStatPeerAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The peer IP address of L3vpn instance."
+            ::= { hwL3vpnPeerStatisticsEntry 2 }
+                
+        hwL3vpnPeerStatEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of L3VPN peer's traffic statistics."
+            DEFVAL { disabled }
+            ::= { hwL3vpnPeerStatisticsEntry 3 }
+                         
+        hwL3vpnPeerStatResetStatistic OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                resetStatistic(1)                           
+            }
+
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset traffic statistics for peer of the L3vpn instance."
+            ::= { hwL3vpnPeerStatisticsEntry 4 } 
+            
+        hwL3vpnPeerVrfName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VRF's name."
+            ::= { hwL3vpnPeerStatisticsEntry 5 }  
+                        
+        hwL3vpnPeerStatResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwL3vpnPeerStatisticsEntry 6 }
+        
+        hwL3vpnPeerStatQosPacketsRate OBJECT-TYPE  
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Average packets of the traffic transmitted out per second."
+            ::= { hwL3vpnPeerStatisticsEntry 7 }
+        
+        hwL3vpnPeerStatQosBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Average bytes of the traffic transmitted out per second ."
+            ::= { hwL3vpnPeerStatisticsEntry 8 }
+        
+        hwL3vpnPeerStatQosPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of Packets transmitted out."
+            ::= { hwL3vpnPeerStatisticsEntry 9 }       
+                             
+        hwL3vpnPeerStatQosBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes transmitted out."
+            ::= { hwL3vpnPeerStatisticsEntry 10 }
+            
+                            
+-- The L3VPN Peer Qos Statistic Table
+-- 
+        hwL3vpnPeerQosStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL3vpnPeerQosStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the L3vpn Peer's Qos traffic statistics."
+            ::= { hwL3vpnStatMibObjects 4 }
+        
+        hwL3vpnPeerQosStatisticsEntry OBJECT-TYPE
+            SYNTAX HwL3vpnPeerQosStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the L3VPN Peer's Qos traffic statistics."
+            INDEX { hwL3vpnPeerQosStatVrfIndex, hwL3vpnPeerQosStatPeerAddress, hwL3vpnPeerQosStatQueueID }
+            ::= { hwL3vpnPeerQosStatisticsTable 1 }
+        
+        HwL3vpnPeerQosStatisticsEntry ::=
+            SEQUENCE {
+                hwL3vpnPeerQosStatVrfIndex           
+                    Unsigned32,
+                hwL3vpnPeerQosStatPeerAddress           
+                    IpAddress,         
+                hwL3vpnPeerQosStatQueueID
+                    INTEGER,
+                hwL3vpnPeerQosStatPassPackets
+                    Counter64,
+                hwL3vpnPeerQosStatPassBytes
+                    Counter64,
+                hwL3vpnPeerQosStatDiscardPackets
+                    Counter64,
+                hwL3vpnPeerQosStatDiscardBytes
+                    Counter64,
+                hwL3vpnPeerQosStatPassPacketsRate
+                    Counter64,
+                hwL3vpnPeerQosStatPassBytesRate
+                    Counter64,
+                hwL3vpnPeerQosStatDiscardPacketsRate
+                    Counter64,
+                hwL3vpnPeerQosStatDiscardBytesRate
+                    Counter64
+            } 
+            
+        hwL3vpnPeerQosStatVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of the vpn instance."
+            ::= { hwL3vpnPeerQosStatisticsEntry 1 }  
+        
+        hwL3vpnPeerQosStatPeerAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The peer IP address of L3vpn instance."
+            ::= { hwL3vpnPeerQosStatisticsEntry 2 }    
+        
+        hwL3vpnPeerQosStatQueueID OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the queue's ID. The value must be 
+                be,af1,af2,af3,af4,ef,cs6,cs7."
+            ::= { hwL3vpnPeerQosStatisticsEntry 3 }
+        
+        
+        hwL3vpnPeerQosStatPassPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed packets, based on peer of the vpn instance."
+            ::= { hwL3vpnPeerQosStatisticsEntry 4 }
+
+
+        hwL3vpnPeerQosStatPassBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total passed bytes, based on peer of the vpn instance."
+            ::= { hwL3vpnPeerQosStatisticsEntry 5 }
+
+
+        hwL3vpnPeerQosStatDiscardPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded packets, based on peer of the vpn instance."
+            ::= { hwL3vpnPeerQosStatisticsEntry 6 }
+
+
+        hwL3vpnPeerQosStatDiscardBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of total discarded bytes, based on peer of the vpn instance."
+            ::= { hwL3vpnPeerQosStatisticsEntry 7 }
+
+
+        hwL3vpnPeerQosStatPassPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed packets for the past 30 seconds, based on peer of the vpn instance. Unit: pps"
+            ::= { hwL3vpnPeerQosStatisticsEntry 8 }
+
+
+        hwL3vpnPeerQosStatPassBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed bytes for the past 30 seconds, based on peer of the vpn instance. Unit: bps"
+            ::= { hwL3vpnPeerQosStatisticsEntry 9 }
+
+
+        hwL3vpnPeerQosStatDiscardPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded packets for the past 30 seconds, based on peer of the vpn instance. Unit: pps"
+            ::= { hwL3vpnPeerQosStatisticsEntry 10 }
+
+
+        hwL3vpnPeerQosStatDiscardBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded bytes for the past 30 seconds, based on peer of the vpn instance. Unit: bps"
+            ::= { hwL3vpnPeerQosStatisticsEntry 11 }
+
+-- The L3VPN Name and Index mapping Table
+-- 
+        hwL3vpnStatMapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL3vpnStatMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the map of L3vpn name and index."
+            ::= { hwL3vpnStatMibObjects 5 }
+        
+        hwL3vpnStatMapEntry OBJECT-TYPE
+            SYNTAX HwL3vpnStatMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the mapping information of the L3vpn name and L3vpn index."
+            INDEX { hwL3vpnStatMapVrfName }
+            ::= { hwL3vpnStatMapTable 1 }
+        
+        HwL3vpnStatMapEntry ::=
+            SEQUENCE {
+                hwL3vpnStatMapVrfName           
+                    DisplayString,
+                hwL3vpnStatMapVrfIndex           
+                    Unsigned32         
+            } 
+        hwL3vpnStatMapVrfName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the vpn instance's name."
+            ::= { hwL3vpnStatMapEntry 1 } 
+               
+        hwL3vpnStatMapVrfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Index of the vpn instance."
+            ::= { hwL3vpnStatMapEntry 2 }  
+        
+-- Conformance            
+            
+        hwL3vpnConformance OBJECT IDENTIFIER ::= { hwL3vpn 2 }
+
+-- group 
+       
+        hwL3vpnGroups OBJECT IDENTIFIER ::= { hwL3vpnConformance 1 }
+
+-- L3vpn Statistics Group        
+        hwL3vpnStatisticsGroup OBJECT-GROUP
+            OBJECTS {hwL3vpnStatEnable,hwL3vpnVrfName,hwL3vpnStatInTrafficRate, hwL3vpnStatOutTrafficRate, hwL3vpnStatInPacketsRate, hwL3vpnStatOutPacketsRate, hwL3vpnStatInBytes, 
+                hwL3vpnStatOutBytes, hwL3vpnStatInPackets, hwL3vpnStatOutPackets, hwL3vpnStatInUnicastPackets, hwL3vpnStatOutUnicastPackets, 
+                hwL3vpnStatInMulticastPackets, hwL3vpnStatOutMulticastPackets, hwL3vpnStatInBroadcastPackets, hwL3vpnStatOutBroadcastPackets, 
+                hwL3vpnStatResetTime, hwL3vpnStatResetStatistic}
+            STATUS current
+            DESCRIPTION 
+                "The L3vpn Statistics Group."
+            ::= { hwL3vpnGroups 1 }                                          
+
+-- L3vpn Qos Statistics Group            
+        hwL3vpnQosStatisticsGroup OBJECT-GROUP
+            OBJECTS {hwL3vpnQosStatPassPackets, hwL3vpnQosStatPassBytes, hwL3vpnQosStatDiscardPackets, hwL3vpnQosStatDiscardBytes, 
+                hwL3vpnQosStatPassPacketsRate, hwL3vpnQosStatPassBytesRate, 
+                hwL3vpnQosStatDiscardPacketsRate, hwL3vpnQosStatDiscardBytesRate }
+            STATUS current
+            DESCRIPTION 
+                "The L3vpn Qos Statistics Group."
+            ::= { hwL3vpnGroups 2 }
+
+-- L3vpn Peer Statistics Group        
+        hwL3vpnPeerStatisticsGroup OBJECT-GROUP
+            OBJECTS {hwL3vpnPeerStatEnable,hwL3vpnPeerStatResetStatistic,hwL3vpnPeerVrfName, hwL3vpnPeerStatResetTime,
+                hwL3vpnPeerStatQosPacketsRate, hwL3vpnPeerStatQosBytesRate, 
+                hwL3vpnPeerStatQosPackets, hwL3vpnPeerStatQosBytes}
+            STATUS current
+            DESCRIPTION 
+                "The L3vpn Statistics Group."
+            ::= { hwL3vpnGroups 3 }
+
+-- L3vpn Peer Qos Statistics Group            
+        hwL3vpnPeerQosStatisticsGroup OBJECT-GROUP
+            OBJECTS {hwL3vpnPeerQosStatPassPackets, hwL3vpnPeerQosStatPassBytes, hwL3vpnPeerQosStatDiscardPackets, hwL3vpnPeerQosStatDiscardBytes, 
+                hwL3vpnPeerQosStatPassPacketsRate, hwL3vpnPeerQosStatPassBytesRate, 
+                hwL3vpnPeerQosStatDiscardPacketsRate, hwL3vpnPeerQosStatDiscardBytesRate }
+            STATUS current
+            DESCRIPTION 
+                "The L3vpn Qos Statistics Group."
+            ::= { hwL3vpnGroups 4 }
+
+-- L3vpn Stat Map Group            
+        hwL3vpnStatMapGroup OBJECT-GROUP
+            OBJECTS { hwL3vpnStatMapVrfIndex }
+            STATUS current
+            DESCRIPTION 
+                "The L3vpn Stat Map Group."
+            ::= { hwL3vpnGroups 5 }                        
+-- Compliance        
+        hwL3vpnCompliances OBJECT IDENTIFIER ::= {hwL3vpnConformance 2}            
+        
+        hwL3vpnCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for HUAWEI-L3VPN-EXT-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwL3vpnStatisticsGroup}
+            ::= { hwL3vpnCompliances 1 }            
+-- L3vpnNotificationsObject
+        hwL3vpnNotificationsObjects OBJECT IDENTIFIER ::= { hwL3vpn 5 }
+
+        hwL3vpnVrfV6VpnName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Vpn Instance Name."
+            ::= { hwL3vpnNotificationsObjects 1 }
+
+        hwL3vpnVrfV6IfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..63))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Interface Name."
+            ::= { hwL3vpnNotificationsObjects 2 }
+
+-- Notification
+        hwL3vpnNotifications OBJECT IDENTIFIER ::= { hwL3vpn 6 }
+
+        hwL3vpnVrfV6Up NOTIFICATION-TYPE
+            OBJECTS { hwL3vpnVrfV6VpnName, hwL3vpnVrfV6IfName }
+            STATUS      current
+            DESCRIPTION
+                "The object indicates that IPv6 status on any interface bound to a VPN instance being Up."
+            ::= { hwL3vpnNotifications 1 }
+
+        hwL3vpnVrfV6Down NOTIFICATION-TYPE
+            OBJECTS { hwL3vpnVrfV6VpnName, hwL3vpnVrfV6IfName }
+            STATUS      current
+            DESCRIPTION
+                "The object indicates that IPv6 status on all interfaces bound to a VPN instance being Down."
+            ::= { hwL3vpnNotifications 2 }
+    END

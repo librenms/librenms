@@ -1,0 +1,25 @@
+<?php
+
+$name = 'nvidia';
+$colours = 'greens';
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 15;
+
+$int = 0;
+$rrd_list = [];
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id, $int]);
+
+while (Rrd::checkRrdExists($rrd_filename)) {
+    $rrd_list[] = [
+        'filename' => $rrd_filename,
+        'descr' => 'GPU ' . $int,
+        'ds' => $rrdVar,
+    ];
+
+    $int++;
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $app->app_type, $app->app_id, $int]);
+}
+
+require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

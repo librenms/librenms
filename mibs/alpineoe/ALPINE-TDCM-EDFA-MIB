@@ -1,0 +1,724 @@
+--
+-- ALPINE-TDCM-EDFA-MIB.mib
+--
+
+	ALPINE-TDCM-EDFA-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			alpineProducts			
+				FROM ALPINE-ROOT			
+			Integer32, OBJECT-TYPE, NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI;
+	
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.52326.2.1
+		alpineTdcmEdfaSystem OBJECT IDENTIFIER ::= { alpineProducts 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1
+		alpineTESlotBasicInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineTESlotBasicInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineTdcmEdfaSystem 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1
+		alpineTESlotBasicInfoEntry OBJECT-TYPE
+			SYNTAX AlpineTESlotBasicInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { alpineTESBISlotNum }
+			::= { alpineTESlotBasicInfoTable 1 }
+
+		
+		AlpineTESlotBasicInfoEntry ::=
+			SEQUENCE { 
+				alpineTESBISlotNum
+					Integer32,
+				alpineTESBISlotType
+					Integer32,
+				alpineTESBISlotHwVer
+					OCTET STRING,
+				alpineTESBISlotFwVer
+					OCTET STRING,
+				alpineTEBISlotPN
+					OCTET STRING,
+				alpineTEBISlotSN
+					OCTET STRING,
+				alpineTEBISlotManuDate
+					OCTET STRING,
+				alpineTEBISlotTemperature
+					OCTET STRING,
+				alpineTEBISlotPower1Status
+					Integer32,
+				alpineTEBISlotPower1Val
+					OCTET STRING,
+				alpineTEBISlotPower2Status
+					Integer32,
+				alpineTEBISlotPower2Val
+					OCTET STRING,
+				alpineTEBISlotPowerTotalCnt
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.52326.2.1.1.1.1
+		alpineTESBISlotNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Line card slot number."
+			::= { alpineTESlotBasicInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.2
+		alpineTESBISlotType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot Type.
+				1. TDCM Line Card
+				2. EDFA Line Card"
+			::= { alpineTESlotBasicInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.3
+		alpineTESBISlotHwVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Hardware version of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.4
+		alpineTESBISlotFwVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Firmware version of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.5
+		alpineTEBISlotPN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"PN info of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.6
+		alpineTEBISlotSN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Serial number of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.7
+		alpineTEBISlotManuDate OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Manufacture date of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.8
+		alpineTEBISlotTemperature OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Temperature of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.9
+		alpineTEBISlotPower1Status OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Power 1's status of the line card in this slot.
+				0. Normal or N/A
+				1. Alarm"
+			::= { alpineTESlotBasicInfoEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.10
+		alpineTEBISlotPower1Val OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "V"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Power 1's value of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.11
+		alpineTEBISlotPower2Status OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Power 2's status of the line card in this slot.
+				0. Normal or N/A
+				1. Alarm"
+			::= { alpineTESlotBasicInfoEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.12
+		alpineTEBISlotPower2Val OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Power 2's value of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.1.1.13
+		alpineTEBISlotPowerTotalCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total power count of the line card in this slot."
+			::= { alpineTESlotBasicInfoEntry 13 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.2
+		alpineTESlotStatusTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineTESlotStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineTdcmEdfaSystem 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.2.1
+		alpineTESlotStatusEntry OBJECT-TYPE
+			SYNTAX AlpineTESlotStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { alpineTESlotNum }
+			::= { alpineTESlotStatusTable 1 }
+
+		
+		AlpineTESlotStatusEntry ::=
+			SEQUENCE { 
+				alpineTESlotNum
+					Integer32,
+				alpineTESlotStatus
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.52326.2.1.2.1.1
+		alpineTESlotNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot number."
+			::= { alpineTESlotStatusEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.2.1.2
+		alpineTESlotStatus OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates slot's card type.
+				0. N/A. The slot is not inserted so the value is meaningless.
+				1. Present. The slot is inserted "
+			::= { alpineTESlotStatusEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3
+		alpineTEAlarm OBJECT IDENTIFIER ::= { alpineTdcmEdfaSystem 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3.1
+		alpineTEAlarmThldTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineTEAlarmThldEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineTEAlarm 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3.1.1
+		alpineTEAlarmThldEntry OBJECT-TYPE
+			SYNTAX AlpineTEAlarmThldEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { alpineTeatSlotNum }
+			::= { alpineTEAlarmThldTable 1 }
+
+		
+		AlpineTEAlarmThldEntry ::=
+			SEQUENCE { 
+				alpineTeatSlotNum
+					Integer32,
+				alpineTeatTempHighAlarmThld
+					OCTET STRING,
+				alpineTeatTempHighWarningThld
+					OCTET STRING,
+				alpineTeatTempLowAlarmThld
+					OCTET STRING,
+				alpineTeatTempLowWarningThld
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.52326.2.1.3.1.1.1
+		alpineTeatSlotNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot Number."
+			::= { alpineTEAlarmThldEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3.1.1.2
+		alpineTeatTempHighAlarmThld OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Threshold of high temperature alarm."
+			::= { alpineTEAlarmThldEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3.1.1.3
+		alpineTeatTempHighWarningThld OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Threshold of high temperature warning."
+			::= { alpineTEAlarmThldEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3.1.1.4
+		alpineTeatTempLowAlarmThld OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Threshold of low temperature alarm."
+			::= { alpineTEAlarmThldEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3.1.1.5
+		alpineTeatTempLowWarningThld OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Threshold of low temperature warning."
+			::= { alpineTEAlarmThldEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.3.2
+		alpineTEAlarmTemperature NOTIFICATION-TYPE
+			OBJECTS { alpineTEBISlotTemperature }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { alpineTEAlarm 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4
+		alpineTESystemPowerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineTESystemPowerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineTdcmEdfaSystem 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1
+		alpineTESystemPowerEntry OBJECT-TYPE
+			SYNTAX AlpineTESystemPowerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { alpineTEPowerCardId }
+			::= { alpineTESystemPowerTable 1 }
+
+		
+		AlpineTESystemPowerEntry ::=
+			SEQUENCE { 
+				alpineTEPowerCardId
+					Integer32,
+				alpineTEPowerCardType
+					Integer32,
+				alpineTEPowerCardHwVer
+					OCTET STRING,
+				alpineTEPowerCardFwVer
+					OCTET STRING,
+				alpineTEPowerCardPN
+					OCTET STRING,
+				alpineTEPowerCardSN
+					OCTET STRING,
+				alpineTEPowerCardManuDate
+					OCTET STRING,
+				alpineTEPowerCardPowerInStatus
+					Integer32,
+				alpineTEPowerCardPowerOutVal
+					OCTET STRING,
+				alpineTEPowerCardPowerOutStatus
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.52326.2.1.4.1.1
+		alpineTEPowerCardId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card ID."
+			::= { alpineTESystemPowerEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.2
+		alpineTEPowerCardType OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card's type.
+				1. 220VAC
+				2. -48VDC"
+			::= { alpineTESystemPowerEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.3
+		alpineTEPowerCardHwVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card's hardware version."
+			::= { alpineTESystemPowerEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.4
+		alpineTEPowerCardFwVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card's firmware version."
+			::= { alpineTESystemPowerEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.5
+		alpineTEPowerCardPN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card's part number."
+			::= { alpineTESystemPowerEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.6
+		alpineTEPowerCardSN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card's serial number."
+			::= { alpineTESystemPowerEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.7
+		alpineTEPowerCardManuDate OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card's manufacture date."
+			::= { alpineTESystemPowerEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.8
+		alpineTEPowerCardPowerInStatus OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The input power of system power card.
+				0. On
+				1. Off/No power input"
+			::= { alpineTESystemPowerEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.9
+		alpineTEPowerCardPowerOutVal OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "V"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System power card's output voltage."
+			::= { alpineTESystemPowerEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.4.1.10
+		alpineTEPowerCardPowerOutStatus OBJECT-TYPE
+			SYNTAX Integer32 (0..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The output power status of system power card's
+				0. Normal
+				1. Voltage High Alarm
+				2. Vlotage Low Alarm"
+			::= { alpineTESystemPowerEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5
+		alpineTESystemFanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineTESystemFanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineTdcmEdfaSystem 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1
+		alpineTESystemFanEntry OBJECT-TYPE
+			SYNTAX AlpineTESystemFanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { alpineTEFanCardId }
+			::= { alpineTESystemFanTable 1 }
+
+		
+		AlpineTESystemFanEntry ::=
+			SEQUENCE { 
+				alpineTEFanCardId
+					Integer32,
+				alpineTEFanCardFansTotalCnt
+					Integer32,
+				alpineTEFanCardHwVer
+					OCTET STRING,
+				alpineTEFanCardFwVer
+					OCTET STRING,
+				alpineTEFanCardPN
+					OCTET STRING,
+				alpineTEFanCardSN
+					OCTET STRING,
+				alpineTEFanCardManuDate
+					OCTET STRING,
+				alpineTEFanCardPower1Val
+					OCTET STRING,
+				alpineTEFanCardFan1Speed
+					Integer32,
+				alpineTEFanCardFan1Status
+					Integer32,
+				alpineTEFanCardFan2Speed
+					Integer32,
+				alpineTEFanCardFan2Status
+					Integer32,
+				alpineTEFanCardFan3Speed
+					Integer32,
+				alpineTEFanCardFan3Status
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.52326.2.1.5.1.1
+		alpineTEFanCardId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's ID."
+			::= { alpineTESystemFanEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.2
+		alpineTEFanCardFansTotalCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's total fans count."
+			::= { alpineTESystemFanEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.3
+		alpineTEFanCardHwVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's hardware version."
+			::= { alpineTESystemFanEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.4
+		alpineTEFanCardFwVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's firmware version."
+			::= { alpineTESystemFanEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.5
+		alpineTEFanCardPN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's part number."
+			::= { alpineTESystemFanEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.6
+		alpineTEFanCardSN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's serial number."
+			::= { alpineTESystemFanEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.7
+		alpineTEFanCardManuDate OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's manufacture date."
+			::= { alpineTESystemFanEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.8
+		alpineTEFanCardPower1Val OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..8))
+			UNITS "V"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's power1's voltage value."
+			::= { alpineTESystemFanEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.9
+		alpineTEFanCardFan1Speed OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "RPM"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's #1 fan speed."
+			::= { alpineTESystemFanEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.10
+		alpineTEFanCardFan1Status OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's #1 fan status.
+				0. Normal
+				1. Abnormal"
+			::= { alpineTESystemFanEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.11
+		alpineTEFanCardFan2Speed OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "RPM"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's #2 fan speed.
+				Depend on the 'alpineTEFanCardFansTotalCnt', #2 fan may not exist. If the fan is not exist, the value should be 0."
+			::= { alpineTESystemFanEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.12
+		alpineTEFanCardFan2Status OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's #2 fan status.
+				0. Normal
+				1. Abnormal
+				Depend on the 'alpineTEFanCardFansTotalCnt', #2 fan may not exist. If the fan is not exist, the value should be 0."
+			::= { alpineTESystemFanEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.13
+		alpineTEFanCardFan3Speed OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "RPM"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's #3 fan speed.
+				Depend on the 'alpineTEFanCardFansTotalCnt', #3 fan may not exist. If the fan is not exist, the value should be 0."
+			::= { alpineTESystemFanEntry 13 }
+
+		
+		-- 1.3.6.1.4.1.52326.2.1.5.1.14
+		alpineTEFanCardFan3Status OBJECT-TYPE
+			SYNTAX Integer32 (0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"System fan card's #3 fan status.
+				0. Normal
+				1. Abnormal
+				Depend on the 'alpineTEFanCardFansTotalCnt', #3 fan may not exist. If the fan is not exist, the value should be 0."
+			::= { alpineTESystemFanEntry 14 }
+
+		
+	
+	END
+
+--
+-- ALPINE-TDCM-EDFA-MIB.mib
+--

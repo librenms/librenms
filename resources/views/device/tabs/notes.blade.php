@@ -1,0 +1,16 @@
+@extends('layouts.librenmsv1')
+
+@section('content')
+<x-device.page :device="$device">
+    <x-panel title="{{ __('Device Notes') }}">
+        <form method="post" action="{{ route('device.notes.update', $device)}}">
+            @csrf
+            @method('PUT')
+            <div class="form-group">
+                <textarea @cannot('updateNotes', $device) disabled @endcannot class="form-control" rows="3" name="note">{{ $device->notes }}</textarea>
+            </div>
+            <button @cannot('updateNotes', $device) disabled @endcannot type="submit" class="btn btn-default"><i class="fa fa-check"></i> Save</button>
+        </form>
+    </x-panel>
+</x-device.page>
+@endsection

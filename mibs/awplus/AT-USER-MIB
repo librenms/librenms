@@ -1,0 +1,363 @@
+-- ============================================================================
+-- AT-USER.MIB, Allied Telesis enterprise MIB:USER
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-USER-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+
+        user MODULE-IDENTITY
+            LAST-UPDATED "201209210000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The AT-USER MIB contains objects for displaying information of
+                users currently logged into a device, or configured in the local
+                user data base of the device."
+            REVISION "201209210000Z"
+            DESCRIPTION
+                "Added chassis switch (e.g. SBx8100) descriptions to stack-related MIB objects"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201006080000Z"
+            DESCRIPTION
+                "Add objects for strong passwords information."
+            REVISION "200810161200Z"
+            DESCRIPTION
+                "Add objects for local user data base information."
+            REVISION "200808260000Z"
+            DESCRIPTION
+                "Initial version."
+            ::= { sysinfo 20 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        userInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF UserInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information about users. Each entry in the table
+                represents a user currently logged into the device."
+            ::= { user 1 }
+
+
+        userInfoEntry OBJECT-TYPE
+            SYNTAX UserInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information on a user currently logged into the device."
+            INDEX { userInfoType, userInfoIndex }
+            ::= { userInfoTable 1 }
+
+
+        UserInfoEntry ::=
+            SEQUENCE {
+                userInfoType
+                    INTEGER,
+                userInfoIndex
+                    Unsigned32,
+                userInfoUserName
+                    DisplayString,
+                userInfoPrivilegeLevel
+                    Unsigned32,
+                userInfoIdleTime
+                    DisplayString,
+                userInfoLocation
+                    DisplayString,
+                userInfoPasswordLifetime
+                    DisplayString,
+                userInfoPasswordLastChange
+                    DisplayString
+             }
+
+        userInfoType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                console(1),
+                aux(2),
+                telnet(3),
+                script(4),
+                stack(5)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of connection through which the user logged into
+                the device:
+                - console (1)
+                - aux (2)
+                - telnet (3)
+                - script (4)
+                - stack or back-up CFC console (5)"
+            ::= { userInfoEntry 1 }
+
+
+        userInfoIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the line upon which the user logged into
+                the device."
+            ::= { userInfoEntry 2 }
+
+
+        userInfoUserName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the user name of the user
+                currently logged into the device."
+            ::= { userInfoEntry 3 }
+
+
+        userInfoPrivilegeLevel OBJECT-TYPE
+            SYNTAX Unsigned32 (1..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the privilege level the user is granted."
+            ::= { userInfoEntry 4 }
+
+
+        userInfoIdleTime OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the amount of time since the user was last
+                active. It is in the form of hh:mm:ss."
+            ::= { userInfoEntry 5 }
+
+
+        userInfoLocation OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the location or login method of the user.
+                It can be an IP address used by the user to telnet into the device,
+                or an asyn port, etc."
+            ::= { userInfoEntry 6 }
+
+
+        userInfoPasswordLifetime OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of days remaining until the users
+                password expires.  Depending on the current user setting it will
+                either display a string of:
+                'No Expiry' - password will never expire (default);
+                'x days' where x is the remaining lifetime of the current password - the
+                 maximum lifetime value is 1000 days;
+                '-x days (expired)' indicates that the current password expired 'x' days ago."
+            ::= { userInfoEntry 7 }
+
+
+        userInfoPasswordLastChange OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates, in days, the last time the password was
+                altered."
+            ::= { userInfoEntry 8 }
+
+
+        userConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF UserConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of user configuration information. Each entry
+                in the table represents a user configured in the local user
+                data base of the device."
+            ::= { user 2 }
+
+
+        userConfigEntry OBJECT-TYPE
+            SYNTAX UserConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A conceptual entry in the userConfigTable."
+            INDEX { userConfigIndex }
+            ::= { userConfigTable 1 }
+
+
+        UserConfigEntry ::=
+            SEQUENCE {
+                userConfigIndex
+                    Unsigned32,
+                userConfigUsername
+                    DisplayString,
+                userConfigPrivilegeLevel
+                    Unsigned32
+             }
+
+        userConfigIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index used to identify entries in the userConfigTable."
+            ::= { userConfigEntry 1 }
+
+
+        userConfigUsername OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the user's name in configuration."
+            ::= { userConfigEntry 2 }
+
+
+        userConfigPrivilegeLevel OBJECT-TYPE
+            SYNTAX Unsigned32 (1..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the user's privilege level in configuration."
+            ::= { userConfigEntry 3 }
+
+
+        userSecurityPasswordRules OBJECT IDENTIFIER ::= { user 3 }
+
+
+        userSecurityPasswordHistory OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the number of previous passwords that will be
+                retained for comparison when a new password is created for the user.
+                The password must be unique when compared against the previous history.
+                A value of 0 represents 'No Restriction' - default.
+                The maximum number of retained passwords is 15."
+            ::= { userSecurityPasswordRules 1 }
+
+
+        userSecurityPasswordLifetime OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the maximum time interval (days) that the
+                password may persist for before a change is required.
+                A value of 0 represents 'No Expiry' - default.
+                The maximum value is 1000 days."
+            ::= { userSecurityPasswordRules 2 }
+
+
+        userSecurityPasswordWarning OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the number of days before the password
+                expires that a warning message will be displayed when the user logs on.
+                A value of 0 indicates 'No Warning' - default.
+                The maximum value is 1000 but must always be less than the password
+                lifetime."
+            ::= { userSecurityPasswordRules 3 }
+
+
+        userSecurityPasswordMinLength OBJECT-TYPE
+            SYNTAX Unsigned32 (1..23)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the minimum password length that the password
+                must satisfy to be considered valid.
+                The default value is 1."
+            ::= { userSecurityPasswordRules 4 }
+
+
+        userSecurityPasswordMinCategory OBJECT-TYPE
+            SYNTAX Unsigned32 (1..4)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the minimum number of different categories
+                that the password must satisfy to be considered valid.
+                Categories are split into four groups:
+                  upper-case letters; lower-case letters; digits; special symbols.
+                For example, combinations of: ABCD (1 category), ABCDabcd (2 categories),
+                ABCD1111 (2 categories), abcd#$# (2 categories), Aa1# (4 categories).
+                The default value is 1."
+            ::= { userSecurityPasswordRules 5 }
+
+
+        userSecurityPasswordForced OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents whether or not a user with an expired password
+                should be forced to alter their password at the next log-on.  When a user
+                logs on with an expired password the system will either reject the log-on
+                attempt or if allowed to log-on then the user may be forced to update
+                their password immediately depending on this setting.
+                This functionality is only valid for administrative users.
+                The default value is disabled."
+            ::= { userSecurityPasswordRules 6 }
+
+
+        userSecurityPasswordReject OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents whether or not a user log-on attempt with an expired
+                password will be rejected.  If they are not rejected then the user will
+                be allowed to log-on.  They may have to alter their password immediately
+                based on the forced setting.
+                This functionality is only valid for administrative users.  The passwords of
+                non-administrative users will never expire.
+                The default value is disabled."
+            ::= { userSecurityPasswordRules 7 }
+
+
+
+    END
+
+--
+-- at-user.mib
+--
+

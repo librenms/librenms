@@ -1,0 +1,188 @@
+-- --------------------------------------------------------------------
+-- ATM FORUM TC MIB
+--
+-- October 1996, Kartik Chandrasekhar
+--
+-- Copyright (c) 1996-1997 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+ATM-FORUM-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TEXTUAL-CONVENTION              FROM SNMPv2-TC
+        enterprises                     FROM RFC1155-SMI;
+
+
+--              Textual Conventions
+
+-- Boolean values use this data type from RFC-1903, "Textual Conventions
+-- for Version 2 of the Simple Network Management Protocol (SNMPv2)"
+TruthValue ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+   "Boolean values use this data type from RFC-1903"
+   SYNTAX      INTEGER {
+                 true(1),
+                 false(2)
+               }
+
+-- CLNP address values use this data type from RFC-1238, "CLNS MIB for
+-- use with Connectionless Network Protocol (ISO 8473) and End System
+-- to Intermediate System (ISO 9542)"
+ClnpAddress ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+   "CLNP address values use this data type from RFC-1238"
+   SYNTAX      OCTET STRING (SIZE (1..21))
+
+
+-- ATM Service Categories use this data type (See [TM4.0]):
+AtmServiceCategory ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+   "ATM Service Categories use this data type"
+   SYNTAX      INTEGER {
+                 other(1),
+                 cbr(2),
+                 rtVbr(3),
+                 nrtVbr(4),
+                 abr(5),
+                 ubr(6)
+              }
+
+-- ATM End-System Addresses use this data type:
+AtmAddress ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+   "ATM End-System Addresses"
+   SYNTAX      OCTET STRING (SIZE (8 | 20))
+
+-- Network-Prefixes for an ATM Address use this data type:
+NetPrefix ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+   "ATM End-System Addresses"
+   SYNTAX      OCTET STRING (SIZE (8 | 13))
+
+
+-- In both the AtmAddress and NetPrefix conventions, Native E.164 addresses
+-- are represented as 8 octets using the format specified in section
+-- 3.1.1.3 of the ATM Forum UNI Signalling 4.0 specification.
+-- In contrast, an NSAP-encoded address is 20 octets, and an NSAP-encoded
+-- network prefix is 13 octets long.
+
+
+--              MIB Groups
+
+-- a subtree for defining ATM Forum MIB object types
+atmForum                OBJECT IDENTIFIER ::= { enterprises 353 }
+
+-- a subtree for defining administrative object types
+atmForumAdmin           OBJECT IDENTIFIER ::= { atmForum 1 }
+atmfTransmissionTypes   OBJECT IDENTIFIER ::= { atmForumAdmin 2 }
+atmfMediaTypes          OBJECT IDENTIFIER ::= { atmForumAdmin 3 }
+atmfTrafficDescrTypes   OBJECT IDENTIFIER ::= { atmForumAdmin 4 }
+atmfSrvcRegTypes        OBJECT IDENTIFIER ::= { atmForumAdmin 5 }
+
+-- a subtree for defining ATM Interface MIB object types
+atmForumUni             OBJECT IDENTIFIER ::= { atmForum 2 }
+atmfPhysicalGroup       OBJECT IDENTIFIER ::= { atmForumUni 1 }
+atmfAtmLayerGroup       OBJECT IDENTIFIER ::= { atmForumUni 2 }
+atmfAtmStatsGroup       OBJECT IDENTIFIER ::= { atmForumUni 3 }
+atmfVpcGroup            OBJECT IDENTIFIER ::= { atmForumUni 4 }
+atmfVccGroup            OBJECT IDENTIFIER ::= { atmForumUni 5 }
+atmfAddressGroup        OBJECT IDENTIFIER ::= { atmForumUni 6 }
+atmfNetPrefixGroup      OBJECT IDENTIFIER ::= { atmForumUni 7 }
+atmfSrvcRegistryGroup   OBJECT IDENTIFIER ::= { atmForumUni 8 }
+atmfVpcAbrGroup         OBJECT IDENTIFIER ::= { atmForumUni 9 }
+atmfVccAbrGroup         OBJECT IDENTIFIER ::= { atmForumUni 10 }
+atmfAddressRegistrationAdminGroup OBJECT IDENTIFIER ::= { atmForumUni 11 }
+
+
+--              Object Identifier definitions
+
+-- Transmission Types: These values are no longer used
+atmfUnknownType         OBJECT IDENTIFIER ::= { atmfTransmissionTypes 1}
+atmfSonetSTS3c          OBJECT IDENTIFIER ::= { atmfTransmissionTypes 2 }
+atmfDs3                 OBJECT IDENTIFIER ::= { atmfTransmissionTypes 3 }
+atmf4B5B                OBJECT IDENTIFIER ::= { atmfTransmissionTypes 4 }
+atmf8B10B               OBJECT IDENTIFIER ::= { atmfTransmissionTypes 5 }
+atmfSonetSTS12c         OBJECT IDENTIFIER ::= { atmfTransmissionTypes 6 }
+atmfE3                  OBJECT IDENTIFIER ::= { atmfTransmissionTypes 7 }
+atmfT1                  OBJECT IDENTIFIER ::= { atmfTransmissionTypes 8 }
+atmfE1                  OBJECT IDENTIFIER ::= { atmfTransmissionTypes 9 }
+
+-- Media Types: These values are no longer used
+atmfMediaUnknownType    OBJECT IDENTIFIER ::= { atmfMediaTypes 1 }
+atmfMediaCoaxCable      OBJECT IDENTIFIER ::= { atmfMediaTypes 2 }
+atmfMediaSingleMode     OBJECT IDENTIFIER ::= { atmfMediaTypes 3 }
+atmfMediaMultiMode      OBJECT IDENTIFIER ::= { atmfMediaTypes 4 }
+atmfMediaStp            OBJECT IDENTIFIER ::= { atmfMediaTypes 5 }
+atmfMediaUtp            OBJECT IDENTIFIER ::= { atmfMediaTypes 6 }
+
+-- Traffic Descriptor Types: These types are combined with a five element
+-- parameter vector to describe a Traffic Descriptor.
+-- Traffic Descriptors along with a Best Effort Indicator are used to
+-- indicate a Conformance Definition as defined in [TM4.0].
+
+-- These types are no longer used
+atmfNoDescriptor        OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 1 }
+atmfPeakRate            OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 2 }
+
+-- The No CLP/No SCR Type
+-- Indicates the CBR.1 Conformance Definition if Best Effort is No
+-- Indicates the UBR.1 and UBR.2 Conformance Definitions if Best Effort is Yes
+atmfNoClpNoScr          OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 3 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - CDVT in tenths of microseconds
+        -- Parameters #3, #4 and #5 are unused
+
+-- These types are no longer used
+atmfClpNoTaggingNoScr   OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 4 }
+atmfClpTaggingNoScr     OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 5 }
+
+-- The SCR/No CLP Type
+-- Indicates the VBR.1 Conformance Definition
+atmfNoClpScr            OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 6 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - sustainable cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #3 - maximum burst size in cells
+        -- Parameter #4 - CDVT in tenths of microseconds
+        -- Parameter #5 - unused
+
+-- The CLP without Tagging/SCR Type
+-- Indicates the VBR.2 Conformance Definition
+atmfClpNoTaggingScr     OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 7 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - sustainable cell rate in cells/second for CLP=0 traffic
+        -- Parameter #3 - maximum burst size in cells
+        -- Parameter #4 - CDVT in tenths of microseconds
+        -- Parameter #5 - unused
+
+-- The CLP with Tagging/SCR Type
+-- Indicates the VBR.3 Conformance Definition
+atmfClpTaggingScr       OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 8 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second for CLP=0+1 traffic
+        -- Parameter #2 - sustainable cell rate in cells/second for CLP=0
+        --      traffic, excess tagged as CLP=1
+        -- Parameter #3 - maximum burst size in cells
+        -- Parameter #4 - CDVT in tenths of microseconds
+        -- Parameter #5 - unused
+
+-- The ABR Type
+-- Indicates the ABR Conformance Definition
+atmfClpNoTaggingMcr      OBJECT IDENTIFIER ::= { atmfTrafficDescrTypes 9 }
+-- The use of the parameter vector for this type:
+        -- Parameter #1 - peak cell rate in cells/second
+        -- parameter #2 - CDVT in tenths of microseconds
+        -- Parameter #3 - minimum cell rate in cells/second
+        -- Parameter #4 - unused
+        -- Parameter #5 - unused
+
+END
+

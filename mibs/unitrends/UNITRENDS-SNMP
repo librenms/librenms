@@ -1,0 +1,1514 @@
+--*****************************************************************************
+-- Unitrends SNMP subagent MIB
+-- MIB Revision:  1.4
+--
+-- Unitrends copyright information 2013-2016
+--*****************************************************************************
+
+UNITRENDS-SNMP DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, Counter32, Integer32
+        FROM SNMPv2-SMI
+
+    DisplayString, TEXTUAL-CONVENTION     
+        FROM SNMPv2-TC;
+
+unitrends                  OBJECT IDENTIFIER ::= { enterprises 21865 }
+rr                         OBJECT IDENTIFIER ::= { unitrends 1 }
+trapMembers                OBJECT IDENTIFIER ::= { rr 1 }
+trapGroups                 OBJECT IDENTIFIER ::= { rr 2 }
+trap100                    OBJECT IDENTIFIER ::= { trapGroups 100 }
+trapPrefix                 OBJECT IDENTIFIER ::= { trap100 0 }
+bpGroup                    OBJECT IDENTIFIER ::= { rr 3 }
+ipmiGroup                  OBJECT IDENTIFIER ::= { rr 4 }
+diskGroup                  OBJECT IDENTIFIER ::= { rr 5 }
+mgtGroup                   OBJECT IDENTIFIER ::= { rr 6 }
+bpBackupGroup		   OBJECT IDENTIFIER ::= { bpGroup 10 }
+bpCapacityGroup		   OBJECT IDENTIFIER ::= { bpGroup 20 }
+bpReplicationGroup	   OBJECT IDENTIFIER ::= { bpGroup 30 }
+bpArchiveGroup		   OBJECT IDENTIFIER ::= { bpGroup 40 }
+coolingGroup		   OBJECT IDENTIFIER ::= { ipmiGroup 10 }
+tempGroup		   OBJECT IDENTIFIER ::= { ipmiGroup 20 }
+voltageGroup		   OBJECT IDENTIFIER ::= { ipmiGroup 30 }
+eventlogGroup		   OBJECT IDENTIFIER ::= { ipmiGroup 40 }
+physdiskGroup		   OBJECT IDENTIFIER ::= { diskGroup 10 }
+volumeGroup		   OBJECT IDENTIFIER ::= { diskGroup 20 }
+
+--*****************************************************************************
+-- MODULE IDENTITY AND REVISION GROUP
+--*****************************************************************************
+unitrendsSnmpModule       MODULE-IDENTITY
+    LAST-UPDATED    "201607281600Z" -- UTC format is YYMMDDHHmmZ
+    ORGANIZATION    "Unitrends"
+    CONTACT-INFO    " "
+    DESCRIPTION     "This SNMP MIB module supports the Unitrends Rapid Recovery 
+                    backup appliances for monitoring various components, 
+	    providing SNMP access to GET and TRAP information,
+	    and support events through the NOTIFICATION-TYPE construct.
+
+                    Version:  1.4  07/28/2016 
+                    Unitrends copyright information 2013-2016"
+                    ::= { bpGroup 1 }
+
+--
+-- 
+--
+UnitrendsStatus                     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The status used for the overall health of the server."
+    SYNTAX      INTEGER {
+                    other(1),
+                    unknown(2),
+                    ok(3),
+                    nonCritical(4),
+                    critical(5),
+                    nonRecoverable(6),
+                    lowerCritical(7),
+                    upperCritical(8) }
+
+UnitrendsFeatureStatus              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The status of a particular feature."
+    SYNTAX      INTEGER {
+                    other(1), 
+                    unknown(2),  
+                    disabled(3),               
+                    enabled(4),           
+                    notImplemented(5) }      
+
+UnitrendsSeverity                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The severity of the event."
+    SYNTAX      INTEGER {
+                    clearing(0),
+                    error(1),
+                    warning(2),
+                    information(3) }
+
+OneBasedIndex                   ::= Integer32(1..2147483647)
+
+--*****************************************************************************
+--
+-- SYSTEM MANAGEMENT INFO GROUP
+--
+--*****************************************************************************
+
+mgtInfoAssetId                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Unitrends Asset ID of the system."
+    ::= { mgtGroup 1 }
+
+mgtInfoHostname                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Hostname of the system."
+    ::= { mgtGroup 2 }
+
+mgtInfoKernelVersion                         OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Linux Kernel version of the system."
+    ::= { mgtGroup 3 }
+
+mgtInfoMemoryTotal                         OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines Total Memory (MB) on the system."
+    ::= { mgtGroup 4 }
+
+mgtInfoMemoryUsed                         OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines Memory Used (MB) on the system."
+    ::= { mgtGroup 5 }
+
+mgtInfoMemoryFree                         OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines Memory Free (MB) on the system."
+    ::= { mgtGroup 6 }
+
+mgtInfoCpuUsed                           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the percentage of CPU used."
+    ::= { mgtGroup 7 }
+
+mgtInfoBaseboard                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the system baseboard model."
+    ::= { mgtGroup 8 }
+
+mgtInfoBiosVersion                           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the BIOS version on the system."
+    ::= { mgtGroup 9 }
+
+mgtInfoFwVersion                               OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Firmware version on the system."
+    ::= { mgtGroup 10 }
+
+mgtInfoDhcpMode                            OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the DHCP Mode of the IPMI LAN interface."
+    ::= { mgtGroup 11 }
+
+mgtInfoIpAddress                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the IP Address of the IPMI LAN interface."
+    ::= { mgtGroup 12 }
+
+mgtInfoMacAddress                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the MAC Address of the IPMI LAN interface."
+    ::= { mgtGroup 13 }
+
+mgtInfoSubnetMask                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Subnet Mask of the IPMI LAN interface."
+    ::= { mgtGroup 14 }
+
+mgtInfoGatewayIP                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Gateway IP Address of the IPMI LAN interface."
+    ::= { mgtGroup 15 }
+
+mgtInfoGatewayMac                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Gateway MAC Address of the IPMI LAN interface."
+    ::= { mgtGroup 16 }
+
+mgtInfoLanPort                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the IPMI LAN interface port used."
+    ::= { mgtGroup 17 }
+
+mgtInfoManufDate                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the IPMI Manufacturing Date of the baseboard."
+    ::= { mgtGroup 18 }
+
+mgtInfoRelease                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Unitrends release version."
+    ::= { mgtGroup 19 }
+
+--*****************************************************************************
+--
+-- POWER GROUP
+--
+--*****************************************************************************
+
+-------------------------------------------------------------------------------
+-- Voltage Probe Table
+-------------------------------------------------------------------------------
+voltageProbeInstances                                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of voltage sensors available
+    on the system"
+    ::= { voltageGroup 1 }
+    
+voltageProbeTable                                       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VoltageProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Voltage Probe Table."
+    ::= { voltageGroup 2 }
+
+
+voltageProbeTableEntry                                  OBJECT-TYPE
+    SYNTAX      VoltageProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Voltage Probe Table Entry."
+    INDEX       { voltageIndex }
+    ::= { voltageProbeTable 1 }
+
+VoltageProbeTableEntry                                  ::= SEQUENCE {
+    voltageIndex                                        OneBasedIndex,
+    voltageDeviceId                                     INTEGER,
+    voltageDescription                                  DisplayString,
+    voltageStatusString                                 DisplayString,
+    voltageStatus                                       UnitrendsStatus,
+    voltageReading                                      DisplayString,
+    voltageUpperCriticalThreshold                       DisplayString,
+    voltageLowerCriticalThreshold                       DisplayString
+}
+
+voltageIndex                                            OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the voltage probe."
+    ::= { voltageProbeTableEntry 1 }
+
+voltageDeviceId                                         OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines an unique ID for the voltage probe"
+    ::= { voltageProbeTableEntry 2 }
+    
+voltageDescription                                      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute textually describes the voltage probe."
+    ::= { voltageProbeTableEntry 3 }
+
+voltageStatusString                                     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current status of the sensor will be one of the
+following strings: OK, Error, Degraded or Unknown."
+    ::= { voltageProbeTableEntry 4 }
+
+voltageStatus                                           OBJECT-TYPE
+    SYNTAX      UnitrendsStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current health status of the sensor."
+    ::= { voltageProbeTableEntry 5 }
+
+voltageReading                                          OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The current reading of the voltage probe."
+    ::= { voltageProbeTableEntry 6 }
+
+voltageUpperCriticalThreshold                           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The upper critical threshold for the voltage probe, in
+millivolts."
+    ::= { voltageProbeTableEntry 7 }
+
+voltageLowerCriticalThreshold                           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The lower non-critical threshold for the voltage probe, in
+millivolts."
+    ::= { voltageProbeTableEntry 8 }
+
+--*****************************************************************************
+--
+-- THERMAL GROUP
+--
+--*****************************************************************************
+
+-------------------------------------------------------------------------------
+-- Cooling Device Table
+-------------------------------------------------------------------------------
+coolingDeviceInstances                                  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of fan sensors available
+    on the system"
+    ::= { coolingGroup 1 }
+
+coolingDeviceTable                                      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoolingDeviceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Cooling Device Table."
+    ::= { coolingGroup 2 }
+
+coolingDeviceTableEntry                                 OBJECT-TYPE
+    SYNTAX      CoolingDeviceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Cooling Device Table Entry"
+    INDEX       { coolingDeviceIndex }
+    ::= { coolingDeviceTable 1 }
+
+CoolingDeviceTableEntry                                 ::= SEQUENCE {
+    coolingDeviceIndex                                  OneBasedIndex,
+    coolingDeviceId                                     INTEGER,
+    coolingDeviceDescription                            DisplayString,
+    coolingDeviceStatusString                           DisplayString,
+    coolingDeviceStatus                                 UnitrendsStatus,
+    coolingDeviceReading                                DisplayString,
+    coolingDeviceUpperCriticalThreshold                 DisplayString,
+    coolingDeviceLowerCriticalThreshold                 DisplayString
+}
+
+coolingDeviceIndex                                      OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the cooling device."
+    ::= { coolingDeviceTableEntry 1 }
+
+coolingDeviceId                                         OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines an unique ID for the cooling device"
+    ::= { coolingDeviceTableEntry 2 }
+    
+coolingDeviceDescription                                OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute textually describes the cooling device."
+    ::= { coolingDeviceTableEntry 3 }
+
+coolingDeviceStatusString                               OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current status of the sensor will be one of the
+following strings: OK, Error, Degraded or Unknown."
+    ::= { coolingDeviceTableEntry 4 }
+
+coolingDeviceStatus                                     OBJECT-TYPE
+    SYNTAX      UnitrendsStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current health status of the sensor."
+    ::= { coolingDeviceTableEntry 5 }
+
+coolingDeviceReading                                    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute contains the current fan sensor  
+reading, measured in the units specified by the Fan Units attribute."
+    ::= { coolingDeviceTableEntry 6 }
+
+coolingDeviceUpperCriticalThreshold                     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute contains the major error threshold 
+level for the fan.  The threshold is given in the units specified by the Fan Units
+attribute. This attribute may not apply to all fan types."
+    ::= { coolingDeviceTableEntry 7 }
+
+coolingDeviceLowerCriticalThreshold                     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute contains the lower critical threshold level
+for the fan.  The threshold is given in the units specified by the Fan Units
+attribute. This attribute may not apply to all fan types."   
+    ::= { coolingDeviceTableEntry 8 }
+
+-------------------------------------------------------------------------------
+-- Temperature Probe Table
+-------------------------------------------------------------------------------
+temperatureProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of temperature sensors 
+    available on the system"
+    ::= { tempGroup 1 }
+
+temperatureProbeTable                                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TemperatureProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Temperature Probe Table."
+    ::= { tempGroup 2 }
+
+temperatureProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      TemperatureProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Temperature Probe Table Entry."
+    INDEX       { temperatureIndex }
+    ::= { temperatureProbeTable 1 }
+
+TemperatureProbeTableEntry                              ::= SEQUENCE {
+    temperatureIndex                                    OneBasedIndex, 
+    temperatureDeviceId                                 INTEGER,
+    temperatureDescription                              DisplayString,
+    temperatureStatusString                             DisplayString,
+    temperatureStatus                                   UnitrendsStatus,
+    temperatureReading                                  DisplayString,
+    temperatureUpperCriticalThreshold                   DisplayString,
+    temperatureLowerCriticalThreshold                   DisplayString
+}
+
+temperatureIndex                                        OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the temperature probe."
+    ::= { temperatureProbeTableEntry 1 }
+
+temperatureDeviceId                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines a unique ID for the temperature probe."
+    ::= { temperatureProbeTableEntry 2 }
+temperatureDescription                                  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute textually describes the temperature probe."
+    ::= { temperatureProbeTableEntry 3}
+
+temperatureStatusString                                 OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current status of the sensor will be one of the
+following strings: OK, Error, Degraded or Unknown."
+    ::= { temperatureProbeTableEntry 4 }
+
+temperatureStatus                                       OBJECT-TYPE
+    SYNTAX      UnitrendsStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current health status of the sensor."
+    ::= { temperatureProbeTableEntry 5 }
+
+temperatureReading                                      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The present temperature reading of this temperature probe
+in 1/10th degrees C. 0x8000000 denotes 'unknown'."
+    ::= { temperatureProbeTableEntry 6 }
+
+temperatureUpperCriticalThreshold                       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The upper critical threshold for the temperature probe, in
+/10th degrees C. 0x80000000 denotes 'unknown'."
+    ::= { temperatureProbeTableEntry 7 }
+
+temperatureLowerCriticalThreshold                       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The lower critical threshold for the temperature probe, in
+1/10 degrees C. 0x80000000 denotes 'unknown'."
+    ::= { temperatureProbeTableEntry 8 }
+
+--*****************************************************************************
+--  IPMI Event Log Entries 
+--*****************************************************************************
+eventlogProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of event log entries
+    available on the system"
+    ::= { eventlogGroup 1 }
+
+eventlogProbeTable                                       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EventLogProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Voltage Probe Table."
+    ::= { eventlogGroup 2 }
+
+eventlogProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      EventLogTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Temperature Probe Table Entry."
+    INDEX       { temperatureIndex }
+    ::= { eventlogProbeTable 1 }
+
+EventLogTableEntry                              ::= SEQUENCE {
+    eventlogDescription                              DisplayString
+}
+
+eventlogEntryDescription                       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This object contains the IPMI System Event Log entry description."
+    ::= { eventlogProbeTableEntry 2 }
+
+--*****************************************************************************
+--  BP Backup Info
+--*****************************************************************************
+backupProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of Backup entries
+    available on the system"
+    ::= { bpBackupGroup 1 }
+
+backupProbeTable                                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BackupProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Backup Probe Table."
+    ::= { bpBackupGroup 2 }
+
+backupProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      BackupProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This defines the Backup Probe Table Entry matching the Backups Report."
+    INDEX       { backupIndex }
+    ::= { backupProbeTable 1 }
+
+BackupProbeTableEntry                              ::= SEQUENCE {
+    backupIndex                                    OneBasedIndex, 
+    backupId                                       INTEGER,
+    backupClient                                   DisplayString,
+    backupStatusString                             DisplayString,
+    backupStatusValue                              INTEGER,
+    backupTime   	                           DisplayString,
+    backupType                                     DisplayString,
+    backupSize                                     DisplayString,
+    backupNumFiles                                 INTEGER,
+    backupIsLast                                   INTEGER
+}
+
+backupIndex                                        OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is an index (one based) for the backup in the list."
+    ::= { backupProbeTableEntry 1 }
+
+backupId                                           OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This is the unique backup ID number of the backup."
+    ::= { backupProbeTableEntry 2 }
+
+backupClient	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Client Name for the backup."
+    ::= { backupProbeTableEntry 3 }
+
+backupStatusString 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Status String for the backup."
+    ::= { backupProbeTableEntry 4 }
+
+backupStatusValue 	 	                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Status Value for the backup."
+    ::= { backupProbeTableEntry 5 }
+
+backupTime 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Date/Time for the backup."
+    ::= { backupProbeTableEntry 6 }
+
+backupType 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Backup Type for the backup."
+    ::= { backupProbeTableEntry 7 }
+
+backupSize 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Size in MB of the backup."
+    ::= { backupProbeTableEntry 8 }
+
+backupNumFiles 	 	                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Number of Files in the backup."
+    ::= { backupProbeTableEntry 9 }
+
+backupIsLast 	 	                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Set to 1 if this is the last backup of this type."
+    ::= { backupProbeTableEntry 10 }
+
+--*****************************************************************************
+--  BP Capacity Info
+--*****************************************************************************
+capacityProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of Capacity entries
+    available on the system"
+    ::= { bpCapacityGroup 1 }
+
+capacityProbeTable                                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapacityProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Capacity Probe Table."
+    ::= { bpCapacityGroup 2 }
+
+capacityProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      CapacityProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Capacity Probe Table Entry."
+    INDEX       { capacityIndex }
+    ::= { capacityProbeTable 1 }
+
+CapacityProbeTableEntry                              ::= SEQUENCE {
+    capacityIndex                                    OneBasedIndex, 
+    capacityDeviceId                                 INTEGER,
+    capacityDeviceName                               DisplayString,
+    capacityDeviceFilename                           DisplayString,
+    capacitySize                                     DisplayString,
+    capacityUsed                                     DisplayString,
+    capacityFree                                     DisplayString
+}
+
+capacityIndex                                        OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the capacity."
+    ::= { capacityProbeTableEntry 1 }
+
+capacityDeviceId                                        OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the unique Device ID of the device."
+    ::= { capacityProbeTableEntry 2 }
+
+capacityDeviceName	 	 	           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Device Name for the device whose capacity is reported."
+    ::= { capacityProbeTableEntry 3 }
+
+capacityDeviceFilename	 	 	           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Device Filename for the device whose capacity is reported."
+    ::= { capacityProbeTableEntry 4 }
+
+capacitySize	 	 	           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Capacity or total logical Size of this device."
+    ::= { capacityProbeTableEntry 5 }
+
+capacityUsed	 	 	           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The amount of space Used on this device."
+    ::= { capacityProbeTableEntry 6 }
+
+capacityFree	 	 	           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The amount of Free space on this device."
+    ::= { capacityProbeTableEntry 7 }
+
+--*****************************************************************************
+--  BP Replication Info
+--*****************************************************************************
+replicationProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of Replication entries
+    available on the system"
+    ::= { bpReplicationGroup 1 }
+
+replicationProbeTable                                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ReplicationProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Replication Probe Table."
+    ::= { bpReplicationGroup 2 }
+
+replicationProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      ReplicationProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Replication Probe Table Entry."
+    INDEX       { replicationIndex }
+    ::= { replicationProbeTable 1 }
+
+ReplicationProbeTableEntry                         ::= SEQUENCE {
+    replicationIndex                               OneBasedIndex, 
+    replicationBackupNo                            INTEGER,
+    replicationClient                              DisplayString,
+    replicationDestination                         DisplayString,
+    replicationTime   	                           DisplayString,
+    replicationSize                                INTEGER,
+    replicationStatusString                        DisplayString,
+    replicationStatus                              INTEGER
+}
+
+replicationIndex                                   OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the replication."
+    ::= { replicationProbeTableEntry 1 }
+
+replicationBackupNo                                OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the backup number of the replication job."
+    ::= { replicationProbeTableEntry 2 }
+
+replicationClient	 	 	           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Client Name for the replication job."
+    ::= { replicationProbeTableEntry 3 }
+
+replicationDestination	 	 	           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Destination Name for the replication job."
+    ::= { replicationProbeTableEntry 4 }
+
+replicationTime	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Date-Time for the replication job."
+    ::= { replicationProbeTableEntry 5 }
+
+replicationSize                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Size of the replication job."
+    ::= { replicationProbeTableEntry 6 }
+
+replicationStatusString	 	 	            OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Status String for the replication job."
+    ::= { replicationProbeTableEntry 7 }
+
+replicationStatus                                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the status of the replication job."
+    ::= { replicationProbeTableEntry 8 }
+
+--*****************************************************************************
+--  BP Archive Info
+--*****************************************************************************
+archiveProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of Archive entries
+    available on the system"
+    ::= { bpArchiveGroup 1 }
+
+archiveProbeTable                                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ArchiveProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Archive Probe Table."
+    ::= { bpArchiveGroup 2 }
+
+archiveProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      ArchiveProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Archive Probe Table Entry."
+    INDEX       { archiveIndex }
+    ::= { archiveProbeTable 1 }
+
+ArchiveProbeTableEntry                              ::= SEQUENCE {
+    archiveIndex                                    OneBasedIndex, 
+    archiveDeviceId                                 INTEGER,
+    archiveClient                                   DisplayString,
+    archiveSuccess	                            INTEGER,
+    archiveSize                                     INTEGER,
+    archiveBackupTime  	                            DisplayString,
+    archiveBackupType                               INTEGER,
+    archiveBackupNo                                 INTEGER,
+    archiveOSType                                   DisplayString,
+    archiveErrorMsg                                 DisplayString,
+    archiveElapsedSec                               INTEGER,
+    archiveCompressed                               INTEGER,
+    archiveEncrypted                                INTEGER
+}
+
+archiveIndex                                        OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the archive."
+    ::= { archiveProbeTableEntry 1 }
+
+archiveDeviceId                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the unique Device ID of the archive."
+    ::= { archiveProbeTableEntry 2 }
+
+archiveClient	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Client Name for the archive."
+    ::= { archiveProbeTableEntry 3 }
+
+archiveSuccess                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute is =1 if the archive job was successful."
+    ::= { archiveProbeTableEntry 4 }
+
+archiveSize                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Size in MB of the archive job."
+    ::= { archiveProbeTableEntry 5 }
+
+archiveBackupTime	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Date-Time of the archive."
+    ::= { archiveProbeTableEntry 6 }
+
+archiveBackupType                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Backup Type of the archive."
+    ::= { archiveProbeTableEntry 7 }
+
+archiveBackupNo                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This defines the Backup Number for the archive."
+    ::= { archiveProbeTableEntry 8 }
+
+archiveOSType	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Client OS Type of the archive."
+    ::= { archiveProbeTableEntry 9 }
+
+archiveErrorMsg	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Error Message for the archive job, if any."
+    ::= { archiveProbeTableEntry 10 }
+
+archiveElapsedSec 	 	                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Elapsed time in seconds for the archive job."
+    ::= { archiveProbeTableEntry 11 }
+
+archiveCompressed 	 	                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Set to 1 if the archive is compressed."
+    ::= { archiveProbeTableEntry 12 }
+
+archiveEncrypted 	 	                   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Set to 1 if the archive is encrypted."
+    ::= { archiveProbeTableEntry 13 }
+
+--*****************************************************************************
+--  Physical Disk Info
+--*****************************************************************************
+physdiskProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of PhysDisk entries
+    available on the system"
+    ::= { physdiskGroup 1 }
+
+physdiskProbeTable                                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PhysDiskProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the PhysDisk Probe Table."
+    ::= { physdiskGroup 2 }
+
+physdiskProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      PhysDiskProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the PhysDisk Probe Table Entry."
+    INDEX       { physdiskIndex }
+    ::= { physdiskProbeTable 1 }
+
+PhysDiskProbeTableEntry                         ::= SEQUENCE {
+    physdiskIndex                               OneBasedIndex, 
+    physdiskDeviceId                            DisplayString,
+    physdiskDescription                         DisplayString,
+    physdiskStatus	                        INTEGER,
+    physdiskSize                                INTEGER,
+    physdiskTime   	                        DisplayString,
+    physdiskAppType                             INTEGER,
+    physdiskOSType                              DisplayString,
+    physdiskErrorMsg                            DisplayString
+}
+
+physdiskIndex                                        OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the physdisk."
+    ::= { physdiskProbeTableEntry 1 }
+
+physdiskDeviceId                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The unique Device ID of the physical disk."
+    ::= { physdiskProbeTableEntry 2 }
+
+physdiskDescription	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Description for the physical disk."
+    ::= { physdiskProbeTableEntry 3 }
+
+physdiskStatusString	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The StatusString for the physical disk."
+    ::= { physdiskProbeTableEntry 4 }
+
+physdiskStatus                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Status of the physical disk."
+    ::= { physdiskProbeTableEntry 5 }
+
+physdiskModel	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Model of the physical disk."
+    ::= { physdiskProbeTableEntry 6 }
+
+physdiskSerialNum	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Serial Number of the physical disk."
+    ::= { physdiskProbeTableEntry 7 }
+
+physdiskFirmware	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Firmware version of the physical disk."
+    ::= { physdiskProbeTableEntry 8 }
+
+physdiskCapacity	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Capacity of the physical disk."
+    ::= { physdiskProbeTableEntry 9 }
+
+physdiskPowerOnHours                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Power-On-Hours of the physical disk."
+    ::= { physdiskProbeTableEntry 10 }
+
+physdiskPendingSectors                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The PendingSectors of the physical disk."
+    ::= { physdiskProbeTableEntry 11 }
+
+physdiskReallocSectors                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Reallocated Sectors of the physical disk."
+    ::= { physdiskProbeTableEntry 12 }
+
+physdiskSeekError                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Seek Error Rate of the physical disk."
+    ::= { physdiskProbeTableEntry 13 }
+
+--*****************************************************************************
+--  Disk Volume (RAID) Info
+--*****************************************************************************
+volumeProbeInstances                               OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute denotes the number of Volume entries
+    available on the system"
+    ::= { volumeGroup 1 }
+
+volumeProbeTable                                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VolumeProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Volume Probe Table."
+    ::= { volumeGroup 2 }
+
+volumeProbeTableEntry                              OBJECT-TYPE
+    SYNTAX      VolumeProbeTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This object defines the Volume Probe Table Entry."
+    INDEX       { volumeIndex }
+    ::= { volumeProbeTable 1 }
+
+VolumeProbeTableEntry                              ::= SEQUENCE {
+    volumeIndex                                    OneBasedIndex, 
+    volumeDeviceId                                 INTEGER,
+    volumeDescription                              DisplayString,
+    volumeStatusString                             DisplayString,
+    volumeStatus                                   INTEGER
+}
+
+volumeIndex                                        OBJECT-TYPE
+    SYNTAX      OneBasedIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the index (one based) of the volume."
+    ::= { volumeProbeTableEntry 1 }
+
+volumeDeviceId                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the unique Device ID of the volume."
+    ::= { volumeProbeTableEntry 2 }
+
+volumeDescription	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Description for the volume."
+    ::= { volumeProbeTableEntry 3 }
+
+volumeStatusString	 	 	                   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Status String for the volume."
+    ::= { volumeProbeTableEntry 4 }
+
+volumeStatus                                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "This attribute defines the Status of the volume."
+    ::= { volumeProbeTableEntry 5 }
+
+--*****************************************************************************
+--
+--  EVENTS - traps are defined below 
+--
+--*****************************************************************************
+
+-------------------------------------------------------------------------------
+-- Unitrends Trap Member (varbind) definitions 
+-------------------------------------------------------------------------------
+trapType                      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The type/category of the event."
+    ::= { trapMembers 1 }
+
+trapAffectedObj               OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The affected object of the event."
+    ::= { trapMembers 2 }
+
+trapDescription                OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Descriptive information about the event."
+    ::= { trapMembers 3 }
+
+trapSeverity                   OBJECT-TYPE
+    SYNTAX      UnitrendsSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Severity of the event" 
+    ::= { trapMembers 4 }
+
+trapStatus                     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status of the event."
+    ::= { trapMembers 5 }
+
+trapLicenseId                  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The License Identity of the system for this event."
+    ::= { trapMembers 6 }
+
+trapDpuId                      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The DPU Identity of the system for this event."
+    ::= { trapMembers 7 }
+
+trapReleaseVersion             OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The Release Version of the system for this event."
+    ::= { trapMembers 8 }
+
+-------------------------------------------------------------------------------
+-- Unitrends Trap / Event definitions 
+-------------------------------------------------------------------------------
+trapGroupClients                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The client state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Clients"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The client state changed"
+    --#CATEGORY   "Client Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 1 }
+
+trapGroup3Ware                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The 3Ware state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "3Ware"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The 3Ware state changed"
+    --#CATEGORY   "3ware Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 2 }
+
+trapGroupPCI                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The PCI state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "PCI"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The PCI state changed"
+    --#CATEGORY   "PCI Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 3 }
+
+trapGroupProcess                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Process state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Process"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The Process state changed"
+    --#CATEGORY   "Process Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 5 }
+
+trapGroupDisk                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Disk state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Disk"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The Disk state changed"
+    --#CATEGORY   "Disk Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 6 }
+
+trapGroupCEP                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The CEP state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "CEP"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The CEP state changed"
+    --#CATEGORY   "CEP Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 7 }
+
+trapGroupDPU                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The DPU state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "DPU"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The DPU state changed"
+    --#CATEGORY   "DPU Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 8 }
+
+trapGroupRAID                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The RAID state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "RAID"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The RAID state changed"
+    --#CATEGORY   "RAID Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 9 }
+
+trapGroupBackup                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Backup state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Backup"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The Backup state changed"
+    --#CATEGORY   "Backup Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 10 }
+
+trapGroupArchive                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Archive state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Archive"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The Archive state changed"
+    --#CATEGORY   "Archive Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 11 }
+
+trapGroupVersion                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Version state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Version"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The Version state changed"
+    --#CATEGORY   "Version Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 12 }
+
+trapGroupNetwork                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Network state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Network"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The Network state changed"
+    --#CATEGORY   "Network Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 14 }
+
+trapGroupDiskHealth                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Disk Health state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Disk Health"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The Disk Health state changed"
+    --#CATEGORY   "Disk Health Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 15 }
+
+trapGroupIPMI                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The IPMI state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "IPMI"
+    --#SEVERITY   MINOR 
+    --#SUMMARY    "The IPMI state changed"
+    --#CATEGORY   "IPMI Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 16 }
+
+trapGroupInstall                    NOTIFICATION-TYPE
+    OBJECTS {
+        trapType, trapAffectedObj, trapDescription, trapSeverity,
+        trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "The Install state has changed."
+    --Novell NMS trap annotation
+    --#TYPE       "Install"
+    --#SEVERITY   MINOR
+    --#SUMMARY    "The Install state changed"
+    --#CATEGORY   "Install Events"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY
+    ::= { trapPrefix 17 }
+
+trapGroupTest                    NOTIFICATION-TYPE
+    OBJECTS { 
+        trapType, trapAffectedObj, trapDescription, trapSeverity, 
+    trapStatus, trapLicenseId, trapDpuId, trapReleaseVersion
+    }
+    STATUS      current
+    DESCRIPTION "A Test trap was issued."
+    --Novell NMS trap annotation
+    --#TYPE       "Test"
+    --#SEVERITY   INFORMATIONAL 
+    --#SUMMARY    "A Test trap was issued"
+    --#CATEGORY   "3ware Alarms"
+    --#STATE      OPERATIONAL
+    --#STATUS     MANDATORY 
+    ::= { trapPrefix 99 }
+
+
+END

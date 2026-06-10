@@ -1,0 +1,13 @@
+os: sm-os
+text: 'SM-OS'
+type: wireless
+icon: siae
+mib_dir: siae
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_wireless_rate, text: Rate }
+    - { graph: device_wireless_power, text: Power }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.3373.1103

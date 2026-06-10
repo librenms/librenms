@@ -1,0 +1,266 @@
+--
+--defines TEMPAGER-MIB for SNMP agent extension of TemPageR
+--Contents:	Global Registration Module
+--		TemPageR OIDs - Enterprise 20916
+--Version:	2.5.1 
+--Date:		11 September 2007
+--Developed By: AVTECH Software, Inc.
+
+--
+--Copyright (c) 2007 AVTECH Software, Inc.
+--
+
+TEMPAGER-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, IpAddress, Counter, TimeTicks
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	TRAP-TYPE
+		FROM RFC-1215;
+
+
+avtech      OBJECT IDENTIFIER ::= { enterprises 20916 }
+products      OBJECT IDENTIFIER ::= { avtech 1 }
+tempager      OBJECT IDENTIFIER ::= { products 1 }
+sensors       OBJECT IDENTIFIER ::= { tempager 1 }
+traps	      OBJECT IDENTIFIER ::= { tempager 2 }
+thresholds    OBJECT IDENTIFIER ::= { tempager 3 }
+temperature   OBJECT IDENTIFIER ::= { sensors 1 }
+ 
+-- TemPageR MIB
+-- Parameters 
+
+tempreading1c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 1 (Celsius)"
+::= { temperature 1 }
+
+tempreading2c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 2 (Celsius)"
+::= { temperature 2 }
+
+tempreading3c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 3 (Celsius)"
+::= { temperature 3 }
+
+
+tempreading4c OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 4 (Celsius)"
+::= { temperature 4 }
+
+tempreading1f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 1 (Fahrenheit)"
+::= { temperature 5 }
+
+tempreading2f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 2 (Fahrenheit)"
+::= { temperature 6 }
+
+tempreading3f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 3 (Fahrenheit)"
+::= { temperature 7 }
+
+
+tempreading4f OBJECT-TYPE
+	SYNTAX  	INTEGER(0..65535)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Temperature Sensor 4 (Fahrenheit)"
+::= { temperature 8 }
+
+alarmtemp1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 1
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 1 }
+	
+alarmtemp2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 2
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 2 }
+	
+alarmtemp3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 3
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 3 }
+	
+alarmtemp4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..2)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Alarm for temperature 4
+			0 = temperature OK
+			1 = temperature too high
+			2 = temperature too low"
+::= { traps 4 }	
+	
+alarmmessage OBJECT-TYPE
+	SYNTAX  	OCTET STRING
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Message string to send with trap messages"
+::= { traps 5 }		
+	
+upperlimit1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 1"
+::= { thresholds 1 }		
+	
+lowerlimit1 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 1"
+::= { thresholds 2 }
+	
+upperlimit2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 2"
+::= { thresholds 3 }		
+	
+lowerlimit2 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 2"
+::= { thresholds 4 }
+	
+upperlimit3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 3"
+::= { thresholds 5 }		
+	
+lowerlimit3 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 3"
+::= { thresholds 6 }
+	
+upperlimit4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"High temperature threshold for temperature sensor 4"
+::= { thresholds 7 }		
+	
+lowerlimit4 OBJECT-TYPE
+	SYNTAX  	INTEGER(0..15000)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Low temperature threshold for temperature sensor 4"
+::= { thresholds 8 }	
+	
+
+-- TEMPAGER TRAPS
+
+alarmstart1-t4 TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading1c, tempreading1f }
+	DESCRIPTION	"A alarmstart1 trap signifies that the current
+			temperature on sensor 1 is outside the 
+			defined high or low threshold."
+::= 1
+	
+tempager-snmp-trap TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading1c, tempreading1f, tempreading2c, tempreading2f, tempreading3c, tempreading3f, tempreading4c, tempreading4f }
+	DESCRIPTION	"A tempager-snmp-trap indicates that an alarm
+			condition has occurred on the sensor inidcated
+			by the alarmmessage variable."
+::= 2
+	
+alarmstart2-t4 TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading2c, tempreading2f }
+	DESCRIPTION	"A alarmstart2 trap signifies that the current
+			temperature on sensor 2 is outside the 
+			defined high or low threshold."
+::= 3
+	
+alarmclear2-t4 TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading2c, tempreading2f }
+	DESCRIPTION	"A alarmclear2 trap signifies that the current
+			temperature on sensor 2 has returned to a 
+			normal condition and is within the defined 
+			high or low threshold."
+::= 4
+	
+alarmstart3-t4 TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading3c, tempreading3f }
+	DESCRIPTION	"A alarmstart3 trap signifies that the current
+			temperature on sensor 3 is outside the 
+			defined high or low threshold."
+::= 5
+	
+alarmclear3-t4 TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading3c, tempreading3f }
+	DESCRIPTION	"A alarmclear3 trap signifies that the current
+			temperature on sensor 3 has returned to a 
+			normal condition and is within the defined 
+			high or low threshold."
+::= 6
+	
+alarmstart4-t4 TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading4c, tempreading4f }
+	DESCRIPTION	"A alarmstart4 trap signifies that the current
+			temperature on sensor 4 is outside the 
+			defined high or low threshold."
+::= 7
+	
+alarmclear4-t4 TRAP-TYPE
+	ENTERPRISE	tempager
+	VARIABLES	{ alarmmessage, tempreading4c, tempreading4f }
+	DESCRIPTION	"A alarmclear4 trap signifies that the current
+			temperature on sensor 4 has returned to a 
+			normal condition and is within the defined 
+			high or low threshold."
+::= 8
+END

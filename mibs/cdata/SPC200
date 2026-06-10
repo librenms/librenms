@@ -1,0 +1,2896 @@
+-- File Name   : SPC200.txt
+
+-- Date        : Wed Aug 23 14:03:00 CEST 2006
+-- Author      : Gilles Marceau
+
+-- Date        : Tue Jul 06 18:48:54 CEST 2004
+-- Author      : Luc Capanaccia
+
+-- Date        : Tue Jul 22 12:00:00 CEST 2004
+-- Reviewed by : Gilles Dupont
+
+-- Date        : Mon Sep 13 12:00:00 CEST 2004
+-- Reviewed by : Gilles Dupont
+
+-- Date        : Mon Sep 21 12:00:00 CEST 2004
+-- Reviewed by : Gilles Dupont
+
+-- Date        : Tue Nov 16 12:30:00 CEST 2004
+-- Reviewed by : Luc Capanaccia
+
+-- Date        : Fri Dec 17 12:30:00 CEST 2004
+-- Reviewed by : Luc Capanaccia
+
+-- Date        : Thu Sep 15 14:00:00 CEST 2005
+-- Reviewed by : Philippe Rimauro (Tag PR01)
+
+-- Date        : Thu Feb 08 14:03:00 CEST 2007
+-- Author      : Gilles Marceau
+
+SPC200  DEFINITIONS ::= BEGIN
+        IMPORTS
+                RowStatus, TruthValue, MacAddress, DisplayString, TEXTUAL-CONVENTION
+                        FROM SNMPv2-TC
+                AGENT-CAPABILITIES, OBJECT-GROUP, MODULE-COMPLIANCE
+                        FROM SNMPv2-CONF
+                MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Integer32, 
+                Counter32, IpAddress, Unsigned32, Gauge32
+                        FROM SNMPv2-SMI
+                interfaces, ifIndex
+                        FROM IF-MIB                        
+                spidcom 
+                        FROM SPIDCOM-MIB;
+
+                spc200MIB       MODULE-IDENTITY
+
+                LAST-UPDATED    "200412171230Z" -- December 17, 2004
+
+                ORGANIZATION    "Organization"
+                CONTACT-INFO    "Contact-info"
+                DESCRIPTION     "Description"
+                
+                REVISION        "200412171230Z"
+                DESCRIPTION     "Add software upgrade features"
+
+                REVISION        "200411161230Z"
+                DESCRIPTION     "Add adapt level table , commit and reset command"
+                                
+                REVISION        "200409211200Z"
+                DESCRIPTION     "Add quick access to channel modulation and pilots"
+                                
+                REVISION        "200409131200Z"
+                DESCRIPTION     "Add quick access to notches"
+
+                REVISION        "200407221200Z"
+                DESCRIPTION     "Corrected compilation errors"
+
+                REVISION        "200407011757Z"
+                DESCRIPTION     "Initial revision"
+           
+                ::=  {  spidcom  1  }
+
+-- TEXTUAL-CONVENTIONS --
+        ModulationValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "Modulation amplitude used by a group of carriers."
+                SYNTAX                  INTEGER  { none ( 1 ) , 
+                                                   bpsk ( 2 ) , 
+                                                   qpsk ( 3 )  , 
+                                                   qam16 ( 4 ) , 
+                                                   qam64 ( 5 ) , 
+                                                   qam256 ( 6 ) } 
+
+        CarrierValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "A group is composed of 8 carriers."
+                SYNTAX                  Integer32  ( 1 .. 8  ) 
+
+        PilotValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "The pilot carrier wave can be chosen between 
+                        the carrier 1 up to carrier 128 inside a band carrier range."
+                SYNTAX                  Integer32  ( 1 .. 128  ) 
+
+        BandValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "A channel is composed of 7 bands."
+                SYNTAX                  Integer32  ( 1 .. 7  ) 
+
+        PlcChannelType ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "The different type of plc channels:
+                          rx for the current reception channel,
+                          rx last for the last reception channel,
+                          tx for the current transmission channel."
+                SYNTAX                  INTEGER  { rx ( 1 ) , 
+                                                   rxLast ( 2 ) , 
+                                                   tx ( 3 ) } 
+
+        EstimationMode ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "The type of Channel estimation process. Two are available:
+                          - automatic, the equipment negociates the best configuration
+                            with the remote equipment,
+                          - manual, the operator defines the configuration."
+                SYNTAX                  INTEGER  { automatic ( 1 ) , 
+                                                   manual ( 2 ) } 
+
+        GroupValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "A band is composed of 16 groups."
+                SYNTAX                  Integer32  ( 1 .. 16  ) 
+
+        ResultValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "Result value of input vectors."
+                SYNTAX                  INTEGER  { success ( 1 ) , 
+                                                   fail ( 2 ) } 
+                                                   
+        AdaptValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "The adapt level integer value."
+                SYNTAX                  Integer32  ( 0 .. 8191  )
+           
+        ChannelBandwidthValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "The channel bandwidth integer value."
+                SYNTAX                  Integer32 --PR01
+                
+        SoftwareIndex ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "The software index."
+                SYNTAX                  Integer32  ( 1 .. 10  )
+                                                                   
+        SoftwareActionResultValue ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "Result value of software action process."
+                SYNTAX                  INTEGER  { success ( 0 ) , 
+                                                   on-going ( 1 ) ,
+                                                   fileNotExist ( 2 ) ,
+                                                   flashExhausted ( 3 ),
+                                                   flashCorrupted ( 4 ),
+                                                   notEnoughMemory ( 5 ),
+                                                   invalidParameter ( 6 ),
+                                                   genericError ( 7 ) } 
+                                                   
+        SoftwareActionType ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "Type of software management action."
+                SYNTAX                  INTEGER  { switch ( 1 ) , 
+                                                   remove ( 2 ) } 
+                                                       
+--PR01 BEGIN
+       PlcModeType ::= TEXTUAL-CONVENTION 
+                STATUS                  current
+                DESCRIPTION
+                        "Type of software management action."
+                SYNTAX                  INTEGER  { ad-hoc ( 0 ) , 
+                                                   slave  ( 1 ) ,
+                                                   master ( 2 ) } 
+--PR01 END
+
+-- PLC data
+
+        plc OBJECT IDENTIFIER
+                ::=  {  spc200MIB  1  }
+
+-- statistic data
+
+        stats OBJECT IDENTIFIER
+                ::=  {  plc  1  }
+--PR01 BEGIN                
+--        protocol OBJECT IDENTIFIER
+--                ::=  {  stats  1  }
+
+--        ip      OBJECT IDENTIFIER
+--                ::=  {  protocol  1  }
+
+--        mac     OBJECT IDENTIFIER
+--                ::=  {  protocol  2  }
+
+--        plcp    OBJECT IDENTIFIER
+--                ::=  {  protocol  3  }
+
+--        ipStatsTable OBJECT-TYPE
+--                SYNTAX          SEQUENCE  OF  IpStatsEntry
+--                MAX-ACCESS      not-accessible
+--                STATUS          current
+--                DESCRIPTION     "This table gathers all statistic data specific to 
+--                                SPC200 chip relative to IP protocol. The data is 
+--                                relative to the underlying interface that is under 
+--                                the IP protocol layer. So the table index is 
+--                                the ifIndex of such an interface."
+--                ::=  { ip  1 }
+
+--        ipStatsEntry OBJECT-TYPE
+--                SYNTAX          IpStatsEntry
+--                MAX-ACCESS      not-accessible
+--                STATUS          current
+--                DESCRIPTION     "This row contains IP statistic data specific to 
+--                                SPC200  chip. The data is relevant for the interface 
+--                                under the IP protocol layer."
+--                INDEX           {  ifIndex  }
+--                ::=  { ipStatsTable 1 }
+
+--        IpStatsEntry  ::=  SEQUENCE {
+--                ipInPkts  Counter32,
+--                ipInErrorPkts  Counter32,
+--                ipOutPkts  Counter32,
+--                ipOutErrorPkts  Counter32,
+--                ipInBridgedPkts  Counter32
+--                }
+
+
+--        ipInPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of IP packets received by the interface 
+--                                        associated with this entry"
+--                ::=  {  ipStatsEntry  1  }
+
+
+--        ipInErrorPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of inbound IP packets that contained 
+--                                        errors preventing them from being deliverable to a
+--                                        higher -layer protocol on the interface associated
+--                                        with this entry."
+--                ::=  {  ipStatsEntry  2  }
+
+
+--        ipOutPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of outbound IP packets transmitted 
+--                                        out the interface associated with this entry"
+--                ::=  {  ipStatsEntry  3  }
+
+
+--        ipOutErrorPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of outbound IP packets that could not be
+--                                        transmitted because of errors."
+--                ::=  {  ipStatsEntry  4  }
+
+
+--        ipInBridgedPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of IP packets bridged from the interface,
+--                                        associated with this entry, and another one"
+--                ::=  {  ipStatsEntry  5  }
+
+--        ipInPackets OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of IP packets received 
+--                                        by the SPC200 CHIP"
+--                ::=  {  ip  2  }
+
+--        ipInErrorPackets OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of inbound IP packets that 
+--                                        contained errors preventing them from being delivered."
+--                ::=  {  ip  3  }
+
+--        ipOutPackets OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of outbound IP packets transmitted 
+--                                        out the interfaces"
+--                ::=  {  ip  4  }
+
+--        ipOutErrorPackets OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of outbound IP packets that could 
+--                                        not be transmitted because of errors."
+--                ::=  {  ip  5  }
+
+--        ipBridgedPackets OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of IP packets bridged"
+--                ::=  {  ip  6  }
+
+--        macStatsTable OBJECT-TYPE
+--                SYNTAX          SEQUENCE  OF  MacStatsEntry
+--                MAX-ACCESS      not-accessible
+--                STATUS          current
+--                DESCRIPTION     "This table gathers all SPC200 chip specific packet 
+--                                statistics relative to MAC layer.
+--                                The data is relative to the underlying interface 
+--                                that is under the MAC layer. So the table index is
+--                                the ifIndex of such an interface."
+--                ::=  { mac  1 }
+
+--        macStatsEntry OBJECT-TYPE
+--                SYNTAX          MacStatsEntry
+--                MAX-ACCESS      not-accessible
+--                STATUS          current
+--                DESCRIPTION     "This row contains MAC statistic data specific 
+--                                to SPC200 chip. The data is relevant for the interface
+--                                under the MAC layer."
+--                INDEX           {  ifIndex  }
+--                ::=  { macStatsTable 1 }
+--
+--        MacStatsEntry  ::=  SEQUENCE {
+--                macInPkts  Counter32,
+--                macInErrorPkts  Counter32,
+--                macOutPackets  Counter32,
+--                macOutErrorPkts  Counter32
+--                }
+
+
+--        macInPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of MAC  packets received by the interface 
+--                                        associated with this entry"
+--                ::=  {  macStatsEntry  1  }
+--
+--
+--        macInErrorPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of inbound MAC packets that contained 
+--                                        errors preventing them from being deliverable to 
+--                                        a higher -layer protocol on the interface
+--                                        associated with this entry."
+--                ::=  {  macStatsEntry  2  }
+
+
+--        macOutPackets OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of outbound MAC packets transmitted
+--                                        out the interface associated with this entry"
+--                ::=  {  macStatsEntry  3  }
+
+
+--        macOutErrorPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of outbound MAC packets that could not be
+--                                        transmitted because of errors."
+--                ::=  {  macStatsEntry  4  }
+
+--        plcpStatsTable OBJECT-TYPE
+--                SYNTAX          SEQUENCE  OF  PlcpStatsEntry
+--                MAX-ACCESS      not-accessible
+--                STATUS          current
+--                DESCRIPTION     "This table gathers all SPC200 chip specific packet 
+--                                statistics relative to PLCP protocol.
+--                                The data is relative to the underlying interface that
+--                                is under the PLCP protocol layer. So the table index 
+--                                is the ifIndex of such an interface."
+--                ::=  { plcp  1 }
+
+--        plcpStatsEntry OBJECT-TYPE
+--                SYNTAX          PlcpStatsEntry
+--                MAX-ACCESS      not-accessible
+--                STATUS          current
+--                DESCRIPTION     "This row contains PLCP statistic data specific 
+--                                to SPC200 chip. The data is relevant for the interface
+--                                under the PLCP layer."
+--                INDEX           {  ifIndex  }
+--                ::=  { plcpStatsTable 1 }
+
+--        PlcpStatsEntry  ::=  SEQUENCE {
+--                plcpInPkts  Counter32,
+--                plcpInErrorPkts  Counter32,
+--                plcpOutPkts  Counter32,
+--                plcpOutErrorPkts  Counter32
+--                }
+
+
+--       plcpInPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of PLCP packets received by the interface
+--                                        associated with this entry"
+--                ::=  {  plcpStatsEntry  1  }
+
+
+--        plcpInErrorPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of inbound PLCP packets that contained 
+--                                        errors preventing them from being deliverable to a
+--                                        higher -layer protocol on the interface associated 
+--                                        with this entry."
+--                ::=  {  plcpStatsEntry  2  }
+
+
+--        plcpOutPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The total number of outbound PLCP packets transmitted
+--                                        out the interface associated with this entry"
+--                ::=  {  plcpStatsEntry  3  }
+
+
+--        plcpOutErrorPkts OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The number of outbound PLCP packets that could not be
+--                                        transmitted because of errors."
+--                ::=  {  plcpStatsEntry  4  }
+--PR01 END                
+
+
+        portStatsTable OBJECT-TYPE
+                SYNTAX          SEQUENCE  OF  PortStatsEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This table gathers all statistic data specific 
+                                to SPC200 chip relative to plc connection."
+                ::=  { stats  2 }
+
+        portStatsEntry OBJECT-TYPE
+                SYNTAX          PortStatsEntry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This row contains statistic data specific to 
+                                SPC200 chip  relative to a connection."
+                INDEX           {  plcBasePortIndex,
+                                   portStatsBandIndex,
+                                   portStatsGroupIndex,
+                                   portStatsCarrierIndex }
+                ::=  { portStatsTable 1 }
+
+        PortStatsEntry  ::=  SEQUENCE {
+                portStatsBandIndex  BandValue,
+                portStatsGroupIndex  GroupValue,
+                portStatsCarrierIndex  CarrierValue,
+                portStatsSignal Counter32,
+                portStatsNoise  Counter32
+--                portStatsBer Counter32
+                }
+
+
+        portStatsBandIndex OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The band number on which the signal, 
+                                        noise, ber data are collected."
+                ::=  {  portStatsEntry  1  }
+
+
+        portStatsGroupIndex OBJECT-TYPE     
+                SYNTAX                  GroupValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The group number on which the signal, 
+                                        noise, ber data are collected"
+                ::=  {  portStatsEntry  2  }
+
+
+        portStatsCarrierIndex OBJECT-TYPE     
+                SYNTAX                  CarrierValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The group number on which the signal, 
+                                        noise, ber data are collected"
+                ::=  {  portStatsEntry  3  }
+
+
+        portStatsSignal OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The DB value of the signal associated 
+                                        with the carrier wave entry."
+                ::=  {  portStatsEntry  4  }
+
+
+        portStatsNoise OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The DB value of the noise associated 
+                                        with the carrier wave entry."
+                ::=  {  portStatsEntry  5  }
+--PR01 BEGIN
+--        portStatsBer OBJECT-TYPE     
+--                SYNTAX                  Counter32
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The BER value * 100 associated 
+--                                        with the carrier wave entry."
+--                ::=  {  portStatsEntry  6  }
+--PR01 END
+
+        portStats2Table OBJECT-TYPE
+                SYNTAX          SEQUENCE  OF  PortStats2Entry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This table gathers all statistic data specific to 
+                                SPC200 chip relative to plc channels. This table has 
+                                the same information as the portChannelStatsTable 
+                                but in a more compact way. This table has been added 
+                                to deal with possible slow performances."
+                ::=  { stats  3 }
+
+        portStats2Entry OBJECT-TYPE
+                SYNTAX          PortStats2Entry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This row contains statistic data specific to 
+                                SPC200 chip  relative to a connection."
+                INDEX           {  plcBasePortIndex,
+                                   plcModBandIndex  }
+                ::=  { portStats2Table 1        }
+
+        PortStats2Entry ::=  SEQUENCE {
+                portStats2Signal     OCTET STRING,
+                portStats2Noise      OCTET STRING,
+
+
+--PR01 BEGIN
+--                portStats2Ber        OCTET STRING,
+                portStats2AvgBandAtt Counter32,
+                portStats2AvgBandSNR Counter32
+--PR01 END
+                }
+
+
+        portStats2Signal OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The values of the signal for all the carrier waves. 
+                                        The expected format is VALUE VALUE VALUE ... VALUE. 
+                                        Each value is coded on two bytes. 
+                                        There is one value for each 128 carriers of the 
+                                        considered band."
+                ::=  {  portStats2Entry 1  }
+
+
+        portStats2Noise OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The values of the noise for all the carrier waves. 
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is coded on two bytes. 
+                                        There is one value for each 128 carriers of the 
+                                        considered band."
+                ::=  {  portStats2Entry 2  }
+
+--        portStats2Ber OBJECT-TYPE     
+--                SYNTAX                  OCTET STRING
+--                MAX-ACCESS              read-only
+--                STATUS                  current
+--                DESCRIPTION             "The values of the signal for all the carrier waves. 
+--                                        The expected format is VALUE VALUE VALUE ... VALUE. 
+--                                        Each value is coded on two bytes. 
+--                                        There is one value for each 128 carriers of the 
+--                                        considered band.
+--                                        The VALUE represents the BER value * 10000."
+--                ::=  {  portStats2Entry 3  }
+
+--PR01 BEGIN
+       portStats2AvgBandAtt OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Average attenuation per band (dB)." 
+                ::=  {  portStats2Entry  3  }
+
+
+        portStats2AvgBandSNR OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Average SNR per band (dB)."
+                ::=  {  portStats2Entry  4  }
+--PR01 END
+--PR01 BEGIN
+        portStats3Table OBJECT-TYPE
+                SYNTAX          SEQUENCE  OF  PortStats3Entry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This table gathers all statistic data specific to 
+                                SPC200 chip relative to plc channels. This table has 
+                                the same information as the portChannelStatsTable 
+                                but in a more compact way. This table has been added 
+                                to deal with possible slow performances."
+                ::=  { stats  4 }
+
+        portStats3Entry OBJECT-TYPE
+                SYNTAX          PortStats3Entry
+                MAX-ACCESS      not-accessible
+                STATUS          current
+                DESCRIPTION     "This row contains statistic data specific to 
+                                SPC200 chip  relative to a connection."
+                INDEX           {  plcBasePortIndex  }
+                ::=  { portStats3Table 1 }
+
+        PortStats3Entry ::=  SEQUENCE {
+                portStats3AvgAtt      Counter32,
+                portStats3AvgSNR      Counter32
+                }
+
+       portStats3AvgAtt OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Average attenuation on the link (dB)." 
+                ::=  {  portStats3Entry 1  }
+
+       portStats3AvgSNR OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Average SNR on the link (dB)." 
+                ::=  {  portStats3Entry 2  }                            
+                         
+	   bootstats OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION   "boot statistics"
+                ::= { stats 5 }
+
+	   bootstatsBoot OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Boot"
+                ::=  { bootstats 1 }
+       
+	   bootstatsManualReset OBJECT-TYPE     
+       			SYNTAX                  Counter32
+		        MAX-ACCESS              read-only
+		        STATUS                  current
+		        DESCRIPTION             "Manual reset"
+		        ::=  { bootstats 2 }
+       
+	   bootstatsFailureReset OBJECT-TYPE     
+ 	            SYNTAX                  Counter32
+		        MAX-ACCESS              read-only
+		        STATUS                  current
+		        DESCRIPTION             "Failure reset"
+		        ::=  { bootstats 3 }              
+                            
+--PR01 END
+                
+-- configuration data
+        plcObjects OBJECT IDENTIFIER
+                ::=  {  plc  2  }
+
+        plcMode OBJECT-TYPE     -- PR01
+                SYNTAX                  PlcModeType --PR01
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "Plc Mode"
+                ::=  {  plcObjects  1  }
+
+        plcTopo OBJECT IDENTIFIER
+                ::=  {  plcObjects  2  }
+
+        plcNodeConfiguration OBJECT IDENTIFIER
+                ::=  {  plcObjects  3  }
+
+--PR01 BEGIN
+         plcSNAnalyser OBJECT IDENTIFIER 
+                ::= { plcObjects  4 }
+
+         plcSNAnalyserEnable OBJECT-TYPE     
+                SYNTAX                  INTEGER { true ( 1 ) , 
+                                                  false ( 2 )  }
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "true if the modem should turn to spectrum analyser mode.
+                                        In this mode the modem enters a receive only mode,
+                                        and captures periodic samples of the signal on the powerline.
+                                        The spectrum analyser mode shall be disabled for normal
+                                        powerline modem operation."
+                ::=  {  plcSNAnalyser 1  }
+
+         plcSNAnalyserTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcSNAnalyserEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table gathers all statistic data specific to 
+                                        SPC200 chip relative to plc analyser."
+                ::=  { plcSNAnalyser  2 }
+
+        plcSNAnalyserEntry OBJECT-TYPE
+                SYNTAX                  PlcSNAnalyserEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains statistic data specific to 
+                                        SPC200 chip relative to a band."
+                INDEX                   {  plcModBandIndex   }
+                ::=  { plcSNAnalyserTable 1 }
+
+        PlcSNAnalyserEntry  ::=  SEQUENCE {
+                plcSNAnalyserMinSignal    OCTET STRING,
+                plcSNAnalyserMaxSignal    OCTET STRING,
+                plcSNAnalyserAvgSignal    OCTET STRING,
+                plcSNAnalyserLastSignal   OCTET STRING,
+                plcSNAnalyserFFTDiv       Counter32     
+                 }
+
+        plcSNAnalyserMinSignal OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Minimum signal measured over several samples for the
+                                        associated carrier wave entry. The value is expressed
+                                        in Glomer© which can be converted in dBm/Hz using the
+                                        following formula: dBm/Hz = 19*log10(Glomer©) - 113"
+                ::=  {  plcSNAnalyserEntry 1  }
+
+
+        plcSNAnalyserMaxSignal OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Maximum signal measured on several samples for the
+                                        associated carrier wave entry. The value is expressed
+                                        in Glomer© which can be converted in dBm/Hz using the
+                                        following formula: dBm/Hz = 19*log10(Glomer©) - 113"
+                ::=  {  plcSNAnalyserEntry  2  }
+
+
+        plcSNAnalyserAvgSignal OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Average signal measured on several samples for the
+                                        associated carrier wave entry. The value is expressed
+                                        in Glomer© which can be converted in dBm/Hz using the
+                                        following formula: dBm/Hz = 19*log10(Glomer©) - 113"
+                ::=  {  plcSNAnalyserEntry  3  }
+
+        plcSNAnalyserLastSignal OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Signal measured for last sample on the associated
+                                        carrier wave entry. The value is expressed
+                                        in Glomer© which can be converted in dBm/Hz using the
+                                        following formula: dBm/Hz = 19*log10(Glomer©) - 113"
+                ::=  {  plcSNAnalyserEntry  4  }
+
+        plcSNAnalyserFFTDiv OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "FFT division factor on the associated band."
+                ::=  {  plcSNAnalyserEntry 5  }
+
+        plcSNAnalyserAGC OBJECT-TYPE
+                SYNTAX                  Integer32 ( 0..255 )
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Gain factor in dB, as used by the
+                                        Automatic Gain Control last sample"
+                ::=  {  plcSNAnalyser 3  }
+
+
+         plcAGCAnalyser OBJECT IDENTIFIER 
+                ::= { plcObjects  5 }
+
+         plcAGCAnalyserEnable OBJECT-TYPE     
+                SYNTAX                  INTEGER { true ( 1 ) , 
+                                                  false ( 2 )  }
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             " "
+                ::=  {  plcAGCAnalyser  1  }
+
+        plcAGCAnalyserSamplesPart1 OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             " "
+                ::=  {  plcAGCAnalyser  2  }
+
+        plcAGCAnalyserSamplesPart2 OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             " "
+                ::=  {  plcAGCAnalyser  3  }
+--PR01 END
+
+        plcTopoChanges OBJECT-TYPE     
+                SYNTAX                  Counter32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The total number of topology changes detected 
+                                        by this plc bridge since the management entity 
+                                        was last reset or initialized. Such changes 
+                                        concerns only 
+                                        - the plcBasePortTable rows 
+                                        - the plcBasePortTable columns 
+                                        except for plcBasePortChannelEstimation"
+                ::=  {  plcTopo  1  }
+
+        plcBasePortTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcBasePortEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains the list of plc remote connection"
+                ::=  { plcTopo  2 }
+
+        plcBasePortEntry OBJECT-TYPE
+                SYNTAX                  PlcBasePortEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains plc remote connection information"
+                INDEX                   {  plcBasePortIndex  }
+                ::=  { plcBasePortTable 1 }
+
+        PlcBasePortEntry  ::=  SEQUENCE {
+                plcBasePortIndex                MacAddress,
+                plcBasePortAddress              MacAddress,
+                plcBasePortChannelEstimation    EstimationMode,
+                plcBasePortAttenuation          Counter32  }
+
+
+        plcBasePortIndex OBJECT-TYPE     
+                SYNTAX                  MacAddress
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The MAC address of the MAC layer above 
+                                        the plc interface of the remote PLC equipment."
+                ::=  {  plcBasePortEntry  1  }
+
+
+        plcBasePortAddress OBJECT-TYPE     
+                SYNTAX                  MacAddress
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The MAC address of the MAC layer above 
+                                        the plc interface of the remote PLC equipment."
+                ::=  {  plcBasePortEntry  2  }
+
+
+        plcBasePortChannelEstimation    OBJECT-TYPE     
+                SYNTAX                  EstimationMode
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "Enable or disable the automatic channel 
+                                        estimation processus."
+                ::=  {  plcBasePortEntry  3  }                     
+                
+		plcBasePortAttenuation			OBJECT-TYPE     
+                SYNTAX                  Counter32 
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Link attenuation (dB)."
+                ::=  {  plcBasePortEntry  4 }       
+
+
+        plcChannelModulationStringTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcChannelModulationStringEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains string values for a quick access to
+                                        the modulation amplitude configurations of all active
+                                        channels."
+                ::=  { plcTopo  3 }
+
+
+        plcChannelModulationStringEntry OBJECT-TYPE
+                SYNTAX                  PlcChannelModulationStringEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains string values for a quick access to 
+                                        the modulation amplitude configuration
+                                        of each active channel of the remote 
+                                        connection referenced by plcBasePortIndex."
+                INDEX                   { plcBasePortIndex }
+                ::=  { plcChannelModulationStringTable 1 }
+
+
+                PlcChannelModulationStringEntry  ::=  SEQUENCE {
+                plcRxChannelModulation          OCTET STRING,
+                plcRxLastChannelModulation      OCTET STRING,
+                plcTxChannelModulation          OCTET STRING }
+
+
+        plcRxChannelModulation OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude values for the Rx channel of 
+                                        a given remote connection entry.
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is an octet representing two modulation values.
+                                        Each modulation is coded on 4 bits.
+                                        There are ( 16 groups * 7 bands ) / 2 = 66 values."
+                ::=  {  plcChannelModulationStringEntry 1  }
+
+
+        plcRxLastChannelModulation OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude values for the Rx Last channel of 
+                                        a given remote connection entry.
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is an octet representing two modulation values.
+                                        Each modulation is coded on 4 bits representing ModulationValue - 1.
+                                        There are ( 16 groups * 7 bands ) / 2 = 66 values."
+                ::=  {  plcChannelModulationStringEntry 2  }
+
+        plcTxChannelModulation OBJECT-TYPE
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude values for the Tx channel of 
+                                        a given remote connection entry.
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is an octet representing two modulation values.
+                                        Each modulation is coded on 4 bits.
+                                        There are ( 16 groups * 7 bands ) / 2 = 66 values."
+                ::=  { plcChannelModulationStringEntry  3 }
+
+
+        plcChannelModulationTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcChannelModulationEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains the modulation amplitude 
+                                        configuration of all active channels."
+                ::=  { plcTopo  4 }
+
+
+       plcChannelModulationEntry OBJECT-TYPE
+                SYNTAX                  PlcChannelModulationEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains modulation amplitude configuration
+                                        of the channel, referenced by the plcPortChannelIndex, 
+                                        of the remote connection referenced by 
+                                        plcBasePortIndex."
+                INDEX                   { plcBasePortIndex, 
+                                        plcPortChannelIndex,
+                                        plcModBandIndex  }
+                ::=  { plcChannelModulationTable 1 }
+
+        PlcChannelModulationEntry  ::=  SEQUENCE {
+                plcModBandIndex         BandValue,
+                plcModGroup1            ModulationValue,
+                plcModGroup2            ModulationValue,
+                plcModGroup3            ModulationValue,
+                plcModGroup4            ModulationValue,
+                plcModGroup5            ModulationValue,
+                plcModGroup6            ModulationValue,
+                plcModGroup7            ModulationValue,
+                plcModGroup8            ModulationValue,
+                plcModGroup9            ModulationValue,
+                plcModGroup10           ModulationValue,
+                plcModGroup11           ModulationValue,
+                plcModGroup12           ModulationValue,
+                plcModGroup13           ModulationValue,
+                plcModGroup14           ModulationValue,
+                plcModGroup15           ModulationValue,
+                plcModGroup16           ModulationValue
+                }
+
+
+        plcModBandIndex OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The band number of which the modulations are defined"
+                ::=  {  plcChannelModulationEntry  1  }
+
+
+        plcModGroup1 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the first group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  2  }
+
+
+        plcModGroup2 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the second group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  3  }
+
+
+        plcModGroup3 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the third group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  4  }
+
+
+        plcModGroup4 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the fourth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  5  }
+
+
+        plcModGroup5 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the fifth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  6  }
+
+
+        plcModGroup6 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the sixth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  7  }
+
+
+        plcModGroup7 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the seventh group 
+                                         of the band entry of the channel entry 
+                                         for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  8  }
+
+
+        plcModGroup8 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the eighth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  9  }
+
+
+        plcModGroup9 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the nineth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  10  }
+
+
+        plcModGroup10 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the tenth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  11  }
+
+
+        plcModGroup11 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the eleventh group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  12  }
+
+
+        plcModGroup12 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the twelveth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  13  }
+
+
+        plcModGroup13 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the thirteenth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  14  }
+
+
+        plcModGroup14 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the fourteenth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  15  }
+
+
+        plcModGroup15 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the fifteenth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  16  }
+
+
+        plcModGroup16 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The modulation amplitude of the sixteenth group 
+                                        of the band entry of the channel entry 
+                                        for a given remote connection entry."
+                ::=  {  plcChannelModulationEntry  17  }
+
+
+        plcChannelModulationInput OBJECT IDENTIFIER
+                ::=  { plcTopo  5 }
+        
+        plcModulationInputAddr OBJECT-TYPE     
+                SYNTAX                  MacAddress
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The MAC address of the MAC layer above 
+                                        the plc interface of the remote 
+                                        PLC equipment for which the modulation 
+                                        value changes are requested."
+                ::=  {  plcChannelModulationInput  1  }
+
+        plcModulationInputChannel OBJECT-TYPE     
+                SYNTAX                  PlcChannelType
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The channel type of the remote PLC equipment
+                                        for which the modulation value changes 
+                                        are requested."
+                ::=  {  plcChannelModulationInput  2  }
+                                
+        plcModulationInputBand OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The band number of which the modulation value 
+                                        changes are requested."
+                ::=  {  plcChannelModulationInput  3  }
+                                                                
+        plcInputModulationGroup1 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        first group of the considered band and 
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  4  }
+
+        plcInputModulationGroup2 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        second group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  5  }
+
+        plcInputModulationGroup3 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        third group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  6  }
+
+        plcInputModulationGroup4 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        fourth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  7  }
+
+        plcInputModulationGroup5 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        fifth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  8  }
+
+        plcInputModulationGroup6 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        sixth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  9  }
+
+        plcInputModulationGroup7 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        seventh group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  10  }
+
+        plcInputModulationGroup8 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        eighth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  11  }
+
+        plcInputModulationGroup9 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        nineth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  12  }
+
+        plcInputModulationGroup10 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        tenth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  13  }
+
+        plcInputModulationGroup11 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        eleventh group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  14  }
+
+        plcInputModulationGroup12 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        twelveth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  15  }
+
+        plcInputModulationGroup13 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        thirteenth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  16  }
+
+        plcInputModulationGroup14 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        fourteenth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  17  }
+
+        plcInputModulationGroup15 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        fifteenth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  18  }
+
+        plcInputModulationGroup16 OBJECT-TYPE     
+                SYNTAX                  ModulationValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The new requested modulation amplitude of the 
+                                        sixteenth group of the considered band and
+                                        channel input values."
+                ::=  {  plcChannelModulationInput  19  }
+
+
+        plcModulationInputProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request a modification of all the modulations
+                                        associated to a band and a channel of a remote
+                                        PLC equipment."
+                ::=  {  plcChannelModulationInput  20  }
+
+         plcModulationInputResult OBJECT-TYPE     
+                SYNTAX                  ResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested modulation value changes."
+                ::=  {  plcChannelModulationInput  21  }
+
+        plcPortChannelTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcPortChannelEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains the list of plc channels"
+                ::=  { plcTopo  6 }
+
+        plcPortChannelEntry OBJECT-TYPE
+                SYNTAX                  PlcPortChannelEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains plc channel information"
+                INDEX           {  plcBasePortIndex, plcPortChannelIndex   }
+                ::=  { plcPortChannelTable 1 }
+
+        PlcPortChannelEntry  ::=  SEQUENCE {
+                plcPortChannelIndex        			Unsigned32,
+                plcPortChannelType         			PlcChannelType,
+                plcPortChannelGain         			Integer32,
+                plcPortChannelBandwidth   			ChannelBandwidthValue,
+                plcPortChannelMaxBandwidth 			ChannelBandwidthValue,
+                plcPortChannelSynchronizationBand 	BandValue
+                }
+
+
+        plcPortChannelIndex OBJECT-TYPE     
+                SYNTAX                  Unsigned32
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The channel number belongs to the remote connection 
+                                        with plc equipment associated with the 
+                                        plcBasePortIndex        value. 
+                                        Only three channels are expected.
+                                        Index 1 for RX channel
+                                        Index 2 for RXLast channel
+                                        index 3 for TX channel"
+                ::=  {  plcPortChannelEntry  1  }
+
+
+        plcPortChannelType OBJECT-TYPE     
+                SYNTAX                  PlcChannelType
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The channel type."
+                ::=  {  plcPortChannelEntry  2  }
+
+
+        plcPortChannelGain OBJECT-TYPE     
+                SYNTAX                  Integer32
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The gain associated with the channel."
+                ::=  {  plcPortChannelEntry  3  }
+                
+        plcPortChannelBandwidth OBJECT-TYPE     
+                SYNTAX                  ChannelBandwidthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The bandwidth of the channel in Kbit/s."
+                ::=  {  plcPortChannelEntry  4  }
+                                                        
+--PR01 BEGIN
+        plcPortChannelMaxBandwidth OBJECT-TYPE     
+                SYNTAX                  ChannelBandwidthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The maximum bandwidth of the channel in Kbit/s."
+                ::=  {  plcPortChannelEntry  5  }
+--PR01 END
+
+		plcPortChannelSynchronizationBand OBJECT-TYPE       
+				SYNTAX					BandValue
+				MAX-ACCESS              read-only
+				STATUS					current
+				DESCRIPTION				"The synchronization band used for this channel."
+				::=  {  plcPortChannelEntry  6  }
+
+        plcChannelPilotStringTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcChannelPilotStringEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains the string values representing
+                                        of pilot values of all active channels."
+                ::=  { plcTopo  7 }
+
+
+       plcChannelPilotStringEntry OBJECT-TYPE
+                SYNTAX                  PlcChannelPilotStringEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains a quick access for pilot values , 
+                                        of the remote connection referenced by 
+                                        plcBasePortIndex."
+                INDEX                   { plcBasePortIndex }
+                ::=  { plcChannelPilotStringTable 1 }
+
+
+        PlcChannelPilotStringEntry  ::=  SEQUENCE {
+                plcRxChannelPilots      OCTET STRING,
+                plcRxLastChannelPilots  OCTET STRING,
+                plcTxChannelPilots      OCTET STRING}
+
+
+        plcRxChannelPilots OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The carrier wave numbers which support  
+                                        the pilot waves for the Rx Channel.
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is a pair of octets representing the pilot 
+                                        values. There is one pair (pilot1 pilot2) for each
+                                        of the 7 bands."
+                ::=  {  plcChannelPilotStringEntry 1  }
+
+
+        plcRxLastChannelPilots OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The carrier wave numbers which support  
+                                        the pilot waves for the Rx Last Channel.
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is a pair of octets representing the pilot 
+                                        values. There is one pair (pilot1 pilot2) for each
+                                        of the 7 bands."
+                ::=  {  plcChannelPilotStringEntry 2  }
+                                
+                                
+        plcTxChannelPilots OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The carrier wave numbers which support  
+                                        the pilot waves for the Tx Channel.
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is a pair of octets representing the pilot 
+                                        values. There is one pair (pilot1 pilot2) for each
+                                        of the 7 bands."
+                ::=  {  plcChannelPilotStringEntry 3  }
+
+
+        plcChannelPilotsTable OBJECT-TYPE
+                SYNTAX                   SEQUENCE  OF  PlcChannelPilotsEntry
+                MAX-ACCESS               not-accessible
+                STATUS                   current
+                DESCRIPTION              "This tabel contains pilots configuration 
+                                         for each plc channel."
+                ::=  { plcTopo  8 }
+
+
+        plcChannelPilotsEntry OBJECT-TYPE
+                SYNTAX                   PlcChannelPilotsEntry
+                MAX-ACCESS               not-accessible
+                STATUS                   current
+                DESCRIPTION              "This row contains the pilots 1 and 2 configuration 
+                                         for a channel defined by the 
+                                         couple (plcBasePortIndex, plcPortChannelIndex)"
+                INDEX                    {   plcBasePortIndex, 
+                                             plcPortChannelIndex,
+                                             plcChannelPilotBandIndex  }
+                ::=  { plcChannelPilotsTable 1 }
+
+        PlcChannelPilotsEntry  ::=  SEQUENCE {
+                plcChannelPilotBandIndex        BandValue,
+                plcChannelPilot1                PilotValue,
+                plcChannePilot2                 PilotValue
+                }
+
+
+        plcChannelPilotBandIndex OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The band number on which the pilots are defined."
+                ::=  {  plcChannelPilotsEntry  1  }
+
+
+        plcChannelPilot1 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The carrier wave number which supports  
+                                        the first pilot wave for the channel
+                                        associated with this entry."
+                ::=  {  plcChannelPilotsEntry  2  }
+
+
+        plcChannePilot2 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The carrier wave number which supports 
+                                        the second pilot wave for the channel
+                                        associated with this entry."
+                ::=  {  plcChannelPilotsEntry  3  }
+
+
+        plcChannelPilotsInput OBJECT IDENTIFIER
+                ::=  { plcTopo  9 }
+                                
+                plcPilotsInputAddr OBJECT-TYPE     
+                SYNTAX                  MacAddress
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The MAC address of the MAC layer above 
+                                        the plc interface of the remote 
+                                        PLC equipment for which the pilot 
+                                        value changes are requested."
+                ::=  {  plcChannelPilotsInput  1  }
+
+        plcPilotsInputChannel OBJECT-TYPE     
+                SYNTAX                  PlcChannelType
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The channel type of the remote PLC equipment
+                                        for which the pilot value changes 
+                                        are requested."
+                ::=  {  plcChannelPilotsInput  2  }
+                                
+        plcPilotsInputBand OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The band number of which the pilots value 
+                                        changes are requested."
+                ::=  {  plcChannelPilotsInput  3  }
+
+
+        plcInputChannelPilot1 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The carrier wave number which supports  
+                                        the first pilot wave for the considered band and
+                                        channel input values."
+                ::=  {  plcChannelPilotsInput  4  }
+
+        plcInputChannelPilot2 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The carrier wave number which supports  
+                                        the second pilot wave for the considered band and
+                                        channel input values."
+                ::=  {  plcChannelPilotsInput  5  }
+
+        plcPilotsInputProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request a modification of the first and second pilot
+                                        associated to a band and a channel of a remote
+                                        PLC equipment."
+                ::=  {  plcChannelPilotsInput  6  }
+
+         plcPilotsInputResult OBJECT-TYPE     
+                SYNTAX                  ResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested pilot values changes."
+                ::=  {  plcChannelPilotsInput  7  }
+
+        plcNodeNotches OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The values of the notches for all the node bands. 
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is an octet representing the 8 notches of 
+                                        each group. There is one value for each 7 * 16 bands."
+                ::=  {  plcNodeConfiguration 1  }
+
+        plcNodeNotchesTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcNodeNotchesEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains Notches configuration 
+                                        for the SPC200 chip."
+                ::=  { plcNodeConfiguration  2 }
+
+        plcNodeNotchesEntry OBJECT-TYPE
+                SYNTAX                  PlcNodeNotchesEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains Notches configuration for a group. 
+                                        The group is defined by the couple 
+                                        (plcNodeNotchesGroupIndex, plcNodeNotchesBandIndex)."
+                INDEX                   {  plcNodeNotchesBandIndex, plcNodeNotchesGroupIndex   }
+                ::=  { plcNodeNotchesTable 1 }
+
+        PlcNodeNotchesEntry  ::=  SEQUENCE {
+                plcNodeNotchesBandIndex  BandValue,
+                plcNodeNotchesGroupIndex GroupValue,
+                plcNodeNotchesCarrier1   TruthValue,
+                plcNodeNotchesCarrier2   TruthValue,
+                plcNodeNotchesCarrier3   TruthValue,
+                plcNodeNotchesCarrier4   TruthValue,
+                plcNodeNotchesCarrier5   TruthValue,
+                plcNodeNotchesCarrier6   TruthValue,
+                plcNodeNotchesCarrier7   TruthValue,
+                plcNodeNotchesCarrier8   TruthValue
+                }
+
+
+        plcNodeNotchesBandIndex OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The band number on which the notches are defined."
+                ::=  {  plcNodeNotchesEntry  1  }
+
+
+        plcNodeNotchesGroupIndex OBJECT-TYPE     
+                SYNTAX                  GroupValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The group number on which the notches are defined."
+                ::=  {  plcNodeNotchesEntry  2  }
+
+
+        plcNodeNotchesCarrier1 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the first carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  3  }
+
+
+        plcNodeNotchesCarrier2 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the second carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  4  }
+
+
+        plcNodeNotchesCarrier3 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the third carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  5  }
+
+
+        plcNodeNotchesCarrier4 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the fourth carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  6  }
+
+
+        plcNodeNotchesCarrier5 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the fifth carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  7  }
+
+
+        plcNodeNotchesCarrier6 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the sixth carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  8  }
+
+
+        plcNodeNotchesCarrier7 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the seventh carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  9  }
+
+
+        plcNodeNotchesCarrier8 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Tell if the eighth carrier of the group entry 
+                                        of the band entry is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesEntry  10  }
+
+        plcNodeNotchesInput OBJECT IDENTIFIER
+                ::=  { plcNodeConfiguration  3 }
+                                
+        plcNodeNotchesInputBand OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The band number on which the notches value 
+                                        changes are requested."
+                ::=  {  plcNodeNotchesInput  1  }
+
+
+        plcNodeNotchesInputGroup OBJECT-TYPE     
+                SYNTAX                  GroupValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The group number on which the notches value 
+                                        changes are requested."
+                ::=  {  plcNodeNotchesInput  2  }
+
+        plcNodeNotchesInputCarrier1 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The first carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  3  }
+                                
+        plcNodeNotchesInputCarrier2 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The second carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  4  }
+                                
+        plcNodeNotchesInputCarrier3 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The third carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  5  }
+                                
+        plcNodeNotchesInputCarrier4 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The fourth carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  6  }
+
+        plcNodeNotchesInputCarrier5 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The eighth carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  7  }
+                                
+        plcNodeNotchesInputCarrier6 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The eighth carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  8  }
+                                
+        plcNodeNotchesInputCarrier7 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The seventh carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  9  }
+                                
+        plcNodeNotchesInputCarrier8 OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The eighth carrier of the considered group and 
+                                        band is a notch carrier. 
+                                        The true value means the current carrier is a notch."
+                ::=  {  plcNodeNotchesInput  10  }
+                              
+        plcNodeNotchesInputProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request a modification of the carrier notches
+                                        associated to the considered group and 
+                                        band."
+                ::=  {  plcNodeNotchesInput  11  }
+
+         plcNodeNotchesInputResult OBJECT-TYPE     
+                SYNTAX                  ResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested node carrier notches value changes."
+                ::=  {  plcNodeNotchesInput  12  }
+
+
+        plcNodePilots OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The values of the pilot for all the node bands. 
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is a pair of octets representing the pilot 
+                                        values. There is one pair (pilot1 pilot2) for each
+                                        of the 7 bands."
+                ::=  {  plcNodeConfiguration 4  }
+
+        plcNodePilotsTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcNodePilotsEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains pilot values 
+                                        used by default on all channels."
+                ::=  { plcNodeConfiguration  5 }
+
+        plcNodePilotsEntry OBJECT-TYPE
+                SYNTAX                  PlcNodePilotsEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains pilot values 
+                                        used by default on a band. 
+                                        The band is defined by the index 
+                                        plcNodePilotsBandIndex."
+                INDEX                   {  plcNodePilotsBandIndex  }
+                ::=  { plcNodePilotsTable 1 }
+
+        PlcNodePilotsEntry  ::=  SEQUENCE {
+                plcNodePilotsBandIndex  BandValue,
+                plcNodePilot1           PilotValue,
+                plcNodePilot2           PilotValue
+                }
+
+
+        plcNodePilotsBandIndex OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The band number on which the pilot values are defined."
+                ::=  {  plcNodePilotsEntry  1  }
+
+
+        plcNodePilot1 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The default carrier wave number 
+                                        which supports the first pilot wave."
+                ::=  {  plcNodePilotsEntry  2  }
+
+
+        plcNodePilot2 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The default carrier wave number 
+                                        which supports the second pilot wave."
+                ::=  {  plcNodePilotsEntry  3  }
+
+
+        plcNodePilotsInput OBJECT IDENTIFIER
+                ::=  { plcNodeConfiguration  6 }
+                                
+        plcNodePilotsInputBand OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The band number on which the pilot values 
+                                        changes are requested."
+                ::=  {  plcNodePilotsInput  1  }
+
+
+        plcInputNodePilot1 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The default carrier wave number 
+                                        which supports the first pilot wave of 
+                                        the considered band."
+                ::=  {  plcNodePilotsInput  2  }
+                                
+        plcInputNodePilot2 OBJECT-TYPE     
+                SYNTAX                  PilotValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The default carrier wave number 
+                                        which supports the second pilot wave of 
+                                        the considered band."
+                ::=  {  plcNodePilotsInput  3  }
+
+                              
+        plcNodePilotsInputProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request a modification of the pilot values
+                                        associated to the considered band."
+                ::=  {  plcNodePilotsInput  4  }
+
+         plcNodePilotsInputResult OBJECT-TYPE     
+                SYNTAX                  ResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested node pilot values changes."
+                ::=  {  plcNodePilotsInput  5  }
+                
+       plcNodeAdaptsStringTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE OF PlcNodeAdaptsStringEntry               
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains string values for a 
+                                        quick access to the adapt configurations 
+                                        of all the carriers."
+                ::=  { plcNodeConfiguration  7 }
+
+
+       plcNodeAdaptsStringEntry OBJECT-TYPE
+                SYNTAX                  PlcNodeAdaptsStringEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains string values for a quick access to 
+                                        the adapt configuration
+                                        of each carrier of a band."
+                INDEX                   { plcBasePortIndex , plcNodeAdaptsStringBandIndex  }
+                ::=  { plcNodeAdaptsStringTable 1 }
+
+        PlcNodeAdaptsStringEntry  ::=  SEQUENCE {
+                plcNodeAdaptsStringBandIndex BandValue,
+                plcNodeAdaptsStringBand      OCTET STRING }
+
+        plcNodeAdaptsStringBandIndex OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The band number on which the adapt values are defined."
+                ::=  {  plcNodeAdaptsStringEntry  1  }
+
+        plcNodeAdaptsStringBand OBJECT-TYPE     
+                SYNTAX                  OCTET STRING
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt values of the 128 carriers of a band.
+                                        The expected format is VALUE VALUE VALUE ... VALUE.
+                                        Each value is two octets representing one adapt carrier 
+                                        level.
+                                        There are ( 16 groups * 8 carriers)  = 128 values."
+                ::=  {  plcNodeAdaptsStringEntry 2  }
+       
+       plcNodeAdaptsTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE OF PlcNodeAdaptsEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains adapt level configuration 
+                                        for each carrier of the node."
+                ::=  { plcNodeConfiguration  8 }
+
+        plcNodeAdaptsEntry OBJECT-TYPE
+                SYNTAX                  PlcNodeAdaptsEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains adapt level values 
+                                        for a group of carriers. 
+                                        The group is defined by the couple
+                                        (plcNodeAdaptsBandIndex,plcNodeAdaptsGroupIndex)."
+                INDEX                   {  plcNodeAdaptsBandIndex,plcNodeAdaptsGroupIndex  }
+                ::=  { plcNodeAdaptsTable 1 }
+
+        PlcNodeAdaptsEntry  ::=  SEQUENCE {
+                plcNodeAdaptsBandIndex  BandValue,
+                plcNodeAdaptsGroupIndex GroupValue,
+                plcNodeAdaptsCarrier1   AdaptValue,
+                plcNodeAdaptsCarrier2   AdaptValue,
+                plcNodeAdaptsCarrier3   AdaptValue,
+                plcNodeAdaptsCarrier4   AdaptValue,
+                plcNodeAdaptsCarrier5   AdaptValue,
+                plcNodeAdaptsCarrier6   AdaptValue,
+                plcNodeAdaptsCarrier7   AdaptValue,
+                plcNodeAdaptsCarrier8   AdaptValue
+                }
+
+
+        plcNodeAdaptsBandIndex OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The band number on which the adapt values are defined."
+                ::=  {  plcNodeAdaptsEntry  1  }
+
+        plcNodeAdaptsGroupIndex OBJECT-TYPE     
+                SYNTAX                  GroupValue
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The group number on which the adapt values are defined."
+                ::=  {  plcNodeAdaptsEntry  2  }
+
+        plcNodeAdaptsCarrier1 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the first carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  3  }
+                
+        plcNodeAdaptsCarrier2 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the second carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  4  }
+
+        plcNodeAdaptsCarrier3 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the third carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  5  }
+
+        plcNodeAdaptsCarrier4 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the fourth carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  6 }         
+                
+        plcNodeAdaptsCarrier5 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the fifth carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  7 }         
+                
+        plcNodeAdaptsCarrier6 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the sixth carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  8 }         
+
+        plcNodeAdaptsCarrier7 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the seventh carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  9 }                         
+                
+        plcNodeAdaptsCarrier8 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the eighth carrier of the group."
+                ::=  {  plcNodeAdaptsEntry  10 }  
+                               
+        plcNodeAdaptsInput OBJECT IDENTIFIER
+                ::=  { plcNodeConfiguration  9 }
+                                
+        plcNodeAdaptsInputBand OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The band number on which the adapt level value 
+                                        changes are requested."
+                ::=  {  plcNodeAdaptsInput  1  }
+
+
+        plcNodeAdaptsInputGroup OBJECT-TYPE     
+                SYNTAX                  GroupValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The group number on which the adapt level value 
+                                         changes are requested."
+                ::=  {  plcNodeAdaptsInput  2  }
+
+        plcNodeAdaptsInputCarrier1 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the first carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  3  }
+                                
+        plcNodeAdaptsInputCarrier2 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the second carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  4  }
+                                
+        plcNodeAdaptsInputCarrier3 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the third carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  5  }
+                                
+        plcNodeAdaptsInputCarrier4 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the fourth carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  6  }
+
+        plcNodeAdaptsInputCarrier5 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the fifth carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  7  }
+                                
+        plcNodeAdaptsInputCarrier6 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the sixth carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  8  }
+                                
+        plcNodeAdaptsInputCarrier7 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the seventh carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  9  }
+                                
+        plcNodeAdaptsInputCarrier8 OBJECT-TYPE     
+                SYNTAX                  AdaptValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The adapt level of the eighth carrier of the 
+                                        considered group of the chosen band."
+                ::=  {  plcNodeAdaptsInput  10  }
+                              
+        plcNodeAdaptsInputProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request a modification of the carrier 
+                                        adapt level associated to the considered group and 
+                                        band."
+                ::=  {  plcNodeAdaptsInput  11  }
+
+         plcNodeAdaptsInputResult OBJECT-TYPE     
+                SYNTAX                  ResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested node adapt level 
+                                        value changes."
+                ::=  {  plcNodeAdaptsInput  12  }
+       
+        plcNodeNetConfigTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  PlcNodeNetConfigEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains ip and mac 
+                                        addresses of the node."
+                ::=  { plcNodeConfiguration  10 }
+
+        plcNodeNetConfigEntry OBJECT-TYPE
+                SYNTAX                  PlcNodeNetConfigEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains ip and mac address
+                                        used by an interface."
+                INDEX                   {  ifIndex  }
+                ::=  { plcNodeNetConfigTable 1 }
+
+        PlcNodeNetConfigEntry  ::=  SEQUENCE {
+                plcNodeIpAddr   IpAddress,
+                plcNodeNetMask  IpAddress,
+                plcNodeMacAddr  MacAddress,
+                plcNodeGateway  IpAddress
+                }
+
+
+        plcNodeIpAddr OBJECT-TYPE     
+                SYNTAX                  IpAddress
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The IP address of the IP layer above the interface."
+                ::=  {  plcNodeNetConfigEntry  1  }
+
+
+        plcNodeNetMask OBJECT-TYPE     
+                SYNTAX                  IpAddress
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The IP Subnet mask of the IP layer above the interface."
+                ::=  {  plcNodeNetConfigEntry  2  }
+
+
+        plcNodeMacAddr OBJECT-TYPE     
+                SYNTAX                  MacAddress
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The MAC address of the MAC layer above the interface."
+                ::=  {  plcNodeNetConfigEntry  3  }
+                
+        plcNodeGateway OBJECT-TYPE     
+                SYNTAX                  IpAddress
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The Gateway address of the IP layer above the interface."
+                ::=  {  plcNodeNetConfigEntry  4  }
+                
+        plcNodeActions OBJECT IDENTIFIER
+                ::=  { plcNodeConfiguration  11 }
+                
+        plcNodeActionsCommit OBJECT IDENTIFIER
+                ::=  { plcNodeActions  1 }
+                
+        plcNodeActionsCommitProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request the commit of the configuration 
+                                        changes into the flash memory"
+                ::=  {  plcNodeActionsCommit  1  }
+
+         plcNodeActionsCommitResult OBJECT-TYPE     
+                SYNTAX                  ResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested flash commit operation."
+                ::=  {  plcNodeActionsCommit  2  }
+            
+         plcNodeActionsReset OBJECT IDENTIFIER
+                ::=  { plcNodeActions  2 }
+                
+         plcNodeActionsResetProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request the reset of the node.
+                                        This operation will terminate the communication 
+                                        between the manager and the node"
+                ::=  {  plcNodeActionsReset  1  }
+                
+         plcNodeActionsCarrier OBJECT IDENTIFIER
+                ::=  { plcNodeActions  3 }
+                
+         plcNodeActionsCarrierFlatProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request the equipment to flat the signal"
+                ::=  {  plcNodeActionsCarrier  1  }
+                
+                
+plcBssId OBJECT IDENTIFIER
+                  ::=  {  plcObjects  6  }
+                
+plcMasterBssId  OBJECT-TYPE
+	  SYNTAX                  INTEGER(0..99)
+          MAX-ACCESS              read-write
+          STATUS                  current
+          DESCRIPTION             "The value of the master Bss Id"
+                  ::=  {  plcBssId  1  }   
+                  
+plcSlaveBssId  OBJECT-TYPE
+	  SYNTAX                  INTEGER(0..99)
+          MAX-ACCESS              read-write
+          STATUS                  current
+          DESCRIPTION             "The value of the slave Bss Id"
+                  ::=  {  plcBssId  2  }                     
+                  
+plcSpy OBJECT IDENTIFIER
+                  ::=  {  plcObjects  7  }
+
+plcSpyIsDynamic OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to set the spy dynamic mode"
+                ::=  {  plcSpy  1  }
+
+plcStaticSpySynchBandNb OBJECT-TYPE     
+                SYNTAX                  BandValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The synchronization band number used for static spy mode"
+                ::=  {  plcSpy  2  }
+                           
+                                                                                                                                        
+-- software upload
+        softwareMgnt  OBJECT IDENTIFIER
+                ::=  {  plc  3  }
+                
+        -- current version
+        currentSoftwareVersion OBJECT-TYPE     
+                SYNTAX                  DisplayString (SIZE (0..255))
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The name of the current software release."
+                ::=  {  softwareMgnt  1 }
+                
+        currentSoftwareBoardVersion OBJECT-TYPE     
+                SYNTAX                  DisplayString (SIZE (0..255))
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The name of the current software board release."
+                ::=  {  softwareMgnt  2 }
+             
+        currentSoftwareAFEVersion OBJECT-TYPE     
+                SYNTAX                  DisplayString (SIZE (0..255))
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The name of the current software Analog Front End  release."
+                ::=  {  softwareMgnt  3 }
+                
+-- table of software
+        softwareTable OBJECT-TYPE
+                SYNTAX                  SEQUENCE  OF  SoftwareEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This table contains the current and reserve 
+                                        softwares of the node."
+                ::=  { softwareMgnt  4 }
+
+        softwareEntry OBJECT-TYPE
+                SYNTAX                  SoftwareEntry
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "This row contains software information."
+                INDEX                   {  softwareIndex  }
+                ::=  { softwareTable 1 }
+
+        SoftwareEntry  ::=  SEQUENCE {
+                softwareIndex           SoftwareIndex,
+                softwareVersion         DisplayString
+                }
+
+        softwareIndex OBJECT-TYPE     
+                SYNTAX                  SoftwareIndex
+                MAX-ACCESS              not-accessible
+                STATUS                  current
+                DESCRIPTION             "The index number of the software."
+                ::=  {  softwareEntry  1  }
+                
+        softwareVersion OBJECT-TYPE     
+                SYNTAX                  DisplayString (SIZE (0..255))
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "The name of the software release."
+                ::=  {  softwareEntry  2  }
+                
+        -- upload software action
+        softwareUpload OBJECT IDENTIFIER
+                ::=  {  softwareMgnt  5 }
+                
+        softwareUploadTFTPServerIP OBJECT-TYPE     
+                SYNTAX                  IpAddress
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The IP address of the TFTP serveur"
+                ::=  {  softwareUpload  1  }
+
+
+        softwareUploadLogin OBJECT-TYPE     
+                SYNTAX                  DisplayString (SIZE (0..16))
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The user login on the TFTP server"
+                ::=  {  softwareUpload  2  }
+               
+        softwareUploadPassword OBJECT-TYPE     
+                SYNTAX                  DisplayString (SIZE (0..16))
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The user password on the TFTP server. 
+                                        Warning: This field is displayed using 6 * characters"
+                ::=  {  softwareUpload  3  }
+         
+        softwareUploadFileName OBJECT-TYPE     
+                SYNTAX                  DisplayString (SIZE (0..255))
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The software file name to upload"
+                ::=  {  softwareUpload  4  }
+
+         softwareUploadProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request the uploading to start"
+                ::=  {  softwareUpload  5  }
+                
+         softwareUploadResult OBJECT-TYPE     
+                SYNTAX                  SoftwareActionResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested uploading"
+                ::=  {  softwareUpload  6  }
+
+         softwareUploadTFTPServerPort OBJECT-TYPE     -- PR01
+                SYNTAX                  Integer32 ( 0..65535 )
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The service port of the TFTP server"
+                ::=  {  softwareUpload  7  }
+
+         
+-- software action
+        softwareAction  OBJECT IDENTIFIER
+                ::=  {  softwareMgnt  6 }
+                
+        softwareActionIndex OBJECT-TYPE     
+                SYNTAX                  SoftwareIndex
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "The index of the reserve software"
+                ::=  {  softwareAction  1  }
+                
+         softwareActionType OBJECT-TYPE     
+                SYNTAX                  SoftwareActionType
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "Type of the software action software:
+                                        switch, remove "
+                ::=  {  softwareAction  2  }
+
+         softwareActionProceed OBJECT-TYPE     
+                SYNTAX                  TruthValue
+                MAX-ACCESS              read-write
+                STATUS                  current
+                DESCRIPTION             "True to request the switch between the current 
+                                        and the reserver software to start"
+                ::=  {  softwareAction  3  }
+           
+         softwareActionResult OBJECT-TYPE     
+                SYNTAX                  SoftwareActionResultValue
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION             "Result value of the requested action"
+                ::=  {  softwareAction  4  }
+
+         
+-- compliance
+        plcConformance OBJECT IDENTIFIER
+                ::=  {  plc  4  }
+                
+        plcCompliances OBJECT IDENTIFIER
+                ::=  {  plcConformance  1  }
+
+        plcGroups OBJECT IDENTIFIER
+                ::=  {  plcConformance  2  }
+                
+        plcCompliance MODULE-COMPLIANCE
+                STATUS                  current
+                DESCRIPTION             "The compliance statement for SPC200 chip."
+
+                MODULE  
+                MANDATORY-GROUPS        { nodeGroup, topologyGroup }
+                GROUP                   statisticGroup
+                DESCRIPTION             "This group is mandatory for 
+                                        channel performances analysis"
+                ::=  {  plcCompliances  1  }
+
+        nodeGroup OBJECT-GROUP
+                OBJECTS                 { plcNodeNotches, plcMode,
+                                          plcNodeNotchesCarrier1, plcNodeNotchesCarrier2, 
+                                          plcNodeNotchesCarrier3, plcNodeNotchesCarrier4,
+                                          plcNodeNotchesCarrier5, plcNodeNotchesCarrier6, 
+                                          plcNodeNotchesCarrier7, plcNodeNotchesCarrier8, 
+                                          plcNodePilots, plcNodePilot1, plcNodePilot2,
+                                          plcNodeAdaptsStringBand, plcNodeAdaptsCarrier1,
+                                          plcNodeAdaptsCarrier2, plcNodeAdaptsCarrier3,
+                                          plcNodeAdaptsCarrier4, plcNodeAdaptsCarrier5,
+                                          plcNodeAdaptsCarrier6, plcNodeAdaptsCarrier7,
+                                          plcNodeAdaptsCarrier8,
+                                          plcNodeIpAddr, plcNodeNetMask, plcNodeMacAddr,
+                                          plcNodeGateway, plcMasterBssId, plcSlaveBssId,
+                                          plcSpyIsDynamic, plcStaticSpySynchBandNb }
+                STATUS                  current
+                DESCRIPTION             "A collection of objects providing 
+                                        node configuration information."
+                ::=  {  plcGroups  1  }
+
+                inputNodeGroup OBJECT-GROUP
+               OBJECTS                 { plcNodeNotchesInputBand, plcNodeNotchesInputGroup,
+                                         plcNodeNotchesInputCarrier1, plcNodeNotchesInputCarrier2, 
+                                         plcNodeNotchesInputCarrier3, plcNodeNotchesInputCarrier4,
+                                         plcNodeNotchesInputCarrier5, plcNodeNotchesInputCarrier6, 
+                                         plcNodeNotchesInputCarrier7, plcNodeNotchesInputCarrier8, 
+                                         plcNodeNotchesInputProceed,  plcNodeNotchesInputResult,
+                                         plcNodePilotsInputBand,
+                                         plcInputNodePilot1, plcInputNodePilot2,
+                                         plcNodePilotsInputProceed,plcNodePilotsInputResult,                                        
+                                         plcNodeAdaptsInputBand, plcNodeAdaptsInputGroup,  
+                                         plcNodeAdaptsInputCarrier1, plcNodeAdaptsInputCarrier2,
+                                         plcNodeAdaptsInputCarrier3, plcNodeAdaptsInputCarrier4,
+                                         plcNodeAdaptsInputCarrier5, plcNodeAdaptsInputCarrier6,
+                                         plcNodeAdaptsInputCarrier7, plcNodeAdaptsInputCarrier8,
+                                         plcNodeAdaptsInputProceed,  plcNodeAdaptsInputResult,
+                                         plcNodeActionsCommitProceed, plcNodeActionsCommitResult,
+                                         plcNodeActionsResetProceed, plcNodeActionsCarrierFlatProceed}
+                STATUS                  current
+                DESCRIPTION             "A collection of objects used to request  
+                                        node configuration information changes."
+                ::=  {  plcGroups  2  }
+
+        topologyGroup OBJECT-GROUP
+                OBJECTS         { plcBasePortAddress, plcBasePortChannelEstimation,
+                				  plcBasePortAttenuation ,
+                                        plcChannePilot2, plcChannelPilot1,
+                                        plcRxChannelPilots,
+                                        plcRxLastChannelPilots,
+                                        plcTxChannelPilots, 
+                                        plcRxChannelModulation,
+                                        plcRxLastChannelModulation,
+                                        plcTxChannelModulation, 
+                                        plcModGroup1, plcModGroup10, plcModGroup11, 
+                                        plcModGroup12, plcModGroup13, plcModGroup14, 
+                                        plcModGroup15, plcModGroup16, plcModGroup2, 
+                                        plcModGroup3, plcModGroup4, plcModGroup5, 
+                                        plcModGroup6, plcModGroup7, plcModGroup8, 
+                                        plcModGroup9, 
+                                        plcPortChannelGain, 
+                                        plcPortChannelBandwidth,
+                                        plcPortChannelMaxBandwidth, 
+                                        plcPortChannelSynchronizationBand,
+                                        plcPortChannelType, plcTopoChanges }
+                STATUS                  current
+                DESCRIPTION             "A collection of objects providing 
+                                        topology configuration."
+                ::=  {  plcGroups  3  }
+
+        inputTopologyGroup OBJECT-GROUP
+                OBJECTS         {       plcModulationInputAddr, plcModulationInputChannel, plcModulationInputBand,
+                                        plcInputModulationGroup1, plcInputModulationGroup2,
+                                        plcInputModulationGroup3, plcInputModulationGroup4, 
+                                        plcInputModulationGroup5, plcInputModulationGroup6, 
+                                        plcInputModulationGroup7, plcInputModulationGroup8, 
+                                        plcInputModulationGroup9, plcInputModulationGroup10, 
+                                        plcInputModulationGroup11, plcInputModulationGroup12,
+                                        plcInputModulationGroup13, plcInputModulationGroup14,
+                                        plcInputModulationGroup15, plcInputModulationGroup16,
+                                        plcModulationInputProceed, plcModulationInputResult,
+                                        plcPilotsInputAddr, plcPilotsInputChannel, plcPilotsInputBand,
+                                        plcInputChannelPilot1, plcInputChannelPilot2,
+                                        plcPilotsInputProceed, plcPilotsInputResult }
+                STATUS                  current
+                DESCRIPTION             "A collection of objects used to request  
+                                        topology configuration changes."
+                ::=  {  plcGroups  4  }
+
+        statisticGroup OBJECT-GROUP
+                OBJECTS         {    --PR01 BEGIN
+                                     --   ipBridgedPackets, ipInBridgedPkts, 
+                                     --   ipInErrorPackets, ipInErrorPkts, ipInPackets, 
+                                     --   ipInPkts, ipOutErrorPackets, ipOutErrorPkts, 
+                                     --   ipOutPackets, ipOutPkts, macInErrorPkts, 
+                                     --   macInPkts, macOutErrorPkts, macOutPackets, 
+                                     --   plcpInErrorPkts, plcpInPkts, plcpOutErrorPkts,
+                                     --   plcpOutPkts, 
+                                     --PR01 END
+                                        portStats2AvgBandAtt, portStats2AvgBandSNR, --PR01
+                                     --   portStats2Ber,
+                                        portStats2Noise, portStats2Signal,       
+                                     --   portStatsBer,
+                                        portStatsNoise, portStatsSignal,
+                                        portStats3AvgAtt, portStats3AvgSNR  ,
+                                        bootstatsBoot, bootstatsManualReset, bootstatsFailureReset
+                                         } --PR01
+                STATUS                  current
+                DESCRIPTION             "A collection of objects providing 
+                                        statistic data on node and plc link performances."
+                ::=  {  plcGroups  5  }
+
+        softwareGroup OBJECT-GROUP
+                OBJECTS         {       currentSoftwareVersion, currentSoftwareBoardVersion, 
+                                        currentSoftwareAFEVersion, softwareVersion,
+                                        softwareUploadTFTPServerIP, softwareUploadLogin,
+                                        softwareUploadPassword, softwareUploadFileName,
+                                        softwareUploadProceed, softwareUploadResult,
+                                        softwareUploadTFTPServerPort, --PR01
+                                        softwareActionIndex, softwareActionType,
+                                        softwareActionProceed, softwareActionResult }
+                STATUS                  current
+                DESCRIPTION             "A collection of objects providing 
+                                        software management"
+                ::=  {  plcGroups  6  }
+
+--PR01 BEGIN
+        analyserGroup OBJECT-GROUP
+                OBJECTS         {       plcSNAnalyserAGC, plcSNAnalyserEnable,
+                                        plcSNAnalyserMinSignal, plcSNAnalyserMaxSignal,
+                                        plcSNAnalyserAvgSignal, plcSNAnalyserLastSignal,
+                                        plcSNAnalyserFFTDiv,
+                                        plcAGCAnalyserEnable,
+                                        plcAGCAnalyserSamplesPart1, plcAGCAnalyserSamplesPart2 }
+                STATUS                  current
+                DESCRIPTION             "A collection of objects providing 
+                                        spectrum analyser data"
+                ::=  {  plcGroups  7  }
+--PR01 END
+
+        agentCapabilities AGENT-CAPABILITIES
+                PRODUCT-RELEASE         "Product-Release"
+                STATUS                  current
+                DESCRIPTION             "The SPC200 chip SNMP agent capabilities"
+
+                SUPPORTS                SPC200
+                        INCLUDES        { nodeGroup, inputNodeGroup, 
+                                          topologyGroup, inputTopologyGroup, 
+                                          statisticGroup, softwareGroup,
+                                          analyserGroup } --PR01
+                                                                  
+--OK                SUPPORTS               IF-MIB
+--OK                        INCLUDES        { ifGeneralInformationGroup, ifHCPacketGroup }                   
+--OK                        VARIATION       ifAdminStatus
+--OK                                ACCESS                          read-only
+--OK                                DESCRIPTION                     "Forbid the update of the administrative status"                    
+--OK                       VARIATION       ifLinkUpDownTrapEnable
+--OK                                ACCESS                          not-implemented
+--OK                                DESCRIPTION                     "No trap supported"
+--KO                       VARIATION       ifAlias
+--KO                                ACCESS                          not-implemented
+--KO                                DESCRIPTION                     "The non volatile alias name 
+--KO                                                                cannot be saved on the SPC200 chip"
+--KO                        VARIATION       ifMtu
+--KO                                ACCESS                          not-implemented
+--KO                                DESCRIPTION                     "Information not available on SPC200 chip"
+                                
+                SUPPORTS               MAU-MIB
+                        INCLUDES        { mauIfGrpBasic }
+                        VARIATION       ifMauIndex
+                                DESCRIPTION                     "Only one MAU. So the value is always 1"
+                        VARIATION       ifMauMediaAvailable
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ifMauMediaAvailableStateExits
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ifMauJabberState
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ifMauJabberingStateEnters
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                                
+                SUPPORTS               IP-MIB
+                        INCLUDES        { ipGroup }
+                        VARIATION       ipForwarding
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipDefaultTTL
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipInHdrErrors
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipInAddrErrors
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipForwDatagrams
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipInUnknownProtos
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipInDiscards
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipInDelivers
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipOutDiscards
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipOutNoRoutes
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipReasmTimeout
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipReasmReqds
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipReasmOKs
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipReasmFails
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipFragOKs
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipFragFails
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipFragCreates
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipAdEntBcastAddr
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipAdEntReasmMaxSize
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                        VARIATION       ipRoutingDiscards
+                                ACCESS                          not-implemented
+                                DESCRIPTION                     "Information not available on SPC200 chip"
+                                
+                SUPPORTS                        SNMPv2-MIB
+                        INCLUDES        { systemGroup }
+                        
+--OK                SUPPORTS                        BRIDGE-MIB
+--OK                        INCLUDES        { dot1dBase }
+--KO                        VARIATION       dot1dBasePortDelayExceededDiscards
+--KO                                ACCESS                          not-implemented
+--KO                                DESCRIPTION                     "Information not available on SPC200 chip"
+--KO                        VARIATION       dot1dBasePortMtuExceededDiscards
+--KO                                ACCESS                          not-implemented
+--KO                                DESCRIPTION                     "Information not available on SPC200 chip"
+                                
+                ::=  {  plcConformance  3  }
+                        
+                
+-- ifTableExt data
+
+--ifTableExt OBJECT-TYPE                                  
+--       SYNTAX SEQUENCE OF IfEntryExt
+--	MAX-ACCESS not-accessible
+--	STATUS current
+--	DESCRIPTION
+--		"A list of interface entries.  The number of entries is
+--		given by the value of ifNumber. This Table is an Ext of the
+--		standard ifTable located in the IF-MIB."
+--	::=  {  spc200MIB  2  }
+
+
+--ifEntryExt OBJECT-TYPE
+--	SYNTAX IfEntryExt
+--	MAX-ACCESS not-accessible
+--	STATUS current
+--	DESCRIPTION
+--		"An entry containing management information applicable to a
+--		particular interface. These entries are indexed using the ifIndex
+--		of the standard IF-MIB."
+--	INDEX { ifIndex }
+--	::= { ifTableExt 1 }
+
+
+--IfEntryExt ::= SEQUENCE {
+--	ifDefaultSpeed              Gauge32,
+--	ifSpeedAutoNegAdminStatus   INTEGER }
+	
+	
+--ifDefaultSpeed OBJECT-TYPE
+--	SYNTAX Gauge32
+--	MAX-ACCESS read-write
+--	STATUS current
+--	DESCRIPTION 
+--	        "This field is used to set the speed for a given interface.
+--	        It contains a default value which will be copied into ifSpeed if
+--	        the ifSpeedAutoNegAdminStatus is disabled"		
+--	::= { ifEntryExt 1 }	
+        
+       
+--ifSpeedAutoNegAdminStatus OBJECT-TYPE
+--	SYNTAX INTEGER {
+--			enabled(1),
+--			disabled(2) }
+--	MAX-ACCESS read-write
+--	STATUS current
+--	DESCRIPTION
+--	       "This field is used to enable/disable the speed auto negotiation 
+--	       process for a given interface. If the status is disabled, the user
+--	       can set the speed by setting ifDefaultSpeed.
+--	       When the speed auto negotiation status is enabled, the hardware 
+--	       select a speed and set it in ifSpeed. When the speed auto negotiation 
+--	       status is disabled, the content of ifDefaultSpeed is copied into 
+--	       ifSpeed."	        		
+--	::= { ifEntryExt 2 }                        
+
+
+--ifGroupExt OBJECT-GROUP
+--	OBJECTS {
+--		ifDefaultSpeed,
+--		ifSpeedAutoNegAdminStatus }
+--	STATUS current
+--	DESCRIPTION
+--		"The fields needed by the SPiDCOM functionalities"
+		
+--	::= { ifTableExt 2 }
+
+
+-- ipExt data , for DHCP mode
+
+ipExt OBJECT-IDENTITY
+      STATUS  current
+      DESCRIPTION
+            "Extended ip needed for SPiDCOM functionalities"
+       ::= { spc200MIB 4 }
+
+ipDynamic OBJECT-TYPE     
+       SYNTAX                  TruthValue
+       MAX-ACCESS              read-write
+       STATUS                  current
+       DESCRIPTION             "True if Ip address is set dynamically"
+       ::=  { ipExt 1  }
+
+ipExtGroup OBJECT-GROUP
+       OBJECTS {
+		ipDynamic 
+		}
+       STATUS current
+       DESCRIPTION             "The fields needed by the SPiDCOM functionalities"		
+       ::= { ipExt 2 }
+
+END

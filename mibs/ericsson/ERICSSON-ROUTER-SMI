@@ -1,0 +1,101 @@
+-- %DNP% $Id: ERICSSON-ROUTER-SMI.my,v 1.1.6.1.452.2 2011/02/22 17:26:17 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-SMI.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-SMI.my:	  Structure of Management Information
+--
+-- Copyright (c) 1998, 2001-2002, 2011, 2015 Ericsson AB.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY
+		FROM SNMPv2-SMI
+	ericsson
+		FROM ERICSSON-TOP-MIB;
+
+eriRouterSMI MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+        ORGANIZATION    "Ericsson AB."
+        CONTACT-INFO
+                "       Ericsson AB.
+
+                Postal: 100 Headquarters Dr
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+	DESCRIPTION
+		"The Structure of Management Information for
+		the enterprise."
+
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+        REVISION        "200206060000Z" -- June 6, 2002
+        DESCRIPTION
+                "Updated Contact-info and recovered revision info."
+
+        REVISION        "200106270000Z" -- June 27, 2001
+        DESCRIPTION
+                "Added eriRouterInternal."
+
+        REVISION        "9804182300Z" -- April 18, 1998
+        DESCRIPTION
+                "Initial version."
+	::= { ericsson 218 }
+
+eriRouterProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		""
+	::= { eriRouterSMI 1 }
+
+eriRouterMgmt OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { eriRouterSMI 2 }
+
+eriRouterExperiment OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { eriRouterSMI 3 }
+
+eriRouterCapabilities OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { eriRouterSMI 4 }
+
+eriRouterModules OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { eriRouterSMI 5 }
+
+eriRouterEntities OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { eriRouterSMI 6 }
+
+eriRouterInternal OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+		""
+	::= { eriRouterSMI 7 }
+
+END

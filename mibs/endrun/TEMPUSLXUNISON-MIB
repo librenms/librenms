@@ -1,0 +1,1442 @@
+-- Revision 4.00 12/20/08
+TEMPUSLXUNISON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   Counter32, enterprises                           FROM SNMPv2-SMI
+   DisplayString                                    FROM SNMPv2-TC;
+
+endRunTechnologiesMIB OBJECT IDENTIFIER ::= { enterprises 13827 }
+
+endRunTechnologies MODULE-IDENTITY
+   LAST-UPDATED
+      "0812200000Z"
+   ORGANIZATION
+      "EndRun Technologies LLC"
+   CONTACT-INFO
+      "Technical Support 1-877-749-3878 snmpsupport@endruntechnologies.com"
+   DESCRIPTION
+      "EndRun Technologies Enterprise MIB"
+                                  ::= { endRunTechnologiesMIB 0 }
+
+-- Tempus LX/Unison Cntp Product Group
+
+tempuslxCntp      OBJECT IDENTIFIER ::= { endRunTechnologiesMIB 5 }
+
+cntp              OBJECT IDENTIFIER ::= { tempuslxCntp 0 }
+
+cntptrap          OBJECT IDENTIFIER ::= { cntp 0 }
+
+cdma              OBJECT IDENTIFIER ::= { tempuslxCntp 1 }
+
+cdmatrap          OBJECT IDENTIFIER ::= { cdma 0 }
+
+cCPUOptions       OBJECT IDENTIFIER ::= { tempuslxCntp 2 }
+
+-- cntp branch of the TempusLX/Unison Cntp subtree
+
+cntpTrapLeapIndBitsChange NOTIFICATION-TYPE
+   OBJECTS { cntpLeapIndBits }
+   STATUS current
+   DESCRIPTION
+   "A cntpTrapNTPLeapIndBitsChange trap signifies that the value of the leap
+   indicator bits contained in the NTP reply packets sent by the time server
+   has changed.  The current value of these bits is contained in the included
+   cntpLeapIndBits.  The decimal value of these bits ranges from 0 to 3:
+
+   0   is the no fault, no leap warning condition
+   1   is the no fault, leap second insertion warning condition
+   2   is the no fault, leap second deletion warning condition
+   3   is the unsynchronized, alarm condition"
+   ::= { cntptrap 1 }
+
+cntpTrapStratumChange NOTIFICATION-TYPE
+   OBJECTS { cntpStratum }
+   STATUS current
+   DESCRIPTION
+   "A cntpTrapStratumChange trap signifies that the value of the stratum
+   field contained in the NTP reply packets sent by the time server
+   has changed.  The current value is contained in the included
+   variable, cntpStratum.  The decimal value of this field ranges from 1 to 16:
+
+   1   is the synchronized, actively locked to the reference UTC source stratum
+   2   is the synchronized, actively locked to a network stratum 1 server stratum
+   16  is the unsynchronized stratum level"
+   ::= { cntptrap 2 }
+
+cntpRxPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets received by the NTP daemon."
+   ::= { cntp 1 }
+
+cntpTxPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP reply packets transmitted by the NTP daemon."
+   ::= { cntp 2 }
+
+cntpIgnoredPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets ignored by the NTP daemon."
+   ::= { cntp 3 }
+
+cntpDroppedPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets dropped by the NTP daemon."
+   ::= { cntp 4 }
+
+cntpAuthFail OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of authentication failures detected by the NTP daemon."
+   ::= { cntp 5 }
+
+cntpTimeFigureOfMerit OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lessthan100us       (6),
+      lessthan1ms         (7),
+      lessthan10ms        (8),
+      greaterthan10ms     (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Time Figure of Merit (TFOM) value ranges from 6 to 9 and indicates the
+   current estimate of the worst case time error.  It is a logarithmic scale,
+   with each increment indicating a tenfold increase in the worst case time
+   error boundaries.
+
+   The scale is referenced to a worst case time error of 100 picoseconds,
+   equivalent to a TFOM of zero.  During normal locked operation with CDMA
+   the TFOM is 6 and implies a worst case time error of 100 microseconds.
+
+   During periods of signal loss, the CDMA sub-system will compute an
+   extrapolated worst case time error.  One hour after the worst case time error
+   has reached the value equivalent to a TFOM of 9, the NTP server will cease
+   to send stratum 1 reply packets and an Alarm LED will be energized."
+   ::= { cntp 6 }
+
+cntpLeapIndBits OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      noFaultorLeap   (0),
+      leapInsWarning  (1),
+      leapDelWarning  (2),
+      unSynchronized  (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a status code indicating:  normal operation, a leap second to
+   be inserted in the last minute of the current day, a leap second to be
+   deleted in the last second of the day or an alarm condition indicating
+   loss of timing synchronization.  The leap indicator field of NTP reply
+   packets sent from this server is set to cntpLeapIndBits."
+   ::= { cntp 7 }
+
+cntpSyncSource OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string identifying the synchronization source for this
+   NTP server.  It is one of CDMA, an IP address of a stratum 1 server, or NONE.
+   If it is NONE, then the server is not synchronized, has its Leap Indicator
+   Bits in the Alarm state and is running at Stratum 16.  If it is an IP
+   address, then the server is operating as a stratum 2 server synchronized to
+   the network connected stratum 1 server whose IP address is shown.
+
+   Check the Stratum, Leap Indicator Bits and Time Figure of Merit for further
+   information.  NTP reply packets from this server will have the reference
+   identifier field set to cntpSyncSource if it is CDMA.  Otherwise
+   it will be set to either an IP address or 0.0.0.0 (NONE)."
+   ::= { cntp 8 }
+
+cntpOffsetToCDMAReference OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string containing the floating value of the current
+   offset in units of seconds of the NTP server CPU clock to the CDMA
+   reference time.  Positive values imply that the NTP server clock is
+   ahead of the CDMA reference time."
+   ::= { cntp 9 }
+
+cntpStratum OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      cntpStratumOne          (1),
+      cntpStratumTwo          (2),
+      cntpStratumUnsync      (16)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an integer showing the current stratum level being reported by
+   the NTP daemon in its reply packets to clients.  If it is 1, then the server
+   is fully synchronized and delivering Stratum 1 accuracy.  If it is greater
+   than 1 and less than 16, it is synchronized to a network connected NTP
+   server operating at one stratum lower.  If it is 16, then the server is
+   unambiguously unsynchronized.
+
+   NTP clients on the network should be configured to not use the time from
+   this server if the stratum is 16."
+   ::= { cntp 10 }
+
+cntpVersion OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the NTP server firmware version."
+   ::= { cntp 11 }
+
+cntpOscType OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..32))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the installed oscillator type.  It is
+   one of TCXO, MS-OCXO, HS-OCXO or Rubidium."
+   ::= { cntp 12 }
+
+cntpTimeMode OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..8))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the time mode of operation for any
+   optional IRIG timecode outputs or the optional front panel vacuum
+   fluorescent display.  It DOES NOT indicate the time mode of the Linux
+   OS clock or the NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It can be LOCAL_AUTO, LOCAL_MANUAL, GPS or UTC.  In LOCAL_AUTO mode,
+   the local offset to UTC is automatically determined from the CDMA
+   transmissions received from the base station.  In LOCAL_MANUAL mode,
+   the local offset to UTC is user programmed and overrides the CDMA
+   system data."
+   ::= { cntp 13 }
+
+cntpLocalOffset OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the local time offset configured for any optional IRIG
+   timecode outputs or the optional front panel vacuum fluorescent display.
+   It is only pertinent when cntpTimeMode is set to LOCAL_MANUAL or LOCAL_AUTO.
+   It DOES NOT indicate the local time offset of the Linux OS clock or the
+   NTP sub-system.  Both of these are ALWAYS UTC.
+
+   When cntpTimeMode is set to LOCAL_AUTO, cntpLocalOffset is determined
+   from the CDMA base station.  When cntpTimeMode is set to LOCAL_MANUAL,
+   cntpLocalOffset is the user configured value.
+
+   Its units are half-hours, ranging from -25 to 25, where negative values
+   imply that the local time is behind UTC."
+   ::= { cntp 14 }
+
+cntpDSTStartMonth OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled (0),
+      Jan      (1),
+      Feb      (2),
+      Mar      (3),
+      Apr      (4),
+      May      (5),
+      Jun      (6),
+      Jul      (7),
+      Aug      (8),
+      Sep      (9),
+      Oct      (10),
+      Nov      (11),
+      Dec      (12)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the month that Daylight Savings Time begins.  It affects
+   the local time operation of any optional IRIG timecode outputs or the
+   optional front panel vacuum fluorescent display.  It is only pertinent
+   when cntpTimeMode is set to LOCAL_MANUAL.  It DOES NOT affect the Linux OS
+   clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { cntp 15 }
+
+cntpDSTStartSunday OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled  (0),
+      1stSunday (1),
+      2ndSunday (2),
+      3rdSunday (3),
+      4thSunday (4),
+      lastSunday (5)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Sunday of the month that Daylight Savings Time begins.
+   It affects the local time operation of any optional IRIG timecode outputs
+   or the optional front panel vacuum fluorescent display.  It is only
+   pertinent when cntpTimeMode is set to LOCAL_MANUAL.  It DOES NOT affect the
+   Linux OS clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { cntp 16 }
+
+cntpDSTStartHour OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the hour that Daylight Savings Time begins.  It affects the
+   local time operation of any optional IRIG timecode outputs or the optional
+   front panel vacuum fluorescent display.  It is only pertinent when
+   cntpTimeMode is set to LOCAL_MANUAL.  It DOES NOT affect the Linux OS clock
+   or the NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It ranges from 0 to 23, where 0 is midnight."
+   ::= { cntp 17 }
+
+cntpDSTStopMonth OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled (0),
+      Jan      (1),
+      Feb      (2),
+      Mar      (3),
+      Apr      (4),
+      May      (5),
+      Jun      (6),
+      Jul      (7),
+      Aug      (8),
+      Sep      (9),
+      Oct      (10),
+      Nov      (11),
+      Dec      (12)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the month that Daylight Savings Time ends.  It affects
+   the local time operation of any optional IRIG timecode outputs or the
+   optional front panel vacuum fluorescent display.  It is only pertinent
+   when cntpTimeMode is set to LOCAL_MANUAL.  It DOES NOT affect the Linux OS
+   clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { cntp 18 }
+
+cntpDSTStopSunday OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled  (0),
+      1stSunday (1),
+      2ndSunday (2),
+      3rdSunday (3),
+      4thSunday (4),
+      lastSunday (5)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Sunday of the month that Daylight Savings Time ends.
+   It affects the local time operation of any optional IRIG timecode outputs
+   or the optional front panel vacuum fluorescent display.  It is only
+   pertinent when cntpTimeMode is set to LOCAL_MANUAL.  It DOES NOT affect the
+   Linux OS clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { cntp 19 }
+
+cntpDSTStopHour OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the hour that Daylight Savings Time ends.  It affects the
+   local time operation of any optional IRIG timecode outputs or the optional
+   front panel vacuum fluorescent display.  It is only pertinent when
+   cntpTimeMode is set to LOCAL_MANUAL.  It DOES NOT affect the Linux OS clock
+   or the NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It ranges from 0 to 23, where 0 is midnight."
+   ::= { cntp 20 }
+
+-- cdma branch of the Tempus LX/Unison Cntp subtree
+
+cdmaTrapFaultStatusChange NOTIFICATION-TYPE
+   OBJECTS { cdmaFaultStatus }
+   STATUS current
+   DESCRIPTION
+   "A cdmaTrapFaultStatusChange trap signifies that the value of the fault
+   status word reported by the CDMA sub-system has changed.  The current value
+   is contained in the included cdmaFaultStatus."
+   ::= { cdmatrap 1 }
+
+cdmaTrapTimeFigureOfMeritChange NOTIFICATION-TYPE
+   OBJECTS { cdmaTimeFigureOfMerit }
+   STATUS current
+   DESCRIPTION
+   "A cdmaTrapTimeFigureOfMeritChange trap signifies that the value of the TFOM
+   reported by the CDMA sub-system has changed.  The current value is
+   contained in the included cdmaTimeFigureOfMerit."
+   ::= { cdmatrap 2 }
+
+cdmaFaultStatus OBJECT-TYPE
+   SYNTAX BITS
+   {
+      cdmaNotUsed         (0)
+      cdmaNTPNotPolling   (1)
+      cdmaRefTimeFlt      (2)
+      cdmaLOPLLFlt        (3)
+      cdmaFLASHWriteFlt   (4)
+      cdmaFPGACfgFlt      (5)
+      cdmaNoSignalTimeout (6)
+      cdmaDACNearLimit    (7)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   least significant two nibbles of the CDMA fault status word.  Unfortunately,
+   SNMP numbers the bits in the reverse order, so that the enumerated values
+   are backwards from the description contained in the User's Manual for the
+   fault status field returned by the cdmastat command.  Each bit indicates
+   a fault when set.  Currently defined fault states encoded in this value:
+
+   Bit 7:    DAC controlling the TCXO is near the high or low limit.
+   Bit 6:    Time Figure of Merit has been 9 (unsynchronized) for 1 hour.
+   Bit 5:    Field Programmable Gate Array (FPGA) did not configure properly.
+   Bit 4:    FLASH memory had a write fault.
+   Bit 3:    Local Oscillator PLL fault.
+   Bit 2:    CDMA reference time fault (fails sanity checks).
+   Bit 1:    NTP daemon is not polling the CDMA reference clock.
+   Bit 0:    Not Used."
+   ::= { cdma 1 }
+
+cdmaTimeFigureOfMerit OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lessthan100us   (6),
+      lessthan1ms     (7),
+      lessthan10ms    (8),
+      greaterthan10ms (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Time Figure of Merit (TFOM) value ranges from 6 to 9 and indicates the
+   current estimate of the worst case time error.  It is a logarithmic scale,
+   with each increment indicating a tenfold increase in the worst case time
+   error boundaries.  The scale is referenced to a worst case time error of
+   100 picoseconds, equivalent to a TFOM of zero.  During normal locked
+   operation the TFOM is 6 and implies a worst case time error of 100
+   microseconds.
+
+   During periods of signal loss, the CDMA sub-system will compute an
+   extrapolated worst case time error.  One hour after the worst case time error
+   has reached the value equivalent to a TFOM of 9, the NTP server will cease
+   to send stratum 1 reply packets and an Alarm LED will be energized."
+   ::= { cdma 2 }
+
+cdmaSigProcState OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      cdmaAcquiring       (0),
+      cdmaDetected        (1),
+      cdmaCodeLocking     (2),
+      cdmaCarrierLocking  (4),
+      cdmaLocked          (8)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current CDMA signal processor state.  One of 0, 1, 2, 4 or 8, with 0
+   indicating the acquisition state and 8 the fully locked on state."
+   ::= { cdma 3 }
+
+cdmaChannel OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      bandclass0subclass0Apri (0),
+      bandclass0subclass0Bpri (1),
+      bandclass0subclass0Asec (2),
+      bandclass0subclass0Bsec (3),
+      bandclass0subclass1Apri (4),
+      bandclass0subclass1Bpri (5),
+      bandclass0subclass1Asec (6),
+      bandclass0subclass1Bsec (7),
+      bandclass1A00           (8),
+      bandclass1A01           (9),
+      bandclass1A02          (10),
+      bandclass1A03          (11),
+      bandclass1A04          (12),
+      bandclass1A05          (13),
+      bandclass1A06          (14),
+      bandclass1A07          (15),
+      bandclass1A08          (16),
+      bandclass1A09          (17),
+      bandclass1A10          (18),
+      bandclass1D00          (19),
+      bandclass1D01          (20),
+      bandclass1D02          (21),
+      bandclass1B00          (22),
+      bandclass1B01          (23),
+      bandclass1B02          (24),
+      bandclass1B03          (25),
+      bandclass1B04          (26),
+      bandclass1B05          (27),
+      bandclass1B06          (28),
+      bandclass1B07          (29),
+      bandclass1B08          (30),
+      bandclass1B09          (31),
+      bandclass1B10          (32),
+      bandclass1E00          (33),
+      bandclass1E01          (34),
+      bandclass1E02          (35),
+      bandclass1F00          (36),
+      bandclass1F01          (37),
+      bandclass1F02          (38),
+      bandclass1C00          (39),
+      bandclass1C01          (40),
+      bandclass1C02          (41),
+      bandclass1C03          (42),
+      bandclass1C04          (43),
+      bandclass1C05          (44),
+      bandclass1C06          (45),
+      bandclass1C07          (46),
+      bandclass1C08          (47),
+      bandclass1C09          (48),
+      bandclass1C10          (49),
+      bandclass3Apri         (50),
+      bandclass3Asec         (51),
+      bandclass0India185     (52),
+      bandclass0India226     (53),
+      bandclass0India267     (54),
+      bandclass0India308     (55),
+      bandclass0India369     (56),
+      bandclass0India410     (57),
+      bandclass0India451     (58),
+      bandclass0India492     (59)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current CDMA frequency band and channel being used.  Channels 0-3 are the
+   North American cellular channels.  Channels 4-7 are the South Korean cellular
+   channels.  Channels 8-49 are the North American PCS channels.  Channels 50-51
+   are the Japanese cellular channels.  Channels 52-59 are the Indian cellular
+   channels."
+   ::= { cdma 4 }
+
+cdmaPNO OBJECT-TYPE
+   SYNTAX INTEGER (0..511)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current Pseudo Noise Offset of the base station being tracked.  The value
+   ranges from 0 to 511 and is in units of 64 Pseudo Noise Code chips.  This
+   offset serves as a base station identifier that is analogous to the Pseudo
+   Random Noise (PRN) codes used by the individual satellites in the GPS system."
+   ::= { cdma 5 }
+
+cdmaAGC OBJECT-TYPE
+   SYNTAX INTEGER (0..255)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current 8 bit, Automatic Gain Control (AGC) DAC value.  Typical values
+   are around 200, but proximity to the base station, type of building
+   construction and orientation within the building have a strong influence on
+   this value.  More positive values have the effect of increasing the RF gain."
+   ::= { cdma 6 }
+
+cdmaVCDAC OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current 16 bit, Voltage Controlled TCXO DAC value.  Typical range is 20000
+   to 40000, where more positive numbers have the effect of raising the TCXO
+   frequency."
+   ::= { cdma 7 }
+
+cdmaCarrierToNoiseRatio OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..4))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current received CDMA signal carrier-to-noise
+   ratio, a unitless quantity.  Numbers less than 2.5 indicate a very weak
+   signal condition."
+   ::= { cdma 8 }
+
+cdmaFrameErrorRate OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..5))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current sync channel message error rate,
+   a number ranging from 0.000 to 1.000.  It indicates the proportion of
+   messages received that fail the Cyclical Redundancy Check."
+   ::= { cdma 9 }
+
+cdmaLeapMode OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the current leap second mode of operation for the
+   CDMA sub-system.  It is either AUTO or USER.  If the mode is USER, then the
+   current and future values of the UTC to GPS leap second offset is also
+   included."
+   ::= { cdma 10 }
+
+cdmaCurrentLeapSeconds OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the current difference in seconds between GPS time and UTC
+   time.  GPS time is ahead of UTC time by this amount."
+   ::= { cdma 11 }
+
+cdmaFutureLeapSeconds OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the future difference in seconds between GPS time and UTC
+   time.  Leap seconds may be inserted or deleted from the UTC timescale twice
+   during the year:  Dec 31 and June 30 at UTC midnight.  If this value is the
+   same as cdmaCurrentLeapSeconds, then no leap second insertion or deletion
+   will occur at the next possible time.  If it is different, then the change
+   will take affect at the next possible time.  GPS time will be ahead of UTC
+   time by this amount."
+   ::= { cdma 12 }
+
+cdmaVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the CDMA sub-system firmware and FPGA versions."
+   ::= { cdma 13 }
+
+cdmaSignalLossFaultMask OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The CDMA signal loss fault mask is either on or off.  When it is off, the server will
+   set the Signal Loss Fault Bit in the Fault Status Byte one hour after TFOM reaches 9.
+   When the setting is on, the server will not set the Signal Loss Fault Bit in the Fault
+   Status Byte one hour or more after TFOM reaches 9."
+   ::= { cdma 14 }
+
+-- cCPUOptions branch of the Tempus LX/Unison CDMA subtree
+
+copt1PPSWidth OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Settable 1PPS PulseWidth CPU Option.
+   It may be NOT INSTALLED, or a string showing the current pulsewidth setting."
+   ::= { cCPUOptions 1 }
+
+coptTimeCodeFormat OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Selectable Time Code Output Format
+   CPU Option.  It may be NOT INSTALLED, or a string showing the current
+   time code output format setting."
+   ::= { cCPUOptions 2 }
+
+coptSynthesizer OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Direct Digital Synthesizer CPU
+   Option.  It may be NOT INSTALLED, or a string showing the current output
+   frequency in units of Hz."
+   ::= { cCPUOptions 3 }
+
+coptBNCOutputC OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the BNC Connector C Output CPU Option.
+   It may be NOT INSTALLED, or a string showing the current output selection."
+   ::= { cCPUOptions 4 }
+
+coptBNCOutputD OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the BNC Connector D Output CPU Option.
+   It may be NOT INSTALLED, or a string showing the current output selection."
+   ::= { cCPUOptions 5 }
+
+coptSerialTimeOutputBaudrate OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Baudrate of the Serial Time Output CPU Option.
+   It may be NOT INSTALLED, or a string showing one of 4800, 9600, 19200 or
+   57600."
+   ::= { cCPUOptions 6 }
+
+coptSerialTimeOutputFormat OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Format of the Serial Time Output CPU Option.
+   It may be NOT INSTALLED, or a string showing one of SYSPLEX, TRUETIME,
+   NENA0, NENA1, NENA8, ENDRUN, ENDRUNX or NMEA."
+   ::= { cCPUOptions 7 }
+
+coptSerialTimeOutputParity OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Parity of the Serial Time Output CPU Option.
+   It may be NOT INSTALLED, or a string showing one of ODD, EVEN or NONE."
+   ::= { cCPUOptions 8 }
+
+coptSerialTimeNMEASentence1 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the first NMEA sentence selected for output from
+   the Serial Time Output CPU Option.  This sentence is only output from 
+   the timeserver when the Serial Time Output CPU Option Format is set to NMEA.
+   It may be NOT INSTALLED, or a string showing one of GGA, GLL, GSA, GSV1,
+   GSV2, RMC, VTG, ZDA or NONE.  At this time, only the ZDA sentence is active
+   from the CDMA products."
+   ::= { cCPUOptions 9}
+
+coptSerialTimeNMEASentence2 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the second NMEA sentence selected for output from
+   the Serial Time Output CPU Option.  This sentence is only output from 
+   the timeserver when the Serial Time Output CPU Option Format is set to NMEA.
+   It may be NOT INSTALLED, or a string showing one of GGA, GLL, GSA, GSV1,
+   GSV2, RMC, VTG, ZDA or NONE.  At this time, only the ZDA sentence is active
+   from the CDMA products."
+   ::= { cCPUOptions 10}
+
+coptSerialTimeNMEASentence3 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the third NMEA sentence selected for output from
+   the Serial Time Output CPU Option.  This sentence is only output from 
+   the timeserver when the Serial Time Output CPU Option Format is set to NMEA.
+   It may be NOT INSTALLED, or a string showing one of GGA, GLL, GSA, GSV1,
+   GSV2, RMC, VTG, ZDA or NONE.  At this time, only the ZDA sentence is active
+   from the CDMA products."
+   ::= { cCPUOptions 11}
+
+-- TempusLX/Unison Gntp Product Group
+
+tempuslxGntp     OBJECT IDENTIFIER ::= { endRunTechnologiesMIB 6 }
+
+gntp             OBJECT IDENTIFIER ::= { tempuslxGntp 0 }
+
+gntptrap         OBJECT IDENTIFIER ::= { gntp 0 }
+
+gps              OBJECT IDENTIFIER ::= { tempuslxGntp 1 }
+
+gpstrap          OBJECT IDENTIFIER ::= { gps 0 }
+
+gCPUOptions      OBJECT IDENTIFIER ::= { tempuslxGntp 2 }
+
+-- gntp branch of the Tempus LX/Unison Gntp subtree
+
+gntpTrapLeapIndBitsChange NOTIFICATION-TYPE
+   OBJECTS { gntpLeapIndBits }
+   STATUS current
+   DESCRIPTION
+   "A gntpTrapNTPLeapIndBitsChange trap signifies that the value of the leap
+   indicator bits contained in the NTP reply packets sent by the time server
+   has changed.  The current value of these bits is contained in the included
+   gntpLeapIndBits.  The decimal value of these bits ranges from 0 to 3:
+
+   0   is the no fault, no leap warning condition
+   1   is the no fault, leap second insertion warning condition
+   2   is the no fault, leap second deletion warning condition
+   3   is the unsynchronized, alarm condition"
+   ::= { gntptrap 1 }
+
+gntpTrapStratumChange NOTIFICATION-TYPE
+   OBJECTS { gntpStratum }
+   STATUS current
+   DESCRIPTION
+   "A gntpTrapStratumChange trap signifies that the value of the stratum
+   field contained in the NTP reply packets sent by the time server
+   has changed.  The current value is contained in the included
+   variable, gntpStratum.  The decimal value of this field ranges from 1 to 16:
+
+   1   is the synchronized, actively locked to the reference UTC source stratum
+   2   is the synchronized, actively locked to a network stratum 1 server stratum
+   16  is the unsynchronized stratum level"
+   ::= { gntptrap 2 }
+
+gntpRxPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets received by the NTP daemon."
+   ::= { gntp 1 }
+
+gntpTxPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP reply packets transmitted by the NTP daemon."
+   ::= { gntp 2 }
+
+gntpIgnoredPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets ignored by the NTP daemon."
+   ::= { gntp 3 }
+
+gntpDroppedPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets dropped by the NTP daemon."
+   ::= { gntp 4 }
+
+gntpAuthFail OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of authentication failures detected by the NTP daemon."
+   ::= { gntp 5 }
+
+gntpTimeFigureOfMerit OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lessthan100ns       (3),
+      lessthan1us         (4),
+      lessthan10us        (5),
+      lessthan100us       (6),
+      lessthan1ms         (7),
+      lessthan10ms        (8),
+      greaterthan10ms     (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Time Figure of Merit (TFOM) value ranges from 3 to 9 and indicates the
+   current estimate of the worst case time error.  It is a logarithmic scale,
+   with each increment indicating a tenfold increase in the worst case time
+   error boundaries.
+
+   The scale is referenced to a worst case time error of 100 picoseconds,
+   equivalent to a TFOM of zero.  During normal locked operation with GPS the
+   TFOM is 3 and implies a worst case time error of 100 nanoseconds.
+
+   During periods of signal loss, the GPS sub-system will compute an
+   extrapolated worst case time error.  One hour after the worst case time error
+   has reached the value equivalent to a TFOM of 9, the NTP server will cease
+   to send stratum 1 reply packets and an Alarm LED will be energized."
+   ::= { gntp 6 }
+
+gntpLeapIndBits OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      noFaultorLeap   (0),
+      leapInsWarning  (1),
+      leapDelWarning  (2),
+      unSynchronized  (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a status code indicating:  normal operation, a leap second to
+   be inserted in the last minute of the current day, a leap second to be
+   deleted in the last second of the day or an alarm condition indicating
+   loss of timing synchronization.  The leap indicator field of NTP reply
+   packets sent from this server is set to gntpLeapIndBits."
+   ::= { gntp 7 }
+
+gntpSyncSource OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..4))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string identifying the synchronization source for this
+   NTP server.  It is one of GPS, an IP address of a stratum 1 server, or NONE.
+   If it is NONE, then the server is not synchronized, has its Leap Indicator
+   Bits in the Alarm state and is running at Stratum 16.  If it is an IP
+   address, then the server is operating as a stratum 2 server synchronized to
+   the network connected stratum 1 server whose IP address is shown.
+
+   Check the Stratum, Leap Indicator Bits and Time Figure of Merit for further
+   information.  NTP reply packets from this server will have the reference
+   identifier field set to gntpSyncSource if it is GPS.  Otherwise
+   it will be set to either an IP address or 0.0.0.0 (NONE)."
+   ::= { gntp 8 }
+
+gntpOffsetToGPSReference OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string containing the floating value of the current
+   offset in units of seconds of the NTP server CPU clock to the GPS
+   reference time.  Positive values imply that the NTP server clock is
+   ahead of the GPS reference time."
+   ::= { gntp 9 }
+
+gntpStratum OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gntpStratumOne          (1),
+      gntpStratumTwo          (2),
+      gntpStratumUnsync      (16)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an integer showing the current stratum level being reported by
+   the NTP daemon in its reply packets to clients.  If it is 1, then the server
+   is fully synchronized and delivering Stratum 1 accuracy.  If it is greater
+   than 1 and less than 16, it is synchronized to a network connected NTP
+   server operating at one stratum lower.  If it is 16, then the server is
+   unambiguously unsynchronized.
+
+   NTP clients on the network should be configured to not use the time from
+   this server if the stratum is 16."
+   ::= { gntp 10 }
+
+gntpVersion OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the NTP server firmware version."
+   ::= { gntp 11 }
+
+gntpOscType OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..32))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the installed oscillator type.  It is
+   one of TCXO, MS-OCXO, HS-OCXO or Rubidium."
+   ::= { gntp 12 }
+
+gntpTimeMode OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..8))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the time mode of operation for any
+   optional IRIG timecode outputs or the optional front panel vacuum
+   fluorescent display.  It DOES NOT indicate the time mode of the Linux
+   OS clock or the NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It can be LOCAL, GPS or UTC."
+   ::= { gntp 13 }
+
+gntpLocalOffset OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the local time offset configured for any optional IRIG
+   timecode outputs or the optional front panel vacuum fluorescent display.
+   It is only pertinent when gntpTimeMode is set to LOCAL.  It DOES NOT
+   indicate the local time offset of the Linux OS clock or the NTP sub-system.
+   Both of these are ALWAYS UTC.
+
+   Its units are half-hours, ranging from -25 to 25, where negative values
+   imply that the local time is behind UTC."
+   ::= { gntp 14 }
+
+gntpDSTStartMonth OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled (0),
+      Jan      (1),
+      Feb      (2),
+      Mar      (3),
+      Apr      (4),
+      May      (5),
+      Jun      (6),
+      Jul      (7),
+      Aug      (8),
+      Sep      (9),
+      Oct      (10),
+      Nov      (11),
+      Dec      (12)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the month that Daylight Savings Time begins.  It affects
+   the local time operation of any optional IRIG timecode outputs or the
+   optional front panel vacuum fluorescent display.  It is only pertinent
+   when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS
+   clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 15 }
+
+gntpDSTStartSunday OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled  (0),
+      1stSunday (1),
+      2ndSunday (2),
+      3rdSunday (3),
+      4thSunday (4),
+      lastSunday (5)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Sunday of the month that Daylight Savings Time begins.
+   It affects the local time operation of any optional IRIG timecode outputs
+   or the optional front panel vacuum fluorescent display.  It is only
+   pertinent when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux
+   OS clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 16 }
+
+gntpDSTStartHour OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the hour that Daylight Savings Time begins.  It affects the
+   local time operation of any optional IRIG timecode outputs or the optional
+   front panel vacuum fluorescent display.  It is only pertinent when
+   gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS clock or the
+   NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It ranges from 0 to 23, where 0 is midnight."
+   ::= { gntp 17 }
+
+gntpDSTStopMonth OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled (0),
+      Jan      (1),
+      Feb      (2),
+      Mar      (3),
+      Apr      (4),
+      May      (5),
+      Jun      (6),
+      Jul      (7),
+      Aug      (8),
+      Sep      (9),
+      Oct      (10),
+      Nov      (11),
+      Dec      (12)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the month that Daylight Savings Time ends.  It affects
+   the local time operation of any optional IRIG timecode outputs or the
+   optional front panel vacuum fluorescent display.  It is only pertinent
+   when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS
+   clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 18 }
+
+gntpDSTStopSunday OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled  (0),
+      1stSunday (1),
+      2ndSunday (2),
+      3rdSunday (3),
+      4thSunday (4),
+      lastSunday (5)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Sunday of the month that Daylight Savings Time ends.
+   It affects the local time operation of any optional IRIG timecode outputs
+   or the optional front panel vacuum fluorescent display.  It is only
+   pertinent when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux
+   OS clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 19 }
+
+gntpDSTStopHour OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the hour that Daylight Savings Time ends.  It affects the
+   local time operation of any optional IRIG timecode outputs or the optional
+   front panel vacuum fluorescent display.  It is only pertinent when
+   gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS clock or the
+   NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It ranges from 0 to 23, where 0 is midnight."
+   ::= { gntp 20 }
+
+-- gps branch of the Tempus LX/Unison Gntp subtree
+
+gpsTrapFaultStatusChange NOTIFICATION-TYPE
+   OBJECTS { gpsFaultStatus }
+   STATUS current
+   DESCRIPTION
+   "A gpsTrapFaultStatusChange trap signifies that the value of the fault status
+   word reported by the GPS sub-system has changed.  The current value is
+   contained in the included gpsFaultStatus."
+   ::= { gpstrap 1 }
+
+gpsTrapTimeFigureOfMeritChange NOTIFICATION-TYPE
+   OBJECTS { gpsTimeFigureOfMerit }
+   STATUS current
+   DESCRIPTION
+   "A gpsTrapTimeFigureOfMeritChange trap signifies that the value of the TFOM
+   reported by the GPS sub-system has changed.  The current value is
+   contained in the included gpsTimeFigureOfMerit."
+   ::= { gpstrap 2 }
+
+gpsFaultStatus OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsAntennaFlt      (0)
+      gpsNTPNotPolling   (1)
+      gpsRefTimeFlt      (2)
+      gpsEngineCommFlt   (3)
+      gpsFLASHWriteFlt   (4)
+      gpsFPGACfgFlt      (5)
+      gpsNoSignalTimeout (6)
+      gpsDACNearLimit    (7)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   least significant two nibbles of the GPS fault status word.  Unfortunately,
+   SNMP numbers the bits in the reverse order, so that the enumerated values
+   are backwards from the description contained in the User's Manual for the
+   fault status field returned by the gpsstat command.  Each bit indicates
+   a fault when set.  Currently defined fault states encoded in this value:
+
+   Bit 7:    DAC controlling the TCXO is near the high or low limit.
+   Bit 6:    Time Figure of Merit has been 9 (unsynchronized) for 1 hour.
+   Bit 5:    Field Programmable Gate Array (FPGA) did not configure properly.
+   Bit 4:    FLASH memory had a write fault.
+   Bit 3:    GPS engine communication fault.
+   Bit 2:    GPS reference time fault (fails sanity checks).
+   Bit 1:    NTP daemon is not polling the GPS reference clock.
+   Bit 0:    GPS antenna or feedline is shorted or open."
+   ::= { gps 1 }
+
+gpsTimeFigureOfMerit OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lessthan100ns       (3),
+      lessthan1us         (4),
+      lessthan10us        (5),
+      lessthan100us       (6),
+      lessthan1ms         (7),
+      lessthan10ms        (8),
+      greaterthan10ms     (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Time Figure of Merit (TFOM) value ranges from 3 to 9 and indicates
+   the current estimate of the worst case time error.  It is a logarithmic
+   scale, with each increment indicating a tenfold increase in the worst case
+   time error boundaries.  The scale is referenced to a worst case time error
+   of 100 picoseconds, equivalent to a TFOM of zero.  During normal locked
+   operation the TFOM is 4 and implies a worst case time error of 100 nanoseconds.
+
+   During periods of signal loss, the GPS sub-system will compute an
+   extrapolated worst case time error.  One hour after the worst case time error
+   has reached the value equivalent to a TFOM of 9, the NTP server will cease
+   to send stratum 1 reply packets and an Alarm LED will be energized."
+   ::= { gps 2 }
+
+gpsSigProcState OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gpsAcquiring (0),
+      gpsLocking   (1),
+      gpsLocked    (2)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current GPS signal processor state.  One of 0, 1 or 2, with 0 being the
+   acquisition state and 2 the fully locked on state."
+   ::= { gps 3 }
+
+gpsNumTrackSats OBJECT-TYPE
+   SYNTAX INTEGER (0..8)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current number of GPS satellites being tracked."
+   ::= { gps 4 }
+
+gpsVCDAC OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current 16 bit, Voltage Controlled TCXO DAC value.  Typical range is 20000
+   to 40000, where more positive numbers have the effect of raising the TCXO
+   frequency."
+   ::= { gps 5 }
+
+gpsAvgCarrierToNoiseRatiodB OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..4))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current average carrier to noise ratio of all
+   tracked satellites, in units of dB.  Values less than 35 indicate weak
+   signal conditions."
+   ::= { gps 6 }
+
+gpsReferencePosition OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "WGS-84 latitude, longitude and height above the reference ellipsoid of the
+   GPS antenna.  Ellipsoid height may deviate from local Mean Sea Level by as
+   much as 100 meters."
+   ::= { gps 7 }
+
+gpsRefPosSource OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..3))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string indicating the source of the GPS antenna reference position.
+   It is one of:
+   USR (user supplied),
+   AVG (automatically determined by averaging thousands of 3-D position fixes),
+   DYN (current un-averaged 3-D position fix, operation is in dynamic mode),
+   UNK (unknown)."
+   ::= { gps 8 }
+
+gpsCurrentLeapSeconds OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the current difference in seconds between GPS time and UTC
+   time.  GPS time is ahead of UTC time by this amount."
+   ::= { gps 9 }
+
+gpsFutureLeapSeconds OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the future difference in seconds between GPS time and UTC
+   time.  Leap seconds may be inserted or deleted from the UTC timescale twice
+   during the year:  Dec 31 and June 30 at UTC midnight.  If this value is the
+   same as cdmaCurrentLeapSeconds, then no leap second insertion or deletion
+   will occur at the next possible time.  If it is different, then the change
+   will take affect at the next possible time.  GPS time will be ahead of UTC
+   time by this amount."
+   ::= { gps 10 }
+
+gpsVersion OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the GPS sub-system firmware and FPGA versions."
+   ::= { gps 11 }
+
+gpsDynamicMode OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gpsDynModeOFF (0),
+      gpsDynModeON  (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The GPS dynamic mode is either on or off.  When it is off, the server is
+   assumed to be in a static installation.  In this case, single satellite mode
+   of operation is supported and Timing Receiver Autonomous Integrity Monitoring
+   (TRAIM) is supported.  When the setting is on, the server is assumed to be on
+   a moving platform.  In this case, minimum four satellite, 3-D operation is
+   required and the TRAIM functionality is minimal."
+   ::= { gps 12 }
+
+gpsAntennaFaultMask OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The GPS antenna fault mask is either on or off.  When it is off, the server will
+   set the Antenna Fault Bit in the Fault Status Byte if an improper antenna impedance
+   is detected.  When the setting is on, the server will not set the Antenna Fault Bit
+   in the Fault Status Byte if an improper antenna impedance is detected."
+   ::= { gps 13 }
+
+gpsSignalLossFaultMask OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The GPS signal loss fault mask is either on or off.  When it is off, the server will
+   set the Signal Loss Fault Bit in the Fault Status Byte one hour after TFOM reaches 9.
+   When the setting is on, the server will not set the Signal Loss Fault Bit in the Fault
+   Status Byte one hour or more after TFOM reaches 9."
+   ::= { gps 14 }
+
+-- gCPUOptions branch of the Tempus LX/Unison GPS subtree
+
+gopt1PPSWidth OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Settable 1PPS PulseWidth CPU Option.
+   It may be NOT INSTALLED, or a string showing the current pulsewidth setting."
+   ::= { gCPUOptions 1 }
+
+goptTimeCodeFormat OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Selectable Time Code Output Format
+   CPU Option.  It may be NOT INSTALLED, or a string showing the current
+   time code output format setting."
+   ::= { gCPUOptions 2 }
+
+goptSynthesizer OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Direct Digital Synthesizer CPU
+   Option.  It may be NOT INSTALLED, or a string showing the current output
+   frequency in units of Hz."
+   ::= { gCPUOptions 3 }
+
+goptBNCOutputC OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the BNC Connector C Output CPU Option.
+   It may be NOT INSTALLED, or a string showing the current output selection."
+   ::= { gCPUOptions 4 }
+
+goptBNCOutputD OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the BNC Connector D Output CPU Option.
+   It may be NOT INSTALLED, or a string showing the current output selection."
+   ::= { gCPUOptions 5 }
+
+goptSerialTimeOutputBaudrate OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Baudrate of the Serial Time Output CPU Option.
+   It may be NOT INSTALLED, or a string showing one of 4800, 9600, 19200 or
+   57600."
+   ::= { gCPUOptions 6 }
+
+goptSerialTimeOutputFormat OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Format of the Serial Time Output CPU Option.
+   It may be NOT INSTALLED, or a string showing one of SYSPLEX, TRUETIME,
+   NENA0, NENA1, NENA8, ENDRUN, ENDRUNX or NMEA."
+   ::= { gCPUOptions 7 }
+
+goptSerialTimeOutputParity OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Parity of the Serial Time Output CPU Option.
+   It may be NOT INSTALLED, or a string showing one of ODD, EVEN or NONE."
+   ::= { gCPUOptions 8 }
+
+goptSerialTimeNMEASentence1 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the first NMEA sentence selected for output from
+   the Serial Time Output CPU Option.  This sentence is only output from 
+   the timeserver when the Serial Time Output CPU Option Format is set to NMEA.
+   It may be NOT INSTALLED, or a string showing one of GGA, GLL, GSA, GSV1,
+   GSV2, RMC, VTG, ZDA or NONE."
+   ::= { gCPUOptions 9}
+
+goptSerialTimeNMEASentence2 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the second NMEA sentence selected for output from
+   the Serial Time Output CPU Option.  This sentence is only output from 
+   the timeserver when the Serial Time Output CPU Option Format is set to NMEA.
+   It may be NOT INSTALLED, or a string showing one of GGA, GLL, GSA, GSV1,
+   GSV2, RMC, VTG, ZDA or NONE."
+   ::= { gCPUOptions 10}
+
+goptSerialTimeNMEASentence3 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the third NMEA sentence selected for output from
+   the Serial Time Output CPU Option.  This sentence is only output from 
+   the timeserver when the Serial Time Output CPU Option Format is set to NMEA.
+   It may be NOT INSTALLED, or a string showing one of GGA, GLL, GSA, GSV1,
+   GSV2, RMC, VTG, ZDA or NONE."
+   ::= { gCPUOptions 11}
+
+END

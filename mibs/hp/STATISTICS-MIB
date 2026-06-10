@@ -1,0 +1,1432 @@
+-- HP Enterprise Switch Statistics MIB 
+
+
+STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Counter, IpAddress
+            FROM RFC1155-SMI
+        OBJECT-TYPE
+            FROM RFC-1212
+        DisplayString
+            FROM RFC1213-MIB
+        HpSwitchPortType
+            FROM HP-ICF-TC
+        InetAddress, InetAddressType,
+        InetPortNumber
+            FROM INET-ADDRESS-MIB
+        hpSwitch
+            FROM HP-ICF-OID;
+
+    -- Icf Switch Specific 
+    hpSwitchStatistics      OBJECT IDENTIFIER ::= { hpSwitch 9 }
+
+    MacAddress ::= OCTET STRING (SIZE (6))    -- a 6 octet address
+                                                    -- in the
+                                                    -- "canonical"
+                                                    -- order
+
+    VlanID ::= INTEGER (1..65535)
+
+    -- ###########################################################
+    -- the hpSwitchStatistics Group
+
+    -- This group contains switch statistics related variables.
+    -- These variables keep the operational value of the variable
+    -- while the similar variable in the hpConfig group keep the
+    -- config. value which will take effect after reboot the
+    -- switch.
+    -- ###########################################################
+
+    -- The IPX Operational Table
+
+    hpSwitchIpxStat   OBJECT IDENTIFIER ::= { hpSwitchStatistics 1 }
+
+    hpSwitchIpxStatTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchIpxStatEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about the
+                    operational IPX status of the virtual LAN in this
+                    device."
+        ::= { hpSwitchIpxStat 1 }
+
+    hpSwitchIpxStatEntry OBJECT-TYPE
+        SYNTAX      HpSwitchIpxStatEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "Information about the operational IPX status of a
+                    virtual LAN in this device."
+        INDEX       { hpSwitchIpxStatIndex }
+        ::= { hpSwitchIpxStatTable 1 }
+       
+    HpSwitchIpxStatEntry ::=
+        SEQUENCE {
+            hpSwitchIpxStatIndex              VlanID,
+            hpSwitchIpxStatNodeAddr           MacAddress,
+            hpSwitchIpxStatGatewayAddr        MacAddress,
+            hpSwitchIpxStatGatewayEncap       INTEGER,
+            hpSwitchIpxStatAdminStatus        INTEGER
+        }
+       
+          
+    hpSwitchIpxStatIndex OBJECT-TYPE
+        SYNTAX      VlanID
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "An index that uniquely identifies the operational
+                    IPX status of a virtual LAN for which this entry
+                    contains information."
+        ::= { hpSwitchIpxStatEntry 1 }
+          
+    hpSwitchIpxStatNodeAddr OBJECT-TYPE
+        SYNTAX      MacAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The current IPX node address of this virtual LAN."
+        ::= { hpSwitchIpxStatEntry 2 }
+          
+    hpSwitchIpxStatGatewayAddr OBJECT-TYPE
+        SYNTAX      MacAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The current IPX node address of the gateway for
+                    this virtual LAN."
+        ::= { hpSwitchIpxStatEntry 3 }
+          
+    hpSwitchIpxStatGatewayEncap OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ethernetII(1),
+                        ieee8022(2),
+                        snap(3),
+                        ieee8023Raw(4),
+                        noGateway(5)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The current type of encapsulation of the gateway."
+        ::= { hpSwitchIpxStatEntry 4 }
+          
+    hpSwitchIpxStatAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The operational status of the IPX protocol entity."
+        ::= { hpSwitchIpxStatEntry 5 }
+
+    -- The IP Operational Table
+
+    hpSwitchIpStat   OBJECT IDENTIFIER ::= { hpSwitchStatistics 2 }
+
+    hpSwitchIpStatTimepAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "The operational status of the Time protocol." 
+        ::= { hpSwitchIpStat 1 }
+       
+    hpSwitchIpStatTimepServerAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "The current IP address of the Time server." 
+        ::= { hpSwitchIpStat 2 }
+       
+
+    hpSwitchIpStatTimepPollInterval OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "The current client poll interval of the Time server
+                    in minute." 
+        ::= { hpSwitchIpStat 3 }
+
+    hpSwitchIpStatTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchIpStatEntry
+        ACCESS      not-accessible
+        STATUS      obsolete
+        DESCRIPTION "A table that contains information about the current
+                    IP status of the virtual LAN in this device."
+        ::= { hpSwitchIpStat 4 }
+
+    hpSwitchIpStatEntry OBJECT-TYPE
+        SYNTAX      HpSwitchIpStatEntry
+        ACCESS      not-accessible
+        STATUS      obsolete
+        DESCRIPTION "Information about the IP status of a specific virtual
+                    LAN in this device."
+        INDEX       { hpSwitchIpStatIndex }
+        ::= { hpSwitchIpStatTable 1 }
+       
+    HpSwitchIpStatEntry ::=
+        SEQUENCE {
+            hpSwitchIpStatIndex               VlanID,
+            hpSwitchIpStatAddr                IpAddress,
+            hpSwitchIpStatMask                IpAddress,
+            hpSwitchIpStatGatewayAddr         IpAddress,
+            hpSwitchIpStatAdminStatus         INTEGER
+        }
+       
+    hpSwitchIpStatIndex OBJECT-TYPE
+        SYNTAX      VlanID
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "An index that uniquely identifies the IP status of
+                    a virtual LAN for which this entry contains
+                    information."
+        ::= { hpSwitchIpStatEntry 1 }
+          
+    hpSwitchIpStatAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "The current IP address of this Virtual LAN."
+        ::= { hpSwitchIpStatEntry 2 }
+          
+    hpSwitchIpStatMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "The current IP subnet mask of this virtual LAN."
+        ::= { hpSwitchIpStatEntry 3 }
+          
+    hpSwitchIpStatGatewayAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "The current IP address of the gateway for this
+                    virtual LAN."
+        ::= { hpSwitchIpStatEntry 4 }
+          
+    hpSwitchIpStatAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2),
+                        bootp(3)
+                    }
+        ACCESS      read-only
+        STATUS      obsolete
+        DESCRIPTION "The operational status of the IP protocol for this
+                    virtual LAN. If the value of this variable is 3, the
+                    IP protocol entity will utilize BOOTP during
+                    initialization."
+        ::= { hpSwitchIpStatEntry 5 }
+
+    --  The Forwarding Database for VLAN
+
+    hpSwitchFdbInfo OBJECT IDENTIFIER ::= { hpSwitchStatistics 4 }
+
+    hpSwitchVlanFdbAddrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchVlanFdbAddrEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about unicast
+                    entries for which the VLAN has forwarding and/or
+                    filtering information.  This information is used
+                    by the VLAN bridging function in determining how
+                    to propagate a received frame."
+        ::= { hpSwitchFdbInfo 1 }
+
+    hpSwitchVlanFdbAddrEntry OBJECT-TYPE
+        SYNTAX      HpSwitchVlanFdbAddrEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "Information about a specific unicast MAC address
+                    for which the VLAN has some forwarding and/or
+                    filtering information."
+        INDEX       { hpSwitchVlanFdbId, hpSwitchVlanFdbAddress }
+        ::= { hpSwitchVlanFdbAddrTable 1 }
+
+    HpSwitchVlanFdbAddrEntry ::=
+        SEQUENCE {
+            hpSwitchVlanFdbId      VlanID,
+            hpSwitchVlanFdbAddress MacAddress,
+            hpSwitchVlanFdbPort    INTEGER
+        }
+
+    hpSwitchVlanFdbId OBJECT-TYPE
+        SYNTAX      VlanID
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "An index that uniquely identifies a virtual LAN
+                    for which this entry contains information."
+        ::= { hpSwitchVlanFdbAddrEntry 1 }
+
+    hpSwitchVlanFdbAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "A unicast MAC address for which the VLAN has
+                    forwarding and/or filtering information."
+        ::= { hpSwitchVlanFdbAddrEntry 2 }
+
+    hpSwitchVlanFdbPort OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The port number of the port on which a frame
+                    having a source address equal to the value of
+                    the corresponding instance of hpSwitchVlanFdbAddress
+                    has been seen."
+        ::= { hpSwitchVlanFdbAddrEntry 3 }
+
+
+    hpSwitchPortFdbAddrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchPortFdbAddrEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about unicast
+                    entries for which the port has forwarding and/or
+                    filtering information.  This information is used
+                    by the bridging function in determining how to
+                    propagate a received frame."
+        ::= { hpSwitchFdbInfo 2 }
+
+    hpSwitchPortFdbAddrEntry OBJECT-TYPE
+        SYNTAX      HpSwitchPortFdbAddrEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "Information about a specific unicast MAC address
+                    for which the port has some forwarding and/or
+                    filtering information."
+        INDEX       { hpSwitchPortFdbId, hpSwitchPortFdbAddress }
+        ::= { hpSwitchPortFdbAddrTable 1 }
+
+    HpSwitchPortFdbAddrEntry ::=
+        SEQUENCE {
+            hpSwitchPortFdbId       INTEGER,
+            hpSwitchPortFdbAddress  MacAddress
+        }
+
+    hpSwitchPortFdbId OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table.  The corresponding row in the
+                    Interfaces Table must exist prior to the index being
+                    used in this table."
+        ::= { hpSwitchPortFdbAddrEntry 1 }
+
+    hpSwitchPortFdbAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "A unicast MAC address for which the port has
+                    forwarding and/or filtering information."
+        ::= { hpSwitchPortFdbAddrEntry 2 }
+
+
+    hpSwitchStpStat OBJECT IDENTIFIER ::= { hpSwitchStatistics 5 }
+
+    hpSwitchStpStatAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The operational status of the spanning tree protocol."
+        ::= { hpSwitchStpStat 1 }
+
+    hpSwitchMiscStat OBJECT IDENTIFIER ::= { hpSwitchStatistics 6 }
+
+    hpSwitchCpuStat OBJECT-TYPE 
+        SYNTAX      INTEGER (0..100)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The CPU utilization in percent(%)."
+        ::= { hpSwitchMiscStat 1 }
+
+    -- The FDDI IP Fragmentation Statistic Group
+
+    hpSwitchFddiIpFragStat OBJECT IDENTIFIER ::= { hpSwitchStatistics 7 }
+
+    -- The FDDI IP Fragmentation Statistic Table
+
+    hpSwitchFddiIpFragStatTable OBJECT-TYPE 
+        SYNTAX      SEQUENCE OF HpSwitchFddiIpFragStatEntry 
+        ACCESS      not-accessible 
+        STATUS      mandatory 
+        DESCRIPTION "A list of IP fragmentation statistics 
+                    for the FDDI cards in the switch." 
+        ::= { hpSwitchFddiIpFragStat 1 } 
+
+    hpSwitchFddiIpFragStatEntry OBJECT-TYPE
+        SYNTAX      HpSwitchFddiIpFragStatEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "An Fddi IP fragmentation entry which is 
+                    containing statictics for the FDDI 
+                    cards in the switch."
+        INDEX       {  hpSwitchFddiIpFragStatIndex }
+        ::= { hpSwitchFddiIpFragStatTable 1 }
+
+    HpSwitchFddiIpFragStatEntry ::=
+        SEQUENCE {
+            hpSwitchFddiIpFragStatIndex         INTEGER,
+            hpSwitchFddiIpFragFramesFragmented  Counter,
+            hpSwitchFddiIpFragFramesCreated     Counter,
+            hpSwitchFddiIpFragFrameErrors       Counter
+        }
+
+    hpSwitchFddiIpFragStatIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "A unique value for each FDDI Card.  
+                    The value for each FDDI card must remain constant 
+                    at least from one re-initialization of the entity's 
+                    network management system to the next 
+                    re-initialization." 
+        ::= { hpSwitchFddiIpFragStatEntry 1 }
+
+    hpSwitchFddiIpFragFramesFragmented OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Number of FDDI Frames which get fragmented when they 
+                    are larger than Ethernet Frame size, 1518 bytes."
+        ::= { hpSwitchFddiIpFragStatEntry 2 }
+
+    hpSwitchFddiIpFragFramesCreated OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Number of inbound FDDI frames which get created when
+                    they larger than Ethernet Frame size, 1518 bytes."
+        ::= { hpSwitchFddiIpFragStatEntry 3 }
+
+    hpSwitchFddiIpFragFrameErrors OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Number of large inbound FDDI frames that contains
+                    error which preventing them from being fragmented
+                    when they are larger than Ethernet Frame size, 1518
+                    bytes.  Or number of large frames which are dropped
+                    because the FDDI IP fragmentation is disabled "
+        ::= { hpSwitchFddiIpFragStatEntry 4 }
+
+    -- The FDDI System Information and Statistic Group  
+
+    hpSwitchFddiSystemStat OBJECT IDENTIFIER ::= { hpSwitchStatistics 8 }
+
+    -- The FDDI System Information and Statistic Table
+
+    hpSwitchFddiSystemStatTable OBJECT-TYPE 
+        SYNTAX      SEQUENCE OF HpSwitchFddiSystemStatEntry 
+        ACCESS      not-accessible 
+        STATUS      mandatory 
+        DESCRIPTION "A list of system infomations and statistics 
+                    for the FDDI cards in the switch." 
+        ::= { hpSwitchFddiSystemStat 1 } 
+
+    hpSwitchFddiSystemStatEntry OBJECT-TYPE
+        SYNTAX      HpSwitchFddiSystemStatEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "An Fddi system entry which is 
+                    containing statictics for the FDDI 
+                    cards in the switch."
+        INDEX       {  hpSwitchFddiSystemStatIndex }
+        ::= { hpSwitchFddiSystemStatTable 1 }
+
+    HpSwitchFddiSystemStatEntry ::=
+        SEQUENCE {
+            hpSwitchFddiSystemStatIndex        INTEGER,
+            hpSwitchFddiSystemOsVersion        DisplayString,
+            hpSwitchFddiSystemRomVersion       DisplayString,
+            hpSwitchFddiSystemMemoryTotal      INTEGER,
+            hpSwitchFddiSystemMemoryFree       INTEGER,
+            hpSwitchFddiSystemCpuUtil          INTEGER,
+            hpSwitchFddiSystemBuildDirectory   OCTET STRING,
+            hpSwitchFddiSystemBuildDate        OCTET STRING,
+            hpSwitchFddiSystemBuildNumber      OCTET STRING
+        }
+
+    hpSwitchFddiSystemStatIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "A unique value for each FDDI Card.  
+                    The value for each FDDI card must remain constant 
+                    at least from one re-initialization of the entity's 
+                    network management system to the next 
+                    re-initialization." 
+        ::= { hpSwitchFddiSystemStatEntry 1 }
+
+    hpSwitchFddiSystemOsVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..10))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Contains the operating code version number (also
+                    known as software or firmware). For example, a
+                    software version such as A.08.01 is described as
+                    follows:
+                        A    the function set available in your switch
+                        08   the common release number
+                        01   updates to the current common release"
+        ::= { hpSwitchFddiSystemStatEntry 2 }
+
+    hpSwitchFddiSystemRomVersion OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..10) )
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Contains the ROM version number (such as A.08.01
+                    is described as follows:
+                        A    the function set available in your router
+                        08   the common release number
+                        01   updates to the current common release"
+        ::= { hpSwitchFddiSystemStatEntry 3 }
+
+    hpSwitchFddiSystemMemoryTotal OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of currently installed bytes."
+        ::= { hpSwitchFddiSystemStatEntry 4 }
+
+    hpSwitchFddiSystemMemoryFree OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of available (unallocated) bytes."
+        ::= { hpSwitchFddiSystemStatEntry 5 }
+
+    hpSwitchFddiSystemCpuUtil OBJECT-TYPE
+        SYNTAX      INTEGER (0..100)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The CPU utilization in percent(%)."
+        ::= { hpSwitchFddiSystemStatEntry 6 }
+
+    hpSwitchFddiSystemBuildDirectory OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (80)) 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The Build directory the FDDI firmware image "
+        ::= { hpSwitchFddiSystemStatEntry 7 }
+
+    hpSwitchFddiSystemBuildDate OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (40))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The Build date and time of the FDDI firmware image"
+        ::= { hpSwitchFddiSystemStatEntry 8 }
+
+    hpSwitchFddiSystemBuildNumber OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (20))
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The Build number of the FDDI firmware image"
+        ::= { hpSwitchFddiSystemStatEntry 9 }
+
+    -- The Automatic Broadcast Control (ABC) Statistic Group  
+
+    hpABCStats OBJECT IDENTIFIER ::= { hpSwitchStatistics 9 }
+
+    hpABCStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpABCStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains statistic information about
+                    Automatic Broadcast Control on any  given VLAN on
+                    the switch."
+        ::= { hpABCStats 1 }
+
+    hpABCStatsEntry OBJECT-TYPE
+        SYNTAX      HpABCStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The information associated with each row in the
+                    ABC Statistics Table."
+        INDEX       { hpABCStatsVlanIndex,hpABCStatsPortIndex }
+        ::= { hpABCStatsTable 1 }
+
+    HpABCStatsEntry ::=
+        SEQUENCE {
+            hpABCStatsVlanIndex         VlanID,
+            hpABCStatsPortIndex         INTEGER,
+            hpABCStatsPortType          HpSwitchPortType,
+            hpABCStatsArpReplies        Counter,
+            hpABCStatsIpxReplies        Counter,
+            hpABCStatsIpRipControl      INTEGER,
+            hpABCStatsIpxRipSapControl  INTEGER
+        }
+
+    hpABCStatsVlanIndex OBJECT-TYPE
+        SYNTAX      VlanID
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The value which uniquely identifies configuration of
+                    a virtual LAN for which entry contains information."
+        ::= { hpABCStatsEntry 1 }
+
+    hpABCStatsPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpABCStatsEntry 2 }
+
+    hpABCStatsPortType OBJECT-TYPE
+        SYNTAX      HpSwitchPortType
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The type of port."
+        ::= { hpABCStatsEntry 3 }
+
+    hpABCStatsArpReplies OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This counter reports the number of ARP responses sent
+                    out by the switch (running ABC) to proxy respond for
+                    hosts learned in the switch ARP cashe."
+        ::= { hpABCStatsEntry 4 }
+
+    hpABCStatsIpxReplies OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This counter reports the number of RIP and SAP
+                    responses sent out by the switch (running ABC) to
+                    proxy respond for routes and services learned by
+                    switch."
+        ::= { hpABCStatsEntry 5 }
+
+    hpABCStatsIpRipControl OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        forwarding(1),
+                        notforwarding(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This status field shows if IP RIP packets are being
+                    forwarded or not forwarded on the ports shown."
+        ::= { hpABCStatsEntry 6 }
+
+    hpABCStatsIpxRipSapControl OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        forwarding(1),
+                        notforwarding(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This status field shows if IPX RIP and/or IPX SAP
+                    packets are being forwarded or not forwarded on the
+                    ports shown."
+        ::= { hpABCStatsEntry 7 }
+
+    -- The IGMP Statistic Group  
+
+    hpIgmpStats OBJECT IDENTIFIER ::= { hpSwitchStatistics 10 }
+
+    hpIgmpStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpIgmpStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains statistic information about
+                    Multicast Groups on any  given VLAN on the switch."
+        ::= { hpIgmpStats 1 }
+
+    hpIgmpStatsEntry OBJECT-TYPE
+        SYNTAX      HpIgmpStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The information associated with each member in
+                    particular multicast group."
+        INDEX       { hpIgmpStatsVlanIndex, hpIgmpStatsActiveGroupAddr }
+        ::= { hpIgmpStatsTable 1 }
+
+    HpIgmpStatsEntry ::=
+        SEQUENCE {
+            hpIgmpStatsVlanIndex         VlanID,
+            hpIgmpStatsActiveGroupAddr   IpAddress,
+            hpIgmpStatsReports           Counter,
+            hpIgmpStatsQueries           Counter,
+            hpIgmpStatsQuerierAccessPort INTEGER
+        }
+
+    hpIgmpStatsVlanIndex OBJECT-TYPE
+        SYNTAX      VlanID
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The value which uniquely identifies configuration of
+                    a virtual LAN for which entry contains information."
+        ::= { hpIgmpStatsEntry 1 }
+
+    hpIgmpStatsActiveGroupAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "An IP Multicast Group Membership address that has been
+                    sent, via IGMP Membership Reports, through the switch
+                    to querier."
+        ::= { hpIgmpStatsEntry 2 }
+
+    hpIgmpStatsReports OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of IGMP report packets that the switch has
+                    seen for this group address."
+        ::= { hpIgmpStatsEntry 3 }
+
+    hpIgmpStatsQueries OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of IGMP query packets the switch has seen
+                    for this group address.  Note: This object is based
+                    on a group, thus if a query is heard before this
+                    object's group joins, the value will be zero. It will
+                    be non-zero when an all host query, or group specific
+                    query for the assoicated group, is heard after the
+                    associated group has joined."
+        ::= { hpIgmpStatsEntry 4 }
+
+    hpIgmpStatsQuerierAccessPort OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The port on which the switch detects IGMP query
+                    packets from the querier (device sending out query
+                    packets). If no queries are heard, the value of the
+                    object is zero and we are querier or electing to be
+                    querier. Anytime a querier besides our switch is
+                    heard the value of the object becomes the port number
+                    on which the other querier was heard and the query
+                    election process will be halted if currently running."
+        ::= { hpIgmpStatsEntry 5 }
+
+    hpIgmpStatsPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpIgmpStatsPortEntry
+        ACCESS      not-accessible
+        STATUS      deprecated
+        DESCRIPTION "A table that contains information about status
+                    of the IGMP port configurations on this switch."
+        ::= { hpIgmpStats 2 }
+
+    hpIgmpStatsPortEntry OBJECT-TYPE
+        SYNTAX      HpIgmpStatsPortEntry
+        ACCESS      not-accessible
+        STATUS      deprecated
+        DESCRIPTION "The information associated with status of each IGMP
+                    port configuration."
+        INDEX       { hpIgmpStatsActiveGroupAddr, hpIgmpStatsPortIndex }
+        ::= { hpIgmpStatsPortTable 1 }
+
+
+    HpIgmpStatsPortEntry ::=        
+        SEQUENCE {
+            hpIgmpStatsPortIndex              INTEGER,
+            hpIgmpStatsPortType               HpSwitchPortType,
+            hpIgmpStatsPortAccess             INTEGER
+        }
+
+    hpIgmpStatsPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      deprecated
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpIgmpStatsPortEntry 1 }
+
+    hpIgmpStatsPortType OBJECT-TYPE
+        SYNTAX      HpSwitchPortType
+        ACCESS      read-only
+        STATUS      deprecated
+        DESCRIPTION "The type of port."
+        ::= { hpIgmpStatsPortEntry 2 }
+
+    hpIgmpStatsPortAccess OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        host(1),
+                        router(2),
+                        host-router(3)
+                    }
+        ACCESS      read-only
+        STATUS      deprecated
+        DESCRIPTION "If this value is host then this port has seen IGMP
+                    report packets for this active group address. If this
+                    value is router then this port has detected IGMP query
+                    packets from the querier (device sending out query
+                    packets). If this value is host-router then this port
+                    has seen report packets, and IGMP query packets from
+                    the querier."
+        ::= { hpIgmpStatsPortEntry 3 }
+
+    hpIgmpStatsPortTable2 OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpIgmpStatsPortEntry2
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about status
+                    of the IGMP port configurations on this switch.
+                    This table2 is supersedes hpIgmpStatsPortTable for
+                    switches which support multiple vlans per port."
+        ::= { hpIgmpStats 3 }
+
+    hpIgmpStatsPortEntry2 OBJECT-TYPE
+        SYNTAX      HpIgmpStatsPortEntry2
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The information associated with status of each IGMP
+                    port configuration."
+        INDEX       { hpIgmpStatsVlanIndex,
+                      hpIgmpStatsActiveGroupAddr,
+                      hpIgmpStatsPortIndex2 }
+        ::= { hpIgmpStatsPortTable2 1 }
+
+
+    HpIgmpStatsPortEntry2 ::=        
+        SEQUENCE {
+            hpIgmpStatsPortIndex2              INTEGER,
+            hpIgmpStatsPortType2               HpSwitchPortType,
+            hpIgmpStatsPortAccess2             INTEGER,
+            hpIgmpStatsPortAgeTimer2           INTEGER,
+            hpIgmpStatsPortLeaveTimer2         INTEGER
+        }
+
+    hpIgmpStatsPortIndex2 OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpIgmpStatsPortEntry2 1 }
+
+    hpIgmpStatsPortType2 OBJECT-TYPE
+        SYNTAX      HpSwitchPortType
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The type of port."
+        ::= { hpIgmpStatsPortEntry2 2 }
+
+    hpIgmpStatsPortAccess2 OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        host(1),
+                        router(2),
+                        host-router(3)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "If this value is host then this port has seen IGMP
+                    report packets for this active group address. If this
+                    value is router then this port has detected IGMP query
+                    packets from the querier (device sending out query
+                    packets). If this value is host-router then this port
+                    has seen report packets, and IGMP query packets from
+                    the querier."
+        ::= { hpIgmpStatsPortEntry2 3 }
+
+    hpIgmpStatsPortAgeTimer2 OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The timer is set when the switch hears a report
+                    and is waiting for the group queries. If the timer
+                    expires the group is considered non-active on the
+                    specific port. The value returned shows how many
+                    seconds left before the timer expires or 0 if the
+                    timer has expired."
+        ::= { hpIgmpStatsPortEntry2 4 }
+
+    hpIgmpStatsPortLeaveTimer2 OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The timer is set when the switch is waiting for a
+                    report response for queries. If the timer expires the
+                    group is considered non-active on the specific port.
+                    The value returned shows how many seconds left before
+                    the timer expires or 0 if the timer has expired."
+        ::= { hpIgmpStatsPortEntry2 5 }
+
+    -- IGMP Statistic end
+
+    -- The Load Balance Protocol Statistics Group  
+
+    hpLdbalStats OBJECT IDENTIFIER ::= { hpSwitchStatistics 11 }
+
+    hpLdbalStatsPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpLdbalStatsPortEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about the
+                    operational status of the load balancing ports on
+                    this switch."
+          ::= { hpLdbalStats 1 }
+
+    hpLdbalStatsPortEntry OBJECT-TYPE
+        SYNTAX      HpLdbalStatsPortEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The information associated with ports configured
+                    for load balancing."
+        INDEX       { hpLdbalStatsPortIndex }
+        ::= { hpLdbalStatsPortTable 1 }
+
+
+    HpLdbalStatsPortEntry ::=
+        SEQUENCE {
+            hpLdbalStatsPortIndex             INTEGER,
+            hpLdbalStatsPortState             INTEGER,
+            hpLdbalStatsAdjacentSwitch        MacAddress,
+            hpLdbalStatsPeerPort              MacAddress
+        }
+
+    hpLdbalStatsPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpLdbalStatsPortEntry 1 }
+
+    hpLdbalStatsPortState OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        disabled(1),
+                        error (2),
+                        initial(3),
+                        notEstablished(4),
+                        established(5),
+                        topologyError(6)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This variable describes the load balancing port state. 
+                    A disabled state indicates the port does not have a
+                    link beat. An initial state indicates the port has
+                    recently established a link beat and is detecting
+                    whether or not it is in the load balancing domain. An
+                    established state indicates that the port is inside
+                    the load balancing domain, directly connected to
+                    another load balancing port, and learning addresses
+                    via the reception of MAC address learn information
+                    packets.  A notEstablished state indicates that the
+                    port is outside the load balancing domain, not
+                    directly connected to a load balancing port, and
+                    learning MAC address by receiving unknown source 
+                    address packets. An error state indicates the port
+                    has detected a direct connection to more than one
+                    load balancing port and is blocked, only accepting
+                    load balancing protocol packets.  When the error
+                    condition clears, the port transitions either into
+                    the established or not established state."
+        ::= { hpLdbalStatsPortEntry 2 }
+
+                                                                           
+    hpLdbalStatsAdjacentSwitch OBJECT-TYPE
+        SYNTAX      MacAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The switch identifier of the adjacent switch connected
+                    to the corresponding load balancing established port.
+                    If load balancing has not been established on this
+                    port then this value is void."
+        ::= { hpLdbalStatsPortEntry 3 }
+
+
+    hpLdbalStatsPeerPort OBJECT-TYPE
+        SYNTAX      MacAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The port identifier of the peer port connected to 
+                    the corresponding load balancing established port. If
+                    load balancing has not been established on this port
+                    then this value is void."
+        ::= { hpLdbalStatsPortEntry 4 }
+
+
+
+    -- Load Balance Protocol Statistics end
+
+    hpSwitchMacStats OBJECT IDENTIFIER ::= { hpSwitchStatistics 12 }
+
+    hpSwitchFdbAddressCount OBJECT-TYPE 
+        SYNTAX      INTEGER (0..16384)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Keep a counter for the total number of MAC
+                    Addresses currently learnt on the box."
+        ::= { hpSwitchMacStats 1 }
+
+    -- Flow Control Status Table
+
+    hpSwitchFlowControlStatus OBJECT IDENTIFIER ::= { hpSwitchStatistics 13 }
+
+    hpSwitchFlowControlStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchFlowControlStatusEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about the
+                    operational status of flow control on this switch."
+        ::= { hpSwitchFlowControlStatus 1 }
+
+    hpSwitchFlowControlStatusEntry OBJECT-TYPE
+        SYNTAX      HpSwitchFlowControlStatusEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The flow control status per port basis." 
+        INDEX       { hpSwitchFlowControlStatusPortIndex }
+        ::= { hpSwitchFlowControlStatusTable 1 }
+
+
+    HpSwitchFlowControlStatusEntry ::=
+        SEQUENCE {
+            hpSwitchFlowControlStatusPortIndex        INTEGER,
+            hpSwitchFlowControlState                  INTEGER
+        }
+
+    hpSwitchFlowControlStatusPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpSwitchFlowControlStatusEntry 1 }
+
+    hpSwitchFlowControlState OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        off(1),
+                        on(2),
+                        on-rx(3),
+                        on-tx(4)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Gets the current Flow Control State from hardware."
+        ::= { hpSwitchFlowControlStatusEntry 2 }
+
+
+    -- Fast EtherChannel Trunk Statistics Group
+
+    hpFECStatsTrunk OBJECT IDENTIFIER ::= { hpSwitchStatistics 14 }
+
+    hpFECStatsTrunkTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpFECStatsTrunkEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about the
+                    operational status of flow control on this switch."
+        ::= { hpFECStatsTrunk 1 }
+
+    hpFECStatsTrunkEntry OBJECT-TYPE
+        SYNTAX      HpFECStatsTrunkEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The flow control status per port basis." 
+        INDEX       { hpFECStatsTrunkIndex }
+        ::= { hpFECStatsTrunkTable 1 }
+
+
+    HpFECStatsTrunkEntry ::=
+        SEQUENCE {
+            hpFECStatsTrunkIndex                      INTEGER,
+            hpFECStatsTrunkName                       DisplayString,
+            hpFECStatsTrunkNegotiationStatus          INTEGER,
+            hpFECStatsTrunkForwardingMode             INTEGER,
+            hpFECStatsTrunkFlushPktsEchoed            Counter
+        }
+
+    hpFECStatsTrunkIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The trunk Index value which uniquely identifies a
+                    row in the Trunk Table."
+        ::= { hpFECStatsTrunkEntry 1 }
+
+    hpFECStatsTrunkName OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The name of the trunk group"
+        ::= { hpFECStatsTrunkEntry 2}
+
+    hpFECStatsTrunkNegotiationStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        successful(1),
+                        failed(2),
+                        initialized(3)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Whether the trunk has been successfully negotiated"
+        ::= { hpFECStatsTrunkEntry 3 }
+
+    hpFECStatsTrunkForwardingMode OBJECT-TYPE
+        SYNTAX     INTEGER {
+                        sa-only(1),
+                        sa-da(2),
+                        none(3)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Whether the trunk has been successfully negotiated"
+        ::= { hpFECStatsTrunkEntry 4 }
+
+    hpFECStatsTrunkFlushPktsEchoed OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of FEC flush packets echoed"
+        ::= { hpFECStatsTrunkEntry 5 }
+
+
+    -- Fast EtherChannel Port Statistics Group
+
+    hpFECStatsPort OBJECT IDENTIFIER ::= { hpSwitchStatistics 15 }
+
+    hpFECStatsPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpFECStatsPortEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about the
+                    operational status of flow control on this switch."
+        ::= { hpFECStatsPort 1 }
+
+    hpFECStatsPortEntry OBJECT-TYPE
+        SYNTAX      HpFECStatsPortEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The flow control status per port basis." 
+        INDEX       { hpFECStatsPortIndex }
+        ::= { hpFECStatsPortTable 1 }
+
+
+    HpFECStatsPortEntry ::=
+        SEQUENCE {
+            hpFECStatsPortIndex                        INTEGER,
+            hpFECStatsPortTrunkNumber                  INTEGER,
+            hpFECStatsPortTrunkName                    DisplayString,
+            hpFECStatsPortMode                         INTEGER,
+            hpFECStatsPortNegotiationStatus            INTEGER,
+            hpFECStatsPortHellosSent                   Counter,
+            hpFECStatsPortHellosReceived               Counter,
+            hpFECStatsPortMySlowHello                  INTEGER,
+            hpFECStatsPortMyAutoMode                   INTEGER,
+            hpFECStatsPortPartner                      MacAddress,
+            hpFECStatsPortFlushPktsEchoed              Counter
+        }
+
+    hpFECStatsPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpFECStatsPortEntry 1 }
+
+    hpFECStatsPortTrunkNumber OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The internal trunk ID"
+        ::= { hpFECStatsPortEntry 2 }
+
+    hpFECStatsPortTrunkName OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The name of the trunk group"
+        ::= { hpFECStatsPortEntry 3 }
+
+    hpFECStatsPortMode OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        down(1),
+                        forwarding(2),
+                        blocking(3),
+                        up(4)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "FEC port mode"
+        ::= { hpFECStatsPortEntry 4 }
+
+    hpFECStatsPortNegotiationStatus OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        successful(1),
+                        failed(2),
+                        initialized(3)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "FEC port negotiation state"
+        ::= { hpFECStatsPortEntry 5 }
+
+    hpFECStatsPortHellosSent OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of FEC hello packets sent"
+        ::= { hpFECStatsPortEntry 6 }
+
+    hpFECStatsPortHellosReceived OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of FEC hello packets received"
+        ::= { hpFECStatsPortEntry 7 }
+
+    hpFECStatsPortMySlowHello OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        fast(1),
+                        slow(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Currently running fast or slow FEC hello state"
+        ::= { hpFECStatsPortEntry 8 }
+
+    hpFECStatsPortMyAutoMode OBJECT-TYPE 
+        SYNTAX      INTEGER {
+                        desirable(1),
+                        auto(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Silent partner mode"
+        ::= { hpFECStatsPortEntry 9 }
+
+    hpFECStatsPortPartner OBJECT-TYPE
+        SYNTAX      MacAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The address of the adjacent device(switch, router,
+                    server, etc.)"
+        ::= { hpFECStatsPortEntry 10 }
+
+    hpFECStatsPortFlushPktsEchoed OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The number of FEC flush packets echoed"
+        ::= { hpFECStatsPortEntry 11 }
+
+    hpGvrpStats OBJECT IDENTIFIER ::= { hpSwitchStatistics 16 }
+
+    hpGvrpStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpGvrpStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains statistic information about
+                    GVRP on any  given VLAN on the switch."
+        ::= { hpGvrpStats 1 }
+
+    hpGvrpStatsEntry OBJECT-TYPE
+        SYNTAX      HpGvrpStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The information associated with each row in the
+                    GVRP Statistics Table."
+        INDEX       { hpGvrpStatsVlanIndex,hpGvrpStatsPortIndex }
+        ::= { hpGvrpStatsTable 1 }
+
+    HpGvrpStatsEntry ::=
+        SEQUENCE {
+            hpGvrpStatsVlanIndex         VlanID,
+            hpGvrpStatsPortIndex         INTEGER,
+            hpGvrpStatsPortVlanMember    INTEGER,
+            hpGvrpPortIfOperStatus       INTEGER,
+            hpPortGvrpCtrlStatus         INTEGER
+        }
+
+    hpGvrpStatsVlanIndex OBJECT-TYPE
+        SYNTAX      VlanID
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The value which uniquely identifies configuration
+                    of a virtual LAN for which entry contains
+                    information."
+        ::= { hpGvrpStatsEntry 1 }
+
+    hpGvrpStatsPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The ifIndex value which uniquely identifies a row
+                    in the Interfaces Table."
+        ::= { hpGvrpStatsEntry 2 }
+
+    hpGvrpStatsPortVlanMember OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        pending(1),
+                        yes(2),
+                        no(3)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "This value reflects the state of the port with
+                    respect to its membership in a VLAN"
+        ::= { hpGvrpStatsEntry 3 }
+
+    hpGvrpPortIfOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The current operational state of the interface."
+        ::= { hpGvrpStatsEntry 4 }
+
+    hpPortGvrpCtrlStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        learn(1),
+                        block(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The status of Gvrp Control on this port."
+        ::= { hpGvrpStatsEntry 5}
+
+    hpSshStats OBJECT IDENTIFIER ::= { hpSwitchStatistics 17 }
+
+    hpSshStatsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSshStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains statistic information about
+                    SSH connections on the switch."
+        ::= { hpSshStats 1 }
+
+    hpSshStatsEntry OBJECT-TYPE
+        SYNTAX      HpSshStatsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "The information associated with each row in the
+                    SSH Statistics Table."
+        INDEX       { hpSshStatsSesIndex }
+        ::= { hpSshStatsTable 1 }
+
+    HpSshStatsEntry ::=
+        SEQUENCE {
+            hpSshStatsSesIndex           INTEGER,
+            hpSshStatsSesType            INTEGER,
+            hpSshStatsSourceIpPort       DisplayString,
+            hpSshStatsSesVersion         INTEGER,
+            hpSshStatsSourceIpType       InetAddressType, 
+            hpSshStatsSourceIpAddress    InetAddress,
+            hpSshStatsSourceIpPortNum    InetPortNumber
+        }
+
+    hpSshStatsSesIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The value which uniquely identifies a row
+                    in the SSH Statistics Table."
+        ::= { hpSshStatsEntry 1 }
+
+    hpSshStatsSesType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        console(1),
+                        telnet(2),
+                        ssh(3),
+                        inactive(4)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The type of session on the switch."
+        ::= { hpSshStatsEntry 2 }
+
+    hpSshStatsSourceIpPort OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..21))
+        ACCESS      read-only
+        STATUS      deprecated
+        DESCRIPTION "Contains the information about source ip address and 
+                     port number of active SSH session (e.g. 192.168.31.114:1722).
+
+                     This object has been depreceted as its not big enough to store 
+                     IPv6 addresses. It is loosely replaced by hpSshStatsSourceIpAddress
+                     and hpSshStatsSourceIpPortNum"
+        ::= { hpSshStatsEntry 3 }
+
+    hpSshStatsSesVersion OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        version1(1),
+                        version2(2),
+                        noConnect(255)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Specifies the SSH protocol version in use for a
+                    given session."
+        ::= { hpSshStatsEntry 4 }
+
+    hpSshStatsSourceIpType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Specifies the Address type of source ip 
+                     address of active SSH session."
+        ::= { hpSshStatsEntry 5 }
+
+    hpSshStatsSourceIpAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Specifies the source ip address of
+                     active SSH session."
+        ::= { hpSshStatsEntry 6 }
+
+    hpSshStatsSourceIpPortNum OBJECT-TYPE
+        SYNTAX      InetPortNumber
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "Specifies the source port number of 
+                     active SSH session."
+        ::= { hpSshStatsEntry 7 }
+
+  hpSwitchPhysicalPort   OBJECT IDENTIFIER ::= { hpSwitchStatistics 18 }
+
+     hpSwitchPhysicalPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpSwitchPhysicalPortEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "A table that contains information about the
+                     physical ports of this device."
+        ::= { hpSwitchPhysicalPort 1 }
+
+    hpSwitchPhysicalPortEntry OBJECT-TYPE
+        SYNTAX      HpSwitchPhysicalPortEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION "Information about the physical ports of this device."
+        INDEX       { hpSwitchPhysicalPortIndex }
+        ::= { hpSwitchPhysicalPortTable 1 }
+       
+    HpSwitchPhysicalPortEntry ::=
+        SEQUENCE {
+            hpSwitchPhysicalPortIndex                INTEGER,
+            hpSwitchPhysicalPortType                 HpSwitchPortType
+        }
+       
+          
+    hpSwitchPhysicalPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "An index that uniquely identifies a row in the physical
+                    port table."
+        ::= { hpSwitchPhysicalPortEntry 1 }
+          
+    hpSwitchPhysicalPortType OBJECT-TYPE
+        SYNTAX      HpSwitchPortType
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION "The type for this port."
+        ::= { hpSwitchPhysicalPortEntry 2 }
+          
+END
+

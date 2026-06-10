@@ -1,0 +1,293 @@
+-- *****************************************************************
+-- DELLEMC-OS10-PRODUCTS-MIB
+--
+--
+-- Copyright (c) 2017 by Dell Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+DELLEMC-OS10-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY
+           FROM SNMPv2-SMI
+        os10
+          FROM DELLEMC-OS10-SMI-MIB;
+
+os10Products MODULE-IDENTITY
+        LAST-UPDATED "201907091200Z"
+        ORGANIZATION "Dell EMC"
+        CONTACT-INFO
+                "http://www.dell.com/support"
+
+        DESCRIPTION
+            "This mib module defines system Object Identifier values for sysObjectID.0 for
+         network elements manufactured and sold by Dell EMC Networking."
+
+
+    -- Revision history.
+        REVISION     "201907091200Z"
+        DESCRIPTION
+            "Add n3248TE for Mt. Evans products"
+
+        REVISION     "201903071200Z"
+        DESCRIPTION
+            "Add z9332F and Mt. Echo products"
+
+        REVISION     "201805151200Z"
+        DESCRIPTION
+            "Add z9232F and Mt. Princeton products"
+
+        REVISION     "201801261200Z"
+        DESCRIPTION
+            "Add z9264F product"
+
+        REVISION     "201710271200Z"
+        DESCRIPTION
+            "Add s4112F and s4112T products"
+
+        REVISION     "201710111200Z"
+        DESCRIPTION
+            "Add s4248FB and s4248FBL products. 
+             Depreciate s4200."
+
+        REVISION     "201709191200Z"
+        DESCRIPTION
+            "Add s5148F and z9100 products"
+
+
+        REVISION     "201706211200Z"
+        DESCRIPTION
+            "Removed OS9 products and updated with OS10 products"
+
+        REVISION     "201701251200Z"
+        DESCRIPTION
+          "Dell EMC Networking OS10 E-Series Family of products object IDs added."
+        ::= { os10 2 }
+
+-- *****************************************************************************
+-- Top-level Dell EMC Networking OS10 Product OBJECT IDENTIFIER assignments.
+-- *****************************************************************************
+
+
+    os10SSeriesProducts  OBJECT-IDENTITY
+            STATUS         current
+            DESCRIPTION
+                "This object identifier roots Dell EMC Networking OS10 S-Series product
+                object identifiers."
+            ::= { os10Products 1 }
+
+    os10MSeriesProducts  OBJECT-IDENTITY
+            STATUS         current
+            DESCRIPTION
+                "This object identifier roots Dell EMC Networking OS10 M-Series
+                product object identifiers."
+            ::= { os10Products 2 }
+
+    os10ZSeriesProducts  OBJECT-IDENTITY
+            STATUS         current
+            DESCRIPTION
+                "This object identifier roots Dell EMC Networking OS10 Z-Series
+                product object identifiers."
+            ::= { os10Products 3 }
+
+    os10NSeriesProducts  OBJECT-IDENTITY
+            STATUS         current
+            DESCRIPTION
+                "This object identifier roots Dell EMC Networking OS10 N-Series
+                product object identifiers."
+            ::= { os10Products 4 }
+
+
+-- *****************************************************************************
+-- Dell EMC Networking OS10 S-Series Product Line
+-- *****************************************************************************
+
+        s6000on OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S6000 ON access switch."
+                ::= { os10SSeriesProducts 1 }
+
+        s4048on OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4048 ON access switch."
+                ::= { os10SSeriesProducts 2 }
+
+        s4048Ton OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4048T ON access switch."
+                ::= { os10SSeriesProducts 3 }
+
+        s3048on OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S3048 ON access switch."
+                ::= { os10SSeriesProducts 4 }
+
+        s6010on OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking 0S S6010 ON access switch."
+                ::= { os10SSeriesProducts 5 }
+
+        s4148Fon OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4148F ON access switch."
+                ::= { os10SSeriesProducts 6 }
+
+        s4128Fon OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4128F ON access switch."
+                ::= { os10SSeriesProducts 7 }
+
+        s4148Ton OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4148T ON access switch."
+                ::= { os10SSeriesProducts 8 }
+
+        s4128Ton OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4128T ON access switch."
+                ::= { os10SSeriesProducts 9 }
+
+        s4148FEon OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4148FE ON access switch."
+                ::= { os10SSeriesProducts 10 }
+
+        s4148Uon OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    "Dell EMC Networking OS10 S4148U ON access switch."
+                ::= { os10SSeriesProducts 11 }
+
+        s4200on OBJECT-IDENTITY
+                STATUS  deprecated
+                DESCRIPTION
+                    "Deprecated: Dell EMC Networking OS10 S4200 ON access switch."
+                ::= { os10SSeriesProducts 12 }
+
+        s5148Fon OBJECT-IDENTITY
+                 STATUS  current
+                 DESCRIPTION
+                     "Dell EMC Networking OS10 S5148F ON access switch."
+                 ::= { os10SSeriesProducts 13 }
+
+        s4248FBon OBJECT-IDENTITY
+                 STATUS  current
+                 DESCRIPTION
+                     "Dell EMC Networking OS10 S4248FB ON access switch."
+                 ::= { os10SSeriesProducts 14 }
+
+        s4248FBLon OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S4248FBL ON access switch."
+                   ::= { os10SSeriesProducts 15 }
+
+        s4112Fon OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S4112F ON access switch."
+                   ::= { os10SSeriesProducts 16 }
+
+        s4112Ton OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S4112T ON access switch."
+                   ::= { os10SSeriesProducts 17 }
+
+        s5212Fon OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S5212F ON access switch."
+                   ::= { os10SSeriesProducts 18 }
+
+        s5224Fon OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S5224F ON access switch."
+                   ::= { os10SSeriesProducts 19 }
+
+        s5232Fon OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S5232F ON access switch."
+                   ::= { os10SSeriesProducts 20 }
+
+        s5248Fon OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S5248F ON access switch."
+                   ::= { os10SSeriesProducts 21 }
+
+        s5296Fon OBJECT-IDENTITY
+                   STATUS  current
+                   DESCRIPTION
+                       "Dell EMC Networking OS10 S5296F ON access switch."
+                   ::= { os10SSeriesProducts 22 }
+
+
+-- *****************************************************************************
+-- Dell EMC Networking OS10 Z-Series Product Line
+-- *****************************************************************************
+
+        z9100on OBJECT-IDENTITY
+                 STATUS  current
+                 DESCRIPTION
+                     "Dell EMC Networking OS10 Z9100 ON access switch."
+                 ::= { os10ZSeriesProducts 1 }
+
+        z9264Fon OBJECT-IDENTITY
+                 STATUS  current
+                 DESCRIPTION
+                     "Dell EMC Networking OS10 Z9264F ON access switch."
+                 ::= { os10ZSeriesProducts 2 }
+
+        z9232Fon OBJECT-IDENTITY
+                 STATUS  current
+                 DESCRIPTION
+                     "Dell EMC Networking OS10 Z9232F ON access switch."
+                 ::= { os10ZSeriesProducts 3 }
+
+        z9332Fon OBJECT-IDENTITY
+                 STATUS  current
+                 DESCRIPTION
+                     "Dell EMC Networking OS10 Z9332F ON access switch."
+                 ::= { os10ZSeriesProducts 4 }
+
+-- *****************************************************************************
+-- Dell EMC Networking OS10 M-Series Product Line
+-- *****************************************************************************
+
+        mx5108Non  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    " Dell EMC Networking OS10 MX5108N-ON access switch."
+                ::= { os10MSeriesProducts 1 }
+
+        mx9116Non  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    " Dell EMC Networking OS10 MX9116N-ON access switch."
+                ::= { os10MSeriesProducts 2 }
+
+-- *****************************************************************************
+-- Dell EMC Networking OS10 N-Series Product Line
+-- *****************************************************************************
+
+        n3248TEon  OBJECT-IDENTITY
+                STATUS  current
+                DESCRIPTION
+                    " Dell EMC Networking OS10 N3248TE-ON access switch."
+                ::= { os10NSeriesProducts 1 }
+END

@@ -1,0 +1,5080 @@
+ASAM-EQUIP-MIB DEFINITIONS ::= BEGIN
+
+-- ==========================================================================
+--  This specification is published by Alcatel-Lucent under Non-Disclosure
+--  Agreement(s) (NDA) with specific parties and has to be considered as
+--  Confidential Information as defined in such NDA.
+--  Alcatel-Lucent reserves the right to revise this document for any reason,
+--  including but not limited to conformity with standards promulgated by
+--  various agencies, utilisation of advances in the state of the technical
+--  areas, or the reflection of changes in the design of any equipment,
+--  techniques, or procedures described or referred to herein.
+--  The product specifications and other technical or performance information
+--  contained herein are subject to change without notice.
+--  Updates of this document will be issued under the above NDA's.
+--  Alcatel-Lucent makes no representation or warranty, expressed or implied,
+--  with respect to the sufficiency, accuracy, or utility of any information
+--  or opinion contained herein. Alcatel-Lucent expressly advises that any
+--  use of for any purpose or reliance upon this technical reference is at
+--  the risk of the user and that Alcatel-Lucent shall not be liable for any
+--  damage or injury incurred by any person arising out of the sufficiency,
+--  accuracy, or utility of any information or opinion contained herein.
+--  This document is not to be construed as a suggestion to any manufacturer
+--  to modify or change any of its products, nor does this document represent
+--  any commitment by Alcatel-Lucent to sell or purchase any product.
+--  Nothing contained herein shall be construed as conferring by implication,
+--  estoppel, or otherwise any license or right under any patent, whether or
+--  not the use of any information herein necessarily employs an invention of
+--  any existing or later issued patent.
+--  Alcatel-Lucent reserves the right not to offer any or all of these
+--  products and to withdraw any or all of them at any future time.
+--  Copyright (C) 2001-2009, Alcatel-Lucent. All Rights Reserved.
+-- ===========================================================================
+--
+--  MODULE-IDENTITY
+--  LAST-UPDATED "201512130000Z"
+--  ORGANIZATION "Alcatel-Lucent"
+--  CONTACT-INFO "email: asam.mibsupport@alcatel-lucent.com"
+--
+--  REVISION "201702100000Z"
+--  DESCRIPTION
+--     "Editor: Bart De Vos
+--      Reason for change: add support for an RFT-C power module on SX-48U (SRNT-K)
+--
+--  REVISION "201611070000Z"
+--  DESCRIPTION
+--     "Editor: Yangxiong Xia
+--      Reason for change: add new shelf mode ngpon-port-reduced(9) to eqptHolderMode object for isam 7362 SF 16-GW and DF 16-GW Low capacity
+--
+--  REVISION "201610210000Z"
+--  DESCRIPTION
+--     "Editor: Lut Mertens
+--      Reason for change: Replace EqptHolderIndex by EqptPowerSupplyIndex in eqptPowerSupplyId object
+--
+--  REVISION "201610170000Z"
+--  DESCRIPTION
+--    Version: 3EC36485EDAA_V5.6.0.0.0
+--    Editor: Mani Batta
+--    Reason for change: RCR: ALU01872170 (Reset LT restart counter)
+--    Change: Introduced two MIBs- eqptBoardRestartCountPerLt and eqptBoardClearRestartCountPerLt in ASAM-EQUIP-MIB.mib.
+--
+--  REVISION "201608290000Z"
+--  DESCRIPTION
+--     "Editor: Weihai LU
+--      Reason for change: add new shelf mode ngpon_supported(7) and gpon_supported(8) to eqptHolderMode object
+--
+--
+--  REVISION "201602080000Z"
+--  DESCRIPTION
+--     "Editor: Eirini Tzimi
+--      Reason for change: add new shelf mode ntbntioextlt-unsupported(4) to eqptHolderMode object
+--
+--
+--  REVISION "201512220000Z"
+--  DESCRIPTION
+--     "Editor:  Qiong K WU
+--      Reason for change: ALU02004304 (Next generation NT-FANT-G)
+--      Change: add new eqptPortMappingPhyPortType: cfp(14)
+--
+--  REVISION "201512130000Z"
+--  DESCRIPTION
+--     "Editor: Laurent Carlier
+--      Reason for change: add eqptPowerSupplyTable table
+--
+--
+--  REVISION "201404150000Z"
+--  DESCRIPTION
+--      "Editor: Bala Amudha Pal Samy
+--       Changes :
+--            Added a new mode ntb-unsupported(3) to eqptHolderMode object (ALU01919868)
+--
+--  REVISION "201310230000Z"
+--  DESCRIPTION
+--     "Editor:  Qiong K WU
+--      Reason for change: ALU01870122 ISR50 DPoE data path redundancy (Phase I)
+--      Change: Add new reason for eqptProtElementStandbyStatuschangeReason
+--              Add new reason for eqptProtGroupLastSwitchoverReason
+--
+--  REVISION "201309180000Z"
+--  DESCRIPTION
+--     "Editor:  Tom Van Peteghem
+--      Reason for change: ALU01873072    NELT-B VLAN/QoS resource pooling
+--      Change: Add eqptBoardPlannedResourceTable
+--
+
+--  REVISION "201304250000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.6.0.0.3
+--      Editor:  Karel Meijfroidt
+--      Reason for change: ALU01815260, Alarm Mechanism Improvement
+--      Change: change the RANGE in the description of the eqptCustAlarmProfileSeverity.
+--
+--  REVISION "201304090000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.6.0.0.2
+--      Editor:  Marita Saveyn
+--      Reason for change: ALU01873776, eqptPortMapping attributes returns NoSuch Instance for ISAM4501, FANT-F board
+--      Change: EqptPortMappingTable: changes to  eqptPortMappingLogPortType (add 4) and eqptPortMappingPhyPortSlot (desc)
+--                                                eqptPortMappingPhyPortType (add 13) and eqptPortMappingPhyPortNbr (desc)
+--
+--  REVISION "201303260000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.6.0.0.1
+--      Editor:  Vanapatla Ramana
+--      Reason for change: ALU01868639, MIB readiness for 2.5G Expansion links on NRNT-A
+--      Change: eqptSlotPlannedCapabilityProfile: change to description.
+--
+--  REVISION "201303200000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.6.0.0.0
+--      Editor:  Long Zhigang
+--      Changes: Add three new attributes in eqptHolderTable (RCR ALU01814646)
+--               - eqptHolderSerialNumber
+--               - eqptHolderVariant
+--               - eqptHolderICScode
+--
+--  REVISION "201201008000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.5.0.0.0
+--      Editor:  Dirk De la Marche
+--      Changes: Change to description of CTRL functionality (NRCD-C introduction)
+--
+--  REVISION "201208220000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.5.0.0.0
+--      Editor:  Vijayakumar Kanniah
+--      Changes: eqptHolderMode: change to description (RCR ALU01807846)
+--
+--
+--  REVISION "201208100000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.4.0.3.0
+--      Editor:  Marita Saveyn
+--      Changes: eqptProtGroupTable: change to description (ALU01810586)
+--
+--
+--  REVISION "201202090000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.4.0.0.0
+--      Editor:  Danny Sioncke
+--      Changes: Added eqptPortProtectionTable (RCR ALU00123609)
+--               Added eqptPortProtectionLookupTable (RCR ALU00123609)
+--
+--
+--  REVISION "201104290000Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EDAA_V4.3.0.0.1
+--      Editor:  Vijayakumar Kanniah
+--      Changes: Added eqptBoardOperError download-ongoing for supporting NRCD-B Automatic download (IR ALU01198543)
+--
+--
+--  REVISION "201103040000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EDAA_V4.3.0.0.0
+--       Editor: Lieve Dierick
+--       Changes :
+--            ALU01096382 :  new MIB object to store the intelligent FAN mode (IR ALU01096386)
+--
+--  REVISION "201008090000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EDAA_V4.2.0.1.4
+--       Editor: Tom Van Peteghem
+--       Changes :
+--            ALU00492406 :  MIB description of the eqptBoardInventorySerialNumber
+--           must be extended with year/week info
+--
+--  REVISION "201005110000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EDAA_V4.2.0.0.1
+--       Editor: Jean Samoise
+--       Changes :
+--            AALU00117331 :
+--           Add scalar global change counter for remote lt portmapping changes.
+---
+--  REVISION "201003290000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EDAA_V4.2.0.0.0
+--       Editor: Jean Samoise
+--       Changes :
+--            AALU00117331 :
+--            Generate trap at configuration change of the PortMapping data.
+--
+--
+--  REVISION "201003040000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EDAA_V4.2.0.0.0
+--       Editor: Jean SamoiseIR context drop NRNT-A
+--       Changes :
+--            ALU00159858 :
+--            Add eth,vp, mcast to eqptPortMappingPhyPortType
+---  REVISION "200910010000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EDAA_V4.0.0.0.0
+--       Editor: Rik Verstraete
+--       Changes :
+--            ANTmt71411 ISAM/FTTU Merge Equipment Domain
+--            Add eqptBoardIfSlotId to eqptBoardTable
+--
+--  REVISION "200908250000Z "
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V4.1.0.0.2
+--      Editor :  Peter Van Mele
+--      Reason for change:  ANTmt72355, licensing of load balancing/redundancy
+--      Change: default value of the NT redundancy protection group is disabled.
+--
+--  REVISION "2009071300000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V4.1.0.0.1
+--       Editor: Dirk De la Marche
+--       Changes :
+--            eqptProtElementStandbyStatuschangeReason : new additions
+--            due to NANT-D redundancy (See ANTms38234)
+--            new values: (18), (19) and (20)
+--
+--  REVISION "20090630"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V4.1.0.0.0
+--      Editor :  Sven Dhuyvetter
+--      Reason for change:  ANTms80204, 'Up/Downlink faceplate nr mapping for O
+--      Change: Add new PortMapping table definition.
+--
+--  REVISION "2009012210007Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V4.0.0.0.1
+--       Editor: Viviane Verswijvel
+--       Changes :
+--            eqptProtElementStandbyStatuschangeReason : new desccriptions
+--            to be compatible with XVPS (See FR ANTmt34321)
+--
+--  REVISION "200803040000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.7.0.0.3
+--       Editor: Furqan Haq
+--       Changes :
+--            Added a new mode ntio-unsupported(6) to eqptHolderMode object
+--            Added a new mnemonics NOT_ALLOWED to eqptSlotPlannedType
+--            Added new error type to eqptBoardOperError for reporting
+--              BoardInsertedInIncompatibleSlot
+--
+--  REVISION "200803104000Z"
+--  DESCRIPTION
+--  "Version: 3EC36485EAAA_V3.7.0.0.0
+--       Editor: Viviane Verswijvel
+--       Changes:
+--     Add 2 new reasons for switch over
+--         Add reason for standby change state reason
+--         => Hitless Redundancy R3.7
+--
+--  REVISION "200711080000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.6.0.0.2
+--       Editor: Danny Sioncke
+--       Changes:
+--         In eqptBoardTable, eqptBoardDualHostIPAddress and
+--         eqptBoardDualHostLsmLocation are added.
+--  REVISION "200707260000Z"
+--  DESCRIPTION
+--  "Version: 3EC36485EAAA_V3.6.0.0.0
+--       Editor: Lu Hao
+--       Changes:
+--     Add a new table, eqptBoardThermalSensorTable to eqptEquipmentMIB
+--
+--  REVISION "200707240000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.5.0.0.3
+--      Editor: Bo Liu
+--      Changes:
+--         restartFromDefaultPresOAM and restartFromDefaultTotal are no longer
+--         supported in eqptAsamRestart.
+--
+--  REVISION "200706010000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.5.0.0.2
+--      Editor: Bo Liu
+--      Changes:
+--          Add the new equipment practice LEWW in the description of
+--          eqptHolderPlannedType.
+--
+--  REVISION "200705230000Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.5.0.0.1
+--      Editor: Wang Jianglin
+--      Changes:
+--          Add the xVPS identifier to equipment table.
+--
+--  REVISION "200705210900Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.5.0.0.0
+--      Editor: Liu Jie
+--      Changes:
+--         - Add the test head type for four-wire or two-wire test
+--
+--
+--  MODULE-IDENTITY
+--  LAST-UPDATED "200704241735Z"
+--  ORGANIZATION "Alcatel"
+--  CONTACT-INFO "email: asam.mibsupport@alcatel-lucent.be"
+--
+--  DESCRIPTION
+--     "The ASAM Equipment Management MIB is a vendor-specific MIB that is
+--      used to manage the equipment (racks, shelves, and pluggable equipment)
+--      of the ASAM subsystem in the ESAM.
+--
+--  REVISION "200706151600Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.4.0.0.2
+--      Editor: Sven Dhuyvetter
+--      Changes:
+--         - restartFromDefaultPresOAM and restartFromDefaultTotal no longer
+--           supported in eqptAsamRestart.
+--
+--  REVISION "200703291600Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.4.0.0.1
+--      Editor: Danny Sioncke
+--      Changes:
+--         - CTRL added in descriptions where applicable.
+--
+--  REVISION "200702021600Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.4.0.0.0
+--      Editor: He Yang
+--      Changes:
+--         - Add three parameter in eqptboardtable: eqptBoardLastRestartCause,
+--           eqptBoardLastRestartTime, eqptBoardRestartNumberOfChanges.
+--         - Add eqptRestartNumberOfChanges
+--
+--  REVISION "200704241735Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.3.0.2.2
+--      Editor: John Chuah
+--      Changes:
+--         - reverted EqptTestChainEntry and eqptTestChainShelfToTapUp to
+--           match the definition that was already shipped since R3.1"
+--
+--  REVISION "200704191800Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.3.0.2.1
+--      Editor: Furqan Haq
+--      Changes:
+--         - reverted the index order of eqptProfileApplicabilityEntry to
+--           match the definition that was already shipped since R2.5"
+--
+--  REVISION "200701041600Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.3.0.2.0
+--      Editor: Sven Dhuyvetter
+--      Changes:
+--         - update DEFVALUE in ALCATEL NOTE.
+--
+--  REVISION "200612182245Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_V3.3.0.1.0
+--      Editor: John Chuah
+--      Changes:
+--         - increased upper range of eqptMaxRacksPerAsam from 6 to 7 and
+--           eqptMaxShelvesPerRack from 3 to 4.
+--         - increased rack and shelf ranges for LEEU, LEUS and LNEU in
+--           eqptHolderPlannedType.
+--
+--  REVISION "200609161200Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_E3.3.0.0
+--      Editor: Zhu Sunbin
+--      Changes:
+--         - eqptProtGroupTable tablesize from 1 row to rows number depending on
+--           shelf type in Alcatel Notes.
+--         - eqptProtElementTable tablesize from 2 rows to rows number depending on
+--           shelf type in Alcatel Notes.
+--         - eqptProtElementGroupId DEFVALUE from 1 to NA
+--         - eqptProtGroupId DEFVALUE from 1 to NA
+--         - added notInService(2) in Alcatel Notes for eqptProtGroupRowStatus
+--
+--  REVISION "200606161200Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_E3.1.0.0.3
+--      Editor: Lucien Marcotte
+--      Changes:
+--         - For HYNT, changed eqptMaxSlotsPerShelf from 21 to 22 in Alcatel Notes.
+--
+--  REVISION "200606011200Z"
+--  DESCRIPTION
+--      "Version: 3EC36485EAAA_E3.1.0.0.2
+--      Editor: Bo Liu
+--      Changes: ITSC
+--         - Added eqptTestChainTable.
+--
+--  REVISION "200605231200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E3.0.0.4
+--      Editor: Danny Sioncke
+--      Changes: - eqptCustAlarmProfile non-REM introduced items put to
+--                 "SUPPORT: NO".
+--
+--  REVISION "200604211200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E3.0.0.3
+--      Editor: Danny Sioncke
+--      Changes: - eqptCustAlarmProfile id changed from nr. 7 to nr. 8,
+--                 solving conflict with eqptTestChainTable (ITSC).
+--               - references to asamCustAlarm-xxx corrected to
+--                 eqptCustAlarm-xxx
+--
+--  REVISION "200512131200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E3.0.0.2
+--      Editor: Sven Dhuyvetter
+--      Changes: update for 8 PVC (BDFhw31519)
+--           - add eqptSlotPlannedCapabilityProfile to eqptBoardTable
+--           - add eqptProfileApplicabilityTable
+--           - add eqptProfileTable
+--           - add eqptProfileDescriptionTable
+--      Editor: Danny Sioncke
+--      Changes: update for REM (BDFhw36030)
+--           - add eqptCustAlarmProfileTable
+--           - add eqptCustAlarmProfileMappingTable
+--
+--  REVISION "200511301200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E3.0.0.1
+--      Editor: zhu jianhua
+--      Changes: update for NEP (BDFhw62300), add eqptHolderMode
+--
+--  REVISION "200509161200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E2.4.0.0
+--      Editor:  vairamuthu karuppiah
+--      Changes: "Added eqptBoardOperError sem-power-fail,sem-ups-fail"
+--
+--  REVISION "200506031200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E2.3.0.1
+--      Editor: Bart Geldof/Christophe De Ras
+--      Changes: ODM Framework
+--         - Added ODM Eqt Boardtype treated as unmanaged board.
+--
+--  REVISION "200504281200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E2.3.0.0
+--      Editor: Lucien Marcotte
+--      Changes: HYNT FGR1.0 (new product release)
+--         - Added the new Eqt Board current and planned type EXT_MANAGED.
+--
+--  REVISION "200412061200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E2.2.0.0
+--      Editor: FAN Min
+--      Changes: support the eqptProt Table for ISAM R2.2 NT Redundancy Feature
+--              * eqptProtGroupLastSwitchoverReason : add "LanxFailure(13)""
+--
+--  REVISION "200411251200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E1.0.0.0
+--      Editor: Steven Luykx
+--      Changes: changes in comment, version is not stepped up"
+--
+--  REVISION "200401291200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485EAAA_E1.0.0.0
+--      Editor: Rafael Van Driessche
+--      Changes: first version for ESAM R1.0 and ESAM R1.1"
+--
+--  REVISION "200304241200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485AAAA_E5.0.0.3
+--      Editor: Eric De Backer
+--      Changes:
+--      * eqptBoardInventoryLastFailedTest: change object type to OCTET string
+--        (BDFaa50395)"
+--
+--  REVISION "200303261200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485AAAA_E5.0.1.0
+--      Editor: Koen Van de Weyer
+--      Changes:
+--      * eqptBoardOperError: add "board-not-licensed" (BDFaa51682)"
+--
+--  REVISION "200309241200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485AAAA_E5.0.0.2
+--      Editor: Frank Devolder
+--      Changes:
+--      * Decrease size of eqptHolderDescription from 255 to 127 bytes
+--        (BDFaa46015).
+--      * Remove eqptHwChangeOccurredTrap & eqptProtChangeOccurredTrap
+--        (BDFaa44804).
+--      * add initialValue(255) to definition of eqptBoardRestart
+--        (BDFaa45317).
+--
+--  REVISION "200201151200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485AAAA_E5.0.0.1
+--      Editor: Frank Devolder
+--      Changes:
+--      * eqptHolderAvailStatus: add state "offLine" and remove state
+--        "unknown".
+--      * eqptBoardSwOverruleStatus: only supported for LSMs.
+--      * line-up enum values of:
+--           eqptBoardOperError & eqptHolderOperError;
+--           eqptBoardAvailStatus & eqptHolderAvailStatus;
+--           eqptBoardRestart & eqptAsamRestart.
+--      * Add object eqptBoardInventoryLastFailedTest.
+--      * eqptBoardRestart: for ACU boards, only a restart without selftest is
+--        supported."
+--
+--  REVISION "200106081200Z"
+--  DESCRIPTION
+--     "Version: 3EC36485AAAA_E5.0.0.0
+--      Editor: Frank Devolder
+--      Changes: creation of new Equipment MIB for ASAM R5.0."
+--
+-- =============================================================================
+
+   IMPORTS IpAddress,  TimeTicks,
+           Counter                  FROM RFC1155-SMI
+           DisplayString, RowStatus,
+           TruthValue               FROM SNMPv2-TC
+           asam                     FROM SYSTEM-MIB
+           OBJECT-TYPE              FROM RFC-1212
+           InterfaceIndex           FROM ITF-MIB
+           AsamAlarmSeverityType    FROM ASAM-ALARM-MIB
+           AsamNextProfileIndex,
+           AsamProfileRefCount,
+           AsamProfilePointer,
+           AsamProfileIndex,
+           AsamProfileName,
+           NetworkTimeInSeconds     FROM ASAM-TC-MIB;
+
+
+   -- asam OBJECT IDENTIFIER ::= { iso(1) identified-organization(3) dod(6)
+   --                              internet(1) private(4) enterprises(1)
+   --                              alcatel(637) asd(61) asam(1) }
+
+   asamEquipmentMIB OBJECT IDENTIFIER ::= { asam 23 }
+
+   -- MAX-INDEX ::= 2147483647  (= 7FFFFFFF HEX)
+
+   -- Start type definitions ==
+
+   EqptHolderIndex ::= INTEGER (1..255)
+
+   EqptPowerSupplyIndex ::= INTEGER (1..255)
+
+   EqptPowerRftcIndex ::= INTEGER (1..255)
+
+   EqptPowerRftcLineStatus ::= INTEGER {
+                                ok(0),
+                                notconnected(1),
+                                highimpedant(2),
+                                earthfault(3)}
+
+   EqptHolderIndexOrZero ::= INTEGER (0..255)
+
+   EqptSlotIndex ::= INTEGER (1..65535)
+
+   EqptCustAlarmProfileOutputType ::=       INTEGER {
+                           triggered(1),    -- alarm output is triggered
+                           notTriggered(2)} -- alarm output is not triggered
+
+   EqptCustAlarmProfilePolarityType ::=       INTEGER {
+                             inversed(1), -- inversed alarm polarity
+                             normal(2)}   -- normal alarm polarity
+
+   EqptPortMappingIndex ::= INTEGER
+
+   -- End type definitions ==
+
+   eqptAsam OBJECT IDENTIFIER ::= { asamEquipmentMIB 1 }
+
+
+   -- Note on appliques:
+   --
+   -- The Equipment MIB is only used to manage appliques that are contained
+   -- in LT shelves or combo shelves.  Appliques that are contained in separate
+   -- splitter shelves cannot be managed.  Therefore, whenever this MIB
+   -- mentions an "applique", it is implicitly understood that this applique
+   -- is contained in the applique area of a combo shelf, or that it is the
+   -- NT-I/O applique in case of an LT shelf.
+
+   --  ==================================================================
+   --  |                     START ASAM FIELDS                          |
+   --  ==================================================================
+
+   eqptAsamId OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Unique identifier of the system.
+          In practice, this attribute contains the serial number of the most
+          recently equipped SMAS board within the main shelf.
+
+          Notice however that there are also shelves in which the SMAS is replaced
+          by a GFC board (e.g ARAM-B) or even shelves without SMAS/GFC in which
+          the serial number of the ACU is taken.
+
+          This attribute is used internally by the system in case both NTs
+          start-up simultaneously to determine whether either the database on
+          NT-A or the database on NT-B should be used as the systems database.
+          It's not the intention to make this attribute visible to an operator.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: ''   UNITS: -"
+      ::= { eqptAsam 1 }
+
+   eqptAsamRestart OBJECT-TYPE
+      SYNTAX INTEGER {
+         restartWithSelfTest (1),
+            -- restart with selftest
+         restartWithoutSelfTest (2),
+            -- restart without selftest
+         -- restartFromDefaultPresOAM (3),
+            -- restart with removal of persistent data, but preserving the
+            -- management channel configuration data
+         -- restartFromDefaultTotal (4),
+            -- restart with removal of all persistent data, including the
+            -- management channel configuration data
+         restartHot (5),
+            -- system hot restart
+         initialValue (255)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute is used to restart the system. The persistent data is preserved.
+          Contains previous restart reason, if not available it contains value 255.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES                  RANGE: See above
+             PERSIST: YES   DEFVALUE: initialValue (255)   UNITS: -"
+      ::= { eqptAsam 2 }
+
+   eqptMaxRacksPerAsam OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is initialized by the system and specifies the maximum
+          number of racks supported by the system.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..7
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptAsam 3 }
+
+   eqptMaxShelvesPerRack OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is initialized by the system and specifies the maximum
+          number of shelves which can be equipped within one rack.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..4
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptAsam 4 }
+
+   eqptMaxSlotsPerShelf OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object is initialized by the system and specifies the maximum
+          number of regular slots supported by one shelf.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..22
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptAsam 5 }
+
+   eqptHwNumberOfChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter which indicates the number of configuration or
+          status changes in the Equipment MIB objects.  This counter is
+          incremented each time any of the summary table objects change.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: 0    UNITS: -"
+      ::= { eqptAsam 6 }
+
+   eqptProtNumberOfChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter which indicates the overall number of status
+          changes in the equipment protection MIB objects.  This counter is
+          incremented each time any of the eqptProtGroupNumberOfChanges
+          counters is incremented.
+
+          ALCATEL NOTE:
+             SUPPORT:YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: 0    UNITS: -"
+      ::= { eqptAsam 7 }
+
+eqptRestartNumberOfChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter which indicates the overall number of status
+          changes in the eqptBoardRestartNumberOfChanges objects in
+          eqptBoardTable. This counter is incremented each time any of the
+          eqptBoardRestartNumberOfChanges counters is incremented.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: 0    UNITS: -"
+      ::= { eqptAsam 8 }
+
+eqptFanMode OBJECT-TYPE
+     SYNTAX     INTEGER
+                {
+                  default (0),
+                  eco (1),
+                  protect (2),
+                  classic (3)
+                }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+         "
+            Parameter indicates the actually applied FAN tray mode:
+
+           'default': the fan packs run in average mode, predefined thermal margins are
+                      used for defining/adapting the fan speeds
+
+           'eco': the fan packs run in 'green' mode, t.i. the most economical mode, minimal
+                  thermal margins wrt default settings
+
+           'protect': the fan packs run in a heavy mode, t.i. wider thermal margins wrt
+                      default settings
+
+           'classic': fixed speed settings apply wrt the fan - no SW control
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 0    UNITS: -"
+      ::= { eqptAsam 9 }
+
+   --  ==================================================================
+   --  |                     STOP ASAM FIELDS                           |
+   --  ==================================================================
+
+   --  ==================================================================
+   --  |                     START HOLDER TABLE                         |
+   --  ==================================================================
+
+   eqptHolderTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptHolderEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Equipment holder table, representing the system, the racks and
+          the shelves.
+
+          This table contains one row for the system, one row per rack,
+          and one row per shelf.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  TABLESIZE: DEP as described above"
+      ::= { asamEquipmentMIB 2 }
+
+   eqptHolderEntry OBJECT-TYPE
+      SYNTAX EqptHolderEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the equipment holder table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptHolderId }
+      ::= { eqptHolderTable 1 }
+
+   EqptHolderEntry ::= SEQUENCE {
+      eqptHolderId                 EqptHolderIndex,
+      eqptHolderClass              INTEGER,
+      eqptHolderPlannedType        DisplayString,
+      eqptHolderActualType         DisplayString,
+      eqptHolderAdminStatus        INTEGER,
+      eqptHolderOperStatus         INTEGER,
+      eqptHolderOperError          INTEGER,
+      eqptHolderAvailStatus        INTEGER,
+      eqptHolderDescription        DisplayString,
+      eqptHolderContainerId        INTEGER,
+      eqptHolderContainerOffset    INTEGER,
+      eqptHolderMode               INTEGER,
+      eqptHolderSerialNumber       DisplayString,
+      eqptHolderVariant       DisplayString,
+      eqptHolderICScode       DisplayString
+   }
+
+   eqptHolderId OBJECT-TYPE
+      SYNTAX EqptHolderIndex
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Index in equipment holder Table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 1 }
+
+   eqptHolderClass OBJECT-TYPE
+      SYNTAX INTEGER {
+          mainIqHcl (1),    -- main shelf supporting both IQ-based and
+                            -- HCL-based traffic
+          extIq (2),        -- extension shelf supporting only IQ-based traffic
+          extHcl (3),       -- extension shelf supporting only HCL-based traffic
+          mainEthernet (4), -- main shelf supporting Ethernet-based traffic
+          extEthernet (5)   -- extension shelf supporting Ethernet-based traffic
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Classification of shelves. This object has no meaning for the
+          system and the rack equipment holders.
+
+          Note: for ISAM, only the values mainEthernet (4) and extEthernet (5)
+                are allowed.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO   RANGE: 1..5
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 2 }
+
+   eqptHolderPlannedType OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "A string representing the planned type of equipment holder.
+          If the equipment holder is planned, the string consists of a
+          mnemonic, identifying the holder type.
+          This object is only writable for the entries that represent a shelf.
+          Other entries get a value corresponding to the detected equipment
+          practice type.
+
+          Following values are valid:
+
+          System-types:
+          =============
+          LAUS          Large ASAM US market (6 racks, 3 shelves per rack)
+          LAEU          Large ASAM EU market (6 racks, 3 shelves per rack)
+          LEEU          Large ESAM EU market (7 racks, 4 shelves per rack)
+          LEUS          Large ESAM US market (7 racks, 4 shelves per rack)
+          LNEU          Large New EquipmentPractise EU market(7 racks, 4 shelves
+                        per rack)
+          LEWW          Large ESAM World Wide (7 racks, 4 shelves per rack)
+          LNWW    Large ESAM World Wide (7 racks, 4 shelves per rack)
+
+          Rack-types:
+          ===========
+          ALTR-A        ADSL Line Termination Rack version A (US)
+          ALTR-E        ADSL Line Termination Rack version E (ETSI 2200mm)
+
+          Shelf-types:
+          ============
+          <SHELF_MNEMONIC>  A shelf of a specific type.  Refer to the ETSI
+                            Configurations and US Configurations documents
+                            for the list of shelf types that are supported
+                            in a given system release.
+
+          NOT_PLANNED       The shelf is not planned.
+
+          NOT_ALLOWED       Shelf planning is not allowed in this position.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO              RANGE: See above
+             PERSIST: YES   DEFVALUE: 'NOT_PLANNED'   UNITS: -"
+      ::= { eqptHolderEntry 3 }
+
+   eqptHolderActualType OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A string representing the actual equipment holder type.
+
+          Following values are possible:
+
+          <HOLDER_MNEMONIC> Indicates the detected equipment holder-type.
+                            Uses same mnemonics as described in object
+                            eqptHolderPlannedType.
+
+          EMPTY             Equipment holder is not detected
+
+          UNKNOWN           The type of the detected holder is unknown.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 4 }
+
+   eqptHolderAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         unlock(1),
+         lock(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Used by the administrator to lock or unlock an equipment holder.
+          This attribute is only supported for shelves.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: 1     UNITS: -"
+      ::= { eqptHolderEntry 5 }
+
+   eqptHolderOperStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         enabled(1),
+         disabled(2)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute identifies whether or not the equipment holder is
+          capable of performing its normal functions.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..2
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 6 }
+
+   eqptHolderOperError OBJECT-TYPE
+      SYNTAX INTEGER {
+         no-error(1),                   -- no-error or admin state = Down
+         type-mismatch(2),
+         holder-missing(3),
+         holder-installation-missing(4),
+         defense(15)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute describes for what reason the equipment holder is
+          not operational. These values correspond with the alarms that are
+          generated in case of a failure.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..4, 15
+             PERSIST: NO    DEFVALUE: 1    UNITS: -"
+      ::= { eqptHolderEntry 7 }
+
+   eqptHolderAvailStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+          available(1),     -- equipment holder is available
+          failed (3),       -- equipment holder is detected but faulty
+          notInstalled (5), -- equipment holder is not installed
+          offLine (6)       -- equipment holder has been disabled
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute indicates whether the equipment holder is
+          available or not.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1, 3, 5, 6
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 8 }
+
+   eqptHolderDescription OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..127))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Text-field, which can for instance be used to describe the
+          location of the equipment holder.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: ''    UNITS: -"
+      ::= { eqptHolderEntry 9 }
+
+   eqptHolderContainerId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute describes in which equipment holder the equipment
+          holder is contained.
+          This object is only meaningful for racks and shelves, since the
+          system itself has no containing equipment holder.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 10 }
+
+   eqptHolderContainerOffset OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute describes the position of the equipment holder
+          in the containing equipment holder.
+          This object is only meaningful for racks and shelves, since the
+          system itself has no containing equipment holder.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 11 }
+
+   eqptHolderMode OBJECT-TYPE
+      SYNTAX INTEGER{
+          ntbntio-supported(1),
+          ntbntio-unsupported(2),
+          ntb-unsupported(3),
+          ntbntioextlt-unsupported(4),
+          ntio-unsupported(6),
+          ngpon-supported(7),
+          gpon-supported(8),
+          ngpon-port-reduced(9)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION  "This attribute identifies the holder mode and is used by
+          both the NEP shelf and the ARAM-E shelf:
+          ntbntio-supported: this mode works in the same manner as iSAM XD. The
+          LSM can only be used on LSM slot. NT in NTB is supported. NTIO is
+          also supported.
+          ntbntio-unsupported: In this mode, NTIO & NTB slot can be used as
+          LT slot. So, two more LSM can be supported in this mode. Therefore,
+          NTIO/NTB board is not supported.
+          ntb-unsupported: In this mode, NTB slot can be used as LT slot.
+          So one more LT can be supported in this mode. Therefore, NTB board will
+          not be supported. This mode is applicable for NFXS-B shelf only.
+          ntio-unsupported: In this mode, there is no NTIO; the slot can be
+          used for an LSM.
+        DEFAULTVALUE:  The default Value of the eqptHolderMode depends
+          on the shelf type. In the case of ARAM-E, default will be ntio-unsupported.
+          All other shelves will default to ntbntio-supported mode.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA          RANGE: See above
+             PERSIST: Yes   DEFVALUE: See above   UNITS: -"
+      ::= { eqptHolderEntry 12 }
+
+
+   eqptHolderSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the serial number of the shelf.
+
+         NOT available    If FIM < 25 in RI, this attribute could not be retrieved.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 13 }
+
+
+   eqptHolderVariant OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the ALU code of the shelf.
+
+          NOT available    If FIM < 25 in RI, this attribute could not be retrieved.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 14 }
+
+   eqptHolderICScode OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the Item Change Status iteration
+          code of the shelf.
+
+          NOT available    If FIM < 25 in RI, this attribute could not be retrieved.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptHolderEntry 15 }
+
+   --  ==================================================================
+   --  |                     STOP HOLDER TABLE                          |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                     START BOARD TABLE                          |
+   --  ==================================================================
+
+   eqptBoardTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptBoardEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A table representing the slots of all planned shelves. Each slot
+          can hold a board of one of the following types: NT, EXT, LSM,
+          ACU, CTRL, applique.
+
+          This table has a row for each slot in each planned shelf.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::=  { asamEquipmentMIB 3 }
+
+   eqptBoardEntry OBJECT-TYPE
+      SYNTAX EqptBoardEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the eqptBoardTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptSlotId }
+      ::=  { eqptBoardTable 1 }
+
+   EqptBoardEntry ::= SEQUENCE {
+      eqptSlotId                         EqptSlotIndex,
+      eqptSlotPlannedType                DisplayString,
+      eqptSlotActualType                 DisplayString,
+      eqptSlotPowerStatus                INTEGER,
+      eqptBoardAdminStatus               INTEGER,
+      eqptBoardOperStatus                INTEGER,
+      eqptBoardOperError                 INTEGER,
+      eqptBoardAvailStatus               INTEGER,
+      eqptBoardRestart                   INTEGER,
+      eqptBoardSwOverruleStatus          INTEGER,
+      eqptBoardContainerId               INTEGER,
+      eqptBoardContainerOffset           INTEGER,
+      eqptBoardInventoryAlcatelCompanyId DisplayString,
+      eqptBoardInventoryTypeName         DisplayString,
+      eqptBoardInventoryPBACode          DisplayString,
+      eqptBoardInventoryFPBACode         DisplayString,
+      eqptBoardInventoryICScode          DisplayString,
+      eqptBoardInventoryCLEICode         DisplayString,
+      eqptBoardInventorySerialNumber     DisplayString,
+      eqptBoardInventoryLastFailedTest   OCTET STRING (SIZE(4)),
+      eqptSlotPlannedCapabilityProfile   AsamProfilePointer,
+      eqptBoardCustAlarmProfile          AsamProfilePointer,
+      eqptBoardLastRestartCause          INTEGER,
+      eqptBoardLastRestartTime           NetworkTimeInSeconds,
+      eqptBoardRestartNumberOfChanges    Counter,
+      eqptBoardRelatedMgntEntityIPAddress   IpAddress,
+      eqptBoardRelatedMgntEntityPairedNumber   INTEGER,
+      eqptBoardDualHostIPAddress         IpAddress,
+      eqptBoardDualHostLsmLocation       EqptHolderIndexOrZero,
+      eqptBoardIfSlotId                  INTEGER,
+      eqptBoardRestartCountPerLt         Counter,
+      eqptBoardClearRestartCountPerLt    TruthValue
+   }
+
+   eqptSlotId OBJECT-TYPE
+      SYNTAX EqptSlotIndex
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A unique value to identify a slot position.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 1 }
+
+   eqptSlotPlannedType OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "A string representing the board (NT, EXT, LSM, ACU, CTRL, Applique) that
+          is planned in the slot.  If the board is planned, the string consists
+          of a mnemonic that identifies the board-type.
+
+          Following mnemonics are valid:
+
+          <BOARD_MNEMONIC> A board of a specific type.  Refer to the ETSI and
+                           US Configurations documents for the list of boards
+                           that are supported in a given release.
+                           ODM board types are planned with the board mnemonic,
+                           they are treated as unmanaged boards.
+
+          EXT_MANAGED      The presence of the LT module can be detected but
+                           it is not managed by this NT in the HYNT module.
+                           The LT type must be planned on the other NT.
+
+          UNMANAGED        Unmanaged board: this means that the presence of
+                           the board can be detected and that the board can
+                           be reset and powered-down but that it is not
+                           possible to establish communication with the board
+                           in software.
+
+          NOT_PLANNED      No board is planned in the slot.
+
+          NOT_ALLOWED      Slot planning is not allowed in this position.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES             RANGE: See above
+             PERSIST: YES   DEFVALUE: 'NOT_PLANNED'   UNITS: -"
+      ::= { eqptBoardEntry 2 }
+
+   eqptSlotActualType OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A string representing the board (NT, EXT, LSM, ACU, CTRL, Applique) that
+          is actually present in the slot.
+
+          Following values are possible:
+
+          <BOARD_MNEMONIC>  Indicates the detected board-type.  Uses same
+                            mnemonics as described in object
+                            eqptSlotPlannedType.
+
+          EMPTY             No board plugged within this slot.
+
+          EXT_MANAGED      The presence of the LT module can be detected but
+                           it is not managed by this NT in the HYNT module.
+                           The LT type must be planned on the other NT.
+
+          UNMANAGED         The type of the detected board is unknown
+                            and the planned board type is UNMANAGED or ODMboardtype.
+
+          UNKNOWN           The type of the detected board is unknown
+                            and the planned board type is not UNMANAGED
+                            and the planned board type is not EXT_MANAGED.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 3 }
+
+   eqptSlotPowerStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         powerUp(1),
+         powerDown(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute is used by the operator to power-up or power-down
+          an LSM slot. This attribute is not supported for other type of slots.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 1..2
+             PERSIST: YES   DEFVALUE: 1     UNITS: -"
+      ::= { eqptBoardEntry 4 }
+
+   eqptBoardAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         unlock(1),
+         lock(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute is used by the operator to lock or unlock the board.
+
+          This attribute is only supported for the following type of boards:
+          NT (but notice that the system will refuse a request to lock the NT
+          of a simplex system), EXT and LSM (if managed).  This attribute has
+          no meaning for an unmanaged or externally managed (EXT_MANAGED) LSM,
+          for an ACU, CTRL or for an applique. An exception is the NRCD-C, CTRL
+          board of the FD-REM, that has LT capabilities next to the regular
+          CTRL capabilities.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 1..2
+             PERSIST: YES   DEFVALUE: 1     UNITS: -"
+      ::= { eqptBoardEntry 5 }
+
+   eqptBoardOperStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         enabled(1),
+         disabled(2)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute informs the operator whether the plug-in unit is able
+          to perform its normal operation.
+
+          This attribute is supported for all type of boards: NT, EXT, LSM,
+          ACU, CTRL, applique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..2
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 6 }
+
+   eqptBoardOperError OBJECT-TYPE
+      SYNTAX INTEGER {
+         no-error(1),                   -- no-error or admin state = Down
+         type-mismatch(2),
+         board-missing(3),
+         board-installation-missing(4),
+         no-planned-board(5),
+         waiting-for-sw(6),
+         init-boot-failed(7),
+         init-download-failed(8),
+         init-connection-failed(9),
+         init-configuration-failed(10),
+         board-reset-protection(11),
+         invalid-parameter(12),
+         temperature-alarm(13),
+         tempshutdown(14),
+         defense(15),
+         board-not-licensed(16),
+         sem-power-fail(17),
+         sem-ups-fail(18),
+         board-in-incompatible-slot(19),
+         download-ongoing(21),
+         unknown-error(255)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute describes for what reason the board is not operational.
+          These values correspond with the alarms which are generated in case of
+          a failure.
+
+          This attribute is supported for all type of boards: NT, EXT, LSM,
+          ACU, CTRL, applique.
+          Default value is no-error, replaced by result from startup sequence.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..15, 255
+             PERSIST: NO    DEFVALUE: 1    UNITS: -"
+      ::= { eqptBoardEntry 7 }
+
+   eqptBoardAvailStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         available(1),    -- board is available, after successfull selftest
+         inTest(2),       -- during selftest or init, after reset or power up
+         failed(3),       -- error, error in selftest or timeout
+         powerOff(4),     -- board is powered off
+         notInstalled(5), -- board is not plugged in
+         offLine(6),      -- board has been disabled
+         dependency(7)    -- board cannot operate because some other resource
+                          -- on which it depends is unavailable
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute provides further information regarding the state
+          of the board. It is set to available after a successfull selftest
+          of the board (if applicable).
+
+          This attribute is supported for all type of boards: NT, EXT, LSM,
+          ACU, CTRL, applique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..7
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 8 }
+
+   eqptBoardRestart OBJECT-TYPE
+      SYNTAX INTEGER {
+         with-selftest(1),
+         without-selftest(2),
+         hot-restart(5),
+         initialValue (255)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Writing a valid value to this object will restart the board in the
+          specified mode.
+
+          This attribute is only supported for the following type of boards:
+          NT, EXT, managed LSM, ACU, CTRL.  For ACU and CTRL boards, only a
+          restart without selftest is supported. An exception is the NRCD-C,
+          FD-REM CTRL board, that has LT capabilities (restart with/without
+          selftest) next to the regular CTRL capabilities.
+          Contains previous restart reason, if not available it has value 255.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 1, 2, 5, 255
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= { eqptBoardEntry 9 }
+
+   eqptBoardSwOverruleStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         no-overrule(1),
+         overrule(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Used to overrule the default software version for this board.
+          This attribute is only supported for managed LSMs.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: 1..2
+             PERSIST: NO    DEFVALUE: 1     UNITS: -"
+      ::= { eqptBoardEntry 10 }
+
+   eqptBoardContainerId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute describes in which equipment holder the slot
+          is contained.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 11 }
+
+   eqptBoardContainerOffset OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute describes the position of the slot in the
+          containing equipment holder.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 12 }
+
+   -- The following attributes are used to represent the board inventory data.
+   -- Board inventory data is retrieved for the following board-types: NT, EXT,
+   -- managed LSM, ACU, CTRL, applique.
+   -- Board inventory data is not retrieved for unmanaged ,externally managed
+   -- (EXT_MANAGED) LSMs and ODM boardtypes.
+
+   eqptBoardInventoryAlcatelCompanyId OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the company of the board.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 13 }
+
+   eqptBoardInventoryTypeName OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the name of the board.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 14 }
+
+   eqptBoardInventoryPBACode OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the Alcatel Printed Board Assembly
+          code of of the board.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 15 }
+
+   eqptBoardInventoryFPBACode OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the Alcatel Printed Board Assembly
+          code of the board, which also identifies the boot software.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 16 }
+
+   eqptBoardInventoryICScode OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the Item Change Status iteration
+          code of the board.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 17 }
+
+   eqptBoardInventoryCLEICode OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the (USA) Common Language Equipment
+          Identification code of the board.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 18 }
+
+   eqptBoardInventorySerialNumber OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute represents the serial number of the board.
+
+          Breakdown of a sample serial number is :
+
+          sample NANT-D serial number is AA1003ZA028
+
+             AA  10    03     ZA028
+                 ---  ====  ==========
+                  |     |        |=====' Production Plant Code
+                  |     |
+                  |     |==============' Week
+                  |
+                  |====================' Year
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 19 }
+
+   eqptBoardInventoryLastFailedTest OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(4))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Identifies the last failing test by means of 4 numbers, from MSB
+          to LSB:
+             - Table number (1 byte)
+             - Segment number (1 byte)
+             - Case number (1 byte)
+             - Check number (1 byte)
+          As long as there has been no failing selftest, the value of this
+          object will be 0.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptBoardEntry 20 }
+
+   eqptSlotPlannedCapabilityProfile OBJECT-TYPE
+      SYNTAX AsamProfilePointer
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "A pointer to the capability profile that will be used for this
+          slot. Capability profiles are only applicable for LT cards
+          that are not EXT_MANAGED and not UNMANAGED,NRNT-A and NTIO cards.
+          Planning the profile should always be done at the same moment the
+          LT/NTIO is planned.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: 0     UNITS: -"
+      ::= { eqptBoardEntry 22 }
+
+   eqptBoardCustAlarmProfile OBJECT-TYPE
+      SYNTAX AsamProfilePointer
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "A pointer to the customizable alarms profile which will be
+    associated to NT for all shelves except FD-REM where the
+    customizable alarms profile will be associated to master LT.
+    In redundant NT shelves the profile will be associated to
+    both NTA and NTB while associating customizable alarms profile
+    to NTA or NTB.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: 0     UNITS: -"
+      ::= { eqptBoardEntry 23 }
+
+   eqptBoardLastRestartCause OBJECT-TYPE
+      SYNTAX INTEGER {
+         poweron(1),
+         unknown(2),
+         watchdog(3),
+         coldreset(4),
+         warmreset(5),
+         hotreset(6),
+         hotreload(7),
+         cleandata(8),
+         emergencybuild(9),
+         poweronreset(10),
+         commitfailure(11),
+         timezonemodified(12)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute gives the last restart cause for board.
+          Currently only LSM board can support. Considering future safe,
+          only use default value for other board entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA        RANGE: See above
+             PERSIST: NO    DEFVALUE: unknown   UNITS: -"
+      ::= { eqptBoardEntry 24 }
+
+   eqptBoardLastRestartTime OBJECT-TYPE
+      SYNTAX NetworkTimeInSeconds
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute gives the last restart time.
+          Currently only LSM board can support. Considering future safe,
+          only use default value for other board entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA    RANGE: See above
+             PERSIST: NO    DEFVALUE: 0     UNITS: -"
+      ::= { eqptBoardEntry 25 }
+
+   eqptBoardRestartNumberOfChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter which indicates the number of restart times.
+          This counter is incremented each time eqptBoardLastRestartTime
+          changes. Considering future safe, only use default value for
+          other board entry.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA    RANGE: See above
+             PERSIST: NO    DEFVALUE: 0     UNITS: -"
+      ::= { eqptBoardEntry 26 }
+
+   eqptBoardRelatedMgntEntityIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Network address. It is a public OAM IP address related to xVPS. For
+    single OAM IP is introduced, multi-xVPS boards existing on a same shelf
+          may use one single OAM IP. This IP is configured on NT which manages
+          these xVPS boards.
+
+          ALCATEL NOTE:
+          SUPPORT: YES      INSRVMOD: NA    RANGE:
+          PERSIST: NO       DEFVALUE: 0     UNITS: -"
+      ::= { eqptBoardEntry 27 }
+
+
+   eqptBoardRelatedMgntEntityPairedNumber OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         " For single OAM IP is introduced, one public OAM IP can not identify an
+           xVPS, so community string is introduced. Each active xVPS will have
+           different community string in one shelf.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE:
+             PERSIST: NO   DEFVALUE: 0   UNITS: -"
+      ::= { eqptBoardEntry 28 }
+
+   eqptBoardDualHostIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Network address. Only applicable for FD REM connected to dual host.
+    It is the public OAM IP address of the host connecting the Lsm in this
+    externally managed slot. It is instantiated with default value and
+    can only be set when the planned type is EXT_MANAGED.
+
+          ALCATEL NOTE:
+          SUPPORT: YES      INSRVMOD: YES   RANGE:
+          PERSIST: YES      DEFVALUE: 0     UNITS: -"
+      ::= { eqptBoardEntry 29 }
+
+
+   eqptBoardDualHostLsmLocation OBJECT-TYPE
+      SYNTAX EqptHolderIndexOrZero
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         " Only applicable for FD REM connected to dual host.
+     It is the Rack/Shelf identifying the location of this
+     externally managed slot, within the scope of the host connecting
+     the Lsm.  The slot component is implicitly present in the key.
+     It is instantiated with default value and can only be set when
+     the planned type is EXT_MANAGED.  The type corresponds to the
+     type EqptHolderIndex, except for the fact that this field can
+     be 0, which is the default value.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: YES  RANGE: See above
+             PERSIST: YES  DEFVALUE: 0    UNITS: -"
+      ::= { eqptBoardEntry 30 }
+
+   eqptBoardIfSlotId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         " This object gives the slot's linear number, which could be
+     used by an external manager to help in mapping a given
+     IfIndex to a physical slot location. It is a numerical value
+     that consists of 6 bits. For a slot that does not carry any
+     interfaces (e.g. applique or NTIO slot), the value is always
+     '0xFF'.
+           Note that this linear slot number is persistent across system
+     restarts, i.e. the same linear slot number will be used for
+     the same slot even after a restart of the ISAM system.
+     However, it is not guaranteed that the same linear slot
+     number will used after a migration to a new release.
+
+      ALCATEL NOTE:
+         SUPPORT: YES  INSRVMOD: YES  RANGE: See above
+         PERSIST: YES  DEFVALUE: 0xFF UNITS: -"
+      ::= { eqptBoardEntry 32 }
+
+      eqptBoardRestartCountPerLt OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter which indicates the number of restart times per LT.
+          This counter is incremented each time eqptBoardLastRestartTime
+          changes.This counter will reset to zero when LT replaced or unplanned.
+
+         Note:This counter is Per LT basis. LTs are distinguished based on serialNumber.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA    RANGE: See above
+             PERSIST: NO    DEFVALUE: 0     UNITS: NA"
+      ::= { eqptBoardEntry 33 }
+
+      eqptBoardClearRestartCountPerLt OBJECT-TYPE
+      SYNTAX TruthValue
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object is a button-like object to reset the eqptBoardRestartCountPerLt counter.
+          When it is set to true(1) value then the corresponding eqptBoardRestartCountPerLt counter is cleared.
+
+          A value set to false(2) or other is ignored..
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA      RANGE: See above
+             PERSIST: NO    DEFVALUE: FALSE   UNITS: NA"
+      ::= { eqptBoardEntry 34 }
+
+
+   --  ==================================================================
+   --  |                     STOP BOARD TABLE                           |
+   --  ==================================================================
+
+   --  ==================================================================
+   --  |                     START SHELF SUMMARY TABLE                  |
+   --  ==================================================================
+
+   eqptShelfSummaryTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptShelfSummaryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Shelf summary table, summarizing slot or board related status
+          changes within each shelf.
+
+          This table has one row per planned shelf.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above."
+      ::= { asamEquipmentMIB 4 }
+
+   eqptShelfSummaryEntry OBJECT-TYPE
+      SYNTAX EqptShelfSummaryEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the shelf summary table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptHolderId }
+      ::= { eqptShelfSummaryTable 1 }
+
+   EqptShelfSummaryEntry ::= SEQUENCE {
+      eqptShelfHwNumberOfChanges         Counter,
+      eqptShelfSlotSummaryOccupation     OCTET STRING,
+      eqptShelfBoardSummaryAdmin         OCTET STRING,
+      eqptShelfBoardSummaryAvail         OCTET STRING,
+      eqptShelfBoardSummaryOper          OCTET STRING,
+      eqptShelfBoardSummaryTypeMismatch  OCTET STRING,
+      eqptShelfBoardSummaryAlarm         OCTET STRING
+   }
+
+   eqptShelfHwNumberOfChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter which indicates the number of configuration or
+          status changes for slots/boards within this shelf. This counter
+          is incremented each time any of the summary table objects of this
+          shelf changes.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptShelfSummaryEntry 1 }
+
+   eqptShelfSlotSummaryOccupation OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Bitmap of the occupation of slots (0 = empty, 1 = full)
+          Applicable for NT, EXT, LSM, ACU, CTRL, applique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptShelfSummaryEntry 2 }
+
+   eqptShelfBoardSummaryAdmin OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Bitmap of the administrative state of the boards
+          (0 = locked, 1 = unlocked).  Applicable for NT, EXT, LSM.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptShelfSummaryEntry 3 }
+
+   eqptShelfBoardSummaryAvail OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Bitmap of the availability state of the boards (0 = not available,
+          1 = available).  Applicable for NT, EXT, LSM, ACU, CTRL, applique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptShelfSummaryEntry 4 }
+
+   eqptShelfBoardSummaryOper OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Bitmap of the operational state of the boards (0 = locked,
+          1 = unlocked).  Applicable for NT, EXT, LSM, ACU, CTRL, applique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptShelfSummaryEntry 5 }
+
+   eqptShelfBoardSummaryTypeMismatch OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Bitmap of the mismatch between the actual board-type and the planned
+          board-type (0 = mismatch, 1 = no mismatch).
+          Applicable for NT, EXT, LSM, ACU, CTRL, applique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptShelfSummaryEntry 6 }
+
+   eqptShelfBoardSummaryAlarm OBJECT-TYPE
+      SYNTAX OCTET STRING (SIZE(8))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Bitmap of the boards which generated an alarm (0 = alarm,
+          1 = no alarm).  Applicable for NT, EXT, LSM, ACU, CTRL, applique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA   RANGE: See above
+             PERSIST: NO   DEFVALUE: NA   UNITS: -"
+      ::= { eqptShelfSummaryEntry 7 }
+
+   --  ==================================================================
+   --  |                     STOP SHELF SUMMARY TABLE                   |
+   --  ==================================================================
+
+   eqptProt OBJECT IDENTIFIER ::= { asamEquipmentMIB 5 }
+
+   eqptProtNextProtGroupId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object contains an appropriate value to be used for
+          eqptProtGroupId when creating entries in the eqptProtGroupTable.
+          The value 0 indicates that no unassigned entries are available.
+          After each retrieval, the agent will modify the value to the
+          next unassigned index.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA    UNITS: -"
+      ::= {eqptProt 1}
+
+   --  ==================================================================
+   --  |                     START PROTECTIONGROUP TABLE                |
+   --  ==================================================================
+
+   eqptProtGroupTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptProtGroupEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A table representing groups of protected or protecting elements.
+          Only one row for NT protection group which will always be created and
+          cannot be deleted.
+          From ISAM R4.1.02 the default created NT protection group will be locked.
+          (before it was unlocked).
+          From R3.3 onwards, each LT protection group (comprised of 2 adjacent
+          slots LT n and LT n+1, where n is a odd number), also has a row.
+          The protection groups are created by default even though
+          the protection groups are not used.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE:  DEP as described above "
+      ::= { eqptProt 2 }
+
+   eqptProtGroupEntry OBJECT-TYPE
+      SYNTAX EqptProtGroupEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the eqptProtGroupTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptProtGroupId }
+      ::= { eqptProtGroupTable 1 }
+
+   EqptProtGroupEntry ::= SEQUENCE {
+      eqptProtGroupId                     INTEGER,
+      eqptProtGroupType                   INTEGER,
+      eqptProtGroupNumberOfChanges        Counter,
+      eqptProtGroupSwitchoverCount        Counter,
+      eqptProtGroupLastSwitchoverReason   INTEGER,
+      eqptProtGroupEpsQuenchfactor        TimeTicks,
+      eqptProtGroupAlarmBitmap            INTEGER,
+      eqptProtGroupAdminStatus            INTEGER,
+      eqptProtGroupAdminProtElement       INTEGER,
+      eqptProtGroupOperProtElement        INTEGER,
+      eqptProtGroupRowStatus              RowStatus
+   }
+
+   eqptProtGroupId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A unique value to identify a protection group.
+          The value 1 is reserved for the NT protection group,
+          which is always present and cannot be deleted.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptProtGroupEntry 1}
+
+   eqptProtGroupType OBJECT-TYPE
+      SYNTAX INTEGER {
+         one-plus-one(1),
+         one-for-N(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This attributes distinguishes between 1+1 and 1:N protection groups.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA                RANGE: 1..2
+             PERSIST: YES   DEFVALUE: one-plus-one(1)   UNITS: -"
+      ::= { eqptProtGroupEntry 2 }
+
+   eqptProtGroupNumberOfChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter which indicates the number of status changes
+          in this protection group as well as the status changes for the
+          protecting elements within this group:
+              eqptProtGroupSwitchoverCount;
+              eqptProtGroupLastSwitchoverReason;
+              eqptProtGroupAlarmBitmap;
+              eqptProtElementStandbyStatus.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptProtGroupEntry 3 }
+
+   eqptProtGroupSwitchoverCount OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Wrap around counter for the number of switchovers being performed.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 0    UNITS: -"
+      ::= { eqptProtGroupEntry 4 }
+
+   eqptProtGroupLastSwitchoverReason OBJECT-TYPE
+      SYNTAX INTEGER {
+          noSwitchOver(1),          -- no switch over has been performed yet
+          forcedActive(2),          -- chain is forced active
+          boardNotPresent(3),       -- board is removed or not reachable
+          extenderChainFailure(4),  -- extender chain failure
+          linkFailure(5),           -- link failure
+          watchDogTimeOut(6),       -- redundancy watchdog
+          fileSystemCorrupt(7),     -- curruption of file system
+          configurationMismatch(8), -- mismatch in boardType or Swversion
+          boardUnplanned(9),        -- board has been unplanned
+          boardLocked(10),          -- board has been locked
+          shelfDefense(11),         -- shelf-error detected by defense
+          revertiveSwitchOver(12),  -- switchover because protected board is
+                                    -- operational again (in case of 1:N)
+          lanxFailure(13),          -- lanx not alive
+           lanxHwFailure(14),        -- active Lanx has detected a
+                                    -- hardware failure
+          lanxSdkFailure(15),       -- active Lanx has detected a
+                                    -- SDK-failure
+          dpoeAppFailure(16),       -- active DPoE has detected application failure
+          dpoeUnreachable(17)       -- DPoE is not reachable
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This object contains the reason of the last switch over.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..17
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptProtGroupEntry 5 }
+
+   eqptProtGroupEpsQuenchfactor OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This object contains a timervalue in 1/100 sec. The EpsQuench timer
+          is used to prevent continuous switch-overs in case of unstable EPS.
+          Value equal to zero means the quenching mechanism is disabled.
+          Configuration of the EPS quenchfactor has mainly be foreseen for
+          test purposes. Operators should preferably not be able to
+          reconfigure the default value.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES       RANGE: See above
+             PERSIST: YES   DEFVALUE: 1440000   UNITS: 0.01 seconds"
+      DEFVAL { 1440000}   -- 4 hours
+      ::= { eqptProtGroupEntry 6 }
+
+   eqptProtGroupAlarmBitmap OBJECT-TYPE
+      SYNTAX INTEGER (1..4294967295)
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Status bitmap:
+             bit 0 set means No defect at all
+             bit 1 : if bit set, Standby degradation alarm is set
+                     (excludes bit 0 setting)
+             bit 2 .. 31 : reserved for future extensions.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA           RANGE: See above
+             PERSIST: NO    DEFVALUE: 0x00000001   UNITS: -"
+      ::= { eqptProtGroupEntry 7 }
+
+   eqptProtGroupAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         unlock(1),
+         lock(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Used by the administrator to disable or enable protection within
+          that protection group.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES         RANGE: 1..2
+             PERSIST: YES   DEFVALUE: unlock(1)   UNITS: -"
+      ::= { eqptProtGroupEntry 8 }
+
+   eqptProtGroupAdminProtElement OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Only supported for 1:N protection groups. In case of a forced
+          switchover to the spare element, this attribute is used to specify
+          the element to be protected. The value 0 means that no element is
+          specified.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA    UNITS: -"
+      ::= { eqptProtGroupEntry 9 }
+
+   eqptProtGroupOperProtElement OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Only supported for 1:N protection groups. Indicates which element
+          is currently protected by the spare element. The value 0 means that
+          currently the spare element is not protecting any element.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptProtGroupEntry 10 }
+
+   eqptProtGroupRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Entries in the eqptProtGroupTable can only be created at once, by
+          specifying eqptProtGroupRowStatus=createAndGo(4).
+          For NT protection group, if all values are valid then the
+          entry is made active(1). For LT protection group, if the group
+          is in service then the entry is made active(1). If the group
+          is not in service then the entry is made notInService(2).
+          If the object is set to destroy(6), the entry is deleted.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO for ISAM R3.3   RANGE: See above
+             PERSIST: NO    DEFVALUE: active(1)          UNITS: -"
+      ::= { eqptProtGroupEntry 11 }
+
+   --  ==================================================================
+   --  |                     STOP  PROTECTIONGROUP TABLE                |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                     START PROTECTIONELEMENT TABLE              |
+   --  ==================================================================
+
+   eqptProtElementTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptProtElementEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A table representing the protected or protecting elements.
+          An element can be either a board or an extension chain. Both are
+          identified by the corresponding slot identifier (extension chain
+          is identified by slot of corresponding NT board).
+          This table has only two rows from ISAM R2.2 to R3.2.
+          From R3.3 onwards, this table has a row for each slots in the
+          main shelf.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above "
+      ::= { eqptProt 3 }
+
+   eqptProtElementEntry OBJECT-TYPE
+      SYNTAX EqptProtElementEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the eqptProtElementTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptSlotId }
+      ::= { eqptProtElementTable 1 }
+
+   EqptProtElementEntry  ::= SEQUENCE {
+      eqptProtElementGroupId               INTEGER,
+      eqptProtElementType                  INTEGER,
+      eqptProtElementStandbyStatus         INTEGER,
+      eqptProtElementRedcyCtrlStatus       INTEGER,
+      eqptProtElementRowStatus             RowStatus,
+      eqptProtElementStandbyStatuschangeReason INTEGER
+   }
+
+   eqptProtElementGroupId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This attributes identifies the protection group to which this
+          element belongs.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NO for ISAM R3.3   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA                 UNITS: -"
+      ::= { eqptProtElementEntry 1}
+
+   eqptProtElementType OBJECT-TYPE
+      SYNTAX INTEGER {
+         normal(1),
+         spare(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute is used to distinguish between normal elements of
+          a protection group and the spare element of a 1:N protection group.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA          RANGE: 1..2
+             PERSIST: YES   DEFVALUE: normal(1)   UNITS: -"
+      ::= { eqptProtElementEntry 2}
+
+   eqptProtElementStandbyStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         providing-service(1),       --active and providing service
+         hot-standby(2),             --standby and ready to become active
+         cold-standby(3),            --standby but not synchronized
+         idle(4)                     --not able to protect peer board
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute reflects the standby status of the protection
+          group element.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..4
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptProtElementEntry 3}
+
+   eqptProtElementRedcyCtrlStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+         normal(1),
+         forced-active(2)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute is used to force a switchover between elements of
+          a protection group or to keep one of the elements active.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: YES         RANGE: 1..2
+             PERSIST: YES   DEFVALUE: normal(1)   UNITS: -"
+      ::= { eqptProtElementEntry 4}
+
+   eqptProtElementRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Entries in the eqptProtElementTable can only be created at once,
+          by specifying eqptProtEelementRowStatus=createAndGo(4). If all
+          values are valid then the entry is made active(1). If the object
+          is set to destroy(6), the entry is deleted.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA          RANGE: See above
+             PERSIST: NO    DEFVALUE: active(1)   UNITS: -"
+      ::= { eqptProtElementEntry 5}
+
+   eqptProtElementStandbyStatuschangeReason OBJECT-TYPE
+      SYNTAX INTEGER {
+         none(0),                     -- standby state is hot standby
+                                    -- or not applicable (default value)
+         protectionGroupLocked(1),    -- redundancy is not enabled
+         forcedActive(2),             -- active board is put to forced active
+         peerLinkUnAvailable(3),      -- standby NT link is not available
+         peerLocked(4),               -- standby board is locked
+         peerNotPlanned(5),           -- standby board is not planned
+         peerNotPluggedIn(6),         -- standby board is not plugged in
+         databaseNotInSync(7),        -- data base is not synchronized
+         lanxDynamicDataNotSynced(8), -- lanx has not synchronized its data
+         lanxSdkFailure(9),           -- standby Lanx has detected a
+                                      -- non recoverable SDK-failure
+         lanxRecovSdkFailure(10),     -- standby Lanx has deteced a
+                                      -- recoverable SDK-failure
+         lanxHwFailure(11),           -- standby Lanx has deteced a hardware failure
+         lanxDynDataSyncFailure(12),  -- standby lanx could not
+                                      -- synchronize its dynamic data
+         lanxStaticSyncFailure(13),   -- standby lanx could not
+                                      -- synchronize its static data
+         lanxPeerCommFailure(14),     -- standby Lanx has lost communication
+                                      -- with the active lanx
+         lanxFailure(15),             -- standby lanx not alive
+         linkGroupNotAvailable(16),   -- link group not available
+         ltNotEnabled(17),            -- for LT redundancy : LT not enabled
+         lanxHiGigFailure(18),        -- lanx (act or stb has detected a HiGiG
+                                      -- failure
+         lanxReconcileFailure(19),    -- lanx has detected a failure in the
+                                      -- reconcile phase (a.k.a. bulk sync phase)
+         lanxDiscoveryFailure(20),    -- act lanx is not able to detect the mate
+                                      -- although the HiGig is up and running.
+         dpoeAppFailure(21),          -- standby DPoE has detected application
+                                      -- failure
+         dpoeCommFailure(22),         -- standby DPoE has lost communication with
+                                      -- active DPoE
+         dpoeSyncFailure(23),         -- standby DPoE could not do synchronization
+                                      -- with active DPoE
+         dpoeUnreachable(24)          -- standby DPoE is not reachable
+
+   }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This attribute reflects the reason why the standby status of the protection group element has changed.
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA        RANGE: 0..24
+             PERSIST: NO    DEFVALUE: none(0)   UNITS: -"
+      ::= { eqptProtElementEntry 6}
+
+   --  ==================================================================
+   --  |                     STOP PROTECTIONELEMENT TABLE               |
+   --  ==================================================================
+
+   eqptProfile OBJECT IDENTIFIER ::= { asamEquipmentMIB 6 }
+
+   --  ==================================================================
+   --  |                     START PROFILE TABLE                        |
+   --  ==================================================================
+
+   eqptProfileTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptProfileEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A table holding the mapping between the profileId and the corresponding
+          profile name.
+          This table has a row for every profile in the system.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::=  { eqptProfile 1 }
+
+   eqptProfileEntry OBJECT-TYPE
+      SYNTAX EqptProfileEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the eqptProfileTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptProfileId }
+      ::=  { eqptProfileTable 1 }
+
+   EqptProfileEntry ::= SEQUENCE {
+      eqptProfileId                      AsamProfileIndex,
+      eqptProfileName                    AsamProfileName,
+      eqptProfileDescription             DisplayString
+   }
+
+   eqptProfileId OBJECT-TYPE
+      SYNTAX AsamProfileIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A value identifying a profile.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptProfileEntry 1 }
+
+   eqptProfileName OBJECT-TYPE
+      SYNTAX AsamProfileName
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The corresponding name for a given profile id.
+          The name corresponding to the ProfileId must also be unique.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptProfileEntry 2 }
+
+   eqptProfileDescription OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A short description for the given profile, explaining the
+          key attributes.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptProfileEntry 3 }
+
+   --  ==================================================================
+   --  |                     STOP PROFILE TABLE                         |
+   --  ==================================================================
+
+   --  ==================================================================
+   --  |                     START PROFILE APPLICABILITY TABLE          |
+   --  ==================================================================
+
+   eqptProfileApplicabilityTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptProfileApplicabilityEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "This table lists for every defined profile in the system for
+          which boards it is applicable.
+          One profile can be applicable for multiple board types.
+          Multiple profiles can be applicable for the same board type.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::=  { eqptProfile 2 }
+
+   eqptProfileApplicabilityEntry OBJECT-TYPE
+      SYNTAX EqptProfileApplicabilityEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the eqptProfileApplicabilityTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptProfileId, eqptBoardType }
+      ::=  { eqptProfileApplicabilityTable 1 }
+
+   EqptProfileApplicabilityEntry ::= SEQUENCE {
+      eqptBoardType                      DisplayString,
+      eqptDefaultProfile                 TruthValue
+   }
+
+
+   eqptBoardType OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A string representing the board for which the profile is applicable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptProfileApplicabilityEntry 1 }
+
+   eqptDefaultProfile OBJECT-TYPE
+      SYNTAX TruthValue
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "A flag indicating if this is the default profile for a specific
+          board type.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptProfileApplicabilityEntry 2 }
+
+   --  ==================================================================
+   --  |                     STOP PROFILE APPLICABILITY TABLE           |
+   --  ==================================================================
+
+   eqptTestChainTable   OBJECT-TYPE
+      SYNTAX         SEQUENCE OF EqptTestChainEntry
+      ACCESS         not-accessible
+      STATUS         mandatory
+      DESCRIPTION
+        "A table contains the test chain configuration indicating
+         which shelf is connected to the TAP_UP or whether an external
+         test head is connected to the TAP_UP. This table has one row
+         for each planned shelf.
+
+         ALCATEL NOTE:
+            TABLESIZE: DEP as described above"
+      ::=  { asamEquipmentMIB 7 }
+
+   eqptTestChainEntry   OBJECT-TYPE
+      SYNTAX         EqptTestChainEntry
+      ACCESS         not-accessible
+      STATUS         mandatory
+      DESCRIPTION
+         "An entry in the eqptTestChainTable."
+
+      INDEX { eqptHolderId }
+      ::=  { eqptTestChainTable 1 }
+
+   EqptTestChainEntry ::= SEQUENCE {
+      eqptTestChainShelfToTapUp           INTEGER,
+      eqptTestChainExtTestHeadToTapUp     INTEGER
+   }
+
+   eqptTestChainShelfToTapUp     OBJECT-TYPE
+      SYNTAX                     INTEGER (0..255)
+      ACCESS                     read-write
+      STATUS                     mandatory
+      DESCRIPTION
+        "A unique value to identify a shelf position which is connected
+         to the TAP_UP. The value '0' (default value) indicates that it
+         is not connected. This parameter is used if
+         eqptTestChainExtTestHeadToTapUp is set to '1' (i.e., 'no') and
+         is ignored if eqptTestChainExtTestHeadToTapUp is set to '2'
+         (i.e., 'yes').
+
+         ALCATEL NOTE:
+            ACCESS: NA     USAGE: OPT      PERSIST: YES     INSRVMOD: YES
+            RANGE: DEP / 0 plus the range of eqptHolderId of the shelves.
+            DEFVALUE: 0 / this means that no shelf is configured to be
+               connected to the TAP_UP.
+            UNITS: NA      SPARSE: NO      DESCR: NA
+         "
+       ::= { eqptTestChainEntry 1 }
+
+    eqptTestChainExtTestHeadToTapUp       OBJECT-TYPE
+       SYNTAX                         INTEGER {
+                                          no (1),
+                                          yes (2)
+                                      }
+       ACCESS                         read-write
+       STATUS                         mandatory
+       DESCRIPTION
+           "This parameter is used to indicate whether an external test
+            head is connected to the TAP_UP.
+            no (1): no external test head is connected to the TAP_UP.
+            yes (2): an external test head is connected to the TAP_UP.
+
+            ALCATEL NOTE:
+                 ACCESS: NA         USAGE: OPT         PERSIST: YES
+                 INSRVMOD: YES      RANGE: 1..2        DEFVALUE: 1
+                 UNITS: NA          SPARSE: NO         DESCR: NA
+             "
+       ::= { eqptTestChainEntry 2 }
+
+
+   eqptCustAlarmProfile OBJECT IDENTIFIER ::= { asamEquipmentMIB 8 }
+
+   --  ==================================================================
+   --  |                     START CUSTOMIZABLE ALARMS PROFILE TABLE    |
+   --  ==================================================================
+
+   eqptCustAlarmProfileIndexNext OBJECT-TYPE
+      SYNTAX AsamNextProfileIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+           "This object contains an appropriate value to be used for
+            eqptCustAlarmProfileIndex
+            when creating entries in the associated profile table.
+            The value 0 indicates that no unassigned entries are
+            available. To obtain the profile index value for a new
+            entry, the manager issues a management protocol retrieval
+            operation to obtain the current value of this object.
+            After each retrieval, the agent should modify the value to
+            the next unassigned index."
+    ::= { eqptCustAlarmProfile 1 }
+
+
+   eqptCustAlarmProfileTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptCustAlarmProfileEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A table representing the configurable attributes of the customizable
+          alarms : a description, and the corresponding Alarm Outputs to be
+          activated when this alarm occurs.
+
+          This table has a row for each external alarms profile.  It offers data
+          for a maximum of 5 external alarms.  Alarms that are not defined for
+          a particular profile, need to contain default values in the fields
+          corresponding to that alarm number.  Independent of the alarm number,
+          the name of the profile is also present, as well as the row status.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::=  { eqptCustAlarmProfile 2}
+
+   eqptCustAlarmProfileEntry OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the eqptCustAlarmProfileTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptCustAlarmProfileIndex }
+      ::=  { eqptCustAlarmProfileTable 1 }
+
+   EqptCustAlarmProfileEntry ::= SEQUENCE {
+      eqptCustAlarmProfileIndex                  AsamProfileIndex,
+      eqptCustAlarmProfileName                   AsamProfileName,
+      eqptCustAlarmProfileUsedStatus             AsamProfileRefCount,
+      eqptCustAlarmProfileRowStatus              RowStatus,
+      eqptCustAlarmProfileMnemonic1              DisplayString,
+      eqptCustAlarmProfileDescription1           DisplayString,
+      eqptCustAlarmProfileVisibleOutput1         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfileAudibleOutput1         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfilePolarity1              EqptCustAlarmProfilePolarityType,
+      eqptCustAlarmProfileSeverity1              AsamAlarmSeverityType,
+      eqptCustAlarmProfileMnemonic2              DisplayString,
+      eqptCustAlarmProfileDescription2           DisplayString,
+      eqptCustAlarmProfileVisibleOutput2         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfileAudibleOutput2         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfilePolarity2              EqptCustAlarmProfilePolarityType,
+      eqptCustAlarmProfileSeverity2              AsamAlarmSeverityType,
+      eqptCustAlarmProfileMnemonic3              DisplayString,
+      eqptCustAlarmProfileDescription3           DisplayString,
+      eqptCustAlarmProfileVisibleOutput3         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfileAudibleOutput3         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfilePolarity3              EqptCustAlarmProfilePolarityType,
+      eqptCustAlarmProfileSeverity3              AsamAlarmSeverityType,
+      eqptCustAlarmProfileMnemonic4              DisplayString,
+      eqptCustAlarmProfileDescription4           DisplayString,
+      eqptCustAlarmProfileVisibleOutput4         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfileAudibleOutput4         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfilePolarity4              EqptCustAlarmProfilePolarityType,
+      eqptCustAlarmProfileSeverity4              AsamAlarmSeverityType,
+      eqptCustAlarmProfileMnemonic5              DisplayString,
+      eqptCustAlarmProfileDescription5           DisplayString,
+      eqptCustAlarmProfileVisibleOutput5         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfileAudibleOutput5         EqptCustAlarmProfileOutputType,
+      eqptCustAlarmProfilePolarity5              EqptCustAlarmProfilePolarityType,
+      eqptCustAlarmProfileSeverity5              AsamAlarmSeverityType
+   }
+
+   eqptCustAlarmProfileIndex OBJECT-TYPE
+      SYNTAX AsamProfileIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The Customizale Alarms Profile Index.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..20
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 1 }
+
+  eqptCustAlarmProfileName OBJECT-TYPE
+      SYNTAX AsamProfileName
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "A textual name uniquely identifying this profile.
+
+          Maximum length is 32, allowed characters A-Z, a-z, 0-9, '-'.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 2 }
+
+   eqptCustAlarmProfileUsedStatus OBJECT-TYPE
+      SYNTAX AsamProfileRefCount
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Indicates the number of entities using this profile.  If the
+          reference count is greater than 0, then this profile is 'in use',
+          and may NOT be deleted.  If the value is 0, then this profile is
+          'not in use', and can be deleted.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 3 }
+
+   eqptCustAlarmProfileRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Entries in the eqptCustAlarmProfileTable can only be created at
+          once, by specifying eqptCustAlarmProfileRowStatus=createAndGo(4).
+          If all values are valid then the entry is made active(1). If the
+          object is set to destroy(6), the entry is deleted.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  INSRVMOD: NA          RANGE: See above
+             PERSIST: NO   DEFVALUE: active(1)   UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 4 }
+
+   eqptCustAlarmProfileMnemonic1 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..16))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The mnemonic of the customizable alarm, for given Profile Index,
+          for external alarm number 1.
+
+          Maximum length is 16, allowed characters A-Z.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'UNDEF' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 5 }
+
+   eqptCustAlarmProfileDescription1 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..40))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The description of the customizable alarm, for given
+          Profile Index, for external alarm number 1.
+
+          Maximum length is 40.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'Undefined' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 6 }
+
+   eqptCustAlarmProfileVisibleOutput1 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the visible alarm output,
+          for given Profile Index, for external alarm number 1.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 7 }
+
+   eqptCustAlarmProfileAudibleOutput1 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the audible alarm output,
+          for given Profile Index, for external alarm number 1.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 8 }
+
+   eqptCustAlarmProfilePolarity1 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfilePolarityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether the alarm polarity is normal or inversed,
+          for given Profile Index, for external alarm number 1.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: normal(2)   UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 9 }
+
+   eqptCustAlarmProfileSeverity1 OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows the severity of the alarm,
+          for given Profile Index, for external alarm number 1.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: 1-5
+             PERSIST: YES   DEFVALUE: major(4) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 10 }
+
+   eqptCustAlarmProfileMnemonic2 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..16))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The mnemonic of the customizable alarm, for given Profile Index,
+          for external alarm number 2.
+
+          Maximum length is 16, allowed characters A-Z.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'UNDEF' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 11 }
+
+   eqptCustAlarmProfileDescription2 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..40))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The description of the customizable alarm, for given
+          Profile Index, for external alarm number 2.
+
+          Maximum length is 40.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'Undefined'   UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 12 }
+
+   eqptCustAlarmProfileVisibleOutput2 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the visible alarm output,
+          for given Profile Index, for external alarm number 2.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 13 }
+
+   eqptCustAlarmProfileAudibleOutput2 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the audible alarm output,
+          for given Profile Index, for external alarm number 2.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 14 }
+
+   eqptCustAlarmProfilePolarity2 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfilePolarityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether the alarm polarity is normal or inversed,
+          for given Profile Index, for external alarm number 2.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: normal(2), UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 15 }
+
+   eqptCustAlarmProfileSeverity2 OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows the severity of the alarm,
+          for given Profile Index, for external alarm number 2.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: 1-5
+             PERSIST: YES   DEFVALUE: major(4) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 16 }
+
+   eqptCustAlarmProfileMnemonic3 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..16))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The mnemonic of the customizable alarm, for given Profile Index,
+          for external alarm number 3.
+
+          Maximum length is 16, allowed characters A-Z.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'UNDEF' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 17 }
+
+   eqptCustAlarmProfileDescription3 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..40))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The description of the customizable alarm, for given
+          Profile Index, for external alarm number 3.
+
+          Maximum length is 40.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'Undefined' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 18 }
+
+   eqptCustAlarmProfileVisibleOutput3 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the visible alarm output,
+          for given Profile Index, for external alarm number 3.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 19 }
+
+   eqptCustAlarmProfileAudibleOutput3 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the audible alarm output,
+          for given Profile Index, for external alarm number 3.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 20 }
+
+   eqptCustAlarmProfilePolarity3 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfilePolarityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether the alarm polarity is normal or inversed,
+          for given Profile Index, for external alarm number 3.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: normal(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 21 }
+
+   eqptCustAlarmProfileSeverity3 OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows the severity of the alarm,
+          for given Profile Index, for external alarm number 3.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: 1-5
+             PERSIST: YES   DEFVALUE: major(4) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 22 }
+
+   eqptCustAlarmProfileMnemonic4 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..16))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The mnemonic of the customizable alarm, for given Profile Index,
+          for external alarm number 4.
+
+          Maximum length is 16, allowed characters A-Z.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'UNDEF' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 23 }
+
+   eqptCustAlarmProfileDescription4 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..40))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The description of the customizable alarm, for given
+          Profile Index, for external alarm number 4.
+
+          Maximum length is 40.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'Undefined' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 24 }
+
+   eqptCustAlarmProfileVisibleOutput4 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the visible alarm output,
+          for given Profile Index, for external alarm number 4.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 25 }
+
+   eqptCustAlarmProfileAudibleOutput4 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the audible alarm output,
+          for given Profile Index, for external alarm number 4.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 26 }
+
+   eqptCustAlarmProfilePolarity4 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfilePolarityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether the alarm polarity is normal or inversed,
+          for given Profile Index, for external alarm number 4.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: normal(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 27 }
+
+   eqptCustAlarmProfileSeverity4 OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows the severity of the alarm,
+          for given Profile Index, for external alarm number 4.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: 1-5
+             PERSIST: YES   DEFVALUE: major(4) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 28 }
+
+   eqptCustAlarmProfileMnemonic5 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..16))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The mnemonic of the customizable alarm, for given Profile Index,
+          for external alarm number 5.
+
+          Maximum length is 16, allowed characters A-Z.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'UNDEF' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 29 }
+
+   eqptCustAlarmProfileDescription5 OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..40))
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The description of the customizable alarm, for given
+          Profile Index, for external alarm number 5.
+
+          Maximum length is 40.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: 'Undefined' UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 30 }
+
+   eqptCustAlarmProfileVisibleOutput5 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the visible alarm output,
+          for given Profile Index, for external alarm number 5.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 31 }
+
+   eqptCustAlarmProfileAudibleOutput5 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfileOutputType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether or not to trigger the audible alarm output,
+          for given Profile Index, for external alarm number 5.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: notTriggered(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 32 }
+
+   eqptCustAlarmProfilePolarity5 OBJECT-TYPE
+      SYNTAX EqptCustAlarmProfilePolarityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows whether the alarm polarity is normal or inversed,
+          for given Profile Index, for external alarm number 5.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: normal(2) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 33 }
+
+   eqptCustAlarmProfileSeverity5 OBJECT-TYPE
+      SYNTAX AsamAlarmSeverityType
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "Shows the severity of the alarm,
+          for given Profile Index, for external alarm number 5.
+
+          ALCATEL NOTE:
+             SUPPORT: NO    INSRVMOD: NA   RANGE: 1-5
+             PERSIST: YES   DEFVALUE: major(4) UNITS: -"
+      ::= { eqptCustAlarmProfileEntry 34 }
+
+   --  ==================================================================
+   --  |                     STOP CUSTOMIZABLE ALARMS PROFILE TABLE     |
+   --  ==================================================================
+   --  ==================================================================
+   --  |            START CUSTOMIZABLE ALARMS PROFILE MAPPING TABLE     |
+   --  ==================================================================
+
+   eqptCustAlarmProfileMappingTable OBJECT-TYPE
+      SYNTAX     SEQUENCE OF EqptCustAlarmProfileMappingEntry
+      ACCESS     not-accessible
+      STATUS     mandatory
+      DESCRIPTION
+            "The table listing the profile name to profile Index
+            Mapping."
+      ::= { eqptCustAlarmProfile 3}
+
+   eqptCustAlarmProfileMappingEntry OBJECT-TYPE
+      SYNTAX     EqptCustAlarmProfileMappingEntry
+      ACCESS     not-accessible
+      STATUS     mandatory
+      DESCRIPTION
+            "An entry (conceptual row) representing the Customizable Alarm Profile
+             Name to Index mapping.  The system automatically creates an entry in
+             this table for each corresponding entry (custAlarm-profile) created
+             in the eqptCustAlarmProfileTable.  Similarly, when a profile is
+             deleted, the corresponding entry in this table is also automatically
+             deleted by the system."
+          INDEX {eqptCustAlarmProfileMappingName }
+        ::= {eqptCustAlarmProfileMappingTable 1}
+
+   EqptCustAlarmProfileMappingEntry ::= SEQUENCE {
+      eqptCustAlarmProfileMappingName                  AsamProfileName,
+      eqptCustAlarmProfileMappingIndex                 AsamProfileIndex
+   }
+
+   eqptCustAlarmProfileMappingName OBJECT-TYPE
+      SYNTAX AsamProfileName
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "A textual name uniquely identifying this profile.
+          This name has to be unique within the assigned scope.
+
+          Maximum length is 32, allowed characters A-Z, a-z, 0-9, '-'.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptCustAlarmProfileMappingEntry 1 }
+
+   eqptCustAlarmProfileMappingIndex OBJECT-TYPE
+      SYNTAX AsamProfileIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The Customizale Alarms Profile Index.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..20
+             PERSIST: YES   DEFVALUE: NA   UNITS: -"
+      ::= { eqptCustAlarmProfileMappingEntry 2 }
+
+   --  ==================================================================
+   --  |              STOP CUSTOMIZABLE ALARMS PROFILE MAPPING TABLE    |
+   --  ==================================================================
+   --  ==================================================================
+   --  |              START MTA FIELD                                   |
+   --  ==================================================================
+
+   eqptMtaTest OBJECT IDENTIFIER ::= { asamEquipmentMIB 9 }
+   eqptMtaTestHeadType OBJECT-TYPE
+  SYNTAX INTEGER {
+                         four-wire(1),
+                         two-wire(2)
+          }
+  ACCESS read-write
+  STATUS mandatory
+  DESCRIPTION
+           "setting the MTA test head type, four-wire mode or two-wire mode.
+           This object should be consistent with external test head equipment,
+           MTA subsystem will operate different relays based on this object.
+           MTA commands will have differentiation between these two mode.
+
+           ALCATEL NOTE:
+              ACCESS: NA         USAGE: OPT         PERSIST: YES
+              INSRVMOD: YES      RANGE: 1..2        DEFVALUE: 1
+              UNITS: NA          SPARSE: NO         DESCR: NA"
+        ::= { eqptMtaTest 1 }
+
+   --  ==================================================================
+   --  |              STOP MTA FIELD                                    |
+   --  ==================================================================
+   --  ==================================================================
+   --  |          START BOARD THERMAL SENSOR TABLE                      |
+   --  ==================================================================
+   eqptBoardThermalSensorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EqptBoardThermalSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+             "A table representing the actual value and thresholds of Thermal Sensor(s) on boards.
+             One entry corresponds to each sensor on board.
+             The entries are presented only when the board is plugged in, operationally up, has thermal sensors on it, and when operator put a read request for it.
+
+             ALCATEL NOTE:
+             SUPPORT: YES  TABLESIZE: DEP as described above"
+          ::= { asamEquipmentMIB 10 }
+
+   eqptBoardThermalSensorEntry OBJECT-TYPE
+    SYNTAX EqptBoardThermalSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+             "An entry of the equipment thermal sensor table on boards
+
+             ALCATEL NOTE:
+             SUPPORT: YES"
+             INDEX {eqptSlotId, eqptBoardThermalSensorId}
+          ::= {eqptBoardThermalSensorTable 1}
+
+   EqptBoardThermalSensorEntry ::= SEQUENCE{
+    eqptBoardThermalSensorId      INTEGER,
+    eqptBoardThermalSensorActualTemperature    INTEGER,
+    eqptBoardThermalSensorTcaThresholdLow    INTEGER,
+    eqptBoardThermalSensorTcaThresholdHigh    INTEGER,
+    eqptBoardThermalSensorShutdownThresholdLow  INTEGER,
+    eqptBoardThermalSensorShutdownThresholdHigh  INTEGER
+    }
+
+  eqptBoardThermalSensorId OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS read-only
+   STATUS mandatory
+   DESCRIPTION
+            "Index of thermal sensors on board.
+
+            ALCATEL NOTE:
+            SUPPORT: YES   INSRVMOD: NA     RANGE: 1..15
+            PERSIST: NO    DEFVALUE: NA         UNITS: - "
+         ::= { eqptBoardThermalSensorEntry 1}
+
+   eqptBoardThermalSensorActualTemperature OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "Actual Temperature value read from thermal sensor on board.
+
+            ALCATEL NOTE:
+            SUPPORT: YES   INSRVMOD: NA     RANGE: -40..150
+            PERSIST: NO    DEFVALUE: NA         UNITS: degree Celsius"
+         ::={ eqptBoardThermalSensorEntry 2}
+
+   eqptBoardThermalSensorTcaThresholdLow  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+             "Low Tca threshold of thermal sensor on Board
+
+             ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+             PERSIST: NO    DEFVALUE: NA         UNITS: degree Celsius"
+          ::= { eqptBoardThermalSensorEntry 3}
+
+   eqptBoardThermalSensorTcaThresholdHigh  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+             "High Tca threshold of thermal sensor on Board
+
+             ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+             PERSIST: NO    DEFVALUE: NA         UNITS: degree Celsius"
+         ::={ eqptBoardThermalSensorEntry 4}
+
+   eqptBoardThermalSensorShutdownThresholdLow  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+             "Low Shutdown threshold of thermal sensor on Board
+
+             ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+             PERSIST: NO    DEFVALUE: NA         UNITS: degree Celsius"
+         ::={ eqptBoardThermalSensorEntry 5}
+
+   eqptBoardThermalSensorShutdownThresholdHigh  OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+             "High Shutdown threshold of thermal sensor on Board
+
+             ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+             PERSIST: NO    DEFVALUE: NA         UNITS: degree Celsius"
+         ::={ eqptBoardThermalSensorEntry 6}
+   --  ==================================================================
+   --  |          STOP BOARD THERMAL SENSOR TABLE                      |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                     START PORTMAPPING TABLE                    |
+   --  ==================================================================
+
+
+   eqptPortMappingTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptPortMappingEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Equipment PortMapping table, showing the mapping between logical ports
+          and physical ports (faceplate numbering).
+
+          This table contains one row per logical port on the xHUB.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  TABLESIZE: DEP as described above"
+      ::= { asamEquipmentMIB 13 }
+
+   eqptPortMappingEntry OBJECT-TYPE
+      SYNTAX EqptPortMappingEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the equipment PortMapping table.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptPortMappingLogPortNbr }
+      ::= { eqptPortMappingTable 1 }
+
+
+   EqptPortMappingEntry ::= SEQUENCE {
+      eqptPortMappingLogPortNbr            EqptPortMappingIndex,
+      eqptPortMappingLogPortType           INTEGER,
+      eqptPortMappingPhyPortSlot           EqptSlotIndex,
+      eqptPortMappingPhyPortType           INTEGER,
+      eqptPortMappingPhyPortNbr            INTEGER,
+      eqptPortMappingLSMSlot               EqptSlotIndex,
+      eqptPortMappingChanges             Counter
+   }
+
+   eqptPortMappingLogPortNbr OBJECT-TYPE
+      SYNTAX EqptPortMappingIndex
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Index in equipment PortMapping Table: corresponds to the logical
+          port id on the xHUB.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptPortMappingEntry 1 }
+
+   eqptPortMappingLogPortType OBJECT-TYPE
+      SYNTAX INTEGER {
+          uplink (1),    --
+          downlink (2),  --
+          hostlink (3),  --
+          internal (4)   --
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The logical port type corresponds to the link classification.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..4
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptPortMappingEntry 2 }
+
+   eqptPortMappingPhyPortSlot OBJECT-TYPE
+      SYNTAX EqptSlotIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The equipment slot index of the physical port.
+          This slot will point to either a NT or NTIO slot position.
+
+          This field is not applicable for hostlinks or internal, in which case it gets
+          the value 0xFFFF
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: 0    UNITS: -"
+      ::= { eqptPortMappingEntry 3 }
+
+   eqptPortMappingPhyPortType OBJECT-TYPE
+      SYNTAX INTEGER {
+         not-applicable(1),
+         sfp(2),
+         xfp(3),
+         vp(5),
+         eth(10),
+         mcast(11),
+         ai(12),
+         ieee(13),
+         cfp(14)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The physcial port type.
+
+          This field is not applicable for hostlinks.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 1..3,5,10,11,12,13,14
+             PERSIST: NO    DEFVALUE: 0    UNITS: -"
+      ::= { eqptPortMappingEntry 4 }
+
+   eqptPortMappingPhyPortNbr OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The pysical port number, which corresponds to the faceplate number
+          of the sfp/xfp port.
+
+          This field is not applicable for hostlinks or internal, in which case it gets
+          the value 0xFF.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: 0    UNITS: -"
+      ::= { eqptPortMappingEntry 5 }
+
+   eqptPortMappingLSMSlot OBJECT-TYPE
+      SYNTAX EqptSlotIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The equipment slot index of the corresponding LSM slot.
+
+          This field is only applicable for hostlinks, and downlinks to which
+          a remote LSM slot is assigned. In other cases it gets the value
+          0xFFFF.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: 0    UNITS: -"
+      ::= { eqptPortMappingEntry 6 }
+
+  eqptPortMappingChanges OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the number of PortMapping configuration changes per row. It is a wraparound counter between 0 and MAX.
+         ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: 0-MAX
+             PERSIST: NO    DEFVALUE: 0    UNITS: -"
+        ::= { eqptPortMappingEntry 7}
+
+       eqptPortMappingGlobalChangeCounter OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "This counter represents the number of global PortMapping configuration changes. It is a wraparound counter between 0 and MAX.
+            SUPPORT: YES   INSRVMOD: NA   RANGE: 0-MAX
+             PERSIST: NO    DEFVALUE: 0    UNITS: -"
+      ::= { asamEquipmentMIB 14 }
+
+   --  ==================================================================
+   --  |                     STOP PORTMAPPING TABLE                     |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                START ANY-TO-ANY PORTPROTECTION TABLE           |
+   --  ==================================================================
+
+        eqptPortProtectionTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptPortProtectionEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      DESCRIPTION
+         "This table holds the port protection groups"
+      ::= { asamEquipmentMIB  15 }
+
+        eqptPortProtectionEntry  OBJECT-TYPE
+      SYNTAX    EqptPortProtectionEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      DESCRIPTION
+         "This entry represents a protection group which consists of two
+          ports.  These two ports can be on the same LT board, or on
+          different LT's."
+      INDEX     { eqptPortProtectionPortId }
+    ::= { eqptPortProtectionTable 1 }
+
+        EqptPortProtectionEntry ::= SEQUENCE {
+      eqptPortProtectionPortId        InterfaceIndex,
+      eqptPortProtectionRowStatus            RowStatus,
+      eqptPortProtectionPairedPortId     InterfaceIndex,
+      eqptPortProtectionPortStatus    INTEGER,
+      eqptPortProtectionPairedPortStatus INTEGER,
+      eqptPortProtectionSwitchCommand        InterfaceIndex,
+      eqptPortProtectionLastSwitchReason     INTEGER,
+      eqptPortProtectionNumberOfSwitchovers  INTEGER
+        }
+
+        eqptPortProtectionPortId  OBJECT-TYPE
+      SYNTAX    InterfaceIndex
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+                "Each row is indexed by the IfIndex of the
+                 primary port of the protection group, the one which
+                 is protected.
+                 Only PON ports can be selected."
+        ::= { eqptPortProtectionEntry 1 }
+
+        eqptPortProtectionRowStatus  OBJECT-TYPE
+      SYNTAX    RowStatus
+      ACCESS    read-write
+      STATUS    mandatory
+      DESCRIPTION
+                "All rows instantiated using 'create-and-go' to
+                 mate 2 ports in a protection group. Set to 'destroy' to
+                 eliminate the protection group.
+
+                 RULE 1 - Cannot create a protection group on an LT card
+                          that doesn't support any-to-any redundancy.
+
+                 RULE 2 - Cannot mate two ports in a protection group if
+                          the paired port has already one or more
+                          interface(s) defined on top of the physical link
+                          interface.
+
+                 RULE 3 - Cannot delete a protection group if paired
+                          port is Admin UP."
+        ::= { eqptPortProtectionEntry 2 }
+
+        eqptPortProtectionPairedPortId  OBJECT-TYPE
+      SYNTAX    InterfaceIndex
+      ACCESS    read-write
+      STATUS    mandatory
+      DESCRIPTION
+                " This attribute represents the IfIndex of the paired
+                  port.  Only PON ports can be selected.
+
+                   Must satisfy the following VALIDATIONs (otherwise OLT
+                   should reject):
+                   1) IfIndex must represent a real port.
+                   2) PON cannot have any provisioned (planned) ONTs.
+                   3) Cannot mate a PON with itself.
+                   4) Cannot mate with a PON that is already mated in a
+                      protection scheme."
+        ::= { eqptPortProtectionEntry 3 }
+
+   eqptPortProtectionPortStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " This attribute represents the status of the primary port.
+
+                   Following DEFINITIONS apply:
+                   Active - means the port is used for transmission.
+                   Inactive - means the system is NOT using the port for
+                   transmission.
+                   Up - means the port is capable of being used for
+                   transmission/reception.
+                   Down - means the port is NOT capable of being used for
+                   transmission/reception (this includes a port that is
+                   ADMIN down as well as a port that is down due to an
+                   operational fault).
+
+                   Enumerations are as follows:
+
+                   1 = Active Up
+                   2 = Active Down
+                   3 = Inactive Up
+                   4 = Inactive Down"
+        ::= { eqptPortProtectionEntry 4 }
+
+   eqptPortProtectionPairedPortStatus OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " This attribute represents the status of the paired
+                  port.
+
+                   Following DEFINITIONS apply:
+                   Active - means the port is used for transmission.
+                   Inactive - means the system is NOT using the port for
+                   transmission.
+                   Up - means the port is capable of being used for
+                   transmission/reception.
+                   Down - means the port is NOT capable of being used for
+                   transmission/reception (this includes a port that is
+                   ADMIN down as well as a port that is down due to an
+                   operational fault).
+
+                   Enumerations are as follows:
+
+                   1 = Active Up
+                   2 = Active Down
+                   3 = Inactive Up
+                   4 = Inactive Down"
+        ::= { eqptPortProtectionEntry 5 }
+
+   eqptPortProtectionSwitchCommand OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        ACCESS  write-only
+        STATUS  mandatory
+        DESCRIPTION
+                " This attribute represents the IfIndex of the desired port
+                  to switch over to.
+
+                   Must satisfy the following VALIDATIONs (otherwise OLT
+                   should reject):
+                   1) IfIndex must represent a real port.
+                   2) IfIndex must be part of a protection group.
+                   3) IfIndex must be either the primary or the paired port
+                      of the protection group on which the switchover is
+          triggered."
+        ::= { eqptPortProtectionEntry 6 }
+
+   eqptPortProtectionLastSwitchReason OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " This attribute contains the reason for the last port
+                  switchover (if any).
+
+                   0 = No switch has occurred (since last LT startup).
+                   1 = Manual switch due to port Admin State change.
+                   2 = Manual switch due to usage of Switch command.
+                   3 = Automatic switch due to system determination.
+                   4 = Automatic switch due to LT failure."
+        ::= { eqptPortProtectionEntry 7 }
+
+   eqptPortProtectionNumberOfSwitchovers OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " This attribute contains the number of switchovers since
+                  last LT startup."
+        ::= { eqptPortProtectionEntry 8 }
+
+   --  ==================================================================
+   --  |                STOP ANY-TO-ANY PORTPROTECTION TABLE            |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                START ANY-TO-ANY PORTPROTECTION LOOKUP TABLE    |
+   --  ==================================================================
+
+        eqptPortProtectionLookupTable  OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptPortProtectionLookupEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      DESCRIPTION
+         "This table holds the lookup port protection groups"
+      ::= { asamEquipmentMIB  16 }
+
+        eqptPortProtectionLookupEntry  OBJECT-TYPE
+      SYNTAX    EqptPortProtectionLookupEntry
+      ACCESS    not-accessible
+      STATUS    mandatory
+      DESCRIPTION
+         "This entry represents a lookup protection group which consists
+          of two ports.  The key is either a primary or a paired port
+          in the eqptPortProtectionTable."
+      INDEX     { eqptPortProtectionLookupPortId }
+    ::= { eqptPortProtectionLookupTable 1 }
+
+        EqptPortProtectionLookupEntry ::= SEQUENCE {
+      eqptPortProtectionLookupPortId        InterfaceIndex,
+      eqptPortProtectionLookupPrimaryPortId InterfaceIndex
+        }
+
+        eqptPortProtectionLookupPortId  OBJECT-TYPE
+      SYNTAX    InterfaceIndex
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+                "Each row is indexed by the IfIndex of a port in a
+                 protection group, either a primary or a paired port.
+                 Only PON ports can be selected."
+        ::= { eqptPortProtectionLookupEntry 1 }
+
+
+        eqptPortProtectionLookupPrimaryPortId  OBJECT-TYPE
+      SYNTAX    InterfaceIndex
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+                " This attribute represents the IfIndex of the primary
+                  port of the protection group to which the key port
+                  belongs.
+                  Only PON ports can be selected."
+        ::= { eqptPortProtectionLookupEntry 2 }
+
+
+   --  ==================================================================
+   --  |                STOP ANY-TO-ANY PORTPROTECTION LOOKUP TABLE     |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                    START PLANNED RESOURCE TABLE                |
+   --  ==================================================================
+   eqptBoardPlannedResourceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EqptBoardPlannedResourceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+             "A table representing the actual values of configured hardware
+             resources on boards.
+             This table only displays entries for resources on the boards
+             that support this view. These are boards for which the relation
+             between HW resource consumption and system configuration is not
+             trivial.
+             If the board is not supporting this view, then no entries will
+             be displayed. The board does not physically need to be present
+             for displaying the resources.
+
+             ALCATEL NOTE:
+             SUPPORT: YES  TABLESIZE: DEP as described above"
+          ::= { asamEquipmentMIB 17 }
+
+   eqptBoardPlannedResourceEntry OBJECT-TYPE
+    SYNTAX EqptBoardPlannedResourceEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+             "An entry of the equipment planned resource table
+
+             ALCATEL NOTE:
+             SUPPORT: YES"
+             INDEX {eqptSlotId, eqptBoardPlannedResourceId}
+          ::= {eqptBoardPlannedResourceTable 1}
+
+   EqptBoardPlannedResourceEntry ::= SEQUENCE{
+    eqptBoardPlannedResourceId             INTEGER,
+    eqptBoardPlannedResourceCurrentValue  INTEGER,
+    eqptBoardPlannedResourceMaxValue      INTEGER,
+    eqptBoardPlannedResourceDescription    DisplayString
+    }
+
+  eqptBoardPlannedResourceId OBJECT-TYPE
+   SYNTAX INTEGER
+   ACCESS not-accessible
+   STATUS mandatory
+   DESCRIPTION
+            "Index of the planned resource for a board
+
+            ALCATEL NOTE:
+            SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+            PERSIST: NO    DEFVALUE: NA         UNITS: - "
+         ::= { eqptBoardPlannedResourceEntry 1}
+
+   eqptBoardPlannedResourceCurrentValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "The actual planned value for the resource
+
+            ALCATEL NOTE:
+            SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+            PERSIST: NO    DEFVALUE: NA         UNITS: - "
+         ::={ eqptBoardPlannedResourceEntry 2}
+
+   eqptBoardPlannedResourceMaxValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "The maximum value that the board supports for this resource.
+
+            ALCATEL NOTE:
+            SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+            PERSIST: NO    DEFVALUE: NA         UNITS: - "
+         ::={ eqptBoardPlannedResourceEntry 3}
+
+   eqptBoardPlannedResourceDescription OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+            "A string describing the planned resource for this board.
+
+            ALCATEL NOTE:
+            SUPPORT: YES   INSRVMOD: NA     RANGE: NA
+            PERSIST: NO    DEFVALUE: NA         UNITS: - "
+         ::={ eqptBoardPlannedResourceEntry 4}
+
+   --  ==================================================================
+   --  |                     STOP PLANNED RESOURCE TABLE                |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                    START POWER MANAGEMENT TABLE                |
+   --  ==================================================================
+
+eqptPowerTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptPowerEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Equipment power table, representing the power management objects per
+          system, rack or shelf.
+          This table contains one row for the system, rack or shelf that is
+          subject to power management. In other cases no entry is instantiated.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  TABLESIZE: DEP as described above"
+      ::= { asamEquipmentMIB 18 }
+
+   eqptPowerEntry OBJECT-TYPE
+      SYNTAX EqptPowerEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the equipment power table.
+          An entry will be instantiated for a system/rack or shelf with active
+          power management functionality.
+          At the time of writing VSRM-A shelf (SX) and NGVR (MX) with a planned
+          RANI-B/RPNI-B comply to this requirement.
+
+          ALCATEL NOTE:
+          SUPPORT: YES "
+      INDEX { eqptPowerId }
+      ::= { eqptPowerTable 1 }
+
+   EqptPowerEntry ::= SEQUENCE {
+      eqptPowerId                  EqptHolderIndex,
+      eqptPowerAdminMode           INTEGER,
+      eqptPowerOperMode            INTEGER,
+      eqptPowerBatType             INTEGER,
+      eqptPowerBatStartCapacity    INTEGER,
+      eqptPowerBatPlannedLifetime  INTEGER,
+      eqptPowerBatState            INTEGER,
+      eqptPowerBatFailure          INTEGER,
+      eqptPowerBatTemperature      INTEGER,
+      eqptPowerBatActualCapacity   INTEGER,
+      eqptPowerBatDefenseMode      INTEGER,
+      eqptPowerBatDefenseThreshold INTEGER,
+      eqptPowerACState             INTEGER,
+      eqptPowerACFailure           INTEGER,
+      eqptPowerNDCaState           INTEGER,
+      eqptPowerNDCaFailure         INTEGER,
+      eqptPowerNDCbState           INTEGER,
+      eqptPowerNDCbFailure         INTEGER,
+      eqptPowerLDCaState           INTEGER,
+      eqptPowerLDCaFailure         INTEGER,
+      eqptPowerLDCbState           INTEGER,
+      eqptPowerLDCbFailure         INTEGER,
+      eqptPowerInVoltage           INTEGER,
+      eqptPowerInCurrent           INTEGER,
+      eqptPowerInConsumedPower     INTEGER
+   }
+
+   eqptPowerId OBJECT-TYPE
+      SYNTAX EqptHolderIndex
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Index in equipment Power Table.
+          Index gives the shelf identification.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+          PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptPowerEntry 1 }
+
+   eqptPowerAdminMode OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-powermgnt (0),
+          ac (1),
+          ac-and-dc-local (2),
+          dc-network (3),
+          dc-network-and-dc-local (4),
+          dc-local (5)
+         }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "The eqptPowerAdminMode shows the configured power mode.
+          This configured mode will be used to mask any failures detected
+          for non-supported modes.
+          Enumeration is as follows:
+             0 = no powermanagement mode configured
+             1 = AC -> failures on DC local and DC network suppressed
+             2 = AC + DC local -> failures on DC network suppressed
+             3 = DC network -> failures on AC or DC local suppressed
+             4 = DC network + DC local -> failures on AC suppressed
+             5 = DC local -> failures on DC network or AC suppressed
+          Configuration of the eqptPowerAdminMode is not mandatory and will
+          not impact the behavior of the power module.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: YES   DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 2}
+
+   eqptPowerOperMode OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-powermgnt (0),
+          ac (1),
+          ac-and-dc-local (2),
+          dc-network (3),
+          dc-network-and-dc-local (4),
+          dc-local (5),
+          battery-fallback (6)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "The eqptPowerOperMode shows the power mode the NE is using at the
+          moment of reading.
+          The VSRM-A (SX) and NGVR (MX) using a power management enabled NTIO
+          (e.g. RANI-B or RPNI-B) will provide valid information for this
+          object.
+          Other systems without Power mode support get no-powermgnt (0).
+          Enumeration is as follows:
+             0 = system without an active power management
+             1 = AC
+             2 = AC + DC local
+             3 = DC network
+             4 = DC network + DC local
+             5 = DC local
+             6 = Battery fallback, i.e. only battery provides power to the system.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 3}
+
+   eqptPowerBatType OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-configured (0),
+          agm-vrla-PbCa-battery (1),
+          agm-vrla-Pure-Pb-battery (2),
+          flooded-battery (3),
+          gel-battery (4)
+         }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "
+          This object is used to configure the battery type.
+          This configuration only possible for planned powermanagement devices,
+          in this case a planned RANI-B or RPNI-B. Only values for supported
+          battery types are possible (e.g. in R51 only AGM/VRLA Lead Calcium
+          BATTERY (1) is supported for the RANI-B/RPNI-B)
+          The configured value is used to configure the power management driver.
+          The link between the configurable value and the battery type is:
+            0 = no battery configured
+            1 = AGM/VRLA Lead Calcium BATTERY
+            2 = AGM/VRLA Pure Lead BATTERY
+            3 = FLOODED BATTERY
+            4 = GEL BATTERY
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: YES   DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 4}
+
+   eqptPowerBatStartCapacity OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The capacity (Ah) of the battery at the moment of installation.
+          The value of the capacity is in 1/100 Ah.
+          Instatiated when eqptPowerBatType is configured.
+          The configuration of this object is mandatory together with the
+          configuration of the eqptPowerBatType
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: 1000 .. 10000
+          PERSIST: YES   DEFVALUE: 1000   UNITS: 1/10O Ah "
+      ::= { eqptPowerEntry 5}
+
+   eqptPowerBatPlannedLifetime OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Planned lifetime of the installed battery in 1/10 year.
+          The planned lifetime, together with the start capacity, is used to
+          calculate the actual maximal capacity of the battery.
+          Instatiated when eqptPowerBatType is configured.
+          The configuration of this object is mandatory together with the
+          configuration of the eqptPowerBatType
+
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: 0 .. 150
+          PERSIST: YES   DEFVALUE: 0      UNITS: 1/10 Year "
+      ::= { eqptPowerEntry 6}
+
+   eqptPowerBatState OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-configured (0),
+          no-data (1),
+          charging (2),
+          charged (3),
+          discharging (4)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The battery state will provide a view on the state of the battery.
+          Possible states are: charging, charged and discharging.
+          This operational state has meaning for devices that have a configured
+          eqptPowerBatType. Other devices get a not-configured (0) value returned.
+          Enumeration is as follows:
+            1 = no data available, e.g. battery configured, but not connected
+            2 = charging
+            3 = charged
+            4 = discharging
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 7}
+
+   eqptPowerBatFailure OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-applicable (0),
+          voltage-good (1),
+          voltage-out-of-range (2),
+          over-voltage (3),
+          over-temperature (4),
+          battery-depleted (5)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The battery failure state will provide an view on the failure state of
+          the battery.
+          This failure state has meaning for devices that have a configured
+          eqptPowerBatType and eqptPowerBatState different from default or
+          no-data. Other devices get a not-applicable (0) value returned.
+          Specific ranges for the failure cases strongly depend on the battery type
+          used. The ranges will be detailed in the customer documentation.
+          Enumeration is as follows:
+            0 = not applicable
+            1 = voltage good
+            2 = voltage out of range
+            3 = over-voltage
+            4 = over-temperature alarm on local temperature sensor
+            5 = battery depleted
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 8}
+
+   eqptPowerBatTemperature OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Measured temperature of the battery in 1/10 Celcius
+          The value is only readable when the battery type (eqptPowerBatType)
+          is configured and the battery is installed and reachable.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: -1000 .. 1000
+          PERSIST: NO    DEFVALUE: 0      UNITS: 1/10 Celcius "
+      ::= { eqptPowerEntry 9}
+
+   eqptPowerBatActualCapacity OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The capacity (in % of a fully charged battery) of the battery.
+          The value is only readable when the battery type (eqptPowerBatType)
+          is configured and the battery is installed and reachable.
+          Default value of 0% is returned when the battery is not reachable.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: 0 - 100
+          PERSIST: NO    DEFVALUE: 0      UNITS: % "
+      ::= { eqptPowerEntry 10}
+
+   eqptPowerBatDefenseMode OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-defense (0),
+          voice-priority (1)
+         }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The battery defense modes offers the operator the possibility to
+          select the preferred power defense mode in case the system falls
+          back to the battery mode. The power defense mode is a way to
+          optimize the power consumption. In R5001 two options are possible.
+          In later releases additional defense modes will be introduced.
+          - no battery defense. In this mode the system will run normally,
+            offering regular service until the battery runs out and the
+            regular hw defenses are started (Dying Gasp)
+          - voice priority. In this mode when the system falls back to the
+            battery the regular service will be maintained until the battery
+            drains until 90% and will then give priority to the voice LT's by
+            powering down the DSL LT's. Voice service will be maintained until
+            the battery runs out and the regular hw defenses are started (Dying
+            Gasp).
+          This configuration only possible for planned powermanagement devices,
+          in this case a planned RANI-B or RPNI-B.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: YES   DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 11}
+
+   eqptPowerBatDefenseThreshold OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The threshold gives an indication of the remaining capacity of the
+          battery at the moment the defense defined in eqptPowerBatDefenseMode
+          should be started. The value is in %. In the default case the configured
+          defense mode is immediately activated.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: 0-100
+          PERSIST: YES   DEFVALUE: 80     UNITS: % "
+      ::= { eqptPowerEntry 12}
+
+
+   eqptPowerACState OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-powermgnt (0),
+          active (1),
+          active-failure (2),
+          failure (3)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The AC power state will provide an view on the state of the AC Power
+          supply.
+          The value is different from no-powermgnt (0) for devices with power
+          management functionality and AC input available.
+          Enumeration is as follows:
+            0 = no-powermgnt
+            1 = active
+            2 = active-failure, i.e. in failure, but still providing power
+            3 = failure
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 13}
+
+   eqptPowerACFailure OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-applicable (0),
+          voltage-good (1),
+          voltage-out-of-range (2)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The AC failure state will provide an view on the failure state of
+          the AC power supply.
+          This failure state has meaning when eqptPowerACstate different from
+          default. In other cases not-applicable (0) is returned.
+          Specific ranges for the failure cases strongly depend on the AC power
+          used. The ranges will be detailed in the customer documentation.
+          Enumeration is as follows:
+            0 = not-applicable
+            1 = voltage good
+            2 = voltage out of range
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 14}
+
+   eqptPowerNDCaState OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-powermgnt (0),
+          active (1),
+          active-failure (2),
+          failure (3)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The NDCa (Network DC a) state will provide an view on the state of
+          the Network DC Power supply.
+          The value is different from no-powermgnt (0) for devices with power
+          management functionality and NDC a input available.
+          Enumeration is as follows:
+            0 = no-powermgnt
+            1 = active
+            2 = active-failure, i.e. in failure, but still providing power
+            3 = failure
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 15}
+
+   eqptPowerNDCaFailure OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-applicable (0),
+          voltage-good (1),
+          low-voltage(2),
+          under-voltage(3)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The NDCa failure state will provide an view on the failure state of
+          the Network DC a power supply.
+          This failure state has meaning when eqptPowerNDCaState different from
+          default. In other cases not-applicable (0) is returned.
+          Specific ranges for the failure cases strongly depend on the DC power
+          used. The ranges will be detailed in the customer documentation.
+          Enumeration is as follows:
+            0 = not-applicable
+            1 = voltage-good
+            2 = low-voltage
+            3 = under-voltage
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 16}
+
+   eqptPowerNDCbState OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-powermgnt (0),
+          active (1),
+          active-failure (2),
+          failure (3)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The NDCb (Network DC a) state will provide an view on the state of
+          the Network DC b power supply.
+          The value is different from no-powermgnt (0) for devices with power
+          management functionality and NDC b input available.
+          Enumeration is as follows:
+            0 = no-powermgnt
+            1 = active
+            2 = active-failure, i.e. in failure, but still providing power
+            3 = failure
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 17}
+
+   eqptPowerNDCbFailure OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-applicable (0),
+          voltage-good (1),
+          low-voltage(2),
+          under-voltage(3)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The NDCb failure state will provide an view on the failure state of
+          the Network DC b power supply.
+          This failure state has meaning when eqptPowerNDCbState different from
+          default. In other cases not-applicable (0) is returned.
+          Specific ranges for the failure cases strongly depend on the DC power
+          used. The ranges will be detailed in the customer documentation.
+          Enumeration is as follows:
+            0 = not-applicable
+            1 = voltage-good
+            2 = low-voltage
+            3 = under-voltage
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 18}
+
+   eqptPowerLDCaState OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-powermgnt (0),
+          active (1),
+          active-failure (2),
+          failure (3)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The LDCa power state will provide an view on the state of the local
+          DC a power supply.
+          The value is different from no-powermgnt (0) for devices with power
+          management functionality and LDC a input available.
+          Enumeration is as follows:
+            0 = no-powermgnt
+            1 = active
+            2 = active-failure, i.e. in failure, but still providing power
+            3 = failure
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 19}
+
+   eqptPowerLDCaFailure OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-applicable (0),
+          voltage-good (1),
+          voltage-out-of-range (2)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The LDCa failure state will provide an view on the failure state of
+          the local DC a power supply.
+          This failure state has meaning when eqptPowerLDCaState different from
+          default. In other cases not-applicable (0) is returned.
+          Enumeration is as follows:
+            0 = not-applicable
+            1 = voltage good
+            2 = voltage out of range
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 20}
+
+   eqptPowerLDCbState OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          no-powermgnt (0),
+          active (1),
+          active-failure (2),
+          failure (3)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The LDCb power state will provide an view on the state of the local
+          DC b power suply.
+          The value is different from no-powermgnt (0) for devices with power
+          management functionality and LDC b input available.
+          Enumeration is as follows:
+            0 = no-powermgnt
+            1 = active
+            2 = active-failure, i.e. in failure, but still providing power
+            3 = failure
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 21}
+
+   eqptPowerLDCbFailure OBJECT-TYPE
+      SYNTAX INTEGER
+         {
+          not-applicable (0),
+          voltage-good (1),
+          voltage-out-of-range (2)
+         }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          The LDCb failure state will provide an view on the failure state of
+          the local DC b power supply.
+          This failure state has meaning when eqptPowerLDCbState different from
+          default. In other cases not-applicable (0) is returned.
+          Enumeration is as follows:
+            0 = not-applicable
+            1 = voltage good
+            2 = voltage out of range
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: 0      UNITS: - "
+      ::= { eqptPowerEntry 22}
+
+   eqptPowerInVoltage OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Measured incoming voltage in 1/10 Volt
+          Only supported for devices that host an extended power management
+          function (e.g RANI-B and RPNI-B).
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: 0 .. 2650
+          PERSIST: NO    DEFVALUE: 0      UNITS: 1/10 Volt "
+      ::= { eqptPowerEntry 23}
+
+   eqptPowerInCurrent OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Measured incoming current in 1/10 Ampere
+          Only supported for devices that host an extended power management
+          function (e.g RANI-B and RPNI-B).
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: 0 .. 60
+          PERSIST: NO    DEFVALUE: 0      UNITS: 1/10 Ampere "
+      ::= { eqptPowerEntry 24}
+
+   eqptPowerInConsumedPower OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Calculated incoming consumed power in 1/10 Watt
+          Only supported for devices that host an extended power management
+          function (e.g RANI-B and RPNI-B).
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: 0 .. 6000
+          PERSIST: NO    DEFVALUE: 0      UNITS: 1/10 Watt "
+      ::= { eqptPowerEntry 25}
+
+   --  ==================================================================
+   --  |                    STOP POWER MANAGEMENT OBJECTS               |
+   --  ==================================================================
+   --  ==================================================================
+   --  |                START POWER SUPPLY MANAGEMENT TABLE             |
+   --  ==================================================================
+eqptPowerSupplyTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptPowerSupplyEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Equipment power table, representing the power suplly management objects
+          This table contains one row per power supply supported on the system.
+          In other cases no entry is instantiated.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  TABLESIZE: DEP as described above"
+      ::= { asamEquipmentMIB 19 }
+
+   eqptPowerSupplyEntry OBJECT-TYPE
+      SYNTAX EqptPowerSupplyEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the equipment power table.
+          An entry will be instantiated per power supply supported on the system.
+
+          ALCATEL NOTE:
+          SUPPORT: YES "
+      INDEX { eqptPowerSupplyId }
+      ::= { eqptPowerSupplyTable 1 }
+
+   EqptPowerSupplyEntry ::= SEQUENCE {
+      eqptPowerSupplyId                    EqptPowerSupplyIndex,
+      eqptPowerSupplyPartNumber            OCTET STRING,
+      eqptPowerSupplyCleiCode              OCTET STRING,
+      eqptPowerSupplySerNumber             OCTET STRING,
+      eqptPowerSupplyVin                   INTEGER,
+      eqptPowerSupplyIin                   INTEGER,
+      eqptPowerSupplyVout                  INTEGER,
+      eqptPowerSupplyIout                  INTEGER,
+      eqptPowerSupplyTemperature           INTEGER,
+      eqptPowerSupplyFaultVin              INTEGER,
+      eqptPowerSupplyFaultVout             INTEGER,
+      eqptPowerSupplyFaultIin              INTEGER,
+      eqptPowerSupplyFaultIout             INTEGER,
+      eqptPowerSupplyFaultTemperature      INTEGER,
+      eqptPowerSupplyFaultCml              INTEGER,
+      eqptPowerSupplyPresent               INTEGER,
+      eqptPowerSupplyFaultDetected         INTEGER
+   }
+
+   eqptPowerSupplyId OBJECT-TYPE
+      SYNTAX EqptPowerSupplyIndex
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Index in equipment Power Supply Table.
+          This is a number representing the Nth power supply present in the system.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+          PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptPowerSupplyEntry 1}
+
+   eqptPowerSupplyPartNumber OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(13))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the part number of the installed power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 2}
+
+   eqptPowerSupplyCleiCode OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(11))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the CLEI code of the installed power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 3}
+
+   eqptPowerSupplySerNumber OBJECT-TYPE
+      SYNTAX OCTET STRING(SIZE(19))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the serial number of the installed power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 4}
+
+   eqptPowerSupplyVin OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the incoming voltage arriving at the power supply in millivolt
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 5}
+
+   eqptPowerSupplyIin OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the incoming current arriving at the power supply in milliampere
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 6}
+
+   eqptPowerSupplyVout OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the output voltage provided by the power supply in millivolt
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 7}
+
+   eqptPowerSupplyIout OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the output current provided by the power supply in milliampere
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 8}
+
+   eqptPowerSupplyTemperature OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the temperature of the power supply in millidegree
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 9}
+
+   eqptPowerSupplyFaultVin OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        no-error (0),
+        input-overvoltage-fault (1),
+        input-overvoltage-warning (2),
+        input-undervoltage-warning (3),
+        input-undervoltage-fault (4),
+        input-ac-nok-fault (5),
+        input-ac-nok-warning (6),
+        unit-off-for-insufficient-input-voltage (7)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the fault or warning occurring for the input voltage
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 10}
+
+   eqptPowerSupplyFaultVout OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        no-error (0),
+        output-overvoltage-fault (1),
+        output-overvoltage-warning (2),
+        output-undervoltage-warning (3),
+        output-undervoltage-fault (4)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the fault or warning occurring for the output voltage
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerSupplyEntry 11}
+
+   eqptPowerSupplyFaultIin OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        no-error (0),
+        input-overcurrent-fault (1),
+        input-overcurrent-warning (2),
+        input-overpower-warning (3)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the fault or warning occurring for the input current
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA      UNITS: - "
+      ::= { eqptPowerSupplyEntry 12}
+
+   eqptPowerSupplyFaultIout OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        no-error (0),
+        output-overcurrent-fault (1),
+        output-overcurrent-warning (2),
+        output-undercurrent-warning (3),
+        output-undercurrent-fault (4)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the fault or warning occurring for the output current
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA      UNITS: - "
+      ::= { eqptPowerSupplyEntry 13}
+
+   eqptPowerSupplyFaultTemperature OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        no-error (0),
+        overtemperature-fault (1),
+        overtemperature-warning (2),
+        undertemperature-warning (3),
+        undertemperature-fault (4)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the fault or warning occurring for the tempertaure
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA      UNITS: - "
+      ::= { eqptPowerSupplyEntry 14}
+
+   eqptPowerSupplyFaultCml OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        no-error (0),
+        invalid-or-unsupported-command-received (1),
+        invalid-or-unsupported-data-received (2),
+        packet-error-check-failed (3),
+        memory-fault-detected (4),
+        processor-fault-detected (5),
+        other-communication-fault (6),
+        other-memory-or-logic-fault (7)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report the fault or warning occurring for the tempertaure
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA      UNITS: - "
+      ::= { eqptPowerSupplyEntry 15}
+
+   eqptPowerSupplyPresent OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        yes (0),
+        no (1)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report if the power supply is present.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA      UNITS: - "
+      ::= { eqptPowerSupplyEntry 16}
+
+   eqptPowerSupplyFaultDetected OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        no (0),
+        yes (1)
+      }
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "
+          Report if a fault has been detected. If yes, then
+          eqptPowerSupplyFaultVin, eqptPowerSupplyFaultVout,
+          eqptPowerSupplyFaultIin, eqptPowerSupplyFaultIOut,
+          eqptPowerSupplyFaultTemperature or eqptPowerSupplyFaultCml
+          is reporting an error.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA      UNITS: - "
+      ::= { eqptPowerSupplyEntry 17}
+   --  ==================================================================
+   --  |                 STOP POWER SUPPLY MANAGEMENT TABLE             |
+   --  ==================================================================
+
+   eqptPowerSupplyRftc OBJECT IDENTIFIER ::= { asamEquipmentMIB 20 }
+
+   --  ==================================================================
+   --  |                 START POWER SUPPLY RFT-C COMMON TABLE          |
+   --  ==================================================================
+
+   eqptPowerRftcTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptPowerRftcEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "Equipment RFT-C power table, representing the RFT-C management objects
+          This table contains one row per RFT-C module supported on the system.
+          In other cases no entry is instantiated.
+
+          ALCATEL NOTE:
+             SUPPORT: YES  TABLESIZE: DEP as described above"
+      ::= { eqptPowerSupplyRftc 1 }
+
+   eqptPowerRftcEntry OBJECT-TYPE
+      SYNTAX EqptPowerRftcEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry of the equipment RFT-C power table.
+
+          ALCATEL NOTE:
+          SUPPORT: YES "
+      INDEX { eqptPowerRftcId }
+      ::= { eqptPowerRftcTable 1 }
+
+   EqptPowerRftcEntry ::= SEQUENCE {
+      eqptPowerRftcId                    EqptHolderIndex,
+      eqptPowerRftcVCommon               INTEGER,
+      eqptPowerRftcICommon               INTEGER,
+      eqptPowerRftcTHotspot              INTEGER,
+      eqptPowerRftcTAmbient              INTEGER,
+      eqptPowerRftcSWVersion             DisplayString,
+      eqptPowerRftcHWVersion             DisplayString,
+      eqptPowerRftcHWRevision            INTEGER,
+      eqptPowerRftcSerialnumber          DisplayString,
+      eqptPowerRftcManufacturer          DisplayString,
+      eqptPowerRftcLineCount             INTEGER
+   }
+
+    eqptPowerRftcId OBJECT-TYPE
+      SYNTAX EqptHolderIndex
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Index in equipment Power RFT-C Table.
+          This is a number represents the shelf containting the RFT-C module.
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+          PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptPowerRftcEntry 1}
+
+   eqptPowerRftcVCommon OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the common voltage arriving at the power supply in millivolt
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: mV "
+      ::= { eqptPowerRftcEntry 2}
+
+   eqptPowerRftcICommon OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the common current arriving at the power supply in milliampere
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: mA "
+      ::= { eqptPowerRftcEntry 3}
+
+   eqptPowerRftcTHotspot OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the temperature of the power supplys hotspot in degrees celcius
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: °C"
+      ::= { eqptPowerRftcEntry 4}
+
+   eqptPowerRftcTAmbient OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the ambient temperature of the power supply in degrees celcius
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: °C"
+      ::= { eqptPowerRftcEntry 5}
+
+   eqptPowerRftcSWVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the software version of the RFT-C power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerRftcEntry 6}
+
+   eqptPowerRftcHWVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the hardware version of the RFT-C power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerRftcEntry 7}
+
+   eqptPowerRftcHWRevision OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report hardware revision of the RFT-C power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerRftcEntry 8}
+
+   eqptPowerRftcSerialnumber OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report serial number of the RFT-C power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerRftcEntry 9}
+
+   eqptPowerRftcManufacturer OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the manufacturer code of the RFT-C power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerRftcEntry 10}
+
+   eqptPowerRftcLineCount OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS optional
+      DESCRIPTION
+         "
+          Report the number of lines used on this RFT-C power supply
+
+          ALCATEL NOTE:
+          SUPPORT: YES   INSRVMOD: NA     RANGE: See above
+          PERSIST: NO    DEFVALUE: NA     UNITS: - "
+      ::= { eqptPowerRftcEntry 11}
+
+   --  ==================================================================
+   --  |                 STOP POWER SUPPLY RFT-C COMMON TABLE           |
+   --  ==================================================================
+
+   --  ==================================================================
+   --  |                 START POWER SUPPLY RFT-C LINE TABLE            |
+   --  ==================================================================
+
+   eqptPowerRftcLineTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF EqptPowerRftcLineEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "
+
+          ALCATEL NOTE:
+             SUPPORT: YES   TABLESIZE: DEP as described above"
+      ::=  { eqptPowerSupplyRftc 2 }
+
+   eqptPowerRftcLineEntry OBJECT-TYPE
+      SYNTAX EqptPowerRftcLineEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+         "An entry in the eqptPowerRftcLineTable.
+
+          ALCATEL NOTE:
+             SUPPORT: YES"
+      INDEX { eqptPowerRftcId, eqptPowerRftcLineId }
+      ::=  { eqptPowerRftcLineTable 1 }
+
+   EqptPowerRftcLineEntry ::= SEQUENCE {
+      eqptPowerRftcLineId                INTEGER,
+      eqptPowerRftcLineStatus            EqptPowerRftcLineStatus
+   }
+
+   eqptPowerRftcLineId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Report the line number
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptPowerRftcLineEntry 1 }
+
+   eqptPowerRftcLineStatus OBJECT-TYPE
+      SYNTAX EqptPowerRftcLineStatus
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+         "Report the line status.
+
+          ALCATEL NOTE:
+             SUPPORT: YES   INSRVMOD: NA   RANGE: See above
+             PERSIST: NO    DEFVALUE: NA   UNITS: -"
+      ::= { eqptPowerRftcLineEntry 2 }
+
+END
+

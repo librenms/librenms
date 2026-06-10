@@ -1,0 +1,1116 @@
+APRISAXE-TC-4RF DEFINITIONS ::= BEGIN
+
+--
+-- File: $Id: 4RF-APRISAXE-TC.txt,v 1.111 2007/08/01 04:52:02 ma Exp $
+--
+-- Copyright: 2004  4RF COMMUNICATIONS LTD
+--
+-- Description:
+--  Textual Conventions for AprisaXE project.
+--
+-- Versions:
+--
+-- Release 3
+-- Added support for 4-wire cards and configurable cross-connections
+--
+-- Notes:
+--  None
+--
+
+
+IMPORTS
+
+    -- Standard imports
+    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, Counter32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+
+    -- 4RF Specific imports
+    fourRFModules
+        FROM MIB-4RF;
+
+
+-- Module Identification
+fourRFAprisaXETCModule MODULE-IDENTITY
+    LAST-UPDATED "200704300000Z"
+    ORGANIZATION "www.4rf.com"
+    CONTACT-INFO    
+         "postal:   4RF Communications Ltd
+                    26 Glover Street
+                    Ngauranga
+                    PO Box 13-506
+                    Wellington 6032
+                    New Zealand
+                    
+          phone:    +64 4 499 6000
+          email:    support@4rf.com"
+    DESCRIPTION "Textual Conventions for the AprisaXE project"
+
+	-- Revision history
+    -- (in reverse chronological order)
+
+    REVISION    "200704300000Z"
+    DESCRIPTION "Second draft"
+
+    REVISION    "200412030152Z"
+    DESCRIPTION "First draft"
+    ::= { fourRFModules 6 }
+
+
+AprisaXESlotNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Represents a slot number in the AprisaXE, the slots include
+                 the modem, transmitter and receiver as well as the MUX cards.
+         H/W Slot    Card      Slot Name
+         0         Aux/Modem    Aux
+         1         MUX Card     H
+         2         MUX Card     G
+         3         MUX Card     F
+         4         MUX Card     E
+         5         MUX Card     D
+         6         MUX Card     C
+         7         MUX Card     B
+         8         MUX Card     A
+         9         Transmitter  Transmitter
+         10        Receiver     Receiver
+                Slots may or may not be populated."
+    SYNTAX      INTEGER { rxSlot       (0),
+                          txSlot       (1),
+                          
+                          -- MUX card slots
+                          slotA        (2),
+                          slotB        (3),
+                          slotC        (4),
+                          slotD        (5),
+                          slotE        (6),
+                          slotF        (7),
+                          slotG        (8),
+                          slotH        (9),
+                          
+                          -- Modem
+                          auxSlot      (10),
+                          
+                          noSlot       (255)
+                }
+    
+AprisaXEHardwareVersion ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Represents a single byte hardware version number."
+    SYNTAX      INTEGER ( 0..255 )   
+    
+AprisaXECardType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify the type of MUX card in a slot.
+                  The values for the enumerations match the hardware type
+                  values returned from the MUX card FPGAs and EEPROMs."
+    SYNTAX      INTEGER { none             (0),  -- No card present
+                          motherboard      ('E0'h),
+                          transmitterCard  ('E3'h),
+                          receiverCard     ('E4'h),
+                          quadJETCard      ('E5'h),
+                          quadFourWireCard ('E7'h),
+                          dualFXOCard      ('E8'h),
+                          dualFXSCard      ('E9'h),
+                          modemCard        ('EA'h),
+                          quadV24Card      ('EB'h),
+                          hssCard          ('EC'h),
+                          pscCard          ('ED'h),
+                          picCard          ('EE'h),
+			  dualJETCard      ('D5'h),
+			  singleJETCard    ('C5'h)		
+                }
+
+AprisaXEAlarmSource ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify the source of an alarm."
+    SYNTAX      INTEGER { none          (0),
+                          
+                          -- Card level alarms
+                          modem         (1),
+                          transmitter   (2),
+                          receiver      (3),
+                          quadJET       (4),
+                          quadFourWire  (5),
+                          dualFxo       (6),
+                          dualFxs       (7),
+                          quadV24       (8),
+                          highSpeedSync (9),
+                          psc           (10),
+                          pic           (11),
+						  dualJET       (12),
+						  singleJET     (13),
+						  
+                          -- External alarms
+                          external1     (50),
+                          external2     (51),
+                          
+                          -- Remote alarms
+                          remote        (60),
+                          
+                          -- User specified
+                          user1         (70),
+                          user2         (71),
+                          
+                          -- System level alarms, e.g. card mismatch, s/w upgrade
+                          system        (100),
+						  swUpgrade		(101)
+                }
+
+AprisaXEPortNumber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to identify a port e.g. reporting an alarm.
+                  Not all alarms are associated with a port, in these cases
+                  noPort will be used."
+    SYNTAX      INTEGER { noPort    (0),
+                          -- We have up to four ports per MUX card
+                          portOne   (1),
+                          portTwo   (2),
+                          portThree (3),
+                          portFour  (4)
+                }
+                        
+AprisaXEAlarmOutput ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to map alarm to external outputs."
+    SYNTAX      INTEGER { none            (0),
+                          -- Map to external outputs
+                          externalOutput1 (1),
+                          externalOutput2 (2),
+                          externalOutput3 (3),
+                          externalOutput4 (4)
+                        }
+
+AprisaXEAlarmMapping ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to map alarm to external outputs."
+    SYNTAX      INTEGER { none         (0),
+                          localMajor   (1),
+                          localMinor   (2),
+                          remoteMajor  (3),
+                          remoteMinor  (4),
+                          remoteInput1 (5),
+                          remoteInput2 (6)
+                }
+                        
+AprisaXEAlarmPolarity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to indicate the polarity indicating an alarm
+                 present on the external outputs."
+    SYNTAX      INTEGER { polarityLow  (0),
+                          polarityHigh (1)
+                }
+                        
+AprisaXEAdcVoltage ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION  "A voltage read from an ADC, in millivolts."
+    SYNTAX       Integer32
+
+
+AprisaXEDbValue ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "A value displayed in dB's."
+    SYNTAX       Integer32
+                        
+       
+AprisaXEIQData ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2x:"
+    STATUS      current
+    DESCRIPTION "A sequence of IQ data pairs, each individual value is 16 bit
+                 thus a single IQ pair is 32 bits."
+    SYNTAX      OCTET STRING ( SIZE (0..200) )
+                                
+AprisaXEAlarmType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The type of an alarm."
+    SYNTAX      INTEGER { none                    (0),
+                
+                          -- Transmitter Alarms
+                          txADCChZeroHi           (1), -- ADC zero high threshold has been passed
+                          txADCChZeroLo           (2), -- ADC zero low threshold has been passed
+                          txADCChOneHi            (3), -- ADC one high threshold has been passed
+                          txADCChOneLo            (4), -- ADC one low threshold has been passed
+                          txADCChTwoHi            (5), -- ADC two high threshold has been passed
+                          txADCChTwoLo            (6), -- ADC two low threshold has been passed
+                          txADCChThreeHi          (7), -- ADC three high threshold has been passed
+                          txADCChThreeLo          (8), -- ADC three low threshold has been passed
+                          txADCChFourHi           (9), -- ADC four high threshold has been passed
+                          txADCChFourLo           (10), -- ADC four low threshold has been passed
+                          txADCChFiveHi           (11), -- ADC five high threshold has been passed
+                          txADCChFiveLo           (12), -- ADC five low threshold has been passed
+                          txADCChSixHi            (13), -- ADC six high threshold has been passed
+                          txADCChSixLo            (14), -- ADC six low threshold has been passed
+                          txADCChSevenHi          (15), -- ADC seven high threshold has been passed
+                          txADCChSevenLo          (16), -- ADC seven low threshold has been passed
+                          txADCChEightHi          (17), -- ADC eight high threshold has been passed
+                          txADCChEightLo          (18), -- ADC eight low threshold has been passed
+                          txADCChNineHi           (19), -- ADC nine high threshold has been passed
+                          txADCCNineLo            (20), -- ADC nine low threshold has been passed
+                          txADCChTenHi            (21), -- ADC ten high threshold has been passed
+                          txADCChTenLo            (22), -- ADC ten low threshold has been passed
+                          txADCChElevenHi         (23), -- ADC eleven high threshold has been passed
+                          txADCChElevenLo         (24), -- ADC eleven low threshold has been passed
+                          txSynthLD               (25), -- Synth is not locked
+                          tx5VFail                (26), -- 5V supply has failed
+                          tx11VFail               (27), -- 11V supply is off/has failed
+                          tx28VFail               (28), -- 28V supply has failed
+                          txEEFail                (29), -- EEPROM contents are corrupt
+                          txTSensorFail           (30), -- Temperature sensor has failed
+                          txReturnLoss            (31), -- Return loss is too high
+                          txAmplifierBalance      (32), -- One side of amplifier has failed
+                          txMibFail               (33), -- MIB is are corrupt in EEPROM
+                
+                          -- Receiver Alarms
+                          rxADCChZeroHi           (50), -- ADC zero high threshold has been passed
+                          rxADCChZeroLo           (51), -- ADC zero low threshold has been passed
+                          rxADCChOneHi            (52), -- ADC one high threshold has been passed
+                          rxADCChOneLo            (53), -- ADC one low threshold has been passed
+                          rxADCChTwoHi            (54), -- ADC two high threshold has been passed
+                          rxADCChTwoLo            (55), -- ADC two low threshold has been passed
+                          rxADCChThreeHi          (56), -- ADC three high threshold has been passed
+                          rxADCChThreeLo          (57), -- ADC three low threshold has been passed
+                          rxADCChFourHi           (58), -- ADC four high threshold has been passed
+                          rxADCChFourLo           (59), -- ADC four low threshold has been passed
+                          rxADCChFiveHi           (60), -- ADC five high threshold has been passed
+                          rxADCChFiveLo           (61), -- ADC five low threshold has been passed
+                          rxADCChSixHi            (62), -- ADC six high threshold has been passed
+                          rxADCChSixLo            (63), -- ADC six low threshold has been passed
+                          rxADCChSevenHi          (64), -- ADC seven high threshold has been passed
+                          rxADCChSevenLo          (65), -- ADC seven low threshold has been passed
+                          rxADCChEightHi          (66), -- ADC eight high threshold has been passed
+                          rxADCChEightLo          (67), -- ADC eight low threshold has been passed
+                          rxADCChNineHi           (68), -- ADC nine high threshold has been passed
+                          rxADCCNineLo            (69), -- ADC nine low threshold has been passed
+                          rxADCChTenHi            (70), -- ADC ten high threshold has been passed
+                          rxADCChTenLo            (71), -- ADC ten low threshold has been passed
+                          rxRSSIHi                (72),
+                          rxRSSILo                (73),
+                          rx12VFail               (74),
+                          rxSynthLD               (75),
+                          rxEEFail                (76),
+                          rxOff                   (77),
+                          rxMibFail               (78), -- MIB is are corrupt in EEPROM
+                
+                          --Modem Alarms
+                          mdLOS                   (100),
+                          mdLink                  (101),
+                          mdStatus                (102),
+                          mdDemodAlignmentLost    (103),
+                          mdTdmAlignmentLost      (104),
+                          mdRefAFail              (105),
+                          mdRefBFail              (106),
+                          mdClkSyncFail           (107),
+                          mdNetClkConfig          (108),
+                          mdUCEPresent            (109),
+                          mdInitFail              (110),
+                          mdEEFail                (120),
+                
+                          --General Mux alarms
+                          muxId                   (150),
+                          muxInit                 (151),
+                          muxStat                 (152),
+                          muxClk                  (153),
+                          muxMibEEFail            (154),
+                          muxCharEEFail           (155),
+                
+                          --E1/T1 Mux Alarms
+                          e1LOF                   (200), -- Loss of frame
+                          e1AIS                   (201),
+                          e1RAI                   (202),
+                          e1RMAI                  (203),
+                          e1TS16AIS               (204),
+                          e1TS16LOS               (205),
+                          e1LOS                   (206),
+                          e1CRC4                  (207),
+                          t1LOF                   (220), -- Loss of frame
+                          t1AIS                   (221),
+                          t1RAI                   (222),
+                          t1LOS                   (226),
+                          t1CRC6                  (227),
+                
+                          --motherboard alarms
+                          mbHwHsc                 (250), -- Unsupported hardware version was detected
+                          mbFan1Fail              (251), -- Fan 1 has failed
+                          mbFan2Fail              (252), -- Fan 2 has failed
+                          mbInvalidConfig         (253),
+                          mbCardMismatch          (254), -- Expected and actual installed MUX card mismatch
+                          mbEEFail                (255), -- General EEPROM configuration problem
+
+                          --cross connect alarms
+                          ccDataFail              (300), -- Cross-connection data is invalid
+                          ccNoBandwidth           (301), -- Insufficient bandwidth for specified cross-connects
+                
+                          --mhsb alarms
+                          mhsbSwitchToStandby     (325),
+                
+                          -- External alarms
+                          externalAlarm1          (350), -- External Input alarm 1 is present
+                          externalAlarm2          (351), -- External Input alarm 2 is present
+                          externalOutputAlarm1    (352), -- An alarm is active on External Output 1
+                          externalOutputAlarm2    (353), -- An alarm is active on External Output 2
+                          externalOutputAlarm3    (354), -- An alarm is active on External Output 3
+                          externalOutputAlarm4    (355), -- An alarm is active on External Output 4
+                
+                          -- Remote Alarms
+                          remoteMajorAlarm        (400), -- A major alarm is present on the remote terminal
+                          remoteMinorAlarm        (401), -- A minor alarm is present on the remote terminal
+                
+                          --FXO alarms
+                          fxoCodecOvld            (402),
+                          fxoBillToneOvld         (403),
+                          fxoUnplug               (404),
+                          fxoCurrentOvld          (405),
+    
+                          --FXS ALARMS
+                          fxsCalibError           (406),
+                          fxsDCDCError            (407),
+                          fxsCASLock              (408),
+
+                          -- HSS Alarms
+                          hssTdmLock              (500),
+                          hss32MhzReset           (501),
+                          hssTdmReset             (502),
+                          hssLoss                 (503),
+                          hssRxFifoFull           (504),
+                          hssRxFifoEmpty          (505),
+                          hssTxFifoFull           (506),
+                          hssTxFifoEmpty          (507),
+                          hssRxClockInvalid       (508),
+                          hssTxClockInvalid       (509),
+    
+                          -- V24 Alarms
+                          v24CtrlLineLoss         (525),
+                
+                          --Generic Alarms
+                          altImageTableUsed       (550),
+                          defaultImageTableUsed   (551),
+                          uploadFail              (552),
+
+                          -- PSC Alarms
+                          pscDemuxAlignmentLost   (575),
+                          pscTDMAlignmentLost     (576),
+                          pscMuxAlignmentError    (577),
+                          pscCompanionTxFail      (578),
+                          pscSoftwareOverride     (579),
+                          pscInvalidSwitchValue   (580),
+
+			  -- HSD Alarms
+			  hsdParamMismatch	  (600),
+			  hsdCompanionLost	  (601),
+			  hsdPMTxFreq	  	  (602),
+			  hsdPMRxFreq	  	  (603),
+			  hsdPMTermModState	  (604),
+			  hsdPMTermRfChWidth	  (605),
+			  hsdPMTxPower	  	  (606),
+			  hsdPMModemIntlvEna	  (607),
+                
+                          -- Used to check alarm ranges
+                          lastAlarm               (608)
+                }
+    
+AprisaXEChannelControlType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to set the control the channels, enabling and
+                 disabling E1/T1 ports."
+    SYNTAX      INTEGER { off (0),
+                          on  (1)
+                }
+        
+AprisaXETdmPortType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to set the port out to the TDM bus."
+    SYNTAX      INTEGER { tdmAo (0),
+                          tdmBo (1),
+                          tdmCo (2),
+                          tdmDo (3),
+                          tdmAi (4),
+                          tdmBi (5),
+                          tdmCi (6),
+                          tdmDi (7)
+                }
+                        
+AprisaXETdmBus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to set the TDM bus to use."
+    SYNTAX      INTEGER { tdmBusA (0),
+                          tdmBusB (1),
+                          tdmBusC (2),
+                          tdmBusD (3)
+                }
+
+AprisaXEQuadJetTrafficType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to set the traffic rate for the Quad JET card."
+    SYNTAX      INTEGER { e1Traffic (0),
+                          t1Traffic (1),
+                          j1Traffic (2)
+                }
+
+AprisaXEQuadJetLineEncoding ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to set the line encoding for the Quad JET card the 
+                 default is HDB3 for E1 and B8ZS for T1."
+    SYNTAX      INTEGER { defaultLineEncoding (0), 
+                          hDB3LineEncoding    (2),
+                          b8ZSLineEncoding    (4),
+                          amiLineEncoding     (1)
+                }
+                        
+AprisaXEQuadJetWaveFormShapers ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to set the T1 Tx Waveform Shaper for a port;
+                 The default value is 0~133 ft."
+    SYNTAX      INTEGER { wfs0To133Ft   (2),
+                          wfs133To266Ft (3),
+                          wfs266To399Ft (4),
+                          wfs399To533Ft (5),
+                          wfs533To655Ft (6)
+                }
+
+AprisaXEQuadJetMultiframeEnable ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This is used to enable/disable support for transport of T1 SF 
+                 and ESF multiframe sync for a port."
+    SYNTAX      INTEGER { t1MFOff (0),
+                          t1MFOn  (1)
+                }
+                        
+AprisaXEDataStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This indicates the state of receiver, transmitter or MUX card 
+                 MIB orcharacterisation data."
+    SYNTAX      INTEGER { invalid (0),
+                          valid   (1)
+                }
+
+AprisaXEAdpcmCompression ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This defines the Compression available on ADPCM."
+    SYNTAX      INTEGER { kbits16 (0),
+                          kbits24 (1),
+                          kbits32 (2),
+                          kbits64 (3),
+                          kbits0  (4)
+                 }
+                        
+AprisaXESignalState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This indicates the state of CAS signalling."
+    SYNTAX      INTEGER { normal (0),
+                          invert (1)
+                }
+
+AprisaXEPcmLaw ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Type of PCM encoding available."
+    SYNTAX      INTEGER { alaw (0),
+                          ulaw (1)
+                }
+                        
+AprisaXE4WRxGain ::= TEXTUAL-CONVENTION
+    STATUS      obsolete
+    DESCRIPTION "The gain in half dB steps for 4wire mux cards."
+    SYNTAX      INTEGER { dbpos40 (0),
+                          dbpos35 (1),
+                          dbpos30 (2),
+                          dbpos25 (3),
+                          dbpos20 (4),
+                          dbpos15 (5),
+                          dbpos10 (6),
+                          dbpos05 (7),
+                          dbpos0  (8),
+                          dbneg05 (9),
+                          dbneg10 (10),
+                          dbneg15 (11),
+                          dbneg20 (12),
+                          dbneg25 (13),
+                          dbneg30 (14),
+                          dbneg35 (15),
+                          dbneg40 (16),
+                          dbneg45 (17),
+                          dbneg50 (18),
+                          dbneg55 (19),
+                          dbneg60 (20),
+                          dbneg65 (21),
+                          dbneg70 (22),
+                          dbneg75 (23),
+                          dbneg80 (24),
+                          dbneg85 (25),
+                          dbneg90 (26),
+                          dbneg95 (27),
+                          dbneg100 (28),
+                          dbneg105 (29),
+                          dbneg110 (30),
+                          dbneg115 (31),
+                          dbneg120 (32),
+                          dbneg125 (33),
+                          dbneg130 (34),
+                          dbneg135 (35),
+                          dbneg140 (36)
+                }
+                        
+AprisaXE4WTxGain ::= TEXTUAL-CONVENTION
+    STATUS      obsolete
+    DESCRIPTION "The gain in half dB steps for 4wire mux cards."
+    SYNTAX      INTEGER { pos140 (0),
+                          pos135 (1),
+                          pos130 (2),
+                          pos125 (3),
+                          pos120 (4),
+                          pos115 (5),
+                          pos110 (6),
+                          pos105 (7),
+                          pos100 (8),
+                          pos95  (9),
+                          pos90  (10),
+                          pos85  (11),
+                          pos80  (12),
+                          pos75  (13),
+                          pos70  (14),
+                          pos65  (15),
+                          pos60  (16),
+                          pos55  (17),
+                          pos50  (18),
+                          pos45  (19),
+                          pos40  (20),
+                          pos35  (21),
+                          pos30  (22),
+                          pos25  (23),
+                          pos20  (24),
+                          pos15  (25),
+                          pos10  (26),
+                          pos05  (27),
+                          pos0   (28),
+                          neg05  (29),
+                          neg10  (30),
+                          neg15  (31),
+                          neg20  (32),
+                          neg25  (33),
+                          neg30  (34),
+                          neg35  (35),
+                          neg40  (36)
+                }
+                        
+AprisaXE4WInputLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The input (A->D) level in half dB steps for the 4wire mux cards."
+    SYNTAX      INTEGER { q4emadpos40 (36),
+                          q4emadpos35 (35),
+                          q4emadpos30 (34),
+                          q4emadpos25 (33),
+                          q4emadpos20 (32),
+                          q4emadpos15 (31),
+                          q4emadpos10 (30),
+                          q4emadpos05 (29),
+                          q4emadpos0  (28),
+                          q4emadneg05 (27),
+                          q4emadneg10 (26),
+                          q4emadneg15 (25),
+                          q4emadneg20 (24),
+                          q4emadneg25 (23),
+                          q4emadneg30 (22),
+                          q4emadneg35 (21),
+                          q4emadneg40 (20),
+                          q4emadneg45 (19),
+                          q4emadneg50 (18),
+                          q4emadneg55 (17),
+                          q4emadneg60 (16),
+                          q4emadneg65 (15),
+                          q4emadneg70 (14),
+                          q4emadneg75 (13),
+                          q4emadneg80 (12),
+                          q4emadneg85 (11),
+                          q4emadneg90 (10),
+                          q4emadneg95  (9),
+                          q4emadneg100 (8),
+                          q4emadneg105 (7),
+                          q4emadneg110 (6),
+                          q4emadneg115 (5),
+                          q4emadneg120 (4),
+                          q4emadneg125 (3),
+                          q4emadneg130 (2),
+                          q4emadneg135 (1),
+                          q4emadneg140 (0)
+                }
+                        
+AprisaXE4WOutputLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The output (D->A) level in half dB steps for the 4wire mux cards."
+    SYNTAX      INTEGER { q4emdapos40 (0),
+                          q4emdapos35 (1),
+                          q4emdapos30 (2),
+                          q4emdapos25 (3),
+                          q4emdapos20 (4),
+                          q4emdapos15 (5),
+                          q4emdapos10 (6),
+                          q4emdapos05 (7),
+                          q4emdapos0  (8),
+                          q4emdaneg05 (9),
+                          q4emdaneg10 (10),
+                          q4emdaneg15 (11),
+                          q4emdaneg20 (12),
+                          q4emdaneg25 (13),
+                          q4emdaneg30 (14),
+                          q4emdaneg35 (15),
+                          q4emdaneg40 (16),
+                          q4emdaneg45 (17),
+                          q4emdaneg50 (18),
+                          q4emdaneg55 (19),
+                          q4emdaneg60 (20),
+                          q4emdaneg65 (21),
+                          q4emdaneg70 (22),
+                          q4emdaneg75 (23),
+                          q4emdaneg80 (24),
+                          q4emdaneg85 (25),
+                          q4emdaneg90 (26),
+                          q4emdaneg95 (27),
+                          q4emdaneg100 (28),
+                          q4emdaneg105 (29),
+                          q4emdaneg110 (30),
+                          q4emdaneg115 (31),
+                          q4emdaneg120 (32),
+                          q4emdaneg125 (33),
+                          q4emdaneg130 (34),
+                          q4emdaneg135 (35),
+                          q4emdaneg140 (36)
+                }
+                       
+AprisaXEFXSInputLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The output (A->D) level in half dB steps for the DFXS mux cards."
+    SYNTAX      INTEGER {
+                          -- dfxsadpos30 (25),
+                          -- dfxsadpos25 (24),
+                          dfxsadpos20 (23),
+                          dfxsadpos15 (22),
+                          dfxsadpos10 (21),
+                          dfxsadpos05 (20),
+                          dfxsadpos0  (19),
+                          dfxsadneg05 (18),
+                          dfxsadneg10 (17),
+                          dfxsadneg15 (16),
+                          dfxsadneg20 (15),
+                          dfxsadneg25 (14),
+                          dfxsadneg30 (13),
+                          dfxsadneg35 (12),
+                          dfxsadneg40 (11),
+                          dfxsadneg45 (10),
+                          dfxsadneg50 (9),
+                          dfxsadneg55 (8),
+                          dfxsadneg60 (7),
+                          dfxsadneg65 (6),
+                          dfxsadneg70 (5),
+                          dfxsadneg75 (4),
+                          dfxsadneg80 (3),
+                          dfxsadneg85 (2),
+                          dfxsadneg90 (1)
+                }
+                        
+AprisaXEFXSOutputLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The output (D->A) level in half dB steps for the DFXS mux cards."
+    SYNTAX      INTEGER { dfxsdapos25 (1),
+                          dfxsdapos20 (2),
+                          dfxsdapos15 (3),
+                          dfxsdapos10 (4),
+                          dfxsdapos05 (5),
+                          dfxsdapos0  (6),
+                          dfxsdaneg05 (7),
+                          dfxsdaneg10 (8),
+                          dfxsdaneg15 (9),
+                          dfxsdaneg20 (10),
+                          dfxsdaneg25 (11),
+                          dfxsdaneg30 (12),
+                          dfxsdaneg35 (13),
+                          dfxsdaneg40 (14),
+                          dfxsdaneg45 (15),
+                          dfxsdaneg50 (16),
+                          dfxsdaneg55 (17),
+                          dfxsdaneg60 (18),
+                          dfxsdaneg65 (19),
+                          dfxsdaneg70 (20),
+                          dfxsdaneg75 (21),
+                          dfxsdaneg80 (22),
+                          dfxsdaneg85 (23),
+                          dfxsdaneg90 (24),
+                          dfxsdaneg95 (25)
+                }
+                        
+AprisaXEFXOInputLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The output (A->D) level in half dB steps for the DFXO mux cards."
+    SYNTAX      INTEGER { dfxoadpos10 (22),
+                          dfxoadpos05 (21),
+                          dfxoadpos0  (20),
+                          dfxoadneg05 (19),
+                          dfxoadneg10 (18),
+                          dfxoadneg15 (17),
+                          dfxoadneg20 (16),
+                          dfxoadneg25 (15),
+                          dfxoadneg30 (14),
+                          dfxoadneg35 (13),
+                          dfxoadneg40 (12),
+                          dfxoadneg45 (11),
+                          dfxoadneg50 (10),
+                          dfxoadneg55 (9),
+                          dfxoadneg60 (8),
+                          dfxoadneg65 (7),
+                          dfxoadneg70 (6),
+                          dfxoadneg75 (5),
+                          dfxoadneg80 (4),
+                          dfxoadneg85 (3),
+                          dfxoadneg90 (2),
+                          dfxoadneg95 (1),
+                          dfxoadneg100 (0)
+                }
+                        
+AprisaXEFXOOutputLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The output (D->A) level in half dB steps for the DFXO mux cards."
+    SYNTAX      INTEGER { dfxodapos10 (18),
+                          dfxodapos05 (19),
+                          dfxodapos0  (20),
+                          dfxodaneg05 (21),
+                          dfxodaneg10 (22),
+                          dfxodaneg15 (23),
+                          dfxodaneg20 (24),
+                          dfxodaneg25 (25),
+                          dfxodaneg30 (26),
+                          dfxodaneg35 (27),
+                          dfxodaneg40 (28),
+                          dfxodaneg45 (29),
+                          dfxodaneg50 (30),
+                          dfxodaneg55 (31),
+                          dfxodaneg60 (32),
+                          dfxodaneg65 (33),
+                          dfxodaneg70 (34),
+                          dfxodaneg75 (35),
+                          dfxodaneg80 (36),
+                          dfxodaneg85 (37),
+                          dfxodaneg90 (38),
+                          dfxodaneg95 (39),
+                          dfxodaneg100 (40)
+                }
+                        
+AprisaXEFXOCountry ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The country code for FXO mux cards this will need to be completed later."
+    SYNTAX      INTEGER { argentina   (0),
+                          australia   (1),
+                          austria     (2),
+                          bahrain     (3),
+                          belgium     (4),
+                          brazil      (5),
+                          bulgaria    (6),
+                          canada      (7),
+                          chile       (8),
+                          china       (9),
+                          columbia    (10),
+                          croatia     (11),
+                          cyprus      (12),
+                          czechrep    (13),
+                          denmark     (14),
+                          ecuador     (15),
+                          egypt       (16),
+                          elslavador  (17),
+                          finland     (18),
+                          france      (19),
+                          germany     (20),
+                          greece      (21),
+                          guam        (22),
+                          hongkong    (23),
+                          hungary     (24),
+                          iceland     (25),
+                          india       (26),
+                          indonesia   (27),
+                          ireland     (28),
+                          israel      (29),
+                          italy       (30),
+                          japan       (31),
+                          jordan      (32),
+                          kazakhstan  (33),
+                          kuwait      (34),
+                          latvia      (35),
+                          lebanon     (36),
+                          luxembourg  (37),
+                          macao       (38),
+                          malaysia    (39),
+                          malta       (40),
+                          mexico      (41),
+                          morocco     (42),
+                          netherlands (43),
+                          newzealand  (44),
+                          nigeria     (45),
+                          norway      (46),
+                          oman        (47),
+                          pakistan    (48),
+                          peru        (49),
+                          philippines (50),
+                          poland      (51),
+                          portugal    (52),
+                          romania     (53),
+                          russia      (54),
+                          saudiarabia (55),
+                          singapore   (56),
+                          slovakia    (57),
+                          slovenia    (58),
+                          southafrica (59),
+                          southkorea  (60),
+                          spain       (61),
+                          sweden      (62),
+                          switzerland (63),
+                          syria       (64),
+                          taiwan      (65),
+                          tbr21       (66),
+                          thailand    (67),
+                          uae         (68),
+                          uk          (69),
+                          usa         (70),
+                          yemen       (71)
+                }
+                            
+AprisaXEFXSPMLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Type of SPM level."
+    SYNTAX      INTEGER { l0  (0),
+                          l1  (1),
+                          l2  (2),
+                          l3  (3),
+                          l4  (4),
+                          l5  (5),
+                          l6  (6),
+                          l7  (7),
+                          l8  (8),
+                          l9  (9),
+                          l10 (10),
+                          l11 (11),
+                          l12 (12),
+                          l13 (13),
+                          l14 (14),
+                          l15 (15),
+                          l16 (16),
+                          l17 (17),
+                          l18 (18),
+                          l19 (19),
+                          l20 (20),
+                          l21 (21),
+                          l22 (22),
+                          l23 (23),
+                          l24 (24),
+                          l25 (25),
+                          l26 (26),
+                          l27 (27)
+                }
+                                             
+AprisaXEFXSPathMute ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The status of the Path Mute function for the DFXS."
+    SYNTAX      INTEGER { noMute (0),
+                          muteRx (16),
+                          muteTx (32)
+                }
+
+AprisaXETableCommand ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A command sent to add or delete table entries."
+    SYNTAX      INTEGER { noCommand     (0), 
+                          addCommand    (1),
+                          deleteCommand (2)
+                }
+                        
+AprisaXEQuadJetConnectionType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Indicates whether a connection is for data or CAS signalling."
+    SYNTAX      INTEGER { dataConnection        (0), 
+                          casConnection         (1),
+                          tsLoopbackConnection  (2)
+                }
+
+AprisaXEInterfaceCnxnType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This describes the interface connection type. The
+                 values are arbitrary and are primarily used to
+                 identify instances of aggregate connections."
+    SYNTAX      INTEGER { none(0),                -- Unused connection
+                          unframedE1Intf    (1),
+                          unframedT1Intf    (2),
+                          aggregateIntf     (3),
+                          fourWireIntf      (4),
+                          fxoIntf           (5),
+                          fxsIntf           (6),
+                          v24AsyncIntf      (7),
+                          custEthernetIntf  (8),
+                          mgmtEthernetIntf  (9),
+                          syncSerialIntf    (10),
+                          -- aggregateCasIntf  (11),
+                          hssControlIntf    (12),
+                          dropAndInsertIntf (13)
+                }
+
+AprisaXEConnectionID ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Represents a unique cross-connection identifier."
+    SYNTAX      INTEGER ( 0..65535 )   
+       
+AprisaXEPcmMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "The current PCM mode."
+    SYNTAX      INTEGER { pcm31c    (0), 
+                          pcm30c    (1),
+                          pcm31     (2),
+                          pcm30     (3),
+                          unframed  (4),
+                          off       (5),  -- The port is off
+                          t1sf      (6),
+                          t1esf     (7),
+                          t1sf4     (8),
+                          t1esf16   (10)
+                }
+
+AprisaXESerialEquipmentMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Mode describing the behaviour of the serial interface."
+    SYNTAX      INTEGER { noCable (0),
+                          dceMode (1),
+                          dteMode (2)
+                }
+        
+AprisaXEHssSerialMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Mode describing the type of serial interface, e.g. V.35."
+    SYNTAX      INTEGER { v11Mode       (0),
+                          rs530AMode    (1),
+                          rs530Mode     (2),
+                          x21Mode       (3),
+                          v35Mode       (4),
+                          rs449v36Mode  (5),
+                          rs232v28Mode  (6),
+                          noSerialCable (7)
+                }
+
+AprisaXE2WireSignalState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This indicates the state of the CAS signalling bits
+                 as normal, inverted and disabled."
+    SYNTAX      INTEGER { fxTransNormal  (0),
+                          fxTransInvert  (1),
+                          fxForcedNormal (2),
+                          fxForcedInvert (3)
+                }
+
+AprisaXEEthernetPortNumber ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Ethernet port numbers."
+    SYNTAX        INTEGER { eth1   (1),
+                            eth2   (2),
+                            eth3   (3),
+                            eth4   (4)
+                  }
+
+AprisaXEEthernetGroup ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Used for Ethernet groupings."
+    SYNTAX        INTEGER { user1 (1),
+                            user2 (2),
+                            user3 (3),
+                            user4 (4),
+                            userAndMgmt (5)
+                  }
+
+AprisaXEEthernetFrameRate ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "The frame rate limits allowed by the Marvell switch."
+    SYNTAX        INTEGER { unlimited    (0),
+                            limit128kbps (1),
+                            limit256kbps (2),
+                            limit512kbps (3),
+                            limit1Mbps   (4),
+                            limit2Mbps   (5),
+                            limit4Mbps   (6),
+                            limit8Mbps   (7)
+                  }
+
+AprisaXEEthernetPortPriority ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Indicates the bandwidth allocated to a port."
+    SYNTAX        INTEGER { fromFrame (0),
+                            low       (1),
+                            medium    (3),
+                            high      (5),
+                            vHigh     (7)
+                  }
+
+AprisaXEEthernetGrouping ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Indicates whether Ethernet Grouping is enabled or disabled."
+    SYNTAX        INTEGER { ethGroupDisabled (0),
+                            ethGroupEnabled  (1)
+                  }
+
+AprisaXEEthernetPrioQueueScheduling ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Indicates the QOS priority scheduling scheme."
+    SYNTAX        INTEGER { weighted (0),
+                            strict   (1)
+                  }
+
+AprisaXEEthernetPrioQueueMapping ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Indicates the QOS priority mapping scheme."
+    SYNTAX        INTEGER { standard (0),
+                            cisco    (1)
+                  }
+
+AprisaXEDefaultAction ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Indicates whether, or not, MIB values should be defaulted."
+    SYNTAX        INTEGER { dontSetToDefaults (0),
+                            setToDefaults     (1)
+                  }
+
+AprisaXEQuadJetLoopbacks ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "This indicates the E1 loopback setting on a port; 
+                   OFF, Line or Radio Facing."
+    SYNTAX        INTEGER { e1LoopbacksOff    (0),
+                            e1LineLoopbackOn  (1),
+                            e1RadioLoopbackOn (2)
+                  }
+
+AprisaXECCActivationStatus ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Indicates the current state of cross connect 
+                   activation for the port." 
+    SYNTAX        INTEGER { ccActivated        (0),
+                            ccActivationFailed (1),
+                            ccBusyActivating   (2)
+                  }
+
+AprisaXESysSoftwareStatus ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION   "Indicates consistency of inventory file and system software."
+    SYNTAX        INTEGER { sysInventoryConsistent (0),
+                          sysInventoryInconsistent (1)
+                  }
+
+AprisaXEPSCActiveRadio ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This indicates the active radio for the PSC card."
+    SYNTAX      INTEGER { autoSelect   (1),
+                          manualA      (0),
+                          manualB      (2)
+                }
+                        
+AprisaXEPSCActiveTx ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "This indicates the active transmitter card."
+    SYNTAX      INTEGER { TxA      (0),
+                          TxB      (1)
+                }
+                        
+END

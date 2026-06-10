@@ -1,0 +1,93 @@
+--
+-- 	whisp-reg.mib
+--
+--      *************************************************************************************
+--	    Copyright 2005 - 2015 (c) Cambium Networks
+--      Cambium Networks Confidential Proprietary
+--      *************************************************************************************
+--
+--	This module contains registrations for Canopy related items such
+--	as the identity of products, product components and other MIB
+--	related items.
+--      
+--      *************************************************************************************
+--	$Id: WHISP-GLOBAL-REG-MIB.txt,v 1.2 2007/07/25 16:16:52 qa6656 Exp $
+--
+--      Revision History:
+--
+--      <Date>                  <Author>                <Changes>
+--      01/31/2002                Y.G              	Initial release.
+--      08/24/2005                M.D              	Change OS type for ucos.
+--		05/02/2006				  M.D				Add new global OID definitions
+--		07/12/2006		  		  V.G				Add new global OIDs whispPlvModem and whispPlvGateway
+--		11/10/2006		  		  V.G				Add new global OID whispPlvRepeater and
+--                                                  whispPlvBridge
+--      **************************************************************************************
+
+WHISP-GLOBAL-REG-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	MODULE-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+whispGlobalRegModule 	MODULE-IDENTITY
+	LAST-UPDATED	"200304100000Z"
+	ORGANIZATION	"Motorola"
+	CONTACT-INFO
+		"Canopy Technical Support
+		email: technical-support@canopywireless.com"
+	DESCRIPTION
+		"The Canopy central registration module."
+	::= {whispModules 1}
+
+-- the root of the sub-tree for Canopy Radio Modem Product Line.
+mot		OBJECT IDENTIFIER ::= {enterprises 161}
+whispRoot	OBJECT IDENTIFIER ::= {mot 19}
+
+-- sub-tree for registrations, which includes modules
+whispReg	OBJECT IDENTIFIER ::= {whispRoot 1}
+
+-- sub-tree for WHiSP wide objects and events
+whispGeneric	OBJECT IDENTIFIER ::= {whispRoot 2}
+
+-- sub-tree for WHiSP product specific objects and events
+whispProducts	OBJECT IDENTIFIER ::= {whispRoot 3}
+
+--      Product registrations. The OIDs should be assigned to
+--      sysObjectID of the system group in SNMPv2-MIB supported
+--      by the agent. A manager needs to know the (unique) IP 
+--      address of the agent and get the value (OID value) of
+--      sysObjectID to uniquely identify the agent type. Once the
+--      agent type has been identified, the manager will know what
+--      MIBs the agent supports (from agent capabilities).
+
+        whispAps        OBJECT IDENTIFIER ::= {whispProducts 1}
+        whispSm         OBJECT IDENTIFIER ::= {whispProducts 2}
+        whispBox        OBJECT IDENTIFIER ::= {whispProducts 3}
+        whispCMM        OBJECT IDENTIFIER ::= {whispProducts 4}
+		whispPlv        OBJECT IDENTIFIER ::= {whispProducts 5}
+		whispCMM4       OBJECT IDENTIFIER ::= {whispProducts 6}
+        whispPlvModem   OBJECT IDENTIFIER ::= {whispProducts 7}
+		whispPlvGateway OBJECT IDENTIFIER ::= {whispProducts 8}
+		whispPlvRepeater OBJECT IDENTIFIER ::= {whispProducts 9}
+        whispPlvBridge   OBJECT IDENTIFIER ::= {whispProducts 10}
+       
+-- the Canopy modules registrations
+        whispModules OBJECT IDENTIFIER ::= {whispReg 1}
+
+-- These are the returned values of the agent type.
+-- returned to:  .iso.org.dod.internet.mgmt.mib-2.system.sysObjectID.0 
+
+--SNMP agent for Canopy units
+canopySnmpAgent      OBJECT IDENTIFIER ::= { whispRoot 250 }
+
+--Canopy SNMP agent OID definition
+ucos           OBJECT IDENTIFIER ::= { canopySnmpAgent 256 }
+
+-- prizm snmp agent 
+prizmSnmpAgent	OBJECT IDENTIFIER ::= { whispRoot 1250 }
+
+-- prizm managed object subtree
+prizm	OBJECT IDENTIFIER ::= {whispRoot 1000}
+
+END

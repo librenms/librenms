@@ -1,0 +1,154 @@
+--==================================================================
+-- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: This mib defines all objects to manager Notification 
+--                packets    which not contained in NOTIFICATION-LOG-MIB
+--                [RFC3014].
+-- Reference: rfc3014  rfc3413
+-- Version: V1.0
+-- History:
+-- WangKe   2006-11-22
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Variables and types are imported
+--
+-- ==================================================================
+
+    
+       
+    
+    HUAWEI-ALARM-RELIABILITY-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI                                       
+            RowStatus, TimeInterval            
+                FROM SNMPv2-TC;
+                            
+            hwARModule MODULE-IDENTITY 
+            LAST-UPDATED "200612142010Z"        
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                "VRP Team Huawei Technologies co.,Ltd. 
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                http://www.huawei.com
+                Zip:100085
+                "
+            DESCRIPTION 
+                "The HUAWEI-ALARM-RELIABILITY-MIB contains all objects 
+                to manager Notification packets, it mainly contains    
+                following parts:    
+                1) The number of pending Inform packets.
+                2) The default retry number.
+                3) The timeout apply to all target hosts.                
+                "
+            REVISION "200612142010Z"        
+            DESCRIPTION 
+                "The initial revision of this MIB module."
+            ::= { hwDatacomm 141 }   
+        
+        
+--
+-- Node definitions
+--
+    
+-- ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ================================================================== 
+            hwAR OBJECT IDENTIFIER ::= { hwARModule 1 }           
+            
+            hwARInformPendings OBJECT-TYPE
+            SYNTAX Integer32 (1..2048)               
+            MAX-ACCESS  read-write
+            STATUS     current
+            DESCRIPTION
+                "If a pending inform packet receives the response 
+                packet and its request-id is equal to pending 
+                packet's, this pending packet is discarded at 
+                once. otherwise, it will try to retransmit the 
+                Inform packet after snmpTargetAddrTimeout[RFC3413], 
+                repeat this operation snmpTargetAddrRetryCount
+                [RFC3413] numbers if a response is not received 
+                for a generated message. After this, this pending 
+                packet will be discarded."
+            DEFVAL  { 39 }
+            ::= { hwAR 1 }    
+            
+            
+            hwARRetryCount OBJECT-TYPE
+            SYNTAX      Integer32 (0..10)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "This object specifies a default number of retries 
+                to be attempted when a response is not received for 
+                a generated message. Note that, this number will 
+                apply on all the target host"
+            DEFVAL { 3 }
+            ::= { hwAR 2 }  
+            
+            
+            
+            hwARTimeout OBJECT-TYPE
+            SYNTAX      TimeInterval (100..180000)
+            MAX-ACCESS  read-write
+            STATUS      current
+            DESCRIPTION
+                "This object should reflect the expected maximum round 
+                trip time for communicating with the target hosts. When 
+                a message is send to the target hosts, and response (if
+                expected) are not received within this time period, an
+                implementation may assume that the response will not be
+                delivered. Note that this time interval will apply to all
+                target host."
+            DEFVAL { 1500 }
+            ::= { hwAR 3 }
+
+
+                      
+                      
+                  
+        --  ============== conformance information ==============
+        hwARConformance OBJECT IDENTIFIER ::= { hwARModule 2 }
+        
+        
+        hwARCompliances OBJECT IDENTIFIER ::= { hwARConformance 1 }
+        hwARCompliance MODULE-COMPLIANCE
+            STATUS      current
+            DESCRIPTION
+                "The compliance statement for systems supporting 
+                the this module."
+
+            MODULE      -- this module
+            MANDATORY-GROUPS    {hwARInformPacketsGroup }  
+                                               
+            ::= { hwARCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwARGroups OBJECT IDENTIFIER ::= { hwARConformance 2 } 
+        
+        hwARInformPacketsGroup OBJECT-GROUP
+        OBJECTS { hwARInformPendings ,
+                    hwARRetryCount,
+                    hwARTimeout }
+            STATUS current
+            DESCRIPTION 
+                "The group of operating inform packets."
+            ::= { hwARGroups 1 }
+
+
+        --  ============== conformance information define end ==============
+                        
+    END
+

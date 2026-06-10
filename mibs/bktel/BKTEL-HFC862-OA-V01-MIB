@@ -1,0 +1,2407 @@
+-- *********************************************************************************************
+-- *
+-- * Description:   Implements definitions for the Optical Amplifiers
+-- *
+-- * Note:          This specification is written for the new high power optical anplifiers,
+-- *                but is intended to represent all new optical amplifiers in the future !!!
+-- *                That is why a superset of all optical amplifier features is specified here.
+-- *
+-- * Copyright 2007 by BKtel communications GmbH
+-- *
+-- * V.0.1  23.03.2007  M. Heldmann    first draft
+-- * V.0.2  25.04.2007  M. Heldmann    some items added to oaDisplayTable
+-- * V.0.3  01.06.2007  M. Heldmann    changed oaStatesTecHeatHigh to oaStatesTecCurrentLow
+-- *                                   and oaStatesTecCoolHigh to oaStatesTecCurrentHigh
+-- * V.0.4  12.09.2007  M. Heldmann    adjusted 'LaserFeatures' type strings 
+-- *                                   (max. stringsize less than 64 characters)
+-- * V.0.5  04.04.2008  M. Heldmann    oaReturnLossLoLo..oaReturnLossHiHi made read-write 
+-- *                                   (same behaviour as in web-interface)
+-- * V.0.6  22.03.2013  M. Heldmann    added raman-type amplifier extensions 
+-- *                                   oaStatesRamanBackReflectionRatio, oaStatesRamanOscSignalMissing
+-- *                                   and oaDisplayAmplifierIsRamanType
+-- * V.0.7  11.07.2013  M. Heldmann    adjusted syntax of "CommonEntry" to remove MIB compiler warnings
+-- * V.0.8  06.05.2014  M. Heldmann    marked all internal voltage parameters as 'optional'
+-- * V.0.9  05.09.2014  M. Heldmann    changed CommonModuleWidth and ConfigNESlotWrite STATUS to optional
+-- *********************************************************************************************
+
+
+BKTEL-HFC862-OA-V01-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE
+                 FROM RFC-1212
+        modules, DisplayString, TruthValue, PerceivedSeverityValue, NESlotValue, ModuleWidthValue
+                 FROM BKTEL-HFC862-BASE-MIB
+    ;
+
+    oa                 OBJECT IDENTIFIER ::= { modules 116 }
+    oaCommon           OBJECT IDENTIFIER ::= { oa 1 }
+    oaStates           OBJECT IDENTIFIER ::= { oa 2 }
+    oaConfiguration    OBJECT IDENTIFIER ::= { oa 3 }
+    oaControl          OBJECT IDENTIFIER ::= { oa 4 }
+    oaMeasuringValues  OBJECT IDENTIFIER ::= { oa 5 }
+    oaDisplay          OBJECT IDENTIFIER ::= { oa 6 }
+
+
+--
+-- Type definitions
+--
+
+
+    RegulationMode ::= INTEGER
+        {
+        regModeConstantOutputPower(1),
+        regModeConstantGain(2)
+        }
+
+    SbsEvaluationMode ::= INTEGER
+        {
+        evalModeDefault(1),
+        evalModeFullScan(2)
+        }
+
+    SbsEvaluationState ::= INTEGER
+        {
+        evaluationNotSupported(1),
+        evaluationDone(2),
+        evaluationInProgress(3),
+        evaluationFailed(4)
+        }
+
+    ExtIOmode ::= INTEGER
+        {
+        modeActiveLowOutput(1),
+        modeActiveHighOutput(2),
+        modeRedundantMasterIrreversible(3),
+        modeRedundantMasterFallback(4),
+        modeRedundantSlave(5)
+        }
+
+    ExtIOmask ::= INTEGER
+        {
+        maskAlarmsOnly(1),
+        maskAlarmsAndWarnings(2),
+        maskSpecial(3)           -- This item is NOT writable !!
+        }
+
+    LaserFeatures ::= INTEGER
+        {
+        lasNonExistent(0),
+        lasCurrent(1),
+        lasCurrentLasTec(3),
+        lasCurrentLasTemperature(5),
+        lasCurrentLasTecLasTemperature(7),
+        lasCurrentLasVoltage(9),
+        lasCurrentLasTecLasVoltage(11),
+        lasCurrentLasTemperatureLasVoltage(13),
+        lasCurrentLasTecLasTemperatureLasVoltage(15),
+        lasCurrentLasPumpPower(17),
+        lasCurrentLasTecLasPumpPower(19),
+        lasCurrentLasTemperatureLasPumpPower(21),
+        lasCurrentLasTecLasTemperatureLasPumpPower(23),
+        lasCurrentLasVoltageLasPumpPower(25),
+        lasCurrentLasTecLasVoltageLasPumpPower(27),
+        lasCurrentLasTemperatureLasVoltageLasPumpPower(29),
+        lasCurrentLasTecLasTemperatureLasVoltageLasPumpPower(31)
+        }
+
+    NESlotWriteValue ::= INTEGER (-1..99)
+
+
+-- MibCompiler defs --
+-- $idx$: InternalVoltage
+-- $idx$: Laser
+-- MibCompiler defs --
+
+--*****************************************************************************************
+-- OA ( Optical Amplifier)
+
+--*****************************************************************************************
+-- oaCommon group
+
+    oaCommonNumberOfModules OBJECT-TYPE
+        SYNTAX  INTEGER(0..50)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of modules in table."
+    ::= { oaCommon 1 }
+
+    oaCommonTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaCommonEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "The table contains all modules of the OA-type in the NE"
+    ::= { oaCommon 2 }
+
+-- table of states entry(ro/rw)
+
+    oaCommonEntry OBJECT-TYPE
+        SYNTAX OaCommonEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Common-Values for a module."
+        INDEX { oaNESlot }
+    ::= { oaCommonTable 1 }
+
+-- the structure of the entry
+
+    OaCommonEntry ::= SEQUENCE
+    {
+        oaNESlot                      NESlotValue,
+        oaCommonType                  DisplayString,
+        oaCommonDescr                 DisplayString,
+        oaCommonFirmwareId            DisplayString,
+        oaCommonModuleWidth           ModuleWidthValue
+    }
+
+    oaNESlot OBJECT-TYPE
+        SYNTAX  NESlotValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "The slot number of the chassis for which this
+        entry contains management information."
+    ::= { oaCommonEntry 1 }
+
+    oaCommonType OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "The type of physical module. modSlotEmpty indicates
+         an empty slot.  A Value of modSlotUnknown indicates
+         that the type of module is unknown."
+    ::= { oaCommonEntry 2 }
+
+    oaCommonDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "A textual description of the module.
+        If not available, this Value should be
+        set to a zero length string."
+    ::= { oaCommonEntry 3 }
+
+    oaCommonFirmwareId OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The firmware Id of the module."
+    ::= { oaCommonEntry 4 }
+
+    oaCommonModuleWidth OBJECT-TYPE
+        SYNTAX ModuleWidthValue
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The width of the module in multiples of slots (1, 2, ...)"
+    ::= { oaCommonEntry 5 }
+
+--*****************************************************************************************
+-- oaMeasuringValues group
+--
+-- !!! NOTE !!!
+--
+--      Measuring values in this table that are not supported by the device
+--      return zero for the value and its limits.
+
+-- table of measuring Values
+
+    oaMeasuringValuesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaMeasuringValuesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+   ::= { oaMeasuringValues 1 }
+
+-- table of measuring Values entry
+
+    oaMeasuringValuesEntry OBJECT-TYPE
+        SYNTAX OaMeasuringValuesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Common-Values for a module."
+        INDEX { oaNESlot }
+  ::= { oaMeasuringValuesTable 1 }
+
+--  the structure of the entry
+
+    OaMeasuringValuesEntry ::= SEQUENCE
+    {
+        oaTemperatureLoLo              INTEGER,
+        oaTemperatureLo                INTEGER,
+        oaTemperatureValue             INTEGER,
+        oaTemperatureHi                INTEGER,
+        oaTemperatureHiHi              INTEGER,
+
+        oaInputPowerLoLo               INTEGER,
+        oaInputPowerLo                 INTEGER,
+        oaInputPowerValue              INTEGER,
+        oaInputPowerHi                 INTEGER,
+        oaInputPowerHiHi               INTEGER,
+
+        oaOutputPwrOrGainLoLo          INTEGER,
+        oaOutputPwrOrGainLo            INTEGER,
+        oaOutputPwrOrGainValue         INTEGER,
+        oaOutputPwrOrGainHi            INTEGER,
+        oaOutputPwrOrGainHiHi          INTEGER,
+
+        oaReturnLossLoLo               INTEGER,
+        oaReturnLossLo                 INTEGER,
+        oaReturnLossValue              INTEGER,
+        oaReturnLossHi                 INTEGER,
+        oaReturnLossHiHi               INTEGER,
+
+        oaInputVoltageLoLo             INTEGER,
+        oaInputVoltageLo               INTEGER,
+        oaInputVoltageValue            INTEGER,
+        oaInputVoltageHi               INTEGER,
+        oaInputVoltageHiHi             INTEGER,
+
+        oaInternalVoltage1LoLo         INTEGER,
+        oaInternalVoltage1Lo           INTEGER,
+        oaInternalVoltage1Value        INTEGER,
+        oaInternalVoltage1Hi           INTEGER,
+        oaInternalVoltage1HiHi         INTEGER,
+
+        oaInternalVoltage2LoLo         INTEGER,
+        oaInternalVoltage2Lo           INTEGER,
+        oaInternalVoltage2Value        INTEGER,
+        oaInternalVoltage2Hi           INTEGER,
+        oaInternalVoltage2HiHi         INTEGER,
+
+        oaInternalVoltage3LoLo         INTEGER,
+        oaInternalVoltage3Lo           INTEGER,
+        oaInternalVoltage3Value        INTEGER,
+        oaInternalVoltage3Hi           INTEGER,
+        oaInternalVoltage3HiHi         INTEGER,
+
+        -- ***
+
+        oaLaser1CurrentRelLoLo         INTEGER,
+        oaLaser1CurrentRelLo           INTEGER,
+        oaLaser1CurrentRelValue        INTEGER,
+        oaLaser1CurrentRelHi           INTEGER,
+        oaLaser1CurrentRelHiHi         INTEGER,
+
+        oaLaser1TecRelLoLo             INTEGER,
+        oaLaser1TecRelLo               INTEGER,
+        oaLaser1TecRelValue            INTEGER,
+        oaLaser1TecRelHi               INTEGER,
+        oaLaser1TecRelHiHi             INTEGER,
+
+        oaLaser1TemperatureLoLo        INTEGER,
+        oaLaser1TemperatureLo          INTEGER,
+        oaLaser1TemperatureValue       INTEGER,
+        oaLaser1TemperatureHi          INTEGER,
+        oaLaser1TemperatureHiHi        INTEGER,
+
+        oaLaser1VoltageLoLo            INTEGER,
+        oaLaser1VoltageLo              INTEGER,
+        oaLaser1VoltageValue           INTEGER,
+        oaLaser1VoltageHi              INTEGER,
+        oaLaser1VoltageHiHi            INTEGER,
+
+        -- ***
+
+        oaLaser2CurrentRelLoLo         INTEGER,
+        oaLaser2CurrentRelLo           INTEGER,
+        oaLaser2CurrentRelValue        INTEGER,
+        oaLaser2CurrentRelHi           INTEGER,
+        oaLaser2CurrentRelHiHi         INTEGER,
+
+        oaLaser2TecRelLoLo             INTEGER,
+        oaLaser2TecRelLo               INTEGER,
+        oaLaser2TecRelValue            INTEGER,
+        oaLaser2TecRelHi               INTEGER,
+        oaLaser2TecRelHiHi             INTEGER,
+
+        oaLaser2TemperatureLoLo        INTEGER,
+        oaLaser2TemperatureLo          INTEGER,
+        oaLaser2TemperatureValue       INTEGER,
+        oaLaser2TemperatureHi          INTEGER,
+        oaLaser2TemperatureHiHi        INTEGER,
+
+        oaLaser2VoltageLoLo            INTEGER,
+        oaLaser2VoltageLo              INTEGER,
+        oaLaser2VoltageValue           INTEGER,
+        oaLaser2VoltageHi              INTEGER,
+        oaLaser2VoltageHiHi            INTEGER,
+
+        -- ***
+
+        oaLaser3CurrentRelLoLo         INTEGER,
+        oaLaser3CurrentRelLo           INTEGER,
+        oaLaser3CurrentRelValue        INTEGER,
+        oaLaser3CurrentRelHi           INTEGER,
+        oaLaser3CurrentRelHiHi         INTEGER,
+
+        oaLaser3TecRelLoLo             INTEGER,
+        oaLaser3TecRelLo               INTEGER,
+        oaLaser3TecRelValue            INTEGER,
+        oaLaser3TecRelHi               INTEGER,
+        oaLaser3TecRelHiHi             INTEGER,
+
+        oaLaser3TemperatureLoLo        INTEGER,
+        oaLaser3TemperatureLo          INTEGER,
+        oaLaser3TemperatureValue       INTEGER,
+        oaLaser3TemperatureHi          INTEGER,
+        oaLaser3TemperatureHiHi        INTEGER,
+
+        oaLaser3VoltageLoLo            INTEGER,
+        oaLaser3VoltageLo              INTEGER,
+        oaLaser3VoltageValue           INTEGER,
+        oaLaser3VoltageHi              INTEGER,
+        oaLaser3VoltageHiHi            INTEGER,
+
+        -- ***
+
+        oaLaser4CurrentRelLoLo         INTEGER,
+        oaLaser4CurrentRelLo           INTEGER,
+        oaLaser4CurrentRelValue        INTEGER,
+        oaLaser4CurrentRelHi           INTEGER,
+        oaLaser4CurrentRelHiHi         INTEGER,
+
+        oaLaser4TecRelLoLo             INTEGER,
+        oaLaser4TecRelLo               INTEGER,
+        oaLaser4TecRelValue            INTEGER,
+        oaLaser4TecRelHi               INTEGER,
+        oaLaser4TecRelHiHi             INTEGER,
+
+        oaLaser4TemperatureLoLo        INTEGER,
+        oaLaser4TemperatureLo          INTEGER,
+        oaLaser4TemperatureValue       INTEGER,
+        oaLaser4TemperatureHi          INTEGER,
+        oaLaser4TemperatureHiHi        INTEGER,
+
+        oaLaser4VoltageLoLo            INTEGER,
+        oaLaser4VoltageLo              INTEGER,
+        oaLaser4VoltageValue           INTEGER,
+        oaLaser4VoltageHi              INTEGER,
+        oaLaser4VoltageHiHi            INTEGER,
+
+        -- ***
+
+        oaLaser5CurrentRelLoLo         INTEGER,
+        oaLaser5CurrentRelLo           INTEGER,
+        oaLaser5CurrentRelValue        INTEGER,
+        oaLaser5CurrentRelHi           INTEGER,
+        oaLaser5CurrentRelHiHi         INTEGER,
+
+        oaLaser5TecRelLoLo             INTEGER,
+        oaLaser5TecRelLo               INTEGER,
+        oaLaser5TecRelValue            INTEGER,
+        oaLaser5TecRelHi               INTEGER,
+        oaLaser5TecRelHiHi             INTEGER,
+
+        oaLaser5TemperatureLoLo        INTEGER,
+        oaLaser5TemperatureLo          INTEGER,
+        oaLaser5TemperatureValue       INTEGER,
+        oaLaser5TemperatureHi          INTEGER,
+        oaLaser5TemperatureHiHi        INTEGER,
+
+        oaLaser5VoltageLoLo            INTEGER,
+        oaLaser5VoltageLo              INTEGER,
+        oaLaser5VoltageValue           INTEGER,
+        oaLaser5VoltageHi              INTEGER,
+        oaLaser5VoltageHiHi            INTEGER,
+
+        -- ***
+
+        oaLaser6CurrentRelLoLo         INTEGER,
+        oaLaser6CurrentRelLo           INTEGER,
+        oaLaser6CurrentRelValue        INTEGER,
+        oaLaser6CurrentRelHi           INTEGER,
+        oaLaser6CurrentRelHiHi         INTEGER,
+
+        oaLaser6TecRelLoLo             INTEGER,
+        oaLaser6TecRelLo               INTEGER,
+        oaLaser6TecRelValue            INTEGER,
+        oaLaser6TecRelHi               INTEGER,
+        oaLaser6TecRelHiHi             INTEGER,
+
+        oaLaser6TemperatureLoLo        INTEGER,
+        oaLaser6TemperatureLo          INTEGER,
+        oaLaser6TemperatureValue       INTEGER,
+        oaLaser6TemperatureHi          INTEGER,
+        oaLaser6TemperatureHiHi        INTEGER,
+
+        oaLaser6VoltageLoLo            INTEGER,
+        oaLaser6VoltageLo              INTEGER,
+        oaLaser6VoltageValue           INTEGER,
+        oaLaser6VoltageHi              INTEGER,
+        oaLaser6VoltageHiHi            INTEGER
+    }
+
+-- *****
+    oaTemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature low alarm threshold in steps of 0.1 celsius degrees."
+    ::= { oaMeasuringValuesEntry 1 }
+
+    oaTemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature low warning threshold in steps of 0.1 celsius degrees."
+    ::= { oaMeasuringValuesEntry 2 }
+
+    oaTemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature in steps of 0.1 celsius degrees."
+    ::= { oaMeasuringValuesEntry 3 }
+
+    oaTemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature high warning threshold in steps of 0.1 celsius degrees."
+    ::= { oaMeasuringValuesEntry 4 }
+
+    oaTemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature high alarm threshold in steps of 0.1 celsius degrees."
+    ::= { oaMeasuringValuesEntry 5 }
+
+-- *****
+    oaInputPowerLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Input power low alarm threshold in steps of 0.1dBm."
+    ::= { oaMeasuringValuesEntry 6 }
+
+    oaInputPowerLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Input power low warning threshold in steps of 0.1dBm."
+    ::= { oaMeasuringValuesEntry 7 }
+
+    oaInputPowerValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Input power in steps of 0.1dBm."
+    ::= { oaMeasuringValuesEntry 8 }
+
+    oaInputPowerHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Input power high warning threshold in steps of 0.1dBm."
+    ::= { oaMeasuringValuesEntry 9 }
+
+    oaInputPowerHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Input power high alarm threshold in steps of 0.1dBm."
+    ::= { oaMeasuringValuesEntry 10 }
+
+-- *****
+    oaOutputPwrOrGainLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power (or gain) low alarm threshold in steps of 0.1dB(m).
+                     See oaConfigRegulationMode variable too"
+    ::= { oaMeasuringValuesEntry 11 }
+
+    oaOutputPwrOrGainLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power (or gain) low warning threshold in steps of 0.1dB(m).
+                     See oaConfigRegulationMode variable too"
+    ::= { oaMeasuringValuesEntry 12 }
+
+    oaOutputPwrOrGainValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Output power (or gain) in steps of 0.1dB(m).
+                     See oaConfigRegulationMode variable too"
+    ::= { oaMeasuringValuesEntry 13 }
+
+    oaOutputPwrOrGainHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power (or gain) high warning threshold in steps of 0.1dB(m).
+                     See oaConfigRegulationMode variable too"
+    ::= { oaMeasuringValuesEntry 14 }
+
+    oaOutputPwrOrGainHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power (or gain) high alarm threshold in steps of 0.1dB(m).
+                     See oaConfigRegulationMode variable too"
+    ::= { oaMeasuringValuesEntry 15 }
+
+-- *****
+    oaReturnLossLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "ReturnLoss low alarm threshold in steps of 0.1 dB."
+    ::= { oaMeasuringValuesEntry 16 }
+
+    oaReturnLossLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "ReturnLoss low warning threshold in steps of 0.1 dB."
+    ::= { oaMeasuringValuesEntry 17 }
+
+    oaReturnLossValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "ReturnLoss in steps of 0.1 dB."
+    ::= { oaMeasuringValuesEntry 18 }
+
+    oaReturnLossHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "ReturnLoss high warning threshold in steps of 0.1 dB."
+    ::= { oaMeasuringValuesEntry 19 }
+
+    oaReturnLossHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "ReturnLoss  high alarm threshold in steps of 0.1 dB."
+    ::= { oaMeasuringValuesEntry 20 }
+
+-- *****
+    oaInputVoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 21 }
+
+    oaInputVoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 22 }
+
+    oaInputVoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage in steps of 0.1 Volts.
+                     Input supply voltage nominal value, see 'oaDisplayInputVoltageNominal'"
+    ::= { oaMeasuringValuesEntry 23 }
+
+    oaInputVoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 24 }
+
+    oaInputVoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The input supply voltage high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 25 }
+
+-- #####+20 Space reserved for 4 additional measuring values with limits
+
+-- ########################### Internal Voltages Section ##################################
+
+-- *****
+    oaInternalVoltage1LoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 46 }
+
+    oaInternalVoltage1Lo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 47 }
+
+    oaInternalVoltage1Value OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage in steps of 0.1 Volts.
+                     Internal voltage nominal value, see 'oaDisplayInternalVoltage1Nominal'"
+    ::= { oaMeasuringValuesEntry 48 }
+
+    oaInternalVoltage1Hi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 49 }
+
+    oaInternalVoltage1HiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 50 }
+
+-- *****
+    oaInternalVoltage2LoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 51 }
+
+    oaInternalVoltage2Lo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 52 }
+
+    oaInternalVoltage2Value OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage in steps of 0.1 Volts.
+                     Internal voltage nominal value, see 'oaDisplayInternalVoltage2Nominal'"
+    ::= { oaMeasuringValuesEntry 53 }
+
+    oaInternalVoltage2Hi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 54 }
+
+    oaInternalVoltage2HiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 55 }
+
+-- *****
+    oaInternalVoltage3LoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 56 }
+
+    oaInternalVoltage3Lo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 57 }
+
+    oaInternalVoltage3Value OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage in steps of 0.1 Volts.
+                     Internal voltage nominal value, see 'oaDisplayInternalVoltage3Nominal'"
+    ::= { oaMeasuringValuesEntry 58 }
+
+    oaInternalVoltage3Hi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 59 }
+
+    oaInternalVoltage3HiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The internal voltage high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 60 }
+
+-- #####+25 Space reserved for 5 additional internal voltage measuring values with limits
+
+-- ################################### Lasers Section ##################################
+
+-- ***********************************
+    oaLaser1CurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 86 }
+
+    oaLaser1CurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 87 }
+
+    oaLaser1CurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser no.1 current relative to the current at begin of life in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 88 }
+
+    oaLaser1CurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 89 }
+
+    oaLaser1CurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 90 }
+
+-- *****
+    oaLaser1TecRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 91 }
+
+    oaLaser1TecRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 92 }
+
+    oaLaser1TecRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The thermo-electric-cooler current of laser no.1 relative to its maximum value in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 93 }
+
+    oaLaser1TecRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 94 }
+
+    oaLaser1TecRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 95 }
+
+-- *****
+    oaLaser1TemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 96 }
+
+    oaLaser1TemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 97 }
+
+    oaLaser1TemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 98 }
+
+    oaLaser1TemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 99 }
+
+    oaLaser1TemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 100 }
+
+-- *****
+    oaLaser1VoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 101 }
+
+    oaLaser1VoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 102 }
+
+    oaLaser1VoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 103 }
+
+    oaLaser1VoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 104 }
+
+    oaLaser1VoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 105 }
+
+-- #####+5 Space reserved for 1 additional laser measuring value with limits
+
+-- ***********************************
+    oaLaser2CurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 111 }
+
+    oaLaser2CurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 112 }
+
+    oaLaser2CurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser no.1 current relative to the current at begin of life in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 113 }
+
+    oaLaser2CurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 114 }
+
+    oaLaser2CurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 115 }
+
+-- *****
+    oaLaser2TecRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 116 }
+
+    oaLaser2TecRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 117 }
+
+    oaLaser2TecRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The thermo-electric-cooler current of laser no.1 relative to its maximum value in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 118 }
+
+    oaLaser2TecRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 119 }
+
+    oaLaser2TecRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 120 }
+
+-- *****
+    oaLaser2TemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 121 }
+
+    oaLaser2TemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 122 }
+
+    oaLaser2TemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 123 }
+
+    oaLaser2TemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 124 }
+
+    oaLaser2TemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 125 }
+
+-- *****
+    oaLaser2VoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 126 }
+
+    oaLaser2VoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 127 }
+
+    oaLaser2VoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 128 }
+
+    oaLaser2VoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 129 }
+
+    oaLaser2VoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 130 }
+
+-- #####+5 Space reserved for 1 additional laser measuring value with limits
+
+-- ***********************************
+    oaLaser3CurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 136 }
+
+    oaLaser3CurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 137 }
+
+    oaLaser3CurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser no.1 current relative to the current at begin of life in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 138 }
+
+    oaLaser3CurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 139 }
+
+    oaLaser3CurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 140 }
+
+-- *****
+    oaLaser3TecRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 141 }
+
+    oaLaser3TecRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 142 }
+
+    oaLaser3TecRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The thermo-electric-cooler current of laser no.1 relative to its maximum value in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 143 }
+
+    oaLaser3TecRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 144 }
+
+    oaLaser3TecRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 145 }
+
+-- *****
+    oaLaser3TemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 146 }
+
+    oaLaser3TemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 147 }
+
+    oaLaser3TemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 148 }
+
+    oaLaser3TemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 149 }
+
+    oaLaser3TemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 150 }
+
+-- *****
+    oaLaser3VoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 151 }
+
+    oaLaser3VoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 152 }
+
+    oaLaser3VoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 153 }
+
+    oaLaser3VoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 154 }
+
+    oaLaser3VoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 155 }
+
+-- #####+5 Space reserved for 1 additional laser measuring value with limits
+
+-- ***********************************
+    oaLaser4CurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 161 }
+
+    oaLaser4CurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 162 }
+
+    oaLaser4CurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser no.1 current relative to the current at begin of life in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 163 }
+
+    oaLaser4CurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 164 }
+
+    oaLaser4CurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 165 }
+
+-- *****
+    oaLaser4TecRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 166 }
+
+    oaLaser4TecRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 167 }
+
+    oaLaser4TecRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The thermo-electric-cooler current of laser no.1 relative to its maximum value in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 168 }
+
+    oaLaser4TecRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 169 }
+
+    oaLaser4TecRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 170 }
+
+-- *****
+    oaLaser4TemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 171 }
+
+    oaLaser4TemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 172 }
+
+    oaLaser4TemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 173 }
+
+    oaLaser4TemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 174 }
+
+    oaLaser4TemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 175 }
+
+-- *****
+    oaLaser4VoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 176 }
+
+    oaLaser4VoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 177 }
+
+    oaLaser4VoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 178 }
+
+    oaLaser4VoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 179 }
+
+    oaLaser4VoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 180 }
+
+-- #####+5 Space reserved for 1 additional laser measuring value with limits
+
+-- ***********************************
+    oaLaser5CurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 186 }
+
+    oaLaser5CurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 187 }
+
+    oaLaser5CurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser no.1 current relative to the current at begin of life in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 188 }
+
+    oaLaser5CurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 189 }
+
+    oaLaser5CurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 190 }
+
+-- *****
+    oaLaser5TecRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 191 }
+
+    oaLaser5TecRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 192 }
+
+    oaLaser5TecRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The thermo-electric-cooler current of laser no.1 relative to its maximum value in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 193 }
+
+    oaLaser5TecRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 194 }
+
+    oaLaser5TecRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 195 }
+
+-- *****
+    oaLaser5TemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 196 }
+
+    oaLaser5TemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 197 }
+
+    oaLaser5TemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 198 }
+
+    oaLaser5TemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 199 }
+
+    oaLaser5TemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 200 }
+
+-- *****
+    oaLaser5VoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 201 }
+
+    oaLaser5VoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 202 }
+
+    oaLaser5VoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 203 }
+
+    oaLaser5VoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 204 }
+
+    oaLaser5VoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 205 }
+
+-- #####+5 Space reserved for 1 additional laser measuring value with limits
+
+-- ***********************************
+    oaLaser6CurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 211 }
+
+    oaLaser6CurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 212 }
+
+    oaLaser6CurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser no.1 current relative to the current at begin of life in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 213 }
+
+    oaLaser6CurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 214 }
+
+    oaLaser6CurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser no.1 current high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 215 }
+
+-- *****
+    oaLaser6TecRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 216 }
+
+    oaLaser6TecRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 low warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 217 }
+
+    oaLaser6TecRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The thermo-electric-cooler current of laser no.1 relative to its maximum value in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 218 }
+
+    oaLaser6TecRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high warning threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 219 }
+
+    oaLaser6TecRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current of laser no.1 high alarm threshold in steps of 0.1%."
+    ::= { oaMeasuringValuesEntry 220 }
+
+-- *****
+    oaLaser6TemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 221 }
+
+    oaLaser6TemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 low warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 222 }
+
+    oaLaser6TemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 223 }
+
+    oaLaser6TemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high warning threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 224 }
+
+    oaLaser6TemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Temperature of laser no.1 high alarm threshold in steps of 0.1 Celsius Degrees."
+    ::= { oaMeasuringValuesEntry 225 }
+
+-- *****
+    oaLaser6VoltageLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 226 }
+
+    oaLaser6VoltageLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 low warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 227 }
+
+    oaLaser6VoltageValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 228 }
+
+    oaLaser6VoltageHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high warning threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 229 }
+
+    oaLaser6VoltageHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The supply voltage of laser no.1 high alarm threshold in steps of 0.1 Volts."
+    ::= { oaMeasuringValuesEntry 230 }
+
+-- #####+5 Space reserved for 1 additional laser measuring value with limits
+
+
+--*****************************************************************************************
+--  oaStates group
+
+    oaStatesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaStatesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { oaStates 1 }
+
+-- table of states entry(ro/rw)
+
+    oaStatesEntry OBJECT-TYPE
+        SYNTAX OaStatesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Alarms for a module."
+        INDEX { oaNESlot }
+    ::= { oaStatesTable 1 }
+
+-- the structure of the entry
+
+    OaStatesEntry ::= SEQUENCE
+    {
+        oaStatesBootloader               PerceivedSeverityValue,
+        oaStatesCommLoss                 PerceivedSeverityValue,
+        oaStatesInitializing             PerceivedSeverityValue,
+        oaStatesLaserShutdown            PerceivedSeverityValue,
+        oaStatesTemperatureLow           PerceivedSeverityValue,
+        oaStatesTemperatureHigh          PerceivedSeverityValue,
+        oaStatesSystem                   PerceivedSeverityValue,
+        oaStatesInputPwrLow              PerceivedSeverityValue,
+        oaStatesInputPwrHigh             PerceivedSeverityValue,
+        oaStatesOutputPwrOrGainLow       PerceivedSeverityValue,
+        oaStatesOutputPwrOrGainHigh      PerceivedSeverityValue,
+        oaStatesReturnLossLow            PerceivedSeverityValue,
+        oaStatesReturnLossHigh           PerceivedSeverityValue,
+        oaStatesRedundancySwitch         PerceivedSeverityValue,
+        oaStatesInputVoltageLow          PerceivedSeverityValue,
+        oaStatesInputVoltageHigh         PerceivedSeverityValue,
+        -- ** Only for 19 inch devices with supply and fan units
+        oaStatesPowerSupplyLeft          PerceivedSeverityValue,
+        oaStatesPowerSupplyRight         PerceivedSeverityValue,
+        oaStatesFanLeft                  PerceivedSeverityValue,
+        oaStatesFanRight                 PerceivedSeverityValue,
+        -- ** Shared alarms for all internal voltages
+        oaStatesInternalVoltageLow       PerceivedSeverityValue,
+        oaStatesInternalVoltageHigh      PerceivedSeverityValue,
+        -- ** Shared alarms for all laser parameters
+        oaStatesLaserCurrentLow          PerceivedSeverityValue,
+        oaStatesLaserCurrentHigh         PerceivedSeverityValue,
+        oaStatesTecCurrentLow            PerceivedSeverityValue,
+        oaStatesTecCurrentHigh           PerceivedSeverityValue,
+        oaStatesLaserTempLow             PerceivedSeverityValue,
+        oaStatesLaserTempHigh            PerceivedSeverityValue,
+        oaStatesLaserVoltageLow          PerceivedSeverityValue,
+        oaStatesLaserVoltageHigh         PerceivedSeverityValue,
+        -- ** Only for amplifiers of raman type (see oaDisplayAmplifierIsRamanType) - 
+        oaStatesRamanBackReflectionRatio PerceivedSeverityValue,
+        oaStatesRamanOscSignalMissing    PerceivedSeverityValue
+    }
+
+    oaStatesBootloader OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The device is running in bootloader mode
+             without a legal application software."
+    ::= { oaStatesEntry 1 }
+
+    oaStatesCommLoss OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The NEC has lost the connection to the device.
+             Reason may be a removed or defective device.
+             Note that this state is set by the NEC and not
+             by the device"
+    ::= { oaStatesEntry 2 }
+
+    oaStatesInitializing OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The device is initializing"
+    ::= { oaStatesEntry 3 }
+
+    oaStatesLaserShutdown OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Lasers are shutdown, no optical output"
+    ::= { oaStatesEntry 4 }
+
+    oaStatesTemperatureLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device internal temperature low"
+    ::= { oaStatesEntry 5 }
+
+    oaStatesTemperatureHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device internal temperature high"
+    ::= { oaStatesEntry 6 }
+
+    oaStatesSystem OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Internal error occured"
+    ::= { oaStatesEntry 7 }
+
+    oaStatesInputPwrLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Optical input power low"
+    ::= { oaStatesEntry 8 }
+
+    oaStatesInputPwrHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Optical input power high"
+    ::= { oaStatesEntry 9 }
+
+    oaStatesOutputPwrOrGainLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Optical output power (or gain) low"
+    ::= { oaStatesEntry 10 }
+
+    oaStatesOutputPwrOrGainHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Optical output power (or gain) high"
+    ::= { oaStatesEntry 11 }
+
+    oaStatesReturnLossLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Return loss low"
+    ::= { oaStatesEntry 12 }
+
+    oaStatesReturnLossHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Return loss high"
+    ::= { oaStatesEntry 13 }
+
+    oaStatesRedundancySwitch OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "This (redundant) device has been activated (redundancy switchover)"
+    ::= { oaStatesEntry 14 }
+
+    oaStatesInputVoltageLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Input supply voltage low"
+    ::= { oaStatesEntry 15 }
+
+    oaStatesInputVoltageHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Input supply voltage high"
+    ::= { oaStatesEntry 16 }
+
+-- #####+8 Space reserved for additional states
+
+    oaStatesPowerSupplyLeft OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The left (looking from front) power supply unit fails.
+                     Only valid for devices in 19 inch housing"
+    ::= { oaStatesEntry 25 }
+
+    oaStatesPowerSupplyRight OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The right (looking from front) power supply unit fails.
+                     Only valid for devices in 19 inch housing"
+    ::= { oaStatesEntry 26 }
+
+    oaStatesFanLeft OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The left (looking from front) fan unit fails.
+                     Only valid for devices in 19 inch housing"
+    ::= { oaStatesEntry 27 }
+
+    oaStatesFanRight OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The right (looking from front) fan unit fails.
+                     Only valid for devices in 19 inch housing"
+    ::= { oaStatesEntry 28 }
+
+    oaStatesInternalVoltageLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "One (or more) internal voltages low"
+    ::= { oaStatesEntry 29 }
+
+    oaStatesInternalVoltageHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "One (or more) internal voltages high"
+    ::= { oaStatesEntry 30 }
+
+    oaStatesLaserCurrentLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser current of one (or more) lasers low"
+    ::= { oaStatesEntry 31 }
+
+    oaStatesLaserCurrentHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser current of one (or more) lasers high (laser is aging)"
+    ::= { oaStatesEntry 32 }
+
+    oaStatesTecCurrentLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser TEC current limit of one (or more) lasers reached (heating limit)"
+    ::= { oaStatesEntry 33 }
+
+    oaStatesTecCurrentHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser TEC current limit of one (or more) lasers reached (cooling limit)"
+    ::= { oaStatesEntry 34 }
+
+    oaStatesLaserTempLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser temperature of one (or more) lasers low"
+    ::= { oaStatesEntry 35 }
+
+    oaStatesLaserTempHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser temperature of one (or more) lasers high"
+    ::= { oaStatesEntry 36 }
+
+    oaStatesLaserVoltageLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser voltage supply of one (or more) lasers low"
+    ::= { oaStatesEntry 37 }
+
+    oaStatesLaserVoltageHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser voltage supply of one (or more) lasers high"
+    ::= { oaStatesEntry 38 }
+
+    oaStatesRamanBackReflectionRatio OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Raman amplifier back reflection ratio high alarm
+                     Only used if oaDisplayAmplifierIsRamanType == true(1)"
+    ::= { oaStatesEntry 39 }
+
+    oaStatesRamanOscSignalMissing OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Raman amplifier oscillator signal missing alarm
+                     Only used if oaDisplayAmplifierIsRamanType == true(1)"
+    ::= { oaStatesEntry 40 }
+
+--*****************************************************************************************
+--  oaControl group
+
+    oaControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { oaControl 1 }
+
+-- table of control entry(ro/rw)
+
+    oaControlEntry OBJECT-TYPE
+        SYNTAX OaControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Alarms for a module."
+        INDEX { oaNESlot }
+    ::= { oaControlTable 1 }
+
+-- the structure of the entry
+
+    OaControlEntry ::= SEQUENCE
+    {
+        oaControlLaserShutdown                     TruthValue,
+        oaControlReset                             TruthValue,
+        oaControlModuleLedBlink                    TruthValue,
+        oaControlSbsEvaluationStart                TruthValue
+    }
+
+    oaControlLaserShutdown OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Shutdown the laser(s), optical power on/off."
+    ::= { oaControlEntry 1 }
+
+    oaControlReset OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Reset the module."
+    ::= { oaControlEntry 2 }
+
+    oaControlModuleLedBlink OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "Writing this variable to true(1) lets the device's
+        modul LED blink green for 10 seconds.
+        Writing this variable to false(2) stops blinking at once.
+        This variable always returns false(2) on read requests"
+    ::= { oaControlEntry 3 }
+
+    oaControlSbsEvaluationStart OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Setting to true(1) starts an SBS threshold evaluation process.
+             Always reads as false(2)"
+    ::={ oaControlEntry 4 }
+
+
+--*****************************************************************************************
+-- oaConfiguration group
+
+    oaConfigurationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaConfigurationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { oaConfiguration 1 }
+
+-- table of configuration entry(ro/rw)
+
+    oaConfigurationEntry OBJECT-TYPE
+        SYNTAX OaConfigurationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { oaNESlot  }
+    ::= { oaConfigurationTable 1 }
+
+-- the structure of the entry
+
+    OaConfigurationEntry ::= SEQUENCE
+    {
+        oaConfigNESlotWrite                     NESlotWriteValue,
+        oaConfigRegulationMode                  RegulationMode,
+        oaConfigOutputPwrOrGainAdjust           INTEGER,
+        oaConfigModeExtIO                       ExtIOmode,
+        oaConfigMaskExtIO                       ExtIOmask,
+        oaConfigSbsEvaluationMode               SbsEvaluationMode
+    }
+
+    oaConfigNESlotWrite OBJECT-TYPE
+        SYNTAX NESlotWriteValue
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION "By writing this variable a slot can be assigned
+            for devices that dont support hardware slot detection.
+            Reading '-1' means that the slot position is NOT writable."
+    ::= { oaConfigurationEntry 1 }
+
+    oaConfigRegulationMode OBJECT-TYPE
+        SYNTAX  RegulationMode
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The regulation mode of the device.
+             - regModeConstantOutputPower(1):
+               If the device runs in constant output power mode, then all *OutputPwrOrGain*
+               variables are interpreted as 'Output Power' specific.
+             - regModeConstantGain(2):
+               If the device runs in constant gain mode, then all *OutputPwrOrGain*
+               variables are interpreted as 'Gain' specific."
+    ::={ oaConfigurationEntry 2 }
+
+    oaConfigOutputPwrOrGainAdjust OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "This variable can be used to adjust the desired output power (or gain)
+             value in 0.1 dB units relative to its nominal level.
+             See oaConfigRegulationMode variable too"
+    ::={ oaConfigurationEntry 3 }
+
+    oaConfigModeExtIO OBJECT-TYPE
+        SYNTAX ExtIOmode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "The mode and usage of the device's external IO port."
+    ::= { oaConfigurationEntry 4 }
+
+    oaConfigMaskExtIO OBJECT-TYPE
+        SYNTAX ExtIOmask
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+          "The alarm/warning mask that activates the device's external IO port."
+    ::= { oaConfigurationEntry 5 }
+
+    oaConfigSbsEvaluationMode OBJECT-TYPE
+        SYNTAX SbsEvaluationMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "The SBS threshold evaluation mode."
+    ::={ oaConfigurationEntry 6 }
+
+--*****************************************************************************************
+-- Display group
+
+    oaDisplayTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OaDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { oaDisplay 1 }
+
+-- table of configuration entry(ro/rw)
+
+    oaDisplayEntry OBJECT-TYPE
+        SYNTAX OaDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { oaNESlot  }
+    ::= { oaDisplayTable 1 }
+
+-- the structure of the entry
+
+    OaDisplayEntry ::= SEQUENCE
+    {
+        oaDisplayNumberOfLasers            INTEGER,
+        oaDisplayNumberOfInternalVoltages  INTEGER,
+        oaDisplayExtIOSupported            TruthValue,
+        oaDisplaySbsSupported              TruthValue,
+        oaDisplayReturnLossSupported       TruthValue,
+        oaDisplaySbsEvaluatedThreshold     INTEGER,
+        oaDisplaySbsLastEvaluationState    SbsEvaluationState,
+        oaDisplaySbsLastEvaluationTime     DisplayString,
+        oaDisplayOutputPwrOrGainNominal    INTEGER,
+        oaDisplayOutputPwrOrGainAdjusted   INTEGER,
+        oaDisplayInputVoltageNominal       INTEGER,
+        oaDisplayInternalVoltage1Nominal   INTEGER,
+        oaDisplayInternalVoltage2Nominal   INTEGER,
+        oaDisplayInternalVoltage3Nominal   INTEGER,
+        oaDisplayLaser1VoltageNominal      INTEGER,
+        oaDisplayLaser2VoltageNominal      INTEGER,
+        oaDisplayLaser3VoltageNominal      INTEGER,
+        oaDisplayLaser4VoltageNominal      INTEGER,
+        oaDisplayLaser5VoltageNominal      INTEGER,
+        oaDisplayLaser6VoltageNominal      INTEGER,
+        oaDisplayLaser1PumpPowerRel        INTEGER,
+        oaDisplayLaser2PumpPowerRel        INTEGER,
+        oaDisplayLaser3PumpPowerRel        INTEGER,
+        oaDisplayLaser4PumpPowerRel        INTEGER,
+        oaDisplayLaser5PumpPowerRel        INTEGER,
+        oaDisplayLaser6PumpPowerRel        INTEGER,
+        oaDisplayLaser1FeaturesSupported   LaserFeatures,
+        oaDisplayLaser2FeaturesSupported   LaserFeatures,
+        oaDisplayLaser3FeaturesSupported   LaserFeatures,
+        oaDisplayLaser4FeaturesSupported   LaserFeatures,
+        oaDisplayLaser5FeaturesSupported   LaserFeatures,
+        oaDisplayLaser6FeaturesSupported   LaserFeatures,
+        oaDisplayAmplifierIsRamanType      TruthValue
+    }
+
+    oaDisplayNumberOfLasers OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The number of lasers used by this optical amplifier"
+    ::={ oaDisplayEntry 1 }
+
+    oaDisplayNumberOfInternalVoltages OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The number of internal voltages monitored by this optical amplifier"
+    ::={ oaDisplayEntry 2 }
+
+    oaDisplayExtIOSupported OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Return 'true(1)' if external I/O feature is supported by the device."
+    ::= { oaDisplayEntry 3 }
+
+    oaDisplaySbsSupported OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Return 'true(1)' if SBS feature is supported by the device."
+    ::= { oaDisplayEntry 4 }
+
+    oaDisplayReturnLossSupported OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Return 'true(1)' if ReturnLoss feature is supported by the device."
+    ::= { oaDisplayEntry 5 }
+
+    oaDisplaySbsEvaluatedThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The evaluated SBS output power or gain threshold in 0.1 dB(m) units.
+             Not supported by all optical amplifiers"
+    ::={ oaDisplayEntry 6 }
+
+    oaDisplaySbsLastEvaluationState OBJECT-TYPE
+        SYNTAX  SbsEvaluationState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The result of last SBS threshold evaluation process.
+             Returns 'evaluationNotSupported(1)' if SBS threshold evaluation
+             is not supported by this optical amplifier"
+    ::={ oaDisplayEntry 7 }
+
+    oaDisplaySbsLastEvaluationTime OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The time of last successfull SBS threshold evaluation process.
+             Not supported by all optical amplifiers"
+    ::={ oaDisplayEntry 8 }
+
+    oaDisplayOutputPwrOrGainNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The nominal value of output power (or gain) in 0.1 dB(m) units.
+             See oaConfigRegulationMode variable too"
+    ::={ oaDisplayEntry 9 }
+
+    oaDisplayOutputPwrOrGainAdjusted OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The adjusted desired value of output power (or gain) in 0.1 dB(m) units.
+             See oaConfigRegulationMode variable too"
+    ::={ oaDisplayEntry 10 }
+
+    oaDisplayInputVoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal value of input voltage in 0.1 V units."
+    ::={ oaDisplayEntry 11 }
+
+    oaDisplayInternalVoltage1Nominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal value of internal voltage no. 1 in 0.1 V units."
+    ::={ oaDisplayEntry 12 }
+
+    oaDisplayInternalVoltage2Nominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal value of internal voltage no. 2 in 0.1 V units."
+    ::={ oaDisplayEntry 13 }
+
+    oaDisplayInternalVoltage3Nominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal value of internal voltage no. 3 in 0.1 V units."
+    ::={ oaDisplayEntry 14 }
+
+-- #####+5 Space reserved for 5 additional internal voltages
+
+    oaDisplayLaser1VoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal supply voltage of laser no.1 in 0.1 V units."
+    ::={ oaDisplayEntry 20 }
+
+    oaDisplayLaser2VoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal supply voltage of laser no.2 in 0.1 V units."
+    ::={ oaDisplayEntry 21 }
+
+    oaDisplayLaser3VoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal supply voltage of laser no.3 in 0.1 V units."
+    ::={ oaDisplayEntry 22 }
+
+    oaDisplayLaser4VoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal supply voltage of laser no.4 in 0.1 V units."
+    ::={ oaDisplayEntry 23 }
+
+    oaDisplayLaser5VoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal supply voltage of laser no.5 in 0.1 V units."
+    ::={ oaDisplayEntry 24 }
+
+    oaDisplayLaser6VoltageNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  optional
+        DESCRIPTION
+            "The nominal supply voltage of laser no.6 in 0.1 V units."
+    ::={ oaDisplayEntry 25 }
+
+-- #####+4 Space reserved for 4 additional lasers
+
+    oaDisplayLaser1PumpPowerRel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The pump power of laser no.1 in steps of 0.1%"
+    ::={ oaDisplayEntry 30 }
+
+    oaDisplayLaser2PumpPowerRel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The pump power of laser no.2 in steps of 0.1%"
+    ::={ oaDisplayEntry 31 }
+
+    oaDisplayLaser3PumpPowerRel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The pump power of laser no.3 in steps of 0.1%"
+    ::={ oaDisplayEntry 32 }
+
+    oaDisplayLaser4PumpPowerRel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The pump power of laser no.4 in steps of 0.1%"
+    ::={ oaDisplayEntry 33 }
+
+    oaDisplayLaser5PumpPowerRel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The pump power of laser no.5 in steps of 0.1%"
+    ::={ oaDisplayEntry 34 }
+
+    oaDisplayLaser6PumpPowerRel OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The pump power of laser no.6 in steps of 0.1%"
+    ::={ oaDisplayEntry 35 }
+
+-- #####+4 Space reserved for 4 additional lasers
+
+    oaDisplayLaser1FeaturesSupported OBJECT-TYPE
+        SYNTAX  LaserFeatures
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The features supported by laser no.1
+             A bitfield containing the features supplied by this laser.
+             Note that laserCurrent is always supplied."
+    ::={ oaDisplayEntry 40 }
+
+    oaDisplayLaser2FeaturesSupported OBJECT-TYPE
+        SYNTAX  LaserFeatures
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The features supported by laser no.2"
+    ::={ oaDisplayEntry 41 }
+
+    oaDisplayLaser3FeaturesSupported OBJECT-TYPE
+        SYNTAX  LaserFeatures
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The features supported by laser no.3"
+    ::={ oaDisplayEntry 42 }
+
+    oaDisplayLaser4FeaturesSupported OBJECT-TYPE
+        SYNTAX  LaserFeatures
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The features supported by laser no.4"
+    ::={ oaDisplayEntry 43 }
+
+    oaDisplayLaser5FeaturesSupported OBJECT-TYPE
+        SYNTAX  LaserFeatures
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The features supported by laser no.5"
+    ::={ oaDisplayEntry 44 }
+
+    oaDisplayLaser6FeaturesSupported OBJECT-TYPE
+        SYNTAX  LaserFeatures
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The features supported by laser no.6"
+    ::={ oaDisplayEntry 45 }
+
+-- #####+4 Space reserved for 4 additional lasers
+
+    oaDisplayAmplifierIsRamanType OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Returns true(1) if this amplifier is of RAMAN type"
+    ::={ oaDisplayEntry 50 }
+
+
+--*****************************************************************************************
+END

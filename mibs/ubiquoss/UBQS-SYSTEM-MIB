@@ -1,0 +1,673 @@
+-- *****************************************************************
+-- UBQS-SYSTEM-MIB:  Ubiquoss System MIB file
+--
+-- June 2009, Hyung Eun Park
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	IpAddress
+		FROM RFC1155-SMI  
+	OBJECT-TYPE
+		FROM RFC-1212
+	DisplayString, PhysAddress
+		FROM SNMPv2-TC
+	ubiMgmtv2
+		FROM UBQS-SMI;
+          
+ubiSystemMIB MODULE-IDENTITY
+    LAST-UPDATED    "200906170000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-SYSTEM-MIB is used to get 
+        the system information."      
+ 	REVISION	"201012170000Z"
+ 	DESCRIPTION
+        "Add system clock table"
+       
+    ::= { ubiMgmtv2 1 }
+                          
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+-- ***************************************************************
+-- ubiSystemMIB
+-- ***************************************************************
+
+ubiSystemMIBObjects             OBJECT IDENTIFIER   ::= { ubiSystemMIB 1 }   
+ubiSystemMIBNotificationPrefix  OBJECT IDENTIFIER   ::= { ubiSystemMIB 2 }   
+ubiSystemMIBConformance    		OBJECT IDENTIFIER 	::= { ubiSystemMIB 3 }
+                    
+                        
+ubiSysInfo             	OBJECT IDENTIFIER 	::= { ubiSystemMIBObjects 2 }
+ubiSysRedundancy		OBJECT IDENTIFIER	::= { ubiSystemMIBObjects 7 }  
+ubiSysTimeZone         	OBJECT IDENTIFIER 	::= { ubiSysInfo 8 }
+ubiSysBanner			OBJECT IDENTIFIER	::= { ubiSysInfo 9 }  
+ 
+-- OID 3, 4, and 5 is resered by UBQS-SYSRSC-MIB
+                                                                
+
+ubiSysLedTest  			OBJECT IDENTIFIER			::= { ubiSystemMIBObjects 6 }    
+ubiSysBarCode  			OBJECT IDENTIFIER			::= { ubiSystemMIBObjects 8 }                                                                
+
+-- ***********************************************************
+-- ubiSysReset
+-- ***********************************************************
+
+	ubiSysReset OBJECT-TYPE
+        SYNTAX	INTEGER 
+        {
+			reset(1)       -- resetting the system
+		}
+        MAX-ACCESS	write-only
+        STATUS		mandatory
+        DESCRIPTION	"Reset the system."  
+		::= { ubiSystemMIBObjects 1 }            
+		
+-- ***********************************************************
+-- ubiSystemInfo
+-- ***********************************************************
+
+	ubiSysModel OBJECT-TYPE
+		SYNTAX        OBJECT IDENTIFIER
+		MAX-ACCESS    read-only
+		STATUS        mandatory
+		DESCRIPTION   "The object identifier for the manufacturer model."
+		::= { ubiSysInfo 1 }
+						
+	ubiHwVersion	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		mandatory
+		DESCRIPTION		
+				"Hardware version of the system."
+		::=  {  ubiSysInfo  2  }
+		
+	ubiSwVersion	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		mandatory
+		DESCRIPTION		
+				"Software version of the system."
+		::=  {  ubiSysInfo  3  }
+		
+	ubiReleaseDate	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		mandatory
+		DESCRIPTION		
+				"The date of release for system OS."
+		::=  {  ubiSysInfo  4  }    
+
+	ubiSerialNumber	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		mandatory
+		DESCRIPTION		
+				"Serial number of the system."
+		::=  {  ubiSysInfo  5  }     
+		
+	ubiSysPhysAddress	OBJECT-TYPE	
+		SYNTAX		PhysAddress   
+		ACCESS		read-only
+		STATUS		mandatory
+		DESCRIPTION		
+				"System mac address"
+		::=  {  ubiSysInfo  6 }            
+		
+	ubiSysClock	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-write
+		STATUS		mandatory
+		DESCRIPTION		
+				"Current local time of the system.
+				 
+				 Clock SET:
+				 	HH:MM:SS - Current Time 
+				 	<1-31> - Day of the month  
+				 	MONTH - Month of the year (First three letters of the month)
+				 	<1993-2035> - Year
+				 
+				 SET Example 
+				 	13:10:00 3 Jan 2010
+				 "
+		::=  {  ubiSysInfo  7 }
+                                   
+	ubiShelfPhysAddress	OBJECT-TYPE	
+		SYNTAX		PhysAddress   
+		ACCESS		read-only
+		STATUS		mandatory
+		DESCRIPTION		
+				"System shelf mac address."
+		::=  {  ubiSysInfo  10 }
+		
+		
+	ubiBspVersion	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-only
+		STATUS		mandatory
+		DESCRIPTION		
+				"System Bsp Versoin."
+		::=  {  ubiSysInfo  11 } 
+ 
+	ubiSysResetReason	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		accessible-for-notify
+		STATUS		mandatory
+		DESCRIPTION		
+				"System Reset Reason."
+		::=  {  ubiSysInfo  12 }
+		
+-- ***********************************************************
+-- ubiSysTimeZone
+-- ***********************************************************
+
+	ubiSysTimeZoneName 		OBJECT-TYPE
+		SYNTAX        DisplayString
+		MAX-ACCESS    read-write
+		STATUS        current
+		DESCRIPTION   "System timezone name."
+		::= { ubiSysTimeZone 1 }
+						
+	ubiSysTimeZoneOffset	OBJECT-TYPE	
+		SYNTAX		DisplayString   
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION		
+				"System timezone offset(Hours:Minutes)."
+		::=  {  ubiSysTimeZone  2  }
+
+-- ***********************************************************
+-- ubiSysBanner
+-- ***********************************************************
+
+	ubiSysBannerLogin	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"null string	-> no banner login
+			 'default'		-> banner login default
+			 STRING			-> banner login WORD"
+		::= { ubiSysBanner 1 }
+		
+	ubiSysBannerMotd	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION
+			"null string	-> no banner motd
+			 'default'		-> banner motd default
+			 STRING			-> banner motd WORD"
+		::= { ubiSysBanner 2 }          
+		
+-- *****************************************************************   	
+-- ubiSysRedundancyInfo
+-- *****************************************************************   
+
+	ubiSysRedundancyInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiSysRedundancyInfoEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Table of redundancy information"
+		::= { ubiSysRedundancy 1 }
+		
+	ubiSysRedundancyInfoEntry	OBJECT-TYPE	
+		SYNTAX		UbiSysRedundancyInfoEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Entry of redundancy information"
+		INDEX	{ ubiSCURedundancyRole }
+		::= { ubiSysRedundancyInfoTable 1 }
+		
+	UbiSysRedundancyInfoEntry ::= SEQUENCE {
+		ubiSCURedundancyRole	INTEGER,
+		ubiSCUPosition			INTEGER,
+		ubiSCUMngLinkStatus		INTEGER,
+		ubiSCUIpAddress 		IpAddress,
+		ubiSCUPeerEquipStatus	INTEGER
+	}
+	
+	ubiSCURedundancyRole		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			active(1),
+			standby(2)
+		}
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"SCU role"
+		::= { ubiSysRedundancyInfoEntry 1 }
+		
+	ubiSCUPosition				OBJECT-TYPE	
+		SYNTAX		INTEGER
+		{
+			left(1),
+			right(2)
+		}           
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"SCU postion"
+		::= { ubiSysRedundancyInfoEntry 2 }   
+		
+	ubiSCUMngLinkStatus			OBJECT-TYPE	
+		SYNTAX		INTEGER
+		{
+			down(0),
+			up(1)
+		}        
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"mng port status of SCU"
+		::= { ubiSysRedundancyInfoEntry 3 }
+		
+	ubiSCUIpAddress				OBJECT-TYPE	
+		SYNTAX		IpAddress
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"IP address of SCU"
+		::= { ubiSysRedundancyInfoEntry 4 }
+		
+	ubiSCUPeerEquipStatus	OBJECT-TYPE	
+		SYNTAX		INTEGER
+		{
+			unequip(0),
+			equip(1)
+		}        
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"Peer Equip status of SCU"
+		::= { ubiSysRedundancyInfoEntry 5 }
+
+-- ubiSysRedundancyReload
+	                                  
+	ubiSysRedundancyReload		OBJECT-TYPE
+		SYNTAX		INTEGER
+		{
+			reload_peer(1),
+			reload_shelf(2)
+		}
+		ACCESS		write-only                   
+		STATUS		current
+		DESCRIPTION
+			"Reload Active and/or Standby"
+		::= { ubiSysRedundancy 2 }
+		
+-- ubiSysRedundancyPeerImage	
+	ubiSysRedundancyPeerImage	OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		write-only
+		STATUS		current
+		DESCRIPTION
+			"Peer boot image"
+		::= { ubiSysRedundancy 3 }	
+		
+
+-- ***********************************************************
+-- ubiSysTest
+-- *********************************************************** 
+
+    ubiLedTestTimeout OBJECT-TYPE
+    	SYNTAX          Integer32(1..300)     
+       	UNITS			"seconds" 	
+    	MAX-ACCESS      read-write
+    	STATUS          current      
+    	DESCRIPTION
+        	"The timeout to terminate the LED Test.
+        	If the timeout is zero, that is set to default."     
+     	DEFVAL			{ 20 }
+    	::= { ubiSysLedTest 1 } 
+    	 
+ 	ubiLedTestTrigger OBJECT-TYPE
+    	SYNTAX          INTEGER {           
+    		none(0),
+    		testing(1),
+    		stop(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Trigger and stop the LED Test." 
+    	::= { ubiSysLedTest 2 } 
+
+     ubiLedTestSlotId OBJECT-TYPE	
+    	SYNTAX		Integer32
+    	MAX-ACCESS	read-write
+    	STATUS		current
+    	DESCRIPTION
+    		"LED test Slot id"
+    	::= { ubiSysLedTest 3 }
+
+-- *****************************************************************   	
+-- ubiSysBarCode
+-- *****************************************************************   
+
+	ubiSysBarcodeSystem			OBJECT IDENTIFIER			::= { ubiSysBarCode 1 }
+    
+    ubiSysBarcodeSystemString OBJECT-TYPE	
+    	SYNTAX		DisplayString
+    	MAX-ACCESS	read-only
+    	STATUS		current
+    	DESCRIPTION
+    		"The textual barcode of system."
+    	::= { ubiSysBarcodeSystem 1 }
+    	   	 
+	ubiSysBarcodePowerTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiSysBarcodePowerEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains information 
+ 			 for power barcode."
+		::= { ubiSysBarCode 2 }
+		
+	ubiSysBarcodePowerEntry	OBJECT-TYPE	
+		SYNTAX		UbiSysBarcodePowerEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Barcode Information about the power."
+		INDEX	{ ubiSysBarcodePowerIndex }
+		::= { ubiSysBarcodePowerTable 1 }
+		
+	UbiSysBarcodePowerEntry ::= SEQUENCE {
+		ubiSysBarcodePowerIndex			INTEGER,
+		ubiSysBarcodePowerString		DisplayString
+	}
+	
+	ubiSysBarcodePowerIndex		OBJECT-TYPE
+		SYNTAX		INTEGER
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"A unique value for each power entity"
+		::= { ubiSysBarcodePowerEntry 1 }
+
+	ubiSysBarcodePowerString		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"The textual barcode of power entity"
+		::= { ubiSysBarcodePowerEntry 2 }
+		
+	ubiSysBarcodeFanTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiSysBarcodeFanEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains information 
+ 			 for fan barcode."
+		::= { ubiSysBarCode 3 }
+		
+	ubiSysBarcodeFanEntry	OBJECT-TYPE	
+		SYNTAX		UbiSysBarcodeFanEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Barcode Information about the fan"
+		INDEX	{ ubiSysBarcodeFanIndex }
+		::= { ubiSysBarcodeFanTable 1 }
+		
+	UbiSysBarcodeFanEntry ::= SEQUENCE {
+		ubiSysBarcodeFanIndex			INTEGER,
+		ubiSysBarcodeFanString			DisplayString
+	}
+	
+	ubiSysBarcodeFanIndex		OBJECT-TYPE
+		SYNTAX		INTEGER
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"A unique value for each fan entity"
+		::= { ubiSysBarcodeFanEntry 1 }
+
+	ubiSysBarcodeFanString		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"The textual barcode of fan entity."
+		::= { ubiSysBarcodeFanEntry 2 }
+		
+	ubiSysBarcodeUplinkTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiSysBarcodeUplinkEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains information 
+ 			 for uplink module's barcode."
+		::= { ubiSysBarCode 4 }
+		
+	ubiSysBarcodeUplinkEntry	OBJECT-TYPE	
+		SYNTAX		UbiSysBarcodeUplinkEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Barcode Information about the uplink module."
+		INDEX	{ ubiSysBarcodeUplinkIndex }
+		::= { ubiSysBarcodeUplinkTable 1 }
+		
+	UbiSysBarcodeUplinkEntry ::= SEQUENCE {
+		ubiSysBarcodeUplinkIndex			INTEGER,
+		ubiSysBarcodeUplinkString			DisplayString
+	}
+	
+	ubiSysBarcodeUplinkIndex		OBJECT-TYPE
+		SYNTAX		INTEGER
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"A unique value for each uplink module."
+		::= { ubiSysBarcodeUplinkEntry 1 }
+
+	ubiSysBarcodeUplinkString		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"The textual barcode of uplink module."
+		::= { ubiSysBarcodeUplinkEntry 2 }
+		
+	ubiSysBarcodeSlotTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiSysBarcodeSlotEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains information 
+ 			 for slot's barcode."
+		::= { ubiSysBarCode 5 }
+		
+	ubiSysBarcodeSlotEntry	OBJECT-TYPE	
+		SYNTAX		UbiSysBarcodeSlotEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Barcode Information about the slot."
+		INDEX	{ ubiSysBarcodeSlotIndex }
+		::= { ubiSysBarcodeSlotTable 1 }
+		
+	UbiSysBarcodeSlotEntry ::= SEQUENCE {
+		ubiSysBarcodeSlotIndex			INTEGER,
+		ubiSysBarcodeSlotString			DisplayString
+	}
+	
+	ubiSysBarcodeSlotIndex		OBJECT-TYPE
+		SYNTAX		INTEGER
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"A unique value for each slot."
+		::= { ubiSysBarcodeSlotEntry 1 }
+
+	ubiSysBarcodeSlotString		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"The textual barcode of slot."
+		::= { ubiSysBarcodeSlotEntry 2 }
+		
+	ubiSysBarcodeScuTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiSysBarcodeScuEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains information 
+ 			 for SCU's barcode."
+		::= { ubiSysBarCode 6 }
+		
+	ubiSysBarcodeScuEntry	OBJECT-TYPE	
+		SYNTAX		UbiSysBarcodeScuEntry
+		ACCESS		not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Barcode Information about the SCU."
+		INDEX	{ ubiSysBarcodeScuIndex }
+		::= { ubiSysBarcodeScuTable 1 }
+		
+	UbiSysBarcodeScuEntry ::= SEQUENCE {
+		ubiSysBarcodeScuIndex			INTEGER,
+		ubiSysBarcodeScuString			DisplayString
+	}
+	
+	ubiSysBarcodeScuIndex		OBJECT-TYPE
+		SYNTAX		INTEGER
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"A unique value for each SCU."
+		::= { ubiSysBarcodeScuEntry 1 }
+
+	ubiSysBarcodeScuString		OBJECT-TYPE
+		SYNTAX		DisplayString
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION
+			"The textual barcode of SCU."
+		::= { ubiSysBarcodeScuEntry 2 }
+										   
+										   	
+-- *****************************************************************   
+-- ubiSysMIBConformance
+-- *****************************************************************
+	
+-- 
+-- conformance information         
+--
+ubiSysMIBCompliances 	OBJECT IDENTIFIER ::= { ubiSystemMIBConformance 1 }
+ubiSysMIBGroups      	OBJECT IDENTIFIER ::= { ubiSystemMIBConformance 2 }      
+
+
+
+-- compliance statements
+
+	ubiSysMIBCompliance MODULE-COMPLIANCE
+        STATUS  current     
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ubiquoss system MIB."
+        MODULE  
+                MANDATORY-GROUPS {  ubiSysInfoMIBGroup,
+                				    ubiSysRscMIBGroup,
+                				    ubiSysBannerGroup }
+
+       GROUP    ubiSysInfoMIBGroup
+       DESCRIPTION  
+       	         "The ubiSysMIBGroup is applicable for implementations which
+                 need to get the system information"     
+             
+       GROUP    ubiSysRscMIBGroup
+       DESCRIPTION  
+       	         "The ubiSysMIBGroup is applicable for implementations which
+                 need to manager the system resource"
+
+       GROUP	ubiSysBannerGroup
+       DESCRIPTION 
+       	         "The ubiSysBannerGroup is applicable for implementations which
+                 need to manager the miscellaneous information of system."   
+        ::= { ubiSysMIBCompliances 1 }
+
+
+ 
+-- units of conformance
+	ubiSysInfoMIBGroup OBJECT-GROUP
+        OBJECTS {        
+        			ubiSystemModel,
+        			ubiSystemSerialNumber,
+        			ubiHwVersion,  
+        			ubiSwVersion,
+        			ubiReleaseDate,
+        			ubiSerialNumber,
+        			ubiSysPhysAddress,
+        			ubiSysClock,
+        			ubiSysTimeZoneName,
+        			ubiSysTimeZoneOffset
+           		}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	system information"
+    	::= { ubiSysMIBGroups 1 }     
+    	
+
+	ubiSysRscMIBGroup OBJECT-GROUP
+        OBJECTS {        
+        			ubiCpuFiveSec,
+        			ubiCpuOneMin,
+        			ubiCpuFiveMin,  
+        			ubiCpuRisingThreshold,
+        			ubiCpuFallingThreshold,     
+        			ubiCpuLoadTimePeriod,
+        			ubiMemoryAlloc,
+        			ubiMemoryFree,
+        			ubiMemoryTotal,
+        			ubiMemoryFreePercentage,
+        			ubiMemoryThreshold
+           		}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to manager the
+        	system resource"
+    	::= { ubiSysMIBGroups 2 }
+
+
+
+	ubiSysMiscGroup OBJECT-GROUP
+        OBJECTS {       
+        	         ubiLedTestTrigger
+        	    }
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to manager the
+        	miscellaneous information of system."
+    	::= { ubiSysMIBGroups 3 }
+
+
+END
+

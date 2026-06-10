@@ -1,0 +1,1380 @@
+--  =================================================================
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:HUAWEI-BRAS-L2TP-MIB
+-- Reference:
+-- Version: V2.15
+-- History:
+--          1.Add  trap node 
+--       
+-- =================================================================
+
+    HUAWEI-BRAS-L2TP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwBRASMib            
+                FROM HUAWEI-MIB            
+            IpAddress, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32, Unsigned32, Counter64, Counter32             
+                FROM SNMPv2-SMI
+            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF            
+            TruthValue, RowStatus            
+                FROM SNMPv2-TC;
+    
+    
+        hwBRASL2tp MODULE-IDENTITY 
+            LAST-UPDATED "201801121616Z"
+            ORGANIZATION 
+                 "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+		 "Huawei Industrial Base
+		  Bantian, Longgang
+		   Shenzhen 518129
+		   People's Republic of China
+		   Website: http://www.huawei.com
+		   Email: support@huawei.com
+		 "
+           DESCRIPTION 
+                "Modify the description in English."
+            REVISION    "201801121616Z"           
+
+            DESCRIPTION 
+                "Modify the range of tunnel name and tunnel password."
+            REVISION    "201512101616Z"
+
+            DESCRIPTION 
+                "Modify the range of tunnel name and tunnel password."
+            REVISION    "201511101616Z"
+
+
+
+            DESCRIPTION 
+                "Modify the range of l2tp aging and l2tp group description."
+            REVISION    "201509190900Z"
+
+            DESCRIPTION 
+                "Modify the range of tunnel name and tunnel password."
+
+            REVISION    "201308190900Z"
+            DESCRIPTION 
+                "Modify the range of tunnel name and tunnel password."  
+            ::= { hwBRASMib 3 }
+        
+    
+
+        hwL2tpMibObjects OBJECT IDENTIFIER ::= { hwBRASL2tp 1 }
+        
+        hwL2tpConfigTable OBJECT IDENTIFIER ::= { hwL2tpMibObjects 1 }
+        
+        
+        hwL2tpEnableStatus OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of startup L2TP funcition.
+                "
+            ::= { hwL2tpConfigTable 1 }
+
+        hwL2tpTunnelClearLocalID OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Clear tunnel by local tunnel ID.
+                "
+            ::= { hwL2tpConfigTable 2 }
+
+        hwL2tpTunnelClearRemoteName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..253))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Clear tunnel by remote tunnel name.
+                "
+            ::= { hwL2tpConfigTable 3 }
+            
+        hwL2tpTunnelClearSlotID OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Clear tunnel by tunnel board ID.
+                "
+            ::= { hwL2tpConfigTable 4 }
+        
+        hwL2tpAging OBJECT-TYPE
+            SYNTAX Integer32 (1..3600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The aging time of LNS down.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpConfigTable 5 }
+        
+        
+        hwL2tpGroupConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL2tpGroupConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The config table of L2TP group.
+                "
+            ::= { hwL2tpMibObjects 2 }
+        
+        hwL2tpGroupConfigEntry OBJECT-TYPE
+            SYNTAX HwL2tpGroupConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table."
+            INDEX { hwL2tpGroupindex }
+            ::= { hwL2tpGroupConfigTable 1 }
+        
+        HwL2tpGroupConfigEntry ::=
+            SEQUENCE { 
+                hwL2tpGroupindex
+                    Integer32,
+                hwL2tpGroupAuthentication
+                    TruthValue,
+                hwL2tpGroupAvpHidden
+                    TruthValue,
+                hwL2tpGroupLoadShare
+                    TruthValue,
+                hwL2tpTunnelName
+                    OCTET STRING,
+                hwL2tpGroupRetransmit
+                    Integer32,
+                hwL2tpGroupTimeout
+                    Integer32,
+                hwL2tpGroupTimer
+                    Integer32,
+                hwL2tpGroupPassWord
+                    OCTET STRING,
+                hwL2tpGroupLnsIP1
+                    IpAddress,
+                hwL2tpGroupLnsWeight1
+                    Integer32,
+                hwL2tpGroupLnsIP2
+                    IpAddress,
+                hwL2tpGroupLnsWeight2
+                    Integer32,
+                hwL2tpGroupLnsIP3
+                    IpAddress,
+                hwL2tpGroupLnsWeight3
+                    Integer32,
+                hwL2tpGroupLnsIP4
+                    IpAddress,
+                hwL2tpGroupLnsWeight4
+                    Integer32,
+                hwL2tpGroupLnsIP5
+                    IpAddress,
+                hwL2tpGroupLnsWeight5
+                    Integer32,
+                hwL2tpGroupRowStatus
+                    RowStatus,
+                hwL2tpGroupName
+                    OCTET STRING,
+                hwL2tpGroupRadiusAuth
+                    TruthValue,
+                hwL2tpGroupAging
+                    Integer32,
+                hwL2tpGroupRemoteName
+                    OCTET STRING,
+                hwL2tpGroupForceChap
+                    TruthValue,
+                hwL2tpGroupForceLcp
+                    TruthValue,
+                hwL2tpGroupVt
+                    Integer32,
+                hwL2tpGroupaaaAuthentication
+                    TruthValue,
+                hwL2tpIdleCutTimer
+                    Integer32,
+                hwL2tpGroupTunnelStartLnsIP1
+                    IpAddress,
+                hwL2tpGroupTunnelStartLnsIP2
+                    IpAddress,
+                hwL2tpGroupTunnelStartLnsIP3
+                    IpAddress,
+                hwL2tpGroupTunnelStartLnsIP4
+                    IpAddress,
+                hwL2tpGroupTunnelStartLnsIP5
+                    IpAddress,
+                hwL2tpGroupFlag
+                    Integer32,
+                hwL2tpGroupLnsIP6
+                    IpAddress,
+                hwL2tpGroupLnsWeight6
+                    Integer32,
+                hwL2tpGroupLnsIP7
+                    IpAddress,
+                hwL2tpGroupLnsWeight7
+                    Integer32,
+                hwL2tpGroupLnsIP8
+                    IpAddress,
+                hwL2tpGroupLnsWeight8
+                    Integer32,
+                hwL2tpAvp46
+                    TruthValue,
+                hwL2tpGroupDefaultDomain
+                        OCTET STRING,
+                hwL2tpGroupPassWord1
+                    OCTET STRING,
+                hwL2tpGroupPassWord2
+                    OCTET STRING,
+                hwL2tpGroupPassWord3
+                    OCTET STRING,
+                hwL2tpGroupPassWord4
+                    OCTET STRING,
+                hwL2tpGroupPassWord5
+                    OCTET STRING,
+                hwL2tpGroupPassWord6
+                    OCTET STRING,
+                hwL2tpGroupPassWord7
+                    OCTET STRING,
+                hwL2tpGroupPassWord8
+                    OCTET STRING,                                                                                                                                                                    
+                hwL2tpGroupDomainAuthMode
+                    INTEGER,
+                hwL2tpGroupDescription
+                    OCTET STRING,
+                hwL2tpTunnelAlarmEnable
+                    TruthValue,
+                hwL2tpGroupQosProfileIn
+                    OCTET STRING,
+                hwL2tpGroupQosProfileOut
+                    OCTET STRING,
+                hwL2tpGroupQosMode
+                    INTEGER,
+                hwL2tpGroupPassWordKeyType
+                    INTEGER
+
+             }
+
+        hwL2tpGroupindex OBJECT-TYPE
+            SYNTAX Integer32 (1..1000)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the index of an L2TP group.
+                "
+            ::= { hwL2tpGroupConfigEntry 1 }
+        
+        hwL2tpGroupAuthentication OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of tunnel authentication.
+                "
+            DEFVAL { true }
+            ::= { hwL2tpGroupConfigEntry 2 }
+        
+        hwL2tpGroupAvpHidden OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of AVP hidden.
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 3 }
+
+        hwL2tpGroupLoadShare OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of LNS Load Share.
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 4 }
+        
+        hwL2tpTunnelName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..253))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Configure the local tunnel name.
+                "
+            ::= { hwL2tpGroupConfigEntry 5 }
+        
+        hwL2tpGroupRetransmit OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The retransmit times of tunnel control packet.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 6 }
+        
+        hwL2tpGroupTimeout OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The retransmit interval of tunnel control packet.
+                "
+            DEFVAL { 2 }
+            ::= { hwL2tpGroupConfigEntry 7 }
+        
+        hwL2tpGroupTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..100000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The keepalive interval of tunnel,and the value of zero is closing keepalive.
+                "
+            DEFVAL { 60 }
+            ::= { hwL2tpGroupConfigEntry 8 }
+        
+        hwL2tpGroupPassWord OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255 | 32..392))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The password of tunnel authentication.
+                "
+            ::= { hwL2tpGroupConfigEntry 9 }
+        
+        hwL2tpGroupLnsIP1 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 10 }
+        
+        hwL2tpGroupLnsWeight1 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 11 }
+        
+        hwL2tpGroupLnsIP2 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 12 }
+        
+        hwL2tpGroupLnsWeight2 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 13 }
+        
+        hwL2tpGroupLnsIP3 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 14 }
+        
+        hwL2tpGroupLnsWeight3 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 15 }
+        
+        hwL2tpGroupLnsIP4 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 16 }
+        
+        hwL2tpGroupLnsWeight4 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 17 }
+        
+        hwL2tpGroupLnsIP5 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 18 }
+        
+        hwL2tpGroupLnsWeight5 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 19 }
+        
+        hwL2tpGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                 Row status.                
+                "
+            ::= { hwL2tpGroupConfigEntry 20 }
+        
+        hwL2tpGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Configure L2TP group name.
+                "
+            ::= { hwL2tpGroupConfigEntry 21 }
+        
+        hwL2tpGroupRadiusAuth OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of tunnel radius authentication.
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 22 }
+        
+        hwL2tpGroupAging OBJECT-TYPE
+            SYNTAX Integer32 (1..60)
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "
+                The aging time of LNS down.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 23 }
+        
+        hwL2tpGroupRemoteName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..253))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Configure acceptable peer tunnel name.
+                "
+            ::= { hwL2tpGroupConfigEntry 24 }
+        
+        hwL2tpGroupForceChap OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of mandatory CHAP authentication.
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 25 }
+        
+        hwL2tpGroupForceLcp OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of mandatory LCP negotiation.
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 26 }
+        
+        hwL2tpGroupVt OBJECT-TYPE
+            SYNTAX Integer32 (0..1023 | 65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The virtual template by L2TP group.
+                "
+            DEFVAL { 65535 }
+            ::= { hwL2tpGroupConfigEntry 27 }
+        
+        hwL2tpGroupaaaAuthentication OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of tunnel aaa authentication.
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 28 }
+        
+        hwL2tpIdleCutTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..100000)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the idle-cut time of tunnels.  The value is an integer ranging from 0 to 100000, in seconds. The value 0 indicates that the local end never proactively tears down tunnels.  The default value is 60s.
+                "
+            DEFVAL { 60 }
+            ::= { hwL2tpGroupConfigEntry 29 }
+        
+        hwL2tpGroupTunnelStartLnsIP1 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "
+                Configure the first Ip address of LNS.
+                "
+            ::= { hwL2tpGroupConfigEntry 30 }
+        
+        hwL2tpGroupTunnelStartLnsIP2 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "
+                Configure the second Ip address of LNS.
+                "
+            ::= { hwL2tpGroupConfigEntry 31 }
+        
+        hwL2tpGroupTunnelStartLnsIP3 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "
+                Configure the third Ip address of LNS.
+                "
+            ::= { hwL2tpGroupConfigEntry 32 }
+        
+        hwL2tpGroupTunnelStartLnsIP4 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "
+                Configure the fourth Ip address of LNS.
+                "
+            ::= { hwL2tpGroupConfigEntry 33 }
+        
+        hwL2tpGroupTunnelStartLnsIP5 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS obsolete
+            DESCRIPTION
+                "
+                Configure the fifth Ip address of LNS.
+                "
+            ::= { hwL2tpGroupConfigEntry 34 }
+        
+        hwL2tpGroupFlag OBJECT-TYPE
+            SYNTAX Integer32 (0..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the type of an L2TP group.
+                "
+            DEFVAL { 0 }
+            ::= { hwL2tpGroupConfigEntry 35 }
+        
+        hwL2tpGroupLnsIP6 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 36 }
+        
+        hwL2tpGroupLnsWeight6 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 37 }
+        
+        hwL2tpGroupLnsIP7 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 38 }
+        
+        hwL2tpGroupLnsWeight7 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 39 }
+        
+        hwL2tpGroupLnsIP8 OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                LNS IP address.
+                "
+            ::= { hwL2tpGroupConfigEntry 40 }
+        
+        hwL2tpGroupLnsWeight8 OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The weight value of LNS Load Share.
+                "
+            DEFVAL { 5 }
+            ::= { hwL2tpGroupConfigEntry 41 }
+        
+        hwL2tpAvp46 OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of avp46.
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 42 }
+        
+        hwL2tpGroupDefaultDomain OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..200))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Configure the default domain name of LNS.
+                "
+            ::= { hwL2tpGroupConfigEntry 43 }
+            
+        hwL2tpGroupPassWord1 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the first ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 44 }
+            
+        hwL2tpGroupPassWord2 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the second ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 45 }            
+            
+        hwL2tpGroupPassWord3 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the third ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 46 }
+        hwL2tpGroupPassWord4 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the fourth ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 47 }
+            
+        hwL2tpGroupPassWord5 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the fifth ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 48 }
+            
+        hwL2tpGroupPassWord6 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the sixth ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 49 }
+            
+        hwL2tpGroupPassWord7 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the seventh ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 50 }
+            
+        hwL2tpGroupPassWord8 OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The tunnel authentication password for the eighth ip address of LNS in LAC.
+                "
+            ::= { hwL2tpGroupConfigEntry 51 }
+
+        hwL2tpGroupDomainAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                default(1),
+                force(2),
+                replace(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The authentication mode of the domain of L2TP group.
+                "
+            DEFVAL { default }
+            ::= { hwL2tpGroupConfigEntry 52 }
+        
+        hwL2tpGroupDescription OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..80))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                Description of this L2TP group.
+                "
+            ::= { hwL2tpGroupConfigEntry 53 }
+        
+        hwL2tpTunnelAlarmEnable OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The switch of tunnel alram when status of tunnel changed. 
+                "
+            DEFVAL { false }
+            ::= { hwL2tpGroupConfigEntry 54 }
+        
+        hwL2tpGroupQosProfileIn OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The name of Qos Profile inbound of the tunnel.
+                "
+            ::= { hwL2tpGroupConfigEntry 55 }
+        
+        hwL2tpGroupQosProfileOut OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The name of Qos Profile outbound of the tunnel.
+                "
+            ::= { hwL2tpGroupConfigEntry 56 }
+        
+        hwL2tpGroupQosMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                tunnel(1),
+                session(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The mode of Qos for the L2TP group.
+                "
+            DEFVAL { tunnel }
+            ::= { hwL2tpGroupConfigEntry 57 }
+        
+         hwL2tpGroupPassWordKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                simple(1),
+                cipher(2),
+                none(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The password type of tunnel authentication, none indicates not configure password.
+                "
+            DEFVAL { 2 }
+            ::= { hwL2tpGroupConfigEntry 58 }
+        hwL2tpLnsGroupConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL2tpLnsGroupConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The config table of lns group.
+                "
+            ::= { hwL2tpMibObjects 3 }
+        
+        hwL2tpLnsGroupConfigEntry OBJECT-TYPE
+            SYNTAX HwL2tpLnsGroupConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table."
+            INDEX { hwL2tpLnsGroupName }
+            ::= { hwL2tpLnsGroupConfigTable 1 }
+        
+        HwL2tpLnsGroupConfigEntry ::=
+            SEQUENCE { 
+                hwL2tpLnsGroupName
+                    OCTET STRING,
+                hwL2tpLnsGroupLoopBack
+                    OCTET STRING,
+                hwL2tpLnsGroupMasterSlot
+                    Integer32,
+                hwL2tpLnsGroupBindSlot
+                    Integer32,
+                hwL2tpLnsGroupRowStatus
+                    RowStatus
+             }
+
+        hwL2tpLnsGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the name of an LNS group.
+                "
+            ::= { hwL2tpLnsGroupConfigEntry 1 }
+        
+        hwL2tpLnsGroupLoopBack OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..30))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The Loopback name binded by lns group.
+                "
+            ::= { hwL2tpLnsGroupConfigEntry 2 }
+        
+        hwL2tpLnsGroupMasterSlot OBJECT-TYPE
+            SYNTAX Integer32 (1..16 | 255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the slot IDs of tunnel boards to which an LNS group is bound.
+                "
+            DEFVAL { 255 }
+            ::= { hwL2tpLnsGroupConfigEntry 3 }
+        
+        hwL2tpLnsGroupBindSlot OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                " 
+                The number of tunnel board binded by Lns Group.
+                "
+            ::= { hwL2tpLnsGroupConfigEntry 4 }
+        
+        hwL2tpLnsGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "    
+                Row status.            
+                "
+            ::= { hwL2tpLnsGroupConfigEntry 5 }
+            
+        hwL2tpLnsGroupLoopbackTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL2tpLnsGroupLoopbackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The loopback table of LNS group.
+                "
+            ::= { hwL2tpMibObjects 4 }    
+            
+        hwL2tpLnsGroupLoopbackEntry OBJECT-TYPE
+            SYNTAX HwL2tpLnsGroupLoopbackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table."
+            INDEX { hwL2tpLnsGroupName ,hwL2tpLnsGroupLoopbackIndex}
+            ::= { hwL2tpLnsGroupLoopbackTable 1 }
+            
+        HwL2tpLnsGroupLoopbackEntry ::=
+            SEQUENCE {
+                  hwL2tpLnsGroupLoopbackIndex
+                            Integer32,
+                  hwL2tpLnsGroupLoopbackInterface
+                          OCTET STRING,
+                  hwL2tpLnsGroupLoopbackRowStatus
+                      RowStatus
+            }
+                     
+        hwL2tpLnsGroupLoopbackIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The ID of loopback bound by lns group.
+                "
+            ::= { hwL2tpLnsGroupLoopbackEntry 1 }
+            
+        hwL2tpLnsGroupLoopbackInterface OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..30))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The Loopback name bound by lns group.
+                "
+            ::= { hwL2tpLnsGroupLoopbackEntry 2 }
+            
+        hwL2tpLnsGroupLoopbackRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "    
+                Row status.            
+                "
+            ::= { hwL2tpLnsGroupLoopbackEntry 3 }
+
+        hwL2tpLnsStat OBJECT IDENTIFIER ::= { hwL2tpMibObjects 5 }
+
+        hwl2tpLnsCurrentUpTunnelNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The up tunnel number of L2TP LNS.
+                "
+            ::= { hwL2tpLnsStat 1 }   
+                      
+       hwl2tpLnsCurrentUpSessionNum  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The up session number of L2TP LNS.
+                "
+            ::= { hwL2tpLnsStat 2 }
+
+       hwl2tpLnsTotalEstablishedTunnelNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The total established tunnel number of L2TP LNS.
+                "
+            ::= { hwL2tpLnsStat 3 }
+
+         hwl2tpLnsTotalEstablishedSessionNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The total established session number of L2TP LNS.
+                "
+            ::= { hwL2tpLnsStat 4 }
+
+         hwl2tpLnsTotalTearDownTunnelNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The total teardown tunnel number of L2TP LNS.
+                "
+            ::= { hwL2tpLnsStat 5 }
+
+          hwl2tpLnsTotalTearDownSessionNum OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The total teardown session number of L2TP LNS.
+                "
+            ::= { hwL2tpLnsStat 6 }
+
+          hwl2tpLnsStatReset OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            	reset(1)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The total teardown session number of L2TP LNS.
+                "
+            ::= { hwL2tpLnsStat 7 }  
+
+        
+       hwL2tpLnsTunnelStaticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL2tpLnsTunnelStaticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The config table of lns group.
+                "
+            ::= { hwL2tpMibObjects 6 }
+        
+        hwL2tpLnsTunnelStaticsEntry OBJECT-TYPE
+            SYNTAX HwL2tpLnsTunnelStaticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table."
+            INDEX { hwL2tpLnsTunnelConfigIfIndex }
+            ::= { hwL2tpLnsTunnelStaticsTable 1 }
+        
+        HwL2tpLnsTunnelStaticsEntry ::=
+            SEQUENCE
+              { 
+                hwL2tpLnsTunnelConfigIfIndex Unsigned32,
+                hwL2tpLnsLocalTunnelName     OCTET STRING, 
+                hwL2tpLnsRemoteTunnelName     OCTET STRING,
+                hwL2tpLnsTunnelRxPkts        Counter64, 
+                hwL2tpLnsTunnelRxOctets        Counter64,
+                hwL2tpLnsTunnelTxPkts         Counter64,
+                hwL2tpLnsTunnelTxOctets        Counter64
+              }
+       
+       
+        hwL2tpLnsTunnelConfigIfIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                This value for this object is equal to the value
+ 	            of ifIndex of the Interfaces MIB for tunnel
+ 	            interfaces of type L2TP. EX. slotid+tunnelID = 15bit+17bit
+                "
+            ::= { hwL2tpLnsTunnelStaticsEntry 1 }  
+
+        hwL2tpLnsLocalTunnelName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..253))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                  The l2tp lns local tunnel name.
+                "
+            ::= { hwL2tpLnsTunnelStaticsEntry 2 }
+
+           hwL2tpLnsRemoteTunnelName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..253))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                   The l2tp lns remote tunnel name.
+
+                "
+            ::= { hwL2tpLnsTunnelStaticsEntry 3 }
+         
+         
+          hwL2tpLnsTunnelRxPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The receive packets of L2TP LNS tunnel.
+                "
+            ::= { hwL2tpLnsTunnelStaticsEntry 4 }
+
+        hwL2tpLnsTunnelRxOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The receive octets of L2TP LNS tunnel.
+                "
+            ::= { hwL2tpLnsTunnelStaticsEntry 5 }
+
+         hwL2tpLnsTunnelTxPkts  OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The send packets of L2TP LNS tunnel.
+                "
+            ::= { hwL2tpLnsTunnelStaticsEntry 6 }  
+            
+             hwL2tpLnsTunnelTxOctets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The send octets of L2TP LNS tunnel.
+                "
+            ::= { hwL2tpLnsTunnelStaticsEntry 7 }
+
+
+        hwL2tpMibTrap OBJECT IDENTIFIER ::= { hwBRASL2tp 2 }
+        
+        hwL2tpTrapOid OBJECT IDENTIFIER ::= { hwL2tpMibTrap 1 }
+        
+        hwL2tpTunnelID OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Local Tunnel ID.
+                "
+            ::= { hwL2tpTrapOid 1 }
+
+                hwL2tpPeerName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..253))
+                        MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                "
+                Peer Name
+                "
+            ::= { hwL2tpTrapOid 2 }
+
+        hwL2tpPeerIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Peer IP address
+                "
+            ::= { hwL2tpTrapOid 3 }
+        
+        hwL2tpTunnelStatus OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..30))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The status of L2tp tunnel : Up/Down.
+                "
+            ::= { hwL2tpTrapOid 4 }
+
+        hwL2tpTunnelDownReason OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE(1..30))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the reason why an L2TP tunnel went Down.
+                "
+            ::= { hwL2tpTrapOid 5 }
+
+        hwL2tpRemoteTunnelID OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                This object indicates the ID of the remote L2TP tunnel.
+                "
+            ::= { hwL2tpTrapOid 6 }
+        
+        hwL2tpTrapsDefine OBJECT IDENTIFIER ::= { hwL2tpMibTrap 2 }
+        
+        hwL2tpTraps OBJECT IDENTIFIER ::= { hwL2tpTrapsDefine 0 }
+        
+        hwL2tpTunnelUpOrDown NOTIFICATION-TYPE
+            OBJECTS { hwL2tpTunnelID, hwL2tpPeerName, hwL2tpPeerIp, hwL2tpTunnelStatus, hwL2tpTunnelDownReason, hwL2tpRemoteTunnelID}
+            STATUS current
+            DESCRIPTION 
+                "
+                1 Notice/Trap name: L2tp Tunnel is Up Or Down.
+                2 Notice/Trap generation cause: L2tp tunnel is up or down.
+                3 Repair suggestions: If the tunnel is down, please check out whether there is a error.
+                "
+            ::= { hwL2tpTraps 1 }
+            
+            
+            --  ============== conformance information ==============
+        hwL2tpConformance OBJECT IDENTIFIER ::= { hwBRASL2tp 3 }
+        
+        
+        hwL2tpCompliances OBJECT IDENTIFIER ::= { hwL2tpConformance 1 }
+        hwL2tpCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwL2tpConfigGroup, hwL2tpGroupConfigGroup, 
+                            hwL2tpLnsGroupConfigGroup,hwL2tpTrapOidGroup,
+                                     hwL2tpObsoleteGroup,hwL2tpTrapNotificationsGroup,hwL2tpLnsGroupLoopbackGroup }  
+                                               
+              ::= { hwL2tpCompliances 1 }
+              
+                --  ============== groups ==============  
+        hwL2tpObjectGroups OBJECT IDENTIFIER ::= { hwL2tpConformance 2 } 
+        
+        hwL2tpConfigGroup OBJECT-GROUP
+            OBJECTS { hwL2tpEnableStatus,hwL2tpTunnelClearLocalID,hwL2tpTunnelClearRemoteName,
+                      hwL2tpTunnelClearSlotID,hwL2tpAging }
+            STATUS current
+            DESCRIPTION 
+                "The L2TP configuration."
+            ::= { hwL2tpObjectGroups 1 }
+
+
+        hwL2tpGroupConfigGroup OBJECT-GROUP
+            OBJECTS { hwL2tpGroupindex, hwL2tpGroupAuthentication, hwL2tpGroupAvpHidden,
+                      hwL2tpGroupLoadShare, hwL2tpTunnelName, hwL2tpGroupRetransmit,
+                      hwL2tpGroupTimeout,hwL2tpGroupTimer,hwL2tpGroupPassWord,
+                      hwL2tpGroupLnsIP1,hwL2tpGroupLnsWeight1,hwL2tpGroupLnsIP2,
+                      hwL2tpGroupLnsWeight2,hwL2tpGroupLnsIP3,hwL2tpGroupLnsWeight3,
+                      hwL2tpGroupLnsIP4,hwL2tpGroupLnsWeight4,hwL2tpGroupLnsIP5,
+                      hwL2tpGroupLnsWeight5,hwL2tpGroupRowStatus,hwL2tpGroupName,
+                      hwL2tpGroupRadiusAuth,hwL2tpGroupRemoteName,
+                      hwL2tpGroupForceChap,hwL2tpGroupForceLcp,hwL2tpGroupVt,
+                      hwL2tpGroupaaaAuthentication,hwL2tpIdleCutTimer,hwL2tpGroupFlag,hwL2tpGroupLnsIP6,
+                      hwL2tpGroupLnsWeight6,hwL2tpGroupLnsIP7,hwL2tpGroupLnsWeight7,
+                      hwL2tpGroupLnsIP8,hwL2tpGroupLnsWeight8,hwL2tpAvp46,
+                      hwL2tpGroupDefaultDomain,hwL2tpGroupPassWord1,hwL2tpGroupPassWord2,
+                      hwL2tpGroupPassWord3,hwL2tpGroupPassWord4,hwL2tpGroupPassWord5,
+                      hwL2tpGroupPassWord6,hwL2tpGroupPassWord7,hwL2tpGroupPassWord8,
+                      hwL2tpGroupDomainAuthMode,hwL2tpGroupDescription,hwL2tpTunnelAlarmEnable,
+                      hwL2tpGroupQosProfileIn,hwL2tpGroupQosProfileOut,hwL2tpGroupQosMode,
+                      hwL2tpGroupPassWordKeyType}
+            STATUS current
+            DESCRIPTION 
+                "The L2TP group configuration."
+            ::= { hwL2tpObjectGroups 2 }
+             
+        hwL2tpLnsGroupConfigGroup OBJECT-GROUP
+            OBJECTS { hwL2tpLnsGroupName, hwL2tpLnsGroupLoopBack, hwL2tpLnsGroupMasterSlot,
+                      hwL2tpLnsGroupBindSlot,hwL2tpLnsGroupRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The LNS group configuration."
+            ::= { hwL2tpObjectGroups 3 } 
+            
+           hwL2tpTrapOidGroup OBJECT-GROUP
+            OBJECTS { hwL2tpTunnelID,hwL2tpPeerName,hwL2tpPeerIp,hwL2tpTunnelStatus,hwL2tpTunnelDownReason,hwL2tpRemoteTunnelID}
+            STATUS current
+            DESCRIPTION 
+                "The L2TP Trap Oid."
+            ::= { hwL2tpObjectGroups 4 }
+            
+           hwL2tpObsoleteGroup OBJECT-GROUP
+            OBJECTS { hwL2tpGroupAging,hwL2tpGroupTunnelStartLnsIP1,hwL2tpGroupTunnelStartLnsIP2,
+                      hwL2tpGroupTunnelStartLnsIP3,hwL2tpGroupTunnelStartLnsIP4,hwL2tpGroupTunnelStartLnsIP5 }
+            STATUS obsolete
+            DESCRIPTION 
+                "The L2TP obsolete node."
+            ::= { hwL2tpObjectGroups 5 }
+        
+        hwL2tpTrapNotificationsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwL2tpTunnelUpOrDown }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the alarm generated when the status of an L2TP tunnel changes."
+            ::= { hwL2tpObjectGroups 6 }
+            
+            hwL2tpLnsGroupLoopbackGroup OBJECT-GROUP
+                OBJECTS { hwL2tpLnsGroupLoopbackInterface,hwL2tpLnsGroupLoopbackRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The source loopback configuration of LNS group configuration."
+            ::= { hwL2tpObjectGroups 7 }
+        --  ============== conformance information define end ==============  
+        
+    
+    END

@@ -1,0 +1,442 @@
+NSCRTV-HFCEMS-OPTICALAMPLIFIER-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+          OBJECT-TYPE
+               FROM RFC-1212
+          DisplayString
+               FROM RFC1213-MIB  
+         oaIdent
+              FROM NSCRTV-ROOT
+     ;     
+
+oaVendorOID OBJECT-TYPE
+     SYNTAX OBJECT IDENTIFIER
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaIdent 1 }
+
+
+oaOutputOpticalPower OBJECT-TYPE	
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaIdent 2 }
+
+oaInputOpticalPower OBJECT-TYPE
+     SYNTAX INTEGER ( -128..127 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaIdent 3 }
+
+oaPumpTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF OaPumpEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaIdent 4 }
+
+oaPumpEntry OBJECT-TYPE
+     SYNTAX OaPumpEntry
+     ACCESS not-accessible
+     STATUS mandatory 
+     DESCRIPTION ""
+     INDEX { oaPumpIndex }
+     ::= { oaPumpTable 1 }
+
+OaPumpEntry ::=
+     SEQUENCE
+     {
+          oaPumpIndex
+               INTEGER,
+          oaPumpBIAS
+               INTEGER,
+          oaPumpTEC          
+               INTEGER,
+          oaPumpTemp
+               INTEGER
+     }
+
+oaPumpIndex OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory 
+     DESCRIPTION ""
+     ::= { oaPumpEntry 1 }
+
+oaPumpBIAS OBJECT-TYPE
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaPumpEntry 2 }
+     
+oaPumpTEC OBJECT-TYPE
+     SYNTAX INTEGER ( -32768..32767 )
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaPumpEntry 3 }
+
+oaPumpTemp OBJECT-TYPE
+     SYNTAX INTEGER ( 0..32768 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaPumpEntry 4 }
+
+
+oaNumberDCPowerSupply OBJECT-TYPE
+     SYNTAX INTEGER ( 0..16 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaIdent 5 }
+
+oaDCPowerSupplyMode OBJECT-TYPE
+     SYNTAX INTEGER { loadsharing(1), switchedRedundant(2),aloneSupply(3) }
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION " "
+     ::= { oaIdent 6 }
+
+oaDCPowerTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF OaDCPowerEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaIdent 7 }
+
+oaDCPowerEntry OBJECT-TYPE
+     SYNTAX OaDCPowerEntry
+     ACCESS not-accessible
+     STATUS mandatory 
+     DESCRIPTION ""
+     INDEX { oaDCPowerIndex }
+     ::= { oaDCPowerTable 1 }
+
+OaDCPowerEntry ::=
+     SEQUENCE
+     {
+          oaDCPowerIndex
+               INTEGER,
+          oaDCPowerVoltage
+               INTEGER,
+          oaDCPowerCurrent
+               INTEGER,
+          oaDCPowerName
+               DisplayString
+     }
+
+oaDCPowerIndex OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaDCPowerEntry 1 }
+
+oaDCPowerVoltage OBJECT-TYPE
+     SYNTAX INTEGER ( -32768..32767 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaDCPowerEntry 2 }
+
+oaDCPowerCurrent OBJECT-TYPE
+     SYNTAX INTEGER ( 0..65535 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaDCPowerEntry 3 }
+
+oaDCPowerName OBJECT-TYPE
+     SYNTAX DisplayString
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaDCPowerEntry 4 }
+
+oaVendorExtend	OBJECT IDENTIFIER ::= { oaIdent 8 }
+
+AdminEDFAIP	OBJECT IDENTIFIER ::= { oaVendorExtend 13 }
+
+edfaIPNetTabNum	OBJECT IDENTIFIER ::= { AdminEDFAIP 1 }
+edfaIPTable	OBJECT IDENTIFIER ::= { AdminEDFAIP 2 }
+
+
+oaPumpNumber OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 1 }
+
+oaOutputPowerSet OBJECT-TYPE
+     SYNTAX INTEGER ( 0..4000 )
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 2 }
+
+oaOutputPowerSetValueMax OBJECT-TYPE
+     SYNTAX INTEGER ( 0..4000 )
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 3 }
+
+oaOutputPowerSetValueMin OBJECT-TYPE
+     SYNTAX INTEGER ( 0..4000 )
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 4 }
+
+oaFansState OBJECT-TYPE
+     SYNTAX INTEGER { on(1), off(2)}
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 5 }
+
+oaFansControl  OBJECT-TYPE
+	SYNTAX 	INTEGER { on(1), off(2), auto(3) }
+	ACCESS  read-write
+	STATUS 	optional
+	DESCRIPTION ""
+	::= { oaVendorExtend 6 }
+
+oaInputOpticalPower2 OBJECT-TYPE
+     SYNTAX INTEGER ( -2000..2000 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaVendorExtend 7 }
+
+oaOpticalOutputNum OBJECT-TYPE
+     SYNTAX INTEGER ( -128..127 )
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { oaVendorExtend 8 }
+
+oaABControl OBJECT-TYPE
+     SYNTAX INTEGER { Auto(1), M(2)}
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 9 } 
+
+oaDSControl OBJECT-TYPE
+     SYNTAX INTEGER { CH(1), CH(2)}
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 10 }
+
+oaABState OBJECT-TYPE
+     SYNTAX INTEGER { CH(1), CH(2)}
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION ""
+     ::= { oaVendorExtend 11 }
+
+oaEDFAAlarmRangeTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF OaEDFAAlarmRangeEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION ""
+     ::= { oaVendorExtend 12 }
+
+		oaEDFAAlarmRangeEntry OBJECT-TYPE
+     			SYNTAX OaEDFAAlarmRangeEntry
+     			MAX-ACCESS not-accessible
+     			STATUS current
+     			DESCRIPTION
+     			"Description."
+			INDEX { oaEDFAAlarmRangeIndex }
+			::= { oaEDFAAlarmRangeTable 1 }
+
+		
+		OaEDFAAlarmRangeEntry ::=
+			SEQUENCE { 
+				oaEDFAAlarmRangeIndex
+					INTEGER,
+				oaEDFAAlarmRangeDecr
+					OCTET STRING,
+				oaEDFAAlarmRangeHIHItoHI
+					INTEGER,
+				oaEDFAAlarmRangeHIHItoLO
+					INTEGER,
+				oaEDFAAlarmRangeHItoHI
+					INTEGER,
+				oaEDFAAlarmRangeHItoLO
+					INTEGER,
+				oaEDFAAlarmRangeLOtoHI
+					INTEGER,
+				oaEDFAAlarmRangeLOtoLO
+					INTEGER,
+				oaEDFAAlarmRangeLOLOtoHI
+					INTEGER,
+				oaEDFAAlarmRangeLOLOtoLO
+					INTEGER,
+				oaEDFAAlarmRangeDDtoHI
+					INTEGER,
+				oaEDFAAlarmRangeDDtoLO
+					INTEGER
+			 }
+
+		oaEDFAAlarmRangeIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..12)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 1 }
+
+		oaEDFAAlarmRangeDecr OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 2 }
+
+		oaEDFAAlarmRangeHIHItoHI OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 3 }
+
+		oaEDFAAlarmRangeHIHItoLO OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 4 }
+
+		oaEDFAAlarmRangeHItoHI OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 5 }
+
+		oaEDFAAlarmRangeHItoLO OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 6 }
+
+		oaEDFAAlarmRangeLOtoHI OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 7 }
+
+		oaEDFAAlarmRangeLOtoLO OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 8 }
+
+		oaEDFAAlarmRangeLOLOtoHI OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 9 }
+
+		oaEDFAAlarmRangeLOLOtoLO OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 10 }
+
+		oaEDFAAlarmRangeDDtoHI OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 11 }
+
+		oaEDFAAlarmRangeDDtoLO OBJECT-TYPE
+			SYNTAX INTEGER ( -32768..32767 )
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { oaEDFAAlarmRangeEntry 12 }
+
+edfaIPNetTabNum	OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { AdminEDFAIP 1 }
+     	
+edfaIPTable	OBJECT-TYPE
+     SYNTAX SEQUENCE OF EdfaNetIPEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { AdminEDFAIP 2 }
+
+EdfaNetIPEntry	OBJECT-TYPE
+     SYNTAX EdfaNetIPEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION ""
+     INDEX { MachineNetIpIndex }
+     ::= { edfaIPTable 1 }
+
+EdfaNetIPEntry	::=
+     SEQUENCE
+     {
+        MachineNetIpIndex
+        	INTEGER,
+        MachineNetIpDecr
+            	DisplayString,
+        MachineNetIpMessg
+            	IpAddress
+     }
+
+	MachineNetIpIndex OBJECT-TYPE
+		SYNTAX INTEGER ( 0..10 )
+     	ACCESS read-only
+     	STATUS mandatory
+     	DESCRIPTION ""
+     	::= { EdfaNetIPEntry  1 }
+     	
+	MachineNetIpDecr OBJECT-TYPE
+		SYNTAX DisplayString
+     	ACCESS read-only
+     	STATUS mandatory
+     	DESCRIPTION ""
+     	::= { EdfaNetIPEntry  2 }
+
+	MachineNetIpMessg	OBJECT-TYPE
+		SYNTAX IpAddress
+     	ACCESS read-write
+     	STATUS mandatory
+     	DESCRIPTION ""
+     	::= { EdfaNetIPEntry  3 }
+
+
+END

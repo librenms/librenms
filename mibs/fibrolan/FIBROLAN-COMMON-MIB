@@ -1,0 +1,137 @@
+--  =======================================================================
+--  File		: FIBROLAN-COMMON-MIB.mib
+--  Description		: Private MIB file for Fibrolan common objects and
+--			  definitions
+--  Author		: Shamir Stein
+--
+--  Copyright Fibrolan, 2009. All rights reserved.
+--
+--  Reproduction of this document is authorized on condition that this
+--  copyright notice is included.
+--  =======================================================================
+
+FIBROLAN-COMMON-MIB	DEFINITIONS ::= BEGIN
+
+	IMPORTS
+
+		TEXTUAL-CONVENTION		FROM SNMPv2-TC
+
+		MODULE-IDENTITY,
+		Integer32,
+		enterprises			FROM SNMPv2-SMI;
+
+
+	fibrolanCommon		MODULE-IDENTITY
+		LAST-UPDATED	"201508100000Z"
+		ORGANIZATION	"Fibrolan Ltd."
+		CONTACT-INFO	"shamir@fibrolan.com"
+		DESCRIPTION	"The MIB module to describe generic Fibrolan
+				 definitions (textual conventions, OIDs, etc).
+				 This module is part of Fibrolan's group of generic
+				 MIB modules.
+				 Copyright (C) Fibrolan Ltd. (2009)."
+		REVISION	"201508100000Z"
+		DESCRIPTION	"Added textual convention for:
+				- Clock interface type
+				- Clock quality"
+		REVISION	"200901260000Z"
+		DESCRIPTION	"Initial version (version 1)."
+	::= { enterprises  4467 1000 1 }
+
+-- ************************************************************
+-- OIDs
+-- ************************************************************
+fibrolan			OBJECT IDENTIFIER ::= { enterprises  4467 }
+fibrolanGeneric			OBJECT IDENTIFIER ::= { fibrolan  1000 }
+
+-- ************************************************************
+-- textual conventions
+-- ************************************************************
+
+FlUtilization ::=		TEXTUAL-CONVENTION
+	DISPLAY-HINT		"d"
+	STATUS			current
+	DESCRIPTION		"Utilization in percents, e.g. CPU utilization."
+	SYNTAX			Integer32 (0..100)
+
+FlTemperature ::=		TEXTUAL-CONVENTION
+	DISPLAY-HINT		"d"
+	STATUS			current
+	DESCRIPTION		"Temperature reading in degrees Centigrades."
+	SYNTAX			Integer32 (-128..127)
+
+FlFileServerType ::=		TEXTUAL-CONVENTION
+	STATUS			current
+	DESCRIPTION		"Type of file server that is used for file transfers.
+				 The type is essentially the transfer protocol."
+	SYNTAX			INTEGER
+				{
+					other		(1),
+					ftp		(2),
+					tftp		(3)
+				}
+
+FlFileXferDirection ::=		TEXTUAL-CONVENTION
+	STATUS			current
+	DESCRIPTION		"Direction of file transfer: from server or to server."
+	SYNTAX			INTEGER
+				{
+					getFromServer	(1),
+					putOnServer	(2)
+				}
+
+FlClockSourceType ::=		TEXTUAL-CONVENTION
+	STATUS			current
+	DESCRIPTION		"Type of a clock source. Can be used for clock input
+				 and clock output types."
+	SYNTAX			INTEGER
+				{
+					gps		(1),
+					bits		(2),
+					syncE		(3),
+					ptp		(4),
+					external	(5),
+					oscillator	(6),
+					other		(99)
+				}
+
+FlClockQuality ::=		TEXTUAL-CONVENTION
+--	DISPLAY-HINT		"d"
+	STATUS			current
+	DESCRIPTION		"Indicates a clock's quality level as it is
+				 used in SSM messages."
+	SYNTAX			INTEGER
+				{
+					stu		(0),	-- Sync Traceability Unknown
+					prs		(1),	-- Primary Reference Source (Stratum 1)
+					prc		(2),	-- Primary Reference Clock (G.811)
+					tnc		(4),	-- Transit Node Clock (SSU-A/G.812 Type V)
+					st2		(7),	-- Stratum 2 (G.812 Type II)
+					ssu-b		(8),	-- G.812 Type VI
+					st3		(10),	-- Stratum 3 (G.812 Type IV)
+					sec		(11),	-- Synchronization Equipment Timing Source(G.813 Option 1)
+					smc		(12),	-- SONET Minimum Clock (G.813 Option 2)
+					st3e		(13),	-- Stratum 3E (G.812 Type III)
+					dus		(15),	-- Dont use for sync (aka DNU)
+					other		(99)	-- should not be present
+				}
+
+FlGeoCoordinateAxis ::=		TEXTUAL-CONVENTION
+	DISPLAY-HINT		"1a1d:1d:1d.1d"
+	STATUS			current
+	DESCRIPTION		"A geographical coordinate, on an axis.
+				 Can be used for Longtitude or Latitude.
+				 Comprised of an octet string with the 
+				 following usage:
+				 field	Octets	Contents		Values
+				 -----	------  --------                -----
+				 1	1	direction		'+' or '-'
+				 2	1	degree (d)              0..180
+				 3	1	minute (m)              0..59
+				 4	1	second (s)              0..59
+				 5	1	second fraction (f)     0..99
+				 Resulting display format should beL +/-ddd:mm:ss.ff"
+	SYNTAX			OCTET STRING (SIZE (5))
+
+
+END

@@ -1,0 +1,4751 @@
+MPBC-2RU-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, enterprises, OBJECT-TYPE,
+    NOTIFICATION-TYPE, OBJECT-IDENTITY, IpAddress,
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF;
+
+    mpbc2RU MODULE-IDENTITY
+        LAST-UPDATED        "200907021128Z"
+        ORGANIZATION        "MPBC"
+        CONTACT-INFO        "MPBC"
+        DESCRIPTION         "MPBC 2RU product line."
+        REVISION            "200907021128Z"
+        DESCRIPTION         "initial version of this module"
+        ::= { mpbcProducts 2 }
+
+
+    mpbc OBJECT IDENTIFIER ::= { enterprises 4464 }
+
+    mpbcRegs OBJECT IDENTIFIER ::= { mpbc 1 }
+
+    mpbcProductRegs OBJECT IDENTIFIER ::= { mpbcRegs 1 }
+
+    mpbc2RUProductReg OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        ::= { mpbcProductRegs 2 }
+
+    mpbcProducts OBJECT IDENTIFIER ::= { mpbc 2 }
+
+    mpbc2RUTrap OBJECT IDENTIFIER ::= { mpbc2RU 0 }
+
+    mpbc2RUTrapCritical NOTIFICATION-TYPE
+        OBJECTS {           
+                        mpbc2RUAlarmNEID
+                }
+        STATUS              current
+        DESCRIPTION         "Critical Trap alarm."
+        ::= { mpbc2RUTrap 1 }
+
+    mpbc2RUTrapMajor NOTIFICATION-TYPE
+        OBJECTS {           
+                        mpbc2RUAlarmNEID
+                }
+        STATUS              current
+        DESCRIPTION         "Major Trap alarm."
+        ::= { mpbc2RUTrap 2 }
+
+    mpbc2RUTrapMinor NOTIFICATION-TYPE
+        OBJECTS {           
+                        mpbc2RUAlarmNEID
+                }
+        STATUS              current
+        DESCRIPTION         "Minor Trap alarm."
+        ::= { mpbc2RUTrap 3 }
+
+    mpbc2RUTrapInformational NOTIFICATION-TYPE
+        OBJECTS {           
+                        mpbc2RUAlarmNEID
+                }
+        STATUS              current
+        DESCRIPTION         "Informational Trap alarm."
+        ::= { mpbc2RUTrap 4 }
+
+    mpbc2RUAlarm OBJECT IDENTIFIER ::= { mpbc2RU 1 }
+
+    mpbc2RUAlarmTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF Mpbc2RUAlarmEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        ::= { mpbc2RUAlarm 1 }
+
+    mpbc2RUAlarmEntry OBJECT-TYPE
+        SYNTAX              Mpbc2RUAlarmEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        INDEX               {
+                                mpbc2RUAlarmIndex
+                            }
+        ::= { mpbc2RUAlarmTable 1 }
+
+    Mpbc2RUAlarmEntry ::= SEQUENCE {
+        mpbc2RUAlarmIndex
+            INTEGER,
+        mpbc2RUAlarmNEID
+            OCTET STRING,
+        mpbc2RUPosition
+            INTEGER,
+        mpbc2RUAlarmModule
+            OCTET STRING,
+        mpbc2RUAlarmID
+            INTEGER,
+        mpbc2RUAlarmDescription
+            OCTET STRING,
+        mpbc2RUAlarmSeverity
+            OCTET STRING,
+        mpbc2RUAlarmDateAndTime
+            OCTET STRING,
+        mpbc2RUAlarmExtraData
+            OCTET STRING
+    }
+
+    mpbc2RUAlarmIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Number from 0 to x that represents the alarm row number of the table"
+        ::= { mpbc2RUAlarmEntry 1 }
+
+    mpbc2RUAlarmNEID OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "This object is a descriptive text that described the device"
+        ::= { mpbc2RUAlarmEntry 2 }
+
+    mpbc2RUPosition OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "This object represents the sub-module. For 2RU products, it always returns 1"
+        ::= { mpbc2RUAlarmEntry 3 }
+
+    mpbc2RUAlarmModule OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Card or sub-module (e.g. Laser Controller, NEM) that generated the alarm"
+        ::= { mpbc2RUAlarmEntry 4 }
+
+    mpbc2RUAlarmID OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alarm Code"
+        ::= { mpbc2RUAlarmEntry 5 }
+
+    mpbc2RUAlarmDescription OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Textual description of the alarm"
+        ::= { mpbc2RUAlarmEntry 6 }
+
+    mpbc2RUAlarmSeverity OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alarm severity (Minor, Major or Critical)"
+        ::= { mpbc2RUAlarmEntry 7 }
+
+    mpbc2RUAlarmDateAndTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The date and time when the alarm was triggered."
+        ::= { mpbc2RUAlarmEntry 8 }
+
+    mpbc2RUAlarmExtraData OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Hexadecimal data associated with the alarm. The
+                            extra data provided is current when the alarm
+                            was raised and may not represent the system's
+                            present status."
+        ::= { mpbc2RUAlarmEntry 9 }
+
+    mpbc2RUPxx OBJECT IDENTIFIER ::= { mpbc2RU 2 }
+
+    mpbc2RUPxxControl OBJECT IDENTIFIER ::= { mpbc2RUPxx 1 }
+
+    mpbc2RUPxxLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+
+        ::= { mpbc2RUPxxControl 1 }
+
+    mpbc2RUPxxControlMode OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4), AGC(5)."
+        ::= { mpbc2RUPxxControl 2 }
+
+    mpbc2RUPxxPwrSetPtmW OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "EDFA output power set point in mW. (For APC mode)"
+        ::= { mpbc2RUPxxControl 3 }
+
+    mpbc2RUPxxGainSetPtdBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "EDFA gain set point in dB x10. (For AGC mode)"
+        ::= { mpbc2RUPxxControl 4 }
+
+    mpbc2RUPxxVOASettingdBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "VOA setting in dB x 10. (If the VOA is not present this object shows zero)"
+        ::= { mpbc2RUPxxControl 5 }
+
+    mpbc2RUPxxReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)"
+        ::= { mpbc2RUPxxControl 6 }
+
+    mpbc2RUPxxMonitor OBJECT IDENTIFIER ::= { mpbc2RUPxx 2 }
+
+    mpbc2RUPxxLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA"
+        ::= { mpbc2RUPxxMonitor 1 }
+
+    mpbc2RUPxxLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPxxMonitor 2 }
+
+    mpbc2RUPxxLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA"
+        ::= { mpbc2RUPxxMonitor 3 }
+
+    mpbc2RUPxxLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA"
+        ::= { mpbc2RUPxxMonitor 4 }
+
+    mpbc2RUPxxLD2TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPxxMonitor 5 }
+
+    mpbc2RUPxxLD2TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 TEC Current in mA"
+        ::= { mpbc2RUPxxMonitor 6 }
+
+    mpbc2RUPxxCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPxxMonitor 7 }
+
+    mpbc2RUPxxOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output power in mW"
+        ::= { mpbc2RUPxxMonitor 8 }
+
+    mpbc2RUPxxGaindBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Gain in dB x 10."
+        ::= { mpbc2RUPxxMonitor 9 }
+
+    mpbc2RUPxxInputPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input power in mW x 100."
+        ::= { mpbc2RUPxxMonitor 10 }
+
+   mpbc2RUPxxBackReflPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Back-reflection power in mW x 100."
+        ::= { mpbc2RUPxxMonitor 11 }
+
+    mpbc2RUPxxMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RUPxxMonitor 12 }
+
+    mpbc2RUPxxMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 ),                             
+								laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+        ::= { mpbc2RUPxxMonitor 13 }
+		
+    mpbc2RUPxxMonControlMode OBJECT-TYPE
+       SYNTAX               INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Monitor laser control mode ACC(3), APC(4), AGC(5)."
+        ::= { mpbc2RUPxxMonitor 14 }
+		
+    mpbc2RUPxxDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUPxxMonitor 15 }
+
+    mpbc2RUPxxUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)"
+        ::= { mpbc2RUPxxMonitor 16 }
+
+    mpbc2RUPxxOSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)"
+        ::= { mpbc2RUPxxMonitor 17 }
+
+    mpbc2RUPxxOSCTempdegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPxxMonitor 18 }
+
+    mpbc2RUPxxOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2)."	
+        ::= { mpbc2RUPxxMonitor 19 }
+
+    mpbc2RUPxxOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100."
+        ::= { mpbc2RUPxxMonitor 20 }
+
+    mpbc2RUPxxOSCRx1610Tone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3). (If Not in OSC Mode with ROPA, this object shows zero)"	
+        ::= { mpbc2RUPxxMonitor 21 }
+
+    mpbc2RUPxxMonVOASettingdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+	DESCRIPTION         "VOA setting in dB x 10. (If the VOA is not present, this object shows zero)"
+        ::= { mpbc2RUPxxMonitor 22 }
+
+    mpbc2RUPxxConfiguration OBJECT IDENTIFIER ::= { mpbc2RUPxx 3 }
+
+    mpbc2RUPxxLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RUPxxConfiguration 1 }
+
+    mpbc2RUPxxLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RUPxxConfiguration 2 }
+
+    mpbc2RUPxxLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RUPxxConfiguration 3 }
+
+    mpbc2RUPxxLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RUPxxConfiguration 4 }
+
+    mpbc2RUPxxCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxConfiguration 5 }
+
+    mpbc2RUPxxCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxConfiguration 6 }
+
+    mpbc2RUPxxCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxConfiguration 7 }
+
+    mpbc2RUPxxCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxConfiguration 8 }
+
+    mpbc2RUPxxCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RUPxxConfiguration 9 }
+
+    mpbc2RUPxxCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RUPxxConfiguration 10 }
+
+    mpbc2RUPxxLOSSetThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Set threshold in dBm x 100."
+        ::= { mpbc2RUPxxConfiguration 11 }
+
+    mpbc2RUPxxLOSClearThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Clear threshold in dBm x 100."
+        ::= { mpbc2RUPxxConfiguration 12 }
+
+    mpbc2RUPxxInputMinThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Input power minimum threshold in dBm x 100."
+        ::= { mpbc2RUPxxConfiguration 13 }
+
+    mpbc2RUPxxInputMaxThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Input power maximum threshold in dBm x 100."
+        ::= { mpbc2RUPxxConfiguration 14 }
+
+    mpbc2RUPxxOutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Output power minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUPxxConfiguration 15 }
+
+    mpbc2RUPxxOutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Output power maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUPxxConfiguration 16 }
+
+    mpbc2RUPxxOSCMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OSC mode, 0: Stand-alone, 1: ROPA."
+        ::= { mpbc2RUPxxConfiguration 17 }
+
+    mpbc2RUPxxOutputSetptminLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output set point minimum limits in dBm x 10"
+        ::= { mpbc2RUPxxConfiguration 18 }
+		
+    mpbc2RUPxxOutputSetptmaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output set point maximum limits in dBm x 10"
+        ::= { mpbc2RUPxxConfiguration 19 }
+		
+    mpbc2RUPxxGainSetptminLimdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Gain set point minimum limit in dB x 10"
+        ::= { mpbc2RUPxxConfiguration 20 }
+		
+    mpbc2RUPxxGainSetptmaxLimdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+	DESCRIPTION         "Gain set point maximum limit in dB x 10"
+        ::= { mpbc2RUPxxConfiguration 21 }
+
+    mpbc2RURFL1 OBJECT IDENTIFIER ::= { mpbc2RU 3 }
+
+    mpbc2RURFL1Control OBJECT IDENTIFIER ::= { mpbc2RURFL1 1 }
+
+    mpbc2RURFL1LaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)"
+        ::= { mpbc2RURFL1Control 1 }
+
+    mpbc2RURFL1ControlMode OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)"
+        ::= { mpbc2RURFL1Control 2 }
+
+    mpbc2RURFL1PwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser output power setpoint in mW."
+        ::= { mpbc2RURFL1Control 3 }
+
+    mpbc2RURFL1Reset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)"
+        ::= { mpbc2RURFL1Control 4 }
+
+    mpbc2RURFL1Monitor OBJECT IDENTIFIER ::= { mpbc2RURFL1 2 }
+
+    mpbc2RURFL1LD1Current OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA"
+        ::= { mpbc2RURFL1Monitor 1 }
+
+    mpbc2RURFL1LD2Current OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA"
+        ::= { mpbc2RURFL1Monitor 2 }
+
+    mpbc2RURFL1CaseTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case Temperature in deg. C x 10"
+        ::= { mpbc2RURFL1Monitor 3 }
+
+    mpbc2RURFL1OutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output power in mW"
+        ::= { mpbc2RURFL1Monitor 4 }
+
+    mpbc2RURFL1MonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)"
+        ::= { mpbc2RURFL1Monitor 5 }
+
+    mpbc2RURFL1MonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 ),                             
+								laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)"
+        ::= { mpbc2RURFL1Monitor 6 }
+		
+	mpbc2RURFL1MonControlMode OBJECT-TYPE
+       SYNTAX               INTEGER 
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RURFL1Monitor 7 }
+		
+    mpbc2RURFL1DisableInputState OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1"
+        ::= { mpbc2RURFL1Monitor 8 }
+
+    mpbc2RURFL1UnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)"
+        ::= { mpbc2RURFL1Monitor 9 }
+
+    mpbc2RURFL1OSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)"
+        ::= { mpbc2RURFL1Monitor 10 }
+
+    mpbc2RURFL1OSCTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Temperature in deg. C x 10. (If OSC Tx not present, this object shows zero)"
+        ::= { mpbc2RURFL1Monitor 11 }
+
+    mpbc2RURFL1OSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2). (If OSC Tx not present, this object shows zero)"	
+        ::= { mpbc2RURFL1Monitor 12 }
+
+    mpbc2RURFL1OSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100. (If OSC Tx not present, this object shows zero)"
+        ::= { mpbc2RURFL1Monitor 13 }
+
+    mpbc2RURFL1Configuration OBJECT IDENTIFIER ::= { mpbc2RURFL1 3 }
+
+    mpbc2RURFL1PwrThrLowdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser output power low threshold in dB x 10."
+        ::= { mpbc2RURFL1Configuration 1 }
+
+    mpbc2RURFL1PwrThrHidBx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser output power high threshold in dB x 10."
+        ::= { mpbc2RURFL1Configuration 2 }
+		
+    mpbc2RURFL1CaseTempMinAlrmThDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL1Configuration 3 }
+
+    mpbc2RURFL1CaseTempMaxAlrmThDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL1Configuration 4 }
+		
+    mpbc2RURFL1LD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RURFL1Configuration 5 }
+
+    mpbc2RURFL1LD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RURFL1Configuration 6 }
+		
+    mpbc2RURFL1LD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RURFL1Configuration 7 }
+
+    mpbc2RURFL1LD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RURFL1Configuration 8 }
+
+    mpbc2RURFL1CaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL1Configuration 9 }
+
+    mpbc2RURFL1CaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10"
+        ::= { mpbc2RURFL1Configuration 10 }
+
+    mpbc2RURFL1CaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION        "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL1Configuration 11 }
+
+    mpbc2RURFL1CaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10"
+        ::= { mpbc2RURFL1Configuration 12 }
+
+    mpbc2RURFL2 OBJECT IDENTIFIER ::= { mpbc2RU 4 }
+
+    mpbc2RURFL2Control OBJECT IDENTIFIER ::= { mpbc2RURFL2 1 }
+
+    mpbc2RURFL2LaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)"
+        ::= { mpbc2RURFL2Control 1 }
+
+    mpbc2RURFL2ControlMode OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)"
+        ::= { mpbc2RURFL2Control 2 }
+
+    mpbc2RURFL2WL145xPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL 145x nm power set point in mW."
+        ::= { mpbc2RURFL2Control 3 }
+
+    mpbc2RURFL2WL142xPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL 142x nm power set point in mW."
+        ::= { mpbc2RURFL2Control 4 }
+
+    mpbc2RURFL2Reset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)"
+        ::= { mpbc2RURFL2Control 5 }
+
+    mpbc2RURFL2Monitor OBJECT IDENTIFIER ::= { mpbc2RURFL2 2 }
+
+    mpbc2RURFL2LD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA"
+        ::= { mpbc2RURFL2Monitor 1 }
+
+    mpbc2RURFL2LD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RURFL2Monitor 2 }
+
+    mpbc2RURFL2LD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA"
+        ::= { mpbc2RURFL2Monitor 3 }
+
+    mpbc2RURFL2LD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA"
+        ::= { mpbc2RURFL2Monitor 4 }
+
+    mpbc2RURFL2CaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RURFL2Monitor 5 }
+
+    mpbc2RURFL2SeedPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed power in mW x 100."
+        ::= { mpbc2RURFL2Monitor 6 }
+
+    mpbc2RURFL2WL142xOutPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL 142x nm Output power in mW x 10"
+        ::= { mpbc2RURFL2Monitor 7 }
+
+    mpbc2RURFL2WL145xOutPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL 145x nm Output power in mW x 10"
+        ::= { mpbc2RURFL2Monitor 8 }
+
+    mpbc2RURFL2TotalOutPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Total Output power in mW x 10"
+        ::= { mpbc2RURFL2Monitor 9 }
+
+	mpbc2RURFL2MonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)"
+        ::= { mpbc2RURFL2Monitor 10 }
+
+    mpbc2RURFL2MonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 ),                             
+				laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)"
+        ::= { mpbc2RURFL2Monitor 11 }
+
+	mpbc2RURFL2MonControlMode OBJECT-TYPE
+       SYNTAX               INTEGER 
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RURFL2Monitor 12 }	
+	
+    mpbc2RURFL2DisableInputState OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1"
+        ::= { mpbc2RURFL2Monitor 13 }
+
+    mpbc2RURFL2UnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)"
+        ::= { mpbc2RURFL2Monitor 14 }
+
+    mpbc2RURFL2OSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+				tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)"
+        ::= { mpbc2RURFL2Monitor 15 }
+
+    mpbc2RURFL2OSCTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Temperature in deg. C x 10. (If OSC Tx not present, this object shows zero)"
+        ::= { mpbc2RURFL2Monitor 16 }
+
+    mpbc2RURFL2OSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2). (If OSC Tx not present, this object shows zero)"	
+        ::= { mpbc2RURFL2Monitor 17 }
+
+    mpbc2RURFL2OSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100. (If OSC Tx not present, this object shows zero)"
+        ::= { mpbc2RURFL2Monitor 18 }
+
+    mpbc2RURFL2Configuration OBJECT IDENTIFIER ::= { mpbc2RURFL2 3 }
+
+    mpbc2RURFL2LD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RURFL2Configuration 1 }
+		
+    mpbc2RURFL2LD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RURFL2Configuration 2 }
+
+    mpbc2RURFL2LD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RURFL2Configuration 3 }
+
+    mpbc2RURFL2LD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RURFL2Configuration 4 }		
+		
+    mpbc2RURFL2CaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL2Configuration 5 }
+
+    mpbc2RURFL2CaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL2Configuration 6 }
+
+    mpbc2RURFL2CaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL2Configuration 7 }
+
+    mpbc2RURFL2CaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL2Configuration 8 }
+
+    mpbc2RURFL2WL1OutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL1 output minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RURFL2Configuration 9 }
+
+    mpbc2RURFL2WL1OutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL1 output maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RURFL2Configuration 10 }
+
+    mpbc2RURFL2WL1FaultSetpointmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 check current in mA. Typ: 1000 mA"
+        ::= { mpbc2RURFL2Configuration 11 }
+
+    mpbc2RURFL2WL1FaultThr OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 check power minimum ratio. Typ:0.67"
+        ::= { mpbc2RURFL2Configuration 12 }
+
+    mpbc2RURFL2WL1FaultDelayms OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 APC period in millisec.  Typ: 10000 ms"
+        ::= { mpbc2RURFL2Configuration 13 }
+
+    mpbc2RURFL2WL2OutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RURFL2Configuration 14 }
+
+    mpbc2RURFL2WL2OutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RURFL2Configuration 15 }
+
+    mpbc2RURFL2CaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RURFL2Configuration 16 }
+
+    mpbc2RURFL2CaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RURFL2Configuration 17 }
+
+    mpbc2RURFL2WL2OutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power minimum limit in dBm x 10."
+        ::= { mpbc2RURFL2Configuration 18 }
+
+    mpbc2RURFL2WL2OutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power maximum limit in dBm x 10."
+        ::= { mpbc2RURFL2Configuration 19 }
+
+    mpbc2RURFL2WL1OutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power minimum limit in dBm x 10."
+        ::= { mpbc2RURFL2Configuration 20 }
+
+    mpbc2RURFL2WL1OutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power maximum limit in dBm x 10."
+        ::= { mpbc2RURFL2Configuration 21 }
+
+
+    mpbc2RUSRCP OBJECT IDENTIFIER ::= { mpbc2RU 5 }
+
+    mpbc2RUSRCPControl OBJECT IDENTIFIER ::= { mpbc2RUSRCP 1 }
+
+    mpbc2RUSRCPLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)"
+        ::= { mpbc2RUSRCPControl 1 }
+
+    mpbc2RUSRCPControlMode OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)"
+        ::= { mpbc2RUSRCPControl 2 }
+
+    mpbc2RUSRCPSeedOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed Output Power set point in mW."
+        ::= { mpbc2RUSRCPControl 3 }
+
+    mpbc2RUSRCPMainOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main Output Power set point in mW."
+        ::= { mpbc2RUSRCPControl 4 }
+
+    mpbc2RUSRCPReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)"
+        ::= { mpbc2RUSRCPControl 5 }
+
+    mpbc2RUSRCPMonitor OBJECT IDENTIFIER ::= { mpbc2RUSRCP 2 }
+
+    mpbc2RUSRCPLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA"
+        ::= { mpbc2RUSRCPMonitor 1 }
+
+    mpbc2RUSRCPLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUSRCPMonitor 2 }
+
+    mpbc2RUSRCPLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA"
+        ::= { mpbc2RUSRCPMonitor 3 }
+
+    mpbc2RUSRCPLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA"
+        ::= { mpbc2RUSRCPMonitor 4 }
+
+    mpbc2RUSRCPCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUSRCPMonitor 5 }
+
+    mpbc2RUSRCPMonSeedOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power in mW x 10."
+        ::= { mpbc2RUSRCPMonitor 6 }
+
+    mpbc2RUSRCPMainOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power in mW x 10."
+        ::= { mpbc2RUSRCPMonitor 7 }
+
+    mpbc2RUSRCPInputPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input power in mW x 100."
+        ::= { mpbc2RUSRCPMonitor 8 }
+
+    mpbc2RUSRCPMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)"
+        ::= { mpbc2RUSRCPMonitor 9 }
+
+    mpbc2RUSRCPMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 ),                             
+				laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)"
+        ::= { mpbc2RUSRCPMonitor 10 }
+
+    mpbc2RUSRCPMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)"
+        ::= { mpbc2RUSRCPMonitor 11 }
+
+    mpbc2RUSRCPDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUSRCPMonitor 12 }
+
+    mpbc2RUSRCPUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)"
+        ::= { mpbc2RUSRCPMonitor 13 }
+
+    mpbc2RUSRCPOSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+				tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)"
+        ::= { mpbc2RUSRCPMonitor 14 }
+
+    mpbc2RUSRCPOSCTempdegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10."
+        ::= { mpbc2RUSRCPMonitor 15 }
+
+    mpbc2RUSRCPOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2)."	
+        ::= { mpbc2RUSRCPMonitor 16 }
+
+    mpbc2RUSRCPOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100."
+        ::= { mpbc2RUSRCPMonitor 17 }
+
+	mpbc2RUSRCPOSCRx1610Tone OBJECT-TYPE	
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+				tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3). (If Not in OSC Mode with ROPA, this object shows zero)"
+        ::= { mpbc2RUSRCPMonitor 18 }
+		
+    mpbc2RUSRCPConfiguration OBJECT IDENTIFIER ::= { mpbc2RUSRCP 3 }
+
+    mpbc2RUSRCPLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RUSRCPConfiguration 1 }
+
+    mpbc2RUSRCPLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RUSRCPConfiguration 2 }
+
+    mpbc2RUSRCPLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RUSRCPConfiguration 3 }
+
+    mpbc2RUSRCPLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RUSRCPConfiguration 4 }
+		
+    mpbc2RUSRCPCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRCPConfiguration 5 }
+
+    mpbc2RUSRCPCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRCPConfiguration 6 }
+
+    mpbc2RUSRCPCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRCPConfiguration 7 }
+
+    mpbc2RUSRCPCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRCPConfiguration 8 }
+
+    mpbc2RUSRCPSeedOutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUSRCPConfiguration 9 }
+
+    mpbc2RUSRCPSeedOutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUSRCPConfiguration 10 }
+
+    mpbc2RUSRCPMainOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output power minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUSRCPConfiguration 11 }
+
+    mpbc2RUSRCPMainOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output power maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUSRCPConfiguration 12 }
+
+    mpbc2RUSRCPSeedOutputMinFautThrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output minimum fault threshold in mW."
+        ::= { mpbc2RUSRCPConfiguration 13 }
+
+    mpbc2RUSRCPCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RUSRCPConfiguration 14 }
+
+    mpbc2RUSRCPCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RUSRCPConfiguration 15 }
+
+    mpbc2RUSRCPMainOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power minimum limit in dBm x 10."
+        ::= { mpbc2RUSRCPConfiguration 16 }
+
+    mpbc2RUSRCPMainOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power maximum limit in dBm x 10."
+        ::= { mpbc2RUSRCPConfiguration 17 }
+
+    mpbc2RUSRCPSeedOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power minimum limit in dBm x 10."
+        ::= { mpbc2RUSRCPConfiguration 18 }
+
+    mpbc2RUSRCPSeedOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power maximum limit in dBm x 10."
+        ::= { mpbc2RUSRCPConfiguration 19 }
+
+    mpbc2RUSRCPAPLSetThrdBmx10  OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APL set threshold in dBm x 10."
+        ::= { mpbc2RUSRCPConfiguration 20 }
+
+    mpbc2RUSRCPAPLClearThrdBmx10  OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APL clear threshold in dBm x 10."
+        ::= { mpbc2RUSRCPConfiguration 21 }
+
+    mpbc2RUSRCPAPLMainOutputPwrdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "APL power set point in dBm x 10."
+        ::= { mpbc2RUSRCPConfiguration 22 }
+
+    mpbc2RUSRCPOSCMode  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OSC mode, 0: Stand-alone, 1: ROPA."
+        ::= { mpbc2RUSRCPConfiguration 23 }
+
+	mpbc2RUSRCPSeedFaultDelayms OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Delay to induce seed fault in ms."
+        ::= { mpbc2RUSRCPConfiguration 24 }		
+	
+    mpbc2RUMLD OBJECT IDENTIFIER ::= { mpbc2RU 6 }
+
+    mpbc2RUMLDControl OBJECT IDENTIFIER ::= { mpbc2RUMLD 1 }
+
+    mpbc2RUMLDLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+
+        ::= { mpbc2RUMLDControl 1 }
+
+    mpbc2RUMLDControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)"
+        ::= { mpbc2RUMLDControl 2 }
+
+    mpbc2RUMLD1stWLPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL1 output power set point in mW."
+        ::= { mpbc2RUMLDControl 3 }
+
+    mpbc2RUMLD2ndWLPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output power set point in mW."
+        ::= { mpbc2RUMLDControl 4 }
+
+    mpbc2RUMLDReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)."
+        ::= { mpbc2RUMLDControl 5 }
+
+    mpbc2RUMLDMonitor OBJECT IDENTIFIER ::= { mpbc2RUMLD 2 }
+
+    mpbc2RUMLDLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA."
+        ::= { mpbc2RUMLDMonitor 1 }
+
+    mpbc2RUMLDLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUMLDMonitor 2 }
+
+    mpbc2RUMLDLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA."
+        ::= { mpbc2RUMLDMonitor 3 }
+
+    mpbc2RUMLDLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA."
+        ::= { mpbc2RUMLDMonitor 4 }
+
+    mpbc2RUMLDLD2TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUMLDMonitor 5 }
+
+    mpbc2RUMLDLD2TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 TEC Current in mA."
+        ::= { mpbc2RUMLDMonitor 6 }
+
+    mpbc2RUMLDCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUMLDMonitor 7 }
+
+    mpbc2RUMLDMon1stWLOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power in mW x 10."
+        ::= { mpbc2RUMLDMonitor 8 }
+
+    mpbc2RUMLDMon2ndWLOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power in mW x 10."
+        ::= { mpbc2RUMLDMonitor 9 }
+
+    mpbc2RUMLDInputPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input power in mW x 100."
+        ::= { mpbc2RUMLDMonitor 10 }
+
+    mpbc2RUMLDMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RUMLDMonitor 11 }
+
+    mpbc2RUMLDMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 ),                             
+								laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+
+        ::= { mpbc2RUMLDMonitor 12 }
+
+    mpbc2RUMLDMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RUMLDMonitor 13 }
+
+    mpbc2RUMLDDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUMLDMonitor 14 }
+
+    mpbc2RUMLDUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)."
+        ::= { mpbc2RUMLDMonitor 15 }
+
+    mpbc2RUMLDOSCRx1574Tone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+				tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)"
+        ::= { mpbc2RUMLDMonitor 16 }
+
+    mpbc2RUMLDOSCTempdegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10."
+        ::= { mpbc2RUMLDMonitor 17 }
+
+    mpbc2RUMLDOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2)."	
+        ::= { mpbc2RUMLDMonitor 18 }
+
+    mpbc2RUMLDOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100."
+        ::= { mpbc2RUMLDMonitor 19 }
+
+    mpbc2RUMLDOSCRx1610Tone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+				tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3). (If Not in OSC Mode with ROPA, this object shows zero)"
+        ::= { mpbc2RUMLDMonitor 20 }
+
+    mpbc2RUMLDConfiguration OBJECT IDENTIFIER ::= { mpbc2RUMLD 3 }
+
+    mpbc2RUMLDLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RUMLDConfiguration 1 }
+		
+	mpbc2RUMLDLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RUMLDConfiguration 2 }
+
+    mpbc2RUMLDLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RUMLDConfiguration 3 }
+		
+    mpbc2RUMLDLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RUMLDConfiguration 4 }
+
+    mpbc2RUMLDCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDConfiguration 5 }
+
+    mpbc2RUMLDCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDConfiguration 6 }
+
+    mpbc2RUMLDCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDConfiguration 7 }
+
+    mpbc2RUMLDCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDConfiguration 8 }
+
+    mpbc2RUMLDCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDConfiguration 9 }
+
+    mpbc2RUMLDCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDConfiguration 10}
+
+    mpbc2RUMLD1stWLOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL1 output minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDConfiguration 11}
+
+    mpbc2RUMLD1stWLOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL1 output maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDConfiguration 12 }
+
+    mpbc2RUMLD2ndWLOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDConfiguration 13 }
+
+    mpbc2RUMLD2ndWLOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDConfiguration 14 }
+
+    mpbc2RUMLD1stWLOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power minimum limit in dBm x 10."
+        ::= { mpbc2RUMLDConfiguration 15 }
+
+    mpbc2RUMLD1stWLOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power maximum limit in dBm x 10."
+        ::= { mpbc2RUMLDConfiguration 16 }
+
+    mpbc2RUMLD2ndWLOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power minimum limit in dBm x 10."
+        ::= { mpbc2RUMLDConfiguration 17 }
+
+    mpbc2RUMLD2ndWLOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power maximum limit in dBm x 10."
+        ::= { mpbc2RUMLDConfiguration 18 }
+
+    mpbc2RUMLDOSCMode  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OSC mode, 0: Stand-alone, 1: ROPA."
+        ::= { mpbc2RUMLDConfiguration 19 }
+	
+    mpbc2RUPY OBJECT IDENTIFIER ::= { mpbc2RU 7 }
+
+    mpbc2RUPYControl OBJECT IDENTIFIER ::= { mpbc2RUPY 1 }
+    
+    mpbc2RUPYLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+
+        ::= { mpbc2RUPYControl 1 }
+
+    mpbc2RUPYControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4), AGC(5)."
+        ::= { mpbc2RUPYControl 2 }
+
+    mpbc2RUPYPreAmpSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Pre-amplifier power setpoint in mW."
+        ::= { mpbc2RUPYControl 3 }
+
+    mpbc2RUPYPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Output power setpoint in mW. (For APC mode)"
+        ::= { mpbc2RUPYControl 4 }
+
+    mpbc2RUPYGainSetPtdBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Gain setpoint in dB x10. (For AGC mode)"
+        ::= { mpbc2RUPYControl 5 }
+
+    mpbc2RUPYVoaSetPtdBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "VOA setpoint in dB x10. (If the VOA is not present this object shows zero)"
+        ::= { mpbc2RUPYControl 6 }
+
+    mpbc2RUPYReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)."
+        ::= { mpbc2RUPYControl 7 }
+
+    mpbc2RUPYMonitor OBJECT IDENTIFIER ::= { mpbc2RUPY 2 }
+
+    mpbc2RUPYLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA."
+        ::= { mpbc2RUPYMonitor 1 }
+
+    mpbc2RUPYLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPYMonitor 2 }
+
+    mpbc2RUPYLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA."
+        ::= { mpbc2RUPYMonitor 3 }
+
+    mpbc2RUPYLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA."
+        ::= { mpbc2RUPYMonitor 4 }
+
+    mpbc2RUPYCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPYMonitor 5 }
+
+    mpbc2RUPYMonPreAmpPumpPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Pre-amplifier pump output power in mW x 10."
+        ::= { mpbc2RUPYMonitor 6 }
+
+    mpbc2RUPYMainOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power in mW x 10."
+        ::= { mpbc2RUPYMonitor 7 }
+
+    mpbc2RUPYGaindBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Gain in dB x 10."
+        ::= { mpbc2RUPYMonitor 8 }
+
+    mpbc2RUPYInputPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input power in mW x 100."
+        ::= { mpbc2RUPYMonitor 9 }
+
+    mpbc2RUPYBackReflPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Back reflection power in mW x 100."
+        ::= { mpbc2RUPYMonitor 10 }
+
+    mpbc2RUPYMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RUPYMonitor 11 }
+
+    mpbc2RUPYMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 ),                             
+								laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+
+        ::= { mpbc2RUPYMonitor 12 }
+		
+    mpbc2RUPYMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4), AGC(5)."
+
+	::= { mpbc2RUPYMonitor 13 }	
+		
+    mpbc2RUPYDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUPYMonitor 14 }
+
+    mpbc2RUPYUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)."
+        ::= { mpbc2RUPYMonitor 15 }
+
+    mpbc2RUPYOSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+				tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)."
+        ::= { mpbc2RUPYMonitor 16 }
+
+    mpbc2RUPYOSCTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPYMonitor 17 }
+
+    mpbc2RUPYOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2)."	
+        ::= { mpbc2RUPYMonitor 18 }
+
+    mpbc2RUPYOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100."
+        ::= { mpbc2RUPYMonitor 19 }
+
+   mpbc2RUPYOSCRx1610Tone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3). (If Not in OSC Mode with ROPA, this object shows zero)"
+        ::= { mpbc2RUPYMonitor 20 }
+
+    mpbc2RUPYVOASettingdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "VOA Setting in dB x 10. (If the VOA is not present, this object shows zero)"
+        ::= { mpbc2RUPYMonitor 21 }
+
+    mpbc2RUPYConfiguration OBJECT IDENTIFIER ::= { mpbc2RUPY 3 }
+
+	mpbc2RUPYLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Preamp current minimum alarm threshold in mA."
+        ::= { mpbc2RUPYConfiguration 1 }		
+	
+    mpbc2RUPYLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Preamp current maximum alarm threshold in mA."
+        ::= { mpbc2RUPYConfiguration 2 }
+		
+    mpbc2RUPYLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main pump current minimum alarm threshold in mA."
+        ::= { mpbc2RUPYConfiguration 3 }	
+		
+    mpbc2RUPYLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main pump current maximum alarm threshold in mA."
+        ::= { mpbc2RUPYConfiguration 4 }
+
+    mpbc2RUPYCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPYConfiguration 5 }
+
+    mpbc2RUPYCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPYConfiguration 6 }
+
+    mpbc2RUPYCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPYConfiguration 7 }
+
+    mpbc2RUPYCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPYConfiguration 8 }
+
+    mpbc2RUPYCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPYConfiguration 9 }
+
+    mpbc2RUPYCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPYConfiguration 10 }
+
+    mpbc2RUPYLOSSetThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Set threshold in dBm x 100."
+        ::= { mpbc2RUPYConfiguration 11}
+
+    mpbc2RUPYLOSClearThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Clear threshold in dBm x 100."
+        ::= { mpbc2RUPYConfiguration 12 }
+
+    mpbc2RUPYInputMinThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Input power minimum threshold in dBm x 100."
+        ::= { mpbc2RUPYConfiguration 13 }
+
+    mpbc2RUPYInputMaxThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Input power maximum threshold in dBm x 100."
+        ::= { mpbc2RUPYConfiguration 14 }
+
+      mpbc2RUPYMainOutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUPYConfiguration 15 }
+
+      mpbc2RUPYMainOutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUPYConfiguration 16 }
+
+    mpbc2RUPYPreampPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Preamplifier output power minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUPYConfiguration 17 }
+
+    mpbc2RUPYPreampPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Preamplifier output power maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUPYConfiguration 18 }
+
+    mpbc2RUPYOSCMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OSC mode, 0: Stand-alone, 1: ROPA."
+        ::= { mpbc2RUPYConfiguration 19 }
+		
+    mpbc2RUPYOutputPwrSetpointMindBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output Power minimum set point limit Min in dBm x 10."
+        ::= { mpbc2RUPYConfiguration 20 }		
+				
+    mpbc2RUPYOutputPwrSetpointMaxdBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output Power maximum set point limit  in dBm x 10."
+        ::= { mpbc2RUPYConfiguration 21 }		
+				
+    mpbc2RUPYGainSetPointMindBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Amplifier minimum gain set point in dB x 10."
+        ::= { mpbc2RUPYConfiguration 22 }		
+				
+    mpbc2RUPYGainSetPointMaxdBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Amplifier maximum gain set point in dB x 10."
+        ::= { mpbc2RUPYConfiguration 23 }		
+
+    mpbc2RUPYPreAmpFaultThrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Pre-amplifier Power Min Threshold in mW."
+        ::= { mpbc2RUPYConfiguration 24 }		
+
+    mpbc2RUPYPreAmpFaultDelayms OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Pre-amplifier Fault Delay in ms."
+        ::= { mpbc2RUPYConfiguration 25 }
+		    
+	mpbc2RUSRP OBJECT IDENTIFIER ::= { mpbc2RU 8 }
+
+    mpbc2RUSRPControl OBJECT IDENTIFIER ::= { mpbc2RUSRP 1 }
+
+    mpbc2RUSRPLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+        ::= { mpbc2RUSRPControl 1 }
+
+    mpbc2RUSRPControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)."
+        ::= { mpbc2RUSRPControl 2 }
+
+    mpbc2RUSRPSeedOutputPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output power set point in mW."
+        ::= { mpbc2RUSRPControl 3 }
+
+    mpbc2RUSRPMainOutputPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output power set point in mW."
+        ::= { mpbc2RUSRPControl 4 }
+   
+    mpbc2RUSRPReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)."
+        ::= { mpbc2RUSRPControl 5 }
+
+    mpbc2RUSRPMonitor OBJECT IDENTIFIER ::= { mpbc2RUSRP 2 }
+
+    mpbc2RUSRPLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA."
+        ::= { mpbc2RUSRPMonitor 1 }
+
+    mpbc2RUSRPLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUSRPMonitor 2 }
+
+    mpbc2RUSRPLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA."
+        ::= { mpbc2RUSRPMonitor 3 }
+
+    mpbc2RUSRPLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA."
+        ::= { mpbc2RUSRPMonitor 4 }
+
+    mpbc2RUSRPCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUSRPMonitor 5 }
+
+    mpbc2RUSRPMonSeedOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power in mW x 10."
+        ::= { mpbc2RUSRPMonitor 6 }
+
+    mpbc2RUSRPMainOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power in mW x 10."
+        ::= { mpbc2RUSRPMonitor 7 }
+
+    mpbc2RUSRPMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RUSRPMonitor 8 }
+
+    mpbc2RUSRPMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 ),                             
+				laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+
+        ::= { mpbc2RUSRPMonitor 9 }
+
+    mpbc2RUSRPMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RUSRPMonitor 10 }
+
+    mpbc2RUSRPDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUSRPMonitor 11 }
+
+    mpbc2RUSRPUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)."
+        ::= { mpbc2RUSRPMonitor 12 }
+
+    mpbc2RUSRPOSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)."
+        ::= { mpbc2RUSRPMonitor 13 }
+
+    mpbc2RUSRPOSCTempdegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10. (If OSC Tx not present, this object shows zero)"
+        ::= { mpbc2RUSRPMonitor 14 }
+
+    mpbc2RUSRPOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2). (If OSC Tx not present, this object shows zero)"	
+        ::= { mpbc2RUSRPMonitor 15 }
+
+    mpbc2RUSRPOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100. (If OSC Tx not present, this object shows zero)"
+        ::= { mpbc2RUSRPMonitor 16 }
+
+    mpbc2RUSRPConfiguration OBJECT IDENTIFIER ::= { mpbc2RUSRP 3 }
+
+	mpbc2RUSRPLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed current minimum threshold in mA."
+        ::= { mpbc2RUSRPConfiguration 1 }
+		
+    mpbc2RUSRPLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed current maximum threshold in mA."
+        ::= { mpbc2RUSRPConfiguration 2 }
+  
+	mpbc2RUSRPLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main pump current minimum threshold in mA."
+        ::= { mpbc2RUSRPConfiguration 3 }
+
+    mpbc2RUSRPLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main pump current maximum threshold in mA."
+        ::= { mpbc2RUSRPConfiguration 4 }
+		
+    mpbc2RUSRPCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRPConfiguration 5 }
+
+    mpbc2RUSRPCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRPConfiguration 6 }
+
+    mpbc2RUSRPCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRPConfiguration 7 }
+
+    mpbc2RUSRPCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRPConfiguration 8 }
+
+    mpbc2RUSRPMainOutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUSRPConfiguration 9 }
+
+    mpbc2RUSRPMainOutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUSRPConfiguration 10 }
+
+    mpbc2RUSRPCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRPConfiguration 11 }
+
+    mpbc2RUSRPCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUSRPConfiguration 12 }
+
+    mpbc2RUSRPSeedOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output power minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUSRPConfiguration 13 }
+
+    mpbc2RUSRPSeedOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output power maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUSRPConfiguration 14 }
+
+    mpbc2RUSRPSeedOutputMinFaultThrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output minimum fault threshold in mW."
+        ::= { mpbc2RUSRPConfiguration 15 }
+
+    mpbc2RUSRPMainOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power minimum limit in dBm x 10."
+        ::= { mpbc2RUSRPConfiguration 16 }
+
+    mpbc2RUSRPMainOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power maximum limit in dBm x 10."
+        ::= { mpbc2RUSRPConfiguration 17 }
+
+    mpbc2RUSRPSeedOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power minimum limit in dBm x 10."
+        ::= { mpbc2RUSRPConfiguration 18 }
+
+    mpbc2RUSRPSeedOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power maximum limit in dBm x 10."
+        ::= { mpbc2RUSRPConfiguration 19 }
+
+    mpbc2RUSRPSeedFaultDelayms OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed Fault Delay in ms."
+        ::= { mpbc2RUSRPConfiguration 20 }
+
+    mpbc2RUCRP OBJECT IDENTIFIER ::= { mpbc2RU 9 }
+
+    mpbc2RUCRPControl OBJECT IDENTIFIER ::= { mpbc2RUCRP 1 }
+
+    mpbc2RUCRPLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+        ::= { mpbc2RUCRPControl 1 }
+
+    mpbc2RUCRPControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)"
+        ::= { mpbc2RUCRPControl 2 }
+
+    mpbc2RUCRPSeedOutputPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output power set point in mW."
+        ::= { mpbc2RUCRPControl 3 } 
+
+    mpbc2RUCRPMainOutputPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output power set point in mW."
+        ::= { mpbc2RUCRPControl 4 }
+   
+    mpbc2RUCRPReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)."
+        ::= { mpbc2RUCRPControl 5 }
+
+    mpbc2RUCRPMonitor OBJECT IDENTIFIER ::= { mpbc2RUCRP 2 }
+
+    mpbc2RUCRPLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA"
+        ::= { mpbc2RUCRPMonitor 1 }
+
+    mpbc2RUCRPLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX             INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUCRPMonitor 2 }
+
+    mpbc2RUCRPLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA."
+        ::= { mpbc2RUCRPMonitor 3 }
+
+    mpbc2RUCRPLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA."
+        ::= { mpbc2RUCRPMonitor 4 }
+
+    mpbc2RUCRPCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUCRPMonitor 5 }
+
+    mpbc2RUCRPMonSeedOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power in mW x 10."
+        ::= { mpbc2RUCRPMonitor 6 }
+
+    mpbc2RUCRPMainOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power in mW x 10."
+        ::= { mpbc2RUCRPMonitor 7 }
+
+    mpbc2RUCRPMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RUCRPMonitor 8 }
+
+    mpbc2RUCRPMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 ),                             
+								laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+
+        ::= { mpbc2RUCRPMonitor 9 }
+
+    mpbc2RUCRPMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RUCRPMonitor 10 }
+
+    mpbc2RUCRPDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUCRPMonitor 11 }
+
+    mpbc2RUCRPUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)."
+        ::= { mpbc2RUCRPMonitor 12 }
+
+    mpbc2RUCRPOSCRx1574Tone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+				tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Rx 1574 nm, No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3) (If in OSC Mode Stand-Alone, this object shows zero)."
+        ::= { mpbc2RUCRPMonitor 13 }
+
+    mpbc2RUCRPOSCTempdegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10."
+        ::= { mpbc2RUCRPMonitor 14 }
+
+    mpbc2RUCRPOSCTx1610Tone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx 1610-nm state: Tone Off(0), Tone 1(1), Tone 2(2)."
+        ::= { mpbc2RUCRPMonitor 15 }
+
+    mpbc2RUCRPOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100."
+        ::= { mpbc2RUCRPMonitor 16 }
+
+    mpbc2RUCRPOSCRx1610Tone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Rx 1610-nm state: No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)."
+        ::= { mpbc2RUCRPMonitor 17 }
+
+    mpbc2RUCRPConfiguration OBJECT IDENTIFIER ::= { mpbc2RUCRP 3 }
+
+    mpbc2RUCRPLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RUCRPConfiguration 1 }
+
+    mpbc2RUCRPLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RUCRPConfiguration 2 }
+
+	mpbc2RUCRPLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RUCRPConfiguration 3 }
+
+    mpbc2RUCRPLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RUCRPConfiguration 4 }
+
+    mpbc2RUCRPCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUCRPConfiguration 5 }
+
+    mpbc2RUCRPCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUCRPConfiguration 6 }
+
+    mpbc2RUCRPCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUCRPConfiguration 7 }
+
+    mpbc2RUCRPCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUCRPConfiguration 8 }
+
+    mpbc2RUCRPMainOutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUCRPConfiguration 9 }
+
+    mpbc2RUCRPMainOutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUCRPConfiguration 10 }
+
+    mpbc2RUCRPCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUCRPConfiguration 11 }
+
+    mpbc2RUCRPCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUCRPConfiguration 12 }
+
+    mpbc2RUCRPSeedOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output power minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUCRPConfiguration 13 }
+
+    mpbc2RUCRPSeedOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Seed output power maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUCRPConfiguration 14 }
+
+    mpbc2RUCRPSeedOutputMinFaultThrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output minimum fault threshold in mW."
+        ::= { mpbc2RUCRPConfiguration 15 }
+
+    mpbc2RUCRPMainOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power minimum limit in dBm x 10."
+        ::= { mpbc2RUCRPConfiguration 16 }
+
+    mpbc2RUCRPMainOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Main output power maximum limit in dBm x 10."
+        ::= { mpbc2RUCRPConfiguration 17 }
+
+    mpbc2RUCRPSeedOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power minimum limit in dBm x 10."
+        ::= { mpbc2RUCRPConfiguration 18 }
+
+    mpbc2RUCRPSeedOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Seed output power maximum limit in dBm x 10."
+        ::= { mpbc2RUCRPConfiguration 19 }
+
+    mpbc2RUCRPSeedFaultDelayms OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Delay to induce seed fault in ms."
+        ::= { mpbc2RUCRPConfiguration 20 }		
+	
+    mpbc2RUCRPOSCMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OSC mode, 0: Dual-OSC, 3: Stand-Alone."
+        ::= { mpbc2RUCRPConfiguration 21 }
+
+    mpbc2RURFL148x OBJECT IDENTIFIER ::= { mpbc2RU 10 }
+
+    mpbc2RURFL148xControl OBJECT IDENTIFIER ::= { mpbc2RURFL148x 1 }
+
+    mpbc2RURFL148xLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+        ::= { mpbc2RURFL148xControl 1 }
+
+    mpbc2RURFL148xControlMode OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)."
+        ::= { mpbc2RURFL148xControl 2 }
+
+    mpbc2RURFL148xPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser output power set point in mW."
+        ::= { mpbc2RURFL148xControl 3 }
+
+    mpbc2RURFL148xReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)."
+        ::= { mpbc2RURFL148xControl 4 }
+
+    mpbc2RURFL148xMonitor OBJECT IDENTIFIER ::= { mpbc2RURFL148x 2 }
+
+    mpbc2RURFL148xLD1Current OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA."
+        ::= { mpbc2RURFL148xMonitor 1 }
+
+    mpbc2RURFL148xLD2Current OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA."
+        ::= { mpbc2RURFL148xMonitor 2 }
+
+    mpbc2RURFL148xCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case Temperature in deg. C x 10."
+        ::= { mpbc2RURFL148xMonitor 3 }
+
+    mpbc2RURFL148xOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output power in mW."
+        ::= { mpbc2RURFL148xMonitor 4 }
+
+    mpbc2RURFL148xMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RURFL148xMonitor 5 }
+
+    mpbc2RURFL148xMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 ),                             
+				laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+        ::= { mpbc2RURFL148xMonitor 6 }
+		
+	mpbc2RURFL148xMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RURFL148xMonitor 7 }
+		
+    mpbc2RURFL148xDisableInputState OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RURFL148xMonitor 8 }
+
+    mpbc2RURFL148xUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)."
+        ::= { mpbc2RURFL148xMonitor 9 }
+
+    mpbc2RURFL148xOSCRx1574Tone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+							tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3) (If in OSC Mode Stand-Alone, this object shows zero)."
+        ::= { mpbc2RURFL148xMonitor 10 }
+
+    mpbc2RURFL148xOSCTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Temperature in deg. C x 10."
+        ::= { mpbc2RURFL148xMonitor 11 }
+
+    mpbc2RURFL148xOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2)."	
+        ::= { mpbc2RURFL148xMonitor 12 }
+
+    mpbc2RURFL148xOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100."
+        ::= { mpbc2RURFL148xMonitor 13 }
+
+    mpbc2RURFL148xOSCRx1610Tone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)."	
+        ::= { mpbc2RURFL148xMonitor 14 }		
+		
+    mpbc2RURFL148xConfiguration OBJECT IDENTIFIER ::= { mpbc2RURFL148x 3 }
+
+    mpbc2RURFL148xAlarmPwrThrLowdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser output low power threshold to declare an alarm in dB x 10."
+        ::= { mpbc2RURFL148xConfiguration 1 }
+
+    mpbc2RURFL148xAlarmPwrThrHidBx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser output high power threshold to declare an alarm in dB x 10."
+        ::= { mpbc2RURFL148xConfiguration 2 }
+
+    mpbc2RURFL148xAlarmCaseTempMinThDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL148xConfiguration 3 }
+
+    mpbc2RURFL148xAlarmCaseTempMaxThDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL148xConfiguration 4 }
+
+    mpbc2RURFL148xLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RURFL148xConfiguration 5 }
+
+    mpbc2RURFL148xLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RURFL148xConfiguration 6 }
+
+    mpbc2RURFL148xLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RURFL148xConfiguration 7 }
+
+    mpbc2RURFL148xLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RURFL148xConfiguration 8 }
+		
+    mpbc2RURFL148xCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL148xConfiguration 9 }
+
+    mpbc2RURFL148xCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL148xConfiguration 10 }
+
+    mpbc2RURFL148xCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION        "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL148xConfiguration 11 }
+
+    mpbc2RURFL148xCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RURFL148xConfiguration 12 }
+
+    mpbc2RURFL148xOutputPwrSetptMindBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output power minimum set point in dBm x 10."
+        ::= { mpbc2RURFL148xConfiguration 13 }
+		
+    mpbc2RURFL148xOutputPwrSetptMaxdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Main output power maximum set point in dBm x 10."
+        ::= { mpbc2RURFL148xConfiguration 14 }
+		
+    mpbc2RURFL148xOSCMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OSC mode, 0: Dual-OSC, 3: Stand-Alone."
+        ::= { mpbc2RURFL148xConfiguration 15 }
+
+    mpbc2RULDP OBJECT IDENTIFIER ::= { mpbc2RU 11 }
+
+    mpbc2RULDPControl OBJECT IDENTIFIER ::= { mpbc2RULDP 1 }
+
+    mpbc2RULDPLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+        ::= { mpbc2RULDPControl 1 }
+
+    mpbc2RULDPControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)"
+        ::= { mpbc2RULDPControl 2 }
+
+    mpbc2RULDP1stWLPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL1 Output power set point in mW."
+        ::= { mpbc2RULDPControl 3 }
+
+    mpbc2RULDP2ndWLPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output power set point in mW."
+        ::= { mpbc2RULDPControl 4 }
+
+    mpbc2RULDPReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)."
+        ::= { mpbc2RULDPControl 5 }
+
+    mpbc2RULDPMonitor OBJECT IDENTIFIER ::= { mpbc2RULDP 2 }
+
+    mpbc2RULDPLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA."
+        ::= { mpbc2RULDPMonitor 1 }
+
+    mpbc2RULDPLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RULDPMonitor 2 }
+		
+    mpbc2RULDPLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA."
+        ::= { mpbc2RULDPMonitor 3 }	
+		
+    mpbc2RULDPLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA."
+        ::= { mpbc2RULDPMonitor 4 }
+		
+    mpbc2RULDPLD2TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 temperature in deg. Celsius x 10."
+        ::= { mpbc2RULDPMonitor 5 }
+
+    mpbc2RULDPLD2TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 TEC Current in mA."
+        ::= { mpbc2RULDPMonitor 6 }
+
+    mpbc2RULDPCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case Temperature in deg. C x 10."
+        ::= { mpbc2RULDPMonitor 7 }
+
+    mpbc2RULDPMon1stWLOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power in mW x 10."
+        ::= { mpbc2RULDPMonitor 8 }
+
+    mpbc2RULDPMon2ndWLOutputPwrmWx10 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power in mW x 10."
+        ::= { mpbc2RULDPMonitor 9 }
+
+    mpbc2RULDPMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RULDPMonitor 10 }
+
+    mpbc2RULDPMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 ),                             
+								laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+        ::= { mpbc2RULDPMonitor 11 }
+	
+    mpbc2RULDPMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RULDPMonitor 12 }
+		
+    mpbc2RULDPDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RULDPMonitor 13 }
+
+    mpbc2RULDPUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)."
+        ::= { mpbc2RULDPMonitor 14 }
+	
+    mpbc2RULDPOSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)."
+        ::= { mpbc2RULDPMonitor 15 }
+
+    mpbc2RULDPOSCTempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10."
+        ::= { mpbc2RULDPMonitor 16 }
+
+    mpbc2RULDPOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2)."	
+        ::= { mpbc2RULDPMonitor 17 }
+
+    mpbc2RULDPOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100, optional for model providing these features"
+        ::= { mpbc2RULDPMonitor 18 }
+		
+    mpbc2RULDPConfiguration OBJECT IDENTIFIER ::= { mpbc2RULDP 3 }
+
+    mpbc2RULDPLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RULDPConfiguration 1 }
+		
+    mpbc2RULDPLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RULDPConfiguration 2 }
+
+    mpbc2RULDPLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RULDPConfiguration 3 }
+
+	mpbc2RULDPLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RULDPConfiguration 4 }
+		
+    mpbc2RULDPCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RULDPConfiguration 5 }
+
+    mpbc2RULDPCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RULDPConfiguration 6 }
+		
+    mpbc2RULDPCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION        "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RULDPConfiguration 7 }
+
+    mpbc2RULDPCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RULDPConfiguration 8 }
+
+    mpbc2RULDPCaseTempMinAlrmThDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RULDPConfiguration 9 }
+		
+    mpbc2RULDPCaseTempMaxAlrmThDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RULDPConfiguration 10 }
+		
+    mpbc2RULDP1stWLOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL1 output maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RULDPConfiguration 11 }
+
+    mpbc2RULDP1stWLOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RULDPConfiguration 12 }
+
+    mpbc2RULDP2ndWLOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RULDPConfiguration 13 }
+
+    mpbc2RULDP2ndWLOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL2 output maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RULDPConfiguration 14 }
+
+    mpbc2RULDP1stWLOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power minimum limit in dBm x 10."
+        ::= { mpbc2RULDPConfiguration 15 }
+
+    mpbc2RULDP1stWLOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL1 output power maximum limit in dBm x 10."
+        ::= { mpbc2RULDPConfiguration 16 }
+
+    mpbc2RULDP2ndWLOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power minimum limit in dBm x 10."
+        ::= { mpbc2RULDPConfiguration 17 }
+
+    mpbc2RULDP2ndWLOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL2 output power maximum limit in dBm x 10."
+        ::= { mpbc2RULDPConfiguration 18 }
+ 	
+    mpbc2RUConfiguration OBJECT IDENTIFIER ::= { mpbc2RU 12 }
+
+    mpbc2RUNetMgt OBJECT IDENTIFIER ::= { mpbc2RUConfiguration 1 }
+
+    mpbc2RUNotifiedNMSipAddressTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF Mpbc2RUNotifiedNMSipAddressEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        ::= { mpbc2RUNetMgt 1 }
+
+    mpbc2RUNotifiedNMSipAddressEntry OBJECT-TYPE
+        SYNTAX              Mpbc2RUNotifiedNMSipAddressEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        INDEX               {
+                                mpbc2RUNotifiedNMSipAddressIndex
+                            }
+        ::= { mpbc2RUNotifiedNMSipAddressTable 1 }
+
+    Mpbc2RUNotifiedNMSipAddressEntry ::= SEQUENCE {
+        mpbc2RUNotifiedNMSipAddress-IP
+            IpAddress,
+        mpbc2RUNotifiedNMSipAddress-Description
+            OCTET STRING,
+        mpbc2RUNotifiedNMSipAddress-Enabled
+            TruthValue,
+        mpbc2RUNotifiedNMSipAddressIndex
+            INTEGER
+    }
+
+    mpbc2RUNotifiedNMSipAddressIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index"
+        ::= { mpbc2RUNotifiedNMSipAddressEntry 1 }
+
+    mpbc2RUNotifiedNMSipAddress-IP OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Address to which agent shall send traps/Informs when mpbcRMH-NotifiedNMSipAddress-Enabled is true(1)
+							 except for the IP address set to a subnet loopback address 192.3.1.253"
+        ::= { mpbc2RUNotifiedNMSipAddressEntry 2 }
+
+    mpbc2RUNotifiedNMSipAddress-Description OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "A textual description of the notified manager station."
+        ::= { mpbc2RUNotifiedNMSipAddressEntry 3 }
+
+    mpbc2RUNotifiedNMSipAddress-Enabled OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "true(1) = send traps/Informs to corresponding notified manager station, false(2) = don't send trap/Informs."
+        ::= { mpbc2RUNotifiedNMSipAddressEntry 4 }
+
+    mpbc2RUAckTrapControl OBJECT IDENTIFIER ::= { mpbc2RUNetMgt 2 }
+
+    mpbc2RUAckTrapCriticalEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Critical Alarm Inform."
+        ::= { mpbc2RUAckTrapControl 1 }
+
+    mpbc2RUAckTrapCriticalRetries OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..5)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Number of retries (1..5)."
+        ::= { mpbc2RUAckTrapControl 2 }
+
+    mpbc2RUAckTrapCriticalTimeOutsec OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TimeOut (1..5) sec."
+        ::= { mpbc2RUAckTrapControl 3 }
+
+    mpbc2RUAckTrapMajorEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Major Alarm Inform."
+        ::= { mpbc2RUAckTrapControl 4 }
+
+    mpbc2RUAckTrapMajorRetries OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..5)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Number of retries (1..5)."
+        ::= { mpbc2RUAckTrapControl 5 }
+
+    mpbc2RUAckTrapMajorTimeOutsec OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..5)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TimeOut (1..5) sec."
+        ::= { mpbc2RUAckTrapControl 6 }
+
+    mpbc2RUAckTrapMinorEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Minor Alarm Inform."
+        ::= { mpbc2RUAckTrapControl 7 }
+
+    mpbc2RUAckTrapMinorRetries OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..5)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Number of retries (1..5)."
+        ::= { mpbc2RUAckTrapControl 8 }
+
+    mpbc2RUAckTrapMinorTimeOutsec OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..5)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TimeOut (1..5) sec."
+        ::= { mpbc2RUAckTrapControl 9 }
+
+    mpbc2RUAckTrapInformationalEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Informational Alarm Inform."
+        ::= { mpbc2RUAckTrapControl 10 }
+
+    mpbc2RUAckTrapInformationalRetries OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..5)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Number of retries (1..5)."
+        ::= { mpbc2RUAckTrapControl 11 }
+
+    mpbc2RUAckTrapInformationalTimeOutsec OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..5)
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "TimeOut (1..5) sec."
+        ::= { mpbc2RUAckTrapControl 12 }
+
+    --Each scalar under this control group represent a type of alarm. The scalar may let
+    --or refuse it's group from sending trap to the notified NMS
+    mpbc2RUTrapControl OBJECT IDENTIFIER ::= { mpbc2RUNetMgt 3 }
+
+    mpbc2RUTrapCriticalEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Critical Alarm Trap."
+        ::= { mpbc2RUTrapControl 1 }
+
+    mpbc2RUTrapMajorEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Major Alarm Trap."
+        ::= { mpbc2RUTrapControl 2 }
+
+    mpbc2RUTrapMinorEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Minor Alarm Trap."
+        ::= { mpbc2RUTrapControl 3 }
+
+    mpbc2RUTrapInformationalEnable OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "To Enable (1) or Disable (2) Informational Alarm Trap."
+        ::= { mpbc2RUTrapControl 4 }
+
+    mpbc2RUMacAddress OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "MAC address of the card."
+        ::= { mpbc2RUNetMgt 4 }
+
+    mpbc2RUEthernetIPaddress OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "NEM IP address."
+        ::= { mpbc2RUNetMgt 5 }
+
+    mpbc2RUEthernetIPsubNetMask OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "NEM subnet mask."
+        ::= { mpbc2RUNetMgt 6 }
+
+    mpbc2RUDefaultGateway OBJECT-TYPE
+        SYNTAX              IpAddress
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "NEM default gateway address."
+        ::= { mpbc2RUNetMgt 7 }
+
+    mpbc2RUSnmpTrapPort OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        DEFVAL              { 161 }
+        ::= { mpbc2RUNetMgt 8 }
+
+    mpbc2RUNE OBJECT IDENTIFIER ::= { mpbc2RUConfiguration 2 }
+
+    mpbc2RUNEID OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        ::= { mpbc2RUNE 1 }
+
+    mpbc2RUInfoTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF Mpbc2RUInfoEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        ::= { mpbc2RUNE 2 }
+
+    mpbc2RUInfoEntry OBJECT-TYPE
+        SYNTAX              Mpbc2RUInfoEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Please replace this text with your description."
+        INDEX               {
+                                mpbc2RUInfoIndex
+                            }
+        ::= { mpbc2RUInfoTable 1 }
+
+    Mpbc2RUInfoEntry ::= SEQUENCE {
+        mpbc2RUInfoIndex
+            INTEGER,
+        mpbc2RUInfoLoc
+            OCTET STRING,
+        mpbc2RUInfoModelNum
+            OCTET STRING,
+        mpbc2RUInfoModelSN
+            OCTET STRING,
+        mpbc2RUInfoOEMPartNum
+            OCTET STRING,
+        mpbc2RUInfoAssyNum
+            OCTET STRING,
+		mpbc2RUInfoRev
+            OCTET STRING,
+        mpbc2RUInfoRev
+            OCTET STRING,
+        mpbc2RUInfoECN
+            OCTET STRING,
+        mpbc2RUInfoSeqNum
+            OCTET STRING,
+        mpbc2RUInfoMfgDate
+            OCTET STRING,
+        mpbc2RUInfoSwVer
+            OCTET STRING,
+        mpbc2RUInfoBootLoaderRev
+            OCTET STRING,
+        mpbc2RUInfoLibRev
+            OCTET STRING,
+        mpbc2RUInfoLddFw1
+            OCTET STRING,
+        mpbc2RUInfoLddFw2
+            OCTET STRING,
+        mpbc2RUInfoCLEI
+            OCTET STRING,
+		mpbc2RUInfoLastRmaDate
+            OCTET STRING
+    }
+
+    mpbc2RUInfoIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Index"
+        ::= { mpbc2RUInfoEntry 1 }
+
+    mpbc2RUInfoLoc OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Physical location.. For 2RU products, it always returns 1"
+        ::= { mpbc2RUInfoEntry 2 }
+
+    mpbc2RUInfoModelNum OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Model Number. Example: 2RU-SDP-R-3000."
+        ::= { mpbc2RUInfoEntry 3 }
+
+    mpbc2RUInfoModelSN OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Model Serial Number. Example: 2RU-999-664."
+        ::= { mpbc2RUInfoEntry 4 }
+
+    mpbc2RUInfoOEMPartNum OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Original Equipment Manufacturer Part Number. Example: A-09999-1_R0/0."
+        ::= { mpbc2RUInfoEntry 5 }
+
+    mpbc2RUInfoAssyNum OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Assembly Part Number. Example: 5408"
+        ::= { mpbc2RUInfoEntry 6 }
+
+    mpbc2RUInfoRev OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Hardware Revision Number. Example: 0"
+        ::= { mpbc2RUInfoEntry 7 }
+
+    mpbc2RUInfoECN OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ECN level. Example: Z"
+        ::= { mpbc2RUInfoEntry 8 }
+
+    mpbc2RUInfoSeqNum OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Hardware Sequence Number. Example: 00792"
+        ::= { mpbc2RUInfoEntry 9 }
+
+    mpbc2RUInfoMfgDate OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Manufacturing Date in format Year/Week (YYWW) Ex: 0848"
+        ::= { mpbc2RUInfoEntry 10 }
+
+    mpbc2RUInfoSwVer OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "MCF52259 Firmware Version."
+        ::= { mpbc2RUInfoEntry 11 }
+
+    mpbc2RUInfoBootLoaderRev OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "MCF52259 Bootloader Software Revision."
+        ::= { mpbc2RUInfoEntry 12 }
+
+    mpbc2RUInfoLibRev OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "MCF52259 Library Software Revision."
+        ::= { mpbc2RUInfoEntry 13 }
+
+    mpbc2RUInfoLddFw1 OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser diode driver board 1 Software Revision."
+        ::= { mpbc2RUInfoEntry 14 }
+
+    mpbc2RUInfoLddFw2 OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser diode driver board 2 Software Revision."
+        ::= { mpbc2RUInfoEntry 15 }
+		
+    mpbc2RUInfoCLEI OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Telcordia Common Language Equipment Identification."
+        ::= { mpbc2RUInfoEntry 16 }
+
+    mpbc2RUInfoLastRmaDate OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Last RMA Date in format Year/Week (YYWW) Ex: 0848"
+        ::= { mpbc2RUInfoEntry 17 }
+
+    mpbc2RUDateTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Format: YYYY-MM-DD hh:mm:ss.  
+                            
+                            For example 2012-03-30 12:04:33 ---> Mar 30 12:04:33
+                            2012
+                            
+                            
+                            2012-03-30 16:04:33 ---> Mar 30 16:04:33 2012
+                            
+                            Any mistake in the format shall be rejected by
+                            the NEM."
+        ::= { mpbc2RUNE 3 }
+
+    mpbc2RUSNMPAgentVersion OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "SNMP Agent Version number and Date."
+        ::= { mpbc2RUNE 4 }
+
+    mpbc2RUSNMPMIBVersion OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "SNMP MIB Version Number."
+        DEFVAL              { "2RU_MIB_VERSION 1.1.2.0" }
+        ::= { mpbc2RUNE 5 }
+		
+    mpbc2RUSNMPMemoryConfig OBJECT IDENTIFIER ::= { mpbc2RUConfiguration 3 }
+		
+    mpbc2RUSNMPMemorySave OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Not used."
+        DEFVAL              { 2 }
+		
+        ::= { mpbc2RUSNMPMemoryConfig 1 }		
+
+    mpbc2RUSNMPMemoryRestore OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Not used."
+        DEFVAL              { 2 }
+		
+        ::= { mpbc2RUSNMPMemoryConfig 2 }		
+
+			
+    mpbc2RUConformance OBJECT IDENTIFIER ::= { mpbc2RU 13 }
+
+    mpbc2RUGroups OBJECT IDENTIFIER ::= { mpbc2RUConformance 1 }
+
+    mpbc2RUMibAllObjects OBJECT-GROUP
+        OBJECTS {           
+                        mpbc2RUTrapCriticalEnable,
+                        mpbc2RUTrapMajorEnable,
+                        mpbc2RUTrapMinorEnable,
+                        mpbc2RUTrapInformationalEnable,
+                        mpbc2RUMacAddress,
+                        mpbc2RUEthernetIPaddress,
+                        mpbc2RUEthernetIPsubNetMask,
+                        mpbc2RUDefaultGateway,
+                        mpbc2RUNEID,
+                        mpbc2RUAlarmNEID,
+                        mpbc2RUAlarmSeverity,
+                        mpbc2RUAlarmDescription,
+			mpbc2RUAlarmDateAndTime,
+                        mpbc2RUNotifiedNMSipAddress-IP,
+                        mpbc2RUNotifiedNMSipAddress-Description,
+                        mpbc2RUNotifiedNMSipAddress-Enabled
+                }
+        STATUS              current
+        DESCRIPTION         "This automatically created object group contains
+                            all those objects that do not belong to any other
+                            OBJECT-GROUP"
+        ::= { mpbc2RUGroups 1 }
+
+    mpbc2RUMibAllNotifications NOTIFICATION-GROUP
+        NOTIFICATIONS       {
+                                mpbc2RUTrapCritical,
+                                mpbc2RUTrapMajor,
+                                mpbc2RUTrapMinor,
+                                mpbc2RUTrapInformational
+                            }
+        STATUS              current
+        DESCRIPTION         "This automatically created notification group
+                            contains all notifications that do not belong
+                            to any other NOTIFICATION-GROUP"
+        ::= { mpbc2RUGroups 2 }
+
+    mpbc2ruMibAllObjects OBJECT-GROUP
+        OBJECTS {           
+                        mpbc2RUAckTrapCriticalEnable,
+                        mpbc2RUAckTrapCriticalRetries,
+                        mpbc2RUAckTrapCriticalTimeOutsec,
+                        mpbc2RUAckTrapMajorEnable,
+                        mpbc2RUAckTrapMajorRetries,
+                        mpbc2RUAckTrapMajorTimeOutsec,
+                        mpbc2RUAckTrapMinorEnable,
+                        mpbc2RUAckTrapMinorRetries,
+                        mpbc2RUAckTrapMinorTimeOutsec,
+                        mpbc2RUAckTrapInformationalEnable,
+                        mpbc2RUAckTrapInformationalRetries,
+                        mpbc2RUAckTrapInformationalTimeOutsec,
+                        mpbc2RUSnmpTrapPort,
+                        mpbc2RUDateTime,
+                        mpbc2RUSNMPAgentVersion,
+                        mpbc2RUSNMPMIBVersion,
+                        mpbc2RUInfoLoc,
+                        mpbc2RUInfoModelNum,
+                        mpbc2RUInfoModelSN,
+                        mpbc2RUInfoOEMPartNum,
+						mpbc2RUInfoAssyNum,
+                        mpbc2RUInfoRev,
+                        mpbc2RUInfoECN,
+                        mpbc2RUInfoSeqNum,
+                        mpbc2RUInfoMfgDate,
+                        mpbc2RUInfoSwVer,
+                        mpbc2RUInfoBootLoaderRev,
+                        mpbc2RUInfoLibRev,
+                        mpbc2RUInfoLddFw1,
+                        mpbc2RUInfoLddFw2,
+                        mpbc2RUInfoCLEI,
+                        mpbc2RUInfoLastRmaDate
+                }
+        STATUS              current
+        DESCRIPTION         "This automatically created object group contains
+                            all those objects that do not belong to any other
+                            OBJECT-GROUP"
+        ::= { mpbc2RUGroups 3 }
+
+    mpbc2RUMLDS OBJECT IDENTIFIER ::= { mpbc2RU 14 }
+
+    mpbc2RUMLDSControl OBJECT IDENTIFIER ::= { mpbc2RUMLDS 1 }
+
+    mpbc2RUMLDSLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+        ::= { mpbc2RUMLDSControl 1 }
+
+    mpbc2RUMLDSControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4)"
+        ::= { mpbc2RUMLDSControl 2 }
+
+    mpbc2RUMLDS3rdWLPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL3 output power setpoint in mW."
+        ::= { mpbc2RUMLDSControl 3 }
+
+    mpbc2RUMLDS4thWLPwrSetPtmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL4 output power setpoint in mW."
+        ::= { mpbc2RUMLDSControl 4 }
+
+    mpbc2RUMLDSReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)."
+        ::= { mpbc2RUMLDSControl 5 }
+
+    mpbc2RUMLDSMonitor OBJECT IDENTIFIER ::= { mpbc2RUMLDS 2 }
+
+    mpbc2RUMLDSLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA."
+        ::= { mpbc2RUMLDSMonitor 1 }
+
+    mpbc2RUMLDSLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSMonitor 2 }
+
+    mpbc2RUMLDSLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA."
+        ::= { mpbc2RUMLDSMonitor 3 }
+
+    mpbc2RUMLDSLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA."
+        ::= { mpbc2RUMLDSMonitor 4 }
+
+    mpbc2RUMLDSLD2TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSMonitor 5 }
+
+    mpbc2RUMLDSLD2TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 TEC Current in mA."
+        ::= { mpbc2RUMLDSMonitor 6 }
+
+    mpbc2RUMLDSCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSMonitor 7 }
+
+    mpbc2RUMLDSMon3rdWLOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL3 output power in mW."
+        ::= { mpbc2RUMLDSMonitor 8 }
+
+    mpbc2RUMLDSMon4thWLOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL4 output power in mW."
+        ::= { mpbc2RUMLDSMonitor 9 }
+
+    mpbc2RUMLDSMonTotalOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output power monitor in mW."
+        ::= { mpbc2RUMLDSMonitor 10 }
+
+    mpbc2RUMLDSInputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input power monitor in mW."
+        ::= { mpbc2RUMLDSMonitor 11 }
+
+    mpbc2RUMLDSMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RUMLDSMonitor 12 }
+
+    mpbc2RUMLDSMonLaserMode OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+				laserAPR( 1 ),                             
+				laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+
+        ::= { mpbc2RUMLDSMonitor 13 }
+
+    mpbc2RUMLDSMonControlMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "ACC(3), APC(4)."
+        ::= { mpbc2RUMLDSMonitor 14 }
+
+    mpbc2RUMLDSDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUMLDSMonitor 15 }
+
+    mpbc2RUMLDSUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)."
+        ::= { mpbc2RUMLDSMonitor 16 }
+
+    mpbc2RUMLDSConfiguration OBJECT IDENTIFIER ::= { mpbc2RUMLDS 3 }
+
+    mpbc2RUMLDSLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RUMLDSConfiguration 1 }
+		
+    mpbc2RUMLDSLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RUMLDSConfiguration 2 }
+
+    mpbc2RUMLDSLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RUMLDSConfiguration 3 }
+		
+    mpbc2RUMLDSLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RUMLDSConfiguration 4 }
+
+    mpbc2RUMLDSCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSConfiguration 5 }
+
+    mpbc2RUMLDSCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSConfiguration 6 }
+
+    mpbc2RUMLDSCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSConfiguration 7 }
+
+    mpbc2RUMLDSCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSConfiguration 8 }
+
+    mpbc2RUMLDSCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSConfiguration 9 }
+
+    mpbc2RUMLDSCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10."
+        ::= { mpbc2RUMLDSConfiguration 10}
+
+    mpbc2RUMLDS3rdWLOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL3 output minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDSConfiguration 11}
+
+    mpbc2RUMLDS3rdWLOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL3 output maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDSConfiguration 12 }
+
+    mpbc2RUMLDS4thWLOutputPwrMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL4 output minimum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDSConfiguration 13 }
+
+    mpbc2RUMLDS4thWLOutputPwrMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "WL4 output maximum threshold in dB x 10, relative to set point."
+        ::= { mpbc2RUMLDSConfiguration 14 }
+
+    mpbc2RUMLDS3rdWLOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL3 output power minimum limit in dBm x 10."
+        ::= { mpbc2RUMLDSConfiguration 15 }
+
+    mpbc2RUMLDS3rdWLOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL3 output power maximum limit in dBm x 10."
+        ::= { mpbc2RUMLDSConfiguration 16 }
+
+    mpbc2RUMLDS4thWLOutputPwrMinLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL4 output power minimum limit in dBm x 10."
+        ::= { mpbc2RUMLDSConfiguration 17 }
+
+    mpbc2RUMLDS4thWLOutputPwrMaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "WL4 output power maximum limit in dBm x 10."
+        ::= { mpbc2RUMLDSConfiguration 18 }
+
+    mpbc2RUMLDSLOSSetThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Set threshold in dBm x 100."
+        ::= { mpbc2RUMLDSConfiguration 19 }
+
+    mpbc2RUMLDSLOSClearThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Clear threshold in dBm x 100."
+        ::= { mpbc2RUMLDSConfiguration 20 }
+
+    mpbc2RUPxxH OBJECT IDENTIFIER ::= { mpbc2RU 15 }
+
+    mpbc2RUPxxHControl OBJECT IDENTIFIER ::= { mpbc2RUPxxH 1 }
+
+    mpbc2RUPxxHLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 )
+                            }
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser APR(1)."
+
+        ::= { mpbc2RUPxxHControl 1 }
+
+    mpbc2RUPxxHControlMode OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "APC(4), AGC(5)."
+        ::= { mpbc2RUPxxHControl 2 }
+
+    mpbc2RUPxxHPwrSetPtmW OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "EDFA output power setpoint in mW. (For APC mode)"
+        ::= { mpbc2RUPxxHControl 3 }
+
+    mpbc2RUPxxHGainSetPtdBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "EDFA gain setpoint in dB x10. (For AGC mode)"
+        ::= { mpbc2RUPxxHControl 4 }
+
+    mpbc2RUPxxHVOASettingdBx10 OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "VOA setting in dB x 10. (If the VOA is not present this object shows zero)"
+        ::= { mpbc2RUPxxHControl 5 }
+
+    mpbc2RUPxxHReset OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Normal = False(2), Reset = True(1)"
+        ::= { mpbc2RUPxxHControl 6 }
+
+    mpbc2RUPxxHMonitor OBJECT IDENTIFIER ::= { mpbc2RUPxxH 2 }
+
+    mpbc2RUPxxHLD1CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 Current in mA"
+        ::= { mpbc2RUPxxHMonitor 1 }
+
+    mpbc2RUPxxHLD1TempDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPxxHMonitor 2 }
+
+    mpbc2RUPxxHLD1TECCurmA  OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 TEC Current in mA"
+        ::= { mpbc2RUPxxHMonitor 3 }
+
+	mpbc2RUPxxHLD1BackFacetPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 back facet power in mW x 100"
+        ::= { mpbc2RUPxxHMonitor 4 }
+
+    mpbc2RUPxxHLD2CurmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 Current in mA"
+        ::= { mpbc2RUPxxHMonitor 5 }
+
+    mpbc2RUPxxHCaseTempDegCx10 OBJECT-TYPE
+        SYNTAX            INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPxxHMonitor 6 }
+
+	mpbc2RUPxxH148xPumpPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "148x Pump power in mW"
+        ::= { mpbc2RUPxxHMonitor 7 }
+
+    mpbc2RUPxxHOutputPwrmW OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output power in mW"
+        ::= { mpbc2RUPxxHMonitor 8 }
+
+    mpbc2RUPxxHGaindBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Gain in dB x 10."
+        ::= { mpbc2RUPxxHMonitor 9 }
+
+    mpbc2RUPxxHInputPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Input power in mW x 100."
+        ::= { mpbc2RUPxxHMonitor 10 }
+
+   mpbc2RUPxxHBackReflPwrmWx100 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Back-reflection power in mW x 100."
+        ::= { mpbc2RUPxxHMonitor 11 }
+
+    mpbc2RUPxxHMonLaserState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                laserOff( 0 ),
+                                laserNormal( 1 ),
+                                laserALS( 2 ),
+                                laserALS100( 3 ),
+                                laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), ALS(2), ALS100(3), Normal(1)."
+        ::= { mpbc2RUPxxHMonitor 12 }
+
+    mpbc2RUPxxHMonLaserMode OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                laserOff( 0 ),
+								laserAPR( 1 ),                             
+								laserOn( 10 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Laser OFF(0), Laser ON(10), Laser APR(1)."
+        ::= { mpbc2RUPxxHMonitor 13 }
+		
+    mpbc2RUPxxHMonControlMode OBJECT-TYPE
+       SYNTAX               INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Monitor laser control mode ACC(3), APC(4), AGC(5)."
+        ::= { mpbc2RUPxxHMonitor 14 }
+		
+    mpbc2RUPxxHDisableInputState OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Off = 0, On = 1."
+        ::= { mpbc2RUPxxHMonitor 15 }
+
+    mpbc2RUPxxHUnitState OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                stateInit( 0 ),
+                                stateNormal( 1 ),
+                                stateFault( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Init(0), Normal(1), Fault(2)"
+        ::= { mpbc2RUPxxHMonitor 16 }
+
+    mpbc2RUPxxHOSCRxTone OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noTone( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 ),
+								tone1plus2( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3)"
+        ::= { mpbc2RUPxxHMonitor 17 }
+
+    mpbc2RUPxxHOSCTempdegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC temperature in deg. Celsius x 10."
+        ::= { mpbc2RUPxxHMonitor 18 }
+
+    mpbc2RUPxxHOSCTxTone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Tone Off(0), Tone 1(1), Tone 2(2)."	
+        ::= { mpbc2RUPxxHMonitor 19 }
+
+    mpbc2RUPxxHOSCTxPwrmWx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "OSC Tx power in mW x 100."
+        ::= { mpbc2RUPxxHMonitor 20 }
+
+    mpbc2RUPxxHOSCRx1610Tone OBJECT-TYPE
+       SYNTAX              INTEGER {
+                                off( 0 ),
+                                tone1( 1 ),
+                                tone2( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "No Tone(0), Tone 1(1), Tone 2(2), Tone1+2(3). (If Not in OSC Mode with ROPA, this object shows zero)"	
+        ::= { mpbc2RUPxxHMonitor 21 }
+
+    mpbc2RUPxxHMonVOASettingdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+	DESCRIPTION         "VOA setting in dB x 10. (If the VOA is not present this object shows zero)"
+        ::= { mpbc2RUPxxHMonitor 22 }
+
+    mpbc2RUPxxHConfiguration OBJECT IDENTIFIER ::= { mpbc2RUPxxH 3 }
+
+    mpbc2RUPxxHLD1CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current minimum threshold in mA."
+        ::= { mpbc2RUPxxHConfiguration 1 }
+
+    mpbc2RUPxxHLD2CurMinThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current minimum threshold in mA."
+        ::= { mpbc2RUPxxHConfiguration 2 }
+
+    mpbc2RUPxxHLD1CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD1 current maximum threshold in mA."
+        ::= { mpbc2RUPxxHConfiguration 3 }
+
+    mpbc2RUPxxHLD2CurMaxThrmA OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LD2 current maximum threshold in mA."
+        ::= { mpbc2RUPxxHConfiguration 4 }
+
+    mpbc2RUPxxHCaseTempMinSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxHConfiguration 5 }
+
+    mpbc2RUPxxHCaseTempMinClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxHConfiguration 6 }
+
+    mpbc2RUPxxHCaseTempMaxSetThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum set threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxHConfiguration 7 }
+
+    mpbc2RUPxxHCaseTempMaxClearThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum clear threshold in deg. Celsius x 10."
+        ::= { mpbc2RUPxxHConfiguration 8 }
+
+    mpbc2RUPxxHCaseTempMinAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature minimum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RUPxxHConfiguration 9 }
+
+    mpbc2RUPxxHCaseTempMaxAlrmThrDegCx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Case temperature maximum alarm threshold in deg. Celsius x 10"
+        ::= { mpbc2RUPxxHConfiguration 10 }
+
+    mpbc2RUPxxHLOSSetThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Set threshold in dBm x 100."
+        ::= { mpbc2RUPxxHConfiguration 11 }
+
+    mpbc2RUPxxHLOSClearThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "LOS Clear threshold in dBm x 100."
+        ::= { mpbc2RUPxxHConfiguration 12 }
+
+    mpbc2RUPxxHInputMinThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Input power minimum threshold in dBm x 100."
+        ::= { mpbc2RUPxxHConfiguration 13 }
+
+    mpbc2RUPxxHInputMaxThrdBmx100 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Input power maximum threshold in dBm x 100."
+        ::= { mpbc2RUPxxHConfiguration 14 }
+
+    mpbc2RUPxxHOutputMinThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Output power minimum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUPxxHConfiguration 15 }
+
+    mpbc2RUPxxHOutputMaxThrdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "Output power maximum threshold relative to set point in dB x 10."
+        ::= { mpbc2RUPxxHConfiguration 16 }
+
+    mpbc2RUPxxHOSCMode OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "OSC mode, 0: Stand-alone, 1: ROPA."
+        ::= { mpbc2RUPxxHConfiguration 17 }
+
+    mpbc2RUPxxHOutputSetptminLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output set point minimum limit in dBm x 10"
+        ::= { mpbc2RUPxxHConfiguration 18 }
+		
+    mpbc2RUPxxHOutputSetptmaxLimdBmx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Output set point maximum limit in dBm x 10"
+        ::= { mpbc2RUPxxHConfiguration 19 }
+		
+    mpbc2RUPxxHGainSetptminLimdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Gain set point minimum limit in dB x 10"
+        ::= { mpbc2RUPxxHConfiguration 20 }
+		
+    mpbc2RUPxxHGainSetptmaxLimdBx10 OBJECT-TYPE
+        SYNTAX              INTEGER
+        MAX-ACCESS          read-only
+        STATUS              current
+	DESCRIPTION         "Gain set point maximum limit in dB x 10"
+        ::= { mpbc2RUPxxHConfiguration 21 }
+
+
+END

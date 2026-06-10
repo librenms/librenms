@@ -1,0 +1,426 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-VOICE-STATISTICS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwStatistics
+        FROM MERU-SMI
+    MwlNetProtocol,
+    MwlDeviceType,
+    MwlOnOffSwitch,
+    MwlQosProtocol,
+    MwlQosCallState
+        FROM MERU-TC;
+
+  mwVoiceStatistics  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Voice Statistics infrastructure"
+    ::= { mwStatistics 3 } 
+  
+    
+  
+  mwPhoneTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwPhoneEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Phone Table "
+    ::= { mwVoiceStatistics 1 }
+
+  mwPhoneEntry  OBJECT-TYPE
+    SYNTAX MwPhoneEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Phone Table "
+    INDEX {  mwPhoneTableIndex  }
+    ::= { mwPhoneTable 1 }
+
+  MwPhoneEntry  ::=  SEQUENCE { 
+       mwPhoneTableIndex                                           Integer32, 
+       mwPhoneIp                                                   IpAddress,
+       mwPhoneAp                                                   Integer32,
+       mwPhoneMac                                                  MacAddress,
+       mwPhoneType                                                 MwlQosProtocol,
+       mwPhoneApName                                               DisplayString,
+       mwPhoneServer                                               DisplayString,
+       mwPhoneUsername                                             DisplayString,
+       mwPhoneTransport                                            MwlNetProtocol,
+       mwPhoneDeviceType                                           MwlDeviceType 
+  }
+   
+   
+  mwPhoneTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwPhoneEntry 1 }
+
+  mwPhoneIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Address"
+    ::= { mwPhoneEntry    2 }
+
+  mwPhoneAp  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwPhoneEntry    3 }
+
+  mwPhoneMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwPhoneEntry    4 }
+
+  mwPhoneType  OBJECT-TYPE
+    SYNTAX MwlQosProtocol
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Protocol Type"
+    ::= { mwPhoneEntry    5 }
+
+  mwPhoneApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwPhoneEntry    6 }
+
+  mwPhoneServer  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Server"
+    ::= { mwPhoneEntry    7 }
+
+  mwPhoneUsername  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Username"
+    ::= { mwPhoneEntry    8 }
+
+  mwPhoneTransport  OBJECT-TYPE
+    SYNTAX MwlNetProtocol
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transport"
+    ::= { mwPhoneEntry    9 }
+
+  mwPhoneDeviceType  OBJECT-TYPE
+    SYNTAX MwlDeviceType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Type"
+    ::= { mwPhoneEntry   10 }
+
+  mwPhoneCallTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwPhoneCallEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Phone Call Table "
+    ::= { mwVoiceStatistics 2 }
+
+  mwPhoneCallEntry  OBJECT-TYPE
+    SYNTAX MwPhoneCallEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Phone Call Table "
+    INDEX {  mwPhoneCallTableIndex  }
+    ::= { mwPhoneCallTable 1 }
+
+  MwPhoneCallEntry  ::=  SEQUENCE { 
+       mwPhoneCallTableIndex                                       Integer32, 
+       mwPhoneCallToIp                                             IpAddress,
+       mwPhoneCallToAp                                             Integer32,
+       mwPhoneCallType                                             MwlQosProtocol,
+       mwPhoneCallToMac                                            MacAddress,
+       mwPhoneCallState                                            MwlQosCallState,
+       mwPhoneCallFromIp                                           IpAddress,
+       mwPhoneCallFromAp                                           Integer32,
+       mwPhoneCallFromMac                                          MacAddress,
+       mwPhoneCallToApName                                         DisplayString,
+       mwPhoneCallToFlowtag                                        Integer32,
+       mwPhoneCallToPending                                        MwlOnOffSwitch,
+       mwPhoneCallFromApName                                       DisplayString,
+       mwPhoneCallToUsername                                       DisplayString,
+       mwPhoneCallFromFlowtag                                      Integer32,
+       mwPhoneCallFromPending                                      MwlOnOffSwitch,
+       mwPhoneCallFromUsername                                     DisplayString 
+  }
+   
+   
+  mwPhoneCallTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwPhoneCallEntry 1 }
+
+  mwPhoneCallToIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes To IP Address"
+    ::= { mwPhoneCallEntry    2 }
+
+  mwPhoneCallToAp  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes To AP ID"
+    ::= { mwPhoneCallEntry    3 }
+
+  mwPhoneCallType  OBJECT-TYPE
+    SYNTAX MwlQosProtocol
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Protocol Type"
+    ::= { mwPhoneCallEntry    4 }
+
+  mwPhoneCallToMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes To MAC Address"
+    ::= { mwPhoneCallEntry    5 }
+
+  mwPhoneCallState  OBJECT-TYPE
+    SYNTAX MwlQosCallState
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Call state"
+    ::= { mwPhoneCallEntry    6 }
+
+  mwPhoneCallFromIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes From IP Address"
+    ::= { mwPhoneCallEntry    7 }
+
+  mwPhoneCallFromAp  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes From AP ID"
+    ::= { mwPhoneCallEntry    8 }
+
+  mwPhoneCallFromMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes From MAC Address"
+    ::= { mwPhoneCallEntry    9 }
+
+  mwPhoneCallToApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes To AP Name"
+    ::= { mwPhoneCallEntry   10 }
+
+  mwPhoneCallToFlowtag  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes To Flow Tag"
+    ::= { mwPhoneCallEntry   11 }
+
+  mwPhoneCallToPending  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes To Qos Pending"
+    ::= { mwPhoneCallEntry   12 }
+
+  mwPhoneCallFromApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes From AP Name"
+    ::= { mwPhoneCallEntry   13 }
+
+  mwPhoneCallToUsername  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes To Username"
+    ::= { mwPhoneCallEntry   14 }
+
+  mwPhoneCallFromFlowtag  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes From Flow Tag"
+    ::= { mwPhoneCallEntry   15 }
+
+  mwPhoneCallFromPending  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes From Qos Pending"
+    ::= { mwPhoneCallEntry   16 }
+
+  mwPhoneCallFromUsername  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes From Username"
+    ::= { mwPhoneCallEntry   17 }
+
+  mwVoiceStatusTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwVoiceStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Voice Status Table "
+    ::= { mwVoiceStatistics 3 }
+
+  mwVoiceStatusEntry  OBJECT-TYPE
+    SYNTAX MwVoiceStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Voice Status Table "
+    INDEX {  mwVoiceStatusTableIndex  }
+    ::= { mwVoiceStatusTable 1 }
+
+  MwVoiceStatusEntry  ::=  SEQUENCE { 
+       mwVoiceStatusTableIndex                                     Integer32, 
+       mwVoiceStatusAp                                             Integer32,
+       mwVoiceStatusApName                                         DisplayString,
+       mwVoiceStatusPhoneCount                                     Unsigned32,
+       mwVoiceStatusRejectCount                                    Counter64,
+       mwVoiceStatusActiveCallCount                                Unsigned32,
+       mwVoiceStatusPendingCallCount                               Unsigned32 
+  }
+   
+   
+  mwVoiceStatusTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwVoiceStatusEntry 1 }
+
+  mwVoiceStatusAp  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwVoiceStatusEntry    2 }
+
+  mwVoiceStatusApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwVoiceStatusEntry    3 }
+
+  mwVoiceStatusPhoneCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Phone Count"
+    ::= { mwVoiceStatusEntry    4 }
+
+  mwVoiceStatusRejectCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Call Rejected Count"
+    ::= { mwVoiceStatusEntry    5 }
+
+  mwVoiceStatusActiveCallCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Active Call Count"
+    ::= { mwVoiceStatusEntry    6 }
+
+  mwVoiceStatusPendingCallCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos Pending Call Count"
+    ::= { mwVoiceStatusEntry    7 }
+
+  
+END
+   

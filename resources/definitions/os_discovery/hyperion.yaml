@@ -1,0 +1,12 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
+        hardware: SNMPv2-MIB::sysDescr.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - ENTITY-MIB::entPhysicalName

@@ -1,0 +1,583 @@
+--  *****************************************************************
+--  DLINKSW-JWAC-MIB.mib : Japanese Web-Based Access Control MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+    DLINKSW-JWAC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32                      FROM SNMPv2-SMI
+        TruthValue,
+        RowStatus                       FROM SNMPv2-TC
+        SnmpAdminString                 FROM SNMP-FRAMEWORK-MIB
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP              FROM SNMPv2-CONF
+        ifIndex                         FROM IF-MIB
+        InetAddressIPv4,
+        InetAddressIPv6,
+        InetAddressType,
+        InetAddress,
+        InetAddressPrefixLength         FROM INET-ADDRESS-MIB
+        dlinkIndustrialCommon           FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwJwacMIB MODULE-IDENTITY
+        LAST-UPDATED "201310080000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+             "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for Japanese Web-Based Access Control.
+            ABBREVIATIONS and ACRONYMS: 
+            JWAC - Japanese Web-Based Access Control
+            Qserver - quarantine server
+            "            
+            
+        REVISION "201310080000Z"
+        DESCRIPTION 
+            "This is the first version of the MIB file."    
+        ::= { dlinkIndustrialCommon 155 }
+
+-- ----------------------------------------------------------------------------------------------
+    dJwacNotifications    OBJECT IDENTIFIER ::= { dlinkSwJwacMIB 0 }
+    dJwacObjects          OBJECT IDENTIFIER ::= { dlinkSwJwacMIB 1 }
+    dJwacConformance      OBJECT IDENTIFIER ::= { dlinkSwJwacMIB 2 }
+-- ----------------------------------------------------------------------------------------------
+
+-- ----------------------------------------------------------------------------------------------
+    dJwacCommonCtrl          OBJECT IDENTIFIER ::= { dJwacObjects 1 }
+    dJwacInterfaceCtrl       OBJECT IDENTIFIER ::= { dJwacObjects 2 }
+    dJwacPageElementsCtrl    OBJECT IDENTIFIER ::= { dJwacObjects 3 }
+    dJwacUpdateServerCtrl    OBJECT IDENTIFIER ::= { dJwacObjects 4 }
+
+    dJwacSystemAuthEnabled    OBJECT-TYPE
+        SYNTAX         TruthValue 
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the global status of JWAC on the device."
+        ::= { dJwacCommonCtrl 1 }
+
+    dJwacVirtualIpv4    OBJECT-TYPE
+        SYNTAX          InetAddressIPv4
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the virtual IPv4 address which is used to accept 
+            authentication requests from an unauthenticated host.
+    
+            The virtual IP of JWAC is used to accept authentication requests 
+            from an unauthenticated host. Only requests sent to this IP will 
+            get a correct response.
+ 
+            NOTE: This IP does not respond to ARP requests or ICMP packets."
+        ::= { dJwacCommonCtrl 2 }
+
+    dJwacVirtualIpv6    OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the virtual IPv6 address which is used to accept 
+            authentication requests from an unauthenticated host.
+    
+            The virtual IP of WAC is used to accept authentication requests 
+            from an unauthenticated host. Only requests sent to this IP will 
+            get a correct response.
+
+            NOTE: This IP does not respond to ICMPv6 packets."
+        ::= { dJwacCommonCtrl 3 }
+
+    dJwacVirtualUrl    OBJECT-TYPE
+        SYNTAX         SnmpAdminString
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the FQDN URL for the virtual IP address.
+    
+            The defined URL only takes effect when the virtual IP address is 
+            configured. The user gets the FQDN URL stored on the DNS server 
+            to get the virtual IP address. The obtained IP address must match 
+            the virtual IP address."
+        ::= { dJwacCommonCtrl 4 }
+
+    dJwacAuthMethod    OBJECT-TYPE
+        SYNTAX         INTEGER        {
+            md5(1),
+            chap(2),
+            pap(3),
+            msChap(4),
+            msChapv2(5)
+        }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the JWAC authentication method.            
+            "
+        ::= { dJwacCommonCtrl 5 }
+
+    dJwacForcibleLogout    OBJECT-TYPE
+        SYNTAX             TruthValue
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION
+            "This object indicates the state of JWAC forcible logout function."
+        ::= { dJwacCommonCtrl 6 }
+
+    dJwacQserverV4Url    OBJECT-TYPE
+        SYNTAX           SnmpAdminString
+        MAX-ACCESS       read-write
+        STATUS           current
+        DESCRIPTION
+            "This object indicates the URL on quarantine server for IPv4 access
+            authentication."
+        ::= { dJwacCommonCtrl 7 }
+
+    dJwacQserverV6Url    OBJECT-TYPE
+        SYNTAX           SnmpAdminString
+        MAX-ACCESS       read-write
+        STATUS           current
+        DESCRIPTION
+            "This object indicates the URL on quarantine server for IPv6 access
+            authentication."
+        ::= { dJwacCommonCtrl 8 }
+
+    dJwacQserverMonitorEnabled    OBJECT-TYPE
+        SYNTAX             TruthValue
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION
+            "This object indicates the state of JWAC Quarantine Server monitor
+            function."
+        ::= { dJwacCommonCtrl 9 }
+
+    dJwacQserverTimeOut    OBJECT-TYPE
+        SYNTAX             Unsigned32 (5..300)
+        MAX-ACCESS         read-write
+        STATUS             current
+        DESCRIPTION
+            "This object indicates the JWAC Quarantine Server timeout period."
+        ::= { dJwacCommonCtrl 10 }
+
+    dJwacRedirectEnabled    OBJECT-TYPE
+        SYNTAX            TruthValue
+        MAX-ACCESS        read-write
+        STATUS            current
+        DESCRIPTION
+            "This object indicates the state of JWAC redirect function."
+        ::= { dJwacCommonCtrl 11 }
+
+    dJwacRedirectDestination    OBJECT-TYPE
+        SYNTAX                  INTEGER         {
+            quarantineServer(1),
+            jwacLoginPage(2)
+        }
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+            "This object indicates the destination which the unauthenticated 
+            host will be redirected to."
+        ::= { dJwacCommonCtrl 12 }
+
+    dJwacRedirectDelayTime    OBJECT-TYPE
+        SYNTAX                Unsigned32 (0..10)
+        MAX-ACCESS            read-write
+        STATUS                current
+        DESCRIPTION
+            "This object indicates the time period after which the unauthenticated
+            host will be redirected.
+            
+            NOTE: 0 means redirect without delaying."
+        ::= { dJwacCommonCtrl 13 }
+
+    dJwacUdpFiltering    OBJECT-TYPE
+        SYNTAX           TruthValue
+        MAX-ACCESS       read-write
+        STATUS           current
+        DESCRIPTION
+            "This object indicates the state of JWAC UDP Filtering function."
+        ::= { dJwacCommonCtrl 14 }
+
+    dJwacAuthPageLanguage    OBJECT-TYPE
+        SYNTAX               INTEGER         {
+            japanese(1),
+            english(2)
+        }
+        MAX-ACCESS           read-write
+        STATUS               current
+        DESCRIPTION
+            "This object indicates the authenticate page language for JWAC."
+        ::= { dJwacCommonCtrl 15 }
+
+-- ----------------------------------------------------------------------------------------------
+    dJwacIfCfgTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DJwacIfCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "A list of JWAC interface information entries."
+        ::= { dJwacInterfaceCtrl 1 }
+
+    dJwacIfCfgEntry    OBJECT-TYPE
+        SYNTAX          DJwacIfCfgEntry
+        MAX-ACCESS      not-accessible       
+        STATUS          current
+        DESCRIPTION            
+            "An entry indicates the setting of JWAC on an interface."
+        INDEX  { ifIndex }
+        ::= { dJwacIfCfgTable 1 }
+
+    DJwacIfCfgEntry ::= SEQUENCE      {           
+        dJwacIfAuthEnabled      TruthValue,
+        dJwacMaxAuthingUser     Unsigned32
+    }
+
+    dJwacIfAuthEnabled    OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the JWAC state on the interface."             
+        ::= { dJwacIfCfgEntry 1 }
+
+    dJwacMaxAuthingUser    OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the maximum authenticating user number on the
+            interface."
+        ::= { dJwacIfCfgEntry 2 }
+
+-- ----------------------------------------------------------------------------------------------
+    dJwacPageElementTable    OBJECT-TYPE
+        SYNTAX               SEQUENCE OF DJwacPageElementEntry
+        MAX-ACCESS           not-accessible
+        STATUS               current
+        DESCRIPTION
+            "A list of JWAC page elements entries."
+        ::= { dJwacPageElementsCtrl 1 }
+
+    dJwacPageElementEntry    OBJECT-TYPE
+        SYNTAX               DJwacPageElementEntry
+        MAX-ACCESS           not-accessible       
+        STATUS               current
+        DESCRIPTION
+            "An entry indicates the setting of JWAC authenticate page elements."
+        INDEX  { dJwacPageLanguage }
+        ::= { dJwacPageElementTable 1 }
+
+    DJwacPageElementEntry ::= SEQUENCE
+    {
+        dJwacPageLanguage             INTEGER,
+        dJwacPageTitle                SnmpAdminString,
+        dJwacPageLoginWindowTitle     SnmpAdminString,
+        dJwacPageUserName             SnmpAdminString,
+        dJwacPagePassWord             SnmpAdminString,
+        dJwacPageLogoutWindowTitle    SnmpAdminString,
+        dJwacPageCopyrightLine1       SnmpAdminString,
+        dJwacPageCopyrightLine2       SnmpAdminString,
+        dJwacPageCopyrightLine3       SnmpAdminString,
+        dJwacPageCopyrightLine4       SnmpAdminString,
+        dJwacPageCopyrightLine5       SnmpAdminString
+    }
+
+    dJwacPageLanguage    OBJECT-TYPE
+        SYNTAX           INTEGER        {
+            japanese(1),
+            english(2)
+        }
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+            "This object indicates the language of JWAC authenticate page."
+        ::= { dJwacPageElementEntry 1 }
+
+    dJwacPageTitle    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the title of the JWAC authentication page."
+        ::= { dJwacPageElementEntry 2 }
+
+    dJwacPageLoginWindowTitle    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the title of the JWAC authentication login
+            window."
+        ::= { dJwacPageElementEntry 3 }
+
+    dJwacPageUserName    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the user name title of JWAC authentication
+            login window."
+        ::= { dJwacPageElementEntry 4 }
+
+    dJwacPagePassWord    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the password title of JWAC authentication
+            login window."
+        ::= { dJwacPageElementEntry 5 }
+
+    dJwacPageLogoutWindowTitle    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the title of the JWAC authentication logout
+            window. "
+        ::= { dJwacPageElementEntry 6 }
+
+    dJwacPageCopyrightLine1    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the first line of copyright information in 
+            JWAC authentication pages."
+        ::= { dJwacPageElementEntry 7 }
+
+    dJwacPageCopyrightLine2    OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the second line of copyright information in 
+            JWAC authentication pages."
+        ::= { dJwacPageElementEntry 8 }
+
+    dJwacPageCopyrightLine3    OBJECT-TYPE
+        SYNTAX                    SnmpAdminString
+        MAX-ACCESS                read-write
+        STATUS                    current
+        DESCRIPTION
+            "This object indicates the third line of copyright information in 
+            JWAC authentication pages."
+        ::= { dJwacPageElementEntry 9 }
+
+    dJwacPageCopyrightLine4    OBJECT-TYPE
+        SYNTAX                    SnmpAdminString
+        MAX-ACCESS                read-write
+        STATUS                    current
+        DESCRIPTION
+           "This object indicates the fourth line of copyright information in 
+            JWAC authentication pages."
+        ::= { dJwacPageElementEntry 10 }
+
+    dJwacPageCopyrightLine5    OBJECT-TYPE
+        SYNTAX                    SnmpAdminString
+        MAX-ACCESS                read-write
+        STATUS                    current
+        DESCRIPTION
+            "This object indicates the fifth line of copyright information in 
+            JWAC authentication pages."
+        ::= { dJwacPageElementEntry 11 }
+
+-- ----------------------------------------------------------------------------------------------
+    dJwacUpdateServerTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DJwacUpdateServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of JWAC update servers."
+        ::= { dJwacUpdateServerCtrl 1 }
+
+    dJwacUpdateServerEntry    OBJECT-TYPE
+        SYNTAX          DJwacUpdateServerEntry
+        MAX-ACCESS      not-accessible       
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates a JWAC update server."
+        INDEX  { 
+            dJwacUpdateServerAddrType,
+            dJwacUpdateServerAddr,
+            dJwacUpdateServerPrefixLen,
+            dJwacUpdateServerProtocol,
+            dJwacUpdateServerPort
+        }
+        ::= { dJwacUpdateServerTable 1 }
+
+    DJwacUpdateServerEntry ::= SEQUENCE
+    {
+        dJwacUpdateServerAddrType     InetAddressType,
+        dJwacUpdateServerAddr         InetAddress,
+        dJwacUpdateServerPrefixLen    InetAddressPrefixLength,
+        dJwacUpdateServerProtocol     INTEGER,
+        dJwacUpdateServerPort         Unsigned32,
+        dJwacupdateServerRowStatus    RowStatus
+    }
+
+    dJwacUpdateServerAddrType    OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address type of JWAC update server."
+        ::= { dJwacUpdateServerEntry 1 }
+
+    dJwacUpdateServerAddr    OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv4 or IPv6 address of JWAC update server."
+        ::= { dJwacUpdateServerEntry 2 }
+
+    dJwacUpdateServerPrefixLen    OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the prefix length of the entry.
+            If this value is smaller than 32(IPv4) or 128(IPv6), it indicates 
+            dJwacUpdateServerAddr is a network address.
+            By adding the network address, an entry can serve multiple update
+            servers on the same network.
+            "
+        ::= { dJwacUpdateServerEntry 3 }
+
+    dJwacUpdateServerProtocol    OBJECT-TYPE
+        SYNTAX          INTEGER        {
+            all(1),
+            tcp(2),
+            udp(3)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the protocol of the entry."
+        ::= { dJwacUpdateServerEntry 4 }
+
+    dJwacUpdateServerPort    OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the port of the entry."
+        ::= { dJwacUpdateServerEntry 5 }
+
+    dJwacupdateServerRowStatus    OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of the entry."
+        ::= { dJwacUpdateServerEntry 99 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+    dJwacMIBCompliances    OBJECT IDENTIFIER
+        ::= { dJwacConformance 1 }
+
+    dJwacMIBGroups    OBJECT IDENTIFIER
+        ::= { dJwacConformance 2 } 
+    
+    dJwacMIBCompliance    MODULE-COMPLIANCE
+        STATUS            current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-JWAC-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS
+        {   
+            dJwacCfgGroup,
+            dJwacIfCfgGroup,
+            dJwacPageElementsGroup,
+            dJwacUpdateServerGroup
+        }                              
+        ::= { dJwacMIBCompliances 1 }
+-- -----------------------------------------------------------------------------        
+    dJwacCfgGroup    OBJECT-GROUP
+        OBJECTS
+        { 
+            dJwacSystemAuthEnabled,
+            dJwacVirtualIpv4,
+            dJwacVirtualIpv6,
+            dJwacVirtualUrl,
+            dJwacAuthMethod,
+            dJwacForcibleLogout,
+            dJwacQserverV4Url,
+            dJwacQserverV6Url,
+            dJwacQserverMonitorEnabled,
+            dJwacQserverTimeOut,
+            dJwacRedirectEnabled,
+            dJwacRedirectDestination,
+            dJwacRedirectDelayTime,
+            dJwacUdpFiltering,
+            dJwacAuthPageLanguage
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing management of the JWAC feature."
+        ::= { dJwacMIBGroups 1 }
+
+    dJwacIfCfgGroup    OBJECT-GROUP
+        OBJECTS 
+        { 
+            dJwacIfAuthEnabled,
+            dJwacMaxAuthingUser
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the interface's configuration of
+            JWAC."
+        ::= { dJwacMIBGroups 2 }
+
+    dJwacPageElementsGroup    OBJECT-GROUP
+        OBJECTS
+        {
+            dJwacPageTitle,
+            dJwacPageLoginWindowTitle,
+            dJwacPageUserName,
+            dJwacPagePassWord,
+            dJwacPageLogoutWindowTitle,
+            dJwacPageCopyrightLine1,
+            dJwacPageCopyrightLine2,
+            dJwacPageCopyrightLine3,
+            dJwacPageCopyrightLine4,
+            dJwacPageCopyrightLine5
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects providing the authenticate page elements information
+            of JWAC."
+        ::= { dJwacMIBGroups 3 }
+
+    dJwacUpdateServerGroup    OBJECT-GROUP
+        OBJECTS
+        {
+            dJwacUpdateServerAddrType,
+            dJwacUpdateServerAddr,
+            dJwacUpdateServerPrefixLen,
+            dJwacUpdateServerProtocol,
+            dJwacUpdateServerPort,
+            dJwacupdateServerRowStatus
+
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects providing the update server information of JWAC."
+        ::= { dJwacMIBGroups 4 }
+
+END

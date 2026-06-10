@@ -1,0 +1,1329 @@
+HP-SN-IPX-MIB DEFINITIONS ::= BEGIN
+
+
+-- Foundry SnIpx Group MIB Release 1.0.0
+-- Revision 0 1/7/97
+
+-- Copyright 1996-97 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry Networks SNMP Management Information Base 
+-- Specification embodies Foundry Networks' confidential and
+-- proprietary intellectual property. Foundry Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+-- SECTION 1: Top Level Definitions
+
+
+-- Imports
+
+IMPORTS
+    Counter 
+        FROM RFC1155-SMI
+	OBJECT-TYPE             
+		FROM RFC-1212
+	snIpx
+		FROM HP-SN-ROOT-MIB;
+
+	-- textual conventions
+
+
+	--  RtrStatus Values
+
+	     RtrStatus ::= INTEGER { disabled(0), enabled(1) }
+
+	--  Clear Status Values
+
+	     ClearStatus ::= INTEGER { normal(0), clear(1) }
+
+	--  Port index
+
+	     PortIndex ::= INTEGER (1..3900)
+
+	--  Action 
+
+		Action ::= INTEGER { deny(0), permit(1) }
+
+
+        PhysAddress ::= OCTET STRING
+    -- This data type is used to model media addresses.  For many
+    -- types of media, this will be in a binary representation.
+    -- For example, an ethernet address would be represented as
+    -- a string of 6 octets.
+
+        NetNumber ::= OCTET STRING (SIZE(4))
+
+
+-- SECTION 2: MIB 
+
+-- Router IPX MIB
+
+snIpxGen			OBJECT IDENTIFIER ::= { snIpx 1 }
+snIpxCache			OBJECT IDENTIFIER ::= { snIpx 2 }
+snIpxRoute			OBJECT IDENTIFIER ::= { snIpx 3 }
+snIpxServer			OBJECT IDENTIFIER ::= { snIpx 4 }
+snIpxFwdFilter		OBJECT IDENTIFIER ::= { snIpx 5 }
+snIpxRipFilter		OBJECT IDENTIFIER ::= { snIpx 6 }
+snIpxSapFilter		OBJECT IDENTIFIER ::= { snIpx 7 }
+snIpxIfFwdAccess	OBJECT IDENTIFIER ::= { snIpx 8 }
+snIpxIfRipAccess	OBJECT IDENTIFIER ::= { snIpx 9 }
+snIpxIfSapAccess	OBJECT IDENTIFIER ::= { snIpx 10 }
+snIpxPortAddr		OBJECT IDENTIFIER ::= { snIpx 11 }
+snIpxPortCounters	OBJECT IDENTIFIER ::= { snIpx 12 }
+
+-- IPX General MIBs
+
+snIpxRoutingMode 	     OBJECT-TYPE
+	SYNTAX	RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enabled/Disabled System IPX Routing Mode status."
+	::= { snIpxGen 1 }
+
+snIpxNetBiosFilterMode		    OBJECT-TYPE
+	SYNTAX	RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enabled/Disabled NetBios Filter Mode status."
+	::= { snIpxGen 2 }
+
+                
+snIpxClearCache 		OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear cache table."
+	::= { snIpxGen 3 }
+
+snIpxClearRoute 		OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear ipx route table."
+	::= { snIpxGen 4 }
+
+snIpxClearTrafficCnts		OBJECT-TYPE
+	SYNTAX  ClearStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"clear(1) will clear ipx all traffic counters.
+		 - snIpxRcvPktsCnt, snIpxFwdPktsCnt,
+		   snIpxRcvDropPktsCnt, snIpxTxDropPktsCnt,
+		   snIpxRcvFiltPktsCnt, snIpxTxFiltPktsCnt."
+	::= { snIpxGen 5 }
+
+
+snIpxRcvPktsCnt 		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX incoming packets counter."
+	::= { snIpxGen 6 }
+
+
+snIpxTxPktsCnt 		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Outgoing packets counter."
+	::= { snIpxGen 7 }
+
+
+snIpxFwdPktsCnt 		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX forwarding packets counter."
+	::= { snIpxGen 8 }
+
+snIpxRcvDropPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX receiving drop packets counter."
+	::= { snIpxGen 9 }
+
+snIpxRcvFiltPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX receiving filter packets counter."
+	::= { snIpxGen 10 }
+
+snIpxRipGblFiltList    OBJECT-TYPE
+	SYNTAX	OCTET STRING(SIZE(1..32))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An IPX RIP Global Filter List."
+	::= { snIpxGen 11 }
+
+snIpxRipFiltOnAllPort		OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    valid(1),
+	    deleteAllInBound(2),
+	    deleteAllOutBound(3),
+	    addAllInBound(4),
+	    addAllOutBound(5)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"Apply the IPX RIP Global filter list snIpxRipGblFiltList to 
+	 all interfaces. This object is used to add all RIP filter 
+	 lists and delete all RIP filter lists to/from all ports.
+	 Prior to sending this command, snIpxRipGblFiltList must be ready.
+	 The values that can be written are:
+     deleteAllInBound(2)...delete all in-bound filter lists from all ports. 
+	 deleteAllOutBound(3)..delete all out-bound filter lists from all ports.
+	 addAllInBound(4)......add all in-bound filter lists to all ports.
+	 addAllOutBound(5).....add all out-bound filter lists to all ports.
+
+	 If set operation is failed, then a SET with
+	 value of (2)or(3) returns error 'GenError'. 
+	 Deleted(2)&(3) go away immediately. 
+	 The following values can be returned on reads:
+	 noSuch(0)...no such operation yet.
+	 valid(1)....set operation is done and is valid"
+
+	::= { snIpxGen 12 }
+
+snIpxSapGblFiltList    OBJECT-TYPE
+	SYNTAX	OCTET STRING(SIZE(1..32))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An IPX SAP Global Filter List."
+	::= { snIpxGen 13 }
+
+
+snIpxSapFiltOnAllPort		OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    valid(1),
+	    deleteAllInBound(2),
+	    deleteAllOutBound(3),
+	    addAllInBound(4),
+	    addAllOutBound(5)
+	}
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+	"Apply the IPX SAP Global filter list snIpxSapGblFiltList to 
+	 all interfaces. This object is used to add all RIP filter 
+	 lists and delete all SAP filter lists to/from all ports.
+	 Prior to sending this command, snIpxSapGblFiltList must be ready.
+	 The values that can be written are:
+     deleteAllInBound(2)...delete all in-bound filter lists from all ports. 
+	 deleteAllOutBound(3)..delete all out-bound filter lists from all ports.
+	 addAllInBound(4)......add all in-bound filter lists to all ports.
+	 addAllOutBound(5).....add all out-bound filter lists to all ports.
+
+	 If set operation is failed, then a SET with
+	 value of (2)or(3) returns error 'GenError'. 
+	 Deleted(2)&(3) go away immediately. 
+	 The following values can be returned on reads:
+	 noSuch(0)...no such operation yet.
+	 valid(1)....set operation is done and is valid"
+	::= { snIpxGen 14 }
+
+snIpxTxDropPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX transmitting drop packets counter."
+	::= { snIpxGen 15 }
+
+snIpxTxFiltPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX transmitting filter packets counter."
+	::= { snIpxGen 16 }
+
+
+-- IPX Cache table
+
+snIpxCacheTable  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxCacheEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Cache table."
+	::= { snIpxCache 1 }
+
+snIpxCacheEntry  OBJECT-TYPE
+	SYNTAX	SnIpxCacheEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Cache table."
+	INDEX	{ snIpxCacheIndex }
+	::= { snIpxCacheTable 1 }
+
+SnIpxCacheEntry ::= SEQUENCE {
+	snIpxCacheIndex
+		INTEGER,
+    snIpxCacheNetNum
+        NetNumber,
+    snIpxCacheNode
+        PhysAddress,
+    snIpxCacheOutFilter
+        RtrStatus,
+    snIpxCacheEncap  
+        INTEGER,
+	snIpxCachePort
+		PortIndex
+	}
+
+snIpxCacheIndex  OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a IPX Cache entry."
+	::= { snIpxCacheEntry 1 }
+
+
+snIpxCacheNetNum  OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Cache Network number."
+	::= { snIpxCacheEntry 2 }
+
+snIpxCacheNode  OBJECT-TYPE
+	SYNTAX	PhysAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Cache Node Number."
+	::= { snIpxCacheEntry 3 }
+
+snIpxCacheOutFilter	OBJECT-TYPE
+	SYNTAX	RtrStatus
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Cache Outbound Filter is ether disabled(0) or enabled(1)."
+	::= { snIpxCacheEntry 4 }
+
+snIpxCacheEncap  OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    ethernetII(1),
+	    ethernet8022(2),
+	    ethernet8023(3),
+	    ethernetSnap(4)
+	}
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPX encapsulation frame type."
+	::= { snIpxCacheEntry 5 }
+
+
+snIpxCachePort  OBJECT-TYPE
+	SYNTAX	PortIndex
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Router Port number." 
+	::= { snIpxCacheEntry 6 }
+
+
+
+
+-- IPX route table
+
+snIpxRouteTable  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxRouteEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX route table."
+	::= { snIpxRoute 1 }
+
+snIpxRouteEntry  OBJECT-TYPE
+	SYNTAX	SnIpxRouteEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX route table."
+	INDEX	{ snIpxRouteIndex }
+	::= { snIpxRouteTable 1 }
+
+SnIpxRouteEntry ::= SEQUENCE {
+	snIpxRouteIndex
+		INTEGER,
+	snIpxDestNetNum
+		NetNumber,
+	snIpxFwdRouterNode
+		PhysAddress,
+	snIpxDestHopCnts
+		INTEGER,
+	snIpxRouteMetric
+		INTEGER,
+	snIpxDestPort
+	    INTEGER
+	}
+
+snIpxRouteIndex  OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a IPX route entry."
+	::= { snIpxRouteEntry 1 }
+
+snIpxDestNetNum  OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination Network number."
+	::= { snIpxRouteEntry 2 }
+
+snIpxFwdRouterNode  OBJECT-TYPE
+	SYNTAX	PhysAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Forward Router Node Number."
+	::= { snIpxRouteEntry 3 }
+
+snIpxDestHopCnts  OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of hops to reach the
+		 destination."
+	::= { snIpxRouteEntry 4 }
+
+snIpxRouteMetric  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The metrics to next hop router."
+	::= { snIpxRouteEntry 5 }
+
+snIpxDestPort  OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The destination port."
+	::= { snIpxRouteEntry 6 }
+
+
+-- IPX Server table
+
+snIpxServerTable  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxServerEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Server table."
+	::= { snIpxServer 1 }
+
+snIpxServerEntry  OBJECT-TYPE
+	SYNTAX	SnIpxServerEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Server table."
+	INDEX	{ snIpxServerIndex }
+	::= { snIpxServerTable 1 }
+
+SnIpxServerEntry ::= SEQUENCE {
+	snIpxServerIndex
+		INTEGER,
+	snIpxServerType
+		INTEGER,
+    snIpxServerNetNum
+        NetNumber,
+    snIpxServerNode
+        PhysAddress,
+    snIpxServerSocket
+        INTEGER,
+    snIpxServerHopCnts  
+        INTEGER,
+	snIpxServerName
+		OCTET STRING
+	}
+
+snIpxServerIndex  OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The table index for a IPX Server entry."
+	::= { snIpxServerEntry 1 }
+
+
+snIpxServerType  OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Server Type."
+	::= { snIpxServerEntry 2 }
+
+snIpxServerNetNum  OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Server Network number."
+	::= { snIpxServerEntry 3 }
+
+snIpxServerNode  OBJECT-TYPE
+	SYNTAX	PhysAddress
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Server Node Number."
+	::= { snIpxServerEntry 4 }
+
+snIpxServerSocket	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Server Socket Number."
+	::= { snIpxServerEntry 5 }
+
+snIpxServerHopCnts  OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Number of intervening networks to reach the
+		 server."
+	::= { snIpxServerEntry 6 }
+
+
+snIpxServerName  OBJECT-TYPE
+	SYNTAX	OCTET STRING(SIZE(0..47))
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Server Name."
+	::= { snIpxServerEntry 7 }
+
+
+
+-- IPX Forward Filter table
+
+snIpxFwdFilterTable	  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxFwdFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Forward Filter table."
+	::= { snIpxFwdFilter 1 }
+
+snIpxFwdFilterEntry	  OBJECT-TYPE
+	SYNTAX	SnIpxFwdFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Forward Filter table."
+	INDEX	{ snIpxFwdFilterIdx }
+	::= { snIpxFwdFilterTable 1 }
+
+SnIpxFwdFilterEntry ::= SEQUENCE {
+	snIpxFwdFilterIdx
+		INTEGER,
+	snIpxFwdFilterAction
+		Action,
+	snIpxFwdFilterSocket
+		INTEGER,
+	snIpxFwdFilterSrcNet
+		NetNumber,
+	snIpxFwdFilterSrcNode
+		PhysAddress,
+	snIpxFwdFilterDestNet
+		NetNumber,
+	snIpxFwdFilterDestNode
+		PhysAddress,
+	snIpxFwdFilterRowStatus
+		INTEGER
+	}
+
+snIpxFwdFilterIdx       OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The filter ID for a filter entry."
+	::= { snIpxFwdFilterEntry 1 }
+
+snIpxFwdFilterAction	  OBJECT-TYPE
+	SYNTAX  Action 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ipx packet match
+		with this filter."
+	::= { snIpxFwdFilterEntry 2 }
+
+snIpxFwdFilterSocket	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Forward Filter Socket Number."
+	::= { snIpxFwdFilterEntry 3 }
+
+snIpxFwdFilterSrcNet	OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Source Network Number."
+	::= { snIpxFwdFilterEntry 4 }
+
+snIpxFwdFilterSrcNode  OBJECT-TYPE
+	SYNTAX	PhysAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Source Node Number."
+	::= { snIpxFwdFilterEntry 5 }
+
+snIpxFwdFilterDestNet	 OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination Network Number."
+	::= { snIpxFwdFilterEntry 6 }
+
+snIpxFwdFilterDestNode	OBJECT-TYPE
+	SYNTAX	PhysAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination Node Number."
+	::= { snIpxFwdFilterEntry 7 }
+
+snIpxFwdFilterRowStatus OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpxFwdFilterEntry 8 }
+
+
+
+-- IPX RIP Filter table
+
+snIpxRipFilterTable	  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxRipFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX RIP Filter table."
+	::= { snIpxRipFilter 1 }
+
+snIpxRipFilterEntry	  OBJECT-TYPE
+	SYNTAX	SnIpxRipFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX RIP Filter table."
+	INDEX	{ snIpxRipFilterId }
+	::= { snIpxRipFilterTable 1 }
+
+SnIpxRipFilterEntry ::= SEQUENCE {
+	snIpxRipFilterId
+		INTEGER,
+	snIpxRipFilterAction
+		Action,
+	snIpxRipFilterNet
+		NetNumber,
+	snIpxRipFilterMask
+		NetNumber,
+	snIpxRipFilterRowStatus
+		INTEGER
+	}
+
+snIpxRipFilterId       OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The filter ID for a filter entry."
+	::= { snIpxRipFilterEntry 1 }
+
+snIpxRipFilterAction	  OBJECT-TYPE
+	SYNTAX  Action 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ipx packet match
+		with this filter."
+	::= { snIpxRipFilterEntry 2 }
+
+snIpxRipFilterNet    OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX RIP Filter Network number."
+	::= { snIpxRipFilterEntry 3 }
+
+snIpxRipFilterMask    OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX RIP Filter Network/Subnet Mask."
+	::= { snIpxRipFilterEntry 4 }
+
+
+snIpxRipFilterRowStatus OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpxRipFilterEntry 5 }
+
+
+
+-- IPX SAP Filter table
+
+snIpxSapFilterTable	  OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxSapFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX SAP Filter table."
+	::= { snIpxSapFilter 1 }
+
+snIpxSapFilterEntry	  OBJECT-TYPE
+	SYNTAX	SnIpxSapFilterEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX SAP Filter table."
+	INDEX	{ snIpxSapFilterId }
+	::= { snIpxSapFilterTable 1 }
+
+SnIpxSapFilterEntry ::= SEQUENCE {
+	snIpxSapFilterId
+		INTEGER,
+	snIpxSapFilterAction
+		Action,
+	snIpxSapFilterType
+		INTEGER,
+	snIpxSapFilterName
+		OCTET STRING,
+	snIpxSapFilterRowStatus
+		INTEGER
+	}
+
+snIpxSapFilterId       OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The filter ID for a filter entry."
+	::= { snIpxSapFilterEntry 1 }
+
+snIpxSapFilterAction	  OBJECT-TYPE
+	SYNTAX  Action 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ipx packet match
+		with this filter."
+	::= { snIpxSapFilterEntry 2 }
+
+snIpxSapFilterType    OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX SAP Filter type to be matched."
+	::= { snIpxSapFilterEntry 3 }
+
+snIpxSapFilterName    OBJECT-TYPE
+	SYNTAX	OCTET STRING(SIZE(0..47))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX SAP Filter Name."  
+	::= { snIpxSapFilterEntry 4 }
+
+
+snIpxSapFilterRowStatus OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpxSapFilterEntry 5 }
+
+
+-- IPX IF Forward Access table
+
+snIpxIfFwdAccessTable	    OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxIfFwdAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX IF Forward Access table."
+	::= { snIpxIfFwdAccess 1 }
+
+snIpxIfFwdAccessEntry	    OBJECT-TYPE
+	SYNTAX	SnIpxIfFwdAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Forward Access table."
+	INDEX	{ snIpxIfFwdAccessPort, snIpxIfFwdAccessDir }
+	::= { snIpxIfFwdAccessTable 1 }
+
+SnIpxIfFwdAccessEntry ::= SEQUENCE {
+	snIpxIfFwdAccessPort
+		INTEGER,
+	snIpxIfFwdAccessDir
+		INTEGER,
+	snIpxIfFwdAccessFilterList
+		OCTET STRING,
+	snIpxIfFwdAccessRowStatus
+		INTEGER
+	}
+
+snIpxIfFwdAccessPort	   OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPX interface to which the Forward Filter applies."
+	::= { snIpxIfFwdAccessEntry 1 }
+
+snIpxIfFwdAccessDir	 OBJECT-TYPE
+	SYNTAX  INTEGER { in(1), out(2) }
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The access direction of incoming packet filter
+		or outgoing packet filter."
+	::= { snIpxIfFwdAccessEntry 2 }
+
+snIpxIfFwdAccessFilterList    OBJECT-TYPE
+	SYNTAX	OCTET STRING(SIZE(1..32))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An IPX IF Forward Filter List."
+	::= { snIpxIfFwdAccessEntry 3 }
+
+
+snIpxIfFwdAccessRowStatus OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+            modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpxIfFwdAccessEntry 4 }
+
+
+
+-- IPX IF RIP Access table
+
+snIpxIfRipAccessTable	    OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxIfRipAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX IF RIP Access table."
+	::= { snIpxIfRipAccess 1 }
+
+snIpxIfRipAccessEntry	    OBJECT-TYPE
+	SYNTAX	SnIpxIfRipAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Forward Access table."
+	INDEX	{ snIpxIfRipAccessPort, snIpxIfRipAccessDir }
+	::= { snIpxIfRipAccessTable 1 }
+
+SnIpxIfRipAccessEntry ::= SEQUENCE {
+	snIpxIfRipAccessPort
+		INTEGER,
+	snIpxIfRipAccessDir
+		INTEGER,
+	snIpxIfRipAccessFilterList
+		OCTET STRING,
+	snIpxIfRipAccessRowStatus
+		INTEGER
+	}
+
+snIpxIfRipAccessPort	   OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPX interface to which the RIP Filter applies."
+	::= { snIpxIfRipAccessEntry 1 }
+
+snIpxIfRipAccessDir	 OBJECT-TYPE
+	SYNTAX  INTEGER { in(1), out(2) }
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The access direction of incoming packet filter
+		or outgoing packet filter."
+	::= { snIpxIfRipAccessEntry 2 }
+
+snIpxIfRipAccessFilterList    OBJECT-TYPE
+	SYNTAX	OCTET STRING(SIZE(1..32))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An IPX IF RIP Access Filter List."
+	::= { snIpxIfRipAccessEntry 3 }
+
+
+snIpxIfRipAccessRowStatus OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpxIfRipAccessEntry 4 }
+
+
+-- IPX IF SAP Access table
+
+snIpxIfSapAccessTable	    OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxIfSapAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX IF RIP Access table."
+	::= { snIpxIfSapAccess 1 }
+
+snIpxIfSapAccessEntry	    OBJECT-TYPE
+	SYNTAX	SnIpxIfSapAccessEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Forward Access table."
+	INDEX	{ snIpxIfSapAccessPort, snIpxIfSapAccessDir }
+	::= { snIpxIfSapAccessTable 1 }
+
+SnIpxIfSapAccessEntry ::= SEQUENCE {
+	snIpxIfSapAccessPort
+		INTEGER,
+	snIpxIfSapAccessDir
+		INTEGER,
+	snIpxIfSapAccessFilterList
+		OCTET STRING,
+	snIpxIfSapAccessRowStatus
+		INTEGER
+	}
+
+snIpxIfSapAccessPort	   OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPX interface to which the SAP Filter applies."
+	::= { snIpxIfSapAccessEntry 1 }
+
+snIpxIfSapAccessDir	 OBJECT-TYPE
+	SYNTAX  INTEGER { in(1), out(2) }
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The access direction of incoming packet filter
+		or outgoing packet filter."
+	::= { snIpxIfSapAccessEntry 2 }
+
+snIpxIfSapAccessFilterList    OBJECT-TYPE
+	SYNTAX	OCTET STRING(SIZE(1..32))
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An IPX IF SAP Access Filter List."
+	::= { snIpxIfSapAccessEntry 3 }
+
+
+snIpxIfSapAccessRowStatus OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpxIfSapAccessEntry 4 }
+
+
+-- ipx interface address table
+
+snIpxPortAddrTable	       OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxPortAddrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX port address table."
+	::= { snIpxPortAddr 1 }
+
+snIpxPortAddrEntry	       OBJECT-TYPE
+	SYNTAX	SnIpxPortAddrEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Port Address table."
+	INDEX	{ snIpxPortAddrPort, snIpxPortAddrEncap }
+	::= { snIpxPortAddrTable 1 }
+
+SnIpxPortAddrEntry ::= SEQUENCE {
+	snIpxPortAddrPort
+		PortIndex,
+	snIpxPortAddrEncap
+		INTEGER,
+	snIpxPortAddrNetNum
+		NetNumber,
+	snIpxPortAddrRowStatus
+		INTEGER,
+	snIpxPortAddrNetBiosFilterMode
+		RtrStatus
+	}
+
+
+snIpxPortAddrPort	       OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for port address entry."
+	::= { snIpxPortAddrEntry 1 }
+
+snIpxPortAddrEncap	      OBJECT-TYPE
+	SYNTAX	 INTEGER {
+		ethernet8022(1),
+	    ethernet8023(2),
+	    ethernetII(3),
+	    ethernetSnap(4)
+	}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The IPX encapsulation type.
+		ethernet8022(1), ethernet8023(2),
+	    ethernetII(3),  ethernetSnap(4)  
+	    Note: Each Network Number can be assigned with one unique Frame type; Otherwise,
+	    a SNMP-SET error will be returned."
+	::= { snIpxPortAddrEntry 2 }
+
+snIpxPortAddrNetNum	       OBJECT-TYPE
+	SYNTAX	NetNumber
+	ACCESS	read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"An unique Network number for the IPX interface port."
+	::= { snIpxPortAddrEntry 3 }
+
+snIpxPortAddrRowStatus OBJECT-TYPE
+	SYNTAX	 INTEGER {
+	    invalid(1),
+	    valid(2),
+	    delete(3),
+	    create(4),
+	    modify(5)
+	}
+	ACCESS	 read-write
+	STATUS	 mandatory
+	DESCRIPTION
+	"This object is used to create and
+	 delete row in the table and control
+	 if they are used. The values
+	 that can be written are:
+	 delete(3)...deletes the row
+	 create(4)...creates a new row
+	 modify(5)...modifies an exsisting row
+
+	 If the row exists, then a SET with
+	 value of create(4) returns error
+	 'badValue'. Deleted rows go away
+	 immediately. The following values
+	 can be returned on reads:
+	 noSuch(0)...no such row
+	 invalid(1)...Setting it to 'invalid' has the effect of
+		      rendering it inoperative..
+	 valid(2)....the row exists and is valid"
+	::= { snIpxPortAddrEntry 4 }
+
+snIpxPortAddrNetBiosFilterMode		    OBJECT-TYPE
+	SYNTAX	RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enabled/Disabled NetBios Filter Mode status per Port Address entry."
+	::= { snIpxPortAddrEntry 5 }
+
+
+-- ipx port counters table
+
+snIpxPortCountersTable	       OBJECT-TYPE
+	SYNTAX	SEQUENCE OF SnIpxPortCountersEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX port Counters table."
+	::= { snIpxPortCounters 1 }
+
+snIpxPortCountersEntry	       OBJECT-TYPE
+	SYNTAX	SnIpxPortCountersEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IPX Port Counters table."
+	INDEX	{ snIpxPortCountersPort }
+	::= { snIpxPortCountersTable 1 }
+
+SnIpxPortCountersEntry ::= SEQUENCE {
+	snIpxPortCountersPort
+		PortIndex,
+	snIpxPortCountersRcvPktsCnt
+	    Counter,
+	snIpxPortCountersTxPktsCnt
+	    Counter,
+	snIpxPortCountersFwdPktsCnt
+	    Counter,
+	snIpxPortCountersRcvDropPktsCnt
+	    Counter,
+	snIpxPortCountersTxDropPktsCnt
+	    Counter,
+	snIpxPortCountersRcvFiltPktsCnt
+	    Counter,
+	snIpxPortCountersTxFiltPktsCnt
+	    Counter
+	}
+
+
+snIpxPortCountersPort	       OBJECT-TYPE
+	SYNTAX  PortIndex
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index for port Counters entry."
+	::= { snIpxPortCountersEntry 1 }
+
+snIpxPortCountersRcvPktsCnt 		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX incoming packets counter for the interface."
+	::= { snIpxPortCountersEntry 2 }
+
+
+snIpxPortCountersTxPktsCnt 		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX Outgoing packets counter for the interface."
+	::= { snIpxPortCountersEntry 3 }
+
+
+snIpxPortCountersFwdPktsCnt 		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX forwarding packets counter for the interface."
+	::= { snIpxPortCountersEntry 4 }
+
+snIpxPortCountersRcvDropPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX receiving drop packets counter for the interface."
+	::= { snIpxPortCountersEntry 5 }
+
+snIpxPortCountersTxDropPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX transmitting drop packets counter for the interface."
+	::= { snIpxPortCountersEntry 6 }
+
+snIpxPortCountersRcvFiltPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX receiving filter packets counter for the interface."
+	::= { snIpxPortCountersEntry 7 }
+
+snIpxPortCountersTxFiltPktsCnt		OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"IPX transmitting filter packets counter for the interface."
+	::= { snIpxPortCountersEntry 8 }
+
+
+
+END

@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": null,
+                    "sysDescr": "Meraki MS",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": "Meraki MS",
+                    "features": null,
+                    "location": null,
+                    "os": "merakims",
+                    "type": "network",
+                    "serial": "9999999999",
+                    "icon": "meraki.png"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

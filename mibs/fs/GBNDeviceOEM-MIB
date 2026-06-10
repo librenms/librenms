@@ -1,0 +1,425 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : bcm5600-oem.mi2
+--  Description  : GBN OEM Product Enterprise MIB 
+--  Version      : 0.03
+--  Date         : May 03, 2001     
+--  Copyright (c) 2002-2005 admin Systems, Inc.  All Rights Reserved.
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    GBNDeviceOEM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Counter64                    FROM SNMPv2-SMI
+        
+        DisplayString, TruthValue               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnDevice                               FROM ADMIN-MASTER-MIB
+        
+        PortList                                FROM Q-BRIDGE-MIB;      
+
+    bcm5600 MODULE-IDENTITY
+        LAST-UPDATED    "0105030000Z"  -- May 03,2001  
+        ORGANIZATION    "Admin Systems, Inc."
+        CONTACT-INFO    "Admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Broadcom BCM5600 StrataSwitch OEM-Product
+                         Enterprise MIB definition."
+
+        REVISION        "0105030000Z"  -- May 03,2001
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnDevice 3 }
+
+------------------------------------------------------------------------------
+-- Textual Conventions (i.e., these do not affect object encoding):
+------------------------------------------------------------------------------
+--
+-- "DURABLE":
+--    Objects that are saved across a system reset and/or power cycle
+--    are noted as "DURABLE" for convenience in the DESCRIPTION
+--    section of the object definition.  Code must be explicitly
+--    written to implement these DURABLE objects.
+--
+
+
+------------------------------------------------------------------------------
+--  define groups in OEM-BCM5600-MIB
+------------------------------------------------------------------------------
+    oemArchIface            OBJECT IDENTIFIER ::= { bcm5600 1 }
+    oemChip                 OBJECT IDENTIFIER ::= { bcm5600 2 }
+    oemProdConformance      OBJECT IDENTIFIER ::= { bcm5600 3 }
+    oemProdGroups           OBJECT IDENTIFIER ::= { oemProdConformance 1 }
+    oemProdCompliances      OBJECT IDENTIFIER ::= { oemProdConformance 2 }
+
+------------------------------------------------------------------------------
+    oemArchIfaceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OemArchIfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of switch interfaces and associated properties."
+        ::= { oemArchIface 1 }
+
+    oemArchIfaceEntry OBJECT-TYPE
+        SYNTAX OemArchIfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for switch interface control and status information."
+        INDEX { oemArchIfaceUnit, oemArchIfacePort }
+        ::= { oemArchIfaceTable 1 }
+
+    OemArchIfaceEntry ::= SEQUENCE {
+        oemArchIfaceUnit                Integer32,
+        oemArchIfacePort                Integer32,
+        oemArchIfaceLLWHPort            Integer32,
+        oemArchIfaceIfIndex             Integer32,
+        oemArchIfaceName                DisplayString,
+        oemArchIfaceEnable              TruthValue,
+        oemArchIfaceSTPEnable           TruthValue,
+        oemArchIfaceLink                INTEGER,
+        oemArchIfaceDuplexSpeedSet      INTEGER,
+        oemArchIfaceDuplexSpeedGet      INTEGER,
+        oemArchIfacePortLoop            INTEGER,
+        oemArchIfaceFlowControl         INTEGER,
+        oemArchIfaceTxVlanTagPkts       Counter64,
+        oemArchIfaceTxL3Pkts            Counter64,
+        oemArchIfaceTxL3AbortedPkts     Counter64,
+        oemArchIfaceRxIpInHdrErrors     Counter64,
+        oemArchIfaceL2Tunneling         INTEGER,
+        oemArchIfaceLinkUpTime          Integer32,
+        oemArchIfaceMasterMode      INTEGER
+      }
+
+    oemArchIfaceUnit OBJECT-TYPE
+        SYNTAX Integer32 (1..4)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An index that uniquely identifies a unit in the TiNet Switch
+             stack.  If an invalid value is used for the index, a SNMP
+             'noSuchName' error (SNMPv1) or 'noSuchInstance' exception
+             (SNMPv2/v3) is returned.  For implementations that do not support
+             stacking, the same response is returned for any unit index other
+             than 1."
+        ::= { oemArchIfaceEntry 1 }
+
+    oemArchIfacePort OBJECT-TYPE
+        SYNTAX Integer32 (1..26)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "An index that uniquely identifies a GBN Application 'logical port'
+             (i.e., IEEE 802.3ad Aggregator) within the oemArchIfaceUnit."
+        ::= { oemArchIfaceEntry 2 }
+
+    oemArchIfaceLLWHPort OBJECT-TYPE
+        SYNTAX Integer32 (8193..8296)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A value that uniquely identifies a GBN Application 'logical port'
+             (i.e., IEEE 802.3ad Aggregator) in the GBN BCM5600 stack.  This is
+             a 'Layered Linear With Holes' (LLWH) port number that may may have
+             holes for missing ports or units.  For this MIB, 26 port numbers
+             are reserved for each unit in the stack.  For example, LLHW port
+             8193 is unit 1, port 1 ."
+        ::= { oemArchIfaceEntry 3 }
+
+    oemArchIfaceIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ifIndex of this GBN Application 'logical port' (i.e., IEEE
+             802.3ad Aggregator).  Note that an ifIndex value of 34603009 
+             (0x02100001) represents the Aggregator layer, unit 1, slot 0
+             (base unit ports), port 1."
+        ::= { oemArchIfaceEntry 4 }
+
+    oemArchIfaceName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..128))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The textual name of this interface, e.g., 'John'."
+        ::= { oemArchIfaceEntry 5 }
+
+    oemArchIfaceEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { true:all }
+             This object is true(1) when this interface is enabled and
+             false(1) when it is disabled.  For this product, this is the
+             ONLY way to enable or disable this interface.  Note that
+             'ifAdminStatus' in RFC1213 and RFC2233 and 'dot1dStpPortEnable'
+             in RFC1493 are each implemented as 'read-only'."
+        ::= { oemArchIfaceEntry 6 }
+
+    oemArchIfaceSTPEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { true:all }
+             This object is true(1) when Spanning Tree operation is enabled
+             for this interface and false(2) when it is disabled."
+        ::= { oemArchIfaceEntry 7 }
+
+    oemArchIfaceLink OBJECT-TYPE
+        SYNTAX INTEGER {
+             up(1), 
+             down(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of Link Detect on this interface."
+        ::= { oemArchIfaceEntry 8 }
+
+    oemArchIfaceDuplexSpeedSet OBJECT-TYPE
+        SYNTAX INTEGER {
+             autonegotiate(1),
+             half-10(2),
+             full-10(3),
+             half-100(4),
+             full-100(5),
+             half-1000(6),
+             full-1000(7),
+             auto-10(8),
+             auto-100(9),
+             auto-1000(10),
+             full-10000(11),
+             illegal(99),
+             full-2500(13),
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { autonegotiate:all }
+            The desired speed and duplex for this interface. If the selected
+            control is not possible on the interface, a value of illegal(99)
+            is returned.  If the port type does NOT support the default
+            of autonegotiate(1), then the application initializes the
+            port to a valid value (e.g., 1000full(6)).  Note that not all
+            controls are possible for all interfaces.  For example, only
+            full-1000(6) is available for Gigabit Ethernet interfaces."
+        ::= { oemArchIfaceEntry 9 }
+
+    oemArchIfaceDuplexSpeedGet OBJECT-TYPE
+        SYNTAX INTEGER {
+             unknown(1),
+             half-10(2),
+             full-10(3),
+             half-100(4),
+             full-100(5),
+             half-1000(6),
+             full-1000(7),
+             auto10(8),
+             auto100(9),
+             auto1000(10), 
+             full-10000(11),
+             illegal(99),
+	         full-2500(13),
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The actual speed and duplex for this interface.  If the
+            interface is not configured for an acceptable value, a value of
+            illegal(99) is returned.  A value of unknown(1) is returned when
+            the 'oemArchIfaceLink' indicates down(2) for this interface." 
+        ::= { oemArchIfaceEntry 10 }
+
+    oemArchIfacePortLoop OBJECT-TYPE
+        SYNTAX INTEGER {
+             internalEnable(1), 
+             externalEnable(2),
+             disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The state of Link Detect on this interface."
+        ::= { oemArchIfaceEntry 11 }
+
+  oemArchIfaceFlowControl OBJECT-TYPE
+      SYNTAX  INTEGER {
+               enable(1), 
+               disable(2)
+              }
+      ACCESS read-write
+      STATUS current
+      DESCRIPTION
+              "DURABLE: { enable }
+               Set the flow control on the interface to enable(1) or disable(2)."
+      ::= { oemArchIfaceEntry 12 }
+        
+    oemArchIfaceTxVlanTagPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of VLAN tagged packets transmitted on this interface."
+        ::= { oemArchIfaceEntry 13 }
+
+    oemArchIfaceTxL3Pkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of Layer 3 packets transmitted on this interface."
+        ::= { oemArchIfaceEntry 14 }
+
+    oemArchIfaceTxL3AbortedPkts OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of Layer 3 transmit packets aborted on this interface."
+        ::= { oemArchIfaceEntry 15 }
+
+    oemArchIfaceRxIpInHdrErrors OBJECT-TYPE
+        SYNTAX Counter64 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of Layer 3 packets received on this interface that
+             were discarded due to IP header errors (e.g., bad checksum,
+             invalid versions, format errors)."
+        ::= { oemArchIfaceEntry 16 }
+
+    oemArchIfaceL2Tunneling    OBJECT-TYPE
+    	SYNTAX  INTEGER(1..63)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When l2 entities (such as STP bridges) conneted across a VPN network, l2 PDUs need
+            delivering through VPN without being processed.To achieve this, users need enbling l2-
+            tunneling on VPN's edge ports, i.e. ports connected to customer bridges. One 32bits 
+            width integer variable is used for each port to represent what kind of PDUs need tunneling 
+            when coming in this ports.Notes, only the six least-significant bits are used here ,each 
+            bit corresponds to one protocol, following is the detail:
+            	bit0 <----> CDP
+            	bit1 <----> LACP
+            	bit2 <----> PAGP
+            	bit3 <----> STP
+            	bit4 <----> UDLD
+            	bit5 <----> VTP
+            	bit6-bit31 <--> reserved.
+            when set one, corresponding PDU tunneling is asserted, deasserted otherwise."
+      ::= { oemArchIfaceEntry 17 }
+      
+   oemArchIfaceLinkUpTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The duration of linkup on this interface. The unit is second."
+        ::= { oemArchIfaceEntry 18 }
+
+    oemArchIfaceMasterMode OBJECT-TYPE
+        SYNTAX INTEGER {
+             slave(0),
+             master(1),
+             auto(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The master/slave mode on this interface."
+        ::= { oemArchIfaceEntry 19 }
+
+------------------------------------------------------------------------------
+--  Chip Interface Section  
+------------------------------------------------------------------------------
+--
+    oemChipStub OBJECT-TYPE
+        SYNTAX INTEGER {  
+            noop(1),
+            chip-value2(2),
+            chip-value3(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is a place holder for the OEM Chip interface." 
+        ::= { oemChip 1 }
+
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+--  conformance information
+------------------------------------------------------------------------------
+
+--  --------------------------------------------------------------------------
+--  units of conformance
+--  --------------------------------------------------------------------------
+
+    oemArchIfaceGroup   OBJECT-GROUP
+        OBJECTS {
+            oemArchIfaceLLWHPort,
+            oemArchIfaceIfIndex,
+            oemArchIfaceName,
+            oemArchIfaceEnable,
+            oemArchIfaceSTPEnable,
+            oemArchIfaceLink,
+            oemArchIfaceDuplexSpeedSet,
+            oemArchIfaceDuplexSpeedGet,
+            oemArchIfacePortLoop,
+            oemArchIfaceFlowControl,
+            oemArchIfaceTxVlanTagPkts,
+            oemArchIfaceTxL3Pkts,
+            oemArchIfaceTxL3AbortedPkts,     
+            oemArchIfaceRxIpInHdrErrors
+        }
+        STATUS  current
+        DESCRIPTION
+           "This group configures and retrieves Architecture interface
+            specific objects."
+        ::= { oemProdGroups 1 }
+    
+    oemChipGroup    OBJECT-GROUP
+        OBJECTS {
+            oemChipStub
+        }
+        STATUS  current
+        DESCRIPTION
+           "This group configures OEM Chip specific objects."
+        ::= { oemProdGroups 2 }
+    
+
+--  --------------------------------------------------------------------------
+--  compliance statements
+--  --------------------------------------------------------------------------
+
+    oemProdCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+           "The compliance statement."
+        MODULE  -- this module
+        MANDATORY-GROUPS {
+             oemArchIfaceGroup
+        }
+        
+    GROUP   oemChipGroup
+    DESCRIPTION
+        "This group is optional."
+        
+        ::= { oemProdCompliances 1 }
+
+--
+-- END of OEM-BCM5600-MIB                
+--
+
+END

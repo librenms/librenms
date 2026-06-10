@@ -1,0 +1,147 @@
+-- ===================================================================
+-- Copyright (C) 2022 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: 
+-- Reference:
+-- Version: V1.04
+-- ===================================================================
+
+  HUAWEI-WARRANTY-MIB DEFINITIONS ::= BEGIN
+ 
+    IMPORTS     
+        TimeTicks, IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY,
+	NOTIFICATION-TYPE
+	    FROM SNMPv2-SMI
+        OBJECT-GROUP, MODULE-COMPLIANCE     
+            FROM SNMPv2-CONF  
+        TruthValue, DateAndTime, RowStatus, DisplayString
+            FROM SNMPv2-TC
+        hwDatacomm      
+            FROM HUAWEI-MIB;
+        hwWarranty MODULE-IDENTITY 
+        LAST-UPDATED "202203110000Z"    
+        ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO                                        
+            "Huawei Industrial Base
+             Bantian, Longgang
+             Shenzhen 518129
+             People's Republic of China
+             Website: http://www.huawei.com
+             Email: support@huawei.com
+            "                                      
+        DESCRIPTION 
+            "The MIB is used for configuring electronic warranty."
+
+            --  Revision history
+            REVISION     "202203110000Z"
+            DESCRIPTION  "Modify the MAX-ACCESS of the hwWarrantyType,hwWarrantySlot,hwWarrantySerialNum,hwWarrantyRemainDay"
+                 
+            --  Revision history
+            REVISION     "202106190000Z"
+            DESCRIPTION  "Change hwWarrantyType data type."
+
+            --  Revision history
+            REVISION     "202105140000Z"
+            DESCRIPTION  "Change import DisplayString."
+
+            REVISION     "202102180000Z"
+            DESCRIPTION  "Change mib oid."
+
+            REVISION     "202004240000Z"
+            DESCRIPTION  "V1.00, initial draft"
+
+        ::= { hwDatacomm  366}
+
+    -- 1.3.6.1.4.1.2011.5.25.366.1
+    hwWarrantyManObject OBJECT IDENTIFIER ::= { hwWarranty 1 }	
+    --1.3.6.1.4.1.2011.5.25.366.1.1
+    hwWarrantyType OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..10))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Specify the type of the electronic warranty."
+            ::= { hwWarrantyManObject 1 }
+			
+	--1.3.6.1.4.1.2011.5.25.366.1.2
+    hwWarrantySlot OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..32))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Specify the position of the electronic warranty."
+            ::= { hwWarrantyManObject 2 }
+			
+    --1.3.6.1.4.1.2011.5.25.366.1.3
+    hwWarrantySerialNum OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..100)) 
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Specify the serial number of the electronic warranty."
+            ::= { hwWarrantyManObject 3 }
+			
+    --1.3.6.1.4.1.2011.5.25.366.1.4
+    hwWarrantyRemainDay OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Specify the unit of the electronic warranty."
+            ::= { hwWarrantyManObject 4 }
+   	
+    -- 1.3.6.1.4.1.2011.5.25.366.2
+    hwWarrantyManNotifications OBJECT IDENTIFIER ::= { hwWarranty 2 }
+	
+	--1.3.6.1.4.1.2011.5.25.366.2.1
+    hwWarrantyToBeExpired NOTIFICATION-TYPE
+        OBJECTS {hwWarrantyType, hwWarrantySlot, hwWarrantySerialNum, hwWarrantyRemainDay}
+        STATUS current
+        DESCRIPTION 
+            "The electronic warranty of the device is expiring."
+        ::= { hwWarrantyManNotifications 1 }
+	
+	--1.3.6.1.4.1.2011.5.25.366.2.2
+    hwWarrantyToBeExpiredResume NOTIFICATION-TYPE
+        OBJECTS {hwWarrantyType, hwWarrantySlot, hwWarrantySerialNum}
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the electronic warranty of the device is expiring was cleared."
+        ::= { hwWarrantyManNotifications 2 }
+	
+	--1.3.6.1.4.1.2011.5.25.366.2.3
+    hwWarrantyExpired NOTIFICATION-TYPE
+        OBJECTS { hwWarrantyType, hwWarrantySlot, hwWarrantySerialNum}
+        STATUS current
+        DESCRIPTION 
+            "The electronic warranty of the device is expired."
+        ::= { hwWarrantyManNotifications 3 }
+		
+	--1.3.6.1.4.1.2011.5.25.366.2.4
+    hwWarrantyExpiredResume NOTIFICATION-TYPE
+        OBJECTS { hwWarrantyType, hwWarrantySlot, hwWarrantySerialNum}
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicating that the electronic warranty of the device is expired was cleared."
+        ::= { hwWarrantyManNotifications 4 }
+		
+	--1.3.6.1.4.1.2011.5.25.366.2.5
+    hwWarrantyMissingSession NOTIFICATION-TYPE
+        OBJECTS { hwWarrantyType, hwWarrantySlot, hwWarrantySerialNum}
+        STATUS current
+        DESCRIPTION 
+            "The electronic warranty's session of the device is missing."
+        ::= { hwWarrantyManNotifications 5 }
+	
+	-- 1.3.6.1.4.1.2011.5.25.366.2.6
+    hwWarrantyMissingSessionResume NOTIFICATION-TYPE
+        OBJECTS { hwWarrantyType, hwWarrantySlot, hwWarrantySerialNum}
+        STATUS current
+        DESCRIPTION 
+            "The alarm indicationg that the electronic warranty's session of the device is missing was cleared."
+        ::= { hwWarrantyManNotifications 6 }
+		
+END
+--
+-- HUAWEI-WARRANTY-MIB.mib
+--

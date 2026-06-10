@@ -1,0 +1,321 @@
+-- =====================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Device Link Detection Protocol (DLDP) MIB.
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2011-12-26 created by Gu Ce
+-- V1.1 2016-03-18 updated by LiYuGang
+--      Modify hh3cDldp2UniShutdown
+-- =====================================================================
+HH3C-DLDP2-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    TruthValue, MacAddress
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    ifIndex, ifDescr
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cDldp2 MODULE-IDENTITY
+    LAST-UPDATED
+        "201603181530Z"
+    ORGANIZATION
+        "New H3C Technologies. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip: 100085"
+    DESCRIPTION
+        "Device Link Detection Protocol (DLDP) MIB.
+        Device Link Detection Protocol is a private Layer 2 protocol,
+        which can be used to detect and shut down unidirectional links (fiber or
+        copper links) to avoid network problems."
+    REVISION
+        "201603181530Z"
+    DESCRIPTION
+        "Modify hh3cDldp2UniShutdown."
+    REVISION
+        "201112261530Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cCommon 117 }
+
+hh3cDldp2ScalarGroup        OBJECT IDENTIFIER ::= { hh3cDldp2 1 }
+
+hh3cDldp2GlobalEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable(true) or disable(false) DLDP on the device."
+    ::= { hh3cDldp2ScalarGroup 1 }
+
+hh3cDldp2Interval OBJECT-TYPE
+    SYNTAX      Integer32(1..100)
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the advertisement packet sending interval."
+    DEFVAL      { 5 }
+    ::= { hh3cDldp2ScalarGroup 2 }
+
+hh3cDldp2AuthMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    none(2),
+                    simple(3),
+                    md5(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the authentication mode.
+        unknown:    cannot be determined for some reason.
+        none:       not authenticated.
+        simple:     authenticated by a clear text password.
+        md5:        authenticated by MD5 digest."
+    DEFVAL      { none }
+    ::= { hh3cDldp2ScalarGroup 3 }
+
+hh3cDldp2AuthPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the authentication password.
+        Setting the password to a zero-length octet string means
+        deleting the password.
+        When read, it always returns a zero-length octet string."
+    ::= { hh3cDldp2ScalarGroup 4 }
+
+hh3cDldp2UniShutdown OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    auto(2),
+                    manual(3),
+                    hybrid(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the shutdown mode when a unidirectional
+        link has been detected.
+        unknown:    cannot be determined for some reason.
+        auto:       the port will be shut down automatically.
+        manual:     the port must be shut down manually.
+        hybrid:     the port will be shut down automatically,
+                    but it must be brought up manually."
+    DEFVAL  { auto }
+    ::= { hh3cDldp2ScalarGroup 5 }
+
+hh3cDldp2TableGroup         OBJECT IDENTIFIER ::= { hh3cDldp2 2 }
+
+hh3cDldp2PortConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDldp2PortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all ports that support DLDP."
+    ::= { hh3cDldp2TableGroup 1 }
+
+hh3cDldp2PortConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cDldp2PortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry describes a port that supports DLDP."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cDldp2PortConfigTable 1 }
+
+Hh3cDldp2PortConfigEntry ::= SEQUENCE
+    {
+        hh3cDldp2PortEnable     TruthValue
+    }
+
+hh3cDldp2PortEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable(true) or disable(false) DLDP on a port."
+    ::= { hh3cDldp2PortConfigEntry 1 }
+
+hh3cDldp2PortStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDldp2PortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all ports enabled with DLDP."
+    ::= { hh3cDldp2TableGroup 2 }
+
+hh3cDldp2PortStatusEntry OBJECT-TYPE
+    SYNTAX      Hh3cDldp2PortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry describes a port enabled with DLDP."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cDldp2PortStatusTable 1 }
+
+Hh3cDldp2PortStatusEntry ::= SEQUENCE
+    {
+        hh3cDldp2PortOperStatus     INTEGER,
+        hh3cDldp2PortLinkStatus     INTEGER
+    }
+
+hh3cDldp2PortOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    initial(2),
+                    inactive(3),
+                    unidirectional(4),
+                    bidirectional(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DLDP operating status on the port.
+        unknown:        cannot be determined for some reason.
+        initial:        DLDP is not globally enabled.
+        inactive:       physical status of the port is down.
+        unidirectional: all neighbors of the port are in 'unconfirmed' status.
+        bidirectional:  more than one neighbor of the port is in 'confirmed'
+                        status."
+    ::= { hh3cDldp2PortStatusEntry 1 }
+
+hh3cDldp2PortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    down(2),
+                    up(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the DLDP link status of the port.
+        unknown:    cannot be determined for some reason.
+        down:       the DLDP link status of the port is down.
+        up:         the DLDP link status of the port is up.
+        If the port operating status is not 'inactive',
+        'unidirectional', or 'bidirectional', it always returns 'unknown'."
+    ::= { hh3cDldp2PortStatusEntry 2 }
+
+hh3cDldp2NeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDldp2NeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains all port's neighbors."
+    ::= { hh3cDldp2TableGroup 3 }
+
+hh3cDldp2NeighborEntry OBJECT-TYPE
+    SYNTAX      Hh3cDldp2NeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry describes a port's neighbors."
+    INDEX
+        {
+            ifIndex,
+            hh3cDldp2NeighborBridgeMac,
+            hh3cDldp2NeighborPortIndex
+        }
+    ::= { hh3cDldp2NeighborTable 1 }
+
+Hh3cDldp2NeighborEntry ::= SEQUENCE
+    {
+        hh3cDldp2NeighborBridgeMac      MacAddress,
+        hh3cDldp2NeighborPortIndex      Integer32,
+        hh3cDldp2NeighborStatus         INTEGER,
+        hh3cDldp2NeighborAgingTime      Integer32
+    }
+
+hh3cDldp2NeighborBridgeMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Indicates the bridge MAC address of a neighbor."
+    ::= { hh3cDldp2NeighborEntry 1 }
+
+hh3cDldp2NeighborPortIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Indicates the port index of a neighbor."
+    ::= { hh3cDldp2NeighborEntry 2 }
+
+hh3cDldp2NeighborStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    unconfirmed(2),
+                    confirmed(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the status of a neighbor.
+        unknown:        cannot be determined for some reason.
+        unconfirmed:    unidirectional communication between the port and
+                        its neighbor.
+        confirmed:      bidirectional communication between the port and
+                        its neighbor."
+    ::= { hh3cDldp2NeighborEntry 3 }
+
+hh3cDldp2NeighborAgingTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the aging time of a neighbor.
+        If the neighbor status is not 'confirmed', it always returns 0."
+    ::= { hh3cDldp2NeighborEntry 4 }
+
+hh3cDldp2TrapBindObjects    OBJECT IDENTIFIER ::= { hh3cDldp2 3 }
+
+hh3cDldp2Trap               OBJECT IDENTIFIER ::= { hh3cDldp2 4 }
+hh3cDldp2TrapPrefix         OBJECT IDENTIFIER ::= { hh3cDldp2Trap 0 }
+hh3cDldp2TrapUniLink NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DLDP detects a unidirectional link,
+        ifIndex and ifDescr identify the port."
+    ::= { hh3cDldp2TrapPrefix 1 }
+
+hh3cDldp2TrapBidLink NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex,
+            ifDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is generated when DLDP detects a bidirectional link,
+        ifIndex and ifDescr identify the port."
+    ::= { hh3cDldp2TrapPrefix 2 }
+
+END

@@ -1,0 +1,211 @@
+CM-TOPOLOGY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+             FROM SNMPv2-SMI
+    DateAndTime, DisplayString, VariablePointer
+             FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+             FROM SNMPv2-CONF
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    fsp150cm
+             FROM  ADVA-MIB;
+
+cmTopologyMIB MODULE-IDENTITY
+    LAST-UPDATED    "200803030000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Topology MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "200803030000Z"
+    DESCRIPTION
+            "Notes from release 200803030000Z,
+             (1)MIB version ready for release FSP150CM 3.1." 
+    ::= {fsp150cm 9}    
+
+-- 
+-- OID definitions
+-- 
+cmTopologyObjects     OBJECT IDENTIFIER ::= {cmTopologyMIB 1}
+cmTopologyConformance OBJECT IDENTIFIER ::= {cmTopologyMIB 2}
+
+--
+-- Textual conventions.
+--
+
+--
+-- Scalar definitions.
+--
+cmTopologyRegionId OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "User specified name of the topology region."
+    ::= { cmTopologyObjects 1 }
+
+cmTopologyRegionDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..128)) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Description of the topology region."
+    ::= { cmTopologyObjects 2 }
+
+cmTopologyRegionLastUpdateTime OBJECT-TYPE
+    SYNTAX      DateAndTime 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Time when the topology region was last updated."
+    ::= { cmTopologyObjects 3 }
+
+--
+-- Table definitions.
+--
+
+--
+-- Topology Item table.
+--
+cmTopologyItemTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmTopologyItemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the topology items. 
+             Entries cannot be created in this table by management
+             application action."
+    ::= { cmTopologyObjects 4 }
+
+
+cmTopologyItemEntry OBJECT-TYPE
+    SYNTAX     CmTopologyItemEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             topology item."
+    INDEX { neIndex }
+    ::= { cmTopologyItemTable 1 }
+
+
+CmTopologyItemEntry ::= SEQUENCE {
+    cmTopologyItemId         DisplayString,
+    cmTopologyItemDescr      DisplayString
+}
+
+cmTopologyItemId OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..32))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "User specified name of the topology item."
+     ::= { cmTopologyItemEntry 1 }
+
+cmTopologyItemDescr OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..128))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Description of the topology item."
+     ::= { cmTopologyItemEntry 2 }
+
+--
+-- Topology Link table.
+--
+cmTopologyLinkTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CmTopologyLinkEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the topology links. 
+             Entries cannot be created in this table by management
+             application action."
+    ::= { cmTopologyObjects 5 }
+
+cmTopologyLinkEntry OBJECT-TYPE
+    SYNTAX     CmTopologyLinkEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a particular
+             topology item."
+    INDEX { cmTopologyLinkFromPort }
+    ::= { cmTopologyLinkTable 1 }
+
+
+CmTopologyLinkEntry ::= SEQUENCE {
+    cmTopologyLinkId              DisplayString,
+    cmTopologyLinkFromPort        VariablePointer,
+    cmTopologyLinkToPort          VariablePointer
+}
+
+cmTopologyLinkId OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "User specified name of the topology link."
+     ::= { cmTopologyLinkEntry 1 }
+
+cmTopologyLinkFromPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Topology Link connects two Network Elements.  This object
+          points to the FROM end Port."
+     ::= { cmTopologyLinkEntry 2 }
+
+cmTopologyLinkToPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Topology Link connects two Network Elements.  This object
+          points to the TO end point."
+     ::= { cmTopologyLinkEntry 3 }
+
+
+--
+-- Conformance
+--
+cmTopologyCompliances OBJECT IDENTIFIER ::= {cmTopologyConformance 1}
+cmTopologyGroups      OBJECT IDENTIFIER ::= {cmTopologyConformance 2}
+
+cmTopologyCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the CM Topology
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              cmTopologyObjectGroup
+        }
+    ::= { cmTopologyCompliances 1 }
+
+cmTopologyObjectGroup OBJECT-GROUP
+    OBJECTS {
+        cmTopologyRegionId, cmTopologyRegionDescr,
+        cmTopologyRegionLastUpdateTime,
+
+        cmTopologyItemId, cmTopologyItemDescr,
+
+        cmTopologyLinkId,
+        cmTopologyLinkFromPort, cmTopologyLinkToPort
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the CM Topology
+             group."
+    ::= { cmTopologyGroups 1 }
+END

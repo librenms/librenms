@@ -1,0 +1,71 @@
+-- ******************************************************************************************
+-- *
+-- * Description:   Base definitions for BKtel HFC-862 systems  
+-- *
+-- * Copyright 2006 by BKtel communications GmbH
+-- *
+-- * V.1.0  04.10.2006  M. Heldmann   - created this "bkbase.mib" file based on BKtel systems "abase.mib" file
+-- *                                  - removed all definitins not used by NMS implementation of BKtel communications GmbH
+-- *                                  - NESlotValue expanded due to new 2G6 platform needs
+-- * V.1.1  08.05.2014  M. Heldmann   - removed NESlotValue (0..99) restriction due to new (2014) NECXE
+-- ******************************************************************************************
+
+
+    BKTEL-HFC862-BASE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS 
+            iso, experimental           
+                FROM RFC1155-SMI;
+    
+    
+--
+-- Type definitions
+--
+    
+        DisplayString ::= OCTET STRING
+        
+        TruthValue ::= INTEGER
+        {
+            true(1),
+            false(2)
+        }
+        
+        NESlotValue      ::= INTEGER  --  (0..99) - removed the restriction due to new (2014) NECXE
+        
+        ModuleWidthValue ::= INTEGER (0..8)
+        
+        -- Due to compatibility reasons this enumeration starts from value (0)
+        -- For the same reason the values (1) and (4) are reserved and must not be used
+        PerceivedSeverityValue ::= INTEGER
+        {                     -- Meaning:
+            notification(0),  -- all OK, notify only
+            alarm(2),         -- used for alarms (hihi or lolo)
+            warning(3),       -- used for warnings (hi or lo)
+            clear(5)          -- all OK
+        }
+        
+--
+-- Node definitions
+--
+    
+        org OBJECT IDENTIFIER ::= { iso 3 }
+
+        dod OBJECT IDENTIFIER ::= { org 6 }
+
+        internet OBJECT IDENTIFIER ::= { dod 1 }
+
+        mgmt OBJECT IDENTIFIER ::= { internet 2 }
+
+        private OBJECT IDENTIFIER ::= { internet 4 }
+
+        enterprises OBJECT IDENTIFIER ::= { private 1 }
+
+        bktelSystems OBJECT IDENTIFIER ::= { enterprises 7501 }
+
+        hfc OBJECT IDENTIFIER  ::= { bktelSystems 1 }
+        
+        ne OBJECT IDENTIFIER ::= { hfc 1  }
+        
+        modules OBJECT IDENTIFIER ::= { hfc 2  }
+
+    END

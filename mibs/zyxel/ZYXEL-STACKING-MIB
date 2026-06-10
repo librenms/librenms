@@ -1,0 +1,502 @@
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition 
+  
+-- This file describes the ZyXEL Communications Corporation Enterprise MIB.
+-- It contains ZyXEL products OIDs, and common managed objects.
+
+-- ZYXEL-STACKING-MIB.mib
+-- Revision 1.10  2014/05/29 
+
+
+ZYXEL-STACKING-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	OBJECT-TYPE
+		FROM SNMPv2-SMI			-- RFC2578	
+		
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI 
+		
+	EnabledStatus
+		FROM  P-BRIDGE-MIB		
+
+	PortList
+		FROM  Q-BRIDGE-MIB
+
+  TimeTicks
+        FROM SNMPv2-SMI
+
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+	esMgmt			
+		FROM ZYXEL-ES-SMI;
+
+	zyxelStacking MODULE-IDENTITY
+		LAST-UPDATED	"201207010000Z"    
+		ORGANIZATION	"Enterprise Solution ZyXEL"     
+		CONTACT-INFO
+			""	   
+		DESCRIPTION
+			"The subtree for stacking"
+		::= { esMgmt 97 }
+	
+	zyxelStackingSetup				OBJECT IDENTIFIER ::= { zyxelStacking 1 }
+	zyxelStackingStatus				OBJECT IDENTIFIER ::= { zyxelStacking 2 }
+	zyxelStackingTrapInfoObjects	OBJECT IDENTIFIER ::= { zyxelStacking 3 }
+	zyxelStackingNotifications		OBJECT IDENTIFIER ::= { zyxelStacking 4 }
+	
+--
+--
+--  97.Stacking
+--
+--
+--	1. zyxelStackingSetup     
+        zyStackingPriority OBJECT-TYPE
+        SYNTAX  	INTEGER (1..63)
+        MAX-ACCESS  read-write
+        STATUS  	current
+        DESCRIPTION
+        "Set the priority of the stacking system."
+        ::= { zyxelStackingSetup 1 }
+
+        zyStackingForceMasterModeState OBJECT-TYPE
+        SYNTAX  	EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  	current
+        DESCRIPTION
+        "Enable/Disable force master mode."
+        ::= { zyxelStackingSetup 2 }
+
+        zyxelStackingSlotTable	OBJECT-TYPE
+        SYNTAX		SEQUENCE OF ZyxelStackingSlotEntry
+        MAX-ACCESS  not-accessible
+        STATUS  	current
+        DESCRIPTION
+        "The table contains stacking slot configuration."
+        ::= { zyxelStackingSetup 3 }    
+              
+		zyxelStackingSlotEntry OBJECT-TYPE
+        SYNTAX		ZyxelStackingSlotEntry
+        MAX-ACCESS	not-accessible
+        STATUS		current
+        DESCRIPTION    	
+		"An entry contains stacking slot configuration."
+        INDEX          	{ zyStackingSlotCurrentSlotId }
+        ::= { zyxelStackingSlotTable 1 }
+
+        ZyxelStackingSlotEntry ::=
+		SEQUENCE {
+        	zyStackingSlotCurrentSlotId				INTEGER,
+        	zyStackingSlotActiveSlotIdAfterReboot	INTEGER
+         }    
+
+        zyStackingSlotCurrentSlotId OBJECT-TYPE
+        SYNTAX  	INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  	current
+        DESCRIPTION
+        "The slot number device, which is the current slot id."
+        ::= { zyxelStackingSlotEntry 1 }
+
+        zyStackingSlotActiveSlotIdAfterReboot OBJECT-TYPE
+        SYNTAX  	INTEGER {
+			auto(0),
+			slotId1(1),
+			slotId2(2),
+			slotId3(3),
+			slotId4(4),
+			slotId5(5),			
+			slotId6(6),
+			slotId7(7),
+			slotId8(8)
+		}
+
+        MAX-ACCESS  read-write
+        STATUS  	current
+        DESCRIPTION
+        "Indicates the slot id that will be after reboot."
+        ::= { zyxelStackingSlotEntry 2 }
+  
+        zyStackingSlotIdFreeze OBJECT-TYPE
+        SYNTAX  	EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS  	current
+        DESCRIPTION
+        "This entry is used to freeze the slot id of each device at stack system to be its current slot id."
+        ::= { zyxelStackingSetup 4 }
+
+  
+
+
+--	2. zyxelStackingStatus
+
+--  zyxelStackingSlotInfoTable
+        
+        zyxelStackingSlotInfoTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelStackingSlotInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains stacking slot information."
+        ::= { zyxelStackingStatus 1 }    
+              
+		zyxelStackingSlotInfoEntry OBJECT-TYPE
+        SYNTAX	ZyxelStackingSlotInfoEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains stacking slot information."
+        INDEX          	{ zyStackingSlotInfoSlot }
+        ::= { zyxelStackingSlotInfoTable 1 }
+
+        ZyxelStackingSlotInfoEntry ::=
+		SEQUENCE {
+        	zyStackingSlotInfoSlot						INTEGER,
+        	zyStackingSlotInfoStackingStatus			INTEGER,  
+        	zyStackingSlotInfoForceMasterMode			EnabledStatus,
+        	zyStackingSlotInfoPriority					INTEGER,
+        	zyStackingSlotInfoRole						INTEGER,
+        	zyStackingSlotInfoMacAddress				OCTET STRING,
+        	zyStackingSlotInfoUptime 					TimeTicks,
+        	zyStackingSlotInfoFirmwareVersionRunning 	OCTET STRING,
+        	zyStackingSlotInfoFirmwareVersionFlash1 	OCTET STRING,
+        	zyStackingSlotInfoFirmwareVersionFlash2 	OCTET STRING
+         }
+
+        zyStackingSlotInfoSlot OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Stacking slot ID."
+        ::= { zyxelStackingSlotInfoEntry 1 }
+
+        zyStackingSlotInfoStackingStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+			inactive(0),
+			init(1),
+			active(2)
+		}
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Stacking status Of the stacking slot."
+        ::= { zyxelStackingSlotInfoEntry 2 }
+
+        zyStackingSlotInfoForceMasterMode OBJECT-TYPE
+        SYNTAX  	EnabledStatus
+        MAX-ACCESS  read-only
+        STATUS  	current
+        DESCRIPTION
+        "The mode is enabled, it will get highest priority to be Master."
+        ::= { zyxelStackingSlotInfoEntry 3 }
+
+        zyStackingSlotInfoPriority OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Stacking priority of the stacking slot."
+        ::= { zyxelStackingSlotInfoEntry 4 }
+
+        zyStackingSlotInfoRole OBJECT-TYPE
+        SYNTAX  INTEGER {
+        	none(0),
+			master(1),
+			backup (2),
+			linecard(3)
+		}
+		MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The role of the stacking slot"
+        ::= { zyxelStackingSlotInfoEntry 5 }     
+        
+        zyStackingSlotInfoMacAddress OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "CPU mac address of the stacking slot."
+        ::= { zyxelStackingSlotInfoEntry 6 }
+
+        zyStackingSlotInfoUptime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Uptime of the stacking slot"
+        ::= { zyxelStackingSlotInfoEntry 7 }
+        
+        zyStackingSlotInfoFirmwareVersionRunning OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "current running firmware version of the stacking slot."
+        ::= { zyxelStackingSlotInfoEntry 8 }
+        
+        zyStackingSlotInfoFirmwareVersionFlash1 OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Firmware version in flash1 of the stacking slot."
+        ::= { zyxelStackingSlotInfoEntry 9 }
+        
+        zyStackingSlotInfoFirmwareVersionFlash2 OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Firmware version in flash2 of the stacking slot."
+        ::= { zyxelStackingSlotInfoEntry 10 }
+        
+--  zyxelStackingSlotChannelInfoTable	
+
+        zyxelStackingSlotChannelInfoTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelStackingSlotChannelInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains stacking the channel information of the stacking slot."
+        ::= { zyxelStackingStatus 2 }
+
+	zyxelStackingSlotChannelInfoEntry OBJECT-TYPE
+        SYNTAX	ZyxelStackingSlotChannelInfoEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains the stacking channel information of the stacking slot."
+        INDEX          	{ zyStackingSlotChannelInfoSlot, zyStackingSlotChannelInfoChannnel }
+        ::= { zyxelStackingSlotChannelInfoTable 1 }
+
+        ZyxelStackingSlotChannelInfoEntry ::=
+		SEQUENCE {
+        	zyStackingSlotChannelInfoSlot	INTEGER,
+        	zyStackingSlotChannelInfoChannnel	INTEGER,
+        	zyStackingSlotChannelInfoStatus	INTEGER,
+        	zyStackingSlotChannelInfoPorts	PortList,
+        	zyStackingSlotChannelInfoNeighbor	INTEGER,
+		zyStackingSlotChannelInfoSpeed	INTEGER   	
+         }
+
+        zyStackingSlotChannelInfoSlot OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Stacking slot ID."
+        ::= { zyxelStackingSlotChannelInfoEntry 1 }
+
+        zyStackingSlotChannelInfoChannnel OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Stacking channel ID"
+        ::= { zyxelStackingSlotChannelInfoEntry 2 }
+	
+        zyStackingSlotChannelInfoStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+   		up(1),
+ 		down (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The stacking channel status."
+        ::= { zyxelStackingSlotChannelInfoEntry 3 }   
+        
+        zyStackingSlotChannelInfoPorts OBJECT-TYPE
+        SYNTAX  PortList
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Port list in the stacking channel."
+        ::= { zyxelStackingSlotChannelInfoEntry 4 }
+        
+        zyStackingSlotChannelInfoNeighbor OBJECT-TYPE
+        SYNTAX  INTEGER 
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "neighbor slot id connected by stacking channel."
+        ::= { zyxelStackingSlotChannelInfoEntry 5 }
+              
+   
+        
+        zyStackingSlotChannelInfoSpeed OBJECT-TYPE
+        SYNTAX  INTEGER {
+        none(0),
+   		speed_10G(1),
+   		speed_12G(2),
+		speed_20G(3)
+         }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "neighbor slot id connected by stacking channel."
+        ::= { zyxelStackingSlotChannelInfoEntry 6 } 
+ --	zyStackingTopology
+        zyStackingTopology OBJECT-TYPE
+        SYNTAX  INTEGER {  
+        chain (1),
+		ring(2)
+	    }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "get current stacking topology"
+        ::= { zyxelStackingStatus 3 }
+  		
+              
+--	zyxelStackingTrapInfoObjects
+	zyStackingTrapInfoMsg	 OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"There is the message of stacking trap."
+		::= { zyxelStackingTrapInfoObjects 1 }  
+			
+--	zyStackingNotifications
+	zyStackingChannelUp NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot,
+				zyStackingSlotChannelInfoChannnel
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Stacking channel up."
+		::= { zyxelStackingNotifications 1 }      
+
+	zyStackingChannelDown NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot,
+				zyStackingSlotChannelInfoChannnel
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Stacking channel down."
+		::= { zyxelStackingNotifications 2 } 		
+	
+	zyStackingSlotAttach NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+		}       
+		STATUS  current
+		DESCRIPTION
+        "Stacking slot attached success."
+		::= { zyxelStackingNotifications 3 }     
+	
+	zyStackingSlotDetach NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+		}       
+		STATUS  current
+		DESCRIPTION
+        "Stacking slot detach."
+		::= { zyxelStackingNotifications 4 }     
+	
+	zyStackingNewMaster NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+		}       
+		STATUS  current
+		DESCRIPTION
+        "New master with correspond slot ID."
+		::= { zyxelStackingNotifications 5 }     
+    	
+	zyStackingUpgradeFirmwareFail NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Upgrade firmware fail with correspond slot ID"
+		::= { zyxelStackingNotifications 6 }  
+		
+ 	zyStackingNewBackup NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+         }       
+		STATUS  current
+		DESCRIPTION
+        "New Backup with correspond slot ID."
+		::= { zyxelStackingNotifications 7 }       	
+
+	zyStackingBackupTakeover NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Replaced master with correspond slot ID."
+		::= { zyxelStackingNotifications 8 }  	
+
+	zyStackingNewMasterFromTakeover NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+         }       
+		STATUS  current
+		DESCRIPTION
+        "New master from taking over with correspond slot ID."
+		::= { zyxelStackingNotifications 9 }  		
+		
+	zyStackingSyncConfFail NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Sync. configuration fail with correspond slot ID."
+		::= { zyxelStackingNotifications 10 }  
+
+	zyStackingSysRestoreConfFail NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingSlotChannelInfoSlot
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Stacking backup takeover resotre configuration fail."
+		::= { zyxelStackingNotifications 11 }
+		
+	 zyStackingSlotInitFail NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingTrapInfoMsg
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Stacking Slot init fail."
+		::= { zyxelStackingNotifications 12 }
+
+	 zyStackingSlotChangeIndex NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingTrapInfoMsg
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Stacking change slot index."
+		::= { zyxelStackingNotifications 13 }
+
+	 zyStackingPriorityChange NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingTrapInfoMsg
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Staking prority change."
+		::= { zyxelStackingNotifications 14 }
+
+	 zyStackingTopologyChange NOTIFICATION-TYPE
+		OBJECTS {
+				zyStackingTrapInfoMsg
+         }       
+		STATUS  current
+		DESCRIPTION
+        "Staking topology change."
+		::= { zyxelStackingNotifications 15 }
+	
+END

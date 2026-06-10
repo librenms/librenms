@@ -1,0 +1,4094 @@
+EXCELIANCE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	IpAddress, enterprises, Counter32, Counter64,
+	NOTIFICATION-TYPE	FROM SNMPv2-SMI
+	Gauge32			FROM SNMPv2-SMI
+	OBJECT-GROUP		FROM SNMPv2-CONF
+	NOTIFICATION-GROUP	FROM SNMPv2-CONF
+	DisplayString		FROM SNMPv2-TC;
+
+exceliance MODULE-IDENTITY
+	LAST-UPDATED "201606010001Z"
+	ORGANIZATION "EXCELIANCE"
+	CONTACT-INFO
+		"EXCELIANCE
+		3 Rue du petit robinson
+		ZAC des Metz
+		78350 JOUY EN JOSAS
+                FRANCE
+
+                support@exceliance.net
+		"
+	DESCRIPTION "EXCELIANCE SNMP MIB"
+	REVISION    "201606010001Z"
+	DESCRIPTION ""
+	::= { enterprises 23263 }
+
+products OBJECT IDENTIFIER ::= { exceliance 4 }
+
+landef OBJECT IDENTIFIER ::= { products 1 }
+
+compat1 OBJECT IDENTIFIER ::= { landef 1 }
+
+counters OBJECT IDENTIFIER ::= { compat1 1 }
+
+attackNumber OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+			"Detected attacks number"
+	::= { counters 1 }
+
+acceptedPqts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+			"Accepted paquets"
+	::= { counters 2 }
+
+droppedPqts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+			"Dropped paquets"
+	::= { counters 3 }
+
+services OBJECT IDENTIFIER ::= { compat1 2 }
+
+serviceName OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE (0..65535))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Service name"
+	::= { services 1 }
+
+serviceStatus OBJECT-TYPE
+	SYNTAX		INTEGER { stopped(0), running(1), unknown(3) }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Service status"
+	::= { services 2 }
+
+hostInfos OBJECT IDENTIFIER ::= { compat1 3 }
+
+lastIP OBJECT-TYPE
+	SYNTAX		IpAddress	
+	MAX-ACCESS	read-only	
+	STATUS		current
+	DESCRIPTION	
+			"Last IP address"
+	::= { hostInfos 1 }
+
+dnsName OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE (0..65535))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Dns name"
+	::= { hostInfos 2 }
+
+hostStatus OBJECT-TYPE
+	SYNTAX		INTEGER { down(0), up(1) }
+	MAX-ACCESS	read-only	
+	STATUS		current
+	DESCRIPTION	
+			"Host status"
+	::= { hostInfos 3 }
+
+os OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE (0..65535))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"OS"
+	::= { hostInfos 4 }
+
+osDetails OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "OS details"
+        ::= { hostInfos 5 }
+
+uptime OBJECT-TYPE
+        SYNTAX         	Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Uptime in seconds"
+        ::= { hostInfos 6 }
+
+netbiosName OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE (0..65535))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Netbios name"
+	::= { hostInfos 7 }
+
+netbiosUser OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE (0..65535))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"Netbios user"
+	::= { hostInfos 8 }
+
+workgroup OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE (0..65535))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	
+			"workgroup"
+	::= { hostInfos 9 }
+
+hostServer OBJECT-TYPE
+        SYNTAX          INTEGER { no(0), yes(1) }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Server (file sharing)"
+        ::= { hostInfos 10 }
+
+manufacturer OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Iface manufacturer"
+        ::= { hostInfos 11 }
+
+eTrapsObjects OBJECT IDENTIFIER ::= { exceliance 2 }
+
+eTraps OBJECT IDENTIFIER ::= { exceliance 3 }
+
+eNotificationMsg NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+                         "A simple notification"
+        ::= { eTraps 1001 }
+
+alTrap NOTIFICATION-TYPE
+       OBJECTS { alTrapId, alTrapMsg, alTrapName  }
+       STATUS current
+       DESCRIPTION "Aloha SMIv2 notification"
+       ::= { eTraps 1002 }
+
+alTrapId OBJECT-TYPE
+        SYNTAX          INTEGER { vrrpmaster(101),
+                                  vrrpbackup(102),
+				  vrrpfault(103),
+				  serverdown(201),
+				  frontendfull(202),
+				  backenddown(203),
+				  serverup(211),
+				  frontendopen(212),
+				  backendup(213),
+				  l4serverdown(301),
+				  l4directordown(302),
+				  l4serverup(311),
+				  l4directorup(312),
+				  synfloodoff(401),
+				  ackrstfloodoff(402),
+				  unknownttloff(403),
+				  surgeoff(404),
+				  synfloodon(411),
+				  ackrstfloodon(412),
+				  unknownttlon(413),
+				  surgeon(414) }
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                "Some determined trap type"
+        ::= { eTrapsObjects 1 }
+
+alTrapMsg OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Trap message text"
+        ::= { eTrapsObjects 2 }
+
+alTrapName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Server or Instance concerned by trap"
+        ::= { eTrapsObjects 3 }
+
+
+aloha OBJECT IDENTIFIER ::= { products 2 }
+
+alcompat1 OBJECT IDENTIFIER ::= { aloha 1 }
+
+alProductInfo OBJECT IDENTIFIER ::= { alcompat1 1 }
+
+alProductName OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Product Name"
+        ::= { alProductInfo 1 }
+
+alProductModel OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Product Model"
+        ::= { alProductInfo 2 }
+
+alProductVersion OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Product Version"
+        ::= { alProductInfo 3 }
+
+alProductSubVersion OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Product SubVersion"
+        ::= { alProductInfo 4 }
+
+alProductBuildVersion OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Product Build Version"
+        ::= { alProductInfo 5 }
+
+alProductBuildDate OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Product Build Date"
+        ::= { alProductInfo 6 }
+
+alProductURL OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Product URL "
+        ::= { alProductInfo 7 }
+
+alServices OBJECT IDENTIFIER ::= { alcompat1 2 }
+
+alServiceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlServiceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of services."
+    ::= { alServices 1 }
+
+alServiceTableEntry OBJECT-TYPE
+    SYNTAX  AlServiceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the services table."
+    INDEX   { alServiceID }
+    ::= { alServiceTable 1 }
+
+AlServiceTableEntry ::=
+    SEQUENCE {
+        alServiceID
+            INTEGER,
+        alServiceName
+            OCTET STRING,
+        alServiceStatus
+            INTEGER
+        }
+
+alServiceID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647) 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The service identifier."
+    ::= { alServiceTableEntry 1 }
+
+alServiceName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The service name."
+    ::= { alServiceTableEntry 2 }
+
+alServiceStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        stopped(0),
+        running(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The service status."
+    ::= { alServiceTableEntry 3 }
+
+alInstanceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlInstanceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of services instances."
+    ::= { alServices 2 }
+
+alInstanceTableEntry OBJECT-TYPE
+    SYNTAX  AlInstanceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the services instances table."
+    INDEX   { alInstanceServiceID, alInstanceID }
+    ::= { alInstanceTable 1 }
+
+AlInstanceTableEntry ::=
+    SEQUENCE {
+        alInstanceServiceID
+            INTEGER,
+        alInstanceID
+            INTEGER,
+        alInstanceName
+            OCTET STRING,
+        alInstanceStatus
+            INTEGER
+        }
+
+alInstanceServiceID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The service identifier."
+    ::= { alInstanceTableEntry 1 }
+
+alInstanceID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The instance identifier."
+    ::= { alInstanceTableEntry 2 }
+
+alInstanceName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The instance name."
+    ::= { alInstanceTableEntry 3 }
+
+alInstanceStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        stopped(0),
+        running(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The instance status."
+    ::= { alInstanceTableEntry 4 }
+
+alStats  OBJECT IDENTIFIER ::= { alcompat1 3 }
+
+alProcessTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlProcessTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of processes."
+    ::= { alStats 1 }
+
+alProcessTableEntry OBJECT-TYPE
+    SYNTAX  AlProcessTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the process table."
+    INDEX   { alProcessID }
+    ::= { alProcessTable 1 }
+
+AlProcessTableEntry ::=
+    SEQUENCE {
+        alProcessID
+            INTEGER,
+        alProcessVersion
+            OCTET STRING,
+        alProcessReleaseDate
+            OCTET STRING,
+        alProcessNbProc
+            INTEGER,
+        alProcessProductName
+            OCTET STRING,
+        alProcessSystemPID
+            INTEGER,
+        alProcessUptime
+            OCTET STRING,
+        alProcessUptimeSec
+            INTEGER,
+	alProcessMemMax
+            INTEGER,
+	alProcessPoolAlloc
+            INTEGER,
+	alProcessPoolUsed
+            INTEGER,
+	alProcessPoolFailed
+            Counter32,
+	alProcessUlimitn
+            INTEGER,
+	alProcessMaxSock
+            INTEGER,
+	alProcessMaxConn
+            INTEGER,
+	alProcessHardMaxConn
+            INTEGER,
+	alProcessCurConn
+            INTEGER,
+	alProcessCumConn
+            Counter32,
+	alProcessCumReq
+            Counter32,
+	alProcessMaxSslConn
+            INTEGER,
+	alProcessCurSslConn
+            INTEGER,
+	alProcessCumSslConn
+            Counter32,
+	alProcessMaxPipes
+            INTEGER,
+	alProcessPipesUsed
+            INTEGER,
+	alProcessPipesFree
+            INTEGER,
+	alProcessConnRate
+            INTEGER,
+	alProcessConnRateLimit
+            INTEGER,
+	alProcessMaxConnRate
+            INTEGER,
+	alProcessSessRate
+            INTEGER,
+	alProcessSessRateLimit
+            INTEGER,
+	alProcessMaxSessRate
+            INTEGER,
+	alProcessSslRate
+            INTEGER,
+	alProcessSslRateLimit
+            INTEGER,
+	alProcessMaxSslRate
+            INTEGER,
+	alProcessSslFrontendKeyRate
+            INTEGER,
+	alProcessMaxSslFrontendKeyRate
+            INTEGER,
+	alProcessSslFrontendSessReuse
+            INTEGER,
+	alProcessSslBackendKeyRate
+            INTEGER,
+	alProcessMaxSslBackendKeyRate
+            INTEGER,
+	alProcessSslCacheLookups
+            Counter32,
+	alProcessSslCacheMisses
+            Counter32,
+	alProcessCompressBpsIn
+            INTEGER,
+	alProcessCompressBpsOut
+            INTEGER,
+	alProcessCompressRateLimit
+            INTEGER,
+	alProcessZlibMemUsage
+            INTEGER,
+	alProcessMaxZlibMemUsage
+            INTEGER,
+	alProcessTasks
+            INTEGER,
+	alProcessRunQueue
+            INTEGER,
+	alProcessIdle
+            INTEGER,
+        alProcessNodeName
+            OCTET STRING,
+        alProcessDescription
+            OCTET STRING
+        }
+
+alProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process identifier."
+    ::= { alProcessTableEntry 1 }
+
+alProcessVersion OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The L7 process version."
+    ::= { alProcessTableEntry 2 }
+
+alProcessReleaseDate OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The L7 process release date."
+    ::= { alProcessTableEntry 3 }
+
+alProcessNbProc OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of process and sub processes."
+    ::= { alProcessTableEntry 4 }
+
+alProcessProductName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The L7 process name."
+    ::= { alProcessTableEntry 5 }
+
+alProcessSystemPID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process system PID."
+    ::= { alProcessTableEntry 6 }
+
+alProcessUptime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process Up time."
+    ::= { alProcessTableEntry 7 }
+
+alProcessUptimeSec OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process Up time in seconds."
+    ::= { alProcessTableEntry 8 }
+
+alProcessMemMax OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process max memory usage in MegaBytes."
+    ::= { alProcessTableEntry 9 }
+
+alProcessPoolAlloc OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of MegaBytes allocated in memory pools."
+    ::= { alProcessTableEntry 10 }
+
+alProcessPoolUsed OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of MegaBytes used in memory pools."
+    ::= { alProcessTableEntry 11 }
+
+alProcessPoolFailed OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of failed from memory pools."
+    ::= { alProcessTableEntry 12 }
+
+alProcessUlimitn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ulimit -n value for current process."
+    ::= { alProcessTableEntry 13 }
+
+alProcessMaxSock OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "maximum socket for current process."
+    ::= { alProcessTableEntry 14 }
+
+alProcessMaxConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Configured maximum of connections for current process."
+    ::= { alProcessTableEntry 15 }
+
+alProcessHardMaxConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Hard configured maximum of connections for current process."
+    ::= { alProcessTableEntry 16 }
+
+alProcessCurConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current number of connections for current process."
+    ::= { alProcessTableEntry 17 }
+
+alProcessCumConn OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of connections for current process."
+    ::= { alProcessTableEntry 18 }
+
+alProcessCumReq OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of requests for current process."
+    ::= { alProcessTableEntry 19 }
+
+alProcessMaxSslConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum of ssl connections for current process."
+    ::= { alProcessTableEntry 20 }
+
+alProcessCurSslConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current number of ssl connections for current process."
+    ::= { alProcessTableEntry 21 }
+
+alProcessCumSslConn OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of ssl connections for current process."
+    ::= { alProcessTableEntry 22 }
+
+alProcessMaxPipes OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max number of pipes for current process."
+    ::= { alProcessTableEntry 23 }
+
+alProcessPipesUsed OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of pipes used by current process."
+    ::= { alProcessTableEntry 24 }
+
+alProcessPipesFree OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of free pipes for current process."
+    ::= { alProcessTableEntry 25 }
+
+alProcessConnRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection rate on current process."
+    ::= { alProcessTableEntry 26 }
+
+alProcessConnRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection rate limit for current process."
+    ::= { alProcessTableEntry 27 }
+
+alProcessMaxConnRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max connection rate reached by current process."
+    ::= { alProcessTableEntry 28 }
+
+alProcessSessRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Session rate on current process."
+    ::= { alProcessTableEntry 29 }
+
+alProcessSessRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Session rate limit for current process."
+    ::= { alProcessTableEntry 30 }
+
+alProcessMaxSessRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max session rate reached by current process."
+    ::= { alProcessTableEntry 31 }
+
+alProcessSslRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl session rate on current process."
+    ::= { alProcessTableEntry 32 }
+
+alProcessSslRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl session rate limit for current process."
+    ::= { alProcessTableEntry 33 }
+
+alProcessMaxSslRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max ssl session rate reached by current process."
+    ::= { alProcessTableEntry 34 }
+
+alProcessSslFrontendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl key rate on frontend side for current process."
+    ::= { alProcessTableEntry 35 }
+
+alProcessMaxSslFrontendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max key rate on frontend side for current process."
+    ::= { alProcessTableEntry 36 }
+
+alProcessSslFrontendSessReuse OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Percent of ssl session reuse on frontend side for current process."
+    ::= { alProcessTableEntry 37 }
+
+alProcessSslBackendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl key rate on backend side for current process."
+    ::= { alProcessTableEntry 38 }
+
+alProcessMaxSslBackendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max key rate on backend side for current process."
+    ::= { alProcessTableEntry 39 }
+
+alProcessSslCacheLookups OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of lookups in cache."
+    ::= { alProcessTableEntry 40 }
+
+alProcessSslCacheMisses OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of unmatching lookups in cache."
+    ::= { alProcessTableEntry 41 }
+
+alProcessCompressBpsIn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Compression bandwidth in input."
+    ::= { alProcessTableEntry 42 }
+
+alProcessCompressBpsOut OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Compression bandwidth in output."
+    ::= { alProcessTableEntry 43 }
+
+alProcessCompressRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Compression bandwidth limit."
+    ::= { alProcessTableEntry 44 }
+
+alProcessZlibMemUsage OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Zlib memory usage in Bytes."
+    ::= { alProcessTableEntry 45 }
+
+alProcessMaxZlibMemUsage OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum limit of zlib memory usage in Bytes."
+    ::= { alProcessTableEntry 46 }
+
+alProcessTasks OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of tasks for current process."
+    ::= { alProcessTableEntry 47 }
+
+alProcessRunQueue OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of scheduled tasks for current process."
+    ::= { alProcessTableEntry 48 }
+
+alProcessIdle OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Idle time in percent."
+    ::= { alProcessTableEntry 49 }
+
+alProcessNodeName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The node's name."
+    ::= { alProcessTableEntry 50 }
+
+alProcessDescription OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Configured description."
+    ::= { alProcessTableEntry 51 }
+
+alBackendTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlBackendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of backends."
+    ::= { alStats 3 }
+
+alBackendTableEntry OBJECT-TYPE
+    SYNTAX  AlBackendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the backends table."
+    INDEX   { alBackendProcessID, alBackendID }
+    ::= { alBackendTable 1 }
+
+AlBackendTableEntry ::=
+    SEQUENCE {
+        alBackendProcessID
+            INTEGER,
+        alBackendID
+            INTEGER,
+	alBackendName
+	    OCTET STRING,
+	alBackendQueueCur
+           Counter64 ,
+        alBackendQueueMax
+           Counter64,
+        alBackendQueueLimit
+           Counter64,
+	alBackendSessionCur
+           Counter64 ,
+        alBackendSessionMax
+           Counter64,
+        alBackendSessionLimit
+           Counter64,
+        alBackendSessionTotal
+           Counter64,
+        alBackendSessionLoadBalanced
+           Counter64,
+        alBackendBytesIN
+           Counter64,
+        alBackendBytesOUT
+           Counter64,
+        alBackendErrorConnection
+           Counter64,
+        alBackendErrorResponse
+           Counter64,
+        alBackendDenyRequest
+           Counter64,
+        alBackendDenyResponse
+           Counter64,
+        alBackendWarningRetry
+           Counter64,
+        alBackendWarningRedispatch
+           Counter64,
+        alBackendStatus
+           OCTET STRING,
+        alBackendLastChange
+           Counter32,
+        alBackendCheckDown
+           Counter32,
+        alBackendDownTime
+           Counter32
+        }
+
+alBackendProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend's process identifier."
+    ::= { alBackendTableEntry 1 }
+
+alBackendID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend identifier."
+    ::= { alBackendTableEntry 2 }
+
+alBackendName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend name."
+    ::= { alBackendTableEntry 3 }
+
+alBackendQueueCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend identifier."
+    ::= { alBackendTableEntry 4 }
+
+alBackendQueueMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions in queue."
+    ::= { alBackendTableEntry 5 }
+
+alBackendQueueLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit in queue."
+    ::= { alBackendTableEntry 6 }
+
+alBackendSessionCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { alBackendTableEntry 7 }
+
+alBackendSessionMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions."
+    ::= { alBackendTableEntry 8 }
+
+alBackendSessionLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit."
+    ::= { alBackendTableEntry 9 }
+
+alBackendSessionTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { alBackendTableEntry 10 }
+
+alBackendSessionLoadBalanced OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Load balanced sessions."
+    ::= { alBackendTableEntry 11 }
+
+alBackendBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { alBackendTableEntry 12 }
+
+alBackendBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes output."
+    ::= { alBackendTableEntry 13 }
+
+alBackendErrorConnection OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection errors."
+    ::= { alBackendTableEntry 14 }
+
+alBackendErrorResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Response errors."
+    ::= { alBackendTableEntry 15 }
+
+alBackendDenyRequest OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied requests."
+    ::= { alBackendTableEntry 16 }
+
+alBackendDenyResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied responses."
+    ::= { alBackendTableEntry 17 }
+
+alBackendWarningRetry OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Retry warnings."
+    ::= { alBackendTableEntry 18 }
+
+alBackendWarningRedispatch OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Redispatch warnings."
+    ::= { alBackendTableEntry 19 }
+
+alBackendStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend status."
+    ::= { alBackendTableEntry 20 }
+
+alBackendLastChange OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend last status change."
+    ::= { alBackendTableEntry 21 }
+
+alBackendCheckDown OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Checked down."
+    ::= { alBackendTableEntry 22 }
+
+alBackendDownTime OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total down time."
+    ::= { alBackendTableEntry 23 }
+
+alFrontendTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlFrontendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of frontends."
+    ::= { alStats 2 }
+
+alFrontendTableEntry OBJECT-TYPE
+    SYNTAX  AlFrontendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the backend table."
+    INDEX   { alFrontendProcessID, alFrontendID }
+    ::= { alFrontendTable 1 }
+
+AlFrontendTableEntry ::=
+    SEQUENCE {
+        alFrontendProcessID
+            INTEGER,
+        alFrontendID
+            INTEGER,
+	alFrontendName
+	    OCTET STRING,
+	alFrontendSessionCur
+           Counter64 ,
+        alFrontendSessionMax
+           Counter64,
+        alFrontendSessionLimit
+           Counter64,
+        alFrontendSessionTotal
+           Counter64,
+        alFrontendBytesIN
+           Counter64,
+        alFrontendBytesOUT
+           Counter64,
+        alFrontendErrorRequest
+           Counter64,
+        alFrontendDenyRequest
+           Counter64,
+        alFrontendDenyResponse
+           Counter64,
+        alFrontendStatus
+           OCTET STRING
+        }
+
+alFrontendProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The frontend's process identifier."
+    ::= { alFrontendTableEntry 1 }
+
+alFrontendID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The frontend identifier."
+    ::= { alFrontendTableEntry 2 }
+
+alFrontendName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The frontend name."
+    ::= { alFrontendTableEntry 3 }
+
+alFrontendSessionCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { alFrontendTableEntry 4 }
+
+alFrontendSessionMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions."
+    ::= { alFrontendTableEntry 5 }
+
+alFrontendSessionLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit."
+    ::= { alFrontendTableEntry 6 }
+
+alFrontendSessionTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { alFrontendTableEntry 7 }
+
+alFrontendBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { alFrontendTableEntry 8 }
+
+alFrontendBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes outpout."
+    ::= { alFrontendTableEntry 9 }
+
+alFrontendErrorRequest OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Request errors."
+    ::= { alFrontendTableEntry 10 }
+
+alFrontendDenyRequest OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied requests."
+    ::= { alFrontendTableEntry 11 }
+
+alFrontendDenyResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied responses."
+    ::= { alFrontendTableEntry 12 }
+
+alFrontendStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend status."
+    ::= { alFrontendTableEntry 13 }
+
+alServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlServerTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of servers."
+    ::= { alStats 4 }
+
+alServerTableEntry OBJECT-TYPE
+    SYNTAX  AlServerTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the server table."
+    INDEX   { alServerProcessID, alServerBackendID, alServerID }
+    ::= { alServerTable 1 }
+
+AlServerTableEntry ::=
+    SEQUENCE {
+        alServerProcessID
+            INTEGER,
+        alServerBackendID
+            INTEGER,
+        alServerID
+            INTEGER,
+	alServerName
+	    OCTET STRING,
+	alServerQueueCur
+           Counter64,
+        alServerQueueMax
+           Counter64,
+        alServerQueueLimit
+           Counter64,
+	alServerSessionCur
+           Counter64 ,
+        alServerSessionMax
+           Counter64,
+        alServerSessionLimit
+           Counter64,
+        alServerSessionTotal
+           Counter64,
+        alServerSessionLoadBalanced
+           Counter64,
+        alServerBytesIN
+           Counter64,
+        alServerBytesOUT
+           Counter64,
+        alServerErrorConnection
+           Counter64,
+        alServerErrorResponse
+           Counter64,
+        alServerDenyResponse
+           Counter64,
+        alServerWarningRetry
+           Counter64,
+        alServerStatus
+           OCTET STRING,
+	alServerLastChange
+           Counter32,
+        alServerWeight
+           Counter32,
+        alServerActive
+           INTEGER,
+        alServerBackup
+           INTEGER,
+        alServerCheckFailure
+           Counter32,
+        alServerCheckDown
+           Counter32,
+        alServerDownTime
+           Counter32,
+        alServerThrottle
+           INTEGER
+        }
+
+alServerProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server's process identifier."
+    ::= { alServerTableEntry 1 }
+
+alServerBackendID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server's backend identifier."
+    ::= { alServerTableEntry 2 }
+
+alServerID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server identifier."
+    ::= { alServerTableEntry 3 }
+
+alServerName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server name."
+    ::= { alServerTableEntry 4 }
+
+alServerQueueCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions in queue."
+    ::= { alServerTableEntry 5 }
+
+alServerQueueMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions in queue."
+    ::= { alServerTableEntry 6 }
+
+alServerQueueLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions queue limit."
+    ::= { alServerTableEntry 7 }
+
+alServerSessionCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { alServerTableEntry 8 }
+
+alServerSessionMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions."
+    ::= { alServerTableEntry 9 }
+
+alServerSessionLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit."
+    ::= { alServerTableEntry 10 }
+
+alServerSessionTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { alServerTableEntry 11 }
+
+alServerSessionLoadBalanced OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Load balanced sessions."
+    ::= { alServerTableEntry 12 }
+
+alServerBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { alServerTableEntry 13 }
+
+alServerBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes output."
+    ::= { alServerTableEntry 14 }
+
+alServerErrorConnection OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection errors."
+    ::= { alServerTableEntry 15 }
+
+alServerErrorResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Response errors."
+    ::= { alServerTableEntry 16 }
+
+alServerDenyResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied responses."
+    ::= { alServerTableEntry 17 }
+
+alServerWarningRetry OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Retry warnigs."
+    ::= { alServerTableEntry 18 }
+
+alServerStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server status."
+    ::= { alServerTableEntry 19 }
+
+alServerLastChange OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last server status change."
+    ::= { alServerTableEntry 20 }
+
+alServerWeight OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server's weight."
+    ::= { alServerTableEntry 21 }
+
+alServerActive OBJECT-TYPE
+    SYNTAX  INTEGER { no(0), yes(1) } 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server is active."
+    ::= { alServerTableEntry 22 }
+
+alServerBackup OBJECT-TYPE
+    SYNTAX  INTEGER { no(0), yes(1) }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server is backup."
+    ::= { alServerTableEntry 23 }
+
+alServerCheckFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Check failure."
+    ::= { alServerTableEntry 24 }
+
+alServerCheckDown OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Checked down."
+    ::= { alServerTableEntry 25 }
+
+alServerDownTime OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total down time."
+    ::= { alServerTableEntry 26 }
+
+alServerThrottle OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server throttle."
+    ::= { alServerTableEntry 27 }
+
+
+alL4Stats OBJECT IDENTIFIER ::= { alcompat1 4 }
+
+alL4ProcessTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlL4ProcessTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of processes."
+    ::= { alL4Stats 1 }
+
+alL4ProcessTableEntry OBJECT-TYPE
+    SYNTAX  AlL4ProcessTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the process table."
+    INDEX   { alL4ProcessID }
+    ::= { alL4ProcessTable 1 }
+
+AlL4ProcessTableEntry ::=
+    SEQUENCE {
+        alL4ProcessID
+            INTEGER
+        }
+
+alL4ProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process identifier."
+    ::= { alL4ProcessTableEntry 1 }
+
+alL4DirectorTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlL4DirectorTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of directors."
+    ::= { alL4Stats 2 }
+
+alL4DirectorTableEntry OBJECT-TYPE
+    SYNTAX  AlL4DirectorTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the backends table."
+    INDEX   { alL4DirectorProcessID, alL4DirectorID }
+    ::= { alL4DirectorTable 1 }
+
+AlL4DirectorTableEntry ::=
+    SEQUENCE {
+        alL4DirectorProcessID
+            INTEGER,
+        alL4DirectorID
+            INTEGER,
+	alL4DirectorName
+	    OCTET STRING,
+	alL4DirectorSessionCur
+           Counter32,
+        alL4DirectorSessionTotal
+           Counter32,
+        alL4DirectorPacketsIN
+           Counter32,
+        alL4DirectorPacketsOUT
+           Counter32,
+        alL4DirectorBytesIN
+           Counter64,
+        alL4DirectorBytesOUT
+           Counter64,
+        alL4DirectorStatus
+           OCTET STRING
+        }
+
+alL4DirectorProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The director's process identifier."
+    ::= { alL4DirectorTableEntry 1 }
+
+alL4DirectorID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The director identifier."
+    ::= { alL4DirectorTableEntry 2 }
+
+alL4DirectorName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The director name."
+    ::= { alL4DirectorTableEntry 3 }
+
+alL4DirectorSessionCur OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { alL4DirectorTableEntry 4 }
+
+alL4DirectorSessionTotal OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { alL4DirectorTableEntry 5 }
+
+
+alL4DirectorPacketsIN OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Packets input."
+    ::= { alL4DirectorTableEntry 6 }
+
+alL4DirectorPacketsOUT OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Packets output."
+    ::= { alL4DirectorTableEntry 7 }
+
+alL4DirectorBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { alL4DirectorTableEntry 8 }
+
+alL4DirectorBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes output."
+    ::= { alL4DirectorTableEntry 9 }
+
+alL4DirectorStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The director status."
+    ::= { alL4DirectorTableEntry 10 }
+
+alL4ServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlL4ServerTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of servers."
+    ::= { alL4Stats 3 }
+
+alL4ServerTableEntry OBJECT-TYPE
+    SYNTAX  AlL4ServerTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the server table."
+    INDEX   { alL4ServerProcessID, alL4ServerDirectorID, alL4ServerID }
+    ::= { alL4ServerTable 1 }
+
+AlL4ServerTableEntry ::=
+    SEQUENCE {
+        alL4ServerProcessID
+            INTEGER,
+        alL4ServerDirectorID
+            INTEGER,
+        alL4ServerID
+            INTEGER,
+	alL4ServerName
+	    OCTET STRING,
+	alL4ServerSessionCur
+           Counter32 ,
+        alL4ServerSessionTotal
+           Counter32,
+        alL4ServerPacketsIN
+           Counter32,
+        alL4ServerPacketsOUT
+           Counter32,
+        alL4ServerBytesIN
+           Counter64,
+        alL4ServerBytesOUT
+           Counter64,
+        alL4ServerStatus
+           OCTET STRING,
+        alL4ServerWeight
+           Counter32,
+        alL4ServerActive
+           INTEGER,
+        alL4ServerBackup
+           INTEGER
+        }
+
+alL4ServerProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server's process identifier."
+    ::= { alL4ServerTableEntry 1 }
+
+alL4ServerDirectorID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server's backend identifier."
+    ::= { alL4ServerTableEntry 2 }
+
+alL4ServerID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server identifier."
+    ::= { alL4ServerTableEntry 3 }
+
+alL4ServerName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server name."
+    ::= { alL4ServerTableEntry 4 }
+
+alL4ServerSessionCur OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { alL4ServerTableEntry 5 }
+
+alL4ServerSessionTotal OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { alL4ServerTableEntry 6 }
+
+alL4ServerPacketsIN OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Packets input."
+    ::= { alL4ServerTableEntry 7 }
+
+alL4ServerPacketsOUT OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Packets output."
+    ::= { alL4ServerTableEntry 8 }
+
+alL4ServerBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { alL4ServerTableEntry 9 }
+
+alL4ServerBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes output."
+    ::= { alL4ServerTableEntry 10 }
+
+alL4ServerStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server status."
+    ::= { alL4ServerTableEntry 11 }
+
+alL4ServerWeight OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server's weight."
+    ::= { alL4ServerTableEntry 12 }
+
+alL4ServerActive OBJECT-TYPE
+    SYNTAX  INTEGER { no(0), yes(1) } 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server is active."
+    ::= { alL4ServerTableEntry 13 }
+
+alL4ServerBackup OBJECT-TYPE
+    SYNTAX  INTEGER { no(0), yes(1) }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server is backup."
+    ::= { alL4ServerTableEntry 14 }
+
+alHardwareInfo OBJECT IDENTIFIER ::= { alcompat1 5 }
+
+alHardwareModel OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Model Name"
+        ::= { alHardwareInfo 1 }
+
+alHardwareUUID OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Hardware UUID"
+        ::= { alHardwareInfo 2 }
+
+alHardwareETHID OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..65535))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                        "Harware ETHID"
+        ::= { alHardwareInfo 3 }
+
+alPshieldStats OBJECT IDENTIFIER ::= { alcompat1 6 }
+
+alPshieldInstanceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlPshieldInstanceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of packetshield's instances."
+    ::= { alPshieldStats 1 }
+
+alPshieldInstanceTableEntry OBJECT-TYPE
+    SYNTAX  AlPshieldInstanceTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the instances table."
+    INDEX   { alPshieldInstanceID }
+    ::= { alPshieldInstanceTable 1 }
+
+AlPshieldInstanceTableEntry ::=
+    SEQUENCE {
+        alPshieldInstanceID
+            INTEGER,
+	alPshieldInstanceName
+	    OCTET STRING,
+	alPshieldInstanceRxTotal
+	    Counter64,
+	alPshieldInstanceRxTotL3B
+	    Counter64,
+	alPshieldInstanceRxTotL1b
+	    Counter64,
+	alPshieldInstanceCaptureMissed
+	    Counter64,
+	alPshieldInstanceDelivered
+	    Counter64,
+	alPshieldInstanceDelivL3B
+	    Counter64,
+	alPshieldInstanceDelivL1b
+	    Counter64,
+	alPshieldInstanceResponses
+	    Counter64,
+	alPshieldInstanceTxTotal
+	    Counter64,
+	alPshieldInstanceSessionMax
+	    Gauge32,
+	alPshieldInstanceSessionOutgoing
+	    Gauge32,
+	alPshieldInstanceSessionUpload
+	    Gauge32,
+	alPshieldInstanceSessionIncoming
+	    Gauge32,
+	alPshieldInstanceSessionTotActive
+	    Gauge32,
+	alPshieldInstanceSessionSynActive
+	    Gauge32,
+	alPshieldInstanceSessionRstActive
+	    Gauge32,
+	alPshieldInstanceSessionAckActive
+	    Gauge32,
+	alPshieldInstanceSessionDnsActive
+	    Gauge32,
+	alPshieldInstanceSessionOutActive
+	    Gauge32,
+	alPshieldInstanceSessionRetransmit
+	    Gauge32,
+	alPshieldInstanceSessionForcedHash
+	    INTEGER,
+	alPshieldInstanceSessionForcedKernel
+	    INTEGER
+        }
+
+alPshieldInstanceID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The instance identifier."
+    ::= { alPshieldInstanceTableEntry 1 }
+
+alPshieldInstanceName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The instance name."
+    ::= { alPshieldInstanceTableEntry 2 }
+
+alPshieldInstanceRxTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total RX packets."
+    ::= { alPshieldInstanceTableEntry 3 }
+
+alPshieldInstanceRxTotL3B OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total RX L3 bandwidth in Bytes/s."
+    ::= { alPshieldInstanceTableEntry 4 }
+
+alPshieldInstanceRxTotL1b OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total RX L1 bandwidth in bits/s."
+    ::= { alPshieldInstanceTableEntry 5 }
+
+alPshieldInstanceCaptureMissed OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of RX packets missed for capture."
+    ::= { alPshieldInstanceTableEntry 6 }
+
+alPshieldInstanceDelivered OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of RX packets delivered to the system."
+    ::= { alPshieldInstanceTableEntry 7 }
+
+alPshieldInstanceDelivL3B OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of RX L3 bandwidth delivered to the system in Bytes/s."
+    ::= { alPshieldInstanceTableEntry 8 }
+
+alPshieldInstanceDelivL1b OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of RX L1 bandwidth delivered to the system in bits/s."
+    ::= { alPshieldInstanceTableEntry 9 }
+
+alPshieldInstanceResponses OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total responded packets (syn cookies)."
+    ::= { alPshieldInstanceTableEntry 10 }
+
+alPshieldInstanceTxTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total TX packets."
+    ::= { alPshieldInstanceTableEntry 11 }
+
+alPshieldInstanceSessionMax OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum number of sessions."
+    ::= { alPshieldInstanceTableEntry 12 }
+
+alPshieldInstanceSessionOutgoing OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Active outgoing sessions."
+    ::= { alPshieldInstanceTableEntry 13 }
+
+alPshieldInstanceSessionUpload OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Active upload sessions."
+    ::= { alPshieldInstanceTableEntry 14 }
+
+alPshieldInstanceSessionIncoming OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Active incoming sessions."
+    ::= { alPshieldInstanceTableEntry 15 }
+
+alPshieldInstanceSessionTotActive OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total of active sessions."
+    ::= { alPshieldInstanceTableEntry 16 }
+
+alPshieldInstanceSessionSynActive OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total of active sessions for SYN packets."
+    ::= { alPshieldInstanceTableEntry 17 }
+
+alPshieldInstanceSessionRstActive OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total of active sessions for RST packets."
+    ::= { alPshieldInstanceTableEntry 18 }
+
+alPshieldInstanceSessionAckActive OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total of active sessions for ACK packets."
+    ::= { alPshieldInstanceTableEntry 19 }
+
+alPshieldInstanceSessionDnsActive OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total of active sessions for DNS packets."
+    ::= { alPshieldInstanceTableEntry 20 }
+
+alPshieldInstanceSessionOutActive OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total of active sessions for outgoing packets."
+    ::= { alPshieldInstanceTableEntry 21 }
+
+alPshieldInstanceSessionRetransmit OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total of active sessions for retransmit validation."
+    ::= { alPshieldInstanceTableEntry 22 }
+
+alPshieldInstanceSessionForcedHash OBJECT-TYPE
+    SYNTAX  INTEGER 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last forced syncookie's hash timer in jiffies."
+    ::= { alPshieldInstanceTableEntry 23 }
+
+alPshieldInstanceSessionForcedKernel OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last forced kernel's syncookie protection timer in jiffies."
+    ::= { alPshieldInstanceTableEntry 24 }
+
+alPshieldContextTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AlPshieldContextTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of packetshield's context."
+    ::= { alPshieldStats 2 }
+
+alPshieldContextTableEntry OBJECT-TYPE
+    SYNTAX  AlPshieldContextTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the packetshield's contexts table."
+    INDEX   { alPshieldContextInstanceID, alPshieldContextID }
+    ::= { alPshieldContextTable 1 }
+
+AlPshieldContextTableEntry ::=
+    SEQUENCE {
+        alPshieldContextInstanceID
+            INTEGER,
+        alPshieldContextID
+            INTEGER,
+	alPshieldContextName
+	    OCTET STRING,
+	alPshieldContextStatus
+	    BITS,
+	alPshieldContextRxTotal
+           Counter64,
+	alPshieldContextInvalid
+           Counter64,
+	alPshieldContextWhitelisted
+           Counter64,
+	alPshieldContextFiltered
+           Counter64,
+	alPshieldContextOutRelated
+           Counter64,
+	alPshieldContextDnsResponses
+           Counter64,
+	alPshieldContextSyn
+           Counter64,
+	alPshieldContextRst
+           Counter64,
+	alPshieldContextAck
+           Counter64,
+	alPshieldContextUnknownTtl
+           Counter64,
+	alPshieldContextTtlFiltered
+           Counter64,
+	alPshieldContextEstablished
+           Counter64,
+	alPshieldContextNewConnections
+           Counter64,
+	alPshieldContextUnmatched
+           Counter64,
+	alPshieldContextSynCookie
+           Counter64,
+	alPshieldContextDropSyn
+           Counter64,
+	alPshieldContextDropRst
+           Counter64,
+	alPshieldContextDropAck
+           Counter64,
+	alPshieldContextDelivered
+           Counter64,
+	alPshieldContextTxTotal
+           Counter64
+        }
+
+alPshieldContextInstanceID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The context's instance identifier."
+    ::= { alPshieldContextTableEntry 1 }
+
+alPshieldContextID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The context's identifier."
+    ::= { alPshieldContextTableEntry 2 }
+
+alPshieldContextName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The context name."
+    ::= { alPshieldContextTableEntry 3 }
+
+alPshieldContextStatus OBJECT-TYPE
+    SYNTAX  BITS { none(0), syncookie(1), unkownttl(2), unmatched(4), surge(8) } 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The context status."
+    ::= { alPshieldContextTableEntry 4 }
+
+alPshieldContextRxTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total RX packets."
+    ::= { alPshieldContextTableEntry 5 }
+
+alPshieldContextInvalid OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total filtered invalid packets."
+    ::= { alPshieldContextTableEntry 6 }
+
+alPshieldContextWhitelisted OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total forwarded packets because whitelisted."
+    ::= { alPshieldContextTableEntry 7 }
+
+alPshieldContextFiltered OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total filtered packets considering the port, protocol or sources policies."
+    ::= { alPshieldContextTableEntry 8 }
+
+alPshieldContextOutRelated OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total forwarded packets because they match an existing outgoing session."
+    ::= { alPshieldContextTableEntry 9 }
+
+alPshieldContextDnsResponses OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total forwarded DNS responses because they match an existing DNS request in session table."
+    ::= { alPshieldContextTableEntry 10 }
+
+alPshieldContextSyn OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total SYN packets received on protected tcp ports."
+    ::= { alPshieldContextTableEntry 11 }
+
+alPshieldContextRst OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total RST packets received on protected tcp ports."
+    ::= { alPshieldContextTableEntry 12 }
+
+alPshieldContextAck OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total ACK packets received on protected tcp ports."
+    ::= { alPshieldContextTableEntry 13 }
+
+alPshieldContextUnknownTtl OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total packets with unknown TTL value."
+    ::= { alPshieldContextTableEntry 14 }
+
+alPshieldContextTtlFiltered OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total packets filtered due to unknown TTL value."
+    ::= { alPshieldContextTableEntry 15 }
+
+alPshieldContextEstablished OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total packets forwarded because matching an existing session."
+    ::= { alPshieldContextTableEntry 16 }
+
+alPshieldContextNewConnections OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of SYN packets considered as new connections."
+    ::= { alPshieldContextTableEntry 17 }
+
+alPshieldContextUnmatched OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of ACK/RST packets which don't match any session."
+    ::= { alPshieldContextTableEntry 18 }
+
+alPshieldContextSynCookie OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of generated SYN+ACK syncookied packets."
+    ::= { alPshieldContextTableEntry 19 }
+
+alPshieldContextDropSyn OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of SYN packets dropped on protected port."
+    ::= { alPshieldContextTableEntry 20 }
+
+alPshieldContextDropRst OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of Rst packets dropped on protected port."
+    ::= { alPshieldContextTableEntry 21 }
+
+alPshieldContextDropAck OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of Ack packets dropped on protected port."
+    ::= { alPshieldContextTableEntry 22 }
+
+alPshieldContextDelivered OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of packets delivered to system."
+    ::= { alPshieldContextTableEntry 23 }
+
+alPshieldContextTxTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The total of packets sent by the system."
+    ::= { alPshieldContextTableEntry 24 }
+
+hapee OBJECT IDENTIFIER ::= { products 3 }
+
+lbcompat1 OBJECT IDENTIFIER ::= { hapee 1 }
+
+lbProductInfo OBJECT IDENTIFIER ::= { lbcompat1 1 }
+
+lbStats  OBJECT IDENTIFIER ::= { lbcompat1 3 }
+
+lbProcessTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LbProcessTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of processes."
+    ::= { lbStats 1 }
+
+lbProcessTableEntry OBJECT-TYPE
+    SYNTAX  LbProcessTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the process table."
+    INDEX   { lbProcessID }
+    ::= { lbProcessTable 1 }
+
+LbProcessTableEntry ::=
+    SEQUENCE {
+        lbProcessID
+            INTEGER,
+        lbProcessVersion
+            OCTET STRING,
+        lbProcessReleaseDate
+            OCTET STRING,
+        lbProcessNbProc
+            INTEGER,
+        lbProcessProductName
+            OCTET STRING,
+        lbProcessSystemPID
+            INTEGER,
+        lbProcessUptime
+            OCTET STRING,
+        lbProcessUptimeSec
+            INTEGER,
+	lbProcessMemMax
+            INTEGER,
+	lbProcessPoolAlloc
+            INTEGER,
+	lbProcessPoolUsed
+            INTEGER,
+	lbProcessPoolFailed
+            Counter32,
+	lbProcessUlimitn
+            INTEGER,
+	lbProcessMaxSock
+            INTEGER,
+	lbProcessMaxConn
+            INTEGER,
+	lbProcessHardMaxConn
+            INTEGER,
+	lbProcessCurConn
+            INTEGER,
+	lbProcessCumConn
+            Counter32,
+	lbProcessCumReq
+            Counter32,
+	lbProcessMaxSslConn
+            INTEGER,
+	lbProcessCurSslConn
+            INTEGER,
+	lbProcessCumSslConn
+            Counter32,
+	lbProcessMaxPipes
+            INTEGER,
+	lbProcessPipesUsed
+            INTEGER,
+	lbProcessPipesFree
+            INTEGER,
+	lbProcessConnRate
+            INTEGER,
+	lbProcessConnRateLimit
+            INTEGER,
+	lbProcessMaxConnRate
+            INTEGER,
+	lbProcessSessRate
+            INTEGER,
+	lbProcessSessRateLimit
+            INTEGER,
+	lbProcessMaxSessRate
+            INTEGER,
+	lbProcessSslRate
+            INTEGER,
+	lbProcessSslRateLimit
+            INTEGER,
+	lbProcessMaxSslRate
+            INTEGER,
+	lbProcessSslFrontendKeyRate
+            INTEGER,
+	lbProcessMaxSslFrontendKeyRate
+            INTEGER,
+	lbProcessSslFrontendSessReuse
+            INTEGER,
+	lbProcessSslBackendKeyRate
+            INTEGER,
+	lbProcessMaxSslBackendKeyRate
+            INTEGER,
+	lbProcessSslCacheLookups
+            Counter32,
+	lbProcessSslCacheMisses
+            Counter32,
+	lbProcessCompressBpsIn
+            INTEGER,
+	lbProcessCompressBpsOut
+            INTEGER,
+	lbProcessCompressRateLimit
+            INTEGER,
+	lbProcessZlibMemUsage
+            INTEGER,
+	lbProcessMaxZlibMemUsage
+            INTEGER,
+	lbProcessTasks
+            INTEGER,
+	lbProcessRunQueue
+            INTEGER,
+	lbProcessIdle
+            INTEGER,
+        lbProcessNodeName
+            OCTET STRING,
+        lbProcessDescription
+            OCTET STRING
+        }
+
+lbProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process identifier."
+    ::= { lbProcessTableEntry 1 }
+
+lbProcessVersion OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The L7 process version."
+    ::= { lbProcessTableEntry 2 }
+
+lbProcessReleaseDate OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The L7 process release date."
+    ::= { lbProcessTableEntry 3 }
+
+lbProcessNbProc OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The number of process and sub processes."
+    ::= { lbProcessTableEntry 4 }
+
+lbProcessProductName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The L7 process name."
+    ::= { lbProcessTableEntry 5 }
+
+lbProcessSystemPID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process system PID."
+    ::= { lbProcessTableEntry 6 }
+
+lbProcessUptime OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process Up time."
+    ::= { lbProcessTableEntry 7 }
+
+lbProcessUptimeSec OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process Up time in seconds."
+    ::= { lbProcessTableEntry 8 }
+
+lbProcessMemMax OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The process max memory usage in MegaBytes."
+    ::= { lbProcessTableEntry 9 }
+
+lbProcessPoolAlloc OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of MegaBytes allocated in memory pools."
+    ::= { lbProcessTableEntry 10 }
+
+lbProcessPoolUsed OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of MegaBytes used in memory pools."
+    ::= { lbProcessTableEntry 11 }
+
+lbProcessPoolFailed OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of failed from memory pools."
+    ::= { lbProcessTableEntry 12 }
+
+lbProcessUlimitn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ulimit -n value for current process."
+    ::= { lbProcessTableEntry 13 }
+
+lbProcessMaxSock OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "maximum socket for current process."
+    ::= { lbProcessTableEntry 14 }
+
+lbProcessMaxConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Configured maximum of connections for current process."
+    ::= { lbProcessTableEntry 15 }
+
+lbProcessHardMaxConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Hard configured maximum of connections for current process."
+    ::= { lbProcessTableEntry 16 }
+
+lbProcessCurConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current number of connections for current process."
+    ::= { lbProcessTableEntry 17 }
+
+lbProcessCumConn OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of connections for current process."
+    ::= { lbProcessTableEntry 18 }
+
+lbProcessCumReq OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of requests for current process."
+    ::= { lbProcessTableEntry 19 }
+
+lbProcessMaxSslConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum of ssl connections for current process."
+    ::= { lbProcessTableEntry 20 }
+
+lbProcessCurSslConn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current number of ssl connections for current process."
+    ::= { lbProcessTableEntry 21 }
+
+lbProcessCumSslConn OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of ssl connections for current process."
+    ::= { lbProcessTableEntry 22 }
+
+lbProcessMaxPipes OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max number of pipes for current process."
+    ::= { lbProcessTableEntry 23 }
+
+lbProcessPipesUsed OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of pipes used by current process."
+    ::= { lbProcessTableEntry 24 }
+
+lbProcessPipesFree OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of free pipes for current process."
+    ::= { lbProcessTableEntry 25 }
+
+lbProcessConnRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection rate on current process."
+    ::= { lbProcessTableEntry 26 }
+
+lbProcessConnRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection rate limit for current process."
+    ::= { lbProcessTableEntry 27 }
+
+lbProcessMaxConnRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max connection rate reached by current process."
+    ::= { lbProcessTableEntry 28 }
+
+lbProcessSessRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Session rate on current process."
+    ::= { lbProcessTableEntry 29 }
+
+lbProcessSessRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Session rate limit for current process."
+    ::= { lbProcessTableEntry 30 }
+
+lbProcessMaxSessRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max session rate reached by current process."
+    ::= { lbProcessTableEntry 31 }
+
+lbProcessSslRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl session rate on current process."
+    ::= { lbProcessTableEntry 32 }
+
+lbProcessSslRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl session rate limit for current process."
+    ::= { lbProcessTableEntry 33 }
+
+lbProcessMaxSslRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max ssl session rate reached by current process."
+    ::= { lbProcessTableEntry 34 }
+
+lbProcessSslFrontendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl key rate on frontend side for current process."
+    ::= { lbProcessTableEntry 35 }
+
+lbProcessMaxSslFrontendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max key rate on frontend side for current process."
+    ::= { lbProcessTableEntry 36 }
+
+lbProcessSslFrontendSessReuse OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Percent of ssl session reuse on frontend side for current process."
+    ::= { lbProcessTableEntry 37 }
+
+lbProcessSslBackendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Ssl key rate on backend side for current process."
+    ::= { lbProcessTableEntry 38 }
+
+lbProcessMaxSslBackendKeyRate OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Max key rate on backend side for current process."
+    ::= { lbProcessTableEntry 39 }
+
+lbProcessSslCacheLookups OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of lookups in cache."
+    ::= { lbProcessTableEntry 40 }
+
+lbProcessSslCacheMisses OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Counter of unmatching lookups in cache."
+    ::= { lbProcessTableEntry 41 }
+
+lbProcessCompressBpsIn OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Compression bandwidth in input."
+    ::= { lbProcessTableEntry 42 }
+
+lbProcessCompressBpsOut OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Compression bandwidth in output."
+    ::= { lbProcessTableEntry 43 }
+
+lbProcessCompressRateLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Compression bandwidth limit."
+    ::= { lbProcessTableEntry 44 }
+
+lbProcessZlibMemUsage OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Zlib memory usage in Bytes."
+    ::= { lbProcessTableEntry 45 }
+
+lbProcessMaxZlibMemUsage OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum limit of zlib memory usage in Bytes."
+    ::= { lbProcessTableEntry 46 }
+
+lbProcessTasks OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of tasks for current process."
+    ::= { lbProcessTableEntry 47 }
+
+lbProcessRunQueue OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Number of scheduled tasks for current process."
+    ::= { lbProcessTableEntry 48 }
+
+lbProcessIdle OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Idle time in percent."
+    ::= { lbProcessTableEntry 49 }
+
+lbProcessNodeName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The node's name."
+    ::= { lbProcessTableEntry 50 }
+
+lbProcessDescription OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Configured description."
+    ::= { lbProcessTableEntry 51 }
+
+lbBackendTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LbBackendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of backends."
+    ::= { lbStats 3 }
+
+lbBackendTableEntry OBJECT-TYPE
+    SYNTAX  LbBackendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the backends table."
+    INDEX   { lbBackendProcessID, lbBackendID }
+    ::= { lbBackendTable 1 }
+
+LbBackendTableEntry ::=
+    SEQUENCE {
+        lbBackendProcessID
+            INTEGER,
+        lbBackendID
+            INTEGER,
+	lbBackendName
+	    OCTET STRING,
+	lbBackendQueueCur
+           Counter64 ,
+        lbBackendQueueMax
+           Counter64,
+        lbBackendQueueLimit
+           Counter64,
+	lbBackendSessionCur
+           Counter64 ,
+        lbBackendSessionMax
+           Counter64,
+        lbBackendSessionLimit
+           Counter64,
+        lbBackendSessionTotal
+           Counter64,
+        lbBackendSessionLoadBalanced
+           Counter64,
+        lbBackendBytesIN
+           Counter64,
+        lbBackendBytesOUT
+           Counter64,
+        lbBackendErrorConnection
+           Counter64,
+        lbBackendErrorResponse
+           Counter64,
+        lbBackendDenyRequest
+           Counter64,
+        lbBackendDenyResponse
+           Counter64,
+        lbBackendWarningRetry
+           Counter64,
+        lbBackendWarningRedispatch
+           Counter64,
+        lbBackendStatus
+           OCTET STRING,
+        lbBackendLastChange
+           Counter32,
+        lbBackendCheckDown
+           Counter32,
+        lbBackendDownTime
+           Counter32
+        }
+
+lbBackendProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend's process identifier."
+    ::= { lbBackendTableEntry 1 }
+
+lbBackendID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend identifier."
+    ::= { lbBackendTableEntry 2 }
+
+lbBackendName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend name."
+    ::= { lbBackendTableEntry 3 }
+
+lbBackendQueueCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend identifier."
+    ::= { lbBackendTableEntry 4 }
+
+lbBackendQueueMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions in queue."
+    ::= { lbBackendTableEntry 5 }
+
+lbBackendQueueLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit in queue."
+    ::= { lbBackendTableEntry 6 }
+
+lbBackendSessionCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { lbBackendTableEntry 7 }
+
+lbBackendSessionMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions."
+    ::= { lbBackendTableEntry 8 }
+
+lbBackendSessionLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit."
+    ::= { lbBackendTableEntry 9 }
+
+lbBackendSessionTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { lbBackendTableEntry 10 }
+
+lbBackendSessionLoadBalanced OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Load balanced sessions."
+    ::= { lbBackendTableEntry 11 }
+
+lbBackendBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { lbBackendTableEntry 12 }
+
+lbBackendBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes output."
+    ::= { lbBackendTableEntry 13 }
+
+lbBackendErrorConnection OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection errors."
+    ::= { lbBackendTableEntry 14 }
+
+lbBackendErrorResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Response errors."
+    ::= { lbBackendTableEntry 15 }
+
+lbBackendDenyRequest OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied requests."
+    ::= { lbBackendTableEntry 16 }
+
+lbBackendDenyResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied responses."
+    ::= { lbBackendTableEntry 17 }
+
+lbBackendWarningRetry OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Retry warnings."
+    ::= { lbBackendTableEntry 18 }
+
+lbBackendWarningRedispatch OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Redispatch warnings."
+    ::= { lbBackendTableEntry 19 }
+
+lbBackendStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend status."
+    ::= { lbBackendTableEntry 20 }
+
+lbBackendLastChange OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend last status change."
+    ::= { lbBackendTableEntry 21 }
+
+lbBackendCheckDown OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Checked down."
+    ::= { lbBackendTableEntry 22 }
+
+lbBackendDownTime OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total down time."
+    ::= { lbBackendTableEntry 23 }
+
+lbFrontendTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LbFrontendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of frontends."
+    ::= { lbStats 2 }
+
+lbFrontendTableEntry OBJECT-TYPE
+    SYNTAX  LbFrontendTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the backend table."
+    INDEX   { lbFrontendProcessID, lbFrontendID }
+    ::= { lbFrontendTable 1 }
+
+LbFrontendTableEntry ::=
+    SEQUENCE {
+        lbFrontendProcessID
+            INTEGER,
+        lbFrontendID
+            INTEGER,
+	lbFrontendName
+	    OCTET STRING,
+	lbFrontendSessionCur
+           Counter64 ,
+        lbFrontendSessionMax
+           Counter64,
+        lbFrontendSessionLimit
+           Counter64,
+        lbFrontendSessionTotal
+           Counter64,
+        lbFrontendBytesIN
+           Counter64,
+        lbFrontendBytesOUT
+           Counter64,
+        lbFrontendErrorRequest
+           Counter64,
+        lbFrontendDenyRequest
+           Counter64,
+        lbFrontendDenyResponse
+           Counter64,
+        lbFrontendStatus
+           OCTET STRING
+        }
+
+lbFrontendProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The frontend's process identifier."
+    ::= { lbFrontendTableEntry 1 }
+
+lbFrontendID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The frontend identifier."
+    ::= { lbFrontendTableEntry 2 }
+
+lbFrontendName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The frontend name."
+    ::= { lbFrontendTableEntry 3 }
+
+lbFrontendSessionCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { lbFrontendTableEntry 4 }
+
+lbFrontendSessionMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions."
+    ::= { lbFrontendTableEntry 5 }
+
+lbFrontendSessionLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit."
+    ::= { lbFrontendTableEntry 6 }
+
+lbFrontendSessionTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { lbFrontendTableEntry 7 }
+
+lbFrontendBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { lbFrontendTableEntry 8 }
+
+lbFrontendBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes outpout."
+    ::= { lbFrontendTableEntry 9 }
+
+lbFrontendErrorRequest OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Request errors."
+    ::= { lbFrontendTableEntry 10 }
+
+lbFrontendDenyRequest OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied requests."
+    ::= { lbFrontendTableEntry 11 }
+
+lbFrontendDenyResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied responses."
+    ::= { lbFrontendTableEntry 12 }
+
+lbFrontendStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The backend status."
+    ::= { lbFrontendTableEntry 13 }
+
+lbServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LbServerTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table of servers."
+    ::= { lbStats 4 }
+
+lbServerTableEntry OBJECT-TYPE
+    SYNTAX  LbServerTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A row in the server table."
+    INDEX   { lbServerProcessID, lbServerBackendID, lbServerID }
+    ::= { lbServerTable 1 }
+
+LbServerTableEntry ::=
+    SEQUENCE {
+        lbServerProcessID
+            INTEGER,
+        lbServerBackendID
+            INTEGER,
+        lbServerID
+            INTEGER,
+	lbServerName
+	    OCTET STRING,
+	lbServerQueueCur
+           Counter64,
+        lbServerQueueMax
+           Counter64,
+        lbServerQueueLimit
+           Counter64,
+	lbServerSessionCur
+           Counter64 ,
+        lbServerSessionMax
+           Counter64,
+        lbServerSessionLimit
+           Counter64,
+        lbServerSessionTotal
+           Counter64,
+        lbServerSessionLoadBalanced
+           Counter64,
+        lbServerBytesIN
+           Counter64,
+        lbServerBytesOUT
+           Counter64,
+        lbServerErrorConnection
+           Counter64,
+        lbServerErrorResponse
+           Counter64,
+        lbServerDenyResponse
+           Counter64,
+        lbServerWarningRetry
+           Counter64,
+        lbServerStatus
+           OCTET STRING,
+	lbServerLastChange
+           Counter32,
+        lbServerWeight
+           Counter32,
+        lbServerActive
+           INTEGER,
+        lbServerBackup
+           INTEGER,
+        lbServerCheckFailure
+           Counter32,
+        lbServerCheckDown
+           Counter32,
+        lbServerDownTime
+           Counter32,
+        lbServerThrottle
+           INTEGER
+        }
+
+lbServerProcessID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server's process identifier."
+    ::= { lbServerTableEntry 1 }
+
+lbServerBackendID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server's backend identifier."
+    ::= { lbServerTableEntry 2 }
+
+lbServerID OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server identifier."
+    ::= { lbServerTableEntry 3 }
+
+lbServerName OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server name."
+    ::= { lbServerTableEntry 4 }
+
+lbServerQueueCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions in queue."
+    ::= { lbServerTableEntry 5 }
+
+lbServerQueueMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions in queue."
+    ::= { lbServerTableEntry 6 }
+
+lbServerQueueLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions queue limit."
+    ::= { lbServerTableEntry 7 }
+
+lbServerSessionCur OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Current sessions."
+    ::= { lbServerTableEntry 8 }
+
+lbServerSessionMax OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Maximum sessions."
+    ::= { lbServerTableEntry 9 }
+
+lbServerSessionLimit OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Sessions limit."
+    ::= { lbServerTableEntry 10 }
+
+lbServerSessionTotal OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total sessions."
+    ::= { lbServerTableEntry 11 }
+
+lbServerSessionLoadBalanced OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Load balanced sessions."
+    ::= { lbServerTableEntry 12 }
+
+lbServerBytesIN OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes input."
+    ::= { lbServerTableEntry 13 }
+
+lbServerBytesOUT OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Bytes output."
+    ::= { lbServerTableEntry 14 }
+
+lbServerErrorConnection OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Connection errors."
+    ::= { lbServerTableEntry 15 }
+
+lbServerErrorResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Response errors."
+    ::= { lbServerTableEntry 16 }
+
+lbServerDenyResponse OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Denied responses."
+    ::= { lbServerTableEntry 17 }
+
+lbServerWarningRetry OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Retry warnigs."
+    ::= { lbServerTableEntry 18 }
+
+lbServerStatus OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The server status."
+    ::= { lbServerTableEntry 19 }
+
+lbServerLastChange OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last server status change."
+    ::= { lbServerTableEntry 20 }
+
+lbServerWeight OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server's weight."
+    ::= { lbServerTableEntry 21 }
+
+lbServerActive OBJECT-TYPE
+    SYNTAX  INTEGER { no(0), yes(1) } 
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server is active."
+    ::= { lbServerTableEntry 22 }
+
+lbServerBackup OBJECT-TYPE
+    SYNTAX  INTEGER { no(0), yes(1) }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server is backup."
+    ::= { lbServerTableEntry 23 }
+
+lbServerCheckFailure OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Check failure."
+    ::= { lbServerTableEntry 24 }
+
+lbServerCheckDown OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Checked down."
+    ::= { lbServerTableEntry 25 }
+
+lbServerDownTime OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Total down time."
+    ::= { lbServerTableEntry 26 }
+
+lbServerThrottle OBJECT-TYPE
+    SYNTAX  INTEGER (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Server throttle."
+    ::= { lbServerTableEntry 27 }
+
+landefgroups OBJECT IDENTIFIER ::= { landef 2 }
+
+landefObjectGroup OBJECT-GROUP
+    OBJECTS {
+        attackNumber,
+	acceptedPqts,
+	droppedPqts,
+	serviceName,
+	serviceStatus,
+	lastIP,
+	dnsName,
+	hostStatus,
+	os,
+	osDetails,
+	uptime,
+	netbiosName,
+	netbiosUser,
+	workgroup,
+	hostServer,
+	manufacturer
+    }
+    STATUS  current
+    DESCRIPTION
+        "LANdef Objects"
+    ::= { landefgroups 1 }
+
+algroups OBJECT IDENTIFIER ::= { aloha 2 }
+
+alTrapNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        eNotificationMsg,
+	alTrap
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Trap Notifs"
+    ::= { algroups 1 }
+
+alTrapGroup OBJECT-GROUP
+    OBJECTS {
+	alTrapId,
+	alTrapMsg,
+	alTrapName
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Trap Objects"
+    ::= { algroups 2 }
+
+alProductGroup OBJECT-GROUP
+    OBJECTS {
+        alProductName,
+        alProductModel,
+        alProductVersion,
+        alProductSubVersion,
+        alProductBuildVersion,
+        alProductBuildDate,
+        alProductURL
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Products Objects"
+    ::= { algroups 3 }
+
+alServiceGroup OBJECT-GROUP
+    OBJECTS {
+        alServiceID,
+        alServiceName,
+        alServiceStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Service Objects"
+    ::= { algroups 4 }
+
+alInstanceGroup OBJECT-GROUP
+    OBJECTS {
+        alInstanceServiceID,
+        alInstanceID,
+        alInstanceName,
+        alInstanceStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Instance Objects"
+    ::= { algroups 5 }
+
+alProcessGroup OBJECT-GROUP
+    OBJECTS {
+        alProcessID,
+        alProcessVersion,
+        alProcessReleaseDate,
+        alProcessNbProc,
+        alProcessProductName,
+        alProcessSystemPID,
+        alProcessUptime,
+        alProcessUptimeSec,
+	alProcessMemMax,
+	alProcessPoolAlloc,
+	alProcessPoolUsed,
+	alProcessPoolFailed,
+	alProcessUlimitn,
+	alProcessMaxSock,
+	alProcessMaxConn,
+	alProcessHardMaxConn,
+	alProcessCurConn,
+	alProcessCumConn,
+	alProcessCumReq,
+	alProcessMaxSslConn,
+	alProcessCurSslConn,
+	alProcessCumSslConn,
+	alProcessMaxPipes,
+	alProcessPipesUsed,
+	alProcessPipesFree,
+	alProcessConnRate,
+	alProcessConnRateLimit,
+	alProcessMaxConnRate,
+	alProcessSessRate,
+	alProcessSessRateLimit,
+	alProcessMaxSessRate,
+	alProcessSslRate,
+	alProcessSslRateLimit,
+	alProcessMaxSslRate,
+	alProcessSslFrontendKeyRate,
+	alProcessMaxSslFrontendKeyRate,
+	alProcessSslFrontendSessReuse,
+	alProcessSslBackendKeyRate,
+	alProcessMaxSslBackendKeyRate,
+	alProcessSslCacheLookups,
+	alProcessSslCacheMisses,
+	alProcessCompressBpsIn,
+	alProcessCompressBpsOut,
+	alProcessCompressRateLimit,
+	alProcessZlibMemUsage,
+	alProcessMaxZlibMemUsage,
+	alProcessTasks,
+	alProcessRunQueue,
+	alProcessIdle,
+        alProcessNodeName,
+        alProcessDescription
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Process Objects"
+    ::= { algroups 6 }
+
+alBackendGroup OBJECT-GROUP
+    OBJECTS {
+       alBackendProcessID,
+       alBackendID,
+       alBackendName,
+       alBackendQueueCur,
+       alBackendQueueMax,
+       alBackendQueueLimit,
+       alBackendSessionCur,
+       alBackendSessionMax,
+       alBackendSessionLimit,
+       alBackendSessionTotal,
+       alBackendSessionLoadBalanced,
+       alBackendBytesIN,
+       alBackendBytesOUT,
+       alBackendErrorConnection,
+       alBackendErrorResponse,
+       alBackendDenyRequest,
+       alBackendDenyResponse,
+       alBackendWarningRetry,
+       alBackendWarningRedispatch,
+       alBackendStatus,
+       alBackendLastChange,
+       alBackendCheckDown,
+       alBackendDownTime
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Backend Objects"
+    ::= { algroups 7 }
+
+alFrontendGroup OBJECT-GROUP
+    OBJECTS {
+        alFrontendProcessID,
+        alFrontendID,
+        alFrontendName,
+        alFrontendSessionCur,
+        alFrontendSessionMax,
+        alFrontendSessionLimit,
+        alFrontendSessionTotal,
+        alFrontendBytesIN,
+        alFrontendBytesOUT,
+        alFrontendErrorRequest,
+        alFrontendDenyRequest,
+        alFrontendDenyResponse,
+        alFrontendStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Frontend Objects"
+    ::= { algroups 8 }
+
+alServerGroup OBJECT-GROUP
+    OBJECTS {
+        alServerProcessID,
+        alServerBackendID,
+        alServerID,
+        alServerName,
+        alServerQueueCur,
+        alServerQueueMax,
+        alServerQueueLimit,
+        alServerSessionCur,
+        alServerSessionMax,
+        alServerSessionLimit,
+        alServerSessionTotal,
+        alServerSessionLoadBalanced,
+        alServerBytesIN,
+        alServerBytesOUT,
+        alServerErrorConnection,
+        alServerErrorResponse,
+        alServerDenyResponse,
+        alServerWarningRetry,
+        alServerStatus,
+        alServerLastChange,
+        alServerWeight,
+        alServerActive,
+        alServerBackup,
+        alServerCheckFailure,
+        alServerCheckDown,
+        alServerDownTime,
+        alServerThrottle
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Server Objects"
+    ::= { algroups 9 }
+
+alL4ProcessGroup OBJECT-GROUP
+    OBJECTS {
+        alL4ProcessID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha L4 Process Objects"
+    ::= { algroups 10 }
+
+alL4DirectorGroup OBJECT-GROUP
+    OBJECTS {
+        alL4DirectorProcessID,
+        alL4DirectorID,
+        alL4DirectorName,
+        alL4DirectorSessionCur,
+        alL4DirectorSessionTotal,
+        alL4DirectorPacketsIN,
+        alL4DirectorPacketsOUT,
+        alL4DirectorBytesIN,
+        alL4DirectorBytesOUT,
+        alL4DirectorStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha L4 Director Objects"
+    ::= { algroups 11 }
+
+alL4ServerGroup OBJECT-GROUP
+    OBJECTS {
+        alL4ServerProcessID,
+        alL4ServerDirectorID,
+        alL4ServerID,
+        alL4ServerName,
+        alL4ServerSessionCur,
+        alL4ServerSessionTotal,
+        alL4ServerPacketsIN,
+        alL4ServerPacketsOUT,
+        alL4ServerBytesIN,
+        alL4ServerBytesOUT,
+        alL4ServerStatus,
+        alL4ServerWeight,
+        alL4ServerActive,
+        alL4ServerBackup
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha L4 Server Objects"
+    ::= { algroups 12 }
+
+alHardwareInfoGroup OBJECT-GROUP
+    OBJECTS {
+        alHardwareModel,
+        alHardwareUUID,
+        alHardwareETHID
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha HardwareInfo Objects"
+    ::= { algroups 13 }
+
+alPshieldInstanceGroup OBJECT-GROUP
+    OBJECTS {
+        alPshieldInstanceID,
+	alPshieldInstanceName,
+	alPshieldInstanceRxTotal,
+	alPshieldInstanceRxTotL3B,
+	alPshieldInstanceRxTotL1b,
+	alPshieldInstanceCaptureMissed,
+	alPshieldInstanceDelivered,
+	alPshieldInstanceDelivL3B,
+	alPshieldInstanceDelivL1b,
+	alPshieldInstanceResponses,
+	alPshieldInstanceTxTotal,
+	alPshieldInstanceSessionMax,
+	alPshieldInstanceSessionOutgoing,
+	alPshieldInstanceSessionUpload,
+	alPshieldInstanceSessionIncoming,
+	alPshieldInstanceSessionTotActive,
+	alPshieldInstanceSessionSynActive,
+	alPshieldInstanceSessionRstActive,
+	alPshieldInstanceSessionAckActive,
+	alPshieldInstanceSessionDnsActive,
+	alPshieldInstanceSessionOutActive,
+	alPshieldInstanceSessionRetransmit,
+	alPshieldInstanceSessionForcedHash,
+	alPshieldInstanceSessionForcedKernel
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Packetshield's Instance Objects"
+    ::= { algroups 14 }
+
+alPshieldContextGroup OBJECT-GROUP
+    OBJECTS {
+        alPshieldContextInstanceID,
+        alPshieldContextID,
+	alPshieldContextName,
+	alPshieldContextStatus,
+	alPshieldContextRxTotal,
+	alPshieldContextInvalid,
+	alPshieldContextWhitelisted,
+	alPshieldContextFiltered,
+	alPshieldContextOutRelated,
+	alPshieldContextDnsResponses,
+	alPshieldContextSyn,
+	alPshieldContextRst,
+	alPshieldContextAck,
+	alPshieldContextUnknownTtl,
+	alPshieldContextTtlFiltered,
+	alPshieldContextEstablished,
+	alPshieldContextNewConnections,
+	alPshieldContextUnmatched,
+	alPshieldContextSynCookie,
+	alPshieldContextDropSyn,
+	alPshieldContextDropRst,
+	alPshieldContextDropAck,
+	alPshieldContextDelivered,
+	alPshieldContextTxTotal
+    }
+    STATUS  current
+    DESCRIPTION
+        "Aloha Packetshield's Context Objects"
+    ::= { algroups 15 }
+
+END

@@ -1,0 +1,29 @@
+RAPID-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+
+        enterprises         FROM SNMPv2-SMI;
+
+
+    rapidstream OBJECT IDENTIFIER ::= { enterprises 4355 }
+
+    rsProducts OBJECT IDENTIFIER ::= { rapidstream 1 }
+    fbXSeries OBJECT IDENTIFIER ::= { rsProducts 4 }
+
+    -- fbX series
+    fbX500     OBJECT IDENTIFIER ::= { fbXSeries 1 }
+    fbX550e    OBJECT IDENTIFIER ::= { fbXSeries 2 }
+    fbX700     OBJECT IDENTIFIER ::= { fbXSeries 3 }
+    fbX750e    OBJECT IDENTIFIER ::= { fbXSeries 4 }
+    fbX1000    OBJECT IDENTIFIER ::= { fbXSeries 5 }
+    fbX1250e   OBJECT IDENTIFIER ::= { fbXSeries 6 }
+    fbX2500    OBJECT IDENTIFIER ::= { fbXSeries 7 }
+    fbX5000    OBJECT IDENTIFIER ::= { fbXSeries 8 }
+    fbX5500e   OBJECT IDENTIFIER ::= { fbXSeries 9 }
+    fbX6000    OBJECT IDENTIFIER ::= { fbXSeries 10 }
+    fbX6500e   OBJECT IDENTIFIER ::= { fbXSeries 11 }
+    fbX8000    OBJECT IDENTIFIER ::= { fbXSeries 12 }
+    fbX8500e   OBJECT IDENTIFIER ::= { fbXSeries 13 }
+    fbX8500e-F OBJECT IDENTIFIER ::= { fbXSeries 14 }
+
+END

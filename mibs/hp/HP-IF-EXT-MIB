@@ -1,0 +1,203 @@
+HP-IF-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Counter32,
+	NOTIFICATION-TYPE, Unsigned32		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, TruthValue		FROM SNMPv2-TC 
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  	FROM SNMPv2-CONF
+	ifIndex, ifEntry                	FROM IF-MIB
+	hpProcurveCommon                  	FROM HP-BASE-MIB;
+
+hpIfExtMIB MODULE-IDENTITY
+	LAST-UPDATED 	"200502011455Z"
+	ORGANIZATION "Hewlett Packard Company,
+                     ProCurve Networking Business"
+	CONTACT-INFO "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+	DESCRIPTION
+		"Extensions to IF-MIB for HP Procurve product line."
+    REVISION     "200502011455Z"  -- February 1, 2005
+    DESCRIPTION  "Modified to reflect new OID hierarchy for 
+                  HP J8162A XL Access Controller Module." 		
+	::= { hpProcurveCommon 2 }
+
+
+-- This MIB displays additional interface statistics common to most
+-- HP Procurve product line.  
+
+hpifMIBObjects OBJECT IDENTIFIER ::= { hpIfExtMIB 1 }
+hpifExtMIBNotificationsPrefix OBJECT IDENTIFIER ::= { hpIfExtMIB 2 }
+hpIfExtMIBConformance OBJECT IDENTIFIER ::= {  hpIfExtMIB 3 }
+
+
+hpifStats  OBJECT IDENTIFIER ::= {  hpifMIBObjects 1 }
+-- hpifStatus  OBJECT IDENTIFIER ::= {  hpifMIBObjects 2 }
+hpifNotificationConfig  OBJECT IDENTIFIER ::= {  hpifMIBObjects 3 }
+
+
+--hpifStats Group
+
+-- device per port Statistics Table
+-- reports statistics per ifIndex on each device which supports these counters.
+--  This table is optional, and only required on devices which support per port
+-- statistics relating to clients.
+ 
+hpifStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HifStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Per interface aggregated statistics for each port on this device.
+             This table relates primarily to HP J8162A XL Access Controller Module
+             and similar devices."
+     ::= { hpifStats 1 }
+
+hpifStatsEntry OBJECT-TYPE
+    SYNTAX      HifStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management statistics applicable to a
+            particular interface on an HP J8162A XL Access Controller Module or similar
+	    device."
+    AUGMENTS { ifEntry }
+    ::= { hpifStatsTable 1 }
+
+HifStatsEntry ::=
+    SEQUENCE {
+        hpifStatsSlot           Unsigned32,
+        hpifStatsPort           Unsigned32,
+        hpifStatsNumClients     Gauge32,
+        hpifStatsExtRoamsTo     Counter32,
+        hpifStatsExtRoamsFrom   Counter32,
+        hpifStatsIntRoamsTo     Counter32,
+        hpifStatsIntRoamsFrom   Counter32,
+        hpifStatsNumSessions    Gauge32
+    }
+
+
+hpifStatsSlot OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object contains the slot designation for this interface
+                on the associated HP J8162A XL Access Controller Module or similar device."
+        ::= { hpifStatsEntry 1 }
+
+hpifStatsPort OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object contains the port designation for this interface
+                in the slot reported by hpifStatsSlot on the associated 
+                HP J8162A XL Access Controller Module or similar device."
+        ::= { hpifStatsEntry 2 }
+
+
+hpifStatsNumClients OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object contains the number of active clients associated
+                with this interface on this HP J8162A XL Access Controller Module or similar
+		device. This number will vary as clients roam, log on or off."
+        ::= { hpifStatsEntry 3 }
+
+hpifStatsExtRoamsTo OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of clients which have roamed to this interface 
+                from another HP J8162A XL Access Controller Module since the last reboot of
+		this HP J8162A XL Access Controller Module or similar device. External roams
+		may indicate client traffic is being tunneled back through the
+		original HP J8162A XL Access Controller Module."
+        ::= { hpifStatsEntry 4 }
+
+hpifStatsExtRoamsFrom OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of clients which have roamed away from 
+                this interface to another external HP J8162A XL Access Controller Module
+		since the last reboot of the HP J8162A XL Access Controller Module or 
+		similar device. External roams may indicate client traffic is
+		being tunneled back through the original HP J8162A XL Access Controller Module."
+		::= { hpifStatsEntry 5 }
+
+hpifStatsIntRoamsTo OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of clients which have roamed to this interface 
+                from another interface on this same HP J8162A XL Access Controller Module
+		since the last reboot of the HP J8162A XL Access Controller Module or 
+		similar device."
+        ::= { hpifStatsEntry 6 }
+
+hpifStatsIntRoamsFrom OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of clients which have roamed away from 
+                this interface to another interface on this same 
+                HP J8162A XL Access Controller Module since the last reboot of the 
+                HP J8162A XL Access Controller Module or similar device."
+        ::= { hpifStatsEntry 7 }
+
+hpifStatsNumSessions OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of active sessions aggregated over all clients
+                associated with this interface on this HP J8162A XL Access Controller Module
+		or similar device."
+        ::= { hpifStatsEntry 8 }
+
+
+-- notification Configuration objects
+
+-- notifications
+
+hpifExtMIBNotifications OBJECT IDENTIFIER ::= { hpifExtMIBNotificationsPrefix 0 }
+
+
+-- conformance information
+
+hpifCompliances OBJECT IDENTIFIER ::= { hpIfExtMIBConformance 1 }
+hpifGroups OBJECT IDENTIFIER ::=      { hpIfExtMIBConformance 2 }
+
+
+hpifExtMIBCompliance1  MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the HP-IF-EXT-MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { hpifStatsGroup }
+
+        ::= { hpifCompliances 1 }
+
+-- units of conformance
+
+hpifStatsGroup    OBJECT-GROUP
+    OBJECTS { hpifStatsSlot, hpifStatsPort, hpifStatsNumClients, 
+	      hpifStatsExtRoamsTo, hpifStatsExtRoamsFrom, 
+	      hpifStatsIntRoamsTo, hpifStatsIntRoamsFrom, hpifStatsNumSessions }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing statistics
+            applicable to all HP J8162A XL Access Controller Module like devices."
+    ::= { hpifGroups 1 }
+
+END

@@ -1,0 +1,315 @@
+-- *****************************************************************
+-- DEV-SYS-USER-MIB.smi:  Transition Networks Enterprise MIB for system user
+-- management feature.
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-DEV-SYS-USER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32 FROM SNMPv2-SMI
+    DisplayString, RowStatus FROM SNMPv2-TC
+    tnDevMgmt FROM TN-MGMT-MIB;
+
+tnDevSysUser    MODULE-IDENTITY
+     LAST-UPDATED "201406130000Z"
+     ORGANIZATION "Transition Networks, Inc."
+     CONTACT-INFO
+                 "       Transition Networks
+                         Technical Support
+                         10900 Red Circle Drive
+                         Minnetonka, MN 55343 USA
+                         Tel: +1-800-526-9267
+
+                     E-mail: techsupport@transition.com"
+
+     DESCRIPTION
+         "The mib provides functionalities for system user management in TN modules."
+
+     REVISION      "201406130000Z"
+     DESCRIPTION
+         "Initial Revision of this module"
+     ::= { tnDevMgmt 19 }
+
+tnDevSysUserTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnDevSysUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the system login users."
+    ::= { tnDevSysUser 1 }
+
+tnDevSysUserEntry OBJECT-TYPE
+    SYNTAX TnDevSysUserEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the system login users."
+    INDEX { tnDevSysUserIndex }
+    ::= { tnDevSysUserTable 1 }
+
+TnDevSysUserEntry ::=
+    SEQUENCE {
+         tnDevSysUserIndex        Integer32,
+         tnDevSysUserName         DisplayString,
+         tnDevSysUserPassword     DisplayString,
+         tnDevSysUserLevel        INTEGER,
+         tnDevSysUserStatus       RowStatus
+    }
+
+tnDevSysUserIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..11111) -- range added by Jing
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of this table."
+    ::= { tnDevSysUserEntry 1 }
+
+tnDevSysUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the user. The user name is starting with alphanumeric."
+    ::= { tnDevSysUserEntry 2 }
+
+tnDevSysUserPassword OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The password of the user. zero length input will set the user enrty
+         without password. The password is starting with alphanumeric. When do
+         getting to this variable, always eight '*' is returned."
+   ::= { tnDevSysUserEntry 3 }
+
+tnDevSysUserLevel OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The level of the user. The value of:
+                 admin(1): this user can read and write though WEB/CLI, also can add, delete other users.
+                 read-write(2): this user can read and write though WEB/CLI.
+                 read-only(3): this user can read though WEB/CLI, but can't write."
+   ::= { tnDevSysUserEntry 4 }
+
+tnDevSysUserStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable is used to dynamically create or delete an entry for this table."
+    ::= { tnDevSysUserEntry 20 }
+
+-- Log in method
+tnDevSysMethodTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnDevSysMethodEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the system login Methods."
+    ::= { tnDevSysUser 3 }
+
+tnDevSysMethodEntry OBJECT-TYPE
+    SYNTAX TnDevSysMethodEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the system login users."
+    INDEX { tnDevSysClientIndex }
+    ::= { tnDevSysMethodTable 1 }
+
+TnDevSysMethodEntry ::=
+    SEQUENCE {
+         tnDevSysClientIndex      Integer32,
+         tnDevSysMethodName       DisplayString,
+         tnDevSysLoginMethod      INTEGER,
+         tnDevSysLoginMethod1     INTEGER,
+         tnDevSysLoginMethod2     INTEGER
+    }
+
+tnDevSysClientIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..11111) -- range added by Jing
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of this table."
+    ::= { tnDevSysMethodEntry 1 }
+
+tnDevSysMethodName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Clients."
+    ::= { tnDevSysMethodEntry 2 }
+
+tnDevSysLoginMethod OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   none         (0),
+                   localLogin   (1),
+                   radius       (2),
+                   radiusLocal  (3),
+                   tacplus      (4),
+                   tacplusLocal (5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It is the methods about clients login in. The value of
+        None(0) indicating does not support login,
+        localLogin(1) indicating supports local,
+        radius(2) indicating supports radius,
+        radiusLocal(3) supports radius and local,
+        tacplus(4) supports tacplus,
+        tacplusLocal(5) supports tacplus and local,
+        "
+    ::= { tnDevSysMethodEntry 3 }
+
+tnDevSysLoginMethod1 OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   none         (0),
+                   localLogin   (1),
+                   radius       (2),
+                   radiusLocal  (3),
+                   tacplus      (4),
+                   tacplusLocal (5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It is the methods about clients login in. The value of
+        None(0) indicating does not support login,
+        localLogin(1) indicating supports local,
+        radius(2) indicating supports radius,
+        radiusLocal(3) supports radius and local,
+        tacplus(4) supports tacplus,
+        tacplusLocal(5) supports tacplus and local,
+        "
+    ::= { tnDevSysMethodEntry 4 }
+
+tnDevSysLoginMethod2 OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   none         (0),
+                   localLogin   (1),
+                   radius       (2),
+                   radiusLocal  (3),
+                   tacplus      (4),
+                   tacplusLocal (5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "It is the methods about clients login in. The value of
+        None(0) indicating does not support login,
+        localLogin(1) indicating supports local,
+        radius(2) indicating supports radius,
+        radiusLocal(3) supports radius and local,
+        tacplus(4) supports tacplus,
+        tacplusLocal(5) supports tacplus and local,
+        "
+    ::= { tnDevSysMethodEntry 5 }
+
+-- Level
+tnDevSysPrivilegeLevelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnDevSysPrivilegeLevelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to maintain the system Privilege level."
+    ::= { tnDevSysUser 4 }
+
+tnDevSysPrivilegeLevelEntry OBJECT-TYPE
+    SYNTAX TnDevSysPrivilegeLevelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table correspond to the system login users."
+    INDEX { tnDevSysPrivilegeLevelIndex }
+    ::= { tnDevSysPrivilegeLevelTable 1 }
+
+TnDevSysPrivilegeLevelEntry ::=
+    SEQUENCE {
+         tnDevSysPrivilegeLevelIndex      Integer32,
+         tnDevSysPrivilegeLevelName       DisplayString,
+         tnDevSysConfigReadLevel          INTEGER,
+         tnDevSysConfigWriteLevel         INTEGER,
+         tnDevSysStatusReadLevel          INTEGER,
+         tnDevSysStatusWriteLevel         INTEGER
+    }
+
+tnDevSysPrivilegeLevelIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..11111) -- range added by Jing
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of this table."
+    ::= { tnDevSysPrivilegeLevelEntry 1 }
+
+tnDevSysPrivilegeLevelName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Clients."
+    ::= { tnDevSysPrivilegeLevelEntry 2 }
+
+tnDevSysConfigReadLevel OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Every group has an authorization Privilege level for
+         the following sub groups: configuration read-only,
+         configuration/execute read-write, status/statistics read-only,
+         status/statistics read-write (e.g. for clearing of statistics).
+         User Privilege should be same or greater than the authorization
+         Privilege level to have the access to that group.
+        "
+    ::= { tnDevSysPrivilegeLevelEntry 3 }
+
+tnDevSysConfigWriteLevel OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Every group has an authorization Privilege level for
+         the following sub groups: configuration read-only,
+         configuration/execute read-write, status/statistics read-only,
+         status/statistics read-write (e.g. for clearing of statistics).
+         User Privilege should be same or greater than the authorization
+         Privilege level to have the access to that group.
+        "
+    ::= { tnDevSysPrivilegeLevelEntry 4 }
+
+tnDevSysStatusReadLevel OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Every group has an authorization Privilege level for
+         the following sub groups: configuration read-only,
+         configuration/execute read-write, status/statistics read-only,
+         status/statistics read-write (e.g. for clearing of statistics).
+         User Privilege should be same or greater than the authorization
+         Privilege level to have the access to that group.
+        "
+    ::= { tnDevSysPrivilegeLevelEntry 5 }
+
+tnDevSysStatusWriteLevel OBJECT-TYPE
+    SYNTAX      INTEGER(1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Every group has an authorization Privilege level for
+         the following sub groups: configuration read-only,
+         configuration/execute read-write, status/statistics read-only,
+         status/statistics read-write (e.g. for clearing of statistics).
+         User Privilege should be same or greater than the authorization
+         Privilege level to have the access to that group.
+        "
+    ::= { tnDevSysPrivilegeLevelEntry 6 }
+END

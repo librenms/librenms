@@ -1,0 +1,103 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "pwrstatd",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "pwrstatd",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "BF01512BA31_mruntime",
+                    "value": 56,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                },
+                {
+                    "metric": "BF01512BA31_pcapacity",
+                    "value": 100,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                },
+                {
+                    "metric": "BF01512BA31_pload",
+                    "value": 17,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                },
+                {
+                    "metric": "BF01512BA31_voutput",
+                    "value": 122,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                },
+                {
+                    "metric": "BF01512BA31_vrating",
+                    "value": 120,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                },
+                {
+                    "metric": "BF01512BA31_vutility",
+                    "value": 122,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                },
+                {
+                    "metric": "BF01512BA31_wload",
+                    "value": 153,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                },
+                {
+                    "metric": "BF01512BA31_wrating",
+                    "value": 900,
+                    "value_prev": null,
+                    "app_type": "pwrstatd"
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux wiii 4.18.0-408.el8.ath_hack.x86_64 #1 SMP Fri Jul 22 10:19:59 PDT 2022 x86_64",
+                    "sysContact": "<private>",
+                    "version": "4.18.0-408.el8.ath_hack.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,0 +1,284 @@
+-- =====================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Timerange MIB Definition
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 xujunjie,2012-05-14,Initial Version.
+-- V1.1 modified by MouXuanli
+--     Change name "trng" to "trange".
+-- =====================================================================
+HH3C-TRNG2-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    TruthValue, DateAndTime, RowStatus
+        FROM SNMPv2-TC;
+
+hh3cTRNG2 MODULE-IDENTITY
+    LAST-UPDATED "201303080000Z"        -- Mar 8, 2013 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The HH3C-TRNG2-MIB contains objects to
+        Configure the system absolute and periodic time-range."
+    REVISION "201303080000Z"        -- Mar 8, 2013 at 00:00 GMT
+    DESCRIPTION
+        "Modified to change node name from 'trng' to 'trange'."
+    REVISION "201205140000Z"        -- May 14, 2012 at 00:00 GMT
+    DESCRIPTION
+        "201205140000Z, --The initial revision of this MIB module."
+    ::= { hh3cCommon 121 }
+
+--
+-- Node definitions
+--
+
+hh3cTRNG2MibObjects OBJECT IDENTIFIER ::= { hh3cTRNG2 1 }
+
+-- hh3cTrangeCreateTimerangeTable
+
+hh3cTrangeCreateTimerangeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cTrangeCreateTimerangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Creat TimeRange."
+    ::= { hh3cTRNG2MibObjects 1 }
+
+hh3cTrangeCreateTimerangeEntry OBJECT-TYPE
+    SYNTAX Hh3cTrangeCreateTimerangeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Define the entry of hh3cTrangeCreateTimerangeTable"
+    INDEX { hh3cTrangeIndex }
+    ::= { hh3cTrangeCreateTimerangeTable 1 }
+
+Hh3cTrangeCreateTimerangeEntry ::=
+    SEQUENCE {
+        hh3cTrangeIndex
+            Integer32,
+        hh3cTrangeName
+            OCTET STRING,
+        hh3cTrangeValidFlag
+            TruthValue,
+        hh3cTrangeCreateRowStatus
+            RowStatus
+     }
+
+hh3cTrangeIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TimeRange's index"
+    ::= { hh3cTrangeCreateTimerangeEntry 1 }
+
+hh3cTrangeName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "TimeRange's name"
+    ::= { hh3cTrangeCreateTimerangeEntry 2 }
+
+hh3cTrangeValidFlag OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Valid or Invalid flag"
+    ::= { hh3cTrangeCreateTimerangeEntry 3 }
+
+hh3cTrangeCreateRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this conceptual row.Now only realize CreateAndGo and Destroy and Active."
+    ::= { hh3cTrangeCreateTimerangeEntry 4 }
+
+-- hh3cTrangeAbsoluteTable
+
+hh3cTrangeAbsoluteTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cTrangeAbsoluteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Creat absoluteness time item of the TimeRange"
+    ::= { hh3cTRNG2MibObjects 2 }
+
+hh3cTrangeAbsoluteEntry OBJECT-TYPE
+    SYNTAX Hh3cTrangeAbsoluteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Define the entry of hh3cTrangeAbsoluteTable"
+    INDEX { hh3cTrangeAbsoluteNameIndex, hh3cTrangeAbsoluteSubIndex }
+    ::= { hh3cTrangeAbsoluteTable 1 }
+
+Hh3cTrangeAbsoluteEntry ::=
+    SEQUENCE {
+        hh3cTrangeAbsoluteNameIndex
+            Integer32,
+        hh3cTrangeAbsoluteSubIndex
+            Integer32,
+        hh3cTrangeAbsoluteStartTime
+            DateAndTime,
+        hh3cTrangeAbsoluteEndTime
+            DateAndTime,
+        hh3cTrangeAbsolueRowStatus
+            RowStatus
+     }
+
+hh3cTrangeAbsoluteNameIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TimeRange's index"
+    ::= { hh3cTrangeAbsoluteEntry 1 }
+
+hh3cTrangeAbsoluteSubIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..12)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "SubItem's index"
+    ::= { hh3cTrangeAbsoluteEntry 2 }
+
+hh3cTrangeAbsoluteStartTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Start point of the timerange.The format defined like 'YYYY-MM-DD,hh:mm:0.0'."
+    ::= { hh3cTrangeAbsoluteEntry 3 }
+
+hh3cTrangeAbsoluteEndTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "End point of the timerange.The format defined like 'YYYY-MM-DD,hh:mm:0.0'."
+    ::= { hh3cTrangeAbsoluteEntry 4 }
+
+hh3cTrangeAbsolueRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this conceptual row. Now only realize CreateAndGo and Destroy and Active."
+    ::= { hh3cTrangeAbsoluteEntry 5 }
+
+-- hh3cTrangePeriodicTable
+
+hh3cTrangePeriodicTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cTrangePeriodicEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Creat periodic time item of the TimeRange"
+    ::= { hh3cTRNG2MibObjects 3 }
+
+hh3cTrangePeriodicEntry OBJECT-TYPE
+    SYNTAX Hh3cTrangePeriodicEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Define the index of hh3cTrangePeriodicTable"
+    INDEX { hh3cTrangePeriodicNameIndex, hh3cTrangePeriodicSubIndex }
+    ::= { hh3cTrangePeriodicTable 1 }
+
+Hh3cTrangePeriodicEntry ::=
+    SEQUENCE {
+        hh3cTrangePeriodicNameIndex
+            Integer32,
+        hh3cTrangePeriodicSubIndex
+            Integer32,
+        hh3cTrangePeriodicDayOfWeek
+            BITS,
+        hh3cTrangePeriodicStartTime
+            DateAndTime,
+        hh3cTrangePeriodicEndTime
+            DateAndTime,
+        hh3cTrangePeriodicRowStatus
+            RowStatus
+     }
+
+hh3cTrangePeriodicNameIndex OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "TimeRange's index"
+    ::= { hh3cTrangePeriodicEntry 1 }
+
+hh3cTrangePeriodicSubIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..32)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "SubItem's index"
+    ::= { hh3cTrangePeriodicEntry 2 }
+
+hh3cTrangePeriodicDayOfWeek OBJECT-TYPE
+    SYNTAX BITS {
+                    sunday(0),
+                    monday(1),
+                    tuesday(2),
+                    wednesday(3),
+                    thursday(4),
+                    friday(5),
+                    saturday(6)
+                }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The day of week. This is a bit-map of possible conditions.
+        The various bit positions are:
+        |0        |sunday                 |
+        |1        |monday                 |
+        |2        |tuesday                |
+        |3        |wednesday              |
+        |4        |thursday               |
+        |5        |friday                 |
+        |6        |saturday               |
+        "
+    ::= { hh3cTrangePeriodicEntry 3 }
+
+hh3cTrangePeriodicStartTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Start point of this timerange,The format defined like 'hh:mm:0,0'."
+    ::= { hh3cTrangePeriodicEntry 4 }
+
+hh3cTrangePeriodicEndTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "End point of this timerange. The format definedlike 'hh:mm:0,0'."
+    ::= { hh3cTrangePeriodicEntry 5 }
+
+hh3cTrangePeriodicRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this conceptual row, Now only realize CreateAndGo and Destroy and Active."
+    ::= { hh3cTrangePeriodicEntry 6 }
+
+END

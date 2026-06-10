@@ -1,0 +1,25 @@
+[Unit]
+Description=LibreNMS: Data caching daemon of rrdtool 
+After=network.service
+Documentation=https://docs.librenms.org/Extensions/RRDCached/ man:rrdcached(1)
+
+[Service]
+Type=forking
+PIDFile=/run/rrdcached.pid
+ExecStart=/usr/bin/rrdcached \
+    -w 1800 \ # Write to disk every 1800 seconds \
+    -z 1800 \ # Delay updates by 1800 seconds \
+    -f 3600 \ # Flush updates every 3600 seconds \
+    -s librenms \ # Run socket librenms user \
+    -U librenms \ # Run as user librenms \
+    -G librenms \ # Run as group librenms \
+    -B -R -j /var/tmp \ # Use /var/tmp for journal files \
+    -l unix:/run/rrdcached.sock \ # Listen on UNIX socket \
+    -t 4    \ # Use 4 threads \
+    -F      \ # Force daemon mode \
+    -b /opt/librenms/rrd/ \ # Base directory for RRD files 
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,189 @@
+-- *****************************************************************
+-- NMS-MEMORY-POOL-MIB
+--
+-- October 2003
+--
+-- Copyright (c) 2003 by NMS, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+NMS-MEMORY-POOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    nmsMgmt
+        FROM NMS-SMI
+    Percent
+        FROM NMS-QOS-PIB-MIB;
+
+nmsMemoryPoolMIB MODULE-IDENTITY
+	LAST-UPDATED "200310160000Z"
+	ORGANIZATION ""
+	CONTACT-INFO
+		""
+    	DESCRIPTION
+        	"MIB module for monitoring memory pools"
+   	REVISION        "200310160000Z"
+	DESCRIPTION
+		"Initial version of this MIB."
+    ::= { nmsMgmt 48 }
+
+nmsMemoryPoolUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization"
+    ::= { nmsMemoryPoolMIB 1 }
+
+nmsMemoryPoolTotalMemorySize OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the total memory size"
+    ::= { nmsMemoryPoolMIB 2 }
+
+nmsMemoryPoolImageRatio OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the ratio of image size to total memory size"
+    ::= { nmsMemoryPoolMIB 3 }
+
+nmsMemoryPoolRegionRatio OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the ratio of total region size to total memory size"
+    ::= { nmsMemoryPoolMIB 4 }
+
+nmsMemoryPoolHeapRatio OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the ratio of heap size to total memory size"
+    ::= { nmsMemoryPoolMIB 5 }
+
+nmsMemoryPoolHeapUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the heap utilization"
+    ::= { nmsMemoryPoolMIB 6 }
+
+nmsMemoryPoolMessageBufferRatio OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the ratio of message buffer size to total memory size"
+    ::= { nmsMemoryPoolMIB 7 }
+
+nmsMemoryPoolMessageBufferUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the message buffer of utilization"
+    ::= { nmsMemoryPoolMIB 8 }
+
+nmsMemoryPoolTotalFlashSize OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the total size of flash memory"
+    ::= { nmsMemoryPoolMIB 9 }
+
+
+
+-- notifications
+
+nmsMemoryPoolNotifications
+    OBJECT IDENTIFIER ::= { nmsMemoryPoolMIB 20 }
+
+-- (no notifications are currently defined)
+
+
+-- conformance information
+
+nmsMemoryPoolConformance
+    OBJECT IDENTIFIER ::= { nmsMemoryPoolMIB 21 }
+nmsMemoryPoolCompliances
+    OBJECT IDENTIFIER ::= { nmsMemoryPoolConformance 1 }
+nmsMemoryPoolGroups
+    OBJECT IDENTIFIER ::= { nmsMemoryPoolConformance 2 }
+
+
+-- compliance statements
+
+nmsMemoryPoolCompliance MODULE-COMPLIANCE
+    STATUS    deprecated -- superceded by nmsMemoryPoolComplianceRev1
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the NMS Memory Pool MIB"
+    MODULE    -- this module
+        MANDATORY-GROUPS { nmsMemoryPoolGroup }
+    ::= { nmsMemoryPoolCompliances 1 }
+
+nmsMemoryPoolComplianceRev1 MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the NMS Memory Pool MIB"
+    MODULE    -- this module
+        MANDATORY-GROUPS { nmsMemoryPoolGroup }
+
+        GROUP nmsMemoryPoolUtilizationGroup
+        DESCRIPTION
+            "Per memory pool utilization statistics is mandatory for
+            the managed system that supports memory pool utilization."
+    ::= { nmsMemoryPoolCompliances 2 }
+
+
+-- units of conformance
+
+nmsMemoryPoolGroup OBJECT-GROUP
+    OBJECTS {
+        nmsMemoryPoolName,
+        nmsMemoryPoolAlternate,
+        nmsMemoryPoolValid,
+        nmsMemoryPoolUsed,
+        nmsMemoryPoolFree,
+        nmsMemoryPoolLargestFree
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects providing memory pool monitoring."
+    ::= { nmsMemoryPoolGroups 1 }
+
+nmsMemoryPoolUtilizationGroup OBJECT-GROUP
+    OBJECTS {
+        nmsMemoryPoolUtilization1Min,
+        nmsMemoryPoolUtilization5Min,
+        nmsMemoryPoolUtilization10Min
+    }
+    STATUS        current
+    DESCRIPTION
+        "An optional group providing a collection of memory pool
+        utilization objects."
+    ::= { nmsMemoryPoolGroups 2 }
+
+
+END

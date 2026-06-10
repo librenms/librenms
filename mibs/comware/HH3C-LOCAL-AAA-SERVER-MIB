@@ -1,0 +1,63 @@
+-- ==========================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: Local AAA Server mib
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2013-07-06 created by yangxu 02965
+-- ==========================================================================
+HH3C-LOCAL-AAA-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cLocAAASvr MODULE-IDENTITY
+    LAST-UPDATED "201307060945Z"
+    ORGANIZATION
+         "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+         "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB provides the definition of the local AAA Server."
+    REVISION "201307060945Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 141 }
+
+-- definition of textual conventions
+
+--
+-- nodes defined
+--
+
+hh3cLocAAASvrControl OBJECT IDENTIFIER ::= { hh3cLocAAASvr 1 }
+
+--
+-- tables defined
+--
+
+hh3cLocAAASvrTables OBJECT IDENTIFIER ::= { hh3cLocAAASvr 2 }
+
+--
+-- traps defined
+--
+
+hh3cLocAAASvrTrap OBJECT IDENTIFIER ::= { hh3cLocAAASvr 3 }
+
+hh3cLocAAASvrTrapPrex OBJECT IDENTIFIER ::= { hh3cLocAAASvrTrap 0 }
+
+hh3cLocAAASvrBillExportFailed NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when local AAA bills
+        cannot be exported to a bill server."
+    ::= { hh3cLocAAASvrTrapPrex 1 }
+
+END

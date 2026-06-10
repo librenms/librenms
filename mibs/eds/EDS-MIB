@@ -1,0 +1,4533 @@
+-- EDS MIB file for all products
+-- Larry Wood	12/15/11	v1.2
+--  Added device types EDS0070, 71, 80, 82, 83, 85, 90, 91, 92
+--  Removed range value in text for TrapHighThreshold, TrapLowThreshold and TrapHysteresis
+--
+-- Larry Wood	12/28/11	v1.3
+--  Updated device types EDS0090, 91, 92
+--
+
+-- Larry Wood	4/9/12	v1.5
+--  Added nodes for Wireless Trap table
+--
+-- Larry Wood	6/26/12	v1.6
+--  Added DS28EA00
+
+--
+
+-- Larry Wood	8/20/12	v1.7
+--  Added EDS0050
+--
+-- Larry Wood	11/29/12	v1.8
+--  Added EDS2030
+--
+EDS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB;
+
+
+    --Embedded Data Systems, Inc. enterprise OID
+    edsMain OBJECT IDENTIFIER ::= { enterprises 31440 }
+
+    --Enterprise company branch.
+    edsEnterprise OBJECT IDENTIFIER ::= { edsMain 1 }
+
+    eCompanyName OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Company owner of this enterprise number"
+        ::= { edsEnterprise 1 }
+
+    eProductName OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Name of this product"
+        ::= { edsEnterprise 2 }
+
+    eMIBVersion OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Version of the MIB file in the product"
+        ::= { edsEnterprise 3 }
+
+    eFirmwareVersion OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Firmware version"
+        ::= { edsEnterprise 4 }
+
+    eFirmwareDate OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Date of firmware"
+        ::= { edsEnterprise 5 }
+
+    --device trap table
+    dTrap OBJECT IDENTIFIER ::= { edsMain 2 }
+    dTrapTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF dTrapEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        ::= { dTrap 1 }
+
+    dTrapEntry OBJECT-TYPE
+        SYNTAX              dTrapEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                dTrapIndex
+                            }
+        ::= { dTrapTable 1 }
+
+    dTrapEntry ::= SEQUENCE {
+        dTrapIndex
+            INTEGER,
+        dTrapEnable
+            INTEGER,
+        dTrapIP
+            IpAddress,
+        dTrapCommunity
+            INTEGER
+    }
+
+    dTrapIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Index of table."
+        ::= { dTrapEntry 1 }
+
+    dTrapEnable OBJECT-TYPE
+        SYNTAX              INTEGER (0..1)
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Zero disables the trap, one enables it."
+        ::= { dTrapEntry 2 }
+
+    dTrapIP OBJECT-TYPE
+        SYNTAX              IpAddress
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Address to send trap to."
+        ::= { dTrapEntry 3 }
+
+    dTrapCommunity OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Community string to send with trap message."
+        ::= { dTrapEntry 4 }
+
+
+    --dTrapDeviceTable
+    dTrapDeviceTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF dTrapDeviceEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        ::= { dTrap 2 }
+
+    dTrapDeviceEntry OBJECT-TYPE
+        SYNTAX              dTrapDeviceEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                dTrapDeviceIndex
+                            }
+        ::= { dTrapDeviceTable 1 }
+
+    dTrapDeviceEntry ::= SEQUENCE {
+        dTrapDeviceIndex
+            INTEGER,
+        dTrapDeviceEnable
+            INTEGER,
+        dTrapDeviceSendPointer
+            INTEGER,
+		dTrapDeviceROM
+		    OCTET STRING,
+		dTrapDeviceVariable
+			INTEGER,
+		dTrapDeviceHighThreshold
+		    DisplayString,
+		dTrapDeviceLowThreshold
+		    DisplayString,
+		dTrapDeviceHysteresis
+			DisplayString
+    }
+
+    dTrapDeviceIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Index of table. Traps are sent with this OID followed by the index
+        					number of the table entry that generated the trap. For example, if
+        					the values at index 5 of this table generated a trap, the name of the
+        					trap would be .iso.org.dod.internet.private.enterprises.edsMain.dTrap.
+        					dTrapDeviceTable.dTrapDeviceEntry.dTrapDeviceIndex.5. The numeric
+        					value is 1.3.6.1.4.1.31440.2.2.1.1.5. An integer value is sent with the
+        					trap, which indicates what state change caused the trap. Using the
+        					dTrapDeviceHighThreshold, dTrapDeviceLowThreshold and 
+        					dTrapDeviceHysteresis values, 3 windows are created. Transitions between
+        					these windows generates a trap. The integer value indicates which 
+        					transition caused the trap as follows:
+        					   1 -> middle to high window transition
+        					   2 -> high to middle window transition
+        					   3 -> middle to low window transition
+        					   4 -> low to middle window transition
+        					   
+        					Note the following when programming traps:
+        					   1) Programming the HighThreshold lower than the LowThreshold is
+        					      invalid and will disable trap generation.
+        					   2) dTrapDeviceHysteresis values are not checked for validity, use them
+        					      with caution.
+        					   3) A trap must be enabled to be sent.
+        					   4) The dTrapDeviceROM must be set to an active device or a trap 
+        					      will not be sent.
+        					   5) The health of the 1-wire device must be greater than 0 or no trap will
+        					      be sent.
+        					   6) The dTrapDeviceVariable must be valid. For exmaple, the DS18S20 has 3
+        					      variables as follows: Temperature, UserByte1 and UserByte2. These are
+        					      numbered 0, 1 and 2 respectively. A setting of 3 or above is invalid.
+        					   7) The dTrapTable must be programmed correctly for traps to be sent.
+        					      The respective table entry must be enabled and have a valid IP address.
+        					      Community strings are not used by the SNMP server."
+        					      
+        					   
+        ::= { dTrapDeviceEntry 1 }
+
+    dTrapDeviceEnable OBJECT-TYPE
+        SYNTAX              INTEGER (0..1)
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Zero disables the trap, one enables it."
+        ::= { dTrapDeviceEntry 2 }
+
+    dTrapDeviceSendPointer OBJECT-TYPE
+        SYNTAX              INTEGER (0..1)
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Indicates which entry in the Trap Table to use to determine where
+                            to send the trap. The Trap Table contains the destination IP address."
+        ::= { dTrapDeviceEntry 3 }
+
+    dTrapDeviceROM OBJECT-TYPE
+        SYNTAX              DisplayString(SIZE(16))
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Device ROM code to base sending trap message on."
+        ::= { dTrapDeviceEntry 4 }
+
+    dTrapDeviceVariable OBJECT-TYPE
+        SYNTAX              INTEGER (0..99)
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Number of the variable to reference, as listed in the Devices section
+        					of this MIB. For example, the DS2406 has 9 items, which would be numbered 0 - 8.
+        					So if dTrapDeviceVariable were set to 0 it would refer to owDS2406PIOAFlipFlop,
+        					if it were set to 3 it would refer to owDS2406PIOBLevel."
+        ::= { dTrapDeviceEntry 5 }
+
+    dTrapDeviceHighThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A trap will be generated when the variable is greater than this value or
+        					it is less than or equal to this value - dTrapDeviceHysteresis. This number 
+        					may be positive or negative and may contain a decimal point."
+        ::= { dTrapDeviceEntry 6 }
+
+    dTrapDeviceLowThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A trap will be generated when the variable is less than this value or
+        					it is greater than or equal to this value + dTrapDeviceHysteresis. This number 
+        					may be positive or negative and may contain a decimal point."
+        ::= { dTrapDeviceEntry 7 }
+
+    dTrapDeviceHysteresis OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "This value is used to limit repeated trap sends due to a value hovering around
+        					a threshold. If it is not used it should be set to zero. This number may be positive 
+        					or negative and may contain a decimal point."
+        ::= { dTrapDeviceEntry 8 }
+
+
+
+    --1-wire devices branch.
+    owDevices OBJECT IDENTIFIER ::= { edsMain 10 }
+
+    --Device type table (conceptual).
+    owDeviceTypes OBJECT IDENTIFIER ::= { owDevices 1 }
+
+    owNone OBJECT IDENTIFIER ::= { owDeviceTypes 0 }
+    owUnknown OBJECT IDENTIFIER ::= { owDeviceTypes 1 }
+    owDS2406 OBJECT IDENTIFIER ::= { owDeviceTypes 2 }
+    owDS18B20 OBJECT IDENTIFIER ::= { owDeviceTypes 3 }
+    owDS18S20 OBJECT IDENTIFIER ::= { owDeviceTypes 4 }
+    owDS2438 OBJECT IDENTIFIER ::= { owDeviceTypes 5 }
+    owDS2423 OBJECT IDENTIFIER ::= { owDeviceTypes 6 }
+    owDS2408 OBJECT IDENTIFIER ::= { owDeviceTypes 7 }
+    owDS2450 OBJECT IDENTIFIER ::= { owDeviceTypes 8 }
+    owEDS0064 OBJECT IDENTIFIER ::= { owDeviceTypes 9 }
+    owEDS0065 OBJECT IDENTIFIER ::= { owDeviceTypes 10 }
+    owEDS0066 OBJECT IDENTIFIER ::= { owDeviceTypes 11 }
+    owEDS0067 OBJECT IDENTIFIER ::= { owDeviceTypes 12 }
+    owEDS0068 OBJECT IDENTIFIER ::= { owDeviceTypes 13 }
+    owEDS0069 OBJECT IDENTIFIER ::= { owDeviceTypes 14 }
+    owEDS0070 OBJECT IDENTIFIER ::= { owDeviceTypes 15 }
+    owEDS0071 OBJECT IDENTIFIER ::= { owDeviceTypes 16 }
+    owEDS0080 OBJECT IDENTIFIER ::= { owDeviceTypes 17 }
+    owEDS0082 OBJECT IDENTIFIER ::= { owDeviceTypes 18 }
+    owEDS0083 OBJECT IDENTIFIER ::= { owDeviceTypes 19 }
+    owEDS0085 OBJECT IDENTIFIER ::= { owDeviceTypes 20 }
+    owEDS0090 OBJECT IDENTIFIER ::= { owDeviceTypes 21 }
+    owEDS0091 OBJECT IDENTIFIER ::= { owDeviceTypes 22 }
+    owEDS0092 OBJECT IDENTIFIER ::= { owDeviceTypes 23 }
+    owDS28EA00 OBJECT IDENTIFIER ::= { owDeviceTypes 24 }
+    owEDS0050 OBJECT IDENTIFIER ::= { owDeviceTypes 25 }
+
+    owDeviceInfo OBJECT IDENTIFIER ::= { owDevices 2 }
+
+    owDeviceNumActive OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Number of currently active 1-wire devices. A device
+                            is active if it's health is non-zero."
+        ::= { owDeviceInfo 1 }
+
+    owDeviceTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDeviceEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        ::= { owDevices 3 }
+
+    owDeviceEntry OBJECT-TYPE
+        SYNTAX              OwDeviceEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDeviceTable 1 }
+
+    OwDeviceEntry ::= SEQUENCE {
+        owDeviceIndex
+            INTEGER,
+        owDeviceType
+            INTEGER,
+        owDeviceName
+            DisplayString,
+        owDeviceDescription
+            DisplayString,
+        owDeviceFamily
+            INTEGER,
+        owDeviceROM
+            OCTET STRING,
+        owDeviceHealth
+            INTEGER
+    }
+
+    owDeviceIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Index of table."
+        ::= { owDeviceEntry 1 }
+
+    owDeviceType OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "An indication of the device type. This is the
+                            last OID number to the owDeviceTypes group pointing
+                            to the name of the device. The corresponding
+                            device table will contain the specific information
+                            from the device. For example: if this entry is
+                            2 (owDS2406) then the table owDS2406Table, at
+                            the appropriate index, will contain the data
+                            from the device."
+        ::= { owDeviceEntry 2 }
+
+    owDeviceName OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Text description of the device."
+        ::= { owDeviceEntry 3 }
+
+    owDeviceDescription OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Text description of the device."
+        ::= { owDeviceEntry 4 }
+
+    owDeviceFamily OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(2))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Family number as read from 1-wire device."
+        ::= { owDeviceEntry 5 }
+
+    owDeviceROM OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(16))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Entire ROM code as read from 1-wire device (includes
+                            family number and CRC). Always 16 bytes long."
+        ::= { owDeviceEntry 6 }
+
+    owDeviceHealth OBJECT-TYPE
+        SYNTAX              INTEGER (0..8)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Health of device. Ranges between 0 and 8 where
+                            0 worst case and 8 is best case. Incremented
+                            every time device responds to a search, decremented
+                            if it does not respond."
+        ::= { owDeviceEntry 7 }
+
+    owDS2406Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS2406Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS2406 (dual addressable switch plus
+                            1K bit memory)."
+        ::= { owDevices 4 }
+
+    owDS2406Entry OBJECT-TYPE
+        SYNTAX              OwDS2406Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS2406Table 1 }
+
+    OwDS2406Entry ::= SEQUENCE {
+        owDS2406PIOALevel
+            INTEGER,
+        owDS2406PIOBLevel
+            INTEGER,
+        owDS2406PIOAFlipFlop
+            INTEGER,
+        owDS2406PIOBFlipFlop
+            INTEGER,
+        owDS2406PIOAActivityLatch
+            INTEGER,
+        owDS2406PIOBActivityLatch
+            INTEGER,
+        owDS2406NumChnls
+            INTEGER,
+        owDS2406PwrSupply
+            INTEGER,
+        owDS2406ActivityLatchReset
+            INTEGER
+    }
+
+    owDS2406PIOALevel OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "PIO-A logic level on pin. If PIO-A flip flop is
+                            low, this input will always read low."
+        ::= { owDS2406Entry 1 }
+
+    owDS2406PIOBLevel OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "PIO-B logic level on pin. If PIO-B flip flop is
+                            low, this input will always read low."
+        ::= { owDS2406Entry 2 }
+
+    owDS2406PIOAFlipFlop OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "DS2406 PIO-A Flip Flop. Sets output state of the
+                            FF. The output is open collector, so the FF must
+                            be high (1) to be able to read a pin state of
+                            low (0)."
+        ::= { owDS2406Entry 3 }
+
+    owDS2406PIOBFlipFlop OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "DS2406 PIO-B Flip Flop. Sets output state of the
+                            FF. The output is open collector, so the FF must
+                            be high (1) to be able to read a pin state of
+                            low (0)."
+        ::= { owDS2406Entry 4 }
+
+    owDS2406PIOAActivityLatch OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noActivity( 0 ),
+                                yesActivity( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "High (1) if the pin state had activity. Reset
+                            by writing to activity latch reset."
+        ::= { owDS2406Entry 5 }
+
+    owDS2406PIOBActivityLatch OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noActivity( 0 ),
+                                yesActivity( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "High (1) if the pin state had activity. Reset
+                            by writing to activity latch reset."
+        ::= { owDS2406Entry 6 }
+
+    owDS2406NumChnls OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                pioAonly( 0 ),
+                                pioAandB( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Number of PIO channels the device supports. PIO-A
+                            only is 0, PIO-A and PIO-B is 1."
+        ::= { owDS2406Entry 7 }
+
+    owDS2406PwrSupply OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                pwrParasite( 0 ),
+                                pwrExternal( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Source of power for device. 0 is parasite powered,
+                            1 is externally powered."
+        ::= { owDS2406Entry 8 }
+
+    owDS2406ActivityLatchReset OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noReset( 0 ),
+                                yesReset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity latch reset is used to reset both PIO-A
+                            and PIO-B activity latch. Send 1 to reset the
+                            latch. Always reads 0."
+        ::= { owDS2406Entry 9 }
+
+    owDS18B20Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS18B20Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS18B20 (programmable resolution 1-wire
+                            digital thermometer)."
+        ::= { owDevices 5 }
+
+    owDS18B20Entry OBJECT-TYPE
+        SYNTAX              OwDS18B20Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS18B20Table 1 }
+
+    OwDS18B20Entry ::= SEQUENCE {
+        owDS18B20Temperature
+            DisplayString,
+        owDS18B20UserByte1
+            INTEGER,
+        owDS18B20UserByte2
+            INTEGER,
+        owDS18B20Resolution
+            INTEGER,
+        owDS18B20PwrSupply
+            INTEGER
+    }
+
+    owDS18B20Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Current temperature from device, desplayed as
+                            a string with decimal point. Required since MIB's
+                            cannot contain floating point numbers."
+        ::= { owDS18B20Entry 1 }
+
+    owDS18B20UserByte1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "User byte 1 as read from EEPROM."
+        ::= { owDS18B20Entry 2 }
+
+    owDS18B20UserByte2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "User byte 2 as read from EEPROM."
+        ::= { owDS18B20Entry 3 }
+
+    owDS18B20Resolution OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nineBits( 9 ),
+                                tenBits( 10 ),
+                                elevenBits( 11 ),
+                                twelveBits( 12 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Resolution of temperature reading, can be 9, 10,
+                            11 or 12 bits. Default is 12 bits. 0 is 9 bits,
+                            1 is 10 bits, 2 is 11 bits and 3 is 12 bits."
+        ::= { owDS18B20Entry 4 }
+
+    owDS18B20PwrSupply OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                parasitePower( 0 ),
+                                externalPower( 255 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Power source. Parasite or external. Zero is parasite."
+        ::= { owDS18B20Entry 5 }
+
+    owDS18S20Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS18S20Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS18S20 device data."
+        ::= { owDevices 6 }
+
+    owDS18S20Entry OBJECT-TYPE
+        SYNTAX              OwDS18S20Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS18S20Table 1 }
+
+    OwDS18S20Entry ::= SEQUENCE {
+        owDS18S20Temperature
+            DisplayString,
+        owDS18S20UserByte1
+            INTEGER,
+        owDS18S20UserByte2
+            INTEGER
+    }
+
+    owDS18S20Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Latest temperature reading, in degrees centigrade."
+        ::= { owDS18S20Entry 1 }
+
+    owDS18S20UserByte1 OBJECT-TYPE
+        SYNTAX              INTEGER (0..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "User byte from device EEPROM."
+        ::= { owDS18S20Entry 2 }
+
+    owDS18S20UserByte2 OBJECT-TYPE
+        SYNTAX              INTEGER (0..255)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "User byte from device EEPROM."
+        ::= { owDS18S20Entry 3 }
+
+
+-- DS2423 TABLE
+
+    owDS2423Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS2423Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS2423 device data."
+        ::= { owDevices 7 }
+
+    owDS2423Entry OBJECT-TYPE
+        SYNTAX              OwDS2423Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS2423Table 1 }
+
+    OwDS2423Entry ::= SEQUENCE {
+        owDS2423CounterA
+            COUNTER32,
+        owDS2423CounterB
+            COUNTER32
+    }
+
+    owDS2423CounterA OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter A value."
+        ::= { owDS2423Entry 1 }
+
+    owDS2423CounterB OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter B value."
+        ::= { owDS2423Entry 2 }
+
+
+-- DS2438 TABLE
+
+    owDS2438Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS2438Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS2438 device data."
+        ::= { owDevices 8 }
+
+    owDS2438Entry OBJECT-TYPE
+        SYNTAX              OwDS2438Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS2438Table 1 }
+
+    OwDS2438Entry ::= SEQUENCE {
+        owDS2438Temperature
+            DisplayString,
+        owDS2438SupplyVoltage
+            DisplayString,
+        owDS2438Current
+            DisplayString,
+        owDS2438PinVoltage
+            DisplayString,
+        owDS2438Humidity
+            DisplayString
+    }
+
+    owDS2438Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owDS2438Entry 1 }
+
+    owDS2438SupplyVoltage OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Voltage of the power supply."
+        ::= { owDS2438Entry 2 }
+
+    owDS2438PinVoltage OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Voltage at Pin Vad (pin 4)."
+        ::= { owDS2438Entry 3 }
+
+    owDS2438Current OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Voltage between the current pins."
+        ::= { owDS2438Entry 4 }
+
+    owDS2438Humidity OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Calculated humidity."
+        ::= { owDS2438Entry 5 }
+
+-- DS2408 TABLE
+
+    owDS2408Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS2408Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS2408 (8-channel addressable switch)."
+        ::= { owDevices 9 }
+
+    owDS2408Entry OBJECT-TYPE
+        SYNTAX              owDS2408Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS2408Table 1 }
+
+    owDS2408Entry ::= SEQUENCE {
+        owDS2408PIOLogicState
+            INTEGER,
+        owDS2408PIOOutputLatchState
+            INTEGER,
+        owDS2408PIOActivityLatchState
+            INTEGER,
+        owDS2408RSTZConfiguration
+            INTEGER,
+        owDS2408PowerOnResetLatch
+            INTEGER,
+        owDS2408VCCPowerStatus
+            INTEGER
+    }
+
+    owDS2408PIOLogicState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Logic level on the 8 IO pins."
+        ::= { owDS2408Entry 1 }
+
+    owDS2408PIOOutputLatchState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output latch states. Sets output state of the
+                            FFs. The output is open collector, so the FF must
+                            be high (1) to be able to read a pin state of
+                            low (0)."
+        ::= { owDS2408Entry 2 }
+
+    owDS2408PIOActivityLatchState OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 255 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "High (1) if the pin state had activity. Reset
+                            by writing to activity latch reset."
+        ::= { owDS2408Entry 3 }
+
+    owDS2408RSTZConfiguration OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Configures the RSTZ pin as a /RSTZ input (set to 0)
+                            or a /STRB output (set to 1)."
+        ::= { owDS2408Entry 4 }
+
+    owDS2408PowerOnResetLatch OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set high (1) with a power on reset. Reset
+                            by writing to a 0."
+        ::= { owDS2408Entry 5 }
+
+    owDS2408VCCPowerStatus OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "High (1) if the VCC pin is connected to power,
+                            low (0) otherwise."
+        ::= { owDS2408Entry 6 }
+
+
+-- DS2450 TABLE
+
+    owDS2450Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS2450Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS2450 (8-channel addressable switch)."
+        ::= { owDevices 10 }
+
+    owDS2450Entry OBJECT-TYPE
+        SYNTAX              owDS2450Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS2450Table 1 }
+
+    owDS2450Entry ::= SEQUENCE {
+        owDS2450ChannelAConversionValue
+            DisplayString,
+        owDS2450ChannelAConversionResolution
+            INTEGER,
+        owDS2450ChannelAConversionRange
+            INTEGER,
+        owDS2450ChannelAOutputEnable
+            INTEGER,
+        owDS2450ChannelAOutputControl
+            INTEGER,
+        owDS2450ChannelBConversionValue
+            DisplayString,
+        owDS2450ChannelBConversionResolution
+            INTEGER,
+        owDS2450ChannelBConversionRange
+            INTEGER,
+        owDS2450ChannelBOutputEnable
+            INTEGER,
+        owDS2450ChannelBOutputControl
+            INTEGER,
+        owDS2450ChannelCConversionValue
+            DisplayString,
+        owDS2450ChannelCConversionResolution
+            INTEGER,
+        owDS2450ChannelCConversionRange
+            INTEGER,
+        owDS2450ChannelCOutputEnable
+            INTEGER,
+        owDS2450ChannelCOutputControl
+            INTEGER,
+        owDS2450ChannelDConversionValue
+            DisplayString,
+        owDS2450ChannelDConversionResolution
+            INTEGER,
+        owDS2450ChannelDConversionRange
+            INTEGER,
+        owDS2450ChannelDOutputEnable
+            INTEGER,
+        owDS2450ChannelDOutputControl
+            INTEGER,
+        owDS2450PowerOnReset
+            INTEGER,
+        owDS2450VCCControl
+            INTEGER
+    }
+
+    owDS2450ChannelAConversionValue OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Conversion value of the channel, in volts."
+        ::= { owDS2450Entry 1 }
+
+    owDS2450ChannelAConversionResolution OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Conversion resolution of the channel. Can be set
+                            between 1 and 16."
+        ::= { owDS2450Entry 2 }
+
+    owDS2450ChannelAConversionRange OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "If high (1), the maximum voltage that can be
+        					measured is 5.10, low (0) sets the maximum voltage
+        					to 2.55."
+        ::= { owDS2450Entry 3 }
+
+    owDS2450ChannelAOutputEnable OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A setting of 1 enables the output transistor, use
+        					ChannelXOutputControl to turn the transistor on / off."
+        ::= { owDS2450Entry 4 }
+
+    owDS2450ChannelAOutputControl OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set to low (0) to turn on the output transistor. Has
+                            no effect if ChannelXOutputEnable is low (0)."
+        ::= { owDS2450Entry 5 }
+
+    owDS2450ChannelBConversionValue OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Conversion value of the channel, in volts."
+        ::= { owDS2450Entry 6 }
+
+    owDS2450ChannelBConversionResolution OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Conversion resolution of the channel. Can be set
+                            between 1 and 16."
+        ::= { owDS2450Entry 7 }
+
+    owDS2450ChannelBConversionRange OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "If high (1), the maximum voltage that can be
+        					measured is 5.10, low (0) sets the maximum voltage
+        					to 2.55."
+        ::= { owDS2450Entry 8 }
+
+    owDS2450ChannelBOutputEnable OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A setting of 1 enables the output transistor, use
+        					ChannelXOutputControl to turn the transistor on / off."
+        ::= { owDS2450Entry 9 }
+
+    owDS2450ChannelBOutputControl OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set to low (0) to turn on the output transistor. Has
+                            no effect if ChannelXOutputEnable is low (0)."
+        ::= { owDS2450Entry 10 }
+
+    owDS2450ChannelCConversionValue OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Conversion value of the channel, in volts."
+        ::= { owDS2450Entry 11 }
+
+    owDS2450ChannelCConversionResolution OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Conversion resolution of the channel. Can be set
+                            between 1 and 16."
+        ::= { owDS2450Entry 12 }
+
+    owDS2450ChannelCConversionRange OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "If high (1), the maximum voltage that can be
+        					measured is 5.10, low (0) sets the maximum voltage
+        					to 2.55."
+        ::= { owDS2450Entry 13 }
+
+    owDS2450ChannelCOutputEnable OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A setting of 1 enables the output transistor, use
+        					ChannelXOutputControl to turn the transistor on / off."
+        ::= { owDS2450Entry 14 }
+
+    owDS2450ChannelCOutputControl OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set to low (0) to turn on the output transistor. Has
+                            no effect if ChannelXOutputEnable is low (0)."
+        ::= { owDS2450Entry 15 }
+
+    owDS2450ChannelDConversionValue OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Conversion value of the channel, in volts."
+        ::= { owDS2450Entry 16 }
+
+    owDS2450ChannelDConversionResolution OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Conversion resolution of the channel. Can be set
+                            between 1 and 16."
+        ::= { owDS2450Entry 17 }
+
+    owDS2450ChannelDConversionRange OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "If high (1), the maximum voltage that can be
+        					measured is 5.10, low (0) sets the maximum voltage
+        					to 2.55."
+        ::= { owDS2450Entry 18 }
+
+    owDS2450ChannelDOutputEnable OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A setting of 1 enables the output transistor, use
+        					ChannelXOutputControl to turn the transistor on / off."
+        ::= { owDS2450Entry 19 }
+
+    owDS2450ChannelDOutputControl OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set to low (0) to turn on the output transistor. Has
+                            no effect if ChannelXOutputEnable is low (0)."
+        ::= { owDS2450Entry 20 }
+
+    owDS2450PowerOnReset OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set high (1) with a power on reset. Reset
+                            by writing any value."
+        ::= { owDS2450Entry 21 }
+
+    owDS2450VCCControl OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set high (1) if the VCC pin is connected to power,
+                            set low (0) otherwise."
+        ::= { owDS2450Entry 22 }
+
+-- EDS0064 TABLE
+
+    owEDS0064Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0064Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0064 device data (temperature)"
+        ::= { owDevices 11 }
+
+    owEDS0064Entry OBJECT-TYPE
+        SYNTAX              owEDS0064Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0064Table 1 }
+
+    owEDS0064Entry ::= SEQUENCE {
+        owEDS0064Temperature
+            DisplayString,
+        owEDS0064Counter
+            COUNTER32
+    }
+
+    owEDS0064Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owEDS0064Entry 1 }
+
+    owEDS0064Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0064Entry 2 }
+
+-- EDS0065 TABLE
+
+    owEDS0065Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0065Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0065 device data (temperature and humiditiy)."
+        ::= { owDevices 12 }
+
+    owEDS0065Entry OBJECT-TYPE
+        SYNTAX              owEDS0065Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0065Table 1 }
+
+    owEDS0065Entry ::= SEQUENCE {
+        owEDS0065Temperature
+            DisplayString,
+        owEDS0065Humidity
+            DisplayString,
+        owEDS0065DewPoint
+            DisplayString,
+        owEDS0065Humidex
+            DisplayString,
+        owEDS0065HeatIndex
+            DisplayString,
+        owEDS0065Counter
+            COUNTER32
+    }
+
+    owEDS0065Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owEDS0065Entry 1 }
+
+    owEDS0065Humidity OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidity."
+        ::= { owEDS0065Entry 2 }
+
+    owEDS0065DewPoint OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "DewPoint."
+        ::= { owEDS0065Entry 3 }
+
+    owEDS0065Humidex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidex."
+        ::= { owEDS0065Entry 4 }
+
+    owEDS0065HeatIndex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Heat Index."
+        ::= { owEDS0065Entry 5 }
+
+    owEDS0065Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0065Entry 6 }
+
+-- EDS0066 TABLE
+
+    owEDS0066Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0066Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0001 device data (temperature and barometric pressure)."
+        ::= { owDevices 13 }
+
+    owEDS0066Entry OBJECT-TYPE
+        SYNTAX              owEDS0066Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0066Table 1 }
+
+    owEDS0066Entry ::= SEQUENCE {
+        owEDS0066Temperature
+            DisplayString,
+        owEDS0066BarometricPressureMb
+        	DisplayString,
+        owEDS0066BarometricPressureHg
+        	DisplayString,
+        owEDS0066Counter
+            COUNTER32
+    }
+
+    owEDS0066Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owEDS0066Entry 1 }
+
+    owEDS0066BarometricPressureMb OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Barometric Pressure in Millibars."
+        ::= { owEDS0066Entry 2 }
+
+    owEDS0066BarometricPressureHg OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Barometric Pressure in Inches of Mercury."
+        ::= { owEDS0066Entry 3 }
+
+    owEDS0066Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0066Entry 4 }
+
+-- EDS0067 TABLE
+
+    owEDS0067Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0067Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0067 device data (temperature and light)."
+        ::= { owDevices 14 }
+
+    owEDS0067Entry OBJECT-TYPE
+        SYNTAX              owEDS0067Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0067Table 1 }
+
+    owEDS0067Entry ::= SEQUENCE {
+        owEDS0067Temperature
+            DisplayString,
+        owEDS0067Light,
+        	DisplayString,
+        owEDS0067Counter
+            COUNTER32
+    }
+
+    owEDS0067Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owEDS0067Entry 1 }
+
+    owEDS0067Light OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Light."
+        ::= { owEDS0067Entry 2 }
+
+    owEDS0067Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0067Entry 3 }
+
+-- EDS0068 TABLE
+
+    owEDS0068Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0068Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0068 device data (temperature, humidity, barometric pressure and light)."
+        ::= { owDevices 15 }
+
+    owEDS0068Entry OBJECT-TYPE
+        SYNTAX              owEDS0068Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0068Table 1 }
+
+    owEDS0068Entry ::= SEQUENCE {
+        owEDS0068Temperature
+            DisplayString,
+        owEDS0068Humidity
+            DisplayString,
+        owEDS0068DewPoint
+            DisplayString,
+        owEDS0068Humidex
+            DisplayString,
+        owEDS0068HeatIndex
+            DisplayString,
+        owEDS0068BarometricPressureMb
+        	DisplayString,
+        owEDS0068BarometricPressureHg
+        	DisplayString,
+        owEDS0068Light,
+        	DisplayString,
+        owEDS0068Counter
+            COUNTER32
+    }
+
+    owEDS0068Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owEDS0068Entry 1 }
+
+    owEDS0068Humidity OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidity."
+        ::= { owEDS0068Entry 2 }
+
+    owEDS0068DewPoint OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "DewPoint."
+        ::= { owEDS0068Entry 3 }
+
+    owEDS0068Humidex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidex."
+        ::= { owEDS0068Entry 4 }
+
+    owEDS0068HeatIndex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Heat Index."
+        ::= { owEDS0068Entry 5 }
+
+    owEDS0068BarometricPressureMb OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Barometric Pressure in Millibars."
+        ::= { owEDS0068Entry 6 }
+
+    owEDS0068BarometricPressureHg OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Barometric Pressure in Inches of Mercury."
+        ::= { owEDS0068Entry 7 }
+
+    owEDS0068Light OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Light."
+        ::= { owEDS0068Entry 8 }
+
+    owEDS0068Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0068Entry 9 }
+
+-- EDS0069 TABLE - motion
+
+    owEDS0069Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0069Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0069 device data (temperature and motion)."
+        ::= { owDevices 16 }
+
+    owEDS0069Entry OBJECT-TYPE
+        SYNTAX              owEDS0069Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0069Table 1 }
+
+    owEDS0069Entry ::= SEQUENCE {
+        owEDS0069Temperature
+            DisplayString,
+        owEDS0069Motion
+            DisplayString,
+        owEDS0069Counter
+            COUNTER32
+    }
+
+    owEDS0069Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owEDS0069Entry 1 }
+
+    owEDS0069Motion OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Motion counter."
+        ::= { owEDS0069Entry 2 }
+
+    owEDS0069Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0069Entry 3 }
+
+-- EDS0070 TABLE - vibration
+
+    owEDS0070Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0070Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0070 device data (vibration)."
+        ::= { owDevices 17 }
+
+    owEDS0070Entry OBJECT-TYPE
+        SYNTAX              owEDS0070Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0070Table 1 }
+
+    owEDS0070Entry ::= SEQUENCE {
+        owEDS0070VibrationInstant
+            INTEGER,
+        owEDS0070VibrationPeak
+            INTEGER,
+        owEDS0070VibrationMax
+            INTEGER,
+        owEDS0070VibrationMin
+            INTEGER,
+        owEDS0070Counter
+            COUNTER32
+    }
+
+    owEDS0070VibrationInstant OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 65535 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Vibration, instant value."
+        ::= { owEDS0070Entry 1 }
+
+    owEDS0070VibrationPeak OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 65535 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Vibration, instant value."
+        ::= { owEDS0070Entry 2 }
+
+    owEDS0070VibrationMax OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 65535 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Vibration, instant value."
+        ::= { owEDS0070Entry 3 }
+
+    owEDS0070VibrationMin OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 65535 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Vibration, instant value."
+        ::= { owEDS0070Entry 4 }
+
+    owEDS0070Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0070Entry 5 }
+
+-- EDS0071 TABLE - RTD 4-wire
+
+    owEDS0071Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0071Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0071 device data (RTD 4-wire)."
+        ::= { owDevices 18 }
+
+    owEDS0071Entry OBJECT-TYPE
+        SYNTAX              owEDS0071Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0071Table 1 }
+
+    owEDS0071Entry ::= SEQUENCE {
+        owEDS0071Temperature
+            DisplayString,
+        owEDS0071Counter
+            COUNTER32
+    }
+
+    owEDS0071Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { owEDS0071Entry 1 }
+
+    owEDS0071Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0071Entry 2 }
+
+-- EDS0080 TABLE - octal 4-20ma
+
+    owEDS0080Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0080Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0080 device data (octal 4-20ma)."
+        ::= { owDevices 19 }
+
+    owEDS0080Entry OBJECT-TYPE
+        SYNTAX              owEDS0080Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0080Table 1 }
+
+    owEDS0080Entry ::= SEQUENCE {
+        owEDS0080Input1
+            DisplayString,
+        owEDS0080Input2
+            DisplayString,
+        owEDS0080Input3
+            DisplayString,
+        owEDS0080Input4
+            DisplayString,
+        owEDS0080Input5
+            DisplayString,
+        owEDS0080Input6
+            DisplayString,
+        owEDS0080Input7
+            DisplayString,
+        owEDS0080Input8
+            DisplayString,
+        owEDS0080Counter
+            COUNTER32
+    }
+
+    owEDS0080Input1 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1."
+        ::= { owEDS0080Entry 1 }
+
+    owEDS0080Input2 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 2."
+        ::= { owEDS0080Entry 2 }
+
+    owEDS0080Input3 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 3."
+        ::= { owEDS0080Entry 3 }
+
+    owEDS0080Input4 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 4."
+        ::= { owEDS0080Entry 4 }
+
+    owEDS0080Input5 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 5."
+        ::= { owEDS0080Entry 5 }
+
+    owEDS0080Input6 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 6."
+        ::= { owEDS0080Entry 6 }
+
+    owEDS0080Input7 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 7."
+        ::= { owEDS0080Entry 7 }
+
+    owEDS0080Input8 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 8."
+        ::= { owEDS0080Entry 8 }
+
+    owEDS0080Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0080Entry 9 }
+
+-- EDS0082 TABLE - octal 0-10v
+
+    owEDS0082Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0082Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0082 device data (octal 0-10v)."
+        ::= { owDevices 20 }
+
+    owEDS0082Entry OBJECT-TYPE
+        SYNTAX              owEDS0082Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0082Table 1 }
+
+    owEDS0082Entry ::= SEQUENCE {
+        owEDS0082Input1
+            DisplayString,
+        owEDS0082Input2
+            DisplayString,
+        owEDS0082Input3
+            DisplayString,
+        owEDS0082Input4
+            DisplayString,
+        owEDS0082Input5
+            DisplayString,
+        owEDS0082Input6
+            DisplayString,
+        owEDS0082Input7
+            DisplayString,
+        owEDS0082Input8
+            DisplayString,
+        owEDS0082Counter
+            COUNTER32
+    }
+
+    owEDS0082Input1 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1."
+        ::= { owEDS0082Entry 1 }
+
+    owEDS0082Input2 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 2."
+        ::= { owEDS0082Entry 2 }
+
+    owEDS0082Input3 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 3."
+        ::= { owEDS0082Entry 3 }
+
+    owEDS0082Input4 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 4."
+        ::= { owEDS0082Entry 4 }
+
+    owEDS0082Input5 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 5."
+        ::= { owEDS0082Entry 5 }
+
+    owEDS0082Input6 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 6."
+        ::= { owEDS0082Entry 6 }
+
+    owEDS0082Input7 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 7."
+        ::= { owEDS0082Entry 7 }
+
+    owEDS0082Input8 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 8."
+        ::= { owEDS0082Entry 8 }
+
+    owEDS0082Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0082Entry 9 }
+
+-- EDS0083 TABLE - quad 4-20ma
+
+    owEDS0083Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0083Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0083 device data (quad 4-20ma)."
+        ::= { owDevices 21 }
+
+    owEDS0083Entry OBJECT-TYPE
+        SYNTAX              owEDS0083Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0083Table 1 }
+
+    owEDS0083Entry ::= SEQUENCE {
+        owEDS0083Input1
+            DisplayString,
+        owEDS0083Input2
+            DisplayString,
+        owEDS0083Input3
+            DisplayString,
+        owEDS0083Input4
+            DisplayString,
+        owEDS0083Counter
+            COUNTER32
+    }
+
+    owEDS0083Input1 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1."
+        ::= { owEDS0083Entry 1 }
+
+    owEDS0083Input2 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 2."
+        ::= { owEDS0083Entry 2 }
+
+    owEDS0083Input3 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 3."
+        ::= { owEDS0083Entry 3 }
+
+    owEDS0083Input4 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 4."
+        ::= { owEDS0083Entry 4 }
+
+    owEDS0083Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0083Entry 5 }
+
+-- EDS0085 TABLE - quad 0-10v
+
+    owEDS0085Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0085Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0085 device data (quad 0-10v)."
+        ::= { owDevices 22 }
+
+    owEDS0085Entry OBJECT-TYPE
+        SYNTAX              owEDS0085Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0085Table 1 }
+
+    owEDS0085Entry ::= SEQUENCE {
+        owEDS0085Input1
+            DisplayString,
+        owEDS0085Input2
+            DisplayString,
+        owEDS0085Input3
+            DisplayString,
+        owEDS0085Input4
+            DisplayString,
+        owEDS0085Counter
+            COUNTER32
+    }
+
+    owEDS0085Input1 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1."
+        ::= { owEDS0085Entry 1 }
+
+    owEDS0085Input2 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 2."
+        ::= { owEDS0085Entry 2 }
+
+    owEDS0085Input3 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 3."
+        ::= { owEDS0085Entry 3 }
+
+    owEDS0085Input4 OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 4."
+        ::= { owEDS0085Entry 4 }
+
+    owEDS0085Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0085Entry 5 }
+
+-- EDS0090 TABLE - octal discrete IO
+
+    owEDS0090Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0090Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0090 device data (octal discrete IO)."
+        ::= { owDevices 23 }
+
+    owEDS0090Entry OBJECT-TYPE
+        SYNTAX              owEDS0090Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0090Table 1 }
+
+    owEDS0090Entry ::= SEQUENCE {
+        owEDS0090Input1
+            INTEGER,
+        owEDS0090Input2
+            INTEGER,
+        owEDS0090Input3
+            INTEGER,
+        owEDS0090Input4
+            INTEGER,
+        owEDS0090Input5
+            INTEGER,
+        owEDS0090Input6
+            INTEGER,
+        owEDS0090Input7
+            INTEGER,
+        owEDS0090Input8
+            INTEGER,
+        owEDS0090ActivityLatch1
+            INTEGER,
+        owEDS0090ActivityLatch2
+            INTEGER,
+        owEDS0090ActivityLatch3
+            INTEGER,
+        owEDS0090ActivityLatch4
+            INTEGER,
+        owEDS0090ActivityLatch5
+            INTEGER,
+        owEDS0090ActivityLatch6
+            INTEGER,
+        owEDS0090ActivityLatch7
+            INTEGER,
+        owEDS0090ActivityLatch8
+            INTEGER,
+        owEDS0090PulseCounter1
+            COUNTER32,
+        owEDS0090PulseCounter2
+            COUNTER32,
+        owEDS0090PulseCounter3
+            COUNTER32,
+        owEDS0090PulseCounter4
+            COUNTER32,
+        owEDS0090PulseCounter5
+            COUNTER32,
+        owEDS0090PulseCounter6
+            COUNTER32,
+        owEDS0090PulseCounter7
+            COUNTER32,
+        owEDS0090PulseCounter8
+            COUNTER32,
+        owEDS0090Output1
+            INTEGER,
+        owEDS0090Output2
+            INTEGER,
+        owEDS0090Output3
+            INTEGER,
+        owEDS0090Output4
+            INTEGER,
+        owEDS0090Output5
+            INTEGER,
+        owEDS0090Output6
+            INTEGER,
+        owEDS0090Output7
+            INTEGER,
+        owEDS0090Output8
+            INTEGER,
+        owEDS0090PullDown1
+            INTEGER,
+        owEDS0090PullDown2
+            INTEGER,
+        owEDS0090PullDown3
+            INTEGER,
+        owEDS0090PullDown4
+            INTEGER,
+        owEDS0090PullDown5
+            INTEGER,
+        owEDS0090PullDown6
+            INTEGER,
+        owEDS0090PullDown7
+            INTEGER,
+        owEDS0090PullDown8
+            INTEGER,
+        owEDS0090ActivityLatchReset1
+            INTEGER,
+        owEDS0090ActivityLatchReset2
+            INTEGER,
+        owEDS0090ActivityLatchReset3
+            INTEGER,
+        owEDS0090ActivityLatchReset4
+            INTEGER,
+        owEDS0090ActivityLatchReset5
+            INTEGER,
+        owEDS0090ActivityLatchReset6
+            INTEGER,
+        owEDS0090ActivityLatchReset7
+            INTEGER,
+        owEDS0090ActivityLatchReset8
+            INTEGER,
+        owEDS0090PulseCounterReset1
+            INTEGER,
+        owEDS0090PulseCounterReset2
+            INTEGER,
+        owEDS0090PulseCounterReset3
+            INTEGER,
+        owEDS0090PulseCounterReset4
+            INTEGER,
+        owEDS0090PulseCounterReset5
+            INTEGER,
+        owEDS0090PulseCounterReset6
+            INTEGER,
+        owEDS0090PulseCounterReset7
+            INTEGER,
+        owEDS0090PulseCounterReset8
+            INTEGER,
+            
+        owEDS0090Counter
+            COUNTER32
+    }
+
+    owEDS0090Input1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1."
+        ::= { owEDS0090Entry 1 }
+
+    owEDS0090Input2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 2."
+        ::= { owEDS0090Entry 2 }
+
+    owEDS0090Input3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 3."
+        ::= { owEDS0090Entry 3 }
+
+    owEDS0090Input4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 4."
+        ::= { owEDS0090Entry 4 }
+
+    owEDS0090Input5 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 5."
+        ::= { owEDS0090Entry 5 }
+
+    owEDS0090Input6 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 6."
+        ::= { owEDS0090Entry 6 }
+
+    owEDS0090Input7 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 7."
+        ::= { owEDS0090Entry 7 }
+
+    owEDS0090Input8 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 8."
+        ::= { owEDS0090Entry 8 }
+
+    owEDS0090ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 1."
+        ::= { owEDS0090Entry 9 }
+
+    owEDS0090ActivityLatch2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 2."
+        ::= { owEDS0090Entry 10 }
+
+    owEDS0090ActivityLatch3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 3."
+        ::= { owEDS0090Entry 11 }
+
+    owEDS0090ActivityLatch4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 4."
+        ::= { owEDS0090Entry 12 }
+
+    owEDS0090ActivityLatch5 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 5."
+        ::= { owEDS0090Entry 13 }
+
+    owEDS0090ActivityLatch6 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 6."
+        ::= { owEDS0090Entry 14 }
+
+    owEDS0090ActivityLatch7 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 7."
+        ::= { owEDS0090Entry 15 }
+
+    owEDS0090ActivityLatch8 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 8."
+        ::= { owEDS0090Entry 16 }
+
+    owEDS0090PulseCounter1 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 1."
+        ::= { owEDS0090Entry 17 }
+
+    owEDS0090PulseCounter2 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 2."
+        ::= { owEDS0090Entry 18 }
+
+    owEDS0090PulseCounter3 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 3."
+        ::= { owEDS0090Entry 19 }
+
+    owEDS0090PulseCounter4 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 4."
+        ::= { owEDS0090Entry 20 }
+
+    owEDS0090PulseCounter5 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 5."
+        ::= { owEDS0090Entry 21 }
+
+    owEDS0090PulseCounter6 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 6."
+        ::= { owEDS0090Entry 22 }
+
+    owEDS0090PulseCounter7 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 7."
+        ::= { owEDS0090Entry 23 }
+
+    owEDS0090PulseCounter8 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 8."
+        ::= { owEDS0090Entry 24 }
+
+    owEDS0090Output1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 1."
+        ::= { owEDS0090Entry 25 }
+
+    owEDS0090Output2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 2."
+        ::= { owEDS0090Entry 26 }
+
+    owEDS0090Output3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 3."
+        ::= { owEDS0090Entry 27 }
+
+    owEDS0090Output4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 4."
+        ::= { owEDS0090Entry 28 }
+
+    owEDS0090Output5 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 5."
+        ::= { owEDS0090Entry 29 }
+
+    owEDS0090Output6 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 6."
+        ::= { owEDS0090Entry 30 }
+
+    owEDS0090Output7 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 7."
+        ::= { owEDS0090Entry 31 }
+
+    owEDS0090Output8 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 8."
+        ::= { owEDS0090Entry 32 }
+
+    owEDS0090PullDown1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 33 }
+
+    owEDS0090PullDown2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 34 }
+
+    owEDS0090PullDown3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 35 }
+
+    owEDS0090PullDown4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 36 }
+
+    owEDS0090PullDown5 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 37 }
+
+    owEDS0090PullDown6 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 38 }
+
+    owEDS0090PullDown7 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 39 }
+
+    owEDS0090PullDown8 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PullDown 1."
+        ::= { owEDS0090Entry 40 }
+
+    owEDS0090ActivityLatchReset1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 1."
+        ::= { owEDS0090Entry 41 }
+
+    owEDS0090ActivityLatchReset2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 2."
+        ::= { owEDS0090Entry 42 }
+
+    owEDS0090ActivityLatchReset3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 3."
+        ::= { owEDS0090Entry 43 }
+
+    owEDS0090ActivityLatchReset4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 4."
+        ::= { owEDS0090Entry 44 }
+
+    owEDS0090ActivityLatchReset5 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 5."
+        ::= { owEDS0090Entry 45 }
+
+    owEDS0090ActivityLatchReset6 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 6."
+        ::= { owEDS0090Entry 46 }
+
+    owEDS0090ActivityLatchReset7 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 7."
+        ::= { owEDS0090Entry 47 }
+
+    owEDS0090ActivityLatchReset8 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 8."
+        ::= { owEDS0090Entry 48 }
+
+    owEDS0090PulseCounterReset1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 1."
+        ::= { owEDS0090Entry 49 }
+
+    owEDS0090PulseCounterReset2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 2."
+        ::= { owEDS0090Entry 50 }
+
+    owEDS0090PulseCounterReset3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 3."
+        ::= { owEDS0090Entry 51 }
+
+    owEDS0090PulseCounterReset4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 4."
+        ::= { owEDS0090Entry 52 }
+
+    owEDS0090PulseCounterReset5 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 5."
+        ::= { owEDS0090Entry 53 }
+
+    owEDS0090PulseCounterReset6 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 6."
+        ::= { owEDS0090Entry 54 }
+
+    owEDS0090PulseCounterReset7 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 7."
+        ::= { owEDS0090Entry 55 }
+
+    owEDS0090PulseCounterReset8 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 8."
+        ::= { owEDS0090Entry 56 }
+
+    owEDS0090Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0090Entry 57 }
+
+
+-- EDS0091 TABLE - quad opto
+
+    owEDS0091Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0091Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0091 device data (quad opto input)."
+        ::= { owDevices 24 }
+
+    owEDS0091Entry OBJECT-TYPE
+        SYNTAX              owEDS0091Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0091Table 1 }
+
+    owEDS0091Entry ::= SEQUENCE {
+        owEDS0091Input1
+            INTEGER,
+        owEDS0091Input2
+            INTEGER,
+        owEDS0091Input3
+            INTEGER,
+        owEDS0091Input4
+            INTEGER,
+        owEDS0091ActivityLatch1
+            INTEGER,
+        owEDS0091ActivityLatch2
+            INTEGER,
+        owEDS0091ActivityLatch3
+            INTEGER,
+        owEDS0091ActivityLatch4
+            INTEGER,
+        owEDS0091PulseCounter1
+            COUNTER32,
+        owEDS0091PulseCounter2
+            COUNTER32,
+        owEDS0091PulseCounter3
+            COUNTER32,
+        owEDS0091PulseCounter4
+            COUNTER32,
+        owEDS0091PulseCounterReset1
+            INTEGER,
+        owEDS0091PulseCounterReset2
+            INTEGER,
+        owEDS0091PulseCounterReset3
+            INTEGER,
+        owEDS0091PulseCounterReset4
+            INTEGER,
+        owEDS0091ActivityLatchReset1
+            INTEGER,
+        owEDS0091ActivityLatchReset2
+            INTEGER,
+        owEDS0091ActivityLatchReset3
+            INTEGER,
+        owEDS0091ActivityLatchReset4
+            INTEGER,
+        owEDS0091Counter
+            COUNTER32
+    }
+
+    owEDS0091Input1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1."
+        ::= { owEDS0091Entry 1 }
+
+    owEDS0091Input2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 2."
+        ::= { owEDS0091Entry 2 }
+
+    owEDS0091Input3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 3."
+        ::= { owEDS0091Entry 3 }
+
+    owEDS0091Input4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 4."
+        ::= { owEDS0091Entry 4 }
+
+    owEDS0091ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 1."
+        ::= { owEDS0091Entry 5 }
+
+    owEDS0091ActivityLatch2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 2."
+        ::= { owEDS0091Entry 6 }
+
+    owEDS0091ActivityLatch3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 3."
+        ::= { owEDS0091Entry 7 }
+
+    owEDS0091ActivityLatch4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch 4."
+        ::= { owEDS0091Entry 8 }
+
+    owEDS0091PulseCounter1 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 1."
+        ::= { owEDS0091Entry 9 }
+
+    owEDS0091PulseCounter2 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 1."
+        ::= { owEDS0091Entry 10 }
+
+    owEDS0091PulseCounter3 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 1."
+        ::= { owEDS0091Entry 11 }
+
+    owEDS0091PulseCounter4 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter 1."
+        ::= { owEDS0091Entry 12 }
+
+    owEDS0091PulseCounterReset1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 1."
+        ::= { owEDS0091Entry 13 }
+
+    owEDS0091PulseCounterReset2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 2."
+        ::= { owEDS0091Entry 14 }
+
+    owEDS0091PulseCounterReset3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 3."
+        ::= { owEDS0091Entry 15 }
+
+    owEDS0091PulseCounterReset4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 4."
+        ::= { owEDS0091Entry 16 }
+
+    owEDS0091ActivityLatchReset1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 1."
+        ::= { owEDS0091Entry 17 }
+
+    owEDS0091ActivityLatchReset2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 2."
+        ::= { owEDS0091Entry 18 }
+
+    owEDS0091ActivityLatchReset3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 3."
+        ::= { owEDS0091Entry 19 }
+
+    owEDS0091ActivityLatchReset4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 4."
+        ::= { owEDS0091Entry 20 }
+
+
+    owEDS0091Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0091Entry 21 }
+
+-- EDS0092 TABLE - quad relay
+
+    owEDS0092Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF owEDS0092Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0092 device data (quad relay output)."
+        ::= { owDevices 25 }
+
+    owEDS0092Entry OBJECT-TYPE
+        SYNTAX              owEDS0092Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0092Table 1 }
+
+    owEDS0092Entry ::= SEQUENCE {
+        owEDS0092Output1
+            DisplayString,
+        owEDS0092Output2
+            DisplayString,
+        owEDS0092Output3
+            DisplayString,
+        owEDS0092Output4
+            DisplayString,
+        owEDS0092Counter
+            COUNTER32
+    }
+
+    owEDS0092Output1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Output 1."
+        ::= { owEDS0092Entry 1 }
+
+    owEDS0092Output2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Output 2."
+        ::= { owEDS0092Entry 2 }
+
+    owEDS0092Output3 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Output 3."
+        ::= { owEDS0092Entry 3 }
+
+    owEDS0092Output4 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Output 4."
+        ::= { owEDS0092Entry 4 }
+
+    owEDS0092Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0092Entry 5 }
+
+
+
+-- DS28EA00 TABLE - Temp with PIO
+
+    owDS28EA00Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwDS28EA00Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for DS28EA00 (1-wire
+                            digital thermometer with PIO)."
+        ::= { owDevices 26 }
+
+    owDS28EA00Entry OBJECT-TYPE
+        SYNTAX              OwDS28EA00Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owDS28EA00Table 1 }
+
+    OwDS28EA00Entry ::= SEQUENCE {
+        owDS28EA00Temperature
+            DisplayString,
+        owDS28EA00UserByte1
+            INTEGER,
+        owDS28EA00UserByte2
+            INTEGER,
+	owDS28EA00PIOALevel
+	    INTEGER,
+	owDS28EA00PIOBLevel
+	    INTEGER,
+	owDS28EA00PIOAFlipFlop
+	    INTEGER,
+	owDS28EA00PIOBFlipFlop
+	    INTEGER,
+    }
+
+    owDS28EA00Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Current temperature from device, displayed as
+                            a string with decimal point. Required since MIB's
+                            cannot contain floating point numbers."
+        ::= { owDS28EA00Entry 1 }
+
+    owDS28EA00UserByte1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "User byte 1 as read from EEPROM."
+        ::= { owDS28EA00Entry 2 }
+
+    owDS28EA00UserByte2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "User byte 2 as read from EEPROM."
+        ::= { owDS28EA00Entry 3 }
+
+    owDS28EA00PIOALevel OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "PIO-A logic level on pin. If PIO-A flip flop is
+                            low, this input will always read low."
+        ::= { owDS28EA00Entry 4 }
+
+    owDS28EA00PIOBLevel OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "PIO-B logic level on pin. If PIO-B flip flop is
+                            low, this input will always read low."
+        ::= { owDS28EA00Entry 5 }
+
+    owDS28EA00PIOAFlipFlop OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PIO-A Flip Flop. Sets output state of the
+                            FF. The output is open collector, so the FF must
+                            be high (1) to be able to read a pin state of
+                            low (0)."
+        ::= { owDS28EA00Entry 6 }
+
+    owDS28EA00PIOBFlipFlop OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "PIO-B Flip Flop. Sets output state of the
+                            FF. The output is open collector, so the FF must
+                            be high (1) to be able to read a pin state of
+                            low (0)."
+        ::= { owDS28EA00Entry 7 }
+
+
+-- EDS0050 TABLE - Temp with PIO
+
+    owEDS0050Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF OwEDS0050Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS0050 (Temp, 
+                            2 discrete, 1 analog (0-10v))."
+        ::= { owDevices 27 }
+
+    owEDS0050Entry OBJECT-TYPE
+        SYNTAX              OwEDS0050Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                owDeviceIndex
+                            }
+        ::= { owEDS0050Table 1 }
+
+    OwEDS0050Entry ::= SEQUENCE {
+        owEDS0050Temperature
+            DisplayString,
+        owEDS0050InputVoltage
+            DisplayString,
+        owEDS0050Input1
+            INTEGER,
+	
+        owEDS0050Input2
+    
+	    INTEGER,
+	
+    	owEDS0050ActivityLatch1	    
+    		INTEGER,
+	
+    	owEDS0050ActivityLatch2
+	    
+    		INTEGER,
+	
+    	owEDS0050PulseCounter1
+	    
+    		COUNTER32,
+    	owEDS0050PulseCounter2
+    		COUNTER32,
+    	owEDS0050Output1
+    		INTEGER,
+    	owEDS0050Output2
+    		INTEGER,
+    	owEDS0050ActivityLatchReset1
+    		INTEGER,
+    	owEDS0050ActivityLatchReset2
+    		INTEGER,
+    	owEDS0050PulseCounterReset1
+    		INTEGER,
+    	owEDS0050PulseCounterReset2
+    		INTEGER,
+    	owEDS0050Counter
+    		COUNTER32,
+    }
+
+    owEDS0050Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Current temperature from device, displayed as
+                            a string with decimal point. Required since MIB's
+                            cannot contain floating point numbers."
+        ::= { owEDS0050Entry 1 }
+
+    owEDS0050InputVoltage OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Voltage at the analog input."
+        ::= { owEDS0050Entry 2 }
+
+    owEDS0050Input1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Discrete state at input 1."
+        ::= { owEDS0050Entry 3 }
+
+    owEDS0050Input2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Discrete state at input 2."
+        ::= { owEDS0050Entry 4 }
+
+    owEDS0050ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Set to 1 if input has changed."
+        ::= { owEDS0050Entry 5 }
+
+    owEDS0050ActivityLatch2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Set to 1 if input has changed."
+        ::= { owEDS0050Entry 6 }
+
+    owEDS0050PulseCounter1 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Count of the pulses on input 1."
+        ::= { owEDS0050Entry 7 }
+
+    owEDS0050PulseCounter2 OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Count of the pulses on input 2."
+        ::= { owEDS0050Entry 8 }
+
+    owEDS0050Output1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 1."
+        ::= { owEDS0050Entry 9 }
+
+    owEDS0050Output2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                low( 0 ),
+                                high( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Output 2."
+        ::= { owEDS0050Entry 10 }
+
+    owEDS0050ActivityLatchReset1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 1."
+        ::= { owEDS0050Entry 11 }
+
+    owEDS0050ActivityLatchReset2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                nofunction( 0 ),
+                                reset( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Activity Latch Reset 2."
+        ::= { owEDS0050Entry 12 }
+
+    owEDS0050PulseCounterReset1 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 1."
+        ::= { owEDS0050Entry 13 }
+
+    owEDS0050PulseCounterReset2 OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                off( 0 ),
+                                on( 1 )
+                            }
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Pulse Counter Reset 2."
+        ::= { owEDS0050Entry 14 }
+
+    owEDS0050Counter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Counter."
+        ::= { owEDS0050Entry 15 }
+
+
+
+
+
+
+    --Wireless device trap table
+    wTrap OBJECT IDENTIFIER ::= { edsMain 3 }
+    wTrapTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wTrapEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        ::= { wTrap 1 }
+
+    wTrapEntry OBJECT-TYPE
+        SYNTAX              wTrapEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                wTrapIndex
+                            }
+        ::= { wTrapTable 1 }
+
+    wTrapEntry ::= SEQUENCE {
+        wTrapIndex
+            INTEGER,
+        wTrapIP
+            IpAddress,
+        wTrapCommunity
+            INTEGER,
+	wTrapEUI
+	    OCTET STRING,
+	wTrapVariable
+	    OCTET STRING,
+	wTrapHighThreshold
+	    DisplayString,
+	wTrapLowThreshold
+	    DisplayString,
+    }
+
+    wTrapIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Index of table. Traps are sent with this OID followed by the index
+        					number of the table entry that generated the trap. An integer value is sent with the
+        					trap which indicates what state change caused the trap. Using the
+        					wTrapDeviceHighThreshold and wTrapDeviceLowThreshold
+        					values, 3 windows are created. Transitions between
+        					these windows generates a trap. The integer value indicates which 
+        					transition caused the trap as follows:
+        					   1 -> middle to high window transition
+        					   2 -> high to middle window transition
+        					   3 -> middle to low window transition
+        					   4 -> low to middle window transition
+        					   
+        					Note the following when programming traps:
+        					   1) Programming the HighThreshold lower than the LowThreshold is
+        					      invalid and will disable trap generation.
+        					   2) The wTrapEUI must be set to an active device or a trap 
+        					      will not be sent.
+        					   3) The health of the device must be greater than 0 or no trap will
+        					      be sent.
+        					   4) The wTrapVariable must match one of the XML names."
+        ::= { wTrapEntry 1 }
+
+    wTrapIP OBJECT-TYPE
+        SYNTAX              IpAddress
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Address to send trap to."
+        ::= { wTrapEntry 2 }
+
+    wTrapCommunity OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Community string to send with trap message."
+        ::= { wTrapEntry 3 }
+
+    wTrapEUI OBJECT-TYPE
+        SYNTAX              DisplayString(SIZE(16))
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Device EUI code to base sending trap message on."
+        ::= { wTrapEntry 4 }
+
+    wTrapVariable OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Name of the variable, as stated in the XML file. For example, the name of humidity
+				for a EDS1068 is 'Humidity' (without the quotes)."
+        ::= { wTrapEntry 5 }
+
+    wTrapHighThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A trap will be generated when the variable is greater than this value or
+        			less than or equal to this value. This number 
+        			may be positive or negative and may contain a decimal point."
+        ::= { wTrapEntry 6 }
+
+    wTrapLowThreshold OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "A trap will be generated when the variable is less than this value or
+        			greater than or equal to this value. This number 
+        			may be positive or negative and may contain a decimal point."
+        ::= { wTrapEntry 7 }
+
+
+
+    --Wireless devices branch.
+    wDevices OBJECT IDENTIFIER ::= { edsMain 11 }
+
+    --Device type table (conceptual).
+    wDeviceTypes OBJECT IDENTIFIER ::= { wDevices 1 }
+
+    wNone OBJECT IDENTIFIER ::= { wDeviceTypes 0 }
+
+    wUnknown OBJECT IDENTIFIER ::= { wDeviceTypes 1 }
+
+    wUnused1 OBJECT IDENTIFIER ::= { wDeviceTypes 2 }
+
+    wUnused2 OBJECT IDENTIFIER ::= { wDeviceTypes 3 }
+
+    wEDS1068 OBJECT IDENTIFIER ::= { wDeviceTypes 4 }
+
+    wEDS1067 OBJECT IDENTIFIER ::= { wDeviceTypes 5 }
+
+    wEDS1066 OBJECT IDENTIFIER ::= { wDeviceTypes 6 }
+
+    wEDS1065 OBJECT IDENTIFIER ::= { wDeviceTypes 7 }
+
+    wEDS1064 OBJECT IDENTIFIER ::= { wDeviceTypes 8 }
+
+    wEDS1101 OBJECT IDENTIFIER ::= { wDeviceTypes 9 }
+
+    wEDS2101 OBJECT IDENTIFIER ::= { wDeviceTypes 10 }
+
+    wEDS2030 OBJECT IDENTIFIER ::= { wDeviceTypes 11 }
+
+    wDeviceInfo OBJECT IDENTIFIER ::= { wDevices 2 }
+
+    wDeviceNumActive OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Number of currently active 1-wire devices. A device
+                            is active if it's health is non-zero."
+        ::= { wDeviceInfo 1 }
+
+    wDeviceTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wDeviceEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        ::= { wDevices 3 }
+
+    wDeviceEntry OBJECT-TYPE
+        SYNTAX              wDeviceEntry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wDeviceTable 1 }
+
+    wDeviceEntry ::= SEQUENCE {
+        wDeviceIndex
+            INTEGER,
+        wDeviceType
+            INTEGER,
+        wDeviceName
+            DisplayString,
+        wDeviceDescription
+            DisplayString,
+        wDeviceFamily
+            INTEGER,
+        wDeviceEUI
+            OCTET STRING,
+        wDeviceHealth
+            INTEGER
+        wDeviceTag
+            DisplayString,
+    }
+
+    wDeviceIndex OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Index of table."
+        ::= { wDeviceEntry 1 }
+
+    wDeviceType OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "An indication of the device type. This is the
+                            last OID number to the wDeviceTypes group pointing
+                            to the name of the device. The corresponding
+                            device table will contain the specific information
+                            from the device. For example: if this entry is
+                            2 (owDS2406) then the table owDS2406Table, at
+                            the appropriate index, will contain the data
+                            from the device."
+        ::= { wDeviceEntry 2 }
+
+    wDeviceName OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Name of the device."
+        ::= { wDeviceEntry 3 }
+
+    wDeviceDescription OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Text description of the device."
+        ::= { wDeviceEntry 4 }
+
+    wDeviceFamily OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(2))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Family number."
+        ::= { wDeviceEntry 5 }
+
+    wDeviceEUI OBJECT-TYPE
+        SYNTAX              OCTET STRING (SIZE(16))
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Entire EUI as read from device."
+        ::= { wDeviceEntry 6 }
+
+    wDeviceHealth OBJECT-TYPE
+        SYNTAX              INTEGER (0..8)
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Health of device. Ranges between 0 and 7 where
+                            0 worst case and 7 is best case. Incremented
+                            every time device responds to a search, decremented
+                            if it does not respond."
+        ::= { wDeviceEntry 7 }
+
+    wDeviceTag OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Tag from device."
+        ::= { wDeviceEntry 8 }
+
+
+-- EDS1068 TABLE
+
+    wEDS1068Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS1068Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS1068 device data (temperature, humidity, barometric pressure and light)."
+        ::= { wDevices 4 }
+
+    wEDS1068Entry OBJECT-TYPE
+        SYNTAX              wEDS1068Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS1068Table 1 }
+
+    wEDS1068Entry ::= SEQUENCE {
+        wEDS1068Temperature
+            DisplayString,
+        wEDS1068Humidity
+            DisplayString,
+        wEDS1068DewPoint
+            DisplayString,
+        wEDS1068Humidex
+            DisplayString,
+        wEDS1068HeatIndex
+            DisplayString,
+        wEDS1068BarometricPressure
+        	DisplayString,
+        wEDS1068LEDState
+        	INTEGER,
+        wEDS1068RelayState
+        	INTEGER,
+        wEDS1068Light
+        	DisplayString,
+        wEDS1068Input1
+        	INTEGER,
+        wEDS1068ActivityLatch1
+        	INTEGER,
+        wEDS1068PulseCounter1
+        	COUNTER32,
+        wEDS1068Battery
+        	DisplayString,
+        wEDS1068ReadCounter
+            	COUNTER32,
+        wEDS1068LEDFunction
+        	INTEGER,
+        wEDS1068RelayFunction
+        	INTEGER,
+        wEDS1068LEDSetState
+        	INTEGER,
+        wEDS1068RelaySetState
+        	INTEGER,
+    }
+
+    wEDS1068Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { wEDS1068Entry 1 }
+
+    wEDS1068Humidity OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidity."
+        ::= { wEDS1068Entry 2 }
+
+    wEDS1068DewPoint OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "DewPoint."
+        ::= { wEDS1068Entry 3 }
+
+    wEDS1068Humidex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidex."
+        ::= { wEDS1068Entry 4 }
+
+    wEDS1068HeatIndex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Heat Index."
+        ::= { wEDS1068Entry 5 }
+
+    wEDS1068BarometricPressure OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Barometric Pressure in Millibars."
+        ::= { wEDS1068Entry 6 }
+
+    wEDS1068LEDState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "LED state."
+        ::= { wEDS1068Entry 7 }
+
+    wEDS1068RelayState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Relay state."
+        ::= { wEDS1068Entry 8 }
+
+    wEDS1068Light OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Light."
+        ::= { wEDS1068Entry 9 }
+
+    wEDS1068Input1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1 state."
+        ::= { wEDS1068Entry 10 }
+
+    wEDS1068ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity latch 1 state."
+        ::= { wEDS1068Entry 11 }
+
+    wEDS1068PulseCounter1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse counter 1."
+        ::= { wEDS1068Entry 12 }
+
+    wEDS1068Battery OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Battery voltage."
+        ::= { wEDS1068Entry 13 }
+
+    wEDS1068ReadCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Read counter."
+        ::= { wEDS1068Entry 14 }
+
+    wEDS1068LEDFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED function."
+        ::= { wEDS1068Entry 15 }
+
+    wEDS1068RelayFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay function."
+        ::= { wEDS1068Entry 16 }
+
+    wEDS1068LEDSetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED set state."
+        ::= { wEDS1068Entry 17 }
+
+    wEDS1068RelaySetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay set state."
+        ::= { wEDS1068Entry 18 }
+
+-- EDS1067 TABLE, temp, light, input, relay
+
+    wEDS1067Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS1067Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS1067 device data (temperature, humidity, barometric pressure and light)."
+        ::= { wDevices 5 }
+
+    wEDS1067Entry OBJECT-TYPE
+        SYNTAX              wEDS1067Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS1067Table 1 }
+
+    wEDS1067Entry ::= SEQUENCE {
+        wEDS1067Temperature
+            DisplayString,
+        wEDS1067LEDState
+        	INTEGER,
+        wEDS1067RelayState
+        	INTEGER,
+        wEDS1067Light
+        	DisplayString,
+        wEDS1067Input1
+        	INTEGER,
+        wEDS1067ActivityLatch1
+        	INTEGER,
+        wEDS1067PulseCounter1
+        	COUNTER32,
+        wEDS1067Battery
+        	DisplayString,
+        wEDS1067ReadCounter
+            	COUNTER32,
+        wEDS1067LEDFunction
+        	INTEGER,
+        wEDS1067RelayFunction
+        	INTEGER,
+        wEDS1067LEDSetState
+        	INTEGER,
+        wEDS1067RelaySetState
+        	INTEGER,
+    }
+
+    wEDS1067Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { wEDS1067Entry 1 }
+
+    wEDS1067LEDState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "LED state."
+        ::= { wEDS1067Entry 2 }
+
+    wEDS1067RelayState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Relay state."
+        ::= { wEDS1067Entry 3 }
+
+    wEDS1067Light OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Light."
+        ::= { wEDS1067Entry 4 }
+
+    wEDS1067Input1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1 state."
+        ::= { wEDS1067Entry 5 }
+
+    wEDS1067ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity latch 1 state."
+        ::= { wEDS1067Entry 6 }
+
+    wEDS1067PulseCounter1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse counter 1."
+        ::= { wEDS1067Entry 7 }
+
+    wEDS1067Battery OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Battery voltage."
+        ::= { wEDS1067Entry 8 }
+
+    wEDS1067ReadCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Read counter."
+        ::= { wEDS1067Entry 9 }
+
+    wEDS1067LEDFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED function."
+        ::= { wEDS1067Entry 10 }
+
+    wEDS1067RelayFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay function."
+        ::= { wEDS1067Entry 11 }
+
+    wEDS1067LEDSetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED set state."
+        ::= { wEDS1067Entry 12 }
+
+    wEDS1067RelaySetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay set state."
+        ::= { wEDS1067Entry 13 }
+
+-- EDS1066 TABLE, temp, BP, input, relay
+
+    wEDS1066Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS1066Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS1066 device data (temperature, humidity, barometric pressure and light)."
+        ::= { wDevices 6 }
+
+    wEDS1066Entry OBJECT-TYPE
+        SYNTAX              wEDS1066Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS1066Table 1 }
+
+    wEDS1066Entry ::= SEQUENCE {
+        wEDS1066Temperature
+            DisplayString,
+        wEDS1066BarometricPressure
+        	DisplayString,
+        wEDS1066LEDState
+        	INTEGER,
+        wEDS1066RelayState
+        	INTEGER,
+        wEDS1066Input1
+        	INTEGER,
+        wEDS1066ActivityLatch1
+        	INTEGER,
+        wEDS1066PulseCounter1
+        	COUNTER32,
+        wEDS1066Battery
+        	DisplayString,
+        wEDS1066ReadCounter
+            	COUNTER32,
+        wEDS1066LEDFunction
+        	INTEGER,
+        wEDS1066RelayFunction
+        	INTEGER,
+        wEDS1066LEDSetState
+        	INTEGER,
+        wEDS1066RelaySetState
+        	INTEGER,
+    }
+
+    wEDS1066Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { wEDS1066Entry 1 }
+
+    wEDS1066BarometricPressure OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Barometric Pressure in Millibars."
+        ::= { wEDS1066Entry 2 }
+
+    wEDS1066LEDState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "LED state."
+        ::= { wEDS1066Entry 3 }
+
+    wEDS1066RelayState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Relay state."
+        ::= { wEDS1066Entry 4 }
+
+    wEDS1066Input1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1 state."
+        ::= { wEDS1066Entry 5 }
+
+    wEDS1066ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity latch 1 state."
+        ::= { wEDS1066Entry 6 }
+
+    wEDS1066PulseCounter1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse counter 1."
+        ::= { wEDS1066Entry 7 }
+
+    wEDS1066Battery OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Battery voltage."
+        ::= { wEDS1066Entry 8 }
+
+    wEDS1066ReadCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Read counter."
+        ::= { wEDS1066Entry 9 }
+
+    wEDS1066LEDFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED function."
+        ::= { wEDS1066Entry 10 }
+
+    wEDS1066RelayFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay function."
+        ::= { wEDS1066Entry 11 }
+
+    wEDS1066LEDSetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED set state."
+        ::= { wEDS1066Entry 12 }
+
+    wEDS1066RelaySetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay set state."
+        ::= { wEDS1066Entry 13 }
+
+-- EDS1065 TABLE, temp, hum, input, relay
+
+    wEDS1065Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS1065Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS1065 device data (temperature, humidity, barometric pressure and light)."
+        ::= { wDevices 7 }
+
+    wEDS1065Entry OBJECT-TYPE
+        SYNTAX              wEDS1065Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS1065Table 1 }
+
+    wEDS1065Entry ::= SEQUENCE {
+        wEDS1065Temperature
+            DisplayString,
+        wEDS1065Humidity
+            DisplayString,
+        wEDS1065DewPoint
+            DisplayString,
+        wEDS1065Humidex
+            DisplayString,
+        wEDS1065HeatIndex
+            DisplayString,
+        wEDS1065LEDState
+        	INTEGER,
+        wEDS1065RelayState
+        	INTEGER,
+        wEDS1065Input1
+        	INTEGER,
+        wEDS1065ActivityLatch1
+        	INTEGER,
+        wEDS1065PulseCounter1
+        	COUNTER32,
+        wEDS1065Battery
+        	DisplayString,
+        wEDS1065ReadCounter
+            	COUNTER32,
+        wEDS1065LEDFunction
+        	INTEGER,
+        wEDS1065RelayFunction
+        	INTEGER,
+        wEDS1065LEDSetState
+        	INTEGER,
+        wEDS1065RelaySetState
+        	INTEGER,
+    }
+
+    wEDS1065Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { wEDS1065Entry 1 }
+
+    wEDS1065Humidity OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidity."
+        ::= { wEDS1065Entry 2 }
+
+    wEDS1065DewPoint OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "DewPoint."
+        ::= { wEDS1065Entry 3 }
+
+    wEDS1065Humidex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Humidex."
+        ::= { wEDS1065Entry 4 }
+
+    wEDS1065HeatIndex OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Heat Index."
+        ::= { wEDS1065Entry 5 }
+
+    wEDS1065LEDState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "LED state."
+        ::= { wEDS1065Entry 6 }
+
+    wEDS1065RelayState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Relay state."
+        ::= { wEDS1065Entry 7 }
+
+    wEDS1065Input1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1 state."
+        ::= { wEDS1065Entry 8 }
+
+    wEDS1065ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity latch 1 state."
+        ::= { wEDS1065Entry 9 }
+
+    wEDS1065PulseCounter1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse counter 1."
+        ::= { wEDS1065Entry 10 }
+
+    wEDS1065Battery OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Battery voltage."
+        ::= { wEDS1065Entry 11 }
+
+    wEDS1065ReadCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Read counter."
+        ::= { wEDS1065Entry 12 }
+
+    wEDS1065LEDFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED function."
+        ::= { wEDS1065Entry 13 }
+
+    wEDS1065RelayFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay function."
+        ::= { wEDS1065Entry 14 }
+
+    wEDS1065LEDSetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED set state."
+        ::= { wEDS1065Entry 15 }
+
+    wEDS1065RelaySetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay set state."
+        ::= { wEDS1065Entry 16 }
+
+-- EDS1064 TABLE, temp, input, relay
+
+    wEDS1064Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS1064Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS1064 device data (temperature, humidity, barometric pressure and light)."
+        ::= { wDevices 8 }
+
+    wEDS1064Entry OBJECT-TYPE
+        SYNTAX              wEDS1064Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS1064Table 1 }
+
+    wEDS1064Entry ::= SEQUENCE {
+        wEDS1064Temperature
+            DisplayString,
+        wEDS1064LEDState
+        	INTEGER,
+        wEDS1064RelayState
+        	INTEGER,
+        wEDS1064Input1
+        	INTEGER,
+        wEDS1064ActivityLatch1
+        	INTEGER,
+        wEDS1064PulseCounter1
+        	COUNTER32,
+        wEDS1064Battery
+        	DisplayString,
+        wEDS1064ReadCounter
+            	COUNTER32,
+        wEDS1064LEDFunction
+        	INTEGER,
+        wEDS1064RelayFunction
+        	INTEGER,
+        wEDS1064LEDSetState
+        	INTEGER,
+        wEDS1064RelaySetState
+        	INTEGER,
+    }
+
+    wEDS1064Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { wEDS1064Entry 1 }
+
+    wEDS1064LEDState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "LED state."
+        ::= { wEDS1064Entry 2 }
+
+    wEDS1064RelayState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Relay state."
+        ::= { wEDS1064Entry 3 }
+
+    wEDS1064Input1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1 state."
+        ::= { wEDS1064Entry 4 }
+
+    wEDS1064ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity latch 1 state."
+        ::= { wEDS1064Entry 5 }
+
+    wEDS1064PulseCounter1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse counter 1."
+        ::= { wEDS1064Entry 6 }
+
+    wEDS1064Battery OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Battery voltage."
+        ::= { wEDS1064Entry 7 }
+
+    wEDS1064ReadCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Read counter."
+        ::= { wEDS1064Entry 8 }
+
+    wEDS1064LEDFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED function."
+        ::= { wEDS1064Entry 9 }
+
+    wEDS1064RelayFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay function."
+        ::= { wEDS1064Entry 10 }
+
+    wEDS1064LEDSetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED set state."
+        ::= { wEDS1064Entry 11 }
+
+    wEDS1064RelaySetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "Relay set state."
+        ::= { wEDS1064Entry 12 }
+
+-- EDS1101 TABLE
+
+    wEDS1101Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS1101Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS1101 device data (repeater)."
+        ::= { wDevices 9 }
+
+    wEDS1101Entry OBJECT-TYPE
+        SYNTAX              wEDS1101Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS1101Table 1 }
+
+    wEDS1101Entry ::= SEQUENCE {
+        wEDS1101DevicesConnected
+            INTEGER,
+        wEDS1101SendCounter
+            COUNTER32,
+    }
+
+    wEDS1101DevicesConnected OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Number of devices connected."
+        ::= { wEDS1101Entry 1 }
+
+    wEDS1101SendCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Send counter."
+        ::= { wEDS1101Entry 2 }
+
+-- EDS2101 TABLE
+
+    wEDS2101Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS2101Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS2101 device data (repeater)."
+        ::= { wDevices 10 }
+
+    wEDS2101Entry OBJECT-TYPE
+        SYNTAX              wEDS2101Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS2101Table 1 }
+
+    wEDS2101Entry ::= SEQUENCE {
+        wEDS2101DevicesConnected
+            INTEGER,
+        wEDS2101SendCounter
+            COUNTER32,
+    }
+
+    wEDS2101DevicesConnected OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Number of devices connected."
+        ::= { wEDS2101Entry 1 }
+
+    wEDS2101SendCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Send counter."
+        ::= { wEDS2101Entry 2 }
+
+
+-- EDS2030 TABLE
+
+    wEDS2030Table OBJECT-TYPE
+        SYNTAX              SEQUENCE OF wEDS2030Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         "Table for EDS2030 device data (temperature, probe, light and input)."
+        ::= { wDevices 11 }
+
+    wEDS2030Entry OBJECT-TYPE
+        SYNTAX              wEDS2030Entry
+        ACCESS              not-accessible
+        STATUS              mandatory
+        DESCRIPTION         ""
+        INDEX               {
+                                wDeviceIndex
+                            }
+        ::= { wEDS2030Table 1 }
+
+    wEDS2030Entry ::= SEQUENCE {
+        wEDS2030Temperature
+            DisplayString,
+        wEDS2030Probe
+            DisplayString,
+        wEDS2030LEDState
+        	INTEGER,
+        wEDS2030Light
+        	DisplayString,
+        wEDS2030Input1
+        	INTEGER,
+        wEDS2030ActivityLatch1
+        	INTEGER,
+        wEDS2030PulseCounter1
+        	COUNTER32,
+        wEDS2030Battery
+        	DisplayString,
+        wEDS2030ReadCounter
+         COUNTER32,
+        wEDS2030LEDFunction
+        	INTEGER,
+        wEDS2030LEDSetState
+        	INTEGER,
+    }
+
+    wEDS2030Temperature OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature."
+        ::= { wEDS2030Entry 1 }
+
+    wEDS2030Probe OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Temperature probe."
+        ::= { wEDS2030Entry 2 }
+
+    wEDS2030LEDState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "LED state."
+        ::= { wEDS2030Entry 3 }
+
+    wEDS2030Light OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Light."
+        ::= { wEDS2030Entry 4 }
+
+    wEDS2030Input1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Input 1 state."
+        ::= { wEDS2030Entry 5 }
+
+    wEDS2030ActivityLatch1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Activity latch 1 state."
+        ::= { wEDS2030Entry 6 }
+
+    wEDS2030PulseCounter1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Pulse counter 1."
+        ::= { wEDS2030Entry 7 }
+
+    wEDS2030Battery OBJECT-TYPE
+        SYNTAX              DisplayString
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Battery voltage."
+        ::= { wEDS2030Entry 8 }
+
+    wEDS2030ReadCounter OBJECT-TYPE
+        SYNTAX              COUNTER32
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Read counter."
+        ::= { wEDS2030Entry 9 }
+
+    wEDS2030LEDFunction OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED function."
+        ::= { wEDS2030Entry 10 }
+
+    wEDS2030LEDSetState OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-write
+        STATUS              mandatory
+        DESCRIPTION         "LED set state."
+        ::= { wEDS2030Entry 11 }
+
+
+END
+

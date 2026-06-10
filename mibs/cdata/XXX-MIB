@@ -1,0 +1,1027 @@
+  
+XXX-MIB DEFINITIONS ::= BEGIN   
+
+IMPORTS
+			MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Gauge32,
+			Integer32,Counter32,enterprises, 
+			NOTIFICATION-TYPE                        FROM SNMPv2-SMI
+			DisplayString                            FROM SNMPv2-TC;
+
+company		MODULE-IDENTITY
+			LAST-UPDATED  "200903050000Z"
+			ORGANIZATION  "CData"
+			CONTACT-INFO  "www.cdatatec.com"
+			DESCRIPTION   "Media Converter NMS SNMP mib file"
+			REVISION      "200903050000Z"
+			DESCRIPTION   "1G MC supported"
+			::= { enterprises 34592 }
+
+ipProduct	OBJECT-IDENTITY 
+			STATUS          current
+			DESCRIPTION     "IP product line"
+			::= {company 1}   
+
+height2HU		OBJECT IDENTIFIER ::= {ipProduct  1}
+
+systemMIB	OBJECT IDENTIFIER ::= {height2HU  1}
+
+alarmMIB		OBJECT IDENTIFIER ::= {height2HU  2}
+
+-- [ShelfInfo] --
+shelfNum		OBJECT-TYPE
+				SYNTAX			INTEGER (1..4)
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The number of shelf in current system"
+				::= { systemMIB 1 } 	
+
+shelfTable		OBJECT-TYPE
+				SYNTAX			SEQUENCE OF ShelfEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION     "Shelf table"
+				::= { systemMIB 2 }  
+						
+shelfEntry  	OBJECT-TYPE
+				SYNTAX			ShelfEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION     "Shelf entry definition"
+				INDEX			{ shelfName }
+				::= { shelfTable 1 }
+						
+ShelfEntry		::= SEQUENCE {
+					shelfName			INTEGER,
+					psuA				INTEGER,     
+					psuB				INTEGER,  
+					volA				INTEGER,     
+					volB				INTEGER,  
+					fan					INTEGER, 
+					temperature			INTEGER,
+					coCardNum			INTEGER, 
+					rmtCardNum			INTEGER 
+				}    
+						
+shelfName		OBJECT-TYPE
+				SYNTAX			INTEGER {master(1),slave_1(2),slave_2(3),slave_3(4)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "Shelf name"
+				::= { shelfEntry 1 }
+
+psuA			OBJECT-TYPE
+				SYNTAX	INTEGER {on(1),off(2),nc(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The status fan A of current shelf"
+				::= { shelfEntry 2 }  
+
+psuB			OBJECT-TYPE
+				SYNTAX	INTEGER {on(1),off(2),nc(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The status psu B of current shelf"
+				::= { shelfEntry 3 }
+
+volA			OBJECT-TYPE
+				SYNTAX	INTEGER {normal(1),abnormal(2),nc(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The voltage status of psuA of current shelf"
+				::= { shelfEntry 4 }  
+
+volB			OBJECT-TYPE
+				SYNTAX	INTEGER {normal(1),abnormal(2),nc(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The voltage status of psuB of current shelf"
+				::= { shelfEntry 5 }
+				
+fan				OBJECT-TYPE
+				SYNTAX	INTEGER {on(1),off(2),nc(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The status fan A of current shelf"
+				::= { shelfEntry 6 } 
+															
+temperature     OBJECT-TYPE
+				SYNTAX			INTEGER
+				UNITS			" °C"
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The temperature status of current shelf"
+				::= { shelfEntry 7 } 
+
+coCardNum		OBJECT-TYPE
+				SYNTAX			INTEGER (0..16)   
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The number of center card inserting of current shelf"
+				::= { shelfEntry 8 } 
+						
+rmtCardNum		OBJECT-TYPE
+				SYNTAX			INTEGER (0..16)
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "The number of remote card inserting of current shelf"
+				::= { shelfEntry 9 }						
+														
+-- [Slot Objects] --
+                
+slotObjects		OBJECT IDENTIFIER  ::= {systemMIB 3}
+						  
+slotTable	    OBJECT-TYPE
+				SYNTAX			SEQUENCE OF SlotEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION     "Sparse table containing one entry for each slot in exist
+                      			 chassis in the system, indexed by shelfIdx and slotIdx."
+				::= { slotObjects 1 }						  
+
+slotEntry		OBJECT-TYPE
+				SYNTAX			SlotEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION     "in this table ,user can find the converter module's type inserted
+		                       in  the system's slot.then you can get the detail information about
+		                       the specified type in the cardObjects table"
+				INDEX			{ shelfIdx, slotIdx }										  
+				::= { slotTable 1 }	
+						
+SlotEntry ::=	SEQUENCE {
+					shelfIdx			INTEGER,
+					slotIdx				INTEGER,
+					coCardType			INTEGER,
+					coCardDesc			DisplayString,															
+					rmtCardType			INTEGER,
+					rmtCardDesc			DisplayString
+				}											  
+
+shelfIdx		OBJECT-TYPE
+				SYNTAX			INTEGER  {master(1),slave_1(2),slave_2(3),slave_3(4)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "Chassis index - 1 = master management module,
+                                 2-4 = slave management module"
+				::= { slotEntry 1 }
+
+slotIdx			OBJECT-TYPE
+				SYNTAX			INTEGER {slot01(1),slot02(2),slot03(3),slot04(4),
+				                         slot05(5),slot06(6),slot07(7),slot08(8),
+				                         slot09(9),slot10(10),slot11(11),slot12(12),
+				                         slot13(13),slot14(14),slot15(15),slot16(16), slot17(17)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "chassis's slot,whitch is a index in this table"
+				::= { slotEntry  2 }
+
+coCardType		OBJECT-TYPE
+				SYNTAX			INTEGER {no_card(0),ip113s(1),ip113f(2),mc_1g_e2o(3),mc_1g_o2o(4),fr600f-mm(100),fr600f-ms(101),not-support(102)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "local card's type inserted in the chassis"
+				::= { slotEntry  3 }
+
+coCardDesc		OBJECT-TYPE
+				SYNTAX			DisplayString
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"local card's description"
+				::= { slotEntry 4 }
+						
+rmtCardType		OBJECT-TYPE
+				SYNTAX			INTEGER {no_card(0),ip113sr(1),ip113f(2),mc_1g_e2o(3),mc_1g_o2o(4),fr600f-mm(100),fr600f-ms(101),not-support(102)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION     "remote card's type connect with the local converter"
+				::= { slotEntry  5 }							 
+							
+rmtCardDesc		OBJECT-TYPE
+				SYNTAX			DisplayString
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"remote card's description"
+				::= { slotEntry 6 }
+							
+-- [Card Objects] --
+cardObjects		OBJECT IDENTIFIER ::= {systemMIB 4}
+                  
+-- --[NMU Objects] --                  
+nmuObjects		OBJECT IDENTIFIER ::= {cardObjects 1}
+nmuConfig		OBJECT IDENTIFIER ::= {nmuObjects 1}
+
+nmuType			OBJECT-TYPE
+				SYNTAX			INTEGER {fr600f-mm(100),fr600f-ms(101),not-support(102)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"The type of NMU (network management unit)"
+				::= { nmuConfig 1 } 
+						
+ipaddr			OBJECT-TYPE
+				SYNTAX			IpAddress
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION 	"The ethernet IP address of NMU (network management unit)"
+				::= { nmuConfig 2 }
+
+subnet			OBJECT-TYPE
+				SYNTAX			IpAddress
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"The etherent mask address of NMU (network management unit)"
+				::= { nmuConfig 3 }
+
+gateway 		OBJECT-TYPE
+				SYNTAX 			IpAddress
+				MAX-ACCESS 		read-only
+				STATUS			current
+				DESCRIPTION		"The ethernet gateway address of NMU (network management unit)"
+				::= { nmuConfig 4 }   
+        
+sysContact		OBJECT-TYPE
+				SYNTAX			DisplayString
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Mirror of the system.sysContact.0"
+				::= { nmuConfig 5 }
+
+sysName			OBJECT-TYPE
+				SYNTAX			DisplayString
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Mirror of the system.sysName.0"
+				::= { nmuConfig 6 }
+
+sysLocation		OBJECT-TYPE
+				SYNTAX			DisplayString
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Mirror of the system.sysLocation.0"
+				::= { nmuConfig 7 }
+
+trapHost1		OBJECT-TYPE
+				SYNTAX			IpAddress
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"The first host's IP address used to receive trap messages,
+								when set 0 it simply delete this entry. This applies to the trap host 2~4 below as well."
+				::= { nmuConfig 8 }
+
+trapHost2		OBJECT-TYPE
+				SYNTAX			IpAddress
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"The second host's IP address used to receive trap messages"
+				::= { nmuConfig 9 }
+
+trapHost3		OBJECT-TYPE
+				SYNTAX			IpAddress
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"The third host's IP address used to receive trap messages"
+				::= { nmuConfig 10 }
+						
+trapHost4		OBJECT-TYPE
+				SYNTAX			IpAddress
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"The fourth host's IP address used to receive trap messages"
+				::= { nmuConfig 11 }																							      
+                
+-- --[MC Configuration table] --
+mcCmObjects		OBJECT IDENTIFIER ::= {cardObjects 2}
+
+mcCmTable		OBJECT-TYPE
+				SYNTAX			SEQUENCE OF McCmEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION    "MC Configuration table"
+				::= { mcCmObjects 1 }			          
+
+mcCmEntry		OBJECT-TYPE
+				SYNTAX			McCmEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION		"MC Configuration entry definition"
+				INDEX			{ mcShelfIdx, mcCardIdx }										  
+						::= { mcCmTable 1 }
+						
+McCmEntry ::=		SEQUENCE {
+					mcShelfIdx			INTEGER,
+					mcCardIdx			INTEGER,
+
+					mcType				INTEGER,
+					mcTransceiverMode	INTEGER,
+					mcTransceiverDist	INTEGER,
+					mcPortState			INTEGER,
+					mcTransmitMode		INTEGER,
+					mcCurWorkMode		INTEGER,
+					mcCfgWorkMode		INTEGER,
+					mcLFPCfg			INTEGER,
+					mcUpStream			Gauge32,
+					mcDownStream		Gauge32,
+					mcTxlink			INTEGER,
+					mcFxlink			INTEGER,
+					mcHWLFP				INTEGER,
+					mcHWTransmitMode	INTEGER,
+					mcHWWorkMode		INTEGER,
+					mcHWRmtCtrlMode		INTEGER,
+					mcNtwSfpExist		INTEGER,  -- for 1G E2O or O2O card
+					mcAccSfpExist		INTEGER,  -- for 1G O2O card only
+					mcUtility			INTEGER,
+					
+					mcRmtDetect			INTEGER,
+					mcRmtType			INTEGER,
+					mcRmtTransmitMode	INTEGER,
+					mcRmtCurWorkMode	INTEGER,
+					mcRmtCfgWorkMode	INTEGER,
+					mcRmtLFP			INTEGER,
+					mcRmtTxlink			INTEGER,
+					mcRmtHWLFP			INTEGER,
+					mcRmtHWTransmitMode	INTEGER,
+					mcRmtHWWorkMode		INTEGER,
+					mcRmtLoopback		INTEGER,
+					mcRmtPwrDown		INTEGER,
+					mcRmtAccSfpExist	INTEGER, -- for 1G O2O card only. NtwSfp is always exist when remore detected.
+					mcRmtUtility		INTEGER				
+				}						
+										  				
+
+mcShelfIdx		OBJECT-TYPE
+				SYNTAX			INTEGER  {master(1),slave1(2),slave2(3),slave3(4)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Shelf index"
+				::= { mcCmEntry 1 }
+
+mcCardIdx		OBJECT-TYPE
+				SYNTAX			INTEGER {card01(1),card02(2),card03(3),card04(4),
+				                         card05(5),card06(6),card07(7),card08(8),
+				                         card09(9),card10(10),card11(11),card12(12),
+				                         card13(13),card14(14),card15(15),card16(16)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Card index"                                                        
+				::= { mcCmEntry 2 }     
+						
+mcType			OBJECT-TYPE
+				SYNTAX			INTEGER {ip113s(1),ip113f(2),mc_1g_e2o(3),mc_1g_o2o(4),not-support(5)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's type"
+				::= { mcCmEntry 3 }                            
+						         
+mcTransceiverMode	OBJECT-TYPE
+				SYNTAX			INTEGER {bidi(1),duplex_fiber(2),sfp(3),not-support(4)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's optical transceiver mode.
+								100M card support bidi/duplex_fiber; 1G card support bidi/duplex_fiber/sfp.
+								Once sfp is given, the following mcTransceiverDist should be ignored."
+				::= { mcCmEntry 4 }             
+
+mcTransceiverDist	OBJECT-TYPE
+				SYNTAX			INTEGER (1..120)
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's optical transceiver distance, 
+								1 means 550m for duplex_fiber mode in case of 1G card,
+								otherwise it represents the real distance (unit of km)."
+				::= { mcCmEntry 5 } 
+						         
+mcPortState		OBJECT-TYPE
+				SYNTAX			INTEGER {locked(1),unlocked(2),not-support(3)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Center card's port status, locked or unlocked"
+				::= { mcCmEntry 6 }     
+				
+mcTransmitMode	OBJECT-TYPE
+				SYNTAX			INTEGER {cut-through(1),store-forward(2),not-support(3)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Center card's transmmit mode"
+				::= { mcCmEntry 7 } 
+
+mcCurWorkMode	OBJECT-TYPE
+				SYNTAX			INTEGER { -- mAuto(1),
+										 m100-full(2),
+				                         m100-half(3),
+				                         m10-full(4),
+				                         m10-half(5), 
+				                         m1G-full(6),
+				                         not-support(7)}
+				MAX-ACCESS		read-only
+				STATUS			mandatory
+				DESCRIPTION		"Center card's current work mode"
+				::= { mcCmEntry 8 } 						
+						
+mcCfgWorkMode	OBJECT-TYPE
+				SYNTAX			INTEGER {mAuto(1),
+										 m100-full(2),
+				                         m100-half(3),
+				                         m10-full(4),
+				                         m10-half(5), 
+				                         m1G-full(6),
+				                         not-support(7)}
+				MAX-ACCESS		read-write
+				STATUS			mandatory
+				DESCRIPTION		"Center card's configurable work mode"
+				::= { mcCmEntry 9 } 						
+						     
+mcLFPCfg		OBJECT-TYPE
+				SYNTAX			INTEGER {enable(1),disable(2),not-support(3)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Remote fault detect function, valid only on center MC card"
+				::= { mcCmEntry 10 }  
+						
+mcUpStream		OBJECT-TYPE
+				SYNTAX			Gauge32  
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Center card's up stream of MC"
+				::= { mcCmEntry 11}
+
+mcDownStream	OBJECT-TYPE
+				SYNTAX			Gauge32 
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Center card's down stream of MC"                                                   
+				::= { mcCmEntry 12 }						 
+						
+mcTxlink		OBJECT-TYPE
+				SYNTAX			INTEGER  {up(1),down(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's electrical port's link status"  
+				::= { mcCmEntry 13 }
+						
+mcFxlink		OBJECT-TYPE
+				SYNTAX			INTEGER  {up(1),down(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's optical port's link status"
+				::= { mcCmEntry 14 }
+                                   
+mcHWLFP			OBJECT-TYPE
+				SYNTAX			INTEGER  {enable(1),disable(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's HW LFP, not applicable for 1G card"
+				::= { mcCmEntry 15 }
+
+mcHWTransmitMode	OBJECT-TYPE
+				SYNTAX			INTEGER  {cut-through(1),store-forward(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's HW transmit mode, not applicable for 1G card"
+				::= { mcCmEntry 16 }
+                                   
+mcHWWorkMode	OBJECT-TYPE
+				SYNTAX			INTEGER {mAuto(1),
+										 m100-full(2),
+				                         m100-half(3),
+				                         m10-full(4),
+				                         m10-half(5), 
+				                         m1G-full(6),
+				                         not-support(7)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's HW work mode, not applicable for 1G card"
+				::= { mcCmEntry 17 }
+                   
+mcHWRmtCtrlMode OBJECT-TYPE
+				SYNTAX			INTEGER {enable(1),disable(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center card's HW remote control mode (only valid for local card).
+								the disable mode indicates that all SET operations must be prohibited"
+				::= { mcCmEntry 18 }
+                                   
+mcNtwSfpExist   OBJECT-TYPE
+				SYNTAX			INTEGER  {inserted(1),removed(2),na(3),not-support(4)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center 1G card's Network SFP indication"
+				::= { mcCmEntry 19 }
+                                   
+mcAccSfpExist   OBJECT-TYPE
+				SYNTAX			INTEGER  {inserted(1),removed(2),na(3),not-support(4)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Center 1G card's Access SFP indication, applicable only for O2O type"
+				::= { mcCmEntry 20 }
+
+mcUtility		OBJECT-TYPE
+				SYNTAX			INTEGER  {idle(1),reset(2),default(3),set2hw(4),not-support(5)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"reset, default to factory, set to HW word, etc..."
+				::= { mcCmEntry 21 }
+                                   
+mcRmtDetect		OBJECT-TYPE
+				SYNTAX			INTEGER  {no_remote(0),yes(1),not-support(2)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"An identifier to indicate if there is a remote MC currently connecting to system or not"
+				::= { mcCmEntry 22 }    
+						
+mcRmtType		OBJECT-TYPE
+				SYNTAX			INTEGER {no_card(0),ip113sr(1),ip113f(2),mc_1g_e2or(3),mc_1g_o2or(4),not-support(5)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Remote card's type"
+				::= { mcCmEntry 23 }
+
+mcRmtTransmitMode	OBJECT-TYPE
+				SYNTAX			INTEGER {no_card(0),cut-through(1),store-forward(2),not-support(3)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Remote card's transmmit mode"
+				::= { mcCmEntry 24 } 
+				
+mcRmtCurWorkMode	OBJECT-TYPE
+				SYNTAX			INTEGER {no_card(0),
+										 -- mAuto(1),
+										 m100-full(2),
+				                         m100-half(3),
+				                         m10-full(4),
+				                         m10-half(5), 
+				                         m1G-full(6),
+				                         not-support(7)}
+				MAX-ACCESS		read-only
+				STATUS			mandatory
+				DESCRIPTION		"Remote card's current work mode"
+				::= { mcCmEntry 25 } 						
+						
+mcRmtCfgWorkMode	OBJECT-TYPE
+				SYNTAX			INTEGER {no_card(0),
+										 mAuto(1),
+										 m100-full(2),
+				                         m100-half(3),
+				                         m10-full(4),
+				                         m10-half(5), 
+				                         m1G-full(6),
+				                         not-support(7)}
+				MAX-ACCESS		read-write
+				STATUS			mandatory
+				DESCRIPTION		"Remote card's configurable work mode"
+				::= { mcCmEntry 26 } 						
+
+mcRmtLFP		OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),enable(1),disable(2),not-support(3)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Remote card's LFP lamp state"                                                   
+				::= { mcCmEntry 27 }
+						
+mcRmtTxlink		OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),up(1),down(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Remote card's electrial port status"                                                   
+				::= { mcCmEntry 28 }   
+
+mcRmtHWLFP		OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),enable(1),disable(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Remote card's HW LFP, not applicable for 1G card"
+				::= { mcCmEntry 29 }
+
+mcRmtHWTransmitMode	OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),cut-through(1),store-forward(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Remote card's HW transmit mode, not applicable for 1G card"
+				::= { mcCmEntry 30 }
+                                   
+mcRmtHWWorkMode	OBJECT-TYPE
+				SYNTAX			INTEGER {no_card(0),
+										 mAuto(1),
+										 m100-full(2),
+				                         m100-half(3),
+				                         m10-full(4),
+				                         m10-half(5), 
+				                         m1G-full(6),
+				                         not-support(7)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Remote card's HW work mode, not applicable for 1G card"
+				::= { mcCmEntry 31 }
+
+mcRmtLoopback	OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),enable(1),disable(2),not-support(3)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Remote card's HW Loopback state"
+				::= { mcCmEntry 32 }
+
+mcRmtPwrDown    OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),powerdown(1),normal(2),not-support(3)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Remote card's power down state"
+				::= { mcCmEntry 33 }
+
+mcRmtAccSfpExist   OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),inserted(1),removed(2),na(3),support(4)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"Remote 1G card's Access SFP indication, applicable only for O2O type"
+				::= { mcCmEntry 34 }
+
+mcRmtUtility	OBJECT-TYPE
+				SYNTAX			INTEGER  {no_card(0),idle(1),reset(2),default(3),set2hw(4),not-support(5)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"Rmote cards's reset, default to factory, set to HW word, etc..."
+				::= { mcCmEntry 35 }
+
+-- --[MC 1G card Specific CM table] --   
+mcCm1gSpecificObjects	OBJECT IDENTIFIER ::= {mcCmObjects 2}
+
+-- -- --[MC 1G card IP table] --  
+mcCm1gIpObjects		OBJECT IDENTIFIER ::= {mcCm1gSpecificObjects 1}
+
+mcCm1gIpTable	OBJECT-TYPE
+				SYNTAX			SEQUENCE OF McCm1gIpEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION    "MC 1G Ip address table"
+				::= { mcCm1gIpObjects 1 }			          
+
+mcCm1gIpEntry	OBJECT-TYPE
+				SYNTAX			McCm1gIpEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION		"MC 1G Ip address entry definition"
+				INDEX			{ mcShelfIdx,mcCardIdx,mcLoOrRmtFg }										  
+						::= { mcCm1gIpTable 1 }
+										
+McCm1gIpEntry ::=	SEQUENCE {
+					mcLoOrRmtFg		INTEGER,
+					mcIpAddr		IpAddress
+				}
+										
+mcLoOrRmtFg		OBJECT-TYPE
+				SYNTAX			INTEGER  {local(1),remote(2)}
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"location index, local or remote"
+				::= { mcCm1gIpEntry 1 }
+										  				
+mcIpAddr		OBJECT-TYPE
+				SYNTAX			IpAddress
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"The Ip address of the node"
+				::= { mcCm1gIpEntry 2 }          
+
+-- -- --[MC 1G card SFP table] --  
+mcCm1gSfpObjects	OBJECT IDENTIFIER ::= {mcCm1gSpecificObjects 2}
+
+mcCm1gSfpTable	OBJECT-TYPE
+				SYNTAX			SEQUENCE OF McCm1gSfpEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION    "MC 1G SFP table"
+				::= { mcCm1gSfpObjects 1 }			          
+
+mcCm1gSfpEntry	OBJECT-TYPE
+				SYNTAX			McCm1gSfpEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION		"MC 1G SFP entry definition"
+				INDEX			{ mcShelfIdx,mcCardIdx,mcLoOrRmtFg }										  
+						::= { mcCm1gSfpTable 1 }
+										
+McCm1gSfpEntry ::=	SEQUENCE {
+					getSfpCmd			INTEGER,
+					sfpCompliance		INTEGER,
+					sfpConnector		INTEGER,
+					sfpTransCode		INTEGER,
+					sfpSmLength			INTEGER,
+					sfpMmLength			INTEGER,
+					sfpCopperLength		INTEGER,
+					sfpBrSpeed			INTEGER,
+					sfpWavelength		INTEGER,
+					sfpTemperature		INTEGER,
+					sfpTranPower		INTEGER,
+					sfpRecvPower		INTEGER,
+					sfpVoltage			INTEGER
+				}				
+						
+getSfpCmd		OBJECT-TYPE
+				SYNTAX			INTEGER {na(0),local(1),remote(2)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"This command will get the updated sfp information. 
+								Please send this command prior to getting the following params,
+								otherwise the history sfp information will be sent back."
+				::= { mcCm1gSfpEntry 1 }
+
+sfpCompliance	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP compliance (one byte)
+								if 0 then the attributs of sfpTemperature/sfpTranPower/sfpRecvPower 
+								should be ignored"
+				::= { mcCm1gSfpEntry 2 }
+
+sfpConnector	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP connector type (one byte)
+									0x01: SC
+									0x07: LC
+									0x22: RJ45
+									others: unsupported"
+				::= { mcCm1gSfpEntry 3 }
+
+sfpTransCode	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP transceiver code (one byte)
+									bit0: SingleMode
+									bit2: MultiMode
+									bit3: MultiMode
+									others: unsupported"
+				::= { mcCm1gSfpEntry 4 }
+
+sfpSmLength		OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP link length for SingleMode, units of km. (one byte)
+								applicable only when sfpTransCode is SingleMode"
+				::= { mcCm1gSfpEntry 5 }
+
+sfpMmLength		OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP link length for MultiMode, units of 10m (one byte)
+								applicable only when sfpTransCode is MultiMode"
+				::= { mcCm1gSfpEntry 6 }       
+				
+sfpCopperLength	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP link length for Copper, units of m (one byte)
+								applicable only when sfpConnector is RJ45"
+				::= { mcCm1gSfpEntry 7 }
+
+sfpBrSpeed		OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP nominal signalling rate, units of 100Mbit/s (one byte)"
+				::= { mcCm1gSfpEntry 8 }   
+				
+sfpWavelength	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP laser wavelength (one word)"
+				::= { mcCm1gSfpEntry 9 }
+
+sfpTemperature	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP temperature (one type, signed)"
+				::= { mcCm1gSfpEntry 10 }
+
+sfpTranPower	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP tx power (one type, signed)"
+				::= { mcCm1gSfpEntry 11 }
+
+sfpRecvPower	OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP rx power (one type, signed)"
+				::= { mcCm1gSfpEntry 12 }
+
+sfpVoltage		OBJECT-TYPE
+				SYNTAX			INTEGER
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"SFP voltage, units of 0.1mV (one word)"
+				::= { mcCm1gSfpEntry 13 }
+
+-- --[MC Performance table] --
+mcPmObjects		OBJECT IDENTIFIER ::= {cardObjects 3}
+
+mcPmTable		OBJECT-TYPE
+				SYNTAX			SEQUENCE OF McPmEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION    "MC Performance table"
+				::= { mcPmObjects 1 }			          
+
+mcPmEntry		OBJECT-TYPE
+				SYNTAX			McPmEntry
+				MAX-ACCESS		not-accessible
+				STATUS			current
+				DESCRIPTION		"MC Performance entry definition"
+				INDEX			{ mcShelfIdx, mcCardIdx }										  
+						::= { mcPmTable 1 }
+						
+McPmEntry ::=		SEQUENCE {
+					mcRxByteHi		Counter32,
+					mcRxByteLo		Counter32,
+					mcTxByteHi		Counter32,
+					mcTxByteLo		Counter32,
+					mcPmRest		INTEGER			
+				}						
+										  				
+mcRxByteHi		OBJECT-TYPE
+				SYNTAX			Counter32
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"The total number of reveive bytes (high)"
+				::= { mcPmEntry 1 }          
+
+mcRxByteLo		OBJECT-TYPE
+				SYNTAX			Counter32
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"The total number of reveive bytes (low)"
+				::= { mcPmEntry 2 } 				
+
+mcTxByteHi		OBJECT-TYPE
+				SYNTAX			Counter32
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"The total number of transmit bytes (high)"
+				::= { mcPmEntry 3 }  
+				 
+mcTxByteLo		OBJECT-TYPE
+				SYNTAX			Counter32
+				MAX-ACCESS		read-only
+				STATUS			current
+				DESCRIPTION		"The total number of transmit bytes (low)"
+				::= { mcPmEntry 4 }				               
+								 
+mcPmRest		OBJECT-TYPE
+				SYNTAX			INTEGER  {idle(1), reset(2),not-support(3)}
+				MAX-ACCESS		read-write
+				STATUS			current
+				DESCRIPTION		"reset counter"
+				::= { mcPmEntry 5 }
+
+-- ---------------------------------------------------------------------------------------------						
+-- [Trap definition] --
+
+-- --[shelf alarm] -- (1~19)       
+shelf-Detected	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                         
+				DESCRIPTION   "A slave shelf is detected"
+				::= { alarmMIB 1}
+                        
+shelf-Lost		NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                         
+				DESCRIPTION   "A shelf is lost"
+				::= { alarmMIB 2}            
+
+shelf-psuA-On	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                          
+				DESCRIPTION   "PSU A is detected"
+				::= { alarmMIB 3}   
+ 
+shelf-psuA-Off	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                          
+				DESCRIPTION   "PSU A is lost"
+				::= { alarmMIB 4}      
+
+shelf-psuB-On	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                          
+				DESCRIPTION   "PSU B is detected"
+				::= { alarmMIB 5}  
+
+shelf-psuB-Off	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                          
+				DESCRIPTION   "PSU B is lost"
+				::= { alarmMIB 6}  
+
+shelf-fan-On	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                          
+				DESCRIPTION   "Fan A is detected"
+				::= { alarmMIB 7}
+						  
+shelf-fan-Off	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx }
+				STATUS  current                         
+				DESCRIPTION   "Fan A is lost"
+				::= { alarmMIB 8}  
+
+-- --[card common alarm] -- (20~29)
+card-Detected	NOTIFICATION-TYPE 
+				OBJECTS  { shelfIdx, slotIdx } 
+				STATUS  current
+				DESCRIPTION   "A card is detected"
+				::= { alarmMIB 20} 
+
+card-Lost		NOTIFICATION-TYPE
+				OBJECTS  { shelfIdx, slotIdx }  
+				STATUS  current     
+				DESCRIPTION   "A card is lost"
+				::= { alarmMIB 21}
+
+-- --[card specific (MC) alarm] -- (above 30)
+card-MC-Co-Tx-Up	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx } 
+				STATUS  current
+				DESCRIPTION   "The tx link of mc in center side is up"
+				::= { alarmMIB 30}
+                            
+card-MC-Co-Tx-Down	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "The tx link of mc in center side is broken"
+				::= { alarmMIB 31}
+                                     
+card-MC-Co-Fx-Up	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx } 
+				STATUS  current                                        
+				DESCRIPTION   "The fx link of mc in center side is up"
+				::= { alarmMIB 32}
+
+card-MC-Co-Fx-Down	NOTIFICATION-TYPE                           
+				OBJECTS  { shelfIdx, slotIdx }   
+				STATUS  current                                        
+				DESCRIPTION   "The fx link of mc in center side is broken"
+				::= { alarmMIB 33}
+
+card-MC-Rmt-Tx-Up	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "The tx link of mc in customer side is up"
+				::= { alarmMIB 34}
+                         
+card-MC-Rmt-Tx-Down	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "The tx link of mc in customer side is broken"
+				::= { alarmMIB 35}
+                        
+card-MC-Rmt-PwrDown	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "Remote mc power down detected"
+				::= { alarmMIB 36}
+
+card-MC-Co-Ntw-SFP-Inserted	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "Local network port SFP inserted"
+				::= { alarmMIB 37}
+
+card-MC-Co-Ntw-SFP-Removed	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "Local network port SFP removed"
+				::= { alarmMIB 38}
+
+card-MC-Co-Acc-SFP-Inserted	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "Local access port SFP inserted"
+				::= { alarmMIB 39}
+
+card-MC-Co-Acc-SFP-Removed	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "Local access port SFP removed"
+				::= { alarmMIB 40}
+
+card-MC-Rmt-Acc-SFP-Inserted	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "Remote access port SFP inserted"
+				::= { alarmMIB 41}
+
+card-MC-Rmt-Acc-SFP-Removed	NOTIFICATION-TYPE  
+				OBJECTS  { shelfIdx, slotIdx }
+				STATUS  current                                        
+				DESCRIPTION   "Remote access port SFP removed"
+				::= { alarmMIB 42}
+
+END

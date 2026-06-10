@@ -1,0 +1,973 @@
+-- *****************************************************************
+-- DOCS-SUBSCRIBER-MIB.my: DOCSIS Subscriber Management MIB
+--
+-- October 2000 Alison Tsao
+-- April 2007 Ragothaman Jayaraman
+--
+-- This MIB is from draft-ietf-ipcdn-subscriber-mib-03.txt.
+-- Apr 2007: This MIB is from CM-SP-OSSIv2.0-I09-050812.
+--
+-- Copyright (c) 2000-2004, 2006-2008 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+DOCS-SUBMGT-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Counter32,
+        Integer32,
+        experimental
+        -- BITS
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        RowStatus,
+        TruthValue
+                FROM SNMPv2-TC
+        OBJECT-GROUP,
+        MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+        docsIfCmtsCmStatusIndex,
+        docsIfCmtsCmStatusEntry
+                FROM DOCS-IF-MIB;  -- RFC2670
+
+docsSubMgt MODULE-IDENTITY
+        LAST-UPDATED    "200503220000Z" -- March 18, 2005
+        ORGANIZATION    "IETF IPCDN Working Group"
+        CONTACT-INFO
+            "        Wilson Sawyer
+             Postal: Arris Interactive
+                     6 Riverside Drive
+                     Andover, MA 01810
+                     U.S.A.
+             Phone:  +1 978 946 4711
+             E-mail: wsawyer@ieee.org"
+        DESCRIPTION
+            "This is the CMTS centric subscriber management MIB for
+        DOCSIS compliant CMTS.  This will be rooted in experimental
+        space with a future transition to be incorporated into the
+        cable device MIB."
+    -- temporary: the following to be assigned by RFC editor. For now,
+    -- use original experimental docsDev value: { docsDev 4 }
+        ::= { experimental 83 4 }
+
+docsSubMgtObjects OBJECT IDENTIFIER ::= { docsSubMgt 1 }
+
+IpV4orV6Addr ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An IP V4 or V6 address expressed as an octet string. The
+    zero length string is equal to both 0.0.0.0 and the IPv6 :0
+    address."
+    SYNTAX OCTET STRING (SIZE (0 | 4 | 16))
+
+docsSubMgtCpeControlTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DocsSubMgtCpeControlEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table extends the docsIfCmtsCmStatusTable and adds 4
+        objects which reflect the state of subscriber management on a
+        particular CM."
+        ::= { docsSubMgtObjects 1 }
+
+docsSubMgtCpeControlEntry OBJECT-TYPE
+        SYNTAX  DocsSubMgtCpeControlEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A row in the docsSubMgtCpeControlTable.  All the values
+        are either set from the system default, or are set from objects
+        included in the DOCSIS registration request sent upstream to
+        the CMTS from the CM."
+        AUGMENTS { docsIfCmtsCmStatusEntry }
+        ::= {docsSubMgtCpeControlTable 1 }
+
+DocsSubMgtCpeControlEntry ::= SEQUENCE
+        {
+        docsSubMgtCpeControlMaxCpeIp        Integer32,
+        docsSubMgtCpeControlActive          TruthValue,
+        docsSubMgtCpeControlLearnable       TruthValue,
+        docsSubMgtCpeControlReset           TruthValue
+        }
+
+
+docsSubMgtCpeControlMaxCpeIp OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The number of simultaneous IP addresses permitted behind
+        the CM. If this is set to zero, all CPE traffic from the CM is
+        dropped.  If the provisioning object corresponding to
+        docsSubMgtCpeIpTable includes more CPE IP address entries for
+        this modem than the value of this object, then this object is
+        set to the count of the number of rows in docsSubMgtCpeIpTable
+        that have the same docsIfCmtsCmStatusIndex value. (E.g. if the
+        CM has 5 IP addresses specified for it, this value is 5). This
+        limit applies to learned and docsis-provisioned entries, but
+        does not limit entries added through some administrative
+        process at the CMTS. If not set through DOCSIS provisioning,
+        this object defaults to docsSubMgtCpeMaxIpDefault. Note that
+        this object is only meaningful if docsSubMgtCpeControlActive
+        is true."
+        ::= { docsSubMgtCpeControlEntry 1 }
+
+docsSubMgtCpeControlActive OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "If this is set to true, CMTS based CPE control is active and
+        all the actions required by the various filter tables and
+        controls apply at the CMTS.  If this is set to false, no
+        subscriber management filtering is done at the CMTS (but other
+        filters may apply). If not set through DOCSIS provisioning,
+        this object defaults to docsSubMgtCpeActiveDefault."
+        ::= { docsSubMgtCpeControlEntry 2 }
+
+docsSubMgtCpeControlLearnable OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "If this is set to true, the CMTS may learn up to
+        docsSubMgtMaxCpeIp addresses (less any DOCSIS-provisioned
+        entries) related to this CM.  Those IP addresses are added (by
+        internal process) to the docsSubMgtCpeIpTable. The nature of the
+        learning mechanism is not specified here. If not set through
+        DOCSIS provisioning, this object defaults to
+        docsSubMgtCpeLearnableDefault. Note that this object is only
+        meaningful if docsSubMgtCpeControlActive is true."
+        ::= { docsSubMgtCpeControlEntry 3 }
+
+docsSubMgtCpeControlReset OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "This object always returns false on read.  If this object is
+        set to true, the rows with  'learned' addresses in
+        docsSubMgtCpeIpTable for this CM are deleted from that table."
+        ::= { docsSubMgtCpeControlEntry 4 }
+
+docsSubMgtCpeMaxIpDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The default value for docsSubMgtCpeControlMaxCpeIp if not
+        signaled in the DOCSIS Registration request. Upon initial CMTS
+        initialization, this defaults to 16."
+        ::= { docsSubMgtObjects 2 }
+
+docsSubMgtCpeActiveDefault OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The default value for docsSubMgtCpeControlActive if not
+        signaled in the DOCSIS Registration request. Upon initial CMTS
+        initialization, this defaults to false."
+        ::= { docsSubMgtObjects 3 }
+
+docsSubMgtCpeLearnableDefault OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The default value for docsSubMgtCpeControlLearnable if not
+        signaled in the DOCSIS Registration request. Upon initial CMTS
+        initialization, this defaults to true."
+        ::= { docsSubMgtObjects 4 }
+
+docsSubMgtCpeIpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DocsSubMgtCpeIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of CPE IP addresses known on a per CM basis."
+        ::= { docsSubMgtObjects 5 }
+
+docsSubMgtCpeIpEntry OBJECT-TYPE
+        SYNTAX      DocsSubMgtCpeIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the docsSubMgtCpeIpTable.  The first index is
+        the specific modem we're referring to, the second index is the
+        specific CPE IP entry."
+        INDEX   { docsIfCmtsCmStatusIndex,
+                  docsSubMgtCpeIpIndex }
+        ::= {docsSubMgtCpeIpTable 1 }
+
+DocsSubMgtCpeIpEntry ::= SEQUENCE
+        {
+        docsSubMgtCpeIpIndex     Integer32,
+        docsSubMgtCpeIpAddr      IpV4orV6Addr,
+        docsSubMgtCpeIpLearned   TruthValue,
+        docsSubMgtCpeType        INTEGER
+        }
+
+docsSubMgtCpeIpIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..1024)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of this CPE IP address relative to the indexed CM.
+        An entry is created either through the included CPE IP addresses
+        in the provisioning object, or via learning.  If a CMTS receives
+        an IP packet from a CM that contains a source IP address which
+        does not match one of the docsSubMgtCpeIpAddr entries for this
+        CM, one of two things occurs.  If the number of entries is less
+        than docsSubMgtCpeControlMaxCpeIp, the source address is added to
+        the table and the packet is forwarded.  If the number of entries
+        equals the docsSubMgtCpeControlMaxCpeIp, AND
+        docsSubMgtCpeControlActive is true, then the packet is dropped.
+        Otherwise the packet is forwarded. "
+        ::= { docsSubMgtCpeIpEntry 1 }
+
+docsSubMgtCpeIpAddr OBJECT-TYPE
+        SYNTAX      IpV4orV6Addr
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address either set from provisioning or learned via
+        wiretapping. See docsSubMgtCpeIpIndex for the mechanism."
+        ::= { docsSubMgtCpeIpEntry 2 }
+
+docsSubMgtCpeIpLearned OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "If true, this entry was learned from IP packets sent
+        upstream rather than from the provisioning objects."
+        ::= { docsSubMgtCpeIpEntry 3 }
+
+docsSubMgtCpeType OBJECT-TYPE
+        SYNTAX  INTEGER {
+        cpe(1),
+        ps(2),
+        mta(3),
+        stb(4)
+        }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            " The type of CPE based on the classification below:
+        'cpe' Regular CPE clients.
+        'ps' CableHome Portal Server (PS)
+        'mta' PacketCable Multimedia Terminal Adapter (MTA)
+        'stb' Digital Setop Box (STB)."
+        ::= { docsSubMgtCpeIpEntry 4 }
+
+    -- The generic packet filter table.  Note that this just defines the
+    -- match criteria.  The docsSubMgtCmFilterTable links this table to
+    -- the specific modems.
+
+docsSubMgtPktFilterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DocsSubMgtPktFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table of filter or classifier criteria. Classifiers are
+        assigned by group to the individual CMs.  That assignment is made
+        via the configuration objects sent upstream from the CM to the
+        CMTS during registration."
+        ::= { docsSubMgtObjects 6 }
+
+docsSubMgtPktFilterEntry OBJECT-TYPE
+        SYNTAX      DocsSubMgtPktFilterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in the docsSubMgtPktFilterTable."
+        INDEX   { docsSubMgtPktFilterGroup,
+                  docsSubMgtPktFilterIndex }
+        ::= {docsSubMgtPktFilterTable 1 }
+
+DocsSubMgtPktFilterEntry ::= SEQUENCE
+        {
+        docsSubMgtPktFilterGroup         Integer32,
+        docsSubMgtPktFilterIndex         Integer32,
+        docsSubMgtPktFilterSrcAddr       IpV4orV6Addr,
+        docsSubMgtPktFilterSrcMask       IpV4orV6Addr,
+        docsSubMgtPktFilterDstAddr       IpV4orV6Addr,
+        docsSubMgtPktFilterDstMask       IpV4orV6Addr,
+        docsSubMgtPktFilterUlp           Integer32,
+        docsSubMgtPktFilterTosValue      OCTET STRING,
+        docsSubMgtPktFilterTosMask       OCTET STRING,
+        docsSubMgtPktFilterAction        INTEGER,
+        docsSubMgtPktFilterMatches       Counter32,
+        docsSubMgtPktFilterStatus        RowStatus
+        }
+
+docsSubMgtPktFilterGroup OBJECT-TYPE
+        SYNTAX      Integer32(1..1024)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Identifies an ordered group of filters. Each modem may be
+        associated with a filter group for its upstream traffic
+        (docsSubMgtCmFilterUpstream) and a filter group for its
+        downstream traffic (docsSubMgtCmFilterDownstream). Typically,
+        many modems will use the same filter group."
+        ::= { docsSubMgtPktFilterEntry 1 }
+
+docsSubMgtPktFilterIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..1024)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An index which describes the ordering of a set of filter
+        specifications within the group.  Filters are applied in index
+        order."
+        ::= { docsSubMgtPktFilterEntry 2 }
+
+docsSubMgtPktFilterSrcAddr OBJECT-TYPE
+        SYNTAX      IpV4orV6Addr
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The source IP address to match in the packet to be
+        classified.  By default, this is the all-zero's IP v4 and v6
+        address. A packet matches the SrcAddr filter if the following is
+        true:
+             AND (FilterSrcAddr, FilterSrcMask) ==
+             AND (Packet SrcAddr, FilterSrcMask).
+        The mask value is applied to both the match value in this table
+        and to the packet IP address."
+        DEFVAL { ''h  }
+        ::= { docsSubMgtPktFilterEntry 3 }
+
+docsSubMgtPktFilterSrcMask OBJECT-TYPE
+        SYNTAX      IpV4orV6Addr
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "A bit mask that is to be applied to the source address
+        prior to matching. This, taken with the SrcAddr specifies a
+        matching criteria.  By default, the pair specifies a filter
+        which matches all source addresses. This mask is not
+        necessarily the same as a subnet mask, but for IPv4 addresses
+        the 1's bits must be leftmost and contiguous. IPv6 masks have
+        no such restriction."
+        DEFVAL { ''h  }
+        ::= { docsSubMgtPktFilterEntry 4 }
+
+docsSubMgtPktFilterDstAddr OBJECT-TYPE
+        SYNTAX      IpV4orV6Addr
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The destination IP address to match in the packet to be
+        classified.  By default, this is the all-zero's IP v4 and v6
+        address. A packet matches the DstAddr filter if the following is
+        true:
+             AND (FilterDstAddr, FilterDstMask) ==
+             AND (Packet DstAddr, FilterDstMask).
+        The mask value is applied to both the match value in this table
+        and to the packet IP address."
+        DEFVAL { ''h  }
+        ::= { docsSubMgtPktFilterEntry 5 }
+
+docsSubMgtPktFilterDstMask OBJECT-TYPE
+        SYNTAX      IpV4orV6Addr
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "A bit mask that is to be applied to the destination
+        address prior to matching. This, taken with the DstAddr
+        specifies a matching criteria.  By default, the pair specifies
+        a filter which matches all destination addresses. This mask is
+        not necessarily the same as a subnet mask, but for IPv4
+        addresses the 1's bits must be leftmost and contiguous. IPv6
+        masks have no such restriction."
+        DEFVAL { ''h  }
+        ::= { docsSubMgtPktFilterEntry 6 }
+
+docsSubMgtPktFilterUlp OBJECT-TYPE
+        SYNTAX      Integer32 (0..256)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Upper level protocol to match.  If this value is 256,
+        matches ALL ULP values.  Otherwise, this matches the specific
+        protocol value.  Note that if the packet ULP is either 6 (tcp) or
+        17 (udp), then docsSubMgtPktTcpUdpFilterTable must also be
+        consulted (if its entry exists) to see if this entry matches.
+        Obviously, if this value is neither tcp, udp nor 256, then that
+        table need not be matched against."
+        DEFVAL { 256 }
+        ::= { docsSubMgtPktFilterEntry 7 }
+
+docsSubMgtPktFilterTosValue OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(1))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The TOS value to match in the IP packet."
+        DEFVAL { '00'h }
+        ::= { docsSubMgtPktFilterEntry 8 }
+
+docsSubMgtPktFilterTosMask OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(1))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The mask to apply against the TOS value to be matched in the
+        IP packet.  The default for both these objects taken together
+        matches all TOS values. A packet matches this filter if the
+        following is true:
+            AND (FilterTosValue, FilterTosMask) ==
+            AND (Packet TOS Value, FilterTosMask)."
+        DEFVAL { '00'h }
+        ::= { docsSubMgtPktFilterEntry 9 }
+
+docsSubMgtPktFilterAction OBJECT-TYPE
+        SYNTAX      INTEGER
+                       {
+                       accept(1),
+                       drop(2)
+                       }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The action to take upon this filter matching.  Accept means
+        to accept the packet for further processing.  Drop means to drop
+        the packet."
+        DEFVAL { accept }
+        ::= { docsSubMgtPktFilterEntry 10 }
+
+docsSubMgtPktFilterMatches OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object counts the number of times this specific rule
+        has been matched.  This is incremented any time this rule is
+        encountered and all components match. It is only incremented for
+        the first (lowest-indexed) filter matching a packet."
+        ::= { docsSubMgtPktFilterEntry 11 }
+
+docsSubMgtPktFilterStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Standard rowStatus object for creating this row.  Any object
+        in this row which is writable may be changed at any time while
+        the row is active."
+        ::= { docsSubMgtPktFilterEntry 12 }
+
+docsSubMgtTcpUdpFilterTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DocsSubMgtTcpUdpFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This is an adjunct to docsSubMgtPktFilterTable. It provides
+             optional filtering based on elements in TCP or UDP headers.
+             This table is separate from docsSubMgtPktFilterTable only
+             because it is expected to be used more rarely. This table
+             is not consulted unless the upper-layer protocol is TCP,
+             UDP, or 'any'."
+        ::= { docsSubMgtObjects 7 }
+
+docsSubMgtTcpUdpFilterEntry OBJECT-TYPE
+        SYNTAX  DocsSubMgtTcpUdpFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Defines filtering criteria for TCP and UDP headers."
+        INDEX   { docsSubMgtPktFilterGroup, docsSubMgtPktFilterIndex }
+        ::= {docsSubMgtTcpUdpFilterTable 1 }
+
+DocsSubMgtTcpUdpFilterEntry ::= SEQUENCE
+        {
+        docsSubMgtTcpUdpSrcPort     Integer32,
+        docsSubMgtTcpUdpDstPort     Integer32,
+        docsSubMgtTcpFlagValues     BITS,
+        docsSubMgtTcpFlagMask       BITS,
+        docsSubMgtTcpUdpStatus      RowStatus
+        }
+
+docsSubMgtTcpUdpSrcPort OBJECT-TYPE
+        SYNTAX  Integer32(0..65536)
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+            "The source port to match.  65536 matches any value in the
+        TCP or UDP source port field."
+        DEFVAL { 65536 }
+        ::= { docsSubMgtTcpUdpFilterEntry 1 }
+
+docsSubMgtTcpUdpDstPort OBJECT-TYPE
+        SYNTAX  Integer32(0..65536)
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+            "The destination port to match.  65536 matches any value in
+        the TCP or UDP destination port field."
+        DEFVAL { 65536 }
+        ::= { docsSubMgtTcpUdpFilterEntry 2 }
+
+docsSubMgtTcpFlagValues OBJECT-TYPE
+        SYNTAX  BITS
+                    {
+                    urgent(0),
+                    ack(1),
+                    push(2),
+                    reset(3),
+                    syn(4),
+                    fin(5)
+                    }
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+            "The value of the flags of interest.  The value of this
+        object MUST always be a subset (proper or otherwise) of
+        docsSubMgtTcpFlagMask.  An attempt to violate this constraint
+        returns an inconsistentValue error for an SNMPv2 or v3 agent
+        and a badValue error for an SNMPv1 agent."
+        DEFVAL { {} }
+        ::= { docsSubMgtTcpUdpFilterEntry 3 }
+
+docsSubMgtTcpFlagMask OBJECT-TYPE
+        SYNTAX  BITS
+                    {
+                    urgent(0),
+                    ack(1),
+                    push(2),
+                    reset(3),
+                    syn(4),
+                    fin(5)
+                    }
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+            "This bit set indicates the flags of interest in the TCP
+        header for the packet to be matched.  For example to match all
+        packets where the urgent bit is set, but that are not either syn
+        or fin, the value of docsSubMgtTcpFlagValues would be { urgent },
+        and the value of this object would be { urgent, syn, fin }"
+        DEFVAL { {} }
+        ::= { docsSubMgtTcpUdpFilterEntry 4 }
+
+docsSubMgtTcpUdpStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS  current
+        DESCRIPTION
+            "Standard row object for this table.  Any object in the
+        conceptual row may be modified regardless of whether this row is
+        active or not."
+        ::= { docsSubMgtTcpUdpFilterEntry 5 }
+
+
+
+docsSubMgtCmFilterTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DocsSubMgtCmFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Binds filter groups to modems. This table identifies for
+        each modem the upstream and downstream filter groups that apply
+        to packets for that modem. Zero is used as a distinguished value
+        to mean no filter group."
+        ::= { docsSubMgtObjects 8 }
+
+docsSubMgtCmFilterEntry OBJECT-TYPE
+        SYNTAX  DocsSubMgtCmFilterEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Binds a filter group to each direction of traffic for a
+        modem."
+        AUGMENTS { docsIfCmtsCmStatusEntry }
+        ::= {docsSubMgtCmFilterTable 1 }
+
+DocsSubMgtCmFilterEntry ::= SEQUENCE
+        {
+        docsSubMgtSubFilterDownstream        Integer32,
+        docsSubMgtSubFilterUpstream          Integer32,
+        docsSubMgtCmFilterDownstream         Integer32,
+        docsSubMgtCmFilterUpstream           Integer32,
+        docsSubMgtPsFilterDownstream         Integer32,
+        docsSubMgtPsFilterUpstream           Integer32,
+        docsSubMgtMtaFilterDownstream        Integer32,
+        docsSubMgtMtaFilterUpstream          Integer32,
+        docsSubMgtStbFilterDownstream        Integer32,
+        docsSubMgtStbFilterUpstream          Integer32
+        }
+
+docsSubMgtSubFilterDownstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic destined for subscribers
+        attached to the referenced CM.  This is set upon row creation to
+        either the default (docsSubMgtSubFilterDownDefault), or to the
+        value in the provisioning object sent upstream from the CM to the
+        CMTS during registration. The value of this object is a pointer
+        into the docsSubMgtPktFilterTable and refers to all filter rows
+        with matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic destined to hosts
+        attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 1 }
+
+docsSubMgtSubFilterUpstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic originating from
+        subscribers attached to the referenced CM.  This is set upon row
+        creation to either the default (docsSubMgtSubFilterUpDefault), or
+        to the value in the provisioning object sent upstream from the CM
+        to the CMTS. The value of this object is a pointer into the
+        docsSubMgtPktFilterTable and refers to all filter rows with
+        matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic originating from
+        hosts attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 2 }
+
+docsSubMgtCmFilterDownstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic destined for the
+        referenced CM itself.  This is set upon row creation to either
+        the default (docsSubMgtCmFilterDownDefault), or to the value in
+        the provisioning object sent upstream from the CM to the CMTS
+        during registration. The value of this object is a pointer into
+        the docsSubMgtPktFilterTable and refers to all filter rows with
+        matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic destined to this CM."
+        ::= { docsSubMgtCmFilterEntry 3 }
+
+docsSubMgtCmFilterUpstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic originating from the
+        referenced CM itself.  This is set upon row creation to either
+        the default (docsSubMgtCmFilterUpDefault), or to the value in
+        the provisioning object sent upstream from the CM to the CMTS.
+        The value of this object is a pointer into the
+        docsSubMgtPktFilterTable and refers to all filter rows with
+        matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set
+        to zero, no filtering is applied to traffic originating from
+        this CM."
+        ::= { docsSubMgtCmFilterEntry 4 }
+
+docsSubMgtPsFilterDownstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic destined for CableHome
+        portal servers attached to the referenced CM. This is set upon
+        row creation to either the default (docsSubMgtPsFilterDownDefault),
+        or to the value in the provisioning object sent upstream from the
+        CM to the CMTS during registration. The value of this object is a pointer
+        into the docsSubMgtPktFilterTable and refers to all filter rows
+        with matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic destined to portal servers
+        attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 5 }
+
+docsSubMgtPsFilterUpstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic originating from
+        CableHome portal servers attached to the referenced CM. This is set
+        upon row creation to either the default (docsSubMgtPsFilterUpDefault),
+        or to the value in the provisioning object sent upstream from the CM
+        to the CMTS. The value of this object is a pointer into the
+        docsSubMgtPktFilterTable and refers to all filter rows with
+        matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic originating from
+        portal servers attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 6 }
+
+docsSubMgtMtaFilterDownstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic destined for MTAs
+        attached to the referenced CM. This is set upon row
+        creation to either the default (docsSubMgtMtaFilterDownDefault),
+        or to the value in the provisioning object sent upstream from the
+        CM to the CMTS during registration. The value of this object is a pointer
+        into the docsSubMgtPktFilterTable and refers to all filter rows
+        with matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic destined to MTAs
+        attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 7 }
+
+docsSubMgtMtaFilterUpstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic originating from MTAs
+        attached to the referenced CM. This is set upon row creation to
+        either the default (docsSubMgtMtaFilterUpDefault), or to
+        the value in the provisioning object sent upstream from the CM
+        to the CMTS. The value of this object is a pointer into the
+        docsSubMgtPktFilterTable and refers to all filter rows with
+        matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic originating from
+        MTAs attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 8 }
+
+docsSubMgtStbFilterDownstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic destined for STBs
+        attached to the referenced CM. This is set upon row
+        creation to either the default (docsSubMgtStbFilterDownDefault),
+        or to the value in the provisioning object sent upstream from the
+        CM to the CMTS during registration. The value of this object is a pointer
+        into the docsSubMgtPktFilterTable and refers to all filter rows
+        with matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic destined to STBs
+        attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 9 }
+
+docsSubMgtStbFilterUpstream OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "The filter group applied to traffic originating from STBs
+        attached to the referenced CM. This is set upon row creation to
+        either the default (docsSubMgtStbFilterUpDefault), or to
+        the value in the provisioning object sent upstream from the CM
+        to the CMTS. The value of this object is a pointer into the
+        docsSubMgtPktFilterTable and refers to all filter rows with
+        matching docsSubMgtPktFilterGroup indices. If there are no
+        matching filter rows in that table, or if this object is set to
+        zero, no filtering is applied to traffic originating from
+        STBs attached to this CM."
+        ::= { docsSubMgtCmFilterEntry 10 }
+
+docsSubMgtSubFilterDownDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtSubFilterDownstream is set to this value if no
+        provisioning object is present to override it.  This object is
+        persistent across CMTS reboots.  Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 9 }
+
+docsSubMgtSubFilterUpDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtSubFilterUpstream is set to this value if no
+        provisioning object is present to override it.  This object is
+        persistent across CMTS reboots.  Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 10 }
+
+docsSubMgtCmFilterDownDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtCmFilterDownstream is set to this value if no
+        provisioning object is present to override it.  This object is
+        persistent across CMTS reboots.  Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 11 }
+
+docsSubMgtCmFilterUpDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtCmFilterUpstream is set to this value if no
+        provisioning object is present to override it.  This object is
+        persistent across CMTS reboots.  Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 12 }
+
+docsSubMgtPsFilterDownDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtPsFilterDownstream is set to this value if no
+        provisioning object is present to override it. This object is
+        persistent across CMTS reboots. Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 13 }
+
+docsSubMgtPsFilterUpDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtPsFilterUpstream is set to this value if no
+        provisioning object is present to override it. This object is
+        persistent across CMTS reboots. Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 14 }
+
+docsSubMgtMtaFilterDownDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtMtaFilterDownstream is set to this value if no
+        provisioning object is present to override it. This object is
+        persistent across CMTS reboots. Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 15 }
+
+docsSubMgtMtaFilterUpDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtMtaFilterUpstream is set to this value if no
+        provisioning object is present to override it. This object is
+        persistent across CMTS reboots. Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 16 }
+
+docsSubMgtStbFilterDownDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtStbFilterDownstream is set to this value if no
+        provisioning object is present to override it. This object is
+        persistent across CMTS reboots. Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 17 }
+
+docsSubMgtStbFilterUpDefault OBJECT-TYPE
+        SYNTAX  Integer32(0..1024)
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Upon a row creation in docsSubMgtCmFilterTable,
+        docsSubMgtStbFilterUpstream is set to this value if no
+        provisioning object is present to override it. This object is
+        persistent across CMTS reboots. Upon initial CMTS
+        initialization, this defaults to 0."
+        ::= { docsSubMgtObjects 18 }
+
+
+
+docsSubMgtNotification OBJECT IDENTIFIER         ::= { docsSubMgt 2 }
+
+docsSubMgtConformance OBJECT IDENTIFIER ::= { docsSubMgt 3 }
+docsSubMgtCompliances OBJECT IDENTIFIER ::=
+                                            { docsSubMgtConformance 1 }
+docsSubMgtGroups OBJECT IDENTIFIER      ::=
+                                            { docsSubMgtConformance 2 }
+
+docsSubMgtBasicCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for CMTS devices that implement
+        CMTS centric subscriber management."
+
+MODULE
+
+MANDATORY-GROUPS {
+        docsSubMgtGroup
+        }
+
+        ::= { docsSubMgtCompliances 1 }
+
+docsSubMgtGroup OBJECT-GROUP
+            OBJECTS {
+                docsSubMgtCpeControlMaxCpeIp,
+                docsSubMgtCpeControlActive,
+                docsSubMgtCpeControlLearnable,
+                docsSubMgtCpeControlReset,
+                docsSubMgtCpeMaxIpDefault,
+                docsSubMgtCpeActiveDefault,
+                docsSubMgtCpeLearnableDefault,
+                docsSubMgtCpeIpAddr,
+                docsSubMgtCpeIpLearned,
+                docsSubMgtCpeType,
+                docsSubMgtPktFilterSrcAddr,
+                docsSubMgtPktFilterSrcMask,
+                docsSubMgtPktFilterDstAddr,
+                docsSubMgtPktFilterDstMask,
+                docsSubMgtPktFilterUlp,
+                docsSubMgtPktFilterTosValue,
+                docsSubMgtPktFilterTosMask,
+                docsSubMgtPktFilterAction,
+                docsSubMgtPktFilterMatches,
+                docsSubMgtPktFilterStatus,
+                docsSubMgtTcpUdpSrcPort,
+                docsSubMgtTcpUdpDstPort,
+                docsSubMgtTcpFlagValues,
+                docsSubMgtTcpFlagMask,
+                docsSubMgtTcpUdpStatus,
+                docsSubMgtSubFilterDownstream,
+                docsSubMgtSubFilterUpstream,
+                docsSubMgtCmFilterDownstream,
+                docsSubMgtCmFilterUpstream,
+                docsSubMgtPsFilterDownstream,
+                docsSubMgtPsFilterUpstream,
+                docsSubMgtMtaFilterDownstream,
+                docsSubMgtMtaFilterUpstream,
+                docsSubMgtStbFilterDownstream,
+                docsSubMgtStbFilterUpstream,
+                docsSubMgtSubFilterDownDefault,
+                docsSubMgtSubFilterUpDefault,
+                docsSubMgtCmFilterDownDefault,
+                docsSubMgtCmFilterUpDefault,
+                docsSubMgtPsFilterDownDefault,
+                docsSubMgtPsFilterUpDefault,
+                docsSubMgtMtaFilterDownDefault,
+                docsSubMgtMtaFilterUpDefault,
+                docsSubMgtStbFilterDownDefault,
+                docsSubMgtStbFilterUpDefault
+                }
+                STATUS      current
+                DESCRIPTION
+                    "The objects use to managed host-based cable modems
+                     via a set of CMTS enforced controls."
+                ::= {  docsSubMgtGroups 1 }
+
+END

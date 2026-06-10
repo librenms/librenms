@@ -1,0 +1,1396 @@
+-- ****************************************************************************
+-- smartnode.my: SmartNode specific parameters MIB file
+--
+--    
+-- (c) COPYRIGHT 2004 by Patton Electronics Co.
+-- All rights reserved.
+--                                                 
+-- The sources may only be used and/or copied with the written permission
+-- from Patton Electronics Co. or in accordance with the terms and conditions
+-- stipulated in the agreement contract under which the sources have been
+-- supplied.
+-- 
+-- ****************************************************************************
+                    
+SMARTNODE-MIB DEFINITIONS ::= BEGIN
+
+-- ****************************************************************************
+-- imports
+-- ****************************************************************************
+
+IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+       Integer32, Counter32, Gauge32,
+       Counter64, TimeTicks                     FROM SNMPv2-SMI
+       TEXTUAL-CONVENTION, DisplayString,
+       PhysAddress, TruthValue, RowStatus,
+       TimeStamp, AutonomousType, TestAndIncr   FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP          FROM SNMPv2-CONF
+       snmpTraps                                FROM SNMPv2-MIB
+       enterprises                              FROM RFC1155-SMI;
+
+-- ****************************************************************************
+-- the path to the root
+-- ****************************************************************************
+
+patton       OBJECT IDENTIFIER ::= { enterprises 1768 }
+
+-- ****************************************************************************
+-- definitions for information modules
+-- ****************************************************************************
+
+smartnode MODULE-IDENTITY
+        LAST-UPDATED "0812150000Z"
+        ORGANIZATION "Patton Electronics Co."
+        CONTACT-INFO
+            "Patton Electronics Co.
+            7622 Rickenbacker Drive
+            Gaithersburg
+            MD 20879 USA
+                        
+            Tel:    +1 301-975-1000
+            Fax:    +1 301-869-9293
+            Web:    http://www.patton.com"
+        DESCRIPTION
+            "Patton Electronics Co.: MIB for SmartNode, Onsite, Copper Link and Forefront Products" 
+        REVISION "0812150000Z"
+        DESCRIPTION
+            "Patton Electronics Co. : MIB for SmartNode Products"
+       ::= { patton 100 }
+
+-- ****************************************************************************
+-- defining the objects
+-- ****************************************************************************
+
+ sysinfo         OBJECT IDENTIFIER ::= { smartnode 1 }
+ admin           OBJECT IDENTIFIER ::= { smartnode 2 }
+ config          OBJECT IDENTIFIER ::= { smartnode 3 }
+ firmware        OBJECT IDENTIFIER ::= { smartnode 5 }
+ products        OBJECT IDENTIFIER ::= { smartnode 4 }
+ performance     OBJECT IDENTIFIER ::= { smartnode 70 }
+
+ startupConfigUpload    OBJECT IDENTIFIER ::= { config 1 }
+ startupConfigDownload  OBJECT IDENTIFIER ::= { config 2 }
+ 
+
+-- ****************************************************************************
+-- defining the sysinfo objects
+-- ****************************************************************************
+
+serialNumber OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Provides the serial number of the device."
+        ::= { sysinfo 1 }
+
+hwRelease OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Provides the hardware release of the device."
+        ::= { sysinfo 3 }
+
+hwVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Provides the hardware version of the device."
+        ::= { sysinfo 4 }
+
+swVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Provides the software version of the device. The following
+            is an example of a software version information:
+
+            R4.2 2008-09-11 SIP"
+        ::= { sysinfo 5 }
+
+productName OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Provides the product name of the device."
+        ::= { sysinfo 6 }
+        
+dslSwVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Provides the firmware version of the DSL card if any present"
+        ::= { sysinfo 7 }
+
+-- ****************************************************************************
+-- defining the startup config upload objects
+-- ****************************************************************************
+
+uploadExecute OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noOp (0),
+            uploadConfiguration (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Starts configuration upload via TFTP.
+                0 noOp
+                1 uploadConfiguration"
+       ::= { startupConfigUpload 1 }
+
+uploadTftpServerAddress OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Tftp server IP address."
+       ::= { startupConfigUpload 2 }
+
+uploadTftpServerPort OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION "Tftp server IP port number."
+        DEFVAL      { 69 }
+       ::= { startupConfigUpload 3 }
+
+uploadTftpServerPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Server path and file name on which the configuration will be stored.
+             ( e.g. configurations/config1.cfg )"
+       ::= { startupConfigUpload 4 }
+
+uploadStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            failed (0),
+            success (1),
+            inProgress (2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The status of the running configuration transfer from the device to
+             a file on the TFTP server.
+                0 failed
+                1 success
+                2 inProgress"
+        ::= { startupConfigUpload 5 }
+
+-- ****************************************************************************
+-- defining the startup config download objects
+-- ****************************************************************************
+
+downloadExecute OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noOp (0),
+            downloadConfiguration (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Starts configuration download via TFTP. A reload of the device will
+             be necessary in order to apply the new downloaded configuration.
+                0 noOP
+                1 downloadConfiguration"
+       ::= { startupConfigDownload 1 }
+
+downloadTftpServerAddress OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Tftp server IP address."
+       ::= { startupConfigDownload 2 }
+
+downloadTftpServerPort OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION "Tftp server IP port number."
+        DEFVAL      { 69 }
+       ::= { startupConfigDownload 3 }
+
+downloadTftpServerPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Server path and file name from which the configuration will
+             be downloaded ( e.g. configurations/config1.cfg )."
+       ::= { startupConfigDownload 4 }
+
+downloadStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            failed (0),
+            success (1),
+            inProgress (2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The status of the configuration file transfer from the TFTP server to
+             the device's startup configuration.
+                0 failed
+                1 success
+                2 inProgress"
+        ::= { startupConfigDownload 5 }
+
+-- ****************************************************************************
+-- defining the firmware download objects
+-- ****************************************************************************
+
+firmwareLoadExecute OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noOp (0),
+            loadFirmware (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Starts firmware download via TFTP.
+               0 noOp
+               1 loadFirmware"
+       ::= { firmware 1 }
+
+firmwareTftpServerAddress OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Tftp server IP address."
+       ::= { firmware 2 }
+
+firmwareTftpServerPort OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        ACCESS  read-write
+        STATUS  current
+        DESCRIPTION "Tftp server IP port number."
+        DEFVAL      { 69 }
+       ::= { firmware 3 }
+
+firmwareTftpServerPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..255))
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Server path and file name of the firmware batch-file.
+             ( e.g. firmware/b )"
+       ::= { firmware 4 }
+
+firmwareLoadStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            failed (0),
+            success (1),
+            inProgress (2)
+            }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The status of the firmware download from the TFTP server to the device.
+                0 failed
+                1 success
+                2 inProgress"
+        ::= { firmware 5 }
+
+-- ****************************************************************************
+-- defining the admin objects
+-- ****************************************************************************
+
+deviceReload OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noOp (0),
+            reload (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Force a reload of the device.
+               0 noOp
+               1 reload"
+       ::= { admin 1 }
+
+saveRunningConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+            noOp (0),
+            saveConfiguration (1)
+            }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Save the device running configuration into the startup configuration.
+               0 noOp
+               1 saveConfiguration"
+       ::= { admin 2 }
+
+-- ****************************************************************************
+-- defining the products objects
+-- ****************************************************************************
+-- The following list of objects is used to identify the product type of a
+-- SmartNode device. Each SmartNode family member device has its own 
+-- and unique .iso.org.dod.internet.mgmt.mib-2.system.sysObjectID, which is  
+-- read by Network Management Systems by contacting the SNMP agent running in 
+-- a SmartNode device. The sysObjectID is an SNMP MIB variable that is 
+-- automatically retrieved by netmon when it successfully communicates with a
+-- SmartNode using SNMP.
+--
+-- the relevant part of RFC 1213
+-- (the system group variable sysObjectID page 14)
+--
+-- sysObjectID OBJECT-TYPE
+--   SYNTAX  OBJECT IDENTIFIER
+--   ACCESS  read-only
+--   STATUS  mandatory
+--   DESCRIPTION
+--          "The vendor's authoritative identification of the
+--          network management subsystem contained in the
+--          entity.  This value is allocated within the SMI
+--          enterprises subtree (1.3.6.1.4.1) and provides an
+--          easy and unambiguous means for determining `what
+--          kind of box' is being managed.  For example, if
+--          vendor `Flintstones, Inc.' was assigned the
+--          subtree 1.3.6.1.4.1.4242, it could assign the
+--          identifier 1.3.6.1.4.1.4242.1.1 to its `Fred
+--          Router'."
+--   ::= { system 2 }
+-- ***************************************************************************+
+
+sn1200        OBJECT IDENTIFIER ::= { products 1 }
+sn1400        OBJECT IDENTIFIER ::= { products 2 }
+sn2300        OBJECT IDENTIFIER ::= { products 3 }
+sn2400        OBJECT IDENTIFIER ::= { products 4 }
+
+-- ****************************************************************************
+
+sn4xxx        OBJECT IDENTIFIER ::= { products 5 }
+
+sn4524-sn4834-JS     OBJECT IDENTIFIER ::= { sn4xxx 1 }
+sn4522-sn4832-JS     OBJECT IDENTIFIER ::= { sn4xxx 2 }
+sn4526-sn4836-JS     OBJECT IDENTIFIER ::= { sn4xxx 3 }
+sn4528-sn4838-JS     OBJECT IDENTIFIER ::= { sn4xxx 4 }
+
+sn4112-JS     OBJECT IDENTIFIER ::= { sn4xxx 5 }
+sn4114-JS     OBJECT IDENTIFIER ::= { sn4xxx 6 }
+sn4116-JS     OBJECT IDENTIFIER ::= { sn4xxx 7 }
+sn4118-JS     OBJECT IDENTIFIER ::= { sn4xxx 8 }
+
+sn4524-sn4834-2JS2JO OBJECT IDENTIFIER ::= { sn4xxx 9 }
+sn4526-sn4836-4JS2JO OBJECT IDENTIFIER ::= { sn4xxx 10 }
+sn4528-sn4838-4JS4JO OBJECT IDENTIFIER ::= { sn4xxx 11 }
+
+sn4114-2JS2JO OBJECT IDENTIFIER ::= { sn4xxx 12 }
+sn4116-4JS2JO OBJECT IDENTIFIER ::= { sn4xxx 13 }
+sn4118-4JS4JO OBJECT IDENTIFIER ::= { sn4xxx 14 }
+
+sn4522-sn4832-JO     OBJECT IDENTIFIER ::= { sn4xxx 15 }
+sn4524-sn4834-JO     OBJECT IDENTIFIER ::= { sn4xxx 16 }
+sn4526-JO     OBJECT IDENTIFIER ::= { sn4xxx 17 }
+sn4528-JO     OBJECT IDENTIFIER ::= { sn4xxx 18 }
+
+sn4112-JO     OBJECT IDENTIFIER ::= { sn4xxx 19 }
+sn4114-JO     OBJECT IDENTIFIER ::= { sn4xxx 20 }
+sn4116-JO     OBJECT IDENTIFIER ::= { sn4xxx 21 }
+sn4118-JO     OBJECT IDENTIFIER ::= { sn4xxx 22 }
+
+sn4834-JSA     OBJECT IDENTIFIER ::= { sn4xxx 23 }
+sn4838-JSA     OBJECT IDENTIFIER ::= { sn4xxx 24 }
+sn4838-4JS4JOA OBJECT IDENTIFIER ::= { sn4xxx 25 }
+
+sn4112S-JS     OBJECT IDENTIFIER ::= { sn4xxx 26 }
+
+sn4832-JSA     OBJECT IDENTIFIER ::= { sn4xxx 27 }
+sn4834-2JS2JOA OBJECT IDENTIFIER ::= { sn4xxx 28 }
+sn4836-JSA     OBJECT IDENTIFIER ::= { sn4xxx 29 }
+sn4836-4JS2JOA OBJECT IDENTIFIER ::= { sn4xxx 30 }
+
+-- ****************************************************************************
+
+sn455x        OBJECT IDENTIFIER ::= { products 6 }
+
+sn4552        OBJECT IDENTIFIER ::= { sn455x 1 }
+sn4562        OBJECT IDENTIFIER ::= { sn455x 2 }
+sdta          OBJECT IDENTIFIER ::= { sn455x 3 }
+sn4554        OBJECT IDENTIFIER ::= { sn455x 4 }
+sn4564        OBJECT IDENTIFIER ::= { sn455x 5 }
+
+-- ****************************************************************************
+
+sn49xx-JS     OBJECT IDENTIFIER ::= { products 7 }
+
+-- sn4908-JS     OBJECT IDENTIFIER ::= { sn49xx-JS 1 }(not yet planned, but likely to appear sometimes)
+sn4912-JS     OBJECT IDENTIFIER ::= { sn49xx-JS 2 }
+sn4916-JS     OBJECT IDENTIFIER ::= { sn49xx-JS 3 }
+sn4924-JS     OBJECT IDENTIFIER ::= { sn49xx-JS 4 }
+sn4932-JS     OBJECT IDENTIFIER ::= { sn49xx-JS 5 }
+
+-- ****************************************************************************
+
+sn28xx        OBJECT IDENTIFIER ::= { products 8 }
+
+sn2802        OBJECT IDENTIFIER ::= { sn28xx 1 }
+sn2805        OBJECT IDENTIFIER ::= { sn28xx 2 }
+sn2821        OBJECT IDENTIFIER ::= { sn28xx 3 }
+sn2835        OBJECT IDENTIFIER ::= { sn28xx 4 }
+
+-- ****************************************************************************
+
+sn46xx        OBJECT IDENTIFIER ::= { products 9 }
+
+sn4634        OBJECT IDENTIFIER ::= { sn46xx 1 }
+sn4638        OBJECT IDENTIFIER ::= { sn46xx 2 }
+sn4654-C      OBJECT IDENTIFIER ::= { sn46xx 3 }
+sn4658-C      OBJECT IDENTIFIER ::= { sn46xx 4 }
+sn4654-D      OBJECT IDENTIFIER ::= { sn46xx 5 }
+sn4658-D      OBJECT IDENTIFIER ::= { sn46xx 6 }
+sn4654-T      OBJECT IDENTIFIER ::= { sn46xx 7 }
+sn4658-T      OBJECT IDENTIFIER ::= { sn46xx 8 }
+sn4654-K      OBJECT IDENTIFIER ::= { sn46xx 9 }
+sn4658-K      OBJECT IDENTIFIER ::= { sn46xx 10 }
+sn4654-AA     OBJECT IDENTIFIER ::= { sn46xx 11 }
+sn4658-AA     OBJECT IDENTIFIER ::= { sn46xx 12 }
+sn4654-AB     OBJECT IDENTIFIER ::= { sn46xx 13 }
+sn4658-AB     OBJECT IDENTIFIER ::= { sn46xx 14 }
+sn4654-G      OBJECT IDENTIFIER ::= { sn46xx 15 }
+sn4658-G      OBJECT IDENTIFIER ::= { sn46xx 16 }
+sn4654-2GS    OBJECT IDENTIFIER ::= { sn46xx 19 }
+sn4658-2GS    OBJECT IDENTIFIER ::= { sn46xx 20 }
+sn4654-A      OBJECT IDENTIFIER ::= { sn46xx 21 }
+sn4658-A      OBJECT IDENTIFIER ::= { sn46xx 22 }
+sn4635        OBJECT IDENTIFIER ::= { sn46xx 101 }
+sn4639        OBJECT IDENTIFIER ::= { sn46xx 102 }
+sn4655-AA     OBJECT IDENTIFIER ::= { sn46xx 111 }
+sn4659-AA     OBJECT IDENTIFIER ::= { sn46xx 112 }
+sn4655-AB     OBJECT IDENTIFIER ::= { sn46xx 113 }
+sn4659-AB     OBJECT IDENTIFIER ::= { sn46xx 114 }
+sn4655-G      OBJECT IDENTIFIER ::= { sn46xx 115 }
+sn4659-G      OBJECT IDENTIFIER ::= { sn46xx 116 }
+sn4655-2GS    OBJECT IDENTIFIER ::= { sn46xx 119 }
+sn4659-2GS    OBJECT IDENTIFIER ::= { sn46xx 120 }
+sn4655-A      OBJECT IDENTIFIER ::= { sn46xx 121 }
+sn4659-A      OBJECT IDENTIFIER ::= { sn46xx 122 }
+
+-- ****************************************************************************
+
+sn496x        OBJECT IDENTIFIER ::= { products 10 }
+
+sn4960-1e15v    OBJECT IDENTIFIER ::= { sn496x 1 }
+sn4960-1e24v    OBJECT IDENTIFIER ::= { sn496x 2 }
+sn4960-1e30v    OBJECT IDENTIFIER ::= { sn496x 3 }
+sn4960-4e15v    OBJECT IDENTIFIER ::= { sn496x 4 }
+sn4960-4e24v    OBJECT IDENTIFIER ::= { sn496x 5 }
+sn4960-4e30v    OBJECT IDENTIFIER ::= { sn496x 6 }
+sn4960-4e48v    OBJECT IDENTIFIER ::= { sn496x 7 }
+sn4960-4e60v    OBJECT IDENTIFIER ::= { sn496x 8 }
+sn4960-4e96v    OBJECT IDENTIFIER ::= { sn496x 9 }
+sn4960-4e120v   OBJECT IDENTIFIER ::= { sn496x 10 }
+sn4961-1e15v    OBJECT IDENTIFIER ::= { sn496x 11 }
+sn4961-1e24v    OBJECT IDENTIFIER ::= { sn496x 12 }
+sn4961-1e30v    OBJECT IDENTIFIER ::= { sn496x 13 }
+sn4961-4e15v    OBJECT IDENTIFIER ::= { sn496x 14 }
+sn4961-4e24v    OBJECT IDENTIFIER ::= { sn496x 15 }
+sn4961-4e30v    OBJECT IDENTIFIER ::= { sn496x 16 }
+sn4961-4e48v    OBJECT IDENTIFIER ::= { sn496x 17 }
+sn4961-4e60v    OBJECT IDENTIFIER ::= { sn496x 18 }
+sn4961-4e96v    OBJECT IDENTIFIER ::= { sn496x 19 }
+sn4961-4e120v   OBJECT IDENTIFIER ::= { sn496x 20 }
+sn4960-4e30v120 OBJECT IDENTIFIER ::= { sn496x 21 }
+
+-- ****************************************************************************
+
+sn49xx-JO     OBJECT IDENTIFIER ::= { products 11 }
+
+-- sn4908-JO     OBJECT IDENTIFIER ::= { sn49xx 1 }(not yet planned, but likely to appear sometimes)
+sn4912-JO     OBJECT IDENTIFIER ::= { sn49xx-JO 2 }
+sn4916-JO     OBJECT IDENTIFIER ::= { sn49xx-JO 3 }
+sn4924-JO     OBJECT IDENTIFIER ::= { sn49xx-JO 4 }
+sn4932-JO     OBJECT IDENTIFIER ::= { sn49xx-JO 5 }
+
+-- ****************************************************************************
+
+sn44xx-JS     OBJECT IDENTIFIER ::= { products 12 }
+
+-- sn4408-JS     OBJECT IDENTIFIER ::= { sn44xx-JS 1 }(not yet planned, but likely to appear sometimes)
+sn4412-JS     OBJECT IDENTIFIER ::= { sn44xx-JS 2 }
+sn4416-JS     OBJECT IDENTIFIER ::= { sn44xx-JS 3 }
+sn4424-JS     OBJECT IDENTIFIER ::= { sn44xx-JS 4 }
+sn4432-JS     OBJECT IDENTIFIER ::= { sn44xx-JS 5 }
+
+-- ****************************************************************************
+
+sn5x00     OBJECT IDENTIFIER ::= { products 13 }
+
+sn5200-32b       OBJECT IDENTIFIER ::= { sn5x00 1 }
+sn5400-16p       OBJECT IDENTIFIER ::= { sn5x00 2 }
+sn5400-32p       OBJECT IDENTIFIER ::= { sn5x00 3 }
+sn5400-64p       OBJECT IDENTIFIER ::= { sn5x00 4 }
+sn5400-128p      OBJECT IDENTIFIER ::= { sn5x00 5 }
+sn5200-4b        OBJECT IDENTIFIER ::= { sn5x00 6 }
+sn5221-4bd       OBJECT IDENTIFIER ::= { sn5x00 7 }
+
+-- ****************************************************************************
+
+sn43xx-JS     OBJECT IDENTIFIER ::= { products 14 }
+
+-- sn4308-JS     OBJECT IDENTIFIER ::= { sn43xx-JS 1 }(not planned yet, but likely to appear sometime)
+sn4312-JS     OBJECT IDENTIFIER ::= { sn43xx-JS 2 }
+sn4316-JS     OBJECT IDENTIFIER ::= { sn43xx-JS 3 }
+sn4324-JS     OBJECT IDENTIFIER ::= { sn43xx-JS 4 }
+sn4332-JS     OBJECT IDENTIFIER ::= { sn43xx-JS 5 }
+
+-- ****************************************************************************
+
+sn495x        OBJECT IDENTIFIER ::= { products 15 }
+
+sn4950-1e15v    OBJECT IDENTIFIER ::= { sn495x 1 }
+sn4950-1e24v    OBJECT IDENTIFIER ::= { sn495x 2 }
+sn4950-1e30v    OBJECT IDENTIFIER ::= { sn495x 3 }
+sn4950-4e15v    OBJECT IDENTIFIER ::= { sn495x 4 }
+sn4950-4e24v    OBJECT IDENTIFIER ::= { sn495x 5 }
+sn4950-4e30v    OBJECT IDENTIFIER ::= { sn495x 6 }
+sn4950-4e48v    OBJECT IDENTIFIER ::= { sn495x 7 }
+sn4950-4e60v    OBJECT IDENTIFIER ::= { sn495x 8 }
+sn4950-4e96v    OBJECT IDENTIFIER ::= { sn495x 9 }
+sn4950-4e120v   OBJECT IDENTIFIER ::= { sn495x 10 }
+sn4951-1e15v    OBJECT IDENTIFIER ::= { sn495x 11 }
+sn4951-1e24v    OBJECT IDENTIFIER ::= { sn495x 12 }
+sn4951-1e30v    OBJECT IDENTIFIER ::= { sn495x 13 }
+sn4951-4e15v    OBJECT IDENTIFIER ::= { sn495x 14 }
+sn4951-4e24v    OBJECT IDENTIFIER ::= { sn495x 15 }
+sn4951-4e30v    OBJECT IDENTIFIER ::= { sn495x 16 }
+sn4951-4e48v    OBJECT IDENTIFIER ::= { sn495x 17 }
+sn4951-4e60v    OBJECT IDENTIFIER ::= { sn495x 18 }
+sn4951-4e96v    OBJECT IDENTIFIER ::= { sn495x 19 }
+sn4951-4e120v   OBJECT IDENTIFIER ::= { sn495x 20 }
+sn4950-4e30v120 OBJECT IDENTIFIER ::= { sn495x 21 }
+
+-- ****************************************************************************
+
+sn494x          OBJECT IDENTIFIER ::= { products 16 }
+
+sn4940-1e15v    OBJECT IDENTIFIER ::= { sn494x 1 }
+sn4940-1e24v    OBJECT IDENTIFIER ::= { sn494x 2 }
+sn4940-1e30v    OBJECT IDENTIFIER ::= { sn494x 3 }
+sn4940-4e15v    OBJECT IDENTIFIER ::= { sn494x 4 }
+sn4940-4e24v    OBJECT IDENTIFIER ::= { sn494x 5 }
+sn4940-4e30v    OBJECT IDENTIFIER ::= { sn494x 6 }
+sn4940-4e48v    OBJECT IDENTIFIER ::= { sn494x 7 }
+sn4940-4e60v    OBJECT IDENTIFIER ::= { sn494x 8 }
+sn4940-4e96v    OBJECT IDENTIFIER ::= { sn494x 9 }
+sn4940-4e120v   OBJECT IDENTIFIER ::= { sn494x 10 }
+sn4941-1e15v    OBJECT IDENTIFIER ::= { sn494x 11 }
+sn4941-1e24v    OBJECT IDENTIFIER ::= { sn494x 12 }
+sn4941-1e30v    OBJECT IDENTIFIER ::= { sn494x 13 }
+sn4941-4e15v    OBJECT IDENTIFIER ::= { sn494x 14 }
+sn4941-4e24v    OBJECT IDENTIFIER ::= { sn494x 15 }
+sn4941-4e30v    OBJECT IDENTIFIER ::= { sn494x 16 }
+sn4941-4e48v    OBJECT IDENTIFIER ::= { sn494x 17 }
+sn4941-4e60v    OBJECT IDENTIFIER ::= { sn494x 18 }
+sn4941-4e96v    OBJECT IDENTIFIER ::= { sn494x 19 }
+sn4941-4e120v   OBJECT IDENTIFIER ::= { sn494x 20 }
+sn4940-4e30v120 OBJECT IDENTIFIER ::= { sn494x 21 }
+
+-- ****************************************************************************
+
+sn466x                OBJECT IDENTIFIER ::= { products 17 }
+
+sn4661-2bis4js8v      OBJECT IDENTIFIER ::= { sn466x 1 }
+sn4661-2bis2js2jo8v   OBJECT IDENTIFIER ::= { sn466x 2 }
+sn4661-4bis4js4jo12v  OBJECT IDENTIFIER ::= { sn466x 3 }
+sn4661-8bis8V         OBJECT IDENTIFIER ::= { sn466x 4 }
+sn4660-8bis16V        OBJECT IDENTIFIER ::= { sn466x 5 }
+sn4661-4bis4js12v     OBJECT IDENTIFIER ::= { sn466x 6 }
+sn4661-8bis16v        OBJECT IDENTIFIER ::= { sn466x 7 }
+sn4661-8bis4js24v     OBJECT IDENTIFIER ::= { sn466x 8 }
+sn4660-4bis8v         OBJECT IDENTIFIER ::= { sn466x 9 }
+sn4660-4bis2js8v      OBJECT IDENTIFIER ::= { sn466x 10 }
+sn4660-4bis8js16v     OBJECT IDENTIFIER ::= { sn466x 11 }
+sn4660-8bis4js16v     OBJECT IDENTIFIER ::= { sn466x 12 }
+sn4660-8bis2js16v     OBJECT IDENTIFIER ::= { sn466x 13 }
+sn4660-4bis4v         OBJECT IDENTIFIER ::= { sn466x 14 }
+sn4661-4bis4v         OBJECT IDENTIFIER ::= { sn466x 15 }
+sn4661-4bis8v         OBJECT IDENTIFIER ::= { sn466x 16 }
+sn4660-8js8v          OBJECT IDENTIFIER ::= { sn466x 17 }
+sn4660-4js4v          OBJECT IDENTIFIER ::= { sn466x 18 }
+sn4660-4jo4v          OBJECT IDENTIFIER ::= { sn466x 19 }
+sn4660-4js4jo8v       OBJECT IDENTIFIER ::= { sn466x 20 }
+
+-- ****************************************************************************
+
+sn467x                   OBJECT IDENTIFIER ::= { products 18 }
+
+sn4671-2bis4js8v2gs      OBJECT IDENTIFIER ::= { sn467x 1 }
+sn4671-4bis4js4jo12v2gs  OBJECT IDENTIFIER ::= { sn467x 2 }
+sn4671-8bis16v2gs        OBJECT IDENTIFIER ::= { sn467x 3 }
+sn4671-4bis8js16v2gs     OBJECT IDENTIFIER ::= { sn467x 4 }
+sn4670-2bis4v2gs         OBJECT IDENTIFIER ::= { sn467x 5 }
+sn4670-2bis2js4v2gs      OBJECT IDENTIFIER ::= { sn467x 6 }
+sn4670-4bis2js8v2gs      OBJECT IDENTIFIER ::= { sn467x 7 }
+sn4670-4bis8v2gs         OBJECT IDENTIFIER ::= { sn467x 8 }
+sn4670-8bis2js16v2gs     OBJECT IDENTIFIER ::= { sn467x 9 }
+sn4671-4bis4js4jo12va    OBJECT IDENTIFIER ::= { sn467x 10 }
+sn4671-2bis2js2jo8Va     OBJECT IDENTIFIER ::= { sn467x 11 }
+sn4671-4bis4js12Va       OBJECT IDENTIFIER ::= { sn467x 12 }
+sn4671-4js4jo8Va         OBJECT IDENTIFIER ::= { sn467x 13 }
+sn4671-8js8Va            OBJECT IDENTIFIER ::= { sn467x 14 }
+sn4671-4bis8va           OBJECT IDENTIFIER ::= { sn467x 15 }
+sn4671-2bis2js2jo8vf     OBJECT IDENTIFIER ::= { sn467x 16 }
+sn4671-2bis4js8vf        OBJECT IDENTIFIER ::= { sn467x 17 }
+sn4671-4bis4js12vf       OBJECT IDENTIFIER ::= { sn467x 18 }
+sn4671-4bis4js4jo12vf    OBJECT IDENTIFIER ::= { sn467x 19 }
+sn4671-4bis8js16vf       OBJECT IDENTIFIER ::= { sn467x 20 }
+sn4671-4bis8vf           OBJECT IDENTIFIER ::= { sn467x 21 }
+sn4671-8bis16vf          OBJECT IDENTIFIER ::= { sn467x 22 }
+sn4671-4js4jo8vf         OBJECT IDENTIFIER ::= { sn467x 23 }
+sn4671-8js8vf            OBJECT IDENTIFIER ::= { sn467x 24 }
+sn4670-8js8vf            OBJECT IDENTIFIER ::= { sn467x 25 }
+sn4670-4js4jo8vf         OBJECT IDENTIFIER ::= { sn467x 26 }
+sn4671-2bis2js2jo8v2g    OBJECT IDENTIFIER ::= { sn467x 27 }
+sn4671-2bis4js8v2g       OBJECT IDENTIFIER ::= { sn467x 28 }
+sn4671-4bis4js12v2g      OBJECT IDENTIFIER ::= { sn467x 29 }
+sn4671-4bis4js4jo12v2g   OBJECT IDENTIFIER ::= { sn467x 30 }
+sn4671-4bis8js16v2g      OBJECT IDENTIFIER ::= { sn467x 31 }
+sn4671-4bis8v2g          OBJECT IDENTIFIER ::= { sn467x 32 }
+sn4671-8bis16v2g         OBJECT IDENTIFIER ::= { sn467x 33 }
+sn4670-4js4jo8v2g        OBJECT IDENTIFIER ::= { sn467x 34 }
+sn4670-8js8v2g           OBJECT IDENTIFIER ::= { sn467x 35 }
+sn4671-2bis2js2jo8v4g    OBJECT IDENTIFIER ::= { sn467x 36 }
+sn4671-2bis4js8v4g       OBJECT IDENTIFIER ::= { sn467x 37 }
+sn4671-4bis4js12v4g      OBJECT IDENTIFIER ::= { sn467x 38 }
+sn4671-4bis4js4jo12v4g   OBJECT IDENTIFIER ::= { sn467x 39 }
+sn4671-4bis8js16v4g      OBJECT IDENTIFIER ::= { sn467x 40 }
+sn4671-4bis8v4g          OBJECT IDENTIFIER ::= { sn467x 41 }
+sn4671-8bis16v4g         OBJECT IDENTIFIER ::= { sn467x 42 }
+sn4670-4js4jo8v4g        OBJECT IDENTIFIER ::= { sn467x 43 }
+sn4670-8js8v4g           OBJECT IDENTIFIER ::= { sn467x 44 }
+
+-- ****************************************************************************
+
+sn-dta                   OBJECT IDENTIFIER ::= { products 19 }
+
+sn-dta-1bis2v            OBJECT IDENTIFIER ::= { sn-dta 1 }
+sn-dta-2bis2v            OBJECT IDENTIFIER ::= { sn-dta 2 }
+sn-dta-2bis4v            OBJECT IDENTIFIER ::= { sn-dta 3 }
+sn-dta-2bis4vhp          OBJECT IDENTIFIER ::= { sn-dta 4 }
+
+-- ****************************************************************************
+
+sn4120                   OBJECT IDENTIFIER ::= { products 20 }
+
+sn4120-1bis2v            OBJECT IDENTIFIER ::= { sn4120 1 }
+sn4120-2bis4v            OBJECT IDENTIFIER ::= { sn4120 2 }
+
+-- ****************************************************************************
+
+sn499x        OBJECT IDENTIFIER ::= { products 21 }
+
+sn4990-1e15v        OBJECT IDENTIFIER ::= { sn499x 1 }
+sn4990-1e24v        OBJECT IDENTIFIER ::= { sn499x 2 }
+sn4990-1e30v        OBJECT IDENTIFIER ::= { sn499x 3 }
+sn4990-4e15v        OBJECT IDENTIFIER ::= { sn499x 4 }
+sn4990-4e24v        OBJECT IDENTIFIER ::= { sn499x 5 }
+sn4990-4e30v        OBJECT IDENTIFIER ::= { sn499x 6 }
+sn4990-4e48v        OBJECT IDENTIFIER ::= { sn499x 7 }
+sn4990-4e60v        OBJECT IDENTIFIER ::= { sn499x 8 }
+sn4990-4e96v        OBJECT IDENTIFIER ::= { sn499x 9 }
+sn4990-4e120v       OBJECT IDENTIFIER ::= { sn499x 10 }
+sn4991-1e15v        OBJECT IDENTIFIER ::= { sn499x 11 }
+sn4991-1e24v        OBJECT IDENTIFIER ::= { sn499x 12 }
+sn4991-1e30v        OBJECT IDENTIFIER ::= { sn499x 13 }
+sn4991-4e15v        OBJECT IDENTIFIER ::= { sn499x 14 }
+sn4991-4e24v        OBJECT IDENTIFIER ::= { sn499x 15 }
+sn4991-4e30v        OBJECT IDENTIFIER ::= { sn499x 16 }
+sn4991-4e48v        OBJECT IDENTIFIER ::= { sn499x 17 }
+sn4991-4e60v        OBJECT IDENTIFIER ::= { sn499x 18 }
+sn4991-4e96v        OBJECT IDENTIFIER ::= { sn499x 19 }
+sn4991-4e120v       OBJECT IDENTIFIER ::= { sn499x 20 }
+sn4990-4e30v120     OBJECT IDENTIFIER ::= { sn499x 21 }
+sn4991-4e30v120     OBJECT IDENTIFIER ::= { sn499x 22 }
+sn4991-1e15vrf      OBJECT IDENTIFIER ::= { sn499x 23 }
+sn4991-1e24vrf      OBJECT IDENTIFIER ::= { sn499x 24 }
+sn4991-1e30vrf      OBJECT IDENTIFIER ::= { sn499x 25 }
+sn4991-4e15vrf      OBJECT IDENTIFIER ::= { sn499x 26 }
+sn4991-4e24vrf      OBJECT IDENTIFIER ::= { sn499x 27 }
+sn4991-4e30vrf      OBJECT IDENTIFIER ::= { sn499x 28 }
+sn4991-4e48vrf      OBJECT IDENTIFIER ::= { sn499x 29 }
+sn4991-4e60vrf      OBJECT IDENTIFIER ::= { sn499x 30 }
+sn4991-4e96vrf      OBJECT IDENTIFIER ::= { sn499x 31 }
+sn4991-4e120vrf     OBJECT IDENTIFIER ::= { sn499x 32 }
+sn4991-4e30v120rf   OBJECT IDENTIFIER ::= { sn499x 33 }
+sn4991-1e15va       OBJECT IDENTIFIER ::= { sn499x 34 }
+sn4991-1e30va       OBJECT IDENTIFIER ::= { sn499x 35 }
+sn4991-4e15vra      OBJECT IDENTIFIER ::= { sn499x 36 }
+sn4991-4e30vra      OBJECT IDENTIFIER ::= { sn499x 37 }
+sn4991-1e15v2g      OBJECT IDENTIFIER ::= { sn499x 38 }
+sn4991-1e24v2g      OBJECT IDENTIFIER ::= { sn499x 39 }
+sn4991-1e30v2g      OBJECT IDENTIFIER ::= { sn499x 40 }
+sn4991-4e15vr2g     OBJECT IDENTIFIER ::= { sn499x 41 }
+sn4991-4e24vr2g     OBJECT IDENTIFIER ::= { sn499x 42 }
+sn4991-4e30vr2g     OBJECT IDENTIFIER ::= { sn499x 43 }
+sn4991-4e48vr2g     OBJECT IDENTIFIER ::= { sn499x 44 }
+sn4991-4e60vr2g     OBJECT IDENTIFIER ::= { sn499x 45 }
+sn4991-4e96vr2g     OBJECT IDENTIFIER ::= { sn499x 46 }
+sn4991-4e120vr2g    OBJECT IDENTIFIER ::= { sn499x 47 }
+sn4991-4e30v120r2g  OBJECT IDENTIFIER ::= { sn499x 48 }
+sn4991-1e15v4g      OBJECT IDENTIFIER ::= { sn499x 49 }
+sn4991-1e24v4g      OBJECT IDENTIFIER ::= { sn499x 50 }
+sn4991-1e30v4g      OBJECT IDENTIFIER ::= { sn499x 51 }
+sn4991-4e15vr4g     OBJECT IDENTIFIER ::= { sn499x 52 }
+sn4991-4e24vr4g     OBJECT IDENTIFIER ::= { sn499x 53 }
+sn4991-4e30vr4g     OBJECT IDENTIFIER ::= { sn499x 54 }
+sn4991-4e48vr4g     OBJECT IDENTIFIER ::= { sn499x 55 }
+sn4991-4e60vr4g     OBJECT IDENTIFIER ::= { sn499x 56 }
+sn4991-4e96vr4g     OBJECT IDENTIFIER ::= { sn499x 57 }
+sn4991-4e120vr4g    OBJECT IDENTIFIER ::= { sn499x 58 }
+sn4991-4e30v120r4g  OBJECT IDENTIFIER ::= { sn499x 59 }
+sn4991-1e24vi       OBJECT IDENTIFIER ::= { sn499x 60 }
+sn4991-1e30vi       OBJECT IDENTIFIER ::= { sn499x 61 }
+sn4991-4e24vri      OBJECT IDENTIFIER ::= { sn499x 62 }
+sn4991-4e30vri      OBJECT IDENTIFIER ::= { sn499x 63 }
+sn4991-4e48vri      OBJECT IDENTIFIER ::= { sn499x 64 }
+sn4991-4e60vri      OBJECT IDENTIFIER ::= { sn499x 65 }
+sn4991-4e96vri      OBJECT IDENTIFIER ::= { sn499x 66 }
+sn4991-4e30v120ri   OBJECT IDENTIFIER ::= { sn499x 67 }
+sn4991-1e30vava     OBJECT IDENTIFIER ::= { sn499x 68 }
+sn4991-1e30vavb     OBJECT IDENTIFIER ::= { sn499x 69 }
+sn4991-4e30vrava    OBJECT IDENTIFIER ::= { sn499x 70 }
+sn4991-4e30vravb    OBJECT IDENTIFIER ::= { sn499x 71 }
+sn4991-4e60vrava    OBJECT IDENTIFIER ::= { sn499x 72 }
+sn4991-4e60vravb    OBJECT IDENTIFIER ::= { sn499x 73 }
+
+-- ****************************************************************************
+
+sn498x        OBJECT IDENTIFIER ::= { products 22 }
+
+sn4980-1e15v  OBJECT IDENTIFIER ::= { sn498x 1 }
+sn4980-1e24v  OBJECT IDENTIFIER ::= { sn498x 2 }
+sn4980-1e30v  OBJECT IDENTIFIER ::= { sn498x 3 }
+sn4980-4e15v  OBJECT IDENTIFIER ::= { sn498x 4 }
+sn4980-4e24v  OBJECT IDENTIFIER ::= { sn498x 5 }
+sn4980-4e30v  OBJECT IDENTIFIER ::= { sn498x 6 }
+sn4980-4e48v  OBJECT IDENTIFIER ::= { sn498x 7 }
+sn4980-4e60v  OBJECT IDENTIFIER ::= { sn498x 8 }
+sn4980-4e96v  OBJECT IDENTIFIER ::= { sn498x 9 }
+sn4980-4e120v OBJECT IDENTIFIER ::= { sn498x 10 }
+sn4981-1e15v  OBJECT IDENTIFIER ::= { sn498x 11 }
+sn4981-1e24v  OBJECT IDENTIFIER ::= { sn498x 12 }
+sn4981-1e30v  OBJECT IDENTIFIER ::= { sn498x 13 }
+sn4981-4e15v  OBJECT IDENTIFIER ::= { sn498x 14 }
+sn4981-4e24v  OBJECT IDENTIFIER ::= { sn498x 15 }
+sn4981-4e30v  OBJECT IDENTIFIER ::= { sn498x 16 }
+sn4981-4e48v  OBJECT IDENTIFIER ::= { sn498x 17 }
+sn4981-4e60v  OBJECT IDENTIFIER ::= { sn498x 18 }
+sn4981-4e96v  OBJECT IDENTIFIER ::= { sn498x 19 }
+sn4981-4e120v OBJECT IDENTIFIER ::= { sn498x 20 }
+sn4980-4e30v120 OBJECT IDENTIFIER ::= { sn498x 21 }
+sn4981-4e30v120 OBJECT IDENTIFIER ::= { sn498x 22 }
+
+-- ****************************************************************************
+
+sn497x        OBJECT IDENTIFIER ::= { products 23 }
+
+sn4970-1e15v  OBJECT IDENTIFIER ::= { sn497x 1 }
+sn4970-1e24v  OBJECT IDENTIFIER ::= { sn497x 2 }
+sn4970-1e30v  OBJECT IDENTIFIER ::= { sn497x 3 }
+sn4970-4e15v  OBJECT IDENTIFIER ::= { sn497x 4 }
+sn4970-4e24v  OBJECT IDENTIFIER ::= { sn497x 5 }
+sn4970-4e30v  OBJECT IDENTIFIER ::= { sn497x 6 }
+sn4970-4e48v  OBJECT IDENTIFIER ::= { sn497x 7 }
+sn4970-4e60v  OBJECT IDENTIFIER ::= { sn497x 8 }
+sn4970-4e96v  OBJECT IDENTIFIER ::= { sn497x 9 }
+sn4970-4e120v OBJECT IDENTIFIER ::= { sn497x 10 }
+sn4971-1e15v  OBJECT IDENTIFIER ::= { sn497x 11 }
+sn4971-1e24v  OBJECT IDENTIFIER ::= { sn497x 12 }
+sn4971-1e30v  OBJECT IDENTIFIER ::= { sn497x 13 }
+sn4971-4e15v  OBJECT IDENTIFIER ::= { sn497x 14 }
+sn4971-4e24v  OBJECT IDENTIFIER ::= { sn497x 15 }
+sn4971-4e30v  OBJECT IDENTIFIER ::= { sn497x 16 }
+sn4971-4e48v  OBJECT IDENTIFIER ::= { sn497x 17 }
+sn4971-4e60v  OBJECT IDENTIFIER ::= { sn497x 18 }
+sn4971-4e96v  OBJECT IDENTIFIER ::= { sn497x 19 }
+sn4971-4e120v OBJECT IDENTIFIER ::= { sn497x 20 }
+sn4970-4e30v120 OBJECT IDENTIFIER ::= { sn497x 21 }
+sn4971-4e30v120 OBJECT IDENTIFIER ::= { sn497x 22 }
+
+-- ****************************************************************************
+
+sn54xx     OBJECT IDENTIFIER ::= { products 24 }
+
+sn5480-32p       OBJECT IDENTIFIER ::= { sn54xx 1 }
+sn5480-64p       OBJECT IDENTIFIER ::= { sn54xx 2 }
+sn5490-32p2gs    OBJECT IDENTIFIER ::= { sn54xx 3 }
+sn5490-64p2gs    OBJECT IDENTIFIER ::= { sn54xx 4 }
+sn5490-32pf      OBJECT IDENTIFIER ::= { sn54xx 5 }
+sn5490-64pf      OBJECT IDENTIFIER ::= { sn54xx 6 }
+sn5480-0p        OBJECT IDENTIFIER ::= { sn54xx 7 }
+sn5480-16p       OBJECT IDENTIFIER ::= { sn54xx 8 }
+sn5490-32pd      OBJECT IDENTIFIER ::= { sn54xx 9 }
+sn5490-32p2g     OBJECT IDENTIFIER ::= { sn54xx 10 }
+sn5490-64p2g     OBJECT IDENTIFIER ::= { sn54xx 11 }
+sn5490-32p4g     OBJECT IDENTIFIER ::= { sn54xx 12 }
+sn5490-64p4g     OBJECT IDENTIFIER ::= { sn54xx 13 }
+
+-- ****************************************************************************
+
+sn43xx-JO     OBJECT IDENTIFIER ::= { products 25 }
+
+-- sn4308-JO     OBJECT IDENTIFIER ::= { sn43xx-JO 1 }(not planned yet, but likely to appear sometime)
+sn4312-JO     OBJECT IDENTIFIER ::= { sn43xx-JO 2 }
+sn4316-JO     OBJECT IDENTIFIER ::= { sn43xx-JO 3 }
+sn4324-JO     OBJECT IDENTIFIER ::= { sn43xx-JO 4 }
+sn4332-JO     OBJECT IDENTIFIER ::= { sn43xx-JO 5 }
+
+-- ****************************************************************************
+
+sn44xx-JO     OBJECT IDENTIFIER ::= { products 26 }
+
+-- sn4408-JO     OBJECT IDENTIFIER ::= { sn44xx-JO 1 }(not planned yet, but likely to appear sometime)
+sn4412-JO     OBJECT IDENTIFIER ::= { sn44xx-JO 2 }
+sn4416-JO     OBJECT IDENTIFIER ::= { sn44xx-JO 3 }
+sn4424-JO     OBJECT IDENTIFIER ::= { sn44xx-JO 4 }
+sn4432-JO     OBJECT IDENTIFIER ::= { sn44xx-JO 5 }
+
+-- ****************************************************************************
+
+sn5300     OBJECT IDENTIFIER ::= { products 27 }
+
+sn5300-4b       OBJECT IDENTIFIER ::= { sn5300 1 }
+sn5300-4b1g     OBJECT IDENTIFIER ::= { sn5300 2 }
+sn5300-4b2g     OBJECT IDENTIFIER ::= { sn5300 3 }
+sn5300-4b4g     OBJECT IDENTIFIER ::= { sn5300 4 }
+
+-- ****************************************************************************
+
+hydraDevelopmentBoard  OBJECT IDENTIFIER ::= { products 28 }
+
+hydra-breadboard       OBJECT IDENTIFIER ::= { hydraDevelopmentBoard 1 }
+hydra-brassboard-bri   OBJECT IDENTIFIER ::= { hydraDevelopmentBoard 2 }
+hydra-brassboard-pri   OBJECT IDENTIFIER ::= { hydraDevelopmentBoard 3 }
+hydra-breadboard-fxs   OBJECT IDENTIFIER ::= { hydraDevelopmentBoard 4 }
+
+-- ****************************************************************************
+
+sn4130     OBJECT IDENTIFIER ::= { products 29 }
+
+sn4130-2bis4v      OBJECT IDENTIFIER ::= { sn4130 1 }
+sn4130-2bis4vhpc   OBJECT IDENTIFIER ::= { sn4130 2 }
+sn4130-4bis8v      OBJECT IDENTIFIER ::= { sn4130 3 }
+sn4130-4bis8vhpc   OBJECT IDENTIFIER ::= { sn4130 4 }
+
+-- ****************************************************************************
+
+sn5530     OBJECT IDENTIFIER ::= { products 30 }
+
+sn5530-2bis4vrhpc  OBJECT IDENTIFIER ::= { sn5530 1 }
+sn5530-4bis8vr     OBJECT IDENTIFIER ::= { sn5530 2 }
+sn5530-4bis8vrhpc  OBJECT IDENTIFIER ::= { sn5530 3 }
+
+-- ****************************************************************************
+
+sn4170     OBJECT IDENTIFIER ::= { products 31 }
+
+sn4170-1e15v       OBJECT IDENTIFIER ::= { sn4170 1 }
+sn4170-1e15vhp     OBJECT IDENTIFIER ::= { sn4170 2 }
+sn4170-1e30v       OBJECT IDENTIFIER ::= { sn4170 3 }
+sn4170-1e30vhp     OBJECT IDENTIFIER ::= { sn4170 4 }
+
+-- ****************************************************************************
+
+sn5570     OBJECT IDENTIFIER ::= { products 32 }
+
+sn5570-1e30v       OBJECT IDENTIFIER ::= { sn5570 1 }
+sn5570-1e30vhp     OBJECT IDENTIFIER ::= { sn5570 2 }
+sn5570-2e30vr      OBJECT IDENTIFIER ::= { sn5570 3 }
+sn5570-2e30vrhp	   OBJECT IDENTIFIER ::= { sn5570 4 }
+sn5570-1e15vhp	   OBJECT IDENTIFIER ::= { sn5570 5 }
+
+-- ****************************************************************************
+
+sn4140     OBJECT IDENTIFIER ::= { products 33 }
+
+sn4140-2js         OBJECT IDENTIFIER ::= { sn4140 1 }
+sn4140-4js         OBJECT IDENTIFIER ::= { sn4140 2 }
+sn4140-8js         OBJECT IDENTIFIER ::= { sn4140 3 }
+
+-- ****************************************************************************
+
+sn5540     OBJECT IDENTIFIER ::= { products 34 }
+
+sn5540-2js         OBJECT IDENTIFIER ::= { sn5540 1 }
+sn5540-4js         OBJECT IDENTIFIER ::= { sn5540 2 }
+sn5540-8js         OBJECT IDENTIFIER ::= { sn5540 3 }
+
+-- ****************************************************************************
+
+sn415x     OBJECT IDENTIFIER ::= { products 35 }
+
+sn4151-2bis2js4vhp OBJECT IDENTIFIER ::= { sn415x 1 }
+sn4151-4bis4js8vhp OBJECT IDENTIFIER ::= { sn415x 2 }
+
+-- ****************************************************************************
+
+sn555x     OBJECT IDENTIFIER ::= { products 36 }
+
+sn5551-2bis2js4vhp    OBJECT IDENTIFIER ::= { sn555x 1 }
+sn5551-4bis4js8vhp    OBJECT IDENTIFIER ::= { sn555x 2 }
+sn5551-2bis2js4vhpava OBJECT IDENTIFIER ::= { sn555x 3 }
+sn5551-2bis2js4vhpavb OBJECT IDENTIFIER ::= { sn555x 4 }
+sn5551-4bis4js8vhpava OBJECT IDENTIFIER ::= { sn555x 5 }
+sn5551-4bis4js8vhpavb OBJECT IDENTIFIER ::= { sn555x 6 }
+
+-- ****************************************************************************
+
+sn4141     OBJECT IDENTIFIER ::= { products 37 }
+
+sn4141-2js         OBJECT IDENTIFIER ::= { sn4141 1 }
+sn4141-4js         OBJECT IDENTIFIER ::= { sn4141 2 }
+sn4141-8js         OBJECT IDENTIFIER ::= { sn4141 3 }
+
+-- ****************************************************************************
+
+sn5541     OBJECT IDENTIFIER ::= { products 38 }
+
+sn5541-2js         OBJECT IDENTIFIER ::= { sn5541 1 }
+sn5541-4js         OBJECT IDENTIFIER ::= { sn5541 2 }
+sn5541-8js         OBJECT IDENTIFIER ::= { sn5541 3 }
+
+-- ****************************************************************************
+
+vSN        OBJECT IDENTIFIER ::= { products 39 }
+
+vSBC       OBJECT IDENTIFIER ::= { vSN 1 }
+
+-- ****************************************************************************
+-- defining the performance objects
+-- ****************************************************************************
+
+ cpu             OBJECT IDENTIFIER ::= { performance 10 }
+ memory          OBJECT IDENTIFIER ::= { performance 20 }
+ temperature     OBJECT IDENTIFIER ::= { performance 30 }
+ gateway         OBJECT IDENTIFIER ::= { performance 40 }
+ isdn            OBJECT IDENTIFIER ::= { performance 50 }
+
+-- ****************************************************************************
+-- defining the CPU objects
+-- ****************************************************************************
+
+          cpuNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of CPUs present 
+                       on this system."
+              ::= { cpu 1 }
+
+          cpuTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF cpuEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of CPU entries. The 
+                       number of entries is given 
+                       by the value of cpuNumber."
+              ::= { cpu 2 }
+
+          cpuEntry OBJECT-TYPE
+              SYNTAX  cpuEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A CPU entry containing objects 
+                       for corresponding to the CPU."
+              INDEX   { cpuDescr }
+              ::= { cpuTable 1 }
+
+          cpuEntry ::=
+              SEQUENCE {
+                  cpuDescr                    DisplayString,
+                  cpuWorkloadCurrent                 Gauge32,
+                  cpuWorkload1MinuteAverage                   Gauge32,
+                  cpuWorkload5MinuteAverage                    Gauge32
+              }
+
+          cpuDescr OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A name identifying the CPU."
+              ::= { cpuEntry 1 }
+
+          cpuWorkloadCurrent OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The current CPU workload in percent."
+              ::= { cpuEntry 2 }
+
+          cpuWorkload1MinuteAverage OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The CPU workload average over the 
+                       last minute in percent."
+              ::= { cpuEntry 3 }
+
+          cpuWorkload5MinuteAverage OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The CPU workload average over the 
+                       last 5 minutes in percent."
+              ::= { cpuEntry 4 }
+
+-- ****************************************************************************
+-- defining the memory objects
+-- ****************************************************************************
+
+          memoryPoolNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of memory pools 
+                       present on this system."
+              ::= { memory 1 }
+
+          memoryPoolTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF memoryPoolEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of memory pool entries. The 
+                       number of entries is given by the 
+                       value of memoryPoolNumber."
+              ::= { memory 2 }
+
+          memoryPoolEntry OBJECT-TYPE
+              SYNTAX  memoryPoolEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A memory pool entry containing objects 
+                       for the corresponding memory pool."
+              INDEX   { memDescr }
+              ::= { memoryPoolTable 1 }
+
+          memoryPoolEntry ::=
+              SEQUENCE {
+                  memDescr
+                      DisplayString,
+                  memTotalBytes
+                      INTEGER,
+                  memAllocatedBytes
+                      INTEGER,
+                  memFreeBytes
+                      INTEGER,
+                  memLargestFreeBlock
+                      INTEGER,
+                  memAllocatedBlocks
+                      INTEGER,
+                  memFreeBlocks
+                      INTEGER
+              }
+
+          memDescr OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A name identifying the memory pool."
+              ::= { memoryPoolEntry 1 }
+
+          memTotalBytes OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  optional
+              DESCRIPTION
+                      "The total number of bytes 
+                       belonging to the memory pool."
+              ::= { memoryPoolEntry 2 }
+
+          memAllocatedBytes OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The current number of allocated 
+                       bytes in the memory pool."
+              ::= { memoryPoolEntry 3 }
+
+          memFreeBytes OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The current number of free bytes 
+                       in the memory pool."
+              ::= { memoryPoolEntry 4 }
+
+          memLargestFreeBlock OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The size of the largest available 
+                       free block."
+              ::= { memoryPoolEntry 5 }
+
+          memAllocatedBlocks OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The current number of allocated 
+                       blocks in the memory pool."
+              ::= { memoryPoolEntry 6 }
+
+          memFreeBlocks OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+
+
+              DESCRIPTION
+                      "The current number of free blocks in the memory pool."
+              ::= { memoryPoolEntry 7 }
+
+-- ****************************************************************************
+-- defining the temperature probe objects
+-- ****************************************************************************
+
+          tempProbeNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of temperature probes 
+                       present on this system."
+              ::= { temperature 1 }
+
+          tempProbeTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF tempProbeEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of temperature probe entries. 
+                       The number of entries is given by the 
+                       value of tempProbeNumber."
+              ::= { temperature 2 }
+
+          tempProbeEntry OBJECT-TYPE
+              SYNTAX  tempProbeEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A temperature probe entry containing 
+                       objects for the corresponding temperature 
+                       probe."
+              INDEX   { tempProbeDescr }
+              ::= { tempProbeTable 1 }
+
+          tempProbeEntry ::=
+              SEQUENCE {
+                  tempProbeDescr
+                      DisplayString,
+                  currentDegreesCelsius
+                      Gauge32
+              }
+
+          tempProbeDescr OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A description for the temperature probe."
+              ::= { tempProbeEntry 1 }
+
+          currentDegreesCelsius OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The current temperature measured by the 
+                       temperature probe in degrees celsius."
+              ::= { tempProbeEntry 2 }
+
+-- ****************************************************************************
+-- defining the gateway objects
+-- ****************************************************************************
+
+          gwNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of gateways present on 
+                       this system."
+              ::= { gateway 1 }
+
+          gwTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF gwEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of gateway entries.  The number of
+                       entries is given by the value of gwNumber."
+              ::= { gateway 2 }
+
+          gwEntry OBJECT-TYPE
+              SYNTAX  gwEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A gateway entry containing objects for 
+                       the corresponding gateway."
+              INDEX   { gwDescr }
+              ::= { gwTable 1 }
+
+          gwEntry ::=
+              SEQUENCE {
+                  gwDescr
+                      DisplayString,
+                  gwCurrentConnectedCalls
+                      Gauge32,
+                  gwCurrentOngoingCalls
+                      Gauge32,
+                  gwTotalAccumulatedCalls
+                      Counter32
+              }
+
+          gwDescr OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A description of the gateway type."
+              ::= { gwEntry 1 }
+
+          gwCurrentConnectedCalls OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of calls on all instances 
+                      of this gateway type that are currently in 
+                      the connected state."
+              ::= { gwEntry 2 }
+
+          gwCurrentOngoingCalls OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of calls on all instances of 
+                       this gateway type that are currently in the 
+                       connected, a call setup or a call clearing 
+                       state."
+              ::= { gwEntry 3 }
+
+          gwTotalAccumulatedCalls OBJECT-TYPE
+              SYNTAX  Counter32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total accumulated number of calls 
+                       processed on all instances of this gateway 
+                       type since the system has started."
+              ::= { gwEntry 4 }
+              
+-- ****************************************************************************
+-- defining the ISDN objects
+-- ****************************************************************************
+
+          isdnPortNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of ISDN ports present on 
+                       this system."
+              ::= { isdn 1 }
+
+          isdnPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF isdnPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A list of ISDN port entries.  The number of entries 
+                      is given by the value of isdnPortNumber."
+              ::= { isdn 2 }
+
+          isdnPortEntry OBJECT-TYPE
+              SYNTAX  isdnPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "A ISDN port entry containing objects for 
+                       the corresponding port."
+              INDEX   { isdnPortDescr }
+              ::= { isdnPortTable 1 }
+
+          isdnPortEntry ::=
+              SEQUENCE {
+                  isdnPortDescr
+                      DisplayString,
+                  isdnPortCurrentConnectedCalls
+                      Gauge32,
+                  isdnPortCurrentOngoingCalls
+                      Gauge32,
+                  isdnPortTotalAccumulatedCalls
+                      Counter32
+              }
+
+          isdnPortDescr OBJECT-TYPE
+              SYNTAX  DisplayString
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "A description of the ISDN port."
+              ::= { isdnPortEntry 1 }
+
+          isdnPortCurrentConnectedCalls OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of calls 
+                      of this ISDN port that are currently in 
+                      the connected state."
+              ::= { isdnPortEntry 2 }
+
+          isdnPortCurrentOngoingCalls OBJECT-TYPE
+              SYNTAX  Gauge32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of calls 
+                       this ISDN port that are currently in the 
+                       connected, a call setup or a call clearing 
+                       state."
+              ::= { isdnPortEntry 3 }
+
+          isdnPortTotalAccumulatedCalls OBJECT-TYPE
+              SYNTAX  Counter32
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total accumulated number of calls 
+                       processed of this ISDN port 
+                       since the system has started."
+              ::= { isdnPortEntry 4 }
+
+
+END

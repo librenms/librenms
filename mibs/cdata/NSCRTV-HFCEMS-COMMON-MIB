@@ -1,0 +1,759 @@
+NSCRTV-HFCEMS-COMMON-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+     OBJECT-TYPE        FROM RFC-1212
+     TRAP-TYPE          FROM RFC-1215
+     Counter            FROM RFC1155-SMI
+     NetworkAddress     FROM RFC1155-SMI
+IpAddress          FROM RFC1155-SMI
+     DisplayString      FROM RFC1213-MIB  
+     nscrtvHFCemsTree    FROM NSCRTV-ROOT
+     commonIdent        FROM NSCRTV-ROOT
+;
+
+commonAdminGroup	OBJECT IDENTIFIER ::= { commonIdent 1 }
+commonAdminUseRf	OBJECT IDENTIFIER ::= { commonIdent 2 }
+commonAdminUseEthernet	OBJECT IDENTIFIER ::= { commonIdent 3 }
+
+commonMACGroup		OBJECT IDENTIFIER ::= { commonAdminUseRf 1 }
+commonRfGroup		OBJECT IDENTIFIER ::= { commonAdminUseRf 2 }
+
+commonMacAddress	OBJECT IDENTIFIER ::= { commonMACGroup 1 }
+commonBackoffParams	OBJECT IDENTIFIER ::= { commonMACGroup 2 }
+commonMacStats		OBJECT IDENTIFIER ::= { commonMACGroup 3 }
+
+commonAgentGroup	OBJECT IDENTIFIER ::= { commonAdminUseEthernet 1 }
+commonDeviceGroup	OBJECT IDENTIFIER ::= { commonAdminUseEthernet 2 }
+
+
+commonNELogicalID  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(0..40))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 1 }
+
+commonNEVendor  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 2 }
+
+commonNEModelNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 3 }
+
+commonNESerialNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 4 }
+
+commonNEVendorInfo  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 5 }
+
+commonNEStatus  OBJECT-TYPE						
+     SYNTAX OCTET STRING (SIZE(1))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+--            Bit 0: CHNLRQST
+--            Bit 1: CNTNRM
+--            Bit 2: CNTCUR
+--            Bit 3: MAJOR ALARMS
+--            Bit 4: MINOR ALARMS
+--            Bit 5: RSVD1
+--            Bit 6: RSVD2
+-- 		   Bit 7: RSVD3"
+     ::= { commonAdminGroup 6 }
+
+commonReset  OBJECT-TYPE							
+     SYNTAX INTEGER { reset (1)}
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION ""
+     ::= { commonAdminGroup 7 }
+
+commonAlarmDetectionControl OBJECT-TYPE
+     SYNTAX INTEGER {
+        detectionDisabled (1),
+        detectionEnabled (2),
+        detectionEnabledAndRegenerate (3)
+     }
+ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 8 }
+
+commonNetworkAddress  OBJECT-TYPE
+     SYNTAX NetworkAddress
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 9 }
+
+
+commonCheckCode  OBJECT-TYPE                    
+     SYNTAX INTEGER
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 10 }
+
+commonTrapCommunityString  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(0..64))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION   
+"Replaced By LiGang"
+     ::= { commonAdminGroup 11 }
+
+commonTamperStatus  OBJECT-TYPE
+     SYNTAX INTEGER { intact (1), compromised (2) }
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 12 }
+
+commonInternalTemperature  OBJECT-TYPE
+     SYNTAX INTEGER (-128..127)
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 13 }
+
+commonTime  OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 14 }
+
+commonVarBindings  OBJECT-TYPE                        
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 15 }
+
+commonResetCause  OBJECT-TYPE
+     SYNTAX INTEGER {
+          other (1),
+          powerup (2),
+          command (3),
+          watchdog (4),
+          craft (5)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 16 }
+
+commonCraftStatus  OBJECT-TYPE
+     SYNTAX INTEGER {
+          disconnected (1),
+          connected (2)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 17 }
+
+commonDeviceOID OBJECT-TYPE                   
+     SYNTAX OBJECT IDENTIFIER
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAdminGroup 18 }
+
+commonDeviceId OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(32))
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION
+"Replaced By LiGang"
+     ::= { commonAdminGroup 19 }
+
+commonPhysAddress  OBJECT-TYPE
+     SYNTAX OCTET STRING
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacAddress 1 }
+
+commonMaxMulticastAddresses  OBJECT-TYPE
+     SYNTAX INTEGER (4..255)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacAddress 2 }
+
+commonMulticastAddressTable  OBJECT-TYPE
+     SYNTAX SEQUENCE OF CommonMulticastAddressEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacAddress 3 }
+
+commonMulticastAddressEntry  OBJECT-TYPE
+     SYNTAX CommonMulticastAddressEntry
+     ACCESS not-accessible
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     INDEX { commonMulticastAddressIndex }
+     ::= { commonMulticastAddressTable 1 }
+
+CommonMulticastAddressEntry ::=
+     SEQUENCE
+     {
+          commonMulticastAddressIndex
+               INTEGER,
+          commonMulticastAddressNumber
+               OCTET STRING
+     }
+
+commonMulticastAddressIndex  OBJECT-TYPE
+     SYNTAX INTEGER (1..255)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMulticastAddressEntry 1 }
+
+commonMulticastAddressNumber  OBJECT-TYPE
+     SYNTAX OCTET STRING (SIZE(6))
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMulticastAddressEntry 2 }
+
+
+commonBackoffPeriod  OBJECT-TYPE
+     SYNTAX INTEGER (0..16383)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonBackoffParams 1 }
+
+commonACKTimeoutWindow  OBJECT-TYPE
+     SYNTAX INTEGER (0..255)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonBackoffParams 2 }
+
+commonMaximumMACLayerRetries  OBJECT-TYPE              
+     SYNTAX INTEGER (0..255)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonBackoffParams 3 }
+
+commonMaxPayloadSize  OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonBackoffParams 4 }
+
+commonBackoffMinimumExponent  OBJECT-TYPE
+     SYNTAX INTEGER (0..15)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonBackoffParams 5 }
+
+commonBackoffMaximumExponent  OBJECT-TYPE
+     SYNTAX INTEGER (0..15)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonBackoffParams 6 }
+
+
+commonForwardPathLOSEvents  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacStats 1 }
+
+commonForwardPathFramingErrors  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacStats 2 }
+
+commonForwardPathCRCErrors  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacStats 3 }
+
+commonInvalidMacCmds  OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacStats 4 }
+
+commonBackwardPathCollisionTimes OBJECT-TYPE
+     SYNTAX Counter
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonMacStats 5 }
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    
+commonReturnPathFrequency  OBJECT-TYPE
+     SYNTAX INTEGER (0..1000000000)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonRfGroup 1 }
+
+commonForwardPathFrequency  OBJECT-TYPE
+     SYNTAX INTEGER (0..1000000000)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonRfGroup 2 }
+
+commonProvisionedReturnPowerLevel  OBJECT-TYPE                 
+     SYNTAX INTEGER (0..127)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonRfGroup 3 }
+
+commonForwardPathReceiveLevel  OBJECT-TYPE
+     SYNTAX INTEGER (0..127)
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonRfGroup 4 }
+
+commonMaxReturnPower  OBJECT-TYPE
+     SYNTAX INTEGER (0..127)
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonRfGroup 5 }
+
+commonAgentBootWay  OBJECT-TYPE
+	SYNTAX  INTEGER {
+		bootDefault (1),
+		bootBOOTP (2),
+		bootTFTP (3)
+	}
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentGroup 1 }
+
+commonAgentReset  OBJECT-TYPE
+	SYNTAX     INTEGER { reset(1) }
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentGroup 2 }
+
+commonAgentMaxTraps  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-only
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentGroup 3 }
+
+commonAgentTrapMinInterval  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentGroup 4 }
+
+commonAgentTrapMaxInterval  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentGroup 5 }
+
+commonTrapAck  OBJECT-TYPE							
+     SYNTAX OCTET STRING ( SIZE ( 17..255 ) )
+     ACCESS read-write
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= { commonAgentGroup 6 }
+
+commonAgentTrapTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CommonAgentTrapEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentGroup 7 }
+
+commonAgentTrapEntry  OBJECT-TYPE
+	SYNTAX 	CommonAgentTrapEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	INDEX { commonAgentTrapIndex }
+	::= { commonAgentTrapTable 1 }
+
+CommonAgentTrapEntry ::= SEQUENCE {
+	commonAgentTrapIndex
+		INTEGER,
+	commonAgentTrapIP
+		IpAddress,
+	commonAgentTrapCommunity
+		DisplayString,
+	commonAgentTrapStatus
+		INTEGER
+}
+
+commonAgentTrapIndex  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentTrapEntry 1 }
+
+commonAgentTrapIP  OBJECT-TYPE
+	SYNTAX     IpAddress
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentTrapEntry 2 }
+
+commonAgentTrapCommunity  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..64))
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentTrapEntry 3 }
+
+commonAgentTrapStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		commonAgentTrapEnable (1),
+		commonAgentTrapDisable (2)
+	}
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonAgentTrapEntry 4 }
+
+
+commonDeviceNum  OBJECT-TYPE
+	SYNTAX     INTEGER
+	ACCESS     read-write
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceGroup 1 }
+	
+commonDeviceInfoTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF CommonDeviceInfoEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceGroup 2 }
+
+commonDeviceInfoEntry  OBJECT-TYPE
+	SYNTAX 	CommonDeviceInfoEntry
+	ACCESS     not-accessible
+	STATUS     mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	INDEX { commonDeviceSlot }
+	::= { commonDeviceInfoTable 1 }
+
+CommonDeviceInfoEntry ::= SEQUENCE {
+	commonDeviceSlot
+		INTEGER,
+	commonDevicesID
+		OCTET STRING,
+	commonDeviceVendor
+		DisplayString,
+	commonDeviceModelNumber
+		DisplayString,
+	commonDeviceSerialNumber
+		DisplayString,
+	commonDeviceVendorInfo
+		DisplayString,
+	commonDeviceStatus
+		OCTET STRING,
+	commonDeviceReset
+		INTEGER,
+	commonDeviceAlarmDetectionControl
+		INTEGER,
+	commonDeviceMACAddress
+		NetworkAddress,
+	commonDeviceTamperStatus
+		INTEGER,
+	commonDeviceInternalTemperature
+		INTEGER,
+	commonDeviceResetCause
+		INTEGER,
+	commonDeviceCraftStatus
+		INTEGER,
+	commonDevicesOID
+		OBJECT IDENTIFIER,
+	commonDeviceAcct
+		Counter,
+	commonDeviceName
+		DisplayString,
+	commonDeviceMFD
+		DisplayString,
+	commonDeviceFW
+		DisplayString
+}
+
+commonDeviceSlot  OBJECT-TYPE
+	SYNTAX 	INTEGER
+	ACCESS  read-only
+	STATUS 	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 1 }
+
+commonDevicesID  OBJECT-TYPE
+	SYNTAX 	OCTET STRING (SIZE(0..40))
+	ACCESS  read-only
+	STATUS 	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 2 }
+	
+commonDeviceVendor  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 3 }
+
+commonDeviceModelNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 4 }
+
+commonDeviceSerialNumber  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 5 }
+
+commonDeviceVendorInfo  OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 6 }
+
+commonDeviceStatus  OBJECT-TYPE						
+     SYNTAX OCTET STRING (SIZE(1))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+--            Bit 0: RSVD0
+--            Bit 1: RSVD1
+--            Bit 2: RSVD2
+--            Bit 3: MAJOR ALARMS
+--            Bit 4: MINOR ALARMS
+--            Bit 5: RSVD5
+--            Bit 6: RSVD6
+-- 		   Bit 7: RSVD7"
+	::= { commonDeviceInfoEntry 7 }
+
+commonDeviceReset  OBJECT-TYPE							
+     SYNTAX INTEGER { reset (1) }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 8 }
+
+commonDeviceAlarmDetectionControl OBJECT-TYPE
+     SYNTAX INTEGER {
+        detectionDisabled (1),
+        detectionEnabled (2),
+        detectionEnabledAndRegenerate (3)
+     }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 9 }
+	
+commonDeviceMACAddress  OBJECT-TYPE
+	SYNTAX 	NetworkAddress
+	ACCESS  read-only
+	STATUS 	mandatory
+	DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 10 }
+
+commonDeviceTamperStatus OBJECT-TYPE
+     SYNTAX INTEGER { intact (1), compromised (2) }
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 11 }
+	
+commonDeviceInternalTemperature OBJECT-TYPE
+     SYNTAX INTEGER (-128..127)
+     ACCESS read-only
+     STATUS optional
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 12 }
+	
+commonDeviceResetCause OBJECT-TYPE
+     SYNTAX INTEGER {
+          other (1),
+          powerup (2),
+          command (3),
+          watchdog (4),
+          craft (5)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 13 }
+	
+commonDeviceCraftStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+          disconnected (1),
+          connected (2)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 14 }
+	
+commonDevicesOID OBJECT-TYPE
+     SYNTAX  OBJECT IDENTIFIER
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 15 }
+
+commonDeviceAcct OBJECT-TYPE
+     SYNTAX  Counter
+     ACCESS  read-only
+     STATUS  optional
+     DESCRIPTION
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 16 }
+	
+commonDeviceName OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 17 }
+	
+commonDeviceMFD OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(10))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 18 }
+	
+commonDeviceFW OBJECT-TYPE
+     SYNTAX DisplayString (SIZE(0..255))
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION 
+"Replaced By LiGang"
+	::= { commonDeviceInfoEntry 19 }
+
+
+hfcColdStart  TRAP-TYPE
+     ENTERPRISE nscrtvHFCemsTree
+     VARIABLES { commonPhysAddress, commonNELogicalID}
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= 0
+
+hfcWarmStart  TRAP-TYPE
+     ENTERPRISE nscrtvHFCemsTree
+     VARIABLES {  commonPhysAddress, commonNELogicalID }
+     DESCRIPTION 
+"Replaced By LiGang"
+     ::= 2
+
+END

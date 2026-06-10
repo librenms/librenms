@@ -1,0 +1,1387 @@
+GENSTAR DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+	IpAddress                            FROM SNMPv2-SMI
+	morningstar                          FROM MORNINGSTAR
+	DisplayString                        FROM RFC1213-MIB
+	TEXTUAL-CONVENTION, TruthValue       FROM SNMPv2-TC
+	OBJECT-GROUP                         FROM SNMPv2-CONF;
+
+genStar MODULE-IDENTITY
+	LAST-UPDATED "202311291854Z"
+	ORGANIZATION "morningstar"
+	CONTACT-INFO "Morningstar Corporation
+			Postal: Morningstar Corporation
+			8 Pheasant Run
+			Newtown, PA 18940
+			United States of America
+			Tel: +1 215 321 4457
+			E-Mail: info@morningstarcorp.com"
+
+	DESCRIPTION "Morningstar Product: GenStar
+			For more information on each node, check out the modbus
+			docs at www.morningstarcorp.com
+			--
+			Copyright (C) Morningstar Corporation (2019).
+			All Rights Reserved"
+	
+	REVISION "202311291854Z"
+	DESCRIPTION "Original version"
+	::= { morningstar 10 }
+
+
+ChargeStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Charge state"
+	SYNTAX INTEGER {
+			starting (0),
+			nightCheck (1),
+			disconnected (2),
+			night (3),
+			fault (4),
+			bulk (5),
+			absorption (6),
+			float (7),
+			equalize (8)
+		}
+LoadStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load state"
+	SYNTAX INTEGER {
+			start (0),
+			norm (1),
+			lvdwarn (2),
+			lvd (3),
+			fault (4),
+			disc (5),
+			norm-off (6),
+			override (7)
+		}
+LoadFaultBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load fault bitfield"
+	SYNTAX BITS {
+			load-software (0),
+			load-overcurrent (1),
+			load-ex-short (2),
+			load-power-supply (3),
+			load-hvd (4),
+			load-heatsink-overtemp (5),
+			load-fet-shorted (6)
+		}
+FaultBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "System fault bitfield"
+	SYNTAX BITS {
+			system-eeprom (0),
+			software (2),
+			no-model (3),
+			system-setting-edit (6),
+			system-bms (8),
+			reset (10),
+			adc-ovr (15),
+			adc-no-inj-update (16),
+			adc-double-update (17),
+			battery-shunt-missing (18),
+			system-setting-bad (29),
+			hardware (30)
+		}
+AlarmBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Alarm bitfield"
+	SYNTAX BITS {
+			rts-open (0),
+			rts-short (1),
+			rts-disc (2),
+			ths-open (3),
+			ths-short (4),
+			ths-hot (5),
+			i-limit (6),
+			ibatt-offset (7),
+			batt-sense (8),
+			batt-sense-disconnect (9),
+			uncal (10),
+			rts-5v (11),
+			factory (13),
+			soc-invalid (14),
+			va-high (17),
+			ia-offset (23),
+			eeprom (24),
+			ethernet (25),
+			load-lvd (26),
+			software (27),
+			extflash (29),
+			i-l-offset (32),
+			rtc-lowbatt (33),
+			rtc-wrong (35),
+			rtc-hardware (36),
+			tindcasting-open (37),
+			tindcasting-short (38),
+			tindcasting-hot (39),
+			wireless-fail (41),
+			hardware (42),
+			unknown-blocktype (43),
+			block1-hardware (44),
+			block2-hardware (45),
+			block3-hardware (46),
+			block4-hardware (47),
+			block5-hardware (48),
+			block6-hardware (49),
+			genstart-primary-fail (50),
+			genstart-secondary-fail (51),
+			schedule-publisher-fail (52),
+			uncal-up (53),
+			i-load-offset (54),
+			load-fet-open (55),
+			bms-sense (56),
+			bms-sense-disconnect (57)
+		}
+ChargeFaultBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Charge fault bitfield"
+	SYNTAX BITS {
+			charge-software (0),
+			charge-batt-hvd (1),
+			charge-rts-short (2),
+			charge-rts-disc (3),
+			charge-slave-to (4)
+		}
+FaultPowersupplyBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Power Supply fault bitfield"
+	SYNTAX BITS {
+			p12 (0),
+			p5 (1),
+			p3 (2),
+			arrayn3 (4),
+			battn3 (6),
+			p12-extbb (7),
+			p3-extbb (8),
+			arrayp10 (9),
+			battp10 (10)
+		}
+BlockFaultBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "ReadyBlock subsystem fault bitfield"
+	SYNTAX BITS {
+			block1-missing (0),
+			block2-missing (1),
+			block3-missing (2),
+			block4-missing (3),
+			block5-missing (4),
+			block6-missing (5),
+			block1-remote-fault (8),
+			block2-remote-fault (9),
+			block3-remote-fault (10),
+			block4-remote-fault (11),
+			block5-remote-fault (12),
+			block6-remote-fault (13),
+			block1-hardware-version (16),
+			block2-hardware-version (17),
+			block3-hardware-version (18),
+			block4-hardware-version (19),
+			block5-hardware-version (20),
+			block6-hardware-version (21),
+			block1-fixable-fault (24),
+			block2-fixable-fault (25),
+			block3-fixable-fault (26),
+			block4-fixable-fault (27),
+			block5-fixable-fault (28),
+			block6-fixable-fault (29)
+		}
+FaultPowerstageBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Powerstage fault bitfield"
+	SYNTAX BITS {
+			powerstage-overcurrent (0),
+			powerstage-fet-short (1),
+			powerstage-dn-short (2),
+			powerstage-batt-hvd (3),
+			powerstage-array-hvd (4),
+			powerstage-software (5),
+			powerstage-bad-setting (6),
+			powerstage-batt-lvd (7),
+			powerstage-power-supply (8),
+			powerstage-h7rev (9),
+			powerstage-hwrev (10),
+			powerstage-inductor-temp (11),
+			powerstage-hs-temp (12),
+			powerstage-inductor-offset (13),
+			powerstage-array-offset (14),
+			powerstage-misc (15)
+		}
+subModel OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The device's exact model"
+	::= { genStar 1 }
+serialNumber OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Device Serial Number"
+	::= { genStar 2 }
+deviceVersion OBJECT-TYPE
+	SYNTAX       DisplayString (SIZE (0..32))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Hardware and firmware versions: vHW1.HW2.FW"
+	::= { genStar 3 }
+vbterm OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VBTERM_F256
+		- Description: Battery voltage
+		- Modbus address: 0x0021"
+	::={ genStar 30 }
+vload OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VLOAD_F256
+		- Description: Load voltage
+		- Modbus address: 0x0023"
+	::={ genStar 31 }
+vbsense OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VBSENSE_F256
+		- Description: Battery sense voltage
+		- Modbus address: 0x0025"
+	::={ genStar 32 }
+vCoin OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"V_COIN_F256
+		- Description: Coincell battery voltage
+		- Modbus address: 0x0036"
+	::={ genStar 33 }
+systemIcharge OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_ICHARGE
+		- Description: System charging current
+		- Modbus address: 0x0063"
+	::={ genStar 34 }
+systemIload OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_ILOAD
+		- Description: System load current
+		- Modbus address: 0x0065"
+	::={ genStar 35 }
+tempBatt OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"TEMP_BATT
+		- Description: Battery temperature
+		- Modbus address: 0x0075"
+	::={ genStar 36 }
+tempRts OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"TEMP_RTS
+		- Description: Remote temperature sensor temperature
+		- Modbus address: 0x0076"
+	::={ genStar 37 }
+tempHeatsink OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"TEMP_HEATSINK
+		- Description: Heatsink temperature
+		- Modbus address: 0x0077"
+	::={ genStar 38 }
+chargeState OBJECT-TYPE
+	SYNTAX     ChargeStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"CHARGE_STATE
+		- Description: Charge state
+		- Modbus address: 0x0080"
+	::={ genStar 39 }
+vbattRefCharge OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VBATT_REF_CHARGE
+		- Description: Charging target voltage
+		- Modbus address: 0x00b1"
+	::={ genStar 40 }
+battSoc OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"BATT_SOC
+		- Description: Battery state of charge
+		- Modbus address: 0x00e0"
+	::={ genStar 41 }
+vbattMin OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VBATT_MIN
+		- Description: Minimum battery voltage
+		- Modbus address: 0x00e1"
+	::={ genStar 42 }
+vbattMax OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VBATT_MAX
+		- Description: Maximum battery voltage
+		- Modbus address: 0x00e2"
+	::={ genStar 43 }
+battSocMinDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"BATT_SOC_MIN_DAILY
+		- Description: Minimum battery state of charge daily
+		- Modbus address: 0x00e9"
+	::={ genStar 44 }
+battSocMaxDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"BATT_SOC_MAX_DAILY
+		- Description: Maximum battery state of charge daily
+		- Modbus address: 0x00ea"
+	::={ genStar 45 }
+loadState OBJECT-TYPE
+	SYNTAX     LoadStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LOAD_STATE
+		- Description: Load state
+		- Modbus address: 0x0100"
+	::={ genStar 46 }
+loadFault OBJECT-TYPE
+	SYNTAX     LoadFaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LOAD_FAULT
+		- Description: Load fault bitfield
+		- Modbus address: 0x0101"
+	::={ genStar 47 }
+loadFaultDaily OBJECT-TYPE
+	SYNTAX     LoadFaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LOAD_FAULT_DAILY
+		- Description: Load fault daily bitfield
+		- Modbus address: 0x0103"
+	::={ genStar 48 }
+fault OBJECT-TYPE
+	SYNTAX     FaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"FAULT
+		- Description: System fault bitfield
+		- Modbus address: 0x0212"
+	::={ genStar 49 }
+faultDaily OBJECT-TYPE
+	SYNTAX     FaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"FAULT_DAILY
+		- Description: System fault daily bitfield
+		- Modbus address: 0x0216"
+	::={ genStar 50 }
+alarm OBJECT-TYPE
+	SYNTAX     AlarmBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"ALARM
+		- Description: Alarm bitfield
+		- Modbus address: 0x021a"
+	::={ genStar 51 }
+alarmDaily OBJECT-TYPE
+	SYNTAX     AlarmBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"ALARM_DAILY
+		- Description: Alarm daily bitfield
+		- Modbus address: 0x021e"
+	::={ genStar 52 }
+chargeFault OBJECT-TYPE
+	SYNTAX     ChargeFaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"CHARGE_FAULT
+		- Description: Charge fault bitfield
+		- Modbus address: 0x0222"
+	::={ genStar 53 }
+chargeFaultDaily OBJECT-TYPE
+	SYNTAX     ChargeFaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"CHARGE_FAULT_DAILY
+		- Description: Charge fault daily bitfield
+		- Modbus address: 0x0226"
+	::={ genStar 54 }
+faultPowersupply OBJECT-TYPE
+	SYNTAX     FaultPowersupplyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"FAULT_POWERSUPPLY
+		- Description: Power Supply fault bitfield
+		- Modbus address: 0x0232"
+	::={ genStar 55 }
+faultPowersupplyDaily OBJECT-TYPE
+	SYNTAX     FaultPowersupplyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"FAULT_POWERSUPPLY_DAILY
+		- Description: Power Supply fault daily bitfield
+		- Modbus address: 0x0234"
+	::={ genStar 56 }
+blockFault OBJECT-TYPE
+	SYNTAX     BlockFaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"BLOCK_FAULT
+		- Description: ReadyBlock subsystem fault bitfield
+		- Modbus address: 0x0236"
+	::={ genStar 57 }
+blockFaultDaily OBJECT-TYPE
+	SYNTAX     BlockFaultBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"BLOCK_FAULT_DAILY
+		- Description: ReadyBlock subsystem fault daily bitfield
+		- Modbus address: 0x0238"
+	::={ genStar 58 }
+faultPowerstage OBJECT-TYPE
+	SYNTAX     FaultPowerstageBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"FAULT_POWERSTAGE
+		- Description: Powerstage fault bitfield
+		- Modbus address: 0x023a"
+	::={ genStar 59 }
+faultPowerstageDaily OBJECT-TYPE
+	SYNTAX     FaultPowerstageBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"FAULT_POWERSTAGE_DAILY
+		- Description: Powerstage fault daily bitfield
+		- Modbus address: 0x023e"
+	::={ genStar 60 }
+vbattMinDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VBATT_MIN_DAILY
+		- Description: Minimum battery voltage daily
+		- Modbus address: 0x026c"
+	::={ genStar 61 }
+vbattMaxDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VBATT_MAX_DAILY
+		- Description: Maximum battery voltage daily
+		- Modbus address: 0x026d"
+	::={ genStar 62 }
+varrayMaxDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"VARRAY_MAX_DAILY
+		- Description: Maximum array voltage daily
+		- Modbus address: 0x026e"
+	::={ genStar 63 }
+timeAbsorbDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"TIME_ABSORB_DAILY
+		- Description: Time battery spent in absorption daily
+		- Modbus address: 0x0274"
+	::={ genStar 64 }
+timeEqDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"TIME_EQ_DAILY
+		- Description: Time battery spent in equalize daily
+		- Modbus address: 0x0276"
+	::={ genStar 65 }
+timeFloatDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"TIME_FLOAT_DAILY
+		- Description: Time battery spent in float daily
+		- Modbus address: 0x0278"
+	::={ genStar 66 }
+hourmeter OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"HOURMETER
+		- Description: How long the control has ever been on
+		- Modbus address: 0x02a6"
+	::={ genStar 67 }
+systemChargeKwhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_CHARGE_KWH_DAILY
+		- Description: System charge kWh daily
+		- Modbus address: 0x02d0"
+	::={ genStar 68 }
+systemChargeKwhResettable10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_CHARGE_KWH_RESETTABLE10
+		- Description: System charge kWh resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02d2"
+	::={ genStar 69 }
+systemChargeKwhTotal10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_CHARGE_KWH_TOTAL10
+		- Description: System charge kWh total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02d4"
+	::={ genStar 70 }
+systemChargeAhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_CHARGE_AH_DAILY
+		- Description: System charge Ah daily
+		- Modbus address: 0x02d6"
+	::={ genStar 71 }
+systemChargeAhResettable10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_CHARGE_AH_RESETTABLE10
+		- Description: System charge Ah resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02d8"
+	::={ genStar 72 }
+systemChargeAhTotal10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_CHARGE_AH_TOTAL10
+		- Description: System charge Ah total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02da"
+	::={ genStar 73 }
+systemBattAhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_BATT_AH_DAILY
+		- Description: System battery Ah daily
+		- Modbus address: 0x02dc"
+	::={ genStar 74 }
+systemBattAhResettable10 OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_BATT_AH_RESETTABLE10
+		- Description: System battery Ah resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02de"
+	::={ genStar 75 }
+systemBattAhTotal10 OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_BATT_AH_TOTAL10
+		- Description: System battery Ah total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02e0"
+	::={ genStar 76 }
+systemLoadAhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_LOAD_AH_DAILY
+		- Description: System load Ah daily
+		- Modbus address: 0x02e2"
+	::={ genStar 77 }
+systemLoadAhResettable10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_LOAD_AH_RESETTABLE10
+		- Description: System load Ah resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02e4"
+	::={ genStar 78 }
+systemLoadAhTotal10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_LOAD_AH_TOTAL10
+		- Description: System load Ah total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02e6"
+	::={ genStar 79 }
+internalChargeKwhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_CHARGE_KWH_DAILY
+		- Description: Internal charge kWh daily
+		- Modbus address: 0x02e8"
+	::={ genStar 80 }
+internalChargeKwhResettable10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_CHARGE_KWH_RESETTABLE10
+		- Description: Internal charge kWh resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02ea"
+	::={ genStar 81 }
+internalChargeKwhTotal10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_CHARGE_KWH_TOTAL10
+		- Description: Internal charge kWh total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02ec"
+	::={ genStar 82 }
+internalChargeAhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_CHARGE_AH_DAILY
+		- Description: Internal charge Ah daily
+		- Modbus address: 0x02ee"
+	::={ genStar 83 }
+internalChargeAhResettable10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_CHARGE_AH_RESETTABLE10
+		- Description: Internal charge Ah resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02f0"
+	::={ genStar 84 }
+internalChargeAhTotal10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_CHARGE_AH_TOTAL10
+		- Description: Internal charge Ah total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02f2"
+	::={ genStar 85 }
+internalBattAhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_BATT_AH_DAILY
+		- Description: Internal battery Ah daily
+		- Modbus address: 0x02f4"
+	::={ genStar 86 }
+internalBattAhResettable10 OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_BATT_AH_RESETTABLE10
+		- Description: Internal battery Ah resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02f6"
+	::={ genStar 87 }
+internalBattAhTotal10 OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"INTERNAL_BATT_AH_TOTAL10
+		- Description: Internal battery Ah total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02f8"
+	::={ genStar 88 }
+load0AhDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LOAD0_AH_DAILY
+		- Description: Internal (load0) Ah daily
+		- Modbus address: 0x02fa"
+	::={ genStar 89 }
+load0AhResettable10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LOAD0_AH_RESETTABLE10
+		- Description: Internal (load0) Ah resettable
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02fc"
+	::={ genStar 90 }
+load0AhTotal10 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LOAD0_AH_TOTAL10
+		- Description: Internal (load0) Ah total
+		- Scaling Factor: 0.1
+		- Modbus address: 0x02fe"
+	::={ genStar 91 }
+adcIloadF1sDispfil OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"ADC_ILOAD_F_1S_DISPFIL
+		- Description: Load current, slow filtered
+		- Modbus address: 0x0f30"
+	::={ genStar 92 }
+powerOutDispfil OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"POWER_OUT_DISPFIL
+		- Description: Charging power out of control to battery, slow filtered
+		- Modbus address: 0x0f31"
+	::={ genStar 93 }
+systemIbattDispfil OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"SYSTEM_IBATT_DISPFIL
+		- Description: System battery current, slow filtered
+		- Modbus address: 0x0f33"
+	::={ genStar 94 }
+adcVarrayFSlowShadowDispfil OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"ADC_VARRAY_F_SLOW_SHADOW_DISPFIL
+		- Description: Array voltage, slow filtered
+		- Modbus address: 0x0f34"
+	::={ genStar 95 }
+adcIarrayFSlowShadowDispfil OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"ADC_IARRAY_F_SLOW_SHADOW_DISPFIL
+		- Description: Array current, slow filtered
+		- Modbus address: 0x0f35"
+	::={ genStar 96 }
+echargevBattRefLimit OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevBattRefLimit
+		- Description: Maximum regulator voltage; 0==disable
+		- Modbus address: 0x1000"
+	::={ genStar 97 }
+echargevAbsorb OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevAbsorb
+		- Description: Absorption voltage target
+		- Modbus address: 0x1002"
+	::={ genStar 98 }
+echargeiBattAbsorbTerm OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargeiBattAbsorbTerm
+		- Description: Absorption end-amps; The net battery current that will terminate absorption (based on timer)
+		- Modbus address: 0x1004"
+	::={ genStar 99 }
+echargetIBattAbsorbTerm OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetIBattAbsorbTerm
+		- Description: Absorption end-amps time; Absorption termination will occur when the net battery current is below the end-amps threshold for this long
+		- Modbus address: 0x1008"
+	::={ genStar 100 }
+echargevFloatExit OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevFloatExit
+		- Description: Voltage trip to exit float prematurely
+		- Modbus address: 0x100c"
+	::={ genStar 101 }
+echargevFloatCancel OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevFloatCancel
+		- Description: Voltage trip to cancel float
+		- Modbus address: 0x100e"
+	::={ genStar 102 }
+echargevAbsorptionExt OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevAbsorptionExt
+		- Description: Absorption extension threshold
+		- Modbus address: 0x1010"
+	::={ genStar 103 }
+echargetAbsorptionExt OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetAbsorptionExt
+		- Description: Time to spend in Absorption extension
+		- Modbus address: 0x1012"
+	::={ genStar 104 }
+echargevEqualize OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevEqualize
+		- Description: Equalize voltage target; 0==disable
+		- Modbus address: 0x1015"
+	::={ genStar 105 }
+echargeiEqualizeLimit OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargeiEqualizeLimit
+		- Description: Equalize max current limit; 0==disable
+		- Modbus address: 0x1017"
+	::={ genStar 106 }
+echargevHVD25 OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevHVD25
+		- Description: High voltage disconnect voltage (25C)
+		- Modbus address: 0x101d"
+	::={ genStar 107 }
+echargevHVR OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevHVR
+		- Description: High voltage reconnect voltage
+		- Modbus address: 0x101f"
+	::={ genStar 108 }
+echargetAbsorption OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetAbsorption
+		- Description: Time to spend in Absorption
+		- Modbus address: 0x1021"
+	::={ genStar 109 }
+echargetEqualize OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetEqualize
+		- Description: Time to spend equalizing
+		- Modbus address: 0x1022"
+	::={ genStar 110 }
+echargetEqualizeCalendar OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetEqualizeCalendar
+		- Description: Interval between auto-equalize cycles
+		- Modbus address: 0x1023"
+	::={ genStar 111 }
+echargetEqualizeTO OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetEqualizeTO
+		- Description: Equalize timeout
+		- Modbus address: 0x1024"
+	::={ genStar 112 }
+echargevTempComp OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargevTempComp
+		- Description: Temperature compensation coefficient
+		- Modbus address: 0x1025"
+	::={ genStar 113 }
+echargeTBattMinLim OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargeTBattMinLim
+		- Description: Minimum compensation temperature
+		- Modbus address: 0x1026"
+	::={ genStar 114 }
+echargeTBattMaxLim OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargeTBattMaxLim
+		- Description: Maximum compensation temperature
+		- Modbus address: 0x1027"
+	::={ genStar 115 }
+echargetemperatureFoldbackCold0 OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetemperatureFoldbackCold0
+		- Description: the cold temperature below which the charge controller current is 0%; NAN==disable
+		- Modbus address: 0x1028"
+	::={ genStar 116 }
+echargetemperatureFoldbackCold100 OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetemperatureFoldbackCold100
+		- Description: the cold temperature above which the charge controller current can be 100%; NAN==disable
+		- Modbus address: 0x1029"
+	::={ genStar 117 }
+echargetemperatureFoldbackHot100 OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetemperatureFoldbackHot100
+		- Description: the hot temperature below which the charge controller current can be 100%; NAN==disable
+		- Modbus address: 0x102a"
+	::={ genStar 118 }
+echargetemperatureFoldbackHot0 OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EchargetemperatureFoldbackHot0
+		- Description: the hot temperature above which the charge controller current is 0%; NAN==disable
+		- Modbus address: 0x102b"
+	::={ genStar 119 }
+egreenMode OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Egreen_mode
+		- Description: Ethernet green mode. Enabling this attempts to save power in the Ethernet system when possible, e.g., turning off power to unused ports. 1==enable, 0==disable
+		- Modbus address: 0x105c"
+	::={ genStar 120 }
+eBatteryType OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EBatteryType
+		- Description: Battery Type; See the latest revision manual on our website for battery type definitions
+		- Modbus address: 0x1060"
+	::={ genStar 121 }
+emodbusId OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Emodbus_id
+		- Description: This device's Modbus address (1 to 247)
+		- Modbus address: 0x1068"
+	::={ genStar 122 }
+ebaudrateMb232 OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Ebaudrate_mb232
+		- Description: Baudrate for serial Modbus; E.g., 96 means 9600 baud
+		- Scaling Factor: 100
+		- Modbus address: 0x1069"
+	::={ genStar 123 }
+eload0VLVD0 OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0VLVD0
+		- Description: Load low voltage disconnect
+		- Modbus address: 0x10a0"
+	::={ genStar 124 }
+eload0VLVR OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0VLVR
+		- Description: Load low voltage reconnect
+		- Modbus address: 0x10a1"
+	::={ genStar 125 }
+eload0vStartLVD OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0vStartLVD
+		- Description: Voltage at start to go straight into LVD
+		- Modbus address: 0x10a2"
+	::={ genStar 126 }
+eload0HVD OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0HVD
+		- Description: The HVD used in the load controller
+		- Modbus address: 0x10a3"
+	::={ genStar 127 }
+eload0HVR OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0HVR
+		- Description: The HVR used in the load controller
+		- Modbus address: 0x10a4"
+	::={ genStar 128 }
+eload0SOCDisconnect OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0SOCDisconnect
+		- Description: Load low SOC disconnect
+		- Modbus address: 0x10a5"
+	::={ genStar 129 }
+eload0SOCReconnect OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0SOCReconnect
+		- Description: Load low SOC reconnect
+		- Modbus address: 0x10a6"
+	::={ genStar 130 }
+eload0tLVDWarn OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0tLVDWarn
+		- Description: Load low voltage disconnect warning timer.
+		- Modbus address: 0x10a8"
+	::={ genStar 131 }
+eload0currentComp OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"Eload0currentComp
+		- Description: Battery resistance for LVD current compensation; this value will always be positive
+		- Modbus address: 0x10aa"
+	::={ genStar 132 }
+eIPAddr OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EIPAddr
+		- Description: This device's static IP address, in host (little-endian) order. Only meaningful if DHCP is disabled.
+		- Modbus address: 0x1110"
+	::={ genStar 133 }
+eNetMask OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"ENetMask
+		- Description: This device's static IP netmask. Only meaningful if DHCP is disabled
+		- Modbus address: 0x1112"
+	::={ genStar 134 }
+eGateway OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EGateway
+		- Description: This device's static IP gateway. Only meaningful if DHCP is disabled
+		- Modbus address: 0x1114"
+	::={ genStar 135 }
+ePrimaryDNSServer OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EPrimaryDNSServer
+		- Description: This device's static IP primary DNS server to use. Only meaningful if DHCP is disabled
+		- Modbus address: 0x1116"
+	::={ genStar 136 }
+eSecondaryDNSServer OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"ESecondaryDNSServer
+		- Description: This device's static IP secondary DNS server to use. Only meaningful if DHCP is disabled
+		- Modbus address: 0x1118"
+	::={ genStar 137 }
+eIsDHCPEnabled OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EIsDHCPEnabled
+		- Description: DHCP status. If DHCP is disabled, the control will use static IP settings. 0==disabled, 1==enabled.
+		- Modbus address: 0x1122"
+	::={ genStar 138 }
+eHTTPPort OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EHTTPPort
+		- Description: HTTP port number
+		- Modbus address: 0x1125"
+	::={ genStar 139 }
+eMBIPPort OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EMBIPPort
+		- Description: Modbus IP port number
+		- Modbus address: 0x1126"
+	::={ genStar 140 }
+eModbusTcpBridgingEnabled OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EModbusTcpBridgingEnabled
+		- Description: Modbus bridging status. 0==disabled, 1==enabled.
+		- Modbus address: 0x1127"
+	::={ genStar 141 }
+eWirelessEnable OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EWirelessEnable
+		- Description: Wireless communications status. If enabled, the wireless radio will be turned on and will advertise for connections, etc. When this value is written, it applies immediately without requiring a reboot. 0==disabled, 1==enabled.
+		- Modbus address: 0x112b"
+	::={ genStar 142 }
+eqtrig OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EQTRIG
+		- Description: Manual equalize trigger; true==start equalize, false==stop equalize
+		- Modbus address: 0x0000"
+	::={ genStar 500 }
+loaddisconnect OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"LOADDISCONNECT
+		- Description: Load Disconnect (refers to DC load, this shuts down inverting from the battery); true==disconnect, false==reconnect
+		- Modbus address: 0x0001"
+	::={ genStar 501 }
+chargedisconnect OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"CHARGEDISCONNECT
+		- Description: Charge disconnect; true==stop charge, false==restart charge
+		- Modbus address: 0x0002"
+	::={ genStar 502 }
+clearCountersResettable OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"CLEAR_COUNTERS_RESETTABLE
+		- Description: Resets all resettable counters; true==do action
+		- Modbus address: 0x0014"
+	::={ genStar 503 }
+clearCountersTotal OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"CLEAR_COUNTERS_TOTAL
+		- Description: Reset all total counters; true==do action
+		- Modbus address: 0x0015"
+	::={ genStar 504 }
+clearVbminmax OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"CLEAR_VBMINMAX
+		- Description: Clear Vbatt min and max saved values; true==do action
+		- Modbus address: 0x0016"
+	::={ genStar 505 }
+clearFaults OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"CLEAR_FAULTS
+		- Description: Clear faults; true==do action
+		- Modbus address: 0x0017"
+	::={ genStar 506 }
+clearAlarms OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"CLEAR_ALARMS
+		- Description: Clear alarms; true==do action
+		- Modbus address: 0x0018"
+	::={ genStar 507 }
+eeUpdate OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EE_UPDATE
+		- Description: Forces eeprom update of logged variables (hourmeter/vbmin/vbmax/etc); true== do action
+		- Modbus address: 0x0020"
+	::={ genStar 508 }
+lvdOverride OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"LVD_OVERRIDE
+		- Description: Override low voltage disconnect; true==do action
+		- Modbus address: 0x0021"
+	::={ genStar 509 }
+eepromSessionApply OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"EEPROM_SESSION_APPLY
+		- Description: Applies or discards any EEPROM session changes which are pending but not yet written to EE; true==apply changes, false==discard changes. Reading this coil will return non-zero if there are pending changes to be applied, zero if not.
+		- Modbus address: 0x00fc"
+	::={ genStar 510 }
+reset OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"RESET
+		- Description: Soft reboot. Resets the controller without power cycling; true==do action
+		- Modbus address: 0x00ff"
+	::={ genStar 511 }
+setOrClearSoc OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"SET_OR_CLEAR_SOC
+		- Description: Tells the coulomb counting algorithm to either set 100% SOC or clear it; true==set 100% SOC, false==clear SOC (SOC=NAN)
+		- Modbus address: 0x1104"
+	::={ genStar 512 }
+
+END

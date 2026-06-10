@@ -1,0 +1,52 @@
+--  **********************************************************
+-- Airespace Reference MIB
+-- Copyright 2005 Cisco Systems, Inc.  All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Cisco's confidential and proprietary
+-- intellectual property.  Cisco retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Cisco
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+-- Status: Release
+-- Version: 4.0
+-- Internal Source Code Version:1.268
+-- Date: 01 Jan 2006
+--  **********************************************************
+
+
+AIRESPACE-REF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+     MODULE-IDENTITY,
+     enterprises                 
+         FROM SNMPv2-SMI;
+
+
+airespace MODULE-IDENTITY
+        LAST-UPDATED "200512190000Z"  -- December 19, 2005
+        ORGANIZATION "Airespace, Inc."
+        CONTACT-INFO
+            "        Cisco Systems,
+                     Customer Service
+             Postal: 170 West Tasman Drive
+                     San Jose, CA  95134
+                     USA
+                Tel: +1 800 553-NETS
+
+              Email: cs-wnbu-snmp@cisco.com"
+        DESCRIPTION
+            "The Structure of Management Information for the
+             Airespace enterprise."
+        REVISION    "200512190000Z"  -- December 19, 2005
+        DESCRIPTION
+                   "Initial version of this MIB module."
+
+        ::= { enterprises 14179 }  -- assigned by IANA
+    
+END

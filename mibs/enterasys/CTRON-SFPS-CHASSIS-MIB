@@ -1,0 +1,171 @@
+CTRON-SFPS-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-chassis-mib.txt
+--  Revision: 0.0.01
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+--      DisplayString
+--                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+      TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt
+        sfpsChassisRipTable, sfpsChassisRipAPI
+
+                        FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+--SfpsSwitchInstance ::= OCTET STRING (SIZE(4))
+--  this will map to chassis.module index value
+ 
+--SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+--HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+
+
+--  SFPS Chassis RIP Table 
+
+
+
+sfpsChassisRipChassisMac   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipTable 1 }
+
+
+sfpsChassisRipFPPortMask   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipTable 2 }
+
+
+sfpsChassisRipINBPortMask   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipTable 3 }
+
+
+sfpsChassisRipModifiedTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipTable 4 }
+
+
+sfpsChassisRipStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                active(2),
+                dead(3)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipTable 5 }
+
+-- sfps Chassis Rip API
+
+
+sfpsChassisRipAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                add(2),
+                delete(3),
+                purgePort(4),
+                sendUpdate(5),
+                clearTable(6),
+                setTimer(7)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipAPI 1 }
+
+sfpsChassisRipAPIChassisMac   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipAPI 2 }
+
+sfpsChassisRipAPIPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipAPI 3 }
+
+sfpsChassisRipAPITimer   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipAPI 4 }
+
+sfpsChassisRipAPINumInTable   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsChassisRipAPI 5 }
+
+END 

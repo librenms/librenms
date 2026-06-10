@@ -1,0 +1,2510 @@
+--
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-ZD-WLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusZDWLANModule
+        FROM RUCKUS-ROOT-MIB
+    RuckusAdminStatus,
+    RuckusRadioMode,
+    RuckusSSID,
+    RuckusdB,
+    RuckusRateLimiting
+        FROM RUCKUS-TC-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    PhysAddress,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    IANAifType
+        FROM IANAifType-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusZDWLANMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus ZD WLAN mib"
+    ::= { ruckusZDWLANModule 1 }
+
+ruckusZDWLANObjects OBJECT IDENTIFIER     ::= { ruckusZDWLANMIB 1 }
+
+ruckusZDWLANInfo OBJECT IDENTIFIER    ::= { ruckusZDWLANObjects 1 }
+
+
+ruckusZDWLANTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN table."
+    ::= { ruckusZDWLANInfo 1 }
+
+ruckusZDWLANEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN entry."
+    INDEX {
+        ruckusZDWLANIndex }
+    ::= { ruckusZDWLANTable 1 }
+
+RuckusZDWLANEntry ::= SEQUENCE {
+  ruckusZDWLANIndex               		InterfaceIndex,
+  ruckusZDWLANSSID                      RuckusSSID,
+  ruckusZDWLANDescription               DisplayString,
+  ruckusZDWLANAuthentication            DisplayString,
+  ruckusZDWLANEncryption                DisplayString,
+  ruckusZDWLANIsGuest                   TruthValue,
+  ruckusZDWLANSSIDBcastDisable          TruthValue,
+  ruckusZDWLANVlanID                    INTEGER,
+  ruckusZDWLANRateLimitingUp            OCTET STRING,
+  ruckusZDWLANRateLimitingDown          OCTET STRING,
+  ruckusZDWLANTunnelWLAN                TruthValue,
+  ruckusZDWLANNumVAP                    Unsigned32,
+  ruckusZDWLANNumSta                    Unsigned32,
+  ruckusZDWLANRxPkts                    Counter64,
+  ruckusZDWLANRxBytes                   Counter64,
+  ruckusZDWLANTxPkts                    Counter64,
+  ruckusZDWLANTxBytes                   Counter64,
+  ruckusZDWLANAuthTotal                 Counter64, 
+  ruckusZDWLANAuthResp                  Counter64, 
+  ruckusZDWLANAuthSuccessTotal          Counter64, 
+  ruckusZDWLANAuthFail                  Counter64, 
+  ruckusZDWLANAssocTotal                Counter64, 
+  ruckusZDWLANAssocResp                 Counter64, 
+  ruckusZDWLANReassocReq                Counter64, 
+  ruckusZDWLANReassocResp               Counter64, 
+  ruckusZDWLANAssocSuccess              Counter64, 
+  ruckusZDWLANAssocFail                 Counter64, 
+  ruckusZDWLANAssocDenied               Counter64, 
+  ruckusZDWLANDiassocAbnormal           Counter64, 
+  ruckusZDWLANDiassocCapacity           Counter64, 
+  ruckusZDWLANDiassocLeave              Counter64, 
+  ruckusZDWLANDiassocMisc               Counter64,
+  ruckusZDWLANRxByteRate                Unsigned32,
+  ruckusZDWLANTxByteRate                Unsigned32,
+  ruckusZDWLANRxDataFrameOnLan          Counter64,
+  ruckusZDWLANRxByteOnLan               Counter64,
+  ruckusZDWLANTxByteOnLan               Counter64,
+  ruckusZDWLANDownDropFrame             Counter64,
+  ruckusZDWLANDownRetxFrame             Counter64,
+  ruckusZDWLANDownTotalFrame            Counter64,
+  ruckusZDWLANDownTotalErrFrame         Counter64,
+  ruckusZDWLANUpTotalFrame              Counter64,
+  ruckusZDWLANUpDropFrame               Counter64,
+  ruckusZDWLANUpRetxFrame               Counter64,
+  ruckusZDWLANNAME                      RuckusSSID
+}
+
+ruckusZDWLANIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index."
+    ::= { ruckusZDWLANEntry 200 }
+
+ruckusZDWLANSSID OBJECT-TYPE
+    SYNTAX  RuckusSSID
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID."
+    ::= { ruckusZDWLANEntry 1 }
+
+ruckusZDWLANDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WLAN description."
+    ::= { ruckusZDWLANEntry 2 }
+
+ruckusZDWLANAuthentication OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication method."
+    ::= { ruckusZDWLANEntry 3 }
+
+ruckusZDWLANEncryption OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Encryption method."
+    ::= { ruckusZDWLANEntry 4 }
+
+ruckusZDWLANIsGuest OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This WLAN is for guest access."
+    ::= { ruckusZDWLANEntry 5 }
+
+ruckusZDWLANSSIDBcastDisable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Hide SSID."
+    ::= { ruckusZDWLANEntry 6 }
+
+ruckusZDWLANVlanID OBJECT-TYPE
+    SYNTAX  INTEGER  ( 1..4094 )
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the VLAN ID of the WLAN.  If VLAN ID is 1, packets from this WLAN will be untagged."
+    ::= { ruckusZDWLANEntry 7 }
+
+ruckusZDWLANRateLimitingUp OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (1..10))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Rate limiting of uplink."
+    ::= { ruckusZDWLANEntry 8 }
+
+ruckusZDWLANRateLimitingDown OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (1..10))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Rate limiting of downlink."
+    ::= { ruckusZDWLANEntry 9 }
+
+ruckusZDWLANTunnelWLAN OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Tunnel WLAN."
+    ::= { ruckusZDWLANEntry 10 }
+
+ruckusZDWLANNumVAP OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of APs."
+    ::= { ruckusZDWLANEntry 11 }
+
+ruckusZDWLANNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of client devices."
+    ::= { ruckusZDWLANEntry 12 }
+
+ruckusZDWLANRxPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received packets."
+    ::= { ruckusZDWLANEntry 13 }
+
+ruckusZDWLANRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusZDWLANEntry 14 }
+
+ruckusZDWLANTxPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted packets."
+    ::= { ruckusZDWLANEntry 15 }
+
+ruckusZDWLANTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusZDWLANEntry 16 }
+
+ruckusZDWLANAuthTotal OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Accumulated total number of attempt to authenticate by wireless terminals on this WLAN,
+        or Authentication request."
+    ::= { ruckusZDWLANEntry 26 }
+
+ruckusZDWLANAuthResp OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication response."
+    ::= { ruckusZDWLANEntry 27 }
+
+ruckusZDWLANAuthSuccessTotal OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Accumulated total number of success out of Wireless authentication  attempts."
+    ::= { ruckusZDWLANEntry 28 }
+
+ruckusZDWLANAuthFail OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication fail."
+    ::= { ruckusZDWLANEntry 29 }
+
+ruckusZDWLANAssocTotal OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Accumulated total number of access of wireless terminal on this WLAN,
+        or Association request."
+    ::= { ruckusZDWLANEntry 30 }
+
+ruckusZDWLANAssocResp OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association response."
+    ::= { ruckusZDWLANEntry 31 }
+
+ruckusZDWLANReassocReq OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reassociation request."
+    ::= { ruckusZDWLANEntry 32 }
+
+ruckusZDWLANReassocResp OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reassociation response."
+    ::= { ruckusZDWLANEntry 33 }
+
+ruckusZDWLANAssocSuccess OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association success."
+    ::= { ruckusZDWLANEntry 34 }
+
+ruckusZDWLANAssocFail OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association fail."
+    ::= { ruckusZDWLANEntry 35 }
+
+ruckusZDWLANAssocDenied OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association denied."
+    ::= { ruckusZDWLANEntry 36 }
+
+ruckusZDWLANDiassocAbnormal OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to abnormal causes."
+    ::= { ruckusZDWLANEntry 37 }
+
+ruckusZDWLANDiassocCapacity OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to device capacity."
+    ::= { ruckusZDWLANEntry 38 }
+
+ruckusZDWLANDiassocLeave OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to client leave."
+    ::= { ruckusZDWLANEntry 39 }
+
+ruckusZDWLANDiassocMisc OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to other reasons."
+    ::= { ruckusZDWLANEntry 40 }
+    
+ruckusZDWLANRxByteRate OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received rate byte/s in last 5 minutes ."
+    ::= { ruckusZDWLANEntry 41 }
+
+ruckusZDWLANTxByteRate OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted rate byte/s in last 5 minutes ."
+    ::= { ruckusZDWLANEntry 42 }
+
+ruckusZDWLANRxDataFrameOnLan OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received Data Frame Number on Lan interface ."
+    ::= { ruckusZDWLANEntry 43 }
+    
+ruckusZDWLANRxByteOnLan OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received Data Bytes on Lan interface ."
+    ::= { ruckusZDWLANEntry 44 }
+    
+ruckusZDWLANTxByteOnLan OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted Data Bytes on Lan interface ."
+    ::= { ruckusZDWLANEntry 45 }
+    
+ruckusZDWLANDownDropFrame OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Drop Frame Number on Downlink of Wireless."
+    ::= { ruckusZDWLANEntry 46 }
+    
+ruckusZDWLANDownRetxFrame OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Retransmitted Frame Number on Downlink of Wireless."
+    ::= { ruckusZDWLANEntry 47 }
+    
+  ruckusZDWLANDownTotalFrame OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total Frame Number on Downlink of Wireless."
+    ::= { ruckusZDWLANEntry 48 }
+    
+ruckusZDWLANDownTotalErrFrame OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total Error Frame Number on Downlink of Wireless."
+    ::= { ruckusZDWLANEntry 49 }
+    
+ruckusZDWLANUpTotalFrame OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total Frame Number on Uplink of Wireless."
+    ::= { ruckusZDWLANEntry 50 }
+    
+ruckusZDWLANUpDropFrame OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Drop Frame Number on Uplink of Wireless."
+    ::= { ruckusZDWLANEntry 51 }
+    
+ruckusZDWLANUpRetxFrame OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Retransmitted Frame Number on Uplink of Wireless."
+    ::= { ruckusZDWLANEntry 52 }
+
+ruckusZDWLANNAME OBJECT-TYPE
+    SYNTAX  RuckusSSID
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "WLAN NAME."
+    ::= { ruckusZDWLANEntry 108 }
+
+
+ruckusZDWLANAPInfo OBJECT IDENTIFIER    ::= { ruckusZDWLANObjects 2 }
+
+ruckusZDWLANAPTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN AP table."
+    ::= { ruckusZDWLANAPInfo 1 }
+
+ruckusZDWLANAPEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN AP entry."
+    INDEX {
+        ruckusZDWLANAPMacAddr }
+    ::= { ruckusZDWLANAPTable 1 }
+
+RuckusZDWLANAPEntry ::= SEQUENCE {
+  ruckusZDWLANAPMacAddr					MacAddress,
+  ruckusZDWLANAPDescription				DisplayString,
+  ruckusZDWLANAPStatus					INTEGER,
+  ruckusZDWLANAPModel					DisplayString,
+  ruckusZDWLANAPSerialNumber			DisplayString,
+  ruckusZDWLANAPUptime					TimeTicks,
+  ruckusZDWLANAPSWversion				DisplayString,
+  ruckusZDWLANAPHWversion				DisplayString,
+  ruckusZDWLANAPIPAddr					IpAddress,
+  ruckusZDWLANAPNumRadios				Unsigned32,
+  ruckusZDWLANAPNumVAP					Unsigned32,
+  ruckusZDWLANAPNumSta					Unsigned32,
+  ruckusZDWLANAPNumRogues				Unsigned32,
+  ruckusZDWLANAPConnectionMode			INTEGER,
+  ruckusZDWLANAPMeshEnable				TruthValue,
+  ruckusZDWLANAPMeshHops				Unsigned32,
+  ruckusZDWLANAPMeshType				INTEGER,
+  ruckusZDWLANAPLANStatsRXByte			Counter32,
+  ruckusZDWLANAPLANStatsRXPkt			Counter32,
+  ruckusZDWLANAPLANStatsRXPktErr		Counter32,
+  ruckusZDWLANAPLANStatsRXPKTSucc		Counter32,
+  ruckusZDWLANAPLANStatsTXByte			Counter32,
+  ruckusZDWLANAPLANStatsTXPkt			Counter32,
+  ruckusZDWLANAPMemUtil					INTEGER,
+  ruckusZDWLANAPMemTotal				Unsigned32,
+  ruckusZDWLANAPCPUUtil					INTEGER,
+  ruckusZDWLANAPFWSize					Unsigned32,
+  ruckusZDWLANAPFWAvail					Unsigned32,
+  ruckusZDWLANAPMultipleVlanCapability  TruthValue,
+  ruckusZDWLANAP11bCapable              TruthValue,
+  ruckusZDWLANAP11gCapable              TruthValue,
+  ruckusZDWLANAPMultiModeAccessStatus   TruthValue,
+  ruckusZDWLANAPEthStateChange          Counter32,
+  ruckusZDWLANAPSyncConf                TruthValue,
+  ruckusZDWLANAPUpgrade                 TruthValue,
+  ruckusZDWLANAPFirstJoinTime           DisplayString,
+  ruckusZDWLANAPLastBootTime            DisplayString,
+  ruckusZDWLANAPLastUpgradeTime         DisplayString,
+  ruckusZDWLANAPLastConfSyncTime        DisplayString,
+  ruckusZDWLANAPLANStatsRXPKTBcast      Counter32,
+  ruckusZDWLANAPLANStatsRXPKTMcast      Counter32,
+  ruckusZDWLANAPLANStatsRXPKTUcast      Counter32,
+  ruckusZDWLANAPLANStatsTXPKTBcast      Counter32,
+  ruckusZDWLANAPLANStatsTXPKTMcast      Counter32,
+  ruckusZDWLANAPLANStatsTXPKTUcast      Counter32,
+  ruckusZDWLANAPLANStatsDropped         Counter32,
+  ruckusZDWLANAPMeshUpPortCntUpdown     Counter32,
+  ruckusZDWLANAPMeshDownPortCntUpdown   Counter32,
+  ruckusZDWLANAPTxFrameDropped			Counter32,
+  ruckusZDWLANAPTxFrameError			Counter32,
+  ruckusZDWLANAPCoverageTech			INTEGER,
+  ruckusZDWLANAPStaTxBytes				Counter32,
+  ruckusZDWLANAPStaRxBytes				Counter32,
+  ruckusZDWLANAPNetmask					IpAddress,
+  ruckusZDWLANAPGateway					IpAddress,
+  ruckusZDWLANAPDNS1					IpAddress,
+  ruckusZDWLANAPDNS2					IpAddress,
+  ruckusZDWLANAPTotalUser				Unsigned32,
+  ruckusZDWLANAPLANStatsRXByteRate		Counter32,
+  ruckusZDWLANAPLANStatsTXByteRate		Counter32
+}
+
+ruckusZDWLANAPMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC address."
+    ::= { ruckusZDWLANAPEntry 1 }
+
+ruckusZDWLANAPDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description."
+    ::= { ruckusZDWLANAPEntry 2 }
+
+ruckusZDWLANAPStatus OBJECT-TYPE
+    SYNTAX  INTEGER  { disconnected(0), connected(1), approvalPending(2), upgradingFirmware(3), provisioning(4)  }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The connection status with ZD."
+    ::= { ruckusZDWLANAPEntry 3 }
+
+ruckusZDWLANAPModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model name."
+    ::= { ruckusZDWLANAPEntry 4 }
+
+ruckusZDWLANAPSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number."
+    ::= { ruckusZDWLANAPEntry 5 }
+
+ruckusZDWLANAPUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time."
+    ::= { ruckusZDWLANAPEntry 6 }
+
+ruckusZDWLANAPSWversion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version."
+    ::= { ruckusZDWLANAPEntry 7 }
+
+ruckusZDWLANAPHWversion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Hardware version."
+    ::= { ruckusZDWLANAPEntry 8 }
+
+ruckusZDWLANAPIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address."
+    ::= { ruckusZDWLANAPEntry 10 }
+
+ruckusZDWLANAPNumRadios OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of radios."
+    ::= { ruckusZDWLANAPEntry 13 }
+
+ruckusZDWLANAPNumVAP OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of APs."
+    ::= { ruckusZDWLANAPEntry 14 }
+
+ruckusZDWLANAPNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of authenticated terminal which is using currently on this AP."
+    ::= { ruckusZDWLANAPEntry 15 }
+
+ruckusZDWLANAPNumRogues OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of rogue devices."
+    ::= { ruckusZDWLANAPEntry 16 }
+
+ruckusZDWLANAPConnectionMode OBJECT-TYPE
+    SYNTAX  INTEGER  { layer2 (0), layer3 (1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The connection mode with ZD."
+    ::= { ruckusZDWLANAPEntry 17 }
+
+ruckusZDWLANAPMeshEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Mesh enable."
+    ::= { ruckusZDWLANAPEntry 18 }
+
+ruckusZDWLANAPMeshHops OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of mesh hops."
+    ::= { ruckusZDWLANAPEntry 19 }
+
+ruckusZDWLANAPMeshType OBJECT-TYPE
+    SYNTAX  INTEGER  { unknown(0), root (1), mesh (2), forming(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Mesh type."
+    ::= { ruckusZDWLANAPEntry 20 }
+
+ruckusZDWLANAPLANStatsRXByte OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bytes received on LAN port."
+    ::= { ruckusZDWLANAPEntry 21 }
+
+ruckusZDWLANAPLANStatsRXPkt OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Packets received on LAN port."
+    ::= { ruckusZDWLANAPEntry 22 }
+
+ruckusZDWLANAPLANStatsRXPktErr OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Packets received erroneously on LAN port."
+    ::= { ruckusZDWLANAPEntry 23 }
+
+ruckusZDWLANAPLANStatsRXPKTSucc OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Packets received successfully on LAN port."
+    ::= { ruckusZDWLANAPEntry 24 }
+
+ruckusZDWLANAPLANStatsTXByte OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bytes transmitted on LAN port."
+    ::= { ruckusZDWLANAPEntry 25 }
+
+ruckusZDWLANAPLANStatsTXPkt OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Packets transmitted on LAN port."
+    ::= { ruckusZDWLANAPEntry 26 }
+
+ruckusZDWLANAPMemUtil OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Memory utilization percentage."
+    ::= { ruckusZDWLANAPEntry 27 }
+
+ruckusZDWLANAPMemTotal OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total memory in KB."
+    ::= { ruckusZDWLANAPEntry 28 }
+
+ruckusZDWLANAPCPUUtil OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU utilization percentage."
+    ::= { ruckusZDWLANAPEntry 29 }
+
+ruckusZDWLANAPFWSize OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Firmware partition size in byte."
+    ::= { ruckusZDWLANAPEntry 30 }
+
+ruckusZDWLANAPFWAvail OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Firmware partition available size in byte."
+    ::= { ruckusZDWLANAPEntry 31 }
+
+ruckusZDWLANAPMultipleVlanCapability OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP support multiple vlan capability."
+    ::= { ruckusZDWLANAPEntry 32 }
+
+ruckusZDWLANAP11bCapable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Support 802.11b."
+    ::= { ruckusZDWLANAPEntry 36 }
+
+ruckusZDWLANAP11gCapable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Support 802.11g."
+    ::= { ruckusZDWLANAPEntry 37 }
+
+ruckusZDWLANAPMultiModeAccessStatus OBJECT-TYPE
+    SYNTAX TruthValue {false(0),true(1)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Support simutaneously connections from 11a/b/g clients."
+    ::= { ruckusZDWLANAPEntry 38 }
+
+ruckusZDWLANAPEthStateChange OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Ethernet port up/down count."
+    ::= { ruckusZDWLANAPEntry 39 }
+
+ruckusZDWLANAPSyncConf OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Manually push configuration to this AP."
+    ::= { ruckusZDWLANAPEntry 41 }
+
+ruckusZDWLANAPUpgrade OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Upgrade this AP."
+    ::= { ruckusZDWLANAPEntry 42 }
+
+ruckusZDWLANAPFirstJoinTime OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Time of first join."
+    ::= { ruckusZDWLANAPEntry 43 }
+
+ruckusZDWLANAPLastBootTime OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Time of last boot."
+    ::= { ruckusZDWLANAPEntry 44 }
+
+ruckusZDWLANAPLastUpgradeTime OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Time of last firmware upgrade."
+    ::= { ruckusZDWLANAPEntry 45 }
+
+ruckusZDWLANAPLastConfSyncTime OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Time of last configuration synchronization."
+    ::= { ruckusZDWLANAPEntry 46 }
+
+ruckusZDWLANAPLANStatsRXPKTBcast OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Broadcast packets received successfully on LAN port."
+    ::= { ruckusZDWLANAPEntry 47 }
+
+ruckusZDWLANAPLANStatsRXPKTMcast OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Multicast packets received successfully on LAN port."
+    ::= { ruckusZDWLANAPEntry 48 }
+
+ruckusZDWLANAPLANStatsRXPKTUcast OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unicast packets received successfully on LAN port."
+    ::= { ruckusZDWLANAPEntry 49 }
+
+ruckusZDWLANAPLANStatsTXPKTBcast OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Broadcast packets transmitted successfully on LAN port."
+    ::= { ruckusZDWLANAPEntry 50 }
+
+ruckusZDWLANAPLANStatsTXPKTMcast OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Multicast packets transmitted successfully on LAN port."
+    ::= { ruckusZDWLANAPEntry 51 }
+
+ruckusZDWLANAPLANStatsTXPKTUcast OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unicast packets transmitted successfully on LAN port."
+    ::= { ruckusZDWLANAPEntry 52 }
+
+ruckusZDWLANAPLANStatsDropped OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of packets dropped on LAN port."
+    ::= { ruckusZDWLANAPEntry 53 }
+
+ruckusZDWLANAPMeshUpPortCntUpdown  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "updown count of AP as a up port node in mesh mode."
+    ::= { ruckusZDWLANAPEntry 54 }
+
+ruckusZDWLANAPMeshDownPortCntUpdown  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "updown count of AP as a down port node in mesh mode."
+    ::= { ruckusZDWLANAPEntry 55 }
+
+ruckusZDWLANAPTxFrameDropped  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Droped Frame count of AP wireless transmitted."
+    ::= { ruckusZDWLANAPEntry 57 }
+    
+ruckusZDWLANAPTxFrameError  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Error Frame count of AP wireless transmitted."
+    ::= { ruckusZDWLANAPEntry 58 }
+    
+ruckusZDWLANAPCoverageTech OBJECT-TYPE
+    SYNTAX  INTEGER  { indoor(1), indoor-distribute(2), outdoor(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP's coverage technology."
+    ::= { ruckusZDWLANAPEntry 59 }
+    
+ruckusZDWLANAPStaTxBytes  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Client send data to this AP.(kbytes) "
+    ::= { ruckusZDWLANAPEntry 61 }
+    
+ruckusZDWLANAPStaRxBytes  OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Client receive data from this AP.(kbytes)"
+    ::= { ruckusZDWLANAPEntry 62 }
+
+ruckusZDWLANAPNetmask OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Netmask address."
+    ::= { ruckusZDWLANAPEntry 100 }
+    
+ruckusZDWLANAPGateway OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Gateway address."
+    ::= { ruckusZDWLANAPEntry 101 }
+    
+ruckusZDWLANAPDNS1 OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Primary DNS address."
+    ::= { ruckusZDWLANAPEntry 105 }
+     
+ruckusZDWLANAPDNS2 OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sencond DNS address."
+    ::= { ruckusZDWLANAPEntry 106 }
+
+ruckusZDWLANAPTotalUser OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of client AP can support."
+    ::= { ruckusZDWLANAPEntry 110 }
+
+ruckusZDWLANAPLANStatsRXByteRate OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bytes rate received on LAN port each 90s."
+    ::= { ruckusZDWLANAPEntry 111 }
+
+ruckusZDWLANAPLANStatsTXByteRate OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bytes rate transmitted on LAN port each 90s."
+    ::= { ruckusZDWLANAPEntry 112 }
+
+ruckusZDWLANAPRadioStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANAPRadioStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN AP Radio table."
+    ::= { ruckusZDWLANAPInfo 2 }
+
+ruckusZDWLANAPRadioStatsEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANAPRadioStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN AP Radio entry."
+    INDEX {
+        ruckusZDWLANAPRadioStatsAPMacAddr,
+        ruckusZDWLANAPRadioStatsRadioIndex }
+    ::= { ruckusZDWLANAPRadioStatsTable 1 }
+
+RuckusZDWLANAPRadioStatsEntry ::= SEQUENCE {
+  ruckusZDWLANAPRadioStatsAPMacAddr           MacAddress,
+  ruckusZDWLANAPRadioStatsRadioIndex          Unsigned32,
+  ruckusZDWLANAPRadioStatsRadioType           INTEGER,
+  ruckusZDWLANAPRadioStatsChannel             Unsigned32,
+  ruckusZDWLANAPRadioStatsTxPower             INTEGER,
+  ruckusZDWLANAPRadioStatsMeshEnable          TruthValue,
+  ruckusZDWLANAPRadioStatsNumVAP              Unsigned32,
+  ruckusZDWLANAPRadioStatsNumSta              Unsigned32,
+  ruckusZDWLANAPRadioStatsAvgStaRSSI          Integer32,
+  ruckusZDWLANAPRadioStatsRxPkts              Counter64,
+  ruckusZDWLANAPRadioStatsRxBytes             Counter64,
+  ruckusZDWLANAPRadioStatsRxMulticast         Counter64,
+  ruckusZDWLANAPRadioStatsTxPkts              Counter64,
+  ruckusZDWLANAPRadioStatsTxBytes             Counter64,
+  ruckusZDWLANAPRadioStatsTxMulticast         Counter64,
+  ruckusZDWLANAPRadioStatsTxFail              Counter64,
+  ruckusZDWLANAPRadioStatsTxRetries           Counter64,
+  ruckusZDWLANAPRadioStatsPowerMgmt           TruthValue,
+  ruckusZDWLANAPRadioStatsMaxSta              Unsigned32,
+  ruckusZDWLANAPRadioStatsFrameErrorRate      Unsigned32,
+  ruckusZDWLANAPRadioStatsFrameRetryRate      Unsigned32,
+  ruckusZDWLANAPRadioStatsMonitoredTime       TimeTicks,
+  ruckusZDWLANAPRadioStatsTotalAssocTime      Counter64,
+  ruckusZDWLANAPRadioStatsAuthReq             Counter64,
+  ruckusZDWLANAPRadioStatsAuthResp            Counter64,
+  ruckusZDWLANAPRadioStatsAuthSuccess         Counter64,
+  ruckusZDWLANAPRadioStatsAuthFail            Counter64,
+  ruckusZDWLANAPRadioStatsAssocReq            Counter64,
+  ruckusZDWLANAPRadioStatsAssocResp           Counter64,
+  ruckusZDWLANAPRadioStatsReassocReq          Counter64,
+  ruckusZDWLANAPRadioStatsReassocResp         Counter64,
+  ruckusZDWLANAPRadioStatsAssocSuccess        Counter64,
+  ruckusZDWLANAPRadioStatsAssocFail           Counter64,
+  ruckusZDWLANAPRadioStatsAssocDenied         Counter64,
+  ruckusZDWLANAPRadioStatsDiassocAbnormal     Counter64,
+  ruckusZDWLANAPRadioStatsDiassocCapacity     Counter64,
+  ruckusZDWLANAPRadioStatsDiassocLeave        Counter64,
+  ruckusZDWLANAPRadioStatsDiassocMisc         Counter64,
+  ruckusZDWLANAPRadioStatsResourceUtil        Unsigned32,
+  ruckusZDWLANAPRadioStatsRxSignalFrm         Counter64,
+  ruckusZDWLANAPRadioStatsTxSignalFrm         Counter64,
+  ruckusZDWLANAPRadioStatsTotalSignalFrm      Counter64,
+  ruckusZDWLANAPRadioStatsAntennaGain         Unsigned32,
+  ruckusZDWLANAPRadioStatsBeaconPeriod        Unsigned32,
+  ruckusZDWLANAPRadioStatsRTSThreshold        Unsigned32,
+  ruckusZDWLANAPRadioStatsFragThreshold       Unsigned32
+}
+
+ruckusZDWLANAPRadioStatsAPMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "AP MAC address."
+    ::= { ruckusZDWLANAPRadioStatsEntry 1 }
+
+ruckusZDWLANAPRadioStatsRadioIndex OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Radio index of the AP."
+    ::= { ruckusZDWLANAPRadioStatsEntry 2 }
+
+ruckusZDWLANAPRadioStatsRadioType OBJECT-TYPE
+    SYNTAX  INTEGER  { radio11bg (0), radio11a (1), radio11ng(2), radio11na(3), radio11ac(4)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Radio type."
+    ::= { ruckusZDWLANAPRadioStatsEntry 3 }
+
+ruckusZDWLANAPRadioStatsChannel OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Radio channel."
+    ::= { ruckusZDWLANAPRadioStatsEntry 4 }
+
+ruckusZDWLANAPRadioStatsTxPower OBJECT-TYPE
+    SYNTAX  INTEGER  { full(0), half(1), quarter(2), eighth(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmit power of radio."
+    ::= { ruckusZDWLANAPRadioStatsEntry 5 }
+
+ruckusZDWLANAPRadioStatsMeshEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Mesh enable."
+    ::= { ruckusZDWLANAPRadioStatsEntry 6 }
+
+ruckusZDWLANAPRadioStatsNumVAP OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of APs."
+    ::= { ruckusZDWLANAPRadioStatsEntry 7 }
+
+ruckusZDWLANAPRadioStatsNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of stations."
+    ::= { ruckusZDWLANAPRadioStatsEntry 8 }
+
+ruckusZDWLANAPRadioStatsAvgStaRSSI OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Average client RSSI."
+    ::= { ruckusZDWLANAPRadioStatsEntry 9 }
+
+ruckusZDWLANAPRadioStatsRxPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received packets."
+    ::= { ruckusZDWLANAPRadioStatsEntry 10 }
+
+ruckusZDWLANAPRadioStatsRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusZDWLANAPRadioStatsEntry 11 }
+
+ruckusZDWLANAPRadioStatsRxMulticast OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received multicast packets."
+    ::= { ruckusZDWLANAPRadioStatsEntry 12 }
+
+ruckusZDWLANAPRadioStatsTxPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted packets."
+    ::= { ruckusZDWLANAPRadioStatsEntry 13 }
+
+ruckusZDWLANAPRadioStatsTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusZDWLANAPRadioStatsEntry 14 }
+
+ruckusZDWLANAPRadioStatsTxMulticast OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted multicast packets."
+    ::= { ruckusZDWLANAPRadioStatsEntry 15 }
+
+ruckusZDWLANAPRadioStatsTxFail OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted fail packets."
+    ::= { ruckusZDWLANAPRadioStatsEntry 16 }
+
+ruckusZDWLANAPRadioStatsTxRetries OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted retry packets."
+    ::= { ruckusZDWLANAPRadioStatsEntry 17 }
+
+ruckusZDWLANAPRadioStatsPowerMgmt OBJECT-TYPE
+    SYNTAX  TruthValue 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Power management enable."
+    ::= { ruckusZDWLANAPRadioStatsEntry 18 }
+
+ruckusZDWLANAPRadioStatsMaxSta OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of max stations allowed."
+    ::= { ruckusZDWLANAPRadioStatsEntry 19 }
+
+ruckusZDWLANAPRadioStatsFrameErrorRate OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    UNITS
+        "1/10000"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Frame error rate."
+    ::= { ruckusZDWLANAPRadioStatsEntry 20 }
+
+ruckusZDWLANAPRadioStatsFrameRetryRate OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    UNITS
+        "1/10000"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Frame retry rate."
+    ::= { ruckusZDWLANAPRadioStatsEntry 21 }
+
+ruckusZDWLANAPRadioStatsMonitoredTime OBJECT-TYPE
+    SYNTAX  TimeTicks 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Monitored time."
+    ::= { ruckusZDWLANAPRadioStatsEntry 22 }
+
+ruckusZDWLANAPRadioStatsTotalAssocTime OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Client total association time."
+    ::= { ruckusZDWLANAPRadioStatsEntry 24 }
+
+ruckusZDWLANAPRadioStatsAuthReq OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication request."
+    ::= { ruckusZDWLANAPRadioStatsEntry 25 }
+
+ruckusZDWLANAPRadioStatsAuthResp OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication response."
+    ::= { ruckusZDWLANAPRadioStatsEntry 26 }
+
+ruckusZDWLANAPRadioStatsAuthSuccess OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication success."
+    ::= { ruckusZDWLANAPRadioStatsEntry 27 }
+
+
+ruckusZDWLANAPRadioStatsAuthFail OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication fail."
+    ::= { ruckusZDWLANAPRadioStatsEntry 28 }
+
+ruckusZDWLANAPRadioStatsAssocReq OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association request."
+    ::= { ruckusZDWLANAPRadioStatsEntry 29 }
+
+ruckusZDWLANAPRadioStatsAssocResp OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association response."
+    ::= { ruckusZDWLANAPRadioStatsEntry 30 }
+
+ruckusZDWLANAPRadioStatsReassocReq OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reassociation request."
+    ::= { ruckusZDWLANAPRadioStatsEntry 31 }
+
+ruckusZDWLANAPRadioStatsReassocResp OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reassociation response."
+    ::= { ruckusZDWLANAPRadioStatsEntry 32 }
+
+ruckusZDWLANAPRadioStatsAssocSuccess OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association success."
+    ::= { ruckusZDWLANAPRadioStatsEntry 33 }
+
+ruckusZDWLANAPRadioStatsAssocFail OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association fail."
+    ::= { ruckusZDWLANAPRadioStatsEntry 34 }
+
+ruckusZDWLANAPRadioStatsAssocDenied OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Association denied."
+    ::= { ruckusZDWLANAPRadioStatsEntry 35 }
+
+ruckusZDWLANAPRadioStatsDiassocAbnormal OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to abnormal causes."
+    ::= { ruckusZDWLANAPRadioStatsEntry 36 }
+
+ruckusZDWLANAPRadioStatsDiassocCapacity OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to device capacity."
+    ::= { ruckusZDWLANAPRadioStatsEntry 37 }
+
+ruckusZDWLANAPRadioStatsDiassocLeave OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to client leave."
+    ::= { ruckusZDWLANAPRadioStatsEntry 38 }
+
+ruckusZDWLANAPRadioStatsDiassocMisc OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Disassociation request due to other reasons."
+    ::= { ruckusZDWLANAPRadioStatsEntry 39 }
+
+ruckusZDWLANAPRadioStatsResourceUtil OBJECT-TYPE
+    SYNTAX  Unsigned32
+    UNITS
+        "percentage" 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Resource utilization."
+    ::= { ruckusZDWLANAPRadioStatsEntry 40 }
+
+ruckusZDWLANAPRadioStatsRxSignalFrm OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received signal frames."
+    ::= { ruckusZDWLANAPRadioStatsEntry 41 }
+
+ruckusZDWLANAPRadioStatsTxSignalFrm OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted signal frames."
+    ::= { ruckusZDWLANAPRadioStatsEntry 42 }
+
+ruckusZDWLANAPRadioStatsTotalSignalFrm OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total signal frames."
+    ::= { ruckusZDWLANAPRadioStatsEntry 43 }
+
+ruckusZDWLANAPRadioStatsAntennaGain OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Get antenna gain."
+    ::= { ruckusZDWLANAPRadioStatsEntry 44 }
+
+ruckusZDWLANAPRadioStatsBeaconPeriod OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Get beacon period."
+    ::= { ruckusZDWLANAPRadioStatsEntry 45 }
+
+ruckusZDWLANAPRadioStatsRTSThreshold OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Get RTS threshold."
+    ::= { ruckusZDWLANAPRadioStatsEntry 46 }
+
+ruckusZDWLANAPRadioStatsFragThreshold OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Get fragment threshold."
+    ::= { ruckusZDWLANAPRadioStatsEntry 47 }
+
+ruckusZDWLANStaInfo OBJECT IDENTIFIER    ::= { ruckusZDWLANObjects 3 }
+
+
+ruckusZDWLANStaTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN Station table."
+    ::= { ruckusZDWLANStaInfo 1 }
+
+ruckusZDWLANStaEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN Station entry."
+    INDEX {
+        ruckusZDWLANStaMacAddr }
+    ::= { ruckusZDWLANStaTable 1 }
+
+RuckusZDWLANStaEntry ::= SEQUENCE {
+  ruckusZDWLANStaMacAddr              MacAddress,
+  ruckusZDWLANStaAPMacAddr            MacAddress,
+  ruckusZDWLANStaBSSID                MacAddress,
+  ruckusZDWLANStaSSID                 RuckusSSID,
+  ruckusZDWLANStaUser                 DisplayString,
+  ruckusZDWLANStaRadioType            INTEGER,
+  ruckusZDWLANStaChannel              Unsigned32,
+  ruckusZDWLANStaIPAddr               IpAddress,
+  ruckusZDWLANStaAvgRSSI              Integer32,
+  ruckusZDWLANStaRxPkts               Counter32,
+  ruckusZDWLANStaRxBytes              Counter64,
+  ruckusZDWLANStaTxPkts               Counter32,
+  ruckusZDWLANStaTxBytes              Counter64,
+  ruckusZDWLANStaRetries              Counter32,
+  ruckusZDWLANStaAssocTime            TimeTicks,
+  ruckusZDWLANStaRxError              Counter32,
+  ruckusZDWLANStaTxSuccess            Counter32,
+  ruckusZDWLANSta11bgReassoc          Counter32,
+  ruckusZDWLANStaAssocTimestamp       DisplayString,
+  ruckusZDWLANStaRetryBytes           Counter32,
+  ruckusZDWLANStaSNR                  Integer32,
+  ruckusZDWLANStaRxDrop               Counter32,
+  ruckusZDWLANStaTxDrop               Counter32,
+  ruckusZDWLANStaTxError              Counter32,
+  ruckusZDWLANStaVlanID               INTEGER,
+  ruckusZDWLANStaAuthMode             DisplayString,
+  ruckusZDWLANStaSignalStrength       Integer32
+}
+
+ruckusZDWLANStaMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The station's MAC Address."
+    ::= { ruckusZDWLANStaEntry 1 }
+
+ruckusZDWLANStaAPMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The MAC address of the associated AP."
+    ::= { ruckusZDWLANStaEntry 2 }
+
+ruckusZDWLANStaBSSID OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "BSSID of WLAN."
+    ::= { ruckusZDWLANStaEntry 3 }
+
+ruckusZDWLANStaSSID OBJECT-TYPE
+    SYNTAX  RuckusSSID 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID."
+    ::= { ruckusZDWLANStaEntry 4 }
+
+ruckusZDWLANStaUser OBJECT-TYPE
+    SYNTAX  DisplayString 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Logined username of the client."
+    ::= { ruckusZDWLANStaEntry 5 }
+
+ruckusZDWLANStaRadioType OBJECT-TYPE
+    SYNTAX  INTEGER  { radio11a (0), radio11b (1), radio11g(2), radio11ng(3), radio11na(4), radio11ac(5) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Radio type."
+    ::= { ruckusZDWLANStaEntry 6 }
+
+ruckusZDWLANStaChannel OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Radio channel."
+    ::= { ruckusZDWLANStaEntry 7 }
+
+ruckusZDWLANStaIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address."
+    ::= { ruckusZDWLANStaEntry 8 }
+
+ruckusZDWLANStaAvgRSSI OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Averaged RSSI."
+    ::= { ruckusZDWLANStaEntry 9 }
+
+ruckusZDWLANStaRxPkts OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received packets."
+    ::= { ruckusZDWLANStaEntry 10 }
+
+ruckusZDWLANStaRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusZDWLANStaEntry 11 }
+
+ruckusZDWLANStaTxPkts OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted packets."
+    ::= { ruckusZDWLANStaEntry 12 }
+
+ruckusZDWLANStaTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusZDWLANStaEntry 13 }
+
+ruckusZDWLANStaRetries OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted retries."
+    ::= { ruckusZDWLANStaEntry 14 }
+
+ruckusZDWLANStaAssocTime OBJECT-TYPE
+    SYNTAX  TimeTicks 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time client has been associated."
+    ::= { ruckusZDWLANStaEntry 15 }
+
+ruckusZDWLANStaRxError OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received error packets."
+    ::= { ruckusZDWLANStaEntry 16 }
+
+ruckusZDWLANStaTxSuccess OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Successful transmitted packets."
+    ::= { ruckusZDWLANStaEntry 17 }
+
+ruckusZDWLANSta11bgReassoc OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Reassociate count on B/G RF."
+    ::= { ruckusZDWLANStaEntry 18 }
+
+ruckusZDWLANStaAssocTimestamp OBJECT-TYPE
+    SYNTAX  DisplayString 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The timestamp client associated."
+    ::= { ruckusZDWLANStaEntry 19 }
+
+ruckusZDWLANStaRetryBytes OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted retry bytes."
+    ::= { ruckusZDWLANStaEntry 20 }
+
+ruckusZDWLANStaSNR OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Station's Signal to Noise Ratio."
+    ::= { ruckusZDWLANStaEntry 21 }
+
+ruckusZDWLANStaRxDrop OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Drop transmitted packets."
+    ::= { ruckusZDWLANStaEntry 22 }
+
+ruckusZDWLANStaTxDrop OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Drop received packets."
+    ::= { ruckusZDWLANStaEntry 23 }
+
+ruckusZDWLANStaTxError OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted error packets."
+    ::= { ruckusZDWLANStaEntry 24 }
+
+ruckusZDWLANStaVlanID OBJECT-TYPE
+    SYNTAX  INTEGER  ( 1..4094 )
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN ID of the station. 1 for not specified."
+    ::= { ruckusZDWLANStaEntry 30 }
+
+ruckusZDWLANStaAuthMode OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication mode of authenticated terminal."
+    ::= { ruckusZDWLANStaEntry 80 }
+
+ruckusZDWLANStaSignalStrength OBJECT-TYPE
+    SYNTAX  Integer32 
+    UNITS
+        "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Signal strength"
+    ::= { ruckusZDWLANStaEntry 81 }
+
+ruckusZDWiredStaTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWiredStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD Wired Station table."
+    ::= { ruckusZDWLANStaInfo 2 }
+
+ruckusZDWiredStaEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWiredStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD Wired Station entry."
+    INDEX {
+        ruckusZDWiredStaMacAddr }
+    ::= { ruckusZDWiredStaTable 1 }
+
+RuckusZDWiredStaEntry ::= SEQUENCE {
+  ruckusZDWiredStaMacAddr               MacAddress,
+  ruckusZDWiredStaAPMacAddr             MacAddress,
+  ruckusZDWiredStaIPAddr                IpAddress,
+  ruckusZDWiredStaIPV6Addr              OCTET STRING,
+  ruckusZDWiredStaVlanID                INTEGER,
+  ruckusZDWiredStaUserName              DisplayString,
+  ruckusZDWiredStaAuthState             INTEGER,
+  ruckusZDWiredStaAssocTime             TimeTicks,
+  ruckusZDWiredStaRxPkts                Counter32,
+  ruckusZDWiredStaRxBytes               Counter64,
+  ruckusZDWiredStaTxPkts                Counter32,
+  ruckusZDWiredStaTxBytes               Counter64,
+}
+
+ruckusZDWiredStaMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The station's MAC Address."
+    ::= { ruckusZDWiredStaEntry 1 }
+
+ruckusZDWiredStaAPMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The MAC address of the associated AP."
+    ::= { ruckusZDWiredStaEntry 3 }
+
+ruckusZDWiredStaIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP address."
+    ::= { ruckusZDWiredStaEntry 5 }
+
+ruckusZDWiredStaIPV6Addr OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(2..40))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IPV6 Address"
+    ::= { ruckusZDWiredStaEntry 6 }
+
+ruckusZDWiredStaVlanID OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VLAN ID of the station. 1 for not specified."
+    ::= { ruckusZDWiredStaEntry 8 }
+
+ruckusZDWiredStaUserName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Logined username of the client."
+    ::= { ruckusZDWiredStaEntry 9 }
+
+ruckusZDWiredStaAuthState OBJECT-TYPE
+    SYNTAX  INTEGER {Unauthorized(0), Authorized(1), Authorized-as-guest(2)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Authentication state of authenticated terminal."
+    ::= { ruckusZDWiredStaEntry 10 }
+
+ruckusZDWiredStaAssocTime OBJECT-TYPE
+    SYNTAX  TimeTicks 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The time client has been associated."
+    ::= { ruckusZDWiredStaEntry 11 }
+
+ruckusZDWiredStaRxPkts OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received packets."
+    ::= { ruckusZDWiredStaEntry 15 }
+
+ruckusZDWiredStaRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes."
+    ::= { ruckusZDWiredStaEntry 16 }
+
+ruckusZDWiredStaTxPkts OBJECT-TYPE
+    SYNTAX  Counter32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted packets."
+    ::= { ruckusZDWiredStaEntry 17 }
+
+ruckusZDWiredStaTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes."
+    ::= { ruckusZDWiredStaEntry 18 }
+
+ruckusZDWLANRogueInfo OBJECT IDENTIFIER    ::= { ruckusZDWLANObjects 4 }
+
+ruckusZDWLANRogueTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANRogueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN rogue device table."
+    ::= { ruckusZDWLANRogueInfo 1 }
+
+ruckusZDWLANRogueEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANRogueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN rogue device entry."
+    INDEX {
+        ruckusZDWLANRogueIndex }
+    ::= { ruckusZDWLANRogueTable 1 }
+
+RuckusZDWLANRogueEntry ::= SEQUENCE {
+  ruckusZDWLANRogueIndex             	InterfaceIndex,
+  ruckusZDWLANRogueMacAddr              MacAddress,
+  ruckusZDWLANRogueSSID                 RuckusSSID,
+  ruckusZDWLANRogueRadioType            INTEGER,
+  ruckusZDWLANRogueChannel              Unsigned32,
+  ruckusZDWLANRogueRSSI                 Integer32,
+  ruckusZDWLANRogueType                 INTEGER,
+  ruckusZDWLANRogueEncrypted            INTEGER,
+  ruckusZDWLANRogueSignalStrength       Integer32
+}
+
+ruckusZDWLANRogueIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index."
+    ::= { ruckusZDWLANRogueEntry 200 }
+
+ruckusZDWLANRogueMacAddr OBJECT-TYPE
+    SYNTAX  MacAddress 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Rogue device's MAC Address."
+    ::= { ruckusZDWLANRogueEntry 1 }
+
+ruckusZDWLANRogueSSID OBJECT-TYPE
+    SYNTAX  RuckusSSID 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID."
+    ::= { ruckusZDWLANRogueEntry 2 }
+
+ruckusZDWLANRogueRadioType OBJECT-TYPE
+    SYNTAX  INTEGER  { radio11bg (0), radio11a (1), radio11ng(2), radio11na(3), radio11ac(4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Radio type."
+    ::= { ruckusZDWLANRogueEntry 3 }
+
+ruckusZDWLANRogueChannel OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Radio channel."
+    ::= { ruckusZDWLANRogueEntry 4 }
+
+ruckusZDWLANRogueRSSI OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "RSSI."
+    ::= { ruckusZDWLANRogueEntry 5 }
+
+ruckusZDWLANRogueType OBJECT-TYPE
+    SYNTAX  INTEGER  { ap (0), ad-hoc (1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of the rogue device."
+    ::= { ruckusZDWLANRogueEntry 6 }
+
+ruckusZDWLANRogueEncrypted OBJECT-TYPE
+    SYNTAX  INTEGER  { open (0), encrypted (1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Encryption mode."
+    ::= { ruckusZDWLANRogueEntry 7 }
+
+ruckusZDWLANRogueSignalStrength OBJECT-TYPE
+    SYNTAX  Integer32 
+    UNITS
+        "dBm"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Signal strength"
+    ::= { ruckusZDWLANRogueEntry 11 }
+
+
+ruckusZDWLANVapTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANVapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN AP table per each WLAN."
+    ::= { ruckusZDWLANAPInfo 3 }
+
+ruckusZDWLANVapEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANVapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN vap entry."
+    INDEX {
+        ruckusZDWLANVapBSSID }
+    ::= { ruckusZDWLANVapTable 1 }
+
+RuckusZDWLANVapEntry ::= SEQUENCE {  
+  ruckusZDWLANVapBSSID                MacAddress,
+  ruckusZDWLANVapPAPAddr              MacAddress,
+  ruckusZDWLANVapSSID                 RuckusSSID,
+  ruckusZDWLANVapLanRxBytes           Counter64,
+  ruckusZDWLANVapLanTxBytes           Counter64,
+  ruckusZDWLANVapWlanRxBytes          Counter64,
+  ruckusZDWLANVapWlanTxBytes          Counter64,
+  ruckusZDWLANVapWlanRxErrorPkt       Counter64,
+  ruckusZDWLANVapWlanRxUnicastPkt     Counter64,
+  ruckusZDWLANVapWlanTxUnicastPkt     Counter64,
+  ruckusZDWLANVapWlanRxPkt            Counter64,
+  ruckusZDWLANVapWlanRxDropPkt        Counter64,
+  ruckusZDWLANVapWlanTxErrPkt         Counter64,
+  ruckusZDWLANVapWlanTxPkt            Counter64,
+  ruckusZDWLANVapWlanTxDropPkt        Counter64
+}
+
+ruckusZDWLANVapBSSID OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The VAP's BSSID ,it is a MAC Address."
+    ::= { ruckusZDWLANVapEntry 1 }
+
+ruckusZDWLANVapPAPAddr OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The MAC address of the Parent's AP."
+    ::= { ruckusZDWLANVapEntry 2 }
+
+ruckusZDWLANVapSSID OBJECT-TYPE
+    SYNTAX  RuckusSSID
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSID of VAP."
+    ::= { ruckusZDWLANVapEntry 3 }
+
+ruckusZDWLANVapLanRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes on LAN in VAP ."
+    ::= { ruckusZDWLANVapEntry 6 }
+
+ruckusZDWLANVapLanTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes on LAN in VAP."
+    ::= { ruckusZDWLANVapEntry 7 }
+
+ruckusZDWLANVapWlanRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received bytes on 	WLAN in VAP ."
+    ::= { ruckusZDWLANVapEntry 8 }
+
+ruckusZDWLANVapWlanTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted bytes on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 9 }
+    
+ruckusZDWLANVapWlanRxErrorPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Receiveed error packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 11 }
+
+ruckusZDWLANVapWlanRxUnicastPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Receiveed unicast packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 12 }
+
+ruckusZDWLANVapWlanTxUnicastPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted unicast packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 13 }
+
+ruckusZDWLANVapWlanRxPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 14 }
+
+ruckusZDWLANVapWlanRxDropPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Received dropped packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 15 }
+
+ruckusZDWLANVapWlanTxErrPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted error packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 16 }
+
+ruckusZDWLANVapWlanTxPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 17 }
+
+ruckusZDWLANVapWlanTxDropPkt OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Transmitted dropped packet on WLAN in VAP."
+    ::= { ruckusZDWLANVapEntry 18 }
+
+ruckusZDWLANIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN AP Interface table per each AP."
+    ::= { ruckusZDWLANAPInfo 4 }
+
+ruckusZDWLANIfEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN vap entry."
+    INDEX {
+        ruckusZDWLANAPMac,
+        ruckusZDWLANAPIfIndex }
+    ::= { ruckusZDWLANIfTable 1 }
+    
+RuckusZDWLANIfEntry ::= SEQUENCE {  
+  ruckusZDWLANAPMac                   MacAddress,
+  ruckusZDWLANAPIfIndex               InterfaceIndex,
+  ruckusZDWLANAPIfDescr               DisplayString,
+  ruckusZDWLANAPIfType                IANAifType,
+  ruckusZDWLANAPIfMtu                   Integer32,
+  ruckusZDWLANAPIfSpeed                 DisplayString,
+  ruckusZDWLANAPIfPhysAddress           DisplayString,
+  ruckusZDWLANAPIfAdminStatus           INTEGER,
+  ruckusZDWLANAPIfOperStatus            INTEGER,
+  ruckusZDWLANAPIfInOctets              Counter32,
+  ruckusZDWLANAPIfInUcastPkts           Counter32,
+  ruckusZDWLANAPIfInNUcastPkts          Counter32, 
+  ruckusZDWLANAPIfInDiscards            Counter32,
+  ruckusZDWLANAPIfInErrors              Counter32,
+  ruckusZDWLANAPIfInUnknownProtos       Counter32,
+  ruckusZDWLANAPIfOutOctets             Counter32,
+  ruckusZDWLANAPIfOutUcastPkts          Counter32,
+  ruckusZDWLANAPIfOutNUcastPkts         Counter32, 
+  ruckusZDWLANAPIfOutDiscards           Counter32,
+  ruckusZDWLANAPIfOutErrors             Counter32,
+  ruckusZDWLANAPIfName               DisplayString,  
+  ruckusZDWLANAPIfNameDefined        DisplayString
+}
+
+ruckusZDWLANAPMac OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The AP's Mac Address."
+    ::= { ruckusZDWLANIfEntry 1 }
+
+ruckusZDWLANAPIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index of Interface in AP ."
+    ::= { ruckusZDWLANIfEntry 2 }
+    
+ruckusZDWLANAPIfDescr  OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Description information for this interface."
+    ::= { ruckusZDWLANIfEntry 3 }
+   
+ruckusZDWLANAPIfType  OBJECT-TYPE
+    SYNTAX   IANAifType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of interface."
+    ::= { ruckusZDWLANIfEntry 4 }
+    
+ruckusZDWLANAPIfMtu   OBJECT-TYPE
+    SYNTAX   Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The size of the largest packet which can be sent/received."
+    ::= { ruckusZDWLANIfEntry 5 }
+      
+ruckusZDWLANAPIfSpeed  OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An estimate of the interface's current bandwidth in bits."
+    ::= { ruckusZDWLANIfEntry 6 }
+      
+ruckusZDWLANAPIfPhysAddress  OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface's mac address."
+    ::= { ruckusZDWLANIfEntry 7 }  
+    
+ruckusZDWLANAPIfAdminStatus   OBJECT-TYPE
+    SYNTAX   INTEGER{
+                up(1),       -- ready to pass packets
+                down(2),
+                testing(3)   -- in some test mode
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The desired state of the interface: up(1), down(2) ,testing(3) ."
+    ::= { ruckusZDWLANIfEntry 8 }  
+      
+ruckusZDWLANAPIfOperStatus   OBJECT-TYPE
+    SYNTAX   INTEGER{
+                up(1),        -- ready to pass packets
+                down(2),
+                testing(3),   -- in some test mode
+                unknown(4),   -- status can not be determined
+                              -- for some reason.
+                dormant(5),
+                notPresent(6),    -- some component is missing
+                lowerLayerDown(7) -- down due to state of
+                                  -- lower-layer interface(s)
+            }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current operational state of the interface:
+up(1), down(2), testing(3), unknown(4), dormant(5) , notPresent(6),  lowerLayerDown(7)."
+    ::= { ruckusZDWLANIfEntry 9 }  
+      
+ruckusZDWLANAPIfInOctets   OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets received on the interface."
+    ::= { ruckusZDWLANIfEntry 10 } 
+       
+ruckusZDWLANAPIfInUcastPkts  OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of unicast packets received on the interface."
+    ::= { ruckusZDWLANIfEntry 11 }  
+    
+ruckusZDWLANAPIfInNUcastPkts  OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of multicast and broadcast packets received on the interface."
+    ::= { ruckusZDWLANIfEntry 12 }  
+     
+ruckusZDWLANAPIfInDiscards  OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of inbound packets which were chosen to be discarded even though no errors had been detected ."
+    ::= { ruckusZDWLANIfEntry 13 }  
+    
+ruckusZDWLANAPIfInErrors   OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of inbound  packets that contained errors."
+    ::= { ruckusZDWLANIfEntry 14 }  
+    
+ruckusZDWLANAPIfInUnknownProtos  OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of packets received via the interface which were discarded because of  an unknown or unsupported protocol."
+    ::= { ruckusZDWLANIfEntry 15 }  
+    
+ruckusZDWLANAPIfOutOctets  OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of octets transmitted out of the interface."
+    ::= { ruckusZDWLANIfEntry 16 }  
+    
+ruckusZDWLANAPIfOutUcastPkts  OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of unicast packets transmitted out of the interface."
+    ::= { ruckusZDWLANIfEntry 17 }  
+    
+ruckusZDWLANAPIfOutNUcastPkts  OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total number of multicast and broadcast packets transmitted out of the interface."
+    ::= { ruckusZDWLANIfEntry 18 }  
+     
+ruckusZDWLANAPIfOutDiscards   OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound packets which were chosen to be discarded even though no errors had been detected."
+    ::= { ruckusZDWLANIfEntry 19 }  
+    
+ruckusZDWLANAPIfOutErrors   OBJECT-TYPE
+    SYNTAX   Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of outbound packets that could not be transmitted because of errors."
+    ::= { ruckusZDWLANIfEntry 20 }  
+    
+ruckusZDWLANAPIfName  OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of interface."
+    ::= { ruckusZDWLANIfEntry 21 }  
+      
+ruckusZDWLANAPIfNameDefined  OBJECT-TYPE
+    SYNTAX   DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The alias of interface."
+    ::= { ruckusZDWLANIfEntry 22 }  
+    
+ruckusZDWLANAPEthStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusZDWLANAPEthStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ZD WLAN AP Ethernet Interface status table per each AP."
+    ::= { ruckusZDWLANAPInfo 8 }
+
+ruckusZDWLANAPEthStatusEntry OBJECT-TYPE
+    SYNTAX  RuckusZDWLANAPEthStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each ZD WLAN AP ethernet interface status entry."
+    INDEX {
+        ruckusZDWLANAPMacAddress,
+        ruckusZDWLANAPEthPortId }
+    ::= { ruckusZDWLANAPEthStatusTable 1 }
+    
+RuckusZDWLANAPEthStatusEntry ::= SEQUENCE {  
+  ruckusZDWLANAPMacAddress                 MacAddress,
+  ruckusZDWLANAPEthPortId               INTEGER,
+  ruckusZDWLANAPEthIfname               OCTET STRING,
+  ruckusZDWLANAPEthDot1xStatus          INTEGER,
+  ruckusZDWLANAPEthLogicalStatus        INTEGER,
+  ruckusZDWLANAPEthPhyStatus            INTEGER,
+  ruckusZDWLANAPEthPhyIfSpeed           INTEGER,
+  ruckusZDWLANAPEthPhyLinkStatus        INTEGER,
+  ruckusZDWLANAPEthLabel                OCTET STRING  
+}
+
+ruckusZDWLANAPMacAddress OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The AP's Mac Address."
+    ::= { ruckusZDWLANAPEthStatusEntry 1 }
+    
+ruckusZDWLANAPEthPortId   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port id."
+    ::= { ruckusZDWLANAPEthStatusEntry 2 }
+    
+ruckusZDWLANAPEthIfname  OBJECT-TYPE
+    SYNTAX   OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of interface."
+    ::= { ruckusZDWLANAPEthStatusEntry 5 }  
+    
+ruckusZDWLANAPEthDot1xStatus   OBJECT-TYPE
+    SYNTAX   INTEGER {
+            auth(1),
+            supp(2),
+            none(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port Dot1xStatus."
+    ::= { ruckusZDWLANAPEthStatusEntry 6 }    
+
+ruckusZDWLANAPEthLogicalStatus   OBJECT-TYPE
+    SYNTAX   INTEGER {
+            up(1),
+            down(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port logical status."
+    ::= { ruckusZDWLANAPEthStatusEntry 7 }    
+    
+ruckusZDWLANAPEthPhyStatus   OBJECT-TYPE
+    SYNTAX   INTEGER {
+            up(1),
+            down(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port physical status."
+    ::= { ruckusZDWLANAPEthStatusEntry 8 }    
+    
+    
+ruckusZDWLANAPEthPhyIfSpeed   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet interface's current bandwidth in Mbits,."
+    ::= { ruckusZDWLANAPEthStatusEntry 9 }         
+
+ruckusZDWLANAPEthPhyLinkStatus   OBJECT-TYPE
+    SYNTAX   INTEGER {
+            full(1),
+            half(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port physical link status."
+    ::= { ruckusZDWLANAPEthStatusEntry 10 }  
+         
+ruckusZDWLANAPEthLabel  OBJECT-TYPE
+    SYNTAX   OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port label."
+    ::= { ruckusZDWLANAPEthStatusEntry 11 }  
+                    
+END

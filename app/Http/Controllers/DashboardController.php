@@ -1,0 +1,282 @@
+<?php
+
+/**
+ * DashboardController.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2022 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace App\Http\Controllers;
+
+use App\Facades\LibrenmsConfig;
+use App\Models\Dashboard;
+use App\Models\User;
+use App\Models\UserPref;
+use App\Models\UserWidget;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+
+class DashboardController extends Controller
+{
+    /** @var \Illuminate\Support\Collection<int, \App\Models\Dashboard> */
+    private $dashboards;
+
+    public function __construct()
+    {
+        $this->authorizeResource(Dashboard::class, 'dashboard');
+    }
+
+    /**
+     * @param  Request  $request
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function index(Request $request)
+    {
+        $this->authorize('viewAny', Dashboard::class);
+
+        $request->validate([
+            'dashboard' => 'integer',
+            'bare' => 'nullable|in:yes',
+        ]);
+
+        $user = $request->user();
+        $dashboards = $this->getAvailableDashboards($user);
+
+        // specific dashboard
+        if (! empty($request->dashboard) && $dashboards->has($request->dashboard)) {
+            return $this->show($request, $dashboards->get($request->dashboard));
+        }
+
+        // default dashboard
+        $user_default_dash = (int) UserPref::getPref($user, 'dashboard');
+        $global_default = (int) LibrenmsConfig::get('webui.default_dashboard_id');
+
+        // load user default
+        if ($dashboards->has($user_default_dash)) {
+            return $this->show($request, $dashboards->get($user_default_dash));
+        }
+
+        // load global default
+        if ($dashboards->has($global_default)) {
+            return $this->show($request, $dashboards->get($global_default));
+        }
+
+        // load users first dashboard
+        $user_first_dashboard = $dashboards->firstWhere('user_id', $user->user_id);
+        if ($user_first_dashboard) {
+            return $this->show($request, $user_first_dashboard);
+        }
+
+        // create a dashboard for this user
+        return $this->show($request, Dashboard::create([
+            'dashboard_name' => 'Default',
+            'user_id' => $user->user_id,
+        ]));
+    }
+
+    /**
+     * @param  Request  $request
+     * @param  Dashboard  $dashboard
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function show(Request $request, Dashboard $dashboard)
+    {
+        $this->authorize('view', $dashboard);
+
+        $request->validate([
+            'bare' => 'nullable|in:yes',
+        ]);
+
+        $user = Auth::user();
+
+        // Split dashboards into user owned or shared
+        $dashboards = $this->getAvailableDashboards($user);
+        [$user_dashboards, $shared_dashboards] = $dashboards->partition(fn ($dashboard) => $dashboard->user_id == $user->user_id);
+
+        $data = $dashboard->widgets;
+
+        if ($data->isEmpty()) {
+            $data = [
+                [
+                    'user_widget_id' => 0,
+                    'title' => 'Add a widget',
+                    'widget' => 'placeholder',
+                    'col' => 1,
+                    'row' => 1,
+                    'size_x' => 6,
+                    'size_y' => 2,
+                    'refresh' => 60,
+                ],
+            ];
+        }
+
+        $widgets = self::listWidgets();
+
+        $user_list = $user->can('viewAny', User::class)
+            ? User::where('user_id', '!=', $user->user_id)
+                ->orderBy('username')
+                ->pluck('username', 'user_id')
+            : [];
+
+        return view('overview.default', [
+            'bare' => $request->input('bare'),
+            'dash_config' => $data,
+            'dashboard' => $dashboard,
+            'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor'),
+            'user_dashboards' => $user_dashboards,
+            'shared_dashboards' => $shared_dashboards,
+            'widgets' => $widgets,
+            'user_list' => $user_list,
+        ]);
+    }
+
+    public function store(Request $request): JsonResponse
+    {
+        $this->authorize('create', Dashboard::class);
+
+        $this->validate($request, [
+            'dashboard_name' => 'string|max:255',
+        ]);
+
+        $name = trim(strip_tags((string) $request->input('dashboard_name')));
+        $dashboard = Dashboard::create([
+            'user_id' => Auth::id(),
+            'dashboard_name' => $name,
+            'access' => 0,
+        ]);
+
+        return new JsonResponse([
+            'status' => 'ok',
+            'message' => 'Dashboard ' . htmlentities($name) . ' created',
+            'dashboard_id' => $dashboard->dashboard_id,
+        ]);
+    }
+
+    public function update(Request $request, Dashboard $dashboard): JsonResponse
+    {
+        $this->authorize('update', $dashboard);
+
+        $validated = $this->validate($request, [
+            'dashboard_name' => 'string|max:255',
+            'access' => 'int|in:0,1,2,3',
+        ]);
+
+        $dashboard->fill($validated);
+        $dashboard->save();
+
+        return new JsonResponse([
+            'status' => 'ok',
+            'message' => 'Dashboard ' . htmlentities($dashboard->dashboard_name) . ' updated',
+        ]);
+    }
+
+    public function destroy(Dashboard $dashboard): JsonResponse
+    {
+        $this->authorize('delete', $dashboard);
+
+        $dashboard->widgets()->delete();
+        $dashboard->delete();
+
+        return new JsonResponse([
+            'status' => 'ok',
+            'message' => 'Dashboard deleted',
+        ]);
+    }
+
+    public function copy(Request $request, Dashboard $dashboard): JsonResponse
+    {
+        $this->authorize('copy', $dashboard);
+
+        $this->validate($request, [
+            'target_user_id' => 'required|exists:App\Models\User,user_id',
+        ]);
+
+        $target_user_id = $request->input('target_user_id');
+
+        $this->authorize('copy', [$dashboard, $target_user_id]);
+
+        $dashboard_copy = $dashboard->replicate()->fill([
+            'user_id' => $target_user_id,
+            'dashboard_name' => $dashboard->dashboard_name . '_' . Auth::user()->username,
+        ]);
+
+        if ($dashboard_copy->save()) {
+            // copy widgets
+            $dashboard->widgets->each(function (UserWidget $widget) use ($dashboard_copy, $target_user_id): void {
+                $dashboard_copy->widgets()->save($widget->replicate()->fill([
+                    'user_id' => $target_user_id,
+                ]));
+            });
+
+            return response()->json([
+                'status' => 'ok',
+                'message' => 'Dashboard copied',
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'ERROR: Could not copy Dashboard',
+        ]);
+    }
+
+    /**
+     * @return Collection<string, string> widget name, widget localized title
+     */
+    public static function listWidgets(): Collection
+    {
+        return collect(Route::getRoutes())->filter(function (\Illuminate\Routing\Route $route) {
+            if (str_ends_with($route->uri, 'placeholder')) {
+                return false;
+            }
+
+            return $route->getPrefix() === 'ajax/dash';
+        })->mapWithKeys(function (\Illuminate\Routing\Route $route) {
+            $widget = Str::afterLast($route->uri, '/');
+            $title = $widget; // default to path for title
+
+            $controller = $route->getController();
+            if (method_exists($controller, 'getTitle')) {
+                $title = $controller->getTitle();
+            }
+
+            return [$widget => $title];
+        })->sort();
+    }
+
+    /**
+     * @param  User  $user
+     * @return \Illuminate\Support\Collection<int, \App\Models\Dashboard>
+     */
+    private function getAvailableDashboards(User $user): Collection
+    {
+        if ($this->dashboards === null) {
+            $this->dashboards = Dashboard::hasAccess($user)->with('user:user_id,username')
+                ->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
+        }
+
+        return $this->dashboards;
+    }
+}

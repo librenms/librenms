@@ -1,0 +1,1491 @@
+DELL-SNMP-UPS-MIB DEFINITIONS ::= BEGIN
+
+-- Title:       UPS MIB
+-- Date:        August 8th, 2013
+-- Author:      Eaton - R&D Communication
+-- Release:     01.04.0002
+-- NMC Firmware compatibility:     01.18.000x
+
+IMPORTS
+        enterprises
+                FROM RFC1155-SMI
+        TimeStamp, DisplayString
+                FROM SNMPv2-TC        
+        OBJECT-TYPE
+                FROM RFC-1212
+        TRAP-TYPE
+                FROM RFC-1215;
+
+----
+-- Path to the root
+----
+dell        OBJECT IDENTIFIER ::= { enterprises 674 }
+upsdell     OBJECT IDENTIFIER ::= { dell 10902 }
+hardware    OBJECT IDENTIFIER ::= { upsdell 2 }
+
+
+
+-- Groups of the MIB
+productID       OBJECT IDENTIFIER ::= { hardware 100 }
+productStatus   OBJECT IDENTIFIER ::= { hardware 110 }
+physical        OBJECT IDENTIFIER ::= { hardware 120 }
+logical         OBJECT IDENTIFIER ::= { hardware 130 }
+traps           OBJECT IDENTIFIER ::= { hardware 140 }
+
+-- Groups of the Physical group
+physicalIdent       OBJECT IDENTIFIER ::= { physical 1 }
+physicalOutput      OBJECT IDENTIFIER ::= { physical 2 }
+physicalRectifier   OBJECT IDENTIFIER ::= { physical 3 }
+physicalUPS         OBJECT IDENTIFIER ::= { physical 4 }
+physicalBattery     OBJECT IDENTIFIER ::= { physical 5 }
+physicalLoadSegment OBJECT IDENTIFIER ::= { physical 6 }
+physicalEnvironment OBJECT IDENTIFIER ::= { physical 7 }
+
+----
+-- Definition of object types
+----
+
+--------------------------
+-- the productID group --
+--------------------------
+
+productIDDisplayName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Name of this product for display purposes."
+        ::= { productID 1 }
+
+productIDDescription OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "A short description of this product."
+        ::= { productID 2 }
+
+productIDVendor OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The name of the product manufacturer."
+        ::= { productID 3 }
+
+productIDVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The version of this product."
+        ::= { productID 4 }
+
+productIDBuildNumber OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The software build number of the product populating the MIB."
+        ::= { productID 5 }
+        
+productIDURL OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The URL of the web-based application to manage this device, should the device provide one."
+        ::= { productID 6 }
+        
+productIDDeviceNetworkName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Operating system specific computer name if product SNMP service is hosted."
+        ::= { productID 7 }
+                        
+--------------------------
+-- the productStatus group --
+--------------------------
+
+productStatusGlobalStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                other(1),
+                unknown(2),
+                ok(3),
+                non-critical(4),
+                critical(5),
+                non-recoverable(6)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Current status of the product.
+                This is a rollup for the entire product including any 
+                monitored devices. The status is intended to give 
+                initiative to an SNMP monitor to get further data when 
+                this status is abnormal."
+        ::= { productStatus 1 }
+
+productStatusLastGlobalStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The status before the current status which induced an initiative 
+                to issue a global status change trap."
+        ::= { productStatus 2 }
+
+productStatusTimeStamp OBJECT-TYPE
+        SYNTAX TimeStamp
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The last time that the SNMP table geometries changed and/or 
+                attribute data was significantly updated.  This is to be used by 
+                management applications to trigger a refresh of data acquired 
+                from the MIB."
+        ::= { productStatus 3 }
+        
+productStatusGetTimeOut OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+                "Suggested time out value in milliseconds for how long the SNMP getter
+                should wait while attempting to poll the product SNMP service."
+        ::= { productStatus 4 }
+        
+productStatusRefreshRate OBJECT-TYPE
+        SYNTAX INTEGER
+
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+                "Rate in seconds at which the SNMP service cached data is being updated."
+        ::= { productStatus 5 }
+
+productStatusGeneratingTrapFlag OBJECT-TYPE
+        SYNTAX INTEGER {
+                true(1),
+                false(2),
+                disabled(3)
+        }
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+                "Indicates if this SNMP sub-agent is capable of and/or is generating SNMP Traps. 
+                This variable can take the following values:
+                1 True, this service is capable of sending traps and is the originator of SNMP 
+                  traps generated for the devices represented in this MIB and is currently generating traps.
+                2 False, this service not capable of sending traps and is not the originator of 
+                  any SNMP traps generated for the devices represented in this MIB.
+                3 Disabled, this service is capable of sending traps and is the originator of SNMP 
+                  traps for the devices represented in this MIB, but traps are currently disabled."
+        ::= { productStatus 6 }
+                                                
+--------------------------
+-- the Physical group --
+--------------------------
+
+-- physicalIdent group
+
+physicalIdentFamilyName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "UPS Family name."
+        ::= { physicalIdent 1 }
+
+physicalIdentSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "UPS Serial number."
+        ::= { physicalIdent 2 }
+
+physicalIdentConverterType OBJECT-TYPE
+        SYNTAX INTEGER {
+                lineInteractive(1),
+                onLine(2),
+                onLineUnitaryParallel(3),
+                onLineParallelWithNS(4),
+                onLineHotStandbyRedundancy(5)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "UPS type."
+        ::= { physicalIdent 3 }
+
+physicalIdentReferenceNumber OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Technical Reference of UPS firmware."
+        ::= { physicalIdent 4 }
+
+-- physicalOutput group
+        
+physicalOutputInstantHeadroom OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "This is the present amount of watt capacity remaining before overload."
+        ::= { physicalOutput 1 }
+        
+physicalOutputPeakHeadroom OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Statistical value holding the lowest value that Instantaneous Headroom 
+                Watts was ever set too since the last time this statistic was reset."
+        ::= { physicalOutput 2 }
+        
+physicalOutputPeakHeadroomTimestamp OBJECT-TYPE
+        SYNTAX TimeStamp
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Time and date stamp of the last time the Peak Headroom Watts value was updated."
+        ::= { physicalOutput 3 }
+        
+physicalOutputPeakConsumption OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Statistical value of the maximum RMS Watts the UPS has seen since 
+                the last time this statistic was reset."
+        ::= { physicalOutput 4 }
+        
+physicalOutputPeakConsumptionTimestamp OBJECT-TYPE
+        SYNTAX TimeStamp
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Time and date stamp of the last time the Peak Consumption Watts value was updated."
+        ::= { physicalOutput 5 }
+        
+physicalOutputPresentConsumption OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Derived by averaging the watt second consumption over the past hour. 
+                Use an array of 60 words to store the average watt seconds consumed over 
+                the last minute then after you have a full hours worth of data in the 60 
+                word array, average those values to get your Present KWH Consumption meter. 
+                Then every minute after that update the oldest value in the array, average 
+                again and update the meter. 
+                Value is 0 until the minimum 1 hour of data has been accumulated."
+        ::= { physicalOutput 6 }
+        
+physicalOutputCumulativeConsumption OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "64 bit meter value that is derived by reading the Present KWH Consumption meter 
+                once per hour and adding it to the last value of this meter. Value accumulates 
+                until it is reset from the LCD or via the SHUT protocol or the meter rolls over."
+        ::= { physicalOutput 7 }
+        
+physicalOutputCumulativeConsumptionTimestamp OBJECT-TYPE
+        SYNTAX TimeStamp
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Time and date stamp of last time this meter value was reset."
+        ::= { physicalOutput 8 }                                                        
+
+physicalOutputVA OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Output VA."
+        ::= { physicalOutput 9 }
+
+
+-- physicalRectifier group
+
+physicalRectifierPosVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "DC bus positive voltage."
+        ::= { physicalRectifier 1 }
+
+physicalRectifierNegVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "DC bus negative  voltage."
+        ::= { physicalRectifier 2 }
+
+
+-- physicalUPS group
+        
+physicalUPSDateTime OBJECT-TYPE
+        SYNTAX TimeStamp
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Real Time Clock with Date and Time."
+        ::= { physicalUPS 1 }
+
+physicalUPSAlarmsStatus OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "List of traps that are in active mode. This list is coded in ASCI format
+                and each trap number is separated by a coma (ex: 1,5,23,77). Only odd traps
+                are listed."
+        ::= { physicalUPS 2 }
+
+physicalUPSRuntimeToShutdown OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Number of seconds remaining until UPS will receive a ShutdownAfterDelay command.
+                2147483647 if no countdown is in effect."
+        ::= { physicalUPS 3 }
+        
+physicalUPSOutpoutSwitchable OBJECT-TYPE
+        SYNTAX INTEGER {
+                switchable(1),
+                notSwitchable(2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Parameter to enable or not remote UPS commands coming from all communication ports."
+        ::= { physicalUPS 4 }
+
+                
+-- physicalBattery group
+
+physicalBatteryABMStatus OBJECT-TYPE
+        SYNTAX INTEGER {                
+                abmCharging(1),
+                abmDischarging(2),
+                abmFloating(3),
+                abmResting(4),
+                abmOff(5)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Advanced Battery Monitoring satus."
+        ::= { physicalBattery 1 }
+
+physicalBatteryTestStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                donePassed(1),
+                doneWarning(2),
+                doneError(3),
+                aborted(4),
+                inProgress(5),
+                noTestIniated(6),
+                testScheduled(7)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery test satus."
+        ::= { physicalBattery 2 }
+
+physicalBatterySecondsRemaining OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Battery remaining time calculated by the autonometer."
+        ::= { physicalBattery 3 }
+
+
+-- physicalLoadSegment group
+
+physicalLoadSegment1ShutdownAfterDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Number of seconds remaining until load segment 1 will switch off.
+                 -1 if no shutdown countdown is in effect."
+        ::= { physicalLoadSegment 1 }
+
+physicalLoadSegment1StartupAfterDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Number of seconds remaining until load segment 1 will switch on.
+                 -1 if no startup countdown is in effect."
+        ::= { physicalLoadSegment 2 }
+        
+physicalLoadSegment2ShutdownAfterDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Number of seconds remaining until load segment 2 will switch off.
+                 -1 if no shutdown countdown is in effect."
+        ::= { physicalLoadSegment 3 }
+
+physicalLoadSegment2StartupAfterDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Number of seconds remaining until load segment 2 will switch on.
+                 -1 if no startup countdown is in effect."
+        ::= { physicalLoadSegment 4 }
+
+physicalLoadSegment1RuntimeToShutdown OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Number of seconds remaining until load segment 1 will receive a 
+                ShutdownAfterDelay command. 2147483647 if no countdown is in effect."
+        ::= { physicalLoadSegment 5 }
+
+physicalLoadSegment2RuntimeToShutdown OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Number of seconds remaining until load segment 2 will receive a 
+                ShutdownAfterDelay command. 2147483647 if no countdown is in effect."
+        ::= { physicalLoadSegment 6 }        
+
+-- physicalEnvironment group
+
+physicalEnvironmentSensorPresent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Informations, if there is Environment Measurement Probe connected."
+        ::= { physicalEnvironment 1 }
+
+physicalEnvironmentSensorName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..59))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "User name of EMP."
+        ::= { physicalEnvironment 2 }
+
+physicalEnvironmentValues OBJECT IDENTIFIER ::= { physicalEnvironment 3 }
+
+physicalEnvironmentValuesTemperatureUnit OBJECT-TYPE
+        SYNTAX INTEGER {
+                celsius(1),
+                fahrenheit(2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature unit setting."
+        ::= { physicalEnvironmentValues 1 }
+
+physicalEnvironmentValuesTemperature OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Current temperature value in 0.1 degree Celsius."
+        ::= { physicalEnvironmentValues 2 }
+
+physicalEnvironmentValuesHumidity OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Current humidity value in 0.1 percents."
+        ::= { physicalEnvironmentValues 3 }
+
+physicalEnvironmentValuesTemperatureLow OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature low threshhold in units of degree Celsius."
+        ::= { physicalEnvironmentValues 4 }
+
+physicalEnvironmentValuesTemperatureHigh OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature high threshhold in units of degree Celsius."
+        ::= { physicalEnvironmentValues 5 }
+
+physicalEnvironmentValuesTemperatureHysteresis OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Temperature hysteresis in units of degree Celsius."
+        ::= { physicalEnvironmentValues 6 }
+
+physicalEnvironmentValueshHumidityLow OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Humidity low threshhold in percents."
+        ::= { physicalEnvironmentValues 7 }
+
+physicalEnvironmentValuesHumidityHigh OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Humidity high threshhold in percents."
+        ::= { physicalEnvironmentValues 8 }
+
+physicalEnvironmentValuesHumidityHysteresis OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Humidity hysteresis in percents."
+        ::= { physicalEnvironmentValues 9 }
+
+physicalEnvironmentInputTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PhysicalEnvironmentInputEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The table containins dry contact inputs information."
+        ::= { physicalEnvironment 4 }
+        
+physicalEnvironmentInputEntry OBJECT-TYPE
+        SYNTAX PhysicalEnvironmentInputEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The description of an entry in the table."
+        INDEX   { physicalEnvironmentInputIndex }
+        ::= { physicalEnvironmentInputTable 1 }
+
+
+PhysicalEnvironmentInputEntry ::= SEQUENCE { -- ASN.1 type definition
+        physicalEnvironmentInputIndex INTEGER,
+        physicalEnvironmentInputName DisplayString,
+        physicalEnvironmentInputState INTEGER,
+        physicalEnvironmentInputOpenedState DisplayString,
+        physicalEnvironmentInputClosedState DisplayString
+        }
+
+physicalEnvironmentInputIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..1)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input index, ranging from 1 to 2."
+        ::= { physicalEnvironmentInputEntry 1 }
+                        
+physicalEnvironmentInputName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..27))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input user-friendly name."
+        ::= { physicalEnvironmentInputEntry 2 }
+
+physicalEnvironmentInputState OBJECT-TYPE
+        SYNTAX INTEGER {
+                opened(1),
+                closed(2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "Current state of input."
+        ::= { physicalEnvironmentInputEntry 3 }
+                        
+physicalEnvironmentInputOpenedState OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..21))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input opened state user-friendly name."
+        ::= { physicalEnvironmentInputEntry 4 }
+
+physicalEnvironmentInputClosedState OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(0..21))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input closed state user-friendly name."
+        ::= { physicalEnvironmentInputEntry 5 }
+
+                                                                                                                                        
+--------------------------
+-- the Logical group --
+--------------------------
+
+
+--------------------------
+-- the Traps group --
+--------------------------
+
+-- This group defines objects and traps, so that for each trap, simple
+-- get request on related objects (one or many) allow to confirm actual
+-- status of the trap.
+
+-- TRAPS NOTIFICATIONS
+
+trapInverterOverVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter AC over voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "The Inverter AC Voltage has exceeded the 'Over Voltage Threshold' value."
+::= 1
+
+trapInverterOverVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter AC over voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "The Inverter AC Voltage is no longer over the 'Over Voltage Threshold' value."
+::= 2
+
+trapInverterUnderVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter AC under voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Inverter AC Voltage has fallen below the 'Under Voltage Threshold' value."
+::= 3
+
+trapInverterUnderVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter AC under voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Inverter AC Voltage is no longer below the 'Under Voltage Threshold' value."
+::= 4
+
+trapBypassFrequencyOutOfRange TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Bypass under or over frequency."
+        --#SEVERITY WARNING
+        --#SUMMARY "UPS Bypass Frequency has gone out of Range."
+::= 5
+
+trapBypassFrequencyOutOfRangeOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Bypass under or over frequency ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS Bypass Frequency is no longer out of Range."
+::= 6
+
+trapOnBuck TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "On Buck / Input Voltage Reducer."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "On Buck / Input Voltage Reducer."
+::= 7
+
+trapReturnFromBuck TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Return from Buck."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "The UPS has returned from Buck."
+::= 8
+
+trapOnBoost TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "On Boost / Input Voltage Booster."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "On Boost / Input Voltage Booster."
+::= 9
+
+trapReturnFromBoost TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Return from Boost."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "The UPS has returned from Boost."
+::= 10
+
+trapInputOverVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input AC over voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Input AC Voltage to the UPS has exceeded the 'Over Voltage Threshold' value."
+::= 11
+
+trapInputOverVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input AC over voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Input AC Voltage to the UPS no longer above the 'Over Voltage Threshold' value."
+::= 12
+
+trapInputUnderVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input AC under voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Input AC Voltage to the UPS has fallen below 'Input Low Voltage Threshold' value."
+::= 13
+
+trapInputUnderVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input AC under voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Input AC Voltage to the UPS is no longer below the 'Under Voltage Threshold' value."
+::= 14
+
+trapInputFrequencyOutOfRange TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input under or over frequency."
+        --#SEVERITY WARNING
+        --#SUMMARY "Input Frequency to UPS has fallen out of Range."
+::= 15
+
+trapInputFrequencyOutOfRangeOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input under or over frequency ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Input Frequency to UPS is no longer out of Range."
+::= 16
+
+trapRemoteEmergencyPowerOff TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Remote emergency power off."
+        --#SEVERITY WARNING
+        --#SUMMARY "Remote emergency power off."
+::= 17
+
+trapReturnFromEmergencyPowerOff TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Return from remote emergency power off."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Return from remote emergency power off."
+::= 18
+
+trapLevel1Overload TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Output Level 1 overload."
+        --#SEVERITY WARNING
+        --#SUMMARY "UPS Output has exceeded the 'OverLoad Level 1 Threshold' value."
+::= 19
+
+trapLevel1OverloadOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Output Level 1 overload ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS Output is no longer above the 'Overload Level 1 threshold' value."
+::= 20
+
+trapLevel2Overload TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Level 2 overload."
+        --#SEVERITY WARNING
+        --#SUMMARY "UPS Output has exceeded the 'OverLoad Level 2 Threshold' value."
+::= 21
+
+trapLevel2OverloadOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Level 2 overload ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS Output is no longer above the 'Overload Level 2 threshold' value."
+::= 22
+
+trapLevel3Overload TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Level 3 overload."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "UPS Output has exceeded the 'OverLoad Level 3 Threshold' value."
+::= 23
+
+trapLevel3OverloadOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Level 3 overload ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS Output is no longer above the 'Overload Level 3 threshold' value."
+::= 24
+
+trapPosDCLinkOverVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Positive DC link over voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Positive DC link voltage has exceeded the 'Over Voltage Threshold' value."
+::= 25
+
+trapPosDCLinkOverVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Positive DC link over voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Positive DC link Voltage is no longer above the "Over Voltage Threshold" value."
+::= 26
+
+trapPosDCLinkUnderVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Positive DC link under voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Positive DC Link Voltage has fallen below 'Low Voltage Threshold' value."
+::= 27
+
+trapPosDCLinkUnderVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Positive DC link under voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Positive DC link Voltage is no longer below the 'Under Voltage Threshold' value."
+::= 28
+
+trapNegDCLinkOverVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Negative DC link over voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Negative DC link Voltage has exceeded the 'Over Voltage Threshold' value."
+::= 29
+
+trapNegDCLinkOverVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Negative DC link over voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Negative DC link over voltage is no longer above the 'Over Voltage Threshold' value."
+::= 30
+
+trapNegDCLinkUnderVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Negative DC link under voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Negative DC link Voltage has fallen below 'Low Voltage Threshold' value."
+::= 31
+
+trapNegDCLinkUnderVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Negative DC link under voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Negative DC link Voltage is no longer below the 'Under Voltage Threshold' value."
+::= 32
+
+trapRectifierFault TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Rectifier fault."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "Rectifier fault has occured."
+::= 33
+
+trapRectifierOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Rectifier ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Rectifier is functioning normally."
+::= 34
+
+trapInverterFault TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter fault."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "There is an Inverter fault."
+::= 35
+
+trapInverterOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Inverter is functioning normally."
+::= 36
+
+trapChargerFailure TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Charger failure."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "Charger failure has occured."
+::= 37
+
+trapChargerOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Charger ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Charger is functioning normally."
+::= 38
+
+trapEepromFailure TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "EEPROM failure."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "EEPROM failure has occured."
+::= 39
+
+trapEepromOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "EEPROM off."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "EEPROM is turned off."
+::= 40
+
+trapShutdownImminent TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Shutdown imminent."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "The UPS Shutdown is imminent."
+::= 41
+
+trapShutdownImminentOver TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Shutdown imminent over."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "The imminient UPS Shutdown is no longer present."
+::= 42
+
+trapBatteryLow TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Battery low."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "UPS battery remaining capacity has fallen below the 'Low Remaining Capacity Threshold' value."
+::= 43
+
+trapBatteryOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Battery ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS battery remaining capacity is no longer below the 'Under Remaining Capacity Threshold' value."
+::= 44
+
+trapOutputShortCircuit TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Output short circuit."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "Output short circuit."
+::= 45
+
+trapOutputReturnFromShortCircuit TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Output return from short circuit."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Output return from short circuit."
+::= 46
+
+trapUtilityNotPresent TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Utility not present."
+        --#SEVERITY WARNING
+        --#SUMMARY "Utility is not present."
+::= 47
+
+trapUtilityPresent TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Utility present."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Utility is present."
+::= 48
+
+trapBatteryOverVoltage TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Battery DC over voltage."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "Battery DC Voltage has exceeded the 'Over Voltage Threshold' value."
+::= 49
+
+trapBatteryOverVoltageOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Battery DC over voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Battery DC Voltage is no longer above the 'Over Voltage Threshold' value."
+::= 50
+
+trapHeatsinkOvertemperature TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Heatsink overtemperature."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "UPS temperature has exceeded the 'Over Temperature Threshold' value."
+::= 51
+
+trapHeatsinkOvertemperatureOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Heatsink overtemperature ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS temperature is no longer above the 'Over Temperature Threshold' value."
+::= 52
+
+trapBypassNotAvailable TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Bypass not available."
+        --#SEVERITY WARNING
+        --#SUMMARY "Bypass is not available."
+::= 53
+
+trapBypassNotAvailableOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Bypass not available ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Bypass is now available."
+::= 54
+
+trapOnManualBypass TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "On manual/ maintenance bypass."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "On manual/ maintenance bypass."
+::= 55
+
+trapUPSOnBattery TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS on battery."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY  "UPS on battery."
+::= 57
+
+trapUPSReturnFromBattery TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS return from battery."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS return from battery."
+::= 58
+
+trapUPSOnBypass TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS on bypass."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS on bypass."
+::= 59
+
+trapUPSReturnFromBypass TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS return from bypass."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS return from bypass."
+::= 60
+
+trapBatteryTestInProgress TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Battery manual or automatic test in progress."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Battery manual or automatic test in progress."
+::= 61
+
+trapBatteryTestDone TRAP-TYPE
+        ENTERPRISE traps
+        VARIABLES { physicalBatteryTestStatus }                
+        DESCRIPTION
+                "Battery test done."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Battery test done, battery status is: %d."
+        --#ARGUMENTS {0}
+::= 62
+
+trapBatteryNeedReplacement TRAP-TYPE
+        ENTERPRISE traps                
+        DESCRIPTION
+                "Battery test failed, battery needs to be replaced."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "Battery test failed, battery needs to be replaced."
+::= 63
+
+trapBatteryReplacementDone TRAP-TYPE
+        ENTERPRISE traps             
+        DESCRIPTION
+                "Battery replacement done."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Battery replacement is done."
+::= 64
+
+trapFanFailure TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Fan failure."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "UPS Fan has failed."
+::= 65
+
+trapFanOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Fan ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS Fan is working normally."
+::= 66
+
+trapSiteWiringFault TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Site wiring fault."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "There is a fault in Site Wiring."
+::= 67
+
+trapSiteWiringOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Site wiring ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "No fault found in Site Wiring."
+::= 68
+
+trapBatteryDisconnected TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Batteries disconnected."
+        --#SEVERITY CRITICAL
+        --#SUMMARY "Batteries have been disconnected from the UPS."
+::= 69
+
+trapBatteryConnected TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Batteries connected."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Batteries have been connected to UPS."
+::= 70
+
+trapUPSOff TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS off."
+        --#SEVERITY WARNING
+        --#SUMMARY "UPS has been turned Off."
+::= 71
+
+trapUPSOn TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS on."
+        --#SEVERITY WARNING
+        --#SUMMARY "UPS has been turned On."
+::= 72
+
+trapDCLinkImbalance TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "DC link imbalance."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS has a DC link imbalance."
+::= 73
+
+trapDCLinkImbalanceOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "DC link imbalance ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS no longer has a DC link imbalance."
+::= 74
+
+trapABMOn TRAP-TYPE
+        ENTERPRISE traps
+        VARIABLES { physicalBatteryABMStatus }
+        DESCRIPTION
+                "ABM state on."
+        --#SEVERITY WARNING
+        --#SUMMARY "ABM is POWERED ON, battery state is : %d"
+        --#ARGUMENTS {0}
+::= 79
+
+trapABMOff TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "ABM state off."
+        --#SEVERITY WARNING
+        --#SUMMARY "ABM state is POWERED OFF."
+::= 80
+
+trapLoadSegment1Off TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Load segment 1 off."
+        --#SEVERITY WARNING
+        --#SUMMARY "Load segment 1 is Switched Off."
+::= 81
+
+trapLoadSegment1On TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Load segment 1 on."
+        --#SEVERITY WARNING
+        --#SUMMARY "Load segment 1 is Switched On."
+::= 82
+
+trapLoadSegment2Off TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Load segment 2 off."
+        --#SEVERITY WARNING
+        --#SUMMARY "Load segment 2 is Switched Off."
+::= 83
+
+trapLoadSegment2On TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Load segment 2 on."
+        --#SEVERITY WARNING
+        --#SUMMARY "Load segment 2 is Switched On."
+::= 84
+
+trapInHighEfficiencyMode TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "In High Efficiency mode."
+        --#SEVERITY WARNING
+        --#SUMMARY "UPS is running in High Efficiency mode."
+::= 85
+
+trapReturnFromHighEfficiencyMode TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Return from High Efficiency mode."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS is no longer running in High Efficiency mode."
+::= 86
+
+trapRectifierOverload TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Rectifier input over current."
+        --#SEVERITY WARNING
+        --#SUMMARY "Rectifier Input Current has exceeded the 'Input Current Threshold' value."
+::= 87
+
+trapRectifierOverloadOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Rectifier current ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Rectifier current is no longer over 'Input Current Threshold' value."
+::= 88
+
+trapInverterOverload TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter output over current."
+        --#SEVERITY WARNING
+        --#SUMMARY "Inverter Output Current has exceeded the 'Over Load Threshold' value."
+::= 89
+
+trapInverterOverloadOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Inverter output current ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Inverter Output Current is no longer over 'Ouput Current Threshold' value."
+::= 90
+
+trapBypassVoltageOutOfRange TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Bypass AC under or over voltage."
+        --#SEVERITY WARNING
+        --#SUMMARY "Bypass AC Voltage has gone out of Normal Range."
+::= 91
+
+trapBypassVoltageOutOfRangeOk TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Bypass AC under or over voltage ok."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Bypass AC Voltage has returned back to Normal Range."
+::= 92
+
+trapServiceBattery TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Service battery."
+        --#SEVERITY WARNING
+        --#SUMMARY "UPS battery needs to be serviced."
+::= 93
+
+trapToBypassCommand TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS received command to switch on bypass."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS received command to switch on bypass."
+::= 94
+
+trapFromBypassCommand TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "UPS received command to switch on inverter."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "UPS received command to switch from bypass to inverter."
+::= 95
+
+trapCommunicationLost TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Lost communication with UPS, HID databasis is not updated."
+        --#SEVERITY WARNING
+        --#SUMMARY "UMC lost communication with UPS, HID databasis is not updated."
+::= 96
+
+trapCommunicationRestored TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Communication restored with UPS, HID databasis is updated."
+        --#SEVERITY INFORMATIONAL
+        --#SUMMARY "Communication restored with UPS."
+::= 97
+
+-- 01.04.0001 Release on 2011/07/28 : Traps 98 to 111 added for the environment sensor.
+
+trapEnvironComFailure TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Environment Probe communication failure."
+       --#SEVERITY WARNING
+       --#SUMMARY "Environment Probe communication failure."
+::= 98
+
+trapEnvironComOK TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Environment Probe communication restored."
+       --#SEVERITY INFORMATIONAL
+       --#SUMMARY "Environment Probe communication restored."
+::= 99
+
+trapEnvironTemperatureLow TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Temperature is below low threshold."
+       --#SEVERITY WARNING
+       --#SUMMARY "Temperature is below low threshold."
+::= 100
+
+trapEnvironTemperatureHigh TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Temperature is above high threshold."
+       --#SEVERITY WARNING
+       --#SUMMARY "Temperature is above high threshold."
+::= 102
+
+trapEnvironTemperatureOK TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Temperature is in normal range."
+       --#SEVERITY INFORMATIONAL
+       --#SUMMARY "Temperature is in normal range."
+::= 103
+
+trapEnvironHumidityLow TRAP-TYPE
+       ENTERPRISE traps
+       DESCRIPTION
+                "Humidity is below low threshold."
+       --#SEVERITY WARNING
+       --#SUMMARY "Humidity is below low threshold."
+::= 104
+
+trapEnvironHumidityHigh TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Humidity is above high threshold."
+       --#SEVERITY WARNING
+       --#SUMMARY "Humidity is above high threshold."
+::= 106
+
+trapEnvironHumidityOK TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Humidity is in normal range."
+       --#SEVERITY INFORMATIONAL
+       --#SUMMARY "Humidity is in normal range."
+::= 107
+
+trapEnvironInput1Closed TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input #1 is Closed."
+       --#SEVERITY INFORMATIONAL
+       --#SUMMARY "Input #1 is Closed."
+::= 108
+
+trapEnvironInput1Open TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input #1 is Open."
+       --#SEVERITY INFORMATIONAL
+       --#SUMMARY "Input #1 is Open."
+::= 109
+
+trapEnvironInput2Closed TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input #2 is Closed."
+       --#SEVERITY INFORMATIONAL
+       --#SUMMARY "Input #2 is Closed."
+::= 110
+
+trapEnvironInput2Open TRAP-TYPE
+        ENTERPRISE traps
+        DESCRIPTION
+                "Input #2 is Open."
+       --#SEVERITY INFORMATIONAL
+       --#SUMMARY "Input #2 is Open."
+::= 111
+END

@@ -1,0 +1,417 @@
+
+-- *****************************************************************************
+-- Juniper-ES2-Registry
+--
+-- Juniper Networks enterprise SNMP MIB.
+--   Registry for the second generation E-series edge router product entities.
+--
+-- Copyright (c) 2003-2008 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-ES2-Registry  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    juniAdmin
+        FROM Juniper-Registry;
+
+juniES2Registry  MODULE-IDENTITY
+    LAST-UPDATED "200805081148Z"  -- 08-May-08 07:48 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "Juniper second generation E-series product family system-specific
+        object identification values.  This module defines AutonomousType (OID)
+        values for all the physical entity types (entPhysicalVendorType).  This
+        module will be updated whenever a new type of module or other hardware
+        becomes available in second generation E-series systems."
+    -- Revision History
+    REVISION    "200805081148Z"  -- 08-May-08 07:48 AM EDT  - JUNOSe 10.0
+    DESCRIPTION
+        "Added es2Lm10s support."
+    REVISION    "200612182106Z"  -- 18-Dec-06 04:06 PM EST  - JUNOSe 8.3
+    DESCRIPTION
+        "Added GE20 IOA Support." 
+    REVISION    "200611240913Z"  -- 24-Nov-06 04:13 AM EST  - JUNOSe 8.2
+    DESCRIPTION
+        "Added E120 product family support."
+    REVISION    "200601061806Z"  -- 06-Jan-06 01:06 PM EST  - JUNOSe main
+    DESCRIPTION
+        "Added LM10 Access Support." 
+    REVISION    "200509151346Z"  -- 15-Sep-05 09:46 AM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Added LM10 Uplink Support." 
+    REVISION    "200508191158Z"  -- 19-Aug-05 06:58 AM EST  - JUNOSe main
+    DESCRIPTION
+        "Added GE8 Support." 
+    REVISION    "200507291826Z"  -- 29-Jul-05 02:26 PM EDT  - JUNOSe 7.0.1
+    DESCRIPTION
+        "renamed entity objects, reordered to match rsSystem.mi2 and removed
+         obsoleted boards."
+    REVISION    "200412231158Z"  -- 23-Dec-04 06:58 AM EST  - JUNOSe main
+    DESCRIPTION
+        "Updated for second generation E-series hardware." 
+    REVISION    "200412061021Z"  -- 06-Dec-04 05:21 AM EDT  - JUNOSe main
+    DESCRIPTION
+        "Renamed E2 MIB objects to ES2 MIB objects."
+    REVISION    "200405191742Z"  -- 19-May-04 01:42 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Updated for revised E320 hardware."
+    REVISION    "200308182027Z"  -- 18-Aug-03 04:27 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Initial version of this SNMP management information module."
+    ::= { juniAdmin 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--  Second generation E-series physical entity identifiers.
+--  The OID values under juniES2EntPhysicalType are used by the SNMP agent in
+--  the second generation E-series product as the AutonomousType values for the
+--  entPhysicalVendorType varbinds for the second generation E-series objects in
+--  the entPhysicalTable.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniES2EntPhysicalType OBJECT IDENTIFIER ::= { juniES2Registry 1 }
+
+
+--
+-- Chassis class
+--
+es2Chassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series chassis.  This
+         identifies an 'overall' physical entity for any second generation
+         E-series system."
+    ::= { juniES2EntPhysicalType 1 }
+
+e320BaseChassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 base chassis with 12 slots for line modules - includes chassis,
+         midplane, DC PDU, and fan tray. The E320 system uses a carrier-class
+         design with a passive midplane, active front-insert line modules(LM) 
+         and rear-insert input/output adapters(IOA)."
+    ::= { es2Chassis 1 }
+
+
+e120BaseChassis  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E120 base chassis with 6 slots for line modules - includes chassis,
+         midplane, DC PDU, and fan tray. The E120 system uses a carrier-class
+         design with a passive midplane, active front-insert line modules(LM) 
+         and rear-insert input/output adapters(IOA)."
+    ::= { es2Chassis 2 }
+
+
+
+
+--
+-- Fan class
+--
+es2FanAssembly  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series fan assembly."
+    ::= { juniES2EntPhysicalType 2 }
+
+e320PrimaryFanTray  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 fan tray with 8 fans."
+    ::= { es2FanAssembly 1 }
+
+e320AuxiliaryFanTray  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 fan tray with 8 fans."
+    ::= { es2FanAssembly 2 }
+
+e120PrimaryFanTray  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E120 fan tray with 9 fans."
+    ::= { es2FanAssembly 3 }
+
+
+--
+-- Power Supply class
+--
+es2PowerInput  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series power distribution
+         module."
+    ::= { juniES2EntPhysicalType 3 }
+
+e320DcPowerDistributionUnit  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 DC power distribution unit (PDU)."
+    ::= { es2PowerInput 1 }
+
+
+--
+-- Backplane class
+--
+es2Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series midplane."
+    ::= { juniES2EntPhysicalType 4 }
+
+e320Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 chassis midplane."
+    ::= { es2Midplane 1 }
+
+e120Midplane  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E120 chassis midplane."
+    ::= { es2Midplane 2 }
+
+--
+-- Module class - integrated system controller/switch fabric
+--
+es2SrpModule  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series system controller/
+         switch fabric module."
+    ::= { juniES2EntPhysicalType 5 }
+
+e320Srp100  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 100Gb SRP - The Switch Route Processor (SRP)
+         is responsible for running the routing protocols as well as
+         overall system control. The SRP also contains a switch fabric
+         slice that is responsible for packet forwarding."
+    ::= { es2SrpModule 1 }
+
+e320Srp320  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 320Gb SRP - The Switch Route Processor (SRP)
+         is responsible for running the routing protocols as well as
+         overall system control. The SRP also contains a switch fabric
+         slice that is responsible for packet forwarding."
+    ::= { es2SrpModule 2 }
+
+e120Srp120  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E120 120Gb SRP - The Switch Route Processor (SRP)
+         is responsible for running the routing protocols as well as
+         overall system control. The SRP also contains a switch fabric
+         slice that is responsible for packet forwarding."
+    ::= { es2SrpModule 3 }
+
+--
+-- Module class - switch fabric
+--
+es2SwitchFabricModule  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series switch fabric
+         module."
+    ::= { juniES2EntPhysicalType 6 }
+
+e320Sfm100  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 100Gb switch fabric module. The SFM functions include buffer
+         management, queuing, scheduling and packet processing."
+    ::= { es2SwitchFabricModule 1 }
+
+e320Sfm320  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 320Gb switch fabric module. The SFM functions include buffer
+         management, queuing, scheduling and packet processing."
+    ::= { es2SwitchFabricModule 2 }
+
+e120Sfm120  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E120 120Gb switch fabric module. The SFM functions include buffer
+         management, queuing, scheduling and packet processing."
+    ::= { es2SwitchFabricModule 3 }
+
+--
+-- Adapter class - system controller I/O Adapter
+--
+es2SrpIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for the system controller I/O adapter for a second
+         generation E-series system."
+    ::= { juniES2EntPhysicalType 7 }
+
+e320SrpIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 SRP IOA. This card provides clocking functions as well as 
+         management and alarm interfaces."
+    ::= { es2SrpIoa 1 }
+
+
+--
+-- Module class - forwarding
+--
+es2ForwardingModule  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series forwarding module."
+    ::= { juniES2EntPhysicalType 8 }
+
+es2Lm4  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 4Gb (series 1) line module. This Line Module supports both 
+         uplink and customer facing IOAs and is responsible for 
+         processing data traffic."
+    ::= { es2ForwardingModule 1 }
+
+es2Lm10Uplink  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+		"E320 10Gb (series 2) uplink line module. This Line Module is
+		primarily focused on uplink IOAs and is responsible for
+		processing data traffic."
+    ::= { es2ForwardingModule 2 }
+
+es2Lm10  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+         "E320 10Gb (series 3) line module. This Line Module supports
+         both uplink and customer facing IOAs and is responsible for
+         processing data traffic."
+    ::= { es2ForwardingModule 3 }
+
+es2Lm10s  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+         "E320 10Gb (series 4) line module. This Line Module supports
+         both uplink and customer facing IOAs and is responsible for
+         processing data traffic."
+    ::= { es2ForwardingModule 4 }
+
+
+--
+-- Adapter class - forwarding I/O adapter
+--
+es2ForwardingIoa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The vendor type ID for a second generation E-series I/O adapter for a
+        forwarding module."
+    ::= { juniES2EntPhysicalType 9 }
+
+es2Ge4S1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 GE-4 IOA. This is a series 1, half-height, single wide IOA
+         with 4 physical interfaces that require pluggable GE interfaces. This
+         IOA uses the full capacity of a Series 1 line module."
+
+    ::= { es2ForwardingIoa 1 }
+
+es2Oc48Stm16PosS1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 OC48/STM16 POS IOA. This is a series 1, half-height, 
+         single wide IOA with 1 physical interface that requires a pluggable 
+         OC48/STM16 interface."
+    ::= { es2ForwardingIoa 2 }
+
+es2ServiceS1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 service IOA. This is a series 1, full-height, single 
+         wide IOA and does not support any physical interfaces."
+    ::= { es2ForwardingIoa 3 }
+
+es2Oc3Stm1x8AtmS1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 OC3/STM1-8 ATM IOA. This is a series 1, half-height, 
+         single wide IOA that supports 8 physical interfaces that require 
+         pluggable OC3/STM1 interfaces. This IOA can be combined with other
+         half-height IOAs (except those that use the full capacity of a slot's
+         bandwidth such as the GE-4 IOA)."
+    ::= { es2ForwardingIoa 4 }
+
+es2RedundancyS1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 redundancy IOA. This is a series 1, full-height, single 
+         wide IOA and does not support any physical interfaces."
+    ::= { es2ForwardingIoa 5 }
+
+es2Oc12Stm4x2PosS1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 OC12/STM4-2 POS IOA. This is a series 1, half-height, 
+         single wide IOA that supports 2 physical interfaces that require 
+         pluggable OC12/STM4 interfaces. This IOA can be combined with other
+         half-height IOAs (except those that use the full capacity 
+         of a slot's bandwidth such as the GE-4 IOA)."
+    ::= { es2ForwardingIoa 6 }
+
+es2Oc12Stm4x2AtmS1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 OC12/STM4-2 ATM IOA. This is a series 1, half-height, 
+         single wide IOA that supports 2 physical interfaces that require 
+         pluggable OC12/STM4 interfaces. This IOA can be combined with other 
+         half-height IOAs (except those that use the full capacity 
+         of a slot's bandwidth such as the GE-4 IOA)."
+    ::= { es2ForwardingIoa 7 }
+
+es2dash10GeS1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 10GE IOA. This is a series 1, full-height, single wide 
+         IOA that supports 2 physical interface that requires a pluggable 
+         10GE interface."
+    ::= { es2ForwardingIoa 8 }
+
+es2Ge8S1Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+		"E320 GE-8 IOA. This is a series 1, half-height, single wide IOA
+		that supports 8 physical interfaces that require pluggable GE
+		transceivers. This IOA will support a configuration of 8 active
+		or 4 active + 4 standby interfaces."
+    ::= { es2ForwardingIoa 9 }
+
+es2dash10GePrS2Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "E320 10GE IOA with port redundancy (PR). This is a series 2,
+        full-height, single wide IOA that supports 2 physical
+        interfaces (1 active + 1 standby) that require pluggable 10GE
+        transceivers."
+    ::= { es2ForwardingIoa 10 }
+
+es2Ge20S2Ioa  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+		"E320 GE-20 IOA. This is a series 2, full-height, single wide IOA
+		that supports 20 physical interfaces that require pluggable GE
+		transceivers. This IOA will support a configuration of 20 active
+		or 10 active + 10 standby interfaces."
+    ::= { es2ForwardingIoa 11 }
+
+END

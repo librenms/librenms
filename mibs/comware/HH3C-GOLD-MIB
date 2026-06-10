@@ -1,0 +1,123 @@
+-- =================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: GOLD MIB
+-- Version: V1.0
+-- History:
+--   V1.0 Created by meishenhe
+--        Initial version 2021-03-13
+-- =================================================================
+HH3C-GOLD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI;
+
+hh3cGold MODULE-IDENTITY
+    LAST-UPDATED "202103131502Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB is used to manage GOLD(Generic OnLine Diagnostics) detection.
+         This MIB is applicable to products that support GOLD."
+    REVISION "202103131502Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 203 }
+
+hh3cGoldTrap OBJECT IDENTIFIER ::= { hh3cGold 1 }
+
+hh3cGoldTrapOjbects OBJECT IDENTIFIER ::= { hh3cGoldTrap 0 }
+
+-- All trap definitions should be placed under this object.
+hh3cGoldLipcLinkFail NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cGoldLipcLinkSourceChassisID,
+            hh3cGoldLipcLinkSourceSlotID,
+            hh3cGoldLipcLinkSourceCpuID,
+            hh3cGoldLipcLinkDestChassisID,
+            hh3cGoldLipcLinkDestSlotID,
+            hh3cGoldLipcLinkDestCpuID
+        }
+    STATUS      current
+    DESCRIPTION
+        "the hh3cGoldLipcLinkFail trap indicates that the GOLD function
+        changed to the fail state."
+    ::= { hh3cGoldTrapOjbects 1 }
+
+hh3cGoldLipcLinkRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cGoldLipcLinkSourceChassisID,
+            hh3cGoldLipcLinkSourceSlotID,
+            hh3cGoldLipcLinkSourceCpuID,
+            hh3cGoldLipcLinkDestChassisID,
+            hh3cGoldLipcLinkDestSlotID,
+            hh3cGoldLipcLinkDestCpuID
+        }
+    STATUS      current
+    DESCRIPTION
+        "the hh3cGoldLipcLinkRecover trap indicates that the GOLD function
+        changed to the recover state."
+    ::= { hh3cGoldTrapOjbects 2 }
+
+hh3cGoldTrapObjectDefinitions OBJECT IDENTIFIER ::= { hh3cGoldTrap 1 }
+-- All objects used for TRAP only are defined here.
+
+hh3cGoldLipcLinkSourceChassisID OBJECT-TYPE
+    SYNTAX         Integer32(0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The source chassis id of lipc node."
+    ::= { hh3cGoldTrapObjectDefinitions 1 }
+
+hh3cGoldLipcLinkSourceSlotID OBJECT-TYPE
+    SYNTAX         Integer32(0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The source slot id of lipc node."
+    ::= { hh3cGoldTrapObjectDefinitions 2 }
+
+hh3cGoldLipcLinkSourceCpuID OBJECT-TYPE
+    SYNTAX         Integer32(0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The source cpu id of lipc node."
+    ::= { hh3cGoldTrapObjectDefinitions 3 }
+
+hh3cGoldLipcLinkDestChassisID OBJECT-TYPE
+    SYNTAX         Integer32(0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The destination chassis id of lipc node."
+    ::= { hh3cGoldTrapObjectDefinitions 4 }
+
+hh3cGoldLipcLinkDestSlotID OBJECT-TYPE
+    SYNTAX         Integer32(0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The destination slot id of lipc node."
+    ::= { hh3cGoldTrapObjectDefinitions 5 }
+
+hh3cGoldLipcLinkDestCpuID OBJECT-TYPE
+    SYNTAX         Integer32(0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS         current
+    DESCRIPTION
+        "The destination cpu id of lipc node."
+    ::= { hh3cGoldTrapObjectDefinitions 6 }
+
+END

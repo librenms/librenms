@@ -1,0 +1,65 @@
+<?php
+
+use LibreNMS\Util\Rewrite;
+
+$vlans = dbFetchRows("SELECT * FROM `ports_vlans` AS PV, vlans AS V WHERE PV.`port_id` = '" . $port['port_id'] . "' and PV.`device_id` = '" . $device['device_id'] . "' AND V.`vlan_vlan` = PV.vlan AND V.device_id = PV.device_id");
+
+echo '<table class="table table-hover table-striped table-condensed">';
+
+echo '<tr><th>VLAN</th><th>Description</th><th>Cost</th><th>Priority</th><th>State</th><th>Other Ports</th></tr>';
+
+foreach ($vlans as $vlan) {
+    echo '<tr>';
+
+    echo '<td width=100 class=list-large> Vlan ' . e($vlan['vlan']) . '</td>';
+    echo '<td width=200 class=box-desc>' . e($vlan['vlan_name']) . '</td>';
+
+    if ($vlan['state'] == 'blocking') {
+        $class = 'red';
+    } elseif ($vlan['state'] == 'forwarding') {
+        $class = 'green';
+    } else {
+        $class = 'none';
+    }
+
+    echo '<td>' . e($vlan['cost']) . '</td><td>' . e($vlan['priority']) . "</td><td class=$class>" . e($vlan['state']) . '</td>';
+
+    $traverse_ifvlan = true;
+    $vlan_ports = [];
+    $otherports = dbFetchRows('SELECT * FROM `ports_vlans` AS V, `ports` as P WHERE V.`device_id` = ? AND V.`vlan` = ? AND P.port_id = V.port_id', [$device['device_id'], $vlan['vlan']]);
+    foreach ($otherports as $otherport) {
+        if ($otherport['untagged']) {
+            $traverse_ifvlan = false;
+        }
+        $vlan_ports[$otherport['ifIndex']] = $otherport;
+    }
+
+    if ($traverse_ifvlan) {
+        $otherports = dbFetchRows(
+            'SELECT * FROM ports WHERE `device_id` = ? AND `ifVlan` = ?',
+            [$device['device_id'], $vlan['vlan']]
+        );
+        foreach ($otherports as $otherport) {
+            $vlan_ports[$otherport['ifIndex']] = array_merge($otherport, ['untagged' => '1']);
+        }
+    }
+
+    ksort($vlan_ports);
+
+    echo '<td>';
+    $vsep = '';
+    foreach ($vlan_ports as $otherport) {
+        $otherport = cleanPort($otherport);
+        echo $vsep . generate_port_link($otherport, Rewrite::shortenIfName($otherport['ifDescr']));
+        if ($otherport['untagged']) {
+            echo '(U)';
+        }
+
+        $vsep = ', ';
+    }
+
+    echo '</td>';
+    echo '</tr>';
+}//end foreach
+
+echo '</table>';

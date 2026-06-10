@@ -1,0 +1,1196 @@
+PHION-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+		OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32, enterprises, Counter64 FROM SNMPv2-SMI
+		TEXTUAL-CONVENTION, DisplayString, DateAndTime FROM SNMPv2-TC;
+
+	phion MODULE-IDENTITY
+		LAST-UPDATED "202007230000Z"
+	    ORGANIZATION
+    	    "Barracuda Networks"
+	    CONTACT-INFO
+    	    "http://www.barracuda.com"
+	    DESCRIPTION
+    	    "."
+
+	    -- Revision log
+		REVISION    "202007230000Z"
+		DESCRIPTION
+			"Added licenses, protectedIP and certificates"
+
+    	REVISION    "201805290000Z"
+	    DESCRIPTION
+    	    "Added firewallSessions64, packetThroughput64 and dataThroughput64 to fwStats group"
+
+    	REVISION    "201401080000Z"
+	    DESCRIPTION
+    	    "Inserted OBJECT-GROUPS"
+
+	REVISION    "201401070000Z"
+	    DESCRIPTION
+    	    "Removed syntax errors"
+
+    	REVISION    "201312030000Z"
+	    DESCRIPTION
+    	    "Removed errors and warnings"
+	    ::= { enterprises 10704 }
+	    
+-- Event
+	event OBJECT IDENTIFIER ::= { phion 10 }
+
+-- Firewall
+	firewall OBJECT IDENTIFIER ::= { phion 1 }
+
+	fwCompliances OBJECT IDENTIFIER ::= { phion 20 }
+	fwGroups OBJECT IDENTIFIER ::= { phion 21 }
+
+	fwCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION
+			"Firewall Info Groups"
+		MODULE
+			GROUP boxGroup
+				DESCRIPTION " "
+			GROUP serverGroup
+				DESCRIPTION " "
+			GROUP releaseGroup
+				DESCRIPTION " "
+			GROUP hotfixGroup
+				DESCRIPTION " "
+			GROUP hwGroup
+				DESCRIPTION " "
+			GROUP raidGroup
+				DESCRIPTION " "
+			GROUP vpnGroup
+				DESCRIPTION " "
+			GROUP bgpGroup
+				DESCRIPTION " "
+			GROUP ospfGroup
+				DESCRIPTION " "
+			GROUP ripGroup
+				DESCRIPTION " "
+			GROUP fwstatsGroup
+				DESCRIPTION " "
+			GROUP vpnusersGroup
+				DESCRIPTION " "
+			GROUP trafficshapeGroup
+				DESCRIPTION " "
+			GROUP diskspaceGroup
+				DESCRIPTION " "
+			GROUP eventGroup
+				DESCRIPTION " "
+			GROUP notificationGroup
+				DESCRIPTION " "
+		::= { fwCompliances 1 }
+
+	serviceGroups OBJECT IDENTIFIER ::= { fwGroups 1 }
+	firmwareGroups OBJECT IDENTIFIER ::= { fwGroups 2 }
+	hwGroups OBJECT IDENTIFIER ::= { fwGroups 3 }
+	netGroups OBJECT IDENTIFIER ::= { fwGroups 4 }
+	eventGroups OBJECT IDENTIFIER ::= { fwGroups 5 }
+
+-- Textual Conventions
+	ServiceState ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"The state a box service be in."
+		SYNTAX INTEGER {
+			unknown(-1),
+			stopped(0),
+			started(1),
+			blocked(2),
+			removed(4)
+		}
+
+	SensorType ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"The types of sensors."
+		SYNTAX INTEGER {
+			unknown(-1),
+			voltage(0),
+			fan(1),
+			temperature(2),
+			psu-status(3)
+		}
+
+	RaidEventSeverity ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"The values of raid event severity."
+		SYNTAX INTEGER {
+			unknown(0),
+			error(1),
+			warning(2),
+			information(3),
+			debug(4)
+		}
+
+	VpnStates ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"The states of the VPN tunnel"
+		SYNTAX INTEGER {
+			down(-1),
+			down-disabled(0),
+			active(1)
+		}
+
+	LicenseState ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+			"The state of a license."
+		SYNTAX INTEGER {
+			ok(1),
+			grace(2),
+			expired(3)
+		}
+
+-- boxServices
+	boxServices OBJECT-TYPE
+		SYNTAX		SEQUENCE OF BoxServicesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 0 }
+
+	boxServicesEntry OBJECT-TYPE
+		SYNTAX		BoxServicesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { boxServiceName }
+		::= { boxServices 1 }
+
+	BoxServicesEntry ::= SEQUENCE {
+		boxServiceName DisplayString,
+		boxServiceState ServiceState
+	}
+
+	boxServiceName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { boxServicesEntry 1 }
+
+	boxServiceState OBJECT-TYPE
+		SYNTAX ServiceState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { boxServicesEntry 2 }
+
+	boxGroup OBJECT-GROUP
+		OBJECTS {
+			boxServiceName,
+			boxServiceState
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { serviceGroups 1 }
+
+-- serverServices
+	serverServices OBJECT-TYPE
+		SYNTAX		SEQUENCE OF ServerServicesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 1 }
+
+	serverServicesEntry OBJECT-TYPE
+		SYNTAX		ServerServicesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { serverServiceName }
+		::= { serverServices 1 }
+
+	ServerServicesEntry ::= SEQUENCE {
+		serverServiceName	DisplayString,
+		serverServiceState	ServiceState
+	}
+
+	serverServiceName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { serverServicesEntry 1 }
+
+	serverServiceState OBJECT-TYPE
+		SYNTAX ServiceState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { serverServicesEntry 2 }
+
+	serverGroup OBJECT-GROUP
+		OBJECTS {
+			serverServiceName,
+			serverServiceState
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { serviceGroups 2 }
+
+-- phionRelease
+	phionRelease OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 2 }
+
+	releaseGroup OBJECT-GROUP
+		OBJECTS {
+			phionRelease
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { firmwareGroups 1 }
+
+-- phionHotfixes
+	phionHotfixes OBJECT-TYPE
+		SYNTAX		SEQUENCE OF PhionHotfixesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 3 }
+
+	phionHotfixesEntry OBJECT-TYPE
+		SYNTAX		PhionHotfixesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { hotfixName }
+		::= { phionHotfixes 1 }
+
+	PhionHotfixesEntry ::= SEQUENCE {
+		hotfixName DisplayString,
+		hotfixInstallTime DateAndTime
+	}
+
+	hotfixName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { phionHotfixesEntry 1 }
+
+	hotfixInstallTime OBJECT-TYPE
+		SYNTAX DateAndTime
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { phionHotfixesEntry 2 }
+
+	hotfixGroup OBJECT-GROUP
+		OBJECTS {
+			hotfixName,
+			hotfixInstallTime
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { firmwareGroups 2 }
+
+-- hwSensors
+	hwSensors OBJECT-TYPE
+		SYNTAX		SEQUENCE OF HwSensorsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 4 }
+
+	hwSensorsEntry OBJECT-TYPE
+		SYNTAX		HwSensorsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { hwSensorName }
+		::= { hwSensors 1 }
+
+	HwSensorsEntry ::= SEQUENCE {
+		hwSensorName DisplayString,
+		hwSensorType SensorType,
+		hwSensorValue Integer32
+	}
+
+	hwSensorName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { hwSensorsEntry 1 }
+
+	hwSensorType OBJECT-TYPE
+		SYNTAX SensorType
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { hwSensorsEntry 2 }
+
+	hwSensorValue OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { hwSensorsEntry 3 }
+
+	hwGroup OBJECT-GROUP
+		OBJECTS {
+			hwSensorName,
+			hwSensorType,
+			hwSensorValue
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { hwGroups 1 }
+
+-- raidEvents
+	raidEvents OBJECT-TYPE
+		SYNTAX		SEQUENCE OF RaidEventsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 5 }
+
+	raidEventsEntry OBJECT-TYPE
+		SYNTAX		RaidEventsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { raidEventIndex }
+		::= { raidEvents 1 }
+
+	RaidEventsEntry ::= SEQUENCE {
+		raidEventIndex Integer32,
+		raidEventSev RaidEventSeverity,
+		raidEventTime DateAndTime,
+		raidEventText DisplayString
+	}
+
+	raidEventIndex OBJECT-TYPE
+		SYNTAX Integer32 (0..2147483647)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { raidEventsEntry 1 }
+
+	raidEventSev OBJECT-TYPE
+		SYNTAX RaidEventSeverity
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { raidEventsEntry 2 }
+
+	raidEventTime OBJECT-TYPE
+		SYNTAX DateAndTime
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { raidEventsEntry 3 }
+
+	raidEventText OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { raidEventsEntry 4 }
+
+	raidGroup OBJECT-GROUP
+		OBJECTS {
+			raidEventIndex,
+			raidEventSev,
+			raidEventTime,
+			raidEventText
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { hwGroups 2 }
+
+-- vpnTunnels
+	vpnTunnels OBJECT-TYPE
+		SYNTAX		SEQUENCE OF VpnTunnelsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 6 }
+
+	vpnTunnelsEntry OBJECT-TYPE
+		SYNTAX		VpnTunnelsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { vpnName }
+		::= { vpnTunnels 1 }
+
+	VpnTunnelsEntry ::= SEQUENCE {
+		vpnName DisplayString,
+		vpnState VpnStates
+	}
+
+	vpnName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { vpnTunnelsEntry 1 }
+
+	vpnState OBJECT-TYPE
+		SYNTAX VpnStates
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { vpnTunnelsEntry 2 }
+
+	vpnGroup OBJECT-GROUP
+		OBJECTS {
+			vpnName,
+			vpnState
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { netGroups 1 }
+
+-- bgpNeighbors
+	bgpNeighbors OBJECT-TYPE
+		SYNTAX		SEQUENCE OF BgpNeighborsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 7 }
+
+	bgpNeighborsEntry OBJECT-TYPE
+		SYNTAX		BgpNeighborsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { bgpNeighborAddress }
+		::= { bgpNeighbors 1 }
+
+	BgpNeighborsEntry ::= SEQUENCE {
+		bgpNeighborAddress DisplayString,
+		bgpNeighborState Integer32
+	}
+
+	bgpNeighborAddress OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { bgpNeighborsEntry 1 }
+
+	bgpNeighborState OBJECT-TYPE
+		-- SYNTAX NeighborState
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { bgpNeighborsEntry 2 }
+
+	bgpGroup OBJECT-GROUP
+		OBJECTS {
+			bgpNeighborAddress,
+			bgpNeighborState
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { netGroups 2 }
+
+
+-- ospfNeighbors
+	ospfNeighbors OBJECT-TYPE
+		SYNTAX		SEQUENCE OF OspfNeighborsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 8 }
+
+	ospfNeighborsEntry OBJECT-TYPE
+		SYNTAX		OspfNeighborsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { ospfNeighborId }
+		::= { ospfNeighbors 1 }
+
+	OspfNeighborsEntry ::= SEQUENCE {
+		ospfNeighborId DisplayString,
+		ospfNeighborAddress DisplayString,
+		ospfNeighborInterface DisplayString,
+		ospfNeighborStatus DisplayString
+	}
+
+	ospfNeighborId OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { ospfNeighborsEntry 1 }
+
+	ospfNeighborAddress OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { ospfNeighborsEntry 2 }
+
+	ospfNeighborInterface OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { ospfNeighborsEntry 3 }
+
+	ospfNeighborStatus OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { ospfNeighborsEntry 4 }
+
+	ospfGroup OBJECT-GROUP
+		OBJECTS {
+			ospfNeighborId,
+			ospfNeighborAddress,
+			ospfNeighborInterface,
+			ospfNeighborStatus
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { netGroups 3 }
+
+-- ripNeighbors
+	ripNeighbors OBJECT-TYPE
+		SYNTAX		SEQUENCE OF RipNeighborsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 9 }
+
+	ripNeighborsEntry OBJECT-TYPE
+		SYNTAX		RipNeighborsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { ripNeighborAddress }
+		::= { ripNeighbors 1 }
+
+	RipNeighborsEntry ::= SEQUENCE {
+		ripNeighborAddress DisplayString,
+		ripNeighborState DisplayString
+	}
+
+	ripNeighborAddress OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { ripNeighborsEntry 1 }
+
+	ripNeighborState OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { ripNeighborsEntry 2 }
+
+	ripGroup OBJECT-GROUP
+		OBJECTS {
+			ripNeighborAddress,
+			ripNeighborState
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { netGroups 4 }
+
+-- fwStats
+	fwStats OBJECT-TYPE
+		SYNTAX		SEQUENCE OF FwStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 10 }
+
+	fwStatsEntry OBJECT-TYPE
+		SYNTAX		FwStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { firewallSessions }
+		::= { fwStats 1 }
+
+	FwStatsEntry ::= SEQUENCE {
+		firewallSessions Integer32,
+		packetThroughput Integer32,
+		dataThroughput Integer32,
+		firewallSessions64 Counter64,
+		packetThroughput64 Counter64,
+		dataThroughput64 Counter64
+	}
+
+	firewallSessions OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { fwStatsEntry 1 }
+
+	packetThroughput OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { fwStatsEntry 2 }
+
+	dataThroughput OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { fwStatsEntry 3 }
+
+	firewallSessions64 OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { fwStatsEntry 4 }
+
+	packetThroughput64 OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { fwStatsEntry 5 }
+
+	dataThroughput64 OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			" "
+		::= { fwStatsEntry 6 }
+
+	fwstatsGroup OBJECT-GROUP
+		OBJECTS {
+			firewallSessions,
+			packetThroughput,
+			dataThroughput,
+			firewallSessions64,
+			packetThroughput64,
+			dataThroughput64
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { hwGroups 3 }
+
+-- vpnUsers
+	vpnUsers OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 11 }
+
+	vpnusersGroup OBJECT-GROUP
+		OBJECTS {
+			vpnUsers
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { netGroups 5 }
+		
+-- trafficShape
+	trafficShape OBJECT-TYPE
+		SYNTAX		SEQUENCE OF TrafficShapeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 12 }
+
+	trafficShapeEntry OBJECT-TYPE
+		SYNTAX		TrafficShapeEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { connectorName }
+		::= { trafficShape 1 }
+
+	TrafficShapeEntry ::= SEQUENCE {
+		connectorName DisplayString,
+		rate Counter64,
+		sessions Counter64,
+		class1Total Counter64,
+		class1Pakets Counter64,
+		class1Drop Counter64,
+		class2Total Counter64,
+		class2Pakets Counter64,
+		class2Drop Counter64,
+		class3Total Counter64,
+		class3Pakets Counter64,
+		class3Drop Counter64,
+		noDelayTotal Counter64,
+		noDelayPakets Counter64,
+		noDelayDrop Counter64
+	}
+
+	connectorName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of shaping connector. With :IN for inbound and :OUT for outbound"
+		::= { trafficShapeEntry 1 }
+
+	rate OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Rate in kbit/sec"
+		::= { trafficShapeEntry 2 }
+
+	sessions OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of sessions"
+		::= { trafficShapeEntry 3 }
+		
+	class1Total OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total bytes for class1"
+		::= { trafficShapeEntry 4 }
+
+	class1Pakets OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total packets for class1"
+		::= { trafficShapeEntry 5 }
+		
+	class1Drop OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Dropped packets for class1"
+		::= { trafficShapeEntry 6 }
+
+	class2Total OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total bytes for class2"
+		::= { trafficShapeEntry 7 }
+
+	class2Pakets OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total packets for class2"
+		::= { trafficShapeEntry 8 }
+		
+	class2Drop OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Dropped packets for class2"
+		::= { trafficShapeEntry 9 }
+	
+	class3Total OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total bytes for class3"
+		::= { trafficShapeEntry 10 }
+
+	class3Pakets OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total packets for class3"
+		::= { trafficShapeEntry 11 }
+		
+	class3Drop OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Dropped packets for class3"
+		::= { trafficShapeEntry 12 }
+		
+	noDelayTotal OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total bytes for no delay"
+		::= { trafficShapeEntry 13 }
+
+	noDelayPakets OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Total packets for no delay"
+		::= { trafficShapeEntry 14 }
+		
+	noDelayDrop OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Dropped packets for no delay"
+		::= { trafficShapeEntry 15 }
+			
+	trafficshapeGroup OBJECT-GROUP
+		OBJECTS {
+			connectorName,
+			rate,
+			sessions,
+			class1Total,
+			class1Pakets,
+			class1Drop,
+			class2Total,
+			class2Pakets,
+			class2Drop,
+			class3Total,
+			class3Pakets,
+			class3Drop,
+			noDelayTotal,
+			noDelayPakets,
+			noDelayDrop
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { hwGroups 4 }
+
+-- diskSpace
+	diskSpace OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DiskSpaceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 13 }
+
+	diskSpaceEntry OBJECT-TYPE
+		SYNTAX		DiskSpaceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { partitionName }
+		::= { diskSpace 1 }
+
+	DiskSpaceEntry ::= SEQUENCE {
+		partitionName DisplayString,
+		partitionMaxSpace Counter64,
+		partitionFreeSpace Counter64,
+		partitionUsedSpace Counter64,
+		partitionUsedSpacePercent Integer32
+	}
+
+	partitionName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the partition entry"
+		::= { diskSpaceEntry 1 }
+
+	partitionMaxSpace OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Maximum space of partition entry in KB"
+		::= { diskSpaceEntry 2 }
+
+	partitionFreeSpace OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Free space of partition entry in KB"
+		::= { diskSpaceEntry 3 }
+		
+	partitionUsedSpace OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Used space of partition entry in KB"
+		::= { diskSpaceEntry 4 }
+		
+	partitionUsedSpacePercent OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Used space of partition entry in %"
+		::= { diskSpaceEntry 5 }
+			
+	diskspaceGroup OBJECT-GROUP
+		OBJECTS {
+			partitionName,
+			partitionMaxSpace,
+			partitionFreeSpace,
+			partitionUsedSpace,
+			partitionUsedSpacePercent			
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { hwGroups 5 }
+
+-- licenses
+	licenses OBJECT-TYPE
+		SYNTAX		SEQUENCE OF LicenseEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 14 }
+
+	licenseEntry OBJECT-TYPE
+		SYNTAX		LicenseEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { licenseName }
+		::= { licenses 1 }
+
+	LicenseEntry ::= SEQUENCE {
+		licenseName DisplayString,
+		licenseState LicenseState,
+		licenseExpiration DateAndTime
+	}
+
+	licenseName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the license"
+		::= { licenseEntry 1 }
+
+	licenseState OBJECT-TYPE
+		SYNTAX LicenseState
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"State of the license"
+		::= { licenseEntry 2 }
+
+	licenseExpiration OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Days until license expiration"
+		::= { licenseEntry 3 }
+
+-- protectedIP
+	protectedIP OBJECT-TYPE
+		SYNTAX		Counter64
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 15 }
+
+-- certificates
+	certificates OBJECT-TYPE
+		SYNTAX		SEQUENCE OF CertificateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		::= { firewall 16 }
+
+	certificateEntry OBJECT-TYPE
+		SYNTAX		CertificateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			" "
+		INDEX { certificateName }
+		::= { certificates 1 }
+
+	CertificateEntry ::= SEQUENCE {
+		certificateName DisplayString,
+		certificateExpiration DateAndTime
+	}
+
+	certificateName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..63))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of the certificate"
+		::= { certificateEntry 1 }
+
+	certificateExpiration OBJECT-TYPE
+		SYNTAX DateAndTime
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Certificate expiration date"
+		::= { certificateEntry 2 }
+
+-- Vars
+	eventID			OBJECT-TYPE
+		SYNTAX		DisplayString 	(SIZE (0..5))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event ID"
+		::= { event 1 }	-- 10704.10.1
+					
+	eventIDDescription	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event Type-Description"
+		::= { event 2 }	-- 10704.10.2
+	
+	eventType		OBJECT-TYPE
+		SYNTAX		DisplayString 	(SIZE (0..5))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event Type"
+		::= { event 3 }	-- 10704.10.3
+	
+	eventAlarmTime	OBJECT-TYPE
+		SYNTAX		DisplayString 	(SIZE (0..24))
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event Alarm Time"
+		::= { event 4 }	-- 10704.10.4
+	
+	eventLayerDescription	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event Layer Description"
+		::= { event 5 }	-- 10704.10.5
+	
+	eventClassification	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event Classification"
+		::= { event 6 }	-- 10704.10.6
+	
+	eventRepresentation	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event Representation"
+		::= { event 7 }	-- 10704.10.7
+					    
+	eventSeverity	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Event Severity"
+		::= { event 8 }	-- 10704.10.8
+
+	eventGroup OBJECT-GROUP
+		OBJECTS {
+			eventID,
+			eventIDDescription,
+			eventType,
+			eventAlarmTime,
+			eventLayerDescription,
+			eventClassification,
+			eventRepresentation,
+			eventSeverity
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { eventGroups 1 }
+
+--- TRAPS
+	eventTrap		NOTIFICATION-TYPE
+		OBJECTS		{ eventID, eventIDDescription, eventType, eventAlarmTime,
+						eventLayerDescription, eventClassification, eventRepresentation, eventSeverity }
+		STATUS		current
+		DESCRIPTION	"Trap"
+		REFERENCE	" "
+		::= { phion 11 }
+
+	notificationGroup NOTIFICATION-GROUP
+		NOTIFICATIONS {
+			eventTrap
+		}
+		STATUS current
+		DESCRIPTION " "
+		::= { eventGroups 2 }
+END
+

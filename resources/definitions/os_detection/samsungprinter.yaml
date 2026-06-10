@@ -1,0 +1,18 @@
+os: samsungprinter
+group: printer
+text: 'Samsung Printer'
+type: printer
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    -
+        sysDescr:
+            - 'Samsung C'
+            - 'Samsung S'
+            - 'Samsung ML'
+            - 'Samsung M4080FX'
+            - 'Samsung X'
+discovery_modules:
+    printer-supplies:   true
+poller_modules:
+    printer-supplies:   true

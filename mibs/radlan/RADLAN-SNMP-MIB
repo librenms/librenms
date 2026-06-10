@@ -1,0 +1,136 @@
+RADLAN-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    rnd                                         FROM RADLAN-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION                          FROM SNMPv2-TC;
+
+rlSNMP MODULE-IDENTITY
+          LAST-UPDATED "0410200000Z"
+          ORGANIZATION "Radlan Computer Communications Ltd."
+          CONTACT-INFO
+                  "radlan.com"
+          DESCRIPTION
+                  "Private MIB module for SNMP support in Radlan devices."
+          REVISION "0410200000Z"
+          DESCRIPTION
+                  "Initial version of this MIB."
+          ::= { rnd 98 }
+
+rlSNMPv3 OBJECT IDENTIFIER ::= { rlSNMP 1 }
+
+rlTargetParamsTestingLevel OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        low(1),
+        high(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The level of the tests done when configuring an entry in the snmpTargetParamsTable."
+    ::= { rlSNMPv3 1 }
+
+rlNotifyFilterTestingLevel OBJECT-TYPE
+    SYNTAX  INTEGER  {
+        low(1),
+        high(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The level of the tests done when configuring an entry in the snmpNotifyFilterTable."
+    ::= { rlSNMPv3 2 }
+
+rlSnmpEngineID OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(5..32))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "A variable for setting the router's local engineID value.
+         Setting this variable will effect the value of snmpEngineID. Setting this
+         variable to the value '00 00 00 00 00'H will cause snmpEngineID to get
+         an automatically created value based on the device basic MAC address.
+         This method of setting the agent's engineID is recommended for stand-alone
+         systems. Setting this variable to any other (valid) value will set snmpEngineID
+         to this value. Setting this variable to all 'ff'H or all zeros is not
+         allowed, with the exception of the value '00 00 00 00 00'H.
+         The last method is recommended for stackable system, in order for the
+         engineID to be unique within an administrative domain.
+         Setting this value (to a value different then the default value)
+         is required before configuring the usmUserTable.
+         Changing the value of this variable has 2 side-effects:
+         - All usmUserTable configured entries will be deleted.
+         - All snmpCommunityTable entries with snmpCommunityContextEngineID value
+           equal to old rlSnmpEngineID value, will be updated with the new
+           rlSnmpEngineID value."
+    DEFVAL      { '0000000001'H }
+    ::= { rlSNMPv3 3 }
+
+rlSNMPDomains OBJECT IDENTIFIER ::= { rlSNMP 2 }
+
+rlSnmpUDPMridDomain  OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The SNMPv2 over UDP transport domain, used when Multi-Instance Router
+             is supported (more than one MIR instance exist).
+             The corresponding transport address is of type RlSnmpUDPMridAddress."
+    ::= { rlSNMPDomains 1 }
+
+RlSnmpUDPMridAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/2d/2d"
+    STATUS       current
+    DESCRIPTION
+            "Represents the UDP address of NMS and the MRID through which it is
+             connected in order to access the agent:
+               octets   contents        encoding
+                1-4     IP-address      network-byte order
+                5-6     UDP-port        network-byte order
+                7-8     MRID            network-byte order
+            "
+    SYNTAX       OCTET STRING (SIZE (8))
+
+rlSnmpRequestMridTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlSnmpRequestMridEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "A table for determining the Mrid for the current SNMP request."
+     ::= { rlSNMP 3 }
+
+rlSnmpRequestMridEntry  OBJECT-TYPE
+   SYNTAX RlSnmpRequestMridEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlSnmpRequestManagedMrid }
+   ::= { rlSnmpRequestMridTable 1 }
+
+RlSnmpRequestMridEntry ::= SEQUENCE {
+       rlSnmpRequestManagedMrid  INTEGER,
+       rlSnmpRequestMridStatus   INTEGER                                  }
+
+rlSnmpRequestManagedMrid OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+    "The router instance the NMS wants to manage in the current SNMP request.
+     The value of this object, when attaching a variable instance of the
+     rlSnmpRequestManagedMridTable to an SNMP request, will determine the
+     managed Mrid for this request.
+     It is important to mention that the variable insance must be attached
+     as the first variable in the PDU in order to influence all variables."
+     ::=  { rlSnmpRequestMridEntry 1 }
+
+rlSnmpRequestMridStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+    enable(1)
+     }
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+    "The status of this entry."
+    ::= { rlSnmpRequestMridEntry 2 }
+
+END

@@ -1,0 +1,293 @@
+-- ***********************************************
+-- PAN-ENTITY-EXT-MIB.my
+--
+-- MIB for the Entity Ext MIB objects implemented by all
+-- Palo Alto devices.
+-- ***********************************************
+
+PAN-ENTITY-EXT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        entPhysicalIndex
+            FROM ENTITY-MIB
+        panModules
+            FROM PAN-GLOBAL-REG;
+
+    panEntityMIBModule MODULE-IDENTITY
+        LAST-UPDATED            "201211051106Z"
+        ORGANIZATION            "Palo Alto Networks"
+        CONTACT-INFO            "
+                    Customer Support
+                    Palo Alto Networks
+                    4401 Great America Pkwy
+                    Santa Clara, CA 95054-1211
+
+                    +1 866-898-9087
+                    support at paloaltonetworks dot com"
+
+        DESCRIPTION                "
+            A MIB module containing definitions of ENTITY Extension objects
+            implemented by Palo Alto Networks' products."
+
+        REVISION                "201211051106Z"
+        DESCRIPTION                "
+            Rev 1.0
+            Initial version of MIB module PAN-ENTITY-EXT-MIB."
+
+        ::= { panModules 7 }
+
+    -- MIB Object Definitions
+
+    panEntityMIBObjects OBJECT IDENTIFIER
+        ::= { panEntityMIBModule 1 }
+
+    panEntityMIBConformance OBJECT IDENTIFIER
+        ::= { panEntityMIBModule 2 }
+
+    -- Top level groups
+    panEntityChassisGroup OBJECT-IDENTITY
+        STATUS                    current
+        DESCRIPTION                "
+            Sub-tree for Power Supply MIB objects."
+        ::= { panEntityMIBObjects 1 }
+
+    panEntityFRUModuleGroup OBJECT-IDENTITY
+        STATUS                    current
+        DESCRIPTION                "
+            Sub-tree for FRU Module MIB objects."
+        ::= { panEntityMIBObjects 2 }
+
+    panEntityFanTrayGroup OBJECT-IDENTITY
+        STATUS                    current
+        DESCRIPTION                "
+            Sub-tree for Fan Tray MIB objects."
+        ::= { panEntityMIBObjects 3 }
+
+    panEntityPowerSupplyGroup OBJECT-IDENTITY
+        STATUS                    current
+        DESCRIPTION                "
+            Sub-tree for Power Supply MIB objects."
+        ::= { panEntityMIBObjects 4 }
+
+    ----------------------------------------------------------------------
+    -- Chassis objects
+
+    panEntityTotalPowerAvail OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total Power Available on the system (in watts)"
+        ::= { panEntityChassisGroup 1 }
+
+    panEntityTotalPowerUsed OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total Power Used on the system (in watts)"
+        ::= { panEntityChassisGroup 2 }
+
+
+    -- FRU Module (Line card) table
+
+    panEntityFRUModuleTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanEntityFRUModuleEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table lists the capacity of the fan trays in the system"
+        ::= { panEntityFRUModuleGroup 1 }
+
+    panEntityFRUModuleEntry OBJECT-TYPE
+        SYNTAX          PanEntityFRUModuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An panEntityFRUModuleTable entry lists the power used by
+            the fan trays.
+
+            Entries are created when the fan trays are added to the
+            entPhysicalTable."
+    INDEX           { entPhysicalIndex } 
+    ::= { panEntityFRUModuleTable 1 }
+
+    PanEntityFRUModuleEntry ::= SEQUENCE {
+        panEntryFRUModulePowerUsed     Integer32,
+        panEntryFRUModuleNumPorts      Integer32
+    }
+
+    panEntryFRUModulePowerUsed OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power used by the FRU Module (in watts)."
+        ::= { panEntityFRUModuleEntry 1 }
+
+    panEntryFRUModuleNumPorts OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of Ports on the FRU Module."
+        ::= { panEntityFRUModuleEntry 2 }
+
+
+    -- Fan Tray table 
+
+    panEntityFanTrayTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanEntityFanTrayEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table lists the capacity of the fan trays in the system"
+        ::= { panEntityFanTrayGroup 1 }
+
+    panEntityFanTrayEntry OBJECT-TYPE
+        SYNTAX          PanEntityFanTrayEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An panEntityFanTrayTable entry lists the power used by
+            the fan trays.
+
+            Entries are created when the fan trays are added to the
+            entPhysicalTable."
+        INDEX           { entPhysicalIndex } 
+        ::= { panEntityFanTrayTable 1 }
+
+    PanEntityFanTrayEntry ::= SEQUENCE {
+        panEntryFanTrayPowerUsed     Integer32
+    }
+
+    panEntryFanTrayPowerUsed OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power used by the Fan Tray (in watts)."
+        ::= { panEntityFanTrayEntry 1 }
+
+    -- Power Supply Table
+
+    panEntityPowerSupplyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF PanEntityPowerSupplyEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table lists the capacity of the power supplies in the system"
+        ::= { panEntityPowerSupplyGroup 1 }
+
+    panEntityPowerSupplyEntry OBJECT-TYPE
+        SYNTAX          PanEntityPowerSupplyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An panEntityPowerSupplyTable entry lists the power capacity of
+            the power supply.
+
+            Entries are created when the power supplies are added to the
+            entPhysicalTable."
+        INDEX           { entPhysicalIndex } 
+        ::= { panEntityPowerSupplyTable 1 }
+
+    PanEntityPowerSupplyEntry ::= SEQUENCE {
+        panEntryPowerSupplyPowerCapacity     Integer32
+    }
+
+    panEntryPowerSupplyPowerCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Power capacity of the power supply (in watts)"
+        ::= { panEntityPowerSupplyEntry 1 }
+
+
+    -- conformance information
+
+    panEntityMIBCompliances  OBJECT IDENTIFIER
+    ::= { panEntityMIBConformance 1 }
+
+    panEntityMIBGroups  OBJECT IDENTIFIER
+    ::= { panEntityMIBConformance 2 }
+
+    -- compliance statements
+
+    panEntityMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "An PAN Entity EXT MIB implementation can implement this group to
+        provide power information."
+    MODULE          -- this module
+    MANDATORY-GROUPS { panEntityMIBChassisGroup }
+
+    GROUP           panEntityMIBFRUModuleGroup
+    DESCRIPTION
+        "The panEntityMIBFRUModulePowerGroup must be implemented
+        for FRU Module that have power information"
+
+    GROUP           panEntityMIBFanTrayGroup
+    DESCRIPTION
+        "The panEntityMIBFanTrayPowerGroup must be implemented
+        for Fan Trays that have power information"
+
+    GROUP           panEntityMIBPowerSupplyGroup
+    DESCRIPTION
+        "The panEntityMIBFRUModulePowerGroup must be implemented
+        for Power Supplies that have power information"
+    ::= { panEntityMIBCompliances 1 }
+
+    -- units of conformance
+
+    panEntityMIBChassisGroup OBJECT-GROUP
+    OBJECTS         {
+                        panEntityTotalPowerAvail,
+                        panEntityTotalPowerUsed
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects which are used
+        to monitor chassis power information"
+    ::= { panEntityMIBGroups 1 }
+
+
+    panEntityMIBFRUModuleGroup OBJECT-GROUP
+    OBJECTS         {
+                        panEntryFRUModulePowerUsed,
+                        panEntryFRUModuleNumPorts
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects which are used
+        to monitor FRU Module information"
+    ::= { panEntityMIBGroups 2 }
+
+    panEntityMIBFanTrayGroup OBJECT-GROUP
+    OBJECTS         {
+                        panEntryFanTrayPowerUsed
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects which are used
+        to monitor Fan Tray information"
+    ::= { panEntityMIBGroups 3 }
+
+    panEntityMIBPowerSupplyGroup OBJECT-GROUP
+    OBJECTS         {
+                        panEntryPowerSupplyPowerCapacity
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The collection of objects which are used
+        to monitor Power Supply information"
+    ::= { panEntityMIBGroups 4 }
+
+END

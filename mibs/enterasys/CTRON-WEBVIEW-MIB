@@ -1,0 +1,119 @@
+CTRON-WEBVIEW-MIB DEFINITIONS ::= BEGIN
+--
+--   ctron-webview-mib.txt
+--    Revision: 1.00.00
+--    Part Number: 
+--    Date: February 8, 1999
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--
+--  Copyright February 99 Cabletron Systems
+--
+
+IMPORTS 
+        OBJECT-TYPE                  FROM RFC-1212
+        DisplayString                FROM RFC1213-MIB
+        ctApplication                FROM CTRON-MIB-NAMES ;
+                        
+ctWebView                       OBJECT IDENTIFIER ::= { ctApplication 4 }
+ctEwvConfiguration              OBJECT IDENTIFIER ::= { ctWebView 1 }
+ctEwvStatus                     OBJECT IDENTIFIER ::= { ctWebView 2 }
+
+-- ctEwvDocSupport is used to house information needed to support
+-- access to WebView Help Documentation
+
+ctEwvDocSupport                 OBJECT IDENTIFIER ::= { ctEwvConfiguration 1 }
+
+ctEwvDocSupportAdmin   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enable/disable Help Content URL"
+        ::= { ctEwvDocSupport 1 }
+
+ctEwvDocSupportLocation  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Server URL of Document Support"
+        ::= { ctEwvDocSupport 2 }
+
+ctEwvDocSupportAdminUID   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enable(1),
+                disable(2)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Enable/Disable using username and password files"
+        ::= { ctEwvDocSupport 3 }
+
+ctEwvDocSupportUsername   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "User ID for remote server authentication"
+        ::= { ctEwvDocSupport 4 }
+
+ctEwvDocSupportPassword   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Password used to determine access to documentation"
+        ::= { ctEwvDocSupport 5 }
+
+--  System Parameters are used to house information about the
+--  WebView system
+
+ctEwvSystemParameters   OBJECT IDENTIFIER ::= { ctEwvConfiguration 2 }
+
+ctEwvAuthScheme   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                basic(2),
+                digest(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Selects the type of HTTP Authorization technique to be
+                 employed by the WebView Server"
+        ::= { ctEwvSystemParameters 1 }
+
+ctEwvAuthNonceValidCount   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of times a server calculated nonce value will be
+                 reused before recalculating a new nonce value"
+        ::= { ctEwvSystemParameters 2 }
+
+END                                                       

@@ -1,0 +1,613 @@
+HP-SN-POS-GROUP-MIB DEFINITIONS ::= BEGIN
+
+
+-- Foundry POS Group MIB Release 1.0.0
+-- Revision 0 10/28/99
+
+-- Copyright 1996-1999 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry Networks SNMP Management Information Base Specification
+-- (Specification) embodies Foundry Networks' confidential and
+-- proprietary intellectual property. Foundry Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+-- SECTION 1: Top Level Definitions
+
+
+-- Imports
+
+IMPORTS
+	Counter, Gauge
+		FROM RFC1155-SMI
+	OBJECT-TYPE             
+		FROM RFC-1212
+	snPOS
+		FROM HP-SN-ROOT-MIB;
+
+	-- textual conventions
+	-- maximum of ports are 32.  
+
+	--  Status Values
+
+	    POSStatus ::= INTEGER { disabled(0), enabled(1) }
+
+	  DisplayString ::=
+	      OCTET STRING
+	  -- This data type is used to model textual information taken
+	  -- from the NVT ASCII character set.  By convention, objects
+	  -- with this syntax are declared as having
+	  --
+	  --      SIZE (0..255)
+    
+
+snPOSInfo						OBJECT IDENTIFIER	  ::= { snPOS 1  }
+
+-- POS Port table information
+
+snPOSInfoTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnPOSInfoEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A specific snPOSInfo group consists of a number of 
+		 switch ports.  "
+	::= { snPOSInfo 1 }
+
+snPOSInfoEntry OBJECT-TYPE
+	SYNTAX  SnPOSInfoEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the snPOSInfo table indicates the 
+		 configuration on a specified port. A SNMP SET PDU 
+		 for a row of the snPOSInfoTable requires the entired 
+		 sequence of the MIB Objects in each 
+		 snPOSInfoEntry stored in one PDU.  Otherwise, 
+	 	 GENERR return-value will be returned."
+	INDEX   { 
+		snPOSInfoPortNum
+	}
+	::= { snPOSInfoTable 1 }
+
+SnPOSInfoEntry ::= SEQUENCE {
+	snPOSInfoPortNum
+		INTEGER,
+	snPOSIfIndex
+		INTEGER,
+	snPOSDescr
+		DisplayString,
+	snPOSName
+		DisplayString,
+	snPOSInfoSpeed
+		INTEGER,
+	snPOSInfoAdminStatus
+		INTEGER,
+	snPOSInfoLinkStatus
+		INTEGER,
+	snPOSInfoClock
+		INTEGER,
+	snPOSInfoLoopBack
+		INTEGER,
+	snPOSInfoScrambleATM
+		POSStatus,
+	snPOSInfoFraming
+		INTEGER,
+	snPOSInfoCRC
+		INTEGER,
+	snPOSInfoKeepAlive
+		INTEGER,
+	snPOSInfoFlagC2
+		INTEGER,
+	snPOSInfoFlagJ0
+		INTEGER,
+	snPOSInfoFlagH1
+		INTEGER,
+	snPOSStatsInFrames
+		Counter,
+	snPOSStatsOutFrames
+		Counter,
+	snPOSStatsAlignErrors
+		Counter,
+	snPOSStatsFCSErrors
+		Counter,
+	snPOSStatsFrameTooLongs              
+		Counter,
+	snPOSStatsFrameTooShorts
+		Counter,
+	snPOSStatsInDiscard
+		Counter,
+	snPOSStatsOutDiscard
+		Counter,
+	snPOSInOctets
+		OCTET STRING,
+	snPOSOutOctets
+		OCTET STRING,
+	snPOSStatsInBitsPerSec
+		Gauge,
+	snPOSStatsOutBitsPerSec
+		Gauge,
+	snPOSStatsInPktsPerSec
+		Gauge,
+	snPOSStatsOutPktsPerSec
+		Gauge,
+	snPOSStatsInUtilization
+		INTEGER (0..10000),
+	snPOSStatsOutUtilization
+		INTEGER (0..10000),
+	snPOSTagType
+		INTEGER,
+	snPOSStatsB1
+		Counter,
+	snPOSStatsB2
+		Counter,
+	snPOSStatsB3
+		Counter,
+	snPOSStatsAIS
+		Counter,
+	snPOSStatsRDI
+		Counter,
+	snPOSStatsLOP
+		Counter,
+	snPOSStatsLOF
+		Counter,
+	snPOSStatsLOS
+		Counter
+	}
+
+
+snPOSInfoPortNum OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The port index.
+		 The bit 0 to bit 7: port number. 
+		 The bit 8 to bit 11: slot number (slot for chassis only)."
+	::= { snPOSInfoEntry 1 }
+
+
+snPOSIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"In order to identify a particular interface, this
+		object shall identify the instance of the ifIndex
+		object, defined in RFC 1213 and RFC 1573."
+    ::= { snPOSInfoEntry 2 }
+
+
+snPOSDescr OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"A textual string containing the slot/port information
+    	about the interface."
+    ::= { snPOSInfoEntry 3 }
+
+
+snPOSName OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..255))
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Port Name string."
+	::= { snPOSInfoEntry 4 }
+
+snPOSInfoSpeed OBJECT-TYPE
+	SYNTAX  INTEGER {
+		s155000(1),
+		s622000(2),
+		other(3),
+		s2488000(4)
+		}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION     
+		"The speed configuration for a port. The values are:
+		155000
+		622000
+		2488000
+		"
+	::= { snPOSInfoEntry 5 }
+
+
+snPOSInfoAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+		up(1),       -- ready to pass packets
+		down(2),
+		testing(3)   -- in some test mode
+		}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"The desired state of all ports.  The
+	 	testing(3) state indicates that no operational
+	 	packets can be passed. 
+	 	(same as ifAdminStatus in MIB-II)"
+    ::= { snPOSInfoEntry 6 }
+
+
+snPOSInfoLinkStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	up(1),       -- ready to pass packets
+    	down(2),
+    	testing(3)   -- in some test mode
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current operational state of the interface.
+         The testing(3) state indicates that no operational
+         packets can be passed. 
+         (same as ifOperStatus in MIB-II)"
+    ::= { snPOSInfoEntry 7 }
+
+
+snPOSInfoClock  OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	internal(1),     
+    	line(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Clock default internal"
+    ::= { snPOSInfoEntry 8 }
+
+snPOSInfoLoopBack   OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	line(1),     
+    	internal(2),
+    	none(3)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Loop back default none"
+    ::= { snPOSInfoEntry 9 }
+
+snPOSInfoScrambleATM  OBJECT-TYPE
+	SYNTAX	POSStatus
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"ATM style scrambling default off"
+    ::= { snPOSInfoEntry 10 }
+
+snPOSInfoFraming  OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	sonet(1),     
+    	sdh(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Framing default SONET"
+    ::= { snPOSInfoEntry 11 }
+
+snPOSInfoCRC  OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	crc32bits(1),     
+    	crc16bits(2)
+        }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"CRC default 32 bit"
+    ::= { snPOSInfoEntry 12 }
+
+snPOSInfoKeepAlive  OBJECT-TYPE
+	SYNTAX  INTEGER (0..32767)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"Keep-alive default 10"
+    ::= { snPOSInfoEntry 13 }
+
+snPOSInfoFlagC2  OBJECT-TYPE
+	SYNTAX  INTEGER (0..255)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"C2 flag"
+    ::= { snPOSInfoEntry 14 }
+
+
+snPOSInfoFlagJ0  OBJECT-TYPE
+	SYNTAX  INTEGER (0..255)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"J0 flag"
+    ::= { snPOSInfoEntry 15 }
+
+snPOSInfoFlagH1  OBJECT-TYPE
+	SYNTAX  INTEGER (0..255)
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+		"H1 flag"
+    ::= { snPOSInfoEntry 16 }
+
+snPOSStatsInFrames OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total number of packets received on the interface."
+    ::= { snPOSInfoEntry 17 }
+
+
+snPOSStatsOutFrames OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total number of packets transmitted out of the interface."
+    ::= { snPOSInfoEntry 18 }
+
+
+snPOSStatsAlignErrors   OBJECT-TYPE
+     SYNTAX     Counter
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+	 	"dot3StatsAlignmentErrors : A count of frames 
+	  	received on a particular interface that are 
+	  	not an integral number of octets in length 
+	  	and do not pass the FCS check.
+
+	  	The count represented by an instance of this
+	  	object is incremented when the alignmentError
+	  	status is returned by the MAC service to the
+	  	LLC (or other MAC user). Received frames for
+	  	which multiple error conditions obtain are,
+	  	according to the conventions of IEEE 802.3
+	  	Layer Management, counted exclusively according
+	  	to the error status presented to the LLC."
+    ::= { snPOSInfoEntry 19 }
+
+snPOSStatsFCSErrors   OBJECT-TYPE
+     SYNTAX      Counter
+     ACCESS      read-only
+     STATUS      mandatory
+     DESCRIPTION
+	 	"dot3StatsFCSErrors : A count of frames received 
+	  	on a particular interface that are an integral 
+	  	number of octets in length but do not pass the 
+	  	FCS check.
+
+	  	The count represented by an instance of this
+	  	object is incremented when the frameCheckError
+	  	status is returned by the MAC service to the
+	  	LLC (or other MAC user). Received frames for
+	  	which multiple error conditions obtain are,
+	  	according to the conventions of IEEE 802.3
+	  	Layer Management, counted exclusively according
+	  	to the error status presented to the LLC."
+    ::= { snPOSInfoEntry 20 }
+
+
+snPOSStatsFrameTooLongs   OBJECT-TYPE
+     SYNTAX    Counter
+     ACCESS    read-only
+     STATUS    mandatory
+     DESCRIPTION
+	 	"dot3StatsFrameTooLongs : A count of frames 
+	  	received on a particular interface that 
+	  	exceed the maximum permitted frame size.
+
+	  	The count represented by an instance of this
+	  	object is incremented when the frameTooLong
+	  	status is returned by the MAC service to the
+	  	LLC (or other MAC user). Received frames for
+	  	which multiple error conditions obtain are,
+	  	according to the conventions of IEEE 802.3
+	  	Layer Management, counted exclusively according
+	  	to the error status presented to the LLC."
+    ::= { snPOSInfoEntry 21 }
+
+
+snPOSStatsFrameTooShorts   OBJECT-TYPE
+     SYNTAX    Counter
+     ACCESS    read-only
+     STATUS    mandatory
+     DESCRIPTION
+	 	" A count of frames received on a particular 
+	 	interface that below the minimum permitted 
+	 	frame size."
+    ::= { snPOSInfoEntry 22 }
+
+snPOSStatsInDiscard OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of inbound packets which were chosen
+         to be discarded even though no errors had been
+         detected to prevent their being deliverable to a
+         higher-layer protocol.  One possible reason for
+         discarding such a packet could be to free up
+         buffer space."
+    ::= { snPOSInfoEntry 23 }
+
+
+snPOSStatsOutDiscard OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of outbound packets which were chosen
+         to be discarded even though no errors had been
+         detected to prevent their being transmitted.  One
+         possible reason for discarding such a packet could
+         be to free up buffer space."
+    ::= { snPOSInfoEntry 24 }
+
+snPOSInOctets OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total number of octets received on the interface,
+    	including framing characters. This object is a 64-bit
+		counter of the ifInOctets object, defined in RFC 1213.
+		The octet string is in big-endian byte order."
+    ::= { snPOSInfoEntry 25 }
+
+
+snPOSOutOctets OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE(8))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The total number of octets transmitted out of the interface,
+    	including framing characters. This object is a 64-bit
+		counter of the ifOutOctets object, defined in RFC 1213.
+		The octet string is in big-endian byte order."
+    ::= { snPOSInfoEntry 26 }
+
+
+snPOSStatsInBitsPerSec OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The number of bits per second received on the interface
+    	over a 5 minutes interval."
+    ::= { snPOSInfoEntry 27 }
+
+
+snPOSStatsOutBitsPerSec OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The number of bits per second transmitted out of the interface
+    	over a 5 minutes interval."
+    ::= { snPOSInfoEntry 28 }
+
+
+snPOSStatsInPktsPerSec OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The number of packets per second received on the interface
+    	over a 5 minutes interval."
+    ::= { snPOSInfoEntry 29 }
+
+
+snPOSStatsOutPktsPerSec OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The number of packets per second transmitted out of the interface
+    	over a 5 minutes interval."
+    ::= { snPOSInfoEntry 30 }
+
+
+snPOSStatsInUtilization OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The input network utilization in hundredths of a percent
+    	over a 5 minutes interval."
+    ::= { snPOSInfoEntry 31 }
+
+
+snPOSStatsOutUtilization OBJECT-TYPE
+    SYNTAX  INTEGER (0..10000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+    	"The output network utilization in hundredths of a percent
+    	over a 5 minutes interval."
+    ::= { snPOSInfoEntry 32 }
+
+snPOSTagType OBJECT-TYPE
+	SYNTAX  INTEGER {
+		tagged(1),      
+		untagged(2)    
+		}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"For tagged port, we could have multiple VLANs 
+		 per port."  
+	::= {snPOSInfoEntry  33}
+
+snPOSStatsB1 OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Section error monitoring."
+    ::= { snPOSInfoEntry 34 }
+
+snPOSStatsB2 OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Line error monitoring."
+    ::= { snPOSInfoEntry 35 }
+
+snPOSStatsB3 OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Path error monitoring."
+    ::= { snPOSInfoEntry 36 }
+
+snPOSStatsAIS OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Alarm indication signal."
+    ::= { snPOSInfoEntry 37 }
+
+snPOSStatsRDI OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Remote defect indication."
+    ::= { snPOSInfoEntry 38 }
+
+snPOSStatsLOP OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Loss of pointer."
+    ::= { snPOSInfoEntry 39 }
+
+snPOSStatsLOF OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Loss of frame."
+    ::= { snPOSInfoEntry 40 }
+
+snPOSStatsLOS OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Loss of signal."
+    ::= { snPOSInfoEntry 41 }
+
+END

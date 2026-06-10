@@ -1,0 +1,509 @@
+BLUECOAT-SG-AUTHENTICATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+bluecoatSGAuthentication MODULE-IDENTITY
+        LAST-UPDATED    "201408060300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The BLUECOAT-SG-AUTHENTICATION-MIB provides authentication information
+                         and statistics for a BlueCoat SG proxy appliance."
+        REVISION        "201408060300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 15 }
+
+ToggleState ::= INTEGER {
+    enabled(1),
+    disabled(2)
+}
+
+---
+--- Main Groups
+---
+
+schannelStats                  OBJECT IDENTIFIER ::= { bluecoatSGAuthentication 2 }
+lsaDomainControllerStats       OBJECT IDENTIFIER ::= { bluecoatSGAuthentication 3 }
+schannelServerStats            OBJECT IDENTIFIER ::= { bluecoatSGAuthentication 4 }
+authNotifications              OBJECT IDENTIFIER ::= { bluecoatSGAuthentication 5 }
+
+authNotificationsPrefix
+        OBJECT IDENTIFIER ::= { authNotifications 0 }
+
+
+schannelStatsTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SchannelStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table lists the various statistics
+                         concerning the schannel."
+        ::= { schannelStats 1 }
+
+schannelStatsEntry OBJECT-TYPE
+        SYNTAX          SchannelStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A schannelStats entry describes the
+                         present usage of a schannel."
+        INDEX           { schannelStatsIndex }
+        ::= { schannelStatsTable 1 }
+
+SchannelStatsEntry ::= SEQUENCE {
+        schannelStatsIndex                 INTEGER,
+        domainName                          DisplayString,
+        domainStatus                        DisplayString,
+        timeouts                            INTEGER,
+        transactions                        INTEGER,
+        currentWaiters                      INTEGER,
+        maxWaiters                          INTEGER,
+        resets                              INTEGER
+}
+
+schannelStatsIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies
+                         a resource."
+        ::= { schannelStatsEntry 1 }
+
+domainName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The name of the domain."
+        ::= { schannelStatsEntry 2 }
+
+domainStatus OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The status of the domain."
+        ::= { schannelStatsEntry 3 }
+
+timeouts OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of Schannel timeouts."
+        ::= { schannelStatsEntry 4 }
+
+transactions OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of Schannel transactions."
+        ::= { schannelStatsEntry 5  }
+
+currentWaiters OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of current waiters."
+        ::= { schannelStatsEntry 6 }
+
+maxWaiters OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Max number of waiters."
+        ::= { schannelStatsEntry 7 }
+
+resets OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of schannel resets."
+        ::= { schannelStatsEntry 8 }
+
+
+lsaDomainControllerStatsTable     OBJECT-TYPE
+        SYNTAX          SEQUENCE OF LSADomainControllerStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table lists the various lsa domain controller statistics."
+        ::= { lsaDomainControllerStats 1 }
+
+lsaDomainControllerStatsEntry     OBJECT-TYPE
+        SYNTAX          LSADomainControllerStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Describe statistics of Domain controllers."
+        INDEX           { lsaDomainControllerStatsIndex }
+        ::= { lsaDomainControllerStatsTable 1 }
+
+LSADomainControllerStatsEntry ::= SEQUENCE {
+        lsaDomainControllerStatsIndex   INTEGER,
+        domainControllerName           DisplayString,
+        address                        DisplayString,
+        siteNmae                       DisplayString,
+        flags                          DisplayString,
+        avgLDAPPingTime                INTEGER,
+        maxLDAPPingTime                INTEGER
+        }
+
+lsaDomainControllerStatsIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies
+                         a resource."
+        ::= { lsaDomainControllerStatsEntry 1 }
+
+domainControllerName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Name of domain controller."
+        ::= { lsaDomainControllerStatsEntry 2 }
+
+address OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Adress of Domain Controller."
+        ::= { lsaDomainControllerStatsEntry 3 }
+
+siteName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Site name of domain controller."
+        ::= { lsaDomainControllerStatsEntry 4 }
+
+avgLDAPPingTime OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Average LDAP ping time in milliseconds."
+        ::= { lsaDomainControllerStatsEntry 5 }
+
+lastLDAPPingTime OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Last LDAP ping time in milliseconds."
+        ::= { lsaDomainControllerStatsEntry 6 }
+
+flags OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Domain Controller flags."
+        ::= { lsaDomainControllerStatsEntry 7 }
+
+
+schannelServerStatsTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SchannelServerStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table lists the various statistics
+                         concerning the schannel server."
+        ::= { schannelServerStats 1 }
+
+schannelServerStatsEntry OBJECT-TYPE
+        SYNTAX          SchannelServerStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A schannelStats entry describes the
+                         present usage of a schannel server."
+        INDEX           { schannelServerStatsIndex }
+        ::= { schannelServerStatsTable 1 }
+
+SchannelServerStatsEntry ::= SEQUENCE {
+        schannelServerStatsIndex            INTEGER,
+        serverName                          DisplayString,
+        connectionsInUse                    INTEGER,
+        availableConnections                INTEGER,
+        averageTransactions                 INTEGER,
+        authsByDomainLast1Minute            INTEGER,
+        authsByDomainLast3Minutes           INTEGER,
+        authsByDomainLast5Minutes           INTEGER,
+        authsByDomainLast15Minutes          INTEGER,
+        authsByDomainLast60Minutes          INTEGER,
+        failedAuthsByDomainLast1Minute      INTEGER,
+        failedAuthsByDomainLast3Minutes     INTEGER,
+        failedAuthsByDomainLast5Minutes     INTEGER,
+        failedAuthsByDomainLast15Minutes    INTEGER,
+        failedAuthsByDomainLast60Minutes    INTEGER,
+        avgLatencyPerDomainLast1Minute      INTEGER,
+        avgLatencyPerDomainLast3Minutes     INTEGER,
+        avgLatencyPerDomainLast5Minutes     INTEGER,
+        avgLatencyPerDomainLast15Minutes    INTEGER,
+        avgLatencyPerDomainLast60Minutes    INTEGER,
+        maxLatencyPerDomainLast1Minute      INTEGER,
+        maxLatencyPerDomainLast3Minutes     INTEGER,
+        maxLatencyPerDomainLast5Minutes     INTEGER,
+        maxLatencyPerDomainLast15Minutes    INTEGER,
+        maxLatencyPerDomainLast60Minutes    INTEGER,
+        minLatencyPerDomainLast1Minute      INTEGER,
+        minLatencyPerDomainLast3Minutes     INTEGER,
+        minLatencyPerDomainLast5Minutes     INTEGER,
+        minLatencyPerDomainLast15Minutes    INTEGER,
+        minLatencyPerDomainLast60Minutes    INTEGER
+}
+
+schannelServerStatsIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies
+                         a resource."
+        ::= { schannelServerStatsEntry 1 }
+
+serverName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The status of the domain."
+        ::= { schannelServerStatsEntry 2 }
+
+connectionsInUse OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of connections in use."
+        ::= { schannelServerStatsEntry 3 }
+
+availableConnections OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Number of available connections."
+        ::= { schannelServerStatsEntry 4 }
+
+averageTransactions OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Average transactions per second (last minute)."
+        ::= { schannelServerStatsEntry 5 }
+
+authsByDomainLast1Minute OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Auths by Domains Last 1 Minute."
+        ::= { schannelServerStatsEntry 6 }
+
+authsByDomainLast3Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Auths by Domains Last 3 Minutes."
+        ::= { schannelServerStatsEntry 7 }
+
+authsByDomainLast5Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Auths by Domains Last 5 Minutes."
+        ::= { schannelServerStatsEntry 8 }
+
+authsByDomainLast15Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Auths by Domains Last 15 Minutes."
+        ::= { schannelServerStatsEntry 9 }
+
+authsByDomainLast60Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Auths by Domains Last 60 Minutes."
+        ::= { schannelServerStatsEntry 10 }
+
+failedAuthsByDomainLast1Minute OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Failed auths by Domains Last 1 Minute."
+        ::= { schannelServerStatsEntry 11 }
+
+failedAuthsByDomainLast3Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Failed auths by Domains Last 3 Minutes."
+        ::= { schannelServerStatsEntry 12 }
+
+failedAuthsByDomainLast5Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Failed auths by Domains Last 5 Minutes."
+        ::= { schannelServerStatsEntry 13 }
+
+failedAuthsByDomainLast15Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Failed auths by Domains Last 15 Minutes."
+        ::= { schannelServerStatsEntry 14 }
+
+failedAuthsByDomainLast60Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Failed auths by Domains Last 60 Minutes."
+        ::= { schannelServerStatsEntry 15 }
+
+avgLatencyPerDomainLast1Minute OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Average Latency Per Domains Last 1 Minute."
+        ::= { schannelServerStatsEntry 16 }
+
+avgLatencyPerDomainLast3Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Average Latency Per Domain Last 3 Minutes."
+        ::= { schannelServerStatsEntry 17 }
+
+avgLatencyPerDomainLast5Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Average Latency Per Last 5 Minutes."
+        ::= { schannelServerStatsEntry 18 }
+
+avgLatencyPerDomainLast15Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Average Latency Per Domain Last 15 Minutes."
+        ::= { schannelServerStatsEntry 19 }
+
+avgLatencyPerDomainLast60Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Average Latency Per Domain Last 60 Minutes."
+        ::= { schannelServerStatsEntry 20 }
+
+maxLatencyPerDomainLast1Minute OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Max Latency Per Domain Last 1 Minute."
+        ::= { schannelServerStatsEntry 21 }
+
+maxLatencyPerDomainLast3Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Max Latency Per Domains Last 3 Minutes."
+        ::= { schannelServerStatsEntry 22 }
+
+maxLatencyPerDomainLast5Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Max Latency Per Domains Last 5 Minutes."
+        ::= { schannelServerStatsEntry 23 }
+
+maxLatencyPerDomainLast15Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Max Latency Per Domains Last 15 Minutes."
+        ::= { schannelServerStatsEntry 24 }
+
+maxLatencyPerDomainLast60Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Max Latency Per Domains Last 60 Minutes."
+        ::= { schannelServerStatsEntry 25 }
+
+minLatencyPerDomainLast1Minute OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Min Latency Per Domains Last 1 Minute."
+        ::= { schannelServerStatsEntry 26 }
+
+minLatencyPerDomainLast3Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Min Latency Per Domains Last 3 Minutes."
+        ::= { schannelServerStatsEntry 27 }
+
+minLatencyPerDomainLast5Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Min Latency Per Domains Last 5 Minutes."
+        ::= { schannelServerStatsEntry 28 }
+
+minLatencyPerDomainLast15Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Min Latency Per Domains Last 15 Minutes."
+        ::= { schannelServerStatsEntry 29 }
+
+minLatencyPerDomainLast60Minutes OBJECT-TYPE
+        SYNTAX          Counter32
+        UNITS           "Bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Min Latency Per Domains Last 60 Minutes."
+        ::= { schannelServerStatsEntry 30 }
+
+--
+-- notifications
+--
+
+schannelLatencyTrap NOTIFICATION-TYPE
+        OBJECTS { domainName, latencyType, latencyValue }
+        STATUS          current
+        DESCRIPTION     "The domain that warrants a notification."
+        ::= { authNotificationsPrefix 1 }
+
+
+---
+--- BLUECOAT-SG-AUTHENTICATION-MIB Ends
+---
+
+END
+

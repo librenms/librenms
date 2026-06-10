@@ -1,0 +1,232 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-OSPF-EXTENSION-MIB
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-CONFIGCHANGE-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-OSPF-EXTENSION-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+             TruthValue, RowStatus
+        FROM SNMPv2-TC
+ipSwitch   
+	                                     FROM PRVT-SWITCH-MIB;  
+
+
+    prvtOSPFExtensionMib MODULE-IDENTITY
+    LAST-UPDATED "200801010000Z"
+    ORGANIZATION "BATM Advanced Communication"
+    CONTACT-INFO
+        "BATM/Telco Systems Support team
+				Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+
+    DESCRIPTION
+        "The OSPF extension MIB module contains additional information, needed to
+         control the OSPF protocol, that is not found in the standard RFC"
+
+    -- revision history    
+         REVISION     "200801010000Z"
+     	 DESCRIPTION
+		"Removed redefined OIDs in private vendor extension definitions." 
+     REVISION     "200502160000Z"
+     	 DESCRIPTION
+		"Fixed spelling errors and changed the contact info." 
+
+    REVISION     "200211110000Z"
+    DESCRIPTION
+        "Initial version."
+
+
+    ::= { routingProtocols 2 }
+
+    -------------------------------------------------------------------------------
+    --     PRIVATE BRANCH  PRODUCTS
+    -------------------------------------------------------------------------------
+    routingProtocols   OBJECT IDENTIFIER ::= { ipSwitch 4 }
+
+
+    ospfExtension OBJECT IDENTIFIER ::= { prvtOSPFExtensionMib 1 }
+
+    ospfEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object enables/disables the OSPF process in the switch"
+    ::= { ospfExtension 1 }
+
+    ospfRedistributeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OspfRedistributeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+              "The table represents the routing protocols, redistributed into the OSPF 
+              routing domain.
+               
+              Creation of conceptual row in the table starts the redistribution of the 
+              specified protocol, which would lead to the injection of routing information 
+              from that protocol into the OSPF.
+              
+              Deletion of conceptual row would stop the redistribution of that protocol 
+              into the OSPF.
+              
+              OSPF router, which redistributes routing information from other 
+              protocols, is an ASBR router"
+    ::= { ospfExtension 2 }
+
+    ospfRedistributeEntry OBJECT-TYPE
+    SYNTAX OspfRedistributeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+               "The conceptual row represents a routing protocol, redistributed into OSPF"
+    INDEX {ospfRedistributeProtocol}
+    ::= {ospfRedistributeTable 1}
+
+    OspfRedistributeEntry ::= SEQUENCE {
+        ospfRedistributeProtocol       INTEGER,
+        ospfRedistributeMetric         INTEGER,
+        ospfRedistributeMetricType     INTEGER,
+        ospfRedistributeRouteMap       OCTET STRING,
+        ospfRedistributeRowStatus      RowStatus
+    }
+
+
+    ospfRedistributeProtocol OBJECT-TYPE
+    SYNTAX INTEGER {
+           kernel (1),
+           connected(2),
+           static (3),
+           rip (4),
+           bgp (5)
+           }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+               "The specific routes redistributed into OSPF. For T4R model the valid values 
+               are connected, rip and static.
+               For all the other models all of the above routes can be redistributed "
+        ::= { ospfRedistributeEntry 1}
+
+    ospfRedistributeMetric OBJECT-TYPE
+    SYNTAX INTEGER (0..16777214)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+               "The metric, with which the external routes will be redistributed in the OSPF"
+        ::= {ospfRedistributeEntry 2}
+
+    ospfRedistributeMetricType OBJECT-TYPE
+    SYNTAX INTEGER {
+           e1(1),
+           e2(2)
+           }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The type of metric, with which the external routes are advertised into the OSPF 
+        routing domain. OSPF supports two types of external metrics.  Type 1 external 
+        metrics are expressed in the same units as the OSPF interface cost (i.e., in terms 
+        of the link state metric).  Type 2 external metrics are an order of magnitude larger; 
+        any Type 2 metric is considered greater than the cost of any path internal to the AS.  
+        Use of Type 2 external metrics assumes that routing between AS'es is the major 
+        cost of routing a packet, and eliminates the need for conversion of external costs 
+        to internal link state metrics."
+    ::= {ospfRedistributeEntry 3}
+
+    ospfRedistributeRouteMap OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+               "The route map that would filter the redistributed routing information"
+    ::= {ospfRedistributeEntry 4}
+
+    ospfRedistributeRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Indicates the status of the row. Setting of this field to active enables the 
+        redistribution of the protocol.
+        
+        Setting this field to destroy disables the redistribution of the protocol."
+    ::= {ospfRedistributeEntry 5}
+
+
+END
+

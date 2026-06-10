@@ -1,0 +1,3407 @@
+--===============================================================
+-- File Name : BW-BroadworksNetworkServer.mib 
+-- Date      : 10/12/2001
+-- Author    : BroadSoft Inc.
+--===============================================================
+
+BW-BroadworksNetworkServer DEFINITIONS ::= BEGIN
+	IMPORTS
+		DisplayString
+			FROM SNMPv2-TC
+                MODULE-COMPLIANCE, OBJECT-GROUP
+                        FROM SNMPv2-CONF
+		enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Gauge32, Counter32, Integer32, Unsigned32
+			FROM SNMPv2-SMI;
+
+
+
+	broadsoft	MODULE-IDENTITY
+		LAST-UPDATED	"200007080000Z"
+		ORGANIZATION	"Broadsoft, Inc"
+		CONTACT-INFO	"Broadsoft, Inc
+220 Perry Parkway
+Gaithersburg, MD  20877
+301-977-9440"
+		DESCRIPTION
+				"This is the System Management Information structure for the
+				Broadsoft enterprise."
+		REVISION		"200009191431Z"
+		DESCRIPTION
+				""
+		::=  {  enterprises  6431  }
+
+	broadworks	OBJECT IDENTIFIER
+		::=  {  broadsoft  1  }
+
+	nsExecutionServer	OBJECT IDENTIFIER
+		::=  {  broadworks  5  }
+
+	nsProvisioningServer	OBJECT IDENTIFIER
+		::=  {  broadworks  9  }
+
+  networkServer OBJECT IDENTIFIER
+    ::=  {  broadworks 11  }
+
+  nsProtocol OBJECT IDENTIFIER
+    ::=  {  networkServer 1  }
+
+	system	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  1  }
+
+	processing	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  2  }
+
+	protocol	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  3  }
+
+	persistency	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  4  }
+
+	management	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  5  }
+
+	serviceControlProxy	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  6  }
+
+	concurrent	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  7  }
+
+	bwNSMibConformance	OBJECT IDENTIFIER
+		::=  {  nsExecutionServer  100  }
+
+	psSystem	OBJECT IDENTIFIER
+		::=  {  nsProvisioningServer  1  }
+
+	psProtocol	OBJECT IDENTIFIER
+		::=  {  nsProvisioningServer  3  }
+
+	psPersistency	OBJECT IDENTIFIER
+		::=  {  nsProvisioningServer  4  }
+
+	psConcurrent	OBJECT IDENTIFIER
+		::=  {  nsProvisioningServer  5  }
+
+-- ################### ...............................
+-- NS EXECUTION SERVER ...............................
+-- ################### ...............................
+
+-- System ...
+
+	licensing	OBJECT IDENTIFIER
+		::=  {  system  11  }
+
+	bwNbTimePeriodWithLicenseViolations	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of Time Periods in which a license violation occurred"
+		::=  {  licensing 1  }
+
+	bwNbTransactionInViolation	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of transactions that were in violation since the last BroadWorks restart"
+		::=  {  licensing 2  }
+
+	bwNbThresholdAlarmSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of times a threshold alarm was sent since the last BroadWorks restart"
+		::=  {  licensing 3  }
+
+	bwNbNonInviteTimePeriodWithLicenseViolations	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of time periods in which a non-invite transaction license violation occurred."
+		::=  {  licensing 4  }
+
+	bwNbNonInviteTransactionInViolation	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of non-invite transactions that were in violation since the last BroadWorks restart."
+		::=  {  licensing 5  }
+
+	bwNbNonInviteThresholdAlarmSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of times a threshold alarm for non-invite transaction was sent since the last BroadWorks restart."
+		::=  {  licensing 6  }
+
+-- System :: Queues Statistics ...........................................
+
+	internalStats	OBJECT IDENTIFIER
+		::=  {  system   12 }
+
+	bwNSSystemInternalQueueResets	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION	"When set to a value other then 0, all the internal queue statistic stored under bwNSSystemInternalQueueTable are reset to 0."
+		::=  {  internalStats  1  }
+
+	bwNSSystemInternalQueueTable		OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSystemInternalQueueEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains statistics about the BroadWorks internal queues"
+		::=  { internalStats  2 }
+
+	bwNSSystemInternalQueueEntry		OBJECT-TYPE
+		SYNTAX			BwNSSystemInternalQueueEntry
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This row contains the statistics for a given internal queue in the system"
+		INDEX		{  bwNSSystemInternalQueueIndex  }
+		::=  { bwNSSystemInternalQueueTable 1 }
+
+	BwNSSystemInternalQueueEntry  ::=  SEQUENCE {
+		bwNSSystemInternalQueueIndex  Unsigned32,
+		bwNSSystemInternalQueueName  DisplayString,
+		bwNSSystemInternalQueueSize  Counter32,
+		bwNSSystemInternalQueueTimeAvg Gauge32,
+		bwNSSystemInternalQueueTimeMin Gauge32,
+		bwNSSystemInternalQueueTimeMax Gauge32,
+		bwNSSystemInternalQueueLengthCurrent Gauge32,
+		bwNSSystemInternalQueueLengthAvg Gauge32,
+		bwNSSystemInternalQueueLengthMax Gauge32,
+		bwNSSystemInternalQueueTimeMaxTimestampMSB Gauge32,
+		bwNSSystemInternalQueueLengthMaxTimestampMSB Gauge32,
+		bwNSSystemInternalQueueLengthMaxTimestampLSB Gauge32,
+		bwNSSystemInternalQueueTimeMaxTimestampLSB Gauge32
+		}
+
+	bwNSSystemInternalQueueIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index to an internal queue in the system."
+		::=  {  bwNSSystemInternalQueueEntry  1  }
+
+	bwNSSystemInternalQueueName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This string represents the name of an internal queue."
+		::=  {  bwNSSystemInternalQueueEntry  2  }
+
+	bwNSSystemInternalQueueSize	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The number of sample elements that the average, minimum and maximum holding time were calculated from."
+		::=  {  bwNSSystemInternalQueueEntry  3  }
+
+	bwNSSystemInternalQueueTimeAvg	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The average queue holding time. Note that this value is in 1/1000 of millisec, i.e. divide by 1000 to get the value in milliseconds."
+		::=  {  bwNSSystemInternalQueueEntry  4  }
+
+	bwNSSystemInternalQueueTimeMin	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The smallest queue sample holding time."
+		::=  {  bwNSSystemInternalQueueEntry  5  }
+
+	bwNSSystemInternalQueueTimeMax	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The biggest queue sample holding time."
+		::=  {  bwNSSystemInternalQueueEntry  6  }
+
+	bwNSSystemInternalQueueTimeMaxTimestamp	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"This counter was replaced by bwNSSystemInternalQueueTimeMaxTimestampMSB and bwNSSystemInternalQueueTimeMaxTimestampLSB"
+		::=  {  bwNSSystemInternalQueueEntry  7 }
+
+	bwNSSystemInternalQueueLengthCurrent	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The number of elements currently hold in the queue."
+		::=  {  bwNSSystemInternalQueueEntry  8  }
+
+	bwNSSystemInternalQueueLengthAvg	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The average number of elements simultaneously held in the queue multiple by 1000. Divide by 1000 to get the value in units."
+		::=  {  bwNSSystemInternalQueueEntry  9 }
+
+	bwNSSystemInternalQueueLengthMax	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The maximum number of elements simultaneously held in the queue multiple by 1000. Divide by 1000 to get the value in units."
+		::=  {  bwNSSystemInternalQueueEntry  10 }
+
+	bwNSSystemInternalQueueLengthMaxTimestamp	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			obsolete
+		DESCRIPTION
+				"This counter was replaced by bwNSSystemInternalQueueLengthMaxTimestampMSB and bwNSSystemInternalQueueLengthMaxTimestampLSB."
+		::=  {  bwNSSystemInternalQueueEntry  11 }
+		
+	bwNSSystemInternalQueueTimeMaxTimestampMSB	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The most significant part of the timestamp (4 most significant bytes) of when bwSystemInternalQueueTimeMax was obtained."
+		::=  {  bwNSSystemInternalQueueEntry  12 }
+
+	bwNSSystemInternalQueueLengthMaxTimestampMSB	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The most significant part of the timestamp (4 most significant bytes) of when bwSystemInternalQueueLengthMax was obtained."
+		::=  {  bwNSSystemInternalQueueEntry  13 }
+		
+	bwNSSystemInternalQueueLengthMaxTimestampLSB	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The least significant part of the timestamp (4 least significant bytes) of when bwSystemInternalQueueLengthMax was obtained."
+		::=  {  bwNSSystemInternalQueueEntry  14 }
+		
+	bwNSSystemInternalQueueTimeMaxTimestampLSB	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The least significant part of the timestamp (4 least significant bytes) of when bwSystemInternalQueueTimeMax was obtained."
+		::=  {  bwNSSystemInternalQueueEntry  15 }
+
+-- System :: Congestion Management  ...........................................
+
+	overloadStats	OBJECT IDENTIFIER
+		::=  {  system   13 }
+
+	bwNSCurrentCallOverloadZone	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION	"The current call related overload zone."
+		::=  {  overloadStats  1  }
+
+	bwNSNumCallYellowZoneOverloadTrans	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION	"The number of times that the server has transitioned to the call-related yellow overload zone."
+		::=  {  overloadStats  2  }
+
+	bwNSNumCallRedZoneOverloadTrans	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION	"The number of times that the server has transitioned to the call-related red overload zone."
+		::=  {  overloadStats  3  }
+
+	bwNSCurrentNonCallOverloadZone	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION	"The current non-call related overload zone."
+		::=  {  overloadStats  4  }
+
+	bwNSNumNonCallYellowZoneOverloadTrans	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION	"The number of times that the server has transitioned to the non-call-related yellow overload zone."
+		::=  {  overloadStats  5  }
+
+	bwNSNumNonCallRedZoneOverloadTrans	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION	"The number of times that the server has transitioned to the non-call-related red overload zone."
+		::=  {  overloadStats  6  }
+
+	bwNSNumDiscardedMessage	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION	"The number of messages that were dropped from the SIP decoder queues."
+		::=  {  overloadStats  7  }
+
+	bwNSTimeLastDiscardedMessage	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION	"The last time a message was dropped from the SIP decoder queues."
+		::=  {  overloadStats  8  }
+
+-- Processing :: Policy Tables ...............................
+
+	policies	OBJECT IDENTIFIER
+		::=  {  processing  3  }
+
+
+-- Processing :: Policy Tables :: Public Policy Table ...........................................
+
+	publicPolicyStatTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PublicPolicyStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"This table stores all of the public policies standard measurements."
+		::=  { policies  1 }
+
+	publicPolicyStatEntry	OBJECT-TYPE
+		SYNTAX		PublicPolicyStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Point of entry for entries to table publicPolicyStatTable."		
+		INDEX		{  pubPolStatID  }
+		::=  { publicPolicyStatTable 1 }
+
+	PublicPolicyStatEntry  ::=  SEQUENCE {
+		pubPolStatID	Unsigned32,
+		pubPolStatPolicyName	DisplayString,
+		pubPolStatNbInstances	Gauge32,
+		pubPolStatNbRequests	Counter32,
+		pubPolStatNbRequestsFailures	Counter32,
+		pubPolStatNbRequestsResults	Counter32
+		}
+
+	pubPolStatID	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  publicPolicyStatEntry  1  }
+
+	pubPolStatPolicyName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the name of the policy"
+		::=  {  publicPolicyStatEntry  2  }
+
+	pubPolStatNbInstances	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the number of instances of that policy in the system"
+		::=  {  publicPolicyStatEntry  3  }
+
+	pubPolStatNbRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the total number of requests processed by that policy"
+		::=  {  publicPolicyStatEntry  4  }
+
+	pubPolStatNbRequestsFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the total number of calls that were sent to treatment by this  policy"
+		::=  {  publicPolicyStatEntry  5  }
+
+	pubPolStatNbRequestsResults	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the total number of calls for which that policy has provided a route list"
+		::=  {  publicPolicyStatEntry  6  }
+
+-- Processing :: Policy Tables :: Private Policy Table ...........................................
+
+	privatePolicyStatTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PrivatePolicyStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"This table stores all of the private policies standard measurements."
+		::=  { policies  2 }
+
+	privatePolicyStatEntry	OBJECT-TYPE
+		SYNTAX		PrivatePolicyStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Point of entry for entries to table privatePolicyStatTable."		
+		INDEX		{  privPolStatID  }
+		::=  { privatePolicyStatTable 1 }
+
+	PrivatePolicyStatEntry  ::=  SEQUENCE {
+		privPolStatID	Unsigned32,
+		privPolStatEnterpriseName	DisplayString,
+		privPolStatPolicyName	DisplayString,
+		privPolStatNbRequests	Counter32,
+		privPolStatNbRequestsFailures	Counter32,
+		privPolStatNbRequestsResults	Counter32
+		}
+
+	privPolStatID	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  privatePolicyStatEntry  1  }
+
+	privPolStatEnterpriseName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the name of the enterprise to which the policy is assigned"
+		::=  {  privatePolicyStatEntry  2  }
+
+	privPolStatPolicyName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the name of the policy"
+		::=  {  privatePolicyStatEntry  3  }
+
+	privPolStatNbRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the total number of requests processed by that policy"
+		::=  {  privatePolicyStatEntry  4  }
+
+	privPolStatNbRequestsFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the total number of calls that were sent to treatment by this policy"
+		::=  {  privatePolicyStatEntry  5  }
+
+	privPolStatNbRequestsResults	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the total number of calls for which that policy has provided a route list"
+		::=  {  privatePolicyStatEntry  6  }
+
+-- Processing :: Policy Tables :: Generic Info Policy Table ...........................................
+
+	policyInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PolicyInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"The table allow for a policy to implement additional custom measurements. Both private and public policies can extend this table."
+		::=  { policies  3 }
+
+	policyInfoEntry	OBJECT-TYPE
+		SYNTAX		PolicyInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Point of entry for entries to table policyInfoTable."		
+		INDEX		{  polInfoID  }
+		::=  { policyInfoTable 1 }
+
+	PolicyInfoEntry  ::=  SEQUENCE {
+		polInfoID	Unsigned32,
+		polInfoEnterpriseName	DisplayString,
+		polInfoPolicyName	DisplayString,
+		polInfoInfoName	DisplayString,
+		polInfoNbOccurences	Counter32
+		}
+
+	polInfoID	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  policyInfoEntry  1  }
+
+	polInfoEnterpriseName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the name of the enterprise for which the policy count applies"
+		::=  {  policyInfoEntry  2  }
+
+	polInfoPolicyName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the name of the policy for which the policy count applies"
+		::=  {  policyInfoEntry  3  }
+
+	polInfoInfoName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the information monitored"
+		::=  {  policyInfoEntry  4  }
+
+	polInfoNbOccurences	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"total number of occurrences of this information/policy"
+		::=  {  policyInfoEntry  5  }
+
+-- Processing :: Policy Tables :: Generic Policy Info ...........................................
+
+	bwNbPolicyRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of Policy processing requests received by BroadWorks."
+		::=  {  policies  4  }
+
+	bwNbPolicyRequestFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of Policy processing request failures received by BroadWorks."
+		::=  {  policies  5  }
+
+
+-- Processing :: NEs table ...............................
+
+	neStatTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NeStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION		"This table implements generic per Network Element measurements."
+		::=  { processing  4  }
+
+	neStatEntry	OBJECT-TYPE
+		SYNTAX		NeStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Point of entry for entries to table neStatTable."		
+		INDEX		{  neStatID  }
+		::=  { neStatTable 1 }
+
+	NeStatEntry  ::=  SEQUENCE {
+		neStatID	Unsigned32,
+		neStatName	DisplayString,
+		neStatNbSIPRequests	Counter32,
+		neStatNbSIPRequestsFailures	Counter32,
+		neStatNbMSSRequests	Counter32,
+		neStatNbMSSRequestsFailures	Counter32
+		}
+
+	neStatID	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  neStatEntry  1  }
+
+	neStatName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"name of the network element that sent a request to the network server"
+		::=  {  neStatEntry  2  }
+
+	neStatNbSIPRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"total number of SIP requests coming in"
+		::=  {  neStatEntry  3  }
+
+	neStatNbSIPRequestsFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"total number of SIP requests which resulted in a treatment "
+		::=  {  neStatEntry  4  }
+
+	neStatNbMSSRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"total number of MSS requests coming in"
+		::=  {  neStatEntry  5  }
+
+	neStatNbMSSRequestsFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"total number of MSS requests resulting in an error"
+		::=  {  neStatEntry  6  }
+
+-- Processing :: Error Occurence Table ...............................
+
+	errorStatTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  ErrorStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"This table implements measurements for all the error codes defined in the system."
+		::=  { processing  5  }
+
+	errorStatEntry	OBJECT-TYPE
+		SYNTAX		ErrorStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Point of entry for entries to table errorStatTable."		
+		INDEX		{  errStatID  }
+		::=  { errorStatTable 1 }
+
+	ErrorStatEntry  ::=  SEQUENCE {
+		errStatID	Unsigned32,
+		errStatName	DisplayString,
+		errStatNbOccurences	Counter32
+		}
+
+	errStatID	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Description"
+		::=  {  errorStatEntry  1  }
+
+	errStatName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"code name of the network server error"
+		::=  {  errorStatEntry  2  }
+
+	errStatNbOccurences		OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"total number of times this error occurred"
+		::=  {  errorStatEntry  3  }
+
+-- Processing :: Other processing counters ...............................
+
+	bwNSCallpCallsPerSecond	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the incoming queue size in the NRS receiver."
+		::=  {  processing  6  }
+
+-- Processing :: Carrier counters ...............................
+
+	carrierStatTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  CarrierStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"This table stores the statistics for all the carriers used to route calls in the system."
+		::=  { processing  7  }
+
+	carrierStatEntry	OBJECT-TYPE
+		SYNTAX		CarrierStatEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Point of entry for entries to table carrierStatTable."		
+		INDEX		{  bwCarrierStatID  }
+		::=  { carrierStatTable 1 }
+
+	CarrierStatEntry  ::=  SEQUENCE {
+                bwCarrierStatID                Unsigned32,
+                bwCarrierName                  DisplayString,
+                bwCarrierCic                   DisplayString,
+                bwCarrierNbIntraLataCalls      Counter32,
+                bwCarrierNbInterLataCalls      Counter32,
+                bwCarrierNbInternationalCalls  Counter32
+		}
+
+	bwCarrierStatID	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION		"Unique identifier for a carrier in the system."
+		::=  {  carrierStatEntry  1  }
+
+	bwCarrierName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The name of a carrier defined on the network server."
+		::=  {  carrierStatEntry  2  }
+
+	bwCarrierCic	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"A CIC used for a given carrier in the system."
+		::=  {  carrierStatEntry  3  }
+
+	bwCarrierNbIntraLataCalls		OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter shall be incremented each time a carrier is used to carry an international call."
+		::=  {  carrierStatEntry  4  }
+
+	bwCarrierNbInterLataCalls		OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter shall be incremented each time a carrier is used to carry an inter-LATA call."
+		::=  {  carrierStatEntry  5  }
+
+	bwCarrierNbInternationalCalls		OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter shall be incremented each time a carrier is used to carry an intra-LATA call."
+		::=  {  carrierStatEntry  6  }
+
+
+-- PROTOCOLS  :: SIP ...............................
+
+	sip	OBJECT IDENTIFIER
+		::=  {  protocol  1  }
+
+	bwNSSipStatsInviteIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of INVITE requests received by BroadWorks."
+		::=  {  sip  1  }
+
+	bwNSSipStatsAckIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of ACK requests received by BroadWorks."
+		::=  {  sip  2  }
+
+	bwNSSipStatsInviteResponsesTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSipStatsInviteResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all SIP responses to the Invite requests sent by BroadWorks. Each counter is a 32-Bit counter. The response code is used to index into the table. Here are all the response codes:  302, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 413, 414, 415, 420, 480, 481, 482, 483, 484, 485, 486, 487"
+		::=  { sip  3 }
+
+	bwNSSipStatsCancelIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of CANCEL requests received by BroadWorks."
+		::=  {  sip  4  }
+
+	bwNSSipStatsRegisterIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of REGISTER requests received by BroadWorks."
+		::=  {  sip  5  }
+
+	bwNSSipStatsNotifyIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of INFO requests received by BroadWorks"
+		::=  {  sip  6  }
+
+	bwNSSipStatsSubscribeIns		OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of SUBSCRIBE message that have been received at the AS."
+		::=  {  sip  7  }
+
+	bwNSSipStatsMessageIns		OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of MESSAGE message that have been received at the AS."
+		::=  {  sip  8  }
+
+	bwNSSipStatsInfoIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of INFO requests received by BroadWorks"
+		::=  {  sip  9  }
+
+	bwNSSipStatsOptionsIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter reflects the total number of OPTIONS requests received by BroadWorks."
+		::=  {  sip  10  }
+
+	bwNSSipStatsOptionsResponsesTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSipStatsOptionsResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all SIP responses to the Options requests received or sent by BroadWorks. Each counter is a 32-Bit counter. The response code is used to index into the table. Here are all the response codes:  100, 180, 181, 182, 183, 200, 300, 301, 302, 305, 380, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 413, 414, 415, 420, 480, 481, 482, 483, 484, 485, 486, 487, 500, 501, 502, 503, 504, 505, 600, 603, 604, 606"
+		::=  { sip  11 }
+
+	bwNSSipStatsRegisterResponsesTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSipStatsRegisterResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all SIP responses to the Register requests received or sent by BroadWorks. Each counter is a 32-Bit counter. The response code is used to index into the table. Here are all the response codes:  100, 180, 181, 182, 183, 200, 300, 301, 302, 305, 380, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 413, 414, 415, 420, 480, 481, 482, 483, 484, 485, 486, 487, 500, 501, 502, 503, 504, 505, 600, 603, 604, 606"
+		::=  { sip  12 }
+
+	bwNSSipStatsInfoResponsesTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSipStatsInfoResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all SIP responses to the Info requests received or sent by BroadWorks. Each counter is a 32-Bit counter. The response code is used to index into the table. Here are all the response codes:  100, 180, 181, 182, 183, 200, 300, 301, 302, 305, 380, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 413, 414, 415, 420, 480, 481, 482, 483, 484, 485, 486, 487, 500, 501, 502, 503, 504, 505, 600, 603, 604, 606"
+		::=  { sip  13 }
+
+	bwNSSipStatsNotifyResponsesTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSipStatsNotifyResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all SIP responses to the Notify requests received or sent by BroadWorks. Each counter is a 32-Bit counter. The response code is used to index into the table. Here are all the response codes:  100, 180, 181, 182, 183, 200, 300, 301, 302, 305, 380, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 413, 414, 415, 420, 480, 481, 482, 483, 484, 485, 486, 487, 500, 501, 502, 503, 504, 505, 600, 603, 604, 606"
+		::=  { sip  14 }
+
+	bwNSSipStatsSubscribeResponsesTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSipStatsSubscribeResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all SIP responses to the Subscribe requests received or sent by BroadWorks. Each counter is a 32-Bit counter. The response code is used to index into the table. Here are all the response codes:  100, 180, 181, 182, 183, 200, 300, 301, 302, 305, 380, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 413, 414, 415, 420, 480, 481, 482, 483, 484, 485, 486, 487, 500, 501, 502, 503, 504, 505, 600, 603, 604, 606"
+		::=  { sip  15 }
+
+	bwNSSipStatsMessageResponsesTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSSipStatsMessageResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all SIP responses to the Message requests received or sent by BroadWorks. Each counter is a 32-Bit counter. The response code is used to index into the table. Here are all the response codes:  100, 180, 181, 182, 183, 200, 300, 301, 302, 305, 380, 400, 401, 402, 403, 404, 405, 406, 407, 408, 409, 410, 411, 413, 414, 415, 420, 480, 481, 482, 483, 484, 485, 486, 487, 500, 501, 502, 503, 504, 505, 600, 603, 604, 606"
+		::=  { sip  16 }
+
+	bwNSSipStatsFailures	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"This counter reflects the total number of request failures, i.e. the number of responses that were not 302s"
+		::=  { sip  17 }
+
+	bwNSSipStatsActiveTcpConnections	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This gauge is incremented whenever a SIP TCP connection is established.   It decremented whenever a connection is closed."
+		::=  {  sip  18  }
+
+	bwNSSipStatsTcpIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a SIP message is received via TCP."
+		::=  {  sip  19  }
+
+	bwNSSipStatsTcpOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a SIP message is sent via TCP."
+		::=  {  sip  20  }
+
+	bwNSSipStatsTcpFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a SIP message was attempted to be sent via TCP but failed."
+		::=  {  sip  21  }
+
+	bwNSSipStatsUdpIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a SIP message is received via UDP."
+		::=  {  sip  22  }
+
+	bwNSSipStatsUdpOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a SIP message is sent via UDP."
+		::=  {  sip  23  }
+
+	bwNSSIPReclaimedStaleTcpConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented every time a SIP TCP connection is reclaimed because it is stale."
+		::=  {  sip  24  }
+
+
+	congestionManagement	OBJECT IDENTIFIER
+		::=  { sip  25 }
+
+
+-- PROTOCOL :: SIP :: INVITE responses ................................................
+
+	bwNSSipStatsInviteResponsesEntry	OBJECT-TYPE
+		SYNTAX		BwNSSipStatsInviteResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular SIP status code sent in response to an Invite"
+		INDEX		{  bwNSSipStatsInviteResponseCodeValue  }
+		::=  { bwNSSipStatsInviteResponsesTable 1 }
+
+	BwNSSipStatsInviteResponsesEntry  ::=  SEQUENCE {
+		bwNSSipStatsInviteResponseCodeValue  Integer32,
+		bwNSSipStatsInviteResponseOuts  Counter32
+		}
+
+	bwNSSipStatsInviteResponseCodeValue	OBJECT-TYPE
+		SYNTAX			Integer32  ( 100 .. 999  )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a SIP status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSSipStatsInviteResponsesEntry  1  }
+
+	bwNSSipStatsInviteResponseOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses sent in response to an Invite"
+		::=  {  bwNSSipStatsInviteResponsesEntry  3  }
+
+-- PROTOCOL :: SIP :: OPTION responses ................................................
+
+	bwNSSipStatsOptionsResponsesEntry	OBJECT-TYPE
+		SYNTAX		BwNSSipStatsOptionsResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular SIP status code received or sent in response to a Options"
+		INDEX		{  bwNSSipStatsOptionsResponseCodeValue  }
+		::=  { bwNSSipStatsOptionsResponsesTable 1 }
+
+	BwNSSipStatsOptionsResponsesEntry  ::=  SEQUENCE {
+		bwNSSipStatsOptionsResponseCodeValue  Integer32,
+		bwNSSipStatsOptionsResponseIns  Counter32,
+		bwNSSipStatsOptionsResponseOuts  Counter32
+		}
+
+
+	bwNSSipStatsOptionsResponseCodeValue	OBJECT-TYPE
+		SYNTAX			Integer32  ( 100 .. 999  )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a SIP status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSSipStatsOptionsResponsesEntry  1  }
+
+
+	bwNSSipStatsOptionsResponseIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses received in response to an Options"
+		::=  {  bwNSSipStatsOptionsResponsesEntry  2  }
+
+
+	bwNSSipStatsOptionsResponseOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses sent in response to an Options"
+		::=  {  bwNSSipStatsOptionsResponsesEntry  3  }
+
+-- PROTOCOL :: SIP :: REGISTER responses ................................................
+
+	bwNSSipStatsRegisterResponsesEntry	OBJECT-TYPE
+		SYNTAX		BwNSSipStatsRegisterResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular SIP status code received or sent in response to a Register"
+		INDEX		{  bwNSSipStatsRegisterResponseCodeValue  }
+		::=  { bwNSSipStatsRegisterResponsesTable 1 }
+
+	BwNSSipStatsRegisterResponsesEntry  ::=  SEQUENCE {
+		bwNSSipStatsRegisterResponseCodeValue  Integer32,
+		bwNSSipStatsRegisterResponseIns  Counter32,
+		bwNSSipStatsRegisterResponseOuts  Counter32
+		}
+
+
+	bwNSSipStatsRegisterResponseCodeValue	OBJECT-TYPE
+		SYNTAX			Integer32  ( 100 .. 999  )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a SIP status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSSipStatsRegisterResponsesEntry  1  }
+
+
+	bwNSSipStatsRegisterResponseIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses received in response to a Register"
+		::=  {  bwNSSipStatsRegisterResponsesEntry  2  }
+
+
+	bwNSSipStatsRegisterResponseOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses sent in response to a Register"
+		::=  {  bwNSSipStatsRegisterResponsesEntry  3  }
+
+-- PROTOCOL :: SIP :: INFO responses ................................................
+
+	bwNSSipStatsInfoResponsesEntry	OBJECT-TYPE
+		SYNTAX		BwNSSipStatsInfoResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular SIP status code received or sent in response to an Info"
+		INDEX		{  bwNSSipStatsInfoResponseCodeValue  }
+		::=  { bwNSSipStatsInfoResponsesTable 1 }
+
+	BwNSSipStatsInfoResponsesEntry  ::=  SEQUENCE {
+		bwNSSipStatsInfoResponseCodeValue  Integer32,
+		bwNSSipStatsInfoResponseIns  Counter32,
+		bwNSSipStatsInfoResponseOuts  Counter32
+		}
+
+
+	bwNSSipStatsInfoResponseCodeValue	OBJECT-TYPE
+		SYNTAX			Integer32  ( 100 .. 999  )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a SIP status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSSipStatsInfoResponsesEntry  1  }
+
+
+	bwNSSipStatsInfoResponseIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses received in response to an Info"
+		::=  {  bwNSSipStatsInfoResponsesEntry  2  }
+
+
+	bwNSSipStatsInfoResponseOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses sent in response to an Info"
+		::=  {  bwNSSipStatsInfoResponsesEntry  3  }
+
+-- PROTOCOL :: SIP :: NOTIFY responses ................................................
+
+	bwNSSipStatsNotifyResponsesEntry	OBJECT-TYPE
+		SYNTAX		BwNSSipStatsNotifyResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular SIP status code received or sent in response to an Notify"
+		INDEX		{  bwNSSipStatsNotifyResponseCodeValue  }
+		::=  { bwNSSipStatsNotifyResponsesTable 1 }
+
+	BwNSSipStatsNotifyResponsesEntry  ::=  SEQUENCE {
+		bwNSSipStatsNotifyResponseCodeValue  Integer32,
+		bwNSSipStatsNotifyResponseIns  Counter32,
+		bwNSSipStatsNotifyResponseOuts  Counter32
+		}
+
+
+	bwNSSipStatsNotifyResponseCodeValue	OBJECT-TYPE
+		SYNTAX			Integer32  ( 100 .. 999  )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a SIP status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSSipStatsNotifyResponsesEntry  1  }
+
+
+	bwNSSipStatsNotifyResponseIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses received in response to a Notify"
+		::=  {  bwNSSipStatsNotifyResponsesEntry  2  }
+
+
+	bwNSSipStatsNotifyResponseOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses sent in response to a Notify"
+		::=  {  bwNSSipStatsNotifyResponsesEntry  3  }
+
+-- PROTOCOL :: SIP :: SUBSCRIBE responses ................................................
+
+	bwNSSipStatsSubscribeResponsesEntry	OBJECT-TYPE
+		SYNTAX		BwNSSipStatsSubscribeResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular SIP status code received or sent in response to a Subscribe"
+		INDEX		{  bwNSSipStatsSubscribeResponseCodeValue  }
+		::=  { bwNSSipStatsSubscribeResponsesTable 1 }
+
+	BwNSSipStatsSubscribeResponsesEntry  ::=  SEQUENCE {
+		bwNSSipStatsSubscribeResponseCodeValue  Integer32,
+		bwNSSipStatsSubscribeResponseIns  Counter32,
+		bwNSSipStatsSubscribeResponseOuts  Counter32
+		}
+
+
+	bwNSSipStatsSubscribeResponseCodeValue	OBJECT-TYPE
+		SYNTAX			Integer32  ( 100 .. 999  )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a SIP status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSSipStatsSubscribeResponsesEntry  1  }
+
+
+	bwNSSipStatsSubscribeResponseIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses received in response to a Subscribe"
+		::=  {  bwNSSipStatsSubscribeResponsesEntry  2  }
+
+
+	bwNSSipStatsSubscribeResponseOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses sent in response to a Subscribe"
+		::=  {  bwNSSipStatsSubscribeResponsesEntry  3  }
+
+
+-- PROTOCOL :: SIP :: MESSAGE responses ................................................
+
+	bwNSSipStatsMessageResponsesEntry	OBJECT-TYPE
+		SYNTAX		BwNSSipStatsMessageResponsesEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular SIP status code received or sent in response to a Message"
+		INDEX		{  bwNSSipStatsMessageResponseCodeValue  }
+		::=  { bwNSSipStatsMessageResponsesTable 1 }
+
+	BwNSSipStatsMessageResponsesEntry  ::=  SEQUENCE {
+		bwNSSipStatsMessageResponseCodeValue  Integer32,
+		bwNSSipStatsMessageResponseIns  Counter32,
+		bwNSSipStatsMessageResponseOuts  Counter32
+		}
+
+
+	bwNSSipStatsMessageResponseCodeValue	OBJECT-TYPE
+		SYNTAX			Integer32  ( 100 .. 999  )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a SIP status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSSipStatsMessageResponsesEntry  1  }
+
+
+	bwNSSipStatsMessageResponseIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses received in response to a Message"
+		::=  {  bwNSSipStatsMessageResponsesEntry  2  }
+
+
+	bwNSSipStatsMessageResponseOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of SIP responses sent in response to a Message"
+		::=  {  bwNSSipStatsMessageResponsesEntry  3  }
+
+-- PROTOCOL :: SIP ::  Congestion Management ................................................
+
+	bwNSCongestionManagementNeighborTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSCongestionManagementNeighborEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains congestion management information associated to neighbors."
+		::=  { congestionManagement  1 }
+
+	bwNSCongestionManagementNeighborEntry	OBJECT-TYPE
+		SYNTAX		BwNSCongestionManagementNeighborEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains congestion management information related to a neighbor."
+		INDEX		{ bwNSCongestionManagementNeighborIndex }
+		::=  { bwNSCongestionManagementNeighborTable 1 }
+
+	BwNSCongestionManagementNeighborEntry  ::=  SEQUENCE {
+		bwNSCongestionManagementNeighborIndex  Unsigned32,
+		bwNSCongestionManagementNeighborIpAddress  DisplayString,
+		bwNSCongestionManagementNeighborInviteIn  Counter32,
+		bwNSCongestionManagementNeighborRegisterIn  Counter32,
+		bwNSCongestionManagementNeighborOptionsIn  Counter32,
+		bwNSCongestionManagementNeighborOptionsOut  Counter32,
+		bwNSCongestionManagementNeighborSubscribeNotifyIn  Counter32,
+		bwNSCongestionManagementNeighbor5xxIn  Counter32,
+		bwNSCongestionManagementNeighborCallpRequestInRate  Gauge32,
+		bwNSCongestionManagementNeighborNonCallpRequestInRate  Gauge32,
+		bwNSCongestionManagementNeighborState  DisplayString,
+		bwNSCongestionManagementNeighborCapability  DisplayString
+		}
+
+	bwNSCongestionManagementNeighborIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"Index to a neighbor IP address."
+		::=  {  bwNSCongestionManagementNeighborEntry  1  }
+
+	bwNSCongestionManagementNeighborIpAddress	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The IP address of the neighbor."
+		::=  {  bwNSCongestionManagementNeighborEntry  2  }
+
+	bwNSCongestionManagementNeighborInviteIn	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the number of Invite requests that the neighbor sends to the Network Server."
+		::=  {  bwNSCongestionManagementNeighborEntry  3  }
+
+	bwNSCongestionManagementNeighborRegisterIn	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the number of Register requests that the neighbor sends to the Network Server."
+		::=  {  bwNSCongestionManagementNeighborEntry  4  }
+
+	bwNSCongestionManagementNeighborOptionsIn	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the number of Options requests that the neighbor sends to the Network Server."
+		::=  {  bwNSCongestionManagementNeighborEntry  5  }
+
+	bwNSCongestionManagementNeighborOptionsOut	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the number of Options requests that the Network Server sends to the neighbor."
+		::=  {  bwNSCongestionManagementNeighborEntry  6  }
+
+	bwNSCongestionManagementNeighborSubscribeNotifyIn	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the number of Subscribe and Notify requests that the neighbor sends to the Network Server."
+		::=  {  bwNSCongestionManagementNeighborEntry  7  }
+
+	bwNSCongestionManagementNeighbor5xxIn	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This is the number of 5xx responses that the neighbor sends to the Network Server."
+		::=  {  bwNSCongestionManagementNeighborEntry  8  }
+
+	bwNSCongestionManagementNeighborCallpRequestInRate	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This is the incoming callp requests rate."
+		::=  {  bwNSCongestionManagementNeighborEntry  9  }
+
+	bwNSCongestionManagementNeighborNonCallpRequestInRate	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This is the incoming non-callp requests rate."
+		::=  {  bwNSCongestionManagementNeighborEntry  10 }
+
+	bwNSCongestionManagementNeighborState	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The current congestion management state of the neighbor."
+		::=  {  bwNSCongestionManagementNeighborEntry  11 }
+
+	bwNSCongestionManagementNeighborCapability	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The congestion management capability of the neighbor."
+		::=  {  bwNSCongestionManagementNeighborEntry  12 }
+
+-- PROTOCOL :: MSSelection ...............................
+
+	nrs	OBJECT IDENTIFIER
+		::=  {  protocol  2  }
+
+-- PROTOCOL :: NRS ...............................
+
+	bwNSNbInvalidMessagesReceived	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when an invalid NRS message is received (either the header was valid but the body was not, or the message was pure junk)"
+		::=  {  nrs  6  }
+
+	bwNSNbRequestsReceived	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS request is received"
+		::=  {  nrs  7  }
+
+	bwNSNbResponsesReceived	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS response is received"
+		::=  {  nrs  8  }
+
+	bwNSNbErrorsReceived	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS error is received"
+		::=  {  nrs  9  }
+
+	bwNSNbRequestsSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS request is sent"
+		::=  {  nrs  10  }
+
+	bwNSNbResponsesSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS response is sent"
+		::=  {  nrs  11  }
+
+	bwNSNbErrorsSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS error is sent"
+		::=  {  nrs  12  }
+
+	bwNSNbRequestsResent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS request is re-sent"
+		::=  {  nrs  13  }
+
+	bwNSNbResponsesResent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS response is re-sent"
+		::=  {  nrs  14  }
+
+	bwNSNbRequestsUnanswered	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a NRS request remains unanswered after a series of retries"
+		::=  {  nrs  15  }
+
+
+	bwNSNRSStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSNRSStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains the counters for all NRS protocols"
+		::=  {  nrs  16 }
+
+	bwNSNRSStatsEntry	OBJECT-TYPE
+		SYNTAX		BwNSNRSStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a particular NRS protocol"
+		INDEX		{  bwNSNRSStatsTableIndex  }
+		::=  { bwNSNRSStatsTable 1 }
+
+	BwNSNRSStatsEntry  ::=  SEQUENCE {
+		bwNSNRSStatsTableIndex  Unsigned32,
+		bwNSNRSStatsTableProtocolName  DisplayString,
+		bwNSNRSStatsTableNbRequestsReceived  Counter32,
+		bwNSNRSStatsTableNbResponsesReceived  Counter32,
+		bwNSNRSStatsTableNbErrorsReceived  Counter32,
+		bwNSNRSStatsTableNbRequestsSent  Counter32,
+		bwNSNRSStatsTableNbResponsesSent  Counter32,
+		bwNSNRSStatsTableNbErrorsSent  Counter32,
+		bwNSNRSStatsTableNbRequestsResent  Counter32,
+		bwNSNRSStatsTableNbResponsesResent  Counter32,
+		bwNSNRSStatsTableNbRequestsUnanswered  Counter32
+		}
+
+
+	bwNSNRSStatsTableIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"This integer represents a NRS protocol status code.  The rest of the information in this row is related to this value."
+		::=  {  bwNSNRSStatsEntry  1  }
+
+
+	bwNSNRSStatsTableProtocolName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This string represents the NRS protocol name"
+		::=  {  bwNSNRSStatsEntry  2  }
+
+	bwNSNRSStatsTableNbRequestsReceived	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a request is received"
+		::=  {  bwNSNRSStatsEntry  3  }
+
+	bwNSNRSStatsTableNbResponsesReceived	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a response is received"
+		::=  {  bwNSNRSStatsEntry  4  }
+
+	bwNSNRSStatsTableNbErrorsReceived	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when an error is received"
+		::=  {  bwNSNRSStatsEntry  5  }
+
+	bwNSNRSStatsTableNbRequestsSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a request is sent"
+		::=  {  bwNSNRSStatsEntry  6  }
+
+	bwNSNRSStatsTableNbResponsesSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a response is sent"
+		::=  {  bwNSNRSStatsEntry  7  }
+
+	bwNSNRSStatsTableNbErrorsSent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when an error is sent"
+		::=  {  bwNSNRSStatsEntry  8  }
+
+	bwNSNRSStatsTableNbRequestsResent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a request is re-sent"
+		::=  {  bwNSNRSStatsEntry  9  }
+
+	bwNSNRSStatsTableNbResponsesResent	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a response is re-sent"
+		::=  {  bwNSNRSStatsEntry  10  }
+
+	bwNSNRSStatsTableNbRequestsUnanswered	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented when a request remains unanswered after a series of retries"
+		::=  {  bwNSNRSStatsEntry  11  }
+
+-- PROTOCOL :: Call Log Protocol ...............................
+
+	callLog	OBJECT IDENTIFIER
+		::=  {  protocol  6  }
+
+	calllogNbEnterprises	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Number of enterprises for which call logging is enabled"
+		::=  {  callLog  1  }
+
+	calllogNbClients	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Number of call log client that are currently connected to the NetworkServer"
+		::=  {  callLog  2  }
+
+-- PROTOCOL :: XS BCCT Protocol ...............................
+
+	nsXSCommonCommStats OBJECT IDENTIFIER
+		::=  {  protocol  7  }
+
+	bwNSCommonCommXSStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSCommonCommXSStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for BCCT for the XS process."
+		::=  { nsXSCommonCommStats  1 }
+
+	bwNSCommonCommXSStatsEntry	OBJECT-TYPE
+		SYNTAX		BwNSCommonCommXSStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSCommonCommXSStatsTable."
+		INDEX		{  bwNSCommonCommXSStatsIndex  }
+		::=  { bwNSCommonCommXSStatsTable 1 }
+
+	BwNSCommonCommXSStatsEntry  ::=  SEQUENCE {
+		bwNSCommonCommXSStatsIndex  Unsigned32,
+		bwNSCommonCommXSHost  DisplayString,
+		bwNSCommonCommXSInterface  DisplayString,
+		bwNSCommonCommXSProtocol  DisplayString,
+		bwNSCommonCommXSAcceptedOutboundConnections  Counter32,
+		bwNSCommonCommXSAcceptedInboundConnections  Counter32,
+		bwNSCommonCommXSRejectedOutboundConnections  Counter32,
+		bwNSCommonCommXSRejectedInboundConnections  Counter32,
+		bwNSCommonCommXSOutputMessagesProcessed  Counter32,
+		bwNSCommonCommXSInputMessagesProcessed  Counter32,
+		bwNSCommonCommXSOutputCommunicationErrors  Counter32,
+		bwNSCommonCommXSInputCommunicationErrors  Counter32
+		}
+
+	bwNSCommonCommXSStatsIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSCommonCommXSStatsTable. The index represents a connection for a specific Host-Interfacece-Protocol combination."
+		::=  {  bwNSCommonCommXSStatsEntry  1  }
+
+	bwNSCommonCommXSHost	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The address of a host connected to the BroadWorks Common Communication Protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  2  }
+
+
+	bwNSCommonCommXSInterface	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The IP address of a local interface that a protocol is bound to."
+		::=  {  bwNSCommonCommXSStatsEntry  3  }
+
+	bwNSCommonCommXSProtocol	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of a BroadWorks Common Communication Protocol client protocol, e.g. OCI or SyncApi."
+		::=  {  bwNSCommonCommXSStatsEntry  4  }
+
+	bwNSCommonCommXSAcceptedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework to a remote host, using the interface and protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  5  }
+
+	bwNSCommonCommXSAcceptedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework from a remote host, using the interface and protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  6  }
+
+	bwNSCommonCommXSRejectedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request going from this process to a remote host and going through this interface has been rejected for a particular protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  7  }
+
+	bwNSCommonCommXSRejectedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request coming to this host and going through this interface has been rejected by the framework for a particular protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  8  }
+
+	bwNSCommonCommXSOutputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  9  }
+
+	bwNSCommonCommXSInputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been received and processed for this host, interface and protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  10  }
+
+	bwNSCommonCommXSOutputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message could not be read because the TCP stack returned an error."
+		::=  {  bwNSCommonCommXSStatsEntry  11  }
+
+	bwNSCommonCommXSInputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwNSCommonCommXSStatsEntry  12  }
+
+-- NSXS - Concurrent Framework ........................
+
+	bwNSXSMonitoringExecutorTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSXSMonitoringExecutorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for the concurrent framework."
+		::=  { concurrent  1 }
+
+	bwNSXSMonitoringExecutorEntry	OBJECT-TYPE
+		SYNTAX		BwNSXSMonitoringExecutorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSXSMonitoringExecutorTable."
+		INDEX		{  bwNSXSMonitoringExecutorIndex  }
+		::=  { bwNSXSMonitoringExecutorTable 1 }
+
+	BwNSXSMonitoringExecutorEntry  ::=  SEQUENCE {
+		bwNSXSMonitoringExecutorIndex  Unsigned32,
+		bwNSXSMonitoringExecutorName   DisplayString,
+		bwNSXSMonitoringExecutorCurrentPoolSize  Gauge32,
+		bwNSXSMonitoringExecutorMaxPoolSize      Gauge32,
+		bwNSXSMonitoringExecutorAvgActiveThreads Gauge32,
+		bwNSXSMonitoringExecutorTaskQueueSize     Gauge32,
+		bwNSXSMonitoringExecutorNbTasksRun       Counter32,
+		bwNSXSMonitoringExecutorNbWarnings       Counter32,
+		bwNSXSMonitoringExecutorNbErrors         Counter32,
+		bwNSXSMonitoringExecutorLongestTaskMs    Gauge32,
+		bwNSXSMonitoringExecutorLongestTaskName  DisplayString
+		}
+
+	bwNSXSMonitoringExecutorIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSXSMonitoringExecutorTable. This is the index to a specific Monitoring Executor name."
+		::=  {  bwNSXSMonitoringExecutorEntry  1  }
+
+	bwNSXSMonitoringExecutorName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of the Monitoring Executor - Names are internally defined at the application level."
+		::=  {  bwNSXSMonitoringExecutorEntry  2  }
+
+	bwNSXSMonitoringExecutorCurrentPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The current thread pool size"
+		::=  {  bwNSXSMonitoringExecutorEntry  3  }
+
+	bwNSXSMonitoringExecutorMaxPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The maximum thread pool size"
+		::=  {  bwNSXSMonitoringExecutorEntry  4  }
+
+	bwNSXSMonitoringExecutorAvgActiveThreads	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The average number of active threads, rounded up"
+		::=  {  bwNSXSMonitoringExecutorEntry  5  }
+
+	bwNSXSMonitoringExecutorTaskQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of tasks in the queue (includes scheduled and recurring tasks)"
+		::=  {  bwNSXSMonitoringExecutorEntry  6  }
+
+	bwNSXSMonitoringExecutorNbTasksRun	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of tasks run"
+		::=  {  bwNSXSMonitoringExecutorEntry  7  }
+
+	bwNSXSMonitoringExecutorNbWarnings	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of warnings that occured"
+		::=  {  bwNSXSMonitoringExecutorEntry  8  }
+
+	bwNSXSMonitoringExecutorNbErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of errors that occured"
+		::=  {  bwNSXSMonitoringExecutorEntry  9  }
+
+	bwNSXSMonitoringExecutorLongestTaskMs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Longest completed task execution time in milliseconds"
+		::=  {  bwNSXSMonitoringExecutorEntry  10  }
+
+	bwNSXSMonitoringExecutorLongestTaskName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Longest completed task name"
+		::=  {  bwNSXSMonitoringExecutorEntry  11  }
+
+-- NSXS - TCP Framework ........................
+
+	tcp	OBJECT IDENTIFIER
+		::=  {  protocol 8 }
+	
+	bwNSXSTcpServersStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSXSTcpServersStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for TCP underlying framework for the NSXS process."
+		::=  { tcp 1 }
+
+	bwNSXSTcpServersStatsEntry	OBJECT-TYPE
+		SYNTAX		BwNSXSTcpServersStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSXSTcpServersStatsTable."
+		INDEX		{  bwNSXSTcpServersStatsIndex  }
+		::=  { bwNSXSTcpServersStatsTable 1 }
+
+	BwNSXSTcpServersStatsEntry  ::=  SEQUENCE {
+		bwNSXSTcpServersStatsIndex  Unsigned32,
+		bwNSXSTcpServersName  DisplayString,
+		bwNSXSTcpServersNbConnectionsAccepted  Counter32,
+		bwNSXSTcpServersNbConnectionsRefused  Counter32,
+		bwNSXSTcpServersNbConnectionsInitiated  Counter32,
+		bwNSXSTcpServersNbConnectionsClosed  Counter32,
+		bwNSXSTcpServersNbBytesSent        Gauge32,
+		bwNSXSTcpServersNbBytesReceived    Gauge32,
+		bwNSXSTcpServersOutgoingQueueSize  Gauge32,
+		bwNSXSTcpServersIncomingQueueSize  Gauge32,
+    bwNSXSTcpServersNbBytesSentSecure Gauge32,
+    bwNSXSTcpServersNbBytesReceivedSecure Gauge32
+		}
+
+	bwNSXSTcpServersStatsIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSXSTcpServersStatsTable. This is the index to a specific TCP server name."
+		::=  {  bwNSXSTcpServersStatsEntry  1  }
+
+	bwNSXSTcpServersName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of TCP server - Names are internally defined at at the application level."
+		::=  {  bwNSXSTcpServersStatsEntry  2  }
+
+	bwNSXSTcpServersNbConnectionsAccepted	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections accepted by the TCP server."
+		::=  {  bwNSXSTcpServersStatsEntry  3  }
+
+	bwNSXSTcpServersNbConnectionsRefused	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections refused by the TCP server."
+		::=  {  bwNSXSTcpServersStatsEntry  4  }
+
+	bwNSXSTcpServersNbConnectionsInitiated	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections initiated by the TCP server."
+		::=  {  bwNSXSTcpServersStatsEntry  5  }
+
+	bwNSXSTcpServersNbConnectionsClosed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections closed by the TCP server or remote hosts."
+		::=  {  bwNSXSTcpServersStatsEntry  6  }
+
+	bwNSXSTcpServersNbBytesSent	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes sent by the TCP server."
+		::=  {  bwNSXSTcpServersStatsEntry  7  }
+
+	bwNSXSTcpServersNbBytesReceived	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes received by the TCP server."
+		::=  {  bwNSXSTcpServersStatsEntry  8  }
+
+	bwNSXSTcpServersOutgoingQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes in the outgoing queue."
+		::=  {  bwNSXSTcpServersStatsEntry  9  }
+
+	bwNSXSTcpServersIncomingQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes in the incoming queue."
+		::=  {  bwNSXSTcpServersStatsEntry  10  }
+
+	bwNSXSTcpServersNbBytesSentSecure	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes sent by the TCP server over secure connections."
+		::=  {  bwNSXSTcpServersStatsEntry  11  }
+
+	bwNSXSTcpServersNbBytesReceivedSecure	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes received by the TCP server over secure connections."
+		::=  {  bwNSXSTcpServersStatsEntry  12  }
+
+-- Persistency ...............................
+
+	perNSNbOpenedTransactions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the total number of transactions currently opened."
+		::=  {  persistency  2  }
+
+	perNSNbCommittedTransactions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of committed transactions."
+		::=  {  persistency  3  }
+
+	perNSNbFailedTransactions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of failed transactions."
+		::=  {  persistency  4  }
+
+	perNSNbCriticalErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of critical errors that occurred in the persistency layer of the network server."
+		::=  {  persistency  5  }
+
+-- Persistency :: Times Ten PMs ...............................
+
+	timesTen	OBJECT IDENTIFIER
+		::=  {  persistency  1  }
+
+	ttNSNbConnectionsCreated	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of connections that have been opened to the DB."
+		::=  {  timesTen  1  }
+
+	ttNSConnectionPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the pool size of the DB."
+		::=  {  timesTen  2  }
+
+	ttNSNbBackdoorUpdates	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"This counter reflects the total number of backdoor updates made to the DB."
+		::=  {  timesTen  3  }
+
+	ttNSNbFailedCheckpoints	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"This counter reflects the total number of failed checkpoints of the DB."
+		::=  {  timesTen  4  }
+
+  -- ::= { timesTen 5 } is used by remoteXla (look a couple of lines down)
+
+  bwNSXSAvgUpdateTime	OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average DB update time in milliseconds"
+		::=  {  timesTen  6  }
+
+  bwNSXSAvgRowsUpdated	OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average number of rows affected in DB updates"
+		::=  {  timesTen  7  }
+
+  bwNSXSAvgQueryTime OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average DB query time in milliseconds"
+		::=  {  timesTen  8  }
+
+  bwNSXSAvgRowsQueried OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average number of rows processed in DB queries"
+		::=  {  timesTen  9 }
+
+  bwNSXSUpdateCount OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of DB updates performed since the application started"
+		::=  {  timesTen  10  }
+
+  bwNSXSQueryCount OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of DB queries performed since the application started"
+		::=  {  timesTen  11  }
+
+-- XS TimesTen High Water Mark table ...............................
+
+	bwNSXSTTHWMTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSXSTTHWMEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for the XS TimesTen high water marks."
+		::=  { timesTen  12 }
+
+	bwNSXSTTHWMEntry	OBJECT-TYPE
+		SYNTAX		BwNSXSTTHWMEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSXSTTHWMTable."
+		INDEX		{  bwNSXSTTHWMIndex  }
+		::=  { bwNSXSTTHWMTable 1 }
+
+	BwNSXSTTHWMEntry  ::=  SEQUENCE {
+    bwNSPSTTHWMIndex Unsigned32,
+    bwNSXSTTHWMName DisplayString,
+    bwNSXSTTHWMValue Gauge32,
+    bwNSXSTTHWMTimestamp DisplayString,
+    bwNSXSTTHWMStackTrace DisplayString
+  }
+
+  bwNSXSTTHWMIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSXSTTHWMTable. This is the index to a specific high water mark."
+		::=  {  bwNSXSTTHWMEntry  1  }
+
+	bwNSXSTTHWMName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of an XS TimesTen high water mark."
+		::=  {  bwNSXSTTHWMEntry  2  }
+
+	bwNSXSTTHWMValue	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The value of an XS TimesTen high water mark."
+		::=  {  bwNSXSTTHWMEntry  3  }
+
+	bwNSXSTTHWMTimestamp	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The timestamp of an XS TimesTen high water mark."
+		::=  {  bwNSXSTTHWMEntry  4  }
+
+	bwNSXSTTHWMStackTrace	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The stack trace of an XS TimesTen high water mark."
+		::=  {  bwNSXSTTHWMEntry  5  }
+
+-- Persistency :: RemoteXla PMs ...............................
+
+	xsRemoteXla	OBJECT IDENTIFIER
+		::=  {  timesTen  5  }
+
+	xsNSRemoteXlaNbTimesConnected	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of times a connection was made to the RemoteXla server"
+		::=  {  xsRemoteXla  1  }
+
+	xsNSRemoteXlaNbTimesDisconnected	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of times the process was disconnected from the RemoteXla server"
+		::=  {  xsRemoteXla  2  }
+
+	xsNSRemoteXlaUpdatesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of XLA updates processed"
+		::=  {  xsRemoteXla  3  }
+
+	xsNSRemoteXlaUpdatesPending	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of XLA updates pending to be processed"
+		::=  {  xsRemoteXla  4  }
+
+
+
+-- Management ...............................
+
+	resetAllNSCounters	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"When set to a value other then 0, all the counters in the system are reset to 0."
+		::=  {  management  1  }
+
+
+-- ###################### ...............................
+-- NS PROVISIONING SERVER ...............................
+-- ###################### ...............................
+
+-- PS System ...............................
+
+	systemNbGrps	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of groups registered in the Network Server"
+		::=  {  psSystem  1  }
+
+	systemNbDNs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of DNs registered in the Network Server"
+		::=  {  psSystem  2  }
+
+	systemNbURLs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of URLs registered in the Network Server"
+		::=  {  psSystem  3  }
+
+	systemNbProfiles	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of profiles registered in the Network Server"
+		::=  {  psSystem  4  }
+
+	systemNbRoutingNEs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of Routing Network Elements registered in the Network Server"
+		::=  {  psSystem  5  }
+
+	systemNbResourceNEs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of Resource Network Elements registered in the Network Server"
+		::=  {  psSystem  6  }
+
+	systemNbEnterprises	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of Enterprises registered in the Network Server"
+		::=  {  psSystem  7  }
+
+	systemNbUnassignedDNs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of Unassigned DNs in the Network Server"
+		::=  {  psSystem  8  }
+
+	systemNbExts	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of Extensions registered in the Network Server"
+		::=  {  psSystem  9  }
+
+	systemNbSites	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of sites defined in the Network Server"
+		::=  {  psSystem  10  }
+
+	systemNbHostingNes	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+		"Number of Hosting Network Elements defined in the Network Server"
+		::=  {  psSystem  11  }
+
+-- Synchronisation API ...............................
+
+	synchAPI	OBJECT IDENTIFIER
+		::=  {  psProtocol  3  }
+
+	syncNbUpdatesRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of update requests made through the synchronization API."
+		::=  {  synchAPI  1  }
+
+	syncNbUpdatesRequestsFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of synchronization requests that ended in a failure."
+		::=  {  synchAPI  2  }
+
+	syncNbOpenedSessions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of synchronization sessions opened up to now."
+		::=  {  synchAPI  3  }
+
+	syncNbAuthorizationFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of synchronization authorization failures up to now."
+		::=  {  synchAPI  4  }
+
+	syncNbActiveSessions 	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the total number of synchronization sessions currently opened."
+		::=  {  synchAPI  5  }
+
+-- OAMP ...............................
+
+	oamp	OBJECT IDENTIFIER
+		::=  {  psProtocol  4  }
+
+	oampNbActiveSessions	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the total number of synchronization sessions currently opened."
+		::=  {  oamp  1  }
+
+-- OSS ...............................
+
+	oss	OBJECT IDENTIFIER
+		::=  {  psProtocol  5  }
+
+	ossNbUpdatesRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of update requests made to the network server through the OSS API."
+		::=  {  oss 1  }
+
+	ossNbUpdatesRequestsFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of OSS update requests that ended in failure."
+		::=  {  oss 2  }
+
+	ossNbQueriesRequests	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of queries made to the network server through the OSS API."
+		::=  {  oss 3  }
+
+	ossNbQueriesRequestsFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of OSS queries that ended in failure."
+		::=  {  oss 4  }
+
+	ossNbOpenedSessions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of OSS sessions opened up to now."
+		::=  {  oss  5  }
+
+	ossNbAuthorizationFailures	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of OSS authorization failures up to now."
+		::=  {  oss  6  }
+
+	ossNbActiveSessions	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the total number of OSS sessions currently opened."
+		::=  {  oss  7  }
+
+-- PROTOCOL :: PS BCCT Protocol ...............................
+
+	nsPSCommonCommStats OBJECT IDENTIFIER
+		::=  {  psProtocol  6  }
+
+	bwNSCommonCommPSStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSCommonCommPSStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for BCCT for the PS process."
+		::=  { nsPSCommonCommStats  1 }
+
+	bwNSCommonCommPSStatsEntry	OBJECT-TYPE
+		SYNTAX		BwNSCommonCommPSStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSCommonCommPSStatsTable."
+		INDEX		{  bwNSCommonCommPSStatsIndex  }
+		::=  { bwNSCommonCommPSStatsTable 1 }
+
+	BwNSCommonCommPSStatsEntry  ::=  SEQUENCE {
+		bwNSCommonCommPSStatsIndex  Unsigned32,
+		bwNSCommonCommPSHost  DisplayString,
+		bwNSCommonCommPSInterface  DisplayString,
+		bwNSCommonCommPSProtocol  DisplayString,
+		bwNSCommonCommPSAcceptedOutboundConnections  Counter32,
+		bwNSCommonCommPSAcceptedInboundConnections  Counter32,
+		bwNSCommonCommPSRejectedOutboundConnections  Counter32,
+		bwNSCommonCommPSRejectedInboundConnections  Counter32,
+		bwNSCommonCommPSOutputMessagesProcessed  Counter32,
+		bwNSCommonCommPSInputMessagesProcessed  Counter32,
+		bwNSCommonCommPSOutputCommunicationErrors  Counter32,
+		bwNSCommonCommPSInputCommunicationErrors  Counter32
+		}
+
+	bwNSCommonCommPSStatsIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSCommonCommPSStatsTable. The index represents a connection for a specific Host-Interfacece-Protocol combination."
+		::=  {  bwNSCommonCommPSStatsEntry  1  }
+
+	bwNSCommonCommPSHost	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The address of a host connected to the BroadWorks Common Communication Protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  2  }
+
+
+	bwNSCommonCommPSInterface	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The IP address of a local interface that a protocol is bound to."
+		::=  {  bwNSCommonCommPSStatsEntry  3  }
+
+	bwNSCommonCommPSProtocol	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of a BroadWorks Common Communication Protocol client protocol, e.g. OCI or SyncApi."
+		::=  {  bwNSCommonCommPSStatsEntry  4  }
+
+	bwNSCommonCommPSAcceptedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework to a remote host, using the interface and protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  5  }
+
+	bwNSCommonCommPSAcceptedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client in this process connects to the framework from a remote host, using the interface and protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  6  }
+
+	bwNSCommonCommPSRejectedOutboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request going from this process to a remote host and going through this interface has been rejected for a particular protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  7  }
+
+	bwNSCommonCommPSRejectedInboundConnections	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a client connection request coming to this host and going through this interface has been rejected by the framework for a particular protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  8  }
+
+	bwNSCommonCommPSOutputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  9  }
+
+	bwNSCommonCommPSInputMessagesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been received and processed for this host, interface and protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  10  }
+
+	bwNSCommonCommPSOutputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message could not be read because the TCP stack returned an error."
+		::=  {  bwNSCommonCommPSStatsEntry  11  }
+
+	bwNSCommonCommPSInputCommunicationErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter is incremented whenever a message has been sent and processed for this host, interface and protocol."
+		::=  {  bwNSCommonCommPSStatsEntry  12  }
+
+-- NSPS - Concurrent Framework ........................
+
+	bwNSPSMonitoringExecutorTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSPSMonitoringExecutorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for the concurrent framework."
+		::=  { psConcurrent  1 }
+
+	bwNSPSMonitoringExecutorEntry	OBJECT-TYPE
+		SYNTAX		BwNSPSMonitoringExecutorEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSPSMonitoringExecutorTable."
+		INDEX		{  bwNSPSMonitoringExecutorIndex  }
+		::=  { bwNSPSMonitoringExecutorTable 1 }
+
+	BwNSPSMonitoringExecutorEntry  ::=  SEQUENCE {
+		bwNSPSMonitoringExecutorIndex  Unsigned32,
+		bwNSPSMonitoringExecutorName   DisplayString,
+		bwNSPSMonitoringExecutorCurrentPoolSize  Gauge32,
+		bwNSPSMonitoringExecutorMaxPoolSize      Gauge32,
+		bwNSPSMonitoringExecutorAvgActiveThreads Gauge32,
+		bwNSPSMonitoringExecutorTaskQueueSize     Gauge32,
+		bwNSPSMonitoringExecutorNbTasksRun       Counter32,
+		bwNSPSMonitoringExecutorNbWarnings       Counter32,
+		bwNSPSMonitoringExecutorNbErrors         Counter32,
+		bwNSPSMonitoringExecutorLongestTaskMs    Gauge32,
+		bwNSPSMonitoringExecutorLongestTaskName  DisplayString
+		}
+
+	bwNSPSMonitoringExecutorIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSPSMonitoringExecutorTable. This is the index to a specific Monitoring Executor name."
+		::=  {  bwNSPSMonitoringExecutorEntry  1  }
+
+	bwNSPSMonitoringExecutorName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of the Monitoring Executor - Names are internally defined at the application level."
+		::=  {  bwNSPSMonitoringExecutorEntry  2  }
+
+	bwNSPSMonitoringExecutorCurrentPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The current thread pool size"
+		::=  {  bwNSPSMonitoringExecutorEntry  3  }
+
+	bwNSPSMonitoringExecutorMaxPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The maximum thread pool size"
+		::=  {  bwNSPSMonitoringExecutorEntry  4  }
+
+	bwNSPSMonitoringExecutorAvgActiveThreads	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The average number of active threads, rounded up"
+		::=  {  bwNSPSMonitoringExecutorEntry  5  }
+
+	bwNSPSMonitoringExecutorTaskQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Number of tasks in the queue (includes scheduled and recurring tasks)"
+		::=  {  bwNSPSMonitoringExecutorEntry  6  }
+
+	bwNSPSMonitoringExecutorNbTasksRun	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of tasks run"
+		::=  {  bwNSPSMonitoringExecutorEntry  7  }
+
+	bwNSPSMonitoringExecutorNbWarnings	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of warnings that occured"
+		::=  {  bwNSPSMonitoringExecutorEntry  8  }
+
+	bwNSPSMonitoringExecutorNbErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of errors that occured"
+		::=  {  bwNSPSMonitoringExecutorEntry  9  }
+
+	bwNSPSMonitoringExecutorLongestTaskMs	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Longest completed task execution time in milliseconds"
+		::=  {  bwNSPSMonitoringExecutorEntry  10  }
+
+	bwNSPSMonitoringExecutorLongestTaskName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Longest completed task name"
+		::=  {  bwNSPSMonitoringExecutorEntry  11  }
+
+-- NSPS - TCP Framework ........................
+
+	nsTcp	OBJECT IDENTIFIER
+		::=  { psProtocol 7 }
+
+	bwNSPSTcpServersStatsTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSPSTcpServersStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for TCP underlying framework for the NSPS process."
+		::=  { nsTcp 1 }
+
+	bwNSPSTcpServersStatsEntry	OBJECT-TYPE
+		SYNTAX		BwNSPSTcpServersStatsEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSPSTcpServersStatsTable."
+		INDEX		{  bwNSPSTcpServersStatsIndex  }
+		::=  { bwNSPSTcpServersStatsTable 1 }
+
+	BwNSPSTcpServersStatsEntry  ::=  SEQUENCE {
+		bwNSPSTcpServersStatsIndex  Unsigned32,
+		bwNSPSTcpServersName  DisplayString,
+		bwNSPSTcpServersNbConnectionsAccepted  Counter32,
+		bwNSPSTcpServersNbConnectionsRefused  Counter32,
+		bwNSPSTcpServersNbConnectionsInitiated  Counter32,
+		bwNSPSTcpServersNbConnectionsClosed  Counter32,
+		bwNSPSTcpServersNbBytesSent        Gauge32,
+		bwNSPSTcpServersNbBytesReceived    Gauge32,
+		bwNSPSTcpServersOutgoingQueueSize  Gauge32,
+		bwNSPSTcpServersIncomingQueueSize  Gauge32,
+    bwNSPSTcpServersNbBytesSentSecure Gauge32,
+    bwNSPSTcpServersNbBytesReceivedSecure Gauge32
+		}
+
+	bwNSPSTcpServersStatsIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSPSTcpServersStatsTable. This is the index to a specific TCP server name."
+		::=  {  bwNSPSTcpServersStatsEntry  1  }
+
+	bwNSPSTcpServersName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of TCP server - Names are internally defined at at the application level."
+		::=  {  bwNSPSTcpServersStatsEntry  2  }
+
+	bwNSPSTcpServersNbConnectionsAccepted	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections accepted by the TCP server."
+		::=  {  bwNSPSTcpServersStatsEntry  3  }
+
+	bwNSPSTcpServersNbConnectionsRefused	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections refused by the TCP server."
+		::=  {  bwNSPSTcpServersStatsEntry  4  }
+
+	bwNSPSTcpServersNbConnectionsInitiated	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections initiated by the TCP server."
+		::=  {  bwNSPSTcpServersStatsEntry  5  }
+
+	bwNSPSTcpServersNbConnectionsClosed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of connections closed by the TCP server or remote hosts."
+		::=  {  bwNSPSTcpServersStatsEntry  6  }
+
+	bwNSPSTcpServersNbBytesSent	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes sent by the TCP server."
+		::=  {  bwNSPSTcpServersStatsEntry  7  }
+
+	bwNSPSTcpServersNbBytesReceived	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes received by the TCP server."
+		::=  {  bwNSPSTcpServersStatsEntry  8  }
+
+	bwNSPSTcpServersOutgoingQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes in the outgoing queue."
+		::=  {  bwNSPSTcpServersStatsEntry  9  }
+
+	bwNSPSTcpServersIncomingQueueSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes in the incoming queue."
+		::=  {  bwNSPSTcpServersStatsEntry  10  }
+
+	bwNSPSTcpServersNbBytesSentSecure	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes sent by the TCP server over secure connections."
+		::=  {  bwNSPSTcpServersStatsEntry  11  }
+
+	bwNSPSTcpServersNbBytesReceivedSecure	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"This counter represents the number of bytes received by the TCP server over secure connections."
+		::=  {  bwNSPSTcpServersStatsEntry  12  }
+-- Persistency ...............................
+
+	psNSPerNbOpenedTransactions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the total number of transactions currently opened."
+		::=  {  psPersistency  2  }
+
+	psNSPerNbCommittedTransactions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of committed transactions."
+		::=  {  psPersistency  3  }
+
+	psNSPerNbFailedTransactions	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of failed transactions."
+		::=  {  psPersistency  4  }
+
+	psNSPerNbCriticalErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of critical errors that occurred in the persistency layer of the network server."
+		::=  {  psPersistency  5  }
+
+-- Times Ten PMs ...............................
+
+	psTimesTen	OBJECT IDENTIFIER
+		::=  {  psPersistency  1  }
+
+	psNSTtNbConnectionsCreated	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"This counter reflects the total number of connections that have been opened to the DB."
+		::=  {  psTimesTen  1  }
+
+	psNSTtConnectionPoolSize	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"This gauge reflects the pool size of the DB."
+		::=  {  psTimesTen  2  }
+
+	psNSTtNbBackdoorUpdates	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"This counter reflects the total number of backdoor updates made to the DB."
+		::=  {  psTimesTen  3  }
+
+	psNSTtNbFailedCheckpoints	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			obsolete
+		DESCRIPTION		"This counter reflects the total number of failed checkpoints of the DB."
+		::=  {  psTimesTen  4  }
+
+  -- ::=  {  psTimesTen  5  } used by RemoteXla (look a couple of lines down)
+
+  bwNSPSAvgUpdateTime OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average DB update time in milliseconds"
+		::=  {  psTimesTen  6  }
+
+  bwNSPSAvgRowsUpdated	OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average number of rows affected in DB updates"
+		::=  {  psTimesTen  7  }
+
+  bwNSPSAvgQueryTime OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average DB query time in milliseconds"
+		::=  {  psTimesTen  8  }    
+
+  bwNSPSAvgRowsQueried OBJECT-TYPE
+  SYNTAX			Gauge32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"Average number of rows processed in DB queries"
+		::=  {  psTimesTen  9  }
+
+
+  bwNSPSUpdateCount OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of DB updates performed since the application started"
+		::=  {  psTimesTen  10  }
+
+  bwNSPSQueryCount OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of DB queries performed since the application started"
+		::=  {  psTimesTen  11  }
+
+  -- ::=  {  psTimesTen  12  } defined below 
+
+-- RemoteXla PMs ...............................
+
+	psRemoteXla	OBJECT IDENTIFIER
+		::=  {  psTimesTen  5  }
+
+	psNSRemoteXlaNbTimesConnected	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of times a connection was made to the RemoteXla server"
+		::=  {  psRemoteXla  1  }
+
+	psNSRemoteXlaNbTimesDisconnected	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of times the process was disconnected from the RemoteXla server"
+		::=  {  psRemoteXla  2  }
+
+	psNSRemoteXlaUpdatesProcessed	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of XLA updates processed"
+		::=  {  psRemoteXla  3  }
+
+	psNSRemoteXlaUpdatesPending	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"Number of XLA updates pending to be processed"
+		::=  {  psRemoteXla  4  }
+
+-- PS TimesTen High Water Mark table ................................
+
+	bwNSPSTTHWMTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwNSPSTTHWMEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table contains counters for the PS TimesTen high water marks."
+		::=  { psTimesTen  12 }
+
+	bwNSPSTTHWMEntry	OBJECT-TYPE
+		SYNTAX		BwNSPSTTHWMEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"Definition of the entries for bwNSPSTTHWMTable."
+		INDEX		{  bwNSPSTTHWMIndex  }
+		::=  { bwNSPSTTHWMTable 1 }
+
+	BwNSPSTTHWMEntry  ::=  SEQUENCE {
+    bwNSPSTTHWMIndex Unsigned32,
+    bwNSPSTTHWMName DisplayString,
+    bwNSPSTTHWMValue Gauge32,
+    bwNSPSTTHWMTimestamp DisplayString,
+    bwNSPSTTHWMStackTrace DisplayString
+  }
+
+  bwNSPSTTHWMIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"This integer represents an index in table bwNSPSTTHWMTable. This is the index to a specific high water mark."
+		::=  {  bwNSPSTTHWMEntry  1  }
+
+	bwNSPSTTHWMName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The name of an PS TimesTen high water mark."
+		::=  {  bwNSPSTTHWMEntry  2  }
+
+	bwNSPSTTHWMValue	OBJECT-TYPE
+		SYNTAX			Gauge32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The value of an PS TimesTen high water mark."
+		::=  {  bwNSPSTTHWMEntry  3  }
+
+	bwNSPSTTHWMTimestamp	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The timestamp of an PS TimesTen high water mark."
+		::=  {  bwNSPSTTHWMEntry  4  }
+
+	bwNSPSTTHWMStackTrace	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+				"The stack trace of an PS TimesTen high water mark."
+		::=  {  bwNSPSTTHWMEntry  5  }
+
+-- ##################### ...............................
+-- Service Control Proxy ...............................
+-- ##################### ...............................
+
+	scpSystemModule	OBJECT IDENTIFIER
+		::=  {  serviceControlProxy  1  }
+
+
+
+	scpCapModule	OBJECT IDENTIFIER
+		::=  {  serviceControlProxy  2  }
+
+-- Service Control Proxy :: scpSystemModule ...............................
+
+	bwSCProxyStatsACLViolationCount	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Reflects the total number of messages received from unauthorized host"
+		::=  {  scpSystemModule  1  }
+
+	bwSCProxyStatsSCPMessageIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Reflects the total number of incoming CAP over HTTP messages"
+		::=  {  scpSystemModule  2  }
+
+	bwSCProxyStatsSCPMessageOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Reflects the total number of outgoing CAP over HTTP messages"
+		::=  {  scpSystemModule  3  }
+
+	bwSCProxyStatsSCPMessageErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Reflects the total number of error CAP over HTTP messages sent"
+		::=  {  scpSystemModule  4  }
+
+-- Service Control Proxy :: scpCapModule ...............................
+
+	bwSCProxyStatsASTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BwSCProxyStatsASEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This table holds bwSCProxyStatsASEntry, which consists of an ID, an address, the number of message In, out, and the number of error.  There is one entry per Application Server."
+		::=  {  scpCapModule  1 }
+
+	bwSCProxyStatsASEntry	OBJECT-TYPE
+		SYNTAX		BwSCProxyStatsASEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"This row contains information on a Hosting NE address"
+		INDEX		{  bwSCProxyStatsASIndex  }
+		::=  { bwSCProxyStatsASTable 1 }
+
+	BwSCProxyStatsASEntry  ::=  SEQUENCE {
+		bwSCProxyStatsASIndex  Unsigned32,
+		bwSCProxyStatsASAddr  DisplayString,
+		bwSCProxyStatsASMessageIns  Counter32,
+		bwSCProxyStatsASMessageOuts  Counter32,
+		bwSCProxyStatsASMessageErrors  Counter32
+		}
+
+
+	bwSCProxyStatsASIndex	OBJECT-TYPE
+		SYNTAX			Unsigned32
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+				"Index to a HostingNe address entry."
+		::=  {  bwSCProxyStatsASEntry  1  }
+
+	bwSCProxyStatsASAddr	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+				"The address of a HostingNe"
+		::=  {  bwSCProxyStatsASEntry  2  }
+
+	bwSCProxyStatsASMessageIns	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Reflects the total number of incoming CAP messages for a specific HostingNe address"
+		::=  {  bwSCProxyStatsASEntry  3  }
+
+	bwSCProxyStatsASMessageOuts	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Reflects the total number of outgoing CAP messages for a specific HostingNe address"
+		::=  {  bwSCProxyStatsASEntry  4  }
+
+	bwSCProxyStatsASMessageErrors	OBJECT-TYPE
+		SYNTAX			Counter32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Reflects the total number of error CAP messages received from a specific HostingNe address"
+		::=  {  bwSCProxyStatsASEntry  5  }
+
+-- ##################### ...............................
+-- LOCATION API          ...............................
+-- ##################### ...............................
+
+	locationApi	OBJECT IDENTIFIER
+		::=  {  nsProtocol  1  }
+
+-- User Location API :: locationApi Module ...............................
+
+	bwUserLocationRequests	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Number of times a user location request has been received."
+		::=  {  locationApi  1 }
+
+  bwUserLocationRequestSuccess	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Number of times a user location request has been answered successfully."
+		::=  {  locationApi  2 }
+
+  bwUserLocationRequestUnknownUser	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Number of times a user location request could not be processed because the user is unknown."
+		::=  {  locationApi  3 }
+
+  bwUserLocationRequestFailures	OBJECT-TYPE
+		SYNTAX		Counter32
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Number of times a user location request could not be processed."
+		::=  {  locationApi  4 }
+
+-- BroadWorks Network Server MIB Conformance Definition  ...........................................
+
+bwNSMibGroups		OBJECT IDENTIFIER ::= { bwNSMibConformance 1 }
+bwNSMibCompliancy	OBJECT IDENTIFIER ::= { bwNSMibConformance 2 }
+
+-- units of conformance
+
+bwNsLicensingGroup    OBJECT-GROUP
+    OBJECTS { bwNbTimePeriodWithLicenseViolations, bwNbTransactionInViolation, bwNbThresholdAlarmSent, bwNSSystemInternalQueueResets }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the licensing information for the Network Server."
+    ::= { bwNSMibGroups 1 }
+
+bwNsSystemQueueStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSSystemInternalQueueResets, bwNSSystemInternalQueueTable, bwNSSystemInternalQueueIndex, bwNSSystemInternalQueueName, bwNSSystemInternalQueueSize, bwNSSystemInternalQueueTimeAvg, bwNSSystemInternalQueueTimeMin, bwNSSystemInternalQueueTimeMax, bwNSSystemInternalQueueTimeMaxTimestampMSB, bwNSSystemInternalQueueLengthCurrent, bwNSSystemInternalQueueLengthAvg, bwNSSystemInternalQueueLengthMax, bwNSSystemInternalQueueLengthMaxTimestampMSB, bwNSSystemInternalQueueLengthMaxTimestampLSB, bwNSSystemInternalQueueTimeMaxTimestampLSB }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the internal system queue statistics information the Network Server."
+    ::= { bwNSMibGroups 2 }
+
+bwNsGenericPolicyStatsGroup    OBJECT-GROUP
+    OBJECTS { publicPolicyStatTable, pubPolStatID, pubPolStatPolicyName, pubPolStatNbInstances, pubPolStatNbRequests, pubPolStatNbRequestsFailures, pubPolStatNbRequestsResults, privatePolicyStatTable, privPolStatID, privPolStatEnterpriseName, privPolStatPolicyName, privPolStatNbRequests, privPolStatNbRequestsFailures, privPolStatNbRequestsResults, policyInfoTable, polInfoID, polInfoEnterpriseName, polInfoPolicyName, polInfoInfoName, polInfoNbOccurences, bwNbPolicyRequests, bwNbPolicyRequestFailures }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the generic counter for all policies on the Network Server."
+    ::= { bwNSMibGroups 3 }
+
+bwNsNeStatsGroup    OBJECT-GROUP
+    OBJECTS { neStatTable, neStatID, neStatName, neStatNbSIPRequests, neStatNbSIPRequestsFailures, neStatNbMSSRequests, neStatNbMSSRequestsFailures }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the information for the Network Elements sending requests to the Network Server."
+    ::= { bwNSMibGroups 4 }
+
+bwNsErrorStatsGroup    OBJECT-GROUP
+    OBJECTS { errorStatTable, errorStatEntry, errStatID, errStatName, errStatNbOccurences }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for all error codes returned by the Network Server to SIP requests."
+    ::= { bwNSMibGroups 5 }
+
+bwNsCallPStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSCallpCallsPerSecond }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for system level callp of the Network Server."
+    ::= { bwNSMibGroups 6 }
+
+bwNsCarrierStatsGroup    OBJECT-GROUP
+    OBJECTS { carrierStatTable, carrierStatEntry, bwCarrierStatID, bwCarrierName, bwCarrierCic, bwCarrierNbIntraLataCalls, bwCarrierNbInterLataCalls, bwCarrierNbInternationalCalls }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics per equal acess carrier."
+    ::= { bwNSMibGroups 7 }
+
+bwNsSipStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSSipStatsInviteIns, bwNSSipStatsAckIns, bwNSSipStatsInviteResponsesTable, bwNSSipStatsCancelIns, bwNSSipStatsRegisterIns, bwNSSipStatsNotifyIns, bwNSSipStatsSubscribeIns, bwNSSipStatsMessageIns, bwNSSipStatsInfoIns, bwNSSipStatsOptionsIns, bwNSSipStatsOptionsResponsesTable, bwNSSipStatsRegisterResponsesTable, bwNSSipStatsInfoResponsesTable, bwNSSipStatsNotifyResponsesTable, bwNSSipStatsSubscribeResponsesTable, bwNSSipStatsMessageResponsesTable, bwNSSipStatsFailures, bwNSSipStatsActiveTcpConnections, bwNSSipStatsTcpIns, bwNSSipStatsTcpOuts, bwNSSipStatsTcpFailures, bwNSSipStatsUdpIns, bwNSSipStatsUdpOuts, bwNSSipStatsInviteResponseCodeValue, bwNSSipStatsInviteResponseOuts, bwNSSipStatsOptionsResponseCodeValue, bwNSSipStatsOptionsResponseIns, bwNSSipStatsOptionsResponseOuts, bwNSSipStatsRegisterResponseCodeValue, bwNSSipStatsRegisterResponseIns, bwNSSipStatsRegisterResponseOuts, bwNSSipStatsInfoResponseCodeValue, bwNSSipStatsInfoResponseIns, bwNSSipStatsInfoResponseOuts, bwNSSipStatsNotifyResponseCodeValue, bwNSSipStatsNotifyResponseIns, bwNSSipStatsNotifyResponseOuts, bwNSSipStatsSubscribeResponseCodeValue, bwNSSipStatsSubscribeResponseIns, bwNSSipStatsSubscribeResponseOuts, bwNSSipStatsMessageResponseCodeValue, bwNSSipStatsMessageResponseIns, bwNSSipStatsMessageResponseOuts }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the SIP protocol."
+    ::= { bwNSMibGroups 8 }
+
+bwNsNrsStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSNbInvalidMessagesReceived, bwNSNbRequestsReceived, bwNSNbResponsesReceived, bwNSNbErrorsReceived, bwNSNbRequestsSent, bwNSNbResponsesSent, bwNSNbErrorsSent, bwNSNbRequestsResent, bwNSNbResponsesResent, bwNSNbRequestsUnanswered, bwNSNRSStatsTable, bwNSNRSStatsTableIndex, bwNSNRSStatsTableProtocolName, bwNSNRSStatsTableNbRequestsReceived, bwNSNRSStatsTableNbResponsesReceived, bwNSNRSStatsTableNbErrorsReceived, bwNSNRSStatsTableNbRequestsSent, bwNSNRSStatsTableNbResponsesSent, bwNSNRSStatsTableNbErrorsSent, bwNSNRSStatsTableNbRequestsResent, bwNSNRSStatsTableNbResponsesResent, bwNSNRSStatsTableNbRequestsUnanswered }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the NRS-based protocols."
+    ::= { bwNSMibGroups 9 }
+
+bwNsCallLogsStatsGroup    OBJECT-GROUP
+    OBJECTS { calllogNbEnterprises, calllogNbClients }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the call logs."
+    ::= { bwNSMibGroups 10 }
+
+bwNsXSPersistencyStatsGroup    OBJECT-GROUP
+    OBJECTS { perNSNbOpenedTransactions, perNSNbCommittedTransactions, perNSNbFailedTransactions, perNSNbCriticalErrors, ttNSNbConnectionsCreated, ttNSConnectionPoolSize, ttNSNbBackdoorUpdates, ttNSNbFailedCheckpoints, xsNSRemoteXlaNbTimesConnected, xsNSRemoteXlaNbTimesDisconnected, xsNSRemoteXlaUpdatesProcessed, xsNSRemoteXlaUpdatesPending }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the Network Server Execution Server process persistency."
+    ::= { bwNSMibGroups 11 }
+
+bwNsMoCountersGroup    OBJECT-GROUP
+    OBJECTS { resetAllNSCounters }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics to perform managed object work for the Network Server."
+    ::= { bwNSMibGroups 12 }
+
+bwNsSystemGroup    OBJECT-GROUP
+    OBJECTS { systemNbGrps, systemNbDNs, systemNbURLs, systemNbProfiles, systemNbRoutingNEs, systemNbResourceNEs, systemNbEnterprises, systemNbUnassignedDNs, systemNbExts, systemNbSites, systemNbHostingNes }
+    STATUS  current
+    DESCRIPTION
+       "This group defines system level counters for the Network Server."
+    ::= { bwNSMibGroups 13 }
+
+bwNsSyncAPIGroup    OBJECT-GROUP
+    OBJECTS { syncNbUpdatesRequests, syncNbUpdatesRequestsFailures, syncNbOpenedSessions, syncNbAuthorizationFailures, syncNbActiveSessions }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the SyncAPI protocol used between the BroadWorks Application and Network Server."
+    ::= { bwNSMibGroups 14 }
+
+bwNsOamGroup    OBJECT-GROUP
+    OBJECTS { oampNbActiveSessions }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the OAM protocol for the Network Server."
+    ::= { bwNSMibGroups 15 }
+
+bwNsOssGroup    OBJECT-GROUP
+    OBJECTS { ossNbUpdatesRequests, ossNbUpdatesRequestsFailures, ossNbQueriesRequests, ossNbQueriesRequestsFailures, ossNbOpenedSessions, ossNbAuthorizationFailures, ossNbActiveSessions }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the Network Server OSS protocol."
+    ::= { bwNSMibGroups 16 }
+
+bwNsPSPersistencyStatsGroup    OBJECT-GROUP
+    OBJECTS { psNSPerNbOpenedTransactions, psNSPerNbCommittedTransactions, psNSPerNbFailedTransactions, psNSPerNbCriticalErrors, psNSTtNbConnectionsCreated, psNSTtConnectionPoolSize, psNSTtNbBackdoorUpdates, psNSTtNbFailedCheckpoints, psNSRemoteXlaNbTimesConnected, psNSRemoteXlaNbTimesDisconnected, psNSRemoteXlaUpdatesProcessed, psNSRemoteXlaUpdatesPending }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the Network Server Provisioning Server process persistency."
+    ::= { bwNSMibGroups 17 }
+
+bwNsScpStatsGroup    OBJECT-GROUP
+    OBJECTS { bwSCProxyStatsACLViolationCount, bwSCProxyStatsSCPMessageIns, bwSCProxyStatsSCPMessageOuts, bwSCProxyStatsSCPMessageErrors, bwSCProxyStatsASTable, bwSCProxyStatsASIndex, bwSCProxyStatsASAddr, bwSCProxyStatsASMessageIns, bwSCProxyStatsASMessageOuts, bwSCProxyStatsASMessageErrors }
+    STATUS  current
+    DESCRIPTION
+       "This group defines statistics for the Network Server SCP process."
+    ::= { bwNSMibGroups 18 }
+
+bwNsXsBcctGroup    OBJECT-GROUP
+    OBJECTS { bwNSCommonCommXSStatsTable, bwNSCommonCommXSStatsIndex, bwNSCommonCommXSHost, bwNSCommonCommXSInterface, bwNSCommonCommXSProtocol, bwNSCommonCommXSAcceptedOutboundConnections, bwNSCommonCommXSAcceptedInboundConnections, bwNSCommonCommXSRejectedOutboundConnections, bwNSCommonCommXSRejectedInboundConnections, bwNSCommonCommXSOutputMessagesProcessed, bwNSCommonCommXSInputMessagesProcessed, bwNSCommonCommXSOutputCommunicationErrors, bwNSCommonCommXSInputCommunicationErrors }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the BCCT protocol for the Network Server Execution Server process."
+    ::= { bwNSMibGroups 19 }
+
+bwNsPsBcctGroup    OBJECT-GROUP
+    OBJECTS { bwNSCommonCommPSStatsTable, bwNSCommonCommPSStatsIndex, bwNSCommonCommPSHost, bwNSCommonCommPSInterface, bwNSCommonCommPSProtocol, bwNSCommonCommPSAcceptedOutboundConnections, bwNSCommonCommPSAcceptedInboundConnections, bwNSCommonCommPSRejectedOutboundConnections, bwNSCommonCommPSRejectedInboundConnections, bwNSCommonCommPSOutputMessagesProcessed, bwNSCommonCommPSInputMessagesProcessed, bwNSCommonCommPSOutputCommunicationErrors, bwNSCommonCommPSInputCommunicationErrors }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the BCCT protocol from the Provisioning Server process."
+    ::= { bwNSMibGroups 20 }
+
+bwNSXSTcpStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSXSTcpServersStatsTable, bwNSXSTcpServersStatsIndex, bwNSXSTcpServersName, bwNSXSTcpServersNbConnectionsAccepted, bwNSXSTcpServersNbConnectionsClosed, bwNSXSTcpServersOutgoingQueueSize, bwNSXSTcpServersIncomingQueueSize, bwNSXSTcpServersNbBytesSentSecure, bwNSXSTcpServersNbBytesReceivedSecure }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the Automatic Hold And Retrieve Service."
+    ::= { bwNSMibGroups 21 }
+
+bwNSPSTcpStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSPSTcpServersStatsTable, bwNSPSTcpServersStatsIndex, bwNSPSTcpServersName, bwNSPSTcpServersNbConnectionsAccepted, bwNSPSTcpServersNbConnectionsClosed, bwNSPSTcpServersOutgoingQueueSize, bwNSPSTcpServersIncomingQueueSize, bwNSPSTcpServersNbBytesSentSecure, bwNSPSTcpServersNbBytesReceivedSecure }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the Automatic Hold And Retrieve Service."
+    ::= { bwNSMibGroups 22 }
+
+bwNSXSConcurrentFrameworkStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSXSMonitoringExecutorTable, bwNSXSMonitoringExecutorIndex, bwNSXSMonitoringExecutorName, bwNSXSMonitoringExecutorCurrentPoolSize, bwNSXSMonitoringExecutorMaxPoolSize, bwNSXSMonitoringExecutorAvgActiveThreads, bwNSXSMonitoringExecutorTaskQueueSize, bwNSXSMonitoringExecutorNbTasksRun, bwNSXSMonitoringExecutorNbWarnings, bwNSXSMonitoringExecutorNbErrors, bwNSXSMonitoringExecutorLongestTaskMs, bwNSXSMonitoringExecutorLongestTaskName }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the Automatic Hold And Retrieve Service."
+    ::= { bwNSMibGroups 23 }
+    
+bwNSPSConcurrentFrameworkStatsGroup    OBJECT-GROUP
+    OBJECTS { bwNSPSMonitoringExecutorTable, bwNSPSMonitoringExecutorIndex, bwNSPSMonitoringExecutorName, bwNSPSMonitoringExecutorCurrentPoolSize, bwNSPSMonitoringExecutorMaxPoolSize, bwNSPSMonitoringExecutorAvgActiveThreads, bwNSPSMonitoringExecutorTaskQueueSize, bwNSPSMonitoringExecutorNbTasksRun, bwNSPSMonitoringExecutorNbWarnings, bwNSPSMonitoringExecutorNbErrors, bwNSPSMonitoringExecutorLongestTaskMs, bwNSPSMonitoringExecutorLongestTaskName }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the Automatic Hold And Retrieve Service."
+    ::= { bwNSMibGroups 24 }
+    
+bwNSXSCongestionManagementGroup    OBJECT-GROUP
+    OBJECTS { bwNSCurrentCallOverloadZone, bwNSNumCallYellowZoneOverloadTrans, bwNSNumCallRedZoneOverloadTrans, bwNSCurrentNonCallOverloadZone, bwNSNumNonCallYellowZoneOverloadTrans, bwNSNumNonCallRedZoneOverloadTrans, bwNSNumDiscardedMessage, bwNSTimeLastDiscardedMessage }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the Congestion Management."
+    ::= { bwNSMibGroups 25 }
+    
+bwSIPCongestionManagementGroup    OBJECT-GROUP
+    OBJECTS { bwNSCongestionManagementNeighborTable, bwNSCongestionManagementNeighborIndex, bwNSCongestionManagementNeighborIpAddress, bwNSCongestionManagementNeighborInviteIn, bwNSCongestionManagementNeighborRegisterIn, bwNSCongestionManagementNeighborOptionsIn, bwNSCongestionManagementNeighborOptionsOut, bwNSCongestionManagementNeighborSubscribeNotifyIn, bwNSCongestionManagementNeighbor5xxIn, bwNSCongestionManagementNeighborCallpRequestInRate, bwNSCongestionManagementNeighborNonCallpRequestInRate, bwNSCongestionManagementNeighborState, bwNSCongestionManagementNeighborCapability }
+    STATUS  current
+    DESCRIPTION
+       "This group defines the statistics for the SIP Congestion Management."
+    ::= { bwNSMibGroups 26 }
+    
+-- 
+bwNsBasicCompliance MODULE-COMPLIANCE
+	STATUS current
+     	DESCRIPTION
+		"BroadWorks Network Server MIB compliance"
+	MODULE -- this module
+		MANDATORY-GROUPS { bwNsLicensingGroup, bwNsSystemQueueStatsGroup, bwNsGenericPolicyStatsGroup, bwNsNeStatsGroup, bwNsErrorStatsGroup, bwNsCallPStatsGroup, bwNsCarrierStatsGroup, bwNsSipStatsGroup, bwNsNrsStatsGroup, bwNsCallLogsStatsGroup, bwNsXSPersistencyStatsGroup, bwNsMoCountersGroup, bwNsSystemGroup, bwNsSyncAPIGroup, bwNsOamGroup, bwNsOssGroup, bwNsPSPersistencyStatsGroup, bwNsScpStatsGroup, bwNSXSTcpStatsGroup, bwNSPSTcpStatsGroup, bwNSXSCongestionManagementGroup, bwSIPCongestionManagementGroup }
+	::= { bwNSMibCompliancy 1 }
+
+-- End of MIB file - Do not put anything behind this line ...........................................
+
+END

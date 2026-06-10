@@ -1,0 +1,108 @@
+-- ***********************************************************************************************
+-- TRANSITION-SMI.my:  Transition Networks Enterprise Structure of Management Information
+--
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TRANSITION-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+transition MODULE-IDENTITY
+	LAST-UPDATED "201307240000Z"
+	ORGANIZATION "Transition Networks, Inc."
+	CONTACT-INFO
+		"	Transition Networks
+			Technical Support
+
+			10900 Red Circle Drive
+			Minnetonka, MN 55343 USA
+			Tel: +1-800-526-9267
+
+		    E-mail: techsupport@transition.com"
+	DESCRIPTION
+		"The Structure of Management Information for the
+		Transition Networks MIBs."
+
+	REVISION      "201307240000Z"
+		DESCRIPTION
+		"Initial Revision of this module"
+	::= { enterprises 868 }	-- IANA assigned
+
+productId        OBJECT IDENTIFIER ::=   { transition 1 }
+products         OBJECT IDENTIFIER ::=   { transition 2 }
+
+tnModules OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The Transition networks products are assigned
+		module identities from here."
+	::= { productId 5 }
+
+tnIONPlatform   OBJECT IDENTIFIER ::=   { tnModules 1 }
+tnCESwitches    OBJECT IDENTIFIER ::=   { tnModules 2 }
+tnIndSwitches   OBJECT IDENTIFIER ::=   { tnModules 3 }
+tnPBSwitches    OBJECT IDENTIFIER ::=   { tnModules 4 }
+tnLIBSwitches   OBJECT IDENTIFIER ::=   { tnModules 5 }
+
+tnCES3280       OBJECT IDENTIFIER ::=   { tnCESwitches 1 }
+tnCES3280TST    OBJECT IDENTIFIER ::=   { tnCESwitches 2 }
+tnCES3280S      OBJECT IDENTIFIER ::=   { tnCESwitches 3 }
+tnCES3280STST   OBJECT IDENTIFIER ::=   { tnCESwitches 4 }
+tnCES3290-24    OBJECT IDENTIFIER ::=   { tnCESwitches 5 }
+tnCES3290-42    OBJECT IDENTIFIER ::=   { tnCESwitches 6 }
+
+tnCES4140       OBJECT IDENTIFIER ::=   { tnCESwitches 20 }
+tnCES4212       OBJECT IDENTIFIER ::=   { tnCESwitches 21 }
+tnCES4224       OBJECT IDENTIFIER ::=   { tnCESwitches 22 }
+
+tnInd3280L      OBJECT IDENTIFIER ::=   { tnIndSwitches 1 }
+tnInd3284L      OBJECT IDENTIFIER ::=   { tnIndSwitches 2 }
+tnInd3280H      OBJECT IDENTIFIER ::=   { tnIndSwitches 3 }
+tnInd3284H      OBJECT IDENTIFIER ::=   { tnIndSwitches 4 }
+
+tnPBPLUSTDM4AC   OBJECT IDENTIFIER ::=  { tnPBSwitches 1 }
+tnPBPLUSTDM4DC   OBJECT IDENTIFIER ::=  { tnPBSwitches 2 }
+tnPBPLUSTDM1VXAC OBJECT IDENTIFIER ::=  { tnPBSwitches 3 }
+tnPBPLUSTDM1VXDC OBJECT IDENTIFIER ::=  { tnPBSwitches 4 }
+tnPBOAMTDM16     OBJECT IDENTIFIER ::=  { tnPBSwitches 5 }
+tnPBTDMCONTRAAC  OBJECT IDENTIFIER ::=  { tnPBSwitches 6 }
+tnPBTDMCONTRADC  OBJECT IDENTIFIER ::=  { tnPBSwitches 7 }
+
+tnLIBUnoAC       OBJECT IDENTIFIER ::=  { tnLIBSwitches 1 }
+tnLIBUnoDC       OBJECT IDENTIFIER ::=  { tnLIBSwitches 2 }
+tnLIBMidi        OBJECT IDENTIFIER ::=  { tnLIBSwitches 3 }
+
+tnProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"The Transition networks next generation Products."
+	::= { products 5 }
+
+tnExperimental OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+        "This provides a root object identifier
+        from which experimental mibs may be temporarily
+        based.  mibs are typicially based here if they
+        fall in one of two categories
+        1) are IETF work-in-process mibs which have not
+        been assigned a permanent object identifier by
+        the IANA.
+        2) are internal work-in-process which has not been
+        assigned a permanent object identifier typicially because
+        the mib is not ready for deployment.
+
+        NOTE WELL:  support for mibs in the tnExperimental
+        subtree will be deleted when a permanent object
+        identifier assignment is made."
+    ::= { transition 3 }
+
+END

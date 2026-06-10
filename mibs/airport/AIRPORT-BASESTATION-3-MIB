@@ -1,0 +1,420 @@
+AIRPORT-BASESTATION-3-MIB
+
+DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		enterprises, MODULE-IDENTITY, OBJECT-TYPE, IpAddress
+			FROM SNMPv2-SMI
+		PhysAddress
+			FROM RFC1213-MIB
+    	DisplayString
+			FROM SNMPv2-TC;
+
+baseStation3 MODULE-IDENTITY
+    LAST-UPDATED "200301160001Z"
+    ORGANIZATION "Apple Computer, Inc."
+    CONTACT-INFO
+            "       Apple Computer, Inc.
+            Postal: 1 Infinite Loop
+                    Cupertino, CA  95014
+                    USA
+               Tel: +1-408-996-1010"
+    DESCRIPTION
+            "Management information base in SMI v2 for the AirPort and AirPort Extreme Base Station (v3)."
+    ::= { airport 3 }
+
+apple OBJECT IDENTIFIER ::= { enterprises 63 }
+
+airport OBJECT IDENTIFIER ::= { apple 501 }
+
+-- (c) 2003 Apple Computer, Inc. All rights reserved. Apple, the Apple logo, 
+-- AirPort, and AirPort Extreme are trademarks of Apple Computer, Inc., 
+-- registered in the U.S. and other countries. 
+
+-- system configuration information
+
+abs3SysConf OBJECT IDENTIFIER ::= { baseStation3 1 }
+
+sysConfName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Configured name of the AirPort Base Station."
+    ::= { abs3SysConf 1 }
+
+sysConfContact  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Configured name of the contact for the AirPort Base Station."
+    ::= { abs3SysConf 2 }
+
+sysConfLocation  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Configured name of where the AirPort Base Station is located."
+    ::= { abs3SysConf 3 }
+    
+sysConfUptime	OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Length of time, in seconds, the AirPort Base Station has been running."
+	::= { abs3SysConf 4 }
+	
+sysConfFirmwareVersion	OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Current firmware revision running on the AirPort Base Station."
+	::= { abs3SysConf 5 }
+
+-- TBD: additional configuration/status information
+--		NAT state
+--		DHCP state
+--		briding state
+--		product information (Snow, Extreme, etc)
+-- 		USB information
+--			list of attached devices, each one with status info
+-- 		print server information
+--			list of printers, each one with number of jobs received, 
+--		logging
+
+
+-- information about wireless clients
+
+wireless OBJECT IDENTIFIER ::= { baseStation3 2 }
+
+wirelessNumber OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of wireless clients associated with this AP."
+	::= { wireless 1 }
+	
+wirelessClientsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF WirelessClient
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of wireless clients."
+	::= { wireless 2 }
+
+wirelessClient OBJECT-TYPE
+	SYNTAX		WirelessClient
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION "A wireless client entry containing information about the client."
+	INDEX { wirelessPhysAddress }
+	::= { wirelessClientsTable 1 }
+	
+WirelessClient ::= SEQUENCE {
+
+	-- the following information is provided by the access point driver (i.e., this is information it knows about the wireless STA)
+
+		wirelessPhysAddress
+			PhysAddress,
+		wirelessType
+			INTEGER,
+		wirelessDataRates
+			DisplayString,
+		wirelessTimeAssociated
+			INTEGER,
+		wirelessLastRefreshTime
+			INTEGER,
+
+	-- the following information is obtained from the client, via a communication protocol between the AP and STA/WDS node
+	-- 		and therefore, it is only supported by Apple STA/AP drivers 
+	-- the information is refreshed once each time it is requested, but since some STAs will not implement this
+	--		protocol, we provide an indication of how long it has been since the data was refreshed.  if that value
+	--		is zero, then it means we have never obtained this information from the clients
+
+		wirelessStrength
+			INTEGER,
+		wirelessNoise
+			INTEGER,
+		wirelessRate
+			INTEGER,
+		wirelessNumRX
+			INTEGER,
+		wirelessNumTX
+			INTEGER,
+		wirelessNumRXErrors
+			INTEGER,
+		wirelessNumTXErrors
+			INTEGER
+
+	}
+
+wirelessPhysAddress OBJECT-TYPE
+	SYNTAX		PhysAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The MAC address of the wireless client."
+	::= { wirelessClient 1 }
+			
+wirelessType OBJECT-TYPE
+	SYNTAX		INTEGER { 
+		sta(1),
+		wds(2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The type of wireless client node."
+	::= { wirelessClient 2 }
+
+wirelessDataRates OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The data rates available for the wireless client."
+	::= { wirelessClient 3 }
+
+wirelessTimeAssociated OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The time that this wireless client associated."
+	::= { wirelessClient 4 }
+
+wirelessLastRefreshTime OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of seconds since the client reported its statistics to the AirPort Base Station (-1 if never refreshed or not supported)."
+	::= { wirelessClient 5 }
+
+wirelessStrength OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The signal strength reported by the wireless client (-1 if not supported)."
+	::= { wirelessClient 6 }
+
+wirelessNoise OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The noise reported by the wireless client (-1 if not supported)."
+	::= { wirelessClient 7 }
+
+wirelessRate OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The rate reported by the wireless client (-1 if not supported)."
+	::= { wirelessClient 8 }
+
+wirelessNumRX OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of packets received reported by the wireless client (-1 if not supported)."
+	::= { wirelessClient 9 }
+
+wirelessNumTX OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of packets transmitted reported by this wireless client (-1 if not supported)."
+	::= { wirelessClient 10 }
+
+wirelessNumRXErrors OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of errors encountered receiving packets reported by this wireless client (-1 if not supported)."
+	::= { wirelessClient 11 }
+
+wirelessNumTXErrors OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of errors encountered transmitting packets reported by this wireless client (-1 if not supported)."
+	::= { wirelessClient 12 }
+
+-- information about DHCP server
+
+dhcpServer OBJECT IDENTIFIER ::= { baseStation3 3 }
+
+dhcpNumber OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of DHCP clients served by the AirPort base station."
+	::= { dhcpServer 1 }
+	
+dhcpClientsTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF DHCPClient
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A list of DHCP clients."
+	::= { dhcpServer 2 }
+
+dhcpClient OBJECT-TYPE
+	SYNTAX		DHCPClient
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION "A DHCP client entry containing information about the client."
+	INDEX { dhcpPhysAddress }
+	::= { dhcpClientsTable 1 }
+	
+DHCPClient ::= SEQUENCE {
+
+		-- indexed by phys address, since it is unique per client
+
+		dhcpPhysAddress
+			PhysAddress,
+		dhcpIpAddress
+			IpAddress,
+		dhcpClientID
+			OCTET STRING,
+		dhcpLeaseTime
+			INTEGER
+	}
+	
+dhcpPhysAddress OBJECT-TYPE
+	SYNTAX		PhysAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The MAC address of the DHCP client."
+	::= { dhcpClient 1 }
+
+dhcpIpAddress OBJECT-TYPE
+	SYNTAX		IpAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The IP address of the DHCP client."
+	::= { dhcpClient 2 }
+
+dhcpClientID OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The DHCP client ID of the DHCP client."
+	::= { dhcpClient 3 }
+
+dhcpLeaseTime OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The lease time for the DHCP client."
+	::= { dhcpClient 4 }
+
+
+-- physical interfaces table
+
+physicalInterfaces OBJECT IDENTIFIER ::= { baseStation3 4 }
+
+physicalInterfaceCount OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of physical interfaces on the AirPort Base Station.  This is different than the number of IP interfaces, as reported by the system MIBs, as the AirPort's bridge typically multiplexes two or more interfaces."
+	::= { physicalInterfaces 1 }
+	
+physicalInterfacesTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF PhysicalInterface
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"List of physical interfaces on the AirPort Base Station."
+	::= { physicalInterfaces 2 }
+	
+physicalInterface	OBJECT-TYPE
+	SYNTAX		PhysicalInterface
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Entry containing data about the physical interface on the AirPort Base Station."
+	INDEX		{ physicalInterfaceIndex }
+	::= { physicalInterfacesTable 1 }
+
+PhysicalInterface ::= SEQUENCE {
+	physicalInterfaceIndex		INTEGER,
+	physicalInterfaceName		OCTET STRING,
+	physicalInterfaceUnit		INTEGER,
+	physicalInterfaceSpeed		INTEGER,
+	physicalInterfaceState		INTEGER,
+	physicalInterfaceDuplex		INTEGER,
+	physicalInterfaceNumTX		INTEGER,
+	physicalInterfaceNumRX		INTEGER,
+	physicalInterfaceNumTXError	INTEGER,
+	physicalInterfaceNumRXError	INTEGER
+}
+
+physicalInterfaceIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "A unique value for each physical interface.  Its value ranges between 1 and the value of physicalInterfaceCount."
+	::= { physicalInterface 1 }
+
+physicalInterfaceName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The name of the physical interface."
+	::= { physicalInterface 2 }
+
+physicalInterfaceUnit OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The unit number of the physical interface."
+	::= { physicalInterface 3 }
+
+physicalInterfaceSpeed OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The speed, in bits per second, of the interface."
+	::= { physicalInterface 4 }
+
+physicalInterfaceState OBJECT-TYPE
+	SYNTAX		INTEGER { 
+		linkDown(0),
+		linkUp(1)
+	}	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The status of this interface."
+	::= { physicalInterface 5 }
+
+physicalInterfaceDuplex OBJECT-TYPE
+	SYNTAX		INTEGER { 
+		half(0),
+		full(1)
+	}	
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The duplex-state of this interface."
+	::= { physicalInterface 6 }
+
+physicalInterfaceNumTX OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of packets transmitted on this interface."
+	::= { physicalInterface 7 }
+
+physicalInterfaceNumRX OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of packets received on this interface."
+	::= { physicalInterface 8 }
+
+physicalInterfaceNumTXError OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of errors during transmission on this interface."
+	::= { physicalInterface 9 }
+
+physicalInterfaceNumRXError OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION "The number of errors during reception on this interface."
+	::= { physicalInterface 10 }
+
+END

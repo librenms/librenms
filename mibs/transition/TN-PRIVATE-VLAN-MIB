@@ -1,0 +1,140 @@
+-- *****************************************************************
+-- TN-PRIVATE-VLAN-MIB
+--
+-- Copyright (c) 2012, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-PRIVATE-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32,
+    Integer32  FROM SNMPv2-SMI
+    NOTIFICATION-GROUP  FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, TimeStamp,
+    RowStatus, TruthValue  FROM SNMPv2-TC
+    entPhysicalIndex  FROM ENTITY-MIB
+    PortList FROM Q-BRIDGE-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnPrivateVlanMIB MODULE-IDENTITY
+        LAST-UPDATED "201207310000Z"
+        ORGANIZATION "Transition Networks, Inc."
+        CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+        E-mail: techsupport@transition.com"
+        DESCRIPTION
+        "The mib module is designed for private vlans."
+
+    ::= { tnProducts 26 }
+
+tnPrivateVlansMIBObjects
+        OBJECT IDENTIFIER ::= { tnPrivateVlanMIB 1 }
+
+tnPrivateVlanMIBNotifications
+        OBJECT IDENTIFIER ::= { tnPrivateVlanMIB 2 }
+
+--
+-- MIB variables
+--
+
+tnPrivateVlanMgmt
+    OBJECT IDENTIFIER ::= { tnPrivateVlansMIBObjects 1 }
+
+--
+-- tnPVlanMembershipTable
+--
+tnPVlanMembershipTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnPVlanMembershipEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "This table is a mapping for private vlan."
+    ::= { tnPrivateVlanMgmt 1 }
+
+tnPVlanMembershipEntry OBJECT-TYPE
+    SYNTAX        TnPVlanMembershipEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The entries list the entries that maps private vlan."
+    INDEX { entPhysicalIndex, tnPVlanMembershipPVlanId }
+    ::= { tnPVlanMembershipTable 1 }
+
+TnPVlanMembershipEntry ::= SEQUENCE {
+    tnPVlanMembershipPVlanId          Unsigned32,
+    tnPVlanMembershipPortMember       PortList,
+    tnPVlanMembershipRowStatus        RowStatus
+    }
+
+tnPVlanMembershipPVlanId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Private VLAN id in the system, typically ranges from 1 to max number of ports."
+    ::= { tnPVlanMembershipEntry 1 }
+
+tnPVlanMembershipPortMember OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The port member of an entry."
+    ::= { tnPVlanMembershipEntry 2 }
+
+tnPVlanMembershipRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create
+        and delete entries in this table."
+    ::= { tnPVlanMembershipEntry 3 }
+
+--
+-- tnPVlanPortIsolationTable
+--
+tnPVlanPortIsolationTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnPVlanPortIsolationEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "This table is a mapping for private vlan isolation."
+    ::= { tnPrivateVlanMgmt 2 }
+
+tnPVlanPortIsolationEntry OBJECT-TYPE
+    SYNTAX        TnPVlanPortIsolationEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+    "The entries list the entries that maps private vlan isolation table."
+    INDEX { entPhysicalIndex }
+    ::= { tnPVlanPortIsolationTable 1 }
+
+TnPVlanPortIsolationEntry ::= SEQUENCE {
+    tnPVlanPortIsolationPortMember          PortList
+    }
+
+tnPVlanPortIsolationPortMember  OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The port member of a port isolation configuration entry."
+    ::= { tnPVlanPortIsolationEntry 1 }
+
+--
+-- Notifications
+--
+
+END

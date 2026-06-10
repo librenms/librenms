@@ -1,0 +1,225 @@
+RADLAN-DNSCL-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                RADLAN DNSCL Private Extension
+--                       This Private MIB supports the DNS Client for ROS
+-- Version:              7.30
+-- Date:                 24 Oct 2003
+
+
+
+IMPORTS
+    rlDnsCl                                 FROM RADLAN-MIB
+    dnsResConfigSbeltEntry                  FROM DNS-RESOLVER-MIB
+    DnsName                                 FROM DNS-SERVER-MIB
+    OBJECT-TYPE, IpAddress,
+    Unsigned32, Integer32                   FROM SNMPv2-SMI
+    DisplayString                           FROM SNMPv2-TC-v1
+    TEXTUAL-CONVENTION,
+    TruthValue, RowStatus                   FROM SNMPv2-TC;
+
+rlDnsClMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+::= { rlDnsCl 1 }
+
+rlDnsClEnable OBJECT-TYPE
+    SYNTAX INTEGER{
+       enable(1),
+       disable(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "Enable or Disable the use of the DNS client feature."
+    ::=  { rlDnsCl 2 }
+
+rlDnsClDomainNameTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlDnsClDomainNameEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "The domain names table."
+     ::= { rlDnsCl 3}
+
+rlDnsClDomainNameEntry  OBJECT-TYPE
+   SYNTAX RlDnsClDomainNameEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+     " The row definition for this table."
+   INDEX { rlDnsClDomainNameName }
+   ::= { rlDnsClDomainNameTable  1 }
+
+RlDnsClDomainNameEntry  ::= SEQUENCE {
+    rlDnsClDomainNameName           DnsName,
+    rlDnsClDomainNameOwner          INTEGER,
+    rlDnsClDomainNameRowStatus      RowStatus
+}
+
+rlDnsClDomainNameName OBJECT-TYPE
+   SYNTAX DnsName
+   MAX-ACCESS read-write
+   STATUS current
+   DESCRIPTION
+     "The domain name for this ifIndex."
+     ::= { rlDnsClDomainNameEntry 1 }
+
+rlDnsClDomainNameOwner OBJECT-TYPE
+    SYNTAX  INTEGER{
+           static(1),
+           dhcp(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The Domain Name owner. Static if Domain Name defined by user, dhcp
+        if received by boot protocol like DHCP."
+    DEFVAL  { static }
+    ::=   { rlDnsClDomainNameEntry 2 }
+
+rlDnsClDomainNameRowStatus  OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+      "The row status variable, used according to
+      row installation and removal conventions."
+    ::= { rlDnsClDomainNameEntry 3 }
+
+rlDnsClMaxNumOfRetransmissions OBJECT-TYPE
+    SYNTAX      INTEGER (0..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of retransmissions for each query."
+    DEFVAL      { 3 }
+::= { rlDnsCl 4 }
+
+rlDnsClMinRetransmissionInterval OBJECT-TYPE
+    SYNTAX      INTEGER (1..15)
+    MAX-ACCESS      read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum number of seconds that must elapsed before
+         retransmission for each query."
+    DEFVAL      { 5 }
+::= { rlDnsCl 5 }
+
+rlDnsClNamesTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlDnsClNamesEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+    "The Names table."
+     ::= { rlDnsCl 6}
+
+rlDnsClNamesEntry  OBJECT-TYPE
+   SYNTAX RlDnsClNamesEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rlDnsClNamesName,
+           rlDnsClNamesOwner,
+           rlDnsClNamesIndex }
+   ::= { rlDnsClNamesTable 1 }
+
+RlDnsClNamesEntry  ::= SEQUENCE {
+  rlDnsClNamesName          DnsName,
+  rlDnsClNamesOwner         INTEGER,
+  rlDnsClNamesIndex         Integer32,
+  rlDnsClNamesAddr          IpAddress,
+  rlDnsClNamesRowStatus     RowStatus
+}
+
+rlDnsClNamesName OBJECT-TYPE
+   SYNTAX     DnsName
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+       "The host name."
+     ::= { rlDnsClNamesEntry 1 }
+
+rlDnsClNamesOwner OBJECT-TYPE
+    SYNTAX  INTEGER{
+           static(1),
+           dhcp(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The Host Name Entry owner. Static if  Host Name Entry defined by user, dhcp
+        if received by boot protocol like DHCP."
+    DEFVAL  { static }
+    ::=   { rlDnsClNamesEntry 2 }
+
+rlDnsClNamesIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A value which makes entries in the table unique when the
+            other index values (rlDnsClNamesName) do not
+            provide a unique index."
+    ::= { rlDnsClNamesEntry 3 }
+
+rlDnsClNamesAddr OBJECT-TYPE
+   SYNTAX     IpAddress
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+       "The host IP address"
+     ::=  { rlDnsClNamesEntry 4 }
+
+rlDnsClNamesRowStatus  OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { rlDnsClNamesEntry 5 }
+
+dnsResConfigSbeltExtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF DnsResConfigSbeltExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Augmenting dnsResConfigSbeltTable (dns resolver safety belt table)
+         for added info"
+    ::= {rlDnsCl 7 }
+
+dnsResConfigSbeltExtEntry OBJECT-TYPE
+    SYNTAX     DnsResConfigSbeltExtEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A row of the table dnsResConfigSbeltTable Extended
+         by this definition."
+    AUGMENTS { dnsResConfigSbeltEntry }
+    ::= {dnsResConfigSbeltExtTable  1 }
+
+DnsResConfigSbeltExtEntry  ::= SEQUENCE {
+  dnsResConfigSbeltOwner         INTEGER
+}
+
+
+dnsResConfigSbeltOwner OBJECT-TYPE
+    SYNTAX  INTEGER{
+           static(1),
+           dhcp(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The DNS server Entry owner. Static if DNS server Entry defined by user, dhcp
+        if received by boot protocol like DHCP."
+    DEFVAL  { static }
+    ::=   { dnsResConfigSbeltExtEntry 1 }
+
+
+END
+

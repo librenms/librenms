@@ -1,0 +1,319 @@
+--  ==================================================================
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI BRAS Management MIB
+-- Reference:
+-- Version:     V2.03
+-- History:
+--              V1.0 YangChangMao, 2007-06-14, publish
+-- ==================================================================
+
+HUAWEI-BRAS-MULTICAST-MIB    DEFINITIONS ::= BEGIN
+	    
+
+    IMPORTS
+        entPhysicalName			
+            FROM ENTITY-MIB	
+        hwBRASMib            
+            FROM HUAWEI-MIB
+        
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF            
+
+        IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
+        NOTIFICATION-TYPE, Integer32            
+            FROM SNMPv2-SMI            
+        RowStatus, DisplayString
+            FROM SNMPv2-TC;
+
+        hwMulticastVirtualAdjust MODULE-IDENTITY 
+            LAST-UPDATED "201801191700Z"        -- May 12, 2007 at 12:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                 Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China
+                 Website: http://www.huawei.com
+                 Email: support@huawei.com"
+            DESCRIPTION 
+                "The HUAWEI-BRAS-MULTICAST-MIB contains objects to
+                manage BRAS."
+            REVISION  "201801191700Z"
+            DESCRIPTION "modify the description of hwMulticastVirtualAdjustShowBandListIndex hwMulticastVirtualAdjustShowBandSourceIp hwMulticastVirtualAdjustShowBandGroupIp hwMulticastVirtualAdjustShowBandwidth."
+
+            REVISION  "201711221700Z"
+            DESCRIPTION "modify the description of hwMulticastTraps's child node at 2017-11-22."
+
+            REVISION  "201606061200Z"
+            DESCRIPTION "modify type add for multicastuser over limit"
+        ::= { hwBRASMib 17 }
+--
+-- Node definitions
+--
+    
+    hwMulticastVirtualAdjustMibObjects OBJECT IDENTIFIER ::= { hwMulticastVirtualAdjust 1 }    
+
+--
+-- Multicast Virtual Adjust Set Band Table
+--
+    hwMulticastVirtualAdjustSetBandTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMulticastVirtualAdjustSetBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of setting multicast program bandwidth."
+        ::= { hwMulticastVirtualAdjustMibObjects 1 }
+
+    
+    hwMulticastVirtualAdjustSetBandEntry OBJECT-TYPE
+        SYNTAX HwMulticastVirtualAdjustSetBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Setting multicast program bandwidth entry."
+        INDEX { 
+            hwMulticastVirtualAdjustSetBandListIndex
+        }
+        ::= { hwMulticastVirtualAdjustSetBandTable 1 }
+
+    
+        HwMulticastVirtualAdjustSetBandEntry ::=
+        SEQUENCE { 
+            hwMulticastVirtualAdjustSetBandListIndex
+                Integer32,
+            hwMulticastVirtualAdjustSetBandType
+                INTEGER,
+            hwMulticastVirtualAdjustSetBandValue
+                Integer32,
+            hwMulticastVirtualAdjustSetBandDetectInterval
+                Integer32,
+            hwMulticastVirtualAdjustSetBandThreshold
+                Integer32,
+            hwMulticastVirtualAdjustSetBandRowStatus
+                RowStatus
+         }
+
+    hwMulticastVirtualAdjustSetBandListIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..8191)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Start of multicast list index."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 1 }
+
+    
+    hwMulticastVirtualAdjustSetBandType OBJECT-TYPE
+        SYNTAX INTEGER {dynamic(1),static(2)}
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Type of multicast program bandwidth configured."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 2 }
+
+    
+    hwMulticastVirtualAdjustSetBandValue OBJECT-TYPE
+        SYNTAX Integer32 (10..400000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Bandwidth of multicast program.
+             units:Kbps(kbit/s)."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 3 }
+
+    
+    hwMulticastVirtualAdjustSetBandDetectInterval OBJECT-TYPE
+        SYNTAX Integer32 (15..1800)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Detect interval of dynamic bandwidth statistics.
+             units:second."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 4 }
+
+    
+    hwMulticastVirtualAdjustSetBandThreshold OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Ratio of bandwidth variation."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 5 }
+
+    hwMulticastVirtualAdjustSetBandRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "used to manage the creation and deletion of multicast virtual adjust band setting rows."
+        ::= { hwMulticastVirtualAdjustSetBandEntry 6 }
+
+
+--
+-- Multicast Virtual Adjust Show Band Table
+--
+        hwMulticastVirtualAdjustShowBandTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwMulticastVirtualAdjustShowBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of displaying multicast program bandwidth."
+        ::= { hwMulticastVirtualAdjustMibObjects 2 }
+
+    
+    hwMulticastVirtualAdjustShowBandEntry OBJECT-TYPE
+        SYNTAX HwMulticastVirtualAdjustShowBandEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Bandwidth display entry."
+        INDEX { 
+            hwMulticastVirtualAdjustShowBandListIndex,
+            hwMulticastVirtualAdjustShowBandSourceIp,
+            hwMulticastVirtualAdjustShowBandGroupIp
+        }
+        ::= { hwMulticastVirtualAdjustShowBandTable 1 }
+
+    
+    HwMulticastVirtualAdjustShowBandEntry ::=
+        SEQUENCE { 
+            hwMulticastVirtualAdjustShowBandListIndex
+                Integer32,
+            hwMulticastVirtualAdjustShowBandSourceIp
+                IpAddress,
+            hwMulticastVirtualAdjustShowBandGroupIp
+                IpAddress,
+            hwMulticastVirtualAdjustShowBandwidth
+                Integer32
+         }
+
+    hwMulticastVirtualAdjustShowBandListIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..8191)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the index of a multicast program list."
+        ::= { hwMulticastVirtualAdjustShowBandEntry 1 }
+
+    
+    hwMulticastVirtualAdjustShowBandSourceIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the source multicast address of a multicast program."
+        ::= { hwMulticastVirtualAdjustShowBandEntry 2 }
+
+    
+    hwMulticastVirtualAdjustShowBandGroupIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the group address of a multicast program."
+        ::= { hwMulticastVirtualAdjustShowBandEntry 3 }
+
+    
+    hwMulticastVirtualAdjustShowBandwidth OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the bandwidth of a multicast program, in kbit/s."
+        ::= { hwMulticastVirtualAdjustShowBandEntry 4 }     
+        
+--
+--  Conformance information
+--
+
+        hwMulticastMIBConformance OBJECT IDENTIFIER ::= { hwMulticastVirtualAdjust 2 }
+        
+        hwMulticastMIBCompliances OBJECT IDENTIFIER ::= { hwMulticastMIBConformance 1 }
+        
+--
+--  this module
+--
+        hwMulticastMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-DATACOMM-OID-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwMulticastGroup }
+            ::= { hwMulticastMIBCompliances 1 }
+        
+        hwMulticastMIBGroups OBJECT IDENTIFIER ::= { hwMulticastMIBConformance 2 }
+        
+        hwMulticastGroup OBJECT-GROUP
+            OBJECTS { 
+            hwMulticastVirtualAdjustSetBandType,
+            hwMulticastVirtualAdjustSetBandValue,
+            hwMulticastVirtualAdjustSetBandDetectInterval,
+            hwMulticastVirtualAdjustSetBandThreshold,
+            hwMulticastVirtualAdjustSetBandRowStatus,
+            hwMulticastVirtualAdjustShowBandwidth           
+            }
+            STATUS current
+            DESCRIPTION 
+                "The hwMulticast group."
+            ::= { hwMulticastMIBGroups 1 }      
+ --
+--  multicast user over limitn
+--
+--
+--  this module
+--
+hwMulticastMIBTrapDefine OBJECT IDENTIFIER ::= { hwMulticastVirtualAdjust 3 }
+
+hwMulticastTrapOid OBJECT IDENTIFIER ::= { hwMulticastMIBTrapDefine 1 }
+hwMulticastTraps OBJECT IDENTIFIER ::= { hwMulticastMIBTrapDefine 2 }
+
+      hwMulticastThreshold OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                Threshold.
+                "
+            ::= { hwMulticastTrapOid 1 }
+
+        hwMulticastUserExceedLimitGEPre NOTIFICATION-TYPE
+           OBJECTS { entPhysicalName, hwMulticastThreshold }
+           STATUS current
+            DESCRIPTION
+                "
+                Physical interface number of online multicast users reaches the maximum user number 95%.
+                "
+            ::= { hwMulticastTraps 1 }
+
+        hwMulticastUserExceedLimitGE NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwMulticastThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                Physical interface specification of the number of multicast subscribers reaches the board online users.
+                "
+            ::= { hwMulticastTraps 2 }
+    
+        hwMulticastUserExceedLimitTrunkPre NOTIFICATION-TYPE
+            OBJECTS { hwMulticastThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                TRUNK port 95% online multicast users reaches the maximum number of system users.
+                "
+            ::= { hwMulticastTraps 3 }
+
+        hwMulticastUserExceedLimitTrunk NOTIFICATION-TYPE
+            OBJECTS { hwMulticastThreshold }
+            STATUS current
+            DESCRIPTION
+                "
+                TRUNK port online multicast users reaches the maximum number of system users.
+                "
+            ::= { hwMulticastTraps 4 }
+END
+        
+        

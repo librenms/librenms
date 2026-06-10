@@ -1,0 +1,233 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI-SLOG-EUDM-MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              yangyinzhu,2003-03-18,<contents>
+-- =================================================================
+
+HUAWEI-SLOG-EUDM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwSLOGEudm MODULE-IDENTITY 
+        LAST-UPDATED "200304081633Z"        -- April 08, 2003 at 16:33 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The HUAWEI-SLOG-EUDM-MIB contains objects to manage the security
+            log for firewall product.
+            "
+        ::= { hwSLOG 2 }
+
+    --
+    -- Textual conventions
+    --
+
+    FlowLogType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        SYNTAX INTEGER
+            {
+            flowLogSysLog(1),
+            flowLogExport(2)
+            }
+    --
+    -- Node definitions
+    --
+
+    -- 1.3.6.1.4.1.2011.5.25.16
+    hwSLOG OBJECT IDENTIFIER ::= { hwDatacomm 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.1
+    hwSLogEudmGlobalCfg OBJECT IDENTIFIER ::= { hwSLOGEudm 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.1.1
+    hwSLogEudmAttackLogInterval OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The interval for sending log of attack event, the unit is second."
+        ::= { hwSLogEudmGlobalCfg 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.1.2
+    hwSLogEudmFlowLogInterval OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The interval for sending flow log, the unit is second."
+        ::= { hwSLogEudmGlobalCfg 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.1.3
+    hwSLogEudmStreamLogInterval OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The interval for sending log of statistics, the unit is second."
+        ::= { hwSLogEudmGlobalCfg 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.1.4
+    hwSLogEudmFlowLogMode OBJECT-TYPE
+        SYNTAX FlowLogType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The sending mode of flow log, can be SysLog or Export."
+        DEFVAL { flowLogSysLog }
+        ::= { hwSLogEudmGlobalCfg 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.1.5
+    hwSLogEudmServerIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The IP address of log server."
+        DEFVAL { 00000000 }
+        ::= { hwSLogEudmGlobalCfg 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.1.6
+    hwSLogEudmServerPort OBJECT-TYPE
+        SYNTAX Integer32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port of log server."
+        ::= { hwSLogEudmGlobalCfg 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.2
+    hwSLogInterZoneEnableCfg OBJECT IDENTIFIER ::= { hwSLOGEudm 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.2.1
+    hwSLogEudmFlowLogEnableTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSLogEudmFlowLogEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description"
+        ::= { hwSLogInterZoneEnableCfg 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.2.1.1
+    hwSLogEudmFlowLogEnableEntry OBJECT-TYPE
+        SYNTAX HwSLogEudmFlowLogEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Each inter-zone must have an entry"
+        INDEX { hwSLogFlowEnableZoneID1, hwSLogFlowEnableZoneID2 }
+        ::= { hwSLogEudmFlowLogEnableTable 1 }
+    
+    HwSLogEudmFlowLogEnableEntry ::=
+        SEQUENCE { 
+            hwSLogFlowEnableZoneID1
+                Integer32,
+            hwSLogFlowEnableZoneID2
+                Integer32,
+            hwSLogEudmFlowEnableFlag
+                TruthValue,
+            hwSLogEudmEnableHostAcl
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.16.2.2.1.1.1
+    hwSLogFlowEnableZoneID1 OBJECT-TYPE
+        SYNTAX Integer32 (1..16)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of first zone that compose the inter-zone."
+        ::= { hwSLogEudmFlowLogEnableEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.2.1.1.2
+    hwSLogFlowEnableZoneID2 OBJECT-TYPE
+        SYNTAX Integer32 (1..16)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of second zone that compose the inter-zone."
+        ::= { hwSLogEudmFlowLogEnableEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.2.1.1.3
+    hwSLogEudmFlowEnableFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status indicate whether the security log is enabled in this interzone."
+        ::= { hwSLogEudmFlowLogEnableEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.2.1.1.4
+    hwSLogEudmEnableHostAcl OBJECT-TYPE
+        SYNTAX Integer32 (0 | 2000..3999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The acl number indicate the data flow which will be logged."
+        ::= { hwSLogEudmFlowLogEnableEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.3
+    hwSLOGEudmConformance OBJECT IDENTIFIER ::= { hwSLOGEudm 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.3.1
+    hwSLOGEudmCompliance OBJECT IDENTIFIER ::= { hwSLOGEudmConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.3.2
+    hwSLOGEudmMibGroups OBJECT IDENTIFIER ::= { hwSLOGEudmConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.3.2.1
+    hwSLOGEudmGlobalCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSLogEudmAttackLogInterval, 
+            hwSLogEudmStreamLogInterval, 
+            hwSLogEudmFlowLogMode, 
+            hwSLogEudmFlowLogInterval, 
+            hwSLogEudmServerIP, 
+            hwSLogEudmServerPort }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwSLOGEudmMibGroups 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.16.2.3.2.2
+    hwSLOGEudmFlowLogEnableGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSLogEudmFlowEnableFlag, 
+            hwSLogEudmEnableHostAcl }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwSLOGEudmMibGroups 2 }
+    
+
+END
+
+--
+-- HUAWEI-SLOG-EUDM-MIB.mib
+--

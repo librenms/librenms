@@ -1,0 +1,383 @@
+<?php
+
+/**
+ * DeviceController.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2019 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace App\Http\Controllers\Table;
+
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\Location;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\DeviceStatus;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
+
+/**
+ * @extends TableController<Device>
+ */
+class DeviceController extends TableController
+{
+    private $detailed; // display format is detailed
+
+    protected function rules(): array
+    {
+        return [
+            'format' => 'nullable|in:list_basic,list_detail',
+            ...Device::filterValidationRules(),
+            'os' => 'nullable|string',
+            'version' => 'nullable|string',
+            'hardware' => 'nullable|string',
+            'features' => 'nullable|string',
+            'location' => 'nullable|string',
+            'type' => 'nullable|string',
+            'state' => 'nullable|in:0,1,up,down',
+            'disabled' => 'nullable|in:0,1',
+            'ignore' => 'nullable|in:0,1',
+            'disable_notify' => 'nullable|in:0,1',
+            'group' => ['nullable', 'regex:/^(\d+|none)$/'],
+            'poller_group' => 'nullable|int',
+            'device_id' => 'nullable|int',
+        ];
+    }
+
+    protected function filterFields(Request $request): array
+    {
+        return ['os', 'version', 'hardware', 'features', 'type', 'status' => 'state', 'disabled', 'disable_notify', 'ignore', 'location_id' => 'location', 'device_id' => 'device_id'];
+    }
+
+    protected function searchFields($request): array
+    {
+        return ['sysName', 'hostname', 'display', 'hardware', 'os', 'locations.location', 'purpose', 'notes'];
+    }
+
+    protected function sortFields(Request $request): array
+    {
+        return [
+            'status' => 'status',
+            'icon' => 'icon',
+            'hostname' => 'hostname',
+            'display' => 'display',
+            'hardware' => 'hardware',
+            'os' => 'os',
+            'uptime' => \DB::raw('IF(`status` = 1, `uptime`, `last_polled` - NOW())'),
+            'location' => 'location',
+            'device_id' => 'device_id',
+        ];
+    }
+
+    /**
+     * Defines the base query for this resource
+     */
+    protected function baseQuery(Request $request): Builder
+    {
+        $this->authorize('viewAny', Device::class);
+
+        /** @var Builder $query */
+        $query = Device::hasAccess($request->user())
+            ->with(['location', 'groups'])
+            ->applyFilters($request->array('filter'))
+            ->withCount(['ports', 'sensors', 'wirelessSensors']);
+
+        // if searching or sorting the location field, join the locations table
+        if ($request->input('searchPhrase') || in_array('location', array_keys($request->input('sort', [])))) {
+            $query->leftJoin('locations', 'locations.id', 'devices.location_id');
+        }
+
+        // filter device group, not sure this is the most efficient query
+        if ($group = $request->input('group')) {
+            if ($group == 'none') {
+                $query->whereDoesntHave('groups');
+            } else {
+                $query->whereHas('groups', function ($query) use ($group): void {
+                    $query->where('id', $group);
+                });
+            }
+        }
+
+        if ($request->input('poller_group') !== null) {
+            $query->where('poller_group', $request->input('poller_group'));
+        }
+
+        return $query;
+    }
+
+    protected function adjustFilterValue(string $field, mixed $value): mixed
+    {
+        if ($field == 'location' && ! is_numeric($value)) {
+            return Location::query()->where('location', $value)->value('id');
+        }
+
+        if ($field == 'state' && ! is_numeric($value)) {
+            return str_replace(['up', 'down'], ['1', '0'], $value);
+        }
+
+        return $value;
+    }
+
+    private function isDetailed()
+    {
+        if (is_null($this->detailed)) {
+            $this->detailed = \Request::input('format', 'list_detail') == 'list_detail';
+        }
+
+        return $this->detailed;
+    }
+
+    /**
+     * @param  Device  $model
+     * @return array<string, scalar>
+     */
+    public function formatItem(Model $model): Model|array|Collection
+    {
+        $deviceStatus = $model->getDeviceStatus();
+        $status = match ($deviceStatus) {
+            DeviceStatus::Down, DeviceStatus::NeverPolled => 'down',
+            DeviceStatus::IgnoredUp, DeviceStatus::Up => 'up',
+            DeviceStatus::IgnoredDown, DeviceStatus::Disabled => 'disabled',
+        };
+
+        return [
+            'extra' => $this->getLabel($model),
+            'status' => $status,
+            'maintenance' => $model->isUnderMaintenance(),
+            'icon' => '<img src="' . asset($model->icon) . '" title="' . pathinfo((string) $model->icon, PATHINFO_FILENAME) . '">',
+            'hostname' => Url::modernDeviceLink($model, extra: $this->isDetailed() ? $model->name() : ''),
+            'metrics' => $this->getMetrics($model),
+            'hardware' => htmlspecialchars(Rewrite::ciscoHardware($model)),
+            'os' => $this->getOsText($model),
+            'uptime' => $deviceStatus == DeviceStatus::NeverPolled ? __('device.never_polled') : Time::formatInterval($model->status ? $model->uptime : (int) $model->downSince()->diffInSeconds(null, true), true),
+            'location' => htmlspecialchars($this->getLocation($model)),
+            'actions' => view('device.actions', ['actions' => $this->getActions($model)])->__toString(),
+            'device_id' => $model->device_id,
+        ];
+    }
+
+    /**
+     * Get the status label class
+     */
+    private function getLabel(Device $device): string
+    {
+        if ($device->disabled == 1) {
+            return 'blackbg';
+        } elseif ($device->disable_notify == 1) {
+            return 'blackbg';
+        } elseif ($device->ignore == 1) {
+            return 'label-default';
+        } elseif ($device->status == 0) {
+            return 'label-danger';
+        } else {
+            $warning_time = LibrenmsConfig::get('uptime_warning', 86400);
+            if ($device->uptime < $warning_time && $device->uptime != 0) {
+                return 'label-warning';
+            }
+
+            return 'label-success';
+        }
+    }
+
+    private function getOsText(Device $device): string
+    {
+        $os_text = htmlspecialchars(LibrenmsConfig::getOsSetting($device->os, 'text'));
+
+        if ($this->isDetailed()) {
+            $os_text .= '<br />' . htmlspecialchars($device->version . ($device->features ? " ($device->features)" : ''));
+        }
+
+        return $os_text;
+    }
+
+    private function getMetrics(Device $device): string
+    {
+        $port_count = $device->ports_count;
+        $sensor_count = $device->sensors_count;
+        $wireless_count = $device->wireless_sensors_count;
+
+        $metrics = [];
+        if ($port_count) {
+            $metrics[] = $this->formatMetric($device, $port_count, 'ports', 'fa-link');
+        }
+
+        if ($sensor_count) {
+            $metrics[] = $this->formatMetric($device, $sensor_count, 'health', 'fa-heartbeat');
+        }
+
+        if ($wireless_count) {
+            $metrics[] = $this->formatMetric($device, $wireless_count, 'wireless', 'fa-wifi');
+        }
+
+        $glue = $this->isDetailed() ? '<br />' : ' ';
+        $metrics_content = implode(count($metrics) == 2 ? $glue : '', $metrics);
+
+        return '<div class="device-table-metrics">' . $metrics_content . '</div>';
+    }
+
+    private function formatMetric(Device $device, int $count, string $tab, string $icon): string
+    {
+        $html = '<a href="' . Url::deviceUrl($device, ['tab' => $tab]) . '">';
+        $html .= '<span><i title="' . $tab . '" class="fa ' . $icon . ' fa-lg icon-theme"></i> ' . $count;
+        $html .= '</span></a> ';
+
+        return $html;
+    }
+
+    private function getLocation(Device $device): string
+    {
+        $location = $device->location ?? '';
+
+        return extension_loaded('mbstring')
+            ? mb_substr($location, 0, 32, 'utf8')
+            : substr($location, 0, 32);
+    }
+
+    private function getActions(Device $device): array
+    {
+        $actions = [
+            [
+                [
+                    'title' => 'View Device',
+                    'href' => Url::deviceUrl($device),
+                    'icon' => 'fa-id-card',
+                    'external' => false,
+                ],
+                [
+                    'title' => 'View alerts',
+                    'href' => Url::deviceUrl($device, ['tab' => 'alerts']),
+                    'icon' => 'fa-exclamation-circle',
+                    'external' => false,
+                ],
+            ],
+        ];
+
+        if (Gate::allows('device.update')) {
+            $actions[0][] = [
+                'title' => 'Edit device',
+                'href' => Url::deviceUrl($device, ['tab' => 'edit']),
+                'icon' => 'fa-gear',
+                'external' => false,
+            ];
+        }
+        $row = $this->isDetailed() ? 1 : 0;
+
+        $actions[$row][] = [
+            'title' => 'Telnet to ' . $device->hostname,
+            'href' => 'telnet://' . $device->hostname,
+            'icon' => 'fa-terminal',
+            'external' => false,
+        ];
+
+        $ssh_href = 'ssh://' . $device->hostname;
+        if ($server = LibrenmsConfig::get('gateone.server')) {
+            $ssh_href = LibrenmsConfig::get('gateone.use_librenms_user')
+                ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $device->hostname . '&location=' . $device->hostname
+                : $server . '?ssh=ssh://' . $device->hostname . '&location=' . $device->hostname;
+        }
+
+        $actions[$row][] = [
+            'title' => 'SSH to ' . $device->hostname,
+            'href' => $ssh_href,
+            'icon' => 'fa-lock',
+            'external' => false,
+        ];
+
+        $actions[$row][] = [
+            'title' => 'Launch browser to ' . $device->hostname,
+            'href' => 'https://' . $device->hostname,
+            'onclick' => 'http_fallback(this); return false;',
+            'icon' => 'fa-globe',
+        ];
+
+        foreach (array_values(Arr::wrap(LibrenmsConfig::get('html.device.links'))) as $index => $custom) {
+            if ($custom['action'] ?? false) {
+                $row = $this->isDetailed() ? $index % 2 : 0;
+                $custom['href'] = Blade::render($custom['url'], ['device' => $device]);
+                $actions[$row][] = $custom;
+            }
+        }
+
+        return $actions;
+    }
+
+    /**
+     * Get headers for CSV export
+     */
+    protected function getExportHeaders(): array
+    {
+        return [
+            'Device ID',
+            'Hostname',
+            'IP Address',
+            'Hardware',
+            'OS',
+            'Version',
+            'Features',
+            'Location',
+            'Uptime',
+            'Status',
+            'Type',
+            'Last Polled',
+        ];
+    }
+
+    /**
+     * Format a row for CSV export
+     *
+     * @param  Device  $device
+     * @return array
+     */
+    protected function formatExportRow(Model $device): array
+    {
+        $status = $device->status ? 'Up' : 'Down';
+        if ($device->disabled) {
+            $status = 'Disabled';
+        } elseif ($device->ignore) {
+            $status = 'Ignored';
+        }
+
+        $location = $device->location ? $device->location->location : '';
+
+        return [
+            'device_id' => $device->device_id,
+            'hostname' => $device->displayName(),
+            'ip' => $device->ip,
+            'hardware' => Rewrite::ciscoHardware($device),
+            'os' => LibrenmsConfig::getOsSetting($device->os, 'text', $device->os),
+            'version' => $device->version,
+            'features' => $device->features,
+            'location' => $location,
+            'uptime' => $device->status ? Time::formatInterval($device->uptime, true) : 'Down',
+            'status' => $status,
+            'type' => $device->type,
+            'last_polled' => $device->last_polled,
+        ];
+    }
+}

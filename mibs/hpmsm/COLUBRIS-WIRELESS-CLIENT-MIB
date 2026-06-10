@@ -1,0 +1,464 @@
+-- ****************************************************************************
+--  COLUBRIS-WIRELESS-CLIENT-MIB definitions
+--
+--  Copyright (c) 2005, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--
+-- ****************************************************************************
+
+
+COLUBRIS-WIRELESS-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MacAddress
+        FROM    SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64, NOTIFICATION-TYPE
+        FROM    SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    sysName
+        FROM    SNMPv2-MIB
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisSSID, ColubrisNotificationEnable
+        FROM    COLUBRIS-TC
+    systemSerialNumber
+        FROM    COLUBRIS-SYSTEM-MIB
+;
+
+colubrisWirelessClientMIB  MODULE-IDENTITY
+    LAST-UPDATED    "200610260000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+
+    DESCRIPTION     "Information for Colubris Networks client mode devices."
+
+    ::= { colubrisMgmtV2 20 }
+
+
+-- colubrisClientMIB definition
+colubrisWirelessClientMIBObjects OBJECT IDENTIFIER ::= { colubrisWirelessClientMIB 1 }
+
+-- definition of objects groups
+colubrisWirelessClientInfo OBJECT IDENTIFIER ::= { colubrisWirelessClientMIBObjects 1 }
+colubrisWirelessClientStats OBJECT IDENTIFIER ::= { colubrisWirelessClientMIBObjects 2 }
+
+-- client information group
+colubrisWirelessClientState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    disconnected(1),
+                    scanning(2),
+                    authenticating(3),
+                    associating(4),
+                    associated(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "802.11 status of the device."
+    ::= { colubrisWirelessClientInfo 1 }
+
+colubrisWirelessClientSSID OBJECT-TYPE
+    SYNTAX      ColubrisSSID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Service Set ID assigned to the device."
+    ::= { colubrisWirelessClientInfo 2 }
+
+colubrisWirelessClientBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When the client state is associated, this object specify the
+                 MAC Address of the access point."
+    ::= { colubrisWirelessClientInfo 3 }
+
+colubrisWirelessClientSignalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Strength of the wireless signal (in dBm)."
+    ::= { colubrisWirelessClientInfo 4 }
+
+colubrisWirelessClientNoiseLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Level of local background noise (in dBm)."
+    ::= { colubrisWirelessClientInfo 5 }
+
+colubrisWirelessClientSNR OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Relative strength of the signal level compared to the noise
+	         level."
+    ::= { colubrisWirelessClientInfo 6 }
+
+colubrisWirelessClientConnectionNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if colubrisWirelessClientConnectionNotification events
+                 are generated."
+    DEFVAL      { enable }
+    ::= { colubrisWirelessClientInfo 7 }
+
+colubrisWirelessClientConnectTime OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Elapsed time in seconds since the device was successfully 
+                 associated with an access point."
+    ::= { colubrisWirelessClientInfo 8 }
+
+colubrisWirelessClientAuthorizedState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    notAuthorized(1),
+                    authorized(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the user traffic is allowed on the
+                 wireless port."
+    ::= { colubrisWirelessClientInfo 9 }
+
+colubrisWirelessClientEncryptionStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(1),
+                    wep(2),
+                    tkip(3),
+                    aes(4),
+                    aesTkip(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the encryption method used to communicate with the
+                 access point."
+    ::= { colubrisWirelessClientInfo 10 }
+
+colubrisWirelessClientTransmitRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transmit rate of the station. Data rates
+                 are set increments of 500 Kb/s from 1 Mb/s to 63.5 Mb/s."
+    ::= { colubrisWirelessClientInfo 11 }
+
+colubrisWirelessClientReceiveRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current receive rate of the station. Data rates
+                 are set in increments of 500 Kb/s from 1 Mb/s to 63.5 Mb/s."
+    ::= { colubrisWirelessClientInfo 12 }
+
+colubrisWirelessClientInPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets received since associating with an access point."
+    ::= { colubrisWirelessClientStats 1 }
+
+colubrisWirelessClientOutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets sent since associating with an access point."
+    ::= { colubrisWirelessClientStats 2 }
+
+colubrisWirelessClientInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of octets received since associating with an access point."
+    ::= { colubrisWirelessClientStats 3}
+
+colubrisWirelessClientOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of octets send since associating with an access point."
+    ::= { colubrisWirelessClientStats 4 }
+
+colubrisWirelessClientPktsTxRate1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 1 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 5 }
+
+colubrisWirelessClientPktsTxRate2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 2 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 6 }
+
+colubrisWirelessClientPktsTxRate5dot5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 5.5 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 7 }
+
+colubrisWirelessClientPktsTxRate11 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 11 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 8 }
+
+colubrisWirelessClientPktsTxRate6 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 6 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 9 }
+
+colubrisWirelessClientPktsTxRate9 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 9 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 10 }
+
+colubrisWirelessClientPktsTxRate12 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 12 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 11 }
+
+colubrisWirelessClientPktsTxRate18 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 18 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 12 }
+
+colubrisWirelessClientPktsTxRate24 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 24 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 13 }
+
+colubrisWirelessClientPktsTxRate36 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 36 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 14 }
+
+colubrisWirelessClientPktsTxRate48 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 48 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 15 }
+
+colubrisWirelessClientPktsTxRate54 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 54 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 16 }
+
+colubrisWirelessClientPktsRxRate1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 1 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 17 }
+
+colubrisWirelessClientPktsRxRate2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 2 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 18 }
+
+colubrisWirelessClientPktsRxRate5dot5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 5.5 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 19 }
+
+colubrisWirelessClientPktsRxRate11 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 11 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 20 }
+
+colubrisWirelessClientPktsRxRate6 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 6 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 21 }
+
+colubrisWirelessClientPktsRxRate9 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 9 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 22 }
+
+colubrisWirelessClientPktsRxRate12 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 12 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 23 }
+
+colubrisWirelessClientPktsRxRate18 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 18 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 24 }
+
+colubrisWirelessClientPktsRxRate24 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 24 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 25 }
+
+colubrisWirelessClientPktsRxRate36 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 36 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 26 }
+
+colubrisWirelessClientPktsRxRate48 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 48 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 27 }
+
+colubrisWirelessClientPktsRxRate54 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 54 Mbit/s since associating with an access point."
+    ::= { colubrisWirelessClientStats 28 }
+
+
+-- system notification
+colubrisWirelessClientMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisWirelessClientMIB 2 }
+colubrisWirelessClientMIBNotifications OBJECT IDENTIFIER ::= { colubrisWirelessClientMIBNotificationPrefix 0 }
+
+colubrisWirelessClientConnectionNotification NOTIFICATION-TYPE
+        OBJECTS     {
+                        sysName,
+                        systemSerialNumber,
+                        colubrisWirelessClientSSID,
+                        colubrisWirelessClientBSSID
+                    }
+        STATUS      current
+        DESCRIPTION "Sent when an 802.11/802.1x connection is completed successfully."
+        ::= { colubrisWirelessClientMIBNotifications 1 }
+
+
+-- conformance information
+colubrisWirelessClientMIBConformance    OBJECT IDENTIFIER ::= { colubrisWirelessClientMIB 3 }
+colubrisWirelessClientMIBCompliances    OBJECT IDENTIFIER ::= { colubrisWirelessClientMIBConformance 1 }
+colubrisWirelessClientMIBGroups         OBJECT IDENTIFIER ::= { colubrisWirelessClientMIBConformance 2 }
+
+
+-- compliance statements
+colubrisWirelessClientMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement the
+                 wireless client extensions MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisWirelessClientMIBGroup,
+                        colubrisWirelessClientNotificationGroup,
+                        colubrisWirelessClientMIBGroupCounters
+                    }
+    ::= { colubrisWirelessClientMIBCompliances 1 }
+
+
+-- units of conformance
+colubrisWirelessClientMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    colubrisWirelessClientState,
+                    colubrisWirelessClientSSID,
+                    colubrisWirelessClientBSSID,
+                    colubrisWirelessClientSignalLevel,
+                    colubrisWirelessClientNoiseLevel,
+                    colubrisWirelessClientSNR,
+                    colubrisWirelessClientConnectionNotificationEnabled,
+                    colubrisWirelessClientTransmitRate,
+                    colubrisWirelessClientReceiveRate,
+                    colubrisWirelessClientConnectTime,
+                    colubrisWirelessClientAuthorizedState,
+                    colubrisWirelessClientEncryptionStatus
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the Client MIB capability."
+    ::= { colubrisWirelessClientMIBGroups 1 }
+
+colubrisWirelessClientNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        colubrisWirelessClientConnectionNotification
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications."
+    ::= { colubrisWirelessClientMIBGroups 2 }
+
+colubrisWirelessClientMIBGroupCounters OBJECT-GROUP
+    OBJECTS     {
+                    colubrisWirelessClientInPkts,
+                    colubrisWirelessClientOutPkts,
+                    colubrisWirelessClientInOctets,
+                    colubrisWirelessClientOutOctets,
+                    colubrisWirelessClientPktsTxRate1,
+                    colubrisWirelessClientPktsTxRate2,
+                    colubrisWirelessClientPktsTxRate5dot5,
+                    colubrisWirelessClientPktsTxRate11,
+                    colubrisWirelessClientPktsTxRate6,
+                    colubrisWirelessClientPktsTxRate9,
+                    colubrisWirelessClientPktsTxRate12,
+                    colubrisWirelessClientPktsTxRate18,
+                    colubrisWirelessClientPktsTxRate24,
+                    colubrisWirelessClientPktsTxRate36,
+                    colubrisWirelessClientPktsTxRate48,
+                    colubrisWirelessClientPktsTxRate54,
+                    colubrisWirelessClientPktsRxRate1,
+                    colubrisWirelessClientPktsRxRate2,
+                    colubrisWirelessClientPktsRxRate5dot5,
+                    colubrisWirelessClientPktsRxRate11,
+                    colubrisWirelessClientPktsRxRate6,
+                    colubrisWirelessClientPktsRxRate9,
+                    colubrisWirelessClientPktsRxRate12,
+                    colubrisWirelessClientPktsRxRate18,
+                    colubrisWirelessClientPktsRxRate24,
+                    colubrisWirelessClientPktsRxRate36,
+                    colubrisWirelessClientPktsRxRate48,
+                    colubrisWirelessClientPktsRxRate54
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the Client MIB counters."
+    ::= { colubrisWirelessClientMIBGroups 3 }
+
+END

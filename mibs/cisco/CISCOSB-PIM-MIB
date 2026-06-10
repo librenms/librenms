@@ -1,0 +1,1533 @@
+CISCOSB-PIM-MIB DEFINITIONS ::= BEGIN
+-- Title:      CISCOSB PIM Private Extension
+-- Version:    7.60.00.00
+-- Date:       19 Sep 2011
+
+IMPORTS
+    switch001                        FROM CISCOSB-MIB
+    pimInterfaceEntry,
+    pimInterfaceIfIndex,
+    pimInterfaceIPVersion,
+    pimNeighborIfIndex,
+    pimNeighborAddressType,
+    pimNeighborAddress               FROM PIM-STD-MIB
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32, Unsigned32,
+    TimeTicks, Gauge32              FROM SNMPv2-SMI
+    RowStatus, TruthValue,
+    TEXTUAL-CONVENTION,
+    DisplayString                    FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP               FROM SNMPv2-CONF
+    InterfaceIndex,
+    InterfaceIndexOrZero             FROM IF-MIB
+    InetAddressType,
+    InetAddressPrefixLength,
+    InetAddress, InetVersion         FROM INET-ADDRESS-MIB
+    IANAipRouteProtocol              FROM IANA-RTPROTO-MIB;
+
+
+rlPim  MODULE-IDENTITY
+        LAST-UPDATED "200809250000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for PIM MIB."
+        REVISION "200809250000Z"
+        DESCRIPTION
+                "Initial version of this MIB."
+        ::= { switch001 211 }
+
+
+
+--Common Textual Conventions
+
+AdminStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "The desired administrative state of a MIB row."
+    SYNTAX      INTEGER {
+                  adminStatusUp(1),
+                  adminStatusDown(2)
+                }
+
+OperStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of a MIB row.  This set of values
+            is used by many Data Connection products written before 2006."
+    SYNTAX      INTEGER {
+                  operStatusUp(1),          -- active
+                  operStatusDown(2),        -- inactive
+                  operStatusGoingUp(3),     -- activating
+                  operStatusGoingDown(4),   -- deactivating
+                  operStatusActFailed(5)    -- activation failed
+                }
+
+Unsigned32NonZero ::= TEXTUAL-CONVENTION
+  STATUS       current
+  DESCRIPTION
+     "A non-zero Unsigned32."
+  SYNTAX       Unsigned32 (1..'FFFFFFFF'h)
+
+NumericIndex ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "A numeric index value or identifier."
+  SYNTAX      Integer32 (1..'7FFFFFFF'h)
+
+NumericIndexOrZero ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "Either a numeric index value or identifier, or the value zero
+               with a special meaning defined by the object description.  Do
+               not use this TC for MIB table index objects.  Zero is not valid
+               for such objects."
+  SYNTAX      Integer32 (0..'7FFFFFFF'h)
+
+EntityIndex ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "The HAF entity index value identifying a DC software entity.
+              This TC is deprecated.  Use NumericIndex for all indexes."
+  SYNTAX      Integer32 (1..2147483647)
+
+EntityIndexOrZero ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "The HAF entity index value identifying a DC software entity, or
+               zero which is used to indicate that the entity is not present.
+               This TC is deprecated.  Use NumericIndexOrZero for all
+               references to indexes."
+  SYNTAX      Integer32 (0..2147483647)
+
+
+StdAccessListListIndexOrZero ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "An arbitrary index value identifying a standard access
+              list or zero for no access list."
+  SYNTAX      Integer32 (0..2147483647)
+
+StdAccessListRuleIndex ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "An index value identifying a particular rule within a
+              standard access list.  Rules are tested in order of
+              increasing rule index."
+  SYNTAX      Integer32 (1..2147483647)
+
+ExtAccessListListIndex ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "An arbitrary index value identifying an extended access
+              list."
+  SYNTAX      Integer32 (1..2147483647)
+
+ExtAccessListListIndexOrZero ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION "An arbitrary index value identifying an extended access
+              list or zero for no access list."
+  SYNTAX      Integer32 (0..2147483647)
+
+PimStatsCounter ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The count of the number of events of a particular type that
+            have occurred since the last time either the NMI join was
+            established (caused by activating DC-PIM TIB Manager or
+            DC-PIM Neighbor Manager, or by recovery after NMI join
+            failure/fail-over), or the statistics were explicitly reset
+            by setting the pimNmEntClearStatsCounters object to 'true'.
+            This value can wrap."
+    SYNTAX     Unsigned32
+
+
+NpgOperStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of a MIB row.  This set of values
+            has been used by the Data Connection Networking Protocols Group
+            since 2006."
+    SYNTAX      INTEGER {
+                  operStatusUp(1),          -- active
+                  operStatusDown(2),        -- inactive
+                  operStatusGoingUp(3),     -- activating
+                  operStatusGoingDown(4),   -- deactivating
+                  operStatusActFailed(5),   -- activation failed
+                  operStatusFailed(8),      -- failed, will recover when
+                                            --   possible
+                  operStatusFailedPerm(10), -- operator intervention required
+                  operStatusFailing(11)     -- failure in progress
+                }
+
+--
+-- The PIM Interface Table
+--
+
+rlPimInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlPimInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table is used to create and manage the {interface, IP
+            version} pairs for which PIM is enabled."
+    ::= { rlPim 1 }
+
+rlPimInterfaceEntry OBJECT-TYPE
+    SYNTAX     RlPimInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the pimInterfaceTable."
+    AUGMENTS   { pimInterfaceEntry }
+    ::= { rlPimInterfaceTable 1 }
+
+RlPimInterfaceEntry ::= SEQUENCE {
+
+-- DC additions {
+    rlPimInterfaceAdminStatus           AdminStatus,
+    rlPimInterfaceOperStatus            NpgOperStatus,
+    rlPimInterfaceStubInterface         TruthValue,
+    rlPimInterfaceP2PNoHellos           TruthValue,
+    rlPimInterfaceMgmdEntIndex          NumericIndexOrZero,
+    rlPimInterfaceNeighborCount         Gauge32,
+    rlPimInterfaceStarGStateLimit       Unsigned32,
+    rlPimInterfaceStarGStateWarnThold   Unsigned32,
+    rlPimInterfaceStarGStateStored      Gauge32,
+    rlPimInterfaceSGStateLimit          Unsigned32,
+    rlPimInterfaceSGStateWarnThold      Unsigned32,
+    rlPimInterfaceSGStateStored         Gauge32,
+    rlPimInterfaceNeighborFilter        DisplayString,
+    rlPimInterfaceAssertInterval        Unsigned32,
+    rlPimInterfaceAssertHoldtime        Unsigned32,
+-- } End DC additions
+-- DC additions {
+    rlPimInterfaceAsmGrpFilter          DisplayString,
+    rlPimInterfaceSsmSrcAndGrpFilter    DisplayString
+-- } End DC additions
+    --rlPimInterfaceStatus                RowStatus
+}
+
+
+-- DC additions {
+
+rlPimInterfaceAdminStatus OBJECT-TYPE
+    SYNTAX     AdminStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The desired administrative state of this interface."
+    DEFVAL { adminStatusUp }
+    ::= { rlPimInterfaceEntry 3 }
+
+rlPimInterfaceOperStatus OBJECT-TYPE
+    SYNTAX     NpgOperStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current operational state of this interface."
+    ::= { rlPimInterfaceEntry 4 }
+
+rlPimInterfaceStubInterface OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Whether this interface is a 'stub interface' with regard to
+            PIM.  If this is set to 'true', no PIM packets are sent or
+            processed (if received) on this interface.  This should be
+            set to 'true' if there are no other PIM routers on the
+            interface but there may be untrusted hosts on the interface,
+            to prevent the router processing forged PIM messages from
+            those hosts.  If there are other PIM routers on this
+            interface, this must be left as 'false'.
+
+            Changing the value of this object while the interface is
+            operational causes the interface to be deactivated and
+            then reactivated."
+    DEFVAL { false }
+    ::= { rlPimInterfaceEntry 5 }
+
+rlPimInterfaceP2PNoHellos OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Whether this interface is a point-to-point interface on
+            which we do not require the neighbor to send PIM-Hello
+            signals.  Provided for back-compatibility with some older
+            implementations that do not send Hellos on point-to-point
+            links.
+
+            Changing the value of this object while the interface is
+            operational causes the interface to be deactivated and
+            then reactivated."
+    DEFVAL { false }
+    ::= { rlPimInterfaceEntry 6 }
+
+rlPimInterfaceMgmdEntIndex OBJECT-TYPE
+    SYNTAX     NumericIndexOrZero
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The HAF entity index of the DC-MGMD (for example, for IPv4
+            this is DC-IGMP) Router component that owns this interface.
+            Zero is a wildcard value meaning that no DC-MGMD Router
+            component currently owns the interface, and the first
+            DC-MGMD Router component that sends Group Membership
+            information for this interface will take ownership of it."
+    DEFVAL { 0 }
+    ::= { rlPimInterfaceEntry 7 }
+
+rlPimInterfaceNeighborCount OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM neighbors on this interface."
+    ::= { rlPimInterfaceEntry 8 }
+
+rlPimInterfaceStarGStateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum number of groups for which DC-PIM TIB Manager
+            is allowed to store (*,G,I) state specific to this
+            interface.  A value of zero means that there is no limit."
+    DEFVAL { 0 }
+    ::= { rlPimInterfaceEntry 9 }
+
+rlPimInterfaceStarGStateWarnThold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "DC-PIM TIB Manager logs an exception if the number of
+            groups for which it is storing (*,G,I) state specific to
+            this interface exceeds this value.  A value of zero means
+            that there is no warning threshold."
+    DEFVAL { 0 }
+    ::= { rlPimInterfaceEntry 10 }
+
+rlPimInterfaceStarGStateStored OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of groups for which DC-PIM TIB Manager is
+            storing (*,G,I) state specific to this interface."
+    ::= { rlPimInterfaceEntry 11 }
+
+rlPimInterfaceSGStateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum number of {source, group} pairs for which
+            DC-PIM TIB Manager is allowed to store (S,G,I) state
+            specific to this interface.  A value of zero means that
+            there is no limit."
+    DEFVAL { 0 }
+    ::= { rlPimInterfaceEntry 12 }
+
+rlPimInterfaceSGStateWarnThold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "DC-PIM TIB Manager logs an exception if the number of
+            {source, group} pairs for which it is storing (S,G,I) state
+            specific to this interface exceeds this value.  A value of
+            zero means that there is no warning threshold."
+    DEFVAL { 0 }
+    ::= { rlPimInterfaceEntry 13 }
+
+rlPimInterfaceSGStateStored OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of {source, group} pairs for which DC-PIM TIB
+            Manager is storing (S,G,I) state specific to this
+            interface."
+    ::= { rlPimInterfaceEntry 14 }
+
+rlPimInterfaceNeighborFilter OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "When neighbor filtering is enabled, the local router
+            will process link-local multicast PIM messages received on
+            this interface only if the originator's IP address (that is,
+            the source address in the IP header) is included in the
+            standard access list corresponding to the list name
+            configured for this object.
+
+            Note that this filter does not apply to unicast PIM
+            messages, even if the originator is directly connected to
+            the local router.  So, for example, this filter has no
+            effect on the processing of received Register messages.
+
+            In other words, the standard access list is a whitelist, and
+            the local router will treat any router excluded from the
+            list as not being a valid PIM neighbor.
+
+            To filter out all PIM neighbors, either configure this
+            object to be the list name of an 'exclude all' standard
+            access list, or use the rlPimInterfaceStubInterface object."
+    DEFVAL { "" }
+    ::= { rlPimInterfaceEntry 15 }
+
+rlPimInterfaceAssertInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The frequency at which this router sends PIM Assert
+            messages on this interface when it is the assert winner.
+            This object corresponds to the 'Assert_Time' minus the
+            'Assert_Override_Interval' defined in the PIM-SM
+            specification [I-D.ietf-rlPim-sm-v2-new].  This must be less
+            than rlPimInterfaceAssertHoldtime."
+    DEFVAL { 177 }
+    ::= { rlPimInterfaceEntry 16 }
+
+rlPimInterfaceAssertHoldtime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The interval before this router leaves assert loser state
+            on this interface, unless it receives a PIM Assert message
+            that refreshes this state.  This object corresponds to the
+            'Assert_Time' timer value defined in the PIM-SM
+            specification [I-D.ietf-rlPim-sm-v2-new].
+
+            Note that configuring different values for this object for
+            different routers on the same interface might lead to
+            incorrect protocol operation."
+    DEFVAL { 180 }
+    ::= { rlPimInterfaceEntry 17 }
+
+-- } End DC additions
+
+-- DC additions {
+
+rlPimInterfaceAsmGrpFilter OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "When ASM group filtering is enabled, then for groups in the
+            ASM space the local router will:
+
+            -  process PIM (*,G) Join and (S,G) Join messages received on
+            this interface only if the group address is included in the
+            standard access list corresponding to the list index value
+            configured for this object
+
+            -  only send PIM (*,G) Join and (S,G) Join messages over this
+            interface if the group address is included in the standard
+            access list corresponding to the list index value configured
+            for this object.
+
+            Local membership requests from the MGMD Router component are
+            not filtered.  These should be filtered by the MGMD Router
+            component.
+
+            In other words, the standard access list is a whitelist of the
+            ASM groups for which DC-PIM is permitted to request or receive
+            traffic over the interface.
+
+            rlPimInterfaceAsmGrpFilter defaults to an empty string, which indicates
+            that no access list is specified.  If the name does not correspond
+            to a valid access list, no group addresses will match the list
+            and therefore all PIM (*,G) Join and PIM (S,G) Join messages
+            will be filtered."
+    DEFVAL { "" }
+    ::= { rlPimInterfaceEntry 18 }
+
+rlPimInterfaceSsmSrcAndGrpFilter OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "When SSM source and group filtering is enabled, then for groups in
+            the SSM space the local router will
+
+            -  process PIM (S,G) Join messages received on this interface
+            only if the {source, group} pair is included in the extended
+            access list corresponding to the list index value configured
+            for this object
+
+            -  only send PIM (S,G) Join messages over this interface if
+            the {source, group} pair is included in the extended access
+            list corresponding to the list index value configured for this
+            object.
+
+            In other words, the extended access list is a whitelist of the
+            SSM {source, group} pairs for which DC-PIM is permitted to
+            request or receive traffic over the interface.
+
+            rlPimInterfaceSsmSrcAndGrpFilter defaults to an empty string,
+            which indicates that no access list is specified.  If the name does not
+            correspond to a valid access list, no {source, group} pairs
+            will match the list and therefore all PIM (S,G) Join messages
+            will be filtered."
+    DEFVAL { "" }
+    ::= { rlPimInterfaceEntry 19 }
+
+-- } End DC additions
+
+
+--
+-- The RL-PIM Interface Statistics Table
+--
+
+rlPimIfStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlPimIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table lists the statistics for {interface, IP version}
+            pairs for which PIM is enabled.
+
+            Note that any messages filtered out by
+            rlPimInterfaceNeighborFilter do not contribute to any
+            statistics in this table except for
+            rlPimIfStatsNumFilteredOut."
+    ::= { rlPim 2 }
+
+rlPimIfStatsEntry OBJECT-TYPE
+    SYNTAX     RlPimIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlPimIfStatsTable."
+    INDEX      { pimInterfaceIfIndex,
+                 pimInterfaceIPVersion }
+    ::= { rlPimIfStatsTable 1 }
+
+RlPimIfStatsEntry ::= SEQUENCE {
+    rlPimIfStatsNumSentHello          PimStatsCounter,
+    rlPimIfStatsNumSentJoinPrune      PimStatsCounter,
+    rlPimIfStatsNumSentAssert         PimStatsCounter,
+    rlPimIfStatsNumSentBsm            PimStatsCounter,
+    rlPimIfStatsNumErrHello           PimStatsCounter,
+    rlPimIfStatsNumRecvUnknownNbr     PimStatsCounter,
+    rlPimIfStatsNumUnknownHelloOpt    PimStatsCounter,
+    rlPimIfStatsNumFilteredOut        PimStatsCounter
+}
+
+rlPimIfStatsNumSentHello OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Hello messages that have been sent out
+            this interface."
+    ::= { rlPimIfStatsEntry 1 }
+
+rlPimIfStatsNumSentJoinPrune OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Join/Prune messages that have been sent
+            out this interface."
+    ::= { rlPimIfStatsEntry 2 }
+
+rlPimIfStatsNumSentAssert OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Assert messages that have been sent out
+            this interface."
+    ::= { rlPimIfStatsEntry 3 }
+
+rlPimIfStatsNumSentBsm OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Bootstrap Router messages that have
+            been sent out this interface.  DC-PIM always multicasts
+            this type of message."
+    ::= { rlPimIfStatsEntry 4 }
+
+rlPimIfStatsNumErrHello OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Hello messages that have been received on
+            this interface that have contained errors."
+    ::= { rlPimIfStatsEntry 5 }
+
+rlPimIfStatsNumRecvUnknownNbr OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Join/Prune, Assert and multicast Bootstrap
+            Router messages that have been received on this interface from
+            a neighbor from which we had not previously received a valid
+            PIM Hello message (and for which rlPimInterfaceP2PNoHellos was
+            'false').
+
+            Bootstrap Router messages which are sent to a unicast address
+            are not included in this count."
+    ::= { rlPimIfStatsEntry 6 }
+
+rlPimIfStatsNumUnknownHelloOpt OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of unknown options that have been received in
+            PIM Hello messages on this interface."
+    ::= { rlPimIfStatsEntry 7 }
+
+rlPimIfStatsNumFilteredOut OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of link-local multicast PIM messages filtered
+            out by rlPimInterfaceNeighborFilter on this interface."
+    ::= { rlPimIfStatsEntry 8 }
+
+--
+-- The DC-PIM Neighbor Manager Entity Table
+--
+
+rlPimNmEntTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlPimNmEntEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table is used to create and manage DC-PIM Neighbor
+            Manager entities."
+     ::= { rlPim 3 }
+
+rlPimNmEntEntry OBJECT-TYPE
+    SYNTAX     RlPimNmEntEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Each entry represents an instance of the DC-PIM Neighbor
+            Manager entity."
+    INDEX       { rlPimNmEntIndex }
+    ::= { rlPimNmEntTable 1 }
+
+RlPimNmEntEntry ::= SEQUENCE {
+    rlPimNmEntIndex                  NumericIndex,
+    rlPimNmEntRowStatus              RowStatus,
+    rlPimNmEntAdminStatus            AdminStatus,
+    rlPimNmEntOperStatus             NpgOperStatus,
+    rlPimNmEntTmEntIndex             NumericIndex,
+    rlPimNmEntI3JoinOperStatus       NpgOperStatus,
+    rlPimNmEntNmiJoinOperStatus      NpgOperStatus,
+    rlPimNmEntSckJoinOperStatus      NpgOperStatus,
+    rlPimNmEntClearStatsCounters     TruthValue,
+    rlPimNmEntStatsUpTime            TimeTicks,
+    rlPimNmEntEnableUnicastMessages  TruthValue,
+    rlPimNmEntAcceptUnicastBsms      TruthValue,
+    rlPimNmEntCrpAdvFilterIndex      StdAccessListListIndexOrZero
+}
+
+rlPimNmEntIndex OBJECT-TYPE
+    SYNTAX     NumericIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The index of this rlPimNmEntEntry.  This is the HAF entity
+            index passed on the entity create parameters."
+    ::= { rlPimNmEntEntry 1 }
+
+rlPimNmEntRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Used to create and delete a DC-PIM Neighbor Manager Entity
+            Table entry."
+    ::= { rlPimNmEntEntry 2 }
+
+rlPimNmEntAdminStatus OBJECT-TYPE
+    SYNTAX     AdminStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The desired administrative state of the DC-PIM Neighbor
+            Manager entity."
+    DEFVAL { adminStatusUp }
+    ::= { rlPimNmEntEntry 3 }
+
+rlPimNmEntOperStatus OBJECT-TYPE
+    SYNTAX     NpgOperStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current operational state of the DC-PIM Neighbor
+            Manager entity."
+    ::= { rlPimNmEntEntry 4 }
+
+rlPimNmEntTmEntIndex OBJECT-TYPE
+    SYNTAX     NumericIndex
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The HAF entity index value of the DC-PIM TIB Manager to
+            join to.
+
+            Once set, the value of this object cannot be changed."
+    ::= { rlPimNmEntEntry 5 }
+
+rlPimNmEntI3JoinOperStatus OBJECT-TYPE
+    SYNTAX       NpgOperStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The current operational state of the I3 join.
+            rlPimNmEntOperStatus cannot transition to 'operStatusUp'
+            unless this object has a value of 'operStatusUp', and cannot
+            transition to 'operStatusDown' unless this object has a
+            value of 'operStatusDown'."
+    ::= { rlPimNmEntEntry 6 }
+
+rlPimNmEntNmiJoinOperStatus OBJECT-TYPE
+    SYNTAX       NpgOperStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The current operational state of the NMI join.
+            rlPimNmEntOperStatus cannot transition to 'operStatusUp'
+            unless this object has a value of 'operStatusUp', and cannot
+            transition to 'operStatusDown' unless this object has a
+            value of 'operStatusDown'."
+    ::= { rlPimNmEntEntry 7 }
+
+rlPimNmEntSckJoinOperStatus OBJECT-TYPE
+    SYNTAX       NpgOperStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+            "The current operational state of the SCK join.
+            rlPimNmEntOperStatus cannot transition to 'operStatusUp'
+            unless this object has a value of 'operStatusUp', and cannot
+            transition to 'operStatusDown' unless this object has a
+            value of 'operStatusDown'."
+    ::= { rlPimNmEntEntry 8 }
+
+rlPimNmEntClearStatsCounters OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Set this object to 'true' to cause DC-PIM Neighbor Manager
+            to reset all its statistics counters (that is, all objects
+            with syntax PimStatsCounter that are either in the
+            rlPimNmEntStatsTable, or in a row of the rlPimIfStatsTable or
+            rlPimNbrStatsTable for an interface for which
+            rlPimInterfaceNmEntIndex equals rlPimNmEntIndex).
+
+            Reading the value of this object has no meaning."
+    DEFVAL { false }
+    ::= { rlPimNmEntEntry 9 }
+
+rlPimNmEntStatsUpTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time since the statistics counters were last reset,
+            either by establishing the NMI join (caused by activating
+            DC-PIM TIB Manager or DC-PIM Neighbor Manager, or by
+            recovery after NMI join failure/fail-over) or by setting the
+            rlPimNmEntClearStatsCounters object to 'true'."
+    ::= { rlPimNmEntEntry 10 }
+
+rlPimNmEntEnableUnicastMessages OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Set this object to 'true' to enable DC-PIM Neighbor
+             Manager to send and receive unicast PIM messages.
+
+             This object must only be set to 'false' if the local
+             router will never be an RP for any multicast group, and
+             will never be the DR for any connected source that sends
+             data to any ASM group.  Note that this will always be the
+             case if the local router will perform only the SSM subset
+             of PIM-SM."
+    DEFVAL { true }
+    ::= { rlPimNmEntEntry 11 }
+
+rlPimNmEntAcceptUnicastBsms OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Set this object to 'true' to enable DC-PIM Neighbor Manager
+            to accept PIM Bootstrap Messages (BSMs) which are sent
+            to DC-PIM as unicast messages.  Setting the object to 'false'
+            means that DC-PIM Neighbor Manager ignores received unicast BSMs.
+
+            The setting of this object has no effect on the ability of
+            DC-PIM to accept BSMs which are multicast.
+
+            DC-PIM only ever multicasts BSMs; it never sends them as unicast
+            messages.
+
+            This object can only be set to 'true' if the
+            rlPimNmEntEnableUnicastMessages object is also set to 'true'."
+    DEFVAL { false }
+    ::= { rlPimNmEntEntry 12 }
+
+rlPimNmEntCrpAdvFilterIndex OBJECT-TYPE
+    SYNTAX     StdAccessListListIndexOrZero
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Set this object to zero to disable Candidate-RP
+            Advertisement filtering.  This means that the local router
+            will process a Candidate-RP Advertisement message from any
+            source IP address.
+
+            Set this object to a non-zero value to enable Candidate-RP
+            Advertisement filtering.  The value gives the standard access
+            list index used to filter received Candidate-RP Advertisement
+            messages.  The local router will process a received
+            Candidate-RP Advertisement message only if its source IP address
+            is included in the specified standard access list.
+
+            In other words, the standard access list is a whitelist of
+            the unicast sources from which DC-PIM is permitted to accept
+            Candidate-RP advertisements."
+    DEFVAL { 0 }
+    ::= { rlPimNmEntEntry 13 }
+
+--
+-- The DC-PIM Neighbor Manager Entity Statistics Table
+--
+
+rlPimNmEntStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlPimNmEntStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table lists the statistics for DC-PIM Neighbor Manager
+            entities.
+
+            Note that any messages filtered out by
+            rlPimInterfaceNeighborFilter do not contribute to any
+            statistics in this table.
+
+            Note that in the case of critical parsing errors, only the
+            first error encountered will be counted.  The checks are
+            made in the following order.
+
+            -  Length.
+            -  Checksum.
+            -  Message type.
+            -  Version."
+
+    ::= { rlPim 4 }
+
+rlPimNmEntStatsEntry OBJECT-TYPE
+    SYNTAX     RlPimNmEntStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Each entry represents the statistics for a DC-PIM Neighbor
+            Manager entity."
+ --   AUGMENTS   { rlPimNmEntEntry }
+    INDEX       { rlPimNmEntIndex }
+    ::= { rlPimNmEntStatsTable 1 }
+
+RlPimNmEntStatsEntry ::= SEQUENCE {
+    rlPimNmEntStatsNumSentCRPAdvert         PimStatsCounter,
+    rlPimNmEntStatsNumSentRegister          PimStatsCounter,
+    rlPimNmEntStatsNumSentRegisterStop      PimStatsCounter,
+    rlPimNmEntStatsNumRecvCRPAdvert         PimStatsCounter,
+    rlPimNmEntStatsNumRecvRegister          PimStatsCounter,
+    rlPimNmEntStatsNumRecvRegisterStop      PimStatsCounter,
+    rlPimNmEntStatsNumErrCRPAdvert          PimStatsCounter,
+    rlPimNmEntStatsNumErrRegister           PimStatsCounter,
+    rlPimNmEntStatsNumErrRegisterStop       PimStatsCounter,
+    rlPimNmEntStatsNumRecvIgnoredType       PimStatsCounter,
+    rlPimNmEntStatsNumRecvUnknownType       PimStatsCounter,
+    rlPimNmEntStatsNumRecvUnknownVer        PimStatsCounter,
+    rlPimNmEntStatsNumRecvBadChecksum       PimStatsCounter,
+    rlPimNmEntStatsNumRecvBadLength         PimStatsCounter,
+    rlPimNmEntStatsNumCRPAdvfiltered        PimStatsCounter
+}
+
+
+rlPimNmEntStatsNumSentCRPAdvert OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Candidate-RP-Advertisement messages that have
+            been sent by this DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 1 }
+
+rlPimNmEntStatsNumSentRegister OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register messages that have been sent by
+            this DC-PIM Neighbor Manager entity.
+
+            Note that this only includes PIM Register messages forwarded
+            to other members of Anycast-RP sets, and Null-Register
+            messages.  It does not include Register-encapsulated data
+            packets sent from the DR to the RP; these are sent by the
+            data plane."
+    ::= { rlPimNmEntStatsEntry 2 }
+
+rlPimNmEntStatsNumSentRegisterStop OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register-Stop messages that have been
+            sent by this DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 3 }
+
+rlPimNmEntStatsNumRecvCRPAdvert OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of valid PIM Candidate-RP-Advertisement messages that
+            have been received by this DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 4 }
+
+rlPimNmEntStatsNumRecvRegister OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of valid PIM Register messages that have been
+            received by this DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 5 }
+
+rlPimNmEntStatsNumRecvRegisterStop OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of valid PIM Register-Stop messages that have
+            been received by this DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 6 }
+
+rlPimNmEntStatsNumErrCRPAdvert OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Candidate-RP-Advertisement messages that have
+            been received by this DC-PIM Neighbor Manager entity that have
+            contained errors."
+    ::= { rlPimNmEntStatsEntry 7 }
+
+rlPimNmEntStatsNumErrRegister OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register messages that have been received
+            by this DC-PIM Neighbor Manager entity that have contained
+            errors."
+    ::= { rlPimNmEntStatsEntry 8 }
+
+rlPimNmEntStatsNumErrRegisterStop OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Register-Stop messages that have been
+            received by this DC-PIM Neighbor Manager entity that have
+            contained errors."
+    ::= { rlPimNmEntStatsEntry 9 }
+
+rlPimNmEntStatsNumRecvIgnoredType OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM messages with a known but unsupported PIM
+            message type that have been received by this DC-PIM Neighbor
+            Manager entity."
+    ::= { rlPimNmEntStatsEntry 10 }
+
+rlPimNmEntStatsNumRecvUnknownType OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM messages with an unknown PIM message type
+            that have been received by this DC-PIM Neighbor Manager
+            entity."
+    ::= { rlPimNmEntStatsEntry 11 }
+
+rlPimNmEntStatsNumRecvUnknownVer OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM messages with an unknown PIM version that
+            have been received by this DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 12 }
+
+rlPimNmEntStatsNumRecvBadChecksum OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM messages with a incorrect PIM checksum
+            that have been received by this DC-PIM Neighbor Manager
+            entity."
+    ::= { rlPimNmEntStatsEntry 13 }
+
+rlPimNmEntStatsNumRecvBadLength OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM messages with a length too short to
+            contain a common PIM header that have been received by this
+            DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 14 }
+
+rlPimNmEntStatsNumCRPAdvfiltered OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of C-RP-Advertisement messages which have been
+             filtered out by this DC-PIM Neighbor Manager entity."
+    ::= { rlPimNmEntStatsEntry 15 }
+
+
+--
+-- The DC-PIM Neighbor Statistics Table
+--
+
+rlPimNbrStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlPimNbrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table lists the statistics for PIM neighbors.
+
+            Note that if a neighbor's Liveness Timer expires (including
+            on receipt of a PIM Hello message with a zero Holdtime),
+            this event resets all of the statistics in this table.
+            However, if a neighbor's Generation ID value changes, none
+            of the statistics in this table are affected."
+    ::= { rlPim 5 }
+
+rlPimNbrStatsEntry OBJECT-TYPE
+    SYNTAX     RlPimNbrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the rlPimNbrStatsTable."
+    INDEX     { pimNeighborIfIndex,
+                pimNeighborAddressType,
+                pimNeighborAddress }
+    ::= { rlPimNbrStatsTable 1 }
+
+RlPimNbrStatsEntry ::= SEQUENCE {
+    rlPimNbrStatsNumRecvHello          PimStatsCounter,
+    rlPimNbrStatsNumRecvJoinPrune      PimStatsCounter,
+    rlPimNbrStatsNumRecvAssert         PimStatsCounter,
+    rlPimNbrStatsNumRecvBSM            PimStatsCounter,
+    rlPimNbrStatsNumErrJoinPrune       PimStatsCounter,
+    rlPimNbrStatsNumErrAssert          PimStatsCounter,
+    rlPimNbrStatsNumErrBSM             PimStatsCounter
+}
+
+rlPimNbrStatsNumRecvHello OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of valid PIM Hello messages that have been
+            received from this neighbor."
+    ::= { rlPimNbrStatsEntry 1 }
+
+rlPimNbrStatsNumRecvJoinPrune OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of valid PIM Join/Prune messages that have been
+            received from this neighbor."
+    ::= { rlPimNbrStatsEntry 2 }
+
+rlPimNbrStatsNumRecvAssert OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of valid PIM Assert messages that have been
+            received from this neighbor."
+    ::= { rlPimNbrStatsEntry 3 }
+
+rlPimNbrStatsNumRecvBSM OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of valid PIM Bootstrap messages that have been
+            received from this neighbor."
+    ::= { rlPimNbrStatsEntry 4 }
+
+rlPimNbrStatsNumErrJoinPrune OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Join/Prune messages that have been
+            received from this neighbor that have contained errors.
+            Note that this does not include messages for which the RP in
+            the message differs from the RP known by the local router,
+            nor does it include (*,G) messages received for SSM groups."
+    ::= { rlPimNbrStatsEntry 5 }
+
+rlPimNbrStatsNumErrAssert OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Assert messages that have been received
+            from this neighbor that have contained errors."
+    ::= { rlPimNbrStatsEntry 6 }
+
+rlPimNbrStatsNumErrBSM OBJECT-TYPE
+    SYNTAX     PimStatsCounter
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of PIM Bootstrap messages that have been received
+            from this neighbor that have contained errors."
+    ::= { rlPimNbrStatsEntry 7 }
+
+--
+-- The DC-PIM TIB Manager Entity Table
+--
+
+rlPimTmEntTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF RlPimTmEntEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "This table is used to create and manage DC-PIM TIB Manager
+            entities."
+    ::= { rlPim 6 }
+
+rlPimTmEntEntry OBJECT-TYPE
+    SYNTAX     RlPimTmEntEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Each entry represents an instance of the DC-PIM TIB Manager
+            entity."
+    INDEX      { rlPimTmEntIndex }
+    ::= { rlPimTmEntTable 1 }
+
+RlPimTmEntEntry ::= SEQUENCE {
+    rlPimTmEntIndex                    NumericIndex,
+    rlPimTmEntRowStatus                RowStatus,
+    rlPimTmEntAdminStatus              AdminStatus,
+    rlPimTmEntOperStatus               NpgOperStatus,
+    rlPimTmEntGStateLimit              Unsigned32,
+    rlPimTmEntGStateWarnThold          Unsigned32,
+    rlPimTmEntGStateStored             Gauge32,
+    rlPimTmEntSGStateLimit             Unsigned32,
+    rlPimTmEntSGStateWarnThold         Unsigned32,
+    rlPimTmEntSGStateStored            Gauge32,
+    rlPimTmEntStarGIStateLimit         Unsigned32,
+    rlPimTmEntStarGIStateWarnThold     Unsigned32,
+    rlPimTmEntStarGIStateStored        Gauge32,
+    rlPimTmEntSGIStateLimit            Unsigned32,
+    rlPimTmEntSGIStateWarnThold        Unsigned32,
+    rlPimTmEntSGIStateStored           Gauge32,
+    rlPimTmEntAsmGrpFilter             DisplayString,
+    rlPimTmEntSsmSrcAndGrpFilter       DisplayString,
+    rlPimTmEntRegSrcAndGrpFilter       DisplayString,
+    rlPimTmEntRegSuppressionTime       Unsigned32,
+    rlPimTmEntRegProbeTime             Unsigned32,
+    rlPimTmEntKeepalivePeriod          Unsigned32,
+-- DC additions {
+    rlPimTmEntSendIfStateChangeTraps   TruthValue,
+    rlPimTmEntSupportedAddrType        InetAddressType
+-- } End DC additions
+}
+
+rlPimTmEntIndex OBJECT-TYPE
+    SYNTAX     NumericIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The index of this rlPimTmEntEntry.  This is the HAF entity
+            index passed on the entity create parameters."
+    ::= { rlPimTmEntEntry 1 }
+
+rlPimTmEntRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Used to create and delete a DC-PIM TIB Manager Entity Table
+            entry."
+    ::= { rlPimTmEntEntry 2 }
+
+rlPimTmEntAdminStatus OBJECT-TYPE
+    SYNTAX     AdminStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The desired administrative state of the DC-PIM TIB Manager
+            entity."
+    DEFVAL { adminStatusUp }
+    ::= { rlPimTmEntEntry 3 }
+
+rlPimTmEntOperStatus OBJECT-TYPE
+    SYNTAX     NpgOperStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The current operational state of the DC-PIM TIB Manager
+            entity."
+    ::= { rlPimTmEntEntry 4 }
+
+rlPimTmEntGStateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum number of groups for which DC-PIM TIB Manager
+            is allowed to store non-interface specific (*,G) and/or
+            (S,G) state.  A value of zero means that there is no limit."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 5 }
+
+rlPimTmEntGStateWarnThold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "DC-PIM TIB Manager logs an exception if the number of
+            groups for which it is storing non-interface specific (*,G)
+            and/or (S,G) state exceeds this value.  A value of zero
+            means that there is no warning threshold."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 6 }
+
+rlPimTmEntGStateStored OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of groups for which DC-PIM TIB Manager is
+            storing non-interface specific (*,G) and/or (S,G) state."
+    ::= { rlPimTmEntEntry 7 }
+
+rlPimTmEntSGStateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum number of {source, group} pairs for which
+            DC-PIM TIB Manager is allowed to store non-interface
+            specific (S,G) state.  A value of zero means that there is
+            no limit."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 8 }
+
+rlPimTmEntSGStateWarnThold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "DC-PIM TIB Manager logs an exception if the number of
+            {source, group} pairs for which it is storing non-interface
+            specific (S,G) state exceeds this value.  A value of zero
+            means that there is no warning threshold."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 9 }
+
+rlPimTmEntSGStateStored OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of {source, group} pairs for which DC-PIM TIB
+            Manager is storing non-interface specific (S,G) state."
+    ::= { rlPimTmEntEntry 10 }
+
+rlPimTmEntStarGIStateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum number of {group, interface} pairs for which
+            DC-PIM TIB Manager is allowed to store (*,G,I) state.  A
+            value of zero means that there is no limit."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 11 }
+
+rlPimTmEntStarGIStateWarnThold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "DC-PIM TIB Manager logs an exception if the number of
+            {group, interface} pairs for which it is storing (*,G,I)
+            state exceeds this value.  A value of zero means that there
+            is no warning threshold."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 12 }
+
+rlPimTmEntStarGIStateStored OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of {group, interface} pairs for which DC-PIM TIB
+            Manager is storing (*,G,I) state."
+    ::= { rlPimTmEntEntry 13 }
+
+rlPimTmEntSGIStateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The maximum number of {source, group, interface} triplets
+            for which DC-PIM TIB Manager is allowed to store (S,G,I)
+            state.  A value of zero means that there is no limit."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 14 }
+
+rlPimTmEntSGIStateWarnThold OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "DC-PIM TIB Manager logs an exception if the number of
+            {source, group, interface} triplets for which it is storing
+            (S,G,I) state exceeds this value.  A value of zero means
+            that there is no warning threshold."
+    DEFVAL { 0 }
+    ::= { rlPimTmEntEntry 15 }
+
+rlPimTmEntSGIStateStored OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of {source, group, interface} triplets for which
+            DC-PIM TIB Manager is storing (S,G,I) state."
+    ::= { rlPimTmEntEntry 16 }
+
+rlPimTmEntAsmGrpFilter OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "When ASM group filtering is enabled, then for groups in the
+            ASM space, the local router will:
+
+            -  process received PIM (*,G) Join and (S,G) Join messages
+               only if the group address is included in the standard
+               access list corresponding to the list index value
+               configured for this object, and
+
+            -  accept (*,G) and (S,G) local membership requests from the
+               MGMD Router component only if the group address is
+               included in the standard access list corresponding to the
+               list index value configured for this object.
+
+            In other words, the standard access list is a whitelist of
+            the ASM groups for which DC-PIM is permitted to request
+            traffic.
+
+            Note that DC-PIM will never Register-encapsulate multicast
+            data packets for groups that are blocked by this filter.
+            See rlPimTmEntRegSrcAndGrpFilter for additional Register
+            message filtering options.
+
+            rlPimTmEntAsmGrpFilter defaults to an empty string,
+            which indicates that no access list is specified."
+    ::= { rlPimTmEntEntry 17 }
+
+rlPimTmEntSsmSrcAndGrpFilter OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "When SSM source and group filtering is enabled, then for
+            groups in the SSM space, the local router will:
+
+            -  process received PIM (S,G) Join messages only if the
+               {source, group} pair is included in the extended access
+               list corresponding to the list index value configured for
+               this object, and
+
+            -  accept (S,G) local membership requests from the MGMD
+               Router component only if the {source, group} pair is
+               included in the extended access list corresponding to the
+               list index value configured for this object.
+
+            In other words, the extended access list is a whitelist of
+            the SSM {source, group} pairs for which DC-PIM is
+            permitted to request traffic.
+
+            rlPimTmEntSsmSrcAndGrpFilter defaults to an empty string,
+            which indicates that no access list is specified."
+    ::= { rlPimTmEntEntry 18 }
+
+rlPimTmEntRegSrcAndGrpFilter OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "When Register message filtering by source and group address
+            is enabled then:
+
+            -  for groups for which the local router is the RP, it
+               will process received PIM Register messages as normal
+               only if the {source, group} pair of the encapsulated
+               multicast data packet is included in the extended
+               access list corresponding to the list index value
+               configured for this object; if the {source, group} pair
+               is excluded from the extended access list, the local
+               router will send a Register-Stop message, and
+
+            -  on interfaces on which the local router is the DR, it
+               will encapsulate received multicast data packets and
+               forward them in PIM Register messages only if the
+               {source, group} pair of the multicast data packet is
+               included in the extended access list corresponding to
+               the list index value configured for this object.
+
+            In other words, the extended access list is a whitelist of
+            the {source, group} pairs for which the local router is
+            permitted to Register-encapsulate/decapsulate multicast
+            data packets.
+
+            rlPimTmEntRegSrcAndGrpFilter defaults to an empty string,
+            which indicates that no access list is specified."
+    DEFVAL { "" }
+    ::= { rlPimTmEntEntry 19 }
+
+rlPimTmEntRegSuppressionTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The mean value of the randomized interval during which a DR
+            stops Register-encapsulation after receiving a PIM
+            Register-Stop message.  This object corresponds to the
+            'Register_Suppression_Time' defined in the PIM-SM
+            specification [I-D.ietf-dcPim-sm-v2-new].
+
+            Note that configuring different values for this object for
+            different routers in the PIM domain might lead to incorrect
+            protocol operation."
+    DEFVAL { 60 }
+    ::= { rlPimTmEntEntry 20 }
+
+rlPimTmEntRegProbeTime OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The time to wait for a PIM Register-Stop message after
+            sending a PIM Null-Register message, before resuming
+            Register-encapsulation at a DR.  This object corresponds to
+            the 'Register_Probe_Time' defined in the PIM-SM
+            specification [I-D.ietf-dcPim-sm-v2-new]."
+    DEFVAL { 5 }
+    ::= { rlPimTmEntEntry 21 }
+
+rlPimTmEntKeepalivePeriod OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The time keep (S,G) state alive in the absence of PIM (S,G)
+            Join messages, (S,G) local membership or (S,G) data packets.
+            This object corresponds to the 'Keepalive_Period' defined in
+            the PIM-SM specification [I-D.ietf-dcPim-sm-v2-new].
+
+            Note that this value must also be configured in the MPF
+            stub, as the duration of its Data Flow Liveness timer.
+
+            Note that configuring different values for this object for
+            different routers in the PIM domain might lead to incorrect
+            protocol operation."
+    DEFVAL { 210 }
+    ::= { rlPimTmEntEntry 22 }
+
+-- DC additions {
+
+rlPimTmEntSendIfStateChangeTraps OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "Setting this object to 'true' means that DC-PIM TIB
+             Manager will send a rlPimInterfaceStateChange trap when an
+             interface's operational state changes."
+    DEFVAL { false }
+    ::= { rlPimTmEntEntry 23 }
+
+rlPimTmEntSupportedAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "This field indicates the address family type that this
+             entity supports.  On routers which support multiple
+             address families, separate DC-PIM-TM and DC-PIM-NM
+             entities must be configured for each family.
+
+             This configuration can only be updated when the row status
+             of the TM entity is NotInService or the admin status is
+             Down."
+    DEFVAL { ipv4 }
+    ::= { rlPimTmEntEntry 24 }
+
+-- } End DC additions
+
+
+rlPimEmbeddedRpEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The enabled status of Embedded-RP function for PIM-SM on this system."
+    DEFVAL { true }
+    ::= { rlPim 7 }
+
+END

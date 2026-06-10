@@ -1,0 +1,38 @@
+RBT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises FROM SNMPv2-SMI;
+
+rbt MODULE-IDENTITY
+    LAST-UPDATED        "201704200000Z"
+    ORGANIZATION        "Riverbed Technology, Inc."
+    CONTACT-INFO
+       "   Riverbed Technical Support
+           support@riverbed.com"
+    DESCRIPTION         "Riverbed Technology MIB"
+	
+    REVISION            "201704200000Z"
+    DESCRIPTION         "Add rbtTrap, rbtTrapInfo, productFamilies"
+	
+    REVISION            "200909230000Z"
+    DESCRIPTION         "Updated contact information"
+	
+    ::= { enterprises 17163 }
+
+products OBJECT IDENTIFIER
+    ::= { rbt 1 }
+
+--This is the only piece we need to add right now for 
+--Steelcentral traps
+rbtTrap OBJECT IDENTIFIER
+    ::= { rbt 2 }
+
+rbtTrapInfo OBJECT IDENTIFIER
+    ::= { rbt 3 }
+
+-- This is needed once we start to add SNMP read support for 
+-- SteelCentral products
+productFamilies OBJECT IDENTIFIER
+	  ::= { rbt 4}
+	
+END

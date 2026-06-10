@@ -1,0 +1,2528 @@
+WebGraph-Thermo-Hygro-Barometer-MIB DEFINITIONS ::= BEGIN
+----------------------------------------------------------------
+-- Revison: 1.30
+----------------------------------------------------------------
+-- 14.12.2009 	RSS Feed
+--		            
+----------------------------------------------------------------
+-- Revison: 1.29
+----------------------------------------------------------------
+-- 02.06.2008 	Correction wtWebGraphThermBaroHTTP
+--		Correction wtWebGraphThermoBaroDiag            
+----------------------------------------------------------------
+-- Revison: 1.28
+----------------------------------------------------------------
+-- 19.01.2007 	Webio
+--		New Graphics java script base parameter 
+----------------------------------------------------------------
+-- Revison: 1.27
+----------------------------------------------------------------
+-- 09.11.2006 	Webio
+--		DHCP enable 
+----------------------------------------------------------------
+-- Revison: 1.26
+----------------------------------------------------------------
+-- 03.08.2006 	wtWebGraphThermoBaroSensorNo korrigiert
+--	
+----------------------------------------------------------------
+-- Revison: 1.25
+----------------------------------------------------------------
+-- 28.06.2006 	New: Community String Trap
+--		
+----------------------------------------------------------------
+-- Revison: 1.24
+----------------------------------------------------------------
+-- 26.07.2005 	#57606, WebGraph Thermo-Hygrometer
+--		CRON Zeitfunktion
+----------------------------------------------------------------
+-- Revison: 1.23
+----------------------------------------------------------------
+-- 14.07.2005 	#57606, WebGraph Thermo-Hygrometer
+--		FTP Funktionen
+----------------------------------------------------------------
+-- Revison: 1.22
+----------------------------------------------------------------
+-- 17.05.2005 	#57606, WebGraph Thermo-Hygrometer
+--		Trap NMS annotations
+----------------------------------------------------------------
+-- Revison: 1.21
+----------------------------------------------------------------
+-- 19.04.2005 	#57606, WebGraph Thermo-Hygrometer
+--		Mail Authentication
+----------------------------------------------------------------
+-- Revison: 1.20
+----------------------------------------------------------------
+-- 05.11.2004 	#57606, WebGraph Themo-Hygrometer
+--		Neu: Syslog
+--		     
+----------------------------------------------------------------
+-- Revison: 1.19
+----------------------------------------------------------------
+-- 08.09.2004 	#57606 WebGraph Thermo-Hygrometer
+--		Neu: 
+--			wtWebGraphThermoBaroAlarmRHMin
+--			wtWebGraphThermoBaroAlarmRHMax
+--			wtWebGraphThermoBaroAlarmRHHysteresis
+--			wtWebGraphThermoBaroPortSensorSelect
+--			wtWebGraphThermoBaroAlarmDeltaTemp		
+--			wtWebGraphThermoBaroAlarmAHMin		
+--			wtWebGraphThermoBaroAlarmAHMax		
+----------------------------------------------------------------
+-- Revison: 1.18
+----------------------------------------------------------------
+-- 21.07.2004 	#57601/3/4, Webio Digital
+--		Neu: 
+--		     Diagnosis
+----------------------------------------------------------------
+-- Revison: 1.17
+----------------------------------------------------------------
+-- 28.06.2004 	#57630/1/2, Webio Digital
+--		Neu: Puls Mode
+----------------------------------------------------------------
+-- Revison: 1.16
+----------------------------------------------------------------
+-- 16.04.2004 	neu: #57632, Webio Digital EA24x24
+--
+--		#57630/1, Webio Digital EA12x12
+--		Neu:
+--			wtWebioEA12x12InputCounterClear
+----------------------------------------------------------------
+-- Revison: 1.15
+----------------------------------------------------------------
+-- 27.02.2004 	#57630/1, Webio Digital EA12x12
+--		Neu:
+--		Länge erweitert auf 32 Bit:
+--			wtWebioEA12x12InputValue
+--			wtWebioEA12x12OutputValue
+--			wtWebioEA12x12LoadControlView
+--			wtWebioEA12x12LCShutDownView
+--			wtWebioEA12x12SetOutput
+--			wtWebioEA12x12AlarmInputTrigger
+--			wtWebioEA12x12AlarmOutputTrigger
+--			wtWebioEA12x12PortOutputSafetyState
+----------------------------------------------------------------
+-- Revison: 1.14
+----------------------------------------------------------------
+-- 16.02.2004 	#57630/1, Webio Digital EA12x12
+--		Neu:
+--		Texte: Location, Contact
+--		SNMP:  ColdStart, WarmStart, ComunityString Read/RW
+--		Alarm: ColdStart / WarmStart trigger
+--
+-- 	 	#57601, 1xWebThermometer
+--		#57603, 2xWebThermometer		
+--		#57604, 8xWebThermometer
+--		Neu:
+--		Alarm Hysterese 
+--		Alarm Clear Traps und Mails
+----------------------------------------------------------------
+-- Revison: 1.13
+----------------------------------------------------------------
+-- 05.02.2004 	#57601, 1xWebThermometer
+--		#57603, 2xWebThermometer		
+--		#57604, 8xWebThermometer
+--		Neu:
+--		Texte: Location, Contact
+--		SNMP:  ColdStart, WarmStart, ComunityString Read/RW
+--		Alarm: ColdStart / WarmStart trigger
+----------------------------------------------------------------
+-- Revison: 1.12
+----------------------------------------------------------------
+-- 05.11.2003 	#57601, 1xWebThermometer
+--		#57603, 2xWebThermometer		
+--		#57604, 8xWebThermometer
+--		Neu:
+--		Mail Option: CSV attachment
+--		Offsetkalibrierung
+--		Alarm: Tcp Client mode
+----------------------------------------------------------------
+-- Revison: 1.11
+----------------------------------------------------------------
+-- 28.10.2003 	#57630/1, Webio Digital EA12x12
+--		Neue Feature:
+--		Alarm : TCP Client mode		
+--		INPUTS: Pulsfilter
+----------------------------------------------------------------
+-- Revison: 1.10
+----------------------------------------------------------------
+-- 04.07.2003 	#57630, Webio Digital EA12x12
+--		Neuer Menübaum, neue Binärmodi		
+--
+----------------------------------------------------------------
+-- Revison: 1.09
+----------------------------------------------------------------
+-- 24.03.2003 	Trap Enterprise (Type 1, 2) korrigiert 
+--		
+----------------------------------------------------------------
+-- Revison: 1.08
+----------------------------------------------------------------
+-- 04.03.2003 	Abgleich der Sprachversionen DE/US 
+--		
+----------------------------------------------------------------
+-- Revison: 1.07
+----------------------------------------------------------------
+-- 25.02.2003 	Korrektur US: wtWebioEA12x12LoadControl
+----------------------------------------------------------------
+-- Revison: 1.06
+----------------------------------------------------------------
+-- 24.02.2003 	Neu:
+--		#57630, Webio EA12x12, LoadControl Group
+--		Korrektur: Trap variable Namen
+----------------------------------------------------------------
+-- Revison: 1.05
+----------------------------------------------------------------
+-- 21.01.2003 	Neu:
+--		#57630, Webio EA12x12
+----------------------------------------------------------------
+-- Revison: 1.04
+----------------------------------------------------------------
+-- 02.01.2003 	Neu:
+--		#57601, 1xWebThermometer
+--		#57603, 2xWebThermometer, 8 Alarme
+----------------------------------------------------------------
+-- Revison: 1.03
+----------------------------------------------------------------
+-- 21.11.2002 	Neu:
+--		#57604, 2xWebThermometer, BOOTP, StartupSite
+--		#57603, 8xWebThermometer, BOOTP, StartupSite
+----------------------------------------------------------------
+-- Revison: 1.02
+----------------------------------------------------------------
+-- 26.07.2002 	Neu:
+--		#57604, 2xWebThermometer
+--		#57603, 8xWebThermometer
+-- 		
+
+    IMPORTS
+
+    OBJECT-TYPE                                        FROM RFC-1212
+    TRAP-TYPE                                          FROM RFC-1215
+    DisplayString, PhysAddress                         FROM RFC1213-MIB
+    enterprises, TimeTicks, IpAddress, NetworkAddress  FROM RFC1155-SMI;
+
+ 
+--    IpAddress ::=
+--        [APPLICATION 0]
+--            IMPLICIT OCTET STRING (SIZE (4))
+--    Counter ::=
+--        [APPLICATION 1]
+--            IMPLICIT INTEGER (0..4294967295)
+--    Gauge ::=
+--        [APPLICATION 2]
+--            IMPLICIT INTEGER (0..4294967295)
+--    TimeTicks ::=
+--        [APPLICATION 3]
+--            IMPLICIT INTEGER (0..4294967295)
+
+
+--    DisplayString ::= OCTET STRING
+--    PhysAddress   ::= OCTET STRING
+
+--    internet         OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+--    privat           OBJECT IDENTIFIER ::= { internet 4 }
+--    enterprises      OBJECT IDENTIFIER ::= { privat 1 }
+
+
+
+--  Wiesemann & Theis Com-Server MIB
+
+    wut                				OBJECT IDENTIFIER ::= { enterprises 5040 }
+    wtComServer        				OBJECT IDENTIFIER ::= { wut 1 }
+    wtWebio            				OBJECT IDENTIFIER ::= { wtComServer 2 }
+
+
+--  wtWebGraph Tree
+
+    wtWebGraphThermoBaro  			OBJECT IDENTIFIER ::= { wtWebio 16 }
+    	
+--  wtWebGraphThermoBaro Tree
+
+    wtWebGraphThermoBaroTemp      		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 1 }
+    wtWebGraphThermoBaroSessCntrl 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 2 }
+    wtWebGraphThermoBaroConfig    		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 3 }
+    wtWebGraphThermoBaroDiag    		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaro 4 }
+    
+--  wtWebGraphThermoBaroConfig Tree
+
+    wtWebGraphThermoBaroDevice    		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 1 }
+    wtWebGraphThermoBaroPorts     		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 2 }	
+    wtWebGraphThermoBaroManufact  		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroConfig 3 }	
+
+--  wtWebGraphThermoBaroDevice Tree
+
+    wtWebGraphThermoBaroText			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 1 }	
+    wtWebGraphThermoBaroTimeDate 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 2 }
+    wtWebGraphThermoBaroBasic			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 3 }	
+    wtWebGraphThermoBaroDatalogger		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 4 }	
+    wtWebGraphThermoBaroAlarm			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 5 }
+    wtWebGraphThermoBaroGraphics 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroDevice 6 }
+ 
+--  wtWebGraphThermoBaroTimeDate Tree
+
+    wtWebGraphThermoBaroTimeZone		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 1 }
+    wtWebGraphThermoBaroTimeServer		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 2 }	
+    wtWebGraphThermoBaroDeviceClock		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroTimeDate 3 }
+
+--  wtWebGraphThermoBaroBasic Tree
+    
+    wtWebGraphThermoBaroNetwork			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 1 }
+    wtWebGraphThermoBaroHTTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 2 }
+    wtWebGraphThermoBaroMail			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 3 }	
+    wtWebGraphThermoBaroSNMP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 4 }
+    wtWebGraphThermoBaroUDP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 5 }
+    wtWebGraphThermoBaroSyslog			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 6 }
+    wtWebGraphThermoBaroFTP			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 7 }
+    wtWebGraphThermoBaroRSS			OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroBasic 8 }
+    
+--  wtWebGraphThermoBaroGraphics Tree
+    
+    wtWebGraphThermoBaroGraphicsBase 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroGraphics 1 }
+    wtWebGraphThermoBaroGraphicsSelect 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroGraphics 2 }
+    wtWebGraphThermoBaroGraphicsScale 		OBJECT IDENTIFIER ::= { wtWebGraphThermoBaroGraphics 3 }
+    
+
+
+-- wtWebGraphThermoBaroTemp Group
+------------------------
+
+wtWebGraphThermoBaroSensors OBJECT-TYPE
+    SYNTAX INTEGER (1..2)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Anzahl der Sensoren"
+    ::= { wtWebGraphThermoBaroTemp 1 }
+
+-- Interface Table
+
+wtWebGraphThermoBaroSensorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Sensoren."
+    ::= { wtWebGraphThermoBaroTemp 2 }
+
+wtWebGraphThermoBaroSensorEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroSensorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Nummern der Sensoren."
+    INDEX  { wtWebGraphThermoBaroSensorNo }
+    ::= { wtWebGraphThermoBaroSensorTable 1 }
+
+WtWebGraphThermoBaroSensorEntry ::= SEQUENCE {
+    wtWebGraphThermoBaroSensorNo INTEGER
+}
+
+wtWebGraphThermoBaroSensorNo OBJECT-TYPE
+    SYNTAX INTEGER (1..3)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Nummer des Sensors."
+    ::= { wtWebGraphThermoBaroSensorEntry 1 }
+
+
+-- wtWebGraphThermoBaroTempValue Table
+
+wtWebGraphThermoBaroTempValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste Sensormesswerte korrespondiernd zu den Kanalnummern."
+    ::= { wtWebGraphThermoBaroTemp 3 }
+
+wtWebGraphThermoBaroTempValueEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Messwerte der Sensoren."
+    INDEX  { wtWebGraphThermoBaroSensorNo }
+    ::= { wtWebGraphThermoBaroTempValueTable 1 }
+
+WtWebGraphThermoBaroTempValueEntry ::= SEQUENCE{
+    wtWebGraphThermoBaroTempValue OCTET STRING
+}
+
+wtWebGraphThermoBaroTempValue OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (5))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Messwert des Sensors, ASCII, 5 Zeichen lang."
+    ::= { wtWebGraphThermoBaroTempValueEntry 1 }
+
+-- wtWebGraphThermoBaroBinaryTempValue Table
+
+wtWebGraphThermoBaroBinaryTempValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroBinaryTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste binärer Messwerte korrespondiernd zu den Kanalnummern."
+    ::= { wtWebGraphThermoBaroTemp 4 }
+
+wtWebGraphThermoBaroBinaryTempValueEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroBinaryTempValueEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Binäre Messwerte der Sensoren."
+    INDEX  { wtWebGraphThermoBaroSensorNo }
+    ::= { wtWebGraphThermoBaroBinaryTempValueTable 1 }
+
+WtWebGraphThermoBaroBinaryTempValueEntry ::= SEQUENCE{
+    wtWebGraphThermoBaroBinaryTempValue INTEGER
+}    
+
+wtWebGraphThermoBaroBinaryTempValue OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Binärer Messwert des Sensors in 1/10 Grad Celcius oder 1/10 Prozent,
+        vorzeichenbehaftete Zahl, der Wert 0x4FFF6 zeigt einen 
+        ungültigen Messwert an."
+    ::= { wtWebGraphThermoBaroBinaryTempValueEntry 1 }
+    
+-- wtWebGraphThermoBaroTempValuePkt Table
+
+wtWebGraphThermoBaroTempValuePktTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroTempValuePktEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste Temperaturwerte korrespondiernd zu den Kanalnummern."
+    ::= { wtWebGraphThermoBaroTemp 8 }
+
+wtWebGraphThermoBaroTempValuePktEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroTempValuePktEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Temperaturen der Sensoren."
+    INDEX  { wtWebGraphThermoBaroSensorNo }
+    ::= { wtWebGraphThermoBaroTempValuePktTable 1 }
+
+WtWebGraphThermoBaroTempValuePktEntry ::= SEQUENCE{
+    wtWebGraphThermoBaroTempValuePkt OCTET STRING
+}
+
+wtWebGraphThermoBaroTempValuePkt OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (5))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Temperaturwert des Sensors, ASCII, 5 Zeichen lang, dezimal Punkt."
+    ::= { wtWebGraphThermoBaroTempValuePktEntry 1 }    
+
+-- wtWebGraphThermoBaroSessCntrl Group
+--------------------------------
+
+wtWebGraphThermoBaroSessCntrlPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Durch Eintrag diese Passworts wird eine Session eröffnet, die durch Schreiben einer 1 
+        in wtWebGraphThermoBaroSessCntrlLogout beendet wird. Gelesen liefert diese Variable einen String der
+        Länge Null."
+    ::= { wtWebGraphThermoBaroSessCntrl 1 }
+
+wtWebGraphThermoBaroSessCntrlConfigMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    wtWebGraphThermoBaroSessCntrl-NoSession(0),
+    wtWebGraphThermoBaroSessCntrl-Session(1)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Wenn sich das Gerät im SNMP-Konfigurationsmodus befindet, wird der Wert
+        1 zurückgeliefert, ansonsten 0. Ist der ausgelesene Wert 0
+        obwohl das Passwort geschrieben wurde, befindet sich das Gerät bereits
+        im Configmodus und die Variablen können nur gelesen werden."
+    ::= { wtWebGraphThermoBaroSessCntrl 2 }
+
+wtWebGraphThermoBaroSessCntrlLogout OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wenn sich das Gerät im Konfigurationsmodus befindet und die Session wurde
+        von diesem SNMP Manager eröffnet, kann durch Schreiben einer 1 in diese 
+        Variable die Session beendet werden und alle Parameter werden gespeichert.
+        Durch Schreiben einer 2 werden alle Eingaben wieder verworfen.
+        Gelesen liefert diese Variable den Wert 0."
+    ::= { wtWebGraphThermoBaroSessCntrl 3 }
+
+wtWebGraphThermoBaroSessCntrlAdminPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieses Passwort schützt den Zugang der Variablen mit Administratorrechten. Es kann nur vom
+        Administrator verändert werden. Wurde kein Passwort vergeben so ist public das gültige Passwort.
+        Gelesen liefert diese Variable einen Null-Pointer."
+    ::= { wtWebGraphThermoBaroSessCntrl 4 }
+
+wtWebGraphThermoBaroSessCntrlConfigPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieses Passwort schützt den Zugang der Variablen mit Configuratorrechten. Es kann vom
+        Administrator und vom Configurator verändert werden. Wurde kein Passwort vergeben so ist 
+        public das gültige Passwort.Gelesen liefert diese Variable einen Null-Pointer."
+    ::= { wtWebGraphThermoBaroSessCntrl 5 }
+    
+
+-- wtWebGraphThermoBaroText Group
+------------------------
+
+wtWebGraphThermoBaroDeviceName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des Webio's, der userdefinierbar ist."
+    ::= { wtWebGraphThermoBaroText 1 }
+
+wtWebGraphThermoBaroDeviceText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Beschreibung des Webio's, die userdefinierbar ist."
+    ::= { wtWebGraphThermoBaroText 2 }
+
+wtWebGraphThermoBaroDeviceLocation OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Aufstellort des Webio's, die userdefinierbar ist."
+    ::= { wtWebGraphThermoBaroText 3 }
+
+wtWebGraphThermoBaroDeviceContact OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Kontaktadresse im Servicefall des Webio's, die userdefinierbar ist."
+    ::= { wtWebGraphThermoBaroText 4 }
+
+-- wtWebGraphThermoBaroTimeZone Group
+----------------------------
+
+wtWebGraphThermoBaroTzOffsetHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Stunden der Zeitzone (Winterzeit) in Bezug auf UTC."
+    ::= { wtWebGraphThermoBaroTimeZone 1 }
+
+wtWebGraphThermoBaroTzOffsetMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Minuten der Zeitzone (Winterzeit) in Bezug auf UTC."
+    ::= { wtWebGraphThermoBaroTimeZone 2 }
+    
+wtWebGraphThermoBaroTzEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Bedingung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+	        Bit 0  : Apply Timezone"
+    ::= { wtWebGraphThermoBaroTimeZone 3 }    
+
+wtWebGraphThermoBaroStTzOffsetHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Stunden der Zeitzone (Sommerzeit) in Bezug auf UTC."
+    ::= { wtWebGraphThermoBaroTimeZone 4 }
+
+wtWebGraphThermoBaroStTzOffsetMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset Minuten der Zeitzone (Sommerzeit) in Bezug auf UTC."
+    ::= { wtWebGraphThermoBaroTimeZone 5 }
+
+wtWebGraphThermoBaroStTzEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Bedingung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+	        Bit 0  : Apply Summertime"
+    ::= { wtWebGraphThermoBaroTimeZone 6 }   
+    
+wtWebGraphThermoBaroStTzStartMonth OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoBaroStartMonth-January(1),
+    	wtWebGraphThermoBaroStartMonth-February(2),
+    	wtWebGraphThermoBaroStartMonth-March(3),
+    	wtWebGraphThermoBaroStartMonth-April(4),
+    	wtWebGraphThermoBaroStartMonth-May(5),
+    	wtWebGraphThermoBaroStartMonth-June(6),
+    	wtWebGraphThermoBaroStartMonth-July(7),
+    	wtWebGraphThermoBaroStartMonth-August(8),
+    	wtWebGraphThermoBaroStartMonth-September(9),
+    	wtWebGraphThermoBaroStartMonth-October(10),
+    	wtWebGraphThermoBaroStartMonth-November(11),
+    	wtWebGraphThermoBaroStartMonth-December(12)
+    	}
+    	
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Monat, in dem von Winterzeit auf Sommerzeit umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 7 }
+
+wtWebGraphThermoBaroStTzStartMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoBaroStartMode-first(1),
+    	wtWebGraphThermoBaroStartMode-second(2),
+    	wtWebGraphThermoBaroStartMode-third(3),
+    	wtWebGraphThermoBaroStartMode-fourth(4),
+    	wtWebGraphThermoBaroStartMode-last(5)
+    	}
+    	
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Modus des Wochentages, bei dem von Winterzeit auf Sommerzeit umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 8 }
+
+wtWebGraphThermoBaroStTzStartWday OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoBaroStartWday-Sunday(1),
+    	wtWebGraphThermoBaroStartWday-Monday(2),
+    	wtWebGraphThermoBaroStartWday-Tuesday(3),
+    	wtWebGraphThermoBaroStartWday-Thursday(4),
+    	wtWebGraphThermoBaroStartWday-Wednesday(5),
+    	wtWebGraphThermoBaroStartWday-Friday(6),
+    	wtWebGraphThermoBaroStartWday-Saturday(7)
+    	}
+    	
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wochentag, bei dem von Winterzeit auf Sommerzeit umgestellt wird"
+    ::= { wtWebGraphThermoBaroTimeZone 9 }
+    
+wtWebGraphThermoBaroStTzStartHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Stunde, in der die Zeitzone von Winter auf Sommerzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 10 }
+
+wtWebGraphThermoBaroStTzStartMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minute, in der die Zeitzone von Winter auf Sommerzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 11 }
+ 
+wtWebGraphThermoBaroStTzStopMonth OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoBaroStopMonth-January(1),
+    	wtWebGraphThermoBaroStopMonth-February(2),
+    	wtWebGraphThermoBaroStopMonth-March(3),
+    	wtWebGraphThermoBaroStopMonth-April(4),
+    	wtWebGraphThermoBaroStopMonth-May(5),
+    	wtWebGraphThermoBaroStopMonth-June(6),
+    	wtWebGraphThermoBaroStopMonth-July(7),
+    	wtWebGraphThermoBaroStopMonth-August(8),
+    	wtWebGraphThermoBaroStopMonth-September(9),
+    	wtWebGraphThermoBaroStopMonth-October(10),
+    	wtWebGraphThermoBaroStopMonth-November(11),
+    	wtWebGraphThermoBaroStopMonth-December(12)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Monat, bei dem von Sommerzeit auf Winterzeit umgestellt wird."
+   ::= { wtWebGraphThermoBaroTimeZone 12 }
+
+wtWebGraphThermoBaroStTzStopMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoBaroStopMode-first(1),
+    	wtWebGraphThermoBaroStopMode-second(2),
+    	wtWebGraphThermoBaroStopMode-third(3),
+    	wtWebGraphThermoBaroStopMode-fourth(4),
+    	wtWebGraphThermoBaroStopMode-last(5)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Modus des Wochentages, bei dem von Sommerzeit auf Winterzeit umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 13 }
+
+wtWebGraphThermoBaroStTzStopWday OBJECT-TYPE
+    SYNTAX INTEGER {
+    	wtWebGraphThermoBaroStopWday-Sunday(1),
+    	wtWebGraphThermoBaroStopWday-Monday(2),
+    	wtWebGraphThermoBaroStopWday-Tuesday(3),
+    	wtWebGraphThermoBaroStopWday-Thursday(4),
+    	wtWebGraphThermoBaroStopWday-Wednesday(5),
+    	wtWebGraphThermoBaroStopWday-Friday(6),
+    	wtWebGraphThermoBaroStopWday-Saturday(7)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wochentage, bei dem von Sommerzeit auf Winterzeit umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 14 }
+    
+wtWebGraphThermoBaroStTzStopHrs OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Stunde, in der die Zeitzone von Sommer auf Winterzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 15 }
+
+wtWebGraphThermoBaroStTzStopMin OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minute, in der die Zeitzone von Sommer auf Winterzeit in Bezug auf UTC
+        umgestellt wird."
+    ::= { wtWebGraphThermoBaroTimeZone 16 }
+
+-- wtWebGraphThermoBaroTimeServer Group
+----------------------------
+
+wtWebGraphThermoBaroTimeServer1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse oder Name des 1. Time Servers in ASCII"
+    ::= { wtWebGraphThermoBaroTimeServer 1 }
+
+wtWebGraphThermoBaroTimeServer2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse oder Name des 2. Time Servers in ASCII"
+    ::= { wtWebGraphThermoBaroTimeServer 2 }
+    
+wtWebGraphThermoBaroTsEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Bedingung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+	        Bit 0  : Apply Time Server"
+    ::= { wtWebGraphThermoBaroTimeServer 3 }
+    
+wtWebGraphThermoBaroTsSyncTime OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Die Abfrage der Timeserver erfolgt zu dieser vollen Stunde (0-23)."
+    ::= { wtWebGraphThermoBaroTimeServer 4 }    
+    
+-- wtWebGraphThermoBaroDeviceClock Group
+----------------------------
+
+wtWebGraphThermoBaroClockHrs OBJECT-TYPE
+    SYNTAX INTEGER (0..23)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Uhrzeit Stunde, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebGraphThermoBaroDeviceClock 1 }
+
+wtWebGraphThermoBaroClockMin OBJECT-TYPE
+    SYNTAX INTEGER (0..59)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Uhrzeit Minute, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebGraphThermoBaroDeviceClock 2 }
+
+wtWebGraphThermoBaroClockDay OBJECT-TYPE
+    SYNTAX INTEGER (1..31)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Datum: Tag des Monats, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebGraphThermoBaroDeviceClock 3 }
+
+wtWebGraphThermoBaroClockMonth OBJECT-TYPE
+   SYNTAX INTEGER {
+    	wtWebGraphThermoBaroClockMonth-January(1),
+    	wtWebGraphThermoBaroClockMonth-February(2),
+    	wtWebGraphThermoBaroClockMonth-March(3),
+    	wtWebGraphThermoBaroClockMonth-April(4),
+    	wtWebGraphThermoBaroClockMonth-May(5),
+    	wtWebGraphThermoBaroClockMonth-June(6),
+    	wtWebGraphThermoBaroClockMonth-July(7),
+    	wtWebGraphThermoBaroClockMonth-August(8),
+    	wtWebGraphThermoBaroClockMonth-September(9),
+    	wtWebGraphThermoBaroClockMonth-October(10),
+    	wtWebGraphThermoBaroClockMonth-November(11),
+    	wtWebGraphThermoBaroClockMonth-December(12)
+    	}
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Datum: Monat, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebGraphThermoBaroDeviceClock 4 }
+
+wtWebGraphThermoBaroClockYear OBJECT-TYPE
+    SYNTAX INTEGER (0..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Datum: Jahr, unter Berücksichtigung der Zeitzoneneinstellungen."
+    ::= { wtWebGraphThermoBaroDeviceClock 5 }
+    
+
+-- wtWebGraphThermoBaroNetwork Group
+------------------------
+
+wtWebGraphThermoBaroIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des Webio's"
+    ::= { wtWebGraphThermoBaroNetwork 1 }
+
+wtWebGraphThermoBaroSubnetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Subnetmask des Webio's"
+    ::= { wtWebGraphThermoBaroNetwork 2 }
+
+wtWebGraphThermoBaroGateway OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Gateway des Webio's"
+    ::= { wtWebGraphThermoBaroNetwork 3 }
+
+wtWebGraphThermoBaroDnsServer1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des 1. DNS Servers in ASCII"
+    ::= { wtWebGraphThermoBaroNetwork 4 }
+
+wtWebGraphThermoBaroDnsServer2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des 2. DNS Servers in ASCII"
+    ::= { wtWebGraphThermoBaroNetwork 5 }
+
+wtWebGraphThermoBaroAddConfig OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Zusatzkonfiguration (1=EIN):
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+	        Bit 1: DHCP disable
+	        Bit 0: BOOTP disable
+	        "
+    ::= { wtWebGraphThermoBaroNetwork 6 }
+    
+--  wtWebGraphThermoBaroHTTP Group
+--------------------------------
+
+wtWebGraphThermoBaroStartup OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Legt die Startseite fest, nur eine Auswahl zulässig:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 2: user.htm
+        	Bit 1: home.htm
+	        Bit 0: index.htm"
+    ::= { wtWebGraphThermoBaroHTTP 1 }
+
+wtWebGraphThermoBaroGetHeaderEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wenn freigeschaltet, wird eine Erkennungssequenz und /oder ein HTTP-Kopf nach 
+        jeder GET-Anfrage der Antwort vorangestellt:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-6: ungenutzt
+        	Bit 1  : GET HTTP enable
+                Bit 0  : GET Header enable"
+    ::= { wtWebGraphThermoBaroHTTP 2 }  
+    
+wtWebGraphThermoBaroHttpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "HTTP Port, an den die TCP-Anfragen gesendet werden können (Default: 80)."
+    ::= { wtWebGraphThermoBaroHTTP 3 }    
+
+-- wtWebGraphThermoBaroMail Group
+--------------------------------
+
+wtWebGraphThermoBaroMailAdName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Gerätename für die Mail-Administration."
+    ::= { wtWebGraphThermoBaroMail 1 }
+    
+wtWebGraphThermoBaroMailReply OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Reply-Adresse für den Mailserver."
+    ::= { wtWebGraphThermoBaroMail 2 }
+    
+wtWebGraphThermoBaroMailServer OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder Ip-Adresse des Mailservers."
+    ::= { wtWebGraphThermoBaroMail 3 }
+    
+wtWebGraphThermoBaroMailEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Erlaubt das versenden von Mails:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+                Bit 0  : Mail enable"
+    ::= { wtWebGraphThermoBaroMail 4 }
+    
+wtWebGraphThermoBaroMailAuthentication OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Auswahl des Authenticationmodi:
+        die OCTETS werden bitweise interpretiert, es darf nur ein Bit gesetzt sein.
+        Bit 0 entspricht dem LSB.
+        OCTET 1: ungenutzt
+        OCTET 2: ungenutzt
+        OCTET 3: ungenutzt
+        OCTET 4: Bit 3-7: ungenutzt
+        	 Bit 2  : POP3 vor SMTP
+        	 Bit 1  : ESMTP, Authentifizierung
+        	 Bit 0  : SMTP, keine Authentifizierung"
+    ::= { wtWebGraphThermoBaroMail 5 }
+    
+wtWebGraphThermoBaroMailAuthUser OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des Postfaches / Postfachusers."
+    ::= { wtWebGraphThermoBaroMail 6 }    
+    
+wtWebGraphThermoBaroMailAuthPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Passwort zur Identifizierung des Users."
+    ::= { wtWebGraphThermoBaroMail 7 }    
+    
+wtWebGraphThermoBaroMailPop3Server OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder Ip-Adresse des POP3 Servers."
+    ::= { wtWebGraphThermoBaroMail 8 }            
+
+-- wtWebGraphThermoBaroSNMP Group
+--------------------------------
+
+wtWebGraphThermoBaroSnmpCommunityStringRead OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string read only"
+    ::= { wtWebGraphThermoBaroSNMP 1 }
+
+wtWebGraphThermoBaroSnmpCommunityStringReadWrite OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string read / write"
+    ::= { wtWebGraphThermoBaroSNMP 2 }
+
+wtWebGraphThermoBaroSystemTrapManagerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des SNMP-Managers, der den System Trap entgegen nimmt."
+    ::= { wtWebGraphThermoBaroSNMP 3 }
+    
+wtWebGraphThermoBaroSystemTrapEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+	        Bit 0:   ColdStart
+	        Bit 1:   WarmStart
+	        Bit 2-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroSNMP 4 }
+    
+wtWebGraphThermoBaroSnmpEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet SNMP frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+                Bit 0  : SNMP enable"
+    ::= { wtWebGraphThermoBaroSNMP 5 }
+
+wtWebGraphThermoBaroSnmpCommunityStringTrap OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Community string der Traps."
+    ::= { wtWebGraphThermoBaroSNMP 6 }    
+        
+    
+-- wtWebGraphThermoBaroUDP Group
+--------------------------------
+    
+wtWebGraphThermoBaroUdpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Udp Port, an den die Udp-Anfragen GET Single gesendet werden können"
+    ::= { wtWebGraphThermoBaroUDP 1 }
+    
+wtWebGraphThermoBaroUdpEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Schaltet UDP frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+                Bit 0  : UDP enable"
+    ::= { wtWebGraphThermoBaroUDP 2 }
+    
+--  wtWebGraphThermoBaroSyslog Group
+--------------------------------
+    
+wtWebGraphThermoBaroSyslogServerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des Syslog-Servers, der die Syslog-Nachricht entgegen nimmt."
+    ::= { wtWebGraphThermoBaroSyslog 1 }
+    
+wtWebGraphThermoBaroSyslogServerPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Syslog-Servers, default ist 514."
+    ::= { wtWebGraphThermoBaroSyslog 2 }
+
+wtWebGraphThermoBaroSyslogSystemMessagesEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+	        Bit 0:   ColdStart
+	        Bit 1:   WarmStart
+	        Bit 2:   Diag Messages
+	        Bit 3-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroSyslog 3 }    
+
+wtWebGraphThermoBaroSyslogEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet Syslog frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+                Bit 0  : Syslog enable"
+    ::= { wtWebGraphThermoBaroSyslog 4 }
+    
+--  wtWebGraphThermoBaroFTP Group
+--------------------------------
+
+wtWebGraphThermoBaroFTPServerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des FTP-Servers, der die FTP-Nachricht entgegen nimmt."
+    ::= { wtWebGraphThermoBaroFTP 1 }
+    
+wtWebGraphThermoBaroFTPServerControlPort OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Kontrollports des FTP-Servers, default ist 21."
+    ::= { wtWebGraphThermoBaroFTP 2 }
+
+wtWebGraphThermoBaroFTPUserName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: Name des Anwenders."
+    ::= { wtWebGraphThermoBaroFTP 3 }
+    
+wtWebGraphThermoBaroFTPPassword OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: Passwort des Anwenders."
+    ::= { wtWebGraphThermoBaroFTP 4 }
+
+wtWebGraphThermoBaroFTPAccount OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "FTP Loggin: Account-Name des Anwenderkontos."
+    ::= { wtWebGraphThermoBaroFTP 5 }
+
+wtWebGraphThermoBaroFTPOption OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet den FTP Server in den Passiv-Modus,
+        der Client kontrolliert die Datenverbindung allein:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+                Bit 0  : PASV enable"
+    ::= { wtWebGraphThermoBaroFTP 6 }
+    
+wtWebGraphThermoBaroFTPEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bit 0 schaltet FTP frei:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 1-7: ungenutzt
+                Bit 0  : FTP enable"
+    ::= { wtWebGraphThermoBaroFTP 7 }
+    
+    
+-- wtWebGraphThermoBaroDatalogger Group
+--------------------------------
+
+wtWebGraphThermoBaroLoggerTimebase OBJECT-TYPE
+    SYNTAX INTEGER {
+    wtWebGraphThermoBaroDatalogger-1Min(1),
+    wtWebGraphThermoBaroDatalogger-5Min(2),
+    wtWebGraphThermoBaroDatalogger-15Min(3),
+    wtWebGraphThermoBaroDatalogger-60Min(4)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Zeitbasis des Dataloggers"
+    ::= { wtWebGraphThermoBaroDatalogger 1 }
+
+wtWebGraphThermoBaroLoggerSensorSel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0  : Sensor 1
+        	Bit 1  : Sensor 2
+        	Bit 2-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroDatalogger 2 }
+    
+    
+--  wtWebGraphThermoBaroRSS Group
+--------------------------------
+
+wtWebGraphThermoBaroRSSChannelTitle OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des RSS Feeds."
+    ::= { wtWebGraphThermoBaroRSS 1 }
+    
+wtWebGraphThermoBaroRSSChannelLink OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link des RSS Feeds."
+    ::= { wtWebGraphThermoBaroRSS 2 }
+
+wtWebGraphThermoBaroRSSChannelDescription OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Beschreibungstext des RSS Feeds."
+    ::= { wtWebGraphThermoBaroRSS 3 }
+
+wtWebGraphThermoBaroRSSChannelImage OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link zu eine Bild, dass mit dem Datensätzen in der Kopfzeile angezeigt wird."
+    ::= { wtWebGraphThermoBaroRSS 4 }
+
+wtWebGraphThermoBaroRSSChannelImageTitle OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des Bildes."
+    ::= { wtWebGraphThermoBaroRSS 5 }
+
+wtWebGraphThermoBaroRSSChannelImageLink OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link, der dem Bild in der Kopfzeile hinterlegt wird."
+    ::= { wtWebGraphThermoBaroRSS 6 }
+    
+wtWebGraphThermoBaroRSSChannelItemTitle OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des RSS Feeds Eintrages."
+    ::= { wtWebGraphThermoBaroRSS 7 }
+
+wtWebGraphThermoBaroRSSChannelItemLink OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Link des RSS Feeds Eintrages."
+    ::= { wtWebGraphThermoBaroRSS 8 }
+
+wtWebGraphThermoBaroRSSChannelItemDescription OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Text des RSS Feeds Eintrages."
+    ::= { wtWebGraphThermoBaroRSS 9 }
+
+wtWebGraphThermoBaroRSSChannelItemQuantity OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Anzahl der auszugebenen RSS Feeds Einträge."
+    ::= { wtWebGraphThermoBaroRSS 10 }
+
+-- wtWebGraphThermoBaroAlarm Group
+--------------------------------
+
+wtWebGraphThermoBaroAlarmCount OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Anzahl der unabhängigen Alarme."
+    ::= { wtWebGraphThermoBaroAlarm 1 }
+    
+-- Alarm Interface Table
+
+wtWebGraphThermoBaroAlarmIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroAlarmIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Alarmindizes."
+    ::= { wtWebGraphThermoBaroAlarm 2 }
+
+wtWebGraphThermoBaroAlarmIfEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroAlarmIfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Nummern der Alarme."
+    INDEX  { wtWebGraphThermoBaroAlarmNo }
+    ::= { wtWebGraphThermoBaroAlarmIfTable 1 }
+
+WtWebGraphThermoBaroAlarmIfEntry ::= SEQUENCE {
+    wtWebGraphThermoBaroAlarmNo INTEGER
+}
+
+wtWebGraphThermoBaroAlarmNo OBJECT-TYPE
+    SYNTAX INTEGER (1..8)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Nummer des Alarms."
+    ::= { wtWebGraphThermoBaroAlarmIfEntry 1 }
+
+-- Alarm Table
+
+wtWebGraphThermoBaroAlarmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroAlarmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Einstellungen abhängig von der Alarmnummer."
+    ::= { wtWebGraphThermoBaroAlarm 3 }
+
+wtWebGraphThermoBaroAlarmEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroAlarmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Alarm-Parameter der einzelnen Alarme."
+    INDEX  { wtWebGraphThermoBaroAlarmNo }
+    ::= { wtWebGraphThermoBaroAlarmTable 1 }
+
+WtWebGraphThermoBaroAlarmEntry ::= SEQUENCE {
+    wtWebGraphThermoBaroAlarmTrigger		OCTET STRING,
+    wtWebGraphThermoBaroAlarmMin		OCTET STRING,
+    wtWebGraphThermoBaroAlarmMax		OCTET STRING,
+    wtWebGraphThermoBaroAlarmHysteresis		OCTET STRING,
+    wtWebGraphThermoBaroAlarmDelay		OCTET STRING,
+    wtWebGraphThermoBaroAlarmInterval		OCTET STRING,
+    wtWebGraphThermoBaroAlarmEnable		OCTET STRING,
+    wtWebGraphThermoBaroAlarmEMailAddr		OCTET STRING,
+    wtWebGraphThermoBaroAlarmMailSubject	OCTET STRING,
+    wtWebGraphThermoBaroAlarmMailText		OCTET STRING,
+    wtWebGraphThermoBaroAlarmManagerIP		OCTET STRING,
+    wtWebGraphThermoBaroAlarmTrapText		OCTET STRING,
+    wtWebGraphThermoBaroAlarmMailOptions	OCTET STRING,
+    wtWebGraphThermoBaroAlarmTcpIpAddr		OCTET STRING,
+    wtWebGraphThermoBaroAlarmTcpPort		INTEGER,
+    wtWebGraphThermoBaroAlarmTcpText		OCTET STRING,
+    wtWebGraphThermoBaroAlarmClearMailSubject	OCTET STRING,
+    wtWebGraphThermoBaroAlarmClearMailText	OCTET STRING,
+    wtWebGraphThermoBaroAlarmClearTrapText	OCTET STRING,
+    wtWebGraphThermoBaroAlarmClearTcpText	OCTET STRING,
+    wtWebGraphThermoBaroAlarmDeltaTemp		OCTET STRING,
+    wtWebGraphThermoBaroAlarmRHMin		OCTET STRING,
+    wtWebGraphThermoBaroAlarmRHMax		OCTET STRING,
+    wtWebGraphThermoBaroAlarmRHHysteresis	OCTET STRING,
+    wtWebGraphThermoBaroAlarmAHMin		OCTET STRING,
+    wtWebGraphThermoBaroAlarmAHMax		OCTET STRING,    
+    wtWebGraphThermoBaroAlarmSyslogIpAddr	OCTET STRING,
+    wtWebGraphThermoBaroAlarmSyslogPort		INTEGER,
+    wtWebGraphThermoBaroAlarmSyslogText		OCTET STRING,
+    wtWebGraphThermoBaroAlarmSyslogClearText	OCTET STRING,
+    wtWebGraphThermoBaroAlarmFtpDataPort	OCTET STRING,
+    wtWebGraphThermoBaroAlarmFtpFileName	OCTET STRING,
+    wtWebGraphThermoBaroAlarmFtpText		OCTET STRING,
+    wtWebGraphThermoBaroAlarmFtpClearText	OCTET STRING,
+    wtWebGraphThermoBaroAlarmFtpOption		OCTET STRING,
+    wtWebGraphThermoBaroAlarmTimerCron		OCTET STRING    
+
+}
+
+wtWebGraphThermoBaroAlarmTrigger OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Triggerbedingungen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3:
+        	Bit 0: Timer
+        	Bit 1: ColdStart
+        	Bit 2: WarmStart
+        	Bit 3: Sensor lost
+        	Bit 4-7 ungenutzt
+        Octet 4:
+        	Bit 0: Sensor 1
+        	Bit 1: Sensor 2
+        	Bit 2-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroAlarmEntry 1 }
+
+wtWebGraphThermoBaroAlarmMin OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum Temperatur in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 2 }
+
+wtWebGraphThermoBaroAlarmMax OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum Temperatur in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 3 }
+
+wtWebGraphThermoBaroAlarmHysteresis OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bei Überschreiten der Temperatur Min+Hyst. und Unterschreiten der Temperatur Max-Hyst.
+        wird der Alarm gelöscht: pos. Temperaturdifferenz in Grad mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 4 }
+
+wtWebGraphThermoBaroAlarmDelay OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Der Alarm wird erst ausgelöst, wenn für die Dauer dieser Zeit
+        die Alarmbedingungen erfüllt sind (Zeit in Minuten)."
+    ::= { wtWebGraphThermoBaroAlarmEntry 5 }
+    
+wtWebGraphThermoBaroAlarmInterval OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Sendeintervall von Alarmmeldungen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 6 }
+
+wtWebGraphThermoBaroAlarmEnable OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Alarmfreischaltung:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+		Bit 0:	Mail Enable
+        	Bit 1:	SNMP Trap enable
+        	Bit 2:  TCP Client enable"
+    ::= { wtWebGraphThermoBaroAlarmEntry 7 }
+
+wtWebGraphThermoBaroAlarmEMailAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "E-Mail Adresse, an die die Alarmmail gesendet werden soll."
+    ::= { wtWebGraphThermoBaroAlarmEntry 8 }
+
+wtWebGraphThermoBaroAlarmMailSubject OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Betreffzeile der Alarmmail."
+    ::= { wtWebGraphThermoBaroAlarmEntry 9 }
+
+wtWebGraphThermoBaroAlarmMailText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Text der Alarmmail: <Tn> liefert die aktuelle Temperatur; n = 1..8.
+        <Z> liefert die aktuelle Zeit."
+    ::= { wtWebGraphThermoBaroAlarmEntry 10 }
+
+wtWebGraphThermoBaroAlarmManagerIP OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name oder IP-Adresse des SNMP-Managers, der den Trap entgegen nimmt."
+    ::= { wtWebGraphThermoBaroAlarmEntry 11 }
+
+wtWebGraphThermoBaroAlarmTrapText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im Trapbody gesendet."
+    ::= { wtWebGraphThermoBaroAlarmEntry 12 }
+    
+wtWebGraphThermoBaroAlarmMailOptions OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Optionen:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+		Bit 0  :	Attach Thermo.csv Enable
+		Bit 1  :	CSV-Data_since_last_report
+        	Bit 2-7:	ungenutzt"
+    ::= { wtWebGraphThermoBaroAlarmEntry 13 }    
+
+wtWebGraphThermoBaroAlarmTcpIpAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des Gerätes, dass eine TCP-Nachricht empfangen soll."
+    ::= { wtWebGraphThermoBaroAlarmEntry 14 }    
+
+wtWebGraphThermoBaroAlarmTcpPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Gerätes, dass eine TCP-Nachricht empfangen soll."
+    ::= { wtWebGraphThermoBaroAlarmEntry 15 }    
+
+wtWebGraphThermoBaroAlarmTcpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im TCP Trapbody gesendet."
+    ::= { wtWebGraphThermoBaroAlarmEntry 16 }
+    
+wtWebGraphThermoBaroAlarmClearMailSubject OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Betreffzeile der Alarm Clear Mail."
+    ::= { wtWebGraphThermoBaroAlarmEntry 17 }
+
+wtWebGraphThermoBaroAlarmClearMailText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Text der Alarm Clear Mail: <Tn> liefert die aktuelle Temperatur; n = 1..8.
+        <Z> liefert die aktuelle Zeit."
+    ::= { wtWebGraphThermoBaroAlarmEntry 18 }
+
+wtWebGraphThermoBaroAlarmClearTrapText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im Trapbody gesendet."
+    ::= { wtWebGraphThermoBaroAlarmEntry 19 }
+
+wtWebGraphThermoBaroAlarmClearTcpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird im TCP Trapbody gesendet."
+    ::= { wtWebGraphThermoBaroAlarmEntry 20 }
+    
+wtWebGraphThermoBaroAlarmDeltaTemp OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximale Temperaturänderung in Grad/min mit maximal 2 Nachkommastellen.
+        Es wird ein Mittelwert einer Periode von 5 Minuten verglichen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 21 }
+
+wtWebGraphThermoBaroAlarmRHMin OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum rel. Feuchte in Prozent mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 22 }
+
+wtWebGraphThermoBaroAlarmRHMax OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum rel.Feuchte in Prozent mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 23 }
+
+wtWebGraphThermoBaroAlarmRHHysteresis OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hysterese rel. Feuchte in Prozent mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 24 }
+
+wtWebGraphThermoBaroAlarmAHMin OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Minimum abs. Feuchte in g/(m*m*m) mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 25 }
+
+wtWebGraphThermoBaroAlarmAHMax OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Maximum abs. Feuchte in g/(m*m*m) mit maximal 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 26 }
+    
+wtWebGraphThermoBaroAlarmSyslogIpAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "IP-Adresse des Gerätes, dass eine Syslog-Nachricht empfangen soll."
+    ::= { wtWebGraphThermoBaroAlarmEntry 27 }    
+
+wtWebGraphThermoBaroAlarmSyslogPort OBJECT-TYPE
+    SYNTAX INTEGER (1..65535) 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Portnummer des Gerätes, dass eine Syslog-Nachricht empfangen soll, default Port ist 514."
+    ::= { wtWebGraphThermoBaroAlarmEntry 28 }    
+
+wtWebGraphThermoBaroAlarmSyslogText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Jede Syslog-Nachricht beginnt mit einem Prioritätsschlüssel, einem Zeitstempel und der Host Ip-Nummer gemäß RFC3164.
+        Dieser Text wird im darauf folgenden Syslog-Nachrichtenteil gesendet."
+    ::= { wtWebGraphThermoBaroAlarmEntry 29 }
+
+wtWebGraphThermoBaroAlarmSyslogClearText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Jede Syslog-Nachricht beginnt mit einem Prioritätsschlüssel, einem Zeitstempel und der Host Ip-Nummer gemäß RFC3164.
+        Dieser Text wird im darauf folgenden Syslog-Nachrichtenteil gesendet."
+    ::= { wtWebGraphThermoBaroAlarmEntry 30 }
+
+wtWebGraphThermoBaroAlarmFtpDataPort OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Lokaler Datenport: 1..65535 oder AUTO: der nächste ungenutzte Port wird automatisch zugewiesen."
+    ::= { wtWebGraphThermoBaroAlarmEntry 31 }
+    
+wtWebGraphThermoBaroAlarmFtpFileName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Der File Name kann auch Pfadinformationen enthalten."
+    ::= { wtWebGraphThermoBaroAlarmEntry 32 }
+    
+wtWebGraphThermoBaroAlarmFtpText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird in die angegebene Datei geschrieben."
+    ::= { wtWebGraphThermoBaroAlarmEntry 33 }
+
+wtWebGraphThermoBaroAlarmFtpClearText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Text wird in die angegebene Datei geschrieben."
+    ::= { wtWebGraphThermoBaroAlarmEntry 34 }
+    
+wtWebGraphThermoBaroAlarmFtpOptions OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Binär kodierte Optionen, nur eine Option darf eingeschaltet sein:
+        STORE  = Datei ersetzen
+        APPEND = Nachrichten ans Dateiende anhängen
+        
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+		Bit 0  :	STORE
+		Bit 1  :	APPEND
+        	Bit 2-7:	ungenutzt"
+    ::= { wtWebGraphThermoBaroAlarmEntry 35 }      
+    
+wtWebGraphThermoBaroAlarmTimerCron OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Dieser Eintrag enthält 5 Leerzeichen- oder Tab-getrente Felder zur Definition von zeitgesteuerten
+        Ausgabe von Alarmnachrichten. Jedes der 5 Felder muss mit der aktuelle Zeit übereinstimmen, um
+        das Senden einer Nachricht auszulösen, Wochentag und Monatstag werden getrennt ausgewertet.
+        Feld		möglicher Zahlenbereich
+        1: Minuten	0-59
+        2. Stunden	0-23, 0 ist Mitternacht
+        3: Monatstag	1-31
+        4: Monat	1-12
+        5: Wochentag	0-6, 0 ist Sonntag
+        
+        Für jedes Feld kann nun angegeben werden:
+        - eine ganze Zahl aus dem angegebenen Zahlenbereich
+	- ein Teil-Zahlenbereich (wie z.B. 1-5) innerhalb des angegebenen Zahlenbereichs
+	- eine mit Komma getrennte Liste von ganzen Zahlen oder Tei-Zahlenbereichen (wie z.B. 2,4-6,8,10)
+	- ein Stern * (deckt den gesamten erlaubten Bereich ab)
+	- ein / gibt die Schrittweite bei Teil-Zahlenbereichen an (z.B. 0-59/2 jede zweite Minute)."
+    ::= { wtWebGraphThermoBaroAlarmEntry 36 } 
+
+-- wtWebGraphThermoBaroGraphicsBase Group
+----------------------------
+
+wtWebGraphThermoBaroGraphicsBaseEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Legt die Anzeigeelemente der Grafik fest:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+                Bit 0  : Auto scroll enable
+                Bit 1  : Show table
+                Bit 2  : Show graph
+                Bit 3  : Show control buttons
+                Bit 4  : Show config menu
+                Bit 5-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroGraphicsBase 1 }
+
+wtWebGraphThermoBaroGraphicsBaseWidth OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Definiert die Breite der Grafik in Pixeln."
+    ::= { wtWebGraphThermoBaroGraphicsBase 2 }
+    
+wtWebGraphThermoBaroGraphicsBaseHeight OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Definiert die Höhe der Grafik in Pixeln."
+        ::= { wtWebGraphThermoBaroGraphicsBase 3 }
+
+wtWebGraphThermoBaroGraphicsBaseFrameColor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(3))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Farbe des Rahmens in der grafischen Darstellung."
+    ::= { wtWebGraphThermoBaroGraphicsBase 4 }
+
+wtWebGraphThermoBaroGraphicsBaseBackgroundColor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(3))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Farbe der Hintergrundfarbe in der grafischen Darstellung."
+    ::= { wtWebGraphThermoBaroGraphicsBase 5 }
+    
+wtWebGraphThermoBaroGraphicsBasePollingrate OBJECT-TYPE
+        SYNTAX INTEGER 
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Definiert die Abfragerate in Sekunden, 
+            mit der die Grafik aktualisiert wird."
+        ::= { wtWebGraphThermoBaroGraphicsBase 6 }
+   
+-- wtWebGraphThermoBaroGraphicsSelect Group
+----------------------------
+
+wtWebGraphThermoBaroGraphicsSelectDisplaySensorSel OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Die hier ausgewählten Sensoren werden grafisch angezeigt:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0: Sensor 1
+        	Bit 1: Sensor 2
+        	Bit 2: Sensor 3
+        	Bit 3-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroGraphicsSelect 1 }   
+
+wtWebGraphThermoBaroGraphicsSelectDisplayShowExtrem OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Die Anzeige von Minima und Maxima der hier ausgewählten Sensoren 
+        wird freigeschaltet:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+        	Bit 0: Sensor 1
+        	Bit 1: Sensor 2
+        	Bit 2: Sensor 3
+        	Bit 3-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroGraphicsSelect 2 }   
+
+-- Graph Sensor Color Table
+
+wtWebGraphThermoBaroSensorColorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroSensorColorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Sensorfarben in der grafischen Darstellung."
+    ::= { wtWebGraphThermoBaroGraphicsSelect 3 }
+
+wtWebGraphThermoBaroSensorColorEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroSensorColorEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Nummern der Sensoren."
+    INDEX  { wtWebGraphThermoBaroSensorNo }
+    ::= { wtWebGraphThermoBaroSensorColorTable 1 }
+
+wtWebGraphThermoBaroSensorColorEntry ::= SEQUENCE {
+    wtWebGraphThermoBaroGraphicsSensorColor OCTET STRING,
+    wtWebGraphThermoBaroGraphicsSelectScale OCTET STRING
+}
+
+wtWebGraphThermoBaroGraphicsSensorColor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(3))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Farbe des Sensors in der grafischen Darstellung."
+    ::= { wtWebGraphThermoBaroSensorColorEntry 1 }
+    
+wtWebGraphThermoBaroGraphicsSelectScale OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Zuweisung einer Skalierung zu einem Sensor:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+                Bit 0  : Use Scale 1
+                Bit 1  : Use Scale 2
+                Bit 2  : Use Scale 3
+                Bit 3-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroSensorColorEntry 2 }
+
+-- wtWebGraphThermoBaroGraphicsScale Group
+----------------------------
+
+wtWebGraphThermoBaroGraphicsScaleAutoScaleEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wählt den Auto Scale Modus für die jeweilige Skalierung aus:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+                Bit 0  : Scale 1 Auto scale enable
+                Bit 1  : Scale 2 Auto scale enable
+                Bit 2  : Scale 3 Auto scale enable
+                Bit 3-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroGraphicsScale 1 }
+
+wtWebGraphThermoBaroGraphicsScaleAutoFitEnable OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Wählt den Auto Fit Modus für die jeweilige Skalierung aus:
+        Octet 1: ungenutzt
+        Octet 2: ungenutzt
+        Octet 3: ungenutzt
+        Octet 4:
+                Bit 0  : Scale 1 Auto fit enable
+                Bit 1  : Scale 2 Auto fit enable
+                Bit 2  : Scale 3 Auto fit enable
+                Bit 3-7: ungenutzt"
+    ::= { wtWebGraphThermoBaroGraphicsScale 2 }
+
+wtWebGraphThermoBaroGraphicsScale1Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 1: Minimum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 3 }
+   
+wtWebGraphThermoBaroGraphicsScale2Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 2: Minimum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 4 }
+
+wtWebGraphThermoBaroGraphicsScale3Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 3: Minimum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 5 }
+
+wtWebGraphThermoBaroGraphicsScale4Min OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 4: Minimum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 6 }
+
+wtWebGraphThermoBaroGraphicsScale1Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 1: Maximum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 7 }
+
+wtWebGraphThermoBaroGraphicsScale2Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 2: Maximum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 8 }
+
+wtWebGraphThermoBaroGraphicsScale3Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 3: Maximum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 9 }
+
+wtWebGraphThermoBaroGraphicsScale4Max OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 4: Maximum."
+    ::= { wtWebGraphThermoBaroGraphicsScale 10 }
+
+wtWebGraphThermoBaroGraphicsScale1Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 1: Einheit."
+    ::= { wtWebGraphThermoBaroGraphicsScale 11 }
+
+wtWebGraphThermoBaroGraphicsScale2Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 2: Einheit."
+    ::= { wtWebGraphThermoBaroGraphicsScale 12 }
+
+wtWebGraphThermoBaroGraphicsScale3Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 3: Einheit."
+    ::= { wtWebGraphThermoBaroGraphicsScale 13 }
+
+wtWebGraphThermoBaroGraphicsScale4Unit OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Skalierung 4: Einheit."
+    ::= { wtWebGraphThermoBaroGraphicsScale 14 }
+    
+
+-- wtWebGraphThermoBaroPorts Group
+----------------------------
+
+-- Table
+
+wtWebGraphThermoBaroPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF WtWebGraphThermoBaroPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Liste der Einstellungen abhängig von der Sensornummer."
+    ::= { wtWebGraphThermoBaroPorts 1 }
+
+wtWebGraphThermoBaroPortEntry OBJECT-TYPE
+    SYNTAX WtWebGraphThermoBaroPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Sensor-Parameter der einzelnen Sensoren."
+    INDEX  { wtWebGraphThermoBaroSensorNo }
+    ::= { wtWebGraphThermoBaroPortTable 1 }
+
+WtWebGraphThermoBaroPortEntry ::= SEQUENCE {
+    wtWebGraphThermoBaroPortName		OCTET STRING,
+    wtWebGraphThermoBaroPortText		OCTET STRING,
+    wtWebGraphThermoBaroPortOffset1		OCTET STRING,
+    wtWebGraphThermoBaroPortTemperature1	OCTET STRING,
+    wtWebGraphThermoBaroPortOffset2		OCTET STRING,
+    wtWebGraphThermoBaroPortTemperature2	OCTET STRING,
+    wtWebGraphThermoBaroPortComment		OCTET STRING,
+    wtWebGraphThermoBaroPortSensorSelect	OCTET STRING
+}
+
+wtWebGraphThermoBaroPortName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Name des Sensors."
+    ::= { wtWebGraphThermoBaroPortEntry 1 }
+
+wtWebGraphThermoBaroPortText OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Beschreibung des Sensors."
+    ::= { wtWebGraphThermoBaroPortEntry 2 }
+
+wtWebGraphThermoBaroPortOffset1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Offset in Grad mit max. 2 Nachkommastellen bei Temperatur 1."
+    ::= { wtWebGraphThermoBaroPortEntry 3 }
+
+wtWebGraphThermoBaroPortTemperature1 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Referenztemperatur 1 in Grad mit max. 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroPortEntry 4 }
+
+wtWebGraphThermoBaroPortOffset2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Offset in Grad mit max. 2 Nachkommastellen bei Temperatur 2."
+    ::= { wtWebGraphThermoBaroPortEntry 5 }
+
+wtWebGraphThermoBaroPortTemperature2 OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Referenztemperatur 2 in Grad mit max. 2 Nachkommastellen."
+    ::= { wtWebGraphThermoBaroPortEntry 6 }
+
+wtWebGraphThermoBaroPortComment OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Offset-Kalibrierung: Angaben zu Datum, Referenzgerät, Operator."
+    ::= { wtWebGraphThermoBaroPortEntry 7 }
+
+wtWebGraphThermoBaroPortAltidude OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Höhe des Sensors über Meereshöhe (üNN)."
+    ::= { wtWebGraphThermoBaroPorts 2 }
+
+-- wtWebGraphThermoBaroManufact Group
+----------------------------
+
+wtWebGraphThermoBaroMfName OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hersteller Firmenname"
+    ::= { wtWebGraphThermoBaroManufact 1 }
+
+wtWebGraphThermoBaroMfAddr OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Adresse des Herstellers."
+    ::= { wtWebGraphThermoBaroManufact 2 }
+
+wtWebGraphThermoBaroMfHotline OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Hotline des Herstellers."
+    ::= { wtWebGraphThermoBaroManufact 3 }
+
+wtWebGraphThermoBaroMfInternet OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Internet-Adresse des Herstellers."
+    ::= { wtWebGraphThermoBaroManufact 4 }
+
+wtWebGraphThermoBaroMfDeviceTyp OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Gerätebezeichnung (Typ) des Herstellers."
+    ::= { wtWebGraphThermoBaroManufact 5 }
+
+wtWebGraphThermoBaroMfOrderNo OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Bestellnummer des Gerätes des Herstellers."
+    ::= { wtWebGraphThermoBaroManufact 6 }
+
+-- wtWebGraphThermoBaroDiag Group
+----------------------------
+
+wtWebGraphThermoBaroDiagErrorCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Anzahl der Einträge im Fehlerspeicher."
+    ::= { wtWebGraphThermoBaroDiag 1 }
+
+wtWebGraphThermoBaroDiagBinaryError OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Bitweise kodierte Fehlerursachen."
+    ::= { wtWebGraphThermoBaroDiag 2 }
+
+wtWebGraphThermoBaroDiagErrorIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "Der Wert dieser Variable wird als Index für die Ausgabe
+        eines Fehlertextes (wtWebGraphThermoBaroDiagErrorMessage) verwendet.
+        Die Fehler im Speicher sind von 1 bis wtWebGraphThermoBaroDiagErrorCount durchnummeriert.
+        Nach dem Schreiben einens gültigen Wertes in diese Variable kann der dazugehörige Text
+        in wtWebGraphThermoBaroDiagErrorMessage ausgelesen werden."
+    ::= { wtWebGraphThermoBaroDiag 3 }
+
+wtWebGraphThermoBaroDiagErrorMessage OBJECT-TYPE
+    SYNTAX OCTET STRING 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Abhängig vom Wert wtWebGraphThermoBaroDiagErrorIndex wird ein Fehlertext angezeigt."
+    ::= { wtWebGraphThermoBaroDiag 4 }
+    
+wtWebGraphThermoBaroDiagErrorClear OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS write-only
+    STATUS mandatory
+    DESCRIPTION
+        "Durch Schreiben eine 1 in diese Variable, wird der Fehlerspeicher gelöscht."
+    ::= { wtWebGraphThermoBaroDiag 5 }
+
+-- TRAP DEFINITIONS
+
+-- Diese SNMP-Traps werden gesendet, wenn die Alarmtriggerbedingungen zutreffen 
+
+wtWebGraphThermoBaroAlert1 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 1 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 1"
+    --#SUMMARY "Alarm 1: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 31
+
+wtWebGraphThermoBaroAlert2 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 2 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 2"
+    --#SUMMARY "Alarm 2: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 32
+
+wtWebGraphThermoBaroAlert3 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 3 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 3"
+    --#SUMMARY "Alarm 3: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 33
+
+wtWebGraphThermoBaroAlert4 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 4 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 4"
+    --#SUMMARY "Alarm 4: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 34
+
+wtWebGraphThermoBaroAlert5 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 5 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 5"
+    --#SUMMARY "Alarm 5: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 35
+
+wtWebGraphThermoBaroAlert6 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 6 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 6"
+    --#SUMMARY "Alarm 6: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 36
+
+wtWebGraphThermoBaroAlert7 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 7 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 7"
+    --#SUMMARY "Alarm 7: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 37
+
+wtWebGraphThermoBaroAlert8 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 8 ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Alarm 8"
+    --#SUMMARY "Alarm 8: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 38
+
+wtWebGraphThermoBaroAlert9 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 1 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 1"
+    --#SUMMARY "Release Alarm 1: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 91
+
+wtWebGraphThermoBaroAlert10 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 2 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 2"
+    --#SUMMARY "Release Alarm 2: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 92
+
+wtWebGraphThermoBaroAlert11 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 3 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 3"
+    --#SUMMARY "Release Alarm 3: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 93
+
+wtWebGraphThermoBaroAlert12 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 4 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 4"
+    --#SUMMARY "Release Alarm 4: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 94
+
+wtWebGraphThermoBaroAlert13 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 5 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 5"
+    --#SUMMARY "Release Alarm 5: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 95
+
+wtWebGraphThermoBaroAlert14 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 6 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 6"
+    --#SUMMARY "Release Alarm 6: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 96
+
+wtWebGraphThermoBaroAlert15 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 7 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 7"
+    --#SUMMARY "Release Alarm 7: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 97
+
+wtWebGraphThermoBaroAlert16 TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { wtWebGraphThermoBaroAlarmClearTrapText }
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn der Alarm 8 gelöscht wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Release Alarm 8"
+    --#SUMMARY "Release Alarm 8: %s"
+    --#ARGUMENTS {0}
+    --#SEVERITY INFORMATIONAL
+    --#TIMEINDEX 99
+    --#STATE OPERATIONAL    
+    ::= 98
+
+wtWebGraphThermoBaroAlertDiag TRAP-TYPE
+    ENTERPRISE  wtWebGraphThermoBaro
+    VARIABLES   { 	
+    		wtWebGraphThermoBaroDiagErrorIndex,
+    	  	wtWebGraphThermoBaroDiagErrorMessage
+    		}
+    DESCRIPTION
+        "Dieser SNMP-Trap wird generiert, wenn eine Diagnose/Error-Message ausgelöst wurde,
+        das SNMP-Trap-Enable gesetzt ist und
+        SNMP in Enable freigegeben ist."
+    -- NMS trap annotation
+    --#TYPE "Thermo-Hygrometer Diagnose Error"
+    --#SUMMARY "Diagnose error index: %d, Message: %s."
+    --#ARGUMENTS {0,1}
+    --#SEVERITY MAJOR
+    --#TIMEINDEX 99
+    --#STATE DEGRADED    
+    ::= 110
+    
+END

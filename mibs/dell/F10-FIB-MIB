@@ -1,0 +1,262 @@
+F10-FIB-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE,
+		Integer32, IpAddress, Counter64
+			FROM SNMPv2-SMI
+		MacAddress
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		chSysCardNumber
+			FROM F10-CHASSIS-MIB
+		f10Mgmt
+			FROM FORCE10-SMI;
+    
+	f10IpForwardMib MODULE-IDENTITY
+		LAST-UPDATED "200709141200Z"   -- Sep 14, 2007 12:00:00 GMT
+		ORGANIZATION "Force10 Networks, Inc."
+		CONTACT-INFO
+			"Force10 Networks, Inc.
+			 350 Holger Way
+			 San Jose, CA 95134 USA
+			 Phone: +1 (408) 571 3500
+			 Fax:   +1 (408) 571 3550
+			 Email: support@force10networks.com"
+		DESCRIPTION
+			"This MIB module is used to display CIDR multipath IP Routes." 
+		REVISION     "200709141200Z"   -- Sep 14, 2007 12:00:00 GMT
+		DESCRIPTION
+			"Initial version of this MIB module." 
+	::= { f10Mgmt 9 }
+	
+
+-- ****************************************************************************
+--
+--  Top-Level Object Identifier Assignments for the FIB MIB
+--
+-- ****************************************************************************
+
+f10IpForwardMibObjects       OBJECT IDENTIFIER ::= { f10IpForwardMib 1 }
+f10IpForwardMibConformance   OBJECT IDENTIFIER ::= { f10IpForwardMib 2 }
+
+
+-- ****************************************************************************
+--
+--  IP Forward Version Table
+--
+-- ****************************************************************************
+
+f10IpForwardVersionTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF F10IpForwardVersionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"This entity's IP forward version table."
+	::= { f10IpForwardMibObjects 1 }
+
+f10IpForwardVersionEntry OBJECT-TYPE
+	SYNTAX     F10IpForwardVersionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"The row definition for the ip forward version Table."
+	INDEX {
+		chSysCardNumber
+	}
+	::= { f10IpForwardVersionTable 1 }
+
+F10IpForwardVersionEntry ::=
+	SEQUENCE {
+		f10IpForwardVersion
+			Counter64
+	}
+
+f10IpForwardVersion OBJECT-TYPE
+	SYNTAX     Counter64 
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"A version number on the Forwarding Table. 
+		 This is always fetched from one line card."
+	::= { f10IpForwardVersionEntry 1 }
+		
+	
+-- ****************************************************************************
+--
+--  IP Forwarding Table
+--
+--  The IP Forwarding Table obsoletes and replaces the ipRoute Table current 
+--  in MIB-I and MIB-II.  It adds knowledge of the autonomous system of 
+--  the next hop, multiple next hop support, and policy routing support.
+--
+-- ****************************************************************************
+
+f10IpForwardTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF F10IpForwardEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"This entity's IP Routing table."
+	::= { f10IpForwardMibObjects 2 }
+
+f10IpForwardEntry OBJECT-TYPE
+	SYNTAX     F10IpForwardEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"A particular route to a particular  destination,
+		 under a particular policy."
+	INDEX {
+		chSysCardNumber,
+		f10IpforwardDest,
+		f10IpforwardMask,
+		f10IpforwardNextHop,
+		f10IpforwardFirstHop
+	}
+	::= { f10IpForwardTable 1 }
+
+F10IpForwardEntry ::=
+	SEQUENCE {
+		f10IpforwardDest
+			IpAddress,
+		f10IpforwardMask
+			IpAddress,
+		f10IpforwardNextHop
+			IpAddress,
+		f10IpforwardFirstHop
+			IpAddress,
+		f10IpforwardIfIndex
+			Integer32,
+		f10IpforwardMacAddress
+			MacAddress,
+		f10IpforwardEgressPort
+			OCTET STRING,
+		f10IpforwardCamIndex
+			Integer32
+	}
+
+f10IpforwardDest OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The destination IP address of this route. An
+		 entry  with  a value of 0.0.0.0 is considered a
+		 default route."
+	::= { f10IpForwardEntry 1 }
+
+f10IpforwardMask OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Indicate the mask to be logical-ANDed with the destination
+		 address  before  being compared to the value in 
+		 the f10IpforwardDest field."
+	::= { f10IpForwardEntry 2 }
+
+f10IpforwardNextHop OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"On remote routes, the address of the next system
+		 en route; Otherwise, 0.0.0.0."
+	::= { f10IpForwardEntry 3 }
+
+f10IpforwardFirstHop OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"On remote routes, the address of the Gateway 
+		 to the nexthop; 0.0.0.0 if the Nexthop itself is a Gateway
+                 to the Destination"
+	::= { f10IpForwardEntry 4 }
+
+f10IpforwardIfIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The ifIndex value which identifies  the  local
+		 interface  through  which  the next hop of this
+		 route should be reached."
+	::= { f10IpForwardEntry 5 }
+
+f10IpforwardMacAddress OBJECT-TYPE
+	SYNTAX     MacAddress 
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Mac address of the NextHop."
+	::= { f10IpForwardEntry 6 }
+
+f10IpforwardEgressPort OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the egress port to which the packets will be
+		 forwarded."
+	::= { f10IpForwardEntry 7 }
+
+f10IpforwardCamIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Cam Entry corresponding to a row."
+	::= { f10IpForwardEntry 8 }
+
+
+-- ****************************************************************************
+--
+-- Module Conformance Statement
+--
+-- DESCRIPTION: This module conformance statement includes the compliance 
+--    statements and the units of conformance section.
+--
+-- ****************************************************************************
+
+f10IpForwardMibCompliances OBJECT IDENTIFIER ::= { f10IpForwardMibConformance 1 }
+f10IpForwardMibGroups      OBJECT IDENTIFIER ::= { f10IpForwardMibConformance 2 }
+
+-- ****************************************************************************
+-- Compliance Statement
+-- ****************************************************************************
+
+f10IpForwardMibCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION 
+		"The basic implementation requirements for the 
+		 Force10 Enterprise Ip Forward MIB."
+	MODULE    -- this module
+	MANDATORY-GROUPS { 
+		f10IpForwardObjectGroup
+	}
+	::= { f10IpForwardMibCompliances 1 }
+
+-- ****************************************************************************
+-- Units of Conformance
+-- ****************************************************************************
+
+f10IpForwardObjectGroup OBJECT-GROUP
+	OBJECTS {
+		f10IpForwardVersion,
+		f10IpforwardDest,
+		f10IpforwardMask,
+		f10IpforwardNextHop,
+		f10IpforwardFirstHop,
+		f10IpforwardIfIndex,
+		f10IpforwardMacAddress,
+		f10IpforwardEgressPort,
+		f10IpforwardCamIndex
+   }
+   STATUS current
+   DESCRIPTION 
+      "Objects for the ATM interface table."
+   ::= { f10IpForwardMibGroups 1 }
+
+END

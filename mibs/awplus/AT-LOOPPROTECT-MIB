@@ -1,0 +1,144 @@
+-- ===========================================================================
+-- AT-LOOPPROTECT.MIB, Allied Telesis enterprise MIB: Loop Protection
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ===========================================================================
+
+    AT-LOOPPROTECT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            InterfaceIndex
+                FROM IF-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI;
+
+
+        atLoopProtect MODULE-IDENTITY
+            LAST-UPDATED "201206190000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects for the
+                Loop Protection modules."
+            REVISION "201206190000Z"
+            DESCRIPTION
+                "Add MAC address thrash-limiting support"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006150100Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200808120000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
+            ::= { modules 54 }
+
+
+
+
+--
+-- Node definitions
+--
+
+        atLoopProtectTrap OBJECT IDENTIFIER ::= { atLoopProtect 0 }
+
+
+        atLoopProtectDetectedLoopBlockedTrap NOTIFICATION-TYPE
+            OBJECTS { atLoopProtectIfIndex, atLoopProtectVlanId, atLoopProtectAction }
+            STATUS current
+            DESCRIPTION
+                "Generated when Loop Protection feature blocks a interface with a loop."
+            ::= { atLoopProtectTrap 1 }
+
+
+        atLoopProtectRecoverLoopBlockedTrap NOTIFICATION-TYPE
+            OBJECTS { atLoopProtectIfIndex, atLoopProtectVlanId, atLoopProtectAction }
+            STATUS current
+            DESCRIPTION
+                "Generated when Loop Protection feature restores a blocked interface back to normal operation."
+            ::= { atLoopProtectTrap 2 }
+
+
+        atLoopProtectDetectedByLoopDetectionTrap NOTIFICATION-TYPE
+            OBJECTS { atLoopProtectIfIndex, atLoopProtectVlanId, atLoopProtectRxLDFIfIndex, atLoopProtectRxLDFVlanId }
+            STATUS current
+            DESCRIPTION
+                "Generated when Loop Protection feature detects a loop by Loop Detection method."
+            ::= { atLoopProtectTrap 3 }
+
+        atLoopProtectDetectedByThrashLimitTrap NOTIFICATION-TYPE
+            OBJECTS { atLoopProtectIfIndex, atLoopProtectVlanId }
+            STATUS current
+            DESCRIPTION
+                "Generated when Loop Protection feature detects a loop by MAC address-table Thrash-Limiting method."
+            ::= { atLoopProtectTrap 4 }
+
+
+        atLoopProtectAction OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                atLoopProtectAction-LearnDisable(0),
+                atLoopProtectAction-LearnEnable(1),
+                atLoopProtectAction-PortDisable(2),
+                atLoopProtectAction-PortEnable(3),
+                atLoopProtectAction-LinkDown(4),
+                atLoopProtectAction-LinkUp(5),
+                atLoopProtectAction-VlanDisable(6),
+                atLoopProtectAction-VlanEnable(7)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The Action for Loop Protection feature"
+            ::= { atLoopProtect 1 }
+
+
+        atLoopProtectIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface where the loop is detected on."
+            ::= { atLoopProtect 2 }
+
+
+        atLoopProtectVlanId OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VLAN ID where the loop is detected on."
+            ::= { atLoopProtect 3 }
+
+
+        atLoopProtectRxLDFIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface where the loop detection frame is received on."
+            ::= { atLoopProtect 4 }
+
+
+        atLoopProtectRxLDFVlanId OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The VLAN ID where the loop detection frame is received on."
+            ::= { atLoopProtect 5 }
+
+
+
+    END
+
+--
+-- at-loopprotect.mib
+--

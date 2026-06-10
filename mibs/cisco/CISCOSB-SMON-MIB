@@ -1,0 +1,117 @@
+CISCOSB-SMON-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private SMON MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI
+    TruthValue                                              FROM SNMPv2-TC
+    dot1dBasePort                                           FROM BRIDGE-MIB;
+
+CopyModeType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "copy destination mode type:
+                    1- monitor-only
+                    2- network."
+    SYNTAX INTEGER {
+        monitor-only(1),
+        network     (2)
+}
+rlSmon MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines SMON private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 84 }
+
+rlPortCopyMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlSmon 1 }
+
+rlPortCopySupport OBJECT-TYPE
+   SYNTAX INTEGER {
+       supported(1),
+       notSupported(2)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+       "supported - The standard portCopy is supported.
+        notSupported - the standard portCopy is not supported.
+                       only basic portCopy operation is supported. "
+   ::= { rlSmon 2 }
+
+rlPortCopyVlanTaggingTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlPortCopyVlanTaggingEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A supplementing table for portCopyTable.
+         For every portCopyDest a vlan-tagging option is available."
+    ::= { rlSmon 3 }
+
+rlPortCopyVlanTaggingEntry OBJECT-TYPE
+    SYNTAX  RlPortCopyVlanTaggingEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Each entry specify how  mirrored packets will transmit from
+         the portCopyDest:   Tagged or unTagged.
+         The values in this entry will be valid only when the
+         dot1dBasePort will be configured as a portCopyDest
+         in the portCopyTable."
+    INDEX   { dot1dBasePort }
+    ::= { rlPortCopyVlanTaggingTable 1 }
+
+RlPortCopyVlanTaggingEntry ::=
+    SEQUENCE {
+        rlPortCopyVlanTagging     TruthValue
+    }
+
+rlPortCopyVlanTagging  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "TRUE  - Mirrored packets will transmit from portCopyDest - Tagged
+         FALSE - Mirrored packets will transmit from portCopyDest - unTagged"
+    DEFVAL { true }
+    ::= { rlPortCopyVlanTaggingEntry 1 }
+
+rlPortCopyMode          OBJECT-TYPE
+      SYNTAX                CopyModeType
+      MAX-ACCESS            read-write
+      STATUS                current
+      DESCRIPTION "This scalar defines a mode of the copy
+                   destination port"
+      ::= { rlSmon 4}
+
+rlPortCopySessionsEnabled          OBJECT-TYPE
+      SYNTAX                TruthValue
+      MAX-ACCESS            read-write
+      STATUS                current
+      DESCRIPTION "This scalar enables globaly  port monitoring sessions "
+      DEFVAL{ true }
+
+      ::= { rlSmon 5}
+
+END

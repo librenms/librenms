@@ -1,0 +1,201 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLISCSI-MIB DEFINITIONS  ::= BEGIN
+
+   IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+   Counter32, enterprises, Integer32, Counter64, Gauge32, Unsigned32,
+   TimeTicks, Opaque, experimental
+   FROM SNMPv2-SMI
+
+   TruthValue, DisplayString
+   FROM  SNMPv2-TC
+
+	iscsiSessionStatsEntry, iscsiSessionAttributesEntry
+	FROM ISCSI-MIB
+
+    equalLogic
+            FROM EQUALLOGIC-SMI
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+   FROM SNMPv2-CONF
+
+   ;
+
+eqliscsiExtModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION
+        "Equallogic Inc augmented ISCSI MIB module."
+
+    REVISION "200206260000Z" -- November 19, 2002
+    DESCRIPTION
+        "Equallogic Inc  augmented ISCSI MIB module
+         
+	 Copyright (c) 2002-2009 by Dell, Inc.
+
+         All rights reserved.  This software may not be copied, disclosed,
+         transferred, or used except in accordance with a license granted
+         by Dell, Inc.  This software embodies proprietary information
+         and trade secrets of Dell, Inc.
+        "
+    ::= { enterprises equalLogic(12740) 11 }
+
+eqliscsiExtObjects OBJECT IDENTIFIER ::= { eqliscsiExtModule 1 }
+
+----------------------------------------------------------------------
+
+-- Session Stats Table
+
+eqliscsiSessionStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlIscsiSessionStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A Dynamic list of general iSCSI traffic counters for each of the
+     sessions present on the system."
+::= { eqliscsiExtObjects 1 }
+
+eqliscsiSessionStatsEntry OBJECT-TYPE
+    SYNTAX        EqlIscsiSessionStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing general iSCSI traffic counters
+     for a particular session."
+    AUGMENTS { iscsiSessionStatsEntry }
+::= { eqliscsiSessionStatsTable 1 }
+
+EqlIscsiSessionStatsEntry ::= SEQUENCE {
+   eqliscsiSsnErrorCount         Counter32,
+   eqliscsiSsnTimeUp             Counter32,
+   eqliscsiSsnTotalDataTrnsfrd	 Counter32,
+   eqliscsiNodeUuid		 OCTET STRING,
+   eqliscsiSsnTotalDataTrnsfrd64	Counter64,
+   eqliscsiSsnMembers            Opaque,
+   eqliscsiSsnRouteStats         Opaque,
+   eqliscsiSsnLoadValue          Unsigned32
+}
+
+
+eqliscsiSsnErrorCount OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The number of errors encountered since this session was established"
+::= { eqliscsiSessionStatsEntry 1 }
+
+eqliscsiSsnTimeUp OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The time in ticks that has elapsed since this session was first 
+         established with the iSCSI target"
+::= { eqliscsiSessionStatsEntry 2 }
+
+eqliscsiSsnTotalDataTrnsfrd OBJECT-TYPE
+    SYNTAX        Counter32
+    UNITS         "KB"
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+        "The amount of data transfered for this session in Kilobytes.
+         This number is determined by the sum of the inbound and outbound
+         traffic counters."
+::= { eqliscsiSessionStatsEntry 3 }
+
+eqliscsiNodeUuid OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE (16))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The UUID of the iscs"
+::= { eqliscsiSessionStatsEntry 4 }
+
+eqliscsiSsnTotalDataTrnsfrd64 OBJECT-TYPE
+    SYNTAX        Counter64
+    UNITS         "KB"
+    MAX-ACCESS    read-only
+    STATUS        deprecated
+    DESCRIPTION
+        "The amount of data transfered for this session in Kilobytes.
+         This number is determined by the sum of the inbound and outbound
+         traffic counters."
+::= { eqliscsiSessionStatsEntry 5 }
+
+
+eqliscsiSsnMembers OBJECT-TYPE
+    SYNTAX      Opaque (SIZE (64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "List of eligible member id's.  This is sizeof(uint32_t) * pss_max_num_grp_members defined in pss_constants.h"
+   ::= { eqliscsiSessionStatsEntry 6 }
+
+
+eqliscsiSsnRouteStats OBJECT-TYPE
+    SYNTAX      Opaque (SIZE (64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Array of the percentage of traffic being routed to each member.  This is a 1 to 1 relationship to the
+                 Members array.  This is sizeof(uint32_t) * pss_max_num_grp_members defined in pss_constants.h"
+   ::= { eqliscsiSessionStatsEntry 7 }
+
+eqliscsiSsnLoadValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Calculated value of how busy this connection is.  0 is 100% busy, 100 is 0% busy"
+    DEFVAL      {0}
+   ::= { eqliscsiSessionStatsEntry 8 }
+
+---*************************************************************  
+
+eqliscsiSessionAttributesTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqliscsiSessionAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "EqualLogic-Dynamic A Dynamic list of general iSCSI connection attributes for connections present on the system."
+::= { eqliscsiExtObjects 2 }
+
+eqliscsiSessionAttributesEntry OBJECT-TYPE
+    SYNTAX        EqliscsiSessionAttributesEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry (row) containing general iSCSI connection attributes."
+    AUGMENTS { iscsiSessionAttributesEntry }
+::= { eqliscsiSessionAttributesTable 1 }
+
+EqliscsiSessionAttributesEntry ::= SEQUENCE {
+        eqliscsiSessionAttributesType        INTEGER  
+}
+
+eqliscsiSessionAttributesType OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                    external(1),
+                    syncrepl(2),
+                    xcopy(3),
+                    replica(4)
+    }     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Describes the src initiator of the connection as external to the array group, or one of various connection types between group members."  
+    DEFVAL          { 1 }
+    ::=   { eqliscsiSessionAttributesEntry 1 }    
+
+--------------------------------------------------------------------------------------
+
+END
+
+
+

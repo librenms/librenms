@@ -1,0 +1,2259 @@
+        ADTRAN-TC    DEFINITIONS ::= BEGIN
+
+    -- TITLE:       ADTRAN Textual Convention Definitions
+    -- FILENAME:    adtrantc.mib
+    -- AUTHOR:      Phil Bergstresser
+    -- DATE:        2000/03/29
+    --
+    -- PROCESS: END email requests to Steve Shown w/ product # & name & description
+    --          CND email requests to Jay Boles w/ product # & name & description
+    --          Each backup for the other
+    --
+    -- MODIFICATIONS:
+    --   2000/03/30 pnb Generate adProductID enumeration
+    --   2000/04/12 pnb add alarm severity enumeration
+    --   2000/04/24 pnb update productIds and adShared types from Source Safe doc
+    --   2000/04/26 pnb same
+    --   2000/05/03 pnb same, plus reorder some types
+    --   2000/05/19 pnb same, reorder some comments
+    --   2000/05/24 pnb correct 270 double comment flaw
+    --   2000/06/19 pnb update adShared
+    --   2000/07/31 pnb update from adtmib doc for options cards and additions.
+    --                correct case typo in alarm severity.
+    --   2000/08/04 pnb align comments for ease of reading, and
+    --                update from latest adtmib.doc changes.
+    --   2000/08/09 sls added TA1500 Dual FXO/DPT product ID
+    --   2000/08/22 sls added TA3000 cards & MX2800STS1 (#s 286-288)
+    --   2000/08/25 sls added TA1500 cards (#s 289-291)
+    --   2000/09/15 sls added nodes to adShared
+    --   2000/09/21 sls aded Lucent, TA1500, & Stratum card entries
+    --   2000/10/02 sls added adTA1500LucentSCU
+    --   2000/10/11 sls added adTA3000qADSL
+    --   2000/10/23 sls added adATLAS890
+    --   2000/10/26 sls added adTA1500FT1dp, adLucentLIU 2.4.1, adGenLIU &
+    --                adDSX1Common
+    --   2000/11/07 sls added adTA3000OctIMA
+    --   2001/01/08 sls added adMgmt.303 - adMgmt.309 & adTSU1500SCUCommon
+    --   2001/01/10 sls added adTA3000qHDSL2 & adTAGSHDSL
+    --   2001/01/17 sls added adMX2810
+    --   2001/02/16 sls corrected entries for enum 218,220, & 295
+    --   2001/02/19 sls ATLAS 550 Packet Voice Rsrc Module
+    --
+    --   02/27/2001 sls added TA1500 Multi 4-Wire
+    --   03/01/2001 sls added adTSULTX
+    --   03/22/2001 sls added 316-321
+    --   03/27/2001 sls consolidated 316-321 to 316-317 & added TA3000 G.SHDSL multi-ports
+    --   04/05/2001 sls added 320-331 (TA 1500 access cards)
+    --   04/10/2001 sls added adPSUcommon
+    --   04/18/2001 sls added adTA1500DDSdp
+    --   04/23/2001 sls added TA 3000 DS3 TSI E1 MUX (trap extension) place holders
+    --   04/26/2001 sls added adGenSHDSL
+    --   05/01/2001 sls added adTA3000CES
+    --   05/03/2001 sls added adTARouterTraps
+    --   05/09/2001 sls added adIQ710, its interface modules & adTA1500LcntUBR1TE
+    --   05/18/2001 sls added adTA3000VCP
+    --   05/23/2001 pnb added adExp6530SHDSL
+    --   05/24/2001 pnb added adTA3000quadE1NTU
+    --   05/29/2001 sls added ATLAS 810
+    --   05/30/2001 sls added adTracerCommon
+    --   05/31/2001 sls added adExp653x
+    --   06/15/2001   sls added adTA608, adTA3000LTU8 & adTANTU8
+    --   06/19/2001   sls added adTA3000DS1FR
+    --   06/26/2001 sls added adTASHDSLbnc & adTASHDSLv35
+    --   06/28/2001 sls added adTA3000ALEc
+    --   06/29/2001 sls added Total Access 2nd Gen H2TUC  cards
+    --   07/09/2001 sls added adTASHDSLSP
+    --   07/31/2001 sls added adTA3000HTUCg6 & adTA3000HTUCg6HLSS
+    --   08/13/2001 sls added adTADS3TSIE3
+    --   08/22/2001 sls added several Total Access 1000 cards
+    --   09/10/2001 sls added adXprs6503
+    --   09/13/2001 sls added 3 HTUC cards
+    --   09/21/2001 sls added adTA300DS3LM(371) & adTA300H2TURsprint(372)
+    --   10/04/2001 sls added adTA1500MCU(373), adTA3000BATS(374) & adTA1500DDSdpQwest(375)
+    --   10/19/2001 sls added adTA3000qSHDSL
+    --   10/23/2001 sls added adTA3000T1OR
+    --   10/25/2001 sls added adTA3000OC3CSM
+    --   10/29/2001 sls added reserved14
+    --   11/07/2001 sls added adTA1500DualCoinCot & adTA1500DualCoinRt
+    --   11/12/2001 pnb added adDSX1CommonTraps (trap extender)
+    --   11/16/2001 sls added adATLAS550NxT1hssi
+    --   11/26/2001 sls added adNV1800
+    --   11/28/2001 sls added adTASHDSLprot
+    --   12/05/2001 pnb added adTA1500qFXOMLT(385)
+    --   12/07/2001 pnb added adTAOC3L3(386) plus two trap extension IDs
+    --   12/17/2001 pnb added EBS C & R phone cards
+    --   01/07/2002 sls added 2nd Gen IQ710
+    --   01/08/2002 pnb added quad E1
+    --   01/11/2002 pnb added TA 1500 4 wire single DX cards
+    --   01/23/2002 pnb added TA4303 PS
+    --   01/24/2002 sls added Atlas 550 cards & corrected PNs on others
+    --   01/24/2002 pnb added TA4303 STS1
+    --   01/25/2002 sls added adunit
+    --   01/25/2002 pnb added TA 3000 DS0 TSI Mux
+    --   01/28/2002 pnb added TA4303 oBRI & adH4TUCcommon
+    --   01/29/2002 pnb changed comment on product ID 3 (reserved00) to reflect usage
+    --   01/30/2002 pnb added TA 3000 IVD
+    --   02/01/2002 sls added TA550 modules
+    --   02/05/2002 pnb added MX2810 STS1 card
+    --   02/05/2002 pnb added TA3000 H4TUC
+    --   02/07/2002 sls added added adTA850RCU
+    --   02/14/2002 pnb added TA 3000 SHDSL 1.5 Gen LTUs
+    --   02/20/2002 sls added ATLAS 800 modules & edited several existing ATLAS
+    --                      entries to make more consistent
+    --   02/24/2002 sls added ATLAS 830
+    --   03/08/2002 pnb added TA 3000 H2TUC-HKT
+    --   04/01/2002 pnb added TA 3000 octal ADSL
+    --   04/02/2002 pnb added TA 3K HTUC cards
+    --   04/03/2002 pnb added LTU4/NTU4
+    --   04/05/2002 pnb added TA4303SNMP
+    --   04/08/2002 pnb add TA3000 octal ADSL w/ POTS splitters
+    --   04/19/2002 pnb add trap extension for MX28xx
+    --   05/13/2002 sls add IAD entries in adShared
+    --   05/16/2002 pnb add 28 slot DS3 TSI & mod description of 22 slot (264) for 3010
+    --   05/17/2002 sls revise adTADSX1 comment
+    --   05/22/2002 pnb change 445 to 455 and mark gap
+    --   06/10/2002 pnb add H2TUC HLSS
+    --   06/11/2002 pnb add H4TUC G2 (3)
+    --   06/21/2002 pnb add 128 port CSM
+    --   06/27/2002 pnb add comment to 319 for 2nd gen equivalence
+    --   06/28/2002 sls add ATLAS 550 Dual Video
+    --   07/02/2002 sls add ATLAS 800 Octal FXS
+    --   07/10/2002 pnb add T200 SHDSL NTU
+    --   07/11/2002 pnb add TA T1/E1 SHDSL LTU
+    --   07/22/2002 pnb add shared GenOPTI3
+    --   07/23/2002 pnb add OPTI3L2, and "Unknown" non-responsive generic
+    --   07/30/2002 pnb add shared adGenAtm, & TA1500 4w cards
+    --   08/02/2002 pnb add ta100 E1/T1 LIU
+    --   08/05/2002 pnb add 3 1500 common nodes
+    --   08/08/2002 pnb add TA3k DS3CSM cr
+    --   08/08/2002 sls add adATLAS550EtherSwitch
+    --   08/09/2002 sls add NetVanta 3xxx update/additions
+    --   08/12/2002 sls add TA 6xx entries
+    --   08/13/2002 pnb add E1FR and 1500 TO & FXS/GT cards
+    --   08/27/2002 pnb add trap extension for generic OPTI3
+    --   09/12/2002 pnb add shared DSx1FR
+    --   09/18/2002 pnb add quad IMA cards
+    --   09/27/2002 pnb add MX2820 19" shelf & cards
+    --   10/16/2002 pnb add SHDSL4 LTU
+    --   10/24/2002 pnb add TA1500 Single 4-Wire ETO
+    --   10/29/2002 sls add adTa6xx & adIadIwf
+    --   11/01/2002 sls add TA604, TA612, TA616
+    --   11/13/2002 pnb add adGen654x to adShared
+    --   12/12/2002 pnb add MX2820 23" shelf
+    --   12/17/2002 pnb add OPTI-MX shelf & cards
+    --   12/23/2002 sls add NV2xxx VPN products
+    --   01/06/2003 pnb add OPTI-MX SCM controller
+    --   02/03/2003 pnb add TA12xx shelves & cards
+    --   02/04/2003 pnb add 512-520 TA3k variety
+    --   02/06/2003 pnb adjust name/descr of SCU(517)
+    --   02/06/2003 pnb add eSCU L3
+    --   02/11/2003 pnb add & correct TA1500 ETO cards
+    --   02/17/2003 pnb add new shared node for SHDSL4 products
+    --   02/18/2003 pnb add 1500 Ubrite
+    --   02/28/2003 pnb add adMCUcommon
+    --   03/07/2003 sls add TA604, TA612, TA616: redundant
+    --   03/11/2003 pnb add oADSL-c w/ ETA, remove redundant 6xx
+    --   03/20/2003 sls add NetVanta 1224 & 1224ST
+    --   04/02/2003 pnb add 1500FT1 shared
+    --   04/08/2003 sls add ATLAS 550 NX
+    --   04/09/2003 sls add ATLAS 550 Dual FXO
+    --   04/18/2003 pnb add 1500 FXO GT
+    --   04/22/2003 pnb add OMM12 shared and product, and 1500 4W TDM
+    --   04/23/2003 pnb add OptiSMXshelf
+    --   05/02/2003 pnb add 1200 ADSL IDs (same Product# as shelf)
+    --   05/02/2003 pnb add adOptical shared node for Phoenix (JV)
+    --   05/07/2003 pnb add DS3Mux L3, L4
+    --   05/14/2003 pnb add SAM/DSLAM equivalents for TA3xxx shelf types
+    --   05/28/2003 sls add adTAH4TUCmg
+    --   05/29/2003 sls add OptiMX VT1.5 & TA300 Quad DS1/Mux to/from Fiber
+    --   06/11/2003 pnb change symbol for adShared(51) HDSL group (BS, BT, JT)
+    --   06/16/2003 pnb Added adShared node for adRFC2955, & ProdID for TA3k QFrAtm line card
+    --   07/11/2003 sls add adGenAOS node to adShared
+    --   07/28/2003 pnb add OC3Q mux IDs
+    --   07/29/2003 pnb add IAD 6xx 3rd gen
+    --   08/08/2003 pnb add MX2820 M13L10
+    --   09/03/2003 pnb add H4TUCL2
+    --   09/18/2003 pnb add OptiMux cards
+    --   09/24/2003 sls add adSmart16eGen2
+    --   09/24/2003 pnb modify descr & label on H2TUCG3(434), & add MX2820 STS1
+    --   09/30/2003 pnb Add TA4303Plus codes + MTC
+    --   10/03/2003 pnb Add Exp6531
+    --   10/08/2003 sls Add IQ790 & NetVanta 5305
+    --   10/09/2003 pnb Add 1124/1125
+    --   10/10/2003 sls Add assorted NetVanta units & modules
+    --   10/16/2003 pnb Add H2TUC HLSS dual circuit models
+    --                  and make all date formats Y2K compliant (CCYY)
+    --   10/21/2003 pnb Add TA1124 internal cards
+    --   10/22/2003 dhw Add adTracer6420
+    --   10/31/2003 pnb Add ETHM
+    --   11/04/2003 pnb Add adShared Accessories
+    --   11/13/2003 dhw Add adTSUNvRouter
+    --   11/17/2003 dhw Add adIQ7xxT1Probe
+    --   11/18/2003 pnb Add 1500 quad 232, ETOcommon, 4wTDMcommon, CN1200, OPT-MX GB Eth,
+    --                  H2TUC sp dc HLSS, TA900R ac/dc
+    --   12/05/2003 pnb Add 3000 QDFC
+    --   12/10/2003 pnb Add TA110x models
+    --   12/15/2003 pnb Add TA30x0 Accessory shelves & modules
+    --   12/29/2003 pnb Add TA1500 TRI-C DP
+    --   01/09/2004 pnb Add TA3000 LPU
+    --   01/16/2004 pnb Add Opti-MX line cards
+    --   01/27/2004 dhw Add adIQ310
+    --   01/28/2004 pnb Add TA3000 RMM, 16 port IMA SHDSL, quad SHDSL E1/CES
+    --   02/04/2004 dhw Add adNV5xxxT3
+    --   02/05/2004 pnb Add shared node for future TA1500 branches (KW)
+    --   02/25/2004 pnb Add shared node for trap extension for OPTI-MX
+    --   03/10/2004 dhw Add adNV950, adNV3350, adNVxx50ESM, adNVxx50FXS, adNVxx50FXO, adNV3350DSS, adNV950T1V35
+    --   03/11/2004 pnb Add 1500 FXS singles
+    --   04/14/2004 pnb add 1500 cards and IAD ATM family
+    --   04/20/2004 pnb add OPTI-MX ethernet card
+    --   04/22/2004 pnb add TA3000 ADSL2+ Line Card
+    --   05/07/2004 pnb add Spirent ITH  & SM2
+    --   05/07/2004 pnb correct 1500 names & descriptions (237/294)
+    --   05/17/2004 pnb Add shared node for future SHDSL branches
+    --   05/27/2004 pnb Add TA3000 DS1 Cut-thru
+    --   06/18/2004 pnb Add MX3yyy
+    --   06/28/2004 pnb Add Opti-Mx DS1VME
+    --   06/29/2004 pnb Add 1124/48, 1224/48 family
+    --   07/07/2004 pnb Add OPTI-MX ETHM8E
+    --   07/08/2004 pnb Add Express 654x remotes
+    --   07/23/2004 pnb Add Opti-6100 VT Cross Coneect Mux
+    --   07/27/2004 pnb Add 11xx/12xx products
+    --   07/29/2004 pnb Add 11xx/12xx component cards
+    --   08/11/2004 pnb add 11xx/12xx Verizon products
+    --   08/16/2004 pnb add TA3000 OC3LM & Hex SHDSL cards
+    --   08/19/2004 dhw change NV3350 descriptions to NV970
+    --   08/27/2004 dhw add adNV1224RPWR, adNV1224STRPWR, adNV1224PWR, adNV1224STPWR
+    --   09/01/2004 pnb add CND Rem Rep shared branch (KE, BT)
+    --   09/02/2004 dhw add adNV340
+    --   09/09/2004 pnb correct 734-739
+    --   09/15/2004 pnb Add TA5000 products
+    --   10/06/2004 dhw Add NV1524ST
+    --   10/06/2004 pnb Add Opti-MX DS3M3E
+    --   10/11/2004 pnb Add TA3k Hex POTS cards
+    --   10/12/2004 dhw Add adNV344 and corrected descriptions for 1224 POE's
+    --   10/15/2004 pnb add TA3000 quad VDSL
+    --   11/05/2004 pnb Add TA1240
+    --   11/15/2004 pnb Add LTU8cr
+    --   11/15/2004 pnb Add octal ADSL2+
+    --   11/15/2004 dhw Add NV3xxx Dual T1 Card
+    --   12/17/2004 pnb Add MX3 RMM, TA3k 19" fans
+    --   01/13/2005 pnb Add IMA Gen3
+    --   01/25/2005 pnb Add 3050 splitters
+    --   02/02/2005 pnb Add shared MiniDSLAM node
+    --   02/15/2005 dhw Add TA908,TA912,TA916,TA908e,TA912e,TA916e
+    --   02/25/2005 pnb Add TAEMS
+    --   02/28/2005 pnb Add OptiO3TME and TA3k 2g CSM128
+    --   03/01/2005 pnb Add TA4303 SCU+ L2
+    --   03/03/2005 pnb Add Opti-6100 OMM-12 SDH
+    --   03/08/2005 pnb Add SCM international
+    --   03/23/2005 dhw Changed part numbers for TA912, TA912e, TA916, TA916e
+    --   03/23/2005 dhw Added adTA912eDualT1, adTA912eQuadT1, adTA916eDualT1, adTA916eQuadT1, adTA924eDualT1, adTA924eQuadT1
+    --   03/23/2005 pnb Added Opti DS1VMT
+    --   03/24/2005 pnb Add Opti STS/VLAN cards
+    --   04/12/2005 pnb Add OMM3 & OMM12 muxes
+    --   04/29/2005 dhw Add DualBRIST and DualBRIU NIM Cards
+    --   05/02/2005 dhw Add TA904
+    --   05/05/2005 pnb Add 6100 GEMF
+    --   05/06/2005 dhw Add NV1224R DC and NV1224STR DC
+    --   05/17/2005 pnb Add MX410
+    --   05/24/2005 dhw Add NetVanta Serial DBU NIM Card
+    --   05/26/2005 dhw Add NetVanta 344 Annex A and NetVanta 344 Annex B
+    --   06/17/2005 pnb Add TA1500 EAM
+    --   06/21/2005 dhw Added adTA924Fxo, adTA924eFxoDualT1, adTA924eFxoQuadT1
+    --   06/21/2005 dhw Added ISDN DBU S/T card, IPSEC card, and Dual E1 Card
+    --   06/24/2005 pnb Added MX3216
+    --   07/01/2005 pnb Added TA238s
+    --   08/03/2005 pnb Added TA1100F legacy
+    --   08/24/2005 dhw Added adTA904eDualT1, adTA904eQuadT1, adTA908eDualT1, adTA908eQuadT1
+    --   08/24/2005 pnb Add IP shared node, and Opti-MX SDH cards
+    --   09/02/2005 pnb Add TA3000 OC-3 cr
+    --   09/13/2005 pnb Add TA3000 Q ADSL2+ BATS
+    --   09/19/2005 pnb Add DS3/EC1 for Opti-Mx
+    --   09/19/2005 dhw Add NetVanta 7100
+    --   09/20/2005 pnb Add MX412
+    --   10/03/2005 pnb Add OC3PSMs
+    --   10/17/2005 pnb Add OMM-48
+    --   10/24/2005 pnb Add OC3 Mux L4
+    --   11/02/2005 pnb Add TA Controllers shared node
+    --   11/14/2005 pnb reclaim 765 for HexVDSL2
+    --   11/18/2005 pnb Add OPTI6100 OMM3 SDH
+    --   11/21/2005 dhw Add Quad FXS VIM, Quad FXO VIM, Dual FXS/FXO VIM, Dual FXO VIM, T1/PRI VIM
+    --   11/23/2005 pnb Add MX3112
+    --   11/29/2005 pnb add shared node for GR303 generics
+    --   12/28/2005 pnb Add MX3 modules
+    --   12/29/2005 pnb Add TA5k Intnat items and revise 753 description
+    --   01/11/2005 pnb Add TA5k 19" Intnat fan
+    --   01/13/2005 pnb Add shared node for VDSL2
+    --   01/16/2006 dhw Add NVxxxxVPN module
+    --   01/19/2006 pnb Add TA3000 HexSHDSL EFM
+    --   01/20/2006 dhw Add 1024PwrMidSpan and NetVanta 1355
+    --   02/03/2006 dhw Add NetVanta xxxx ISDN BRI U and NetVanta xxxx ISDN BRI ST Modules
+    --   03/01/2006 pnb Add shared node for EFM
+    --   03/08/2006 pnb Add 1248 Ethernet feed
+    --   03/14/2004 pnb add OPTI-6100 SCM2 controller
+    --   03/14/2006 dhw Add NetVanta 347
+    --   03/17/2006 pnb Add TA4303 STS1+ & octal DSX+
+    --   03/29/2006 pnb Add MX3112 controller w/ 16 DS1s
+    --   04/04/2006 pnb Add TA3k HS Fiber LM
+    --   04/07/2006 pnb Add 3rd gen TA3k HTUC modules
+    --   04/10/2006 dhw Add NetVanta 3430 and NetVanta 3448
+    --   04/11/2006 dhw Add NetVanta 3120 and NetVanta 3130
+    --   04/12/2006 pnb Add Opti6100 CEGM and TA3k DS1/E1 EFM cards
+    --   04/12/2006 dhw changed NetVanta 3130 to NetVanta 3130 Annex A
+    --   04/18/2006 pnb Add TA1200F, and gen1500 shared node
+    --   04/20/2006 pnb Add TA1248E modules
+    --   04/25/2006 pnb Add 21 TA5000 modules
+    --   05/01/2006 pnb Add TA3k Fiber quad E1
+    --   05/17/2006 pnb Add 18 TA1148 E1/SHDSL products, & O12TME
+    --   06/07/2006 pnb Add TA3k MLPPP card & OMM 3 cr
+    --   06/09/2006 pnb Add TA3k H2TUR L2 cr
+    --   06/19/2006 pnb Add genFibE1 node
+    --   07/05/2006 dhw Add NetVanta 1335, NetVanta 1335 W/AP, NetVanta 1335 PoE, NetVanta 1335 PoE W/AP
+    --   07/21/2006 pnb Add Opti6100 ethernet modules and MX2820 M13
+    --   08/07/2006 dhw Add TA1124T1, TA1124Expansion, TA1224T1, and TA1224Expansion
+    --   08/10/2006 dhw Add NetVanta 3448 PoE Card and Tracer 6500 16T\Ethernet Radio
+    --   08/21/2006 pnb Add TA1248 expansion cards and Opti OC12TME
+    --   08/23/2006 pnb Add TA3050 VDSL splitter and cancel duplicate 947
+    --   09/11/2006 dhw Add NetVanta 150 WAP
+    --   09/14/2006 pnb Add Opti transmux L2g
+    --   09/15/2006 dhw Add NetVanta 1355
+    --   09/25/2006 pnb Add TA83x SHDSL EFM
+    --   09/25/2006 dhw change ID 950 to Unassigned to correct duplicate with 864
+    --   09/26/2006 pnb Add MX3400 ctrl
+    --   09/29/2006 pnb Add TA5k 32 SHDSL EFM Intl
+    --   10/04/2006 pnb Add TA1500 Dual OCUDP & DS0DP
+    --   10/20/2006 pnb Add TA5K quad GigE, & TA1100D Fed Atm Sw
+    --   10/23/2006 pnb Corrected Part # for ProdID 757
+    --   10/26/2006 pnb remove revised Product# and revert to renamed 906
+    --   11/20/2006 pnb Add TA1124P modules
+    --   12/20/2006 pnb add MX408e, Opti-6100 cards
+    --   12/28/2006 pnb Add Opti-6100 DS1 L2
+    --   01/05/2007 pnb Add TA3k LTU8 eth
+    --   01/16/2007 pnb Add TA1148Vdsl2 modules, TA5k qDS3ATM, OC3ATMs
+    --   01/18/2007 pnb Add TA1100D modules
+    --   01/19/2007 pnb Add TA1148V chassis
+    --   01/26/2007 pnb Add Opti SDH EthM8E
+    --   02/07/2007 pnb Add TA5006 mini & fan
+    --   02/21/2007 dhw Add 2nd Gen TA904, TA908, TA912, TA916, TA924, TA924Fxo, TA908e, TA916e, TA924e, TA924eFxo
+    --   02/26/2007 pnb Add shared container node for EoCu
+    --   03/19/2007 pnb Change OMMcr to OMM3S (930)
+    --   03/28/2007 pnb Change Desc of 632 and add Opti Tram3 STS-1 (998)
+    --   04/17/2007 pnb Add TA5k 32 port DS1 EFM & SHDSL
+    --   04/19/2007 pnb Correct descriptions and names of 249 and 545
+    --   04/24/2007 pnb Add TA8xx & TA3K Bats modules
+    --   04/24/2007 pnb remove dots from all part numbers
+    --   05/08/2007 pnb Add TA8xx and probes
+    --   05/21/2007 pnb Add OMM-48L and STS1MuxL5
+    --   05/30/2007 pnb Add Opti ethernet modules
+    --   06/13/2007 dhw Add NetVanta 3120 No DBU, 3130 Annex A No DBU, 3130 Annex B No DBU
+    --   06/22/2007 pnb Add TA30xx TSI Muxes
+    --   07/06/2007 pnb Add Opti-LMX
+    --   07/20/2007 pnb Add TA5K SCM2
+    --   07/26/2007 pnb Change TA30xx TSI Part number suffixes
+    --   08/17/2007 pnb change assignments on gen5K node
+    --   08/22/2007 dhw Add NetVanta 1534 Gigabit Switch, 1534 POE Gigabit Switch, 1364 Gigabit Switch/Router, and 1364 POE Gigabit Switch/Router
+    --   09/10/2007 pnb Add NetVanta 8xxEFM
+    --   09/10/2007 pnb Add TA5000 EFM Protect
+    --   09/13/2007 dhw Add NetVanta Cellular 3G NIM Card
+    --   09/14/2007 dhw Add NetVanta 3430DC Chassis
+    --   10/04/2007 pnb Add shared node GenCndSystem(70) and 2 Opti octal ethernet cards
+    --   10/25/2007 pnb Add TA5000 Quad DS3 EFM, & SCM G3
+    --   12/17/2007 pnb Add TA5000 3 port DS3, NV842 2 port HDSL4 EFM
+    --   01/25/2008 pnb Add TA5000 32 port ADSL2+ international
+    --   01/31/2008 pnb Add TA838 LTU, & TA1124P GigE ADSL2+ Minidslam
+    --   02/06/2008 pnb Add TA5006 intl chassis & fan
+    --   02/21/2008 pnb Add TA5000 SM 4GE, and shared node adGenQueue
+    --   03/12/2008 pnb Add TA5000 32 port DS1 MS LM & Splitter no MTA, and RPR SM
+    --   03/18/2008 pnb Add 1124V and 1148A
+    --   04/02/2008 sls NetVanta 7020, 7040, 7060
+    --   04/22/2008 pnb Add shared node for GPON
+    --   04/24/2008 pnb Add shared node for DS3
+    --   04/25/2008 sls NetVanta 6310, 6320, 6330
+    --   05/06/2008 pnb Add shared node for ethernet OAM
+    --   05/07/2008 sls Add Netvanta 4430
+    --   05/07/2008 pnb Replace 998 from TRAM3 to Opti PWE3EM
+    --   05/09/2008 pnb Add many 11xx and 12xx assignments
+    --   05/20/2008 pnb add TA5k combo A2+ L2
+    --   06/06/2008 pnb Add Opti OMM UPS
+    --   06/09/2008 sls Add NV1234 & NV1238 switches
+    --   06/13/2008 pnb Add TA1148V components
+    --   07/07/2008 pnb Add Opti-6100 DS10TSIM
+    --   07/10/2008 pnb Add Netvanta 838 & TA1148S & OPTI octal eth Gige
+    --   07/14/2008 pnb Add TA5k SW Mod Gx
+    --   07/18/2008 pnb Add xDSL and EMS shared nodes
+    --   07/29/2008 pnb correct typo on 1089
+    --   08/11/2008 sls Add NV 1544 & NV1544 PoE
+    --   08/15/2008 pnb Change product # suffix on 857, add Channelized DS3 MSLM
+    --   08/18/2008 pnb Add TA5K Switch modules & NV838s
+    --   08/20/2008 pnb Clarify SM descriptions & 838 Prod #s
+    --   09/05/2008 pnb Add TA5K 4 port GigE G2
+    --   09/11/2008 sls Add TA1148V Client and TA1248V components
+    --   09/12/2008 sls correct duplication for TA1148V Client
+    --   09/16/2008 sls correct comment of ID 1101
+    --   09/18/2008 pnb Add DS1 shared node
+    --   09/29/2008 pnb Add ERPS shared node
+    --   10/02/2008 pnb Add Opti MXF shelf
+    --   11/10/2008 sls Add TA5000 32 port DS1 & TA5000 3-port Channelized DS3 code images, BATS DS3 SSB, & OPTI-6100 84 DS1 CEM
+    --   11/11/2008 pnb Add Opti-6100 TRAM3E
+    --   11/19/2008 sls Add n-Command MSP
+    --   01/05/2009 sls Add NetVanta 1543
+    --   01/05/2009 pnb ADD OPTI ETHMF
+    --   01/13/2009 sls Add NV3450, NV3458 & NV Octal PoE card
+    --   01/14/2009 pnb ADD TA5K intl 32E1 EFM & domestic SCM w/ Bridging
+    --   01/22/2009 pnb Add TA1148A
+    --   02/12/2009 sls Add TA5000 Fan High Flow
+    --   03/10/2009 sls Add TA1148V, TA1248V, TA1148A 2nd Gen Switch Modules; correct description for adTA1248ASm
+    --   03/25/2009 sls Add NetVanta 3430 Gen2
+    --   03/25/2009 twc Add NV838T, NV834T, NV858, NV850; commented out adNV838oShdslEFMcr(1087)
+    --   03/26/2009 twc Swapped adGenGPON(was 73, now 76) with adGenXDSL(was 76, now 73) due to conflict
+    --   03/31/2009 twc Added TA1248A ADSL Client
+    --   04/21/2009 jlb Added Netvanta 832T 2 Port SHDSL, 4 Port Ethernet
+    --   05/01/2009 sls Added TA5000 SPLTR V2 32-PORT w/o Test Access
+    --   05/13/2009 jlb Added NetVanta 8044
+    --   05/20/2009 jlb Added OPTI-6100 28 Port VT1.5/DS1 Line Card with Framers
+    --   06/10/2009 jlb Added (1179732G1R) TA 1148V Host (Broadcom SM), (1179652G1R) TA 1248A Host (Broadcom SM),
+    --                  (1179650G1R) TA 1248A Client, (1179752G1R) TA 1148A Host, (1179655G1R) TA 1448A (DMT Aggregator)
+    --   06/26/2009 sls Add TA500x Fan High Flow Rear
+    --   06/30/2009 jlb Added TA 1448S-CE
+    --   07/10/2009 jlb Added Opti-6100 OMM312V SDH
+    --   07/10/2009 jlb Added Opti-6100 O3TME3 SDH
+    --   07/10/2009 jlb Added Opti-6100 O3TME3
+    --   07/28/2009 jb  Added adNV8322pShdslEFMTelstra(1152) (1172832G2), NetVanta 832 2 Port SHDSL for Telstra
+    --   08/13/2009 jlb Added adOptiMXO12TME2(1153)    (1184544G2), Opti-6100 O12TME2
+    --   08/25/2009 jlb Added TA1148A DMT Host (1179781Gx), TA1148A DMT Switch Module (1179781Gx-SM)
+    --   08/28/2009 sls Added NV3133
+    --   09/14/2009 jlb Added (1184530G3) OPTI-6100, 2 Ports 10/100/1000 BaseT and 6 Ports 10/100 BaseT Ethernet
+    --   09/17/2009 jlb Added (1184535L1G)  OPTI-6100, GEFM SDH 63-channel EFM bonded Ethernet over T1/E1
+    --   09/21/2009 jlb Added (1187552Gx-LM)  TA5000 8-port Ethernet over Fiber Access Module
+    --   09/22/2009 twc Added adGenDHCP(80) to AdSharedCommon
+    --   09/24/2009 jlb Added (1188803G1)  TA5000 E1 32-port Multi-Service LM IMA mode
+    --   10/02/2009 jlb Added (1188803G1)  TA5000 E1 32-port PPP/MLPPP mode
+    --   10/07/2009 sls Added NV1544 Gen2, NV1544P Gen2, NV1534 Gen2, NV1534P Gen2,
+    --   10/09/2009 jlb Added (1187181G1)  TA5000 24-port SHDSL EFM
+    --   10/12/2009 sls Added GPIC Module Gen3
+    --   10/13/2009 sls Added Gen3 Sweet16 Chassis & Gen3 Voice Chassis
+    --   10/16/2009 twc Added (1179655Gx-ADSL)  TA1448A ADSL Module
+    --   10/16/2009 twc Added (1179781Gx-ADSL)  TA1148A DMT ADSL Module
+    --   10/26/2009 jlb Added (1184535G3G) Opti-6100 63 E1 Circuit Emulation Module
+    --   11/19/2009 jlb Added (1184535G4) OPTI-6100 GEFM2 SONET, 84-channel EFM bonded Ethernet over SONET
+    --   11/19/2009 jlb Added (1184535G4G) OPTI-6100 GEFM2 SDH 63-channel EFM bonded Ethernet over T1/E1
+    --   11/23/2009 jlb Added (1184535G4G) Added OPTI-6100 GESW4 4 Port Gigabit Ethernet Switch Module
+    --   12/03/2009 jlb Added (1200633G3) Netvanta 838 8 port SHDSL 4 port Ethernet, and (1200633G5) Netvanta 834 4 port SHDSL 4 port Ethernet
+    --   12/18/2009 jlb Added (1184500F3) OPTI-6100 SCM Controller w/ isolation, RoHS 6 of 6
+    --   12/22/2009 jlb Added (1187501G1) TA5000 2.5G 2-PORT SFP Based GPON OLT
+    --   01/12/2010 sls Added NV1638, NV1638P, & NV1554F
+    --   01/19/2010 jlb Added (1179791G1) TA1108VP Chassis, SCM, SM, and AM OSP DSLAM
+    --   01/25/2010 jlb Added (1174801G1) NetVanta 8044M
+    --   01/29/2010 jlb Added (1188801G1) TA5000 E1 32-PORT PWE3 Module
+    --   02/25/2010 jlb Added (1187502F1) TA5000 2.5G 4-PORT SFP Based GPON OLT
+    --   03/02/2010 jlb Added (1200633G3T) Netvanta 838 8 port SHDSL 4 port Ethernet, (1200633G5T) Netvanta 834 4 port SHDSL 4 port Ethernet, (1200718G1T) Netvanta 832 2 port SHDSL 1 port Ethernet
+    --   03/15/2010 jlb Added (1187560F1) TA5K ActiveE Module
+    --   03/22/2010 sls correct comment for  adSw16ChassisG3(1168)
+    --   03/24/2010 sls add NetVanta 3200, Gen3
+    --   04/06/2010 jlb Added (1399023L1) TA5K 10G Bert Test
+    --   06/04/2010 jlb Added (1172805G1) NetVanta 8044 gen 2
+    --   06/07/2010 jlb Added (1174101F1-ETOS) 10G Ethernet Transport Optical Switch and (1174110F1-STOS) OC192/STM64 Sonet/SDH Transport Optical Switch
+    --   06/08/2010 jlb Added (1174819G1) Netvanta 8 port T1/E1 Pseudowire Expansion Module
+    --   06/28/2010 sls Added NV6240s
+    --   07/26/2010 jlb Added (1187122G1) TA5000 VDSL2 32-PORT AM
+    --   07/26/2010 sls Added TA3xxs & GPON NIM2
+    --   08/24/2010 sls Added Sweet 16 Packet Buss Interface
+    --   08/31/2010 jlb Added (1174801G2) NetVanta 8044M - AC
+    --   09/08/2010 jlb Added (1187126G1) VDSL MTA/SC 32 Port
+    --   09/15/2010 jlb Added (1188011G1) TA5000 ETSI SCM with Bridging
+    --   09/23/2010 jlb Added prouduct IDs for all componenets of (117971xG1) Next Generation 1124P, both Ethernet and HDSL4 fed
+    --   09/29/2010 jlb Added (1187160F1) TA5k 24 PORT CPOTS and (1188100F1) TA5000 ETSI Combo A2+ Access Module
+    --   10/28/2010 sls Added NV 123x Gen 2
+    --   11/01/2010 jlb Added (1187030G2) TA5k 10G Switch Module with Ring Generator ( 5G Backplane ), and (1187030G3) TA5k 10G Switch Module with 1588v2 and SyncE ( 5G Backplane )
+    --   11/03/2010 sls Added adGenTest(81) to AdSharedCommon
+    --   01/05/2011 jlb Added (1174510G3) TA5k Optical Carrier Card
+    --   02/23/2011 jlb Added (1187561F1) 2nd Gen 24 port ActiveE card – Single
+    --   03/09/2011 jlb Added (1188085G3) Ta5k 19" High Flow Front Fan Module International
+    --   04/01/2011 jlb Added (1187130G1) TA5000 VDSL2 48-PORT AM
+    --   04/07/2011 jlb Added (117472xG1) Variable optical multiplexers/demultiplexers
+    --   05/10/2011 jlb Added (1174120F1-OTOS)  OTN Transport Optical Switch
+    --   05/13/2011 jlb Added (1174211G1)       Transponder card
+    --   05/16/2011 jlb Added (1174441G1)     Fiber based Dispersion Compensation Module 20km
+                                -- (1174442G1)     Fiber based Dispersion Compensation Module 40km
+                                -- (1174443G1)     Fiber based Dispersion Compensation Module 60km
+                                -- (1174444G1)     Fiber based Dispersion Compensation Module 80km
+                                -- (1174452G1)     Bragg-Grating based Dispersion Compensation Module 40km
+                                -- (1174453G1)     Bragg-Grating based Dispersion Compensation Module 60km
+                                -- (1174454G1)     Bragg-Grating based Dispersion Compensation Module 80km
+    --   05/17/2011 jlb Added (11744x1G1)     Optical Amplifier card
+    --   05/17/2011 jlb Added (1174401G1) and (1174411G1)     Optical Amplifier cards
+    --   05/20/2011 twc Added (1174720G1)       Variable optical multiplexers/demultiplexers THz 192.1-192.4
+				-- (1174721G1)       Variable optical multiplexers/demultiplexers THz 192.5-192.8
+    				-- (1174722G1)       Variable optical multiplexers/demultiplexers THz 192.9-193.2
+    				-- (1174723G1)       Variable optical multiplexers/demultiplexers THz 193.3-193.6
+    				-- (1174724G1)       Variable optical multiplexers/demultiplexers THz 193.7-194.0
+    				-- (1174725G1)       Variable optical multiplexers/demultiplexers THz 194.1-194.4
+    				-- (1174726G1)       Variable optical multiplexers/demultiplexers THz 194.5-194.8
+    				-- (1174727G1)       Variable optical multiplexers/demultiplexers THz 194.9-195.2
+    				-- (1174728G1)       Variable optical multiplexers/demultiplexers THz 195.3-195.6
+    				-- (1174729G1)       Variable optical multiplexers/demultiplexers THz 195.7-196.0
+    --   06/07/2011 twc Added (11799xxxx-SCM)        TA1148V 4th Gen 48 port VDSL2 Host Dslam SCM
+	      			-- (1179932/3Fx)     TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+	      			-- (1179932/3Fx-SM)  TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+	      			-- (1179932/3Fx-VDSL2) TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+	      			-- (1179930/1Fx)     TA1148V 4th Gen 48 port VDSL2 Client Dslam
+	      			-- (1179950F1)       TA1148V 4th Gen GigE/DMT Fed 48 port VDSL2 Host Dslam
+              			-- (1179950F1-SM)    TA1148V 4th Gen GigE/DMT Fed 48 port VDSL2 Host Dslam SM
+              			-- (1179950F1-VDSL2) TA1148V 4th Gen GigE/DMT Fed 48 port VDSL2 Host Dslam, VDSL2
+              			-- (1179942/3Fx)     TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+              			-- (1179942/3Fx-SM)  TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+              			-- (1179942/3Fx-VDSL2) TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+              			-- (1179940/1Fx)     TA1148V 4th Gen 48 port VDSL2 Client Dslam
+              			-- (11795xxxx-SCM)   TA1248V 4th Gen 48 port VDSL2 Host Dslam SCM
+              			-- (1179532/3Fx)     TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+              			-- (1179532/3Fx-SM)  TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+              			-- (1179532/3Fx-VDSL2) TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+              			-- (1179530/1Fx)     TA1248V 4th Gen 48 port VDSL2 Client Dslam
+              			-- (1179542/3Fx)     TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+              			-- (1179542/3Fx-SM)  TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+              			-- (1179542/3Fx-VDSL2) TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+              			-- (1179540/1Fx)     TA1248V 4th Gen 48 port VDSL2 Client Dslam
+    --   06/20/2011 twc Changed adTA5k48pVDSL2(1244) comment top assembly number from 1187130G1 to 1187131G1 per developer's instructions
+    --   06/30/2011 sls Added NV 3140, 3150 Annex A & 3150 Annex B
+    --   07/07/2011 twc Added TA5006 19" Domestic Mini Chassis 2nd Generation
+    --   08/02/2011 twc Added (1172654G1) TA 1424S-CE
+    --   08/22/2011 sls Added NV 644
+    --   08/24/2011 sls Added NetVanta 1234 PoE w/ RPS
+    --   08/29/2011 twc Added (1174720G2), Variable optical multiplexers/demultiplexers THz 191.7-192.0
+    --   09/14/2011 twc Added (1172657G1), TA 1448S-CE ANSI
+	      			-- Added (1172656G1)       TA 1424S-CE ANSI
+				-- Added "ETSI" comment to the following previously defined entries
+					-- adTA1448SCE(1148),    (1172655G1)       TA 1448S-CE ETSI
+					-- adTA1424SCE(1292),    (1172654G1)       TA 1424S-CE ETSI
+    --   09/28/2011 twc Added (1174501G1), Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 2 Degrees
+    --   10/13/2011 twc Added (1174451G1), DCM-B20 Bragg/Grating based dispersion compensation module 20km
+	      			-- Added (1174455G1)	    DCM-B100 Bragg/Grating based dispersion compensation module 100km
+	      			-- Added (1174456G1)	    DCM-B120 Bragg/Grating based dispersion compensation module 120km
+    --   10/13/2011 twc Added (1174471G1) TA5000 Optical Supervisory Channel Processor
+    --   10/14/2011 twc Added (1179560F1) TA1648 Chassis  48p Active Ethernet OLT
+				-- (1179560F1/SCM) TA1648 SCM      48p Active Ethernet OLT
+				-- (1179560F1/SM)  TA1648 SM       48p Active Ethernet OLT
+				-- (1179560F1/AM)  TA1648 AM       48p Active Ethernet OLT
+    --   10/14/2011 twc Added (1187121G2) TA5000 VDSL2 32PORT AM
+    --   10/26/2011 twc Added (1174101F2) and (1174121F1)
+    --   11/01/2011 twc Added (1187040F1) TA5000 SM20 4-10G
+    --   12/02/2011 twc Added (1188122G1) TA5000 International VDSL2 32-PORT AM
+    --   12/02/2011 twc Added (1188126G1) TA5000 International VDSL2 MTA-SC 32 Port
+    --   01/03/2012 twc Added (1174431G1) Optical Mid-Stage Amplifier card
+    --   01/04/2012 twc Added (1174130F1_ETOS_10_OTN) and (1174130F2_ETOS_10)
+    --   01/19/2012 twc Added (1174511G1) Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 4 Degrees
+    --   03/07/2012 twc Added (1172868F1) NetVanta 868 VDSL 8 Port
+    --   04/02/2012 twc Added (1188085G4) TA5000 19" Fan Module Top Exhaust
+    --   04/20/2012 twc Added (1188090G3) TA5006 Int 19" High Flow Fan Module
+    --   05/09/2012 twc Added (1174123F1_OTOS_0) and (1174121F1_OTOS_8)
+    --   05/31/2012 sls Added (1702803F1) NetVanta USB WWAN NIM
+    --   07/27/2012 twc Added (1172868F2) NetVanta 868 VDSL 8 Port, Annex A, DC
+                           -- (1172868F3) NetVanta 868 VDSL 8 Port, Annex B, AC
+                           -- (1172868F4) NetVanta 868 VDSL 8 Port, Annex B, DC
+                           -- (1172868F5) NetVanta 868 VDSL 8 Port, Annex A, AC, Nordic
+    --   08/02/2012 twc Added (1174502G1) Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 2 Degrees with Pre Amp
+                           -- (1174503G1) Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 2 Degrees with Pre and Booster Amp
+                           -- (1174512G1) Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 4 Degrees with Pre and Booster Amp
+                           -- (1174513G1) Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 4 Degrees with Booster Amp
+    --   08/17/2012 twc Added (1174402G1) Optical Pre/Boost Amplifier card
+    --   08/17/2012 twc Added (1200633G8) NetVanta 838 8 Port Enhanced Memory
+    --   08/20/2012 twc Updated part number. Changed 1200633G8 to 1172633G4 per PM
+    --   09/11/2012 twc Updated 1174503G1 entry. Changed adTA5kMARS2PB(1328) to adTA5kMARS2B(1328) and removed comment reference to Pre Amp
+    --   01/22/2013 twc Added (1187014F1) TA5004 1G Management Switch Module ( 1G Backplane )
+                           -- (1187014F2)       TA5004 10G Management Switch Module ( 10G Backplane )
+                           -- (1187016F1)       TA5004 10G Management Switch Module ( 20G Backplane )
+    --   02/14/2013 sls Added all TA9xxe Gen3 and NV6250 models
+    --   02/19/2013 sls Correct ad3GTA908eFxo & ad3GTA916eFxo
+
+    --   03/21/2013 twc Added (1187016F1_SCM)       TA5004 10G MSM SCM ( 20G Backplane )
+                           -- (1187004F1)           TA5004 19 inch shelf
+    --   03/22/2013 sls Added NV1244, NV1244P, NV1248, & NV1248P
+    --   03/25/2013 twc Added (1187503F1)       TA5000 2.5G 8-PON SFP Based GPON OLT
+    --   03/25/2013 twc Updated Product ID 1334 entry and comment to match change in product design
+    --   04/22/2013 twc Added (1187562F1) 20 Gig Active Ethernet
+    --   07/09/2013 sls Added (17004660F1) NV 4660
+    --   07/12/2013 sls Added NetVanta 6360 chassis & modules
+    --   07/22/2013 sls Added NV 123x Gen 3
+    --   07/24/2013 twc Added (1187094F1) TA5004 19" Domestic Mini Chassis Fan Module
+    --   08/21/2013 twc Added (1179870F1) TA1108VP GPON MDU ONT
+			-- Updated 1244 Product ID entry (per PM) to adTA5k48pVDSL2Ovr(1244)
+    --   09/23/2013 sls Added (1700595G10) NV 1235P
+    --   11/20/2013 twc Added (1187130F1) TA5000 VDSL2 48 PORT Combo
+    --   11/21/2013 twc Added (1187031F1) TA5k 10G Switch Module ( 5G Backplane )
+    --   01/06/2014 sls Added (1700570F1) NV 1531
+    --                        (1700571F1) NV 1531P
+    --   01/30/2014 twc Added (1187190F1) TA5004 VDSL2 Vector 192 PORT SLV
+    --   02/04/2014 sls Added (1951900G1) vWLAN
+    --   03/10/2014 twc Added (1187502F2)    TA5000 2.5G 4PON SFP Based GPON OLT Gen 2
+    --                        (1187503F2)    TA5000 2.5G 8PON SFP Based GPON OLT Gen 2
+    --                        (1187510F1)    TA5000 4PON XFP Based XGPON OLT
+    --   04/10/2014 sls Added (47006366F1) NetVanta 6360 24 FXS
+    --                        (47006367F1) NetVanta 6360 16 FXS 8 FXO
+    --   04/28/2014 twc Added (1179870F1)  TA508VP GPON MDU ONT
+    --                  Changed previous 1179870F1 Product ID comment to 1179870F1R (Prod ID = 1376)
+    --   05/02/2014 twc Added (1174820F1) NetVanta 8424 Ethernet Switch aka NV8424RA Multi-service Edge Switch
+    --   05/02/2014 sls updated comment for NV3140; added new  part number (1700340F1)
+    --   05/02/2014 twc Changed adNV8424EthSw(1390) to adNV8424RAEthSw(1390) (per PM request)
+    --                  Added (1174821F1) NetVanta 8424 SD Multi-service Edge Switch
+    --   06/10/2014 sls Added (17005660F1) NetVanta 5660
+    --   07/03/2014 twc Added (1174155F1_OTOS_100)  100G OTN Transport Optical Switch
+    --                        (1174140F1_ETOS_100)  100G Ethernet Transport Optical Switch
+    --                        (1174215F1_TPR_100)   100G Transponder Card
+    --   08/21/2014 sls Added (1702595G10) NetVanta 1535P
+    --   09/23/2014 twc Added (1187514F1)   NGPON  10/10,  4 XFP
+    --   12/02/2014 sls Added NetVanta 1550 switches
+
+    -- *** ENSURE ANY UPDATES TO THIS FILE ARE ALSO REFLECTED IN ADTRANTC.MI2 ***
+
+    -- This mmodule of Textual Conventions contains definitions that can be
+    --   imported into MIB modules so that independent additions can be made
+    --   for new products without affecting existing MIBs.
+
+
+
+    -- TYPES
+
+    -- The first tier (adtran) and second tier (adProducts, adMgmt, adAdmin,
+    --   adPerform, adShared) object identifiers are defined in the ADTRAN-MIB module.
+
+    -- The third tier of adProducts and adMgmt object identifiers are defined
+    --   in each product specific MIB in accordance with the enumeration above
+    --   of the AdProductIdentifier textual convention type.
+
+    -- The third tier of adAdmin objects are defined in the ADTRAN-MIB module.
+
+    -- The third tier of adPerform objects are named here for use in generic
+    --   performance statistics MIBs.
+
+    -- The third tier of adShared objects are named here for use in generic
+    --   shared MIBs.
+
+
+    -- The following type defines the third tier of the ADTRAN OID sub-tree,
+    --   or specifies where they are defined.
+    -- They may be redefined in legacy modules, but the OIDs must mean the same.
+
+
+    -- This type is used to define the product leaves
+    --   in the subtree adtran(664).adProducts(1)
+
+    AdProductIdentifier ::= INTEGER {  -- use to define all ADTRAN product OIDs
+        adADVISOR(1),                  -- ADVISOR SNMP Proxy Agent
+        adACTDAX(2),                   -- ACTDAX List 2
+        reserved00(3),                 -- Used by the adDS1 DS1 extension MIB for mg only
+        adTSU(4),                      -- TSU T1 Mux
+        adLIU3(5),                     -- LIU3-PM T1 Line Interface Unit
+        adOCUDP(6),                    -- OCUDP-PM / SD4 Channel Unit
+        adDDST(7),                     -- DDST-PM DDS Termination Unit
+        adDSUDP(8),                    -- DSUDP Channel Unit
+        adACTDAXL3(9),                 -- ACTDAX List 3 - ACT1241 Line Interface Unit
+        adTSU100(10),                  -- TSU 100 - T1 Multiplexer
+        adTSU600(11),                  -- TSU 600
+        adLPRPTR(12),                  -- LOOP REPEATER-PM
+        adDSU3ARs(13),                 -- DSU III AR (standalone same as shelf MIB)
+        adDSU3AR(14),                  -- DSU III AR (shelf)
+        adDSU3S4Ws(15),                -- DSU III AR Switch 4 Wire
+        adDSU3S4W(16),                 -- DSU III AR Switch 4 Wire (shelf)
+        adDSU3DBS4Ws(17),              -- DSU III AR Dial Backup Switch 4 Wire
+        adDSU3DBS4W(18),               -- DSU III AR Dial Backup S4W (shelf)
+        adDSU3DBS2Ws(19),              -- DSU III AR Dial Backup Switch 2 Wire
+        adDSU3DBS2W(20),               -- DSU III AR Dial Backup S2W (shelf)
+        adDSU3DBV32s(21),              -- DSU III AR Dial Backup V.32
+        adDSU3DBV32(22),               -- DSU III AR Dial Backup V.32 (shelf)
+        adDSU3DBISDNs(23),             -- DSU III AR Dial Backup ISDN
+        adDSU3DBISDN(24),              -- DSU III AR Dial Backup ISDN (shelf)
+        adDSUS2Ws(25),                 -- DSU III Switch 2 Wire
+        adOCUDPP(26),                  -- OCUDP-PLUS+ Channel Unit
+        adDSUS2W(27),                  -- DSU III Switch 2 Wire (shelf)
+        adACT2300BCU(28),              -- ACT2300 Bank Control Unit List 1
+        adACT2300LIU(29),              -- ACT2300 Line Interface Unit List 1
+        adACT2300OSU(30),              -- ACT2300 Office Support Unit List 1
+        adACT2300PWR(31),              -- ACT2300 Power Unit List 1
+        adHSU100(32),                  -- HDSL TSU100
+        adHSU600(33),                  -- HDSL TSU600
+        adSMART16SC(34),               -- Smart 16 Shelf Controller
+        adSITEMGR(35),                 -- ACT2300 Site Manager
+        adDSU3DBV34(36),               -- DSU III AR Dial Backup V.34 (shelf)
+        adDSUCARs(37),                 -- DSU III AR Compression
+        adDSUCAR(38),                  --
+        adDSUCS4Ws(39),                -- DSU III AR C Switch 4 Wire
+        adDSUCS4W(40),                 --
+        adDSUCDBS4Ws(41),              -- DSU III AR C Dial Backup Switch 4 Wire
+        adDSUCDBS4W(42),               --
+        adDSUCDBS2Ws(43),              -- DSU III AR C Dial Backup Switch 2 Wire
+        adDSUCDBS2W(44),               --
+        adDSUCDBV32s(45),              -- DSU III AR C Dial Backup V.32
+        adDSUCDBV32(46),               --
+        adDSUCDBISDNs(47),             -- DSU III AR C Dial Backup ISDN
+        adDSUCDBISDN(48),              --
+        adTDMs(49),                    -- DSU III Time Division Mux (TDM) stand alone
+        adTDM(50),                     -- DSU III TDM (shelf)
+        adTDMDBS4Ws(51),               -- DSU III TDM Dial Backup Switch 4 Wire
+        adTDMDBS4W(52),                -- DSU III TDM Dial Backup S4W (shelf)
+        adTDMDBS2Ws(53),               -- DSU III TDM Dial Backup Switch 2 Wire
+        adTDMDBS2W(54),                -- DSU III TDM Dial Backup S2W (shelf)
+        adTDMDBV32s(55),               -- DSU III TDM Dial Backup V.32
+        adTDMDBV32(56),                -- DSU III TDM Dial Backup V.32 (shelf)
+        adTDMDBISDNs(57),              -- DSU III TDM Dial Backup ISDN
+        adTDMDBISDN(58),               -- DSU III TDM Dial Backup ISDN (shelf)
+        adISU128(59),                  -- ISU 128 (shelf)
+        adISU2X64(60),                 -- ISU 2 X 64 (shelf)
+        adT1CSUACE(61),                -- T1 ESF CSU ACE
+        adSMX(62),                     -- SMX RS485 DSU PM channel unit
+        adEMTO(63),                    -- EMTO - 4WE&M PM channel unit
+        adLIU3PML2(64),                -- LIU3 PM List 2
+        adTSURM(65),                   -- TSU RM - SMART16 Shelf card
+        adCSURM(66),                   -- CSU RM - SMART16 Shelf card
+        adFXS2DPO(67),                 -- D4 analog channel unit
+        adFXO2DPT(68),                 -- D4 analog channel unit
+        adExpressSL(69),               -- Express SL
+        adTSUNXBase(70),               -- Nx56/64 V.35/530
+        adTSUNxV35(71),                -- Nx56/64 V.35
+        adTSUNx530(72),                -- Nx56/64 530
+        adTSUDSX1(73),                 -- DSX-1 Plug In
+        adTSUOCU(74),                  -- OCU DP
+        adTSUDI(75),                   -- Drop  and Insert
+        adTSUFXS(76),                  -- FXS
+        adTSUunassign(77),             -- ???????
+        adTSUDSX1PO(78),               -- DSX-1 Plug On
+        adTSUFXO(79),                  -- FX0
+        adTSUDBU(80),                  -- Multi Port DBU
+        adTSUNX2(81),                  -- 2nd Gen Nx56/64 V.35/530
+        adTSUNX2V35(82),               -- 2nd Gen Nx56/64 V.35
+        adTSUNX2530(83),               -- 2nd Gen Nx56/64 530
+        adTSUEM(84),                   -- E and M
+        adTSUCmprss(85),               -- Compression Card
+        adTSUNxBase120(86),            -- Base 120 Nx
+        adTSUDsxBase120(87),           -- Base 120 Dsx
+        adTSUFXS2(88),                 -- FXS Voice 2
+        adTSUNxDBU(89),                -- Nx DBU
+        adTSUDsxBase140(90),           -- Base 140 Dsx
+        adTSUPassThru(91),             -- Pass Thru
+        adTSUMUXAgent(92),             -- Agent
+        adTSUNX2DUAL(93),              -- Dual Nx56/64
+        adTSUDSUDP(94),                -- Dual DSU III
+        adNxDBUTest(95),               -- Nx DBU Test Card
+        adTSUDModem(96),               -- Dual V.34 Modem
+        adTSUQmodem(97),               -- Quad V.34 Modem
+        adTSUDXC(98),                  -- DXC
+        adTSUUBrite(99),               -- U Brite
+        adTSUNxeBase(100),             -- TSU 1x0e Base Nx56/64
+        adTSUDsxBase120e(101),         -- TSU120e Base DSX-1
+        adTSUDUALOCU(102),             -- Dual OCU DP
+        adTSUNXDBUeBase(103),          -- TSU 1x0e Base NXDBU
+        adFXSG2(104),                  -- FXS_Gen2
+        adTSU4FXS(105),                -- Quad FXS
+        adTSU8FXS(106),                -- Octal FXS
+        adTSUNxIQ(107),                -- Nx IQ
+        adTSURtr(108),                 -- Router
+        adTSUDrop(109),                -- DropPort
+        adESUNxBase(110),              -- ESUBaseNx
+        adTSU4FXSG2(111),              -- Quad FXS Gen2
+        optionCards70to120(120),       -- TSU Mux option cards
+        adDS0PM(121),                  -- DS0DP /PM
+        adUBRITE(122),                 -- UBRITE /PM
+        adISU512(123),                 -- ISU512 standalone unit
+        adTSUMUXAGENT(124),            -- TSU Embedded Agent Option card
+        adDSUIVESP(125),               -- DSU IV ESP
+        adFSU(126),                    -- FSU
+        adTSUESP(127),                 -- TSU ESP
+        adTSU120(128),                 -- TSU 120
+        adTSU600e(129),                -- TSU 600 e
+        adTSU120e(130),                -- TSU 120 e
+        ad4WEM(131),                   -- 4 Wire E&M
+        ad2WEM(132),                   -- 2 Wire E&M
+        adESPEtherCard(133),           -- ESP Ethernet Card
+        adESPS4WCard(134),             -- ESP S4W DBU Card
+        adESPV34Card(135),             -- ESP V34 DBU Card
+        adESPISDNCard(136),            -- ESP ISDN DBU Card
+        adESPDTECard(137),             -- ESP DTE DBU Card
+        adESPDualISDNCard(138),        -- ESP Dual ISDN DBU Card
+        adFramePort144(139),           -- D4 FramePort 144
+        adFSU5622(140),                -- FSU 5622 ESP
+        adDSUIQ(141),                  -- DSU IQ
+        adTSU100e(142),                -- TSU 100 with Embedded SNMP
+        adATLAS800(143),               -- ATLAS 800 (1200180L1)
+        adCOFRAD(144),                 -- CO FRAD
+        adFramePort768(145),           -- D4 FramePort 768
+        adBR110Chassis(146),           -- BR 1/10 Chassis used by CO FRAD
+        adTSUIQ(147),                  -- TSU IQ
+        adExpressL128FR(148),          -- Express L128 Frame Relay    1202070L1
+        adExpressL768(149),            --  Express L768 1202192L1
+        adExpressL15(150),             -- Express L1.5   1202192L2
+        adTotalAccessSCU(151),         -- Total Access SCU (1181010L1)
+        adTotalAccessHTUC(152),        -- Total Access HTU-C (1181101L1)
+        adTDU120E(153),                -- TDU 120 E
+        adATLASGen(154),               -- ATLAS Generic
+        adATLAS800Plus(155),           -- ATLAS 800Plus (1200226L1)
+        adATLAS1200(156),              -- ATLAS 1200
+        adATLASOC(157),                -- ATLAS Generic Option Card
+        adATLAST1PRI4OC(158),          -- ATLAS T1PRI4 Option Card (1200185L1-L3)
+        adATLASV35Nx4OC(159),          -- ATLAS V35Nx4 Option Card 1200184L1
+        adATLASUBRI8OC(160),           -- ATLAS UBRI8 Option Card 1200186L2
+        adATLAST3OC(161),              -- ATLAS T3 Option Card 1200223L1
+        adATLASSerialOC(162),          -- ATLAS Serial Option Card 1200182L1
+        adATLASModemOC(163),           -- ATLAS Modem Option Card 1200181L1
+        adATLASE1OC(164),              -- ATLAS E1 Option Card 1200264L1
+        adATLASHDLCOC(165),            -- ATLAS HDLC Option Card 1200222L1
+        adATLASCompVoiceOC(166),       -- ATLAS Comp Voice Option Card (1200221L1 - L4)
+        adATLASSyncSerialOC(167),      -- ATLAS Synchronous Serial OC (NO LONGER ACTIVE)
+        adESU120e(168),                -- ESU 120e 1200420L1
+        adESU120eHDSL(169),            -- ESU 120e HDSL 1200421L1
+        adT3SU300(170),                -- T3SU-300 1200217L1
+        adBRFP144(171),                -- BR 1/10 FramePort 144
+        adBRFP768(172),                -- BR 1/10 FramePort 768
+        adBRFP768SP(173),              -- BR 1/10 FramePort 768 SpanPowering
+        adT3SUHSSIOC(174),             -- T3SU HSSI Option Card
+        adT3SUV35OC(175),              -- T3SU V35 Option Card
+        adIQPROBE(176),                -- IQPROBE
+        adESPEM(177),                  -- Dual ESP E&M Option Card
+        adESPFXO(178),                 -- Dual ESP FXO Option Card
+        adESPFXS(179),                 -- Dual ESP FXS Option Card
+        adTotalAccessNMI(180),         -- Total Access NMI
+        adTADS3MUX(181),               -- Total Access DS3 MUX
+        adTotalAccessE1HDSL(182),      -- Total Access E1 HDSL LTU (1181102L1)
+        adT3SUQDSX1OC(183),            -- T3SU Quad DSX1 Option Card
+        adTAGenCard(184),              -- Total Access Generic Card
+        adTotalAccessHD10(185),        -- Total Access HD10 (1181200L1)
+        adTSUIQPlus(186),              -- TSU IQ+
+        adTAQFOC(187),                 -- Total Access Westell Quad Fiber Optic Card
+        adTA3000DSX1(188),             -- Total Access 3000 DSX1 Module (1181050L1)
+        adTASTS1Mux(189),              -- Total Access STS1 Mux
+        reserved01(190),               -- Total Access STS1 Mux (trap extension)
+        adTAT1OR(191),                 -- Total Access Westell T1 Office Repeater
+        adTAECU(192),                  -- Total Access E1 External Clock Module
+        reserved02(193),               -- Total Access DS3 MUX (trap extension)
+        adTAOC3MUX(194),               -- Total Access OC-3 MUX
+        adTSU610(195),                 -- TSU 610
+        adISU512e(196),                -- ISU 512e
+        reserved03(197),               -- Total Access DSX1 module (trap extension)
+        adMX2800(198),                 -- MX2800 (T3 Mux)
+        adESULT(199),                  -- ESU LT
+        adD4DIGROUP(200),              -- Virtual FramePort Controller
+        adTAH2TUC(201),                -- Total Access H2TUC for Bell Atl. (1181111L1)
+        adTAHD10E1(202),               -- Total Access HD10 E1 version
+        adTADS3MUXL2(203),             -- Total Access DS3 MUX List 2
+        adTA850BCU(204),               -- Total Access 850 BCU
+        reserved04(205),               -- Total Access OC-3 MUX (trap extension)
+        adTRSDSL(206),                 -- D4 TR-SDSL
+        adBRTRSDSL(207),               -- BR1/10 TR-SDSL
+        adEx6100(208),                 -- Express 6100
+        adTAE1LTU(209),                -- Total Access HDSL LTU (1182007L1)
+        adTA750BCU(210),               -- Total Access 750 BCU (1175012L1)
+        adTAQuadFXS(211),              -- Total Access Quad FXS (1175408L1)
+        adTAQuadFXO(212),              -- Total Access Quad FXO (1175407L1)
+        adTANx64(213),                 -- Total Access Nx56/64 (1175025L1)
+        adTAOCUDP(214),                -- Total Access OCU-DP (1180005L1)
+        adTADSODP(215),                -- Total Access DSO-DP (1180003L1)
+        adTAUBRITE(216),               -- Total Access U-BRITE (1180020L1)
+        adTSUIQRM(217),                -- TSU IQ Smart 16 Rackmount
+        adF3SU300(218),                -- NTU-45 (1200660L1) former name: F3SU-300
+        adATLAS550(219),               -- ATLAS 550
+        adTALTU45(220),                -- Total Access LTU-45 (1182033L1)
+        adTA1500qLIU(221),             -- TA1500 Quad LIU (1180109L1)
+        adTA1500dLIU(222),             -- TA1500 Dual LIU (1180009L1)
+        adTA1500SCUrt(223),            -- TA1500 SCU RT w/MLT (1180008L2)
+        adTA1500SCUcot(224),           -- TA1500 SCU COT w/MLT (1180008L3)
+        adTAEM(225),                   -- TotalAccess E&M (1180402L1)
+        adTAFXO(226),                  -- TotalAccess FXO/DPT (1180404L1)
+        adTAFXS (227),                 -- TotalAccess FXS (1180403L1)
+        adTAqPOTS(228),                -- TotalAccess Quad POTS RT (1180408L1)
+        adTA1500SCU(229),              -- TA1500 SCU w/o MLT  (1180008L1)
+        adTA1500DualFXS(230),          -- Total Access 1500 Dual FXS (1180208L1)
+        adTA1500DualFXO(231),          -- Total Access 1500 Dual FXO (1180207L1)
+        adLucentDualOCUDP(232),        -- Lucent Dual OCUDP (1133205L1)
+        adLucentDualDS0DP(233),        -- Lucent Dual DS0DP (1133203L1)
+        adTASTS1MuxL2(234),            -- Total Access STS1 Mux L2 (1181030L2)
+        adTA4303(235),                 -- Total Access 4303 (1200330L1) chassis
+        reserved05(236),               -- Total Access STS1 Mux L2 (trap extension)
+        adTA1500EMsmas(237),           -- TA1500 E&M w/SMAS (1180402L2 / 1133402L1)
+        adTAH2TUCgte(238),             -- Total Access H2TUC for GTE  (1181111L2)
+        adTAH2TUCsbc(239),             -- Total Access H2TUC for SBC (1181111L4)
+        adTAH2TUCclec(240),            -- Total Access H2TUC for CLEC (1181111L1#C)
+        adTA3000eSCU(241),             -- Total Access SCU (1181018L1)
+        adESPPRIdbu(242),              -- ESP PRI DBU Card
+        adTA1500DualDSU(243),          -- Total Access 750/1500 Dual DSU DP (1175225L1)
+        adTA4303Ctrl(244),             -- TA4303 EN GR303 Controller 1200334L1
+        adTA3000(245),                 -- TA3000  1181001L1 TA3000 23 inch domestic shelf
+        adTA3010(246),                 -- TA3010  1182003L1 TA3010 19 inch domestic shelf
+        adTA3011(247),                 -- TA3011  1182001L1 Total Access OMP-FC
+        adTA3011Mex(248),              -- TA3011  1181001L1#M Total Access for Mexico
+        adTA3010LA(249),               -- TA3010  1182013L1 19 inch Loop Access Punch Down chassis
+        adTA1500(250),                 -- TA1500  1180001L1 TA1500 23 inch chassis
+        adTA1000(251),                 -- TA1000  1179001L1 Total Access 1000 OSP housing
+        adTA1000COT(252),              -- TA1000  1179501L1 Total Access 1000 COT chassis
+        adTA850(253),                  -- TA850   1200375L1 Total Access 850 chassis
+        adTA750(254),                  -- TA750   1175001L1 Total Access 750 chassis
+        adATLASt3DI(255),              -- ATLAS T3 Drop & Insert module 1200225L1
+        adATLASussi(256),              -- ATLAS USSI module (1200261L1-L4)
+        adATLASimux(257),              -- ATLAS IMUX (Nx56/64 Bonding Rsrc) module (1200262L1)
+        adATLAS8DSX(258),              -- ATLAS Octal DSX module 1200317L1
+        adATLAS4DSX(259),              -- ATLAS Quad DSX module 1200320L1
+        adTA4303QuadDSX(260),          -- TA4303 Quad DSX module 1200331L1
+        adTA4303OctalDSX(261),         -- TA4303 Octal DSX module 1200332L1
+        adTA4303DS3(262),              -- TA4303 DS3 module 1200333L1
+        adTA4303DualDS3(263),          -- TA4303 Dual DS3 module 1200336L1
+        adTADS3TSIE1(264),             -- TA 3010 DS3 TSI E1 MUX (1182020L1) 22 slot
+        adTAOC3L2(265),                -- TA 3000 OC-3 MUX L2 1181031L2
+        reserved06(266),               -- TA 3000 OC-3 MUX L2 (trap extension)
+        reserved07(267),               -- TA 3000 OC-3 MUX L2 (trap extension)
+        reserved08(268),               -- TA 3000 OC-3 MUX L2 (trap extension)
+        adATLAS550VCom(269),           -- ATLAS 550 VCOM Module - 1200312Lx (x = 1,2,3,5)
+        adATLAS550IMux(270),           -- ATLAS 550 IMUX Module - 1200326L1
+        adATLAS550T1(271),             -- ATLAS 550 T1 Network Module - 1200307L1
+        adATLAS550DualT1(272),         -- ATLAS 550 Dual T1/Pri Module - 1200314L1
+        adATLAS550DualNx(273),         -- ATLAS 550  Dual NX Module - 1200311L1
+        adATLAS550QuadBRI(274),        -- ATLAS 550 Quad Bri Module - 1200315L1
+        adATLAS550OctFXS(275),         -- ATLAS 550 Octal FXS Module - 1200309L1
+        adATLAS550OctFXO(276),         -- ATLAS 550 Octal FX0 Module - 1200310L1
+        adATLAS550QuadFXS(277),        -- ATLAS 550 Quad FXS Module - 1200328L1
+        adATLAS550QuadFXO(278),        -- ATLAS 550 Quad FX0 Module - 1200329L1
+        adATLAS550RsrcHost(279),       -- ATLAS 550 Resource Host Module - 1200324L1
+        adATLAS550E1(280),             -- ATLAS 550 E1 Network Module - 1200308L1
+        adATLAS550EM(281),             -- ATLAS 550 E&M Module - 1200313L1
+        adOSU300(282),                 -- OSU 300 - 1200663-L1
+        adTAATMMUX(283),               -- Total Access ATM MUX - 1181041L1
+        adTA1500DualFXSL2(284),        -- Total Access 1500 Dual FXS/DPT w/o SMAS (1180208L2)
+        adTA1500DualFXOL2(285),        -- Total Access 1500 Dual FXO/DPT w/o SMAS (1180207L2)
+        adTA3000HTUCICOT(286),         -- Total Access 3000 HTU-C ICOT (1179511L1)
+        adTA3000quadDSX1E1(287),       -- Total Access 3000 quad DSX-1/E1 (1181402L1)
+        adMX2800STS1(288),             -- MX2800 STS-1 multiplexer (1200659)
+        adTA1500dNx64(289),            -- TA1500 Daul Nx56/64 (1180025L1)
+        adTA1500DDS4x4(290),           -- TA1500 4x4 DDS (1180106L1)
+        adTA1500DDS4x4PO(291),         -- TA1500 4x4 DDS Preferred Option (1180106L2)
+        adLucentFXS(292),              -- Lucent FXS (1133406L1)
+        adLucentFXO(293),              -- LucentFXO (1133405L1)
+        adTA1500EML2unused(294),       -- TA1500 unassigned
+        adStratum3Eclock(295),         -- Stratum 3E clock (1181930-L1)
+        adTA1500LucentSCU(296),        -- TA1500 Lucent SCU (1133008L4)
+        adTA3000qADSL(297),            -- TA3000 Quad ADSL (1181408L1)
+        adTA3000OctIDSL(298),          -- TA3000 Octal IDSL (1181407L1)
+        adATLAS890(299),               -- ATLAS 890 (1200321L1)
+        adTA1500FT1dp(300),            -- Total Access 15000 FT1 DP (1180405L1)
+        adLucentLIU(301),              -- TA1500 Lucent LIU (1133209L1)
+        adTA3000OctIMA(302),           -- TA3000 Octal DS1 IMA (1181409L1)
+        reserved09(303),               -- Total Access ATM MUX  (1181041L1) (trap extension)
+        adTADualOCUDP(304),            -- Total Access Dual OCU DP (1180205L1)
+        adTADualDSODP(305),            -- Total Access Dual DSO DP (1180203L1)
+        adTADualOCUDPL2(306),          -- Total Access Dual OCU DP w/o SMAS (1180205L2)
+        adTADualDSODPL2(307),          -- Total Access Dual DSO DP w/o SMAS (1180203L2)
+        adTA1500OCUDPoem(308),         -- Total Access 1500 OCU-DP OEM (1133105L1)
+        adTA1500OCUDP(309),            -- Total Access 1500 OCU-DP Preferred Option (1180105L2)
+        adTA3000qHDSL2(310),           -- TA3000 Quad HDSL2 (1181404L1)
+        adTAGSHDSL(311),               -- Total Access G.SHDSL Single Port (1182008L1)
+        adMX2810(312),                 -- MX2810 (1185002L1)
+        adATLAS550PVRM(313),           -- ATLAS 550 Packet Voice Rsrc Module (1200752L1)
+        adTA1500M4W(314),              -- TA1500 Multi 4 Wire (1180413L1)
+        adTSULTX(315),                 -- TSU LTX (2200250)
+        adTA1500DualOCUDPTJ(316),      -- TA 1500 Dual OCU DP w/ Tst Jacks (1180205L3, -L4 & 1133205L3)
+        adTA1500DualDSODPTJ(317),      -- TA 1500 Dual DSO DP w/ Tst Jacks (1180203L3, -L4 & 1133203L3)
+        adTA3000qGSHDSL(318),          -- TA 3000 G.SHDSL Quad Port (1181403L1#T)
+        adTA3000oGSHDSL(319),          -- TA 3000 G.SHDSL Octal Port (1181403L1)  (1181403L2)
+        adTA1500d2wTO(320),            -- TA1500 Dual 2-Wire TO w/o SMAS (1180212L2)
+        adTA1500d2wTOsmas(321),        -- TA1500 Dual 2-Wire TO w/ SMAS (1180212L1 / 1133212L1)
+        adTA1500d2wFXS(322),           -- TA1500 Dual 2-Wire FXS GT w/o SMAS (1180214L2)
+        adTA1500d2wFXSsmas(323),       -- TA1500 Dual 2-Wire FXS GT w/ SMAS (1180214L1 / 1133214L1)
+        adTA15002wFXO(324),            -- TA1500 2-Wire FXO GT w/o SMAS (1180115L2)
+        adTA15002wFXOsmas(325),        -- TA1500 2-Wire FXO GT w/ SMAS (1180115L1 / 1133115L1)
+        adTA1500d4wDX(326),            -- TA1500 Dual 4-Wire DX w/o SMAS (1180216L2)
+        adTA1500d4wDXsmas(327),        -- TA1500 Dual 4-Wire DX w/ SMAS (1180216L1 / 1133216L1)
+        adTA1500d4wFXO(328),           -- TA1500 Dual 4-Wire FXO w/o SMAS (1180217L2)
+        adTA1500d4wFXOsmas(329),       -- TA1500 Dual 4-Wire FXO w/ SMAS (1180217L1 / 1133217L1)
+        adTA1500d4wFXS(330),           -- TA1500 Dual 4-Wire FXS w/o SMAS (1180218L2)
+        adTA1500d4wFXSsmas(331),       -- TA1500 Dual 4-Wire FXS w/ SMAS (1180218L1 / 1133218L1)
+        adTA1500DDSdp(332),            -- TA1500 DDS-DP (1180105L1)
+        reserved10(333),               -- TA 3000 DS3 TSI E1 MUX (trap extension)
+        reserved11(334),               -- TA 3000 DS3 TSI E1 MUX (trap extension)
+        adTA3000CES(335),              -- TA 3000 CES module (1181420L1)
+        adIQ710(336),                  -- IQ 710 (1200800L1)
+        adIQ7xxDDS(337),               -- IQ 710 DDS Interface Module (1200801L1)
+        adIQ7xxT1(338),                -- IQ 710 T1 Interface Module (1200802L1)
+        adIQ7xxT1DSX(339),             -- IQ 710 T1-DSX Interface Module (1200803L1)
+        adTA1500LcntUBR1TE(340),       -- TA1500 Lucent UBR1TE (1133120L1)
+        adTA3000VCP(341),              -- TA 3000 Voice Cell Processor  (1181410L1)
+        adExp6530SHDSL(342),           -- Express 6530 SHDSL NxNTU (1225001L1)
+        adTA3000quadE1NTU(343),        -- Total Access 3000 quad E1 w/ NTU mgmt (1181402L1#T)
+        adATLAS810(344),               -- ATLAS 810+ AC (1200265L1)
+        adTA608(345),                  -- Total Access 608 (T1model)  (1200680L1)
+        adTA3000LTU8(346),             -- Total Access 3000 LTU-8  (1182300L1)
+        reserved12(347),               -- Total Access 3000 LTU-8  (trap extension)
+        reserved13(348),               -- Total Access 3000 LTU-8  (trap extension)
+        adTANTU8(349),                 -- Total Access NTU-8  (1182301L1)
+        adTA3000DS1FR(350),            -- TA 3000 DS1 Frame Relay (1181414L1)
+        adTASHDSLbnc(351),             -- Total Access SHDSL LTU w/ BNC (1182008L3)
+        adTASHDSLv35(352),             -- Total Access SHDSL V.35 LTU (1182008L5)
+        adTA3000ALEc(353),             -- TA3000 ADSL Loop Extender, CO Unit (181600L1)
+        adTAH2TUCvrzneG2(354),         -- Total Access H2TUC for Versizon East, 2nd Gen (1181112L1)
+        adTAH2TUCvrznwG2(355),         -- Total Access H2TUC for Versizon West, 2nd Gen (1181112L2)
+        adTAH2TUCmciG2(356),           -- Total Access H2TUC for MCI, 2nd Gen (1181112L3)
+        adTAH2TUCsbcG2(357),           -- Total Access H2TUC for SBC, 2nd Gen (1181112L4)
+        adTAH2TUCqwestG2(358),         -- Total Access H2TUC for QWEST, 2nd Gen (1181112L5)
+        adTAH2TUCbellsG2(359),         -- Total Access H2TUC for BellSouth, 2nd Gen (1181112L6)
+        adTA3000HTUCg6(360),           -- Total Access 3000 HTU-C 6th Gen for SBC (1181106L4)
+        adTA3000HTUCg6HLSS(361),       -- Total Access 3000 HTU-C 6th Gen for Qwest (1181106L5)
+        adTADS3TSIE3(362),             -- TA 3000 DS3 TSI E3 MUX 1182021L1
+        adTA1000qADSL(363),            -- Total Access 1000 QUAD ADSL            (1179413L1)
+        adTA1000qH2LIU(364),           -- Total Access 1000 DSLAM QUAD HDSL2 LIU (1179109L1)
+        adTA1000atmBCU(365),           -- Total Access 1000 ATM BCU              (1179112L1)
+        adTA1000dslamPSU(366),         -- Total Access 1000 DSLAM PSU            (1179008L1)
+        adXprs6503(367),               -- Express 6503  (1200296L1)
+        adTA3000HTUCg6BSouth(368),     -- Total Access 3000 HTU-C 6th Gen for BellSouth (1181106L6)
+        adTA3000H4TUCL4G1(369),        -- Total Access 3000 H4TUC, 1st Gen (1181411L4)
+        adTA3000H4TUCL5G1(370),        -- Total Access 3000 H4TUC, 1st Gen (1181411L5)
+        adTA300DS3LM(371),             -- TA 3000 DS3 Line Module (1181450L1)
+        adTA300H2TURsprint(372),       -- Total Access 3000 H2TU-R L6 for Sprint (1181126L6)
+        adTA1500MCU(373),              -- TA1500 MCU (1180434L1)
+        adTA3000BATS(374),             -- TA3000 Broadband ATM Test System (1358007L1)
+        adTA1500DDSdpQwest(375),       -- TA1500 TR DDS-DP Qwest Red-Opt (1180105L2#Q)
+        adTA3000qSHDSL(376),           -- TA 3000 SHDSL Quad Port (1181423L1)
+        adTA3000T1OR(377),             -- TA 3000 T1-OR 1st Gen (1181310L2)
+        adTA3000OC3CSM(378),           -- TA 3000 OC3 CSM ATM MUX (1181044L1)
+        reserved14(379),               -- TA 3000 OC3 CSM ATM MUX (1181044L1) (trap extension)
+        adTA1500DualCoinCot(380),      -- TA 1500 Dual Coin COT (1180432L1)
+        adTA1500DualCoinRt(381),       -- TA 1500 Dual Coin RT (1180433L1)
+        adATLAS550NxT1hssi(382),       -- ATLAS 550 NxT1 HSSI Module (1200346L1)
+        adNV3200(383),                 -- NetVanta 3200 (1200860L1)
+        adTASHDSLprot(384),            -- Total Access SHDSL LTU w/ Prot (1182008L6)
+        adTA1500qFXOMLT(385),          -- Total Access 1500 quad FXO w/ MLT (1180407L1)
+        adTAOC3L3(386),                -- TA OC-3 MUX L3 w/ 2 DS3 drops & 1 DS3 to 28 DS1s (1181031L3)
+        reserved15(387),               -- TA OC-3 MUX L3  (1181031L3) trap extension 1
+        reserved16(388),               -- TA OC-3 MUX L3  (1181031L3) trap extension 2
+        adTA1500EBSCot(389),           -- TA 1500 CO p-phone card (1180430L1)
+        adTA1500EBSRt(390),            -- TA 1500 RT p-phone card (1180431L1)
+        adIQ710Gen2(391),              -- IQ 710 2nd Gen (1202800L1)
+        adTA3000quadE1(392),           -- Total Access 3000 quad E1 (1181402L1#E)
+        adTA1500s4wDX(393),            -- TA1500 Single 4-Wire DX w/o SMAS (1180116L1)
+        adTA1500s4wDXsmas(394),        -- TA1500 Single 4-Wire DX w/ SMAS (1180116L2)
+        adTA4303PSU(395),              -- TA4303 Power Supply module (1200335L1)
+        adATLAS550MdmMgmt(396),        -- ATLAS 550 Modem Management Network Module (1200341L1)
+        adATLAS550BriDbu(397),         -- ATLAS 550 BRI DBU Network Interface Module (1200327L1)
+        adATLAS550DualUssi(398),       -- ATLAS 550 Dual USSI Module (1200754L1)
+        adATLAS550QuadT1(399),         -- ATLAS 550 Quad T1/PRI Module (1200755L1)
+        adATLAS550LgcyData(400),       -- ATLAS 550 Legacy Data Module (1200342L1)
+        adTA4303STS1(401),             -- TA4303 STS1 module (1200352L1)
+        adTADS0TSIMux(402),            -- TA 3000 DS0 TSI MUX (1182022L1)
+        adTA4303OctalBRI(403),         -- TA4303 Octal BRI module 1202332L1
+        adTA3000IVD(404),              -- TA 3000 Integrated Voice & Data triple wide (1181424L1)
+        adATLAS550PbxRsrc(405),        -- ATLAS 550 PBX Resource Module (1200756L1)
+        adATLAS550Pots(406),           -- ATLAS 550 Lifeline/POTS Network Module (1200757L1)
+        adATLAS550OctDss(407),         -- ATLAS 550 Octal DSS User Module (1200758L1)
+        adATLAS550qStBri(408),         -- ATLAS 550 Quad S/T BRI Module (1200764L1)
+        adATLAS550NxT1Imux(409),       -- ATLAS 550 NxT1 IMUX Module (1200347L1)
+        adATLAS550NxT1hssiL2(410),     -- ATLAS 550 NxT1 HSSI/V.35 Module (1200346L2)
+        adMX2810STS1(411),             -- MX2810 STS-1 card (1185004L1)
+        adTA3000H4TUCL1G1(412),        -- Total Access 3000 H4TUC, 1st Gen (1181411L1)
+        adTA850RCU(413),               -- TA850 RCU (1200376L1)
+        adTA3000SHDSLltu15gSp(414),    -- TA 3000 SHDSL LTU Single port, 1.5 Gen (1182108L1)
+        adTA3000SHDSLltu15gSpBnc(415), -- TA 3000 SHDSL LTU Single port w/ BNC, 1.5 Gen (1182108L3)
+        adTA3000SHDSLltu15gV35Bnc(416),-- TA 3000 SHDSL LTU V.35 w/ BNC 1.5 Gen (1182108L5)
+        adTA3000SHDSLltu15gSp11(417),  -- TA 3000 SHDSL LTU Single port w/ 1:1, 1.5 Gen (1182108L6)
+        adTA3000SHDSLltu15gSpT(418),   -- TA 3000 SHDSL LTU Single port, 1.5 Gen Telstra (1182108L7)
+        adTADSX1(419),                 -- TA 750/850/1500 DSX1 Module (1200385L1, 2200385-3)
+        adATLASRdntAcPs(420),          -- ATLAS Redundant AC Pwr Supply (1200220L1)
+        adATLASRdntDcPs(421),          -- ATLAS Redundant DC Pwr Supply (1200316L1)
+        adATLAS890Cntrlr(422),         -- ATLAS 890 System Controller (1200322L1)
+        adATLASOctBRI(423),            -- ATLAS Octal S/T BRI Option (1200343L1)
+        adATLAS890AcPs(424),           -- ATLAS 890 AC Power Supply (1200344L1)
+        adATLAS890DcPs(425),           -- ATLAS 890 DC Power Supply (1200345L1)
+        adATLASadpcmRsrc(426),         -- ATLAS ADPCM Resource Module (1200770L1)
+        adATLASNxT1hssi(427),          -- ATLAS NxT1 HSSI/V.35 Option (1200771L1)
+        adATLASNxT1IMUX(428),          -- ATLAS NxT1 IMUX Resource (1200772L1)
+        adATLASvideo(429),             -- ATLAS Video Option (1200773L1)
+        adATLAS830(430),               -- ATLAS 830 (1200780L1)
+        adTA3000H2TucHKT(431),         -- TA 3000 H2TUC for HKT (1181112L9)
+        adTA3000OctADSL(432),          -- TA 3000 octal ADSL (1181405L1)
+        adTAH2TUCvrzneG3(433),         -- TA 3000 H2TUC for Verizon East, 3rd Gen (1181113L1)
+        adTAH2TUCG3(434),              -- TA 3000 H2TUC for general distribution, 3rd Gen (1181113L2)
+        adTAH2TUCmciG3(435),           -- TA 3000 H2TUC for MCI, 3rd Gen (1181113L3)
+        adTAH2TUCsbcG3(436),           -- TA 3000 H2TUC for SBC, 3rd Gen (1181113L4)
+        adTAH2TUCqwestG3(437),         -- TA 3000 H2TUC for QWEST, 3rd Gen (1181113L5)
+        adTAH2TUCbellsG3(438),         -- TA 3000 H2TUC for BellSouth, 3rd Gen (1181113L6)
+        adTA3000H2TucHKTG3(439),       -- TA 3000 H2TUC for HKT, 3rd Gen (1181113L9)
+        adTA3000LTU4(440),             -- Total Access 3000 LTU-4  (1181308L1)
+        reserved17(441),               -- Total Access 3000 LTU-4  (trap extension)
+        reserved18(442),               -- Total Access 3000 LTU-4  (trap extension)
+        adTANTU4(443),                 -- Total Access NTU-4  (1181307L1)
+        adTA4303snmp(444),             -- Total Access 4303 (1200330L1) chassis w/ full SNMP
+        reserved18a(445),              -- was (1181405L2), moved to 455
+        reserved19(446),               -- MX2800 Trap extensions (1204288L1/L2)
+        adTADS3TSIE1L2(447),           -- TA 3000 DS3 TSI E1 MUX (1182020L2) 28 slot
+        adTAH2TUCHlss(448),            -- Total Access H2TUC single port dual circuit (1181213L1)
+        adTA3000H4TUCL1G2(449),        -- Total Access 3000 H4TUC, 2nd Gen (1181412L1)
+        adTA3000H4TUCL4G2(450),        -- Total Access 3000 H4TUC, 2nd Gen (1181412L4)
+        adTA3000H4TUCL5G2(451),        -- Total Access 3000 H4TUC, 2nd Gen (1181412L5)
+        adTA3000CSM128(452),           -- Total Access 3000 128 port Cell Switch Module (1181041L4)
+        adATLAS550DualVideo(453),      -- ATLAS 550 Dual Video Option (1200765L1)
+        adATLAS800octalFxs(454),       -- ATLAS 800 Octal FXS (1200338L1)
+        adTA3000OctADSL2(455),         -- TA 3000 octal ADSL + POTS splitters (1181405L2)
+        adT200SHDSLNTU(456),           -- T200 SHDSL NTU  (1225035L1)
+        adTAT1E1SHDSLLtu(457),         -- Total Access T1/E1 SHDSL LTU  (1182210L1)
+        adTAOPTI3L2(458),              -- Total Access OPTI3L2 (1184002L2)
+        adTA1500s4wFxoSmas(459),       -- TA1500 Single 4-Wire FXO w/  SMAS (1180117L1)
+        adTA1500s4wFxoNoSmas(460),     -- TA1500 Single 4-Wire FXO w/o SMAS (1180117L2)
+        adTA1500s4wFxsSmas(461),       -- TA1500 Single 4-Wire FXS w/  SMAS (1180118L1)
+        adTA1500s4wFxsNoSmas(462),     -- TA1500 Single 4-Wire FXS w/o SMAS (1180118L2)
+        adTA1000DualT1E1Liu(463),      -- Total Access 1000 DSLAM DUAL T1/E1 LIU (1179010L1)
+        adTA3000CSMcr(464),            -- Total Access 3000 DS3 Cell Switch Module cost reduced (1181041L2)
+        adATLAS550EtherSwitch(465),    -- ATLAS 550 Ethernet Switch Module (1200766L1)
+        adNV3205(466),                 -- NetVanta 3205 (1200870L1)
+        adNV3305(467),                 -- NetVanta 3305 (1200880L1)
+        adNV3xxxDDS(468),              -- NetVanta 3xxx DDS (1200861L1)
+        adNV3xxxT1(469),               -- NetVanta 3xxx T1 (1200862L1)
+        adNV3xxxT1Dsx1(470),           -- NetVanta 3xxx T1/Dsx-1 (1200863L1)
+        adNV3xxxV90dbu(471),           -- NetVanta 3xxx V.90 DBU (1200864L1)
+        adNV3xxxISDNdbu(472),          -- NetVanta 3xxx ISDN DBU (1200865L1)
+        adNV3xxxSerial(473),           -- NetVanta 3xxx Serial (1200866L1)
+        adNV3xxxSHDSL(474),            -- NetVanta 3xxx SHDSL (1200867L1)
+        adTA624(475),                  -- Total Access 624 (4200624L1#ATM & 4200624L1#TDM)
+        adTA600R(476),                 -- Total Access 600R Router-Only (4200600L1#TDM)
+        adTA1500s4wToSmas(477),        -- TA1500 Single 4-Wire TO w/ SMAS (1180112L1)
+        adTA1500s4wToNoSmas(478),      -- TA1500 Single 4-Wire TO w/o SMAS (1180112L2)
+        adTA3000E1FR(479),             -- TA 3000 E1 Frame Relay (1182414L1)
+        adTA1500s2wFxsGtSmas(480),     -- TA1500 Single 2-Wire FXS/GT w/  SMAS (1180114L1)
+        adTA1500s2wFxsGtNoSmas(481),   -- TA1500 Single 2-Wire FXS/GT w/o SMAS (1180114L2)
+        adTA3000OctDs1E1IMA(482),      -- TA3000 Octal DS1/E1 IMA (1181409L2)
+        adTA3000QuadDs1IMA(483),       -- TA3000 Quad DS1 IMA (1181409L10)
+        adMX2820(484),                 -- MX2820 shelf  19"             (1186001L1)
+        adMX2820M13(485),              -- MX2820 M13 DS3 Mux module     (1186002L1)
+        adMX2820Scu(486),              -- MX2820 SCU card               (1186003L1)
+        adMX2820Clock(487),            -- MX2820 Clock card             (1186004L1)
+        adTASHDSL4(488),               -- Total Access SHDSL4 LTU  (1182118L1)
+        adTA1500s4wEtoSmas(489),       -- TA1500 Single 4-Wire ETO w/ SMAS (1180113L1)
+        adTA1500s4wEtoNoSmas(490),     -- TA1500 Single 4-Wire ETO w/o SMAS (1180113L2)
+        adTA604(491),                  -- Total Access 604 (T1model)  (1200641L1)
+        adTA612(492),                  -- Total Access 612 (T1model)  (1200612L1)
+        adTA616(493),                  -- Total Access 616 (T1model)  (1200616L1)
+        adMX2820wide(494),             -- MX2820 shelf  23"        (1186001L2)
+        adOptiMXshelf(495),            -- OPTI-MX shelf                            (1184501L1)
+        adOptiMXOc3OMM(496),           -- OPTI-MX OC3 Mux                          (1184502L1)
+        adOptiMXOc3OMMx1(497),         -- OPTI-MX OC3 Mux Trap Exten               (1184502L1)
+        adOptiMXT1E1(498),             -- OPTI-MX DS1 line card (T1/E1)            (1184513L1)
+        adOptiMXT1E1x1(499),           -- OPTI-MX DS1 line card (T1/E1) Trap Exten (1184513L1)
+        adOptiMXDs3(500),              -- OPTI-MX DS3 line card                    (1184503L1)
+        adNV2050(501),                 -- NetVanta 2050 (1202362L1)
+        adNV2054(502),                 -- NetVanta 2054 (1202362L2)
+        adNV2100(503),                 -- NetVanta 2100 (1202361L1)
+        adNV2104(504),                 -- NetVanta 2104 (1202361L2)
+        adNV2300(505),                 -- NetVanta 2300 (1202366L1)
+        adNV2400(506),                 -- NetVanta 2400 (1202367L1)
+        adOptiMXScm(507),              -- OPTI-MX SCM Controller                   (1184500L1)
+        adTA1200Shelf(508),            -- TA1200 RDS shelf                                (1179601L1)
+        adTA1280Shelfalc(509),         -- TA1280 RDS shelf                      (Alcatel) (1179601L1#A)
+        adTA1200QuadIMA(510),          -- TA1200 Quad IMA module "network card"           (1179611L1)
+        adTA1280QuadIMAalc(511),       -- TA1280 Quad IMA module "network card" (Alcatel) (1179611L1#A)
+        adTA3000HC(512),               -- TA3000 23 inch domestic High Cap shelf    (1181001L2)
+        adTA3kPCU(513),                -- TA3000 Primary Controller Unit            (1181918L1)
+        adTA3kPSM(514),                -- TA3000 Primary Switch Module              (1181041L3)
+        adTA3kECU(515),                -- TA3000 Expansion Controller Unit          (1181919L1)
+        adTA3kSAM(516),                -- TA3000 Subtending Access Module           (1181046L1)
+        adTA3kSCUL2(517),              -- TA3000 System Controller Unit - No FLD    (1181018L2)
+        adTA3kH4TUCL1G3(518),          -- TA3000 H4TUC, 3rd Gen (1181413L1)
+        adTA3kH4TUCL4G3(519),          -- TA3000 H4TUC, 3rd Gen (1181413L4)
+        adTA3kH4TUCL5G3(520),          -- TA3000 H4TUC, 3rd Gen (1181413L5)
+        adTA3kSCUL3(521),              -- TA3000 System Controller Unit - No FCD, w/Inband (1181018L3)
+        adTA1500d4wEtoSmas(522),       -- TA1500 Dual 4-Wire ETO w/ SMAS (1180213L1)
+        adTA1500d4wEtoNoSmas(523),     -- TA1500 Dual 4-Wire ETO w/o SMAS (1180213L2)
+        adTA1500UBRITE(524),           -- TA1500 U-BRITE w/PWR (1180020L2)
+        adNV1224(525),                 -- NetVanta 1224 (1200500L1)
+        adNV1224ST(526),               -- NetVanta 1224ST (1200500L2)
+        adATLAS550Nx(527),             -- ATLAS 550 NX Module - 1200349L1
+        adTA3KoADSLCwEta(528),         -- TA 3000 octal ADSL-C w/ ETA               (1181425L2)
+        adATLAS550DualFXO(529),        -- ATLAS 550 Dual FX0 Module - 1200349L1
+        adTA1500dFXOGT(530),           -- TA1500 Dual FXO GT w/o SMAS (1180215L2)
+        adTA1500dFXOGTsmas(531),       -- TA1500 Dual FXO GT w/ SMAS  (1180215L1)
+        adTA1500dFXOGTLuc(532),        -- Dual FXO GT                 (1133215L1)
+        adOptiMXOc12OMM(533),          -- OPTI-MX OC12 Sonet Mux      (1184504L1-4)
+        adTA1500s4wTdmSmas(534),       -- TA1500 4-Wire TDM w/  SMAS  (1180119L1)
+        adTA1500s4wTdm(535),           -- TA1500 4-Wire TDM w/o SMAS  (1180119L2)
+        adOptiSMXshelf(536),           -- OPTI-SMX shelf              (1184514L1)
+        adTA1200ADSL(537),             -- TA1200 24 port ADSL module            (1179601L1)  Same ID as shelf
+        adTA1280ADSLalc(538),          -- TA1280 24 port ADSL module  (Alcatel) (1179601L1#A)Same ID as shelf
+        adTADS3MUXL3(539),             -- Total Access DS3 MUX List 3 (1181020L3)
+        adTADS3MUXL4(540),             -- Total Access DS3 MUX List 4 (1181020L4)
+        adTA3000SAM(541),              -- TA3000  1181001L1    TA3000 23 inch domestic shelf          SAM/DSLAM
+        adTA3010SAM(542),              -- TA3010  1182003L1    TA3010 19 inch domestic shelf          SAM/DSLAM
+        adTA3011SAM(543),              -- TA3011  1182001L1    Total Access OMP-FC                    SAM/DSLAM
+        adTA3011MexSAM(544),           -- TA3011  1181001L1#M  Total Access for Mexico                SAM/DSLAM
+        adTA3010LASAM(545),            -- TA3010  1182013L1    19 inch Loop Access Punch Down HDX chassis        SAM/DSLAM
+        adTA3000HCSAM(546),            -- TA3000  1181001L2    TA3000 23 inch domestic High Cap shelf SAM/DSLAM
+        adOptiMXVT15(547),             -- OPTI-MX VT1.5 line card               (1184515L1)
+        adOptiMXVT15x1(548),           -- OPTI-MX VT1.5 line card Trap Exten    (1184515L1)
+        adTA3kQDFC(549),               -- TA3000 QDFC, Quad DS1/Mux to Fiber           (1181308L4)
+        adTA3kQDFCx1(550),             -- TA3000 QDFC, Quad DS1/Mux to Fiber Trap Ext. (1181308L4)
+        adTA3kQDFR(551),               -- TA3000 QDFR, Fiber to Quad DS1/Mux           (1181307L4)
+        adTA3kQuadFrAtm(552),          -- TA3000 Quad E1/DSX1 Frame Relay/ATM          (1181415L1)
+        adTA3kOC3Qmux(553),            -- TA3000 OC3 Mux w/ Quad DSX to line cards     (1181031L4)
+        adTA3kOC3Qmuxx1(554),          -- TA3000 OC3 Mux w/ Quad DSX to line cards Trap Ext. (1181031L4)
+        adTAIadNwPhoneT1(555),         -- Total Access IAD Network Telephone T1        (1200608L1)
+        adTAIad600Rg3(556),            -- Total Access IAD 3rd gen 600R Router         (1203600L1)
+        adTAIad604g3(557),             -- Total Access IAD 3rd gen 604                 (1203640L1)
+        adTAIad608g3(558),             -- Total Access IAD 3rd gen 608                 (1203680L1)
+        adTAIad612g3(559),             -- Total Access IAD 3rd gen 612                 (1203612L1)
+        adTAIad616g3(560),             -- Total Access IAD 3rd gen 616                 (1203616L1)
+        adTAIad624g3(561),             -- Total Access IAD 3rd gen 624                 (1203624L1)
+        adMX2820M13L10(562),           -- MX2820 M13 access module DS1->DS3 (1186002L10)
+        adTA3kH4TUCL2G3(563),          -- TA3000 H4TUC, 3rd Gen (1181413L2)  augments 518-520
+        adOptiMXTransMux(564),         -- OPTI-MX STS-1 to DS3 with VT1.5 payload      (1184512L1)
+        adOptiMXOC3Trib(565),          -- OPTI-MX OC3 Fiber Card                       (1184543L1)
+        adOptiMXDS3TripleW(566),       -- OPTI-MX Triple Wide DS3 Interface            (1184533L1)
+        adSmart16eGen2(567),           -- Gen 2 Smart 16 Shelf Controller (1202162L1)
+        adMX2820STS1(568),             -- MX2820 STS1 Mux module     (1186005L1)
+        adTA4303Plus(569),             -- TA4303 Plus chassis              (1200330L2)
+        adTA4303PlusScu(570),          -- TA4303 Plus SCU                  (1202334L1)
+        adTA4303PlusDS3(571),          -- TA4303 Plus DS3                  (1202333L1)
+        adTA4303PlusSTS1(572),         -- TA4303 Plus STS1                 (1202352L1)
+        adTA4303PlusDSX1(573),         -- TA4303 Plus Octal DSX1 (BRI)     (1202331L1)
+        adTA4303PlusPsu(574),          -- TA4303 Plus Power Supply Unit    (1202335L1)
+        adTA30x0AccMTC(575),           -- TA30x0 Accessory Metallic Test Controller  (1183010L1)
+        adExp6531SHDSL(576),           -- Express 6531 SHDSL NxNTU         (1225105L1)
+        adIQ790(577),                  -- IQ 790            (1200831L1)
+        adNV5305(578),                 -- Netvanta 5305     (1200990L1)
+        adTA1124OSP(579),              -- TA1124 OSP shelf                 (1179724L1)
+        adTA1125DSLAM(580),            -- TA1124 DSLAM shelf               (1179725L1)
+        adNvIsdnSt(581),               -- NetVanta ISDN S/T DIM            (1200875L1)
+        adNV1224R(582),                -- NetVanta 1224R                   (1200510L1)
+        adNV1224STR(583),              -- NetVanta 1224STR                 (1200520L1)
+        adNvE1(584),                   -- NetVanta E1 NIM                  (1200868L1)
+        adNvE1G703(585),               -- NetVanta E1 & G.703 NIM          (1200878L1)
+        adNv4305(586),                 -- NetVanta 4305                    (1200890L1)
+        adTAH2TUCHlssVrz(587),         -- Total Access H2TUC HLSS dual circuit for Verizon,      (1181214L1)
+        adTAH2TUCHlssDist(588),        -- Total Access H2TUC HLSS dual circuit for Distribution, (1181214L2)
+        adTAH2TUCHlssSbc(589),         -- Total Access H2TUC HLSS dual circuit for SBC,          (1181214L4)
+        adTAH2TUCHlssBells(590),       -- Total Access H2TUC HLSS dual circuit for Bellsouth,    (1181214L6)
+        adTA1124ADSL(591),             -- TA1124 24 port internal ADSL module       (2179724-1)
+        adTA1124Network(592),          -- TA1124 internal network module            (2179724-10)
+        adTracer6420(593),             -- Tracer 6420 5.8ghz Modular Radio          (12806420L1A) and (12806420L1B)
+        adOptiMXEthM(594),             -- OPTI-MX Ethernet Module                (1184510L1)
+        adOptiMXEthMx1(595),           -- OPTI-MX Ethernet Module trap extension (1184510L1)
+        adTSUNvRouter(596),            -- TSU Router Module Option Card (1202350L1)
+        adIQ7xxT1Probe(597),           -- IQ710 T1 Probe Card (1202804L1)
+        adTA1500qRS232(598),           -- TA1500 Quad RS232 (1180435L1)
+        adTA1200NetworkL2(599),        -- (1179611L2)       TA1200 Network module
+        adTA1200NetworkL3IP(600),      -- (1179611L3)       TA1200 Network Module  (IP Fed)
+        adCN24Shelf(601),              -- (1179601L1#C)     TA1200 CN24 Chassis
+        adCN24ADSL(602),               -- (1179601L1#C)     TA1200 CN24 24 port ADSL
+        adCN24Network(603),            -- (1179611L1#C)     TA1200 CN24 Network/IMA
+        adOptiMXEthGB(604),            -- (1184516L1)       OPTI-MX Single port Giga-Bit Cu Ethernet
+        adTAH2TUCSpHlssDist(605),      -- (1181213L2)       Total Access H2TUC HLSS single port dual circuit for Distribution,
+        adTA900Rac(606),               -- (1200630L1)       TA900R AC version
+        adTA900Rdc(607),               -- (1200630L2)       TA900R DC version
+        adTA3kQDFCL7G1(608),           -- (1181308L7)       TA3000 QDFC, 1st Gen
+        adCN24m211(609),               -- (1179701L1#C)     TA1200 CN24 Model 211 Mini-DSLAM (chassis, ADSL module, network module) Sealed, Quad T1 IMA fed
+        adCN24m211ADSL(610),           -- (1179701L1#C)     TA1200 CN24 Model 211 ADSL module
+        adCN24m211Network(611),        -- (1179701L1#C)     TA1200 CN24 Model 211 Network Quad T1 IMA module
+        adCN24m212(612),               -- (1179702L1#C)     TA1200 CN24 Model 212 Mini-DSLAM (chassis, ADSL module, network module) Sealed, Quad HDSL4 IMA
+        adCN24m212ADSL(613),           -- (1179702L1#C)     TA1200 CN24 Model 212 ADSL module
+        adCN24m212Network(614),        -- (1179702L1#C)     TA1200 CN24 Model 212 Network Quad HDSL4 IMA module
+        adTA1101(615),                 -- (1179701L1)       TA1101 (chassis, ADSL module, network module) Sealed, Quad T1 IMA fed
+        adTA1101ADSL(616),             -- (1179701L1)       TA1101 ADSL module
+        adTA1101Network(617),          -- (1179701L1)       TA1101 Network Quad T1 IMA module
+        adTA1102(618),                 -- (1179702L1)       TA1102 (chassis, ADSL module, network module) Sealed, Quad HDSL4 IMA fed
+        adTA1102ADSL(619),             -- (1179702L1)       TA1102 ADSL module
+        adTA1102Network(620),          -- (1179702L1)       TA1102 Network Quad HDSL4 IMA module
+        adTA3050(621),                 -- (1183001L1)       TA3050 23" Accessory Shelf for 3000
+        adTA3060(622),                 -- (1183006L1)       TA3060 19" Accessory Shelf for 3010
+        adTA30x0AccSpltrNoTest(623),   -- (1183002L1)       TA30x0 Accessory ADSL Splitter w/o Test Access
+        adTA30x0AccSpltrTest(624),     -- (1183002L2)       TA30x0 Accessory ADSL Splitter w/  Test Access
+        adTA30x0AccCTMNoTest(625),     -- (1183003L1)       TA30x0 Accessory Cut Thru Module w/o Test Access
+        adTA30x0AccCTMTest(626),       -- (1183003L2)       TA30x0 Accessory Cut Thru Module w/  Test Access
+        adTA30x0AccETSINoTest(627),    -- (1183007L1)       TA30x0 Accessory ETSI Splitter w/o Test Access
+        adTA1500TriCdp(628),           -- (1180182L1)       TA1500 TRI-C DP
+        adTA3kLpu(629),                -- (1181500L1)       TA3000 LPU line Power Unit for remote power
+        adOptiMXGESM(630),             -- (1184518L1)       OPTI-MX · Giga-Bit Ethernet With Single-Mode Fiber Interface
+        adOptiMXGEMM(631),             -- (1184519L1)       OPTI-MX · Giga-Bit Ethernet With Multi-Mode Fiber Interface
+        adOptiMXTRAM3(632),            -- (1184532L1)       OPTI-MX · 3 Wide TransMux - DS3 with VT1.5 payload (see ProdID 998)
+        adIQ310(633),                  -- (1203800L1)        IQ310
+        adTA3kRMM(634),                -- (1181019L1)       TA3000 RMM  Remote management module ethernet bridge
+        adTA3kIMA16GSHDSL(635),        -- (1181429L1)       TA3000 IMA G.SHDSL 16 Port
+        adTA3kSHDSLqE1CES(636),        -- (1182421L1)       TA3000 SHDSL E1/CES 4 Port
+        adNV5xxxT3(637),               -- (1200832L1)        NetVanta 5305 T3 NIM
+        adNV950(638),                  -- (1200788L1)        NetVanta 950 System Controller Unit
+        adNV970(639),                  -- (1200787L1)        NetVanta 970 System Controller Unit
+        adNV9xxESM(640),               -- (1200793L1)        NetVanta 950/970 Octal Ethernet Switch Module
+        adNV9xxFXS(641),               -- (1200791L1)        NetVanta 950/970 Octal FXS Module
+        adNV9xxFXO(642),               -- (1200792L1)        NetVanta 950/970 Octal FXO Module
+        adNV970DSS(643),               -- (1200790L1)        NetVanta 970 Octal DSS Module
+        adNV950T1V35(644),             -- (1200798L1)        NetVanta T1/V35 Expansion Module
+        adTA1500singleFXSsmas(645),    -- (1180108L1)       TA 1500 Single FXS w/ SMAS
+        adTA1500singleFXS(646),        -- (1180108L2)       TA 1500 Single FXS w/o SMAS
+        adTA1500sFXOdptTOsmas(647),    -- (1180107L3)       TA 1500 Single FXO/DPT/TO w/ SMAS
+        adTA1500sFXOdptTO(648),        -- (1180107L4)       TA 1500 Single FXO/DPT/TO w/o SMAS
+        adTA1500dFXOdptTO(649),        -- (1180207L4)       TA 1500 Dual FXO/DPT/TO w/o SMAS
+        adTA1500dFXOdptTOsmasLuc(650), -- (1133207L3)       TA 1500 Dual FXO/DPT/TO w/ SMAS
+        adTA600Ratm(651),              -- (4203600L1#ATM)   TA 600R Router-Only
+        adTA612atm(652),               -- (4203612L1#ATM)   TA 612 ATM IAD
+        adTA616atm(653),               -- (4203616L1#ATM)   TA 616 ATM IAD
+        adTA624atm(654),               -- (4203624L1#ATM)   TA 624 ATM IAD
+        adTA604atm(655),               -- (4203640L1#ATM)   TA 604 ATM IAD
+        adTA608atm(656),               -- (4203680L1#ATM)   TA 608 ATM IAD
+        adTA850Rcu3Gatm(657),          -- (4203376L1#ATM)   TA 850 3G RCU ATM IAD
+        adOptiMXEth8(658),             -- (1184524L1)       OPTI-MX 8 port 10/100 Ethernet
+        adTA3kHexADSL2Plus(659),       -- (1181426L1)       TA 3000 hex (16 port) ADSL2+
+        adTA3kSpirentITH(660),         -- (KD #?)            TA 3000  Spirent ITH Test Access Card
+        adTA3kSM2(661),                -- (1181047L1)       TA 3000 Dual GigE Switch Module
+        adTA30x0AccDS1CutThruNoTest(662), -- (1183008L1)    TA30x0 Accessory DS1 Cut Thru w/o Test Access
+        adMX3000(663),                 -- (1189001L1)       MX3000 Chassis
+        adMX3208Ctrl(664),             -- (1189002L1)       MX3208 Controller  2-DS3, 8-DSX
+        adOptiMXDS1VME(665),           -- (1184515L2 )      OPTI-MX 28 Port VT1.5 card with framers
+        adTA1148qT1oL123(667),         -- (1179741L1/L2/L3) TA1148 w/ 4 T1 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148qT1oL4v5v(668),        -- (1179741L4V/L5V)  TA1148 w/ 4 T1 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148sNIoL123(669),         -- (1179740L1/L2/L3) TA1148 Subtended Network Interface, 48 ADSL Ports in OSP enclosure
+        adTA1148qHDSLoL123(670),       -- (1179742L1/L2/L3) TA1148 w/ 4 HDSL4 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148qHDSLoL4v5v(671),      -- (1179742L4V/L5V)  TA1148 w/ 4 HDSL4 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1248qT1L1(672),            -- (1179641L1)       TA1248 w/ 4 T1 IMA Network Interface, 48 ADSL ports in 1 mtg space 19" rack enclosure
+        adTA1248sNIL5(673),            -- (1179641L5)       TA1248 Subtended Network Interface, 48 ADSL ports in 1 mtg space 19" rack enclosure
+        adTA1124qT1oL123(674),         -- (1179721L1/L2/L3) TA1124 w/ 4 T1 IMA Network Interface, 24 ADSL ports in OSP enclosure
+        adTA1124qHDSLoL123(675),       -- (1179722L1/L2/L3) TA1124 w/ 4 HDSL4 IMA Network Interface, 24 ADSL ports in OSP enclosure
+        adTA1124sNIL123(676),          -- (1179720L1/L2/L3) TA1124 Subtended Network Interface, 24 ADSL Ports in OSP enclosure
+        adTA1224qT1L1(677),            -- (1179621L1)       TA1224 w/ 4 T1 IMA Network Interface, 24 ADSL ports in 1 mtg space 19" rack enclosure
+        adTA1224sNIL5(678),            -- (1179621L5)       TA1224 Subtended Network Interface, 24 ADSL ports in 1 mtg space 19" rack enclosure
+        adOptiMXEthM8E(679),           -- (1184525L1)       OPTI-MX 8 Port 10/100 Enhanced Ethernet with VLAN Double Tagging
+        adExp6540acSHDSL(680),         -- (1230001L1)       Express 6540, AC, SHDSL remote unit
+        adExp6540dcSHDSL(681),         -- (1230002L1)       Express 6540, DC, SHDSL remote unit
+        adExp6541acSHDSL(682),         -- (1230007L1)       Express 6541, AC, SHDSL remote unit
+        adExp6541dcSHDSL(683),         -- (1230008L1)       Express 6541, DC, SHDSL remote unit
+        adExp6542SHDSL(684),           -- (1230009L1)       Express 6542, SHDSL remote unit
+        adOpti61VTccMux(685),          -- (1184536L1)       OPTI-6100 VT Cross-Connect MUX
+        adTA1148oT1ospL123(686),       -- (1179743L1/L2/L3) TA1148 w/ 8 T1 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148oHDSLospL123(687),     -- (1179748L1/L2/L3) TA1148 w/ 8 HDSL4 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1248oT1L4(688),            -- (1179641L4)       TA1248 w/ 8 T1 IMA Network Interface, 48 ADSL ports in 1 mtg space 19" rack enclosure
+        adTA1124oT1ospL123(689),       -- (1179723L1/L2/L3) TA1124 w/ 8 T1 IMA Network Interface, 24 ADSL ports in OSP enclosure
+        adTA1124oHDSLospL123(690),     -- (1179728L1/L2/L3) TA1124 w/ 8 HDSL4 IMA Network Interface, 24 ADSL ports in OSP enclosure
+        adTA1224oT1L4(691),            -- (1179621L4)       TA1224 w/ 8 T1 IMA Network Interface, 24 ADSL ports in 1 mtg space 19" rack enclosure
+        adTA1148qT1oL123A(692),        -- (1179741L1/L2/L3-A) TA1148 1179741L1/L2/L3 48 Port ADSL Module
+        adTA1148qT1oL123N(693),        -- (1179741L1/L2/L3-N) TA1148 1179741L1/L2/L3 4 Port T1 IMA Network Module
+        adTA1148qT1oL4v5vA(694),       -- (1179741L4V/L5V-A)  TA1148 1179741L4V/L5V 48 Port ADSL Module
+        adTA1148qT1oL4v5vN(695),       -- (1179741L4V/L5V-N)  TA1148 1179741L4V/L5V 4 Port T1 IMA Network Module
+        adTA1148sNIoL123A(696),        -- (1179740L1/L2/L3-A) TA1148 1179740L1/L2/L3 48 Port ADSL Module
+        adTA1148sNIoL123N(697),        -- (1179740L1/L2/L3-N) TA1148 1179740L1/L2/L3 Subtending Network Module
+        adTA1148qHDSLoL123A(698),      -- (1179742L1/L2/L3-A) TA1148 1179742L1/L2/L3 48 Port ADSL Module
+        adTA1148qHDSLoL123N(699),      -- (1179742L1/L2/L3-N) TA1148 1179742L1/L2/L3 4 Port HDSL4 IMA Network Module
+        adTA1148qHDSLoL4v5vA(700),     -- (1179742L4V/L5V-A)  TA1148 1179742L4V/L5V 48 Port ADSL Module
+        adTA1148qHDSLoL4v5vN(701),     -- (1179742L4V/L5V-N)  TA1148 1179742L4V/L5V 4 Port HDSL4 Network Module
+        adTA1248qT1L1A(702),           -- (1179641L1-A)       TA1248 1179641L1 48 Port ADSL Module
+        adTA1248qT1L1N(703),           -- (1179641L1-N)       TA1248 1179641L1 4 Port T1 IMA Network Module
+        adTA1248sNIL5A(704),           -- (1179641L5-A)       TA1248 1179641L5 48 Port ADSL Module
+        adTA1248sNIL5N(705),           -- (1179641L5-N)       TA1248 1179641L5 Subtending Network Module
+        adTA1124qT1oL123A(706),        -- (1179721L1/L2/L3-A) TA1124 1179721L1/L2/L3 24 Port ADSL Module
+        adTA1124qT1oL123N(707),        -- (1179721L1/L2/L3-N) TA1124 1179721L1/L2/L3 4 Port T1 IMA Network Module
+        adTA1124qHDSLoL123A(708),      -- (1179722L1/L2/L3-A) TA1124 1179722L1/L2/L3 24 Port ADSL Module
+        adTA1124qHDSLoL123N(709),      -- (1179722L1/L2/L3-N) TA1124 1179722L1/L2/L3 4 Port HDSL4 IMA Network Module
+        adTA1124sNIL123A(710),         -- (1179720L1/L2/L3-A) TA1124 1179720L1/L2/L3 24 Port ADSL Module
+        adTA1124sNIL123N(711),         -- (1179720L1/L2/L3-N) TA1124 1179720L1/L2/L3 Subtending Network Module
+        adTA1224qT1L1A(712),           -- (1179621L1-A)       TA1224 1179621L1 24 Port ADSL Module
+        adTA1224qT1L1N(713),           -- (1179621L1-N)       TA1224 1179621L1 4 Port T1 IMA Network Module
+        adTA1224sNIL5A(714),           -- (1179621L5-A)       TA1224 1179621L5 24 Port ADSL Module
+        adTA1224sNIL5N(715),           -- (1179621L5-N)       TA1224 1179621L5 Subtending Network Module
+        adTA1148oT1ospL123A(716),      -- (1179743L1/L2/L3-A) TA1148 1179743L1/L2/L3 48 Port ADSL Module
+        adTA1148oT1ospL123N(717),      -- (1179743L1/L2/L3-N) TA1148 1179743L1/L2/L3 8 Port T1 IMA Network Module
+        adTA1148oHDSLospL123A(718),    -- (1179748L1/L2/L3-A) TA1148 1179748L1/L2/L3 48 Port ADSL Module
+        adTA1148oHDSLospL123N(719),    -- (1179748L1/L2/L3-N) TA1148 1179748L1/L2/L3 8 Port HDSL4 Network Module
+        adTA1248oT1L4A(720),           -- (1179641L4-A)       TA1248 1179641L4 48 Port ADSL Module
+        adTA1248oT1L4N(721),           -- (1179641L4-N)       TA1248 1179641L4 8 Port T1 IMA Network Module
+        adTA1124oT1ospL123A(722),      -- (1179723L1/L2/L3-A) TA1124 1179723L1/L2/L3 24 Port ADSL Module
+        adTA1124oT1ospL123N(723),      -- (1179723L1/L2/L3-N) TA1124 1179723L1/L2/L3 8 Port T1 IMA Network Module
+        adTA1124oHDSLospL123A(724),    -- (1179728L1/L2/L3-A) TA1124 1179728L1/L2/L3 24 Port ADSL Module
+        adTA1124oHDSLospL123N(725),    -- (1179728L1/L2/L3-N) TA1124 1179728L1/L2/L3 8 Port HDSL4 Network Module
+        adTA1224oT1L4A(726),           -- (1179621L4-A)       TA1224 1179621L4 24 Port ADSL Module
+        adTA1224oT1L4N(727),           -- (1179621L4-N)       TA1224 1179621L4 8 Port T1 IMA Network Module
+        adTA1124qHDSLoL4v5vns(728),    -- (1179722L4V/L5V)    TA1124 w/ 4 HDSL4 IMA Network Interface, 24 ADSL Ports in OSP enclosure (no subtending)
+        adTA1124qHDSLoL4v5vnsA(729),   -- (1179722L4V/L5V-A)  TA1124 1179722L4V/L5V 24 Port ADSL Module
+        adTA1124qHDSLoL4v5vnsN(730),   -- (1179722L4V/L5V-N)  TA1124 1179722L4V/L5V 4 Port HDSL4 IMA Network Module
+        adTA1124qT1oL4v5vns(731),      -- (1179721L4V/L5V)    TA1124 w/ 4 T1 IMA Network Interface, 24 ADSL Ports in OSP enclosure (no subtending)
+        adTA1124qT1oL4v5vnsA(732),     -- (1179721L4V/L5V-A)  TA1124 1179721L4V/L5V 24 Port ADSL Module
+        adTA1124qT1oL4v5vnsN(733),     -- (1179721L4V/L5V-N)  TA1124 1179721L4V/L5V 4 Port T1 IMA Network Module
+        adTA1224qT1L1ns(734),          -- (1179622L1)         TA1224 w/ 4 T1 IMA Network Interface, 24 ADSL ports in 1 mtg space 19" rack enclosure (no subtending)
+        adTA1224qT1L1nsA(735),         -- (1179622L1-A)       TA1224 1179622L1 24 Port ADSL Module
+        adTA1224qT1L1nsN(736),         -- (1179622L1-N)       TA1224 1179622L1 4 Port T1 IMA Network Module
+        adTA1248qT1L1ns(737),          -- (1179642L1)         TA1248 w/ 4 T1 IMA Network Interface, 48 ADSL ports in 1 mtg space 19" rack enclosure (no subtending)
+        adTA1248qT1L1nsA(738),         -- (1179642L1-A)       TA1248 1179642L1 48 Port ADSL Module
+        adTA1248qT1L1nsN(739),         -- (1179642L1-N)       TA1248 1179642L1 4 Port T1 IMA Network Module
+        adTA3kOC3LM(740),              -- (1181454L1)       TA3000 OC3 Line Module
+        adTA3kHexSHDSL(741),           -- (1181422L1)       TA 3000 2w4w SHDSL 16 Port
+        adNV1224PoE(742),              -- (1200580L1)        NV1224 PoE
+        adNV1224STPoE(743),            -- (1200584L1)        NV1224ST PoE
+        adNV1224RPoE(744),             -- (1200530L1)        NV1224R PoE
+        adNV1224STRPoE(745),           -- (1200570L1)        NV1224STR PoE
+        adNV340(746),                  -- (1200422L1)        Netvanta 340 chassis
+        adTA500023(747),               -- (1187001L1)       TA 5000 23 inch shelf
+        adTA500019(748),               -- (1187002L1)       TA 5000 19 inch shelf
+        adTA5kSCM(749),                -- (1187010L1)       TA5k System Controller Module
+        adTA5kSwM(750),                -- (1187020L1)       TA5k Switch Module
+        adTA5kFan23(751),              -- (1187080L1)       TA5k 23" Fan Module
+        adTA5k32pADSL2(752),           -- (1187101L1)       TA5k 32 PORT ADSL2+
+        adTA5k24pPOTS(753),            -- (1187150L1)       TA5k 24 PORT POTS
+        adTA5kETSI32Spltr(754),        -- (1188105L1)       TA5k ETSI ADJ 32 SPLITTER
+        adTA5kANSI32Spltr(755),        -- (1187105L1)       TA5k ANSI ADJ 32 SPLITTER
+        adTA5kSHDSL(756),              -- (1187110L1)       TA5k SHDSL
+        adTA5kqAtmOC3LM(757),          -- (1187210L1)       TA5k Quad ATM OC3 line module
+        adTA5kOLT(758),                -- (1187201L1)       TA5k PON 622/155 OLT card
+        adTA5k32DS1vGW(759),           -- (1187800L1)       TA5k 32 DS1 voice gateway
+        adNV1524ST(760),               -- (1200560L1)       Netvanta 1524ST
+        adOptiMXDS3M3E(761),           -- (1184533L2)       OPTI-MX 3 Port DS3/EC1 card with framers
+        adTA3kHexPOTS(762),            -- (1181441L1)       TA 3000 hex (16 port) POTS
+        adTA3kHexPOTSADSL(763),        -- (1181442L1)       TA 3000 hex (16 port) POTS + ADSL
+        adNV344(764),                  -- (1200423L1)       Netvanta 344
+        adTA3kHexVDSL2(765),           -- (1181471L1)       TA 3000 16-Port VDSL2
+        adTA1240EthSHDSL2w4wShelf(766),-- (1179605L5)       TA1240 L5 Ethernet 2w4w SHDSL Shelf
+        adTA1240SHDSL2w4w(767),        -- (1179605L5)A      TA1240 L5 2w4w SHDSL module
+        adTA1240Eth(768),              -- (1179605L5)B      TA1240 L5 Ethernet module
+        adTA3kLTU8cr(769),             -- (1182300L1)       Total Access 3000 cost-reduced LTU-8 (346)
+        adTA3kOctADSL2Plus(770),       -- (1181426L2)       TA 3000 octal (8 port) ADSL2+ Splitter card w/ ETA
+        adNV3xxxDualT1(771),           -- (1200872L1)       NetVanta 3xxx DualT1 (1200872L1)
+        adMX3RMM(772),                 -- (1189004L1)       MX3 Remote Management Module
+        adTA5kFan19(773),              -- (1187085L1)       TA5k 19" Fan Module
+        adTA3kOctDs1E1IMAg3(774),      -- (1181409L12)      TA3000 Octal DS1/E1 IMA, 3rd Gen
+        adTA3kQuadDs1E1IMAg3(775),     -- (1181409L14)      TA3000 Quad DS1/E1 IMA, 3rd Gen
+        adTA30x0AccSpltrEmVid(776),    -- (1183102L1)       TA30x0 Accessory 8-port POTS Splitter with enhanced magnetics for Video Support
+        adTA30x0AccSpltrEmTest(777),   -- (1183102L2)       TA30x0 Accessory 8-port POTS Splitter with enhanced magnetics and test access
+        adTA30x0AccSpltrEmTestProt(778),--(1183002L12)      TA30x0 Accessory 8-port POTS Splitter with enhanced magnetics and test access and POTS protection
+        adTA908(779),                  -- (1200908L1)       TA908
+        adTA912(780),                  -- (4210912L1)       TA912
+        adTA916(781),                  -- (4210916L1)       TA916
+        adTA908e(782),                 -- (1200909L1)       TA908e
+        adTA912e(783),                 -- (1200913L1)       TA912e
+        adTA916e(784),                 -- (1200917L1)       TA916e
+        adTAEMSL1(785),                -- (4150TAEMSL1)      TAEMS Element Management System
+        adTAOptiO3TME(786),            -- (1184543L4)       Opti-6100 Enhanced OC-3 Tributary Module
+        adTA3k2gCSM128(787),           -- (1181041L14)      TA3000 2nd gen 128 port Cell Switch Module
+        adTA4303PlusScuL2(788),        -- (1202334L2)       TA4303 Plus SCU L2
+        adOptiMXOc12OMMsdh(789),       -- (1184504L1-4)     OPTI-6100 OC12 Sonet/SDH Mux firmware
+        adTA5kSCMint(790),             -- (1188010L1)       TA5k System Controller Module International
+        adTA924(791),                  -- (4210924L1)       TA924
+        adTA912eDualT1(792),           -- (4220912L1)       TA912e Dual T1
+        adTA916eDualT1(793),           -- (4220916L1)       TA916e Dual T1
+        adTA924eDualT1(794),           -- (4220924L1)       TA924e Dual T1
+        adTA912eQuadT1(795),           -- (4240912L1)       TA912e Quad T1
+        adTA916eQuadT1(796),           -- (4240916L1)       TA916e Quad T1
+        adTA924eQuadT1(797),           -- (4240924L1)       TA924e Quad T1
+        adOptiMXDS1VMT(798),           -- (1184515L3)       OPTI-MX 28 Port VT1.5 card with Tx Timing Option
+        adOptiMXEthM8Eh(799),          -- (1184545L1)       OPTI-MX 8-port 10/100 Ethernet to STS - 12 single VCG card w/ VLANs
+        adOptiMXGefM1Eh(800),          -- (1184546L1)       OPTI-MX 1-port Gigabit Ethernet Fiber (SFP) to STS - 12 single VCG card w/ VLANs
+        adOptiMXOc12OMMy(801),         -- (1184504L6-8)     OPTI-6100 OC12 Mux OMM12 UPSR w/ Y
+        adOptiMXOc3OMMy(802),          -- (1184502L5-7)     OPTI-6100 OC3  Mux OMM3  UPSR w/ Y
+        adNV3xxxDualBRIST(803),        -- (1195885L1)       NetVanta 3xxx DualBRIST (1195885L1)
+        adNV3xxxDualBRIU(804),         -- (1195886L1)       NetVanta 3xxx DualBRIU (1195886L1)
+        adTA904(805),                  -- (4210904L1)       TA904 (4210904L1)
+        adTAOptiGEFM(806),             -- (1184535L1)       Opti-6100 Gigabit Ethernet Fiber Module
+        adNV1224RDC(807),              -- (1200590L1)       NetVanta 1224R DC chassis
+        adNV1224STRDC(808),            -- (1200590L1)       NetVanta 1224STR DC chassis
+        adMX410(809),                  -- (1189500L1)       MX410 4 port DS1 4 port Ethernet switch
+        adNVxxxxSerialDBU(810),        -- (1200886L1)       NetVanta xxxx Serial DBU Card (1200886L1)
+        adNV344A(811),                 -- (1200426L1)       NetVanta 344 Annex A (1200426L1)
+        adNV344B(812),                 -- (1200423L1)       NetVanta 344 Annex B (1200423L1)
+        adTA1500EAM(813),              -- (1180206L1)       TA1500 - Ethernet Access Module (EAM)
+        adTA924Fxo(814),               -- (4210924L2)       TA924  Fxo
+        adTA924FxoeDualT1(815),        -- (4220924L2)       TA924e Fxo With Dual T1
+        adTA924eFxoQuadT1(816),        -- (4240924L2)       TA924e Fxo With Quad T1
+        adNVxxxxISDNDBUST(817),        -- (1200875L1)       NetVanta xxxx ISDN DBU S/T Card (1200875L1)
+        adNVxxxxIPSEC(818),            -- (1195368L1)       NetVanta xxxx IPSEC Card (1195368L1)
+        adNVxxxxDualE1(819),           -- (1200872L1)       NetVanta xxxx Dual E1 Card (1200872L1)
+        adMX3216Ctrl(820),             -- (1189008L1)       MX3216 Controller  2-DS3, 16-DSX
+        adTA238AnxAdc(821),            -- (1200630L1)       TA238 SHDSL Annex A, DC
+        adTA238AnxAac(822),            -- (1200630L2)       TA238 SHDSL Annex A, AC
+        adTA238AnxBdc(823),            -- (1200632L1)       TA238 SHDSL Annex B, DC
+        adTA1100Fff(824),              -- (1179760L1/L2/L3) TA1100F fiber-fed, L1/L2/L3 are power options
+        adTA1100FffScm(825),           -- (1179760Lx-SCM)   TA1100F fiber-fed, 1179760L1-SCM, L2-SCM, L3-SCM
+        adTA1100FffSm(826),            -- (1179760Lx-SM)    TA1100F fiber-fed, 1179760L1-SM, L2-SM, L3-SM
+        adTA1100Fcf(827),              -- (1179762L1/L2/L3) TA1100F copper-fed, L1/L2/L3 are power options
+        adTA1100FcfScm(828),           -- (1179762Lx-SCM)   TA1100F copper-fed, 1179762L1-SCM, L2-SCM, L3-SCM
+        adTA1100FcfSm(829),            -- (1179762Lx-SM)    TA1100F copper-fed, 1179762L1-SM, L2-SM, L3-SM
+        adTA1148oT1LxQ(830),           -- (1179743LxQ)      TA1148 Host w/ 8 T1 1179743L1Q/L2Q/L3Q Quest 48 ADSL Ports
+        adTA1148ExpLxQ(831),           -- (1179740LxQ)      TA1148 Expansion, 1179740L1Q/L2Q/L3Q Quest 48 ADSL Ports
+        adTA904eDualT1(832),           -- (4220904L1)       TA904e Dual T1
+        adTA904eQuadT1(833),           -- (4240904L1)       TA904e Quad T1
+        adTA908eDualT1(834),           -- (4220908L1)       TA908e Dual T1
+        adTA908eQuadT1(835),           -- (4240908L1)       TA908e Quad T1
+        adOptiMXDS3M3Esdh(836),        -- (1184533L2G)      OPTI-MX 3 Port DS3 card with SDH
+        adOptiMXDS1VMEsdh(837),        -- (1184515L2G)      OPTI-MX 21 Port E1 card with SDH
+        adTA3kOC3L5(838),              -- (1181031L5)       TA OC-3 MUX L5 w/ STS-1 drops (cr)
+        adTA3kQAdls2BATS(839),         -- (1358062L1)       TA3000 Broadband quad ADSL2+ Remote Test System
+        adOptiMXDS3M3T(840),           -- (1184533L3)       OPTI-MX 3 Port DS3/EC1 card with framers, NP
+        adNV7100(841),                 -- (1200796L1)       NetVanta 7100
+        adMX412(842),                  -- (1189512L1)       MX412 12 port DS1 4 port Ethernet switch
+        adTA3kOc3PSM(843),             -- (1181044L3)       TA3000 OC3 Primary Switch Module
+        adTA3kOc3PSMq(844),            -- (1181044L3Q)      TA3000 OC3 Primary Switch Module, Q version
+        adOpti61OMM48(845),            -- (1184548L1)       OPTI-6100 OC48 Mux OMM48
+        adTA3kOC3L4bs(846),            -- (1181031L4B)      TA3000 OC3 Mux w/ Quad DSX to line cards   (BS version)
+        adOptiMXOMM3sdh(847),          -- (1184502L5G-7G)   OPTI-6100 STM1 OMM3 SDH Mux
+        adNVxxxxQuadFxs(848),          -- (1200690L1)       NetVanta xxxx Quad FXS VIM (1200690L1)
+        adNVxxxxQuadFxo(849),          -- (1200691L1)       NetVanta xxxx Quad FXO VIM (1200691L1)
+        adNVxxxxDualFxsFxo(850),       -- (1200692L1)       NetVanta xxxx Dual FXS/FXO VIM (1200692L1)
+        adNVxxxxDualFxo(851),          -- (1200694L1)       NetVanta xxxx Dual FXO VIM (1200694L1)
+        adNVxxxxT1Pri(852),            -- (1200695L1)       NetVanta xxxx T1/PRI VIM (1200695L1)
+        adMX3112Ctrl(853),             -- (1189901L1)       MX3112 Controller
+        adMX3216ACtrl(854),            -- (1189801L1)       MX3216A Controller
+        adMX3IPRM(855),                -- (1189808L1)       MX3 IP Router Module (IPRM)
+        adMX34DS1M(856),               -- (1189810L1)       MX3 Quad DS1 Module (4DS1M)
+        adTA5kIntl19(857),             -- (1188001E1)       TA 5000 International 19 inch shelf
+        adTA5k24pPOTSADSL2(858),       -- (1187100L1)       TA 5000 24 port POTS + ADSL2+
+        adTA5koDS1EFM(859),            -- (1187300L1)       TA 5000 Octal DS1 Ethernet Final Mile
+        adTA5kFan19Intl(860),          -- (1188085L1)       TA5k 19" Fan Module International
+        adNVxxxxVPN(861),              -- (1195892E1)       NetVanta xxxx VPN (1195892E1)
+        adTA3kEFM16SHDSL(862),         -- (1181429L2)       TA3000 16 Port SHDSL EFM
+        adNV1024PwrMidSpan(863),       -- (1200506L1)       NetVanta 1024 Pwr MidSpan (1200506L1)
+        adNV1355(864),                 -- (1200740L1)       NetVanta 1355 (1200740L1)
+        adNVxxxxISDNBRIU(865),         -- (1202865L1)        NetVanta xxxx ISDN BRI U Module
+        adNVxxxxISDNBRIST(866),        -- (1202875L1)        NetVanta xxxx ISDN BRI ST Module
+        adTA1248EthIP(867),            -- (1179641AL3)      TA1248, Ethernet feed, 48 port, IP enabled DSLAM
+        adOpti6100Scm2(868),           -- (1184500L2)       OPTI-6100 SCM2 Controller w/ front eth port
+        adNV347(869),                  -- (1200429L1)       NetVanta 347 (1200429L1)
+        adTA4303PlusSTS1L2(870),       -- (1202352L2)       TA4303 Plus STS1 L2
+        adTA4303PlusDSX1L2(871),       -- (1202331L2)       TA4303 Plus Octal DSX1 (BRI) L2
+        adMX3112Ctrl16DS1(872),        -- (1189901L2)       MX3112 Controller with 16 bonded DS1s
+        adTA3kHsFLM(873),              -- (1181455L1)       TA3000 High Speed Fiber Line Module (Dual Wide)
+        adTA3kH2TUCL9G3(874),          -- (1181113L9)       TA3000 H2TUC, 3rd Gen
+        adTA3kH4TUCL9G3(875),          -- (1181413L9)       TA3000 H4TUC, 3rd Gen
+        adNV3430(876),                 -- (1200820E1)       NetVanta 3430 (1200820E1)
+        adNV3448(877),                 -- (1200821E1)       NetVanta 3448 (1200821E1)
+        adNV3120(878),                 -- (1700600L2)       NetVanta 3120 (1700600L2)
+        adNV3130A(879),                -- (1700610L2)       NetVanta 3130 Annex A (1700610L2)
+        adOpti6100CEGM(880),           -- (1184535L2)       OPTI-6100 DS1 to Gigabit Ethernet line card (pseudowire)
+        adTA3kEFMoDs1E1(881),          -- (1181409L4)       TA3000 Octal DS1/E1 EFM
+        adTA3kEFMqDs1E1(882),          -- (1181409L5)       TA3000 Quad DS1/E1 EFM
+        adTA1200Fff(883),              -- (1179660L1)       TA1200F fiber-fed, DC powered
+        adTA1200FffScm(884),           -- (1179660L1-SCM)   TA1200F fiber-fed, 1179660L1-SCM, DC Powered
+        adTA1200FffSm(885),            -- (1179660L1-SM)    TA1200F fiber-fed, 1179660L1-SM, DC Powered
+        adTA1248EthIPScm(886),         -- (1179641AL3-SCM)  TA1248E, Ethernet feed, 48 port, IP enabled DSLAM (see 867)
+        adTA1248EthIPADSL(887),        -- (1179641AL3-ADSL) TA1248E, Ethernet feed, 48 port, IP enabled DSLAM
+        adTA5k25GigRprSM(888),         -- (1187022L1)       TA5000 25G RPR/2GE SWITCH MOD
+        adTA5kSMIO2(889),              -- (1187050L1)       TA5000 SMIO2 SWITCH MOD I/O
+        adTA5kSMIO3(890),              -- (1187051L1)       TA5000 SMIO3 SWITCH MOD I/O
+        adTA5k24pVDSL2Combo(891),      -- (1187120L1)       TA5000 COMBO V2 24-PORT AM
+        adTA5k32pVDSL2(892),           -- (1187121L1)       TA5000 VDSL2 32-PORT AM
+        adTA5k32pVDSL2Spltr(893),      -- (1187125L1)       TA5000 SPLTR V2 32-PORT AM
+        adTA5kSsCarrier(894),          -- (1187161L1)       TA5000 SPECIAL SERVICES CM
+        adTA5kHcCarrier(895),          -- (1187171L1)       TA5000 HI-CAP CM
+        adTA5kAtmDs3LM(896),           -- (1187200L1)       TA5000 ATM DS3 1-PORT LM
+        adTA5k8pHDSL4LM(897),          -- (1187310L1)       TA5000 HDSL4 8-PORT LM
+        adTA5k8pSHDSLLM(898),          -- (1187320L1)       TA5000 SHDSL 8-PORT LM
+        adTA5kLMIO2Ch64B(899),         -- (1187400L1)       TA5000 LMIO2-CH64 BRIDGED
+        adTA5kLMIO2Ch50D(900),         -- (1187401L1)       TA5000 LMIO2-CH50 DIVIDED PAIR
+        adTA5kCMIO2Ss(901),            -- (1187420L1)       TA5000 CMIO2 SPECIAL SERVICES
+        adTA5kCMIO2Hc(902),            -- (1187430L1)       TA5000 CMIO2 HI-CAP
+        adTA5kLMIO2Ds3B(903),          -- (1187440L1)       TA5000 LMIO2 DS3 BRIDGED BNC
+        adTA5k2p25GigGPON(904),        -- (1187500L1)       TA5000 GPON 25G 2-PORT OLT
+        adTA5k25GigRprLM(905),         -- (1187520L1)       TA5000 25G 1-port RPR LM
+        adTA5k4pGigELM(906),           -- (1187550E1)       TA5000 GigE 4-PORT LM  Was L1
+        adTA5k32pDs1LM(907),           -- (1187801L1)       TA5000 DS1 32-PORT LM
+        adTA5kSMIO3Intl(908),          -- (1188051L1)       TA5000 SMIO3 SWITCH MOD I/O (intl)
+        adTA3k4pFiberE1(909),          -- (1182300L1T)      Total Access 3000 Fiber Quad E1
+        adTA1148qE1oL123(910),         -- (1179741L1E/L2E/L3E)   TA1148 w/ 4 E1 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148qE1oL123A(911),        -- (1179741L1E/L2E/L3E-A) TA1148 1179741L1E/L2E/L3E 48 Port ADSL Module
+        adTA1148qE1oL123N(912),        -- (1179741L1E/L2E/L3E-N) TA1148 1179741L1E/L2E/L3E 4 Port E1 IMA Network Module
+        adTA1148qE1oL4(913),           -- (1179741L4E)           TA1148 w/ 4 E1 IMA Network interface, 48 ADSL ports in OSP enclosure (no expansion)
+        adTA1148qE1oL4A(914),          -- (1179741L4E-A)         TA1148 1179741L4E 48 Port ADSL Module
+        adTA1148qE1oL4N(915),          -- (1179741L4E-N)         TA1148 1179741L4E 4 Port E1 IMA Network Module
+        adTA1148oE1ospL123(916),       -- (1179743L1E/L2E/L3E)   TA1148 w/ 8 E1 IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148oE1ospL123A(917),      -- (1179743L1E/L2E/L3E-A) TA1148 1179743L1E/L2E/L3E 48 Port ADSL Module
+        adTA1148oE1ospL123N(918),      -- (1179743L1E/L2E/L3E-N) TA1148 1179743L1E/L2E/L3E 8 Port E1 IMA Network Module
+        adTA1148qSHDSLoL123(919),      -- (1179742L1E/L2E/L3E)   TA1148 w/ 4 SHDSL IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148qSHDSLoL123A(920),     -- (1179742L1E/L2E/L3E-A) TA1148 1179742L1E/L2E/L3E 48 Port ADSL Module
+        adTA1148qSHDSLoL123N(921),     -- (1179742L1E/L2E/L3E-N) TA1148 1179742L1E/L2E/L3E 4 Port SHDSL IMA Network Module
+        adTA1148qSHDSLoL4(922),        -- (1179742L4E)           TA1148 w/ 4 SHDSL IMA Network interface, 48 ADSL ports in OSP enclosure (no expansion)
+        adTA1148qSHDSLoL4A(923),       -- (1179742L4E-A)         TA1148 1179742L4E 48 Port ADSL Module
+        adTA1148qSHDSLoL4N(924),       -- (1179742L4E-N)         TA1148 1179742L4E 4 Port SHDSL IMA Network Module
+        adTA1148oSHDSLospL123(925),    -- (1179748L1E/L2E/L3E)   TA1148 w/ 8 SHDSL IMA Network Interface, 48 ADSL ports in OSP enclosure
+        adTA1148oSHDSLospL123A(926),   -- (1179748L1E/L2E/L3E-A) TA1148 1179748L1E/L2E/L3E 48 Port ADSL Module
+        adTA1148oSHDSLospL123N(927),   -- (1179748L1E/L2E/L3E-N) TA1148 1179748L1E/L2E/L3E 8 Port SHDSL IMA Network Module
+        adTAOptiO12TME(928),           -- (1184544L1)       Opti-6100 Enhanced OC-12 Tributary Module
+        adTA3MLPPP(929),               -- (1181416L1)       TA3000 Multi-link PPP
+        adOptiOc3OMMS(930),            -- (1184502L11)      Opti-6100 OC3 Mux (SFP)
+        adTA3kH2TURcrL2(931),          -- (1181126L2)       TA3000 H2TU-R L2 cr
+        adNV1335(932),                 -- (1700515E2)       NetVanta 1335 (1700515E2)
+        adNV1335AP(933),               -- (1700515E1)       NetVanta 1335 W/AP (1700515E1)
+        adNV1335PoE(934),              -- (1700525E2)       NetVanta 1335 PoE (1700525E2)
+        adNV1335PoEAP(935),            -- (1700525E1)       NetVanta 1335 PoE W/AP (1700525E1)
+        adOpti6100EthL2(936),          -- (1184510L2)       OPTI-6100 Ethernet Module uP+
+        adOpti6100Eth8L2(937),         -- (1184524L2)       OPTI-6100 8 port 10/100 Ethernet uP+
+        adMX2820M13L3(938),            -- (1186002L3)       MX2820 M13 DS3 Mux module L3
+        adTA1124oT1Lx(939),            -- (1179721Lx)       TA1124 Host with 4 T1 1179721L1/L2/L3 24 ADSL ports
+        adTA1124oExpLx(940),           -- (1179720Lx)       TA1124 Expansion 1179720L1/L2/L3 24 ADSL ports
+        adTA1224oT1Lx(941),            -- (1179621L1)       TA1224 Host with 4 T1 1179621L1 24 ADSL ports
+        adTA1224oExpLx(942),           -- (1179621L5)       TA1224 Host with 4 T1 1179621L5 24 ADSL ports
+        adNV3448PoE(943),              -- (1200825E1)       NetVanta 3448 PoE Daughter Card (1200825E1)
+        adTracer6500(944),             -- (12806500L1A\B)   Tracer 6500 16T\Ethernet Radio(12806500L1A) and (12006500L1B)
+        adTA1148ExpL4Q(945),           -- (1179740L4Q)      TA1248 2.5 gen Expansion, Qwest 48 ADSL Ports
+        adTA1248sNIL5G25(946),         -- (1179641L5)       TA1248 2.5 gen Subtended Network Interface, 48 ADSL ports (same Part# as 673)
+        adOptiMXTRAM3G(947),           -- (1184532L2G)      OPTI-MX · DS3/E3 TransMux
+        adTA3050VdslSpltrNoTest(948),  -- (1183202L1)       TA3050 Accessory VDSL Splitter w/o Test Access
+        adNV150AP(949),                -- (1700515E1)       NetVanta 150 W/AP
+        adNV1355unused(950),           -- (1200740L1)       NetVanta 1355 backed out for duplicate with ID 864
+        adTA832(951),                  -- (1200718L1/L2)    TA832 SHDSL EFM
+        adTA838(952),                  -- (1200633L1/L2)    TA838 SHDSL EFM
+        adMX3400Ctrl(953),             -- (1189934L1)       MX3400 Controller
+        adTA5k32SHDSLEFMIntl(954),     -- (1188180E1)       TA5k 32 Port SHDSL EFM Intl
+        adTADualOCUDPL4(955),          -- (1180205L4)       TA1500 Dual OCU DP
+        adTADualDSODPL4(956),          -- (1180203L4)       TA1500 Dual DSO DP
+        adTA1100DDs3FedAtm(957),       -- (1179763AL1)      TA1100D DS3 Fed Atm Unit   SysObjectId for product
+        adTA1124PT1(958),              -- (1179713Lx)       TA1124P T1-EFM Fed Minidslam 24 port ADSL2+ digital Pots
+        adTA1124PT1Scm(959),           -- (1179713Lx-SCM)   TA1124P T1-EFM Fed Minidslam SCM
+        adTA1124PT1Sm(960),            -- (1179713Lx-SM)    TA1124P T1-EFM Fed Minidslam SM
+        adTA1124PT1Efm(961),           -- (1179713Lx-EFM)   TA1124P T1-EFM Fed Minidslam EFM/ADSL2+ digital Pots combo
+        adTA1124PHDSL4(962),           -- (1179718Lx)       TA1124P HDSL4-EFM Fed Minidslam 24 port ADSL2+ digital Pots
+        adTA1124PHDSL4Scm(963),        -- (1179718Lx-SCM)   TA1124P HDSL4-EFM Fed Minidslam SCM (959 alias, not expected to be used, 12/5/2006)
+        adTA1124PHDSL4Sm(964),         -- (1179718Lx-SM)    TA1124P HDSL4-EFM Fed Minidslam SM
+        adTA1124PHDSL4Efm(965),        -- (1179718Lx-EFM)   TA1124P HDSL4-EFM Fed Minidslam EFM/ADSL2+ digital Pots combo
+        adTA1124PClient(966),          -- (1179710Lx)       TA1124P Client Minidslam 24 port ADSL2+ digital Pots combo
+        adMX408e(967),                 -- (1189608L1)       MX408e 8 T1 4 Ethernet client side & 10/100 or GigE SFP network side
+        adOptiSdh3Ds(968),             -- (1184533L3G)      OPTI-6100 SDH Three Port DS3 Line Card
+        adOptiWiMax(969),              -- (1184560L1)       OPTI-6100 WIMAX Base-Band Line Card
+        adOptiDs3Sm(970),              -- (1184567L1)       OPTI-6100 DS3/EC1 Switch Card
+        adOptiOMM12Stm4G2(971),        -- (1184504L6G-8G)   OPTI-6100 OMM12 2nd Gen STM4 w/ SDH
+        adOpti28DS1M2(972),            -- (1184513L2)       OPTI-6100 28 port DS1 Module
+        adTA3kLtu8Eth(973),            -- (1182300E1)       TA3000 LTU8 w/ Ethernet, Fiber
+        adTA1148GeV2(974),             -- (1179731Lx)       TA1148V GigE Fed 48 port VDSL2 Host Dslam
+        adTA1148GeV2Scm(975),          -- (1179731Lx-SCM)   TA1148V GigE Fed 48 port VDSL2 Host Dslam SCM
+        adTA1148GeV21Sm(976),          -- (1179731Lx-SM)    TA1148V GigE Fed 48 port VDSL2 Host Dslam SM
+        adTA1148GeVdsl2(977),          -- (1179731Lx-VDSL2) TA1148V GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+        adTA1148GeV2Client(978),       -- (1179730Lx)       TA1148V 48 port VDSL2 Client Dslam
+        adTA5kAtmqDs3LM(979),          -- (1187201L1)       TA5000 ATM DS3 4-PORT LM
+        adTA5kAtmOc3LM(980),           -- (1187210L1)       TA5000 ATM OC3 1-PORT LM
+        adTA5kAtmqOc3LM(981),          -- (1187211L1)       TA5000 ATM OC3 4-PORT LM
+        adTA1100DDs3FedAtmScm(982),    -- (1179763AL1-SCM)  TA1100D DS3 Fed Atm Controller
+        adTA1100DDs3FedAtmSm(983),     -- (1179763AL1-SM)   TA1100D DS3 Fed Atm Switch Module
+        adTA1148SfpV2(984),            -- (1179732Lx)       TA1148V SFP Fed 48 port VDSL2 Host Dslam
+        adOptiSdhEthM8E(985),          -- (1184525L1G)      OPTI-6100 SDH 8 Port Enhanced 10/100 Ethernet
+        adTA5006Dom19(986),            -- (1187003E1)       TA 5006 19" domestic Mini Chassis
+        adTA5006Dom19Fan(987),         -- (1187090E1)       TA 5006 19" domestic Mini Chassis Fan Module
+        ad2GTA904(988),                -- (4212904L1)       TA 904 2nd Gen
+        ad2GTA908(989),                -- (4212908L1)       TA 908 2nd Gen
+        ad2GTA912(990),                -- (4212912L1)       TA 912 2nd Gen
+        ad2GTA916(991),                -- (4212916L1)       TA 916 2nd Gen
+        ad2GTA924(992),                -- (4212924L1)       TA 924 2nd Gen
+        ad2GTA924Fxo(993),             -- (4212924L2)       TA 924 Fxo 2nd Gen
+        ad2GTA908e(994),               -- (4242908L1)       TA 908e 2nd Gen
+        ad2GTA916e(995),               -- (4242916L1)       TA 916e 2nd Gen
+        ad2GTA924e(996),               -- (4242924L1)       TA 924e 2nd Gen
+        ad2GTA924eFxo(997),            -- (4242924L2)       TA 924e Fxo 2nd Gen
+        adOpti6100SdhPW3EM(998),       -- (1184535L2G)      OPTI-6100 · Pseudowire SDH (E1/T1) Module with Gigabit Ethernet
+
+        adUnknown(999),                -- Any unresponsive or unrecognizable card actually detectable
+
+        adTA5k32pDs1Efm(1000),         -- (1187802L1)       TA5000 DS1 32-PORT EFM
+        adTA5k32pSHDSLLM(1001),        -- (1187180L1)       TA5000 SHDSL 32-PORT LM
+        adTA3000BATSDS3(1002),         -- (1358043L1)       TA3000 BATS-DS3
+        adTA3000BATSEnet(1003),        -- (1358045L1)       TA3000 BATS-Ethernet +(1358085L1
+        adTA3000BATSGigE(1004),        -- (1358086L1)       TA3000 BATS-Gigabit Ethernet
+        adTA838oShdslEFM(1005),        -- (1200633G4)       TA838 8 port SHDSL EFM
+        adTA828oHdsl2EFM(1006),        -- (1200634G2)       TA828 8 port HDSL2 EFM
+        adTA844qHdsl4EFM(1007),        -- (1200635G2)       TA844 4 port HDSL4 EFM
+        adTA838qShdslEFM(1008),        -- (1200633G6)       TA834 4 port SHDSL EFM
+        adTA828qHdsl2EFM(1009),        -- (1200634G4)       TA824 4 port HDSL2 EFM
+        adTA801sGigE(1010),            -- (1200638G1)       TA801 Single Gigabit Ethernet
+        adAPMC(1011),                  -- (1200638G2)       Active Probe Monitor COT
+        adAPMR(1012),                  -- (1200638G3)       Active Probe Monitor RMT
+        adTA3kSTS1MuxL5(1013),         -- (1181030L5)       Total Access STS1 Mux L5
+        adOpti61OMM48L(1014),          -- (1184563L1)       OPTI-6100 LMX OC48 Mux OMM48L
+        adOpti61Ethm8ew(1015),         -- (1184530L1)       OPTI-6100 Ethernet over Copper - 6 Ports at 10/100 Mbps + 2 Ports at 1000 Mbps
+        adOpti61GefMew(1016),          -- (1184531L1)       OPTI-6100 Ethernet over Fiber - 2 Ports at GigE
+        adNV3130ANoDBU(1017),          -- (1700611G1)       NetVanta 3130 Annex A No DBU (1700611G1)
+        adNV3130BNoDBU(1018),          -- (1700612G1)       NetVanta 3130 Annex B No DBU (1700612G1)
+        adNV3120NoDBU(1019),           -- (1700601G1)       NetVanta 3120 No DBU (1700601G1)
+        adTADS3TSIMux(1020),           -- (1182020L3)       TA 30xx DS3 TSI MUX  Replaces: 1182020L1 and 1182020L3
+        adTAE3TSIMux(1021),            -- (1182021L2)       TA 30xx E3 TSI MUX  Replaces: 1182021L1
+        adTADs0TSIMux(1022),           -- (1182022L2)       TA 30xx DS0 TSI MUX  Replaces: 1182022L1
+        adOptiLMX24shelf(1023),        -- (1184555L1)       Opti-LMX 24 slot shelf
+        adTA5kSCM2(1024),              -- (1187010G2)       TA5k System Controller 2 (Domestic)
+        adTA5kSCM2int(1025),           -- (1188010G2)       TA5k System Controller 2 (International)
+        adNV1534(1026),                -- (1700590G1)       Netvanta 1534 Gigabit Switch (1700590G1)
+        adNV1534PoE(1027),             -- (1700591G1)       Netvanta 1534 POE Gigabit Switch (1700591G1)
+        adNV1364(1028),                -- (1700592G1)       Netvanta 1364 Gigabit Switch/Router (1700592G1)
+        adNV1364PoE(1029),             -- (1700593G1)       Netvanta 1364 POE Gigabit Switch/Router (1700593G1)
+        adNetVanta814qDS1EFM(1030),    -- (1200637G4)       NetVanta 814 4 port DS1 EFM
+        adNetVanta818oDS1EFM(1031),    -- (1200637G2)       NetVanta 818 8 port DS1 EFM
+        adNetVanta873tDS3EFM(1032),    -- (1200639G1)       NetVanta 873 3 port DS3 EFM
+        adTA5kEFMPRG1G1(1033),         -- (1187250G1)       TA5000 EFM Protect, 1st Gen
+        adNvCellular3G(1034),          -- (1700801G1)       NetVanta Cellular 3G NIM Card
+        adNV3430DC(1035),              -- (1200822G1)       NetVanta 3430DC chassis
+        adOpti61Ethm8ef(1036),         -- (1184525G2)       OPTI-6100 8 SFP Ports, each 100FX (Optical) or 10/100 (Cu); 155mb Backplane
+        adOpti61Ethm8hf(1037),         -- (1184545G2)       OPTI-6100 8 SFP Ports, each 100FX (Optical) or 10/100 (Cu); 622mb/1.2Gb Backplane
+        adTA5kqDS3EFM(1038),           -- (1187260G1)       TA5k Quad DS3 EFM Card
+        adTA5kSCM3(1039),              -- (1187010G3)       TA5k System Controller 3 (Domestic)
+        adTA5kSCM3int(1040),           -- (1188010G3)       TA5k System Controller 3 (International)
+        adTA5k3pChanDs3(1041),         -- (1187810G1)       TA5000 Channelized DS3 3-Port Access Module
+        adNV842dHdsl4EFM(1042),        -- (1200635G4)       NV842 2 port HDSL4 EFM
+        adTA5k32pADSL2int(1043),       -- (1188101E1)       TA5k 32 PORT ADSL2+ International
+        adTA838ABLtu(1044),            -- (1200633G7)       TA838 Annex A/B LTU
+        adTA1124PGIGE(1045),           -- (1179711Lx)       TA1124P GIGE Fed Minidslam 24 port ADSL2+ digital Pots
+        adTA1124PGIGESm(1046),         -- (1179711Lx-SM)    TA1124P GIGE Fed Minidslam SM
+        adTA1124PGIGEADSL(1047),       -- (1179711Lx-ADSL)  TA1124P GIGE Fed Minidslam ADSL2+ digital Pots combo
+        adTA5006Int19(1048),           -- (1188003G2)       TA 5006 19" international Mini Chassis ETSI w/ SMI03
+        adTA5006Int19Fan(1049),        -- (1188090G1)       TA 5006 19" international Mini Chassis Fan Module ETSI
+        adTA5kSwM1GBp4G1(1050),        -- (1187021G1)       TA5k Switch Module 4GE ( 1G backplane )
+        adTA5kANSI32SpltrNoMta(1051),  -- (1187105L2)       TA5k ANSI ADJ 32 SPLITTER A2+ No MTA
+        adTA5k32pDs1MsLm(1052),        -- (1187803G1)       TA5000 DS1 32-port Multi-Service LM
+        adTA5kSwM5GBp10G1(1053),       -- (1187030G1)       TA5k 10G Switch Module ( 5G Backplane )
+        adTA5kSwM25GBp10G1(1054),      -- (1187025G1)       TA5k 10G Switch Module ( 2.5G Backplane )
+        adTA1124VH(1055),              -- (1179735Gx)       TA1124V Host
+        adTA1124VScm(1056),            -- (1179735Gx-SCM)   TA1124V SCM controller
+        adTA1124VSm(1057),             -- (1179735Gx-SM)    TA1124V Switch Module
+        adTA1124VVdsl(1058),           -- (1179735Gx-VDSL)  TA1124V VDSL Module
+        adTA1148AH(1059),              -- (1179752Gx)       TA1148A Host
+        adTA1148AScm(1060),            -- (1179752Gx-SCM)   TA1148A SCM controller
+        adTA1148ASm(1061),             -- (1179752Gx-SM)    TA1148A Switch Module
+        adTA1148AAdsl(1062),           -- (1179752Gx-ADSL)  TA1148A ADSL Module
+        adNV7020(1063),                -- (1700702G1)       NetVanta 7020
+        adNV7040(1064),                -- (1700704G1)       NetVanta 7040
+        adNV7060(1065),                -- (1700706G1)       NetVanta 7060
+        adNV6310(1066),	               -- (1700100G1)       NetVanta 6310
+        adNV6320(1067),	               -- (1700110G1)       NetVanta 6320
+        adNV6330(1068),	               -- (1700120G1)       NetVanta 6330
+        adNV4430(1069),                -- (1700630E1)       NetVanta 4430
+        adTA1248qT1ImaH(1070),         -- (1179641AL1)      Total Access 1248, 48-Port, 4T1 IMA with Internal Modem - TA1248 Host DSLAM, IP
+                                       -- (1179641L1)       Total Access 1248, 48-Port, 4T1 IMA - TA1248 Host DSLAM, IP
+        adTA1248oT1ImaH(1071),         -- (1179641AL4)      Total Access 1248 Octal T1 IMA DSLAM with Modem - TA1248 Host DSLAM, IP
+                                       -- (1179641L4)       Total Access 1248 Octal T1 IMA DSLAM - TA1248 Host DSLAM, IP
+        adTA1248oT1ImaQH(1072),        -- (1179641L4Q)      Total Access 1248 Octal T1 IMA DSLAM, Qwest - TA1248 Host DSLAM, IP
+        adTA1148VH(1073),              -- (1179732Gx)       TA1148V Host
+        adTA1148VScm(1074),            -- (1179732Gx-SCM)   TA1148V SCM controller
+        adTA1148VSm(1075),             -- (1179732Gx-SM)    TA1148V Switch Module
+        adTA1148VVdsl(1076),           -- (1179732Gx-VDSL)  TA1148V VDSL Module
+        adTA1148VC(1077),              -- (1179730Gx)       TA1148V Client
+        adTA1124VC(1078),              -- (1179733Gx)       TA1124V Client
+        adTA1148AC(1079),              -- (1179750Gx)       TA1148A Client
+        adTA5k24pComboA2Plus(1080),    -- (1187100L2)       TA5000 Combo A2+ Access Module
+        adOptiMXOCnOMM(1081),          -- (1184571G1)       OPTI-6100 OC3/OC12 OMM UPS
+        adNV1234(1082),	               -- (1700594G1)       NetVanta 1234
+        adNV1234PoE(1083),             -- (1700595G1)       NetVanta 1234 PoE
+        adNV1238(1084),                -- (1700598G1)       NetVanta 1238
+        adNV1238PoE(1085),             -- (1700599G1)       NetVanta 1238 PoE
+        adOpti61DS10Tsim(1086),        -- (1184570G1)       OPTI-6100 DS0/DS1 Mapper Module (grooms 84 DS1's and 2016 DS0's)
+        -- 1087 can be re-assigned; unused/replaced by adNV838T8pShdslEFMcr(1131)
+--        adNV838oShdslEFMcr(1087),    --  -- (1172838G1)       NETVANTA 838 octal SHDSL EFM NCTE cr from 1200633G4
+        adTA1248SClient(1088),         -- (1172653G1)       TA1248S Client 48 Port SHDSL EFM
+        adTA1248SHost(1089),           -- (1172655G1)       TA1248S Host 48 Port SHDSL EFM
+        adOpti61Ethm8ewF(1090),        -- (1184530G2)       OPTI-6100 Octal Ethernet (2 GigE + 6 10/100 Ports)
+        adTA5kSwM1GBpG1(1091),         -- (1187020G1)       TA5k Switch Module ( 1G backplane )
+        adNV1544(1092),                -- (1700544G1)       NetVanta 1544
+        adNV1544PoE(1093),             -- (1700545G1)       NetVanta 1544 PoE
+        adTA5k3pChDs3MsLm(1094),       -- (1187220G1)       TA5000 3-port Channelized DS3 Multi-Service LM
+        adTA5kSwM1GBp4G2(1095),        -- (1187021G2)       Ta5k Switch Module 4GE with Ring Generator ( 1G backplane )
+        adTA5kSwM25GBp10G2(1096),      -- (1187025G2)       Ta5k 10G Switch Module with Ring Generator ( 2.5G backplane )
+        adTA5kSwM1GBpG2(1097),         -- (1187020G2)       Ta5k Switch Module with Ring Generator ( 1G backplane )
+        adNV838EP(1098),               -- (1172839G1)       NetVanta 838 Enhanced Protection
+        adNV838Osp(1099),              -- (1172830G1)       NetVanta 838 OSP
+        adTA5k4pGigEG2LM(1100),        -- (1187550G2)       TA5000 GigE 4-PORT G2 LM
+        -- 1101 can be re-assigned; duplicate for adTA1148VC(1077)
+--        adTA1148GeVClient(1101),     --  -- (1179730Gx)       TA1148V Client VDSL
+        adTA1248VH(1102),              -- (1179632Gx)       TA1248V System (chassis)
+        adTA1248VScm(1103),            -- (1179632Gx-SCM)   TA1248V SCM
+        adTA1248VSm(1104),             -- (1179632Gx-SM)    TA1248V SM
+        adTA1248VVdsl(1105),           -- (1179632Gx-VDSL)  TA1248V Host VDSL
+        adTA1248GeVClient(1106),       -- (1179630Gx)       TA1248V Client VDSL
+        adOptiMXFshelf(1107),          -- (1184556G1)       Opti-MXF Front access shelf
+        adOpti61DS1CEM(1108),          -- (1184535G3)       Opti-6100 84 DS1 Circuit Emulation Module
+        adTA3000BATSDS3SSB(1109),      -- (1358083L1)       TA3000 BATS-DS3 SSB
+        adTA5k32pDs1PPP(1110),         -- (1187803G1)       TA5000 DS1 32-port T1 PPP/MLPPP
+        adTA5k32pDs1FR(1111),          -- (1187803G1)       TA5000 DS1 32-port T1 FR
+        adTA5k3pChDs3IMA(1112),        -- (1187220G1)       TA5000 3-port Channelized DS3 IMA
+        adTA5k3pChDs3FR(1113),         -- (1187220G1)       TA5000 3-port Channelized DS3 FR
+        adOptiMXTRAM3E(1114),          -- (1184532G3)       OPTI-6100 Enhanced TRAM3 Module with DCC and Trib Timing
+        adnCommandMSP(1115),           -- (1700840G1)       nCommand MSP server (or NV 450)
+        adNV1543(1116),                -- (1700546G1)       NetVanta 1543
+        adOpti6100EthG3(1117),         -- (1184510G3)       OPTI-6100 Thee Port Ethernet Module with support for SFP modules
+        adNV3450(1118),                -- (1200823G1)       NetVanta 3450
+        adNV3458(1119),                -- (1200824G1)       NetVanta 3458
+        adNVOctPoe(1120),              -- (1200824E1)       NetVanta Octal PoE Daughter Card
+        adTA5k32pE1Efm(1121),          -- (1188802G1)       TA5000 Intl E1 32-PORT EFM
+        adTA5kSCMBr(1122),             -- (1187011G1)       TA5k System Controller w/ Bridging (Domestic)
+        adTA1248AH(1123),              -- (1179652Gx)       TA1248A Host
+        adTA1248AScm(1124),            -- (1179652Gx-SCM)   TA1248A SCM controller
+        adTA1248ASm(1125),             -- (1179652Gx-SM)    TA1248A 2nd Gen Switch Module
+        adTA1248AAdsl(1126),           -- (1179652Gx-ADSL)  TA1248A ADSL Module
+        adTA5kFanHF(1127),             -- (1187080G2)       TA5000 Fan High Flow Top
+        adTA1148VG2Sm(1128),           -- (1179732Gx-SM)    TA1148V 2nd Gen Switch Module
+        adTA1248VG2Sm(1129),           -- (1179632Gx-SM)    TA1248V 2nd Gen Switch Module
+        adTA1148AG2Sm(1130),           -- (1179752Gx-SM)    TA1148A 2nd Gen Switch Module
+        adNV3430G2(1131),              -- (1202820G1)       NetVanta 3430 Gen2(1202820G1)
+	adNV834T4pShdslEFMcr(1132),    -- (1172834G1)	    NetVanta 834T Light (Reduced Cost)
+	adNV858Adsl8pEnhProt(1133),    -- (1172858G1)	    NetVanta 858 ADSL 8 Port Enhanced Protection
+	adNV850Adsl12pEnhProt(1134),   -- (1172850G1)	    NetVanta 850 ADSL 12 Port Enhanced Protection
+	adNV838T8pShdslEFMcr(1135),    -- (1172838G1)	    NetVanta 838T Light (Reduced Cost)
+        adTA1248AAdslClient(1136),     -- (1179650Gx-ADSL)  TA1248A ADSL Client
+        adNV832T2pShdslEFM(1137),      -- (1172832G1)       NetVanta 832T  2 Port SHDSL, 4 Port Ethernet
+        adTA5k32pVDSL2SpltrNoTest(1138), -- (1187125G2)     TA5000 SPLTR V2 32-PORT w/o Test Access
+        adNV8044G1(1139),              -- (1172804G1)       NetVanta 8044
+        adOptiDS1VME2(1140),           -- (1184515E5)       Opti-6100 28 Port VT1.5/DS1 Line Card with Framers
+        adTA1148AHBc(1141),            -- (1179732G1R)      TA 1148V Host (Broadcom SM)
+        adTA1248AHBc(1142),            -- (1179652G1R)      TA 1248A Host (Broadcom SM)
+        adTA1248ACR(1143),             -- (1179650G1R)      TA 1248A Client
+        adTA1148AHR(1144),             -- (1179752G1R)      TA 1148A Host
+        adTA1448A(1145),               -- (1179655G1R)      TA 1448A (DMT Aggregator)
+        adTA5kFanHFRear(1146),         -- (1187080G3)       TA5000 Fan High Flow Rear
+        adTA5006FanHFRear(1147),       -- (1187090G3)       TA5006 Fan High Flow Rear
+        adTA1448SCE(1148),             -- (1172655G1)       TA 1448S-CE ETSI
+        adOptiMXOMM312VSDH(1149),      -- (1184571G1)       Opti-6100 OMM312V SDH
+        adOptiMXO3TME3SDH(1150),       -- (1184543G5G)      Opti-6100 O3TME3 SDH
+        adOptiMXO3TME3(1151),          -- (1184543G5)       Opti-6100 O3TME3
+        adNV8322pShdslEFMTelstra(1152),-- (1172832G2)       NetVanta 832 2 Port SHDSL for Telstra
+        adOptiMXO12TME2(1153),         -- (1184544G2)       Opti-6100 O12TME2
+        adTA1148ADmtH(1154),           -- (1179781Gx)       TA1148A DMT Host
+        adTA1148ADmtSm(1155),          -- (1179781Gx-SM)    TA1148A DMT Switch Module
+        adNV3133(1156),                -- (1700616G1)       NetVanta 3132 (1700616G1)
+        adOpti6100ETHM8EWS(1157),      -- (1184530G3)       OPTI-6100, 2 Ports 10/100/1000 BaseT and 6 Ports 10/100 BaseT Ethernet
+        adOpti6100SdhGEFM(1158),       -- (1184535L1G)      OPTI-6100, GEFM SDH 63-channel EFM bonded Ethernet over T1/E1
+        adTA5k8pEoFAM(1159),           -- (1187552Gx-LM)    TA5000 8-port Ethernet over Fiber Access Module
+        adTA5k32pE1MsLm(1160),         -- (1188803G1)       TA5000 E1 32-port Multi-Service LM IMA mode
+        adTA5k32pE1PPP(1161),          -- (1188803G1)       TA5000 E1 32-port PPP/MLPPP mode
+        adNV1544G2(1162),              -- (1702544G1)       NetVanta 1544 Gen2
+        adNV1544PoEG2(1163),           -- (1702545G1)       NetVanta 1544 PoE Gen2
+        adNV1534G2(1164),              -- (1702590G1)       Netvanta 1534 Gigabit Gen2 Switch
+        adNV1534PoEG2(1165),           -- (1702591G1)       Netvanta 1534 POE Gigabit Gen2 Switch
+        adTA5k24pSHDSLLM(1166),        -- (1187181G1)       TA5000 24-port SHDSL EFM
+        adGPICModG3(1167),             -- (1328005L1)       GPIC Module Gen3
+        adSw16ChassisG3(1168),         -- (1328004L1)       3GEN Eth Serial 16 Module
+        adVoiceChassisG3(1169),        -- (1328007L1)       Voice Chassis Gen3
+	adTA1448AAdsl(1170),           -- (1179655Gx-ADSL)  TA1448A ADSL Module
+        adTA1148ADmtAdsl(1171),        -- (1179781Gx-ADSL)  TA1148A DMT ADSL Module
+        adOpti61DS1CEME1(1172),        -- (1184535G3G)      Opti-6100 63 E1 Circuit Emulation Module
+        adOpti6100GEFM2(1173),         -- (1184535G4)       OPTI-6100 GEFM2 SONET, 84-channel EFM bonded Ethernet over SONET
+        adOpti6100SdhGEFM2(1174),      -- (1184535G4G)      OPTI-6100 GEFM2 SDH 63-channel EFM bonded Ethernet over T1/E1
+        adOpti6100GESW4(1175),         -- (1184572G1)       OPTI-6100 GESW4 4 Port Gigabit Ethernet Switch Module
+        adNetVanta838INT(1176),        -- (1200633G3)       Netvanta 838 8 port SHDSL, 4 port Ethernet
+        adNetVanta834INT(1177),        -- (1200633G5)       Netvanta 834 4 port SHDSL, 4 port Ethernet
+        adOpti6100ScmF3(1178),         -- (1184500F3)       OPTI-6100 SCM Controller w/ isolation, RoHS 6 of 6
+        adTA5k2pSfp25GigGPON(1179),    -- (1187501G1)       TA5000 2.5G 2-PORT SFP Based GPON OLT
+        adNV1638(1180),                -- (1700568F1)       NetVanta 1638
+        adNV1638P(1181),               -- (1700569F1)       NetVanta 1638P
+        adNV1554F(1182),               -- (1700548F1)       NetVanta 1554F
+        adTA1108VP(1183),              -- (1179791G1)       TA1108VP Chassis  OSP DSLAM
+        adTA1108VPSCM(1184),           -- (1179791G1)       TA1108VPSCM  OSP DSLAM
+        adTA1108VPVSM(1185),           -- (1179791G1)       TA1108VPVSM  OSP DSLAM
+        adTA1108VPAM(1186),            -- (1179791G1)       TA1108VPAM    OSP DSLAM
+        adNV8044MG1(1187),             -- (1174801G1)       NetVanta 8044M
+        adTA5k32pE1Pwe3(1188),         -- (1188801G1)       TA5000 E1 32-PORT PWE3 Module
+        adTA5k4pSfp25GigGPON(1189),    -- (1187502F1)       TA5000 2.5G 4-PORT SFP Based GPON OLT
+        adNetVanta838T(1190),          -- (1200633G3T)      Netvanta 838 8 port SHDSL, 4 port Ethernet
+        adNetVanta834T(1191),          -- (1200633G5T)      Netvanta 834 4 port SHDSL, 4 port Ethernet
+        adNetVanta832T(1192),          -- (1200718G1T)      Netvanta 832 2 port SHDSL, 1 port Ethernet
+        adTA5k24pActiveE(1193),        -- (1187560F1)       TA5K ActiveE Module
+        adNV3200G3(1194),              -- (1203860G1)       NetVanta 3200, Gen3
+        adTA5K10GigErnie(1195),        -- (1399023L1)       TA5K 10G Bert Test
+        adNV8044gen2(1196),            -- (1172805G1)       NetVanta 8044 gen 2
+        adTAETOS(1197),                -- (1174101F1-ETOS)  10G Ethernet Transport Optical Switch
+        adTASTOS(1198),                -- (1174110F1-STOS)  OC192/STM64 Sonet/SDH Transport Optical Switch
+        adNV8pT1E1Pwe3(1199),          -- (1174819G1)       Netvanta 8 port T1/E1 Pseudowire Expansion Module
+        adNV6240FXS8(1200),            -- (1700202G1)       NV 6240 w/ 8FXS
+        adNV6240FXS16(1201),           -- (1700204G1)       NV 6240 w/ 16FXS
+        adTA5k32pVDSLAM(1202),         -- (1187122G1)       TA5000 VDSL2 32-PORT AM
+        adTA351(1203),                 -- (1187701G1)       TA 351
+        adTA352(1204),                 -- (1187702G1)       TA 352
+        adTA361(1205),                 -- (1187711G1)       TA 361
+        adTA362(1206),                 -- (1187712G1)       TA 362
+        adTA362S(1207),                -- (1187712G2)       TA 362S
+        adTA362R(1208),                -- (1187715G1)       TA 362R
+        ad2GTA351(1209),               -- (1287701G1)       TA 351 2nd Gen
+        ad2GTA352(1210),               -- (1287702G1)       TA 352 2nd Gen
+        adTA354E(1211),                -- (1287704G1)       TA 354E
+        ad2GTA361(1212),               -- (1287711G1)       TA 361 2nd Gen
+        ad2GTA362(1213),               -- (1287712G1)       TA 362 2nd Gen
+        ad2GTA362S(1214),              -- (1287712G2)       TA 362S 2nd Gen
+        ad2GTA362R(1215),              -- (1287715G1)       TA 362R 2nd Gen
+        adTA372(1216),                 -- (1287722G1)       TA 372
+        adTA372E(1217),                -- (1287723G1)       TA 372E
+        adTA372R(1218),                -- (1287722G2)       TA 372R
+        adTA324(1219),                 -- (1287735G1)       TA 324
+        adTA334(1220),                 -- (1287736G1)       TA 334
+        adTA324E(1221),                -- (1287737G1)       TA 324E
+        adTGPONNIM2(1222),             -- (1700115G1)       GPON NIM2
+        adPacketBusG3(1223),           -- (1328009L1)       Sweet 16 Packet Buss Interface
+        adNV8044MG2(1224),             -- (1174801G2)       NetVanta 8044M - AC
+        adTA5kVdslMtaSC(1225),          -- (1187126G1)       TA5k  VDSL  MTA-SC 32 Port
+        adTA5kSCMBrInt (1226),         -- (1188011G1)       TA5000 ETSI SCM with Bridging
+        adTA1124PNGAM(1227),           -- (117971xG1)       TA1124P AM 24 Port ADSL2Plus w Pots
+        adTA1124PNGSCM(1228),          -- (117971xG1)       TA1124P SCM OSP DSLAM
+        adTA1124PNGVSMEth(1229),       -- (1179711G1)       TA1124P VSM with Eth Uplink
+        adTA1124PNGEth(1230),          -- (1179711G1)       TA1124P Ethernet fed OSP DSLAM Chassis
+        adTA1124PNGVSMHdsl4(1231),     -- (1179718G1)       TA1124P VSM with Hdsl4 Uplink
+        adTA1124PNGHdsl4(1232),        -- (1179718G1)       TA1124P HDSL4 fed OSP DSALM Chassis
+        adTA5k24pCPOTS(1233),          -- (1187160F1)       TA5k 24 PORT CPOTS
+        adTA5k24pETSIComboA2Plus(1234),-- (1188100F1)       TA5000 ETSI Combo A2+ Access Module
+        adNV1234G2(1235),              -- (1702594G1)       NetVanta 1234 2nd Gen
+        adNV1234PoEG2(1236),           -- (1702595G1)       NetVanta 1234 PoE 2nd Gen
+        adNV1238G2(1237),              -- (1702598G1)       NetVanta 1238 2nd Gen
+        adNV1238PoEG2(1238),           -- (1702599G1)       NetVanta 1238 PoE 2nd Gen
+        adTA5kSwM5GBp10G2(1239),       -- (1187030G2)       TA5k 10G Switch Module with Ring Generator ( 5G Backplane )
+        adTA5kSwM5GBp10G3(1240),       -- (1187030G3)       TA5k 10G Switch Module with 1588v2 and SyncE ( 5G Backplane )
+        adTA5kCarrier(1241),           -- (1174510G3)       TA5k Optical Carrier Card
+        adTA5k24pActiveEg2(1242),      -- (1187561F1)       2nd Gen 24 port ActiveE card – Single
+        adTA5kFan19IntlHF(1243),       -- (1188085G3)       Ta5k 19" High Flow Front Fan Module International
+        adTA5k48pVDSL2Ovr(1244),       -- (1187133F1)       TA5000 VDSL2 48-PORT Overlay Module
+        adTA5kVMux(1245),              -- (117472xG1)       Variable optical multiplexers/demultiplexers
+        adTAOTOS(1246),                -- (1174120F1-OTOS)  OTN Transport Optical Switch
+        adTATPR10(1247),               -- (1174211G1)       Transponder card
+        adTA5kDCMF20(1248),            -- (1174441G1)     Fiber based Dispersion Compensation Module 20km
+        adTA5kDCMF40(1249),            -- (1174442G1)     Fiber based Dispersion Compensation Module 40km
+        adTA5kDCMF60(1250),            -- (1174443G1)     Fiber based Dispersion Compensation Module 60km
+        adTA5kDCMF80(1251),            -- (1174444G1)     Fiber based Dispersion Compensation Module 80km
+        adTA5kDCMB40(1252),            -- (1174452G1)     Bragg-Grating based Dispersion Compensation Module 40km
+        adTA5kDCMB60(1253),            -- (1174453G1)     Bragg-Grating based Dispersion Compensation Module 60km
+        adTA5kDCMB80(1254),            -- (1174454G1)     Bragg-Grating based Dispersion Compensation Module 80km
+        adTAEDFAB(1255),               -- (1174401G1)     Optical Boost Amplifier card
+        adTAEDFAP(1256),               -- (1174411G1)     Optical Pre Amplifier card
+	adTA5kVMux21(1257),            -- (1174720G1)       Variable optical multiplexers/demultiplexers THz 192.1-192.4
+        adTA5kVMux25(1258),            -- (1174721G1)       Variable optical multiplexers/demultiplexers THz 192.5-192.8
+        adTA5kVMux29(1259),            -- (1174722G1)       Variable optical multiplexers/demultiplexers THz 192.9-193.2
+        adTA5kVMux33(1260),            -- (1174723G1)       Variable optical multiplexers/demultiplexers THz 193.3-193.6
+        adTA5kVMux37(1261),            -- (1174724G1)       Variable optical multiplexers/demultiplexers THz 193.7-194.0
+        adTA5kVMux41(1262),            -- (1174725G1)       Variable optical multiplexers/demultiplexers THz 194.1-194.4
+        adTA5kVMux45(1263),            -- (1174726G1)       Variable optical multiplexers/demultiplexers THz 194.5-194.8
+        adTA5kVMux49(1264),            -- (1174727G1)       Variable optical multiplexers/demultiplexers THz 194.9-195.2
+        adTA5kVMux53(1265),            -- (1174728G1)       Variable optical multiplexers/demultiplexers THz 195.3-195.6
+        adTA5kVMux57(1266),            -- (1174729G1)       Variable optical multiplexers/demultiplexers THz 195.7-196.0
+	adTA1148V4Scm(1267),           -- (11799xxxx-SCM)   TA1148V 4th Gen 48 port VDSL2 Host Dslam SCM
+	adTA1148GeV4(1268),            -- (1179932/3Fx)     TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+	adTA1148GeV4Sm(1269),          -- (1179932/3Fx-SM)  TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+	adTA1148GeV4Vdsl2(1270),       -- (1179932/3Fx-VDSL2) TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+	adTA1148GeV4Client(1271),      -- (1179930/1Fx)     TA1148V 4th Gen 48 port VDSL2 Client Dslam
+	adTA1148GeDMTV4(1272),         -- (1179950F1)       TA1148V 4th Gen GigE/DMT Fed 48 port VDSL2 Host Dslam
+        adTA1148GeDMTV4Sm(1273),       -- (1179950F1-SM)    TA1148V 4th Gen GigE/DMT Fed 48 port VDSL2 Host Dslam SM
+        adTA1148GeDMTV4Vdsl2(1274),    -- (1179950F1-VDSL2) TA1148V 4th Gen GigE/DMT Fed 48 port VDSL2 Host Dslam, VDSL2
+        adTA1148GeV42(1275),           -- (1179942/3Fx)     TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+        adTA1148GeV42Sm(1276),         -- (1179942/3Fx-SM)  TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+        adTA1148GeV42Vdsl2(1277),      -- (1179942/3Fx-VDSL2) TA1148V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+        adTA1148GeV42Client(1278),     -- (1179940/1Fx)     TA1148V 4th Gen 48 port VDSL2 Client Dslam
+        adTA1248V4Scm(1279),           -- (11795xxxx-SCM)   TA1248V 4th Gen 48 port VDSL2 Host Dslam SCM
+        adTA1248GeV4(1280),            -- (1179532/3Fx)     TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+        adTA1248GeV4Sm(1281),          -- (1179532/3Fx-SM)  TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+        adTA1248GeV4Vdsl2(1282),       -- (1179532/3Fx-VDSL2) TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+        adTA1248GeV4Client(1283),      -- (1179530/1Fx)     TA1248V 4th Gen 48 port VDSL2 Client Dslam
+        adTA1248GeV42(1284),           -- (1179542/3Fx)     TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam
+        adTA1248GeV42Sm(1285),         -- (1179542/3Fx-SM)  TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam SM
+        adTA1248GeV42Vdsl2(1286),      -- (1179542/3Fx-VDSL2) TA1248V 4th Gen GigE Fed 48 port VDSL2 Host Dslam, VDSL2
+        adTA1248GeV42Client(1287),     -- (1179540/1Fx)     TA1248V 4th Gen 48 port VDSL2 Client Dslam
+        adNV3140(1288),                -- (1700640F10; replaced w/ 1700340F1) NetVanta 3140
+        adNV3150A(1289),               -- (1700641F10)      NetVanta 3150 Annex A
+        adNV3150B(1290),               -- (1700641F10#IN)   NetVanta 3150 Annex B
+        adTA5006Dom192ndGen(1291),     -- (1187003F2)       TA5006 19" Domestic Mini Chassis 2nd Generation
+	adTA1424SCE(1292),             -- (1172654G1)       TA 1424S-CE ETSI
+        adNV644(1293),                 -- (1700144G1)       NetVanta 644
+        adNV1234PoERps(1294),          -- (1700599G2)       NetVanta 1234 PoE w/ RPS
+	adTA5kVMux17(1295),            -- (1174720G2)       Variable optical multiplexers/demultiplexers THz 191.7-192.0
+	adTA1448SCEANSI(1296),         -- (1172657G1)       TA 1448S-CE ANSI
+	adTA1424SCEANSI(1297),         -- (1172656G1)       TA 1424S-CE ANSI
+	adTA5kMARS2(1298),             -- (1174501G1)       Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 2 Degrees
+	adTA5kDCMB20(1299),            -- (1174451G1)	    DCM-B20 Bragg/Grating based dispersion compensation module 20km
+	adTA5kDCMB100(1300),           -- (1174455G1)	    DCM-B100 Bragg/Grating based dispersion compensation module 100km
+	adTA5kDCMB120(1301),           -- (1174456G1)	    DCM-B120 Bragg/Grating based dispersion compensation module 120km
+	adTA5kOSCP(1302),              -- (1174471G1)       TA5000 Optical Supervisory Channel Processor
+	adTA1648(1303),                -- (1179560F1)       TA1648 Chassis 48p Active Ethernet OLT
+	adTA1648SCM(1304),             -- (1179560F1/SCM)   TA1648 SCM     48p Active Ethernet OLT
+	adTA1648SM(1305),              -- (1179560F1/SM)    TA1648 SM      48p Active Ethernet OLT
+	adTA1648AM(1306),              -- (1179560F1/AM)    TA1648 AM      48p Active Ethernet OLT
+	adTA5k32pVDSL2G2(1307),        -- (1187121G2)       TA5000 VDSL2 32PORT AM
+	adTAETOS1N(1308),              -- (1174101F2)	    Ethernet Transport Optical System with Dual 10 GigE/OTN PHYs and 16 x 1 GigE PHYs
+	adTASTOS8(1309),               -- (1174121F1)	    Eight GigE/STM1/STM4 client ports  and one 10 GigE Network Port
+	adTA5kSwM20GBp10F1(1310),      -- (1187040F1)       TA5000 SM20 4-10G
+	adTA5k32pIntlVDSLAM(1311),     -- (1188122G1)       TA5000 International VDSL2 32-PORT AM
+	adTA5kIntlVdslMtaSC(1312),     -- (1188126G1)       TA5000 International VDSL2 MTA-SC 32 Port
+        adTAEDFAM(1313),               -- (1174431G1)       Optical Mid-Stage Amplifier card
+        adTAEtos10Otn(1314),           -- (1174130F1_ETOS_10_OTN)  Ethernet Transport Optical Switch with OTN, 8 10G ports, and 2 1G ports
+        adTAEtos10(1315),              -- (1174130F2_ETOS_10)  Ethernet Transport Optical Switch with 8 10G ports, and 2 1G ports
+	adTA5kMARS4(1316),             -- (1174511G1)       Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 4 Degrees
+        adNV868Vdsl8p(1317),           -- (1172868F1)       NetVanta 868 VDSL 8 Port, Annex A, AC
+	adTa5kIntTopFan(1318),         -- (1188085G4)       TA5000 19" Fan Module Top Exhaust
+	adTa5006IntFanHF(1319),        -- (1188090G3)       TA5006 Int 19" High Flow Fan Module
+        adTAOTOS0(1320),               -- (1174123F1_OTOS_0)  OTN Transport Optical Switch w/ ODU0 support
+        adTAOTOS8(1321),               -- (1174121F1_OTOS_8)  OTN Transport Optical Switch (8 port)
+        adNVUsbWwanNim(1322),          -- (1702803F1)       NetVanta USB WWAN NIM
+	adNV868Vdsl8pAnxAdc(1323),           -- (1172868F2)       NetVanta 868 VDSL 8 Port, Annex A, DC
+	adNV868Vdsl8pAnxBac(1324),           -- (1172868F3)       NetVanta 868 VDSL 8 Port, Annex B, AC
+	adNV868Vdsl8pAnxBdc(1325),           -- (1172868F4)       NetVanta 868 VDSL 8 Port, Annex B, DC
+	adNV868Vdsl8pAnxAacNordic(1326),     -- (1172868F5)       NetVanta 868 VDSL 8 Port, Annex A, AC, Nordic
+        adTA5kMARS2P(1327),            -- (1174502G1)       Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 2 Degrees with Pre Amp
+        adTA5kMARS2B(1328),            -- (1174503G1)       Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 2 Degrees with Booster Amp
+        adTA5kMARS4PB(1329),           -- (1174512G1)       Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 4 Degrees with Pre and Booster Amp
+        adTA5kMARS4B(1330),            -- (1174513G1)       Mini Amplified Reconfigurable Optical Add/Drop Multiplexer System 4 Degrees with Booster Amp
+        adTAEDFAPB(1331),              -- (1174402G1)       Optical Pre/Boost Amplifier card
+        adNV838Shdsl8pEnhMem(1332),    -- (1172633G4)       NetVanta 838 8 Port, Enhanced Memory
+	adTA5004MSwM1GBp1GF1(1333),    -- (1187014F1)       TA5004 1G Management Switch Module ( 1G Backplane )
+        adTA5004MSwM25GBp1GF1(1334),   -- (1187013F1)       TA5004 1G Management Switch Module ( 2.5G Backplane )
+	adTA5004MSwM20GBp10GF1(1335),  -- (1187016F1)       TA5004 10G Management Switch Module ( 20G Backplane )
+
+        ad3GTA908e(1336),              -- (4243908F1)       TA 908e 3rd Gen
+        ad3GTA908eFxo(1337),           -- (4243908F2)       TA 908e Fxo 3rd Gen
+        ad3GTA916e(1338),              -- (4243916F1)       TA 916e 3rd Gen
+        ad3GTA916eFxo(1339),           -- (4243916F2)       TA 916e Fxo 3rd Gen
+        ad3GTA924e(1340),              -- (4243924F1)       TA 924e 3rd Gen
+        ad3GTA924eFxo(1341),           -- (4243924F2)       TA 924e Fxo 3rd Gen
+        ad3GTA924eFxsFxo(1342),        -- (4243924F3)       TA 924e 16Fxs+9Fxo 3rd Gen
+
+        adNV6250Fxs8(1343),            -- (4700252F1)       NetVanta 6250, 8 FXS
+        adNV6250Fxs8Fxo(1344),         -- (4700252F2)       NetVanta 6250, 8 FXS + 1 FXO
+        adNV6250Fxs16(1345),           -- (4700254F1)       NetVanta 6250, 16 FXS
+        adNV6250Fxs16Fxo(1346),        -- (4700254F2)       NetVanta 6250, 16 FXS + 1 FXO
+        adNV6250Fxs24(1347),           -- (4700256F1)       NetVanta 6250, 24 FXS
+        adNV6250Fxs24Fxo(1348),        -- (4700256F2)       NetVanta 6250, 24 FXS + 1 FXO
+        adNV6250Fxs16Fxo9(1349),       -- (4700256F3)       NetVanta 6250, 16 FXS + 9 FXO
+
+	adTA5004MSM20GBp10GF1SCM(1350),    -- (1187016F1_SCM)       TA5004 10G MSM SCM ( 20G Backplane )
+	adTA500419(1351),                  -- (1187004F1)           TA5004 19 inch shelf
+        adNV1244(1352),                -- (1700574G1)       NetVanta 1244
+        adNV1244PoE(1353),             -- (1700575G1)       NetVanta 1244 w/ PoE
+        adNV1248(1354),                -- (1700578G1)       NetVanta 1248
+        adNV1248PoE(1355),             -- (1700579G1)       NetVanta 1248 w/ PoE
+        adTA5k8pSfp25GigGPON(1356),    -- (1187503F1)       TA5000 2.5G 8-PON SFP Based GPON OLT
+        adTA5k24pActiveE20G (1357),    -- (1187562F1)       20 Gig Active Ethernet
+        adNV4660(1358),                -- (17004660F1)      NetVanta 4660
+        adNV6360Fxs8(1359),            -- (17006362F1)      NetVanta 6360 8 FXS
+        adNV6360Fxs16(1360),           -- (17006364F1)      NetVanta 6360 16 FXS
+        adNV6360Vdsl2(1361),           -- (17206369F1)      NetVanta 6360 DUAL VDSL
+        adNV6360Vdsl2AnxB(1362),       -- (17206369F2)      NetVanta 6360 DUAL VDSL, ANX B
+        adNV6360T1E14Efm(1363),        -- (17406367F1)      NetVanta 6360 QUAD T1/E1 EFM
+        adNV6360Shdsl4Efm(1364),       -- (17406368F1)      NetVanta 6360 QUAD SHDSL EFM
+        adNV6360Shdsl4EfmAnxB(1365),   -- (17406368F2)      NetVanta 6360 QUAD SHDSL EFM ANX B
+        adNV6360Vdsl4AnxA(1366),       -- (17406369F1)      NetVanta 6360 QUAD VDSL, ANX A
+        adNV6360Vdsl4AnxB(1367),       -- (17406369F2)      NetVanta 6360 QUAD VDSL, ANX B
+        adNV6360T1E18Efm(1368),        -- (17806367F1)      NetVanta 6360 OCTAL T1/E1 EFM
+        adNV6360Shdsl8Efm(1369),       -- (17806368F1)      NetVanta 6360 OCTAL SHDSL EFM
+        adNV6360Shdsl8EfmAnxB(1370),   -- (17806368F2)      NetVanta 6360 OCTAL SHDSL EFM ANX B
+        adNV1234G3(1371),              -- (1703594G1)       NetVanta 1234 3rd Gen
+        adNV1234PoEG3(1372),           -- (1703595G1)       NetVanta 1234 PoE 3rd Gen
+        adNV1238G3(1373),              -- (1703598G1)       NetVanta 1238 3rd Gen
+        adNV1238PoEG3(1374),           -- (1703599G1)       NetVanta 1238 PoE 3rd Gen
+        adTA5004Dom19Fan(1375),        -- (1187094F1)       TA5004 19" Domestic Mini Chassis Fan Module
+        adTA1108VPGponMduOnt(1376),    -- (1179870F1R)      TA1108VP GPON MDU ONT
+        adNV1235P(1377),               -- (1700595G10)      NetVanta 1235 PoE
+        adTA5k48pVDSL2Combo(1378),     -- (1187130F1)       TA5000 VDSL2 48 PORT Combo
+        adTA5kSwM5GBp10F1(1379),       -- (1187031F1)       TA5k 10G Switch Module ( 5G Backplane )
+        adNV1531(1380),                -- (1700570F1)       NetVanta 1531
+        adNV1531P(1381),               -- (1700571F1)       NetVanta 1531P
+        adTA5004VDSL2Vector192p(1382), -- (1187190F1)       TA5004 VDSL2 Vector 192 PORT SLV
+        advWLAN(1383),                 -- (1951900G1)       vWLAN
+        adTA5k4pSfp25GigGPONGen2(1384),      -- (1187502F2)       TA5000 2.5G 4PON SFP Based GPON OLT Gen 2
+        adTA5k8pSfp25GigGPONGen2(1385),      -- (1187503F2)       TA5000 2.5G 8PON SFP Based GPON OLT Gen 2
+        adTA5k4pXGPONOLT(1386),              -- (1187510F1)       TA5000 4PON XFP Based XGPON OLT
+        adNV6360Fxs24(1387),           -- (47006366F1)      NetVanta 6360 24 FXS
+        adNV6360Fxs16Fxo8(1388),       -- (47006367F1)      NetVanta 6360 16 FXS 8 FXO
+        adTA508VPGponMduOnt(1389),     -- (1179870F1)       TA508VP GPON MDU ONT
+        adNV8424RAEthSw(1390),         -- (1174820F1)       NetVanta 8424 RA Multi-service Edge Switch
+        adNV8424SDEthSw(1391),         -- (1174821F1)       NetVanta 8424 SD Multi-service Edge Switch
+        adNV5660(1392),                -- (17005660F1)      NetVanta 5660
+        adTAOTOS100(1393),             -- (1174155F1_OTOS_100)  100G OTN Transport Optical Switch
+        adTAETOS100(1394),             -- (1174140F1_ETOS_100)  100G Ethernet Transport Optical Switch
+        adTATPR100(1395),              -- (1174215F1_TPR_100)   100G Transponder Card
+        adNV1535P(1396),               -- (1702595G10)      NetVanta 1535P
+        adNGPON4XFP1010(1397),         -- (1187514F1)       NGPON 10/10, 4 XFP
+        adNV155024(1398),              -- (17101524F1)      NetVanta 1550-24
+        adNV155024P(1399),             -- (17101524PF1)     NetVanta 1550-24P
+        adNV155048(1400),              -- (17101548F1)      NetVanta 1550-48
+        adNV155048P(1401),             -- (17101548PF1)     NetVanta 1550-48P
+
+        adEndOfList(9999)              -- place holder for editing, never used.
+        }
+
+   -- These identifiers are used to define the product leaves
+   --   in the subtree adtran(664).adPerform(4)
+
+    AdPerformance ::= INTEGER { -- use to define all ADTRAN performance OIDs
+        adFRPerformmg (1),
+        adL3Performmg (2)
+        }
+
+    -- These identifiers are used to define the product leaves
+    --   in the subtree adtran(664).adShared(5)
+
+    AdSharedCommon ::= INTEGER { -- use to define all ADTRAN shared OIDs
+        adExLan(1),
+        adFRHistory(2),
+        adEOCxxx(3),
+        adTARouterGroup(4),
+        adFXOcommon(5),
+        adNx64common(6),
+        adOCUDPcommon(7),
+        adDSODPcommon(8),
+        adUBRITEcommon(9),
+        adFXScommon(10),
+        adPRI(11),
+        adXSUIQEXTmg(12),
+        adGenericShelves(13),
+        adH2TUCcommon(14),
+        adENDgenChassis(15),
+        adTrapInform(16),
+        adSCUCommon(17),
+        adEandMcommon(18),
+        adGenVoice(19),
+        adGenLIU(20),
+        adDSX1Common(21),
+        adTA1500SCUCommon(22),
+        adPSUcommon(23),
+        adGenSHDSL(24),
+        adTARouterTraps(25),
+        adTracerCommon(26),
+        adExp653x(27),
+        adTASHDSLSP(28),
+        adDSX1CommonTraps(29),  -- extends adDSX1Common for traps
+        adunit(30),
+        adH4TUCcommon(31),
+        adIadSysMib(32),
+        adIadRouter(33),
+        adIadVoice(34),
+        adGenOPTI3(35),
+        adGenAtm(36),
+        ad4WCommon(37),
+        adDXCommon(38),
+        adGTCommon(39),
+        adGenOPTI3Traps(40),
+        adgenDSX1FR(41),
+        adTa6xx(42),
+        adIadIwf(43),
+        adGen654x(44),
+        adGenSHDSL4(45),
+        adMCUcommon(46),
+        adTA1500FT1common(47),
+        adGenOMMX(48),
+        adGenOMMXTraps(49),
+        adGenOptical(50),      -- All future Phoenix (JV)
+        adGenHDSL(51),         -- All future HDSL (BS, BT, JT)
+        adRfc2955FrAtm(52),    -- CND (DC)
+        adGenAOS(53),
+        adGenAccessories(54),  -- TA 3xxx apps (AP, GF, MR, EB)
+        adETOCommon(55),       -- 1500
+        ad4WTDMCommon(56),     -- 1500
+        adGen1500(57),         -- All future 1500 (KW, PD)
+        adGenOMMXTraps2(58),
+        adSHDSL(59),           -- All future SHDSL (JB, JB)
+        adCndRemRep(60),       -- All future Rem Rep products (KE, BT)
+        adGenMiniDSLAM(61),    -- All future Mini DSLAM products (GO, JT)
+        adGenCndIP(62),        -- IP services for 1100F/5000 initially (TC)
+        adGenTaControllers(63),-- Total Access Controller products (AP, MR)
+        adGenGR303(64),        -- All future GR303 generic MIBs (MM, PD)
+        adGenVDSL2(65),        -- All future VDSL2 (JZ, BT)
+        adGenEfm(66),          -- All future EFM (JB, JB)
+        adGen5000(67),         -- All future 5000 (PM, PD -> AD, RW)
+        adGenFibE1(68),        -- All future Fiber E1 (TC, JB)
+        adGenEoCu(69),         -- All future Ethernet over Copper (JB, JB)
+        adGenCndSystem(70),    -- Generic System MIB for CND products
+        adGenPwe(71),          -- All future PWE (BM, JM)
+        adGenQueue(72),        -- All future Queue (AR, JB)
+        adGenXDSL(73),         -- All future xDSL DSL applicable options (CH, CP)
+        adGenDS3(74),          -- All future DS3 products (JB, JB)
+        adGenEthernetOAM(75),  -- All future Ethernet OAM products (RK, BT)
+        adGenGPON(76),         -- All future GPON products (SS, JW)
+        adGenTAEMS(77),        -- All future EMS MIBs (pb, tc, KD)
+        adGenDS1(78),          -- All future DS1 products (AS, JV)
+        adGenErps(79),         -- All future ERPS products (SM, JZ)
+	adGenDHCP(80),         -- All future DHCP support (CB, TC)
+        adGenTest(81)          -- All future Generic Test Engineering
+        }
+
+    -- A type to define occupancy of a slot (real or virtual)
+
+    AdPresence ::=  INTEGER {    -- used to reflect occupancy status
+        empty(1),         -- not occupied and not reserved
+        virtual(2),       -- empty, but was, or is
+                          --   preprovisioned (optional)
+        occupied(3)       -- occupied with designated type
+        }
+
+
+    -- A type to define alarm severities
+
+    AdAlarmSeverity ::= INTEGER {    -- A type to define alarm severities
+        informational(1),
+        warning(2),
+        minor(3),
+        major(4),
+        critical(5)
+        }
+
+    -- A type for dynamic row creation, maintenance, and deletion
+
+    EntryStatus ::= INTEGER {    -- used to dynamically manage rows
+        valid(1),         -- row exists, or command
+                          --   to signal row complete
+        createRequest(2), -- command to insert row
+        underCreation(3), -- status upon creation if interim
+        invalid(4)        -- command to delete row
+        }
+
+    -- Table algorithm from rfc1757 RMON-MIB:
+
+              --   EntryStatus ::= INTEGER
+              --           { valid(1),
+              --             createRequest(2),
+              --             underCreation(3),
+              --             invalid(4)
+              --           }
+              -- The status of a table entry.
+              --
+              -- Setting this object to the value invalid(4) has the
+              -- effect of invalidating the corresponding entry.
+              -- That is, it effectively disassociates the mapping
+              -- identified with said entry.
+              -- It is an implementation-specific matter as to whether
+              -- the agent removes an invalidated entry from the table.
+              -- Accordingly, management stations must be prepared to
+              -- receive tabular information from agents that
+              -- corresponds to entries currently not in use.  Proper
+              -- interpretation of such entries requires examination
+              -- of the relevant EntryStatus object.
+              --
+              -- An existing instance of this object cannot be set to
+              -- createRequest(2).  This object may only be set to
+              -- createRequest(2) when this instance is created.  When
+              -- this object is created, the agent may wish to create
+              -- supplemental object instances with default values
+              -- to complete a conceptual row in this table.  Because
+              -- the creation of these default objects is entirely at
+              -- the option of the agent, the manager must not assume
+              -- that any will be created, but may make use of any that
+              -- are created. Immediately after completing the create
+              -- operation, the agent must set this object to
+              -- underCreation(3).
+              --
+              -- When in the underCreation(3) state, an entry is
+              -- allowed to exist in a possibly incomplete, possibly
+              -- inconsistent state, usually to allow it to be
+              -- modified in mutiple PDUs.  When in this state, an
+              -- entry is not fully active.  Entries shall exist in
+              -- the underCreation(3) state until the management
+              -- station is finished configuring the entry and sets
+              -- this object to valid(1) or aborts, setting this
+              -- object to invalid(4).  If the agent determines that
+              -- an entry has been in the underCreation(3) state for
+              -- an abnormally long time, it may decide that the
+              -- management station has crashed.  If the agent makes
+              -- this decision, it may set this object to invalid(4)
+              -- to reclaim the entry.  A prudent agent will
+              -- understand that the management station may need to
+              -- wait for human input and will allow for that
+              -- possibility in its determination of this abnormally
+              -- long period.
+              --
+              -- An entry in the valid(1) state is fully configured and
+              -- consistent and fully represents the configuration or
+              -- operation such a row is intended to represent.  For
+              -- example, it could be a statistical function that is
+              -- configured and active, or a filter that is available
+              -- in the list of filters processed by the packet capture
+              -- process.
+              --
+              -- A manager is restricted to changing the state of an
+              -- entry in the following ways:
+              --
+              --                       create   under
+              --      To:       valid  Request  Creation  invalid
+              -- From:
+              -- valid             OK       NO        OK       OK
+              -- createRequest    N/A      N/A       N/A      N/A
+              -- underCreation     OK       NO        OK       OK
+              -- invalid           NO       NO        NO       OK
+              -- nonExistent       NO       OK        NO       OK
+              --
+              -- In the table above, it is not applicable to move the
+              -- state from the createRequest state to any other
+              -- state because the manager will never find the
+              -- variable in that state.  The nonExistent state is
+              -- not a value of the enumeration, rather it means that
+              -- the entryStatus variable does not exist at all.
+              --
+              -- An agent may allow an entryStatus variable to change
+              -- state in additional ways, so long as the semantics
+              -- of the states are followed.  This allowance is made
+              -- to ease the implementation of the agent and is made
+              -- despite the fact that managers should never
+              -- excercise these additional state transitions.
+
+    END

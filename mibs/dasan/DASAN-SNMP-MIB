@@ -1,0 +1,221 @@
+--
+-- dasanSNMP.my
+--
+--  Provide SNMP informations & control.
+--  
+--  Aug 25 2005   at 21:43            
+--
+--                                
+                                 
+DASAN-SNMP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32, Gauge32, Counter64, Unsigned32,
+    Integer32, TimeTicks, mib-2,
+    NOTIFICATION-TYPE
+    			FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString,
+    PhysAddress, TruthValue, RowStatus,
+    TimeStamp, AutonomousType, TestAndIncr
+                        FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP        FROM SNMPv2-CONF
+    ifIndex             FROM IF-MIB
+    dasanEvents,dasanMgmt,dasanModules
+                        FROM DASAN-SMI 
+    dasanSwitchMIBObjects,dsSwitchModules
+			FROM DASAN-SWITCH-MIB; 
+ 
+dsSnmp MODULE-IDENTITY 
+       LAST-UPDATED   "200508250000Z"
+       ORGANIZATION   "Dasan Co., Ltd."
+       CONTACT-INFO
+                   "Dasan Co., Ltd."
+       DESCRIPTION
+        "The MIB module to describe SNMP of DASAN product."	   
+       ::= { dsSwitchModules 23 }
+
+ 
+--
+-- TrapHost Informations.
+--
+dsSnmpTrapHost OBJECT IDENTIFIER ::= { dsSnmp 3 }  
+
+
+dsSnmpTrapHostTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF DsSnmpTrapHostEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"DASAN SNMP TrapHost Information Table."
+		::= { dsSnmpTrapHost 1 }
+
+		
+dsSnmpTrapHostEntry OBJECT-TYPE
+		SYNTAX DsSnmpTrapHostEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"DASAN SNMP TrapHost Information Table."
+		INDEX { dsSnmpTrapHostType, dsSnmpTrapHostAddress }
+		::= { dsSnmpTrapHostTable 1 }
+
+DsSnmpTrapHostEntry ::=
+		SEQUENCE { 
+			dsSnmpTrapHostType
+				INTEGER,
+			dsSnmpTrapHostAddress
+				IpAddress,
+			dsSnmpTrapHostCommunity
+				OCTET STRING,
+			dsSnmpTrapSourceAddress              -- Binding source-Address
+				IpAddress,                        
+			dsSnmpTrapProtocol                   -- UDP(1) : default, TCP(2)
+				INTEGER,				
+			dsSnmpTrapHostPort                   -- Destination's Port
+				Integer32
+		 }
+
+dsSnmpTrapHostType OBJECT-TYPE
+		SYNTAX INTEGER
+			{
+			trapHost(1),
+			trap2Host(2),
+			informTrapHost(3)
+			}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The type of trap-host.  
+			trapHost(1) means a SNMP version 1.
+			trap2Host(2) means a SNMP version 2.
+			informTrapHost(3) means a SNMP version 2 inform notification."
+		::= { dsSnmpTrapHostEntry 1 }
+
+		
+dsSnmpTrapHostAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Host address for received traps."
+		::= { dsSnmpTrapHostEntry 2 }
+		
+dsSnmpTrapHostCommunity OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Trap community."
+		::= { dsSnmpTrapHostEntry 3 }
+
+dsSnmpTrapSourceAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Trap binding address."
+		::= { dsSnmpTrapHostEntry 4 } 
+                       
+dsSnmpTrapProtocol OBJECT-TYPE
+		SYNTAX INTEGER  
+			{
+				udp(1),
+				tcp(2)
+			}
+		MAX-ACCESS read-only      -- currently not available
+		STATUS current
+		DESCRIPTION
+			"Trap communication protocol."
+		::= { dsSnmpTrapHostEntry 5 } 
+              						
+dsSnmpTrapHostPort OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only      -- currently not available
+		STATUS current
+		DESCRIPTION
+			"Trap commnunication port. (advanced)"
+		::= { dsSnmpTrapHostEntry 6 }
+
+ 
+--
+-- dsSnmpConrol
+--
+dsSnmpTrapHostControl OBJECT IDENTIFIER ::= { dsSnmpTrapHost 2 }
+
+dsSnmpTrapHostControlRequest OBJECT-TYPE
+		SYNTAX INTEGER 
+				{
+				 create(1),
+				 delete(2)
+				}
+		MAX-ACCESS write-only
+		STATUS current
+		DESCRIPTION
+			"Create(1) or delete(2) trap-host entry."
+		::= { dsSnmpTrapHostControl 1 }
+
+dsSnmpTrapHostControlType OBJECT-TYPE
+		SYNTAX INTEGER 
+               {
+				trapHost(1),
+				trap2Host(2),
+				informTrapHost(3)
+				}
+		MAX-ACCESS write-only
+		STATUS current
+		DESCRIPTION
+			"The type of trap-host.  
+			trapHost(1) means a SNMP version 1.
+			trap2Host(2) means a SNMP version 2.
+			informTrapHost(3) means a SNMP version 2 inform notification."
+		::= { dsSnmpTrapHostControl 2 }
+
+dsSnmpTrapHostControlAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS write-only
+		STATUS current
+		DESCRIPTION
+			"Host address for received traps."
+		::= { dsSnmpTrapHostControl 3 }
+
+dsSnmpTrapHostControlCommunity OBJECT-TYPE
+		SYNTAX OCTET STRING 
+		MAX-ACCESS write-only
+		STATUS current
+		DESCRIPTION
+			"Trap community."
+		::= { dsSnmpTrapHostControl 4 }
+
+dsSnmpTrapHostControlSrcAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS write-only
+		STATUS current
+		DESCRIPTION
+			"Trap binding address."
+		::= { dsSnmpTrapHostControl 5 }
+
+dsSnmpTrapHostControlProtocol OBJECT-TYPE
+		SYNTAX INTEGER 
+               {
+				 udp(1),
+				 tcp(2)
+				}
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Trap communication protocol."
+		::= { dsSnmpTrapHostControl 6 }
+
+dsSnmpTrapHostControlPort OBJECT-TYPE
+		SYNTAX INTEGER 
+   		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Trap commnunication port. (advanced)"
+		::= { dsSnmpTrapHostControl 7 }
+                               
+                                   
+END

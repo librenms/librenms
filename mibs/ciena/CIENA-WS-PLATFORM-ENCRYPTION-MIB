@@ -1,0 +1,240 @@
+CIENA-WS-PLATFORM-ENCRYPTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsPlatformConfig
+        FROM CIENA-WS-MIB
+    ifIndex                     
+        FROM IF-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue, DisplayString
+        FROM SNMPv2-TC;
+
+cienaWsPlatformEncryptionMIB MODULE-IDENTITY
+    LAST-UPDATED "201808220000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION 
+       "Encryption MIB name change to include PLATFORM in the name." 
+    REVISION "201808220000Z"
+    DESCRIPTION 
+       "Datapath encryption support on Waveserver Ai." 
+    REVISION "201807160000Z"
+    DESCRIPTION "Added MIB Definition"
+    ::= { cienaWsPlatformConfig 23 }
+
+AuthenticationMaterialType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        unknown (0),
+        preSharedKey (1),
+        certificateECC(2)
+}
+
+WarmRestartType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        unknown (0),
+        fips (1),
+        nonFIPS (2)
+}
+
+channelEncryptionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ChannelEncryptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Data Path Encryption properties for a channel of a line port."
+    ::= { cienaWsPlatformEncryptionMIB 3 }
+
+channelEncryptionEntry OBJECT-TYPE
+    SYNTAX ChannelEncryptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for channelEncryptionTable."
+    INDEX { ifIndex }
+    ::= { channelEncryptionTable 1 }
+
+ChannelEncryptionEntry ::= SEQUENCE { 
+    channelDescr DisplayString,
+    peerAuthenticationStatus INTEGER,
+    peerAuthenticationStatusUpdateTime DisplayString 
+}
+
+channelDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "ifIndex descriptor"
+    ::= { channelEncryptionEntry 1 }
+
+peerAuthenticationStatus OBJECT-TYPE
+    SYNTAX INTEGER { unknown(0), pass(1), fail(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the channel of a line port is authenticated with its peer."
+    ::= { channelEncryptionEntry 2 }
+
+peerAuthenticationStatusUpdateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Last time when the channel's peer authentication status is updated."
+    ::= { channelEncryptionEntry 3 }
+
+encryptionPreSharedKeyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EncryptionPreSharedKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Channel of a line port data path encryption pre-shared-key properties."
+    ::= { cienaWsPlatformEncryptionMIB 4 }
+
+encryptionPreSharedKeyEntry OBJECT-TYPE
+    SYNTAX EncryptionPreSharedKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for encryptionPreSharedKeyTable."
+    INDEX { ifIndex }
+    ::= { encryptionPreSharedKeyTable 1 }
+
+EncryptionPreSharedKeyEntry ::= SEQUENCE { 
+    encryptionPreSharedChannelDescr DisplayString,
+    encryptionPreSharedKeyFingerprint DisplayString,
+    encryptionPreSharedKeyStatus TruthValue,
+    encryptionPreSharedKeyDescription DisplayString 
+}
+
+encryptionPreSharedChannelDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "ifIndex descriptor"
+    ::= { encryptionPreSharedKeyEntry 1 }
+
+encryptionPreSharedKeyFingerprint OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A system generated hash value based on the provisioned pre-shared-key. If no key is provisioned, the fingerprint is empty."
+    ::= { encryptionPreSharedKeyEntry 2 }
+
+encryptionPreSharedKeyStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Boolean value to indicate whether the pre-shared-key has been setup by user or not." 
+    ::= { encryptionPreSharedKeyEntry 3 }
+
+encryptionPreSharedKeyDescription OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A human-readable description for the applied pre-shared-key. Eg. 'PSK for site 1 and site 2'"
+    ::= { encryptionPreSharedKeyEntry 4 }
+
+systemEncryptionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SystemEncryptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "System level data path encryption properties."
+    ::= { cienaWsPlatformEncryptionMIB 5 }
+
+systemEncryptionEntry OBJECT-TYPE
+    SYNTAX SystemEncryptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for systemEncryptionTable."
+    INDEX { systemEncryptionTableSnmpKey }
+    ::= { systemEncryptionTable 1 }
+
+SystemEncryptionEntry ::= SEQUENCE { 
+    systemEncryptionTableSnmpKey Integer32,
+    authenticationMaterialType AuthenticationMaterialType,
+    warmRestartType WarmRestartType,
+    signingCACertificate DisplayString,
+    entityCertificate DisplayString
+}
+
+systemEncryptionTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemEncryptionState"
+    ::= { systemEncryptionEntry 1 }
+
+authenticationMaterialType OBJECT-TYPE
+    SYNTAX AuthenticationMaterialType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Authentication material for this Waveserver. Default Type is pre-shared-key."
+    ::= { systemEncryptionEntry 2 }
+
+warmRestartType OBJECT-TYPE
+    SYNTAX  WarmRestartType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Defines the warm-restart type for all encryption cards in the chassis. The default type is FIPS"
+    ::= { systemEncryptionEntry 3 }
+
+signingCACertificate OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Signing CA (Certificate Authority) Certificate"
+    ::= { systemEncryptionEntry 4 }
+
+entityCertificate OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Entity Certificate name issued by Certificate Authority (CA)"
+    ::= { systemEncryptionEntry 5 }
+
+
+-- Conformance statements
+cienaWsEncryptionObjects OBJECT IDENTIFIER
+    ::= { cienaWsPlatformEncryptionMIB 1 }
+
+cienaWsEncryptionConformance OBJECT IDENTIFIER
+    ::= { cienaWsPlatformEncryptionMIB 2 }
+
+cienaWsEncryptionGroups OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionConformance 1 }
+
+cienaWsEncryptionGroup OBJECT-GROUP
+    OBJECTS { 
+        channelDescr,
+        peerAuthenticationStatus,
+        peerAuthenticationStatusUpdateTime,
+	encryptionPreSharedChannelDescr,
+	encryptionPreSharedKeyFingerprint,
+        encryptionPreSharedKeyStatus,
+        encryptionPreSharedKeyDescription,
+	authenticationMaterialType,
+        warmRestartType ,
+	signingCACertificate,
+        entityCertificate
+    }
+
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsEncryptionGroups 1 }
+
+cienaWsEncryptionCompliances OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionConformance 2 }
+
+cienaWsEncryptionCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsEncryptionGroup }
+    ::= { cienaWsEncryptionCompliances 1 }
+
+END -- End module

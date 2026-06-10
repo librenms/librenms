@@ -1,0 +1,364 @@
+-- ****************************************************************************
+--  COLUBRIS-SATELLITE-MANAGEMENT-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks Satellite Management MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-SATELLITE-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, IpAddress
+        FROM    SNMPv2-SMI
+    MacAddress, DisplayString, TruthValue
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisNotificationEnable, ColubrisSSIDOrNone
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisSatelliteManagementMIB  MODULE-IDENTITY
+    LAST-UPDATED    "200602230000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris SatelliteManagement MIB."
+
+    ::= { colubrisMgmtV2 7 }
+
+
+-- colubrisSatelliteManagementMIB definition
+colubrisSatelliteManagementMIBObjects OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIB 1 }
+
+-- MIB defines the following groupings
+satelliteInfo   OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIBObjects 1 }
+masterSettings  OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIBObjects 2 }
+
+-- Satellite Information
+satelliteTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SatelliteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The table of all satellite access points currently registered
+                 by the Master access point. In tabular form to allow multiple
+                 instance on an agent."
+    ::= { satelliteInfo 1 }
+
+satelliteEntry OBJECT-TYPE
+    SYNTAX      SatelliteEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Information about a Satellite access point currently registered
+                 by the Master access point.
+                 satelliteIndex - Uniquely identifies a device in the satellite
+                                  table."
+    INDEX       { satelliteIndex }
+    ::= { satelliteTable 1 }
+
+SatelliteEntry ::= SEQUENCE
+{
+    satelliteIndex                      Integer32,
+    satelliteDeviceId                   DisplayString,
+    satelliteMacAddress                 MacAddress,
+    satelliteIpAddress                  IpAddress,
+    satelliteName                       DisplayString,
+    satelliteSSID                       ColubrisSSIDOrNone,
+    satelliteChannelNumber              Unsigned32,
+    satelliteForwardWirelessToWireless  TruthValue,
+    satelliteMasterTrafficOnly          TruthValue,
+    satelliteSNMPPort                   Integer32,
+    satelliteSecureWebPort              Integer32,
+    satelliteDeviceMacAddress           MacAddress,
+    satelliteProductName                DisplayString,
+    satelliteFirmwareRevision           DisplayString,
+    satelliteGroupName                  DisplayString,
+    satelliteChannelNumberRadio2        Unsigned32,
+    satelliteVLAN                       Integer32,
+    satelliteDetectionPort              DisplayString
+}
+
+satelliteIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index of a the satellite in the satelliteTable."
+    ::= { satelliteEntry 1 }
+
+satelliteDeviceId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device ID of a the satellite in the satelliteTable."
+    ::= { satelliteEntry 2 }
+
+satelliteMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the MAC address of the wireless radio of the
+                 satellite access point."
+    ::= { satelliteEntry 3 }
+
+satelliteIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the IP address of the satellite access point."
+    ::= { satelliteEntry 4 }
+
+satelliteName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the name of the satellite access point."
+    ::= { satelliteEntry 5 }
+
+satelliteSSID OBJECT-TYPE
+    SYNTAX      ColubrisSSIDOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the SSID of the satellite access point."
+    ::= { satelliteEntry 6 }
+
+satelliteChannelNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the wireless channel number the satellite
+                 access point is operating on."
+    ::= { satelliteEntry 7 }
+
+satelliteForwardWirelessToWireless OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the forwarding of traffic between wireless client
+                 stations is enabled on the satellite access point.
+                   'true': indicates that the forwarding feature is enabled,
+                   'false': indicates that no forwarding takes place."
+    ::= { satelliteEntry 8 }
+
+satelliteMasterTrafficOnly OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the satellite will only forward traffic that
+                 is addressed to the MAC address of the Master access point."
+    ::= { satelliteEntry 9 }
+
+satelliteSNMPPort OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP port on which the satellite listens.
+                 The value zero is used when no information could be
+                 retrieved from the satellite device."
+    ::= { satelliteEntry 10 }
+
+satelliteSecureWebPort  OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the secure web port on which the satellite listens.
+                The value zero is used when no information could be
+                retrieved from the satellite device."
+    ::= { satelliteEntry 11 }
+
+satelliteDeviceMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the MAC address of the satellite access point
+                 bridge interface."
+    ::= { satelliteEntry 12 }
+
+satelliteProductName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the Colubris Networks product name for the device 
+                 in printable ASCII characters."
+    ::= { satelliteEntry 13 }
+
+satelliteFirmwareRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the revision number of the device firmware in 
+                 printable ASCII characters."
+    ::= { satelliteEntry 14 }
+
+satelliteGroupName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the location-aware group name of the satellite.
+                 The group name is only returned when location-aware is
+		     enabled at the satellite. An empty string is returned
+		     otherwise."
+    ::= { satelliteEntry 15 }
+
+satelliteChannelNumberRadio2 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the wireless channel number the radio 2 is
+                 operating on."
+    ::= { satelliteEntry 16 }
+
+satelliteVLAN OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Management VLAN."
+    ::= { satelliteEntry 17 }
+
+satelliteDetectionPort OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The detection packet is send on this interface."
+    ::= { satelliteEntry 18 }
+
+satelliteNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the number of satellites present in the satellite table."
+    ::= { satelliteInfo 2 }
+
+
+-- satellite notification configuration
+satelliteUpNotificationEnabled OBJECT-TYPE 
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if satelliteUpNotification notifications are generated."
+    DEFVAL      { enable }
+    ::= { masterSettings 1 }
+
+satelliteDownNotificationEnabled OBJECT-TYPE 
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if satelliteDownNotification notifications are generated."
+    DEFVAL      { enable }
+    ::= { masterSettings 2 }
+
+-- Satellite notifications
+colubrisSatelliteManagementMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIB 2 }
+colubrisSatelliteManagementMIBNotifications OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIBNotificationPrefix 0 }
+
+satelliteUpNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    satelliteName,
+                    satelliteDeviceId,
+                    satelliteMacAddress,
+                    satelliteIpAddress,
+                    satelliteSSID
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a new satellite is detected." 
+  --#SUMMARY "New satellite detected: name:%s IP:%s MAC:%s SSID:%s ID:%s"
+  --#ARGUMENTS { 0, 3, 2, 4, 1 }
+  --#SEVERITY INFORMATIONNAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSatelliteManagementMIBNotifications  1 }
+
+satelliteDownNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    satelliteName,
+                    satelliteDeviceId,
+                    satelliteMacAddress,
+                    satelliteIpAddress,
+                    satelliteSSID
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a satellite becomes unreachable."
+  --#SUMMARY "Satellite unreachable: name:%s IP:%s MAC:%s SSID:%s ID:%s"
+  --#ARGUMENTS { 0, 3, 2, 4, 1 }
+  --#SEVERITY INFORMATIONNAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisSatelliteManagementMIBNotifications 2 }
+
+-- conformance information
+colubrisSatelliteManagementMIBConformance OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIB 3 }
+colubrisSatelliteManagementMIBCompliances OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIBConformance 1 }
+colubrisSatelliteManagementMIBGroups      OBJECT IDENTIFIER ::= { colubrisSatelliteManagementMIBConformance 2 }
+
+-- compliance statements
+colubrisSatelliteManagementMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement
+                 the Colubris SatelliteManagement MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisSatelliteManagementMIBGroup,
+                        colubrisSatelliteNotificationControlGroup,
+                        colubrisSatelliteNotificationGroup
+
+                    }
+    ::= { colubrisSatelliteManagementMIBCompliances 1 }
+
+-- units of conformance
+colubrisSatelliteManagementMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    satelliteDeviceId,
+                    satelliteMacAddress,
+                    satelliteIpAddress,
+                    satelliteName,
+                    satelliteSSID,
+                    satelliteChannelNumber,
+                    satelliteForwardWirelessToWireless,
+                    satelliteMasterTrafficOnly,
+                    satelliteSNMPPort,
+                    satelliteSecureWebPort,
+                    satelliteDeviceMacAddress,
+                    satelliteProductName,
+                    satelliteFirmwareRevision,
+                    satelliteGroupName,
+                    satelliteNumber,
+                    satelliteChannelNumberRadio2,
+                    satelliteVLAN,
+                    satelliteDetectionPort
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the Satellite Management MIB
+                 capability."
+    ::= { colubrisSatelliteManagementMIBGroups 1 }
+
+colubrisSatelliteNotificationControlGroup OBJECT-GROUP
+    OBJECTS     {
+                    satelliteUpNotificationEnabled,
+                    satelliteDownNotificationEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing the Satellite Management MIB
+                 notification control capability."
+    ::= { colubrisSatelliteManagementMIBGroups 2 }
+
+colubrisSatelliteNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        satelliteUpNotification,
+                        satelliteDownNotification
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications."
+    ::= { colubrisSatelliteManagementMIBGroups 3 }
+
+END

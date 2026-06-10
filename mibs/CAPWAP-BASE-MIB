@@ -1,0 +1,2503 @@
+CAPWAP-BASE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+   PhysAddress, TEXTUAL-CONVENTION, TruthValue,
+   DateAndTime, RowStatus
+       FROM SNMPv2-TC
+   InterfaceIndex
+       FROM IF-MIB
+   PhysicalIndex
+       FROM ENTITY-MIB
+   SnmpAdminString
+       FROM SNMP-FRAMEWORK-MIB
+   NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+       FROM SNMPv2-CONF
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, mib-2,
+   Integer32, Unsigned32, Counter32
+       FROM SNMPv2-SMI
+   InetAddressType, InetAddress
+       FROM INET-ADDRESS-MIB;
+
+capwapBaseMIB MODULE-IDENTITY
+    LAST-UPDATED "200908130000Z"        -- August 13th, 2009
+    ORGANIZATION "IETF Control And Provisioning of Wireless Access
+                  Points (CAPWAP) Working Group
+                  http://www.ietf.org/html.charters/capwap-charter.html"
+    CONTACT-INFO
+        "General Discussion: capwap@frascone.com
+         To Subscribe: http://lists.frascone.com/mailman/listinfo/capwap
+
+         Yang Shi (editor)
+         Hangzhou H3C Tech. Co., Ltd.
+         Beijing R&D Center of H3C, Digital Technology Plaza,
+         NO.9 Shangdi 9th Street,Haidian District,
+         Beijing
+         China(100085)
+         Phone: +86 010 82775276
+         EMail: young@h3c.com
+
+         David T. Perkins
+         228 Bayview Dr
+         San Carlos, CA 94070
+         USA
+         Phone: +1 408 394-8702
+         Email:  dperkins@snmpinfo.com
+
+         Chris Elliott
+         Cisco Systems, Inc.
+         7025 Kit Creek Rd., P.O. Box 14987
+         Research Triangle Park  27709
+         USA
+         Phone: +1 919-392-2146
+         Email: chelliot@cisco.com
+
+         Yong Zhang
+         Fortinet, Inc.
+         1090 Kifer Road
+         Sunnyvale, CA 94086
+         USA
+         Email: yzhang@fortinet.com"
+
+    DESCRIPTION
+        "Copyright (C) 2009 The Internet Society.  This version of
+         the MIB module is part of RFC xxx; see the RFC itself
+         for full legal notices.
+
+         This MIB module contains managed object definitions for
+         the CAPWAP Protocol."
+    REVISION    "200908130000Z"
+    DESCRIPTION
+        "Initial version published as RFC xxx"
+         ::= { mib-2 145 }
+
+-- Textual Conventions
+
+CapwapBaseWtpProfileIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a WTP profile."
+    SYNTAX      Unsigned32 (0..4096)
+
+CapwapBaseWtpIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a WTP instance.
+         As usual, the Base MAC address of WTP is used."
+    SYNTAX      OCTET STRING (SIZE (6))
+
+CapwapBaseStationIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x:"
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a station instance.
+         As usual, the MAC address of station is used."
+    SYNTAX      OCTET STRING (SIZE (6))
+
+CapwapBaseRadioIdTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a radio on a WTP."
+    SYNTAX      Unsigned32 (1..31)
+
+CapwapBaseTunnelModeTC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the tunneling modes of operation that are
+         supported by a WTP.
+         The WTP MAY support more than one option, represented by
+         the bit field below:
+           localBridging(0) - Local bridging mode
+           dot3Tunnel(1)    - 802.3 frame tunnel mode
+           nativeTunnel(2)  - Native frame tunnel mode"
+    REFERENCE
+        "Section 4.6.43. of CAPWAP Protocol Specification, RFC 5415."
+    SYNTAX      BITS {
+                  localBridging(0),
+                  dot3Tunnel(1),
+                  nativeTunnel(2)
+                }
+
+CapwapBaseMacTypeTC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC mode of operation supported by a WTP.
+         The following enumerated values are supported:
+           localMAC(0) - Local-MAC mode
+           splitMAC(1) - Split-MAC mode
+           both(2)     - Both Local-MAC and Split-MAC"
+    REFERENCE
+        "Section 4.6.44. of CAPWAP Protocol Specification, RFC 5415."
+    SYNTAX      INTEGER {
+                  localMAC(0),
+                  splitMAC(1),
+                  both(2)
+                }
+
+CapwapBaseChannelTypeTC::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the channel type for CAPWAP protocol.
+         The following enumerated values are supported:
+           data(1)    - Data channel
+           control(2) - Control channel"
+    SYNTAX      INTEGER {
+                  data(1),
+                  control(2)
+                }
+
+CapwapBaseAuthenMethodTC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication credential type for a WTP.
+         The following enumerated values are supported:
+           other(1) - Other method, for example, vendor specific
+           clear(2) - Clear text and no authentication
+           x509(3)  - X.509 certificate authentication
+           psk(4)   - Pre-Shared secret authentication
+         As mandatory requirement, CAPWAP control channel
+         authentication SHOULD use DTLS, and either by certificate or
+         PSK. For data channel, DTLS is optional."
+    SYNTAX      INTEGER {
+                  other(1),
+                  clear(2),
+                  x509(3),
+                  psk(4)
+                }
+
+-- Top level components of this MIB module
+
+-- Notifications
+capwapBaseNotifications OBJECT IDENTIFIER
+    ::= { capwapBaseMIB 0 }
+-- Tables, Scalars
+capwapBaseObjects OBJECT IDENTIFIER
+    ::= { capwapBaseMIB 1 }
+-- Conformance
+capwapBaseConformance OBJECT IDENTIFIER
+    ::= { capwapBaseMIB 2 }
+
+-- AC Objects Group
+
+capwapBaseAc OBJECT IDENTIFIER
+    ::= { capwapBaseObjects 1 }
+
+capwapBaseWtpSessions OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of WTPs which are connecting to
+         the AC."
+    REFERENCE
+        "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 1 }
+
+capwapBaseWtpSessionsLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of WTP sessions configured on
+         the AC.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 2 }
+
+capwapBaseStationSessions  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of stations which are accessing
+         the wireless service provided by the AC."
+    REFERENCE
+        "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 3 }
+
+capwapBaseStationSessionsLimit  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of station sessions configured
+         on the AC.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 4 }
+
+capwapBaseDataChannelDTLSPolicyOptions  OBJECT-TYPE
+    SYNTAX      BITS {
+                  other(0),
+                  clear(1),
+                  dtls(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The AC communicates its policy on the use of DTLS for
+         CAPWAP data channel.
+         The AC MAY support more than one option, represented by the bit
+         field below:
+           other(0) - Other method, for example, vendor specific
+           clear(1) - Clear text
+           dtls(2)  - DTLS"
+    REFERENCE
+       "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 5 }
+
+capwapBaseDataChannelDTLSPolicyConfig  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  other(0),
+                  clear(1),
+                  dtls(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the security policy configured on the AC for
+         CAPWAP data channel.
+         The value of the object is persistent at restart/reboot.
+         The following enumerated values are supported:
+           other(0) - Other method, for example, vendor specific
+           clear(1) - Clear text
+           dtls(2)  - DTLS"
+    REFERENCE
+       "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 6 }
+
+capwapBaseControlChannelAuthenOptions  OBJECT-TYPE
+    SYNTAX      BITS {
+                  x509(0),
+                  psk(1)
+                }
+
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication credential type supported by the
+         AC for CAPWAP control channel.
+         The AC MAY support more than one option, represented by the bit
+         field below:
+           x509(0) - X.509 certificate based
+           psk(1)  - Pre-Shared secret"
+    REFERENCE
+       "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 7 }
+
+capwapBaseControlChannelAuthenConfig  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  x509(1),
+                  psk(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication credential type configured on
+         the AC for CAPWAP control channel.
+         The value of the object is persistent at restart/reboot.
+         The following enumerated values are supported:
+           x509(1) - X.509 certificate based
+           psk(2)  - Pre-Shared secret"
+    REFERENCE
+       "Section 4.6.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 8 }
+
+-- capwapBaseAcNameListTable table
+
+capwapBaseAcNameListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseAcNameListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that configure the AC name list.
+         Values of all read-create objects in this table are
+         persistent at restart/reboot."
+    REFERENCE
+        "Section 4.6.5. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 9 }
+
+capwapBaseAcNameListEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseAcNameListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that configure the AC name list."
+    INDEX { capwapBaseAcNameListId }
+    ::= { capwapBaseAcNameListTable 1 }
+
+CapwapBaseAcNameListEntry ::= SEQUENCE {
+      capwapBaseAcNameListId          Unsigned32,
+      capwapBaseAcNameListName        OCTET STRING,
+      capwapBaseAcNameListPriority    Unsigned32,
+      capwapBaseAcNameListRowStatus   RowStatus
+    }
+
+capwapBaseAcNameListId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a AC Name list."
+    ::= { capwapBaseAcNameListEntry 1 }
+
+capwapBaseAcNameListName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(512))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of an AC, and it is expected to be
+         an UTF-8 encoded string."
+    REFERENCE
+        "Section 4.6.5. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAcNameListEntry 2 }
+
+capwapBaseAcNameListPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the priority order of the preferred AC.
+         For instance, the value of one (1) is used to set the primary
+         AC, the value of two (2) is used to set the secondary AC, etc."
+    REFERENCE
+        "Section 4.6.5. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAcNameListEntry 3 }
+
+capwapBaseAcNameListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or delete a row
+         in this table."
+    ::= { capwapBaseAcNameListEntry 4 }
+
+-- End of capwapBaseAcNameListTable table
+
+
+-- capwapBaseMacAclTable table
+
+capwapBaseMacAclTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseMacAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that configure station Access Control
+         Lists (ACL).
+         The WTP will not provide service to the MAC addresses
+         configured in this table.
+         Values of all read-create objects in this table are persistent
+         at AC restart/reboot."
+    REFERENCE
+        "Section 4.6.7. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseAc 10 }
+
+capwapBaseMacAclEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseMacAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that configure station Access Control
+         List (ACL)."
+    INDEX { capwapBaseMacAclId }
+    ::= { capwapBaseMacAclTable 1 }
+
+CapwapBaseMacAclEntry ::= SEQUENCE {
+      capwapBaseMacAclId           Unsigned32,
+      capwapBaseMacAclStationId    CapwapBaseStationIdTC,
+      capwapBaseMacAclRowStatus    RowStatus
+    }
+
+capwapBaseMacAclId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of an ACL."
+    ::= { capwapBaseMacAclEntry 1 }
+
+capwapBaseMacAclStationId OBJECT-TYPE
+    SYNTAX      CapwapBaseStationIdTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of a station to which WTPs will
+         no longer provides service."
+    REFERENCE
+        "Section 4.6.7. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseMacAclEntry 2 }
+
+capwapBaseMacAclRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or delete a row
+         in this table."
+    ::= { capwapBaseMacAclEntry 3 }
+
+-- End of capwapBaseMacAclTable table
+
+-- End of AC Objects Group
+
+
+-- WTP Objects Group
+
+capwapBaseWtps OBJECT IDENTIFIER
+    ::= { capwapBaseObjects 2 }
+
+-- capwapBaseWtpProfileTable Table
+
+capwapBaseWtpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseWtpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that configure WTP profiles for WTPs to
+         be managed before they connect to the AC.
+         An operator could change a WTP's configuration by changing
+         the values of parameters in the corresponding WTP profile,
+         then the WTP could get the new configuration through the
+         CAPWAP control channel.
+         Values of all read-create objects in this table are
+         persistent at restart/reboot."
+    ::= { capwapBaseWtps 1 }
+
+capwapBaseWtpProfileEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that configure and display a WTP profile."
+    INDEX { capwapBaseWtpProfileId }
+    ::= { capwapBaseWtpProfileTable 1 }
+
+CapwapBaseWtpProfileEntry ::= SEQUENCE {
+      capwapBaseWtpProfileId                  CapwapBaseWtpProfileIdTC,
+      capwapBaseWtpProfileName                       SnmpAdminString,
+      capwapBaseWtpProfileWtpMacAddr                 CapwapBaseWtpIdTC,
+      capwapBaseWtpProfileWtpModelNumber             SnmpAdminString,
+      capwapBaseWtpProfileWtpName                    OCTET STRING,
+      capwapBaseWtpProfileWtpLocation                OCTET STRING,
+      capwapBaseWtpProfileWtpStaticIpEnable          TruthValue,
+      capwapBaseWtpProfileWtpStaticIpType            InetAddressType,
+      capwapBaseWtpProfileWtpStaticIp                InetAddress,
+      capwapBaseWtpProfileWtpNetmask                 InetAddress,
+      capwapBaseWtpProfileWtpGateway                 InetAddress,
+      capwapBaseWtpProfileWtpFallbackEnable          INTEGER,
+      capwapBaseWtpProfileWtpEchoInterval            Unsigned32,
+      capwapBaseWtpProfileWtpIdleTimeout             Unsigned32,
+      capwapBaseWtpProfileWtpMaxDiscoveryInterval    Unsigned32,
+      capwapBaseWtpProfileWtpReportInterval          Unsigned32,
+      capwapBaseWtpProfileWtpSilentInterval          Unsigned32,
+      capwapBaseWtpProfileWtpStatisticsTimer         Unsigned32,
+      capwapBaseWtpProfileWtpWaitDTLSTimer           Unsigned32,
+      capwapBaseWtpProfileWtpEcnSupport              INTEGER,
+      capwapBaseWtpProfileRowStatus                  RowStatus
+    }
+
+capwapBaseWtpProfileId OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpProfileIdTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a WTP profile."
+    ::= { capwapBaseWtpProfileEntry 1 }
+
+capwapBaseWtpProfileName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of a WTP profile."
+    ::= { capwapBaseWtpProfileEntry 2 }
+
+capwapBaseWtpProfileWtpMacAddr  OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpIdTC
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the Base MAC address of a WTP.
+         A WTP profile MUST contain the Base MAC address of the WTP
+         because the CAPWAP message received from the WTP contains
+         its Base MAC address and the AC uses the Base MAC address to
+         find the corresponding WTP profile.
+         The section 4.6.40 [RFC5415] does not clarify that the WTP's
+         Base MAC address MUST be included in the WTP Board Data
+         message element. This is a known errata item and assumed to be
+         fixed in future by the editors of the RFC5415."
+    REFERENCE
+        "Section 4.6.40. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 3 }
+
+capwapBaseWtpProfileWtpModelNumber  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the model number of a WTP.
+         A WTP profile MUST include the WTP's model number, which
+         reflects the number of PHY radios on the WTP.
+         In this way, the creation of a WTP profile triggers the AC
+         to automatically create the same number of WTP Virtual Radio
+         Interfaces corresponding to the WTP's PHY radios without
+         manual intervention. With the ifIndexes of WTP Virtual
+         Radio Interfaces, the operator could configure and manage
+         the WTP's PHY radios through the wireless binding MIB
+         modules."
+    REFERENCE
+        "Section 4.6.40. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 4 }
+
+capwapBaseWtpProfileWtpName  OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(512))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of the WTP."
+    REFERENCE
+        "Section 4.6.45. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 5 }
+
+capwapBaseWtpProfileWtpLocation  OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1024))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the location of the WTP."
+    REFERENCE
+        "Section 4.6.30. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 6 }
+
+capwapBaseWtpProfileWtpStaticIpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the WTP SHOULD use a static IP address
+         or not. A value of false disables the static IP address,
+         while a value of true enables it."
+    REFERENCE
+        "Section 4.6.48. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 7 }
+
+capwapBaseWtpProfileWtpStaticIpType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the static IP address type used by the WTP, IPv4
+         or IPv6."
+    ::= { capwapBaseWtpProfileEntry 8 }
+
+capwapBaseWtpProfileWtpStaticIp OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When capwapBaseWtpProfileWtpStaticIpEnable is true,
+         it represents the static IP address to be assigned to the WTP."
+    REFERENCE
+        "Section 4.6.48. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 9 }
+
+capwapBaseWtpProfileWtpNetmask OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When capwapBaseWtpProfileWtpStaticIpEnable is true,
+         it represents the netmask to be assigned to the WTP."
+    REFERENCE
+        "Section 4.6.48. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 10 }
+
+capwapBaseWtpProfileWtpGateway OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When capwapBaseWtpProfileWtpStaticIpEnable is true,
+         it represents the gateway to be assigned to the WTP."
+    REFERENCE
+        "Section 4.6.48. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 11 }
+
+capwapBaseWtpProfileWtpFallbackEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  enabled(1),
+                  disabled(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents whether to enable or disable automatic CAPWAP
+         fallback in the event that a WTP detects its preferred AC,
+         and is not currently connected to it.
+         The following enumerated values are supported:
+           enabled(1)  - The fallback mode is enabled
+           disabled(2) - The fallback mode is disabled"
+    REFERENCE
+        "Section 4.6.42. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { enabled }
+     ::= { capwapBaseWtpProfileEntry 12 }
+
+capwapBaseWtpProfileWtpEchoInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, between sending Echo
+         Request messages to the AC that the WTP has joined."
+    REFERENCE
+        "Section 4.7.7. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseWtpProfileEntry 13 }
+
+capwapBaseWtpProfileWtpIdleTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the idle timeout value that the WTP SHOULD enforce
+         for its active stations."
+    REFERENCE
+        "Section 4.7.8. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 300 }
+    ::= { capwapBaseWtpProfileEntry 14 }
+
+capwapBaseWtpProfileWtpMaxDiscoveryInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..180)
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum time allowed between sending Discovery
+         Request messages, in seconds."
+    REFERENCE
+        "Section 4.7.10. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 20 }
+    ::= { capwapBaseWtpProfileEntry 15 }
+
+capwapBaseWtpProfileWtpReportInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the interval for WTP to send Decryption Error
+         report."
+    REFERENCE
+        "Section 4.7.11. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 120 }
+    ::= { capwapBaseWtpProfileEntry 16 }
+
+capwapBaseWtpProfileWtpSilentInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, a WTP MUST wait
+         before it MAY again send Discovery Request messages or
+         attempt to a establish DTLS session."
+    REFERENCE
+        "Section 4.7.13. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseWtpProfileEntry 17 }
+
+capwapBaseWtpProfileWtpStatisticsTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the interval the WTP uses between the WTP Events
+         Requests it transmits to the AC to communicate its statistics,
+         in seconds."
+    REFERENCE
+        "Section 4.7.14. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 120 }
+    ::= { capwapBaseWtpProfileEntry 18 }
+
+capwapBaseWtpProfileWtpWaitDTLSTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (30..4294967295)
+    UNITS       "second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum time, in seconds, an AC MUST wait
+         without having received a DTLS Handshake message from an AC.
+         This timer MUST be greater than 30 seconds."
+    REFERENCE
+        "Section 4.7.15. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 60 }
+    ::= { capwapBaseWtpProfileEntry 19 }
+
+capwapBaseWtpProfileWtpEcnSupport OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  limited(0),
+                  fullAndLimited(1)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the support for the Explicit Congestion Notification
+         (ECN) bits, as defined in [RFC3168].
+         The following enumerated values are supported:
+           limited(0)        - Limited ECN support
+           fullAndLimited(1) - Full and limited ECN support"
+    REFERENCE
+        "Section 4.6.25. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpProfileEntry 20 }
+
+capwapBaseWtpProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable is used to create, modify, and/or delete a row
+         in this table.
+         Deleting a WTP profile in use will disconnect the WTP to
+         the AC. So the network management system SHOULD
+         ask the operator to confirm such an operation.
+         When a WTP profile entry is removed from the table,
+         the corresponding WTP Virtual Radio Interfaces are also
+         removed from the CapwapBaseWirelessBindingTable and
+         ifTable [RFC2863].
+         Also, the related object instances SHOULD be removed from
+         the wireless binding MIB modules such as IEEE 802.11
+         MIB module [IEEE.802-11.2007]."
+    ::= { capwapBaseWtpProfileEntry 21 }
+
+-- End of capwapBaseWtpProfileTable table
+
+
+-- capwapBaseWtpStateTable table
+
+capwapBaseWtpStateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseWtpStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that indicate each WTP's CAPWAP FSM
+         state, and helps the operator to query the WTPs' current
+         configuration."
+    ::= { capwapBaseWtps 2 }
+
+capwapBaseWtpStateEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that display the WTP's CAPWAP FSM state.
+         Also, the operator could query the current configuration
+         of a WTP by using the identifier of the corresponding
+         WTP profile."
+    INDEX { capwapBaseWtpStateWtpId }
+    ::= { capwapBaseWtpStateTable 1 }
+
+CapwapBaseWtpStateEntry ::= SEQUENCE {
+      capwapBaseWtpStateWtpId                   CapwapBaseWtpIdTC,
+      capwapBaseWtpStateWtpIpAddressType        InetAddressType,
+      capwapBaseWtpStateWtpIpAddress            InetAddress,
+      capwapBaseWtpStateWtpBaseMacAddress       PhysAddress,
+      capwapBaseWtpState                        INTEGER,
+      capwapBaseWtpStateWtpCurrWtpProfileId     CapwapBaseWtpProfileIdTC
+    }
+
+capwapBaseWtpStateWtpId OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpIdTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a WTP."
+    ::= { capwapBaseWtpStateEntry 1 }
+
+capwapBaseWtpStateWtpIpAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address type of a WTP."
+    ::= { capwapBaseWtpStateEntry 2 }
+
+capwapBaseWtpStateWtpIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of a WTP."
+    ::= { capwapBaseWtpStateEntry 3 }
+
+capwapBaseWtpStateWtpBaseMacAddress  OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the WTP's Base MAC Address, which MAY be
+         assigned to the primary Ethernet interface."
+    REFERENCE
+        "Section 4.6.40. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpStateEntry 4 }
+
+capwapBaseWtpState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  dtls(1),
+                  join(2),
+                  image(3),
+                  configure(4),
+                  dataCheck(5),
+                  run(6),
+                  reset(7),
+                  dtlsTeardown(8),
+                  unknown(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the various possible CAPWAP FSM states of WTP
+         The following enumerated values are supported:
+           dtls(1)         - DTLS negotiation states, which include
+                             DTLS setup, authorize, DTLS connect
+           join(2)         - The WTP is joining with the AC
+           image(3)        - The WTP is downloading software
+           configure(4)    - The WTP is getting configuration from
+                             the AC
+           dataCheck(5)    - The AC is waiting for the Data Channel Keep
+                             Alive Packet
+           run(6)          - The WTP enters the running state
+           reset(7)        - The AC transmits a reset request message
+                             to the WTP
+           dtlsTeardown(8) - DTLS session is tear down
+           unknown(9)      - Operator already prepared configuration
+                             for the WTP, while the WTP has not contact
+                             with the AC till now"
+    REFERENCE
+        "Section 2.3.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpStateEntry 5 }
+
+capwapBaseWtpStateWtpCurrWtpProfileId OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpProfileIdTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current identifier of a WTP profile.
+         The operator could query a WTP's current configuration
+         with the identifier of a WTP profile."
+    ::= { capwapBaseWtpStateEntry 6 }
+
+-- End of capwapBaseWtpStateTable Table
+
+
+-- capwapBaseWtpTable Table
+
+capwapBaseWtpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseWtpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that display properties of the WTPs
+         in running state."
+    ::= { capwapBaseWtps 3 }
+
+capwapBaseWtpEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that display properties of the WTPs
+         in running state."
+    INDEX { capwapBaseWtpCurrId }
+    ::= { capwapBaseWtpTable 1 }
+
+CapwapBaseWtpEntry ::= SEQUENCE {
+      capwapBaseWtpCurrId                       CapwapBaseWtpIdTC,
+      capwapBaseWtpPhyIndex                     PhysicalIndex,
+      capwapBaseWtpBaseMacAddress               PhysAddress,
+      capwapBaseWtpTunnelModeOptions            CapwapBaseTunnelModeTC,
+      capwapBaseWtpMacTypeOptions               CapwapBaseMacTypeTC,
+      capwapBaseWtpDiscoveryType                INTEGER,
+      capwapBaseWtpRadiosInUseNum               Unsigned32,
+      capwapBaseWtpRadioNumLimit                Unsigned32,
+      capwapBaseWtpRetransmitCount              Counter32,
+      capwapBaseWtpMaxDiscoveries               Unsigned32,
+      capwapBaseWtpMaxFailedDTLSSessionRetry    Unsigned32,
+      capwapBaseWtpMaxRetransmit                Unsigned32,
+      capwapBaseWtpDataChannelKeepAliveTimer    Unsigned32,
+      capwapBaseWtpDataChannelDeadInterval      Unsigned32,
+      capwapBaseWtpDiscoveryInterval            Unsigned32,
+      capwapBaseWtpDTLSSessionDeleteTimer       Unsigned32,
+      capwapBaseWtpImageDataStartTimer          Unsigned32,
+      capwapBaseWtpRetransmitInterval           Unsigned32
+    }
+
+capwapBaseWtpCurrId OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpIdTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a WTP in running state."
+    ::= { capwapBaseWtpEntry 1 }
+
+capwapBaseWtpPhyIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique physical index of a physical entity
+         in the ENTITY-MIB module [RFC4133].
+         The information such as software version of a specific WTP
+         could be accessed through the index."
+    ::= { capwapBaseWtpEntry 2 }
+
+capwapBaseWtpBaseMacAddress  OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the WTP's Base MAC Address, which MAY be assigned
+         to the primary Ethernet interface."
+    REFERENCE
+        "Section 4.6.40. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEntry 3 }
+
+capwapBaseWtpTunnelModeOptions  OBJECT-TYPE
+    SYNTAX      CapwapBaseTunnelModeTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the tunneling modes of operation supported by
+         the WTP."
+    REFERENCE
+        "Section 4.6.43. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEntry 4 }
+
+capwapBaseWtpMacTypeOptions  OBJECT-TYPE
+    SYNTAX      CapwapBaseMacTypeTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC mode of operation supported by the WTP."
+    REFERENCE
+        "Section 4.6.44. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEntry 5 }
+
+capwapBaseWtpDiscoveryType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  unknown(0),
+                  staticConfig(1),
+                  dhcp(2),
+                  dns(3),
+                  acRef(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how the WTP discovers the AC.
+         The following enumerated values are supported:
+           unknown(0)      - Unknown
+           staticConfig(1) - Static configuration
+           dhcp(2)         - DHCP
+           dns(3)          - DNS
+           acRef(4)        - AC referral"
+    REFERENCE
+        "Section 4.6.21. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEntry 6 }
+
+capwapBaseWtpRadiosInUseNum OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of radios in use on the WTP."
+    REFERENCE
+        "Section 4.6.41. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEntry 7 }
+
+capwapBaseWtpRadioNumLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum radio number supported by the WTP."
+    REFERENCE
+        "Section 4.6.41. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEntry 8 }
+
+capwapBaseWtpRetransmitCount OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of retransmissions for a given
+         CAPWAP packet."
+    REFERENCE
+        "Section 4.8.8. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEntry 9 }
+
+capwapBaseWtpMaxDiscoveries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of Discovery Request messages
+         that will be sent after a WTP boots."
+    REFERENCE
+        "Section 4.8.5. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 10 }
+    ::= { capwapBaseWtpEntry 10 }
+
+capwapBaseWtpMaxFailedDTLSSessionRetry OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of failed DTLS session
+         establishment attempts before the CAPWAP device enters a
+         silent period."
+    REFERENCE
+        "Section 4.8.6. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 3 }
+    ::= { capwapBaseWtpEntry 11 }
+
+capwapBaseWtpMaxRetransmit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of retransmission for a given
+         CAPWAP packet before the link layer considers the peer dead."
+    REFERENCE
+        "Section 4.8.7. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 5 }
+    ::= { capwapBaseWtpEntry 12 }
+
+capwapBaseWtpDataChannelKeepAliveTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the next opportunity, in seconds, the WTP must
+         transmit the Data Channel Keep Alive message."
+    REFERENCE
+        "Section 4.7.2. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseWtpEntry 13 }
+
+capwapBaseWtpDataChannelDeadInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..240)
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, a WTP MUST wait
+         without having received a Data Channel Keep Alive packet
+         before the destination for the Data Channel Keep Alive
+         packets MAY be considered dead."
+    REFERENCE
+        "Section 4.7.3. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 60 }
+    ::= { capwapBaseWtpEntry 14 }
+
+capwapBaseWtpDiscoveryInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, that a WTP MUST
+         wait after receiving a Discovery Response message, before
+         initiating a DTLS handshake."
+    REFERENCE
+        "Section 4.7.5. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 5 }
+    ::= { capwapBaseWtpEntry 15 }
+
+capwapBaseWtpDTLSSessionDeleteTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, a WTP MUST wait
+         for DTLS session deletion."
+    REFERENCE
+        "Section 4.7.6. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 5 }
+     ::= { capwapBaseWtpEntry 16 }
+
+capwapBaseWtpImageDataStartTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of seconds the WTP will wait for its
+         peer to transmit the Image Data Request."
+    REFERENCE
+        "Section 4.7.9. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseWtpEntry 17 }
+
+capwapBaseWtpRetransmitInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, in which a
+         non-acknowledged CAPWAP packet will be retransmitted."
+    REFERENCE
+        "Section 4.7.12. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 3 }
+    ::= { capwapBaseWtpEntry 18 }
+
+-- End of capwapBaseWtpTable table
+
+
+-- capwapBaseWirelessBindingTable Table
+
+capwapBaseWirelessBindingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseWirelessBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that display the mappings between
+         WTP Virtual Radio Interfaces and PHY radios, and the
+         wireless binding type for each PHY radio.
+         Values of all objects in this table are persistent at
+         restart/reboot."
+    ::= { capwapBaseWtps 4 }
+
+capwapBaseWirelessBindingEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseWirelessBindingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that display the mapping between
+         a specific WTP Virtual Radio Interface and a PHY
+         radio, and the wireless binding type for the PHY radio."
+    INDEX {
+      capwapBaseWtpProfileId,
+      capwapBaseWirelessBindingRadioId
+    }
+    ::= { capwapBaseWirelessBindingTable 1 }
+
+CapwapBaseWirelessBindingEntry ::= SEQUENCE {
+      capwapBaseWirelessBindingRadioId              CapwapBaseRadioIdTC,
+      capwapBaseWirelessBindingVirtualRadioIfIndex  InterfaceIndex,
+      capwapBaseWirelessBindingType                 INTEGER
+    }
+
+capwapBaseWirelessBindingRadioId OBJECT-TYPE
+    SYNTAX      CapwapBaseRadioIdTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the identifier of a PHY radio on a WTP, which
+         is required to be unique on a WTP.
+         For example, WTP A and WTP B use a same value of
+         capwapBaseWirelessBindingRadioId for their first radio."
+    REFERENCE
+        "Section 4.3. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWirelessBindingEntry 1 }
+
+capwapBaseWirelessBindingVirtualRadioIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the index value that uniquely identifies a
+         WLAN Virtual Radio Interface. The interface identified by
+         a particular value of this index is the same interface as
+         identified by the same value of the ifIndex.
+         Before WTPs contact the AC to get configuration,
+         the operator configures WTP profiles for them.
+         The creation of a WTP profile triggers system to automatically
+         create a specific number of WTP Virtual Radio Interfaces and
+         add a new row object in the capwapBaseWirelessBindingTable
+         without manual intervention.
+         As most MIB modules use the ifIndex to identify an interface
+         for configuration and statistic data, for example, IEEE 802.11
+         MIB module [IEEE.802-11.2007]
+         It will be easy to reuse other wireless binding MIB modules
+         through the WTP Virtual Radio Interface in the Centralized
+         WLAN Architecture."
+    ::= { capwapBaseWirelessBindingEntry 2 }
+
+capwapBaseWirelessBindingType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  dot11(1),
+                  epc(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the wireless binding type for the radio.
+         The following enumerated values are supported:
+           dot11(1) - IEEE 802.11
+           epc(3)   - EPCGlobal"
+    REFERENCE
+        "Section 4.3. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWirelessBindingEntry 3 }
+
+-- End of capwapBaseWirelessBindingTable Table
+
+
+-- capwapBaseStationTable Table
+
+capwapBaseStationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseStationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that display stations which are accessing
+         the wireless service provided by the AC."
+    REFERENCE
+        "Section 4.6.8. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtps 5 }
+
+capwapBaseStationEntry OBJECT-TYPE
+    SYNTAX      CapwapBaseStationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that display a station which is
+         associated with the specific radio on the WTP."
+    INDEX {
+      capwapBaseWtpCurrId,
+      capwapBaseWirelessBindingRadioId,
+      capwapBaseStationId
+    }
+    ::= { capwapBaseStationTable 1 }
+
+CapwapBaseStationEntry ::= SEQUENCE {
+      capwapBaseStationId           CapwapBaseStationIdTC,
+      capwapBaseStationAddedTime    DateAndTime,
+      capwapBaseStationVlanName     SnmpAdminString
+    }
+
+capwapBaseStationId OBJECT-TYPE
+    SYNTAX      CapwapBaseStationIdTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of the station."
+    REFERENCE
+        "Section 4.6.8. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseStationEntry 1 }
+
+capwapBaseStationAddedTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time when the station is added."
+    REFERENCE
+        "Section 4.6.8. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseStationEntry 2 }
+
+capwapBaseStationVlanName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents VLAN name to which the station is associated."
+    REFERENCE
+        "Section 4.6.8. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseStationEntry 3 }
+
+-- End of capwapBaseStationTable Table
+
+
+--  capwapBaseWtpEventsStatsTable
+
+capwapBaseWtpEventsStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseWtpEventsStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that display the WTPs' events statistics."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtps 6 }
+
+capwapBaseWtpEventsStatsEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpEventsStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that display the events statistic data
+         of a WTP."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    INDEX { capwapBaseWtpCurrId }
+    ::= { capwapBaseWtpEventsStatsTable 1 }
+
+CapwapBaseWtpEventsStatsEntry ::= SEQUENCE {
+      capwapBaseWtpEventsStatsRebootCount            Counter32,
+      capwapBaseWtpEventsStatsInitCount              Counter32,
+      capwapBaseWtpEventsStatsLinkFailureCount       Counter32,
+      capwapBaseWtpEventsStatsSwFailureCount         Counter32,
+      capwapBaseWtpEventsStatsHwFailureCount         Counter32,
+      capwapBaseWtpEventsStatsOtherFailureCount      Counter32,
+      capwapBaseWtpEventsStatsUnknownFailureCount    Counter32,
+      capwapBaseWtpEventsStatsLastFailureType        INTEGER
+    }
+
+capwapBaseWtpEventsStatsRebootCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of reboots that have occurred due to a
+         WTP crash.  A value of 65535 implies that this information is
+         not available on the WTP."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 1 }
+
+capwapBaseWtpEventsStatsInitCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of reboots that have occurred at the
+         request of a CAPWAP protocol message, such as a change in
+         configuration that requires a reboot or an explicit CAPWAP
+         protocol reset request.  A value of 65535 implies that this
+         information is not available on the WTP."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 2 }
+
+capwapBaseWtpEventsStatsLinkFailureCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that a CAPWAP protocol
+         connection with an AC has failed due to link failures."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 3 }
+
+capwapBaseWtpEventsStatsSwFailureCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that a CAPWAP protocol
+         connection with an AC has failed due to software related
+         reasons."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 4 }
+
+capwapBaseWtpEventsStatsHwFailureCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that a CAPWAP protocol
+         connection with an AC has failed due to hardware related
+         reasons."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 5 }
+
+capwapBaseWtpEventsStatsOtherFailureCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that a CAPWAP protocol
+         connection with an AC has failed due to known reasons, other
+         than the AC initiated, link, software or hardware failures."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 6 }
+
+capwapBaseWtpEventsStatsUnknownFailureCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that a CAPWAP protocol
+         connection with an AC has failed for unknown reasons."
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 7 }
+
+capwapBaseWtpEventsStatsLastFailureType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  notSupport(0),
+                  acInit(1),
+                  linkFailure(2),
+                  swFailure(3),
+                  hwFailure(4),
+                  otherFailure(5),
+                  unknown(255)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the failure type of the most recent WTP failure.
+         The following enumerated values are supported:
+           notSupport(0)   - Not supported
+           acInit(1)       - The AC initiated
+           linkFailure(2)  - Link failure
+           swFailure(3)    - Software failure
+           hwFailure(4)    - Hardware failure
+           otherFailure(5) - Other failure
+           unknown(255)    - Unknown (e.g., WTP doesn't keep track
+                             of info)"
+    REFERENCE
+        "Section 4.6.47. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtpEventsStatsEntry 8 }
+
+--  End of capwapBaseWtpEventsStatsTable table
+
+
+--  capwapBaseRadioEventsStatsTable table
+
+capwapBaseRadioEventsStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CapwapBaseRadioEventsStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of objects that display statistics on radios behavior,
+         and reasons why the WTP radio has been reset."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseWtps 7 }
+
+capwapBaseRadioEventsStatsEntry  OBJECT-TYPE
+    SYNTAX      CapwapBaseRadioEventsStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A set of objects that display the statistic data of
+         events happened on a specific radio of a WTP."
+    INDEX { capwapBaseWtpCurrId, capwapBaseWirelessBindingRadioId }
+    ::= { capwapBaseRadioEventsStatsTable 1 }
+
+CapwapBaseRadioEventsStatsEntry ::= SEQUENCE {
+      capwapBaseRadioEventsStatsResetCount            Counter32,
+      capwapBaseRadioEventsStatsSwFailCount           Counter32,
+      capwapBaseRadioEventsStatsHwFailCount           Counter32,
+      capwapBaseRadioEventsStatsOtherFailCount        Counter32,
+      capwapBaseRadioEventsStatsUnknownFailCount      Counter32,
+      capwapBaseRadioEventsStatsConfigUpdateCount     Counter32,
+      capwapBaseRadioEventsStatsChannelChangeCount    Counter32,
+      capwapBaseRadioEventsStatsBandChangeCount       Counter32,
+      capwapBaseRadioEventsStatsCurrentNoiseFloor     Integer32,
+      capwapBaseRadioEventsStatsDecryptErrorCount     Counter32,
+      capwapBaseRadioEventsStatsLastFailType          INTEGER
+    }
+
+capwapBaseRadioEventsStatsResetCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that that the radio has been
+         reset."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 1 }
+
+capwapBaseRadioEventsStatsSwFailCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that the radio has failed due
+         to software related reasons."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 2 }
+capwapBaseRadioEventsStatsHwFailCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that the radio has failed due
+         to hardware related reasons."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 3 }
+
+capwapBaseRadioEventsStatsOtherFailCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that the radio has failed due to
+         known reasons, other than software or hardware failure."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 4 }
+
+capwapBaseRadioEventsStatsUnknownFailCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that the radio has failed for
+         unknown reasons."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 5 }
+
+capwapBaseRadioEventsStatsConfigUpdateCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that the radio configuration has
+         been updated."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 6 }
+
+capwapBaseRadioEventsStatsChannelChangeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that the radio channel has
+         been changed."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 7 }
+
+capwapBaseRadioEventsStatsBandChangeCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of times that the radio has changed
+         frequency bands."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 8 }
+
+capwapBaseRadioEventsStatsCurrentNoiseFloor OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the noise floor of the radio receiver in units of
+         dBm."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 9 }
+
+capwapBaseRadioEventsStatsDecryptErrorCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of decryption errors that have occurred
+         on the WTP.  Note that this field is only valid in cases where
+         the WTP provides encryption/decryption services."
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 10 }
+
+capwapBaseRadioEventsStatsLastFailType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  notSupport(0),
+                  swFailure(1),
+                  hwFailure(2),
+                  otherFailure(3),
+                  unknown(255)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the failure type of the most recent radio failure.
+         The following enumerated values are supported:
+           notSupport(0)   - Not supported
+           swFailure(1)    - Software failure
+           hwFailure(2)    - Hardware failure
+           otherFailure(3) - Other failure
+           unknown(255)    - Unknown"
+    REFERENCE
+        "Section 4.6.46. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseRadioEventsStatsEntry 11 }
+
+--  End of capwapBaseRadioEventsStatsTable table
+
+-- End of WTP Objects Group
+
+
+-- CAPWAP Base Parameters Group
+
+capwapBaseParameters OBJECT IDENTIFIER
+    ::= { capwapBaseObjects 3 }
+
+capwapBaseAcMaxRetransmit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum number of retransmissions for a given
+         CAPWAP packet before the link layer considers the peer dead.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.8.7. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 5 }
+    ::= { capwapBaseParameters 1 }
+
+capwapBaseAcChangeStatePendingTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum time, in seconds, the AC will wait
+         for the Change State Event Request from the WTP after having
+         transmitted a successful Configuration Status Response
+         message.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.1. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 25 }
+    ::= { capwapBaseParameters 2 }
+
+capwapBaseAcDataCheckTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents The number of seconds the AC will wait for
+         the Data Channel Keep Alive, which is required by the
+         CAPWAP state machine's Data Check state.
+         The AC resets the state machine if this timer expires
+         prior to transitioning to the next state.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.4. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseParameters 3 }
+
+capwapBaseAcDTLSSessionDeleteTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, the AC MUST wait
+         for DTLS session deletion.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.6. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 5 }
+    ::= { capwapBaseParameters 4 }
+
+capwapBaseAcEchoInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, between sending Echo
+         Request messages to the AC with which the WTP has joined.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.7. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseParameters 5 }
+
+capwapBaseAcRetransmitInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, in which a
+         non-acknowledged CAPWAP packet will be retransmitted.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.12. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 3 }
+    ::= { capwapBaseParameters 6 }
+
+capwapBaseAcSilentInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the minimum time, in seconds, during which the AC
+         SHOULD ignore all CAPWAP and DTLS packets received from the
+         WTP that is in the Sulking state.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.13. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 30 }
+    ::= { capwapBaseParameters 7 }
+
+capwapBaseAcWaitDTLSTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (30..4294967295)
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum time, in seconds, the AC MUST wait
+         without having received a DTLS Handshake message from an AC.
+         This timer MUST be greater than 30 seconds.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.15. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 60 }
+    ::= { capwapBaseParameters 8 }
+
+capwapBaseAcWaitJoinTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (20..4294967295)
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum time, in seconds, the AC will wait
+         after the DTLS session has been established until it receives
+         the Join Request from the WTP. This timer MUST be greater
+         than 20 seconds.
+         The value of the object is persistent at restart/reboot."
+    REFERENCE
+        "Section 4.7.16. of CAPWAP Protocol Specification, RFC 5415."
+    DEFVAL { 60 }
+    ::= { capwapBaseParameters 9 }
+
+capwapBaseAcEcnSupport OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  limited(0),
+                  fullAndLimited(1)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the support for the Explicit Congestion Notification
+         (ECN) bits, as defined in [RFC3168].
+         The value of the object is persistent at restart/reboot.
+         The following enumerated values are supported:
+           limited(0)        - Limited ECN support
+           fullAndLimited(1) - Full and limited ECN support"
+    REFERENCE
+        "Section 4.6.25. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseParameters 10 }
+
+-- End of CAPWAP Base Parameters Group
+
+
+-- CAPWAP Statistics Group
+
+capwapBaseStats OBJECT IDENTIFIER
+    ::= { capwapBaseObjects 4 }
+
+capwapBaseFailedDTLSAuthFailCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of failed DTLS session establishment
+         attempts due to authentication failures."
+    REFERENCE
+        "Section 4.8.3. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseStats 1 }
+
+capwapBaseFailedDTLSSessionCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of failed DTLS session
+         establishment attempts."
+    REFERENCE
+        "Section 4.8.4. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseStats 2 }
+
+-- Notifications
+
+capwapBaseChannelUp NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfChannelType,
+                  capwapBaseNtfAuthenMethod
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when a CAPWAP channel
+         established.
+         The notification is separated for data or control channel."
+    ::= { capwapBaseNotifications 1 }
+
+capwapBaseChannelDown NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfChannelType,
+                  capwapBaseNtfChannelDownReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent by the AC when CAPWAP channel
+         becomes down.
+         The notification is separated for data or control channel."
+    ::= { capwapBaseNotifications 2 }
+
+capwapBaseDecryptErrorReport NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfRadioId,
+                  capwapBaseNtfStationIdList
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a WTP that has occurred
+         decryption error since the last report."
+    REFERENCE
+        "Section 4.6.17. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifications 3 }
+
+capwapBaseJoinFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfJoinFailureReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a WTP fails to join."
+    REFERENCE
+        "Section 4.6.35. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifications 4 }
+
+capwapBaseImageUpgradeFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfImageFailureReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a WTP fails to update
+         the firmware image."
+    REFERENCE
+        "Section 4.6.35. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifications 5 }
+
+capwapBaseConfigMsgError NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfConfigMsgErrorType,
+                  capwapBaseNtfMsgErrorElements
+                }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a WTP receives message
+         elements in the configuration management messages which it
+         is unable to apply locally."
+    REFERENCE
+        "Section 4.6.35. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifications 6 }
+
+capwapBaseRadioOperableStatus NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfRadioId,
+                  capwapBaseNtfRadioOperStatusFlag,
+                  capwapBaseNtfRadioStatusCause
+                }
+    STATUS      current
+    DESCRIPTION
+        "The notification is generated when a radio's operational state
+         is changed."
+    REFERENCE
+        "Section 4.6.34. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifications 7 }
+
+capwapBaseAuthenticationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                  capwapBaseNtfWtpId,
+                  capwapBaseNtfChannelType,
+                  capwapBaseNtfAuthenMethod,
+                  capwapBaseNtfAuthenFailureReason
+                }
+    STATUS      current
+    DESCRIPTION
+        "The notification notifies an authentication failure event,
+         and provides the reason for it."
+    ::= { capwapBaseNotifications 8 }
+
+-- Objects used only in notifications
+
+
+-- for notifications
+capwapBaseNotifyVarObjects OBJECT IDENTIFIER
+    ::= { capwapBaseObjects 5 }
+
+capwapBaseNtfWtpId OBJECT-TYPE
+    SYNTAX      CapwapBaseWtpIdTC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique identifier of a WTP."
+    ::= { capwapBaseNotifyVarObjects 1 }
+
+capwapBaseNtfRadioId OBJECT-TYPE
+    SYNTAX      CapwapBaseRadioIdTC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the identifier of a PHY radio on a WTP, which is
+         only required to be unique on a WTP.
+         For example, WTP A and WTP B can use the same value of
+         capwapBaseNtfRadioId for their first radio."
+    REFERENCE
+        "Section 4.3. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 2 }
+
+capwapBaseNtfChannelType OBJECT-TYPE
+    SYNTAX      CapwapBaseChannelTypeTC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the channel type for CAPWAP protocol."
+    ::= { capwapBaseNotifyVarObjects 3 }
+
+capwapBaseNtfAuthenMethod OBJECT-TYPE
+    SYNTAX      CapwapBaseAuthenMethodTC
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents authentication method for CAPWAP Channel."
+    ::= { capwapBaseNotifyVarObjects 4 }
+
+capwapBaseNtfChannelDownReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  timeout(1),
+                  rekeyfailure(2),
+                  acRebootWtp(3),
+                  dtlsError(4),
+                  maxRetransmit(5)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason for Channel down.
+         The following enumerated values are supported:
+           timeout(1)       - The keep alive is timeout
+           rekeyfailure(2)  - Rekey process is failed, channel will be
+                              broken
+           acRebootWtp(3)   - The AC reboot WTP
+           dtlsError(4)     - DTLS notifications: DTLSAborted,
+                              DTLSReassemblyFailure, DTLSPeerDisconnect,
+                              or frequent DTLSDecapFailure
+           maxRetransmit(5) - The underlying reliable transport's
+                              RetransmitCount counter has reached the
+                              MaxRetransmit variable"
+    ::= { capwapBaseNotifyVarObjects 5 }
+
+capwapBaseNtfStationIdList OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents a list of station identifiers separated by
+         semicolons."
+    REFERENCE
+        "Section 4.6.17. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 6 }
+
+capwapBaseNtfAuthenFailureReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  keyMismatch(1),
+                  invalidCert(2),
+                  reassemblyFailure(3),
+                  decapFailure(4),
+                  encapFailure(5),
+                  timeout(6),
+                  unknown(8)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents reason for WTP authorization failure.
+         The following enumerated values are supported:
+           keyMismatch(1)       - WTP's and AC's key are not matched
+           invalidCert(2)       - Certification is not valid
+           reassemblyFailure(3) - Fragment reassembly failure
+           decapFailure(4)      - Decapsulation error
+           encapFailure(5)      - Encapsulation error
+           timeout(6)           - WaitDTLS timer timeout
+           unknown(8)           - Unknown reason"
+    REFERENCE
+        "Section 2.3.1. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 7 }
+
+capwapBaseNtfRadioOperStatusFlag OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  operable(0),
+                  inoperable(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the operation status of a radio.
+         The following enumerated values are supported:
+           operable(0)   - The radio is operable
+           inoperable(1) - The radio is inoperable, and the
+                           capwapBaseNtfRadioStatusCause object
+                           gives the reason in details"
+    REFERENCE
+        "Section 4.6.34. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 8 }
+
+capwapBaseNtfRadioStatusCause OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  normal(0),
+                  hwError(1),
+                  swError(2),
+                  adminSet(3)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason why radio is out of service.
+         The following enumerated values are supported:
+           normal(0)   - Normal status
+           hwError(1)  - Radio failure
+           swError(2)  - Software failure
+           adminSet(3) - Administratively set"
+    REFERENCE
+        "Section 4.6.34. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 9 }
+
+capwapBaseNtfJoinFailureReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  unspecified(1),
+                  resDepletion(2),
+                  unknownSource(3),
+                  incorrectData(4),
+                  sessionIdInUse(5),
+                  notSupportHw(6),
+                  notSupportBinding(7)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason of join failure.
+         The following enumerated values are supported:
+           unspecified(1)       - Unspecified failure reason
+           resDepletion(2)      - Resource depletion
+           unknownSource(3)     - Unknown source
+           incorrectData(4)     - Incorrect data
+           sessionIdInUse(5)    - Session ID already in use
+           notSupportHw(6)      - WTP hardware not supported
+           notSupportBinding(7) - Binding not supported"
+    REFERENCE
+        "Section 4.6.35. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 10 }
+
+capwapBaseNtfImageFailureReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  invalidChecksum(1),
+                  invalidLength(2),
+                  other(3),
+                  inStorage(4)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason of image failure.
+         The following enumerated values are supported:
+           invalidChecksum(1) - Invalid checksum
+           invalidLength(2)   - Invalid data length
+           other(3)           - Other error
+           inStorage(4)       - Image already present"
+    REFERENCE
+        "Section 4.6.35. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 11 }
+
+capwapBaseNtfConfigMsgErrorType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  unknownElement(1),
+                  unsupportedElement(2),
+                  unknownValue(3),
+                  unsupportedValue(4)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of configuration message error.
+         The following enumerated values are supported:
+           unknownElement(1)     - Unknown message element
+           unsupportedElement(2) - Unsupported message element
+           unknownValue(3)       - Unknown message element value
+           unsupportedValue(4)   - Unsupported message element value"
+    REFERENCE
+        "Section 4.6.36. of CAPWAP Protocol Specification, RFC 5415."
+   ::= { capwapBaseNotifyVarObjects 12 }
+
+capwapBaseNtfMsgErrorElements  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the message elements sent by the AC in the
+         Configuration Status Response message that caused the error."
+    REFERENCE
+        "Section 4.6.36. of CAPWAP Protocol Specification, RFC 5415."
+    ::= { capwapBaseNotifyVarObjects 13 }
+
+-- Module compliance
+
+capwapBaseCompliances OBJECT IDENTIFIER
+    ::= { capwapBaseConformance 1 }
+
+capwapBaseGroups OBJECT IDENTIFIER
+    ::= { capwapBaseConformance 2 }
+
+capwapBaseCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+       "Describes the requirements for conformance to the
+        CAPWAP-BASE-MIB module."
+
+   MODULE -- this module
+     MANDATORY-GROUPS {
+       capwapBaseAcNodeGroup,
+       capwapBaseWtpProfileGroup,
+       capwapBaseWtpStateGroup,
+       capwapBaseWtpGroup,
+       capwapBaseRadioGroup,
+       capwapBaseStationGroup
+     }
+
+     GROUP capwapBaseAcNodeGroup2
+     DESCRIPTION
+         "The capwapBaseAcNodeGroup2 group is optional."
+
+     GROUP capwapBaseAcNameListGroup
+     DESCRIPTION
+         "The capwapBaseAcNameListGroup group is optional."
+
+     GROUP capwapBaseMacAclsGroup
+     DESCRIPTION
+         "The capwapBaseMacAclsGroup group is optional."
+
+     GROUP capwapBaseWtpProfileGroup2
+
+     DESCRIPTION
+         "The capwapBaseWtpProfileGroup2 group is optional."
+
+     GROUP capwapBaseWtpGroup2
+     DESCRIPTION
+         "The capwapBaseWtpGroup2 group is optional."
+
+     GROUP capwapBaseWtpEventsStatsGroup
+     DESCRIPTION
+         "The capwapBaseWtpEventsStatsGroup group is optional."
+
+     GROUP capwapBaseRadioEventsStatsGroup
+     DESCRIPTION
+         "The capwapBaseRadioEventsStatsGroup group is optional."
+
+     GROUP capwapBaseParametersGroup
+     DESCRIPTION
+         "The capwapBaseParametersGroup group is optional."
+
+     GROUP capwapBaseStatsGroup
+     DESCRIPTION
+         "The capwapBaseStatsGroup group is optional."
+
+     GROUP capwapBaseNotificationsGroup
+     DESCRIPTION
+          "The capwapBaseNotificationsGroup group is optional."
+
+     GROUP capwapBaseNotifyVarsGroup
+     DESCRIPTION
+         "The capwapBaseNotifyVarsGroup group is optional.
+          If capwapBaseNotificationsGroup is supported,
+          this group must be implemented."
+     ::= { capwapBaseCompliances 1 }
+
+capwapBaseAcNodeGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWtpSessions,
+      capwapBaseWtpSessionsLimit,
+      capwapBaseStationSessions,
+      capwapBaseStationSessionsLimit
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to represent
+         the basic properties for the AC from the CAPWAP
+         protocol perspective."
+    ::= { capwapBaseGroups 1 }
+
+capwapBaseAcNodeGroup2   OBJECT-GROUP
+    OBJECTS {
+      capwapBaseDataChannelDTLSPolicyOptions,
+      capwapBaseDataChannelDTLSPolicyConfig,
+      capwapBaseControlChannelAuthenOptions,
+      capwapBaseControlChannelAuthenConfig
+     }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to represent
+         the other properties such as security for the AC from
+         the CAPWAP protocol perspective."
+    ::= { capwapBaseGroups 2 }
+
+capwapBaseAcNameListGroup  OBJECT-GROUP
+    OBJECTS {
+      capwapBaseAcNameListName,
+      capwapBaseAcNameListPriority,
+      capwapBaseAcNameListRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to configure
+         the AC name list."
+    ::= { capwapBaseGroups 3 }
+
+capwapBaseMacAclsGroup  OBJECT-GROUP
+    OBJECTS {
+      capwapBaseMacAclStationId,
+      capwapBaseMacAclRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to configure
+         the stations ACL."
+    ::= { capwapBaseGroups 4 }
+
+capwapBaseWtpProfileGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWtpProfileName,
+      capwapBaseWtpProfileWtpMacAddr,
+      capwapBaseWtpProfileWtpModelNumber,
+      capwapBaseWtpProfileWtpName,
+      capwapBaseWtpProfileWtpLocation,
+      capwapBaseWtpProfileRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to configure
+         the WTP profile."
+    ::= { capwapBaseGroups 5 }
+
+capwapBaseWtpProfileGroup2    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWtpProfileWtpStaticIpEnable,
+      capwapBaseWtpProfileWtpStaticIpType,
+      capwapBaseWtpProfileWtpStaticIp,
+      capwapBaseWtpProfileWtpNetmask,
+      capwapBaseWtpProfileWtpGateway,
+      capwapBaseWtpProfileWtpFallbackEnable,
+      capwapBaseWtpProfileWtpEchoInterval,
+      capwapBaseWtpProfileWtpIdleTimeout,
+      capwapBaseWtpProfileWtpMaxDiscoveryInterval,
+      capwapBaseWtpProfileWtpReportInterval,
+      capwapBaseWtpProfileWtpSilentInterval,
+      capwapBaseWtpProfileWtpStatisticsTimer,
+      capwapBaseWtpProfileWtpWaitDTLSTimer,
+      capwapBaseWtpProfileWtpEcnSupport
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of optional objects which are used to
+         configure the WTP profile."
+    ::= { capwapBaseGroups 6 }
+
+capwapBaseWtpStateGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWtpStateWtpIpAddressType,
+      capwapBaseWtpStateWtpIpAddress,
+      capwapBaseWtpStateWtpBaseMacAddress,
+      capwapBaseWtpState,
+      capwapBaseWtpStateWtpCurrWtpProfileId
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to represent
+         the WTP's state information."
+    ::= { capwapBaseGroups 7 }
+
+capwapBaseWtpGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWtpBaseMacAddress,
+      capwapBaseWtpTunnelModeOptions,
+      capwapBaseWtpMacTypeOptions,
+      capwapBaseWtpDiscoveryType,
+      capwapBaseWtpRadiosInUseNum,
+      capwapBaseWtpRadioNumLimit
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to represent
+         the properties information for the WTPs in running state."
+    ::= { capwapBaseGroups 8 }
+
+capwapBaseWtpGroup2   OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWtpPhyIndex,
+      capwapBaseWtpRetransmitCount,
+      capwapBaseWtpMaxDiscoveries,
+      capwapBaseWtpMaxFailedDTLSSessionRetry,
+      capwapBaseWtpMaxRetransmit,
+      capwapBaseWtpDataChannelKeepAliveTimer,
+      capwapBaseWtpDataChannelDeadInterval,
+      capwapBaseWtpDiscoveryInterval,
+      capwapBaseWtpDTLSSessionDeleteTimer,
+      capwapBaseWtpImageDataStartTimer,
+      capwapBaseWtpRetransmitInterval
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of optional objects which are used to represent
+         the properties information for the WTPs in running state."
+    ::= { capwapBaseGroups 9 }
+
+capwapBaseRadioGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWirelessBindingVirtualRadioIfIndex,
+      capwapBaseWirelessBindingType
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to represent
+         the wireless binding type, the mappings between the
+         ifIndexes of WLAN Virtual Radio Interfaces and PHY radios."
+    ::= { capwapBaseGroups 10 }
+
+capwapBaseStationGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseStationAddedTime,
+      capwapBaseStationVlanName
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used to represent
+         the stations' basic properties."
+    ::= { capwapBaseGroups 11 }
+
+capwapBaseWtpEventsStatsGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseWtpEventsStatsRebootCount,
+      capwapBaseWtpEventsStatsInitCount,
+      capwapBaseWtpEventsStatsLinkFailureCount,
+      capwapBaseWtpEventsStatsSwFailureCount,
+      capwapBaseWtpEventsStatsHwFailureCount,
+      capwapBaseWtpEventsStatsOtherFailureCount,
+      capwapBaseWtpEventsStatsUnknownFailureCount,
+      capwapBaseWtpEventsStatsLastFailureType
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used for collecting
+         WTP reboot count, link failure count, hardware failure
+         count and so on."
+    ::= { capwapBaseGroups 12 }
+
+capwapBaseRadioEventsStatsGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseRadioEventsStatsResetCount,
+      capwapBaseRadioEventsStatsSwFailCount,
+      capwapBaseRadioEventsStatsHwFailCount,
+      capwapBaseRadioEventsStatsOtherFailCount,
+      capwapBaseRadioEventsStatsUnknownFailCount,
+      capwapBaseRadioEventsStatsConfigUpdateCount,
+      capwapBaseRadioEventsStatsChannelChangeCount,
+      capwapBaseRadioEventsStatsBandChangeCount,
+      capwapBaseRadioEventsStatsCurrentNoiseFloor,
+      capwapBaseRadioEventsStatsDecryptErrorCount,
+      capwapBaseRadioEventsStatsLastFailType
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects which are used for collecting
+         radio reset count, channel change count, hardware failure
+         count and so on"
+    ::= { capwapBaseGroups 13 }
+
+capwapBaseParametersGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseAcMaxRetransmit,
+      capwapBaseAcChangeStatePendingTimer,
+      capwapBaseAcDataCheckTimer,
+      capwapBaseAcDTLSSessionDeleteTimer,
+      capwapBaseAcEchoInterval,
+      capwapBaseAcRetransmitInterval,
+      capwapBaseAcSilentInterval,
+      capwapBaseAcWaitDTLSTimer,
+      capwapBaseAcWaitJoinTimer,
+      capwapBaseAcEcnSupport
+    }
+    STATUS  current
+    DESCRIPTION
+        "Objects used for the CAPWAP protocol's parameters."
+    ::= { capwapBaseGroups 14 }
+
+capwapBaseStatsGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseFailedDTLSAuthFailCount,
+      capwapBaseFailedDTLSSessionCount
+    }
+    STATUS  current
+    DESCRIPTION
+        "Objects used for collecting the CAPWAP protocol's statistic."
+    ::= { capwapBaseGroups 15 }
+
+capwapBaseNotificationsGroup    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+      capwapBaseChannelUp,
+      capwapBaseChannelDown,
+      capwapBaseDecryptErrorReport,
+      capwapBaseJoinFailure,
+      capwapBaseImageUpgradeFailure,
+      capwapBaseConfigMsgError,
+      capwapBaseRadioOperableStatus,
+      capwapBaseAuthenticationFailure
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of notifications in this MIB module."
+    ::= { capwapBaseGroups 16 }
+
+capwapBaseNotifyVarsGroup    OBJECT-GROUP
+    OBJECTS {
+      capwapBaseNtfWtpId,
+      capwapBaseNtfRadioId,
+      capwapBaseNtfChannelType,
+      capwapBaseNtfAuthenMethod,
+      capwapBaseNtfChannelDownReason,
+      capwapBaseNtfStationIdList,
+      capwapBaseNtfAuthenFailureReason,
+      capwapBaseNtfRadioOperStatusFlag,
+      capwapBaseNtfRadioStatusCause,
+      capwapBaseNtfJoinFailureReason,
+      capwapBaseNtfImageFailureReason,
+      capwapBaseNtfConfigMsgErrorType,
+      capwapBaseNtfMsgErrorElements
+    }
+    STATUS  current
+    DESCRIPTION
+        "Objects used for notifications."
+    ::= { capwapBaseGroups 17 }
+
+END

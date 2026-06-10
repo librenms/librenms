@@ -1,0 +1,2965 @@
+-- *------------------------------------------------------------------
+-- * CISCO-CEF-MIB.my:  Cisco CEF MIB.
+-- *
+-- * Jan 2006, Rohit Mendiratta
+-- *
+-- * This MIB module is used to manage CISCO Express Forwarding
+-- * (CEF).
+-- *
+-- * Copyright (c) 2006 by Cisco Systems, Inc.
+-- * All rights reserved.
+-- *
+-- *------------------------------------------------------------------
+
+CISCO-CEF-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, 
+      OBJECT-TYPE,
+      NOTIFICATION-TYPE,
+      Counter64,
+      Counter32,
+      Integer32,
+      Gauge32,
+      Unsigned32
+        FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, 
+      OBJECT-GROUP,
+      NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+      TimeStamp,
+      RowStatus,
+      TruthValue,
+      TestAndIncr
+        FROM SNMPv2-TC
+      CounterBasedGauge64
+        FROM HCNUM-TC
+      ifIndex,
+      InterfaceIndexOrZero 
+        FROM IF-MIB
+      entPhysicalIndex,
+      PhysicalIndex
+        FROM ENTITY-MIB
+      InetAddressType,
+      InetAddress,
+      InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+      SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+      MplsVpnId 
+        FROM MPLS-VPN-MIB
+      EntPhysicalIndexOrZero
+        FROM CISCO-TC
+      CefIpVersion,
+      CefAdjLinkType,
+      CefAdjacencySource,
+      CefPathType,
+      CefPrefixSearchState,
+      CefForwardingElementSpecialType,
+      CefMplsLabelList,
+      CefAdminStatus,
+      CefOperStatus,
+      CefFailureReason,
+      CefCCType,
+      CefCCAction,
+      CefCCStatus
+        FROM CISCO-CEF-TC 
+      ciscoMgmt 
+        FROM CISCO-SMI;
+
+
+   ciscoCefMIB MODULE-IDENTITY
+      LAST-UPDATED "200601300000Z"
+      ORGANIZATION "Cisco System, Inc."
+      CONTACT-INFO
+          "Postal: Cisco Systems, Inc.
+          170 West Tasman Drive
+          San Jose, CA 95134-1706
+          USA
+
+          Tel: +1 800 553-NETS
+
+          E-mail: cs-cef@cisco.com"
+
+      DESCRIPTION
+         "Cisco Express Forwarding (CEF) describes a high speed 
+          switching mechanism that a router uses to forward packets
+          from the inbound to the outbound interface. 
+
+          CEF uses two sets of data structures
+          or tables, which it stores in router memory:
+
+          Forwarding information base (FIB) - Describes a database
+          of information used to make forwarding decisions. It is 
+          conceptually similar to a routing table or route-cache, 
+          although its implementation is different.
+
+          Adjacency - Two nodes in the network are said to be 
+          adjacent if they can reach each other via a single hop 
+          across a link layer.           
+       
+          CEF path is a valid route to reach to a destination 
+          IP prefix. Multiple paths may exist out of a router to the 
+          same destination prefix. CEF Load balancing capability 
+          share the traffic to the destination IP prefix over all 
+          the active paths. 
+
+          After obtaining the prefix in the CEF table with the
+          longest match, output forwarding follows the chain of 
+          forwarding elements. 
+
+          Forwarding element (FE) may process the packet, forward 
+          the packet, drop or punt the packet or it may also
+          pass the packet to the next forwarding element in the 
+          chain for further processing.
+
+          Forwarding Elements are of various types
+          but this MIB only represents the forwarding elements of
+          adjacency and label types. Hence a forwarding element 
+          chain will be represented as a list of labels and
+          adjacency. The adjacency may point to a forwarding element
+          list again, if it is not the last forwarding element in this
+          chain. 
+    
+          For the simplest IP forwarding case, the prefix entry will 
+          point at an adjacency forwarding element.
+          The IP adjacency processing function will apply the output
+          features, add the encapsulation (performing any required 
+          fixups), and may send the packet out.
+
+          If loadbalancing is configured, the prefix entry will point 
+          to lists of forwarding elements. One of these lists will be 
+          selected to forward the packet. 
+
+          Each forwarding element list dictates which of a set of 
+          possible packet transformations to apply on the way to 
+          the same neighbour. 
+
+          The following diagram represents relationship
+          between three of the core tables in this MIB module.
+
+           cefPrefixTable             cefFESelectionTable
+         
+           +---------------+  points           +--------------+   
+           |   |     |     |  a set     +----> |   |   |   |  | 
+           |---------------|  of FE     |      |--------------|   
+           |   |     |     |  Selection |      |   |   |   |  |
+           |---------------|  Entries   |      |--------------|    
+           |   |     |     |------------+      |              |<----+ 
+           |---------------|                   |--------------|     |
+           |               |    +--------------|   |   |   |  |     |
+           +---------------+    |              +--------------+     |
+                                |                                   |
+                          points to an                              |
+                          adjacency entry                           |
+                                |                                   |
+                                |   cefAdjTable                     |
+                                |  +---------------+  may point     |
+                                +->|   |     |     |  to a set      |
+                                   |---------------|  of FE         |
+                                   |   |     |     |  Selection     |
+                                   |---------------|  Entries       | 
+                                   |   |     |     |----------------+
+                                   |---------------| 
+                                   |               | 
+                                   +---------------+ 
+
+          Some of the Cisco series routers (e.g. 7500 & 12000) 
+          support distributed CEF (dCEF), in which the line cards 
+          (LCs) make the packet forwarding decisions using locally 
+          stored copies of the same Forwarding information base (FIB)
+          and adjacency tables as the Routing Processor (RP).
+                    
+          Inter-Process Communication (IPC) is the protocol used 
+          by routers that support distributed packet forwarding. 
+          CEF updates are encoded as external Data Representation 
+          (XDR) information elements inside IPC messages. 
+                   
+          This MIB reflects the distributed nature of CEF, e.g. CEF
+          has different instances running on the RP and the line cards.
+
+          There may be instances of inconsistency between the
+          CEF forwarding databases(i.e between CEF forwarding 
+          database on line cards and the CEF forwarding database
+          on the RP). CEF consistency checkers (CC) detects 
+          this inconsistency.
+
+          When two databases are compared by a consistency checker, 
+          a set of records from the first (master) database is 
+          looked up in the second (slave).
+          
+          There are two types of consistency checkers, 
+          active and passive. Active consistency checkers 
+          are invoked in response to some stimulus, i.e. 
+          when a packet cannot be forwarded because the 
+          prefix is not in the forwarding table or 
+          in response to a Management Station request.
+
+          Passive consistency checkers operate in the background, 
+          scanning portions of the databases on a periodic basis.
+
+          The full-scan checkers are active consistency checkers
+          which are invoked in response to a Management Station
+          Request.
+
+          If 64-bit counter objects in this MIB are supported,
+          then their associated 32-bit counter objects 
+          must also be supported. The 32-bit counters will
+          report the low 32-bits of the associated 64-bit 
+          counter count (e.g., cefPrefixPkts will report the 
+          least significant 32 bits of cefPrefixHCPkts).
+          The same rule should be applied for the 64-bit gauge
+          objects and their assocaited 32-bit gauge objects.
+
+          If 64-bit counters in this MIB are not supported,
+          then an agent MUST NOT instantiate the corresponding
+          objects with an incorrect value; rather, it MUST 
+          respond with the appropriate error/exception 
+          condition (e.g., noSuchInstance or noSuchName). 
+
+          Counters related to CEF accounting (e.g.,
+          cefPrefixPkts) MUST NOT be instantiated if the
+          corresponding accounting method has been disabled.  
+           
+          This MIB allows configuration and monitoring of CEF 
+          related objects."
+
+      REVISION     "200601300000Z"
+      DESCRIPTION
+         "Initial version of this MIB module."
+      ::= { ciscoMgmt 492 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- CISCO CEF MIB Object Groups
+--
+-- This MIB module contains the following groups:
+--        CEF FIB Group
+--        CEF Adjacency Group
+--        CEF Forwarding Element Group
+--        CEF Cfg Group
+--        CEF Interface Group
+--        CEF Peer Group
+--        CEF Consistency Checker (CC) group
+--        CEF Stats Group
+--        CEF Notification Control Group.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   ciscoCefMIBNotifs  OBJECT IDENTIFIER  ::= {ciscoCefMIB 0}
+   ciscoCefMIBObjects OBJECT IDENTIFIER  ::= {ciscoCefMIB 1}
+   ciscoCefMIBConform OBJECT IDENTIFIER  ::= {ciscoCefMIB 2}
+
+   cefFIB        OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  1 }   
+   cefAdj        OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  2 }
+   cefFE         OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  3 }
+   cefGlobal     OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  4 }
+   cefInterface  OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  5 }
+   cefPeer       OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  6 }
+   cefCC         OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  7 }
+   cefStats      OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  8 }
+   cefNotifCntl  OBJECT IDENTIFIER ::= { ciscoCefMIBObjects  9 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF FIB Summary 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefFIBSummary  OBJECT IDENTIFIER  
+                  ::= { cefFIB 1 }
+
+   cefFIBSummaryTable OBJECT-TYPE
+      SYNTAX     SEQUENCE OF CefFIBSummaryEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+         "This table contains the summary information
+          for the cefPrefixTable."
+     ::= { cefFIBSummary 1 }
+
+   cefFIBSummaryEntry OBJECT-TYPE
+      SYNTAX     CefFIBSummaryEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contains the FIB summary related
+          attributes for the managed entity.
+        
+          A row may exist for each IP version type
+          (v4 and v6) depending upon the IP version
+          supported on the device.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex, cefFIBIpVersion }
+      ::= { cefFIBSummaryTable 1}
+
+   CefFIBSummaryEntry ::= SEQUENCE { 
+      cefFIBIpVersion             CefIpVersion, 
+      cefFIBSummaryFwdPrefixes    Unsigned32
+   }
+
+   cefFIBIpVersion OBJECT-TYPE
+      SYNTAX      CefIpVersion 
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The version of IP forwarding."
+   ::= { cefFIBSummaryEntry 1 }
+
+   cefFIBSummaryFwdPrefixes OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Total number of forwarding Prefixes
+          in FIB for the IP version specified
+          by cefFIBIpVersion object." 
+      ::= { cefFIBSummaryEntry 2 }
+
+ 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Forwarding Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefPrefixTable OBJECT-TYPE
+      SYNTAX     SEQUENCE OF CefPrefixEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+         "A list of CEF forwarding prefixes."
+      ::= { cefFIB 2 }
+
+   cefPrefixEntry OBJECT-TYPE
+      SYNTAX      CefPrefixEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contains the forwarding 
+          prefix attributes. 
+
+          CEF prefix based non-recursive stats are maintained
+          in internal and external buckets (depending upon the 
+          value of cefIntNonrecursiveAccouting object in the 
+          CefIntEntry).
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex, 
+              cefPrefixType,
+              cefPrefixAddr,
+              cefPrefixLen
+            }
+      ::= { cefPrefixTable 1}
+
+   CefPrefixEntry ::= SEQUENCE {
+      cefPrefixType                  InetAddressType,
+      cefPrefixAddr                  InetAddress,
+      cefPrefixLen                   InetAddressPrefixLength,
+      cefPrefixForwardingInfo        SnmpAdminString,
+      cefPrefixPkts                  Counter32,
+      cefPrefixHCPkts                Counter64,
+      cefPrefixBytes                 Counter32,
+      cefPrefixHCBytes               Counter64,
+      cefPrefixInternalNRPkts        Counter32,                    
+      cefPrefixInternalNRHCPkts      Counter64,                    
+      cefPrefixInternalNRBytes       Counter32,
+      cefPrefixInternalNRHCBytes     Counter64,
+      cefPrefixExternalNRPkts        Counter32,                    
+      cefPrefixExternalNRHCPkts      Counter64,                    
+      cefPrefixExternalNRBytes       Counter32,                       
+      cefPrefixExternalNRHCBytes     Counter64                       
+   }
+
+   cefPrefixType OBJECT-TYPE
+      SYNTAX      InetAddressType
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The Network Prefix Type.
+          This object specifies the address type
+          used for cefPrefixAddr.
+
+          Prefix entries are only valid for the address
+          type of ipv4(1) and ipv6(2)." 
+      ::= { cefPrefixEntry 1 }
+
+   cefPrefixAddr OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The Network Prefix Address.
+          The type of this address is determined by
+          the value of the cefPrefixType object.
+          This object is a Prefix Address containing the 
+          prefix with length specified by cefPrefixLen. 
+          Any bits beyond the length specified by
+          cefPrefixLen are zeroed." 
+      ::= { cefPrefixEntry 2 }
+
+   cefPrefixLen OBJECT-TYPE
+      SYNTAX      InetAddressPrefixLength
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "Length in bits of the FIB Address prefix."
+      ::= { cefPrefixEntry 3 }
+
+   cefPrefixForwardingInfo OBJECT-TYPE
+       SYNTAX      SnmpAdminString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+          "This object indicates the associated forwarding element
+           selection entries in cefFESelectionTable.
+           The value of this object is index value (cefFESelectionName)
+           of cefFESelectionTable."  
+       ::= { cefPrefixEntry 4 }
+
+   cefPrefixPkts OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable per prefix
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'perPrefix' 
+          accounting), then this object represents the 
+          number of packets switched to this prefix." 
+      ::= { cefPrefixEntry 5 }
+
+   cefPrefixHCPkts OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable per prefix
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'perPrefix' 
+          accounting), then this object represents the 
+          number of packets switched to this prefix. 
+
+          This object is a 64-bit version of 
+          cefPrefixPkts." 
+      ::= { cefPrefixEntry 6 }
+
+   cefPrefixBytes OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable per prefix
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'perPrefix' 
+          accounting), then this object represents the 
+          number of bytes switched to this prefix."
+      ::= { cefPrefixEntry 7 }
+
+   cefPrefixHCBytes OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable per prefix
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'perPrefix' 
+          accounting), then this object represents the 
+          number of bytes switched to this prefix.
+
+          This object is a 64-bit version of 
+          cefPrefixBytes." 
+      ::= { cefPrefixEntry 8 }
+
+   cefPrefixInternalNRPkts OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable non-recursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents the number
+          of non-recursive packets in the internal bucket
+          switched using this prefix."
+      ::= { cefPrefixEntry 9 }
+
+   cefPrefixInternalNRHCPkts OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable non-recursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents the number
+          of non-recursive packets in the internal bucket
+          switched using this prefix.
+
+          This object is a 64-bit version of 
+          cefPrefixInternalNRPkts."
+      ::= { cefPrefixEntry 10 }
+
+   cefPrefixInternalNRBytes OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable nonRecursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents 
+          the number of non-recursive bytes in the internal
+          bucket switched using this prefix."
+      ::= { cefPrefixEntry 11 }
+
+   cefPrefixInternalNRHCBytes OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable nonRecursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents 
+          the number of non-recursive bytes in the internal
+          bucket switched using this prefix.
+
+          This object is a 64-bit version of 
+          cefPrefixInternalNRBytes." 
+      ::= { cefPrefixEntry 12 }
+
+   cefPrefixExternalNRPkts OBJECT-TYPE
+      SYNTAX       Counter32
+      UNITS        "packets"
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "If CEF accounting is set to enable non-recursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents the number
+          of non-recursive packets in the external bucket
+          switched using this prefix."
+      ::= { cefPrefixEntry 13 }
+
+   cefPrefixExternalNRHCPkts OBJECT-TYPE
+      SYNTAX       Counter64
+      UNITS        "packets"
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "If CEF accounting is set to enable non-recursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents the number
+          of non-recursive packets in the external bucket
+          switched using this prefix.
+
+          This object is a 64-bit version of 
+          cefPrefixExternalNRPkts."
+      ::= { cefPrefixEntry 14 }
+
+   cefPrefixExternalNRBytes OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable nonRecursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents 
+          the number of non-recursive bytes in the external
+          bucket switched using this prefix."
+      ::= { cefPrefixEntry 15 }
+
+   cefPrefixExternalNRHCBytes OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "If CEF accounting is set to enable nonRecursive
+          accounting (value of cefCfgAccountingMap object in 
+          the cefCfgEntry is set to enable 'nonRecursive' 
+          accounting), then this object represents 
+          the number of non-recursive bytes in the external
+          bucket switched using this prefix.
+
+          This object is a 64-bit version of 
+          cefPrefixExternalNRBytes."
+      ::= { cefPrefixEntry 16 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Longest Match Prefix Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   cefLMPrefixSpinLock OBJECT-TYPE
+      SYNTAX       TestAndIncr
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+         "An advisory lock used to allow cooperating SNMP
+          Command Generator applications to coordinate their
+          use of the Set operation in creating Longest
+          Match Prefix Entries in cefLMPrefixTable.
+
+          When creating a new longest prefix match entry,
+          the value of cefLMPrefixSpinLock should be retrieved.  
+          The destination address should be determined to be
+          unique by the SNMP Command Generator application by
+          consulting the cefLMPrefixTable. Finally, the longest 
+          prefix entry may be created (Set), including the
+          advisory lock.
+                 
+          If another SNMP Command Generator application has
+          altered the longest prefix entry in the meantime, 
+          then the spin lock's value will have changed, 
+          and so this creation will fail because it will specify
+          the wrong value for the spin lock.
+
+          Since this is an advisory lock, the use of this lock
+          is not enforced, but not using this lock may lead
+          to conflict with the another SNMP command responder 
+          application which may also be acting on the
+          cefLMPrefixTable."
+      ::= { cefFIB 3 }
+
+   cefLMPrefixTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF CefLMPrefixEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+         "A table of Longest Match Prefix Query requests.
+
+          Generator application should utilize the
+          cefLMPrefixSpinLock to try to avoid collisions.
+          See DESCRIPTION clause of cefLMPrefixSpinLock."
+      ::= { cefFIB 4 }
+
+   cefLMPrefixEntry OBJECT-TYPE
+      SYNTAX      CefLMPrefixEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the managed device, then each
+          entry represents a longest Match Prefix request.
+
+          A management station wishing to get the longest
+          Match prefix for a given destination address
+          should create the associate instance of the
+          row status. The row status should be set to
+          active(1) to initiate the request. Note that 
+          this entire procedure may be initiated via a 
+          single set request which specifies a row status 
+          of createAndGo(4).
+
+          Once the request completes, the management station 
+          should retrieve the values of the objects of 
+          interest, and should then delete the entry.  In order 
+          to prevent old entries from clogging the table, 
+          entries will be aged out, but an entry will never be 
+          deleted within 5 minutes of completion.
+          Entries are lost after an agent restart.
+
+          I.e. to find out the longest prefix match for 
+          destination address of A.B.C.D on entity whose
+          entityPhysicalIndex is 1, the Management station
+          will create an entry in cefLMPrefixTable with
+          cefLMPrefixRowStatus.1(entPhysicalIndex).1(ipv4).A.B.C.D
+          set to createAndGo(4). Management Station may query the
+          value of objects cefLMPrefix and cefLMPrefixLen
+          to find out the corresponding prefix entry from the
+          cefPrefixTable once the value of cefLMPrefixState
+          is set to matchFound(2).
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF.
+         "
+      INDEX { entPhysicalIndex, 
+              cefLMPrefixDestAddrType,
+              cefLMPrefixDestAddr }
+      ::= { cefLMPrefixTable 1}
+
+   CefLMPrefixEntry ::= SEQUENCE {
+      cefLMPrefixDestAddrType          InetAddressType,
+      cefLMPrefixDestAddr              InetAddress,
+      cefLMPrefixState                 CefPrefixSearchState,
+      cefLMPrefixAddr                  InetAddress,
+      cefLMPrefixLen                   InetAddressPrefixLength,
+      cefLMPrefixRowStatus             RowStatus
+   }
+
+   cefLMPrefixDestAddrType OBJECT-TYPE
+      SYNTAX      InetAddressType
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The Destination Address Type.
+          This object specifies the address type
+          used for cefLMPrefixDestAddr.
+
+          Longest Match Prefix entries are only valid 
+          for the address type of ipv4(1) and ipv6(2)." 
+      ::= { cefLMPrefixEntry 1 }
+
+   cefLMPrefixDestAddr OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The Destination Address.
+          The type of this address is determined by
+          the value of the cefLMPrefixDestAddrType object." 
+      ::= { cefLMPrefixEntry 2 }
+
+   cefLMPrefixState OBJECT-TYPE
+      SYNTAX      CefPrefixSearchState
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Indicates the state of this prefix search request."
+      ::= { cefLMPrefixEntry 3 } 
+
+   cefLMPrefixAddr OBJECT-TYPE
+      SYNTAX       InetAddress
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The Network Prefix Address. Index to the cefPrefixTable.
+          The type of this address is determined by
+          the value of the cefLMPrefixDestAddrType object."
+      ::= { cefLMPrefixEntry 4 }
+
+   cefLMPrefixLen OBJECT-TYPE
+      SYNTAX       InetAddressPrefixLength
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The Network Prefix Length. Index to the cefPrefixTable."
+      ::= { cefLMPrefixEntry 5 }
+
+   cefLMPrefixRowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+         "The status of this table entry.  Once the entry 
+          status is set to active(1), the associated entry 
+          cannot be modified until the request completes
+          (cefLMPrefixState transitions to matchFound(2) 
+          or noMatchFound(3)).
+
+          Once the longest match request has been created
+          (i.e. the cefLMPrefixRowStatus has been made active),
+          the entry cannot be modified - the only operation
+          possible after this is to delete the row."
+      ::= { cefLMPrefixEntry 6 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Path Table 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefPathTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF CefPathEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "CEF prefix path is a valid route to reach to a 
+          destination IP prefix. Multiple paths may exist 
+          out of a router to the same destination prefix. 
+          This table specify lists of CEF paths."
+      ::= { cefFIB 5 }
+    
+   cefPathEntry OBJECT-TYPE
+      SYNTAX        CefPathEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contain a CEF prefix path.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX  { entPhysicalIndex, 
+               cefPrefixType,
+               cefPrefixAddr,
+               cefPrefixLen,
+               cefPathId
+             }
+      ::= { cefPathTable 1 }
+    
+   CefPathEntry ::= SEQUENCE {
+      cefPathId                 Integer32,
+      cefPathType               CefPathType,     
+      cefPathInterface          InterfaceIndexOrZero, 
+      cefPathNextHopAddr        InetAddress,
+      cefPathRecurseVrfName     MplsVpnId
+   }
+    
+   cefPathId OBJECT-TYPE
+      SYNTAX        Integer32 (1..2147483647)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "The locally arbitrary, but unique identifier associated
+          with this prefix path entry."
+      ::= { cefPathEntry 1 }
+   
+   cefPathType OBJECT-TYPE
+      SYNTAX        CefPathType   
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "Type for this CEF Path."
+      ::= { cefPathEntry 2 }
+
+   cefPathInterface OBJECT-TYPE
+      SYNTAX        InterfaceIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "Interface associated with this CEF path.
+
+          A value of zero for this object will indicate
+          that no interface is associated with this path 
+          entry."
+      ::= { cefPathEntry 3 }
+
+   cefPathNextHopAddr OBJECT-TYPE
+      SYNTAX        InetAddress
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "Next hop address associated with this CEF path.
+
+          The value of this object is only relevant
+          for attached next hop and recursive next hop  
+          path types (when the object cefPathType is
+          set to attachedNexthop(4) or recursiveNexthop(5)).
+          and will be set to zero for other path types.
+ 
+          The type of this address is determined by
+          the value of the cefPrefixType object."
+      ::= { cefPathEntry 4 }
+
+   cefPathRecurseVrfName OBJECT-TYPE
+      SYNTAX        MplsVpnId
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "The recursive vrf name associated with this path.
+
+          The value of this object is only relevant
+          for recursive next hop path types (when the 
+          object cefPathType is set to recursiveNexthop(5)),
+          and '0x00' will be returned for other path types."
+      ::= { cefPathEntry 5 }
+
+   -- End of cefPathTable
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Adjacency Summary 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefAdjSummary  OBJECT IDENTIFIER  
+                  ::= { cefAdj 1 }
+
+   cefAdjSummaryTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefAdjSummaryEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This table contains the summary information
+          for the cefAdjTable."
+      ::= { cefAdjSummary 1 }
+
+   cefAdjSummaryEntry OBJECT-TYPE
+      SYNTAX       CefAdjSummaryEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contains the CEF Adjacency  
+          summary related attributes for the
+          Managed entity. A row exists for
+          each adjacency link type.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex, cefAdjSummaryLinkType}
+      ::= { cefAdjSummaryTable 1}
+
+   CefAdjSummaryEntry ::= SEQUENCE {
+      cefAdjSummaryLinkType                CefAdjLinkType, 
+      cefAdjSummaryComplete                Unsigned32,
+      cefAdjSummaryIncomplete              Unsigned32,
+      cefAdjSummaryFixup                   Unsigned32,
+      cefAdjSummaryRedirect                Unsigned32
+   }
+
+   cefAdjSummaryLinkType OBJECT-TYPE
+      SYNTAX      CefAdjLinkType
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The link type of the adjacency."
+      ::= { cefAdjSummaryEntry 1 }
+
+   cefAdjSummaryComplete OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The total number of complete adjacencies.
+
+          The total number of adjacencies which can be used 
+          to switch traffic to a neighbour."
+      ::= { cefAdjSummaryEntry 2 }
+
+   cefAdjSummaryIncomplete OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The total number of incomplete adjacencies.
+
+          The total number of adjacencies which cannot be 
+          used to switch traffic in their current state."
+      ::= { cefAdjSummaryEntry 3 }
+
+   cefAdjSummaryFixup OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The total number of adjacencies for which
+          the Layer 2 encapsulation string (header) may be 
+          updated (fixed up) at packet switch time."
+      ::= { cefAdjSummaryEntry 4 }
+
+   cefAdjSummaryRedirect OBJECT-TYPE
+      SYNTAX       Unsigned32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The total number of adjacencies for which 
+          ip redirect (or icmp redirection) is enabled.
+          The value of this object is only relevant for
+          ipv4 and ipv6 link type (when the index object 
+          cefAdjSummaryLinkType value is ipv4(1) or ipv6(2))
+          and will be set to zero for other link types.
+         "
+      REFERENCE
+        "1. Internet Architecture Extensions for Shared Media,
+            RFC 1620, May 1994."
+      ::= { cefAdjSummaryEntry 5 }
+ 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Adjacency Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefAdjTable OBJECT-TYPE
+      SYNTAX       SEQUENCE OF CefAdjEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION
+         "A list of CEF adjacencies."
+      ::= { cefAdj 2 }
+
+   cefAdjEntry OBJECT-TYPE
+      SYNTAX      CefAdjEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contains the adjacency 
+          attributes. Adjacency entries may exist
+          for all the interfaces on which packets
+          can be switched out of the device.
+          The interface is instantiated by ifIndex.  
+          Therefore, the interface index must have been
+          assigned, according to the applicable procedures,
+          before it can be meaningfully used.
+          Generally, this means that the interface must exist.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { 
+              entPhysicalIndex, 
+              ifIndex,
+              cefAdjNextHopAddrType,
+              cefAdjNextHopAddr,
+              cefAdjConnId,
+              cefAdjSummaryLinkType
+            }
+      ::= { cefAdjTable 1}
+
+   CefAdjEntry ::= SEQUENCE {
+      cefAdjNextHopAddrType       InetAddressType,
+      cefAdjNextHopAddr           InetAddress,
+      cefAdjConnId                Unsigned32,
+      cefAdjSource                CefAdjacencySource,
+      cefAdjEncap                 SnmpAdminString,       
+      cefAdjFixup                 SnmpAdminString,      
+      cefAdjMTU                   Unsigned32,
+      cefAdjForwardingInfo        SnmpAdminString,  
+      cefAdjPkts                  Counter32,
+      cefAdjHCPkts                Counter64,
+      cefAdjBytes                 Counter32,
+      cefAdjHCBytes               Counter64
+   }
+
+
+   cefAdjNextHopAddrType OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    not-accessible 
+      STATUS        current
+      DESCRIPTION
+         "Address type for the cefAdjNextHopAddr.
+          This object specifies the address type
+          used for cefAdjNextHopAddr. 
+
+          Adjacency entries are only valid for the 
+          address type of ipv4(1) and ipv6(2)." 
+      ::= { cefAdjEntry 1 }
+
+   cefAdjNextHopAddr OBJECT-TYPE
+      SYNTAX        InetAddress
+      MAX-ACCESS    not-accessible 
+      STATUS        current
+      DESCRIPTION
+         "The next Hop address for this adjacency.
+          The type of this address is determined by
+          the value of the cefAdjNextHopAddrType object." 
+      ::= { cefAdjEntry 2 }
+
+   cefAdjConnId OBJECT-TYPE
+      SYNTAX        Unsigned32(0 | 1..4294967295)
+      MAX-ACCESS    not-accessible 
+      STATUS        current
+      DESCRIPTION
+         "In cases where cefLinkType, interface and the
+          next hop address are not able to uniquely define
+          an adjacency entry (e.g. ATM and Frame Relay
+          Bundles), this object is a unique identifier
+          to differentiate between these adjacency entries. 
+
+          In all the other cases the value of this 
+          index object will be 0."
+      ::= { cefAdjEntry 3 }
+
+   cefAdjSource OBJECT-TYPE
+      SYNTAX       CefAdjacencySource
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "If the adjacency is created because some neighbour
+          discovery mechanism has discovered a neighbour
+          and all the information required to build a frame header to
+          encapsulate traffic to the neighbour is available
+          then the source of adjacency is set to the mechanism
+          by which the adjacency is learned."
+      ::= { cefAdjEntry 4 }
+
+   cefAdjEncap OBJECT-TYPE
+      SYNTAX      SnmpAdminString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The layer 2 encapsulation string to be used
+          for sending the packet out using this adjacency."
+      ::= { cefAdjEntry 5 }
+
+   cefAdjFixup OBJECT-TYPE
+      SYNTAX      SnmpAdminString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "For the cases, where the encapsulation string
+          is decided at packet switch time, the adjacency 
+          encapsulation string specified by object cefAdjEncap 
+          require a fixup. I.e. for the adjacencies out of IP 
+          Tunnels, the string prepended is an IP header which has 
+          fields which can only be setup at packet switch time.
+ 
+          The value of this object represent the kind of fixup
+          applied to the packet.
+
+          If the encapsulation string doesn't require any fixup,
+          then the value of this object will be of zero length."
+      ::= { cefAdjEntry 6 }
+
+   cefAdjMTU OBJECT-TYPE
+      SYNTAX      Unsigned32(0..65535)
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The Layer 3 MTU which can be transmitted using 
+          this adjacency."
+      ::= { cefAdjEntry 7 }
+
+   cefAdjForwardingInfo OBJECT-TYPE
+      SYNTAX      SnmpAdminString
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "This object selects a forwarding info entry 
+          defined in the cefFESelectionTable. The 
+          selected target is defined by an entry in the
+          cefFESelectionTable whose index value (cefFESelectionName) 
+          is equal to this object.
+
+          The value of this object will be of zero length if
+          this adjacency entry is the last forwarding 
+          element in the forwarding path."
+      ::= { cefAdjEntry 8 }
+
+   cefAdjPkts OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of pkts transmitted using this adjacency."
+      ::= { cefAdjEntry 9 }
+
+   cefAdjHCPkts OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of pkts transmitted using this adjacency.
+          This object is a 64-bit version of cefAdjPkts." 
+      ::= { cefAdjEntry 10 }
+
+   cefAdjBytes OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of bytes transmitted using this adjacency."
+      ::= { cefAdjEntry 11 }
+
+   cefAdjHCBytes OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of bytes transmitted using this adjacency.
+          This object is a 64-bit version of cefAdjBytes." 
+      ::= { cefAdjEntry 12 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Forwarding Element Selection Table 
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefFESelectionTable OBJECT-TYPE
+      SYNTAX        SEQUENCE OF CefFESelectionEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "A list of forwarding element selection entries."
+      ::= { cefFE 1 }
+    
+   cefFESelectionEntry OBJECT-TYPE
+      SYNTAX        CefFESelectionEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contain a CEF forwarding element
+          selection list.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX  { entPhysicalIndex, 
+               cefFESelectionName, 
+               cefFESelectionId }
+      ::= { cefFESelectionTable 1 }
+    
+   CefFESelectionEntry ::= SEQUENCE {
+      cefFESelectionName                SnmpAdminString,
+      cefFESelectionId                  Integer32,
+      cefFESelectionSpecial             CefForwardingElementSpecialType,
+      cefFESelectionLabels              CefMplsLabelList,
+      cefFESelectionAdjLinkType         CefAdjLinkType,
+      cefFESelectionAdjInterface        InterfaceIndexOrZero,
+      cefFESelectionAdjNextHopAddrType  InetAddressType,
+      cefFESelectionAdjNextHopAddr      InetAddress,
+      cefFESelectionAdjConnId           Unsigned32,
+      cefFESelectionVrfName             MplsVpnId,
+      cefFESelectionWeight              Unsigned32 
+   }
+    
+   cefFESelectionName OBJECT-TYPE
+      SYNTAX        SnmpAdminString (SIZE(1..32))
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "The locally arbitrary, but unique identifier used
+          to select a set of forwarding element lists."
+      ::= { cefFESelectionEntry 1 }
+    
+   cefFESelectionId OBJECT-TYPE
+      SYNTAX        Integer32 (1..2147483647)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "Secondary index to identify a forwarding elements List 
+          in this Table." 
+      ::= { cefFESelectionEntry 2 }
+
+   cefFESelectionSpecial OBJECT-TYPE
+      SYNTAX        CefForwardingElementSpecialType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "Special processing for a destination
+          is indicated through the use of special 
+          forwarding element. 
+
+          If the forwarding element list contains the 
+          special forwarding element, then this object 
+          represents the type of special forwarding element."
+      ::= { cefFESelectionEntry 3 }
+
+   cefFESelectionLabels OBJECT-TYPE
+      SYNTAX        CefMplsLabelList
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object represent the MPLS Labels 
+           associated with this forwarding Element List.
+
+           The value of this object will be irrelevant and will
+           be set to zero length if the forwarding element list 
+           doesn't contain a label forwarding element. A zero 
+           length label list will indicate that there is no label
+           forwarding element associated with this selection entry."
+      ::= { cefFESelectionEntry 4 }
+
+   cefFESelectionAdjLinkType OBJECT-TYPE
+      SYNTAX        CefAdjLinkType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object represent the link type for
+           the adjacency associated with this forwarding 
+           Element List.
+
+           The value of this object will be irrelevant and will
+           be set to unknown(5) if the forwarding element list 
+           doesn't contain an adjacency forwarding element."
+      ::= { cefFESelectionEntry 5 }
+
+   cefFESelectionAdjInterface OBJECT-TYPE
+      SYNTAX        InterfaceIndexOrZero
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object represent the interface for
+           the adjacency associated with this forwarding 
+           Element List.
+
+           The value of this object will be irrelevant and will
+           be set to zero if the forwarding element list doesn't 
+           contain an adjacency forwarding element."
+      ::= { cefFESelectionEntry 6 }
+
+   cefFESelectionAdjNextHopAddrType OBJECT-TYPE
+      SYNTAX        InetAddressType
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object represent the next hop address type for
+           the adjacency associated with this forwarding 
+           Element List.
+
+           The value of this object will be irrelevant and will
+           be set to unknown(0) if the forwarding element list 
+           doesn't contain an adjacency forwarding element."
+      ::= { cefFESelectionEntry 7 }
+
+   cefFESelectionAdjNextHopAddr OBJECT-TYPE
+      SYNTAX        InetAddress
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+          "This object represent the next hop address for
+           the adjacency associated with this forwarding 
+           Element List.
+
+           The value of this object will be irrelevant and will
+           be set to zero if the forwarding element list doesn't 
+           contain an adjacency forwarding element."
+      ::= { cefFESelectionEntry 8 }
+
+   cefFESelectionAdjConnId OBJECT-TYPE
+       SYNTAX        Unsigned32(0 | 1..4294967295)
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "This object represent the connection id for
+           the adjacency associated with this forwarding 
+           Element List.
+
+           The value of this object will be irrelevant and will
+           be set to zero if the forwarding element list doesn't 
+           contain an adjacency forwarding element. 
+         
+           In cases where cefFESelectionAdjLinkType, interface 
+           and the next hop address are not able to uniquely 
+           define an adjacency entry (e.g. ATM and Frame Relay
+           Bundles), this object is a unique identifier
+           to differentiate between these adjacency entries." 
+      ::= { cefFESelectionEntry 9 }
+
+   cefFESelectionVrfName OBJECT-TYPE
+       SYNTAX        MplsVpnId
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "This object represent the Vrf name for
+           the lookup associated with this forwarding 
+           Element List.
+
+           The value of this object will be irrelevant and will
+           be set to a string containing the single octet
+           0x00 if the forwarding element list 
+           doesn't contain a lookup forwarding element."
+      ::= { cefFESelectionEntry 10 }
+
+   cefFESelectionWeight OBJECT-TYPE
+       SYNTAX        Unsigned32(0 | 1..4294967295)
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "This object represent the weighting for 
+           load balancing between multiple Forwarding Element
+           Lists. The value of this object will be zero if
+           load balancing is associated with this selection
+           entry."
+      ::= { cefFESelectionEntry 11 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Cfg Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+   cefCfgTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefCfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This table contains global config parameter 
+          of CEF on the Managed device."
+      ::= { cefGlobal 1 }
+
+   cefCfgEntry OBJECT-TYPE
+      SYNTAX      CefCfgEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If the Managed device supports CEF, 
+          each entry contains the CEF config 
+          parameter for the managed entity.
+          A row may exist for each IP version type
+          (v4 and v6) depending upon the IP version
+          supported on the device.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex, 
+              cefFIBIpVersion }
+      ::= { cefCfgTable 1}
+
+   CefCfgEntry ::= SEQUENCE {
+      cefCfgAdminState                    CefAdminStatus, 
+      cefCfgOperState                     CefOperStatus,
+      cefCfgDistributionAdminState        CefAdminStatus,
+      cefCfgDistributionOperState         CefOperStatus,
+      cefCfgAccountingMap                 BITS,
+      cefCfgLoadSharingAlgorithm          INTEGER,
+      cefCfgLoadSharingID                 Unsigned32,
+      cefCfgTrafficStatsLoadInterval      Unsigned32,
+      cefCfgTrafficStatsUpdateRate        Unsigned32
+   }
+
+   cefCfgAdminState   OBJECT-TYPE
+      SYNTAX      CefAdminStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The desired state of CEF."
+      ::= { cefCfgEntry 1 }
+   
+   cefCfgOperState   OBJECT-TYPE
+      SYNTAX      CefOperStatus
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The current operational state of CEF.
+          
+          If the cefCfgAdminState is disabled(2), then
+          cefOperState will eventually go to the down(2)
+          state unless some error has occurred. 
+
+          If cefCfgAdminState is changed to enabled(1) then 
+          cefCfgOperState should change to up(1) only if the 
+          CEF entity is ready to forward the packets using 
+          Cisco Express Forwarding (CEF) else it should remain 
+          in the down(2) state. The up(1) state for this object 
+          indicates that CEF entity is forwarding the packet
+          using Cisco Express Forwarding."
+      ::= { cefCfgEntry 2 }
+
+   cefCfgDistributionAdminState   OBJECT-TYPE
+      SYNTAX      CefAdminStatus
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The desired state of CEF distribution."
+      ::= { cefCfgEntry 3 }
+   
+   cefCfgDistributionOperState   OBJECT-TYPE
+      SYNTAX      CefOperStatus
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The current operational state of CEF distribution.
+          
+          If the cefCfgDistributionAdminState is disabled(2), then
+          cefDistributionOperState will eventually go to the down(2)
+          state unless some error has occurred.  
+
+          If cefCfgDistributionAdminState is changed to enabled(1) 
+          then cefCfgDistributionOperState should change to up(1) 
+          only if the CEF entity is ready to forward the packets 
+          using Distributed Cisco Express Forwarding (dCEF) else 
+          it should remain in the down(2) state. The up(1) state 
+          for this object indicates that CEF entity is forwarding
+          the packet using Distributed Cisco Express Forwarding."
+      ::= { cefCfgEntry 4 }
+
+   cefCfgAccountingMap  OBJECT-TYPE
+      SYNTAX      BITS {
+                    nonRecursive(0),
+                    perPrefix(1),
+                    prefixLength(2)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object represents a bitmap of network
+          accounting options.
+
+          CEF network accounting is disabled by default.
+
+          CEF network accounting can be enabled 
+          by selecting one or more of the following
+          CEF accounting option for the value
+          of this object.
+           
+           nonRecursive(0):  enables accounting through 
+                             nonrecursive prefixes.
+
+           perPrefix(1):     enables the collection of the numbers 
+                             of pkts and bytes express forwarded
+                             to a destination (prefix)
+
+           prefixLength(2):  enables accounting through 
+                             prefixlength.        
+         
+           Once the accounting is enabled, the corresponding stats
+           can be retrieved from the cefPrefixTable and
+           cefStatsPrefixLenTable.
+           
+          "
+      ::= { cefCfgEntry 5 }
+
+   cefCfgLoadSharingAlgorithm  OBJECT-TYPE
+      SYNTAX      INTEGER { 
+                     none     (1), -- Load sharing is disabled
+                     original (2),
+                     tunnel   (3),
+                     universal(4)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Indicates the CEF Load balancing algorithm.
+
+          Setting this object to none(1) will disable
+          the Load sharing for the specified entry.
+          
+          CEF load balancing can be enabled by setting 
+          this object to one of following Algorithms:
+
+           original(2)  : This algorithm is based on a 
+                          source and destination hash 
+
+           tunnel(3)    : This algorithm is used in 
+                          tunnels environments or in
+                          environments where there are
+                          only a few source 
+                            
+           universal(4)  : This algorithm uses a source and 
+                           destination and ID hash
+
+          If the value of this object is set to 'tunnel'
+          or 'universal', then the FIXED ID for these
+          algorithms may be specified by the managed 
+          object cefLoadSharingID. 
+         "
+      ::= { cefCfgEntry 6 }
+
+   cefCfgLoadSharingID  OBJECT-TYPE
+      SYNTAX      Unsigned32(0 | 1..4294967295)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The Fixed ID associated with the managed object
+          cefCfgLoadSharingAlgorithm. The hash of this object
+          value may be used by the Load Sharing Algorithm.
+
+          The value of this object is not relevant and will
+          be set to zero if the value of managed object 
+          cefCfgLoadSharingAlgorithm is set to none(1) or original(2).
+          The default value of this object is calculated by
+          the device at the time of initialization."
+      ::= { cefCfgEntry 7 }
+
+   cefCfgTrafficStatsLoadInterval  OBJECT-TYPE
+      SYNTAX      Unsigned32
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The interval time over which the CEF traffic statistics
+          are collected."
+      ::= { cefCfgEntry 8 }
+
+   cefCfgTrafficStatsUpdateRate  OBJECT-TYPE
+      SYNTAX      Unsigned32(0 | 1..65535)
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The frequency with which the line card sends the
+          traffic load statistics to the Router Processor.
+
+          Setting the value of this object to 0 will disable
+          the CEF traffic statistics collection."
+      ::= { cefCfgEntry 9 }
+
+   cefResourceTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefResourceEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This table contains global resource 
+          information of CEF on the Managed device."
+      ::= { cefGlobal 2 }
+
+   cefResourceEntry OBJECT-TYPE
+      SYNTAX      CefResourceEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If the Managed device supports CEF,
+          each entry contains the CEF Resource 
+          parameters for the managed entity.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex }
+      ::= { cefResourceTable 1}
+
+   CefResourceEntry ::= SEQUENCE {
+      cefResourceMemoryUsed                Gauge32,
+      cefResourceFailureReason             CefFailureReason 
+   }
+
+   cefResourceMemoryUsed OBJECT-TYPE
+      SYNTAX      Gauge32 
+      UNITS       "bytes"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Indicates the number of bytes from
+          the Processor Memory Pool that
+          are currently in use by CEF on the
+          managed entity."
+      ::= { cefResourceEntry 1 }
+
+   cefResourceFailureReason  OBJECT-TYPE
+      SYNTAX      CefFailureReason 
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The CEF resource failure reason which may lead to CEF
+          being disabled on the managed entity."
+      ::= { cefResourceEntry 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Interface Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   
+  cefIntTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefIntEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This Table contains interface specific
+          information of CEF on the Managed
+          device."
+      ::= { cefInterface 1 }
+
+   cefIntEntry OBJECT-TYPE
+      SYNTAX      CefIntEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device, 
+          each entry contains the CEF attributes 
+          associated with an interface.
+          The interface is instantiated by ifIndex.  
+          Therefore, the interface index must have been
+          assigned, according to the applicable procedures,
+          before it can be meaningfully used.
+          Generally, this means that the interface must exist.
+        
+          A row may exist for each IP version type
+          (v4 and v6) depending upon the IP version
+          supported on the device.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex, cefFIBIpVersion, ifIndex }
+      ::= { cefIntTable 1}
+
+   CefIntEntry ::= SEQUENCE {
+      cefIntSwitchingState             INTEGER,
+      cefIntLoadSharing                INTEGER,
+      cefIntNonrecursiveAccouting      INTEGER
+   }
+
+   cefIntSwitchingState  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                     cefEnabled     (1),
+                     distCefEnabled (2),
+                     cefDisabled    (3)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The CEF switching State for the interface. 
+          If CEF is enabled but distributed CEF(dCEF) is
+          disabled then CEF is in cefEnabled(1) state.
+          
+          If distributed CEF is enabled, then CEF is in 
+          distCefEnabled(2) state. The cefDisabled(3) state
+          indicates that CEF is disabled.
+
+          The CEF switching state is only applicable to the
+          received packet on the interface."
+      ::= { cefIntEntry 1 }
+
+   cefIntLoadSharing OBJECT-TYPE
+      SYNTAX     INTEGER {
+                    perPacket      (1),
+                    perDestination (2)
+                 }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "The status of load sharing on the
+          interface.
+
+          perPacket(1) : Router to send data packets
+                         over successive equal-cost paths
+                         without regard to individual hosts
+                         or user sessions.
+
+          perDestination(2) : Router to use multiple, equal-cost
+                              paths to achieve load sharing
+
+          Load sharing is enabled by default 
+          for an interface when CEF is enabled." 
+      ::= { cefIntEntry 2 }
+
+
+    cefIntNonrecursiveAccouting  OBJECT-TYPE
+      SYNTAX     INTEGER { 
+                    internal(1),
+                    external(2)
+                 }
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+         "The CEF accounting mode for the interface.
+          CEF prefix based non-recursive accounting 
+          on an interface can be configured to store 
+          the stats for non-recursive prefixes in a internal 
+          or external bucket.
+      
+          internal(1)  :  Count input traffic in the nonrecursive
+                          internal bucket
+
+          external(2)  :  Count input traffic in the nonrecursive
+                          external bucket
+
+          The value of this object will only be effective if 
+          value of the object cefAccountingMap is set to enable
+          nonRecursive(1) accounting."
+      ::= { cefIntEntry 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Peer Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefPeerTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefPeerEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "Entity acting as RP (Routing Processor) keeps
+          the CEF states for the line card entities and
+          communicates with the line card entities using
+          XDR. This Table contains the CEF information 
+          related to peer entities on the managed device."
+      ::= { cefPeer 1 }
+
+   cefPeerEntry OBJECT-TYPE
+      SYNTAX      CefPeerEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contains the CEF related attributes 
+          associated with a CEF peer entity.
+
+          entPhysicalIndex and entPeerPhysicalIndex are
+          also indexes for this table which represents
+          entities of 'module' entPhysicalClass which are
+          capable of running CEF."
+      INDEX { entPhysicalIndex, entPeerPhysicalIndex  }
+      ::= { cefPeerTable 1}
+
+   CefPeerEntry ::= SEQUENCE {
+      entPeerPhysicalIndex           PhysicalIndex, 
+      cefPeerOperState               INTEGER,
+      cefPeerNumberOfResets          Counter32        
+   }
+
+   entPeerPhysicalIndex    OBJECT-TYPE
+      SYNTAX      PhysicalIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The entity index for the CEF peer entity.
+          Only the entities of 'module' 
+          entPhysicalClass are included here."
+      ::= { cefPeerEntry 1 }
+
+   cefPeerOperState  OBJECT-TYPE
+      SYNTAX     INTEGER { 
+                    peerDisabled (1),
+                    peerUp       (2),
+                    peerHold     (3)
+                 }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "The current CEF operational state of the CEF peer entity.
+
+          Cef peer entity oper state will be peerDisabled(1) in 
+          the following condition:
+
+             : Cef Peer entity encounters fatal error i.e. resource
+               allocation failure, ipc failure etc
+
+             : When a reload/delete request is received from the Cef 
+               Peer Entity
+
+          Once the peer entity is up and no fatal error is encountered,
+          then the value of this object will transits to the peerUp(3) 
+          state.
+
+          If the Cef Peer entity is in held stage, then the value
+          of this object will be peerHold(3). Cef peer entity can only
+          transit to peerDisabled(1) state from the peerHold(3) state."
+      ::= { cefPeerEntry 2 }
+
+   cefPeerNumberOfResets OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of times the session with CEF peer entity 
+          has been reset."
+      ::= { cefPeerEntry 3 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Peer FIB Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   cefPeerFIBTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefPeerFIBEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "Entity acting as RP (Routing Processor) keep
+          the CEF FIB states for the line card entities and
+          communicate with the line card entities using
+          XDR. This Table contains the CEF FIB State 
+          related to peer entities on the managed device."
+      ::= { cefPeer 2 }
+
+   cefPeerFIBEntry OBJECT-TYPE
+      SYNTAX      CefPeerFIBEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry contains the CEF FIB State 
+          associated a CEF peer entity.
+
+          entPhysicalIndex and entPeerPhysicalIndex are
+          also indexes for this table which represents
+          entities of 'module' entPhysicalClass which are
+          capable of running CEF."
+      INDEX { entPhysicalIndex, 
+              entPeerPhysicalIndex,
+              cefFIBIpVersion  }
+      ::= { cefPeerFIBTable 1}
+
+   CefPeerFIBEntry ::= SEQUENCE {
+      cefPeerFIBOperState            INTEGER      
+   }
+
+   cefPeerFIBOperState OBJECT-TYPE
+      SYNTAX INTEGER { 
+                peerFIBDown         (1),
+                peerFIBUp           (2),
+                peerFIBReloadRequest(3), 
+                peerFIBReloading    (4),
+                peerFIBSynced       (5)
+             }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "The current CEF FIB Operational State for the 
+          CEF peer entity.
+         "
+      ::= { cefPeerFIBEntry 1 } 
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Prefix Length Stats Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   cefStatsPrefixLenTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefStatsPrefixLenEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This table specifies the CEF stats based
+          on the Prefix Length."
+     ::= { cefStats 1 }
+
+   cefStatsPrefixLenEntry OBJECT-TYPE
+      SYNTAX      CefStatsPrefixLenEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device
+          and if CEF accounting is set to enable 
+          prefix length based accounting (value of 
+          cefCfgAccountingMap object in the 
+          cefCfgEntry is set to enable 'prefixLength' 
+          accounting), each entry contains the traffic 
+          statistics for a prefix length.
+          A row may exist for each IP version type
+          (v4 and v6) depending upon the IP version
+          supported on the device.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex, 
+              cefFIBIpVersion,
+              cefStatsPrefixLen }
+      ::= { cefStatsPrefixLenTable 1}
+
+   CefStatsPrefixLenEntry ::= SEQUENCE {
+      cefStatsPrefixLen                   InetAddressPrefixLength,
+      cefStatsPrefixQueries               Counter32,
+      cefStatsPrefixHCQueries             Counter64,
+      cefStatsPrefixInserts               Counter32,
+      cefStatsPrefixHCInserts             Counter64,
+      cefStatsPrefixDeletes               Counter32,
+      cefStatsPrefixHCDeletes             Counter64,
+      cefStatsPrefixElements              Gauge32,
+      cefStatsPrefixHCElements            CounterBasedGauge64
+   }
+
+
+   cefStatsPrefixLen OBJECT-TYPE
+      SYNTAX      InetAddressPrefixLength
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "Length in bits of the Destination IP prefix.
+          As 0.0.0.0/0 is a valid prefix, hence 
+          0 is a valid prefix length."
+      ::= { cefStatsPrefixLenEntry 1 }
+
+   cefStatsPrefixQueries OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of queries received in the FIB database 
+          for the specified IP prefix length."
+      ::= { cefStatsPrefixLenEntry 2 }
+
+   cefStatsPrefixHCQueries OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of queries received in the FIB database
+          for the specified IP prefix length.
+          This object is a 64-bit version of 
+          cefStatsPrefixQueries."
+      ::= { cefStatsPrefixLenEntry 3 }
+
+   cefStatsPrefixInserts OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of insert operations performed to the FIB 
+          database for the specified IP prefix length."
+      ::= { cefStatsPrefixLenEntry 4 }
+
+   cefStatsPrefixHCInserts OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of insert operations performed to the FIB 
+          database for the specified IP prefix length.
+          This object is a 64-bit version of 
+          cefStatsPrefixInsert."
+      ::= { cefStatsPrefixLenEntry 5 }
+
+   cefStatsPrefixDeletes OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of delete operations performed to the FIB 
+          database for the specified IP prefix length."
+      ::= { cefStatsPrefixLenEntry 6 }
+
+   cefStatsPrefixHCDeletes OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of delete operations performed to the FIB 
+          database for the specified IP prefix length.
+          This object is a 64-bit version of 
+          cefStatsPrefixDelete."
+      ::= { cefStatsPrefixLenEntry 7 }
+
+   cefStatsPrefixElements OBJECT-TYPE
+      SYNTAX      Gauge32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Total number of elements in the FIB database for the
+          specified IP prefix length."
+      ::= { cefStatsPrefixLenEntry 8 }
+
+   cefStatsPrefixHCElements OBJECT-TYPE
+      SYNTAX      CounterBasedGauge64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Total number of elements in the FIB database for the
+          specified IP prefix length.
+          This object is a 64-bit version of 
+          cefStatsPrefixElements."
+      ::= { cefStatsPrefixLenEntry 9 }
+
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Switching Stats Table
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefSwitchingStatsTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefSwitchingStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This table specifies the CEF switch stats."
+      ::= { cefStats 2 }
+
+   cefSwitchingStatsEntry OBJECT-TYPE
+      SYNTAX      CefSwitchingStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If CEF is enabled on the Managed device,
+          each entry specifies the switching stats.
+          A row may exist for each IP version type
+          (v4 and v6) depending upon the IP version
+          supported on the device.
+
+          entPhysicalIndex is also an index for this
+          table which represents entities of
+          'module' entPhysicalClass which are capable
+          of running CEF."
+      INDEX { entPhysicalIndex, 
+              cefFIBIpVersion,
+              cefSwitchingIndex
+            }
+      ::= { cefSwitchingStatsTable 1}
+
+   CefSwitchingStatsEntry ::= SEQUENCE { 
+      cefSwitchingIndex               Integer32, 
+      cefSwitchingPath                SnmpAdminString,
+      cefSwitchingDrop                Counter32,
+      cefSwitchingHCDrop              Counter64,
+      cefSwitchingPunt                Counter32,
+      cefSwitchingHCPunt              Counter64,
+      cefSwitchingPunt2Host           Counter32,
+      cefSwitchingHCPunt2Host         Counter64
+   }
+
+   cefSwitchingIndex OBJECT-TYPE
+      SYNTAX        Integer32 (1..2147483647)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "The locally arbitrary, but unique identifier associated
+          with this switching stats entry."
+      ::= { cefSwitchingStatsEntry  1 }
+
+   cefSwitchingPath OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE(1..32))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Switch path where the feature was executed.
+          Available switch paths are platform-dependent.
+          Following are the examples of switching paths:
+
+             RIB : switching with CEF assistance
+
+             Low-end switching (LES) : CEF switch path
+
+             PAS : CEF turbo switch path.
+         "
+      ::= { cefSwitchingStatsEntry  2 }
+
+   cefSwitchingDrop OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of packets dropped by CEF."
+      ::= { cefSwitchingStatsEntry  3 }
+
+   cefSwitchingHCDrop OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of packets dropped by CEF.
+          This object is a 64-bit version of cefSwitchingDrop."
+      ::= { cefSwitchingStatsEntry  4 }
+
+   cefSwitchingPunt OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of packets that could not be switched
+          in the normal path and were punted to the
+          next-fastest switching vector."
+      ::= { cefSwitchingStatsEntry  5 }
+
+   cefSwitchingHCPunt OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of packets that could not be switched
+          in the normal path and were punted to the
+          next-fastest switching vector.
+          This object is a 64-bit version of cefSwitchingPunt."
+      ::= { cefSwitchingStatsEntry  6 }
+
+   cefSwitchingPunt2Host  OBJECT-TYPE
+      SYNTAX      Counter32
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of packets that could not be switched
+          in the normal path and were punted to the host
+          (process switching path).
+
+          For most of the switching paths, the value of
+          this object may be similar to cefSwitchingPunt."
+      ::= { cefSwitchingStatsEntry  7 }
+
+   cefSwitchingHCPunt2Host  OBJECT-TYPE
+      SYNTAX      Counter64
+      UNITS       "packets"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of packets that could not be switched
+          in the normal path and were punted to the host
+          (process switching path).
+ 
+          For most of the switching paths, the value of
+          this object may be similar to cefSwitchingPunt.
+          This object is a 64-bit version of cefSwitchingPunt2Host."
+      ::= { cefSwitchingStatsEntry  8 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF IP Prefix Consistency Checker Group
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   cefCCGlobalTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefCCGlobalEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This table contains CEF consistency checker
+          (CC) global parameters for the managed device."
+      ::= { cefCC 1 }
+
+   cefCCGlobalEntry OBJECT-TYPE
+      SYNTAX      CefCCGlobalEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If the managed device supports CEF,
+          each entry contains the global consistency 
+          checker parameter for the managed device.
+          A row may exist for each IP version type
+          (v4 and v6) depending upon the IP version
+          supported on the device."
+      INDEX { cefFIBIpVersion }
+      ::= { cefCCGlobalTable 1}
+
+   CefCCGlobalEntry ::= SEQUENCE {
+      cefCCGlobalAutoRepairEnabled        TruthValue, 
+      cefCCGlobalAutoRepairDelay          Unsigned32, 
+      cefCCGlobalAutoRepairHoldDown       Unsigned32,
+      cefCCGlobalErrorMsgEnabled          TruthValue,
+      cefCCGlobalFullScanAction           CefCCAction,
+      cefCCGlobalFullScanStatus           CefCCStatus
+   }
+
+   cefCCGlobalAutoRepairEnabled OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Once an inconsistency has been detected, 
+          CEF has the ability to repair the problem. 
+          This object indicates the status of auto-repair 
+          function for the consistency checkers." 
+      ::= { cefCCGlobalEntry 1 }
+
+   cefCCGlobalAutoRepairDelay OBJECT-TYPE
+      SYNTAX      Unsigned32
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Indiactes how long the consistency checker 
+          waits to fix an inconsistency.
+
+          The value of this object has no effect when the
+          value of object cefCCGlobalAutoRepairEnabled
+          is 'false'."
+      ::= { cefCCGlobalEntry 2 }
+
+   cefCCGlobalAutoRepairHoldDown OBJECT-TYPE
+      SYNTAX       Unsigned32
+      UNITS        "seconds"
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+         "Indicates how long the consistency checker
+          waits to re-enable auto-repair after 
+          auto-repair runs.
+
+          The value of this object has no effect when the
+          value of object cefCCGlobalAutoRepairEnabled
+          is 'false'."
+      ::= { cefCCGlobalEntry 3 }
+
+   cefCCGlobalErrorMsgEnabled OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Enables the consistency checker to generate 
+          an error message when it detects an inconsistency."
+      ::= { cefCCGlobalEntry 4 }
+
+   cefCCGlobalFullScanAction OBJECT-TYPE
+      SYNTAX      CefCCAction
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Setting the value of this object to ccActionStart(1)
+          will start the full scan consistency checkers.
+
+          The Management station should poll the 
+          cefCCGlobalFullScanStatus object to get the 
+          state of full-scan operation.
+
+          Once the full-scan operation completes (value
+          of cefCCGlobalFullScanStatus object is ccStatusDone(3)), 
+          the Management station should retrieve the values of the
+          related stats object from the cefCCTypeTable.
+
+          Setting the value of this object to ccActionAbort(2) will 
+          abort the full-scan operation.
+          
+          The value of this object can't be set to ccActionStart(1), 
+          if the value of object cefCCGlobalFullScanStatus
+          is ccStatusRunning(2).
+ 
+          The value of this object will be set to cefActionNone(1)
+          when the full scan consistency checkers have never
+          been activated.
+
+          A Management Station cannot set the value of
+          this object to cefActionNone(1)."
+      DEFVAL { ccActionNone }
+      ::= { cefCCGlobalEntry 5 }
+
+   cefCCGlobalFullScanStatus OBJECT-TYPE
+      SYNTAX     CefCCStatus
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "Indicates the status of the full scan consistency
+          checker request."
+      ::= { cefCCGlobalEntry 6 }
+
+   --
+   -- Consistency Checker Type Table
+   --
+
+   cefCCTypeTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF CefCCTypeEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "This table contains CEF consistency
+          checker types specific parameters on the managed device.
+
+          All detected inconsistency are signaled to the
+          Management Station via cefInconsistencyDetection
+          notification.
+         "
+      ::= { cefCC 2 }
+
+   cefCCTypeEntry OBJECT-TYPE
+      SYNTAX CefCCTypeEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "If the managed device supports CEF,
+          each entry contains the consistency 
+          checker statistics for a consistency 
+          checker type.
+          A row may exist for each IP version type
+          (v4 and v6) depending upon the IP version
+          supported on the device."
+      INDEX { cefFIBIpVersion,
+              cefCCType }
+      ::= { cefCCTypeTable 1}
+
+   CefCCTypeEntry ::= SEQUENCE {
+      cefCCType                      CefCCType,
+      cefCCEnabled                   TruthValue,
+      cefCCCount                     Unsigned32,
+      cefCCPeriod                    Unsigned32,
+      cefCCQueriesSent               Counter32,
+      cefCCQueriesIgnored            Counter32,
+      cefCCQueriesChecked            Counter32,
+      cefCCQueriesIterated           Counter32
+   }
+
+   cefCCType OBJECT-TYPE
+      SYNTAX      CefCCType
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "Type of the consistency checker."    
+      ::= { cefCCTypeEntry 1 }
+
+   cefCCEnabled OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Enables the passive consistency checker.
+          Passive consistency checkers are disabled
+          by default.
+
+          Full-scan consistency checkers are always enabled.
+          An attempt to set this object to 'false' for
+          an active consistency checker will result in
+          'wrongValue' error."
+      ::= { cefCCTypeEntry 2 }
+
+   cefCCCount  OBJECT-TYPE
+      SYNTAX      Unsigned32
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The maximum number of prefixes to check per scan.
+
+          The default value for this object 
+          depends upon the consistency checker type.
+
+          The value of this object will be irrelevant 
+          for some of the consistency checkers and
+          will be set to 0.
+
+          A Management Station cannot set the value of
+          this object to 0."
+      ::= { cefCCTypeEntry 3 }
+
+   cefCCPeriod  OBJECT-TYPE
+      SYNTAX      Unsigned32
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "The period between scans for the consistency
+          checker." 
+      ::= { cefCCTypeEntry 4 }
+
+   cefCCQueriesSent OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "Number of prefix consistency queries sent to CEF
+          forwarding databases by this consistency checker."
+      ::= { cefCCTypeEntry 5 }
+
+   cefCCQueriesIgnored OBJECT-TYPE
+      SYNTAX       Counter32
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "Number of prefix consistency queries for which
+          the consistency checks were not performed by this 
+          consistency checker. This may be because of some
+          internal error or resource failure."
+      ::= { cefCCTypeEntry 6 }
+
+   cefCCQueriesChecked OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Number of prefix consistency queries processed by this 
+          consistency checker."
+      ::= { cefCCTypeEntry 7 }
+
+   cefCCQueriesIterated OBJECT-TYPE
+      SYNTAX        Counter32
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "Number of prefix consistency queries iterated back to
+          the master database by this consistency checker."
+      ::= { cefCCTypeEntry 8 }
+
+   --
+   -- Inconsistency Record Table
+   --
+
+   cefInconsistencyRecordTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF CefInconsistencyRecordEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "This table contains CEF inconsistency
+          records."
+      ::= { cefCC 3 }
+
+   cefInconsistencyRecordEntry OBJECT-TYPE
+      SYNTAX      CefInconsistencyRecordEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "If the managed device supports CEF,
+          each entry contains the inconsistency 
+          record." 
+      INDEX { cefFIBIpVersion, 
+              cefInconsistencyRecId }
+      ::= { cefInconsistencyRecordTable 1}
+
+   CefInconsistencyRecordEntry ::= SEQUENCE {
+      cefInconsistencyRecId          Integer32,
+      cefInconsistencyPrefixType     InetAddressType,
+      cefInconsistencyPrefixAddr     InetAddress,
+      cefInconsistencyPrefixLen      InetAddressPrefixLength, 
+      cefInconsistencyVrfName        MplsVpnId,
+      cefInconsistencyCCType         CefCCType,
+      cefInconsistencyEntity         EntPhysicalIndexOrZero,
+      cefInconsistencyReason         INTEGER
+   }
+
+   cefInconsistencyRecId OBJECT-TYPE
+      SYNTAX        Integer32 (1..2147483647)
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "The locally arbitrary, but unique identifier associated
+          with this inconsistency record entry."
+      ::= { cefInconsistencyRecordEntry 1 }
+
+   cefInconsistencyPrefixType OBJECT-TYPE
+      SYNTAX       InetAddressType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The network prefix type associated with this inconsistency
+          record."
+      ::= { cefInconsistencyRecordEntry 2 }
+
+   cefInconsistencyPrefixAddr OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The network prefix address associated with this 
+          inconsistency record.
+
+          The type of this address is determined by
+          the value of the cefInconsistencyPrefixType object."
+      ::= { cefInconsistencyRecordEntry 3 }
+
+   cefInconsistencyPrefixLen OBJECT-TYPE
+      SYNTAX        InetAddressPrefixLength
+      MAX-ACCESS    read-only
+      STATUS        current
+      DESCRIPTION
+         "Length in bits of the inconsistency address prefix."
+      ::= { cefInconsistencyRecordEntry 4 }
+
+   cefInconsistencyVrfName OBJECT-TYPE
+      SYNTAX      MplsVpnId
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "Vrf name associated with this inconsistency record."
+      ::= { cefInconsistencyRecordEntry 5 }
+
+   cefInconsistencyCCType OBJECT-TYPE
+      SYNTAX       CefCCType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+         "The type of consistency checker who generated this
+          inconsistency record."
+      ::= { cefInconsistencyRecordEntry 6 }
+
+   cefInconsistencyEntity OBJECT-TYPE
+      SYNTAX      EntPhysicalIndexOrZero
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The entity for which this inconsistency record was 
+          generated. The value of this object will be 
+          irrelevant and will be set to 0 when the inconsisency 
+          record is applicable for all the entities."
+      ::= { cefInconsistencyRecordEntry 7 }
+
+   cefInconsistencyReason OBJECT-TYPE
+      SYNTAX     INTEGER { 
+                    missing    (1),
+                    checksumErr(2),
+                    unknown    (3)
+                 }
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "The reason for generating this inconsistency record. 
+
+             missing(1):        the prefix is missing
+
+             checksumErr(2):    checksum error was found
+
+             unknown(3):        reason is unknown
+          "
+      ::= { cefInconsistencyRecordEntry 8 }
+
+   -- 
+   -- Global objects for CEF Inconsistency
+   --
+
+   -- last change time stamp for the whole MIB
+   entLastInconsistencyDetectTime OBJECT-TYPE
+      SYNTAX      TimeStamp
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         "The value of sysUpTime at the time an
+          inconsistency is detecetd." 
+      ::= { cefCC 4 }
+
+   cefInconsistencyReset OBJECT-TYPE
+      SYNTAX      CefCCAction
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Setting the value of this object to ccActionStart(1)
+          will reset all the active consistency checkers.
+
+          The Management station should poll the 
+          cefInconsistencyResetStatus object to get the 
+          state of inconsistency reset operation.
+
+          This operation once started, cannot be aborted.
+          Hence, the value of this object cannot be set to
+          ccActionAbort(2).
+          
+          The value of this object can't be set to ccActionStart(1), 
+          if the value of object cefInconsistencyResetStatus
+          is ccStatusRunning(2).
+          "
+      DEFVAL { ccActionNone }
+      ::= { cefCC 5 }
+
+   cefInconsistencyResetStatus OBJECT-TYPE
+      SYNTAX     CefCCStatus
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+         "Indicates the status of the consistency reset
+          request."
+      ::= { cefCC 6 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The CEF Notif Control Group
+--
+-- This group of objects controls the sending of CEF Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   cefResourceFailureNotifEnable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Indicates whether or not a notification should be
+          generated on the detection of CEF resource Failure."
+      ::= { cefNotifCntl 1 }
+
+   cefPeerStateChangeNotifEnable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Indicates whether or not a notification should be
+          generated on the detection of CEF peer state change."
+      ::= { cefNotifCntl 2 }
+
+   cefPeerFIBStateChangeNotifEnable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Indicates whether or not a notification should be
+          generated on the detection of CEF FIB peer state change."
+      ::= { cefNotifCntl 3 }
+
+   cefNotifThrottlingInterval OBJECT-TYPE
+      SYNTAX      Integer32 (0 | 1..3600)
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "This object controls the generation of the
+          cefInconsistencyDetection notification.
+
+          If this object has a value of zero,
+          then the throttle control is disabled.
+
+          If this object has a non-zero value, then the agent
+          must not generate more than one 
+          cefInconsistencyDetection 'notification-event' in the 
+          indicated period, where a 'notification-event' is the
+          transmission of a single trap
+          or inform PDU to a list of notification destinations.
+
+          If additional inconsistency is detected within the 
+          throttling period, then notification-events
+          for these inconsistencies should be suppressed by the agent
+          until the current throttling period expires.  At the end of a
+          throttling period, one notification-event should be generated
+          if any inconsistency was detected since the start of the 
+          throttling period. In such a case,  another throttling period
+          is started right away.
+
+          An NMS should periodically poll cefInconsistencyRecordTable
+          to detect any missed cefInconsistencyDetection
+          notification-events, e.g., due to throttling or transmission
+          loss.
+           
+          If cefNotifThrottlingInterval notification generation
+          is enabled, the suggested default throttling period is
+          60 seconds, but generation of the cefInconsistencyDetection
+          notification should be disabled by default.
+
+          If the agent is capable of storing non-volatile
+          configuration, then the value of this object must be
+          restored after a re-initialization of the management
+          system.
+
+          The actual transmission of notifications is controlled
+          via the MIB modules in RFC 3413."
+      DEFVAL { 0 }
+      ::= { cefNotifCntl 4 }
+
+   cefInconsistencyNotifEnable OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+         "Indicates whether cefInconsistencyDetection notification
+          should be generated for this managed device."
+      ::= { cefNotifCntl 5 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- CEF Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   cefResourceFailure NOTIFICATION-TYPE
+      OBJECTS {
+                cefResourceFailureReason
+              }
+      STATUS  current
+      DESCRIPTION
+         "A cefResourceFailure notification is generated when 
+          CEF resource failure on the managed entity is 
+          detected. The reason for this failure is indicated 
+          by cefResourcefFailureReason."
+      ::= { ciscoCefMIBNotifs 1 }
+
+   cefPeerStateChange NOTIFICATION-TYPE
+      OBJECTS {
+                cefPeerOperState
+              }
+      STATUS  current
+      DESCRIPTION
+         "A cefPeerStateChange notification is generated if
+          change in cefPeerOperState is detected for the
+          peer entity."
+      ::= { ciscoCefMIBNotifs 2 }
+
+   cefPeerFIBStateChange NOTIFICATION-TYPE
+      OBJECTS {
+                cefPeerFIBOperState
+              }
+      STATUS  current
+      DESCRIPTION
+         "A cefPeerFIBStateChange notification is generated if
+          change in cefPeerFIBOperState is detected for the
+          peer entity."
+      ::= { ciscoCefMIBNotifs 3 }
+
+   cefInconsistencyDetection NOTIFICATION-TYPE
+      OBJECTS {
+                entLastInconsistencyDetectTime
+              }
+      STATUS  current
+      DESCRIPTION
+         "A cefInconsistencyDetection notification is generated
+          when CEF consistency checkers detects an inconsistent 
+          prefix in one of the CEF forwarding databases.
+
+          Note that the generation of cefInconsistencyDetection
+          notifications is throttled by the agent, as specified
+          by the 'cefNotifThrottlingInterval' object."
+      ::= { ciscoCefMIBNotifs 4 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance Information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+   cefMIBGroups        OBJECT IDENTIFIER 
+                   ::= { ciscoCefMIBConform 1 }
+   cefMIBCompliances   OBJECT IDENTIFIER 
+                   ::= { ciscoCefMIBConform 2 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Compliance Statements
+-- +++++++++++++++++++++++++++++++++++ ++++++++++++++++++++
+  cefMIBCompliance       MODULE-COMPLIANCE
+      STATUS      current
+      DESCRIPTION
+         "The compliance statement for SNMP Agents which
+          implement this MIB."
+      MODULE -- this module
+        MANDATORY-GROUPS  { cefGroup,
+                            cefNotifCntlGroup,
+                            cefNotificationGroup
+                          }
+
+      GROUP     cefDistributedGroup
+      DESCRIPTION
+         "This group should be supported on the agents
+          which support distributed CEF (dCEF)."
+
+      GROUP     cefHCStatsGroup
+      DESCRIPTION
+         "This group should be supported on the agents
+          which support 64-bit counters."
+
+      -- OBJECT  cefFESelectionAdjNextHopAddrType
+      -- SYNTAX  InetAddressType { ipv4(1), ipv6(2) }
+      -- DESCRIPTION
+      --    "An implementation is required to support global IPv4
+      --     and/or IPv6 addresses, depending on its support for
+      --     IPv4 and IPv6."
+
+      OBJECT  cefFESelectionAdjNextHopAddr
+      SYNTAX  InetAddress (SIZE(4|16))
+      DESCRIPTION
+         "An implementation is required to support global IPv4
+          and/or IPv6 addresses, depending on its support for
+          IPv4 and IPv6."
+
+      -- OBJECT  cefInconsistencyPrefixType
+      -- SYNTAX  InetAddressType { ipv4(1), ipv6(2) }
+      -- DESCRIPTION
+      --    "An implementation is required to support global IPv4
+      --     and/or IPv6 addresses, depending on its support for
+      --     IPv4 and IPv6."
+
+      OBJECT  cefInconsistencyPrefixAddr
+      SYNTAX  InetAddress (SIZE(4|16))
+      DESCRIPTION
+         "An implementation is required to support global IPv4
+          and/or IPv6 addresses, depending on its support for
+          IPv4 and IPv6."
+
+        ::= { cefMIBCompliances 1 }
+
+   
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Units of Conformance
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+   cefGroup OBJECT-GROUP
+      OBJECTS {
+                cefFIBSummaryFwdPrefixes,
+                cefPrefixForwardingInfo,
+                cefPrefixPkts,
+                cefPrefixBytes,
+                cefPrefixInternalNRPkts,  
+                cefPrefixInternalNRBytes,  
+                cefPrefixExternalNRPkts,  
+                cefPrefixExternalNRBytes,  
+                cefLMPrefixSpinLock, 
+                cefLMPrefixState,
+                cefLMPrefixAddr,
+                cefLMPrefixLen,
+                cefLMPrefixRowStatus,
+                cefPathType,
+                cefPathInterface, 
+                cefPathNextHopAddr,
+                cefPathRecurseVrfName,
+                cefAdjSummaryComplete,
+                cefAdjSummaryIncomplete,
+                cefAdjSummaryFixup,
+                cefAdjSummaryRedirect,
+                cefAdjSource,
+                cefAdjEncap,
+                cefAdjFixup,
+                cefAdjMTU,
+                cefAdjForwardingInfo,
+                cefAdjPkts,
+                cefAdjBytes,
+                cefFESelectionSpecial,
+                cefFESelectionLabels,
+                cefFESelectionAdjLinkType,
+                cefFESelectionAdjInterface,
+                cefFESelectionAdjNextHopAddrType,
+                cefFESelectionAdjNextHopAddr,
+                cefFESelectionAdjConnId,
+                cefFESelectionVrfName,
+                cefFESelectionWeight,
+                cefCfgAdminState, 
+                cefCfgOperState, 
+                cefCfgAccountingMap,
+                cefCfgLoadSharingAlgorithm,
+                cefCfgLoadSharingID,
+                cefCfgTrafficStatsLoadInterval,
+                cefCfgTrafficStatsUpdateRate, 
+                cefResourceMemoryUsed,
+                cefResourceFailureReason, 
+                cefIntSwitchingState,
+                cefIntLoadSharing,                
+                cefIntNonrecursiveAccouting,
+                cefStatsPrefixQueries,
+                cefStatsPrefixInserts,
+                cefStatsPrefixDeletes,
+                cefStatsPrefixElements,
+                cefSwitchingPath,
+                cefSwitchingDrop,
+                cefSwitchingPunt,
+                cefSwitchingPunt2Host
+              }
+      STATUS current
+      DESCRIPTION
+         "This group consists of all the managed objects
+          which are applicable to CEF irrespective
+          of the value of object cefDistributionOperState."
+      ::= { cefMIBGroups 1 }
+   
+    cefDistributedGroup OBJECT-GROUP
+       OBJECTS {
+                cefCfgDistributionAdminState,
+                cefCfgDistributionOperState,
+                cefPeerOperState,      
+                cefPeerNumberOfResets,
+                cefPeerFIBOperState,
+                cefCCGlobalAutoRepairEnabled,
+                cefCCGlobalAutoRepairDelay,                 
+                cefCCGlobalAutoRepairHoldDown,              
+                cefCCGlobalErrorMsgEnabled,
+                cefCCGlobalFullScanStatus,
+                cefCCGlobalFullScanAction,
+                cefCCEnabled,
+                cefCCCount,
+                cefCCPeriod,
+                cefCCQueriesSent,
+                cefCCQueriesIgnored,
+                cefCCQueriesChecked,
+                cefCCQueriesIterated,
+                entLastInconsistencyDetectTime,
+                cefInconsistencyPrefixType,   
+                cefInconsistencyPrefixAddr,     
+                cefInconsistencyPrefixLen,    
+                cefInconsistencyVrfName,        
+                cefInconsistencyCCType,         
+                cefInconsistencyEntity,           
+                cefInconsistencyReason,
+                cefInconsistencyReset,
+                cefInconsistencyResetStatus     
+              }
+
+      STATUS current
+      DESCRIPTION
+         "This group consists of all the Managed objects
+          which are only applicable to CEF is 
+          the value of object cefDistributionOperState
+          is 'up'."
+      ::= { cefMIBGroups 2 }
+
+   cefHCStatsGroup OBJECT-GROUP
+      OBJECTS {
+                cefPrefixHCPkts,
+                cefPrefixHCBytes,
+                cefPrefixInternalNRHCPkts, 
+                cefPrefixInternalNRHCBytes,
+                cefPrefixExternalNRHCPkts, 
+                cefPrefixExternalNRHCBytes,
+                cefAdjHCPkts,
+                cefAdjHCBytes,
+                cefStatsPrefixHCQueries,
+                cefStatsPrefixHCInserts,
+                cefStatsPrefixHCDeletes,
+                cefStatsPrefixHCElements,
+                cefSwitchingHCDrop,
+                cefSwitchingHCPunt,
+                cefSwitchingHCPunt2Host
+              }
+      STATUS current
+      DESCRIPTION
+         "This group consists of all the 64-bit
+          counter objects which are applicable to 
+          CEF irrespective of the value of object 
+          cefDistributionOperState."
+      ::= { cefMIBGroups 3 }
+
+   cefNotifCntlGroup OBJECT-GROUP
+      OBJECTS {
+                cefResourceFailureNotifEnable,
+                cefPeerStateChangeNotifEnable,
+                cefPeerFIBStateChangeNotifEnable,
+                cefNotifThrottlingInterval,
+                cefInconsistencyNotifEnable
+              }
+      STATUS current
+      DESCRIPTION
+         "This group of objects controls the sending of 
+          CEF Notifications."
+      ::= { cefMIBGroups 5 }
+
+   cefNotificationGroup    NOTIFICATION-GROUP
+      NOTIFICATIONS {
+                      cefResourceFailure,
+                      cefPeerStateChange,
+                      cefPeerFIBStateChange,
+                      cefInconsistencyDetection
+                    }
+      STATUS current
+      DESCRIPTION
+         "This group contains the notifications for the CEF MIB."
+      ::= { cefMIBGroups 6 }   
+  
+
+END

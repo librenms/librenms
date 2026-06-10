@@ -1,0 +1,576 @@
+-- ==================================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: 802.1Q-in-Q and BPDU Tunnel MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2006-03-10 Initial version Created by Baiping Chen
+-- V1.1 2007/10/15 modified by wangjinwang
+--   Add hh3cQinQServiceTPIDValue and hh3cQinQCustomerTPIDValue
+--   to hh3cQinQGlobalConfigGroup.
+--   Add hh3cQinQIfServiceTPIDValue hh3cQinQIfCustomerTPIDValue
+--   hh3cQinQIfUplinkSwitch and hh3cQinQIfDownlinkSwitch
+--   to hh3cQinQIfConfigTable.
+-- ==================================================================
+HH3C-QINQ-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32
+            FROM SNMPv2-SMI
+        ifIndex
+            FROM RFC1213-MIB
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+-- ==================================================================
+--
+-- module identity part
+--
+-- ==================================================================
+    hh3cQINQ MODULE-IDENTITY
+        LAST-UPDATED
+            "200603100000Z"
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "802.1Q-in-Q MIB"
+        REVISION
+            "200603100000Z"
+        DESCRIPTION
+            "The initial version of this MIB."
+        ::= { hh3cCommon 69 }
+
+
+-- ==================================================================
+--
+-- Textual Conventions
+--
+-- ==================================================================
+        Hh3cQinQSwitchState ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+            "An enumerated value which indicates the state of
+            switch."
+        SYNTAX  INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+
+
+-- ==================================================================
+--
+-- =====================object definition begin======================
+--
+-- ==================================================================
+    hh3cQinQMibObject      OBJECT IDENTIFIER ::= { hh3cQINQ 1 }
+
+    hh3cQinQGlobalConfigGroup OBJECT IDENTIFIER ::= { hh3cQinQMibObject 1 }
+
+    hh3cQinQBpduTunnelSwitch  OBJECT-TYPE
+        SYNTAX Hh3cQinQSwitchState
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The global configuration switch of BPDU 802.1q tunnel.
+            If global configuration is disabled, BPDU tunnel function
+            will be disabled despite of the corresponding configuration
+            of interface. BPDU tunnel function of a certain interface
+            would work only if the global and interface's switch are
+            both enabled."
+        DEFVAL { enabled }
+        ::= { hh3cQinQGlobalConfigGroup 1 }
+
+    hh3cQinQEthernetTypeValue  OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ethernet protocol type configuring for a global value.
+            The ethernet protocol type is also the TPID(Tag Protocol
+            Identity) field of a VLAN tag described in 802.1q
+            document. This value can be also configured for an
+            individual interface or VLAN. The node that configure
+            this value for a single interface is hh3cQinQIfEthernetType,
+            whose priority is higher than hh3cQinQEthernetTypeValue.
+            That means, if the value configured for a interface is
+            different from the global value, the switch will select
+            the configuration of the interface and ignore the global
+            configuration. The ethernet protocol type of node
+            hh3cQinQVidEthernetType that configured for a VLAN has
+            the highest priority."
+        DEFVAL { 33024 }
+        ::= { hh3cQinQGlobalConfigGroup 2 }
+
+    hh3cQinQServiceTPIDValue  OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ethernet protocol type configured for service VLAN tags
+            globally.  The ethernet protocol type is also the TPID(Tag
+            Protocol Identity) field of a VLAN tag described in 802.1q
+            document.  This value can be also configured for an
+            individual interface.  The node that configure this
+            value for a single interface is hh3cQinQIfServiceTPIDValue,
+            whose priority is higher than hh3cQinQServiceTPIDValue.
+            That means, if the value configured for a interface is
+            different from the global value, the switch will select
+            the configuration of the interface and ignore the global
+            configuration."
+        ::= { hh3cQinQGlobalConfigGroup 3 }
+
+    hh3cQinQCustomerTPIDValue  OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ethernet protocol type configured for customer VLAN tags
+            globally.  The ethernet protocol type is also the TPID(Tag
+            Protocol Identity) field of a VLAN tag described in 802.1q
+            document.  This value can be also configured for an
+            individual interface.  The node that configure this
+            value for a single interface is hh3cQinQIfCustomerTPIDValue,
+            whose priority is higher than hh3cQinQCustomerTPIDValue.
+            That means, if the value configured for a interface is
+            different from the global value, the switch will select
+            the configuration of the interface and ignore the global
+            configuration."
+        ::= { hh3cQinQGlobalConfigGroup 4 }
+
+    hh3cQinQBpduTunnelTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cQinQBpduTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for configuring 802.1q BPDU tunnel function
+            for interfaces."
+        ::= { hh3cQinQMibObject 2 }
+
+    hh3cQinQBpduTunnelEntry  OBJECT-TYPE
+        SYNTAX      Hh3cQinQBpduTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry for configuring 802.1q BPDU tunnel function
+            for interfaces."
+        INDEX
+        {
+            ifIndex,
+            hh3cQinQProtocolIndex
+        }
+        ::= { hh3cQinQBpduTunnelTable 1 }
+
+    Hh3cQinQBpduTunnelEntry ::=
+        SEQUENCE
+        {
+            hh3cQinQProtocolIndex INTEGER,
+            hh3cQinQBpduRowStatus RowStatus
+        }
+
+    hh3cQinQProtocolIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            bpdu(1),
+            stp(2),
+            gmosaic(3),
+            igmp(4)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index of protocol on which the BPDU tunnel state
+            will be set. 'bpdu' represents status of BPDU tunnel.
+            'stp' represents STP tunnel. 'gmosaic' represents GMOSAIC
+            tunnel. 'igmp' represents IGMP tunnel. STP/GMOSAIC/IGMP
+            tunnel will start to work only if BPDU tunnel and
+            STP/GMOSAIC/IGMP tunnel are both enabled."
+        ::= { hh3cQinQBpduTunnelEntry 1 }
+
+    hh3cQinQBpduRowStatus     OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Operation status of this table entry."
+        ::= { hh3cQinQBpduTunnelEntry 2 }
+
+
+    hh3cQinQPriorityRemarkTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cQinQPriorityRemarkEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for configuring priority field in 802.1Q-in-Q
+            outer VLAN tag for interfaces. This feature uses the
+            priority of an inner VLAN tag to remark the priority
+            of an outer VLAN tag."
+        ::= { hh3cQinQMibObject 3 }
+
+    hh3cQinQPriorityRemarkEntry  OBJECT-TYPE
+        SYNTAX      Hh3cQinQPriorityRemarkEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry for configuring priority remark function for
+            interfaces."
+        INDEX
+        {
+            ifIndex,
+            hh3cQinQPriorityValue
+        }
+        ::= { hh3cQinQPriorityRemarkTable 1 }
+
+    Hh3cQinQPriorityRemarkEntry ::=
+        SEQUENCE
+        {
+            hh3cQinQPriorityValue Integer32,
+            hh3cQinQPriorityRemarkValue Integer32,
+            hh3cQinQPriorityRowStatus RowStatus
+        }
+
+    hh3cQinQPriorityValue  OBJECT-TYPE
+        SYNTAX      Integer32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The priority value in inner VLAN tag. Since the priority
+            range is from 0 to 7, yet the index range is from 1 to 8.
+            Thus, the actual priority value equals to the value that
+            subtracts 1 from corresponding index value."
+        ::= { hh3cQinQPriorityRemarkEntry 1 }
+
+    hh3cQinQPriorityRemarkValue  OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The new priority value used to fill outer tag."
+        ::= { hh3cQinQPriorityRemarkEntry 2 }
+
+    hh3cQinQPriorityRowStatus     OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Operation status of this table entry."
+        ::= { hh3cQinQPriorityRemarkEntry 3 }
+
+
+    hh3cQinQVidTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cQinQVidEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for configuring VLAN ID of the 802.1Q-in-Q
+            interfaces."
+        ::= { hh3cQinQMibObject 4 }
+
+    hh3cQinQVidEntry  OBJECT-TYPE
+        SYNTAX      Hh3cQinQVidEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry for configuring VLAN ID of the 802.1Q-in-Q
+            interfaces."
+        INDEX
+        {
+            ifIndex,
+            hh3cQinQVlanID
+        }
+        ::= { hh3cQinQVidTable 1 }
+
+    Hh3cQinQVidEntry ::=
+        SEQUENCE
+        {
+            hh3cQinQVlanID Integer32,
+            hh3cQinQInboundVidListLow OCTET STRING,
+            hh3cQinQInboundVidListHigh OCTET STRING,
+            hh3cQinQVidEthernetType Integer32,
+            hh3cQinQVidRowStatus RowStatus
+        }
+
+    hh3cQinQVlanID    OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "VLAN ID"
+        ::= { hh3cQinQVidEntry 1 }
+
+    hh3cQinQInboundVidListLow    OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(256))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The inbound VLAN IDs which need 802.1Q-in-Q processing.
+            The VLAN ID range, described by bitmap, is from 1 to
+            2048. The length of bitmap is 256 in bytes. Each octet
+            within this value specifies a set of eight VLANs, with
+            the first octet specifying VLANs 1 through 8, the second
+            octet specifying VLANs 9 through 16, etc. Within each
+            octet, the most significant bit represents the highest
+            numbered VLAN, and the least significant bit represents
+            the lowest numbered VLAN."
+        ::= { hh3cQinQVidEntry 2 }
+
+    hh3cQinQInboundVidListHigh    OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(256))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The inbound VLAN IDs which need 802.1Q-in-Q processing.
+            The VLAN ID range, described by bitmap, is from 2049 to
+            4094. The length of bitmap is 256 in bytes. Each octet
+            within this value specifies a set of eight VLANs, with
+            the first octet specifying VLANs 2049 through 2056, the
+            second octet specifying VLANs 2057 through 2064, etc.
+            Within each octet, the most significant bit represents
+            the highest numbered VLAN, and the least significant bit
+            represents the lowest numbered VLAN."
+        ::= { hh3cQinQVidEntry 3 }
+
+    hh3cQinQVidEthernetType   OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Ethernet protocol type configuring for a VLAN."
+        DEFVAL { 33024 }
+        ::= { hh3cQinQVidEntry 4 }
+
+    hh3cQinQVidRowStatus  OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Operation status of this table entry."
+        ::= { hh3cQinQVidEntry 5 }
+
+
+    hh3cQinQVidSwapTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cQinQVidSwapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for configuring 802.1Q-in-Q inner VLAN ID
+            swapping function for interfaces."
+        ::= { hh3cQinQMibObject 5 }
+
+    hh3cQinQVidSwapEntry  OBJECT-TYPE
+        SYNTAX      Hh3cQinQVidSwapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry for configuring 802.1Q-in-Q inner VLAN ID
+            swapping function for interfaces."
+        INDEX
+        {
+            ifIndex,
+            hh3cQinQVlanID,
+            hh3cQinQVidSwapOld
+        }
+        ::= { hh3cQinQVidSwapTable 1 }
+
+    Hh3cQinQVidSwapEntry ::=
+        SEQUENCE
+        {
+            hh3cQinQVidSwapOld Integer32,
+            hh3cQinQVidSwapNew Integer32,
+            hh3cQinQVidSwapRowStatus RowStatus
+        }
+
+    hh3cQinQVidSwapOld    OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The old VLAN ID of original 802.1Q packets."
+        ::= { hh3cQinQVidSwapEntry 1 }
+
+    hh3cQinQVidSwapNew    OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The new VLAN ID of original 802.1Q packets."
+        ::= { hh3cQinQVidSwapEntry 2 }
+
+    hh3cQinQVidSwapRowStatus     OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Operation status of this table entry."
+        ::= { hh3cQinQVidSwapEntry 3 }
+
+
+    hh3cQinQPrioritySwapTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cQinQPrioritySwapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for configuring 802.1Q-in-Q inner VLAN priority
+            swapping function for interfaces. Using this function,
+            the priority of inner VLAN tag can be modified."
+        ::= { hh3cQinQMibObject 6 }
+
+    hh3cQinQPrioritySwapEntry  OBJECT-TYPE
+        SYNTAX      Hh3cQinQPrioritySwapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry for configuring 802.1Q-in-Q inner VLAN
+            priority swapping function for interfaces."
+        INDEX
+        {
+            ifIndex,
+            hh3cQinQVlanID,
+            hh3cQinQPrioritySwapOld
+        }
+        ::= { hh3cQinQPrioritySwapTable 1 }
+
+    Hh3cQinQPrioritySwapEntry ::=
+        SEQUENCE
+        {
+            hh3cQinQPrioritySwapOld Integer32,
+            hh3cQinQPrioritySwapNew Integer32,
+            hh3cQinQPrioritySwapRowStatus RowStatus
+        }
+
+    hh3cQinQPrioritySwapOld    OBJECT-TYPE
+        SYNTAX      Integer32 (1..8)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The old priority of original 802.1Q packets. It is the
+            priority of inner VLAN tag. Since the VLAN priority range
+            is from 0 to 7, yet the index range is from 1 to 8. Thus,
+            the actual priority value equals to the value that
+            subtracts 1 from corresponding index value."
+        ::= { hh3cQinQPrioritySwapEntry 1 }
+
+    hh3cQinQPrioritySwapNew    OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The new priority of original 802.1Q packets. It is the
+            priority of inner VLAN tag after swapped."
+        ::= { hh3cQinQPrioritySwapEntry 2 }
+
+    hh3cQinQPrioritySwapRowStatus     OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Operation status of this table entry."
+        ::= { hh3cQinQPrioritySwapEntry 3 }
+
+
+    hh3cQinQIfConfigTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF Hh3cQinQIfConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A table for configuring 802.1Q-in-Q functions for
+            interfaces."
+        ::= { hh3cQinQMibObject 7 }
+
+    hh3cQinQIfConfigEntry  OBJECT-TYPE
+        SYNTAX      Hh3cQinQIfConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry for configuring 802.1Q-in-Q functions for
+            interfaces."
+        INDEX
+        {
+            ifIndex
+        }
+        ::= { hh3cQinQIfConfigTable 1 }
+
+    Hh3cQinQIfConfigEntry ::=
+        SEQUENCE
+        {
+            hh3cQinQIfEthernetType Integer32,
+            hh3cQinQIfSwitch Hh3cQinQSwitchState,
+            hh3cQinQIfRowStatus RowStatus,
+            hh3cQinQIfServiceTPIDValue Integer32,
+            hh3cQinQIfCustomerTPIDValue Integer32,
+            hh3cQinQIfUplinkSwitch Hh3cQinQSwitchState,
+            hh3cQinQIfDownlinkSwitch Hh3cQinQSwitchState
+        }
+
+    hh3cQinQIfEthernetType    OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Ethernet protocol type configuring for an interface."
+        DEFVAL { 33024 }
+        ::= { hh3cQinQIfConfigEntry 1 }
+
+    hh3cQinQIfSwitch    OBJECT-TYPE
+        SYNTAX      Hh3cQinQSwitchState
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Switch of 802.1Q-in-Q functions configuring for an
+            interface."
+        DEFVAL { disabled }
+        ::= { hh3cQinQIfConfigEntry 2 }
+
+    hh3cQinQIfRowStatus    OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Operation status of this table entry."
+        ::= { hh3cQinQIfConfigEntry 3 }
+
+    hh3cQinQIfServiceTPIDValue    OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Service TPID value configured for an interface."
+        ::= { hh3cQinQIfConfigEntry 4 }
+
+    hh3cQinQIfCustomerTPIDValue    OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Customer TPID value configured for an interface."
+        ::= { hh3cQinQIfConfigEntry 5 }
+
+    hh3cQinQIfUplinkSwitch    OBJECT-TYPE
+        SYNTAX      Hh3cQinQSwitchState
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Switch of the uplink 802.1Q-in-Q function
+            for an interface."
+        DEFVAL { disabled }
+        ::= { hh3cQinQIfConfigEntry 6 }
+
+    hh3cQinQIfDownlinkSwitch    OBJECT-TYPE
+        SYNTAX      Hh3cQinQSwitchState
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Switch of the downlink 802.1Q-in-Q function
+            for an interface."
+        DEFVAL { disabled }
+        ::= { hh3cQinQIfConfigEntry 7 }
+
+END

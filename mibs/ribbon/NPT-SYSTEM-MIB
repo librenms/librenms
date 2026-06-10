@@ -1,0 +1,1854 @@
+
+-- File Name : NPT-SYSTEM-MIB
+-- Date      : Fri Jun 03 19:12:03 CST 2011
+-- Author    : AdventNet Agent Toolkit C Edition - MibEditor 6
+
+
+
+NPT-SYSTEM-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		nptSystem
+			FROM NPT-ROOT-MIB
+		NPTSfpOperStatus,NPTSfpLaserTrStatus,NPTSfpLOSStatus,NPTSfpFiberType,NPTSNMPYesOrNo,NPTSNMPEnable,NPTSfpLineCode
+			FROM NPT-TC-MIB
+		RowStatus, DisplayString, TruthValue
+			FROM SNMPv2-TC
+		DisplayString
+			FROM RFC1213-MIB
+		MODULE-IDENTITY, enterprises, OBJECT-TYPE, Integer32, OBJECT-IDENTITY, Unsigned32
+			FROM SNMPv2-SMI;
+
+	nptSystemModule	MODULE-IDENTITY
+		LAST-UPDATED	"201105240945Z"
+		ORGANIZATION	"Ribbon Communications Inc."
+		CONTACT-INFO	"on.support@rbbn.com
+                         Ribbon Communications Inc.,China
+                         Dongxin Tower, No.398 Wensan Road,
+                         Hangzhou, 310012 P.R.China"
+		DESCRIPTION		"The MIB module to describe the NPT system information, including CPU, memory, FAN state, card inventory,
+						transceiver information, power consumption, etc."
+		REVISION		"201105240945Z"
+		DESCRIPTION		""
+		::=  {  nptSystem  1  }
+
+	nptMibVersion	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The MIB version"
+		::=  {  nptSystemModule  1  }
+
+	nptNESoftwareVersion	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The current running NPT software version."
+		::=  {  nptSystemModule  2  }
+
+	nptBoardInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptBoardInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of board (card) entries."
+		::=  { nptSystemModule  3 }
+
+	nptSysTrapConfig	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"This node contains the alarm configurations for the NPT equipment."
+		::=  {  nptSystemModule  4  }
+
+	nptCpuInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptCpuInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of CPU entries, located in different cards."
+		::=  { nptSystemModule  5 }
+
+	nptMemoryInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptMemoryInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A list of memory entries, located in different cards."
+		::=  { nptSystemModule  6 }
+
+	nptSysStartTime	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The time of system startup."
+		::=  {  nptSystemModule  7  }
+
+	nptTransceiverInformation OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION	"Transceiver related information."
+		::=  {	nptSystemModule  8  }
+
+	nptPowerConsumption	OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION	"Power consumption information."
+		::=  { nptSystemModule  9 }
+
+	nptChassisEnvironment	OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION	"Chassis management related states."
+		::=  { nptSystemModule  10 }
+
+	nptBoardInfoEntry	OBJECT-TYPE
+		SYNTAX		NptBoardInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Each entry defines an existing board (card) in the system."
+		INDEX		{  nptSlotId  }
+		::=  { nptBoardInfoTable 1 }
+
+	NptBoardInfoEntry  ::=  SEQUENCE {
+		nptSlotId  Integer32,
+		nptPhysicalBoardType  DisplayString,
+		nptLogicalBoardType  DisplayString,
+		nptCardDescription  DisplayString,
+		nptCardSerialNumber  DisplayString,
+		nptHwRevision  DisplayString,
+		nptHwOption  DisplayString,
+		nptEPLDRevision  DisplayString,
+		nptBootVersion  DisplayString,
+		nptFPGAVersion  DisplayString,
+		nptSWRevision  DisplayString,
+		nptVendor  DisplayString,
+		nptMacAddress  DisplayString
+		}
+
+
+	nptSlotId	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The slot ID for the card."
+		::=  {  nptBoardInfoEntry  1  }
+
+
+	nptPhysicalBoardType	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The physical name of the card."
+		::=  {  nptBoardInfoEntry  2  }
+
+
+	nptLogicalBoardType	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The logical name of the card."
+		::=  {  nptBoardInfoEntry  3  }
+
+
+	nptCardDescription	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The description of the card."
+		::=  {  nptBoardInfoEntry  4  }
+
+
+	nptCardSerialNumber	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The serial number of the card."
+		::=  {  nptBoardInfoEntry  5  }
+
+
+
+	nptHwRevision	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The hardware revision of the card."
+		::=  {  nptBoardInfoEntry  6  }
+
+	nptHwOption	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The hardware option of the card."
+		::=  {  nptBoardInfoEntry  7  }
+
+	nptEPLDRevision	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The EPLD Revision of the card."
+		::=  {  nptBoardInfoEntry  8  }
+
+	nptBootVersion	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The boot version of the card."
+		::=  {  nptBoardInfoEntry  9  }
+
+	nptFPGAVersion	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The FPGA version of the card."
+		::=  {  nptBoardInfoEntry  10  }
+
+	nptSWRevision	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The version of software running in the card."
+		::=  {  nptBoardInfoEntry  11  }
+
+	nptVendor	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The vendor of the card."
+		::=  {  nptBoardInfoEntry  12  }
+
+
+	nptMacAddress	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The MAC address of the card."
+		::=  {  nptBoardInfoEntry  13  }
+
+
+
+	nptCpuInfoEntry	OBJECT-TYPE
+		SYNTAX		NptCpuInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Each entry defines the CPU information in one card."
+		INDEX		{  nptCpuSlotId  }
+		::=  { nptCpuInfoTable 1 }
+
+	NptCpuInfoEntry  ::=  SEQUENCE {
+		nptCpuSlotId  Integer32,
+		nptCpuSlotType  DisplayString,
+		nptCpuPhysicalBoardType  DisplayString,
+		nptCpuType  DisplayString,
+		nptCpuRevision  DisplayString,
+		nptCpuSpeed  DisplayString,
+		nptCpuCacheSize  DisplayString,
+		nptTotalProcesses  Integer32,
+		nptProcessesStatus  DisplayString,
+        nptUptime       DisplayString,
+		nptLoadAverage  DisplayString,
+		nptUserUtilization  Integer32,
+		nptNiceUtilization  Integer32,
+		nptSystemUtilization  Integer32,
+        nptWaitingUtilization  Integer32,
+        nptHwInterupUtilization  Integer32,
+        nptSoftInterupUtilization  Integer32,
+        nptIdle  Integer32
+		}
+
+
+	nptCpuSlotId	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The slot ID of the card where the CPU is located."
+		::=  {  nptCpuInfoEntry  1  }
+
+	nptCpuSlotType	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The slot name of the card where the CPU is located."
+		::=  {  nptCpuInfoEntry  2  }
+
+	nptCpuPhysicalBoardType	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The name of the card where the CPU is located."
+		::=  {  nptCpuInfoEntry  3  }
+
+	nptCpuType	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The type of the CPU."
+		::=  {  nptCpuInfoEntry  4  }
+
+	nptCpuRevision	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The revision of the CPU."
+		::=  {  nptCpuInfoEntry  5  }
+
+	nptCpuSpeed	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The speed of the CPU."
+		::=  {  nptCpuInfoEntry  6  }
+
+	nptCpuCacheSize	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The cache size information of the CPU."
+		::=  {  nptCpuInfoEntry  7  }
+
+	nptTotalProcesses	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The total number of existing processes in the CPU."
+		::=  {  nptCpuInfoEntry  8  }
+
+	nptProcessesStatus	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The processes status in the CPU."
+		::=  {  nptCpuInfoEntry  9  }
+
+	nptUptime	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The uptime of the CPU."
+		::=  {  nptCpuInfoEntry  10  }
+
+	nptLoadAverage	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The load average information of the CPU."
+		::=  {  nptCpuInfoEntry  11  }
+
+	nptUserUtilization	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of CPU utilization that occurred while executing at the user level (application).Unit:0.1%"
+		::=  {  nptCpuInfoEntry  12  }
+
+	nptNiceUtilization	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of CPU utilization that occurred while executing at the user level with nice priority.Unit:0.1%"
+		::=  {  nptCpuInfoEntry  13  }
+
+	nptSystemUtilization	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of CPU utilization that occurred while executing at the system level (kernel).Unit:0.1%"
+		::=  {  nptCpuInfoEntry  14  }
+
+	nptWaitingUtilization	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of time that the CPU or CPUs were idle during which the system had an outstanding disk I/O request.Unit:0.1%"
+		::=  {  nptCpuInfoEntry  15  }
+
+	nptHwInterupUtilization	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of CPU time spent processing hardware interrupts.Unit:0.1%"
+		::=  {  nptCpuInfoEntry  16  }
+
+	nptSoftInterupUtilization	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of CPU time spent processing software interrupts.Unit:0.1%"
+		::=  {  nptCpuInfoEntry  17  }
+
+	nptIdle	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Percentage of time that the CPU or CPUs were idle and the system did not have an outstanding disk I/O request.Unit:0.1%"
+		::=  {  nptCpuInfoEntry  18  }
+
+
+
+	nptMemoryInfoEntry	OBJECT-TYPE
+		SYNTAX		NptMemoryInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Each entry defines the memory information of an existing board (card) in the system."
+		INDEX		{  nptMemorySlotId  }
+		::=  { nptMemoryInfoTable 1 }
+
+
+	NptMemoryInfoEntry  ::=  SEQUENCE {
+		nptMemorySlotId  Integer32,
+		nptMemorySlotType  DisplayString,
+		nptMemoryPhysicalBoardType  DisplayString,
+		nptMemoryFree  Integer32,
+		nptMemoryUsed  Integer32,
+		nptMemoryBuffers  Integer32,
+		nptMemoryTotal  Integer32,
+		nptMemoryFreeSwap  Integer32,
+		nptMemoryUsedSwap  Integer32,
+		nptMemoryCachedSwap  Integer32,
+		nptMemoryTotalSwap  Integer32
+		}
+
+
+	nptMemorySlotId	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The slot ID of the card where the memory is located."
+		::=  {  nptMemoryInfoEntry  1  }
+
+	nptMemorySlotType	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The slot name of the card where the memory is located."
+		::=  {  nptMemoryInfoEntry  2  }
+
+	nptMemoryPhysicalBoardType	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The name of the card where the memory is located."
+		::=  {  nptMemoryInfoEntry  3  }
+
+	nptMemoryFree	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Free RAM, in KB."
+		::=  {  nptMemoryInfoEntry  4  }
+
+	nptMemoryUsed	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Used RAM, in KB."
+		::=  {  nptMemoryInfoEntry  5  }
+
+	nptMemoryBuffers	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Temporary storage element in memory, in KB."
+		::=  {  nptMemoryInfoEntry  6  }
+
+	nptMemoryTotal	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Total usable RAM, in KB"
+		::=  {  nptMemoryInfoEntry  7  }
+
+	nptMemoryFreeSwap	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Unused swap space, the memory that has been transferred from RAM to the disk temporarily, in KB."
+		::=  {  nptMemoryInfoEntry  8  }
+
+	nptMemoryUsedSwap	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Used swap memory, in KB."
+		::=  {  nptMemoryInfoEntry  9  }
+
+	nptMemoryCachedSwap	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Cached swap memory, in KB."
+		::=  {  nptMemoryInfoEntry  10  }
+
+	nptMemoryTotalSwap	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The total amount of swap space available in the system, in KB."
+		::=  {  nptMemoryInfoEntry  11  }
+
+	nptManagerTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptManagerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"It is possible to configure up to ten managers,
+				to whom, traps will be sent. It is possible also
+				to define trap filters for each of the managers."
+		::=  { nptSysTrapConfig  4 }
+
+	nptManagerEntry	OBJECT-TYPE
+		SYNTAX		NptManagerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row definition for NptManagerTable"
+		INDEX		{  nptTrapIpAddress, nptTrapPortNumber, nptTrapVersion }
+		::=  { nptManagerTable 1 }
+
+	NptManagerEntry  ::=  SEQUENCE {
+		nptTrapIpAddress	DisplayString,
+		nptTrapPortNumber  Unsigned32,
+		nptTrapVersion  Unsigned32,
+		nptIsAdministrator  Unsigned32
+		}
+
+
+	nptTrapIpAddress	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The manager IP address. Value of 0 will disable that
+					entry."
+		::=  {  nptManagerEntry  1  }
+
+
+	nptTrapPortNumber	OBJECT-TYPE
+		SYNTAX			Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The port number on which the manager is listening for
+					traps, the default is 162."
+		::=  {  nptManagerEntry  2  }
+
+
+	nptTrapVersion	OBJECT-TYPE
+		SYNTAX			Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The port number on which the manager is listening for
+					traps, the default is 162."
+		::=  {  nptManagerEntry  3  }
+
+
+	nptIsAdministrator	OBJECT-TYPE
+		SYNTAX			Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Defining a manager if it is an administrator or not.
+					An administrator has rights to read,write and create.
+					A common manager can read only.
+					0-common manager
+					1-administrator manager"
+		::=  {  nptManagerEntry  4  }
+
+	nptTransceiverConfigurationTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptTransceiverConfigurationEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Table for transceiver configuration data."
+		::=  { nptTransceiverInformation  1 }
+
+	nptTransceiverConfigurationEntry	OBJECT-TYPE
+		SYNTAX			NptTransceiverConfigurationEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Entry for each transceiver configuration data."
+        INDEX			{	nptTransceiverConfigurationIndex	}
+		::=  { nptTransceiverConfigurationTable 1 }
+
+		NptTransceiverConfigurationEntry   ::=  SEQUENCE {
+		nptTransceiverConfigurationIndex	Unsigned32,
+		nptTransceiverConfigurationName	DisplayString,
+		nptExpectedTransceiverType	DisplayString,
+		nptExpectedApplicationCode	DisplayString,
+		nptRate	 DisplayString,
+		nptConnectorType	DisplayString,
+		nptNominalBitrate 	DisplayString,
+		nptSupportedLinkLength DisplayString,
+        nptTransmitedWavelength DisplayString,
+		nptChannelColor	DisplayString,
+		nptSupportedFiberType	DisplayString
+		}
+
+	nptTransceiverConfigurationIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverConfiguration Index"
+		::=  {  nptTransceiverConfigurationEntry  1  }
+
+	nptTransceiverConfigurationName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverConfiguration Name"
+		::=  {  nptTransceiverConfigurationEntry  2  }
+
+	nptExpectedTransceiverType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Expected Transceiver Type"
+		::=  {  nptTransceiverConfigurationEntry  3  }
+
+	nptExpectedApplicationCode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Expected Transceiver Code"
+		::=  {  nptTransceiverConfigurationEntry  4  }
+
+	nptRate	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Rate"
+		::=  {  nptTransceiverConfigurationEntry  5  }
+
+	nptConnectorType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Connector Type"
+		::=  {  nptTransceiverConfigurationEntry  6  }
+
+	nptNominalBitrate 	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Nominal Bitrate"
+		::=  {  nptTransceiverConfigurationEntry  7  }
+
+	nptSupportedLinkLength	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Supported Link Length"
+		::=  {  nptTransceiverConfigurationEntry  8  }
+
+	nptTransmitedWavelength	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Transmited Wavelength"
+		::=  {  nptTransceiverConfigurationEntry  9  }
+
+	nptChannelColor	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Channel Color"
+		::=  {  nptTransceiverConfigurationEntry  10  }
+
+	nptSupportedFiberType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Supported Fiber Type"
+		::=  {  nptTransceiverConfigurationEntry  11  }
+
+	nptTransceiverStatusTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptTransceiverStatusEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Transceiver status table."
+		::=  { nptTransceiverInformation  2 }
+
+	nptTransceiverStatusEntry	OBJECT-TYPE
+		SYNTAX			NptTransceiverStatusEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Row Description"
+        INDEX			{	nptTransceiverStatusIndex	}
+		::=  { nptTransceiverStatusTable 1 }
+
+	NptTransceiverStatusEntry   ::=  SEQUENCE {
+		nptTransceiverStatusIndex	Unsigned32,
+		nptTransceiverStatusName	DisplayString,
+		nptOperationalState 	NPTSfpOperStatus,
+		nptActualLaserTransmitStatus 	NPTSfpLaserTrStatus,
+		nptReceivedLOSStatus 	 NPTSfpLOSStatus,
+		nptActualNominalBitrate 	Integer32,
+		nptActualSupportedLinkLength 	Integer32,
+		nptActualTransmitedWavelength Integer32,
+        nptActualSupportedFiberType  NPTSfpFiberType,
+		nptLineCode				 	 NPTSfpLineCode,
+		nptCoherent					 TruthValue,
+		nptSubBand					 Integer32,
+		nptMeasuredRxOSNR			 DisplayString,
+		nptTxOSNR					 DisplayString
+		}
+
+	nptTransceiverStatusIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverStatus Index"
+		::=  {  nptTransceiverStatusEntry  1  }
+
+	nptTransceiverStatusName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverStatus Name"
+		::=  {  nptTransceiverStatusEntry  2  }
+
+	nptOperationalState	OBJECT-TYPE
+		SYNTAX		NPTSfpOperStatus
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Operational State"
+		::=  {  nptTransceiverStatusEntry  3  }
+
+	nptActualLaserTransmitStatus	OBJECT-TYPE
+		SYNTAX		NPTSfpLaserTrStatus
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Actual Laser Transmit Status"
+		::=  {  nptTransceiverStatusEntry  4  }
+
+	nptReceivedLOSStatus	OBJECT-TYPE
+		SYNTAX		NPTSfpLOSStatus
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Received LOS Status"
+		::=  {  nptTransceiverStatusEntry  5  }
+
+	nptActualNominalBitrate	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Actual Nominal Bitrate (Mbps)"
+		::=  {  nptTransceiverStatusEntry  6  }
+
+	nptActualSupportedLinkLength 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Actual Supported Link Length (m)"
+		::=  {  nptTransceiverStatusEntry  7  }
+
+	nptActualTransmitedWavelength	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Actual Transmited Wavelength (nm)"
+		::=  {  nptTransceiverStatusEntry  8  }
+
+	nptActualSupportedFiberType	OBJECT-TYPE
+		SYNTAX		NPTSfpFiberType
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Actual Supported Fiber Type"
+		::=  {  nptTransceiverStatusEntry  9  }
+
+	nptLineCode	OBJECT-TYPE
+		SYNTAX		NPTSfpLineCode
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Line Code"
+		::=  {  nptTransceiverStatusEntry  10  }
+
+	nptCoherent		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Coherent"
+		::=  {  nptTransceiverStatusEntry  11  }
+
+	nptSubBand	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Sub Band"
+		::=  {  nptTransceiverStatusEntry  12  }
+
+	nptMeasuredRxOSNR	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Measured Rx OSNR"
+		::=  {  nptTransceiverStatusEntry  13  }
+
+	nptTxOSNR	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Tx OSNR"
+		::=  {  nptTransceiverStatusEntry  14  }
+
+	nptTransceiverInventoryTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptTransceiverInventoryEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Description"
+		::=  { nptTransceiverInformation  3 }
+
+	nptTransceiverInventoryEntry	OBJECT-TYPE
+		SYNTAX			NptTransceiverInventoryEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Row Description"
+        INDEX			{	nptTransceiverInventoryIndex	}
+		::=  { nptTransceiverInventoryTable 1 }
+
+	NptTransceiverInventoryEntry   ::=  SEQUENCE {
+		nptTransceiverInventoryIndex	Unsigned32,
+		nptTransceiverInventoryName	DisplayString,
+		nptActualTransceiverType 	DisplayString,
+		nptTransceiverInventoryVendor 	DisplayString,
+		nptSerialNumber  	 DisplayString,
+		nptHWRevision 	DisplayString,
+		nptHWOption 	DisplayString,
+		nptGeneralDescription  DisplayString,
+        nptModuleSubType   DisplayString,
+		nptActualApplicationCode DisplayString,
+		nptSupportChannelNumber DisplayString,
+		nptWDMFirstChannelnumber DisplayString,
+		nptChannelSpacing DisplayString
+		}
+
+	nptTransceiverInventoryIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverInventory Index"
+		::=  {  nptTransceiverInventoryEntry  1  }
+
+	nptTransceiverInventoryName		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverInventory Name"
+		::=  {  nptTransceiverInventoryEntry  2  }
+
+	nptActualTransceiverType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Actual Transceiver Type"
+		::=  {  nptTransceiverInventoryEntry  3  }
+
+	nptTransceiverInventoryVendor	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Vendor"
+		::=  {  nptTransceiverInventoryEntry  4  }
+
+	nptSerialNumber	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Serial Number"
+		::=  {  nptTransceiverInventoryEntry  5  }
+
+	nptHWRevision	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"H/W Revision"
+		::=  {  nptTransceiverInventoryEntry  6  }
+
+	nptHWOption 	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"H/W Option"
+		::=  {  nptTransceiverInventoryEntry  7  }
+
+	nptGeneralDescription	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"General Description"
+		::=  {  nptTransceiverInventoryEntry  8  }
+
+	nptModuleSubType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Module Sub Type"
+		::=  {  nptTransceiverInventoryEntry  9  }
+
+	nptActualApplicationCode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Actual Application Code"
+		::=  {  nptTransceiverInventoryEntry  10  }
+
+	nptSupportChannelNumber	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Support Channel Number"
+		::=  {  nptTransceiverInventoryEntry  11  }
+
+	nptWDMFirstChannelnumber	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"WDM First Channel number"
+		::=  {  nptTransceiverInventoryEntry  12  }
+
+	nptChannelSpacing	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Channel Spacing"
+		::=  {  nptTransceiverInventoryEntry  13  }
+
+
+	nptTransceiverPower OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION	"Transceiver power information."
+		::=  {	nptTransceiverInformation  4  }
+
+	nptTransceiverPowerTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptTransceiverPowerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Transceiver power table."
+		::=  { nptTransceiverPower  1 }
+
+	nptTransceiverPowerEntry	OBJECT-TYPE
+		SYNTAX			NptTransceiverPowerEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Row Description"
+        INDEX			{	nptTransceiverPowerIndex	}
+		::=  { nptTransceiverPowerTable 1 }
+
+	NptTransceiverPowerEntry   ::=  SEQUENCE {
+		nptTransceiverPowerIndex	Unsigned32,
+		nptTransceiverPowerName	DisplayString,
+		nptLaservoltage 	Integer32,
+		nptLaserbiascurrent  	Integer32,
+		nptLasertemperature   	 Integer32,
+		nptTxlaserpower  	Integer32,
+		nptRxlaserpower  	Integer32,
+		nptMaxrxpowerlane	Integer32,
+		nptMinrxpowerlane	Integer32,
+		nptMaxtxpowerlane	Integer32,
+		nptMintxpowerlane	Integer32,
+		nptMaxLaserBiasCur	Integer32
+		}
+
+	nptTransceiverPowerIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverPower Index"
+		::=  {  nptTransceiverPowerEntry  1  }
+
+	nptTransceiverPowerName		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverPower Name"
+		::=  {  nptTransceiverPowerEntry  2  }
+
+	nptLaservoltage	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Laser voltage.Unit:0.1 V"
+		::=  {  nptTransceiverPowerEntry  3  }
+
+	nptLaserbiascurrent	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Laser bias current.Unit:0.1 mA"
+		::=  {  nptTransceiverPowerEntry  4  }
+
+	nptLasertemperature 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Laser temperature.Unit:0.1 C"
+		::=  {  nptTransceiverPowerEntry  5  }
+
+	nptTxlaserpower	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Tx laser power.Unit:0.1 dBm"
+		::=  {  nptTransceiverPowerEntry  6  }
+
+	nptRxlaserpower 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Rx laser power.Unit:0.1 dBm"
+		::=  {  nptTransceiverPowerEntry  7  }
+
+	nptMaxrxpowerlane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Max rx power lane.Unit:0.1 dBm"
+		::=  {  nptTransceiverPowerEntry  8  }
+
+	nptMinrxpowerlane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Min rx power lane.Unit:0.1 dBm"
+		::=  {  nptTransceiverPowerEntry  9  }
+
+	nptMaxtxpowerlane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Max tx power lane.Unit:0.1 dBm"
+		::=  {  nptTransceiverPowerEntry  10  }
+
+	nptMintxpowerlane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Min tx power lane.Unit:0.1 dBm"
+		::=  {  nptTransceiverPowerEntry  11  }
+
+	nptMaxLaserBiasCur	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Laser bias voltage.Unit:0.1 C"
+		::=  {  nptTransceiverPowerEntry  12  }
+
+
+	nptTransceiverPowerMultilaneTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptTransceiverPowerMultilaneEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Transceiver power table for each lane."
+		::=  { nptTransceiverPower  2 }
+
+	nptTransceiverPowerMultilaneEntry	OBJECT-TYPE
+		SYNTAX			NptTransceiverPowerMultilaneEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Row Description"
+        INDEX			{	nptTransceiverPowerMultilaneIndex,
+							nptLaneNum		}
+		::=  { nptTransceiverPowerMultilaneTable 1 }
+
+	NptTransceiverPowerMultilaneEntry   ::=  SEQUENCE {
+		nptTransceiverPowerMultilaneIndex	Unsigned32,
+		nptLaneNum							Unsigned32,
+		nptTransceiverPowerMultilaneName	DisplayString,
+		nptLaneTxLaserPower					Integer32,
+		nptLaneRxLaserPower					Integer32,
+		nptLaneLaserBiasCur					Integer32
+		}
+
+	nptTransceiverPowerMultilaneIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverPower Index"
+		::=  {  nptTransceiverPowerMultilaneEntry  1  }
+
+	nptLaneNum	OBJECT-TYPE
+		SYNTAX		Unsigned32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Lane Number"
+		::=  {  nptTransceiverPowerMultilaneEntry  2  }
+
+	nptTransceiverPowerMultilaneName		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TransceiverPower Name"
+		::=  {  nptTransceiverPowerMultilaneEntry  3  }
+
+	nptLaneTxLaserPower 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Lane Tx laser power.Unit: 0.1dBm"
+		::=  {  nptTransceiverPowerMultilaneEntry  4  }
+
+	nptLaneRxLaserPower	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Lane Rx laser power.Unit: 0.1dBm"
+		::=  {  nptTransceiverPowerMultilaneEntry  5  }
+
+	nptLaneLaserBiasCur 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Lane Laser bias voltage.Unit: 0.1mA"
+		::=  {  nptTransceiverPowerMultilaneEntry  6  }
+
+	nptTunnableTransceiverConfigurationTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptTunnableTransceiverConfigurationEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Tunnable transceiver configuration table."
+		::=  { nptTransceiverInformation  5 }
+
+	nptTunnableTransceiverConfigurationEntry	OBJECT-TYPE
+		SYNTAX			NptTunnableTransceiverConfigurationEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Row Description"
+        INDEX			{	nptTunnableTransceiverConfigurationIndex	}
+		::=  { nptTunnableTransceiverConfigurationTable 1 }
+
+	NptTunnableTransceiverConfigurationEntry   ::=  SEQUENCE {
+		nptTunnableTransceiverConfigurationIndex	Unsigned32,
+		nptTunnableTransceiverConfigurationName	DisplayString,
+		nptChannelFrequency 	Integer32,
+		nptWavelength  	DisplayString,
+		nptTxDither   	 NPTSNMPEnable,
+		nptFrequencyTuning  	NPTSNMPYesOrNo,
+		nptWavelengthTuning  	NPTSNMPYesOrNo,
+		nptTxDitherSupport		NPTSNMPYesOrNo,
+		nptFirstFrequency		DisplayString,
+		nptLastFrequency		DisplayString,
+		nptMinimumSupportedGridSpacing	DisplayString
+		}
+
+	nptTunnableTransceiverConfigurationIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TunnableTransceiverConfiguration Index"
+		::=  {  nptTunnableTransceiverConfigurationEntry  1  }
+
+	nptTunnableTransceiverConfigurationName		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TunnableTransceiverConfiguration Name"
+		::=  {  nptTunnableTransceiverConfigurationEntry  2  }
+
+	nptChannelFrequency	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Channel Frequency (MHz)"
+		::=  {  nptTunnableTransceiverConfigurationEntry  3  }
+
+	nptWavelength	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Wavelength"
+		::=  {  nptTunnableTransceiverConfigurationEntry  4  }
+
+	nptTxDither 	OBJECT-TYPE
+		SYNTAX		NPTSNMPEnable
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"TxDither"
+		::=  {  nptTunnableTransceiverConfigurationEntry  5  }
+
+	nptFrequencyTuning	OBJECT-TYPE
+		SYNTAX		NPTSNMPYesOrNo
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Frequency Tuning"
+		::=  {  nptTunnableTransceiverConfigurationEntry  6  }
+
+	nptWavelengthTuning 	OBJECT-TYPE
+		SYNTAX		NPTSNMPYesOrNo
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Wavelength Tuning"
+		::=  {  nptTunnableTransceiverConfigurationEntry  7  }
+
+	nptTxDitherSupport	 	OBJECT-TYPE
+		SYNTAX		NPTSNMPYesOrNo
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Tx Dither Support"
+		::=  {  nptTunnableTransceiverConfigurationEntry  8  }
+
+	nptFirstFrequency 	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"First Frequency"
+		::=  {  nptTunnableTransceiverConfigurationEntry  9  }
+
+	nptLastFrequency	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Last Frequency"
+		::=  {  nptTunnableTransceiverConfigurationEntry  10  }
+
+	nptMinimumSupportedGridSpacing 	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Minimum Supported GridSpacing"
+		::=  {  nptTunnableTransceiverConfigurationEntry  11 }
+
+	nptTransceiverThresholdTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptTransceiverThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Transceiver threshold table."
+		::=  { nptTransceiverInformation  6 }
+
+	nptTransceiverThresholdEntry	OBJECT-TYPE
+		SYNTAX			NptTransceiverThresholdEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Row Description"
+        INDEX			{	nptTransceiverThresholdIfIndex	}
+		::=  { nptTransceiverThresholdTable 1 }
+
+	NptTransceiverThresholdEntry   ::=  SEQUENCE {
+		nptTransceiverThresholdIfIndex	Unsigned32,
+		nptTransceiverThresholdPortName	DisplayString,
+		nptTxOpticalPowerWarningLowTotal 	Integer32,
+		nptTxOpticalPowerWarningHighTotal  	Integer32,
+		nptTxOpticalPowerAlarmLowTotal   	 Integer32,
+		nptTxOpticalPowerAlarmHighTotal  	Integer32,
+		nptRxOpticalPowerWarningLowTotal  	Integer32,
+		nptRxOpticalPowerWarningHighTotal		Integer32,
+		nptRxOpticalPowerAlarmLowTotal		Integer32,
+		nptRxOpticalPowerAlarmHighTotal		Integer32,
+		nptTxOpticalPowerWarningLowPerLane  	Integer32,
+		nptTxOpticalPowerWarningHighPerLane		Integer32,
+		nptTxOpticalPowerAlarmLowPerLane		Integer32,
+		nptTxOpticalPowerAlarmHighPerLane		Integer32,
+		nptRxOpticalPowerWarningLowPerLane  	Integer32,
+		nptRxOpticalPowerWarningHighPerLane		Integer32,
+		nptRxOpticalPowerAlarmLowPerLane		Integer32,
+		nptRxOpticalPowerAlarmHighPerLane		Integer32,
+		nptTxLaserBiasCurrentWarningLow  	Integer32,
+		nptTxLaserBiasCurrentWarningHigh		Integer32,
+		nptTxLaserBiasCurrentAlarmLow		Integer32,
+		nptTxLaserBiasCurrentAlarmHigh		Integer32,
+		nptTransceiverTemperatureWarningLow  	Integer32,
+		nptTransceiverTemperatureWarningHigh		Integer32,
+		nptTransceiverTemperatureAlarmLow		Integer32,
+		nptTransceiverTemperatureAlarmHigh		Integer32,
+		nptThreeDotThreeVoltageSupplyWarningLow  	Integer32,
+		nptThreeDotThreeVoltageSupplyWarningHigh		Integer32,
+		nptThreeDotThreeVoltageSupplyAlarmLow		Integer32,
+		nptThreeDotThreeVoltageSupplyAlarmHigh		Integer32
+		}
+
+	nptTransceiverThresholdIfIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"The port index where the transceiver locates"
+		::=  {  nptTransceiverThresholdEntry  1  }
+
+	nptTransceiverThresholdPortName		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"The port name where the transceiver locates"
+		::=  {  nptTransceiverThresholdEntry  2  }
+
+	nptTxOpticalPowerWarningLowTotal	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per transceiver TX Power Low Warning (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  3  }
+
+	nptTxOpticalPowerWarningHighTotal	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per transceiver TX Power High Warning (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  4  }
+
+	nptTxOpticalPowerAlarmLowTotal 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"	Per transceiver TX Power Low Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  5  }
+
+	nptTxOpticalPowerAlarmHighTotal	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per transceiver TX Power High Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  6  }
+
+	nptRxOpticalPowerWarningLowTotal 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per transceiver TX Power High Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  7  }
+
+	nptRxOpticalPowerWarningHighTotal	 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per transceiver RX Power High Warning (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  8  }
+
+	nptRxOpticalPowerAlarmLowTotal 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per transceiver RX Power Low Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  9  }
+
+	nptRxOpticalPowerAlarmHighTotal	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per transceiver RX Power High Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  10  }
+
+	nptTxOpticalPowerWarningLowPerLane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane TX Power Low Warning (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  11 }
+
+	nptTxOpticalPowerWarningHighPerLane	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane TX Power High Warning (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  12  }
+
+	nptTxOpticalPowerAlarmLowPerLane	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane TX Power Low Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  13  }
+
+	nptTxOpticalPowerAlarmHighPerLane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane TX Power High Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  14  }
+
+	nptRxOpticalPowerWarningLowPerLane	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane RX Power Low Warning (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  15  }
+
+	nptRxOpticalPowerWarningHighPerLane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane RX Power High Warning (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  16  }
+
+	nptRxOpticalPowerAlarmLowPerLane	 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane RX Power Low Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  17  }
+
+	nptRxOpticalPowerAlarmHighPerLane 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Per Lane RX Power High Alarm (with unit 0.1 dBm)"
+		::=  {  nptTransceiverThresholdEntry  18  }
+
+	nptTxLaserBiasCurrentWarningLow	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Bias Low Warning (with unit 0.1 mA)"
+		::=  {  nptTransceiverThresholdEntry  19  }
+
+	nptTxLaserBiasCurrentWarningHigh 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Bias High Warning (with unit 0.1 mA)"
+		::=  {  nptTransceiverThresholdEntry  20 }
+
+	nptTxLaserBiasCurrentAlarmLow	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Bias Low Alarm (with unit 0.1 mA)"
+		::=  {  nptTransceiverThresholdEntry  21  }
+
+	nptTxLaserBiasCurrentAlarmHigh	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Bias High Alarm (with unit 0.1 mA)"
+		::=  {  nptTransceiverThresholdEntry  22  }
+
+	nptTransceiverTemperatureWarningLow 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Temp Low Warning (with unit 0.1 Celsius)"
+		::=  {  nptTransceiverThresholdEntry  23  }
+
+	nptTransceiverTemperatureWarningHigh	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Temp High Warning (with unit 0.1 Celsius)"
+		::=  {  nptTransceiverThresholdEntry  24  }
+
+	nptTransceiverTemperatureAlarmLow 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Temp Low Alarm (with unit 0.1 Celsius)"
+		::=  {  nptTransceiverThresholdEntry  25  }
+
+	nptTransceiverTemperatureAlarmHigh	 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Temp High Alarm (with unit 0.1 Celsius)"
+		::=  {  nptTransceiverThresholdEntry  26  }
+
+	nptThreeDotThreeVoltageSupplyWarningLow 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Voltage Low Warning (with unit 0.01 V)"
+		::=  {  nptTransceiverThresholdEntry  27  }
+
+	nptThreeDotThreeVoltageSupplyWarningHigh	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Voltage High Warning (with unit 0.01 V)"
+		::=  {  nptTransceiverThresholdEntry  28  }
+
+	nptThreeDotThreeVoltageSupplyAlarmLow 	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Voltage Low Alarm (with unit 0.01 V)"
+		::=  {  nptTransceiverThresholdEntry  29 }
+
+	nptThreeDotThreeVoltageSupplyAlarmHigh	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Voltage High Alarm (with unit 0.01 V)"
+		::=  {  nptTransceiverThresholdEntry  30  }
+
+	nptChassisPowerTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptChassisPowerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Chassis power table."
+		::=  { nptPowerConsumption  1 }
+
+	nptChassisPowerEntry	OBJECT-TYPE
+		SYNTAX		NptChassisPowerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  nptChassisPowerObjectIndex  }
+		::=  { nptChassisPowerTable 1 }
+
+
+	NptChassisPowerEntry  ::=  SEQUENCE {
+		nptChassisPowerObjectIndex              Integer32,
+		nptChassisPowerObjectName               DisplayString,
+		nptChassisPowerCurrentInputDCVoltage    Integer32,
+		nptChassisPowerCurrentInputDCCurrent    Integer32,
+		nptChassisPowerMaxInputDCVoltage        Integer32,
+		nptChassisPowerMinInputDCVoltage        Integer32,
+		nptChassisPowerMaxInputDCCurrent        Integer32,
+		nptChassisPowerMinInputDCCurrent        Integer32,
+		nptChassisPowerCurrentPowerConsumption  Integer32,
+		nptChassisPowerShelfPowerConsumption    Integer32,
+		nptChassisPowerMaxOutputPower           Integer32
+		}
+
+
+	nptChassisPowerObjectIndex	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Index for the power card."
+		::=  {  nptChassisPowerEntry  1  }
+
+	nptChassisPowerObjectName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Slot name for the power card."
+		::=  {  nptChassisPowerEntry  2  }
+
+	nptChassisPowerCurrentInputDCVoltage	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Current input DC voltage, in 0.01V."
+		::=  {  nptChassisPowerEntry  3  }
+
+	nptChassisPowerCurrentInputDCCurrent	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Current input DC current, in 0.01A."
+		::=  {  nptChassisPowerEntry  4  }
+
+	nptChassisPowerMaxInputDCVoltage	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Max input DC voltage, in 0.01V."
+		::=  {  nptChassisPowerEntry  5  }
+
+	nptChassisPowerMinInputDCVoltage	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Min input DC voltage, in 0.01V."
+		::=  {  nptChassisPowerEntry  6  }
+
+	nptChassisPowerMaxInputDCCurrent	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Max input DC current, in 0.01A."
+		::=  {  nptChassisPowerEntry  7  }
+
+	nptChassisPowerMinInputDCCurrent	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Min input DC current, in 0.01A."
+		::=  {  nptChassisPowerEntry  8  }
+
+	nptChassisPowerCurrentPowerConsumption	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Current power consumption, in 0.01W."
+		::=  {  nptChassisPowerEntry  9  }
+
+	nptChassisPowerShelfPowerConsumption	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Shelf power consumption, in 0.01W."
+		::=  {  nptChassisPowerEntry  10  }
+
+	nptChassisPowerMaxOutputPower	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Max output power, in 0.01W."
+		::=  {  nptChassisPowerEntry  11  }
+
+
+	nptShelfPowerTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptShelfPowerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Shelf power table."
+		::=  { nptPowerConsumption  2 }
+
+	nptShelfPowerEntry	OBJECT-TYPE
+		SYNTAX		NptShelfPowerEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  nptShelfPowerObjectIndex  }
+		::=  { nptShelfPowerTable 1 }
+
+
+	NptShelfPowerEntry  ::=  SEQUENCE {
+		nptShelfPowerObjectIndex              Integer32,
+		nptShelfPowerObjectName               DisplayString,
+		nptShelfPowerTotalPowerBudget         Integer32,
+		nptShelfPowerAssignedBudget           Integer32,
+		nptShelfPowerRemainingBudget          Integer32,
+		nptShelfPowerStatus                   DisplayString,
+		nptShelfPowerActualPowerConsumption   Integer32
+		}
+
+
+	nptShelfPowerObjectIndex	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Index for the shelf."
+		::=  {  nptShelfPowerEntry  1  }
+
+	nptShelfPowerObjectName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Shelf name."
+		::=  {  nptShelfPowerEntry  2  }
+
+	nptShelfPowerTotalPowerBudget	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Total power budget, in 0.01W."
+		::=  {  nptShelfPowerEntry  3  }
+
+	nptShelfPowerAssignedBudget	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Assigned budget, in 0.01W."
+		::=  {  nptShelfPowerEntry  4  }
+
+	nptShelfPowerRemainingBudget	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Remaining budget, in 0.01W."
+		::=  {  nptShelfPowerEntry  5  }
+
+	nptShelfPowerStatus	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Status of the shelf power."
+		::=  {  nptShelfPowerEntry  6  }
+
+	nptShelfPowerActualPowerConsumption	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Actual power consumption, in 0.01W."
+		::=  {  nptShelfPowerEntry  7  }
+
+	nptFanStateTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptFanStateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"FAN state table."
+		::=  { nptChassisEnvironment  1 }
+
+	nptFanStateEntry	OBJECT-TYPE
+		SYNTAX		NptFanStateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{  nptFanStateIndex  }
+		::=  { nptFanStateTable 1 }
+
+	NptFanStateEntry  ::=  SEQUENCE {
+		nptFanStateIndex                    Integer32,
+		nptFanStateObjectName               DisplayString,
+		nptFanStateTurboMode                DisplayString,
+        nptFanStateSpeed                    DisplayString,
+        nptFanStateLevel                    DisplayString,
+        nptFanStatePowerVoltage             DisplayString
+		}
+
+	nptFanStateIndex	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Index for the FAN info."
+		::=  {  nptFanStateEntry  1  }
+
+	nptFanStateObjectName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN name."
+		::=  {  nptFanStateEntry  2  }
+
+	nptFanStateTurboMode	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN turbo mode."
+		::=  {  nptFanStateEntry  3  }
+
+	nptFanStateSpeed	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN speed."
+		::=  {  nptFanStateEntry  4  }
+
+	nptFanStateLevel	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN level."
+		::=  {  nptFanStateEntry  5  }
+
+	nptFanStatePowerVoltage	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN power voltage."
+		::=  {  nptFanStateEntry  6  }
+
+	nptFanUnitStateTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptFanUnitStateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"FAN unit state table."
+		::=  { nptChassisEnvironment  2 }
+
+	nptFanUnitStateEntry	OBJECT-TYPE
+		SYNTAX		NptFanUnitStateEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Row Description"
+		INDEX		{   nptFanUnitSlot,
+                        nptFanUnitStateID,
+                        nptFanUnitStateObjectName
+                    }
+		::=  { nptFanUnitStateTable 1 }
+
+	NptFanUnitStateEntry  ::=  SEQUENCE {
+		nptFanUnitSlot                          Integer32,
+		nptFanUnitStateID                       Integer32,
+		nptFanUnitStateObjectName               DisplayString,
+		nptFanUnitStateRPM                      Integer32,
+		nptFanUnitStateLevel                    DisplayString,
+		nptFanUnitStateStatus                   DisplayString
+		}
+
+	nptFanUnitSlot	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Slot num."
+		::=  {  nptFanUnitStateEntry  1  }
+
+	nptFanUnitStateID	OBJECT-TYPE
+		SYNTAX			Integer32  ( -2147483648 .. 2147483647  )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Index of FAN unit."
+		::=  {  nptFanUnitStateEntry  2  }
+
+	nptFanUnitStateObjectName	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN name."
+		::=  {  nptFanUnitStateEntry  3  }
+
+	nptFanUnitStateRPM	OBJECT-TYPE
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"RPM."
+		::=  {  nptFanUnitStateEntry  4  }
+
+	nptFanUnitStateLevel	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN unit level."
+		::=  {  nptFanUnitStateEntry  5  }
+
+	nptFanUnitStateStatus	OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"FAN unit status."
+		::=  {  nptFanUnitStateEntry  6  }
+
+	nptCardTemperatureTable 	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  NptCardTemperatureEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"Card temperature table."
+		::=  { nptChassisEnvironment  3 }
+
+	nptCardTemperatureEntry	OBJECT-TYPE
+		SYNTAX		NptCardTemperatureEntry
+		MAX-ACCESS 		not-accessible
+		STATUS			current
+		DESCRIPTION		"Row Description"
+		INDEX			{	nptSlotIndex	}
+		::=	 { nptCardTemperatureTable 1 }
+
+		NptCardTemperatureEntry	::=  SEQUENCE {
+		nptSlotIndex	Unsigned32,
+		nptCardName		DisplayString,
+		nptStatus		DisplayString,
+		nptTemperature	Integer32,
+		nptHighAlarmThreshold	Integer32,
+		nptHighWarnThreshold	Integer32,
+		nptLowAlarmThreshold	Integer32,
+		nptLowWarnThreshold		Integer32
+		}
+
+	nptSlotIndex	OBJECT-TYPE
+		SYNTAX		Unsigned32  ( 0 .. 4294967295  )
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Slot Number"
+		::=	{ nptCardTemperatureEntry 1 }
+
+	nptCardName	 	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Card Name"
+		::=	{ nptCardTemperatureEntry 2 }
+
+	nptStatus		OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Card Status"
+		::=	{ nptCardTemperatureEntry 3 }
+
+	nptTemperature	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Temperature.Unit:0.1 C"
+		::=	{ nptCardTemperatureEntry 4 }
+
+	nptHighAlarmThreshold	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"High Alarm Threshold.Unit:0.1 C"
+		::=	{ nptCardTemperatureEntry 5 }
+
+	nptHighWarnThreshold	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+        DESCRIPTION	"High Warn Threshold.Unit:0.1 C"
+		::=	{ nptCardTemperatureEntry 6 }
+
+	nptLowAlarmThreshold	OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Low Alarm Threshold.Unit:0.1 C"
+		::=	{ nptCardTemperatureEntry 7 }
+
+	nptLowWarnThreshold		OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Low Warn Threshold.Unit:0.1 C"
+		::=	{ nptCardTemperatureEntry 8 }
+END

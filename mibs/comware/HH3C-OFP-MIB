@@ -1,0 +1,331 @@
+-- ============================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 created by qiyunsheng.
+-- V1.1 2019-4-11 updated by yizhigao
+--      create hh3cOfpInstanceFlowTableTable.
+--      create hh3cOfpMibTrap
+-- ============================================================================
+HH3C-OFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM  HH3C-OID-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB;
+
+-- ----------------------------------------------------------------------
+-- Node definitions
+-- ----------------------------------------------------------------------
+hh3cOfp MODULE-IDENTITY
+    LAST-UPDATED "201904111300Z"        -- APRIL 11, 2019 at 13:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB contains information about the OpenFlow module"
+    REVISION "201904111300Z"
+    DESCRIPTION
+        "Add Flow table and trap."
+    REVISION "201702281700Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 167 }
+
+-- ----------------------------------------------------------------------
+-- nodes defined
+-- ----------------------------------------------------------------------
+hh3cOfpInstanceObjects OBJECT IDENTIFIER ::= { hh3cOfp 1 }
+
+-- ----------------------------------------------------------------------
+-- Node of hh3cOfpInstanceControllerTable
+-- ----------------------------------------------------------------------
+hh3cOfpInstanceControllerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cOfpInstanceControllerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about OpenFlow controllers."
+    ::= { hh3cOfpInstanceObjects 1 }
+
+hh3cOfpInstanceControllerEntry OBJECT-TYPE
+    SYNTAX Hh3cOfpInstanceControllerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Define the index of hh3cOfpInstanceControllerTable."
+    INDEX
+        {
+            hh3cOfpInstanceID,
+            hh3cOfpInstanceControllerID
+        }
+    ::= { hh3cOfpInstanceControllerTable 1 }
+
+Hh3cOfpInstanceControllerEntry ::=
+    SEQUENCE
+    {
+        hh3cOfpInstanceID
+            Integer32,
+        hh3cOfpInstanceControllerID
+            Integer32,
+        hh3cOfpInstanceControllerRole
+            INTEGER,
+        hh3cOfpInstanceCtrConnectType
+            INTEGER,
+        hh3cOfpInstanceCtrConnectState
+            INTEGER,
+        hh3cOfpInstanceCtrSSLPolicy
+            OCTET STRING,
+        hh3cOfpInstanceCtrVRFName
+            OCTET STRING,
+        hh3cOfpInstanceCtrIPType
+            InetAddressType,
+        hh3cOfpInstanceCtrIPaddress
+            InetAddress,
+        hh3cOfpInstanceCtrPort
+            Integer32
+     }
+
+hh3cOfpInstanceID OBJECT-TYPE
+    SYNTAX Integer32 (1..4094)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Index of an OpenFlow instance"
+    ::= { hh3cOfpInstanceControllerEntry 1 }
+
+hh3cOfpInstanceControllerID OBJECT-TYPE
+    SYNTAX Integer32 (0..63)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Index of an OpenFlow controller."
+    ::= { hh3cOfpInstanceControllerEntry 2 }
+
+hh3cOfpInstanceControllerRole OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        equal(1),
+        master(2),
+        slave(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the controller's role."
+    ::= { hh3cOfpInstanceControllerEntry 3 }
+
+hh3cOfpInstanceCtrConnectType OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        tcp(1),
+        ssl(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the controller's type."
+    ::= { hh3cOfpInstanceControllerEntry 4 }
+
+hh3cOfpInstanceCtrConnectState OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        idle(0),
+        established(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of the controller's state."
+    ::= { hh3cOfpInstanceControllerEntry 5 }
+
+hh3cOfpInstanceCtrSSLPolicy OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "SSL policy name for SSL connection with controller."
+    ::= { hh3cOfpInstanceControllerEntry 6 }
+
+hh3cOfpInstanceCtrVRFName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VRF name for VPN connection with controller."
+    ::= { hh3cOfpInstanceControllerEntry 7 }
+
+hh3cOfpInstanceCtrIPType OBJECT-TYPE
+    SYNTAX InetAddressType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The IP addresses type of the Controller's IP Address."
+    ::= { hh3cOfpInstanceControllerEntry 8 }
+
+hh3cOfpInstanceCtrIPaddress OBJECT-TYPE
+    SYNTAX InetAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Controller's IP address.
+         The type of this address is determined by the value of
+         hh3cOfpInstanceCtrIPType.
+        "
+    ::= { hh3cOfpInstanceControllerEntry 9}
+
+hh3cOfpInstanceCtrPort OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Controller's port,
+         Default value is 6633."
+    ::= { hh3cOfpInstanceControllerEntry 10 }
+
+-- ----------------------------------------------------------------------
+-- Node of hh3cOfpInstanceFlowTableTable
+-- ----------------------------------------------------------------------
+hh3cOfpInstanceFlowTableTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cOfpInstanceFlowTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about OpenFlow flow tables."
+    ::= { hh3cOfpInstanceObjects 2 }
+
+hh3cOfpInstanceFlowTableEntry OBJECT-TYPE
+    SYNTAX Hh3cOfpInstanceFlowTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Define the index of hh3cOfpInstanceFlowTableTable."
+    INDEX
+        {
+            hh3cOfpFlowTableInstanceID,
+            hh3cOfpInstanceTableID
+        }
+    ::= { hh3cOfpInstanceFlowTableTable 1 }
+
+Hh3cOfpInstanceFlowTableEntry ::=
+    SEQUENCE
+    {
+        hh3cOfpFlowTableInstanceID
+            Integer32,
+        hh3cOfpInstanceTableID
+            Integer32,
+        hh3cOfpInstanceFlowEntryNumCtrl
+            Unsigned32,
+        hh3cOfpInstanceFlowEntryTotalNum
+            Unsigned32,
+        hh3cOfpInstanceFlowEntryLimit
+            Unsigned32
+     }
+
+hh3cOfpFlowTableInstanceID OBJECT-TYPE
+    SYNTAX Integer32 (1..4094)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of an OpenFlow instance"
+    ::= { hh3cOfpInstanceFlowTableEntry 1 }
+
+hh3cOfpInstanceTableID OBJECT-TYPE
+    SYNTAX Integer32 (0..254)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of an OpenFlow table."
+    ::= { hh3cOfpInstanceFlowTableEntry 2 }
+
+hh3cOfpInstanceFlowEntryNumCtrl OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of flow entries added by controllers in an OpenFlow flow table."
+    ::= { hh3cOfpInstanceFlowTableEntry 3 }
+
+hh3cOfpInstanceFlowEntryTotalNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total number of flow entries in an OpenFlow table."
+    ::= { hh3cOfpInstanceFlowTableEntry 4 }
+
+hh3cOfpInstanceFlowEntryLimit OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Flow entry count limit in an OpenFlow table."
+    ::= { hh3cOfpInstanceFlowTableEntry 5 }
+
+-- ----------------------------------------------------------------------
+-- hh3cOfpMibTrapOid Table
+-- ----------------------------------------------------------------------
+hh3cOfpMibTrap OBJECT IDENTIFIER ::= { hh3cOfp 2 }
+
+hh3cOfpMibTrapOid OBJECT IDENTIFIER ::= { hh3cOfpMibTrap 1 }
+
+hh3cOfpTrapDisconnectReason OBJECT-TYPE
+    SYNTAX Integer32 (0..10)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Reason why this instance is disconnected from a controller
+             0: Unknown reason.
+             1: Undo commands executed
+             2: Echo timeout.
+             3: Hello failed.
+             4: Receiving Hello packets timed out.
+             5: Receiving messages failed.
+             6: Epoll error.
+             7: VRF deleted.
+             8: VRF global port down.
+             9: Failed to recycle the buffer.
+             10: AP down."
+    ::= { hh3cOfpMibTrapOid 1 }
+
+-- ----------------------------------------------------------------------
+-- hh3cOfpTraps Table
+-- ----------------------------------------------------------------------
+hh3cOfpTraps      OBJECT IDENTIFIER ::= { hh3cOfpMibTrap 2 }
+hh3cOfpTrapsPrefix      OBJECT IDENTIFIER ::= { hh3cOfpTraps 0 }
+
+hh3cOfpControllerDisconnect NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cOfpInstanceID,
+                hh3cOfpInstanceControllerID,
+                hh3cOfpTrapDisconnectReason
+             }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the instance is disconnected
+         from the controller.  The disconnection reason is
+         hh3cOfpTrapDisconnectReason."
+    ::= { hh3cOfpTrapsPrefix 1 }
+
+hh3cOfpControllerConnect NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cOfpInstanceID,
+                hh3cOfpInstanceControllerID
+             }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the instance is connected
+         to the controller."
+    ::= { hh3cOfpTrapsPrefix 2 }
+END

@@ -1,0 +1,263 @@
+NBS-META-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, OBJECT-IDENTITY, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+
+        DisplayString
+            FROM SNMPv2-TC
+
+        InterfaceIndex
+            FROM IF-MIB
+
+        nbs
+            FROM NBS-MIB
+        ;
+
+nbsMetaMib MODULE-IDENTITY
+        LAST-UPDATED "201209260000Z"  -- Sep 26, 2012
+        ORGANIZATION  "NBS"
+        CONTACT-INFO
+          "For technical support, please contact your service channel"
+
+        DESCRIPTION
+          "MIB for representing NBS FDRNIX private information"
+
+        ::= { nbs 205 }
+
+
+nbsMetaMibGrp OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION "Meta MIB"
+        ::= { nbsMetaMib 1 }
+
+nbsMetaMibFeatureTableSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of rows in the nbsMetaMibFeature table"
+        ::= { nbsMetaMibGrp 1 }
+
+nbsMetaMibFeatureTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsMetaMibFeatureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of features a hardware device might implement."
+        ::= { nbsMetaMibGrp 2 }
+
+nbsMetaMibFeatureEntry OBJECT-TYPE
+        SYNTAX      NbsMetaMibFeatureEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A specific feature"
+
+        INDEX { nbsMetaMibFeatureID }
+
+        ::= { nbsMetaMibFeatureTable 1 }
+
+NbsMetaMibFeatureEntry ::= SEQUENCE {
+        nbsMetaMibFeatureID               INTEGER,
+        nbsMetaMibFeatureFamily           DisplayString,
+        nbsMetaMibFeatureName             DisplayString,
+        nbsMetaMibFeatureDesc             DisplayString,
+        nbsMetaMibFeatureUnits            DisplayString,
+        nbsMetaMibFeatureType             INTEGER
+}
+
+nbsMetaMibFeatureID OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Unique identifier for this feature"
+        ::= { nbsMetaMibFeatureEntry 1 }
+
+nbsMetaMibFeatureFamily OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Family of this feature"
+        ::= { nbsMetaMibFeatureEntry 2 }
+
+nbsMetaMibFeatureName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Name of this feature"
+        ::= { nbsMetaMibFeatureEntry 3 }
+
+nbsMetaMibFeatureDesc OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Description of this feature and its settings"
+        ::= { nbsMetaMibFeatureEntry 4 }
+
+nbsMetaMibFeatureUnits OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The units used in this feature"
+        ::= { nbsMetaMibFeatureEntry 5 }
+
+nbsMetaMibFeatureType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                enum         (1), -- nbsMetaMibVariableCaps contains comma separated
+                                  -- list of allowed enums
+                string       (2), -- Caps contains (min, max) string length
+                integer      (3), -- Caps contains (min, max) values
+                float        (4)  -- Caps contains (min, max) values
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Data type"
+        ::= { nbsMetaMibFeatureEntry 6 }
+
+nbsMetaMibVariableTableSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of rows in the nbsMetaMibVariable table"
+        ::= { nbsMetaMibGrp 3 }
+
+nbsMetaMibVariableTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsMetaMibVariableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "List of variables a specific device implements."
+        ::= { nbsMetaMibGrp 4 }
+
+nbsMetaMibVariableEntry OBJECT-TYPE
+        SYNTAX      NbsMetaMibVariableEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A specific feature"
+
+        INDEX { nbsMetaMibVariableIfIndex, nbsMetaMibVariableID }
+
+        ::= { nbsMetaMibVariableTable 1 }
+
+NbsMetaMibVariableEntry ::= SEQUENCE {
+        nbsMetaMibVariableIfIndex          InterfaceIndex,
+        nbsMetaMibVariableID               INTEGER,
+        nbsMetaMibVariableCaps             DisplayString,
+        nbsMetaMibVariableDefault          DisplayString,
+        nbsMetaMibVariableJumper           DisplayString,
+        nbsMetaMibVariableOper             DisplayString,
+        nbsMetaMibVariableAdmin            DisplayString,
+        nbsMetaMibVariableStatus           DisplayString
+}
+
+nbsMetaMibVariableIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "What CCSSPPP does this belong to? If SS and PPP are zero, this
+           belongs to a chassis. If PPP is zero, this belongs to a slot."
+        ::= { nbsMetaMibVariableEntry 1 }
+
+nbsMetaMibVariableID OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Index into nbsMetaMibFeatureTable (nbsMetaMibFeatureID)."
+        ::= { nbsMetaMibVariableEntry 2 }
+
+nbsMetaMibVariableCaps OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "A list of comma separated strings that indicate what values
+           this variable supports. Ranges and string lengths are
+           expressed as a two item list (MIN,MAX). A zero length string
+           indicates this variable is read only."
+        ::= { nbsMetaMibVariableEntry 3 }
+
+nbsMetaMibVariableDefault OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Default value of this variable. It may report a zero length
+           string if FeatureType is string."
+        ::= { nbsMetaMibVariableEntry 4 }
+
+nbsMetaMibVariableJumper OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Current jumper setting for this variable. If the current
+           jumper setting cannot be reported:
+
+               - VariableJumper will report 'N/A' if FeatureType is
+                 string.
+               - VariableJumper will be zero length otherwise.
+
+           If FeatureType is string, a zero length VariableJumper is
+           a valid value."
+
+        ::= { nbsMetaMibVariableEntry 5 }
+
+nbsMetaMibVariableOper OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Current operational value for this variable. If the current
+           operational value cannot be reported:
+
+               - VariableOper will report 'N/A' if FeatureType is
+                 string.
+               - VariableOper will be zero length otherwise.
+
+           If VariableOper reports not supported, but VariableCaps
+           reports non-zero length, this variable is write-only.
+
+           If FeatureType is string, a zero length VariableOper is
+           a valid value."
+
+        ::= { nbsMetaMibVariableEntry 6 }
+
+nbsMetaMibVariableAdmin OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Administrative value of this variable. If the administrative
+           value cannot be set for this variable, VariableCaps will
+           report a zero length string when read.
+
+           Writing zero length values are only permitted if FeatureType
+           is string and VariableCaps permits it. Otherwise, zero
+           length strings will be rejected.
+
+           If FeatureType is string, a zero length VariableAdmin is
+           a valid value."
+
+        ::= { nbsMetaMibVariableEntry 7 }
+
+nbsMetaMibVariableStatus OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..128))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Messages relating to this variable"
+        ::= { nbsMetaMibVariableEntry 8 }
+
+END
+

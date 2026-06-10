@@ -1,0 +1,800 @@
+--  *****************************************************************
+--  DLINKSW-SYSLOG-MIB.mib : Syslog MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32,
+        Integer32
+            FROM SNMPv2-SMI
+        RowStatus, TruthValue, DateAndTime, DisplayString
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF
+        SyslogFacility, SyslogSeverity
+            FROM SYSLOG-TC-MIB           
+        InterfaceIndexOrZero
+                FROM IF-MIB                        
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        dlinkIndustrialCommon           
+             FROM DLINK-ID-REC-MIB;
+
+    dlinkSwSyslogMIB MODULE-IDENTITY
+        LAST-UPDATED "201401170000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for system log function."
+        REVISION "201309140000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file.
+            "
+        ::= { dlinkIndustrialCommon 13 }
+
+-- -----------------------------------------------------------------------------
+    dSyslogMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwSyslogMIB 0 }
+    dSyslogMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwSyslogMIB 1 }
+    dSyslogMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwSyslogMIB 2 }
+
+-- -----------------------------------------------------------------------------   
+    dSyslogGeneral             OBJECT IDENTIFIER ::= { dSyslogMIBObjects 1 }
+	
+	dSyslogSourceIfIndex  OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface whose IP address
+            will be used as the source address for sending the SYSLOG packet. 
+            A special value of zero indicates the source interface is not
+            specified, the IP address of the closest interface will be used.
+            "
+        ::= { dSyslogGeneral 1 }
+	    
+    dSyslogDiscriminatorTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSyslogDiscriminatorEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table contains a list of discriminators which can be further
+            used to filter SYSLOG messages sent to various destinations.
+			At least one sub-filter(facility filter or severity filter) needs 
+			to be specified to make sure the the discriminator is available.
+			Facility filter:facility mode and facility string.
+			Severity filter:severity mode and severity list.
+            "
+        ::= { dSyslogGeneral 2 }
+
+    dSyslogDiscriminatorEntry OBJECT-TYPE
+        SYNTAX          DSyslogDiscriminatorEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+           "An entry defines a discriminator."
+        INDEX           { dSyslogDiscriminatorName }
+        ::= { dSyslogDiscriminatorTable 1 }
+
+    DSyslogDiscriminatorEntry ::= SEQUENCE {
+        dSyslogDiscriminatorName            DisplayString,
+        dSyslogDiscriminatorRowstatus       RowStatus,
+        dSyslogDisFacilityFilterMode        INTEGER,
+        dSyslogDisFacilityFilterString      DisplayString,
+        dSyslogDisSeverityFilterMode        INTEGER,
+        dSyslogDisSeverityList              BITS
+        }
+
+    dSyslogDiscriminatorName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the discriminator.
+            "
+        ::= { dSyslogDiscriminatorEntry 1 }
+    
+    dSyslogDiscriminatorRowstatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows.
+            "
+        ::= { dSyslogDiscriminatorEntry 2 }
+ 
+    dSyslogDisFacilityFilterMode OBJECT-TYPE
+       SYNTAX	    INTEGER {
+            notSpecified(1),
+            drops(2),
+            includes(3)
+        }
+	    MAX-ACCESS      read-create
+	    STATUS	        current
+	    DESCRIPTION		    
+        	"This object indicates the mode how dSyslogDisFacilityFilterString
+            is used to filter system log messages.
+            notSpecified(1) - dSyslogDisFacilityFilterString will become a zero
+                              length string.           
+            drops(2) - The matching message will be filtered.
+            includes(3) - The matching message will be included, in other
+                          words, the unmatched messages are filtered.
+            "           
+        DEFVAL { notSpecified }
+        ::= { dSyslogDiscriminatorEntry 3 }
+
+    dSyslogDisFacilityFilterString OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates a one or more facility name to filter or
+            include the matching messages. 
+            If multiple facility names, they should be separated by comma without
+            space before and after the comma. 
+            A zero length string indicates the regular expression is not specified.
+            "      
+        ::= { dSyslogDiscriminatorEntry 4 }  
+    
+    dSyslogDisSeverityFilterMode OBJECT-TYPE
+       SYNTAX	    INTEGER {
+            notSpecified(1),
+            drops(2),
+            includes(3)
+        }
+	    MAX-ACCESS      read-create
+	    STATUS	        current
+	    DESCRIPTION		    
+        	"This object indicates the mode how the severity list of 
+            dSyslogDisSeverityList is used to filter message.
+            notSpecified(1) - dSyslogDisSeverityList is not applicable.
+            drops(2) -  The list of severity level will be filtered.
+            includes(3) - The list of severity level will be included.
+            "           
+        DEFVAL { notSpecified }
+        ::= { dSyslogDiscriminatorEntry 5 }
+         
+    dSyslogDisSeverityList OBJECT-TYPE
+        SYNTAX          BITS {
+            emerg           (0),  -- emergency; system is unusable
+            alert           (1),  -- action must be taken immediately
+            crit            (2),  -- critical condition
+            err             (3),  -- error condition
+            warning         (4),  -- warning condition
+            notice          (5),  -- normal but significant condition
+            info            (6),  -- informational message
+            debug           (7)   -- debug-level messages
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates severity level to be specified by this
+             discriminator definition.
+
+             This object is a bit map, with each bit representing
+             a severitly level. 
+             A 1-bit indicates that severity level is specified in the list.
+             A 0-bit indicates that severity level is unspecified.
+             Note: whether a severity level is included is always interpreted
+             within the context of dSyslogDisSeverityFilterMode.
+             dSyslogDisSeverityFilterMode  Specified     Result
+             ============================  ==========    ==============
+             notSpecified                  don't care    Not applicable
+             drops                         specified     filtered
+             drops                         unspecified   included         
+             includes                      specified     included
+             includes                      unspecified   filtered
+            "
+        ::= { dSyslogDiscriminatorEntry 6 }
+		
+	dSyslogLogOnEnabled  OBJECT-TYPE
+		SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables or disables the System Log function
+            during system runtime."
+        ::= { dSyslogGeneral 3 }
+    
+	dSyslogSourceIfType  OBJECT-TYPE
+		SYNTAX          DisplayString
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of source interface.
+			The default type is vlan,when the type is default and the value of 
+			sourceIfIndex is zero, this means the source interface is not specified"
+        ::= { dSyslogGeneral 4 }
+		
+-- -----------------------------------------------------------------------------
+    dSyslogLogbuffer OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION
+            "This object identifier represents the group of objects that are 
+            related to the logging system message to local buffer.
+            "
+        ::= { dSyslogMIBObjects 2 } 
+ 
+    dSyslogClearLogBuffer OBJECT-TYPE
+        SYNTAX	    INTEGER {
+            clear(1),
+            noOp(2)                    
+        }
+	    MAX-ACCESS      read-write
+	    STATUS	        current
+	    DESCRIPTION		    
+        	"This object is used to clear log messages at logging buffer when set
+        	to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."           
+        ::= { dSyslogLogbuffer 1 }
+
+    dSyslogLogBufferEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of logging system messages to the
+            local buffer.
+            Messages must enter the local message buffer first before it can
+            be further dispatched to other destinations.
+            "      
+        ::= { dSyslogLogbuffer 2 }
+
+    dSyslogLogBufSeverity OBJECT-TYPE
+        SYNTAX          SyslogSeverity
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the severity level of system messages. 
+            The messages at that severity level or a more severe level will be
+            logged to message buffers.
+            "      
+        ::= { dSyslogLogbuffer 3 } 
+     
+    dSyslogLogBufDiscriminator OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of discriminator which is used 
+            to filter the message to be sent to local buffer.
+            A zero length string indicates the discriminator is not specified.
+            "      
+        ::= { dSyslogLogbuffer 4 }  
+
+    dSyslogLogBufWriteDelay OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION    
+			"This object indicates the interval for periodic writing of the
+            logging buffer to FLASH. The valid value is N to 65535. 
+            N is project dependent. The default interval is 300 seconds.    
+            Setting this object to -1 means infinite which will disable 
+			periodical writing logging buffer to FLASH.
+			Setting this object to 0 means writing logging buffer 
+			to flash by trigger way.
+			"
+        ::= { dSyslogLogbuffer 5 }  
+
+    dSyslogClearAttackLogBufByUnit OBJECT-TYPE
+        SYNTAX	        Integer32
+	    MAX-ACCESS      read-write
+	    STATUS	        current
+	    DESCRIPTION		    
+        	"This object indicates the unit on which the attack log messages
+            will be cleared.
+            The special value -1 indicates clearing all attack log entries.
+            For a standalone device, 1 is used.
+            No action is taken if this object is set to 0.
+            When read, the value 0 is returned.
+            "           
+        ::= { dSyslogLogbuffer 6 }
+-- -----------------------------------------------------------------------------
+    dSyslogLogConsole OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION
+            "This object identifier represents the group of objects that are 
+            related to the logging system messages to the local console.
+            "
+        ::= { dSyslogMIBObjects 3 } 
+            
+    dSyslogLogConsoleEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of logging system messages to the
+            local console.                       
+            "      
+        ::= { dSyslogLogConsole 1 }
+
+    dSyslogLogConsoleSeverity OBJECT-TYPE
+        SYNTAX          SyslogSeverity
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the severity level of system messages. 
+            The messages at that severity level or a more severe level will be
+            logged to the local console.
+            "      
+        ::= { dSyslogLogConsole 2 } 
+     
+    dSyslogLogConsoleDiscriminator OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of discriminator which is used 
+            to filter the message to be sent to local console.
+            A zero length string indicates the discriminator is not specified.
+            "      
+        ::= { dSyslogLogConsole 3 }  
+
+-- -----------------------------------------------------------------------------
+    dSyslogLogSmtp OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION
+            "This object identifier represents the group of objects that are 
+            related to the logging system messages to the email recipients.
+            "
+        ::= { dSyslogMIBObjects 4 } 
+            
+    dSyslogLogSmtpEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of logging of system messages to
+            the email recipients.           
+            "      
+        ::= { dSyslogLogSmtp 1 }
+
+    dSyslogLogSmtpSeverity OBJECT-TYPE
+        SYNTAX          SyslogSeverity
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the severity level of system messages. 
+            The messages at that severity level or a more severe level will be
+            logged to the email recipients.
+            "      
+        ::= { dSyslogLogSmtp 2 } 
+     
+    dSyslogLogSmtpDiscriminator OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of discriminator which is used 
+            to filter the message to be sent to the email recipients.
+            A zero length string indicates the discriminator is not specified.
+            "      
+        ::= { dSyslogLogSmtp 3 }  
+
+-- -----------------------------------------------------------------------------   
+    dSyslogServerTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSyslogServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of SYSLOG servers to log system messages
+            and debug output to a remote SYSLOG server host."
+        ::= { dSyslogMIBObjects 5 }
+
+    dSyslogServerEntry OBJECT-TYPE
+        SYNTAX          DSyslogServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defines information for a SYSLOG server.
+            "
+        INDEX  { 
+            dSyslogServerAddressType,
+            dSyslogServerAddress,
+			dSyslogServerVrfName
+        }
+        ::= { dSyslogServerTable 1 }
+
+    DSyslogServerEntry ::= SEQUENCE {
+        dSyslogServerAddressType      InetAddressType,
+        dSyslogServerAddress          InetAddress,   
+		dSyslogServerVrfName          DisplayString,		
+        dSyslogServerRowstatus        RowStatus,
+        dSyslogServerPort             Unsigned32,
+        dSyslogServerSeverity         SyslogSeverity,
+        dSyslogServerFacility         SyslogFacility,
+        dSyslogServerDiscriminator    DisplayString
+        }
+    
+    dSyslogServerAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of the server address."
+        ::= { dSyslogServerEntry 1 }
+    
+    dSyslogServerAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP or IPv6 address of the SYSLOG server."
+        ::= { dSyslogServerEntry 2 }
+		
+	dSyslogServerVrfName OBJECT-TYPE
+        SYNTAX          DisplayString	(SIZE(0..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the routing forwarding instance.
+            If this object is a zero length string, the SYSLOG server is in
+            global routing and forwarding space."
+        ::= { dSyslogServerEntry 3 }
+		
+    dSyslogServerRowstatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dSyslogServerEntry 4 }
+
+    dSyslogServerPort OBJECT-TYPE
+        SYNTAX          Unsigned32 (514 | 1024..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the UDP port number to be used for the
+            SYSLOG server.
+            "
+        DEFVAL      { 514 }
+        ::= { dSyslogServerEntry 5 }
+
+    dSyslogServerSeverity OBJECT-TYPE
+        SYNTAX          SyslogSeverity
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the severity of log messages that will be
+            sent to the server."
+        DEFVAL      { warning }
+        ::= { dSyslogServerEntry 6 }
+
+    dSyslogServerFacility OBJECT-TYPE
+        SYNTAX          SyslogFacility
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the logging facility of the log host.
+            "
+        DEFVAL      { local7 }
+        ::= { dSyslogServerEntry 7 }
+    
+     dSyslogServerDiscriminator OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of discriminator which is used 
+            to filter the message to be sent to SYSLOG server.
+            A zero length string indicates the discriminator is not specified.
+            "      
+        ::= { dSyslogServerEntry 8 }  
+       
+-- -----------------------------------------------------------------------------
+    dSyslogBufferTableNum  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the number of entries presented in the 
+            dSyslogBufferTable."
+        ::= { dSyslogMIBObjects 6 }
+
+    dSyslogBufferTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSyslogBufferEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of system log messages."
+        ::= { dSyslogMIBObjects 7 }
+
+    dSyslogBufferEntry OBJECT-TYPE
+        SYNTAX          DSyslogBufferEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "An entry defines a log message."
+        INDEX           { dSyslogBufferIndex }
+        ::= { dSyslogBufferTable 1 }
+
+    DSyslogBufferEntry ::= SEQUENCE {
+        dSyslogBufferIndex          Unsigned32,
+        dSyslogBufferDateAndTime    DateAndTime,
+        dSyslogBufferDescription    DisplayString
+    }
+
+    dSyslogBufferIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..100000)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An index that uniquely identifies the message."
+        ::= { dSyslogBufferEntry 1 }
+
+    dSyslogBufferDateAndTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The date and time when the message is logged."
+        ::= { dSyslogBufferEntry 2 }
+
+    dSyslogBufferDescription OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The content of the log message."
+        ::= { dSyslogBufferEntry 3 }
+
+
+-- -----------------------------------------------------------------------------
+    dSyslogAttackLogTableNum  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the number of entries presented in the
+            dSyslogAttackLogTable."
+        ::= { dSyslogMIBObjects 8 }
+
+    dSyslogAttackLogTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSyslogAttackLogEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of attack log messages."
+        ::= { dSyslogMIBObjects 9 }
+
+    dSyslogAttackLogEntry OBJECT-TYPE
+        SYNTAX          DSyslogAttackLogEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+            "An entry defines a attack log message."
+        INDEX           { 
+            dSyslogAttackLogUnitId,
+            dSyslogAttackLogIndex        
+        }
+        ::= { dSyslogAttackLogTable 1 }
+
+    DSyslogAttackLogEntry ::= SEQUENCE {
+        dSyslogAttackLogUnitId         Unsigned32,
+        dSyslogAttackLogIndex          Unsigned32,        
+        dSyslogAttackLogDateAndTime    DateAndTime,
+        dSyslogAttackLogDescription    DisplayString
+    }
+
+    dSyslogAttackLogUnitId OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the unit (stacking device) or slot (chassis
+            device) ID of the attack log message."
+        ::= { dSyslogAttackLogEntry 1 } 
+
+    dSyslogAttackLogIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..100000)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An index that uniquely identifies the attack log message."
+        ::= { dSyslogAttackLogEntry 2 }
+
+    dSyslogAttackLogDateAndTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The date and time when the attack message is logged."
+        ::= { dSyslogAttackLogEntry 3 }
+
+    dSyslogAttackLogDescription OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The content of the attack log message."
+        ::= { dSyslogAttackLogEntry 4 }
+
+--****************************************************************************
+-- Conformance
+--****************************************************************************
+  
+    dSyslogMIBCompliances OBJECT IDENTIFIER ::= { dSyslogMIBConformance 1 }
+
+
+-- compliance statements
+
+    dSyslogMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for entities which
+             implement the DLINKSW-SYSLOG-MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS       {
+            dSyslogGeneralGroup          
+        }        
+              
+        GROUP           dSyslogDiscriminatorGroup
+        DESCRIPTION
+            "Implementation of this group is optional."
+
+        GROUP           dSyslogLogConsoleGroup
+        DESCRIPTION
+            "Implementation of this group is optional."
+
+        GROUP           dSyslogLogSmtpGroup
+        DESCRIPTION
+            "Implementation of this group is optional."
+
+        GROUP           dSyslogLogServerGroup
+        DESCRIPTION
+            "Implementation of this group is optional."
+
+        GROUP           dSyslogAttackLogGroup
+        DESCRIPTION
+            "Implementation of this group is optional."
+
+        OBJECT          dSyslogSourceIfIndex        
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is compliant to implement this object as
+            read-only. The write-access is only required
+            when source interface is configurable."
+
+        OBJECT          dSyslogLogConsoleDiscriminator        
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is compliant to implement this object as
+            read-only. The write-access is only required
+            when discriminator feature is supported."
+        
+        OBJECT          dSyslogLogSmtpDiscriminator        
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is compliant to implement this object as
+            read-only. The write-access is only required
+            when discriminator feature is supported."
+
+        OBJECT          dSyslogServerDiscriminator        
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is compliant to implement this object as
+            read-only. The write-access is only required
+            when discriminator feature is supported."
+
+        OBJECT          dSyslogServerVrfName        
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is compliant to implement this object as
+            read-only. The write-access is only required
+            when VRF feature is supported."
+               
+        ::= { dSyslogMIBCompliances 1 }
+
+-- units of conformance
+
+    dSyslogMIBGroups      OBJECT IDENTIFIER ::=  { dSyslogMIBCompliances 2 }
+
+    dSyslogGeneralGroup OBJECT-GROUP
+        OBJECTS {                       
+            dSyslogClearLogBuffer,
+            dSyslogLogBufferEnabled,
+            dSyslogLogBufSeverity,
+            dSyslogLogBufDiscriminator,
+            dSyslogLogBufWriteDelay,
+            dSyslogBufferTableNum,
+            dSyslogBufferDateAndTime,
+            dSyslogBufferDescription,
+			dSyslogLogOnEnabled	
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects provides basic configuration of
+            SYSLOG feature.
+            "
+        ::= { dSyslogMIBGroups 1 }
+
+
+    dSyslogDiscriminatorGroup OBJECT-GROUP
+        OBJECTS {
+            dSyslogDiscriminatorRowstatus,
+            dSyslogDisFacilityFilterMode, 
+            dSyslogDisFacilityFilterString,
+            dSyslogDisSeverityFilterMode,
+            dSyslogDisSeverityList,
+            dSyslogLogBufDiscriminator
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects provides configuration of
+            discriminator which is used to filter SYSLOG messages sent to
+            various destinations.
+            "
+        ::= { dSyslogMIBGroups 2 }
+     
+    dSyslogLogConsoleGroup OBJECT-GROUP
+        OBJECTS {
+            dSyslogLogConsoleEnabled,
+            dSyslogLogConsoleSeverity,
+            dSyslogLogConsoleDiscriminator
+
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects provides configurations that are related
+            to the logging system messages to the local console.
+            "
+        ::= { dSyslogMIBGroups 3 } 
+
+    dSyslogLogSmtpGroup OBJECT-GROUP
+        OBJECTS {
+            dSyslogLogSmtpEnabled,
+            dSyslogLogSmtpSeverity,
+            dSyslogLogSmtpDiscriminator
+
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects provides configurations that are related
+            to the logging system messages to the email recipients.
+            "
+        ::= { dSyslogMIBGroups 4 } 
+
+   dSyslogLogServerGroup OBJECT-GROUP
+        OBJECTS {
+           dSyslogSourceIfIndex,
+           dSyslogServerRowstatus,
+           dSyslogServerPort,
+           dSyslogServerSeverity,
+           dSyslogServerFacility,
+           dSyslogServerDiscriminator
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects provides configurations that are related
+            to the logging system messages to the SYSLOG servers.
+            "
+        ::= { dSyslogMIBGroups 5 } 
+
+    dSyslogAttackLogGroup OBJECT-GROUP
+        OBJECTS {            
+            dSyslogClearAttackLogBufByUnit,
+            dSyslogAttackLogTableNum,
+            dSyslogAttackLogDateAndTime,
+            dSyslogAttackLogDescription           
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects provides the management of attack log.            
+            "
+        ::= { dSyslogMIBGroups 6 } 
+END

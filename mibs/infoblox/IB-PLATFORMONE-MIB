@@ -1,0 +1,1011 @@
+--
+-- Copyright (c) 2004-2016, Infoblox, Inc
+-- All rights reserved.
+
+IB-PLATFORMONE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION FROM SNMPv2-TC
+   Counter FROM RFC1155-SMI
+   ibPlatformOne, IbString, IbIpAddr, IbFloat FROM IB-SMI-MIB;
+
+ibPlatformModule MODULE-IDENTITY
+    LAST-UPDATED "201606120000Z"  -- Jun 12, 2016
+    ORGANIZATION "Infoblox"
+    CONTACT-INFO "Please See IB-SMI-MIB."
+    DESCRIPTION "This file defines the Infoblox One platform MIB."
+
+    REVISION  "201606120000Z"  -- Jun 12, 2016
+    DESCRIPTION "Add BFD service status"
+
+    REVISION  "201606070000Z"  -- June 07, 2016
+    DESCRIPTION "Add Outbound traps"
+
+    REVISION  "201605060000Z"  -- May 06, 2016
+    DESCRIPTION "Removed ibCPUTemperature OBJECT-TYPE"
+
+    REVISION  "201511190000Z"  -- November 19, 2015
+    DESCRIPTION "Add SNIC interface statistics"
+
+    REVISION  "201510290000Z"  -- Oct 29, 2015
+    DESCRIPTION "Add Taxii service status"
+
+    REVISION  "201510090000Z"  -- Oct 9, 2015
+    DESCRIPTION "Add Analytics service status"
+
+    REVISION  "201505190000Z"  -- May 19, 2015
+    DESCRIPTION "Add new float OIDs for CPU temprature"
+
+    REVISION  "201407300000Z"  -- July 30, 2014
+    DESCRIPTION "Add Cloud API service status"
+
+    REVISION  "201310290000Z"  -- October 29, 2013
+    DESCRIPTION "Add Threat Protection service status info"
+
+    REVISION  "201310220000Z"  -- October 22, 2013
+    DESCRIPTION "Add Discovery Capacity info"
+
+    REVISION  "201308020000Z"  -- August 02, 2013
+    DESCRIPTION "Add Swap Usage info"
+
+    REVISION  "201305070000Z"  --  May 07, 2013
+    DESCRIPTION   "Added Discovery status services"
+
+    REVISION  "201205240000Z"  --  May 24, 2012
+    DESCRIPTION   "Rename Node1, Node2 to Node, PassiveNode"
+    
+    REVISION  "201204130000Z"  --  April 13, 2012
+    DESCRIPTION   "Added DNS Cache Acceleration info"
+    
+    REVISION  "201112020000Z"  --  December 02, 2011
+    DESCRIPTION   "Add support for 8 fans and 8 raid disks"
+    
+    REVISION  "201112010000Z"  --  December 01, 2011
+    DESCRIPTION   "Added second power-supply service"
+
+    REVISION  "201105050000Z"  --  May 05, 2011
+    DESCRIPTION   "Removed Radius service status info"
+
+    REVISION  "201011150000Z"  --  November 15, 2010
+    DESCRIPTION   "Added Bloxtools_move service status info"
+
+    REVISION  "201010190000Z"  --  October 19, 2010
+    DESCRIPTION   "Added BGP service status info"
+
+    REVISION  "201007280000Z"  --  July 28, 2010
+    DESCRIPTION   "Added MIBs for Node status info"
+
+    REVISION  "200906050000Z"  --  June 05, 2009
+    DESCRIPTION   "Added MIBs for CPU, Memory usage"
+
+    REVISION  "200809290000Z"  --  Sep 29, 2008
+    DESCRIPTION   "Added security counters"
+
+    REVISION  "200501100000Z"  --  Jan 10, 2005
+    DESCRIPTION   "Added copyright"
+
+    REVISION  "200405210000Z"  --  May 21, 2004
+    DESCRIPTION   "Creation of the MIB file"
+
+    ::= { ibPlatformOne 1 }
+
+-- PlatformOne Mib Definitions
+
+
+ibClusterReplicationStatusTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbClusterReplicationStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of Physical Node's Grid Replication Status."
+   ::= { ibPlatformModule 2 }
+
+ibClusterReplicationStatusEntry OBJECT-TYPE
+   SYNTAX        IbClusterReplicationStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row containing info about a particular
+                  grid replication status."
+   INDEX         {ibNodeIPAddress}
+   ::= { ibClusterReplicationStatusTable 1 }
+
+IbClusterReplicationStatusEntry ::=
+   SEQUENCE {
+     ibNodeIPAddress     	  IbIpAddr,
+     ibNodeReplicationStatus	  IbString,
+     ibNodeQueueFromMaster        INTEGER,
+     ibNodeLastRepTimeFromMaster  IbString,
+     ibNodeQueueToMaster          INTEGER,
+     ibNodeLastRepTimeToMaster	  IbString
+   }
+
+ibNodeIPAddress OBJECT-TYPE
+   SYNTAX        IbIpAddr
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Physical node IP address."
+   ::= { ibClusterReplicationStatusEntry 1 }
+
+ibNodeReplicationStatus OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Replication queue status for this node."
+   ::= { ibClusterReplicationStatusEntry 2 }
+
+ibNodeQueueFromMaster OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Sent queue size from master."
+   ::= { ibClusterReplicationStatusEntry 3 }
+
+ibNodeLastRepTimeFromMaster OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Last sent time from master."
+   ::= { ibClusterReplicationStatusEntry 4 }
+
+ibNodeQueueToMaster OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Receive queue size to master."
+   ::= { ibClusterReplicationStatusEntry 5 }
+
+ibNodeLastRepTimeToMaster OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Last receive time to master."
+   ::= { ibClusterReplicationStatusEntry 6 }
+
+ibNetworkMonitor OBJECT IDENTIFIER
+   ::= { ibPlatformModule 3 }
+
+ibHardwareType  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Infoblox One hardware type"
+   ::= { ibPlatformModule 4 }
+
+ibHardwareId  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Infoblox One hardware id"
+   ::= { ibPlatformModule 5 }
+
+ibSerialNumber  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Infoblox One device serial number"
+   ::= { ibPlatformModule 6 }
+
+ibNiosVersion  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Infoblox One NIOS version"
+   ::= { ibPlatformModule 7 }
+
+ibSystemMonitor  OBJECT IDENTIFIER
+   ::= { ibPlatformModule 8 }
+
+ibSystemMonitorCpu  OBJECT IDENTIFIER
+   ::= { ibSystemMonitor 1 }
+
+ibSystemMonitorMem  OBJECT IDENTIFIER
+   ::= { ibSystemMonitor 2 }
+
+ibSystemMonitorSwap  OBJECT IDENTIFIER
+   ::= { ibSystemMonitor 3 }
+
+ibSystemMonitorSnic  OBJECT IDENTIFIER
+   ::= { ibSystemMonitor 4 }
+
+ibSystemMonitorCpuUsage  OBJECT-TYPE
+   SYNTAX         INTEGER
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Current average CPU usage"
+   ::= { ibSystemMonitorCpu 1 }
+
+ibSystemMonitorMemUsage  OBJECT-TYPE
+   SYNTAX         INTEGER
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Current Memory usage"
+   ::= { ibSystemMonitorMem 1 }
+
+ibSystemMonitorSwapUsage  OBJECT-TYPE
+   SYNTAX         INTEGER
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Current Swap usage"
+   ::= { ibSystemMonitorSwap 1 }
+
+ibNetworkMonitorDNS  OBJECT IDENTIFIER
+   ::= { ibNetworkMonitor 1 }
+
+ibNetworkMonitorDNSActive OBJECT-TYPE
+   SYNTAX	INTEGER { nonactive(0), active(1) }
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Equal to 1 if monitoring is active. No other data is
+		likely to be correct if not active"
+   ::= { ibNetworkMonitorDNS 1 }
+
+ibNetworkMonitorDNSNonAA OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNS 2 }
+
+ibNetworkMonitorDNSNonAAT1 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSNonAA 1 }
+
+ibNetworkMonitorDNSNonAAT5 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSNonAA 2 }
+
+ibNetworkMonitorDNSNonAAT15 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSNonAA 3 }
+
+ibNetworkMonitorDNSNonAAT60 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSNonAA 4 }
+
+ibNetworkMonitorDNSNonAAT1440 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSNonAA 5 }
+
+ibNetworkMonitorDNSAA OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNS 3 }
+
+ibNetworkMonitorDNSAAT1 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSAA 1 }
+
+ibNetworkMonitorDNSAAT5 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSAA 2 }
+
+ibNetworkMonitorDNSAAT15 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSAA 3 }
+
+ibNetworkMonitorDNSAAT60 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSAA 4 }
+
+ibNetworkMonitorDNSAAT1440 OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSAA 5 }
+
+ibNetworkMonitorDNSNonAAT1AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 1 minute where the reply was
+		 non authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT1 1 }
+
+ibNetworkMonitorDNSNonAAT1Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 1 minute where the reply was non
+		 authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT1 2 }
+
+ibNetworkMonitorDNSNonAAT5AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 5 minutes where the reply was
+		 non authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT5 1 }
+
+ibNetworkMonitorDNSNonAAT5Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 5 minutes where the reply was non
+		 authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT5 2 }
+
+ibNetworkMonitorDNSNonAAT15AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 15 minutes where the reply was
+		 non authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT15 1 }
+
+ibNetworkMonitorDNSNonAAT15Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 15 minutes where the reply was non
+		 authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT15 2 }
+
+ibNetworkMonitorDNSNonAAT60AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 60 minutes where the reply was
+		 non authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT60 1 }
+
+ibNetworkMonitorDNSNonAAT60Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 60 minutes where the reply was non
+		 authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT60 2 }
+
+ibNetworkMonitorDNSNonAAT1440AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 1440 minutes (24 hours) where
+		 the reply was non authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT1440 1 }
+
+ibNetworkMonitorDNSNonAAT1440Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 1440 minutes (24 hours) where the
+		 reply was non authoritative"
+   ::= { ibNetworkMonitorDNSNonAAT1440 2 }
+
+ibNetworkMonitorDNSAAT1AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 1 minute where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT1 1 }
+
+ibNetworkMonitorDNSAAT1Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 1 minute where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT1 2 }
+
+ibNetworkMonitorDNSAAT5AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 5 minutes where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT5 1 }
+
+ibNetworkMonitorDNSAAT5Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 5 minutes where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT5 2 }
+
+ibNetworkMonitorDNSAAT15AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 15 minutes where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT15 1 }
+
+ibNetworkMonitorDNSAAT15Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 15 minutes where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT15 2 }
+
+ibNetworkMonitorDNSAAT60AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 60 minutes where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT60 1 }
+
+ibNetworkMonitorDNSAAT60Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 60 minutes where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT60 2 }
+
+ibNetworkMonitorDNSAAT1440AvgLatency OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Average Latencies (in microseconds) for incoming DNS
+		 queries during the last 1440 minutes (24 hours) where
+		 the reply was authoritative"
+   ::= { ibNetworkMonitorDNSAAT1440 1 }
+
+ibNetworkMonitorDNSAAT1440Count OBJECT-TYPE
+   SYNTAX	INTEGER
+   MAX-ACCESS	read-only
+   STATUS	current
+   DESCRIPTION	"Number of queries used to calculate the average latencies
+		 during the last 1440 minutes (24 hours) where the reply was
+		 authoritative"
+   ::= { ibNetworkMonitorDNSAAT1440 2 }
+
+ibNetworkMonitorDNSSecurity OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNS 4 }
+
+ibNetworkMonitorDNSSecurityInvalidPort OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSSecurity 1 }
+
+ibNetworkMonitorDNSSecurityInvalidPort1 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to invalid ports
+                during the last 1 minute"
+   ::= { ibNetworkMonitorDNSSecurityInvalidPort 1 }
+
+ibNetworkMonitorDNSSecurityInvalidPort5 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to invalid ports
+                during the last 5 minutes"
+   ::= { ibNetworkMonitorDNSSecurityInvalidPort 2 }
+
+ibNetworkMonitorDNSSecurityInvalidPort15 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to invalid ports
+                during the last 15 minutes"
+   ::= { ibNetworkMonitorDNSSecurityInvalidPort 3 }
+
+ibNetworkMonitorDNSSecurityInvalidPort60 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to invalid ports
+                during the last 60 minutes"
+   ::= { ibNetworkMonitorDNSSecurityInvalidPort 4 }
+
+ibNetworkMonitorDNSSecurityInvalidPort1440 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to invalid ports
+                during the last 1440 minutes (24 hours)"
+   ::= { ibNetworkMonitorDNSSecurityInvalidPort 5 }
+
+ibNetworkMonitorDNSSecurityInvalidPortCount OBJECT-TYPE
+   SYNTAX       Counter
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to invalid ports"
+   ::= { ibNetworkMonitorDNSSecurityInvalidPort 6 }
+
+ibNetworkMonitorDNSSecurityInvalidTxid OBJECT IDENTIFIER
+   ::= { ibNetworkMonitorDNSSecurity 2 }
+
+ibNetworkMonitorDNSSecurityInvalidTxid1 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses with an invalid TXID
+                during the last 1 minute"
+   ::= { ibNetworkMonitorDNSSecurityInvalidTxid 1 }
+
+ibNetworkMonitorDNSSecurityInvalidTxid5 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses with an invalid TXID
+                during the last 5 minutes"
+   ::= { ibNetworkMonitorDNSSecurityInvalidTxid 2 }
+
+ibNetworkMonitorDNSSecurityInvalidTxid15 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses with an invalid TXID
+                during the last 15 minutes"
+   ::= { ibNetworkMonitorDNSSecurityInvalidTxid 3 }
+
+ibNetworkMonitorDNSSecurityInvalidTxid60 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses with an invalid TXID
+                during the last 60 minutes"
+   ::= { ibNetworkMonitorDNSSecurityInvalidTxid 4 }
+
+ibNetworkMonitorDNSSecurityInvalidTxid1440 OBJECT-TYPE
+   SYNTAX       INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses with an invalid TXID
+                during the last 1440 minutes (24 hours)"
+   ::= { ibNetworkMonitorDNSSecurityInvalidTxid 5 }
+
+ibNetworkMonitorDNSSecurityInvalidTxidCount OBJECT-TYPE
+   SYNTAX       Counter
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses with an invalid TXID"
+   ::= { ibNetworkMonitorDNSSecurityInvalidTxid 6 }
+
+ibNetworkMonitorDNSSecurityInvalidPortOnly OBJECT-TYPE
+   SYNTAX       Counter
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to invalid ports
+                with a valid TXID"
+   ::= { ibNetworkMonitorDNSSecurity 3 }
+
+ibNetworkMonitorDNSSecurityInvalidTxidOnly OBJECT-TYPE
+   SYNTAX       Counter
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to valid ports
+                with an invalid TXID"
+   ::= { ibNetworkMonitorDNSSecurity 4 }
+
+ibNetworkMonitorDNSSecurityInvalidTxidAndPort OBJECT-TYPE
+   SYNTAX       Counter
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION  "Number of DNS responses to an invalid port
+                and with an invalid TXID"
+   ::= { ibNetworkMonitorDNSSecurity 5 }
+
+IbServiceStates ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "It defines the states for infoblox services
+                  Note: NTP service will always be running on NIOS,
+                  even when disabled in the GUI.This is for internal
+                  grid operations."
+   SYNTAX        INTEGER {
+                   working      (1),
+                   warning      (2),
+                   failed       (3),
+                   inactive     (4),
+                   unknown      (5)
+                 }
+
+IbServiceNames ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "It defines the names for infoblox services."
+   SYNTAX        INTEGER {
+                   dhcp             (1),
+                   dns              (2),
+                   ntp              (3),
+                   tftp             (4),
+                   http-file-dist   (5),
+                   ftp              (6),
+                   bloxtools-move   (7),
+                   bloxtools        (8),
+                   node-status      (9),
+                   disk-usage       (10),
+                   enet-lan         (11),
+                   enet-lan2        (12),
+                   enet-ha          (13),
+                   enet-mgmt        (14),
+                   lcd              (15),
+                   memory           (16),
+                   replication      (17),
+                   db-object        (18),
+                   raid-summary     (19),
+                   raid-disk1       (20),
+                   raid-disk2       (21),
+                   raid-disk3       (22),
+                   raid-disk4       (23),
+                   raid-disk5       (24),
+                   raid-disk6       (25),
+                   raid-disk7       (26),
+                   raid-disk8       (27),
+                   fan1             (28),
+                   fan2             (29),
+                   fan3             (30),
+                   fan4             (31),
+                   fan5             (32),
+                   fan6             (33),
+                   fan7             (34),
+                   fan8             (35),
+                   power-supply1    (36),
+                   power-supply2    (37),
+                   ntp-sync         (38),
+                   cpu1-temp        (39),
+                   cpu2-temp        (40),
+                   sys-temp         (41),
+                   raid-battery     (42),
+                   cpu-usage        (43),
+                   ospf             (44),
+                   bgp              (45),
+                   mgm-service      (46),
+                   subgrid-conn     (47),
+                   network-capacity (48),
+                   reporting        (49),
+                   dns-cache-acceleration        (50),
+                   ospf6            (51),
+                   swap-usage       (52),
+                   discovery-consolidator        (53),
+                   discovery-collector           (54),
+                   discovery-capacity            (55),
+                   threat-protection             (56),
+                   cloud-api                     (57),
+                   threat-analytics              (58),
+                   taxii                         (59),
+                   bfd                           (60),
+                   outbound                      (61)
+                 }
+
+ibMemberServiceStatusTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbMemberServiceStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of member service status."
+   ::= { ibPlatformModule 9 }
+
+ibMemberServiceStatusEntry OBJECT-TYPE
+   SYNTAX        IbMemberServiceStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row containing info about a particular
+                  service status."
+   INDEX         {ibServiceName}
+   ::= { ibMemberServiceStatusTable 1 }
+
+IbMemberServiceStatusEntry ::=
+   SEQUENCE {
+     ibServiceName                IbServiceNames,
+     ibServiceStatus              IbServiceStates,
+     ibServiceDesc                IbString
+   }
+
+ibServiceName OBJECT-TYPE
+   SYNTAX        IbServiceNames
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Name."
+   ::= { ibMemberServiceStatusEntry 1 }
+
+ibServiceStatus OBJECT-TYPE
+   SYNTAX        IbServiceStates
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Status."
+   ::= { ibMemberServiceStatusEntry 2 }
+
+ibServiceDesc OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Description."
+   ::= { ibMemberServiceStatusEntry 3 }
+
+ibMemberNodeServiceStatusTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbMemberNodeServiceStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of Physical Node's Service Status."
+   ::= { ibPlatformModule 10 }
+
+ibMemberNodeServiceStatusEntry OBJECT-TYPE
+   SYNTAX        IbMemberNodeServiceStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row containing info about a particular
+                  service status."
+   INDEX         {ibNodeServiceName}
+   ::= { ibMemberNodeServiceStatusTable 1 }
+
+IbMemberNodeServiceStatusEntry ::=
+   SEQUENCE {
+     ibNodeServiceName                IbServiceNames,
+     ibNodeServiceStatus              IbServiceStates,
+     ibNodeServiceDesc                IbString
+   }
+
+ibNodeServiceName OBJECT-TYPE
+   SYNTAX        IbServiceNames
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Name."
+   ::= { ibMemberNodeServiceStatusEntry 1 }
+
+ibNodeServiceStatus OBJECT-TYPE
+   SYNTAX        IbServiceStates
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Status."
+   ::= { ibMemberNodeServiceStatusEntry 2 }
+
+ibNodeServiceDesc OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Description."
+   ::= { ibMemberNodeServiceStatusEntry 3 }
+
+ibMemberPasiveNodeServiceStatusTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbMemberPasiveNodeServiceStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of Physical Node's Service Status."
+   ::= { ibPlatformModule 11 }
+
+ibMemberPasiveNodeServiceStatusEntry OBJECT-TYPE
+   SYNTAX        IbMemberPasiveNodeServiceStatusEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row containing info about a particular
+                  service status."
+   INDEX         {ibPasiveNodeServiceName}
+   ::= { ibMemberPasiveNodeServiceStatusTable 1 }
+
+IbMemberPasiveNodeServiceStatusEntry ::=
+   SEQUENCE {
+     ibPasiveNodeServiceName                IbServiceNames,
+     ibPasiveNodeServiceStatus              IbServiceStates,
+     ibPasiveNodeServiceDesc                IbString
+   }
+
+ibPasiveNodeServiceName OBJECT-TYPE
+   SYNTAX        IbServiceNames
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Name."
+   ::= { ibMemberPasiveNodeServiceStatusEntry 1 }
+
+ibPasiveNodeServiceStatus OBJECT-TYPE
+   SYNTAX        IbServiceStates
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Status."
+   ::= { ibMemberPasiveNodeServiceStatusEntry 2 }
+
+ibPasiveNodeServiceDesc OBJECT-TYPE
+   SYNTAX        IbString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "Service Description."
+   ::= { ibMemberPasiveNodeServiceStatusEntry 3 }
+
+ibGridStatus  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Grid Status"
+   ::= { ibPlatformModule 12 }
+
+ibHaStatus  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "High Availability Status"
+   ::= { ibPlatformModule 13 }
+
+ibGridMasterCandStatus  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Grid Master candidate status"
+   ::= { ibPlatformModule 14 }
+
+ibGridMasterVIP  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Grid Master virtual IP address"
+   ::= { ibPlatformModule 15 }
+
+ibGridReplicationState  OBJECT-TYPE
+   SYNTAX         IbString
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Grid Replication State"
+   ::= { ibPlatformModule 16 }
+
+ibCPU1Temperature  OBJECT-TYPE
+   SYNTAX         IbFloat 
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Infoblox CPU One temperature."
+   ::= { ibPlatformModule 17 }
+
+ibCPU2Temperature  OBJECT-TYPE
+   SYNTAX         IbFloat 
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION "Infoblox CPU Two temperature."
+   ::= { ibPlatformModule 18 }
+
+IbSnicNames ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION   "It defines the names for SNIC supported interfaces."
+   SYNTAX        INTEGER {
+                   lan1             (1),
+                   lan2             (2),
+                   ha               (3)
+                 }
+
+ibSystemMonitorSnicStatsTable1 OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbSystemMonitorSnicStatsEntry1
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of SNIC statistics during last 1 min."
+   ::= { ibSystemMonitorSnic 1 }
+
+ibSystemMonitorSnicStatsEntry1 OBJECT-TYPE
+   SYNTAX        IbSystemMonitorSnicStatsEntry1
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row containing info about a particular
+                  SNIC statistics."
+   INDEX         { ibSnicName1 }
+   ::= { ibSystemMonitorSnicStatsTable1 1 }
+
+IbSystemMonitorSnicStatsEntry1 ::=
+   SEQUENCE {
+     ibSnicName1                   IbSnicNames,
+     ibSnicRxBits1                 INTEGER,
+     ibSnicRxPackets1              INTEGER,
+     ibSnicTxBits1                 INTEGER,
+     ibSnicTxPackets1              INTEGER,
+     ibSnicDropBits1               INTEGER,
+     ibSnicDropPackets1            INTEGER
+   }
+
+ibSnicName1 OBJECT-TYPE
+   SYNTAX        IbSnicNames
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic Name."
+   ::= { ibSystemMonitorSnicStatsEntry1 1 }
+
+ibSnicRxBits1 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic recieved bits per second."
+   ::= { ibSystemMonitorSnicStatsEntry1 2 }
+
+ibSnicRxPackets1 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic recieved packets per second."
+   ::= { ibSystemMonitorSnicStatsEntry1 3 }
+
+ibSnicTxBits1 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic sent bits per second."
+   ::= { ibSystemMonitorSnicStatsEntry1 4 }
+
+ibSnicTxPackets1 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic sent packets per second."
+   ::= { ibSystemMonitorSnicStatsEntry1 5 }
+
+ibSnicDropBits1 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic dropped bits per second."
+   ::= { ibSystemMonitorSnicStatsEntry1 6 }
+
+ibSnicDropPackets1 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic dropped packets per second."
+   ::= { ibSystemMonitorSnicStatsEntry1 7 }
+
+
+
+ibSystemMonitorSnicStatsTable5 OBJECT-TYPE
+   SYNTAX SEQUENCE OF IbSystemMonitorSnicStatsEntry5
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A table of SNIC statistics during last 5 min."
+   ::= { ibSystemMonitorSnic 2 }
+
+ibSystemMonitorSnicStatsEntry5 OBJECT-TYPE
+   SYNTAX        IbSystemMonitorSnicStatsEntry5
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION   "A conceptual row containing info about a particular
+                  SNIC statistics."
+   INDEX         { ibSnicName5 }
+   ::= { ibSystemMonitorSnicStatsTable5 1 }
+
+IbSystemMonitorSnicStatsEntry5 ::=
+   SEQUENCE {
+     ibSnicName5                   IbSnicNames,
+     ibSnicRxBits5                 INTEGER,
+     ibSnicRxPackets5              INTEGER,
+     ibSnicTxBits5                 INTEGER,
+     ibSnicTxPackets5              INTEGER,
+     ibSnicDropBits5               INTEGER,
+     ibSnicDropPackets5            INTEGER
+   }
+
+ibSnicName5 OBJECT-TYPE
+   SYNTAX        IbSnicNames
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic Name."
+   ::= { ibSystemMonitorSnicStatsEntry5 1 }
+
+ibSnicRxBits5 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic recieved bits per second."
+   ::= { ibSystemMonitorSnicStatsEntry5 2 }
+
+ibSnicRxPackets5 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic recieved packets per second."
+   ::= { ibSystemMonitorSnicStatsEntry5 3 }
+
+ibSnicTxBits5 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic sent bits per second."
+   ::= { ibSystemMonitorSnicStatsEntry5 4 }
+
+ibSnicTxPackets5 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic sent packets per second."
+   ::= { ibSystemMonitorSnicStatsEntry5 5 }
+
+ibSnicDropBits5 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic dropped bits per second."
+   ::= { ibSystemMonitorSnicStatsEntry5 6 }
+
+ibSnicDropPackets5 OBJECT-TYPE
+   SYNTAX        INTEGER
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION   "SmartNic dropped packets per second."
+   ::= { ibSystemMonitorSnicStatsEntry5 7 }
+
+END

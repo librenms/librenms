@@ -1,0 +1,476 @@
+LENOVO-ENV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32
+ 	    FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION	
+	    FROM SNMPv2-TC
+    SnmpAdminString                      
+		FROM SNMP-FRAMEWORK-MIB
+	PhysicalIndex   
+		FROM ENTITY-MIB
+    network-mibs                               
+	    FROM LENOVO-SMI-MIB;
+
+-------------------------------------------------------------------------------
+-- Module Identity
+-------------------------------------------------------------------------------
+		
+lenovoEnvMIB MODULE-IDENTITY
+    LAST-UPDATED "201609230000Z"    -- 09/23/2016 00:00GMT
+	ORGANIZATION "Lenovo"
+    CONTACT-INFO "
+                Lenovo 
+                3325 Scott Blvd.
+                Santa Clara, CA 95054
+                " 
+    DESCRIPTION " 
+        Defines environmental notifications
+                "
+	REVISION       "201609230000Z"    -- 09/23/2016 00:00GMT
+    DESCRIPTION    "Initial version."
+
+    ::= { network-mibs 11 }
+
+-------------------------------------------------------------------------------
+-- Textual Conventions
+-------------------------------------------------------------------------------
+
+LenovoEnvMibPowerSupplyState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Status of the Power Supply"
+    SYNTAX INTEGER {
+        off(0),
+        on(1),
+        absent(2),
+		outputFault (3)
+        }
+
+LenovoEnvMibFanState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Status of the Fan"
+    SYNTAX INTEGER {
+         ok(0),
+         absent(1),
+		 fault (2)
+        }
+
+LenovoEnvMibTempSensorState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Status of the temperature sensor"
+    SYNTAX INTEGER {
+         ok(0),
+         fault(1)
+        }
+		
+LenovoEnvMibTempSensorThreshold ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Threshold that was crossed that generated the notification"
+    SYNTAX INTEGER {
+         warning(0),
+         failure(1),
+         ok(2)
+        }
+		
+LenovoEnvMibFanAirFlow ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Air flow direction of the Fan"
+    SYNTAX INTEGER {
+         front2back(0),
+         back2front(1),
+         notinstalled(2)
+        }
+
+-------------------------------------------------------------------------------
+-- Objects 
+-------------------------------------------------------------------------------
+
+lenovoEnvMibObjects OBJECT IDENTIFIER ::= { lenovoEnvMIB 1 }
+
+lenovoEnvMibPowerSupplyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF LenovoEnvMibPowerSupplyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table contains information for the 
+        various power supplies in the switch."
+    ::= { lenovoEnvMibObjects 1 }
+
+lenovoEnvMibPowerSupplyEntry OBJECT-TYPE
+    SYNTAX       LenovoEnvMibPowerSupplyEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A single row containing information for a power supply.  
+		The power supply description and name are derived from
+		values in the Entity MIB.  Row is indexed using the same
+		index used by the Physical Table of the Entity MIB"
+    INDEX { lenovoEnvMibPowerSupplyIndex } 
+    ::= { lenovoEnvMibPowerSupplyTable 1 }
+
+LenovoEnvMibPowerSupplyEntry ::= SEQUENCE {
+    lenovoEnvMibPowerSupplyIndex  PhysicalIndex,
+	lenovoEnvMibPowerSupplyID     Integer32,
+	lenovoEnvMibPowerSupplyDesc   SnmpAdminString,
+    lenovoEnvMibPowerSupplyName   SnmpAdminString,
+	lenovoEnvMibPowerSupplyState  LenovoEnvMibPowerSupplyState
+}
+
+lenovoEnvMibPowerSupplyIndex OBJECT-TYPE
+    SYNTAX        PhysicalIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Index of entry for power supply in Physical Table of Entity MIB"
+    ::= { lenovoEnvMibPowerSupplyEntry 1 }
+	
+lenovoEnvMibPowerSupplyID OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "ID of power supply"
+    ::= { lenovoEnvMibPowerSupplyEntry 2 }
+	
+lenovoEnvMibPowerSupplyDesc   OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Description of power supply"
+    ::= { lenovoEnvMibPowerSupplyEntry 3 }
+	
+lenovoEnvMibPowerSupplyName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Name of power supply"
+    ::= { lenovoEnvMibPowerSupplyEntry 4 }
+	
+lenovoEnvMibPowerSupplyState OBJECT-TYPE
+    SYNTAX        LenovoEnvMibPowerSupplyState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "State of the power supply"
+    ::= { lenovoEnvMibPowerSupplyEntry 5 }
+	
+lenovoEnvMibFanTable OBJECT-TYPE 
+    SYNTAX       SEQUENCE OF LenovoEnvMibFanEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table contains information for the 
+        various fans in the switch."
+    ::= { lenovoEnvMibObjects 2 }
+
+lenovoEnvMibFanEntry OBJECT-TYPE 
+    SYNTAX       LenovoEnvMibFanEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A single row containing information for a fan.  
+		The fan description and name are derived from
+		values in the Entity MIB.  Row is indexed using the same
+		index used by the Physical Table of the Entity MIB"
+    INDEX { lenovoEnvMibFanIndex } 
+	::= { lenovoEnvMibFanTable 1 }
+
+LenovoEnvMibFanEntry ::= SEQUENCE {
+    lenovoEnvMibFanIndex         PhysicalIndex,
+	lenovoEnvMibFanID            Integer32,
+	lenovoEnvMibFanDesc          SnmpAdminString,
+    lenovoEnvMibFanName          SnmpAdminString,
+	lenovoEnvMibFanState         LenovoEnvMibFanState,
+	lenovoEnvMibFanAirFlow       LenovoEnvMibFanAirFlow,
+	lenovoEnvMibFanModule        Integer32,
+	lenovoEnvMibFanSpeedRPM      Integer32,
+	lenovoEnvMibFanSpeedPercent  Gauge32
+}
+	
+lenovoEnvMibFanIndex OBJECT-TYPE
+    SYNTAX        PhysicalIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Index of entry for fan in Physical Table of Entity MIB"
+    ::= { lenovoEnvMibFanEntry 1 }
+	
+lenovoEnvMibFanID OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "ID of fan"
+    ::= { lenovoEnvMibFanEntry 2 }
+	
+	
+lenovoEnvMibFanDesc OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Description of fan"
+    ::= { lenovoEnvMibFanEntry 3 }
+	
+	
+lenovoEnvMibFanName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Name of fan"
+    ::= { lenovoEnvMibFanEntry 4 }
+	
+	
+lenovoEnvMibFanState OBJECT-TYPE
+    SYNTAX        LenovoEnvMibFanState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "State of the fan"
+    ::= { lenovoEnvMibFanEntry 5 }
+	
+	
+lenovoEnvMibFanAirFlow OBJECT-TYPE
+    SYNTAX        LenovoEnvMibFanAirFlow
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Airflow direction of the fan"
+    ::= { lenovoEnvMibFanEntry 6 }
+	
+	
+lenovoEnvMibFanModule OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Module number of the fan"
+    ::= { lenovoEnvMibFanEntry 7 }
+	
+lenovoEnvMibFanSpeedRPM OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Speed of the fan in revolutions per minute (RPM)"
+    ::= { lenovoEnvMibFanEntry 8 }
+	
+	
+lenovoEnvMibFanSpeedPercent OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Speed of the fan as a percentage"
+    ::= { lenovoEnvMibFanEntry 9 }
+		
+lenovoEnvMibTempSensorTable OBJECT-TYPE  
+    SYNTAX       SEQUENCE OF LenovoEnvMibTempSensorEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table contains information for the 
+        various temperature sensors in the switch."
+    ::= { lenovoEnvMibObjects 3 }
+
+lenovoEnvMibTempSensorEntry OBJECT-TYPE 
+    SYNTAX       LenovoEnvMibTempSensorEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A single row containing information for a temperature sensor.  
+		The temperature sensor description and name are derived from
+		values in the Entity MIB.  Row is indexed using the same
+		index used by the Physical Table of the Entity MIB"
+    INDEX { lenovoEnvMibTempSensorIndex } 
+	::= { lenovoEnvMibTempSensorTable 1 }
+
+LenovoEnvMibTempSensorEntry ::= SEQUENCE {
+    lenovoEnvMibTempSensorIndex         PhysicalIndex,
+	lenovoEnvMibTempSensorID            Integer32,
+	lenovoEnvMibTempSensorDesc          SnmpAdminString,
+    lenovoEnvMibTempSensorName          SnmpAdminString,
+	lenovoEnvMibTempSensorState         LenovoEnvMibTempSensorState,
+	lenovoEnvMibTempSensorTemperature   Integer32
+}
+	
+lenovoEnvMibTempSensorIndex OBJECT-TYPE
+    SYNTAX        PhysicalIndex
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Index of entry for temperature sensor in Physical Table of Entity MIB"
+    ::= { lenovoEnvMibTempSensorEntry 1 }
+	
+lenovoEnvMibTempSensorID OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "ID of temperature sensor"
+    ::= { lenovoEnvMibTempSensorEntry 2 }
+		
+lenovoEnvMibTempSensorDesc OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Description of temperature sensor"
+    ::= { lenovoEnvMibTempSensorEntry 3 }
+	
+lenovoEnvMibTempSensorName OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Name of temperature sensor"
+    ::= { lenovoEnvMibTempSensorEntry 4 }
+	
+lenovoEnvMibTempSensorState OBJECT-TYPE
+    SYNTAX        LenovoEnvMibTempSensorState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "State of the temperature sensor"
+    ::= { lenovoEnvMibTempSensorEntry 5 }
+	
+lenovoEnvMibTempSensorTemperature OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "Temperature of the sensor in Celcius"
+    ::= { lenovoEnvMibTempSensorEntry 6 }	
+
+lenovoEnvMibTempSensorThresholds OBJECT IDENTIFIER ::= { lenovoEnvMibObjects 4 }	
+	
+lenovoEnvMIBTempSensorWarning OBJECT-TYPE
+	SYNTAX 		Integer32
+	MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION       
+        "System temperature sensor warning threshold value"
+    ::= { lenovoEnvMibTempSensorThresholds 1 }
+
+lenovoEnvMIBTempSensorShutdown OBJECT-TYPE
+	SYNTAX 		Integer32
+	MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION       
+        "System temperature sensor shutdown/failure threshold value"
+    ::= { lenovoEnvMibTempSensorThresholds 2 }
+
+lenovoEnvMIBTempSensorSetPoint OBJECT-TYPE
+	SYNTAX 		Integer32
+	MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION       
+        "System temperature sensor set point threshold value"
+    ::= { lenovoEnvMibTempSensorThresholds 3 }	
+	
+-------------------------------------------------------------------------------
+-- Notifications 
+-------------------------------------------------------------------------------
+	
+lenovoEnvMibNotificationPrefix OBJECT IDENTIFIER ::= { lenovoEnvMIB 3 }
+
+lenovoEnvMibNotifications OBJECT IDENTIFIER ::= { lenovoEnvMibNotificationPrefix 0 }
+
+lenovoEnvMibNotificationObjects OBJECT IDENTIFIER ::= { lenovoEnvMibNotificationPrefix 1 }
+
+lenovoEnvMibTempSensorThreshold OBJECT-TYPE
+	SYNTAX LenovoEnvMibTempSensorThreshold
+	MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION       
+        "Threshold that was crossed that generated the notification"
+    ::= { lenovoEnvMibNotificationObjects 1 }
+	
+lenovoEnvMibPowerSupplyFailure NOTIFICATION-TYPE
+    OBJECTS {
+			lenovoEnvMibPowerSupplyID,
+			lenovoEnvMibPowerSupplyName,
+			lenovoEnvMibPowerSupplyState
+			}
+	STATUS  current
+	DESCRIPTION
+			"This trap signifies that a power supply has failed."
+	--#SEVERITY CRITICAL
+	::= { lenovoEnvMibNotifications 1 }
+
+lenovoEnvMibPowerSupplyFixed NOTIFICATION-TYPE
+	OBJECTS {
+			lenovoEnvMibPowerSupplyID,
+			lenovoEnvMibPowerSupplyName,
+			lenovoEnvMibPowerSupplyState
+			}
+	STATUS  current
+	DESCRIPTION
+			"This trap signifies that a power supply has been restored."
+	--#SEVERITY INFORMATIONAL
+	::= { lenovoEnvMibNotifications 2 }
+
+lenovoEnvMibFanFailure NOTIFICATION-TYPE
+	OBJECTS {
+			lenovoEnvMibFanID,
+			lenovoEnvMibFanName,
+			lenovoEnvMibFanState,
+			lenovoEnvMibFanRPM
+			}
+	STATUS  current
+	DESCRIPTION
+			"This trap signifies that a fan has failed."
+	--#SEVERITY CRITICAL
+	::= { lenovoEnvMibNotifications 3 }
+
+lenovoEnvMibFanFixed NOTIFICATION-TYPE
+	OBJECTS {
+			lenovoEnvMibFanID,
+			lenovoEnvMibFanName,
+			lenovoEnvMibFanState,
+			lenovoEnvMibFanRPM
+			}
+	STATUS  current
+	DESCRIPTION
+			"This trap signifies that a fan has been restored."
+	--#SEVERITY INFORMATIONAL
+	::= { lenovoEnvMibNotifications 4 }
+		
+lenovoEnvMibTempSensorFailure NOTIFICATION-TYPE
+	OBJECTS {
+			lenovoEnvMibTempSensorID,
+			lenovoEnvMibTempSensorName,
+			lenovoEnvMibTempSensorState,
+			lenovoEnvMibTempSensorTemperature,
+			lenovoEnvMibTempSensorThreshold				
+			}
+	STATUS  current
+	DESCRIPTION
+			"This trap signifies that a temperature sensor has failed."
+	--#SEVERITY CRITICAL
+	::= { lenovoEnvMibNotifications 5 }
+
+lenovoEnvMibTempSensorFixed NOTIFICATION-TYPE
+	OBJECTS {
+			lenovoEnvMibTempSensorID,
+			lenovoEnvMibTempSensorName,
+			lenovoEnvMibTempSensorState,
+			lenovoEnvMibTempSensorTemperature,
+			lenovoEnvMibTempSensorThreshold				
+			}
+	STATUS  current
+	DESCRIPTION
+			"This trap signifies that a temperature sensor has been restored."
+	--#SEVERITY INFORMATIONAL
+	::= { lenovoEnvMibNotifications 6 }
+
+END
+

@@ -1,0 +1,439 @@
+-- ==================================================================
+-- Copyright (C) 2002 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI RPR extend MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- ==================================================================
+
+    HUAWEI-RPR-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            rprIfIndex, rprIfWrapConfig, rprIfRingOperModes, rprIfCurrentStatus, rprSpanIfIndex, 
+            rprSpanId, rprSpanTotalRingletReservedRate, rprTopoImageIfIndex, rprTopoImageMacAddress, rprTopoImageStationIfIndex, 
+            rprTopoImageRinglet0Hops, rprTopoImageRinglet1Hops, rprTopoImageWestProtectionStatus, rprTopoImageEastProtectionStatus, rprTopoImageStatus, 
+            RprSpan            
+                FROM IEEE-802DOT17-RPR-MIB            
+            ifIndex, ifPhysAddress, ifName, InterfaceIndex            
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+    
+    
+        hwRPR MODULE-IDENTITY 
+            LAST-UPDATED "200601090000Z"        -- January 09, 2006 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                " R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd.,
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085
+                Http://www.huawei.com
+                E-mail:support@huawei.com "
+            DESCRIPTION 
+                "The HUAWEI-RPR-TRAP-MIB contains objects to
+                Monitor the RPR TRAPs.
+                
+                *********************************
+                RPR TRAP
+                **********************************
+                 This RPR TRAP consists of the following TRAPs:
+                 1 :  hwRPRexcessReservedRateDefect
+                 2 :  hwRPRprotMisconfigDefect
+                 3 :  hwRPRtopoChange
+                 4 :  hwRPRtopoInvalidDefect
+                 5 :  hwRPRduplicateMacAddressDefect
+                 6 :  hwRPRtopoInstabilityDefect
+                 7 :  hwRPRtopoStabilityRestore
+                 8 :  hwRPRPhyIfEventTrap
+                 9 :  hwRPRLogicIfEventTrap
+                "
+            ::= { hwDatacomm 36 }
+        
+    
+    
+--
+-- Node definitions
+--
+    
+        hwRPRObjects OBJECT IDENTIFIER ::= { hwRPR 1 }
+        
+        hwRPRIfEventTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRPRIfEventEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of  interface event information."
+            ::= { hwRPRObjects 1 }
+        
+        hwRPRIfEventEntry OBJECT-TYPE
+            SYNTAX HwRPRIfEventEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Interface event information Entry."
+            INDEX { hwRPRLogicIfIndex, hwRPRLogicIfSpanId }
+            ::= { hwRPRIfEventTable 1 }
+        
+        HwRPRIfEventEntry ::=
+            SEQUENCE { 
+                hwRPRLogicIfIndex
+                    InterfaceIndex,
+                hwRPRLogicIfSpanId
+                    RprSpan,
+                hwRPRLogicIfEvent
+                    INTEGER,
+                hwRPRPhyIfEvent
+                    INTEGER
+             }
+
+        hwRPRLogicIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ifIndex of this RPR logic interface."
+            ::= { hwRPRIfEventEntry 1 }
+        
+        hwRPRLogicIfSpanId OBJECT-TYPE
+            SYNTAX RprSpan
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The SpanId of this RPR logic interface."
+            ::= { hwRPRIfEventEntry 2 }
+        
+        hwRPRLogicIfEvent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                sd(1),
+                sf(2),
+                mateerr(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Type of logic interface event.
+                SD indicates that SDH Signal of the RPR logic interface degrades;
+                SF indicates that SDH Signal of the RPR logic interface fails;
+                MATEERR indicates that mate cable error caused by mate cable of
+                the RPR physical interface is linked incorrect;
+                "
+            ::= { hwRPRIfEventEntry 3 }
+        
+        hwRPRPhyIfEvent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                sdHFramerSDst(1),
+                sdHFramerSFst(2),
+                sdHFramerLOSst(3),
+                sdHFramerLOFst(4),
+                sdHFramerRDIst(5),
+                sdHFramerAISst(6),
+                sdHFramerREIst(7),
+                miscabling(8),
+                keepalive(9),
+                mateState(10)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Type of physical interface event.
+                SDHFramerSDst indicates that SDH Signal of the RPR physical interface degrades;
+                SDHFramerSFst indicates that SDH Signal of the RPR physical interface fails;
+                SDHFramerLOSst indicates that SDH Signal of the RPR physical interface loses;
+                SDHFramerLOFst indicates that SDH framer of the RPR physical interface loses;
+                SDHFramerRDIst indicates that remote Defect Indication ;
+                SDHFramerAISst indicates that alarm Indication Signal;
+                SDHFramerREIst indicates that remote ErrorIndication;
+                Miscabling indicates that cable of the RPR physical interface is linked incorrect;
+                Keepalive indicates that an exchange of messages allowing verification
+                that communication between stations is not active;
+                MateState indicates that mate cable of the RPR physical interface is linked incorrect.
+                "
+            ::= { hwRPRIfEventEntry 4 }
+        
+        hwRPRIfConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRPRIfConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of RPR logic interface configuration information."
+            ::= { hwRPRObjects 2 }
+        
+        hwRPRIfConfigEntry OBJECT-TYPE
+            SYNTAX HwRPRIfConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "RPR interface Configuration entry."
+            INDEX { hwRPRIfConfigIfIndex }
+            ::= { hwRPRIfConfigTable 1 }
+        
+        HwRPRIfConfigEntry ::=
+            SEQUENCE { 
+                hwRPRIfConfigIfIndex InterfaceIndex,
+                hwRPRLogicIfTotalBandWidth INTEGER
+             }
+        hwRPRIfConfigIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The ifIndex of this RPR logic interface."
+            ::= { hwRPRIfConfigEntry 1 }
+        hwRPRLogicIfTotalBandWidth OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                bandwidth1000(1000),
+                bandwidth2488(2488),
+                bandwidth10000(10000)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The total bandwidth of this RPR logic interface."
+            ::= { hwRPRIfConfigEntry 2 }
+        
+        hwRPRTraps OBJECT IDENTIFIER ::= { hwRPR 2 }
+        
+        hwRPRexcessReservedRateDefect NOTIFICATION-TYPE
+            OBJECTS { rprSpanTotalRingletReservedRate }
+            STATUS current
+            DESCRIPTION 
+                "This defect indicates that the amount of reserved
+                bandwidth on a ringlet exceeds the available LINK_RATE.
+                When an excess reserved rate defect is present,
+                a notification may be generated.
+                "
+            ::= { hwRPRTraps 1 }
+        
+        hwRPRprotMisconfigDefect NOTIFICATION-TYPE
+            OBJECTS { rprIfWrapConfig, rprIfRingOperModes }
+            STATUS current
+            DESCRIPTION 
+                "A critical severity defect that indicates the presence
+                of mismatched-protection-configuration stations, based
+                on the value returned by MismatchedProtection().
+                When a protection configuration defect is present
+                on the station, a notification may be generated.
+                "
+            ::= { hwRPRTraps 2 }
+        
+        hwRPRtopoChange NOTIFICATION-TYPE
+            OBJECTS { rprTopoImageStationIfIndex, rprTopoImageStatus, rprTopoImageWestProtectionStatus, rprTopoImageEastProtectionStatus, rprIfCurrentStatus
+                 }
+            STATUS current
+            DESCRIPTION 
+                "When an  topology change is present,
+                a notification may be generated..
+                "
+            ::= { hwRPRTraps 3 }
+        
+        hwRPRtopoInvalidDefect NOTIFICATION-TYPE
+            OBJECTS { ifPhysAddress, rprIfCurrentStatus }
+            STATUS current
+            DESCRIPTION 
+                "A critical severity defect indicating that an
+                invalid entry has been found within the scope
+                of the topology,the stations on the ring excess
+                the MAX_STATIONS or the local station has one
+                or more duplicate secondary MAC addresses. When
+                a topology entry invalid defect ,exceeing MaxStations
+                or  duplicate secondary MAC addresses is present,
+                a notification may be generated.
+                "
+            ::= { hwRPRTraps 4 }
+        
+        hwRPRduplicateMacAddressDefect NOTIFICATION-TYPE
+            OBJECTS { ifPhysAddress, rprTopoImageRinglet0Hops, rprTopoImageRinglet1Hops }
+            STATUS current
+            DESCRIPTION 
+                "A critical severity defect indicating that a
+                duplicateMacAddress has been found on the ring.
+                When a duplicateMacAddress defect is present,
+                a notification may be generated.
+                "
+            ::= { hwRPRTraps 5 }
+        
+        hwRPRtopoInstabilityDefect NOTIFICATION-TYPE
+            OBJECTS { ifPhysAddress }
+            STATUS current
+            DESCRIPTION 
+                "The critical severity Instable topology defect.
+                When an Instable topology defect is present,
+                a notification may be generated.
+                "
+            ::= { hwRPRTraps 6 }
+        
+        hwRPRtopoStabilityRestore NOTIFICATION-TYPE
+            OBJECTS { ifPhysAddress }
+            STATUS current
+            DESCRIPTION 
+                "The critical severity Instable topology restore.
+                When an stable topology  is present,
+                a notification may be generated.
+                "
+            ::= { hwRPRTraps 7 }
+        
+        hwRPRPhyIfEventTrap NOTIFICATION-TYPE
+            OBJECTS { hwRPRLogicIfIndex, hwRPRLogicIfSpanId, hwRPRPhyIfEvent }
+            STATUS current
+            DESCRIPTION 
+                "The critical severity physical interface defect.
+                When an physical interface  defect is present,
+                a notification may be generated.
+                "
+            ::= { hwRPRTraps 8 }
+        
+        hwRPRLogicIfEventTrap NOTIFICATION-TYPE
+            OBJECTS { hwRPRLogicIfIndex, hwRPRLogicIfSpanId, hwRPRLogicIfEvent }
+            STATUS current
+            DESCRIPTION 
+                "The critical severity Logic interface defect.
+                When an logic interface  defect that caused
+                by physical interface event is present,
+                a notification may be generated.
+                "
+            ::= { hwRPRTraps 9 }
+        
+        hwRPRNodeConErr NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "On RPR ring, to detect the connection, a kind of packet
+                is send between neighbor RPR nodes, This kind of packet 
+                is SC(Single-Choke) packet, If a node cannot receive SC 
+                packet from neighbor node in KEEPALIVE time, then there 
+                is failure between the two nodes. When happened, auto protection 
+                is executed by software.!"
+            ::= { hwRPRTraps 10 }
+        
+        hwRPRNodeConErrResume NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "On RPR ring, to detect the connection, a kind of packet
+                is send between neighbor RPR nodes, This kind of packet 
+                is SC(Single-Choke) packet, If a node cannot receive SC 
+                packet from neighbor node in KEEPALIVE time, then there 
+                is failure between the two nodes. When failure is resumed
+                 , this notification is sent.!"
+            ::= { hwRPRTraps 11 }
+        
+        hwRPRNodeMisCabling NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "Optical fiber is connected in error. i.e the east direction 
+                of one node is connected with east direction of another node, 
+                or the west direction of one node is connected with west direction 
+                of another node!"
+            ::= { hwRPRTraps 12 }
+        
+        hwRPRNodeMisCablingResume NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "when phenomena that Optical fiber is connected in error disappears,
+                this notification is sent!"
+            ::= { hwRPRTraps 13 }
+        
+        hwRPRMateErr NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "In double RPR operating mode, east and west directions 
+                of one rpr node lay on two RPR cards, These two cards are 
+                internally conntected by Gigaibit-ethernet, which is called 
+                MATE interface. The RPR nodes cannot work normaly under 
+                condition of MATE error.!"
+            ::= { hwRPRTraps 14 }
+        
+        hwRPRMateErrResume NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "In double RPR operating mode, east and west directions 
+                of one rpr node lay on two RPR cards, These two cards are 
+                internally conntected by Gigaibit-ethernet, which is called 
+                MATE interface. The RPR nodes cannot work normaly under 
+                condition of MATE error.when MATE error is resumed ,this 
+                notification is sent!"
+            ::= { hwRPRTraps 15 }
+        
+        hwRPRLOS NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "On RPR physical layer, link connection is detected 
+                through physical singal. When can't receive physical
+                 singal, then local node from neighbor node, LOS(lost of signal) 
+                 alarm is report, auto protection is executed by software.!"
+            ::= { hwRPRTraps 16 }
+        
+        hwRPRLOSResume NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "On RPR physical layer, link connection is detected 
+                through physical singal. When can't receive physical
+                singal, then local node from neighbor node, LOS(lost of signal) 
+                alarm is report, auto protection is executed by software.when LOS
+                is resumed,this notification is sent"
+            ::= { hwRPRTraps 17 }
+        
+        hwRPRTrapConformance OBJECT IDENTIFIER ::= { hwRPR 3 }
+        
+        hwRPRTrapCompliances OBJECT IDENTIFIER ::= { hwRPRTrapConformance 1 }
+        
+        hwRPRTrapCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities that implement
+                RPRTRAP on a router.
+                "
+            MODULE -- this module
+                MANDATORY-GROUPS { hwRPRIfEventGroup, hwRPRTrapGroup }
+            ::= { hwRPRTrapCompliances 1 }
+        
+        hwRPRTrapGroups OBJECT IDENTIFIER ::= { hwRPRTrapConformance 2 }
+        
+        hwRPRIfEventGroup OBJECT-GROUP
+            OBJECTS { hwRPRLogicIfIndex, hwRPRLogicIfSpanId, hwRPRPhyIfEvent, hwRPRLogicIfEvent }
+            STATUS current
+            DESCRIPTION 
+                "provide RPRTRAP objects configuration information. "
+            ::= { hwRPRTrapGroups 1 }
+        
+        hwRPRTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwRPRexcessReservedRateDefect, hwRPRprotMisconfigDefect, hwRPRtopoChange, hwRPRtopoInvalidDefect, hwRPRduplicateMacAddressDefect, 
+                hwRPRtopoInstabilityDefect, hwRPRtopoStabilityRestore, hwRPRPhyIfEventTrap, hwRPRLogicIfEventTrap, hwRPRNodeConErr, 
+                hwRPRNodeConErrResume, hwRPRNodeMisCabling, hwRPRNodeMisCablingResume, hwRPRMateErr, hwRPRMateErrResume, 
+                hwRPRLOS, hwRPRLOSResume }
+            STATUS current
+            DESCRIPTION 
+                "Required objects to provide RPRTRAP objects configuration
+                information. "
+            ::= { hwRPRTrapGroups 2 }
+        
+        hwRPRIfConfigGroup OBJECT-GROUP
+            OBJECTS { hwRPRLogicIfTotalBandWidth }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRPRTrapGroups 3 }
+        
+    
+    END
+
+--
+-- HUAWEI-RPR-MIB.mib
+--

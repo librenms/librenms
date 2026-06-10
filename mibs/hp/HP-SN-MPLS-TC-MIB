@@ -1,0 +1,272 @@
+HP-SN-MPLS-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Unsigned32, Integer32
+	FROM SNMPv2-SMI
+    transmission
+        FROM RFC1213-MIB
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    snMpls
+        FROM HP-SN-ROOT-MIB;
+
+    mplsTCMIB MODULE-IDENTITY
+    LAST-UPDATED "200101041200Z"  -- 4 January 2002 12:00:00 GMT
+
+    ORGANIZATION
+    "Multiprotocol Label Switching (MPLS) Working Group"
+CONTACT-INFO
+        "        Thomas D. Nadeau
+                 Cisco Systems, Inc.
+                 tnadeau@cisco.com
+        
+                 Joan Cucchiara
+                 Crescent Networks
+                 jcucchiara@crescentnetworks.com
+        
+                 Cheenu Srinivasan
+                 Parama Networks, Inc.
+                 cheenu@paramanet.com
+        
+                 Arun Viswanathan
+                 Force10 Networks, Inc.
+                 arun@force10networks.com
+        
+                 Hans Sjostrand
+                 ipUnplugged
+                 hans@ipunplugged.com
+        
+        Email comments to the MPLS WG Mailing List at
+          mpls@uu.net."
+
+      DESCRIPTION
+        "This MIB module defines Textual Conventions and
+          OBJECT-IDENTITIES for use in documents defining
+          management information bases (MIBs) for managing
+          MPLS networks."
+        
+     -- Revision history.
+        
+      REVISION
+      "200101041200Z"  -- 4 January 2002 12:00:00 GMT
+      DESCRIPTION
+	  "Initial version published as part of RFC XXXX."
+      ::= { mplsMIB 1 }
+
+  -- This object identifier needs to be assigned by IANA.
+  -- Since mpls has been assigned an ifType of 166 we recommend
+  -- that this OID be 166 as well.
+
+  mplsMIB OBJECT IDENTIFIER
+  ::= { snMpls 15 }
+
+-- Textual Conventions (sorted alphabetically).
+
+MplsAtmVcIdentifier ::= TEXTUAL-CONVENTION
+
+    STATUS  current
+    DESCRIPTION
+        "The VCI value for a VCL. The maximum VCI value
+          cannot exceed the value allowable by
+          atmInterfaceMaxVciBits defined in ATM-MIB. The
+          minimum value is 32, values 0 to 31 are reserved
+          for other uses by the ITU and ATM Forum.  32 is
+          typically the  default value for the Control VC."
+      REFERENCE
+        "Definitions of Textual Conventions and OBJECT-
+          IDENTITIES for ATM Management, RFC 2514, Feb.
+          1999."
+      SYNTAX  Integer32 (32..65535)
+
+MplsBitRate ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "d"
+   STATUS      current
+   DESCRIPTION
+        "An estimate of bandwidth in units of 1,000 bits per
+          second.  If this object reports a value of 'n' then
+          the rate of the object is somewhere in the range of
+          'n-500' to 'n+499'. For objects which do not vary
+          in bit rate, or for those where no accurate
+          estimation can be made, this object should contain
+          the nominal bit rate."
+   SYNTAX  Integer32 (1..2147483647)
+
+MplsBurstSize ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+   DESCRIPTION
+        "The number of octets of MPLS data that the stream
+          may send back-to-back without concern for
+          policing."
+   SYNTAX  Unsigned32 (1..4294967295)
+
+MplsExtendedTunnelId ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "A unique identifier for an MPLS Tunnel. This MAY
+          represent an IpV4 address of the ingress or egress
+          LSR for the tunnel. This value is derived from the
+          Extended Tunnel Id in RSVP or the Ingress Router ID
+          for CR-LDP."
+   REFERENCE
+        "1. Awduche, D., et al., RSVP-TE: Extensions to RSVP
+          for LSP Tunnels,  RFC 3209, December 2001.
+         2. Constraint-Based LSP Setup using LDP, Jamoussi,
+          B., et al., draft-ietf-mpls-cr-ldp-06.txt, November
+          2001."
+   SYNTAX  Unsigned32
+
+MplsInitialCreationSource ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+        "The entity that originally created the object in
+          question. The values of this enumeration are
+          defined as follows:
+        
+         other(1) - This is used when an entity which has not
+          been enumerated in this textual convention but
+          which is known by the agent.
+        
+         snmp(2) - The Simple Network Management Protocol was
+          used to configure this object initially.
+        
+         ldp(3 - The Label Distribution Protocol was used to
+          configure this object initially.
+        
+         rsvp(4) - The Resource Reservation Protocol was used
+          to configure this object initially.
+        
+         crldp(5) - The Constraint-Based Label Distribution
+          Protocol was used to configure this object
+          initially.
+        
+         policyAgent(6) - A policy agent (perhaps in
+          combination with one of the above protocols) was
+          used to configure this object initially.
+        
+         unknown(7) - the agent cannot discern which
+          component created the object."
+   SYNTAX  INTEGER {
+             other(1),
+             snmp(2),
+             ldp(3),
+             rsvp(4),
+             crldp(5),
+             policyAgent(6),
+             unknown (7)
+         }
+
+
+
+MplsLSPID ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "An identifier that is assigned to each LSP and is
+          used to uniquely identify it.  This is assigned at
+          the head end of the LSP and can be used by all LSRs
+          to identify this LSP.  This value is piggybacked by
+          the signaling protocol when this LSP is signaled
+          within the network.  This identifier can then be
+          used at each LSR to identify which labels are being
+          swapped to other labels for this LSP.  For IPv4
+          addresses this results in a 6-octet long cookie."
+   SYNTAX  OCTET STRING (SIZE (0..31))
+
+MplsLabel ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "This value represents an MPLS label as defined in
+          [RFC3031],  [RFC3032], [RFC3034] and [RFC3035]."
+   REFERENCE
+        "1. Multiprotocol Label Switching Architecture, Rosen
+          et al, RFC 3031, August 1999.
+         2. MPLS Label Stack Encoding, Rosen et al, RFC 3032,
+          January 2001.
+         3. Use of Label Switching on Frame Relay Networks,
+          Conta et al, RFC 3034, January 2001.
+         4. MPLS using LDP and ATM VC switching, Davie et al,
+          RFC 3035, January 2001."
+   SYNTAX  Unsigned32 (0..4294967295)
+
+MplsLdpGenAddr ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+        "The value of an network layer or data link layer
+          address."
+   SYNTAX  OCTET STRING (SIZE (0..64))
+
+MplsLdpIdentifier ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+        "The LDP identifier is a six octet quantity which is
+          used to identify an Label Switch Router (LSR) label
+          space.
+        
+         The first four octets identify the LSR and must be a
+          globally unique value, such as a 32-bit router ID
+          assigned to the LSR, and the last two octets
+          identify a specific label space within the LSR."
+   SYNTAX  OCTET STRING (SIZE (6))
+
+MplsLdpLabelTypes ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+        "The Layer 2 label types which are defined for MPLS
+          LDP/CRLDP are generic(1), atm(2), or
+          frameRelay(3)."
+   SYNTAX  INTEGER {
+             generic(1),
+             atm(2),
+             frameRelay(3)
+         }
+
+MplsLsrIdentifier ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+        "The Label Switch Router (LSR) identifier is the
+          first 4 bytes of the Label Distribution Protocol
+          (LDP) identifier."
+   SYNTAX  OCTET STRING (SIZE (4))
+
+MplsPathIndex ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "A unique identifier used to identify a specific path
+          used by a tunnel."
+   SYNTAX  Unsigned32
+
+MplsPathIndexOrZero ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "A unique identifier used to identify a specific path
+          used by a tunnel. If this value is set to 0, it
+          indicates that no path is in use."
+   SYNTAX  Unsigned32
+
+MplsPortNumber ::= TEXTUAL-CONVENTION
+   STATUS              current
+   DESCRIPTION
+        "A TCP or UDP port number. Along with an IP address
+          identifies a stream of IP traffic uniquely."
+   SYNTAX              Integer32 (0..65535)
+
+MplsTunnelAffinity ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "Include-any, include-all, or exclude-all constraint
+          for link selection."
+   SYNTAX  Unsigned32
+
+MplsTunnelIndex ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "Index into mplsTunnelTable."
+   SYNTAX  Integer32 (1..65535)
+
+MplsTunnelInstanceIndex ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+        "Instance index into mplsTunnelTable."
+   SYNTAX  Unsigned32 (0..65535)
+
+END

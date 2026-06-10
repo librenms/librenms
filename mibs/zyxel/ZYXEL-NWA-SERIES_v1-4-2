@@ -1,0 +1,900 @@
+-- $Id: ZYXEL-NWA-SERIES.mib,v 1.3 2008/01/14 11:20:00 LiKuang Tsai Exp $
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition
+-- This file describes the ZyXEL Communications Corporation Enterprise MIB.
+-- It includes object identifiers and object definitions for the ZyXEL
+-- Enterprise MIB only, and should be used for compilation by a management
+-- tool in order to extend the tool to support the ZyXEL MIB.
+
+    ZYXEL-NWA-SERIES_v1-4-2 DEFINITIONS ::=BEGIN
+
+    IMPORTS
+	enterprises, NetworkAddress, PhysAddress, IpAddress, Counter
+		FROM RFC1155-SMI
+    	RowStatus, RowPointer, DateAndTime, TruthValue
+        	FROM SNMPv2-TC
+    	OBJECT-TYPE, TimeTicks
+        	FROM SNMPv2-SMI
+	ifIndex                                 FROM RFC1213-MIB;
+
+
+	DisplayString	::=	OCTET STRING
+
+ -- tree structure
+
+	zyxel			OBJECT IDENTIFIER ::= { enterprises 890 }
+
+	products		OBJECT IDENTIFIER ::= { zyxel 1 }
+
+	proWireless		OBJECT IDENTIFIER ::= { products 9 }
+
+	pwCommon			OBJECT IDENTIFIER ::= { proWireless 1 }
+	pwTraps				OBJECT IDENTIFIER ::= { proWireless 2 }
+	pwStations			OBJECT IDENTIFIER ::= { proWireless 3 }
+	pwRogueAPDetect		OBJECT IDENTIFIER ::= { proWireless 4 }
+	pwWlanControl		OBJECT IDENTIFIER ::= { proWireless 5 }
+	pwWlanStatistics		OBJECT IDENTIFIER ::= { proWireless 6 }
+	
+	nwaSeries		OBJECT IDENTIFIER ::= { proWireless 100 }
+	nwa3100 		OBJECT IDENTIFIER ::= { nwaSeries  1 }
+        nwa3500 		OBJECT IDENTIFIER ::= { nwaSeries  2 } 
+        nwa3160 		OBJECT IDENTIFIER ::= { nwaSeries  3 } 
+        nwa3163 		OBJECT IDENTIFIER ::= { nwaSeries  4 } 
+        nwa3550 		OBJECT IDENTIFIER ::= { nwaSeries  5 } 
+        nwa3165 		OBJECT IDENTIFIER ::= { nwaSeries  6 }
+        nwa1100 		OBJECT IDENTIFIER ::= { nwaSeries  7 }
+        nwa3166 		OBJECT IDENTIFIER ::= { nwaSeries  8 }
+
+ -- Node: ZyXEL
+ -- Node: Products
+ -- Node: proWireless
+ -- Node: pwCommon		This group contains information dealing
+ --				wish the overall proWireless system, such as
+ --				software versions, software and configuration download...etc.
+
+	pwSwVersion OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		ACCESS	read-only
+		STATUS	current
+		DESCRIPTION 
+			"The current software version."
+	::= { pwCommon 1 }
+
+	pwCfgVersion OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The current WLAN configuration version."
+	::= { pwCommon 2 }
+
+	pwTftpServer OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"TFTP download server IP Address."
+	::= { pwCommon 3 }
+
+	pwTftpFileName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"TFTP file name in TFTP server."
+	::= { pwCommon 4 }
+
+	pwTftpFileType OBJECT-TYPE
+		SYNTAX	INTEGER {
+			software(1),
+			romfile(2),
+			textconfig(3)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"File type in TFTP server."
+	::= { pwCommon 5 }
+
+	pwTftpOpStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+			idle(0),
+			inprogress(1),
+			failed(2)
+			success(3),
+			timeout(4)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"TFTP Operation Status."
+	::= { pwCommon 6 }
+
+	pwTftpOpCommand OBJECT-TYPE
+		SYNTAX	INTEGER {
+			upload(1),
+			download(2)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"TFTP Operation Command."
+	::= { pwCommon 7 }
+
+	pwSystemReboot OBJECT-TYPE
+		SYNTAX	INTEGER {
+			running(0),
+			reboot(1)
+		}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"System Reboot."
+	::= { pwCommon 8 }
+
+	pwAutoCfgMessage OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The last error massage of Auto Configuration process."
+
+	::= { pwCommon 9 }
+	
+	pwCPUUsage OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Display the CPU usage information"
+        ::= { pwCommon 10 }
+
+	pwMemoryUsage OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Display the memory usage information"
+        ::= { pwCommon 11 }
+
+	pwSystemCountry   OBJECT-TYPE
+ 		SYNTAX OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The country of wlan"
+        ::= { pwCommon 13 }
+
+	pwPassword OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE (0..255))
+		ACCESS	write-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Change system password."
+	::= { pwCommon 14 }
+--
+-- The following table represent the associated station list
+--
+
+pwStationTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PwStationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table lists the associated stations."
+        ::= { pwStations 2 }
+
+pwStationEntry OBJECT-TYPE
+        SYNTAX      PwStationEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry describing the station information."
+        INDEX { pwStationIndex  }
+        ::= {  pwStationTable 1 }
+
+PwStationEntry ::= SEQUENCE {
+            pwStationIndex         		Integer32,
+--            docsDevNmAccessIp           IpAddress,
+--            docsDevNmAccessIpMask       IpAddress,
+            pwStationMacAddress			OCTET STRING,
+            pwStationAssociateTime      DateAndTime,
+            pwStationSSID				OCTET STRING,
+            pwStationStatus       		RowStatus
+        }
+
+pwStationIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index of stations."
+        ::= { pwStationEntry 1 }
+
+pwStationMacAddress OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC Addresss of the station."
+        DEFVAL { "public" }
+        ::= { pwStationEntry 2 }
+
+pwStationAssociateTime OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The associated time of the station."
+        ::= { pwStationEntry 3 }
+
+pwStationSSID OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The associated ssid."
+        ::= { pwStationEntry 4 }
+
+pwStationStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this
+             the row is active."
+        ::= { pwStationEntry 5 }
+
+
+--
+-- Node: pwRogueAPDetect		This group defines the neighbor AP detection
+--
+
+--pwRogueAPDetectInterval OBJECT-TYPE
+--	SYNTAX INTEGER {
+--		disable(0)
+--	}
+--        MAX-ACCESS  read-write
+--        STATUS      current
+--        DESCRIPTION
+--            "AP Detection Interval, time unit is minute.
+--             The range is 10-60 minutes."
+--        ::= { pwRogueAPDetect 1 }
+
+pwRogueAPPeriodTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PwRogueAPPeriodEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table lists the rogue AP Period Detection."
+        ::= { pwRogueAPDetect 1 }
+
+pwRogueAPPeriodEntry OBJECT-TYPE
+        SYNTAX      PwRogueAPPeriodEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry describing the control for rogue AP Period Detection."
+	INDEX { ifIndex  }
+        ::= {  pwRogueAPPeriodTable 1 }
+
+PwRogueAPPeriodEntry ::= SEQUENCE {
+            pwRogueAPPeriodDetection			INTEGER,
+            pwRogueAPPeriod				INTEGER,
+            pwRogueAPExpirationTime			INTEGER
+        }
+
+pwRogueAPPeriodDetection OBJECT-TYPE
+         SYNTAX INTEGER {
+		disable(0),
+		enable(1)
+ 	}       	
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Control rogue AP Period Detection. enable(1) or disable(0)."
+        ::= { pwRogueAPPeriodEntry 1 }
+
+pwRogueAPPeriod OBJECT-TYPE
+         SYNTAX INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Rogue AP period time. 10~60(min)."
+        ::= { pwRogueAPPeriodEntry 2 }
+
+pwRogueAPExpirationTime OBJECT-TYPE
+         SYNTAX INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Rogue AP Expiration time. 30~180(min)."
+        ::= { pwRogueAPPeriodEntry 3 }        	        	
+     	        
+pwRogueAPDetectTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PwRogueAPDetectEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table lists the neighbor AP."
+        ::= { pwRogueAPDetect 2 }
+
+pwRogueAPDetectEntry OBJECT-TYPE
+        SYNTAX      PwRogueAPDetectEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry describing the neighbor AP information."
+        INDEX { pwRogueAPIndex  }
+        ::= {  pwRogueAPDetectTable 1 }
+
+PwRogueAPDetectEntry ::= SEQUENCE {
+            pwRogueAPIndex				INTEGER,
+            pwRogueAPSSID 				OCTET STRING,
+            pwRogueAPMacAddress 		OCTET STRING,
+            pwRogueAPChannel     		OCTET STRING,
+--            pwRogueAPDetectSignal			Integer32,
+--            pwRogueAPDetectNetwork			INTEGER,
+            pwRogueAPSecurity 			OCTET STRING,
+            pwRogueAPSignal				OCTET STRING
+        }
+
+pwRogueAPIndex OBJECT-TYPE
+	SYNTAX	INTEGER (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The index of neighbor AP table."
+        ::= { pwRogueAPDetectEntry 1 }
+
+pwRogueAPSSID OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The SSID. If SSID of the AP is hidden, it will be displayed as '(Hidden SSID)'."
+        ::= { pwRogueAPDetectEntry 2 }
+
+pwRogueAPMacAddress OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC address."
+        ::= { pwRogueAPDetectEntry 3 }
+
+pwRogueAPChannel OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The frequency channel ID."
+        ::= { pwRogueAPDetectEntry 4 }
+
+pwRogueAPSecurity OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The data security mode."
+        ::= { pwRogueAPDetectEntry 5 }
+
+pwRogueAPSignal OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The data signal."
+        ::= { pwRogueAPDetectEntry 6 }
+        
+pwFriendlyAPTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PwFriendlyAPEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table lists the neighbor Friendly AP."
+        ::= { pwRogueAPDetect 3 }
+
+pwFriendlyAPEntry OBJECT-TYPE
+        SYNTAX      PwFriendlyAPEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry describing the neighbor Friendly AP information."
+        INDEX { pwFriendlyAPIndex }
+        ::= {  pwFriendlyAPTable 1 }
+
+PwFriendlyAPEntry ::= SEQUENCE {
+            pwFriendlyAPIndex			INTEGER,
+            pwFriendlyAPSSID			OCTET STRING,
+            pwFriendlyAPMacAddress		OCTET STRING,
+            pwFriendlyAPChannel			OCTET STRING,
+            pwFriendlyAPSecurity		OCTET STRING,
+            pwFriendlyAPSignal			OCTET STRING,
+            pwFriendlyAPDescription		OCTET STRING
+        }
+
+pwFriendlyAPIndex OBJECT-TYPE
+	SYNTAX	INTEGER (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The index of neighbor friendly AP table."
+        ::= { pwFriendlyAPEntry 1 }
+
+pwFriendlyAPSSID OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The SSID. If SSID of the friendly AP is hidden, it will be displayed as '(Hidden SSID)'."
+        ::= { pwFriendlyAPEntry 2 }
+
+pwFriendlyAPMacAddress OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The friendly AP MAC address. When setting this item, 
+	    a new entry of frienly AP will be added."
+        ::= { pwFriendlyAPEntry 3 }
+
+pwFriendlyAPChannel OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The frequency channel ID."
+        ::= { pwFriendlyAPEntry 4 }
+
+pwFriendlyAPSecurity OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The data security mode."
+        ::= { pwFriendlyAPEntry 5 }
+
+pwFriendlyAPSignal OBJECT-TYPE
+	SYNTAX	OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The data signal."
+        ::= { pwFriendlyAPEntry 6 }
+        
+pwFriendlyAPDescription OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Description of friendly AP. When setting this item, 
+	    the description field of relative entry will be updated"
+        ::= { pwFriendlyAPEntry 7 }
+
+
+--
+-- Node: pwMacFilter		This group defines the MAC Filter
+--
+pwWlanControlTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PwWlanControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table lists WLAN control information. Use chipIndex as the index of each entry"
+        ::= { pwWlanControl 1 }
+
+pwWlanControlEntry OBJECT-TYPE
+        SYNTAX      PwWlanControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry describing WLAN control information for each chip."
+        INDEX { ifIndex  }
+        ::= {  pwWlanControlTable 1 }
+
+PwWlanControlEntry ::= SEQUENCE {
+            pwWlanMode          		INTEGER,
+            pwWlanSupportedChannel 		OCTET STRING,
+            pwWlanChannel     			INTEGER,
+            pwWlanTxPower 				INTEGER,
+            pwAutoChannelSelection		INTEGER,
+            pwCurrentChannel			INTEGER,
+            pwStationCount				Counter32,
+	    	pwWlanSupportedMode			OCTET STRING
+        }
+
+pwWlanMode  OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 			mode_802_11b(1),
+ 			mode_802_11g(2),
+ 			mode_802_11bg(3),
+ 			mode_802_11a(4),
+ 			mode_802_11ng(6),
+ 			mode_802_11na(7)
+ 		}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The mode of wlan right now."
+        ::= { pwWlanControlEntry 1 }
+
+pwWlanSupportedChannel   OBJECT-TYPE
+ 	SYNTAX OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The all channel supported by wlan"
+        ::= { pwWlanControlEntry 3 }
+
+pwWlanChannel   OBJECT-TYPE
+ 	SYNTAX INTEGER {
+ 			channel-01_2412mhz(1),
+ 			channel-02_2417mhz(2),
+ 			channel-03_2422mhz(3),
+ 			channel-04_2427mhz(4),
+			channel-05_2432mhz(5),
+			channel-06_2437mhz(6),
+			channel-07_2442mhz(7),
+			channel-08_2447mhz(8),
+			channel-09_2452mhz(9),
+			channel-10_2457mhz(10),
+			channel-11_2462mhz(11),
+			channel-12_2467mhz(12),
+			channel-13_2472mhz(13),
+
+			channel-36_5180mhz(36),
+			channel-40_5200mhz(40),
+			channel-44_5220mhz(44),
+			channel-48_5240mhz(48),
+			channel-52_5260mhz(52),
+			channel-56_5280mhz(56),
+			channel-60_5300mhz(60),
+			channel-64_5320mhz(64),
+			channel-100_5500mhz(100),
+			channel-104_5520mhz(104),
+			channel-108_5540mhz(108),
+			channel-112_5560mhz(112),
+			channel-116_5580mhz(116),
+			channel-120_5600mhz(120),
+			channel-124_5620mhz(124),
+			channel-128_5640mhz(128),
+			channel-132_5660mhz(132),
+			channel-136_5680mhz(136),
+			channel-140_5700mhz(140),
+			channel-149_5745mhz(149),
+			channel-153_5765mhz(153),
+			channel-157_5785mhz(157),
+			channel-161_5805mhz(161),
+			channel-165_5825mhz(165)
+ 		}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The current channel of wlan right now. When setting this 
+	    parameter, the value should be a subset of all supported channel"
+        ::= { pwWlanControlEntry 4 }
+
+pwWlanTxPower OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 			full(1),
+ 			half(2),
+ 			quarter(4),
+ 			eighth(8),
+			minimum(16)
+
+ 		}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "To specify the RF transmission power."
+        ::= { pwWlanControlEntry 5 }    
+        
+pwAutoChannelSelection OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 			disable(0),
+ 			enble(1)
+ 		}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable Auto Channel Selection."
+        ::= { pwWlanControlEntry 6 }
+
+pwCurrentChannel OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 			device_is_disable(0),
+ 			channel-01_2412mhz(1),
+ 			channel-02_2417mhz(2),
+ 			channel-03_2422mhz(3),
+ 			channel-04_2427mhz(4),
+			channel-05_2432mhz(5),
+			channel-06_2437mhz(6),
+			channel-07_2442mhz(7),
+			channel-08_2447mhz(8),
+			channel-09_2452mhz(9),
+			channel-10_2457mhz(10),
+			channel-11_2462mhz(11),
+			channel-12_2467mhz(12),
+			channel-13_2472mhz(13),
+
+			channel-36_5180mhz(36),
+			channel-40_5200mhz(40),
+			channel-44_5220mhz(44),
+			channel-48_5240mhz(48),
+			channel-52_5260mhz(52),
+			channel-56_5280mhz(56),
+			channel-60_5300mhz(60),
+			channel-64_5320mhz(64),
+			channel-100_5500mhz(100),
+			channel-104_5520mhz(104),
+			channel-108_5540mhz(108),
+			channel-112_5560mhz(112),
+			channel-116_5580mhz(116),
+			channel-120_5600mhz(120),
+			channel-124_5620mhz(124),
+			channel-128_5640mhz(128),
+			channel-132_5660mhz(132),
+			channel-136_5680mhz(136),
+			channel-140_5700mhz(140),
+			channel-149_5745mhz(149),
+			channel-153_5765mhz(153),
+			channel-157_5785mhz(157),
+			channel-161_5805mhz(161),
+			channel-165_5825mhz(165)
+ 		}
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current Operating channel."
+        ::= { pwWlanControlEntry 7 }        
+
+pwStationCount   OBJECT-TYPE
+ 	SYNTAX Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of ssocited stations"
+        ::= { pwWlanControlEntry 8 }
+        	
+pwWlanSupportedMode   OBJECT-TYPE
+	SYNTAX OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The all mode supported by wlan"
+        ::= { pwWlanControlEntry 9 }
+
+--
+-- Node: pwWlanStatistics		Copy from dot11CountersTable
+--
+
+pwWlanStatisticsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PwWlanStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table lists WLAN statistics information. Use chipIndex as the index of each entry"
+        ::= { pwWlanStatistics 1 }
+
+pwWlanStatisticsEntry OBJECT-TYPE
+        SYNTAX      PwWlanStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry describing WLAN statistics information."
+        INDEX { ifIndex  }
+        ::= {  pwWlanStatisticsTable 1 }
+
+PwWlanStatisticsEntry ::= SEQUENCE {
+            pwDot11FailedCount          	Counter32,
+            pwDot11RetryCount 			Counter32,
+            pwDot11ACKFailureCount 		Counter32,
+            pwDot11ReceivedFragmentCount     	Counter32,
+            pwDot11TransmittedFrameCount 	Counter32,
+            pwDot11ReceivedPktCount     	Counter32,
+            pwDot11TransmittedPktCount 		Counter32,
+            pwDot11ReceptionRate     		Counter32,
+            pwDot11TransmissionRate 		Counter32
+        }
+
+pwDot11FailedCount  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+
+        "This counter shall increment when an MSDU is not transmitted
+        successfully due to the number of transmit attempts exceeding
+        either the  dot11ShortRetryLimit or dot11LongRetryLimit. "
+
+    ::= {  pwWlanStatisticsEntry 1 }
+
+pwDot11RetryCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+
+            "This counter shall increment when an MSDU is successfully
+            transmitted after one or more retransmissions."
+    ::= {  pwWlanStatisticsEntry 2 }
+
+pwDot11ACKFailureCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+
+            "This counter shall increment when an ACK is not received
+            when expected."
+
+    ::= {  pwWlanStatisticsEntry 3 }
+
+pwDot11ReceivedFragmentCount OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+
+            "This counter shall be incremented for each successfully
+            received MPDU of type Data or Management."
+
+    ::= {  pwWlanStatisticsEntry 4 }
+
+pwDot11TransmittedFrameCount  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+
+"This counter shall increment for each successfully transmitted MSDU."
+
+    ::= {  pwWlanStatisticsEntry 5 }
+
+pwDot11ReceivedPktCount  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+				"This counter shall increment for each successfully received packets every five minutes."
+
+    ::= {  pwWlanStatisticsEntry 6 }
+    
+pwDot11TransmittedPktCount  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+				"This counter shall increment for each successfully transmitted packets every five minutes."
+
+    ::= {  pwWlanStatisticsEntry 7 }
+    
+pwDot11ReceptionRate  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+				"Reception Rate in Byte per second."
+
+    ::= {  pwWlanStatisticsEntry 8 }
+    
+pwDot11TransmissionRate  OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+				"Transmission Rate in Byte per second."
+
+    ::= {  pwWlanStatisticsEntry 9 }
+ 
+ 
+ -- Node: pwTraps		This group defines information of pro wireless product
+ --						specific snmpv2 notifications. 
+ --						Including control variables to enable / disable 
+ -- 					sending trap.
+ 	                                                       
+	pwTrapControl		OBJECT IDENTIFIER ::= { pwTraps 1 } 	                                                       
+ 	pwTrapVariables		OBJECT IDENTIFIER ::= { pwTraps 2 }
+ 	pwTrapTypes			OBJECT IDENTIFIER ::= { pwTraps 3 }  
+ 	
+ 	pwWirelessTraps		OBJECT IDENTIFIER ::= { pwTrapTypes 1 }
+ 	pwSecurityTraps		OBJECT IDENTIFIER ::= { pwTrapTypes 2 }
+ 	pwTFTPTraps			OBJECT IDENTIFIER ::= { pwTrapTypes 3 }
+ 	
+ -- 	Control
+ 	pwTrapWirelessStatus OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 			enable(1),
+ 			disable(2)
+ 		}
+ 		MAX-ACCESS read-write
+ 		STATUS current
+ 		DESCRIPTION
+ 		"Controls wireless group traps enable or disable."
+ 	::= { pwTrapControl 1 }
+ 	
+ 	pwTrapSecurityStatus OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 			enable(1),
+ 			disable(2)
+ 		}
+ 		MAX-ACCESS read-write
+ 		STATUS current
+ 		DESCRIPTION
+ 		"Controls security group traps enable or disable."
+ 	::= { pwTrapControl 2 }
+ 	
+ 	pwTrapTFTPStatus  OBJECT-TYPE
+ 		SYNTAX INTEGER {
+ 			enable(1),
+ 			disable(2)
+ 		}
+ 		MAX-ACCESS read-write
+ 		STATUS current
+ 		DESCRIPTION
+ 		"Controls TFTP group traps enable or disable."
+ 	::= { pwTrapControl 3 }
+
+ 	 	              
+ -- 	Trap variables
+ 	pwTrapGenericMessage OBJECT-TYPE 
+ 	    SYNTAX DisplayString
+    	MAX-ACCESS accessible-for-notify
+    	STATUS current
+    	DESCRIPTION
+		"Provide generic information on traps."
+    ::= { pwTrapVariables 1 }
+    
+    pwTrapMACAddress OBJECT-TYPE
+    	SYNTAX DisplayString
+    	MAX-ACCESS accessible-for-notify
+    	STATUS current
+    	DESCRIPTION
+		"Represents MAC address of the device or the host 
+		which triggers the trap."
+    ::= { pwTrapVariables 2 }
+    
+    pwTrapWlanSSID OBJECT-TYPE
+    	SYNTAX DisplayString
+    	MAX-ACCESS accessible-for-notify
+    	STATUS current
+    	DESCRIPTION
+		"The SSID name which the wireless client associates."
+    ::= { pwTrapVariables 3 }
+ 	              
+ -- 	Wireless Traps
+ -- 		Assocication, Disassociation
+ 	pwWlanStaAssociation NOTIFICATION-TYPE
+		STATUS	current
+		DESCRIPTION
+			"Wireless client assocication notification."
+	::= { pwWirelessTraps 1 }    
+	                           
+	pwWlanStaDisassociation NOTIFICATION-TYPE
+		STATUS	current
+		DESCRIPTION
+			"Wireless client disassocication notification."
+	::= { pwWirelessTraps 2 }  
+	                           
+ -- 	Security Traps
+ --         Client authenticate failed
+ 
+	pwWlanStaAuthFail NOTIFICATION-TYPE
+		STATUS	current
+		DESCRIPTION
+			"Wireless client authentication failed."
+	::= { pwSecurityTraps 1 }  
+
+ --		TFTP Traps
+ --			Status
+
+	pwTFTPStatus NOTIFICATION-TYPE
+		OBJECTS {pwTrapGenericMessage, pwTftpOpStatus, pwTftpServer, 
+		pwTftpFileName, pwTftpFileType, pwTftpOpCommand }
+		STATUS current
+		DESCRIPTION
+			"Send when TFTP operation completed, or stopped due to some reason. 
+			For example, timeout or wrong configuration."
+	::= { pwTFTPTraps 1 }
+END

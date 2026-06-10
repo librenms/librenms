@@ -1,0 +1,1571 @@
+CTRON-SFPS-BASE-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-base-mib.txt
+--  Revision: 0.0.18
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+--      Counter, Gauge, 
+      TimeTicks
+                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsCPResources, sfpsServiceCenter, sfpsBlockSource,
+        sfpsBlockSourcePort, sfpsBlockSourceAPI, sfpsBlockSourceExclude,
+        sfpsBlockSourceStats, sfpsBlockSourceOnly, sfpsCSPControl,
+        sfpsDHCPServerVLAN, sfpsATalkAMRVLANControl
+        
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+ 
+-- SfpsSwitchInstance ::= INTEGER
+--  this will map to chassis.module index value
+
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+ 
+ 
+--
+
+
+sfpsCPResourcesTable            OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsCPResourcesTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table contains all Call Processors registered with the
+                 CPResources Table and is indexed by the Call Processor id."
+        ::= { sfpsCPResources 1 }
+
+sfpsCPResourcesTableEntry       OBJECT-TYPE
+        SYNTAX  SfpsCPResourcesTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains information pertaining to a Call Processor."
+        INDEX   { sfpsCPResourcesTableId }
+        ::= { sfpsCPResourcesTable 1 }
+
+SfpsCPResourcesTableEntry       ::=
+        SEQUENCE {
+                sfpsCPResourcesTableId                  INTEGER,
+                sfpsCPResourcesTableName                DisplayString,
+                sfpsCPResourcesTableOperStatus          INTEGER,
+                sfpsCPResourcesTableAdminStatus         INTEGER,
+                sfpsCPResourcesTableStateTime           TimeTicks,
+                sfpsCPResourcesTablePtsIn                   INTEGER,
+                sfpsCPResourcesTablePtsUsed                 INTEGER,
+                sfpsCPResourcesTablePolicyFlood         INTEGER,
+                sfpsCPResourcesResolveFlood                     INTEGER,
+                sfpsCPResourcesConnectOK                        INTEGER,
+                sfpsCPResourcesDuplicate                        INTEGER,
+                sfpsCPResourcesDiscoverOnly                     INTEGER,
+                sfpsCPResourcesDiscoverError            INTEGER,
+                sfpsCPResourcesResolveFail                      INTEGER,
+                sfpsCPResourcesResolveError                     INTEGER,
+                sfpsCPResourcesPolicyFail                       INTEGER,
+                sfpsCPResourcesPolicyError                      INTEGER,
+                sfpsCPResourcesConnectFail                      INTEGER,
+                sfpsCPResourcesConnectFlood                     INTEGER,
+                sfpsCPResourcesConnectError                     INTEGER,
+                sfpsCPResourcesConfigTime                       TimeTicks,
+                sfpsCPResourcesNeedFlood                        INTEGER,
+                sfpsCPResourcesNeedResolve                      INTEGER,
+                sfpsCPResourcesNeedDiscover                     INTEGER,
+                sfpsCPResourcesDiscoverAll                      INTEGER,
+                sfpsCPResourcesNeedProxyOut                     INTEGER,
+                sfpsCPResourcesNeedProxyIn                      INTEGER,
+                sfpsCPResourcesNeedFilter                       INTEGER,
+                sfpsCPResourcesAcceptRate                       INTEGER,
+                sfpsCPResourcesTotalRate                        INTEGER,                
+                sfpsCPResourcesSingleFlood                      INTEGER,
+        sfpsCPResourcesNeedValidNet         INTEGER,
+        sfpsCPResourcesInvalidNetDrops      INTEGER,
+        sfpsCPResourcesPersistMask          INTEGER
+        }
+
+sfpsCPResourcesTableId                  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Call Processor id used to index into the table."
+        ::= { sfpsCPResourcesTableEntry 1 }
+
+sfpsCPResourcesTableName                OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The name of the associated Call Processor."
+        ::= { sfpsCPResourcesTableEntry 2 }
+
+sfpsCPResourcesTableOperStatus          OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        kStatusRunning(1),      --  all is well
+                        kStatusHalted(2),       -- admin disabled
+                        kStatusPending(3),      -- Trying to run, not there yet
+                        kStatusFaulted(4),      -- Internal error, never will recover
+                        kStatusNotStarted(5)    -- Not fully started yet
+        }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational state of entry."
+        ::= { sfpsCPResourcesTableEntry 3 }
+
+sfpsCPResourcesTableAdminStatus         OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disabled(2),
+                        enabled(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This value represents the current administration status of the
+                associated Call Processor. When enabled(3) the Call Processor
+                is still allowed to call process packets.
+
+                When this value is disabled(2) the call processor will not
+                process any packets."
+        ::= { sfpsCPResourcesTableEntry 4 }
+
+sfpsCPResourcesTableStateTime           OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The last time that this Call Processor has changed states."
+        ::= { sfpsCPResourcesTableEntry 5 }
+
+sfpsCPResourcesTablePtsIn               OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets that have been sent to this Call
+                Processor to be handled."
+        ::= { sfpsCPResourcesTableEntry 6 }
+
+sfpsCPResourcesTablePtsUsed     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets that have been sent to this Call
+                Processor and accepted for the purpose of processing."
+        ::= { sfpsCPResourcesTableEntry 7 }
+
+sfpsCPResourcesTablePolicyFlood OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets flooded due to Policy."
+        ::= { sfpsCPResourcesTableEntry 8 }
+
+
+sfpsCPResourcesResolveFlood     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets flooded due to not able to Resolve."
+        ::= { sfpsCPResourcesTableEntry 9 }
+
+
+sfpsCPResourcesConnectOK        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that caused a successful connect."
+        ::= { sfpsCPResourcesTableEntry 10 }
+
+
+sfpsCPResourcesDuplicate        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that were duplicates of an existing call."
+        ::= { sfpsCPResourcesTableEntry 11 }
+
+
+sfpsCPResourcesDiscoverOnly     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that the switch only discovered information."
+        ::= { sfpsCPResourcesTableEntry 12 }
+
+
+sfpsCPResourcesDiscoverError    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that the switch could not discover
+                 information. Something was wrong with the packet."
+        ::= { sfpsCPResourcesTableEntry 13 }
+
+
+sfpsCPResourcesResolveFail      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets which caused the Resolve to fail. The fail
+                is due to no vlan information was returned."
+        ::= { sfpsCPResourcesTableEntry 14 }
+
+
+sfpsCPResourcesResolveError     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets which caused the Resolve to return an error.
+                An error could be caused by a bad packet."
+        ::= { sfpsCPResourcesTableEntry 15 }
+
+
+sfpsCPResourcesPolicyFail       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets which caused the Policy to fail. The fail
+                is caused because the switch has no information on the vlan(s)
+                returned by Resolve."
+        ::= { sfpsCPResourcesTableEntry 16 }
+
+
+sfpsCPResourcesPolicyError      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets which caused the Policy to return an error.
+                An error could be caused by a bad packet."
+        ::= { sfpsCPResourcesTableEntry 17 }
+
+
+sfpsCPResourcesConnectFail      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that caused the Connect to fail."
+        ::= { sfpsCPResourcesTableEntry 18 }
+
+
+sfpsCPResourcesConnectFlood     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that caused the Connect to flood."
+        ::= { sfpsCPResourcesTableEntry 19 }
+
+
+sfpsCPResourcesConnectError     OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that caused the Connect to return an error."
+        ::= { sfpsCPResourcesTableEntry 20 }
+
+sfpsCPResourcesConfigTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of time ticks since the last configuration change."
+        ::= { sfpsCPResourcesTableEntry 21 }
+ 
+sfpsCPResourcesNeedFlood   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Set to enabled(1)/disabled(0) if the BaseNeedFlood attribute
+                is desired. If disabled, then an attempt to resolve is
+                performed."
+        ::= { sfpsCPResourcesTableEntry 22 }
+
+sfpsCPResourcesNeedResolve   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Set to enabled(1)/disabled(0) if the Resoolve attribute 
+                is desired."
+        ::= { sfpsCPResourcesTableEntry 23 }
+
+sfpsCPResourcesNeedDiscover  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Set to enabled(1)/disabled(0) if the Discover attribute
+                is desired."
+        ::= { sfpsCPResourcesTableEntry 24 }
+
+sfpsCPResourcesDiscoverAll   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Set to enabled(1)/disabled(0) if the DiscoverAll attribute
+                is desired."
+        ::= { sfpsCPResourcesTableEntry 25 }
+
+sfpsCPResourcesNeedProxyOut   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Set to enabled(1)/disabled(0) if the Proxy Forward attribute
+                is desired."
+        ::= { sfpsCPResourcesTableEntry 26 }
+
+sfpsCPResourcesNeedProxyIn   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Set to enabled(1)/disabled(0) if the Proxy Back attribute
+                is desired."
+        ::= { sfpsCPResourcesTableEntry 27 }
+
+sfpsCPResourcesNeedFilter   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Set to enabled(1)/disabled(0) if the Filter attribute
+                is desired."
+        ::= { sfpsCPResourcesTableEntry 28 }
+
+sfpsCPResourcesAcceptRate   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets per second that have been sent to this
+                 Call Processor to be handled and accepted for processing."
+        ::= { sfpsCPResourcesTableEntry 29 }
+
+sfpsCPResourcesTotalRate   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets per second that have been sent to this
+                 Call Processor to be handled."
+        ::= { sfpsCPResourcesTableEntry 30 }
+
+sfpsCPResourcesSingleFlood   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that were unicast (single) flooded."
+        ::= { sfpsCPResourcesTableEntry 34 }
+
+sfpsCPResourcesNeedValidNet   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of packets that were unicast (single) flooded."
+        ::= { sfpsCPResourcesTableEntry 35 }
+
+sfpsCPResourcesInvalidNetDrops   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCPResourcesTableEntry 36 }
+
+sfpsCPResourcesPersistMask   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCPResourcesTableEntry 37 }
+
+--  CPResource API
+
+sfpsCPResourcesAPI   OBJECT IDENTIFIER ::= { sfpsCPResources 2 }
+
+sfpsCPResourcesAPIID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Identifier for the call processor."
+        ::= { sfpsCPResourcesAPI 1 }
+
+sfpsCPResourcesAPIAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        disabled(2),
+                        enabled(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative status of the call processor."
+        ::= { sfpsCPResourcesAPI 2 }
+
+sfpsCPResourcesAPIAttribute   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        none(1),
+                        noFlood(2),
+                        flood(3),
+                        noResolve(4),
+                        resolve(5),
+                        noDiscover(6),
+                        discover(7),
+                        noDiscoverAll(8),
+                        discoverAll(9),
+                        noProxyIn(10),
+                        proxyIn(11),
+                        noProxyOut(12),
+                        proxyOut(13),
+                        nofilter(14),
+                        filter(15),
+            noValidateNet(16),
+            validNet(17)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Call processor attribute/features."
+        ::= { sfpsCPResourcesAPI 3 }
+
+sfpsCPResourcesAPIScope   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        switch(1),
+                        port(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Scope this attribute to switch or port."
+        ::= { sfpsCPResourcesAPI 4 }
+
+sfpsCPResourcesAPIPersistance   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        persistOther(1),
+                        persistDisabled(2),
+            persistEnabled(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Parameter to make persistent on switch reset."
+        ::= { sfpsCPResourcesAPI 5 }
+
+sfpsCPResourcesAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        set(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to perform."
+        ::= { sfpsCPResourcesAPI 6 }
+
+ 
+--
+
+
+sfpsCSPControlTable             OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsCSPControlTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Cabletron Switch Protocol Control statistics"
+        ::= { sfpsCSPControl 1 }
+
+sfpsCSPControlTableEntry        OBJECT-TYPE
+        SYNTAX  SfpsCSPControlTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsCSPControlTableIndex }
+        ::= { sfpsCSPControlTable 1 }
+
+SfpsCSPControlTableEntry        ::=
+        SEQUENCE {
+                sfpsCSPControlTableIndex                        INTEGER,
+                sfpsCSPControlTableCSPType              INTEGER,
+                sfpsCSPControlTableCSPName              DisplayString,
+                sfpsCSPControlTableAdminStatus          INTEGER,
+                sfpsCSPControlTableSwitchToCallProc     INTEGER,                
+                sfpsCSPControlTablePktsProcessed        INTEGER,
+                sfpsCSPControlTablePktRate                      INTEGER
+        }
+
+sfpsCSPControlTableIndex                        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCSPControlTableEntry 1 }
+
+sfpsCSPControlTableCSPType                      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCSPControlTableEntry 2 }
+
+sfpsCSPControlTableCSPName                      OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCSPControlTableEntry 3 }
+
+sfpsCSPControlTableAdminStatus                  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disable(2),
+                enable(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCSPControlTableEntry 4 }
+
+sfpsCSPControlTableSwitchToCallProc                     OBJECT-TYPE
+        SYNTAX  INTEGER {
+        other(1),
+                disable(2),
+                enable(3)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCSPControlTableEntry 5 }
+
+sfpsCSPControlTablePktsProcessed                        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCSPControlTableEntry 6 }
+
+sfpsCSPControlTablePktRate                      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCSPControlTableEntry 7 }
+
+-- FACILITY
+
+sfpsServiceCenterFacilityTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsServiceCenterFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table gives facility semantics to call processing."
+        ::= { sfpsServiceCenter 9 }
+
+sfpsServiceCenterFacilityEntry    OBJECT-TYPE
+        SYNTAX  SfpsServiceCenterFacilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the configuration of the Facility Entry."
+        INDEX   { sfpsServiceCenterFacilityHashLeaf } 
+        ::= { sfpsServiceCenterFacilityTable 1 }
+
+SfpsServiceCenterFacilityEntry ::=
+        SEQUENCE {
+                sfpsServiceCenterFacilityHashLeaf       HexInteger,  
+                sfpsServiceCenterFacilityMetric         INTEGER,  
+                sfpsServiceCenterFacilityName           DisplayString,  
+                sfpsServiceCenterFacilityOperStatus     INTEGER,  
+                sfpsServiceCenterFacilityAdminStatus     INTEGER,
+                sfpsServiceCenterFacilityStatusTime     TimeTicks,
+                sfpsServiceCenterFacilityRequests       INTEGER,
+                sfpsServiceCenterFacilityReply          INTEGER
+                  
+         }  
+
+sfpsServiceCenterFacilityHashLeaf   OBJECT-TYPE
+        SYNTAX  HexInteger  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server hash, part of instance key."
+        ::= { sfpsServiceCenterFacilityEntry 1 }
+
+sfpsServiceCenterFacilityMetric   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines order servers are called low to high."
+        ::= { sfpsServiceCenterFacilityEntry 2 }
+
+sfpsServiceCenterFacilityName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server name."
+        ::= { sfpsServiceCenterFacilityEntry 3 }
+
+sfpsServiceCenterFacilityOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                        kStatusRunning(1),      --  all is well
+                        kStatusHalted(2),       -- admin disabled
+                        kStatusPending(3),      -- Trying to run, not there yet
+                        kStatusFaulted(4),      -- Internal error, never will recover
+                        kStatusNotStarted(5)    -- Not fully started yet
+        }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational state of entry."
+        ::= { sfpsServiceCenterFacilityEntry 4 }
+
+sfpsServiceCenterFacilityAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER       {
+                        other(1),               -- Not running or stopped
+                        disable(2),             -- Please stop
+                        enable(3)               -- Go
+        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative State of Entry."
+        ::= { sfpsServiceCenterFacilityEntry 5 }
+
+sfpsServiceCenterFacilityStatusTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time Tick of last operStatus change."
+        ::= { sfpsServiceCenterFacilityEntry 6 }
+
+sfpsServiceCenterFacilityRequests   OBJECT-TYPE
+        SYNTAX   INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Requests made to server."
+        ::= { sfpsServiceCenterFacilityEntry 7 }
+
+sfpsServiceCenterFacilityReply   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "GOOD replies by server."
+        ::= { sfpsServiceCenterFacilityEntry 8 }
+ 
+-- Source Blocker Table
+
+sfpsBlockSourceTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsBlockSourceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+                "The SourceBlocker table lists all nodes (MAC addresses) that
+                 have been heard locally on the switch. Only a certain subset
+                 (if any) of the nodes in this table are blocked."
+        ::= { sfpsBlockSource 1 }
+
+sfpsBlockSourceEntry    OBJECT-TYPE
+        SYNTAX  SfpsBlockSourceEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Entry in the SourceBlocker table indexed by a counter."
+        INDEX   { sfpsBlockSourceIndex }
+        ::= { sfpsBlockSourceTable 1 }
+
+SfpsBlockSourceEntry ::=
+        SEQUENCE {
+                sfpsBlockSourceIndex                    INTEGER,
+                sfpsBlockSourceMAC                      SfpsAddress,
+                sfpsBlockSourceElapTimeShort            TimeTicks,
+                sfpsBlockSourceNumCallsShort            INTEGER,
+                sfpsBlockSourceElapTimeLong             TimeTicks,
+                sfpsBlockSourceNumCallLong              INTEGER,
+                sfpsBlockSourceBlockFlag                INTEGER,
+                sfpsBlockSourceUnBlockableFlag  INTEGER,
+                sfpsBlockSourceFilterPresent            INTEGER,
+                sfpsBlockSourceNext                     INTEGER,
+                sfpsBlockSourceBlocksOnlyIndex  INTEGER
+        }  
+
+sfpsBlockSourceIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index into the table"
+        ::= { sfpsBlockSourceEntry 1 }
+
+sfpsBlockSourceMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address of the node."
+        ::= { sfpsBlockSourceEntry 2 }
+
+sfpsBlockSourceElapTimeShort    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time (seconds) in the current short-threshold
+                 period."
+        ::= { sfpsBlockSourceEntry 3 }
+
+sfpsBlockSourceNumCallsShort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets seen from the node during the elapsed
+                 time for the short-threshold."
+        ::= { sfpsBlockSourceEntry 4 }
+
+sfpsBlockSourceElapTimeLong    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time (seconds) in the current long-threshold 
+                period."
+        ::= { sfpsBlockSourceEntry 5 }
+
+sfpsBlockSourceNumCallLong    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets seen from the node during the elapsed
+                 time for the long-threshold."
+        ::= { sfpsBlockSourceEntry 6 }
+
+sfpsBlockSourceBlockFlag    OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              notBlocked (0),
+                blocked (1),
+                wouldBeBlocked (2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes whether the node is blocked or not. There are three
+                 possible integer values for this field: 0-notBlocked,
+                 1-Blocked, 2-WouldBeBlocked. The WouldBeBlocked value is used
+                 to represent a node that would be in the blocked state if the
+                 SourceBlocker was enabled. A node can get into this state only
+                 if the blocker is disabled. If the blocker is enabled at this
+                 point, the node will be blocked, and a connection filter will
+                 be put in place when the next packet is received from this
+                 node."
+        ::= { sfpsBlockSourceEntry 7 }
+
+sfpsBlockSourceUnBlockableFlag    OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              blockable (0),
+                unblockable (1)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Flags a node as either Blockable(0) or Unblockable(1). When a
+                 node is unblockable, it will never be blocked regardless of the
+                 number of packets it sends. The default setting is blockable.
+                 Any node can be changed to unblockable via the Source Blocker
+                 API (SBAPI)."
+        ::= { sfpsBlockSourceEntry 8 }
+
+sfpsBlockSourceFilterPresent    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Flags whether or not a connection filter is in place for the
+                 given node. (This attribute cannot be changed on its own and is
+                 therefore used only for diagnostic purposes. It is used
+                 internally so that only one filter connection will be mapped
+                 per node.)"
+        ::= { sfpsBlockSourceEntry 9 }
+
+sfpsBlockSourceNext    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this node entry (instance) is part of a hash chain, the 
+                NEXT leaf will contain the index to the next node entry in 
+                the chain. Otherwise, it will contain -1."
+        ::= { sfpsBlockSourceEntry 10 }
+
+sfpsBlockSourceBlocksOnlyIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Contains the index into the BlockSourceOnly table or the
+                 UnblockableOnly table depending on the entry flags. If the
+                 'blocked flag' is set, this value represents the index into
+                 the BlockSourceOnly table. If the 'unblockable' flag is set,
+                 this value represents the index into the UnblockableOnly
+                 table. Otherwise, this value is set to -1 (representing that
+                 it is not used.)"
+        ::= { sfpsBlockSourceEntry 11 }
+
+
+-- Source Blocks Only Table
+
+sfpsBlockSourceOnlyTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsBlockSourceOnlyEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+                "The format of the BlockSourceOnly Table is exactly the same as the
+                 SourceBlocker Table. The only difference is that the entries in
+                 this table are only a subset of the entries in the SourceBlocker
+                 Table. Only the entries that have a BLOCKFLAG set to 'blocked' or
+                 'would-be-blocked' will reside in this table."
+        ::= { sfpsBlockSourceOnly 1 }
+
+sfpsBlockSourceOnlyEntry    OBJECT-TYPE
+        SYNTAX  SfpsBlockSourceOnlyEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Entry in the BlockSourceOnly table indexed by a counter."
+        INDEX   { sfpsBlockSourceOnlyIndex }
+        ::= { sfpsBlockSourceOnlyTable 1 }
+
+SfpsBlockSourceOnlyEntry ::=
+        SEQUENCE {
+                sfpsBlockSourceOnlyIndex                INTEGER,
+                sfpsBlockSourceOnlyMAC          SfpsAddress,
+                sfpsBlockSourceOnlyElapTimeShort        TimeTicks,
+                sfpsBlockSourceOnlyNumCallsShort        INTEGER,
+                sfpsBlockSourceOnlyElapTimeLong TimeTicks,
+                sfpsBlockSourceOnlyNumCallLong  INTEGER,
+                sfpsBlockSourceOnlyBlockFlag            INTEGER,
+                sfpsBlockSourceOnlyUnBlockableFlag      INTEGER,
+                sfpsBlockSourceOnlyFilterPresent        INTEGER,
+                sfpsBlockSourceOnlyNext         INTEGER,
+                sfpsBlockSourceOnlyBlocksOnlyIndex      INTEGER
+        }  
+
+sfpsBlockSourceOnlyIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The index into the table"
+        ::= { sfpsBlockSourceOnlyEntry 1 }
+
+sfpsBlockSourceOnlyMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address of the node."
+        ::= { sfpsBlockSourceOnlyEntry 2 }
+
+sfpsBlockSourceOnlyElapTimeShort    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time (seconds) in the current short-threshold
+                 period."
+        ::= { sfpsBlockSourceOnlyEntry 3 }
+
+sfpsBlockSourceOnlyNumCallsShort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets seen from the node during the elapsed
+                 time for the short-threshold."
+        ::= { sfpsBlockSourceOnlyEntry 4 }
+
+sfpsBlockSourceOnlyElapTimeLong    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               "The elapsed time (seconds) in the current long-threshold 
+                period."
+        ::= { sfpsBlockSourceOnlyEntry 5 }
+
+sfpsBlockSourceOnlyNumCallLong    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets seen from the node during the elapsed
+                 time for the long-threshold."
+        ::= { sfpsBlockSourceOnlyEntry 6 }
+
+sfpsBlockSourceOnlyBlockFlag    OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              notBlocked (0),
+                blocked (1),
+                wouldBeBlocked (2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes whether the node is blocked or not. There are three
+                 possible integer values for this field: 0-notBlocked,
+                 1-Blocked, 2-WouldBeBlocked. The WouldBeBlocked value is used
+                 to represent a node that would be in the blocked state if the
+                 SourceBlocker was enabled. A node can get into this state only
+                 if the blocker is disabled. If the blocker is enabled at this
+                 point, the node will be blocked, and a connection filter will
+                 be put in place when the next packet is received from this
+                 node."
+        ::= { sfpsBlockSourceOnlyEntry 7 }
+
+sfpsBlockSourceOnlyUnBlockableFlag    OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              blockable (0),
+                unblockable (1)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               " Flags a node as either Blockable(0) or Unblockable(1). When a
+                 node is unblockable, it will never be blocked regardless of the
+                 number of packets it sends. The default setting is blockable.
+                 Any node can be changed to unblockable via the Source Blocker
+                 API (SBAPI)."
+        ::= { sfpsBlockSourceOnlyEntry 8 }
+
+sfpsBlockSourceOnlyFilterPresent    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " Flags whether or not a connection filter is in place for the
+                 given node. (This attribute cannot be changed on its own and is
+                 therefore used only for diagnostic purposes. It is used
+                 internally so that only one filter connection will be mapped
+                 per node.)"
+        ::= { sfpsBlockSourceOnlyEntry 9 }
+
+sfpsBlockSourceOnlyNext    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this node entry (instance) is part of a hash chain, the 
+                NEXT leaf will contain the index to the next node entry in 
+                the chain. Otherwise, it will contain -1."
+        ::= { sfpsBlockSourceOnlyEntry 10 }
+
+sfpsBlockSourceOnlyBlocksOnlyIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Contains the index into the BlockSourceOnly table or the
+                 UnblockableOnly table depending on the entry flags. If the
+                 'blocked' flag is set, this value represents the index into
+                 the BlockSourceOnly table. If the 'unblockable' flag is set,
+                 this value represents the index into the UnblockableOnly
+                 table. Otherwise, this value is set to -1 (representing that
+                 it is not used.)"
+        ::= { sfpsBlockSourceOnlyEntry 11 }
+
+-- Source Block Port Table
+
+sfpsBlockSourcePortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsBlockSourcePortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+               " The SourceBlock API allows for administratively selecting a port and
+                 flagging it as 'unblockable'. The BlockSourcePort table shows which
+                 ports are set to 'unblockable' and which ones remain set to the default
+                 'blockable' setting."
+        ::= { sfpsBlockSourcePort 1 }
+
+sfpsBlockSourcePortEntry    OBJECT-TYPE
+        SYNTAX  SfpsBlockSourcePortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+               " Entry into the BlockSourcePort Table"
+        INDEX   { sfpsBlockSourcePortPort }
+        ::= { sfpsBlockSourcePortTable 1 }
+
+SfpsBlockSourcePortEntry ::=
+        SEQUENCE {
+                sfpsBlockSourcePortPort         INTEGER,
+                sfpsBlockSourcePortBlockability INTEGER
+        }  
+
+sfpsBlockSourcePortPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the instance part of the table. There will be as many
+                 instances as there are logical ports in the device. The attributes 
+                represented in subsequent leaves all pertain to this port instance."
+        ::= { sfpsBlockSourcePortEntry 1 }
+
+sfpsBlockSourcePortBlockability   OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              blockable(0),
+                unblockable(1)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This leaf contains either 0-blockable or 1-unblockable, depending on 
+                whether nodes on this port are allowed to be blocked or not."
+        ::= { sfpsBlockSourcePortEntry 2 }
+
+-- Source Block API
+
+sfpsBlockSourceAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                switchToLearning(2),
+                switchToBlocking(3),
+                setShortThreshold(4),
+                setShortPeriod(5),
+                setLongThreshold(6),
+                setLongPeriod(7),
+                clearAll(8),
+                blockMac(9),
+                unblockMac(10),
+                setMacUnblockable(11),
+                setMacBlockable(12),
+                setPortUnblockable(13),
+                setPortBlockable(14),
+                setReapUserCnx(15)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+               "Other -- N/A
+                Disable -- disable the source blocker (nodes that are currently 
+                 blocked will remain blocked, but no additional nodes will be blocked)
+                Enable -- enable the source blocker (allow it to start blocking nodes)
+                ClearAll -- clear the entire block table (this does not remove any 
+                 connection filters, and should only be used as a diagnostic tool.)
+                BlockMac -- administratively block a node (The node's MAC address
+                 must be previously set in the MAC leaf.)
+                UnblockMac -- administratively unblock a node (The node's MAC address
+                 must be previously set in the MAC leaf.)
+                SetMacUnblockable -- administratively mark a node as 'unblockable' 
+                 so that it cannot be blocked. (The node's MAC must be previously set 
+                 in the MAC leaf.) If the relevant node is blocked at the time the 
+                SetMacUnblockable command is issued, the node will automatically be
+                 'unblocked' first.
+                SetMacBlockable -- administratively mark a node as 'blockable' so that 
+                 it can be blocked. (The node's MAC must be previously set in the MAC
+                 leaf.)
+                SetPortUnblockable -- administratively mark a port as 'unblockable' so
+                 that any nodes on that port cannot be blocked. (The port number must
+                 be previously set in the Port leaf.)
+                SetPortBlockable -- administratively mark a port as 'blockable' so that
+                 all nodes on that port can be blocked. (The port number must be
+                 previously set in the Port leaf.)
+                SetReapUserCnx -- administratively mark a port as 'blocked' so that administratively
+                 mark a port as 'blockable' so that.)"
+      ::= { sfpsBlockSourceAPI 1 }
+
+sfpsBlockSourceAPIInputValue   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Set the input value to enter"
+        ::= { sfpsBlockSourceAPI 2 }
+
+sfpsBlockSourceAPIPort   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Read/Write leaf used in conjunction with SetPortUnblockable and
+                 SetPortBlockable. (values of 1 through numLogicalPorts are valid."
+        ::= { sfpsBlockSourceAPI 3 }
+
+sfpsBlockSourceAPIMAC   OBJECT-TYPE
+        SYNTAX  SfpsAddress     
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Leaf used to set the MAC address that will be operated on with one
+                 of the above verbs."
+        ::= { sfpsBlockSourceAPI 4 }
+
+sfpsBlockSourceAPIBlockStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                learning(2),
+                blocking(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Status of the blocker object (enabled/disabled.) Additional nodes 
+                will be blocked only when this status leaf is in the 'enabled' state."
+        ::= { sfpsBlockSourceAPI 5 }
+
+sfpsBlockSourceAPIShortThreshold   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets per a SHORTPERIOD that will result in a node
+                 being blocked. This can be changed by writing directly to this leaf.
+                 The only limit imposed on this value is that it has to be positive 
+                (greater than zero.) There is no upper bound except for what is 
+                implied by the size of an integer."
+        ::= { sfpsBlockSourceAPI 6 }
+
+sfpsBlockSourceAPIShortPeriod   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The sample period to use for determining if any given node has 
+                exceeded the SHORTTHRESHOLD. See SHORTTHRESHOLD for bounds checking 
+                for this value"
+        ::= { sfpsBlockSourceAPI 7 }
+
+sfpsBlockSourceAPILongThreshold   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets per a LONGPERIOD that will result in a node
+                 being blocked. See SHORTTHRESHOLD for bounds checking for this value."
+        ::= { sfpsBlockSourceAPI 8 }
+
+sfpsBlockSourceAPILongPeriod   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The sample period to use for determining if any given node has
+                 exceeded the LONGTHRESHOLD. See SHORTTHRESHOLD for bounds checking
+                 for this value."
+        ::= { sfpsBlockSourceAPI 9 }
+
+sfpsBlockSourceAPIReapUserCnxs   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The sample period to use for determining if any given node has
+                 exceeded the LONGTHRESHOLD. See SHORTTHRESHOLD for bounds checking
+                 for this value."
+        ::= { sfpsBlockSourceAPI 10 }
+
+
+-- Unblockable Nodes Table
+
+sfpsBlockSourceExcludeTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsBlockSourceExcludeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION 
+                "The format of the UnblockableOnly Table is exactly the same as the
+                 SourceBlocker Table. The only difference is that the entries in this
+                 table are only a subset of the entries in the SourceBlocker Table. 
+                Only the entries that have an UNBLOCKABLEFLAG set to 'unblockable'
+                 will show up in this table."
+        ::= { sfpsBlockSourceExclude 1 }
+
+sfpsBlockSourceExcludeEntry    OBJECT-TYPE
+        SYNTAX  SfpsBlockSourceExcludeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+               " Entry in the BlockSourceOnly table indexed by a counter."
+        INDEX   { sfpsBlockSourceExcludeIndex }
+        ::= { sfpsBlockSourceExcludeTable 1 }
+
+SfpsBlockSourceExcludeEntry ::=
+        SEQUENCE {
+                sfpsBlockSourceExcludeIndex             INTEGER,
+                sfpsBlockSourceExcludeMAC                       SfpsAddress,
+                sfpsBlockSourceExcludeElapTimeShort     TimeTicks,
+                sfpsBlockSourceExcludeNumCallsShort     INTEGER,
+                sfpsBlockSourceExcludeElapTimeLong      TimeTicks,
+                sfpsBlockSourceExcludeNumCallLong               INTEGER,
+                sfpsBlockSourceExcludeBlockFlag         INTEGER,
+                sfpsBlockSourceExcludeUnBlockableFlag   INTEGER,
+                sfpsBlockSourceExcludeFilterPresent     INTEGER,
+                sfpsBlockSourceExcludeNext              INTEGER,
+                sfpsBlockSourceExcludeBlockSourceOnlyIndex      INTEGER
+        }  
+
+sfpsBlockSourceExcludeIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               " The index into the table"
+        ::= { sfpsBlockSourceExcludeEntry 1 }
+
+sfpsBlockSourceExcludeMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The MAC address of the node."
+        ::= { sfpsBlockSourceExcludeEntry 2 }
+
+sfpsBlockSourceExcludeElapTimeShort    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time (seconds) in the current short-threshold
+                 period."
+        ::= { sfpsBlockSourceExcludeEntry 3 }
+
+sfpsBlockSourceExcludeNumCallsShort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets seen from the node during the elapsed
+                 time for the short-threshold"
+        ::= { sfpsBlockSourceExcludeEntry 4 }
+
+sfpsBlockSourceExcludeElapTimeLong    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The elapsed time (seconds) in the current long-threshold 
+                period"
+        ::= { sfpsBlockSourceExcludeEntry 5 }
+
+sfpsBlockSourceExcludeNumCallLong    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets seen from the node during the elapsed
+                 time for the long-threshold."
+        ::= { sfpsBlockSourceExcludeEntry 6 }
+
+sfpsBlockSourceExcludeBlockFlag    OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              notBlocked (0),
+                blocked (1),
+                wouldBeBlocked (2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Describes whether the node is blocked or not. There are three
+                 possible integer values for this field: 0-notBlocked,
+                 1-Blocked, 2-WouldBeBlocked. The WouldBeBlocked value is used
+                 to represent a node that would be in the blocked state if the
+                 SourceBlocker was enabled. A node can get into this state only
+                 if the blocker is disabled. If the blocker is enabled at this
+                 point, the node will be blocked, and a connection filter will
+                 be put in place when the next packet is received from this
+                 node"
+        ::= { sfpsBlockSourceExcludeEntry 7 }
+
+sfpsBlockSourceExcludeUnBlockableFlag    OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              blockable (0),
+                unblockable (1)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Flags a node as either Blockable(0) or Unblockable(1). When a
+                 node is unblockable, it will never be blocked regardless of the
+                 number of packets it sends. The default setting is blockable.
+                 Any node can be changed to unblockable via the Source Blocker
+                 API (SBAPI)."
+        ::= { sfpsBlockSourceExcludeEntry 8 }
+
+sfpsBlockSourceExcludeFilterPresent    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               " Flags whether or not a connection filter is in place for the
+                 given node. (This attribute cannot be changed on its own and is
+                 therefore used only for diagnostic purposes. It is used
+                 internally so that only one filter connection will be mapped
+                 per node.)"
+        ::= { sfpsBlockSourceExcludeEntry 9 }
+
+sfpsBlockSourceExcludeNext    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "If this node entry (instance) is part of a hash chain, the 
+                NEXT leaf will contain the index to the next node entry in 
+                the chain. Otherwise, it will contain -1"
+        ::= { sfpsBlockSourceExcludeEntry 10 }
+
+sfpsBlockSourceExcludeBlockSourceOnlyIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Contains the index into the BlockSourceOnly table or the
+                 UnblockableOnly table depending on the entry flags. If the
+                 'blocked' flag is set, this value represents the index into
+                 the BlockSourceOnly table. If the 'unblockable' flag is set,
+                 this value represents the index into the UnblockableOnly
+                 table. Otherwise, this value is set to -1 (representing that
+                 it is not used"
+        ::= { sfpsBlockSourceExcludeEntry 11 }
+
+-- Source Blocker Stats API
+
+sfpsBlockSourceStatsNumBlocks    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsBlockSourceStats 1 }
+
+sfpsBlockSourceStatsNumCollisions    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of hash collisions resulting in a chain of nodes. 
+                (diagnostic only.)"
+        ::= { sfpsBlockSourceStats 2 }
+
+sfpsBlockSourceStatsLongestChain    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The maximum number of nodes in a linked list chain 
+                (including the hash bucket itself) due to hashing collisions. 
+                (diagnostic only.)"
+        ::= { sfpsBlockSourceStats 3 }
+
+sfpsBlockSourceStatsNumEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of entries in the SourceBlocker table. 
+                (Each new node that is heard has its own entry."
+        ::= { sfpsBlockSourceStats 4 }
+
+sfpsBlockSourceStatsMaxNumEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+               " The maximum number of entries that can fit in the SourceBlocker Table. 
+                (This currently mirrors the size of the Directory's NodeTable.)"
+        ::= { sfpsBlockSourceStats 5 }
+
+sfpsBlockSourceStatsSizeOfObj    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The size of the SourceBlocker object itself (in bytes.)"
+        ::= { sfpsBlockSourceStats 6 }
+
+sfpsBlockSourceStatsHashModValue    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The value that is used for the modulus operation in the 
+                hashing algorythm."
+        ::= { sfpsBlockSourceStats 7 }
+
+sfpsBlockSourceStatsHashSlotsSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The amount of storage used for the hash buckets (in bytes.)"
+        ::= { sfpsBlockSourceStats 8 }
+
+sfpsBlockSourceStatsTableSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The amount of storage used for the SourceBlocker Table (in bytes.)"
+        ::= { sfpsBlockSourceStats 9 }
+
+sfpsBlockSourceStatsBlockSourceOnlySize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The amount of storage used for the Blocks-Only index array (in bytes.)"
+        ::= { sfpsBlockSourceStats 10 }
+
+sfpsBlockSourceStatsUnblockableSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The amount of storage used for the Unblockable-Only index array 
+                (in bytes.)"
+        ::= { sfpsBlockSourceStats 11 }
+
+sfpsBlockSourceStatsPortMaskSize   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The amount of storage used for the port mask object (in bytes.)"
+        ::= { sfpsBlockSourceStats 12 }
+
+sfpsBlockSourceStatsTotalHeapBytes    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The total amount of heap memory used for all data storage (above) 
+                including the SourceBlocker object itself (in bytes.)"
+        ::= { sfpsBlockSourceStats 13 }
+
+
+-- sfpsDHCPServerVLAN
+
+sfpsDHCPServerVLANName    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDHCPServerVLAN 1 }
+
+sfpsDHCPServerVLANSingleFloodStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                on(1),
+                off(2)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDHCPServerVLAN 2 }
+
+sfpsDHCPServerVLANVersion    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDHCPServerVLAN 3 }
+
+
+-- sfpsATalkAMRVLANControl
+
+sfpsATalkAMRVLANControlName    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsATalkAMRVLANControl 1 }
+
+
+sfpsATalkAMRVLANControlVersion    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsATalkAMRVLANControl 2 }
+
+END

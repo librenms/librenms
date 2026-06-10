@@ -1,0 +1,1079 @@
+-- ***************************************************************************
+-- ***************************************************************************
+--
+-- File         : immalert.mib
+-- Description  : Integrated Management Module mib for SNMP alerts
+-- By           : IBM
+-- Version      : 2.6
+-- Date         : July 26, 2011
+--
+--
+-- Copyright (c) 2011 IBM  All Rights Reserved.
+--
+-- 
+-- Contains MIB description for: 
+--  This MIB is used by the IMM to generate traps
+--  for Alert conditions detected by the management firmware.
+-- ***************************************************************************
+-- ***************************************************************************
+-- ***************************************************************************
+-- Revisions: 
+--     07/28/2010 Version 2.0
+--     Updated version info for imm2.mib and added portParity and portStopBits since these are supported in IMM2 hardware. 
+--
+--     09/13/2010 Version 2.1 
+--     added some Trap Types. Removed a couple of Trap Types.  Changed some Trap Type names for consistency. 
+--
+--     10/20/2010 Version 2.2
+--     add additional OIDs required to be sent with each SNMP Trap. 
+--     
+--     02/24/2011 Version 2.3 
+--     change netfinitySupportProcessor to supportProcessor to be consistent with naming of "ibmProd 158" in other alert MIBs 
+--
+--     03/17/2011 Version 2.4
+--     fix spelling of imm2alertMIB 
+--
+--     07/07/2011 Version 2.5
+--     changes to make mib compatible with IMM1
+--
+--     07/26/2011 Version 2.6
+--     correction to "Alert Severity Value", range 0..65535
+-- ***************************************************************************
+        IMMALERT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            OBJECT-TYPE                          FROM RFC-1212
+            enterprises,
+            Counter, TimeTicks, IpAddress        FROM RFC1155-SMI
+            mib-2,
+            DisplayString                        FROM RFC1213-MIB;
+
+
+        -- MIB for IMM Alerts starts here
+
+
+        ibm            OBJECT IDENTIFIER ::=   { enterprises 2 }
+
+        -- IBM products group
+
+        ibmProd        OBJECT IDENTIFIER ::=   { ibm 6 }
+
+        -- IBM Netfinity SP
+
+        supportProcessor OBJECT IDENTIFIER ::= { ibmProd 158 }
+
+        -- IBM IMM Alert
+
+        immalertMIB   OBJECT IDENTIFIER ::= { supportProcessor 5 }
+
+        -- the nfspalt generic trap generator group
+
+        immtrapg      OBJECT IDENTIFIER ::=   { immalertMIB 1 }
+
+        altDateTime    OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Timestamp of Local Date and Time when alert was generated"
+                       ::= { immtrapg 1 }
+
+        altSpTxtId        OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "SP System Identification - Text Identification"
+                       ::= { immtrapg 3 }
+
+        altSysUuid     OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host System UUID(Universal Unique ID)"
+                       ::= { immtrapg 5 }
+                       
+        altSysSern     OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host System Serial Number"
+                       ::= { immtrapg 6 }
+        
+        altPriority     OBJECT-TYPE
+                       SYNTAX  INTEGER (0..65535)
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Alert Severity Value
+                          - Critical Alert(0)
+                          - Non-Critical Alert(2)
+                          - System Alert(4)
+                          - Recovery(8)"
+                       ::= { immtrapg 8 }
+
+        altMsgText     OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Alert Message Text"
+                       ::= { immtrapg 9 }
+
+        altMsgID       OBJECT-TYPE
+                       SYNTAX  INTEGER
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Alert Message ID"
+                       ::= { immtrapg 10 }
+
+        altMsgIDPrefix OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Alert Message ID"
+                       ::= { immtrapg 11 }	
+                       
+				   
+        altHostContact  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Contact"
+                       ::= { immtrapg 12 }
+
+        altHostLocation  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Location"
+                       ::= { immtrapg 13 }
+
+        altHostRoomID  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Location - Room ID"
+                       ::= { immtrapg 14 }
+
+        altHostRackID  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Location - Rack ID"
+                       ::= { immtrapg 15 }
+
+        altHostLowestUpos  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Location - Lowest U-position"
+                       ::= { immtrapg 16 }
+
+        altHostBladeBay  OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Host Location - BladeBay"
+                       ::= { immtrapg 17 }
+
+        altEventID     OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Event Identifier"
+                       ::= { immtrapg 18 }
+
+        altServiceable OBJECT-TYPE
+                       SYNTAX  INTEGER {
+                       notServiceable(0),
+                       serviceableByIBM(1),
+                       serviceableByCustomer(2)
+                       }
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Serviceability information."
+                       ::= { immtrapg 19 }
+
+        altTest        OBJECT-TYPE
+                       SYNTAX  INTEGER {
+                       false(0),
+                       true(1)
+                       }
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "This event generated for test purposes."
+                       ::= { immtrapg 20 }
+
+        altFailingFRUs OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Ordered list of Failing FRU Numbers, separated by commas."
+                       ::= { immtrapg 21 }
+
+        altHostMTM     OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Machine Type and Model for failing host."
+                       ::= { immtrapg 22 }
+
+        altAuxData     OBJECT-TYPE
+                       SYNTAX  DisplayString
+                       ACCESS  read-only
+                       STATUS  mandatory
+                       DESCRIPTION
+                       "Auxiliary data that may be included for some events."
+                       ::= { immtrapg 23 }
+
+
+-- ******************************************
+-- Critical Traps
+-- ******************************************
+        ibmSpTrapTempC        TRAP-TYPE
+                              ENTERPRISE  immalertMIB
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Temperature threshold exceeded."
+                                  ::= 0
+
+        ibmSpTrapVoltC        TRAP-TYPE
+                              ENTERPRISE  immalertMIB  
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Voltage threshold exceeded."
+                                ::= 1
+
+        ibmSpTrapPowerC       TRAP-TYPE
+                              ENTERPRISE  immalertMIB
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Power failure."
+                                ::= 4
+
+        ibmSpTrapHdC          TRAP-TYPE
+                              ENTERPRISE  immalertMIB
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Hard disk drive failure."
+                                ::= 5
+
+        ibmSpTrapFanC         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Single Fan failure."
+                                ::= 11
+
+
+        ibmSpTrapIhcC         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Incompatible hardware configuration."
+                                ::= 36
+
+        ibmSpTrapCPUC         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: CPU Error."
+                                ::= 40
+
+        ibmSpTrapMemoryC      TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Memory Error."
+                                ::= 41
+
+        ibmSpTrapRdpsC          TRAP-TYPE
+                                ENTERPRISE  immalertMIB 
+                                VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                  }
+                                  DESCRIPTION
+                                    "Critical Alert: Redundant Power Supply failure."
+                                  ::= 9
+
+        ibmSpTrapHardwareC    TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Critical Alert: Other Failure - refer to Message ID for specific condition."
+                                ::= 50
+
+-- ******************************************
+-- Non-Critical Traps
+-- ******************************************
+
+        ibmSpTrapRdpsN          TRAP-TYPE
+                                ENTERPRISE  immalertMIB 
+                                VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                  }
+                                  DESCRIPTION
+                                    "Non-Critical Alert: Redundant Power Supply failure."
+                                  ::= 10
+
+        ibmSpTrapTempN        TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Temperature threshold exceeded."
+                                ::= 12
+
+        ibmSpTrapVoltN        TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Voltage threshold exceeded."
+                                ::= 13
+
+        ibmSpTrapPowerN        TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Power."
+                                ::= 164
+
+        ibmSpTrapFanN         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Fan Error."
+                                ::= 165
+
+        ibmSpTrapCPUN         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: CPU Error."
+                                ::= 42
+
+        ibmSpTrapMemoryN      TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Memory Error."
+                                ::= 43
+
+        ibmSpTrapHardwareN    TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Non-Critical Alert: Warning - refer to Message ID for specific condition."
+                                ::= 60
+
+-- ******************************************
+-- System Traps
+-- ******************************************
+
+        ibmSpTrapRLogin       TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "Sev-Off Alert: Event Remote Login."
+                                ::= 30
+
+
+        ibmSpTrapOsToS        TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: OS Timeout value exceeded."
+                                ::= 21
+
+        ibmSpTrapAppS         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: Application Alert. Refer to Message ID for specific condition."
+                                ::= 22
+
+        ibmSpTrapPoffS        TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: Power Off."
+                                ::= 23
+
+        ibmSpTrapPonS         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: Power On."
+                                ::= 24
+
+        ibmSpTrapBootS        TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: System Boot Failure."
+                                ::= 25
+
+        ibmSpTrapLdrToS       TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: OS Loader Timeout."
+                                ::= 26
+
+        ibmSpTrapPFAS         TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: Predictive Failure Analysis(PFA) information."
+                                ::= 27
+
+        ibmSpTrapSysLogS      TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: System Log 75% full."
+                                ::= 35
+
+        ibmSpTrapNwChangeS    TRAP-TYPE
+                              ENTERPRISE  immalertMIB 
+                              VARIABLES
+                                {
+                                altDateTime,
+                                altSpTxtId,
+                                altSysUuid,
+                                altSysSern,
+                                altMsgID,
+                                altMsgIDPrefix,
+                                altPriority,
+                                altMsgText,
+                                altHostContact,
+                                altHostLocation,
+                                altHostRoomID,
+                                altHostRackID,
+                                altHostLowestUpos,
+                                altHostBladeBay,
+                                altEventID,
+                                altServiceable,
+                                altTest,
+                                altFailingFRUs,
+                                altHostMTM,
+                                altAuxData
+                                }
+                                DESCRIPTION
+                                  "System Alert: Network change notification."
+                                ::= 37
+END
+
+
+
+
+
+
+
+
+

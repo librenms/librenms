@@ -1,0 +1,1178 @@
+ARRIS-D5-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32, Counter32, Gauge32, NOTIFICATION-TYPE, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    arrisD5UEQam
+        FROM ARRIS-MIB
+    entPhysicalIndex,
+    entPhysicalContainedIn
+        FROM ENTITY-MIB
+    entPhySensorValue
+        FROM ENTITY-SENSOR-MIB
+    d5vIpSrcIndex,
+    d5vIpDestIndex,
+    d5vIpUdpIndex,
+    d5vStreamProgIndex,
+    d5vStreamEsPidIndex
+        FROM ARRIS-D5-VIDEO-MIB
+    docsDevEvLevel,
+    docsDevEvId,
+    docsDevEvText,
+    docsDevEventEntry
+        FROM DOCS-CABLE-DEVICE-MIB --RFC2669
+    d5QamExtServingGroup
+        FROM ARRIS-D5-QAM-EXT-MIB;
+
+d5AlarmMIB  MODULE-IDENTITY
+    LAST-UPDATED "200907150000Z" -- 15th July 2009
+    ORGANIZATION "Arris International"
+    CONTACT-INFO
+        "Network Management
+        Arris International.
+        4300 Cork Airport Business Park
+        Cork Airport, Kinsale Road
+        Cork, Ireland.
+        Tel:    +353 21 7305 800
+        Fax:    +353 21 4321 972"
+
+    DESCRIPTION
+        "D5 Universal Edge QAM Alarm MIB"
+    ::= { arrisD5UEQam  2 }
+
+
+    eqTraps OBJECT IDENTIFIER ::= { d5AlarmMIB 0 }
+    d5Traps OBJECT IDENTIFIER ::= { d5AlarmMIB 1 }
+    
+    d5EnvMonTraps   OBJECT IDENTIFIER ::= { d5Traps 1 }
+    d5MpegMgtTraps  OBJECT IDENTIFIER ::= { d5Traps 2 }
+    d5SessMgtTraps  OBJECT IDENTIFIER ::= { d5Traps 3 }
+    d5CasTraps      OBJECT IDENTIFIER ::= { d5Traps 4 }
+    d5MiscTraps     OBJECT IDENTIFIER ::= { d5Traps 5 }
+    d5TrapGroup     OBJECT IDENTIFIER ::= { d5Traps 6 }
+    d5AlarmStatus   OBJECT IDENTIFIER ::= { d5Traps 7 }
+    d5EqmMgtTraps   OBJECT IDENTIFIER ::= { d5Traps 8 }  --Reserved for EQM, do not change this OID
+    d5DtiTraps      OBJECT IDENTIFIER ::= { d5Traps 9 }
+
+    alarmNotification NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+                "This trap is sent whenever an alarmable event is generated."
+        ::= { eqTraps 1 }
+
+    alarmNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            alarmNotification
+            }
+        STATUS current
+        DESCRIPTION
+            "The D5 alarm notification group."
+        ::= { eqTraps 2 }
+
+    d5EnvMonAlarmOffTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor alarm off event is detected."
+        ::= { d5EnvMonTraps 1 }
+
+    d5EnvMonFanErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn,
+            entPhySensorValue
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor fan error is detected."
+        ::= { d5EnvMonTraps 2 }
+
+    d5EnvMonFanWarningTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn,
+            entPhySensorValue
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor fan warning is detected."
+        ::= { d5EnvMonTraps 3 }
+
+    d5EnvMonVoltErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn,
+            entPhySensorValue
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor voltage error is detected."
+        ::= { d5EnvMonTraps 4 }
+
+    d5EnvMonVoltWarningTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn,
+            entPhySensorValue
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor voltage warning is detected."
+        ::= { d5EnvMonTraps 5 }
+
+    d5EnvMonTempErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn,
+            entPhySensorValue
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor temperature error is detected."
+        ::= { d5EnvMonTraps 6 }
+
+    d5EnvMonTempWarningTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn,
+            entPhySensorValue
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor temperature warning is detected."
+        ::= { d5EnvMonTraps 7 }
+
+    d5EnvMonPsuErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor PSU error is detected."
+        ::= { d5EnvMonTraps 8 }
+
+    d5EnvMonPsuWarningTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor PSU warning is detected."
+        ::= { d5EnvMonTraps 9 }
+
+    d5EnvMonSysFatalTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor system error event is detected."
+        ::= { d5EnvMonTraps 10 }
+
+    d5EnvMonSysRecoverTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an environmental monitor system recovered event is detected."
+        ::= { d5EnvMonTraps 11 }
+
+--
+-- MPEG Management Traps
+--
+    d5MpegMgtProgErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management program error is detected."
+        ::= { d5MpegMgtTraps 1 }
+
+    d5MpegMgtProgPidErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex,
+            d5vStreamEsPidIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management program pid error is detected."
+        ::= { d5MpegMgtTraps 2 }
+
+    d5MpegMgtProgOversubsTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management program oversubscription event is detected."
+        ::= { d5MpegMgtTraps 3 }
+
+    d5MpegMgtProgStartTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management program start event is detected."
+        ::= { d5MpegMgtTraps 4 }
+
+    d5MpegMgtProgStopTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management program stop event is detected."
+        ::= { d5MpegMgtTraps 5 }
+
+    d5MpegMgtQamErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5StreamMax
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management QAM error event is detected."
+        ::= { d5MpegMgtTraps 6 }
+
+    d5MpegMgtQamOversubsTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5QamIndex,
+            d5QamBandwidth,
+            d5QamBandwidthNull,
+            d5QamBandwidthActual
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management QAM oversubscription event is detected."
+        ::= { d5MpegMgtTraps 7 }
+
+    d5MpegMgtQamOversubsFilterTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management QAM oversubscription filter event is detected."
+        ::= { d5MpegMgtTraps 8 }
+
+    d5MpegMgtQamOversubsRecoveryTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5QamIndex,
+            d5QamBandwidth,
+            d5QamBandwidthNull,
+            d5QamBandwidthActual
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management QAM oversubscription recovery event is detected."
+        ::= { d5MpegMgtTraps 9 }
+
+    d5MpegMgtSessStartTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when video is first detected for a particular session."
+        ::= { d5MpegMgtTraps 10 }
+
+    d5MpegMgtSessStopTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when all video streams for a particular session have stopped."
+        ::= { d5MpegMgtTraps 11 }
+
+    d5MpegMgtTableErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5MpegTableFailureReason
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an MPEG Management error is detected."
+        ::= { d5MpegMgtTraps 12 }
+
+    d5MpegMgtProgUnderflowTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an underflow is detected in an MPEG jitter buffer."
+        ::= { d5MpegMgtTraps 13 }
+
+    d5MpegMgtProgOverflowTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever an overflow is detected in an MPEG jitter buffer."
+        ::= { d5MpegMgtTraps 14 }
+
+--
+-- Session Management Traps
+--
+    d5SessMgtConnectTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessMgtIpAddr,
+            d5SessMgtPort
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management connect event is detected."
+        ::= { d5SessMgtTraps 1 }
+
+    d5SessMgtDisconnectTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5SessMgtIpAddr,
+            d5SessMgtPort,
+            d5SessMgtReason            
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management disconnect event is detected."
+        ::= { d5SessMgtTraps 2 }
+
+    d5SessMgtGenErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessMgtIpAddr,
+            d5SessMgtPort
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management error event is detected."
+        ::= { d5SessMgtTraps 3 }
+
+    d5SessMgtIgmpErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessMgtMcastIpAddr,
+            d5SessMgtIpAddr
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management IGMP error event is detected."
+        ::= { d5SessMgtTraps 4 }
+
+    d5SessMgtMsgInfoTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessMgtIpAddr,
+            d5SessMgtPort
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management info event is detected."
+        ::= { d5SessMgtTraps 5 }
+
+    d5SessMgtProgOversubsTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5SessionId,
+            d5QamIndex,
+            d5ProvisionedBandwidth,
+            d5ActualBandwidth
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management program oversubscription event is detected."
+        ::= { d5SessMgtTraps 6 }
+
+    d5SessMgtQamOversubsTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5QamIndex,
+            d5ProvisionedBandwidth,
+            d5ActualBandwidth
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management QAM oversubscription event is detected."
+        ::= { d5SessMgtTraps 7 }
+
+    d5SessMgtSessGroupOversubsTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5SessionId,
+            d5QamIndex,
+            d5ProvisionedBandwidth,
+            d5ActualBandwidth
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management connect group oversubscription event is detected."
+        ::= { d5SessMgtTraps 8 }
+
+    d5SessMgtQamErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5QamIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management QAM error event is detected."
+        ::= { d5SessMgtTraps 9 }
+
+    d5SessMgtSessInfoTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessionId
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management info event is detected."
+        ::= { d5SessMgtTraps 10 }
+
+    d5SessMgtSessErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessionId
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management error event is detected."
+        ::= { d5SessMgtTraps 11 }
+
+    d5SessMgtSessGroupErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessionId,
+            d5QamIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management group error event is detected."
+        ::= { d5SessMgtTraps 12 }
+
+    d5SessMgtShutdownTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5ShutdownReason
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management shutdown event is detected."
+        ::= { d5SessMgtTraps 13 }
+
+    d5SessMgtStartupTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management startup event is detected."
+        ::= { d5SessMgtTraps 14 }
+
+    d5SessMgtTimeoutResetTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            d5SessMgtIpAddr,
+            d5SessMgtPort
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a Session Management timeout reset event is detected."
+        ::= { d5SessMgtTraps 15 }
+        
+    d5SessMgtStreamUnavailTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5SessionId
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever Session Management detects that a stream is not available."
+        ::= { d5SessMgtTraps 16 }
+        
+    d5SessMgtStreamLostTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5SessionId,
+            d5QamIndex,
+            d5vStreamProgIndex
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever Session Management detects that a stream is no longer available."
+        ::= { d5SessMgtTraps 17 }
+
+    d5SessMgtMcpStreamLostTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted,
+            d5vIpSrcIndex,
+            d5vIpDestIndex,
+            d5vIpUdpIndex,
+            d5QamExtServingGroup
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever Session Management detects that an MCP stream is no longer available."
+        ::= { d5SessMgtTraps 18 } 
+        
+--
+-- DVB Simulcrypt Traps
+--
+    d5CasEcmgErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a DVB ECMG PSIG error is detected."
+        ::= { d5CasTraps 1 }
+
+    d5CasEisErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a DVB CAS EIS error is detected."
+        ::= { d5CasTraps 2 }
+
+    d5CasEmmgErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a DVB CAS EMMG error is detected."
+        ::= { d5CasTraps 3 }
+
+    d5CasPsigErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a DVB CAS PSIG error is detected."
+        ::= { d5CasTraps 4 }
+
+    d5SystemRebootTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a D5 reboot event is detected."
+        ::= { d5MiscTraps 1 }
+
+    d5TacacsErrorTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a TACACS error event is detected."
+        ::= { d5MiscTraps 2 }
+
+    d5TacacsInfoTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a TACACS info event is detected."
+        ::= { d5MiscTraps 3 }
+
+    d5HardwareMismatchTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            entPhysicalIndex,
+            entPhysicalContainedIn
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent whenever a hardware mismatch is detected."
+        ::= { d5MiscTraps 4 }
+
+    d5EnvMonTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            d5EnvMonAlarmOffTrap,
+            d5EnvMonFanErrorTrap,
+            d5EnvMonFanWarningTrap,
+            d5EnvMonVoltErrorTrap,
+            d5EnvMonVoltWarningTrap,
+            d5EnvMonTempErrorTrap,
+            d5EnvMonTempWarningTrap,
+            d5EnvMonPsuErrorTrap,
+            d5EnvMonPsuWarningTrap,
+            d5EnvMonSysFatalTrap,
+            d5EnvMonSysRecoverTrap
+            }
+        STATUS current
+        DESCRIPTION
+            "The D5 alarm notification group."
+        ::= { d5TrapGroup 1 }
+
+    d5MpegMgtTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            d5MpegMgtProgErrorTrap,
+            d5MpegMgtProgPidErrorTrap,
+            d5MpegMgtProgOversubsTrap,
+            d5MpegMgtProgStartTrap,
+            d5MpegMgtProgStopTrap,
+            d5MpegMgtQamErrorTrap,
+            d5MpegMgtQamOversubsTrap,
+            d5MpegMgtQamOversubsFilterTrap,
+            d5MpegMgtQamOversubsRecoveryTrap,
+            d5MpegMgtSessStartTrap,
+            d5MpegMgtSessStopTrap,
+            d5MpegMgtTableErrorTrap,
+            d5MpegMgtProgUnderflowTrap,
+            d5MpegMgtProgOverflowTrap
+            }
+        STATUS current
+        DESCRIPTION
+            "The D5 alarm notification group."
+        ::= { d5TrapGroup 2 }
+          
+    d5SessMgtTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            d5SessMgtConnectTrap,
+            d5SessMgtDisconnectTrap,
+            d5SessMgtGenErrorTrap,
+            d5SessMgtIgmpErrorTrap,
+            d5SessMgtMsgInfoTrap,
+            d5SessMgtProgOversubsTrap,
+            d5SessMgtQamOversubsTrap,
+            d5SessMgtSessGroupOversubsTrap,
+            d5SessMgtQamErrorTrap,
+            d5SessMgtSessInfoTrap,
+            d5SessMgtSessErrorTrap,
+            d5SessMgtSessGroupErrorTrap,
+            d5SessMgtShutdownTrap,
+            d5SessMgtStartupTrap,
+            d5SessMgtTimeoutResetTrap,
+            d5SessMgtStreamUnavailTrap,
+            d5SessMgtStreamLostTrap,
+            d5SessMgtMcpStreamLostTrap 
+            }
+        STATUS current
+        DESCRIPTION
+            "The D5 alarm notification group."
+        ::= { d5TrapGroup 3 }
+
+    d5CasTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            d5CasEcmgErrorTrap,
+            d5CasEisErrorTrap,
+            d5CasEmmgErrorTrap,
+            d5CasPsigErrorTrap
+            }
+        STATUS current
+        DESCRIPTION
+            "The D5 alarm notification group."
+        ::= { d5TrapGroup 4 }
+
+    d5MiscTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            d5SystemRebootTrap,
+            d5TacacsErrorTrap,
+            d5TacacsInfoTrap,
+            d5HardwareMismatchTrap
+            }
+        STATUS current
+        DESCRIPTION
+            "The D5 alarm notification group."
+        ::= { d5TrapGroup 5 }
+
+    d5AlarmStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF D5AlarmStatusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "."
+        ::= { d5AlarmStatus 1 }
+		
+		d5AlarmStatusEntry OBJECT-TYPE
+			SYNTAX D5AlarmStatusEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"."
+			AUGMENTS { docsDevEventEntry }
+			::= { d5AlarmStatusTable 1 }
+
+		D5AlarmStatusEntry ::=
+			SEQUENCE { 
+				alarmAsserted          TruthValue,
+				alarmId                Unsigned32,
+				d5StreamMax            Unsigned32,
+				d5QamBandwidth         Unsigned32,
+				d5QamBandwidthActual   Unsigned32,
+				d5ProvisionedBandwidth Unsigned32,
+				d5SessionId            Unsigned32,
+				d5ActualBandwidth      Unsigned32,
+				d5ShutdownReason       Unsigned32,
+				d5QamIndex             Unsigned32,
+				d5MpegTableFailureReason   Unsigned32,
+				d5MpegSectionFailureReason Unsigned32,
+				d5SessMgtIpAddr            IpAddress,
+				d5SessMgtPort              Unsigned32,
+				d5SessMgtReason            Unsigned32,
+				d5SessMgtMcastIpAddr       IpAddress,
+                                d5QamBandwidthNull     Unsigned32
+			 }
+
+		alarmAsserted OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				". "
+			::= { d5AlarmStatusEntry 1 }
+
+		alarmId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"A unique alarm identifier."
+			::= { d5AlarmStatusEntry 2 }
+
+        d5StreamMax OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The maximum number of streams."
+            ::= { d5AlarmStatusEntry 3 }
+        
+        d5QamBandwidth OBJECT-TYPE
+            SYNTAX     Unsigned32
+            UNITS      "Hz"
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The bandwidth of the QAM channel."
+            ::= { d5AlarmStatusEntry 4 }
+    
+        d5QamBandwidthActual OBJECT-TYPE
+            SYNTAX     Unsigned32
+            UNITS      "Hz"
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The actual bandwidth consumed on the QAM channel."
+            ::= { d5AlarmStatusEntry 5 }
+    
+        d5ProvisionedBandwidth OBJECT-TYPE
+            SYNTAX     Unsigned32
+            UNITS      "Hz"
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The bandwidth provisioned on the stream."
+            ::= { d5AlarmStatusEntry 6 }
+    
+        d5SessionId OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The sessionId."
+            ::= { d5AlarmStatusEntry 7 }
+    
+        d5ActualBandwidth OBJECT-TYPE
+            SYNTAX     Unsigned32
+            UNITS      "Hz"
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The actual bandwidth."
+            ::= { d5AlarmStatusEntry 8 }
+    
+        d5ShutdownReason OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The reaon why the session was shutdown."
+            ::= { d5AlarmStatusEntry 9 }
+    
+        d5QamIndex OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The index of the QAM channel."
+            ::= { d5AlarmStatusEntry 10 }
+        
+        d5MpegTableFailureReason OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "MPEG table failure reason."
+            ::= { d5AlarmStatusEntry 11 }
+
+        d5MpegSectionFailureReason OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "MPEG section failure reason."
+            ::= { d5AlarmStatusEntry 12 }
+
+        d5SessMgtIpAddr OBJECT-TYPE
+            SYNTAX     IpAddress
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "Session Management Source IP Address."
+            ::= { d5AlarmStatusEntry 13 }
+
+
+        d5SessMgtPort OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "Session Management Source IP Port."
+            ::= { d5AlarmStatusEntry 14 }
+
+
+        d5SessMgtReason OBJECT-TYPE
+            SYNTAX     Unsigned32
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "Session Management Reason."
+            ::= { d5AlarmStatusEntry 15 }
+
+
+        d5SessMgtMcastIpAddr OBJECT-TYPE
+            SYNTAX     IpAddress
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "Session Management Muticast IP Address."
+            ::= { d5AlarmStatusEntry 16 }
+
+        d5QamBandwidthNull OBJECT-TYPE
+            SYNTAX     Unsigned32
+            UNITS      "Hz"
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                 "The bandwidth of the Null packets in the QAM channel."
+            ::= { d5AlarmStatusEntry 17}
+
+--
+-- EQM Management Traps
+--
+    d5EqmNoEcmTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This alarm is asserted when the EQM loses connectivity to the ERS,
+             and the EQM is missing 1 or more ECM."
+        ::= { d5EqmMgtTraps 1 }
+
+    d5EqmStaleEcmTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This alarm is asserted when the EQM loses connectivity to the ERS,
+             and the EQM has 1 or more out-of-date ECMs."
+        ::= { d5EqmMgtTraps 2 }
+
+    d5EqmNoConnTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This alarm is asserted when the EQM loses connectivity to the ERS."
+        ::= { d5EqmMgtTraps 3 }
+
+    d5EqmDomainShutdownTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This alarm is asserted when an EQM domain is shutdown, and cleared
+             when the domain is restarted."
+        ::= { d5EqmMgtTraps 4 }
+
+--
+-- DTI Traps
+--
+
+    d5DtiNoPortTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when there is no active DTI port."
+        ::= { d5DtiTraps 1 }
+
+    d5DtiStateTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when there is a DTI state change."
+        ::= { d5DtiTraps 2 }
+
+    d5DtiPortStatusTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText,
+            alarmAsserted
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when there is a DTI port status change."
+        ::= { d5DtiTraps 3 }
+
+    d5DtiAdminTrap NOTIFICATION-TYPE
+        OBJECTS { 
+            docsDevEvLevel, 
+            docsDevEvId, 
+            docsDevEvText
+            }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when there is a DTI Admin change."
+        ::= { d5DtiTraps 4 }
+
+        END

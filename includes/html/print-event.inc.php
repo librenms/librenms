@@ -1,0 +1,46 @@
+<?php
+
+use App\Facades\DeviceCache;
+use App\Facades\PortCache;
+use LibreNMS\Util\Rewrite;
+use LibreNMS\Util\Url;
+
+/*
+ * LibreNMS
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ *
+ * @package    LibreNMS
+ * @subpackage webui
+ * @link       https://www.librenms.org
+ * @copyright  2017 LibreNMS
+ * @author     LibreNMS Contributors
+*/
+
+$severity_colour = eventlog_severity($entry['severity']);
+$icon = '<span class="alert-status ' . $severity_colour . '"></span>';
+
+echo '<tr>';
+echo '<td>' . $icon . '</td>';
+echo '<td style="vertical-align: middle;">' . $entry['datetime'] . '</td>';
+
+if (! isset($vars['device'])) {
+    $device = DeviceCache::get($entry['device_id']);
+    echo '<td style="vertical-align: middle;">' . Url::deviceLink($device, shorthost($device->hostname)) . '</td>';
+}
+
+if ($entry['type'] == 'interface') {
+    $port = PortCache::get($entry['reference']);
+    $entry['link'] = '<b>' . Url::portLink($port, Rewrite::shortenIfName(strtolower((string) $port->getLabel()))) . '</b>';
+} else {
+    $entry['link'] = 'System';
+}
+
+echo '<td style="vertical-align: middle;">' . $entry['link'] . '</td>';
+
+echo '<td style="vertical-align: middle;">' . htmlspecialchars((string) $entry['message']) . '</td>';
+echo '</tr>';

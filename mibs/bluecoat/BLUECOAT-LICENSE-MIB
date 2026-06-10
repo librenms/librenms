@@ -1,0 +1,228 @@
+BLUECOAT-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, DateAndTime
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+appLicenseMIB MODULE-IDENTITY
+        LAST-UPDATED    "201501130300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The appliance license status MIB is used to monitor
+                         the state of appliance Licenses"
+        REVISION        "201501130300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 16 }
+
+appLicenseMIBObjects
+        OBJECT IDENTIFIER ::= { appLicenseMIB 1 }
+
+appLicenseMIBNotifications
+        OBJECT IDENTIFIER ::= { appLicenseMIB 2 }
+
+appLicenseMIBConformance
+        OBJECT IDENTIFIER ::= { appLicenseMIB 3 }
+
+appLicenseMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { appLicenseMIBNotifications 0 }
+
+
+-- Conformance information *******************************************
+
+appLicenseMIBCompliances OBJECT IDENTIFIER
+    ::= {appLicenseMIBConformance 1}
+
+appLicenseMIBGroups OBJECT IDENTIFIER
+    ::= {appLicenseMIBConformance 2}
+
+appLicenseMIBNotifGroups OBJECT IDENTIFIER
+    ::= {appLicenseMIBConformance 3}
+
+
+-- Compliance statements *********************************************
+
+appLicenseMIBCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for health check module. "
+    MODULE -- this module
+        MANDATORY-GROUPS { appLicenseMIBGroup }
+
+        OBJECT        appLicenseStatusApplicationName
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        appLicenseStatusFeatureName
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        appLicenseStatusComponentName
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        appLicenseStatusExpireType
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        appLicenseStatusExpireDate
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        appLicenseStatusLicenseState
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+        ::= { appLicenseMIBCompliances 1 }
+
+
+-- textual conventions
+
+LicenseState ::= TEXTUAL-CONVENTION
+        STATUS           current
+        DESCRIPTION     "State of the License"
+        SYNTAX INTEGER {
+                unknown(0),
+                active(1),
+                expired(2)
+        }
+
+LicenseExpireType ::= TEXTUAL-CONVENTION
+        STATUS           current
+        DESCRIPTION     "Type of license expiration"
+        SYNTAX INTEGER {
+                unknown(0),
+                perpetual(1),
+                subscription(2),
+                demo(3)
+        }
+
+
+--
+-- MIB variables
+--
+
+appLicense
+        OBJECT IDENTIFIER ::= { appLicenseMIBObjects 1 }
+
+--
+-- appLicenseStatusTable
+--
+
+appLicenseStatusTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AppLicenseStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of appliance licenses."
+        ::= { appLicense 1 }
+
+appLicenseStatusEntry OBJECT-TYPE
+        SYNTAX          AppLicenseStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An appLicenseStatusTable entry describes the
+                         license status for each license of the appliance."
+        INDEX           { appLicenseStatusIndex }
+        ::= { appLicenseStatusTable 1 }
+
+AppLicenseStatusEntry ::= SEQUENCE {
+        appLicenseStatusIndex                INTEGER,
+        appLicenseStatusApplicationName      DisplayString,
+        appLicenseStatusFeatureName          DisplayString,
+        appLicenseStatusComponentName        DisplayString,
+        appLicenseStatusExpireType           LicenseExpireType,
+        appLicenseStatusExpireDate           DateAndTime,
+        appLicenseStatusLicenseState         LicenseState
+        }
+
+appLicenseStatusIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies the license."
+        ::= { appLicenseStatusEntry 1 }
+
+appLicenseStatusApplicationName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the application name of the license entry."
+        ::= { appLicenseStatusEntry 2 }
+
+appLicenseStatusFeatureName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the feature name of the license entry."
+        ::= { appLicenseStatusEntry 3 }
+
+appLicenseStatusComponentName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the component name of the license entry."
+        ::= { appLicenseStatusEntry 4 }
+
+appLicenseStatusExpireType OBJECT-TYPE
+        SYNTAX          LicenseExpireType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the type of license expiration."
+        ::= { appLicenseStatusEntry 5 }
+
+appLicenseStatusExpireDate OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the license entry expiration date
+                         if applicable."
+        ::= { appLicenseStatusEntry 6 }
+
+appLicenseStatusLicenseState OBJECT-TYPE
+        SYNTAX          LicenseState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the state of the license entry."
+        ::= { appLicenseStatusEntry 7 }
+
+--
+-- notifications
+--
+
+appLicenseStateTrap NOTIFICATION-TYPE
+        OBJECTS { appLicenseStatusApplicationName, appLicenseStatusFeatureName, appLicenseStatusComponentName, appLicenseStatusExpireType, appLicenseStatusExpireDate, appLicenseStatusLicenseState }
+        STATUS          current
+        DESCRIPTION     "The appliance license state has changed."
+        ::= { appLicenseMIBNotificationsPrefix 1 }
+
+
+--
+-- groups
+--
+
+appLicenseMIBGroup OBJECT-GROUP
+        OBJECTS {
+                appLicenseStatusApplicationName,
+                appLicenseStatusFeatureName,
+                appLicenseStatusComponentName,
+                appLicenseStatusExpireType,
+                appLicenseStatusExpireDate,
+                appLicenseStatusLicenseState
+                }
+        STATUS       current
+        DESCRIPTION  "Group of Appliance License related objects."
+        ::= { appLicenseMIBGroups 1 }
+
+appLicenseMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  { appLicenseStateTrap }
+        STATUS         current
+        DESCRIPTION    "Group of Appliance License notifications."
+        ::= { appLicenseMIBNotifGroups 1 }
+
+END
+
+

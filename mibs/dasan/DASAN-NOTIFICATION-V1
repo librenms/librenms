@@ -1,0 +1,1571 @@
+-- *****************************************************************
+-- DASAN-NOTIFICATION.mib:  Dasan Enterprise Notifications
+--
+-- Copyright (c) 2001 by Dasan Co., Ltd.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+DASAN-NOTIFICATION-V1 DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI
+	dasanEvents
+		FROM DASAN-SMI
+	dsPortInstallStatus, dsPowerIndex, dsPowerstatus, dsFanIndex, dsFanstatus, dsSubnetConfName,
+	dsTemperatureStatus, dsSwitchAtMacAddress, dsSwitchAtNetAddress, dsSwitchAtVID,
+	dsUserMacAddress1, dsUserMacAddress2, dsUserMacAddress3, dsUserMacAddress4,
+	dsFreeMem, dsSystemUpgradePath, dsSystemUpgradeStorage, dsPortModuleIndex, dsPortPortIndex
+		FROM DASAN-SWITCH-MIB
+	dsUserLoginName, dsUserLoginIpAddress
+		FROM DASAN-USER-MANAGEMENT-MIB
+	dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonQueueIndex, dsPonPortIndex,
+	dsPonDirection, dsPonState, dsPonCount, dsPonOltIndex, dsPonPortIndex
+		FROM DASAN-GEPON-MIB
+	ifIndex	FROM IF-MIB
+	sysDescr, sysUpTime FROM SNMPv2-MIB;
+	
+--
+--  Dasan Enterprise-Specific TRAP define 
+--  updated by dhlee@da-san.com 2003/03/07    
+--  moved from DASAN-SWITCH-MIB.my  
+--  updated by dhl@da-san.com   2004/06/10
+
+
+-- V1 TRAP-TYPE  
+--
+
+portInstalledTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex , dsPortInstallStatus }
+    DESCRIPTION
+             "portInstalled trap send when portInstallStatus is enabled."
+    ::= 1
+
+portRemovedTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex , dsPortInstallStatus }
+    DESCRIPTION
+             "portInstalled trap send when portInstallStatus is disabled."
+    ::= 2                                         
+         
+powerOkTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsPowerIndex , dsPowerstatus }
+    DESCRIPTION
+             "Power status OK trap when powerStatus change from disable to enable."
+    ::= 3                                         
+    
+powerFailTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsPowerIndex , dsPowerstatus }
+    DESCRIPTION
+             "Power status fail trap when powerStatus change from enable to disable."
+    ::= 4
+
+fanOkTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsFanIndex , dsFanstatus }
+    DESCRIPTION
+             "Fan status OK trap when fanStatus change from disable to enable."
+    ::= 5
+         
+fanFailTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsFanIndex , dsFanstatus }
+    DESCRIPTION
+             "Fan status fail trap when fanStatus change from enable to disable."
+    ::= 6                
+
+powerInstalledTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsPowerIndex }
+    DESCRIPTION
+             "Power Installed trap when power was installed."
+    ::= 7                
+
+powerRemovedTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsPowerIndex }
+    DESCRIPTION
+             "Power removed trap when power was removed."
+    ::= 8                
+
+fanInstalledTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsFanIndex }
+    DESCRIPTION
+             "Fan Installed trap when fan was installed."
+    ::= 9                
+
+fanRemovedTrap TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { dsFanIndex }
+    DESCRIPTION
+             "Fan removed trap when fan was removed."
+    ::= 10
+   
+bcastOverTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { sysDescr }
+    DESCRIPTION
+             "Broadcast packet over trap when Rx broadcast packet is over the given limit."
+    ::= 11
+    
+cpuLoadOverThresholdTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { sysDescr }
+    DESCRIPTION
+             "The cpuLoadoverThreshold trap is sentwhen cpuLoad is over the given limit."
+    ::= 12
+    
+cpuLoadFallThresholdTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { sysDescr }
+    DESCRIPTION
+             "The cpuLoadfallThreshold trap is sent when cpuLoad fall under the given limit."
+    ::= 13                       
+
+dhcpLeaseShortageTrap	TRAP-TYPE
+	ENTERPRISE	dasanEvents
+	VARIABLES	{ sysDescr, dsSubnetConfName }
+	DESCRIPTION	
+			"DHCP User IP pool shortage when User's DHCPDISCOVER message arrive."
+	::= 14 
+	
+portOverThresholdTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "Port traffic over HighThreshold trap when port traffic is over the given limit."
+    ::= 15
+    
+portFallThresholdTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "Port traffic fall under HighThreshold trap when port traffic fall under the given limit."
+    ::= 16                                     
+
+temperatureOverThresholdTrap TRAP-TYPE
+	ENTERPRISE dasanEvents
+	VARIABLES  { dsTemperatureStatus }
+	DESCRIPTION
+			"TemperatureOverThreshold Trap is sent when temperature is over the certain threshold."
+	::= 17
+
+systemRestartTrap TRAP-TYPE
+	ENTERPRISE dasanEvents
+	VARIABLES  { sysDescr }
+	DESCRIPTION
+			"SystemRestart Trap is sent when system is restarted by user."
+	::= 18                                
+	
+mfgdBlockedTrap TRAP-TYPE
+	ENTERPRISE dasanEvents
+	VARIABLES { dsSwitchAtMacAddress, dsSwitchAtNetAddress, dsSwitchAtVID }
+	DESCRIPTION
+			"mfgdblocked Trap is sent when a certain mac address is denied by mac-flood-guard mechanism." 
+    ::= 19
+
+mfgdReleasedTrap TRAP-TYPE
+	ENTERPRISE dasanEvents
+	VARIABLES { dsSwitchAtMacAddress, dsSwitchAtNetAddress, dsSwitchAtVID }
+	DESCRIPTION
+			"mfgdblocked Trap is sent when a certain mac address is permitted again by mac-flood-guard mechanism." 
+    ::= 20
+    
+ipConflictTrap TRAP-TYPE
+	ENTERPRISE dasanEvents
+	VARIABLES {dsSwitchAtNetAddress, dsSwitchAtMacAddress}
+	DESCRIPTION
+			"ipConflict Trap is sent when a certain IP address is shared among different users." 
+    ::= 21  
+
+dhcpIllegalEntryTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { sysDescr }
+    DESCRIPTION
+             "dhcpIllegalEntry trap is sent when illegal dhcp user is found."
+    ::= 22     
+    
+optionModuleInstalledTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "optionModuleInstalled Trap is sent when option Module was installed."
+    ::= 23
+ 
+optionModuleRemovedTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "optionModuleRemoved Trap is sent when option Module was removed."
+    ::= 24
+ 
+memoryOverThresholdTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { sysDescr }
+    DESCRIPTION
+             "Memory over HighThreshold trap when used memory size is over the given limit."
+    ::= 25
+    
+memoryFallThresholdTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { sysDescr }
+    DESCRIPTION
+             "Memory fall under HighThreshold trap when used memory size fall under the given limit."
+    ::= 26                       
+
+slotInstalledTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "slotInstalledTrap Trap is sent when Board was installed."
+    ::= 27
+ 
+slotRemovedTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "slotRemovedTrap Trap is sent when Board was removed."
+    ::= 28
+ 
+slotStateChangeTrap   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "slotStateChangeTrap Trap is sent when Board State change."
+    ::= 29
+
+portCRCOverThreshold   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "CRC Load over HighThreshold trap when crcLoad is over the given limit."
+    ::= 30
+
+portCRCFallThreshold   TRAP-TYPE
+    ENTERPRISE  dasanEvents
+    VARIABLES   { ifIndex }
+    DESCRIPTION
+             "CRC Load fall under HighThreshold trap when crcLoad fall under the given limit."
+    ::= 31                                        
+
+temperatureHighOverThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { dsTemperatureStatus }
+	DESCRIPTION
+			"The temperatureHighOverThreshold Trap is sent when temperature is over the high-threshold."
+	::= 32
+
+temperatureHighFallThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { dsTemperatureStatus }
+	DESCRIPTION
+			"The temperatureHighFallThreshold Trap is sent when temperature fall the high-threshold."
+	::= 33
+    
+temperatureLowOverThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { dsTemperatureStatus }
+	DESCRIPTION
+			"The temperatureLowOverThreshold Trap is sent when 1st temperature is over the low-threshold."
+	::= 34
+
+temperatureLowFallThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { dsTemperatureStatus }
+	DESCRIPTION
+			"The temperatureLowFallThreshold Trap is sent when temperature fall under the low-threshold."
+	::= 35
+    
+userLogIn TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { dsUserLoginName, dsUserLoginIpAddress }
+	DESCRIPTION
+			"The user-login trap is sent when user login."
+	::= 36
+	
+userLogOut TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { dsUserLoginName, dsUserLoginIpAddress }
+	DESCRIPTION
+			"The user-logout trap is sent when user logout."
+	::= 37    
+
+restoreFactory TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { sysDescr }
+	DESCRIPTION
+			"The restoreFactory trap is sent when user initialize as factory defaults."
+	::= 38
+	
+cpuLoadHighOverThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { sysDescr }
+	DESCRIPTION
+			"The cpuloadHighOverThreshold Trap is sent when cpuload is over the high-threshold."
+	::= 39
+
+cpuLoadHighFallThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { sysDescr }
+	DESCRIPTION
+			"The cpuloadHighFallThreshold Trap is sent when cpuload fall the high-threshold."
+	::= 40
+    
+cpuLoadLowOverThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { sysDescr }
+	DESCRIPTION
+			"The cpuloadLowOverThreshold Trap is sent when 1st cpuload is over the low-threshold."
+	::= 41
+
+cpuLoadLowFallThreshold TRAP-TYPE
+	ENTERPRISE  dasanEvents
+	VARIABLES   { sysDescr }
+	DESCRIPTION
+			"The cpuloadLowFallThreshold Trap is sent when cpuload fall under the low-threshold."
+	::= 42            
+		
+igmpSnoopingChanged TRAP-TYPE
+	ENTERPRISE dasanEvents
+	VARIABLES { dsIgmpSnoopingChanged }
+	DESCRIPTION 
+		    " "
+	::= 43
+
+ 
+dsSystemUpgradeChanged TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysDescr }
+	DESCRIPTION
+			"System NOS Upgrade status"
+	::= 44
+
+
+ 
+adslAtucPerfLofsThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Loss of Framing threshold reached(ATUC)"
+	::= 51
+	
+adslAtucPerfLossThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Loss of signal threshold reached(ATUC)"
+	::= 52
+             
+adslAtucPerfLprsThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Loss of power threshold reached (ATUC)"
+	::= 53
+
+adslAtucPerfESsThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Errored Seconds threshold reached (ATUC)"
+	::= 54
+
+adslAtucRateChangeTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Changed atuc rate"
+	::= 55
+
+adslAtucPerfLolsThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Loss of Link threshold reached (ATUC)"
+	::= 56
+
+
+adslAturPerfLofsThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Loss of Framing threshold reached(ATUR) "
+	::= 61
+
+adslAturPerfLossThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Loss of signal threshold reached(ATUR)"
+	::= 62
+
+adslAturPerfLprsThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Loss of power threshold reached (ATUR)"
+	::= 63
+
+adslAturPerfESsThreshTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysUpTime }
+	DESCRIPTION
+			"Errored Seconds threshold reached (ATUR)"
+	::= 64
+
+
+vdslCPEChangeInfoTrap TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysDescr, ipAdEntAddr, dsVdslPortIndex, vdslPhysInvSerialNumber, dsUserMacAddress1, dsUserMacAddress2, dsUserMacAddress3, dsUserMacAddress4}
+	DESCRIPTION
+			"Trap is sent with CPE Serial No., Mac Address of CPE, after CPE serial change.  "
+	::= 65
+
+--
+-- Flood-guard
+--  
+cfgdBlocked TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"Cfgdblocked Trap is sent when a certain port is blocked by cpu-flood-guard mechanism." 
+        ::= 71
+
+cfgdReleased TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"CfgdReleased Trap is sent when a certain port is non-blocked by cpu-flood-guard mechanism." 
+        ::= 72
+	
+cfgdOverThreshold TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"CfgdOverThreshold Trap is sent when a certain port is over the threshold by cpu-flood-guard mechanism." 
+        ::= 73
+
+cfgdUnderThreshold TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"CfgdUnderThreshold Trap is sent when a certain port fall under the threshold by cpu-flood-guard mechanism" 
+        ::= 74
+
+sfgdBlocked TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"Sfgdblocked Trap is sent when a certain port is blocked by system-flood-guard mechanism." 
+        ::= 75
+
+sfgdReleased TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"SfgdReleased Trap is sent when a certain port is non-blocked by system-flood-guard mechanism." 
+        ::= 76
+
+	
+sfgdOverThreshold TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"SfgdOverThreshold Trap is sent when a certain port is over the threshold by system-flood-guard mechanism." 
+        ::= 77
+
+sfgdUnderThreshold TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"SfgdUnderThreshold Trap is sent when a certain port fall under the threshold by system-flood-guard mechanism" 
+        ::= 78
+
+ppsControlBlocked TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"ppsControlBlocked Trap is sent when a certain port is blocked by PPS-Control mechanism." 
+        ::= 79
+
+ppsControlReleased TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"ppsControlReleased Trap is sent when a certain port is non-blocked by PPS-Control mechanism." 
+        ::= 80
+
+	
+ppsControlOverThreshold TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"ppsControlOverThreshold Trap is sent when a certain port is over the threshold by PPS-Control mechanism." 
+        ::= 81
+
+ppsontrolUnderThreshold TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION
+			"ppsControlUnderThreshold Trap is sent when a certain port fall under the threshold by PPS-Control mechanism" 
+        ::= 82
+ 
+
+nosRemoteUpgradeRequest TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr, dsSystemUpgradePath, dsSystemUpgradeStorage }
+	DESCRIPTION
+	"This trap indicates that the system received nos-remote-upgrade command."
+	::= 83
+
+nosRemoteUpgradeSuccess TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr, dsSystemUpgradePath, dsSystemUpgradeStorage }
+	DESCRIPTION
+ 	"This trap indicates that the NOS succeeded to upgrade NOS."
+	::= 84
+
+nosRemoteUpgradeFailAbort TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr, dsSystemUpgradePath, dsSystemUpgradeStorage }
+	DESCRIPTION
+	"This trap indicates that the system failed to download NOS by user interrup."
+	::= 85
+
+nosRemoteUpgradeFailHeaderError TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr, dsSystemUpgradePath, dsSystemUpgradeStorage }
+	DESCRIPTION
+	"This trap indicates that the system failed to download NOS, for NOS header-error."
+	::= 86
+
+nosRemoteUpgradeFailDownloadError TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr, dsSystemUpgradePath, dsSystemUpgradeStorage }
+	DESCRIPTION
+	"This trap indicates that the system failed to download NOS, for NOS checksum-error."
+	::= 87
+
+nosRemoteUpgradeFailFlashError TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr, dsSystemUpgradePath, dsSystemUpgradeStorage }
+	DESCRIPTION
+	"This trap indicates that the system failed to download NOS, for flash operation."
+	::= 88
+
+nosRemoteUpgradeStart TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr, dsSystemUpgradePath, dsSystemUpgradeStorage  }
+	DESCRIPTION
+	"This trap indicates that the upgrade NOS process was started."
+	::= 89
+
+-- Dying gasp for power fault 
+systemDyingGasp TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sysDescr }
+	DESCRIPTION
+	"This trap indicates that Dying-gasp for power fault."
+	::= 90
+
+-- Attack-Guard 
+attackGuardBlock TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { dsPortModuleIndex, dsPortPortIndex }
+	DESCRIPTION
+	"This trap indicates that some port is blocked by attack-guard." 
+	::= 91
+
+attackGuardUnBlock TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { dsPortModuleIndex, dsPortPortIndex }
+	DESCRIPTION
+	"This trap indicates that some port is unblocked by attack-guard." 
+	::= 92
+
+fanPeriodicFault  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { dsFanIndex, dsFanstatus }
+	DESCRIPTION
+	"This trap indicates the fan status is fault in some period."
+	::=  93 
+
+remoteOamDyingGasp  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { ifindex }
+	DESCRIPTION
+	"This trap indicates the remote oam entity is in dying-gasp."
+	::=  94
+
+remoteOamDyingGaspRestoration  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { ifindex }
+	DESCRIPTION
+	"This trap indicates the remote oam entity is restored."
+	::=  95
+
+arpInspectInvalid  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+        VARIABLES { sleArpInspectInvalidLogReason, sleArpInspectInvalidLogSamePktCnt, sleArpInspectInvalidLogOpcode, sleArpInspectInvalidLogPortNumber, sleArpInspectInvalidLogVlanId, sleArpInspectInvalidLogSrcMacAddr, sleArpInspectInvalidLogSrcIpAddr, sleArpInspectInvalidLogDstMacAddr, sleArpInspectInvalidLogDstIpAddr, sleArpInspectInvalidLogLastRecvTime }
+	DESCRIPTION
+	"This trap indicates the ARP inspection is invalided."
+	::=  96
+
+systemSwitchover  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sysDescr }
+        DESCRIPTION
+        "This trap indicates the system is switchover."
+        ::=  97
+
+boardChangeState  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleRedActiveBoard, sleRedActivePrevState, sleRedActiveCurrState }
+        DESCRIPTION
+        "This trap indicates the board state is changed."
+        ::=  98
+
+clockModuleInstalled  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex, sleClockModuleBoardId, sleClockModuleInstallStatus }
+        DESCRIPTION
+        "clockModuleInstalled trap send when sleClockModuleInstallStatus is installed."
+        ::=  105
+
+clockModuleRemoved  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex, sleClockModuleBoardId, sleClockModuleInstallStatus }
+        DESCRIPTION
+        "clockModuleRemoved trap send when sleClockModuleInstallStatus is removed."
+        ::=  106
+
+clockModuleInitOk  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex, sleClockModuleBoardId, sleClockModuleInitStatus }
+        DESCRIPTION
+        "clockModuleInitOk trap send when sleClockModuleInitStatus is ok."
+        ::=  107
+
+clockModuleInitFail  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex, sleClockModuleBoardId, sleClockModuleInitStatus }
+        DESCRIPTION
+        "clockModuleInitFail trap send when sleClockModuleInitStatus is failure."
+        ::=  108
+
+interfaceAdminUp  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { ifIndex, ifDescr, ifAdminStatus }
+        DESCRIPTION
+	"This trap indicates the interface admin up."
+        ::=  109
+
+interfaceAdminDown  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { ifIndex, ifDescr, ifAdminStatus }
+        DESCRIPTION
+	"This trap indicates the interface admin down."
+        ::=  110
+
+powerMonEventDetected TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleSlotPowerMonIndex, sleSlotPowerMonStatus }
+	DESCRIPTION
+	"This trap indicates the power monitoring detects voltage change of slot."
+	::= 111
+
+ntpConnectionFail   TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleNTPServerName }
+        DESCRIPTION
+	"This trap indicates the ntp connection is lost."
+        ::=  112
+
+fanSpeedFallUnderThreshold   TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleFanUnitIndex, sleFanUnitSpeed }
+        DESCRIPTION
+	"This trap indicates the fan speed is under the threshold."
+        ::=  113
+
+fanSpeedRisingOverThreshold   TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleFanUnitIndex, sleFanUnitSpeed }
+        DESCRIPTION
+	"This trap indicates the fan speed is over the threshold."
+        ::=  114
+
+userLoginFail  TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { dsUserLoginName, dsUserLoginIpAddress }
+        DESCRIPTION	"This trap indicates the user fail to login."
+        ::=  115
+
+bfdSessionStateChanged TRAP-TYPE  
+        ENTERPRISE      dasanEvents
+        VARIABLES { ifIndex, sleBFDSessionNeighAddrType, sleBFDSessionNeighAddrValue, sleBFDSessionStatus}
+        DESCRIPTION	"This trap indicates that BFD session state is changed."
+        ::=  116
+
+clockModuleOPModeChanged TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex, sleClockModuleOPMode, sleSlotSystemIndex }
+        DESCRIPTION    	"This trap indicate that slot Operation mode is changed."
+        ::=  117
+
+clockModuleRefrencesChanged TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex, sleSlotSystemIndex }
+        DESCRIPTION     "This trap indicate that slot reference ntr is changed."
+	::=  118
+
+portRxOverThreshold TRAP-TYPE
+        ENTERPRISE      dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION 
+		"Port Rx traffic over HighThreshold trap when port traffic is over the given limit."
+	::=  121
+
+portRxFallThreshold TRAP-TYPE
+        ENTERPRISE      dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION 
+		"Port Rx traffic fall under HighThreshold trap when port traffic falls below the given limit."
+	::= 122
+
+
+portTxOverThreshold TRAP-TYPE
+        ENTERPRISE      dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION 
+		"Port Tx traffic over HighThreshold trap when port traffic is over the given limit."
+	::= 123
+
+
+portTxFallThreshold TRAP-TYPE
+        ENTERPRISE      dasanEvents
+	VARIABLES { ifIndex }
+	DESCRIPTION 
+		"Port Tx traffic fall under HighThreshold trap when port traffic falls below the given limit."
+	::= 124
+
+clockModuleInSrcStatusChanged TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex, sleClockInfoInSrcType,sleClockInfoSrcStatus }
+        DESCRIPTION     "This trap indicate that BFD reference ntr is changed."
+	::=  125
+
+clockModuleInSrcAISStatusChanged TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex,sleClockInfoInSrcType,sleClockInfoInSrcAISStatus }
+        DESCRIPTION     "This trap indicate that BFD reference ntr is changed."
+	::=  126
+
+clockModuleInSrcLoSStatusChanged TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex,sleClockInfoInSrcType,sleClockInfoInSrcLoSStatus }
+        DESCRIPTION     "This trap indicate that BFD reference ntr is changed."
+	::=  127
+
+clockModuleInSrcLDSCStatus TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex,sleClockInfoInSrcType,sleClockInfoInSrcLoSStatus }
+        DESCRIPTION     "This trap indicate that BFD reference ntr is changed."
+	::=  128
+
+clockModuleInSrcNtrClockchanged TRAP-TYPE
+        ENTERPRISE      dasanEvents
+        VARIABLES { sleClockModuleIndex,sleClockInfoInSrcType,sleClockInfoInSrcNtrClockType }
+        DESCRIPTION     "This trap indicate that BFD reference ntr is changed."
+	::=  129
+
+-- GEPON
+ponLinkFault  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			"ONU reports a Link Fault via the flag in the 802.3ah OAM header.No further information about the fault is available.."
+	::= 151
+
+ponLos  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Loss of Signal is detected by the PHY device for OLT Network  interface, and PON interfaces on  the OLT and ONU. "
+	::= 152
+
+ponTransmitFail  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Transmitted output does not match input, as reported by EPON optics "
+	::= 153
+
+ponTransmitDegrade  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Transmitted output has a high error level, but not so high as to cause - Failure. Optionallyreported by EPON optical module.."
+	::= 154
+
+ponQueueOverflow  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" One of the queues for the link has dropped frames due to becoming full "
+	::= 155
+
+ponMacLearningTableOverflow  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" MAC address learning table is full, not in overwrite mode, and a new MAC address wasencountered "
+	::= 156
+
+ponDuplicateMacRegistration  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" MPCP register request received for MAC that is registered and in-service "
+	::= 157
+
+ponReportTimeout  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" ONU does not respond to grants from the OLT "
+	::= 158
+
+ponGateTimeout  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Excessive interval between MPCP gates. "
+	::= 159
+
+ponOAMKeepaliveTimeout  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" OAM KeepaliveTimeout - OAM layer does not receive periodic messages from its peer "
+	::= 160
+
+ponKeyExchangeFailure  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" The link peer has failed to generate a new key message, or to switch to the new key, in the timeallotted by the key exchange timer for this link. Encryption remains in force using the old key, and the key exchange process continues.The alarm will clear when a new key is established. "
+	::= 161
+
+ponAutoNegotiation  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" OLT Network port fails to auto-negotiate with the peer (if auto-negotiation feature is enabled)."
+	::= 162
+
+ponLinkLoopback  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" The link is currently in the loopback state "
+	::= 163
+
+ponStandardDyingGasp  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" ONU reports Dying Gasp via that bit in 802.3ah OAM header "
+	::= 164
+
+ponPowerFail  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Power supply failure "
+	::= 165
+
+ponTemperature  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Operating temperature range exceeded "
+	::= 166
+
+ponAuthenticationInformationUnavailable  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonState, dsPonCount }
+	DESCRIPTION
+			" ONU is configured to use external authentication device, and that device is not present "
+	::= 167
+
+-- statistics 
+
+ponOctetsTransferred  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Octets Transferred "
+	::= 171
+ 
+ponTotalFramesTransferred  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Total frames transferred "
+	::= 172
+
+ponUnicastFramesTransferred  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Unicast frames transferred "
+	::= 173
+
+ponBroadcastFramesTransferred  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Broadcast frames transferred "
+	::= 174
+
+ponMulticastFramesTransferred  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Multicast frames transferred "
+	::= 175
+
+ponCRC32Errors  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" CRC-32 Errors "
+	::= 176
+
+ponUndersizeFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Undersize Frames "
+	::= 177
+
+ponOversizeFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Oversize Frames "
+	::= 178
+
+ponCollisions  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Collisions "
+	::= 179
+
+pon64OctetFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" 64 Octet Frames "
+	::= 180
+
+pon127OctetFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" 65-127 Octet Frames "
+	::= 181
+
+pon255OctetFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" 128-255 Octet Frames "
+	::= 182
+
+pon511OctetFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" 256-511 Octet Frames "
+	::= 183
+
+pon1023OctetFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" 512-1023 Octet Frames "
+	::= 184
+
+pon1518OctetFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" 1024-1518 Octet Frames "
+	::= 185
+
+pon1519OverOctetFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" 1519+ Octet Frames "
+	::= 186
+
+ponFramesDropped  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Frames dropped "
+	::= 187
+
+ponOctetsDropped  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Octets dropped "
+	::= 188
+
+ponOctetsDelayed  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Octets delayed "
+	::= 189
+
+ponOctetsGranted  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Octets granted "
+	::= 190
+
+ponOctetsGrantedButUnused  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Octets granted but unused "
+	::= 191
+
+ponMaximumDelay  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Maximum Delay (units of 100usec) "
+	::= 192
+
+ponCRC8Errors  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" CRC-8 (preamble) Errors "
+	::= 193
+
+ponLineCodeErrors  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Line code errors "
+	::= 194
+
+ponPauseFrames  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Pause Frames "
+	::= 195
+
+ponErroredFrameSeconds  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Errored Frame Seconds "
+	::= 196
+
+ponErroredFramePeriod  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Errored Frame Period "
+	::= 197
+
+ponErroredFrameSecondsSummary  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { dsPonOltIndex, dsPonOnuIndex, dsPonOnuMacAddress, dsPonTaggedLabel, dsPonPortIndex, dsPonQueueIndex, dsPonDirection, dsPonState, dsPonCount }
+	DESCRIPTION
+			" Errored Frame Seconds Summary "
+	::= 198
+
+gponOnuRegistered  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysDescr, sleAgentAddress, sleGponOltId, sleGponOnuId, sleGponOnuSerial, sleGponOnuIsFirst }
+	DESCRIPTION
+			" Registered Onu Information "
+	::= 200
+
+gponOnuDeregistered  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sysDescr, sleAgentAddress, sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			" Deregistered Onu Information "
+	::= 201
+
+swWatchdogDetectError  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSwWatchdogType }
+	DESCRIPTION
+			" S/W Watchdog Detect Error "
+	::= 202
+             
+swWatchdogClearError  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSwWatchdogType }
+	DESCRIPTION
+			" S/W Watchdog Clear Error "
+	::= 203
+             
+swWatchdogNormalState  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSwWatchdogType }
+	DESCRIPTION
+			" S/W Watchdog Normal State "
+	::= 204
+             
+swWatchdogAbnormalState  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSwWatchdogType }
+	DESCRIPTION
+			" S/W Watchdog Abnormal State "
+	::= 205
+             
+gponOnuUpgradeCompleted  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			" Upgrade Completed Onu Informations "
+	::= 206
+
+gponOltCableDown  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId }
+	DESCRIPTION
+			" GPON Cable down event is detected "
+	::= 207
+
+gponOnuAutoToManual  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			" GPON Onu is auto-to-manual "
+	::= 208
+
+slotActionEvent  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSlotSystemIndex, sleSlotStatusCurrentInstallCardType, sleSlotStatusActionEvent }
+	DESCRIPTION
+			" This trap indicates the slot action event "
+	::= 209
+
+slotStateChanged  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSlotSystemIndex, sleSlotStatusCurrentInstallCardType, sleSlotStatusState }
+	DESCRIPTION
+			" This trap indicates the slot state is changed "
+	::= 210
+
+gponNoAuthONU  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuAthenticationStatus }
+	DESCRIPTION
+			" No authenticated ONU "
+	::= 211
+             
+gponDuplicateONU  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			" Duplicated ONU "
+	::= 212
+
+gponDyingGasp  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			" Dying Gasp of GPON ONU"
+	::= 213
+
+gponRogueOnu  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			"Found Rogue ONU."
+	::= 214
+
+gponOnuBatteryEvent TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuBatteryStatus }
+	DESCRIPTION
+			"Battery Event."
+	::= 215
+
+gponOnuBatteryEventCleared TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuBatteryStatus }
+	DESCRIPTION
+			"Battery Event is cleared."
+	::= 216
+
+gponOnuPortOperStatus  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial, sleGponOnuPortId, sleGponOnuPortOperStatus }
+	DESCRIPTION
+			" This trap indicates state of ONU Port Operation. "
+	::= 217
+
+gponTransceiverChanged TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOltTransceiverPort }
+	DESCRIPTION
+			" This trap indicates GPON transceiver changed. "
+	::= 218
+
+gponOltLosOn TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId }
+	DESCRIPTION
+			" This trap indicates state of OLT Log Of Signal (on). "
+	::= 219
+
+gponOltLosOff TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId }
+	DESCRIPTION
+			" This trap indicates state of OLT Log Of Signal (off). "
+	::= 220
+
+gponOltLosiOn TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId }
+	DESCRIPTION
+			" This trap indicates state of OLT Log Of Signal for ONUi (on). "
+	::= 221
+
+gponOltLosiOff TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId }
+	DESCRIPTION
+			" This trap indicates state of OLT Log Of Signal for ONUi (off). "
+	::= 222
+
+gponDyingGaspOn  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			" This trap indicates Dying Gasp of GPON ONU (on). "
+	::= 223
+
+gponDyingGaspOff  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOltId, sleGponOnuId, sleGponOnuSerial }
+	DESCRIPTION
+			" This trap indicates Dying Gasp of GPON ONU (off). "
+	::= 224
+
+slotErrorLEDChanged  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSlotSystemIndex }
+	DESCRIPTION
+			" This trap indicates slot error LED changed. "
+	::= 225
+             
+nmsConnectionTypeChanged  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleSnmpConnectionType }
+	DESCRIPTION
+			" This trap indicates NMS connection type changed. "
+	::= 226
+             
+gponOntOSUpgradeStatus  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOntFirmwareOltId, sleGponOntFirmwareOntId, sleGponOntFirmwareOntOsStatus }
+	DESCRIPTION
+			" This trap indicates ONT OS upgrade status changes. "
+	::= 227
+             
+gponOntBLUpgradeStatus  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES   { sleGponOntFirmwareOltId, sleGponOntFirmwareOntId, sleGponOntFirmwareOntOsStatus }
+	DESCRIPTION
+			" This trap indicates ONT BL upgrade status changes. "
+	::= 228
+
+gponOntRxPowerLoss  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId }
+	DESCRIPTION 
+	"This trap indicates ONT port failed to detect Rx Power. "
+	::= 229
+
+gponOntRxPowerDetected  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId }
+	DESCRIPTION "This trap indicates ONT port detected Rx Power. "
+	::= 230
+
+gponOnuTemperatureHighOverThreshold  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+ 	VARIABLES { sleGponOltId, sleGponOnuId }
+    	DESCRIPTION "This trap indicates the temperature of ONU is over high threshold. "
+    	::= 231
+
+gponOnuTemperatureHighFallThreshold  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+    	VARIABLES { sleGponOltId, sleGponOnuId }
+    	DESCRIPTION "This trap indicates the temperature of ONU falls under high threshold. "
+    	::= 232
+
+gponOnuTemperatureLowOverThreshold  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+    	VARIABLES { sleGponOltId, sleGponOnuId }
+    	DESCRIPTION "This trap indicates the temperature of ONU is over low threshold. "
+    	::= 233
+
+gponOnuTemperatureLowFallThreshold  TRAP-TYPE
+	ENTERPRISE 	dasanEvents
+    	VARIABLES { sleGponOltId, sleGponOnuId }
+    	DESCRIPTION "This trap indicates the temperature of ONU falls under low threshold. "
+    	::= 234
+
+gponOnuCpuOverThreshold  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates the CPU-load of ONU is over threshold. "
+	::= 235
+
+gponOnuCpuFallThreshold  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates the CPU-load of ONU falls under threshold. "
+    	::= 236
+
+gponOnuMemoryOverThreshold  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates the memory-utilization of ONU is over threshold. "
+	::= 237
+
+gponOnuMemoryFallThreshold  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates the memory-utilization of ONU falls under threshold. "
+	::= 238
+
+gponOnuI2cFail  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates that detect ONU's i2c fail."
+	::= 239
+
+gponOnuRxOpticPowerLowThreshAlarmOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates that ONU's low threshold Rx Optic power Alarm is On."
+	::= 240 
+
+gponOnuRxOpticPowerLowThreshAlarmOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates that ONU's low threshold Rx Optic power Alarm is Off."
+	::= 241
+
+gponOnuRxOpticPowerHighThreshAlarmOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates that ONU's high threshold Rx Optic power Alarm is On."
+	::= 242
+
+gponOnuRxOpticPowerHighThreshAlarmOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "This trap indicates that ONU's high threshold Rx Optic power Alarm is Off."
+	::= 243
+
+gponOltLOFIOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 244
+
+gponOltLOFIOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 245
+gponOltDOWOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 246
+gponOltDOWOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 247
+
+gponOltSFOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 248
+
+gponOltSFOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 249
+gponOltSDOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 250
+
+gponOltSDOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 251
+
+gponOltLCDGIOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 252
+
+
+gponOltLCDGIOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 253
+
+
+gponOltRDOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 254
+
+
+gponOltRDOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 255
+
+gponOltSUFOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 256
+
+gponOltSUFOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 257
+
+
+gponOltLOAOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 258
+
+gponOltLOAOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 259
+
+gponOltLOAMIOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+
+	::= 260
+gponOltLOAMIOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 261
+
+gponOltMEMOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 262
+
+gponOltMEMOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 263
+
+gponOltPEEOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 264
+
+gponOltPEEOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 265
+
+gponOltPSTOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 266
+
+gponOltPSTOff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 267
+
+gponOltERROn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 268
+
+gponOltERROff  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 269
+
+gponOltREIOn  TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 270
+
+gponOltREIOff   TRAP-TYPE
+ 	ENTERPRISE 	dasanEvents
+	VARIABLES { sleGponOltId, sleGponOnuId }
+	DESCRIPTION "Description"
+	::= 271
+             
+END

@@ -1,0 +1,32 @@
+<?php
+
+$name = 'postgres';
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = '';
+$unitlen = 10;
+$bigdescrlen = 15;
+$smalldescrlen = 15;
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 15;
+
+if (isset($vars['database'])) {
+    $rrd_name_array = ['app', $name, $app->app_id, $vars['database']];
+} else {
+    $rrd_name_array = ['app', $name, $app->app_id];
+}
+
+$rrd_filename = Rrd::name($device['hostname'], $rrd_name_array);
+
+$rrd_list = [
+    [
+        'filename' => $rrd_filename,
+        'descr' => 'Backends',
+        'ds' => 'backends',
+        'colour' => '582A72',
+    ],
+];
+
+require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

@@ -1,0 +1,498 @@
+--  *****************************************************************
+--  DLINKSW-VOICE-VLAN-MIB.mib : Voice VLAN MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-VOICE-VLAN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,Unsigned32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        MacAddress, TruthValue, RowStatus, DateAndTime
+            FROM SNMPv2-TC
+        PortList, VlanIdOrNone
+            FROM Q-BRIDGE-MIB
+        InterfaceIndex
+            FROM IF-MIB
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB 
+        LldpPortNumber, LldpChassisIdSubtype, LldpChassisId, LldpPortIdSubtype,
+        LldpPortId
+            FROM LLDP-MIB;
+
+
+    dlinkSwVoiceVlanMIB MODULE-IDENTITY
+        LAST-UPDATED "201304260000Z"
+        ORGANIZATION "D-Link Corp."
+            CONTACT-INFO
+                "        D-Link Corporation
+
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+        DESCRIPTION
+            "The MIB module for managing voice VLAN feature."
+        REVISION        "201304260000Z"
+        DESCRIPTION
+            "Initial version of this MIB module."
+        ::= { dlinkIndustrialCommon 74}
+
+-- -----------------------------------------------------------------------------
+-- Node definitions
+-- -----------------------------------------------------------------------------
+
+    dVoiceVlanMIBNotifications  OBJECT IDENTIFIER ::= { dlinkSwVoiceVlanMIB 0 }
+    dVoiceVlanMIBObjects        OBJECT IDENTIFIER ::= { dlinkSwVoiceVlanMIB 1 }
+    dVoiceVlanMIBConformance    OBJECT IDENTIFIER ::= { dlinkSwVoiceVlanMIB 2 }
+
+-- -----------------------------------------------------------------------------
+-- dVoiceVlanGlobal
+-- -----------------------------------------------------------------------------
+    dVoiceVlanGlobal    OBJECT IDENTIFIER ::= { dVoiceVlanMIBObjects 1 }
+
+    dVoiceVlanVlanId OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The object specifies the voice VLAN on a switch.
+            A value of zero indicates that no voice VLAN has been
+            configured.
+            It is required to configure the global dVoiceVlanVlanId and enable
+            dVoiceVlanIfEnabled to start the voice VLAN function
+            on a port."
+        DEFVAL          { 0 }
+        ::= { dVoiceVlanGlobal 1 }
+
+    dVoiceVlanQos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The priority for the voice VLAN, which is used to distinguish
+            the QoS of the voice traffic from data traffic."
+        DEFVAL          { 5 }
+        ::= { dVoiceVlanGlobal 2 }
+
+    dVoiceVlanAgingTime OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        UNITS           "minutes"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The aging time for the voice VLAN, for aging out the voice
+            device and the voice VLAN automatically learned member ports."
+        DEFVAL          { 720 }
+        ::= { dVoiceVlanGlobal 3 }
+
+    dVoiceVlanOuiTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVoiceVlanOuiEntry
+        MAX-ACCESS      not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the voice VLAN OUI configuration."
+        ::= { dVoiceVlanGlobal 4 }
+
+    dVoiceVlanOuiEntry OBJECT-TYPE
+        SYNTAX          DVoiceVlanOuiEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates an OUI information, which is used to classify
+            voice traffic into the voice VLAN. If the source MAC addresses of
+            the received packet matches any of the OUI pattern, the received
+            packet is determined as voice packet. "
+        INDEX { dVoiceVlanOuiAddr, dVoiceVlanOuiMask}
+        ::= { dVoiceVlanOuiTable 1 }
+
+    DVoiceVlanOuiEntry ::=
+        SEQUENCE {
+            dVoiceVlanOuiAddr       MacAddress,
+            dVoiceVlanOuiMask       MacAddress,
+            dVoiceVlanOuiDes        SnmpAdminString,
+            dVoiceVlanOuiRowStatus  RowStatus
+        }
+
+    dVoiceVlanOuiAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The MAC address of the OUI referring to this VoiceVlanOuiEntry."
+        ::= { dVoiceVlanOuiEntry 1 }
+
+    dVoiceVlanOuiMask OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the OUI MAC address matching bitmask."
+        ::= { dVoiceVlanOuiEntry 2 }
+
+    dVoiceVlanOuiDes OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The description of the OUI. A zero length string of this object indicates
+            there is no description for this OUI."
+        ::= { dVoiceVlanOuiEntry 3 }
+
+    dVoiceVlanOuiRowStatus  OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { dVoiceVlanOuiEntry 4 }
+
+-- -----------------------------------------------------------------------------
+    dVoiceVlanInterface OBJECT IDENTIFIER ::= { dVoiceVlanMIBObjects 2 }
+
+    dVoiceVlanInterfaceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVoiceVlanInterfaceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the interface-specific voice VLAN parameters."
+        ::= { dVoiceVlanInterface 1 }
+
+    dVoiceVlanInterfaceEntry OBJECT-TYPE
+        SYNTAX          DVoiceVlanInterfaceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the voice VLAN parameters for a port/port-channel."
+        INDEX { dVoiceVlanIfIndex }
+        ::= { dVoiceVlanInterfaceTable 1 }
+
+    DVoiceVlanInterfaceEntry ::=
+        SEQUENCE {
+            dVoiceVlanIfIndex       InterfaceIndex,
+            dVoiceVlanIfEnabled       TruthValue,
+            dVoiceVlanIfMode        INTEGER
+        }
+
+    dVoiceVlanIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the physical port/port-channel interface."
+        ::= { dVoiceVlanInterfaceEntry 1 }
+
+    dVoiceVlanIfEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates whether the voice VLAN is enabled at the port."
+        ::= { dVoiceVlanInterfaceEntry 2 }
+
+    dVoiceVlanIfMode OBJECT-TYPE
+        SYNTAX          INTEGER{
+            autoUntagged(1),
+            autoTagged(2),
+            manual(3)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "If auto learning is enabled, the port will be automatically learned
+            as voice VLAN member.
+            When the port is working in auto tagged mode, and the port captures
+            a voice device through the device's OUI, it will join the voice VLAN
+            as a tagged member automatically. When the voice device sends tagged
+            packets, the switch will change its priority. When the voice device
+            sends untagged packets, it will forward them in port's PVID VLAN.
+            When the port is working in auto untagged mode, and the port captures
+            a voice device through the device's OUI, it will join the voice VLAN
+            as an untagged member automatically. When the voice device sends tagged
+            packets, the switch will change its priority. When the voice device
+            sends untagged packets, it will forward them in voice VLAN." 
+        ::= { dVoiceVlanInterfaceEntry 3 }
+
+-- -----------------------------------------------------------------------------
+    dVoiceVlanInfo      OBJECT IDENTIFIER ::= { dVoiceVlanMIBObjects 3 }
+
+    dVoiceVlanMemberPorts OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The voice VLAN's member ports, includes the dynamically
+            learned ports."
+        ::= { dVoiceVlanInfo 1 }
+
+    dVoiceVlanDynamicMemberPorts OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The voice VLAN's dynamically learned member ports."
+        ::= { dVoiceVlanInfo 2 }
+
+    dVoiceVlanDeviceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVoiceVlanDeviceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the information about the learned voice devices."
+        ::= { dVoiceVlanInfo 3 }
+
+    dVoiceVlanDeviceEntry OBJECT-TYPE
+        SYNTAX          DVoiceVlanDeviceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the information of the connected voice device."
+        INDEX {
+            dVoiceVlanDevicePortIfindex,
+            dVoiceVlanDeviceAddr }
+        ::= { dVoiceVlanDeviceTable 1 }
+
+    DVoiceVlanDeviceEntry ::=
+        SEQUENCE {
+            dVoiceVlanDevicePortIfindex     InterfaceIndex,
+            dVoiceVlanDeviceAddr            MacAddress,
+            dVoiceVlanDeviceStartTime       DateAndTime,
+            dVoiceVlanDeviceStatus          INTEGER
+        }
+
+    dVoiceVlanDevicePortIfindex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the port to which the voice device connects."
+        ::= { dVoiceVlanDeviceEntry 1 }
+
+    dVoiceVlanDeviceAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the MAC address of the voice device."
+        ::= { dVoiceVlanDeviceEntry 2 }
+
+     dVoiceVlanDeviceStartTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the start time of the connected voice device."
+        ::= { dVoiceVlanDeviceEntry 3 }
+
+    dVoiceVlanDeviceStatus OBJECT-TYPE
+        SYNTAX          INTEGER{
+            active(1),
+            aging(2)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the status of the connected voice device."
+        ::= { dVoiceVlanDeviceEntry 4 }
+
+-- -----------------------------------------------------------------------------        
+    dVoiceVlanLldpMedDeviceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DVoiceVlanLldpMedDeviceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the voice devices that are learned through LLDP-MED."
+        ::= { dVoiceVlanInfo 4 }
+
+    dVoiceVlanLldpMedDeviceEntry OBJECT-TYPE
+        SYNTAX          DVoiceVlanLldpMedDeviceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains the information of a voice device learned through
+            LLDP-MED."
+        INDEX { dVoiceVlanLldpMedDeviceIndex }
+        ::= { dVoiceVlanLldpMedDeviceTable 1 }      
+        
+    DVoiceVlanLldpMedDeviceEntry ::=
+        SEQUENCE {
+            dVoiceVlanLldpMedDeviceIndex                Unsigned32,
+            dVoiceVlanLldpMedDeviceLocalPort            LldpPortNumber,
+            dVoiceVlanLldpMedDevChIdSubtype             LldpChassisIdSubtype,
+            dVoiceVlanLldpMedDevChassisId               LldpChassisId,
+            dVoiceVlanLldpMedDevPoIdSubtype             LldpPortIdSubtype,
+            dVoiceVlanLldpMedDevicePortId               LldpPortId,             
+            dVoiceVlanLldpMedDevCreateTime              DateAndTime,
+            dVoiceVlanLldpMedDevRemainTime              Unsigned32
+        }
+            
+    dVoiceVlanLldpMedDeviceIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..4294967295)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The local index used to identify the entry."
+        ::= { dVoiceVlanLldpMedDeviceEntry 1 }
+ 
+    dVoiceVlanLldpMedDeviceLocalPort OBJECT-TYPE
+        SYNTAX          LldpPortNumber
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the local port number on which the voice
+            device is learned."
+        ::= { dVoiceVlanLldpMedDeviceEntry 2 }
+        
+    dVoiceVlanLldpMedDevChIdSubtype OBJECT-TYPE
+        SYNTAX          LldpChassisIdSubtype
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The type of encoding used to identify the chassis associated with
+            the voice device."  
+        REFERENCE 
+            "IEEE Std 802.1AB-2005 9.5.2.2"
+        ::= { dVoiceVlanLldpMedDeviceEntry 3 }   
+            
+    dVoiceVlanLldpMedDevChassisId OBJECT-TYPE
+        SYNTAX          LldpChassisId
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The string value used to identify the chassis component associated
+            with the voice device."
+        REFERENCE 
+            "IEEE Std 802.1AB-2005 9.5.2.3"
+        ::= { dVoiceVlanLldpMedDeviceEntry 4 }
+   
+    dVoiceVlanLldpMedDevPoIdSubtype OBJECT-TYPE
+        SYNTAX          LldpPortIdSubtype
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The type of port identifier encoding used to identify the port component
+            associated with the voice device." 
+        REFERENCE 
+            "IEEE Std 802.1AB-2005 9.5.3.2"
+        ::= { dVoiceVlanLldpMedDeviceEntry 5 }   
+            
+    dVoiceVlanLldpMedDevicePortId OBJECT-TYPE
+        SYNTAX          LldpPortId
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The string value used to identify the port component associated with
+            the voice device."  
+        REFERENCE 
+            "IEEE Std 802.1AB-2005 9.5.3.3"
+        ::= { dVoiceVlanLldpMedDeviceEntry 6 }
+
+    dVoiceVlanLldpMedDevCreateTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The creation time of the voice device."
+        ::= { dVoiceVlanLldpMedDeviceEntry 7}   
+            
+    dVoiceVlanLldpMedDevRemainTime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The Time-To-Live (in seconds) remaining for the voice device. 
+            If the Remain Time decreases to 0, the voice device will be deleted."
+        ::= { dVoiceVlanLldpMedDeviceEntry 8}
+    
+
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+    dVoiceVlanMIBCompliances  OBJECT IDENTIFIER
+        ::= { dVoiceVlanMIBConformance 1 }
+
+    dVoiceVlanMIBGroups  OBJECT IDENTIFIER
+        ::= { dVoiceVlanMIBConformance 2 }
+
+    dVoiceVlanMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+            DLINKSW-VOICE-VLAN-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS  {   dVoiceVlanBasicGroup  }
+
+        GROUP dVoiceVlanOUICfgGroup
+        DESCRIPTION
+            "This group is required for entities that implement classifying
+            voice traffic based on OUI patterns."
+
+        GROUP dVoiceVlanDeviceInfoGroup
+        DESCRIPTION
+            "This group is required for entities that display voice vlan
+            device infomation."
+        
+        GROUP dVoiceVlanDeviceLldpMedInfoGroup
+        DESCRIPTION
+            "This group is optional."
+
+        ::= { dVoiceVlanMIBCompliances 1 }
+          
+    dVoiceVlanBasicGroup OBJECT-GROUP
+        OBJECTS {
+            dVoiceVlanVlanId,
+            dVoiceVlanQos,
+            dVoiceVlanAgingTime,
+            dVoiceVlanIfEnabled,
+            dVoiceVlanIfMode,
+            dVoiceVlanMemberPorts,
+            dVoiceVlanDynamicMemberPorts}
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to configure or display the status
+            of voice VLAN feature."
+        ::= { dVoiceVlanMIBGroups 1 }
+
+    dVoiceVlanOUICfgGroup OBJECT-GROUP
+        OBJECTS {
+            dVoiceVlanOuiDes,
+            dVoiceVlanOuiRowStatus }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to configure voice device OUI(s)."
+        ::= { dVoiceVlanMIBGroups 2 }
+     
+    dVoiceVlanDeviceInfoGroup OBJECT-GROUP
+        OBJECTS {
+            dVoiceVlanDeviceStartTime,
+            dVoiceVlanDeviceStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to display voice device(s)."
+        ::= { dVoiceVlanMIBGroups 3 }
+    
+    dVoiceVlanDeviceLldpMedInfoGroup OBJECT-GROUP
+        OBJECTS {
+            dVoiceVlanLldpMedDeviceLocalPort,
+            dVoiceVlanLldpMedDevChIdSubtype,
+            dVoiceVlanLldpMedDevChassisId,
+            dVoiceVlanLldpMedDevPoIdSubtype,
+            dVoiceVlanLldpMedDevicePortId,
+            dVoiceVlanLldpMedDevCreateTime,
+            dVoiceVlanLldpMedDevRemainTime  
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects displays information learned via LLDP-MED."
+        ::= { dVoiceVlanMIBGroups 4 } 
+
+ 
+END

@@ -1,0 +1,526 @@
+HP-SN-IP-ACL-MIB DEFINITIONS ::= BEGIN
+
+-- Imports
+
+IMPORTS
+	IpAddress		
+		FROM RFC1155-SMI
+	OBJECT-TYPE     
+		FROM RFC-1212
+	Counter64		
+		FROM SNMPv2-SMI
+	snIp			
+		FROM HP-SN-ROOT-MIB;
+
+	--  textual conventions
+		DisplayString ::= OCTET STRING
+
+	--  RtrStatus Values
+		RtrStatus ::= INTEGER { disabled(0), enabled (1) }
+
+	--  Row Status
+	    SnRowStatus ::= INTEGER { 
+							    other(1),
+							    valid(2),
+							    delete(3),
+							    create(4)
+						      }
+
+	--  Action 
+		Action ::= INTEGER { deny(0), permit(1) }
+
+    --  Boolean Values
+         TruthVal ::= INTEGER { false (0), true (1)  }
+
+	--  ACL number
+		AclNumber ::= INTEGER (1..199)
+
+	--  Operator
+		Operator ::= INTEGER { eq(0), neq(1), lt(2), gt(3), range(4), undefined(7) }
+
+	--  IP Protocol
+		IpProtocol ::= INTEGER (0..255)
+
+	-- Precedence Value
+		PrecedenceValue ::= INTEGER { critical(5), flash(3), flashoverride(4),
+									  immediate(2), internet(6), network(7),
+									  priority(1), routine(0), undefined(8) }
+									
+	-- Tos Value
+		TosValue ::= INTEGER {
+						normal(0),
+						minMonetaryCost(1),
+						maxReliability(2),
+						tosValue3(3),
+						maxThroughput(4),
+						tosValue5(5),
+						tosValue6(6),
+						tosValue7(7),
+						minDelay(8),
+						tosValue9(9),
+						tosValue10(10),
+						tosValue11(11),
+						tosValue12(12),
+						tosValue13(13),
+						tosValue14(14),
+						tosValue15(15),
+						undefined(16)
+							}
+
+	--  Direction 
+		Direction ::= INTEGER { inbound(0), outbound(1) }
+		
+------Access Control List
+
+snAgAcl		OBJECT IDENTIFIER ::= { snIp 15 }
+
+snAgAclGlobal	OBJECT IDENTIFIER ::= { snAgAcl 1 }
+
+snAgAclGblCurRowIndex OBJECT-TYPE
+	SYNTAX	INTEGER 
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The current row index of the ACL table entry."
+	::= { snAgAclGlobal 1 }
+
+--
+-- ACL Table
+--
+
+snAgAclTable       OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnAgAclEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Table of Access Control List"
+	::= { snAgAcl 2 }
+
+snAgAclEntry       OBJECT-TYPE
+	SYNTAX  SnAgAclEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the IP access control list table."
+	INDEX   { snAgAclIndex }
+	::= { snAgAclTable 1 }
+
+SnAgAclEntry ::= SEQUENCE {
+	snAgAclIndex
+		INTEGER,
+	snAgAclNumber
+		AclNumber,
+	snAgAclName
+		DisplayString,
+	snAgAclAction              
+		Action,
+	snAgAclProtocol            
+		IpProtocol,
+	snAgAclSourceIp
+		IpAddress,
+	snAgAclSourceMask
+		IpAddress,
+	snAgAclSourceOperator
+		Operator,
+	snAgAclSourceOperand1
+		INTEGER,
+	snAgAclSourceOperand2
+		INTEGER,
+	snAgAclDestinationIp
+		IpAddress,
+	snAgAclDestinationMask
+		IpAddress,
+	snAgAclDestinationOperator
+		Operator,
+	snAgAclDestinationOperand1
+		INTEGER,
+	snAgAclDestinationOperand2
+		INTEGER,
+	snAgAclPrecedence
+		PrecedenceValue,
+	snAgAclTos
+		TosValue,
+	snAgAclEstablished
+		RtrStatus,
+	snAgAclLogOption
+		TruthVal,
+	snAgAclStandardFlag
+		TruthVal,
+	snAgAclRowStatus
+		SnRowStatus,
+	snAgAclFlowCounter
+		Counter64,
+	snAgAclPacketCounter
+		Counter64,
+	snAgAclComments
+		DisplayString,
+	snAgAclIpPriority
+		INTEGER,
+	snAgAclPriorityForce
+		INTEGER,
+	snAgAclPriorityMapping
+		INTEGER,
+	snAgAclDscpMarking
+		INTEGER,
+	snAgAclDscpMapping
+		INTEGER
+	}
+
+snAgAclIndex       OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"The access control list item number for an entry.
+		This is a unique number that identifies different
+		Access list entries combined with the access list
+		name and access list number. This one has to be 
+		unique even though the name and number are not unique
+		for a give access list with same or different source
+		address, subnet mask, destination address and destination
+		mask, protocol type, action (permit/deny) type and the
+		operator (neq, eq, gt and , lt) which makes the index a 
+		unique tuple (name, number, itemnumber)."
+	::= { snAgAclEntry 1 }
+
+snAgAclNumber       OBJECT-TYPE
+	SYNTAX  AclNumber
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"The access control list number for an entry.
+		The standard access list is in the range <1..99>.
+		The extended access list is in the range <100-199>."
+	::= { snAgAclEntry 2 }
+
+snAgAclName		OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"ACL name for an entry."
+	::= { snAgAclEntry 3 }
+
+snAgAclAction      OBJECT-TYPE
+	SYNTAX  Action 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Action to take if the ip packet matches
+		with this access control list."
+	::= { snAgAclEntry 4 }
+
+snAgAclProtocol    OBJECT-TYPE
+	SYNTAX  IpProtocol
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Transport protocol. 0 means any protocol."
+	::= { snAgAclEntry 5 }
+
+snAgAclSourceIp    OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Source IP address."
+	::= { snAgAclEntry 6 }
+
+snAgAclSourceMask  OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Source IP subnet mask."
+	::= { snAgAclEntry 7 }
+
+snAgAclSourceOperator    OBJECT-TYPE
+	SYNTAX  Operator
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Type of comparison to perform.
+		for now, this only applys to tcp or udp
+		to compare the port number"
+	::= { snAgAclEntry 8 }
+
+snAgAclSourceOperand1     OBJECT-TYPE
+	SYNTAX  INTEGER(0..65535)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"For now this only refers to transport 
+		protocol port number. 0 means NA"
+	::= { snAgAclEntry 9 }
+
+snAgAclSourceOperand2     OBJECT-TYPE
+	SYNTAX  INTEGER(0..65535)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"For now this only refers to transport 
+		protocol port number. 0 means NA"
+	::= { snAgAclEntry 10 }
+
+snAgAclDestinationIp      OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination IP address."
+	::= { snAgAclEntry 11 }
+
+snAgAclDestinationMask    OBJECT-TYPE
+	SYNTAX  IpAddress
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Destination IP subnet mask."
+	::= { snAgAclEntry 12 }
+
+snAgAclDestinationOperator    OBJECT-TYPE
+	SYNTAX  Operator
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Type of comparison to perform.
+		for now, this only applys to tcp or udp
+		to compare the port number"
+	::= { snAgAclEntry 13 }
+
+snAgAclDestinationOperand1     OBJECT-TYPE
+	SYNTAX  INTEGER(0..65535)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"For now this only refers to transport 
+		protocol port number. 0 means NA"
+	::= { snAgAclEntry 14 }
+
+snAgAclDestinationOperand2     OBJECT-TYPE
+	SYNTAX  INTEGER(0..65535)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"For now this only refers to transport 
+		protocol port number. 0 means NA"
+	::= { snAgAclEntry 15 }
+
+snAgAclPrecedence OBJECT-TYPE
+	SYNTAX  PrecedenceValue
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"This refers to IP precedence value in the range <0-7>
+		critical(5), 
+		flash(3), 
+		flash-override(4), 
+		immediate(2), 
+		internet(6), 
+		network(7), 
+		priority(1), 
+		routine(0)"
+		::= { snAgAclEntry 16 }
+
+snAgAclTos OBJECT-TYPE
+	  SYNTAX  TosValue
+	  ACCESS  read-write
+	  STATUS  mandatory
+	  DESCRIPTION
+		"This refers to the IP type of service value in range
+		<0-15> which is the sum of numeric vlaues of the 
+		following options -
+		match packets with maximum reliability TOS (2)
+		match packets with maximum throughput TOS (4)
+		match packets with minimum delay (8)
+		match packets with minimum monetary cost TOS (1)
+		match packets with normal TOS  (0)"
+		::= { snAgAclEntry 17 }
+
+snAgAclEstablished OBJECT-TYPE
+	SYNTAX  RtrStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Enable/Disable the filtering of established TCP
+		packets of which the ACK or RESET flag is on. This
+		additional filter only applies to TCP transport
+		protocol."
+	::= { snAgAclEntry 18 }
+
+snAgAclLogOption OBJECT-TYPE
+	SYNTAX  TruthVal
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Log flag"
+	::= { snAgAclEntry 19 }
+
+snAgAclStandardFlag OBJECT-TYPE
+	SYNTAX  TruthVal
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Return whether the ACL is standard or extended, 1 for standard ACL"
+	::= { snAgAclEntry 20 }
+
+snAgAclRowStatus   OBJECT-TYPE
+	SYNTAX  SnRowStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a access list
+		entry."
+	::= { snAgAclEntry 21 }
+
+snAgAclFlowCounter   OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Approximate count of flows matching individual ACL entry."
+	::= { snAgAclEntry 22 }
+
+snAgAclPacketCounter   OBJECT-TYPE
+	SYNTAX  Counter64
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Accurate count of packets matching individual ACL entry."
+	::= { snAgAclEntry 23 }
+
+snAgAclComments   OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Remark description of individual ACL entry."
+	::= { snAgAclEntry 24 }
+
+snAgAclIpPriority   OBJECT-TYPE
+	SYNTAX  INTEGER(0..3)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"QoS priority option for IP ACL entry."
+	::= { snAgAclEntry 25 }
+
+snAgAclPriorityForce   OBJECT-TYPE
+	SYNTAX  INTEGER(0..4)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Force packet outgoing priority.  Not defined(4)"
+	::= { snAgAclEntry 26 }
+
+snAgAclPriorityMapping   OBJECT-TYPE
+	SYNTAX  INTEGER(0..8)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Map incoming packet priority. Not defined(8)"
+	::= { snAgAclEntry 27 }
+
+snAgAclDscpMarking   OBJECT-TYPE
+	SYNTAX  INTEGER(0..64)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Mark packets with given DSCP value.  Not defined(64)"
+	::= { snAgAclEntry 28 }
+
+snAgAclDscpMapping   OBJECT-TYPE
+	SYNTAX  INTEGER(0..64)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Map incoming DSCP value.  Not defined(64)"
+	::= { snAgAclEntry 29 }
+
+--
+-- Acl Port Table
+
+snAgAclBindToPortTable   OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SnAgAclBindToPortEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"Table of ACL binding to port for router"
+	::= { snAgAcl 3 }
+
+snAgAclBindToPortEntry       OBJECT-TYPE
+	SYNTAX  SnAgAclBindToPortEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry in the ACL-binding-to-port table."
+	INDEX   { 
+			   snAgAclPortNum, 
+			   snAgAclPortBindDirection
+			}
+	::= { snAgAclBindToPortTable 1 }
+
+SnAgAclBindToPortEntry ::= SEQUENCE {
+	snAgAclPortNum
+		INTEGER,
+	snAgAclPortBindDirection
+		Direction,
+	snAgAclNum
+		INTEGER,
+	snAgAclNameString
+		DisplayString,
+	snAgBindPortListInVirtualInterface
+		OCTET STRING,
+	snAgAclPortRowStatus
+		SnRowStatus
+	}
+
+snAgAclPortNum      OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"Binding-to port num, either physical port or virtual interface."
+	::= { snAgAclBindToPortEntry 1 }
+
+snAgAclPortBindDirection   OBJECT-TYPE
+	SYNTAX  Direction
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"ACL port direction, inbound or outbound"
+	::= { snAgAclBindToPortEntry 2 }
+
+snAgAclNum      OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Defined ACL number"
+	::= { snAgAclBindToPortEntry 3 }
+
+snAgAclNameString      OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Defined ACL name"
+	::= { snAgAclBindToPortEntry 4 }
+
+snAgBindPortListInVirtualInterface   OBJECT-TYPE
+	SYNTAX  OCTET STRING
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"Port list for binding virtual interface"
+	::= { snAgAclBindToPortEntry 5 }
+
+snAgAclPortRowStatus   OBJECT-TYPE
+	SYNTAX  SnRowStatus
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION
+		"To create or delete a ACL port entry."
+	::= { snAgAclBindToPortEntry 6 }
+
+END

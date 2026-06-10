@@ -1,0 +1,3116 @@
+CTRON-SFPS-TOPOLOGY-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-topology-mib.txt
+--  Revision: 0.0.09
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+--
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services API MIB.
+--
+--  This module will be extended, as required.
+--
+--
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--  tcl    enterprises
+--       Counter, Gauge
+       IpAddress, TimeTicks
+                FROM RFC1155-SMI
+ 
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsTopologyVNSNeighbors, sfpsServiceCenter, sfpsTopologyPortManager,
+        sfpsTopologyAgentCommon, sfpsTopologyFCL, sfpsTPMPortTableAPIIn, 
+        sfpsTPMPortTableAPIOut, sfpsNeighborEvents, sfpsRATopologyAgent,
+        sfpsRATopAgentPortTableAPIIn, sfpsRATopAgentPortTableAPIOut,
+        sfpsVMTopologyServer, sfpsTAPITestIn, sfpsTAPITestOut,
+        sfpsTopologyServerTestIn, sfpsTopologyServerTest, sfpsVLANTopologyAgent,
+        sfpsVLANTopAgentPortTableAPIIn, sfpsDirViolation, sfpsDirLockConfig, 
+        sfpsDirLockStats, sfpsDirViolationAPI, sfpsDirViolationDeltaAPI, 
+        sfpsDirRestriction, sfpsDapiNvramStats, sfpsESPTopologyAgent, 
+        sfpsRestrictedMobility, sfpsRestrictedMobilityAPI, sfpsTopologyServerPortEventRelay
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+ 
+-- SfpsSwitchPort ::= INTEGER
+--  this will map to chassis.module.portgroup.portsubgroup.port index value
+ 
+SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+  
+
+
+-- TOPOLOGY
+
+sfpsServiceCenterTopologyTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsServiceCenterTopologyEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table gives topology semantics to call processing."
+        ::= { sfpsServiceCenter 8 }
+
+sfpsServiceCenterTopologyEntry    OBJECT-TYPE
+        SYNTAX  SfpsServiceCenterTopologyEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry contains the configuration of the Topology Entry."
+        INDEX   { sfpsServiceCenterTopologyHashLeaf } 
+        ::= { sfpsServiceCenterTopologyTable 1 }
+
+SfpsServiceCenterTopologyEntry ::=
+        SEQUENCE {
+                sfpsServiceCenterTopologyHashLeaf       HexInteger,  
+                sfpsServiceCenterTopologyMetric         INTEGER,  
+                sfpsServiceCenterTopologyName           DisplayString,  
+                sfpsServiceCenterTopologyOperStatus     INTEGER,  
+                sfpsServiceCenterTopologyAdminStatus     INTEGER,
+                sfpsServiceCenterTopologyStatusTime     TimeTicks,
+                sfpsServiceCenterTopologyRequests       INTEGER,
+                sfpsServiceCenterTopologyResponses      INTEGER
+                  
+         }  
+
+sfpsServiceCenterTopologyHashLeaf   OBJECT-TYPE
+        SYNTAX  HexInteger  
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server hash, part of instance key."
+        ::= { sfpsServiceCenterTopologyEntry 1 }
+
+sfpsServiceCenterTopologyMetric   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Defines order servers are called low to high."
+        ::= { sfpsServiceCenterTopologyEntry 2 }
+
+sfpsServiceCenterTopologyName   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Server name."
+        ::= { sfpsServiceCenterTopologyEntry 3 }
+
+sfpsServiceCenterTopologyOperStatus   OBJECT-TYPE
+        SYNTAX  INTEGER  {
+                        kStatusRunning(1),      --  all is well
+                        kStatusHalted(2),       -- admin disabled
+                        kStatusPending(3),      -- Trying to run, not there yet
+                        kStatusFaulted(4),      -- Internal error, never will recover
+                        kStatusNotStarted(5)    -- Not fully started yet
+        }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Operational state of entry."
+        ::= { sfpsServiceCenterTopologyEntry 4 }
+
+sfpsServiceCenterTopologyAdminStatus   OBJECT-TYPE
+        SYNTAX  INTEGER       {
+                        other(1),               -- Not running or stopped
+                        disable(2),             -- Please stop
+                        enable(3)               -- Go
+        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Administrative State of Entry."
+        ::= { sfpsServiceCenterTopologyEntry 5 }
+
+sfpsServiceCenterTopologyStatusTime   OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time Tick of last operStatus change."
+        ::= { sfpsServiceCenterTopologyEntry 6 }
+
+sfpsServiceCenterTopologyRequests   OBJECT-TYPE
+        SYNTAX   INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Requests made to server."
+        ::= { sfpsServiceCenterTopologyEntry 7 }
+
+sfpsServiceCenterTopologyResponses   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "GOOD replies by server."
+        ::= { sfpsServiceCenterTopologyEntry 8 }
+ 
+--  History Topology Server Table
+
+sfpsHistoryTopologyServerTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsHistoryTopologyServerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyVNSNeighbors 7 }
+
+sfpsHistoryTopologyServerEntry    OBJECT-TYPE
+        SYNTAX  SfpsHistoryTopologyServerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsHistoryTopologyServerIndex } 
+                        ::= { sfpsHistoryTopologyServerTable 1 }
+
+SfpsHistoryTopologyServerEntry ::=
+        SEQUENCE {
+                        sfpsHistoryTopologyServerIndex            INTEGER,
+                        sfpsHistoryTopologyServerLogicalPort      INTEGER,
+                        sfpsHistoryTopologyServerSwitchID                 OCTET STRING,
+                        sfpsHistoryTopologyServerEvent                    INTEGER,
+                        sfpsHistoryTopologyServerSwitchIP                 IpAddress,
+                        sfpsHistoryTopologyServerChassisMAC               SfpsAddress,
+                        sfpsHistoryTopologyServerChassisIP                IpAddress,
+                        sfpsHistoryTopologyServerAgent                    DisplayString,
+                        sfpsHistoryTopologyServerDeltaOptionsMask INTEGER,
+                        sfpsHistoryTopologyServerCurrentOptionsMask  INTEGER,
+                        sfpsHistoryTopologyServerFCL              INTEGER,
+                        sfpsHistoryTopologyServerSysTime          TimeTicks
+        }  
+
+sfpsHistoryTopologyServerIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Index"
+        ::= { sfpsHistoryTopologyServerEntry 1 }
+
+sfpsHistoryTopologyServerLogicalPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical port neighbor was discovered on"
+        ::= { sfpsHistoryTopologyServerEntry 2 }
+
+sfpsHistoryTopologyServerSwitchID    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "neighboring switch's switchID or portName"
+        ::= { sfpsHistoryTopologyServerEntry 3 }
+
+sfpsHistoryTopologyServerEvent    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        foundNeighbor(1),
+                        optionsGain(2),
+                        optionsLoss(3),
+                        agingNghLoss(4),
+                        portDownNghLoss(5),
+                        duplicateNghLoss(6),
+                        subtractPortNghLoss(7),
+                        loopedPortNhgLoss(8),
+                        crossedPortNghLoss(9),
+                        functionalLevelNghLoss(10),
+                        versionedPortNghLoss(11),
+                        twoWayCommLoss(12),
+                        sequenceNumberReset(13)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Event"
+        ::= { sfpsHistoryTopologyServerEntry 4 }
+
+sfpsHistoryTopologyServerSwitchIP    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "neighboring switch's IP"
+        ::= { sfpsHistoryTopologyServerEntry 5 }
+
+sfpsHistoryTopologyServerChassisMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Chassis MAC address"
+        ::= { sfpsHistoryTopologyServerEntry 6 }
+
+sfpsHistoryTopologyServerChassisIP    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Chassis IP address"
+        ::= { sfpsHistoryTopologyServerEntry 7 }
+
+sfpsHistoryTopologyServerAgent    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "topology agent that discovered neighbor"
+        ::= { sfpsHistoryTopologyServerEntry 8 }
+
+sfpsHistoryTopologyServerDeltaOptionsMask    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                " switch's delta options mask"
+        ::= { sfpsHistoryTopologyServerEntry 9 }
+
+sfpsHistoryTopologyServerCurrentOptionsMask    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Current options mask"
+        ::= { sfpsHistoryTopologyServerEntry 10 }
+
+sfpsHistoryTopologyServerFCL    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "systime of options mask change"
+        ::= { sfpsHistoryTopologyServerEntry 11 }
+
+sfpsHistoryTopologyServerSysTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "systime of switch"
+        ::= { sfpsHistoryTopologyServerEntry 12 }
+
+--
+
+sfpsTPMPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsTPMPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyPortManager 1 }
+
+sfpsTPMPortEntry    OBJECT-TYPE
+        SYNTAX  SfpsTPMPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsTPMPortLogicalPort} 
+
+        ::= { sfpsTPMPortTable 1 }
+
+SfpsTPMPortEntry ::=
+        SEQUENCE {
+                        sfpsTPMPortLogicalPort      INTEGER,
+                        sfpsTPMPortMediaType            INTEGER,
+                        sfpsTPMPortTopologyAgent        DisplayString,
+                        sfpsTPMPortVlanAttributes       INTEGER,
+                        sfpsTPMPortNVRAMStatus          INTEGER,
+                        sfpsTPMPortCorePortVID          INTEGER
+        }  
+
+sfpsTPMPortLogicalPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsTPMPortEntry 1 }
+
+sfpsTPMPortMediaType    OBJECT-TYPE
+         SYNTAX  INTEGER       {
+                            ethernet(1),
+                            fddi(2),
+                            atm-lec(3),
+                            token-ring(4),
+                            wan(5),
+                            inb(6),
+                            hcp(7),
+                            hdp(8),
+                            atm-encap(9),
+                            atm-pvc(10),
+                            unknown(11),
+                            atm-forum-lec(12),
+                            atm-forum-pvc(13),
+                            atm-forum-svc(14)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Gapi media type"
+        ::= { sfpsTPMPortEntry 2 }
+
+sfpsTPMPortTopologyAgent    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "TopologyAgent of the port - NVRAM"
+        ::= { sfpsTPMPortEntry 3 }
+
+
+sfpsTPMPortVlanAttributes    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port Vlan attributes"
+        ::= { sfpsTPMPortEntry 8 }
+
+sfpsTPMPortNVRAMStatus    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "NVRAM Status - set/unset"
+        ::= { sfpsTPMPortEntry 9 }
+
+sfpsTPMPortCorePortVID   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTPMPortEntry 10 }
+
+--
+
+sfpsTPMPortTableAPIInVerb    OBJECT-TYPE
+         SYNTAX  INTEGER       {
+             other(1),
+             add(2),
+             getPortInfo(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take"
+        ::= { sfpsTPMPortTableAPIIn 1 }
+
+sfpsTPMPortTableAPIInLogicalPort    OBJECT-TYPE
+         SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "TPM Port Table entry specifier"
+        ::= { sfpsTPMPortTableAPIIn 2 }
+
+sfpsTPMPortTableAPIInTopologyAgent    OBJECT-TYPE
+         SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies topologyAgent of the specified entry"
+        ::= { sfpsTPMPortTableAPIIn 3 }
+
+sfpsTPMPortTableAPIInAdminPortUp   OBJECT-TYPE
+         SYNTAX  INTEGER       {
+             other(1),
+             disabled(2),
+             enabled(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies adminPortUp of the specified entry"
+        ::= { sfpsTPMPortTableAPIIn 4 }
+
+sfpsTPMPortTableAPIInAdminPortDown   OBJECT-TYPE
+         SYNTAX  INTEGER       {
+             other(1),
+             disabled(2),
+             enabled(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies adminPortDown of the specified entry"
+        ::= { sfpsTPMPortTableAPIIn 5 }
+
+sfpsTPMPortTableAPIInCorePortVID  OBJECT-TYPE
+         SYNTAX  INTEGER  
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTPMPortTableAPIIn 6 }
+
+
+--
+
+
+sfpsTPMPortTableAPIOutLogicalPort    OBJECT-TYPE
+         SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "TPMPortTable entry specifier"
+        ::= { sfpsTPMPortTableAPIOut 1 }
+
+sfpsTPMPortTableAPIOutTopologyAgent    OBJECT-TYPE
+         SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Displays topologyAgent of the specified entry"
+        ::= { sfpsTPMPortTableAPIOut 2 }
+
+--
+
+sfpsCommonNeighborTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsCommonNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The CommonNeighborTable holds all switch neighbors.  It is populated by all topology agents"
+        ::= { sfpsTopologyAgentCommon 1 }
+
+sfpsCommonNeighborEntry    OBJECT-TYPE
+        SYNTAX  SfpsCommonNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsCommonNeighborLogicalPort, sfpsCommonNeighborSwitchID} 
+
+        ::= { sfpsCommonNeighborTable 1 }
+
+SfpsCommonNeighborEntry ::=
+        SEQUENCE {
+                        sfpsCommonNeighborLogicalPort           INTEGER,
+                        sfpsCommonNeighborSwitchID              DisplayString,
+                        sfpsCommonNeighborSwitchIP              IpAddress,
+                        sfpsCommonNeighborSwitchMAC             SfpsAddress,
+                        sfpsCommonNeighborSwitchType            INTEGER,
+                        sfpsCommonNeighborHellosReceived    INTEGER,
+                        sfpsCommonNeighborFirstHeard            TimeTicks,
+                        sfpsCommonNeighborLastHeard             TimeTicks,
+                        sfpsCommonNeighborReceiveFrequency  INTEGER,
+                        sfpsCommonNeighborTopologyAgent     DisplayString,
+                        sfpsCommonNeighborChassisMAC            SfpsAddress,
+                        sfpsCommonNeighborCommState             INTEGER,
+                        sfpsCommonNeighborNotifyState           INTEGER,
+                        sfpsCommonNeighborTwoWayLossCount   INTEGER,
+                        sfpsCommonNeighborTwoWayLossTime    TimeTicks,
+                        sfpsCommonNeighborSeqNumLossCount   INTEGER,
+                        sfpsCommonNeighborSeqNumLossTime    TimeTicks,
+                        sfpsCommonNeighborFalseAgingCount   INTEGER,
+                        sfpsCommonNeighborFalseAgingTime    TimeTicks,
+                        sfpsCommonNeighborChassisIP             IpAddress,
+                        sfpsCommonNeighborFCL                       HexInteger,
+                        sfpsCommonNeighborOptionsMask           INTEGER,
+                        sfpsCommonNeighborRcvdPortState     INTEGER,
+                        sfpsCommonNeighborSendPortState     INTEGER,
+                        sfpsCommonNeighborCompatibility         INTEGER,
+                        sfpsCommonNeighborCorePortVID           INTEGER
+        }  
+
+sfpsCommonNeighborLogicalPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsCommonNeighborEntry 1 }
+
+sfpsCommonNeighborSwitchID    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsCommonNeighborEntry 2 }
+
+sfpsCommonNeighborSwitchIP    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of neighboring switch"
+        ::= { sfpsCommonNeighborEntry 3 }
+
+sfpsCommonNeighborSwitchMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Interface mac address of neighboring switch"
+        ::= { sfpsCommonNeighborEntry 4 }
+
+sfpsCommonNeighborSwitchType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                vns(1),
+                vlan(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Type of SecureFast switch"
+        ::= { sfpsCommonNeighborEntry 5 }
+
+sfpsCommonNeighborHellosReceived    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Hello packet counter"
+        ::= { sfpsCommonNeighborEntry 6 }
+
+sfpsCommonNeighborFirstHeard    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time stamp of first hello received"
+        ::= { sfpsCommonNeighborEntry 7 }
+
+sfpsCommonNeighborLastHeard    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time stamp of last hello received"
+        ::= { sfpsCommonNeighborEntry 8 }
+
+sfpsCommonNeighborReceiveFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Allows CommonNeighborTable to age entries"
+        ::= { sfpsCommonNeighborEntry 9 }
+
+sfpsCommonNeighborTopologyAgent    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Owner of entry"
+        ::= { sfpsCommonNeighborEntry 10 }
+
+sfpsCommonNeighborChassisMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Not currently used"
+        ::= { sfpsCommonNeighborEntry 11 }
+
+sfpsCommonNeighborCommState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                init(1),
+                oneWay(2),
+                twoWay(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Neighbor communication state"
+        ::= { sfpsCommonNeighborEntry 12 }
+
+sfpsCommonNeighborNotifyState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                init(1),
+                unNotified(2),
+                notified(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Topology server notification state"
+        ::= { sfpsCommonNeighborEntry 13 }
+
+sfpsCommonNeighborTwoWayLossCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Two-way communication loss count"
+        ::= { sfpsCommonNeighborEntry 14 }
+
+sfpsCommonNeighborTwoWayLossTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time stamp of last two-way communication loss"
+        ::= { sfpsCommonNeighborEntry 15 }
+
+sfpsCommonNeighborSeqNumLossCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Sequence number loss count"
+        ::= { sfpsCommonNeighborEntry 16 }
+
+sfpsCommonNeighborSeqNumLossTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Timestamp of last sequence number loss"
+        ::= { sfpsCommonNeighborEntry 17 }
+
+sfpsCommonNeighborFalseAgingCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "False aging loss count"
+        ::= { sfpsCommonNeighborEntry 18 }
+
+sfpsCommonNeighborFalseAgingTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Timestamp of last false aging loss"
+        ::= { sfpsCommonNeighborEntry 19 }
+
+sfpsCommonNeighborChassisIP    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of the switch chassis"
+        ::= { sfpsCommonNeighborEntry 20 }
+
+sfpsCommonNeighborFCL    OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Functional Capability Level"
+        ::= { sfpsCommonNeighborEntry 21 }
+
+sfpsCommonNeighborOptionsMask    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit encoded list of switch features"
+        ::= { sfpsCommonNeighborEntry 22 }
+
+sfpsCommonNeighborRcvdPortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgnt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9),
+                networkOnly(10),
+                accessOnly(11),
+                raPrimary(12),
+                uplink(13),
+                fclStandby(14),
+                loopStandby(15),
+                raStandby(16),
+                flood(17),
+                uplinkFlood(18),
+                downlingFlood(19),
+                unknown-ra-standy(20)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCommonNeighborEntry 23 }
+
+sfpsCommonNeighborSendPortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgnt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9),
+                networkOnly(10),
+                accessOnly(11),
+                raPrimary(12),
+                uplink(13),
+                fclStandby(14),
+                loopStandby(15),
+                raStandby(16),
+                flood(17),
+                uplinkFlood(18),
+                downlingFlood(19),
+                unknown-ra-standy(20)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCommonNeighborEntry 24 }
+
+sfpsCommonNeighborCompatibility    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                compatible(1),
+                notCompatible(2),
+                unknown(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Neighbor compatibility state"
+        ::= { sfpsCommonNeighborEntry 25 }
+
+sfpsCommonNeighborCorePortVID    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsCommonNeighborEntry 26 }
+
+--
+
+sfpsTopologyFCLTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsTopologyFCLEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyFCL 1 }
+
+sfpsTopologyFCLEntry    OBJECT-TYPE
+        SYNTAX  SfpsTopologyFCLEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsTopologyFCLFunctionalLevel} 
+
+        ::= { sfpsTopologyFCLTable 1 }
+
+SfpsTopologyFCLEntry ::=
+        SEQUENCE {
+                        sfpsTopologyFCLFunctionalLevel          INTEGER,
+                        sfpsTopologyFCLCompatability            INTEGER,
+                        sfpsTopologyFCLThisPortState            INTEGER,
+                        sfpsTopologyFCLSendPortState            INTEGER
+        }  
+
+sfpsTopologyFCLFunctionalLevel    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "functional compatability level"
+        ::= { sfpsTopologyFCLEntry 1 }
+
+sfpsTopologyFCLCompatability    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                compatable(1),
+                notCompatable(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "compatability to this switch's FCL"
+        ::= { sfpsTopologyFCLEntry 2 }
+
+sfpsTopologyFCLThisPortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostManagement(4),
+                hostControl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This switch's port state when neighboring a switch of this FCL"
+        ::= { sfpsTopologyFCLEntry 3 }
+
+sfpsTopologyFCLSendPortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostManagement(4),
+                hostControl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9)
+                }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Sending switch's port state when neighboring a switch of this FCL"
+        ::= { sfpsTopologyFCLEntry 4 }
+
+--  Neighbor Events
+
+sfpsNeighborEventsFoundEvents    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "number of VLAN neighbors found"
+        ::= { sfpsNeighborEvents 1 }
+
+sfpsNeighborEventsLostEvents    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "number of VLAN neighbors lost"
+        ::= { sfpsNeighborEvents 2 }
+
+-- Redundant Access Neighbor Table
+
+sfpsRATopAgentNeighborTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsRATopAgentNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopologyAgent 1 }
+
+sfpsRATopAgentNeighborEntry    OBJECT-TYPE
+        SYNTAX  SfpsRATopAgentNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsRATopAgentNeighborInPort, sfpsRATopAgentNeighborSwitchID } 
+
+        ::= { sfpsRATopAgentNeighborTable 1 }
+
+SfpsRATopAgentNeighborEntry ::=
+        SEQUENCE {
+                        sfpsRATopAgentNeighborInPort            INTEGER,
+                        sfpsRATopAgentNeighborSwitchID          OCTET STRING,
+                        sfpsRATopAgentNeighborPriority          INTEGER,
+                        sfpsRATopAgentNeighborNetworkPort       INTEGER,
+                        sfpsRATopAgentNeighborCallTag           INTEGER,
+                        sfpsRATopAgentNeighborNetHellosRcvd     INTEGER,
+                        sfpsRATopAgentNeighborSeqNumMismatch                    INTEGER,
+                        sfpsRATopAgentNeighborNetHelloAgeTimeOuts               INTEGER,
+                        sfpsRATopAgentNeighborNetHelloNetPortLosses             INTEGER,
+                        sfpsRATopAgentNeighborNetHelloNetPortChanges    INTEGER
+        }  
+
+sfpsRATopAgentNeighborInPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsRATopAgentNeighborEntry 1 }
+
+sfpsRATopAgentNeighborSwitchID    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsRATopAgentNeighborEntry 2 }
+
+sfpsRATopAgentNeighborPriority    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Neighbor switch priority"
+        ::= { sfpsRATopAgentNeighborEntry 3 }
+
+sfpsRATopAgentNeighborNetworkPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopAgentNeighborEntry 4 }
+
+sfpsRATopAgentNeighborCallTag    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopAgentNeighborEntry 5 }
+
+sfpsRATopAgentNeighborNetHellosRcvd    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopAgentNeighborEntry 6 }
+
+sfpsRATopAgentNeighborSeqNumMismatch    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopAgentNeighborEntry 7 }
+
+sfpsRATopAgentNeighborNetHelloAgeTimeOuts    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopAgentNeighborEntry 8 }
+
+sfpsRATopAgentNeighborNetHelloNetPortLosses    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopAgentNeighborEntry 9 }
+
+sfpsRATopAgentNeighborNetHelloNetPortChanges    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopAgentNeighborEntry 10 }
+
+
+-- Redundant Access Port Table
+
+sfpsRATopAgentPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsRATopAgentPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRATopologyAgent 2 }
+
+sfpsRATopAgentPortEntry    OBJECT-TYPE
+        SYNTAX  SfpsRATopAgentPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsRATopAgentPortLogicalPort } 
+
+        ::= { sfpsRATopAgentPortTable 1 }
+
+SfpsRATopAgentPortEntry ::=
+        SEQUENCE {
+                        sfpsRATopAgentPortLogicalPort           INTEGER,
+                        sfpsRATopAgentPortHelloVersion          INTEGER,
+                        sfpsRATopAgentPortSendFrequency         INTEGER,
+                        sfpsRATopAgentPortRecvFrequency         INTEGER,
+                        sfpsRATopAgentPortPriority                  INTEGER,
+                        sfpsRATopAgentPortPortState                 INTEGER,
+                        sfpsRATopAgentPortPrimarySwitch         SfpsAddress,
+                        sfpsRATopAgentPortNetHelloRecvFreq  INTEGER,
+                        sfpsRATopAgentPortStateChangeCount      INTEGER, 
+                        sfpsRATopAgentPortNVRAMStatus           INTEGER
+        }  
+
+sfpsRATopAgentPortLogicalPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsRATopAgentPortEntry 1 }
+
+sfpsRATopAgentPortHelloVersion    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                version1(1)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RAHello version of the port"
+        ::= { sfpsRATopAgentPortEntry 2 }
+
+sfpsRATopAgentPortSendFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RAHello transmission frequency of the port"
+        ::= { sfpsRATopAgentPortEntry 3 }
+
+sfpsRATopAgentPortRecvFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RAHello reception frequency of the port (used for aging neighbors)"
+        ::= { sfpsRATopAgentPortEntry 4 }
+
+sfpsRATopAgentPortPriority    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Priority of the port (used for primary switch election)"
+        ::= { sfpsRATopAgentPortEntry 5 }
+
+sfpsRATopAgentPortPortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                added(1),
+                init(2),
+                poised(3),
+                primary(4),
+                backup(5),
+                down(6),
+                halted(7),
+                deleted(8),
+                backupWait(9)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RAPortState of the port"
+        ::= { sfpsRATopAgentPortEntry 6 }
+
+sfpsRATopAgentPortPrimarySwitch    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "BaseMAC Address of switch providing connectivity"
+        ::= { sfpsRATopAgentPortEntry 7 }
+
+sfpsRATopAgentPortNetHelloRecvFreq    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "NetHelloRecvFreq of the port"
+        ::= { sfpsRATopAgentPortEntry 8 }
+
+sfpsRATopAgentPortStateChangeCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "PortStateChangeCount of the port"
+        ::= { sfpsRATopAgentPortEntry 9 }
+
+sfpsRATopAgentPortNVRAMStatus    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        set(1),
+                        unset(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "NVRAM status - set/unset"
+        ::= { sfpsRATopAgentPortEntry 10 }
+
+-- Redundant Access Port Table API In
+
+sfpsRATopAgentPortTableAPIInVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        add(2),
+                        getPortInfo(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action to take"
+        ::= { sfpsRATopAgentPortTableAPIIn 1 }
+
+sfpsRATopAgentPortTableAPIInLogicalPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "RATopAgentPortTable entry specifier"
+        ::= { sfpsRATopAgentPortTableAPIIn 2 }
+
+sfpsRATopAgentPortTableAPIInHelloVersion    OBJECT-TYPE
+        SYNTAX  INTEGER
+                ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies helloVersion of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIIn 3 }
+
+sfpsRATopAgentPortTableAPIInSendFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies sendFrequency of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIIn 4 }
+
+sfpsRATopAgentPortTableAPIInRecvFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "modified receiveFrequency of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIIn 5 }
+
+sfpsRATopAgentPortTableAPIInPriority    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies priority of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIIn  6 }
+
+sfpsRATopAgentPortTableAPIInNetHelloRecvFreq    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies NetHelloRecvFreq of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIIn  7 }
+
+-- RA Port Table API Out
+
+sfpsRATopAgentPortTableAPIOutLogicalPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RATopAgentPortTable entry specifier"
+        ::= { sfpsRATopAgentPortTableAPIOut 1 }
+
+sfpsRATopAgentPortTableAPIOutHelloVersion    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                        "RAHelloVersion of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIOut 2 }
+
+sfpsRATopAgentPortTableAPIOutSendFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies sendFrequency of specified entry"
+        ::= { sfpsRATopAgentPortTableAPIOut 3 }
+
+sfpsRATopAgentPortTableAPIOutRecvFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Modifies receiveFrequency of specified entry"
+        ::= { sfpsRATopAgentPortTableAPIOut 4 }
+
+sfpsRATopAgentPortTableAPIOutPriority    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Priority of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIOut  5 }
+
+sfpsRATopAgentPortTableAPIOutPortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                added(1),
+                init(2),
+                poised(3),
+                primary(4),
+                backup(5),
+                down(6),
+                halted(7),
+                deleted(8),
+                backupWait(9)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "RAPortState of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIOut  6 }
+
+sfpsRATopAgentPortTableAPIOutPrimarySwitch    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "BaseMAC address of switch providing connectivity"
+        ::= { sfpsRATopAgentPortTableAPIOut  7 }
+
+sfpsRATopAgentPortTableAPIOutNetHelloRecvFreq    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "NetHelloRecvFreq of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIOut  8 }
+
+sfpsRATopAgentPortTableAPIOutPortStateChangeCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "PortStateChangeCount of the specified entry"
+        ::= { sfpsRATopAgentPortTableAPIOut  9 }
+
+-- VM Topology Server Delta Table
+
+sfpsVMTopServerDeltaTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsVMTopServerDeltaEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table displaying status changes of neighboring switch"
+        ::= { sfpsVMTopologyServer 1 }
+
+sfpsVMTopServerDeltaEntry    OBJECT-TYPE
+        SYNTAX  SfpsVMTopServerDeltaEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical port neighboring switch was discovered on"
+        INDEX   { sfpsVMTopServerDeltaIndex } 
+
+        ::= { sfpsVMTopServerDeltaTable 1 }
+
+SfpsVMTopServerDeltaEntry ::=
+        SEQUENCE {
+                        sfpsVMTopServerDeltaIndex               INTEGER,
+                        sfpsVMTopServerDeltaInPort              INTEGER,
+                        sfpsVMTopServerDeltaSwitchID            DisplayString,
+                        sfpsVMTopServerDeltaState               INTEGER,
+                        sfpsVMTopServerDeltaIPAddress           IpAddress,
+                        sfpsVMTopServerDeltaAgent               DisplayString
+        }  
+
+sfpsVMTopServerDeltaIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Table index"
+        ::= { sfpsVMTopServerDeltaEntry 1 }
+
+sfpsVMTopServerDeltaInPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical port neighboring switch was discovered on"
+        ::= { sfpsVMTopServerDeltaEntry 2 }
+
+sfpsVMTopServerDeltaSwitchID    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Switch ID or PortName of neighboring switch"
+        ::= { sfpsVMTopServerDeltaEntry 3 }
+
+sfpsVMTopServerDeltaState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                added(2),
+                deleted(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Status of neighboring switch - lost or found"
+        ::= { sfpsVMTopServerDeltaEntry 4 }
+
+sfpsVMTopServerDeltaIPAddress    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of switch of neighboring switch"
+        ::= { sfpsVMTopServerDeltaEntry 5 }
+
+sfpsVMTopServerDeltaAgent    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Topology agent that discovered neighboring switch"
+        ::= { sfpsVMTopServerDeltaEntry 6 }
+
+--
+
+sfpsVMTopServerDeltaCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of entries in Delta Table"
+        ::= { sfpsVMTopologyServer 2 }
+
+sfpsVMTopServerTableLock    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                lock(1),
+                unlock(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Table update prevention while table is read"
+        ::= { sfpsVMTopologyServer 3 }
+
+sfpsVMTopServerPortChange    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                noPortChange(1),
+                portChange(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port state change indictor"
+        ::= { sfpsVMTopologyServer 4 }
+
+sfpsVMTopServerTableFull    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                tableFull(1),
+                tableNotFull(2)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsVMTopologyServer 5 }
+
+sfpsVMTopServerChangeCnt    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsVMTopologyServer 6 }
+
+--  TAPI Test IN
+
+sfpsTAPITestInVerb    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                add(2),
+                portUp(3),
+                portDown(4),
+                changePortAccess(5),
+                resolvePortNameToPort(6),
+                resolveBaseMACToPorts(7),
+                resolveINBNeighbor(8),
+                getPortNeighbors(9),
+                getTotalNeighbors(10),
+                getLogicalNetworkPortMask(11),
+                getPhysicalNetworkPortMask(12),
+                getPhysicalStandByPortMask(13),
+                getLogicalINBNetworkPortMask(14),
+                getPhysicalINBNetworkPortMask(15),
+                enableAccessPortOnly(16),
+                disableAccessPortOnly(17),
+                getPhysicalPortDownPortMask(18),
+                                getLogicalSameFCLPortMask (19),
+                getNeighborFCL(20)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action input indicator"
+        ::= { sfpsTAPITestIn 1 }
+
+sfpsTAPITestInLogicalPort    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Logical port input value"
+        ::= { sfpsTAPITestIn 2 }
+
+sfpsTAPITestInSwitchID    OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "SwitchID or portName input value"
+        ::= { sfpsTAPITestIn 3 }
+
+sfpsTAPITestInMAC    OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "MAC Address input value"
+        ::= { sfpsTAPITestIn 4 }
+
+sfpsTAPITestInPortTypeState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+        access(2),
+                network(3),
+                hostMgmt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9),
+                networkOnly(10)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "PortTypeState input value"
+        ::= { sfpsTAPITestIn 5 }
+
+sfpsTAPITestInTopologyAgentID    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            ""
+        ::= { sfpsTAPITestIn 6 }
+
+sfpsTAPITestInUNIT321    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            ""
+        ::= { sfpsTAPITestIn 7 }
+
+-- TAPI Test Out
+
+sfpsTAPITestOutOutputInteger    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Integer output value"
+        ::= { sfpsTAPITestOut 1 }
+
+sfpsTAPITestOutOutPutString    OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "String output value"
+        ::= { sfpsTAPITestOut 2 }
+
+-- Topology Server Test In
+
+sfpsTopologyServerTestInVerb    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                add(2),
+                clear(3),
+                lostEvent(4),
+                foundEvent(5),
+                portEvent(6)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action input indicator"
+        ::= { sfpsTopologyServerTestIn 1 }
+
+sfpsTopologyServerTestInServer    OBJECT-TYPE
+        SYNTAX  DisplayString   
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Topology server to send toprelays to"
+        ::= { sfpsTopologyServerTestIn 2 }
+
+sfpsTopologyServerTestInNumberOfRelays    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of linked toprelays to send"
+        ::= { sfpsTopologyServerTestIn 3 }
+
+-- Topology Server Test Table
+
+sfpsTopologyServerTestTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsTopologyServerTestEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table displaying toprelay test entries"
+        ::= { sfpsTopologyServerTest 2 }
+
+sfpsTopologyServerTestEntry    OBJECT-TYPE
+        SYNTAX  SfpsTopologyServerTestEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A toprelay plus its index"
+        INDEX   { sfpsTopologyServerTestRelayNumber } 
+
+        ::= { sfpsTopologyServerTestTable 1 }
+
+SfpsTopologyServerTestEntry ::=
+        SEQUENCE {
+                        sfpsTopologyServerTestRelayNumber       INTEGER,
+                        sfpsTopologyServerTestServerFlavor      INTEGER,
+                        sfpsTopologyServerTestPortNumber        INTEGER,
+                        sfpsTopologyServerTestPortName          DisplayString,
+                        sfpsTopologyServerTestIpAddr            DisplayString,
+                        sfpsTopologyServerTestLostPort          INTEGER,
+                        sfpsTopologyServerTestOldState          INTEGER,
+                        sfpsTopologyServerTestNewState          INTEGER,
+                        sfpsTopologyServerTestTopologyAgent     DisplayString
+        }  
+
+sfpsTopologyServerTestRelayNumber   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Toprelay index"
+        ::= { sfpsTopologyServerTestEntry 1 }
+
+sfpsTopologyServerTestServerFlavor    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                vns(1),
+                vlan(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Type of neighbor/event relayed"
+        ::= { sfpsTopologyServerTestEntry 2 }
+
+sfpsTopologyServerTestPortNumber    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical port"
+        ::= { sfpsTopologyServerTestEntry 3 }
+
+sfpsTopologyServerTestPortName    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "SwitchId or PortName of neighboring switch"
+        ::= { sfpsTopologyServerTestEntry 4 }
+
+sfpsTopologyServerTestIpAddr    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of neighboring switch"
+        ::= { sfpsTopologyServerTestEntry 5 }
+
+sfpsTopologyServerTestLostPort    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                disabled(2),
+                enabled(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Electrical loss of port indicator"
+        ::= { sfpsTopologyServerTestEntry 6 }
+
+sfpsTopologyServerTestOldState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgmt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Previous port type state of port"
+        ::= { sfpsTopologyServerTestEntry 7 }
+
+sfpsTopologyServerTestNewState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgmt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Current port type state of port"
+        ::= { sfpsTopologyServerTestEntry 8 }
+
+sfpsTopologyServerTestTopologyAgent    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Topology agent that discovered neighboring switch"
+        ::= { sfpsTopologyServerTestEntry 9 }
+
+-- VLAN Topology Agent Neightbor Table
+
+sfpsVLANTopAgentNeighborTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsVLANTopAgentNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table of neighboring switches"
+        ::= { sfpsVLANTopologyAgent 1 }
+
+sfpsVLANTopAgentNeighborEntry    OBJECT-TYPE
+        SYNTAX  SfpsVLANTopAgentNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Neighboring switch descriptors"
+        INDEX   { sfpsVLANTopAgentNeighborInPort, sfpsVLANTopAgentNeighborSwitchID } 
+
+        ::= { sfpsVLANTopAgentNeighborTable 1 }
+
+SfpsVLANTopAgentNeighborEntry ::=
+        SEQUENCE {
+                        sfpsVLANTopAgentNeighborInPort          INTEGER,
+                        sfpsVLANTopAgentNeighborSwitchID        DisplayString,
+                        sfpsVLANTopAgentNeighborOptions         INTEGER
+
+        }  
+
+sfpsVLANTopAgentNeighborInPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical port neighbor was discovered on"
+        ::= { sfpsVLANTopAgentNeighborEntry 1 }
+
+sfpsVLANTopAgentNeighborSwitchID   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "SwitchID or PortName of switch"
+        ::= { sfpsVLANTopAgentNeighborEntry 2 }
+
+sfpsVLANTopAgentNeighborOptions   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Functional capabilities of switch in bitmask"
+        ::= { sfpsVLANTopAgentNeighborEntry 3 }
+
+-- VLAN Topology Agent Port Table
+
+sfpsVLANTopAgentPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsVLANTopAgentPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table of logical ports"
+        ::= { sfpsVLANTopologyAgent 2 }
+
+sfpsVLANTopAgentPortEntry    OBJECT-TYPE
+        SYNTAX  SfpsVLANTopAgentPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Entry into VLANTopAgentPortTable - Logical port information"
+        INDEX   { sfpsVLANTopAgentPortPort } 
+
+        ::= { sfpsVLANTopAgentPortTable 1 }
+
+SfpsVLANTopAgentPortEntry ::=
+        SEQUENCE {
+                        sfpsVLANTopAgentPortPort                INTEGER,
+                        sfpsVLANTopAgentPortHelloVersion        INTEGER,
+                        sfpsVLANTopAgentPortSendFrequency       INTEGER,
+                        sfpsVLANTopAgentPortRecvFrequency       INTEGER,
+                        sfpsVLANTopAgentPortPortOptions         INTEGER,
+                        sfpsVLANTopAgentPortNVRAMStatus         INTEGER
+
+        }  
+
+sfpsVLANTopAgentPortPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical port of switch"
+        ::= { sfpsVLANTopAgentPortEntry 1 }
+
+sfpsVLANTopAgentPortHelloVersion   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                versionOther(1),
+                version2(2),
+                version3(3),
+                version4(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Version of hello sent on the port"
+        ::= { sfpsVLANTopAgentPortEntry 2 }
+
+sfpsVLANTopAgentPortSendFrequency   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of seconds between hellos sent"
+        ::= { sfpsVLANTopAgentPortEntry 3 }
+
+sfpsVLANTopAgentPortRecvFrequency   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of seconds without hello reception"
+        ::= { sfpsVLANTopAgentPortEntry 4 }
+
+sfpsVLANTopAgentPortPortOptions  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Port options"
+        ::= { sfpsVLANTopAgentPortEntry 5 }
+
+sfpsVLANTopAgentPortNVRAMStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        set(1),
+                        unset(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Status of NVRAM - set/unset"
+        ::= { sfpsVLANTopAgentPortEntry 6 }
+
+--  VLAN Topology Agent Port Table API In
+
+sfpsVLANTopAgentPortTableAPIInVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                add(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Action input indicator"
+        ::= { sfpsVLANTopAgentPortTableAPIIn 1 }
+
+sfpsVLANTopAgentPortTableAPIInLogicalPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Logical port of switch"
+        ::= { sfpsVLANTopAgentPortTableAPIIn 2 }
+
+sfpsVLANTopAgentPortTableAPIInHelloVersion   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Version of hello sent on the port"
+        ::= { sfpsVLANTopAgentPortTableAPIIn 3 }
+
+sfpsVLANTopAgentPortTableAPIInSendFrequency   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of seconds between hellos sent"
+        ::= { sfpsVLANTopAgentPortTableAPIIn 4 }
+
+sfpsVLANTopAgentPortTableAPIInRecvFrequency   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Number of seconds without hello reception"
+        ::= { sfpsVLANTopAgentPortTableAPIIn 5 }
+
+--
+
+sfpsIncompatibleNeighborTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsIncompatibleNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "The IncompatibleNeighborTable holds all incompatible switch neighbors"
+        ::= { sfpsTopologyAgentCommon 2 }
+
+sfpsIncompatibleNeighborEntry    OBJECT-TYPE
+        SYNTAX  SfpsIncompatibleNeighborEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsIncompatibleNeighborLogicalPort, sfpsIncompatibleNeighborSwitchID} 
+
+        ::= { sfpsIncompatibleNeighborTable 1 }
+
+SfpsIncompatibleNeighborEntry ::=
+        SEQUENCE {
+                        sfpsIncompatibleNeighborLogicalPort             INTEGER,
+                        sfpsIncompatibleNeighborSwitchID        DisplayString,
+                        sfpsIncompatibleNeighborSwitchIP                IpAddress,
+                        sfpsIncompatibleNeighborSwitchMAC       SfpsAddress,
+                        sfpsIncompatibleNeighborSwitchType              INTEGER,
+                        sfpsIncompatibleNeighborHellosReceived          INTEGER,
+                        sfpsIncompatibleNeighborFirstHeard              TimeTicks,
+                        sfpsIncompatibleNeighborLastHeard       TimeTicks,
+                        sfpsIncompatibleNeighborReceiveFrequency      INTEGER,
+                        sfpsIncompatibleNeighborTopologyAgent           DisplayString,
+                        sfpsIncompatibleNeighborChassisMAC              SfpsAddress,
+                        sfpsIncompatibleNeighborCommState       INTEGER,
+                        sfpsIncompatibleNeighborNotifyState             INTEGER,
+                        sfpsIncompatibleNeighborTwoWayLossCount         INTEGER,
+                        sfpsIncompatibleNeighborTwoWayLossTime          TimeTicks,
+                        sfpsIncompatibleNeighborSeqNumLossCount         INTEGER,
+                        sfpsIncompatibleNeighborSeqNumLossTime          TimeTicks,
+                        sfpsIncompatibleNeighborFalseAgingCount         INTEGER,
+                        sfpsIncompatibleNeighborFalseAgingTime          TimeTicks,
+                        sfpsIncompatibleNeighborChassisIP       IpAddress,
+                        sfpsIncompatibleNeighborFCL                     HexInteger,
+                        sfpsIncompatibleNeighborOptionsMask             INTEGER,
+                        sfpsIncompatibleNeighborLocalPortState  INTEGER,
+                        sfpsIncompatibleNeighborRemotePortState INTEGER,
+                        sfpsIncompatibleNeighborCompatibility           INTEGER
+        }  
+
+sfpsIncompatibleNeighborLogicalPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsIncompatibleNeighborEntry 1 }
+
+sfpsIncompatibleNeighborSwitchID    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsIncompatibleNeighborEntry 2 }
+
+sfpsIncompatibleNeighborSwitchIP    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of neighboring switch"
+        ::= { sfpsIncompatibleNeighborEntry 3 }
+
+sfpsIncompatibleNeighborSwitchMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Interface mac address of neighboring switch"
+        ::= { sfpsIncompatibleNeighborEntry 4 }
+
+sfpsIncompatibleNeighborSwitchType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                vns(1),
+                vlan(2)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Type of SecureFast switch"
+        ::= { sfpsIncompatibleNeighborEntry 5 }
+
+sfpsIncompatibleNeighborHellosReceived    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Hello packet counter"
+        ::= { sfpsIncompatibleNeighborEntry 6 }
+
+sfpsIncompatibleNeighborFirstHeard    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time stamp of first hello received"
+        ::= { sfpsIncompatibleNeighborEntry 7 }
+
+sfpsIncompatibleNeighborLastHeard    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time stamp of last hello received"
+        ::= { sfpsIncompatibleNeighborEntry 8 }
+
+sfpsIncompatibleNeighborReceiveFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Allows IncompatibleNeighborTable to age entries"
+        ::= { sfpsIncompatibleNeighborEntry 9 }
+
+sfpsIncompatibleNeighborTopologyAgent    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Owner of entry"
+        ::= { sfpsIncompatibleNeighborEntry 10 }
+
+sfpsIncompatibleNeighborChassisMAC    OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Not currently used"
+        ::= { sfpsIncompatibleNeighborEntry 11 }
+
+sfpsIncompatibleNeighborCommState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                init(1),
+                oneWay(2),
+                twoWay(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Neighbor communication state"
+        ::= { sfpsIncompatibleNeighborEntry 12 }
+
+sfpsIncompatibleNeighborNotifyState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                init(1),
+                unNotified(2),
+                notified(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Topology server notification state"
+        ::= { sfpsIncompatibleNeighborEntry 13 }
+
+sfpsIncompatibleNeighborTwoWayLossCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Two-way communication loss count"
+        ::= { sfpsIncompatibleNeighborEntry 14 }
+
+sfpsIncompatibleNeighborTwoWayLossTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Time stamp of last two-way communication loss"
+        ::= { sfpsIncompatibleNeighborEntry 15 }
+
+sfpsIncompatibleNeighborSeqNumLossCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Sequence number loss count"
+        ::= { sfpsIncompatibleNeighborEntry 16 }
+
+sfpsIncompatibleNeighborSeqNumLossTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Timestamp of last sequence number loss"
+        ::= { sfpsIncompatibleNeighborEntry 17 }
+
+sfpsIncompatibleNeighborFalseAgingCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "False aging loss count"
+        ::= { sfpsIncompatibleNeighborEntry 18 }
+
+sfpsIncompatibleNeighborFalseAgingTime    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Timestamp of last false aging loss"
+        ::= { sfpsIncompatibleNeighborEntry 19 }
+
+sfpsIncompatibleNeighborChassisIP    OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "IP address of the switch chassis"
+        ::= { sfpsIncompatibleNeighborEntry 20 }
+
+sfpsIncompatibleNeighborFCL    OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Functional Capability Level"
+        ::= { sfpsIncompatibleNeighborEntry 21 }
+
+sfpsIncompatibleNeighborOptionsMask    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Bit encoded list of switch features"
+        ::= { sfpsIncompatibleNeighborEntry 22 }
+
+sfpsIncompatibleNeighborLocalPortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgnt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Neighbor's idea of what our port should be"
+        ::= { sfpsIncompatibleNeighborEntry 23 }
+
+sfpsIncompatibleNeighborRemotePortState    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgnt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAccess(7),
+                hybrid(8),
+                standBy(9)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This switch's idea of what the neighbor's port should be"
+        ::= { sfpsIncompatibleNeighborEntry 24 }
+
+sfpsIncompatibleNeighborCompatibility    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                compatible(1),
+                notCompatible(2),
+                unknown(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Neighbor compatibility state"
+        ::= { sfpsIncompatibleNeighborEntry 25 }
+
+--
+
+
+sfpsDirViolationTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsDirViolationEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolation 1 }
+
+sfpsDirViolationEntry    OBJECT-TYPE
+        SYNTAX  SfpsDirViolationEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsDirViolationHash, sfpsDirViolationHashIndex } 
+
+        ::= { sfpsDirViolationTable 1 }
+
+SfpsDirViolationEntry ::=
+        SEQUENCE {
+                        sfpsDirViolationHash                INTEGER,
+                        sfpsDirViolationHashIndex       INTEGER,
+                        sfpsDirViolationType            INTEGER,
+                        sfpsDirViolationSrcPort         INTEGER,
+                        sfpsDirViolationAOType          INTEGER,
+                        sfpsDirViolationAOValue         DisplayString,
+                        sfpsDirViolationLocalPort       INTEGER,
+                        sfpsDirViolationCount           INTEGER,
+                        sfpsDirViolationLastSeen        TimeTicks,
+                        sfpsDirViolationFirstSeen       TimeTicks,
+                        sfpsDirViolationSrcMac          OCTET STRING,
+                        sfpsDirViolationCPId            OCTET STRING
+        }  
+
+sfpsDirViolationHash    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 1 }
+
+sfpsDirViolationHashIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 2    }
+
+sfpsDirViolationType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+--              other(0),
+                userLock(1),
+                restrictPort(2),
+                ipNotLearned(3),
+                ipInvalid(4),
+                restrictMobility(5),
+                userLockSamePort(6),
+                sapDisabled(7)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 3 }
+
+sfpsDirViolationSrcPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 4 }
+
+sfpsDirViolationAOType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        aoMacDX(1),
+            aoIpxSap(2),
+            aoIpxRIP(3),
+            aoInetYP(4),
+            aoInetUDP(5),
+            aoIpxIpx(6),
+            aoInetIP(7),
+            aoInetRPC(8),
+            aoInetRIP(9),
+            aoMacDXMcast(10),
+            aoAtDDP(11),
+            aoEmpty(12),
+            aoVlan(13),
+            aoHostName(14),
+            aoNetBiosName(15),
+            aoInetIPMask(16)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 5 }
+
+sfpsDirViolationAOValue    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 6 }
+
+sfpsDirViolationLocalPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 7 }
+
+sfpsDirViolationCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 8 }
+
+sfpsDirViolationLastSeen    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 9 }
+
+sfpsDirViolationFirstSeen    OBJECT-TYPE
+        SYNTAX  TimeTicks
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 10 }
+
+sfpsDirViolationSrcMac    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 11 }
+
+sfpsDirViolationCPId    OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationEntry 12 }
+
+
+
+--  Dir Violation API
+
+sfpsDirViolationAPIVerb    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        add(2),
+                        delete(3),
+                        reset(4)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the action to be initiated as a result of setting this leaf."
+        ::= { sfpsDirViolationAPI 1 }
+
+sfpsDirViolationAPIViolType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        restrictPort(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the violation type."
+        ::= { sfpsDirViolationAPI 2 }
+
+sfpsDirViolationAPISourcePort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies source port"
+        ::= { sfpsDirViolationAPI 3 }
+
+sfpsDirViolationAPIAOType    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies AO type"
+        ::= { sfpsDirViolationAPI 4 }
+
+sfpsDirViolationAPIAOValue  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies AO value"
+        ::= { sfpsDirViolationAPI 5 }
+
+sfpsDirViolationAPIChangeCount    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationAPI 6 }
+
+sfpsDirViolationAPICPId    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationAPI 7 }
+
+--
+
+
+sfpsDirViolationDeltaTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsDirViolationDeltaEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolation 3 }
+
+sfpsDirViolationDeltaEntry    OBJECT-TYPE
+        SYNTAX  SfpsDirViolationDeltaEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsDirViolationDeltaIndex } 
+
+        ::= { sfpsDirViolationDeltaTable 1 }
+
+SfpsDirViolationDeltaEntry ::=
+        SEQUENCE {
+                        sfpsDirViolationDeltaIndex                  INTEGER,
+                        sfpsDirViolationDeltaSrcPort                INTEGER,
+                        sfpsDirViolationDeltaAOType                 INTEGER,
+                        sfpsDirViolationDeltaAOValue                INTEGER,
+                        sfpsDirViolationDeltaEntryType              INTEGER
+        }  
+
+sfpsDirViolationDeltaIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationDeltaEntry 1 }
+
+sfpsDirViolationDeltaSrcPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationDeltaEntry 2 }
+
+sfpsDirViolationDeltaAOType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        aoMacDX(1),
+            aoIpxSap(2),
+            aoIpxRIP(3),
+            aoInetYP(4),
+            aoInetUDP(5),
+            aoIpxIpx(6),
+            aoInetIP(7),
+            aoInetRPC(8),
+            aoInetRIP(9),
+            aoMacDXMcast(10),
+            aoAtDDP(11),
+            aoEmpty(12),
+            aoVlan(13),
+            aoHostName(14),
+            aoNetBiosName(15),
+            aoInetIPMask(16)
+}
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationDeltaEntry 3 }
+
+sfpsDirViolationDeltaAOValue    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationDeltaEntry 4 }
+
+sfpsDirViolationDeltaEntryType    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        added(2),
+                        deleted(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirViolationDeltaEntry 5 }
+
+
+--  Dir Violation Delta API
+
+sfpsDirViolationDeltaAPINumEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the number of entries in the Directory Violation Delta Table"
+        ::= { sfpsDirViolationDeltaAPI 1 }
+
+ sfpsDirViolationDeltaAPIVerb    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        lock(1),
+                        unlock(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Set the state of the Violation Table.  When the table is locked,
+                 no changes to the Violation Table will be allowed. Events that occur 
+                 while the table is locked will not be logged when the table is 
+                 subsequently unlocked."
+        ::= { sfpsDirViolationDeltaAPI 2 }
+
+
+--
+
+
+sfpsRestrictedPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsRestrictedPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirRestriction 1 }
+
+sfpsRestrictedPortEntry    OBJECT-TYPE
+        SYNTAX  SfpsRestrictedPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsRestrictedPortPort, sfpsRestrictedPortHash, sfpsRestrictedPortHashIndex } 
+
+        ::= { sfpsRestrictedPortTable 1 }
+
+SfpsRestrictedPortEntry ::=
+        SEQUENCE {
+                        sfpsRestrictedPortPort                INTEGER,
+                sfpsRestrictedPortHash                INTEGER,
+            sfpsRestrictedPortHashIndex           INTEGER,
+            sfpsRestrictedPortSrcMac              DisplayString
+        }  
+
+sfpsRestrictedPortPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedPortEntry 1 }
+
+sfpsRestrictedPortHash    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedPortEntry 2 }
+
+sfpsRestrictedPortHashIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedPortEntry 3 }
+
+sfpsRestrictedPortSrcMac   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedPortEntry 4 }
+
+--  Dir Lock Stats
+
+sfpsDirLockStatsNumViolators    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 1 }
+
+sfpsDirLockStatsNumNodeLocked    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 2 }
+
+sfpsDirLockStatsNumAliasLocked    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 3 }
+
+sfpsDirLockStatsNumRestrictedPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 4 }
+
+sfpsDirLockStatsNumRestrictMob    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 5 }
+
+sfpsDirLockStatsViolationTblSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 6 }
+
+sfpsDirLockStatsRestrictPortTblSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 7 }
+
+sfpsDirLockStatsRestrictMobTblSize    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockStats 8 }
+
+--  Dir Lock Config
+
+sfpsDirLockConfigUserLocking   OBJECT-TYPE
+        SYNTAX  INTEGER         {
+                        disabled(1),
+                        enabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockConfig 1 }
+
+sfpsDirLockConfigRestrictedPort    OBJECT-TYPE
+        SYNTAX  INTEGER         {
+                        disabled(1),
+                        enabled(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockConfig 2 }
+
+sfpsDirLockConfigRouterPortLock    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockConfig 3 }
+
+sfpsDirLockConfigRAPortLock    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        disabled(1),
+                        enabled(2)
+                }
+
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDirLockConfig 4 }
+
+--  Dir Lock Config
+
+sfpsDapiNvramStatsVerb   OBJECT-TYPE
+        SYNTAX  INTEGER         {
+                other(1),
+                clearAllEntries(2),
+                clearAllUserLock(3),
+                clearAllSrcUnblock(4),
+                clearAllPortUnblock(5),
+                clearAllLimitMobility(6)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDapiNvramStats 1 }
+
+sfpsDapiNvramStatsTotalEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDapiNvramStats 2 }
+
+sfpsDapiNvramStatsMacEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDapiNvramStats 3 }
+
+sfpsDapiNvramStatsAliasEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDapiNvramStats 4 }
+
+sfpsDapiNvramStatsMaxEntries    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDapiNvramStats 5 }
+
+sfpsDapiNvramStatsNvramUsed    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsDapiNvramStats 6 }
+
+
+-- Redundant Access Neighbor Table
+
+sfpsESPTopAgentPortTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsESPTopAgentPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsESPTopologyAgent 2 }
+
+sfpsESPTopAgentPortEntry    OBJECT-TYPE
+        SYNTAX  SfpsESPTopAgentPortEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsESPTopAgentPortPort } 
+
+        ::= { sfpsESPTopAgentPortTable 1 }
+
+SfpsESPTopAgentPortEntry ::=
+        SEQUENCE {
+                        sfpsESPTopAgentPortPort                 INTEGER,
+                        sfpsESPTopAgentPortHelloVersion         INTEGER,
+                        sfpsESPTopAgentPortSendFrequency        INTEGER,
+                        sfpsESPTopAgentPortRecvFrequency        INTEGER
+        }  
+
+sfpsESPTopAgentPortPort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsESPTopAgentPortEntry 1 }
+
+sfpsESPTopAgentPortHelloVersion    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                versionOther(1),
+                version2(2),
+                version3(3),
+                version4(4)
+        }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsESPTopAgentPortEntry 2 }
+
+sfpsESPTopAgentPortSendFrequency   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsESPTopAgentPortEntry 3 }
+
+sfpsESPTopAgentPortRecvFrequency    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Key"
+        ::= { sfpsESPTopAgentPortEntry 4 }
+
+-- Topology Server Relay Test Table
+
+sfpsTopologyServerTestTopRelayTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsTopologyServerTestTopRelayEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Table displaying top relay test entries"
+        ::= { sfpsTopologyServerTest 3 }
+
+sfpsTopologyServerTestTopRelayEntry    OBJECT-TYPE
+        SYNTAX  SfpsTopologyServerTestTopRelayEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "A top relay plus its index"
+        INDEX   { sfpsTopologyServerTestTopRelayRelayNumber } 
+
+        ::= { sfpsTopologyServerTestTopRelayTable 1 }
+
+SfpsTopologyServerTestTopRelayEntry ::=
+        SEQUENCE {
+                sfpsTopologyServerTestTopRelayRelayNumber       INTEGER,
+                sfpsTopologyServerTestTopRelayEvent     INTEGER,
+                sfpsTopologyServerTestTopRelayDeltaOptions      INTEGER,
+                sfpsTopologyServerTestTopRelayCurrentOptions    INTEGER,
+                sfpsTopologyServerTestTopRelayLogicalPort       INTEGER,
+                sfpsTopologyServerTestTopRelayPortName  OCTET STRING,
+                sfpsTopologyServerTestTopRelayIPAddr    IpAddress,
+                sfpsTopologyServerTestTopRelayChassisMAC        SfpsAddress,
+                sfpsTopologyServerTestTopRelayChassisIP IpAddress,
+                sfpsTopologyServerTestTopRelayFLevel    INTEGER,
+                sfpsTopologyServerTestTopRelayTopologyAgent     OCTET STRING
+          }  
+
+sfpsTopologyServerTestTopRelayRelayNumber   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Toprelay index"
+        ::= { sfpsTopologyServerTestTopRelayEntry 1 }
+
+sfpsTopologyServerTestTopRelayEvent   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 2 }
+
+sfpsTopologyServerTestTopRelayDeltaOptions   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                foundNeighbor(1),
+                optionsGain(2),
+                optionsLoss(3),
+                agingNghLoss(4),
+                portDownNghLoss(5),
+                duplicateNghLoss(6),
+                subtractPortNghLoss(7),
+                loopedPortNghLoss(8),
+                crossedPortNghLoss(9),
+                functionalLevelNghLoss(10),
+                versionedPortNghLoss(11),
+                twoWayCommLoss(12)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 3 }
+
+sfpsTopologyServerTestTopRelayCurrentOptions   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 4 }
+
+sfpsTopologyServerTestTopRelayLogicalPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 5 }
+
+sfpsTopologyServerTestTopRelayPortName   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 6 }
+
+sfpsTopologyServerTestTopRelayIPAddr   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 7 }
+
+sfpsTopologyServerTestTopRelayChassisMAC   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 8 }
+
+sfpsTopologyServerTestTopRelayChassisIP   OBJECT-TYPE
+        SYNTAX  IpAddress
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 9 }
+
+sfpsTopologyServerTestTopRelayFLevel   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 10 }
+
+sfpsTopologyServerTestTopRelayTopologyAgent   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerTestTopRelayEntry 11 }
+
+
+-- 
+
+sfpsRestrictedMobilityTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsRestrictedMobilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobility 1 }
+
+sfpsRestrictedMobilityEntry    OBJECT-TYPE
+        SYNTAX  SfpsRestrictedMobilityEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsRestrictedMobilityHash, sfpsRestrictedMobilityPort, sfpsRestrictedMobilityHashIndex } 
+
+        ::= { sfpsRestrictedMobilityTable 1 }
+
+SfpsRestrictedMobilityEntry ::=
+        SEQUENCE {
+                sfpsRestrictedMobilityHash      INTEGER,
+                sfpsRestrictedMobilityPort      INTEGER,
+                sfpsRestrictedMobilityHashIndex INTEGER,
+                sfpsRestrictedMobilitySrcMac    OCTET STRING,
+                sfpsRestrictedMobilitySwitch    SfpsAddress
+          }  
+
+sfpsRestrictedMobilityHash   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityEntry 1 }
+
+sfpsRestrictedMobilityPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityEntry 2 }
+
+sfpsRestrictedMobilityHashIndex   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityEntry 3 }
+
+sfpsRestrictedMobilitySrcMac   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityEntry 4 }
+
+sfpsRestrictedMobilitySwitch   OBJECT-TYPE
+        SYNTAX  SfpsAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityEntry 5 }
+
+--
+
+sfpsRestrictedMobilityAPIVerb   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                add(2),
+                delete(3),
+                reset(4)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityAPI 1 }
+
+sfpsRestrictedMobilityAPISourcePort   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityAPI 2 }
+
+sfpsRestrictedMobilityAPISrcMac   OBJECT-TYPE
+        SYNTAX  SfpsAddress     
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityAPI 3 }
+
+sfpsRestrictedMobilityAPISwitch   OBJECT-TYPE
+        SYNTAX  SfpsAddress     
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsRestrictedMobilityAPI 4 }
+
+-- sfps
+
+sfpsTopologyServerPortEventRelayLogicalPort   OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerPortEventRelay 1 }
+
+sfpsTopologyServerPortEventRelayOldState   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgmt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAcces(7),
+                standBy(8),
+                networkOnly(10)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerPortEventRelay 2 }
+
+sfpsTopologyServerPortEventRelayNewState   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                access(2),
+                network(3),
+                hostMgmt(4),
+                hostCtrl(5),
+                unknown(6),
+                goingToAcces(7),
+                standBy(8),
+                networkOnly(10)
+        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsTopologyServerPortEventRelay 3 }
+
+END 

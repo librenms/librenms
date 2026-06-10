@@ -1,0 +1,2176 @@
+AE-PM-TABLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    Counter32
+        FROM SNMPv2-SMI
+
+    RowStatus
+        FROM SNMPv2-TC
+
+    AePwe3AggInstance,
+    AePwe3T1Instance,
+    AePwe3BundleInstance,
+    PerfCurrentCount,
+    PerfInvalidFlag,
+    AeThresholdCrossingIndex,
+    AeThresholdCrossingPointer
+        FROM AE-TC
+
+    pSeries
+        FROM AE-ALARM-TABLE-MIB
+    ;
+
+aePmModule MODULE-IDENTITY
+    LAST-UPDATED "201001150000Z"
+    ORGANIZATION "Calix Networks, Inc."
+    CONTACT-INFO
+        "   Calix Networks, Inc.
+
+        Postal: 1035 North McDowell Boulevard
+            Petaluma, CA  94954-1173
+            USA
+
+         Phone: +1 707 766 3000
+           Fax: +1 707 766 3100
+
+        E-mail: mib-info@calix.com"
+    DESCRIPTION "This management information module contains AE ONT performance statistics."
+
+    REVISION "201001150000Z"
+    DESCRIPTION "Initial release."
+    ::= { pSeries 5 }
+
+    aePmTCModule        OBJECT IDENTIFIER ::= { aePmModule 1 }
+    aePwe3PmModule      OBJECT IDENTIFIER ::= { aePmModule 2 }
+
+--------------------------------------------------------------------------
+--
+-- General PM Design:
+-- Each group of stats requires 4 tables:
+--   1 current 15-minute bucket
+--   1..n interval 15-minute buckets (typically 96 of these to cover a 24-hour period)
+--   1 current 24-hour bucket
+--   1..n interval 24-hour buckets (typically 1 of these buckets for yesterday)
+--
+--------------------------------------------------------------------------
+
+--************************************************************************
+--
+-- AE PM TC (threshold crossing) Module
+--      Placeholder. Not currently implemented.
+--
+--************************************************************************
+aeThresholdCrossingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AeThresholdCrossingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains threshold values for the
+         performance monitoring parameters maintained by other
+         entities. Other entities may point to this table.
+         Multiple other entities may point to a single entry in
+         this table.
+
+         The convention for threshold crossing values is a
+         value of 0 means the threshold value is not being
+         checked, i.e., the TCA is disabled."
+    ::= { aePmTCModule 1 }
+
+aeThresholdCrossingEntry OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains one set of threshold crossing
+         values."
+    INDEX       { aeThresholdCrossingIndex }
+    ::= { aeThresholdCrossingTable 1 }
+
+AeThresholdCrossingEntry ::=
+    SEQUENCE {
+        aeThresholdCrossingIndex
+            AeThresholdCrossingIndex,
+        aeThresholdCrossingValue1
+            PerfCurrentCount,
+        aeThresholdCrossingValue2
+            PerfCurrentCount,
+        aeThresholdCrossingValue3
+            PerfCurrentCount,
+        aeThresholdCrossingValue4
+            PerfCurrentCount,
+        aeThresholdCrossingValue5
+            PerfCurrentCount,
+        aeThresholdCrossingValue6
+            PerfCurrentCount,
+        aeThresholdCrossingValue7
+            PerfCurrentCount,
+        aeThresholdCrossingValue8
+            PerfCurrentCount,
+        aeThresholdCrossingValue9
+            PerfCurrentCount,
+        aeThresholdCrossingValue10
+            PerfCurrentCount,
+        aeThresholdCrossingValue11
+            PerfCurrentCount,
+        aeThresholdCrossingValue12
+            PerfCurrentCount,
+        aeThresholdCrossingValue13
+            PerfCurrentCount,
+        aeThresholdCrossingValue14
+            PerfCurrentCount,
+        aeThresholdCrossingValue15
+            PerfCurrentCount,
+        aeThresholdCrossingValue16
+            PerfCurrentCount,
+        aeThresholdCrossingRowStatus
+            RowStatus
+    }
+
+aeThresholdCrossingIndex OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the index info the
+         threshold crossing table."
+    ::= { aeThresholdCrossingEntry 1 }
+
+aeThresholdCrossingValue1 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 1st thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 2 }
+
+aeThresholdCrossingValue2 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 2nd thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 3 }
+
+aeThresholdCrossingValue3 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 3rd thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 4 }
+
+aeThresholdCrossingValue4 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 4th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 5 }
+
+aeThresholdCrossingValue5 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 5th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 6 }
+
+aeThresholdCrossingValue6 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 6th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 7 }
+
+aeThresholdCrossingValue7 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 7th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 8 }
+
+aeThresholdCrossingValue8 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 8th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 9 }
+
+aeThresholdCrossingValue9 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 9th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 10 }
+
+aeThresholdCrossingValue10 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 10th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 11 }
+
+aeThresholdCrossingValue11 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 11th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 12 }
+
+aeThresholdCrossingValue12 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 12th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 13 }
+
+aeThresholdCrossingValue13 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 13th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 14 }
+
+aeThresholdCrossingValue14 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 14th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 15 }
+
+aeThresholdCrossingValue15 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 15th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 16 }
+
+aeThresholdCrossingValue16 OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the threshold value
+         for the 16th thresholded counter. A value of
+         zero indicates no threshold value."
+    DEFVAL      { 0 }
+    ::= { aeThresholdCrossingEntry 17 }
+
+aeThresholdCrossingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is used for row creation."
+    ::= { aeThresholdCrossingEntry 18 }
+
+--************************************************************************
+--
+-- AE PWE3 PM Module
+--      1. Bundle Interface PM Tables (Individual packet pseudowires)
+--      2. T1 Interface PM Tables (TDM T1 ports)
+--      3. Aggregate Bundle Interface PM Tables (PWE3 Ethernet interface)
+--
+--      12 tables total
+--
+--************************************************************************
+
+--------------------------------------------------------------------------
+--
+-- Current 15-minute PWE3 Bundle (individual pseudowire) PM Table
+--
+--------------------------------------------------------------------------
+aePwe3BunCurrent15Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3BunCurrent15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The bundle table contains statistics for the pseudowire connection (i.e. bundle)."
+    ::= { aePwe3PmModule 1 }
+
+aePwe3BunCurrent15Entry OBJECT-TYPE
+    SYNTAX      AePwe3BunCurrent15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3BunCurrent15Port,
+                  aePwe3BunCurrent15Bundle }
+    ::= { aePwe3BunCurrent15Table 1 }
+
+AePwe3BunCurrent15Entry ::=
+    SEQUENCE {
+        aePwe3BunCurrent15Port
+            AePwe3T1Instance,
+        aePwe3BunCurrent15Bundle
+            AePwe3BundleInstance,
+        aePwe3BunCurrent15RxPacket
+            Counter32,
+        aePwe3BunCurrent15TxPacket
+            Counter32,
+        aePwe3BunCurrent15LostPacket
+            Counter32,
+        aePwe3BunCurrent15DiscardPacket
+            Counter32,
+        aePwe3BunCurrent15ReorderPacket
+            Counter32,
+        aePwe3BunCurrent15JumpedPacket
+            Counter32,
+        aePwe3BunCurrent15MalformedSec
+            Counter32,
+        aePwe3BunCurrent15TxRbitSec
+            Counter32,
+        aePwe3BunCurrent15TxLbitSec
+            Counter32,
+        aePwe3BunCurrent15RxRbitSec
+            Counter32,
+        aePwe3BunCurrent15RxLbitSec
+            Counter32,
+        aePwe3BunCurrent15JitterBufferUnderrun
+            Counter32,
+        aePwe3BunCurrent15JitterBufferOverrun
+            Counter32,
+        aePwe3BunCurrent15ES
+            Counter32,
+        aePwe3BunCurrent15UAS
+            Counter32,
+        aePwe3BunCurrent15ValidData
+            PerfInvalidFlag,
+        aePwe3BunCurrent15ThresholdCrossingPointer
+            AeThresholdCrossingPointer
+    }
+
+aePwe3BunCurrent15Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance associated with this bundle."
+    ::= { aePwe3BunCurrent15Entry 1 }
+
+aePwe3BunCurrent15Bundle OBJECT-TYPE
+    SYNTAX      AePwe3BundleInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The bundle instance (identifier) associated with this pseudowire."
+    ::= { aePwe3BunCurrent15Entry 2 }
+
+aePwe3BunCurrent15RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunCurrent15Entry 3 }
+
+aePwe3BunCurrent15TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunCurrent15Entry 4 }
+
+aePwe3BunCurrent15LostPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets lost. These are packets that were never received as
+         determined by gaps in the packet sequence numbers."
+    ::= { aePwe3BunCurrent15Entry 5 }
+
+aePwe3BunCurrent15DiscardPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received but discarded. Packets may be discarded
+         if they are received too far out of order to be reordered."
+    ::= { aePwe3BunCurrent15Entry 6 }
+
+aePwe3BunCurrent15ReorderPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received and reordered. If packets are received out
+         of order, an attempt is made to reorder. Reordering packets does
+         not result in an error on the T1. However, this could be used as an
+         indication that there is congestion within the network."
+    ::= { aePwe3BunCurrent15Entry 7 }
+
+aePwe3BunCurrent15JumpedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets jumped. A jump occurs when there is a gap in the sequence
+         numbers. As such, lost = jumped - reordered. If packets are not arriving out of
+         order, then the lost = jumped. This is an indication that packet(s) are dropping
+         somewhere within the network."
+    ::= { aePwe3BunCurrent15Entry 8 }
+
+aePwe3BunCurrent15MalformedSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds a packet length mismatch has been detected. The packet
+         size must be the same at each end of the pseudowire. This is an indication
+         of a configuration problem."
+    ::= { aePwe3BunCurrent15Entry 9 }
+
+aePwe3BunCurrent15TxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the R-bit asserted.
+         The R-bit is asserted in the transmit packets when a bundle stops receiving
+         packets. This could indicate that the other end of the pseudowire is not
+         configured."
+    ::= { aePwe3BunCurrent15Entry 10 }
+
+aePwe3BunCurrent15TxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the L-bit asserted.
+         The L-bit is asserted in the transmit packets when there is a local T1 LOS
+         condition."
+    ::= { aePwe3BunCurrent15Entry 11 }
+
+aePwe3BunCurrent15RxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the R-bit asserted.
+         This is an indication that the other end of the pseudowire is not receiving
+         packets."
+    ::= { aePwe3BunCurrent15Entry 12 }
+
+aePwe3BunCurrent15RxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the L-bit asserted.
+         This is an indication that there is a far-end T1 LOS condition."
+    ::= { aePwe3BunCurrent15Entry 13 }
+
+aePwe3BunCurrent15JitterBufferUnderrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer underruns that have been detected. The jitter buffer
+         has emptied (packet reception is too slow). This could be an indication that the
+         jitter buffer is not configured big enough to accommodate the network packet
+         delay variation."
+    ::= { aePwe3BunCurrent15Entry 14 }
+
+aePwe3BunCurrent15JitterBufferOverrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer overruns that have been detected. The jitter buffer
+         is full and there is no room for addition packets. This could be an indication
+         of a timing problem (T1 timing at each end of the pseudowire is not synchronous)."
+    ::= { aePwe3BunCurrent15Entry 15 }
+
+aePwe3BunCurrent15ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of errored seconds.
+         An errored second is counted for any of the following conditions:
+         Lost Packets
+         Discarded Packets
+         Jitter Buffer Underrun
+         Jitter Buffer Overrun"
+    ::= { aePwe3BunCurrent15Entry 16 }
+
+aePwe3BunCurrent15UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unavailable seconds.
+         An unavailable second is counted for any of the following conditions:
+         Packet Size Mismatch
+         R-bit is being transmitted
+         L-bit is being transmitted
+         R-bit is being received
+         L-bit is being received
+         Not receiving any packets
+         Not transmitting any packets
+         Bundle is not yet connected (e.g. ARP is not resolved)"
+    ::= { aePwe3BunCurrent15Entry 17 }
+
+aePwe3BunCurrent15ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3BunCurrent15Entry 18 }
+
+aePwe3BunCurrent15ThresholdCrossingPointer OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingPointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the index of the threshold crossing entry.
+         Threshold crossings are not implemented."
+    DEFVAL      { 0 }
+    ::= { aePwe3BunCurrent15Entry 19 }
+
+--------------------------------------------------------------------------
+--
+-- Interval 15-minute PWE3 Bundle (individual pseudowire) PM Table
+--
+--------------------------------------------------------------------------
+aePwe3BunInterval15Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3BunInterval15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The bundle table contains statistics for the pseudowire connection (i.e. bundle)."
+    ::= { aePwe3PmModule 2 }
+
+aePwe3BunInterval15Entry OBJECT-TYPE
+    SYNTAX      AePwe3BunInterval15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3BunInterval15Port,
+                  aePwe3BunInterval15Bundle,
+                  aePwe3BunInterval15Interval }
+    ::= { aePwe3BunInterval15Table 1 }
+
+AePwe3BunInterval15Entry ::=
+    SEQUENCE {
+        aePwe3BunInterval15Port
+            AePwe3T1Instance,
+        aePwe3BunInterval15Bundle
+            AePwe3BundleInstance,
+        aePwe3BunInterval15Interval
+            INTEGER,
+        aePwe3BunInterval15RxPacket
+            Counter32,
+        aePwe3BunInterval15TxPacket
+            Counter32,
+        aePwe3BunInterval15LostPacket
+            Counter32,
+        aePwe3BunInterval15DiscardPacket
+            Counter32,
+        aePwe3BunInterval15ReorderPacket
+            Counter32,
+        aePwe3BunInterval15JumpedPacket
+            Counter32,
+        aePwe3BunInterval15MalformedSec
+            Counter32,
+        aePwe3BunInterval15TxRbitSec
+            Counter32,
+        aePwe3BunInterval15TxLbitSec
+            Counter32,
+        aePwe3BunInterval15RxRbitSec
+            Counter32,
+        aePwe3BunInterval15RxLbitSec
+            Counter32,
+        aePwe3BunInterval15JitterBufferUnderrun
+            Counter32,
+        aePwe3BunInterval15JitterBufferOverrun
+            Counter32,
+        aePwe3BunInterval15ES
+            Counter32,
+        aePwe3BunInterval15UAS
+            Counter32,
+        aePwe3BunInterval15ValidData
+            PerfInvalidFlag
+    }
+
+aePwe3BunInterval15Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance associated with this bundle."
+    ::= { aePwe3BunInterval15Entry 1 }
+
+aePwe3BunInterval15Bundle OBJECT-TYPE
+    SYNTAX      AePwe3BundleInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The bundle instance (identifier) associated with this pseudowire."
+    ::= { aePwe3BunInterval15Entry 2 }
+
+aePwe3BunInterval15Interval OBJECT-TYPE
+    SYNTAX      INTEGER(1..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "There are 32 15-minute bucket intervals."
+    ::= { aePwe3BunInterval15Entry 3 }
+
+aePwe3BunInterval15RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunInterval15Entry 4 }
+
+aePwe3BunInterval15TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunInterval15Entry 5 }
+
+aePwe3BunInterval15LostPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets lost. These are packets that were never received as
+         determined by gaps in the packet sequence numbers."
+    ::= { aePwe3BunInterval15Entry 6 }
+
+aePwe3BunInterval15DiscardPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received but discarded. Packets may be discarded
+         if they are received too far out of order to be reordered."
+    ::= { aePwe3BunInterval15Entry 7 }
+
+aePwe3BunInterval15ReorderPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received and reordered. If packets are received out
+         of order, an attempt is made to reorder. Reordering packets does
+         not result in an error on the T1. However, this could be used as an
+         indication that there is congestion within the network."
+    ::= { aePwe3BunInterval15Entry 8 }
+
+aePwe3BunInterval15JumpedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets jumped. A jump occurs when there is a gap in the sequence
+         numbers. As such, lost = jumped - reordered. If packets are not arriving out of
+         order, then the lost = jumped. This is an indication that packet(s) are dropping
+         somewhere within the network."
+    ::= { aePwe3BunInterval15Entry 9 }
+
+aePwe3BunInterval15MalformedSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds a packet length mismatch has been detected. The packet
+         size must be the same at each end of the pseudowire. This is an indication
+         of a configuration problem."
+    ::= { aePwe3BunInterval15Entry 10 }
+
+aePwe3BunInterval15TxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the R-bit asserted.
+         The R-bit is asserted in the transmit packets when a bundle stops receiving
+         packets. This could indicate that the other end of the pseudowire is not
+         configured."
+    ::= { aePwe3BunInterval15Entry 11 }
+
+aePwe3BunInterval15TxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the L-bit asserted.
+         The L-bit is asserted in the transmit packets when there is a local T1 LOS
+         condition."
+    ::= { aePwe3BunInterval15Entry 12 }
+
+aePwe3BunInterval15RxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the R-bit asserted.
+         This is an indication that the other end of the pseudowire is not receiving
+         packets."
+    ::= { aePwe3BunInterval15Entry 13 }
+
+aePwe3BunInterval15RxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the L-bit asserted.
+         This is an indication that there is a far-end T1 LOS condition."
+    ::= { aePwe3BunInterval15Entry 14 }
+
+aePwe3BunInterval15JitterBufferUnderrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer underruns that have been detected. The jitter buffer
+         has emptied (packet reception is too slow). This could be an indication that the
+         jitter buffer is not configured big enough to accommodate the network packet
+         delay variation."
+    ::= { aePwe3BunInterval15Entry 15 }
+
+aePwe3BunInterval15JitterBufferOverrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer overruns that have been detected. The jitter buffer
+         is full and there is no room for addition packets. This could be an indication
+         of a timing problem (T1 timing at each end of the pseudowire is not synchronous)."
+    ::= { aePwe3BunInterval15Entry 16 }
+
+aePwe3BunInterval15ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of errored seconds.
+         See current15 table description."
+    ::= { aePwe3BunInterval15Entry 17 }
+
+aePwe3BunInterval15UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unavailable seconds.
+         See current15 table description."
+    ::= { aePwe3BunInterval15Entry 18 }
+
+aePwe3BunInterval15ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3BunInterval15Entry 19 }
+
+--------------------------------------------------------------------------
+--
+-- Current 24-hour PWE3 Bundle (individual pseudowire) PM Table
+--
+--------------------------------------------------------------------------
+aePwe3BunCurrent24Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3BunCurrent24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The bundle table contains statistics for the pseudowire connection (i.e. bundle)."
+    ::= { aePwe3PmModule 3 }
+
+aePwe3BunCurrent24Entry OBJECT-TYPE
+    SYNTAX      AePwe3BunCurrent24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3BunCurrent24Port,
+                  aePwe3BunCurrent24Bundle }
+    ::= { aePwe3BunCurrent24Table 1 }
+
+AePwe3BunCurrent24Entry ::=
+    SEQUENCE {
+        aePwe3BunCurrent24Port
+            AePwe3T1Instance,
+        aePwe3BunCurrent24Bundle
+            AePwe3BundleInstance,
+        aePwe3BunCurrent24RxPacket
+            Counter32,
+        aePwe3BunCurrent24TxPacket
+            Counter32,
+        aePwe3BunCurrent24LostPacket
+            Counter32,
+        aePwe3BunCurrent24DiscardPacket
+            Counter32,
+        aePwe3BunCurrent24ReorderPacket
+            Counter32,
+        aePwe3BunCurrent24JumpedPacket
+            Counter32,
+        aePwe3BunCurrent24MalformedSec
+            Counter32,
+        aePwe3BunCurrent24TxRbitSec
+            Counter32,
+        aePwe3BunCurrent24TxLbitSec
+            Counter32,
+        aePwe3BunCurrent24RxRbitSec
+            Counter32,
+        aePwe3BunCurrent24RxLbitSec
+            Counter32,
+        aePwe3BunCurrent24JitterBufferUnderrun
+            Counter32,
+        aePwe3BunCurrent24JitterBufferOverrun
+            Counter32,
+        aePwe3BunCurrent24ES
+            Counter32,
+        aePwe3BunCurrent24UAS
+            Counter32,
+        aePwe3BunCurrent24ValidData
+            PerfInvalidFlag,
+        aePwe3BunCurrent24ThresholdCrossingPointer
+            AeThresholdCrossingPointer
+    }
+
+aePwe3BunCurrent24Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance associated with this bundle."
+    ::= { aePwe3BunCurrent24Entry 1 }
+
+aePwe3BunCurrent24Bundle OBJECT-TYPE
+    SYNTAX      AePwe3BundleInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The bundle instance (identifier) associated with this pseudowire."
+    ::= { aePwe3BunCurrent24Entry 2 }
+
+aePwe3BunCurrent24RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunCurrent24Entry 3 }
+
+aePwe3BunCurrent24TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunCurrent24Entry 4 }
+
+aePwe3BunCurrent24LostPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets lost. These are packets that were never received as
+         determined by gaps in the packet sequence numbers."
+    ::= { aePwe3BunCurrent24Entry 5 }
+
+aePwe3BunCurrent24DiscardPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received but discarded. Packets may be discarded
+         if they are received too far out of order to be reordered."
+    ::= { aePwe3BunCurrent24Entry 6 }
+
+aePwe3BunCurrent24ReorderPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received and reordered. If packets are received out
+         of order, an attempt is made to reorder. Reordering packets does
+         not result in an error on the T1. However, this could be used as an
+         indication that there is congestion within the network."
+    ::= { aePwe3BunCurrent24Entry 7 }
+
+aePwe3BunCurrent24JumpedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets jumped. A jump occurs when there is a gap in the sequence
+         numbers. As such, lost = jumped - reordered. If packets are not arriving out of
+         order, then the lost = jumped. This is an indication that packet(s) are dropping
+         somewhere within the network."
+    ::= { aePwe3BunCurrent24Entry 8 }
+
+aePwe3BunCurrent24MalformedSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds a packet length mismatch has been detected. The packet
+         size must be the same at each end of the pseudowire. This is an indication
+         of a configuration problem."
+    ::= { aePwe3BunCurrent24Entry 9 }
+
+aePwe3BunCurrent24TxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the R-bit asserted.
+         The R-bit is asserted in the transmit packets when a bundle stops receiving
+         packets. This could indicate that the other end of the pseudowire is not
+         configured."
+    ::= { aePwe3BunCurrent24Entry 10 }
+
+aePwe3BunCurrent24TxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the L-bit asserted.
+         The L-bit is asserted in the transmit packets when there is a local T1 LOS
+         condition."
+    ::= { aePwe3BunCurrent24Entry 11 }
+
+aePwe3BunCurrent24RxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the R-bit asserted.
+         This is an indication that the other end of the pseudowire is not receiving
+         packets."
+    ::= { aePwe3BunCurrent24Entry 12 }
+
+aePwe3BunCurrent24RxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the L-bit asserted.
+         This is an indication that there is a far-end T1 LOS condition."
+    ::= { aePwe3BunCurrent24Entry 13 }
+
+aePwe3BunCurrent24JitterBufferUnderrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer underruns that have been detected. The jitter buffer
+         has emptied (packet reception is too slow). This could be an indication that the
+         jitter buffer is not configured big enough to accommodate the network packet
+         delay variation."
+    ::= { aePwe3BunCurrent24Entry 14 }
+
+aePwe3BunCurrent24JitterBufferOverrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer overruns that have been detected. The jitter buffer
+         is full and there is no room for addition packets. This could be an indication
+         of a timing problem (T1 timing at each end of the pseudowire is not synchronous)."
+    ::= { aePwe3BunCurrent24Entry 15 }
+
+aePwe3BunCurrent24ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of errored seconds.
+         See current15 table description."
+    ::= { aePwe3BunCurrent24Entry 16 }
+
+aePwe3BunCurrent24UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unavailable seconds.
+         See current15 table description."
+    ::= { aePwe3BunCurrent24Entry 17 }
+
+aePwe3BunCurrent24ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3BunCurrent24Entry 18 }
+
+aePwe3BunCurrent24ThresholdCrossingPointer OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingPointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the index of the threshold crossing entry.
+         Threshold crossings are not implemented."
+    DEFVAL      { 0 }
+    ::= { aePwe3BunCurrent24Entry 19 }
+
+--------------------------------------------------------------------------
+--
+-- Interval 24-hour PWE3 Bundle (individual pseudowire) PM Table
+--
+--------------------------------------------------------------------------
+aePwe3BunInterval24Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3BunInterval24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The bundle table contains statistics for the pseudowire connection (i.e. bundle)."
+    ::= { aePwe3PmModule 4 }
+
+aePwe3BunInterval24Entry OBJECT-TYPE
+    SYNTAX      AePwe3BunInterval24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3BunInterval24Port,
+                  aePwe3BunInterval24Bundle,
+                  aePwe3BunInterval24Interval }
+    ::= { aePwe3BunInterval24Table 1 }
+
+AePwe3BunInterval24Entry ::=
+    SEQUENCE {
+        aePwe3BunInterval24Port
+            AePwe3T1Instance,
+        aePwe3BunInterval24Bundle
+            AePwe3BundleInstance,
+        aePwe3BunInterval24Interval
+            INTEGER,
+        aePwe3BunInterval24RxPacket
+            Counter32,
+        aePwe3BunInterval24TxPacket
+            Counter32,
+        aePwe3BunInterval24LostPacket
+            Counter32,
+        aePwe3BunInterval24DiscardPacket
+            Counter32,
+        aePwe3BunInterval24ReorderPacket
+            Counter32,
+        aePwe3BunInterval24JumpedPacket
+            Counter32,
+        aePwe3BunInterval24MalformedSec
+            Counter32,
+        aePwe3BunInterval24TxRbitSec
+            Counter32,
+        aePwe3BunInterval24TxLbitSec
+            Counter32,
+        aePwe3BunInterval24RxRbitSec
+            Counter32,
+        aePwe3BunInterval24RxLbitSec
+            Counter32,
+        aePwe3BunInterval24JitterBufferUnderrun
+            Counter32,
+        aePwe3BunInterval24JitterBufferOverrun
+            Counter32,
+        aePwe3BunInterval24ES
+            Counter32,
+        aePwe3BunInterval24UAS
+            Counter32,
+        aePwe3BunInterval24ValidData
+            PerfInvalidFlag
+    }
+
+aePwe3BunInterval24Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance associated with this bundle."
+    ::= { aePwe3BunInterval24Entry 1 }
+
+aePwe3BunInterval24Bundle OBJECT-TYPE
+    SYNTAX      AePwe3BundleInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The bundle instance (identifier) associated with this pseudowire."
+    ::= { aePwe3BunInterval24Entry 2 }
+
+aePwe3BunInterval24Interval OBJECT-TYPE
+    SYNTAX      INTEGER(1..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "There is 1 24-hour interval (yesterday)."
+    ::= { aePwe3BunInterval24Entry 3 }
+
+aePwe3BunInterval24RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunInterval24Entry 4 }
+
+aePwe3BunInterval24TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will increment at the same rate."
+    ::= { aePwe3BunInterval24Entry 5 }
+
+aePwe3BunInterval24LostPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets lost. These are packets that were never received as
+         determined by gaps in the packet sequence numbers."
+    ::= { aePwe3BunInterval24Entry 6 }
+
+aePwe3BunInterval24DiscardPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received but discarded. Packets may be discarded
+         if they are received too far out of order to be reordered."
+    ::= { aePwe3BunInterval24Entry 7 }
+
+aePwe3BunInterval24ReorderPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received and reordered. If packets are received out
+         of order, an attempt is made to reorder. Reordering packets does
+         not result in an error on the T1. However, this could be used as an
+         indication that there is congestion within the network."
+    ::= { aePwe3BunInterval24Entry 8 }
+
+aePwe3BunInterval24JumpedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets jumped. A jump occurs when there is a gap in the sequence
+         numbers. As such, lost = jumped - reordered. If packets are not arriving out of
+         order, then the lost = jumped. This is an indication that packet(s) are dropping
+         somewhere within the network."
+    ::= { aePwe3BunInterval24Entry 9 }
+
+aePwe3BunInterval24MalformedSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds a packet length mismatch has been detected. The packet
+         size must be the same at each end of the pseudowire. This is an indication
+         of a configuration problem."
+    ::= { aePwe3BunInterval24Entry 10 }
+
+aePwe3BunInterval24TxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the R-bit asserted.
+         The R-bit is asserted in the transmit packets when a bundle stops receiving
+         packets. This could indicate that the other end of the pseudowire is not
+         configured."
+    ::= { aePwe3BunInterval24Entry 11 }
+
+aePwe3BunInterval24TxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been transmitted with the L-bit asserted.
+         The L-bit is asserted in the transmit packets when there is a local T1 LOS
+         condition."
+    ::= { aePwe3BunInterval24Entry 12 }
+
+aePwe3BunInterval24RxRbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the R-bit asserted.
+         This is an indication that the other end of the pseudowire is not receiving
+         packets."
+    ::= { aePwe3BunInterval24Entry 13 }
+
+aePwe3BunInterval24RxLbitSec OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds packets have been received with the L-bit asserted.
+         This is an indication that there is a far-end T1 LOS condition."
+    ::= { aePwe3BunInterval24Entry 14 }
+
+aePwe3BunInterval24JitterBufferUnderrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer underruns that have been detected. The jitter buffer
+         has emptied (packet reception is too slow). This could be an indication that the
+         jitter buffer is not configured big enough to accommodate the network packet
+         delay variation."
+    ::= { aePwe3BunInterval24Entry 15 }
+
+aePwe3BunInterval24JitterBufferOverrun OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of jitter buffer overruns that have been detected. The jitter buffer
+         is full and there is no room for addition packets. This could be an indication
+         of a timing problem (T1 timing at each end of the pseudowire is not synchronous)."
+    ::= { aePwe3BunInterval24Entry 16 }
+
+aePwe3BunInterval24ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of errored seconds.
+         See current15 table description."
+    ::= { aePwe3BunInterval24Entry 17 }
+
+aePwe3BunInterval24UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of unavailable seconds.
+         See current15 table description."
+    ::= { aePwe3BunInterval24Entry 18 }
+
+aePwe3BunInterval24ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3BunInterval24Entry 19 }
+
+--------------------------------------------------------------------------
+--
+-- Current 15-minute PWE3 T1 PM Table
+--
+--------------------------------------------------------------------------
+aePwe3T1Current15Table   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3T1Current15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The PWE3 T1 table contains statistics for the T1 TDM interface."
+    ::= { aePwe3PmModule 5 }
+
+aePwe3T1Current15Entry   OBJECT-TYPE
+    SYNTAX      AePwe3T1Current15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3T1Current15Port }
+    ::= { aePwe3T1Current15Table 1 }
+
+AePwe3T1Current15Entry ::=
+    SEQUENCE {
+        aePwe3T1Current15Port
+            AePwe3T1Instance,
+        aePwe3T1Current15LCV
+            Counter32,
+        aePwe3T1Current15ES
+            Counter32,
+        aePwe3T1Current15SES
+            Counter32,
+        aePwe3T1Current15UAS
+            Counter32,
+        aePwe3T1Current15CSS
+            Counter32,
+        aePwe3T1Current15ValidData
+            PerfInvalidFlag,
+        aePwe3T1Current15ThresholdCrossingPointer
+            AeThresholdCrossingPointer
+    }
+
+aePwe3T1Current15Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance."
+    ::= { aePwe3T1Current15Entry 1 }
+
+aePwe3T1Current15LCV OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of line code violations."
+    ::= { aePwe3T1Current15Entry 2 }
+
+aePwe3T1Current15ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of errored seconds."
+    ::= { aePwe3T1Current15Entry 3 }
+
+aePwe3T1Current15SES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of severely errored seconds."
+    ::= { aePwe3T1Current15Entry 4 }
+
+aePwe3T1Current15UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of unavailable seconds."
+    ::= { aePwe3T1Current15Entry 5 }
+
+aePwe3T1Current15CSS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of controlled slip seconds."
+    ::= { aePwe3T1Current15Entry 6 }
+
+aePwe3T1Current15ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3T1Current15Entry 7 }
+
+aePwe3T1Current15ThresholdCrossingPointer OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingPointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the index of the threshold crossing entry.
+         Threshold crossings are not implemented."
+    DEFVAL      { 0 }
+    ::= { aePwe3T1Current15Entry 8 }
+
+--------------------------------------------------------------------------
+--
+-- Interval 15-minute PWE3 T1 PM Table
+--
+--------------------------------------------------------------------------
+aePwe3T1Interval15Table   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3T1Interval15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PWE3 T1 table contains statistics for the specified interval
+         and T1 TDM interface."
+    ::= { aePwe3PmModule 6 }
+
+aePwe3T1Interval15Entry   OBJECT-TYPE
+    SYNTAX      AePwe3T1Interval15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3T1Interval15Port,
+                  aePwe3T1Interval15Interval }
+    ::= { aePwe3T1Interval15Table 1 }
+
+AePwe3T1Interval15Entry ::=
+    SEQUENCE {
+        aePwe3T1Interval15Port
+            AePwe3T1Instance,
+        aePwe3T1Interval15Interval
+            INTEGER,
+        aePwe3T1Interval15LCV
+            Counter32,
+        aePwe3T1Interval15ES
+            Counter32,
+        aePwe3T1Interval15SES
+            Counter32,
+        aePwe3T1Interval15UAS
+            Counter32,
+        aePwe3T1Interval15CSS
+            Counter32,
+        aePwe3T1Interval15ValidData
+            PerfInvalidFlag
+    }
+
+aePwe3T1Interval15Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance."
+    ::= { aePwe3T1Interval15Entry 1 }
+
+aePwe3T1Interval15Interval OBJECT-TYPE
+    SYNTAX      INTEGER(1..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "There are 32 15-minute T1 PM buckets."
+    ::= { aePwe3T1Interval15Entry 2 }
+
+aePwe3T1Interval15LCV OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of line code violations."
+    ::= { aePwe3T1Interval15Entry 3 }
+
+aePwe3T1Interval15ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of errored seconds."
+    ::= { aePwe3T1Interval15Entry 4 }
+
+aePwe3T1Interval15SES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of severely errored seconds."
+    ::= { aePwe3T1Interval15Entry 5 }
+
+aePwe3T1Interval15UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of unavailable seconds."
+    ::= { aePwe3T1Interval15Entry 6 }
+
+aePwe3T1Interval15CSS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of controlled slip seconds."
+    ::= { aePwe3T1Interval15Entry 7 }
+
+aePwe3T1Interval15ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3T1Interval15Entry 8 }
+
+--------------------------------------------------------------------------
+--
+-- Current 24-hour PWE3 T1 PM Table
+--
+--------------------------------------------------------------------------
+aePwe3T1Current24Table   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3T1Current24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The PWE3 T1 table contains statistics for the T1 TDM interface."
+    ::= { aePwe3PmModule 7 }
+
+aePwe3T1Current24Entry   OBJECT-TYPE
+    SYNTAX      AePwe3T1Current24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3T1Current24Port }
+    ::= { aePwe3T1Current24Table 1 }
+
+AePwe3T1Current24Entry ::=
+    SEQUENCE {
+        aePwe3T1Current24Port
+            AePwe3T1Instance,
+        aePwe3T1Current24LCV
+            Counter32,
+        aePwe3T1Current24ES
+            Counter32,
+        aePwe3T1Current24SES
+            Counter32,
+        aePwe3T1Current24UAS
+            Counter32,
+        aePwe3T1Current24CSS
+            Counter32,
+        aePwe3T1Current24ValidData
+            PerfInvalidFlag,
+        aePwe3T1Current24ThresholdCrossingPointer
+            AeThresholdCrossingPointer
+    }
+
+aePwe3T1Current24Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance."
+    ::= { aePwe3T1Current24Entry 1 }
+
+aePwe3T1Current24LCV OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of line code violations."
+    ::= { aePwe3T1Current24Entry 2 }
+
+aePwe3T1Current24ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of errored seconds."
+    ::= { aePwe3T1Current24Entry 3 }
+
+aePwe3T1Current24SES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of severely errored seconds."
+    ::= { aePwe3T1Current24Entry 4 }
+
+aePwe3T1Current24UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of unavailable seconds."
+    ::= { aePwe3T1Current24Entry 5 }
+
+aePwe3T1Current24CSS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of controlled slip seconds."
+    ::= { aePwe3T1Current24Entry 6 }
+
+aePwe3T1Current24ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3T1Current24Entry 7 }
+
+aePwe3T1Current24ThresholdCrossingPointer OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingPointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the index of the threshold crossing entry.
+         Threshold crossings are not implemented."
+    DEFVAL      { 0 }
+    ::= { aePwe3T1Current24Entry 8 }
+
+--------------------------------------------------------------------------
+--
+-- Interval 24-hour PWE3 T1 PM Table
+--
+--------------------------------------------------------------------------
+aePwe3T1Interval24Table   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3T1Interval24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The PWE3 T1 table contains statistics for the specified interval
+         and T1 TDM interface."
+    ::= { aePwe3PmModule 8 }
+
+aePwe3T1Interval24Entry   OBJECT-TYPE
+    SYNTAX      AePwe3T1Interval24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3T1Interval24Port,
+                  aePwe3T1Interval24Interval }
+    ::= { aePwe3T1Interval24Table 1 }
+
+AePwe3T1Interval24Entry ::=
+    SEQUENCE {
+        aePwe3T1Interval24Port
+            AePwe3T1Instance,
+        aePwe3T1Interval24Interval
+            INTEGER,
+        aePwe3T1Interval24LCV
+            Counter32,
+        aePwe3T1Interval24ES
+            Counter32,
+        aePwe3T1Interval24SES
+            Counter32,
+        aePwe3T1Interval24UAS
+            Counter32,
+        aePwe3T1Interval24CSS
+            Counter32,
+        aePwe3T1Interval24ValidData
+            PerfInvalidFlag
+    }
+
+aePwe3T1Interval24Port OBJECT-TYPE
+    SYNTAX      AePwe3T1Instance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The T1 port instance."
+    ::= { aePwe3T1Interval24Entry 1 }
+
+aePwe3T1Interval24Interval OBJECT-TYPE
+    SYNTAX      INTEGER(1..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "There is 1 24-hour interval (yesterday)."
+    ::= { aePwe3T1Interval24Entry 2 }
+
+aePwe3T1Interval24LCV OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of line code violations."
+    ::= { aePwe3T1Interval24Entry 3 }
+
+aePwe3T1Interval24ES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of errored seconds."
+    ::= { aePwe3T1Interval24Entry 4 }
+
+aePwe3T1Interval24SES OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of severely errored seconds."
+    ::= { aePwe3T1Interval24Entry 5 }
+
+aePwe3T1Interval24UAS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of unavailable seconds."
+    ::= { aePwe3T1Interval24Entry 6 }
+
+aePwe3T1Interval24CSS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of controlled slip seconds."
+    ::= { aePwe3T1Interval24Entry 7 }
+
+aePwe3T1Interval24ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the validity of the data in the bucket."
+    ::= { aePwe3T1Interval24Entry 8 }
+
+--------------------------------------------------------------------------
+--
+-- Current 15-minute PWE3 Aggregate Bundle (Ethernet) Interface PM Table
+--
+--------------------------------------------------------------------------
+aePwe3AggCurrent15Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3AggCurrent15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aggregate bundle table contains statistics for the aggregate (i.e. Ethernet) PWE3 interface."
+    ::= { aePwe3PmModule 9 }
+
+aePwe3AggCurrent15Entry OBJECT-TYPE
+    SYNTAX      AePwe3AggCurrent15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3AggCurrent15Instance }
+    ::= { aePwe3AggCurrent15Table 1 }
+
+AePwe3AggCurrent15Entry ::=
+    SEQUENCE {
+        aePwe3AggCurrent15Instance
+            AePwe3AggInstance,
+        aePwe3AggCurrent15RxPacket
+            Counter32,
+        aePwe3AggCurrent15RxByte
+            Counter32,
+        aePwe3AggCurrent15TxPacket
+            Counter32,
+        aePwe3AggCurrent15TxByte
+            Counter32,
+        aePwe3AggCurrent15ClassifiedPacket
+            Counter32,
+        aePwe3AggCurrent15ValidData
+            PerfInvalidFlag,
+        aePwe3AggCurrent15ThresholdCrossingPointer
+            AeThresholdCrossingPointer
+    }
+
+aePwe3AggCurrent15Instance OBJECT-TYPE
+    SYNTAX      AePwe3AggInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index for the aggregate PWE3 interface."
+    ::= { aePwe3AggCurrent15Entry 1 }
+
+aePwe3AggCurrent15RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggCurrent15Entry 2 }
+
+aePwe3AggCurrent15RxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes received."
+    ::= { aePwe3AggCurrent15Entry 3 }
+
+aePwe3AggCurrent15TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggCurrent15Entry 4 }
+
+aePwe3AggCurrent15TxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes transmitted."
+    ::= { aePwe3AggCurrent15Entry 5 }
+
+aePwe3AggCurrent15ClassifiedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of received packets that have passed classification. Packet
+         classification is performed on each packet received to determine if the packet
+         is truly intended for this interface. If the packet passes classification, it
+         is passed through to the intended T1 interface.
+
+         Under normal conditions, the received packet count and the classified packet
+         count will be incrementing at the same rate. If the received packet count is
+         increasing faster than the classified packet count, this is an indication that
+         stray packets are being received by the interface."
+    ::= { aePwe3AggCurrent15Entry 6 }
+
+aePwe3AggCurrent15ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the data in the bucket."
+    ::= { aePwe3AggCurrent15Entry 7 }
+
+aePwe3AggCurrent15ThresholdCrossingPointer OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingPointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the index of the threshold crossing entry.
+         Threshold crossings are not implemented."
+    DEFVAL      { 0 }
+    ::= { aePwe3AggCurrent15Entry 8 }
+
+--------------------------------------------------------------------------
+--
+-- Interval 15-minute PWE3 Aggregate Bundle (Ethernet) Interface PM Table
+--
+--------------------------------------------------------------------------
+aePwe3AggInterval15Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3AggInterval15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aggregate bundle table contains statistics for the specified interval
+         and aggregate (i.e. Ethernet) PWE3 interface."
+    ::= { aePwe3PmModule 10 }
+
+aePwe3AggInterval15Entry OBJECT-TYPE
+    SYNTAX      AePwe3AggInterval15Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3AggInterval15Instance,
+                  aePwe3AggInterval15Interval }
+    ::= { aePwe3AggInterval15Table 1 }
+
+AePwe3AggInterval15Entry ::=
+    SEQUENCE {
+        aePwe3AggInterval15Instance
+            AePwe3AggInstance,
+        aePwe3AggInterval15Interval
+            INTEGER,
+        aePwe3AggInterval15RxPacket
+            Counter32,
+        aePwe3AggInterval15RxByte
+            Counter32,
+        aePwe3AggInterval15TxPacket
+            Counter32,
+        aePwe3AggInterval15TxByte
+            Counter32,
+        aePwe3AggInterval15ClassifiedPacket
+            Counter32,
+        aePwe3AggInterval15ValidData
+            PerfInvalidFlag
+    }
+
+aePwe3AggInterval15Instance OBJECT-TYPE
+    SYNTAX      AePwe3AggInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index for the aggregate PWE3 interface."
+    ::= { aePwe3AggInterval15Entry 1 }
+
+aePwe3AggInterval15Interval OBJECT-TYPE
+    SYNTAX      INTEGER(1..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "There are 32 15-minute bucket intervals."
+    ::= { aePwe3AggInterval15Entry 2 }
+
+aePwe3AggInterval15RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggInterval15Entry 3 }
+
+aePwe3AggInterval15RxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes received."
+    ::= { aePwe3AggInterval15Entry 4 }
+
+aePwe3AggInterval15TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggInterval15Entry 5 }
+
+aePwe3AggInterval15TxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes transmitted."
+    ::= { aePwe3AggInterval15Entry 6 }
+
+aePwe3AggInterval15ClassifiedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of received packets that have passed classification. Packet
+         classification is performed on each packet received to determine if the packet
+         is truly intended for this interface. If the packet passes classification, it
+         is passed through to the intended T1 interface.
+
+         Under normal conditions, the received packet count and the classified packet
+         count will be incrementing at the same rate. If the received packet count is
+         increasing faster than the classified packet count, this is an indication that
+         stray packets are being received by the interface."
+    ::= { aePwe3AggInterval15Entry 7 }
+
+aePwe3AggInterval15ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the data in the bucket."
+    ::= { aePwe3AggInterval15Entry 8 }
+
+--------------------------------------------------------------------------
+--
+-- Current 24-hour PWE3 Aggregate Bundle (Ethernet) Interface PM Table
+--
+--------------------------------------------------------------------------
+aePwe3AggCurrent24Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3AggCurrent24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aggregate bundle table contains statistics for the aggregate (i.e. Ethernet) PWE3 interface."
+    ::= { aePwe3PmModule 11 }
+
+aePwe3AggCurrent24Entry OBJECT-TYPE
+    SYNTAX      AePwe3AggCurrent24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3AggCurrent24Instance }
+    ::= { aePwe3AggCurrent24Table 1 }
+
+AePwe3AggCurrent24Entry ::=
+    SEQUENCE {
+        aePwe3AggCurrent24Instance
+            AePwe3AggInstance,
+        aePwe3AggCurrent24RxPacket
+            Counter32,
+        aePwe3AggCurrent24RxByte
+            Counter32,
+        aePwe3AggCurrent24TxPacket
+            Counter32,
+        aePwe3AggCurrent24TxByte
+            Counter32,
+        aePwe3AggCurrent24ClassifiedPacket
+            Counter32,
+        aePwe3AggCurrent24ValidData
+            PerfInvalidFlag,
+        aePwe3AggCurrent24ThresholdCrossingPointer
+            AeThresholdCrossingPointer
+    }
+
+aePwe3AggCurrent24Instance OBJECT-TYPE
+    SYNTAX      AePwe3AggInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index for the aggregate PWE3 interface."
+    ::= { aePwe3AggCurrent24Entry 1 }
+
+aePwe3AggCurrent24RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggCurrent24Entry 2 }
+
+aePwe3AggCurrent24RxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes received."
+    ::= { aePwe3AggCurrent24Entry 3 }
+
+aePwe3AggCurrent24TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggCurrent24Entry 4 }
+
+aePwe3AggCurrent24TxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes transmitted."
+    ::= { aePwe3AggCurrent24Entry 5 }
+
+aePwe3AggCurrent24ClassifiedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of received packets that have passed classification. Packet
+         classification is performed on each packet received to determine if the packet
+         is truly intended for this interface. If the packet passes classification, it
+         is passed through to the intended T1 interface.
+
+         Under normal conditions, the received packet count and the classified packet
+         count will be incrementing at the same rate. If the received packet count is
+         increasing faster than the classified packet count, this is an indication that
+         stray packets are being received by the interface."
+    ::= { aePwe3AggCurrent24Entry 6 }
+
+aePwe3AggCurrent24ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the data in the bucket."
+    ::= { aePwe3AggCurrent24Entry 7 }
+
+aePwe3AggCurrent24ThresholdCrossingPointer OBJECT-TYPE
+    SYNTAX      AeThresholdCrossingPointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the index of the threshold crossing entry.
+         Threshold crossings are not implemented."
+    DEFVAL      { 0 }
+    ::= { aePwe3AggCurrent24Entry 8 }
+
+--------------------------------------------------------------------------
+--
+-- Interval 24-hour PWE3 Aggregate Bundle (Ethernet) Interface PM Table
+--
+--------------------------------------------------------------------------
+aePwe3AggInterval24Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AePwe3AggInterval24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The aggregate bundle table contains statistics for the specified interval
+         and aggregate (i.e. Ethernet) PWE3 interface."
+    ::= { aePwe3PmModule 12 }
+
+aePwe3AggInterval24Entry OBJECT-TYPE
+    SYNTAX      AePwe3AggInterval24Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aePwe3AggInterval24Instance,
+                  aePwe3AggInterval24Interval }
+    ::= { aePwe3AggInterval24Table 1 }
+
+AePwe3AggInterval24Entry ::=
+    SEQUENCE {
+        aePwe3AggInterval24Instance
+            AePwe3AggInstance,
+        aePwe3AggInterval24Interval
+            INTEGER,
+        aePwe3AggInterval24RxPacket
+            Counter32,
+        aePwe3AggInterval24RxByte
+            Counter32,
+        aePwe3AggInterval24TxPacket
+            Counter32,
+        aePwe3AggInterval24TxByte
+            Counter32,
+        aePwe3AggInterval24ClassifiedPacket
+            Counter32,
+        aePwe3AggInterval24ValidData
+            PerfInvalidFlag
+    }
+aePwe3AggInterval24Instance OBJECT-TYPE
+    SYNTAX      AePwe3AggInstance
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index for the aggregate PWE3 interface."
+    ::= { aePwe3AggInterval24Entry 1 }
+
+aePwe3AggInterval24Interval OBJECT-TYPE
+    SYNTAX      INTEGER(1..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "There are 2 24-hour interval (yesterday)."
+    ::= { aePwe3AggInterval24Entry 2 }
+
+aePwe3AggInterval24RxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets received. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggInterval24Entry 3 }
+
+aePwe3AggInterval24RxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes received."
+    ::= { aePwe3AggInterval24Entry 4 }
+
+aePwe3AggInterval24TxPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of packets transmitted. Under normal conditions, the received
+         and transmitted counts will be incrementing at the same rate."
+    ::= { aePwe3AggInterval24Entry 5 }
+
+aePwe3AggInterval24TxByte OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of bytes transmitted."
+    ::= { aePwe3AggInterval24Entry 6 }
+
+aePwe3AggInterval24ClassifiedPacket OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total number of received packets that have passed classification. Packet
+         classification is performed on each packet received to determine if the packet
+         is truly intended for this interface. If the packet passes classification, it
+         is passed through to the intended T1 interface.
+
+         Under normal conditions, the received packet count and the classified packet
+         count will be incrementing at the same rate. If the received packet count is
+         increasing faster than the classified packet count, this is an indication that
+         stray packets are being received by the interface."
+    ::= { aePwe3AggInterval24Entry 7 }
+
+aePwe3AggInterval24ValidData OBJECT-TYPE
+    SYNTAX      PerfInvalidFlag
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the validity of the data in the bucket."
+    ::= { aePwe3AggInterval24Entry 8 }
+
+--************************************************************************
+--
+-- End of AE PWE3 PM Module
+--
+--************************************************************************
+
+END

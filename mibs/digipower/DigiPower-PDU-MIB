@@ -1,0 +1,3198 @@
+        
+DigiPower-PDU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	TRAP-TYPE
+		FROM RFC-1215
+	DisplayString
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC-1212
+	enterprises
+		FROM RFC1155-SMI;
+
+
+digipower OBJECT IDENTIFIER 	::= { enterprises 17420 }
+
+products OBJECT IDENTIFIER 	::= { digipower 1 }
+
+devTable OBJECT IDENTIFIER	::= { products 2 }
+
+envthreshold OBJECT IDENTIFIER	::= { products 4 }
+
+-- DEV basic information --
+
+devID OBJECT-TYPE
+	SYNTAX INTEGER (1..16)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The ID number of dev."
+	::= { devTable 1 }
+
+
+devIP OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..128))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current IP address, netmask, default gateway, and DNS server."
+	::= { devTable 2 }
+
+
+devMAC OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current MAC address."
+	::= { devTable 3 }
+
+
+devVersion OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current firmware version."
+	::= { devTable 4 }
+
+
+devInfo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the count of attached PDUs and their id."
+	::= { devTable 5 }
+
+
+devValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the PDU values (currents) from PDU1 to PDU16"
+	::= { devTable 6 }
+
+devTemperature OBJECT-TYPE
+	SYNTAX INTEGER (-50..100)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the PDU temperature in Celsius degree"
+	::= { devTable 7 }
+
+devHumidity OBJECT-TYPE
+	SYNTAX INTEGER (0..100)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the PDU humidity in percentage (%)"
+	::= { devTable 8 }
+
+pduTable OBJECT IDENTIFIER	::= { devTable 9 }
+
+
+-- PDU entries --
+-- PDU01 --
+
+pdu01Entry OBJECT IDENTIFIER	::= { pduTable 1 }
+
+
+pdu01Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-01 detect."
+	::= { pdu01Entry 11 }
+
+
+pdu01SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu01Entry 12 }
+
+
+pdu01OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu01Entry 13 }
+
+
+pdu01OutletConfigs OBJECT IDENTIFIER	::= { pdu01Entry 14 }
+
+
+pdu01Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu01OutletConfigs 1 }
+
+
+pdu01Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu01OutletConfigs 2 }
+
+
+pdu01Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu01OutletConfigs 3 }
+
+
+pdu01Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu01OutletConfigs 4 }
+
+
+pdu01Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu01OutletConfigs 5 }
+
+
+pdu01Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu01OutletConfigs 6 }
+
+
+pdu01Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu01OutletConfigs 7 }
+
+
+pdu01Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu01OutletConfigs 8 }
+
+
+pdu01Outlet9Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet9"
+	::= { pdu01OutletConfigs 9 }
+
+
+pdu01Outlet10Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet10"
+	::= { pdu01OutletConfigs 10 }
+	
+	
+pdu01Outlet11Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet11"
+	::= { pdu01OutletConfigs 11 }
+
+
+pdu01Outlet12Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet12"
+	::= { pdu01OutletConfigs 12 }
+
+
+pdu01Outlet13Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet13"
+	::= { pdu01OutletConfigs 13 }
+
+
+pdu01Outlet14Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet14"
+	::= { pdu01OutletConfigs 14 }
+
+
+pdu01Outlet15Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet15"
+	::= { pdu01OutletConfigs 15 }
+
+
+pdu01Outlet16Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet16"
+	::= { pdu01OutletConfigs 16 }
+
+
+pdu01Outlet17Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet17"
+	::= { pdu01OutletConfigs 17 }
+
+
+pdu01Outlet18Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet18"
+	::= { pdu01OutletConfigs 18 }
+
+
+pdu01Outlet19Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet19"
+	::= { pdu01OutletConfigs 19 }
+
+
+pdu01Outlet20Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet20"
+	::= { pdu01OutletConfigs 20 }
+
+
+pdu01Outlet21Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet21"
+	::= { pdu01OutletConfigs 21 }
+
+
+pdu01Outlet22Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet22"
+	::= { pdu01OutletConfigs 22 }
+
+
+pdu01Outlet23Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet23"
+	::= { pdu01OutletConfigs 23 }
+
+
+pdu01Outlet24Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet24"
+	::= { pdu01OutletConfigs 24 }
+	
+	
+pdu01Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu01Entry 15 }
+
+
+pdu01Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu01Entry 16 }
+
+
+pdu01Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu01Entry 17 }
+
+
+pdu01ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu01Entry 18 }
+
+
+pdu01ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu01Entry 19 }
+
+
+pdu01Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu01Entry 20 }
+	
+pdu01DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..128))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu01Entry 21 }	
+
+pdu01DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..128))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu01Entry 22 }	
+
+-- PDU02 --
+
+pdu02Entry OBJECT IDENTIFIER	::= { pduTable 2 }
+
+pdu02Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-02 detect."
+	::= { pdu02Entry 11 }
+
+
+pdu02SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu02Entry 12 }
+
+
+pdu02OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu02Entry 13 }
+
+
+pdu02OutletConfigs OBJECT IDENTIFIER	::= { pdu02Entry 14 }
+
+
+pdu02Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu02OutletConfigs 1 }
+
+
+pdu02Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu02OutletConfigs 2 }
+
+
+pdu02Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu02OutletConfigs 3 }
+
+
+pdu02Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu02OutletConfigs 4 }
+
+
+pdu02Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu02OutletConfigs 5 }
+
+
+pdu02Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu02OutletConfigs 6 }
+
+
+pdu02Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu02OutletConfigs 7 }
+
+
+pdu02Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu02OutletConfigs 8 }
+
+
+pdu02Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu02Entry 15 }
+
+
+pdu02Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu02Entry 16 }
+
+
+pdu02Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu02Entry 17 }
+
+
+pdu02ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu02Entry 18 }
+
+
+pdu02ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu02Entry 19 }
+
+
+pdu02Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu02Entry 20 }
+
+pdu02DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..128))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu02Entry 21 }	
+
+pdu02DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu02Entry 22 }	
+	
+-- PDU03 --
+
+pdu03Entry OBJECT IDENTIFIER	::= { pduTable 3 }
+
+
+pdu03Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-03 detect."
+	::= { pdu03Entry 11 }
+
+
+pdu03SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu03Entry 12 }
+
+
+pdu03OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu03Entry 13 }
+
+
+pdu03OutletConfigs OBJECT IDENTIFIER	::= { pdu03Entry 14 }
+
+
+pdu03Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu03OutletConfigs 1 }
+
+
+pdu03Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu03OutletConfigs 2 }
+
+
+pdu03Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu03OutletConfigs 3 }
+
+
+pdu03Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu03OutletConfigs 4 }
+
+
+pdu03Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu03OutletConfigs 5 }
+
+
+pdu03Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu03OutletConfigs 6 }
+
+
+pdu03Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu03OutletConfigs 7 }
+
+
+pdu03Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu03OutletConfigs 8 }
+
+
+pdu03Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu03Entry 15 }
+
+
+pdu03Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu03Entry 16 }
+
+
+pdu03Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu03Entry 17 }
+
+
+pdu03ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu03Entry 18 }
+
+
+pdu03ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu03Entry 19 }
+
+
+pdu03Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu03Entry 20 }
+
+pdu03DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu03Entry 21 }	
+
+pdu03DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu03Entry 22 }	
+	
+-- PDU04 --
+
+pdu04Entry OBJECT IDENTIFIER	::= { pduTable 4 }
+
+
+pdu04Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-04 detect."
+	::= { pdu04Entry 11 }
+
+
+pdu04SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu04Entry 12 }
+
+
+pdu04OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu04Entry 13 }
+
+
+pdu04OutletConfigs OBJECT IDENTIFIER	::= { pdu04Entry 14 }
+
+pdu04Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu04OutletConfigs 1 }
+
+
+pdu04Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu04OutletConfigs 2 }
+
+
+pdu04Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu04OutletConfigs 3 }
+
+
+pdu04Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu04OutletConfigs 4 }
+
+
+pdu04Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu04OutletConfigs 5 }
+
+
+pdu04Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu04OutletConfigs 6 }
+
+
+pdu04Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu04OutletConfigs 7 }
+
+
+pdu04Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu04OutletConfigs 8 }
+
+
+pdu04Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu04Entry 15 }
+
+
+pdu04Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu04Entry 16 }
+
+
+pdu04Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu04Entry 17 }
+
+
+pdu04ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu04Entry 18 }
+
+
+pdu04ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu04Entry 19 }
+
+
+pdu04Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu04Entry 20 }
+
+pdu04DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu04Entry 21 }	
+
+pdu04DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu04Entry 22 }	
+	
+-- PDU05 --
+
+pdu05Entry OBJECT IDENTIFIER	::= { pduTable 5 }
+
+pdu05Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-05 detect."
+	::= { pdu05Entry 11 }
+
+
+pdu05SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu05Entry 12 }
+
+
+pdu05OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu05Entry 13 }
+
+
+pdu05OutletConfigs OBJECT IDENTIFIER	::= { pdu05Entry 14 }
+
+
+pdu05Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu05OutletConfigs 1 }
+
+
+pdu05Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu05OutletConfigs 2 }
+
+
+pdu05Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu05OutletConfigs 3 }
+
+
+pdu05Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu05OutletConfigs 4 }
+
+
+pdu05Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu05OutletConfigs 5 }
+
+
+pdu05Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu05OutletConfigs 6 }
+
+
+pdu05Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu05OutletConfigs 7 }
+
+
+pdu05Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu05OutletConfigs 8 }
+
+
+pdu05Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu05Entry 15 }
+
+
+pdu05Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu05Entry 16 }
+
+
+pdu05Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu05Entry 17 }
+
+
+pdu05ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu05Entry 18 }
+
+
+pdu05ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu05Entry 19 }
+
+
+pdu05Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu05Entry 20 }
+
+pdu05DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu05Entry 21 }	
+
+pdu05DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu05Entry 22 }	
+	
+-- PDU06 --
+
+pdu06Entry OBJECT IDENTIFIER	::= { pduTable 6 }
+
+
+pdu06Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-06 detect."
+	::= { pdu06Entry 11 }
+
+
+pdu06SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu06Entry 12 }
+
+
+pdu06OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		-1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu06Entry 13 }
+
+
+pdu06OutletConfigs OBJECT IDENTIFIER	::= { pdu06Entry 14 }
+
+
+pdu06Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu06OutletConfigs 1 }
+
+
+pdu06Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu06OutletConfigs 2 }
+
+
+pdu06Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu06OutletConfigs 3 }
+
+
+pdu06Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu06OutletConfigs 4 }
+
+
+pdu06Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu06OutletConfigs 5 }
+
+
+pdu06Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu06OutletConfigs 6 }
+
+
+pdu06Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu06OutletConfigs 7 }
+
+
+pdu06Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu06OutletConfigs 8 }
+
+
+pdu06Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu06Entry 15 }
+
+
+pdu06Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu06Entry 16 }
+
+
+pdu06Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu06Entry 17 }
+
+
+pdu06ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu06Entry 18 }
+
+
+pdu06ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu06Entry 19 }
+
+
+pdu06Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu06Entry 20 }
+
+pdu06DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu06Entry 21 }	
+
+pdu06DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu06Entry 22 }	
+	
+-- PDU07 --
+
+pdu07Entry OBJECT IDENTIFIER	::= { pduTable 7 }
+
+
+pdu07Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-07 detect."
+	::= { pdu07Entry 11 }
+
+
+pdu07SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu07Entry 12 }
+
+
+pdu07OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu07Entry 13 }
+
+
+pdu07OutletConfigs OBJECT IDENTIFIER	::= { pdu07Entry 14 }
+
+
+pdu07Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu07OutletConfigs 1 }
+
+
+pdu07Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu07OutletConfigs 2 }
+
+
+pdu07Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu07OutletConfigs 3 }
+
+
+pdu07Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu07OutletConfigs 4 }
+
+
+pdu07Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu07OutletConfigs 5 }
+
+
+pdu07Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu07OutletConfigs 6 }
+
+
+pdu07Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu07OutletConfigs 7 }
+
+
+pdu07Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu07OutletConfigs 8 }
+
+
+pdu07Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu07Entry 15 }
+
+
+pdu07Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu07Entry 16 }
+
+
+pdu07Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu07Entry 17 }
+
+
+pdu07ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu07Entry 18 }
+
+
+pdu07ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu07Entry 19 }
+
+
+pdu07Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu07Entry 20 }
+
+pdu07DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu07Entry 21 }	
+
+pdu07DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu07Entry 22 }	
+	
+-- PDU08 --
+
+pdu08Entry OBJECT IDENTIFIER	::= { pduTable 8 }
+
+
+pdu08Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-08 detect."
+	::= { pdu08Entry 11 }
+
+
+pdu08SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu08Entry 12 }
+
+
+pdu08OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu08Entry 13 }
+
+
+pdu08OutletConfigs OBJECT IDENTIFIER	::= { pdu08Entry 14 }
+
+
+pdu08Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu08OutletConfigs 1 }
+
+
+pdu08Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu08OutletConfigs 2 }
+
+
+pdu08Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu08OutletConfigs 3 }
+
+
+pdu08Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu08OutletConfigs 4 }
+
+
+pdu08Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu08OutletConfigs 5 }
+
+
+pdu08Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu08OutletConfigs 6 }
+
+
+pdu08Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu08OutletConfigs 7 }
+
+
+pdu08Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu08OutletConfigs 8 }
+
+
+pdu08Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu08Entry 15 }
+
+
+pdu08Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu08Entry 16 }
+
+
+pdu08Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu08Entry 17 }
+
+
+pdu08ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu08Entry 18 }
+
+
+pdu08ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu08Entry 19 }
+
+
+pdu08Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu08Entry 20 }
+
+pdu08DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu08Entry 21 }	
+
+pdu08DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu08Entry 22 }	
+	
+-- PDU09 --
+
+pdu09Entry OBJECT IDENTIFIER	::= { pduTable 9 }
+
+
+pdu09Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-09 detect."
+	::= { pdu09Entry 11 }
+
+
+pdu09SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu09Entry 12 }
+
+
+pdu09OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu09Entry 13 }
+
+
+pdu09OutletConfigs OBJECT IDENTIFIER	::= { pdu09Entry 14 }
+
+
+pdu09Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu09OutletConfigs 1 }
+
+
+pdu09Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu09OutletConfigs 2 }
+
+
+pdu09Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu09OutletConfigs 3 }
+
+
+pdu09Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu09OutletConfigs 4 }
+
+
+pdu09Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu09OutletConfigs 5 }
+
+
+pdu09Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu09OutletConfigs 6 }
+
+
+pdu09Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu09OutletConfigs 7 }
+
+
+pdu09Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu09OutletConfigs 8 }
+
+
+pdu09Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu09Entry 15 }
+
+
+pdu09Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu09Entry 16 }
+
+
+pdu09Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu09Entry 17 }
+
+
+pdu09ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu09Entry 18 }
+
+
+pdu09ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu09Entry 19 }
+
+
+pdu09Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu09Entry 20 }
+
+pdu09DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu09Entry 21 }	
+
+pdu09DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu09Entry 22 }	
+	
+-- PDU10 --
+
+pdu10Entry OBJECT IDENTIFIER	::= { pduTable 10 }
+
+
+pdu10Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-10 detect."
+	::= { pdu10Entry 11 }
+
+
+pdu10SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu10Entry 12 }
+
+
+pdu10OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu10Entry 13 }
+
+
+pdu10OutletConfigs OBJECT IDENTIFIER	::= { pdu10Entry 14 }
+
+
+pdu10Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu10OutletConfigs 1 }
+
+
+pdu10Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu10OutletConfigs 2 }
+
+
+pdu10Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu10OutletConfigs 3 }
+
+
+pdu10Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu10OutletConfigs 4 }
+
+
+pdu10Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu10OutletConfigs 5 }
+
+
+pdu10Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu10OutletConfigs 6 }
+
+
+pdu10Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu10OutletConfigs 7 }
+
+
+pdu10Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu10OutletConfigs 8 }
+
+
+pdu10Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu10Entry 15 }
+
+
+pdu10Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu10Entry 16 }
+
+
+pdu10Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu10Entry 17 }
+
+
+pdu10ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu10Entry 18 }
+
+
+pdu10ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu10Entry 19 }
+
+
+pdu10Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu10Entry 20 }
+
+pdu10DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu10Entry 21 }	
+
+pdu10DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu10Entry 22 }	
+	
+-- PDU11 --
+
+pdu11Entry OBJECT IDENTIFIER	::= { pduTable 11 }
+
+
+pdu11Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-11 detect."
+	::= { pdu11Entry 11 }
+
+
+pdu11SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu11Entry 12 }
+
+
+pdu11OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu11Entry 13 }
+
+
+pdu11OutletConfigs OBJECT IDENTIFIER	::= { pdu11Entry 14 }
+
+
+pdu11Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu11OutletConfigs 1 }
+
+
+pdu11Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu11OutletConfigs 2 }
+
+
+pdu11Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu11OutletConfigs 3 }
+
+
+pdu11Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu11OutletConfigs 4 }
+
+
+pdu11Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu11OutletConfigs 5 }
+
+
+pdu11Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu11OutletConfigs 6 }
+
+
+pdu11Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu11OutletConfigs 7 }
+
+
+pdu11Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu11OutletConfigs 8 }
+
+
+pdu11Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu11Entry 15 }
+
+
+pdu11Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu11Entry 16 }
+
+
+pdu11Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu11Entry 17 }
+
+
+pdu11ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu11Entry 18 }
+
+
+pdu11ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu11Entry 19 }
+
+
+pdu11Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu11Entry 20 }
+
+pdu11DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu11Entry 21 }	
+
+pdu11DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu11Entry 22 }	
+	
+-- PDU12 --
+
+pdu12Entry OBJECT IDENTIFIER	::= { pduTable 12 }
+
+
+pdu12Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-12 detect."
+	::= { pdu12Entry 11 }
+
+
+pdu12SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu12Entry 12 }
+
+
+pdu12OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu12Entry 13 }
+
+
+pdu12OutletConfigs OBJECT IDENTIFIER	::= { pdu12Entry 14 }
+
+
+pdu12Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu12OutletConfigs 1 }
+
+
+pdu12Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu12OutletConfigs 2 }
+
+
+pdu12Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu12OutletConfigs 3 }
+
+
+pdu12Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu12OutletConfigs 4 }
+
+
+pdu12Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu12OutletConfigs 5 }
+
+
+pdu12Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu12OutletConfigs 6 }
+
+
+pdu12Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu12OutletConfigs 7 }
+
+
+pdu12Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu12OutletConfigs 8 }
+
+
+pdu12Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu12Entry 15 }
+
+
+pdu12Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu12Entry 16 }
+
+
+pdu12Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu12Entry 17 }
+
+
+pdu12ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu12Entry 18 }
+
+
+pdu12ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu12Entry 19 }
+
+
+pdu12Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu12Entry 20 }
+
+pdu12DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu12Entry 21 }	
+
+pdu12DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu12Entry 22 }	
+	
+-- PDU13 --
+
+pdu13Entry OBJECT IDENTIFIER	::= { pduTable 13 }
+
+
+pdu13Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-13 detect."
+	::= { pdu13Entry 11 }
+
+
+pdu13SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu13Entry 12 }
+
+
+pdu13OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu13Entry 13 }
+
+
+pdu13OutletConfigs OBJECT IDENTIFIER	::= { pdu13Entry 14 }
+
+
+pdu13Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu13OutletConfigs 1 }
+
+
+pdu13Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu13OutletConfigs 2 }
+
+
+pdu13Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu13OutletConfigs 3 }
+
+
+pdu13Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu13OutletConfigs 4 }
+
+
+pdu13Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu13OutletConfigs 5 }
+
+
+pdu13Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu13OutletConfigs 6 }
+
+
+pdu13Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu13OutletConfigs 7 }
+
+
+pdu13Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu13OutletConfigs 8 }
+
+
+pdu13Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu13Entry 15 }
+
+
+pdu13Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu13Entry 16 }
+
+
+pdu13Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu13Entry 17 }
+
+
+pdu13ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu13Entry 18 }
+
+
+pdu13ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu13Entry 19 }
+
+
+pdu13Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu13Entry 20 }
+
+pdu13DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu13Entry 21 }	
+
+pdu13DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu13Entry 22 }	
+	
+-- PDU14 --
+
+pdu14Entry OBJECT IDENTIFIER	::= { pduTable 14 }
+
+
+pdu14Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-14 detect."
+	::= { pdu14Entry 11 }
+
+
+pdu14SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu14Entry 12 }
+
+
+pdu14OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu14Entry 13 }
+
+
+pdu14OutletConfigs OBJECT IDENTIFIER	::= { pdu14Entry 14 }
+
+
+pdu14Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu14OutletConfigs 1 }
+
+
+pdu14Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu14OutletConfigs 2 }
+
+
+pdu14Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu14OutletConfigs 3 }
+
+
+pdu14Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu14OutletConfigs 4 }
+
+
+pdu14Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu14OutletConfigs 5 }
+
+
+pdu14Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu14OutletConfigs 6 }
+
+
+pdu14Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu14OutletConfigs 7 }
+
+
+pdu14Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu14OutletConfigs 8 }
+
+
+pdu14Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu14Entry 15 }
+
+
+pdu14Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu14Entry 16 }
+
+
+pdu14Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu14Entry 17 }
+
+
+pdu14ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu14Entry 18 }
+
+
+pdu14ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu14Entry 19 }
+
+
+pdu14Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu14Entry 20 }
+
+pdu14DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu14Entry 21 }	
+
+pdu14DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu14Entry 22 }	
+	
+-- PDU15 --
+
+pdu15Entry OBJECT IDENTIFIER	::= { pduTable 15 }
+
+
+pdu15Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-15 detect."
+	::= { pdu15Entry 11 }
+
+
+pdu15SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu15Entry 12 }
+
+
+pdu15OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu15Entry 13 }
+
+
+pdu15OutletConfigs OBJECT IDENTIFIER	::= { pdu15Entry 14 }
+
+
+pdu15Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu15OutletConfigs 1 }
+
+
+pdu15Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu15OutletConfigs 2 }
+
+
+pdu15Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu15OutletConfigs 3 }
+
+
+pdu15Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu15OutletConfigs 4 }
+
+
+pdu15Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu15OutletConfigs 5 }
+
+
+pdu15Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu15OutletConfigs 6 }
+
+
+pdu15Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu15OutletConfigs 7 }
+
+
+pdu15Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu15OutletConfigs 8 }
+
+
+pdu15Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu15Entry 15 }
+
+
+pdu15Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu15Entry 16 }
+
+
+pdu15Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu15Entry 17 }
+
+
+pdu15ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu15Entry 18 }
+
+
+pdu15ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu15Entry 19 }
+
+
+pdu15Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu15Entry 20 }
+
+pdu15DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu15Entry 21 }	
+
+pdu15DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu15Entry 22 }	
+	
+-- PDU16 --
+
+pdu16Entry OBJECT IDENTIFIER	::= { pduTable 16 }
+
+
+pdu16Value OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the current of PDU-16 detect."
+	::= { pdu16Entry 11 }
+
+
+pdu16SubValues OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet values (currents) from Outlet1 to Outlet8"
+	::= { pdu16Entry 12 }
+
+
+pdu16OutletStatus OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the outlet statuses (On or Off) from Outlet1 to Outlet8
+		 1: Outlet ON
+		 0: Outlet OFF
+		 -1: Outlet is not available
+		 -2: Outlet powr lost or Breaker triggered"
+	::= { pdu16Entry 13 }
+
+
+pdu16OutletConfigs OBJECT IDENTIFIER	::= { pdu16Entry 14 }
+
+
+pdu16Outlet1Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet1"
+	::= { pdu16OutletConfigs 1 }
+
+
+pdu16Outlet2Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet2"
+	::= { pdu16OutletConfigs 2 }
+
+
+pdu16Outlet3Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet3"
+	::= { pdu16OutletConfigs 3 }
+
+
+pdu16Outlet4Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet4"
+	::= { pdu16OutletConfigs 4 }
+
+
+pdu16Outlet5Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet5"
+	::= { pdu16OutletConfigs 5 }
+
+
+pdu16Outlet6Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet6"
+	::= { pdu16OutletConfigs 6 }
+
+
+pdu16Outlet7Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet7"
+	::= { pdu16OutletConfigs 7 }
+
+
+pdu16Outlet8Config OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..64))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate the configuration of Outlet8"
+	::= { pdu16OutletConfigs 8 }
+
+
+pdu16Threshold1 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 1 (warning current)."
+	::= { pdu16Entry 15 }
+
+
+pdu16Threshold2 OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate current threshold 2 (critical current)."
+	::= { pdu16Entry 16 }
+
+
+pdu16Voltage OBJECT-TYPE
+	SYNTAX INTEGER (0..999)
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate voltage of PDU."
+	::= { pdu16Entry 17 }
+
+
+pdu16ModelName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model name."
+	::= { pdu16Entry 18 }
+
+
+pdu16ModelNo OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU model number."
+	::= { pdu16Entry 19 }
+
+
+pdu16Identify OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU identify."
+	::= { pdu16Entry 20 }
+
+pdu16DelayOn OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet On delay time. Unit is second "
+	::= { pdu16Entry 21 }	
+
+pdu16DelayOff OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate PDU Outlet Off delay time. Unit is second "
+	::= { pdu16Entry 22 }	
+	
+
+-- ENV Threshold information --
+
+tempLower OBJECT-TYPE
+	SYNTAX INTEGER (1..16)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate temperature lower threshold"
+	::= { envthreshold 42 }
+	
+tempUpper OBJECT-TYPE
+	SYNTAX INTEGER (1..16)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate temperature upper threshold"
+	::= { envthreshold 43 }
+	
+humidityLower OBJECT-TYPE
+	SYNTAX INTEGER (1..16)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate humidity lower threshold"
+	::= { envthreshold 44 }
+	
+humidityLower OBJECT-TYPE
+	SYNTAX INTEGER (1..16)
+	ACCESS read-write
+	STATUS mandatory
+	DESCRIPTION
+		"Indicate humidity upper threshold"
+	::= { envthreshold 45 }
+	
+--dev traps ----------------------------------------------------------------
+
+--pdu01TrapEntry TRAP-TYPE
+--	ENTERPRISE digipower
+--	ACCESS not-accessible
+--	STATUS mandatory
+--	DESCRIPTION
+--		"An entry containing trap information of PDU-01."
+--	::= 1
+
+--pdu01CommunicationLost TRAP-TYPE
+--	SYNTAX pdu01CommunicationLost
+--	DESCRIPTION
+--		"PDU-01 communication lost."
+--	:: = { pdu01TrapEntry 19 }
+
+
+devOutOfThreshold1 TRAP-TYPE
+	ENTERPRISE digipower
+	DESCRIPTION 
+		"WARNING: DEV current out of threshold 1."
+ ::= 105
+
+
+devOutOfThreshold2 TRAP-TYPE
+	ENTERPRISE digipower
+	DESCRIPTION 
+		"CRITICAL: DEV current out of threshold 2."
+ ::= 106
+
+
+--devCommunicationLost TRAP-TYPE
+--	ENTERPRISE digipower
+--	DESCRIPTION 
+--		"CRITICAL: DEV Communication lost."
+-- ::= 107
+
+devBackToNormal TRAP-TYPE
+	ENTERPRISE digipower
+	DESCRIPTION
+		"NORMAL: DEV back to normal states"
+ ::= 108
+
+END
+

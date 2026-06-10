@@ -1,0 +1,797 @@
+-- %DNP% $Id: ERICSSON-ROUTER-ENVMON-MIB.my,v 1.2.4.4.120.5 2011/05/05 18:15:55 chiachun Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/ERICSSON-ROUTER-ENVMON-MIB.my,v $
+-- *****************************************************************
+-- ERICSSON-ROUTER-ENVMON-MIB	Environmental Monitor MIB
+--
+-- Copyright (c) 1999-2007, 2010-2011, 2015 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+ERICSSON-ROUTER-ENVMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Unsigned32,
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString,
+	TruthValue,
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF
+	entPhysicalIndex
+		FROM ENTITY-MIB
+	eriRouterMgmt
+		FROM ERICSSON-ROUTER-SMI;
+
+eriRouterEnvMonMIB MODULE-IDENTITY
+        LAST-UPDATED    "201501141800Z" -- Jan 14, 2015
+	ORGANIZATION	"Ericsson AB."
+	CONTACT-INFO
+		"	Ericsson AB.
+
+		Postal:	100 Headquarters Dr.
+			San Jose, CA  95134
+			USA
+
+		 Phone:	+1 408 750 5000
+		   Fax: +1 408 750 5599
+
+		"
+	DESCRIPTION
+		"The MIB used to genericially manage Environmental
+		Monitor functionality on network devices."
+               
+        REVISION        "201501141800Z" -- Jan 14, 2015
+        DESCRIPTION
+                "Updated RBN/rbn/Rbn as ERICSSON-ROUTER/eriRouter/EriRouter
+                 to migrate RBN MIB to ERICSSON MIB."
+
+        REVISION        "201210030000Z" -- October 3, 2012
+        DESCRIPTION
+                "Removed DISPLAY-HINT from EriRouterVoltage and EriRouterFanSpeed."
+
+        REVISION        "201101191800Z" -- Jan 19, 2011
+        DESCRIPTION
+                "Update CONTACT-INFO & ORGANIZATION. "
+
+        REVISION        "201011110000Z" -- Nov 11, 2010
+        DESCRIPTION
+                "Add new Table eriRouterEntityTempSensorTable. This will display 
+                the TempSensor Details for all the entities. "
+
+	REVISION	"200601160000Z" -- January 16, 2006
+	DESCRIPTION
+		"Add textual convention EriRouterFanSpeed.  Add new OIDs:
+			eriRouterFanUnitID
+			eriRouterFanUnitDescr
+			eriRouterFanSpeedCurrent
+			eriRouterEnvMonFanSpeedObjectGroup
+			eriRouterEnvMonMIBComplianceV4
+		"
+	REVISION	"200206050000Z" -- June 5, 2002
+	DESCRIPTION
+		"Update/correct CONTACT-INFO. Fix syntax errors on IMPORTS list,
+		ranges on Integer32, and size for DisplayString types.
+		Restore the incorrectly deprecated OIDs to current, since they
+		are still supported."
+	REVISION        "200107250000Z" -- July 25, 2001
+	DESCRIPTION
+		"Added new OIDs:
+			eriRouterFanStatus
+			eriRouterPowerStatus
+			eriRouterFanStatusChange
+			eriRouterPowerStatusChange
+			eriRouterEnvMonMIBObjectGroupV2
+			eriRouterEnvMonMIBNotificationGroupV2
+			eriRouterEnvMonMIBComplianceV3
+		 Deprecated the OIDs:
+			eriRouterFanFail
+			eriRouterPowerFail
+			eriRouterFanFailChange
+			eriRouterPowerFailChange
+			eriRouterEnvMonMIBObjectGroup
+			eriRouterEnvMonMIBNotificationGroup
+			eriRouterEnvMonMIBComplianceV2
+		"
+	REVISION	"200004240000Z" -- May 24, 2000
+	DESCRIPTION
+		"Added voltage and temperature sensor tables."
+
+	REVISION	"199903100000Z" -- Mar 10, 1999
+	DESCRIPTION
+            "Initial version."
+	::= { eriRouterMgmt 4 }
+
+eriRouterEnvMonMIBNotifications OBJECT IDENTIFIER
+	::= { eriRouterEnvMonMIB 0 }
+
+eriRouterEnvMonMIBObjects OBJECT IDENTIFIER
+	::= { eriRouterEnvMonMIB 1 }
+
+eriRouterEnvMonMIBConformance OBJECT IDENTIFIER
+	::= { eriRouterEnvMonMIB 2 }
+
+
+-- Textual Conventions
+
+EriRouterVoltage ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"Represents a voltage value. The value is millivolts.
+		 For example, a voltage of 5.5V would be represented
+		 by the value 5500."
+	SYNTAX       Unsigned32 (0..50000)
+
+EriRouterTemperature ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT "d"
+	STATUS       current
+	DESCRIPTION
+		"Represents a temperature, in degrees Celsius. In the
+		 unlikely event that the temperature to be reported is
+		 less than 0 degrees Celsius, a value of 0 will be
+		 used. Likewise, if the temperature is greater than
+		 100, a value of 100 will be used."
+	SYNTAX       Unsigned32 (0..100)
+
+EriRouterFanSpeed ::= TEXTUAL-CONVENTION
+	STATUS       current
+	DESCRIPTION
+		"Represents a fan speed value in units of Revolutions Per
+		Minute(RPM)."
+	SYNTAX       Unsigned32
+
+-- MIB Objects
+
+eriRouterFanStatusTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF EriRouterFanStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per fan test point.
+		Note that there is not necessarily a one-to-one
+		relationship between fan test points and fan
+		assemblies; a single test point may be used to
+		monitor the status of multiple fans."
+	::= { eriRouterEnvMonMIBObjects 1 }
+
+eriRouterFanStatusEntry OBJECT-TYPE
+	SYNTAX	    EriRouterFanStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular fan test point"
+	INDEX	{ eriRouterFanIndex }
+	::= { eriRouterFanStatusTable 1 }
+
+EriRouterFanStatusEntry ::= SEQUENCE {
+	eriRouterFanIndex	Integer32,
+	eriRouterFanDescr	DisplayString,
+	eriRouterFanFail	TruthValue,
+	eriRouterFanStatus	INTEGER
+}
+
+eriRouterFanIndex OBJECT-TYPE
+	SYNTAX	    Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"The index of a fan test point."
+	::= { eriRouterFanStatusEntry 1 }
+
+eriRouterFanDescr OBJECT-TYPE
+	SYNTAX	    DisplayString(SIZE(0..32))
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of a fan test point.  If an instance of
+		this object is associated with a single fan assembly,
+		then the value of this object should be the same as the
+		name by which the assembly is normally referenced.  If
+		an instance is associated with multiple fan assemblies,
+		then the value of this object should contain the names
+		of all of the fan assemblies being monitored."
+	::= { eriRouterFanStatusEntry 2 }
+
+eriRouterFanFail OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The status of a fan test point.  If an instance of
+		this object has the value true, then a fan monitored
+		by the test point has failed.  If an instance of
+		this object has the value false, then the fan (or fans)
+		monitored by the test point are operational."
+	::= { eriRouterFanStatusEntry 3 }
+
+eriRouterFanStatus OBJECT-TYPE
+	SYNTAX	    INTEGER {
+			normal(1),
+			failed(2),
+			absent(3),
+			unknown(4)
+		    }
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of a fan test point.  If an instance of
+		this object has the value normal, then the fan (or 
+		fans) monitored by the test point is operational.  If
+		an instance of this object has the value failed, then 
+		the fan (or fans) monitored by the test point has 
+		failed. If an instance of this object has the value 
+		absent, then the fan (or fans) monitored by this test 
+		point is not present. If an instance of this object has
+		the value unknown, then the test point is unable to
+		monitor the fan (or fans)."
+	::= { eriRouterFanStatusEntry 4 }
+
+eriRouterPowerStatusTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF EriRouterPowerStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per power test point.
+		Note that there is not necessarily a one-to-one
+		relationship between power test points and power
+		supply assemblies; a single test point may be used
+		to monitor the status of multiple power supplies."
+	::= { eriRouterEnvMonMIBObjects 2 }
+
+eriRouterPowerStatusEntry OBJECT-TYPE
+	SYNTAX	    EriRouterPowerStatusEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular power test point"
+	INDEX	{ eriRouterPowerIndex }
+	::= { eriRouterPowerStatusTable 1 }
+
+EriRouterPowerStatusEntry ::= SEQUENCE {
+	eriRouterPowerIndex	Integer32,
+	eriRouterPowerDescr	DisplayString,
+	eriRouterPowerFail	TruthValue,
+	eriRouterPowerStatus	INTEGER
+}
+
+eriRouterPowerIndex OBJECT-TYPE
+	SYNTAX	    Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"The index of a power test point."
+	::= { eriRouterPowerStatusEntry 1 }
+
+eriRouterPowerDescr OBJECT-TYPE
+	SYNTAX	    DisplayString(SIZE(0..32))
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of a power supply test point.  If an
+		instance of this object is associated with a single
+		power supply assembly, then the value of this object
+		should be the same as the name by which the assembly
+		is normally referenced.  If an instance is associated
+		with multiple power supply assemblies, then the value
+		of this object should contain the names of all of the
+		power supply assemblies being monitored."
+	::= { eriRouterPowerStatusEntry 2 }
+
+eriRouterPowerFail OBJECT-TYPE
+	SYNTAX	    TruthValue
+	MAX-ACCESS  read-only
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The status of a power test point.  If an instance of
+		this object has the value true, then a power supply
+		monitored by the test point has failed.  If an instance
+		of this object has the value false, then the power
+		supply (or supplies) monitored by the test point are
+		operational."
+	::= { eriRouterPowerStatusEntry 3 }
+
+eriRouterPowerStatus OBJECT-TYPE
+	SYNTAX	    INTEGER {
+			normal(1),
+			failed(2),
+			absent(3),
+			unknown(4)
+		    }
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of a power test point.  If an instance of
+		this object has the value normal, then the power 
+		supply (or supplies) monitored by the test point is 
+		operational.  If an instance of this object has the 
+		value failed, then the power supply (or supplies)
+		monitored by the test point has failed. If an instance
+		of this object has the value absent, then the power
+		supply (or supplies) monitored by this test point is 
+		not present. If an instance of this object has
+		the value unknown, then the test point is unable to
+		monitor the power supply (or supplies)."
+	::= { eriRouterPowerStatusEntry 4 }
+
+eriRouterVoltageSensorTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF EriRouterVoltageSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per voltage test point.
+		 Each physical entity (e.g. cards) in the system may
+		 contain zero or more voltage test points."
+	::= { eriRouterEnvMonMIBObjects 3 }
+
+eriRouterVoltageSensorEntry OBJECT-TYPE
+	SYNTAX	EriRouterVoltageSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular voltage test point."
+	INDEX	{ entPhysicalIndex, eriRouterVoltageIndex }
+	::= { eriRouterVoltageSensorTable 1 }
+
+EriRouterVoltageSensorEntry ::= SEQUENCE {
+	eriRouterVoltageIndex   Integer32,
+	eriRouterVoltageDescr   DisplayString,
+	eriRouterVoltageDesired EriRouterVoltage,
+	eriRouterVoltageCurrent EriRouterVoltage
+}
+
+eriRouterVoltageIndex OBJECT-TYPE
+	SYNTAX      Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An arbitrary value which uniquely identifies a
+		 voltage test point on a particular physical entity.
+		 Index values for different test points are not
+		 necessarily contiguous."
+	::= { eriRouterVoltageSensorEntry 1 }
+
+eriRouterVoltageDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..48))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The description of a voltage test point. Typically
+		 an instance of this object will hold a user-friendly
+		 description of the physical entity and the level of
+		 voltage being monitored by this test point."
+	::= { eriRouterVoltageSensorEntry 2 }
+
+eriRouterVoltageDesired OBJECT-TYPE
+	SYNTAX      EriRouterVoltage
+	UNITS	    "millivolts"
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The desired voltage level for this test point. If
+		 the monitored voltage level (eriRouterVoltageCurrent) is
+		 equal to this value, then the system is performing
+		 as designed."
+	::= { eriRouterVoltageSensorEntry 3 }
+
+eriRouterVoltageCurrent OBJECT-TYPE
+	SYNTAX      EriRouterVoltage
+	UNITS	    "millivolts"
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The current voltage level at this test point."
+	::= { eriRouterVoltageSensorEntry 4 }
+
+eriRouterCpuTempSensorTable OBJECT-TYPE
+	SYNTAX      SEQUENCE OF EriRouterCpuTempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    deprecated 
+	DESCRIPTION
+		"This table contains one row per CPU temperature
+		 sensor. Each physical entity in the system may have
+		 zero or more CPUs. Each of those CPUs that has a
+		 temperature sensor will show up here."
+	::= { eriRouterEnvMonMIBObjects 4 }
+
+eriRouterCpuTempSensorEntry OBJECT-TYPE
+	SYNTAX      EriRouterCpuTempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    deprecated 
+	DESCRIPTION
+		"Information about a particular CPU temperature test
+		 point."
+	INDEX   { entPhysicalIndex, eriRouterCpuTempIndex }
+	::= { eriRouterCpuTempSensorTable 1 }
+
+EriRouterCpuTempSensorEntry ::= SEQUENCE {
+	eriRouterCpuTempIndex   Integer32,
+	eriRouterCpuTempDescr   DisplayString,
+	eriRouterCpuTempCurrent EriRouterTemperature
+}
+
+eriRouterCpuTempIndex OBJECT-TYPE
+	SYNTAX      Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    deprecated
+	DESCRIPTION
+		"An arbitrary value which uniquely identifies a CPU on
+		 a particular physical entity.  Index values for
+		 different CPUs are not necessarily contiguous."
+	::= { eriRouterCpuTempSensorEntry 1 }
+
+eriRouterCpuTempDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..48))
+	MAX-ACCESS  read-only
+	STATUS	    deprecated
+	DESCRIPTION
+		"The description of a CPU temperature test
+		 point. Typically an instance of this object will hold
+		 a user-friendly description of the physical entity
+		 and a description of the CPU being monitored by this
+		 test point."
+	::= { eriRouterCpuTempSensorEntry 2 }
+
+eriRouterCpuTempCurrent OBJECT-TYPE
+	SYNTAX      EriRouterTemperature
+	UNITS	    "degrees"
+	MAX-ACCESS  read-only
+	STATUS	    deprecated
+	DESCRIPTION
+		"The current temperature of this CPU."
+	::= { eriRouterCpuTempSensorEntry 3 }
+
+eriRouterFanSpeedTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF EriRouterFanSpeedEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This table contains one row per fan unit within a fan
+		test point."
+	::= { eriRouterEnvMonMIBObjects 5 }
+
+eriRouterFanSpeedEntry OBJECT-TYPE
+	SYNTAX	    EriRouterFanSpeedEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"Information about a particular fan unit within a fan
+                test point."
+	INDEX	{ eriRouterFanIndex, eriRouterFanUnitID }
+	::= { eriRouterFanSpeedTable 1 }
+
+EriRouterFanSpeedEntry ::= SEQUENCE {
+	eriRouterFanUnitID	    Integer32,
+	eriRouterFanUnitDescr	    DisplayString,
+	eriRouterFanSpeedCurrent  EriRouterFanSpeed
+}
+
+eriRouterFanUnitID OBJECT-TYPE
+	SYNTAX	    Integer32(1..2147483647)
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"This is the fan identification number that describes the
+		specific location of the fan unit within a fan test point."
+	::= { eriRouterFanSpeedEntry 1 }
+
+eriRouterFanUnitDescr OBJECT-TYPE
+	SYNTAX	    DisplayString(SIZE(0..32))
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of the fan unit within a fan test point."
+	::= { eriRouterFanSpeedEntry 2 }
+
+eriRouterFanSpeedCurrent OBJECT-TYPE
+	SYNTAX	    EriRouterFanSpeed
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The current speed of this fan unit."
+	::= { eriRouterFanSpeedEntry 3 }
+
+eriRouterEntityTempSensorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EriRouterEntityTempSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "This table contains one row per temperature
+                 sensor on the physical entity."
+        ::= { eriRouterEnvMonMIBObjects 6 }
+
+eriRouterEntityTempSensorEntry OBJECT-TYPE
+        SYNTAX      EriRouterEntityTempSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Information about a particular temperature test
+                 point."
+        INDEX   { entPhysicalIndex, eriRouterEntityTempIndex }
+        ::= { eriRouterEntityTempSensorTable 1 }
+
+EriRouterEntityTempSensorEntry ::= SEQUENCE {
+        eriRouterEntityTempIndex   Integer32,
+        eriRouterEntityTempDescr   DisplayString,
+        eriRouterEntityTempCurrent EriRouterTemperature
+}
+
+eriRouterEntityTempIndex OBJECT-TYPE
+        SYNTAX      Integer32(1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "An arbitrary value which uniquely identifies a
+                 particular physical entity.  Index values are 
+                 not necessarily contiguous."
+        ::= { eriRouterEntityTempSensorEntry 1 }
+
+eriRouterEntityTempDescr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..48))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The description of a temperature test
+                 point. Typically an instance of this object will hold
+                 a user-friendly description of the physical entity
+                 being monitored by this test point."
+        ::= { eriRouterEntityTempSensorEntry 2 }
+
+eriRouterEntityTempCurrent OBJECT-TYPE
+        SYNTAX      EriRouterTemperature
+        UNITS       "degrees Celsius"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The current temperature of this entity in degrees Celsius."
+        ::= { eriRouterEntityTempSensorEntry 3 }
+
+-- Notifications
+
+eriRouterFanFailChange NOTIFICATION-TYPE
+	OBJECTS	    { eriRouterFanFail }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A eriRouterFanFailChange notification signifies
+		that the value of an instance of eriRouterFanFail
+		has changed."
+	::= { eriRouterEnvMonMIBNotifications 1 }
+
+eriRouterPowerFailChange NOTIFICATION-TYPE
+	OBJECTS	    { eriRouterPowerFail }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A eriRouterPowerFailChange notification signifies
+		that the value of an instance of eriRouterPowerFail
+		has changed"
+	::= { eriRouterEnvMonMIBNotifications 2 }
+
+eriRouterFanStatusChange NOTIFICATION-TYPE
+	OBJECTS	    { eriRouterFanStatus }
+	STATUS	    current
+	DESCRIPTION
+		"A eriRouterFanStatusChange notification signifies
+		that the value of an instance of eriRouterFanStatus
+		has changed."
+	::= { eriRouterEnvMonMIBNotifications 3 }
+
+eriRouterPowerStatusChange NOTIFICATION-TYPE
+	OBJECTS	    { eriRouterPowerStatus }
+	STATUS	    current
+	DESCRIPTION
+		"A eriRouterPowerStatusChange notification signifies
+		that the value of an instance of eriRouterPowerStatus
+		has changed"
+	::= { eriRouterEnvMonMIBNotifications 4 }
+
+-- Conformance Statements
+
+eriRouterEnvMonMIBGroups OBJECT IDENTIFIER
+	::= { eriRouterEnvMonMIBConformance 1 }
+
+eriRouterEnvMonMIBCompliances OBJECT IDENTIFIER
+	::= { eriRouterEnvMonMIBConformance 2 }
+
+eriRouterEnvMonMIBObjectGroup OBJECT-GROUP
+	OBJECTS	    {	eriRouterFanDescr, eriRouterFanFail,
+			eriRouterPowerDescr, eriRouterPowerFail
+		    }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A collection of objects providing
+		environmental monitor information."
+	::= { eriRouterEnvMonMIBGroups 1 }
+
+eriRouterEnvMonMIBNotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {	eriRouterFanFailChange,
+			eriRouterPowerFailChange
+		    }
+	STATUS	    deprecated 
+	DESCRIPTION
+		"A collection of notifications providing
+		fan and power environmental monitor information."
+	::= { eriRouterEnvMonMIBGroups 2 }
+
+eriRouterEnvMonVoltageObjectGroup OBJECT-GROUP
+	OBJECTS	    {	eriRouterVoltageDescr, eriRouterVoltageDesired,
+			eriRouterVoltageCurrent
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing voltage
+		environmental monitor information."
+	::= { eriRouterEnvMonMIBGroups 3 }
+
+eriRouterEnvMonTempObjectGroup OBJECT-GROUP
+	OBJECTS	    {	eriRouterCpuTempDescr, eriRouterCpuTempCurrent
+		    }
+	STATUS	   deprecated   
+	DESCRIPTION
+		"A collection of objects providing temperature
+		environmental monitor information."
+	::= { eriRouterEnvMonMIBGroups 4 }
+
+eriRouterEnvMonMIBObjectGroupV2 OBJECT-GROUP
+	OBJECTS	    {	eriRouterFanDescr, eriRouterFanStatus,
+			eriRouterPowerDescr, eriRouterPowerStatus
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing
+		environmental monitor information."
+	::= { eriRouterEnvMonMIBGroups 5 }
+
+eriRouterEnvMonMIBNotificationGroupV2 NOTIFICATION-GROUP
+	NOTIFICATIONS {	eriRouterFanStatusChange,
+			eriRouterPowerStatusChange
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of notifications providing
+		fan and power environmental monitor information."
+	::= { eriRouterEnvMonMIBGroups 6 }
+
+eriRouterEnvMonFanSpeedObjectGroup OBJECT-GROUP
+	OBJECTS	    {	eriRouterFanUnitDescr, eriRouterFanSpeedCurrent
+		    }
+	STATUS	    current
+	DESCRIPTION
+		"A collection of objects providing fan speed
+		environmental monitor information."
+	::= { eriRouterEnvMonMIBGroups 7 }
+
+eriRouterEnvMonEntityObjectGroup OBJECT-GROUP
+        OBJECTS     {   eriRouterEntityTempDescr, eriRouterEntityTempCurrent
+                    }
+        STATUS      current
+        DESCRIPTION
+                "A collection of objects providing fan speed
+                environmental monitor information."
+        ::= { eriRouterEnvMonMIBGroups 8 }
+
+eriRouterEnvMonMIBCompliance MODULE-COMPLIANCE
+	STATUS	    obsolete
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+	MODULE	    -- this module
+	GROUP	    eriRouterEnvMonMIBObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    eriRouterEnvMonMIBNotificationGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	::= { eriRouterEnvMonMIBCompliances 1 }
+
+eriRouterEnvMonMIBComplianceV2 MODULE-COMPLIANCE
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+
+	MODULE	    -- this module
+	GROUP	    eriRouterEnvMonMIBObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    eriRouterEnvMonMIBNotificationGroup
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    eriRouterEnvMonVoltageObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system voltages."
+	GROUP	    eriRouterEnvMonTempObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system temperatures."
+	::= { eriRouterEnvMonMIBCompliances 2 }
+
+eriRouterEnvMonMIBComplianceV3 MODULE-COMPLIANCE
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+	MODULE	    -- this module
+	GROUP	    eriRouterEnvMonMIBObjectGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    eriRouterEnvMonMIBNotificationGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    eriRouterEnvMonVoltageObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system voltages."
+	GROUP	    eriRouterEnvMonTempObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system temperatures."
+	::= { eriRouterEnvMonMIBCompliances 3 }
+
+eriRouterEnvMonMIBComplianceV4 MODULE-COMPLIANCE
+	STATUS	    deprecated 
+	DESCRIPTION
+		"The compliance statement for the EnvMon MIB"
+	MODULE	    -- this module
+	GROUP	    eriRouterEnvMonMIBObjectGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    eriRouterEnvMonMIBNotificationGroupV2
+	DESCRIPTION
+		"This group is mandatory for devices which contain
+		Environmental Monitoring capabilities"
+	GROUP	    eriRouterEnvMonVoltageObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system voltages."
+	GROUP	    eriRouterEnvMonTempObjectGroup
+	DESCRIPTION
+		"This group is mandatory for devices which are capable
+		 of sensing system temperatures."
+	GROUP	    eriRouterEnvMonFanSpeedObjectGroup
+	DESCRIPTION
+		"This group is mandatory for SNMP entities which are
+                capable of sensing fan speeds."
+	::= { eriRouterEnvMonMIBCompliances 4 }
+
+
+eriRouterEnvMonMIBComplianceV5 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+                "The compliance statement for the EnvMon MIB"
+        MODULE      -- this module
+        GROUP       eriRouterEnvMonMIBObjectGroupV2
+        DESCRIPTION
+                "This group is mandatory for devices which contain
+                Environmental Monitoring capabilities"
+        GROUP       eriRouterEnvMonMIBNotificationGroupV2
+        DESCRIPTION
+                "This group is mandatory for devices which contain
+                Environmental Monitoring capabilities"
+        GROUP       eriRouterEnvMonVoltageObjectGroup
+        DESCRIPTION
+                "This group is mandatory for devices which are capable
+                 of sensing system voltages."
+        GROUP       eriRouterEnvMonFanSpeedObjectGroup
+        DESCRIPTION
+                "This group is mandatory for SNMP entities which are
+                capable of sensing fan speeds."
+        GROUP       eriRouterEnvMonEntityObjectGroup
+        DESCRIPTION
+                "This group is mandatory for devices which contain
+                Environmental Monitoring capabilities, also applicable to SSE
+                card and disks"
+
+        ::= { eriRouterEnvMonMIBCompliances 5 }
+
+END

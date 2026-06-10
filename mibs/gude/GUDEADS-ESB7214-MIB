@@ -1,0 +1,876 @@
+GUDEADS-ESB7214-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202211230917Z"	-- Nov 23, 2022, 9:17:00 AM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude.info"
+	DESCRIPTION
+		"Expert Power Control 7214 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+esb7214ExtInputs OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.6.2
+	::= { esb7214ExtSensors 2 }
+
+esb7214ExtInputEntry OBJECT-TYPE
+	SYNTAX  Esb7214ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		esb7214ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.67.1.6.2.2.1
+	::= { esb7214ExtInputTable 1 }
+
+
+Esb7214ExtInputEntry ::= SEQUENCE {
+
+	esb7214ExtInputIndex      Unsigned32,
+	esb7214ExtInput           INTEGER,
+	esb7214ExtInputName       OCTET STRING,
+	esb7214ExtInputPortNum    Integer32,
+	esb7214ExtInputBlockIndex Integer32 }
+
+
+esb7214ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.67.1.6.2.2.1.2
+	::= { esb7214ExtInputEntry 2 }
+
+
+esb7214ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.67.1.6.2.1
+	::= { esb7214ExtInputs 1 }
+
+
+esb7214ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7214ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.67.1.6.2.2
+	::= { esb7214ExtInputs 2 }
+
+
+esb7214ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.67.1.6.2.2.1.1
+	::= { esb7214ExtInputEntry 1 }
+
+
+esb7214ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.67.1.6.2.2.1.32
+	::= { esb7214ExtInputEntry 32 }
+
+
+esb7214ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.67.1.6.2.2.1.33
+	::= { esb7214ExtInputEntry 33 }
+
+
+esb7214ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.67.1.6.2.2.1.34
+	::= { esb7214ExtInputEntry 34 }
+
+
+esb7214PortResetDuration OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for turning Port on again after Reset action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.8
+	::= { esb7214portEntry 8 }
+
+
+esb7214NTPClient OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.5.15
+	::= { esb7214IntSensors 15 }
+
+esb7214NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.67.1.5.15.2
+	::= { esb7214NTPClient 2 }
+
+
+esb7214NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.67.1.5.15.3
+	::= { esb7214NTPClient 3 }
+
+
+esb7214NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.67.1.5.15.1
+	::= { esb7214NTPClient 1 }
+
+
+esb7214InputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.67.1.5.6.2.1.32
+	::= { esb7214InputEntry 32 }
+
+
+esb7214ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.32
+	::= { esb7214SensorEntry 32 }
+
+
+esb7214PwrSupplyTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7214PwrSupplyEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"Power Supply Table - shows if Power Supply is avail"
+	-- 1.3.6.1.4.1.28507.67.1.5.13
+	::= { esb7214IntSensors 13 }
+
+
+esb7214PwrSupplyEntry OBJECT-TYPE
+	SYNTAX  Esb7214PwrSupplyEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		esb7214PwrSupplyIndex }
+	-- 1.3.6.1.4.1.28507.67.1.5.13.1
+	::= { esb7214PwrSupplyTable 1 }
+
+
+Esb7214PwrSupplyEntry ::= SEQUENCE {
+
+	esb7214PwrSupplyIndex  Integer32,
+	esb7214PwrSupplyStatus INTEGER }
+
+
+esb7214PwrSupplyIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..2)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Index of Power Supply entries"
+	-- 1.3.6.1.4.1.28507.67.1.5.13.1.1
+	::= { esb7214PwrSupplyEntry 1 }
+
+
+esb7214PwrSupplyStatus OBJECT-TYPE
+	SYNTAX  INTEGER {
+			up(1),
+			down(0) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"shows status of the Power Supply
+		1 = fst, 2 = snd etc."
+	-- 1.3.6.1.4.1.28507.67.1.5.13.1.2
+	::= { esb7214PwrSupplyEntry 2 }
+
+
+esb7214relayports OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.3.1
+	::= { esb7214IntActors 1 }
+
+esb7214portNumber OBJECT-TYPE
+	SYNTAX  Integer32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The number of Relay Ports"
+	-- 1.3.6.1.4.1.28507.67.1.3.1.1
+	::= { esb7214relayports 1 }
+
+
+-- the Interfaces table
+-- The Interfaces table contains information on the entity's
+-- interfaces.  Each sub-layer below the internetwork-layer
+-- of a network interface is considered to be an interface.
+
+esb7214portTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7214portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all ENC Relay Ports"
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2
+	::= { esb7214relayports 2 }
+
+
+esb7214portEntry OBJECT-TYPE
+	SYNTAX  Esb7214portEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		particular relay port."
+	INDEX {
+		esb7214PortIndex }
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1
+	::= { esb7214portTable 1 }
+
+
+Esb7214portEntry ::= SEQUENCE {
+
+	esb7214PortIndex         Integer32,
+	esb7214PortName          OCTET STRING,
+	esb7214PortState         INTEGER,
+	esb7214PortSwitchCount   Integer32,
+	esb7214PortStartupMode   INTEGER,
+	esb7214PortStartupDelay  Integer32,
+	esb7214PortRepowerTime   Integer32,
+	esb7214PortResetDuration Integer32 }
+
+
+esb7214PortIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each Relay Port."
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.1
+	::= { esb7214portEntry 1 }
+
+
+esb7214PortName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..15))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a Relay Port."
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.2
+	::= { esb7214portEntry 2 }
+
+
+esb7214PortState OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"current state of a Relay Port"
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.3
+	::= { esb7214portEntry 3 }
+
+
+esb7214PortSwitchCount OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"The total number of switch actions ocurred on a Relay Port.
+		Does not count switch commands which will not switch
+		the ralay state, so just real relay switches are displayed here."
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.4
+	::= { esb7214portEntry 4 }
+
+
+esb7214PortStartupMode OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1),
+			laststate(2) }
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"set Mode of startup sequence (off, on , remember last state)"
+	DEFVAL { off }
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.5
+	::= { esb7214portEntry 5 }
+
+
+esb7214PortStartupDelay OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for startup action"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.6
+	::= { esb7214portEntry 6 }
+
+
+esb7214PortRepowerTime OBJECT-TYPE
+	SYNTAX  Integer32 (0..65535)
+	UNITS	"seconds"
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"Delay in sec for repower port after switching off"
+	DEFVAL { 0 }
+	-- 1.3.6.1.4.1.28507.67.1.3.1.2.1.7
+	::= { esb7214portEntry 7 }
+
+
+esb7214AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1 hPA (hectopascal) ~ 1 milibar"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.5
+	::= { esb7214SensorEntry 5 }
+
+
+esb7214DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree Celsius"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.6
+	::= { esb7214SensorEntry 6 }
+
+
+esb7214DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree Celsius"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.7
+	::= { esb7214SensorEntry 7 }
+
+
+esb7214POE OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	UNITS	"0 = no POE, 1 = POE available"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"signals POE availability"
+	-- 1.3.6.1.4.1.28507.67.1.5.10
+	::= { esb7214IntSensors 10 }
+
+
+
+esb7214POEEvt NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214POE}
+	STATUS  current
+	DESCRIPTION
+		"Power over Ethernet changed"
+	-- 1.3.6.1.4.1.28507.67.3.8
+	::= { events 8 }
+
+gadsESB7214 OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67
+	::= { gudeads 67 }
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.3
+	::= { gadsESB7214 3 }
+
+-- Scalars and Tables
+--
+
+esb7214Objects OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1
+	::= { gadsESB7214 1 }
+
+esb7214CommonConfig OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.1
+	::= { esb7214Objects 1 }
+
+esb7214SNMPaccess OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.1.1
+	::= { esb7214CommonConfig 1 }
+
+esb7214TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.67.1.1.1.1
+	::= { esb7214SNMPaccess 1 }
+
+
+esb7214TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7214TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.67.1.1.1.2
+	::= { esb7214SNMPaccess 2 }
+
+
+esb7214TrapIPEntry OBJECT-TYPE
+	SYNTAX  Esb7214TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		esb7214TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.67.1.1.1.2.1
+	::= { esb7214TrapIPTable 1 }
+
+
+Esb7214TrapIPEntry ::= SEQUENCE {
+
+	esb7214TrapIPIndex Integer32,
+	esb7214TrapAddr    OCTET STRING }
+
+
+esb7214TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.67.1.1.1.2.1.1
+	::= { esb7214TrapIPEntry 1 }
+
+
+esb7214TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.67.1.1.1.2.1.2
+	::= { esb7214TrapIPEntry 2 }
+
+
+esb7214DeviceConfig OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.2
+	::= { esb7214Objects 2 }
+
+esb7214IntActors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.3
+	::= { esb7214Objects 3 }
+
+esb7214ExtActors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.4
+	::= { esb7214Objects 4 }
+
+esb7214IntSensors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.5
+	::= { esb7214Objects 5 }
+
+esb7214ExtSensors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.6
+	::= { esb7214Objects 6 }
+
+esb7214SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7214SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.67.1.6.1
+	::= { esb7214ExtSensors 1 }
+
+
+esb7214SensorEntry OBJECT-TYPE
+	SYNTAX  Esb7214SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		esb7214SensorIndex }
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1
+	::= { esb7214SensorTable 1 }
+
+
+Esb7214SensorEntry ::= SEQUENCE {
+
+	esb7214SensorIndex   Integer32,
+	esb7214TempSensor    Integer32,
+	esb7214HygroSensor   Integer32,
+	esb7214InputSensor   INTEGER,
+	esb7214AirPressure   Integer32,
+	esb7214DewPoint      Integer32,
+	esb7214DewPointDiff  Integer32,
+	esb7214ExtSensorName OCTET STRING }
+
+
+esb7214SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..4)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.1
+	::= { esb7214SensorEntry 1 }
+
+
+esb7214TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree Celsius"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.2
+	::= { esb7214SensorEntry 2 }
+
+
+esb7214HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.3
+	::= { esb7214SensorEntry 3 }
+
+
+esb7214InputSensor OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"logical state of input sensor"
+	-- 1.3.6.1.4.1.28507.67.1.6.1.1.4
+	::= { esb7214SensorEntry 4 }
+
+
+-- Conformance
+--
+
+esb7214Conf OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.2
+	::= { gadsESB7214 2 }
+
+-- Groups
+--
+
+esb7214Groups OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.2.1
+	::= { esb7214Conf 1 }
+
+-- Compliance
+--
+
+esb7214Compls OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.2.2
+	::= { esb7214Conf 2 }
+
+esb7214BasicGroup OBJECT-GROUP
+	OBJECTS {
+		esb7214TrapCtrl,
+		esb7214TrapIPIndex,
+		esb7214TrapAddr,
+		esb7214portNumber,
+		esb7214PortIndex,
+		esb7214PortName,
+		esb7214PortState,
+		esb7214PortSwitchCount,
+		esb7214PortStartupMode,
+		esb7214PortStartupDelay,
+		esb7214PortRepowerTime,
+		esb7214ActiveInputs,
+		esb7214InputIndex,
+		esb7214Input,
+		esb7214POE,
+		esb7214SensorIndex,
+		esb7214TempSensor,
+		esb7214HygroSensor,
+		esb7214InputSensor,
+		esb7214AirPressure,
+		esb7214DewPoint,
+		esb7214DewPointDiff,
+		esb7214PwrSupplyIndex,
+		esb7214PwrSupplyStatus,
+		esb7214ExtSensorName,
+		esb7214InputName,
+		esb7214NTPTimeValid,
+		esb7214NTPUnixTime,
+		esb7214NTPLastValidTimestamp,
+		esb7214PortResetDuration,
+		esb7214ExtActiveInputs,
+		esb7214ExtInputIndex,
+		esb7214ExtInput,
+		esb7214ExtInputName,
+		esb7214ExtInputPortNum,
+		esb7214ExtInputBlockIndex }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.67.2.1.1
+	::= { esb7214Groups 1 }
+
+esb7214NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		esb7214InputEvt,
+		esb7214TempEvtSen,
+		esb7214HygroEvtSen,
+		esb7214InputEvtSen,
+		esb7214AirPressureEvtSen,
+		esb7214DewPtDiffEvtSen,
+		esb7214POEEvt,
+		esb7214SwitchEvtPort,
+		esb7214PwrSupplyChangeEvt,
+		esb7214ExtInputEvt }
+	STATUS  current
+	DESCRIPTION
+		""
+	-- 1.3.6.1.4.1.28507.67.2.1.2
+	::= { esb7214Groups 2 }
+
+esb7214Inputs OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.67.1.5.6
+	::= { esb7214IntSensors 6 }
+
+esb7214InputEntry OBJECT-TYPE
+	SYNTAX  Esb7214InputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		esb7214InputIndex }
+	-- 1.3.6.1.4.1.28507.67.1.5.6.2.1
+	::= { esb7214InputTable 1 }
+
+
+Esb7214InputEntry ::= SEQUENCE {
+
+	esb7214InputIndex Integer32,
+	esb7214Input      INTEGER,
+	esb7214InputName  OCTET STRING }
+
+
+esb7214Input OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.67.1.5.6.2.1.2
+	::= { esb7214InputEntry 2 }
+
+
+
+esb7214InputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214InputIndex,
+		esb7214Input}
+	STATUS  current
+	DESCRIPTION
+		"Change of device input."
+	-- 1.3.6.1.4.1.28507.67.3.2
+	::= { events 2 }
+
+esb7214ActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.67.1.5.6.1
+	::= { esb7214Inputs 1 }
+
+
+esb7214InputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7214InputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.67.1.5.6.2
+	::= { esb7214Inputs 2 }
+
+
+esb7214InputIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.67.1.5.6.2.1.1
+	::= { esb7214InputEntry 1 }
+
+
+
+esb7214HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214SensorIndex,
+		esb7214HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.67.3.4
+	::= { events 4 }
+
+
+esb7214InputEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214SensorIndex,
+		esb7214InputSensor}
+	STATUS  current
+	DESCRIPTION
+		"change of logical input sensor state"
+	-- 1.3.6.1.4.1.28507.67.3.5
+	::= { events 5 }
+
+
+esb7214AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214SensorIndex,
+		esb7214AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.67.3.6
+	::= { events 6 }
+
+
+esb7214DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214SensorIndex,
+		esb7214DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.67.3.7
+	::= { events 7 }
+
+
+esb7214TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214SensorIndex,
+		esb7214TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.67.3.3
+	::= { events 3 }
+
+
+esb7214SwitchEvtPort NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214PortIndex,
+		esb7214PortName,
+		esb7214PortState,
+		esb7214PortSwitchCount}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when a port is switched"
+	-- 1.3.6.1.4.1.28507.67.3.1
+	::= { events 1 }
+
+
+esb7214PwrSupplyChangeEvt NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214PwrSupplyIndex,
+		esb7214PwrSupplyStatus}
+	STATUS  current
+	DESCRIPTION
+		"Event is triggered when Power Supply state
+		changes"
+	-- 1.3.6.1.4.1.28507.67.3.9
+	::= { events 9 }
+
+
+esb7214ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		esb7214ExtInputIndex,
+		esb7214ExtInput,
+		esb7214ExtInputName,
+		esb7214ExtInputPortNum,
+		esb7214ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.67.3.10
+	-- 1.3.6.1.4.1.28507.67.3.25
+	::= { events 25 }
+
+END

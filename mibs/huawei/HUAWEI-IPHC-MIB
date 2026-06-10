@@ -1,0 +1,680 @@
+--  ====================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei IPHC MIB Definition
+-- Reference:   
+-- Version:     V1.0
+-- History:
+--              wanglili create first version v1.0
+-- =====================================================================
+
+HUAWEI-IPHC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm            
+            FROM HUAWEI-MIB            
+        OBJECT-TYPE,  MODULE-IDENTITY, Counter64, Integer32, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI                                           -- [RFC2578]            
+        RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC                                            -- [RFC2579]            
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF                                          -- [RFC2580]          
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB                                   -- [RFC3411]
+        ifIndex         
+            FROM RFC1213-MIB
+        ifName
+            FROM IF-MIB                                               -- [RFC2233]
+        ;
+
+    hwIphcMIB MODULE-IDENTITY 
+        LAST-UPDATED "200707230000Z"        
+        ORGANIZATION 
+            "Huawei Technologies Co., Ltd."
+        CONTACT-INFO 
+            "R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com"
+        DESCRIPTION 
+            "HUAWEI-IPHC-MIB is a private MIB defined by Huawei. 
+            It describes the configurations, configuration status, 
+            and statistics of IP packet header compression.
+            "
+        ::= { hwDatacomm 154 }
+
+--            
+--Textual conventions
+--
+
+--HWCompressType         
+    HWCompressType ::= TEXTUAL-CONVENTION
+        STATUS  current  
+        DESCRIPTION
+            "The Compress type:
+                withoutCompress(1),
+                enableTcpCompress(2),
+                enableRtpCompress(3),
+                enableEcRtpCompress(4),
+                enableUdpCompressOnly(5),
+                enableUdpandRtpCompressOnly(6)
+            "
+        SYNTAX  INTEGER { 
+            withoutCompress(1),
+            enableTcpCompress(2),
+            enableRtpCompress(3),
+            enableEcRtpCompress(4),
+            enableUdpCompressOnly(5),
+            enableUdpandRtpCompressOnly(6)
+             }
+
+--Compress packet in ietf-format or not     
+    HWCompressFormat ::= TEXTUAL-CONVENTION
+        STATUS  current  
+        DESCRIPTION
+            "Compress packets in ietf-format(defined in RFC2507) or not  
+            "
+        SYNTAX  INTEGER { 
+            ietf(1),
+            nonstandard(2)
+             }
+
+--
+-- Config Node definitions
+--
+
+    hwIphcInfoObjects OBJECT IDENTIFIER ::= { hwIphcMIB 1 }
+
+    hwIphcTcpConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIphcTcpConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure the parameters of IP/TCP header compression."
+        ::= { hwIphcInfoObjects 1 }
+    
+    hwIphcTcpConfigEntry OBJECT-TYPE
+        SYNTAX HwIphcTcpConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in this table."
+        INDEX { hwIphcTcpIfIndex }
+        ::= { hwIphcTcpConfigTable 1 }
+    
+    HwIphcTcpConfigEntry ::=
+        SEQUENCE { 
+            hwIphcTcpIfIndex
+                Integer32,
+            hwIphcTcpEnable
+                HWCompressType,                
+            hwIphcTcpConnnectionNumber
+                Integer32,
+            hwIphcTcpRowStatus
+                RowStatus
+         }
+         
+    hwIphcTcpIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index of the interface enabled with IP/TCP header compression, the same as IfIndex of this interface. "
+        ::= { hwIphcTcpConfigEntry 1 }
+        
+    hwIphcTcpEnable OBJECT-TYPE
+        SYNTAX HWCompressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Identifies whether IP/TCP header compression is enabled on the interface. The default value is 2."
+        ::= { hwIphcTcpConfigEntry 2 }
+         
+    hwIphcTcpConnnectionNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The maximum number of IP/TCP header compression sessions on the interface.The default value is 16."
+        ::= { hwIphcTcpConfigEntry 3 }
+        
+
+    hwIphcTcpRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row status."
+        ::= { hwIphcTcpConfigEntry 4 }
+
+    hwIphcTcpConfigEffectTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIphcTcpConfigEffectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists the valid parameters of IP/TCP header compression on the interface after negotiation with the peer interface. "
+        ::= { hwIphcInfoObjects 2 }
+    
+    hwIphcTcpConfigEffectEntry OBJECT-TYPE
+        SYNTAX HwIphcTcpConfigEffectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in this table."
+        INDEX { hwIphcTcpIfIndex }
+        ::= { hwIphcTcpConfigEffectTable 1 }
+    
+    HwIphcTcpConfigEffectEntry ::=
+        SEQUENCE { 
+            hwIphcTcpEffectEnable
+                HWCompressType,                
+            hwIphcTcpEffectConnnectionNumber
+                Integer32
+         }
+         
+        
+    hwIphcTcpEffectEnable OBJECT-TYPE
+        SYNTAX HWCompressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Identifies whether the IP/TCP header compression is effective on the interface after negotiation with the peer interface. "
+        ::= { hwIphcTcpConfigEffectEntry 1 }
+         
+    hwIphcTcpEffectConnnectionNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of valid IP/TCP header compression sessions on the interface after negotiation with the peer interface. "
+        ::= { hwIphcTcpConfigEffectEntry 2 }
+        
+    hwIphcRtpConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIphcRtpConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure the parameters of IP/UDP or IP/UDP/RTP header compression."
+        ::= { hwIphcInfoObjects 3 }
+    
+    hwIphcRtpConfigEntry OBJECT-TYPE
+        SYNTAX HwIphcRtpConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in this table."
+        INDEX { hwIphcRtpIfIndex }
+        ::= { hwIphcRtpConfigTable 1 }
+    
+    HwIphcRtpConfigEntry ::=
+        SEQUENCE { 
+            hwIphcRtpIfIndex
+                Integer32,
+            hwIphcRtpEnable
+                HWCompressType,                
+            hwIphcRtpConnnectionNumber
+                Integer32,
+            hwIphcRtpNValue
+                Integer32,
+            hwIphcRtpFormatType
+                HWCompressFormat,
+            hwIphcRtpRowStatus
+                RowStatus
+         }
+         
+    hwIphcRtpIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Index of the interface enabled with IP/UDP or IP/UDP/RTP header compression, the same as IfIndex of this interface"
+        ::= { hwIphcRtpConfigEntry 1 }
+        
+    hwIphcRtpEnable OBJECT-TYPE
+        SYNTAX HWCompressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Identifies whether IP/UDP and IP/UDP/RTP header compression is enabled on the interface. "
+        ::= { hwIphcRtpConfigEntry 2 }
+         
+    hwIphcRtpConnnectionNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The maximum number of IP/UDP and IP/UDP/RTP header compression sessions on the interface."
+        ::= { hwIphcRtpConfigEntry 3 }
+
+    hwIphcRtpNValue OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The number of packet retransmissions when EcRTP is enabled on the interface."
+        ::= { hwIphcRtpConfigEntry 4 }
+
+    hwIphcRtpFormatType OBJECT-TYPE
+        SYNTAX HWCompressFormat
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Compressed packet format supported by the interface. "
+        ::= { hwIphcRtpConfigEntry 5 }
+                        
+    hwIphcRtpRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row status."
+        ::= { hwIphcRtpConfigEntry 6 }
+        
+    hwIphcRtpConfigEffectTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIphcRtpConfigEffectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists the valid parameters of IP/UDP and IP/UDP/RTP header compression on the interface after negotiation with the peer interface. "
+        ::= { hwIphcInfoObjects 4 }
+    
+    hwIphcRtpConfigEffectEntry OBJECT-TYPE
+        SYNTAX HwIphcRtpConfigEffectEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in this table."
+        INDEX { hwIphcRtpIfIndex }
+        ::= { hwIphcRtpConfigEffectTable 1 }
+    
+    HwIphcRtpConfigEffectEntry ::=
+        SEQUENCE { 
+            hwIphcRtpEffectEnable
+                HWCompressType,                
+            hwIphcRtpEffectConnnectionNumber
+                Integer32,
+            hwIphcRtpEffectNValue
+                Integer32
+                
+         }
+         
+    hwIphcRtpEffectEnable OBJECT-TYPE
+        SYNTAX HWCompressType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Identifies whether IP/UDP and IP/UDP/RTP header compression is effective on the interface after negotiation with the peer interface."
+        ::= { hwIphcRtpConfigEffectEntry 1 }
+         
+    hwIphcRtpEffectConnnectionNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of valid IP/UDP and IP/UDP/RTP header compression sessions on the interface."
+        ::= { hwIphcRtpConfigEffectEntry 2 }
+        
+    hwIphcRtpEffectNValue OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of packet retransmissions when EcRTP is enabled on the interface after negotiation with the peer interface."
+        ::= { hwIphcRtpConfigEffectEntry 3 }        
+
+-- 
+--  Statistics Node definitions
+-- 
+    hwIphcStatisticsObjects   OBJECT IDENTIFIER ::= { hwIphcMIB 2 }
+
+    hwIphcTcpRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIphcTcpRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists statistics on IP/TCP header compression."
+        ::= { hwIphcStatisticsObjects 1 }
+    
+    hwIphcTcpRunInfoEntry OBJECT-TYPE
+        SYNTAX HwIphcTcpRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in this table."
+        INDEX { hwIphcTcpIfIndex }
+        ::= { hwIphcTcpRunInfoTable 1 }
+    
+    HwIphcTcpRunInfoEntry ::=
+        SEQUENCE { 
+            hwIphcTcpSentTotalPackets
+                Counter64,
+            hwIphcTcpSentTotalBytes
+                Counter64,                
+            hwIphcTcpSentCompressPackets
+                Counter64,
+            hwIphcTcpSentCompressBytes
+                Counter64,
+            hwIphcTcpSavedBytes
+                Counter64,
+            hwIphcTcpCompressRatio
+                Integer32,
+            hwIphcTcpReceivedTotalPackets
+                Counter64,
+            hwIphcTcpReceivedCompressPackets
+                Counter64,
+            hwIphcTcpReceivedCompressErrorPackets
+                Counter64,
+            hwIphcTcpReceivedCompressDiscardPackets
+                Counter64                                             
+         }
+         
+    hwIphcTcpSentTotalPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of sent packets with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 1 }
+                
+    hwIphcTcpSentTotalBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of the bytes of sent packets with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 2 }
+                
+    hwIphcTcpSentCompressPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of compressed packets."
+        ::= { hwIphcTcpRunInfoEntry 3 }
+                
+    hwIphcTcpSentCompressBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of the bytes of compressed packets with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 4 }
+                
+    hwIphcTcpSavedBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of the bytes saved after compression with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 5 }
+                
+    hwIphcTcpCompressRatio OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Compression ratio."
+        ::= { hwIphcTcpRunInfoEntry 6 }
+                
+    hwIphcTcpReceivedTotalPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of received packets with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 7 }
+                
+    hwIphcTcpReceivedCompressPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of received compressed packets with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 8 }
+                
+    hwIphcTcpReceivedCompressErrorPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of incorrectly-compressed packets with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 9 }
+                
+    hwIphcTcpReceivedCompressDiscardPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of the packets discarded due to failed decompression with IP/TCP header."
+        ::= { hwIphcTcpRunInfoEntry 10 }
+
+    hwIphcRtpRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIphcRtpRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists statistics on IP/UDP or IP/UDP/RTP header compression."
+        ::= { hwIphcStatisticsObjects 2 }
+    
+    hwIphcRtpRunInfoEntry OBJECT-TYPE
+        SYNTAX HwIphcRtpRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in this table."
+        INDEX { hwIphcRtpIfIndex }
+        ::= { hwIphcRtpRunInfoTable 1 }
+    
+    HwIphcRtpRunInfoEntry ::=
+        SEQUENCE { 
+            hwIphcRtpSentTotalPackets
+                Counter64,
+            hwIphcRtpSentTotalBytes
+                Counter64,                
+            hwIphcRtpSentCompressPackets
+                Counter64,
+            hwIphcRtpSentCompressBytes
+                Counter64,
+            hwIphcRtpSavedBytes
+                Counter64,
+            hwIphcRtpCompressRatio
+                Integer32,
+            hwIphcRtpReceivedTotalPackets
+                Counter64,
+            hwIphcRtpReceivedCompressPackets
+                Counter64,
+            hwIphcRtpReceivedCompressErrorPackets
+                Counter64,
+            hwIphcRtpReceivedCompressDiscardPackets
+                Counter64                                             
+         }
+         
+    hwIphcRtpSentTotalPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of sent packets with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 1 }
+                
+    hwIphcRtpSentTotalBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of the bytes of sent packets with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 2 }
+                
+    hwIphcRtpSentCompressPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of sent compressed packets with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 3 }
+                
+    hwIphcRtpSentCompressBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of the bytes of sent compressed packets with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 4 }
+                
+    hwIphcRtpSavedBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of saved bytes after compression with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 5 }
+                
+    hwIphcRtpCompressRatio OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Compression ratio."
+        ::= { hwIphcRtpRunInfoEntry 6 }
+                
+    hwIphcRtpReceivedTotalPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of received packets with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 7 }
+                
+    hwIphcRtpReceivedCompressPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total number of the bytes of received compressed packets with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 8 }
+                
+    hwIphcRtpReceivedCompressErrorPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of received incorrectly-compressed packets with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 9 }
+                
+    hwIphcRtpReceivedCompressDiscardPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of packets discarded due to failed compression with IP/UDP or IP/UDP/RTP header."
+        ::= { hwIphcRtpRunInfoEntry 10 }
+
+-- 
+--     Notifications
+-- 
+        hwIphcTraps OBJECT IDENTIFIER ::= { hwIphcMIB 3 }
+
+        hwIphcContextError NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName }
+            STATUS current
+            DESCRIPTION 
+            "During a specified period, the number of the CONTEXT_STATE packets received by the compressor exceeds the threshold. "
+            ::= { hwIphcTraps 1 }
+        
+        hwIphcContextErrorResume NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifName }
+            STATUS current
+            DESCRIPTION 
+            "During a specified period, the number of the CONTEXT_STATE packets received by the compressor restores to the normal state. "
+            ::= { hwIphcTraps 2 }
+
+
+--     Conformance and Compliance
+-- 
+        hwIphcConformance OBJECT IDENTIFIER ::= { hwIphcMIB 4 }
+        
+        hwIphcCompliances OBJECT IDENTIFIER ::= { hwIphcConformance 1 }
+        
+--  this module
+        hwIphcCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting the HUAWEI-IPHC-MIB."
+            MODULE -- this module
+            MANDATORY-GROUPS { hwIphcInfoGroup, hwIphcStatisticsGroup, hwIphcNotificationGroup }
+            OBJECT hwIphcTcpEnable
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwIphcTcpConnnectionNumber
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwIphcTcpRowStatus
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwIphcRtpEnable
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwIphcRtpConnnectionNumber
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwIphcRtpNValue
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwIphcRtpFormatType
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            OBJECT hwIphcRtpRowStatus
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            ::= { hwIphcCompliances 1 }
+        
+        hwIphcGroups OBJECT IDENTIFIER ::= { hwIphcConformance 2 }
+        
+        hwIphcInfoGroup OBJECT-GROUP
+            OBJECTS { hwIphcTcpEnable, hwIphcTcpConnnectionNumber, hwIphcTcpRowStatus, 
+                hwIphcTcpEffectEnable, hwIphcTcpEffectConnnectionNumber, 
+                hwIphcRtpEnable, hwIphcRtpConnnectionNumber, hwIphcRtpNValue, hwIphcRtpFormatType, hwIphcRtpRowStatus, 
+                hwIphcRtpEffectEnable, hwIphcRtpEffectConnnectionNumber, hwIphcRtpEffectNValue
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI IPHC Configuration group."
+            ::= { hwIphcGroups 1 }
+        
+        hwIphcStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwIphcTcpSentTotalPackets, hwIphcTcpSentTotalBytes, hwIphcTcpSentCompressPackets, hwIphcTcpSentCompressBytes, 
+                hwIphcTcpSavedBytes, hwIphcTcpCompressRatio, hwIphcTcpReceivedTotalPackets, hwIphcTcpReceivedCompressPackets, 
+                hwIphcTcpReceivedCompressErrorPackets, hwIphcTcpReceivedCompressDiscardPackets, hwIphcRtpSentTotalPackets, 
+                hwIphcRtpSentTotalBytes, hwIphcRtpSentCompressPackets, hwIphcRtpSentCompressBytes, hwIphcRtpSavedBytes, 
+                hwIphcRtpCompressRatio, hwIphcRtpReceivedTotalPackets, hwIphcRtpReceivedCompressPackets, 
+                hwIphcRtpReceivedCompressErrorPackets, hwIphcRtpReceivedCompressDiscardPackets
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI IPHC Statistics group."
+            ::= { hwIphcGroups 2 }
+        
+        hwIphcNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwIphcContextError, hwIphcContextErrorResume }
+            STATUS current
+            DESCRIPTION 
+                "Standard HUAWEI IPHC Notification group."
+            ::= { hwIphcGroups 3 }
+        
+    
+    END
+
+--
+-- HUAWEI-IPHC-MIB.mib
+--

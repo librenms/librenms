@@ -1,0 +1,353 @@
+EXAGRID-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      OBJECT-TYPE     FROM RFC-1212
+      TRAP-TYPE       FROM RFC-1215
+      DisplayString   FROM RFC1213-MIB
+      Gauge,
+      TimeTicks       FROM RFC1155-SMI
+      InternationalDisplayString FROM HOST-RESOURCES-MIB
+      enterprises     FROM SNMPv2-SMI;
+
+exagrid              OBJECT IDENTIFIER ::= { enterprises 14941 }
+exagridTraps         OBJECT IDENTIFIER ::= { exagrid 1 }
+egEventParams        OBJECT IDENTIFIER ::= { exagrid 2 }
+
+--
+-- ExaGrid product lines, series, and device identifiers
+--
+exagridProductLines  OBJECT IDENTIFIER ::= { exagrid 3 }
+exagridExX000Series  OBJECT IDENTIFIER ::= { exagridProductLines 1 }
+exagridExX000        OBJECT IDENTIFIER ::= { exagridExX000Series 0 }
+exagridEx1000        OBJECT IDENTIFIER ::= { exagridExX000Series 1 }
+exagridEx2000        OBJECT IDENTIFIER ::= { exagridExX000Series 2 }
+exagridEx3000        OBJECT IDENTIFIER ::= { exagridExX000Series 3 }
+exagridEx4000        OBJECT IDENTIFIER ::= { exagridExX000Series 4 }
+exagridEx5000        OBJECT IDENTIFIER ::= { exagridExX000Series 5 }
+exagridExGW          OBJECT IDENTIFIER ::= { exagridExX000Series 6 }
+exagridEx10000E      OBJECT IDENTIFIER ::= { exagridExX000Series 10 }
+exagridEx1T          OBJECT IDENTIFIER ::= { exagridExX000Series 11 }
+exagridEx2T          OBJECT IDENTIFIER ::= { exagridExX000Series 12 }
+exagridEx3T          OBJECT IDENTIFIER ::= { exagridExX000Series 13 }
+exagridEx4T          OBJECT IDENTIFIER ::= { exagridExX000Series 14 }
+exagridEx5T          OBJECT IDENTIFIER ::= { exagridExX000Series 15 }
+exagridEx7T          OBJECT IDENTIFIER ::= { exagridExX000Series 16 }
+exagridEx9T          OBJECT IDENTIFIER ::= { exagridExX000Series 19 }
+exagridEx7S          OBJECT IDENTIFIER ::= { exagridExX000Series 26 }
+exagridEx9S          OBJECT IDENTIFIER ::= { exagridExX000Series 29 }
+exagridEx1T2012A     OBJECT IDENTIFIER ::= { exagridExX000Series 31 }
+exagridEx2T2012A     OBJECT IDENTIFIER ::= { exagridExX000Series 32 }
+exagridEx3T2012A     OBJECT IDENTIFIER ::= { exagridExX000Series 33 }
+exagridEx4T2012A     OBJECT IDENTIFIER ::= { exagridExX000Series 34 }
+exagridEx5T2012A     OBJECT IDENTIFIER ::= { exagridExX000Series 35 }
+exagridEx7T2012A     OBJECT IDENTIFIER ::= { exagridExX000Series 36 }
+exagridEx7S2012A     OBJECT IDENTIFIER ::= { exagridExX000Series 46 }
+exagridEx10T         OBJECT IDENTIFIER ::= { exagridExX000Series 110 }
+exagridEx13T         OBJECT IDENTIFIER ::= { exagridExX000Series 113 }
+exagridEx10S         OBJECT IDENTIFIER ::= { exagridExX000Series 210 }
+exagridEx13S         OBJECT IDENTIFIER ::= { exagridExX000Series 213 }
+exagridEx10T2012A    OBJECT IDENTIFIER ::= { exagridExX000Series 310 }
+exagridEx13T2012A    OBJECT IDENTIFIER ::= { exagridExX000Series 313 }
+exagridEx21T2012A    OBJECT IDENTIFIER ::= { exagridExX000Series 321 }
+exagridEx10S2012A    OBJECT IDENTIFIER ::= { exagridExX000Series 410 }
+exagridEx13S2012A    OBJECT IDENTIFIER ::= { exagridExX000Series 413 }
+exagridEx21S2012A    OBJECT IDENTIFIER ::= { exagridExX000Series 421 }
+
+--
+-- ExaGrid server data
+--
+exagridServerData           OBJECT IDENTIFIER ::= { exagrid 4 }
+exagridLandingSpace         OBJECT IDENTIFIER ::= { exagridServerData 1 }
+exagridRetentionSpace       OBJECT IDENTIFIER ::= { exagridServerData 2 }
+exagridDeduplicationRatio   OBJECT IDENTIFIER ::= { exagridServerData 3 }
+exagridPendingDeduplication OBJECT IDENTIFIER ::= { exagridServerData 4 }
+exagridPendingReplication   OBJECT IDENTIFIER ::= { exagridServerData 5 }
+exagridServerStatus         OBJECT IDENTIFIER ::= { exagridServerData 6 }
+
+egLandingSpaceConfiguredWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of configured landing space scaled to GigaBytes (10^9) bytes"
+   ::= { exagridLandingSpace 1 }
+
+egLandingSpaceConfiguredFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of configured landing space below 1 Gigabyte in bytes"
+   ::= { exagridLandingSpace 2 }
+
+egLandingSpaceAvailableWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of available landing space scaled to GigaBytes (10^9) bytes"
+   ::= { exagridLandingSpace 3 }
+
+egLandingSpaceAvailableFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of available landing space below 1 Gigabyte in bytes"
+   ::= { exagridLandingSpace 4 }
+
+egRetentionSpaceConfiguredWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of configured retention space scaled to GigaBytes (10^9) bytes"
+   ::= { exagridRetentionSpace 1 }
+
+egRetentionSpaceConfiguredFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of configured retention space below 1 Gigabyte in bytes"
+   ::= { exagridRetentionSpace 2 }
+
+egRetentionSpaceAvailableWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of available retention space scaled to GigaBytes (10^9) bytes"
+   ::= { exagridRetentionSpace 3 }
+
+egRetentionSpaceAvailableFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of available retention space below 1 Gigabyte in bytes"
+   ::= { exagridRetentionSpace 4 }
+
+egBackupDataAvailableWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of data available for restore by a backup application scaled to GigaBytes (10^9) bytes"
+   ::= { exagridDeduplicationRatio 1 }
+
+egBackupDataAvailableFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of data available for restore by a backup application below 1 Gigabyte in bytes"
+   ::= { exagridDeduplicationRatio 2 }
+
+egBackupDataSpaceConsumedWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of consumed retention space scaled to GigaBytes (10^9) bytes"
+   ::= { exagridDeduplicationRatio 3 }
+
+egBackupDataSpaceConsumedFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of consumed retention space below 1 Gigabyte in bytes"
+   ::= { exagridDeduplicationRatio 4 }
+
+egPendingDeduplicationWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of data not yet deduplicated scaled to GigaBytes (10^9) bytes"
+   ::= { exagridPendingDeduplication 1 }
+
+egPendingDeduplicationFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of data not yet deduplicated below 1 Gigabyte in bytes"
+   ::= { exagridPendingDeduplication 2 }
+
+egPendingDeduplicationAge OBJECT-TYPE
+   SYNTAX      TimeTicks
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of time that data has been available for deduplication, but has not yet been deduplicated"
+   ::= { exagridPendingDeduplication 3 }
+
+egPendingReplicationWholeGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of data that has not yet completed replication scaled to GigaBytes (10^9) bytes"
+   ::= { exagridPendingReplication 1 }
+
+egPendingReplicationFractionalGigabytes OBJECT-TYPE
+   SYNTAX      Gauge
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of data that has not yet completed replication below 1 Gigabyte in bytes"
+   ::= { exagridPendingReplication 2 }
+
+egPendingReplicationAge OBJECT-TYPE
+   SYNTAX      TimeTicks
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "The amount of time that data has been available for replication, but has not yet been replicated"
+   ::= { exagridPendingReplication 3 }
+
+egServerAlarmState OBJECT-TYPE
+   SYNTAX      INTEGER
+   ACCESS      read-only
+   STATUS      mandatory
+   DESCRIPTION "Current alarm state of the server.
+                1 Server has no alarms
+                2 Server is in a Warning Alarm State
+                3 Server is in an Error Alarm State"
+   ::= { exagridServerStatus 1 }
+
+--
+-- egEventParams
+--
+egEventParamsName OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Event Name"
+   ::= { egEventParams 1 }
+
+egEventParamsId OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Event Id"
+   ::= { egEventParams 2 }
+
+egEventParamsCreateTime OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Event Creation Time"
+   ::= { egEventParams 3 }
+
+egEventParamsCreateTimeRaw OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Event Creation Time (milliseconds)"
+   ::= { egEventParams 4 }
+
+egEventParamsGridName OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Name of the Grid for the device originating the event"
+   ::= { egEventParams 5 }
+
+egEventParamsSiteName OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Name of the Site for the device originating the event"
+   ::= { egEventParams 6 }
+
+egEventParamsSiteId OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Id of the Site for the device originating the event"
+   ::= { egEventParams 7 }
+
+egEventParamsSeverity OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Event Severity"
+   ::= { egEventParams 8 }
+
+egEventParamsDeviceName OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Name of the device originating the event"
+   ::= { egEventParams 9 }
+
+egEventParamsDeviceId OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Id of the device originating the event"
+   ::= { egEventParams 10 }
+
+egEventParamsDeviceSerialNumber OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The Name of the device originating the event"
+   ::= { egEventParams 11 }
+
+egEventParamsDeviceIp OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The IP address of the device originating the event"
+   ::= { egEventParams 12 }
+
+egEventParamsDupCount OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The count of recently generated duplicates of this event"
+   ::= { egEventParams 13 }
+
+egEventParamsText OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (0..255))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The short description for the event"
+   ::= { egEventParams 14 }
+
+egEventParamsDetail OBJECT-TYPE
+   SYNTAX  InternationalDisplayString (SIZE (0..999))
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+      "The long description for the event"
+   ::= { egEventParams 15 }
+
+--
+-- Trap Definitions
+--
+
+egTrap TRAP-TYPE
+   ENTERPRISE exagridTraps
+   VARIABLES {
+        egEventParamsName,
+        egEventParamsId,
+        egEventParamsCreateTime,
+        egEventParamsCreateTimeRaw,
+        egEventParamsGridName,
+        egEventParamsSiteName,
+        egEventParamsSiteId,
+        egEventParamsSeverity,
+        egEventParamsDeviceName,
+        egEventParamsDeviceId,
+        egEventParamsDeviceIp,
+        egEventParamsDeviceSerialNumber,
+        egEventParamsDupCount,
+        egEventParamsText,
+        egEventParamsDetail
+   }
+   DESCRIPTION
+      "An event of note has been posted"
+   ::= 1
+
+END

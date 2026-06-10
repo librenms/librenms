@@ -1,0 +1,76 @@
+-- *****************************************************************
+-- UBQS-PRODUCTS-MIB.mib:  Ubiquoss Enterprise Structure of Management Information
+--   
+-- July 2009, hyung eun Park 
+-- April 2004, Jisoo Kim
+--   05.08.11: P3024, P408 added (KH.PARK)
+--
+-- Copyright (c) 2004 by LocusNetworks, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+UBQS-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	ubqsProducts
+		FROM UBQS-SMI;
+        
+
+
+
+    e7508 OBJECT IDENTIFIER ::= {  ubqsProducts  65 }    
+
+	u9264H_EPON OBJECT IDENTIFIER ::= {  ubqsProducts  69 } 
+         
+  -- CSR 3400                                              
+    cs3400 OBJECT IDENTIFIER ::= {  ubqsProducts  73 }
+
+    u9264H_GPON OBJECT IDENTIFIER ::= { ubqsProducts 92 }
+    
+    u9016B_EPON OBJECT IDENTIFIER ::= { ubqsProducts 93 }
+    
+    u9016B_GPON OBJECT IDENTIFIER ::= { ubqsProducts 94 }
+
+    e5224C OBJECT IDENTIFIER ::= { ubqsProducts 95 }  
+    
+    e5224D OBJECT IDENTIFIER ::= { ubqsProducts 100 }
+    
+    e3224C OBJECT IDENTIFIER ::= { ubqsProducts 101 }
+    
+    e3224D OBJECT IDENTIFIER ::= { ubqsProducts 102 }
+    
+    e6100 OBJECT IDENTIFIER ::= { ubqsProducts 103 }  
+    
+    e5002G OBJECT IDENTIFIER ::= { ubqsProducts 105 }
+ 
+    e7505 OBJECT IDENTIFIER ::= {  ubqsProducts  108 } 
+    
+    u9764H_GPON OBJECT IDENTIFIER ::= { ubqsProducts 112 }   
+    
+    e5224CP OBJECT IDENTIFIER ::= { ubqsProducts 115 }
+    
+    u9500h OBJECT IDENTIFIER ::= { ubqsProducts 117 }
+    
+    ce7010 OBJECT IDENTIFIER ::= { ubqsProducts 118 }
+    
+    uCrown6020 OBJECT IDENTIFIER ::= { ubqsProducts 128 }    
+    
+    U9008B OBJECT IDENTIFIER ::= { ubqsProducts 129 }
+    
+    uHon1010 OBJECT IDENTIFIER ::= { ubqsProducts 130 }
+    
+    e6300 OBJECT IDENTIFIER ::= { ubqsProducts 133 }               
+ 
+    uSafe4010 OBJECT IDENTIFIER ::= { ubqsProducts 134 }  
+  
+    iES4028GP OBJECT IDENTIFIER ::= { ubqsProducts 135 }       
+      
+    iES4028XP OBJECT IDENTIFIER ::= { ubqsProducts 136 }
+    
+    uCrown5010_48T OBJECT IDENTIFIER ::= { ubqsProducts 140 }
+
+    uCrown5010_48S OBJECT IDENTIFIER ::= { ubqsProducts 141 }
+
+END
+

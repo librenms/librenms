@@ -1,0 +1,1142 @@
+-- This file was automatically generated from ciena-ws-system.yang. Do not edit.
+
+CIENA-WS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    EnabledDisabledEnum, StringMaxl128, StringMaxl16, StringMaxl256, StringMaxl32, StringMaxl64
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201707260000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This YANG module defines Ciena's WaveServer System representation for the NETCONF protocol"
+    REVISION "201707260000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Obsolete: leaf 'user-message-state' in 'front-display'.
+Obsolete: leaf 'reset-to-factory-default-button' in container 'global-provisioning'.
+Added scp server support.
+Added 'chassis-functionality' attribute."
+    REVISION "201702280000Z"
+    DESCRIPTION "Waveserver Rel 1.4 revision.  
+Added containers and leaf: environment/root/password.
+Obsolete: leaf lamp-test in container global-provisioning. 
+Added container lamp-flash-test and RPCs ws-system-enable-lamp-mode and ws-system-disable-lamp-mode.
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+Change the fraction-digits for leaf time-offset from 5 to 2."
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201604060000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.  
+enum value updated for leaves: 
+  sftp-server-state, 
+  web-server-state, 
+  netconf-server-state, 
+  restconf-server-state, 
+  zero-touch-provisioning-admin, 
+  low-power-mode, 
+  display-admin-state, 
+  display-screensaver-state, 
+  display-user-message-state, 
+  display-input-button, 
+  lamp-test"
+    REVISION "201506080000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 12 }
+
+BandplanEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { none(0), flex12(1), fixed44(2), fixed88(3), fixed96(4) }
+
+Decimal32Len2 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX Integer32(-4320000..5040000)
+
+Decimal32Len5 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-5"
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX Integer32(-18000000..18000000)
+
+LampModeEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { flash(0) }
+
+LampTargetTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { chassis(1), port(2) }
+
+LineProtectionEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unprotected(0), trunkOps(1) }
+
+cwsSystemSiteTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemSiteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system site attributes."
+    ::= { cienaWsSystemMIB 3 }
+
+cwsSystemSiteEntry OBJECT-TYPE
+    SYNTAX CwsSystemSiteEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemSiteTable."
+    INDEX { cwsSystemSiteTableSnmpKey }
+    ::= { cwsSystemSiteTable 1 }
+
+CwsSystemSiteEntry ::= SEQUENCE { 
+    cwsSystemSiteTableSnmpKey Integer32,
+    cwsSystemSiteId Unsigned32,
+    cwsSystemSiteName OCTET STRING,
+    cwsSystemSiteDescription OCTET STRING,
+    cwsSystemSiteLatitude Decimal32Len5,
+    cwsSystemSiteLongitude Decimal32Len5,
+    cwsSystemSiteAddress OCTET STRING 
+}
+
+cwsSystemSiteTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemSite"
+    ::= { cwsSystemSiteEntry 1 }
+
+cwsSystemSiteId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify the site where this Waveserver is located. This is used to help group Waveservers together with line system equipment. All equipment in a common site should share the same site identifier. "
+    ::= { cwsSystemSiteEntry 2 }
+
+cwsSystemSiteName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The name for the site where the Waveserver is located."
+    ::= { cwsSystemSiteEntry 3 }
+
+cwsSystemSiteDescription OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The site description"
+    ::= { cwsSystemSiteEntry 4 }
+
+cwsSystemSiteLatitude OBJECT-TYPE
+    SYNTAX Decimal32Len5
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Geographic coordinate for the site location in degrees."
+    ::= { cwsSystemSiteEntry 5 }
+
+cwsSystemSiteLongitude OBJECT-TYPE
+    SYNTAX Decimal32Len5
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Geographic coordinate for the site location in degrees."
+    ::= { cwsSystemSiteEntry 6 }
+
+cwsSystemSiteAddress OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The street address of the site."
+    ::= { cwsSystemSiteEntry 7 }
+
+cwsSystemGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system group attributes."
+    ::= { cienaWsSystemMIB 4 }
+
+cwsSystemGroupEntry OBJECT-TYPE
+    SYNTAX CwsSystemGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemGroupTable."
+    INDEX { cwsSystemGroupTableSnmpKey }
+    ::= { cwsSystemGroupTable 1 }
+
+CwsSystemGroupEntry ::= SEQUENCE { 
+    cwsSystemGroupTableSnmpKey Integer32,
+    cwsSystemGroupId Unsigned32,
+    cwsSystemGroupName OCTET STRING,
+    cwsSystemGroupDescription OCTET STRING 
+}
+
+cwsSystemGroupTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemGroup"
+    ::= { cwsSystemGroupEntry 1 }
+
+cwsSystemGroupId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify a group of Waveservers within a site."
+    ::= { cwsSystemGroupEntry 2 }
+
+cwsSystemGroupName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "A name for the group of Waveservers."
+    ::= { cwsSystemGroupEntry 3 }
+
+cwsSystemGroupDescription OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "A description for the group of Waveservers. "
+    ::= { cwsSystemGroupEntry 4 }
+
+cwsSystemMemberTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system member attributes."
+    ::= { cienaWsSystemMIB 5 }
+
+cwsSystemMemberEntry OBJECT-TYPE
+    SYNTAX CwsSystemMemberEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemMemberTable."
+    INDEX { cwsSystemMemberTableSnmpKey }
+    ::= { cwsSystemMemberTable 1 }
+
+CwsSystemMemberEntry ::= SEQUENCE { 
+    cwsSystemMemberTableSnmpKey Integer32,
+    cwsSystemMemberId Unsigned32,
+    cwsSystemMemberName OCTET STRING,
+    cwsSystemMemberDescription OCTET STRING,
+    cwsSystemMemberFrameIdentification OCTET STRING,
+    cwsSystemMemberRackUnitNumber Unsigned32 
+}
+
+cwsSystemMemberTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemMember"
+    ::= { cwsSystemMemberEntry 1 }
+
+cwsSystemMemberId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "An integer to uniquely identify a Waveserver chassis within a group of Waveservers. Initial configuration of this identifier automatically assigns 2 specific wavelengths for the Ciena wavelength grid to the Wavelogic 3 Extreme ports 1 and 12. Wavelengths can also be manually assigned independently."
+    ::= { cwsSystemMemberEntry 2 }
+
+cwsSystemMemberName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "A name for the Waveserver chassis."
+    ::= { cwsSystemMemberEntry 3 }
+
+cwsSystemMemberDescription OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "A description for the Waveserver chassis."
+    ::= { cwsSystemMemberEntry 4 }
+
+cwsSystemMemberFrameIdentification OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "A description to identify the location of the Waveserver chassis within the data center. For example, the building, floor, aisle, frame number, etc."
+    ::= { cwsSystemMemberEntry 5 }
+
+cwsSystemMemberRackUnitNumber OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "A logical identifier for the Waveservers location within the frame or rack. For example, the device at the top could be labelled unit 1."
+    ::= { cwsSystemMemberEntry 6 }
+
+cwsSystemHostNameTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemHostNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system host name attributes."
+    ::= { cienaWsSystemMIB 6 }
+
+cwsSystemHostNameEntry OBJECT-TYPE
+    SYNTAX CwsSystemHostNameEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemHostNameTable."
+    INDEX { cwsSystemHostNameTableSnmpKey }
+    ::= { cwsSystemHostNameTable 1 }
+
+CwsSystemHostNameEntry ::= SEQUENCE { 
+    cwsSystemHostNameTableSnmpKey Integer32,
+    cwsSystemHostNameCurrentHostName StringMaxl64,
+    cwsSystemHostNameConfigHostName StringMaxl64,
+    cwsSystemHostNameDhcpHostName StringMaxl64 
+}
+
+cwsSystemHostNameTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemHostName"
+    ::= { cwsSystemHostNameEntry 1 }
+
+cwsSystemHostNameCurrentHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Current host name."
+    ::= { cwsSystemHostNameEntry 2 }
+
+cwsSystemHostNameConfigHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "User configured host name."
+    ::= { cwsSystemHostNameEntry 3 }
+
+cwsSystemHostNameDhcpHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "DHCP Host name."
+    ::= { cwsSystemHostNameEntry 4 }
+
+cwsSystemTimeConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemTimeConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system time configuration attributes."
+    ::= { cienaWsSystemMIB 7 }
+
+cwsSystemTimeConfigEntry OBJECT-TYPE
+    SYNTAX CwsSystemTimeConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemTimeConfigTable."
+    INDEX { cwsSystemTimeConfigTableSnmpKey }
+    ::= { cwsSystemTimeConfigTable 1 }
+
+CwsSystemTimeConfigEntry ::= SEQUENCE { 
+    cwsSystemTimeConfigTableSnmpKey Integer32,
+    cwsSystemTimeConfigDate OCTET STRING,
+    cwsSystemTimeConfigTime OCTET STRING,
+    cwsSystemTimeConfigTimeOffset Decimal32Len2,
+    cwsSystemTimeConfigTimeStamp INTEGER,
+    cwsSystemTimeConfigLocalDateTime OCTET STRING,
+    cwsSystemTimeConfigCoordinatedUniversalTime OCTET STRING,
+    cwsSystemTimeConfigSystemUptime OCTET STRING 
+}
+
+cwsSystemTimeConfigTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemTimeConfig"
+    ::= { cwsSystemTimeConfigEntry 1 }
+
+cwsSystemTimeConfigDate OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..11))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Date: must be in format: yyyy-mm-dd, or yy-mm-dd, or mm-dd."
+    ::= { cwsSystemTimeConfigEntry 2 }
+
+cwsSystemTimeConfigTime OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..9))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Time: must be in format: hh:mm:ss"
+    ::= { cwsSystemTimeConfigEntry 3 }
+
+cwsSystemTimeConfigTimeOffset OBJECT-TYPE
+    SYNTAX Decimal32Len2
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "System time-offset from UTC in seconds."
+    ::= { cwsSystemTimeConfigEntry 4 }
+
+cwsSystemTimeConfigTimeStamp OBJECT-TYPE
+    SYNTAX INTEGER { utc(0), local(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "System time stamp format: local time or UTC time."
+    ::= { cwsSystemTimeConfigEntry 5 }
+
+cwsSystemTimeConfigLocalDateTime OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..41))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Local date and time Time"
+    ::= { cwsSystemTimeConfigEntry 6 }
+
+cwsSystemTimeConfigCoordinatedUniversalTime OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..41))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "UTC date and time Time"
+    ::= { cwsSystemTimeConfigEntry 7 }
+
+cwsSystemTimeConfigSystemUptime OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..17))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Time since last reboot, in format: xxxd xxh xxm xxs"
+    ::= { cwsSystemTimeConfigEntry 8 }
+
+cwsSystemServerConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemServerConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system server configuration attributes."
+    ::= { cienaWsSystemMIB 8 }
+
+cwsSystemServerConfigEntry OBJECT-TYPE
+    SYNTAX CwsSystemServerConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemServerConfigTable."
+    INDEX { cwsSystemServerConfigTableSnmpKey }
+    ::= { cwsSystemServerConfigTable 1 }
+
+CwsSystemServerConfigEntry ::= SEQUENCE { 
+    cwsSystemServerConfigTableSnmpKey Integer32,
+    cwsSystemServerConfigSftpServerState EnabledDisabledEnum,
+    cwsSystemServerConfigWebServerState EnabledDisabledEnum,
+    cwsSystemServerConfigNetconfServerState EnabledDisabledEnum,
+    cwsSystemServerConfigRestconfServerState EnabledDisabledEnum 
+}
+
+cwsSystemServerConfigTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemServerConfig"
+    ::= { cwsSystemServerConfigEntry 1 }
+
+cwsSystemServerConfigSftpServerState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Indicate whether SFTP server is enabled."
+    ::= { cwsSystemServerConfigEntry 2 }
+
+cwsSystemServerConfigWebServerState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Indicate whether web server is enabled, HTTPS only."
+    ::= { cwsSystemServerConfigEntry 3 }
+
+cwsSystemServerConfigNetconfServerState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Indicate whether netconf server is enabled."
+    ::= { cwsSystemServerConfigEntry 4 }
+
+cwsSystemServerConfigRestconfServerState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Indicate whether RESTCONF server is enabled, HTTPS only."
+    ::= { cwsSystemServerConfigEntry 5 }
+
+cwsSystemDhcpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemDhcpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver DHCP client configuration attributes."
+    ::= { cienaWsSystemMIB 21 }
+
+cwsSystemDhcpEntry OBJECT-TYPE
+    SYNTAX CwsSystemDhcpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemDhcpTable."
+    INDEX { cwsSystemDhcpTableSnmpKey }
+    ::= { cwsSystemDhcpTable 1 }
+
+CwsSystemDhcpEntry ::= SEQUENCE { 
+    cwsSystemDhcpTableSnmpKey Integer32,
+    cwsSystemDhcpAdminState EnabledDisabledEnum 
+}
+
+cwsSystemDhcpTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemDhcp"
+    ::= { cwsSystemDhcpEntry 1 }
+
+cwsSystemDhcpAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "DHCP Client Administrative State"
+    ::= { cwsSystemDhcpEntry 2 }
+
+cwsSystemXftpConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemXftpConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system XFTP configuration attributes."
+    ::= { cienaWsSystemMIB 9 }
+
+cwsSystemXftpConfigEntry OBJECT-TYPE
+    SYNTAX CwsSystemXftpConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemXftpConfigTable."
+    INDEX { cwsSystemXftpConfigTableSnmpKey }
+    ::= { cwsSystemXftpConfigTable 1 }
+
+CwsSystemXftpConfigEntry ::= SEQUENCE { 
+    cwsSystemXftpConfigTableSnmpKey Integer32,
+    cwsSystemXftpConfigMode INTEGER 
+}
+
+cwsSystemXftpConfigTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemXftpConfig"
+    ::= { cwsSystemXftpConfigEntry 1 }
+
+cwsSystemXftpConfigMode OBJECT-TYPE
+    SYNTAX INTEGER { none(0), tftp(1), ftp(2), sftp(3), scp(4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "XFTP mode: FTP, SFTP, or TFTP"
+    ::= { cwsSystemXftpConfigEntry 2 }
+
+cwsSystemTftpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemTftpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system TFTP configuration."
+    ::= { cienaWsSystemMIB 10 }
+
+cwsSystemTftpEntry OBJECT-TYPE
+    SYNTAX CwsSystemTftpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemTftpTable."
+    INDEX { cwsSystemTftpTableSnmpKey }
+    ::= { cwsSystemTftpTable 1 }
+
+CwsSystemTftpEntry ::= SEQUENCE { 
+    cwsSystemTftpTableSnmpKey Integer32,
+    cwsSystemTftpConfigHostName StringMaxl64,
+    cwsSystemTftpDhcpHostName StringMaxl64,
+    cwsSystemTftpCurrentHostName StringMaxl64 
+}
+
+cwsSystemTftpTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemTftp"
+    ::= { cwsSystemTftpEntry 1 }
+
+cwsSystemTftpConfigHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "TFTP host name configured by user."
+    ::= { cwsSystemTftpEntry 2 }
+
+cwsSystemTftpDhcpHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "TFTP DHCP host name."
+    ::= { cwsSystemTftpEntry 3 }
+
+cwsSystemTftpCurrentHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "TFTP current host name."
+    ::= { cwsSystemTftpEntry 4 }
+
+cwsSystemFtpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemFtpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system FTP configuration."
+    ::= { cienaWsSystemMIB 11 }
+
+cwsSystemFtpEntry OBJECT-TYPE
+    SYNTAX CwsSystemFtpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemFtpTable."
+    INDEX { cwsSystemFtpTableSnmpKey }
+    ::= { cwsSystemFtpTable 1 }
+
+CwsSystemFtpEntry ::= SEQUENCE { 
+    cwsSystemFtpTableSnmpKey Integer32,
+    cwsSystemFtpHostName StringMaxl64,
+    cwsSystemFtpUserName StringMaxl32,
+    cwsSystemFtpPassword StringMaxl128,
+    cwsSystemFtpSecret StringMaxl256 
+}
+
+cwsSystemFtpTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemFtp"
+    ::= { cwsSystemFtpEntry 1 }
+
+cwsSystemFtpHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "FTP host name configured by user."
+    ::= { cwsSystemFtpEntry 2 }
+
+cwsSystemFtpUserName OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "FTP user name."
+    ::= { cwsSystemFtpEntry 3 }
+
+cwsSystemFtpPassword OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "FTP password string."
+    ::= { cwsSystemFtpEntry 4 }
+
+cwsSystemFtpSecret OBJECT-TYPE
+    SYNTAX StringMaxl256
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "FTP secret string."
+    ::= { cwsSystemFtpEntry 5 }
+
+cwsSystemSftpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemSftpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system SFTP configuration."
+    ::= { cienaWsSystemMIB 12 }
+
+cwsSystemSftpEntry OBJECT-TYPE
+    SYNTAX CwsSystemSftpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemSftpTable."
+    INDEX { cwsSystemSftpTableSnmpKey }
+    ::= { cwsSystemSftpTable 1 }
+
+CwsSystemSftpEntry ::= SEQUENCE { 
+    cwsSystemSftpTableSnmpKey Integer32,
+    cwsSystemSftpHostName StringMaxl64,
+    cwsSystemSftpUserName StringMaxl32,
+    cwsSystemSftpPassword StringMaxl128,
+    cwsSystemSftpSecret StringMaxl256 
+}
+
+cwsSystemSftpTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemSftp"
+    ::= { cwsSystemSftpEntry 1 }
+
+cwsSystemSftpHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SFTP host name configured by user."
+    ::= { cwsSystemSftpEntry 2 }
+
+cwsSystemSftpUserName OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SFTP user name."
+    ::= { cwsSystemSftpEntry 3 }
+
+cwsSystemSftpPassword OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SFTP password string."
+    ::= { cwsSystemSftpEntry 4 }
+
+cwsSystemSftpSecret OBJECT-TYPE
+    SYNTAX StringMaxl256
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SFTP secret string."
+    ::= { cwsSystemSftpEntry 5 }
+
+cwsSystemScpTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemScpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system SCP configuration."
+    ::= { cienaWsSystemMIB 19 }
+
+cwsSystemScpEntry OBJECT-TYPE
+    SYNTAX CwsSystemScpEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemScpTable."
+    INDEX { cwsSystemScpTableSnmpKey }
+    ::= { cwsSystemScpTable 1 }
+
+CwsSystemScpEntry ::= SEQUENCE { 
+    cwsSystemScpTableSnmpKey Integer32,
+    cwsSystemScpHostName StringMaxl64,
+    cwsSystemScpUserName StringMaxl32,
+    cwsSystemScpPassword StringMaxl128,
+    cwsSystemScpSecret StringMaxl256 
+}
+
+cwsSystemScpTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemScp"
+    ::= { cwsSystemScpEntry 1 }
+
+cwsSystemScpHostName OBJECT-TYPE
+    SYNTAX StringMaxl64
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SCP host name configured by user."
+    ::= { cwsSystemScpEntry 2 }
+
+cwsSystemScpUserName OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SCP user name."
+    ::= { cwsSystemScpEntry 3 }
+
+cwsSystemScpPassword OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SCP password string."
+    ::= { cwsSystemScpEntry 4 }
+
+cwsSystemScpSecret OBJECT-TYPE
+    SYNTAX StringMaxl256
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "SCP secret string."
+    ::= { cwsSystemScpEntry 5 }
+
+cwsSystemGlobalProvisioningTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemGlobalProvisioningEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system global provisioning attributes."
+    ::= { cienaWsSystemMIB 13 }
+
+cwsSystemGlobalProvisioningEntry OBJECT-TYPE
+    SYNTAX CwsSystemGlobalProvisioningEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemGlobalProvisioningTable."
+    INDEX { cwsSystemGlobalProvisioningTableSnmpKey }
+    ::= { cwsSystemGlobalProvisioningTable 1 }
+
+CwsSystemGlobalProvisioningEntry ::= SEQUENCE { 
+    cwsSystemGlobalProvisioningTableSnmpKey Integer32,
+    cwsSystemGlobalProvisioningLowPowerMode EnabledDisabledEnum,
+    cwsSystemGlobalProvisioningLampTest EnabledDisabledEnum,
+    cwsSystemGlobalProvisioningResetToFactoryDefaultButton EnabledDisabledEnum,
+    cwsSystemGlobalProvisioningFcsErrorForwarding TruthValue,
+    cwsSystemGlobalProvisioningChassisFunctionality StringMaxl16 
+}
+
+cwsSystemGlobalProvisioningTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemGlobalProvisioning"
+    ::= { cwsSystemGlobalProvisioningEntry 1 }
+
+cwsSystemGlobalProvisioningLowPowerMode OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Low power mode is enabled or disabled"
+    ::= { cwsSystemGlobalProvisioningEntry 2 }
+
+cwsSystemGlobalProvisioningLampTest OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION "Enable to initiate chassis level lamp test. Disable to end the test."
+    ::= { cwsSystemGlobalProvisioningEntry 3 }
+
+cwsSystemGlobalProvisioningResetToFactoryDefaultButton OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION "Indicate whether the reset button for reset to factory default is enabled. If enabled, the reset button on the faceplate will trigger a reset to factory default settings"
+    ::= { cwsSystemGlobalProvisioningEntry 4 }
+
+cwsSystemGlobalProvisioningFcsErrorForwarding OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "FCS error forwarding settings."
+    ::= { cwsSystemGlobalProvisioningEntry 5 }
+
+cwsSystemGlobalProvisioningChassisFunctionality OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Description of chassis functionality, used by MCP."
+    ::= { cwsSystemGlobalProvisioningEntry 6 }
+
+cwsSystemFrontDisplayTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemFrontDisplayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system front display configuration."
+    ::= { cienaWsSystemMIB 14 }
+
+cwsSystemFrontDisplayEntry OBJECT-TYPE
+    SYNTAX CwsSystemFrontDisplayEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemFrontDisplayTable."
+    INDEX { cwsSystemFrontDisplayTableSnmpKey }
+    ::= { cwsSystemFrontDisplayTable 1 }
+
+CwsSystemFrontDisplayEntry ::= SEQUENCE { 
+    cwsSystemFrontDisplayTableSnmpKey Integer32,
+    cwsSystemFrontDisplayAdminState EnabledDisabledEnum,
+    cwsSystemFrontDisplayScreensaverState EnabledDisabledEnum,
+    cwsSystemFrontDisplayScreensaverTimeout Unsigned32,
+    cwsSystemFrontDisplayInputButtonState EnabledDisabledEnum,
+    cwsSystemFrontDisplayUserMessageState EnabledDisabledEnum,
+    cwsSystemFrontDisplayUserMessage OCTET STRING 
+}
+
+cwsSystemFrontDisplayTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemFrontDisplay"
+    ::= { cwsSystemFrontDisplayEntry 1 }
+
+cwsSystemFrontDisplayAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Display is enabled or disabled. When the display is disabled, it will be turned off and will not be woken up by pressing on the faceplate navigation buttons"
+    ::= { cwsSystemFrontDisplayEntry 2 }
+
+cwsSystemFrontDisplayScreensaverState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Screensaver is enabled or disabled. When the screensaver is enabled, the LED display on the faceplate will be automatically turned off after N minutes of inactivity. If an input button is pressed, it will turn the display back on. The length of the screensaver idle time is controlled by the screensaver-timeout parameter."
+    ::= { cwsSystemFrontDisplayEntry 3 }
+
+cwsSystemFrontDisplayScreensaverTimeout OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Number of minutes before screensaver activates. The screensaver can be disabled via the display-screensaver-state attribute. The display can be completely disabled via the display-admin-state attribute."
+    ::= { cwsSystemFrontDisplayEntry 4 }
+
+cwsSystemFrontDisplayInputButtonState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Enable or disable display input control."
+    ::= { cwsSystemFrontDisplayEntry 5 }
+
+cwsSystemFrontDisplayUserMessageState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS obsolete
+    DESCRIPTION "Enable or disable user message display. If a user-message has been provisioned, enabling it via this parameter will display that message on the LED display.
+This leaf is now obsolete in WS 1.5"
+    ::= { cwsSystemFrontDisplayEntry 6 }
+
+cwsSystemFrontDisplayUserMessage OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..144))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Message to be shown on the display. This is a custom message to be displayed on the LED display."
+    ::= { cwsSystemFrontDisplayEntry 7 }
+
+cwsSystemLineConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemLineConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system line configuration."
+    ::= { cienaWsSystemMIB 15 }
+
+cwsSystemLineConfigEntry OBJECT-TYPE
+    SYNTAX CwsSystemLineConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemLineConfigTable."
+    INDEX { cwsSystemLineConfigTableSnmpKey }
+    ::= { cwsSystemLineConfigTable 1 }
+
+CwsSystemLineConfigEntry ::= SEQUENCE { 
+    cwsSystemLineConfigTableSnmpKey Integer32,
+    cwsSystemLineConfigBandPlan BandplanEnum,
+    cwsSystemLineConfigLineProtection LineProtectionEnum 
+}
+
+cwsSystemLineConfigTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemLineConfig"
+    ::= { cwsSystemLineConfigEntry 1 }
+
+cwsSystemLineConfigBandPlan OBJECT-TYPE
+    SYNTAX BandplanEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Band Plan. The band plan is a way of selecting a mapping between channels and wavelengths/frequencies. The selected band plan should correspond to the band plan on the line system. The band plan is used to automatically select the next wavelength or frequency for newly installed Waveservers based on the member-id assigned to the device. Modifying Band plan will have an effect on PTP attributes. Software will automatically assign a per-defined PTP Wavelength, Frequency, and Channel combination from selected Band Plan. Note that the automatic reassignment will only occur when a valid Band Plan is already provisioned (i.e. existing Band Plan is not equal to None), the existing PTP Wavelength, Frequency, and Channel have value of zero, and user provisions Member ID from 0 to a non-zero value (i.e. from 'uncommisioned' state to 'commissioned' state) that's within the maximum wavelength allocation specified in the Band Plan (each Member ID reserves two wavelengths) . Software shall automatically update existing channel number provisioning when user changes Band Plan provisioning. Channel number shall be set to 0 if provisioned wavelength/frequency is not found in the new Band Plan or the new Band Plan equals to None. "
+    ::= { cwsSystemLineConfigEntry 2 }
+
+cwsSystemLineConfigLineProtection OBJECT-TYPE
+    SYNTAX LineProtectionEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Line protection settings. If line protection is enabled, this means that the photonic line the Waveserver is connected to has protection enabled. In the event of a line side fault, the protection card on the line side will select the protection path and the modems will reacquire the signal on the alternate path. While the switch is occuring, link state messaging will be disabled to the clients so that the connected devices do not attempt a switch or a restoration."
+    ::= { cwsSystemLineConfigEntry 3 }
+
+cwsSystemLampFlashTestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemLampFlashTestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver lamp flash test attributes."
+    ::= { cienaWsSystemMIB 16 }
+
+cwsSystemLampFlashTestEntry OBJECT-TYPE
+    SYNTAX CwsSystemLampFlashTestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemLampFlashTestTable."
+    INDEX { cwsSystemLampFlashTestTableSnmpKey }
+    ::= { cwsSystemLampFlashTestTable 1 }
+
+CwsSystemLampFlashTestEntry ::= SEQUENCE { 
+    cwsSystemLampFlashTestTableSnmpKey Integer32,
+    cwsSystemLampFlashTestOperationalState EnabledDisabledEnum,
+    cwsSystemLampFlashTestMode LampModeEnum,
+    cwsSystemLampFlashTestTargetType LampTargetTypeEnum,
+    cwsSystemLampFlashTestTimeout Unsigned32,
+    cwsSystemLampFlashTestPorts BITS 
+}
+
+cwsSystemLampFlashTestTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemLampFlashTest"
+    ::= { cwsSystemLampFlashTestEntry 1 }
+
+cwsSystemLampFlashTestOperationalState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Lamp flash test operational state. It reflects whether the lamp flash test is enabled or disabled. "
+    ::= { cwsSystemLampFlashTestEntry 2 }
+
+cwsSystemLampFlashTestMode OBJECT-TYPE
+    SYNTAX LampModeEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Lamp mode selection. The default mode is flash. It is the only mode supported"
+    ::= { cwsSystemLampFlashTestEntry 3 }
+
+cwsSystemLampFlashTestTargetType OBJECT-TYPE
+    SYNTAX LampTargetTypeEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Lamp testing target type. It can be chassis or port. The default type is chassis. When the target-type is port, the port list should be set for the selected ports to be tested."
+    ::= { cwsSystemLampFlashTestEntry 4 }
+
+cwsSystemLampFlashTestTimeout OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "The number of minutes the lamp flash testing will be operating when enabled. The default timeout value is 30 minutes"
+    ::= { cwsSystemLampFlashTestEntry 5 }
+
+cwsSystemLampFlashTestPorts OBJECT-TYPE
+    SYNTAX BITS { port1(0), port2(1), port3(2), port4(3), port5(4), port6(5), port7(6), port8(7), port9(8), port10(9), port11(10), port12(11) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Ports selected for lamp flash test. The bits in this leaf represent port number from 1 to 12, starting from position 1. When target-type is port and lamp-flash-test is enabled, the selected ports (bit is set) will have its lamp operate in the mode set. When the target-type is chassis, this leaf should not be specified or should be empty."
+    ::= { cwsSystemLampFlashTestEntry 6 }
+
+cwsSystemRootTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsSystemRootEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Waveserver system user root configuration."
+    ::= { cienaWsSystemMIB 18 }
+
+cwsSystemRootEntry OBJECT-TYPE
+    SYNTAX CwsSystemRootEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsSystemRootTable."
+    INDEX { cwsSystemRootTableSnmpKey }
+    ::= { cwsSystemRootTable 1 }
+
+CwsSystemRootEntry ::= SEQUENCE { 
+    cwsSystemRootTableSnmpKey Integer32,
+    cwsSystemRootPassword StringMaxl128 
+}
+
+cwsSystemRootTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsSystemRoot"
+    ::= { cwsSystemRootEntry 1 }
+
+cwsSystemRootPassword OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "User root password string."
+    ::= { cwsSystemRootEntry 2 }
+
+
+
+-- Conformance statements
+cienaWsSystemObjects OBJECT IDENTIFIER
+    ::= { cienaWsSystemMIB 1 }
+
+cienaWsSystemConformance OBJECT IDENTIFIER
+    ::= { cienaWsSystemMIB 2 }
+
+cienaWsSystemGroups OBJECT IDENTIFIER
+    ::= { cienaWsSystemConformance 1 }
+
+cienaWsSystemGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsSystemSiteId,
+        cwsSystemSiteName,
+        cwsSystemSiteDescription,
+        cwsSystemSiteLatitude,
+        cwsSystemSiteLongitude,
+        cwsSystemSiteAddress,
+        cwsSystemGroupId,
+        cwsSystemGroupName,
+        cwsSystemGroupDescription,
+        cwsSystemMemberId,
+        cwsSystemMemberName,
+        cwsSystemMemberDescription,
+        cwsSystemMemberFrameIdentification,
+        cwsSystemMemberRackUnitNumber,
+        cwsSystemHostNameCurrentHostName,
+        cwsSystemHostNameConfigHostName,
+        cwsSystemHostNameDhcpHostName,
+        cwsSystemTimeConfigDate,
+        cwsSystemTimeConfigTime,
+        cwsSystemTimeConfigTimeOffset,
+        cwsSystemTimeConfigTimeStamp,
+        cwsSystemTimeConfigLocalDateTime,
+        cwsSystemTimeConfigCoordinatedUniversalTime,
+        cwsSystemTimeConfigSystemUptime,
+        cwsSystemServerConfigSftpServerState,
+        cwsSystemServerConfigWebServerState,
+        cwsSystemServerConfigNetconfServerState,
+        cwsSystemServerConfigRestconfServerState,
+        cwsSystemDhcpAdminState,
+        cwsSystemXftpConfigMode,
+        cwsSystemTftpConfigHostName,
+        cwsSystemTftpDhcpHostName,
+        cwsSystemTftpCurrentHostName,
+        cwsSystemFtpHostName,
+        cwsSystemFtpUserName,
+        cwsSystemFtpPassword,
+        cwsSystemFtpSecret,
+        cwsSystemSftpHostName,
+        cwsSystemSftpUserName,
+        cwsSystemSftpPassword,
+        cwsSystemSftpSecret,
+        cwsSystemScpHostName,
+        cwsSystemScpUserName,
+        cwsSystemScpPassword,
+        cwsSystemScpSecret,
+        cwsSystemGlobalProvisioningLowPowerMode,
+        cwsSystemGlobalProvisioningLampTest,
+        cwsSystemGlobalProvisioningResetToFactoryDefaultButton,
+        cwsSystemGlobalProvisioningFcsErrorForwarding,
+        cwsSystemGlobalProvisioningChassisFunctionality,
+        cwsSystemFrontDisplayAdminState,
+        cwsSystemFrontDisplayScreensaverState,
+        cwsSystemFrontDisplayScreensaverTimeout,
+        cwsSystemFrontDisplayInputButtonState,
+        cwsSystemFrontDisplayUserMessageState,
+        cwsSystemFrontDisplayUserMessage,
+        cwsSystemLineConfigBandPlan,
+        cwsSystemLineConfigLineProtection,
+        cwsSystemLampFlashTestOperationalState,
+        cwsSystemLampFlashTestMode,
+        cwsSystemLampFlashTestTargetType,
+        cwsSystemLampFlashTestTimeout,
+        cwsSystemLampFlashTestPorts,
+        cwsSystemRootPassword
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsSystemGroups 1 }
+
+cienaWsSystemCompliances OBJECT IDENTIFIER
+    ::= { cienaWsSystemConformance 2 }
+
+cienaWsSystemCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsSystemGroup }
+    ::= { cienaWsSystemCompliances 1 }
+
+END -- End module

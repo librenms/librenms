@@ -1,0 +1,112 @@
+<div class="panel panel-default panel-condensed">
+    <div class="panel-heading">
+        <strong>MAC Addresses</strong>
+    </div>
+    <table id="mac-search" class="table table-hover table-condensed table-striped">
+        <thead>
+            <tr>
+                <th data-column-id="hostname" data-order="asc">Device</th>
+                <th data-column-id="interface">Interface</th>
+                <th data-column-id="address" data-formatter="tooltip">MAC Address</th>
+                <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="<?php echo \App\Facades\LibrenmsConfig::get('mac_oui.enabled') ? 'true' : 'false' ?>" data-formatter="tooltip">Vendor</th>
+                <th data-column-id="description" data-formatter="tooltip">Description</th></tr>
+            </tr>
+        </thead>
+    </table>
+</div>
+
+<script>
+
+var grid = $("#mac-search").bootgrid({
+    ajax: true,
+    rowCount: [50, 100, 250, -1],
+    templates: {
+        header: "<div id=\"{{ctx.id}}\" class=\"{{css.header}}\"><div class=\"row\">"+
+                "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\">"+
+                "<form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
+                "<?php echo addslashes(csrf_field()) ?>"+
+                "<div class=\"form-group\">"+
+                "<select name=\"device_id\" id=\"device_id\" class=\"form-control input-sm\">"+
+                "<option value=\"\">All Devices</option>"+
+<?php
+
+$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
+$param = [];
+$where = '';
+
+$device_id = (int) ($_POST['device_id'] ?? 0);
+$interface = $_POST['interface'] ?? '';
+$address = $_POST['address'] ?? '';
+
+if (Gate::denies('viewAll', \App\Models\Device::class)) {
+    $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
+    $where .= ' WHERE `devices`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
+    $param = array_merge($param, $device_ids);
+}
+
+$sql .= " $where ORDER BY `hostname`";
+foreach (dbFetchRows($sql, $param) as $data) {
+    echo '"<option value=\"' . $data['device_id'] . '\""+';
+    if ($data['device_id'] == $device_id) {
+        echo '" selected "+';
+    }
+
+    echo '">' . str_replace(['"', '\''], '', htmlentities(format_hostname($data))) . '</option>"+';
+}
+?>
+               "</select>"+
+               "</div>"+
+               "<div class=\"form-group\">"+
+               "<select name=\"interface\" id=\"interface\" class=\"form-control input-sm\">"+
+               "<option value=\"\">All Interfaces</option>"+
+               "<option value=\"Loopback%\" "+
+<?php
+if ($interface == 'Loopback%') {
+    echo '" selected "+';
+}
+?>
+               ">Loopbacks</option>"+
+               "<option value=\"Vlan%\""+
+<?php
+if ($interface == 'Vlan%') {
+    echo '" selected "+';
+}
+?>
+
+               ">VLANs</option>"+
+               "</select>"+
+               "</div>"+
+               "<div class=\"form-group\">"+
+               "<input type=\"text\" name=\"address\" id=\"address\" value=\""+
+<?php
+echo '"' . htmlspecialchars((string) $address) . '"+';
+?>
+
+               "\" class=\"form-control input-sm\" placeholder=\"Mac Address\"/>"+
+               "</div>"+
+               "<button type=\"submit\" class=\"btn btn-default input-sm\">Search</button>"+
+               "</form></span></div>"+
+               "<div class=\"col-sm-3 actionBar\"><p class=\"{{css.actions}}\"></p></div></div></div>"
+    },
+    post: function ()
+    {
+        return {
+            device_id: '<?php echo $device_id ?: ''; ?>',
+            interface: '<?php echo htmlspecialchars((string) $interface); ?>',
+            address: '<?php echo htmlspecialchars((string) $address); ?>'
+        };
+    },
+    url: "<?php echo route('search.mac'); ?>",
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                var vendor = '';
+                if (column.id == 'address' && ((vendor = row['mac_oui']) != '' )) {
+                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
+    },
+});
+
+</script>

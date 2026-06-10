@@ -1,0 +1,7 @@
+os: axisaudio
+text: 'AXIS Audio Appliances'
+type: appliance
+icon: axis
+discovery:
+    -
+        sysDescr_regex: '/AXIS .* (Network IO Audio Module|Network Speaker)/'

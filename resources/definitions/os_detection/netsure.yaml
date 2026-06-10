@@ -1,0 +1,40 @@
+os: netsure
+text: 'Emerson Netsure'
+type: power
+icon: emerson
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_state, text: State }
+mib_dir: emerson
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.885.3
+discovery_modules:
+    storage: false
+    bgp-peers: false
+    ntp: false
+    stp: false
+    diskio: false
+    vlans: false
+    arp-table: false
+    discovery-protocols: false
+    hr-device: false
+    mempools: false
+    entity-physical: false
+    ports-stack: false
+    ucd-diskio: false
+    processors: false
+    mpls: false
+    wireless: false
+    fdb-table: false
+    services: false
+    cisco-vrf-lite: false
+poller_modules:
+    ospf: false
+    ntp: false
+    services: false
+    storage: false
+    ucd-diskio: false
+    mpls: false

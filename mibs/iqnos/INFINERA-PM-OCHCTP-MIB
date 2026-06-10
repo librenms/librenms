@@ -1,0 +1,600 @@
+-- *****************************************************************
+-- INFINERA-PM-OCHCTP-MIB
+-- 
+-- October 2008, Sharfuddin Syed / Narendra Gupta
+-- 
+-- 
+-- Copyright (c) 2008-2012 by Infinera Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+INFINERA-PM-OCHCTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32                                   FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    TruthValue                                  FROM SNMPv2-TC
+    ifIndex                                     FROM IF-MIB
+    HCPerfIntervalCount                         FROM HC-PerfHist-TC-MIB
+    FloatHundredths, FloatArbitraryPrecision    FROM INFINERA-TC-MIB
+    perfMon                                     FROM INFINERA-REG-MIB;
+
+
+ochCtpPmMIB MODULE-IDENTITY
+    LAST-UPDATED  "201110230000Z"
+    ORGANIZATION  "Infinera"
+    CONTACT-INFO
+        "Infinera
+        1322 Bordeaux Drive
+        Sunnyvale, CA - 94089
+
+        Contact : Technical Support
+        Email   : support@infinera.com
+        Phone   : 1-877-INF-5288"
+    DESCRIPTION
+        " "
+    REVISION      "201110230000Z" 
+    DESCRIPTION
+        "First Version"
+    ::= { perfMon 30 }
+
+ochCtpPmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OchCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of OchCtpPm entries. Each entry is uniquely identified by the value of ifIndex, Sample Duration and OchCtpPmTimestamp."
+    ::= { ochCtpPmMIB 2 } 
+
+ochCtpPmEntry  OBJECT-TYPE
+    SYNTAX      OchCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A OchCtp entry containing historical performance information pertaining to Infinera LM OCH CTP interfaces.
+        This table is a subclass of IfCommon. Entries will exist in this table only for interfaces
+        of type OCH CTP.
+        Each interface may have a number of entries in this table, each with a different combination of timestamp
+        and sample duration."
+    INDEX { ifIndex, ochCtpPmSampleDuration, ochCtpPmTimestamp }
+    ::= { ochCtpPmTable 1 }
+
+
+OchCtpPmEntry  ::= SEQUENCE {
+    ochCtpPmTimestamp            Integer32,
+    ochCtpPmSampleDuration       INTEGER,
+    ochCtpPmValidity             TruthValue,
+    ochCtpPmChanOchOptMin        FloatHundredths,
+    ochCtpPmChanOchOptMax        FloatHundredths,
+    ochCtpPmChanOchOptAve        FloatHundredths,
+    ochCtpPmChanOchOprMin        FloatHundredths,
+    ochCtpPmChanOchOprMax        FloatHundredths,
+    ochCtpPmChanOchOprAve        FloatHundredths,
+    ochCtpPmChanOchLBCMin        FloatHundredths,
+    ochCtpPmChanOchLBCMax        FloatHundredths,
+    ochCtpPmChanOchLBCAve        FloatHundredths,
+    ochCtpPmChanOchQValueMin     FloatHundredths,
+    ochCtpPmChanOchQValueMax     FloatHundredths,
+    ochCtpPmChanOchQValueAve     FloatHundredths,
+    ochCtpPmChanOchCDMin         FloatHundredths,
+    ochCtpPmChanOchCDMax         FloatHundredths,
+    ochCtpPmChanOchCDAve         FloatHundredths,
+    ochCtpPmPmdMin               FloatArbitraryPrecision,
+    ochCtpPmPmdMax               FloatArbitraryPrecision,
+    ochCtpPmPmdAve               FloatArbitraryPrecision,
+    ochCtpPmSoPmdMin             FloatArbitraryPrecision,
+    ochCtpPmSoPmdMax             FloatArbitraryPrecision,
+    ochCtpPmSoPmdAve             FloatArbitraryPrecision,
+    ochCtpPmBerPreFecMin         FloatArbitraryPrecision,
+    ochCtpPmBerPreFecMax         FloatArbitraryPrecision,
+    ochCtpPmBerPreFecAve         FloatArbitraryPrecision,
+    ochCtpPmPhaseCorrectionMin	 FloatHundredths,
+    ochCtpPmPhaseCorrectionMax	 FloatHundredths,
+    ochCtpPmPhaseCorrectionAve	 FloatHundredths,
+    ochCtpPmBerPostFecMin        FloatArbitraryPrecision,
+    ochCtpPmBerPostFecMax        FloatArbitraryPrecision,
+    ochCtpPmBerPostFecAve        FloatArbitraryPrecision,
+    ochCtpPmCWProc               HCPerfIntervalCount,
+    ochCtpPmUnCrctblCW           HCPerfIntervalCount,
+    ochCtpPmCrctdBits            HCPerfIntervalCount
+
+}
+
+ochCtpPmTimestamp OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "End Time stamp for this interval. If this time is later than the current time,
+        then the data for this bucket is currently being collected."
+    ::= { ochCtpPmEntry  1 }
+
+
+ochCtpPmSampleDuration OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    fifteenMinutes(1),
+                    day(2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The duration of this sample."
+    ::= { ochCtpPmEntry  2 }
+
+
+ochCtpPmValidity OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flag indicating if data was valid for the entire interval"
+    ::= { ochCtpPmEntry  3 }
+
+
+ochCtpPmChanOchOptMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum OCH optical power leaving the LM towards its attached XLM/DLM/OLM or GAM."
+    ::= { ochCtpPmEntry  4 }
+
+
+ochCtpPmChanOchOptMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum OCH optical power leaving the LM towards its attached XLM/DLM/OLM or GAM."
+    ::= { ochCtpPmEntry  5 }
+
+
+ochCtpPmChanOchOptAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average OCH optical power leaving the LM towards its attached XLM/DLM/OLM or GAM."
+    ::= { ochCtpPmEntry  6 }
+
+
+   ochCtpPmChanOchOprMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum OCH optical power arriving at the LM from the local XLM/DLM/OLM or GAM."
+    ::= { ochCtpPmEntry  7 }
+
+
+   ochCtpPmChanOchOprMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum OCH optical power arriving at the LM from the local XLM/DLM/OLM or GAM."
+    ::= { ochCtpPmEntry  8 }
+
+
+   ochCtpPmChanOchOprAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average OCH optical power arriving at the LM from the local XLM/DLM/OLM or GAM."
+    ::= { ochCtpPmEntry  9 }
+
+    ochCtpPmChanOchLBCMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum Laser Bias Current"
+    ::= { ochCtpPmEntry  10 }
+
+
+    ochCtpPmChanOchLBCMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum Laser Bias Current."
+    ::= { ochCtpPmEntry  11 }
+
+
+    ochCtpPmChanOchLBCAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average Laser Bias Current."
+    ::= { ochCtpPmEntry  12 }
+
+    ochCtpPmChanOchQValueMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "."
+    ::= { ochCtpPmEntry  13 }
+
+    ochCtpPmChanOchQValueMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmEntry  14 }
+
+    ochCtpPmChanOchQValueAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmEntry  15 }
+
+    ochCtpPmChanOchCDMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum Chromatic Dispersion."
+    ::= { ochCtpPmEntry  16 }
+
+    ochCtpPmChanOchCDMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum Chromatic Dispersion."
+    ::= { ochCtpPmEntry  17 }
+
+    ochCtpPmChanOchCDAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average Chromatic Dispersion."
+    ::= { ochCtpPmEntry  18 }
+
+	ochCtpPmPmdMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum PMD."
+    ::= { ochCtpPmEntry  19 }
+
+	ochCtpPmPmdMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum PMD."
+    ::= { ochCtpPmEntry  20 }
+
+	ochCtpPmPmdAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SoPMD."
+    ::= { ochCtpPmEntry  21 }
+
+	ochCtpPmSoPmdMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum PMD."
+    ::= { ochCtpPmEntry  22 }
+
+	ochCtpPmSoPmdMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum SoPMD."
+    ::= { ochCtpPmEntry  23 }
+
+	ochCtpPmSoPmdAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average SoPMD."
+    ::= { ochCtpPmEntry  24 }
+    
+    ochCtpPmBerPreFecMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum BER PRE FEC."
+    ::= { ochCtpPmEntry  25 }
+
+	ochCtpPmBerPreFecMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum BER PRE FEC."
+    ::= { ochCtpPmEntry  26 }
+
+	ochCtpPmBerPreFecAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average BER PRE FEC."
+    ::= { ochCtpPmEntry  27 }
+
+	ochCtpPmPhaseCorrectionMin	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Min Phase Correction."
+    ::= { ochCtpPmEntry  28 }
+
+	ochCtpPmPhaseCorrectionMax	OBJECT-TYPE
+    SYNTAX     FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Max Phase Correction"
+    ::= { ochCtpPmEntry  29 }
+
+	ochCtpPmPhaseCorrectionAve	OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average Phase Correction."
+    ::= { ochCtpPmEntry  30 }
+
+    ochCtpPmBerPostFecMin OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Minimum BER POST FEC."
+    ::= { ochCtpPmEntry  31 }
+
+    ochCtpPmBerPostFecMax OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum BER POST FEC."
+    ::= { ochCtpPmEntry  32 }
+
+    ochCtpPmBerPostFecAve OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average BER POST FEC."
+    ::= { ochCtpPmEntry  33 }
+
+    ochCtpPmCWProc OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Code Words Processed by OCH client CTP."
+    ::= { ochCtpPmEntry  34 }
+
+    ochCtpPmUnCrctblCW OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uncorrected Code Words."
+    ::= { ochCtpPmEntry  35 }
+
+    ochCtpPmCrctdBits OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of Corrected bits."
+    ::= { ochCtpPmEntry  36 }
+
+
+ochCtpPmRealTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OchCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of OchCtpPmReal entries. Each entry is uniquely identified by the value of ifIndex."
+    ::= { ochCtpPmMIB 1 } 
+
+ochCtpPmRealEntry  OBJECT-TYPE
+    SYNTAX      OchCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A OchCtp entry containing real-time performance information pertaining to Infinera
+        OCH CTP interfaces. This table is a subclass of IfCommon. Entries will exist in this
+        table only for interfaces of type LM OCH CTP."
+    INDEX { ifIndex }
+    ::= { ochCtpPmRealTable 1 }
+
+
+
+
+OchCtpPmRealEntry  ::= SEQUENCE {
+    ochCtpPmRealChanOchOpt                          FloatHundredths,
+    ochCtpPmRealChanOchOpr                          FloatHundredths,
+    ochCtpPmRealChanOchLBC                          FloatHundredths,
+    ochCtpPmRealChanOchMeasuredWavelength           FloatHundredths,
+    ochCtpPmRealChanOchQValue                       FloatHundredths,
+    ochCtpPmRealChanOchCD                           FloatHundredths,
+    ochCtpPmRealPmd                                 FloatArbitraryPrecision,
+    ochCtpPmRealSoPmd                               FloatArbitraryPrecision,
+    ochCtpPmBerPreFec                               FloatArbitraryPrecision,
+    ochCtpPmRealPhaseCorrection			    FloatHundredths,
+    ochCtpPmRealBerPostFec                          FloatArbitraryPrecision,
+    ochCtpPmRealCWProc                              HCPerfIntervalCount,
+    ochCtpPmRealUnCrctblCW                          HCPerfIntervalCount,
+    ochCtpPmRealCrctdBits                           HCPerfIntervalCount                  
+}
+
+ochCtpPmRealChanOchOpt OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total OCH optical power leaving the LM towards its attached XLM/DLM/OLM or GAM. One attribute for each OCH."
+    ::= { ochCtpPmRealEntry  1 }
+
+
+ochCtpPmRealChanOchOpr OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total OCH optical power arriving at the LM from the local XLM/DLM/OLM or GAM. One attribute for each OCH."
+    ::= { ochCtpPmRealEntry  2 }
+
+ochCtpPmRealChanOchLBC OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Laser Bias Current. One attribute for each OCH."
+    ::= { ochCtpPmRealEntry  3 }
+
+ochCtpPmRealChanOchMeasuredWavelength OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  4 }
+
+ochCtpPmRealChanOchQValue OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  5 }
+    
+ochCtpPmRealChanOchCD OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  6 }
+
+ochCtpPmRealPmd OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  7 }
+
+ochCtpPmRealSoPmd OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  8 }
+
+ochCtpPmBerPreFec OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  9 }
+
+ochCtpPmRealPhaseCorrection	 OBJECT-TYPE
+    SYNTAX     FloatHundredths 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  10 }
+
+ochCtpPmRealBerPostFec OBJECT-TYPE
+    SYNTAX      FloatArbitraryPrecision
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { ochCtpPmRealEntry  11 }
+
+ochCtpPmRealCWProc OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Code Words Processed by OCH client CTP."
+    ::= { ochCtpPmRealEntry  12 }
+
+ochCtpPmRealUnCrctblCW OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uncorrected Code Words."
+    ::= { ochCtpPmRealEntry  13 }
+
+ochCtpPmRealCrctdBits OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of Corrected bits."
+    ::= { ochCtpPmRealEntry  14 }
+
+
+-- Conformance Statements
+ochCtpPmConformance    OBJECT IDENTIFIER ::= { ochCtpPmMIB 3 }
+ochCtpPmCompliances    OBJECT IDENTIFIER ::= { ochCtpPmConformance 1 }
+ochCtpPmGroups         OBJECT IDENTIFIER ::= { ochCtpPmConformance 2 }
+
+ochCtpPmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the OCHCTP-MIB"
+    MODULE
+        MANDATORY-GROUPS { ochCtpPmGroup }
+    ::= { ochCtpPmCompliances 1 }
+
+ochCtpPmRealCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the OchCtpPmReal-MIB"
+    MODULE
+        MANDATORY-GROUPS { ochCtpPmRealGroup }
+    ::= { ochCtpPmCompliances 2 }
+
+ochCtpPmGroup OBJECT-GROUP
+    OBJECTS {
+        ochCtpPmValidity,
+         ochCtpPmChanOchOptMin,
+         ochCtpPmChanOchOptMax,
+         ochCtpPmChanOchOptAve,
+         ochCtpPmChanOchOprMin,
+         ochCtpPmChanOchOprMax,
+         ochCtpPmChanOchOprAve,
+         ochCtpPmChanOchLBCMin,
+         ochCtpPmChanOchLBCMax,
+         ochCtpPmChanOchLBCAve,
+         ochCtpPmChanOchQValueMin,
+         ochCtpPmChanOchQValueMax,
+         ochCtpPmChanOchQValueAve,
+         ochCtpPmChanOchCDMin,
+         ochCtpPmChanOchCDMax,
+         ochCtpPmChanOchCDAve,
+         ochCtpPmPmdMin,           
+         ochCtpPmPmdMax,           
+         ochCtpPmPmdAve,           
+         ochCtpPmSoPmdMin,         
+         ochCtpPmSoPmdMax,         
+         ochCtpPmSoPmdAve,
+         ochCtpPmBerPreFecMin,
+         ochCtpPmBerPreFecMax,
+         ochCtpPmBerPreFecAve,         
+         ochCtpPmPhaseCorrectionMin,
+         ochCtpPmPhaseCorrectionMax,
+         ochCtpPmPhaseCorrectionAve,
+         ochCtpPmBerPostFecMin,        
+         ochCtpPmBerPostFecMax,
+         ochCtpPmBerPostFecAve,
+         ochCtpPmCWProc,
+         ochCtpPmUnCrctblCW,
+         ochCtpPmCrctdBits 
+    }                      
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the historical performance of the OchCtp."
+    ::= { ochCtpPmGroups 1 }
+
+
+ochCtpPmRealGroup OBJECT-GROUP
+    OBJECTS {
+    ochCtpPmRealChanOchOpt,
+    ochCtpPmRealChanOchOpr,
+    ochCtpPmRealChanOchLBC,
+    ochCtpPmRealChanOchMeasuredWavelength,
+    ochCtpPmRealChanOchQValue,
+    ochCtpPmRealChanOchCD,
+    ochCtpPmRealPmd,
+    ochCtpPmRealSoPmd,
+    ochCtpPmBerPreFec,
+    ochCtpPmRealPhaseCorrection,
+    ochCtpPmRealBerPostFec,
+    ochCtpPmRealCWProc,
+    ochCtpPmRealUnCrctblCW,
+    ochCtpPmRealCrctdBits                       
+
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the real-time performance of the OchCtp."
+    ::= { ochCtpPmGroups 2 }
+
+
+END

@@ -1,0 +1,1285 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "suricata",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "suricata",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"version\":1,\"instances\":[\"ids\"]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": ".total_af_dcerpc_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_dcerpc_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_dhcp",
+                    "value": 52,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_dns_tcp",
+                    "value": 1901,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_dns_udp",
+                    "value": 556315,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_failed_tcp",
+                    "value": 4260,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_failed_udp",
+                    "value": 8121,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_ftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_ftp_data",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_http",
+                    "value": 30855,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_ikev2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_imap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_krb5_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_krb5_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_mqtt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_nfs_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_nfs_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_ntp",
+                    "value": 1682,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_rdp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_rfb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_sip",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_smb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_smtp",
+                    "value": 1408,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_snmp",
+                    "value": 14203,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_ssh",
+                    "value": 37,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_tftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_af_tls",
+                    "value": 126907,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_dcerpc_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_dcerpc_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_dhcp",
+                    "value": 2571,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_dns_tcp",
+                    "value": 3806,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_dns_udp",
+                    "value": 1207694,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_ftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_ftp_data",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_http",
+                    "value": 31784,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_ikev2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_imap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_krb5_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_krb5_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_mqtt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_nfs_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_nfs_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_ntp",
+                    "value": 2409,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_rdp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_rfb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_sip",
+                    "value": 4137,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_smb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_smtp",
+                    "value": 2108,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_snmp",
+                    "value": 433976,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_ssh",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_tftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_at_tls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_bytes",
+                    "value": 7587094274,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_avg_pkt_size",
+                    "value": 513,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_chdlc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_ethernet",
+                    "value": 14772989,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_geneve",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_ieee8021ah",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_invalid",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_ipv4",
+                    "value": 14616928,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_ipv4_in_ipv6",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_ipv6",
+                    "value": 428,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_max_pkt_size",
+                    "value": 1514,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_mpls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_mx_mac_addrs_d",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_mx_mac_addrs_s",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_packets",
+                    "value": 14772989,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_ppp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_pppoe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_raw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_sctp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_sll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_tcp",
+                    "value": 9921619,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_teredo",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_too_many_layer",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_udp",
+                    "value": 4120492,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_vlan",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_vlan_qinq",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_vntag",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dec_vxlan",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_drop_delta",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_drop_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_dropped",
+                    "value": 12750,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_error_delta",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_error_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_errors",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_f_icmpv4",
+                    "value": 3667,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_f_icmpv6",
+                    "value": 371,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_f_memuse",
+                    "value": 8567872,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_f_tcp",
+                    "value": 287482,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_f_udp",
+                    "value": 580374,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_ftp_memuse",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_http_memuse",
+                    "value": 155770,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_ifdrop_delta",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_ifdrop_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_ifdropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_packet_delta",
+                    "value": 55223,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_packets",
+                    "value": 14785697,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_tcp_memuse",
+                    "value": 2425072,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_tcp_reass_memuse",
+                    "value": 16676636,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": ".total_uptime",
+                    "value": 104890,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_dcerpc_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_dcerpc_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_dhcp",
+                    "value": 52,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_dns_tcp",
+                    "value": 1901,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_dns_udp",
+                    "value": 556315,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_failed_tcp",
+                    "value": 4260,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_failed_udp",
+                    "value": 8121,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_ftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_ftp_data",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_http",
+                    "value": 30855,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_ikev2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_imap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_krb5_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_krb5_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_mqtt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_nfs_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_nfs_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_ntp",
+                    "value": 1682,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_rdp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_rfb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_sip",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_smb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_smtp",
+                    "value": 1408,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_snmp",
+                    "value": 14203,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_ssh",
+                    "value": 37,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_tftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_af_tls",
+                    "value": 126907,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_dcerpc_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_dcerpc_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_dhcp",
+                    "value": 2571,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_dns_tcp",
+                    "value": 3806,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_dns_udp",
+                    "value": 1207694,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_ftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_ftp_data",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_http",
+                    "value": 31784,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_ikev2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_imap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_krb5_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_krb5_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_mqtt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_nfs_tcp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_nfs_udp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_ntp",
+                    "value": 2409,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_rdp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_rfb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_sip",
+                    "value": 4137,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_smb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_smtp",
+                    "value": 2108,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_snmp",
+                    "value": 433976,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_ssh",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_tftp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_at_tls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_bytes",
+                    "value": 7587094274,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_avg_pkt_size",
+                    "value": 513,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_chdlc",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_ethernet",
+                    "value": 14772989,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_geneve",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_ieee8021ah",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_invalid",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_ipv4",
+                    "value": 14616928,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_ipv4_in_ipv6",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_ipv6",
+                    "value": 428,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_max_pkt_size",
+                    "value": 1514,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_mpls",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_mx_mac_addrs_d",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_mx_mac_addrs_s",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_packets",
+                    "value": 14772989,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_ppp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_pppoe",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_raw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_sctp",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_sll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_tcp",
+                    "value": 9921619,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_teredo",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_too_many_layer",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_udp",
+                    "value": 4120492,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_vlan",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_vlan_qinq",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_vntag",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dec_vxlan",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_drop_delta",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_drop_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_dropped",
+                    "value": 12750,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_error_delta",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_error_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_errors",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_f_icmpv4",
+                    "value": 3667,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_f_icmpv6",
+                    "value": 371,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_f_memuse",
+                    "value": 8567872,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_f_tcp",
+                    "value": 287482,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_f_udp",
+                    "value": 580374,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_ftp_memuse",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_http_memuse",
+                    "value": 155770,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_ifdrop_delta",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_ifdrop_percent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_ifdropped",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_packet_delta",
+                    "value": 55223,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_packets",
+                    "value": 14785697,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_tcp_memuse",
+                    "value": 2425072,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_tcp_reass_memuse",
+                    "value": 16676636,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
+                    "metric": "ids_uptime",
+                    "value": 104890,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64",
+                    "sysContact": "<private>",
+                    "version": "3.10.0-693.5.2.el7.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

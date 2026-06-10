@@ -1,0 +1,361 @@
+CT-FLASH-MIB    DEFINITIONS ::= BEGIN
+ 
+        --  ct-flash-mib.txt
+        --  Revision: 01.01.02
+        --  Part Number:  
+        --  Date: May 7, 1998
+ 
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+ 
+        --  This module provides authoritative definitions for Cabletron's
+        --  flash filing system mib.
+        --
+        --  This module will be extended, as required.
+        --
+ 
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+ 
+        --  Copyright (c)1998 Cabletron Systems
+
+ IMPORTS
+    NetworkAddress
+       FROM RFC1155-SMI
+
+    OBJECT-TYPE
+       FROM RFC-1212
+
+    DisplayString
+       FROM RFC1213-MIB
+
+    ctFlash
+       FROM CTRON-MIB-NAMES;
+
+--===============   Group Definitions   ===================
+
+flashStatus     OBJECT IDENTIFIER ::= { ctFlash 1 }
+flashFile       OBJECT IDENTIFIER ::= { ctFlash 2 }
+flashCmd        OBJECT IDENTIFIER ::= { ctFlash 3 }
+
+-- All groups are optional, within a group all objects are 
+-- mandatory.
+-- Groups 1 and 2 contain related summary information and 
+-- should be implemented together.
+
+
+
+--===============   Flash Status group : ctFlash 1   ===================
+
+flashVolumeStatusTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF  FlashVolumeStatusEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "This table contains status information on each flash volume."
+::= { flashStatus 1 }
+
+flashVolumeStatusEntry  OBJECT-TYPE
+SYNTAX  FlashVolumeStatusEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "Information on a particular volume."
+INDEX { flashVolume }
+::= { flashVolumeStatusTable 1 }
+
+FlashVolumeStatusEntry ::= SEQUENCE {
+        flashVolume
+                INTEGER,
+        flashVolFiles
+                INTEGER,
+        flashVolSpace
+                INTEGER
+        }
+
+flashVolume     OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+        "Uniquely defines a volume."
+::= { flashVolumeStatusEntry 1 }
+
+flashVolFiles   OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "The flash filing system status contains the number of
+                files currently in the volume." 
+        ::= { flashVolumeStatusEntry 2 }
+
+ flashVolSpace  OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "This object returns the approximate amount of remaining 
+                  storage space, in bytes, in the flash filing system."
+        ::= { flashVolumeStatusEntry 3 }
+ 
+
+
+--===============   Flash File group : ctFlash 2   ===================
+
+flashFileTable  OBJECT-TYPE
+SYNTAX  SEQUENCE OF FlashFileEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "Describes each file in a flash file system volume."
+::= { flashFile 1 }
+
+flashFileEntry  OBJECT-TYPE
+SYNTAX  FlashFileEntry
+ACCESS  not-accessible
+STATUS  mandatory
+DESCRIPTION
+        "Describes a particular file."
+INDEX { flashVolume, flashFileID }
+::= { flashFileTable 1 }
+
+FlashFileEntry  ::= SEQUENCE {
+        flashFileID
+                INTEGER,
+        flashFilename
+                DisplayString,
+        flashFileVersion
+                DisplayString,
+        flashFileType
+                INTEGER,
+        flashFileSize
+                INTEGER
+        }
+
+ flashFileID    OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "This object contains a volume-unique file id associated with
+                each file."
+        ::= { flashFileEntry 1 }
+
+ flashFilename  OBJECT-TYPE
+     SYNTAX     DisplayString(SIZE (0..16))
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "This object contains the filename of the current file."
+        ::= { flashFileEntry 2 }
+ 
+ flashFileVersion       OBJECT-TYPE
+     SYNTAX     DisplayString(SIZE (0..8))
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "This object contains the file version number of the current
+                  file in the form 'XX.XX.XX', where 'X' is in the range 0-9."
+        ::= { flashFileEntry 3 }
+ 
+ flashFileType  OBJECT-TYPE
+     SYNTAX     INTEGER { intelHex(1),
+                          intelHexCompressed(2),
+                          iEEE695(3),
+                          eLF(4),
+                          table(5),
+                          dLL(6),
+                          bOOT(7),
+                          binary(8),
+                          binaryCompressed(9),
+                          taggedData(10),
+                          package(11) }
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "This object contains the file type defined for the file."
+        ::= { flashFileEntry 4  }
+ 
+ flashFileSize  OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "This object contains the size, in bytes, currently allocated
+                  to the file."
+        ::= { flashFileEntry 5 }
+ 
+
+
+--===============   Flash Command group : ctFlash 3   ===================
+
+flashCmdPath    OBJECT-TYPE
+     SYNTAX     DisplayString (SIZE (0..128))
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "Filename requested of the server for a TFTP download
+                or upload."
+        ::= { flashCmd 1 }
+
+flashCmdNetAddress OBJECT-TYPE
+     SYNTAX     NetworkAddress
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "IP address of the TFTP server to use with a flash file
+                download or upload operation. If an IP address is not
+                specified, the operation will default to the IP address
+                 associated with the runtime TFTP download."
+        ::= { flashCmd 2 }
+
+flashCmdVolume  OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "Flash volume to contain the file created during a
+                download operation."
+        ::= { flashCmd 3 }
+
+flashCmdOperation OBJECT-TYPE
+     SYNTAX     INTEGER { install(1),
+                          download(2),
+                          upload(3),
+                          cleanup(4),
+                          delete(5),
+                          none(6) }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "Operation to perform on the specified flash file.
+                Download and upload operations require that the network.
+                pathname, filename, version, type, and volume be specified.
+                Cleanup does not require any additional information."
+        ::= { flashCmd 4 }
+
+flashCmdStatus  OBJECT-TYPE
+     SYNTAX     INTEGER { idle(1),
+                          other(2),             -- none of the following
+                          flashVerifyServer(3),
+                          flashCleanup(4),      -- erasing "dirty" flash
+                          downLoadActive(5),
+                          upLoadActive(6),
+                          completeError(7) }
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "Status of the download or upload operation. The idle(1)
+                status indicates no operation is in progress. The 
+                downLoadActive(3) or upLoadActive(4) indicate a file 
+                transfer in progress. The completeError(5) status indicates
+                that a file transfer was started but an error was detected."
+        ::= { flashCmd 5 }
+
+flashCmdError   OBJECT-TYPE
+     SYNTAX     INTEGER { oK(1),            -- No error condition
+                          deleteFailed(2),  -- Flash file deletion failed
+                          fileSystem(3),    -- Generic file system error
+                          tFTPerror(4),     -- Generic TFTP session error
+                          corruptFile(5),   -- File checksum error
+                          dupFlashName(6),  -- Duplicate flash file name
+                          noFlashFile(7),   -- Flash file does not exist
+                          flashAlloc(8),    -- Flash allocation error
+                          maxFiles(9),      -- Exceeded maximum files per
+                                            -- flash volume
+                          invalidName(10),  -- Invalid flash filename
+                          protocolErr(11),  -- TFTP protocol error 
+                          serverLost(12),   -- Lost TFTP server
+                          noNetFile(13),    -- Network file not found
+                          noNetAccess(14),  -- Network access violation
+                          netDiskFull(15),  -- Network disk full
+                          dupNetFile(16),   -- Network file already exists
+                          parseError(17),   -- Install file parse error
+                          invalidType(18),  -- Invalid file type
+                          invalidCmd(19),   -- Invalid command
+                          invalidModId(20), -- Invalid module id.
+                          noServerIP(21),   -- No server ip
+                          socketError(22),  -- UDP socket error
+                          blockSequence(23),-- Block sequence error
+                          bufferError(24)}  -- Buffer error
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "If the value of flashCmdStatus is completeError(5), then
+                this object describes the nature of the error."
+        ::= { flashCmd 6 }
+
+flashCmdFile    OBJECT-TYPE
+     SYNTAX     DisplayString (SIZE (0..16))
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "Flash filename to perform the specified operation."
+        ::= { flashCmd 7 }
+
+flashCmdVersion OBJECT-TYPE
+     SYNTAX     DisplayString (SIZE (0..8))
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "Flash file version to perform the specified operation
+                in the form 'XX.XX.XX' where 'X' is in the range 0-9."
+        ::= { flashCmd 8 }
+
+flashCmdType    OBJECT-TYPE
+     SYNTAX     INTEGER { intelHex(1),
+                          intelHexCompressed(2),
+                          iEEE695(3),
+                          eLF(4),
+                          table(5),
+                          dLL(6),
+                          bOOT(7),
+                          binary(8),
+                          binaryCompressed(9),
+                          taggedData(10),
+                          package(11) }
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "File type to specify with a flash file created during
+                a download operation."
+        ::= { flashCmd 9 }
+
+flashCmdSize    OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-write
+     STATUS     mandatory
+     DESCRIPTION
+                "Size of the download file. This value allows the flash
+                filing system to initialize an appropriate amount of 
+                flash memory prior to the TFTP transfer, preventing a
+                time-out condition during a transfer."
+        ::= { flashCmd 10 }
+
+flashBlockCount OBJECT-TYPE
+     SYNTAX     INTEGER
+     ACCESS     read-only
+     STATUS     mandatory
+     DESCRIPTION
+                "Current TFTP block count of an active session. If no
+                TFTP transfer is in progress, zero is returned."
+        ::= { flashCmd 11}
+
+END

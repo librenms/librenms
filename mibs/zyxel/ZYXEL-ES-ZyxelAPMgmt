@@ -1,0 +1,52 @@
+-- **********************************************
+-- ZyXEL Communications Corporation
+--
+-- Enterprise Solution MIB definitions
+-- ZyXEL AP Management MIBs 
+--
+-- LiKuang Tsai
+--
+-- Copyright by ZyXEL Communications Corp.
+-- All rights reserved.
+-- **********************************************
+
+ZYXEL-ES-ZyxelAPMgmt DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	OBJECT-TYPE		FROM SNMPv2-SMI
+
+	OBJECT-GROUP,
+	MODULE-COMPLIANCE	FROM SNMPv2-CONF
+
+	esMgmt			FROM ZYXEL-ES-SMI;
+
+zyxelAPMgmt MODULE-IDENTITY
+	LAST-UPDATED	"201403100000Z"    
+	ORGANIZATION "Enterprise Solution ZyXEL"     
+	CONTACT-INFO
+		""	   
+	DESCRIPTION
+		"The subtree for zyxelAPMgmt information"
+	::= { esMgmt 4 }
+
+
+-- zyxelAPMgmt OIDs
+                                    
+	
+	operationMode OBJECT-TYPE
+		SYNTAX	  INTEGER  {
+			standalone (1),
+    		controller (2),
+    		managed (3)
+		}
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Wireless AP operation mode"
+	::= { zyxelAPMgmt 1 } 	
+                                 	                           
+END
+

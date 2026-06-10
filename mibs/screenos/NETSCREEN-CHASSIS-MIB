@@ -1,0 +1,272 @@
+-- This module defines chassis MIBs for modular ScreenOS platforms
+-- Copyright (c) 1999-2007, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-CHASSIS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    netscreen
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenChassis MODULE-IDENTITY
+    LAST-UPDATED  "200705080000Z" 
+-- May 8, 2007 by mxk
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the objects that are used to monitor 
+	device status such as Battery, Fan, Power and Temperature"
+    ::= { netscreen 21} 
+ 
+    NsPowerEntry ::=
+    	SEQUENCE {
+        	nsPowerId           Integer32,
+        	nsPowerStatus       Integer32, 
+        	nsPowerDesc	    DisplayString
+    }
+ 
+   nsPowerTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF NsPowerEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing installed power supply modules and 
+	   their status"
+     ::= { netscreenChassis 1}
+
+    nsPowerEntry OBJECT-TYPE
+        SYNTAX   NsPowerEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing one power supply module and its status"
+    INDEX { nsPowerId }
+     ::= { nsPowerTable 1 }
+
+    nsPowerId OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION  
+		      "A 32-bit integer uniquely identifying the power supply
+	        id. For 5400, range is 1~3, For 5200, range is 1~2"
+	  ::= { nsPowerEntry 1 }
+      
+    nsPowerStatus OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A  32-bit  integer uniquely identifying the
+           power supply module's status:
+           		0. Fail
+           		1. Good
+				2. Not installed"
+    ::= { nsPowerEntry 2 }
+	
+    nsPowerDesc OBJECT-TYPE
+        SYNTAX   DisplayString
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A description for the power supply module"
+    ::= { nsPowerEntry 3 }
+
+    NsFanEntry ::=
+    	SEQUENCE {
+        	nsFanId           Integer32,
+        	nsFanStatus       Integer32, 
+        	nsFanDesc	  DisplayString
+    }
+   	
+    nsFanTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF NsFanEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the installed Fan modules and their status"
+     ::= { netscreenChassis 2}
+
+    nsFanEntry OBJECT-TYPE
+        SYNTAX   NsFanEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing one installed Fan module and its status"
+    INDEX { nsFanId }
+     ::= { nsFanTable 1 }
+
+    nsFanId OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION  
+		"A 32-bit integer uniquely identifying the Fan id. At the time of 
+		this writing."
+	  ::= { nsFanEntry 1 }
+      
+    nsFanStatus OBJECT-TYPE
+        SYNTAX   Integer32 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A  32-bit integer uniquely identifying the
+           Fan module's status:
+           		0. Fail
+           		1. Good
+           "
+    ::= { nsFanEntry 2 }
+	
+    nsFanDesc OBJECT-TYPE
+        SYNTAX   DisplayString
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A description for the Fan module"
+    ::= { nsFanEntry 3 }
+           
+
+    sysBatteryStatus OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Information describing the installed Battery and its status:
+                      1. Good
+                      2. Error
+                      "
+              ::= { netscreenChassis 3 }
+
+    NsTemperatureEntry ::=
+    	SEQUENCE {
+        	nsTemperatureId         Integer32,     
+        	nsTemperatureSlotId 	  Integer32,     
+        	nsTemperatureDesc		DisplayString,
+        	nsTemperatureCur        Integer32,
+    }
+                
+    nsTemperatureTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF NsTemperatureEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+           "Information describing the temperature measured by each module"
+    ::= { netscreenChassis 4}
+
+    nsTemperatureEntry OBJECT-TYPE
+        SYNTAX   NsTemperatureEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "The temperature measured by a module"
+    INDEX { nsTemperatureId }
+     ::= { nsTemperatureTable 1 }
+  
+    nsTemperatureId OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION  
+		"A 32-bit integer uniquely identifying temperature measured on a board or on a component e.g. CPU"
+		::= { nsTemperatureEntry 1 }
+  
+    nsTemperatureSlotId OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION  
+		"A 32-bit integer uniquely identifying the slot where the temperature is measured. "
+	::= { nsTemperatureEntry 2 }
+      
+     nsTemperatureCur OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The current temperature measured by the module, unit is Celsius"
+    ::= { nsTemperatureEntry 3 }
+            
+    nsTemperatureDesc OBJECT-TYPE
+        SYNTAX   DisplayString
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A description for the module"
+    ::= { nsTemperatureEntry 4 }
+            
+
+	  NsSlotEntry ::= SEQUENCE {
+				nsSlotId              Integer32,
+        nsSlotType          	DisplayString,
+        nsSlotStatus        	Integer32,  
+        nsSlotSN            	DisplayString,  
+    }
+
+    nsSlotTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF NsSlotEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing the installed management and traffic 
+	   processing modules and their status, built-in and internal module are also listed here.
+	   "
+      ::= { netscreenChassis 5}
+
+    nsSlotEntry OBJECT-TYPE
+        SYNTAX   NsSlotEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Information describing one installed module and its status"
+       INDEX { nsSlotId,
+       				 nsSubSlotId }
+       ::= { nsSlotTable 1 }
+
+    nsSlotId OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A 32-bit integer uniquely identifying the slot id. The range 
+	   varies on different platforms "
+      ::= { nsSlotEntry 1 }
+
+    nsSlotType OBJECT-TYPE
+        SYNTAX   DisplayString
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "A description of the installed module"
+      ::= { nsSlotEntry 2 }
+
+   	nsSlotStatus OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "Slot status"
+      ::= { nsSlotEntry 3 }
+
+    nsSlotSN OBJECT-TYPE
+        SYNTAX   DisplayString
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "Serial Number of the module"
+      ::= { nsSlotEntry 4 }
+     
+END
+
+

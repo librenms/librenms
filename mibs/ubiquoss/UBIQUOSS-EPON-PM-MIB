@@ -1,0 +1,504 @@
+-- *****************************************************************
+-- UBIQUOSS-EPON-PM-MIB.mib:  
+-- Ubiquoss Enterprise Vdsl Performance Structure of Management Information
+--
+-- Jan 2007, SangJun Song
+--
+-- Copyright (c) 2007 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBIQUOSS-EPON-PM-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		
+		DisplayString 
+		FROM RFC1213-MIB
+		
+		IANAifType                               
+		FROM IANAifType-MIB
+		
+		RowStatus, TruthValue
+		FROM SNMPv2-TC           -- [RFC2579]
+        
+        ubiSysIndex
+        FROM UBQS-INTERFACE-MIB
+        
+        HCPerfIntervalThreshold,
+      	HCPerfTimeElapsed,
+      	HCPerfValidIntervals,
+      	HCPerfInvalidIntervals
+         FROM  HC-PerfHist-TC-MIB   -- [RFC3705]
+         
+		ubiMgmt
+		FROM UBQS-SMI;     
+
+ubiEponPMMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  SangJun Song
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      sjsong@ubiquoss.com
+         Phone:      +82-2-2190-3139
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      sjsong@ubiquoss.com
+         Phone:      +82-2-2190-3139"
+    DESCRIPTION
+        "This MIB module defines vdsl line information" 
+   	::= { ubiMgmt  401 }
+   				
+	ubiEponPMMIBObjects OBJECT IDENTIFIER ::= { ubiEponPMMIB  1 }
+    
+    ubiEponPhysSide ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+           "switch(1)  -- switch side of port
+            pon(2)     -- pon side of port"
+       SYNTAX  INTEGER
+           {
+           switch(1),
+           pon(2)
+           }
+           
+-- ***********************************************************
+--          PM line current total Counters          
+-- *********************************************************** 
+
+   ubiEponPMOltCurrTotalCntTable  OBJECT-TYPE
+      SYNTAX      SEQUENCE  OF  UbiEponPMOltCurrTotalCntEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The table ubiEponPMOltCurrTable contains current Performance
+          Monitoring results of DSL line."
+      ::= { ubiEponPMMIBObjects 1 }
+
+   ubiEponPMOltCurrTotalCntEntry  OBJECT-TYPE
+      SYNTAX      UbiEponPMOltCurrTotalCntEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The table ubiEponPMOltCurrTable contains current Performance
+          Monitoring results of DSL line.
+          The index of this table is an interface index where the
+          interface has an ifType of vdsl and the termination
+          unit."
+      INDEX  { ubiSysIndex, ubiPortIndex, ubiEponPhysSide }
+      ::= { ubiEponPMOltCurrTotalCntTable 1 }
+
+   UbiEponPMOltCurrTotalCntEntry  ::=
+      SEQUENCE {
+      	 ubiEponPMOltCurrInTotalBytes                 	Counter64,
+         ubiEponPMOltCurrInTotalFrames                	Counter64,
+         ubiEponPMOltCurrInUnicastFrames              	Counter64,
+         ubiEponPMOltCurrInBroadcastFrames             Counter64,
+         ubiEponPMOltCurrInMulticastFrames             Counter64,
+         ubiEponPMOltCurrInErrorFrames                 Counter64,
+         ubiEponPMOltCurrInDropedFrames         		Counter64,
+         ubiEponPMOltCurrInPausedFrames         		Counter64,
+         ubiEponPMOltCurrOutTotalBytes                 Counter64,
+         ubiEponPMOltCurrOutTotalFrames                Counter64,
+         ubiEponPMOltCurrOutUnicastFrames              Counter64,
+         ubiEponPMOltCurrOutBroadcastFrames            Counter64,
+         ubiEponPMOltCurrOutMulticastFrames            Counter64,
+         ubiEponPMOltCurrOutErrorFrames                Counter64,
+         ubiEponPMOltCurrOutDropedFrames         		Counter64,
+         ubiEponPMOltCurrOutPausedFrames         		Counter64         
+   }
+   
+   ubiEponPMOltCurrInTotalBytes  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 1 }
+
+   ubiEponPMOltCurrInTotalFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 2 }
+   
+   ubiEponPMOltCurrInUnicastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 3 }
+   
+   ubiEponPMOltCurrInBroadcastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 4 }
+      
+   ubiEponPMOltCurrInMulticastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 5 }
+      
+   ubiEponPMOltCurrInErrorFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 6 } 
+      
+   ubiEponPMOltCurrInDropedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 7 }
+      
+   ubiEponPMOltCurrInPausedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 8 }
+           
+   ubiEponPMOltCurrOutTotalBytes  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 9 }
+
+   ubiEponPMOltCurrOutTotalFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 10 }
+   
+   ubiEponPMOltCurrOutUnicastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 11 }
+   
+   ubiEponPMOltCurrOutBroadcastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 12 }
+      
+   ubiEponPMOltCurrOutMulticastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 13 }
+      
+   ubiEponPMOltCurrOutErrorFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 14 } 
+      
+   ubiEponPMOltCurrOutDropedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 15 }
+      
+   ubiEponPMOltCurrOutPausedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOltCurrTotalCntEntry 16 }   
+      
+-- ***********************************************************
+--          PM ONU current total counters          --
+-- ***********************************************************
+   ubiEponPMOnuCurrTotalCntTable        OBJECT-TYPE
+      SYNTAX      SEQUENCE  OF  UbiEponPMOnuCurrTotalCntEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         "The table ubiEponPMOnuCurrTable contains current Performance
+          Monitoring results of DSL channel."
+      ::= { ubiEponPMMIBObjects 2 }
+
+   ubiEponPMOnuCurrTotalCntEntry  OBJECT-TYPE
+      SYNTAX      UbiEponPMOnuCurrTotalCntEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+         ""
+      INDEX  { ubiSysIndex, ubiPortIndex, ubiEponOnuIndex, ubiEponPhysSide }
+      ::= { ubiEponPMOnuCurrTotalCntTable 1 }
+
+   UbiEponPMOnuCurrTotalCntEntry  ::=
+      SEQUENCE {
+         ubiEponPMOnuCurrInTotalBytes                 	Counter64,
+         ubiEponPMOnuCurrInTotalFrames                	Counter64,
+         ubiEponPMOnuCurrInUnicastFrames              	Counter64,
+         ubiEponPMOnuCurrInBroadcastFrames             Counter64,
+         ubiEponPMOnuCurrInMulticastFrames             Counter64,
+         ubiEponPMOnuCurrInErrorFrames                 Counter64,
+         ubiEponPMOnuCurrInDropedFrames         		Counter64,
+         ubiEponPMOnuCurrInPausedFrames         		Counter64,
+         ubiEponPMOnuCurrOutTotalBytes                 Counter64,
+         ubiEponPMOnuCurrOutTotalFrames                Counter64,
+         ubiEponPMOnuCurrOutUnicastFrames              Counter64,
+         ubiEponPMOnuCurrOutBroadcastFrames            Counter64,
+         ubiEponPMOnuCurrOutMulticastFrames            Counter64,
+         ubiEponPMOnuCurrOutErrorFrames                Counter64,
+         ubiEponPMOnuCurrOutDropedFrames         		Counter64,
+         ubiEponPMOnuCurrOutPausedFrames         		Counter64
+      }
+
+   ubiEponPMOnuCurrInTotalBytes  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 1 }
+
+   ubiEponPMOnuCurrInTotalFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 2 }
+   
+   ubiEponPMOnuCurrInUnicastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 3 }
+   
+   ubiEponPMOnuCurrInBroadcastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 4 }
+      
+   ubiEponPMOnuCurrInMulticastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 5 }
+      
+   ubiEponPMOnuCurrInErrorFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 6 } 
+      
+   ubiEponPMOnuCurrInDropedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 7 }
+      
+   ubiEponPMOnuCurrInPausedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 8 }
+           
+   ubiEponPMOnuCurrOutTotalBytes  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 9 }
+
+   ubiEponPMOnuCurrOutTotalFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 10 }
+   
+   ubiEponPMOnuCurrOutUnicastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 11 }
+   
+   ubiEponPMOnuCurrOutBroadcastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 12 }
+      
+   ubiEponPMOnuCurrOutMulticastFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 13 }
+      
+   ubiEponPMOnuCurrOutErrorFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 14 } 
+      
+   ubiEponPMOnuCurrOutDropedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 15 }
+      
+   ubiEponPMOnuCurrOutPausedFrames  OBJECT-TYPE
+      SYNTAX      Counter64
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+         ""
+      ::= { ubiEponPMOnuCurrTotalCntEntry 16 }
+              														              
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiEponPMMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiEponPMMIB 2 }
+ubiEponPMMIBNotifications OBJECT IDENTIFIER ::= { ubiEponPMMIBNotificationPrefix 0 }
+
+	ubiFerThreshNotification NOTIFICATION-TYPE
+       OBJECTS      {
+	                    ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                    }
+       STATUS       current
+       DESCRIPTION
+           "Fer threshold reached."
+       ::= { ubiEponPMMIBNotifications 1 }
+
+   ubiBerPerfLossThreshNotification NOTIFICATION-TYPE
+       OBJECTS       {
+	                    ubiAlarmIndex,
+						ubiAlarmId,
+						ubiAlarmType,
+						ubiAlarmSeverity,
+						ubiAlarmPhysicalLoc,
+						ubiAlarmLogicalLoc,
+						ubiAlarmCurStatus,
+						ubiAlarmAuxinfo,
+						ubiAlarmDateTime,
+						ubiAlarmStatus
+                     }
+       STATUS        current
+       DESCRIPTION
+           "Ber threshold reached."
+       ::= { ubiEponPMMIBNotifications 2 }
+                            
+-- conformance information
+
+ubiEponPMMIBConformance OBJECT IDENTIFIER ::= { ubiEponPMMIB 3 }
+ubiEponPMMIBCompliances OBJECT IDENTIFIER ::= { ubiEponPMMIBConformance 1 }
+ubiEponPMMIBGroups      OBJECT IDENTIFIER ::= { ubiEponPMMIBConformance 2 }
+
+
+-- compliance statements
+ubiEponPMMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss port MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiEponPMMIBGroup	
+                                  }
+
+        GROUP   ubiEponPMMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for port."
+                                 
+        ::= { ubiEponPMMIBCompliances 1 }
+
+-- ports of conformance
+ubiEponPMMIBGroup OBJECT-GROUP
+        OBJECTS {
+							   
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss epon pm."
+        ::= { ubiEponPMMIBGroups 1 }
+        
+ubiEponPMMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        	ubiFerThreshNotification,
+        	ubiBerThreshNotification        	
+        }
+        STATUS   current
+        DESCRIPTION
+                 "A collection of notifications providing the 
+                 notification for epon pm."
+        ::= { ubiEponPMMIBGroups 2 }
+        
+END

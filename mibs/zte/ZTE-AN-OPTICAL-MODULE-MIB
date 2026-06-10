@@ -1,0 +1,1224 @@
+ZTE-AN-OPTICAL-MODULE-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS     
+        TEXTUAL-CONVENTION,RowStatus, DisplayString     FROM SNMPv2-TC
+        MODULE-IDENTITY,  OBJECT-TYPE, 
+        Integer32,NOTIFICATION-TYPE                     FROM SNMPv2-SMI
+        ifIndex, ifAdminStatus, ifOperStatus, ifType    FROM IF-MIB
+        zxAnInterface                                   FROM ZTE-AN-SMI;
+
+    zxAnOpticalModuleMib    MODULE-IDENTITY
+        LAST-UPDATED    "201109132000Z"
+        ORGANIZATION    "ZTE Corporation"
+        CONTACT-INFO    "Zhang WeiPing      ZTE Corporation
+                        Mail: zhang.weiping@zte.com.cn
+                        Tel : 021-68896470"
+        DESCRIPTION     "This MIB defines zte Access Node managed objects."
+
+        REVISION        "201109132000Z"
+        DESCRIPTION
+            "Modify this mib according to standard."
+                                 
+        REVISION        "201109101100Z"
+        DESCRIPTION
+            "Add the Optical Module Notifications:zxAnEquipIfFiberLosTrap
+             and zxAnEquipIfFiberLosCleardTrap."   
+                 
+        REVISION        "201108230900Z"
+        DESCRIPTION
+            "Modify the bias/voltage value range."
+            
+        REVISION "201105311500Z"
+        DESCRIPTION 
+            "Initial version of this MIB module."          
+        
+        ::=  {  zxAnInterface 40  }  
+
+--------------------------------------------------------------------------------
+-- Following objects are defined.
+-- 0.Optical Module Global Objects
+-- 1.Optical Module Alarm Profile Table
+-- 2.Optical Module Alarm Profile Configuration Table
+-- 3.Optical Module Informations Table
+-- 4.Optical Module ALS Configuration Table
+-- 5.Optical Module Configuration Table
+
+-- 10.Optical Module Channel Information Table
+
+-- 20.Optical Module Class Value Table
+
+-- Following notification objects are defined.
+-- 21.Optical Module Notifications Definations
+
+-- Following conformance information is defined.
+-- 31.Optical Module Conformance
+--------------------------------------------------------------------------------
+
+zxAnOpticalModuleGlobalObjects OBJECT IDENTIFIER ::= {zxAnOpticalModuleMib 1}
+zxAnOpticalModuleObjects       OBJECT IDENTIFIER ::= {zxAnOpticalModuleMib 2}   
+zxAnOpticalModuleNotifications OBJECT IDENTIFIER ::= {zxAnOpticalModuleMib 3}
+zxAnOpticalModuleConformance   OBJECT IDENTIFIER ::= {zxAnOpticalModuleMib 4}
+
+--------------------------------------------------------------------------------
+-- 0.Optical Module Global Objects
+--------------------------------------------------------------------------------
+  
+    zxAnOpticalModuleCapabilities  OBJECT-TYPE
+        SYNTAX      BITS  { 
+            opticalModuleConfClass (0),
+            opticalAlarmPrfUnit(1),
+            opticalModuleConfTechNorms(2)
+        } 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The optical module management capabilities of this equipment. 
+             The bit value 1 means the function represented by this bit is
+             supported by this equipment.
+
+             opticalModuleConfClass (0): value 1 means
+                 zxAnOpticalModuleConfClass is supported.
+             opticalAlarmPrfUnit(1): value 1 means some objects in the 
+                 zxAnOpticalModuleAlmPrfTable will use the new unit, for more
+                 information, please see the description of the object in the
+                 zxAnOpticalModuleAlmPrfTable.
+             opticalModuleConfTechNorms(2): value 1 means 
+                 zxAnOpticalModuleConfTechNorms is supported.
+
+                 NOTE: No recommended to display it in NMS.                                                                                       
+            "
+        ::= { zxAnOpticalModuleGlobalObjects 1 }
+
+    zxAnOptModuleIfShutdownUnplugEn  OBJECT-TYPE
+        SYNTAX      INTEGER  { 
+            enabled(1),
+            disabled(2)
+        } 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the zxAnOpticalModuleUnpluggedAlm should be 
+             generated when the port the optical module plugged in has been 
+             shutdown.
+             enabled(1) : The zxAnOpticalOfflineTrapEnable indicates whether the 
+                 zxAnOpticalModuleUnpluggedAlm should be generated or not.
+             disabled(2): The zxAnOpticalModuleUnpluggedAlm should not be 
+                 generated."
+        DEFVAL { disabled }
+        ::= { zxAnOpticalModuleGlobalObjects 2 }
+
+    zxAnOptModuleFstUnpluggedRptEn  OBJECT-TYPE
+        SYNTAX      INTEGER  { 
+            enabled(1),
+            disabled(2)
+        } 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the zxAnOpticalModuleUnpluggedAlm should be 
+             generated when the agent has detected the optical module is offline
+             for the first time."
+        DEFVAL { disabled }
+        ::= { zxAnOpticalModuleGlobalObjects 3 }
+
+--------------------------------------------------------------------------------
+-- 1.Optical Module Alarm Profile Table
+--------------------------------------------------------------------------------
+    zxAnOpticalModuleAlmPrfTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnOpticalModuleAlmPrfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the optical module threshold profile."
+        ::=  { zxAnOpticalModuleObjects  2 }
+
+    zxAnOpticalModuleAlmPrfEntry   OBJECT-TYPE
+        SYNTAX      ZxAnOpticalModuleAlmPrfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnOpticalModuleAlmPrfTable."
+        INDEX       { zxAnOpticalModuleAlmPrfName  }
+        ::=  { zxAnOpticalModuleAlmPrfTable 1 }
+
+    ZxAnOpticalModuleAlmPrfEntry  ::=  SEQUENCE {
+        zxAnOpticalModuleAlmPrfName             DisplayString,
+        zxAnOpticalRxPwrLowerThresh             Integer32,
+        zxAnOpticalRxPwrUpperThresh             Integer32,
+        zxAnOpticalTxPwrLowerThresh             Integer32,
+        zxAnOpticalTxPwrUpperThresh             Integer32,
+        zxAnOpticalBiasCurrLowerThresh          Integer32,
+        zxAnOpticalBiasCurrUpperThresh          Integer32,
+        zxAnOpticalVoltageLowerThresh           Integer32,
+        zxAnOpticalVoltageUpperThresh           Integer32,
+        zxAnOpticalTempLowerThresh              Integer32,
+        zxAnOpticalTempUpperThresh              Integer32,
+        zxAnOpticalOfflineTrapEnable            INTEGER,
+        zxAnOpticalModuleConfClass              DisplayString, 
+        zxAnOpticalModuleAlmPrfRowStatus        RowStatus 
+        }
+
+    zxAnOpticalModuleAlmPrfName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..32))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information about the
+            optical module alarm threshold profile name ."
+        ::= { zxAnOpticalModuleAlmPrfEntry 1 }
+     
+    zxAnOpticalRxPwrLowerThresh OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "1dBm"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The lower limit threshold on input optical power.
+             The alarm should be generated  when zxAnOpticalIfRxPwrCurrValue
+             is lower than this threshold. 
+             The unit is 1dBm when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1dBm."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  2}
+
+    zxAnOpticalRxPwrUpperThresh OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "1dBm"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The upper limit threshold on input optical power. 
+             The alarm should be generated when zxAnOpticalIfRxPwrCurrValue
+             exceeds this threshold.
+             The unit is 1dBm when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1dBm."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  3 }
+
+    zxAnOpticalTxPwrLowerThresh OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "1dBm"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The lower limit threshold on output optical power.
+             The alarm should be generated  when zxAnOpticalIfTxPwrCurrValue
+             is lower than this threshold. 
+             The unit is 1dBm when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1dBm."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  4 }
+
+    zxAnOpticalTxPwrUpperThresh OBJECT-TYPE 
+        SYNTAX      Integer32
+        UNITS       "1dBm"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The upper limit threshold on output optical power.
+             The alarm should be generated when zxAnOpticalIfTxPwrCurrValue
+             exceeds this threshold.
+             The unit is 1dBm when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1dBm."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  5 }
+
+    zxAnOpticalBiasCurrLowerThresh OBJECT-TYPE 
+        SYNTAX      Integer32(0..1500)
+        UNITS       "1mA"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The lower limit threshold on optical modules bias
+             current.The alarm should be generated  when
+             zxAnOpticalBiasCurrent is lower than this threshold.
+             The unit is 1mA when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1mA."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  6 }    
+        
+    zxAnOpticalBiasCurrUpperThresh OBJECT-TYPE 
+        SYNTAX      Integer32(0..1500)
+        UNITS       "1mA"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The upper limit threshold on optical modules bias current.
+             The alarm should be generated when zxAnOpticalBiasCurrent 
+             exceeds this threshold.
+             The unit is 1mA when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1mA."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  7 } 
+
+    zxAnOpticalVoltageLowerThresh OBJECT-TYPE 
+        SYNTAX      Integer32(0..100)
+        UNITS       "1 Volt"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The lower limit threshold on optical modules supply voltage.
+             The alarm should be generated when zxAnOpticalSupplyVoltage 
+             is lower than this threshold.
+             The unit is 1 Volt when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1 Volt."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  8 } 
+        
+    zxAnOpticalVoltageUpperThresh OBJECT-TYPE 
+        SYNTAX      Integer32(0..100)
+        UNITS       "1 Volt"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The upper limit threshold on optical modules supply voltage.
+             The alarm should be generated when zxAnOpticalSupplyVoltage 
+             exceeds this threshold.
+             The unit is 1 Volt when the value of opticalAlarmPrfUnit(1) is 1, 
+             otherwise the unit is 0.1 Volt."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  9 } 
+
+    zxAnOpticalTempLowerThresh OBJECT-TYPE 
+        SYNTAX      Integer32(-50..100)
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The lower limit threshold on optical modules temperature.
+             The alarm should be generated  when zxAnOpticalTemperature 
+             is lower than this threshold."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  10 }      
+        
+    zxAnOpticalTempUpperThresh OBJECT-TYPE 
+        SYNTAX      Integer32(-50..100)
+        UNITS       "Centigrade"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION 
+            "The upper limit threshold on optical modules temperature.
+             The alarm should be generated when zxAnOpticalTemperature 
+             exceeds this threshold."
+        ::=  {  zxAnOpticalModuleAlmPrfEntry  11 }   
+
+     zxAnOpticalOfflineTrapEnable  OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether optical module is online/offline traps should 
+            be generated for this interface.
+
+            By default, this object should have the value enabled(1) for
+            interfaces which do not operate on 'top' of any other
+            interface (as defined in the ifStackTable), and disabled(2)
+            otherwise."
+        ::= { zxAnOpticalModuleAlmPrfEntry 12 }
+
+    zxAnOpticalModuleConfClass  OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The optical module configured class."
+        ::= { zxAnOpticalModuleAlmPrfEntry 13 }
+
+    zxAnOpticalModuleAlmPrfRowStatus    OBJECT-TYPE 
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current 
+        DESCRIPTION
+            "The row status of this entry."
+        ::= {zxAnOpticalModuleAlmPrfEntry 50 }  
+
+--------------------------------------------------------------------------------
+-- 2.Optical Module Alarm Profile Configuration Table
+--------------------------------------------------------------------------------
+    zxAnOpticalAlmPrfIfConfTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnOpticalAlmPrfIfConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the optical module profile configuration."
+        ::=  { zxAnOpticalModuleObjects  3 }
+
+    zxAnOpticalAlmPrfIfConfEntry   OBJECT-TYPE
+        SYNTAX      ZxAnOpticalAlmPrfIfConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnOpticalAlmPrfIfConfTable."
+        INDEX       { ifIndex  }
+        ::=  { zxAnOpticalAlmPrfIfConfTable 1 }
+
+    ZxAnOpticalAlmPrfIfConfEntry  ::=  SEQUENCE {           
+        zxAnOpticalIfAlmPrf                    DisplayString     
+        }  
+
+    zxAnOpticalIfAlmPrf OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..32))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information about the
+            optical module alarm threshold profile name ."
+        ::= { zxAnOpticalAlmPrfIfConfEntry 2 }
+
+--------------------------------------------------------------------------------
+-- 3.Optical Module Informations Table
+--------------------------------------------------------------------------------    
+    zxAnOpticalModuleInfoTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnOpticalModuleInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the optical module information."
+        ::=  { zxAnOpticalModuleObjects  4 }
+
+    zxAnOpticalModuleInfoEntry   OBJECT-TYPE
+        SYNTAX      ZxAnOpticalModuleInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnOpticalModuleInfoTable."
+        INDEX       { ifIndex  }
+        ::=  { zxAnOpticalModuleInfoTable 1 }
+
+    ZxAnOpticalModuleInfoEntry  ::=  SEQUENCE {          
+        zxAnOpticalIfRxPwrCurrValue             Integer32,
+        zxAnOpticalIfTxPwrCurrValue             Integer32,
+        zxAnOpticalIfRate                       Integer32,
+        zxAnOpticalBiasCurrent                  Integer32,
+        zxAnOpticalSupplyVoltage                Integer32,
+        zxAnOpticalWavelength                   Integer32,
+        zxAnOpticalTemperature                  Integer32,
+        zxAnOpticalFiberType                    INTEGER,
+        zxAnOpticalVersionLevel                 DisplayString,
+        zxAnOpticalVendorPn                     DisplayString,
+        zxAnOpticalVendorName                   DisplayString,  
+        zxAnOpticalVendorSn                     DisplayString,       
+        zxAnOpticalProductionDate               DisplayString,  
+        zxAnOpticalModuleType                   DisplayString,  
+        zxAnOpticalFiberInterfaceType           DisplayString,  
+        zxAnOpticalMaterialNumber               OCTET STRING,
+        zxAnOpticalRegisterData                 OCTET STRING,
+        zxAnOpticalOtdrSupport                  INTEGER,
+        zxAnOpticalModuleActualClass            DisplayString,
+        zxAnOpticalOtdrVersion                  DisplayString,
+        zxAnOpticalTransDistanceSmLongR         Integer32,
+        zxAnOpticalTransDistanceSmShortR        Integer32,
+        zxAnOpticalTransDistanceOm1             Integer32,
+        zxAnOpticalTransDistanceOm2             Integer32,
+        zxAnOpticalTransDistanceOm3             Integer32,
+        zxAnOpticalTransDistanceCopper          Integer32,
+        zxAnOpticalPartNumber                   DisplayString
+        }   
+
+    zxAnOpticalIfRxPwrCurrValue OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.001dBm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical power monitored at the input."
+        ::=  {  zxAnOpticalModuleInfoEntry  2  } 
+
+    zxAnOpticalIfTxPwrCurrValue OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.001dBm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical power monitored at the output."
+        ::=  {  zxAnOpticalModuleInfoEntry  3  } 
+ 
+    zxAnOpticalIfRate OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.1Gbps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module interface rate."
+        ::=  {  zxAnOpticalModuleInfoEntry  4 }        
+
+    zxAnOpticalBiasCurrent OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.001mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module bias current ."
+        ::=  {  zxAnOpticalModuleInfoEntry  5 }        
+
+    zxAnOpticalSupplyVoltage OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.001 Volts"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical  module supply voltage."
+        ::=  {  zxAnOpticalModuleInfoEntry  6 }        
+
+    zxAnOpticalWavelength OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical  module wavelength."
+        ::=  {  zxAnOpticalModuleInfoEntry  7 }        
+
+    zxAnOpticalTemperature OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.001Degrees"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module temperature ."
+        ::=  {  zxAnOpticalModuleInfoEntry  8 }        
+
+    zxAnOpticalFiberType OBJECT-TYPE 
+        SYNTAX          INTEGER { singleMode(1), multiMode(2), unknown(3)}
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module Fiber Type."
+        ::=  {  zxAnOpticalModuleInfoEntry  9}    
+
+    zxAnOpticalVersionLevel OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..20))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module vendor Level."
+        ::=  {  zxAnOpticalModuleInfoEntry  10}  
+
+    zxAnOpticalVendorPn OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..64))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module vendor P/N."
+        ::=  {  zxAnOpticalModuleInfoEntry  11}        
+
+    zxAnOpticalVendorName OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..32))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical  module vendor name."
+        ::=  {  zxAnOpticalModuleInfoEntry  12 }    
+ 
+    zxAnOpticalVendorSn OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..20))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical  module vendor sn."
+        ::=  {  zxAnOpticalModuleInfoEntry  13 }     
+ 
+    zxAnOpticalProductionDate OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..8))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical  module production date."
+        ::=  {  zxAnOpticalModuleInfoEntry  14 }  
+        
+    zxAnOpticalModuleType OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..20))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS               current
+        DESCRIPTION     "The optical  module type."
+        ::=  {  zxAnOpticalModuleInfoEntry  15 }          
+
+    zxAnOpticalFiberInterfaceType OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..20))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical fiber interface."
+        ::=  {  zxAnOpticalModuleInfoEntry  16 }  
+
+    zxAnOpticalMaterialNumber OBJECT-TYPE 
+        SYNTAX          OCTET STRING (SIZE (0..20))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The material number of pin(A2)."
+        ::=  {  zxAnOpticalModuleInfoEntry  17 }  
+
+    zxAnOpticalRegisterData OBJECT-TYPE 
+        SYNTAX          OCTET STRING (SIZE (0..128))
+        UNITS           ""
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module data is from register."
+        ::=  {  zxAnOpticalModuleInfoEntry  18 }  
+
+    zxAnOpticalOtdrSupport OBJECT-TYPE 
+        SYNTAX      INTEGER {
+            supported(1),
+            unsupported(2),
+            unknown(255)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION     
+            "The OTDR is supported by the optical module or not. 
+             supported(1): The optical module supports OTDR.
+             unsupported(2): The optical module doesn't support OTDR.
+             unknown(255): Whether the optical module supports OTDR is unknown."        
+        ::=  {  zxAnOpticalModuleInfoEntry  19 }
+
+    zxAnOpticalModuleActualClass OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module actual class."
+        ::=  {  zxAnOpticalModuleInfoEntry  20 }
+
+    zxAnOpticalOtdrVersion OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..16))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module OTDR software version.
+                         If the optical module doesn't support OTDR or the OTDR 
+                         has no software version, this object will be set to an 
+                         empty string."
+        ::=  {  zxAnOpticalModuleInfoEntry  21 }
+
+    zxAnOpticalTransDistanceSmLongR OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "km"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "This value specifies the transfer distance that is supported by the
+             transceiver while operating in compliance with the applicable 
+             standards using single mode based long reach fiber. The value is in
+             units of kilometers. A value of 255 means the transceiver supports 
+             a transfer distance greater than 254 km. A value of zero means the 
+             transceiver does not support single mode fiber or that the transfer
+             distance information must be determined from the transceiver 
+             technology."
+        ::=  {  zxAnOpticalModuleInfoEntry  40 }
+        
+    zxAnOpticalTransDistanceSmShortR OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "100m"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "This value specifies the transfer distance that is supported by the
+             transceiver while operating in compliance with the applicable 
+             standards using single mode based short reach fiber. The value is 
+             in units of 100 meters. A value of 255 means the transceiver 
+             supports a transfer distance greater than 25.4 km. A value of zero 
+             means the transceiver does not support single mode fiber or that 
+             the transfer distance information must be determined from the 
+             transceiver technology."
+        ::=  {  zxAnOpticalModuleInfoEntry  41 }
+
+    zxAnOpticalTransDistanceOm1 OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "10m"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "This value specifies the transfer distance that is supported by the
+             transceiver wihle operating in compliance with applicable standards 
+             using 62.5 micron multimode OM1(200 MHz*km at 850nm, 500MHz*km at 
+             1310mm) fiber. The value is in units of 10 meters. A value of 255 
+             means that the transceiver supports a transfer distance greater 
+             than 2.54km. A value of zero means that the transceiver does not 
+             support 62.5 micron multimode fiber or the transfer distance must 
+             determined from the transceiver technology."
+        ::=  {  zxAnOpticalModuleInfoEntry  42 }
+
+    zxAnOpticalTransDistanceOm2 OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "10m"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "This value specifies the transfer distance that is supported by the
+             transceiver wihle operating in compliance with applicable standards
+             using 50 micron multimode OM2(500 MHz*km at 850nm) fiber. The value
+             is in units of 10 meters. A value of 255 means that the transceiver 
+             supports a transfer distance greater than 2.54km. A value of zero 
+             means that the transceiver does not support OM2 fiber or the 
+             transfer distance must determined from the transceiver technology."
+        ::=  {  zxAnOpticalModuleInfoEntry  43 }
+
+    zxAnOpticalTransDistanceOm3 OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "10m"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "This value specifies the transfer distance that is supported by the
+             transceiver wihle operating in compliance with applicable standards
+             using 50 micron multimode OM3(2000 MHz*km) fiber. The value is in 
+             units of 10 meters. A value of 255 means that the transceiver 
+             supports a transfer distance greater than 2.54km. A value of zero 
+             means that the transceiver does not support OM3 fiber or the 
+             transfer distance must determined from the transceiver technology."
+        ::=  {  zxAnOpticalModuleInfoEntry  44 }
+
+    zxAnOpticalTransDistanceCopper OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "m"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+            "This value specifies the transfer distance that is supported by the
+             transceiver wihle operating in compliance with applicable standards
+             using copper cable. For active cable, this value represents actual 
+             length. The value is in units of 1 meter. A value of 255 means that
+             the transceiver supports a transfer distance greater than 254m. A 
+             value of zero means that the transceiver does not support copper or
+             active cables or the transfer distance must determined from the 
+             transceiver technology."
+        ::=  {  zxAnOpticalModuleInfoEntry  45 }
+
+    zxAnOpticalPartNumber OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module part number."
+        ::=  {  zxAnOpticalModuleInfoEntry  48}
+        
+--------------------------------------------------------------------------------
+-- 4.Optical Module ALS Configuration Table
+--------------------------------------------------------------------------------
+    zxAnOpticalAlsIfConfTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnOpticalAlsIfConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the ALS configuration of the optical module."
+        ::=  { zxAnOpticalModuleObjects  5 }
+
+    zxAnOpticalAlsIfConfEntry   OBJECT-TYPE
+        SYNTAX      ZxAnOpticalAlsIfConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "An entry in zxAnOpticalAlsIfConfTable."
+        INDEX       { ifIndex  }
+        ::=  { zxAnOpticalAlsIfConfTable 1 }
+
+    ZxAnOpticalAlsIfConfEntry  ::=  SEQUENCE {           
+        zxAnOptAlsEnable                INTEGER,
+        zxAnOptAlsLaserLosDuration      Integer32,
+        zxAnOptAlsLaserShutdownDuration Integer32,
+        zxAnOptAlsLaserStartUpDuration  Integer32
+        }  
+
+    zxAnOptAlsEnable OBJECT-TYPE
+        SYNTAX INTEGER{
+                enabled(1),
+                disabled(2) 
+                }
+        MAX-ACCESS read-write
+        STATUS  current
+        DESCRIPTION
+            "Enable or disable the ALS function."
+        DEFVAL { disabled }
+        ::= { zxAnOpticalAlsIfConfEntry 1 }
+
+    zxAnOptAlsLaserLosDuration  OBJECT-TYPE 
+        SYNTAX  Integer32(5..200000)
+        UNITS  "100ms"
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION     
+            "This attribute specifies the value of the LOS duration. 
+            The laser will be shutdown when detected the LOS duration 
+            longer than zxAnOptAlsLaserLosDuration value.
+            Setting this object will enable the ALS function.
+            For C300 Series NE, the default value is 5.
+            For C600 Series NE, the default value is 50."
+        ::=  {  zxAnOpticalAlsIfConfEntry  2}
+
+    zxAnOptAlsLaserShutdownDuration  OBJECT-TYPE 
+        SYNTAX  Integer32(5..200000)
+        UNITS  "100ms"
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION     
+            "This attribute specifies the value of the laser shutdown 
+            duration. 
+            Setting this object will enable the ALS function."
+        DEFVAL  { 100 }  
+        ::=  {  zxAnOpticalAlsIfConfEntry  3}
+
+    zxAnOptAlsLaserStartUpDuration  OBJECT-TYPE 
+        SYNTAX      Integer32(5..200000)
+        UNITS       "100ms"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION     
+            "This attribute specifies the value of the laser re-open 
+            duration.
+            Setting this object will enable the ALS function."
+        DEFVAL  { 50 }
+        ::=  {  zxAnOpticalAlsIfConfEntry  4}
+
+--------------------------------------------------------------------------------
+-- 5.Optical Module Configuration Table
+--------------------------------------------------------------------------------
+    zxAnOpticalModuleConfTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnOpticalModuleConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the optical module configuration."
+        ::=  { zxAnOpticalModuleObjects  6 }
+
+    zxAnOpticalModuleConfEntry   OBJECT-TYPE
+        SYNTAX      ZxAnOpticalModuleConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnOpticalModuleConfTable."
+        INDEX       { zxAnOpticalModuleConfVendorName,  
+                      zxAnOpticalModuleConfVendorPn }
+        ::=  { zxAnOpticalModuleConfTable 1 }
+
+    ZxAnOpticalModuleConfEntry  ::=  SEQUENCE {
+        zxAnOpticalModuleConfVendorName  DisplayString,
+        zxAnOpticalModuleConfVendorPn    DisplayString,
+        zxAnOpticalModuleConfiguredClass DisplayString,
+        zxAnOpticalModuleConfProperty    INTEGER,
+        zxAnOpticalModuleConfTechNorms   DisplayString,
+        zxAnOpticalModuleConfRowStatus   RowStatus
+        }
+
+    zxAnOpticalModuleConfVendorName OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The optical module vendor name."
+        ::=  {  zxAnOpticalModuleConfEntry  1}        
+
+    zxAnOpticalModuleConfVendorPn OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (1..64))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The optical module vendor P/N."
+        ::=  {  zxAnOpticalModuleConfEntry  2 }    
+
+    zxAnOpticalModuleConfiguredClass OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The optical module configured class. 
+                         Includes the following:
+                            GPON/B+,
+                            GPON/C+,
+                            GPON/EC+,
+                            XGPON1/N1,
+                            XGPON1/N2a,
+                            EPON/PX20+,
+                            10G-EPON/PRX30,
+                            10G-EPON/PR30,
+                            GPON/D,
+                            XGS-PON/N1,
+                            XGS-PON/N2,
+                            XG-PON&GPON_COMBO/N1-B+,
+                            XG-PON&GPON_COMB0/N2-C+,
+                            GPON-OTDR/C+."
+        ::= { zxAnOpticalModuleConfEntry 3 }
+        
+    zxAnOpticalModuleConfProperty OBJECT-TYPE
+        SYNTAX      INTEGER {
+            default(1),   
+            userDefined(2)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The property of the table record.
+                         default: the default record, it can't be modified or 
+                                  deleted by the user.
+                         userDefined: the user-defined record."
+        ::= { zxAnOpticalModuleConfEntry 4 }
+
+    zxAnOpticalModuleConfTechNorms OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The optical module configured technical norms."
+        ::=  {  zxAnOpticalModuleConfEntry  11 }
+
+    zxAnOpticalModuleConfRowStatus   OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row.
+
+             The supported actions of this conceptual row only include:
+             'createAndGo' and 'destroy'. 
+
+             To create a row in this table, a manager must set this object to 
+             createAndGo(4), and must comply with the rule described in 
+             zxAnLacpAggEntry.
+
+             To delete a row in this table, a manager must set this object to 
+             destroy(6).
+             
+             To get this object, the agent always returns active(1)."
+        ::= { zxAnOpticalModuleConfEntry 50 }
+
+--------------------------------------------------------------------------------
+-- 10.Optical Module Channel Information Table
+--------------------------------------------------------------------------------
+    zxAnOpticalModuleChanInfoTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnOpticalModuleChanInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "This table includes the optical module channel information."
+        ::=  { zxAnOpticalModuleObjects  10 }
+
+    zxAnOpticalModuleChanInfoEntry   OBJECT-TYPE
+        SYNTAX      ZxAnOpticalModuleChanInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "An entry in zxAnOpticalModuleChanInfoTable."
+        INDEX       { ifIndex}
+        ::=  { zxAnOpticalModuleChanInfoTable 1 }
+
+    ZxAnOpticalModuleChanInfoEntry  ::=  SEQUENCE {
+        zxAnOpticalChanLaserSwitch     INTEGER,
+        zxAnOpticalChanWavelength      Integer32,
+        zxAnOpticalChanCurrTxPwr       Integer32,
+        zxAnOpticalChanBiasCurrent     Integer32
+        }
+
+    zxAnOpticalChanLaserSwitch  OBJECT-TYPE
+        SYNTAX      INTEGER {
+            open(1),
+            close(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables or disables the laser function of the optical module 
+             channel."
+        DEFVAL  { open }       
+        ::= { zxAnOpticalModuleChanInfoEntry 1 }
+        
+    zxAnOpticalChanWavelength OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.01nm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The wavelength of the optical module channel."
+        ::=  {  zxAnOpticalModuleChanInfoEntry  2 }         
+        
+    zxAnOpticalChanCurrTxPwr OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.001dBm"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The transmitted power of the optical module channel."
+        ::=  {  zxAnOpticalModuleChanInfoEntry  3  } 
+        
+    zxAnOpticalChanBiasCurrent OBJECT-TYPE 
+        SYNTAX          Integer32
+        UNITS           "0.001mA"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The bias current of the optical module channel."
+        ::=  {  zxAnOpticalModuleChanInfoEntry  4 }  
+
+--------------------------------------------------------------------------------
+-- 20.Optical Module Class Value Table
+--------------------------------------------------------------------------------
+    zxAnOpticalModuleClassValueTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE  OF  ZxAnOpticalModuleClassValueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table includes the optical module class value.
+                     NOTE: No recommended to develop this function in EMS."
+        ::=  { zxAnOpticalModuleObjects  20 }
+
+    zxAnOpticalModuleClassValueEntry   OBJECT-TYPE
+        SYNTAX      ZxAnOpticalModuleClassValueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in zxAnOpticalModuleClassValueTable."
+        INDEX       { zxAnOpticalModuleClassId}
+        ::=  { zxAnOpticalModuleClassValueTable 1 }
+
+    ZxAnOpticalModuleClassValueEntry  ::=  SEQUENCE {
+        zxAnOpticalModuleClassId       Integer32,
+        zxAnOpticalModuleClassValue    DisplayString
+        }
+
+    zxAnOpticalModuleClassId OBJECT-TYPE 
+        SYNTAX          Integer32(1..256)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The optical module class id."
+        ::=  {  zxAnOpticalModuleClassValueEntry  1}        
+
+    zxAnOpticalModuleClassValue OBJECT-TYPE 
+        SYNTAX          DisplayString (SIZE (1..64))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The optical module class value."
+        ::=  {  zxAnOpticalModuleClassValueEntry  2 }    
+
+--------------------------------------------------------------------------------
+-- 21.Optical Module Notifications Definations
+-------------------------------------------------------------------------------- 
+       
+    zxAnOptRxPwrUnderThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalIfRxPwrCurrValue, zxAnOpticalRxPwrLowerThresh }
+        STATUS  current
+        DESCRIPTION
+            " It indicates that zxAnOpticalIfRxPwrCurrValue is below  the zxAnOpticalRxPwrLowerThresh."
+        ::= { zxAnOpticalModuleNotifications 1}
+        
+    zxAnOptRxPwrUnderThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalIfRxPwrCurrValue , zxAnOpticalRxPwrLowerThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptRxPwrUnderThreshAlm clear"
+        ::= { zxAnOpticalModuleNotifications 2 }        
+
+    zxAnOptRxPwrOverThreshAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnOpticalIfRxPwrCurrValue, zxAnOpticalRxPwrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            " It indicates that zxAnOpticalIfRxPwrCurrValue is exceeds  the zxAnOpticalRxPwrUpperThresh."
+        ::= { zxAnOpticalModuleNotifications 3 }
+
+    zxAnOptRxPwrOverThreshClr NOTIFICATION-TYPE
+        OBJECTS { zxAnOpticalIfRxPwrCurrValue, zxAnOpticalRxPwrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptPwrRxOverThreshAlarm clear."
+        ::= { zxAnOpticalModuleNotifications 4 }
+        
+
+    zxAnOptTxPwrUnderThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalIfTxPwrCurrValue, zxAnOpticalTxPwrLowerThresh }
+        STATUS  current
+        DESCRIPTION
+            " It indicates that zxAnOpticalIfTxPwrCurrValue is below  the zxAnOpticalTxPwrLowerThresh."
+        ::= { zxAnOpticalModuleNotifications 5 }
+        
+    zxAnOptTxPwrUnderThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalIfTxPwrCurrValue , zxAnOpticalTxPwrLowerThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptPwrTxUnderThreshAlarm clear"
+        ::= { zxAnOpticalModuleNotifications 6 }        
+
+    zxAnOptTxPwrOverThreshAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnOpticalIfTxPwrCurrValue, zxAnOpticalTxPwrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            " It indicates that zxAnOpticalIfTxPwrCurrValue is exceeds  the zxAnOpticalTxPwrUpperThresh."
+        ::= { zxAnOpticalModuleNotifications 7 }
+
+    zxAnOptTxPwrOverThreshClr NOTIFICATION-TYPE
+        OBJECTS { zxAnOpticalIfTxPwrCurrValue, zxAnOpticalTxPwrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptPwrTxOverThreshAlarm clear."
+        ::= { zxAnOpticalModuleNotifications 8 }     
+        
+        
+    zxAnOptBiasCurrUnderThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalBiasCurrent, zxAnOpticalBiasCurrLowerThresh }
+        STATUS  current
+        DESCRIPTION
+            " It indicates that zxAnOpticalBiasCurrent 
+               is below the zxAnOpticalBiasCurrLowerThresh."
+        ::= { zxAnOpticalModuleNotifications 9 }
+        
+    zxAnOptBiasCurrUnderThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalBiasCurrent, zxAnOpticalBiasCurrLowerThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptBiasCurrUnderThreshAlm clear."
+        ::= { zxAnOpticalModuleNotifications 10 }            
+        
+    zxAnOptBiasCurrOverThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalBiasCurrent, zxAnOpticalBiasCurrUpperThresh }
+        STATUS  current
+        DESCRIPTION
+            "It indicates that zxAnOpticalBiasCurrent 
+               is over the zxAnOpticalBiasCurrUpperThresh."
+        ::= { zxAnOpticalModuleNotifications 11 }
+        
+    zxAnOptBiasCurrOverThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalBiasCurrent, zxAnOpticalBiasCurrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptBiasCurrOverThreshAlm clear."
+        ::= { zxAnOpticalModuleNotifications 12 }       
+        
+    zxAnOptVoltageUnderThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalSupplyVoltage, zxAnOpticalVoltageLowerThresh }
+        STATUS  current
+        DESCRIPTION
+            " It indicates that zxAnOpticalSupplyVoltage is below 
+              the zxAnOpticalVoltageLowerThresh."
+        ::= { zxAnOpticalModuleNotifications 13 }
+        
+    zxAnOptVoltageUnderThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalSupplyVoltage, zxAnOpticalVoltageLowerThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptVoltageUnderThreshAlm clear."
+        ::= { zxAnOpticalModuleNotifications 14 }            
+        
+    zxAnOptVoltageOverThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalSupplyVoltage, zxAnOpticalVoltageUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            "It indicates that zxAnOpticalSupplyVoltage 
+             is over the zxAnOpticalVoltageUpperThresh."
+        ::= { zxAnOpticalModuleNotifications 15 }
+        
+    zxAnOptVoltageOverThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalSupplyVoltage, zxAnOpticalVoltageUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptVoltageOverThreshAlm clear."
+        ::= { zxAnOpticalModuleNotifications 16 }               
+        
+    zxAnOptTempUnderThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalTemperature, zxAnOpticalTempLowerThresh }
+        STATUS  current
+        DESCRIPTION
+            " It indicates that zxAnOpticalTemperature is below 
+              the zxAnOpticalTempLowerThresh."
+        ::= { zxAnOpticalModuleNotifications 17 }
+
+    zxAnOptTempUnderThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalTemperature, zxAnOpticalTempLowerThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptTempUnderThreshAlm clear."
+        ::= { zxAnOpticalModuleNotifications 18 }            
+        
+    zxAnOptTempOverThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalTemperature, zxAnOpticalTempUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            "It indicates that zxAnOpticalTemperature is over 
+             the zxAnOpticalTempUpperThresh."
+        ::= { zxAnOpticalModuleNotifications 19 }
+        
+    zxAnOptTempOverThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalTemperature, zxAnOpticalTempUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            " zxAnOptTempOverThreshAlm clear."
+        ::= { zxAnOpticalModuleNotifications 20 }    
+          
+    zxAnOpticalModuleUnpluggedAlm NOTIFICATION-TYPE
+        OBJECTS {ifAdminStatus, ifOperStatus, ifType}
+        STATUS  current
+        DESCRIPTION
+            "The alarm occurred when optical module is not online."
+        ::= { zxAnOpticalModuleNotifications 21 }
+
+    zxAnOpticalModuleUnpluggedClr NOTIFICATION-TYPE
+        OBJECTS {ifAdminStatus,ifOperStatus,ifType}
+        STATUS  current
+        DESCRIPTION
+            "The alarm restore when optical module is online."
+        ::= { zxAnOpticalModuleNotifications 22 }
+        
+    zxAnOptModuleClassMismatchAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalModuleConfClass, zxAnOpticalModuleActualClass}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptModuleClassMismatchAlm trap is sent when the agent has 
+             detected that the optical module has plugged in, but 
+             zxAnOpticalModuleConfClass is not same as 
+             zxAnOpticalModuleActualClass."
+        ::= { zxAnOpticalModuleNotifications 23 }
+    
+    zxAnOptModuleClassMismatchClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalModuleConfClass, zxAnOpticalModuleActualClass}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptModuleClassMismatchClr trap is sent when the agent has
+             detected that the optical module has plugged in, and 
+             zxAnOpticalModuleConfClass is same as 
+             zxAnOpticalModuleActualClass."
+        ::= { zxAnOpticalModuleNotifications 24 } 
+
+    zxAnOptChanTxPwrUnderThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalChanCurrTxPwr, zxAnOpticalTxPwrLowerThresh }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanTxPwrUnderThreshAlm trap is sent when the agent has
+             detected that the zxAnOpticalChanCurrTxPwr has been less than 
+             the zxAnOpticalTxPwrLowerThresh."
+        ::= { zxAnOpticalModuleNotifications 51 }
+
+    zxAnOptChanTxPwrUnderThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalChanCurrTxPwr , zxAnOpticalTxPwrLowerThresh}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanTxPwrUnderThreshClr trap is sent when the 
+             zxAnOptChanTxPwrUnderThreshAlm is cleared."
+        ::= { zxAnOpticalModuleNotifications 52 }        
+
+    zxAnOptChanTxPwrOverThreshAlm NOTIFICATION-TYPE
+        OBJECTS { zxAnOpticalChanCurrTxPwr, zxAnOpticalTxPwrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanTxPwrOverThreshAlm trap is sent when the agent has
+             detected that the zxAnOpticalChanCurrTxPwr has been exceeded 
+             the zxAnOpticalTxPwrUpperThresh."
+        ::= { zxAnOpticalModuleNotifications 53 }
+
+    zxAnOptChanTxPwrOverThreshClr NOTIFICATION-TYPE
+        OBJECTS { zxAnOpticalChanCurrTxPwr, zxAnOpticalTxPwrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanTxPwrOverThreshClr trap is sent when the 
+             zxAnOptChanTxPwrOverThreshAlm is cleared."
+        ::= { zxAnOpticalModuleNotifications 54 }     
+
+    zxAnOptChanBiasUnderThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalChanBiasCurrent, zxAnOpticalBiasCurrLowerThresh }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanBiasUnderThreshAlm trap is sent when the agent has
+             detected that the zxAnOpticalChanBiasCurrent has been less than
+             the zxAnOpticalBiasCurrLowerThresh."
+        ::= { zxAnOpticalModuleNotifications 55 }
+        
+    zxAnOptChanBiasUnderThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalChanBiasCurrent, zxAnOpticalBiasCurrLowerThresh}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanBiasCurrUnderThreshClr trap is sent when the 
+             zxAnOptChanBiasUnderThreshAlm is cleared."
+        ::= { zxAnOpticalModuleNotifications 56 }            
+        
+    zxAnOptChanBiasOverThreshAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalChanBiasCurrent, zxAnOpticalBiasCurrUpperThresh }
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanBiasOverThreshAlm trap is sent when the agent has 
+             detected that the zxAnOpticalChanBiasCurrent has been exceeded 
+             the zxAnOpticalBiasCurrUpperThresh."
+        ::= { zxAnOpticalModuleNotifications 57 }
+        
+    zxAnOptChanBiasOverThreshClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalChanBiasCurrent, zxAnOpticalBiasCurrUpperThresh}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptChanBiasOverThreshClr trap is sent when the 
+             zxAnOptChanBiasOverThreshAlm is cleared."
+        ::= { zxAnOpticalModuleNotifications 58 }
+
+    zxAnOptEponGponMismatchAlm NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalModuleType}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptEponGponMismatchAlm trap is sent when the agent has 
+             detected that the GPON optical module is plugged in the EPON 
+             port or the EPON optical module is plugged in the GPON port."
+        ::= { zxAnOpticalModuleNotifications 59 }
+        
+    zxAnOptEponGponMismatchClr NOTIFICATION-TYPE
+        OBJECTS {zxAnOpticalModuleType}
+        STATUS  current
+        DESCRIPTION
+            "A zxAnOptEponGponMismatchClr trap is sent when the 
+             zxAnOptEponGponMismatchAlm is cleared."
+        ::= { zxAnOpticalModuleNotifications 60 }
+END

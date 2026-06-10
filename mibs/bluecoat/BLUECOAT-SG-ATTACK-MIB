@@ -1,0 +1,125 @@
+BLUECOAT-SG-ATTACK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TimeStamp, DisplayString
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+deviceAttackMIB MODULE-IDENTITY
+        LAST-UPDATED    "200711050300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The Blue Coat Attack MIB is used to monitor
+                         possible protocol attacks by hackers."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting."
+        REVISION        "200211060300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 3 }
+
+deviceAttackMIBObjects
+        OBJECT IDENTIFIER ::= { deviceAttackMIB 1 }
+
+deviceAttackMIBNotifications
+        OBJECT IDENTIFIER ::= { deviceAttackMIB 2 }
+
+deviceAttackMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { deviceAttackMIBNotifications 0 }
+
+-- textual conventions
+
+AttackStatus ::= TEXTUAL-CONVENTION
+        STATUS           current
+        DESCRIPTION      "Indicates the status of the attack.
+                noAttack(1)       - no attack.
+                underAttack(2)    - attack in progress."
+
+        SYNTAX INTEGER {
+                noAttack(1),
+                underAttack(2)
+        }
+
+--
+-- MIB variables
+--
+
+deviceAttackValues
+        OBJECT IDENTIFIER ::= { deviceAttackMIBObjects 1 }
+
+
+--
+-- deviceAttackTable
+--
+
+deviceAttackTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DeviceAttackEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This table lists the various attacks that are
+                         detected."
+        ::= { deviceAttackValues 1 }
+
+deviceAttackEntry OBJECT-TYPE
+        SYNTAX          DeviceAttackEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A deviceAttack entry describes the
+                         present state of an attack."
+        INDEX           { deviceAttackIndex }
+        ::= { deviceAttackTable 1 }
+
+DeviceAttackEntry ::= SEQUENCE {
+        deviceAttackIndex       INTEGER,
+        deviceAttackName        DisplayString,
+        deviceAttackStatus      AttackStatus,
+        deviceAttackTime        TimeStamp
+        }
+
+deviceAttackIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies an attack."
+        ::= { deviceAttackEntry 1 }
+
+deviceAttackName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The textual name of the attack i.e. SYN Flood."
+        ::= { deviceAttackEntry 2  }
+
+deviceAttackStatus      OBJECT-TYPE
+        SYNTAX          AttackStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "noAttack(1) not under attack, underAttack(2) attack in progress.
+                         The default start-up value is noAttack(1)."
+        ::= { deviceAttackEntry 3 }
+
+deviceAttackTime        OBJECT-TYPE
+        SYNTAX          TimeStamp
+        UNITS           "Hundredths of seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The value of 'sysUpTime.0' at the time of the attack."
+        ::= { deviceAttackEntry 4 }
+
+--
+-- notifications
+--
+
+deviceAttackTrap NOTIFICATION-TYPE
+        OBJECTS { deviceAttackName, deviceAttackStatus }
+        STATUS          current
+        DESCRIPTION     "At the start of an attack a notification is
+                         generated with 'deviceAttackStatus = underAttack(2)'.
+                         At the end of an attack a notification is generated with
+                         'deviceAttackStatus = noAttack(1)'."
+        ::= { deviceAttackMIBNotificationsPrefix 1 }
+
+END

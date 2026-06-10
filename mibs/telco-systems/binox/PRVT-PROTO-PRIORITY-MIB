@@ -1,0 +1,129 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-PROTO-PRIORITY-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-PROTO-PRIORITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC;
+
+prvtProtoPriorityMIB MODULE-IDENTITY
+    LAST-UPDATED "201402030000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This document is the SNMP MIB module to manage dscp remarking."
+    REVISION    "201402030000Z"
+    DESCRIPTION 
+        "Initial implementation"
+    ::= { switch 182 }
+
+
+prvtProtoPriorityMIBObjects OBJECT IDENTIFIER
+    ::= { prvtProtoPriorityMIB 1 }
+
+dscpRemarkingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DscpRemarkingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains dscpRemarking information."
+    ::= { prvtProtoPriorityMIBObjects 1 }
+
+dscpRemarkingEntry OBJECT-TYPE
+    SYNTAX      DscpRemarkingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific dscpRemarking."
+    INDEX       { dscpRemarkingValue }
+    ::= { dscpRemarkingTable 1 }
+
+DscpRemarkingEntry ::= SEQUENCE {
+    dscpRemarkingValue      Unsigned32,
+    dscpRemarkingRowStatus  RowStatus,
+    dscpRemarkingFc         INTEGER
+}
+
+dscpRemarkingValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Specify DSCP value to be remarked."
+    ::= { dscpRemarkingEntry 1 }
+
+dscpRemarkingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This object indicates the status of this row."
+    ::= { dscpRemarkingEntry 2 }
+
+dscpRemarkingFc OBJECT-TYPE
+    SYNTAX      INTEGER { be(1), l2(2), af(3), l1(4), h2(5), ef(6), 
+                    h1(7), nc(8) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Forwarding class."
+    ::= { dscpRemarkingEntry 3 }
+
+prvtArpPriorityMappingToFc OBJECT-TYPE
+    SYNTAX      INTEGER { be(1), l2(2), af(3), l1(4), h2(5), ef(6), 
+                    h1(7), nc(8) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specify ARP packets mapping
+         to forwarding class"
+    ::= { prvtProtoPriorityMIBObjects 2 }
+
+END -- end of module PRVT-PROTO-PRIORITY-MIB.

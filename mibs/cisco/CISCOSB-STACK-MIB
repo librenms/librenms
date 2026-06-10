@@ -1,0 +1,140 @@
+CISCOSB-STACK-MIB DEFINITIONS ::= BEGIN
+
+-- Title:               CISCOSB LOCALIZATION ROS
+--                      This Private MIB supports the unit id configuration for stack of ROS products
+-- Version:             7.40
+-- Date:                21 Nov 2005
+-- 23-May-2012			Update unit id from 4 to 8 units maximum
+-- 19-Dec-2012          Support Lion Native and advanced-hybrid-xg
+--
+-- 01-Nov-2005 Add rlStackUnitMacAddressAfterReset
+-- 21-Nov-2005 Change range of rlStackActiveUnitIdAfterReset
+-- 21 mar 2011 In version 7.50, unit id configuration for hybrid stack 
+-- 10 Oct 2011 Add port-speed-down 
+
+IMPORTS
+    MacAddress      FROM SNMPv2-TC
+    switch001       FROM CISCOSB-MIB OBJECT-TYPE,
+    MODULE-IDENTITY FROM SNMPv2-SMI
+    TruthValue, TEXTUAL-CONVENTION FROM SNMPv2-TC;
+
+
+rlStack MODULE-IDENTITY
+         LAST-UPDATED "200504140000Z"
+         ORGANIZATION "Cisco Systems, Inc."
+
+         CONTACT-INFO
+         "Postal: 170 West Tasman Drive
+         San Jose , CA 95134-1706
+         USA
+
+         
+         Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+         DESCRIPTION
+                "The private MIB module definition for stack."
+         REVISION "200504140000Z"
+         DESCRIPTION
+                "Initial revision."
+        ::= { switch001 107 }
+
+rlStackActiveUnitIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlStackActiveUnitIdEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        " The table listing the active unit id of the requested unit."
+    ::= {rlStack 1 }
+
+rlStackActiveUnitIdEntry  OBJECT-TYPE
+    SYNTAX      RlStackActiveUnitIdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        " An entry in the rlStackActiveUnitIdTable."
+    INDEX {rlStackCurrentUnitId }
+    ::= {rlStackActiveUnitIdTable  1 }
+
+RlStackActiveUnitIdEntry ::= SEQUENCE {
+    rlStackCurrentUnitId             INTEGER,
+    rlStackActiveUnitIdAfterReset    INTEGER
+}
+
+rlStackCurrentUnitId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unit number device, which is the active unit id"
+    ::= {rlStackActiveUnitIdEntry 1 }
+
+
+rlStackActiveUnitIdAfterReset OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the unit id that will be after reset."
+    ::= {rlStackActiveUnitIdEntry 2 }
+
+rlStackUnitModeAfterReset OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    standalone(1),
+                    stack(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "set unit type that will be after reset, standalone or stack."
+    ::= {rlStack 2 }
+
+rlStackUnitMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    standalone(1),
+                    stack(2)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "show unit type standalone or stack."
+    ::= {rlStack 3 }
+
+rlStackUnitMacAddressAfterReset OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The MAC address used by this bridge after rest."
+    REFERENCE
+            "IEEE 802.1D-1990: Sections 6.4.1.1.3 and 3.12.5"
+    ::= { rlStack 4 }
+
+
+rlStackTopology OBJECT-TYPE
+    SYNTAX  INTEGER {
+                    topology-chain(1),
+                    topology-ring(2),
+                    topology-star(3)
+                    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "show stack topology type"
+    ::= {rlStack 6 }
+	
+---------------
+-- rlStackMode
+---------------
+rlStackMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    native(1),
+                    hybrid(2)                    
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set the stack mode that would be taken after reset - native or hybrid."
+   ::= { rlStack 7}   
+
+
+END

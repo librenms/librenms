@@ -1,0 +1,244 @@
+-- *****************************************************************
+-- TT-LOOP-MIB : TN LOOPBACK private MIB
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-TT-LOOP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI   
+    DisplayString FROM SNMPv2-TC
+    InterfaceIndex FROM IF-MIB
+    ;
+
+tnTtLoopMib MODULE-IDENTITY
+    LAST-UPDATED "201507160000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "This is a private Traffic Test Loop MIB that can be used for RFC2544
+         and Y.1564 (remote end) testing"
+    REVISION    "201507160000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { tnProducts 149 }
+
+
+TNTtLoopInstanceAdminState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance Administrative State."
+    SYNTAX      INTEGER { adminDisabled(0), adminEnabled(1) }
+
+TNTtLoopInstanceDomain ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Domain."
+    SYNTAX      INTEGER { port(0), evc(1), vlan(2) }
+
+TNTtLoopInstanceDirection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance direction."
+    SYNTAX      INTEGER { facility(0), terminal(1) }
+
+TNTtLoopInstanceSubscriber ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance subscriber mode."
+    SYNTAX      INTEGER { none(0), all(1), test(2) }
+
+TNTtLoopInstanceType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance type."
+    SYNTAX      INTEGER { macLoop(0), oamLoop(1) }
+             
+TNTtLoopInstanceOperState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The instance Operational State."
+    SYNTAX      INTEGER { operDown(0), operUp(1) }
+    
+tnTtLoopCapabilitiesInstanceMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Max number of TT_LOOP instance"
+    ::= { tnTtLoopMib 1 }
+
+tnTtLoopCapabilitiesNameMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Max length of instance name"
+    ::= { tnTtLoopMib 2 }
+ 
+tnTtLoopConfigInstanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNTtLoopConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of created instance configuration parameters"
+    ::= { tnTtLoopMib 3 }
+
+tnTtLoopConfigInstanceEntry OBJECT-TYPE
+    SYNTAX      TNTtLoopConfigInstanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a created instance configuration parameters. Not all parameters
+         can be changed"
+    INDEX       { tnTtLoopConfigInstanceId }
+    ::= { tnTtLoopConfigInstanceTable 1 }
+
+TNTtLoopConfigInstanceEntry ::= SEQUENCE {
+    tnTtLoopConfigInstanceId      		Integer32,
+    tnTtLoopConfigInstanceName    		DisplayString, 
+    tnTtLoopConfigInstanceDomain        TNTtLoopInstanceDomain,
+    tnTtLoopConfigInstanceType    		TNTtLoopInstanceType,
+    tnTtLoopConfigInstanceDirection 	TNTtLoopInstanceDirection,
+    tnTtLoopConfigInstanceFlow    		InterfaceIndex,
+    tnTtLoopConfigInstancePort    		InterfaceIndex,
+    tnTtLoopConfigInstanceLevel   		Unsigned32,
+    tnTtLoopConfigInstanceSubscriber    TNTtLoopInstanceSubscriber,  
+    tnTtLoopStatusInstanceOperState     TNTtLoopInstanceOperState,
+    tnTtLoopConfigInstanceAdminState    TNTtLoopInstanceAdminState, 
+    tnTtLoopConfigInstanceAction     	INTEGER
+}
+
+tnTtLoopConfigInstanceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Instance name"
+    DEFVAL { "TRAFFIC_TEST_LOOP_INSTANCE" }
+    ::= { tnTtLoopConfigInstanceEntry 1 }
+
+tnTtLoopConfigInstanceDomain OBJECT-TYPE
+    SYNTAX      TNTtLoopInstanceDomain
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Domain"
+    ::= { tnTtLoopConfigInstanceEntry 2 }
+
+tnTtLoopConfigInstanceType OBJECT-TYPE
+    SYNTAX      TNTtLoopInstanceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Traffic Test loop type. Currently OAM Loop is only supported in EVC
+         domain."
+    ::= { tnTtLoopConfigInstanceEntry 3 }
+
+tnTtLoopConfigInstanceDirection OBJECT-TYPE
+    SYNTAX      TNTtLoopInstanceDirection
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The instance direction. Currently Terminal Loop is only supported in
+         EVC domain."
+    ::= { tnTtLoopConfigInstanceEntry 4 }
+
+tnTtLoopConfigInstanceFlow OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The flow instance. Currently VLAN domain is not supported."
+    DEFVAL         { 1 }
+    ::= { tnTtLoopConfigInstanceEntry 5 }
+
+tnTtLoopConfigInstancePort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The instance residence port."
+    DEFVAL         { 1 }
+    ::= { tnTtLoopConfigInstanceEntry 6 }
+
+tnTtLoopConfigInstanceLevel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The instance MEG level"
+    ::= { tnTtLoopConfigInstanceEntry 7 }
+
+tnTtLoopConfigInstanceSubscriber OBJECT-TYPE
+    SYNTAX      TNTtLoopInstanceSubscriber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The EVC OAM loop subscriber mode"
+    ::= { tnTtLoopConfigInstanceEntry 8 }
+
+tnTtLoopStatusInstanceOperState OBJECT-TYPE
+    SYNTAX      TNTtLoopInstanceOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The instance Operational state."
+    ::= { tnTtLoopConfigInstanceEntry 9 }
+
+tnTtLoopConfigInstanceAdminState OBJECT-TYPE
+    SYNTAX      TNTtLoopInstanceAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The instance Administrative state."
+    ::= { tnTtLoopConfigInstanceEntry 10 }
+
+tnTtLoopConfigInstanceAction OBJECT-TYPE
+    SYNTAX       INTEGER{ noAction(0), save(1), delete(2) }
+
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"  
+    DEFVAL         { 1 }
+    ::= { tnTtLoopConfigInstanceEntry 11 }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

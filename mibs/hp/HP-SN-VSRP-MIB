@@ -1,0 +1,628 @@
+
+HP-SN-VSRP-MIB DEFINITIONS ::= BEGIN
+-- Foundry SnRouter Group MIB Release 1.0.0
+-- Revision 1 6/5/02
+-- Revision 2 08/15/02
+-- Copyright 1996-97 Foundry Networks, Inc.
+-- All rights reserved.
+-- This Foundry Networks SNMP Management Information Base 
+-- Specification embodies Foundry Networks' confidential and
+-- proprietary intellectual property. Foundry Networks retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS," and Foundry Networks makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+-- SECTION 1: Top Level Definitions
+-- Imports
+
+IMPORTS
+
+	Counter FROM RFC1155-SMI 
+	IpAddress, Counter	FROM RFC1155-SMI 
+
+	snVsrp	FROM HP-SN-SWITCH-GROUP-MIB;
+		
+	MacAddress ::=
+	      OCTET STRING (SIZE(6))
+	  -- This data type is used to model media addresses.  For many
+	  -- types of media, this will be in a binary representation.
+	  -- For example, an ethernet address would be represented as
+	  -- a string of 6 octets.
+
+snVsrpGlobal 	OBJECT IDENTIFIER ::= { snVsrp 1 } 
+snVsrpIfIntf 	OBJECT IDENTIFIER ::= { snVsrp 2 }
+snVsrpVirRtr 	OBJECT IDENTIFIER ::= { snVsrp 3 }
+
+--  Section 1:	VSRP Global Variables
+
+snVsrpGroupOperModeVsrp OBJECT-TYPE 
+    SYNTAX  INTEGER 
+        {   disabled(0),             
+		    enabled(1)
+		} 
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "The VSRP is configured on this system either enabled or 
+        disabled and thedefault is disabled mode.
+		 disabled(0)..........disable VSRP   
+		 enabled(1)...........activate VSRP" 
+	::= { snVsrpGlobal 1 } 
+	
+snVsrpIfStateChangeTrap OBJECT-TYPE
+	SYNTAX	INTEGER { disabled(0), enabled(1) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates whether the SNMP agent process is
+		permitted to generate VSRP interface state change
+		traps."
+    DEFVAL { enabled }
+	::= { snVsrpGlobal 2 }
+
+snVsrpIfMaxNumVridPerIntf OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates the maximum number of VRID per interface."
+	::= { snVsrpGlobal 3 }
+
+snVsrpIfMaxNumVridPerSystem OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"Indicates the maximum number of VRID per system."
+	::= { snVsrpGlobal 4 }
+
+snVsrpClearVrrpStat OBJECT-TYPE
+	SYNTAX	INTEGER { normal(0), clear(1) }
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+		"Clear VSRP statistics command."
+	::= { snVsrpGlobal 5 }
+
+	 
+--  Section 2:	VSRP  Interface Table, new table with vlan_id as an index, 
+
+snVsrpIfTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF SnVsrpIfEntry
+    ACCESS   not-accessible
+    STATUS   mandatory
+    DESCRIPTION
+       "The VSRP Interface Table describes the interfaces from
+        the viewpoint of VSRP."
+    ::= { snVsrpIfIntf 1 }
+
+     snVsrpIfEntry OBJECT-TYPE
+         SYNTAX   SnVsrpIfEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "The VSRP Interface Entry describes one interface from
+            the viewpoint of VSRP."
+         INDEX { snVsrpIfVlanId}
+         ::= { snVsrpIfTable 1 }
+
+     SnVsrpIfEntry ::=
+         SEQUENCE {
+             snVsrpIfVlanId
+ 		 		INTEGER,
+             snVsrpIfAuthType
+			     INTEGER,
+			 snVsrpIfAuthPassword
+			     OCTET STRING
+         }
+
+     snVsrpIfVlanId OBJECT-TYPE
+ 		 SYNTAX  INTEGER
+ 		 ACCESS  read-only
+ 		 STATUS  mandatory
+         DESCRIPTION
+            "Vlan index."
+         ::= { snVsrpIfEntry 1 }
+
+    snVsrpIfAuthType OBJECT-TYPE
+         SYNTAX   INTEGER { 
+         				noAuth(0), 
+         				simpleTextPasswd(1), 
+						ipAuthHeader(2)
+						}
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The authentication type of this interface."
+         ::= { snVsrpIfEntry 2 }
+
+    snVsrpIfAuthPassword OBJECT-TYPE
+		 SYNTAX	  OCTET STRING (SIZE (0..7))
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The simple text password is allowed if only if 
+            the snVsrpIfAuthType type is simpleTextPasswd."
+         ::= { snVsrpIfEntry 3 }
+
+	 
+--  Section 3: VSRP Virtual Router Configuration Table
+--  The vsrp Virtual Router Table augments with vsrp specific information.
+
+snVsrpVirRtrTable OBJECT-TYPE
+    SYNTAX   SEQUENCE OF SnVsrpVirRtrEntry
+    ACCESS   not-accessible
+    STATUS   mandatory
+    DESCRIPTION
+       "The vsrp virtual router Entry describes one virtual router from
+        the viewpoint of vsrp."
+    ::= { snVsrpVirRtr 1 }
+
+     snVsrpVirRtrEntry OBJECT-TYPE
+         SYNTAX   SnVsrpVirRtrEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "The vsrp virtual router Entry describes one virtual router from
+            the viewpoint of vsrp."
+         INDEX { snVsrpVirRtrVlanId, snVsrpVirRtrId }
+         ::= { snVsrpVirRtrTable 1 }
+
+     SnVsrpVirRtrEntry ::=
+         SEQUENCE {
+              snVsrpVirRtrVlanId
+ 		 		INTEGER,
+             snVsrpVirRtrId
+			     INTEGER,
+             snVsrpVirRtrOwnership
+			     INTEGER,
+             snVsrpVirRtrCfgPriority
+                 INTEGER,
+             snVsrpVirRtrTrackPriority
+                 INTEGER,
+             snVsrpVirRtrCurrPriority
+                 INTEGER,
+			 snVsrpVirRtrHelloInt 
+				 INTEGER,
+			 snVsrpVirRtrDeadInt 
+				 INTEGER,
+			 snVsrpVirRtrPreemptMode 
+				 INTEGER,
+			 snVsrpVirRtrState
+				 INTEGER,
+			snVsrpVirRtrIpAddrMask
+				OCTET STRING,
+			 snVsrpVirRtrActivate 
+				 INTEGER,
+             snVsrpVirRtrTrackPortList
+                 OCTET STRING,
+			 snVsrpVirRtrAdvertiseBackup 
+				 INTEGER,
+			 snVsrpVirRtrHoldDownInt 
+				 INTEGER,
+			 snVsrpVirRtrInitTtl
+				 INTEGER,
+             snVsrpVirRtrIncPortList
+                 OCTET STRING,
+			 snVsrpVirRtrSave
+				 INTEGER,
+			 snVsrpVirRtrBackupInt
+				 INTEGER,
+			 snVsrpVirRtrRowStatus 
+				 INTEGER,
+			 snVsrpVirRtrRxArpPktDropCnts 
+				 Counter,
+			 snVsrpVirRtrRxIpPktDropCnts 
+				 Counter,
+			 snVsrpVirRtrRxPortMismatchCnts 
+				 Counter,
+			 snVsrpVirRtrRxNumOfIpMismatchCnts 
+				 Counter,				 
+			 snVsrpVirRtrRxIpMismatchCnts 
+				 Counter,
+			 snVsrpVirRtrRxHelloIntMismatchCnts 
+				 Counter,
+			 snVsrpVirRtrRxPriorityZeroFromMasterCnts 
+				 Counter,
+			 snVsrpVirRtrRxHigherPriorityCnts 
+				 Counter,
+			 snVsrpVirRtrTransToMasterStateCnts 
+				 Counter,
+			 snVsrpVirRtrTransToBackupStateCnts 
+				 Counter,
+			 snVsrpVirRtrCurrDeadInt 
+				 INTEGER,
+			 snVsrpVirRtrCurHelloInt 
+				 INTEGER,
+			 snVsrpVirRtrCurHoldDownInt 
+				 INTEGER,
+			 snVsrpVirRtrCurInitTtl
+				 INTEGER,
+			snVsrpVirRtrHelloMacAddress
+				MacAddress,
+		    snVsrpVirRtrMasterIpAddr
+				 IpAddress
+       }
+       
+     snVsrpVirRtrVlanId OBJECT-TYPE
+ 		 SYNTAX  INTEGER
+ 		 ACCESS  read-only
+ 		 STATUS  mandatory
+         DESCRIPTION
+            "Vlan index."
+         ::= { snVsrpVirRtrEntry 1 }
+         
+    snVsrpVirRtrId OBJECT-TYPE
+         SYNTAX   INTEGER (1..255)
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "One of the virtual router ID of this vsrp interface."
+         ::= { snVsrpVirRtrEntry 2 }
+
+    snVsrpVirRtrOwnership OBJECT-TYPE
+	     SYNTAX   INTEGER {
+					incomplete(0),
+					owner(1),
+					backup(2)
+					}
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The ownership of this vsrp router interface 
+            can be set to backup(2).  
+            VirRtr SNMP-GET returns incomplete(0), it means 
+            no IP address has assigned to this vsrp router interface."
+         ::= { snVsrpVirRtrEntry 3 }
+
+     snVsrpVirRtrCfgPriority OBJECT-TYPE
+         SYNTAX   INTEGER (1..254)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The higher the number the higher the priority is.
+            This parameter decides which backup router should becomes
+            the Active Router for the interface.  A backup Router with
+            higher priority selected to becomes the Active Router.
+            Therefore, this Object can be set if only if snVsrpVirRtrOwnership
+            is set to backup(2)."
+         DEFVAL { 100 }
+         ::= { snVsrpVirRtrEntry 4 }
+
+     snVsrpVirRtrTrackPriority OBJECT-TYPE
+         SYNTAX   INTEGER (1..254)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The higher the number the higher the priority is.
+            after this object is configured, the snVsrpVirRtrCurrPriority 
+            of this interface will be adjusted dynamically with this
+			track priority when the Track Port states first
+            changes from UP to DOWN."
+         ::= { snVsrpVirRtrEntry 5 }
+
+     snVsrpVirRtrCurrPriority OBJECT-TYPE
+         SYNTAX   INTEGER (1..254)
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The higher the number the higher the priority is.
+            This object will be adjusted dynamically with the
+			track priority when the Track Port states first
+            changes from UP to DOWN."
+         ::= { snVsrpVirRtrEntry 6 }
+
+     snVsrpVirRtrHelloInt OBJECT-TYPE
+         SYNTAX   INTEGER (1..84)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Time interval between advertisements (seconds)."
+         DEFVAL { 1 }
+         ::= { snVsrpVirRtrEntry 7 }
+
+     snVsrpVirRtrDeadInt OBJECT-TYPE
+         SYNTAX   INTEGER (0..84)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Dead interval (seconds)."
+         DEFVAL { 1 }
+         ::= { snVsrpVirRtrEntry 8 }
+
+     snVsrpVirRtrPreemptMode OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "This mode controls whether a higher priority Backup router
+            preempts a lower priority Master.  The mode with enabled(1)
+            allow preemption and disabled(0) prohibit preemption."
+         DEFVAL { enabled }
+         ::= { snVsrpVirRtrEntry 9 }
+
+	 snVsrpVirRtrState OBJECT-TYPE
+	     SYNTAX   INTEGER {
+					init(0),
+					master(1),
+					backup(2)
+				  }
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "This object specifies the vsrp Router's interface state as:
+            init(0)...initialization state.
+            master(1)...master state.
+            backup(2)...backup state."
+         ::= { snVsrpVirRtrEntry 10 }
+
+    snVsrpVirRtrIpAddrMask OBJECT-TYPE
+		 SYNTAX  OCTET STRING (SIZE(64))
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "The numbers of IP Addresses of this virtual router of this 
+            interface, this holds good for L3 vsrp."
+         ::= { snVsrpVirRtrEntry 11 }
+
+	 snVsrpVirRtrActivate OBJECT-TYPE
+	     SYNTAX   INTEGER {
+					disabled(0),
+					enabled(1)
+				  }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "This object specifies the vsrp Router's activate command as:
+            disabled(0)...deactivate this vsrp Router.
+            enabled(1)....activate this vsrp Router."
+         ::= { snVsrpVirRtrEntry 12 }
+
+     snVsrpVirRtrTrackPortList OBJECT-TYPE
+		 SYNTAX  OCTET STRING
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "This object specifies the identity of the physical port and virtual ports
+			whose state is to be monitored.  Each port index is 
+			an ifIndex, if there are consecutive 4 or more ifIndex then
+			they will be encoded like below. 
+            Encoding and decoding scheme is range based:
+            Each range prefix with 0000 (2 octets) where 0000 is not valid 
+            ifIndex. Next 2 octets indicates lower range ifIndex, followed by 2 
+            octets of higher range ifIndex. Individual(non range) ones will be displayed as it is.
+            Ex:
+            port list: 0001..0005 0015 0032..0047
+            Port list in PDU:  0000 0001 0005 000f 0000 0020 002f.
+			If this object is configured
+			then the Preference Level of this interface will be adjusted
+			dynamically depending on the state of the Track Port.
+            The interface's Preference Level is reduced by value of 
+            Preference Level parameter when the Track Port states first
+            changes from UP to DOWN.  When the Track Port next comes up
+            the interface's Preference Level is increased by the amount
+            specified by the Preference Level.
+            The router VSRP physical track port membership."
+         ::= { snVsrpVirRtrEntry 13 }
+
+     snVsrpVirRtrAdvertiseBackup OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Set Advertise this backup router to master "
+         DEFVAL { disabled }
+         ::= { snVsrpVirRtrEntry 14 }			  
+         
+	snVsrpVirRtrHoldDownInt OBJECT-TYPE
+         SYNTAX   INTEGER (1..84)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "VSRP protection mechanism, an extra delay for a switch in
+            backup mode to upgrade itself to master mode"
+         DEFVAL { 2 }
+         ::= { snVsrpVirRtrEntry 15 }
+
+     snVsrpVirRtrInitTtl OBJECT-TYPE
+         SYNTAX   INTEGER (1..255)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "VSRP:TTL in the hello packet to regulate the distance that a hello packet 
+            can travel. It prevents the flooding of VSRP hello packets in the network"
+         DEFVAL { 2 }
+         ::= { snVsrpVirRtrEntry 16 }
+
+     snVsrpVirRtrIncPortList OBJECT-TYPE
+		 SYNTAX  OCTET STRING
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Include all free ports of the VLAN into its control ports"
+         ::= { snVsrpVirRtrEntry 17 }
+
+     snVsrpVirRtrSave OBJECT-TYPE
+         SYNTAX   INTEGER { disabled(0), enabled(1) }
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Set VSRP to save current parameters value"
+         DEFVAL { disabled }
+         ::= { snVsrpVirRtrEntry 18 }
+
+     snVsrpVirRtrBackupInt OBJECT-TYPE
+         SYNTAX   INTEGER (60..3600)
+         ACCESS   read-write
+         STATUS   mandatory
+         DESCRIPTION
+            "Time interval between backup routers hello message advertisements (seconds)."
+         DEFVAL { 60 }
+         ::= { snVsrpVirRtrEntry 19 }
+         
+    snVsrpVirRtrRowStatus OBJECT-TYPE
+	     SYNTAX   INTEGER {
+					invalid(1),
+					valid(2),
+					delete(3),
+					create(4),
+					modify(5)
+				  }
+		 ACCESS   read-write
+	     STATUS   mandatory
+		 DESCRIPTION
+		 	"This object is used to create and
+		     delete row in the table and control
+			 if they are used. The values
+		     that can be written are:
+		     delete(3)...deletes the row
+		     create(4)...creates a new row
+		     modify(5)...modifies an existing row
+
+		     VirRtr the row exists, then a SET with
+		     value of create(4) returns error
+		     'badValue'. Deleted rows go away
+		     immediately. The following values
+		     can be returned on reads:
+		     noSuch(0)...no such row
+		     invalid(1)...Setting it to 'invalid' has the effect of
+                          rendering it inoperative..
+		     valid(2)....the row exists and is valid"
+	     ::= { snVsrpVirRtrEntry 20}
+
+	 snVsrpVirRtrRxArpPktDropCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The received vsrp ARP Packet Drop Counts."
+         ::= { snVsrpVirRtrEntry 21 }
+
+	 snVsrpVirRtrRxIpPktDropCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The received VSRP IP Packet Drop Counts."
+         ::= { snVsrpVirRtrEntry 22 }
+
+	 snVsrpVirRtrRxPortMismatchCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The received vsrp Port mismatching Counts."
+         ::= { snVsrpVirRtrEntry 23 }
+
+	 snVsrpVirRtrRxNumOfIpMismatchCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The received VSRP Number of IP Addresses mismatching Counts."
+         ::= { snVsrpVirRtrEntry 24 }
+
+	 snVsrpVirRtrRxIpMismatchCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "The received vsrp IP Address mismatching Counts."
+         ::= { snVsrpVirRtrEntry 25 }
+
+	 snVsrpVirRtrRxHelloIntMismatchCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+  			"The counts of the virtual router interface with hello interval mismatch counts."
+         ::= { snVsrpVirRtrEntry 26 }
+
+	 snVsrpVirRtrRxPriorityZeroFromMasterCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+  			"The counts of the virtual router interface with Priority zero from the master."
+         ::= { snVsrpVirRtrEntry 27 }
+
+	 snVsrpVirRtrRxHigherPriorityCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+  			"The counts of the virtual router interface with higher Priority."
+         ::= { snVsrpVirRtrEntry 28 }
+
+	 snVsrpVirRtrTransToMasterStateCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+  			"The counts of the virtual router interface transition to master state."
+         ::= { snVsrpVirRtrEntry 29 }
+
+	 snVsrpVirRtrTransToBackupStateCnts OBJECT-TYPE
+	     SYNTAX   Counter
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+  			"The counts of the virtual router interface transition to backup state."
+         ::= { snVsrpVirRtrEntry 30 }
+
+     snVsrpVirRtrCurrDeadInt OBJECT-TYPE
+         SYNTAX   INTEGER 
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "Current Dead interval (in 100 milliseconds)."
+         ::= { snVsrpVirRtrEntry 31 }
+
+	snVsrpVirRtrCurHelloInt OBJECT-TYPE
+         SYNTAX   INTEGER (1..84)
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "Set backup router hello interval"
+         ::= { snVsrpVirRtrEntry 32 }
+
+	snVsrpVirRtrCurHoldDownInt OBJECT-TYPE
+         SYNTAX   INTEGER (1..84)
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "VSRP protection mechanism, an extra delay for a switch in
+            backup mode to upgrade itself to master mode"
+         ::= { snVsrpVirRtrEntry 33 }
+
+     snVsrpVirRtrCurInitTtl OBJECT-TYPE
+         SYNTAX   INTEGER (1..255)
+         ACCESS   read-only
+         STATUS   mandatory
+         DESCRIPTION
+            "VSRP:TTL in the hello packet to regulate the distance that a hello packet 
+            can travel. It prevents the flooding of VSRP hello packets in the network"
+         ::= { snVsrpVirRtrEntry 34 }
+
+	snVsrpVirRtrHelloMacAddress    OBJECT-TYPE
+		SYNTAX  MacAddress
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Hello MAC address."
+		::= { snVsrpVirRtrEntry 35 }
+
+     snVsrpVirRtrMasterIpAddr OBJECT-TYPE
+         SYNTAX       IpAddress
+         ACCESS       read-only
+         STATUS       mandatory
+         DESCRIPTION
+             "The master router's real/virtual (primary) IP address. This is
+             the IP address listed as the source in vsrp advertisement
+             last received by this virtual router."
+         ::= { snVsrpVirRtrEntry 36 }
+
+		
+END		

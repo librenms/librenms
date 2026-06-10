@@ -1,0 +1,233 @@
+BENU-HTTP-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32 ,Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY
+      FROM SNMPv2-SMI
+
+   benuWAG FROM BENU-WAG-MIB;
+
+benuHttpClientMIB  MODULE-IDENTITY 
+            LAST-UPDATED "201510210000Z" -- Oct 21, 2015
+
+
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This MIB module defines management information
+                related to the HTTP client.
+
+                Copyright (C)  2013 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201510210000Z" --  Oct 21, 2015
+            DESCRIPTION "Initial Version"
+
+    ::= { benuWAG 11 }
+
+-- declare top-level MIB objects for each component
+
+bHttpClientObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "HTTP client information is defined in this branch."
+   ::= { benuHttpClientMIB 1 }
+
+
+-- HTTP client latency Table
+
+bHttpClientLatencyTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BHttpClientLatencyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "Latency information list for HTTP client."
+   ::= { bHttpClientObjects 1 }
+
+bHttpClientLatencyEntry  OBJECT-TYPE
+   SYNTAX      BHttpClientLatencyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "A logical row in the bHttpClientLatencyTable."
+   INDEX {
+      bHttpClientLatencyStatsInterval
+   }
+   ::= { bHttpClientLatencyTable 1}
+
+BHttpClientLatencyEntry ::= SEQUENCE {
+    bHttpClientLatencyStatsInterval                                Integer32,
+    bHttpClientLatencyStatsIntervalDuration                        Integer32,
+    bHttpClientLatencyTotalPktCount                                Unsigned32,
+    bHttpClientLatencyMaxProcessingTime                            Unsigned32,
+    bHttpClientLatencyMinProcessingTime                            Unsigned32,
+    bHttpClientLatencyAvgProcessingTime                            Unsigned32,
+    bHttpClientLatencyProcessTimeMorethan10MSPktCount              Unsigned32,
+    bHttpClientServReqLatencyTotalPktCount                         Unsigned32,
+    bHttpClientServReqLatencyMaxProcessingTime                     Unsigned32,
+    bHttpClientServReqLatencyMinProcessingTime                     Unsigned32,
+    bHttpClientServReqLatencyAvgProcessingTime                     Unsigned32,
+    bHttpClientServReqLatencyProcessTimeMorethan10MSPktCount        Unsigned32,
+    bHttpClientJsonParsingLatencyTotalPktCount                     Unsigned32,
+    bHttpClientJsonParsingLatencyMaxProcessingTime                 Unsigned32,
+    bHttpClientJsonParsingLatencyMinProcessingTime                 Unsigned32,
+    bHttpClientJsonParsingLatencyAvgProcessingTime                 Unsigned32,
+    bHttpClientJsonParsingLatencyProcessTimeMorethan10MS            Unsigned32
+
+}
+
+bHttpClientLatencyStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated. The
+       interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics data, greater the interval
+       index value.
+       In a system supporting a history of n intervals with IntervalCount(1)
+       and IntervalCount(n), the most and least recent intervals respectively, the
+       following applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that of IntervalCount(i+1) for
+         1 <= i < n
+       - the value of IntervalCount(1) becomes that of CurrentCount." 
+   ::= { bHttpClientLatencyEntry 1 }
+
+bHttpClientLatencyStatsIntervalDuration     OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Http client latency stats interval duration."
+   ::= { bHttpClientLatencyEntry 2 }
+
+bHttpClientLatencyTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of packets handled by http client."
+   ::= { bHttpClientLatencyEntry 3 }
+
+bHttpClientLatencyMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum packet processing time handled by http client in micro seconds."
+   ::= { bHttpClientLatencyEntry 4 }
+
+bHttpClientLatencyMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Minimum packet processing time handled by http client in micro seconds."
+   ::= { bHttpClientLatencyEntry 5 }
+
+bHttpClientLatencyAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Average packet processing time handled by http client in micro seconds."
+   ::= { bHttpClientLatencyEntry 6 }
+
+bHttpClientLatencyProcessTimeMorethan10MSPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of packets took more than 10 milli second processing time handled by http client."
+   ::= { bHttpClientLatencyEntry 7 }
+
+bHttpClientServReqLatencyTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of http server request packets handled by http client."
+   ::= { bHttpClientLatencyEntry 8 }
+
+bHttpClientServReqLatencyMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Http server request handled by http client maximum packet processing time in micro seconds."
+   ::= { bHttpClientLatencyEntry 9 }
+
+bHttpClientServReqLatencyMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Http server request handled by http client minimum packet processing time in micro seconds."
+   ::= { bHttpClientLatencyEntry 10 }
+
+bHttpClientServReqLatencyAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Http server request handled by http client average packet processing time in micro seconds."
+   ::= { bHttpClientLatencyEntry 11 }
+
+bHttpClientServReqLatencyProcessTimeMorethan10MSPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of http server request packets handled by http client took more than 
+      10 milli second processing time."
+   ::= { bHttpClientLatencyEntry 12 }
+
+bHttpClientJsonParsingLatencyTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Total number of packets handled by http client - JSON parsing."
+   ::= { bHttpClientLatencyEntry 13 }
+
+bHttpClientJsonParsingLatencyMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum packet processing time for JSON parsing handled by httpclient in micro seconds."
+   ::= { bHttpClientLatencyEntry 14 }
+
+bHttpClientJsonParsingLatencyMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Minimum packet processing time for JSON parsing handled by httpclient in micro seconds."
+   ::= { bHttpClientLatencyEntry 15 }
+
+bHttpClientJsonParsingLatencyAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Average packet processing time for JSON parsing handled by httpclient in micro seconds."
+   ::= { bHttpClientLatencyEntry 16 }
+
+bHttpClientJsonParsingLatencyProcessTimeMorethan10MS     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of packets handled by http client for JSON parsing took more than 
+      10 milli second processing time."
+   ::= { bHttpClientLatencyEntry 17 }
+
+END
+

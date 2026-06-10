@@ -1,0 +1,140 @@
+-- ============================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: 802.1 QinQv2 MIB Version 1
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 Initial version Created by XiaoRen Yang, 2013.3.8
+-- ==================================================================
+HH3C-QINQV2-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    ifIndex
+        FROM IF-MIB;
+
+-- ==================================================================
+--
+-- module identity part
+--
+-- ==================================================================
+hh3cQinQv2 MODULE-IDENTITY
+    LAST-UPDATED
+        "201303080000Z"
+    ORGANIZATION
+       "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+       "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip: 100085"
+    DESCRIPTION
+        "802.1 QinQv2 MIB Version 1"
+    REVISION
+        "201303080000Z"
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { hh3cCommon 137 }
+
+-- ==================================================================
+--
+-- =====================object definition begin======================
+--
+-- ==================================================================
+hh3cQinQv2MibObject OBJECT IDENTIFIER ::= { hh3cQinQv2 1 }
+
+hh3cQinQv2ScalarObjects OBJECT IDENTIFIER ::= { hh3cQinQv2MibObject 1 }
+
+hh3cQinQv2ServiceTPID  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TPID globally configured for service VLAN tags.  The global TPID value
+        for service VLAN tags does not take effect on interfaces where
+        hh3cQinQIfServiceTPID is configured.
+        By default, the global TPID for service VLAN tags is 0x8100."
+    ::= { hh3cQinQv2ScalarObjects 1 }
+
+hh3cQinQv2CustomerTPID  OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "TPID globally configured for customer VLAN tags.  The global TPID value
+        for customer VLAN tags does not take effect on interfaces where
+        hh3cQinQIfCustomerTPID is configured.
+        By default, the global TPID for customer VLAN tags is 0x8100."
+    ::= { hh3cQinQv2ScalarObjects 2 }
+
+hh3cQinQv2IfCfgTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cQinQv2IfCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "802.1 QinQ configuration table."
+    ::= { hh3cQinQv2MibObject 2 }
+
+hh3cQinQv2IfCfgEntry OBJECT-TYPE
+    SYNTAX      Hh3cQinQv2IfCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "802.1 QinQ configuration entries."
+    INDEX { ifIndex }
+    ::= { hh3cQinQv2IfCfgTable 1 }
+
+Hh3cQinQv2IfCfgEntry ::=
+    SEQUENCE
+    {
+        hh3cQinQv2IfState           TruthValue,
+        hh3cQinQv2IfServiceTPID     Integer32,
+        hh3cQinQv2IfCustomerTPID    Integer32,
+        hh3cQinQv2IfTransVlanList   OCTET STRING
+    }
+
+hh3cQinQv2IfState OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "802.1 QinQ functions on the port.
+         The value is false by default."
+    DEFVAL { false }
+    ::= { hh3cQinQv2IfCfgEntry 1 }
+
+hh3cQinQv2IfServiceTPID    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Service TPID value on the port."
+    ::= { hh3cQinQv2IfCfgEntry 2 }
+
+hh3cQinQv2IfCustomerTPID    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Customer TPID value on the port."
+    ::= { hh3cQinQv2IfCfgEntry 3 }
+
+hh3cQinQv2IfTransVlanList    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(512))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Transparent VLANs described as a bitmap.  Each octet within this value
+        specifies a set of eight VLANs.  The first octet specifies VLANs 1
+        through 8.  The second octet specifies VLANs 9 through 16, and so on.
+        Within each octet, the most significant bit represents the highest
+        numbered VLAN, and the least significant bit represents the lowest
+        numbered VLAN."
+    ::= { hh3cQinQv2IfCfgEntry 4 }
+
+END

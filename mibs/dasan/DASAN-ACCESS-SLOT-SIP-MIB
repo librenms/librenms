@@ -1,0 +1,454 @@
+-- Made by Jeon, DHL 
+-- at Thu Jan 27 16:50:00 2005
+
+     DASAN-ACCESS-SLOT-SIP-MIB DEFINITIONS ::= BEGIN 
+   
+     IMPORTS 
+          BITS, mib-2, Counter32, Gauge32, -- inserted by jeon 20041206
+          MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+          Integer32, IpAddress, Unsigned32 
+                  FROM SNMPv2-SMI 
+          TEXTUAL-CONVENTION, 
+          RowStatus, TestAndIncr, AutonomousType, TimeStamp, DisplayString 
+                  FROM SNMPv2-TC 
+          MODULE-COMPLIANCE, OBJECT-GROUP, 
+          NOTIFICATION-GROUP                          
+                  FROM SNMPv2-CONF 
+          SnmpAdminString                             
+                  FROM SNMP-FRAMEWORK-MIB
+--          Unsigned32
+--          		  FROM DASAN-TC
+          InterfaceIndex                              
+                  FROM IF-MIB
+          dasanMgmt
+          		  FROM DASAN-SMI;
+
+     dasanAccessMib MODULE-IDENTITY 
+   
+         LAST-UPDATED   "200506112100Z" 
+         ORGANIZATION   "DASAN Networks" 
+         CONTACT-INFO 
+          " 
+          Postal: 
+   
+          Phone: 
+   
+          Email: 
+
+          " 
+         DESCRIPTION 
+          "Access Gateway Management Information Base (MIB)" 
+       
+         -- Revision History  
+   
+         REVISION     "200502112100Z"              -- Feb, 2005
+         DESCRIPTION 
+          "Initial Version by Jeon." 
+   
+   
+         --::= { mib-2 64 }
+         ::= { dasanMgmt 100 }
+         -- private oid
+         -- _ should be .... final assignment by IANA at publication time  
+   
+   
+     -- *****************************************************************  
+     --  
+     -- OID For the MIB 
+     -- 
+     -- *****************************************************************  
+   
+     dasanAccGatewayMIBObjects    OBJECT IDENTIFIER::= { dasanAccessMib 2 }
+   
+      
+     -- *****************************************************************  
+     --  
+     -- Group Objects 
+     -- 
+     -- *****************************************************************  
+     
+     dsAccGwySip       OBJECT IDENTIFIER ::= { dasanAccGatewayMIBObjects 4 }
+  
+     dsAccGwySipConfiguration		OBJECT IDENTIFIER ::= { dsAccGwySip 1 }
+
+     dsAccGwySipMonitor			OBJECT IDENTIFIER ::= { dsAccGwySip 2 }
+                                                           
+     -- ***************************************************************** 
+     -- *****************************************************************                                                           
+                                                                                                                                               
+     dsAccGwyConfigSipSlot			OBJECT IDENTIFIER ::= { dsAccGwySipConfiguration 1 }
+     
+     dsAccGwyConfigSipPort			OBJECT IDENTIFIER ::= { dsAccGwySipConfiguration 2 }
+     
+     dsAccGwyMonitorSipPort		OBJECT IDENTIFIER ::= { dsAccGwySipMonitor 1 }  
+
+     -- *****************************************************************   
+     -- ConfigSipSlot
+     -- *****************************************************************    
+	          
+	 dsAccGwyConfigSipSlotTable OBJECT-TYPE
+	 	SYNTAX		SEQUENCE OF DsAccGwyConfigSipSlotEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current
+	 	DESCRIPTION "A list of dsAccGwyConfigSipSlotEntry object."
+	 ::= { dsAccGwyConfigSipSlot 1 }
+	 
+	 dsAccGwyConfigSipSlotEntry OBJECT-TYPE
+	 	SYNTAX		DsAccGwyConfigSipSlotEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current  
+	 	DESCRIPTION "Config AGLU Functions for each slot."
+	 	INDEX		{ dsSipSlotIndex } 
+	 ::= { dsAccGwyConfigSipSlotTable 1}
+	 
+	 DsAccGwyConfigSipSlotEntry ::= SEQUENCE
+	 {        
+	 	dsSipSlotIndex				INTEGER,
+        dsSipSlotDomain  	    	DisplayString,
+        dsSipSlotSockMode 			INTEGER,
+        dsSipSlotSipPort   			INTEGER,
+        dsSipSlotProxyAddr1  		DisplayString,
+        dsSipSlotProxyPort1    	 	INTEGER,
+        dsSipSlotProxyAddr2       	DisplayString,
+        dsSipSlotProxyPort2     	INTEGER,
+        dsSipSlotProxyAddr3       	DisplayString,
+        dsSipSlotProxyPort3     	INTEGER,
+        dsSipSlotHuntMapItem    	DisplayString,
+        dsSipSlotDigitMapItem   	DisplayString,
+        dsSipSlotSigProvisionTO 	INTEGER,
+        dsSipSlotSigAleringTO   	INTEGER,
+        dsSipSlotSigConnectTO   	INTEGER,
+        dsSipSlotHookOffTO      	INTEGER,
+        dsSipSlotHookOnTO       	INTEGER
+     }
+                                            
+     dsSipSlotIndex					   OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU Slot Index of a System"
+     ::= {dsAccGwyConfigSipSlotEntry 1}
+
+     dsSipSlotDomain  				   OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"AGLU domain name (Default: dasan.com)"
+      ::= {dsAccGwyConfigSipSlotEntry 2}	    
+    
+     dsSipSlotSockMode 			       OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"AGLU Domain name
+     				[valude index]
+     				1 = UDP (Default: 1[UDP])
+    				2 = TCP"
+     ::= {dsAccGwyConfigSipSlotEntry 3}
+     
+     dsSipSlotSipPort   			   OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Local SIP Signaling Port
+     				[range]
+     				<1024-32767> = Port Number (Default: 5060)"
+     ::= {dsAccGwyConfigSipSlotEntry 4}
+     
+     dsSipSlotProxyAddr1  			   OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Proxy 1 IP Address
+     				[range]
+     				<LEN(1)-LEN(16> = Address Length (Default: 1.1.1.1)"
+     ::= {dsAccGwyConfigSipSlotEntry 5}
+     
+     dsSipSlotProxyPort1    	 	   OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Proxy 1 Signal Port
+     				[range]
+     				<1024-32767> = Port Number (Default: 5060)"
+     ::= {dsAccGwyConfigSipSlotEntry 6}
+     
+     dsSipSlotProxyAddr2       	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Proxy 2 IP Address
+     				[range]
+     				<LEN(1)-LEN(16> = Address Length (Default: 1.1.1.1)"
+     ::= {dsAccGwyConfigSipSlotEntry 7}
+     
+     dsSipSlotProxyPort2     	       OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Proxy 2 Signal Port
+     				[range]
+     				<1024-32767> = Port Number (Default: 5060)"
+     ::= {dsAccGwyConfigSipSlotEntry 8}
+     
+     dsSipSlotProxyAddr3       	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Proxy 3 IP Address
+     				[range]
+     				<LEN(1)-LEN(16> = Address Length (Default: 1.1.1.1)"
+     ::= {dsAccGwyConfigSipSlotEntry 9}
+     
+     dsSipSlotProxyPort3               OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Proxy 3 Signal Port
+     				[range]
+     				<1024-32767> = Port Number (Default: 5060)"
+     ::= {dsAccGwyConfigSipSlotEntry 10}
+     
+     dsSipSlotHuntMapItem    	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"If nCommand is [CMD_GET], [syntax] is 'URI'. For example, aData[0] is 'iptel.org'
+     				The other case, if nCommand is [CMD_SET], [syntax] is 'op;URI;Port;IP' 
+     				(*)op:add/mod/del. 
+     				For example,
+     				ex1) aData[0] = 'add;iptel.org;5060;195.37.77.99'
+     				ex2) aData[0] = 'mod;iptel.org;5000;195.37.77.99'
+     				ex3) aData[0] = 'del;iptel.org'
+     				[range]
+     				<LEN(11)-LEN(127> = Syntax Length (Default: iptel.org;5060;195.37.77.99)" 
+     ::= {dsAccGwyConfigSipSlotEntry 11}
+     
+     dsSipSlotDigitMapItem   	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"If nCommand is [CMD_GET], [syntax] is 'PhoneList'. For example, aData[0] is '010'
+     				The other case, if nCommand is [CMD_SET], [syntax] is 'op;PhoneList;HuntID;Min;Max;Strip Header;
+                    Prefix;Suffix;Strip Tail;Voice Prompt' 
+     				(*)op:add/mod/del. 
+     				For example,
+     				ex1) aData[0] = 'add;010;0;3;10;none;none;;0'
+     				ex2) aData[0] = 'mod;010;0;3;10;none;none;;0'
+     ¿				ex3) aData[0] = 'del;010'
+     				[range]
+     				<LEN(11)-LEN(255> = Syntax Length (Default: all;0;1;20;none;none;;0)"
+     ::= {dsAccGwyConfigSipSlotEntry 12}
+     
+     dsSipSlotSigProvisionTO 	       OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Singnaling INVITE->TRYING Time
+     				[range]
+     				<0-300> = Time in sec (Default: 4)"
+     ::= {dsAccGwyConfigSipSlotEntry 13}
+     
+     dsSipSlotSigAleringTO   	       OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Singnaling INVITE[TRYING]->RINGING Time
+     				[range]
+     				<0-300> = Time in sec (Default: 16)"
+     ::= {dsAccGwyConfigSipSlotEntry 14}
+     
+     dsSipSlotSigConnectTO   	       OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Singnaling INVITE[TRYING,RINGING]-> 200OK Time
+     				[range]
+     				<0-300> = Time in sec (Default: 180)"
+     ::= {dsAccGwyConfigSipSlotEntry 15}
+     
+     dsSipSlotHookOffTO      	       OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The period : In spite of ringing, a telephone subscriber doesn't answer the telephone.
+     				[range]
+     				<0-300> = Time in sec (Default: 60)"
+     ::= {dsAccGwyConfigSipSlotEntry 16}
+     
+     dsSipSlotHookOnTO                 OBJECT-TYPE
+     	SYNTAX		INTEGER 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The period : During generated BusyTone, Hook-Off is being lasted.
+     				[range]
+     				<0-300> = Time in sec (Default: 30)"
+     ::= {dsAccGwyConfigSipSlotEntry 17}  
+     
+     -- *****************************************************************   
+     -- ConfigSipPort
+     -- *****************************************************************    
+     
+     dsAccGwyConfigSipPortTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyConfigSipPortEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of dsAccGwyConfigSipPortEntry objects." 
+     ::= { dsAccGwyConfigSipPort 1}
+     
+     dsAccGwyConfigSipPortEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyConfigSipPortEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Config AGLU Functions for each port."
+         INDEX      { dsSipPortIndex }
+     ::= { dsAccGwyConfigSipPortTable 1 }
+            
+     DsAccGwyConfigSipPortEntry ::= SEQUENCE 
+     {   
+		dsSipPortIndex		    INTEGER,
+		dsSipPortMyTel      	DisplayString,
+        dsSipPortURI        	DisplayString,
+        dsSipPortContactURI 	DisplayString,
+        dsSipPortDisplayName	DisplayString,
+        dsSipPortUserName       DisplayString,
+        dsSipPortUserID         DisplayString,
+        dsSipPortUserPW         DisplayString,
+        dsSipPortRealM          DisplayString,
+        dsSipPortExpiry         INTEGER
+
+	 }
+	                                                         
+	 dsSipPortIndex		OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AccessGateway Board(AGLU) port Index"
+     ::= {dsAccGwyConfigSipPortEntry 1}  
+     
+     dsSipPortMyTel      	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"fxs Phone Number
+     				[range]
+     				<LEN(1)=LEN(127)> = Length (Default: 1~'64'=>72)"
+     ::= {dsAccGwyConfigSipPortEntry 2}
+     
+     dsSipPortURI        	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Port URI Address, the address type is '1234@dasan.com'
+     	 			[range]
+     				<LEN(1)=LEN(127)> = Length 
+     				(Default: '1@dasan.com' ~ '64@dasan.com'=>72@dasan.com)"
+     ::= {dsAccGwyConfigSipPortEntry 3}
+     
+     dsSipPortContactURI 	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Port ContactURI Address, the address type is '1234@dasan.com' or '1234@1.2.3.4'
+     	 			[range]
+     				<LEN(1)=LEN(127)> = Length 
+     				(Default: '1@1.1.1.1' ~ '64@1.1.1.1'=>72@1.1.1.1)"
+     ::= {dsAccGwyConfigSipPortEntry 4}
+     
+     dsSipPortDisplayName	       OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The display name which is going to be inserted in sip-field
+     				[range]
+     				<LEN(1)=LEN(127)> = Length (Default: 1 ~ '64'=>72)"
+     ::= {dsAccGwyConfigSipPortEntry 5}
+     
+     dsSipPortUserName             OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The name which is using for the authentication.    				
+     				[range]
+     				<LEN(1)=LEN(127)> = Length (Default: 1 ~ '64'=>72)"
+     ::= {dsAccGwyConfigSipPortEntry 6}
+     
+     dsSipPortUserID               OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The ID which is using for the authentication.    				
+     				[range]
+     				<LEN(1)=LEN(127)> = Length (Default: 1 ~ '64'=>72)"
+     ::= {dsAccGwyConfigSipPortEntry 7}
+     
+     dsSipPortUserPW               OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The Password which is using for the authentication.    				
+     				[range]
+     				<LEN(1)=LEN(127)> = Length (Default: 1 ~ '64'=>72)"
+     ::= {dsAccGwyConfigSipPortEntry 8}
+     
+     dsSipPortRealM                OBJECT-TYPE
+     	SYNTAX		DisplayString 
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The RealM which is using for the authentication.    				
+     				[range]
+     				<LEN(1)=LEN(127)> = Length (Default: dasan.com)"
+     ::= {dsAccGwyConfigSipPortEntry 9}
+     
+     dsSipPortExpiry               OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"The Registration Interval time
+     				[range]
+     				<1-3600> = Time in sec (Default: 60)"
+     ::= {dsAccGwyConfigSipPortEntry 10}  
+        
+     -- *****************************************************************   
+     -- MonitorSipPort
+     -- *****************************************************************    
+                 
+     dsAccGwyMonitorSipPortTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyMonitorSipPortEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of dsAccGwyMonitorSipPortEntry objects." 
+     ::= { dsAccGwyMonitorSipPort 1}
+     
+     dsAccGwyMonitorSipPortEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyMonitorSipPortEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Monitor AGLU Functions for each slot."
+         INDEX      { dsMonitorSipPortIndex }
+     ::= { dsAccGwyMonitorSipPortTable 1 }
+   
+     DsAccGwyMonitorSipPortEntry ::= SEQUENCE 
+     {                  
+     	dsMonitorSipPortIndex		INTEGER,
+		dsSipPortProxyStatus    	INTEGER
+	 }
+	 
+	 dsMonitorSipPortIndex			    OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU Port Index of a System"
+     ::= {dsAccGwyMonitorSipPortEntry 1}
+     
+     dsSipPortProxyStatus   	OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"Proxy Server setting status.
+			     	[valude index]
+     				0 = unreg (Default: 0[unreg])
+    				1 = reg"
+     ::= {dsAccGwyMonitorSipPortEntry 2}
+     
+     END

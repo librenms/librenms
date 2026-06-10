@@ -1,0 +1,606 @@
+UBNT-UniFi-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32, Gauge32, IpAddress, enterprises 
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime, TruthValue 
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+        FROM SNMPv2-CONF
+    ubntMIB, ubntUniFi, ubntUniFiGroups
+        FROM UBNT-MIB;
+
+ubntUniFi MODULE-IDENTITY
+  LAST-UPDATED "201606250000Z"
+  ORGANIZATION "Ubiquiti Networks, Inc."
+  CONTACT-INFO "support@ubnt.com"
+  DESCRIPTION "The UniFi MIB module for Ubiquiti Networks, Inc. entities"
+  REVISION "201606250000Z"
+  DESCRIPTION "Initial Revision."
+  ::= { ubntMIB 6 }
+
+unifiApWireless OBJECT IDENTIFIER ::= { ubntUniFi 1 }
+unifiApIf       OBJECT IDENTIFIER ::= { ubntUniFi 2 }
+unifiApSystem   OBJECT IDENTIFIER ::= { ubntUniFi 3 }
+
+
+TableIndex ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS			current
+	DESCRIPTION
+		"A unique value, greater than zero. It is recommended
+		that values are assigned contiguously starting from 1."
+	SYNTAX			Integer32 (1..2147483647)
+
+
+ObjectIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS current
+    DESCRIPTION "Internal "
+    SYNTAX Integer32 (0..2147483647)
+-- SYNTAX Integer32 (-2147483648..2147483647)
+-- SYNTAX Unsigned32 (0..4294967295)
+
+Voltage ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX Integer32 (-2147483648..2147483647)
+
+Temperature ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS current
+    DESCRIPTION ""
+    SYNTAX Integer32 (-2147483648..2147483647)
+
+unifiIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UbntIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApIf 1 }
+
+unifiIfEntry OBJECT-TYPE
+    SYNTAX UbntIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Ethernet interface"
+    INDEX { unifiIfIndex }
+    ::= { unifiIfTable 1 }
+    
+UbntIfEntry ::= SEQUENCE {
+    unifiIfIndex ObjectIndex,
+    unifiIfFullDuplex TruthValue,
+    unifiIfIp IpAddress,
+    unifiIfMac MacAddress,
+    unifiIfName DisplayString,
+    unifiIfRxBytes Counter32,
+    unifiIfRxDropped Counter32,
+    unifiIfRxError Counter32,
+    unifiIfRxMulticast Counter32,
+    unifiIfRxPackets Counter32,
+    unifiIfSpeed Integer32,
+    unifiIfTxBytes Counter32,
+    unifiIfTxDropped Counter32,
+    unifiIfTxError Counter32,
+    unifiIfTxPackets Counter32,
+    unifiIfUp TruthValue
+}
+
+unifiIfIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 1 }
+
+unifiIfFullDuplex OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 2 }
+
+unifiIfIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 3 }
+
+unifiIfMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 4 }
+
+unifiIfName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 5 }
+
+unifiIfRxBytes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 6 }
+
+unifiIfRxDropped OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 7 }
+
+unifiIfRxError OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 8 }
+
+unifiIfRxMulticast OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 9 }
+
+unifiIfRxPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 10 }
+
+unifiIfSpeed OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 11 }
+
+unifiIfTxBytes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 12 }
+
+unifiIfTxDropped OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 13 }
+
+unifiIfTxError OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 14 }
+
+unifiIfTxPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 15 }
+
+unifiIfUp OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiIfEntry 16 }
+
+unifiRadioTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UbntRadioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApWireless 1 }
+
+unifiRadioEntry OBJECT-TYPE
+    SYNTAX UbntRadioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Wireless interface"
+    INDEX { unifiRadioIndex }
+    ::= { unifiRadioTable 1 }
+
+UbntRadioEntry ::= SEQUENCE {
+    unifiRadioIndex ObjectIndex,
+    unifiRadioName DisplayString,
+    unifiRadioRadio DisplayString,
+    unifiRadioRxPackets Counter32,
+    unifiRadioTxPackets Counter32,
+    unifiRadioCuTotal Integer32,
+    unifiRadioCuSelfRx Integer32,
+    unifiRadioCuSelfTx Integer32,
+    unifiRadioOtherBss Integer32
+}
+
+unifiRadioIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 1 }
+
+unifiRadioName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 2 }
+
+unifiRadioRadio OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 3 }
+
+unifiRadioRxPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 4 }
+
+unifiRadioTxPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 5 }
+
+unifiRadioCuTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 6 }
+
+unifiRadioCuSelfRx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 7 }
+
+unifiRadioCuSelfTx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 8 }
+
+unifiRadioOtherBss OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiRadioEntry 9 }
+
+unifiVapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UbntVapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApWireless 2 }
+
+unifiVapEntry OBJECT-TYPE
+    SYNTAX UbntVapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "BSS"
+    INDEX { unifiVapIndex }
+    ::= { unifiVapTable 1 }
+
+UbntVapEntry ::= SEQUENCE {
+    unifiVapIndex ObjectIndex,
+    unifiVapBssId MacAddress,
+    unifiVapCcq Integer32,
+    unifiVapChannel Integer32,
+    unifiVapExtChannel Integer32,
+    unifiVapEssId DisplayString,
+    unifiVapName DisplayString,
+    unifiVapNumStations Integer32,
+    unifiVapRadio DisplayString,
+    unifiVapRxBytes Counter32,
+    unifiVapRxCrypts Counter32,
+    unifiVapRxDropped Counter32,
+    unifiVapRxErrors Counter32,
+    unifiVapRxFrags Counter32,
+    unifiVapRxPackets Counter32,
+    unifiVapTxBytes Counter32,
+    unifiVapTxDropped Counter32,
+    unifiVapTxErrors Counter32,
+    unifiVapTxPackets Counter32,
+    unifiVapTxRetries Counter32,
+    unifiVapTxPower Integer32,
+    unifiVapUp TruthValue,
+    unifiVapUsage DisplayString
+}
+
+unifiVapIndex OBJECT-TYPE
+    SYNTAX ObjectIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 1 }
+
+unifiVapBssId OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 2 }
+
+unifiVapCcq OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 3 }
+
+unifiVapChannel OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 4 }
+
+unifiVapExtChannel OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 5 }
+
+unifiVapEssId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 6 }
+
+unifiVapName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 7 }
+
+unifiVapNumStations OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 8 }
+
+unifiVapRadio OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 9 }
+
+unifiVapRxBytes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 10 }
+
+unifiVapRxCrypts OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 11 }
+
+unifiVapRxDropped OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 12 }
+
+unifiVapRxErrors OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 13 }
+
+unifiVapRxFrags OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 14 }
+
+unifiVapRxPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 15 }
+
+unifiVapTxBytes OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 16 }
+
+unifiVapTxDropped OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 17 }
+
+unifiVapTxErrors OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 18 }
+
+unifiVapTxPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 19 }
+
+unifiVapTxRetries OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 20 }
+
+unifiVapTxPower OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 21 }
+
+unifiVapUp OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiVapEntry 22 }
+
+unifiVapUsage OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "guest or regular user"
+    ::= { unifiVapEntry 23 }
+
+unifiApSystemIp OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApSystem 1 }
+
+unifiApSystemIsolated OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApSystem 2 }
+
+unifiApSystemModel OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApSystem 3 }
+
+unifiApSystemUplink OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApSystem 4 }
+
+unifiApSystemUptime OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApSystem 5 }
+
+unifiApSystemVersion OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION ""
+    ::= { unifiApSystem 6 }
+
+unifiIfGroup OBJECT-GROUP OBJECTS {
+    unifiIfFullDuplex,
+    unifiIfIp,
+    unifiIfMac,
+    unifiIfName,
+    unifiIfRxBytes,
+    unifiIfRxDropped,
+    unifiIfRxError,
+    unifiIfRxMulticast,
+    unifiIfRxPackets,
+    unifiIfSpeed,
+    unifiIfTxBytes,
+    unifiIfTxDropped,
+    unifiIfTxError,
+    unifiIfTxPackets,
+    unifiIfUp
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { ubntUniFiGroups 1 }
+
+unifiRadioGroups OBJECT-GROUP OBJECTS {
+    unifiRadioName,
+    unifiRadioRadio,
+    unifiRadioRxPackets,
+    unifiRadioTxPackets,
+    unifiRadioCuTotal,
+    unifiRadioCuSelfRx,
+    unifiRadioCuSelfTx,
+    unifiRadioOtherBss 
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { ubntUniFiGroups 2 }
+
+unifiVapGroups OBJECT-GROUP OBJECTS {
+    unifiVapBssId,
+    unifiVapCcq,
+    unifiVapChannel,
+    unifiVapExtChannel,
+    unifiVapEssId,
+    unifiVapName,
+    unifiVapNumStations,
+    unifiVapRadio, 
+    unifiVapRxBytes,
+    unifiVapRxCrypts,
+    unifiVapRxDropped,
+    unifiVapRxErrors,
+    unifiVapRxFrags,
+    unifiVapRxPackets,
+    unifiVapTxBytes,
+    unifiVapTxDropped,
+    unifiVapTxErrors,
+    unifiVapTxPackets,
+    unifiVapTxRetries,
+    unifiVapTxPower,
+    unifiVapUp,
+    unifiVapUsage
+    }
+    STATUS current
+    DESCRIPTION ""
+    ::= { ubntUniFiGroups 3 }
+
+unifiApSystemGroup OBJECT-GROUP OBJECTS {
+   unifiApSystemIp, unifiApSystemIsolated, unifiApSystemModel, unifiApSystemUplink, unifiApSystemUptime, unifiApSystemVersion
+   }
+   STATUS current
+   DESCRIPTION ""
+   ::= { ubntUniFiGroups 4 }
+
+END

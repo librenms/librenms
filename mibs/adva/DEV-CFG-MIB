@@ -1,0 +1,1124 @@
+--  File        : dev-cfg.mib
+--  Description : Private MIB for Device General Configuration
+--  By          : Yaron, Sharon, Alon & Alex & Yakov
+--  Version     : 0.1
+--  Date        : 
+--  $Log: dev-cfg.mib,v $
+--
+--  Revision 2.1  2017/5/04	 11:00:00  ymaimon
+--  Add nbsDevFANType pwm and fixed members
+--
+--  Revision 2.0  2017/3/13	 11:00:00  ymaimon 
+--  Add nbsDevFANSpeed
+--
+--  Revision 1.9  2011/07/20 10:02:28  inna
+--       nbsDevPSType - value=4(externalPS) 
+--
+--  Revision 1.8  2011/07/18 14:48:28  inna
+--   nbsDevProperties for new Devices Type OS904MBH-4A
+--   nbsDevProperties:
+--       - value=512 - for OS904MBH-4A
+--
+--  Revision 1.7  2009/12/22 13:21:04  inna
+--  nbsDevHeaterStatus oid fix:  12 instead 20
+--
+--  Revision 1.6  2009/12/21 14:48:28  inna
+--   nbsDevProperties and nbsDevHeaterStatus for new Devices Types OS_904E and OS_904EXT
+--   nbsDevProperties:
+--       - value=0   - for the regular OS_904
+--       - value=128 - for the regular OS_904E
+--       - value=256 - for the regular OS_904EXT
+--  nbsDevHeaterStatus:
+--       unknown - for the regular OS_904 and OS_904E
+--       on/off  - for heater of OS_904EXT
+--
+--  Revision 1.5  2009/08/30 05:41:25  alex
+--  errors & d2u
+--
+--  Revision 1.4  2009/03/05 12:01:14  mlevy
+--  Fixed a typo
+--
+--  Revision 1.3  2007/06/03 12:05:20  eyal
+--  Add snmp-trap for fan,power-supply,temperature
+--
+--  Revision 1.2  2003/10/22 08:14:25  pavel
+--  Added:
+--  1.
+--  2. Wrong access trap.
+--
+--  Revision 1.1.1.1  2002/03/19 13:41:54  alex
+--  Version 4.2.3
+--
+--  Revision 1.1.1.1  2002/03/10 11:52:41  alex
+--  Version 4.2.3 (For CERT report reasons)
+--
+--  Revision 1.6  2001/10/22 12:49:01  alex
+--  Merged from 1-4-4
+--
+--  =======================================================================
+--
+--
+-- Copyright (c) 1999 NBase-Xyplex.  All Rights Reserved.
+--
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.  This NBase-Xyplex SNMP MIB Specification
+-- embodies NBase-Xyplex's proprietary intellectual property.  NBase-Xyplex
+-- retains all title and ownership in the specification, including any
+-- revisions.
+--
+-- It is NBase-Xyplex's intent to encourage the widespread use of this
+-- specification in connection with the management of NBase-Xyplex's
+-- products. NBase-Xyplex grants vendor, end-users, and other interested
+-- parties a non-exclusive license to use this specification in
+-- connection with the management of NBase-Xyplex's products.
+--
+-- This specification is supplied "AS IS," and NBase-Xyplex makes no
+-- warranty, either express or implied, as to the use, operation,
+-- condition, or performance of the specification.
+--
+-- Copyright text courtesy of NBase-Xyplex
+--
+-- If you have any questions about this MIB, please call NBase-Xyplex
+-- Technical Support Center at 1-800-858-7815 from inside USA or
+-- 1-818-773-0900 from outside USA.
+--
+--
+-- NBase-Xyplex retains the right to change this MIB without notification.
+--
+
+DEV-CFG-MIB DEFINITIONS ::= BEGIN
+
+                        IMPORTS
+                                enterprises,
+                                IpAddress       FROM RFC1155-SMI
+                                Unsigned32      FROM SNMPv2-SMI
+                                DisplayString   FROM RFC1213-MIB
+                                OBJECT-TYPE     FROM RFC-1212
+                                TRAP-TYPE       FROM RFC-1215
+                                nbSwitchG1Il    FROM OS-COMMON-TC-MIB;
+
+-- ************************************************************
+-- NBase Object Identifier Definition
+-- ************************************************************
+
+-- GROUPS for General Device Configuration
+nbDeviceConfig     OBJECT IDENTIFIER ::= { nbSwitchG1Il 11}
+nbDevGen           OBJECT IDENTIFIER ::= { nbDeviceConfig 1 }
+
+-- -------------------------  nbDevGen ------------------------------------
+
+nbDevOperationMode      OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       accelerouter  (1),
+       router        (2),
+       switch        (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Operational mode of Device. This is for internal usage."
+      ::= { nbDevGen 1 }
+
+nbDevErrorText          OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "This is the text of the last error that the agent found.
+      it is sent to the RS232 port, and it used by the manager
+      to show the cause of the last error."
+      ::= { nbDevGen 2 }
+
+nbsDevTftpMode          OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none          (1),
+       server        (2),
+       client        (3)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "The TFTP Download Process mode of the Device.
+       The 'client' mode is a default."
+      ::= { nbDevGen 3 }
+
+nbDevRouterSaveConfig OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       saveConfig  (1),
+       warmReset   (2),
+       coldReset   (3),
+       backupReset (4)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "If operation SET is issued with value saveConfig(1), all
+       configuration is to be saved in relevant configuration files;
+       SET with value warmReset(2) causes only a restart of the
+       the SNMP Agent CPU operative software;
+       SET with value coldReset(3) causes the switching engine
+       as well as the SNMP Agent CPU to be hardware resetted,
+       similar to a power-on cycle;
+       SET with value backupReset(4) causes the warmReset from backup partition."
+       ::= { nbDevGen 4 }
+
+nbsDevProperties OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+       none                     (0),
+       redundantPowerSupply     (1),
+       highDensityFibrePorts    (2),
+       dcPowerSupply            (4),
+       optiSwitch100FX          (8),
+       chipModification        (16),
+       expensiveModification   (32),
+       telcoSubType            (64),
+       extendedTempRange      (128),
+       extraExtendedTempRange (256),
+       ptpSlaveSync           (512)
+      }
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+      "Additional Device Properties.
+       This MIB Object is created as a Bits Mask,
+       when the corresponding Bit says about the
+       specific property.
+       value=0 :  If no additional properties exist.
+       value=1 :  If Device have a Redundant Power Supply.
+       value=2 :  If Device can include the High Density Fibre Ports.
+       value=4 :  If Device have a Direct Current (DC) Power Supply for
+                  extreme temperature conditions.
+       value=8 :  If Device is of the OptiSwitch_100FX Type
+                  (fixed schema of the OptiSwitch_400 Device).
+       value=16:  If Device is of the Cheap Modification.
+       value=32:  If Device is of the Expensive Modification.
+       value=64:  If Device is of 'Telco' SubType.
+       value=128: If Device is built to working in the Extended Temperature range.
+       value=256: If If Device is built to working in the Extra Extended Temperature range.
+       value=512: If Device supports PTP slave synchronization.
+       For example: If Device have a the both properties
+       (Redundant Power Supply & High Density Fiber Ports), value=3
+        will be responded on the GET SNMP command (etc...)."
+      ::= { nbDevGen 5 }
+
+nbsDevTemperatureMode   OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none          (1),
+       normal        (2),
+       high          (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Temperature Mode of Device."
+      ::= { nbDevGen 6 }
+
+nbsDevResetAfterDnldMode   OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none          (1),
+       yes           (2),
+       no            (3)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "Device Reset Mode after Download process.
+       In case of 'yes'(2) the Reset will be created
+       immediately after the Download process will 
+       successfuly finish; 
+       In case of 'no'(3) the Reset will not be created
+       immediately after the Download process will 
+       successfuly finish."
+       ::= { nbDevGen 7 }
+
+nbsDevHeaterStatus   OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+        unknown       (1),
+        on            (2),
+        off           (3)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+       "The Heater Status of Device."
+       ::= { nbDevGen 12 }
+
+nbsDevTemperatureProfile   OBJECT-TYPE
+       SYNTAX  INTEGER
+       {
+        unknown       (1),
+        commercial    (2),
+        extreme       (3),
+        industrial    (4),
+        nebsF2B       (5),
+        nebsS2S       (6)
+       }
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+       "The Temperature profile of Device."
+       ::= { nbDevGen 15 }
+
+-- ************************************************************
+-- Objects in the Device's Power Supplies Group
+-- ************************************************************
+        
+nbsDevPS  OBJECT IDENTIFIER ::= { nbDevGen 8 }
+
+nbsDevPSNumber  OBJECT-TYPE
+      SYNTAX  INTEGER 
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The number of Power Supplies in the corresponding Device.
+       Value = 0 says, that Power Supply Table is not supported."
+      ::= { nbsDevPS 1 }
+
+nbsDevPSTable  OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NbsDevPSEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "This table shows all the Power Supplies modules,
+       existing in the corresponding Device."
+      ::= { nbsDevPS 2 }
+
+nbsDevPSEntry  OBJECT-TYPE
+      SYNTAX  NbsDevPSEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "The entries of the table."
+      INDEX { nbsDevPSIndex }
+      ::= { nbsDevPSTable 1 }
+
+NbsDevPSEntry ::= SEQUENCE
+      {
+       nbsDevPSIndex  INTEGER,
+       nbsDevPSType  INTEGER,
+       nbsDevPSDescription DisplayString,
+       nbsDevPSRedundantMode INTEGER,
+       nbsDevPSOperStatus INTEGER,
+       nbsDevPSAdminStatus INTEGER
+      }
+
+nbsDevPSIndex  OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The index of the table,
+       (MAX Value is equal to nbsDevPSNumber)."
+      ::= { nbsDevPSEntry 1 }
+
+nbsDevPSType  OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none       (1),
+       acPS       (2),
+       dcPS       (3),
+       externalPS (4)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The physical Type of the Power Supply.
+       acPS (2) - alternating current PS,
+       dcPS (3) - dirrect     current PS,
+       externalPS (4) - external PS."
+      ::= { nbsDevPSEntry 2 }
+
+nbsDevPSDescription OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Text Decription of the Power Supply."
+      ::= { nbsDevPSEntry 3 }
+
+nbsDevPSRedundantMode OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none        (1),
+       mainPS      (2),
+       secondaryPS (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The working mode of the Power Supply."
+      ::= { nbsDevPSEntry 4 }
+  
+      nbsDevPSOperStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Oper status of the Power Supply."
+      ::= { nbsDevPSEntry 5 }
+  
+nbsDevPSAdminStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "The Admin status of the Power Supply."
+      ::= { nbsDevPSEntry 6 }
+
+-- ************************************************************
+-- Objects in the Device's Power Supplies Inputs Group
+-- ************************************************************
+nbsDevPSInput  OBJECT IDENTIFIER ::= { nbDevGen 9 }
+
+nbsDevPSInputNumber  OBJECT-TYPE
+      SYNTAX  INTEGER 
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The number of Power Suppliy Inputs in the corresponding Device.
+       Value = 0 says, that Power Supply Inputs Table is not supported."
+      ::= { nbsDevPSInput 1 }
+
+nbsDevPSInputTable  OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NbsDevPSInputEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "This table shows all the Power Supply Inputs,
+       existing in the corresponding Device."
+      ::= { nbsDevPSInput 2 }
+
+nbsDevPSInputEntry  OBJECT-TYPE
+      SYNTAX  NbsDevPSInputEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "The entries of the table."
+      INDEX { nbsDevPSInputIndex }
+      ::= { nbsDevPSInputTable 1 }
+
+NbsDevPSInputEntry ::= SEQUENCE
+      {
+       nbsDevPSInputIndex  INTEGER,
+       nbsDevPSInputType  INTEGER,
+       nbsDevPSInputDescription DisplayString,
+       nbsDevPSInputRedundantMode INTEGER,
+       nbsDevPSInputOperStatus INTEGER,
+       nbsDevPSInputAdminStatus INTEGER
+      }
+
+nbsDevPSInputIndex  OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The index of the table,
+       (MAX Value is equal to nbsDevPSInputNumber)."
+      ::= { nbsDevPSInputEntry 1 }
+
+nbsDevPSInputType  OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none          (1),
+       acInput       (2),
+       dcInput       (3),
+       dcRedundInput (4)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The physical Type of the Power Supply.
+       acInput       (2) - alternating current input,
+       dcInput       (3) - direct current input,
+       dcRedundInput (4) - direct current Redundant input."
+      ::= { nbsDevPSInputEntry 2 }
+
+nbsDevPSInputDescription OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Text Decription of the Power Supply Input."
+      ::= { nbsDevPSInputEntry 3 }
+
+nbsDevPSInputRedundantMode OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none           (1),
+       mainInput      (2),
+       secondaryInput (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Redundant mode of the Power Supply Input."
+      ::= { nbsDevPSInputEntry 4 }
+  
+nbsDevPSInputOperStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Oper status of the Power Supply Input."
+      ::= { nbsDevPSInputEntry 5 }
+  
+nbsDevPSInputAdminStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "The Admin status of the Power Supply Input."
+      ::= { nbsDevPSInputEntry 6 }
+
+-- ************************************************************
+-- Objects in the Device's CPU Group
+-- ************************************************************
+        
+nbsDevCPU  OBJECT IDENTIFIER ::= { nbDevGen 10 }
+
+nbsDevCPUNumber  OBJECT-TYPE
+      SYNTAX  INTEGER 
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The number of CPU cards in the corresponding Device.
+       Value = 0 says, that CPU Table is not supported."
+      ::= { nbsDevCPU 1 }
+
+nbsDevCPUTable  OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NbsDevCPUEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "This table shows all the CPU modules,
+       existing in the corresponding Device."
+      ::= { nbsDevCPU 2 }
+
+nbsDevCPUEntry  OBJECT-TYPE
+      SYNTAX  NbsDevCPUEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "The entries of the table."
+      INDEX { nbsDevCPUIndex }
+      ::= { nbsDevCPUTable 1 }
+
+NbsDevCPUEntry ::= SEQUENCE
+      {
+       nbsDevCPUIndex         INTEGER,
+       nbsDevCPUType          INTEGER,
+       nbsDevCPUDescription   DisplayString,
+       nbsDevCPURedundantMode INTEGER,
+       nbsDevCPUOperStatus    INTEGER,
+       nbsDevCPUAdminStatus   INTEGER,
+       nbsDevCPUOrderNumber   INTEGER
+      }
+
+nbsDevCPUIndex  OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The index of the table,
+       (MAX Value is equal to nbsDevCPUNumber)."
+      ::= { nbsDevCPUEntry 1 }
+
+nbsDevCPUType  OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none                    (1),
+       cx33cpu2MBflash16MBdram (2),
+       cx33cpu4MBflash16MBdram (3),
+       cx33cpu4MBflash64MBdram (4)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The physical Type of the CPU.
+       - cx33cpu2MBflash16MBdram (2)
+             CPU CX with 33Mhz clock,2MB Flash Memory and 16 MB DRAM Memory,
+       - cx33cpu4MBflash16MBdram (2)
+             CPU CX with 33Mhz clock,4MB Flash Memory and 16 MB DRAM Memory,
+       - cx33cpu4MBflash64MBdram (2)
+             CPU CX with 33Mhz clock,4MB Flash Memory and 64 MB DRAM Memory."
+      ::= { nbsDevCPUEntry 2 }
+
+nbsDevCPUDescription OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Text Decription of the CPU card."
+      ::= { nbsDevCPUEntry 3 }
+
+nbsDevCPURedundantMode OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none         (1),
+       mainCPU      (2),
+       redundantCPU (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Redundant mode of the CPU card."
+      ::= { nbsDevCPUEntry 4 }
+  
+nbsDevCPUOperStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none     (1),
+       enabled  (2),
+       disabled (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Oper status of the CPU card."
+      ::= { nbsDevCPUEntry 5 }
+  
+nbsDevCPUAdminStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none    (1),
+       enable  (2),
+       disable (3)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "The Admin status of the CPU card."
+      ::= { nbsDevCPUEntry 6 }
+
+nbsDevCPUOrderNumber OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The order number of the CPU card."
+      ::= { nbsDevCPUEntry 7 }
+  
+-- ************************************************************
+-- Objects in the Device's FAN Group
+-- ************************************************************
+        
+nbsDevFAN  OBJECT IDENTIFIER ::= { nbDevGen 11 }
+
+nbsDevFANsNumber OBJECT-TYPE
+      SYNTAX  INTEGER 
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The number of FAN cards in the corresponding Device.
+       Value = 0 says, that FAN Table is not supported."
+      ::= { nbsDevFAN 1 }
+
+nbsDevFANTable  OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NbsDevFANEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "This table shows all the FAN modules,
+       existing in the corresponding Device."
+      ::= { nbsDevFAN 2 }
+
+nbsDevFANEntry  OBJECT-TYPE
+      SYNTAX  NbsDevFANEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "The entries of the table."
+      INDEX { nbsDevFANIndex }
+      ::= { nbsDevFANTable 1 }
+
+NbsDevFANEntry ::= SEQUENCE
+      {
+       nbsDevFANIndex  INTEGER,
+       nbsDevFANType  INTEGER,
+       nbsDevFANDescription DisplayString,
+       nbsDevFANOperStatus INTEGER,
+       nbsDevFANAdminStatus INTEGER,
+       nbsDevFANSpeed	INTEGER
+      }
+
+nbsDevFANIndex  OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The index of the table,
+       (MAX Value is equal to nbsDevFANsNumber)."
+      ::= { nbsDevFANEntry 1 }
+
+nbsDevFANType  OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none  (1),
+       fixed (2),
+       pwm   (3)
+      }
+      ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+     "The physical Type of the FAN."
+     ::= { nbsDevFANEntry 2 }
+
+nbsDevFANDescription OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Text Decription of the FAN card."
+      ::= { nbsDevFANEntry 3 }
+
+nbsDevFANOperStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Oper status of the FAN card."
+      ::= { nbsDevFANEntry 5 }
+  
+nbsDevFANAdminStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "The Admin status of the FAN card."
+      ::= { nbsDevFANEntry 6 }
+      
+nbsDevFANSpeed  OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Current PWM fan speed (percent units)"
+      ::= { nbsDevFANEntry 7 }
+
+-- ************************************************************
+-- Objects in the Device's Physical Parameters Group
+-- ************************************************************
+        
+nbsDevPhysParams              OBJECT IDENTIFIER ::= { nbDevGen 13 }
+
+nbsDevPhParamDevAmbientTempC  OBJECT-TYPE
+      SYNTAX  Unsigned32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Device Ambient Temperature [Celsius scale]."
+      ::= { nbsDevPhysParams 1 }
+
+nbsDevPhParamPackProcTempC   OBJECT-TYPE
+      SYNTAX  Unsigned32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Device Packet Processor Temperature [Celsius scale]."
+      ::= { nbsDevPhysParams 2 }
+
+ nbsDevPhParamCpuTempC   OBJECT-TYPE
+      SYNTAX  Unsigned32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Device CPU Temperature [Celsius scale]."
+      ::= { nbsDevPhysParams 3 }
+
+nbsDevPhParamDevAmbientTempF  OBJECT-TYPE
+      SYNTAX  Unsigned32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Device Ambient Temperature [Fahrenheit scale]."
+      ::= { nbsDevPhysParams 7 }
+
+nbsDevPhParamPackProcTempF   OBJECT-TYPE
+      SYNTAX  Unsigned32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Device Packet Processor Temperature [Fahrenheit scale]."
+      ::= { nbsDevPhysParams 8 }
+
+ nbsDevPhParamCpuTempF   OBJECT-TYPE
+      SYNTAX  Unsigned32
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Device CPU Temperature [Fahrenheit scale]."
+      ::= { nbsDevPhysParams 9 }
+
+-- ************************************************************
+-- Objects in the Device's Power Supplies Hosts Group
+-- ************************************************************
+        
+nbsDevPSHost            OBJECT IDENTIFIER ::= { nbDevGen 14 }
+
+nbsDevPSHostsNumber     OBJECT-TYPE
+      SYNTAX  INTEGER 
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The number of Power Supplies Hosts in the
+       corresponding Device.
+       Value = 0 says, that Power Supply Hosts Table
+       is not supported."
+      ::= { nbsDevPSHost 1 }
+
+nbsDevPSHostTable       OBJECT-TYPE
+      SYNTAX  SEQUENCE OF NbsDevPSHostEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "This table shows all the Power Supplies modules,
+       existing in the corresponding Device."
+      ::= { nbsDevPSHost 2 }
+
+nbsDevPSHostEntry       OBJECT-TYPE
+      SYNTAX  NbsDevPSHostEntry
+      ACCESS  not-accessible
+      STATUS  mandatory
+      DESCRIPTION
+      "The entries of the table."
+      INDEX { nbsDevPSHostIndex }
+      ::= { nbsDevPSHostTable 1 }
+
+NbsDevPSHostEntry ::= SEQUENCE
+      {
+       nbsDevPSHostIndex       INTEGER,
+       nbsDevPSHostType        INTEGER,
+       nbsDevPSHostDescr       DisplayString,
+       nbsDevPSHostPSNumber    INTEGER,
+       nbsDevPSHostFirstPS     INTEGER,
+       nbsDevPSHostOperStatus  INTEGER,
+       nbsDevPSHostAdminStatus INTEGER
+      }
+
+nbsDevPSHostIndex       OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The index of the table,
+       (MAX Value is equal to nbsDevPSHostsNumber)."
+      ::= { nbsDevPSHostEntry 1 }
+
+nbsDevPSHostType        OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none       (1),
+       acPSHost   (2),
+       dcPSHost   (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The physical Type of the Power Supply Host.
+       acPSHost (2) - alternating current PS,
+       dcPSHost (3) - dirrect     current PS."
+      ::= { nbsDevPSHostEntry 2 }
+
+nbsDevPSHostDescr       OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Text Decription of the Power Supply Host."
+      ::= { nbsDevPSHostEntry 3 }
+
+nbsDevPSHostPSNumber    OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Power Supplies Number in the Host."
+      ::= { nbsDevPSHostEntry 4 }
+
+nbsDevPSHostFirstPS     OBJECT-TYPE
+      SYNTAX  INTEGER
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "Number of the First Power Supply in the Host.
+       according to the Power Supplies Numeration.
+       in the nbsDevPSTable. "
+      ::= { nbsDevPSHostEntry 6 }
+
+nbsDevPSHostOperStatus  OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Oper status of the Power Supply Host."
+      ::= { nbsDevPSHostEntry 8 }
+  
+nbsDevPSHostAdminStatus OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       none      (1),
+       active    (2),
+       notActive (3)
+      }
+      ACCESS  read-write
+      STATUS  mandatory
+      DESCRIPTION
+      "The Admin status of the Power Supply Host."
+      ::= { nbsDevPSHostEntry 10 }
+
+-- ************************************************************
+-- Objects in the Device's TRAPs Variables Group
+-- ************************************************************
+        
+nbsDevTrapVars            OBJECT IDENTIFIER ::= { nbDevGen 50 }
+
+nbsDevSessionType      OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       cliSession              (1),
+       telnetSession           (2),
+       none                    (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The type of the protocol session in use 
+       when the LOGIN password is invalidated."
+      ::= { nbsDevTrapVars 1 }
+
+nbsDevAuthenticationRejectReason      OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       localAgentReject        (1),
+       radiusServerReject      (2),
+       radiusServerNotFound    (3),
+       none                    (4)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The reason for the Authentication Error."
+      ::= { nbsDevTrapVars 2 }
+
+nbsTrapLoginName    OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..255))
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Login User Name that creates wrong access."
+      ::= { nbsDevTrapVars 5 }
+
+nbsTrapHostIpAddress     OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..255))
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Remote Host Name (Ip Address or DNS Name)
+       that attempts wrong access."
+      ::= { nbsDevTrapVars 6 }
+
+nbsTrapWrongAccessDateTime    OBJECT-TYPE
+      SYNTAX  DisplayString (SIZE (0..255))
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The Date / Time of the wrong access."
+      ::= { nbsDevTrapVars 7 }
+
+nbsTrapRCMredundancyState    OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "RCM Redundancy State of device."
+      ::= { nbsDevTrapVars 8 }
+
+nbsDevSNMPAccessMode      OBJECT-TYPE
+      SYNTAX  INTEGER
+      {
+       readOnWriteOn        (1),
+       readOnWriteOff       (2),
+       readOffWriteOff      (3)
+      }
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "SNMP access mode of device."
+      ::= { nbsDevTrapVars 10 }
+
+nbsDeviceTrapReason    OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The reason of the coming TRAP."
+      ::= { nbsDevTrapVars 11 }
+
+nbsDeviceTrapAdminPasswdChangeDescripton    OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  mandatory
+      DESCRIPTION
+      "The admin password change TRAP."
+      ::= { nbsDevTrapVars 12 }
+
+------------------------------------------------------------------------------
+-- TRAPS
+------------------------------------------------------------------------------
+ 
+powerSupplyUp TRAP-TYPE
+      ENTERPRISE nbsDevPS
+      VARIABLES { nbsDevPSIndex }
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       power supply unit changes it's state from notActive to active"
+      ::= 2
+    
+powerSupplyDown TRAP-TYPE
+      ENTERPRISE nbsDevPS
+      VARIABLES { nbsDevPSIndex }
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       power supply unit changes it's state from active to notActive"
+      ::= 3
+    
+invalidPassword TRAP-TYPE
+      ENTERPRISE nbDevGen
+      VARIABLES {
+                 nbsDevSessionType,
+                 nbsDevAuthenticationRejectReason,
+                 nbsTrapHostIpAddress
+                }
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       invalid password was used in the current protocol session."
+      ::= 7
+    
+wrongAccess TRAP-TYPE
+      ENTERPRISE nbDevGen
+      VARIABLES {
+                 nbsTrapWrongAccessDateTime,
+                 nbsDevSessionType,
+                 nbsDevAuthenticationRejectReason,
+                 nbsTrapLoginName,
+                 nbsTrapHostIpAddress
+                }
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       wrong access attempt is occured."
+      ::= 8
+    
+deviceRCMredundancyState TRAP-TYPE
+      ENTERPRISE nbDevGen
+      VARIABLES {
+                 nbsTrapRCMredundancyState
+                }
+      DESCRIPTION
+      "Generate SNMP trap when RCM Redundancy
+       state of the device is changed."
+      ::= 12
+
+snmpAccessMode TRAP-TYPE
+      ENTERPRISE nbDevGen
+      VARIABLES {
+                 nbsDevSNMPAccessMode
+                }
+      DESCRIPTION
+      "Generate SNMP trap when SNMP Access
+       mode of the device is changed."
+      ::= 20
+    
+snmpRequestRejected TRAP-TYPE
+      ENTERPRISE nbDevGen
+      VARIABLES {
+                 nbsDevSNMPAccessMode
+                }
+      DESCRIPTION
+      "Generate SNMP trap when an SNMP Request
+       is rejected due to SNMP Access Mode of the Device."
+      ::= 21
+
+fanUnitUp TRAP-TYPE
+      ENTERPRISE nbsDevFAN
+      VARIABLES { nbsDevFANIndex }
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       FAN unit changes it's state from notActive to active"
+      ::= 46
+    
+fanUnitDown TRAP-TYPE
+      ENTERPRISE nbsDevFAN
+      VARIABLES { nbsDevFANIndex }
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       FAN unit changes it's state from active to notActive"
+      ::= 47
+    
+deviceTemperatureNormal TRAP-TYPE
+      ENTERPRISE nbDevGen
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       Device Temperature changes it's state from High to Normal"
+      ::= 48
+    
+deviceTemperatureHigh TRAP-TYPE
+      ENTERPRISE nbDevGen
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       Device Temperature changes it's state from Normal to High"
+      ::= 49
+
+AdminPasswdChange TRAP-TYPE
+      ENTERPRISE nbDevGen
+      VARIABLES {
+                 nbsDeviceTrapAdminPasswdChangeDescripton
+                }
+      DESCRIPTION
+      "The SNMP trap that is generated when 
+       admin password is changed."
+      ::= 50
+    
+END

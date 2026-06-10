@@ -1,0 +1,1223 @@
+-- *******************************************************************
+-- CISCO-MVPN-MIB.my:  CISCO MULTICAST in BGP/MPLS VPNs MIB
+--
+-- Copyright (c) 2004 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *******************************************************************
+
+-- Caution.  This MIB is temporary and experimental. In the future it 
+-- will be removed from products, perhaps with short notice, in favor 
+-- of more standard or generic MIBs.  Application developers should 
+-- not depend on long-term access to this MIB.
+
+CISCO-MVPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32
+      FROM SNMPv2-SMI
+
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+
+   TruthValue, RowStatus, TimeStamp, DisplayString, TimeInterval
+      FROM SNMPv2-TC
+
+   ciscoExperiment 
+      FROM CISCO-SMI
+
+   ifIndex
+      FROM IF-MIB
+
+   SnmpAdminString
+      FROM SNMP-FRAMEWORK-MIB
+
+   InetAddress, InetAddressType
+      FROM INET-ADDRESS-MIB
+
+    mplsVpnVrfName, MplsVpnRouteDistinguisher
+      FROM MPLS-VPN-MIB;
+
+ciscoMvpnMIB MODULE-IDENTITY
+   LAST-UPDATED "200402231200Z"  -- 23 February 2004 12:00:00 GMT
+   ORGANIZATION "Cisco Systems, Inc."
+   CONTACT-INFO
+          " Cisco Systems, Inc.
+            170 Tasman Drive
+            San Jose, CA 95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            EMail: cs-ipmulticast@cisco.com"
+
+   DESCRIPTION
+        "This MIB contains managed object definitions for
+         Cisco implementation of multicast in VPNs defined 
+         by the Internet draft: draft-rosen-vpn-mcast-05.txt. 
+         Note that this MIB works along with the 
+         L3VPN-MPLS-VPN-MIB." 
+
+  -- Revision history.
+  REVISION "200402231200Z"  -- 23 February 2004 12:00:00 GMT
+   DESCRIPTION
+      "Initial version."
+   ::= { ciscoExperiment 113 } 
+
+
+-- Definition of some terms used
+
+-- MVPN: Multicast VPN
+
+-- MVRF: Multicast VRF, a VRF which has multicast routing enabled
+-- or has an interface that has PIM or IGMP protocol enabled.
+
+-- MDT: Multicast distribution tree.
+
+-- MD: Multicast domain. A multicast domain is a set of MVRFs that 
+-- are connected to the potential (but possibly inactive) sources and 
+-- receivers via CE interfaces. 
+
+-- MDT group: Each MD is assigned a distinct group address from a 
+-- pool that is administered by the service provider(s). Such groups 
+-- reserved for MDs are called MDT groups. 
+-- MDT groups are used to encapsulate and transport multicast VPN 
+-- traffic within the corresponding MD. 
+
+-- Default MDT/MDT-default: The MDT group used for forwarding MVPN 
+-- multicast data and PIM control traffic. Initially all MVPN
+-- multicast data is forwarded using this group. This group is user 
+-- configured. 
+
+-- Data MDT/MDT-data: Range of MDT group addresses that is created on 
+-- demand for specific MVPN groups. MVPN traffic that is initially 
+-- forwarded on the MDT-default can be moved to an MDT-data to 
+-- minimize flooding the other PE routers in the same MD. 
+
+-- MDT Joins: When a MVPN multicast stream exceeds the threshold, a 
+-- PE device picks a group from the configured MDT-data pool and 
+-- advertises the (S,G,MDT-data) mapping to all PE routers in that 
+-- MVPN. The advertisements are done via UDP TLV messages and are 
+-- termed MDT joins.
+
+-- SSM: Source Specific Multicast.
+
+-- Multicast/MVPN Tunnel Interface: For every MD an MVRF is part of,
+-- a PE router creates a special interface called the multicast/MVPN
+-- tunnel interface. A multicast tunnel interface is the interface 
+-- an MVRF uses to access a MD. It can be thought of as conduit 
+-- that connects the MVRF and the global MVRF. 
+
+
+-- Top level components of this MIB.
+ciscoMvpnNotifications OBJECT IDENTIFIER ::= { ciscoMvpnMIB 0 }
+ciscoMvpnObjects       OBJECT IDENTIFIER ::= { ciscoMvpnMIB 1 }
+ciscoMvpnScalars       OBJECT IDENTIFIER ::= { ciscoMvpnObjects 1 }
+ciscoMvpnGeneric       OBJECT IDENTIFIER ::= { ciscoMvpnObjects 2 }
+ciscoMvpnConfig        OBJECT IDENTIFIER ::= { ciscoMvpnObjects 3 }
+ciscoMvpnProtocol      OBJECT IDENTIFIER ::= { ciscoMvpnObjects 4 }
+ciscoMvpnConformance   OBJECT IDENTIFIER ::= { ciscoMvpnMIB 2 }
+
+-- Scalar Objects
+
+ciscoMvpnMvrfNumber OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The number of MVRFs that are present in this device."
+   ::= { ciscoMvpnScalars 1 }
+
+ciscoMvpnNotificationEnable OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+        "If this object is TRUE, then the generation of 
+         all notifications defined in this MIB is enabled."
+   DEFVAL { false }
+   ::= { ciscoMvpnScalars 2 }
+
+-- Generic MVRF Information Table
+
+ciscoMvpnGenericTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnGenericEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table gives the generic information about the MVRFs 
+        present in this device."
+   ::= { ciscoMvpnGeneric 1 }
+
+ciscoMvpnGenericEntry OBJECT-TYPE
+   SYNTAX        CiscoMvpnGenericEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created for every MVRF in the 
+        device. 
+        Note that many implementations may have MVRF for global 
+        VRF (VRF0) by default in the device.
+        Also note that existence of the correspoding VRF in 
+        L3VPN-MPLS-VPN-MIB is necessary for a row to exist in
+        this table. Deletion of corresponding VRF in 
+        L3VPN-MPLS-VPN-MIB also results in deletion of a row here. 
+        But deletion of a row ie deletion of a MVRF here does not 
+        result in the deletion of the corresponding VRF in 
+        L3VPN-MPLS-VPN-MIB."
+   INDEX       { mplsVpnVrfName }
+   ::= { ciscoMvpnGenericTable 1 }
+
+CiscoMvpnGenericEntry ::= SEQUENCE {
+   ciscoMvpnGenOperStatusChange         INTEGER,
+   ciscoMvpnGenOperChangeTime           TimeStamp,
+   ciscoMvpnGenAssociatedInterfaces     Unsigned32,
+   ciscoMvpnGenRowStatus                RowStatus
+}
+
+ciscoMvpnGenOperStatusChange OBJECT-TYPE
+   SYNTAX      INTEGER { createdMvrf(1),
+                         deletedMvrf(2),
+                         modifiedMvrfDefMdtConfig(3),
+                         modifiedMvrfDataMdtConfig(4)
+                        }
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "This object describes the last operational change that
+        happened for the given MVRF. 
+
+        createdMvrf - indicates that the MVRF was created in the 
+        device.
+
+        deletedMvrf - indicates that the MVRF was deleted from 
+        the device. A row in this table will never have 
+        ciscoMvpnGenOperStatusChange equal to deletedMvrf(2),
+        because in that case the row itself will be deleted 
+        from the table. This value for 
+        ciscoMvpnGenOperStatusChange is defined mainly for use 
+        in ciscoMvpnMvrfChange notification.
+
+        modifiedMvrfDefMdtConfig - indicates that the default MDT 
+        group for the MVRF was configured, deleted or changed.
+
+        modifiedMvrfDataMdtConfig - indicates that the data MDT 
+        group range or a associated variable (like the threshold) 
+        for the MVRF was configured, deleted or changed."
+   DEFVAL { createdMvrf }
+   ::= { ciscoMvpnGenericEntry 1 }
+
+ciscoMvpnGenOperChangeTime OBJECT-TYPE
+   SYNTAX        TimeStamp
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The time at which the last operational change for the 
+        MVRF in question took place. The last operational change
+        is specified by ciscoMvpnGenOperStatusChange."
+   ::= { ciscoMvpnGenericEntry 2 }
+
+ciscoMvpnGenAssociatedInterfaces OBJECT-TYPE
+   SYNTAX        Unsigned32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Total number of interfaces associated with this MVRF (including
+        the MDT tunnel interface) with ifOperStatus = up(1)." 
+   ::= { ciscoMvpnGenericEntry 3 }
+
+ciscoMvpnGenRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create or delete a row in this table."
+   ::= { ciscoMvpnGenericEntry 4 }
+
+-- MDT-default group Configuration Table
+
+ciscoMvpnMdtDefaultTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnMdtDefaultEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies the default MDT address and the 
+        encapsulation type used for a MVRF instance."
+   ::= { ciscoMvpnConfig 1 }
+
+ciscoMvpnMdtDefaultEntry OBJECT-TYPE
+   SYNTAX        CiscoMvpnMdtDefaultEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created for every MVRF for which 
+        a default MDT group is configured. A MVRF which does not 
+        have a default MDT group configured will not appear in 
+        this table.
+        Creation of a row in this table is the equivalent of 
+        configuring default MDT address for the given MVRF. 
+        Deletion of a row in this table is the equivalent of 
+        deconfiguring default MDT address for the given MVRF."
+   INDEX       { mplsVpnVrfName }
+   ::= { ciscoMvpnMdtDefaultTable 1 }
+
+CiscoMvpnMdtDefaultEntry ::= SEQUENCE {
+  ciscoMvpnMdtDefaultAddrType         InetAddressType,
+  ciscoMvpnMdtDefaultAddress          InetAddress,
+  ciscoMvpnMdtEncapsType              INTEGER,
+  ciscoMvpnMdtDefaultRowStatus        RowStatus
+}
+
+ciscoMvpnMdtDefaultAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtDefaultAddress."
+::= { ciscoMvpnMdtDefaultEntry 1 }
+
+ciscoMvpnMdtDefaultAddress OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The default MDT address to be used for the MVRF in question."
+   ::= { ciscoMvpnMdtDefaultEntry 2 }
+
+ciscoMvpnMdtEncapsType OBJECT-TYPE
+   SYNTAX        INTEGER { greIp (1),
+                           ipIp  (2),
+                           mpls  (3)
+                         }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The encapsulation type to be used in the MVRF in question."
+   ::= { ciscoMvpnMdtDefaultEntry 3 }
+
+ciscoMvpnMdtDefaultRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify or delete a 
+        row in this table."
+  ::= { ciscoMvpnMdtDefaultEntry 4 }
+
+-- MDT-data configuration table
+
+ciscoMvpnMdtDataTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnMdtDataEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies the range of data MDT addresses and 
+        associated variables for a MVRF instance."
+   ::= { ciscoMvpnConfig 2 }
+   
+ciscoMvpnMdtDataEntry OBJECT-TYPE  
+   SYNTAX        CiscoMvpnMdtDataEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created for every MVRF for which 
+        a data MDT group range is configured. A MVRF which does
+        not have a data MDT group range configured will not appear
+        in this table. 
+        Creation of a row in this table is the equivalent of 
+        configuring data MDT addresses for the given MVRF. Deletion 
+        of a row in this table is the equivalent of deconfiguring 
+        data MDT address usage in the given MVRF. 
+
+        Note that ciscoMvpnMdtDefaultEntry for a MVRF should be 
+        present in the device before ciscoMvpnMdtDataEntry for 
+        that MVRF can be created."
+   INDEX       {  mplsVpnVrfName }
+   ::= { ciscoMvpnMdtDataTable 1 }
+   
+CiscoMvpnMdtDataEntry ::= SEQUENCE { 
+   ciscoMvpnMdtDataRangeAddrType    InetAddressType,
+   ciscoMvpnMdtDataRangeAddress     InetAddress,
+   ciscoMvpnMdtDataWildcardType     InetAddressType,
+   ciscoMvpnMdtDataWildcardBits     InetAddress,
+   ciscoMvpnMdtDataThreshold        Unsigned32,
+   ciscoMvpnMdtDataRowStatus        RowStatus
+}
+       
+ciscoMvpnMdtDataRangeAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtDataRangeAddress."
+   ::= { ciscoMvpnMdtDataEntry 1 }
+
+ciscoMvpnMdtDataRangeAddress OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-create
+   STATUS        current  
+   DESCRIPTION
+       "The data MDT group range address for the given MVRF. 
+        This along with ciscoMvpnMdtDataWildcardBits gives the 
+        pool of data MDT addresses that can be used for
+        encapsulation in the MVRF upon data MDT switchover."
+   ::= { ciscoMvpnMdtDataEntry 2 }
+
+ciscoMvpnMdtDataWildcardType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtDataWildcardBits."
+   ::= { ciscoMvpnMdtDataEntry 3 }
+
+ciscoMvpnMdtDataWildcardBits OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-create   
+   STATUS        current
+   DESCRIPTION
+       "Wildcard bits which when used along with data MDT range 
+        address, give a pool of addresses to be used in a MVRF.
+
+        For example, if ciscoMvpnMdtDataRangeAddress is 239.1.2.0 
+        and ciscoMvpnMdtDataWildcardBits is 0.0.0.3, the possible 
+        data MDT addresses are 239.1.2.0, 239.1.2.1, 239.1.2.2 
+        and 239.1.2.3.
+
+        Note that wild card bits should be right contiguous." 
+   ::= { ciscoMvpnMdtDataEntry 4 }
+
+ciscoMvpnMdtDataThreshold OBJECT-TYPE
+   SYNTAX        Unsigned32  (0..4294967295) 
+   UNITS         "kilobits per second"
+   MAX-ACCESS    read-create   
+   STATUS        current
+   DESCRIPTION
+       "The bandwidth threshold value which when exceeded for a 
+        multicast routing entry in the given MVRF, triggers usage 
+        of data MDT address instead of default MDT address for 
+        encapsulation."
+   ::= { ciscoMvpnMdtDataEntry 5 }
+
+ciscoMvpnMdtDataRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify or delete a 
+        row in this table."
+  ::= { ciscoMvpnMdtDataEntry 6 }
+
+-- MDT group info for a multicast route entry in question
+   
+ciscoMvpnMrouteMdtTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnMrouteMdtEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Given a multicast routing entry and the context MVRF, this 
+        table provides information about the MDT group being used for 
+        encapsulating the traffic for the multicast routing entry in 
+        the provider network at the instance of querying. Note that
+        this table is a read-only table and is the result of the 
+        default MDT and data MDT configurations and the operational 
+        conditions like the traffic rate and sometimes, the 
+        implementation choices."
+   ::= { ciscoMvpnProtocol 1 }
+
+ciscoMvpnMrouteMdtEntry OBJECT-TYPE
+   SYNTAX        CiscoMvpnMrouteMdtEntry  
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table exists for a multicast routing entry 
+        the traffic for which is being encapsulated in a context 
+        MVRF." 
+   INDEX       { mplsVpnVrfName, 
+                 ciscoMvpnMrouteMvrfGrpAddrType,
+                 ciscoMvpnMrouteMvrfGroup,
+                 ciscoMvpnMrouteMvrfSrcAddrType,
+                 ciscoMvpnMrouteMvrfSource,
+                 ciscoMvpnMrouteUpDownStreamInfo }
+   ::= { ciscoMvpnMrouteMdtTable 1 }
+   
+CiscoMvpnMrouteMdtEntry ::= SEQUENCE {
+   ciscoMvpnMrouteMvrfGrpAddrType      InetAddressType,
+   ciscoMvpnMrouteMvrfGroup            InetAddress,
+   ciscoMvpnMrouteMvrfSrcAddrType      InetAddressType,
+   ciscoMvpnMrouteMvrfSource           InetAddress,
+   ciscoMvpnMrouteUpDownStreamInfo     INTEGER,
+   ciscoMvpnMrouteMdtGrpAddrType       InetAddressType,
+   ciscoMvpnMrouteMdtGroup             InetAddress,
+   ciscoMvpnMrouteMdtType              INTEGER
+}
+        
+ciscoMvpnMrouteMvrfGrpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType   
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMrouteMvrfGroup."
+  ::= { ciscoMvpnMrouteMdtEntry 1 }
+
+ciscoMvpnMrouteMvrfGroup OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))
+   MAX-ACCESS    not-accessible 
+   STATUS        current 
+   DESCRIPTION
+       "Group adddress of multicast routing entry in question."
+  ::= { ciscoMvpnMrouteMdtEntry 2 }
+
+ciscoMvpnMrouteMvrfSrcAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMrouteMvrfSource."
+  ::= { ciscoMvpnMrouteMdtEntry 3 }
+
+ciscoMvpnMrouteMvrfSource OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))
+   MAX-ACCESS    not-accessible 
+   STATUS        current
+   DESCRIPTION
+       "Source adddress of the multicast routing entry in question."
+  ::= { ciscoMvpnMrouteMdtEntry 4 }
+
+ciscoMvpnMrouteUpDownStreamInfo OBJECT-TYPE
+   SYNTAX        INTEGER { upstream   (1),
+                           downstream (2)
+                         }
+   MAX-ACCESS    not-accessible 
+   STATUS        current
+   DESCRIPTION
+       "Indicates if this PE is the upstream (sending) or the 
+        downstream (receiving) router for the multicast routing entry 
+        specified by ciscoMvpnMrouteMvrfSource and 
+        ciscoMvpnMrouteMvrfGroup in the context MVRF specified by 
+        mplsVpnVrfName.
+        Note that there may be two rows for the same multicast 
+        routing entry if the traffic is bi-directional, one row 
+        for PE as an upstream router the other for PE as the 
+        downstream router."
+  ::= { ciscoMvpnMrouteMdtEntry 5 }
+
+ciscoMvpnMrouteMdtGrpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMrouteMdtGroup."
+  ::= { ciscoMvpnMrouteMdtEntry 6 }
+
+ciscoMvpnMrouteMdtGroup OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "MDT group address used to encapsulate the multicast routing 
+        entry specified by ciscoMvpnMrouteMvrfSource and 
+        ciscoMvpnMrouteMvrfGroup in the context MVRF specified by 
+        mplsVpnVrfName."
+  ::= { ciscoMvpnMrouteMdtEntry 7 }
+
+ciscoMvpnMrouteMdtType OBJECT-TYPE
+   SYNTAX        INTEGER { mdtDefault (1), 
+                           mdtData    (2)
+                         }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Indicates the type of MDT group used for encapsulation."
+  ::= { ciscoMvpnMrouteMdtEntry 8 }
+
+-- Table of BGP MDT Updates received
+
+ciscoMvpnBgpMdtUpdateTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnBgpMdtUpdateEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table has information about the BGP advertisement of the 
+        the MDT groups. (These advertisements are generated 
+        and used for source discovery when SSM is used.)"
+   ::= { ciscoMvpnProtocol 2 }
+
+ciscoMvpnBgpMdtUpdateEntry OBJECT-TYPE
+   SYNTAX        CiscoMvpnBgpMdtUpdateEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created when a BGP advertisement of 
+        the MDT group is received and cached in the PE device. 
+        An entry in this table deleted when such a cached BGP MDT 
+        update is withdrawn." 
+   INDEX  { ciscoMvpnBgpMdtUpdGrpAddrType,
+            ciscoMvpnBgpMdtUpdateGroup,
+            ciscoMvpnBgpMdtUpdSrcAddrType,
+            ciscoMvpnBgpMdtUpdateSource }
+   ::= { ciscoMvpnBgpMdtUpdateTable 1 }
+
+CiscoMvpnBgpMdtUpdateEntry ::= SEQUENCE {
+   ciscoMvpnBgpMdtUpdGrpAddrType    InetAddressType,
+   ciscoMvpnBgpMdtUpdateGroup       InetAddress,
+   ciscoMvpnBgpMdtUpdateRd          MplsVpnRouteDistinguisher,
+   ciscoMvpnBgpMdtUpdSrcAddrType    InetAddressType,
+   ciscoMvpnBgpMdtUpdateSource      InetAddress,
+   ciscoMvpnBgpMdtUpdOrigAddrType   InetAddressType,
+   ciscoMvpnBgpMdtUpdateOriginator  InetAddress,
+   ciscoMvpnBgpMdtUpdNhAddrType     InetAddressType,
+   ciscoMvpnBgpMdtUpdateNexthop     InetAddress
+   }
+
+ciscoMvpnBgpMdtUpdGrpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnBgpMdtUpdateGroup."
+   ::= { ciscoMvpnBgpMdtUpdateEntry 1 }
+
+ciscoMvpnBgpMdtUpdateGroup OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "MDT group address in the BGP MDT advertisement."
+   ::= { ciscoMvpnBgpMdtUpdateEntry 2 }
+
+ciscoMvpnBgpMdtUpdateRd OBJECT-TYPE
+   SYNTAX        MplsVpnRouteDistinguisher
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "RD (route distinguisher) in the BGP MDT advertisement. This 
+        is the RD corresponding to the originator PE."
+   ::= { ciscoMvpnBgpMdtUpdateEntry 3 }
+
+ciscoMvpnBgpMdtUpdSrcAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnBgpMdtUpdateSource."
+   ::= { ciscoMvpnBgpMdtUpdateEntry 4 }
+
+ciscoMvpnBgpMdtUpdateSource OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "MDT source address in the BGP MDT advertisement." 
+   ::= { ciscoMvpnBgpMdtUpdateEntry 5 }
+
+ciscoMvpnBgpMdtUpdOrigAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnBgpMdtUpdateOriginator."
+   ::= { ciscoMvpnBgpMdtUpdateEntry 6 }
+
+ciscoMvpnBgpMdtUpdateOriginator OBJECT-TYPE 
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The BGP peering address of the device that originated (or 
+        advertized) the BGP MDT update." 
+   ::= { ciscoMvpnBgpMdtUpdateEntry 7 }
+
+ciscoMvpnBgpMdtUpdNhAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnBgpMdtUpdateNexthop."
+   ::= { ciscoMvpnBgpMdtUpdateEntry 8 }
+
+ciscoMvpnBgpMdtUpdateNexthop OBJECT-TYPE 
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-only 
+   STATUS        current
+   DESCRIPTION
+       "The next-hop address (address of the border router to be
+        used to reach the destination network) in the BGP MDT 
+        advertisement."
+   ::= { ciscoMvpnBgpMdtUpdateEntry 9 }
+
+-- Table of MDT-data joins received 
+
+ciscoMvpnMdtJnRcvTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnMdtJnRcvEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+          "This table has information about the data MDT join TLVs 
+           received by a device."
+   ::= { ciscoMvpnProtocol 3 }
+      
+ciscoMvpnMdtJnRcvEntry OBJECT-TYPE
+   SYNTAX        CiscoMvpnMdtJnRcvEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created or updated for every MDT 
+        data join TLV received and cached in the device. The value of 
+        mplsVpnVrfName in such an entry specifies the name of the 
+        MVRF for which the data MDT groups from the TLVs are used."
+   INDEX  { mplsVpnVrfName,
+            ciscoMvpnMdtJnRcvGrpAddrType, 
+            ciscoMvpnMdtJnRcvGroup,
+            ciscoMvpnMdtJnRcvSrcAddrType,
+            ciscoMvpnMdtJnRcvSource }
+   ::= { ciscoMvpnMdtJnRcvTable 1 }
+   
+CiscoMvpnMdtJnRcvEntry ::= SEQUENCE {
+   ciscoMvpnMdtJnRcvGrpAddrType InetAddressType,
+   ciscoMvpnMdtJnRcvGroup       InetAddress,
+   ciscoMvpnMdtJnRcvSrcAddrType InetAddressType,
+   ciscoMvpnMdtJnRcvSource      InetAddress,
+   ciscoMvpnMdtJnRcvUpTime      TimeInterval,
+   ciscoMvpnMdtJnRcvExpTime     TimeInterval
+   }
+
+ciscoMvpnMdtJnRcvGrpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType   
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtJnRcvGroup."
+   ::= { ciscoMvpnMdtJnRcvEntry 1 }
+
+ciscoMvpnMdtJnRcvGroup OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))   
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Data MDT group address in the MDT join TLV."
+   ::= { ciscoMvpnMdtJnRcvEntry 2 }
+
+ciscoMvpnMdtJnRcvSrcAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtJnRcvSource."
+   ::= { ciscoMvpnMdtJnRcvEntry 3 }
+
+ciscoMvpnMdtJnRcvSource OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Source address for the MDT multicast routing entry created 
+        following the receipt of MDT join TLV."
+   ::= { ciscoMvpnMdtJnRcvEntry 4 }
+
+ciscoMvpnMdtJnRcvUpTime OBJECT-TYPE
+   SYNTAX        TimeInterval
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The time since this MDT join TLV was first received by the 
+        device."
+   ::= { ciscoMvpnMdtJnRcvEntry 5 }
+
+ciscoMvpnMdtJnRcvExpTime OBJECT-TYPE
+   SYNTAX        TimeInterval
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The amount of time remaining before the cache corresponding 
+        to this MDT join TLV is deleted from the device and the 
+        corresponding  MDT multicast routing entry is marked as a 
+        non-MDT entry.
+        Note that multiple TLVs for a data MDT group may be received 
+        by a device. Upon receipt, the expiry timer of an already 
+        existing entry is restarted and so ciscoMvpnMdtJnRcvExpTime 
+        is updated."
+   ::= { ciscoMvpnMdtJnRcvEntry 6 }
+
+-- Table for MDT-data join TLVs sent
+
+ciscoMvpnMdtJnSendTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnMdtJnSendEntry
+   MAX-ACCESS    not-accessible  
+   STATUS        current
+   DESCRIPTION
+       "This table specifies the data MDT Join TLVs sent by a 
+        device."
+   ::= { ciscoMvpnProtocol 4 }
+           
+ciscoMvpnMdtJnSendEntry OBJECT-TYPE
+   SYNTAX        CiscoMvpnMdtJnSendEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Entries in this table exist for data MDT Join TLVs that are 
+        being sent by this device to other PEs."
+   INDEX  { mplsVpnVrfName, 
+            ciscoMvpnMdtJnSendGrpAddrType,
+            ciscoMvpnMdtJnSendGroup,
+            ciscoMvpnMdtJnSendSrcAddrType,
+            ciscoMvpnMdtJnSendSource }
+   ::= { ciscoMvpnMdtJnSendTable 1 }
+   
+CiscoMvpnMdtJnSendEntry ::= SEQUENCE {
+   ciscoMvpnMdtJnSendGrpAddrType    InetAddressType,
+   ciscoMvpnMdtJnSendGroup          InetAddress,
+   ciscoMvpnMdtJnSendSrcAddrType    InetAddressType, 
+   ciscoMvpnMdtJnSendSource         InetAddress,
+   ciscoMvpnMdtJnSendMdtGrpAddrType InetAddressType,
+   ciscoMvpnMdtJnSendMdtGroup       InetAddress,
+   ciscoMvpnMdtJnSendMdtRefCt       Unsigned32 
+   }
+          
+ciscoMvpnMdtJnSendGrpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType   
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtJnSendGroup."
+   ::= { ciscoMvpnMdtJnSendEntry 1 }
+
+ciscoMvpnMdtJnSendGroup OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This indicates the address of a multicast group in the 
+        MVRF specified by the column mplsVpnVrfName. This along 
+        with ciscoMvpnMdtJnSendSource identifies the multicast 
+        routing entry for which the MDT join TLV is sent."
+   ::= { ciscoMvpnMdtJnSendEntry 2 }
+
+ciscoMvpnMdtJnSendSrcAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtJnSendSource."
+   ::= { ciscoMvpnMdtJnSendEntry 3 }
+
+ciscoMvpnMdtJnSendSource OBJECT-TYPE
+   SYNTAX        InetAddress (SIZE (4|16|20))   
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This indicates the address of a source in the MVRF 
+        specified by the column mplsVpnVrfName. This, along with 
+        ciscoMvpnMdtJnSendGroup identifies the multicast routing entry
+        for which the MDT join TLV is sent."
+   ::= { ciscoMvpnMdtJnSendEntry 4 }
+
+ciscoMvpnMdtJnSendMdtGrpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The Internet address type of ciscoMvpnMdtJnSendMdtGroup."
+   ::= { ciscoMvpnMdtJnSendEntry 5 }
+
+ciscoMvpnMdtJnSendMdtGroup OBJECT-TYPE
+   SYNTAX        InetAddress
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The data MDT group in the MDT Join TLV sent."
+   ::= { ciscoMvpnMdtJnSendEntry 6 }
+
+ciscoMvpnMdtJnSendMdtRefCt OBJECT-TYPE
+   SYNTAX        Unsigned32 (0..65535)
+   MAX-ACCESS    read-only 
+   STATUS        current
+   DESCRIPTION
+       "Indicates how many multicast routing entries in the MVRF 
+        specified by the column mplsVpnVrfName are using 
+        ciscoMvpnMdtJnSendMdtGroup for encapsulation."
+   ::= { ciscoMvpnMdtJnSendEntry 7 }
+
+-- Table of MVPN tunnel interfaces
+
+ciscoMvpnTunnelTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF CiscoMvpnTunnelEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table gives information about the MVPN/MDT tunnels 
+        present in the device."
+   ::= { ciscoMvpnProtocol 5 }
+          
+ciscoMvpnTunnelEntry OBJECT-TYPE
+   SYNTAX        CiscoMvpnTunnelEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current   
+   DESCRIPTION
+       "An entry in this table is created for every MVPN tunnel 
+        interface present in the device. The ifType for a MVPN
+        tunnel is 'tunnel' (131). 
+        (A MVPN tunnel interface should have relevant generic 
+        support in the IF-MIB and in the internet draft,
+        draft-thaler-inet-tunnel-mib. Only MVPN specific aspects
+        of such a tunnel interface are to be specified in this
+        table.)"
+   INDEX  { ifIndex }
+   ::= { ciscoMvpnTunnelTable 1 }
+          
+CiscoMvpnTunnelEntry ::= SEQUENCE {
+   ciscoMvpnTunnelName       DisplayString,
+   ciscoMvpnTunnelMvrf       SnmpAdminString
+   }
+
+ciscoMvpnTunnelName OBJECT-TYPE  
+   SYNTAX        DisplayString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The canonical name assigned to the tunnel. The ifName of 
+        this tunnel interface should have a value equal to 
+        ciscoMvpnTunnelName."
+   ::= { ciscoMvpnTunnelEntry 1 }
+
+ciscoMvpnTunnelMvrf OBJECT-TYPE  
+   SYNTAX        SnmpAdminString
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Name of the MVRF that this tunnel is associated with.
+        This object has the same value as mplsVpnVrfName
+        for the MVRF."
+   ::= { ciscoMvpnTunnelEntry 2 }
+
+-- MVPN Notifications
+
+ciscoMvpnMvrfChange NOTIFICATION-TYPE
+   OBJECTS     {
+                 ciscoMvpnGenOperStatusChange
+               }
+   STATUS      current
+   DESCRIPTION
+       "A ciscoMvpnMvrfChange notification signifies a change about
+        a MVRF in the device. The change event can be creation of 
+        the MVRF, deletion of the MVRF or an update on the default 
+        or data MDT configuration of the MVRF. The change event 
+        is indicated by ciscoMvpnGenOperStatusChange embedded in 
+        the notification. The user can then query 
+        ciscoMvpnGenericTable, ciscoMvpnMdtDefaultTable and/or 
+        ciscoMvpnMdtDataTable to get the details of the change as 
+        necessary.
+
+        Note: Since the creation of a MVRF is often followed by 
+        configuration of default and data MDT groups for the MVRF, 
+        more than one (three at most) notifications for a MVRF may 
+        be generated serially, and it is really not necessary to 
+        generate all three of them. An agent may choose to generate a 
+        notification for the last event only, that is for data MDT 
+        configuration.
+
+        Similarly, deletion of default or data MDT configuration on a 
+        MVRF happens before a MVRF is deleted, it is recommended 
+        that the agent send the notification for MVRF deletion 
+        event only."
+   ::= { ciscoMvpnNotifications 2 }
+
+-- Conformance information
+
+ciscoMvpnGroups
+   OBJECT IDENTIFIER ::= { ciscoMvpnConformance 1 }
+
+ciscoMvpnCompliances
+   OBJECT IDENTIFIER ::= { ciscoMvpnConformance 2 }
+
+-- Module Compliance
+
+ciscoMvpnModuleFullCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+       "Compliance statement for agents that support read-create
+        so that both configuration and monitoring can be
+        accomplished via this MIB module."
+   MODULE -- this module 
+
+      MANDATORY-GROUPS    { ciscoMvpnScalarGroup,
+                            ciscoMvpnMIBGenericGroup,
+                            ciscoMvpnMIBMdtDefaultGroup,
+                            ciscoMvpnMIBMdtDataGroup,
+                            ciscoMvpnMIBMrouteMdtGroup,
+                            ciscoMvpnMIBBgpMdtUpdateGroup,
+                            ciscoMvpnMIBMdtJnRcvGroup,
+                            ciscoMvpnMIBMdtJnSendGroup,
+                            ciscoMvpnTunnelGroup,
+                            ciscoMvpnNotificationGroup
+                          }
+
+      OBJECT      ciscoMvpnGenRowStatus
+      SYNTAX      RowStatus 
+      DESCRIPTION
+          "Support for notReady(3) and createAndWait(5) is
+           not required."
+
+      OBJECT      ciscoMvpnMdtDefaultAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+      
+      OBJECT      ciscoMvpnMdtEncapsType
+      DESCRIPTION
+          "Not all encapsulation types defined need to be supported.
+           Only one type may be supported by default."
+
+      OBJECT      ciscoMvpnMdtDefaultRowStatus
+      SYNTAX      RowStatus
+      DESCRIPTION
+          "Support for notReady(3) and createAndWait(5) is
+           not required."
+
+      OBJECT      ciscoMvpnMdtDataRangeAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+
+      OBJECT      ciscoMvpnMdtDataWildcardType  
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+
+      OBJECT      ciscoMvpnMdtDataRowStatus
+      SYNTAX      RowStatus 
+      DESCRIPTION
+          "Support for notReady(3) and createAndWait(5) is
+           not required."
+
+      OBJECT      ciscoMvpnMrouteMdtGrpAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+     
+      OBJECT      ciscoMvpnBgpMdtUpdOrigAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+
+      OBJECT      ciscoMvpnBgpMdtUpdNhAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+      
+      OBJECT      ciscoMvpnMdtJnSendMdtGrpAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+
+   ::= { ciscoMvpnCompliances 1 }
+
+ciscoMvpnModuleReadOnlyCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+       "Compliance statement for agents that support the
+        monitoring of MVRFs via this MIB module."
+   MODULE -- this module
+
+      MANDATORY-GROUPS    { ciscoMvpnScalarGroup,
+                            ciscoMvpnMIBGenericGroup,
+                            ciscoMvpnMIBMdtDefaultGroup,
+                            ciscoMvpnMIBMdtDataGroup,   
+                            ciscoMvpnMIBMrouteMdtGroup, 
+                            ciscoMvpnMIBBgpMdtUpdateGroup,
+                            ciscoMvpnMIBMdtJnRcvGroup,
+                            ciscoMvpnMIBMdtJnSendGroup,
+                            ciscoMvpnTunnelGroup,
+                            ciscoMvpnNotificationGroup
+                          }
+                           
+      OBJECT      ciscoMvpnGenRowStatus
+      SYNTAX      RowStatus
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required and active(1) is the
+           only status that needs to be supported."
+
+      OBJECT      ciscoMvpnMdtDefaultAddrType
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Not all Internet address types need to be supported.
+           Write access is not required."
+
+      OBJECT      ciscoMvpnMdtDefaultAddress
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      ciscoMvpnMdtEncapsType
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Not all encapsulation types defined need to be supported.
+           Only one type may be supported by default. Write access
+           is not required."
+
+      OBJECT      ciscoMvpnMdtDefaultRowStatus
+      SYNTAX      RowStatus
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required and active(1) is the
+           only status that needs to be supported."
+
+      OBJECT      ciscoMvpnMdtDataRangeAddrType
+      MIN-ACCESS  read-only   
+      DESCRIPTION
+          "Not all Internet address types need to be supported.
+           Write access is not required."
+
+      OBJECT      ciscoMvpnMdtDataRangeAddress
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      ciscoMvpnMdtDataWildcardType
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Not all Internet address types need to be supported. 
+           Write access is not required."
+
+      OBJECT      ciscoMvpnMdtDataWildcardBits
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      ciscoMvpnMdtDataThreshold
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+      
+      OBJECT      ciscoMvpnMdtDataRowStatus
+      SYNTAX      RowStatus 
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required and active(1) is the
+           only status that needs to be supported."
+
+      OBJECT      ciscoMvpnMrouteMdtGrpAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+
+      OBJECT      ciscoMvpnBgpMdtUpdOrigAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+   
+      OBJECT      ciscoMvpnBgpMdtUpdNhAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+
+      OBJECT      ciscoMvpnMdtJnSendMdtGrpAddrType
+      DESCRIPTION
+          "Not all Internet address types need to be supported."
+
+   ::= { ciscoMvpnCompliances 2 }
+
+   -- Units of conformance.
+
+   ciscoMvpnScalarGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnMvrfNumber,
+                ciscoMvpnNotificationEnable
+              }
+      STATUS  current
+      DESCRIPTION
+          "Collection of scalar objects required for MVPN management."
+      ::= { ciscoMvpnGroups 1 }
+
+   ciscoMvpnMIBGenericGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnGenOperStatusChange,
+                ciscoMvpnGenOperChangeTime,
+                ciscoMvpnGenAssociatedInterfaces,
+                ciscoMvpnGenRowStatus
+              }
+      STATUS  current
+      DESCRIPTION
+          "Collection of objects needed for MVPN MVRF management."
+      ::= { ciscoMvpnGroups 2 }
+
+   ciscoMvpnMIBMdtDefaultGroup OBJECT-GROUP
+        OBJECTS { ciscoMvpnMdtDefaultAddrType,
+                  ciscoMvpnMdtDefaultAddress,
+                  ciscoMvpnMdtEncapsType,
+                  ciscoMvpnMdtDefaultRowStatus
+           }
+      STATUS  current
+      DESCRIPTION
+          "Collection of objects needed for MVPN default MDT group 
+           management."
+      ::= { ciscoMvpnGroups 3 }
+
+   ciscoMvpnMIBMdtDataGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnMdtDataRangeAddrType,
+                ciscoMvpnMdtDataRangeAddress,
+                ciscoMvpnMdtDataWildcardType,
+                ciscoMvpnMdtDataWildcardBits,
+                ciscoMvpnMdtDataThreshold,
+                ciscoMvpnMdtDataRowStatus
+             }
+      STATUS  current
+      DESCRIPTION
+          "Collection of objects needed for MVPN data MDT group
+           management."
+      ::= { ciscoMvpnGroups 4 }
+
+   ciscoMvpnMIBMrouteMdtGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnMrouteMdtGrpAddrType,
+                ciscoMvpnMrouteMdtGroup, 
+                ciscoMvpnMrouteMdtType
+              }
+      STATUS  current
+      DESCRIPTION
+          "Collection of objects that list sources in a MVRF
+           and the corresponding MDT groups."
+      ::= { ciscoMvpnGroups 5 }
+
+   ciscoMvpnMIBBgpMdtUpdateGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnBgpMdtUpdateRd,
+                ciscoMvpnBgpMdtUpdOrigAddrType,
+                ciscoMvpnBgpMdtUpdateOriginator,
+                ciscoMvpnBgpMdtUpdNhAddrType,
+                ciscoMvpnBgpMdtUpdateNexthop
+              }
+      STATUS  current
+      DESCRIPTION
+           "Collection of objects needed for MVPN BGP MDT updates 
+            related information."
+      ::= { ciscoMvpnGroups 6 }
+
+   ciscoMvpnMIBMdtJnRcvGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnMdtJnRcvUpTime, 
+                ciscoMvpnMdtJnRcvExpTime
+              }
+      STATUS  current
+      DESCRIPTION
+          "Collection of objects needed for management of MVPN MDT 
+           data joins received by a device."
+      ::= { ciscoMvpnGroups 7 }
+
+   ciscoMvpnMIBMdtJnSendGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnMdtJnSendMdtGrpAddrType,
+                ciscoMvpnMdtJnSendMdtGroup, 
+                ciscoMvpnMdtJnSendMdtRefCt
+              }
+      STATUS  current
+      DESCRIPTION
+          "Collection of objects needed for management of MVPN MDT 
+           data joins received by a device."
+   ::= { ciscoMvpnGroups 8 }
+
+   ciscoMvpnTunnelGroup OBJECT-GROUP
+      OBJECTS { ciscoMvpnTunnelName,
+                ciscoMvpnTunnelMvrf
+              }
+      STATUS  current
+      DESCRIPTION
+          "Objects required for MDT tunnel interface management."
+   ::= { ciscoMvpnGroups 9 }
+
+   ciscoMvpnNotificationGroup NOTIFICATION-GROUP
+       NOTIFICATIONS { ciscoMvpnMvrfChange
+                     }
+      STATUS  current
+      DESCRIPTION
+          "A collection of MVPN notifications."
+   ::= { ciscoMvpnGroups 10 }
+
+-- End of CISCO-MVPN-MIB
+
+END

@@ -1,0 +1,274 @@
+STORMSHIELD-VPNSA-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+         Unsigned32, Counter64                FROM SNMPv2-SMI
+      DisplayString                           FROM RFC1213-MIB
+      snsVPN                                  FROM STORMSHIELD-VPN-MIB;
+
+   snsVPNSATable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsVPNSAEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "List of Security Association"
+      ::= { snsVPN 1 }
+
+   snsVPNSAEntry OBJECT-TYPE
+      SYNTAX  SnsVPNSAEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "Each entry in the snsVPNSATable holds a set of parameters."
+      INDEX   { snsVPNSAIndex }
+      ::= { snsVPNSATable 1 }
+
+   SnsVPNSAEntry ::= SEQUENCE {
+      snsVPNSAIndex        INTEGER,
+      snsVPNSARulename     DisplayString,
+      snsVPNSAIKEIndex     INTEGER,
+      snsVPNSAIKERulename  DisplayString,
+      snsVPNSAIPSrc        DisplayString,
+      snsVPNSAIPDst        DisplayString,
+      snsVPNSAType         INTEGER,
+      snsVPNSAMode         DisplayString,
+      snsVPNSAEncap        INTEGER,
+      snsVPNSAEsn          INTEGER,
+      snsVPNSASpi          Unsigned32,
+      snsVPNSAPeerSpi      Unsigned32,
+      snsVPNSAReqID        Integer32,
+      snsVPNSAEnc          DisplayString,
+      snsVPNSAAuth         DisplayString,
+      snsVPNSAPrf          DisplayString,
+      snsVPNSAPfs          DisplayString,
+      snsVPNSAState        DisplayString,
+      snsVPNSABytesIn      Counter64,
+      snsVPNSABytesOut     Counter64,
+      snsVPNSAPacketsIn    Counter64,
+      snsVPNSAPacketsOut   Counter64,
+      snsVPNSALifetime     Counter64,
+      snsVPNSAMaxLifetime  Counter64,
+      snsVPNSAGlobal       INTEGER
+   }
+
+   snsVPNSAIndex OBJECT-TYPE
+      SYNTAX  INTEGER  (1..65535)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "A unique value for phase two table. Its value
+         may not be contigous. The index has no other
+         meaning but a pure index"
+      ::= { snsVPNSAEntry 1 }
+
+   snsVPNSARulename OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "CHILD_SA rulename"
+      ::= { snsVPNSAEntry 2 }
+
+   snsVPNSAIKEIndex OBJECT-TYPE
+      SYNTAX  INTEGER  (1..65535)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "A unique value for phase one table.  Its value
+         ranges between 1 and 65535 and may not be contigous.
+         the index has no other meaning but a pure index"
+      ::= { snsVPNSAEntry 3 }
+
+   snsVPNSAIKERulename OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IKE_SA rulename"
+      ::= { snsVPNSAEntry 4 }
+
+   snsVPNSAIPSrc OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP source"
+      ::= { snsVPNSAEntry 5 }
+
+   snsVPNSAIPDst OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "IP destination"
+      ::= { snsVPNSAEntry 6 }
+
+   snsVPNSAType OBJECT-TYPE
+      SYNTAX INTEGER {
+         unspec(0),
+         unknown(1),
+         ah(2),
+         esp(3),
+         rsvp(4),
+         ospfv2(5),
+         ripv2(6),
+         mip(7),
+         ipcomp(8)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Type"
+      ::= { snsVPNSAEntry 7 }
+
+   snsVPNSAMode OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Mode"
+      ::= { snsVPNSAEntry 8 }
+
+   snsVPNSAEncap OBJECT-TYPE
+      SYNTAX INTEGER {
+         no(0),
+         yes(1)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "UDP Encapsulation"
+      ::= { snsVPNSAEntry 9 }
+
+   snsVPNSAEsn OBJECT-TYPE
+      SYNTAX INTEGER {
+         no(0),
+         yes(1)
+      }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Extended Sequence Number"
+      ::= { snsVPNSAEntry 10 }
+
+   snsVPNSASpi OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Secure property index"
+      ::= { snsVPNSAEntry 11 }
+
+   snsVPNSAPeerSpi OBJECT-TYPE
+      SYNTAX Unsigned32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Secure property index of the peer"
+      ::= { snsVPNSAEntry 12 }
+
+   snsVPNSAReqID OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "ReqID"
+      ::= { snsVPNSAEntry 13 }
+
+   snsVPNSAEnc OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Encryption algorithm"
+      ::= { snsVPNSAEntry 14 }
+
+   snsVPNSAAuth OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Authentication algorithm"
+      ::= { snsVPNSAEntry 15 }
+
+   snsVPNSAPrf OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Pseudo-Random Function"
+      ::= { snsVPNSAEntry 16 }
+
+   snsVPNSAPfs OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Perfect Forward Secrecy algorithm"
+      ::= { snsVPNSAEntry 17 }
+
+   snsVPNSAState OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "VPN State"
+      ::= { snsVPNSAEntry 18 }
+
+   snsVPNSABytesIn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Bytes Input"
+      ::= { snsVPNSAEntry 19 }
+
+   snsVPNSABytesOut OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Bytes Output"
+      ::= { snsVPNSAEntry 20 }
+
+   snsVPNSAPacketsIn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Packets Input"
+      ::= { snsVPNSAEntry 21 }
+
+   snsVPNSAPacketsOut OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Packets Output"
+      ::= { snsVPNSAEntry 22 }
+
+   snsVPNSALifetime OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Lifetime"
+      ::= { snsVPNSAEntry 23 }
+
+   snsVPNSAMaxLifetime OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Maximum lifetime"
+      ::= { snsVPNSAEntry 24 }
+
+   snsVPNSAGlobal OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Global"
+      ::= { snsVPNSAEntry 25 }
+
+END

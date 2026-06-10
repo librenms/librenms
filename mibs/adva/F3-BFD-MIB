@@ -1,0 +1,597 @@
+F3-BFD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, IpAddress
+             FROM SNMPv2-SMI
+    RowStatus, StorageType, TruthValue,DisplayString,
+    VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    bfdSessEntry, bfdSessIndex
+             FROM BFD-STD-MIB
+    IANAbfdSessStateTC
+         FROM IANA-BFD-TC-STD-MIB
+    AdminState, OperationalState, SecondaryState,
+    VlanId, VlanPriority
+             FROM  CM-COMMON-MIB
+    neIndex
+             FROM CM-ENTITY-MIB
+    f3L3TrafficIPInterfaceEntry, f3VrfEntry, f3L3TrafficBgpPeerEntry,
+    f3L3TrafficOspfInterfaceEntry
+             FROM F3-L3-MIB
+    fsp150cm
+             FROM  ADVA-MIB
+    Ipv6Address
+             FROM  IPV6-TC;
+
+f3BfdMIB MODULE-IDENTITY
+    LAST-UPDATED        "202101280000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
+    CONTACT-INFO
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
+    DESCRIPTION
+            "This module defines the Ethernet Service Manager MIB defitinions
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA."
+    REVISION        "202101280000Z"
+    DESCRIPTION
+        "
+         Notes from release 201508140000Z." 
+
+    ::= {fsp150cm 38}
+
+-- 
+-- OID definitions
+-- 
+f3BfdConfigObjects      OBJECT IDENTIFIER ::= {f3BfdMIB 1}
+f3BfdConformance        OBJECT IDENTIFIER ::= {f3BfdMIB 2}
+
+BfdSessPerfAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the action on bfd session performance data."
+    SYNTAX       INTEGER {
+                   notApplicable (0),
+                   clearCtrlPkts (1)
+                 }
+
+--
+-- Bfd Config Table
+--
+bfdSessExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BfdSessExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table has list of entries with which FSPNM can associate some
+         information in the form of name-value pairs.
+         NOTE: This table is for FSPNM use only."
+   ::= { f3BfdConfigObjects 1 }
+
+bfdSessExtEntry OBJECT-TYPE
+    SYNTAX      BfdSessExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The conceptual row in bfdSessExtTable."
+    AUGMENTS { bfdSessEntry }
+   ::= { bfdSessExtTable 1 }
+
+BfdSessExtEntry ::= SEQUENCE {
+    bfdSessExtInnerVlanControl                TruthValue,
+    bfdSessExtInnerVlanId                     VlanId,
+    bfdSessExtInnerVlanPri                    VlanPriority,
+    bfdSessExtOuterVlanControl                TruthValue,
+    bfdSessExtOuterVlanId                     VlanId,
+    bfdSessExtOuterVlanPri                    VlanPriority,
+    bfdSessExtIpPri                           Unsigned32,
+    bfdSessExtIpGateway                       IpAddress,
+    bfdSessExtAdminState                      AdminState,
+    bfdSessExtOperationalState                OperationalState,
+    bfdSessExtSecondaryState                  SecondaryState,
+    bfdSessExtNegRxInterval                   Unsigned32,
+    bfdSessExtAlias                           DisplayString,    
+    bfdSessExtAction                          BfdSessPerfAction,
+    bfdSessExtIpv6Gateway                     Ipv6Address
+}
+
+bfdSessExtInnerVlanControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify whether enable inner Vlan Tag."
+   ::= { bfdSessExtEntry 1 }
+
+bfdSessExtInnerVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify inner VlanId."
+   ::= { bfdSessExtEntry 2 }
+
+bfdSessExtInnerVlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify inner Vlan Priority."
+   ::= { bfdSessExtEntry 3 }
+
+bfdSessExtOuterVlanControl OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify whether enable outer Vlan Tag."
+   ::= { bfdSessExtEntry 4 }
+
+bfdSessExtOuterVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify outer VlanId."
+   ::= { bfdSessExtEntry 5 }
+
+bfdSessExtOuterVlanPri OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify outer Vlan Priority."
+   ::= { bfdSessExtEntry 6 }
+
+bfdSessExtIpPri OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify IP DSCP value."
+   ::= { bfdSessExtEntry 7 }
+
+bfdSessExtIpGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to specify IP gateway."
+   ::= { bfdSessExtEntry 8 }
+
+bfdSessExtAdminState OBJECT-TYPE
+    SYNTAX     AdminState
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Administrative State of the BFD session."
+     ::= { bfdSessExtEntry 9 }
+
+bfdSessExtOperationalState OBJECT-TYPE
+    SYNTAX     OperationalState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Operational State of the BFD session."
+     ::= { bfdSessExtEntry 10 }
+
+bfdSessExtSecondaryState OBJECT-TYPE
+    SYNTAX     SecondaryState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents the Secondary State of the BFD session."
+     ::= { bfdSessExtEntry 11 }
+
+bfdSessExtNegRxInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents negatiated recieve direction interval of the BFD session."
+     ::= { bfdSessExtEntry 12 }
+
+bfdSessExtAlias OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..64))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object represents the alias of the BFD session."
+     ::= { bfdSessExtEntry 13 }
+
+bfdSessExtAction OBJECT-TYPE
+    SYNTAX      BfdSessPerfAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object allows to perform some action on the bfd session."
+   ::= { bfdSessExtEntry 14 }
+
+bfdSessExtIpv6Gateway OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+       "This object allows to specify the IPv6 gateway." 
+    ::= { bfdSessExtEntry 15 }
+
+---
+---
+---
+f3BfdIpIfMemberTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3BfdIpIfMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the BFD Traffic Ip Interface member."
+    ::= { f3BfdConfigObjects 2 }
+
+f3BfdIpIfMemberEntry  OBJECT-TYPE
+    SYNTAX      F3BfdIpIfMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3BfdIpIfMemberTable."
+    INDEX { bfdSessIndex, f3BfdIpIfMemberObject }
+    ::= { f3BfdIpIfMemberTable 1 }
+
+F3BfdIpIfMemberEntry ::= SEQUENCE {
+    f3BfdIpIfMemberObject             VariablePointer,
+    f3BfdIpIfMemberStorageType        StorageType,
+    f3BfdIpIfMemberRowStatus          RowStatus
+}
+
+f3BfdIpIfMemberObject OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This object describes the traffic ip interface."
+    ::= { f3BfdIpIfMemberEntry 1 }
+
+f3BfdIpIfMemberStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of storage configured for this entry."
+    ::= { f3BfdIpIfMemberEntry 2 }
+
+f3BfdIpIfMemberRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+          	An entry MUST NOT exist in the active state unless all
+          	objects in the entry have an appropriate value, as described
+          	in the description clause for each writable object.
+ 	
+          	The values of f3BfdIpIfMemberRowStatus supported are
+          	createAndGo(4) and destroy(6).  All mandatory attributes
+          	must be specified in a single SNMP SET request with
+          	f3BfdIpIfMemberRowStatus value as createAndGo(4).
+          	Upon successful row creation, this object has a
+          	value of active(1).
+ 	
+          	The f3BfdIpIfMemberRowStatus object may be modified if
+          	the associated instance of this object is equal to active(1)."
+    ::= { f3BfdIpIfMemberEntry 3 }
+
+
+
+--
+-- Traffic IP Interface extension Table
+--
+f3L3TrafficIPInterfaceExtBfdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3L3TrafficIPInterfaceExtBfdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to traffic ip interface for configuration purposes."
+    ::= { f3BfdConfigObjects 3 }
+
+f3L3TrafficIPInterfaceExtBfdEntry OBJECT-TYPE
+    SYNTAX      F3L3TrafficIPInterfaceExtBfdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3L3TrafficIPInterfaceExtBfdTable."
+    AUGMENTS { f3L3TrafficIPInterfaceEntry }
+    ::= { f3L3TrafficIPInterfaceExtBfdTable 1 }
+
+F3L3TrafficIPInterfaceExtBfdEntry ::= SEQUENCE {
+    f3L3TrafficIPInterfaceExtBfdObject                     VariablePointer,
+    f3L3TrafficIPInterfaceExtBfdDesiredMinTxInterval       Unsigned32,
+    f3L3TrafficIPInterfaceExtBfdReqMinRxInterval           Unsigned32,
+    f3L3TrafficIPInterfaceExtBfdLocalMultiplier            Unsigned32
+}
+
+f3L3TrafficIPInterfaceExtBfdObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+          "This object describes the BFD object OID."
+     ::= { f3L3TrafficIPInterfaceExtBfdEntry 1 }
+
+f3L3TrafficIPInterfaceExtBfdDesiredMinTxInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "."
+     ::= { f3L3TrafficIPInterfaceExtBfdEntry 2 }
+
+f3L3TrafficIPInterfaceExtBfdReqMinRxInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "."
+     ::= { f3L3TrafficIPInterfaceExtBfdEntry 3 }
+
+f3L3TrafficIPInterfaceExtBfdLocalMultiplier OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "."
+     ::= { f3L3TrafficIPInterfaceExtBfdEntry 4 }
+
+
+--
+-- vrf extension BFD config Table
+--
+f3VrfExtBfdConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3VrfExtBfdConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to vrf for configuration purposes."
+    ::= { f3BfdConfigObjects 4 }
+
+f3VrfExtBfdConfigEntry OBJECT-TYPE
+    SYNTAX      F3VrfExtBfdConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3VrfExtBfdConfigTable."
+    AUGMENTS { f3VrfEntry }
+    ::= { f3VrfExtBfdConfigTable 1 }
+
+F3VrfExtBfdConfigEntry ::= SEQUENCE {
+    f3VrfExtBfdDesiredMinTxInterval       Unsigned32,
+    f3VrfExtBfdReqMinRxInterval           Unsigned32,
+    f3VrfExtBfdLocalMultiplier            Unsigned32
+}
+
+f3VrfExtBfdDesiredMinTxInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "."
+     ::= { f3VrfExtBfdConfigEntry 1 }
+
+f3VrfExtBfdReqMinRxInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "."
+     ::= { f3VrfExtBfdConfigEntry 2 }
+
+f3VrfExtBfdLocalMultiplier OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "."
+     ::= { f3VrfExtBfdConfigEntry 3 }
+
+
+--
+--  L3 Traffic BGP Peer extension Table 
+--
+f3L3TrafficBgpPeerExtBfdConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3L3TrafficBgpPeerExtBfdConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Traffic BGP peer extension Table."
+    ::= { f3BfdConfigObjects 5 }
+
+f3L3TrafficBgpPeerExtBfdConfigEntry OBJECT-TYPE
+    SYNTAX      F3L3TrafficBgpPeerExtBfdConfigEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3L3TrafficBgpPeerExtBfdConfigTable."
+    AUGMENTS { f3L3TrafficBgpPeerEntry }
+    ::= { f3L3TrafficBgpPeerExtBfdConfigTable 1 }
+
+F3L3TrafficBgpPeerExtBfdConfigEntry ::= SEQUENCE {
+    f3L3TrafficBgpPeerBfdDetect               TruthValue
+}
+
+f3L3TrafficBgpPeerBfdDetect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "."
+   ::= { f3L3TrafficBgpPeerExtBfdConfigEntry 1 }
+
+
+--
+--  Traffic OSPF Interface extension Table
+--
+f3L3TrafficOspfInterfaceExtBfdConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3L3TrafficOspfInterfaceExtBfdConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the Traffic OSPF Interface."
+    ::= { f3BfdConfigObjects 6 }
+
+f3L3TrafficOspfInterfaceExtBfdConfigEntry  OBJECT-TYPE
+    SYNTAX      F3L3TrafficOspfInterfaceExtBfdConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3L3TrafficOspfInterfaceExtBfdConfigTable."
+    AUGMENTS { f3L3TrafficOspfInterfaceEntry }
+    ::= { f3L3TrafficOspfInterfaceExtBfdConfigTable 1 }
+
+F3L3TrafficOspfInterfaceExtBfdConfigEntry ::= SEQUENCE {
+    f3L3TrafficOspfInterfaceBfdDetect           TruthValue
+}
+
+f3L3TrafficOspfInterfaceBfdDetect OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "."
+   ::= { f3L3TrafficOspfInterfaceExtBfdConfigEntry 1 }
+
+
+--
+--  VRF BFD Session Table
+--
+f3VrfBfdSessionTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3VrfBfdSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for VRF BFD Sessions.
+             Must set f3VrfActionX as optimizeBfdSessionRetrieve(9)
+             before get data from this table."
+    ::= { f3BfdConfigObjects 7 }
+
+f3VrfBfdSessionEntry  OBJECT-TYPE
+    SYNTAX      F3VrfBfdSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3VrfBfdSessionTable."
+    INDEX { neIndex, 
+            f3VrfIndex, 
+            f3VrfBfdSessionIpAddress,
+            f3VrfBfdSessionInterface }
+    ::= { f3VrfBfdSessionTable 1 }
+
+F3VrfBfdSessionEntry ::= SEQUENCE {
+    f3VrfBfdSessionIpAddress                               DisplayString,
+    f3VrfBfdSessionInterface                               DisplayString,
+    f3VrfBfdSessionNegotiatedTxInterval                    Unsigned32,
+    f3VrfBfdSessionNegotiatedDetectionTimer                Unsigned32,
+    f3VrfBfdSessionState                                   IANAbfdSessStateTC
+}
+
+f3VrfBfdSessionIpAddress OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "."
+    ::= { f3VrfBfdSessionEntry 1 }
+
+f3VrfBfdSessionInterface OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "."
+    ::= { f3VrfBfdSessionEntry 2 }
+
+f3VrfBfdSessionNegotiatedTxInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "."
+    ::= { f3VrfBfdSessionEntry 3 }
+
+f3VrfBfdSessionNegotiatedDetectionTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "."
+    ::= { f3VrfBfdSessionEntry 4 }
+
+f3VrfBfdSessionState OBJECT-TYPE
+    SYNTAX      IANAbfdSessStateTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "."
+    ::= { f3VrfBfdSessionEntry 5 }
+
+
+--
+-- Conformance
+--
+f3BfdCompliances OBJECT IDENTIFIER ::= {f3BfdConformance 1}
+f3BfdGroups      OBJECT IDENTIFIER ::= {f3BfdConformance 2}
+
+f3BfdCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-BFD-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3BfdConfigGroup
+        }
+    ::= { f3BfdCompliances 1 }
+
+f3BfdConfigGroup OBJECT-GROUP
+   OBJECTS {
+    bfdSessExtInnerVlanControl,
+    bfdSessExtInnerVlanId,
+    bfdSessExtInnerVlanPri,
+    bfdSessExtOuterVlanControl,
+    bfdSessExtOuterVlanId,
+    bfdSessExtOuterVlanPri,
+    bfdSessExtIpPri,
+    bfdSessExtIpGateway,
+    bfdSessExtAdminState,
+    bfdSessExtOperationalState,
+    bfdSessExtSecondaryState,
+    bfdSessExtNegRxInterval,
+    bfdSessExtAlias,    
+    bfdSessExtAction,
+    bfdSessExtIpv6Gateway,
+    f3BfdIpIfMemberObject,
+    f3BfdIpIfMemberStorageType,
+    f3BfdIpIfMemberRowStatus,
+    f3L3TrafficIPInterfaceExtBfdObject,
+    f3VrfExtBfdDesiredMinTxInterval,
+    f3VrfExtBfdReqMinRxInterval,
+    f3VrfExtBfdLocalMultiplier,
+    f3L3TrafficBgpPeerBfdDetect,
+    f3L3TrafficOspfInterfaceBfdDetect,
+    
+    f3VrfBfdSessionIpAddress,
+    f3VrfBfdSessionInterface,
+    f3VrfBfdSessionNegotiatedTxInterval,
+    f3VrfBfdSessionNegotiatedDetectionTimer,
+    f3VrfBfdSessionState
+   }
+   STATUS  current
+   DESCRIPTION
+             "A collection of objects used to manage the BFD Configuration objects."
+    ::= { f3BfdGroups 1 }
+
+END

@@ -1,0 +1,193 @@
+-- MIB File: BROCADE-CONTEXT-MAPPING-MIB.mib
+-- *********************************************************************
+-- BROCADE-CONTEXT-MAPPING-MIB.mib: Extreme SNMP Context Mapping MIB
+-- 
+-- June 2015, Prabhu Sundaram
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- *********************************************************************
+BROCADE-CONTEXT-MAPPING-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP        
+        FROM SNMPv2-CONF        
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    RowStatus, StorageType
+        FROM SNMPv2-TC
+    bcsiModules 
+        FROM Brocade-REG-MIB;
+brocadeContextMappingMIB  MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+    DESCRIPTION
+        "This MIB module is for the management of the SNMP context in 
+        the Extreme managed entities. 
+        
+        An SNMP context, or just 'context' for short, is a collection 
+        of management information accessible by an SNMP entity. An item 
+        of management information may exist in more than one context. 
+        An SNMP entity potentially has access to many contexts.
+        
+        While SNMP context itself is generically defined to cater to 
+        the access of multiple instances of the MIB modules and 
+        management information, it is required to define what 'context' 
+        means for a given managed entity. This MIB module provides the 
+        management of such context. As technology evolves, the 
+        definition of the context can evolve and hence such definition 
+        should be extensible. 
+        
+        The context referred in this management module is same as 
+        'contextName' as defined in the SNMPv3 PDU and also
+        maps to the 'snmpCommunityContextName' of snmpCommunityTable 
+        in 'SNMP-COMMUNITY-MIB'. The rest of the elements of procedure
+        described for processing SNMP PDU remains the same.
+       
+        Glossary of the terms used in this MIB:
+        --------------------------------------
+        SNMP Context - Name of the SNMP context name used in SNMPv3 
+                       PDU/SNMPv2 community mapping.
+        VRF - Virtual Routing and Forwarding.
+        "
+    REVISION	    "201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION        "201506180000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcsiModules 7 }
+    
+bContextMapMIBNotifs  OBJECT IDENTIFIER 
+    ::=  { brocadeContextMappingMIB 0 }
+bContextMapMIBObjects OBJECT IDENTIFIER 
+    ::=  { brocadeContextMappingMIB 1 }
+bContextMapMIBConform OBJECT IDENTIFIER 
+    ::=  { brocadeContextMappingMIB 2 }
+
+bcmContexMapConfig  OBJECT IDENTIFIER ::= { bContextMapMIBObjects 1 }
+    
+bcmContextMappingTable OBJECT-TYPE 
+    SYNTAX     SEQUENCE OF BcmContextMappingEntry 
+    MAX-ACCESS not-accessible 
+    STATUS     current 
+    DESCRIPTION  
+        "A tabe that provides the  mapping of SNMP context  
+        represented by the value of (vacmContextName) to the various 
+        entities within the entities within the managed device."
+--/    REFERENCE 
+  --      "D. Harrington, 'An Architecture for Describing Simple Network 
+    --    Management Protocol (SNMP) Management Frameworks', 
+      --  RFC 3411, Dec 2002."
+	::= { bcmContexMapConfig 1 }
+
+bcmContextMappingEntry OBJECT-TYPE
+    SYNTAX     BcmContextMappingEntry 
+    MAX-ACCESS not-accessible 
+    STATUS     current 
+    DESCRIPTION  
+        "A conceptual entry (row) of this table. Each entry represents 
+        a Context and has all the mapping information of the managed 
+        device." 
+    INDEX	{ bcmContextMappingVacmContextName } 
+    ::= { bcmContextMappingTable 1 } 
+
+BcmContextMappingEntry ::= SEQUENCE { 
+    bcmContextMappingVacmContextName  SnmpAdminString, 
+    bcmContextMappingVrfName          SnmpAdminString, 
+    bcmContextMappingStorageType      StorageType,
+    bcmContextMappingRowStatus        RowStatus
+}   
+
+bcmContextMappingVacmContextName  OBJECT-TYPE 
+    SYNTAX     SnmpAdminString (SIZE(0..32)) 
+    MAX-ACCESS not-accessible 
+    STATUS     current 
+    DESCRIPTION 
+        "The vacmContextName given to the SNMP context. This is a human
+        readable name identifying a particular SNMP VACM context at a 
+        particular SNMP entity. The empty contextName (zero length) 
+        represents the default context." 
+        ::= { bcmContextMappingEntry 1 } 
+
+bcmContextMappingVrfName  OBJECT-TYPE 
+    SYNTAX     SnmpAdminString (SIZE(0..32)) 
+    MAX-ACCESS read-only 
+    STATUS     current 
+    DESCRIPTION 
+        "This object specifies the VRF name mapped to this 'context'." 
+        ::= { bcmContextMappingEntry 2 } 
+		
+bcmContextMappingStorageType OBJECT-TYPE
+    SYNTAX       StorageType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The storage type for this conceptual row.
+        Conceptual rows having the value 'permanent' need not allow 
+        write-access to any columnar objects in the row."
+    DEFVAL      { nonVolatile }
+    ::= { bcmContextMappingEntry 3 }
+
+bcmContextMappingRowStatus OBJECT-TYPE
+    SYNTAX       RowStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object facilitates the creation, modification or deletion 
+        of a conceptual row in this table."
+    ::= { bcmContextMappingEntry 4 }
+    
+--
+-- Conformance
+--
+
+brocadeContextMapMIBCompliances OBJECT IDENTIFIER 
+                             ::= { bContextMapMIBConform 1 }
+brocadeContextMapMIBGroups       OBJECT IDENTIFIER 
+                             ::= { bContextMapMIBConform 2 }
+
+brocadeContextMapMIBCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which
+        implement BROCADE-CONEXT-MAPPING-MIB."
+    MODULE MANDATORY-GROUPS { brocadeContextMapConfigGroup }
+    
+OBJECT bcmContextMappingRowStatus
+    SYNTAX     INTEGER {
+                    active (1),
+                    createAndGo (4),
+                    destroy (6)
+                }
+    DESCRIPTION 
+        "Only 'createAndGo', 'destroy' and 'active' need to be 
+        supported."
+    ::= { brocadeContextMapMIBCompliances 1 }
+--
+-- Units of Conformance
+--
+   
+brocadeContextMapConfigGroup  OBJECT-GROUP
+    OBJECTS {
+        bcmContextMappingVrfName,
+        bcmContextMappingStorageType,
+        bcmContextMappingRowStatus
+    }
+    STATUS         current  
+    DESCRIPTION
+        "A collection of objects for the management of the Extreme 
+        SNMP context Mapping."
+    ::= { brocadeContextMapMIBGroups 1 }        
+END
+
+

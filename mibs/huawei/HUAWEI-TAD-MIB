@@ -1,0 +1,509 @@
+--==================================================================
+-- Copyright (C) 2014 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Transmission Alarm Damping MIB
+-- Reference:
+-- Version: V2.01
+-- History:
+-- <author>,  <date>,  <contents>
+-- Jiangwei   2006-6-28
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Variables and types be imported
+--
+-- ==================================================================
+
+HUAWEI-TAD-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, OBJECT-IDENTITY
+        FROM SNMPv2-SMI  
+        
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime
+      FROM SNMPv2-TC
+      
+    OBJECT-GROUP, MODULE-COMPLIANCE            
+      FROM SNMPv2-CONF    
+      
+    hwDatacomm
+        FROM HUAWEI-MIB
+
+    ifIndex,InterfaceIndex
+        FROM IF-MIB ;
+        
+    hwTAD MODULE-IDENTITY
+       LAST-UPDATED "201403191100Z"        
+         ORGANIZATION
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+              "
+          DESCRIPTION
+            "The Custom damping MIB module is defined to manage the configuration under system or interface view."
+
+      REVISION "201403191100Z"        
+            DESCRIPTION  
+              "Update hwTADAlarmType , add object-type prefectca(40)."
+      REVISION "200606281600Z"        
+            DESCRIPTION  
+              "The Custom damping MIB module is defined to manage the configuration under system or interface view."
+            ::= { hwDatacomm 128 }
+              
+
+HWEnableValue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enable(1), disable(2) }
+    
+-- ==================================================================
+--
+-- ======================= Definitions begin =========================
+--
+-- ==================================================================
+    
+hwTADObjects OBJECT IDENTIFIER ::= { hwTAD 1 }
+    
+
+-- ======================= interface table =========================
+
+    hwTADInterfaceTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTADInterfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Transmission alarm damping interface configuration table."
+        ::= { hwTADObjects  1 }
+
+
+    hwTADInterfaceEntry  OBJECT-TYPE
+        SYNTAX HwTADInterfaceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of a SDH or SONET interface with damping function enabled."
+        INDEX   { hwTADInterfaceIndex }
+        ::= { hwTADInterfaceTable 1}
+
+
+    HwTADInterfaceEntry  ::=
+    SEQUENCE {
+        hwTADInterfaceIndex    InterfaceIndex  ,
+        hwTADFilterEnable    HWEnableValue   ,
+        hwTADFilterExpireTime   Integer32   ,
+        hwTADDampingEnable  HWEnableValue    ,
+        hwTADSuppress   Integer32   ,
+        hwTADCeiling    Integer32    ,
+        hwTADReuse  Integer32   ,
+        hwTADDecayOk  Integer32   ,
+        hwTADDecayNg  Integer32   ,
+        hwTADResetStatistics   INTEGER   ,
+        hwTADResetTime   DateAndTime   ,
+        hwTADB3tcaThreshold  Integer32   ,
+        hwTADSdbereThreshold  Integer32   ,
+        hwTADSfbereThreshold  Integer32   ,
+        hwTADB1tcaThreshold  Integer32   ,
+        hwTADB2tcaThreshold  Integer32   ,
+        hwTADBip2tcaThreshold  Integer32
+        }
+
+
+    hwTADInterfaceIndex  OBJECT-TYPE
+        SYNTAX    InterfaceIndex 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Index number of the interface."
+        ::= { hwTADInterfaceEntry 1 }
+
+
+    hwTADFilterEnable  OBJECT-TYPE
+        SYNTAX  HWEnableValue 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Whether filter function is enabled."
+        DEFVAL      { disable }
+        ::= { hwTADInterfaceEntry 2 }
+        
+
+    hwTADFilterExpireTime  OBJECT-TYPE
+        SYNTAX  Integer32(20..10000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "How long the alarm will be postponed to process. Unit: millisecond."
+        DEFVAL      { 50 }
+        ::= { hwTADInterfaceEntry 3 }
+        
+        
+    hwTADDampingEnable  OBJECT-TYPE
+        SYNTAX  HWEnableValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Whether damping function is enabled."
+        DEFVAL      { disable }
+        ::= { hwTADInterfaceEntry 4 }
+
+    
+    hwTADSuppress  OBJECT-TYPE
+        SYNTAX  Integer32(2..19999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "The suppressing value. When figure-of-merit of alarm exceeds this value,
+        this alarm will be damped."
+        DEFVAL      { 2000 }
+        ::= { hwTADInterfaceEntry 5 }
+        
+             
+    hwTADCeiling OBJECT-TYPE
+        SYNTAX  Integer32(1001..20000) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "The ceiling value. Figure-of-merit can't exceed this value. The ceiling
+        value must be larger than suppressing value."
+        DEFVAL      { 6000 }
+        ::= { hwTADInterfaceEntry 6 }
+        
+        
+    hwTADReuse OBJECT-TYPE
+        SYNTAX  Integer32(1..19998) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "The reusing value. When figure-of-merit becomes lower than this value.
+        The alarm will be reused (exit from suppressing status). The reusing value must be
+        less than suppressing value."
+        DEFVAL      { 750 }
+        ::= { hwTADInterfaceEntry 7 }
+        
+    
+    hwTADDecayOk OBJECT-TYPE
+        SYNTAX  Integer32(500..10000) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "The half decay time when alarm status is down. Unit: millisecond."
+        DEFVAL      { 1000 }
+        ::= { hwTADInterfaceEntry 8 }       
+
+   
+    hwTADDecayNg OBJECT-TYPE
+        SYNTAX  Integer32(500..10000) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "The half decay time when alarm status is up. Unit: millisecond."
+        DEFVAL      { 1000 }
+        ::= { hwTADInterfaceEntry 9 }          
+
+
+    hwTADResetStatistics OBJECT-TYPE
+        SYNTAX  INTEGER{
+        reset(1),
+        unreset(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "Whether to reset alarm statistics. 1 means resetting statistics once."
+        DEFVAL      { 2 }
+        ::= { hwTADInterfaceEntry 10 }
+        
+    hwTADResetTime OBJECT-TYPE
+        SYNTAX  DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   "Last reset time."
+        ::= { hwTADInterfaceEntry 11 }
+
+
+    hwTADB3tcaThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "B3tca threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 12 }
+
+
+    hwTADSdbereThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "Sdbere threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 13 }
+
+
+    hwTADSfbereThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "Sfbere threshold in form of 10e-n."
+        DEFVAL      { 3 }
+        ::= { hwTADInterfaceEntry 14 }
+
+
+    hwTADB1tcaThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "B1tca threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 15 }    
+
+
+    hwTADB2tcaThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "B2tca threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 16 }
+
+
+    hwTADBip2tcaThreshold OBJECT-TYPE
+        SYNTAX  Integer32(3..9) 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION   "Bip2tca threshold in form of 10e-n."
+        DEFVAL      { 6 }
+        ::= { hwTADInterfaceEntry 17 }     
+
+  
+-- ======================= alarm table =========================
+
+    hwTADAlarmTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTADAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Transmission alarm damping alarm configuration table."
+        ::= { hwTADObjects  2 }
+
+
+    hwTADAlarmEntry  OBJECT-TYPE
+        SYNTAX HwTADAlarmEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "The entry of an alarm."
+        INDEX   { hwTADAlarmIfIndex, hwTADAlarmType }
+        ::= { hwTADAlarmTable 1}
+
+
+    HwTADAlarmEntry  ::=
+    SEQUENCE {
+        hwTADAlarmIfIndex    InterfaceIndex  ,
+        hwTADAlarmType    INTEGER   ,
+        hwTADAlarmIfDown   HWEnableValue   ,
+        hwTADAlarmLog  HWEnableValue    ,
+        hwTADAlarmStatus   INTEGER   ,
+        hwTADAlarmInFilter    INTEGER    ,
+        hwTADAlarmFigure  DisplayString   ,
+        hwTADAlarmInSuppress  INTEGER   ,
+        hwTADAlarmFlappingCount  Counter32   ,
+        hwTADAlarmSuppressCount  Counter32
+        }
+
+
+    hwTADAlarmIfIndex  OBJECT-TYPE
+        SYNTAX    InterfaceIndex 
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Index number of the interface."
+        ::= { hwTADAlarmEntry 1 }
+
+
+    hwTADAlarmType  OBJECT-TYPE
+        SYNTAX  INTEGER{
+        auais(1),
+        b3tca(2),
+        lais(3),
+        lof(4),
+        lom(5),
+        lop(6),
+        los(7),
+        lrdi(8),
+        lrei(9),
+        oof(10),
+        pais(11),
+        prdi(12),
+        prei(13),
+        pplm(14),
+        rdool(15),
+        rrool(16),
+        sdbere(17),
+        sfbere(18),
+        trool(19),
+        puneq(20),
+        lcd(21),
+        wlnk(22),
+        oduais(23),
+        odulck(24),
+        oduoci(25),
+        otuais(26),
+        otuom(27),
+        otusdber(28),
+        otusfber(29),
+        pmbdi(30),
+        pmtim(31),
+        rlof(32),
+        rlos(33),
+        roof(34),
+        smbdi(35),
+        smiae(36),
+        smtim(37),
+        b1tca(38),
+        b2tca(39),
+        prefectca(40)
+        }
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION "Index number of the alarm. The range is from 1 to 39, corresponding to:
+        auais, b3tca, lais, lof, lom, lop, los, lrdi, lrei, oof, pais, prdi, prei, pplm, rdool,
+        rrool, sdbere, sfbere, trool, puneq, lcd, wlnk, oduais, odulck, oduoci, otuais, otulom,
+        otusdber, otusfber, pmbdi, pmtim, rlof, rlos, roof, smbdi, smiae, smtim, b1tca, b2tca, prefectca."
+        ::= { hwTADAlarmEntry 2 }
+        
+
+    hwTADAlarmIfDown  OBJECT-TYPE
+        SYNTAX  HWEnableValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Whether this alarm leads to interface down. In default lais, lof and los
+        are enabled to lead interface down."
+        ::= { hwTADAlarmEntry 3 }
+        
+        
+    hwTADAlarmLog  OBJECT-TYPE
+        SYNTAX  HWEnableValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Whether this alarm will be logged. In default all alarm types won't be logged."
+        DEFVAL      { disable }
+        ::= { hwTADAlarmEntry 4 }
+
+    
+    hwTADAlarmStatus  OBJECT-TYPE
+        SYNTAX  INTEGER{
+        up(1),
+        down(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "The status of the alarm. 1 means alarm is up, 2 means alarm is down."
+        ::= { hwTADAlarmEntry 5 }
+        
+             
+    hwTADAlarmInFilter OBJECT-TYPE
+        SYNTAX  INTEGER {
+        in(1),
+        out(2)
+        } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   "Whether this alarm is in filtering status. 1 means alarm is in filtering status,
+        2 means alarm isn't in filtering status."
+        ::= { hwTADAlarmEntry 6 }
+        
+        
+    hwTADAlarmFigure OBJECT-TYPE
+        SYNTAX  DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   "This figure is used to evaluate the stability of the alarm. Large
+        value means un-stability."
+        ::= { hwTADAlarmEntry 7 }
+        
+    
+    hwTADAlarmInSuppress OBJECT-TYPE
+        SYNTAX  INTEGER{
+        suppressed(1),
+        unsuppressed(2)
+        } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   "Whether this alarm is in suppressing status. 1 means alarm is
+        in suppressing status, 2 means alarm isn't in suppressing status."
+        ::= { hwTADAlarmEntry 8 }       
+
+   
+    hwTADAlarmFlappingCount OBJECT-TYPE
+        SYNTAX  Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   "How many times alarm's status changed."
+        ::= { hwTADAlarmEntry 9 }          
+
+
+    hwTADAlarmSuppressCount OBJECT-TYPE
+        SYNTAX  Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION   "How many times alarm is suppressed."
+        ::= { hwTADAlarmEntry 10 }  
+
+        
+-- ==================================================================
+-- HUAWEI-CUSTOM-DAMPING-MIB MIB - Conformance Information
+-- ==================================================================        
+        
+    hwTADConformance OBJECT IDENTIFIER ::= { hwTAD 2 }
+
+    hwTADGroups OBJECT IDENTIFIER ::= { hwTADConformance 1 }
+
+
+-- ==================================================================
+-- Units of conformance
+-- ==================================================================
+
+hwTADInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+        hwTADFilterEnable   ,
+        hwTADFilterExpireTime   ,
+        hwTADDampingEnable  ,
+        hwTADSuppress   ,
+        hwTADCeiling  ,
+        hwTADReuse   ,
+        hwTADDecayOk   ,
+        hwTADDecayNg   ,
+        hwTADResetStatistics   ,
+        hwTADResetTime   ,
+        hwTADB3tcaThreshold   ,
+        hwTADSdbereThreshold   ,
+        hwTADSfbereThreshold
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device level control
+        and status information for the interface."
+    ::= { hwTADGroups 1 }      
+           
+hwTADAlarmGroup OBJECT-GROUP
+    OBJECTS {
+        hwTADAlarmIfDown   ,
+        hwTADAlarmLog   ,
+        hwTADAlarmStatus   ,
+        hwTADAlarmInFilter   ,
+        hwTADAlarmFigure   ,
+        hwTADAlarmInSuppress  ,
+        hwTADAlarmFlappingCount  ,
+        hwTADAlarmSuppressCount  
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device level control
+        and status information for the alarm."
+    ::= { hwTADGroups 2 } 
+  
+hwTADCompliances OBJECT IDENTIFIER ::= { hwTADConformance 2 }  
+    hwTADCompliance MODULE-COMPLIANCE
+         STATUS current
+         DESCRIPTION
+            "The core compliance statement for all TAD implementations."
+         MODULE
+         MANDATORY-GROUPS  {
+             hwTADInterfaceGroup,
+             hwTADAlarmGroup
+         }
+         ::= { hwTADCompliances 1 }
+         
+END

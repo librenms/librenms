@@ -1,0 +1,1226 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+--FROM SNMP-FRAMEWORK-MIB; 
+-- RFC 2571  
+  
+--  These are from draft-ietf-ops-rfc2851-update-00.txt  
+--  You will have to work out the details with your own  
+--  compiler being because they are so new. 
+
+     
+--equalLogic   OBJECT IDENTIFIER ::= { enterprises 12740 } 
+-- assigned by IANA to EqualLogic.  
+EQLSTORAGEPOOL-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, Integer32,TimeTicks,  enterprises, IpAddress 
+            FROM SNMPv2-SMI  
+    DateAndTime, RowPointer       
+            FROM SNMPv2-TC
+    TruthValue, RowStatus, DisplayString    
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqlGroupId, eqlStorageGroupAdminAccountIndex, UTFString, eqlLdapLoginAccessName, eqlLdapLoginAccessType, eqlStorageGroupAdminAccountName
+            FROM EQLGROUP-MIB;
+
+eqlStoragePoolModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Equallogic Inc. Storage Array volume information 
+
+        Copyright (c) 2002-2011 by Dell, Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell, Inc.  This software embodies proprietary information 
+        and trade secrets of Dell, Inc. 
+        "
+
+    -- Revision history, in reverse chronological order
+    REVISION    "200503170000Z"         -- 05-Mar-17
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 16 }     
+
+
+eqlStoragePoolObjects OBJECT IDENTIFIER ::=  { eqlStoragePoolModule 1 }   
+eqlStoragePoolNotifications OBJECT IDENTIFIER ::= { eqlStoragePoolModule 2 }   
+eqlStoragePoolConformance OBJECT IDENTIFIER ::=  { eqlStoragePoolModule 3 } 
+     
+--***********************************************************************************
+-- Textual conventions
+--
+-- If adding entries here, also update the file mibconv.c !!!
+
+SiteIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "This textual convention defines a greater
+            than zero value used to identify an external group
+            operating autonomously from the local group."
+    SYNTAX       Integer32 (1..2147483647)
+
+SiteIndexOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "This textual convention is an extension of the
+            SiteIndex convention.  The latter defines a greater
+            than zero value used to identify an external group
+            operating autonomously from the local group. This extension permits the
+            additional value of zero.  the value zero is object-specific
+            and must therefore be defined as part of the description of
+            any object which uses this syntax.  Examples of the usage of
+            zero might include situations where the site is unknown or not 
+            relevant"
+    SYNTAX       Integer32 (0..2147483647)
+
+Unsigned64 ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+           "A non-negative 64-bit bit integer, without counter
+            semantics."
+       SYNTAX Counter64
+
+
+PoolQuotaType ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT       "d"
+       STATUS              current
+       DESCRIPTION        "The format of the adminQuota value:
+                            0 - Unlimited quota,
+                            1 - Size in Megabytes."               
+       SYNTAX              INTEGER  {
+                                none(0),
+                                size(1)  
+                            }
+
+StatusEnabledDefault ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT       "d"
+       STATUS              current
+       DESCRIPTION        "This textual convention can be used to define a status 
+                           of enabled or disabled. The value 0 is assigned to enabled"
+
+       SYNTAX              INTEGER  {
+                            enabled (0),
+                            disabled (1)
+                            }
+
+--***********************************************************************************
+
+
+eqlStoragePoolTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStoragePoolEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Storage Pool Table.
+                     This table contains a list of storage pools in a group and their attributes." 
+    ::=    { eqlStoragePoolObjects 1 }     
+
+
+eqlStoragePoolEntry OBJECT-TYPE      
+    SYNTAX          EqlStoragePoolEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing storage pool info."
+    INDEX           { eqlGroupId, eqlStoragePoolIndex }
+    ::=   { eqlStoragePoolTable 1}     
+
+EqlStoragePoolEntry ::= 
+    SEQUENCE { 
+        eqlStoragePoolIndex                                Unsigned32,
+        eqlStoragePoolRowStatus                            RowStatus,
+        eqlStoragePoolName                                 UTFString,
+        eqlStoragePoolDefaultFlag                          TruthValue,
+        eqlStoragePoolRAIDConfigWaitFlag                   TruthValue,
+        eqlStoragePoolShouldEvalMask                       Unsigned32,
+        eqlStoragePoolLastBalance                          Unsigned32,
+        eqlStoragePoolDescription                          DisplayString,
+        eqlStoragePoolLeadMemberId                         Unsigned32,
+        eqlStoragePoolUUID                                 OCTET STRING,
+        eqlStoragePoolExecMergeTo                          Unsigned32,
+        eqlStoragePoolBorrow                               StatusEnabledDefault,
+		eqlStoragePoolSnapTrimThreshold                    Unsigned32,
+		eqlStoragePoolSnapTrimBuffer                       Counter64,
+        eqlStoragePoolSnapTrimmerHWMLifeTime               Integer32,
+        eqlStoragePoolSnapTrimmerBorrowInfoRefreshInterval Integer32,
+        eqlStoragePoolDefaultCompressionStrategy           INTEGER,
+        eqlStoragePoolDefaultCompressionMinSnapDelay       Integer32,
+        eqlStoragePoolDefaultCompressionMinSnapAge         Integer32,
+        eqlStoragePoolSnapMemberTrimThresholdAmount        Counter64,
+        eqlStoragePoolSnapTrimRecheckTimer                 Unsigned32
+     }
+
+eqlStoragePoolIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies a unique index for identifying a storage pool."
+    ::= { eqlStoragePoolEntry 1 }
+
+eqlStoragePoolRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlStoragePoolEntry 2 }  
+
+eqlStoragePoolName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (1..64))    
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies a user friendly name for a storage pool.
+                     The name must be unique within a group.
+                     The name must not contain spaces or special characters.
+                     The name can be up to 64 characters in length."
+    DEFVAL           { "default" }
+    ::=  {  eqlStoragePoolEntry 3 }  
+
+eqlStoragePoolDefaultFlag OBJECT-TYPE      
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field specifies if this storage pool is the default pool.  TRUE == default pool."
+    DEFVAL          { true }
+    ::=  {  eqlStoragePoolEntry 4 } 
+
+eqlStoragePoolRAIDConfigWaitFlag OBJECT-TYPE      
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current      
+    DESCRIPTION     "This field specifies if the system should wait for a 
+                     configured RAID-set before allowing volumes to be
+                     created."
+    DEFVAL          { false }
+    ::=  {  eqlStoragePoolEntry 5 } 
+
+eqlStoragePoolShouldEvalMask OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies one or more reasons (32-bit mask) the pool should be evaluated."
+    ::=  {  eqlStoragePoolEntry 6 } 
+          
+eqlStoragePoolLastBalance OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only 
+    STATUS          current      
+    DESCRIPTION     "This field specifies a timestamp of the last time the pool was balanced."
+    ::=   { eqlStoragePoolEntry 7 }
+
+eqlStoragePoolDescription OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE(0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field contains a description of the storage pool."
+    ::=  {  eqlStoragePoolEntry 8 }
+
+eqlStoragePoolLeadMemberId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION     "This field is deprecated and will be unsupported in the next release."
+    ::=  {  eqlStoragePoolEntry 9 }
+
+eqlStoragePoolUUID OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (16))     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY 
+                     This field is for internal use only."  
+    ::=  { eqlStoragePoolEntry 10 }
+
+eqlStoragePoolExecMergeTo OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field, when non-zero, specifies the index of the storage pool that this pool is being merged into."
+    ::= { eqlStoragePoolEntry 11 }
+
+
+eqlStoragePoolBorrow OBJECT-TYPE
+    SYNTAX          StatusEnabledDefault
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies if borrowing is enabled for this pool."
+    DEFVAL          { enabled }
+    ::= { eqlStoragePoolEntry 12 }
+
+eqlStoragePoolSnapTrimThreshold OBJECT-TYPE      
+    SYNTAX          Unsigned32 (0..100)
+    UNITS           "%"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies the threshold % of the pool capacity that indicates when to begin trimming."
+    DEFVAL          { 100 }
+    ::= { eqlStoragePoolEntry 13 }
+
+eqlStoragePoolSnapTrimBuffer OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies how far below the SnapTrimThreshold to trim in MB."
+    DEFVAL          { 600 }
+    ::= { eqlStoragePoolEntry 14 }
+
+eqlStoragePoolSnapTrimmerHWMLifeTime OBJECT-TYPE      
+    SYNTAX          Integer32
+    UNITS           "secs"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field defines the amount of time (in secs) that the trimmer will use Volume
+                     In Use HWM to calculate the borrowed space for the thin volume. Default is 10 days "
+    DEFVAL          { 864000 }
+    ::= { eqlStoragePoolEntry 15 }
+
+eqlStoragePoolSnapTrimmerBorrowInfoRefreshInterval OBJECT-TYPE      
+    SYNTAX          Integer32
+    UNITS           "secs"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field defines the amount of time (in secs) after which 
+                     the snap trimmer will attempt to refresh its borrow information "
+    DEFVAL          { 60 }
+    ::= { eqlStoragePoolEntry 16 }
+
+eqlStoragePoolDefaultCompressionStrategy  OBJECT-TYPE
+    SYNTAX            INTEGER {
+                                automatic(0),  -- Allow system to determine which snapshots to compress.
+                                always(1), -- Immediately mark all snapshots as compressible.
+                                never(2) -- Never mark snapshots as compressible.
+    }
+    MAX-ACCESS        read-create
+    STATUS            current      
+    DESCRIPTION       "Default value for how compression for snapshots should be set if not specified."
+    DEFVAL            { automatic }
+    ::=   { eqlStoragePoolEntry 17 }
+
+eqlStoragePoolDefaultCompressionMinSnapDelay  OBJECT-TYPE      
+    SYNTAX          Integer32 
+    UNITS           "minutes"
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     
+          " 
+            The value of this object represents how long to wait prior
+            to marking a snapshot as eligible for automatic compression.
+            Current default is 10 minutes.
+          "
+    DEFVAL          { 10 }
+    ::=  {  eqlStoragePoolEntry 18 }
+
+eqlStoragePoolDefaultCompressionMinSnapAge  OBJECT-TYPE      
+    SYNTAX          Integer32 
+    UNITS           "minutes"
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     
+          " 
+            The value of this object represents the minimum amout of time
+            a snapshot is expected to kept around in order to be marked
+            for automatic compression.  Current default is 23 hours.
+          "
+    DEFVAL          { 1380 }
+    ::=  {  eqlStoragePoolEntry 19 }
+
+eqlStoragePoolSnapMemberTrimThresholdAmount OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "
+                     This field specifies the per member trimming threshold used by the trimmer in MB.
+                     The default value of 204800 MB (200 GB) represents the minimum value for this field.
+                    "
+    DEFVAL          { 204800 }
+    ::= { eqlStoragePoolEntry 20 }
+
+eqlStoragePoolSnapTrimRecheckTimer OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    UNITS           "secs"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "
+                     This field defines the interval (in seconds) that will be used to determine if
+                     trimming needs to occur.
+                    "
+    DEFVAL          { 20 }
+    ::= { eqlStoragePoolEntry 21 }
+
+
+---*************************************************************  
+
+eqlStoragePoolStatsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStoragePoolStatsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Storage Pool Statistics Table.
+                     This table contains a list of pools in a group and their statistics." 
+    ::=    { eqlStoragePoolObjects 2 }     
+
+
+eqlStoragePoolStatsEntry OBJECT-TYPE      
+    SYNTAX          EqlStoragePoolStatsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing storage pool stats."
+    AUGMENTS        { eqlStoragePoolEntry }
+    ::=   { eqlStoragePoolStatsTable 1}     
+
+EqlStoragePoolStatsEntry ::= 
+    SEQUENCE { 
+        eqlStoragePoolStatsSpace                Counter64,
+        eqlStoragePoolStatsSpaceUsed            Counter64,      
+        eqlStoragePoolStatsFreeSpace            Counter64,
+        eqlStoragePoolStatsReplicationSpace     Counter64,      
+        eqlStoragePoolStatsReplicationSpaceUsed Counter64,      
+        eqlStoragePoolStatsReplicationFreeSpace Counter64,      
+        eqlStoragePoolStatsMemberNumOnline      Integer32,      
+        eqlStoragePoolStatsMemberCount          Integer32,
+        eqlStoragePoolStatsSnapshotReserved     Counter64,
+        eqlStoragePoolStatsSnapshotUsed         Counter64,
+        eqlStoragePoolStatsSnapshotNumInUse     Integer32,
+        eqlStoragePoolStatsSnapshotNumOnline    Integer32,
+        eqlStoragePoolStatsSnapshotCount        Integer32,
+        eqlStoragePoolStatsVolumeNumInUse       Integer32,
+        eqlStoragePoolStatsVolumeNumOnline      Integer32,
+        eqlStoragePoolStatsVolumeCount          Integer32,
+        eqlStoragePoolStatsDelegatedSpace       Counter64,
+        eqlStoragePoolStatsDelegatedSpaceUsed   Counter64,
+        eqlStoragePoolStatsMembersInUse         Integer32,
+        eqlStoragePoolStatsVolumeSubscribed     Counter64,
+        eqlStoragePoolStatsVolumeSpaceAllocated Counter64,
+        eqlStoragePoolStatsFailbackSpace        Counter64,
+        eqlStoragePoolStatsThinProvFreeSpace    Counter64,
+        eqlStoragePoolStatsConnectionCount      Integer32,
+        eqlStoragePoolStatsSnapshotResvFreeSpace Counter64,
+        eqlStoragePoolStatsVirtualVolumeNumInUse       Integer32,
+        eqlStoragePoolStatsVirtualVolumeNumOnline      Integer32,
+        eqlStoragePoolStatsSnapshotResvBorrowing    Counter64,
+        eqlStoragePoolStatsFreeSpaceBorrowing       Counter64,
+        eqlStoragePoolStatsAvailableForBorrowing    Counter64,
+        eqlStoragePoolStatsRecoverableVolBorrowing  Counter64,
+        eqlStoragePoolStatsActualFreeSpace          Counter64,
+        eqlStoragePoolStatsTotalSpaceBorrowing      Counter64, 
+        eqlStoragePoolStatsSnapShotBorrowing        Counter64,
+        eqlStoragePoolStatsStorageContainerCount    Integer32, 
+        eqlStoragePoolStatsStorageContainerSpaceReserved Counter64,
+        eqlStoragePoolStatsCompressedSpaceUsed      Counter64,
+        eqlStoragePoolStatsVirtualSpaceSize         Counter64,
+        eqlStoragePoolStatsStorageContainerVolumeCount Integer32,
+        eqlStoragePoolStatsStorageContainerSnapCount Integer32,
+        eqlStoragePoolStatsStorageContainerVolumesOnline Integer32        
+    }
+
+eqlStoragePoolStatsSpace OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space comprises this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 1 }
+
+eqlStoragePoolStatsSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the space used by volumes in this pool. The value is represented in MB.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 2 }
+
+eqlStoragePoolStatsFreeSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is available in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 3 }
+
+eqlStoragePoolStatsReplicationSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is allocated for replication in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 4 }
+
+eqlStoragePoolStatsReplicationSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is currently utilized by replication in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 5 }
+
+eqlStoragePoolStatsReplicationFreeSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is available to replication in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 6 }
+
+eqlStoragePoolStatsMemberNumOnline OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many members are online in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 7 }
+
+eqlStoragePoolStatsMemberCount OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many total members are in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 8 }
+
+eqlStoragePoolStatsSnapshotReserved OBJECT-TYPE      
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of snapshot space is reserved in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 9 }
+
+eqlStoragePoolStatsSnapshotUsed OBJECT-TYPE      
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of snapshot space is currently utilized in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 10 }
+
+eqlStoragePoolStatsSnapshotNumInUse OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many snapshots are currently in use in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 11 }
+
+eqlStoragePoolStatsSnapshotNumOnline OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many snapshots are online in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 12 }
+
+eqlStoragePoolStatsSnapshotCount OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many total snapshots are in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 13 }
+
+eqlStoragePoolStatsVolumeNumInUse OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many volumes are currently in use in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 14 }
+
+eqlStoragePoolStatsVolumeNumOnline OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many volumes are online in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 15 }
+
+eqlStoragePoolStatsVolumeCount OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many total volumes are in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 16 }
+
+eqlStoragePoolStatsDelegatedSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total delegated space for partners in this pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 17 }
+
+
+eqlStoragePoolStatsDelegatedSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total delegated space used by partners in this pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 18 }
+
+eqlStoragePoolStatsMembersInUse OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total members of online+offline members in this group.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 19 }
+
+eqlStoragePoolStatsVolumeSubscribed OBJECT-TYPE      
+    SYNTAX          Counter64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total subscribed space for all volumes in this pool. For a thin provisioned volume, 
+                     subscribed space is the advertised space. For a regular volume, subscribed space is the volume size.
+                     The value of this field will be equal to sum of eqliscsiVolumeSize field for all volumes in this pool."
+    ::=  { eqlStoragePoolStatsEntry 20 }
+
+eqlStoragePoolStatsVolumeSpaceAllocated OBJECT-TYPE      
+    SYNTAX          Counter64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents the sum of actual materialized pages for all volumes in the pool."
+    ::=  { eqlStoragePoolStatsEntry 21 }
+
+eqlStoragePoolStatsFailbackSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field represents the amount of space consumed by fail-back replicasets in this pool."
+    ::=  { eqlStoragePoolStatsEntry 22 }
+
+eqlStoragePoolStatsThinProvFreeSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field represents the amount of space available for Thin Provisioned Volumes in this pool."
+    ::=  { eqlStoragePoolStatsEntry 23 }
+
+eqlStoragePoolStatsConnectionCount OBJECT-TYPE      
+    SYNTAX          Integer32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field gives the number of iSCSI connections that are currently connected to volumes in this pool."
+    ::=  { eqlStoragePoolStatsEntry 24 }
+
+eqlStoragePoolStatsSnapshotResvFreeSpace OBJECT-TYPE      
+    SYNTAX          Counter64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is available to Snapshots in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 25 }
+
+eqlStoragePoolStatsVirtualVolumeNumInUse OBJECT-TYPE      
+    SYNTAX          Integer32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  { eqlStoragePoolStatsEntry 26 }
+
+eqlStoragePoolStatsVirtualVolumeNumOnline OBJECT-TYPE      
+    SYNTAX          Integer32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=  { eqlStoragePoolStatsEntry 27 }
+
+eqlStoragePoolStatsSnapshotResvBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64   
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the amount of free snapshot reserve that is being borrowed against by other volumes 
+                     for either Recoverable Volumes or snapshots"
+    ::=  { eqlStoragePoolStatsEntry 28 }
+
+eqlStoragePoolStatsFreeSpaceBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the amount of free space that is being borrowed against by volumes for 
+                     either Recoverable Volumes or snapshots"
+    ::=  { eqlStoragePoolStatsEntry 29 }
+
+eqlStoragePoolStatsAvailableForBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is still avaiable in this storage pool to borrow against."
+    ::=  { eqlStoragePoolStatsEntry 30 }
+
+eqlStoragePoolStatsRecoverableVolBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of free space (in MB) 
+                     that soft-deleted (i.e. recoverable) volumes are consuming
+                     in this pool.  Recoverable volumes are permanently deleted
+                     by the array whenever the free space that they occupy is
+                     needed by the system."
+    ::=  { eqlStoragePoolStatsEntry 31 }
+
+eqlStoragePoolStatsActualFreeSpace OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the actual free space (in MB) 
+                     that doesn't include soft-deleted (i.e. recoverable) volumes 
+                     or borrowed space"
+    ::=  { eqlStoragePoolStatsEntry 32 }
+
+eqlStoragePoolStatsTotalSpaceBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total space used for borrowing and includes
+                     Recoverable Volumes and Snapshots"
+    ::=  { eqlStoragePoolStatsEntry 33 }
+
+eqlStoragePoolStatsSnapShotBorrowing OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of borrowing for just snapshots"
+    ::=  { eqlStoragePoolStatsEntry 34 }
+
+eqlStoragePoolStatsStorageContainerCount OBJECT-TYPE      
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount number of storage containers in the pool"
+    ::=  { eqlStoragePoolStatsEntry 35 }
+
+eqlStoragePoolStatsStorageContainerSpaceReserved OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total amount of pool space allocated to storage containers. 
+                     The value is represented in MB. It is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 36 }
+
+eqlStoragePoolStatsCompressedSpaceUsed OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is currently utilized for compressed pages in this storage pool.   This is a dynamic value and cannot be set."
+    ::=  { eqlStoragePoolStatsEntry 37 }
+
+eqlStoragePoolStatsVirtualSpaceSize OBJECT-TYPE      
+    SYNTAX          Counter64
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space would be utilized by compressed pages in this pool if there was no compression."
+    ::=  { eqlStoragePoolStatsEntry 38 }
+
+ eqlStoragePoolStatsStorageContainerVolumeCount OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total volumes in storage containers within this this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 39 }
+
+ eqlStoragePoolStatsStorageContainerSnapCount OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total snapshots in storage containers within this this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 40 }
+
+ eqlStoragePoolStatsStorageContainerVolumesOnline OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates the total online volumes in storage containers within this storage 
+                     pool. This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolStatsEntry 41 }
+
+---*************************************************************  
+
+eqlStoragePoolAdminAccountTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStoragePoolAdminAccountEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Admin Account Storage Pool Table.
+                     This table contains a list of privilege matchings of administrative
+                     accounts and the pools those administrators have access to."
+    ::=    { eqlStoragePoolObjects 3 }     
+
+eqlStoragePoolAdminAccountEntry OBJECT-TYPE      
+    SYNTAX          EqlStoragePoolAdminAccountEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing mapping of administrative accounts and their
+                     pool access."
+    INDEX           { eqlGroupId, eqlStoragePoolIndex, eqlStorageGroupAdminAccountIndex }
+    ::=   { eqlStoragePoolAdminAccountTable 1}
+
+EqlStoragePoolAdminAccountEntry ::= 
+    SEQUENCE { 
+        eqlStoragePoolAdminAccountRowStatus      RowStatus,
+        eqlStoragePoolAdminAccountQuotaType      PoolQuotaType,
+        eqlStoragePoolAdminAccountQuota          Unsigned32
+    }
+
+eqlStoragePoolAdminAccountRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlStoragePoolAdminAccountEntry 1 }  
+
+eqlStoragePoolAdminAccountQuotaType OBJECT-TYPE
+    SYNTAX         PoolQuotaType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The format of the adminQuota value:
+                        0 - Unlimited quota,
+                        1 - Size in Megabytes.
+                    This field applies only to Volume Administrators."
+    ::=  {  eqlStoragePoolAdminAccountEntry 2 }
+
+eqlStoragePoolAdminAccountQuota OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the storage space quota (in MB) for a 
+                     Volume Administrator in the storage pool.  This field 
+                     applies only to Volume Administrators."  
+    ::= { eqlStoragePoolAdminAccountEntry 3 }  
+
+--******************************************************************
+
+eqlAdminAccountStoragePoolTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlAdminAccountStoragePoolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic table indicating the access an administrator
+                     has to a storage pool."
+    ::= { eqlStoragePoolObjects 4 }
+
+eqlAdminAccountStoragePoolEntry OBJECT-TYPE
+    SYNTAX          EqlAdminAccountStoragePoolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the access privilege."
+    INDEX           {  eqlGroupId, eqlStorageGroupAdminAccountIndex, eqlStoragePoolIndex }
+    ::=   { eqlAdminAccountStoragePoolTable 1 }
+
+EqlAdminAccountStoragePoolEntry ::=
+    SEQUENCE {
+        eqlAdminAccountStoragePoolAccess         INTEGER
+    }
+
+eqlAdminAccountStoragePoolAccess OBJECT-TYPE
+    SYNTAX          INTEGER {
+                         read-only (1),
+                         read-write (2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The administrative permission to a storage pool."
+    ::=   { eqlAdminAccountStoragePoolEntry 1 }
+
+--******************************************************************
+    
+eqlStoragePoolOpsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlStoragePoolOpsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "EqualLogic-Persistent Storage Pool Operations Table."
+    ::=  {  eqlStoragePoolObjects 5 }
+    
+eqlStoragePoolOpsEntry OBJECT-TYPE
+    SYNTAX        EqlStoragePoolOpsEntry
+    MAX-ACCESS    not-accessible  
+    STATUS        current  
+    DESCRIPTION   "An entry (row) containing storage pool configuration"
+    INDEX  { eqlGroupId, eqlStoragePoolIndex, eqlStoragePoolOpsIndex } 
+    ::=    { eqlStoragePoolOpsTable 1 }
+    
+EqlStoragePoolOpsEntry ::=
+    SEQUENCE {
+        eqlStoragePoolOpsIndex                       Unsigned32,
+        eqlStoragePoolOpsRowStatus                   RowStatus,
+        eqlStoragePoolOpsOperation                   INTEGER,
+        eqlStoragePoolOpsStoragePoolDestinationIndex Unsigned32
+    }                
+    
+eqlStoragePoolOpsIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible  
+    STATUS          current
+    DESCRIPTION     "This field unique identifies an operation withing a storage pool."
+    ::=  {  eqlStoragePoolOpsEntry 1 }
+    
+eqlStoragePoolOpsRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used indicate the status of this entry."
+    ::= { eqlStoragePoolOpsEntry 2 }
+    
+eqlStoragePoolOpsOperation OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        delete(1)   
+    }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "The current operation for this drive group
+                        0 - no operation
+                        1 - delete/merge"
+    ::=  {  eqlStoragePoolOpsEntry 3 }
+
+eqlStoragePoolOpsStoragePoolDestinationIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field unique identifies the destination Storage Pool."
+    DEFVAL          { 1 }
+    ::=  {  eqlStoragePoolOpsEntry 4 }
+
+---*************************************************************
+
+eqlStoragePoolAdminAccountStatsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlStoragePoolAdminAccountStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current  
+    DESCRIPTION     "EqualLogic-Dynamic Storage Pool Admin Account Statistics Table.
+                     This table contains a list of pools in a group and their statistics."
+    ::=    { eqlStoragePoolObjects 6 } 
+    
+    
+eqlStoragePoolAdminAccountStatsEntry OBJECT-TYPE
+    SYNTAX          EqlStoragePoolAdminAccountStatsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing storage pool admin account stats."
+    AUGMENTS        { eqlStoragePoolAdminAccountEntry }
+    ::=   { eqlStoragePoolAdminAccountStatsTable 1}
+    
+EqlStoragePoolAdminAccountStatsEntry ::=
+    SEQUENCE {      
+        eqlStorageAdminAccountPoolStatsQuota                 Unsigned64,
+        eqlStorageAdminAccountPoolStatsQuotaUsed             Unsigned64,
+        eqlStorageAdminAccountPoolStatsQuotaAvailable        Unsigned64,
+        eqlStorageAdminAccountPoolStatsSnapshotReserved      Unsigned64,
+        eqlStorageAdminAccountPoolStatsSnapshotUsed          Unsigned64,
+        eqlStorageAdminAccountPoolStatsSnapshotSubscribed    Unsigned64,
+        eqlStorageAdminAccountPoolStatsSnapshotNumInUse      Integer32,
+        eqlStorageAdminAccountPoolStatsSnapshotNumOnline     Integer32,
+        eqlStorageAdminAccountPoolStatsSnapshotCount         Integer32,
+        eqlStorageAdminAccountPoolStatsVolumeNumInUse        Integer32,
+        eqlStorageAdminAccountPoolStatsVolumeNumOnline       Integer32,
+        eqlStorageAdminAccountPoolStatsVolumeCount           Integer32,
+        eqlStorageAdminAccountPoolStatsVolumeSubscribed      Unsigned64,
+        eqlStorageAdminAccountPoolStatsVolumeQuotaUsage      Unsigned64,
+        eqlStorageAdminAccountPoolStatsVolumeSpaceAllocated  Unsigned64,
+        eqlStorageAdminAccountPoolStatsFailbackSpace         Unsigned64,
+        eqlStorageAdminAccountPoolStatsFailbackSubscribed    Unsigned64,
+        eqlStorageAdminAccountPoolStatsThinProvFreeSpace     Unsigned64,
+        eqlStorageAdminAccountPoolStatsConnectionCount       Integer32,
+        eqlStorageAdminAccountPoolStatsSnapshotResvFreeSpace Unsigned64,
+        eqlStorageAdminAccountPoolStatsSpaceUsed             Unsigned64
+    }
+
+eqlStorageAdminAccountPoolStatsQuota OBJECT-TYPE      
+    SYNTAX          Unsigned64
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of quota comprises this storage pool for this account.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 1 }
+
+eqlStorageAdminAccountPoolStatsQuotaUsed OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the number of MB used by volumes in this pool for this account.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 2 }
+
+eqlStorageAdminAccountPoolStatsQuotaAvailable OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is available in this storage pool for this account.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 3 }
+
+eqlStorageAdminAccountPoolStatsSnapshotReserved OBJECT-TYPE      
+    SYNTAX          Unsigned64 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of snapshot space is reserved in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 4 }
+
+eqlStorageAdminAccountPoolStatsSnapshotUsed OBJECT-TYPE      
+    SYNTAX          Unsigned64 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of snapshot space is currently utilized in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 5 }
+
+eqlStorageAdminAccountPoolStatsSnapshotSubscribed OBJECT-TYPE      
+    SYNTAX          Unsigned64 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total subscribed space for all snapshots in this pool. For a snapshot of a 
+                     thin provisioned volume, subscribed space is the advertised space. For a snapshot of a classic volume, 
+                     subscribed space is the volume size.  This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 6 }
+
+eqlStorageAdminAccountPoolStatsSnapshotNumInUse OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many snapshots are currently in use in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 7 }
+
+eqlStorageAdminAccountPoolStatsSnapshotNumOnline OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many snapshots are online in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 8 }
+
+eqlStorageAdminAccountPoolStatsSnapshotCount OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many total snapshots are in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 9 }
+
+eqlStorageAdminAccountPoolStatsVolumeNumInUse OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many volumes are currently in use in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 10 }
+
+eqlStorageAdminAccountPoolStatsVolumeNumOnline OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many volumes are online in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 11 }
+
+eqlStorageAdminAccountPoolStatsVolumeCount OBJECT-TYPE      
+    SYNTAX          Integer32     
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field indicates how many total volumes are in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 12 }
+
+eqlStorageAdminAccountPoolStatsVolumeSubscribed OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total subscribed space for all volumes in this pool. For a thin provisioned volume, 
+                     subscribed space is the advertised space. For a regular volume, subscribed space is the volume size.
+                     The value of this field will be equal to sum of eqliscsiVolumeSize field for all volumes in this pool."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 13 }
+
+eqlStorageAdminAccountPoolStatsVolumeQuotaUsage OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total MB against the quota for all volumes in this pool. 
+                     The space contributed by a regular volume is its volume size.
+                     The sapce contributed by a thin provisioned volume is its max grow size."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 14 }
+
+eqlStorageAdminAccountPoolStatsVolumeSpaceAllocated OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "The value of this object represents the sum of actual materialized pages for all volumes in the pool."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 15 }
+
+eqlStorageAdminAccountPoolStatsFailbackSpace OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field represents the amount of space consumed by fail-back replicasets in this pool."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 16 }
+
+eqlStorageAdminAccountPoolStatsFailbackSubscribed OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the total subscribed space for failback for all volumes in this pool. For the failback 
+                     of a thin provisioned volume, subscribed space is the advertised space. For a failabck of a classic volume, 
+                     subscribed space is the volume size.  This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 17 }
+
+eqlStorageAdminAccountPoolStatsThinProvFreeSpace OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field represents the amount of space available for Thin Provisioned Volumes in this pool."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 18 }
+
+eqlStorageAdminAccountPoolStatsConnectionCount OBJECT-TYPE      
+    SYNTAX          Integer32   
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field gives the number of iSCSI connections that are currently connected to volumes in this pool."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 19 }
+
+eqlStorageAdminAccountPoolStatsSnapshotResvFreeSpace OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space is available to Snapshots in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 20 }
+
+eqlStorageAdminAccountPoolStatsSpaceUsed  OBJECT-TYPE      
+    SYNTAX          Unsigned64     
+    UNITS           "MB"
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies how many MB of space currently used by this account in this storage pool.
+                     This is a dynamic value, it is not Administrator setable."
+    ::=  { eqlStoragePoolAdminAccountStatsEntry 21 }
+
+--*************************************************************************************
+
+eqlLdapLoginAccessPoolTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlLdapLoginAccessPoolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Persistent Group LDAP login access group table. 
+                     For LDAP login access configured with volume-admin 
+                     this table stores the pool-quota information. For LDAP login access 
+                     configured with pool-admin privilege this tables stores the pools 
+                     that belong to the pool-admin" 
+    ::=  {  eqlStoragePoolObjects  7 }
+
+eqlLdapLoginAccessPoolEntry OBJECT-TYPE
+    SYNTAX          EqlLdapLoginAccessPoolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the configuration for the LDAP login access
+                     pool information."
+    INDEX           { eqlGroupId, eqlLdapLoginAccessType, eqlLdapLoginAccessName, eqlStoragePoolIndex }
+    ::=    { eqlLdapLoginAccessPoolTable 1 }
+
+EqlLdapLoginAccessPoolEntry ::=
+    SEQUENCE {
+        eqlLdapLoginAccessPoolQuotaType         PoolQuotaType,
+        eqlLdapLoginAccessPoolQuota             Unsigned32,
+        eqlLdapLoginAccessPoolQuotaRowStatus    RowStatus
+        }
+
+eqlLdapLoginAccessPoolQuotaType OBJECT-TYPE
+    SYNTAX         PoolQuotaType
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION    "The format of the adminQuota value:
+                        0 - Unlimited quota,
+                        1 - Size in Megabytes.
+                    This field applies only to the LDAP login access  
+                    that have Volume Admin Privilege."
+    ::=  {  eqlLdapLoginAccessPoolEntry 1 }
+
+eqlLdapLoginAccessPoolQuota OBJECT-TYPE
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the pool quota (in MB) for a 
+                     each Volume Administrator using the LDAP login access. 
+                     This field applies only to Volume Administrators."  
+    ::= { eqlLdapLoginAccessPoolEntry 2 }  
+
+eqlLdapLoginAccessPoolQuotaRowStatus OBJECT-TYPE  
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlLdapLoginAccessPoolEntry 3 }  
+
+--*************************************************************  
+
+eqlStoragePoolOperStatusTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlStoragePoolOperStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Storage Pool Operational Status Table.
+                     This table contains the list of operational status for each pool." 
+    ::=    { eqlStoragePoolObjects 8 }     
+
+
+eqlStoragePoolOperStatusEntry OBJECT-TYPE      
+    SYNTAX          EqlStoragePoolOperStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a storage pool operational status."
+    AUGMENTS        { eqlStoragePoolEntry }
+    ::=   { eqlStoragePoolOperStatusTable 1 }     
+
+EqlStoragePoolOperStatusEntry ::= 
+    SEQUENCE { 
+        eqlStoragePoolOperStatusCompression INTEGER 
+    }
+
+eqlStoragePoolOperStatusCompression OBJECT-TYPE      
+    SYNTAX          INTEGER
+    {
+        disabled(0),            -- Data reduction is not enabled on this pool.                          
+        enabled(1),             -- Pool is capable of performing data reduction.
+        paused(2),              -- Data reduction has been suspended on all capable pool members.
+        no-capable-hardware(3), -- No members capable of performing data reduction are in the pool.
+        no-capable-raid(4),     -- No data reduction RAID configurations exist on available members capable of performing data reduction.
+        unknown(5)              -- Could not determine status
+    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field the operational status of data optimization this pool."
+    ::=  { eqlStoragePoolOperStatusEntry 1 }
+
+--*************************************************************  
+
+END
+

@@ -1,0 +1,2017 @@
+HP-ICF-PIM DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, IpAddress, 
+        Integer32, Unsigned32, TimeTicks, Counter32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        TruthValue, RowStatus
+            FROM SNMPv2-TC
+        InterfaceIndex
+            FROM IF-MIB
+        pimComponentEntry, pimRPSetEntry, pimNeighborEntry, pimInterfaceEntry,
+        pimInterfaceIfIndex, pimRPSetComponent
+            FROM PIM-MIB
+        hpSwitch
+            FROM HP-ICF-OID 
+        InetAddressType, InetAddress, InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+        ipMRouteEntry, ipMRouteGroup, ipMRouteSource
+            FROM IPMROUTE-STD-MIB;
+
+    hpicfPimMIB MODULE-IDENTITY
+        LAST-UPDATED "201204120000Z"  -- April 12, 2012
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     extensions to the standard PIM MIB (RFC 2934)."
+
+        REVISION     "201204120000Z"  -- April 12, 2012
+        DESCRIPTION  "Added hpicfPimScalars to provide global counter data for
+                     PIM-SM Register messages and hpicfPimIfMessageCounterTable
+                     to provide per-interface totals for received, transmitted
+                     and dropped PIM protocol packets.
+                     Extended hpicfPimIfTable to provide more detail on PIM 
+                     enabled interfaces.
+                     Extended hpicfPimComponentTable to indicate next scheduled
+                     C-RP Advertisement message time.
+                     Extended hpicfPimStatRpfTable to provide more detail on RPF
+                     Overrides/Multicast Static Routes.
+                     Added hpicfPimVersion to provide the Version number of PIM
+                     on the router.
+                     Added hpicfPimStarGEntries and hpicfPimSGEntries to provide
+                     a count of the number of (*,G) and (S,G) entries in their 
+                     respective tables.
+                     Added hpicfPimMRouteTable to extend ipMRouteTable 
+                     (RFC 2932) to provide more detail on multicast forwarding
+                     table entries.
+                     Added hpicfPimNeighborTable, which extends pimNeighborTable
+                     (RFC 2934) to provide more detail on known PIM neighbor 
+                     routers.
+                     Added hpicfPimTotalNeighborCount to provide a count of all
+                     known PIM neighbors.
+                     Added hpicfPimUcastRouteTable to provide information on 
+                     unicast routing information used by PIM.
+                     Added hpicfPimJoinPruneTable to provide information on 
+                     Join-Prune protocol messages to be sent across the routers
+                     PIM interfaces.
+                     Added hpicfPimRPSetTable, which extends pimRPSetEntry 
+                     (RFC 2934) to provide more detail on PIM-SM RP->Group 
+                     mappings.
+                     Added hpicfPimUnackGraftsTable to provide information on
+                     sent-but-unacknowledged PIM-DM Graft messages."
+
+        REVISION     "201010040000Z"  -- October 4, 2010
+        DESCRIPTION  "Added hpicfPimStaticRpfTable to statically configure
+                     reverse path forwarding (RPF) override entries. This
+                     information is currently used in the PIM 
+                     sparse mode only."
+
+        REVISION     "201009010000Z"  -- September 1, 2010
+        DESCRIPTION  "Added hpicfPimRemoveConfig to disable PIM and
+                      remove its entire config schema from the switch.
+                      hpicfPimRemoveConfig to the
+                      hpicfhpicfPim object"
+
+        REVISION     "200508041619Z"  -- August 4, 2005
+        DESCRIPTION  "Added PIM-SM objects."
+
+        REVISION     "200406300000Z"  -- June 30, 2004
+        DESCRIPTION  "Initial revision."
+        ::= { hpSwitch 20 }
+
+-- **********************************************************************
+-- The PIM MIB Groups
+-- **********************************************************************
+
+    hpicfPimObjects     OBJECT IDENTIFIER ::= { hpicfPimMIB 1 }
+    hpicfPimTraps       OBJECT IDENTIFIER ::= { hpicfPimObjects 0 }
+    hpicfPim            OBJECT IDENTIFIER ::= { hpicfPimObjects 1 }
+    hpicfPimScalars     OBJECT IDENTIFIER ::= { hpicfPimObjects 2 }
+
+    hpicfPimConformance OBJECT IDENTIFIER ::= { hpicfPimMIB 2 }
+    hpicfPimGroups      OBJECT IDENTIFIER ::= { hpicfPimConformance 1 }
+    hpicfPimCompliances OBJECT IDENTIFIER ::= { hpicfPimConformance 2 }
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+    hpicfPimAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the PIM routing protocol
+                    on this router. Default is disabled."
+        DEFVAL      { disable }
+        ::= { hpicfPim 1 }
+
+    hpicfPimStateRefreshInterval OBJECT-TYPE
+        SYNTAX      Integer32 (10..300)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The interval between successive State Refresh
+                    messages originated by this router.
+                    Its default value is 60 seconds. The maximum value allowed
+                    in PIM for State Refresh interval will be 100."
+        DEFVAL { 60 } 
+        ::= { hpicfPim 2 } 
+
+    hpicfPimSPTThreshold OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Specifies a threshold for switching to the Shortest 
+                    Path Tree (SPT) on this router. If the object has 
+                    the special value of -1, the Shared Tree rooted to the
+                    Rendezvous Point (RP) will be used indefinitely on the 
+                    router. Default is -1."
+        DEFVAL { -1 }
+        ::= { hpicfPim 3 }
+
+    hpicfPimTrapControl OBJECT-TYPE
+        SYNTAX       BITS {
+                         neighborLoss(0),
+                         hardMrtFull(1),
+                         softMrtFull(2)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "Indicates whether the PIM-enabled router will generate
+                     SNMP traps for PIM events. The set bit means 'enabled'.
+
+                     - neighborLoss(0)
+                       This bit controls whether the notification trap is
+                       allowed to be sent when the neighbor timer expires
+                       and the router has no other neighbors on the same
+                       interface with a lower IP address than itself.
+
+                     - hardMrtFull(1)
+                       This bit controls whether the notification trap is
+                       allowed to be sent when the MRT table is full and
+                       the error has been originated by hardware.
+
+                     - softMrtFull(2)
+                       This bit controls whether the notification trap is
+                       allowed to be sent when the MRT table is full and
+                       the error has been originated by software."
+        ::= { hpicfPim 4 }
+
+-- **********************************************************************
+-- The PIM Static RP-Set Table
+-- **********************************************************************
+
+    hpicfPimStaticRPSetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimStaticRPSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The (conceptual) table containing statically 
+                    configured Rendezvous Points (RPs) for IP multicast 
+                    group mappings. This information is being used 
+                    in the PIM Sparse mode only."
+        ::= { hpicfPim 5 }
+
+    hpicfPimStaticRPSetEntry OBJECT-TYPE
+        SYNTAX      HpicfPimStaticRPSetEntry 
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry (row) in the hpicfPimStaticRPSetTable. 
+                    NOTE: the pimRPSetComponent is an index that uniquely 
+                    identifies the component. Each protocol instance 
+                    connected to a separate domain should have a different 
+                    index value."
+        INDEX      { pimRPSetComponent,
+                     hpicfPimStaticRPSetGroupAddress, 
+                     hpicfPimStaticRPSetGroupMask,
+                     hpicfPimStaticRPSetAddress }
+        ::= { hpicfPimStaticRPSetTable 1 }
+
+    HpicfPimStaticRPSetEntry ::= 
+        SEQUENCE {
+            hpicfPimStaticRPSetGroupAddress      IpAddress,
+            hpicfPimStaticRPSetGroupMask         IpAddress,
+            hpicfPimStaticRPSetAddress           IpAddress,
+            hpicfPimStaticRPSetOverride          TruthValue,
+            hpicfPimStaticRPSetRowStatus         RowStatus
+    }
+
+    hpicfPimStaticRPSetGroupAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP multicast group address which, when combined
+                    with hpicfPimStaticRPSetGroupMask, gives the group 
+                    prefix for which this entry contains information 
+                    about the statically configured RP."
+        ::= { hpicfPimStaticRPSetEntry 1 }
+
+    hpicfPimStaticRPSetGroupMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The multicast group address mask which, when combined 
+                    with hpicfPimStaticRPSetGroupAddress, gives the group 
+                    prefix for which this entry contains information about 
+                    the statically configured RP."
+        ::= { hpicfPimStaticRPSetEntry 2 }
+
+    hpicfPimStaticRPSetAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address of statically configured RP for the 
+                    given IP multicast group(s)."
+        ::= { hpicfPimStaticRPSetEntry 3 }
+
+    hpicfPimStaticRPSetOverride OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "If true, indicates that the router should ignore the 
+                    information learned by a BSR if there is a conflict 
+                    between the information this static entry contains and 
+                    the information that is learned by the BSR. 
+                    Default is false."
+        DEFVAL { false }
+        ::= { hpicfPimStaticRPSetEntry 4 }
+
+    hpicfPimStaticRPSetRowStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION "The status of this row, by which new entries may be 
+                    created, or old entries deleted from this table."
+        ::= { hpicfPimStaticRPSetEntry 5 }
+
+-- **********************************************************************
+-- The Extensions to the PIM Interface Table (RFC 2934)
+-- **********************************************************************
+
+    hpicfPimIfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the pimInterfaceTable."
+        ::= { hpicfPim 6 }
+
+    hpicfPimIfEntry OBJECT-TYPE
+        SYNTAX      HpicfPimIfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the pimInterfaceTable."
+        AUGMENTS    { pimInterfaceEntry }
+        ::= { hpicfPimIfTable 1 }
+
+    HpicfPimIfEntry ::=
+        SEQUENCE {
+            hpicfPimIfAddress                      IpAddress,
+            hpicfPimIfTrigHelloInterval            Integer32,
+            hpicfPimIfHelloHoldtime                Integer32,
+            hpicfPimIfLanPruneDelay                TruthValue,
+            hpicfPimIfPropagationDelay             Integer32,
+            hpicfPimIfOverrideInterval             Integer32,
+            hpicfPimIfGenerationID                 TruthValue,
+            hpicfPimIfJoinPruneHoldtime            Unsigned32,
+            hpicfPimIfGraftRetryInterval           Integer32,
+            hpicfPimIfMaxGraftRetries              Integer32,
+            hpicfPimIfSRTTLThreshold               Unsigned32,
+            hpicfPimIfLanDelayEnabled              TruthValue,
+            hpicfPimIfSRCapable                    TruthValue,
+            hpicfPimIfDRPriority                   Unsigned32,
+            hpicfPimIfNBRTimeout                   Integer32,
+            hpicfPimIfNBRCount                     Counter32,
+            hpicfPimIfNegotiatedPropagationDelay   TimeTicks,
+            hpicfPimIfNegotiatedOverrideInterval   TimeTicks,
+            hpicfPimIfAssertHoldInterval           Counter32,
+            hpicfPimIfNumRoutersNotUsingDRPriority Counter32,
+            hpicfPimIfNumRoutersNotUsingLanDelay   Counter32
+        }
+
+    hpicfPimIfAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This is copy of pimInterfaceAddress with read-create 
+                    access. PIM uses this source address to send its 
+                    protocol packets out on this interface. This address can 
+                    be set to one of IP addresses of the interface or 
+                    255.255.255.255 if the address is determined dynamically 
+                    based on the current IP configuration.
+                    The currently used source address is value of
+                    pimInterfaceAddress in the latter case."
+        ::= { hpicfPimIfEntry 1 }
+
+    hpicfPimIfTrigHelloInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (0..5)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The maximum time before a triggered PIM Hello message 
+                    is transmitted on this interface. Default is 5 seconds."
+        DEFVAL { 5 } 
+        ::= { hpicfPimIfEntry 2 } 
+
+    hpicfPimIfHelloHoldtime OBJECT-TYPE 
+        SYNTAX      Integer32 (17..1050) 
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value set in the Holdtime field of Hello messages 
+                    transmitted on this interface.  This should be 3.5 
+                    times the value of pimInterfaceHelloInterval. 
+                    Default is 105 seconds."
+        DEFVAL { 105 } 
+        ::= { hpicfPimIfEntry 3 } 
+
+    hpicfPimIfLanPruneDelay OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Turns the LAN Prune Delay options ON and OFF, on this
+                     interface. Default is true."
+        DEFVAL { true }
+        ::= { hpicfPimIfEntry 4 }
+
+    hpicfPimIfPropagationDelay OBJECT-TYPE 
+        SYNTAX      Integer32 (250..2000)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value inserted into the LAN Prune Delay field of a 
+                     LAN Prune Delay option on this interface. 
+                     Default is 500 milliseconds."
+        DEFVAL { 500 } 
+        ::= { hpicfPimIfEntry 5 }
+
+    hpicfPimIfOverrideInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (500..6000)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value inserted into the Override Interval field of 
+                     a LAN Prune Delay option on this interface. 
+                     Default is 2500 milliseconds."
+        DEFVAL { 2500 } 
+        ::= { hpicfPimIfEntry 6 } 
+
+    hpicfPimIfGenerationID OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Turns the Generation ID option ON and OFF, on this
+                      interface. Default is false."
+        DEFVAL { false } 
+        ::= { hpicfPimIfEntry 7 }
+
+    hpicfPimIfJoinPruneHoldtime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value inserted into the Holdtime field of a Join/
+                    Prune message sent on this interface.  The value should
+                    be 3.5 times pimInterfaceJoinPruneInterval.
+                    Default is 210 seconds."
+        DEFVAL { 210 }
+        ::= { hpicfPimIfEntry 8 }
+
+    hpicfPimIfGraftRetryInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (1..10)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The interval a PIM router waits for a Graft Ack before 
+                    re-sending a Graft on this interface. 
+                    Default is 3 seconds."
+        DEFVAL { 3 }
+        ::= { hpicfPimIfEntry 9 } 
+
+    hpicfPimIfMaxGraftRetries OBJECT-TYPE 
+        SYNTAX      Integer32 (1..10)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The maximum number of times this router will re-send a 
+                     Graft on this interface. Default is 2."
+        DEFVAL { 2 }
+        ::= { hpicfPimIfEntry 10 }
+
+    hpicfPimIfSRTTLThreshold OBJECT-TYPE 
+        SYNTAX      Unsigned32 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The Time To Live in a PIM-DM State Refresh message at
+                    which it is not forwarded on this interface. Default is 0."
+        DEFVAL { 0 }
+        ::= { hpicfPimIfEntry 11 }
+
+    hpicfPimIfLanDelayEnabled OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Evaluates to TRUE if all routers on this interface are
+                    using the LAN Prune Delay Option."
+        ::= { hpicfPimIfEntry 12 }
+
+    hpicfPimIfSRCapable OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Evaluates to TRUE if all routers on this interface are
+                    using the State Refresh Capable Option."
+        ::= { hpicfPimIfEntry 13 }
+
+    hpicfPimIfDRPriority OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The Designated Router Priority inserted into the DR
+                    priority option on this interface. Default is 1."
+        DEFVAL { 1 }
+        ::= { hpicfPimIfEntry 14 }
+
+    hpicfPimIfNBRTimeout OBJECT-TYPE
+        SYNTAX      Integer32 (60..8000)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Time interval after which the router will consider a 
+                    neighbor to not be present, if no PIM Hello messages
+                    arrived on the interface. Default is 180 seconds."
+        DEFVAL { 180 }
+        ::= { hpicfPimIfEntry 15 }
+
+    hpicfPimIfNBRCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Count."
+        ::= { hpicfPimIfEntry 16 }
+
+    hpicfPimIfNegotiatedPropagationDelay OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Negotiated PIM LAN/Propagation Delay (ms)."
+        ::= { hpicfPimIfEntry 17 }
+
+    hpicfPimIfNegotiatedOverrideInterval OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Negotiated PIM Override Interval (ms)."
+        ::= { hpicfPimIfEntry 18 }
+
+    hpicfPimIfAssertHoldInterval OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Assert Hold Interval (s)."
+        ::= { hpicfPimIfEntry 19 }
+
+    hpicfPimIfNumRoutersNotUsingDRPriority OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of routers on network not using DR priority."
+        ::= { hpicfPimIfEntry 20 }
+
+    hpicfPimIfNumRoutersNotUsingLanDelay OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of routers on network not using LAN Delay."
+        ::= { hpicfPimIfEntry 21 }
+
+
+-- **********************************************************************
+-- The Extensions to the PIM Component Table (RFC 2934)
+-- **********************************************************************
+
+    hpicfPimComponentTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimComponentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the pimComponentTable - the 
+                    (conceptual) table containing objects specific to a
+                    PIM domain. One row exists for each domain to which 
+                    the router is connected. Typically, a PIM-SM router 
+                    will be a member of exactly one domain, however, the 
+                    table also supports routers which may form a border 
+                    between two PIM-SM domains and do not forward Bootstrap 
+                    messages between them."
+        ::= { hpicfPim 7 }
+
+    hpicfPimComponentEntry OBJECT-TYPE
+        SYNTAX      HpicfPimComponentEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the pimComponentTable."
+        AUGMENTS    { pimComponentEntry }
+        ::= { hpicfPimComponentTable 1 }
+
+    HpicfPimComponentEntry ::=
+        SEQUENCE {
+            -- ------------------
+            -- read-write objects
+            -- ------------------
+            hpicfPimComponentCBSRAdminStatus        INTEGER,
+            hpicfPimComponentCBSRAddress            IpAddress,
+            hpicfPimComponentCBSRPriority           Integer32,
+            hpicfPimComponentCBSRHashMaskLength     Integer32,
+            hpicfPimComponentCBSRMessageInterval    Integer32,
+            hpicfPimComponentCRPPriority            Integer32,
+            -- ------------------
+            -- read-only objects
+            -- ------------------
+            hpicfPimComponentCRPAdvInterval         Unsigned32, 
+            hpicfPimComponentBSRPriority            Unsigned32,
+            hpicfPimComponentBSRHashMaskLength      Unsigned32,
+            hpicfPimComponentBSRUpTime              TimeTicks,
+            hpicfPimComponentBSRNextMessage         TimeTicks,
+            hpicfPimComponentCRPAdvTimer            TimeTicks
+            
+        }
+
+    hpicfPimComponentCBSRAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This objects specifies whether or not the router 
+                    configured to be a Candidate BSR for the local 
+                    PIM region. Default is disabled."
+        DEFVAL      { disable }
+        ::= { hpicfPimComponentEntry 1 }
+
+    hpicfPimComponentCBSRAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The IP address the Candidate BSR router will advertise 
+                    for the local PIM region."
+        ::= { hpicfPimComponentEntry 2 }
+
+    hpicfPimComponentCBSRPriority OBJECT-TYPE 
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The priority for Candidate BSR router. In BSR election
+                    process the candidate BSR with the highest (numerically 
+                    bigger) priority becomes the BSR. If the priority values 
+                    are the same, the router with the larger IP address is 
+                    the BSR. Default is 0."
+        DEFVAL { 0 }
+        ::= { hpicfPimComponentEntry 3 }
+
+    hpicfPimComponentCBSRHashMaskLength OBJECT-TYPE 
+        SYNTAX      Integer32 (1..128)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Specifies the length (in bits) of a multicast group
+                    address to use when mapping a group to one of the 
+                    candidate RPs from the RP-Set whose group-prefix 
+                    includes the group. The recommended value for IPv4 
+                    is 30, for IPv6 is 126. Default is 30."
+        DEFVAL { 30 }
+        ::= { hpicfPimComponentEntry 4 }
+
+    hpicfPimComponentCBSRMessageInterval OBJECT-TYPE 
+        SYNTAX      Integer32 (5..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "If this router is the elected BSR, this object 
+                    is the interval for sending (multicast out) periodic 
+                    Bootstrap (RP-Set) messages on all PIM SM interfaces.
+                    The acceptable range is 5-300. The default value of this
+                    object is 60 seconds."
+        DEFVAL { 60 }
+        ::= { hpicfPimComponentEntry 5 }
+
+    hpicfPimComponentCRPPriority OBJECT-TYPE 
+        SYNTAX      Integer32 (0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The priority for the Candidate RP for the local PIM 
+                    domain. Determines which Candidate RPs get selected by 
+                    the BSR to be in the RP Set. The smaller value means 
+                    the higher priority (a value of zero is the highest 
+                    possible priority). Default is 192."
+        DEFVAL { 192 }
+        ::= { hpicfPimComponentEntry 6 }
+
+    hpicfPimComponentCRPAdvInterval OBJECT-TYPE 
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The interval at which the Candidate RP transmits
+                    (unicast to the elected BSR) advertise messages in
+                    the local PIM domain."
+        ::= { hpicfPimComponentEntry 7 }
+
+    hpicfPimComponentBSRPriority OBJECT-TYPE 
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The priority of the Bootstrap Router (BSR) elected
+                    for the local PIM region."
+        ::= { hpicfPimComponentEntry 8 }
+
+    hpicfPimComponentBSRHashMaskLength OBJECT-TYPE 
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The hash mask length of the elected Bootstrap 
+                    Router (BSR)."
+        ::= { hpicfPimComponentEntry 9 }
+
+    hpicfPimComponentBSRUpTime OBJECT-TYPE 
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Length of time that the elected Bootstrap Router (BSR)
+                    has been up."
+        ::= { hpicfPimComponentEntry 10 }
+
+    hpicfPimComponentBSRNextMessage OBJECT-TYPE 
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Time in which the next bootstrap message is due from 
+                    the elected Bootstrap Router (BSR)."
+        ::= { hpicfPimComponentEntry 11 }
+
+    hpicfPimComponentCRPAdvTimer OBJECT-TYPE 
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Next scheduled Candidate RP Advertisement."
+        ::= { hpicfPimComponentEntry 12 }
+
+    hpicfPimRemoveConfig OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "PIM is halted.  This objects clears all existing PIM
+                    configuration, intializes the pim config to the default
+                    state.  SnmpGet on this will always return false.
+                    An SnmpSet of false has no effect."
+        DEFVAL      { false }
+        ::= { hpicfPim 8 }
+
+-- **********************************************************************
+-- HP PIM Static RPF Override table 
+-- **********************************************************************
+
+    hpicfPimStaticRpfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimStaticRpfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The (conceptual) table containing statically configured 
+                    reverse path forwarding (RPF) source address to interface 
+                    mappings. This information is currently used in the PIM 
+                    sparse mode only."
+        ::= { hpicfPim 9 }
+
+    hpicfPimStaticRpfEntry OBJECT-TYPE
+        SYNTAX      HpicfPimStaticRpfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A row in the hpicfPimStaticRpfTable."
+        INDEX       { hpicfPimStaticRpfSourceAddressType,
+                      hpicfPimStaticRpfSourceAddress,
+                      hpicfPimStaticRpfSourcePrefixLength,
+                      hpicfPimStaticRpfAddressType,
+                      hpicfPimStaticRpfAddress }
+        ::= { hpicfPimStaticRpfTable 1 }
+
+    HpicfPimStaticRpfEntry ::=
+        SEQUENCE {
+            hpicfPimStaticRpfSourceAddressType     InetAddressType,                       
+            hpicfPimStaticRpfSourceAddress         InetAddress,
+            hpicfPimStaticRpfSourcePrefixLength    InetAddressPrefixLength,
+            hpicfPimStaticRpfAddressType           InetAddressType,                       
+            hpicfPimStaticRpfAddress               InetAddress,
+            hpicfPimStaticRpfRowStatus             RowStatus,
+            hpicfPimStaticRpfOverrideState         INTEGER,	 
+            hpicfPimStaticRpfIfIndex               InterfaceIndex,
+            hpicfPimStaticRpfNeighborAddressType   InetAddressType,
+            hpicfPimStaticRpfNeighborAddress       InetAddress
+    }
+
+    hpicfPimStaticRpfSourceAddressType   OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address type of the statically configured 
+                    multicast source."
+        ::= { hpicfPimStaticRpfEntry 1}
+
+    hpicfPimStaticRpfSourceAddress   OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address of the statically configured 
+                    multicast source."
+        ::= { hpicfPimStaticRpfEntry 2}
+
+    hpicfPimStaticRpfSourcePrefixLength   OBJECT-TYPE
+        SYNTAX      InetAddressPrefixLength
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The prefix length of the statically 
+                    configured multicast source."
+        ::= { hpicfPimStaticRpfEntry 3}
+
+    hpicfPimStaticRpfAddressType   OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The type of RPF address for this route.
+                    The value of this object must be equal to a value
+                    appropriate for the corresponding instance of the
+                    hpicfPimStaticRpfSourceAddressType object."
+        ::= { hpicfPimStaticRpfEntry 4}
+
+    hpicfPimStaticRpfAddress   OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP address of the interface to use for RPF 
+                    checks."
+        ::= { hpicfPimStaticRpfEntry 5}
+
+    hpicfPimStaticRpfRowStatus      OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The status of this row, by which new entries may be 
+                    created, or old entries deleted from this table."
+        ::= { hpicfPimStaticRpfEntry 6}
+
+    hpicfPimStaticRpfOverrideState OBJECT-TYPE
+        SYNTAX INTEGER  { 
+            active(1),
+            inActive(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The state of this RPF override entry." 
+        ::= { hpicfPimStaticRpfEntry 7}
+
+    hpicfPimStaticRpfIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Index of the Interface towards the RPF neighbor."
+        ::= { hpicfPimStaticRpfEntry 8 }
+
+    hpicfPimStaticRpfNeighborAddressType   OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The IP address type of the statically configured 
+                     RPF neighbor."
+        ::= { hpicfPimStaticRpfEntry 9 }
+									  
+    hpicfPimStaticRpfNeighborAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The IP address of the static RPF Neighbor."
+        ::= { hpicfPimStaticRpfEntry 10 }
+
+-- **********************************************************************
+-- Sum total of entries in hpicfPimStaticRpfTable
+-- **********************************************************************
+
+    hpicfPimNumStaticRpfEntries OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Total number of Static RPF entries."
+        ::= { hpicfPim 10 }
+
+    hpicfPimVersion OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Currently running PIM Version."
+        ::= { hpicfPim 11 }
+
+    hpicfPimStarGEntries OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Total number of entries in the (*,G) table"
+        ::= { hpicfPim 12 }
+
+    hpicfPimSGEntries OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Total number of entries in the (S,G) table."
+        ::= { hpicfPim 13 }
+
+-- **********************************************************************
+-- Extensions to the ipMRouteEntry table (RFC 2932)
+-- **********************************************************************
+
+    hpicfPimMRouteTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimMRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to rfc2932's ipMRouteEntry table."
+        ::= { hpicfPim 14 }
+
+    hpicfPimMRouteEntry OBJECT-TYPE
+        SYNTAX      HpicfPimMRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in ipMRouteEntry."
+        AUGMENTS    { ipMRouteEntry }
+        ::= { hpicfPimMRouteTable 1 }
+
+    HpicfPimMRouteEntry ::=
+        SEQUENCE {
+            hpicfPimSendRegStop                 TruthValue,
+            hpicfPimSGSourceIsActive            TruthValue,
+            hpicfPimOutgoingRegisterIfAvailable TruthValue,
+            hpicfPimEntryAddSuccess             TruthValue,
+            hpicfPimNumOutgoingInterfaces       Counter32,
+            hpicfPimDirectlyConnectedSource     TruthValue,
+            hpicfPimNeighborSearchFailure       TruthValue,
+            hpicfPimRPTreePruneSent             TruthValue,
+            hpicfPimOnSPTree                    TruthValue,
+            hpicfPimRPToSPTreeSwitching         TruthValue,
+            hpicfPimWildcardEntry               TruthValue,
+            hpicfPimRPFPrimeNeighborAddressType InetAddressType,
+            hpicfPimRPFPrimeNeighborAddress     InetAddress,
+            hpicfPimNumDownstreams              Counter32
+        }
+
+    hpicfPimSendRegStop OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates that a register-stop message must be sent."
+        ::= { hpicfPimMRouteEntry 1 }
+
+    hpicfPimSGSourceIsActive OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates whether the multicast source 
+                     corresponding to the (S,G) is active."
+        ::= { hpicfPimMRouteEntry 2 }
+
+    hpicfPimOutgoingRegisterIfAvailable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates that a register outgoing 
+                     interface is available."
+        ::= { hpicfPimMRouteEntry 3 }
+
+    hpicfPimEntryAddSuccess OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates that an entry has been 
+                     successfully added."
+        ::= { hpicfPimMRouteEntry 4 }
+
+    hpicfPimNumOutgoingInterfaces OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "List of outgoing interfaces."
+        ::= { hpicfPimMRouteEntry 5 }
+
+    hpicfPimDirectlyConnectedSource OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Specifies PIM routing entries on routers
+                     directly connecting to the same subnet with the
+                     multicast source."
+        ::= { hpicfPimMRouteEntry 6 }
+
+    hpicfPimNeighborSearchFailure OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Specifies PIM routing entries with PIM
+                     neighbor searching failure."
+        ::= { hpicfPimMRouteEntry 7 }
+
+    hpicfPimRPTreePruneSent OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Specifies PIM routing entries on RPT branches
+                     where (S, G) prunes have been sent to the RP."
+        ::= { hpicfPimMRouteEntry 8 }
+
+    hpicfPimOnSPTree OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Specifies PIM routing entries on the SPT."
+        ::= { hpicfPimMRouteEntry 9 }
+
+    hpicfPimRPToSPTreeSwitching OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Specifies PIM routing entries in the process of
+                     RPT-to-SPT switchover."
+        ::= { hpicfPimMRouteEntry 10 }
+
+    hpicfPimWildcardEntry OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Specifies wildcard routing entries."
+        ::= { hpicfPimMRouteEntry 11 }
+
+    hpicfPimRPFPrimeNeighborAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "RPF Prime Neighbor address type"
+        ::= { hpicfPimMRouteEntry 12 }
+
+    hpicfPimRPFPrimeNeighborAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "RPF Prime Neighbor address"
+        ::= { hpicfPimMRouteEntry 13 }
+
+    hpicfPimNumDownstreams OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Total number of downstreams."
+        ::= { hpicfPimMRouteEntry 14 }
+
+-- **********************************************************************
+-- Sum total of the entries in hpicfPimNeighborTable
+-- **********************************************************************
+
+    hpicfPimTotalNeighborCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Count."
+        ::= { hpicfPim 15 }
+
+-- **********************************************************************
+-- Extensions to the PIM Neighbor Table	(RFC 2934)
+-- **********************************************************************
+
+    hpicfPimNeighborTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimNeighborEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the pimNeighborTable."
+        ::= { hpicfPim 16 }
+
+    hpicfPimNeighborEntry OBJECT-TYPE
+        SYNTAX      HpicfPimNeighborEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the pimNeighborTable."
+        AUGMENTS    { pimNeighborEntry }
+        ::= { hpicfPimNeighborTable 1 }
+
+    HpicfPimNeighborEntry ::=
+        SEQUENCE { 
+            hpicfPimNeighborDRPriority           Counter32,
+            hpicfPimNeighborGenerationIDValue    Counter32,
+            hpicfPimNeighborHoldtime             Counter32,
+            hpicfPimNeighborPropagationDelay     Counter32,
+            hpicfPimNeighborOverrideInterval     Counter32,
+            hpicfPimNeighborStateRefreshInterval Counter32
+        }
+
+    hpicfPimNeighborDRPriority OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Router's Designated Router Priority value."
+        ::= { hpicfPimNeighborEntry 1 }
+
+    hpicfPimNeighborGenerationIDValue OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Router's Generation ID value."
+        ::= { hpicfPimNeighborEntry 2 }
+
+    hpicfPimNeighborHoldtime OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Router's Hold Time value."
+        ::= { hpicfPimNeighborEntry 3 }
+
+    hpicfPimNeighborPropagationDelay OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Router's LAN Delay value."
+        ::= { hpicfPimNeighborEntry 4 }
+
+    hpicfPimNeighborOverrideInterval OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Router's Override Interval value."
+        ::= { hpicfPimNeighborEntry 5 }
+
+    hpicfPimNeighborStateRefreshInterval OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM Neighbor Router's State Refresh Interval value."
+        ::= { hpicfPimNeighborEntry 6 }
+
+
+-- **********************************************************************
+-- PIM-cached unicast routing data relevant to PIM operation.
+-- **********************************************************************
+
+    hpicfPimUcastRouteTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimUcastRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Cached Unicast Route related to PIM."
+        ::= { hpicfPim 17 }
+
+    hpicfPimUcastRouteEntry OBJECT-TYPE
+        SYNTAX      HpicfPimUcastRouteEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in pimUcastRouteTable."
+        INDEX      { hpicfPimUcastRouteAddressType,
+                     hpicfPimUcastRouteAddress,
+                     hpicfPimUcastRoutePrefix }
+        ::= { hpicfPimUcastRouteTable 1 }
+
+    HpicfPimUcastRouteEntry ::=
+        SEQUENCE { 
+            hpicfPimUcastRouteAddressType      InetAddressType,
+            hpicfPimUcastRouteAddress          InetAddress,
+            hpicfPimUcastRoutePrefix           Unsigned32,
+            hpicfPimUcastRouteIfIndex          InterfaceIndex,
+            hpicfPimUcastRouteUpstreamNbrType  InetAddressType,
+            hpicfPimUcastRouteUpstreamNbr      InetAddress,
+            hpicfPimUcastRouteProtocol         Unsigned32
+        }
+												  
+    hpicfPimUcastRouteAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Address family of a Unicast IP Address 
+                     of a Source or network."
+        ::= { hpicfPimUcastRouteEntry 1 }						
+
+    hpicfPimUcastRouteAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Unicast IP Address of a Source or network."
+        ::= { hpicfPimUcastRouteEntry 2 }
+
+    hpicfPimUcastRoutePrefix OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Network Prefix length in bits of the address."
+        ::= { hpicfPimUcastRouteEntry 3 }
+
+    hpicfPimUcastRouteIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Index of the Interface towards the source/network."
+        ::= { hpicfPimUcastRouteEntry 4 }
+
+    hpicfPimUcastRouteUpstreamNbrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Address type of the PIM neighbor on 
+                     Interface towards the source/network."
+        ::= { hpicfPimUcastRouteEntry 5 }
+													   
+    hpicfPimUcastRouteUpstreamNbr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Address of the PIM neighbor on the
+                     Interface towards the source/network."
+        ::= { hpicfPimUcastRouteEntry 6 }
+
+    hpicfPimUcastRouteProtocol OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Unicast routing protocol through which the route 
+                     was learned."
+        ::= { hpicfPimUcastRouteEntry 7 }
+
+
+-- **********************************************************************
+-- Per-interface / neighbor Join-Prune messages to be sent.
+-- **********************************************************************
+
+    hpicfPimJoinPruneTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimJoinPruneEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Info on Join-Prune messages to send"
+        ::= { hpicfPim 18 }
+
+    hpicfPimJoinPruneEntry OBJECT-TYPE
+        SYNTAX      HpicfPimJoinPruneEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in hpicfPimJoinPruneTable."
+        INDEX      { hpicfPimJoinPruneInterface, 
+                     hpicfPimJoinPruneInterfaceState,
+                     hpicfPimJoinPruneSourceType,
+                     hpicfPimJoinPruneSourceAddress,
+                     hpicfPimJoinPruneGroupType,
+                     hpicfPimJoinPruneGroupAddress }
+        ::= { hpicfPimJoinPruneTable 1 }
+
+    HpicfPimJoinPruneEntry ::=
+        SEQUENCE { 
+            hpicfPimJoinPruneInterface           InterfaceIndex,
+            hpicfPimJoinPruneInterfaceState      INTEGER,
+            hpicfPimJoinPruneSourceType          InetAddressType,
+            hpicfPimJoinPruneSourceAddress       InetAddress,
+            hpicfPimJoinPruneGroupType           InetAddressType,
+            hpicfPimJoinPruneGroupAddress        InetAddress,
+            hpicfPimJoinPruneNeighborAddressType InetAddressType,
+            hpicfPimJoinPruneNeighborAddress     InetAddress,
+            hpicfPimJoinPruneExpiryTime          Unsigned32
+        }
+
+    hpicfPimJoinPruneInterface OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Interface on which Join-Prune messages will be sent."
+        ::= { hpicfPimJoinPruneEntry 1 }
+
+    hpicfPimJoinPruneInterfaceState OBJECT-TYPE
+        SYNTAX     INTEGER {
+                     join (1),
+                     prune (2)
+        }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flag indicating a (S,G)/(*,G) join
+                     or (S,G,Rpt) prune."
+        ::= { hpicfPimJoinPruneEntry 2 }
+
+    hpicfPimJoinPruneSourceType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow source address type for a (S,G) join 
+                     or (S,G,Rpt) prune."
+        ::= { hpicfPimJoinPruneEntry 3 }
+
+    hpicfPimJoinPruneSourceAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow source address for a (S,G) join 
+                     or (S,G,Rpt) prune."
+        ::= { hpicfPimJoinPruneEntry 4 }
+
+    hpicfPimJoinPruneGroupType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow group address type for a (S,G)/(*,G) 
+                     join or (S,G,Rpt) prune."
+        ::= { hpicfPimJoinPruneEntry 5 }
+
+    hpicfPimJoinPruneGroupAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow group address for a (S,G)/(*,G) join 
+                     or (S,G,Rpt) prune."
+        ::= { hpicfPimJoinPruneEntry 6 }
+
+    hpicfPimJoinPruneNeighborAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM neighbor router address type towards the
+                     source/RP to which Join-Prune messages are sent."
+        ::= { hpicfPimJoinPruneEntry 7 }
+
+    hpicfPimJoinPruneNeighborAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIM neighbor router address towards the source/RP
+                     to which Join-Prune messages are sent."
+        ::= { hpicfPimJoinPruneEntry 8 }
+
+    hpicfPimJoinPruneExpiryTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Expiry time of sending Join-Prune messages."
+        ::= { hpicfPimJoinPruneEntry 9 }
+
+-- **********************************************************************
+-- HP Extensions to rfc2943 pimRPSetEntry 
+-- **********************************************************************
+
+    hpicfPimRPSetTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimRPSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Extensions to rfc2943's pimRPSetTable."
+        ::= { hpicfPim 19 }
+
+    hpicfPimRPSetEntry OBJECT-TYPE
+        SYNTAX      HpicfPimRPSetEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in pimUcastRouteTable."
+        AUGMENTS    { pimRPSetEntry }
+        ::= { hpicfPimRPSetTable 1 }
+
+    HpicfPimRPSetEntry ::=
+        SEQUENCE { 
+            hpicfPimRPSetPriority        Counter32,
+            hpicfPimRPSetUptime          TimeTicks
+        }
+
+    hpicfPimRPSetPriority OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "RP Set Priority."
+        ::= { hpicfPimRPSetEntry 1 }
+
+    hpicfPimRPSetUptime OBJECT-TYPE 
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Time RP has been up."
+        ::= { hpicfPimRPSetEntry 2 }
+
+-- **********************************************************************
+-- HP PIM per-interface counters
+-- **********************************************************************
+
+    hpicfPimIfMessageCounterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimIfMessageCounterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of per-interface message counters."
+        ::= { hpicfPim 20 }
+
+    hpicfPimIfMessageCounterEntry OBJECT-TYPE
+        SYNTAX      HpicfPimIfMessageCounterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in hpicfPimIfMessageCounterTable."
+        INDEX      { pimInterfaceIfIndex }
+        ::= { hpicfPimIfMessageCounterTable 1 }
+
+    HpicfPimIfMessageCounterEntry ::=
+        SEQUENCE { 
+            hpicfPimIfMsgCountAssertReceive    Counter32,
+            hpicfPimIfMsgCountAssertTransmit   Counter32,
+            hpicfPimIfMsgCountAssertInvalid    Counter32,
+            hpicfPimIfMsgCountGraftReceive     Counter32,
+            hpicfPimIfMsgCountGraftTransmit    Counter32,
+            hpicfPimIfMsgCountGraftInvalid     Counter32,
+            hpicfPimIfMsgCountGraftAckReceive  Counter32,
+            hpicfPimIfMsgCountGraftAckTransmit Counter32,
+            hpicfPimIfMsgCountGraftAckInvalid  Counter32,
+            hpicfPimIfMsgCountHelloReceive     Counter32,
+            hpicfPimIfMsgCountHelloTransmit    Counter32,
+            hpicfPimIfMsgCountHelloInvalid     Counter32,
+            hpicfPimIfMsgCountJPReceive        Counter32,
+            hpicfPimIfMsgCountJPTransmit       Counter32,
+            hpicfPimIfMsgCountJPInvalid        Counter32,
+            hpicfPimIfMsgCountSRReceive        Counter32,
+            hpicfPimIfMsgCountSRTransmit       Counter32,
+            hpicfPimIfMsgCountSRInvalid        Counter32,
+            hpicfPimIfMsgCountBSRReceive       Counter32,
+            hpicfPimIfMsgCountBSRTransmit      Counter32,
+            hpicfPimIfMsgCountBSRInvalid       Counter32,
+            hpicfPimIfMsgCountCRPReceive       Counter32,
+            hpicfPimIfMsgCountCRPTransmit      Counter32,
+            hpicfPimIfMsgCountCRPInvalid       Counter32
+
+        }
+
+    hpicfPimIfMsgCountAssertReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received Assert messages."
+        ::= { hpicfPimIfMessageCounterEntry 1 }
+
+    hpicfPimIfMsgCountAssertTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     transmitted Assert messages."
+        ::= { hpicfPimIfMessageCounterEntry 2 }
+
+    hpicfPimIfMsgCountAssertInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid 
+                     Assert messages received."
+        ::= { hpicfPimIfMessageCounterEntry 3 }
+
+    hpicfPimIfMsgCountGraftReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received Graft messages."
+        ::= { hpicfPimIfMessageCounterEntry 4 }
+
+    hpicfPimIfMsgCountGraftTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     transmitted Graft messages."
+        ::= { hpicfPimIfMessageCounterEntry 5 }
+
+    hpicfPimIfMsgCountGraftInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid 
+                     Graft messages received."
+        ::= { hpicfPimIfMessageCounterEntry 6 }
+
+    hpicfPimIfMsgCountGraftAckReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received Graft-Ack messages."
+        ::= { hpicfPimIfMessageCounterEntry 7 }
+
+    hpicfPimIfMsgCountGraftAckTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     transmitted Graft-Ack messages."
+        ::= { hpicfPimIfMessageCounterEntry 8 }
+
+    hpicfPimIfMsgCountGraftAckInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid 
+                     Graft-Ack messages received."
+        ::= { hpicfPimIfMessageCounterEntry 9 }
+
+    hpicfPimIfMsgCountHelloReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received HELLO messages."
+        ::= { hpicfPimIfMessageCounterEntry 10 }
+
+    hpicfPimIfMsgCountHelloTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     transmitted HELLO messages."
+        ::= { hpicfPimIfMessageCounterEntry 11 }
+
+    hpicfPimIfMsgCountHelloInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid
+                     HELLO messages received."
+        ::= { hpicfPimIfMessageCounterEntry 12 }
+
+    hpicfPimIfMsgCountJPReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received Join-Prune messages."
+        ::= { hpicfPimIfMessageCounterEntry 13 }
+
+    hpicfPimIfMsgCountJPTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     transmitted Join-Prune messages."
+        ::= { hpicfPimIfMessageCounterEntry 14 }
+
+    hpicfPimIfMsgCountJPInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid
+                     Join-Prune messages received."
+        ::= { hpicfPimIfMessageCounterEntry 15 }
+
+    hpicfPimIfMsgCountSRReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received State-Refresh messages."
+        ::= { hpicfPimIfMessageCounterEntry 16 }
+
+    hpicfPimIfMsgCountSRTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of transmitted
+                     State-Refresh messages."
+        ::= { hpicfPimIfMessageCounterEntry 17 }
+
+    hpicfPimIfMsgCountSRInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid
+                     State-Refresh messages received."
+        ::= { hpicfPimIfMessageCounterEntry 18 }
+
+    hpicfPimIfMsgCountBSRReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received BSR messages."
+        ::= { hpicfPimIfMessageCounterEntry 19 }
+
+    hpicfPimIfMsgCountBSRTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     transmitted BSR messages."
+        ::= { hpicfPimIfMessageCounterEntry 20 }
+
+    hpicfPimIfMsgCountBSRInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid
+                     BSR messages received."
+        ::= { hpicfPimIfMessageCounterEntry 21 }
+
+    hpicfPimIfMsgCountCRPReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     received Candidate-RP messages."
+        ::= { hpicfPimIfMessageCounterEntry 22 }
+
+    hpicfPimIfMsgCountCRPTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of 
+                     transmitted Candidate-RP messages."
+        ::= { hpicfPimIfMessageCounterEntry 23 }
+
+    hpicfPimIfMsgCountCRPInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Per-interface count of invalid
+                     Candidate-RP messages received."
+        ::= { hpicfPimIfMessageCounterEntry 24 }
+
+-- **********************************************************************
+-- HP 'display pim grafts' extension
+-- **********************************************************************
+
+    hpicfPimUnackGraftsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPimUnackGraftsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Information about unacknowledged graft messages on the network."
+        ::= { hpicfPim 21 }
+
+    hpicfPimUnackGraftsEntry OBJECT-TYPE
+        SYNTAX      HpicfPimUnackGraftsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in hpicfPimUnackGraftsTable."
+        INDEX      { hpicfPimUnackGraftSourceType, 
+                     hpicfPimUnackGraftSource,
+                     hpicfPimUnackGraftGroupType,
+                     hpicfPimUnackGraftGroup }
+        ::= { hpicfPimUnackGraftsTable 1 }
+
+    HpicfPimUnackGraftsEntry ::=
+        SEQUENCE { 
+            hpicfPimUnackGraftSourceType InetAddressType,
+            hpicfPimUnackGraftSource     InetAddress,
+            hpicfPimUnackGraftGroupType  InetAddressType,
+            hpicfPimUnackGraftGroup      InetAddress,
+            hpicfPimUnackGraftAge        Counter32,
+            hpicfPimUnackGraftRetransIn  Counter32
+        }
+
+    hpicfPimUnackGraftSourceType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow Source address type for an unacknowledged
+                     Graft message on the network."
+        ::= { hpicfPimUnackGraftsEntry 1 }
+
+    hpicfPimUnackGraftSource OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow Source address for an unacknowledged
+                     Graft message on the network."
+        ::= { hpicfPimUnackGraftsEntry 2 }
+
+    hpicfPimUnackGraftGroupType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow Group address type for an unacknowledged
+                     Graft message on the network."
+        ::= { hpicfPimUnackGraftsEntry 3 }
+
+
+    hpicfPimUnackGraftGroup OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Flow Group address for an unacknowledged graft
+                     message on the network."
+        ::= { hpicfPimUnackGraftsEntry 4 }
+
+    hpicfPimUnackGraftAge OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Time in which the graft message 
+                     will be timed-out."
+        ::= { hpicfPimUnackGraftsEntry 5 }
+
+    hpicfPimUnackGraftRetransIn OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Time in which the graft message 
+                     will be retransmitted."
+        ::= { hpicfPimUnackGraftsEntry 6 }
+
+-- **********************************************************************
+-- HP PIM global counters
+-- **********************************************************************
+
+    hpicfPimMsgCountRegisterReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Global count of received 
+                     Register messages."
+        ::= { hpicfPimScalars 1 }
+
+    hpicfPimMsgCountRegisterTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Global count of transmitted
+                     Register messages."
+        ::= { hpicfPimScalars 2 }
+
+    hpicfPimMsgCountRegisterInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Global count of invalid 
+                     Register messages received."
+        ::= { hpicfPimScalars 3 }
+
+    hpicfPimMsgCountRegStopReceive OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Global count of received 
+                     Register-stop messages."
+        ::= { hpicfPimScalars 4 }
+
+    hpicfPimMsgCountRegStopTransmit OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Global count of transmitted 
+                     Register-stop messages."
+        ::= { hpicfPimScalars 5 }
+
+    hpicfPimMsgCountRegStopInvalid OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Global count of invalid  
+                     Register-stop messages received."
+        ::= { hpicfPimScalars 6 }
+
+-- **********************************************************************
+-- PIM Notifications Trap Definitions
+-- **********************************************************************
+
+    hpicfPimHardMRTFull NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION "This notification signifies that the MRT table is 
+                    full and the error has been originated by hardware. 
+                    This trap should be generated whenever a multicast 
+                    flow or MRT  entry cannot be added."
+        ::= { hpicfPimTraps 1 }
+
+    hpicfPimSoftMRTFull NOTIFICATION-TYPE
+        STATUS      current
+        DESCRIPTION "This notification signifies that the MRT table is 
+                    full and the error has been originated by software. 
+                    This trap should be generated whenever a multicast 
+                    flow or MRT entry cannot be added."
+        ::= { hpicfPimTraps 2 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfPimNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+                    { hpicfPimHardMRTFull,
+                      hpicfPimSoftMRTFull }
+        STATUS      current
+        DESCRIPTION "A collection of notifications that extends 
+                     notifications defined in RFC 2934 - used for signaling 
+                     important PIM events."
+        ::= { hpicfPimGroups 1 }
+
+    hpicfPimBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimAdminStatus,
+                      hpicfPimStateRefreshInterval,
+                      hpicfPimSPTThreshold,
+                      hpicfPimTrapControl, 
+                      hpicfPimRemoveConfig }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support basic PIM 
+                    configuration information on HP routers."
+        ::= { hpicfPimGroups 2 }
+
+    hpicfPimStaticRPSetMappingGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimStaticRPSetOverride,
+                      hpicfPimStaticRPSetRowStatus }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support management of
+                    static Rendezvous Point (RP) to IP multicast group 
+                    mappings."
+        ::= { hpicfPimGroups 3 }
+
+    hpicfPimSparseIfGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimIfAddress,
+                      hpicfPimIfTrigHelloInterval,
+                      hpicfPimIfHelloHoldtime,
+                      hpicfPimIfLanPruneDelay,
+                      hpicfPimIfPropagationDelay,
+                      hpicfPimIfOverrideInterval,
+                      hpicfPimIfGenerationID,
+                      hpicfPimIfJoinPruneHoldtime,
+                      hpicfPimIfLanDelayEnabled,
+                      hpicfPimIfDRPriority,
+                      hpicfPimIfNBRTimeout }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in pimInterfaceTable and used to support management of 
+                    interfaces operating in PIM Sparse Mode."
+        ::= { hpicfPimGroups 4 }
+
+    hpicfPimDenseIfGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimIfAddress,
+                      hpicfPimIfTrigHelloInterval,
+                      hpicfPimIfHelloHoldtime,
+                      hpicfPimIfLanPruneDelay,
+                      hpicfPimIfPropagationDelay,
+                      hpicfPimIfOverrideInterval,
+                      hpicfPimIfGenerationID,
+                      hpicfPimIfJoinPruneHoldtime,
+                      hpicfPimIfGraftRetryInterval,
+                      hpicfPimIfMaxGraftRetries,
+                      hpicfPimIfSRTTLThreshold,
+                      hpicfPimIfLanDelayEnabled,
+                      hpicfPimIfSRCapable,
+                      hpicfPimIfDRPriority }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in pimInterfaceTable and used to support management of 
+                    interfaces operating in PIM Dense Mode."
+        ::= { hpicfPimGroups 5 }
+								  
+
+
+
+    hpicfPimComponentGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimComponentCBSRAdminStatus,
+                      hpicfPimComponentCBSRAddress,
+                      hpicfPimComponentCBSRPriority,
+                      hpicfPimComponentCBSRHashMaskLength,
+                      hpicfPimComponentCBSRMessageInterval,
+                      hpicfPimComponentCRPPriority,
+                      hpicfPimComponentCRPAdvInterval,
+                      hpicfPimComponentBSRPriority,
+                      hpicfPimComponentBSRHashMaskLength,
+                      hpicfPimComponentBSRUpTime,
+                      hpicfPimComponentBSRNextMessage }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined 
+                    in pimComponentTable (RFC 2934)."
+        ::= { hpicfPimGroups 6 }
+
+    hpicfPimStaticRpfGroup OBJECT-GROUP
+        OBJECTS     {
+           hpicfPimStaticRpfOverrideState,
+           hpicfPimStaticRpfRowStatus }
+        STATUS      current
+        DESCRIPTION "A collection of objects defined 
+                    in hpicfPimStaticRpfTable."
+        ::= { hpicfPimGroups 7 }				
+										
+
+    hpicfPimInterfaceExtensionsGroup OBJECT-GROUP
+        OBJECTS     { hpicfPimVersion,
+                      hpicfPimIfNBRCount,
+                      hpicfPimIfNegotiatedPropagationDelay,
+                      hpicfPimIfNegotiatedOverrideInterval,
+                      hpicfPimIfAssertHoldInterval,
+                      hpicfPimIfNumRoutersNotUsingDRPriority,
+                      hpicfPimIfNumRoutersNotUsingLanDelay,		  
+                      hpicfPimIfMsgCountGraftReceive,
+                      hpicfPimIfMsgCountGraftTransmit,
+                      hpicfPimIfMsgCountGraftInvalid,
+                      hpicfPimIfMsgCountGraftAckReceive,
+                      hpicfPimIfMsgCountGraftAckTransmit,
+                      hpicfPimIfMsgCountGraftAckInvalid,
+                      hpicfPimIfMsgCountSRReceive,
+                      hpicfPimIfMsgCountSRTransmit,
+                      hpicfPimIfMsgCountSRInvalid,
+                      hpicfPimIfMsgCountBSRReceive,
+                      hpicfPimIfMsgCountBSRTransmit,
+                      hpicfPimIfMsgCountBSRInvalid,
+                      hpicfPimIfMsgCountCRPReceive,
+                      hpicfPimIfMsgCountCRPTransmit,
+                      hpicfPimIfMsgCountCRPInvalid,
+                      hpicfPimIfMsgCountJPReceive,
+                      hpicfPimIfMsgCountJPTransmit,
+                      hpicfPimIfMsgCountJPInvalid,
+                      hpicfPimIfMsgCountAssertReceive,
+                      hpicfPimIfMsgCountAssertTransmit,
+                      hpicfPimIfMsgCountAssertInvalid,
+                      hpicfPimIfMsgCountHelloReceive,
+                      hpicfPimIfMsgCountHelloTransmit,
+                      hpicfPimIfMsgCountHelloInvalid }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in pimInterfaceTable."
+        ::= { hpicfPimGroups 8 }
+
+
+    hpicfPimStaticRpfExtensionsGroup OBJECT-GROUP
+        OBJECTS     {
+           hpicfPimStaticRpfIfIndex,
+           hpicfPimStaticRpfNeighborAddressType,
+           hpicfPimStaticRpfNeighborAddress,
+           hpicfPimNumStaticRpfEntries }
+        STATUS      current
+        DESCRIPTION "A collection of objects that
+                    extend hpicfPimStaticRpfTable."
+        ::= { hpicfPimGroups 9 }	
+							
+    hpicfPimNeighborGroup OBJECT-GROUP
+        OBJECTS     {		 
+           hpicfPimNeighborDRPriority,
+           hpicfPimNeighborGenerationIDValue,
+           hpicfPimNeighborHoldtime,
+           hpicfPimNeighborPropagationDelay,
+           hpicfPimNeighborOverrideInterval,
+           hpicfPimNeighborStateRefreshInterval }
+        STATUS      current
+        DESCRIPTION "A collection of objects defined 
+                    in hpicfPimNeighborTable."
+        ::= { hpicfPimGroups 10 }
+
+
+    hpicfPimMRouteGroup OBJECT-GROUP
+        OBJECTS     {		 
+           hpicfPimSendRegStop,
+           hpicfPimSGSourceIsActive,
+           hpicfPimOutgoingRegisterIfAvailable,
+           hpicfPimEntryAddSuccess,
+           hpicfPimNumOutgoingInterfaces,
+           hpicfPimDirectlyConnectedSource,
+           hpicfPimNeighborSearchFailure,
+           hpicfPimRPTreePruneSent,
+           hpicfPimOnSPTree,
+           hpicfPimRPToSPTreeSwitching,
+           hpicfPimWildcardEntry,
+           hpicfPimRPFPrimeNeighborAddressType,
+           hpicfPimRPFPrimeNeighborAddress,
+           hpicfPimNumDownstreams }
+        STATUS      current
+        DESCRIPTION "A collection of objects defined 
+                    in hpicfMRouteTable."
+        ::= { hpicfPimGroups 11 }
+
+ 
+    hpicfPimUcastRouteGroup OBJECT-GROUP
+        OBJECTS     {		 
+            hpicfPimUcastRouteIfIndex,
+            hpicfPimUcastRouteUpstreamNbrType,
+            hpicfPimUcastRouteUpstreamNbr,
+            hpicfPimUcastRouteProtocol }
+        STATUS      current
+        DESCRIPTION "A collection of objects defined 
+                    in hpicfUcastRouteTable."
+        ::= { hpicfPimGroups 12 }
+
+								 
+    hpicfPimUnackGraftsGroup OBJECT-GROUP
+        OBJECTS     {							  
+            hpicfPimUnackGraftAge,
+            hpicfPimUnackGraftRetransIn }
+        STATUS      current
+        DESCRIPTION "A collection of objects defined 
+                    in hpicfUnackGraftTable."
+        ::= { hpicfPimGroups 13 }
+ 
+
+    hpicfPimGlobalCounterGroup OBJECT-GROUP
+        OBJECTS     {		 
+           hpicfPimMsgCountRegisterReceive,
+           hpicfPimMsgCountRegisterTransmit,
+           hpicfPimMsgCountRegisterInvalid,
+           hpicfPimMsgCountRegStopReceive,
+           hpicfPimMsgCountRegStopTransmit,
+           hpicfPimMsgCountRegStopInvalid,
+           hpicfPimStarGEntries,
+           hpicfPimSGEntries,
+           hpicfPimTotalNeighborCount }
+        STATUS      current
+        DESCRIPTION "A collection of global 
+                     PIM counter objects."
+        ::= { hpicfPimGroups 14 }
+
+    hpicfPimRPSetGroup OBJECT-GROUP
+        OBJECTS     {		 
+           hpicfPimRPSetPriority,
+           hpicfPimRPSetUptime,
+           hpicfPimComponentCRPAdvTimer }
+        STATUS      current
+        DESCRIPTION "A collection of additional RP & BSR objects."
+        ::= { hpicfPimGroups 15 }	 
+
+    hpicfPimJoinPruneGroup OBJECT-GROUP
+        OBJECTS     {
+           hpicfPimJoinPruneNeighborAddressType,
+           hpicfPimJoinPruneNeighborAddress,
+           hpicfPimJoinPruneExpiryTime }
+        STATUS      current
+        DESCRIPTION "A collection of objects defined in hpicfPimJoinPruneTable."
+        ::= { hpicfPimGroups 17 }
+
+
+
+-- **********************************************************************
+-- Compliance statements
+-- **********************************************************************
+
+    hpicfPimSparseMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM Sparse Mode and implementing the HP-ICF-PIM MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimBaseGroup,
+                               hpicfPimStaticRPSetMappingGroup,
+                               hpicfPimSparseIfGroup,
+                               hpicfPimComponentGroup, 
+                               hpicfPimStaticRpfGroup }
+        ::= { hpicfPimCompliances 1 }
+
+    hpicfPimDenseMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM Dense Mode and implementing the HP-ICF-PIM MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimBaseGroup,
+                               hpicfPimDenseIfGroup }
+        ::= { hpicfPimCompliances 2 }
+
+    hpicfPimNotificationCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The collection of notifications that extends 
+                     notifications defined in RFC 2934 - used for signalling 
+                     important PIM events."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimNotificationGroup}
+        ::= { hpicfPimCompliances 3 }
+
+
+    hpicfPimUcastRoutingCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM and related Unicast routing info."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimStaticRpfExtensionsGroup,
+                               hpicfPimUcastRouteGroup }
+        ::= { hpicfPimCompliances 4 }
+					   
+
+    hpicfPimMcastRoutingCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM and related multicast forwarding info."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimMRouteGroup }
+        ::= { hpicfPimCompliances 5 }
+
+
+    hpicfPimInterfaceInfoCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM and related interface and neighbor info."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimNeighborGroup,
+                               hpicfPimInterfaceExtensionsGroup }
+        ::= { hpicfPimCompliances 6 }
+						 
+
+    hpicfPimProtoMessageCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM and certain protocol packet info."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimUnackGraftsGroup,
+                               hpicfPimJoinPruneGroup }
+        ::= { hpicfPimCompliances 7 }
+
+
+    hpicfPimGlobalCountersCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM and related global statistics data."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimGlobalCounterGroup }
+        ::= { hpicfPimCompliances 8 }
+
+
+    hpicfPimRPSetExtensionsCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIM Sparse Mode and further RP set info."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPimRPSetGroup }
+        ::= { hpicfPimCompliances 9 }
+
+END

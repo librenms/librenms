@@ -1,0 +1,1049 @@
+
+    DELL-NETWORKING-OPENFLOW-MIB DEFINITIONS ::= BEGIN
+
+    --  This module provides authoritative definitions for
+    --  Dell Networking OS OpenFlow MIB.
+    --
+    --  This module will be extended, as needed.
+    --
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter64, Unsigned32, TimeTicks,
+        NOTIFICATION-TYPE, Integer32, IpAddress
+            FROM SNMPv2-SMI
+        TimeStamp, DisplayString, TruthValue, MacAddress,
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        InterfaceIndex
+            FROM IF-MIB            -- [RFC2863]
+        VlanId
+            FROM Q-BRIDGE-MIB      -- [RFC4363]
+        InetAddressType, InetAddress, InetPortNumber
+            FROM INET-ADDRESS-MIB  -- [RFC4001]
+        dellNetMgmt
+            FROM DELL-NETWORKING-SMI;
+
+    dellNetOpenFlow MODULE-IDENTITY
+    LAST-UPDATED "201203271200Z"  -- Mar 27, 2012 12:00:00 GMT
+    ORGANIZATION
+      "Dell Inc"
+    CONTACT-INFO
+      "http://www.dell.com/support"
+
+    DESCRIPTION
+       "Dell Networking OS OpenFlow MIB provides information base of
+                OpenFlow enabled Dell Networking OS Switch. This MIB exposes information
+                about the Switch in OpenFlow perspective.
+                Information of :
+                1) OpenFlow Instances configured,
+                2) Controller that configured it,
+                3) Ports that are configured under these instances,
+                4) VLANs that are part of these instances and
+                5) Flows & Flowactions configured
+                are shared via this MIB."
+
+       ::= { dellNetMgmt 20 }
+
+--
+-- ### Groups ###
+--
+    ofSwitchObjects         OBJECT IDENTIFIER ::={ dellNetOpenFlow 1 }
+    ofSwitchNotification    OBJECT IDENTIFIER ::={ dellNetOpenFlow 2 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+    DataPathIdentifier ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "1x:"
+        STATUS       current
+        DESCRIPTION
+            "The representation of an Open Flow Instance DataPath Identifier."
+        SYNTAX OCTET STRING(SIZE(8))
+
+
+-- ****************************************************************************
+-- *   Scalar Definitions
+-- ****************************************************************************
+    ofSwitchId OBJECT-TYPE
+        SYNTAX        Unsigned32(0..255)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Switch Id: Identifier of this Switch"
+        ::= { ofSwitchObjects 1 }
+
+    ofManufacturerDesc OBJECT-TYPE
+        SYNTAX        DisplayString  (SIZE (0..32))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Manufacturer Description: Provides info about the
+                 OF Switch manufacturer"
+        ::= { ofSwitchObjects 2 }
+
+    ofHardwareDesc OBJECT-TYPE
+        SYNTAX        DisplayString  (SIZE (0..32))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Switch HardwareDescription"
+        ::= { ofSwitchObjects 3 }
+
+    ofSoftwareDesc OBJECT-TYPE
+        SYNTAX        DisplayString  (SIZE (0..32))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Switch SoftwareDescription"
+        ::= { ofSwitchObjects 4 }
+
+    ofSwitchSerialNo OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..8))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Switch Serial No: Provides the serial number of the switch"
+        ::= { ofSwitchObjects 5 }
+
+    ofSwitchVersion OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (0..8))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Switch Version"
+        ::= { ofSwitchObjects 6 }
+
+
+-- ****************************************************************************
+-- ## Instance Table ##
+-- ****************************************************************************
+    ofInstTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF OfInstEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Table"
+        ::= { ofSwitchObjects 7 }
+
+    ofInstEntry OBJECT-TYPE
+        SYNTAX        OfInstEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Entry: This provides the sequence of objects
+                 that describes the properties of the Instance. ofInstId uniquely
+                 identifies the instance and hence it becomes an index"
+        INDEX        { ofInstId }
+        ::= { ofInstTable 1 }
+
+    OfInstEntry ::=
+        SEQUENCE {
+            ofInstId                Unsigned32,
+            ofInstAdminState        INTEGER,
+            ofInstIntfType          INTEGER,
+            ofInstDataPathId        DataPathIdentifier,
+            ofInstConnectTimeout    Unsigned32,
+            ofInstEchoReplyTimeout  Unsigned32,
+            ofInstEchoReqInterval   Unsigned32,
+            ofInstNumFlows          Unsigned32,
+            ofInstSuppCapabilities  BITS,
+            ofInstSuppActions       BITS
+        }
+
+    ofInstId OBJECT-TYPE
+        SYNTAX        Unsigned32(0..255)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Identifier"
+        ::= { ofInstEntry 1 }
+
+    ofInstAdminState OBJECT-TYPE
+        SYNTAX        INTEGER { up(1),
+                                down(2)}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Admin State: tells whether this instance is
+         enabled or not."
+        ::= { ofInstEntry 2 }
+
+    ofInstIntfType OBJECT-TYPE
+        SYNTAX        INTEGER { port(1),
+                                vlan(2),
+                                any(3)}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Interface Type: tells whether this instance is
+         a Port or VLAN or ANY"
+        ::= { ofInstEntry 3 }
+
+    ofInstDataPathId OBJECT-TYPE
+        SYNTAX        DataPathIdentifier
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance DataPath Identifier"
+        ::= { ofInstEntry 4 }
+
+    ofInstConnectTimeout OBJECT-TYPE
+        SYNTAX        Unsigned32(0..65535)
+        UNITS         "seconds"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Connection Timeout: Tells the time after which the
+         connection would be dropped"
+        ::= { ofInstEntry 5 }
+
+    ofInstEchoReplyTimeout OBJECT-TYPE
+        SYNTAX        Unsigned32(0..65535)
+        UNITS         "seconds"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Echo Reply Timeout: Tells the max time for which the
+         Echo message would wait for reply"
+        ::= { ofInstEntry 6 }
+
+    ofInstEchoReqInterval OBJECT-TYPE
+        SYNTAX        Unsigned32(0..65535)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Echo Request Interval: Tells how often the Echo
+         message would be sent"
+        ::= { ofInstEntry 7 }
+
+    ofInstNumFlows OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The current number of flows in this Instance"
+        ::= { ofInstEntry 8 }
+
+    ofInstSuppCapabilities OBJECT-TYPE
+        SYNTAX        BITS { port(0),
+                             table(1),
+                             flow(2) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Supported Capabilities: Gives the supported
+         capabilities information by setting the appropriate BITS"
+        ::= { ofInstEntry 9 }
+
+    ofInstSuppActions OBJECT-TYPE
+        SYNTAX        BITS { output(0),
+                             set-vlan(1),
+                             set-pcp(2),
+                             set-smac(3),
+                             set-dmac(4),
+                             set-tos(5) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Supported Actions: Gives the supported
+         Action information by setting the appropriate BITS"
+        ::= { ofInstEntry 10 }
+
+
+-- ****************************************************************************
+-- ## Controller Table ##
+-- ****************************************************************************
+
+    ofCntlrTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF OfCntlrEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Controller Table: This table provides information about the Controller"
+        ::= { ofSwitchObjects 8 }
+
+    ofCntlrEntry OBJECT-TYPE
+        SYNTAX        OfCntlrEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Controller Entry"
+        INDEX        { ofInstId, ofCntlrId }
+        ::= { ofCntlrTable 1 }
+
+    OfCntlrEntry ::=
+        SEQUENCE {
+                ofCntlrId           Unsigned32,
+                ofCntlrAddrType     InetAddressType,
+                ofCntlrAddr         InetAddress,
+                ofCntlrPortNumber   InetPortNumber,
+                ofCntlrProtocol     INTEGER,
+                ofCntlrConState     INTEGER
+        }
+
+    ofCntlrId OBJECT-TYPE
+        SYNTAX        Unsigned32(0..255)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Controller Id: This provides Id of this controller"
+        ::= { ofCntlrEntry 1 }
+
+    ofCntlrAddrType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+        "Open Flow Controller IP Address Type : The address type
+        of the controller's IP address. If no controller is configured
+        yet then this is set to unknown(0)."
+        ::= { ofCntlrEntry 2 }
+
+    ofCntlrAddr OBJECT-TYPE
+        SYNTAX        InetAddress (SIZE (0|4|8|16|20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Controller IP Address: This gives the IP Address of
+         the controller. The InetAddressType of this is given by the
+         ofCntlrAddrType object."
+        ::= { ofCntlrEntry 3 }
+
+    ofCntlrPortNumber OBJECT-TYPE
+        SYNTAX        InetPortNumber
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Controller Port: This provides the port number to be
+         used to communicate with the controller"
+        ::= { ofCntlrEntry 4 }
+
+    ofCntlrProtocol OBJECT-TYPE
+        SYNTAX        INTEGER { tls(1),
+                                tcp(2) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Controller Protocol: Tells which protocol is being used
+         by this Controller for communication, either TLS or TCP"
+        ::= { ofCntlrEntry 5 }
+
+    ofCntlrConState OBJECT-TYPE
+        SYNTAX        INTEGER { down(1),
+                                up(2) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Controller Connection State"
+        ::= { ofCntlrEntry 6 }
+
+
+-- ****************************************************************************
+-- ## Port Table ##
+-- ****************************************************************************
+
+    ofPortTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF OfPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Port Table"
+        ::= { ofSwitchObjects 9 }
+
+    ofPortEntry OBJECT-TYPE
+        SYNTAX        OfPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Port Entry has ports assigned to the instance"
+        INDEX        { ofInstId, ofPortIfIndex }
+        ::= { ofPortTable 1 }
+
+    OfPortEntry ::=
+        SEQUENCE {
+            ofPortIfIndex           InterfaceIndex,
+            ofPortAssociationType   INTEGER
+        }
+
+    ofPortIfIndex OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "The ifIndex value corresponding to this port"
+        ::= { ofPortEntry 1 }
+
+    ofPortAssociationType OBJECT-TYPE
+        SYNTAX        INTEGER { instancePort(1),
+                                instVlanPort(2) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Port Association Type: Tells whether this port
+         is directly assigned to the instance or via VLAN."
+        ::= { ofPortEntry 2 }
+
+
+-- ****************************************************************************
+-- ## VLAN Table ##
+-- ****************************************************************************
+
+    ofVlanTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF OfVlanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow VLAN Table containing port list information for
+         each VLAN configured into the instance."
+        ::= { ofSwitchObjects 10 }
+
+    ofVlanEntry OBJECT-TYPE
+        SYNTAX        OfVlanEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow VLAN Entry.
+         Restricted to max 8 VLANs per instance."
+        INDEX        { ofInstId, ofVlanIfIndex }
+        ::= { ofVlanTable 1 }
+
+    OfVlanEntry ::=
+        SEQUENCE {
+            ofVlanIfIndex           InterfaceIndex,
+            ofVlanId                VlanId
+        }
+
+    ofVlanIfIndex  OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "The ifIndex value corresponding to this VLAN."
+        ::= { ofVlanEntry 1 }
+
+    ofVlanId  OBJECT-TYPE
+        SYNTAX        VlanId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Vlan Id: VALN-ID referring to this VLAN."
+        ::= { ofVlanEntry 2 }
+
+
+-- ****************************************************************************
+-- ## FLOW Table ##
+-- ****************************************************************************
+
+    ofFlowTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF OfFlowEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow FlowTable"
+        ::= { ofSwitchObjects 11 }
+
+    ofFlowEntry OBJECT-TYPE
+        SYNTAX        OfFlowEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Instance Flow Entry"
+        INDEX        { ofInstId, ofFlowId, ofFlowTblId }
+        ::= { ofFlowTable 1 }
+
+    OfFlowEntry ::=
+        SEQUENCE {
+            ofFlowId                Unsigned32,
+            ofFlowTblId             Unsigned32,
+            ofFlowPriority          Unsigned32,
+            ofFlowIdleTime          Unsigned32,
+            ofFlowHardTime          Unsigned32,
+            ofFlowUpTime            TimeTicks,
+            ofFlowCookie            OCTET STRING,
+            ofFlowPacketCount       Counter64,
+            ofFlowByteCount         Counter64
+    }
+
+    ofFlowId OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Id"
+        ::= { ofFlowEntry 1 }
+
+    ofFlowTblId OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Table Id"
+        ::= { ofFlowEntry 2 }
+
+    ofFlowPriority OBJECT-TYPE
+        SYNTAX        Unsigned32(0..65535)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow priority "
+        ::= { ofFlowEntry 3 }
+
+     ofFlowIdleTime OBJECT-TYPE
+        SYNTAX        Unsigned32(0..65535)
+        UNITS         "seconds"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Idle Time"
+        ::= { ofFlowEntry 4 }
+
+    ofFlowHardTime OBJECT-TYPE
+        SYNTAX        Unsigned32(0..65535)
+        UNITS         "seconds"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Hard Timeout"
+        ::= { ofFlowEntry 5 }
+
+    ofFlowUpTime OBJECT-TYPE
+        SYNTAX        TimeTicks
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "The time since the OpenFlow flow was configured to be up."
+        ::= { ofFlowEntry 6 }
+
+    ofFlowCookie OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..64))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Cookie String"
+        ::= { ofFlowEntry 7 }
+
+    ofFlowPacketCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Packet Count"
+        ::= { ofFlowEntry 8 }
+
+    ofFlowByteCount OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Byte Count"
+        ::= { ofFlowEntry 9 }
+
+-- ****************************************************************************
+-- ## Match Parameter Table ##
+-- ****************************************************************************
+
+    ofFlowMatchParamsTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF OfFlowMatchParamsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Match Parameter Table"
+        ::= { ofSwitchObjects 12 }
+
+    ofFlowMatchParamsEntry OBJECT-TYPE
+        SYNTAX        OfFlowMatchParamsEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "A set of parameters to be mactheded on a particular openFlow Table."
+        AUGMENTS        { ofFlowEntry }
+        ::= { ofFlowMatchParamsTable 1 }
+
+    OfFlowMatchParamsEntry ::=
+        SEQUENCE {
+            ofFlowMatchInPort       OCTET STRING,
+            ofFlowMatchEtherSrcAddr OCTET STRING,
+            ofFlowMatchEtherDstAddr OCTET STRING,
+            ofFlowMatchVlanId       OCTET STRING,
+            ofFlowMatchEthType      OCTET STRING,
+            ofFlowMatchVlanPri      OCTET STRING,
+            ofFlowMatchIpTos        OCTET STRING,
+            ofFlowMatchIpProto      OCTET STRING,
+            ofFlowMatchIpSrcAddr    OCTET STRING,
+            ofFlowMatchIpDestAddr   OCTET STRING,
+            ofFlowMatchTpSrcPort    OCTET STRING,
+            ofFlowMatchTpDstPort    OCTET STRING
+    }
+
+    ofFlowMatchInPort OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match Ingress Ports;
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 1 }
+
+    ofFlowMatchEtherSrcAddr OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..6))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match Ethernet Source Address.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 2 }
+
+    ofFlowMatchEtherDstAddr OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..6))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match Ethernet Destination Address.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 3 }
+
+    ofFlowMatchVlanId OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match Vlan Id.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 4 }
+
+    ofFlowMatchEthType OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match Ethernet Type.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 5 }
+
+    ofFlowMatchVlanPri OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..1))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match VLAN Priority.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 6 }
+
+    ofFlowMatchIpTos OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..1))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match IP TOS"
+        ::= { ofFlowMatchParamsEntry 7 }
+
+    ofFlowMatchIpProto OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..1))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow match IP Protocol"
+        ::= { ofFlowMatchParamsEntry 8 }
+
+    ofFlowMatchIpSrcAddr OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..4))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match IP Source Address.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 9 }
+
+    ofFlowMatchIpDestAddr OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..4))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match IP Destination Adress.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 10 }
+
+    ofFlowMatchTpSrcPort OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match Transport Source Port.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 11 }
+
+    ofFlowMatchTpDstPort OBJECT-TYPE
+        SYNTAX        OCTET STRING(SIZE (0..2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Match Transport Destination Port.
+         Note that when the value of this object is the
+         zero-length string, it indicates 'wild card'."
+        ::= { ofFlowMatchParamsEntry 12 }
+
+
+-- ****************************************************************************
+-- ## FLOW Action Table ##
+-- ****************************************************************************
+
+    ofFlowActionTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF OfFlowActionEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action Table"
+        ::= { ofSwitchObjects 13 }
+
+    ofFlowActionEntry OBJECT-TYPE
+        SYNTAX        OfFlowActionEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action Entry"
+        INDEX        { ofInstId, ofFlowId, ofFlowTblId, ofFlowActionId }
+        ::= { ofFlowActionTable 1 }
+
+    OfFlowActionEntry ::=
+        SEQUENCE {
+            ofFlowActionId          Unsigned32,
+            ofFlowActionType        INTEGER,
+            ofFlowActionSrcMac      MacAddress,
+            ofFlowActionDstMac      MacAddress,
+            ofFlowActionPortIndex   InterfaceIndex,
+            ofFlowActionVlanId      VlanId,
+            ofFlowActionMaxLen      Unsigned32,
+            ofFlowActionVlanPcp     Unsigned32,
+            ofFlowActionNWTos       Unsigned32
+            }
+
+    ofFlowActionId OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+        "Open Flow Action Id"
+        ::= { ofFlowActionEntry 1 }
+
+
+    ofFlowActionType OBJECT-TYPE
+        SYNTAX       INTEGER {  outToSwitchPort(1),
+                                setVlanVid(2),
+                                setVlanPcp(3),
+                                stripVlan(4),
+                                setDlSrc(5),
+                                setDlDst(6),
+                                setNetworkSrc(7),
+                                setNetworkDst(8),
+                                setNetworkTos(9),
+                                setTpSrc(10),
+                                setTpDest(11),
+                                outToQueue(12),
+                                vendor(65535)
+                             }
+
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action Type - Following are the supported Actions
+         outToSwitchPort -> Output to switch port.
+         setVlanVid      -> Set the 802.1q VLAN id.
+         setVlanPcp      -> Set the 802.1q priority.
+         stripVlan       -> Strip the 802.1q header.
+         setDlSrc        -> Ethernet source address.
+         setDlDst        -> Ethernet destination address.
+         setNetworkSrc   -> IP source address.
+         setNetworkDst   -> IP destination address.
+         setNetworkTos   -> IP ToS (DSCP field, 6 bits).
+         setTpSrc        -> TCP/UDP source port.
+         setTpDest       -> TCP/UDP destination port.
+         outToQueue      -> Output to queue.
+         vendor          -> Vendor specific action "
+        ::= { ofFlowActionEntry 2 }
+
+    ofFlowActionSrcMac OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action Source Mac address"
+        ::= { ofFlowActionEntry 3 }
+
+    ofFlowActionDstMac OBJECT-TYPE
+        SYNTAX        MacAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action Destination Mac"
+        ::= { ofFlowActionEntry 4 }
+
+    ofFlowActionPortIndex OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "Ifindex value of OpenFlow Flow Action Port"
+        ::= { ofFlowActionEntry 5 }
+
+    ofFlowActionVlanId OBJECT-TYPE
+        SYNTAX        VlanId
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action VLAN ID"
+        ::= { ofFlowActionEntry 6 }
+
+    ofFlowActionMaxLen OBJECT-TYPE
+        SYNTAX        Unsigned32(0..65535)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action Max Length"
+        ::= { ofFlowActionEntry 7 }
+
+    ofFlowActionVlanPcp OBJECT-TYPE
+        SYNTAX        Unsigned32(0..255)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action VLAN PCP"
+        ::= { ofFlowActionEntry 8 }
+
+    ofFlowActionNWTos OBJECT-TYPE
+        SYNTAX        Unsigned32(0..255)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+        "OpenFlow Flow Action Network TOS"
+        ::= { ofFlowActionEntry 9 }
+
+
+-- ****************************************************************************
+-- ## Alarm Group or Notifications ##
+-- ****************************************************************************
+    ofSwitchNotifications   OBJECT IDENTIFIER ::= { ofSwitchNotification 0 }
+    ofSwitchNotifyVariable  OBJECT IDENTIFIER ::= { ofSwitchNotification 1 }
+
+    ofSwitchFlowTableSrc OBJECT-TYPE
+        SYNTAX       INTEGER { ifp(1),
+                               vlan(2),
+                               dmac(3),
+                               route(4),
+                               lb(5) }
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+            " The unique ID of an OpenFlow Table.
+              Used by ofSwitchFlowTableFull trap."
+        ::= { ofSwitchNotifyVariable 1 }
+
+-- ****************************************************************************
+-- Notifications
+-- ****************************************************************************
+
+    ofSwitchCntlrSessionStatusChanged NOTIFICATION-TYPE
+        OBJECTS         { ofCntlrConState }
+        STATUS          current
+        DESCRIPTION
+        "This notification is sent when ever Controller's Session
+         Status has changed."
+        ::= { ofSwitchNotifications 1 }
+
+    ofSwitchFlowTableFull NOTIFICATION-TYPE
+        OBJECTS         { ofSwitchFlowTableSrc }
+        STATUS          current
+        DESCRIPTION
+        "This notification is sent when ever Flow Table reached
+         its maximum capacity. ofSwitchFlowTableSrc gives the id of the
+         Flow Table that reached max flows"
+        ::= { ofSwitchNotifications 2 }
+
+-- ****************************************************************************
+-- Conformance Information
+-- ****************************************************************************
+
+        ofSwitchMibConformance     OBJECT IDENTIFIER
+       ::= { ofSwitchObjects 14 }
+
+        ofSwitchMibCompliances     OBJECT IDENTIFIER
+       ::= { ofSwitchMibConformance 1 }
+
+        ofSwitchMibGroups          OBJECT IDENTIFIER
+       ::= { ofSwitchMibConformance 2 }
+
+-- ****************************************************************************
+-- * Compliance Statements
+-- ****************************************************************************
+
+        ofSwitchMibCompliance   MODULE-COMPLIANCE
+       STATUS                   current
+       DESCRIPTION
+              "The compliance statement for the Dell Networking OS OpenFlow MIB."
+       MODULE
+       MANDATORY-GROUPS {
+                     ofSwitchScalarGroup,
+                     ofInstanceGroup,
+                     ofControllerGroup,
+                     ofPortGroup,
+                     ofVlanGroup,
+                     ofFlowGroup,
+                     ofFlowMatchParamsGroup,
+                     ofFlowActionGroup,
+                     ofSwitchMibNotificationsGroup
+              }
+       ::= { ofSwitchMibCompliances 1}
+
+-- ****************************************************************************
+-- Units of Conformance
+-- ****************************************************************************
+
+    ofSwitchScalarGroup OBJECT-GROUP
+       OBJECTS {
+            ofSwitchId,
+            ofManufacturerDesc,
+            ofHardwareDesc,
+            ofSoftwareDesc,
+            ofSwitchSerialNo,
+            ofSwitchVersion
+       }
+       STATUS               current
+       DESCRIPTION
+              "This represents group of objects that provides
+               OF Switch information."
+       ::= { ofSwitchMibGroups 1 }
+
+    ofInstanceGroup OBJECT-GROUP
+       OBJECTS {
+            ofInstAdminState,
+            ofInstIntfType,
+            ofInstDataPathId,
+            ofInstConnectTimeout,
+            ofInstEchoReplyTimeout,
+            ofInstEchoReqInterval,
+            ofInstNumFlows,
+            ofInstSuppCapabilities,
+            ofInstSuppActions
+       }
+       STATUS               current
+       DESCRIPTION
+              "This represents group of objects that provides
+               OF Instance information."
+       ::= { ofSwitchMibGroups 2 }
+
+    ofControllerGroup OBJECT-GROUP
+           OBJECTS {
+                ofCntlrAddrType,
+                ofCntlrAddr,
+                ofCntlrPortNumber,
+                ofCntlrProtocol,
+                ofCntlrConState
+           }
+           STATUS               current
+           DESCRIPTION
+                  "This represents group of objects that provides
+                   OF Controller information."
+           ::= { ofSwitchMibGroups 3 }
+
+    ofPortGroup OBJECT-GROUP
+           OBJECTS {
+                ofPortAssociationType
+           }
+           STATUS               current
+           DESCRIPTION
+                  "This represents group of objects that provides information
+                   about OF Port that corresponds to OF Instance."
+           ::= { ofSwitchMibGroups 4 }
+
+    ofVlanGroup OBJECT-GROUP
+           OBJECTS {
+                ofVlanId
+           }
+           STATUS               current
+           DESCRIPTION
+                  "This represents group of objects that provides information
+                   about OF VLAN that corresponds to OF Instance."
+           ::= { ofSwitchMibGroups 5 }
+
+    ofFlowGroup OBJECT-GROUP
+           OBJECTS {
+                ofFlowPriority,
+                ofFlowIdleTime,
+                ofFlowHardTime,
+                ofFlowUpTime,
+                ofFlowCookie,
+                ofFlowPacketCount,
+                ofFlowByteCount
+           }
+           STATUS               current
+           DESCRIPTION
+                  "This represents group of objects that provides
+                   OF Flow information."
+           ::= { ofSwitchMibGroups 6 }
+
+    ofFlowMatchParamsGroup OBJECT-GROUP
+           OBJECTS {
+                ofFlowMatchInPort,
+                ofFlowMatchEtherSrcAddr,
+                ofFlowMatchEtherDstAddr,
+                ofFlowMatchVlanId,
+                ofFlowMatchEthType,
+                ofFlowMatchVlanPri,
+                ofFlowMatchIpTos,
+                ofFlowMatchIpProto,
+                ofFlowMatchIpSrcAddr,
+                ofFlowMatchIpDestAddr,
+                ofFlowMatchTpSrcPort,
+                ofFlowMatchTpDstPort
+           }
+           STATUS               current
+           DESCRIPTION
+                  "This represents group of objects that provides
+                   OF Flow match information."
+           ::= { ofSwitchMibGroups 7 }
+
+    ofFlowActionGroup OBJECT-GROUP
+           OBJECTS {
+                ofFlowActionType,
+                ofFlowActionSrcMac,
+                ofFlowActionDstMac,
+                ofFlowActionPortIndex,
+                ofFlowActionVlanId,
+                ofFlowActionMaxLen,
+                ofFlowActionVlanPcp,
+                ofFlowActionNWTos
+           }
+           STATUS               current
+           DESCRIPTION
+                  "This represents group of objects that provides information
+                   about OF Flow Actions."
+           ::= { ofSwitchMibGroups 8 }
+
+    ofSwitchMibNotificationsGroup NOTIFICATION-GROUP
+           NOTIFICATIONS {
+                ofSwitchCntlrSessionStatusChanged,
+                ofSwitchFlowTableFull
+           }
+           STATUS               current
+           DESCRIPTION
+                  "This represents Notification object of OF Switch."
+           ::= { ofSwitchMibGroups 9 }
+
+-- ****************************************************************************
+-- End of Units of conformance
+-- ****************************************************************************
+
+END
+

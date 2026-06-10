@@ -1,0 +1,136 @@
+-- *****************************************************************
+-- CISCO-IMAGE-MIB.my:  Router Image MIB file
+--   
+-- Jan 1995, Yunsen Wang
+--   
+-- Copyright (c) 1995, 2009 by cisco Systems Inc.
+-- All rights reserved.
+--   
+-- *****************************************************************
+
+CISCO-IMAGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoImageMIB MODULE-IDENTITY
+    LAST-UPDATED    "9508150000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "Router image MIB which identify the capabilities
+        and characteristics of the image"
+    REVISION        "9508150000Z"
+    DESCRIPTION
+        "Specify a correct (non-negative) range for an index
+        object."
+    REVISION        "9501160000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 25 }
+
+
+-- This group is present in all IOS based products.
+
+ciscoImageMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoImageMIB 1 }
+
+
+ciscoImageTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CiscoImageEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table provides content information describing the
+        executing IOS image."
+    ::= { ciscoImageMIBObjects 1 }
+
+ciscoImageEntry OBJECT-TYPE
+    SYNTAX          CiscoImageEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A image characteristic string entry."
+    INDEX           { ciscoImageIndex } 
+    ::= { ciscoImageTable 1 }
+
+CiscoImageEntry ::= SEQUENCE {
+        ciscoImageIndex  Integer32,
+        ciscoImageString DisplayString
+}
+
+ciscoImageIndex OBJECT-TYPE
+    SYNTAX          Integer32 (0..2147483647)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A sequence number for each string stored
+        in the IOS image." 
+    ::= { ciscoImageEntry 1 }
+
+ciscoImageString OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The string of this entry." 
+    ::= { ciscoImageEntry 2 }
+ 
+
+-- conformance information
+
+ciscoImageMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoImageMIB 2 }
+
+ciscoImageMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoImageMIBConformance 1 }
+
+ciscoImageMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoImageMIBConformance 2 }
+
+
+-- compliance statements
+
+ciscoImageMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Image MIB"
+    MODULE          -- this module
+    MANDATORY-GROUPS { ciscoImageMIBGroup }
+    ::= { ciscoImageMIBCompliances 1 }
+
+-- units of conformance
+
+ciscoImageMIBGroup OBJECT-GROUP
+    OBJECTS         { ciscoImageString }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing IOS image characteristics"
+    ::= { ciscoImageMIBGroups 1 }
+
+END
+
+
+

@@ -1,0 +1,114 @@
+CISCOSB-TIMEBASED-PORT-SHUTDOWN-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB TIME-BASED PORT OPERATION  Configuration
+-- Version:    7.50.00.00
+-- Date:       06-Aug-2011
+--
+
+IMPORTS
+    TruthValue,TEXTUAL-CONVENTION,DisplayString,
+    RowStatus                                            FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE                         FROM SNMPv2-SMI
+    ifIndex                                              FROM IF-MIB
+    PortList                                             FROM Q-BRIDGE-MIB
+    switch001                                            FROM CISCOSB-MIB;
+
+
+
+    rlTimeBasedPort MODULE-IDENTITY
+       LAST-UPDATED "201108060000Z"
+       ORGANIZATION "Cisco Systems, Inc."
+
+       CONTACT-INFO
+       "Postal: 170 West Tasman Drive
+       San Jose , CA 95134-1706
+       USA
+
+       
+       Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+       DESCRIPTION
+                "The private MIB module definition for Time Based Port Operation MIB."
+       REVISION "201108060000Z"
+       DESCRIPTION
+                "Initial version of this MIB."
+    ::= { switch001 208 }
+
+     rlTimeBasedPortVersion OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+        "This scalar keep current supported version for Time Based Port feature.Initial version value is 1"
+    ::=  { rlTimeBasedPort  1 }
+
+
+
+    rlTimeBasedPortTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF RlTimeBasedPortEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+       "The table is used to manage time based port operation schedules."
+    ::=  { rlTimeBasedPort  2 }
+
+
+    rlTimeBasedPortEntry OBJECT-TYPE
+    SYNTAX     RlTimeBasedPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlTimeBasedPortEntry."
+    INDEX  { ifIndex,rlTimeBasedPortTimeRangeName }
+    ::= { rlTimeBasedPortTable 1 }
+
+
+    RlTimeBasedPortEntry ::= SEQUENCE {
+    rlTimeBasedPortTimeRangeName     DisplayString,
+    rlTimeBasedPortAction            INTEGER,
+    rlTimeBasedPortActive            TruthValue,
+    rlTimeBasedPortRowStatus         RowStatus
+    }
+
+
+    rlTimeBasedPortTimeRangeName  OBJECT-TYPE
+    SYNTAX     DisplayString(SIZE(1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Name of time range."
+    ::= { rlTimeBasedPortEntry 1 }
+
+
+    rlTimeBasedPortAction  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        up   (1),
+        down (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This field constitutes what action must be applyed to port during the time range."
+    ::= { rlTimeBasedPortEntry 2 }
+
+    rlTimeBasedPortActive  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This field indicates if the time-range is active or not ."
+    ::= { rlTimeBasedPortEntry 3 }
+
+
+    rlTimeBasedPortRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+         "The status of a table entry.
+          It is used to delete an entry from this table."
+    ::= { rlTimeBasedPortEntry 4 }
+
+
+END
+

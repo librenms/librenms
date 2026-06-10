@@ -1,0 +1,355 @@
+-- *****************************************************************
+-- UBQS-PB-MIB.: Ubiquoss PB MIB      
+--
+-- Nov 2010,   Park Hyung Eun
+--   
+-- Copyright (c) 2010 by Ubiquoss, Corp.
+-- All rights reserved.
+-- *****************************************************************
+--   
+
+UBQS-PB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    IpAddress,
+    Gauge32,
+    Integer32,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    DisplayString,
+    TruthValue,
+        FROM SNMPv2-TC
+    ifIndex,
+        FROM IF-MIB      
+    VlanIndex,
+    	FROM Q-BRIDGE-MIB
+ 	UbiPortList,
+ 	UbiBridgeId
+        FROM UBQS-TC
+    ubiMgmtv2
+        FROM UBQS-SMI;                                     
+
+
+ubiPbMIB MODULE-IDENTITY
+    LAST-UPDATED    "201011300000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+	DESCRIPTION
+        "Provider Bridge MIB module for managing 802.1ad"
+    ::= { ubiMgmtv2 8 }
+
+ 
+ 
+-- *****************************************************************
+-- Textual Conventions
+-- *****************************************************************
+     
+VlanStpType   ::= TEXTUAL-CONVENTION
+STATUS          current
+    DESCRIPTION
+        "The type of the Spanning Tree Protocol (STP) running on
+        this VLAN."           
+    SYNTAX          INTEGER  {    
+                        stp(1),
+                        stp-vlan-bridge(2),
+                        rstp(3),
+                        rstp-vlan-bridge(4),
+                        mstp(5),
+                        provider-rstp(6),
+                        provider-mstp(7),
+                        rpvstExt(8)		-- rpvst+ 
+        }
+
+UbiVlanType   ::= TEXTUAL-CONVENTION
+STATUS          current
+    DESCRIPTION
+        "The type of the VLAN."           
+    SYNTAX          BITS 
+      	{            
+      		other(0),
+            static(1), 
+            dynamic(2),  
+            cvlan(3),
+            svlan(4),
+            svlan_p2p(5),
+            svlan_m2m(6),
+            --PBB
+            bvlan(7),
+            bvlan_p2p(8),
+            bvlan_m2m(9),
+            -- PBB TE
+            tevlan(10),
+            auto(11)
+      	}     
+      	
+UbiBridgeProtocol    ::= TEXTUAL-CONVENTION
+STATUS          current
+    DESCRIPTION
+        "Indicates the component type(s) of this bridge.  The
+ 		  following component types are possible:
+ 	
+ 	    	iComponent(1) - An S-VLAN aware component of a Backbone
+ 	        		Edge Bridge which performs encapsulation of customer
+ 	        		frames.
+ 	
+ 	    	bComponent(2) - An S-VLAN aware component of a Backbone
+ 	        		Edge Bridge which bundles backbone service instances
+ 	        		into B-VLANs.
+ 	
+ 	    	cVlanComponent(3) - A C-VLAN aware component of an
+ 	        		enterprise VLAN bridge or of a Provider Bridge used
+ 	        		to process C-tagged frames.
+ 	
+ 	    	sVlanComponent(4) - An S-VLAN aware component of a
+ 	        		Provider Bridge.
+ 	
+ 	    	dBridgeComponent(5) - A VLAN unaware component of an
+ 	        		802.1D bridge."           
+    SYNTAX          INTEGER  {          
+			iComponent(1),
+			bComponent(2),
+			cVlanComponent(3),
+			sVlanComponent(4),
+			dBridgeComponent(5)
+    }         
+          
+ 
+-- *****************************************************************
+-- ubiPbMIBObjects
+-- *****************************************************************
+
+ubiPbMIBNotificationsPrefix  	OBJECT IDENTIFIER		::= { ubiPbMIB 0 }
+ubiPbMIBObjects  				OBJECT IDENTIFIER		::= { ubiPbMIB 1 }        
+ubiPbMIBConformance  			OBJECT IDENTIFIER		::= { ubiPbMIB 2 }
+                 
+                                                          
+-- *****************************************************************
+-- ubiCvlanRegistrationTable
+-- *****************************************************************
+
+	ubiCvlanRegistrationTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCvlanRegistrationEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table that contains generic information about
+ 			 every C-VLAN registration tables."
+    	::= { ubiPbMIBObjects 1 }
+
+  	ubiCvlanRegistrationEntry OBJECT-TYPE
+    	SYNTAX          UbiCvlanRegistrationEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A list of information for each C-VLAN 
+        	 registration entry."
+    	INDEX           { ubiCvlanRegBridgeId, ubiCvlanRegName } 
+    	::= { ubiCvlanRegistrationTable 1 }
+
+  	
+  	UbiCvlanRegistrationEntry ::= SEQUENCE {          
+         	ubiCvlanRegBridgeId				UbiBridgeId, 	
+        	ubiCvlanRegName              	DisplayString,      
+	       	ubiCvlanRegRowStatus       		RowStatus
+        }
+    	
+  	ubiCvlanRegBridgeId OBJECT-TYPE
+    	SYNTAX          UbiBridgeId
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The Bridge Id to identifier the C-VLAN registration 
+        	 table with C-VLAN name.
+        	 
+        	 Bridge id represents 1~32, backbone, or beb." 
+    	::= { ubiCvlanRegistrationEntry 1 }
+
+  	ubiCvlanRegName OBJECT-TYPE
+    	SYNTAX          DisplayString (SIZE  (1..32))
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The name of C-VLAN registration table." 
+    	::= { ubiCvlanRegistrationEntry 2 }     
+    
+   	ubiCvlanRegRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+        	"The status of C-VLAN registration row." 
+    	::= { ubiCvlanRegistrationEntry 3 }
+                                           
+
+-- *****************************************************************
+-- ubiCvlanMappingTable
+-- *****************************************************************
+
+	ubiCvlanMappingTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCvlanMappingEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table that contains generic information about
+ 			 C-VLAN and S-VLAN mapping."
+    	::= { ubiPbMIBObjects 2 }
+  
+  	ubiCvlanMappingEntry OBJECT-TYPE
+    	SYNTAX          UbiCvlanMappingEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A list of information for each C-VLAN 
+        	 and S-VLAN mappin entry."
+    	INDEX           { ubiCvlanRegBridgeId, ubiCvlanRegName, ubiCvlanRegCvid, ubiCvlanRegSvid } 
+    	::= { ubiCvlanMappingTable 1 }
+
+  	
+  	UbiCvlanMappingEntry ::= SEQUENCE {
+        	ubiCvlanMappingCvid					VlanIndex,
+        	ubiCvlanMappingSvid                 VlanIndex,     
+        	ubiCvlanMappingRowStatus			RowStatus 
+        }
+   	
+  	ubiCvlanMappingCvid OBJECT-TYPE
+    	SYNTAX          VlanIndex
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"C-VLAN id." 
+    	::= { ubiCvlanMappingEntry 1 }
+    
+  	ubiCvlanMappingSvid OBJECT-TYPE
+    	SYNTAX          VlanIndex
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"S-VLAN id." 
+    	::= { ubiCvlanMappingEntry 2 }
+ 
+  	ubiCvlanMappingRowStatus OBJECT-TYPE
+    	SYNTAX          RowStatus
+    	MAX-ACCESS      read-create
+    	STATUS          current
+    	DESCRIPTION
+ 	      	"The status of C-VLAN and S-VLAN mapping row." 
+    	::= { ubiCvlanMappingEntry 3 }
+ 
+
+
+-- *****************************************************************
+-- ubiCvlanPortTable
+-- *****************************************************************
+
+	ubiCvlanRegistrationPortTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiCvlanRegistrationPortEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A table that contains generic information about the device's 
+        	 ports that reference C-VLAN registration table"
+    	::= { ubiPbMIBObjects 3 }
+
+  	ubiCvlanRegistrationPortEntry OBJECT-TYPE
+    	SYNTAX          UbiCvlanRegistrationPortEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A list of information for the device's ports 
+        	that reference C-VLAN registration table."
+    	INDEX           { ubiCvlanRegBridgeId, ubiCvlanRegName, ubiBridgePort } 
+    	::= { ubiCvlanRegistrationPortTable 1 }
+
+  	
+  	UbiCvlanRegistrationPortEntry ::= SEQUENCE {
+        	ubiCvlanRegPortName					DisplayString,
+	       	ubiCvlanRegPortSet					INTEGER 
+        }
+   	
+  	ubiCvlanRegPortName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"A textual string containing information about 
+        	the port that reference C-VLAN registration table" 
+    	::= { ubiCvlanRegistrationPortEntry 1 }
+    
+  	ubiCvlanRegPortSet OBJECT-TYPE
+    	SYNTAX          INTEGER {   
+    			none(0), 
+    	 		add(1),
+    	 		delete(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"The operational set for bridge port that 
+        	 reference C-VLAN registration table." 
+    	::= { ubiCvlanRegistrationPortEntry 2 }
+ 
+                                                      
+-- *****************************************************************
+-- ubiPbMIBConformance
+-- *****************************************************************
+
+-- Conformance Information
+ubiPbMIBCompliances  	OBJECT IDENTIFIER		::= { ubiPbMIBConformance 1 }
+ubiPbMIBGroups  		OBJECT IDENTIFIER		::= { ubiPbMIBConformance 2 }
+
+
+-- compliance statements
+
+	ubiPbMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for PB implementations."
+    	MODULE          -- this module
+    	MANDATORY-GROUPS {             
+                       ubiPbCvlanRegGroup,
+                    }
+    	::= { ubiPbMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiPbCvlanRegGroup OBJECT-GROUP
+    	OBJECTS         {   
+          	ubiCvlanRegBridgeId, 	
+        	ubiCvlanRegName,      
+	       	ubiCvlanRegRowStatus,
+        	ubiCvlanMappingCvid,
+        	ubiCvlanMappingSvid,     
+        	ubiCvlanMappingRowStatus, 
+         	ubiCvlanRegPortName,
+	       	ubiCvlanRegPortSet        
+	    }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects that provide cvlan 
+        	 registration information."
+    	::= { ubiPbMIBGroups 1 }
+
+END
+
+
+
+

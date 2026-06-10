@@ -1,0 +1,32 @@
+LINKSYS-Dlf-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      Linksys Switch Interfaces Private
+-- Version:    7.47
+-- Date:       15 Sep 2008
+
+IMPORTS
+    OBJECT-TYPE                                     FROM SNMPv2-SMI
+    PortList                                        FROM Q-BRIDGE-MIB
+    rnd                                             FROM LINKSYS-MIB;
+
+rlDlf MODULE-IDENTITY
+        LAST-UPDATED "200809151234Z"
+        ORGANIZATION "Linksys LLC."
+        CONTACT-INFO
+              "www.linksys.com/business/support"
+        DESCRIPTION
+            "The private MIB module definition for DLF Ports MIB.
+             unknown unicast egress filtering "
+        ::= { rnd 135 }
+
+--rlDlfPortList
+rlDlfPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A port bitmap containing entries of unknown unicas egress filtering"
+    ::= { rlDlf 1 }
+
+END
+

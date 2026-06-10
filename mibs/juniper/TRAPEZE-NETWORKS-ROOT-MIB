@@ -1,0 +1,65 @@
+TRAPEZE-NETWORKS-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+trpzRootMib MODULE-IDENTITY
+    LAST-UPDATED "200805220008Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+	"Trapeze Networks Technical Support
+	 www.trapezenetworks.com
+	 US:            866.TRPZ.TAC
+	 International: 925.474.2400
+	 support@trapezenetworks.com"
+    DESCRIPTION
+        "Trapeze Networks Root MIB
+
+	Copyright 2008 Trapeze Networks, Inc.
+	All rights reserved.
+	This Trapeze Networks SNMP Management Information Base
+	Specification (Specification) embodies Trapeze Networks'
+	confidential and proprietary intellectual property.
+	Trapeze Networks retains all title and ownership in
+	the Specification, including any revisions.
+
+	This Specification is supplied 'AS IS' and Trapeze Networks
+	makes no warranty, either express or implied, as to the use,
+	operation, condition, or performance of the Specification."
+
+    REVISION "200805220008Z"
+    DESCRIPTION "v3.1.1: Changed IMPORT of enterprises
+                from RFC1155-SMI to SNMPv2-SMI
+                (this will be published in 7.0 release)"
+
+    REVISION "200711280007Z"
+    DESCRIPTION "v3.0.0: Added subtree for
+                wireless Management Applications specific MIBs
+                (this will be published in 7.0 release)"
+
+    REVISION "200604140006Z"
+    DESCRIPTION "v2.0.5: Revised for 4.1 release"
+
+    REVISION "200501010000Z"
+    DESCRIPTION "v1: initial version, as for 4.0 and older releases"
+
+    ::= { enterprises 14525 }
+
+-- Top level Branches
+
+trpzProducts      OBJECT IDENTIFIER ::= { trpzRootMib 1 }
+trpzTemporary     OBJECT IDENTIFIER ::= { trpzRootMib 2 }
+trpzRegistration  OBJECT IDENTIFIER ::= { trpzRootMib 3 }
+trpzMibs          OBJECT IDENTIFIER ::= { trpzRootMib 4 }
+trpzTraps         OBJECT IDENTIFIER ::= { trpzRootMib 5 }
+
+--
+-- 'MgmtAppMibs' is a subtree for MIB modules
+-- intended to be implemented by wireless Management Applications,
+-- not by the wireless switch's SNMP agent:
+--
+trpzMgmtAppMibs   OBJECT IDENTIFIER ::= { trpzRootMib 6 }
+
+
+END

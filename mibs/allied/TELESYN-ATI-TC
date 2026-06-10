@@ -1,0 +1,62 @@
+TELESYN-ATI-TC
+
+DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+
+    MODULE-IDENTITY, enterprises       FROM SNMPv2-SMI;
+
+
+alliedtelesyn          OBJECT IDENTIFIER ::= { enterprises 207 }
+mibObjects            OBJECT IDENTIFIER ::= { alliedtelesyn 8 }
+products            OBJECT IDENTIFIER ::= { alliedtelesyn 1 }
+switchingHubs            OBJECT IDENTIFIER ::= { products 4 }
+at-8200Switch            OBJECT IDENTIFIER ::= { switchingHubs 9 }
+at8200SwitchMib            OBJECT IDENTIFIER ::= { mibObjects 9 }
+--
+-- atiChassis is the root for modules defining generic chassis objects
+--
+switchChassis        OBJECT IDENTIFIER ::= { at8200SwitchMib 1 }
+
+switchMibModules        OBJECT IDENTIFIER ::= { at8200SwitchMib 2 }
+--
+-- some nodes under atiMibModules 
+    atmModule         OBJECT IDENTIFIER ::= { switchMibModules 1 }
+    bridgeModule      OBJECT IDENTIFIER ::= { switchMibModules 2 }
+    fddiModule        OBJECT IDENTIFIER ::= { switchMibModules 3 }
+    isdnModule        OBJECT IDENTIFIER ::= { switchMibModules 4 }
+    vLanModule        OBJECT IDENTIFIER ::= { switchMibModules 5 }
+
+--
+-- This following OID is the root for objects which are model or product
+-- specific - they don't or won't fall into a general class of objects
+atiProducts       OBJECT IDENTIFIER ::= { at8200SwitchMib 3 }
+    switchProduct      OBJECT IDENTIFIER ::= { atiProducts 1 }
+
+--
+-- The following OID is the root for constructing the sysObjectID for 
+-- for individual agents or subagents.
+atiAgents         OBJECT IDENTIFIER ::= { at8200SwitchMib 100 }
+    uplinkSwitchAgent        OBJECT IDENTIFIER ::= { atiAgents 1 }
+    switchAgent        OBJECT IDENTIFIER ::= { atiAgents 2 }
+
+--
+-- It is suggested that the root OID for the AGENT-CAPABILITIES
+-- macro be atiAgentCapabilities when the capabilities includes
+-- multiple mib modules. 
+--
+-- This does not preclude defining capabilites for a specific
+-- module such as atmModule, for example, where that capabilities is
+-- self contained.
+atiAgentCapabilities OBJECT IDENTIFIER ::= { at8200SwitchMib 1000 }
+
+--use this as the root OID when defining a MIB module with only 
+--textual conventions
+atiConventions      OBJECT IDENTIFIER ::= { at8200SwitchMib 200 }
+
+-- for Vendor specific mib modules
+switchVendor           OBJECT IDENTIFIER ::= { at8200SwitchMib 300 }
+
+--
+END
+

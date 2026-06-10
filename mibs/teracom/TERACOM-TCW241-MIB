@@ -1,0 +1,1923 @@
+TERACOM-TCW241-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, IpAddress, Integer32, snmpModules 		
+															FROM SNMPv2-SMI
+	DateAndTime, MacAddress, DisplayString					FROM SNMPv2-TC
+	TEXTUAL-CONVENTION										FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP , NOTIFICATION-GROUP      						
+															FROM SNMPv2-CONF;
+	
+snmpMIB MODULE-IDENTITY
+    LAST-UPDATED "201904170000Z"
+	ORGANIZATION "TERACOM"
+	CONTACT-INFO
+			"EMail:	info@teracomsystems.com"
+	DESCRIPTION
+			"The MIB module for TCW241 SNMP entities."
+	REVISION      "201904170000Z"
+	DESCRIPTION
+			"TCW241v1.3"
+	::= { snmpModules 1 }
+
+teracom                           	OBJECT IDENTIFIER ::=  { enterprises 38783 }
+tcw241                           	OBJECT IDENTIFIER ::=  { teracom 3 }
+trapNotifications                  	OBJECT IDENTIFIER ::=  { tcw241 0 }
+product                            	OBJECT IDENTIFIER ::=  { tcw241 1 }
+setup                              	OBJECT IDENTIFIER ::=  { tcw241 2 }
+monitorNcontrol                    	OBJECT IDENTIFIER ::=  { tcw241 3 }
+
+tcw241MIBConformance				OBJECT IDENTIFIER ::=  { tcw241 4 }
+
+tcw241MIBCompliances         		OBJECT IDENTIFIER ::= { tcw241MIBConformance 1 }
+tcw241MIBGroups  					OBJECT IDENTIFIER ::= { tcw241MIBConformance 2 }
+
+
+CONTROLLED ::=  TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+           "Relay control logic"
+       SYNTAX    INTEGER
+ 			{	manual(0),sensor11(1),sensor12(2),sensor21(3),sensor22(4),
+				sensor31(5),sensor32(6),sensor41(7),sensor42(8),sensor51(9),
+				sensor52(10),sensor61(11),sensor62(12),sensor71(13),sensor72(14),
+				sensor81(15),sensor82(16),analog1(17),analog2(18),analog3(19),analog4(20),
+				digital1(21),digital2(22),digital3(23),digital4(24),
+				anyAlarm(25),anySensor(26),anyAnalog(27),anyDigital(28),
+				func1(29),func2(30),func3(31),func4(32),
+				shedule1(33),shedule2(34),shedule3(35),shedule4(36),
+				virtual1(37),virtual2(38),virtual3(39),virtual4(40)
+			}
+
+RELAYACTION ::=  TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+           "Relay action"
+       SYNTAX    INTEGER
+ 			{turnon(0),pulse(2)}
+
+VIRTUALPARENT ::=  TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+           "Virtual input parent"
+       SYNTAX    INTEGER
+ 			{	none(0),sensor11(1),sensor12(2),sensor21(3),sensor22(4),
+				sensor31(5),sensor32(6),sensor41(7),sensor42(8),sensor51(9),
+				sensor52(10),sensor61(11),sensor62(12),sensor71(13),sensor72(14),
+				sensor81(15),sensor82(16),analog1(17),analog2(18),analog3(19),analog4(20)
+			}
+
+SensorId ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "16a"
+       STATUS  current
+       DESCRIPTION
+	      "Sensor ROM code in ASCII HEX format"
+       SYNTAX    OCTET STRING (SIZE (16))
+	   
+AnalogValue ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-3"
+       STATUS  current
+       DESCRIPTION
+	      "Analog value x1000 in Integer format"
+       SYNTAX    Integer32
+	   
+SensorValue ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-3"
+       STATUS  current
+       DESCRIPTION
+	      "Sensor value x1000 in Integer format"
+       SYNTAX    Integer32
+
+VirtualValue ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d-3"
+       STATUS  current
+       DESCRIPTION
+	      "Virtual input value x1000 in Integer format"
+       SYNTAX    Integer32
+			
+ALARMSTATUS ::=  TEXTUAL-CONVENTION
+       STATUS  current
+       DESCRIPTION
+           "Alarm status"
+       SYNTAX    INTEGER
+ 			{normal(0), alarm(1)}
+			
+name    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Name of product"
+   ::= { product 1 }
+   
+
+version    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Version string"
+   ::= { product 2 }
+   
+dateTime    OBJECT-TYPE
+   SYNTAX DateAndTime
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Date and time"
+   ::= { product 3 }
+
+network                             	OBJECT IDENTIFIER ::=  { setup 1 }
+
+deviceID OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Device ID is Default MAC Address"
+    ::= { network 1 }
+	
+hostName  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..38))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Host Name"
+    ::= { network 2 }
+	
+deviceIP OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Device IP Address"
+    ::= { network 3 }
+	
+io                             	OBJECT IDENTIFIER ::=  { setup 2 }
+sensorsSetup                      	OBJECT IDENTIFIER ::=  { io 1 }
+
+sensor1setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 1 }
+sensor2setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 2 }
+sensor3setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 3 }
+sensor4setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 4 }
+sensor5setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 5 }
+sensor6setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 6 }
+sensor7setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 7 }
+sensor8setup                      	OBJECT IDENTIFIER ::=  { sensorsSetup 8 }
+
+s1description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Sensor1 description"
+    ::= { sensor1setup 1 }
+
+sensor11setup                      	OBJECT IDENTIFIER ::=  { sensor1setup 2 }
+sensor12setup                      	OBJECT IDENTIFIER ::=  { sensor1setup 3 }
+
+s11MAXInt OBJECT-TYPE
+    SYNTAX  SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 maximum value x1000 in Integer format"
+    ::= { sensor11setup 1 }
+
+s11MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 minimum value x1000 in Integer format"
+    ::= { sensor11setup 2 }
+	
+s11HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S11 hysteresis value x1000 in Integer format"
+    ::= { sensor11setup 3 }
+
+s12MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 maximum value x1000 in Integer format"
+    ::= { sensor12setup 1 }
+
+s12MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 minimum value x1000 in Integer format"
+    ::= { sensor12setup 2 }
+	
+s12HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "S12 hysteresis value x1000 in Integer format"
+    ::= { sensor12setup 3 }
+	
+s2description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "sensor2 description"
+    ::= { sensor2setup 1 }
+
+sensor21setup                      	OBJECT IDENTIFIER ::=  { sensor2setup 2 }
+sensor22setup                      	OBJECT IDENTIFIER ::=  { sensor2setup 3 }
+
+s21MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s21 maximum value x1000 in Integer format"
+    ::= { sensor21setup 1 }
+
+s21MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s21 minimum value x1000 in Integer format"
+    ::= { sensor21setup 2 }
+	
+s21HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s21 hysteresis value x1000 in Integer format"
+    ::= { sensor21setup 3 }
+
+s22MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s22 maximum value x1000 in Integer format"
+    ::= { sensor22setup 1 }
+
+s22MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s22 minimum value x1000 in Integer format"
+    ::= { sensor22setup 2 }
+	
+s22HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s22 hysteresis value x1000 in Integer format"
+    ::= { sensor22setup 3 }
+
+s3description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor3 description"
+    ::= { sensor3setup 1 }
+
+sensor31setup                      	OBJECT IDENTIFIER ::=  { sensor3setup 2 }
+sensor32setup                      	OBJECT IDENTIFIER ::=  { sensor3setup 3 }
+
+s31MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s31 maximum value x1000 in Integer format"
+    ::= { sensor31setup 1 }
+
+s31MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s31 minimum value x1000 in Integer format"
+    ::= { sensor31setup 2 }
+	
+s31HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s31 hysteresis value x1000 in Integer format"
+    ::= { sensor31setup 3 }
+
+s32MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s32 maximum value x1000 in Integer format"
+    ::= { sensor32setup 1 }
+
+s32MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s32 minimum value x1000 in Integer format"
+    ::= { sensor32setup 2 }
+	
+s32HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s32 hysteresis value x1000 in Integer format"
+    ::= { sensor32setup 3 }
+
+s4description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor4 description"
+    ::= { sensor4setup 1 }
+
+sensor41setup                      	OBJECT IDENTIFIER ::=  { sensor4setup 2 }
+sensor42setup                      	OBJECT IDENTIFIER ::=  { sensor4setup 3 }
+
+s41MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s41 maximum value x1000 in Integer format"
+    ::= { sensor41setup 1 }
+
+s41MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s41 minimum value x1000 in Integer format"
+    ::= { sensor41setup 2 }
+	
+s41HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s41 hysteresis value x1000 in Integer format"
+    ::= { sensor41setup 3 }
+
+s42MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s42 maximum value x1000 in Integer format"
+    ::= { sensor42setup 1 }
+
+s42MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s42 minimum value x1000 in Integer format"
+    ::= { sensor42setup 2 }
+	
+s42HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s42 hysteresis value x1000 in Integer format"
+    ::= { sensor42setup 3 }
+
+s5description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor5 description"
+    ::= { sensor5setup 1 }
+
+sensor51setup                      	OBJECT IDENTIFIER ::=  { sensor5setup 2 }
+sensor52setup                      	OBJECT IDENTIFIER ::=  { sensor5setup 3 }
+
+s51MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s51 maximum value x1000 in Integer format"
+    ::= { sensor51setup 1 }
+
+s51MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s51 minimum value x1000 in Integer format"
+    ::= { sensor51setup 2 }
+	
+s51HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s51 hysteresis value x1000 in Integer format"
+    ::= { sensor51setup 3 }
+
+s52MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s52 maximum value x1000 in Integer format"
+    ::= { sensor52setup 1 }
+
+s52MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s52 minimum value x1000 in Integer format"
+    ::= { sensor52setup 2 }
+	
+s52HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s52 hysteresis value x1000 in Integer format"
+    ::= { sensor52setup 3 }
+
+s6description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor6 description"
+    ::= { sensor6setup 1 }
+
+sensor61setup                      	OBJECT IDENTIFIER ::=  { sensor6setup 2 }
+sensor62setup                      	OBJECT IDENTIFIER ::=  { sensor6setup 3 }
+
+s61MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s61 maximum value x1000 in Integer format"
+    ::= { sensor61setup 1 }
+
+s61MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s61 minimum value x1000 in Integer format"
+    ::= { sensor61setup 2 }
+	
+s61HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s61 hysteresis value x1000 in Integer format"
+    ::= { sensor61setup 3 }
+
+s62MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s62 maximum value x1000 in Integer format"
+    ::= { sensor62setup 1 }
+
+s62MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s62 minimum value x1000 in Integer format"
+    ::= { sensor62setup 2 }
+	
+s62HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s62 hysteresis value x1000 in Integer format"
+    ::= { sensor62setup 3 }
+
+s7description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor7 description"
+    ::= { sensor7setup 1 }
+
+sensor71setup                      	OBJECT IDENTIFIER ::=  { sensor7setup 2 }
+sensor72setup                      	OBJECT IDENTIFIER ::=  { sensor7setup 3 }
+
+s71MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s71 maximum value x1000 in Integer format"
+    ::= { sensor71setup 1 }
+
+s71MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s71 minimum value x1000 in Integer format"
+    ::= { sensor71setup 2 }
+	
+s71HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s71 hysteresis value x1000 in Integer format"
+    ::= { sensor71setup 3 }
+
+s72MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s72 maximum value x1000 in Integer format"
+    ::= { sensor72setup 1 }
+
+s72MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s72 minimum value x1000 in Integer format"
+    ::= { sensor72setup 2 }
+	
+s72HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s72 hysteresis value x1000 in Integer format"
+    ::= { sensor72setup 3 }
+
+s8description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current    DESCRIPTION
+        "sensor8 description"
+    ::= { sensor8setup 1 }
+
+sensor81setup                      	OBJECT IDENTIFIER ::=  { sensor8setup 2 }
+sensor82setup                      	OBJECT IDENTIFIER ::=  { sensor8setup 3 }
+
+s81MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s81 maximum value x1000 in Integer format"
+    ::= { sensor81setup 1 }
+
+s81MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s81 minimum value x1000 in Integer format"
+    ::= { sensor81setup 2 }
+	
+s81HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s81 hysteresis value x1000 in Integer format"
+    ::= { sensor81setup 3 }
+
+s82MAXInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s82 maximum value x1000 in Integer format"
+    ::= { sensor82setup 1 }
+
+s82MINInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s82 minimum value x1000 in Integer format"
+    ::= { sensor82setup 2 }
+	
+s82HYSTInt OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "s82 hysteresis value x1000 in Integer format"
+    ::= { sensor82setup 3 }
+
+
+
+analogSetup                      	OBJECT IDENTIFIER ::=  { io 2 }
+
+analog1setup                   	OBJECT IDENTIFIER ::=  { analogSetup 1 }
+analog2setup                   	OBJECT IDENTIFIER ::=  { analogSetup 2 }
+analog3setup                   	OBJECT IDENTIFIER ::=  { analogSetup 3 }
+analog4setup                   	OBJECT IDENTIFIER ::=  { analogSetup 4 }
+
+voltage1description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 1 description"
+    ::= { analog1setup 1 }
+	
+voltage1max  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 1 maximum x1000 in Integer format"
+    ::= { analog1setup 2 }
+	
+voltage1min  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 1 minimum x1000 in Integer format"
+    ::= { analog1setup 3 }
+	
+voltage1hyst  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 1 hysteresis x1000 in Integer format"
+    ::= { analog1setup 4 }
+
+voltage2description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 2 description"
+    ::= { analog2setup 1 }
+	
+voltage2max  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 2 maximum x1000 in Integer format"
+    ::= { analog2setup 2 }
+	
+voltage2min  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 2 minimum x1000 in Integer format"
+    ::= { analog2setup 3 }
+	
+voltage2hyst  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 2 hysteresis x1000 in Integer format"
+    ::= { analog2setup 4 }
+	
+voltage3description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 3 description"
+    ::= { analog3setup 1 }
+	
+voltage3max  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 3 maximum x1000 in Integer format"
+    ::= { analog3setup 2 }
+	
+voltage3min  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 3 minimum x1000 in Integer format"
+    ::= { analog3setup 3 }
+	
+voltage3hyst  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 3 hysteresis x1000 in Integer format"
+    ::= { analog3setup 4 }
+	
+voltage4description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 4 description"
+    ::= { analog4setup 1 }
+	
+voltage4max  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 4 maximum x1000 in Integer format"
+    ::= { analog4setup 2 }
+	
+voltage4min  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 4 minimum x1000 in Integer format"
+    ::= { analog4setup 3 }
+	
+voltage4hyst  OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Voltage 4 hysteresis x1000 in Integer format"
+    ::= { analog4setup 4 }
+
+digitalSetup                      	OBJECT IDENTIFIER ::=  { io 3 }
+
+digitalInput1description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Digital Input 1 description"
+    ::= { digitalSetup 1 }
+
+digitalInput2description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Digital Input 2 description"
+    ::= { digitalSetup 2 }
+
+digitalInput3description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Digital Input 3 description"
+    ::= { digitalSetup 3 }
+	
+digitalInput4description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Digital Input 4 description"
+    ::= { digitalSetup 4 }
+
+relaysSetup                      	OBJECT IDENTIFIER ::=  { io 4 }
+
+relay1setup                      	OBJECT IDENTIFIER ::=  { relaysSetup 1 }
+relay2setup                      	OBJECT IDENTIFIER ::=  { relaysSetup 2 }
+relay3setup                      	OBJECT IDENTIFIER ::=  { relaysSetup 3 }
+relay4setup                      	OBJECT IDENTIFIER ::=  { relaysSetup 4 }
+
+relay1description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay 1 description"
+    ::= { relay1setup 1 }
+	
+relay1pulseWidth OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay1 Pulse x100ms"
+    ::= { relay1setup 2 }
+	
+relay1controlledBy OBJECT-TYPE
+    SYNTAX CONTROLLED
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay1 control logic"
+    ::= { relay1setup 3 }
+
+relay1action OBJECT-TYPE
+    SYNTAX RELAYACTION
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay1 action"
+    ::= { relay1setup 4 }
+
+relay2description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay 2 description"
+    ::= { relay2setup 1 }
+	
+relay2pulseWidth OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay2 Pulse x100ms"
+    ::= { relay2setup 2 }
+
+relay2controlledBy OBJECT-TYPE
+    SYNTAX CONTROLLED
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay2 control logic"
+    ::= { relay2setup 3 }
+
+relay2action OBJECT-TYPE
+    SYNTAX RELAYACTION
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay2 action"
+    ::= { relay2setup 4 }
+	
+relay3description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay 3 description"
+    ::= { relay3setup 1 }
+	
+relay3pulseWidth OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay3 Pulse x100ms"
+    ::= { relay3setup 2 }
+
+relay3controlledBy OBJECT-TYPE
+    SYNTAX CONTROLLED
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay3 control logic"
+    ::= { relay3setup 3 }
+
+relay3action OBJECT-TYPE
+    SYNTAX RELAYACTION
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay3 action"
+    ::= { relay3setup 4 }
+	
+relay4description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Relay 4 description"
+    ::= { relay4setup 1 }
+	
+relay4pulseWidth OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay4 Pulse x100ms"
+    ::= { relay4setup 2 }
+
+relay4controlledBy OBJECT-TYPE
+    SYNTAX CONTROLLED
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay4 control logic"
+    ::= { relay4setup 3 }
+
+relay4action OBJECT-TYPE
+    SYNTAX RELAYACTION
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay4 action"
+    ::= { relay4setup 4 }
+
+virtualSetup                      	OBJECT IDENTIFIER ::=  { io 5 }
+
+virtual1setup                   	OBJECT IDENTIFIER ::=  { virtualSetup 1 }
+virtual2setup                   	OBJECT IDENTIFIER ::=  { virtualSetup 2 }
+virtual3setup                   	OBJECT IDENTIFIER ::=  { virtualSetup 3 }
+virtual4setup                   	OBJECT IDENTIFIER ::=  { virtualSetup 4 }
+
+virtualInput1description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 1 description"
+    ::= { virtual1setup 1 }
+	
+virtualInput1max  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 1 maximum"
+    ::= { virtual1setup 2 }
+	
+virtualInput1min  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 1 minimum"
+    ::= { virtual1setup 3 }
+	
+virtualInput1hyst  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 1 hysteresis"
+    ::= { virtual1setup 4 }
+
+virtualInput1Parent OBJECT-TYPE
+    SYNTAX VIRTUALPARENT
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 1 parent"
+    ::= { virtual1setup 5 }
+
+virtualInput2description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 2 description"
+    ::= { virtual2setup 1 }
+	
+virtualInput2max  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 2 maximum"
+    ::= { virtual2setup 2 }
+	
+virtualInput2min  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 2 minimum"
+    ::= { virtual2setup 3 }
+	
+virtualInput2hyst  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 2 hysteresis"
+    ::= { virtual2setup 4 }
+	
+virtualInput2Parent OBJECT-TYPE
+    SYNTAX VIRTUALPARENT
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 2 parent"
+    ::= { virtual2setup 5 }
+
+virtualInput3description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 3 description"
+    ::= { virtual3setup 1 }
+	
+virtualInput3max  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 3 maximum"
+    ::= { virtual3setup 2 }
+	
+virtualInput3min  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 3 minimum"
+    ::= { virtual3setup 3 }
+	
+virtualInput3hyst  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 3 hysteresis"
+    ::= { virtual3setup 4 }
+
+virtualInput3Parent OBJECT-TYPE
+    SYNTAX VIRTUALPARENT
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 3 parent"
+    ::= { virtual3setup 5 }
+	
+virtualInput4description  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..12))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 4 description"
+    ::= { virtual4setup 1 }
+	
+virtualInput4max  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 4 maximum"
+    ::= { virtual4setup 2 }
+	
+virtualInput4min  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 4 minimum"
+    ::= { virtual4setup 3 }
+	
+virtualInput4hyst  OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Virtual input 4 hysteresis"
+    ::= { virtual4setup 4 }
+
+virtualInput4Parent OBJECT-TYPE
+    SYNTAX VIRTUALPARENT
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 4 parent"
+    ::= { virtual4setup 5 }
+
+sensors	OBJECT IDENTIFIER ::=  { monitorNcontrol 1 }
+sensor1	OBJECT IDENTIFIER ::=  { sensors 1 }
+s1Alarm	OBJECT IDENTIFIER ::=  { sensor1 4 }
+
+s11Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S11 value x1000 in Integer format"
+    ::= { sensor1 1 }
+	
+s12Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S12 value x1000 in Integer format"
+    ::= { sensor1 2 }
+	
+s1ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S1 ID value"
+    ::= { sensor1 3 }
+	
+s11Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S11 alarm status"
+    ::= { s1Alarm 1 }
+	
+s12Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S12 alarm status"
+    ::= { s1Alarm 2 }
+
+sensor2	OBJECT IDENTIFIER ::=  { sensors 2 }
+s2Alarm	OBJECT IDENTIFIER ::=  { sensor2 4 }
+s21Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S21 value x1000 in Integer format"
+    ::= { sensor2 1 }
+	
+s22Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S22 value x1000 in Integer format"
+    ::= { sensor2 2 }
+	
+s2ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S2 ID value"
+    ::= { sensor2 3 }
+	
+s21Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S21 alarm status"
+    ::= { s2Alarm 1 }
+	
+s22Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S22 alarm status"
+    ::= { s2Alarm 2 }
+
+sensor3	OBJECT IDENTIFIER ::=  { sensors 3 }
+s3Alarm	OBJECT IDENTIFIER ::=  { sensor3 4 }
+s31Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S31 value x1000 in Integer format"
+    ::= { sensor3 1 }
+	
+s32Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S32 value x1000 in Integer format"
+    ::= { sensor3 2 }
+	
+s3ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S3 ID value"
+    ::= { sensor3 3 }
+	
+s31Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S31 alarm status"
+    ::= { s3Alarm 1 }
+	
+s32Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S32 alarm status"
+    ::= { s3Alarm 2 }
+
+sensor4	OBJECT IDENTIFIER ::=  { sensors 4 }
+s4Alarm	OBJECT IDENTIFIER ::=  { sensor4 4 }
+s41Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S41 value x1000 in Integer format"
+    ::= { sensor4 1 }
+	
+s42Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S42 value x1000 in Integer format"
+    ::= { sensor4 2 }
+	
+s4ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S4 ID value"
+    ::= { sensor4 3 }
+	
+s41Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S41 alarm status"
+    ::= { s4Alarm 1 }
+	
+s42Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S42 alarm status"
+    ::= { s4Alarm 2 }
+
+sensor5	OBJECT IDENTIFIER ::=  { sensors 5 }
+s5Alarm	OBJECT IDENTIFIER ::=  { sensor5 4 }
+s51Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S51 value x1000 in Integer format"
+    ::= { sensor5 1 }
+	
+s52Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S52 value x1000 in Integer format"
+    ::= { sensor5 2 }
+	
+s5ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S5 ID value"
+    ::= { sensor5 3 }
+	
+s51Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S51 alarm status"
+    ::= { s5Alarm 1 }
+	
+s52Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S52 alarm status"
+    ::= { s5Alarm 2 }
+
+sensor6	OBJECT IDENTIFIER ::=  { sensors 6 }
+s6Alarm	OBJECT IDENTIFIER ::=  { sensor6 4 }
+s61Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S61 value x1000 in Integer format"
+    ::= { sensor6 1 }
+	
+s62Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S62 value x1000 in Integer format"
+    ::= { sensor6 2 }
+	
+s6ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S6 ID value"
+    ::= { sensor6 3 }
+	
+s61Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S61 alarm status"
+    ::= { s6Alarm 1 }
+	
+s62Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S62 alarm status"
+    ::= { s6Alarm 2 }
+
+sensor7	OBJECT IDENTIFIER ::=  { sensors 7 }
+s7Alarm	OBJECT IDENTIFIER ::=  { sensor7 4 }
+s71Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S71 value x1000 in Integer format"
+    ::= { sensor7 1 }
+	
+s72Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S72 value x1000 in Integer format"
+    ::= { sensor7 2 }
+	
+s7ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S7 ID value"
+    ::= { sensor7 3 }
+	
+s71Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S71 alarm status"
+    ::= { s7Alarm 1 }
+	
+s72Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S72 alarm status"
+    ::= { s7Alarm 2 }
+
+sensor8	OBJECT IDENTIFIER ::=  { sensors 8 }
+s8Alarm	OBJECT IDENTIFIER ::=  { sensor8 4 }
+s81Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S81 value x1000 in Integer format"
+    ::= { sensor8 1 }
+	
+s82Int OBJECT-TYPE
+    SYNTAX SensorValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "S82 value x1000 in Integer format"
+    ::= { sensor8 2 }
+	
+s8ID OBJECT-TYPE
+    SYNTAX  SensorId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S8 ID value"
+    ::= { sensor8 3 }
+	
+s81Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S81 alarm status"
+    ::= { s8Alarm 1 }
+	
+s82Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "S82 alarm status"
+    ::= { s8Alarm 2 }
+
+analog	OBJECT IDENTIFIER ::=  { monitorNcontrol 2 }
+analogAlarm	OBJECT IDENTIFIER ::=  { analog 5 }
+voltage1Int OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Voltage1 x1000 in Integer format"
+    ::= { analog 1 }
+	
+voltage2Int OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Voltage2 x1000 in Integer format"
+    ::= { analog 2 }
+	
+voltage3Int OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Voltage3 x1000 in Integer format"
+    ::= { analog 3 }
+	
+voltage4Int OBJECT-TYPE
+    SYNTAX AnalogValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Voltage4 x1000 in Integer format"
+    ::= { analog 4 }
+	
+volt1Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Voltage 1 alarm status"
+    ::= { analogAlarm 1 }
+	
+volt2Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Voltage 2 alarm status"
+    ::= { analogAlarm 2 }
+	
+volt3Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Voltage 3 alarm status"
+    ::= { analogAlarm 3 }
+	
+volt4Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Voltage 4 alarm status"
+    ::= { analogAlarm 4 }
+
+digital	OBJECT IDENTIFIER ::=  { monitorNcontrol 3 }
+digAlarm	OBJECT IDENTIFIER ::=  { digital 5 }											 
+
+digitalInput1State OBJECT-TYPE
+    SYNTAX INTEGER { closed(0), open(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Digital1 Input State"
+    ::= { digital 1 }
+
+digitalInput2State OBJECT-TYPE
+    SYNTAX INTEGER { closed(0), open(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Digital2 Input State"
+    ::= { digital 2 }
+
+digitalInput3State OBJECT-TYPE
+    SYNTAX INTEGER { closed(0), open(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Digital3 Input State"
+    ::= { digital 3 }
+
+digitalInput4State OBJECT-TYPE
+    SYNTAX INTEGER { closed(0), open(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Digital4 Input State"
+    ::= { digital 4 }
+	
+dig1Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Digital 1 alarm status"
+    ::= { digAlarm 1 }
+	
+dig2Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Digital 2 alarm status"
+    ::= { digAlarm 2 }
+	
+dig3Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Digital 3 alarm status"
+    ::= { digAlarm 3 }
+	
+dig4Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Digital 3 alarm status"
+    ::= { digAlarm 4 }
+
+relays	OBJECT IDENTIFIER ::=  { monitorNcontrol 4 }
+
+relay1	OBJECT IDENTIFIER ::=  { relays 1 }
+
+relay1State OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay1 State"
+    ::= { relay1 1 }
+
+relay1Pulse OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay1 Pulse"
+    ::= { relay1 2 }
+	
+relay2	OBJECT IDENTIFIER ::=  { relays 2 }
+relay2State OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay2 State"
+    ::= { relay2 1 }
+
+relay2Pulse OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay2 Pulse"
+    ::= { relay2 2 }
+	
+relay3	OBJECT IDENTIFIER ::=  { relays 3 }
+relay3State OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay3 State"
+    ::= { relay3 1 }
+
+relay3Pulse OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay3 Pulse"
+    ::= { relay3 2 }
+	
+relay4	OBJECT IDENTIFIER ::=  { relays 4 }
+relay4State OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay4 State"
+    ::= { relay4 1 }
+
+relay4Pulse OBJECT-TYPE
+    SYNTAX INTEGER { off(0), on(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Relay4 Pulse"
+    ::= { relay4 2 }
+		
+--- configurationSaved
+configurationSaved OBJECT-TYPE
+	SYNTAX INTEGER { unsaved(0), saved(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Configuration save status SAVED/UNSAVED"
+	::= { monitorNcontrol 5 }
+
+restartDevice OBJECT-TYPE
+	SYNTAX INTEGER {  cancel(0), restart(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Restart Device"
+	::= { monitorNcontrol 6}
+	
+temperatureUnit OBJECT-TYPE
+	SYNTAX INTEGER {  celcius(0), fahrenheit(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Unit of the all temperature values"
+	::= { monitorNcontrol 7}
+	
+hardwareErr OBJECT-TYPE
+	SYNTAX INTEGER {  noErr(0), owErr(1), hwErr(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Hardware Error"
+	::= { monitorNcontrol 8}
+	
+pressureUnit OBJECT-TYPE
+	SYNTAX INTEGER {  hPa(0), mbar(1), mmhg(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Unit of the pressure value"
+	::= { monitorNcontrol 9}
+	
+functions	OBJECT IDENTIFIER ::=  { monitorNcontrol 10 }
+funcAlarm	OBJECT IDENTIFIER ::=  { functions 5 }	
+
+func1State OBJECT-TYPE
+    SYNTAX INTEGER { false(0), true(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Funtion 1 State"
+    ::= { functions 1 }
+	
+func2State OBJECT-TYPE
+    SYNTAX INTEGER { false(0), true(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Funtion 2 State"
+    ::= { functions 2 }
+	
+func3State OBJECT-TYPE
+    SYNTAX INTEGER { false(0), true(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Funtion 3 State"
+    ::= { functions 3 }
+	
+func4State OBJECT-TYPE
+    SYNTAX INTEGER { false(0), true(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Funtion 4 State"
+    ::= { functions 4 }
+	
+func1Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Function 1 alarm status"
+    ::= { funcAlarm 1 }
+	
+func2Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Function 2 alarm status"
+    ::= { funcAlarm 2 }
+	
+func3Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Function 3 alarm status"
+    ::= { funcAlarm 3 }
+	
+func4Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Function 4 alarm status"
+    ::= { funcAlarm 4 }
+	
+virtual	OBJECT IDENTIFIER ::=  { monitorNcontrol 11 }
+virtAlarm	OBJECT IDENTIFIER ::=  { virtual 5 }
+
+virtualInput1Int OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 1 x1000 in Integer format"
+    ::= { virtual 1 }
+	
+virtualInput2Int OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 2 x1000 in Integer format"
+    ::= { virtual 2 }
+	
+virtualInput3Int OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 3 x1000 in Integer format"
+    ::= { virtual 3 }
+	
+virtualInput4Int OBJECT-TYPE
+    SYNTAX VirtualValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Virtual input 4 x1000 in Integer format"
+    ::= { virtual 4 }
+	
+virt1Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Virtual input 1 alarm status"
+    ::= { virtAlarm 1 }
+	
+virt2Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Virtual input 2 alarm status"
+    ::= { virtAlarm 2 }
+	
+virt3Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Virtual input 3 alarm status"
+    ::= { virtAlarm 3 }
+	
+virt4Al OBJECT-TYPE
+    SYNTAX  ALARMSTATUS
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "Virtual input 4 alarm status"
+    ::= { virtAlarm 4 }
+
+snmp-trap-notification NOTIFICATION-TYPE
+	OBJECTS { 	digitalInput1State,digitalInput2State,
+				digitalInput3State,digitalInput4State,
+				dig1Al,dig2Al,dig3Al,dig4Al,
+				voltage1Int,voltage2Int,voltage3Int,voltage4Int,
+				volt1Al,volt2Al,volt3Al,volt4Al,
+				s11Int,s12Int,s11Al,s12Al,
+				s21Int,s22Int,s21Al,s22Al,
+				s31Int,s32Int,s31Al,s32Al,
+				s41Int,s42Int,s41Al,s42Al,
+				s51Int,s52Int,s51Al,s52Al,
+				s61Int,s62Int,s61Al,s62Al,
+				s71Int,s72Int,s71Al,s72Al,
+				s81Int,s82Int,s81Al,s82Al,
+				restartDevice,deviceIP,
+				func1State, func2State, func3State, func4State,
+				func1Al, func2Al, func3Al, func4Al,
+				virtualInput1Int, virtualInput2Int, virtualInput3Int, virtualInput4Int,
+				virt1Al, virt2Al, virt3Al, virt4Al
+			}
+	STATUS current
+	DESCRIPTION 
+		"SMIV2 Trap notification information for the SNMP Manager."
+	::= {trapNotifications 1}
+	
+tcw241MIBCompliances1 MODULE-COMPLIANCE
+    STATUS  current
+	DESCRIPTION
+            "This group is for SNMP applications."
+    MODULE  -- this module
+        MANDATORY-GROUPS { tcw241ProductGroup, tcw241SetupGroup, tcw241MonitorGroup, tcw241TrapGroup}
+
+    ::= { tcw241MIBCompliances 1 }
+	
+tcw241ProductGroup OBJECT-GROUP
+    OBJECTS {name, version, dateTime}
+	STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic product info."
+    ::= { tcw241MIBGroups 1 }	
+	
+tcw241SetupGroup OBJECT-GROUP
+    OBJECTS {	deviceID, hostName, deviceIP,
+				s1description, s11MAXInt, s11MINInt, s11HYSTInt, s12MAXInt, s12MINInt, s12HYSTInt,
+				s2description, s21MAXInt, s21MINInt, s21HYSTInt, s22MAXInt, s22MINInt, s22HYSTInt,
+				s3description, s31MAXInt, s31MINInt, s31HYSTInt, s32MAXInt, s32MINInt, s32HYSTInt,
+				s4description, s41MAXInt, s41MINInt, s41HYSTInt, s42MAXInt, s42MINInt, s42HYSTInt,
+				s5description, s51MAXInt, s51MINInt, s51HYSTInt, s52MAXInt, s52MINInt, s52HYSTInt,
+				s6description, s61MAXInt, s61MINInt, s61HYSTInt, s62MAXInt, s62MINInt, s62HYSTInt,
+				s7description, s71MAXInt, s71MINInt, s71HYSTInt, s72MAXInt, s72MINInt, s72HYSTInt,
+				s8description, s81MAXInt, s81MINInt, s81HYSTInt, s82MAXInt, s82MINInt, s82HYSTInt,
+				voltage1description, voltage1max, voltage1min, voltage1hyst, 
+				voltage2description, voltage2max, voltage2min, voltage2hyst, 
+				voltage3description, voltage3max, voltage3min, voltage3hyst, 
+				voltage4description, voltage4max, voltage4min, voltage4hyst, 
+				digitalInput1description, digitalInput2description, digitalInput3description, digitalInput4description,
+				relay1description, relay1pulseWidth, relay1controlledBy, relay1action,
+				relay2description, relay2pulseWidth, relay2controlledBy, relay2action,
+				relay3description, relay3pulseWidth, relay3controlledBy, relay3action,
+				relay4description, relay4pulseWidth, relay4controlledBy, relay4action,
+				virtualInput1description, virtualInput1max, virtualInput1min, virtualInput1hyst, virtualInput1Parent,
+				virtualInput2description, virtualInput2max, virtualInput2min, virtualInput2hyst, virtualInput2Parent,
+				virtualInput3description, virtualInput3max, virtualInput3min, virtualInput3hyst, virtualInput3Parent,
+				virtualInput4description, virtualInput4max, virtualInput4min, virtualInput4hyst, virtualInput4Parent
+			}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic setup."
+    ::= { tcw241MIBGroups 2 }	
+	
+tcw241MonitorGroup OBJECT-GROUP
+    OBJECTS {	s11Int, s12Int, s1ID, s11Al, s12Al, s21Int, s22Int, s2ID, s21Al, s22Al, s31Int, s32Int, s3ID, s31Al, s32Al, 
+				s41Int, s42Int, s4ID, s41Al, s42Al, s51Int, s52Int, s5ID, s51Al, s52Al, s61Int, s62Int, s6ID, s61Al, s62Al,
+				s71Int, s72Int, s7ID, s71Al, s72Al, s81Int, s82Int, s8ID, s81Al, s82Al,
+				voltage1Int, voltage2Int, voltage3Int, voltage4Int,
+				volt1Al, volt2Al, volt3Al, volt4Al,
+				digitalInput1State, digitalInput2State, digitalInput3State, digitalInput4State,
+				dig1Al, dig2Al, dig3Al, dig4Al,
+				relay1State, relay1Pulse, relay2State, relay2Pulse, relay3State, relay3Pulse, relay4State, relay4Pulse,
+				configurationSaved, restartDevice, temperatureUnit, hardwareErr, pressureUnit,
+				func1State, func2State, func3State, func4State,
+				func1Al, func2Al, func3Al, func4Al,
+				virtualInput1Int, virtualInput2Int, virtualInput3Int, virtualInput4Int,
+				virt1Al, virt2Al, virt3Al, virt4Al
+			}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic monitoring
+            and control of a product."
+    ::= { tcw241MIBGroups 3 }	
+	
+tcw241TrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS  {snmp-trap-notification}
+    STATUS  current
+    DESCRIPTION
+            "SNMP Trap Notification object."
+    ::= { tcw241MIBGroups 4 }	
+
+	
+END

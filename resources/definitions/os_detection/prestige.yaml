@@ -1,0 +1,10 @@
+os: prestige
+text: 'ZyXEL Prestige'
+group: zyxel
+type: network
+icon: zyxel
+discovery:
+    -
+        sysDescr_regex:
+            - '/^Prestige/'
+            - '/^P-.*-/'

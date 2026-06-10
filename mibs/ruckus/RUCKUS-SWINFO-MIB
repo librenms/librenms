@@ -1,0 +1,138 @@
+--
+-- Copyright (c) 2010 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-SWINFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusCommonSwInfoModule
+        FROM RUCKUS-ROOT-MIB
+    DateAndTime,
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI;
+
+ruckusSwInfoMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless Inc."
+    CONTACT-INFO
+        "Ruckus Wireless Inc.
+
+        Postal:
+        880 W Maude Ave
+        Sunnyvale, CA 94085
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "This is the MIB Module for representing the software Information
+        objects."
+    ::= { ruckusCommonSwInfoModule 1 }
+
+
+-- Groups
+--
+
+ruckusSwInfoObjects OBJECT IDENTIFIER   ::= { ruckusSwInfoMIB 1 }
+
+ruckusSwInfo OBJECT IDENTIFIER  ::= { ruckusSwInfoObjects 1 }
+
+ruckusSwInfoEvents OBJECT IDENTIFIER    ::= { ruckusSwInfoMIB 2 }
+
+-- Software Revision Information
+--
+
+ruckusSwRevTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusSwRevEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table maintains all the software revision information.
+        This table is used to activate the inactive software."
+    ::= { ruckusSwInfo 1 }
+
+
+ruckusSwRevEntry OBJECT-TYPE
+    SYNTAX  RuckusSwRevEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each software revision entry."
+    INDEX {
+        ruckusSwRevIndex }
+    ::= { ruckusSwRevTable 1 }
+
+
+RuckusSwRevEntry ::= SEQUENCE {
+
+    ruckusSwRevIndex  INTEGER,
+    ruckusSwRevName   DisplayString,
+    ruckusSwRevision  DisplayString,
+    ruckusSwRevSize   Unsigned32,
+    ruckusSwRevStatus INTEGER }
+
+
+ruckusSwRevIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..10)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This is an index into the SoftwareRev Table. This table
+        contains two entries for active and inactive respectively."
+    ::= { ruckusSwRevEntry 1 }
+
+
+ruckusSwRevName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the file."
+    ::= { ruckusSwRevEntry 2 }
+
+
+ruckusSwRevision OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The software revision of the file."
+    ::= { ruckusSwRevEntry 3 }
+
+
+ruckusSwRevSize OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The size of the file in kilo bytes (KB=2**10, rounded up)."
+    ::= { ruckusSwRevEntry 4 }
+
+
+ruckusSwRevStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+            inactive(1),
+            active(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This indicates the current state of the software.
+        This may either be active (currently running), or
+        inactive."
+    ::= { ruckusSwRevEntry 5 }
+
+
+-- Conformance & Compliances
+--
+
+END

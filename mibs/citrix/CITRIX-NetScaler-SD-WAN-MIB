@@ -1,0 +1,3722 @@
+--************************************************************************
+-- CITRIX-NetScaler-SD-WAN-MIB.txt: CITRIX
+--
+-- Copyright (c) 2004-2016 by CITRIX Systems, Inc.
+-- All rights Reserved.
+--
+--************************************************************************
+
+CITRIX-NetScaler-SD-WAN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        enterprises
+                FROM SNMPv2-SMI
+        Integer32,
+        Counter32,
+        Gauge32,
+        Counter64,
+        IpAddress,
+        TimeTicks
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        DisplayString,
+        PhysAddress,
+        TruthValue,
+        RowStatus,
+        TimeStamp,
+        AutonomousType,
+        TestAndIncr
+                FROM SNMPv2-TC;
+
+-- Citrix enterprise ID
+citrix           OBJECT IDENTIFIER ::= { enterprises 3845 }
+
+-- sdWAN mib
+sdWANMIB MODULE-IDENTITY
+    LAST-UPDATED "201709260000Z"
+    ORGANIZATION "www.citrix.com"
+    CONTACT-INFO
+         "	CITRIX, Inc.
+		postal: 851 West Cypress Creek Road
+			Fort Lauderdale, Florida  33309
+			United States"
+    DESCRIPTION
+        "The MIB module for managing the CITRIX NetScaler SD-WAN Appliance"
+
+    ::= { citrix 31 }
+
+-- sdWANStatus mib
+sdWANStatusMIB	 OBJECT IDENTIFIER ::= { sdWANMIB 4 }
+
+--
+-- Base assignments
+--
+sdWANObjects     OBJECT IDENTIFIER ::= { sdWANStatusMIB 2 }
+sdWANNotifs      OBJECT IDENTIFIER ::= { sdWANStatusMIB 3 }
+
+--
+--
+--
+sdWANConfiguration   OBJECT IDENTIFIER ::= { sdWANObjects 1 }
+sdWANStatistics      OBJECT IDENTIFIER ::= { sdWANObjects 2 }
+sdWANEvents          OBJECT IDENTIFIER ::= { sdWANObjects 3 }
+
+--
+-- Statistics sub-section.
+-- This contains information for the following.
+--
+-- Appliances
+-- Ethernet Interfaces
+-- Routes
+-- Rules
+-- WAN Links
+-- Virtual Paths
+--    WANPaths
+--    WANClasses
+--    WANRules
+-- Internet Service
+--    InternetRules
+-- Intranet Service
+--    IntranetRules
+-- Passthrough Service
+-- RoutesV2
+-- DynamicVirtualPaths
+--    DynamicWANPaths
+--    DynamicWANClasses
+--    DynamicWANRules
+
+--
+-- Statistics for the Appliance object
+--
+sdWANStatsAppliances   OBJECT IDENTIFIER ::= { sdWANStatistics 12 }
+
+sdWANStatsApplianceScalars   OBJECT IDENTIFIER ::= { sdWANStatsAppliances 1 }
+
+sdWANStatsApplianceName            OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string name for the appliance."
+    ::= { sdWANStatsApplianceScalars 1 }
+
+sdWANStatsApplianceBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes sent for the appliance since
+             the last time the NetScaler SD-WAN service was started."
+    ::= { sdWANStatsApplianceScalars 2 }
+
+sdWANStatsAppliancePacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets sent for the appliance since
+             the last time the NetScaler SD-WAN service was started."
+    ::= { sdWANStatsApplianceScalars 3 }
+
+sdWANStatsApplianceBytesReceived     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes received for the appliance since
+             the last time the NetScaler SD-WAN service was started."
+    ::= { sdWANStatsApplianceScalars 4 }
+
+sdWANStatsAppliancePacketsReceived   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets received for the appliance since
+             the last time the NetScaler SD-WAN service was started."
+    ::= { sdWANStatsApplianceScalars 5 }
+
+sdWANStatsApplianceBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes dropped for the appliance since
+             the last time the NetScaler SD-WAN service was started."
+    ::= { sdWANStatsApplianceScalars 6 }
+
+sdWANStatsAppliancePacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets dropped for the appliance since
+             the last time the NetScaler SD-WAN service was started."
+    ::= { sdWANStatsApplianceScalars 7 }
+
+sdWANStatsApplianceState             OBJECT-TYPE
+    SYNTAX  INTEGER {
+                undefined(0),    -- Undefined state
+                disabled(1),     -- Disabled
+                enabled(2)       -- Enabled
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of the appliance - whether or not it is enabled
+             (passing traffic) or disabled."
+    ::= { sdWANStatsApplianceScalars 8 }
+
+sdWANStatsApplianceHAState           OBJECT-TYPE
+    SYNTAX  INTEGER {
+                undefined(0),      -- Undefined state
+                notConfigured(1),  -- HA not configured
+                active(2),         -- Active
+                standby(3)         -- Standby
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The High Availability state of the appliance - whether or not it
+            is the currently active appliance or the standby appliance."
+    ::= { sdWANStatsApplianceScalars 9 }
+
+sdWANStatsApplianceSerialNumber     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string representation of the serial number for the appliance."
+    ::= { sdWANStatsApplianceScalars 10 }
+
+sdWANStatsApplianceOSVersion        OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string representation of the OS Version."
+    ::= { sdWANStatsApplianceScalars 11 }
+
+sdWANStatsApplianceSoftwareVersion  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The string representation of the Software Version running on
+             the appliance."
+    ::= { sdWANStatsApplianceScalars 12 }
+
+sdWANStatsApplianceConfigCreatedOn  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Day and Time NetScaler SD-WAN Configuration was created.  Only displayed
+            on client when appliance is not disabled."
+    ::= { sdWANStatsApplianceScalars 13 }
+
+sdWANStatsApplianceServiceUptime  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of time since the Virtual WAN Service was last initialized"
+    ::= { sdWANStatsApplianceScalars 14 }
+
+sdWANStatsApplianceApplianceUptime  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The amount of time since this Appliance was last initialized"
+    ::= { sdWANStatsApplianceScalars 15 }
+
+--
+-- Stats associated with Ethernet Interfaces
+--
+sdWANStatsEthernetInterfaces   OBJECT IDENTIFIER ::= { sdWANStatistics 13 }
+
+sdWANStatsEthernetInterfaceScalars   OBJECT IDENTIFIER ::= { sdWANStatsEthernetInterfaces 1 }
+
+sdWANStatsNumEthernetInterfaces OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of Ethernet interfaces."
+    DEFVAL { 0 }
+    ::= { sdWANStatsEthernetInterfaceScalars 1 }
+
+sdWANStatsEthernetInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsEthernetInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Ethernet Interface objects.
+            Contains statistics counts for all the Ethernet Interfaces in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started."
+
+    ::= { sdWANStatsEthernetInterfaces 2 }
+
+sdWANStatsEthernetInterfaceEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsEthernetInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular Ethernet interface object."
+    INDEX   { sdWANStatsEthernetInterfaceIndex }
+    ::= { sdWANStatsEthernetInterfaceTable 1 }
+
+SdWANStatsEthernetInterfaceEntry ::=
+    SEQUENCE {
+        sdWANStatsEthernetInterfaceIndex             Integer32,
+        sdWANStatsEthernetInterfaceIfIndex           Integer32,
+        sdWANStatsEthernetInterfaceName              DisplayString,
+        sdWANStatsEthernetInterfaceBytesSent         Counter64,
+        sdWANStatsEthernetInterfacePacketsSent       Counter64,
+        sdWANStatsEthernetInterfaceBytesReceived     Counter64,
+        sdWANStatsEthernetInterfacePacketsReceived   Counter64,
+        sdWANStatsEthernetInterfaceBytesDropped      Counter64,
+        sdWANStatsEthernetInterfacePacketsDropped    Counter64
+    }
+
+sdWANStatsEthernetInterfaceIndex              OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix Index value for the Ethernet
+            interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 1 }
+
+sdWANStatsEthernetInterfaceIfIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique ifIndex value for the Ethernet
+            interface.  This can be used to reference
+            information in the IF-MIB about this interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 2 }
+
+sdWANStatsEthernetInterfaceName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the Ethernet interface.  This is the
+            name shown on the front panel of the appliance and
+            used in the user interfaces (Web and CLI)."
+    ::= { sdWANStatsEthernetInterfaceEntry 3 }
+
+sdWANStatsEthernetInterfaceBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this Ethernet interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 4 }
+
+sdWANStatsEthernetInterfacePacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this Ethernet interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 5 }
+
+sdWANStatsEthernetInterfaceBytesReceived     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes received for this Ethernet interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 6 }
+
+sdWANStatsEthernetInterfacePacketsReceived   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received for this Ethernet interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 7 }
+
+sdWANStatsEthernetInterfaceBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes dropped for this Ethernet interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 8 }
+
+sdWANStatsEthernetInterfacePacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets dropped for this Ethernet interface."
+    ::= { sdWANStatsEthernetInterfaceEntry 9 }
+
+--
+-- Stats associated with Rules
+--
+sdWANStatsRules   OBJECT IDENTIFIER ::= { sdWANStatistics 14 }
+
+sdWANStatsRuleScalars   OBJECT IDENTIFIER ::= { sdWANStatsRules 1 }
+
+sdWANStatsNumRules OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of rules in the system."
+    DEFVAL { 0 }
+    ::= { sdWANStatsRuleScalars 1 }
+
+
+sdWANStatsRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for rule objects.
+            Contains statistics counts for all the rules in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started."
+
+    ::= { sdWANStatsRules 2 }
+
+sdWANStatsRuleEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular route object."
+    INDEX   { sdWANStatsRuleIndex }
+    ::= { sdWANStatsRuleTable 1 }
+
+SdWANStatsRuleEntry ::=
+    SEQUENCE {
+        sdWANStatsRuleIndex               Integer32,
+        sdWANStatsRuleID                  Integer32,
+        sdWANStatsRuleApplicationName     DisplayString,
+        sdWANStatsRuleLANToWANHitCount  Gauge32,
+        sdWANStatsRuleWANToLANHitCount   Gauge32,
+        sdWANStatsRuleBytesSent           Gauge32,
+        sdWANStatsRulePacketsSent         Gauge32,
+        sdWANStatsRuleBytesReceived       Gauge32,
+        sdWANStatsRulePacketsReceived     Gauge32,
+        sdWANStatsRuleBytesDropped        Gauge32,
+        sdWANStatsRulePacketsDropped      Gauge32,
+        sdWANStatsRuleLastActiveNMinuteAgo TimeTicks
+    }
+
+sdWANStatsRuleIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the rule."
+    ::= { sdWANStatsRuleEntry 1 }
+
+sdWANStatsRuleID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID for the rule."
+    ::= { sdWANStatsRuleEntry 2 }
+
+sdWANStatsRuleApplicationName         OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The optional string application name associated with this rule."
+    ::= { sdWANStatsRuleEntry 3 }
+
+sdWANStatsRuleLANToWANHitCount         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of LAN to WAN packets that have
+             hit this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 4 }
+
+sdWANStatsRuleWANToLANHitCount         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of WAN to LAN packets that have
+            hit this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 5 }
+
+sdWANStatsRuleBytesSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes sent that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 6 }
+
+sdWANStatsRulePacketsSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets sent that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 7 }
+
+sdWANStatsRuleBytesReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes received that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 8 }
+
+sdWANStatsRulePacketsReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets received that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 9 }
+
+sdWANStatsRuleBytesDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes dropped that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 10 }
+
+sdWANStatsRulePacketsDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets dropped that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsRuleEntry 11 }
+
+sdWANStatsRuleLastActiveNMinuteAgo            OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This rule was hit last N Minutes ago.
+            If this field value is 0 and either sdWANStatsRuleBytesSent
+            or sdWANStatsRuleBytesReceived is not zero, then that means
+            that this rule is currently being used.  The rule
+            statistics contain the latest values.
+            If this field is > 0, then the rule statistics is
+            plateaued to show that this rule was used N minutes ago."
+
+    ::= { sdWANStatsRuleEntry 12 }
+
+--
+-- Stats associated with WAN Links
+--
+sdWANStatsWANLinks   OBJECT IDENTIFIER ::= { sdWANStatistics 15 }
+
+sdWANStatsWANLinkScalars   OBJECT IDENTIFIER ::= { sdWANStatsWANLinks 1 }
+
+sdWANStatsNumWANLinks OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of WAN Links on this appliance."
+    DEFVAL { 0 }
+    ::= { sdWANStatsWANLinkScalars 1 }
+
+sdWANStatsWANLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsWANLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for WAN Link objects.
+            Contains statistics counts for all the WAN Links in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            WAN service was started."
+
+    ::= { sdWANStatsWANLinks 2 }
+
+sdWANStatsWANLinkEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsWANLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular WAN Link object."
+    INDEX   { sdWANStatsWANLinkIndex }
+    ::= { sdWANStatsWANLinkTable 1 }
+
+SdWANStatsWANLinkEntry ::=
+    SEQUENCE {
+        sdWANStatsWANLinkIndex             Integer32,
+        sdWANStatsWANLinkID                Integer32,
+        sdWANStatsWANLinkName              DisplayString,
+        sdWANStatsWANLinkState             INTEGER,
+        sdWANStatsWANLinkBytesSent         Counter64,
+        sdWANStatsWANLinkPacketsSent       Counter64,
+        sdWANStatsWANLinkBytesReceived     Counter64,
+        sdWANStatsWANLinkPacketsReceived   Counter64,
+        sdWANStatsWANLinkBytesDropped      Counter64,
+        sdWANStatsWANLinkPacketsDropped    Counter64
+    }
+
+sdWANStatsWANLinkIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the WAN Link."
+    ::= { sdWANStatsWANLinkEntry 1 }
+
+sdWANStatsWANLinkID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID for the WAN Link."
+    ::= { sdWANStatsWANLinkEntry 2 }
+
+sdWANStatsWANLinkName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the WAN Link."
+    ::= { sdWANStatsWANLinkEntry 3 }
+
+sdWANStatsWANLinkState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                undefined(0),    -- Undefined state
+                disabled(1),     -- Admin Disabled
+                dead(2),         -- Dead
+                bad(3),          -- Errors above threshold
+                good(4)          -- Passing traffic
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of the virtual path."
+    ::= { sdWANStatsWANLinkEntry 4 }
+
+sdWANStatsWANLinkBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this WAN Link."
+    ::= { sdWANStatsWANLinkEntry 5 }
+
+sdWANStatsWANLinkPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this WAN Link."
+    ::= { sdWANStatsWANLinkEntry 6 }
+
+sdWANStatsWANLinkBytesReceived     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes received for this WAN Link."
+    ::= { sdWANStatsWANLinkEntry 7 }
+
+sdWANStatsWANLinkPacketsReceived   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received for this WAN Link."
+    ::= { sdWANStatsWANLinkEntry 8 }
+
+sdWANStatsWANLinkBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes dropped for this WAN Link."
+    ::= { sdWANStatsWANLinkEntry 9 }
+
+sdWANStatsWANLinkPacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets dropped for this WAN Link."
+    ::= { sdWANStatsWANLinkEntry 10 }
+
+--
+-- Stats associated with VirtualPaths
+--
+sdWANStatsVPaths   OBJECT IDENTIFIER ::= { sdWANStatistics 16 }
+
+sdWANStatsVPathScalars   OBJECT IDENTIFIER ::= { sdWANStatsVPaths 1 }
+
+sdWANStatsNumVPaths OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of VPaths."
+    DEFVAL { 0 }
+    ::= { sdWANStatsVPathScalars 1 }
+
+sdWANStatsVPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsVPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for VPath objects.
+            Contains statistics counts for all the VPaths in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started."
+
+    ::= { sdWANStatsVPaths 2 }
+
+sdWANStatsVPathEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsVPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular VPath object."
+    INDEX   { sdWANStatsVPathIndex }
+    ::= { sdWANStatsVPathTable 1 }
+
+SdWANStatsVPathEntry ::=
+    SEQUENCE {
+        sdWANStatsVPathIndex             Integer32,
+        sdWANStatsVPathID                Integer32,
+        sdWANStatsVPathName              DisplayString,
+        sdWANStatsVPathState             INTEGER,
+        sdWANStatsVPathBytesSent         Counter64,
+        sdWANStatsVPathPacketsSent       Counter64,
+        sdWANStatsVPathBytesReceived     Counter64,
+        sdWANStatsVPathPacketsReceived   Counter64,
+        sdWANStatsVPathNumPaths          Integer32,
+        sdWANStatsVPathNumRules          Integer32,
+        sdWANStatsVPathSendBytesDropped      Counter64,
+        sdWANStatsVPathSendPacketsDropped    Counter64,
+        sdWANStatsVPathSendPacketsLost       Counter64,
+        sdWANStatsVPathSendPacketsOOO        Counter64,
+        sdWANStatsVPathSendBOWTms            Gauge32,
+        sdWANStatsVPathSendJitterms          Gauge32,
+        sdWANStatsVPathReceiveBytesDropped   Counter64,
+        sdWANStatsVPathReceivePacketsDropped Counter64,
+        sdWANStatsVPathReceivePacketsLost    Counter64,
+        sdWANStatsVPathReceivePacketsOOO     Counter64,
+        sdWANStatsVPathReceiveBOWTms         Gauge32,
+        sdWANStatsVPathReceiveJitterms       Gauge32
+    }
+
+sdWANStatsVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the VPath."
+    ::= { sdWANStatsVPathEntry 1 }
+
+sdWANStatsVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID for the VPath."
+    ::= { sdWANStatsVPathEntry 2 }
+
+sdWANStatsVPathName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the VPath."
+    ::= { sdWANStatsVPathEntry 3 }
+
+sdWANStatsVPathState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                undefined(0),    -- Undefined state
+                disabled(1),     -- Admin Disabled
+                dead(2),         -- Dead
+                bad(3),          -- Errors above threshold
+                good(4)          -- Passing traffic
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of the virtual path."
+    ::= { sdWANStatsVPathEntry 4 }
+
+sdWANStatsVPathBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this VPath."
+    ::= { sdWANStatsVPathEntry 5 }
+
+sdWANStatsVPathPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this VPath."
+    ::= { sdWANStatsVPathEntry 6 }
+
+sdWANStatsVPathBytesReceived     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes received for this VPath."
+    ::= { sdWANStatsVPathEntry 7 }
+
+sdWANStatsVPathPacketsReceived   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received for this VPath."
+    ::= { sdWANStatsVPathEntry 8 }
+
+sdWANStatsVPathNumPaths          OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of Paths associated with this virtual path - this
+            is the number of rows in the sdWANStatsWANPathsTable for
+            the current virtual path.  Each virtual path can have a different
+            number of paths associated with it."
+    ::= { sdWANStatsVPathEntry 9 }
+
+sdWANStatsVPathNumRules          OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of Rules associated with this virtual path - this
+            is the number of rows in the sdWANStatsWANRulesTable for
+            the current virtual path.  Each virtual path can have a different
+            number of rules associated with it."
+    ::= { sdWANStatsVPathEntry 10 }
+
+sdWANStatsVPathSendBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of send bytes dropped for this VPath."
+    ::= { sdWANStatsVPathEntry 11 }
+
+sdWANStatsVPathSendPacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of send packets dropped for this VPath."
+    ::= { sdWANStatsVPathEntry 12 }
+
+sdWANStatsVPathSendPacketsLost       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of send packets lost for this
+            VPath."
+    ::= { sdWANStatsVPathEntry 13 }
+
+sdWANStatsVPathSendPacketsOOO        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of send packets received out
+             of order by the remote on this VPath."
+    ::= { sdWANStatsVPathEntry 14 }
+
+sdWANStatsVPathSendBOWTms            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best one-way time (BOWT) value (in milliseconds)
+            in the send direction for this VPath."
+    ::= { sdWANStatsVPathEntry 15 }
+
+sdWANStatsVPathSendJitterms          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current worst jitter value (in milliseconds) in the send
+            direction for this VPath."
+    ::= { sdWANStatsVPathEntry 16 }
+
+sdWANStatsVPathReceiveBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of receive bytes dropped for this VPath."
+    ::= { sdWANStatsVPathEntry 17 }
+
+sdWANStatsVPathReceivePacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of receive packets dropped for this VPath."
+    ::= { sdWANStatsVPathEntry 18 }
+
+sdWANStatsVPathReceivePacketsLost       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of receive packets lost for this
+            VPath."
+    ::= { sdWANStatsVPathEntry 19 }
+
+sdWANStatsVPathReceivePacketsOOO        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of received packets out
+             of order on this VPath."
+    ::= { sdWANStatsVPathEntry 20 }
+
+sdWANStatsVPathReceiveBOWTms            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best one-way time (BOWT) value (in milliseconds)
+            in the receive direction for this VPath."
+    ::= { sdWANStatsVPathEntry 21 }
+
+sdWANStatsVPathReceiveJitterms          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current worst jitter value (in milliseconds) in the
+            receive direction for this VPath."
+    ::= { sdWANStatsVPathEntry 22 }
+
+--
+-- Stats for Paths associated with VPaths
+--
+sdWANStatsWANPaths   OBJECT IDENTIFIER ::= { sdWANStatsVPaths 3 }
+
+sdWANStatsWANPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsWANPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for VPath Path objects.
+            Contains statistics counts for all the VPath Paths in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started.  The number of virtual paths in
+            this table is stored in sdWANStatsNumVPaths and the number
+            of Paths for each virtual path is in the variable
+            sdWANStatsVPathNumPaths which is in the sdWANStatsVPathTable
+            and has a specific number of paths value for each virtual path
+            index."
+    ::= { sdWANStatsWANPaths 1 }
+
+sdWANStatsWANPathEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsWANPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular VPath object."
+    INDEX   { sdWANStatsWANPathVPathIndex, sdWANStatsWANPathPathIndex }
+    ::= { sdWANStatsWANPathTable 1 }
+
+SdWANStatsWANPathEntry ::=
+    SEQUENCE {
+        sdWANStatsWANPathVPathIndex      Integer32,
+        sdWANStatsWANPathPathIndex         Integer32,
+        sdWANStatsWANPathVPathID         Integer32,
+        sdWANStatsWANPathPathID            Integer32,
+        sdWANStatsWANPathName              DisplayString,
+        sdWANStatsWANPathState             INTEGER,
+        sdWANStatsWANPathBytesSent         Counter64,
+        sdWANStatsWANPathPacketsSent       Counter64,
+        sdWANStatsWANPathBytesReceived     Counter64,
+        sdWANStatsWANPathPacketsReceived   Counter64,
+        sdWANStatsWANPathBOWTms            Gauge32,
+        sdWANStatsWANPathJitterms          Gauge32,
+        sdWANStatsWANPathPacketsLost       Counter64,
+        sdWANStatsWANPathPacketsOOO        Counter64
+    }
+
+sdWANStatsWANPathVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (VPath) value for the VPath Path."
+    ::= { sdWANStatsWANPathEntry 1 }
+
+sdWANStatsWANPathPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (Path) value for the VPath Path."
+    ::= { sdWANStatsWANPathEntry 2 }
+
+sdWANStatsWANPathVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (VPath) value for the VPath Path."
+    ::= { sdWANStatsWANPathEntry 3 }
+
+sdWANStatsWANPathPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (Path) value for the VPath Path."
+    ::= { sdWANStatsWANPathEntry 4 }
+
+sdWANStatsWANPathName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the VPath Path."
+    ::= { sdWANStatsWANPathEntry 5 }
+
+sdWANStatsWANPathState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                undefined(0),    -- Undefined state
+                disabled(1),     -- Admin Disabled
+                dead(2),         -- Dead
+                bad(3),          -- Errors above threshold
+                good(4)          -- Passing traffic
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of the virtual path."
+    ::= { sdWANStatsWANPathEntry 6 }
+
+sdWANStatsWANPathBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this VPath Path."
+    ::= { sdWANStatsWANPathEntry 7 }
+
+sdWANStatsWANPathPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this VPath Path."
+    ::= { sdWANStatsWANPathEntry 8 }
+
+sdWANStatsWANPathBytesReceived     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes received for this VPath Path."
+    ::= { sdWANStatsWANPathEntry 9 }
+
+sdWANStatsWANPathPacketsReceived   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received for this VPath Path."
+    ::= { sdWANStatsWANPathEntry 10 }
+
+sdWANStatsWANPathBOWTms            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best one-way time (BOWT) value (in milliseconds)
+            value for this VPath Path."
+    ::= { sdWANStatsWANPathEntry 11 }
+
+sdWANStatsWANPathJitterms          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best jitter value (in milliseconds) for this
+            VPath Path."
+    ::= { sdWANStatsWANPathEntry 12 }
+
+sdWANStatsWANPathPacketsLost       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of packets lost for this
+            VPath Path."
+    ::= { sdWANStatsWANPathEntry 13 }
+
+sdWANStatsWANPathPacketsOOO        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of out of order
+             packets detected on this VPath Path."
+    ::= { sdWANStatsWANPathEntry 14 }
+
+--
+-- Stats for Classes associated with VPaths
+--
+sdWANStatsWANClasses   OBJECT IDENTIFIER ::= { sdWANStatsVPaths 4 }
+
+sdWANStatsWANClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsWANClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for VPath Class objects.
+            Contains statistics counts for all the VPath Classes in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started.  The number of virtual path in
+            this table is stored in sdWANStatsNumVPaths and the number
+            of Classes for each virtual path is always 17."
+    ::= { sdWANStatsWANClasses 1 }
+
+sdWANStatsWANClassEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsWANClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular VPath object."
+    INDEX   { sdWANStatsWANClassVPathIndex, sdWANStatsWANClassClassIndex }
+    ::= { sdWANStatsWANClassTable 1 }
+
+SdWANStatsWANClassEntry ::=
+    SEQUENCE {
+        sdWANStatsWANClassVPathIndex      Integer32,
+        sdWANStatsWANClassClassIndex        Integer32,
+        sdWANStatsWANClassVPathID         Integer32,
+        sdWANStatsWANClassClassID           Integer32,
+        sdWANStatsWANClassName              DisplayString,
+        sdWANStatsWANClassType              INTEGER,
+        sdWANStatsWANClassBytesSent         Counter64,
+        sdWANStatsWANClassPacketsSent       Counter64,
+        sdWANStatsWANClassBytesPending     Counter64,
+        sdWANStatsWANClassPacketsPending   Counter64,
+        sdWANStatsWANClassBytesDropped      Counter64,
+        sdWANStatsWANClassPacketsDropped    Counter64
+    }
+
+sdWANStatsWANClassVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (VPath) value for the VPath Class."
+    ::= { sdWANStatsWANClassEntry 1 }
+
+sdWANStatsWANClassClassIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (Class) value for the VPath Class."
+    ::= { sdWANStatsWANClassEntry 2 }
+
+sdWANStatsWANClassVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The internal Citrix ID for the VPath object."
+    ::= { sdWANStatsWANClassEntry 3 }
+
+sdWANStatsWANClassClassID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The internal Citrix ID for the Class object."
+    ::= { sdWANStatsWANClassEntry 4 }
+
+sdWANStatsWANClassName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the VPath Class."
+    ::= { sdWANStatsWANClassEntry 5 }
+
+sdWANStatsWANClassType              OBJECT-TYPE
+    SYNTAX  INTEGER {
+                realtime(1),
+                interactive(2),
+                bulk(3),
+                unknown(4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the VPath Class."
+    ::= { sdWANStatsWANClassEntry 6 }
+
+sdWANStatsWANClassBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this VPath Class."
+    ::= { sdWANStatsWANClassEntry 7 }
+
+sdWANStatsWANClassPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this VPath Class."
+    ::= { sdWANStatsWANClassEntry 8 }
+
+sdWANStatsWANClassBytesPending     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes pending for this VPath Class."
+    ::= { sdWANStatsWANClassEntry 9 }
+
+sdWANStatsWANClassPacketsPending   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets pending for this VPath Class."
+    ::= { sdWANStatsWANClassEntry 10 }
+
+sdWANStatsWANClassBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes dropped for this VPath Class."
+    ::= { sdWANStatsWANClassEntry 11 }
+
+sdWANStatsWANClassPacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets dropped for this VPath Class."
+    ::= { sdWANStatsWANClassEntry 12 }
+
+--
+-- Stats for Rules associated with VPaths
+--
+sdWANStatsWANRules   OBJECT IDENTIFIER ::= { sdWANStatsVPaths 5 }
+
+sdWANStatsWANRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsWANRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for VPath Rule objects.
+            Contains statistics counts for all the VPath Rules in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started.  The number of virtual paths in
+            this table is stored in sdWANStatsNumVPaths and the number
+            of Rules for each virtual path is in the variable
+            sdWANStatsVPathNumRules which is in the sdWANStatsVPathTable
+            and has a specific number of rules value for each virtual path
+            index."
+    ::= { sdWANStatsWANRules 1 }
+
+sdWANStatsWANRuleEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsWANRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular VPath object."
+    INDEX   { sdWANStatsWANRuleVPathIndex, sdWANStatsWANRuleRuleIndex }
+    ::= { sdWANStatsWANRuleTable 1 }
+
+SdWANStatsWANRuleEntry ::=
+    SEQUENCE {
+        sdWANStatsWANRuleVPathIndex       Integer32,
+        sdWANStatsWANRuleRuleIndex          Integer32,
+        sdWANStatsWANRuleVPathID          Integer32,
+        sdWANStatsWANRuleRuleID             Integer32,
+        sdWANStatsWANRuleGlobalRuleIndex    Integer32,
+        sdWANStatsWANRuleApplicationName    DisplayString,
+        sdWANStatsWANRuleLANToWANHitCount Gauge32,
+        sdWANStatsWANRuleWANToLANHitCount  Gauge32,
+        sdWANStatsWANRuleBytesSent          Gauge32,
+        sdWANStatsWANRulePacketsSent        Gauge32,
+        sdWANStatsWANRuleBytesReceived      Gauge32,
+        sdWANStatsWANRulePacketsReceived    Gauge32,
+        sdWANStatsWANRuleBytesDropped       Gauge32,
+        sdWANStatsWANRulePacketsDropped     Gauge32,
+        sdWANStatsWANRuleLastActiveNMinuteAgo TimeTicks
+    }
+
+sdWANStatsWANRuleVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (VPath) value for the VPath Rule."
+    ::= { sdWANStatsWANRuleEntry 1 }
+
+sdWANStatsWANRuleRuleIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (Rule) value for the VPath Rule."
+    ::= { sdWANStatsWANRuleEntry 2 }
+
+sdWANStatsWANRuleVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (VPath) value for the VPath Rule."
+    ::= { sdWANStatsWANRuleEntry 3 }
+
+sdWANStatsWANRuleRuleID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (Rule) value for the VPath Rule."
+    ::= { sdWANStatsWANRuleEntry 4 }
+
+sdWANStatsWANRuleGlobalRuleIndex      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of this rule in the sdWANStatsRuleTable."
+    ::= { sdWANStatsWANRuleEntry 5 }
+
+sdWANStatsWANRuleApplicationName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The optional string application name associated
+            with this rule."
+    ::= { sdWANStatsWANRuleEntry 6 }
+
+sdWANStatsWANRuleLANToWANHitCount         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of times this rule has
+            been hit for in the LAN to WAN direction, measured over
+            the past active minute."
+    ::= { sdWANStatsWANRuleEntry 7 }
+
+sdWANStatsWANRuleWANToLANHitCount       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of times this rule has
+            been hit for in the WAN to LAN direction, measured over
+            the past active minute."
+    ::= { sdWANStatsWANRuleEntry 8 }
+
+sdWANStatsWANRuleBytesSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsWANRuleEntry 9 }
+
+sdWANStatsWANRulePacketsSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsWANRuleEntry 10 }
+
+sdWANStatsWANRuleBytesReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsWANRuleEntry 11 }
+
+sdWANStatsWANRulePacketsReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsWANRuleEntry 12 }
+
+sdWANStatsWANRuleBytesDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsWANRuleEntry 13 }
+
+sdWANStatsWANRulePacketsDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsWANRuleEntry 14 }
+
+sdWANStatsWANRuleLastActiveNMinuteAgo            OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This rule was hit last N Minutes ago.
+            If this field value is 0 and either sdWANStatsWANRuleBytesSent
+            or sdWANStatsWANRuleBytesReceived is not zero, then that means
+            that this rule is currently being used.  The rule
+            statistics contain the latest values.
+            If this field is > 0, then the rule statistics is
+            plateaued to show that this rule was used N minutes ago."
+
+    ::= { sdWANStatsWANRuleEntry 15 }
+
+
+--
+-- Stats associated with Internet Service
+--
+sdWANStatsInternet   OBJECT IDENTIFIER ::= { sdWANStatistics 17 }
+
+sdWANStatsInternetScalars   OBJECT IDENTIFIER ::= { sdWANStatsInternet 1 }
+
+sdWANStatsInternetBytesSent         OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the bytes sent on this Internet service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsInternetScalars 1 }
+
+sdWANStatsInternetPacketsSent       OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the packets sent on this Internet service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsInternetScalars 2 }
+
+sdWANStatsInternetBytesReceived     OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the bytes received on this Internet service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsInternetScalars 3 }
+
+sdWANStatsInternetPacketsReceived   OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the packets received on this Internet service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsInternetScalars 4 }
+
+sdWANStatsInternetBytesDropped      OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the bytes dropped on this Internet service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsInternetScalars 5 }
+
+sdWANStatsInternetPacketsDropped    OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the packets dropped on this Internet service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsInternetScalars 6 }
+
+sdWANStatsInternetNumRules OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of Rules associated with the Internet service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsInternetScalars 7 }
+
+sdWANStatsInternetRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsInternetRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Rules associated with
+            the Internet service.
+            Counter data in this table is updated once a minute
+            and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started.
+            The number of rules in this table is sdWANStatsInternetNumRules
+            and there is an entry for each of them."
+    ::= { sdWANStatsInternet 2 }
+
+sdWANStatsInternetRuleEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsInternetRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular InternetRule object."
+    INDEX   { sdWANStatsInternetRuleIndex }
+    ::= { sdWANStatsInternetRuleTable 1 }
+
+SdWANStatsInternetRuleEntry ::=
+    SEQUENCE {
+        sdWANStatsInternetRuleIndex               Integer32,
+        sdWANStatsInternetRuleID                  Integer32,
+        sdWANStatsInternetRuleGlobalRuleIndex     Integer32,
+        sdWANStatsInternetRuleApplicationName     DisplayString,
+        sdWANStatsInternetRuleLANToWANHitCount  Gauge32,
+        sdWANStatsInternetRuleWANToLANHitCount   Gauge32,
+        sdWANStatsInternetRuleBytesSent           Gauge32,
+        sdWANStatsInternetRulePacketsSent         Gauge32,
+        sdWANStatsInternetRuleBytesReceived       Gauge32,
+        sdWANStatsInternetRulePacketsReceived     Gauge32,
+        sdWANStatsInternetRuleBytesDropped        Gauge32,
+        sdWANStatsInternetRulePacketsDropped      Gauge32,
+        sdWANStatsInternetRuleLastActiveNMinuteAgo   TimeTicks
+    }
+
+sdWANStatsInternetRuleIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the InternetRule."
+    ::= { sdWANStatsInternetRuleEntry 1 }
+
+sdWANStatsInternetRuleID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID for the InternetRule."
+    ::= { sdWANStatsInternetRuleEntry 2 }
+
+sdWANStatsInternetRuleGlobalRuleIndex      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of this rule in the sdWANStatsRuleTable."
+    ::= { sdWANStatsInternetRuleEntry 3 }
+
+sdWANStatsInternetRuleApplicationName     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The optional string application name associated
+            with this rule."
+    ::= { sdWANStatsInternetRuleEntry 4 }
+
+sdWANStatsInternetRuleLANToWANHitCount  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of LAN to WAN packets that hit this rule,
+            measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 5 }
+
+sdWANStatsInternetRuleWANToLANHitCount   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of WAN to LAN packets that hit this rule,
+            measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 6 }
+
+sdWANStatsInternetRuleBytesSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 7 }
+
+sdWANStatsInternetRulePacketsSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 8 }
+
+sdWANStatsInternetRuleBytesReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 9 }
+
+sdWANStatsInternetRulePacketsReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 10 }
+
+sdWANStatsInternetRuleBytesDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 11 }
+
+sdWANStatsInternetRulePacketsDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsInternetRuleEntry 12 }
+
+sdWANStatsInternetRuleLastActiveNMinuteAgo            OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This rule was hit last N Minutes ago.
+            If this field value is 0 and either sdWANStatsInternetRuleBytesSent
+            or sdWANStatsInternetRuleBytesReceived is not zero, then that means
+            that this rule is currently being used.  The rule
+            statistics contain the latest values.
+            If this field is > 0, then the rule statistics is
+            plateaued to show that this rule was used N minutes ago."
+
+    ::= { sdWANStatsInternetRuleEntry 13 }
+
+
+--
+-- Stats associated with Intranet Service
+--
+sdWANStatsIntranet   OBJECT IDENTIFIER ::= { sdWANStatistics 18 }
+
+sdWANStatsIntranetScalars   OBJECT IDENTIFIER ::= { sdWANStatsIntranet 1 }
+
+sdWANStatsIntranetNumIntranetServices OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The number of Intranet Services on this site."
+    DEFVAL { 0 }
+    ::= { sdWANStatsIntranetScalars 8 }
+
+sdWANStatsIntranetsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsIntranetsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for the Intranet
+            services on this site.
+            Counter data in this table is updated once a minute
+            and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started."
+    ::= { sdWANStatsIntranet 3 }
+
+sdWANStatsIntranetsEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsIntranetsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular Intranets object."
+    INDEX   { sdWANStatsIntranetsIndex }
+    ::= { sdWANStatsIntranetsTable 1 }
+
+SdWANStatsIntranetsEntry ::=
+    SEQUENCE {
+        sdWANStatsIntranetsIndex               Integer32,
+        sdWANStatsIntranetsID                  Integer32,
+        sdWANStatsIntranetsName                DisplayString,
+        sdWANStatsIntranetsBytesSent           Counter64,
+        sdWANStatsIntranetsPacketsSent         Counter64,
+        sdWANStatsIntranetsBytesReceived       Counter64,
+        sdWANStatsIntranetsPacketsReceived     Counter64,
+        sdWANStatsIntranetsBytesDropped        Counter64,
+        sdWANStatsIntranetsPacketsDropped      Counter64,
+        sdWANStatsIntranetsNumRules            Integer32,
+        sdWANStatsIntranetsRoutingDomainName   DisplayString
+    }
+
+sdWANStatsIntranetsIndex                OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The intranet index."
+    ::= { sdWANStatsIntranetsEntry 1 }
+
+sdWANStatsIntranetsID                   OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The intranet id."
+    ::= { sdWANStatsIntranetsEntry 2 }
+
+sdWANStatsIntranetsName                 OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The intranet name."
+    ::= { sdWANStatsIntranetsEntry 3 }
+
+sdWANStatsIntranetsBytesSent            OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the bytes sent on this intranet service."
+    ::= { sdWANStatsIntranetsEntry 4 }
+
+sdWANStatsIntranetsPacketsSent          OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the packets sent on this intranet service."
+    ::= { sdWANStatsIntranetsEntry 5 }
+
+sdWANStatsIntranetsBytesReceived        OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the bytes received on this intranet service."
+    ::= { sdWANStatsIntranetsEntry 6 }
+
+sdWANStatsIntranetsPacketsReceived      OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received on this intranet service."
+    ::= { sdWANStatsIntranetsEntry 7 }
+
+sdWANStatsIntranetsBytesDropped         OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of bytes dropped on this intranet service."
+    ::= { sdWANStatsIntranetsEntry 8 }
+
+sdWANStatsIntranetsPacketsDropped       OBJECT-TYPE
+    SYNTAX       Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets dropped on this intranet service."
+    ::= { sdWANStatsIntranetsEntry 9 }
+
+sdWANStatsIntranetsNumRules             OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of rules associated with this specific Intranet
+            service."
+    ::= { sdWANStatsIntranetsEntry 10 }
+
+sdWANStatsIntranetsRoutingDomainName    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The routing domain name. Each routing domain has
+            its own set of interfaces and routing tables."
+    ::= { sdWANStatsIntranetsEntry 11 }
+
+sdWANStatsIntranetRulesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsIntranetRulesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Rules associated with
+            the Intranet service.
+            Counter data in this table is updated once a minute
+            and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started.
+            The number of rules in this table is sdWANStatsIntranetNumRules
+            and there is an entry for each of them."
+    ::= { sdWANStatsIntranet 4 }
+
+sdWANStatsIntranetRulesEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsIntranetRulesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular IntranetRules object."
+    INDEX   { sdWANStatsIntranetRulesIntranetIndex, sdWANStatsIntranetRulesRuleIndex }
+    ::= { sdWANStatsIntranetRulesTable 1 }
+
+SdWANStatsIntranetRulesEntry ::=
+    SEQUENCE {
+        sdWANStatsIntranetRulesIntranetIndex       Integer32,
+        sdWANStatsIntranetRulesRuleIndex           Integer32,
+        sdWANStatsIntranetRulesID                  Integer32,
+        sdWANStatsIntranetRulesGlobalRuleIndex     Integer32,
+        sdWANStatsIntranetRulesIntranetName        DisplayString,
+        sdWANStatsIntranetRulesApplicationName     DisplayString,
+        sdWANStatsIntranetRulesLANToWANHitCount  Gauge32,
+        sdWANStatsIntranetRulesWANToLANHitCount   Gauge32,
+        sdWANStatsIntranetRulesBytesSent           Gauge32,
+        sdWANStatsIntranetRulesPacketsSent         Gauge32,
+        sdWANStatsIntranetRulesBytesReceived       Gauge32,
+        sdWANStatsIntranetRulesPacketsReceived     Gauge32,
+        sdWANStatsIntranetRulesBytesDropped        Gauge32,
+        sdWANStatsIntranetRulesPacketsDropped      Gauge32,
+        sdWANStatsIntranetRulesLastActiveNMinuteAgo      TimeTicks
+    }
+
+sdWANStatsIntranetRulesIntranetIndex       OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the Intranet service."
+    ::= { sdWANStatsIntranetRulesEntry 1 }
+
+sdWANStatsIntranetRulesRuleIndex           OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the Rule corresponding to
+            the current Intranet service in the IntranetRules."
+    ::= { sdWANStatsIntranetRulesEntry 2 }
+
+sdWANStatsIntranetRulesID                  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID for this Rule in the IntranetRules."
+    ::= { sdWANStatsIntranetRulesEntry 3 }
+
+sdWANStatsIntranetRulesGlobalRuleIndex     OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of this rule in the sdWANStatsRuleTable."
+    ::= { sdWANStatsIntranetRulesEntry 4 }
+
+sdWANStatsIntranetRulesIntranetName        OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The optional string name associated with this
+            Intranet service."
+    ::= { sdWANStatsIntranetRulesEntry 5 }
+
+sdWANStatsIntranetRulesApplicationName     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The optional string application name associated
+            with this rule."
+    ::= { sdWANStatsIntranetRulesEntry 6 }
+
+sdWANStatsIntranetRulesLANToWANHitCount  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of LAN to WAN packets that hit this rule,
+            measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 7 }
+
+sdWANStatsIntranetRulesWANToLANHitCount   OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of WAN to LAN packets that hit this rule,
+            measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 8 }
+
+sdWANStatsIntranetRulesBytesSent           OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 9 }
+
+sdWANStatsIntranetRulesPacketsSent         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 10 }
+
+sdWANStatsIntranetRulesBytesReceived       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 11 }
+
+sdWANStatsIntranetRulesPacketsReceived     OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 12 }
+
+sdWANStatsIntranetRulesBytesDropped        OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 13 }
+
+sdWANStatsIntranetRulesPacketsDropped      OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsIntranetRulesEntry 14 }
+
+sdWANStatsIntranetRulesLastActiveNMinuteAgo  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This rule was hit last N Minutes ago.
+            If this field value is 0 and either sdWANStatsIntranetRulesBytesSent
+            or sdWANStatsIntranetRulesBytesReceived is not zero, then that means
+            that this rule is currently being used.  The rule
+            statistics contain the latest values.
+            If this field is > 0, then the rule statistics is
+            plateaued to show that this rule was used N minutes ago."
+
+    ::= { sdWANStatsIntranetRulesEntry 15 }
+
+
+--
+-- Stats associated with Passthrough Service
+--
+sdWANStatsPassthrough   OBJECT IDENTIFIER ::= { sdWANStatistics 19 }
+
+sdWANStatsPassthroughScalars   OBJECT IDENTIFIER ::= { sdWANStatsPassthrough 1 }
+
+sdWANStatsPassthroughBytesSent         OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the bytes sent on this Passthrough service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsPassthroughScalars 1 }
+
+sdWANStatsPassthroughPacketsSent       OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the packets sent on this Passthrough service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsPassthroughScalars 2 }
+
+sdWANStatsPassthroughBytesReceived     OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the bytes received on this Passthrough service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsPassthroughScalars 3 }
+
+sdWANStatsPassthroughPacketsReceived   OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the packets received on this Passthrough service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsPassthroughScalars 4 }
+
+sdWANStatsPassthroughBytesDropped      OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the bytes dropped on this Passthrough service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsPassthroughScalars 5 }
+
+sdWANStatsPassthroughPacketsDropped    OBJECT-TYPE
+    SYNTAX         Counter64
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The count of the packets dropped on this Passthrough service."
+    DEFVAL { 0 }
+    ::= { sdWANStatsPassthroughScalars 6 }
+
+--
+-- Stats associated with Routes Version 2
+--
+sdWANStatsRoutesV2   OBJECT IDENTIFIER ::= { sdWANStatistics 20 }
+
+sdWANStatsRouteScalars   OBJECT IDENTIFIER ::= { sdWANStatsRoutesV2 1 }
+
+sdWANStatsNumRoutesV2 OBJECT-TYPE
+    SYNTAX         Gauge32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of routes in the system."
+    DEFVAL { 0 }
+    ::= { sdWANStatsRouteScalars 1 }
+
+
+sdWANStatsRouteTableV2 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsRouteEntryV2
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for route objects.
+            Contains statistics counts for all the routes in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started."
+
+    ::= { sdWANStatsRoutesV2 2 }
+
+sdWANStatsRouteEntryV2 OBJECT-TYPE
+    SYNTAX      SdWANStatsRouteEntryV2
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular route object."
+    INDEX   { sdWANStatsRouteIndexV2 }
+    ::= { sdWANStatsRouteTableV2 1 }
+
+SdWANStatsRouteEntryV2 ::=
+    SEQUENCE {
+        sdWANStatsRouteIndexV2           Integer32,
+        sdWANStatsRouteNetworkAddr       IpAddress,
+        sdWANStatsRouteNetworkPrefix     Integer32,
+        sdWANStatsRouteGateway           IpAddress,
+        sdWANStatsRouteServiceType       INTEGER,
+        sdWANStatsRouteServiceID         Integer32,
+        sdWANStatsRouteServiceName       DisplayString,
+        sdWANStatsRouteReachable         INTEGER,
+        sdWANStatsRouteSiteName          DisplayString,
+        sdWANStatsRouteType              INTEGER,
+        sdWANStatsRouteNeighborDirect    INTEGER,
+        sdWANStatsRouteCost              Integer32,
+        sdWANStatsRouteHitCountV2        Counter64,
+        sdWANStatsRouteEligible          DisplayString,
+        sdWANStatsRouteEligibilityType   DisplayString,
+        sdWANStatsRouteEligibilityValue  DisplayString,
+        sdWANStatsRouteProtocol          INTEGER,
+        sdWANStatsRouteRoutingDomainName DisplayString
+    }
+
+sdWANStatsRouteIndexV2          OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the route."
+    ::= { sdWANStatsRouteEntryV2 1 }
+
+sdWANStatsRouteNetworkAddr           OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This is the destination IP Address."
+    ::= { sdWANStatsRouteEntryV2 2 }
+
+sdWANStatsRouteNetworkPrefix         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Network Prefix indicate number of significant
+            bits in the NetworkAddr field."
+    ::= { sdWANStatsRouteEntryV2 3 }
+
+sdWANStatsRouteGateway               OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The Gateway IP Address for Route."
+    ::= { sdWANStatsRouteEntryV2 4 }
+
+sdWANStatsRouteServiceType           OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    discard(0),       -- discard route
+                    passthrough(1),   -- passthrough route
+                    internet(2),      -- internet route
+                    multicast(3),     -- multicast route
+                    intranet(4),      -- intranet route
+                    virtualpath(5),   -- virtual path route
+                    langretunnel(6),  -- lan gre tunnel route
+                    lanipsectunnel(7),-- lan ipsec tunnel route
+                    local(8),         -- local route
+                    iphost(9)         -- host route
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Service Type for Route."
+    ::= { sdWANStatsRouteEntryV2 5 }
+
+sdWANStatsRouteServiceID             OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID for the Service ID.
+            meaningful for service type virtual path and intranet."
+    ::= { sdWANStatsRouteEntryV2 6 }
+
+sdWANStatsRouteServiceName           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Service Name in meaning format."
+    ::= { sdWANStatsRouteEntryV2 7 }
+
+sdWANStatsRouteReachable             OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no(0),       -- route not reachable
+                    yes(1),      -- route reachable
+                    na(2)        -- not applicable i.e. passthrough
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicate whether route is reachable."
+    ::= { sdWANStatsRouteEntryV2 8 }
+
+sdWANStatsRouteSiteName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Destination NetScaler SD-WAN Site Name for VPath Routes."
+    ::= { sdWANStatsRouteEntryV2 9 }
+
+sdWANStatsRouteType                  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    static(0),             -- static route
+                    dynamic(1),            -- dynamic route
+                    dynamicVPath(2)      -- dynamic virtual path route
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicate whether route is static, dynamic, or
+            part of dynamic virtual path route."
+    ::= { sdWANStatsRouteEntryV2 10 }
+
+sdWANStatsRouteNeighborDirect        OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    na(0),                 -- static route
+                    directNeighbor (1),    -- dynamic route, learned from neighbor
+                    indirectNeighbor (2)   -- dynamic route, learned from in-direct
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "If route is learned from another NetScaler SD-WAN Site, route
+            is neighbor's direct route.  Otherwise, neighbor
+            learned route from its neighbor.  Field is
+            only applicable for dynamic routes."
+    ::= { sdWANStatsRouteEntryV2 11 }
+
+sdWANStatsRouteCost                  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Route Cost."
+    ::= { sdWANStatsRouteEntryV2 12 }
+
+
+sdWANStatsRouteHitCountV2         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets that have hit this route."
+    ::= { sdWANStatsRouteEntryV2 13 }
+
+sdWANStatsRouteEligible              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "When eligiblility type and eligibility
+             and value are specified for this route, this route is
+             only available for use when the conditions specified is
+             up.  If eligibility fields are not specified, then this
+             route is always eligible."
+    ::= { sdWANStatsRouteEntryV2 14 }
+
+sdWANStatsRouteEligibilityType       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Use route only when either a specified path or gateway
+             or both are available."
+    ::= { sdWANStatsRouteEntryV2 15 }
+
+sdWANStatsRouteEligibilityValue      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Either the name of the path or gateway IP or both."
+    ::= { sdWANStatsRouteEntryV2 16 }
+
+sdWANStatsRouteProtocol              OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    NA(0),        -- static or learned through SNMP
+                    BGP(1),       -- BGP Protocol
+                    OSPF(2),      -- OSPF Protocol
+                    VW(3)         -- VW Protocol
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The Routing Protocol."
+    ::= { sdWANStatsRouteEntryV2 17 }
+
+sdWANStatsRouteRoutingDomainName       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The routing domain name. Each routing domain has
+            its own set of interfaces and routing tables."
+    ::= { sdWANStatsRouteEntryV2 18 }
+
+--
+-- Stats associated with Dynamic VPaths
+--
+sdWANStatsDynamicVPaths   OBJECT IDENTIFIER ::= { sdWANStatistics 21 }
+
+sdWANStatsDynamicVPathScalars   OBJECT IDENTIFIER ::= { sdWANStatsDynamicVPaths 1 }
+
+sdWANStatsNumDynamicVPaths OBJECT-TYPE
+    SYNTAX         Gauge32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of Dynamic VPaths."
+    DEFVAL { 0 }
+    ::= { sdWANStatsDynamicVPathScalars 1 }
+
+sdWANStatsDynamicVPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsDynamicVPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Dynamic VPath objects.
+            Contains statistics counts for all the Dynamic VPaths in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the last time the
+            NetScaler SD-WAN service was started.  Dynamic VPaths can be added
+            and removed."
+
+    ::= { sdWANStatsDynamicVPaths 2 }
+
+sdWANStatsDynamicVPathEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsDynamicVPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular Dynamic VPath object."
+    INDEX   { sdWANStatsDynamicVPathIndex }
+    ::= { sdWANStatsDynamicVPathTable 1 }
+
+SdWANStatsDynamicVPathEntry ::=
+    SEQUENCE {
+        sdWANStatsDynamicVPathIndex                 Integer32,
+        sdWANStatsDynamicVPathID                    Integer32,
+        sdWANStatsDynamicVPathName                  DisplayString,
+        sdWANStatsDynamicVPathState                 INTEGER,
+        sdWANStatsDynamicVPathTimeSinceCreation     Counter64,
+        sdWANStatsDynamicVPathBytesSent             Counter64,
+        sdWANStatsDynamicVPathPacketsSent           Counter64,
+        sdWANStatsDynamicVPathSendBytesDropped      Counter64,
+        sdWANStatsDynamicVPathSendPacketsDropped    Counter64,
+        sdWANStatsDynamicVPathSendPacketsLost       Counter64,
+        sdWANStatsDynamicVPathSendPacketsOOO        Counter64,
+        sdWANStatsDynamicVPathSendBOWTms            Gauge32,
+        sdWANStatsDynamicVPathSendJitterms          Gauge32,
+        sdWANStatsDynamicVPathBytesReceived         Counter64,
+        sdWANStatsDynamicVPathPacketsReceived       Counter64,
+        sdWANStatsDynamicVPathReceiveBytesDropped   Counter64,
+        sdWANStatsDynamicVPathReceivePacketsDropped Counter64,
+        sdWANStatsDynamicVPathReceivePacketsLost    Counter64,
+        sdWANStatsDynamicVPathReceivePacketsOOO     Counter64,
+        sdWANStatsDynamicVPathReceiveBOWTms         Gauge32,
+        sdWANStatsDynamicVPathReceiveJitterms       Gauge32,
+        sdWANStatsDynamicVPathNumPaths              Integer32,
+        sdWANStatsDynamicVPathNumRules              Integer32
+    }
+
+sdWANStatsDynamicVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index value for the Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 1 }
+
+sdWANStatsDynamicVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID for the Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 2 }
+
+sdWANStatsDynamicVPathName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 3 }
+
+sdWANStatsDynamicVPathState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                undefined(0),    -- Undefined state
+                disabled(1),     -- Admin Disabled
+                dead(2),         -- Dead
+                bad(3),          -- Errors above threshold
+                good(4)          -- Passing traffic
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of the dynamic virtual path."
+    ::= { sdWANStatsDynamicVPathEntry 4 }
+
+sdWANStatsDynamicVPathTimeSinceCreation OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of seconds since the dynamic virtual path has been created."
+    ::= { sdWANStatsDynamicVPathEntry 5 }
+
+sdWANStatsDynamicVPathBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 6 }
+
+sdWANStatsDynamicVPathPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 7 }
+
+sdWANStatsDynamicVPathSendBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of send bytes dropped for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 8 }
+
+sdWANStatsDynamicVPathSendPacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of send packets dropped for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 9 }
+
+sdWANStatsDynamicVPathSendPacketsLost       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of send packets lost for this
+            Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 10 }
+
+sdWANStatsDynamicVPathSendPacketsOOO        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of send packets received out
+             of order by the remote on this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 11 }
+
+sdWANStatsDynamicVPathSendBOWTms            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best one-way time (BOWT) value (in milliseconds)
+            in the send direction for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 12 }
+
+sdWANStatsDynamicVPathSendJitterms          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current worst jitter value (in milliseconds) in the send
+            direction for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 13 }
+
+sdWANStatsDynamicVPathBytesReceived     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes received for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 14 }
+
+sdWANStatsDynamicVPathPacketsReceived   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 15 }
+
+sdWANStatsDynamicVPathReceiveBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of receive bytes dropped for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 16 }
+
+sdWANStatsDynamicVPathReceivePacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of receive packets dropped for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 17 }
+
+sdWANStatsDynamicVPathReceivePacketsLost       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of receive packets lost for this
+            Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 18 }
+
+sdWANStatsDynamicVPathReceivePacketsOOO        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of received packets out
+             of order on this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 19 }
+
+sdWANStatsDynamicVPathReceiveBOWTms            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best one-way time (BOWT) value (in milliseconds)
+            in the receive direction for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 20 }
+
+sdWANStatsDynamicVPathReceiveJitterms          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current worst jitter value (in milliseconds) in the
+            receive direction for this Dynamic VPath."
+    ::= { sdWANStatsDynamicVPathEntry 21 }
+
+sdWANStatsDynamicVPathNumPaths          OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of Paths associated with this virtual path - this
+            is the number of rows in the sdWANStatsDynamicWANPathsTable for
+            the current virtual path.  Each dynamic virtual path can have a different
+            number of paths associated with it."
+    ::= { sdWANStatsDynamicVPathEntry 22 }
+
+sdWANStatsDynamicVPathNumRules          OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of Rules associated with this virtual path - this
+            is the number of rows in the sdWANStatsDynamicWANRulesTable for
+            the current virtual path.  Each dynamic virtual path can have a different
+            number of rules associated with it."
+    ::= { sdWANStatsDynamicVPathEntry 23 }
+
+
+--
+-- Stats for Paths associated with Dynamic VPaths
+--
+sdWANStatsDynamicWANPaths   OBJECT IDENTIFIER ::= { sdWANStatsDynamicVPaths 3 }
+
+sdWANStatsDynamicWANPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsDynamicWANPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Dynamic VPath Path objects.
+            Contains statistics counts for all the Dynamic VPath Paths in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the time the
+            VPath was added.  The number of virtual path in
+            this table is stored in sdWANStatsDynamicNumVPaths and the number
+            of Paths for each dynamic virtual path is in the variable
+            sdWANStatsDynamicVPathNumPaths which is in the sdWANStatsDynamicVPathTable
+            and has a specific number of paths value for each dynamic virtual path
+            index."
+    ::= { sdWANStatsDynamicWANPaths 1 }
+
+sdWANStatsDynamicWANPathEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsDynamicWANPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular Dynamic VPath object."
+    INDEX   { sdWANStatsDynamicWANPathVPathIndex, sdWANStatsDynamicWANPathPathIndex }
+    ::= { sdWANStatsDynamicWANPathTable 1 }
+
+SdWANStatsDynamicWANPathEntry ::=
+    SEQUENCE {
+        sdWANStatsDynamicWANPathVPathIndex      Integer32,
+        sdWANStatsDynamicWANPathPathIndex         Integer32,
+        sdWANStatsDynamicWANPathVPathID         Integer32,
+        sdWANStatsDynamicWANPathPathID            Integer32,
+        sdWANStatsDynamicWANPathName              DisplayString,
+        sdWANStatsDynamicWANPathState             INTEGER,
+        sdWANStatsDynamicWANPathBytesSent         Counter64,
+        sdWANStatsDynamicWANPathPacketsSent       Counter64,
+        sdWANStatsDynamicWANPathBytesReceived     Counter64,
+        sdWANStatsDynamicWANPathPacketsReceived   Counter64,
+        sdWANStatsDynamicWANPathBytesDropped      Counter64,
+        sdWANStatsDynamicWANPathPacketsDropped    Counter64,
+        sdWANStatsDynamicWANPathBOWTms            Gauge32,
+        sdWANStatsDynamicWANPathJitterms          Gauge32,
+        sdWANStatsDynamicWANPathPacketsLost       Counter64,
+        sdWANStatsDynamicWANPathPacketsOOO        Counter64
+    }
+
+sdWANStatsDynamicWANPathVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (VPath) value for the Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 1 }
+
+sdWANStatsDynamicWANPathPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (Path) value for the Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 2 }
+
+sdWANStatsDynamicWANPathVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (VPath) value for the Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 3 }
+
+sdWANStatsDynamicWANPathPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (Path) value for the Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 4 }
+
+sdWANStatsDynamicWANPathName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 5 }
+
+sdWANStatsDynamicWANPathState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                undefined(0),    -- Undefined state
+                disabled(1),     -- Admin Disabled
+                dead(2),         -- Dead
+                bad(3),          -- Errors above threshold
+                good(4)          -- Passing traffic
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of the dynamic virtual path path."
+    ::= { sdWANStatsDynamicWANPathEntry 6 }
+
+sdWANStatsDynamicWANPathBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 7 }
+
+sdWANStatsDynamicWANPathPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 8 }
+
+sdWANStatsDynamicWANPathBytesReceived     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes received for this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 9 }
+
+sdWANStatsDynamicWANPathPacketsReceived   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received for this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 10 }
+
+sdWANStatsDynamicWANPathBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes dropped for this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 11 }
+
+sdWANStatsDynamicWANPathPacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets dropped for this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 12 }
+
+sdWANStatsDynamicWANPathBOWTms            OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best one-way time (BOWT) value (in milliseconds)
+            value for this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 13 }
+
+sdWANStatsDynamicWANPathJitterms          OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current best jitter value (in milliseconds) for this
+            Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 14 }
+
+sdWANStatsDynamicWANPathPacketsLost       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of packets lost for this
+            Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 15 }
+
+sdWANStatsDynamicWANPathPacketsOOO        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current total number of out of order
+             packets detected on this Dynamic VPath Path."
+    ::= { sdWANStatsDynamicWANPathEntry 16 }
+
+--
+-- Stats for Classes associated with VPaths
+--
+sdWANStatsDynamicWANClasses   OBJECT IDENTIFIER ::= { sdWANStatsDynamicVPaths 4 }
+
+sdWANStatsDynamicWANClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsDynamicWANClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Dynamic VPath Class objects.
+            Contains statistics counts for all the Dynamic VPath
+            Classes in the system.  Counter data in this table is
+            updated once a minute and is a cumulative count since the
+            virtual path has been added.  The number of virtual path in
+            this table is stored in sdWANStatsNumDynamicVPaths and the number
+            of Classes for each virtual path is always 17."
+    ::= { sdWANStatsDynamicWANClasses 1 }
+
+sdWANStatsDynamicWANClassEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsDynamicWANClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular Dynamic VPath object."
+    INDEX   { sdWANStatsDynamicWANClassVPathIndex, sdWANStatsDynamicWANClassClassIndex }
+    ::= { sdWANStatsDynamicWANClassTable 1 }
+
+SdWANStatsDynamicWANClassEntry ::=
+    SEQUENCE {
+        sdWANStatsDynamicWANClassVPathIndex      Integer32,
+        sdWANStatsDynamicWANClassClassIndex        Integer32,
+        sdWANStatsDynamicWANClassVPathID         Integer32,
+        sdWANStatsDynamicWANClassClassID           Integer32,
+        sdWANStatsDynamicWANClassName              DisplayString,
+        sdWANStatsDynamicWANClassType              INTEGER,
+        sdWANStatsDynamicWANClassBytesSent         Counter64,
+        sdWANStatsDynamicWANClassPacketsSent       Counter64,
+        sdWANStatsDynamicWANClassBytesPending      Counter64,
+        sdWANStatsDynamicWANClassPacketsPending    Counter64,
+        sdWANStatsDynamicWANClassBytesDropped      Counter64,
+        sdWANStatsDynamicWANClassPacketsDropped    Counter64
+    }
+
+sdWANStatsDynamicWANClassVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (VPath) value for the Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 1 }
+
+sdWANStatsDynamicWANClassClassIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (Class) value for the Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 2 }
+
+sdWANStatsDynamicWANClassVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The internal Citrix ID for the Dynamic VPath object."
+    ::= { sdWANStatsDynamicWANClassEntry 3 }
+
+sdWANStatsDynamicWANClassClassID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The internal Citrix ID for the Dynamic VPath Class object."
+    ::= { sdWANStatsDynamicWANClassEntry 4 }
+
+sdWANStatsDynamicWANClassName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 5 }
+
+sdWANStatsDynamicWANClassType              OBJECT-TYPE
+    SYNTAX  INTEGER {
+                realtime(1),
+                interactive(2),
+                bulk(3),
+                unknown(4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of the Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 6 }
+
+sdWANStatsDynamicWANClassBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 7 }
+
+sdWANStatsDynamicWANClassPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 8 }
+
+sdWANStatsDynamicWANClassBytesPending     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes pending for this Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 9 }
+
+sdWANStatsDynamicWANClassPacketsPending   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets pending for this Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 10 }
+
+sdWANStatsDynamicWANClassBytesDropped      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes dropped for this Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 11 }
+
+sdWANStatsDynamicWANClassPacketsDropped    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets dropped for this Dynamic VPath Class."
+    ::= { sdWANStatsDynamicWANClassEntry 12 }
+
+--
+-- Stats for Rules associated with Dynamic VPaths
+--
+sdWANStatsDynamicWANRules   OBJECT IDENTIFIER ::= { sdWANStatsDynamicVPaths 5 }
+
+sdWANStatsDynamicWANRuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsDynamicWANRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Dynamic VPath Rule objects.
+            Contains statistics counts for all the Dynamic VPath Rules in
+            the system.  Counter data in this table is updated once a
+            minute and is a cumulative count since the time that the
+            virtual path has been added.  The number of virtual paths in this table
+            is stored in sdWANStatsNumDynamicVPaths and the number of Rules
+            for each virtual path is in the variable sdWANStatsDynamicVPathNumRules
+            which is in the sdWANStatsDynamicVPathTable
+            and has a specific number of rules value for each virtual path
+            index."
+    ::= { sdWANStatsDynamicWANRules 1 }
+
+sdWANStatsDynamicWANRuleEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsDynamicWANRuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular Dynamic VPath object."
+    INDEX   { sdWANStatsDynamicWANRuleVPathIndex, sdWANStatsDynamicWANRuleRuleIndex }
+    ::= { sdWANStatsDynamicWANRuleTable 1 }
+
+SdWANStatsDynamicWANRuleEntry ::=
+    SEQUENCE {
+        sdWANStatsDynamicWANRuleVPathIndex       Integer32,
+        sdWANStatsDynamicWANRuleRuleIndex          Integer32,
+        sdWANStatsDynamicWANRuleVPathID          Integer32,
+        sdWANStatsDynamicWANRuleRuleID             Integer32,
+        sdWANStatsDynamicWANRuleGlobalRuleIndex    Integer32,
+        sdWANStatsDynamicWANRuleApplicationName    DisplayString,
+        sdWANStatsDynamicWANRuleLANToWANHitCount Gauge32,
+        sdWANStatsDynamicWANRuleWANToLANHitCount  Gauge32,
+        sdWANStatsDynamicWANRuleBytesSent          Gauge32,
+        sdWANStatsDynamicWANRulePacketsSent        Gauge32,
+        sdWANStatsDynamicWANRuleBytesReceived      Gauge32,
+        sdWANStatsDynamicWANRulePacketsReceived    Gauge32,
+        sdWANStatsDynamicWANRuleBytesDropped       Gauge32,
+        sdWANStatsDynamicWANRulePacketsDropped     Gauge32,
+        sdWANStatsDynamicWANRuleLastActiveNMinuteAgo     TimeTicks
+    }
+
+sdWANStatsDynamicWANRuleVPathIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (VPath) value for the Dynamic VPath Rule."
+    ::= { sdWANStatsDynamicWANRuleEntry 1 }
+
+sdWANStatsDynamicWANRuleRuleIndex            OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique index (Rule) value for the Dynamic VPath Rule."
+    ::= { sdWANStatsDynamicWANRuleEntry 2 }
+
+sdWANStatsDynamicWANRuleVPathID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (VPath) value for the Dynamic VPath Rule."
+    ::= { sdWANStatsDynamicWANRuleEntry 3 }
+
+sdWANStatsDynamicWANRuleRuleID               OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix ID (Rule) value for the Dynamic VPath Rule."
+    ::= { sdWANStatsDynamicWANRuleEntry 4 }
+
+sdWANStatsDynamicWANRuleGlobalRuleIndex      OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index of this rule in the sdWANStatsRuleTable."
+    ::= { sdWANStatsDynamicWANRuleEntry 5 }
+
+sdWANStatsDynamicWANRuleApplicationName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The optional string application name associated
+            with this dynamic virtual path rule."
+    ::= { sdWANStatsDynamicWANRuleEntry 6 }
+
+sdWANStatsDynamicWANRuleLANToWANHitCount         OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of times this rule has
+            been hit for in the LAN to WAN direction, measured over
+            the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 7 }
+
+sdWANStatsDynamicWANRuleWANToLANHitCount       OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of times this rule has
+            been hit for in the WAN to LAN direction, measured over
+            the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 8 }
+
+sdWANStatsDynamicWANRuleBytesSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 9 }
+
+sdWANStatsDynamicWANRulePacketsSent                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 10 }
+
+sdWANStatsDynamicWANRuleBytesReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets sent for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 11 }
+
+sdWANStatsDynamicWANRulePacketsReceived                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets received for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 12 }
+
+sdWANStatsDynamicWANRuleBytesDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of bytes dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 13 }
+
+sdWANStatsDynamicWANRulePacketsDropped                 OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of the number of packets dropped for packets that
+            matched this rule, measured over the past active minute."
+    ::= { sdWANStatsDynamicWANRuleEntry 14 }
+
+sdWANStatsDynamicWANRuleLastActiveNMinuteAgo            OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This rule was hit last N Minutes ago.
+            If this field value is 0 and either sdWANStatsDynamicWANRuleBytesSent
+            or sdWANStatsDynamicWANRuleBytesReceived is not zero, then that means
+            that this rule is currently being used.  The rule
+            statistics contain the latest values.
+            If this field is > 0, then the rule statistics is
+            plateaued to show that this rule was used N minutes ago."
+
+    ::= { sdWANStatsDynamicWANRuleEntry 15 }
+
+--
+-- Stats associated with Arp
+--
+sdWANStatsArp   OBJECT IDENTIFIER ::= { sdWANStatistics 22 }
+
+sdWANStatsArpScalars   OBJECT IDENTIFIER ::= { sdWANStatsArp 1 }
+
+sdWANStatsNumArpEntries OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of Arp entries."
+    DEFVAL { 0 }
+    ::= { sdWANStatsArpScalars 1 }
+
+sdWANStatsArpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsArpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for Arp entry objects.
+            Contains statistics counts for all the Arp entries in
+            the system. Counter data in this table is updated once a
+            minute."
+
+    ::= { sdWANStatsArp 2 }
+
+sdWANStatsArpEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsArpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing all the information for a ARP entry object."
+    INDEX   { sdWANStatsArpID }
+    ::= { sdWANStatsArpTable 1 }
+
+SdWANStatsArpEntry ::=
+    SEQUENCE {
+        sdWANStatsArpID            Integer32,
+        sdWANStatsArpIfIndex       DisplayString,
+        sdWANStatsArpVlanTag       Counter64,
+        sdWANStatsArpIpAddr        IpAddress,
+        sdWANStatsArpPhysAddr     	PhysAddress,
+        sdWANStatsArpState   	DisplayString,
+        sdWANStatsArpType      	DisplayString,
+        sdWANStatsArpReplyAgeMs    Counter64
+    }
+
+sdWANStatsArpID              OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix Index value for the Arp
+            entry."
+    ::= { sdWANStatsArpEntry 1 }
+
+sdWANStatsArpIfIndex            OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The interface name corresponding to the Arp entry. This is the
+            name shown on the front panel of the appliance and
+            used in the user interfaces (Web and CLI)."
+    ::= { sdWANStatsArpEntry 2 }
+
+sdWANStatsArpVlanTag              OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The VLAN ID associated with the Arp entry."
+    ::= { sdWANStatsArpEntry 3 }
+
+sdWANStatsArpIpAddr         OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IP address mapping for the physical address."
+    ::= { sdWANStatsArpEntry 4 }
+
+sdWANStatsArpPhysAddr       OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The destination MAC address in a frame to which
+        this entry's filtering information applies."
+    ::= { sdWANStatsArpEntry 5 }
+
+sdWANStatsArpState     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of the Arp entry."
+    ::= { sdWANStatsArpEntry 6 }
+
+sdWANStatsArpType     OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of Arp entry describes whether it is persistent or end-user. "
+    ::= { sdWANStatsArpEntry 7 }
+
+sdWANStatsArpReplyAgeMs   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The age of arp reply we received in milliseconds."
+    ::= { sdWANStatsArpEntry 8 }
+
+--
+-- Stats associated with LAN GRE Tunnels
+--
+sdWANStatsLanGRETunnels   OBJECT IDENTIFIER ::= { sdWANStatistics 23 }
+
+sdWANStatsLanGRETunnelScalars   OBJECT IDENTIFIER ::= { sdWANStatsLanGRETunnels 1 }
+
+sdWANStatsNumLanGRETunnels OBJECT-TYPE
+    SYNTAX         Integer32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+            "The total number of LAN-side GRE Tunnels."
+    DEFVAL { 0 }
+    ::= { sdWANStatsLanGRETunnelScalars 1 }
+
+sdWANStatsLanGRETunnelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANStatsLanGRETunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of statistics for LAN-side GRE tunnel objects.
+            Contains statistics counts and state for all the LAN-side GRE
+            tunnels in the system.  Counter data in this table is updated
+            once a minute and is a cumulative count since the last time
+            the NetScaler SD-WAN service was started."
+
+    ::= { sdWANStatsLanGRETunnels 2 }
+
+sdWANStatsLanGRETunnelEntry OBJECT-TYPE
+    SYNTAX      SdWANStatsLanGRETunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing management information applicable to a
+            particular LAN-side GRE tunnel object."
+    INDEX   { sdWANStatsLanGRETunnelIndex }
+    ::= { sdWANStatsLanGRETunnelTable 1 }
+
+SdWANStatsLanGRETunnelEntry ::=
+    SEQUENCE {
+        sdWANStatsLanGRETunnelIndex                    Integer32,
+        sdWANStatsLanGRETunnelName                     DisplayString,
+        sdWANStatsLanGRETunnelState                    DisplayString,
+        sdWANStatsLanGRETunnelKeepaliveRequestSent     Counter64,
+        sdWANStatsLanGRETunnelKeepaliveReplyReceived   Counter64,
+        sdWANStatsLanGRETunnelKeepaliveReplySent       Counter64,
+        sdWANStatsLanGRETunnelPacketsSent              Counter64,
+        sdWANStatsLanGRETunnelBytesSent                Counter64,
+        sdWANStatsLanGRETunnelPacketsSentDropped       Counter64,
+        sdWANStatsLanGRETunnelPacketsSentFragmented    Counter64,
+        sdWANStatsLanGRETunnelBytesSentDropped         Counter64,
+        sdWANStatsLanGRETunnelPacketsReceived          Counter64,
+        sdWANStatsLanGRETunnelBytesReceived            Counter64,
+        sdWANStatsLanGRETunnelPacketsReceivedDropped   Counter64,
+        sdWANStatsLanGRETunnelBytesReceivedDropped     Counter64,
+        sdWANStatsLanGRETunnelRoutingDomainName        DisplayString
+    }
+
+sdWANStatsLanGRETunnelIndex              OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The unique Citrix Index value for the LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 1 }
+
+sdWANStatsLanGRETunnelName              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name for the LAN-side GRE tunnel.  This is the
+            tunnel IP adddress of the configured tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 2 }
+
+sdWANStatsLanGRETunnelState              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The state of the LAN-side GRE tunnel.  This can
+            be up or down."
+    ::= { sdWANStatsLanGRETunnelEntry 3 }
+
+sdWANStatsLanGRETunnelKeepaliveRequestSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of keepalive request packets sent for this
+            LAN-side GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 4 }
+
+sdWANStatsLanGRETunnelKeepaliveReplyReceived         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of keepalive reply packets received for this
+            LAN-side GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 5 }
+
+sdWANStatsLanGRETunnelKeepaliveReplySent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of keepalive reply packets sent for this
+            LAN-side GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 6 }
+
+sdWANStatsLanGRETunnelPacketsSent       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets sent for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 7 }
+
+sdWANStatsLanGRETunnelBytesSent         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes sent for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 8 }
+
+sdWANStatsLanGRETunnelPacketsSentDropped       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets failed to sent for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 9 }
+
+sdWANStatsLanGRETunnelBytesSentDropped         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes fail to sent for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 10 }
+
+sdWANStatsLanGRETunnelPacketsSentFragmented       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets fragmented before sent for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 11 }
+
+sdWANStatsLanGRETunnelPacketsReceived       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets received for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 12 }
+
+sdWANStatsLanGRETunnelBytesReceived         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes received for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 13 }
+
+sdWANStatsLanGRETunnelPacketsReceivedDropped       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of packets dropped after received for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 14 }
+
+sdWANStatsLanGRETunnelBytesReceivedDropped         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The count of bytes dropped after received for this LAN-side
+            GRE tunnel."
+    ::= { sdWANStatsLanGRETunnelEntry 15 }
+
+ sdWANStatsLanGRETunnelRoutingDomainName             OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The routing domain name. Each routing domain has
+            its own set of interfaces and routing tables."
+    ::= { sdWANStatsLanGRETunnelEntry 16 }
+
+--
+-- Events sub-section - contains a table with
+-- the current event database and up to the
+-- latest 1000 events in the system.
+--
+-- Events Objects
+--   Events Scalars
+--   Events Table
+--
+--
+-- Some Textual conventions used in the events
+--
+
+SdWANEventObjectTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Describes an enumeration of values used to represent the
+            severity of an event generated by the NetScaler SD-WAN Appliance."
+    SYNTAX       INTEGER {
+                     undefined(1),
+                     service(2),
+                     virtualpath(3),
+                     wanlink(4),
+                     wanpath(5),
+                     harddisk(6),
+                     fan(7),
+                     vwanappliance(8),
+                     vwuser(9),
+                     powersupply(10),
+                     configupdate(11),
+                     softwareupdate(12),
+                     proxyarp(13),
+                     ethernet(14),
+                     watchdog(15),
+                     dynamicvirtualpath(16),
+                     lantowanpath(17),
+                     wantolanpath(18),
+                     appliancesettingsupdate(19),
+                     discoveredmtu(20),
+                     wanlinkcongestion(21),
+                     usagecongestion(22),
+                     gretunnel(23),
+                     ipsectunnel(24),
+                     vwcentersystem(1001),
+                     vwcenteruser(1002),
+                     vwcenterstorage(1003),
+                     vwcenterdatabase(1004),
+                     vwcenterconnectiontovirtualwan(1005)
+                 }
+
+SdWANEventSeverityEnum ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Describes an enumeration of values used to represent the
+            severity of an event generated by the NetScaler SD-WAN Appliance."
+    SYNTAX       INTEGER {
+                     debug(1),
+                     info(2),
+                     notice(3),
+                     warning(4),
+                     error(5),
+                     critical(6),
+                     alert(7),
+                     emergency(8)
+                 }
+
+SdWANEventStateEnum ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Describes an enumeration of values used to represent the
+            current state of the object that generated the event or
+            trap in the NetScaler SD-WAN Appliance."
+    SYNTAX       INTEGER {
+                     undefined(1),
+                     disabled(2),
+                     dead(3),
+                     bad(4),
+                     good(5),
+                     warning(6),
+                     error(7),
+                     restart(8),
+                     reboot(9),
+                     active(10),
+                     standby(11),
+                     success(12),
+                     failure(13),
+                     enabled(14),
+                     pending(15),
+                     created(16),
+                     removed(17),
+                     systemerror(18),
+                     activeha(19),
+                     standbyha(20),
+                     activemcn(21),
+                     standbymcn(22),
+                     congested(23),
+                     uncongested(24),
+                     iplearned(25),
+                     ipreleased(26),
+                     ipexpired(27),
+                     ipgwnorsp(28),
+                     iprcvdnak(29),
+                     ipdetecteddup(30),
+                     ipdhcpsnorsp(31),
+                     rollback(32),
+                     usage0(33),
+                     usage1(34),
+                     usage2(35),
+                     usage3(36),
+                     thresholdok(1001),
+                     thresholdexceeded(1002),
+                     pollingthresholdok(1003),
+                     pollingthresholdexceeded(1004),
+                     start(1005),
+                     stop(1006),
+                     mismatch(1007),
+                     statserror(1008)
+                 }
+
+sdWANEventScalars   OBJECT IDENTIFIER ::= { sdWANEvents 1 }
+
+sdWANNumEvents OBJECT-TYPE
+    SYNTAX         Gauge32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "The current number of Events in the system."
+    DEFVAL { 0 }
+    ::= { sdWANEventScalars 1 }
+
+sdWANEventTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdWANEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table containing the latest set of events that have
+            been generated by the sdWAN system."
+    ::= { sdWANEvents 2 }
+
+sdWANEventEntry OBJECT-TYPE
+    SYNTAX      SdWANEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing information describing an event that
+            occurred in the system."
+    INDEX   { sdWANEventIndex }
+    ::= { sdWANEventTable 1 }
+
+SdWANEventEntry ::=
+    SEQUENCE {
+        sdWANEventIndex        Integer32,
+        sdWANEventID           Integer32,
+        sdWANEventObjectID     Integer32,
+        sdWANEventObjectName   DisplayString,
+        sdWANEventObjectType   SdWANEventObjectTypeEnum,
+        sdWANEventTime         DisplayString,
+        sdWANEventType         SdWANEventStateEnum,
+        sdWANEventSeverity     SdWANEventSeverityEnum,
+        sdWANEventDescription  DisplayString
+    }
+
+sdWANEventIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each event.  It
+            is recommended that values are assigned contiguously
+            starting from 1.  The value for each interface sub-layer
+            must remain constant at least from one re-initialization of
+            the entity's network management system to the next re-
+            initialization."
+    ::= { sdWANEventEntry 1 }
+
+sdWANEventID    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, used for the internal identification
+            of the event.  This ID will match the ID used in the
+            other User Interfaces."
+    ::= { sdWANEventEntry 2 }
+
+sdWANEventObjectID    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The ID of the object associated with the event."
+    ::= { sdWANEventEntry 3 }
+
+sdWANEventObjectName   OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A String representing the object that generated the event."
+    ::= { sdWANEventEntry 4 }
+
+sdWANEventObjectType    OBJECT-TYPE
+    SYNTAX    SdWANEventObjectTypeEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An enumerated value representing the object type of the
+            object that generated the event."
+    ::= { sdWANEventEntry 5 }
+
+sdWANEventTime    OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The localtime on the appliance as a String when the
+            event occurred."
+    ::= { sdWANEventEntry 6 }
+
+sdWANEventType    OBJECT-TYPE
+    SYNTAX    SdWANEventStateEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The type of the event - basically an enumeration of
+            State transitions that can occur in the appliance that
+            will generate an event."
+    ::= { sdWANEventEntry 7 }
+
+sdWANEventSeverity    OBJECT-TYPE
+    SYNTAX    SdWANEventSeverityEnum
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The severity of the event."
+    ::= { sdWANEventEntry 8 }
+
+sdWANEventDescription    OBJECT-TYPE
+    SYNTAX    DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A string description of the event."
+    ::= { sdWANEventEntry 9 }
+
+--
+-- Trap definitions
+--
+
+sdWANEventNotification NOTIFICATION-TYPE
+    OBJECTS            { sdWANEventIndex,
+                         sdWANEventID,
+                         sdWANEventObjectID,
+                         sdWANEventObjectName,
+                         sdWANEventObjectType,
+                         sdWANEventTime,
+                         sdWANEventType,
+                         sdWANEventSeverity,
+                         sdWANEventDescription }
+    STATUS             current
+    DESCRIPTION
+            "Trap sent when an event occurs in a NetScaler SD-WAN appliance.
+            These events can be from any of several sdWANEventObjectType
+            object types in the system, and can represent a state
+            transition or error condition in the sdWANEventType."
+   ::= { sdWANNotifs 1 }
+
+sdWANNetworkEventNotification NOTIFICATION-TYPE
+    OBJECTS            { sdWANNetworkEventSiteName,
+                         sdWANEventID,
+                         sdWANEventObjectID,
+                         sdWANEventObjectName,
+                         sdWANEventObjectType,
+                         sdWANEventTime,
+                         sdWANEventType,
+                         sdWANEventSeverity,
+                         sdWANEventDescription }
+    STATUS             current
+    DESCRIPTION
+            "Trap sent from the network management/
+            monitoring system.  These
+            events can be from any of the appliances in the network
+            being managed."
+   ::= { sdWANNotifs 2 }
+
+
+sdWANNetworkEventScalars   OBJECT IDENTIFIER ::= { sdWANEvents 3 }
+
+sdWANNetworkEventSiteName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, used for the identification of the
+            site that is the source of the event."
+    ::= { sdWANNetworkEventScalars 1 }
+
+--
+--
+END

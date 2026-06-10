@@ -1,0 +1,236 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI BLS MIB, this mib will maintain the blacklist 
+--              for datacomm product.  
+-- Reference:
+-- Version:     V1.20
+-- History:
+--  
+--  V1.20 2005-05-30 Wei Rixi(22510) added mplsVpnVrfName as table index,
+--                  added hwBlsFilterTypeSet and its objects
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =================================================================
+
+HUAWEI-BLS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue, RowStatus, DateAndTime, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwBLS MODULE-IDENTITY 
+        LAST-UPDATED "200304111150Z"        -- April 11, 2003 at 11:50 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd.,
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085
+            Http://www.huawei.com
+            E-mail:support@huawei.com
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The blacklist mib is for all datacomm product.
+            "
+        ::= { hwDatacomm 8 }
+
+    --
+    -- Textual conventions
+    --
+
+    BlsAddReason ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "
+            Descript the blacklist item added by manual or by system. 
+            "
+        SYNTAX INTEGER
+            {
+            reasonUnknow(1),
+            reasonManual(2),
+            reasonIPSweep(3),
+            reasonPortScan(4)
+            }
+        
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.8.1
+    hwBlsMibObjects OBJECT IDENTIFIER ::= { hwBLS 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.1.1
+    hwBlsEnableFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The blacklist function switch.
+            1: true(on)
+            2: false(off)
+            "
+        DEFVAL { false }
+        ::= { hwBlsMibObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.1.2
+    hwBlsBlackListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwBlsBlackListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The blacklist table.
+            "
+        ::= { hwBlsMibObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.1.2.1
+    hwBlsBlackListEntry OBJECT-TYPE
+        SYNTAX HwBlsBlackListEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The blacklist entry.                
+            "
+        INDEX { mplsVpnVrfName, hwBlsItemIPAddress }
+        ::= { hwBlsBlackListTable 1 }
+    
+    HwBlsBlackListEntry ::=
+        SEQUENCE { 
+            hwBlsItemIPAddress
+                IpAddress,
+            hwBlsItemAge
+                Integer32,
+            hwBlsItemAddReason
+                BlsAddReason,
+            hwBlsItemAddTime
+                DateAndTime,
+            hwBlsRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.8.1.2.1.1
+    hwBlsItemIPAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The packet source IP address. 
+            If match, drop the packet.
+            "
+        ::= { hwBlsBlackListEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.1.2.1.2
+    hwBlsItemAge OBJECT-TYPE
+        SYNTAX Integer32 (0..1000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            The blacklist item aging time. 
+            This item will be deleted when overtime. 
+            The default value is 0, no aging.
+            (unit:minutes)"
+        ::= { hwBlsBlackListEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.1.2.1.3
+    hwBlsItemAddReason OBJECT-TYPE
+        SYNTAX BlsAddReason
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The blacklist item is added by manual or by system. 
+            1: manual
+            2: dynamic(system)                
+            "
+        ::= { hwBlsBlackListEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.1.2.1.4
+    hwBlsItemAddTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " 
+            The system time when add this blacklist item.
+            It's automatically appended by system when create the item.  
+            (the seconds since 1970.)"
+        ::= { hwBlsBlackListEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.1.2.1.5
+    hwBlsRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Only support CreateAndGo and Destroy.
+            "
+        ::= { hwBlsBlackListEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.8.1.3
+    hwBlsFilterTypeSet OBJECT IDENTIFIER ::= { hwBlsMibObjects 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.8.1.3.1
+    hwBlsFilterType OBJECT-TYPE
+        SYNTAX Integer32 (0..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            The blacklist filter type.
+            none(0x00)
+            icmp(0x01)
+            tcp(0x02)
+            udp(0x04)
+            others(0x08)
+            all(0x0F)    
+            "
+        DEFVAL { 15 }
+        ::= { hwBlsFilterTypeSet 1 }
+            
+    -- 1.3.6.1.4.1.2011.5.25.8.2
+    hwBlsMibConformance OBJECT IDENTIFIER ::= { hwBLS 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.2.1
+    hwBlsMibGroup OBJECT IDENTIFIER ::= { hwBlsMibConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.2.1.1
+    hwBlsEnableGroup OBJECT-GROUP
+        OBJECTS { hwBlsEnableFlag }
+        STATUS current
+        DESCRIPTION 
+            "Blacklist function switch."
+        ::= { hwBlsMibGroup 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.8.2.1.2
+    hwBlsBlackListTableGroup OBJECT-GROUP
+        OBJECTS { 
+            hwBlsItemIPAddress, 
+            hwBlsItemAge, 
+            hwBlsItemAddReason, 
+            hwBlsItemAddTime, 
+            hwBlsRowStatus
+            }
+        STATUS current
+        DESCRIPTION 
+            "Blacklist table struct group."
+        ::= { hwBlsMibGroup 2 }
+
+END
+

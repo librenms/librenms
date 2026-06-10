@@ -1,0 +1,26 @@
+os: eltex-mes21xx
+text: Eltex
+ifname: true
+type: network
+icon: eltex
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.35265.1.24 #mes 3124
+            - .1.3.6.1.4.1.35265.1.43 #mes 2124
+            - .1.3.6.1.4.1.35265.1.52 #MES 1124MB
+            - .1.3.6.1.4.1.35265.1.154
+            - .1.3.6.1.4.1.35265.1.143 # MES2408
+
+mib_dir: eltexmes21xx
+group: radlan
+
+bad_iftype:
+    - tunnel
+    - softwareLoopback
+    - propPointToPointSerial

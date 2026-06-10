@@ -1,0 +1,80 @@
+STORMSHIELD-IPSEC-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      OBJECT-TYPE, Integer32, Counter32, Counter64, MODULE-IDENTITY   FROM SNMPv2-SMI
+      TruthValue                                                      FROM SNMPv2-TC
+      DisplayString                                                   FROM RFC1213-MIB
+      stormshieldMIB                                                  FROM STORMSHIELD-SMI-MIB;
+
+   snsIPSECStats MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+        "Customer Support
+
+        22 rue du Gouverneur General Eboue
+        92130 Issy-les-Moulineaux
+        FRANCE
+
+        Tel: +33 (0)9 69 32 96 29
+        E-mail: support@stormshield.eu
+        http://www.stormshield.eu"
+      DESCRIPTION   "stormshield IPSEC Statistics"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 13 }
+
+   snsIPSECStatsSPD         OBJECT IDENTIFIER ::= { snsIPSECStats 1 }
+   snsIPSECStatsSAD         OBJECT IDENTIFIER ::= { snsIPSECStats 2 }
+
+   -----------------------------------
+   -- IPSEC SPD Statistics Group --
+   -----------------------------------
+
+   snsIPSECStatsSPDIn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of incomming security policies"
+      ::= { snsIPSECStatsSPD 1 }
+
+   snsIPSECStatsSPDOut OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of outgoing security policies"
+      ::= { snsIPSECStatsSPD 2 }
+
+   -----------------------------------
+   -- IPSEC SAD Statistics Group --
+   -----------------------------------
+
+   snsIPSECStatsSADLarval OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of security associations in establishment"
+      ::= { snsIPSECStatsSAD 1 }
+
+   snsIPSECStatsSADMature OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number established security associations"
+      ::= { snsIPSECStatsSAD 2 }
+
+   snsIPSECStatsSADDying OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of security associations in end of life"
+      ::= { snsIPSECStatsSAD 3 }
+
+   snsIPSECStatsSADDead OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Number of dead security associations"
+      ::= { snsIPSECStatsSAD 4 }
+
+END

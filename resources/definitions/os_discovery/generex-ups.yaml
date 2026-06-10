@@ -1,0 +1,8 @@
+modules:
+    os:
+        sysDescr_regex: '/^(?<hardware>\w+) v (?<version>[\d.]+$)/'
+        hardware:
+            - UPS-MIB::upsIdentManufacturer.0
+            - UPS-MIB::upsIdentModel.0
+        hardware_template: '{{ UPS-MIB::upsIdentManufacturer.0 }} {{ UPS-MIB::upsIdentModel.0 }}'
+        version: UPS-MIB::upsIdentAgentSoftwareVersion.0

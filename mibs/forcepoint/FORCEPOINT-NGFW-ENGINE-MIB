@@ -1,0 +1,1835 @@
+FORCEPOINT-NGFW-ENGINE-MIB DEFINITIONS ::= BEGIN
+
+      -- SUBTREE: 1.3.6.1.4.1.47565.1.1
+        -- iso.org.dod.internet.private.enterprises.forcepoint.ngfw.engine
+
+IMPORTS
+    enterprises, Integer32, Counter32, Counter64, Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+	  FROM SNMPv2-SMI
+    DisplayString, TimeStamp, DateAndTime, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    InetAddressIPv4, InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+    CounterBasedGauge64
+        FROM HCNUM-TC;
+
+forcepointNGFWEngineMib MODULE-IDENTITY
+	LAST-UPDATED	"202409060000Z"
+	ORGANIZATION	"Forcepoint LLC"
+	CONTACT-INFO	"email: mib.stonesoft@forcepoint.com"
+	DESCRIPTION	"Top level enterprise MIB for Forcepoint NGFW"
+	REVISION	"202409060000Z"
+	DESCRIPTION	"Added fwInspectionPercentageUsed"
+	REVISION	"202409020000Z"
+	DESCRIPTION	"Added fwInspectionBytesUsed"
+	REVISION	"202403280000Z"
+	DESCRIPTION	"Added fwIfStatsProcTable"
+	REVISION	"202112110000Z"
+	DESCRIPTION	"First public revision"
+	::= { enterprises 47565 1 1 }
+
+engineNotifications OBJECT IDENTIFIER ::= { forcepointNGFWEngineMib 0 }
+engineObjects       OBJECT IDENTIFIER ::= { forcepointNGFWEngineMib 1 }
+engineGroups        OBJECT IDENTIFIER ::= { forcepointNGFWEngineMib 2 }
+
+--
+-- Firewall objects
+--
+
+fwSoftwareVersion   OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Version string of the firewall software"
+              ::= { engineObjects 1 }
+
+fwSecurityPolicy  OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Name of the current security policy on the
+                  firewall"
+              ::= { engineObjects 2 }
+
+fwPolicyTime  OBJECT-TYPE
+              SYNTAX        TimeStamp
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "The time when the security policy was
+                  installed to the firewall"
+              ::= { engineObjects 3 }
+
+-- interface related objects
+
+fwIfStatsTable  OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwIfStatsEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each
+                   interface in system"
+              ::= { engineObjects 10 }
+
+-- Statistics
+
+fwIfStatsEntry OBJECT-TYPE
+              SYNTAX        FwIfStatsEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for an interface"
+              INDEX         { fwIfStatsIndex }
+              ::= { fwIfStatsTable 1 }
+
+FwIfStatsEntry ::=
+    SEQUENCE {
+            fwIfStatsIndex        INTEGER,
+            fwIfName              DisplayString,
+            fwIfAcceptedPkts      Counter64,
+            fwIfDroppedPkts       Counter64,
+            fwIfLoggedPkts        Counter64,
+            fwIfAccountedPkts     Counter64,
+            fwIfRejectedPkts      Counter64,
+            fwIfAcceptedBytes     Counter64,
+            fwIfDroppedBytes      Counter64,
+            fwIfLoggedBytes       Counter64,
+            fwIfAccountedBytes    Counter64,
+            fwIfRejectedBytes     Counter64,
+            fwIfForwardedPkts     Counter64,
+            fwIfForwardedBytes    Counter64,
+            fwIfComment           DisplayString
+            }
+
+fwIfStatsIndex OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                "A unique value, greater than zero, for each interface or
+                 interface sub-layer in the managed system."
+              ::= { fwIfStatsEntry 1 }
+
+fwIfName	OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Name of interface"
+              ::= { fwIfStatsEntry 2 }
+
+fwIfAcceptedPkts OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of accepted packets by firewall rules"
+              ::= { fwIfStatsEntry 3 }
+
+fwIfDroppedPkts OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of dropped packets by firewall rules"
+              ::= { fwIfStatsEntry 4 }
+
+fwIfLoggedPkts OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of logged packets by firewall rules"
+              ::= { fwIfStatsEntry 5 }
+
+fwIfAccountedPkts OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of accounted packets by firewall rules"
+              ::= { fwIfStatsEntry 6 }
+
+fwIfRejectedPkts OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of rejected packets by firewall rules"
+              ::= { fwIfStatsEntry 7 }
+
+fwIfAcceptedBytes	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of accepted bytes by firewall rules"
+              ::= { fwIfStatsEntry 8 }
+
+fwIfDroppedBytes	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of dropped bytes by firewall rules"
+              ::= { fwIfStatsEntry 9 }
+
+fwIfLoggedBytes	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of logged bytes by firewall rules"
+              ::= { fwIfStatsEntry 10 }
+
+fwIfAccountedBytes	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of accounted bytes by firewall rules"
+              ::= { fwIfStatsEntry 11 }
+
+fwIfRejectedBytes	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of rejected bytes by firewall rules"
+              ::= { fwIfStatsEntry 12 }
+
+fwIfForwardedPkts OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of forwarded packets by firewall rules"
+              ::= { fwIfStatsEntry 13 }
+
+fwIfForwardedBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of forwarded bytes by firewall rules"
+              ::= { fwIfStatsEntry 14 }
+
+fwIfComment OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Comment of interface"
+              ::= { fwIfStatsEntry 15 }
+
+-- VPN end-point related objects
+
+VpnEndpointType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value that represents the type of the remote VPN end-point.
+
+         unknown(0)  The type of the remote VPN end-point is not known.
+
+         static(1)   The remote VPN end-point has a static IP address.
+
+         dynamic(2)  The remote VPN end-point has a dynamic IP address.
+
+         mobile(3)   The remote is a mobile VPN client."
+    SYNTAX       INTEGER {
+                     unknown(0),
+                     static(1),
+                     dynamic(2),
+                     mobile(3)
+                 }
+
+-- IPv4 end-points --
+
+fwVpnEp4Table OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwVpnEp4Entry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "This table contains an entry for each
+                             IPv4 VPN end-point pair"
+              ::= { engineObjects 12 }
+
+fwVpnEp4Entry OBJECT-TYPE
+              SYNTAX        FwVpnEp4Entry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for an IPv4 VPN end-point pair"
+              INDEX         { fwVpnEp4Index }
+              ::= { fwVpnEp4Table 1 }
+
+FwVpnEp4Entry ::=
+    SEQUENCE {
+            fwVpnEp4Index             INTEGER,
+            fwVpnEp4Local             InetAddressIPv4,
+            fwVpnEp4Remote            InetAddressIPv4,
+            fwVpnEp4RemoteType        VpnEndpointType,
+            fwVpnEp4ReceivedBytes     Counter64,
+            fwVpnEp4SentBytes         Counter64,
+            fwVpnEp4IpsecSa           Counter32
+            }
+
+fwVpnEp4Index OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "A unique value, greater than zero, for each
+                             end-point pair."
+              ::= { fwVpnEp4Entry 1 }
+
+fwVpnEp4Local OBJECT-TYPE
+              SYNTAX        InetAddressIPv4
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Local IPv4 end-point address"
+              ::= { fwVpnEp4Entry 2 }
+
+fwVpnEp4Remote OBJECT-TYPE
+              SYNTAX        InetAddressIPv4
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Remote IPv4 end-point address"
+              ::= { fwVpnEp4Entry 3 }
+
+fwVpnEp4RemoteType OBJECT-TYPE
+              SYNTAX        VpnEndpointType
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The type of remote VPN end-point"
+              ::= { fwVpnEp4Entry 4 }
+
+fwVpnEp4ReceivedBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Number of received bytes between the end-point pair"
+              ::= { fwVpnEp4Entry 5 }
+
+fwVpnEp4SentBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Number of sent bytes between the end-point pair"
+              ::= { fwVpnEp4Entry 6 }
+
+fwVpnEp4IpsecSa OBJECT-TYPE
+              SYNTAX        Counter32
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Number of currently established IPsec SAs
+                   between the end-point pair"
+              ::= { fwVpnEp4Entry 7 }
+
+-- IPv6 end-points --
+
+fwVpnEp6Table OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwVpnEp6Entry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "This table contains an entry for each
+                             IPv6 VPN end-point pair"
+              ::= { engineObjects 13 }
+
+fwVpnEp6Entry OBJECT-TYPE
+              SYNTAX        FwVpnEp6Entry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for an IPv6 VPN end-point pair"
+              INDEX         { fwVpnEp6Index }
+              ::= { fwVpnEp6Table 1 }
+
+FwVpnEp6Entry ::=
+    SEQUENCE {
+            fwVpnEp6Index             INTEGER,
+            fwVpnEp6Local             InetAddressIPv6,
+            fwVpnEp6Remote            InetAddressIPv6,
+            fwVpnEp6RemoteType        VpnEndpointType,
+            fwVpnEp6ReceivedBytes     Counter64,
+            fwVpnEp6SentBytes         Counter64,
+            fwVpnEp6IpsecSa           Counter32
+            }
+
+fwVpnEp6Index OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "A unique value, greater than zero, for each
+                             end-point pair."
+              ::= { fwVpnEp6Entry 1 }
+
+fwVpnEp6Local OBJECT-TYPE
+              SYNTAX        InetAddressIPv6
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Local IPv6 end-point address"
+              ::= { fwVpnEp6Entry 2 }
+
+fwVpnEp6Remote OBJECT-TYPE
+              SYNTAX        InetAddressIPv6
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Remote IPv6 end-point address"
+              ::= { fwVpnEp6Entry 3 }
+
+fwVpnEp6RemoteType OBJECT-TYPE
+              SYNTAX        VpnEndpointType
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The type of remote VPN end-point"
+              ::= { fwVpnEp6Entry 4 }
+
+fwVpnEp6ReceivedBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Number of received bytes between the end-point pair"
+              ::= { fwVpnEp6Entry 5 }
+
+fwVpnEp6SentBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Number of sent bytes between the end-point pair"
+              ::= { fwVpnEp6Entry 6 }
+
+fwVpnEp6IpsecSa OBJECT-TYPE
+              SYNTAX        Counter32
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Number of currently established IPsec SAs
+                   between the end-point pair"
+              ::= { fwVpnEp6Entry 7 }
+
+-- Global firewall informations
+
+fwConnNumber OBJECT-TYPE
+              SYNTAX        CounterBasedGauge64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of current connections"
+              ::= { engineObjects 4 }
+
+fwAccepted OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of accepted packets"
+              ::= { engineObjects 5 }
+
+fwDropped OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of dropped packets"
+              ::= { engineObjects 6 }
+
+fwLogged OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of logged packets"
+              ::= { engineObjects 7 }
+
+fwAccounted OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of accounted packets"
+              ::= { engineObjects 8 }
+
+fwRejected OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of rejected packets"
+              ::= { engineObjects 9 }
+
+-- Hardware status used by data corresponding to sg-hwstat output
+
+FwHwComponentStatus ::=
+              TEXTUAL-CONVENTION
+              STATUS        current
+              DESCRIPTION
+                  "Operational status of the corresponding hardware component.
+                   notPresent(-1)  Component is unexpectedly not present.
+                   ok(0)           Component working as intended.
+                   warning(1)      Component needs attention.
+                   error(2)        Component is inoperative due to a failure.
+                   fatalError(3)   Component has failed unrecoverably."
+              SYNTAX        INTEGER {
+                  notPresent(-1),  -- This should never occur.
+                  ok(0),
+                  warning(1),
+                  error(2),
+                  fatalError(3)  -- Currently nothing produces this.
+              }
+
+-- Temperature sensors
+
+fwHwTempSensorTable  OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwHwTempSensorEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each
+                  temperature sensor in system"
+              ::= { engineObjects 16 }
+
+fwHwTempSensorEntry OBJECT-TYPE
+              SYNTAX        FwHwTempSensorEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for a temperature sensor"
+              INDEX         { fwHwTempSensorIndex }
+              ::= { fwHwTempSensorTable 1 }
+
+FwHwTempSensorEntry ::=
+    SEQUENCE {
+            fwHwTempSensorIndex   INTEGER,
+            fwHwTemperatureName   DisplayString,
+            fwHwTemperature       Integer32,
+            fwHwTemperatureStatus FwHwComponentStatus
+            }
+
+fwHwTempSensorIndex     OBJECT-TYPE
+                        SYNTAX        Integer32(1..2147483647)
+                        MAX-ACCESS    not-accessible
+                        STATUS        current
+                        DESCRIPTION
+                            "A unique value, greater than zero, for each
+                            temperature sensor"
+                        ::= { fwHwTempSensorEntry 1 }
+
+fwHwTemperatureName     OBJECT-TYPE
+                        SYNTAX          DisplayString
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION     "Name of the temperature sensor"
+                        ::= { fwHwTempSensorEntry 2 }
+
+fwHwTemperature         OBJECT-TYPE
+                        SYNTAX        Integer32
+                        UNITS         "degrees C"
+                        MAX-ACCESS    read-only
+                        STATUS        current
+                        DESCRIPTION
+                            "Temperature in degrees C
+                             for the given temperature sensor"
+                        ::= { fwHwTempSensorEntry 3 }
+
+fwHwTemperatureStatus   OBJECT-TYPE
+                        SYNTAX          FwHwComponentStatus
+                        MAX-ACCESS      read-only
+                        STATUS          current
+                        DESCRIPTION     "Status of the temperature sensor
+                                        (not present, ok, warning, error, fatal error)"
+                        ::= { fwHwTempSensorEntry 4 }
+
+-- PSU statuses
+
+fwPsuTable    OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwPsuEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each
+                  power supply unit in system"
+              ::= { engineObjects 17 }
+
+fwPsuEntry OBJECT-TYPE
+              SYNTAX        FwPsuEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for a PSU"
+              INDEX         { fwPsuIndex }
+              ::= { fwPsuTable 1 }
+
+FwPsuEntry ::=
+    SEQUENCE {
+            fwPsuIndex   INTEGER,
+            fwPsuName    DisplayString,
+            fwPsuStatus  FwHwComponentStatus
+            }
+
+fwPsuIndex  OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                "A unique value, greater than zero, for each PSU"
+              ::= { fwPsuEntry 1 }
+
+fwPsuName   OBJECT-TYPE
+            SYNTAX          DisplayString
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION     "Name of the PSU"
+              ::= { fwPsuEntry 2 }
+
+fwPsuStatus OBJECT-TYPE
+            SYNTAX          FwHwComponentStatus
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION     "Status of the PSU
+                             (not present, ok, warning, error, fatal error)"
+              ::= { fwPsuEntry 3 }
+
+-- Fan statuses
+
+fwFanTable    OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwFanEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each
+                  fan in system"
+              ::= { engineObjects 18 }
+
+fwFanEntry OBJECT-TYPE
+              SYNTAX        FwFanEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for a fan"
+              INDEX         { fwFanIndex }
+              ::= { fwFanTable 1 }
+
+FwFanEntry ::=
+    SEQUENCE {
+            fwFanIndex   INTEGER,
+            fwFanName    DisplayString,
+            fwFan        Integer32,
+            fwFanStatus  FwHwComponentStatus
+            }
+
+fwFanIndex    OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                "A unique value, greater than zero, for each fan"
+              ::= { fwFanEntry 1 }
+
+fwFanName     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION     "Fan name"
+              ::= { fwFanEntry 2 }
+
+fwFan       OBJECT-TYPE
+            SYNTAX          Integer32
+            UNITS           "RPM"
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION     "Fan speed in RPM"
+              ::= { fwFanEntry 3 }
+
+fwFanStatus OBJECT-TYPE
+            SYNTAX          FwHwComponentStatus
+            MAX-ACCESS      read-only
+            STATUS          current
+            DESCRIPTION     "Status of the fan
+                             (not present, ok, warning, error, fatal error)"
+              ::= { fwFanEntry 4 }
+
+-- Voltage statuses
+
+fwVoltageTable  OBJECT-TYPE
+                SYNTAX        SEQUENCE OF FwVoltageEntry
+                MAX-ACCESS    not-accessible
+                STATUS        current
+                DESCRIPTION
+                    "This table contains an entry for each
+                    voltage in system"
+                ::= { engineObjects 20 }
+
+fwVoltageEntry  OBJECT-TYPE
+                SYNTAX        FwVoltageEntry
+                MAX-ACCESS    not-accessible
+                STATUS        current
+                DESCRIPTION   "Row for a voltage"
+                INDEX         { fwVoltageIndex }
+                ::= { fwVoltageTable 1 }
+
+FwFixedThousandths ::=
+                TEXTUAL-CONVENTION
+                DISPLAY-HINT    "d-3"
+                STATUS          current
+                DESCRIPTION     "Fixed point, three decimals"
+                SYNTAX          Integer32
+
+FwVoltageEntry ::=
+    SEQUENCE {
+            fwVoltageIndex       INTEGER,
+            fwVoltageName        DisplayString,
+            fwVoltage            FwFixedThousandths,
+            fwVoltageStatus      FwHwComponentStatus
+            }
+
+fwVoltageIndex  OBJECT-TYPE
+                SYNTAX        Integer32(1..2147483647)
+                MAX-ACCESS    not-accessible
+                STATUS        current
+                DESCRIPTION
+                    "A unique value, greater than zero, for each voltage"
+                ::= { fwVoltageEntry 1 }
+
+fwVoltageName   OBJECT-TYPE
+                SYNTAX          DisplayString
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "Voltage name"
+                ::= { fwVoltageEntry 2 }
+
+fwVoltage   OBJECT-TYPE
+                SYNTAX          FwFixedThousandths
+                UNITS           "V"
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "Voltage in volts"
+                ::= { fwVoltageEntry 3 }
+
+fwVoltageStatus OBJECT-TYPE
+                SYNTAX          FwHwComponentStatus
+                MAX-ACCESS      read-only
+                STATUS          current
+                DESCRIPTION     "Status of the voltage
+                                (not present, ok, warning, error, fatal error)"
+                ::= { fwVoltageEntry 4 }
+
+-- fw connections
+
+fwNewConnectionsS       OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of new connections / second"
+              ::= { fwHardware 4 }
+
+fwDiscardedConnectionsS OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of discarded connections / second"
+              ::= { fwHardware 5 }
+
+fwRefusedConnectionsS   OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of refused connections / second"
+              ::= { fwHardware 6 }
+
+-- Mobile Broadband
+
+fwMbrInterfaceTable  OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwMbrInterfaceEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each cellular
+                   interface in system"
+              ::= { engineObjects 14 }
+
+fwMbrInterfaceEntry OBJECT-TYPE
+              SYNTAX        FwMbrInterfaceEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for a cellular interface"
+              INDEX         { fwMbrInterfaceIndex }
+              ::= { fwMbrInterfaceTable 1 }
+
+FwMbrInterfaceEntry ::=
+    SEQUENCE {
+            fwMbrInterfaceIndex   INTEGER,
+            fwMbrName             DisplayString,
+            fwMbrBandUsed         DisplayString,
+            fwMbrSignalStrength   Integer32,
+            fwMbrStatus           FwHwComponentStatus
+            }
+
+fwMbrInterfaceIndex OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                "A unique value, greater than zero, for each cellular
+                 interface or interface sub-layer in the managed system."
+              ::= { fwMbrInterfaceEntry 1 }
+
+fwMbrName     OBJECT-TYPE
+              SYNTAX          DisplayString
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION     "Modem name"
+              ::= { fwMbrInterfaceEntry 2 }
+
+fwMbrBandUsed OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Interface band in use"
+              ::= { fwMbrInterfaceEntry 3 }
+
+fwMbrSignalStrength OBJECT-TYPE
+              SYNTAX        Integer32
+              UNITS         "dBm"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Modem signal strength in dBm"
+              ::= { fwMbrInterfaceEntry 4 }
+
+fwMbrStatus   OBJECT-TYPE
+              SYNTAX          FwHwComponentStatus
+              MAX-ACCESS      read-only
+              STATUS          current
+              DESCRIPTION     "Status of the modem
+                               (not present, ok, warning, error, fatal error)"
+              ::= { fwMbrInterfaceEntry 5 }
+
+-- hardware related objects
+
+fwHardware OBJECT IDENTIFIER ::= { engineObjects 11 }
+
+-- Processor
+
+fwCpuStatsTable  OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwCpuEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "This table contains an entry for each CPU in
+                            a system and total usage of all cpus."
+              ::= { fwHardware 1 }
+
+fwCpuStatsEntry OBJECT-TYPE
+              SYNTAX        FwCpuEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row with information about CPU usage"
+              INDEX         { fwCpuStatsId }
+              ::= { fwCpuStatsTable 1 }
+
+FwCpuEntry ::= SEQUENCE {
+            fwCpuStatsId    INTEGER,
+            fwCpuName       DisplayString,
+            fwCpuTotal      Unsigned32,
+            fwCpuUser       Unsigned32,
+            fwCpuSystem     Unsigned32,
+            fwCpuNice       Unsigned32,
+            fwCpuIdle       Unsigned32,
+            fwCpuIoWait     Unsigned32,
+            fwCpuHwIrq      Unsigned32,
+            fwCpuSoftIrq    Unsigned32
+            }
+
+
+fwCpuStatsId     OBJECT-TYPE
+              SYNTAX        Integer32(1..1024)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "A unique value, greater than zero, for each
+                             CPU in the managed system. First element with Id '0'
+                             is designed for total values."
+              ::= { fwCpuStatsEntry 1 }
+
+fwCpuName   OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Name of data current line concern"
+              ::= { fwCpuStatsEntry 2 }
+
+fwCpuTotal  OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The total CPU load percentage"
+              ::= { fwCpuStatsEntry 3 }
+
+fwCpuUser   OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The percentage of time the CPU has spent running
+                             users' processes that are not niced"
+              ::= { fwCpuStatsEntry 4 }
+
+fwCpuSystem OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The percentage of time the CPU has spent running
+                             the kernel and its processes"
+              ::= { fwCpuStatsEntry 5 }
+
+fwCpuNice   OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The percentage of time the CPU has spent running
+                             users' processes that have been niced"
+              ::= { fwCpuStatsEntry 6 }
+
+fwCpuIdle   OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The percentage of time the CPU was idle"
+              ::= { fwCpuStatsEntry 7 }
+
+fwCpuIoWait OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The percentage of time the CPU has been waiting
+                             for I/O to complete"
+              ::= { fwCpuStatsEntry 8 }
+
+fwCpuHwIrq  OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The percentage of time the CPU has been servicing
+                             hardware interrupts"
+              ::= { fwCpuStatsEntry 9 }
+
+fwCpuSoftIrq OBJECT-TYPE
+              SYNTAX        Unsigned32
+              UNITS         "percent"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "The percentage of time the CPU has been servicing
+                             software interrupts"
+              ::= { fwCpuStatsEntry 10 }
+
+-- Memory
+
+fwMemoryInfo OBJECT IDENTIFIER ::= { fwHardware 2 }
+
+fwSwapBytesTotal OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Total swap space"
+              ::= { fwMemoryInfo 1 }
+
+fwSwapBytesUsed OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Used space of swap"
+              ::= { fwMemoryInfo 2 }
+
+fwSwapBytesUnused OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of unused space of swap"
+              ::= { fwMemoryInfo 3 }
+
+
+fwMemBytesTotal OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Number of available bytes of physical memory"
+              ::= { fwMemoryInfo 4 }
+
+fwMemBytesUsed OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of memory being in use"
+              ::= { fwMemoryInfo 5 }
+
+fwMemBytesUnused OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of unused bytes of physical memory"
+              ::= { fwMemoryInfo 6 }
+
+fwMemBytesBuffers OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of memory used as buffers"
+              ::= { fwMemoryInfo 7 }
+
+fwMemBytesCached OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of memory used as cache"
+              ::= { fwMemoryInfo 8 }
+
+fwMemBytesSReclaimable OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of reclaimable Slab memory "
+              ::= { fwMemoryInfo 9 }
+
+fwMemBytesAvailable OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of memory available"
+              ::= { fwMemoryInfo 10 }
+
+fwInspectionBytesUsed OBJECT-TYPE
+              SYNTAX      CounterBasedGauge64
+              UNITS       "bytes"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of inspection memory being used"
+              ::= { fwMemoryInfo 11 }
+
+fwInspectionPercentageUsed OBJECT-TYPE
+              SYNTAX      Unsigned32 (0..100)
+              UNITS       "percent"
+              MAX-ACCESS  read-only
+              STATUS      current
+              DESCRIPTION "Amount of inspection memory being used as a percentage of memory given to inspection"
+              ::= { fwMemoryInfo 12 }
+
+-- disk(s) statistics
+
+fwDiskStatsTable  OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwDiskStatsEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Table contains an entry for each partition
+                             mounted in a system."
+              ::= { fwHardware 3 }
+
+fwDiskStatsEntry OBJECT-TYPE
+              SYNTAX        FwDiskStatsEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row of information concerning one partition"
+              INDEX         { fwPartitionIndex }
+              ::= { fwDiskStatsTable 1 }
+
+FwDiskStatsEntry ::= SEQUENCE {
+                fwPartitionIndex    INTEGER,
+                fwPartitionDevName  DisplayString,
+                fwMountPointName    DisplayString,
+                fwPartitionSize     CounterBasedGauge64,
+                fwPartitionUsed     CounterBasedGauge64,
+                fwPartitionAvail    CounterBasedGauge64
+            }
+
+fwPartitionIndex  OBJECT-TYPE
+              SYNTAX        Integer32(1..1024)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "A unique value, greater than zero, for each partition"
+              ::= { fwDiskStatsEntry 1 }
+
+fwPartitionDevName  OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "A unique name of a device"
+              ::= { fwDiskStatsEntry 2 }
+
+fwMountPointName    OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Name of a mount point"
+              ::= { fwDiskStatsEntry 3 }
+
+fwPartitionSize OBJECT-TYPE
+              SYNTAX        CounterBasedGauge64
+              UNITS         "kbytes"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Total size of the partition"
+              ::= { fwDiskStatsEntry 4 }
+
+fwPartitionUsed OBJECT-TYPE
+              SYNTAX        CounterBasedGauge64
+              UNITS         "kbytes"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Amount of used space of the partition
+                             (in kilobytes)"
+              ::= { fwDiskStatsEntry 5 }
+
+fwPartitionAvail    OBJECT-TYPE
+              SYNTAX        CounterBasedGauge64
+              UNITS         "kbytes"
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION   "Information about amount of free space on
+                             partition (in kilobytes)"
+              ::= { fwDiskStatsEntry 6 }
+
+fwDiskSerialNumber  OBJECT-TYPE
+              SYNTAX		DisplayString
+              MAX-ACCESS	read-only
+              STATUS		current
+              DESCRIPTION   "Disk serial number"
+              ::= { engineObjects 15 }
+
+--
+-- Network node objects, e.g. identifications, state, load
+
+netNodeObjects OBJECT IDENTIFIER ::= { engineObjects 19 }
+
+nodeClusterId	OBJECT-TYPE
+		SYNTAX		Integer32 (0..65535)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The identification number of the cluster
+			 this node belongs to"
+		::= { netNodeObjects 1 }
+
+
+nodeMemberId	OBJECT-TYPE
+		SYNTAX		Integer32 (1..16)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Node's member identification within the cluster"
+		::= { netNodeObjects 2 }
+
+nodeOperState	OBJECT-TYPE
+		SYNTAX		INTEGER {
+						unknown(0),
+						online(1),
+						goingOnline(2),
+						lockedOnline(3),
+						goingLockedOnline(4),
+						offline(5),
+						goingOffline(6),
+						lockedOffline(7),
+						goingLockedOffline(8),
+						standby(9),
+						goingStandby(10)
+					}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The operative (clustering) state of the node"
+		::= { netNodeObjects 3 }
+
+nodeCPULoad	OBJECT-TYPE
+		SYNTAX		Integer32 (0..100)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The CPU load percentage on the node"
+		::= { netNodeObjects 4 }
+
+nodeLastLogin	    OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The most recent login event on the node"
+		::= { netNodeObjects 5 }
+
+nodeLastLoginTime	OBJECT-TYPE
+		SYNTAX		TimeStamp
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Timestamp of the most recent login event on the node"
+		::= { netNodeObjects 6 }
+
+nodeHwmonEvent	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Reason for the hardware monitoring event"
+		::= { netNodeObjects 8 }
+
+nodeApplianceModel	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Appliance model name"
+		::= { netNodeObjects 9 }
+
+nodePosCode			OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Appliance POS code"
+		::= { netNodeObjects 10 }
+
+nodeLoginTime	OBJECT-TYPE
+		SYNTAX		DateAndTime
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The most recent login event on the node"
+		::= { netNodeObjects 11 }
+
+nodePolicyApplyTime	OBJECT-TYPE
+		SYNTAX		DateAndTime
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The time when the security policy was installed to the node"
+		::= { netNodeObjects 12 }
+
+nodeHardwareSerialNumber	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Hardware chassis serial number"
+		::= { netNodeObjects 13 }
+
+--
+-- Tester objects
+
+nodeTestTable	        OBJECT-TYPE
+			SYNTAX		SEQUENCE OF NodeTestEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION
+				"This table contains an entry for each
+				 test instance that was
+				 configured to send a trap on test failure"
+
+			::= { netNodeObjects 7 }
+
+
+nodeTestEntry    	OBJECT-TYPE
+			SYNTAX 		NodeTestEntry
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"Row for a test instance"
+			INDEX		{ nodeTestIndex }
+			::= { nodeTestTable 1 }
+
+
+NodeTestEntry		::= SEQUENCE {
+			nodeTestIndex		Unsigned32,
+			nodeTestIdentity	DisplayString,
+			nodeTestResult		INTEGER,
+			nodeTestResultTime 	TimeStamp
+			}
+
+nodeTestIndex		OBJECT-TYPE
+			SYNTAX 		Unsigned32(1..65535)
+			MAX-ACCESS	not-accessible
+			STATUS		current
+			DESCRIPTION	"Unique positive integer index
+					 of the nodeTest instance"
+			::= { nodeTestEntry 1 }
+
+nodeTestIdentity	OBJECT-TYPE
+			SYNTAX 		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION	"Identification string of a nodeTest"
+			::= { nodeTestEntry 2 }
+
+
+nodeTestResult		OBJECT-TYPE
+			SYNTAX 		INTEGER {success(1), failure(2)}
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION	"The most recent result of the
+					 nodeTest"
+			::= { nodeTestEntry 3 }
+
+nodeTestResultTime	OBJECT-TYPE
+			SYNTAX 		TimeStamp
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION	"The timestamp of the most recent
+					 result of the nodeTest"
+			::= { nodeTestEntry 4 }
+
+-- Firewall events
+
+fwPolicyInstall     NOTIFICATION-TYPE
+            OBJECTS       { fwSecurityPolicy }
+            STATUS        current
+            DESCRIPTION   "A firewall policy was (re)installed"
+            ::= { engineNotifications 1 }
+
+-- Network node events
+
+nodeOnline		NOTIFICATION-TYPE
+		        OBJECTS		{ nodeOperState }
+		        STATUS		current
+		        DESCRIPTION	"A node has gone to an online state"
+		        ::= { engineNotifications 2 }
+
+
+nodeOffline		NOTIFICATION-TYPE
+			OBJECTS		{ nodeOperState }
+			STATUS		current
+			DESCRIPTION	"A node has gone to an offline
+					 or standby state"
+			::= {  engineNotifications 3 }
+
+nodeBoot 		NOTIFICATION-TYPE
+			STATUS		current
+			DESCRIPTION	"A node has booted up"
+			::= {  engineNotifications 4 }
+
+nodeShutdown		NOTIFICATION-TYPE
+			STATUS		current
+			DESCRIPTION	"A node is shutting down"
+			::= {  engineNotifications 5 }
+
+nodeUserLogin		NOTIFICATION-TYPE
+			OBJECTS		{ nodeLastLogin }
+			STATUS 		current
+			DESCRIPTION	"A user has started a login session"
+			::= { engineNotifications 6 }
+
+nodeFailedUserLogin	NOTIFICATION-TYPE
+			STATUS 		current
+			DESCRIPTION	"Failed user login"
+			::= { engineNotifications 7 }
+
+nodeUserLogout		NOTIFICATION-TYPE
+			STATUS 		current
+			DESCRIPTION	"A user has finished session"
+			::= { engineNotifications 8 }
+
+nodeTestFailure		NOTIFICATION-TYPE
+			OBJECTS 	{ nodeTestIdentity }
+			STATUS 		current
+			DESCRIPTION	"NodeTest has failed"
+			::= { engineNotifications 9 }
+
+
+nodeHwmon		NOTIFICATION-TYPE
+			OBJECTS		{ nodeHwmonEvent }
+			STATUS 		current
+			DESCRIPTION	"Hardware monitoring system has detected problems"
+			::= { engineNotifications 10 }
+
+-- Groups
+
+firewallGeneralInformationGroup   OBJECT-GROUP
+      OBJECTS	{ fwSoftwareVersion, fwSecurityPolicy, fwPolicyTime }
+      STATUS	current
+      DESCRIPTION
+          "A collection of objects giving general information about the
+           firewall"
+      ::= { engineGroups 1 }
+
+firewallIfaceStatsGroup  OBJECT-GROUP
+      OBJECTS { fwIfName,
+                fwIfAcceptedPkts, fwIfDroppedPkts, fwIfLoggedPkts,
+                fwIfAccountedPkts, fwIfRejectedPkts, fwIfForwardedPkts,
+                fwIfAcceptedBytes, fwIfDroppedBytes, fwIfLoggedBytes,
+                fwIfAccountedBytes, fwIfRejectedBytes, fwIfForwardedBytes,
+                fwIfComment }
+      STATUS current
+      DESCRIPTION
+          "A collection of objects giving information about the
+           current firewall interface related traffic statistics"
+      ::= { engineGroups 2 }
+
+firewallGeneralStatsGroup   OBJECT-GROUP
+      OBJECTS   { fwConnNumber, fwAccepted, fwDropped,
+                  fwLogged, fwAccounted, fwRejected }
+      STATUS	current
+      DESCRIPTION
+          "A collection of objects giving general information about the
+           firewall traffic statistics"
+      ::= { engineGroups 3 }
+
+firewallHardwareGroup   OBJECT-GROUP
+      OBJECTS   { fwCpuName, fwCpuTotal, fwCpuUser, fwCpuSystem,
+                  fwCpuHwIrq, fwCpuSoftIrq, fwSwapBytesTotal,
+                  fwMemBytesTotal, fwMemBytesBuffers,
+                  fwHwTemperatureName, fwHwTemperature, fwHwTemperatureStatus,
+                  fwPsuName, fwPsuStatus,
+                  fwFanName, fwFan, fwFanStatus,
+                  fwVoltageName, fwVoltage, fwVoltageStatus,
+                  fwPartitionDevName, fwMountPointName, fwDiskSerialNumber,
+                  fwPartitionSize }
+      STATUS    current
+      DESCRIPTION
+          "A collection of objects giving information about the
+           hardware parameters"
+      ::= { engineGroups 4 }
+
+firewallMbrInterfaceGroup   OBJECT-GROUP
+      OBJECTS   { fwMbrName, fwMbrBandUsed, fwMbrSignalStrength, fwMbrStatus }
+      STATUS    current
+      DESCRIPTION
+          "A collection of objects giving information about the
+           Mbr related parameters"
+      ::= { engineGroups 5 }
+
+firewallPerformanceGroup OBJECT-GROUP
+      OBJECTS   { fwCpuNice, fwCpuIdle, fwCpuIoWait, fwSwapBytesUsed,
+                  fwSwapBytesUnused, fwMemBytesUsed, fwMemBytesUnused,
+                  fwMemBytesCached, fwMemBytesAvailable, fwInspectionBytesUsed,
+                  fwInspectionPercentageUsed,
+                  fwMemBytesSReclaimable, fwPartitionUsed, fwPartitionAvail,
+                  fwNewConnectionsS, fwDiscardedConnectionsS,
+                  fwRefusedConnectionsS}
+      STATUS    current
+      DESCRIPTION
+          "A collection of objects giving information about the
+           performance related parameters"
+      ::= { engineGroups 6 }
+
+firewallVpnEpGroup OBJECT-GROUP
+      OBJECTS { fwVpnEp4Local, fwVpnEp4Remote, fwVpnEp4RemoteType,
+                fwVpnEp4ReceivedBytes, fwVpnEp4SentBytes,
+                fwVpnEp4IpsecSa, fwVpnEp6Local, fwVpnEp6Remote,
+                fwVpnEp6RemoteType, fwVpnEp6ReceivedBytes,
+                fwVpnEp6SentBytes, fwVpnEp6IpsecSa }
+      STATUS current
+      DESCRIPTION
+          "A collection of objects giving information about the
+           configured VPN end-point pairs"
+      ::= { engineGroups 7 }
+
+nodeIdentificationGroup OBJECT-GROUP
+      OBJECTS   { nodeClusterId, nodeMemberId, nodeApplianceModel, nodePosCode, nodeHardwareSerialNumber }
+      STATUS	current
+	  DESCRIPTION
+		  "A collection of objects identifying the node in a cluster"
+	  ::= { engineGroups 8 }
+
+nodeStatusGroup     OBJECT-GROUP
+      OBJECTS { nodeOperState, nodeCPULoad, nodePolicyApplyTime }
+      STATUS	current
+	  DESCRIPTION
+		  "A collection of objects giving information about
+		   the status of the node"
+	  ::= { engineGroups 9 }
+
+nodeLoginGroup      OBJECT-GROUP
+      OBJECTS { nodeLastLogin, nodeLastLoginTime, nodeLoginTime }
+      STATUS	current
+	  DESCRIPTION
+		  "A collection of objects giving information about logins
+		   into the node"
+	  ::= { engineGroups 10 }
+
+nodeTesterGroup     OBJECT-GROUP
+      OBJECTS { nodeTestIdentity, nodeTestResult, nodeTestResultTime }
+      STATUS current
+	  DESCRIPTION
+		  "A collection of objects giving information about the tests
+		   in the test subsystem of the node"
+	  ::= { engineGroups 11 }
+
+firewallGeneralNotifGroup NOTIFICATION-GROUP
+      NOTIFICATIONS	{ fwPolicyInstall }
+      STATUS	current
+      DESCRIPTION
+          "A collection of notification giving information about
+           general events in the firewall"
+      ::= { engineGroups 12 }
+
+nodeStatusNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeOnline, nodeOffline, nodeBoot, nodeShutdown }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about changes
+		 in a node's status"
+	::= { engineGroups 13 }
+
+nodeLoginNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeUserLogin, nodeFailedUserLogin, nodeUserLogout }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about user logins"
+	::= { engineGroups 14 }
+
+nodeTesterNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeTestFailure }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about test failures"
+	::= { engineGroups 15 }
+
+
+nodeHwmonNotificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { nodeHwmon }
+	STATUS current
+	DESCRIPTION
+		"A collection of notifications informing about
+                 hardware monitoring issues"
+	::= { engineGroups 16 }
+
+nodeHwmonGroup		OBJECT-GROUP
+	OBJECTS { nodeHwmonEvent }
+	STATUS current
+	DESCRIPTION
+		"A collection of objects giving information about
+		 hardware monitoring events in the node"
+	::= { engineGroups 17 }
+
+firewallIfaceStatsProcGroup  OBJECT-GROUP
+      OBJECTS { fwIfProcName,
+                fwIfProcReceivedBytes, fwIfProcReceivedPackets,
+                fwIfProcReceivedErrs, fwIfProcReceivedDrop,
+                fwIfProcReceivedFifo, fwIfProcReceivedFrame,
+                fwIfProcReceivedCompressed, fwIfProcReceivedMulticast,
+                fwIfProcTransmitBytes, fwIfProcTransmitPackets,
+                fwIfProcTransmitErrs, fwIfProcTransmitDrop,
+                fwIfProcTransmitFifo, fwIfProcTransmitColls,
+                fwIfProcTransmitCarrier, fwIfProcTransmitCompressed
+                }
+      STATUS current
+      DESCRIPTION
+          "A collection of objects giving information about the
+           current firewall interface related traffic statistics"
+      ::= { engineGroups 19 }
+
+-- Virtual Engine Information
+
+fwVETable     OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwVEEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each
+                  virtual engine"
+              ::= { engineObjects 21 }
+
+fwVEEntry OBJECT-TYPE
+          SYNTAX      FwVEEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION "Row for virtual engine"
+          INDEX       { fwVEIndex }
+          ::= { fwVETable 1 }
+
+FwVEEntry ::=
+    SEQUENCE {
+        fwVEIndex    INTEGER,
+        fwVEEngineId INTEGER,
+        fwVEName     DisplayString,
+        fwVEStatus   DisplayString
+    }
+
+fwVEIndex OBJECT-TYPE
+          SYNTAX      Integer32(1..256)
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION "A unique value, greater that zero, for each
+                       virtual engine."
+          ::= { fwVEEntry 1 }
+
+fwVEEngineId OBJECT-TYPE
+             SYNTAX      Integer32(1..256)
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION "Engine ID of the virtual engine"
+             ::= { fwVEEntry 2 }
+
+fwVEName     OBJECT-TYPE
+             SYNTAX      DisplayString
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION "Name of the virtual engine"
+             ::= { fwVEEntry 3 }
+
+fwVEStatus   OBJECT-TYPE
+             SYNTAX      DisplayString
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION "Status of the virtual engine e.g. Active"
+             ::= { fwVEEntry 4 }
+
+
+engineVEGroup OBJECT-GROUP
+              OBJECTS { fwVEEngineId, fwVEName, fwVEStatus }
+              STATUS current
+              DESCRIPTION
+              "A collection of objects giving information about
+               Virtual Engines in the Engine"
+              ::= { engineGroups 18 }
+
+-- interface stats from proc
+
+fwIfStatsProcTable  OBJECT-TYPE
+              SYNTAX        SEQUENCE OF FwIfStatsProcEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                  "This table contains an entry for each
+                   interface in system"
+              ::= { engineObjects 22 }
+
+-- Statistics
+
+fwIfStatsProcEntry OBJECT-TYPE
+              SYNTAX        FwIfStatsProcEntry
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION   "Row for an interface"
+              INDEX         { fwIfStatsProcIndex }
+              ::= { fwIfStatsProcTable 1 }
+
+FwIfStatsProcEntry ::=
+    SEQUENCE {
+            fwIfStatsProcIndex        INTEGER,
+            fwIfProcName                DisplayString,
+            fwIfProcReceivedBytes       Counter64,
+            fwIfProcReceivedPackets     Counter64,
+            fwIfProcReceivedErrs        Counter64,
+            fwIfProcReceivedDrop        Counter64,
+            fwIfProcReceivedFifo        Counter64,
+            fwIfProcReceivedFrame       Counter64,
+            fwIfProcReceivedCompressed  Counter64,
+            fwIfProcReceivedMulticast   Counter64,
+            fwIfProcTransmitBytes       Counter64,
+            fwIfProcTransmitPackets     Counter64,
+            fwIfProcTransmitErrs        Counter64,
+            fwIfProcTransmitDrop        Counter64,
+            fwIfProcTransmitFifo        Counter64,
+            fwIfProcTransmitColls       Counter64,
+            fwIfProcTransmitCarrier     Counter64,
+            fwIfProcTransmitCompressed  Counter64
+            }
+
+fwIfStatsProcIndex OBJECT-TYPE
+              SYNTAX        Integer32(1..2147483647)
+              MAX-ACCESS    not-accessible
+              STATUS        current
+              DESCRIPTION
+                "A unique value, greater than zero, for each interface or
+                 interface sub-layer in the managed system."
+              ::= { fwIfStatsProcEntry 1 }
+
+fwIfProcName	OBJECT-TYPE
+              SYNTAX        DisplayString
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Name of interface."
+              ::= { fwIfStatsProcEntry 2 }
+
+fwIfProcReceivedBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of good received bytes, corresponding to rx_packets.
+                   For IEEE 802.3 devices should count the length of Ethernet
+                   Frames excluding the FCS."
+              ::= { fwIfStatsProcEntry 3 }
+
+fwIfProcReceivedPackets OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of good packets received by the interface.
+                   For hardware interfaces counts all good packets received from
+                   the device by the host, including packets which host had to
+                   drop at various stages of processing (even in the driver)."
+              ::= { fwIfStatsProcEntry 4 }
+
+fwIfProcReceivedErrs OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Total number of bad packets received on this network device.
+                   This counter must include events counted by rx_length_errors,
+                   rx_crc_errors, rx_frame_errors and other errors not otherwise
+                   counted."
+              ::= { fwIfStatsProcEntry 5 }
+
+fwIfProcReceivedDrop OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of packets received but not processed,
+                   e.g. due to lack of resources or unsupported protocol.
+                   For hardware interfaces this counter may include packets
+                   discarded due to L2 address filtering but should not include
+                   packets dropped by the device due to buffer exhaustion which
+                   are counted separately in rx_missed_errors (since procfs
+                   folds those two counters together)."
+              ::= { fwIfStatsProcEntry 6 }
+
+fwIfProcReceivedFifo OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Historically the count of overflow events. Those events may be
+                   reported in the receive descriptors or via interrupts, and may
+                   not correspond one-to-one with dropped packets.
+                   This statistics was used interchangeably with rx_over_errors.
+                   Not recommended for use in drivers for high speed interfaces.
+                   This statistic is used on software devices, e.g. to count
+                   software packet queue overflow (can) or sequencing errors
+                   (GRE)."
+              ::= { fwIfStatsProcEntry 7 }
+
+fwIfProcReceivedFrame	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Receiver frame alignment errors.
+                   Part of aggregate frame errors in /proc/net/dev.
+                   For IEEE 802.3 devices this counter should be equivalent to:
+                   - 30.3.1.1.7 aAlignmentErrors"
+              ::= { fwIfStatsProcEntry 8 }
+
+fwIfProcReceivedCompressed	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of correctly received compressed packets.
+                   This counters is only meaningful for interfaces which support
+                   packet compression (e.g. CSLIP, PPP)."
+              ::= { fwIfStatsProcEntry 9 }
+
+fwIfProcReceivedMulticast	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Multicast packets received.
+                   For hardware interfaces this statistic is commonly calculated
+                   at the device level (unlike rx_packets) and therefore may
+                   include packets which did not reach the host.
+                   For IEEE 802.3 devices this counter may be equivalent to:
+                   - 30.3.1.1.21 aMulticastFramesReceivedOK"
+              ::= { fwIfStatsProcEntry 10 }
+
+fwIfProcTransmitBytes OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of good transmitted bytes, corresponding to tx_packets.
+                   For IEEE 802.3 devices should count the length of Ethernet
+                   Frames excluding the FCS."
+              ::= { fwIfStatsProcEntry 11 }
+
+fwIfProcTransmitPackets OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of packets successfully transmitted.
+                   For hardware interfaces counts packets which host was able to
+                   successfully hand over to the device, which does not
+                   necessarily mean that packets had been successfully
+                   transmitted out of the device, only that device acknowledged
+                   it copied them out of host memory."
+              ::= { fwIfStatsProcEntry 12 }
+
+fwIfProcTransmitErrs OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Total number of transmit problems.
+                   This counter must include events counter by tx_aborted_errors,
+                   tx_carrier_errors, tx_fifo_errors, tx_heartbeat_errors,
+                   tx_window_errors and other errors not otherwise counted."
+              ::= { fwIfStatsProcEntry 13 }
+
+fwIfProcTransmitDrop OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of packets dropped on their way to transmission,
+                   e.g. due to lack of resources."
+              ::= { fwIfStatsProcEntry 14 }
+
+fwIfProcTransmitFifo OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of frame transmission errors due to device
+                   FIFO underrun / underflow. This condition occurs when the
+                   device begins transmission of a frame but is unable to deliver
+                   the entire frame to the transmitter in time for transmission.
+                   Part of aggregate carrier errors in /proc/net/dev."
+              ::= { fwIfStatsProcEntry 15 }
+
+fwIfProcTransmitColls	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of collisions during packet transmissions."
+              ::= { fwIfStatsProcEntry 16 }
+
+fwIfProcTransmitCarrier	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of frame transmission errors due to loss of carrier
+                  during transmission.
+                  Part of aggregate carrier errors in /proc/net/dev.
+                  For IEEE 802.3 devices this counter must be equivalent to:
+                 - 30.3.1.1.13 aCarrierSenseErrors"
+              ::= { fwIfStatsProcEntry 17 }
+
+fwIfProcTransmitCompressed	OBJECT-TYPE
+              SYNTAX        Counter64
+              MAX-ACCESS    read-only
+              STATUS        current
+              DESCRIPTION
+                  "Number of transmitted compressed packets.
+                   This counters is only meaningful for interfaces which support
+                   packet compression (e.g. CSLIP, PPP)."
+              ::= { fwIfStatsProcEntry 18 }
+
+
+END

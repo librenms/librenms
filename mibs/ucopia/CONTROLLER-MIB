@@ -1,0 +1,408 @@
+CONTROLLER-MIB DEFINITIONS ::= BEGIN
+	
+--
+-- Imports type from other MIBS
+--
+IMPORTS	
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Gauge32, enterprises
+		FROM SNMPv2-SMI
+	
+	OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+		FROM SNMPv2-CONF;
+	
+ucopia MODULE-IDENTITY
+	LAST-UPDATED "201701240000Z"
+	ORGANIZATION "www.ucopia.com"
+	CONTACT-INFO
+		"UCOPIA Communications
+		postal: 201, avenue Pierre Brossolette
+				92120 MONTROUGE, France
+		email:  contactus@ucopia.com"
+	DESCRIPTION
+		"Re-design notifications"
+	REVISION "201701240000Z"
+	DESCRIPTION
+		"The MIB module for SNMP variables specific to UCOPIA controller."
+	::= { enterprises 31218 }
+	
+--
+-- top level structure
+--
+ucpMIBConformance      OBJECT IDENTIFIER ::= { ucopia 1 }
+ucpNotifications       OBJECT IDENTIFIER ::= { ucopia 2 }
+ucpMIBGroups           OBJECT IDENTIFIER ::= { ucpMIBConformance 1 }
+ucpMIBCompliances      OBJECT IDENTIFIER ::= { ucpMIBConformance 2 }
+ucpNotificationPrefix  OBJECT IDENTIFIER ::= { ucpNotifications 0 }
+ucpState               OBJECT IDENTIFIER ::= { ucopia 3 }
+serviceStatus          OBJECT IDENTIFIER ::= { ucopia 4 }
+
+statesGroup  OBJECT-GROUP
+	OBJECTS {
+		totalConnectedUsers,
+		debugValue,
+		cpuTemperature,
+		diskTemperature,
+		licenseUsers,
+		sysObjectDescription,
+		highAvailabilityStatus
+	}
+	STATUS current
+	DESCRIPTION
+		"The objects relating to controller states."
+	::= { ucpMIBGroups 1 }
+
+servicesGroup OBJECT-GROUP
+	OBJECTS {
+		webServerService,
+		sqlServerService,
+		urlSnifferService,
+		portalService,
+		webProxyService,
+		autodisconnectService,
+		printingServerService,
+		dhcpServerService,
+		dnsServerService,
+		staticIpManagerService,
+		highAvailabilityService,
+		ldapDirectoryService,
+		ldapReplicationManagerService,
+		timeServerService,
+		radiusServerService,
+		sambaService,
+		sshService,
+		syslogService,
+		usersLogService,
+		pmsClientService
+	}
+	STATUS current
+	DESCRIPTION
+		"The objects relating to controller services."
+	::= { ucpMIBGroups 2 }
+
+notificationsGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		ucpServiceFaultStateNotification
+	}
+	STATUS current
+	DESCRIPTION
+		"The notifications relating to the services status of the controller."
+	::= { ucpMIBGroups 3 }
+
+ucpCompliance MODULE-COMPLIANCE
+	STATUS  current
+	DESCRIPTION
+			"The compliance statement for the controller MIB."
+    MODULE  -- this module
+    MANDATORY-GROUPS {
+    	statesGroup,
+    	servicesGroup,
+    	notificationsGroup
+    }
+   ::= { ucpMIBCompliances 2 }
+
+--
+-- States
+--
+totalConnectedUsers OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A value which indicates the number of connected users on this controller."
+	::= { ucpState 1 }
+	
+debugValue OBJECT-TYPE
+	SYNTAX Integer32 (0..7)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A value which indicates the debug level.
+		Numerical	Severity
+		0	Emergency: system is unusable
+		1	Alert: action must be taken immediately
+		2	Critical: critical conditions
+		3	Error: error conditions
+		4	Warning: warning conditions
+		5	Notice: normal but significant condition
+		6	Informational: informational messages
+		7	Debug: debug-level messages"
+	::= { ucpState 2 }
+
+cpuTemperature OBJECT-TYPE
+	SYNTAX Integer32 (0..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Processor temperature (in degree Celsius)"
+	::= { ucpState 3 }
+
+diskTemperature OBJECT-TYPE
+	SYNTAX Integer32 (0..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Disk temperature (in degree Celsius)"
+	::= { ucpState 4 }
+
+licenseUsers OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The number of users that the license allow to be connected simulteaneously."
+	::= { ucpState 5 }
+
+sysObjectDescription OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The description of 'what kind of the box' is being managed."
+	::= { ucpState 6 }
+
+highAvailabilityStatus OBJECT-TYPE
+	SYNTAX INTEGER { standalone(0), master(1), active(2), passive(3), fault(4) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the controller current status in high availability cluster
+		(0) Standalone
+		(1) Master (HA)
+		(2) Active node (HA)
+		(3) Passive node (HA)
+		(4) FAULT (HA)"
+	::= { ucpState 7 }
+
+--
+-- Services Status
+--
+webServerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Web Server service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 1 }
+
+sqlServerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of SQL Server service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 2 }
+
+urlSnifferService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of URL sniffer service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 3 }
+
+portalService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Portal service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 4 }
+
+webProxyService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Web Proxy service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 5 }
+
+autodisconnectService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Autodisconnect service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 6 }
+
+printingServerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Printing Server service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 7 }
+
+dhcpServerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+				"Indicates status of DHCP server.
+				(1) running	service is running
+				(2) stopped	service is stopped or crashed
+				(3) disabled	service is disabled by configuration."
+	::= { serviceStatus 8 }
+
+dnsServerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of DNS Server service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 9 }
+
+staticIpManagerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Static IP Manager service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 10 }
+
+highAvailabilityService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of High-Availability service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 11 }
+
+ldapDirectoryService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of LDAP Directory service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 12 }
+
+ldapReplicationManagerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of LDAP Replication Manager service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 13 }
+
+timeServerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Time Server service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 14 }
+
+radiusServerService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Radius Server service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 15 }
+
+sambaService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Samba service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 16 }
+
+sshService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Ssh service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 17 }
+
+syslogService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Syslog service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 18 }
+
+usersLogService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of Users Log service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 19 }
+
+pmsClientService OBJECT-TYPE
+	SYNTAX INTEGER { running(1), stopped(2), disabled(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Indicates the status of PMSClient service
+		(1) Running, service is running
+		(2) Stopped, service is stopped or crashed
+		(3) Disabled, service is disabled by configuration."
+	::= { serviceStatus 20 }
+	
+--
+-- Notifications
+--
+ucpServiceFaultStateNotification NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"A notification, used to alert that a service has entered a fault state"
+	::= { ucpNotificationPrefix 1 }
+
+END

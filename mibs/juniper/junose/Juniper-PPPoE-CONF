@@ -1,0 +1,237 @@
+
+-- *****************************************************************************
+-- Juniper-PPPoE-CONF
+--
+-- SNMP Agent Capabilities definitions for the PPPoE MIB.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003, 2008 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-PPPoE-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniPppoeAgent  MODULE-IDENTITY
+    LAST-UPDATED "200811271023Z"  -- 27-Nov-08 03:53 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the point-to-point protocol over
+        Ethernet (PPPoE) component of the SNMP agent in JUNOSe family of
+        products."
+    -- Revision History
+    REVISION    "200811271023Z"  -- 27-Nov-08 03:53 PM EST  - JUNOSe 10.1
+    DESCRIPTION
+        "Added unknownAction configuration support in PPPoE service name table"
+    REVISION    "200508032058Z"  -- 03-Aug-05 04:58 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Added Interface Lockout configuration and state support."
+    REVISION    "200507131140Z"  -- 13-Jul-05 11:40 AM EDT  - JUNOSe 7.0.1
+    DESCRIPTION
+        "Added MTU control object."
+    REVISION    "200406142048Z"  -- 14-Jun-04 03:48 PM EDT  - JUNOSe 7.0
+    DESCRIPTION
+        "Added PADR Remote Circuit Id Capture support."
+    REVISION    "200303101848Z"  -- 10-Mar-03 01:48 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Replaced invalid session counter with separate PADI and PADR invalid
+        session counters.
+         Added invalid length and invalid tag length counters.
+         Added ServiceName table support."
+    REVISION    "200212231941Z"  -- 23-Dec-02 02:41 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200210011837Z"  -- 01-Oct-02 02:37 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added PADN counter."
+    REVISION    "200208191514Z"  -- 19-Aug-02 11:14 AM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added PADI flag support."
+    REVISION    "200106191427Z"  -- 14-May-02 06:38 PM EST  - JUNOSe 3.2.3
+    DESCRIPTION
+        "Added AC-NAME and duplicate MAC address indicator objects."
+    REVISION    "200104021921Z"  -- 02-Apr-01 03:21 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 33 }
+
+
+-- *****************************************************************************
+-- PPPoE SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniPppoeAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component was supported in JUNOSe 3.0 thru 3.2.2
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe.  These capabilities became obsolete when AC-NAME and duplicate
+        MAC address indicator objects were added."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup2,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup }
+    ::= { juniPppoeAgent 1 }
+
+juniPppoeAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component was supported in JUNOSe 3.2.3 through 3.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe.  These capabilities became obsolete when PADI flag support was
+        added."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup3,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup }
+    ::= { juniPppoeAgent 2 }
+
+juniPppoeAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component was supported in JUNOSe 4.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in the
+        JUNOSe.  These capabilities became obsolete when PADN counter support
+        was added."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES  {
+            juniPPPoEGroup4,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup }
+    ::= { juniPppoeAgent 3 }
+
+juniPppoeAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component was supported in JUNOSe 4.1 through 5.0
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe.  These capabilities became obsolete when the invalid session
+        counter was replaced by separate PADI and PADR invalid session counters,
+        invalid length and invalid tag length counters and service name table
+        support were added."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup5,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup }
+    ::= { juniPppoeAgent 4 }
+
+juniPppoeAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component was supported in JUNOSe 5.1 through 7.0
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe.  These capabilities became obsolete when PADR remote-circuit-id
+        field was added."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup6,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup,
+            juniPPPoEServiceNameTableGroup }
+    ::= { juniPppoeAgent 5 }
+
+juniPppoeAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component is supported in JUNOSe 7.0 system
+        release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe.  These capabilities became obsolete when MTU configuration
+        was added."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup7,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup,
+            juniPPPoEServiceNameTableGroup }
+    ::= { juniPppoeAgent 6 }
+
+juniPppoeAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component is supported in JUNOSe 7.0.1 through 7.1
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe.  These capabilities became obsolete when lockout configuration
+        was added."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup8,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup,
+            juniPPPoEServiceNameTableGroup }
+    ::= { juniPppoeAgent 7 }
+
+juniPppoeAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component is supported in JUNOSe 7.2 through 9.3 
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe. These capabilities became obsolete when unknownAction option 
+        was added to PPPoE service name table."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup9,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup,
+            juniPPPoEServiceNameTableGroup,
+            juniPPPoELockoutTableGroup }
+    ::= { juniPppoeAgent 8 }
+
+juniPppoeAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the PPPoE component of the JUNOSe SNMP agent.  This
+        version of the PPPoE component is supported in JUNOSe 10.1 and subsequent
+        system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPPoE application in
+        JUNOSe."
+    SUPPORTS    Juniper-PPPOE-MIB
+        INCLUDES {
+            juniPPPoEGroup9,
+            juniPPPoESubIfGroup2,
+            juniPPPoESummaryGroup,
+            juniPPPoEServiceNameTableGroup1,
+            juniPPPoELockoutTableGroup }
+    ::= { juniPppoeAgent 9 }
+
+END

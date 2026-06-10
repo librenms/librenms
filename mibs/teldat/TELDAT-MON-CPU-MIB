@@ -1,0 +1,86 @@
+                -- Teldat, S.A.
+
+                -- Parque Tecnológico de Madrid
+
+                -- 28760, Tres Cantos (Madrid)
+
+                -- Tlf: +34-918076565
+
+                -- Fax: +34-918076521
+
+                -- e-mail: id@teldat.com
+
+
+            -- MIB privada de Teldat
+
+            -- Monitorización del porcentaje de uso de la CPU
+
+
+    -- Historial:
+    --      07/02/14    M.A. Pastor     XH 3523. Errors with HP Openview 9.20
+    -- 1.1  08/07/09    I. Muñoz        Revisión de todas las MIB para evitar
+    --                  M.A. Pastor     warnings y errores de compilación
+    -- 1.0  ??/??/??    Javier Molina   Initial Coding. Based on TELDAT-CPU-MIB.mib
+
+
+    -- Historial de TELDAT-CPU-MIB.mib:
+
+    -- 25-05-04  M.A. Pastor    Implementación inicial
+--------------------------------------------------------------------------------
+
+TELDAT-MON-CPU-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Gauge
+            FROM RFC1155-SMI
+        OBJECT-TYPE
+            FROM RFC-1212
+        telProdNpMonitSistema
+            FROM TELDAT-SW-STRUCTURE-MIB;
+
+
+    -- Información acerca de la carga de la CPU
+
+    teldatCPUMonMIB             OBJECT IDENTIFIER ::= {telProdNpMonitSistema 2}
+
+
+    -- Grupos en la teldatCPUMonMIB
+
+    teldatCPUMonMIBObjects      OBJECT IDENTIFIER ::= { teldatCPUMonMIB 1 }
+
+    teldatCPUMonMIBNotifPrefix  OBJECT IDENTIFIER ::= { teldatCPUMonMIB 2 }
+    teldatCPUMonMIBNotifs       OBJECT IDENTIFIER ::= { teldatCPUMonMIBNotifPrefix 0 }
+
+    teldatCPUMonMIBConformance  OBJECT IDENTIFIER ::= { teldatCPUMonMIB 3 }
+    teldatCPUCompliances        OBJECT IDENTIFIER ::= { teldatCPUMonMIBConformance 1 }
+    teldatCPUGroups             OBJECT IDENTIFIER ::= { teldatCPUMonMIBConformance 2 }
+
+    -- Grupo teldatCPUMonMIBObjects
+
+    teldatCPUBusyGroup          OBJECT IDENTIFIER ::= { teldatCPUMonMIBObjects 1 }
+
+    teldatCPUBusy5sec OBJECT-TYPE
+        SYNTAX Gauge
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The overall CPU busy percentage in the last 5 second period."
+        ::= { teldatCPUBusyGroup 1 }
+
+    teldatCPUBusy1min OBJECT-TYPE
+        SYNTAX Gauge
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The overall CPU busy percentage in the last 1 minute period."
+        ::= { teldatCPUBusyGroup 2 }
+
+    teldatCPUBusy5min OBJECT-TYPE
+        SYNTAX Gauge
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The overall CPU busy percentage in the last 5 minute period."
+        ::= { teldatCPUBusyGroup 3 }
+
+END

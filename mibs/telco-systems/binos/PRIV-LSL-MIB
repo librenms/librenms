@@ -1,0 +1,220 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: priv_lsl.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+--
+
+PRIV-LSL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE
+FROM SNMPv2-SMI
+
+MODULE-COMPLIANCE,
+OBJECT-GROUP
+FROM SNMPv2-CONF
+
+TEXTUAL-CONVENTION,
+MacAddress
+FROM SNMPv2-TC
+
+ifIndex
+FROM IF-MIB
+
+switch
+FROM PRVT-SWITCH-MIB;
+
+privLsl MODULE-IDENTITY
+LAST-UPDATED "200803210000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"MIB module for management of Logical Service Loopback(LSL) Iometrix compatible product."
+
+REVISION "200803210000Z"
+DESCRIPTION
+"Initial"
+
+::= { switch 113 }
+
+privLslLevel1 OBJECT IDENTIFIER ::= { privLsl 1 } -- all tables and scalars for Lsl level 1
+
+privLslObjects OBJECT IDENTIFIER ::= { privLslLevel1 1 } -- tables and scalars
+privLslNotifications OBJECT IDENTIFIER ::= { privLslLevel1 2 } -- traps according to rfc2580.txt SMIv2-CONF
+privLslConformance OBJECT IDENTIFIER ::= { privLslLevel1 3 } -- conformance according to rfc2580.txt SMIv2-CONF
+
+-- Textual Conventions
+
+PrivLslStates ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION "The the switch on/off states for LSL on ports."
+SYNTAX INTEGER {
+enable(1),
+disable(2)
+}
+
+-- Object definitiosn in privLslObjects
+
+privLslGlobalMacAddress OBJECT-TYPE
+SYNTAX MacAddress
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object defines the destination mac address assigned
+to lsl packets. The device can recognise the lsl packets
+by a specific destination mac address given by this
+object.
+"
+::= { privLslObjects 1 }
+
+privLslManagementTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrivLslManagementEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"LSL interface extention table.
+This table contains all objects which are used for LSL
+management per interface. It uses ifIndex defined in
+rfc1213"
+::= { privLslObjects 2 }
+
+privLslManagementEntry OBJECT-TYPE
+SYNTAX PrivLslManagementEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The only valid LSL interfaces are phyical port interfaces"
+INDEX { ifIndex }
+::= { privLslManagementTable 1 }
+
+PrivLslManagementEntry ::= SEQUENCE {
+privLslStatus PrivLslStates
+}
+
+privLslStatus OBJECT-TYPE
+SYNTAX PrivLslStates
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object indicates whether the port have Logical Service
+Loopback enabled or disabled. It allows the client to
+determine which interface should be used for this type
+of service"
+::= { privLslManagementEntry 1 }
+
+privIometrixManagementTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrivIometrixManagementEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Iometrix Level 1 table.
+This table contains all objects which are used for Iometrix
+level 1 management per interface. It uses ifIndex defined in
+rfc1213"
+::= { privLslObjects 3 }
+
+privIometrixManagementEntry OBJECT-TYPE
+SYNTAX PrivIometrixManagementEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"the index is ifindex"
+INDEX { ifIndex }
+::= { privIometrixManagementTable 1 }
+
+PrivIometrixManagementEntry ::= SEQUENCE {
+privIometrixStatus PrivLslStates
+}
+
+privIometrixStatus OBJECT-TYPE
+SYNTAX PrivLslStates
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object indicates whether the port have Logical Service
+Loopback enabled or disabled. It allows the client to
+determine which interface should be used for this type
+of service"
+::= { privIometrixManagementEntry 1 }
+
+-- Notification NOTIFICATION-TYPE definitions in privLslNotifications
+-- according to rfc2580.txt SMIv2-CONF
+-- (Currently no notifications)
+
+-- Conformance Information
+privLslGroups OBJECT IDENTIFIER ::= { privLslConformance 1 }
+privLslCompliances OBJECT IDENTIFIER ::= { privLslConformance 2 }
+
+privLevel1ObjectsGroup OBJECT-GROUP
+OBJECTS { privLslGlobalMacAddress, privLslStatus, privIometrixStatus }
+STATUS current
+DESCRIPTION
+"All objects related to level1 logical loopback service. Object
+grouping will be extended if the mib is also extended"
+::= { privLslGroups 1 }
+
+privLevel1Compliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement. It will be extended if new
+functionality is added"
+MODULE -- this module
+MANDATORY-GROUPS { privLevel1ObjectsGroup }
+
+OBJECT privLslGlobalMacAddress
+MIN-ACCESS read-only
+DESCRIPTION
+"read-write access "
+
+OBJECT privLslStatus
+MIN-ACCESS read-only
+DESCRIPTION
+"read-write access "
+
+OBJECT privIometrixStatus
+MIN-ACCESS read-only
+DESCRIPTION
+"read-write access "
+
+::= { privLslCompliances 1 }
+
+END

@@ -1,0 +1,148 @@
+WATCHGUARD-SYSTEM-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,  Counter64, 
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, TimeTicks       FROM SNMPv2-SMI
+        watchguard                 FROM WATCHGUARD-SMI;
+        
+    wgInfoModule MODULE-IDENTITY
+        LAST-UPDATED  "200701251200Z"
+        ORGANIZATION  "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                   "  WatchGuard Technologies, Inc.
+
+                      505 Fifth Avenue South
+                      Suite 500
+                      Seattle, WA 98104
+                      United States
+
+                      +1.206.613.6600 " 
+
+
+        DESCRIPTION
+            "The MIB module describes various system statistics information
+            of WatchGuard system."
+
+
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 6 }
+
+
+    wgSystemStatisticsMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base system information for all system related
+             statistical counters."
+    ::= { wgInfoModule 3 }
+
+    wgSoftwareVersion OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(0..64))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Software version of sysA and sysB"
+        ::= { wgSystemStatisticsMIB 1 }
+
+    wgSystemCpuUtil OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSystemStatisticsMIB 4 }
+            
+    wgSystemTotalSendBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes sent since system is up. This
+            number includes both cut through traffic and host traffic."
+        ::= { wgSystemStatisticsMIB 8 }
+    
+    wgSystemTotalRecvBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of bytes received since system is up. This
+            number includes both cut through traffic and host traffic."
+        ::= { wgSystemStatisticsMIB 9 }
+    
+    wgSystemTotalSendPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the packets sent since system is up. This
+            number includes both cut through traffic and host traffic."
+        ::= { wgSystemStatisticsMIB 10 }
+  
+    wgSystemTotalRecvPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of the packets received since system is up.
+            The number includes both cut through traffic and host traffic."
+        ::= { wgSystemStatisticsMIB 11 }
+  
+    wgSystemStreamReqTotal OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSystemStatisticsMIB 30 }
+ 
+    wgSystemStreamReqDrop OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgSystemStatisticsMIB 34 }
+     
+    wgSystemCpuUtil1 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization of the system in last 1 minute. The value
+            is measured in 0.01%.  For example, if the value is 234, 
+            then CPU utilization is 2.34%."
+        ::= { wgSystemStatisticsMIB 77 }
+
+    wgSystemCpuUtil5 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization of the system in last 5 minutes. The value
+            is measured in 0.01%.  For example, if the value is 234, 
+            then CPU utilization is 2.34%."
+        ::= { wgSystemStatisticsMIB 78 }
+
+    wgSystemCpuUtil15 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "CPU utilization of the system in last 15 minutes. The value
+            is measured in 0.01%.  For example, if the value is 234, 
+            then CPU utilization is 2.34%."
+        ::= { wgSystemStatisticsMIB 79 }
+
+
+    wgSystemCurrActiveConns OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of currently active connections of the system."
+        ::= { wgSystemStatisticsMIB 80 }
+
+END

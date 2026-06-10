@@ -1,0 +1,1501 @@
+-- *****************************************************************
+-- DASAN SHDSL MIB -  The MIB for G.SHDSL Product
+--
+-- Jan 2005, Dongha Lee
+--
+-- Copyright (c) 2001 by Dasan Co., Ltd.
+-- All rights reserved.
+-- *****************************************************************
+ 
+ 
+DASAN-SHDSL-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, mib-2,
+                IpAddress, Integer32, Counter32, Gauge32, TimeTicks, Unsigned32
+                      FROM SNMPv2-SMI
+                TEXTUAL-CONVENTION, TimeStamp, TruthValue, DisplayString,
+                RowStatus
+                      FROM SNMPv2-TC
+    		    ifIndex
+        	          FROM IF-MIB
+--               adslLineAlarmConfProfileName, adslAtucChanIntervalNumber, adslAtucIntervalNumber, adslLineConfProfileName, adslAturChanIntervalNumber
+--			          FROM ADSL-LINE-MIB
+
+                dasanMgmt           FROM DASAN-SMI;
+
+ 
+dasanShdslMIB MODULE-IDENTITY
+    LAST-UPDATED   "200407150000Z"
+    ORGANIZATION   "Dasan Co., Ltd."
+    CONTACT-INFO
+                   "Dasan Co., Ltd."
+    DESCRIPTION
+        "The MIB module to describe G.SHDSL product.
+         The MIB module that provides objects that are proprietary and extension to SHDSL-
+        LINE-MIB. The MIB include extension to following Tables.                
+   	
+        The MIB also include a set of scalar(s) clubbed under the group 'dsShdslCapabilityGroup'." 
+    ::= { dasanMgmt 6 }
+
+
+dasanShdslLineMIB  OBJECT IDENTIFIER ::= { dasanShdslMIB 1 }
+  
+dasanShdslMIBObjects OBJECT IDENTIFIER ::= { dasanShdslLineMIB 1 }
+ 
+-- dasanShdslMIBObjects  OBJECT IDENTIFIER ::= { dasanShdslMIB 1 }
+               
+                                    
+   
+dsShdslLineStatusTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsHdsl2ShdslLineStatusEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This MO is proprietary extension of RFC 3276 MIB and contains the proprietary line status."
+	::= { dasanShdslMIBObjects 2 }
+
+
+dsShdslLineStatusEntry OBJECT-TYPE
+	SYNTAX       DsHdsl2ShdslLineStatusEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsShdslLineStatusTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsShdslLineStatusTable 1 }
+
+DsHdsl2ShdslLineStatusEntry ::= SEQUENCE {
+		dsShdslOpState     INTEGER,
+		dsShdslStartProgress     INTEGER,
+		dsShdslFwRelease     OCTET STRING,
+		dsShdslLineSwap     INTEGER,
+		dsShdslRmtCountryCode     OCTET STRING,
+		dsShdslRmtEncoderA     INTEGER,
+		dsShdslRmtEncoderB     INTEGER,
+		dsShdslRmtProviderCode     OCTET STRING,
+		dsShdslLocDetect     INTEGER,
+		dsShdslTxPower     INTEGER,
+		dsShdslFramerSync     INTEGER,
+		dsShdslRmtTomData     INTEGER,
+		dsShdslDriftAlarm     INTEGER,
+		dsShdslReceiverGain     INTEGER,
+		dsShdslBertError     INTEGER,
+		dsShdslFramerOHAndDefects     OCTET STRING,
+		dsShdslRmtFwVersion     INTEGER,
+		dsShdslUtopiaCellDelineation     INTEGER,
+		dsShdslUtopiaRxCellCnt     INTEGER,
+		dsShdslUtopiaCellDropCnt     INTEGER,
+		dsShdslUtopiaRxHecErrorCnt     INTEGER,
+		dsShdslUtopiaTxCellCnt     INTEGER,
+		dsShdslRmtNsfCusId     INTEGER,
+		dsShdslRmtNsfCusData     OCTET STRING,
+		dsShdslLocalHandshake     OCTET STRING,
+		dsShdslRemoteHandshake     OCTET STRING,
+		dsShdslActualHandshake     OCTET STRING,
+		dsShdslRmtTxPower     INTEGER,
+		dsShdslRmtPowerBackoff     INTEGER,
+		dsShdslAutoRetrainCount     INTEGER,
+		dsShdslEocState     INTEGER,
+		dsShdslFramerOneSecondCnt     OCTET STRING,
+		dsShdslNtrFault     INTEGER,
+		dsShdslCpeMasterCore     INTEGER,
+		dsShdslParametricTestResult     INTEGER,
+		dsShdslParametricTestArray     OCTET STRING }
+
+
+dsShdslOpState OBJECT-TYPE
+	SYNTAX       INTEGER{
+			idle(0),
+			data(1),
+			handshake(16),
+			training(24),
+			bootupLoad(8),
+			bootupLoadDone(9),
+			pmms(20),
+			framerGearShift(26),
+			framerManualReset(27),
+			silence(29),
+			analogLb(128),
+			rmtFramerLb(130),
+			digitalLb(131),
+			spectrumTest(133),
+			selt(138),
+			pSDTest(139),
+			lclFramerLb(142),
+			interfaceLb(143),
+			bertTest(144),
+			analogLbBertTest(145),
+			digLbBertTest(146)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the high level operational state for the STU."
+	::= { dsShdslLineStatusEntry 1 }
+
+
+dsShdslStartProgress OBJECT-TYPE
+	SYNTAX       INTEGER{
+			noActivity(0),
+			preActivation(1),
+			activation(4),
+			checkBitrate(7),
+			pmmsChkComnRate(8),
+			transmitCr(55),
+			transmitSc(56),
+			transmitSr(57),
+			coLineAgc(64),
+			cpLineAgc(65),
+			fdEcTrain(66),
+			equalizerTrain(67),
+			tipRingAligned(68),
+			transmitTc(69),
+			receiveTr(70),
+			transmitFc1(71),
+			transmitFc2(72),
+			receiveTc(73),
+			transmitTr(74),
+			receiveFc(75),
+			spectTestOk(113),
+			albTestOk(114),
+			dlbTestOk(115),
+			crcFail(116),
+			framerSyncFail(117),
+			snrMarginFail(118),
+			loadCppa(128),
+			loadCptrain(129),
+			loadCptom(130),
+			loadCpdm(131),
+			loadCopa(144),
+			loadCotrain(145),
+			loadCotom(146),
+			loadCodm(147)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the current detailed operational state of the STU."
+	::= { dsShdslLineStatusEntry 2 }
+
+
+dsShdslFwRelease OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..255 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Transceiver firmware release number."
+	::= { dsShdslLineStatusEntry 3 }
+
+
+dsShdslLineSwap OBJECT-TYPE
+	SYNTAX       INTEGER{
+			swapped(1),
+			unswapped(0)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates if the physical lines are swapped, i.e., logical channel A is connected to physical channel B. This applies to 4-wire operation only."
+	::= { dsShdslLineStatusEntry 4 }
+
+
+dsShdslRmtCountryCode OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..255 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the country code word, as defined in ITU-T G.991.2, for the STU at the other end of the loop. GlobespanVirata sets this to USA."
+	::= { dsShdslLineStatusEntry 5 }
+
+
+dsShdslRmtEncoderA OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the 21-bit value corresponding to encoder coefficient A, as defined in ITU-T G.991.2, for the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 6 }
+
+
+dsShdslRmtEncoderB OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the 21-bit value corresponding to encoder coefficient B, as defined in ITU-T G.991.2, for the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 7 }
+
+
+dsShdslRmtProviderCode OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..255 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the provider code word, as defined in ITU-T G.991.2, for the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 8 }
+
+
+dsShdslLocDetect OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object is used to determine if carrier has been lost."
+	::= { dsShdslLineStatusEntry 9 }
+
+
+dsShdslTxPower OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the local STU transmit power in tenths of a dBm."
+	::= { dsShdslLineStatusEntry 10 }
+
+
+dsShdslFramerSync OBJECT-TYPE
+	SYNTAX       INTEGER{
+			outOfSync(0),
+			inSync(1)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object returns information regarding the framer synchronization status."
+	::= { dsShdslLineStatusEntry 11 }
+
+
+dsShdslRmtTomData OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides vendor-provided data, as defined in ITU-T G.991.2, for the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 12 }
+
+
+dsShdslDriftAlarm OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies if the receive clock is in or out of range."
+	::= { dsShdslLineStatusEntry 13 }
+
+
+dsShdslReceiverGain OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the total receiver gain in dB."
+	::= { dsShdslLineStatusEntry 14 }
+
+
+dsShdslBertError OBJECT-TYPE
+	SYNTAX       INTEGER{
+			outOfSync(0),
+			framedSync(64),
+			unframedSync(128)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the count of bit errors since the last time the object was read, as well as the type of synchronization."
+	::= { dsShdslLineStatusEntry 15 }
+
+
+dsShdslFramerOHAndDefects OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..10 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object returns overhead data. The four least significant bits contain the overhead data in the following format: bit 0 is losd, bit 1 is sega, bit 2 is ps, and bit 3 is segd."
+	::= { dsShdslLineStatusEntry 16 }
+
+
+dsShdslRmtFwVersion OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the transceiver firmware release number of the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 17 }
+
+
+dsShdslUtopiaCellDelineation OBJECT-TYPE
+	SYNTAX       INTEGER{
+			inSync(1),
+			preSync(160),
+			hunt(240)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates whether cell delineation has been found."
+	::= { dsShdslLineStatusEntry 18 }
+
+
+dsShdslUtopiaRxCellCnt OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the number of UTOPIA cells received since the last time the object has been called. The maximum value is 0xFFFF."
+	::= { dsShdslLineStatusEntry 19 }
+
+
+dsShdslUtopiaCellDropCnt OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the number of UTOPIA cells dropped since the last time the object has been called. The maximum value is 0xFF."
+	::= { dsShdslLineStatusEntry 20 }
+
+
+dsShdslUtopiaRxHecErrorCnt OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the number of UTOPIA cells with HEC errors since the last time the object has been called. The maximum value is 0xFF."
+	::= { dsShdslLineStatusEntry 21 }
+
+
+dsShdslUtopiaTxCellCnt OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the number of UTOPIA cells transmitted since the last time the object has been called. The maximum value is 0xFFFF."
+	::= { dsShdslLineStatusEntry 22 }
+
+
+dsShdslRmtNsfCusId OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object returns the customer identification that was sent by the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 23 }
+
+
+dsShdslRmtNsfCusData OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..4 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object returns non-standard format customer data that was sent by the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 24 }
+
+
+dsShdslLocalHandshake OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..52 )  )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides a way to see what capabilities are supported by the local STU. A total of 26 handshake parameters are supported."
+	::= { dsShdslLineStatusEntry 25 }
+
+
+dsShdslRemoteHandshake OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..52 )  )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides a way to see what capabilities are supported by the STU at the other end of the loop. A total of 26 handshake parameters are supported."
+	::= { dsShdslLineStatusEntry 26 }
+
+
+dsShdslActualHandshake OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..52 )  )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the results of capabilities exchanged during handshake. A total of 26 handshake parameters are supported."
+	::= { dsShdslLineStatusEntry 27 }
+
+
+dsShdslRmtTxPower OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the transmit power of the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 28 }
+
+
+dsShdslRmtPowerBackoff OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(0),
+			disable(32768)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates whether power backoff is enabled or disabled at the STU at the other end of the loop."
+	::= { dsShdslLineStatusEntry 29 }
+
+
+dsShdslAutoRetrainCount OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object indicates the number of automatic retrains. This counter is only reset when a startup is initiated."
+	::= { dsShdslLineStatusEntry 30 }
+
+
+dsShdslEocState OBJECT-TYPE
+	SYNTAX       INTEGER{
+			online(0),
+			discovery(1),
+			inventory(2),
+			configuration(3),
+			cmdInProgress(4)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides status information about the eoc stage."
+	::= { dsShdslLineStatusEntry 31 }
+
+
+dsShdslFramerOneSecondCnt OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..6 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides CRC, SEGA, and LOSW defect one second error counts, and should be called every second."
+	::= { dsShdslLineStatusEntry 32 }
+
+
+dsShdslNtrFault OBJECT-TYPE
+	SYNTAX       INTEGER{
+			present(0),
+			absent(1)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the Network Timing Recovery Fault."
+	::= { dsShdslLineStatusEntry 33 }
+
+
+dsShdslCpeMasterCore OBJECT-TYPE
+	SYNTAX       INTEGER{
+			core0(0),
+			core1(16),
+			core2(32),
+			core3(48),
+			core4(64),
+			core5(80),
+			core6(96),
+			core7(112),
+			noMasterCore(128)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		""
+	::= { dsShdslLineStatusEntry 34 }
+
+
+dsShdslParametricTestResult OBJECT-TYPE
+	SYNTAX       INTEGER{
+			pass(0),
+			fail(1)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Indicates the Result of the Parametric Test conducted on the Xcvr."
+	::= { dsShdslLineStatusEntry 35 }
+
+
+dsShdslParametricTestArray OBJECT-TYPE
+	SYNTAX       OCTET STRING (SIZE ( 0..1024 ) )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Conexant parameter that indicates the Parametric Test Array."
+	::= { dsShdslLineStatusEntry 36 }
+  
+--  testtesttest
+-- --
+dsShdslLineParamsTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF DsHdsl2ShdslLineParamsEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This MO is proprietary extension of RFC 3276 MIB and contains the proprietary line parameters."
+	::= { dasanShdslMIBObjects 3 }
+
+
+dsShdslLineParamsEntry OBJECT-TYPE
+	SYNTAX       DsHdsl2ShdslLineParamsEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsShdslLineParamsTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsShdslLineParamsTable 1 }
+
+DsHdsl2ShdslLineParamsEntry ::= SEQUENCE {
+		dsShdslAction     INTEGER,
+		dsShdslMode     INTEGER,
+		dsShdslPowerScale     INTEGER,
+		dsShdslFramerType     INTEGER,
+		dsShdslAFEType     INTEGER,
+		dsShdslEncodeCoeffA     INTEGER,
+		dsShdslEncodeCoeffB     INTEGER,
+		dsShdslTxEOCBufferLen     INTEGER,
+		dsShdslRxEOCBufferLen     INTEGER,
+		dsShdslNTR     INTEGER,
+		dsShdslRxUpstreamFrameSync     INTEGER,
+		dsShdslRxDownstreamFrameSync     INTEGER,
+		dsShdslRxUpstreamStuffBits     INTEGER,
+		dsShdslRxDownstreamStuffBits     INTEGER,
+		dsShdslInitiate     INTEGER,
+		dsShdslFramerRxClockMode     INTEGER,
+		dsShdslFramerRxPllMode     INTEGER,
+		dsShdslSerialAtmCiuBufferSize     INTEGER,
+		dsShdslUtopiaL2TxAddress     INTEGER,
+		dsShdslUtopiaL2RxAddress     INTEGER,
+		dsShdslTxFramerPulseDelay     INTEGER,
+		dsShdslRxFramerPulseDelay     INTEGER,
+		dsShdslMultiFrameMode     INTEGER,
+		dsShdslEnable4or6MbpsBitrate     INTEGER,
+		dsShdslTomDataWord1     INTEGER,
+		dsShdslTomDataWord2     INTEGER,
+		dsShdslTomDataWord3     INTEGER,
+		dsShdslTomDataWord4     INTEGER,
+		dsShdslSetReqSilenceMode     INTEGER,
+		dsShdslSetIndividualRates1     INTEGER,
+		dsShdslSetIndividualRates2     INTEGER,
+		dsShdslSetIndividualRates3     INTEGER,
+		dsShdslSatmCellDelineation     INTEGER,
+		dsShdslFramerCellDropOnError     INTEGER,
+		dsShdslGearShiftType     INTEGER,
+		dsShdslHsNsf     INTEGER,
+		dsShdslHsMaxBitsPerBaud     INTEGER,
+		dsShdslHsCusId     INTEGER,
+		dsShdslHsCusData0     INTEGER,
+		dsShdslHsCusData1     INTEGER,
+		dsShdslHsAnnexBType     INTEGER,
+		dsShdslAutoRetrain     INTEGER,
+		dsShdslArCrcCheck     INTEGER,
+		dsShdslArFramerSyncCheck     INTEGER,
+		dsShdslArSnrMarginCheck     INTEGER,
+		dsShdslArCrcThreshold     INTEGER,
+		dsShdslArSnrMarginThreshold     INTEGER,
+		dsShdslArRetrainTime     INTEGER,
+		dsShdslOpStateTrapEnable     INTEGER,
+		dsShdslTxFrmrDataClkEdge     INTEGER,
+		dsShdslRxFrmrDataClkEdge     INTEGER,
+		dsShdslTxFrmrPulseClkEdge     INTEGER,
+		dsShdslRxFrmrPulseClkEdge     INTEGER,
+		dsShdslTxFrmrPulseLvl     INTEGER,
+		dsShdslRxFrmrPulseLvl     INTEGER,
+		dsShdslUtopiaDataBusWidth     INTEGER,
+		dsShdslFrmrOH     INTEGER,
+		dsShdslLoopAttenCrossingTrapEnable     INTEGER,
+		dsShdslSNRMarginCrossingTrapEnable     INTEGER,
+		dsShdslFramerOHAndDefectsTrapEnable     INTEGER,
+		dsShdslParametricTestInputFile     DisplayString,
+		dsShdslParamHybridLossTestStart     INTEGER,
+		dsShdslParamHybridLossTestEnd     INTEGER }
+
+
+dsShdslAction OBJECT-TYPE
+	SYNTAX       INTEGER{
+			startUp(0),
+			abortReq(2),
+			gearShiftReq(6),
+			downloadReq(8),
+			bertStartTxReq(17),
+			bertStartRxReq(18),
+			bertStopReq(20),
+			hybridLossTestReq(33),
+			spectrumDownReq(25),
+			spectrumUpReq(26),
+			spectrumTxRxReq(32),
+			residualEchoReq(34),
+			totalEchoReq(35),
+			nextPsdReq(36),
+			autoRetrainOnReq(37),
+			autoRetrainOffReq(38),
+			propEocOnReq(45),
+			propEocOffReq(46),
+			rmtAtmCellStatusReq(47),
+			rmtFullStatusReq(48)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object specifies actions that are used to control transceiver operation."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 1 }
+
+
+dsShdslMode OBJECT-TYPE
+	SYNTAX       INTEGER{
+			co(0),
+			cpe(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object specifies the operational mode of the transceiver."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 2 }
+
+
+dsShdslPowerScale OBJECT-TYPE
+	SYNTAX       INTEGER{
+			defaultScale(26112)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object is used to compensate for minor differences in transmit power between designs."
+	DEFVAL   { 26112 }
+	::= { dsShdslLineParamsEntry 3 }
+
+
+dsShdslFramerType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			unframed(0),
+			t1Slotted(1),
+			e1Slotted(2),
+			utopiaL2(3),
+			nx64(6),
+			serialATM(7),
+			vC12(8),
+			iMA(9)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object defines which type of data interface type is used. Note that the non-default values only apply to Conexant chips that support serial interfaces."
+	::= { dsShdslLineParamsEntry 4 }
+
+
+dsShdslAFEType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			saturn(3),
+			saturnLg(4)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This objects defines which AFE is being used."
+	::= { dsShdslLineParamsEntry 5 }
+
+
+dsShdslEncodeCoeffA OBJECT-TYPE
+	SYNTAX       INTEGER{
+			default(366)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object determines the value of encoder coefficient A, as defined in ITU-T G.991.2."
+	DEFVAL   { 366 }
+	::= { dsShdslLineParamsEntry 6 }
+
+
+dsShdslEncodeCoeffB OBJECT-TYPE
+	SYNTAX       INTEGER{
+			default(817)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object determines the value of encoder coefficient B, as defined in ITU-T G.991.2"
+	DEFVAL   { 817 }
+	::= { dsShdslLineParamsEntry 7 }
+
+
+dsShdslTxEOCBufferLen OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable5(5),
+			dsShdslLineParamsTable10(10),
+			dsShdslLineParamsTable15(15),
+			dsShdslLineParamsTable20(20),
+			dsShdslLineParamsTable25(25),
+			dsShdslLineParamsTable30(30),
+			dsShdslLineParamsTable35(35),
+			dsShdslLineParamsTable40(40),
+			dsShdslLineParamsTable45(45),
+			dsShdslLineParamsTable50(50),
+			dsShdslLineParamsTable55(55),
+			dsShdslLineParamsTable60(60)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object determines the number of bytes of EOC data that is buffered by the DSP in the transmit direction."
+	DEFVAL   { 5 }
+	::= { dsShdslLineParamsEntry 8 }
+
+
+dsShdslRxEOCBufferLen OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable5(5),
+			dsShdslLineParamsTable10(10),
+			dsShdslLineParamsTable15(15),
+			dsShdslLineParamsTable20(20),
+			dsShdslLineParamsTable25(25),
+			dsShdslLineParamsTable30(30),
+			dsShdslLineParamsTable35(35),
+			dsShdslLineParamsTable40(40),
+			dsShdslLineParamsTable45(45),
+			dsShdslLineParamsTable50(50),
+			dsShdslLineParamsTable55(55),
+			dsShdslLineParamsTable60(60)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object determines the number of bytes of EOC data that is buffered by the DSP in the receive direction."
+	DEFVAL   { 5 }
+	::= { dsShdslLineParamsEntry 9 }
+
+
+dsShdslNTR OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(1),
+			refClkIp8k(2),
+			refClkOp4096k(4)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object defines how network-timing recovery is performed."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 10 }
+
+
+dsShdslRxUpstreamFrameSync OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Customer-defined value. This object defines the upstream frame sync word."
+	DEFVAL   { 13727 }
+	::= { dsShdslLineParamsEntry 11 }
+
+
+dsShdslRxDownstreamFrameSync OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object defines the downstream frame sync word."
+	DEFVAL   { 13727 }
+	::= { dsShdslLineParamsEntry 12 }
+
+
+dsShdslRxUpstreamStuffBits OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Customer-defined value. This object defines the upstream."
+	DEFVAL   { 15 }
+	::= { dsShdslLineParamsEntry 13 }
+
+
+dsShdslRxDownstreamStuffBits OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object defines the downstream stuff bits."
+	DEFVAL   { 15 }
+	::= { dsShdslLineParamsEntry 14 }
+
+
+dsShdslInitiate OBJECT-TYPE
+	SYNTAX       INTEGER{
+			default(0),
+			co(1),
+			cpe(2)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object defines which STU initiates a startup. The default is STU-R initiates and STU-C waits."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 15 }
+
+
+dsShdslFramerRxClockMode OBJECT-TYPE
+	SYNTAX       INTEGER{
+			slave(2),
+			internal(3)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object determines the source of the receive clock."
+	DEFVAL   { 2 }
+	::= { dsShdslLineParamsEntry 16 }
+
+
+dsShdslFramerRxPllMode OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object enables or disables the internal PLL."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 17 }
+
+
+dsShdslSerialAtmCiuBufferSize OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable24(24),
+			dsShdslLineParamsTable53(53)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object enables the user to set the size of the framer buffer for serial ATM operation."
+	DEFVAL   { 53 }
+	::= { dsShdslLineParamsEntry 18 }
+
+
+dsShdslUtopiaL2TxAddress OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object selects the appropriate UTOPIA Level 2 address for the transmit interface."
+	::= { dsShdslLineParamsEntry 19 }
+
+
+dsShdslUtopiaL2RxAddress OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object selects the appropriate UTOPIA Level 2 address for the receive interface."
+	::= { dsShdslLineParamsEntry 20 }
+
+
+dsShdslTxFramerPulseDelay OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable0(0),
+			dsShdslLineParamsTable1(1),
+			dsShdslLineParamsTable2(2),
+			dsShdslLineParamsTable3(3),
+			dsShdslLineParamsTable4(4),
+			dsShdslLineParamsTable5(5),
+			dsShdslLineParamsTable6(6),
+			dsShdslLineParamsTable7(7)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, a delay of up to 7 clock cycles can be specified for the transmit frame pulse."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 21 }
+
+
+dsShdslRxFramerPulseDelay OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable0(0),
+			dsShdslLineParamsTable1(1),
+			dsShdslLineParamsTable2(2),
+			dsShdslLineParamsTable3(3),
+			dsShdslLineParamsTable4(4),
+			dsShdslLineParamsTable5(5),
+			dsShdslLineParamsTable6(6),
+			dsShdslLineParamsTable7(7)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, a delay of up to 7 clock cycles can be specified for the receive frame pulse."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 22 }
+
+
+dsShdslMultiFrameMode OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(1),
+			disable(0)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object specifies the multi frame operational mode of the transceiver."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 23 }
+
+
+dsShdslEnable4or6MbpsBitrate OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object specifies the operational state of the 4_6Mbps bit rate."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 24 }
+
+
+dsShdslTomDataWord1 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies one of four words of proprietary vendor data, as described in the Vendor Data section of ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 25 }
+
+
+dsShdslTomDataWord2 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies one of four words of proprietary vendor data, as described in the Vendor Data section of ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 26 }
+
+
+dsShdslTomDataWord3 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies one of four words of proprietary vendor data, as described in the Vendor Data section of ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 27 }
+
+
+dsShdslTomDataWord4 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies one of four words of proprietary vendor data, as described in the Vendor Data section of ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 28 }
+
+
+dsShdslSetReqSilenceMode OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(4),
+			disable(0)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object enables a silent mode for the STU at the opposite end of the loop for approximately one minute. During the silent period, the STU that requested the silent mode could perform whatever operations it wants and the STU at the opposite end will remain in handshake."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 29 }
+
+
+dsShdslSetIndividualRates1 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This item enables the user to individually enable or disable base rates for N=1 through N=16. The default is all rates enabled."
+	DEFVAL   { 65535 }
+	::= { dsShdslLineParamsEntry 30 }
+
+
+dsShdslSetIndividualRates2 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This item enables the user to individually enable or disable base rates for N=17 through N=32. The default is all rates enabled."
+	DEFVAL   { 65535 }
+	::= { dsShdslLineParamsEntry 31 }
+
+
+dsShdslSetIndividualRates3 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This item enables the user to individually enable or disable base rates for N=33 through N=36. The default is all rates enabled."
+	DEFVAL   { 15 }
+	::= { dsShdslLineParamsEntry 32 }
+
+
+dsShdslSatmCellDelineation OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object enables the user to enable or disable cell delineation for serial ATM operation. This parameter should be set before a startup."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 33 }
+
+
+dsShdslFramerCellDropOnError OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(1),
+			disable(0)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object determines whether cells are dropped, i.e., not passed to the host, or not dropped, i.e., passed to the host. This object must be set prior to startup."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 34 }
+
+
+dsShdslGearShiftType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable0(0),
+			dsShdslLineParamsTable1(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object specifies the Gear Shift Type."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 35 }
+
+
+dsShdslHsNsf OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object enables or disables nonstandard Information fields for MP, MS, CL, and CLR messages, as defined in ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 36 }
+
+
+dsShdslHsMaxBitsPerBaud OBJECT-TYPE
+	SYNTAX       INTEGER{
+			default(3),
+			dsShdslLineParamsTable2bits(2),
+			dsShdslLineParamsTable1bits(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object specifies the maximum bit per baud."
+	DEFVAL   { 3 }
+	::= { dsShdslLineParamsEntry 37 }
+
+
+dsShdslHsCusId OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies the customer identification during handshaking, as described in ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 38 }
+
+
+dsShdslHsCusData0 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies two words of customer data during handshaking, as defined in ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 39 }
+
+
+dsShdslHsCusData1 OBJECT-TYPE
+	SYNTAX       INTEGER
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object identifies two words of customer data during handshaking, as defined in ITU-T G.994.1.bis."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 40 }
+
+
+dsShdslHsAnnexBType OBJECT-TYPE
+	SYNTAX       INTEGER{
+			default(1),
+			anfp(2),
+			annexbOrAnfp(3)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object allows the customer to choose between support for Annex B, Annex B with Access Network Frequency Plan (ANFP), or both."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 41 }
+
+
+dsShdslAutoRetrain OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables or disables auto-retrain."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 42 }
+
+
+dsShdslArCrcCheck OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables or disables auto-retrain based on CRC errors."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 43 }
+
+
+dsShdslArFramerSyncCheck OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables or disables auto-retrain based on framer synchronization."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 44 }
+
+
+dsShdslArSnrMarginCheck OBJECT-TYPE
+	SYNTAX       INTEGER{
+			disable(0),
+			enable(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables or disables auto-retrain based on whether the S/N margin falls below a preset threshold."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 45 }
+
+
+dsShdslArCrcThreshold OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..1024 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Sets the threshold for the number of frames with CRC errors for autoretrain."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 46 }
+
+
+dsShdslArSnrMarginThreshold OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable1(1),
+			dsShdslLineParamsTable2(2),
+			dsShdslLineParamsTable3(3),
+			dsShdslLineParamsTable4(4),
+			dsShdslLineParamsTable5(5),
+			dsShdslLineParamsTable6(6)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Set the margin threshold for autoretrain."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 47 }
+
+
+dsShdslArRetrainTime OBJECT-TYPE
+	SYNTAX       INTEGER{
+			dsShdslLineParamsTable1(1),
+			dsShdslLineParamsTable2(2),
+			dsShdslLineParamsTable3(3),
+			dsShdslLineParamsTable4(4),
+			dsShdslLineParamsTable5(5),
+			dsShdslLineParamsTable6(6),
+			dsShdslLineParamsTable7(7),
+			dsShdslLineParamsTable8(8),
+			dsShdslLineParamsTable9(9),
+			dsShdslLineParamsTable10(10)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Sets the time over which the autoretrain parameters must be outside their normal ranges, so that an auto-retrain occurs."
+	DEFVAL   { 3 }
+	::= { dsShdslLineParamsEntry 48 }
+
+
+dsShdslOpStateTrapEnable OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(1),
+			disable(2)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Enables/disables trap indicating a change in op state."
+	DEFVAL   { 2 }
+	::= { dsShdslLineParamsEntry 49 }
+
+
+dsShdslTxFrmrDataClkEdge OBJECT-TYPE
+	SYNTAX       INTEGER{
+			negative(0),
+			positive(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, transmit data can be sampled upon either rising or falling edge of the transmit clock."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 50 }
+
+
+dsShdslRxFrmrDataClkEdge OBJECT-TYPE
+	SYNTAX       INTEGER{
+			negative(0),
+			positive(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, receive data can be valid upon either rising or falling edge of the receive clock."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 51 }
+
+
+dsShdslTxFrmrPulseClkEdge OBJECT-TYPE
+	SYNTAX       INTEGER{
+			negative(0),
+			positive(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, the transmit frame pulse can be active upon either rising or falling edge."
+	DEFVAL   { 0 }
+	::= { dsShdslLineParamsEntry 52 }
+
+
+dsShdslRxFrmrPulseClkEdge OBJECT-TYPE
+	SYNTAX       INTEGER{
+			negative(0),
+			positive(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, the transmit frame pulse can be active upon either rising or falling edge."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 53 }
+
+
+dsShdslTxFrmrPulseLvl OBJECT-TYPE
+	SYNTAX       INTEGER{
+			low(0),
+			high(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, the transmit frame pulse can be either active high (1) or active low (0)."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 54 }
+
+
+dsShdslRxFrmrPulseLvl OBJECT-TYPE
+	SYNTAX       INTEGER{
+			low(0),
+			high(1)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This parameter is for Serial ATM applications only. It is recommended that the default value be used. For special customer configurations, the transmit frame pulse can be either active high (1) or active low (0)."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 55 }
+
+
+dsShdslUtopiaDataBusWidth OBJECT-TYPE
+	SYNTAX       INTEGER{
+			tx8Rx8(0),
+			tx16Rx16(1),
+			tx16Rx8(2),
+			tx8Rx16(3)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This parameter is used to specify width of UTOPIA data bus."
+	::= { dsShdslLineParamsEntry 56 }
+
+
+dsShdslFrmrOH OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..65535 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This object specifies framer OverHead Channel."
+	DEFVAL   { 15 }
+	::= { dsShdslLineParamsEntry 57 }
+
+
+dsShdslLoopAttenCrossingTrapEnable OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(1),
+			disable(2)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This Parameter enables or disables the Trap for Loop Attenuation Threshold crossing."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 58 }
+
+
+dsShdslSNRMarginCrossingTrapEnable OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(1),
+			disable(2)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This Parameter enables or disables the Trap for SNR Margin Threshold crossing."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 59 }
+
+
+dsShdslFramerOHAndDefectsTrapEnable OBJECT-TYPE
+	SYNTAX       INTEGER{
+			enable(1),
+			disable(2)
+		}
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"This Parameter enables or disables the Trap for Framer Overhead and Defects."
+	DEFVAL   { 1 }
+	::= { dsShdslLineParamsEntry 60 }
+
+
+dsShdslParametricTestInputFile OBJECT-TYPE
+	SYNTAX       DisplayString (SIZE ( 0..56 ) )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Indicates Name of the Input file from which to take the Mask Array Size, lower and upper mask Array. Null string means no file is specified."
+	::= { dsShdslLineParamsEntry 61 }
+
+
+dsShdslParamHybridLossTestStart OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..255 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Indicates Start bin for range of bins to be measured. The default value mentioned is an indicative value only, for exact value refer to document number DO-400523-AN and DO-401163-AN."
+	DEFVAL   { 2 }
+	::= { dsShdslLineParamsEntry 62 }
+
+
+dsShdslParamHybridLossTestEnd OBJECT-TYPE
+	SYNTAX       INTEGER ( 0..255 )
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"Indicates End bin for range of bins to be measured.  The default value mentioned is an indicative value only."
+	DEFVAL   { 64 }
+	::= { dsShdslLineParamsEntry 63 }
+
+
+
+dsShdslSpanStatusExtnTable OBJECT-TYPE
+	SYNTAX       SEQUENCE OF GsvHdsl2ShdslSpanStatusExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"This table is a proprietary extension of hdsl2ShdslSpanStatusTable"
+	::= { dasanShdslMIBObjects 4 }
+
+
+dsShdslSpanStatusExtnEntry OBJECT-TYPE
+	SYNTAX       GsvHdsl2ShdslSpanStatusExtnEntry
+	MAX-ACCESS   not-accessible
+	STATUS       current
+	DESCRIPTION
+		"An entry (conceptual row) in the dsShdslSpanStatusExtnTable.
+		The Table is indexed by ifIndex."
+	INDEX        { ifIndex }
+	::= { dsShdslSpanStatusExtnTable 1 }
+
+GsvHdsl2ShdslSpanStatusExtnEntry ::= SEQUENCE {
+		dsShdslStatusPMMSMaxLineRate     Unsigned32,
+		dsShdslStatus4WireHsMode     INTEGER }
+
+
+dsShdslStatusPMMSMaxLineRate OBJECT-TYPE
+	SYNTAX       Unsigned32 ( 0..4112000 )
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This object provides the maximum PMMS rate the line is capable of achieving"
+	::= { dsShdslSpanStatusExtnEntry 1 }
+
+
+dsShdslStatus4WireHsMode OBJECT-TYPE
+	SYNTAX       INTEGER {
+			standard(0),
+			enhanced(1)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Contains the current 4 Wire Handshake Mode Configured"
+	::= { dsShdslSpanStatusExtnEntry 2 }
+
+dsShdslCapabilityGroup		OBJECT IDENTIFIER ::= { dasanShdslMIBObjects 1 }
+
+dsShdslCapabilityLineTxCap OBJECT-TYPE
+	SYNTAX       BITS{
+			region1(0),
+			region2(1)
+		}
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"This bitmap specifies the transmission modes that the STU-C is capable of supporting. Right now, support for Annex A (q9921PotsNonOverlapped(2) and q9921PotsOverlapped(3)) is present.  This value depends on the DSL PHY firmware present on Columbia MxU."
+	::= { dsShdslCapabilityGroup 1 }
+
+
+-- --------- testtesttest
+
+
+--
+--
+
+  
+END

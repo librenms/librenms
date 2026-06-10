@@ -1,0 +1,207 @@
+-- ============================================================================
+-- at-ip.mib, Allied Telesis enterprise MIB:
+-- License MIB for the AlliedWare Plus(tm) operating system
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-IP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            InterfaceIndex
+                FROM IF-MIB
+            InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+            OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString, RowStatus, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+
+        atIpMib MODULE-IDENTITY
+            LAST-UPDATED "201006140509Z"
+            ORGANIZATION
+                "Allied Telesis Labs New Zealand"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The IP MIB - for AT specific IP management."
+            REVISION "201006140509Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200811100000Z"
+            DESCRIPTION
+                "Initial revision."
+            ::= { modules 602 }
+
+
+
+--
+-- Textual conventions
+--
+
+        AtIpAddressAssignmentType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "The IP address assignment type being applied to the interface.
+                notSet(0) indicates that the IP address assignment type has
+                not yet been configured. This value can only ever be read.
+                primary(1) indicates that the address is a primary IP address
+                (only one primary address is allowed per interface).
+                secondary(2) indicates that the address is a secondary IP
+                address (any number of secondary IP addresses may be applied
+                to each interface)."
+            SYNTAX INTEGER
+                {
+                notSet(0),
+                primary(1),
+                secondary(2)
+                }
+
+
+--
+-- Node definitions
+--
+
+-- ---------------------------------------------------------- --
+-- The IP Address Assignment Table
+-- ---------------------------------------------------------- --
+
+        atIpAddressTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtIpAddressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table containing mappings between primary/secondary IP
+                addresses, and the interfaces they are assigned to."
+            ::= { atIpMib 1 }
+
+
+        atIpAddressEntry OBJECT-TYPE
+            SYNTAX AtIpAddressEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An address mapping for a particular interface."
+            INDEX { atIpAddressAddrType, atIpAddressAddr }
+            ::= { atIpAddressTable 1 }
+
+
+        AtIpAddressEntry ::=
+            SEQUENCE {
+                atIpAddressAddrType
+                    InetAddressType,
+                atIpAddressAddr
+                    InetAddress,
+                atIpAddressPrefixLen
+                    INTEGER,
+                atIpAddressLabel
+                    DisplayString,
+                atIpAddressIfIndex
+                    InterfaceIndex,
+                atIpAddressAssignmentType
+                    AtIpAddressAssignmentType,
+                atIpAddressRowStatus
+                    RowStatus
+             }
+
+        atIpAddressAddrType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An indication of the IP version of atIpAddressAddr."
+            ::= { atIpAddressEntry 1 }
+
+
+        atIpAddressAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The IP address to which this entry's addressing information
+                pertains. The address type of this object is specified in
+                atIpAddressAddrType."
+            ::= { atIpAddressEntry 2 }
+
+
+        atIpAddressPrefixLen OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The prefix length of the IP address represented by this entry."
+            ::= { atIpAddressEntry 3 }
+
+
+        atIpAddressLabel OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "A name assigned to the IP address represented by this entry."
+            ::= { atIpAddressEntry 4 }
+
+
+        atIpAddressIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The index value that uniquely identifies the interface to
+                which this entry is applicable.  The interface identified by
+                a particular value of this index is the same interface as
+                identified by the same value of the IF-MIB's ifIndex."
+            ::= { atIpAddressEntry 5 }
+
+
+        atIpAddressAssignmentType OBJECT-TYPE
+            SYNTAX AtIpAddressAssignmentType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The IP address assignment type for this entry (primary or
+                secondary)."
+            ::= { atIpAddressEntry 6 }
+
+
+        atIpAddressRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The current status of the IP address entry. The following
+                values may be returned when reading this object:
+
+                active (1)        - The IP address is currently mapped to
+                                    an interface and is valid.
+                notReady (3)      - The IP address is currently partially
+                                    configured and is not mapped to an
+                                    interface.
+
+                The following values may be written to this object:
+
+                active (1)        - An attempt will be made to map the IP
+                                    address to the configured interface.
+                createAndWait (5) - An attempt will be made to create a new
+                                    IP address entry.
+                destroy (6)       - The IP address setting will be removed
+                                    from the device.
+
+                An entry cannot be made active until its atIpAddressPrefixLen,
+                atIpAddressIfIndex and atIpAddressAssignmentType objects have
+                been set to valid values."
+            ::= { atIpAddressEntry 7 }
+
+
+
+    END
+
+--
+-- at-ip.mib
+--
+

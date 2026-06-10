@@ -1,0 +1,182 @@
+CTRON-FRONTPANEL-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-frontpanel-mib.txt
+        --  Revision: 1.04.00
+        --  Part Number:  2170558-02
+        --  Date: August 11, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific front panel MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright October 95 Cabletron Systems
+
+        -- This MIB describes objects that define front panel
+        -- redundance within the MMAC chassis.
+
+        IMPORTS
+                NetworkAddress                  FROM RFC1155-SMI
+                ctFpRedundancy                  FROM CTRON-MIB-NAMES
+                OBJECT-TYPE                     FROM RFC-1212;
+
+        --  The fPredund group
+        --  Implementation of this group is mandatory for devices with
+        --  front panel redundancy.
+
+        ctFpRedund      OBJECT IDENTIFIER ::= { ctFpRedundancy 1 }
+
+        ctFpRedundReset     OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    noReset(1),
+                    reset(2)
+                    }
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                    "If this object is set to Reset it will cause a reset
+                     of the front panel redundancy. Setting this object to
+                     NoReset will do nothing. This object will always be 
+                     read as NoReset."
+             ::= { ctFpRedund 1 }
+ 
+        ctFpRedundPollInterval  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                    "Get/Set the number of seconds between polls for front
+                     panel redundancy."
+             ::= { ctFpRedund 2 }
+        
+        ctFpRedundRetrys    OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                    "Get/Set the the number of unanswered polls allowed for
+                     the front panel redundancy before it switches ports."
+            ::= { ctFpRedund 3 }
+        
+        ctFpRedundNumAddr   OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                    "Get the number of IP Addresses associated with front panel
+                     redundancy."
+            ::= { ctFpRedund 4 }
+        
+        ctFpRedundAddAddr   OBJECT-TYPE
+            SYNTAX      NetworkAddress
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                    "Add an IP Address to the polling list for the front panel
+                     redundancy."
+            ::= { ctFpRedund 5 }
+          
+        ctFpRedundDelAddr   OBJECT-TYPE
+            SYNTAX      NetworkAddress
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                    "Delete an IP Address from the polling list for the 
+                     front panel redundancy."
+            ::= { ctFpRedund 6 }
+
+        ctFpRedundActivePort  OBJECT-TYPE
+            SYNTAX      INTEGER
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                    "Get/Set the front panel port you want to be active 
+                     when front panel redundancy is enabled."
+            ::= { ctFpRedund 7 }
+        
+        ctFpRedundEnable    OBJECT-TYPE
+            SYNTAX      INTEGER {
+                        disable(1),
+                        enable(2)
+                        }
+            ACCESS      read-write
+            STATUS      mandatory
+            DESCRIPTION
+                    "If this object is set to enable, the front panel
+                     redundancy will be activated. If this object is set 
+                     to disable,  the front panel redundancy will be 
+                     deactivated.  When read, this object will returns the 
+                     state of the object based on the last request 
+                     made."
+            ::= { ctFpRedund 8 }
+
+        ctFpRedundAddrTable OBJECT-TYPE
+            SYNTAX      SEQUENCE OF CtFpRedundAddrEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                    ""
+            ::= { ctFpRedund 9 }
+        
+        ctFpRedundAddrEntry OBJECT-TYPE
+            SYNTAX      CtFpRedundAddrEntry
+            ACCESS      not-accessible
+            STATUS      mandatory
+            DESCRIPTION
+                    ""
+            INDEX       { ctFpRedundAddrId }
+            ::= { ctFpRedundAddrTable 1 }
+        
+        CtFpRedundAddrEntry ::=
+          SEQUENCE {
+             ctFpRedundAddrId
+                  INTEGER,
+             ctFpRedundAddrIPAddr
+                  NetworkAddress
+          }
+        
+        ctFpRedundAddrId    OBJECT-TYPE
+            SYNTAX      INTEGER (1..65535)
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                    "A unique value identifying an element in a sequence of
+                     member IP Addresses which belong to the front panel 
+                     redundancy.  This value goes from 1 to the maximum 
+                     number of IP Addresses which may be included in  
+                     front panel redundancy."
+            ::= { ctFpRedundAddrEntry 1 }
+          
+        ctFpRedundAddrIPAddr    OBJECT-TYPE
+            SYNTAX      NetworkAddress
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                    "Returns an IP Address associated with the front panel
+                     redundancy."
+            ::= { ctFpRedundAddrEntry 2 }
+
+END

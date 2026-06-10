@@ -1,0 +1,714 @@
+-- ============================================================================
+-- AT-SWI.MIB
+-- Allied Telesis enterprise MIB
+-- For AlliedWare Plus (tm) operating system
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+
+AT-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32
+    	FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+	modules
+		FROM AT-SMI-MIB
+;
+
+swi MODULE-IDENTITY
+    LAST-UPDATED "200606121222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    SWITCH module. "
+
+    REVISION "200606121222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 87}
+
+
+-- The branch is named 'swi' because it is the common internal module name, 
+-- also to reduce the chance of naming conflicts with other MIB objects.
+
+swiPortTable  OBJECT-TYPE
+   SYNTAX    	SEQUENCE OF SwiPortEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+           "Table of port properties."
+   ::= { swi 1 }
+
+swiPortEntry  OBJECT-TYPE
+   SYNTAX    	SwiPortEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+           "An entry in the port information table."
+   INDEX   { swiPortNumber }
+   ::= { swiPortTable 1 }
+
+SwiPortEntry  ::=
+   SEQUENCE {
+        swiPortNumber
+           INTEGER,
+        swiPortIngressLimit
+           INTEGER,
+        swiPortEgressLimit
+           INTEGER
+   }
+
+swiPortNumber OBJECT-TYPE
+   SYNTAX    	INTEGER (1..65535)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "This object identifies the port of the switch."
+   ::= { swiPortEntry 1 }
+
+
+swiPortIngressLimit OBJECT-TYPE
+    SYNTAX  INTEGER (1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The Ingress Bandwidth Limit applied to the port. A value of
+            zero indicates that no limit is set."
+    ::= { swiPortEntry 20 }
+
+swiPortEgressLimit OBJECT-TYPE
+    SYNTAX  	INTEGER (1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS  	current
+    DESCRIPTION
+            "The Egress Bandwidth Limit applied to the port. A value of
+            zero indicates that no limit is set."
+    ::= { swiPortEntry 21 } 
+    
+swiPortVlanTable  OBJECT-TYPE
+   SYNTAX    	SEQUENCE OF SwiPortVlanEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+           "Table of port vlan properties."
+   ::= { swi 4 }
+
+swiPortVlanEntry  OBJECT-TYPE
+   SYNTAX    	SwiPortVlanEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+           "An entry of vlan  in the port information table."
+   INDEX   { swiPortVlanPortNumber, swiPortVlanVlanId }
+   ::= { swiPortVlanTable 1 }
+
+SwiPortVlanEntry  ::=
+   SEQUENCE {
+        swiPortVlanPortNumber
+           INTEGER,
+        swiPortVlanVlanId
+           INTEGER,
+        swiPortVlanControl
+           INTEGER 
+   }
+
+swiPortVlanPortNumber OBJECT-TYPE
+   SYNTAX    	INTEGER (1..65535)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "This object identifies the port of the switch."
+   ::= { swiPortVlanEntry 1 } 
+   
+swiPortVlanVlanId OBJECT-TYPE
+   SYNTAX    	INTEGER (1..65535)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "This object identifies the vlans that a port attached to "
+   ::= { swiPortVlanEntry 2 }       
+
+swiPortVlanControl OBJECT-TYPE
+   SYNTAX    	INTEGER {
+                	enable (1),
+                    disable (2)
+				 }
+   MAX-ACCESS   read-write
+   STATUS    	current
+   DESCRIPTION
+             "The writting to this object enables or disable the port in a vlan.
+              The reading  of this object indicates the port state in a vlan. "
+   ::= { swiPortVlanEntry 3 }   
+   
+swiPortVlanStateNotify NOTIFICATION-TYPE
+   OBJECTS {swiPortVlanPortNumber, swiPortVlanVlanId, swiPortVlanControl}
+   STATUS  current
+   DESCRIPTION
+   "This objects informs a state change of a port in vlan."
+   ::= { swi 9 }
+
+-- The following table lists the various switch port counters for the
+-- swi56xx based products.
+
+swi56xxPortCounterTable  OBJECT-TYPE
+   SYNTAX    	SEQUENCE OF Swi56xxPortCounterEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+           "Table of swi56xx port counter properties."
+   ::= { swi 2 }
+
+swi56xxPortCounterEntry  OBJECT-TYPE
+   SYNTAX    	Swi56xxPortCounterEntry
+   MAX-ACCESS   not-accessible
+   STATUS    	current
+   DESCRIPTION
+           "An entry in the port information table."
+   INDEX   { swi56xxPortNumber }
+   ::= { swi56xxPortCounterTable 1 }
+
+Swi56xxPortCounterEntry  ::=
+   SEQUENCE {
+        swi56xxPortNumber
+           INTEGER,
+		swi56xxRxTx64kPkts
+           Counter32, 
+	    swi56xxRxTx65To127kPkts 
+           Counter32, 
+	    swi56xxRxTx128To255kPkts
+           Counter32, 
+	    swi56xxRxTx256To511kPkts
+           Counter32, 
+	    swi56xxRxTx512To1023kPkts
+           Counter32, 
+	    swi56xxRxTx1024ToMaxPktSzPkts
+           Counter32, 
+	    swi56xxRxTx519To1522kPkts 
+           Counter32, 
+        swi56xxPortRxOctets
+           Counter32, 
+        swi56xxPortRxPkts
+           Counter32,
+        swi56xxPortRxFCSErrors
+           Counter32, 
+        swi56xxPortRxMulticastPkts
+           Counter32,                
+        swi56xxPortRxBroadcastPkts
+           Counter32, 
+        swi56xxPortRxPauseMACCtlFrms
+           Counter32,
+        swi56xxPortRxOversizePkts
+           Counter32, 
+        swi56xxPortRxFragments
+           Counter32,
+        swi56xxPortRxJabbers
+           Counter32,                
+        swi56xxPortRxMACControlFrms
+           Counter32, 
+        swi56xxPortRxUnsupportOpcode
+           Counter32,
+        swi56xxPortRxAlignmentErrors
+           Counter32,                                              
+        swi56xxPortRxOutOfRngeLenFld
+           Counter32,
+        swi56xxPortRxSymErDurCarrier
+           Counter32, 
+        swi56xxPortRxCarrierSenseErr
+           Counter32,
+        swi56xxPortRxUndersizePkts
+           Counter32, 
+        swi56xxPortRxIpInHdrErrors 
+           Counter32,            
+        swi56xxPortTxOctets
+           Counter32, 
+        swi56xxPortTxPkts
+           Counter32,
+        swi56xxPortTxFCSErrors
+           Counter32, 
+        swi56xxPortTxMulticastPkts
+           Counter32,                
+        swi56xxPortTxBroadcastPkts
+           Counter32, 
+        swi56xxPortTxPauseMACCtlFrms
+           Counter32,
+        swi56xxPortTxOversizePkts
+           Counter32, 
+        swi56xxPortTxFragments
+           Counter32,
+        swi56xxPortTxJabbers
+           Counter32,
+        swi56xxPortTxPauseCtrlFrms
+           Counter32, 
+        swi56xxPortTxFrameWDeferrdTx
+           Counter32, 
+        swi56xxPortTxFrmWExcesDefer
+           Counter32, 
+        swi56xxPortTxSingleCollsnFrm
+           Counter32, 
+        swi56xxPortTxMultCollsnFrm
+           Counter32, 
+        swi56xxPortTxLateCollsns
+           Counter32, 
+        swi56xxPortTxExcessivCollsns
+           Counter32, 
+        swi56xxPortTxCollisionFrames
+           Counter32, 
+        swi56xxPortMiscDropEvents
+           Counter32,                                                                                                                                          
+        swi56xxPortMiscTaggedPktTx
+           Counter32,
+        swi56xxPortMiscTotalPktTxAbort
+           Counter32,
+        swi56xxPortHWMultiTTLexpired
+           Counter32,
+        swi56xxPortHWMultiBridgedFrames
+           Counter32,
+        swi56xxPortHWMultiRxDrops
+           Counter32,
+        swi56xxPortHWMultiTxDrops
+           Counter32                                                                
+   }
+
+swi56xxPortNumber OBJECT-TYPE
+   SYNTAX    	INTEGER (1..65535)
+   MAX-ACCESS   read-only
+   STATUS    	current
+   DESCRIPTION
+             "This object identifies the port of the switch."
+   ::= { swi56xxPortCounterEntry 1 }
+
+swi56xxRxTx64kPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of 64kB packets received and transmitted."
+    ::= { swi56xxPortCounterEntry 2 }
+
+swi56xxRxTx65To127kPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of 65kB To 127kB packets received and transmitted."
+    ::= { swi56xxPortCounterEntry 3 }
+
+swi56xxRxTx128To255kPkts OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of 128kB To 255kB packets received and transmitted."
+    ::= { swi56xxPortCounterEntry 4 }
+
+swi56xxRxTx256To511kPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of 256kB To 511kB packets received and transmitted."
+    ::= { swi56xxPortCounterEntry 5 }
+
+swi56xxRxTx512To1023kPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of 512kB To 1023kB packets received and transmitted."
+    ::= { swi56xxPortCounterEntry 6 }
+
+swi56xxRxTx1024ToMaxPktSzPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of 1024kB To MaxPktSz packets received and transmitted."
+    ::= { swi56xxPortCounterEntry 7 }
+
+swi56xxRxTx519To1522kPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of 519kB To 1522kB packets received and transmitted."
+    ::= { swi56xxPortCounterEntry 8 }
+
+swi56xxPortRxOctets OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of octets received."
+    ::= { swi56xxPortCounterEntry 9 }
+
+swi56xxPortRxPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of packets received."
+    ::= { swi56xxPortCounterEntry 10 }
+
+swi56xxPortRxFCSErrors OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames received containing a Frame Check Sequence
+             error."
+    ::= { swi56xxPortCounterEntry 11 }
+
+swi56xxPortRxMulticastPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of multicast packets received."
+    ::= { swi56xxPortCounterEntry 12 }
+
+swi56xxPortRxBroadcastPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of broadcast packets received."
+    ::= { swi56xxPortCounterEntry 13 }
+
+swi56xxPortRxPauseMACCtlFrms OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of valid PAUSE MAC Control frames received."
+    ::= { swi56xxPortCounterEntry 14 }
+
+swi56xxPortRxOversizePkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of oversize packets received."
+    ::= { swi56xxPortCounterEntry 15 }
+
+swi56xxPortRxFragments OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of fragments received."
+    ::= { swi56xxPortCounterEntry 16 }
+
+swi56xxPortRxJabbers OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of jabber frames received."
+    ::= { swi56xxPortCounterEntry 17 }
+
+swi56xxPortRxMACControlFrms OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of MAC Control frames (Pause and
+             Unsupported) received."
+    ::= { swi56xxPortCounterEntry 18 }
+
+swi56xxPortRxUnsupportOpcode OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of MAC Control frames with unsupported
+             opcode (i.e. not Pause) received."
+    ::= { swi56xxPortCounterEntry 19 }
+
+swi56xxPortRxAlignmentErrors OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames with alignment errors received."
+    ::= { swi56xxPortCounterEntry 20 }
+
+swi56xxPortRxOutOfRngeLenFld OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of packets with length out of range received."
+    ::= { swi56xxPortCounterEntry 21 }
+
+swi56xxPortRxSymErDurCarrier OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames with invalid data symbols received."
+    ::= { swi56xxPortCounterEntry 22 }
+
+swi56xxPortRxCarrierSenseErr OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of false carrier conditions between frames received."
+    ::= { swi56xxPortCounterEntry 23 }
+
+swi56xxPortRxUndersizePkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of undersized packets received."
+    ::= { swi56xxPortCounterEntry 24 }
+
+swi56xxPortRxIpInHdrErrors OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "swiPortRxIpInHdrErrors"
+    ::= { swi56xxPortCounterEntry 25 }
+
+swi56xxPortTxOctets OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of octets transmitted."
+    ::= { swi56xxPortCounterEntry 26 }
+
+swi56xxPortTxPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of packets transmitted."
+    ::= { swi56xxPortCounterEntry 27 }
+
+swi56xxPortTxFCSErrors OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames containing a Frame Check Sequence
+             error transmitted."
+    ::= { swi56xxPortCounterEntry 28 }
+
+swi56xxPortTxMulticastPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of multicast packets transmitted."
+    ::= { swi56xxPortCounterEntry 29 }
+
+swi56xxPortTxBroadcastPkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of broadcast packets transmitted."
+    ::= { swi56xxPortCounterEntry 30 }
+
+swi56xxPortTxPauseMACCtlFrms OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of valid PAUSE MAC Control frames transmitted."
+    ::= { swi56xxPortCounterEntry 31 }
+    
+swi56xxPortTxOversizePkts OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of oversize packets transmitted."
+    ::= { swi56xxPortCounterEntry 32 }
+           
+swi56xxPortTxFragments OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of fragments transmitted."
+    ::= { swi56xxPortCounterEntry 33 }
+    
+swi56xxPortTxJabbers OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of jabber frames transmitted."
+    ::= { swi56xxPortCounterEntry 34 }
+    
+swi56xxPortTxPauseCtrlFrms OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of Pause control frames transmitted."
+    ::= { swi56xxPortCounterEntry 35 }                                                              
+
+swi56xxPortTxFrameWDeferrdTx OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames deferred once before successful
+             transmission."
+    ::= { swi56xxPortCounterEntry 36 }
+    
+swi56xxPortTxFrmWExcesDefer OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frame aborted after too many deferrals."
+    ::= { swi56xxPortCounterEntry 37 }
+
+swi56xxPortTxSingleCollsnFrm OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames which experienced exactly one
+             collision."
+    ::= { swi56xxPortCounterEntry 38 }
+
+swi56xxPortTxMultCollsnFrm OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames which experienced 2 to 15 collisions
+             (including late collisions)."
+    ::= { swi56xxPortCounterEntry 39 }
+
+swi56xxPortTxLateCollsns OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames which experienced late collisions."
+    ::= { swi56xxPortCounterEntry 40 }
+
+swi56xxPortTxExcessivCollsns OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of frames aborted before transmission after 16
+             collisions."
+    ::= { swi56xxPortCounterEntry 41 }
+
+swi56xxPortTxCollisionFrames OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The total number of collisions."
+    ::= { swi56xxPortCounterEntry 42 }
+
+swi56xxPortMiscDropEvents OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of packets discarded at ingress port."
+    ::= { swi56xxPortCounterEntry 43 }
+
+swi56xxPortMiscTaggedPktTx OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of VLAN tagged packets transmitted."
+    ::= { swi56xxPortCounterEntry 44 }
+
+swi56xxPortMiscTotalPktTxAbort OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "The number of Layer 2 and 3 packets aborted during
+             transmission."
+    ::= { swi56xxPortCounterEntry 45 }
+
+swi56xxPortHWMultiTTLexpired OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "Number of multicast TTL expired frames."
+    ::= { swi56xxPortCounterEntry 46 }
+
+swi56xxPortHWMultiBridgedFrames OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "Number of multicast bridged frames"
+    ::= { swi56xxPortCounterEntry 47 }
+
+swi56xxPortHWMultiRxDrops OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "Number of multicast frames dropped at reception"
+    ::= { swi56xxPortCounterEntry 48 }
+    
+swi56xxPortHWMultiTxDrops OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "NNumber of multicast frames dropped at transmission"
+    ::= { swi56xxPortCounterEntry 49 }
+    
+
+-- A MIB group set up to contain odds and ends of debugging variables in the SWI module.
+
+swiDebugVariables OBJECT IDENTIFIER ::= { swi 3 }
+swiTrap  OBJECT IDENTIFIER ::= { swi 0 }
+
+swiDebugMemoryParityErrors OBJECT-TYPE
+    SYNTAX  	Counter32
+    MAX-ACCESS  read-only
+    STATUS  	current
+    DESCRIPTION
+            "For switches based on certain switch chips, the number of parity errors
+            that have been detected in packet memory associated with the switch. If the
+            device does not include the counting of memory parity errors, this variable
+            will return 0."
+    ::= { swiDebugVariables 1 }
+
+swiIntrusionDetectionTrap NOTIFICATION-TYPE
+    OBJECTS   	{ swiPortNumber }
+	STATUS		current
+    DESCRIPTION
+                "An intrusion detection trap is generated when a port has intrusion
+                detection enabled, and the action taken when intrusion is detected is
+                to generate a trap. Intrusion is detected when the number of MAC
+                addresses learned on the port exceeds the configured learn limit.
+                The ifIndex of the port is included in the trap."
+    ::= { swiTrap 6 }
+
+END

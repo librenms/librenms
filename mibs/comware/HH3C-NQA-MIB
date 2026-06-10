@@ -1,0 +1,3197 @@
+-- =================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  Extended MIB File(extended from DISMAN-PING-MIB RFC2925)
+-- Reference:
+-- Version: V2.9
+-- History:
+-- V1.0  Lv zhenfeng, 2003.08, Initial Version
+-- V1.1 2004-10-12 updated by gaolong
+--      Import OBJECT-IDENTITY, Integer32, Counter32, Gauge32.
+-- V1.2 Add new column objects
+--      hh3cNqaResultsMaxDelaySD
+--      hh3cNqaResultsMaxDelayDS
+--      hh3cNqaResultsLostPacketRatio
+--      under hh3cNqaResultsTable table by zhaoyujin, 20041101
+--  Add new column objects
+--      hh3cNqaJitterStatsAvePositivesSD
+--      hh3cNqaJitterStatsAveNegativesSD
+--      hh3cNqaJitterStatsAvePositivesDS
+--      hh3cNqaJitterStatsAveNegativesDS
+--      hh3cNqaJitterStatsPktLossUnknown
+--  under hh3cNqaJitterStatsTable table by zhaoyujin, 20041101
+--      revise words errors
+-- V1.3 2004-12-25 updated by zhaoyujin and weixinzhe
+--      Objects description updated
+-- V1.4 2005-12-22 Modified by qiuchunxia and liqian
+--      add hh3cNqaCtlHistoryKeptTime
+--      add hh3cNqaCtlHistoryEnable
+--      add hh3cNqaStatisticsResultsTable
+--      add hh3cNqaGroupStatsJitterTable
+--      add hh3cNqaStatisticsCtlTable
+--      add hh3cNqaStatsMaxGroupNumber
+--      remove definition of InetAddress, and import from INET-ADDRESS-MIB
+-- V1.5 2006-03-03 Modified by jinyi and wangqingfeng
+--      modified the description of hh3cNqaStatResRttSequenceErrors
+--      modified the description of hh3cNqaResultsRttSequenceErrors
+--      modified UNITS of some objects by jinyi
+--      add hh3cNqaCtlICPIFAdvFactor, hh3cNqaCtlCodecType in hh3cNqaCtlTable
+--      add hh3cNqaResultsPacketLateArrival in hh3cNqaResultsTable
+--      add hh3cNqaJitterStatsOperOfICPIF and hh3cNqaJitterStatsOperOfMOS
+--      in hh3cNqaJitterStatsTable
+--      add hh3cNqaStatResPacketLateArrival in hh3cNqaStatisticsResultsTable
+--      add hh3cNqaStatJitterMaxOfICPIF, hh3cNqaStatJitterMinOfICPIF
+--      hh3cNqaStatJitterMaxOfMOS and hh3cNqaStatJitterMinOfMOS
+--      in hh3cNqaGroupStatsJitterTable
+--      rename subidentifier 5 of hh3cNqaStatisticsCtlEntry to
+--      hh3cNqaCtlLifeTime by wangqingfeng
+--      rename subidentifier 11 of hh3cNqaStatisticsResultsEntry to
+--      hh3cNqaStatResInterval by wangqingfeng
+-- V1.6 2006-05-12
+--      rewrite this MIB with prefix "hh3cNqa".
+-- V2.0 2006-08-14 Modified by zhangjun
+--      change the name of root from "hh3cDismanPing" to "hh3cNqa"
+--      modify some mistakes
+-- V2.1 2006-08-22 Modified by qiuchunxia, dupengfei and shenjuanjuan
+--      add hh3cNqaReactionTable and add hh3cNqaNotifications
+-- V2.2 2007-03-08 Modified by zhouwenming
+--      add hh3cNqaResultsRttSum, hh3cNqaResultsNumOfDelaySD, hh3cNqaResultsMinDelaySD,
+--       hh3cNqaResultsSumDelaySD, hh3cNqaResultsSum2DelaySD, hh3cNqaResultsNumOfDelayDS,
+--       hh3cNqaResultsMinDelayDS, hh3cNqaResultsSumDelayDS, hh3cNqaResultsSum2DelayDS
+--       in hh3cNqaResultsTable
+--      add hh3cNqaStatResRttSum, hh3cNqaStatResNumOfDelaySD, hh3cNqaStatResMinDelaySD,
+--       hh3cNqaStatResSumDelaySD, hh3cNqaStatResSum2DelaySD, hh3cNqaStatResNumOfDelayDS,
+--       hh3cNqaStatResMinDelayDS, hh3cNqaStatResSumDelayDS, hh3cNqaStatResSum2DelayDS,
+--       hh3cNqaStatResMaxDelaySD, hh3cNqaStatResMaxDelayDS
+--       in hh3cNqaStatisticsResultsTable
+--      add jitterOwdSD, jitterOwdDS to hh3cNqaReactCheckedElement
+--       in hh3cNqaReactionTable.
+--      add hh3cNqaReactCheckedNum, hh3cNqaReactThresholdNum in hh3cNqaReactionTable
+--      add hh3cNqaStatisticsReactionTable
+-- V2.3 2007-04-25 Modified by zhouxingyue and zhouhaifeng
+--      add icmpTimestamp in hh3cNqaCtlCodecType
+--      remove size limit and DEFVAL in definition of hh3cNqaCtlStatisticsInterval.
+--      modify type of below from  Unsigned32 to Gauge32:
+--       hh3cNqaStatResMinRtt, hh3cNqaStatResMaxRtt,hh3cNqaStatResAverageRtt,
+--       hh3cNqaStatResInterval, hh3cNqaStatResLostPacketRatio, hh3cNqaStatResMinDelaySD,
+--       hh3cNqaStatResMaxDelaySD,hh3cNqaStatResMinDelayDS, hh3cNqaStatResMaxDelayDS.
+--      modify type of below from  Unsigned32 to Counter32:
+--       hh3cNqaStatResProbeResponses, hh3cNqaStatResSentProbes, hh3cNqaStatResRttSumOfSquares,
+--       hh3cNqaStatResRttNumDisconnects, hh3cNqaStatResRttTimeouts, hh3cNqaStatResRttBusies,
+--       hh3cNqaStatResRttNoConnections, hh3cNqaStatResRttDrops, hh3cNqaStatResRttSequenceErrors,
+--       hh3cNqaStatResRttErrors, hh3cNqaStatResPacketLateArrival, hh3cNqaStatResRttSum,
+--       hh3cNqaStatResNumOfDelaySD, hh3cNqaStatResSumDelaySD, hh3cNqaStatResSum2DelaySD,
+--       hh3cNqaStatResNumOfDelayDS, hh3cNqaStatResSumDelayDS, hh3cNqaStatResSum2DelayDS,
+--       hh3cNqaStatReactCheckedNum, hh3cNqaStatReactThresholdNum.
+--      modify type of below from  Gauge32 to Counter32:
+--       hh3cNqaStatJitterNumOfPosSD, hh3cNqaStatJitterSumOfPosSD, hh3cNqaStatJitterSumOfSquarePosSD,
+--       hh3cNqaStatJitterNumOfNegSD, hh3cNqaStatJitterSumOfNegSD, hh3cNqaStatJitterSumOfSquareNegSD,
+--       hh3cNqaStatJitterNumOfPosDS, hh3cNqaStatJitterSumOfPosDS, hh3cNqaStatJitterSumOfSquarePosDS,
+--       hh3cNqaStatJitterNumOfNegDS, hh3cNqaStatJitterSumOfNegDS, hh3cNqaStatJitterSumOfSquareNegDS,
+--       hh3cNqaStatJitterPacketLossSD, hh3cNqaStatJitterPacketLossDS, hh3cNqaStatJitterPktLossUnknown.
+-- V2.4 2012-04-20 Modified by sunbiliang and wanghaidong
+--      add raw in hh3cNqaCtlHttpOperationType
+--      modifiy the range of hh3cNqaCtlHttpOperationString
+-- V2.5 2013-12-17 Modified by wangbo
+--      modify the descriptions of hh3cNqaCtlICPIFAdvFactor, hh3cNqaStatJitterNumOfNegSD,
+--       hh3cNqaStatJitterNumOfPosSD, hh3cNqaStatJitterNumOfPosDS, hh3cNqaStatJitterNumOfNegDS,
+--       hh3cNqaReactCurrentStatus
+-- V2.6 2017-07-03 Modified by zhanbaobin
+--      add hh3cNqaJitterStatsAveSD, hh3cNqaJitterStatsAveDS to hh3cNqaJitterStatsEntry,
+--      add hh3cNqaStatJitterAveSD, hh3cNqaStatJitterAveDS to hh3cNqaGroupStatsJitterEntry.
+--      add hh3cNqaTcpServerExtendTable
+--      add hh3cNqaUdpServerExtendEntry
+-- V2.7 2018-06-15 Modified by wangshen
+--      modify the range of hh3cNqaTcpServerExtDSField
+--      modify the range of hh3cNqaUdpServerExtDSField
+--      2018-11-01 Modified by zhanbaobin
+--      add hh3cNqaTwampLight
+--      add hh3cNqaJitterOverThreshold
+--      2018-12-20 Modified by wangshen
+--      modify the default value of hh3cNqaAgentEnable
+-- V2.8 2019-02-15 Modified by zhanbaobin
+--      add hh3cNqaArp
+--      2019-06-04 Modified by liuyi
+--      add hh3cNqaJitterStatsLostPacketPermillage to hh3cNqaJitterStatsEntry.
+--      add hh3cNqaStatResLostPacketPermillage to hh3cNqaStatisticsResultsEntry.
+-- V2.9 2020-03-25 Modified by zhanbaobin
+--      add hh3cNqaProbeTimeAboveThreshold to hh3cNqaNotifications.
+--      add hh3cNqaProbeTimeBelowThreshold to hh3cNqaNotifications.
+--      add hh3cNqaProbeFailAboveThreshold to hh3cNqaNotifications.
+--      add hh3cNqaProbeFailBelowThreshold to hh3cNqaNotifications.
+-- =================================================================
+HH3C-NQA-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE, Unsigned32,
+            OBJECT-IDENTITY, NOTIFICATION-TYPE, Integer32, Counter32, Gauge32
+                FROM SNMPv2-SMI
+            DateAndTime, DisplayString, RowStatus, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+            InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+            hh3cRhw
+                FROM HH3C-OID-MIB
+            pingCtlEntry, pingCtlOwnerIndex, pingCtlTestName, pingCtlType,
+            pingCtlTargetAddress, pingCtlTargetAddressType, pingCtlDescr
+                FROM DISMAN-PING-MIB
+            SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB;          -- RFC2571
+
+    hh3cNqa MODULE-IDENTITY
+        LAST-UPDATED "202003250000Z"
+        ORGANIZATION
+            "New H3C Technologies Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Technologies Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085"
+            DESCRIPTION
+                "The private MIB file includes the test information of the
+                device. It is supplementary for rfc2925.txt."
+            REVISION "202003250000Z"
+            DESCRIPTION
+                "Add hh3cNqaProbeTimeAboveThreshold to hh3cNqaNotifications.
+                 Add hh3cNqaProbeTimeBelowThreshold to hh3cNqaNotifications.
+                 Add hh3cNqaProbeFailAboveThreshold to hh3cNqaNotifications.
+                 Add hh3cNqaProbeFailBelowThreshold to hh3cNqaNotifications."
+        ::= { hh3cRhw 3 }
+
+ -- Textual Conventions
+VpnInstanceType ::= TEXTUAL-CONVENTION
+     STATUS      current
+     DESCRIPTION
+         "A value that represents a type of VPN instance.
+          public(1)   Public network.
+          vpn(2)      Private network."
+     SYNTAX      INTEGER {
+                     public(1),
+                     vpn(2)
+                 }
+
+    hh3cNqaObjects OBJECT IDENTIFIER ::= { hh3cNqa 1 }
+
+ -- The registration node (point) for remote NQA(Network Quality Analysis) test
+ -- implementation types
+
+hh3cNqaImplementationTypeDomains  OBJECT IDENTIFIER ::= { hh3cNqa 2 }
+
+hh3cNqaUdpEcho OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using the UDP based echo server.
+        Notes: The hh3cNqaCtlTargetPort and hh3cNqaCtlSourcePort need to be set,
+        while in the pingUdpEcho Node, hh3cNqaCtlTargetPort must be set to the
+        default value."
+    ::= { hh3cNqaImplementationTypeDomains 1 }
+
+hh3cNqaTcpconnect OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is attempting to
+        connect to a TCP port in order to calculate a round
+        trip time.
+        Notes: The hh3cNqaCtlTargetPort and hh3cNqaCtlSourcePort need to be set,
+        while in the pingTcpConnectionAttempt Node, hh3cNqaCtlTargetPort must
+        be set to the default value."
+    ::= { hh3cNqaImplementationTypeDomains 2 }
+
+hh3cNqajitter OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using udp for packet transfers.
+        'jitter' will cause the NQA(Network Quality Analysis) application
+        to perform delay variance analysis."
+    ::= { hh3cNqaImplementationTypeDomains 3 }
+
+hh3cNqaHttp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using udp for name resolution,
+        tcp connect and tcp data transfer mechanisms for HTTP data download
+        from a particular HTTP Server.
+        It causes the NQA application to perform a download of the object
+        specified in the URL."
+    ::= { hh3cNqaImplementationTypeDomains 4 }
+
+
+hh3cNqadlsw OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using tcp for sending keepalives.
+        'dlsw' will cause the NQA application to perform a keepalive operation
+        to measure the response time of a DLSw peer."
+    ::= { hh3cNqaImplementationTypeDomains 5 }
+
+hh3cNqadhcp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using udp for sending dhcp
+        requests. 'dhcp' will cause the NQA application
+        to perform an IP Address lease request/teardown operation."
+    ::= { hh3cNqaImplementationTypeDomains 6 }
+
+hh3cNqaftp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using tcp packet for ftp connect
+         and data transfer."
+    ::= { hh3cNqaImplementationTypeDomains 7 }
+
+hh3cNqaTwampLight OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that a measurement for two-way network quality through UDP
+         packets. The type only supports sending traps."
+    ::= { hh3cNqaImplementationTypeDomains 8 }
+
+hh3cNqaArp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Indicates that an implementation is using the Address
+         Resolution Protocol (ARP) test facility.
+         The type only supports IPv4 network."
+    ::= { hh3cNqaImplementationTypeDomains 9 }
+
+-- MIB contains 3 groups
+
+hh3cNqaMIBVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Version string of this MIB.
+        The format will be: 'Version.Release.Patch: Description'
+        An instance likes: '1.0.0: Initial NQA MIB'
+        "
+    ::= { hh3cNqaObjects 1 }
+
+hh3cNqaCtlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNqaCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the NQA Control Extend Table for providing, via SNMP,
+        the capability of performing network analysis operations at a
+        remote host."
+   ::= { hh3cNqaObjects 2 }
+
+hh3cNqaCtlEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cNqaCtlTable. The operation of this
+        table is same as that of pingResultsTable."
+    AUGMENTS    { pingCtlEntry }
+    ::= { hh3cNqaCtlTable 1 }
+
+Hh3cNqaCtlEntry ::=
+    SEQUENCE {
+    hh3cNqaCtlTargetPort               Integer32,
+    hh3cNqaCtlSourcePort               Integer32,
+    hh3cNqaCtlTTL                      Integer32,
+    hh3cNqaCtlJitterAdminInterval      Integer32,
+    hh3cNqaCtlJitterAdminNumPackets    Integer32,
+    hh3cNqaCtlHttpOperationType        INTEGER,
+    hh3cNqaCtlHttpOperationString      DisplayString,
+    hh3cNqaCtlFtpOperationType         INTEGER,
+    hh3cNqaCtlFtpUsername              DisplayString,
+    hh3cNqaCtlFtpPassword              DisplayString,
+    hh3cNqaCtlFtpOperationString       DisplayString,
+    hh3cNqaCtlVPNInstance              DisplayString,
+    hh3cNqaCtlHistoryKeptTime          Integer32,
+    hh3cNqaCtlHistoryEnable            INTEGER,
+    hh3cNqaCtlICPIFAdvFactor           Integer32,
+    hh3cNqaCtlCodecType                INTEGER
+    }
+
+hh3cNqaCtlTargetPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination port that may be used by udpEcho,
+        tcpConnect and jitter probes."
+    DEFVAL      { 0 }
+    ::= { hh3cNqaCtlEntry 1 }
+
+hh3cNqaCtlSourcePort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source port that may be used by all tests except
+        for dns and dlsw.
+        If no source port is specified, system will create
+        a random port as source port."
+    DEFVAL      { 0 }
+    ::= { hh3cNqaCtlEntry 2 }
+
+hh3cNqaCtlTTL OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value to store in the TTL Field in the IP packet used to
+        encapsulate the NQA probe."
+    DEFVAL      { 20 }
+    ::= { hh3cNqaCtlEntry 3 }
+
+hh3cNqaCtlJitterAdminInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..60000)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Time value in milliseconds that is an interval between two continuous
+        probes in jitter test.
+
+        This object is only used by jitter test."
+    DEFVAL      { 20 }
+    ::= { hh3cNqaCtlEntry 4 }
+
+hh3cNqaCtlJitterAdminNumPackets OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Packet number that specifies how many packets will be sent in
+        one jitter test.
+
+        This object is only used by jitter test."
+    DEFVAL      { 10 }
+    ::= { hh3cNqaCtlEntry 5 }
+
+hh3cNqaCtlHttpOperationType OBJECT-TYPE
+    SYNTAX      INTEGER{
+                get(1),
+                post(2),
+                raw(3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Http operation type: get, post or raw."
+    DEFVAL      { get }
+    ::= { hh3cNqaCtlEntry 6 }
+
+hh3cNqaCtlHttpOperationString OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..1023))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Http operation string. For example, if the http operation type is get,
+        the string will be url, home page and http version."
+    DEFVAL      { "" }
+    ::= { hh3cNqaCtlEntry 7 }
+
+hh3cNqaCtlFtpOperationType OBJECT-TYPE
+    SYNTAX      INTEGER{
+                get(1),
+                put(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ftp operation type."
+    DEFVAL      { get }
+    ::= {hh3cNqaCtlEntry 8 }
+
+hh3cNqaCtlFtpUsername OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ftp username."
+    DEFVAL      { "" }
+    ::= { hh3cNqaCtlEntry 9 }
+
+hh3cNqaCtlFtpPassword OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ftp password."
+    DEFVAL      { "" }
+    ::= { hh3cNqaCtlEntry 10 }
+
+hh3cNqaCtlFtpOperationString OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Ftp operation string. If the ftp operation type is get,
+        the string must be the file name which will be gotten from ftp server."
+    DEFVAL      { "" }
+    ::= { hh3cNqaCtlEntry 11 }
+
+hh3cNqaCtlVPNInstance OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VPN name by which system finds route in the specified VPN
+        to send NQA probe packets."
+    DEFVAL      { "" }
+    ::= { hh3cNqaCtlEntry 12 }
+
+hh3cNqaCtlHistoryKeptTime OBJECT-TYPE
+    SYNTAX     Integer32(1..1440)
+    UNITS      "minutes"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "To indicate how long the history records will be saved
+        in the pingProbeHistoryTable table after the test stopped."
+    DEFVAL     { 120 }
+    ::= { hh3cNqaCtlEntry 13 }
+
+hh3cNqaCtlHistoryEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enabled(1),  --history will be recorded
+            disabled(2)  --history will not be recorded
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "To indicate whether the history should be recorded in the
+        PingProbeHistoryTable or not.
+            enabled(1)   --history will be recorded
+            disabled(2)  --history will not be recorded."
+    DEFVAL      { disabled }
+    ::= {hh3cNqaCtlEntry 14 }
+
+hh3cNqaCtlICPIFAdvFactor OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS read-create
+    STATUS  current
+    DESCRIPTION
+        "The advantage factor depends on the type of access and how the service
+        is to be used. This object will be used while calculating the ICPIF
+        (Calculated Planning Impairment Factor) values.  This is applicable
+        only for the jitter probe.
+
+        Suggestion values:
+
+        |-----------------------------------|-------|
+        |          Service                  |factor |
+        |-----------------------------------|-------|
+        |conventional wire-line             |  0    |
+        |-----------------------------------|-------|
+        |mobility within Building           |  5    |
+        |-----------------------------------|-------|
+        |mobility within geographical area  |  10   |
+        |-----------------------------------|-------|
+        |access to hard-to-reach location   |  20   |
+        |-----------------------------------|-------|
+        "
+    DEFVAL  {0}
+    ::= { hh3cNqaCtlEntry 15 }
+
+hh3cNqaCtlCodecType OBJECT-TYPE
+    SYNTAX     INTEGER
+        {
+            notDefined(1),     -- no codec type is defined or codec is unknown
+            g711Alaw(2),       -- uses G.711 A-Law
+            g711Ulaw(3),       -- uses G.711 muHmm-Law
+            g729A(4),          -- uses G.729A
+            icmpTimestamp(5)   -- uses icmp timestamp packet type
+        }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "To indicate the codec type to be used with jitter probe. This is
+        applicable only for the jitter probe."
+    DEFVAL     { notDefined }
+    ::= { hh3cNqaCtlEntry 16 }
+
+-- NQA Test Results Table
+
+hh3cNqaResultsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNqaResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the NQA Results Extend Table for providing
+        the capability of performing NQA operations at a remote
+        host. The results of these operations are stored in the
+        hh3cNqaResultsTable. The operation of this table is same
+        as that of pingResultsTable."
+   ::= { hh3cNqaObjects 3 }
+
+hh3cNqaResultsEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The operation of this table is same as that of pingResultsTable."
+    INDEX {
+             pingCtlOwnerIndex,
+             pingCtlTestName
+          }
+    ::= { hh3cNqaResultsTable 1 }
+
+Hh3cNqaResultsEntry ::=
+    SEQUENCE {
+        hh3cNqaResultsRttNumDisconnects   Unsigned32,
+        hh3cNqaResultsRttTimeouts         Unsigned32,
+        hh3cNqaResultsRttBusies           Unsigned32,
+        hh3cNqaResultsRttNoConnections    Unsigned32,
+        hh3cNqaResultsRttDrops            Unsigned32,
+        hh3cNqaResultsRttSequenceErrors   Unsigned32,
+        hh3cNqaResultsRttStatsErrors      Unsigned32,
+        hh3cNqaResultsMaxDelaySD          Unsigned32,
+        hh3cNqaResultsMaxDelayDS          Unsigned32,
+        hh3cNqaResultsLostPacketRatio     Unsigned32,
+        hh3cNqaResultsPacketLateArrival   Unsigned32,
+        hh3cNqaResultsRttSum              Unsigned32,
+        hh3cNqaResultsNumOfDelaySD        Unsigned32,
+        hh3cNqaResultsMinDelaySD          Unsigned32,
+        hh3cNqaResultsSumDelaySD          Unsigned32,
+        hh3cNqaResultsSum2DelaySD         Unsigned32,
+        hh3cNqaResultsNumOfDelayDS        Unsigned32,
+        hh3cNqaResultsMinDelayDS          Unsigned32,
+        hh3cNqaResultsSumDelayDS          Unsigned32,
+        hh3cNqaResultsSum2DelayDS         Unsigned32
+    }
+
+hh3cNqaResultsRttNumDisconnects OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA probe failed because
+        the destination became disconnected.
+
+        For connectionless protocol pingCtlTypes, this number should be
+        zero."
+    ::= { hh3cNqaResultsEntry 1 }
+
+
+hh3cNqaResultsRttTimeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA probe failed because the
+        probe timed out."
+    ::= { hh3cNqaResultsEntry 2 }
+
+
+hh3cNqaResultsRttBusies OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA probe failed because all
+         NQA tasks have been running.
+
+        If a new probe fails to start, the value of this object
+        is incremented. The next test will not start until the
+        next Frequency."
+   ::= { hh3cNqaResultsEntry 3 }
+
+
+hh3cNqaResultsRttNoConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA probe failed because the probe
+        destination is unavailable.
+
+        For connectionless protocol pingCtlTypes, this number should be
+        zero."
+    ::= { hh3cNqaResultsEntry 4 }
+
+
+hh3cNqaResultsRttDrops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA operation failed to initiated
+        for unavailibility of necessary internal resources."
+    ::= { hh3cNqaResultsEntry 5 }
+
+
+hh3cNqaResultsRttSequenceErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets arrived out of sequence."
+   ::= { hh3cNqaResultsEntry 6 }
+
+hh3cNqaResultsRttStatsErrors OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of some other errors."
+    ::= { hh3cNqaResultsEntry 7 }
+
+hh3cNqaResultsMaxDelaySD OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximal delay from source device to destination device.
+         Currently this value is only used for jitter test, and this
+         value must be 0 in other type test. In jitter test, if
+         destination system time is not valid, the SD delay may be set 0."
+    ::= { hh3cNqaResultsEntry 8 }
+
+hh3cNqaResultsMaxDelayDS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximal delay from destination device to source device.
+         Currently this value is only used for jitter test, and this
+         value is 0 in other type test. In jitter test, if destination
+         system time is not valid, the DS delay may be set 0."
+    ::= { hh3cNqaResultsEntry 9 }
+
+hh3cNqaResultsLostPacketRatio OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object reflects the drop rate of NQA test.
+         For example, this value is 30 that means source device only
+         had received 70% packets of total sent packets."
+    ::= { hh3cNqaResultsEntry 10 }
+
+hh3cNqaResultsPacketLateArrival OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object indicates the number of the packets that
+        arrived after the timeout."
+    ::= { hh3cNqaResultsEntry 11 }
+
+hh3cNqaResultsRttSum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of round trip time."
+    ::= { hh3cNqaResultsEntry 12 }
+
+hh3cNqaResultsNumOfDelaySD OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of delay from source to destination that are
+        successfully measured."
+    ::= { hh3cNqaResultsEntry 13 }
+
+hh3cNqaResultsMinDelaySD OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum of all one way times from source to destination."
+    ::= { hh3cNqaResultsEntry 14 }
+
+hh3cNqaResultsSumDelaySD OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of one way times from source to destination."
+    ::= { hh3cNqaResultsEntry 15 }
+
+hh3cNqaResultsSum2DelaySD OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of squares of one way times from source to  destination."
+    ::= { hh3cNqaResultsEntry 16 }
+
+hh3cNqaResultsNumOfDelayDS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of delay from destination to source that are
+        successfully measured."
+    ::= { hh3cNqaResultsEntry 17 }
+
+hh3cNqaResultsMinDelayDS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum of all one way times from destination to source."
+    ::= { hh3cNqaResultsEntry 18 }
+
+hh3cNqaResultsSumDelayDS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of one way times from destination to source."
+    ::= { hh3cNqaResultsEntry 19 }
+
+hh3cNqaResultsSum2DelayDS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of squares of one way times from destination to source."
+    ::= { hh3cNqaResultsEntry 20 }
+
+-- =================================================================
+--    Jitter Statistics Table
+-- =================================================================
+
+
+hh3cNqaJitterStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cNqaJitterStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Statistics table for latest jitter activity."
+    ::= { hh3cNqaObjects 4 }
+
+hh3cNqaJitterStatsEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaJitterStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the statistics for the latest jitter activity.
+        This entry is created only if the pingCtlType is hh3cNqajitter."
+    INDEX {
+            pingCtlOwnerIndex,
+            pingCtlTestName
+          }
+    ::= { hh3cNqaJitterStatsTable 1 }
+
+Hh3cNqaJitterStatsEntry  ::= SEQUENCE
+{
+    hh3cNqaJitterStatsNumOfRTT                Counter32,
+    hh3cNqaJitterStatsMinOfPositivesSD        Gauge32,
+    hh3cNqaJitterStatsMaxOfPositivesSD        Gauge32,
+    hh3cNqaJitterStatsNumOfPositivesSD        Gauge32,
+    hh3cNqaJitterStatsSumOfPositivesSD        Gauge32,
+    hh3cNqaJitterStatsSum2PositivesSD         Gauge32,
+    hh3cNqaJitterStatsMinOfNegativesSD        Gauge32,
+    hh3cNqaJitterStatsMaxOfNegativesSD        Gauge32,
+    hh3cNqaJitterStatsNumOfNegativesSD        Gauge32,
+    hh3cNqaJitterStatsSumOfNegativesSD        Gauge32,
+    hh3cNqaJitterStatsSum2NegativesSD         Gauge32,
+    hh3cNqaJitterStatsMinOfPositivesDS        Gauge32,
+    hh3cNqaJitterStatsMaxOfPositivesDS        Gauge32,
+    hh3cNqaJitterStatsNumOfPositivesDS        Gauge32,
+    hh3cNqaJitterStatsSumOfPositivesDS        Gauge32,
+    hh3cNqaJitterStatsSum2PositivesDS         Gauge32,
+    hh3cNqaJitterStatsMinOfNegativesDS        Gauge32,
+    hh3cNqaJitterStatsMaxOfNegativesDS        Gauge32,
+    hh3cNqaJitterStatsNumOfNegativesDS        Gauge32,
+    hh3cNqaJitterStatsSumOfNegativesDS        Gauge32,
+    hh3cNqaJitterStatsSum2NegativesDS         Gauge32,
+    hh3cNqaJitterStatsPacketLossSD            Gauge32,
+    hh3cNqaJitterStatsPacketLossDS            Gauge32,
+    hh3cNqaJitterStatsAvePositivesSD          Gauge32,
+    hh3cNqaJitterStatsAveNegativesSD          Gauge32,
+    hh3cNqaJitterStatsAvePositivesDS          Gauge32,
+    hh3cNqaJitterStatsAveNegativesDS          Gauge32,
+    hh3cNqaJitterStatsPktLossUnknown          Gauge32,
+    hh3cNqaJitterStatsOperOfICPIF             Gauge32,
+    hh3cNqaJitterStatsOperOfMOS               Gauge32,
+    hh3cNqaJitterStatsAveSD                   Gauge32,
+    hh3cNqaJitterStatsAveDS                   Gauge32,
+    hh3cNqaJitterStatsLostPacketPermillage    Gauge32
+}
+
+hh3cNqaJitterStatsNumOfRTT OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of received destination device responses with which
+        jitter test can reach round-trip time."
+    ::= { hh3cNqaJitterStatsEntry 1 }
+
+
+hh3cNqaJitterStatsMinOfPositivesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal positive jitter value from
+        source to destination in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 2 }
+
+hh3cNqaJitterStatsMaxOfPositivesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal positive jitter value from
+        source to destination in the jitter test."
+   ::= { hh3cNqaJitterStatsEntry 3 }
+
+hh3cNqaJitterStatsNumOfPositivesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number that records positive jitter times from source to
+        destination in the jitter test.
+        The total number of the value of all positive jitters in packets
+        sent from source to destination."
+    ::= { hh3cNqaJitterStatsEntry 4 }
+
+hh3cNqaJitterStatsSumOfPositivesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of positive jitter values from
+        source to destination in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 5 }
+
+hh3cNqaJitterStatsSum2PositivesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of positive jitter
+        values from source to destination in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 6 }
+
+hh3cNqaJitterStatsMinOfNegativesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal absolute values of
+        negative jitter value from source to destination in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 7 }
+
+hh3cNqaJitterStatsMaxOfNegativesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal absolute values of negative
+        jitter value from source to destination in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 8 }
+
+hh3cNqaJitterStatsNumOfNegativesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number that records negative jitter times from source to
+        destination in the jitter test.
+        The total number of all negative jitter values in packets
+        sent from source to destination."
+    ::= { hh3cNqaJitterStatsEntry 9 }
+
+hh3cNqaJitterStatsSumOfNegativesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of negative jitter values from
+        source to destination in the jitter test.
+        The total number of the value of all negative jitters in packets
+        sent from source to destination."
+    ::= { hh3cNqaJitterStatsEntry 10 }
+
+hh3cNqaJitterStatsSum2NegativesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of negative jitter
+        values from source to destination in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 11 }
+
+hh3cNqaJitterStatsMinOfPositivesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal positive jitter value from
+        destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 12 }
+
+hh3cNqaJitterStatsMaxOfPositivesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal positive jitter value from
+        destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 13 }
+
+hh3cNqaJitterStatsNumOfPositivesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number that records positive jitter times from destination to
+        source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 14 }
+
+hh3cNqaJitterStatsSumOfPositivesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of positive jitter values from
+        destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 15 }
+
+hh3cNqaJitterStatsSum2PositivesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of positive jitter
+        values from destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 16 }
+
+hh3cNqaJitterStatsMinOfNegativesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal absolute values of negative
+        jitter value from destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 17 }
+
+hh3cNqaJitterStatsMaxOfNegativesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal absolute values of negative
+        jitter value from destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 18 }
+
+hh3cNqaJitterStatsNumOfNegativesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number that records negative jitter times from destination to source
+        in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 19 }
+
+hh3cNqaJitterStatsSumOfNegativesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of negative jitter values from
+        destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 20 }
+
+hh3cNqaJitterStatsSum2NegativesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of negative jitter
+        values from destination to source in the jitter test."
+    ::= { hh3cNqaJitterStatsEntry 21 }
+
+hh3cNqaJitterStatsPacketLossSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lost packets number sent from source to destination."
+    ::= { hh3cNqaJitterStatsEntry 22 }
+
+hh3cNqaJitterStatsPacketLossDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lost packets number sent from destination to source."
+    ::= { hh3cNqaJitterStatsEntry 23 }
+
+hh3cNqaJitterStatsAvePositivesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average positive jitter value
+        from source to destination."
+    ::= { hh3cNqaJitterStatsEntry 24 }
+
+hh3cNqaJitterStatsAveNegativesSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average negative jitter value
+        from source to destination."
+    ::= { hh3cNqaJitterStatsEntry 25 }
+
+hh3cNqaJitterStatsAvePositivesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average positive jitter value
+        from destination to source."
+    ::= { hh3cNqaJitterStatsEntry 26 }
+
+hh3cNqaJitterStatsAveNegativesDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average negative jitter value
+        from destination to source."
+    ::= { hh3cNqaJitterStatsEntry 27 }
+
+hh3cNqaJitterStatsPktLossUnknown OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets which is lost with unknown reason."
+    ::= { hh3cNqaJitterStatsEntry 28 }
+
+hh3cNqaJitterStatsOperOfICPIF OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ICPIF (Calculated Planning Impairment Factor) value for the latest
+        jitter test."
+    ::= { hh3cNqaJitterStatsEntry 29 }
+
+hh3cNqaJitterStatsOperOfMOS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MOS (Mean Opinion Score) value for the latest jitter test."
+    ::= { hh3cNqaJitterStatsEntry 30 }
+
+hh3cNqaJitterStatsAveSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from source to destination."
+    ::= { hh3cNqaJitterStatsEntry 31 }
+
+hh3cNqaJitterStatsAveDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from destination to source."
+    ::= { hh3cNqaJitterStatsEntry 32 }
+
+hh3cNqaJitterStatsLostPacketPermillage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object reflects the drop rate of NQA
+        test packet.
+        For example, if the value is 100, that means source device
+        only had received 900 packets per thousand."
+    ::= { hh3cNqaJitterStatsEntry 33 }
+
+hh3cNqaAgentEnable OBJECT-TYPE
+    SYNTAX      INTEGER{
+                enable(1),
+                disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable NQA agent function."
+    DEFVAL { enable }
+    ::= { hh3cNqaObjects 5 }
+
+-- =================================================================
+--   Tcp server configuration information Statistics Table
+-- =================================================================
+
+
+hh3cNqaTcpServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cNqaTcpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of NQA tcp server
+        configuration information."
+    ::= { hh3cNqaObjects 6 }
+
+hh3cNqaTcpServerEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaTcpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of NQA tcp server
+        configuration information.
+
+        This entry includes not only the tcp server ip address
+        but also the tcp server port."
+    INDEX {
+            hh3cNqaTcpServerIpAddress,
+            hh3cNqaTcpServerPort
+          }
+    ::= { hh3cNqaTcpServerTable 1 }
+
+Hh3cNqaTcpServerEntry  ::= SEQUENCE
+{
+    hh3cNqaTcpServerIpAddress                InetAddress,
+    hh3cNqaTcpServerPort                     Integer32,
+    hh3cNqaTcpServerRowStatus                RowStatus
+}
+
+hh3cNqaTcpServerIpAddress          OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Tcp server's ip address."
+    ::= { hh3cNqaTcpServerEntry 1 }
+
+hh3cNqaTcpServerPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Tcp server's port number."
+    ::= { hh3cNqaTcpServerEntry 2 }
+
+hh3cNqaTcpServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "hh3cNqaTcpServerIpAddress and hh3cNqaTcpServerPort
+        must be set during a creation operation."
+    REFERENCE
+        "RFC 2579"
+    ::= { hh3cNqaTcpServerEntry 3 }
+
+hh3cNqaUdpServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cNqaUdpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status of NQA udp server configuration information."
+    ::= { hh3cNqaObjects 7 }
+
+hh3cNqaUdpServerEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaUdpServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry includes not only the udp server ip address
+        but also the udp server udp port."
+    INDEX {
+            hh3cNqaUdpServerIpAddress,
+            hh3cNqaUdpServerPort
+          }
+    ::= { hh3cNqaUdpServerTable 1 }
+
+Hh3cNqaUdpServerEntry  ::= SEQUENCE
+{
+    hh3cNqaUdpServerIpAddress                InetAddress,
+    hh3cNqaUdpServerPort                     Integer32,
+    hh3cNqaUdpServerRowStatus                RowStatus
+}
+
+hh3cNqaUdpServerIpAddress          OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Udp server's ip address."
+    ::= { hh3cNqaUdpServerEntry 1 }
+
+hh3cNqaUdpServerPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Udp server's port number."
+    ::= { hh3cNqaUdpServerEntry 2 }
+
+hh3cNqaUdpServerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "hh3cNqaUdpServerIpAddress and hh3cNqaUdpServerPort
+        must be set during a creation operation."
+    REFERENCE
+        "RFC 2579"
+    ::= { hh3cNqaUdpServerEntry 3 }
+
+hh3cNqaServerEnable OBJECT-TYPE
+    SYNTAX      INTEGER{
+                enable(1),
+                disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable NQA server function."
+    DEFVAL { disable }
+    ::= { hh3cNqaObjects 8 }
+
+hh3cNqaStatsMaxGroupNumber OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The maximum number saved per group. The maximum value of
+        hh3cNqaCtlStatisticsGroupNumber can not exceed the value of
+        this object."
+    ::= { hh3cNqaObjects 9 }
+
+
+hh3cNqaStatisticsCtlTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNqaStatisticsCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the NQA statistics control table for providing, via SNMP,
+        the capability of performing NQA operations at a remote host.
+        The results of these operations are stored in the
+        hh3cNqaStatisticsResultsTable and the hh3cNqaGroupStatsJitterTable."
+    ::= { hh3cNqaObjects 10 }
+
+hh3cNqaStatisticsCtlEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaStatisticsCtlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cNqaStatisticsCtlTable.
+        The hh3cNqaStatisticsCtlTable has the same index as the
+        pingCtlTable in order for a hh3cNqaStatisticsCtlTable to
+        correspond to the pingCtlEntry."
+    AUGMENTS    { pingCtlEntry }
+    ::= { hh3cNqaStatisticsCtlTable 1 }
+
+Hh3cNqaStatisticsCtlEntry ::=
+    SEQUENCE
+        {
+            hh3cNqaCtlStatisticsInterval       Unsigned32,
+            hh3cNqaCtlStatisticsGroupNumber    Unsigned32,
+            hh3cNqaCtlStatisticsKeptTime       Unsigned32,
+            hh3cNqaCtlBeginTime                DateAndTime,
+            hh3cNqaCtlLifeTime                 Unsigned32
+        }
+
+hh3cNqaCtlStatisticsInterval OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "minutes"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Statistic information will be calculated after the time that is
+        the value of hh3cNqaCtlStatisticsInterval."
+    ::= { hh3cNqaStatisticsCtlEntry 1 }
+
+hh3cNqaCtlStatisticsGroupNumber OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The value of this object indicates the number of group saved.
+        The length of this object is from 1 to hh3cNqaStatsMaxGroupNumber."
+    DEFVAL     { 2 }
+    ::= { hh3cNqaStatisticsCtlEntry 2 }
+
+hh3cNqaCtlStatisticsKeptTime OBJECT-TYPE
+    SYNTAX     Unsigned32(1..1440)
+    UNITS      "minutes"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "To indicate how long the statistic information will be saved after
+        the test stops."
+    DEFVAL     { 120 }
+    ::= { hh3cNqaStatisticsCtlEntry 3 }
+
+hh3cNqaCtlBeginTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Time at which the type-specified test will start."
+    ::= { hh3cNqaStatisticsCtlEntry 4 }
+
+hh3cNqaCtlLifeTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    UNITS      "seconds"
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "To indicate how long the type-specified test will last."
+    DEFVAL     { 0 }
+    ::= { hh3cNqaStatisticsCtlEntry 5 }
+
+hh3cNqaStatisticsResultsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNqaStatisticsResultsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the NQA statistics results table for providing
+        the capability of performing NQA operations at a remote
+        host. The statistics results of these operations in a statistic cycle
+        are stored in the hh3cNqaStatisticsResultsTable. The statistic cycle is
+        the value of hh3cNqaCtlStatisticsInterval.
+        The first two index identify the pingCtlEntry that the probe statistics
+        result (Hh3cNqaStatisticsResultsEntry) belongs to."
+
+    ::= { hh3cNqaObjects 11 }
+
+
+hh3cNqaStatisticsResultsEntry OBJECT-TYPE
+    SYNTAX       Hh3cNqaStatisticsResultsEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "Defines an entry in the hh3cNqaStatisticsResultsTable. The
+        hh3cNqaStatisticsResultsTable has the same index as the
+        pingCtlTable in order for a hh3cNqaStatisticsResultsEntry to
+        correspond to the pingCtlEntry that caused it to be created."
+    INDEX
+        {
+            pingCtlOwnerIndex,
+            pingCtlTestName,
+            hh3cNqaStatResIndex
+        }
+    ::= { hh3cNqaStatisticsResultsTable 1 }
+
+Hh3cNqaStatisticsResultsEntry ::=
+    SEQUENCE
+        {
+            hh3cNqaStatResIndex                  Unsigned32,
+            hh3cNqaStatResIpTargetAddressType    InetAddressType,
+            hh3cNqaStatResIpTargetAddress        InetAddress,
+            hh3cNqaStatResMinRtt                 Gauge32,
+            hh3cNqaStatResMaxRtt                 Gauge32,
+            hh3cNqaStatResAverageRtt             Gauge32,
+            hh3cNqaStatResProbeResponses         Counter32,
+            hh3cNqaStatResSentProbes             Counter32,
+            hh3cNqaStatResRttSumOfSquares        Counter32,
+            hh3cNqaStatResStartTime              DateAndTime,
+            hh3cNqaStatResInterval               Gauge32,
+            hh3cNqaStatResRttNumDisconnects      Counter32,
+            hh3cNqaStatResRttTimeouts            Counter32,
+            hh3cNqaStatResRttBusies              Counter32,
+            hh3cNqaStatResRttNoConnections       Counter32,
+            hh3cNqaStatResRttDrops               Counter32,
+            hh3cNqaStatResRttSequenceErrors      Counter32,
+            hh3cNqaStatResRttErrors              Counter32,
+            hh3cNqaStatResLostPacketRatio        Gauge32,
+            hh3cNqaStatResPacketLateArrival      Counter32,
+            hh3cNqaStatResRttSum                 Counter32,
+            hh3cNqaStatResNumOfDelaySD           Counter32,
+            hh3cNqaStatResMinDelaySD             Gauge32,
+            hh3cNqaStatResMaxDelaySD             Gauge32,
+            hh3cNqaStatResSumDelaySD             Counter32,
+            hh3cNqaStatResSum2DelaySD            Counter32,
+            hh3cNqaStatResNumOfDelayDS           Counter32,
+            hh3cNqaStatResMinDelayDS             Gauge32,
+            hh3cNqaStatResMaxDelayDS             Gauge32,
+            hh3cNqaStatResSumDelayDS             Counter32,
+            hh3cNqaStatResSum2DelayDS            Counter32,
+            hh3cNqaStatResLostPacketPermillage   Gauge32
+        }
+
+hh3cNqaStatResIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..'ffffffff'h)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created when the statistics
+        result of a NQA probe is determined.
+
+        An implementation MUST start assigning
+        hh3cNqaStatResIndex values at 1 and wrap after
+        exceeding the maximum possible value as defined by
+        the limit of this object ('ffffffff'h)."
+    ::= { hh3cNqaStatisticsResultsEntry 1 }
+
+hh3cNqaStatResIpTargetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the type of address stored
+        in the corresponding hh3cNqaStatResIpTargetAddress
+        object."
+    DEFVAL { unknown }
+    ::= { hh3cNqaStatisticsResultsEntry 2 }
+
+hh3cNqaStatResIpTargetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represent the host address to be used at a remote host for
+        performing a network analysis operation."
+    DEFVAL { ''H }
+    ::= { hh3cNqaStatisticsResultsEntry 3 }
+
+hh3cNqaStatResMinRtt  OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum NQA probe round-trip-time (RTT) received. The value
+        of 0 for this object implies that no RTT has been received."
+    ::= { hh3cNqaStatisticsResultsEntry 4 }
+
+hh3cNqaStatResMaxRtt OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum NQA probe round-trip-time (RTT) received. The value
+        of 0 for this object implies that no RTT has been received."
+    ::= { hh3cNqaStatisticsResultsEntry 5 }
+
+hh3cNqaStatResAverageRtt OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average NQA probe round-trip-time (RTT)."
+    ::= { hh3cNqaStatisticsResultsEntry 6 }
+
+hh3cNqaStatResProbeResponses OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of responses received. The value of this object
+        MUST be reported as 0 when no probe responses have been
+        received."
+    ::= { hh3cNqaStatisticsResultsEntry 7 }
+
+hh3cNqaStatResSentProbes OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "probes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object reflects the number of probes sent.
+        The value of this object MUST be reported as 0 when no probes
+        have been sent."
+    ::= { hh3cNqaStatisticsResultsEntry 8 }
+
+hh3cNqaStatResRttSumOfSquares OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the sum of the squares for all NQA
+        responses received. The value of this object MUST
+        be reported as 0 when no NQA responses have been
+        received."
+    ::= { hh3cNqaStatisticsResultsEntry 9 }
+
+hh3cNqaStatResStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the start time of the statistic."
+    ::= { hh3cNqaStatisticsResultsEntry 10 }
+
+hh3cNqaStatResInterval OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the interval between two times of statistic."
+    ::= { hh3cNqaStatisticsResultsEntry 11 }
+
+hh3cNqaStatResRttNumDisconnects OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA probe failed because the destination
+        became disconnected.
+        For connectionless protocol pingCtlTypes, this number should be
+        zero."
+    ::= { hh3cNqaStatisticsResultsEntry 12 }
+
+hh3cNqaStatResRttTimeouts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of times that a probe failed because the probe timed out."
+    ::= { hh3cNqaStatisticsResultsEntry 13 }
+
+hh3cNqaStatResRttBusies OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA probe failed because
+        errors related to sockets."
+    ::= { hh3cNqaStatisticsResultsEntry 14 }
+
+hh3cNqaStatResRttNoConnections OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA probe failed because the
+        probe destination is unavailable.
+        For connectionless protocol pingCtlTypes, this number should be
+        zero."
+    ::= { hh3cNqaStatisticsResultsEntry 15 }
+
+hh3cNqaStatResRttDrops OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times that a NQA operation failed to initiate
+        for unavailibility of necessary internal resources."
+    ::= { hh3cNqaStatisticsResultsEntry 16 }
+
+hh3cNqaStatResRttSequenceErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets arrived out of sequence."
+    ::= { hh3cNqaStatisticsResultsEntry 17 }
+
+hh3cNqaStatResRttErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of other errors."
+    ::= { hh3cNqaStatisticsResultsEntry 18 }
+
+hh3cNqaStatResLostPacketRatio OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object reflects the drop rate of NQA
+        test packet.
+        For example, if the value is 30, that means source device
+        only had received 70 percent packets of total sent packets."
+    ::= { hh3cNqaStatisticsResultsEntry 19 }
+
+hh3cNqaStatResPacketLateArrival OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object reflects the number of the packets that
+        arrived after the timeout."
+    ::= { hh3cNqaStatisticsResultsEntry 20 }
+
+hh3cNqaStatResRttSum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object contains the sum for all NQA responses received
+         during the test lifetime.  The value of this object MUST be
+         reported as 0 when no NQA responses have been received."
+    ::= { hh3cNqaStatisticsResultsEntry 21 }
+
+hh3cNqaStatResNumOfDelaySD OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of one way times from source to destination that are
+        successfully measured."
+    ::= { hh3cNqaStatisticsResultsEntry 22 }
+
+hh3cNqaStatResMinDelaySD OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum one way times from source to destination."
+    ::= { hh3cNqaStatisticsResultsEntry 23 }
+
+hh3cNqaStatResMaxDelaySD OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum one way times from source to destination."
+    ::= { hh3cNqaStatisticsResultsEntry 24 }
+
+hh3cNqaStatResSumDelaySD OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of one way times from source to destination."
+    ::= { hh3cNqaStatisticsResultsEntry 25 }
+
+hh3cNqaStatResSum2DelaySD OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of squares of one way times from source to destination."
+    ::= { hh3cNqaStatisticsResultsEntry 26 }
+
+hh3cNqaStatResNumOfDelayDS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of one way times from destination to source that are
+        successfully measured."
+    ::= { hh3cNqaStatisticsResultsEntry 27 }
+
+hh3cNqaStatResMinDelayDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum one way times from destination to source."
+    ::= { hh3cNqaStatisticsResultsEntry 28 }
+
+hh3cNqaStatResMaxDelayDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum one way times from destination to source."
+    ::= { hh3cNqaStatisticsResultsEntry 29 }
+
+hh3cNqaStatResSumDelayDS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of one way times from destination to source."
+    ::= { hh3cNqaStatisticsResultsEntry 30 }
+
+hh3cNqaStatResSum2DelayDS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sum of squares of one way times from destination to source."
+    ::= { hh3cNqaStatisticsResultsEntry 31 }
+
+hh3cNqaStatResLostPacketPermillage OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of this object reflects the drop rate of NQA
+        test packet.
+        For example, if the value is 100, that means source device
+        only had received 900 packets per thousand."
+    ::= { hh3cNqaStatisticsResultsEntry 32 }
+
+
+
+-- =================================================================
+--    hh3cNqaGroupStatsJitterTable
+-- =================================================================
+
+hh3cNqaGroupStatsJitterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNqaGroupStatsJitterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Test Group Statistic table for jitter activity in a statistic cycle.
+        The statistic cycle is the value of hh3cNqaCtlStatisticsInterval.
+        The first two index identify the pingCtlEntry that a probe statistics
+        result (Hh3cNqaStatisticsResultsEntry) belongs to."
+    ::= { hh3cNqaObjects 12 }
+
+hh3cNqaGroupStatsJitterEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaGroupStatsJitterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the group statistic information for jitter activity.
+        This entry is created only if the pingCtlType is hh3cNqajitter."
+    INDEX
+        {
+            pingCtlOwnerIndex,
+            pingCtlTestName,
+            hh3cNqaStatJitterIndex
+        }
+    ::= { hh3cNqaGroupStatsJitterTable 1 }
+
+Hh3cNqaGroupStatsJitterEntry ::=
+    SEQUENCE
+        {
+            hh3cNqaStatJitterIndex               Unsigned32,
+            hh3cNqaStatJitterMinOfPosSD          Gauge32,
+            hh3cNqaStatJitterMaxOfPosSD          Gauge32,
+            hh3cNqaStatJitterNumOfPosSD          Counter32,
+            hh3cNqaStatJitterSumOfPosSD          Counter32,
+            hh3cNqaStatJitterSumOfSquarePosSD    Counter32,
+            hh3cNqaStatJitterMinOfNegSD          Gauge32,
+            hh3cNqaStatJitterMaxOfNegSD          Gauge32,
+            hh3cNqaStatJitterNumOfNegSD          Counter32,
+            hh3cNqaStatJitterSumOfNegSD          Counter32,
+            hh3cNqaStatJitterSumOfSquareNegSD    Counter32,
+            hh3cNqaStatJitterMinOfPosDS          Gauge32,
+            hh3cNqaStatJitterMaxOfPosDS          Gauge32,
+            hh3cNqaStatJitterNumOfPosDS          Counter32,
+            hh3cNqaStatJitterSumOfPosDS          Counter32,
+            hh3cNqaStatJitterSumOfSquarePosDS    Counter32,
+            hh3cNqaStatJitterMinOfNegDS          Gauge32,
+            hh3cNqaStatJitterMaxOfNegDS          Gauge32,
+            hh3cNqaStatJitterNumOfNegDS          Counter32,
+            hh3cNqaStatJitterSumOfNegDS          Counter32,
+            hh3cNqaStatJitterSumOfSquareNegDS    Counter32,
+            hh3cNqaStatJitterPacketLossSD        Counter32,
+            hh3cNqaStatJitterPacketLossDS        Counter32,
+            hh3cNqaStatJitterAvePosSD            Gauge32,
+            hh3cNqaStatJitterAveNegSD            Gauge32,
+            hh3cNqaStatJitterAvePosDS            Gauge32,
+            hh3cNqaStatJitterAveNegDS            Gauge32,
+            hh3cNqaStatJitterPktLossUnknown      Counter32,
+            hh3cNqaStatJitterMaxOfICPIF          Gauge32,
+            hh3cNqaStatJitterMinOfICPIF          Gauge32,
+            hh3cNqaStatJitterMaxOfMOS            Gauge32,
+            hh3cNqaStatJitterMinOfMOS            Gauge32,
+            hh3cNqaStatJitterAveSD               Gauge32,
+            hh3cNqaStatJitterAveDS               Gauge32
+        }
+
+hh3cNqaStatJitterIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..'ffffffff'h)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created when the statistic
+        result of a NQA probe in a statistic cycle is determined.
+
+        An implementation MUST start assigning hh3cNqaStatJitterIndex
+        values at 1 and wrap after exceeding the maximum possible
+        value as defined by the limit of this object ('ffffffff'h)."
+    ::= { hh3cNqaGroupStatsJitterEntry 1 }
+
+hh3cNqaStatJitterMinOfPosSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal positive jitter value
+        from source to destination in jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 2 }
+
+hh3cNqaStatJitterMaxOfPosSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal positive jitter value
+        from source to destination in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 3 }
+
+hh3cNqaStatJitterNumOfPosSD OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of positive jitters from source to destination in the
+        jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 4 }
+
+hh3cNqaStatJitterSumOfPosSD OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of positive jitter values
+        from source to destination in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 5 }
+
+hh3cNqaStatJitterSumOfSquarePosSD OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of positive jitter
+        values from source to destination in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 6 }
+
+hh3cNqaStatJitterMinOfNegSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal absolute values of
+        negative jitter value from source to destination in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 7 }
+
+hh3cNqaStatJitterMaxOfNegSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal absolute values of negative
+        jitter value from source to destination in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 8 }
+
+hh3cNqaStatJitterNumOfNegSD OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of negative jitters from source to destination in the
+        jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 9 }
+
+hh3cNqaStatJitterSumOfNegSD OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of negative jitter values
+        from source to destination in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 10 }
+
+hh3cNqaStatJitterSumOfSquareNegSD OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of negative jitter
+        values from source to destination in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 11 }
+
+hh3cNqaStatJitterMinOfPosDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal positive jitter value
+        from destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 12 }
+
+hh3cNqaStatJitterMaxOfPosDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal positive jitter value
+        from destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 13 }
+
+hh3cNqaStatJitterNumOfPosDS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of positive jitters from destination to source in the
+        jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 14 }
+
+hh3cNqaStatJitterSumOfPosDS OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of positive jitter values
+        from destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 15 }
+
+hh3cNqaStatJitterSumOfSquarePosDS OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of positive jitter
+        values destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 16 }
+
+hh3cNqaStatJitterMinOfNegDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimal absolute values of negative
+        jitter value from destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 17 }
+
+hh3cNqaStatJitterMaxOfNegDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximal absolute values of negative
+        jitter value from destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 18 }
+
+hh3cNqaStatJitterNumOfNegDS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of negative jitters from destination to source in the
+        jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 19 }
+
+hh3cNqaStatJitterSumOfNegDS OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of negative jitter values
+        from destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 20 }
+
+hh3cNqaStatJitterSumOfSquareNegDS OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the sum of square of negative jitter
+        values from destination to source in the jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 21 }
+
+hh3cNqaStatJitterPacketLossSD OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lost packets number sent from source to destination."
+    ::= { hh3cNqaGroupStatsJitterEntry 22 }
+
+hh3cNqaStatJitterPacketLossDS OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lost packets number sent from destination to source."
+    ::= { hh3cNqaGroupStatsJitterEntry 23 }
+
+hh3cNqaStatJitterAvePosSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average positive jitter value
+        from source to destination."
+    ::= { hh3cNqaGroupStatsJitterEntry 24 }
+
+hh3cNqaStatJitterAveNegSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average negative jitter value
+        from source to destination."
+    ::= { hh3cNqaGroupStatsJitterEntry 25 }
+
+hh3cNqaStatJitterAvePosDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average positive jitter value
+        from destination to source."
+    ::= { hh3cNqaGroupStatsJitterEntry 26 }
+
+hh3cNqaStatJitterAveNegDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average negative jitter value
+        from destination to source."
+    ::= { hh3cNqaGroupStatsJitterEntry 27 }
+
+hh3cNqaStatJitterPktLossUnknown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets which is lost with unknown reason."
+    ::= { hh3cNqaGroupStatsJitterEntry 28 }
+
+hh3cNqaStatJitterMaxOfICPIF OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum of all ICPIF values in a statistic cycle for jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 29 }
+
+hh3cNqaStatJitterMinOfICPIF OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum of all ICPIF values in a statistic cycle for jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 30 }
+
+hh3cNqaStatJitterMaxOfMOS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum of all MOS values in a statistic cycle for jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 31 }
+
+hh3cNqaStatJitterMinOfMOS OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum of all MOS values in a statistic cycle for jitter test."
+    ::= { hh3cNqaGroupStatsJitterEntry 32 }
+
+hh3cNqaStatJitterAveSD OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from source to destination."
+    ::= { hh3cNqaGroupStatsJitterEntry 33 }
+
+hh3cNqaStatJitterAveDS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        from destination to source."
+    ::= { hh3cNqaGroupStatsJitterEntry 34 }
+
+-- Reaction Table
+hh3cNqaReactionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNqaReactionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of NQA test monitoring notification and
+        reaction configuration definitions.
+
+        An entry is removed from this table when its
+        corresponding pingCtlEntry is deleted.
+
+         When PingCtlType of the test is hh3cNqaTwampLight,
+         it does not support the table."
+  ::= { hh3cNqaObjects 13 }
+
+hh3cNqaReactionEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaReactionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cNqaReactionTable. The first two index
+        elements identify the pingCtlEntry that a hh3cNqaReactItemIndex
+        belongs to. The third index element selects a single reaction."
+    INDEX
+        {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex
+        }
+    ::= { hh3cNqaReactionTable 1 }
+
+Hh3cNqaReactionEntry ::=
+    SEQUENCE
+        {
+            hh3cNqaReactOwnerIndex                   SnmpAdminString,
+            hh3cNqaReactTestName                     SnmpAdminString,
+            hh3cNqaReactItemIndex                    Unsigned32,
+            hh3cNqaReactCheckedElement               INTEGER,
+            hh3cNqaReactThresholdUpperLimit          Unsigned32,
+            hh3cNqaReactThresholdLowerLimit          Unsigned32,
+            hh3cNqaReactThresholdType                INTEGER,
+            hh3cNqaReactThresholdConsecNum           Unsigned32,
+            hh3cNqaReactThresholdAccumNum            Unsigned32,
+            hh3cNqaReactActionType                   INTEGER,
+            hh3cNqaReactCurrentStatus                INTEGER,
+            hh3cNqaReactRowStatus                    RowStatus,
+            hh3cNqaReactCheckedNum                   Unsigned32,
+            hh3cNqaReactThresholdNum                 Unsigned32
+        }
+
+hh3cNqaReactOwnerIndex OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The first index of hh3cNqaReactionTable, it is the same as
+        pingCtlOwnerIndex in pingCtlTable. hh3cNqaReactOwnerIndex and
+        hh3cNqaReactTestName identify an existed test."
+    ::= { hh3cNqaReactionEntry 1 }
+
+hh3cNqaReactTestName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The second index of hh3cNqaReactionTable, it is the same as
+        pingCtlTestName in pingCtlTable. hh3cNqaReactOwnerIndex and
+        hh3cNqaReactTestName identify an existed test."
+    ::= { hh3cNqaReactionEntry 2 }
+
+hh3cNqaReactItemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The third index of hh3cNqaReactionTable, it definitely
+        identifies one of the reaction configurations for a test."
+    ::= { hh3cNqaReactionEntry 3 }
+
+hh3cNqaReactCheckedElement OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          probetime(1),
+                          probefailure(2),
+                          jitterrtt(3),
+                          jitterpacketloss(4),
+                          jittersd(5),
+                          jitterds(6),
+                          icpif(7),
+                          mos(8),
+                          jitterOwdSD(9),
+                          jitterOwdDS(10)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A list of reaction condition type.
+        'probetime' and 'probefailure' are valid when pingCtlType of
+        the test is not hh3cNqajitter.
+
+        'jitterOwdSD': one way time from source to destination in
+                       jitter test.
+        'jitterOwdDS': one way time from destination to source in
+                       jitter test.
+
+        'jitterrtt', 'jitterpacketloss', 'jittersd', 'jitterds',
+        'jitterOwdSD' and 'jitterOwdDS' are valid when pingCtlType
+        of the test is hh3cNqajitter.
+
+        'icpif' and 'mos' are valid when pingCtlType of the test is
+        hh3cNqajitter and hh3cNqaCtlCodecType is 'g711Alaw' or 'g711Ulaw'
+        or 'g729A'."
+     ::= { hh3cNqaReactionEntry 4 }
+
+hh3cNqaReactThresholdUpperLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object defines an administrative upper-threshold value for
+        hh3cNqaReactCheckedElement.
+
+        The value of this object is zero if hh3cNqaReactCheckedElement is
+        specified as 'jitterpacketloss' and 'probefailure'."
+    DEFVAL { 0 }
+    ::= { hh3cNqaReactionEntry 5 }
+
+hh3cNqaReactThresholdLowerLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object defines an administrative lower-threshold value for
+        hh3cNqaReactCheckedElement.
+
+        The value of hh3cNqaReactThresholdLowerLimit should be equal or less
+        than the value of hh3cNqaReactThresholdUpperLimit.
+
+        The value of this object is zero if hh3cNqaReactCheckedElement is
+        specified as 'jitterpacketloss' and 'probefailure'."
+    DEFVAL { 0 }
+    ::= { hh3cNqaReactionEntry 6 }
+
+hh3cNqaReactThresholdType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           invalid(0),
+                           average(1),
+                           consecutive(2),
+                           accumulative(3)
+                       }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object defines the reaction threshold types.
+
+        invalid(0):     Invalid value.
+
+        average(1):     If reaction threshold type is average and the average
+                        value of watched operation exceeds threshold limit,
+                        an action specified in hh3cNqaReactActionType is
+                        generated when hh3cNqaReactCurrentStatus changes.
+
+        consecutive(2): If reaction threshold type is consecutive and
+                        the times of watched operation consecutively exceeds
+                        the limit specified by hh3cNqaReactThresholdConsecNum,
+                        an action specified in hh3cNqaReactActionType is
+                        generated when hh3cNqaReactCurrentStatus changes.
+
+        accumulative(3): If reaction threshold type is accumulative and
+                        the times of watched operation accumulatively exceeds
+                        the limit specified by hh3cNqaReactThresholdAccumNum,
+                        an action specified in hh3cNqaReactActionType is
+                        generated when hh3cNqaReactCurrentStatus changes.
+
+        If reaction threshold type is not configured, the value of this
+        object is 'invalid'."
+    ::= { hh3cNqaReactionEntry 7 }
+
+hh3cNqaReactThresholdConsecNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object defines a consecutive threshold limit.
+
+        The value is zero when hh3cNqaReactThresholdType
+        is not 'consecutive'."
+    DEFVAL { 0 }
+    ::= { hh3cNqaReactionEntry 8 }
+
+hh3cNqaReactThresholdAccumNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object defines an accumulative threshold limit.
+
+        The value is zero when the hh3cNqaReactThresholdType
+        is not 'accumulative'."
+    DEFVAL { 0 }
+    ::= { hh3cNqaReactionEntry 9 }
+
+hh3cNqaReactActionType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           none(0),
+                           trapOnly(1),
+                           triggerOnly(2),
+                           trapAndTrigger(3)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of reaction to generate if the specified
+        violation type occurs for the monitored element:
+
+        none               - No reaction is generated
+        trapOnly           - A trap is generated
+        triggerOnly        - All trigger actions defined for this
+                             entry are generated
+        trapAndTrigger     - Both a trap and all trigger actions
+                             are generated "
+    DEFVAL { none }
+    ::= { hh3cNqaReactionEntry 10 }
+
+hh3cNqaReactCurrentStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            invalid(1),
+                            overThreshold(2),
+                            belowThreshold(3),
+                            overUpperThreshold(4),
+                            belowLowerThreshold(5)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the current status of this reaction entry:
+
+        invalid  - The status of the reaction entry is unknown.
+
+        overThreshold       - The status of the reaction entry is overThreshold
+                              when the monitored result exceeds the threshold
+                              value for the hh3cNqaReactThresholdType.
+
+        belowThreshold      - The status of the reaction entry is belowThreshold
+                              when the monitored result is under the threshold
+                              value for the hh3cNqaReactThresholdType.
+
+        overUpperThreshold  - The status of the reaction entry is overThreshold
+                              when the monitored result is exceeds the
+                              upper-threshold value for the
+                              hh3cNqaReactThresholdType.
+
+        belowLowerThreshold - The status of the reaction entry is belowThreshold
+                              when the monitored result is under the
+                              lower-threshold value for
+                              hh3cNqaReactThresholdType."
+
+    ::= { hh3cNqaReactionEntry 11 }
+
+hh3cNqaReactRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the hh3cNqaReactionTable.
+
+        Creation of an entry in this table results in a new set of reaction
+        configurations which take effect immediately.
+
+        Deletion of an entry in this table results in corresponding reaction
+        configurations are being deleted and stop taking effect."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { hh3cNqaReactionEntry 12 }
+
+hh3cNqaReactCheckedNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of checked element samples that are monitored."
+    DEFVAL { 0 }
+    ::= { hh3cNqaReactionEntry 13 }
+
+hh3cNqaReactThresholdNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of checked element samples that are over threshold."
+    DEFVAL { 0 }
+    ::= { hh3cNqaReactionEntry 14 }
+
+-- Statistics Reaction Table
+hh3cNqaStatisticsReactionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cNqaStatisticsReactionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of NQA test monitoring notification and
+        reaction configuration definitions.
+
+        An entry is removed from this table when its
+        corresponding pingCtlEntry is deleted."
+  ::= { hh3cNqaObjects 14 }
+
+hh3cNqaStatisticsReactionEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaStatisticsReactionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cNqaStatisticsReactionTable. The
+        first two index elements identify the pingCtlEntry that a
+        hh3cNqaReactItemIndex belongs to. The third index element
+        identifies an entry in the hh3cNqaStatisticsResultsTable.
+        The forth index element selects a single reaction."
+    INDEX
+        {
+            hh3cNqaStatReactOwnerIndex,
+            hh3cNqaStatReactTestName,
+            hh3cNqaStatReactIndex,
+            hh3cNqaStatReactItemIndex
+        }
+    ::= { hh3cNqaStatisticsReactionTable 1 }
+
+Hh3cNqaStatisticsReactionEntry ::=
+    SEQUENCE
+        {
+            hh3cNqaStatReactOwnerIndex               SnmpAdminString,
+            hh3cNqaStatReactTestName                 SnmpAdminString,
+            hh3cNqaStatReactIndex                    Unsigned32,
+            hh3cNqaStatReactItemIndex                Unsigned32,
+            hh3cNqaStatReactCheckedNum               Counter32,
+            hh3cNqaStatReactThresholdNum             Counter32
+        }
+
+hh3cNqaStatReactOwnerIndex OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The first index of hh3cNqaStatisticsReactionTable, it is the same
+        as pingCtlOwnerIndex in pingCtlTable."
+    ::= { hh3cNqaStatisticsReactionEntry 1 }
+
+hh3cNqaStatReactTestName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The second index of hh3cNqaStatisticsReactionTable, it is the same
+        as pingCtlTestName in pingCtlTable."
+    ::= { hh3cNqaStatisticsReactionEntry 2 }
+
+hh3cNqaStatReactIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The third index of hh3cNqaStatisticsReactionTable. An entry in
+        this table is created when the statistics result of a NQA probe
+        is determined.
+
+        An implementation MUST start assigning hh3cNqaStatResIndex values
+        at 1 and wrap after exceeding the maximum possible value as
+        defined by the limit of this object ('ffffffff'h)."
+    DEFVAL { 0 }
+    ::= { hh3cNqaStatisticsReactionEntry 3 }
+
+hh3cNqaStatReactItemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The forth index of hh3cNqaStatisticsReactionTable, it definitely
+        identifies one of the reaction configurations for a test"
+    DEFVAL { 0 }
+    ::= { hh3cNqaStatisticsReactionEntry 4 }
+
+hh3cNqaStatReactCheckedNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of checked element samples that are monitored."
+    DEFVAL { 0 }
+    ::= { hh3cNqaStatisticsReactionEntry 5 }
+
+hh3cNqaStatReactThresholdNum OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of checked element samples that are over threshold."
+    DEFVAL { 0 }
+    ::= { hh3cNqaStatisticsReactionEntry 6 }
+
+-- =================================================================
+--   NQA server configuration extended information
+-- =================================================================
+
+hh3cNqaTcpServerExtendTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cNqaTcpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of extended NQA TCP server
+        configuration information."
+    ::= { hh3cNqaObjects 15 }
+
+hh3cNqaTcpServerExtendEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaTcpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of extended NQA TCP server
+        configuration information.
+        This entry includes the TCP server IP address, port,
+        VPN name and DSField."
+    INDEX {
+            hh3cNqaTcpServerExtIpAddress,
+            hh3cNqaTcpServerExtPort,
+            hh3cNqaTcpServerExtVPNType,
+            hh3cNqaTcpServerExtVPNInstance
+          }
+    ::= { hh3cNqaTcpServerExtendTable 1 }
+
+Hh3cNqaTcpServerExtendEntry  ::= SEQUENCE
+{
+    hh3cNqaTcpServerExtIpAddress                InetAddress,
+    hh3cNqaTcpServerExtPort                     Integer32,
+    hh3cNqaTcpServerExtVPNType                  VpnInstanceType,
+    hh3cNqaTcpServerExtVPNInstance              OCTET STRING,
+    hh3cNqaTcpServerExtDSField                  Unsigned32,
+    hh3cNqaTcpServerExtRowStatus                RowStatus
+}
+
+hh3cNqaTcpServerExtIpAddress          OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's IP address."
+    ::= { hh3cNqaTcpServerExtendEntry 1 }
+
+hh3cNqaTcpServerExtPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's port number."
+    ::= { hh3cNqaTcpServerExtendEntry 2 }
+
+hh3cNqaTcpServerExtVPNType OBJECT-TYPE
+    SYNTAX      VpnInstanceType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's VPN instance type."
+    ::= { hh3cNqaTcpServerExtendEntry 3 }
+
+hh3cNqaTcpServerExtVPNInstance OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "TCP server's VPN name.If the NQA server listens on the public network,
+        the value of hh3cNqaTcpServerExtVPNType must be public(1) and the value
+        of this object can be set to any non-printable character string.If the
+        NQA server listens on the private network, the value of hh3cNqaTcpServerExtVPNType
+        must be vpn(2) and the value of this object can be set to any non-printable
+        character string."
+    ::= { hh3cNqaTcpServerExtendEntry 4 }
+
+hh3cNqaTcpServerExtDSField OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..256)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value to store in the Differentiated
+        Services (DS) Field in the IP packet used to
+        encapsulate the probe.  The DS Field is defined
+        as the Type of Service (TOS) octet in a IPv4 header
+        or as the Traffic Class octet in a IPv6 header.
+
+        The value of this object must be a decimal integer
+        in the range of 0 to 255.  Not all values are legal or
+        meaningful.  A value of 0 means that the function
+        represented by this option is not supported.  The value
+        of 256 indicates that TOS is not configured, and this
+        value is not supported by IP implementations.  DS Field
+        usage is often not supported by IP implementations and
+        not all values are supported.  Refer to RFC 2474 for
+        guidance on usage of this field."
+    REFERENCE
+        "Refer to RFC 2474 for the definition of the
+        Differentiated Services Field and to RFC 1812
+        Section 5.3.2 for Type of Service (TOS)."
+    ::= { hh3cNqaTcpServerExtendEntry 5 }
+
+hh3cNqaTcpServerExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "hh3cNqaTcpServerIpAddress, hh3cNqaTcpServerPort, hh3cNqaTcpServerExtVPNType
+        and hh3cNqaTcpServerVPNInstance must be set during a creation operation."
+    REFERENCE
+        "RFC 2579"
+    ::= { hh3cNqaTcpServerExtendEntry 6 }
+
+hh3cNqaUdpServerExtendTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cNqaUdpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Status of extended NQA UDP server configuration information."
+    ::= { hh3cNqaObjects 16 }
+
+hh3cNqaUdpServerExtendEntry OBJECT-TYPE
+    SYNTAX      Hh3cNqaUdpServerExtendEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which contains the status of extended NQA UDP server
+        configuration information.
+        This entry includes the UDP server IP address, port,
+        VPN name and DSField."
+    INDEX {
+            hh3cNqaUdpServerExtIpAddress,
+            hh3cNqaUdpServerExtPort,
+            hh3cNqaUdpServerExtVPNType,
+            hh3cNqaUdpServerExtVPNInstance
+          }
+    ::= { hh3cNqaUdpServerExtendTable 1 }
+
+Hh3cNqaUdpServerExtendEntry  ::= SEQUENCE
+{
+    hh3cNqaUdpServerExtIpAddress                InetAddress,
+    hh3cNqaUdpServerExtPort                     Integer32,
+    hh3cNqaUdpServerExtVPNType                  VpnInstanceType,
+    hh3cNqaUdpServerExtVPNInstance              OCTET STRING,
+    hh3cNqaUdpServerExtDSField                  Unsigned32,
+    hh3cNqaUdpServerExtRowStatus                RowStatus
+}
+
+hh3cNqaUdpServerExtIpAddress          OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's IP address."
+    ::= { hh3cNqaUdpServerExtendEntry 1 }
+
+hh3cNqaUdpServerExtPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65536)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's port number."
+    ::= { hh3cNqaUdpServerExtendEntry 2 }
+
+hh3cNqaUdpServerExtVPNType OBJECT-TYPE
+    SYNTAX      VpnInstanceType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's VPN instance type."
+    ::= { hh3cNqaUdpServerExtendEntry 3 }
+
+hh3cNqaUdpServerExtVPNInstance OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "UDP server's VPN name.If the NQA server listens on the public network,
+        the value of hh3cNqaUdpServerExtVPNType must be public(1) and the value
+        of this object can be set to any non-printable character string.If the
+        NQA server listens on the private network, the value of hh3cNqaUdpServerExtVPNType
+        must be vpn(2) and the value of this object can be set to any non-printable
+        character string."
+    ::= { hh3cNqaUdpServerExtendEntry 4 }
+
+hh3cNqaUdpServerExtDSField OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..256)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value to store in the Differentiated
+        Services (DS) Field in the IP packet used to
+        encapsulate the probe.  The DS Field is defined
+        as the Type of Service (TOS) octet in a IPv4 header
+        or as the Traffic Class octet in a IPv6 header.
+
+        The value of this object must be a decimal integer
+        in the range of 0 to 255.  Not all values are legal or
+        meaningful.  A value of 0 means that the function
+        represented by this option is not supported.  The value
+        of 256 indicates that TOS is not configured, and this
+        value is not supported by IP implementations.  DS Field
+        usage is often not supported by IP implementations and
+        not all values are supported.  Refer to RFC 2474 for
+        guidance on usage of this field."
+    REFERENCE
+        "Refer to RFC 2474 for the definition of the
+        Differentiated Services Field and to RFC 1812
+        Section 5.3.2 for Type of Service (TOS)."
+    ::= { hh3cNqaUdpServerExtendEntry 5 }
+
+hh3cNqaUdpServerExtRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "hh3cNqaUdpServerIpAddress, hh3cNqaUdpServerPort, hh3cNqaUdpServerExtVPNType
+        and hh3cNqaUdpServerVPNInstance must be set during a creation operation."
+    REFERENCE
+        "RFC 2579"
+    ::= { hh3cNqaUdpServerExtendEntry 6 }
+
+-- Notification Definition section
+hh3cNqaNotifications  OBJECT IDENTIFIER ::= { hh3cNqa 3 }
+hh3cNqaProbeTimeOverThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. Probe time(equals to RTT for some type of tests) is not in
+             the range hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit.
+          2. The probe time is accumulatively not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times
+             specified in hh3cNqaReactThresholdAccumNum.
+          3. The probe time is consecutively in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times
+             specified in hh3cNqaReactThresholdConsecNum.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is not hh3cNqajitter."
+    ::= { hh3cNqaNotifications 1 }
+
+hh3cNqaJitterRTTOverThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. The average NQA round-trip-time (RTT) of jitter packets
+             is not in the range hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit.
+          2. The RTT of jitter packets is accumulatively not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times specified
+             in hh3cNqaReactThresholdAccumNum in one test.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is hh3cNqajitter or hh3cNqaTwampLight."
+    ::= { hh3cNqaNotifications 2 }
+
+hh3cNqaProbeFailure NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. When the probe test accumulatively failed for a
+             number of times specified in hh3cNqaReactThresholdAccumNum in one
+             test while the value of hh3cNqaReactThresholdType is 'accumulative'.
+          2. When the probe test consecutively failed for
+             a number of times specified in hh3cNqaReactThresholdConsecNum in one
+             test while the value of hh3cNqaReactThresholdType is 'consecutive'.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is not hh3cNqajitter."
+    ::= { hh3cNqaNotifications 3 }
+
+hh3cNqaJitterPacketLoss NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. When the jitter packets accumulatively lost for a
+             number of times specified in hh3cNqaReactThresholdAccumNum in one
+             test while the value of hh3cNqaReactThresholdType is 'accumulative'.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is hh3cNqajitter or hh3cNqaTwampLight."
+    ::= { hh3cNqaNotifications 4 }
+
+hh3cNqaJitterSDOverThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "The SD means the jitter values from source to destination.
+
+        It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. The average of SD in one jitter test is not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit and the
+             hh3cNqaReactThresholdType is specified as 'average' type.
+          2. The average of SD in one jitter test is accumulatively
+             not in the range hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times specified
+             in hh3cNqaReactThresholdAccumNum and the
+             hh3cNqaReactThresholdType is specified as 'accumulative' type.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is hh3cNqajitter."
+    ::= { hh3cNqaNotifications 5 }
+
+hh3cNqaJitterDSOverThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "The DS means the jitter values from destination to source.
+
+        It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. The average of DS in one jitter test is not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit and the
+             hh3cNqaReactThresholdType is specified as 'average' type.
+          2. The average of DS in one jitter test is accumulatively not
+             in the range hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times specified
+             in hh3cNqaReactThresholdAccumNum and the
+             hh3cNqaReactThresholdType is specified as 'accumulative' type.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is hh3cNqajitter."
+    ::= { hh3cNqaNotifications 6 }
+
+hh3cNqaICPIFOverThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. When the ICPIF value in one jitter test is not in
+             the range hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger', pingCtlType of the test
+        is hh3cNqajitter and hh3cNqaCtlCodecType is 'g711Alaw' or 'g711Ulaw'
+        or 'g729A'."
+    ::= { hh3cNqaNotifications 7 }
+
+hh3cNqaMOSOverThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is over threshold
+        or below threshold.
+
+        The over threshold situations is specified as below.
+          1. When the MOS value in one jitter test is not in
+             the range hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger', pingCtlType of the test
+        is hh3cNqajitter and hh3cNqaCtlCodecType is 'g711Alaw' or 'g711Ulaw'
+        or 'g729A'."
+    ::= { hh3cNqaNotifications 8 }
+
+hh3cNqaJitterOverThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType,
+            hh3cNqaReactCurrentStatus
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes.
+        The change may occur when the watched condition is above threshold
+        or below threshold.
+
+          1. The average jitter value is not in the range of
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit and the
+             hh3cNqaReactThresholdType is specified as 'average' type.
+          2. The total number of times that the average jitter value is not
+             in the range of hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit reaches or exceeds
+             the value specified in hh3cNqaReactThresholdAccumNum and the
+             hh3cNqaReactThresholdType is specified as 'accumulative' type.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is hh3cNqajitter or hh3cNqaTwampLight."
+    ::= { hh3cNqaNotifications 9 }
+
+hh3cNqaProbeTimeAboveThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes to 'overThreshold', 'invalid' or 'overUpperThreshold'.
+        The change may occur when the monitored condition exceeds the
+        threshold (or upper threshold) or When NQA operation is stopped.
+
+        The above threshold situations are specified as below.
+          1. Probe time is not in the range hh3cNqaReactThresholdLowerLimit
+             through hh3cNqaReactThresholdUpperLimit.
+          2. The probe time is accumulatively not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times
+             specified in hh3cNqaReactThresholdAccumNum.
+          3. The probe time is consecutively not in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times
+             specified in hh3cNqaReactThresholdConsecNum.
+          4. When NQA operation is stopped.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is not hh3cNqajitter."
+    ::= { hh3cNqaNotifications 10 }
+
+hh3cNqaProbeTimeBelowThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes to 'belowThreshold' or 'belowLowerThreshold' from a
+        threshold-crossing state.
+
+        The below threshold situations are specified as below.
+          1. Probe time is in the range hh3cNqaReactThresholdLowerLimit
+             through hh3cNqaReactThresholdUpperLimit.
+          2. The probe time is accumulatively in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times
+             specified in hh3cNqaReactThresholdAccumNum.
+          3. The probe time is consecutively in the range
+             hh3cNqaReactThresholdLowerLimit through
+             hh3cNqaReactThresholdUpperLimit for a number of times
+             specified in hh3cNqaReactThresholdConsecNum.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is not hh3cNqajitter."
+    ::= { hh3cNqaNotifications 11 }
+
+hh3cNqaProbeFailAboveThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes to 'overThreshold', 'invalid' or 'overUpperThreshold'.
+        The change may occur when the monitored condition exceeds the
+        threshold (or upper threshold) or When NQA operation is stopped.
+
+        The threshold-crossing situations are specified as below.
+          1. When the number of accumulative failed probes reaches the specified
+             value in hh3cNqaReactThresholdAccumNum in one test while the value
+             of hh3cNqaReactThresholdType is 'accumulative'.
+          2. When the number of consecutive failed probes reaches the specified
+             value in hh3cNqaReactThresholdConsecNum in one test while the value
+             of hh3cNqaReactThresholdType is 'consecutive'.
+          3. When NQA operation is stopped.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is not hh3cNqajitter."
+    ::= { hh3cNqaNotifications 12 }
+
+hh3cNqaProbeFailBelowThreshold NOTIFICATION-TYPE
+    OBJECTS {
+            hh3cNqaReactOwnerIndex,
+            hh3cNqaReactTestName,
+            hh3cNqaReactItemIndex,
+            pingCtlTargetAddressType,
+            pingCtlTargetAddress,
+            pingCtlType,
+            pingCtlDescr,
+            hh3cNqaReactThresholdType
+        }
+    STATUS  current
+    DESCRIPTION
+        "It is generated when the value of hh3cNqaReactCurrentStatus
+        changes to 'belowThreshold' or 'belowLowerThreshold' from a
+        threshold-crossing state.
+
+        The below threshold situations are specified as below.
+          1. When the number of accumulative successful probes reaches the specified
+             value in hh3cNqaReactThresholdAccumNum in one test while the value
+             of hh3cNqaReactThresholdType is 'accumulative'.
+          2. When the number of consecutive successful probes reaches the specified
+             value in hh3cNqaReactThresholdConsecNum in one test while the value
+             of hh3cNqaReactThresholdType is 'consecutive'.
+
+        This notification is valid only when hh3cNqaReactActionType
+        is 'trapOnly' or 'trapAndTrigger' and pingCtlType of the test
+        is not hh3cNqajitter."
+    ::= { hh3cNqaNotifications 13 }
+
+END

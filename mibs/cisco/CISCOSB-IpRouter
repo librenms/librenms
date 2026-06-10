@@ -1,0 +1,1781 @@
+CISCOSB-IpRouter DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB IP Router Private Extension
+-- Version:    7.50.00.00
+-- Date:       30 Nov 2010
+
+IMPORTS
+    rip2Spec, ipRedundancy, ipRouteLeaking, ipRipFilter,
+    rlIpRoutingProtPreference, rlOspf, ipSpec               FROM CISCOSB-IP
+    rip2IfConfEntry                                         FROM RIPv2-MIB
+    ospfIfEntry, AreaID, RouterID, ospfVirtIfEntry          FROM OSPF-MIB
+    Unsigned32, Integer32, Counter32, IpAddress,
+    MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue,
+    TEXTUAL-CONVENTION                                      FROM SNMPv2-TC;
+
+
+
+   rlIpRouter  MODULE-IDENTITY
+                 LAST-UPDATED "200406010000Z"
+                 ORGANIZATION "Cisco Systems, Inc."
+
+                 CONTACT-INFO
+                 "Postal: 170 West Tasman Drive
+                 San Jose , CA 95134-1706
+                 USA
+
+                 
+                 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                 DESCRIPTION
+                      "The private MIB module definition for switch001 router MIB."
+                 REVISION "200406010000Z"
+                 DESCRIPTION
+                      "Initial version of this MIB."
+                 ::= { ipSpec 18 }
+
+
+
+
+--
+-- RIP
+--
+
+rsRip2IfConfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE  OF RsRip2IfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This table is extension of rip2IfConfTable (RFC 1724 ,RIP 2)"
+    ::=  { rip2Spec 1  }
+
+rsRip2IfConfEntry   OBJECT-TYPE
+    SYNTAX      RsRip2IfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The row definition for this table."
+    INDEX  { rsRip2IfConfAddress }
+    ::=  {  rsRip2IfConfTable 1  }
+
+RsRip2IfConfEntry  ::= SEQUENCE {
+    rsRip2IfConfAddress             IpAddress,
+    rsRip2IfConfVirtualDis          INTEGER,
+    rlRip2IfConfKeyChain            DisplayString,
+    rlRip2IfConfAdminStatus         INTEGER,
+    rlRip2IfConfInFilteringType     INTEGER,
+    rlRip2IfConfOutFilteringType    INTEGER,
+    rlRip2IfConfInFilterListName    DisplayString,
+    rlRip2IfConfOutFilterListName   DisplayString,
+    rlRip2IfConfDefInfOriginate     INTEGER
+    }
+
+rsRip2IfConfAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      " The IP Address of this system on the indicated subnet. "
+    ::=  { rsRip2IfConfEntry 1 }
+
+
+rsRip2IfConfVirtualDis OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This variable defines the virtual number of hops assigned to
+          the interface specified by rsIfIpAddrIndex. This enables
+          fine-tuning of the RIP routing algorithm."
+    DEFVAL  { 1 }
+    ::=   { rsRip2IfConfEntry  2  }
+
+rlRip2IfConfKeyChain OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of the key-chain which rip2
+         interface uses for md5 authentication"
+    ::= { rsRip2IfConfEntry  3 }
+
+rlRip2IfConfAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This variable defines administrative status of RIP interface. "
+    DEFVAL  {enable}
+     ::= { rsRip2IfConfEntry  4  }
+
+rlRip2IfConfInFilteringType OBJECT-TYPE
+    SYNTAX  INTEGER {
+       none  (1),
+       stdIpAcl (2),
+       pefixList (3)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Type of Rx filtering (ACL, Prefix List etc)."
+    DEFVAL  {none}
+     ::= { rsRip2IfConfEntry  5  }
+
+rlRip2IfConfOutFilteringType OBJECT-TYPE
+    SYNTAX  INTEGER {
+       none  (1),
+       stdIpAcl (2),
+       pefixList (3)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Type of Tx filtering (ACL, Prefix List etc)."
+    DEFVAL  {none}
+     ::= { rsRip2IfConfEntry  6  }
+
+rlRip2IfConfInFilterListName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of a filtering list. The list defines
+         which networks are to be received and which
+         are to be suppressed in routing updates.
+         List type is defined by rlRip2IfConfFilteringType."
+    ::= { rsRip2IfConfEntry  7 }
+
+rlRip2IfConfOutFilterListName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of a filtering list. The list defines
+         which networks are to be sent and which
+         are to be suppressed.
+         List type is defined by rlRip2IfConfFilteringType."
+    ::= { rsRip2IfConfEntry  8 }
+
+rlRip2IfConfDefInfOriginate  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        global      (1),
+        disabled    (2),
+        enabled     (3),
+        passiveOnly (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to global RIP behavior is specified by the value of
+         rlRip2GlobalDefaultInformationOriginate scalar
+         if set to enabled RIP will advertise default route on this interfaces
+         if set to passiveOnly RIP will advertise default route on this interfaces
+         only if it is configured to passive mode"
+    DEFVAL { global }
+    ::= { rsRip2IfConfEntry  9 }
+
+
+rlRip2MibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 2."
+    ::=  { rip2Spec 2  }
+
+rlRip2RedistDefaultMetric OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Default metric value when RIP advertises routes,
+         derived by other protocols."
+    DEFVAL { 1 }
+    ::=  { rip2Spec 3  }
+
+rlRip2RedistStaticTransparent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to TRUE causes RIP to use the routing table metric
+         for redistributed static routes as the RIP metric.
+         If set to FALSE then the metric defined in
+         rlRip2RedistDefaultMetric is used."
+    DEFVAL { false }
+    ::=  { rip2Spec 4  }
+
+rlRip2ClearStatistics OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Clears RIP statistics counters of all interfaces and all peers."
+    DEFVAL { false }
+    ::=  { rip2Spec 5  }
+
+rlRip2IfConfGlobalPassiveInterface OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to TRUE all interfaces created will be created as passive (rip2IfConfSend = doNotSend)"
+    DEFVAL { false }
+    ::= { rip2Spec 6 }
+
+
+rlRip2GlobalDefInfOriginate  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled    (1),
+        enabled     (2),
+        passiveOnly (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "if set to Enabled RIP will advertise default route on all RIP interfaces
+         if set to PassiveOnly RIP will advertise default route on all RIP passive interfaces"
+    DEFVAL { disabled }
+    ::= { rip2Spec 7 }
+
+rlRip2RedistConnected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to TRUE causes RIP to redistribute
+         directly connected interfaces, on which RIP is not enabled."
+    DEFVAL { false }
+    ::=  { rip2Spec 8  }
+
+rlRip2RedistConnectedTransparent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If set to TRUE causes RIP to use the routing table metric
+         for redistributed connected routes as the RIP metric.
+         If set to FALSE then the metric defined in
+         rlRip2RedistDefaultMetric is used."
+    DEFVAL { false }
+    ::=  { rip2Spec 9  }
+
+rlRip2RedistConnectedMetric OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..15)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User defined metric value when RIP advertises
+         directly connected interfaces, on which RIP is not enabled."
+    DEFVAL { 0 }
+    ::=  { rip2Spec 10  }
+
+--
+-- CISCOSB Private IP Router Redundancy
+--
+
+ipRedundAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        enable(1),
+        disable(2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This parameter controls the IP Redundancy in the device.
+         In case the parameter is Enable and the other router
+         becomes inoperational, all the traffic is handled by
+         this element."
+    DEFVAL {disable }
+    ::= { ipRedundancy 1 }
+
+ipRedundOperStatus   OBJECT-TYPE
+    SYNTAX INTEGER {
+       active(1),
+       inactive(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " obsolete "
+    DEFVAL  {inactive}
+    ::= { ipRedundancy 2 }
+
+ipRedundRoutersTable OBJECT-TYPE
+   SYNTAX     SEQUENCE OF IpRedundRoutersEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+    "List of IP addresses backed up by this router."
+     ::= {ipRedundancy 3 }
+
+ipRedundRoutersEntry  OBJECT-TYPE
+   SYNTAX     IpRedundRoutersEntry
+   MAX-ACCESS not-accessible
+   STATUS     current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX {ipRedundRoutersIfAddr, ipRedundRoutersMainRouterAddr}
+   ::= {ipRedundRoutersTable  1 }
+
+IpRedundRoutersEntry ::= SEQUENCE {
+      ipRedundRoutersIfAddr          IpAddress,
+      ipRedundRoutersMainRouterAddr  IpAddress,
+      ipRedundRoutersOperStatus      INTEGER,
+      ipRedundRoutersPollInterval    INTEGER,
+      ipRedundRoutersTimeout         INTEGER,
+      ipRedundRoutersStatus          INTEGER
+  }
+
+ipRedundRoutersIfAddr OBJECT-TYPE
+   SYNTAX     IpAddress
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "The Ip address of the IP interface on which the redundancy feature
+     is operational."
+     ::=  { ipRedundRoutersEntry  1}
+
+ipRedundRoutersMainRouterAddr OBJECT-TYPE
+   SYNTAX     IpAddress
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "The Ip address of the polled main router."
+     ::=  { ipRedundRoutersEntry 2}
+
+ipRedundRoutersOperStatus OBJECT-TYPE
+   SYNTAX     INTEGER { active(1), inactive(2) }
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+    "If active, the main router is considered inoperational and the IP
+    interface operates as its backup."
+     ::=  { ipRedundRoutersEntry 3 }
+
+ipRedundRoutersPollInterval OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+    "Polling interval for this router (in seconds). If 0 the router is not
+     polled."
+   DEFVAL  { 3 }
+     ::=  { ipRedundRoutersEntry 4 }
+
+ipRedundRoutersTimeout OBJECT-TYPE
+   SYNTAX     INTEGER
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+    "Interval in seconds during which the backed-up router must signal.
+     If it does not signal, it is considered inoperational and the IP
+     interface starts operating as backup."
+   DEFVAL  { 12 }
+     ::=  { ipRedundRoutersEntry  5}
+
+ipRedundRoutersStatus OBJECT-TYPE
+   SYNTAX INTEGER {
+     active(1),
+     notInService(2),
+     notReady(3),
+     createAndGo(4),
+     createAndWait(5),
+     destroy(6)
+     }
+   MAX-ACCESS read-write
+   STATUS     current
+   DESCRIPTION
+    "Entry status"
+     ::=  { ipRedundRoutersEntry 6}
+
+--
+-- IP Routing Protol leaking
+--
+
+ipLeakStaticToRip   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of static routes
+         to RIP. When enabled, all routes inserted to the IP routing table
+         via SNMP are advertised into RIP."
+    DEFVAL  {enable}
+    ::= { ipRouteLeaking 1 }
+
+ipLeakStaticToOspf   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of static routes
+         into OSPF. When enabled, all routes inserted to the IP routing table
+         via SNMP are advertised into OSPF as external routes."
+    DEFVAL  {enable}
+    ::= { ipRouteLeaking 2 }
+
+ipLeakOspfToRip   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of routes
+         from OSPF to RIP. If enabled, all routes learned via OSPF
+         are advertised into RIP."
+    DEFVAL  {disable}
+    ::= { ipRouteLeaking 3 }
+
+ipLeakRipToOspf   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) of routes
+         from RIP to OSPF. If enabled, all routes learned via RIP
+         are advertised into OSPF as external routes."
+    DEFVAL  {disable}
+    ::= { ipRouteLeaking 4 }
+
+ipLeakExtDirectToOspf   OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+       }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This parameter controls leaking (redistribution) into OSPF of
+         direct routes external to OSPF, i.e. routes to local network
+         corresponding to IP interfaces on which OSPF is disabled.
+         When enabled, all such direct routes are advertised into OSPF
+         as external routes."
+    DEFVAL  {enable}
+    ::= { ipRouteLeaking 5 }
+
+--
+-- RIP Filters
+--
+
+-- Global RIP filter is defined per IP router.
+
+rsIpRipFilterGlbTable OBJECT-TYPE
+   SYNTAX      SEQUENCE OF RsIpRipFilterGlbEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The table of RIP global filters per IP router."
+::= { ipRipFilter 1 }
+
+rsIpRipFilterGlbEntry  OBJECT-TYPE
+SYNTAX        RsIpRipFilterGlbEntry
+MAX-ACCESS    not-accessible
+STATUS        current
+DESCRIPTION
+      " An entry in the RIP global filter table "
+INDEX  { rsIpRipFilterGlbType,
+         rsIpRipFilterGlbNumber }
+::= { rsIpRipFilterGlbTable 1 }
+
+RsIpRipFilterGlbEntry  ::= SEQUENCE {
+      rsIpRipFilterGlbType            INTEGER,
+      rsIpRipFilterGlbNumber          INTEGER,
+      rsIpRipFilterGlbStatus          INTEGER,
+      rsIpRipFilterGlbIpAddr          IpAddress,
+      rsIpRipFilterGlbNetworkMaskBits INTEGER,
+      rsIpRipFilterGlbMatchBits       INTEGER,
+      rsIpRipFilterGlbAction          INTEGER
+}
+
+rsIpRipFilterGlbType  OBJECT-TYPE
+SYNTAX INTEGER  {
+    input(1),
+    output(2)
+}
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION
+    " Type of filter - input/output "
+::= {rsIpRipFilterGlbEntry 1}
+
+rsIpRipFilterGlbNumber OBJECT-TYPE
+SYNTAX      INTEGER
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION
+   " Number of RIP filter. "
+::= {rsIpRipFilterGlbEntry  2}
+
+rsIpRipFilterGlbStatus OBJECT-TYPE
+SYNTAX INTEGER  {
+    valid (1),
+    invalid (2),
+    underCreation (3)
+}
+MAX-ACCESS read-write
+STATUS     current
+DESCRIPTION
+   " The validity of this entry. Setting this value to invalid deletes
+   the entry, and the entry may be actualy removed from the table."
+DEFVAL  { valid }
+::= {rsIpRipFilterGlbEntry 3}
+
+rsIpRipFilterGlbIpAddr OBJECT-TYPE
+SYNTAX      IpAddress
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+   " network prefix IP address, as in the forwarding table. "
+DEFVAL {'00000000'H}
+::= {rsIpRipFilterGlbEntry  4}
+
+rsIpRipFilterGlbNetworkMaskBits  OBJECT-TYPE
+SYNTAX      INTEGER
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+   " the number of bits in the IP Network mask, called network-prefix-length
+   in Router Requirements terminology. for example: the value 16 means
+   mask 255.255.0.0 "
+DEFVAL {0}
+::= {rsIpRipFilterGlbEntry 5}
+
+rsIpRipFilterGlbMatchBits  OBJECT-TYPE
+SYNTAX      INTEGER
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+   " the number of bits to match in the Network IP address. A value
+   smaller than 32 defines a wildcard. for example: the value 8 means
+   all routes whose leftmost 8 bits are equal to those of the network IP
+   address. If this variable has a value other than 32, than
+   rsIpRipFilterGlbNetworkMaskBits must be 0 and is ignored. "
+DEFVAL {32}
+::= {rsIpRipFilterGlbEntry 6}
+
+rsIpRipFilterGlbAction OBJECT-TYPE
+SYNTAX INTEGER {
+   deny(1),
+   permit(2)
+}
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+   " Filter action - permit/deny for this network"
+DEFVAL { permit }
+::= {rsIpRipFilterGlbEntry  7}
+
+
+-- Intf RIP filter is defined per IP Interface
+
+rsIpRipFilterLclTable OBJECT-TYPE
+SYNTAX  SEQUENCE OF RsIpRipFilterLclEntry
+MAX-ACCESS  not-accessible
+STATUS      current
+DESCRIPTION
+   "Table of input/output  RIP filters used per IP Interface."
+::= { ipRipFilter 2 }
+
+rsIpRipFilterLclEntry  OBJECT-TYPE
+SYNTAX  RsIpRipFilterLclEntry
+MAX-ACCESS not-accessible
+STATUS  current
+DESCRIPTION
+   " An entry in the Intf RIP filter table"
+INDEX  {rsIpRipFilterLclIpIntf,
+        rsIpRipFilterLclType,
+        rsIpRipFilterLclNumber}
+::= { rsIpRipFilterLclTable 1 }
+
+RsIpRipFilterLclEntry  ::= SEQUENCE {
+      rsIpRipFilterLclIpIntf          IpAddress,
+      rsIpRipFilterLclType            INTEGER,
+      rsIpRipFilterLclNumber          INTEGER,
+      rsIpRipFilterLclStatus          INTEGER,
+      rsIpRipFilterLclIpAddr          IpAddress,
+      rsIpRipFilterLclNetworkMaskBits INTEGER,
+      rsIpRipFilterLclMatchBits       INTEGER,
+      rsIpRipFilterLclAction          INTEGER
+}
+
+rsIpRipFilterLclIpIntf  OBJECT-TYPE
+SYNTAX      IpAddress
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION
+   " The IP address identifying the RIP interface for this filter.
+   This value corresponds to rsIpAdEntAddr. "
+::= {rsIpRipFilterLclEntry 1}
+
+
+rsIpRipFilterLclType  OBJECT-TYPE
+SYNTAX INTEGER  {
+   input(1),
+   output(2)
+}
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+   " Type of filter - input/output "
+::= {rsIpRipFilterLclEntry 2}
+
+rsIpRipFilterLclNumber OBJECT-TYPE
+SYNTAX     INTEGER
+MAX-ACCESS read-only
+STATUS     current
+DESCRIPTION
+   " Number of RIP filter for this Interface"
+::= {rsIpRipFilterLclEntry  3}
+
+rsIpRipFilterLclStatus   OBJECT-TYPE
+SYNTAX INTEGER  {
+   valid (1),
+   invalid (2),
+   underCreation (3)
+}
+MAX-ACCESS read-write
+STATUS     current
+DESCRIPTION
+   " The validity of this entry. Setting this value to invalid deletes
+   the entry, and the entry may be actualy removed from the table."
+DEFVAL  { valid }
+::= {rsIpRipFilterLclEntry  4}
+
+rsIpRipFilterLclIpAddr OBJECT-TYPE
+SYNTAX  IpAddress
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+   " network prefix IP address, as in the forwarding table. "
+DEFVAL {'00000000'H}
+::= {rsIpRipFilterLclEntry  5}
+
+rsIpRipFilterLclNetworkMaskBits  OBJECT-TYPE
+SYNTAX      INTEGER
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+   " the number of bits in the IP Network mask, called network-prefix-length
+   in Router Requirements terminology. for example: the value 16 means
+   mask 255.255.0.0 "
+DEFVAL {0}
+::= {rsIpRipFilterLclEntry 6}
+
+rsIpRipFilterLclMatchBits  OBJECT-TYPE
+SYNTAX      INTEGER
+MAX-ACCESS  read-write
+STATUS      current
+DESCRIPTION
+   " the number of bits to match in the Network IP address. A value
+   smaller than 32 defines a wildcard. for example: the value 8 means
+   all routes whose leftmost 8 bits are equal to those of the network IP
+   address. If this variable has a value other than 32, than
+   rsIpRipFilterLclNetworkMaskBits must be 0 and is ignored. "
+DEFVAL {32}
+::= {rsIpRipFilterLclEntry 7}
+
+rsIpRipFilterLclAction OBJECT-TYPE
+SYNTAX INTEGER  {
+   deny(1),
+   permit(2)
+}
+MAX-ACCESS read-write
+STATUS     current
+DESCRIPTION
+   " Filter action - permit/deny "
+DEFVAL { permit }
+::= {rsIpRipFilterLclEntry  8}
+
+--
+-- Ip Routing Protocol Preference
+--
+
+-- Mib for Preferance among routing protocols:
+-- Range value 0..255 .  O is most preferred, 255 never used for forwarding.
+-- only exception is direct which range 0..254 we prevent direct from becoming unreachable
+-- (according to RFC1812  section 5.2.4)
+
+rlIpRoutingProtPreferenceDirect OBJECT-TYPE
+    SYNTAX      INTEGER  (0..254)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is Local
+            IP (i.e. IP interface in IpAddrTable)
+            It is proposed that the value will be higher than dynamic routing protocols.
+            The change of its value may lead to unexpected results, such as routing loops"
+    DEFVAL  { 20 }
+    ::= {rlIpRoutingProtPreference 1}
+
+rlIpRoutingProtPreferenceStatic OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is Men configured by
+            Net managment tools, i.e. Command line or SNMP configured."
+    DEFVAL  { 10 }
+    ::= {rlIpRoutingProtPreference 2}
+
+-- For OSPF:
+rlIpRoutingProtPreferenceOspfInter OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is internal
+            ospf Links.
+            Relate to routes which are based on
+            OSPF Link State Advertisements of type 1-4"
+    DEFVAL  { 30 }
+    ::= {rlIpRoutingProtPreference 3}
+
+rlIpRoutingProtPreferenceOspfExt OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is external to OSPF
+            i.e. routes imported by as OSPF AS Border router.
+            Relate to routes which are based on
+            OSPF Link State Advertisements of types 5 and 7"
+    DEFVAL  { 60 }
+    ::= {rlIpRoutingProtPreference 4}
+
+rlIpRoutingProtPreferenceOspfReject OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is OSPF
+            and Are inserted to cover gaps in net range"
+    DEFVAL  { 254 }
+    ::= {rlIpRoutingProtPreference 5}
+
+
+--For Rip
+rlIpRoutingProtPreferenceRipNormal OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is RIP
+            routing domain"
+    DEFVAL  { 60 }
+    ::= {rlIpRoutingProtPreference 6}
+
+rlIpRoutingProtPreferenceRipAggregate OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is aggregation
+            As a method of rip1 to handle the CIDR schema.
+            The idea is that ripv1 aggregates route which fall into certion
+            class of IP. This route is a discard route in effect,
+            and is referenced, at forwarding route look up, if there is no beter
+            match. (which means the route is not available)"
+    DEFVAL  { 254 }
+    ::= {rlIpRoutingProtPreference 7}
+
+rlIpRoutingProtPreferenceBgp OBJECT-TYPE
+    SYNTAX      INTEGER  (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Preference given to routes whose origin is
+            BGP ROUTERS (EBGP or IBGP)"
+    DEFVAL  { 80 }
+    ::= {rlIpRoutingProtPreference 8}
+
+-- We may use it in the future to control
+-- the time scalars new values take effect
+-- rlRoutePrefChangeTakeEffectAT OBJECT-TYPE
+--    SYNTAX  INTEGER  {
+--        afterReset (1),
+--        immediate  (2)
+--       }
+--    MAX-ACCESS  read-write
+--      STATUS  current
+--    DESCRIPTION
+--           "The time the changes to preference of protocols will become in effect.
+--            options are:
+--             1. At run time.
+--             2. after rebboting the devise
+--             default value 2 to avoid masive routing change at run time
+--            "
+--    DEFVAL  { afterReset }
+--    ::= {rlIpRoutingProtPreference 9}
+
+--
+-- OSPF
+--
+
+rlOspfMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::=  { rlOspf 1  }
+
+rlOspfAutoInterfaceCreation OBJECT-TYPE
+    SYNTAX  INTEGER {
+       enable  (1),
+       disable (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This variable controls OSPF automatic creation and activation of
+          interfaces.  If value is enable - IP interface creation results in
+          creation and activation of OSPF Interface.  If value is disable
+          OSPF interface is created but not activated.
+          The option is a platform parameter."
+    ::=  { rlOspf 2  }
+
+
+--Extention to ospfIfTable
+
+rlOspfIfExtTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF RlOspfIfExtEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The OSPF Interface Table describes the
+          interfaces from the viewpoint of OSPF."
+     ::= { rlOspf 3 }
+
+rlOspfIfExtEntry OBJECT-TYPE
+     SYNTAX     RlOspfIfExtEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The OSPF interface table extension
+          for md5 authentication"
+     AUGMENTS    { ospfIfEntry }
+     ::= { rlOspfIfExtTable 1 }
+
+RlOspfIfExtEntry ::= SEQUENCE {
+     rlOspfifKeyChain        DisplayString
+}
+
+rlOspfifKeyChain OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of the key-chain which ospf
+         interface uses for md5 authentication"
+    ::= { rlOspfIfExtEntry 1 }
+
+--  OSPF Link State Advertisements
+
+--  OSPF Router LSA
+
+rlOspfRtrLnkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlOspfRtrLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Router Link State Advertisement."
+    ::= { rlOspf 4 }
+
+
+rlOspfRtrLnkEntry OBJECT-TYPE
+    SYNTAX      RlOspfRtrLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A single entry from Router LSA."
+    INDEX { rlOspfRtrLnkAreaId, rlOspfRtrLnkLsid,
+            rlOspfRtrLnkRouterId, rlOspfRtrLnkIdx }
+       ::= { rlOspfRtrLnkTable 1 }
+
+RlOspfRtrLnkEntry ::=
+    SEQUENCE {
+        rlOspfRtrLnkAreaId
+            AreaID,
+        rlOspfRtrLnkLsid
+            IpAddress,
+        rlOspfRtrLnkRouterId
+            RouterID,
+        rlOspfRtrLnkIdx
+            Unsigned32,
+        rlOspfRtrLnkSequence
+            Integer32,
+        rlOspfRtrLnkAge
+            Integer32,
+        rlOspfRtrLnkChecksum
+            Integer32,
+        rlOspfRtrLnkLength
+            Unsigned32,
+        rlOspfRtrLnkBitV
+            INTEGER,
+        rlOspfRtrLnkBitE
+            INTEGER,
+        rlOspfRtrLnkBitB
+            INTEGER,
+        rlOspfRtrLnkLinks
+            Unsigned32,
+        rlOspfRtrLnkLinkID
+            IpAddress,
+        rlOspfRtrLnkLinkData
+            IpAddress,
+        rlOspfRtrLnkType
+            INTEGER,
+        rlOspfRtrLnkMetric
+            Unsigned32
+}
+
+rlOspfRtrLnkAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit identifier of the Area  from  which
+        the LSA was received."
+    REFERENCE
+       "OSPF Version 2, Appendix C.2 Area parameters"
+  ::= { rlOspfRtrLnkEntry 1 }
+
+rlOspfRtrLnkLsid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Link State ID is an LS Type Specific field
+        containing either a Router ID or an IP Address;
+        it identifies the piece of the  routing  domain
+        that is being described by the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.4 Link State ID"
+  ::= { rlOspfRtrLnkEntry 2 }
+
+rlOspfRtrLnkRouterId OBJECT-TYPE
+    SYNTAX      RouterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit number that uniquely identifies the
+        originating router in the Autonomous System."
+    REFERENCE
+       "OSPF Version 2, Appendix C.1 Global parameters"
+  ::= { rlOspfRtrLnkEntry 3 }
+
+rlOspfRtrLnkIdx OBJECT-TYPE
+    SYNTAX      Unsigned32 (1.. 65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The index is a unsigned 32-bit integer.
+        It is used as sequence number of entry
+        in the LSA and relevant only for Router
+        or Network LSA which can contain
+        unlimited number of entries."
+  ::= { rlOspfRtrLnkEntry 4 }
+
+rlOspfRtrLnkSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The sequence number field is a signed  32-bit
+        integer. It is used to detect old and duplicate
+        link state advertisements. The space of sequence
+        numbers is linearly ordered. The larger the
+        sequence number the more recent the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.6 LS sequence number"
+  ::= { rlOspfRtrLnkEntry 5 }
+
+
+rlOspfRtrLnkAge OBJECT-TYPE
+    SYNTAX      Integer32    -- Should be 0..MaxAge
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the age of the link state
+        advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+  ::= { rlOspfRtrLnkEntry 6 }
+
+rlOspfRtrLnkChecksum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the checksum of the complete contents
+        of the advertisement, excepting the age field.
+        The age field is excepted so that an advertisement's
+        age can be incremented without updating the checksum.
+        The checksum used is the same that is used for ISO
+        connectionless datagrams; it is commonly referred
+        to as the Fletcher checksum."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.7 LS checksum"
+  ::= { rlOspfRtrLnkEntry 7 }
+
+rlOspfRtrLnkLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The lenth in bytes of the LSA.
+        This includes the 20 byte LSA header."
+  ::= { rlOspfRtrLnkEntry 8 }
+
+rlOspfRtrLnkBitV OBJECT-TYPE
+    SYNTAX INTEGER {
+        off(1),
+        on(2)
+    }
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+       "When set, the router is an endpoint
+        of one or more fully adjacent virtual
+        links having the described area as Transit
+        area (V is for virtual link endpoint)."
+  ::= { rlOspfRtrLnkEntry 9 }
+
+rlOspfRtrLnkBitE OBJECT-TYPE
+    SYNTAX INTEGER {
+        off(1),
+        on(2)
+    }
+    MAX-ACCESS   read-only
+        STATUS   current
+    DESCRIPTION
+       "When set, the router is an AS
+        boundary router (E is for external)."
+  ::= { rlOspfRtrLnkEntry 10 }
+
+rlOspfRtrLnkBitB OBJECT-TYPE
+    SYNTAX INTEGER {
+        off(1),
+        on(2)
+    }
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+       "When set, the router is an area
+        border router (B is for border)."
+  ::= { rlOspfRtrLnkEntry 11 }
+
+rlOspfRtrLnkLinks OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of router links described in this LSA.
+        This must be the total collection of router links
+        (i.e., interfaces) to the area."
+  ::= { rlOspfRtrLnkEntry 12 }
+
+rlOspfRtrLnkLinkID OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Identifies the object that this router link
+        connects to. Value depends on the link's Type."
+  ::= { rlOspfRtrLnkEntry 13 }
+
+rlOspfRtrLnkLinkData OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Value depends on the link's Type field."
+  ::= { rlOspfRtrLnkEntry 14 }
+
+rlOspfRtrLnkType OBJECT-TYPE
+    SYNTAX INTEGER {
+        pointToPoint(1),
+        transitNetwork(2),
+        stubNetwork(3),
+        virtualLink(4)
+    }
+    MAX-ACCESS   read-only
+        STATUS   current
+    DESCRIPTION
+       "A quick description of the router link."
+  ::= { rlOspfRtrLnkEntry 15 }
+
+rlOspfRtrLnkMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The cost of using this router link."
+  ::= { rlOspfRtrLnkEntry 16 }
+
+--  OSPF Network LSA
+
+rlOspfNetLnkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlOspfNetLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Network Link State Advertisement."
+    ::= { rlOspf 5 }
+
+rlOspfNetLnkEntry OBJECT-TYPE
+    SYNTAX      RlOspfNetLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A single entry from Network LSA."
+    INDEX { rlOspfNetLnkAreaId, rlOspfNetLnkLsid,
+            rlOspfNetLnkRouterId, rlOspfNetLnkIdx }
+       ::= { rlOspfNetLnkTable 1 }
+
+RlOspfNetLnkEntry ::=
+    SEQUENCE {
+        rlOspfNetLnkAreaId
+            AreaID,
+        rlOspfNetLnkLsid
+            IpAddress,
+        rlOspfNetLnkRouterId
+            RouterID,
+        rlOspfNetLnkIdx
+            Unsigned32,
+        rlOspfNetLnkSequence
+            Integer32,
+        rlOspfNetLnkAge
+            Integer32,
+        rlOspfNetLnkChecksum
+            Integer32,
+        rlOspfNetLnkLength
+            Unsigned32,
+        rlOspfNetLnkMask
+            IpAddress,
+        rlOspfNetLnkAttRouter
+            IpAddress
+}
+
+rlOspfNetLnkAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit identifier of the Area  from  which
+        the LSA was received."
+    REFERENCE
+       "OSPF Version 2, Appendix C.2 Area parameters"
+  ::= { rlOspfNetLnkEntry 1 }
+
+rlOspfNetLnkLsid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Link State ID is an LS Type Specific field
+        containing either a Router ID or an IP Address;
+        it identifies the piece of the  routing  domain
+        that is being described by the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.4 Link State ID"
+  ::= { rlOspfNetLnkEntry 2 }
+
+rlOspfNetLnkRouterId OBJECT-TYPE
+    SYNTAX      RouterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit number that uniquely identifies the
+        originating router in the Autonomous System."
+    REFERENCE
+       "OSPF Version 2, Appendix C.1 Global parameters"
+  ::= { rlOspfNetLnkEntry 3 }
+
+rlOspfNetLnkIdx OBJECT-TYPE
+    SYNTAX      Unsigned32 (1.. 65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The index is a unsigned 32-bit integer.
+        It is used as sequence number of entry
+        in the LSA and relevant only for Router
+        or Network LSA which can contain
+        unlimited number of entries."
+  ::= { rlOspfNetLnkEntry 4 }
+
+rlOspfNetLnkSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The sequence number field is a signed  32-bit
+        integer. It is used to detect old and duplicate
+        link state advertisements. The space of sequence
+        numbers is linearly ordered. The larger the
+        sequence number the more recent the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.6 LS sequence number"
+  ::= { rlOspfNetLnkEntry 5 }
+
+
+rlOspfNetLnkAge OBJECT-TYPE
+    SYNTAX      Integer32    -- Should be 0..MaxAge
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the age of the link state
+        advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+  ::= { rlOspfNetLnkEntry 6 }
+
+rlOspfNetLnkChecksum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the checksum of the complete contents
+        of the advertisement, excepting the age field.
+        The age field is excepted so that an advertisement's
+        age can be incremented without updating the checksum.
+        The checksum used is the same that is used for ISO
+        connectionless datagrams; it is commonly referred
+        to as the Fletcher checksum."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.7 LS checksum"
+  ::= { rlOspfNetLnkEntry 7 }
+
+rlOspfNetLnkLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The lenth in bytes of the LSA.
+        This includes the 20 byte LSA header."
+  ::= { rlOspfNetLnkEntry 8 }
+
+rlOspfNetLnkMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The IP address mask for the network."
+  ::= { rlOspfNetLnkEntry 9 }
+
+rlOspfNetLnkAttRouter OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Router IDs of each of the routers
+        attached to the network."
+  ::= { rlOspfNetLnkEntry 10 }
+
+--  OSPF Summary LSA (Type 3)
+
+rlOspfSumLnkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlOspfSumLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Summary Link State Advertisement
+         for network (Type 3)."
+    ::= { rlOspf 6 }
+
+
+rlOspfSumLnkEntry OBJECT-TYPE
+    SYNTAX      RlOspfSumLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A single entry from Summary LSA."
+    INDEX { rlOspfSumLnkAreaId, rlOspfSumLnkLsid,
+            rlOspfSumLnkRouterId}
+       ::= { rlOspfSumLnkTable 1 }
+
+RlOspfSumLnkEntry ::=
+    SEQUENCE {
+        rlOspfSumLnkAreaId
+            AreaID,
+        rlOspfSumLnkLsid
+            IpAddress,
+        rlOspfSumLnkRouterId
+            RouterID,
+        rlOspfSumLnkSequence
+            Integer32,
+        rlOspfSumLnkAge
+            Integer32,
+        rlOspfSumLnkChecksum
+            Integer32,
+        rlOspfSumLnkLength
+            Unsigned32,
+        rlOspfSumLnkMask
+            IpAddress,
+        rlOspfSumLnkMetric
+            Unsigned32
+}
+
+rlOspfSumLnkAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit identifier of the Area  from  which
+        the LSA was received."
+    REFERENCE
+       "OSPF Version 2, Appendix C.2 Area parameters"
+  ::= { rlOspfSumLnkEntry 1 }
+
+rlOspfSumLnkLsid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Link State ID is an LS Type Specific field
+        containing either a Router ID or an IP Address;
+        it identifies the piece of the  routing  domain
+        that is being described by the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.4 Link State ID"
+  ::= { rlOspfSumLnkEntry 2 }
+
+rlOspfSumLnkRouterId OBJECT-TYPE
+    SYNTAX      RouterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit number that uniquely identifies the
+        originating router in the Autonomous System."
+    REFERENCE
+       "OSPF Version 2, Appendix C.1 Global parameters"
+  ::= { rlOspfSumLnkEntry 3 }
+
+rlOspfSumLnkSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The sequence number field is a signed  32-bit
+        integer. It is used to detect old and duplicate
+        link state advertisements. The space of sequence
+        numbers is linearly ordered. The larger the
+        sequence number the more recent the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.6 LS sequence number"
+  ::= { rlOspfSumLnkEntry 4 }
+
+
+rlOspfSumLnkAge OBJECT-TYPE
+    SYNTAX      Integer32    -- Should be 0..MaxAge
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the age of the link state
+        advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+  ::= { rlOspfSumLnkEntry 5 }
+
+rlOspfSumLnkChecksum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the checksum of the complete contents
+        of the advertisement, excepting the age field.
+        The age field is excepted so that an advertisement's
+        age can be incremented without updating the checksum.
+        The checksum used is the same that is used for ISO
+        connectionless datagrams; it is commonly referred
+        to as the Fletcher checksum."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.7 LS checksum"
+  ::= { rlOspfSumLnkEntry 6 }
+
+rlOspfSumLnkLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The lenth in bytes of the LSA.
+        This includes the 20 byte LSA header."
+  ::= { rlOspfSumLnkEntry 7 }
+
+rlOspfSumLnkMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Value depends on the link's Type field."
+  ::= { rlOspfSumLnkEntry 8 }
+
+rlOspfSumLnkMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The cost of using this router link."
+  ::= { rlOspfSumLnkEntry 9 }
+
+
+
+--  OSPF Summary LSA (Type 4)
+
+rlOspfAsbLnkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlOspfAsbLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Summary Link State Advertisement
+         for ASBR (Type 4)."
+    ::= { rlOspf 7 }
+
+
+rlOspfAsbLnkEntry OBJECT-TYPE
+    SYNTAX      RlOspfAsbLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A single entry from Summary LSA."
+    INDEX { rlOspfAsbLnkAreaId, rlOspfAsbLnkLsid,
+            rlOspfAsbLnkRouterId}
+       ::= { rlOspfAsbLnkTable 1 }
+
+RlOspfAsbLnkEntry ::=
+    SEQUENCE {
+        rlOspfAsbLnkAreaId
+            AreaID,
+        rlOspfAsbLnkLsid
+            IpAddress,
+        rlOspfAsbLnkRouterId
+            RouterID,
+        rlOspfAsbLnkSequence
+            Integer32,
+        rlOspfAsbLnkAge
+            Integer32,
+        rlOspfAsbLnkChecksum
+            Integer32,
+        rlOspfAsbLnkLength
+            Unsigned32,
+        rlOspfAsbLnkMetric
+            Unsigned32
+}
+
+rlOspfAsbLnkAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit identifier of the Area  from  which
+        the LSA was received."
+    REFERENCE
+       "OSPF Version 2, Appendix C.2 Area parameters"
+  ::= { rlOspfAsbLnkEntry 1 }
+
+rlOspfAsbLnkLsid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Link State ID is an LS Type Specific field
+        containing either a Router ID or an IP Address;
+        it identifies the piece of the  routing  domain
+        that is being described by the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.4 Link State ID"
+  ::= { rlOspfAsbLnkEntry 2 }
+
+rlOspfAsbLnkRouterId OBJECT-TYPE
+    SYNTAX      RouterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit number that uniquely identifies the
+        originating router in the Autonomous System."
+    REFERENCE
+       "OSPF Version 2, Appendix C.1 Global parameters"
+  ::= { rlOspfAsbLnkEntry 3 }
+
+rlOspfAsbLnkSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The sequence number field is a signed  32-bit
+        integer. It is used to detect old and duplicate
+        link state advertisements. The space of sequence
+        numbers is linearly ordered. The larger the
+        sequence number the more recent the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.6 LS sequence number"
+  ::= { rlOspfAsbLnkEntry 4 }
+
+
+rlOspfAsbLnkAge OBJECT-TYPE
+    SYNTAX      Integer32    -- Should be 0..MaxAge
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the age of the link state
+        advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+  ::= { rlOspfAsbLnkEntry 5 }
+
+rlOspfAsbLnkChecksum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the checksum of the complete contents
+        of the advertisement, excepting the age field.
+        The age field is excepted so that an advertisement's
+        age can be incremented without updating the checksum.
+        The checksum used is the same that is used for ISO
+        connectionless datagrams; it is commonly referred
+        to as the Fletcher checksum."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.7 LS checksum"
+  ::= { rlOspfAsbLnkEntry 6 }
+
+rlOspfAsbLnkLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The lenth in bytes of the LSA.
+        This includes the 20 byte LSA header."
+  ::= { rlOspfAsbLnkEntry 7 }
+
+rlOspfAsbLnkMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The cost of using this router link."
+  ::= { rlOspfAsbLnkEntry 8 }
+
+
+  --  OSPF External LSA
+
+rlOspfAseLnkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlOspfAseLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "External Link State Advertisement."
+    ::= { rlOspf 8 }
+
+
+rlOspfAseLnkEntry OBJECT-TYPE
+    SYNTAX      RlOspfAseLnkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A single entry from External LSA."
+    INDEX { rlOspfAseLnkLsid,
+            rlOspfAseLnkRouterId}
+       ::= { rlOspfAseLnkTable 1 }
+
+RlOspfAseLnkEntry ::=
+    SEQUENCE {
+        rlOspfAseLnkLsid
+            IpAddress,
+        rlOspfAseLnkRouterId
+            RouterID,
+        rlOspfAseLnkSequence
+            Integer32,
+        rlOspfAseLnkAge
+            Integer32,
+        rlOspfAseLnkChecksum
+            Integer32,
+        rlOspfAseLnkLength
+            Unsigned32,
+        rlOspfAseLnkMask
+            IpAddress,
+        rlOspfAseLnkFrwAddress
+            IpAddress,
+        rlOspfAseLnkBitE
+            INTEGER,
+        rlOspfAseLnkMetric
+            Unsigned32,
+        rlOspfAseLnkTag
+            Unsigned32
+}
+
+
+rlOspfAseLnkLsid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The Link State ID is an LS Type Specific field
+        containing either a Router ID or an IP Address;
+        it identifies the piece of the  routing  domain
+        that is being described by the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.4 Link State ID"
+  ::= { rlOspfAseLnkEntry 1 }
+
+rlOspfAseLnkRouterId OBJECT-TYPE
+    SYNTAX      RouterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The 32 bit number that uniquely identifies the
+        originating router in the Autonomous System."
+    REFERENCE
+       "OSPF Version 2, Appendix C.1 Global parameters"
+  ::= { rlOspfAseLnkEntry 2 }
+
+rlOspfAseLnkSequence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The sequence number field is a signed  32-bit
+        integer. It is used to detect old and duplicate
+        link state advertisements. The space of sequence
+        numbers is linearly ordered. The larger the
+        sequence number the more recent the advertisement."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.6 LS sequence number"
+  ::= { rlOspfAseLnkEntry 3 }
+
+rlOspfAseLnkAge OBJECT-TYPE
+    SYNTAX      Integer32    -- Should be 0..MaxAge
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the age of the link state
+        advertisement in seconds."
+       REFERENCE
+          "OSPF Version 2, Section 12.1.1 LS age"
+  ::= { rlOspfAseLnkEntry 4 }
+
+rlOspfAseLnkChecksum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This field is the checksum of the complete contents
+        of the advertisement, excepting the age field.
+        The age field is excepted so that an advertisement's
+        age can be incremented without updating the checksum.
+        The checksum used is the same that is used for ISO
+        connectionless datagrams; it is commonly referred
+        to as the Fletcher checksum."
+    REFERENCE
+       "OSPF Version 2, Section 12.1.7 LS checksum"
+  ::= { rlOspfAseLnkEntry 5 }
+
+rlOspfAseLnkLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The lenth in bytes of the LSA.
+        This includes the 20 byte LSA header."
+  ::= { rlOspfAseLnkEntry 6 }
+
+rlOspfAseLnkMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Value depends on the link's Type field."
+  ::= { rlOspfAseLnkEntry 7 }
+
+rlOspfAseLnkFrwAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Data traffic for the advertised destination
+        will be forwarded to this address. If the
+        Forwarding address is set to 0.0.0.0, data
+        traffic will be forwarded instead to the LSA's
+        originator (i.e., the responsible AS boundary router)."
+  ::= { rlOspfAseLnkEntry 8 }
+
+rlOspfAseLnkBitE OBJECT-TYPE
+    SYNTAX INTEGER {
+        off(1),
+        on(2)
+    }
+    MAX-ACCESS   read-only
+        STATUS   current
+    DESCRIPTION
+       "The type of external metric. If bit E is set,
+        the metric specified is a Type 2 external metric."
+  ::= { rlOspfAseLnkEntry 9 }
+
+rlOspfAseLnkMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The cost of this route."
+  ::= { rlOspfAseLnkEntry 10 }
+
+rlOspfAseLnkTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "A 32-bit field attached to each external route."
+  ::= { rlOspfAseLnkEntry 11 }
+
+
+--Extention to ospfVirtIfTable
+
+rlospfVirtIfExtTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF RlospfVirtIfExtEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The Virtual Interface Table describes the virtual
+          links that the OSPF Process is configured to carry on."
+     ::= { rlOspf 9 }
+
+rlospfVirtIfExtEntry OBJECT-TYPE
+     SYNTAX     RlospfVirtIfExtEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "The OSPF virtual interface table
+          extension for md5 authentication"
+     AUGMENTS    { ospfVirtIfEntry }
+     ::= { rlospfVirtIfExtTable 1 }
+
+RlospfVirtIfExtEntry ::= SEQUENCE {
+     rlospfVirtifKeyChain        DisplayString
+}
+
+rlospfVirtifKeyChain OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Name of the key-chain which ospf virtual
+         interface uses for md5 authentication"
+    ::= { rlospfVirtIfExtEntry 1 }
+
+END
+

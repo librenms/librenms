@@ -1,0 +1,846 @@
+CTELS100-NG-MIB DEFINITIONS ::= BEGIN
+
+    --  ctels100-ng-mib.txt
+    --  Revision: 01.03.00
+    --  Part Number:
+    --  Date: December 15, 1999
+
+    --  Cabletron Systems, Inc.
+    --  35 Industrial Way, P.O. Box 5005
+    --  Rochester, NH 03867-0505
+    --  (603) 332-9400
+    --  support@ctron.com
+
+    --  This module provides authoritative definitions for part of the
+    --  naming tree below:
+    --
+    --  cabletron { enterprises 52 }
+    --
+    --  This module will be extended, as required.
+    --
+    --  Cabletron Systems reserves the right to make changes in
+    --  specification and other information contained in this document
+    --  without prior notice.  The reader should consult Cabletron Systems
+    --  to determine whether any such changes have been made.
+    --
+    --  In no event shall Cabletron Systems be liable for any incidental,
+    --  indirect, special, or consequential damages whatsoever (including
+    --  but not limited to lost profits) arising out of or related to this
+    --  document or the information contained in it, even if Cabletron
+    --  Systems has been advised of, known, or should have known, the
+    --  possibility of such damages.
+    --
+    --  Cabletron grants vendors, end-users, and other interested parties
+    --  a non-exclusive license to use this Specification in connection
+    --  with the management of Cabletron products.
+    --
+    --  Copyright (c)1999 Cabletron Systems
+    --
+    --  This mib is part of the assigned enterprise MIB tree for Cabletron Systems.
+    --  This mib provides management information for the next generation of the 
+    --  ELS100 product line (specifically: ELS100-24TX, ELS100-24TXM, and 
+    --  ELS100-24TXG), part of the SmartSTACK product line.
+
+          IMPORTS
+                     Counter, mgmt, NetworkAddress, enterprises
+                             FROM RFC1155-SMI
+                     DisplayString
+                             FROM RFC1213-MIB
+                     OBJECT-TYPE
+                             FROM RFC-1212;
+          --         TRAP-TYPE
+          --                 FROM RFC-1215;
+
+          -- All representations of MAC addresses in this MIB Module
+          -- use, as a textual convention (i.e. this convention does
+          -- not affect their encoding), the data type:
+
+          -- DisplayString ::= OCTET STRING
+
+          mib-2 OBJECT IDENTIFIER ::= { mgmt 1 }
+
+
+          cabletron OBJECT IDENTIFIER ::= { enterprises 52 }
+          els100  OBJECT IDENTIFIER ::= { cabletron 1011 }
+
+          els100SystemConfig  OBJECT IDENTIFIER ::= { els100 1 }
+--        els100PortTable  OBJECT IDENTIFIER ::= { els100 2 }
+          els100Switch  OBJECT IDENTIFIER ::= { els100 3 }
+
+
+          -- System-level configuration information
+
+          els100SysSerialno OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The serial number of the system."
+              ::= { els100SystemConfig 1 }
+
+          els100SysTftpIPAddress OBJECT-TYPE
+              SYNTAX  NetworkAddress
+              ACCESS  read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The IP address of the TFTP server from which a software
+                 download is to be initiated. This variable must be set
+                 before a TFTP download can be started with the 
+                 els100SysTftpStartDownload variable."
+              ::= { els100SystemConfig 2 }
+
+          els100SysTftpFilename OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE (0..255))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The name of the software upgrade file residing on the 
+                  TFTP server. Path information must be included in the file
+                  name. This variable must be set before a TFTP download can 
+                  be started with the els100SysTftpStartDownload variable."
+              ::= { els100SystemConfig 3 }
+
+          els100SysPowerupCount OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The total number of times the system has powered up since
+                  it was shipped from the factory."
+              ::= { els100SystemConfig 4 }
+
+          els100SysBrcastCutoffRate OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The Broadcast Cutoff Rate of the switch allowing for the
+                  control of broadcast storms. The value of this variable sets
+                  a per second rate. If the broadcast and unknown destination
+                  address frames being forwarded through the system surpass this
+                  rate, they are dropped. Valid values for this parameter are
+                  in the range (100..500000)."
+              ::= { els100SystemConfig 5 }
+
+          els100SysGatewayIPAddress OBJECT-TYPE
+              SYNTAX NetworkAddress
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The IP address of the next hop router (gateway) to which 
+                 frames destined for an IP subnet different than what the 
+                 system resides are sent."      
+              ::= { els100SystemConfig 6 }
+
+          els100SysTftpStartDownload OBJECT-TYPE
+              SYNTAX  INTEGER{
+                download (1),
+                noDownload (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Start a TFTP download. A SET of this variable with the
+                  value download (1) initiates a TFTP download to upgrade the
+                  system software. The variables els100SysTftpIPAddress and 
+                  els100SysTftpFilename must be configured before a download
+                  can begin. A GET of this variable will always return the 
+                  value noDownload (2)."
+              ::= { els100SystemConfig 7 }
+
+          els100SysBootPDhcpEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable (1),
+                enable (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Enable or disable the operation of the BootP and DHCP
+                  protocols on the system. These protocols are used for 
+                  automatically configuring the system's IP address 
+                  information if a properly configured BootP and/or DHCP
+                  server exists on the network."
+              ::= { els100SystemConfig 8 }
+
+--      els100SysRmonStatsHistEnable OBJECT-TYPE
+--            SYNTAX  INTEGER{
+--                disable (1),
+--                enable (2)
+--              }
+--            ACCESS  read-write
+--            STATUS  mandatory
+--            DESCRIPTION
+--                    "Globally enable/disable the operation of the RMON 
+--                     Statistics and History Groups on all ports simultaneously."
+--            ::= { els100SystemConfig 9 }
+
+          els100SysReset OBJECT-TYPE
+              SYNTAX  INTEGER{
+                      noReset (1),
+                      reset (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Initiate a software reset of the system."
+              ::= { els100SystemConfig 10 }
+
+          els100SysSyslogServer OBJECT-TYPE
+              SYNTAX  NetworkAddress
+              ACCESS  read-write
+              STATUS mandatory
+              DESCRIPTION
+                      "The IP address of the Syslog Server."
+              ::= { els100SystemConfig 11 }
+
+          els100SysLowestSyslogSeverity OBJECT-TYPE
+              SYNTAX  INTEGER{
+                      emergency (0),
+                      alert (1),
+                      critical (2),
+                      error (3),
+                      warning (4),
+                      notice (5),
+                      info (6),
+                      debug (7)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The Lowest Syslog Severity Level. All logs with
+                       the same or higher severity will be delivered.
+                       Note: higher severity has lower number."
+              ::= { els100SystemConfig 12 }
+
+          els100SysComPortEnable        OBJECT-TYPE
+              SYNTAX    INTEGER {
+                            disabled(1),
+                            enabled(2)          -- default
+           }
+              ACCESS    read-write
+              STATUS    mandatory
+              DESCRIPTION
+                      "The administrative state of the Com Port."
+              ::= { els100SystemConfig 13 }
+
+
+          els100SysBoardID      OBJECT-TYPE
+              SYNTAX    INTEGER
+              ACCESS    read-only
+              STATUS    mandatory
+              DESCRIPTION
+                "The system board ID."
+              ::= { els100SystemConfig 14 }
+
+          -- The port table - indexed by port
+
+          els100PortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Els100PortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port table."
+              ::= { els100 2 }
+
+          els100PortEntry OBJECT-TYPE
+              SYNTAX  Els100PortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An entry in the port table."
+              INDEX   { els100Port }
+              ::= { els100PortTable 1 }
+
+          Els100PortEntry ::=
+              SEQUENCE {
+                  els100Port
+                      INTEGER,
+                  els100PortStatus
+                      INTEGER,
+                  els100PortDuplexStatus
+                      INTEGER,
+                  els100PortForwardedFrames
+                      Counter,
+                  els100PortRcvdLocalFrames
+                      Counter,
+                  els100PortName
+                      DisplayString,
+                  els100PortEnable
+                      INTEGER,
+                  els100PortSpeed
+                      INTEGER,
+                  els100PortAutonegEnable
+                      INTEGER,
+                  els100PortFlowControlEnable
+                      INTEGER,
+                  els100PortType
+                      INTEGER             
+                  }
+
+          els100Port OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the port, from 1 to the number of ports on
+                  the system."
+              ::= { els100PortEntry 1 }
+
+          els100PortStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                up (1),
+                down (2)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The connection (link) status of the port, either up 
+                  (linked) or down (not linked)."
+              ::= { els100PortEntry 2 }
+
+          els100PortDuplexStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                half (1),
+                full (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The duplex status of the port, either half duplex or 
+                  full duplex."
+              ::= { els100PortEntry 3 }
+
+          els100PortForwardedFrames OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of frames received on the port and forwarded 
+                  to another port on the system module for processing."
+              ::= { els100PortEntry 4 }
+
+          els100PortRcvdLocalFrames OBJECT-TYPE
+              SYNTAX  Counter
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of frames received where the destination is 
+                  on the port."
+              ::= { els100PortEntry 5 }
+
+          els100PortName OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(0..60))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                       "A descriptive string of up to 60 characters used by the
+                  network administrator to name the port."
+              ::= { els100PortEntry 6 }
+
+          els100PortEnable OBJECT-TYPE
+              SYNTAX  INTEGER {
+                    disable (1), 
+                    enable (2) 
+                    }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                    "The enable status of the port, either enable or disable."
+              ::= { els100PortEntry 7 }
+
+          els100PortSpeed OBJECT-TYPE
+              SYNTAX  INTEGER {
+                    tenMbps (1),
+                    oneHundredMbps(2),
+                    oneThousandMbps(3) 
+                    }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                       "The speed the port is operating at: 10Mbps, or
+                       100Mbps, or 1000Mbps."
+              ::= { els100PortEntry 8 }
+
+          els100PortAutonegEnable OBJECT-TYPE
+              SYNTAX  INTEGER {
+                    disable (1), 
+                    enable (2) 
+                    }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                       "The auto-negotiation status of the port, either enable
+                    or disable. When in the enable (2) state, the port will
+                    automatically configure its duplex and speed operation."
+            ::= { els100PortEntry 9 }
+
+          els100PortFlowControlEnable OBJECT-TYPE
+              SYNTAX  INTEGER {
+                    disable (1), 
+                    enable (2) 
+                    }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                    "The state of flow control operation of the port, either 
+                    enable or disable."
+              ::= { els100PortEntry 10 }
+
+          els100PortType OBJECT-TYPE
+              SYNTAX  INTEGER {
+                    unknown(1),
+                    ieee10BaseT(2),
+                    ieee100BaseTx(3),
+                    ieee100BaseFx-MM(4),
+                    ieee100BaseFx-SM(5),
+                    ieee1000BaseCx(6),
+                    ieee1000BaseLx(7),
+                    ieee1000BaseSx(8),
+                    ieee1000BaseT(9),
+                    ieee1000BaseX(10)
+                    }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                    "Port physical interface type."
+              ::= { els100PortEntry 11 }
+
+
+        -- Switch-level information and configuration
+
+          els100SwitchIPAddress OBJECT-TYPE
+              SYNTAX NetworkAddress
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                       "The IP address of the system."
+              ::= { els100Switch 1 }
+
+          els100SwitchSubnetMask OBJECT-TYPE
+              SYNTAX NetworkAddress
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The subnet mask associated with the IP address of the system."
+              ::= { els100Switch 2 }
+
+          els100ActiveAgingTime OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                       "The aging time of entries in the MAC address forwarding table
+                  of the system."
+              ::= { els100Switch 3 }
+
+--        els100PurgeAgingTime OBJECT-TYPE
+--            SYNTAX  INTEGER
+--            ACCESS  read-write
+--            STATUS  mandatory
+--            DESCRIPTION
+--                     "The purge aging time of entries in the MAC address forwarding 
+--                  table of the system."
+--            ::= { els100Switch 4 }
+
+          els100SwitchSTPStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                on (1),
+                off (2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The Spanning Tree status of the system, enter on or off."
+              ::= { els100Switch 5 }
+            
+          els100SwitchManager OBJECT IDENTIFIER ::= { els100Switch 6 }
+
+          els100SwitchTrapRcvr1 OBJECT-TYPE
+              SYNTAX NetworkAddress
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The IP address of the first SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 1 }
+
+          els100SwitchTrapCommunity1 OBJECT-TYPE
+              SYNTAX DisplayString (SIZE(0..60))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The community name of the first SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 2 }
+
+          els100SwitchTrapRcvr2 OBJECT-TYPE
+              SYNTAX NetworkAddress
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The IP address of the second SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 3 }
+
+          els100SwitchTrapCommunity2 OBJECT-TYPE
+              SYNTAX DisplayString (SIZE(0..60))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The community name of the second SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 4 }
+
+          els100SwitchTrapRcvr3 OBJECT-TYPE
+              SYNTAX NetworkAddress
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The IP address of the third SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 5 }
+
+          els100SwitchTrapCommunity3 OBJECT-TYPE
+              SYNTAX DisplayString (SIZE(0..60))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The community name of the third SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 6 }
+
+          els100SwitchTrapRcvr4 OBJECT-TYPE
+              SYNTAX NetworkAddress
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The IP address of the fourth SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 7 }
+
+          els100SwitchTrapCommunity4 OBJECT-TYPE
+              SYNTAX DisplayString (SIZE(0..60))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+                     "The community name of the fourth SNMP manager to which traps 
+                 from the system are directed."
+              ::= { els100SwitchManager 8 }
+
+          els100SwitchPortMirroringStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable (1),
+                enable (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The Port Mirroring status of the system, either disable 
+                  or enable."
+              ::= { els100Switch 7 }
+
+          els100SwitchMirroredPort OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port that is being mirrored - the source."
+              ::= { els100Switch 8 }
+
+          els100SwitchMirroringPort OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port that is mirroring - the destination."
+              ::= { els100Switch 9 }
+
+          els100SwitchXmitMirrorEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable (1),
+                enable (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Enable or disable the mirroring of transmitted traffic
+                  out the mirrored port to the mirroring port."
+              ::= { els100Switch 10 }
+
+          els100SwitchRcvMirrorEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable (1),
+                enable (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Enable or disable the mirroring of received traffic
+                  into the mirrored port to the mirroring port."
+              ::= { els100Switch 11 }
+
+          els100SwitchVlanEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable (1),
+                enable (2)
+                }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Globally enable or disable the VLAN operation of the
+                  system."
+              ::= { els100Switch 12 }
+
+        -- Switch Info Vlan table - indexed by VLAN
+
+          els100SwitchVlanConfigTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Els100SwitchVlanEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "The VLAN configuration table."
+              ::= { els100Switch 13 }
+
+          els100SwitchVlanEntry OBJECT-TYPE
+              SYNTAX  Els100SwitchVlanEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                       "An entry in the VLAN configuration table."
+              INDEX   { els100SwitchVlanId }
+              ::= { els100SwitchVlanConfigTable 1 }
+
+          Els100SwitchVlanEntry ::=
+              SEQUENCE {
+                  els100SwitchVlanId
+                      INTEGER,
+                  els100SwitchVlanName
+                      DisplayString,
+                  els100SwitchVlanPorts
+                      OCTET STRING,
+                  els100SwitchVlanEgressPorts
+                      OCTET STRING,
+                  els100SwitchVlanStatus
+                      INTEGER
+              }
+    
+          els100SwitchVlanId OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                       "The number of the VLAN, from 1 to the number of VLAN's
+                     supported on the system."
+              ::= { els100SwitchVlanEntry 1 }
+
+          els100SwitchVlanName OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(0..60))
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "A descriptive string of up to 60 characters used by the
+                     network administrator to name the VLAN."
+              ::= { els100SwitchVlanEntry 2 }
+
+          els100SwitchVlanPorts OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                       "The set of ports in the VLAN. For systems supporting 
+                     tagged VLAN's, these are the ports to which packets 
+                     on the VLAN are sent untagged. Each octet within the 
+                     value of this object specifies a set of eight ports, 
+                     with the first octet specifying ports 1 through 8, the 
+                     second octet specifying ports 9 through 16, etc. Within 
+                     each octet, the most significant bit represents the 
+                     lowest numbered port, and the least significant bit 
+                     represents the highest numbered port. Thus each port 
+                     of the system is represented by a single bit within the 
+                     value of this object. If that bit has a value of '1' 
+                     then that port is included in the VLAN; the port is not
+                     included if its bit has a value of '0'."
+              ::= { els100SwitchVlanEntry 3 }
+
+          els100SwitchVlanEgressPorts OBJECT-TYPE
+              SYNTAX  OCTET STRING
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The set of ports defined to be on other VLAN's to which 
+                     tagged packets destined for this specific VLAN should 
+                     also be sent. Thus, this variable defines ports on the
+                     system that reach stations downstream which are on this 
+                     VLAN and to which traffic may be forwarded. Each octet 
+                     within the value of this object specifies a set of eight 
+                     ports, with the first octet specifying ports 1 through 8, 
+                     the second octet specifying ports 9 through 16, etc. 
+                     Within each octet, the most significant bit represents the 
+                     lowest numbered port, and the least significant bit 
+                     represents the highest numbered port. Thus each port 
+                     of the system is represented by a single bit within the 
+                     value of this object. If that bit has a value of '1' 
+                     then that port is included in the VLAN; the port is not
+                     included if its bit has a value of '0'."
+              ::= { els100SwitchVlanEntry 4 }
+
+          els100SwitchVlanStatus OBJECT-TYPE
+              SYNTAX  INTEGER{
+                  enable (1),
+                  disable (2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                    "Control variable used to enable or disable the operation
+                     of the associated VLAN in the system."
+              ::= { els100SwitchVlanEntry 5 }
+
+          els100SwitchVlanPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Els100SwitchVlanPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                    "The VLAN port configuration table."
+              ::= { els100Switch 14 }
+
+          els100SwitchVlanPortEntry OBJECT-TYPE
+              SYNTAX  Els100SwitchVlanPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "An entry in the VLAN port configuration table."
+              INDEX   { els100SwitchVlanPortId }
+              ::= { els100SwitchVlanPortTable 1 }
+
+          Els100SwitchVlanPortEntry ::=
+              SEQUENCE {
+                  els100SwitchVlanPortId
+                      INTEGER,
+                  els100SwitchVlanPvid
+                      INTEGER,
+                  els100SwitchVlanPortType
+                      INTEGER
+              }
+
+          els100SwitchVlanPortId OBJECT-TYPE
+              SYNTAX  INTEGER (0..63)
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The number of the port, from 1 to number of ports 
+                   in the system."
+              ::= { els100SwitchVlanPortEntry 1 }
+
+          els100SwitchVlanPvid OBJECT-TYPE
+              SYNTAX  INTEGER (1..4095)
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port's VLAN ID. For tagged VLAN's, this variable
+                   defines a 12 bit port VLAN ID (PVID) used as the 
+                   identifier of the VLAN in the packet tag."
+              ::= { els100SwitchVlanPortEntry 2 }
+
+          els100SwitchVlanPortType OBJECT-TYPE
+              SYNTAX  INTEGER{
+                hybrid (1),
+                access (2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "For tagged VLAN's, the VLAN port type, either hybrid or 
+                   access. Hybrid ports allow both tagged and untagged
+                   packets to enter the switch. Access ports only accept
+                   untagged packets."
+              ::= { els100SwitchVlanPortEntry 3 }
+
+          els100SwitchPriorityEnable OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable (1),
+                enable (2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Globally enable or disable the Class of Service traffic
+                   priority mechanism for the system."
+              ::= { els100Switch 15 }
+
+          els100SwitchPriorityThreshold OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                  "The global priority threshold level for the system
+                   at which VLAN tagged frames entering the associated
+                   port are assigned a high priority. This variable can
+                   have a value from (0...7). Traffic with a priority level
+                   equal to or above this value are high priority. Traffic
+                   with a priority level below this value are normal priority."
+              ::= { els100Switch 16 }
+
+          els100SwitchPriorityPortTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Els100SwitchPriorityPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "The priority port table."
+              ::= { els100Switch 17 }
+
+          els100SwitchPriorityPortEntry OBJECT-TYPE
+              SYNTAX  Els100SwitchPriorityPortEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                     "An entry in the port priority table."
+              INDEX   { els100SwitchPriorityPortId }
+              ::= { els100SwitchPriorityPortTable 1 }
+
+          Els100SwitchPriorityPortEntry ::=
+              SEQUENCE {
+                 els100SwitchPriorityPortId
+                     INTEGER,
+                 els100SwitchPriorityDefault
+                     INTEGER
+              }
+
+          els100SwitchPriorityPortId OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port number, from 1 to number of ports in the 
+                   system."
+              ::= { els100SwitchPriorityPortEntry 1 }
+
+          els100SwitchPriorityDefault OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "The port priority level assigned to untagged
+                   traffic entering the associated port. This variable
+                   can have a value in the range (0...7). This value is
+                   compared to the value of the els100SwitchPriorityThreshold 
+                   variable to determine if the traffic on the port is
+                   high or normal."
+              ::= { els100SwitchPriorityPortEntry 2 }
+
+
+          els100SwitchSpanningTreeStandby OBJECT-TYPE
+              SYNTAX  INTEGER{
+                disable (1),
+                enable (2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+                      "Globally enable or disable Spanning Tree Standby.
+                       If set to disable, every port will instanly enter 
+                       forwarding mode after link up"
+              ::= { els100Switch 18 }
+
+END

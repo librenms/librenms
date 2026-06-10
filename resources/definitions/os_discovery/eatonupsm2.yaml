@@ -1,0 +1,63 @@
+modules:
+    os:
+        hardware: XUPS-MIB::xupsIdentModel.0
+        version: XUPS-MIB::xupsIdentSoftwareVersion.0
+        serial: XUPS-MIB::xupsIdentSerialNumber.0
+        features:
+            - XUPS-MIB::xupsAgentModel.0
+            - XUPS-MIB::xupsAgentSoftwareVersion.0
+        features_template: '{{ XUPS-MIB::xupsAgentModel.0 }} {{ XUPS-MIB::xupsAgentSoftwareVersion.0 }}'
+    sensors:
+        runtime:
+            data:
+                -
+                    oid: XUPS-MIB::xupsBatteryLastReplacedDate
+                    value: XUPS-MIB::xupsBatteryLastReplacedDate
+                    num_oid: '.1.3.6.1.4.1.534.1.2.6.{{ $index }}'
+                    descr: 'Last battery replacement'
+                    index: 'xupsBatteryLastReplacedDate.{{ $index }}'
+                    user_func: dateToRuntime
+        temperature:
+            data:
+                -
+                    oid: XUPS-MIB::xupsEnvAmbientTemp
+                    value: XUPS-MIB::xupsEnvAmbientTemp
+                    num_oid: '.1.3.6.1.4.1.534.1.6.1.{{ $index }}'
+                    descr: 'Ambient'
+                    index: 'xupsEnvAmbientTemp.{{ $index }}'
+                -
+                    oid: EATON-EMP-MIB::xupsEnvRemoteTemp
+                    value: EATON-EMP-MIB::xupsEnvRemoteTemp
+                    num_oid: '.1.3.6.1.4.1.534.1.6.5.{{ $index }}'
+                    descr: 'Remote'
+                    index: 'xupsEnvRemoteTemp.{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: EATON-EMP-MIB::xupsEnvRemoteHumidity
+                    value: EATON-EMP-MIB::xupsEnvRemoteHumidity
+                    num_oid: '.1.3.6.1.4.1.534.1.6.6.{{ $index }}'
+                    descr: 'Humidity'
+                    index: 'xupsEnvRemoteHumidity.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: EATON-EMP-MIB::xupsContactState
+                    value: EATON-EMP-MIB::xupsContactState
+                    num_oid: '.1.3.6.1.4.1.534.1.6.8.1.3.{{ $index }}'
+                    descr: 'Contact {{ $index }}'
+                    state_name: xupsEnvironment
+                    index: 'xupsContactState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: open, generic: 2 }
+                        - { value: 2, descr: closed, generic: 2 }
+                -
+                    oid: XUPS-MIB::xupsBatteryLowCapacity
+                    value: XUPS-MIB::xupsBatteryLowCapacity
+                    num_oid: '.1.3.6.1.4.1.534.1.2.10.{{ $index }}'
+                    state_name: xupsBatteryLowCapacity
+                    descr: 'Battery Low Capacity Warning'
+                    index: 'xupsBatteryLowCapacity.{{ $index }}'
+                    states:
+                        - { value: 1, descr: Yes, generic: 1 }
+                        - { value: 2, descr: No, generic: 0 }

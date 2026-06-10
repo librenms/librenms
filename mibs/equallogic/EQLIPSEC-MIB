@@ -1,0 +1,1062 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLIPSEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, IpAddress, Counter64, Integer32,TimeTicks,  enterprises 
+            FROM SNMPv2-SMI  
+
+    DateAndTime, RowPointer, TruthValue, RowStatus, DisplayString, TimeStamp, StorageType
+            FROM SNMPv2-TC
+
+    equalLogic
+            FROM EQUALLOGIC-SMI
+
+    eqlGroupId
+            FROM EQLGROUP-MIB
+
+    eqlMemberIndex
+            FROM EQLMEMBER-MIB
+
+    Unsigned64
+            FROM EQLSTORAGEPOOL-MIB
+
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB       -- RFC2851
+
+    ;
+
+--
+-- module identity
+--
+
+eqlIpsecModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION
+        "Equallogic Inc. group information
+
+        Copyright (c) 2002-2010 by Dell, Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell, Inc.  This software embodies proprietary information 
+        and trade secrets of Dell, Inc. 
+        "
+
+
+    -- Revision history, in reverse chronological order
+    REVISION    "201007190000Z"         -- 19-Jul-10
+    DESCRIPTION "Initial revision"
+    ::= { enterprises equalLogic(12740) 22 }
+--
+-- groups of related objects
+--
+
+eqlIpsecObjects OBJECT IDENTIFIER ::=  { eqlIpsecModule 1 }   
+eqlIpsecNotifications OBJECT IDENTIFIER ::= { eqlIpsecModule 2 }   
+eqlIpsecConformance OBJECT IDENTIFIER ::=  { eqlIpsecModule 3 } 
+
+--
+-- Textual Conventions
+--
+
+SnmpAdminString ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT     "t"
+       STATUS           current
+       DESCRIPTION  "An octet string containing administrative
+                    information, preferably in human-readable form."
+       SYNTAX       OCTET STRING (SIZE (0..1024))
+
+InetPortNumber ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "Represents a 16 bit port number of an Internet transport
+         layer protocol.  Port numbers are assigned by IANA.  A
+         current list of all assignments is available from
+         <http://www.iana.org/>.
+
+         The value zero is object-specific and must be defined as
+         part of the description of any object that uses this
+         syntax.  Examples of the usage of zero might include
+         situations where a port number is unknown, or when the
+         value zero is used as a wildcard in a filter."
+    REFERENCE   "STD 6 (RFC 768), STD 7 (RFC 793) and RFC 2960"
+    SYNTAX       Unsigned32 (0..65535)
+
+IpsecAuthType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT       "d"
+    STATUS             current
+    DESCRIPTION
+        "The IpsecAuthType is used to specify the authentication
+         type to be used with a particular peer."
+    SYNTAX      INTEGER { presharedkey(1), certificates(2), manualkey(3) }
+
+IpsecIdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT       "d"
+    STATUS   current
+    DESCRIPTION
+        "The IpsecIdType is used to specify the type of identifier
+         for a peer to be used with the ID payload."
+    SYNTAX      INTEGER { none(1), ipaddress(2), userfqdn(3), fqdn(4), asn1dn(5) }
+
+IpsecEncType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT       "d"
+    STATUS   current
+    DESCRIPTION
+        "The IpsecEncType is used to specify the encryption
+         algorithm to be used when manual keying is used."
+    SYNTAX      INTEGER { nullenc(1), aes-cbc(2), triple-des-cbc(3) }
+
+ --
+ -- IPSec global settings definition table
+ --
+
+eqlIpsecTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EqlIpsecEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "EqualLogic-Persistent Storage IPSec global settings
+
+            This table contains global IPSec settings."
+       ::= { eqlIpsecObjects 1 }
+
+eqlIpsecEntry OBJECT-TYPE
+       SYNTAX      EqlIpsecEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "An entry (row) containing global IPSec settings."
+       INDEX       {  eqlIpsecInstanceId }
+       ::= { eqlIpsecTable 1 }
+
+EqlIpsecEntry ::=
+    SEQUENCE {
+       eqlIpsecInstanceId                             Integer32,
+       eqlIpsecEnable                                 TruthValue,
+       eqlIpsecRowStatus                              RowStatus
+   }
+
+eqlIpsecInstanceId OBJECT-TYPE
+       SYNTAX          Integer32
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION     "This index identifies the IPSec instance. This index should always be 1."
+       ::=  {  eqlIpsecEntry 1 }
+
+eqlIpsecEnable OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+          "This specifies if IPSec is enabled or disbaled.
+
+           True for enabled and False for disabled."
+       DEFVAL      { false }
+       ::= { eqlIpsecEntry 2 }
+
+eqlIpsecRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object indicates the conceptual status of this row.
+
+            This object may not be set to active if the requirements
+            of the spdIpHeadFiltType object are not met.  In other
+            words, if the associated value columns needed by a
+            particular test have not been set, then attempting to
+            change this row to an active state will result in an
+            inconsistentValue error.  See the spdIpHeadFiltType
+            object description for further details."
+       ::= { eqlIpsecEntry 3 }
+
+ --
+ -- Policy IPHeader filter definition table
+ --
+
+eqlIpsecPolicyTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EqlIpsecPolicyEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "EqualLogic-Persistent Storage IPSec Policy Table.
+            This table contains a list of filter definitions."
+       ::= { eqlIpsecObjects 2 }
+
+eqlIpsecPolicyEntry OBJECT-TYPE
+       SYNTAX      EqlIpsecPolicyEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A definition of a particular filter."
+       INDEX       {  eqlIpsecPolicyInstanceId }
+       ::= { eqlIpsecPolicyTable 1 }
+
+EqlIpsecPolicyEntry ::= SEQUENCE {
+       eqlIpsecPolicyInstanceId                       Integer32,
+       eqlIpsecPolicyFilterName                       SnmpAdminString,
+       eqlIpsecPolicyFilterIPVersion                  InetAddressType,
+       eqlIpsecPolicyFilterAddress                    InetAddress,
+       eqlIpsecPolicyFilterNetmaskLen                 Integer32,
+       eqlIpsecPolicyFilterLocalAddress               InetAddress,
+       eqlIpsecPolicyFilterPort                       Integer32,
+       eqlIpsecPolicyFilterLocalPort                  Integer32,
+       eqlIpsecPolicyFilterProtocol                   Integer32,
+       eqlIpsecPolicyFilterPeerName                   SnmpAdminString,
+       eqlIpsecPolicyFilterAction                     INTEGER,
+       eqlIpsecPolicyFilterRowStatus                  RowStatus
+   }
+
+eqlIpsecPolicyInstanceId OBJECT-TYPE
+       SYNTAX          Integer32
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION     "This index identifies the IPSec policy instance."
+       ::=  {  eqlIpsecPolicyEntry 1 }
+
+eqlIpsecPolicyFilterName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..32))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The administrative name for this filter."
+       ::= { eqlIpsecPolicyEntry 2 }
+
+eqlIpsecPolicyFilterIPVersion OBJECT-TYPE
+       SYNTAX      InetAddressType
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The Internet Protocol version the addresses are to match
+            against.  The value of this property determines the size
+            and format of the eqlIpsecPolicyFilterAddress and
+            eqlIpsecPolicyFilterLocalAddress."
+
+       DEFVAL  { ipv6 }
+       ::= { eqlIpsecPolicyEntry 3 }
+
+eqlIpsecPolicyFilterAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The starting address of a source address range that the
+            packet must match against for this filter to be
+            considered TRUE.
+
+            This object is only used if sourceAddress is set in
+            spdIpHeadFiltType."
+       ::= { eqlIpsecPolicyEntry 4 }
+
+eqlIpsecPolicyFilterNetmaskLen OBJECT-TYPE
+       SYNTAX      Integer32 (0..128)
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The ending address of a source address range to check a
+            packet against, where the starting is specified by the
+            spdIpHeadFiltSrcAddressBegin object.  Set this column to
+            the same value as the spdIpHeadFiltSrcAddressBegin
+            column to get an exact single address match.
+
+            This object is only used if sourceAddress is set in
+            spdIpHeadFiltType."
+       ::= { eqlIpsecPolicyEntry 5 }
+
+eqlIpsecPolicyFilterLocalAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The Local IP Address on the array to bind a policy to.
+            This option is only used when the Peer is of type manual.
+            Can be either a IPv4 or IPV6 address."
+
+       ::= { eqlIpsecPolicyEntry 6 }
+
+eqlIpsecPolicyFilterPort OBJECT-TYPE
+       SYNTAX      Integer32 (0..65535)
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The low port of the port range a packet's source must
+            match against.  To match, the port number must be
+            greater than or equal to this value.
+
+            This object is only used if sourcePort is set in
+            spdIpHeadFiltType.
+
+            The value of 0 for this object is illegal."
+       ::= { eqlIpsecPolicyEntry 7 }
+
+eqlIpsecPolicyFilterLocalPort OBJECT-TYPE
+       SYNTAX      Integer32 (0..65535)
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The low port of the port range a packet's source must
+            match against.  To match, the port number must be
+            greater than or equal to this value.
+
+            This object is only used if sourcePort is set in
+            spdIpHeadFiltType.
+
+            The value of 0 for this object is illegal.
+
+            This object specifies the local port to be used."
+       ::= { eqlIpsecPolicyEntry 8 }
+
+eqlIpsecPolicyFilterProtocol OBJECT-TYPE
+       SYNTAX      Integer32 (0..255)
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The protocol number the incoming packet must match
+            against for this filter to be evaluated as true.
+
+            This object is only used if protocol is set in
+            spdIpHeadFiltType."
+       ::= { eqlIpsecPolicyEntry 9 }
+
+eqlIpsecPolicyFilterPeerName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..64))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "This specifies the name of the peer this policy must be associated with."
+       ::= { eqlIpsecPolicyEntry 10 }
+
+eqlIpsecPolicyFilterAction OBJECT-TYPE
+       SYNTAX      INTEGER { 
+                       ipsec(1),
+                       pass(2),
+                       drop(3)
+       }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The action to be taken on packets matching this rule."
+       ::= { eqlIpsecPolicyEntry 11 }
+
+eqlIpsecPolicyFilterRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object indicates the conceptual status of this row.
+
+            This object may not be set to active if the requirements
+            of the spdIpHeadFiltType object are not met.  In other
+            words, if the associated value columns needed by a
+            particular test have not been set, then attempting to
+            change this row to an active state will result in an
+            inconsistentValue error.  See the spdIpHeadFiltType
+            object description for further details."
+       ::= { eqlIpsecPolicyEntry 12 }
+
+
+ --
+ -- IPSec certificate configuration table
+ --
+
+eqlIpsecCertConfigTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EqlIpsecCertConfigEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "EqualLogic-Dynamic IPSec certificate configuration Table.
+            This table contains the list of certificates configured."
+       ::= { eqlIpsecObjects 3 }
+
+eqlIpsecCertConfigEntry OBJECT-TYPE
+       SYNTAX      EqlIpsecCertConfigEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A definition of a particular certificate."
+       INDEX       {  eqlIpsecCertInstanceId }
+       ::= { eqlIpsecCertConfigTable 1 }
+
+EqlIpsecCertConfigEntry ::= SEQUENCE {
+       eqlIpsecCertInstanceId                 Integer32,
+       eqlIpsecCertName                       SnmpAdminString,
+       eqlIpsecCertFileName                   SnmpAdminString,
+       eqlIpsecCertType                       INTEGER,
+       eqlIpsecPrivKeyFileName                SnmpAdminString,
+       eqlIpsecCertPassword                   SnmpAdminString,
+       eqlIpsecCertRowStatus                  RowStatus
+   }
+
+eqlIpsecCertInstanceId OBJECT-TYPE
+       SYNTAX          Integer32
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION     "This index identifies the IPSec certificate instance."
+       ::=  {  eqlIpsecCertConfigEntry 1 }
+
+eqlIpsecCertName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..32))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The administrative name for this certificate."
+       ::= { eqlIpsecCertConfigEntry 2 }
+
+eqlIpsecCertFileName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The certificate file name."
+       ::= { eqlIpsecCertConfigEntry 3 }
+
+eqlIpsecCertType OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       local-cert(1),
+                       root-cert(2),
+                       intermediate(3)
+       }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The certificate type. Local cert, Root CA cert or intermediate cert."
+            
+       ::= { eqlIpsecCertConfigEntry 4 }
+
+eqlIpsecPrivKeyFileName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The private key file name."
+       ::= { eqlIpsecCertConfigEntry 5 }
+
+eqlIpsecCertPassword OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..64))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The password to use for decrypting certificate."
+       ::= { eqlIpsecCertConfigEntry 6 }
+
+eqlIpsecCertRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object indicates the conceptual status of this row.
+
+            This object may not be set to active if the requirements
+            of the spdIpHeadFiltType object are not met.  In other
+            words, if the associated value columns needed by a
+            particular test have not been set, then attempting to
+            change this row to an active state will result in an
+            inconsistentValue error.  See the spdIpHeadFiltType
+            object description for further details."
+       ::= { eqlIpsecCertConfigEntry 7 }
+
+ --
+ -- IPSec peer configuration table
+ --
+
+eqlIpsecPeerTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EqlIpsecPeerEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "EqualLogic-Persistent Storage IPSec peer Table.
+            This table contains the list of peers configured."
+       ::= { eqlIpsecObjects 4 }
+
+eqlIpsecPeerEntry OBJECT-TYPE
+       SYNTAX      EqlIpsecPeerEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A definition of a particular certificate."
+       INDEX       {  eqlIpsecPeerInstanceId }
+       ::= { eqlIpsecPeerTable 1 }
+
+EqlIpsecPeerEntry ::= SEQUENCE {
+       eqlIpsecPeerInstanceId                 Integer32,
+       eqlIpsecPeerName                       SnmpAdminString,
+       eqlIpsecPeerAuthType                   INTEGER,
+       eqlIpsecPeerPreSharedKey               DisplayString,
+       eqlIpsecPeerCertIdType                 INTEGER,
+       eqlIpsecPeerCertIdValue                SnmpAdminString,
+       eqlIpsecPeerNullEnc                    TruthValue,
+       eqlIpsecPeerTunnelMode                 TruthValue,
+       eqlIpsecPeerTunnelAddressIPVersion     InetAddressType,
+       eqlIpsecPeerTunnelAddress              InetAddress,
+       eqlIpsecPeerIkeV2                      TruthValue,
+       eqlIpsecPeerManualKeyEncAlg            INTEGER,
+       eqlIpsecPeerManualKeyEncKeyOut         SnmpAdminString,
+       eqlIpsecPeerManualKeyEncKeyIn          SnmpAdminString,
+       eqlIpsecPeerManualKeyAuthAlg           INTEGER,
+       eqlIpsecPeerManualKeyAuthKeyOut        SnmpAdminString,
+       eqlIpsecPeerManualKeyAuthKeyIn         SnmpAdminString,
+       eqlIpsecPeerManualKeySpiOut            Integer32,
+       eqlIpsecPeerManualKeySpiIn             Integer32,
+       eqlIpsecPeerRowStatus                  RowStatus
+   }
+
+eqlIpsecPeerInstanceId OBJECT-TYPE
+       SYNTAX          Integer32
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION     "This index identifies the IPSec policy instance."
+       ::=  {  eqlIpsecPeerEntry 1 }
+
+eqlIpsecPeerName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..64))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The administrative name for this peer."
+       ::= { eqlIpsecPeerEntry 2 }
+
+eqlIpsecPeerAuthType OBJECT-TYPE
+       SYNTAX      INTEGER { 
+                       presharedkey(1), 
+                       certificates(2), 
+                       manualkey(3) 
+       }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The authentication method used with this peer.
+
+            Pre-shared keys, certificates and manual keys are the options."
+       ::= { eqlIpsecPeerEntry 3 }
+
+eqlIpsecPeerPreSharedKey OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(6..130))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The pre-shared key to be used during authentication.
+            It is mandatory that this only contain printable ASCII
+            ASCII characters, meaning each byte must be in the range
+            of 33 to 126."
+       ::= { eqlIpsecPeerEntry 4 }
+
+eqlIpsecPeerCertIdType OBJECT-TYPE
+       SYNTAX      INTEGER { none(1), ipaddress(2), userfqdn(3), fqdn(4), asn1dn(5) }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "The identifier type to be used in ID payload.
+
+            Only applicable if the auth type is certificates."
+       ::= { eqlIpsecPeerEntry 5 }
+
+eqlIpsecPeerCertIdValue OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..256))
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+           "The pre-shared key to be used during authentication.
+
+            Only applicable if the auth type is certificates."
+       ::= { eqlIpsecPeerEntry 6 }
+
+eqlIpsecPeerNullEnc OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This specifies if null encryption is to be used.
+
+            Only applicable if the auth type is certificates or pre-shared keys."
+       ::= { eqlIpsecPeerEntry 7 }
+
+eqlIpsecPeerTunnelMode OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "This specifies if tunnel mode is to be used with this peer."
+       DEFVAL          {false}
+       ::= { eqlIpsecPeerEntry 8 }
+
+eqlIpsecPeerTunnelAddressIPVersion OBJECT-TYPE
+       SYNTAX      InetAddressType
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The Internet Protocol version the addresses are to match
+            against.  The value of this property determines the size
+            and format of the spdIpHeadFiltSrcAddressBegin,
+            spdIpHeadFiltSrcAddressEnd,
+            spdIpHeadFiltDstAddressBegin, and
+            spdIpHeadFiltDstAddressEnd objects.
+
+            Values of unknown, ipv4z, ipv6z and dns are not legal
+            values for this object."
+       DEFVAL  { ipv6 }
+       ::= { eqlIpsecPeerEntry 9 }
+
+eqlIpsecPeerTunnelAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The address of the tunnel remote end
+
+            This object is only used if tunnelMode is set to True."
+       ::= { eqlIpsecPeerEntry 10 }
+
+eqlIpsecPeerIkeV2 OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+          "This specifies the IKE version to be used with this peer. If the peer talks
+           the other version, the IPSec session will not be established."
+       DEFVAL          {false}
+       ::= { eqlIpsecPeerEntry 11 }
+
+eqlIpsecPeerManualKeyEncAlg OBJECT-TYPE
+       SYNTAX      INTEGER { none(0), des-cbc(2), triple-des-cbc(3), cast128-cbc(6), blowfish-cbc(7), null-enc(11), aes(12), aes-ctr(13), skipjack(250) }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The encryption algorithm to be used.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 12 }
+
+eqlIpsecPeerManualKeyEncKeyOut OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The encryption key to be used in the outbound direction.
+
+            Specified as a hex string.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 13 }
+
+eqlIpsecPeerManualKeyEncKeyIn OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The encryption key to be used in the inbound direction.
+
+            Specified as a hex string.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 14 }
+
+eqlIpsecPeerManualKeyAuthAlg OBJECT-TYPE
+       SYNTAX      INTEGER { none(0), sha1(1), sha256(2) }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The authentication algorithm to be used.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 15 }
+
+eqlIpsecPeerManualKeyAuthKeyOut OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The authentication key to be used in the outbound direction.
+
+            Specified as a string.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 16 }
+
+eqlIpsecPeerManualKeyAuthKeyIn OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The authentication key to be used in the inbound direction.
+
+            Specified as a string.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 17 }
+
+eqlIpsecPeerManualKeySpiOut OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The SPI to be used in the outbound direction.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 18 }
+
+eqlIpsecPeerManualKeySpiIn OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The SPI to be used in the inbound direction.
+
+            Only applicable if the auth type is manual keys."
+       ::= { eqlIpsecPeerEntry 19 }
+
+eqlIpsecPeerRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object indicates the conceptual status of this row.
+
+            This object may not be set to active if the requirements
+            of the spdIpHeadFiltType object are not met.  In other
+            words, if the associated value columns needed by a
+            particular test have not been set, then attempting to
+            change this row to an active state will result in an
+            inconsistentValue error.  See the spdIpHeadFiltType
+            object description for further details."
+       ::= { eqlIpsecPeerEntry 20 }
+
+ --
+ -- IPSec certificate display table
+ --
+
+eqlIpsecCertDisplayTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EqlIpsecCertDisplayEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "EqualLogic-Dynamic IPSec certificate display Table.
+            This table is used to display certificate details."
+       ::= { eqlIpsecObjects 5 }
+
+eqlIpsecCertDisplayEntry OBJECT-TYPE
+       SYNTAX      EqlIpsecCertDisplayEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "Contents of a particular certificate instance for display."
+       INDEX       {  eqlIpsecCertInstanceId }
+       ::= { eqlIpsecCertDisplayTable 1 }
+
+EqlIpsecCertDisplayEntry ::= SEQUENCE {
+       eqlIpsecCertDisplayName                SnmpAdminString,
+       eqlIpsecCertDisplayIssuedToDName       SnmpAdminString,
+       eqlIpsecCertDisplaySerialNumber        SnmpAdminString,
+       eqlIpsecCertDisplayIssuedByDName       SnmpAdminString,
+       eqlIpsecCertDisplayIssuedOn            SnmpAdminString,
+       eqlIpsecCertDisplayExpiresOn           SnmpAdminString,
+       eqlIpsecCertDisplaySha1Fingerprint     SnmpAdminString,
+       eqlIpsecCertDisplayMd5Fingerprint      SnmpAdminString,
+       eqlIpsecCertDisplayLocal               INTEGER,
+       eqlIpsecCertDisplayFormat              INTEGER,
+       eqlIpsecCertDisplaySubAltName          SnmpAdminString
+    }
+
+eqlIpsecCertDisplayName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..32))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The administrative name for this certificate."
+       ::= { eqlIpsecCertDisplayEntry 1 }
+
+eqlIpsecCertDisplayIssuedToDName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..256))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field issued to distinguished name."
+       ::= { eqlIpsecCertDisplayEntry 2 }
+
+eqlIpsecCertDisplaySerialNumber OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field serial number."
+       ::= { eqlIpsecCertDisplayEntry 3 }
+
+eqlIpsecCertDisplayIssuedByDName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..256))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field issued by distinguished name."
+       ::= { eqlIpsecCertDisplayEntry 4 }
+
+eqlIpsecCertDisplayIssuedOn OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field issued on."
+       ::= { eqlIpsecCertDisplayEntry 5 }
+
+eqlIpsecCertDisplayExpiresOn OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field expires on."
+       ::= { eqlIpsecCertDisplayEntry 6 }
+
+eqlIpsecCertDisplaySha1Fingerprint OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field SHA1 finger print."
+       ::= { eqlIpsecCertDisplayEntry 7 }
+
+eqlIpsecCertDisplayMd5Fingerprint OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field MD5 finger print."
+       ::= { eqlIpsecCertDisplayEntry 8 }
+
+eqlIpsecCertDisplayLocal OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       local-cert(1),
+                       root-cert(2),
+                       intermediate(3)
+       }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Boolean that indicates if this is a localm certificate or not."
+       ::= { eqlIpsecCertDisplayEntry 9 }
+
+eqlIpsecCertDisplayFormat OBJECT-TYPE
+       SYNTAX      INTEGER {
+                       x509(1),
+                       pkcs12(2)
+       }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The certificate format. x.509 or pkcs12."
+            
+       ::= { eqlIpsecCertDisplayEntry 10 }
+
+eqlIpsecCertDisplaySubAltName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..256))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the field MD5 finger print."
+       ::= { eqlIpsecCertDisplayEntry 11 }
+   
+ --
+ -- IPSec SA display table
+ --
+
+eqlIpsecSecAssocTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EqlIpsecSecAssocEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "EqualLogic-Dynamic IPSec security association Table.
+            This table is used to display the security association details."
+       ::= { eqlIpsecObjects 6 }
+
+eqlIpsecSecAssocEntry OBJECT-TYPE
+       SYNTAX      EqlIpsecSecAssocEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "Contents of a particular SA instance for display."
+       INDEX       { eqlGroupId, eqlMemberIndex,
+                     eqlIpsecSecAssocInstanceIdHigh,
+                     eqlIpsecSecAssocInstanceIdLow }
+       ::= { eqlIpsecSecAssocTable 1 }
+
+EqlIpsecSecAssocEntry ::= SEQUENCE {
+       eqlIpsecSecAssocInstanceIdHigh                Unsigned32,
+       eqlIpsecSecAssocInstanceIdLow                 Unsigned32,
+       eqlIpsecSecAssocSrcAddressIPVersion           InetAddressType,
+       eqlIpsecSecAssocSrcAddress                    InetAddress,
+       eqlIpsecSecAssocDstAddressIPVersion           InetAddressType,
+       eqlIpsecSecAssocDstAddress                    InetAddress,
+       eqlIpsecSecAssocEncAlg                        INTEGER,
+       eqlIpsecSecAssocAuthAlg                       INTEGER,
+       eqlIpsecSecAssocSpi                           Integer32,
+       eqlIpsecSecAssocEncKey                        SnmpAdminString,
+       eqlIpsecSecAssocAuthKey                       SnmpAdminString,
+       eqlIpsecSecAssocManual                        TruthValue
+   }
+
+eqlIpsecSecAssocInstanceIdHigh OBJECT-TYPE
+       SYNTAX          Unsigned32
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION     "This index carries the high-order 32-bit of the instance ID that identifies the IPSec security association."
+       ::=  {  eqlIpsecSecAssocEntry 1 }
+
+eqlIpsecSecAssocInstanceIdLow  OBJECT-TYPE
+       SYNTAX          Unsigned32
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION     "This index carries the low-order 32-bit of the instance ID that identifies the IPSec security association."
+       ::=  {  eqlIpsecSecAssocEntry 2 }
+
+eqlIpsecSecAssocSrcAddressIPVersion OBJECT-TYPE
+       SYNTAX      InetAddressType 
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The IP version of the source endpoint."
+       ::= { eqlIpsecSecAssocEntry 3 }
+
+eqlIpsecSecAssocSrcAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The IP address of the source endpoint."
+       ::= { eqlIpsecSecAssocEntry 4 }
+
+eqlIpsecSecAssocDstAddressIPVersion OBJECT-TYPE
+       SYNTAX      InetAddressType 
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The IP version of the destination endpoint."
+       ::= { eqlIpsecSecAssocEntry 5 }
+
+eqlIpsecSecAssocDstAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The IP address of the destination endpoint."
+       ::= { eqlIpsecSecAssocEntry 6 }
+
+eqlIpsecSecAssocEncAlg OBJECT-TYPE
+       SYNTAX      INTEGER { none(0), des-cbc(2), triple-des-cbc(3), cast128-cbc(6), blowfish-cbc(7), null-enc(11), aes(12), aes-ctr(13), skipjack(250) }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The encryption algorithm used."
+       ::= { eqlIpsecSecAssocEntry 7 }
+
+eqlIpsecSecAssocAuthAlg OBJECT-TYPE
+       SYNTAX      INTEGER { none(0), md5-hmac(2), sha1-hmac(3), sha2-256(5), sha2-384(6), sha2-512(7), ripemd160-hmac(8), aes-xcbc-mac(9), md5(249), sha(250), null(251), tcp-md5(252) }
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The authentication algorithm used."
+       ::= { eqlIpsecSecAssocEntry 8 }
+
+eqlIpsecSecAssocSpi OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "SPI used in the security association."
+       ::= { eqlIpsecSecAssocEntry 9 }
+
+eqlIpsecSecAssocEncKey OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the encryption key used in the SA."
+       ::= { eqlIpsecSecAssocEntry 10 }
+
+eqlIpsecSecAssocAuthKey OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE(1..128))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "Display string for the authentication key used in the SA."
+       ::= { eqlIpsecSecAssocEntry 11 }
+
+eqlIpsecSecAssocManual OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "True means SA is from a manual key configured."
+       ::= { eqlIpsecSecAssocEntry 12 }
+
+--
+ -- IPSec stale SA delete table
+ --
+
+eqlIpsecStaleSecAssocDeleteTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF EqlIpsecStaleSecAssocDeleteEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "EqualLogic-Dynamic IPSec stale security association 
+            delete Table. This table is used to indicate the 
+            destination address and type of all security associations
+            to delete."
+       ::= { eqlIpsecObjects 7 }
+
+eqlIpsecStaleSecAssocDeleteEntry OBJECT-TYPE
+       SYNTAX      EqlIpsecStaleSecAssocDeleteEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "Contents of a particular SA instance for delete."
+       INDEX       { eqlGroupId, eqlMemberIndex, eqlIpsecStaleSecAssocDeleteInstanceId }
+       ::= { eqlIpsecStaleSecAssocDeleteTable 1 }
+
+EqlIpsecStaleSecAssocDeleteEntry ::= SEQUENCE {
+       eqlIpsecStaleSecAssocDeleteInstanceId            Integer32,
+       eqlIpsecStaleSecAssocDeleteDestAddressIPVersion  InetAddressType,
+       eqlIpsecStaleSecAssocDeleteDestAddress           InetAddress,
+       eqlIpsecStaleSecAssocDeleteRowStatus             RowStatus
+   }
+
+eqlIpsecStaleSecAssocDeleteInstanceId OBJECT-TYPE
+       SYNTAX          Integer32
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION     "This index identifies the IPSec stale SA delete instance."
+       ::=  { eqlIpsecStaleSecAssocDeleteEntry 1 }
+
+eqlIpsecStaleSecAssocDeleteDestAddressIPVersion OBJECT-TYPE
+       SYNTAX      InetAddressType 
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The IP version of the destination address of the security 
+            associations to delete."
+       ::= { eqlIpsecStaleSecAssocDeleteEntry 2 }
+
+eqlIpsecStaleSecAssocDeleteDestAddress OBJECT-TYPE
+       SYNTAX      InetAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "The destination address of the security associations to delete."
+       ::= { eqlIpsecStaleSecAssocDeleteEntry 3 }
+
+eqlIpsecStaleSecAssocDeleteRowStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+           "This object indicates the conceptual status of this row."
+       ::= { eqlIpsecStaleSecAssocDeleteEntry 4 }
+
+END

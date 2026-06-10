@@ -1,0 +1,400 @@
+STORMSHIELD-IF-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64 FROM SNMPv2-SMI
+      DisplayString                                      FROM RFC1213-MIB
+      SnmpAdminString                                    FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB                                     FROM STORMSHIELD-SMI-MIB;
+
+   snsif MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield Interface MIBS"
+      REVISION      "201904250000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 4 }
+
+   snsifTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsifEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "List of interfaces"
+      ::= { snsif 1 }
+
+   snsifEntry OBJECT-TYPE
+      SYNTAX SnsifEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+         "Each entry in the snsifTable holds a set of information."
+      INDEX { snsifIndex }
+      ::= { snsifTable 1 }
+
+   SnsifEntry ::= SEQUENCE {
+      snsifIndex                  INTEGER,
+      snsifUserName               SnmpAdminString,
+      snsifName                   DisplayString,
+      snsifAddr                   DisplayString,
+      snsifMask                   DisplayString,
+      snsifType                   DisplayString,
+      snsifColor                  Integer32,
+      snsifMacThroughput          Counter64,
+      snsifCurThroughput          Counter64,
+      snsifMaxThroughput          Counter64,
+      snsifPktAccepted            Counter64,
+      snsifPktBlocked             Counter64,
+      snsifPktFragmented          Counter64,
+      snsifPktTcp                 Counter64,
+      snsifPktUdp                 Counter64,
+      snsifPktIcmp                Counter64,
+      snsifTotalBytes             Counter64,
+      snsifTcpBytes               Counter64,
+      snsifUdpBytes               Counter64,
+      snsifIcmpBytes              Counter64,
+      snsifTcpConn                Counter64,
+      snsifUdpConn                Counter64,
+      snsifTcpConnCount           Integer32,
+      snsifUdpConnCount           Integer32,
+      snsifInCurThroughput        Integer32,
+      snsifOutCurThroughput       Integer32,
+      snsifInMaxThroughput        Integer32,
+      snsifOutMaxThroughput       Integer32,
+      snsifInTotalBytes           Counter64,
+      snsifOutTotalBytes          Counter64,
+      snsifInTcpBytes             Counter64,
+      snsifOutTcpBytes            Counter64,
+      snsifInUdpBytes             Counter64,
+      snsifOutUdpBytes            Counter64,
+      snsifInIcmpBytes            Counter64,
+      snsifOutIcmpBytes           Counter64,
+      snsifProtected              Integer32,
+      snsifDrvName                DisplayString,
+      snsifComment                DisplayString
+   }
+
+   snsifIndex OBJECT-TYPE
+   SYNTAX INTEGER (0..65535)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "A unique value for the table. Its value
+      ranges between 0 and 65535 and may not be contigous.
+      the index has no other meaning but a pure index"
+   ::= { snsifEntry 1 }
+
+   snsifUserName OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "User interface name"
+      ::= { snsifEntry 2 }
+
+   snsifName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "System interface name"
+      ::= { snsifEntry 3 }
+
+   snsifAddr OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Interface address"
+      ::= { snsifEntry 4 }
+
+   snsifMask OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Interface mask"
+      ::= { snsifEntry 5 }
+
+   snsifType OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Interface type"
+      ::= { snsifEntry 6 }
+
+   snsifColor OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         ""
+      ::= { snsifEntry 7 }
+
+   snsifMacThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         " "
+      ::= { snsifEntry 8 }
+
+   snsifCurThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "incoming + outgoing current throughput in B/s "
+      ::= { snsifEntry 9 }
+
+   snsifMaxThroughput OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "incoming + outgoing maximum throughput in B/s"
+      ::= { snsifEntry 10 }
+
+   snsifPktAccepted OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "number of accepted packets"
+      ::= { snsifEntry 11 }
+
+   snsifPktBlocked OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "number of packets that have been blocked"
+      ::= { snsifEntry 12 }
+
+   snsifPktFragmented OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "number of fragmented packets"
+      ::= { snsifEntry 13 }
+
+   snsifPktTcp OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of TCP packets forwarded"
+      ::= { snsifEntry 14 }
+
+   snsifPktUdp OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of UDP packets forwarded"
+      ::= { snsifEntry 15 }
+
+   snsifPktIcmp OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Number of ICMP packets forwarded"
+      ::= { snsifEntry 16 }
+
+   snsifTotalBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "data bytes forwarded"
+      ::= { snsifEntry 17 }
+
+   snsifTcpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "incoming + outgoing TCP data bytes"
+      ::= { snsifEntry 18 }
+
+   snsifUdpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "incoming + outgoing UDP data bytes"
+      ::= { snsifEntry 19 }
+
+   snsifIcmpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "incoming + outgoing ICMP data bytes"
+      ::= { snsifEntry 20 }
+
+   snsifTcpConn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "TCP connection established"
+      ::= { snsifEntry 21 }
+
+   snsifUdpConn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "UDP connection established"
+      ::= { snsifEntry 22 }
+
+   snsifTcpConnCount OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "current TCP connection count"
+      ::= { snsifEntry 23 }
+
+   snsifUdpConnCount OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "current UCP connection count"
+      ::= { snsifEntry 24 }
+
+   snsifInCurThroughput OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Incoming Current throughput in B/s "
+      ::= { snsifEntry 25 }
+
+   snsifOutCurThroughput OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Outgoing Current throughput in B/s "
+      ::= { snsifEntry 26 }
+
+   snsifInMaxThroughput OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Incoming maximum throughput in B/s"
+      ::= { snsifEntry 27 }
+
+   snsifOutMaxThroughput OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Outgoing maximum throughput in B/s"
+      ::= { snsifEntry 28 }
+
+   snsifInTotalBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Incoming data bytes"
+      ::= { snsifEntry 29 }
+
+   snsifOutTotalBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Outgoing data bytes"
+      ::= { snsifEntry 30 }
+
+   snsifInTcpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Incoming TCP data bytes"
+      ::= { snsifEntry 31 }
+
+   snsifOutTcpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Outgoing TCP data bytes"
+      ::= { snsifEntry 32 }
+
+   snsifInUdpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Incoming UDP data bytes"
+      ::= { snsifEntry 33 }
+
+   snsifOutUdpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Outgoing UDP data bytes"
+      ::= { snsifEntry 34 }
+
+   snsifInIcmpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Incoming ICMP data bytes"
+      ::= { snsifEntry 35 }
+
+   snsifOutIcmpBytes OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Outgoing ICMP data bytes"
+      ::= { snsifEntry 36 }
+
+   snsifProtected OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Is interface protected ?"
+      ::= { snsifEntry 37 }
+
+   snsifDrvName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Driver interface name"
+      ::= { snsifEntry 38 }
+
+   snsifComment OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Interface comment"
+      ::= { snsifEntry 39 }
+
+END

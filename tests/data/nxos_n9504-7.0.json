@@ -1,0 +1,130 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.9.12.3.1.3.1507",
+                    "sysDescr": "Cisco NX-OS(tm) nxos.7.0.3.I7.7.bin, Software (nxos), Version 7.0(3)I7(7), RELEASE SOFTWARE Copyright (c) 2002-2019 by Cisco Systems, Inc. Compiled 8/28/2019 15:00:00",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "nxos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "cisco.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "slas": {
+        "discovery": {
+            "slas": [
+                {
+                    "sla_nr": 11,
+                    "owner": "",
+                    "tag": "100.102.1.14",
+                    "rtt_type": "echo",
+                    "rtt": 3,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 12,
+                    "owner": "",
+                    "tag": "100.102.1.16",
+                    "rtt_type": "echo",
+                    "rtt": 2,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 13,
+                    "owner": "",
+                    "tag": "100.102.75.10",
+                    "rtt_type": "echo",
+                    "rtt": 4,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 14,
+                    "owner": "",
+                    "tag": "100.102.3.10",
+                    "rtt_type": "echo",
+                    "rtt": 3,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 15,
+                    "owner": "",
+                    "tag": "100.102.1.2",
+                    "rtt_type": "echo",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 21,
+                    "owner": "",
+                    "tag": "100.104.1.49",
+                    "rtt_type": "echo",
+                    "rtt": 6,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 22,
+                    "owner": "",
+                    "tag": "100.104.1.24",
+                    "rtt_type": "echo",
+                    "rtt": 4,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 23,
+                    "owner": "",
+                    "tag": "100.104.1.10",
+                    "rtt_type": "echo",
+                    "rtt": 2,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 24,
+                    "owner": "",
+                    "tag": "100.104.1.52",
+                    "rtt_type": "echo",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                },
+                {
+                    "sla_nr": 25,
+                    "owner": "",
+                    "tag": "100.104.1.2",
+                    "rtt_type": "echo",
+                    "rtt": 1,
+                    "status": 1,
+                    "opstatus": 0,
+                    "deleted": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,0 +1,549 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-DHCPV4-MIB.mib:  BlueCat Networks DHCPv4 services
+--
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-DHCPV4-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+    OBJECT-TYPE, Integer32, Unsigned32, Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    BcnAlarmSeverity
+        FROM BCN-TC-MIB
+    bcnServices
+        FROM BCN-SMI-MIB;
+
+bcnDhcpv4MIB MODULE-IDENTITY
+    LAST-UPDATED	"201012080000Z"
+    ORGANIZATION	"BlueCat Networks"
+    CONTACT-INFO
+        "BlueCat Networks. Customer Care.
+
+        North America
+        Call: +1.866.491.2228
+        Europe
+        Call: +44.8081.011.306
+        Other
+        Call: +1.416.646.8433
+        
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "This module provides status as well as statistical information
+        about the DHCPv4 service."
+    REVISION "201012080000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcnDhcpv4 1 }
+
+bcnDhcpv4 OBJECT IDENTIFIER  ::= { bcnServices 1 }
+
+-- Organization
+
+bcnDhcpv4Objects OBJECT IDENTIFIER 
+    ::= { bcnDhcpv4 2 }
+
+bcnDhcpv4Notification OBJECT IDENTIFIER 
+    ::= { bcnDhcpv4 3 }
+
+bcnDhcpv4Conformance OBJECT IDENTIFIER 
+    ::= { bcnDhcpv4 4 }
+
+
+-- Data objects
+
+bcnDhcpv4ServiceStatus OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "General state of the DHCPv4 Service."
+    ::= { bcnDhcpv4Objects 1 }
+
+bcnDhcpv4SerOperState OBJECT-TYPE
+    SYNTAX      INTEGER {
+      running(1),
+      notRunning(2),
+      starting(3),
+      stopping(4),
+      fault(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operational state of the Service. The possible states are:
+        running(1)    The service is running normally.
+        notRunning(2) The service is stopped either intentionally (i.e.:
+                      the service is not supposed to run on this node) or
+                      unintentionally (a problem has occurred).
+        starting(3)   The service is in the process of starting, either
+                      for the first time of after an event occurred.
+        stopping(4)   The service is in the process of stopping. Stopping
+                      a service might be necessary after a configuration
+                      change.
+        fault(5)      An error has been detected and the state is undefined.
+        "
+    ::= { bcnDhcpv4ServiceStatus 1 }
+
+bcnDhcpv4FirstAlertIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The IP address identifying either subnet or pool for which
+        the available IPs have been exhausted."
+    ::= { bcnDhcpv4ServiceStatus 2 }
+
+bcnDhcpv4LeaseStatsSuccess OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of successful DHCPv4 leases issued per second."
+    ::= { bcnDhcpv4ServiceStatus 3 }
+
+-- DHCP server statistics
+
+bcnDhcpv4ServiceStatistics OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "General state of the DHCPv4 Service."
+    ::= { bcnDhcpv4Objects 2 }
+
+
+-- DHCP lease table
+
+bcnDhcpv4LeaseTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF BcnDhcpv4LeaseEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Current lease table."
+	::= { bcnDhcpv4ServiceStatistics 1 }
+
+bcnDhcpv4LeaseEntry OBJECT-TYPE
+	SYNTAX BcnDhcpv4LeaseEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "A logical row in the bcnDhcpv4LeaseTable."
+	INDEX { bcnDhcpv4LeaseIP }
+	::= { bcnDhcpv4LeaseTable 1 }
+
+BcnDhcpv4LeaseEntry ::= SEQUENCE {
+	bcnDhcpv4LeaseIP              IpAddress,
+	bcnDhcpv4LeaseStartTime       Unsigned32,
+	bcnDhcpv4LeaseEndTime         Unsigned32,
+	bcnDhcpv4LeaseTimeStamp       Unsigned32,
+	bcnDhcpv4LeaseMacAddress      MacAddress,
+	bcnDhcpv4LeaseHostname        DisplayString 
+}
+	
+bcnDhcpv4LeaseIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "IP address of the lease."
+	::= { bcnDhcpv4LeaseEntry 1 }
+
+bcnDhcpv4LeaseStartTime OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Start time of the lease."
+	::= { bcnDhcpv4LeaseEntry 2 }
+
+bcnDhcpv4LeaseEndTime OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "End time of the lease."
+	::= { bcnDhcpv4LeaseEntry 3 }
+
+bcnDhcpv4LeaseTimeStamp OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "When failover protocol is being used the timestamp will
+        indicate the time the peer has either been told the lease expires,
+        or the expiry time that the peer has acknowledged."
+	::= { bcnDhcpv4LeaseEntry 4 }
+
+bcnDhcpv4LeaseMacAddress OBJECT-TYPE
+	SYNTAX MacAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The hardware address (MAC address) of this lease."
+	::= { bcnDhcpv4LeaseEntry 5 }
+
+bcnDhcpv4LeaseHostname OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The client hostname of the lease."
+	::= { bcnDhcpv4LeaseEntry 6 }
+
+-- DHCP Subnet table
+
+bcnDhcpv4SubnetTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF BcnDhcpv4SubnetEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Current subnet table."
+	::= { bcnDhcpv4ServiceStatistics 2 }
+
+bcnDhcpv4SubnetEntry OBJECT-TYPE
+	SYNTAX BcnDhcpv4SubnetEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "A logical row in the bcnDhcpv4SubnetTable."
+	INDEX { bcnDhcpv4SubnetIP }
+	::= { bcnDhcpv4SubnetTable 1 }
+
+BcnDhcpv4SubnetEntry ::= SEQUENCE {
+    bcnDhcpv4SubnetIP              IpAddress,
+    bcnDhcpv4SubnetMask            IpAddress,
+    bcnDhcpv4SubnetSize            Unsigned32,
+    bcnDhcpv4SubnetFreeAddresses   Unsigned32,
+    bcnDhcpv4SubnetLowThreshold    Unsigned32,
+    bcnDhcpv4SubnetHighThreshold   Unsigned32
+}
+	
+bcnDhcpv4SubnetIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "IP address of the subnet."
+	::= { bcnDhcpv4SubnetEntry 1 }
+
+bcnDhcpv4SubnetMask OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "IP mask of the subnet."
+	::= { bcnDhcpv4SubnetEntry 2 }
+
+bcnDhcpv4SubnetSize OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Size of the subnet. The size of the subnet is calculated
+      as the sum of the sizes of each pool defined within it. The pools
+      are defined such that the fixed IPs are not contained within them."
+	::= { bcnDhcpv4SubnetEntry 3 }
+
+bcnDhcpv4SubnetFreeAddresses OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The number of IPs addresses available in this subnet."
+	::= { bcnDhcpv4SubnetEntry 4 }
+
+bcnDhcpv4SubnetLowThreshold OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Low threshold for available free addresses in this
+        subnet.  If the value for available free addresses in this 
+        subnet becomes equal to or less than this value, a 
+        bcnDhcpv4SubnetLowNotif event is generated for this subnet.
+        No more bcnDhcpv4SubnetLowNotif events will be generated for
+        this subnet during this execution of the DHCPv4 server until
+        the value for available free addresses has exceeded the value
+        of bcnDhcpv4SubnetHighThreshold."
+	::= { bcnDhcpv4SubnetEntry 5 }
+
+bcnDhcpv4SubnetHighThreshold OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "High threshold for available free addresses in this
+        subnet.  If a bcnDhcpv4SubnetLowNotif event was generated and
+        the value for available free addresses in this subnet has
+        exceeded this value, a bcnDhcpv4SubnetHighNotif event is 
+        generated for this subnet.
+        No more bcnDhcpv4SubnetHighNotif events will be generated for
+        this subnet during this execution of the DHCPv4 server until
+        another bcnDhcpv4SubnetLowNotif is generated."
+	::= { bcnDhcpv4SubnetEntry 6 }
+
+-- DHCP pool table 
+
+bcnDhcpv4PoolTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF BcnDhcpv4PoolEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Current pool table."
+	::= { bcnDhcpv4ServiceStatistics 3 }
+
+bcnDhcpv4PoolEntry OBJECT-TYPE
+	SYNTAX BcnDhcpv4PoolEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "A logical row in the bcnDhcpv4PoolTable."
+	INDEX { bcnDhcpv4PoolStartIP }
+	::= { bcnDhcpv4PoolTable 1 }
+
+BcnDhcpv4PoolEntry ::= SEQUENCE {
+	bcnDhcpv4PoolStartIP          IpAddress,
+	bcnDhcpv4PoolEndIP            IpAddress,
+	bcnDhcpv4PoolSubnetIP         IpAddress,
+	bcnDhcpv4PoolSize             Unsigned32,
+	bcnDhcpv4PoolFreeAddresses    Unsigned32
+}
+	
+bcnDhcpv4PoolStartIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Start IP address of this pool."
+	::= { bcnDhcpv4PoolEntry 1 }
+
+bcnDhcpv4PoolEndIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "End IP address of this pool."
+	::= { bcnDhcpv4PoolEntry 2 }
+
+bcnDhcpv4PoolSubnetIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Subnet IP address of the pool."
+	::= { bcnDhcpv4PoolEntry 3 }
+
+bcnDhcpv4PoolSize OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The size of this pool."
+	::= { bcnDhcpv4PoolEntry 4 }
+
+bcnDhcpv4PoolFreeAddresses OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "The number of IPs addresses available in this pool."
+	::= { bcnDhcpv4PoolEntry 5 }
+
+
+bcnDhcpv4FixedIPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF BcnDhcpv4FixedIPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "List of fixed IP addresses for this DHCPv4 server."
+	::= { bcnDhcpv4ServiceStatistics 4 }
+
+-- DHCP Fixed IP address table 
+
+bcnDhcpv4FixedIPEntry OBJECT-TYPE
+	SYNTAX BcnDhcpv4FixedIPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "A logical row in the bcnDhcpv4FixedIPTable."
+	INDEX { bcnDhcpv4FixedIP }
+	::= { bcnDhcpv4FixedIPTable 1 }
+
+BcnDhcpv4FixedIPEntry ::= SEQUENCE {
+	bcnDhcpv4FixedIP IpAddress
+	}
+
+bcnDhcpv4FixedIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "One of the fixed IP addresses in the DHCPv4
+        configuration."
+	::= { bcnDhcpv4FixedIPEntry 1 }
+
+
+-- Notification definitions
+
+bcnDhcpv4NotificationEvents OBJECT IDENTIFIER 
+    ::= { bcnDhcpv4Notification 0 }
+
+bcnDhcpv4NotificationData OBJECT IDENTIFIER 
+    ::= { bcnDhcpv4Notification 1 }
+
+-- Notification data
+
+bcnDhcpv4AlarmSeverity OBJECT-TYPE
+    SYNTAX          BcnAlarmSeverity
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Severity classification for the alarm."
+    ::= { bcnDhcpv4NotificationData 1 }
+
+bcnDhcpv4AlarmInfo OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Descriptive information about the alarm event."
+    ::= { bcnDhcpv4NotificationData 2 }
+
+bcnDhcpv4FailOverState OBJECT-TYPE
+    SYNTAX INTEGER {
+            startup (1),
+            normal (2),
+            communicationsInterrupted (3),
+            partnerDown (4),
+            potentialConflict (5),
+            recover (6),
+            paused (7),
+            shutdown (8),
+            recoverDone (9),
+            recoverWait (254)
+          }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION "The state of DHCPv4 failover."
+    ::= { bcnDhcpv4NotificationData 3 }
+
+bcnDhcpv4SubnetAlertIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The IP address identifying a subnet for which the 
+        available IPs have been exhausted."
+    ::= { bcnDhcpv4NotificationData 4 }
+
+-- Notification events
+
+bcnDhcpv4AlarmNotif NOTIFICATION-TYPE
+    OBJECTS {   
+                bcnDhcpv4SerOperState,
+                bcnDhcpv4AlarmSeverity,
+                bcnDhcpv4AlarmInfo
+            }
+    STATUS          current
+    DESCRIPTION
+        "A bcnDhcpv4AlarmNotif signifies that the DHCPv4 service has
+        transitioned state or a particular event has been detected
+        on the service."
+   ::= { bcnDhcpv4NotificationEvents 1 }
+
+bcnDhcpv4FailOverNotif NOTIFICATION-TYPE
+    OBJECTS {
+                bcnDhcpv4FailOverState
+            }
+    STATUS          current
+    DESCRIPTION
+        "A change of state has been detected on the DHCPv4 failover
+         mechanism."
+   ::= { bcnDhcpv4NotificationEvents 2 }
+
+bcnDhcpv4SubnetLowNotif NOTIFICATION-TYPE
+    OBJECTS {   
+                bcnDhcpv4SubnetAlertIpAddr,
+                bcnDhcpv4SubnetFreeAddresses,
+                bcnDhcpv4SubnetLowThreshold
+            }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of available IPv4
+        addresses for a particular subnet has fallen below the value
+        of bcnDhcpv4SubnetLowThreshold for that subnet."
+   ::= { bcnDhcpv4NotificationEvents 3 }
+
+bcnDhcpv4SubnetHighNotif NOTIFICATION-TYPE
+    OBJECTS {   
+                bcnDhcpv4SubnetAlertIpAddr,
+                bcnDhcpv4SubnetFreeAddresses,
+                bcnDhcpv4SubnetHighThreshold
+            }
+    STATUS          current
+    DESCRIPTION
+        "This notification signifies that the number of available IPv4
+        addresses for a particular subnet has risen above the value
+        of bcnDhcpv4SubnetHighThreshold for that subnet."
+   ::= { bcnDhcpv4NotificationEvents 4 }
+
+
+-- Conformance
+
+bcnDhcpv4ServiceCompliances OBJECT IDENTIFIER 
+    ::= { bcnDhcpv4Conformance 1 }
+
+bcnDhcpv4ServiceGroups OBJECT IDENTIFIER 
+    ::= { bcnDhcpv4Conformance 2 }
+
+
+bcnDhcpv4ServiceStatusGroup OBJECT-GROUP
+    OBJECTS { 
+          bcnDhcpv4SerOperState, 
+          bcnDhcpv4FirstAlertIpAddr,
+          bcnDhcpv4LeaseStatsSuccess
+    }
+    STATUS current
+    DESCRIPTION "Status conformance."
+    ::= { bcnDhcpv4ServiceGroups 1 }
+
+bcnDhcpv4StatisticsGroup OBJECT-GROUP
+    OBJECTS { 
+--	bcnDhcpv4LeaseIP,
+	bcnDhcpv4LeaseStartTime,
+	bcnDhcpv4LeaseEndTime,
+	bcnDhcpv4LeaseTimeStamp,
+	bcnDhcpv4LeaseMacAddress,
+	bcnDhcpv4LeaseHostname,
+
+--	bcnDhcpv4SubnetIP,
+	bcnDhcpv4SubnetMask,
+	bcnDhcpv4SubnetSize,
+	bcnDhcpv4SubnetFreeAddresses,
+    bcnDhcpv4SubnetLowThreshold,
+    bcnDhcpv4SubnetHighThreshold,
+
+	bcnDhcpv4PoolSubnetIP,
+--	bcnDhcpv4PoolStartIP,
+	bcnDhcpv4PoolEndIP,
+	bcnDhcpv4PoolSize,
+	bcnDhcpv4PoolFreeAddresses,
+
+    bcnDhcpv4FixedIP
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnDhcpv4ServiceGroups 2 }
+
+bcnDhcpv4NotificationEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { 
+          bcnDhcpv4AlarmNotif, 
+          bcnDhcpv4FailOverNotif,
+          bcnDhcpv4SubnetLowNotif,
+          bcnDhcpv4SubnetHighNotif
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnDhcpv4ServiceGroups 3 }
+
+bcnDhcpv4NotificationDataGroup OBJECT-GROUP
+    OBJECTS { 
+          bcnDhcpv4AlarmSeverity, 
+          bcnDhcpv4AlarmInfo,
+          bcnDhcpv4FailOverState,
+          bcnDhcpv4SubnetAlertIpAddr
+    }
+    STATUS current
+    DESCRIPTION "Server statistics conformance."
+    ::= { bcnDhcpv4ServiceGroups 4 }
+
+
+bcnDhcpv4StatusCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Basic conformance"
+    MODULE -- This module
+    MANDATORY-GROUPS {
+        bcnDhcpv4ServiceStatusGroup, bcnDhcpv4StatisticsGroup,
+        bcnDhcpv4NotificationEventGroup, bcnDhcpv4NotificationDataGroup }
+    ::= {bcnDhcpv4ServiceCompliances 1 }
+
+
+END

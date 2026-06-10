@@ -1,0 +1,313 @@
+WATCHGUARD-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,  
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, Unsigned32, TimeTicks   FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        watchguard                         FROM WATCHGUARD-SMI;
+        
+    wgInfoModule MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "  WatchGuard Technologies, Inc.
+                  
+                     505 Fifth Avenue South
+                     Suite 500
+                     Seattle, WA 98104
+                     United States
+                     
+                     +1.206.613.6600 "
+
+        DESCRIPTION
+            "The MIB module describes client information
+             of WatchGuard system."
+
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 6 }
+
+    wgClientMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for DHCP Server, DHCP Client
+         and PPPoE Client"
+        ::= { wgInfoModule 2 }
+
+    wgClientDHCPServer OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all DHCP server related information."
+        ::= { wgClientMIB 1 }
+
+    wgClientDHCPClient OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all DHCP client related information."
+        ::= { wgClientMIB 2 }
+
+    wgClientPPPoEClient OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all PPPoE client related information."
+        ::= { wgClientMIB 3 }
+
+    wgClientDHCPServerEnable OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1),
+                        relay(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether if DHCP Server has been enabled. "
+        ::= { wgClientDHCPServer 1 }
+
+    wgClientDHCPServerStartIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The starting IP address of the range of IP addresses leased by the DHCP server."
+        ::= { wgClientDHCPServer 2 }
+
+    wgClientDHCPServerEndIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The last IP address of the range of IP addresses leased by the DHCP Server. "
+        ::= { wgClientDHCPServer 3 }
+
+    wgClientDHCPServerLeaseTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The lease time of an address assigned to a DHCP client. "
+        ::= { wgClientDHCPServer 4 }
+
+    wgClientDHCPServerNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of entries in the wgClientDHCPServerTable. "
+        ::= { wgClientDHCPServer 5 }
+
+    wgClientDHCPServerConnTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGClientDHCPServerConnEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the client lease table of the DHCP Server."
+        ::= { wgClientDHCPServer 6 }
+
+    wgClientDHCPServerRelayServer OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of remote DHCP server to which
+             DHCP requests should be relayed."
+        ::= { wgClientDHCPServer 7 }
+
+    wgClientDHCPServerConnEntry OBJECT-TYPE
+        SYNTAX      WGClientDHCPServerConnEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the leasing
+            information of an assigned address by the DHCP Server."
+        INDEX {
+            wgClientDHCPServerConnIPAddr
+        }
+        ::= { wgClientDHCPServerConnTable 1 }
+
+    WGClientDHCPServerConnEntry ::= SEQUENCE {
+
+        wgClientDHCPServerConnIPAddr            IpAddress,
+
+        wgClientDHCPServerConnClientHostName    OCTET STRING,
+        wgClientDHCPServerConnMACAddr           OCTET STRING (SIZE(6)),
+        wgClientDHCPServerConnLeaseTimeStart    DateAndTime,
+        wgClientDHCPServerConnLeaseTimeEnd      DateAndTime
+    
+    }
+
+    wgClientDHCPServerConnClientHostName OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The hostname of the client."
+        ::= { wgClientDHCPServerConnEntry 1 }
+
+    wgClientDHCPServerConnIPAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address assigned to the client."
+        ::= { wgClientDHCPServerConnEntry 2 }
+
+    wgClientDHCPServerConnMACAddr OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC address of the client."
+        ::= { wgClientDHCPServerConnEntry 3 }
+
+
+    wgClientDHCPServerConnLeaseTimeStart OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date and time when the lease starts." 
+        ::= { wgClientDHCPServerConnEntry 4 }
+
+    wgClientDHCPServerConnLeaseTimeEnd OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date and time when the lease ends." 
+        ::= { wgClientDHCPServerConnEntry 5 }
+
+   -- DHCP Client information
+
+    wgClientDHCPClientEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether interface 1 (public) is configured to obtain IP address through DHCP."
+        ::= { wgClientDHCPClient 1 }
+
+    wgClientDHCPClientDomainName  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The domain name of the DHCP Client."
+        ::= { wgClientDHCPClient 2 }
+
+    wgClientDHCPClientDefaultGateway  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the default gateway obtained by the DHCP client."
+        ::= { wgClientDHCPClient 3 }
+
+    wgClientDHCPClientDNSOne  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the primary DNS server obtained by the DHCP client."
+        ::= { wgClientDHCPClient 4 }
+
+    wgClientDHCPClientDNSTwo  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the secondary DNS server obtained by the DHCP client."
+        ::= { wgClientDHCPClient 5 }
+
+
+   -- PPPoE Client information
+
+    wgClientPPPoEClientEnable  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether the interface 1 (public) is configured to use PPPoE."
+        ::= { wgClientPPPoEClient 1 }
+
+    wgClientPPPoEClientADSLStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    disconnect(0),       -- ADSL is disconnected
+                    initialize(1),       -- ADSL is initializing
+                    establish(2),        -- ASDL is established
+                    authenticate(3),     -- ASDL is authenticated
+                    network(4),
+                    running(5)           -- ASDL is running
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current ADSL status of the PPPoE Client. "
+        ::= { wgClientPPPoEClient 2 }
+ 
+    wgClientPPPoEClientLocalIPAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address obtained by the PPPoE Client."
+        ::= { wgClientPPPoEClient 3 }
+
+    wgClientPPPoEClientRemoteIPAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP Address of the PPP server this PPPoE client connects to."
+        ::= { wgClientPPPoEClient 4 }
+
+    wgClientPPPoEClientNetMask   OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+
+        DESCRIPTION
+            "The subnet mask of the PPPoE client."    
+        ::= { wgClientPPPoEClient 5 }
+
+    wgClientPPPoEClientDNSOne  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the primary DNS server obtained."
+        ::= { wgClientPPPoEClient 6 }
+
+    wgClientPPPoEClientDNSTwo  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The IP address of the secondary DNS server obtained."
+        ::= { wgClientPPPoEClient 7 }
+
+    wgClientPPPoEADSLPeerMACAddr OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The MAC Address of the PPP server this client connects to."
+        ::= { wgClientPPPoEClient 8 }
+
+    wgClientPPPoEClientConnTime  OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The connection time of the PPPoE connection."
+        ::= { wgClientPPPoEClient 9 }
+
+END

@@ -1,0 +1,68 @@
+-- ============================================================================
+-- at-mibversion.mib, Allied Telesis enterprise MIB:
+-- Mib-set version MIB for the AlliedWare Plus(tm) operating system
+--
+-- Copyright (c) 2009 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-MIBVERSION-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI;
+
+
+        atMibVersion MODULE-IDENTITY
+            LAST-UPDATED "201006150011Z"
+            ORGANIZATION
+                "Allied Telesis Labs New Zealand"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The mib-set version MIB, for detailing the versions of MIB's
+                that are currently supported by AT software."
+            REVISION "201006150011Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200901150000Z"
+            DESCRIPTION
+                "Initial revision."
+            ::= { sysinfo 15 }
+
+
+
+--
+-- Node definitions
+--
+
+-- ---------------------------------------------------------- --
+-- Objects to define currently supported MIB's.
+-- ---------------------------------------------------------- --
+        atMibsetVersion OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The overall version of the complete set of MIB's that is
+                currently supported by the software running on the device.
+
+                It returns an integer which relates to the last software
+                release that contained changes to the supported AT Enterprise
+                MIB definition files. For example, if the currently loaded
+                software release on the the device is 5.3.1-03 but the
+                Enterprise MIB's have not changed since 5.3.1-01, then the
+                value returned will be 5030101 (5.03.01-01)."
+            ::= { atMibVersion 1 }
+
+
+
+    END
+
+--
+-- at-mibversion.mib
+--
+

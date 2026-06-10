@@ -1,0 +1,36 @@
+NORTEL-OPTICAL-GENERIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       nortel            FROM NORTEL-MIB
+
+       MODULE-IDENTITY,
+       OBJECT-IDENTITY   FROM SNMPv2-SMI;
+
+nnOpticalGenericMIBs MODULE-IDENTITY
+        LAST-UPDATED "200802070000Z"
+        ORGANIZATION "Nortel"
+        CONTACT-INFO
+           "   7035 Ridge Road
+               Hanover, Maryland 21076
+               United States
+               Toll-free: +1-800-921-1144
+               Phone: +1-410-694-5700
+               Fax: +1-410-694-5750
+               www.ciena.com "
+        DESCRIPTION
+              "This Module represents the top-level MIB branch for the
+               generic MIBs that are common to Nortel Optical products"
+
+        --Revision history
+        REVISION "200507120000Z"
+        DESCRIPTION "Initial Version - created for CPL R2.0 & OME R1.5"
+
+	REVISION "200802070000Z"
+        DESCRIPTION "Formatting for OME REL 5.1"
+        ::= { opterametro 10 }
+
+opterametro OBJECT IDENTIFIER
+        ::= { nortel 68 }
+
+
+END

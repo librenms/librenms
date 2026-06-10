@@ -1,0 +1,5505 @@
+    XF-RADIOLINK-RLT-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            entLogicalIndex, entPhysicalIndex
+                FROM ENTITY-MIB
+            ifIndex
+                FROM IF-MIB
+            MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+            OBJECT-TYPE, MODULE-IDENTITY, TimeTicks, Integer32, IpAddress, Counter32, Counter64, Gauge32
+                FROM SNMPv2-SMI
+            PerfCurrentCount, PerfIntervalCount
+                FROM PerfHist-TC-MIB
+            HCPerfCurrentCount
+                FROM HC-PerfHist-TC-MIB
+            InetAddressIPv6
+                FROM INET-ADDRESS-MIB
+            TEXTUAL-CONVENTION, DisplayString, TruthValue
+                FROM SNMPv2-TC
+            xfRadioLink
+                FROM XF-TOP-MIB;
+
+        xfRadioLinkRltMIB MODULE-IDENTITY
+            LAST-UPDATED "202011050000Z" -- 5 November 2020
+            ORGANIZATION
+                "Ericsson AB"
+            CONTACT-INFO
+                "
+                Ericsson AB
+                BURA DURA
+                SE-417 56 Goteborg
+                Sweden
+                "
+            DESCRIPTION
+                "
+                This MIB defines objects for Radio Link Terminal (RLT) and Carrier Termination (CT)
+                for new Radio Link application in MINI-LINK TN supporting dual carrier capability.
+                "
+
+    REVISION "202011050000Z" -- 5 November 2020
+        DESCRIPTION
+            "
+            Rev PC17
+            xfFrameFormatType MO: added definition of FF type for:
+            - 2-boards MIMO
+            - SISO CA
+            - XPIC CA
+            "
+
+    REVISION "202009170000Z" -- 17 September 2020
+        DESCRIPTION
+            "
+            Rev PC16
+            Added object xfRLTMeasuredHopLength in xfRLTTable:
+            "
+
+    REVISION "202006100000Z" -- 10 June 2020
+        DESCRIPTION
+            "
+            Rev PC15
+            TR#3054036: MIB Range validation failed:
+            - xfRLTNumOfRLPSwitch
+            "
+
+    REVISION "202006030000Z" -- 03 June 2020
+        DESCRIPTION
+            "
+            Rev PC14
+            TR#3052599: extended range for following objects (adding 0 as valid value):
+            - xfCarrierTermActualCapacity
+            - xfActualTDMCapacity
+            - xfCarrierTermActualLicensedCapacity
+            "
+
+    REVISION "202005280000Z" -- 28 May 2020
+        DESCRIPTION
+            "
+            Rev PC13
+            xfACMCapacity range extended to add 0 as valid value (TR#3045800)
+            "
+
+    REVISION "202004300000Z" -- 30 April 2020
+        DESCRIPTION
+            "
+            Rev PC12
+            xfRLTTDMIfTable: added 'xfTDMHopLength' object for TDM traffic delay compensation
+            "
+
+    REVISION "202003040000Z" -- 03 March 2020
+        DESCRIPTION
+            "
+            Rev PC11
+            xfRLTCapability: added 'capTXswoAndSSD' capability bit for TX switchover and SSD
+            "
+
+    REVISION "201910140000Z" -- 14 October 2019
+        DESCRIPTION
+            "
+            Rev PC10
+            In xfCarrierTerminationCapability table, xfACMprofile object is extended in order to
+            support 8192QAM and 16384QAM modulations.
+            For the same reason, following tables are updated:
+            - xfRLPMACMCurrent24hTable
+            - xfRLPMACMInterval24hTable
+            - xfRLPMACMCurrent15mTable
+            - xfRLPMACMInterval15mTable
+            "
+
+    REVISION "201910090000Z" -- 09 October 2019
+        DESCRIPTION
+            "
+            Rev PC9
+            new MIb added:
+            xfRLPMMimoCurrentTable
+            xfRLPMMimoCurrent24hTable
+            xfRLPMMimoInterval24hTable
+            xfRLPMMimoCurrent15mTable
+            xfRLPMMimoInterval15mTable
+            "
+
+    REVISION "201907180000Z" -- 18 July 2019
+        DESCRIPTION
+            "
+            Rev PC8
+            xfRLTTxSwitchOverConfiguration: removed value 'remote'
+            "
+    REVISION "201906070000Z" -- 07 June 2019
+        DESCRIPTION
+            "
+            Rev PC7
+            Added Selective Space Diversity support
+            xfRLTProtectionSwitchMode: added value 'txSwitchDisabled'
+            xfRLTTxSwitchOverConfiguration: added values 'local' and 'remote'
+            "
+
+    REVISION "201903260000Z" -- 26 March 2019
+        DESCRIPTION
+            "
+            Rev PC6
+            xfRLTCapability: added description for 'capMIMO' capability bit
+            "
+
+    REVISION "201903250000Z" -- 25 March 2019
+        DESCRIPTION
+            "
+            Rev PC5
+            xfRLTCapability: added 'capMIMO' capability bit for MIMO
+            "
+
+    REVISION "201902280000Z" -- 28 February 2019
+        DESCRIPTION
+            "
+            Rev PC4
+            xfMIMOCTmember1-4 in xfMIMOGroupTable changed access to read-only.
+            xfRLTEncryptionOperStatus: changed values to UP and DOWN.
+            "
+
+    REVISION "201902200000Z" -- 20 February 2019
+        DESCRIPTION
+            "
+            Rev PC3
+            xfFrameFormatType MO: added definition of FF type for Long Haul 2-boards XPIC.
+            "
+
+    REVISION "201901300000Z" -- 30 January 2019
+        DESCRIPTION
+            "
+            Rev PC2
+            xfRLTCapability: added capRLEncryption capability bit for Radio Link Encryption.
+            "
+
+    REVISION "201901110000Z" -- 11 January 2019
+        DESCRIPTION
+            "
+            Rev PC1
+            Added xfRLTEncryptionTable for Radio Link Encryption.
+            "
+
+    REVISION "201811240000Z" -- 24 November 2018
+        DESCRIPTION
+            "
+            Rev PB32
+            xfRLTFeRltSeverity renamed to xfRLTRltSeverity.
+            "
+
+    REVISION "201810240000Z" -- 24 October 2018
+        DESCRIPTION
+            "
+            Rev PB31
+            Changed naming of xfRLTEnhancedACMProtectionMode values in xfRLTProtectionTable:
+             - basic -> activeTransmitter
+             - maximumThroughput -> maximumCapacity
+
+            Changed name of capEnhAcmMaxThroughput into capEnhAcmMaxCapacity.
+            "
+
+    REVISION "201810030000Z" -- 03 October 2018
+        DESCRIPTION
+            "
+            Rev PB30
+            Added xfRLTEnhancedACMProtectionOperStatus in xfRLTProtectionTable.
+            "
+
+    REVISION "201809170000Z" -- 17 September 2018
+        DESCRIPTION
+            "
+            Rev PB29
+            - Added xfRLTEnhancedACMProtectionMode in xfRLTProtectionTable.
+            - Added cap bit in xfRLTCapability for Enhanced ACM Protection: Maximum Throughput.
+            - Added cap bit in xfRLTCapability for Enhanced ACM Protection: Maximum Protection.
+            "
+
+    REVISION "201808270000Z" -- 27 August 2018
+        DESCRIPTION
+            "
+            Rev PB28
+            xfCarrierTermXPI: modified description.
+            "
+
+    REVISION "201808160000Z" -- 16 August 2018
+        DESCRIPTION
+            "
+            Rev PB27
+            xfCarrierTermXPICOperStatus: Removed reference to SNIR in MO description.
+            "
+
+    REVISION "201807090000Z" -- 09 July 2018
+        DESCRIPTION
+            "
+            Rev PB26
+            xfFrameFormatType MO: added definition of FF type for 2-boards XPIC.
+            "
+
+    REVISION "201804130000Z" -- 13 April 2018
+        DESCRIPTION
+            "
+            Rev PB25
+            Type of MOs:
+               - xfRLTActualTxTotalCapacity
+               - xfRLTActualTxPacketCapacity
+               - xfRLTLimitedTotalCapacity
+               - xfCGIfMaxSpeed
+               - xfRLWANActualCapacity
+               - xfRLWANLimitedCapacity
+            changed to Gauge32.
+            "
+
+    REVISION "201804090000Z" -- 09 April 2018
+        DESCRIPTION
+            "
+            Rev PB24
+            In table xfRLTTable:
+               - Added bit(12) capXpicMembersAutoSelection(12)
+               - Added bit(13) capManualEqpSwitch(13)
+            "
+
+    REVISION "201803230000Z" -- 23 March 2018
+        DESCRIPTION
+            "
+            Rev PB23
+            Added to xfXPICPairTable second index:
+                * xfXpicPairIndex
+            "
+
+    REVISION "201803130000Z" -- 13 March 2018
+        DESCRIPTION
+            "
+            Rev PB22
+            Added to xfCGIfAlarms the alarm:
+                * unableToProtectEqp
+            "
+
+    REVISION "201801300000Z" -- 30 January 2018
+        DESCRIPTION
+            "
+            Rev PB21
+            In table xfRLTTable:
+               - xfRLTCapability bit(1) changed to capTDMWithEQP(1)
+               - Added bit(11) capXpicBetweenBoards(11)
+            "
+
+    REVISION "201712270000Z"  -- 27 December 2017
+        DESCRIPTION
+            "
+            Rev PB20
+            Added values to MO xfRLTMode in xfRLTTable:
+              - onePlusOneRadioLinkProtectionAndEquipmentProtection
+              - twoPlusZeroRadioLinkBondingAndEquipmentProtection
+              - twoPlusTwoRadioLinkProtectionAndEquipmentProtection
+              - fourPlusZeroRadioLinkBondingAndEquipmentProtection
+
+            Added capability bits to xfRLTCapability in xfRLTTable:
+              - capTDM
+              - capCsPlurality
+              - capCtAutoSelection
+              - capOnePlusZero
+              - capOnePlusOneRadioLinkProtection
+              - capTwoPlusZeroAdvancedRadioLinkBonding
+              - capOnePlusOneRadioLinkProtectionWithEQP
+              - capTwoPlusZeroRadioLinkBondingWithEQP
+              - capTwoPlusTwoRadioLinkProtectionWithEQP
+              - capFourPlusZeroRadioLinkBondingWithEQP
+            "
+
+    REVISION "201709190000Z"  -- 19 September 2017
+        DESCRIPTION
+            "
+            Rev PB19
+            - Type of MOs in table xfRLPMContinuousCounterTable changed to PerfCurrentCount/HCPerfCurrentCount.
+            - Removed MO xfRLTProtectionPMReset in table xfRLTProtectionTable.
+            "
+
+    REVISION "201708030000Z"  -- 03 August 2017
+        DESCRIPTION
+            "
+            Rev PB18
+            Introduction in xfRLPMContinuousCounterTable of MOs:
+              - xfPMCurrentESR
+              - xfPMCurrentSESR
+              - xfPMCurrentBBER
+            "
+
+    REVISION "201705030000Z" -- 03 May 2017
+        DESCRIPTION
+            "
+            Rev. PB17
+            - Updated description for xfCarrierTermActualLicensedCapacity MO.
+            "
+
+    REVISION "201702010000Z" -- 01 February 2017
+        DESCRIPTION
+            "
+            Rev. PB16
+            - Added to xfCGIfAlarms the alarms:
+                * txSwitchover
+                * remoteTxSwitchOver
+                * unableToProtect
+                * rfInputThresholdProtection
+            "
+
+    REVISION "201701300000Z" -- 30 January 2017
+        DESCRIPTION
+            "
+            Rev. PB15
+            - Added the MOs xfRLTNumOfRLPSwitch and xfRLTProtectionPMReset in table xfRLTProtectionTable.
+            "
+
+
+    REVISION "201611040000Z" -- 04 November 2016
+        DESCRIPTION
+            "
+            Rev. PB14
+            - Added the MO xfRLTHighestSeverityAlarm in table xfRLTHierarchyModuleTable.
+            "
+
+    REVISION "201609290000Z" -- 29 September 2016
+        DESCRIPTION
+            "
+            Rev. PB13
+            - Added xfRLTProtectionTable.
+            - Move unused Protection MOs from xfRLTTable to xfRLTProtectionTable
+            "
+
+    REVISION "201609080000Z" -- 08 September 2016
+        DESCRIPTION
+            "
+            Rev. PB12
+            - Updated description for xfTDMMaxTributaries MO.
+            "
+
+    REVISION "201607180000Z" -- 18 July 2016
+        DESCRIPTION
+            "
+            Rev. PB11
+            - Updated description for xfPMPerfReset MO.
+            "
+
+    REVISION "201606100000Z" -- 10 June 2016
+        DESCRIPTION
+            "
+            Rev. PB10
+            - Added new table 'xfRLTHierarchyModuleTable'.
+            "
+
+    REVISION "201606060000Z" -- 06 June 2016
+        DESCRIPTION
+            "
+            Rev. PB9
+            - 'xfRLTCapability' and 'xfRLTInventoryLastChange' MOs added to 'xfRLTTable'.
+            "
+
+    REVISION "201606010000Z" -- 01 June 2016
+        DESCRIPTION
+            "
+            Rev. PB8
+            - Modified syntax for 'xfXPICCTmember1' and 'xfXPICCTmember2' MOs.
+            "
+
+    REVISION "201605020000Z" -- 02 May 2016
+        DESCRIPTION
+            "
+            Rev. PB7
+            - Added xfRLWANIfTable.
+            "
+
+    REVISION "201604290000Z" -- 29 April 2016
+        DESCRIPTION
+            "
+            Rev. PB6
+            - Changed enum for xfCGIfHopViewStatus MO.
+            "
+
+    REVISION "201604120000Z" -- 12 April 2016
+        DESCRIPTION
+            "
+            Rev. PB5
+            - Updated description for xfPMPerfReset MO.
+            - Updated description for xfCarrierTermActualCapacity MO.
+            - Updated description for xfRLTActualTXPacketCapacity MO.
+            - Extended list of possible values for xfRLTStatus MO.
+            "
+
+    REVISION "201603010000Z" -- 1 March 2016
+        DESCRIPTION
+            "
+            Rev. PB4
+            - Changed syntax for xfRLTManualSwitchCommand MO.
+            - NotApplicable value added to xfCarrierTermXPICOperStatus and xfCarrierTermMIMOOperStatus.
+            "
+
+    REVISION "201602220000Z" -- 22 February 2016
+        DESCRIPTION
+            "
+            Rev. PB2
+            - xfCarrierTermXPICOperStatus: added value 'testing'.
+            - xfRLTTxSwitchFarEnd MO renamed into xfRLTTxSwitchOverConfiguration
+            - xfRLTResetTxSwitchAlarm MO renamed into xfRLTTxSwitchOverAlarmReset, syntax changed.
+            - Description updated for some MOs.
+            "
+
+    REVISION "201602050000Z" -- 05 February 2016
+        DESCRIPTION
+            "
+            Rev. PB1
+            - Modified in xfCarrierTerminationCapabilityTable:
+              * xfACMProfile: removed non-XPIC / XPIC definition
+              * xfFrameFormatType: Standard definition added, other values updated
+              * xfChannelSpacing: added 60 MHz and 80 MHz for ANSI,
+                changed vaue for 112 MHz
+            - Modified in xfCarrierTerminationTable:
+              * xfCarrierTermXPICOperStatus: updated list of possible values
+              * xfCarrierTermMIMOOperStatus: updated list of possible values
+              * xfCarrierTermOperStatus: updated list of possible values
+            - Added in xfRLTTable:
+              * xfRLTManualSwitchCommand
+              * xfRLTTxSwitchFarEnd
+              * xfRLTResetTxSwitchAlarm
+              * xfRLTfeRltSeverity
+            - Added in xfRLTDMIfTable:
+              * xfTDMMaxTributaries
+            - Added in xfCGIfTable:
+              * xfCGIfHopViewStatus
+            - Added in xfCarrierTerminationTable:
+              * xfCarrierTermActualRxACM
+              * xfCarrierTermFeCTSeverity
+            - Added in xfXPICPairTable:
+              * xfXPICAutoRestore
+            "
+
+    REVISION "201511250000Z" -- 25 November 2015
+        DESCRIPTION
+            "
+            Rev. PA31
+            - Added RLT ID alarm in MO xfCGIfAlarms of xfCGIfTable.
+            - Range of xfCarrierTermWantedLicensedCapacity extended, it starts from 0 now (instead of 1).
+            - Value 'other' for xfCarrierTermPreamble renamed with 'notSpecified'.
+            - Value 'other' for xfCarrierTermReferenceSEC renamed with 'notSpecified'.
+            - Updated description for following objects:
+              * xfCarrierTermPreamble
+              * xfCarrierTermReferenceSEC
+              * xfCarrierTermBerAlarmThreshold
+            - Updated names and/or values list for following objects:
+              * xfRLTFarEndIdCheck
+              * xfTDMRxLoop
+              * xfTDMEnable
+              * xfXPICPairAdminStatus
+              * xfXPICPairRecovery
+              * xfMIMOGroupAdminStatus
+              * xfMIMOGroupRecovery
+            "
+
+    REVISION "201511160000Z" -- 16 November 2015
+        DESCRIPTION
+            "
+            Rev. PA30
+            Value 'other' for xfCarrierTermPolarization renamed with 'notSpecified'.
+            "
+
+    REVISION "201511100000Z" -- 10 November 2015
+        DESCRIPTION
+            "
+            Rev. PA29
+            Added status 'testing' to xfCarrierTermOperStatus object.
+            Size of xfTDMDistinguishedName object limited to 32 characters.
+            "
+
+    REVISION "201511050000Z" -- 05 November 2015
+        DESCRIPTION
+            "
+            Rev. PA28
+            Updated definition of xfPMACMStatus object in xfRLPMACMConfigTable.
+            "
+
+    REVISION "201509160000Z" -- 16 September 2015
+        DESCRIPTION
+            "
+            Rev. PA27
+            * Updated list of possible values for xfCarrierTermReferenceSEC object.
+            * Added RLT PM tables:
+              - xfRLPMContinuousCounterTable
+              - xfRLPMACMConfigTable
+              - xfRLPMACMCurrent24hTable
+              - xfRLPMACMInterval24hTable
+              - xfRLPMACMCurrent15mTable
+              - xfRLPMACMInterval15mTable
+            "
+
+    REVISION "201508270000Z" -- 27 August 2015
+        DESCRIPTION
+            "
+            Rev. PA26
+            * xfIfStatus object is read-only now.
+            * Changed names of possible values for xfTDMRxLoop object.
+            "
+
+    REVISION "201508200000Z" -- 20 August 2015
+        DESCRIPTION
+            "
+            Rev. PA25
+            * xfRadioChannelTable renamed into xfCarrierTerminationTable.
+              Overall review of table's objects, including renaming of *RadioChannel* into *CarrierTerm*.
+              Removed XPIC and MIMO related objects (but Oper Status).
+            * xfRadioChannelCapabilityTable renamed into xfCarrierTerminationCapabilityTable.
+            * xfRLTTable added:
+              - xfRLTReset
+              - xfRLTFadeNotificationTimer
+            * xfXPICPairTable added:
+              - xfXPICPairRecovery
+              - xfXPICPairRestore
+            * xfMIMOGroupTable added:
+              - xfMIMOGroupRecovery
+              - xfMIMOGroupRestore
+            * xfRLTDMIfTable added:
+              - xfTDMDistinguishedName
+              - xfTDMRxLoop
+            "
+
+    REVISION "201507070000Z" -- 7 July 2015
+        DESCRIPTION
+            "
+            Rev. PA24
+            * Modified RLT table.
+            * Added xfXPICPairTable.
+            * Added xfMIMOGroupTable.
+            "
+
+    REVISION "201506300000Z" -- 30 June 2015
+        DESCRIPTION
+            "
+            Rev. PA23
+            Added chsp112MHz value to xfChannelSpacing object.
+            "
+
+    REVISION "201506040000Z" -- 04 June 2015
+        DESCRIPTION
+            "
+            Rev. PA22
+            Added second index, liIfIndex, in xfLIMappingtable.
+            "
+
+    REVISION "201506030000Z" -- 03 June 2015
+        DESCRIPTION
+            "
+            Rev. PA21
+            Removed xfWantedTDMCapacity in xfRLTDMIfTable.
+            "
+
+    REVISION "201505110000Z" -- 11 May 2015
+        DESCRIPTION
+            "
+            Rev. PA20
+            Added xfCGIfIndex to xfCGIfTable.
+            "
+
+    REVISION "201505080000Z" -- 8 May 2015
+        DESCRIPTION
+            "
+            Rev. PA19
+            Added xfCGIfTable.
+            "
+
+    REVISION "201505060000Z" -- 6 May 2015
+        DESCRIPTION
+            "
+            Rev. PA18
+            Removed:
+                xfRLTDMIfTable    xfTDMAllocation
+            Added:
+                xfRLTDMIfTable    xfWantedTDMAllocation
+                                  xfActualTDMAllocation
+            "
+    REVISION "201504200000Z" -- 20 April 2015
+        DESCRIPTION
+            "
+            Rev. PA17
+            Removed rcEntLogicalIndex in xfRadioChannelTable.
+            "
+
+    REVISION "201504130000Z" -- 13 April 2015
+        DESCRIPTION
+            "
+            Rev. PA16
+            Removed xfRLWANIfTable.
+            "
+
+    REVISION "201503300000Z" -- 30 March 2015
+        DESCRIPTION
+            "
+            Rev. PA15
+            Changed type for xfACMIndex object in xfACMProfileCapacityTable.
+            "
+
+    REVISION "201503190000Z" -- 19 March 2015
+        DESCRIPTION
+            "
+            Rev. PA14
+            * xfRLTDMIfIndex object added in xfRLTDMIfTable.
+            * xfRLWANIfIndex object added in xfRLWANIfTable.
+            * Changed names of values for xfACMProfile object.
+            * Changed type from Integer32 to RadioChannelACMIndex for objects
+              - xfRadioChannelMinACMIndex
+              - xfRadioChannelActualACMIndex
+              - xfRadioChannelMaxACMIndex
+            "
+
+    REVISION "201503110000Z" -- 11 March 2015
+        DESCRIPTION
+            "
+            Rev. PA13
+            xfRadioChannelBerAlarmThresholdCapability object removed.
+            "
+
+    REVISION "201503090000Z" -- 09 March 2015
+        DESCRIPTION
+            "
+            Rev. PA12
+            * xfRadioFrameType changed to xfFrameFormatType.
+            * xfACMMinCapacity changed to xfMinACMCapacity.
+            * xfACMMaxCapacity changed to xfMaxACMCapacity.
+            "
+
+    REVISION "201503060000Z" -- 06 March 2015
+        DESCRIPTION
+            "
+            Rev. PA11
+            * cgIfDescr changed to cgTypeIndex.
+            * Minor adjustments to avoid sintax check warning.
+            "
+
+    REVISION "201503050000Z" -- 05 March 2015
+        DESCRIPTION
+            "
+            Rev. PA10
+            * Adjustements to objects in xfRadioChannelTable.
+              - Descriptions updated.
+              - For enumerative objects, value (1) is always used for 'other'.
+            * xfRadioLinkRltConformance added.
+            "
+
+    REVISION "201502250000Z" -- 25 February 2015
+        DESCRIPTION
+            "
+            Rev. PA9
+            * <xfChannel> changed to <xfRadioChannel> for all applicable objects and tables.
+            * Removed object <xfRadioChannelSpectrumEfficiencyClassCapability>.
+            * Wrong spelling corrected: xfChanneMinACMIndex --> xfRadioChannelMinACMIndex.
+            * Changed objects names:
+              xfRadioChannelStatus -> xfRadioChannelOperStatus
+              xfXPICOper --> xfXPICAdminStatus
+              xfXPICStatus --> xfXPICOperStatus
+              xfMIMOOper --> xfMIMOAdminStatus
+              xfMIMOStatus --> xfIMIMOOperStatus
+              xfXPICPaired --> xfXPICRadioChannelPaired
+              xfMIMOPaired --> xfMIMORadioChannelPaired
+              xfRCPreamble --> xfRadioChannelPreamble
+              xfChannelMSELevel --> xfMSELevel
+            * Added new objects:
+              xfXPICRestore
+              xfMIMORestore
+              xfRadioChannelRestore
+              xfRadioChannelAutoRemoveLoopEnable
+              xfRadioChannelBerAlarmThreshold
+            "
+
+    REVISION "201502180000Z" -- 18 February 2015
+        DESCRIPTION
+            "
+            Rev. PA8
+            XfRadioChannelTable:
+                Changed:
+                    xfXPICMIMORecovery --> xfXPICRecovery
+                    xfXPICMIMOPaired --> xfXPICPaired
+                Added:
+                   xfMIMORecovery
+                   xfMIMOPaired
+            xfRLTTable
+                Changed:
+                    xfActualCapacity --> xfRLTActualCapacity
+            "
+
+    REVISION "201502100000Z" -- 10 February 2015
+        DESCRIPTION
+            "
+            Rev. PA7
+            Added:
+                xfSelectedFrameID MO in xfRadioChannelTable
+            Changed:
+                xfXPICMIMOPaired to R-W
+            "
+
+    REVISION "201501290000Z" -- 29 January 2015
+        DESCRIPTION
+            "
+            Rev. PA6
+            Added:
+                xfACMProfileCapacityTable
+            Modified:
+                xfChannelCapabilityTable - added the following MOs:
+                    xfRadioFrameType
+                    xfACMMinCapacity
+                    xfACMMaxCapacity
+                    xfACMProfile
+            "
+
+    REVISION "201412120000Z" -- 12 December 2014
+        DESCRIPTION
+            "
+            Rev. PA5
+            Removed:
+                xfRadioChannelTable: xfRadioChannelName
+            Added:
+                xfRadioChannelTable: xfRadioChannelStatus
+                                     xfXPICOper
+                                     xfMIMOOper
+                                     xfXPICMIMORecovery
+                                     xfXPICMIMOPaired
+                                     xfRCPreamble
+                xfRLTDMIfTable       xfTDMAllocation
+                xfRLWANIfTable       xfWANMinSpeed
+                                     xfMaxMaxSpeed
+            "
+
+    REVISION "201412100000Z" -- 10 December 2014
+        DESCRIPTION
+            "
+            Rev. PA4
+            Minor change to compile with Wind River compiler.
+            "
+
+    REVISION "201412020000Z" -- 02 December 2014
+        DESCRIPTION
+            "
+            Rev. PA3
+            Table removed: xfRadioLinkRltTable
+            Table renamed: xfRadioChannelMappingTable --> xfRadioChannelTable
+                           xfRLTTerminalTable --> xfRLTTable,
+                           xfRLLogicalToIfTable --> xfLIMappingTable
+            Table added:   xfChannelGroupTable, xfTrafficTable,
+                           xfRLTDMIfTable, xfRLWANIfTable.
+            Object value removed: equipmentProtection in ChannelGroupType
+            Changed ifName to ifIndex in xfChannelGroupTable index
+            Changed ifName to ifIndex in xfLIMappingTable and removed ifIndex as table index
+            Added in:
+                xfLIMappingTable the MOs:    xfLIName
+                                             xfLIIfDescr
+                xfRadioChannelTable the MOs: xfRadioChannelID
+                                             xfChanneMinRowIndex
+                                             xfChannelActualRowIndex
+                                             xfChannelMaxRowIndex
+                                             xfChannelCapabilitiesLastChange
+                                             xfChannelSpectrumEfficiencyClass
+                                             xfChannelSpectrumEfficiencyClassCapability
+                                             xfChannelActualCapacity
+                                             xfChannelCapacityLicense
+                                             xfXPICStatus
+                                             xfMIMOStatus
+                                             xfXPILevel
+                                             xfChannelMSELevel
+            "
+
+    REVISION "201412010000Z" -- 01 December 2014
+        DESCRIPTION
+            "
+            Rev. PA2
+            Table added: xfRadioLinkRltTable, xfRLLogicalToIfTable
+                         xfRadioChannelMappingTable, xfRLTTerminalTable.
+            "
+
+    REVISION "201411110000Z" -- 11 November 2014
+        DESCRIPTION
+            "
+            Rev. PA1
+            Initial revision.
+            "
+        ::= { xfRadioLink 5 }
+
+--
+-- Textual conventions
+--
+
+    CarrierTermACMIndex ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "This TC enumerates all possible ACM index values."
+        SYNTAX INTEGER
+        {
+            acm4QAMStrong(1),
+            acm4QAMStd(2),
+            acm4QAMLight(3),
+            acm16QAMStrong(4),
+            acm16QAMStd(5),
+            acm16QAMLight(6),
+            acm32QAMStrong(7),
+            acm32QAMStd(8),
+            acm32QAMLight(9),
+            acm64QAMStrong(10),
+            acm64QAMStd(11),
+            acm64QAMLight(12),
+            acm128QAMStrong(13),
+            acm128QAMStd(14),
+            acm128QAMLight(15),
+            acm256QAMStrong(16),
+            acm256QAMStd(17),
+            acm256QAMLight(18),
+            acm512QAMStrong(19),
+            acm512QAMStd(20),
+            acm512QAMLight(21),
+            acm1024QAMStrong(22),
+            acm1024QAMStd(23),
+            acm1024QAMLight(24),
+            acm2048QAMStrong(25),
+            acm2048QAMStd(26),
+            acm2048QAMLight(27),
+            acm4096QAMStrong(28),
+            acm4096QAMStd(29),
+            acm4096QAMLight(30),
+            acm8192QAMStrong(31),
+            acm8192QAMStd(32),
+            acm8192QAMLight(33),
+            acm16384QAMStrong(34),
+            acm16384QAMStd(35),
+            acm16384QAMLight(36)
+        }
+
+--
+-- Node definitions
+--
+    xfRadioLinkRltObjects OBJECT IDENTIFIER
+            ::= { xfRadioLinkRltMIB 1 }
+    xfRadioLinkRltPmObjects OBJECT IDENTIFIER
+            ::= { xfRadioLinkRltMIB 2 }
+    xfRadioLinkRltConformance OBJECT IDENTIFIER
+            ::= { xfRadioLinkRltMIB 3 }
+
+--
+------------------------------------------------------------------------------
+-- xfRadioLinkRltObjects
+------------------------------------------------------------------------------
+-- The xfRadioLinkRltObjects MOs
+
+------------------------------------------------------------------------------
+-- xfChannelGroupTable
+------------------------------------------------------------------------------
+    xfChannelGroupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfChannelGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table lists all relationships, for ech Channel Group (CG), between the Bonding/RLP interface
+            and the RL WAN interface and allows to configure CG as either Bonding or Radio Link protection (RLP)."
+        ::= { xfRadioLinkRltObjects 1 }
+
+    xfChannelGroupEntry OBJECT-TYPE
+        SYNTAX XfChannelGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfChannelGroupTable."
+        INDEX { cgIfIndex, cgTypeIndex }
+        ::= { xfChannelGroupTable 1 }
+
+    XfChannelGroupEntry ::=
+        SEQUENCE
+        {
+            cgIfIndex       Integer32,
+            cgTypeIndex     INTEGER,
+            xfIfStatus      INTEGER
+        }
+
+    cgIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It is the ifIndex of WAN interface.
+            The interface identified by atIfIndex is the same
+            interface as identified by the same value of ifIndex."
+        ::= { xfChannelGroupEntry 1 }
+
+    cgTypeIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            bonding(2),
+            rlp(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Index representing the Channel Group interface type:
+            - Bonding (2)
+            - RLP: Radio Link Protection (3)"
+        ::= { xfChannelGroupEntry 2 }
+
+    xfIfStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            ready(2),
+            notReady(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object defines the Channel Group interface type:
+            either Bonding or RLP (Radio Link Protection).
+            Default: notReady"
+        ::= { xfChannelGroupEntry 3 }
+
+------------------------------------------------------------------------------
+-- xfLIMappingTable
+------------------------------------------------------------------------------
+    xfLIMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfLIMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used when navigating from a logical entity to interface,
+            representing the relationship between:
+            - RLT logical entity and either Bonding/RLP interface;
+            - Carrier Termination (CT) logical entity and RAU IF interface."
+        ::= { xfRadioLinkRltObjects 2 }
+
+    xfLIMappingEntry OBJECT-TYPE
+        SYNTAX XfLIMappingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfLIMappingTable."
+        INDEX { liEntLogicalIndex, liIfIndex }
+        ::= { xfLIMappingTable 1 }
+
+    XfLIMappingEntry ::=
+        SEQUENCE
+        {
+            liEntLogicalIndex   Integer32,
+            liIfIndex           Integer32,
+            xfLIName            DisplayString,
+            xfLIIfDescr         DisplayString
+        }
+
+    liEntLogicalIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of this object uniquely identifies the logical
+            entity: RLT (Radio Link Terminal) and CT (Carrier Termination).
+            The logical entity identified by liEntLogicalIndex is the same
+            interface as identified by the same value of entLogicalIndex."
+        ::= { xfLIMappingEntry 1 }
+
+    liIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the ifIndex of Bonding/RLP interface and RAU IF.
+            The interface identified by liIfIndex is the same
+            interface as identified by the same value of ifIndex."
+        ::= { xfLIMappingEntry 2 }
+
+    xfLIName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the Name of the Radio Link Terminal (RLT) or Carrier Termination (CT)."
+        ::= { xfLIMappingEntry 3 }
+
+    xfLIIfDescr OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information about the ifDescr of both
+            Channel Group interface (either Bonding or RLP (Radio Link Protection))
+            and RAU IF interface."
+        ::= { xfLIMappingEntry 4 }
+
+------------------------------------------------------------------------------
+-- xfCarrierTerminationTable
+------------------------------------------------------------------------------
+    xfCarrierTerminationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfCarrierTerminationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure the Carrier Termination (CT)."
+        ::= { xfRadioLinkRltObjects 3 }
+
+    xfCarrierTerminationEntry OBJECT-TYPE
+        SYNTAX XfCarrierTerminationEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfCarrierTerminationTable."
+        INDEX { entLogicalIndex }
+        ::= { xfCarrierTerminationTable 1 }
+
+    XfCarrierTerminationEntry ::=
+        SEQUENCE
+        {
+            xfCarrierTermDistinguishedName              DisplayString,
+            xfCarrierTermLabel                          DisplayString,
+            xfCarrierTermOperStatus                     INTEGER,
+            xfCarrierTermRadioFrameId                   Integer32,
+            xfCarrierTermPreamble                       INTEGER,
+            xfCarrierTermSelectedMinACM                 CarrierTermACMIndex,
+            xfCarrierTermActualACM                      CarrierTermACMIndex,
+            xfCarrierTermSelectedMaxACM                 CarrierTermACMIndex,
+            xfCarrierTermCapabilitiesLastChange         TimeTicks,
+            xfCarrierTermReferenceSEC                   INTEGER,
+            xfCarrierTermWantedLicensedCapacity         Integer32,
+            xfCarrierTermActualLicensedCapacity         Integer32,
+            xfCarrierTermActualCapacity                 Integer32,
+            xfCarrierTermPolarization                   INTEGER,
+            xfCarrierTermXPICOperStatus                 INTEGER,
+            xfCarrierTermMIMOOperStatus                 INTEGER,
+            xfCarrierTermSNIR                           Integer32,
+            xfCarrierTermXPI                            Integer32,
+            xfCarrierTermReset                          INTEGER,
+            xfCarrierTermRestore                        INTEGER,
+            xfCarrierTermAutoRemoveLoopEnable           INTEGER,
+            xfCarrierTermBerAlarmThreshold              INTEGER,
+            xfCarrierTermActualRxACM                    CarrierTermACMIndex,
+            xfCarrierTermFeCTSeverity                   BITS
+        }
+
+    xfCarrierTermDistinguishedName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the distinguished name of the Carrier Termination in the format Rack/Slot/CT."
+        ::= { xfCarrierTerminationEntry 1 }
+
+    xfCarrierTermLabel OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Label identifying the Carrier Termination.
+            It can be freely set by operator to label the Carrier Termination."
+        ::= { xfCarrierTerminationEntry 2 }
+
+    xfCarrierTermOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            other(1),
+            down(2),
+            up(3),
+            degraded(4),
+            testing(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the operative status of the Carrier Termination:
+            - down(2)
+            - up(3)
+            - degraded(4)
+            - testing(5)"
+        ::= { xfCarrierTerminationEntry 3 }
+
+    xfCarrierTermRadioFrameId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It represents the selected Radio Frame ID."
+        ::= { xfCarrierTerminationEntry 4 }
+
+    xfCarrierTermPreamble OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notSpecified(1),
+            preambleA(2),
+            preambleB(3),
+            preambleC(4),
+            preambleD(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It allows to set different preambles in the radio frame
+            of each Carrier Termination in a XPIC or MIMO configuration:
+            - preambleA(2)
+            - preambleB(3)
+            - preambleC(4)
+            - preambleD(5)
+            For non XPIC nor MIMO configurations, it can be left to notSpecified(1)."
+        ::= { xfCarrierTerminationEntry 5 }
+
+    xfCarrierTermSelectedMinACM OBJECT-TYPE
+        SYNTAX      CarrierTermACMIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It represents the selected minimum Tx ACM (Adaptive Code Modulation)."
+        ::= { xfCarrierTerminationEntry 6 }
+
+    xfCarrierTermActualACM OBJECT-TYPE
+        SYNTAX      CarrierTermACMIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the actual (current) Tx ACM (Adaptive Code Modulation)."
+        ::= { xfCarrierTerminationEntry 7 }
+
+    xfCarrierTermSelectedMaxACM OBJECT-TYPE
+        SYNTAX      CarrierTermACMIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It represents the selected maximum Tx ACM (Adaptive Code Modulation)."
+        ::= { xfCarrierTerminationEntry 8 }
+
+    xfCarrierTermCapabilitiesLastChange OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime at the time of the last creation or
+             deletion of an entry in the xfCarrierTerminationCapabilityTable.
+             If the number of entries has been unchanged since the last
+             re-initialization of the local network management subsystem,
+             then this object contains a zero value."
+        ::= { xfCarrierTerminationEntry 9 }
+
+    xfCarrierTermReferenceSEC OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notSpecified(1),
+            sec2(2),
+            sec4L(3),
+            sec4H(4),
+            sec5LB(5),
+            sec5HB(6),
+            sec6LB(7),
+            sec6HB(8),
+            sec7B(9)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Reference Spectrum Efficiency Class (SEC):
+            - notSpecified(1): not configured, not possible to set
+            - sec2(2): spectrum eff. Class 2
+            - sec4L(3): spectrum eff. Class 4L
+            - sec4H(4): specturm eff. Class 4H
+            - sec5LB(5): spectrum eff. Class 5LB
+            - sec5HB(6): spectrum eff. Class 5HB
+            - sec6LB(7): spectrum eff. Class 6LB
+            - sec6HB(8): spectrum eff. Class 6HB
+            - sec7B(9): spectrum eff. Class 7B
+
+            In ETSI, a value different from notSpecified(1) must be configured.
+            In ANSI, no value can be set and notSpecified(1) is always returned.
+
+            Near end access: read-write.
+            Far end access: read-write."
+        ::= { xfCarrierTerminationEntry 10 }
+
+    xfCarrierTermWantedLicensedCapacity OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It represents the wanted traffic licensed capacity on the Carrier Termination, expressed in Kbps.
+            The default value 0 (i.e. disabled) means that no wanted licensed capacity has been selected by the user.
+            The value used by RL license logic to request capacity licenses for the Carrier Termination is:
+            - the capacity of selected max profile, if xfCarrierTermWantedLicensedCapacity = 0
+            - the value of xfCarrierTermWantedLicensedCapacity itself, if it is different from 0
+            "
+        ::= { xfCarrierTerminationEntry 11 }
+
+    xfCarrierTermActualLicensedCapacity OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This MO represents the Actual Licensed Capacity used on the Carrier Termination:
+            - if Wanted Licensed Capacity is disabled (i.e. xfCarrierTermWantedLicensedCapacity = 0),
+              the Selected Max ACM (xfCarrierTermSelectedMaxACM MO) is used for requesting the license capacity on the carrier;
+            - if Wanted Licensed Capacity is enabled (i.e. xfCarrierTermWantedLicensedCapacity > 0),
+              the value of Wanted Licensed Capacity itself is used for requesting the license capacity on the carrier.
+            "
+        ::= { xfCarrierTerminationEntry 12 }
+
+    xfCarrierTermActualCapacity OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the actual transmitted capacity supported by Carrier Termination in Kbps."
+        ::= { xfCarrierTerminationEntry 13 }
+
+    xfCarrierTermPolarization OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notSpecified(1),
+            horizontal(2),
+            vertical(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "XPIC polarization, either horizontal or vertical."
+        ::= { xfCarrierTerminationEntry 14 }
+
+    xfCarrierTermXPICOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            locked(2),
+            unlocked(3),
+            mute(4),
+            notApplicable(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "XPIC locking status:
+            - Other(1): don't use
+            - Locked(2): XPIC is locked: XPI valid
+            - Unlocked(3): XPIC is not locked: XPI not valid
+            - Mute(4): XPIC is muted (XPIC recovery started)
+            - NotApplicable(5): XPIC is disabled"
+        ::= { xfCarrierTerminationEntry 15 }
+
+    xfCarrierTermMIMOOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            locked(2),
+            unlocked(3),
+            mute(4),
+            notApplicable(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "MIMO locking status:
+            - Other(1): don't use
+            - Locked(2): MIMO is locked: XPI and SNIR valid
+            - Unlocked(3): MIMO is not locked: XPI and SNIR not valid
+            - Mute(4): MIMO is muted
+            - NotApplicable(5): MIMO is disabled"
+        ::= { xfCarrierTerminationEntry 16 }
+
+    xfCarrierTermSNIR OBJECT-TYPE
+        SYNTAX Integer32 --(-1000..1000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Signal to Noise Interference Ratio (SNIR) in dB."
+        ::= { xfCarrierTerminationEntry 17 }
+
+    xfCarrierTermXPI OBJECT-TYPE
+        SYNTAX Integer32 --(-1000..1000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cross-Polar Interference (XPI) level of the receiver in tenth of dB."
+        ::= { xfCarrierTerminationEntry 18 }
+
+     xfCarrierTermReset OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noReset(2),
+            reset(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset command forces all the Carrier Termination settings
+            to their own default."
+        ::= { xfCarrierTerminationEntry 19 }
+
+     xfCarrierTermRestore OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noRestore(2),
+            restore(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Restore command clears RFloop, IFloop and turns RAU transmitter on."
+        ::= { xfCarrierTerminationEntry 20 }
+
+    xfCarrierTermAutoRemoveLoopEnable OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disabled(2),
+            enabled(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Auto remove all RL loops after 15 minutes."
+        ::= { xfCarrierTerminationEntry 21 }
+
+    xfCarrierTermBerAlarmThreshold OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            ber1e3(2),
+            ber1e4(3),
+            ber1e5(4),
+            ber1e6(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Threshold for BER alarm.
+            Default: ber1e3(2)."
+        ::= { xfCarrierTerminationEntry 22 }
+
+    xfCarrierTermActualRxACM OBJECT-TYPE
+        SYNTAX      CarrierTermACMIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the actual (current) Rx ACM (Adaptive Code Modulation)."
+        ::= { xfCarrierTerminationEntry 23 }
+
+      xfCarrierTermFeCTSeverity OBJECT-TYPE
+        SYNTAX BITS
+        {
+            feCtSeverity0(0),
+            feCtSeverity1(1),
+            feCtSeverity2(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object represents the highest severity of Far-End CT alarms and is populated only if Far-End terminal is
+            represented by a Packet terminal (PT). Craft uses this MO to colour the box representing the Far-End CT
+            in the hop view.
+            In case of the Far-End is a TN, the remote highest alarm severity of CT is referred to the interfaces:
+            RAU IF and RF IF.
+            "
+        ::= { xfCarrierTerminationEntry 24 }
+
+------------------------------------------------------------------------------
+-- xfCarrierTerminationCapabilityTable
+------------------------------------------------------------------------------
+    xfCarrierTerminationCapabilityTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfCarrierTerminationCapabilityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure the Carrier Termination (CT)."
+        ::= { xfRadioLinkRltObjects 4 }
+
+    xfCarrierTerminationCapabilityEntry OBJECT-TYPE
+        SYNTAX XfCarrierTerminationCapabilityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfCarrierTerminationCapabilityTable."
+        INDEX { entLogicalIndex, xfRadioFrameId }
+        ::= { xfCarrierTerminationCapabilityTable 1 }
+
+    XfCarrierTerminationCapabilityEntry ::=
+        SEQUENCE
+        {
+            xfRadioFrameId              Integer32,
+            xfChannelSpacing            INTEGER,
+            xfFrameFormatType           INTEGER,
+            xfMinACMCapacity            Integer32,
+            xfMaxACMCapacity            Integer32,
+            xfACMProfile                BITS
+        }
+
+    xfRadioFrameId OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the Radio Frame Id."
+        ::= { xfCarrierTerminationCapabilityEntry 1 }
+
+    xfChannelSpacing OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            chspOther(1),
+            chsp3500kHz(2),
+            chsp7MHz(3),
+            chsp10MHz(4),
+            chsp14MHz(5),
+            chsp20MHz(6),
+            chsp28MHz(7),
+            chsp30MHz(8),
+            chsp40MHz(9),
+            chsp50MHz(10),
+            chsp56MHz(11),
+            chsp60MHz(12),
+            chsp80MHz(13),
+            chsp112MHz(14)
+        }
+
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Channel spacing:
+            - ETSI: 3.5, 7, 14, 28, 40, 56, 112 MHz
+            - ANSI: 10, 20, 30, 40, 50, 60, 80 MHz"
+        ::= { xfCarrierTerminationCapabilityEntry 2 }
+
+    xfFrameFormatType OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            other(1),
+            standard(2),
+            xpic(3),
+            mimo(4),
+            longHaulStandard(5),
+            longHaulXpic(6),
+            xpic2boards(7),
+            longHaulXpic2boards(8),
+            mimo2boards(9),
+            sisoCA(10),
+            xpicCA(11)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the Frame Format type:
+            - Standard
+            - XPIC
+            - MIMO
+            - Long Haul Standard
+            - Long Haul XPIC
+            - XPIC on two boards
+            - Long Haul XPIC on two boards
+            "
+        ::= { xfCarrierTerminationCapabilityEntry 3 }
+
+    xfMinACMCapacity OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the minimum capacity designed for the specific frame format (Radio Frame Id)."
+        ::= { xfCarrierTerminationCapabilityEntry 4 }
+
+    xfMaxACMCapacity OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the maximum capacity designed for the frame format (Radio Frame Id)."
+        ::= { xfCarrierTerminationCapabilityEntry 5 }
+
+    xfACMProfile OBJECT-TYPE
+        SYNTAX      BITS
+        {
+            none(0),
+            qam4Strong(1),
+            qam4Std(2),
+            qam4Light(3),
+            qam16Strong(4),
+            qam16Std(5),
+            qam16Light(6),
+            qam32Strong(7),
+            qam32Std(8),
+            qam32Light(9),
+            qam64Strong(10),
+            qam64Std(11),
+            qam64Light(12),
+            qam128Strong(13),
+            qam128Std(14),
+            qam128Light(15),
+            qam256Strong(16),
+            qam256Std(17),
+            qam256Light(18),
+            qam512Strong(19),
+            qam512Std(20),
+            qam512Light(21),
+            qam1024Strong(22),
+            qam1024Std(23),
+            qam1024Light(24),
+            qam2048Strong(25),
+            qam2048Std(26),
+            qam2048Light(27),
+            qam4096Strong(28),
+            qam4096Std(29),
+            qam4096Light(30),
+            qam8192Strong(31),
+            qam8192Std(32),
+            qam8192Light(33),
+            qam16384Strong(34),
+            qam16384Std(35),
+            qam16384Light(36)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It specifies which adaptive code and modulation profiles are supported."
+        ::= { xfCarrierTerminationCapabilityEntry 6 }
+
+----------------------------------------------------------------------------
+-- xfACMProfileCapacityTable
+----------------------------------------------------------------------------
+    xfACMProfileCapacityTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfACMProfileCapacityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This tables reports the ACM capacities of the selected Radio Frame Id per each Carrier Termination."
+        ::= { xfRadioLinkRltObjects 5 }
+
+    xfACMProfileCapacityEntry OBJECT-TYPE
+        SYNTAX XfACMProfileCapacityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfACMProfileCapacityTable."
+        INDEX { entLogicalIndex, xfACMIndex  }
+        ::= { xfACMProfileCapacityTable 1 }
+
+     XfACMProfileCapacityEntry ::=
+        SEQUENCE
+        {
+            xfACMIndex              CarrierTermACMIndex,
+            xfACMCapacity           Integer32
+        }
+
+    xfACMIndex OBJECT-TYPE
+        SYNTAX      CarrierTermACMIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the positional index of the bitmap xfACMProfile in xfCarrierTerminationCapabilityTable."
+        ::= { xfACMProfileCapacityEntry 1 }
+
+    xfACMCapacity OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the capacity in Kbps of the ACM profile identified by the positional index
+            xfACMIndex of the xfACMProfile in xfCarrierTerminationCapabilityTable.
+            Value 0 means that the ACM profile is not included in current Frame Format."
+        ::= { xfACMProfileCapacityEntry 2 }
+
+------------------------------------------------------------------------------
+-- xfRLTTable
+------------------------------------------------------------------------------
+    xfRLTTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLTEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure the Radio Link Terminal (RLT)."
+        ::= { xfRadioLinkRltObjects 6 }
+
+    xfRLTEntry OBJECT-TYPE
+        SYNTAX XfRLTEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLTTable."
+        INDEX { rltEntLogicalIndex }
+        ::= { xfRLTTable 1 }
+
+    XfRLTEntry ::=
+        SEQUENCE
+        {
+            rltEntLogicalIndex                  Integer32,
+            xfRLTDistinguishedName              DisplayString,
+            xfRLTIpAddress                      IpAddress,
+            xfRLTIPv6Address                    InetAddressIPv6,
+            xfRLTNeName                         DisplayString,
+            xfRLTNeType                         DisplayString,
+            xfRLTId                             DisplayString,
+            xfRLTExpectedFarEndId               DisplayString,
+            xfRLTFarEndIdCheck                  INTEGER,
+            xfRLTStatus                         INTEGER,
+            xfRLTMode                           INTEGER,
+            xfRLTActualTXTotalCapacity          Gauge32,
+            xfRLTActualTXPacketCapacity         Gauge32,
+            xfRLTLimitedTotalCapacity           Gauge32,
+            xfRLTRltSeverity                    BITS,
+            xfRLTCapability                     BITS,
+            xfRLTInventoryLastChange            TimeTicks,
+            xfRLTCpriMode                       INTEGER,
+            xfRLTReset                          INTEGER,
+            xfRLTMeasuredHopLength              INTEGER
+        }
+
+    rltEntLogicalIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the entLogicalIndex of the Radio Link Terminal (RLT).
+            The logical entity identified by rltEntLogicalIndex is the same
+            entity as identified by the same value of entLogicalIndex."
+        ::= { xfRLTEntry 1 }
+
+    xfRLTDistinguishedName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the distinguished name of the Radio Link Terminal (RLT): Rack/Slot/RLT number.
+            It is the ifName of RL-WAN i/f."
+        ::= { xfRLTEntry 2 }
+
+    xfRLTIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IPv4 address of the network element the Radio Link Terminal (RLT) belongs to."
+        ::= { xfRLTEntry 3 }
+
+    xfRLTIPv6Address OBJECT-TYPE
+        SYNTAX      InetAddressIPv6
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "IPv6 Address of the network element the Radio Link Terminal (RLT) belongs to."
+        ::= { xfRLTEntry 4 }
+
+    xfRLTNeName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The name of the network element the Radio Link Terminal (RLT) belongs to (System Name - sysName)."
+        ::= { xfRLTEntry 5 }
+
+    xfRLTNeType OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..255))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the network element the Radio Link Terminal (RLT) belongs to (System Descr - sysDescr)."
+        ::= { xfRLTEntry 6 }
+
+    xfRLTId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Radio Link Terminal (RLT) identifier used for integrity check with far-end."
+        ::= { xfRLTEntry 7 }
+
+    xfRLTExpectedFarEndId OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Expected Id of far-end Radio Link Terminal (RLT), used for integrity check with near-end."
+        ::= { xfRLTEntry 8 }
+
+    xfRLTFarEndIdCheck OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When enabled, the system verifies that far-end Radio Link Terminal name is equal to the expected.
+            If ok Radio Link Terminal status is UP. If not ok the Radio Link Terminal status is stated as DOWN.
+            Default value: disabled.
+            "
+        ::= { xfRLTEntry 9 }
+
+    xfRLTStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            other(1),
+            down(2),
+            up(3),
+            degraded(4),
+            resourceUnavailable(5)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the operational status of the Radio Link Terminal (RLT)."
+        ::= { xfRLTEntry 10 }
+
+    xfRLTMode OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            other(1),
+            onePlusZero(2),
+            onePlusOneRadioLinkProtection(3),
+            twoPlusZeroAdvancedRadioLinkBonding(4),
+            onePlusOneRadioLinkProtectionAndEquipmentProtection(5),
+            twoPlusZeroRadioLinkBondingAndEquipmentProtection(6),
+            twoPlusTwoRadioLinkProtectionAndEquipmentProtection(7),
+            fourPlusZeroRadioLinkBondingAndEquipmentProtection(8)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The mode of the Radio Link Terminal (RLT).
+            Values:
+            - 1+0: onePlusZero (default)
+            - 1+1 RLP: onePlusOneRadioLinkProtection
+            - 2+0 RLB: twoPlusZeroAdvancedRadioLinkBonding
+            - 1+1 RLP EQP: onePlusOneRadioLinkProtectionAndEquipmentProtection
+            - 2+0 RLB EQP: twoPlusZeroRadioLinkBondingAndEquipmentProtection
+            - 2+2 RLP EQP: twoPlusTwoRadioLinkProtectionAndEquipmentProtection
+            - 4+0 RLB EQP: fourPlusZeroRadioLinkBondingAndEquipmentProtection
+            "
+        ::= { xfRLTEntry 11 }
+
+    xfRLTActualTXTotalCapacity OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "
+            It represents the total transmitted capacity throughput (considering both Packet and TDM traffic),
+            expressed in bps, of the Radio Link Terminal (RLT).
+            "
+        ::= { xfRLTEntry 12 }
+
+    xfRLTActualTXPacketCapacity OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "
+            It represents the transmitted packet capacity throughput (only packet traffic),
+            expressed in bps, of the Radio Link Terminal (RLT).
+            "
+        ::= { xfRLTEntry 13 }
+
+    xfRLTLimitedTotalCapacity OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "
+            It represents the total transmitted capacity throughput (considering both Packet and TDM traffic),
+            expressed in bps, of the Radio Link Terminal (RLT) limited by License.
+            "
+        ::= { xfRLTEntry 14 }
+
+      xfRLTRltSeverity OBJECT-TYPE
+        SYNTAX BITS
+        {
+            rltSeverity0(0),
+            rltSeverity1(1),
+            rltSeverity2(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            This object represents the highest severity alarm related to RLT with logical index 'rltEntLogicalIndex'.
+            Node GUI uses the Far-End entry value (of this MIB MO) to define the colour of the Far-End RLT box in the hop view.
+            "
+        ::= { xfRLTEntry 15 }
+
+      xfRLTCapability OBJECT-TYPE
+        SYNTAX BITS
+        {
+          xpicCapability0(0),
+          capTDMWithEQP(1),
+          capCsPlurality(2),
+          capCtAutoSelection(3),
+          capOnePlusZero(4),
+          capOnePlusOneRadioLinkProtection(5),
+          capTwoPlusZeroAdvancedRadioLinkBonding(6),
+          capOnePlusOneRadioLinkProtectionWithEQP(7),
+          capTwoPlusZeroRadioLinkBondingWithEQP(8),
+          capTwoPlusTwoRadioLinkProtectionWithEQP(9),
+          capFourPlusZeroRadioLinkBondingWithEQP(10),
+          capXpicBetweenBoards(11),
+          capXpicMembersAutoSelection(12),
+          capManualEqpSwitch(13),
+          capEnhAcmMaxCapacity(14),
+          capEnhAcmMaxProtection(15),
+          capRLEncryption(16),
+          capMIMO(17),
+          capTXswoAndSSD(18)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            Each bit of this object represents an RLT capability:
+            Bit 0 - XPIC capability
+            Bit 1 - TDM capability
+            Bit 2 - CsPlurality capability
+            Bit 3 - CtAutoSelection capability
+            Bit 4 - OnePlusZero capability
+            Bit 5 - OnePlusOneRadioLinkProtection capability
+            Bit 6 - TwoPlusZeroAdvancedRadioLinkBonding capability
+            Bit 7 - OnePlusOneRadioLinkProtectionWithEQP capability
+            Bit 8 - TwoPlusZeroRadioLinkBondingWithEQP capability
+            Bit 9 - TwoPlusTwoRadioLinkProtectionWithEQP capability
+            Bit 10 - FourPlusZeroRadioLinkBondingWithEQP capability
+            Bit 11 - XPIC between boards capability
+            Bit 12 - XPIC Members Auto Selection capability
+            Bit 13 - Manual EQP Switch capability
+            Bit 14 - Enhanced ACM Protection: Maximum Capacity capability
+            Bit 15 - Enhanced ACM Protection: Maximum Protection capability
+            Bit 16 - Radio Link Encryption capability
+            Bit 17 - MIMO capability
+            Bit 18 - TX swicthover and SSD capability
+            "
+        ::= { xfRLTEntry 16 }
+
+      xfRLTInventoryLastChange OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The value of sysUpTime at the time of the last creation or
+            deletion of an entry in the xfRLTHierarchyModuleTable.
+            If the current state was entered prior to the last
+            re-initialization of the local network management subsystem,
+            then this object contains a zero value.
+            "
+        ::= { xfRLTEntry 17 }
+
+    xfRLTCpriMode OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Set the mode of the CPRI front-haul product.
+       Default: notApplicable."
+        ::= { xfRLTEntry 18 }
+
+     xfRLTReset OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            rltNoReset(2),
+            rltReset(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It resets RLT to default configuration."
+        ::= { xfRLTEntry 19 }
+
+     xfRLTMeasuredHopLength OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It represents the measured value of the radio hop length expressed in Km.
+             Values:
+              - Radio hop length measurement not yet available: -1;
+              - Measured hop length in Km: > 0.
+            "
+        ::= { xfRLTEntry 20 }
+
+------------------------------------------------------------------------------
+-- xfTrafficTable
+------------------------------------------------------------------------------
+    xfTrafficTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfTrafficEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to map the TDM interface to the specified RLT."
+        ::= { xfRadioLinkRltObjects 7 }
+
+    xfTrafficEntry OBJECT-TYPE
+        SYNTAX XfTrafficEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfTrafficEntry."
+        INDEX { trEntLogicalIndex }
+        ::= { xfTrafficTable 1 }
+
+    XfTrafficEntry ::=
+        SEQUENCE
+        {
+            trEntLogicalIndex       Integer32,
+            xfTDMEnable             INTEGER
+        }
+
+    trEntLogicalIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the entLogicalIndex of the Radio Link Terminal (RLT).
+            The logical entity identified by trEntLogicalIndex is the same
+            interface as identified by the same value of entLogicalIndex."
+        ::= { xfTrafficEntry 1 }
+
+    xfTDMEnable OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It allows to map TDM interface to a specific Radio Link Terminal (RLT).
+            Default: disable."
+        ::= { xfTrafficEntry 2 }
+
+------------------------------------------------------------------------------
+-- xfRLTDMIfTable
+------------------------------------------------------------------------------
+    xfRLTDMIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLTDMIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is an extention of the ifTable used to configure TDM interface."
+        ::= { xfRadioLinkRltObjects 8 }
+
+    xfRLTDMIfEntry OBJECT-TYPE
+        SYNTAX XfRLTDMIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLTDMIfEntry."
+        INDEX { xfRLTDMIfIndex }
+        ::= { xfRLTDMIfTable 1 }
+
+    XfRLTDMIfEntry ::=
+        SEQUENCE
+        {
+            xfRLTDMIfIndex          Integer32,
+            xfActualTDMCapacity     Integer32,
+            xfWantedTDMAllocation   BITS,
+            xfActualTDMAllocation   BITS,
+            xfTDMIfAlarms           BITS,
+            xfTDMRxLoop             INTEGER,
+            xfTDMDistinguishedName  DisplayString,
+            xfTDMMaxTributaries     INTEGER,
+            xfTDMHopLength          INTEGER
+        }
+
+    xfRLTDMIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It is the ifIndex of RL TDM I/F table."
+        ::= { xfRLTDMIfEntry 1 }
+
+    xfActualTDMCapacity OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the current tributary capacity."
+        ::= { xfRLTDMIfEntry 2 }
+
+    xfWantedTDMAllocation OBJECT-TYPE
+        SYNTAX      BITS { firstE1(0) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It represents the wanted tributary allocation."
+        ::= { xfRLTDMIfEntry 3 }
+
+    xfActualTDMAllocation OBJECT-TYPE
+        SYNTAX      BITS { firstE1(0) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It represents the actual tributary allocation."
+        ::= { xfRLTDMIfEntry 4 }
+
+     xfTDMIfAlarms OBJECT-TYPE
+        SYNTAX BITS
+        {
+            ber0(0),
+            ber1(1),
+            ber2(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows TDM if related alarms."
+        ::= { xfRLTDMIfEntry 5 }
+
+     xfTDMRxLoop OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It configures TDM RX loop:
+            - other(1)
+            - enable(2)
+            - disable(3) (default)
+            "
+        ::= { xfRLTDMIfEntry 6 }
+
+      xfTDMDistinguishedName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It is the disinguished name of TDM i/f, i.e. R/S/P."
+        ::= { xfRLTDMIfEntry 7 }
+
+      xfTDMMaxTributaries OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It represents the maximum number of tributaries that can be allocated to TDM i/f,
+            depending on frame ID, minimum ACM profile configured and licensed capacity in each CTs of the RLT.
+            The maximum number is limited to 80."
+        ::= { xfRLTDMIfEntry 8 }
+
+      xfTDMHopLength OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It represents the length of the radio hop expressed in Km.
+            This is used to calculate the propagation delay over the radio hop
+            that shall be compensated to guarantee TDM traffic error free.
+            Values:
+              - default value for delay compensation: -1
+              - admissible range of values in Km: 0-200
+            "
+        ::= { xfRLTDMIfEntry 9 }
+
+
+------------------------------------------------------------------------------
+-- xfCGIfTable
+------------------------------------------------------------------------------
+    xfCGIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfCGIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is an extension of ifTable reporting the main characteristics of CG i/f."
+        ::= { xfRadioLinkRltObjects 9 }
+
+    xfCGIfEntry OBJECT-TYPE
+        SYNTAX XfCGIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfCGIfEntry."
+        INDEX { xfCGIfIndex }
+        ::= { xfCGIfTable 1 }
+
+    XfCGIfEntry ::=
+        SEQUENCE
+        {
+            xfCGIfIndex           Integer32,
+            xfCGIfMinSpeed        Integer32,
+            xfCGIfMaxSpeed        Gauge32,
+            xfCGIfRCNum           INTEGER,
+            xfCGIfAlarms          BITS,
+            xfCGIfHopViewStatus   INTEGER
+        }
+
+    xfCGIfIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It is the ifIndex of CG interface."
+        ::= { xfCGIfEntry 1 }
+
+     xfCGIfMinSpeed OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The minimum speed (throughput) of this interface expressed in bit/s, including both Ethernet and TDM capacities.
+            Note: in case of bonding configurations, it represents the minimum of the min speeds
+            of all Carrier Terminations in the bonding group.
+            "
+        ::= { xfCGIfEntry 2 }
+
+     xfCGIfMaxSpeed OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The maximum speed (throughput) of this interface expressed in bit/s, including both Ethernet and TDM capacities.
+            Note: in case of bonding configurations, it represents the sum of the max speeds
+            of all Carrier Terminations in the bonding group.
+            "
+        ::= { xfCGIfEntry 3 }
+
+     xfCGIfRCNum OBJECT-TYPE
+        SYNTAX INTEGER (1..16)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of Carrier Termination members belonging to the CG group."
+        ::= { xfCGIfEntry 4 }
+
+     xfCGIfAlarms OBJECT-TYPE
+        SYNTAX BITS
+        {
+            hccNe0(0),
+            hccNe1(1),
+            hccNe2(2),
+
+            rltId0(3),
+            rltId1(4),
+            rltId2(5),
+
+            txSwitchover0(6),
+            txSwitchover1(7),
+            txSwitchover2(8),
+
+            remoteTxSwitchOver0(9),
+            remoteTxSwitchOver1(10),
+            remoteTxSwitchOver2(11),
+
+            unableToProtect0(12),
+            unableToProtect1(13),
+            unableToProtect2(14),
+
+            rfInputThresholdProtection0(15),
+            rfInputThresholdProtection1(16),
+            rfInputThresholdProtection2(17),
+
+            unableToProtectEqp0(18),
+            unableToProtectEqp1(19),
+            unableToProtectEqp2(20)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows CG i/f related alarms."
+        ::= { xfCGIfEntry 5 }
+
+     xfCGIfHopViewStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            down(2),
+            up(3)
+         }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object represents the Hop View status.
+            Up:   Far-End is reachable
+            Down: Far-End not reachable
+
+            The status is related to HCC-NE alarm.
+            "
+        ::= { xfCGIfEntry 6 }
+
+------------------------------------------------------------------------------
+-- xfXPICPairTable
+------------------------------------------------------------------------------
+    xfXPICPairTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfXPICPairEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to enable XPIC (Admid Status) and set the CT pair in XPIC."
+        ::= { xfRadioLinkRltObjects 10 }
+
+    xfXPICPairEntry OBJECT-TYPE
+        SYNTAX XfXPICPairEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfXPICPairTable."
+        INDEX { entLogicalIndex, xfXpicPairIndex }
+        ::= { xfXPICPairTable 1 }
+
+    XfXPICPairEntry ::=
+        SEQUENCE
+        {
+            xpicPairEntLogicalIIndex    Integer32,
+            xfXPICPairAdminStatus       INTEGER,
+            xfXPICPairNumber            INTEGER,
+            xfXPICPairRecovery          INTEGER,
+            xfXPICPairRestore           INTEGER,
+            xfXPICCTmember1             DisplayString,
+            xfXPICCTmember2             DisplayString,
+            xfXPICAutoRestore           INTEGER,
+            xfXpicPairIndex             INTEGER
+        }
+
+     xpicPairEntLogicalIIndex OBJECT-TYPE
+        SYNTAX Integer32  (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It represents the entLogicalIndex of the Radio Link Terminal (RLT).
+            The logical entity identified by xpicPairEntLogicalIIndex is the same
+            entity as identified by the same value of entLogicalIndex.
+            "
+        ::= { xfXPICPairEntry 1 }
+
+     xfXPICPairAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Administrative status of XPIC pair.
+             Default value: disable."
+        ::= { xfXPICPairEntry 2 }
+
+     xfXPICPairNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It specifies the number used for identification of the XPIC pair."
+        ::= { xfXPICPairEntry 3 }
+
+    xfXPICPairRecovery OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It allows to enable/disable the recovery procedure when XPIC mode is enabled."
+        ::= { xfXPICPairEntry 4 }
+
+    xfXPICPairRestore OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            xpicNoRestore(2),
+            xpicRestore(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Restore XPIC functionality after XPIC recovery has been triggered and resets
+            XPIC Auto Restore procedure"
+        ::= { xfXPICPairEntry 5 }
+
+     xfXPICCTmember1 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It specifies the first Carrier Termination (CT) member of the XPIC pair.
+             The member is identified by the CT distinguished name (R/S/P).
+            "
+        ::= { xfXPICPairEntry 6 }
+
+     xfXPICCTmember2 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It specifies the second Carrier Termination (CT) member of the XPIC pair.
+             The member is identified by the CT distinguished name (R/S/P).
+            "
+        ::= { xfXPICPairEntry 7 }
+
+     xfXPICAutoRestore OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It enable/disables the XPIC Auto Recovery procedure.
+            "
+        ::= { xfXPICPairEntry 8 }
+
+     xfXpicPairIndex OBJECT-TYPE
+        SYNTAX INTEGER  (1..10)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It represents the table second index and is used to index the XPIC pair associated
+             to Radio Link Terminal (RLT) with entLogicalIndex equal to xpicPairEntLogicalIIndex.
+             It has been introduce to support configurations like 4+0 RLB EQP, 2+2 RLP EQP."
+        ::= { xfXPICPairEntry 9 }
+
+------------------------------------------------------------------------------
+-- xfMIMOGroupTable
+------------------------------------------------------------------------------
+    xfMIMOGroupTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfMIMOGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to enable MIMO (Admid Status) and set the CTs in MIMO group."
+        ::= { xfRadioLinkRltObjects 11 }
+
+    xfMIMOGroupEntry OBJECT-TYPE
+        SYNTAX XfMIMOGroupEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfMIMOGroupTable."
+        INDEX { entLogicalIndex }
+        ::= { xfMIMOGroupTable 1 }
+
+    XfMIMOGroupEntry ::=
+        SEQUENCE
+        {
+            mimoGroupEntLogicalIIndex   Integer32,
+            xfMIMOGroupAdminStatus      INTEGER,
+            xfMIMOGroupNumber           INTEGER,
+            xfMIMOGroupRecovery         INTEGER,
+            xfMIMOGroupRestore          INTEGER,
+            xfMIMOCTmember1             DisplayString,
+            xfMIMOCTmember2             DisplayString,
+            xfMIMOCTmember3             DisplayString,
+            xfMIMOCTmember4             DisplayString
+        }
+
+      mimoGroupEntLogicalIIndex OBJECT-TYPE
+        SYNTAX Integer32  (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It represents the entLogicalIndex of the Radio Link Terminal (RLT).
+            The logical entity identified by mimoGroupEntLogicalIIndex is the same
+            entity as identified by the same value of entLogicalIndex.
+            "
+        ::= { xfMIMOGroupEntry 1 }
+
+     xfMIMOGroupAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Administrative status of MIMO group.
+             Default value: disable.
+            "
+        ::= { xfMIMOGroupEntry 2 }
+
+     xfMIMOGroupNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It specifies the Number used for identification of the MIMO group.
+            "
+        ::= { xfMIMOGroupEntry 3 }
+
+    xfMIMOGroupRecovery OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It allows to enable/disable the recovery procedure when MIMO mode is enabled."
+        ::= { xfMIMOGroupEntry 4 }
+
+    xfMIMOGroupRestore OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            mimoNoRestore(2),
+            mimoRestore(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Restore MIMO functionality after MIMO recovery has been triggered."
+        ::= { xfMIMOGroupEntry 5 }
+
+    xfMIMOCTmember1 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It specifies the first Carrier Termination (CT) member of the MIMO group.
+             The member is identified by the CT distinguished name (R/S/P).
+            "
+        ::= { xfMIMOGroupEntry 6 }
+
+    xfMIMOCTmember2 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It specifies the second Carrier Termination (CT) member of the MIMO group.
+             The member is identified by the CT distinguished name (R/S/P).
+            "
+        ::= { xfMIMOGroupEntry 7 }
+
+    xfMIMOCTmember3 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It specifies the third Carrier Termination (CT) member of the MIMO group.
+             The member is identified by the CT distinguished name (R/S/P).
+            "
+        ::= { xfMIMOGroupEntry 8 }
+
+    xfMIMOCTmember4 OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It specifies the forth Carrier Termination (CT) member of the MIMO group.
+             The member is identified by the CT distinguished name (R/S/P).
+            "
+        ::= { xfMIMOGroupEntry 9 }
+
+------------------------------------------------------------------------------
+-- xfRLWANIfTable
+------------------------------------------------------------------------------
+    xfRLWANIfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLWANIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to handle the RL-WAN i/f."
+        ::= { xfRadioLinkRltObjects 12 }
+
+    xfRLWANIfEntry OBJECT-TYPE
+        SYNTAX XfRLWANIfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLWANIfTable."
+        INDEX { xfRLWANIfIndex }
+        ::= { xfRLWANIfTable 1 }
+
+    XfRLWANIfEntry ::=
+        SEQUENCE
+        {
+            xfRLWANIfIndex                 Integer32,
+            xfRLWANDistinguishedName       DisplayString,
+            xfRLWANCompAdminStatus         INTEGER,
+            xfRLWANCompConnStatus          INTEGER,
+            xfRLWANMlhcMplsMode            INTEGER,
+            xfRLWANMlhcOperStatus          INTEGER,
+            xfRLWANPlcOperStatus           INTEGER,
+            xfRLWANActualCapacity          Gauge32,
+            xfRLWANLimitedCapacity         Gauge32
+        }
+
+  xfRLWANIfIndex OBJECT-TYPE
+        SYNTAX Integer32  (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It is the table index.
+            It contains the ifIndex value of the WAN interface.
+            "
+        ::= { xfRLWANIfEntry 1 }
+
+  xfRLWANDistinguishedName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It is the name uniquely identifying the RL-WAN interface within the system, i.e. R/S/P."
+  ::= { xfRLWANIfEntry 2 }
+
+  xfRLWANCompAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            down(2),
+            mlhcUp(3),
+            mlhcPlcUp(4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It enables and disables MLHC and PLC on the RL-WAN interface.
+
+             down(2): both MLHC and PLC are disabled.
+             mlhcUp(3): only MLHC is enabled.
+             mlhcPlcUp(4): both MLHC and PLC are enabled.
+             Default:down(2).
+
+             Compression can be enabled on only one of the two RL-WAN interfaces belonging to the same MMU.
+             Any attempt to enable compression on both RL-WAN interfaces belonging to the same MMU is refused.
+            "
+        ::= { xfRLWANIfEntry 3 }
+
+  xfRLWANCompConnStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            disconnected(2),
+            connected(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "It specifies if the compression building block is physically connected to the RL-WAN interface.
+             Physical connection of the compression building block to the RL-WAN interface is pre-requisite for enabling compression.
+
+             When xfRLWANCompAdminStatus is set either to mlhcUp or mlhcPlcUp, the compression building block
+             is physically connected to RL-WAN interfaces and xfRLWANCompConnStatus becomes connected.
+             When xfRLWANCompAdminStatus is set either to mlhcUp or mlhcPlcUp on the other RL-WAN interface,
+             the compression building block is physically connected to the other RL-WAN interfaces
+             and xfRLWANCompConnStatus becomes disconnected.
+            "
+        ::= { xfRLWANIfEntry 4 }
+
+  xfRLWANMlhcMplsMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            mplsOnly(2),
+            controlWord(3),
+            l2(4),
+            l3(5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "It specifies the wanted mpls mode.
+            mplsOnly(2): Ethernet customer bridge, provider bridge and QinQ headers, including MPLS labels (up to 3) are compressed.
+            controlWord(3): L2 VPN with Pseudo-Wire Control Word headers are compressed.
+            l2(4): L2 VPN without Pseudo-Wire Control Word headers are compressed.
+            l3(5): L3 VPN headers are compressed.
+            Default: mplsOnly(2).
+
+            This can be configured only if compression administrative status is down.
+            "
+        ::= { xfRLWANIfEntry 5 }
+
+  xfRLWANMlhcOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            down(2),
+            up(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Multi-Layer Header Compression operative status.
+            "
+        ::= { xfRLWANIfEntry 6 }
+
+  xfRLWANPlcOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            down(2),
+            up(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Payload Compression operative status.
+            "
+        ::= { xfRLWANIfEntry 7 }
+
+  xfRLWANActualCapacity OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Actual Capacity (speed) of RL WAN interface, in bps.
+            "
+        ::= { xfRLWANIfEntry 8 }
+
+  xfRLWANLimitedCapacity OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Capacity (speed) limited by license of RL WAN interface, in bps.
+            "
+        ::= { xfRLWANIfEntry 9 }
+
+------------------------------------------------------------------------------
+-- xfRLTHierarchyModuleTable
+------------------------------------------------------------------------------
+    xfRLTHierarchyModuleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLTHierarchyModuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to handle Module (MMU - RAU) hierarchy for the specific RLT."
+        ::= { xfRadioLinkRltObjects 13 }
+
+    xfRLTHierarchyModuleEntry OBJECT-TYPE
+        SYNTAX XfRLTHierarchyModuleEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLTHierarchyModuleTable."
+        INDEX { xfRLTMHIndex, xfRLTModuleIndex }
+        ::= { xfRLTHierarchyModuleTable 1 }
+
+    XfRLTHierarchyModuleEntry ::=
+        SEQUENCE
+        {
+            xfRLTMHIndex                   Integer32,
+            xfRLTModuleIndex               Integer32,
+            xfRLTEntPhysicalIndex          Integer32,
+            xfRLTPhysicalCointainedIn      Integer32,
+            xfRLTPhysicalParentRelPos      Integer32,
+            xfRLTEntityPhysicalDescr       DisplayString,
+            xfRLTModuleSlotPosition        Integer32,
+            xfRLTNEDistinguishedName       DisplayString,
+            xfRLTFEDistinguishedName       DisplayString,
+            xfRLTInterfaceIndex            Integer32,
+            xfRLTHighestSeverityAlarm      INTEGER
+        }
+
+   xfRLTMHIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It is the table index.
+             It contains the entPhisycalIndex of the WAN port associated to the RLT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 1 }
+
+   xfRLTModuleIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1000)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It is the table index.
+             It is a sequential number referred to the module (entity), either MMU or RAU, constituting the RLT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 2 }
+
+   xfRLTEntPhysicalIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents the value of entPhysicalIndex of the module, either MMU or RAU,
+             constituting the RLT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 3 }
+
+   xfRLTPhysicalCointainedIn OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents the value of entPhysicalIndex for the physical entity which
+           'contains' this physical entity, which is either MMU or RAU (constituting the RLT).
+            "
+        ::= { xfRLTHierarchyModuleEntry 4 }
+
+   xfRLTPhysicalParentRelPos OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents the indication of the relative position of this 'child'
+           component among all its 'sibling' components.
+            "
+        ::= { xfRLTHierarchyModuleEntry 5 }
+
+    xfRLTEntityPhysicalDescr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents a textual description of physical entity (module),
+             either MMU or RAU, constituting the RLT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 6 }
+
+    xfRLTModuleSlotPosition OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents the slot position of the physical entity (module),
+             either MMU or RAU, constituting the RLT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 7 }
+
+    xfRLTFEDistinguishedName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents the distinguished name of the Near-End logical entity,
+             either RLT or CT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 8 }
+
+    xfRLTNEDistinguishedName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents the distinguished name of the Far-End logical entity,
+             either RLT or CT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 9 }
+
+   xfRLTInterfaceIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO represents the value of ifIndex of the interface, either CG IF (Bonding/RLP) or RAU IF,
+             constituting the RLT.
+            "
+        ::= { xfRLTHierarchyModuleEntry 10 }
+
+   xfRLTHighestSeverityAlarm OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            critical(0),
+            major(1),
+            minor(2),
+            warning(3),
+            clear(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+             This MO reports the highest severity of the alarms active in the physical module, MMU or RAU, it refers to.
+             Value list:
+                - critical(0): highest severity is Critical;
+                - major(1):    highest severity is Major;
+                - minor(2):    highest severity is Minor;
+                - warning(3):  highest severity is Warning;
+                - clear(4):    no alarm.
+
+            "
+        ::= { xfRLTHierarchyModuleEntry 11 }
+
+------------------------------------------------------------------------------
+-- xfRLTProtectionTable
+------------------------------------------------------------------------------
+    xfRLTProtectionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLTProtectionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to handle RL Protection for the RLT whose mode is set 1+1RLP."
+        ::= { xfRadioLinkRltObjects 14 }
+
+    xfRLTProtectionEntry OBJECT-TYPE
+        SYNTAX XfRLTProtectionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLTProtectionTable."
+        INDEX { xfRLTProtIndex}
+        ::= { xfRLTProtectionTable 1 }
+
+    XfRLTProtectionEntry ::=
+        SEQUENCE
+        {
+            xfRLTProtIndex                         Integer32,
+            xfRLTProtectionSwitchMode              INTEGER,
+            xfRLTProtectionStatus                  INTEGER,
+            xfRLTRevertivePreferredTX              DisplayString,
+            xfRLTProtectionWaitToRestoreTime       INTEGER,
+            xfRLTFadeNotificationTimer             INTEGER,
+            xfRLTManualSwitchCommand               INTEGER,
+            xfRLTTxSwitchOverConfiguration         INTEGER,
+            xfRLTTxSwitchOverAlarmReset            INTEGER,
+            xfRLTNumOfRLPSwitch                    Integer32,
+            xfRLTEnhancedACMProtectionMode         INTEGER,
+            xfRLTEnhancedACMProtectionOperStatus   INTEGER
+        }
+
+  xfRLTProtIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It is the table index.
+             It contains the entity logical index of the RLT configured in 1+1RLP.
+            "
+        ::= { xfRLTProtectionEntry 1 }
+
+  xfRLTProtectionSwitchMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            auto(2),
+            manual(3),
+            autoRevertive(4),
+            txSwitchDisable(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The mode in which the switching mechanism is configured.
+             Auto:   System automatically switches from the degraded to the other transmitter (Tx).
+             Manual: Automatic switching is disabled and operator can select Tx manually.
+             Auto & Revertive:  makes it possible to manually set the preferred Tx.
+             TX switch disable: Selective Space Diverity, SSD.
+                                RLP TX switch is disabled.
+                                The two received signals, from different paths, are combined.
+
+             Default: AUTO (for RLT mode RLP) & NA (default for RLT mode RLB).
+            "
+        ::= { xfRLTProtectionEntry 2 }
+
+  xfRLTProtectionStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            unprotected(2),
+            protected(3),
+            unableToProtect(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Status of the protection, when configured in a protected mode.
+             Values:
+             - unprotected;
+             - protected
+             - unableToProtect
+
+             Note:
+             Applicable only when RLT-mode is RL protection.
+            "
+        ::= { xfRLTProtectionEntry 3 }
+
+  xfRLTRevertivePreferredTX OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It specifies the preferred TX Radio Carrier Termination (CT) in revertive protection mode.
+             The member is identified by the CT distinguished name (R/S/P).
+            "
+        ::= { xfRLTProtectionEntry 4 }
+
+  xfRLTProtectionWaitToRestoreTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The time, in # of seconds, to wait before switching back to the preferred Tx in Auto & Revertive mode.
+
+             Default: 0.
+            "
+        ::= { xfRLTProtectionEntry 5 }
+
+  xfRLTFadeNotificationTimer OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Notifications for alarms caused by fading, with a duration less than the specified time (0 - 1000 seconds) are not sent.
+             Only applicable for protected configurations.
+
+             Default: 200.
+            "
+        ::= { xfRLTProtectionEntry 6 }
+
+  xfRLTManualSwitchCommand OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            txManualSwitch(2),
+            txManualNoSwitch(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Used to request a TX switch-over.
+             Applicable for protected configurations and when protectionSwitchMode is set to Manual.
+             Not Applicable for RLT mode RLB
+
+             Value:
+             - txManualSwitch
+             - txManualNoSwitch.
+            "
+        ::= { xfRLTProtectionEntry 7 }
+
+  xfRLTTxSwitchOverConfiguration OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            notSupported(2),
+            enable(3),
+            disable(4),
+            enableLocal(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable or disable the function to switch TX on a request from far-end, including also the TX switchover alarm notifications , both local and remote. Only applicable in RLT mode RLP.
+
+             Values:
+             - notSupported: (default for RLT in RLB mode)
+             - enable:       TX switchover triggered by local and remote faults
+             - disable:      TX switchover disabled(default for RLT in RLP mode) - DEPRECATED
+             - enableLocal:  TX switchover triggered by local faults only (default for RLT in RLP mode)
+            "
+        ::= { xfRLTProtectionEntry 8 }
+
+  xfRLTTxSwitchOverAlarmReset OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            txSwitchOverAlarmNoReset(2),
+            txSwitchOverAlarmReset(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Used to manual reset the TX switch-over alarm and Remote TX switchover alarm (consequently to TX switch ordered from far-end).
+             Note: the alarm is raised when TX Switch far-end function is enabled (xfRLTTxSwitchOverConfiguration).
+
+             Value:
+             - txSwitchOverAlarmNoReset
+             - txSwitchOverAlarmReset.
+            "
+        ::= { xfRLTProtectionEntry 9 }
+
+  xfRLTNumOfRLPSwitch OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It represents the number of RLP Radio TX switch.
+            "
+        ::= { xfRLTProtectionEntry 10 }
+
+  xfRLTEnhancedACMProtectionMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            activeTransmitter(2),
+            maximumCapacity(3),
+            maximumProtection(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It configures the enhanced ACM protection mode. The enhanced ACM protection uses RX indicators from both the working and the protection links
+             to select an ACM profile to optimize capacity (throughput) and/or protection (robustness).
+
+             Values:
+             - Active Transmitter        : ACM engine determines the ACM profile according to the working Rx ACM indications only;
+             - Maximum Capacity (default): Working Rx ACM engine is aware of the ACM profile requests from the
+                                           protection Rx ACM engine, and determines the highest ACM profile between
+                                           the working and the protection links;
+             - Maximum Protection        : Working Rx ACM engine is aware of the protection Rx ACM engine's ACM
+                                           profile requests, and determines the lowest ACM profile between the working
+                                           and the protection links.
+            "
+        ::= { xfRLTProtectionEntry 11 }
+
+  xfRLTEnhancedACMProtectionOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            notApplicable(2),
+            enhAcmProtActive(3),
+            enhAcmProtNotActive(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Status of the enhanched ACM protection engine, when ACM engine is configured either in maximum-troughtput or maximum-protection mode.
+
+             Values:
+             - notApplicable      : when enhanced ACM protection mode is basic;
+             - enhAcmProtActive   : when the enhanced ACM engine is working and the highest ACM profile is selected
+                                    between the working and the protection links;
+             - enhAcmProtNotActive: when the enhanced ACM engine is not working.
+            "
+        ::= { xfRLTProtectionEntry 12 }
+
+
+------------------------------------------------------------------------------
+-- xfRLTEncryptionTable
+------------------------------------------------------------------------------
+    xfRLTEncryptionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLTEncryptionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to handle Radio Link Encryption."
+        ::= { xfRadioLinkRltObjects 15 }
+
+    xfRLTEncryptionEntry OBJECT-TYPE
+        SYNTAX XfRLTEncryptionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLTEncryptionTable."
+        INDEX { xfRLTEncryptionIndex}
+        ::= { xfRLTEncryptionTable 1 }
+
+    XfRLTEncryptionEntry ::=
+        SEQUENCE
+        {
+            xfRLTEncryptionIndex             Integer32,
+            xfRLTEncryptionAdminStatus       INTEGER,
+            xfRLTEncryptionOperStatus        INTEGER,
+            xfRLTEncryptionMasterKey         DisplayString
+        }
+
+  xfRLTEncryptionIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It represents the xfRLTEncryptionTable index and is the RLT entity logical index."
+        ::= { xfRLTEncryptionEntry 1 }
+
+  xfRLTEncryptionAdminStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            enable(2),
+            disable(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This MO allows to enable/disable the Encryption of both control and traffic plain over the Radio Link hop.
+             Values:
+              - enable;
+              - disable.
+
+             Default: DISABLE.
+            "
+        ::= { xfRLTEncryptionEntry 2 }
+
+  xfRLTEncryptionOperStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            up(2),
+            down(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This MO represents the Operative Status of the Encryption function over the Radio Link hop
+             and refers to receiving direction. Therefore, it indicates if the receiving side is able or
+             not able to correctly/successfully decipher the ciphered data stream transmitted from remote side..
+             The ecryption status can assume the values:
+              - up: control and traffic plain are correctly deciphered;
+              - down: control and traffic plain are not deciphered correctly/successfully, due to e.g. authentication failure, disturbance over the radio-hop.
+            "
+        ::= { xfRLTEncryptionEntry 3 }
+
+  xfRLTEncryptionMasterKey OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This MO allows to define the Master Key used to initiate the Encryption operation.
+             Master Key is hidden.
+            "
+        ::= { xfRLTEncryptionEntry 4 }
+
+--
+------------------------------------------------------------------------------
+-- xfRadioLinkRltPmObjects
+------------------------------------------------------------------------------
+-- The xfRadioLinkRltPmObjects MOs
+
+------------------------------------------------------------------------------
+-- xfRLPMContinuousCounterTable
+------------------------------------------------------------------------------
+    xfRLPMContinuousCounterTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMContinuousCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table for RLT performance data."
+        ::= { xfRadioLinkRltPmObjects 1 }
+
+    xfRLPMContinuousCounterEntry OBJECT-TYPE
+        SYNTAX XfRLPMContinuousCounterEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLPMContinuousCounterTable."
+        INDEX { ifIndex }
+        ::= { xfRLPMContinuousCounterTable 1 }
+
+    XfRLPMContinuousCounterEntry ::=
+        SEQUENCE
+        {
+            xfPMTimeElapsed         PerfIntervalCount,
+            xfPMCurrentES           PerfCurrentCount,
+            xfPMCurrentSES          PerfCurrentCount,
+            xfPMCurrentBBE          HCPerfCurrentCount,
+            xfPMCurrentUAS          PerfCurrentCount,
+            xfPMCurrentBB           HCPerfCurrentCount,
+            xfPMPerfReset           INTEGER,
+            xfPMCurrentESR          PerfCurrentCount,
+            xfPMCurrentSESR         PerfCurrentCount,
+            xfPMCurrentBBER         HCPerfCurrentCount
+        }
+
+    xfPMTimeElapsed OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The number of seconds that have elapsed since the beginning
+            of the current error-measurement period.
+            If the current interval exceeds the maximum
+            value, the agent will return the maximum value.
+            Reset by xfPMPerfReset.
+            "
+        ::= { xfRLPMContinuousCounterEntry 1 }
+
+    xfPMCurrentES OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows the errored seconds.
+             Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 2 }
+
+    xfPMCurrentSES OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows the severely errored seconds.
+             Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 3 }
+
+    xfPMCurrentBBE OBJECT-TYPE
+        SYNTAX HCPerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows the background block errors.
+            Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 4 }
+
+    xfPMCurrentUAS OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows the unavailable seconds (or unavailable time).
+              Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 5 }
+
+    xfPMCurrentBB OBJECT-TYPE
+        SYNTAX HCPerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object shows the background blocks.
+             Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 6 }
+
+    xfPMPerfReset OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            other(1),
+            noReset(2),
+            reset(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This object is used to reset the performance counters:
+                - Elapsed Time, ES, SES, BBE, BB
+                - PM ACM
+                - ETSI - EN 301 129 (TLTS, RLTS, ...) current/interval 15m/24h
+                - Max and Min XPI/MSE current/interval 15m/24h
+
+            It can be also set when the RAU is not present.
+            Near end access: read-write.
+            "
+        ::= { xfRLPMContinuousCounterEntry 7 }
+
+    xfPMCurrentESR OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ratio of ES to total seconds in available time during a
+             fixed measurement interval.
+             Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 8 }
+
+    xfPMCurrentSESR OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ratio of SES to total seconds in available time
+             during a fixed measurement interval.
+             Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 9 }
+
+    xfPMCurrentBBER OBJECT-TYPE
+        SYNTAX HCPerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ratio of Background Block Errors (BBE) to total blocks in
+             available time during a fixed measurement interval.
+             Reset by xfPMPerfReset."
+        ::= { xfRLPMContinuousCounterEntry 10 }
+
+------------------------------------------------------------------------------
+-- xfRLPMACMConfigTable
+------------------------------------------------------------------------------
+    xfRLPMACMConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMACMConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Alarm threshold values for RL PM."
+        ::= { xfRadioLinkRltPmObjects 2 }
+
+    xfRLPMACMConfigEntry OBJECT-TYPE
+        SYNTAX XfRLPMACMConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the xfRLPMACMConfigTable"
+        INDEX { ifIndex }
+        ::= { xfRLPMACMConfigTable 1 }
+
+    XfRLPMACMConfigEntry ::=
+        SEQUENCE
+        {
+            xfPMACMSetThreshold15m      Integer32,
+            xfPMACMSetThreshold24h      Integer32,
+            xfPMACMResetThreshold15m    Integer32,
+            xfPMACMStatus               BITS,
+            xfPMACMValidData            BITS
+        }
+
+    xfPMACMSetThreshold15m OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The 15 minute set threshold for minimum modulation.
+            Near end access: read-write.
+            Far end access: no access.
+            Default value is 180.
+            "
+        ::= { xfRLPMACMConfigEntry 1 }
+
+    xfPMACMSetThreshold24h OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The 24 hour set threshold for minimum modulation.
+            Near end access: read-write.
+            Far end access: no access.
+            Default value is 1500.
+            "
+        ::= { xfRLPMACMConfigEntry 2 }
+
+    xfPMACMResetThreshold15m OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The 15 minute reset threshold for minimum modulation.
+            Near end access: read-write.
+            Far end access: no access.
+            Default value is 20.
+            "
+        ::= { xfRLPMACMConfigEntry 3 }
+
+    xfPMACMStatus OBJECT-TYPE
+        SYNTAX BITS
+        {
+            acm15m0(0),
+            acm15m1(1),
+            acm15m2(2),
+            acm24h0(3),
+            acm24h1(4),
+            acm24h2(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            It reports threshold crossing alarm status:
+            - acm15m: ACM 15 min threshold crossing: ACM has been in the lowest configured profile
+                      for a number of seconds exceeding the configured 15 min threshold.
+            - acm24h: ACM 24 hour threshold crossing: ACM has been in the lowest configured profile
+                      for a number of seconds exceeding the configured 24 hour threshold.
+            "
+        ::= { xfRLPMACMConfigEntry 4 }
+
+    xfPMACMValidData OBJECT-TYPE
+        SYNTAX BITS
+        {
+            valid15m4QAMStrong(0),
+            valid15m4QAMStd(1),
+            valid15m4QAMLight(2),
+            valid15m16QAMStrong(3),
+            valid15m16QAMStd(4),
+            valid15m16QAMLight(5),
+            valid15m32QAMStrong(6),
+            valid15m32QAMStd(7),
+            valid15m32QAMLight(8),
+            valid15m64QAMStrong(9),
+            valid15m64QAMStd(10),
+            valid15m64QAMLight(11),
+            valid15m128QAMStrong(12),
+            valid15m128QAMStd(13),
+            valid15m128QAMLight(14),
+            valid15m256QAMStrong(15),
+            valid15m256QAMStd(16),
+            valid15m256QAMLight(17),
+            valid15m512QAMStrong(18),
+            valid15m512QAMStd(19),
+            valid15m512QAMLight(20),
+            valid15m1024QAMStrong(21),
+            valid15m1024QAMStd(22),
+            valid15m1024QAMLight(23),
+            valid15m2048QAMStrong(24),
+            valid15m2048QAMStd(25),
+            valid15m2048QAMLight(26),
+            valid15m4096QAMStrong(27),
+            valid15m4096QAMStd(28),
+            valid15m4096QAMLight(29),
+            valid15m8192QAMStrong(30),
+            valid15m8192QAMStd(31),
+            valid15m8192QAMLight(32),
+            valid15m16384QAMStrong(33),
+            valid15m16384QAMStd(34),
+            valid15m16384QAMLight(35)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "It reports which ACM's PM data are valid."
+        ::= { xfRLPMACMConfigEntry 5 }
+
+------------------------------------------------------------------------------
+-- xfRLPMACMCurrent24hTable
+------------------------------------------------------------------------------
+    xfRLPMACMCurrent24hTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMACMCurrent24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ACM-based counters for current 24h table."
+        ::= { xfRadioLinkRltPmObjects 3 }
+
+    xfRLPMACMCurrent24hEntry OBJECT-TYPE
+        SYNTAX XfRLPMACMCurrent24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the xfRLPMACMCurrent24hTable."
+        INDEX { ifIndex }
+        ::= { xfRLPMACMCurrent24hTable 1 }
+
+    XfRLPMACMCurrent24hEntry ::=
+        SEQUENCE
+        {
+            xfPMACMCurrent24h4QAMStrong         PerfCurrentCount,
+            xfPMACMCurrent24h4QAMStd            PerfCurrentCount,
+            xfPMACMCurrent24h4QAMLight          PerfCurrentCount,
+            xfPMACMCurrent24h16QAMStrong        PerfCurrentCount,
+            xfPMACMCurrent24h16QAMStd           PerfCurrentCount,
+            xfPMACMCurrent24h16QAMLight         PerfCurrentCount,
+            xfPMACMCurrent24h32QAMStrong        PerfCurrentCount,
+            xfPMACMCurrent24h32QAMStd           PerfCurrentCount,
+            xfPMACMCurrent24h32QAMLight         PerfCurrentCount,
+            xfPMACMCurrent24h64QAMStrong        PerfCurrentCount,
+            xfPMACMCurrent24h64QAMStd           PerfCurrentCount,
+            xfPMACMCurrent24h64QAMLight         PerfCurrentCount,
+            xfPMACMCurrent24h128QAMStrong       PerfCurrentCount,
+            xfPMACMCurrent24h128QAMStd          PerfCurrentCount,
+            xfPMACMCurrent24h128QAMLight        PerfCurrentCount,
+            xfPMACMCurrent24h256QAMStrong       PerfCurrentCount,
+            xfPMACMCurrent24h256QAMStd          PerfCurrentCount,
+            xfPMACMCurrent24h256QAMLight        PerfCurrentCount,
+            xfPMACMCurrent24h512QAMStrong       PerfCurrentCount,
+            xfPMACMCurrent24h512QAMStd          PerfCurrentCount,
+            xfPMACMCurrent24h512QAMLight        PerfCurrentCount,
+            xfPMACMCurrent24h1024QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent24h1024QAMStd         PerfCurrentCount,
+            xfPMACMCurrent24h1024QAMLight       PerfCurrentCount,
+            xfPMACMCurrent24h2048QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent24h2048QAMStd         PerfCurrentCount,
+            xfPMACMCurrent24h2048QAMLight       PerfCurrentCount,
+            xfPMACMCurrent24h4096QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent24h4096QAMStd         PerfCurrentCount,
+            xfPMACMCurrent24h4096QAMLight       PerfCurrentCount,
+            xfPMACMCurrent24h8192QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent24h8192QAMStd         PerfCurrentCount,
+            xfPMACMCurrent24h8192QAMLight       PerfCurrentCount,
+            xfPMACMCurrent24h16384QAMStrong     PerfCurrentCount,
+            xfPMACMCurrent24h16384QAMStd        PerfCurrentCount,
+            xfPMACMCurrent24h16384QAMLight      PerfCurrentCount
+        }
+
+    xfPMACMCurrent24h4QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 1 }
+
+    xfPMACMCurrent24h4QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 2 }
+
+    xfPMACMCurrent24h4QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 3 }
+
+    xfPMACMCurrent24h16QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 4 }
+
+    xfPMACMCurrent24h16QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 5 }
+
+    xfPMACMCurrent24h16QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 6 }
+
+    xfPMACMCurrent24h32QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 7 }
+
+    xfPMACMCurrent24h32QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 8 }
+
+    xfPMACMCurrent24h32QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 9 }
+
+    xfPMACMCurrent24h64QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 10 }
+
+    xfPMACMCurrent24h64QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 11 }
+
+    xfPMACMCurrent24h64QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 12 }
+
+    xfPMACMCurrent24h128QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 13 }
+
+    xfPMACMCurrent24h128QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 14 }
+
+    xfPMACMCurrent24h128QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 15 }
+
+    xfPMACMCurrent24h256QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 16 }
+
+    xfPMACMCurrent24h256QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 17 }
+
+    xfPMACMCurrent24h256QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 18 }
+
+    xfPMACMCurrent24h512QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 19 }
+
+    xfPMACMCurrent24h512QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 20 }
+
+    xfPMACMCurrent24h512QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 21 }
+
+    xfPMACMCurrent24h1024QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 22 }
+
+    xfPMACMCurrent24h1024QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 23 }
+
+    xfPMACMCurrent24h1024QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 24 }
+
+    xfPMACMCurrent24h2048QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 25 }
+
+    xfPMACMCurrent24h2048QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 26 }
+
+    xfPMACMCurrent24h2048QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 27 }
+
+    xfPMACMCurrent24h4096QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 28 }
+
+    xfPMACMCurrent24h4096QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 29 }
+
+    xfPMACMCurrent24h4096QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 30 }
+
+     xfPMACMCurrent24h8192QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 31 }
+
+    xfPMACMCurrent24h8192QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 32 }
+
+    xfPMACMCurrent24h8192QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 33 }
+
+    xfPMACMCurrent24h16384QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 34 }
+
+    xfPMACMCurrent24h16384QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 35 }
+
+    xfPMACMCurrent24h16384QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid time since reset."
+        ::= { xfRLPMACMCurrent24hEntry 36 }
+
+
+------------------------------------------------------------------------------
+-- xfRLPMACMInterval24hTable
+------------------------------------------------------------------------------
+    xfRLPMACMInterval24hTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMACMInterval24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ACM-based counters for interval 24h table."
+        ::= { xfRadioLinkRltPmObjects 4 }
+
+    xfRLPMACMInterval24hEntry OBJECT-TYPE
+        SYNTAX XfRLPMACMInterval24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the xfRLPMACMInterval24hTable."
+        INDEX { ifIndex }
+        ::= { xfRLPMACMInterval24hTable 1 }
+
+    XfRLPMACMInterval24hEntry ::=
+        SEQUENCE
+        {
+            xfPMACMInterval24h4QAMStrong        PerfIntervalCount,
+            xfPMACMInterval24h4QAMStd           PerfIntervalCount,
+            xfPMACMInterval24h4QAMLight         PerfIntervalCount,
+            xfPMACMInterval24h16QAMStrong       PerfIntervalCount,
+            xfPMACMInterval24h16QAMStd          PerfIntervalCount,
+            xfPMACMInterval24h16QAMLight        PerfIntervalCount,
+            xfPMACMInterval24h32QAMStrong       PerfIntervalCount,
+            xfPMACMInterval24h32QAMStd          PerfIntervalCount,
+            xfPMACMInterval24h32QAMLight        PerfIntervalCount,
+            xfPMACMInterval24h64QAMStrong       PerfIntervalCount,
+            xfPMACMInterval24h64QAMStd          PerfIntervalCount,
+            xfPMACMInterval24h64QAMLight        PerfIntervalCount,
+            xfPMACMInterval24h128QAMStrong      PerfIntervalCount,
+            xfPMACMInterval24h128QAMStd         PerfIntervalCount,
+            xfPMACMInterval24h128QAMLight       PerfIntervalCount,
+            xfPMACMInterval24h256QAMStrong      PerfIntervalCount,
+            xfPMACMInterval24h256QAMStd         PerfIntervalCount,
+            xfPMACMInterval24h256QAMLight       PerfIntervalCount,
+            xfPMACMInterval24h512QAMStrong      PerfIntervalCount,
+            xfPMACMInterval24h512QAMStd         PerfIntervalCount,
+            xfPMACMInterval24h512QAMLight       PerfIntervalCount,
+            xfPMACMInterval24h1024QAMStrong     PerfIntervalCount,
+            xfPMACMInterval24h1024QAMStd        PerfIntervalCount,
+            xfPMACMInterval24h1024QAMLight      PerfIntervalCount,
+            xfPMACMInterval24h2048QAMStrong     PerfIntervalCount,
+            xfPMACMInterval24h2048QAMStd        PerfIntervalCount,
+            xfPMACMInterval24h2048QAMLight      PerfIntervalCount,
+            xfPMACMInterval24h4096QAMStrong     PerfIntervalCount,
+            xfPMACMInterval24h4096QAMStd        PerfIntervalCount,
+            xfPMACMInterval24h4096QAMLight      PerfIntervalCount,
+            xfPMACMInterval24hValidData         TruthValue,
+            xfPMACMInterval24h8192QAMStrong     PerfIntervalCount,
+            xfPMACMInterval24h8192QAMStd        PerfIntervalCount,
+            xfPMACMInterval24h8192QAMLight      PerfIntervalCount,
+            xfPMACMInterval24h16384QAMStrong    PerfIntervalCount,
+            xfPMACMInterval24h16384QAMStd       PerfIntervalCount,
+            xfPMACMInterval24h16384QAMLight     PerfIntervalCount
+        }
+
+    xfPMACMInterval24h4QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 1 }
+
+    xfPMACMInterval24h4QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 2 }
+
+    xfPMACMInterval24h4QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 3 }
+
+    xfPMACMInterval24h16QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 4 }
+
+    xfPMACMInterval24h16QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 5 }
+
+    xfPMACMInterval24h16QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 6 }
+
+    xfPMACMInterval24h32QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 7 }
+
+    xfPMACMInterval24h32QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 8 }
+
+    xfPMACMInterval24h32QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 9 }
+
+    xfPMACMInterval24h64QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 10 }
+
+    xfPMACMInterval24h64QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 11 }
+
+    xfPMACMInterval24h64QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 12 }
+
+    xfPMACMInterval24h128QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 13 }
+
+    xfPMACMInterval24h128QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 14 }
+
+    xfPMACMInterval24h128QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 15 }
+
+    xfPMACMInterval24h256QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 16 }
+
+    xfPMACMInterval24h256QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 17 }
+
+    xfPMACMInterval24h256QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 18 }
+
+    xfPMACMInterval24h512QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 19 }
+
+    xfPMACMInterval24h512QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 20 }
+
+    xfPMACMInterval24h512QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 21 }
+
+    xfPMACMInterval24h1024QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 22 }
+
+    xfPMACMInterval24h1024QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 23 }
+
+    xfPMACMInterval24h1024QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 24 }
+
+    xfPMACMInterval24h2048QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 25 }
+
+    xfPMACMInterval24h2048QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 26 }
+
+    xfPMACMInterval24h2048QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 27 }
+
+    xfPMACMInterval24h4096QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 28 }
+
+    xfPMACMInterval24h4096QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 29 }
+
+    xfPMACMInterval24h4096QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 30 }
+
+    xfPMACMInterval24hValidData OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This variable indicates whether the data for this interval is valid."
+        ::= { xfRLPMACMInterval24hEntry 31 }
+
+    xfPMACMInterval24h8192QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 32 }
+
+    xfPMACMInterval24h8192QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 33 }
+
+    xfPMACMInterval24h8192QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 34 }
+
+    xfPMACMInterval24h16384QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 35 }
+
+    xfPMACMInterval24h16384QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 36 }
+
+    xfPMACMInterval24h16384QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval24hEntry 37 }
+
+------------------------------------------------------------------------------
+-- xfRLPMACMCurrent15mTable
+------------------------------------------------------------------------------
+    xfRLPMACMCurrent15mTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMACMCurrent15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ACM-based counters for current 15m table."
+        ::= { xfRadioLinkRltPmObjects 5 }
+
+    xfRLPMACMCurrent15mEntry OBJECT-TYPE
+        SYNTAX XfRLPMACMCurrent15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the table."
+        INDEX { ifIndex }
+        ::= { xfRLPMACMCurrent15mTable 1 }
+
+    XfRLPMACMCurrent15mEntry ::=
+        SEQUENCE
+        {
+            xfPMACMCurrent15m4QAMStrong         PerfCurrentCount,
+            xfPMACMCurrent15m4QAMStd            PerfCurrentCount,
+            xfPMACMCurrent15m4QAMLight          PerfCurrentCount,
+            xfPMACMCurrent15m16QAMStrong        PerfCurrentCount,
+            xfPMACMCurrent15m16QAMStd           PerfCurrentCount,
+            xfPMACMCurrent15m16QAMLight         PerfCurrentCount,
+            xfPMACMCurrent15m32QAMStrong        PerfCurrentCount,
+            xfPMACMCurrent15m32QAMStd           PerfCurrentCount,
+            xfPMACMCurrent15m32QAMLight         PerfCurrentCount,
+            xfPMACMCurrent15m64QAMStrong        PerfCurrentCount,
+            xfPMACMCurrent15m64QAMStd           PerfCurrentCount,
+            xfPMACMCurrent15m64QAMLight         PerfCurrentCount,
+            xfPMACMCurrent15m128QAMStrong       PerfCurrentCount,
+            xfPMACMCurrent15m128QAMStd          PerfCurrentCount,
+            xfPMACMCurrent15m128QAMLight        PerfCurrentCount,
+            xfPMACMCurrent15m256QAMStrong       PerfCurrentCount,
+            xfPMACMCurrent15m256QAMStd          PerfCurrentCount,
+            xfPMACMCurrent15m256QAMLight        PerfCurrentCount,
+            xfPMACMCurrent15m512QAMStrong       PerfCurrentCount,
+            xfPMACMCurrent15m512QAMStd          PerfCurrentCount,
+            xfPMACMCurrent15m512QAMLight        PerfCurrentCount,
+            xfPMACMCurrent15m1024QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent15m1024QAMStd         PerfCurrentCount,
+            xfPMACMCurrent15m1024QAMLight       PerfCurrentCount,
+            xfPMACMCurrent15m2048QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent15m2048QAMStd         PerfCurrentCount,
+            xfPMACMCurrent15m2048QAMLight       PerfCurrentCount,
+            xfPMACMCurrent15m4096QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent15m4096QAMStd         PerfCurrentCount,
+            xfPMACMCurrent15m4096QAMLight       PerfCurrentCount,
+            xfPMACMCurrent15m8192QAMStrong      PerfCurrentCount,
+            xfPMACMCurrent15m8192QAMStd         PerfCurrentCount,
+            xfPMACMCurrent15m8192QAMLight       PerfCurrentCount,
+            xfPMACMCurrent15m16384QAMStrong     PerfCurrentCount,
+            xfPMACMCurrent15m16384QAMStd        PerfCurrentCount,
+            xfPMACMCurrent15m16384QAMLight      PerfCurrentCount
+        }
+
+    xfPMACMCurrent15m4QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 1 }
+
+    xfPMACMCurrent15m4QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 2 }
+
+    xfPMACMCurrent15m4QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 3 }
+
+    xfPMACMCurrent15m16QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 4 }
+
+    xfPMACMCurrent15m16QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 5 }
+
+    xfPMACMCurrent15m16QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 6 }
+
+    xfPMACMCurrent15m32QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 7 }
+
+    xfPMACMCurrent15m32QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 8 }
+
+    xfPMACMCurrent15m32QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 9 }
+
+    xfPMACMCurrent15m64QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 10 }
+
+    xfPMACMCurrent15m64QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 11 }
+
+    xfPMACMCurrent15m64QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 12 }
+
+    xfPMACMCurrent15m128QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 13 }
+
+    xfPMACMCurrent15m128QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 14 }
+
+    xfPMACMCurrent15m128QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 15 }
+
+    xfPMACMCurrent15m256QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 16 }
+
+    xfPMACMCurrent15m256QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 17 }
+
+    xfPMACMCurrent15m256QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 18 }
+
+    xfPMACMCurrent15m512QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 19 }
+
+    xfPMACMCurrent15m512QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 20 }
+
+    xfPMACMCurrent15m512QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 21 }
+
+    xfPMACMCurrent15m1024QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 22 }
+
+    xfPMACMCurrent15m1024QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 23 }
+
+    xfPMACMCurrent15m1024QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 24 }
+
+    xfPMACMCurrent15m2048QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 25 }
+
+    xfPMACMCurrent15m2048QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 26 }
+
+    xfPMACMCurrent15m2048QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 27 }
+
+    xfPMACMCurrent15m4096QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 28 }
+
+    xfPMACMCurrent15m4096QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 29 }
+
+    xfPMACMCurrent15m4096QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 30 }
+
+    xfPMACMCurrent15m8192QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 31 }
+
+    xfPMACMCurrent15m8192QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 32 }
+
+    xfPMACMCurrent15m8192QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 33 }
+
+    xfPMACMCurrent15m16384QAMStrong OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 34 }
+
+    xfPMACMCurrent15m16384QAMStd OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 35 }
+
+    xfPMACMCurrent15m16384QAMLight OBJECT-TYPE
+        SYNTAX PerfCurrentCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Valid interval time since reset."
+        ::= { xfRLPMACMCurrent15mEntry 36 }
+
+------------------------------------------------------------------------------
+-- xfRLPMACMInterval15mTable
+------------------------------------------------------------------------------
+    xfRLPMACMInterval15mTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMACMInterval15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "ACM-based counters for interval 15m table."
+        ::= { xfRadioLinkRltPmObjects 6 }
+
+    xfRLPMACMInterval15mEntry OBJECT-TYPE
+        SYNTAX XfRLPMACMInterval15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the table."
+        INDEX { ifIndex, xfPMACMInterval15mIntervalNumber }
+        ::= { xfRLPMACMInterval15mTable 1 }
+
+    XfRLPMACMInterval15mEntry ::=
+        SEQUENCE
+        {
+            xfPMACMInterval15mIntervalNumber    Integer32,
+            xfPMACMInterval15m4QAMStrong        PerfIntervalCount,
+            xfPMACMInterval15m4QAMStd           PerfIntervalCount,
+            xfPMACMInterval15m4QAMLight         PerfIntervalCount,
+            xfPMACMInterval15m16QAMStrong       PerfIntervalCount,
+            xfPMACMInterval15m16QAMStd          PerfIntervalCount,
+            xfPMACMInterval15m16QAMLight        PerfIntervalCount,
+            xfPMACMInterval15m32QAMStrong       PerfIntervalCount,
+            xfPMACMInterval15m32QAMStd          PerfIntervalCount,
+            xfPMACMInterval15m32QAMLight        PerfIntervalCount,
+            xfPMACMInterval15m64QAMStrong       PerfIntervalCount,
+            xfPMACMInterval15m64QAMStd          PerfIntervalCount,
+            xfPMACMInterval15m64QAMLight        PerfIntervalCount,
+            xfPMACMInterval15m128QAMStrong      PerfIntervalCount,
+            xfPMACMInterval15m128QAMStd         PerfIntervalCount,
+            xfPMACMInterval15m128QAMLight       PerfIntervalCount,
+            xfPMACMInterval15m256QAMStrong      PerfIntervalCount,
+            xfPMACMInterval15m256QAMStd         PerfIntervalCount,
+            xfPMACMInterval15m256QAMLight       PerfIntervalCount,
+            xfPMACMInterval15m512QAMStrong      PerfIntervalCount,
+            xfPMACMInterval15m512QAMStd         PerfIntervalCount,
+            xfPMACMInterval15m512QAMLight       PerfIntervalCount,
+            xfPMACMInterval15m1024QAMStrong     PerfIntervalCount,
+            xfPMACMInterval15m1024QAMStd        PerfIntervalCount,
+            xfPMACMInterval15m1024QAMLight      PerfIntervalCount,
+            xfPMACMInterval15m2048QAMStrong     PerfIntervalCount,
+            xfPMACMInterval15m2048QAMStd        PerfIntervalCount,
+            xfPMACMInterval15m2048QAMLight      PerfIntervalCount,
+            xfPMACMInterval15m4096QAMStrong     PerfIntervalCount,
+            xfPMACMInterval15m4096QAMStd        PerfIntervalCount,
+            xfPMACMInterval15m4096QAMLight      PerfIntervalCount,
+            xfPMACMInterval15mValidData         TruthValue,
+            xfPMACMInterval15m8192QAMStrong     PerfIntervalCount,
+            xfPMACMInterval15m8192QAMStd        PerfIntervalCount,
+            xfPMACMInterval15m8192QAMLight      PerfIntervalCount,
+            xfPMACMInterval15m16384QAMStrong    PerfIntervalCount,
+            xfPMACMInterval15m16384QAMStd       PerfIntervalCount,
+            xfPMACMInterval15m16384QAMLight     PerfIntervalCount
+        }
+
+    xfPMACMInterval15mIntervalNumber OBJECT-TYPE
+        SYNTAX Integer32 (1..96)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A number between 1 and 96, which identifies the interval for which
+            the set of statistics is available. The interval identified by 1
+            is the most recently completed 15 minute interval, and the interval
+            identified by N is the interval immediately preceding the one
+            identified by N-1."
+        ::= { xfRLPMACMInterval15mEntry 1 }
+
+    xfPMACMInterval15m4QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 2 }
+
+    xfPMACMInterval15m4QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 3 }
+
+    xfPMACMInterval15m4QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 4 }
+
+    xfPMACMInterval15m16QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 5 }
+
+    xfPMACMInterval15m16QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 6 }
+
+    xfPMACMInterval15m16QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 7 }
+
+    xfPMACMInterval15m32QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 8 }
+
+    xfPMACMInterval15m32QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 9 }
+
+    xfPMACMInterval15m32QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 10 }
+
+    xfPMACMInterval15m64QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 11 }
+
+    xfPMACMInterval15m64QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 12 }
+
+    xfPMACMInterval15m64QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 13 }
+
+    xfPMACMInterval15m128QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 14 }
+
+    xfPMACMInterval15m128QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 15 }
+
+    xfPMACMInterval15m128QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 16 }
+
+    xfPMACMInterval15m256QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 17 }
+
+    xfPMACMInterval15m256QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 18 }
+
+    xfPMACMInterval15m256QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 19 }
+
+    xfPMACMInterval15m512QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 20 }
+
+    xfPMACMInterval15m512QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 21 }
+
+    xfPMACMInterval15m512QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 22 }
+
+    xfPMACMInterval15m1024QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 23 }
+
+    xfPMACMInterval15m1024QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 24 }
+
+    xfPMACMInterval15m1024QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 25 }
+
+    xfPMACMInterval15m2048QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 26 }
+
+    xfPMACMInterval15m2048QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 27 }
+
+    xfPMACMInterval15m2048QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 28 }
+
+    xfPMACMInterval15m4096QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 29 }
+
+    xfPMACMInterval15m4096QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 30 }
+
+    xfPMACMInterval15m4096QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 31 }
+
+    xfPMACMInterval15mValidData OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This variable indicates whether the data for this interval is valid."
+        ::= { xfRLPMACMInterval15mEntry 32 }
+
+    xfPMACMInterval15m8192QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 33 }
+
+    xfPMACMInterval15m8192QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 34 }
+
+    xfPMACMInterval15m8192QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 35 }
+
+    xfPMACMInterval15m16384QAMStrong OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 36 }
+
+    xfPMACMInterval15m16384QAMStd OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 37 }
+
+    xfPMACMInterval15m16384QAMLight OBJECT-TYPE
+        SYNTAX PerfIntervalCount
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interval count."
+        ::= { xfRLPMACMInterval15mEntry 38 }
+
+------------------------------------------------------------------------------
+-- xfRLPMMimoCurrentTable
+------------------------------------------------------------------------------
+    xfRLPMMimoCurrentTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMMimoCurrentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table for RLT MIMO Current performance data."
+        ::= { xfRadioLinkRltPmObjects 7 }
+
+    xfRLPMMimoCurrentEntry OBJECT-TYPE
+        SYNTAX XfRLPMMimoCurrentEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the xfRLPMMimoCurrentTable."
+        INDEX { ifIndex }
+        ::= { xfRLPMMimoCurrentTable 1 }
+
+    XfRLPMMimoCurrentEntry ::=
+        SEQUENCE
+        {
+            xfPMPerfCurrentEta                INTEGER,
+            xfPMPerfEtaMinLast7days           INTEGER,
+            xfPMPerfEtaMaxLast7days           INTEGER
+        }
+
+    xfPMPerfCurrentEta OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " Performance Monitoring for Current MIMO Eta Value."
+        ::= { xfRLPMMimoCurrentEntry 1 }
+
+    xfPMPerfEtaMinLast7days OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicate ETA Min level for the last 7 days."
+        ::= { xfRLPMMimoCurrentEntry 2 }
+
+    xfPMPerfEtaMaxLast7days OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Indicate ETA Max level for the last 7 days."
+        ::= { xfRLPMMimoCurrentEntry 3 }
+
+
+------------------------------------------------------------------------------
+-- xfRLPMMimoCurrent24hTable
+------------------------------------------------------------------------------
+    xfRLPMMimoCurrent24hTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMMimoCurrent24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Counters for Eta in current 24h."
+        ::= { xfRadioLinkRltPmObjects 8 }
+
+    xfRLPMMimoCurrent24hEntry OBJECT-TYPE
+        SYNTAX XfRLPMMimoCurrent24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the xfRLPMMimoCurrent24hTable."
+        INDEX { ifIndex }
+        ::= { xfRLPMMimoCurrent24hTable 1 }
+
+    XfRLPMMimoCurrent24hEntry ::=
+        SEQUENCE
+        {
+            xfPMPerfCurrent24hElapsedTime      Counter32,
+            xfPMPerfCurrent24hEtaMin           INTEGER,
+            xfPMPerfCurrent24hEtaMax           INTEGER
+        }
+
+    xfPMPerfCurrent24hElapsedTime OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of seconds that have elapsed since the
+             beginning of the current error-measurement period. "
+        ::= { xfRLPMMimoCurrent24hEntry 1 }
+
+
+    xfPMPerfCurrent24hEtaMin OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Min Value in Current 24h."
+        ::= { xfRLPMMimoCurrent24hEntry 2 }
+
+    xfPMPerfCurrent24hEtaMax OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for Current MIMO 24h Eta Max Value."
+        ::= { xfRLPMMimoCurrent24hEntry 3 }
+
+------------------------------------------------------------------------------
+-- xfRLPMMimoInterval24hTable
+------------------------------------------------------------------------------
+    xfRLPMMimoInterval24hTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMMimoInterval24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Min Value in Interval of 24h."
+        ::= { xfRadioLinkRltPmObjects 9 }
+
+    xfRLPMMimoInterval24hEntry OBJECT-TYPE
+        SYNTAX XfRLPMMimoInterval24hEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the xfRLPMMimoInterval24hTable."
+        INDEX { ifIndex }
+        ::= { xfRLPMMimoInterval24hTable 1 }
+
+    XfRLPMMimoInterval24hEntry ::=
+        SEQUENCE
+        {
+            xfPMPerfInterval24hValidData        INTEGER,
+            xfPMPerfInterval24hEtaMin           INTEGER,
+            xfPMPerfInterval24hEtaMax           INTEGER
+        }
+
+    xfPMPerfInterval24hValidData OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This variable indicates whether the data for this interval is valid."
+        ::= { xfRLPMMimoInterval24hEntry 1 }
+
+
+    xfPMPerfInterval24hEtaMin OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Min Value in Interval of 24h."
+        ::= { xfRLPMMimoInterval24hEntry 2 }
+
+    xfPMPerfInterval24hEtaMax OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Max Value in Interval of 24h."
+        ::= { xfRLPMMimoInterval24hEntry 3 }
+
+------------------------------------------------------------------------------
+-- xfRLPMMimoCurrent15mTable
+------------------------------------------------------------------------------
+    xfRLPMMimoCurrent15mTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMMimoCurrent15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Counters for Eta MIMO Current 15m table."
+        ::= { xfRadioLinkRltPmObjects 10 }
+
+    xfRLPMMimoCurrent15mEntry OBJECT-TYPE
+        SYNTAX XfRLPMMimoCurrent15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the table."
+        INDEX { ifIndex }
+        ::= { xfRLPMMimoCurrent15mTable 1 }
+
+     XfRLPMMimoCurrent15mEntry ::=
+        SEQUENCE
+        {
+            xfPMPerfCurrent15mElapsedTime      Counter32,
+            xfPMPerfCurrent15mEtaMin           INTEGER,
+            xfPMPerfCurrent15mEtaMax           INTEGER
+        }
+
+     xfPMPerfCurrent15mElapsedTime OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of seconds that have elapsed since the
+             beginning of the current error-measurement period"
+        ::= { xfRLPMMimoCurrent15mEntry 1 }
+
+    xfPMPerfCurrent15mEtaMin OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Min Value in Current 15m."
+        ::= { xfRLPMMimoCurrent15mEntry 2 }
+
+    xfPMPerfCurrent15mEtaMax OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Max Value in Current 15m."
+        ::= { xfRLPMMimoCurrent15mEntry 3 }
+
+------------------------------------------------------------------------------
+-- xfRLPMMimoInterval15mTable
+------------------------------------------------------------------------------
+    xfRLPMMimoInterval15mTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF XfRLPMMimoInterval15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Counters for Eta MIMO for Interval 15m."
+        ::= { xfRadioLinkRltPmObjects 11 }
+
+    xfRLPMMimoInterval15mEntry OBJECT-TYPE
+        SYNTAX XfRLPMMimoInterval15mEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry in the table."
+        INDEX { ifIndex, xfPMPerfInterval15mIntervalNumber }
+        ::= { xfRLPMMimoInterval15mTable 1 }
+
+     XfRLPMMimoInterval15mEntry ::=
+        SEQUENCE
+        {
+            xfPMPerfInterval15mIntervalNumber   INTEGER,
+            xfPMPerfInterval15mEtaMin           INTEGER,
+            xfPMPerfInterval15mEtaMax           INTEGER,
+            xfPMPerfInterval15mValidData        INTEGER
+        }
+
+     xfPMPerfInterval15mIntervalNumber OBJECT-TYPE
+        SYNTAX INTEGER(1..96)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "A number between 1 and 96, which identifies the interval for which
+             the set of statistics is available. The interval identified by 1
+             is the most recently completed 15 minute interval, and the interval
+             identified by N is the interval immediately preceding the one
+             identified by N-1."
+        ::= { xfRLPMMimoInterval15mEntry 1 }
+
+    xfPMPerfInterval15mEtaMin OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Min Value in Interval 15m."
+        ::= { xfRLPMMimoInterval15mEntry 2 }
+
+    xfPMPerfInterval15mEtaMax OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Performance Monitoring for MIMO Eta Max Value in Interval 15m."
+        ::= { xfRLPMMimoInterval15mEntry 3 }
+
+     xfPMPerfInterval15mValidData OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This variable indicates whether the data for this interval is valid."
+        ::= { xfRLPMMimoInterval15mEntry 4 }
+--
+------------------------------------------------------------------------------
+-- xfRadioLinkRltConformance
+------------------------------------------------------------------------------
+--
+
+    xfRadioLinkRltCompliances OBJECT IDENTIFIER ::= { xfRadioLinkRltConformance 1 }
+
+    xfRadioLinkRltGroups OBJECT IDENTIFIER ::= { xfRadioLinkRltConformance 2 }
+
+    xfRadioLinkRltFullCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { xfRadioLinkRltCompleteGroup }
+        ::= { xfRadioLinkRltCompliances 1 }
+
+    xfRadioLinkRltCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            cgIfIndex,
+            cgTypeIndex,
+            xfIfStatus,
+
+            liEntLogicalIndex,
+            liIfIndex,
+            xfLIName,
+            xfLIIfDescr,
+
+            xfCarrierTermDistinguishedName,
+            xfCarrierTermLabel,
+            xfCarrierTermOperStatus,
+            xfCarrierTermRadioFrameId,
+            xfCarrierTermPreamble,
+            xfCarrierTermSelectedMinACM,
+            xfCarrierTermActualACM,
+            xfCarrierTermSelectedMaxACM,
+            xfCarrierTermCapabilitiesLastChange,
+            xfCarrierTermReferenceSEC,
+            xfCarrierTermWantedLicensedCapacity,
+            xfCarrierTermActualLicensedCapacity,
+            xfCarrierTermActualCapacity,
+            xfCarrierTermPolarization,
+            xfCarrierTermXPICOperStatus,
+            xfCarrierTermMIMOOperStatus,
+            xfCarrierTermSNIR,
+            xfCarrierTermXPI,
+            xfCarrierTermReset,
+            xfCarrierTermRestore,
+            xfCarrierTermAutoRemoveLoopEnable,
+            xfCarrierTermBerAlarmThreshold,
+            xfCarrierTermActualRxACM,
+            xfCarrierTermFeCTSeverity,
+
+            xfRadioFrameId,
+            xfChannelSpacing,
+            xfFrameFormatType,
+            xfMinACMCapacity,
+            xfMaxACMCapacity,
+            xfACMProfile,
+
+            xfACMIndex,
+            xfACMCapacity,
+
+            rltEntLogicalIndex,
+            xfRLTDistinguishedName,
+            xfRLTIpAddress,
+            xfRLTIPv6Address,
+            xfRLTNeName,
+            xfRLTNeType,
+            xfRLTId,
+            xfRLTExpectedFarEndId,
+            xfRLTFarEndIdCheck,
+            xfRLTStatus,
+            xfRLTMode,
+            xfRLTActualTXTotalCapacity,
+            xfRLTActualTXPacketCapacity,
+            xfRLTLimitedTotalCapacity,
+            xfRLTRltSeverity,
+            xfRLTCapability,
+            xfRLTInventoryLastChange,
+            xfRLTCpriMode,
+            xfRLTReset,
+            xfRLTMeasuredHopLength,
+
+            trEntLogicalIndex,
+            xfTDMEnable,
+
+            xfRLTDMIfIndex,
+            xfActualTDMCapacity,
+            xfWantedTDMAllocation,
+            xfActualTDMAllocation,
+            xfTDMIfAlarms,
+            xfTDMRxLoop,
+            xfTDMDistinguishedName,
+            xfTDMMaxTributaries,
+            xfTDMHopLength,
+
+            xfCGIfIndex,
+            xfCGIfMinSpeed,
+            xfCGIfMaxSpeed,
+            xfCGIfRCNum,
+            xfCGIfAlarms,
+            xfCGIfHopViewStatus,
+
+            xpicPairEntLogicalIIndex,
+            xfXPICPairAdminStatus,
+            xfXPICPairNumber,
+            xfXPICPairRecovery,
+            xfXPICPairRestore,
+            xfXPICCTmember1,
+            xfXPICCTmember2,
+            xfXPICAutoRestore,
+            xfXpicPairIndex,
+
+            mimoGroupEntLogicalIIndex,
+            xfMIMOGroupAdminStatus,
+            xfMIMOGroupNumber,
+            xfMIMOGroupRecovery,
+            xfMIMOGroupRestore,
+            xfMIMOCTmember1,
+            xfMIMOCTmember2,
+            xfMIMOCTmember3,
+            xfMIMOCTmember4,
+
+            xfPMTimeElapsed,
+            xfPMCurrentES,
+            xfPMCurrentSES,
+            xfPMCurrentBBE,
+            xfPMCurrentUAS,
+            xfPMCurrentBB,
+            xfPMPerfReset,
+            xfPMCurrentESR,
+            xfPMCurrentSESR,
+            xfPMCurrentBBER,
+
+            xfPMACMSetThreshold15m,
+            xfPMACMSetThreshold24h,
+            xfPMACMResetThreshold15m,
+            xfPMACMStatus,
+            xfPMACMValidData,
+
+            xfPMACMCurrent24h4QAMStrong,
+            xfPMACMCurrent24h4QAMStd,
+            xfPMACMCurrent24h4QAMLight,
+            xfPMACMCurrent24h16QAMStrong,
+            xfPMACMCurrent24h16QAMStd,
+            xfPMACMCurrent24h16QAMLight,
+            xfPMACMCurrent24h32QAMStrong,
+            xfPMACMCurrent24h32QAMStd,
+            xfPMACMCurrent24h32QAMLight,
+            xfPMACMCurrent24h64QAMStrong,
+            xfPMACMCurrent24h64QAMStd,
+            xfPMACMCurrent24h64QAMLight,
+            xfPMACMCurrent24h128QAMStrong,
+            xfPMACMCurrent24h128QAMStd,
+            xfPMACMCurrent24h128QAMLight,
+            xfPMACMCurrent24h256QAMStrong,
+            xfPMACMCurrent24h256QAMStd,
+            xfPMACMCurrent24h256QAMLight,
+            xfPMACMCurrent24h512QAMStrong,
+            xfPMACMCurrent24h512QAMStd,
+            xfPMACMCurrent24h512QAMLight,
+            xfPMACMCurrent24h1024QAMStrong,
+            xfPMACMCurrent24h1024QAMStd,
+            xfPMACMCurrent24h1024QAMLight,
+            xfPMACMCurrent24h2048QAMStrong,
+            xfPMACMCurrent24h2048QAMStd,
+            xfPMACMCurrent24h2048QAMLight,
+            xfPMACMCurrent24h4096QAMStrong,
+            xfPMACMCurrent24h4096QAMStd,
+            xfPMACMCurrent24h4096QAMLight,
+            xfPMACMCurrent24h8192QAMStrong,
+            xfPMACMCurrent24h8192QAMStd,
+            xfPMACMCurrent24h8192QAMLight,
+            xfPMACMCurrent24h16384QAMStrong,
+            xfPMACMCurrent24h16384QAMStd,
+            xfPMACMCurrent24h16384QAMLight,
+
+
+            xfPMACMInterval24h4QAMStrong,
+            xfPMACMInterval24h4QAMStd,
+            xfPMACMInterval24h4QAMLight,
+            xfPMACMInterval24h16QAMStrong,
+            xfPMACMInterval24h16QAMStd,
+            xfPMACMInterval24h16QAMLight,
+            xfPMACMInterval24h32QAMStrong,
+            xfPMACMInterval24h32QAMStd,
+            xfPMACMInterval24h32QAMLight,
+            xfPMACMInterval24h64QAMStrong,
+            xfPMACMInterval24h64QAMStd,
+            xfPMACMInterval24h64QAMLight,
+            xfPMACMInterval24h128QAMStrong,
+            xfPMACMInterval24h128QAMStd,
+            xfPMACMInterval24h128QAMLight,
+            xfPMACMInterval24h256QAMStrong,
+            xfPMACMInterval24h256QAMStd,
+            xfPMACMInterval24h256QAMLight,
+            xfPMACMInterval24h512QAMStrong,
+            xfPMACMInterval24h512QAMStd,
+            xfPMACMInterval24h512QAMLight,
+            xfPMACMInterval24h1024QAMStrong,
+            xfPMACMInterval24h1024QAMStd,
+            xfPMACMInterval24h1024QAMLight,
+            xfPMACMInterval24h2048QAMStrong,
+            xfPMACMInterval24h2048QAMStd,
+            xfPMACMInterval24h2048QAMLight,
+            xfPMACMInterval24h4096QAMStrong,
+            xfPMACMInterval24h4096QAMStd,
+            xfPMACMInterval24h4096QAMLight,
+            xfPMACMInterval24hValidData,
+            xfPMACMInterval24h8192QAMStrong,
+            xfPMACMInterval24h8192QAMStd,
+            xfPMACMInterval24h8192QAMLight,
+            xfPMACMInterval24h16384QAMStrong,
+            xfPMACMInterval24h16384QAMStd,
+            xfPMACMInterval24h16384QAMLight,
+
+            xfPMACMCurrent15m4QAMStrong,
+            xfPMACMCurrent15m4QAMStd,
+            xfPMACMCurrent15m4QAMLight,
+            xfPMACMCurrent15m16QAMStrong,
+            xfPMACMCurrent15m16QAMStd,
+            xfPMACMCurrent15m16QAMLight,
+            xfPMACMCurrent15m32QAMStrong,
+            xfPMACMCurrent15m32QAMStd,
+            xfPMACMCurrent15m32QAMLight,
+            xfPMACMCurrent15m64QAMStrong,
+            xfPMACMCurrent15m64QAMStd,
+            xfPMACMCurrent15m64QAMLight,
+            xfPMACMCurrent15m128QAMStrong,
+            xfPMACMCurrent15m128QAMStd,
+            xfPMACMCurrent15m128QAMLight,
+            xfPMACMCurrent15m256QAMStrong,
+            xfPMACMCurrent15m256QAMStd,
+            xfPMACMCurrent15m256QAMLight,
+            xfPMACMCurrent15m512QAMStrong,
+            xfPMACMCurrent15m512QAMStd,
+            xfPMACMCurrent15m512QAMLight,
+            xfPMACMCurrent15m1024QAMStrong,
+            xfPMACMCurrent15m1024QAMStd,
+            xfPMACMCurrent15m1024QAMLight,
+            xfPMACMCurrent15m2048QAMStrong,
+            xfPMACMCurrent15m2048QAMStd,
+            xfPMACMCurrent15m2048QAMLight,
+            xfPMACMCurrent15m4096QAMStrong,
+            xfPMACMCurrent15m4096QAMStd,
+            xfPMACMCurrent15m4096QAMLight,
+            xfPMACMCurrent15m8192QAMStrong,
+            xfPMACMCurrent15m8192QAMStd,
+            xfPMACMCurrent15m8192QAMLight,
+            xfPMACMCurrent15m16384QAMStrong,
+            xfPMACMCurrent15m16384QAMStd,
+            xfPMACMCurrent15m16384QAMLight,
+
+
+            xfPMACMInterval15mIntervalNumber,
+            xfPMACMInterval15m4QAMStrong,
+            xfPMACMInterval15m4QAMStd,
+            xfPMACMInterval15m4QAMLight,
+            xfPMACMInterval15m16QAMStrong,
+            xfPMACMInterval15m16QAMStd,
+            xfPMACMInterval15m16QAMLight,
+            xfPMACMInterval15m32QAMStrong,
+            xfPMACMInterval15m32QAMStd,
+            xfPMACMInterval15m32QAMLight,
+            xfPMACMInterval15m64QAMStrong,
+            xfPMACMInterval15m64QAMStd,
+            xfPMACMInterval15m64QAMLight,
+            xfPMACMInterval15m128QAMStrong,
+            xfPMACMInterval15m128QAMStd,
+            xfPMACMInterval15m128QAMLight,
+            xfPMACMInterval15m256QAMStrong,
+            xfPMACMInterval15m256QAMStd,
+            xfPMACMInterval15m256QAMLight,
+            xfPMACMInterval15m512QAMStrong,
+            xfPMACMInterval15m512QAMStd,
+            xfPMACMInterval15m512QAMLight,
+            xfPMACMInterval15m1024QAMStrong,
+            xfPMACMInterval15m1024QAMStd,
+            xfPMACMInterval15m1024QAMLight,
+            xfPMACMInterval15m2048QAMStrong,
+            xfPMACMInterval15m2048QAMStd,
+            xfPMACMInterval15m2048QAMLight,
+            xfPMACMInterval15m4096QAMStrong,
+            xfPMACMInterval15m4096QAMStd,
+            xfPMACMInterval15m4096QAMLight,
+            xfPMACMInterval15mValidData,
+            xfPMACMInterval15m8192QAMStrong,
+            xfPMACMInterval15m8192QAMStd,
+            xfPMACMInterval15m8192QAMLight,
+            xfPMACMInterval15m16384QAMStrong,
+            xfPMACMInterval15m16384QAMStd,
+            xfPMACMInterval15m16384QAMLight,
+
+
+            xfRLWANIfIndex,
+            xfRLWANDistinguishedName,
+            xfRLWANCompAdminStatus,
+            xfRLWANCompConnStatus,
+            xfRLWANMlhcMplsMode,
+            xfRLWANMlhcOperStatus,
+            xfRLWANPlcOperStatus,
+            xfRLWANActualCapacity,
+            xfRLWANLimitedCapacity,
+
+            xfRLTMHIndex,
+            xfRLTModuleIndex,
+            xfRLTEntPhysicalIndex,
+            xfRLTPhysicalCointainedIn,
+            xfRLTPhysicalParentRelPos,
+            xfRLTEntityPhysicalDescr,
+            xfRLTModuleSlotPosition,
+            xfRLTNEDistinguishedName,
+            xfRLTFEDistinguishedName,
+            xfRLTInterfaceIndex,
+            xfRLTHighestSeverityAlarm,
+
+            xfRLTProtIndex,
+            xfRLTProtectionSwitchMode,
+            xfRLTProtectionStatus,
+            xfRLTRevertivePreferredTX,
+            xfRLTProtectionWaitToRestoreTime,
+            xfRLTFadeNotificationTimer,
+            xfRLTManualSwitchCommand,
+            xfRLTTxSwitchOverConfiguration,
+            xfRLTTxSwitchOverAlarmReset,
+            xfRLTNumOfRLPSwitch,
+            xfRLTEnhancedACMProtectionMode,
+            xfRLTEnhancedACMProtectionOperStatus,
+
+            xfRLTEncryptionIndex,
+            xfRLTEncryptionAdminStatus,
+            xfRLTEncryptionOperStatus,
+            xfRLTEncryptionMasterKey,
+
+            xfPMPerfCurrentEta,
+            xfPMPerfEtaMinLast7days,
+            xfPMPerfEtaMaxLast7days,
+
+            xfPMPerfCurrent24hElapsedTime,
+            xfPMPerfCurrent24hEtaMin,
+            xfPMPerfCurrent24hEtaMax,
+
+            xfPMPerfInterval24hValidData,
+            xfPMPerfInterval24hEtaMin,
+            xfPMPerfInterval24hEtaMax,
+
+            xfPMPerfCurrent15mElapsedTime,
+            xfPMPerfCurrent15mEtaMin,
+            xfPMPerfCurrent15mEtaMax,
+
+            xfPMPerfInterval15mIntervalNumber,
+            xfPMPerfInterval15mEtaMin,
+            xfPMPerfInterval15mEtaMax,
+            xfPMPerfInterval15mValidData
+       }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module"
+        ::= { xfRadioLinkRltGroups 1 }
+
+    END

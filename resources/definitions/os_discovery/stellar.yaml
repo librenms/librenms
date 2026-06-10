@@ -1,0 +1,38 @@
+modules:
+    os:
+        hardware:
+            - OAW-AP1101::apModel
+            - OAW-AP1201BG::apModel
+            - OAW-AP1201HL::apModel
+            - OAW-AP1201H::apModel
+            - OAW-AP1201L::apModel
+            - OAW-AP1201::apModel
+            - OAW-AP1221::apModel
+            - OAW-AP1222::apModel
+            - OAW-AP1231::apModel
+            - OAW-AP1232::apModel
+            - OAW-AP1251D::apModel
+            - OAW-AP1251::apModel
+            - OAW-AP1321::apModel
+            - OAW-AP1322::apModel
+            - OAW-AP1361D::apModel
+            - OAW-AP1361::apModel
+            - OAW-AP1362::apModel
+        serial:
+            - OAW-AP1101::apSerial
+            - OAW-AP1201BG::apSerial
+            - OAW-AP1201HL::apSerial
+            - OAW-AP1201H::apSerial
+            - OAW-AP1201L::apSerial
+            - OAW-AP1201::apSerial
+            - OAW-AP1221::apSerial
+            - OAW-AP1222::apSerial
+            - OAW-AP1231::apSerial
+            - OAW-AP1232::apSerial
+            - OAW-AP1251D::apSerial
+            - OAW-AP1251::apSerial
+            - OAW-AP1321::apSerial
+            - OAW-AP1322::apSerial
+            - OAW-AP1361D::apSerial
+            - OAW-AP1361::apSerial
+            - OAW-AP1362::apSerial

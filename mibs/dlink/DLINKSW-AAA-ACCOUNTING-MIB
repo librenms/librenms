@@ -1,0 +1,499 @@
+-- *****************************************************************
+-- DLINKSW-AAA-ACCOUNTING-MIB: D-Link AAA Accounting MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+
+DLINKSW-AAA-ACCOUNTING-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE
+            FROM SNMPv2-SMI   
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        RowStatus
+            FROM SNMPv2-TC
+        dAaaMIBObjects, DAaaSessionType,
+        DAaaPrivilegeLevel, DAaaMethodListName,
+        DAaaMethodPriority, DAaaMethodName
+            FROM DLINKSW-AAA-COMMON-MIB;
+
+
+    dlinkSwAaaAccountingMIB MODULE-IDENTITY
+        LAST-UPDATED    "201304250000Z"
+        ORGANIZATION    "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+                Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                        Taipei City 114, Taiwan, R.O.C
+                Tel:     +886-2-66000123
+                E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for configuring accounting feature
+            which based on Authentication, Authorization,
+            Accounting (AAA) protocols."
+            
+        REVISION        "201304250000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file.
+            "
+       ::= { dAaaMIBObjects 3 }
+
+
+-- ----------------------------------------------------------------------------- 
+    dAaaAcctMIBNotifications 	OBJECT IDENTIFIER ::= { dlinkSwAaaAccountingMIB 0 }
+    dAaaAcctMIBObjects	        OBJECT IDENTIFIER ::= { dlinkSwAaaAccountingMIB 1 }
+    dAaaAcctMIBConformance	    OBJECT IDENTIFIER ::= { dlinkSwAaaAccountingMIB 2 }
+
+-- -----------------------------------------------------------------------------    
+    dAaaAcctGenericCfg    OBJECT IDENTIFIER ::= { dAaaAcctMIBObjects 1 }
+        
+    dAaaAcctGeneicAcctMethodTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DAaaAcctGeneicAcctMethodEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This table contains entries for AAA accounting
+            methods configured for accounting exec/network/system.
+
+            The following table describes the accounting method.
+          
+           
+            Method Lst
+            type        DAaaMethodListName  Priority Method
+            ----------- -----------------  -------- ------------
+            exec        console             1        radius
+            exec        default             1        radius
+            exec        default             2        acct_rad
+            exec        default             3        tacacs+
+            exec        default             4        none
+            exec        ssh                 1        radius
+            exec        ssh                 2        none
+            exec        telnet              1        tacacs+
+            network     default             1        radius
+            network     default             2        acct_rad
+            network     default             3        tacacs+
+            network     default             4        none
+            system      default             1        radius
+            system      default             2        acct_rad
+            system      default             3        tacacs+
+            system      default             4        none
+           "         
+        ::= { dAaaAcctGenericCfg 1 }
+
+    dAaaAcctGeneicAcctMethodEntry OBJECT-TYPE
+        SYNTAX      DAaaAcctGeneicAcctMethodEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry containing the priority number of an accounting
+             method list used for Exec/network/system.
+            "
+        INDEX       {
+            dAaaAcctGenMethodLstType,
+            dAaaAcctGenMethodLstName,
+            dAaaAcctGenMethodPriority
+        }
+        ::= { dAaaAcctGeneicAcctMethodTable 1 }
+    
+    DAaaAcctGeneicAcctMethodEntry ::=
+        SEQUENCE {
+            dAaaAcctGenMethodLstType       INTEGER,
+            dAaaAcctGenMethodLstName       DAaaMethodListName,
+            dAaaAcctGenMethodPriority      DAaaMethodPriority,
+            dAaaAcctGenMethodName          DAaaMethodName,
+            dAaaAcctGenMethodRowStatus     RowStatus
+        }
+
+    dAaaAcctGenMethodLstType OBJECT-TYPE
+	    SYNTAX	        INTEGER {
+			exec(1),
+			network(2),
+			system(3)
+		}
+	    MAX-ACCESS      not-accessible
+	    STATUS	        current
+	    DESCRIPTION
+	        "This object indicates the type for which the method list will be
+	        used.
+	         
+		    exec(1)	 - for accounting user activities.
+		    network(2) - for accounting user activity in accessing the network.
+		    system(3) -  for accounting system events.	
+		    
+		    Note: Not all method list types defined need to be supported.	   
+	       "
+	    ::= { dAaaAcctGeneicAcctMethodEntry 1 }
+
+    dAaaAcctGenMethodLstName OBJECT-TYPE
+        SYNTAX          DAaaMethodListName
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the name of the accounting method list.
+           If dAaaAcctGenMethodLstType is 'network' or 'system' then only 'default' 
+           can be specified for dAaaAcctGenMethodLstName, and 
+           accounting commands/exec and the configured method list will take 
+           effect without being explicitly applied. 
+           If the type is 'exec', the method list will take effect after it is
+           applied in dAaaAcctExecAcctApplyTable.           
+           "
+       ::= { dAaaAcctGeneicAcctMethodEntry 2 }
+
+    dAaaAcctGenMethodPriority OBJECT-TYPE
+        SYNTAX          DAaaMethodPriority
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This is the method priority of a method within a method list.
+           "
+       ::= { dAaaAcctGeneicAcctMethodEntry 3 }
+
+    dAaaAcctGenMethodName OBJECT-TYPE
+        SYNTAX          DAaaMethodName
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the accounting method name.
+            "
+       ::= { dAaaAcctGeneicAcctMethodEntry 4 }
+
+    dAaaAcctGenMethodRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this table entry.
+         
+           Before modify the higher method, must destroy the lower method in method list.
+          "
+       ::= { dAaaAcctGeneicAcctMethodEntry 5 }
+
+-- -----------------------------------------------------------------------------
+    dAaaAcctCommandsAcct    OBJECT IDENTIFIER ::= { dAaaAcctMIBObjects 2 }
+ 
+    dAaaAcctCommandsAcctMethodTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAaaAcctCommandsAcctMethodEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains entries for AAA accounting
+            methods configured for commands.
+
+           The following table describes examples of the accounting commands method.
+
+           PrivLevel AcctMethodListName  Priority Method 
+           --------- ------------------  -------- ------------
+           1         default             0        radius
+           12        Acct12_telnet       0        tacacs+
+           12        Acct12_ssh          0        radius
+           12        Acct12_ssh          1        none
+           15        default             0        radius
+           15        default             1        acct_rad
+           15        default             2        tacacs+
+           15        default             3        none
+           "
+        ::= { dAaaAcctCommandsAcct 1 }
+
+    dAaaAcctCommandsAcctMethodEntry OBJECT-TYPE
+        SYNTAX          DAaaAcctCommandsAcctMethodEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry containing information of an accounting
+             method within a method list which is used for accounting commands.
+            "
+        INDEX       {
+            dAaaAcctCommandsAcctPrivLevel,
+            dAaaAcctCommandsAcctListName,
+            dAaaAcctCommandsAcctPriority
+        }
+        ::= { dAaaAcctCommandsAcctMethodTable 1 }
+
+    DAaaAcctCommandsAcctMethodEntry ::=        SEQUENCE {
+        dAaaAcctCommandsAcctPrivLevel      DAaaPrivilegeLevel, 
+        dAaaAcctCommandsAcctListName       DAaaMethodListName,
+        dAaaAcctCommandsAcctPriority       DAaaMethodPriority,
+        dAaaAcctCommandsAcctMethodName     DAaaMethodName,
+        dAaaAcctCommandsAcctRowStatus      RowStatus
+    }
+
+    dAaaAcctCommandsAcctPrivLevel OBJECT-TYPE
+        SYNTAX          DAaaPrivilegeLevel
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the privilege level of the method list.
+           "
+       ::= { dAaaAcctCommandsAcctMethodEntry 1 }
+
+    dAaaAcctCommandsAcctListName OBJECT-TYPE
+        SYNTAX          DAaaMethodListName
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the name of the method list to which the 
+           method is associated.
+           "
+       ::= { dAaaAcctCommandsAcctMethodEntry 2 }
+
+    dAaaAcctCommandsAcctPriority OBJECT-TYPE
+        SYNTAX          DAaaMethodPriority
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the priority of the method in a method list for
+           accounting commands.
+           "
+       ::= { dAaaAcctCommandsAcctMethodEntry 3 }
+
+    dAaaAcctCommandsAcctMethodName OBJECT-TYPE
+        SYNTAX          DAaaMethodName
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the method in a method list for
+            accounting commands.                        
+            "
+       ::= { dAaaAcctCommandsAcctMethodEntry 4 }
+
+    dAaaAcctCommandsAcctRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+          "The status of this table entry.
+          Once the entry status is set to active, 
+          all writable objects of the same entry cannot be modified 
+          except destroyed by setting this object to destroy(6).
+          A method which has lower value of dAaaAcctCommandsAcctPriority
+          (which has higher precedence) needs be created than higher
+          value of dAaaAcctCommandsAcctPriority.
+          "
+       ::= { dAaaAcctCommandsAcctMethodEntry 5 }
+
+-- ----------------------------------------------------------------------------- 
+    dAaaAcctCommandsAcctApplyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAaaAcctCommandsAcctApplyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+          "This table contains a list of session-specific specification to apply
+          accounting method list for command accounting in a session (line).
+
+          The following table describes examples of the entries.
+
+           Session PrivLevel  Applied Method List
+           ------- ---------  ------------------
+           telnet  1          default
+           telnet  12         Acct12_telnet
+           console 12         default
+           console 15         default
+           ssh     12         Acct12_ssh
+           ssh     15         Acct15_ssh          
+          "
+        ::= { dAaaAcctCommandsAcct 2 }
+
+    dAaaAcctCommandsAcctApplyEntry OBJECT-TYPE
+        SYNTAX          DAaaAcctCommandsAcctApplyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry specifies a method list used for command accounting at
+            the specified session and privilege level.
+            The command accounting takes effect after a method list is properly 
+            applied.
+            "
+        INDEX  {
+              dAaaAcctCommandsAcctApplySession,
+              dAaaAcctCommandsAcctApplyPrivLevel              
+        }
+        ::= { dAaaAcctCommandsAcctApplyTable 1 }
+
+
+    DAaaAcctCommandsAcctApplyEntry ::=        SEQUENCE {
+        dAaaAcctCommandsAcctApplySession       DAaaSessionType,
+        dAaaAcctCommandsAcctApplyPrivLevel     DAaaPrivilegeLevel,
+        dAaaAcctCommandsAcctApplyListName      DAaaMethodListName,
+        dAaaAcctCommandsAcctApplyRowStatus     RowStatus
+    }
+
+    dAaaAcctCommandsAcctApplySession OBJECT-TYPE
+        SYNTAX          DAaaSessionType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the session type of the entry. 
+           The type of 'http' is not supported for commands accounting.
+           "
+       ::= { dAaaAcctCommandsAcctApplyEntry 1 }
+
+    dAaaAcctCommandsAcctApplyPrivLevel OBJECT-TYPE
+        SYNTAX          DAaaPrivilegeLevel
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the privilege level of the entry.           
+            "
+        ::= { dAaaAcctCommandsAcctApplyEntry 2 }
+    
+    dAaaAcctCommandsAcctApplyListName OBJECT-TYPE
+        SYNTAX          DAaaMethodListName
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the method list name of the entry.           
+            "
+        ::= { dAaaAcctCommandsAcctApplyEntry 3 }
+           
+    dAaaAcctCommandsAcctApplyRowStatus OBJECT-TYPE
+       SYNTAX           RowStatus
+       MAX-ACCESS       read-create
+       STATUS           current
+       DESCRIPTION
+          "The status of this table entry.
+          "
+       ::= { dAaaAcctCommandsAcctApplyEntry 4 }
+
+-- -----------------------------------------------------------------------------   
+    dAaaAcctExecAcct    OBJECT IDENTIFIER ::= { dAaaAcctMIBObjects 3 }     
+    
+    dAaaAcctExecAcctApplyTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAaaAcctExecAcctApplyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains entries to apply method lists for accounting Exec
+            (user activities).
+
+           The following table describes examples.
+
+           Session  AAA Method List 
+           ------- ------------------
+           telnet  default
+           console rad_cons
+           ssh     acct_ssh
+           "
+        ::= { dAaaAcctExecAcct 1 }
+
+    dAaaAcctExecAcctApplyEntry OBJECT-TYPE
+        SYNTAX          DAaaAcctExecAcctApplyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry containing the session of an accounting
+             application used for Exec(user activities).
+            "
+        INDEX       {
+              dAaaAcctExecAcctApplySession              
+        }
+        ::= { dAaaAcctExecAcctApplyTable 1 }
+
+    DAaaAcctExecAcctApplyEntry ::=        SEQUENCE {
+        dAaaAcctExecAcctApplySession           DAaaSessionType,
+        dAaaAcctExecAcctApplyListName          DAaaMethodListName,
+        dAaaAcctExecAcctApplyRowStatus         RowStatus
+    }
+
+    dAaaAcctExecAcctApplySession OBJECT-TYPE
+        SYNTAX          DAaaSessionType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the session type of the entry.           
+           "
+       ::= { dAaaAcctExecAcctApplyEntry 1 }
+
+     dAaaAcctExecAcctApplyListName OBJECT-TYPE
+        SYNTAX          DAaaMethodListName
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the method list name of the entry.           
+            "
+        ::= { dAaaAcctExecAcctApplyEntry 2 }
+        
+    dAaaAcctExecAcctApplyRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this table entry.
+            "
+       ::= { dAaaAcctExecAcctApplyEntry 3 }
+
+
+--****************************************************************************
+-- Conformance
+--****************************************************************************
+
+    dAaaAcctMIBCompliances OBJECT IDENTIFIER ::= { dAaaAcctMIBConformance 1 }
+
+
+    dAaaAcctMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for entities which
+             implement the DLINKSW-AAA-ACCOUNTING-MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS     {
+            dAaaAcctGenericMethodLstGroup,
+            dAaaAcctExecApplyGroup              
+        }
+
+        GROUP  dAaaAcctAccountingCommandsGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+	        commands accounting configuration.
+            "
+                                                                      
+        ::= { dAaaAcctMIBCompliances 1 }
+
+-- -----------------------------------------------------------------------------
+     dAaaAcctMIBGroups     OBJECT IDENTIFIER ::= { dAaaAcctMIBConformance 2 }
+
+     dAaaAcctAccountingCommandsGroup OBJECT-GROUP
+        OBJECTS {
+            dAaaAcctCommandsAcctMethodName,
+            dAaaAcctCommandsAcctRowStatus,
+            dAaaAcctCommandsAcctApplyListName,
+            dAaaAcctCommandsAcctApplyRowStatus           
+        }
+        STATUS      current
+        DESCRIPTION
+             "A collection of objects provides the
+             configuration for AAA accounting commands feature.
+             "
+        ::= { dAaaAcctMIBGroups 1 }
+        
+     dAaaAcctGenericMethodLstGroup OBJECT-GROUP
+        OBJECTS {           
+            dAaaAcctGenMethodName,
+            dAaaAcctGenMethodRowStatus 
+        }
+        STATUS      current
+        DESCRIPTION
+             "A collection of objects provides the
+             configuration of generic AAA accounting method list.
+             "
+        ::= { dAaaAcctMIBGroups 2 }
+    
+    dAaaAcctExecApplyGroup OBJECT-GROUP
+        OBJECTS {
+            dAaaAcctExecAcctApplyListName,
+             dAaaAcctExecAcctApplyRowStatus
+        }
+        STATUS  current
+        DESCRIPTION
+            "A collection of objects providing the
+             AAA accounting Exec application.
+            "
+        ::= { dAaaAcctMIBGroups 3 }
+
+END

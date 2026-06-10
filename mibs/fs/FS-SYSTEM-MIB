@@ -1,0 +1,2433 @@
+-- *****************************************************************
+-- FS-SYSTEM-MIB.mib:  FS System MIB file
+--
+-- March 2002, Wuzg
+--
+-- Copyright (c) 2002 by FS.COM Inc..
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+FS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        TimeTicks,
+        Unsigned32
+                FROM SNMPv2-SMI
+        DisplayString,
+        MacAddress
+                FROM SNMPv2-TC
+        Gauge
+                FROM RFC1155-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        fsApMacAddr   
+                FROM FS-AC-MGMT-MIB
+        fsMemoryPoolCurrentUtilization
+                FROM FS-MEMORY-MIB
+        fsCPUUtilization1Min,
+        Percent
+                FROM FS-PROCESS-MIB
+        fsMgmt
+                FROM FS-SMI;
+
+fsSystemMIB MODULE-IDENTITY
+        LAST-UPDATED "200203200000Z"
+        ORGANIZATION "FS.COM Inc.."
+        CONTACT-INFO
+                " 
+                Tel: 400-865-2852 
+
+                E-mail: https://www.fs.com/live_chat_service_mail.html"
+        DESCRIPTION
+                "This module defines fs system mibs."
+        REVISION      "200203200000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { fsMgmt 1}
+
+fsSystemMIBObjects OBJECT IDENTIFIER ::= { fsSystemMIB 1 }
+
+fsSystemHwVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of hardware resides
+          on the FastSwitch."
+        ::= { fsSystemMIBObjects 1 }
+
+fsSystemSwVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of software resides
+          on the FastSwitch."
+        ::= { fsSystemMIBObjects 2 }
+        
+fsSystemBootVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of BOOT software resides
+          on the FastSwitch."
+        ::= { fsSystemMIBObjects 3 }
+        
+fsSystemSysCtrlVersion OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the Revision number of CTRL software resides
+          on the FastSwitch."
+        ::= { fsSystemMIBObjects 4 }       
+
+fsSystemParametersSave OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Save all parameters changed in configuration by setting 
+            this object to any value but 0, set its value to 0 will
+            cause no action of agent, otherwise all changes of 
+            prarameters will be saved for retrive when system is 
+            reset, if parameter is changed but not saved all changes
+            will come to their original value when system down and up
+            again, when query always return value 0."
+        ::= { fsSystemMIBObjects 5 }
+
+fsSystemOutBandRate OBJECT-TYPE
+   	  SYNTAX  INTEGER {
+                baud9600  (1),
+                baud19200 (2),
+                baud38400 (3),
+                baud57600 (4),
+                baud115200 (5)
+             }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+   	    "Determine the console(OutBand) baud rate :
+             9600 - 1,19200 - 2, 38300 - 3, 57600 - 4, 115200 - 5, 
+             when the console baud rate is other value will return value 0."
+   	::=  { fsSystemMIBObjects 6 }
+        
+fsSystemReset OBJECT-TYPE
+        SYNTAX INTEGER {
+            normal(0),
+            restart(1)
+        } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This Object allow perform soft reset of system by setting its
+            value to none zero. if a soft resetis performed, after this 
+            having completed a warm start trap will send to declare the state
+            and when queried will always return 0."
+        ::= { fsSystemMIBObjects 7 }
+
+fsSwitchLayer OBJECT-TYPE
+   	  SYNTAX  INTEGER {
+                layer2 (1), -- Layer 2 Switch
+                layer3 (2), -- Layer 3 Switch
+                router(3)  -- Router
+             }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+   		"Which layer's device the switch in system "
+   	     ::=  { fsSystemMIBObjects 8 }
+
+fsSystemHwPower OBJECT-TYPE
+        SYNTAX INTEGER{
+        	rpsNoLink(1),
+        	rpsLinkAndNoPower(2),
+        	rpsLinkAndReadyForPower(3),
+        	rpsLinkAndPower(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "The state of power."
+        ::= { fsSystemMIBObjects 9 }
+
+fsSystemHwFan OBJECT-TYPE
+        SYNTAX INTEGER{
+        	work(1),
+        	stop(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "The state of fan."
+        ::= { fsSystemMIBObjects 10 }
+
+--The fsSystemOutBandTimeout is obsoleted after 2007.9
+fsSystemOutBandTimeout OBJECT-TYPE
+        SYNTAX     Integer32(0..3600)
+        UNITS      "seconds"
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+          "The timeout of console.0 indicate that timeout function is disabled."
+        ::= { fsSystemMIBObjects 11 }
+
+--The fsSystemTelnetTimeout is obsoleted after 2007.9
+fsSystemTelnetTimeout OBJECT-TYPE
+        SYNTAX     Integer32(0..3600)
+        UNITS      "seconds"
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+          "The timeout of telnet.0 indicate that timeout function is disabled."
+        ::= { fsSystemMIBObjects 12 }
+      
+fsSystemMainFile OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the name of main file on the FastSwitch."
+        ::= { fsSystemMIBObjects 13 }
+        
+fsSystemCurrentPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the current power of the FastSwitch."
+        ::= { fsSystemMIBObjects 14 }
+
+fsSystemRemainPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the remain power of the FastSwitch."
+        ::= { fsSystemMIBObjects 15 }
+
+fsSystemTemperature OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the temperature of the FastSwitch."
+        ::= { fsSystemMIBObjects 16 }
+
+fsSystemElectricalSourceNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the electrical source number of the FastSwitch."
+        ::= { fsSystemMIBObjects 17 }
+
+fsSystemElectricalSourceIsNormalTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemElectricalSourceIsNormalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of electrical source entries. Each object displays 
+     whether different electrical sources are normal or not."
+  ::= { fsSystemMIBObjects 18 }
+
+fsSystemElectricalSourceIsNormalEntry OBJECT-TYPE
+  SYNTAX      FSSystemElectricalSourceIsNormalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays whether different electrical sources are normal or not."
+  INDEX { fsSystemElectricalSourceIsNormalIndex }
+  ::= { fsSystemElectricalSourceIsNormalTable 1 }
+
+FSSystemElectricalSourceIsNormalEntry ::=
+  SEQUENCE {
+    fsSystemElectricalSourceIsNormalIndex  Integer32,
+    fsSystemElectricalSourceIsNormal  INTEGER,
+    fsSystemElectricalSourceName   DisplayString
+  }
+    
+fsSystemElectricalSourceIsNormalIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a electrical source."
+    ::= { fsSystemElectricalSourceIsNormalEntry 1 }
+
+fsSystemElectricalSourceIsNormal OBJECT-TYPE
+   	SYNTAX  INTEGER {
+                noexist (1),          --no exist
+                existnopower (2),     -- exist no power
+                existreadypower (3),  --exist ready power
+                normal (4),           --normal
+                powerbutabnormal (5), --power but abnormal
+                unknow (6)            --unknow
+             }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays whether an electrical source is normal or not."
+    ::= { fsSystemElectricalSourceIsNormalEntry 2 }
+    
+fsSystemElectricalSourceName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The name of electrical source"
+    ::= { fsSystemElectricalSourceIsNormalEntry 3 }  
+    
+fsSystemCurrentVoltage OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the current voltage of the FastSwitch."
+        ::= { fsSystemMIBObjects 19 }
+        
+fsSystemFanNUM OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the number of fan on the FastSwitch."
+        ::= { fsSystemMIBObjects 20 }  
+        
+fsSystemFanIsNormalTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemFanIsNormalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of fan entries. Each object displays 
+     whether different fans are normal or not."
+  ::= { fsSystemMIBObjects 21 }
+
+fsSystemFanIsNormalEntry OBJECT-TYPE
+  SYNTAX      FSSystemFanIsNormalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays whether different fans are normal or not."
+  INDEX { fsSystemFanIsNormalIndex }
+  ::= { fsSystemFanIsNormalTable 1 }
+
+FSSystemFanIsNormalEntry ::=
+  SEQUENCE {
+    fsSystemFanIsNormalIndex  Integer32,
+    fsSystemFanIsNormal  INTEGER,
+    fsSystemFanName   DisplayString,
+    fsSystemFanSpeed  Integer32
+  }
+    
+fsSystemFanIsNormalIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a fan."
+    ::= { fsSystemFanIsNormalEntry 1 }
+
+fsSystemFanIsNormal OBJECT-TYPE
+   	SYNTAX  INTEGER {
+                noexist (1),          --no exist
+                existnopower (2),     -- exist no power
+                existreadypower (3),  --exist ready power
+                normal (4),           --normal
+                powerbutabnormal (5), --power but abnormal
+                unknow (6)            --unknow
+             }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays whether an fan is normal or not."
+    ::= { fsSystemFanIsNormalEntry 2 }   
+        
+fsSystemFanName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The name of fan"
+    ::= { fsSystemFanIsNormalEntry 3 }     
+
+fsSystemFanSpeed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the fan's speed."
+    ::= { fsSystemFanIsNormalEntry 4 }   
+
+fsSystemReloadTimeRemain OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the remain time of reloading on the FastSwitch."
+        ::= { fsSystemMIBObjects 22 }      
+        
+fsSystemTemperatureTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemTemperatureEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of temperature entries. Each object displays 
+     the temperature information."
+  ::= { fsSystemMIBObjects 23 }
+
+fsSystemTemperatureEntry OBJECT-TYPE
+  SYNTAX      FSSystemTemperatureEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the temperature information."
+  INDEX { fsSystemTemperatureIndex }
+  ::= { fsSystemTemperatureTable 1 }
+
+FSSystemTemperatureEntry ::=
+  SEQUENCE {
+    fsSystemTemperatureIndex    Integer32,
+    fsSystemTemperatureName     DisplayString,
+    fsSystemTemperatureCurrent  Integer32,
+    fsSystemTemperatureWarningVaule Integer32,
+    fsSystemTemperatureCritialVaule Integer32
+  }
+    
+fsSystemTemperatureIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device's temperature information."
+    ::= { fsSystemTemperatureEntry 1 }
+
+fsSystemTemperatureName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to a temperature chip"
+    ::= { fsSystemTemperatureEntry 2 }          
+                    
+fsSystemTemperatureCurrent OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the current temperature of the FastSwitch.The temperature display
+         is not supported for the current temperature returns to 0."
+    ::= { fsSystemTemperatureEntry 3 }        
+        
+fsSystemTemperatureWarningVaule OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first warning of temperature of the device CPU."
+    ::= { fsSystemTemperatureEntry 4 }       
+        
+fsSystemTemperatureCritialVaule OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second warning of temperature of the device CPU."
+    ::= { fsSystemTemperatureEntry 5 }           
+        
+fsSystemSerialno OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the serial number resides on the FastSwitch. 
+          Or return the serial number resides on the current master engine of a chassis device."
+        ::= { fsSystemMIBObjects 24 }    
+    
+fsSystemVersionTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemVersionEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of system version entries. Each object displays 
+     the system version information."
+  ::= { fsSystemMIBObjects 25 }
+
+fsSystemVersionEntry OBJECT-TYPE
+  SYNTAX      FSSystemVersionEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the system version information."
+  INDEX { fsSystemVersionIndex }
+  ::= { fsSystemVersionTable 1 }
+
+FSSystemVersionEntry ::=
+  SEQUENCE {
+    fsSystemVersionIndex    Unsigned32,
+    fsSystemVersionName     DisplayString,
+    fsSystemVersionSwBoot   DisplayString,
+    fsSystemVersionSwCtrl   DisplayString,
+    fsSystemVersionSwMain   DisplayString,
+    fsSystemVersionHw       DisplayString,
+    fsSystemVersionSerialno DisplayString
+  }
+    
+fsSystemVersionIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device's system version information."
+    ::= { fsSystemVersionEntry 1 }
+
+fsSystemVersionName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to a system version chip"
+    ::= { fsSystemVersionEntry 2 }          
+                    
+fsSystemVersionSwBoot OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the software boot system version of the FastSwitch."
+    ::= { fsSystemVersionEntry 3 }        
+        
+fsSystemVersionSwCtrl OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the software ctrl system version of the FastSwitch."
+    ::= { fsSystemVersionEntry 4 }       
+        
+fsSystemVersionSwMain OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the software main system version of the FastSwitch."
+    ::= { fsSystemVersionEntry 5 }      
+        
+fsSystemVersionHw OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the hardware system version of the FastSwitch."
+    ::= { fsSystemVersionEntry 6 }      
+                
+fsSystemVersionSerialno OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the serial number of the FastSwitch."
+    ::= { fsSystemVersionEntry 7 }               
+
+--System models added 2010-05
+fsSystemSysModel OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SysModel of equipment."
+    ::={ fsSystemMIBObjects 26 }
+    
+fsSystemUptime OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SysUptime of equipment,unit is seconds."
+    ::={ fsSystemMIBObjects 27 }
+    
+--System Sample Time 2010-05
+fsSystemSampleTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Sampling duration."
+    ::={ fsSystemMIBObjects 28 }
+    
+fsSystemStatWindowTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Stating duration."
+    ::={ fsSystemMIBObjects 29 }
+    
+fsSystemManufacturer OBJECT-TYPE
+    SYNTAX DisplayString 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the string of the manufacturer."
+    ::= { fsSystemMIBObjects 30 }    
+    
+fsSystemCurrentTime OBJECT-TYPE
+    SYNTAX DisplayString 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "Return the current time of the system."
+    ::= { fsSystemMIBObjects 31 }    
+    
+fsSystemWarnResendTime OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+      "Return the resending time of warn trap of the system."
+    ::= { fsSystemMIBObjects 32 }    
+    
+fsSystemSoftwareName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the software name of the system."
+    ::= { fsSystemMIBObjects 33 }    
+    
+fsSystemSoftwareManufacturer OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the software manufacturer of the system."
+    ::= { fsSystemMIBObjects 34 }    
+    
+fsSystemCpuType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the cpu type infomation of the system."
+    ::= { fsSystemMIBObjects 35 }    
+    
+fsSystemMemoryType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the memory type of the system."
+    ::= { fsSystemMIBObjects 36 }    
+    
+fsSystemMemorySize OBJECT-TYPE
+    SYNTAX Gauge
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the memory card storage of the system."
+    ::= { fsSystemMIBObjects 37 }    
+    
+fsSystemFlashSize OBJECT-TYPE
+    SYNTAX Gauge
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the flash size of the system."
+    ::= { fsSystemMIBObjects 38 }    
+    
+ --lank ap 2010-7    
+fsSystemLankApTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemLankApEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of lank ap system entries. Each object displays 
+     the lank ap system information."
+  ::= { fsSystemMIBObjects 39 }
+
+fsSystemLankApEntry OBJECT-TYPE
+  SYNTAX      FSSystemLankApEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the lank ap system information."
+  INDEX { fsSystemLankApMacAddr }
+  ::= { fsSystemLankApTable 1 }
+
+FSSystemLankApEntry ::=
+  SEQUENCE {
+    fsSystemLankApMacAddr              MacAddress,
+    fsSystemLankApStatWindowTime       Integer32,
+    fsSystemLankApSampleTime           Integer32,
+    fsSystemLankApReset                INTEGER,
+    fsSystemLankApSoftwareName         DisplayString,
+    fsSystemLankApSwVersion            DisplayString,
+    fsSystemLankApSoftwareManufacturer DisplayString,
+    fsSystemLankApCpuType              DisplayString,
+    fsSystemLankApMemoryType           DisplayString,
+    fsSystemLankApMemorySize           Gauge,
+    fsSystemLankAPFlashSize            Gauge,
+    fsSystemLankApManufacturer         DisplayString,
+    fsSystemLankApSerialno             DisplayString,
+    fsSystemLankApSysModel             DisplayString,
+    fsSystemLankApUptime               INTEGER,
+    fsSystemLankApAccurateUptime       TimeTicks,
+    fsSystemLankApHwVersion            DisplayString
+  }
+    
+fsSystemLankApMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents lank ap system information."
+    ::= { fsSystemLankApEntry 1 }    
+    
+fsSystemLankApStatWindowTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Stating duration of lank ap."
+    ::={ fsSystemLankApEntry 2 }   
+
+fsSystemLankApSampleTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Sampling duration of lank ap."
+    ::={ fsSystemLankApEntry 3 }    
+    
+fsSystemLankApReset OBJECT-TYPE
+    SYNTAX INTEGER {
+        normal(0),
+        restart(1)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This Object allow perform soft reset of lank ap system by setting 
+         its value to none zero. if a soft resetis performed, after this 
+         having completed a warm start trap will send to declare the state
+         and when queried will always return 0."
+    ::= { fsSystemLankApEntry 4 }
+        
+fsSystemLankApSoftwareName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the software name of the lank ap system."
+    ::= { fsSystemLankApEntry 5 }    
+
+fsSystemLankApSwVersion OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Return the string of the Revision number of software resides
+         on the lank ap FastSwitch."
+    ::= { fsSystemLankApEntry 6 }   
+    
+fsSystemLankApSoftwareManufacturer OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the software manufacturer of the lank ap system."
+    ::= { fsSystemLankApEntry 7 } 
+  
+fsSystemLankApCpuType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the cpu type infomation of the lank ap system."
+    ::= { fsSystemLankApEntry 8 }  
+   
+fsSystemLankApMemoryType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the memory type of the lank ap system."
+    ::= { fsSystemLankApEntry 9 }    
+ 
+fsSystemLankApMemorySize OBJECT-TYPE
+    SYNTAX Gauge
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the memory card storage of the lank ap system."
+    ::= { fsSystemLankApEntry 10 }    
+
+fsSystemLankAPFlashSize OBJECT-TYPE
+    SYNTAX Gauge
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the flash size of the lank ap system."
+    ::= { fsSystemLankApEntry 11 }   
+    
+fsSystemLankApManufacturer OBJECT-TYPE
+    SYNTAX DisplayString 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+      "Return the string of the manufacturer of lank ap."
+    ::= { fsSystemLankApEntry 12} 
+    
+fsSystemLankApSerialno OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "Return the string of the serial number resides
+          on the lank ap FastSwitch."
+        ::= { fsSystemLankApEntry 13 }    
+        
+fsSystemLankApSysModel OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SysModel of lank ap equipment."
+    ::={ fsSystemLankApEntry 14 }
+      
+fsSystemLankApUptime OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SysUptime of lank ap equipment."
+    ::={ fsSystemLankApEntry 15 }
+    
+fsSystemLankApAccurateUptime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the accurate system Uptime of ap equipment,unit is ticks"
+    ::={ fsSystemLankApEntry 16 }
+
+fsSystemLankApHwVersion OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Return the string of the Revision number of hardware resides
+         on the lank ap FastSwitch."
+    ::= { fsSystemLankApEntry 17 }   
+    
+
+fsSystemBoardTemperatureTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemBoardTemperatureEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of board temperature entries. Each object displays 
+     the board temperature information."
+  ::= { fsSystemMIBObjects 40 }
+
+fsSystemBoardTemperatureEntry OBJECT-TYPE
+  SYNTAX      FSSystemBoardTemperatureEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the board temperature information."
+  INDEX { fsSystemBoardTemperatureIndex }
+  ::= { fsSystemBoardTemperatureTable 1 }
+
+FSSystemBoardTemperatureEntry ::=
+  SEQUENCE {
+    fsSystemBoardTemperatureIndex    Integer32,
+    fsSystemBoardTemperatureName     DisplayString,
+    fsSystemBoardTemperatureCurrent  Integer32
+  }
+    
+fsSystemBoardTemperatureIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device's board temperature information."
+    ::= { fsSystemBoardTemperatureEntry 1 }
+
+fsSystemBoardTemperatureName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to a board temperature chip"
+    ::= { fsSystemBoardTemperatureEntry 2 }          
+                    
+fsSystemBoardTemperatureCurrent OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the current board temperature of the FastSwitch.The temperature display
+         is not supported for the current temperature returns to 0."
+    ::= { fsSystemBoardTemperatureEntry 3 }    
+
+fsSystemElectricalInformationTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemElectricalInformationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of electrical entries. Each object displays the electrical information."
+  ::= { fsSystemMIBObjects 41 }
+
+fsSystemElectricalInformationEntry OBJECT-TYPE
+  SYNTAX      FSSystemElectricalInformationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the electrical information."
+  INDEX {fsSystemElectricalInformationDeviceIndex, fsSystemElectricalInformationIndex }
+  ::= { fsSystemElectricalInformationTable 1 }
+
+FSSystemElectricalInformationEntry ::=
+  SEQUENCE {
+    fsSystemElectricalInformationDeviceIndex      Integer32,
+    fsSystemElectricalInformationIndex            Integer32,
+    fsSystemElectricalInformationStatus           INTEGER,
+    fsSystemElectricalInformationType             DisplayString,
+    fsSystemElectricalInformationAttribute        DisplayString,
+    fsSystemElectricalInformationSofeVersion      DisplayString,
+    fsSystemElectricalInformationHardwareVersion  DisplayString,
+    fsSystemElectricalInformationSerial           DisplayString,
+    fsSystemElectricalInformationProductionDate   DisplayString,
+    fsSystemElectricalInformationRatedPower       Integer32,
+    fsSystemElectricalInformationInVoltage        Integer32,
+    fsSystemElectricalInformationInCurrent        Integer32,
+    fsSystemElectricalInformationOutVoltage       Integer32,
+    fsSystemElectricalInformationOutCurrent       Integer32,
+    fsSystemElectricalInformationOutPower         Integer32,
+    fsSystemElectricalInformationTemperature      Integer32,
+    fsSystemElectricalInformationAirflowCoexist   DisplayString,
+    fsSystemElectricalInformationWarningStatus    DisplayString
+  }
+
+fsSystemElectricalInformationDeviceIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device."
+    ::= { fsSystemElectricalInformationEntry 1 }
+
+fsSystemElectricalInformationIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a electriacl."
+    ::= { fsSystemElectricalInformationEntry 2 }
+
+fsSystemElectricalInformationStatus OBJECT-TYPE
+   	SYNTAX  INTEGER {
+                noexist (1),          --no exist
+                existnopower (2),     -- exist no power
+                existreadypower (3),  --exist ready power
+                normal (4),           --normal
+                powerbutabnormal (5), --power but abnormal
+                unknow (6)            --unknow
+             }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays whether an electrical source is normal or not.
+         If the electrical is no exist, the other of electrical information maybe 
+         return nothing information and 0."
+    ::= { fsSystemElectricalInformationEntry 3 }
+
+fsSystemElectricalInformationType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the type of the electrical. If the device is no support this information,
+         This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 4 }
+
+fsSystemElectricalInformationAttribute OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays attribute of the electrical. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 5 }
+
+fsSystemElectricalInformationSofeVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the sofe version of the electrical. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 6}
+
+fsSystemElectricalInformationHardwareVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the hardware version of the electrical. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 7 }
+
+fsSystemElectricalInformationSerial OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the serial of the electrical. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 8 }
+
+fsSystemElectricalInformationProductionDate OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the productiron date of the electrical. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 9 }
+
+fsSystemElectricalInformationRatedPower OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the rated power(Unit: W) of the electrical. If the device is no support
+         this information, This object will return 0."
+    ::= { fsSystemElectricalInformationEntry 10 }
+
+fsSystemElectricalInformationInVoltage OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the input voltage(Unit: V) of the electrical. If the device is no support
+         this information, This object will return 0."
+    ::= { fsSystemElectricalInformationEntry 11 }
+
+fsSystemElectricalInformationInCurrent OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the input current(Unit: mA) of the electrical. If the device is no support
+         this information, This object will return 0."
+    ::= { fsSystemElectricalInformationEntry 12 }
+
+fsSystemElectricalInformationOutVoltage OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the output voltage(Unit: V) of the electrical. If the device is no support
+         this information, This object will return 0."
+    ::= { fsSystemElectricalInformationEntry 13 }
+
+fsSystemElectricalInformationOutCurrent OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the output current(Unit: mA) of the electrical. If the device is no support
+         this information, This object will return 0."
+    ::= { fsSystemElectricalInformationEntry 14 }
+
+fsSystemElectricalInformationOutPower OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the output power(Unit: W) of the electrical. If the device is no support
+         this information, This object will return 0."
+    ::= { fsSystemElectricalInformationEntry 15 }
+
+fsSystemElectricalInformationTemperature OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the temperature(Unit: C) of the electrical. If the device is no support
+         this information, This object will return -255."
+    ::= { fsSystemElectricalInformationEntry 16 }
+
+fsSystemElectricalInformationAirflowCoexist OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the airflow coexist of the electrical. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 17 }
+
+fsSystemElectricalInformationWarningStatus OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the warning status of the electrical. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemElectricalInformationEntry 18 }	
+
+fsSystemFanInformationTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemFanInformationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of fan entries. Each object displays the fan information."
+  ::= { fsSystemMIBObjects 42 }
+
+fsSystemFanInformationEntry OBJECT-TYPE
+  SYNTAX      FSSystemFanInformationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the fan information."
+  INDEX { fsSystemFanInformationDeviceIndex ,  fsSystemFanInformationFanIndex}
+  ::= {fsSystemFanInformationTable 1 }
+
+FSSystemFanInformationEntry ::=
+  SEQUENCE {
+    fsSystemFanInformationDeviceIndex      Integer32,
+    fsSystemFanInformationFanIndex         Integer32,
+    fsSystemFanInformationStatus           INTEGER,
+    fsSystemFanInformationType             DisplayString,
+    fsSystemFanInformationAttribute        DisplayString,
+    fsSystemFanInformationSofeVersion      DisplayString,
+    fsSystemFanInformationFirmwareVersion  DisplayString,
+    fsSystemFanInformationHardwareVersion  DisplayString,
+    fsSystemFanInformationSerial           DisplayString,
+    fsSystemFanInformationProductionDate   DisplayString,
+    fsSystemFanInformationTemperature      Integer32,
+    fsSystemFanInformationNumber           Integer32,
+    fsSystemFanInformationAirflowCoexist   DisplayString,
+    fsSystemFanInformationWarningStatus    DisplayString
+  }
+
+fsSystemFanInformationDeviceIndex  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device."
+    ::= { fsSystemFanInformationEntry 1 }
+
+fsSystemFanInformationFanIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a fan device."
+    ::= { fsSystemFanInformationEntry 2 }
+
+fsSystemFanInformationStatus OBJECT-TYPE
+   	SYNTAX  INTEGER {
+                noexist (1),          --no exist
+                existnopower (2),     --exist no power
+                existreadypower (3),  --exist ready power
+                normal (4),           --normal
+                powerbutabnormal (5), --power but abnormal
+                unknow (6)            --unknow
+             }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays whether an fan device source is exist or not.
+         If the fan device is no exist, the other of fan information maybe 
+         return nothing information and 0."
+    ::= { fsSystemFanInformationEntry 3 }
+
+fsSystemFanInformationType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the type of the fan. If the device is no support this information,
+         This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 4 }
+
+fsSystemFanInformationAttribute OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays attribute of the fan. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 5 }
+
+fsSystemFanInformationSofeVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the sofe version of the fan. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 6}
+
+fsSystemFanInformationFirmwareVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the firmware version of the fan. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 7 }
+
+fsSystemFanInformationHardwareVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the hardware version of the fan. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 8 }
+
+fsSystemFanInformationSerial OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the serial of the fan. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 9 }
+
+fsSystemFanInformationProductionDate OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the productiron date of the fan. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 10 }
+
+fsSystemFanInformationTemperature OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the temperature of the fan device. If the device is no support
+         this information, This object will return -255."
+    ::= { fsSystemFanInformationEntry 11 }
+
+fsSystemFanInformationNumber OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the number of the fan device. If the device is no support
+         this information, This object will return 0."
+    ::= { fsSystemFanInformationEntry 12 }
+
+fsSystemFanInformationAirflowCoexist OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the airflow coexist of the fan device. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 13 }
+
+fsSystemFanInformationWarningStatus OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the warning status of the fan device. If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanInformationEntry 14 }
+
+fsSystemFanStatusTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemFanStatusEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of fan status entries. Each object displays the fan status information."
+  ::= { fsSystemMIBObjects 43 }
+
+fsSystemFanStatusEntry OBJECT-TYPE
+  SYNTAX      FSSystemFanStatusEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the fan status information."
+  INDEX { fsSystemFanStatusDeviceIndex,
+          fsSystemFanStatusFanIndex,
+          fsSystemFanStatusIndex }
+  ::= {fsSystemFanStatusTable 1 }
+
+FSSystemFanStatusEntry ::=
+  SEQUENCE {
+    fsSystemFanStatusDeviceIndex      Integer32,
+    fsSystemFanStatusFanIndex         Integer32,
+    fsSystemFanStatusIndex            Integer32,
+    fsSystemFanStatus                 INTEGER,
+    fsSystemFanStatusLevel            Integer32,
+    fsSystemFanStatusSpeed            Integer32
+  }
+
+fsSystemFanStatusDeviceIndex  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device."
+    ::= { fsSystemFanStatusEntry 1 }
+
+fsSystemFanStatusFanIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a fan device."
+    ::= { fsSystemFanStatusEntry 2 }
+
+fsSystemFanStatusIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a fan."
+    ::= { fsSystemFanStatusEntry 3 }
+
+fsSystemFanStatus OBJECT-TYPE
+   	SYNTAX  INTEGER {
+                noexist (1),          --no exist
+                existnopower (2),     --exist no power
+                existreadypower (3),  --exist ready power
+                normal (4),           --normal
+                powerbutabnormal (5), --power but abnormal
+                unknow (6)            --unknow
+             }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays whether an fan is normal or not."
+    ::= { fsSystemFanStatusEntry 4 }
+
+fsSystemFanStatusLevel OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays the level of the fan speed. If the device is no support this information,
+         This object will return 0."
+    ::= { fsSystemFanStatusEntry 5 }
+
+fsSystemFanStatusSpeed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object displays fan speed(rpm). If the device is no support
+         this information, This object will return nothing information."
+    ::= { fsSystemFanStatusEntry 6 }
+
+fsSystemMultipleTemperatureTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemMultipleTemperatureEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of multiple temperature entries. Each object displays 
+     the multiple temperature information."
+  ::= { fsSystemMIBObjects 44 }
+
+fsSystemMultipleTemperatureEntry OBJECT-TYPE
+  SYNTAX      FSSystemMultipleTemperatureEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the multiple temperature information."
+  INDEX { fsSystemMultipleTemperatureDeviceIndex,
+          fsSystemMultipleTemperatureSlotIndex, 
+          fsSystemMultipleTemperatureIndex }
+  ::= { fsSystemMultipleTemperatureTable 1 }
+
+FSSystemMultipleTemperatureEntry ::=
+  SEQUENCE {
+    fsSystemMultipleTemperatureDeviceIndex  Integer32,
+    fsSystemMultipleTemperatureSlotIndex    Integer32,
+    fsSystemMultipleTemperatureIndex        Integer32,
+    fsSystemMultipleTemperatureName         DisplayString,
+    fsSystemMultipleTemperatureCurrent      Integer32,
+    fsSystemMultipleTemperatureWarning      Integer32,
+    fsSystemMultipleTemperatureCritical     Integer32
+  }
+
+fsSystemMultipleTemperatureDeviceIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device."
+    ::= { fsSystemMultipleTemperatureEntry 1 }
+
+fsSystemMultipleTemperatureSlotIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a slot device."
+    ::= { fsSystemMultipleTemperatureEntry 2 }
+
+fsSystemMultipleTemperatureIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a device's multiple temperature information."
+    ::= { fsSystemMultipleTemperatureEntry 3 }
+
+fsSystemMultipleTemperatureName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to a multiple temperature chip"
+    ::= { fsSystemMultipleTemperatureEntry 4 }          
+                    
+fsSystemMultipleTemperatureCurrent OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the current multiple temperature of the FastSwitch.The temperature display
+         is not supported for the current temperature returns to -255."
+::= { fsSystemMultipleTemperatureEntry 5 }
+
+fsSystemMultipleTemperatureWarning OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Return the warning multiple temperature of the FastSwitch.The temperature display
+         is not supported for the warning temperature returns to -255."
+::= { fsSystemMultipleTemperatureEntry 6 }
+
+fsSystemMultipleTemperatureCritical OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Return the critical multiple temperature of the FastSwitch.The temperature display
+         is not supported for the critical temperature returns to -255."
+::= { fsSystemMultipleTemperatureEntry 7 }
+        
+fsSystemAccurateUptime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the accurate system Uptime of equipment,unit is ticks."
+    ::={ fsSystemMIBObjects 45 }     
+
+fsSystemPowerIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of power"
+    ::= { fsSystemMIBObjects 46 }
+
+fsSystemSwitchID OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Switch id in VSU"
+    ::= { fsSystemMIBObjects 47 }
+
+fsSystemApDeviceDescriptionTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemApDeviceDescriptionEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of lank ap system entries. Each object displays 
+     the lank ap system information."
+  ::= { fsSystemMIBObjects 48 }
+
+fsSystemApDeviceDescriptionEntry OBJECT-TYPE
+  SYNTAX      FSSystemApDeviceDescriptionEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the ap Device Description."
+  INDEX { fsSystemApDescMacAddr }
+  ::= { fsSystemApDeviceDescriptionTable 1 }
+
+FSSystemApDeviceDescriptionEntry ::=
+  SEQUENCE {
+    fsSystemApDescMacAddr          MacAddress,
+    fsSystemApMemoryType           INTEGER,
+    fsSystemApMemorySize           Gauge,
+    fsSystemAPFlashType            INTEGER,
+    fsSystemAPFlashSize            Gauge,
+    fsSystemApNVRAMSize            Gauge,
+    fsSystemApCFSize               Gauge,
+    fsSystemApCPUType              DisplayString        
+  }
+    
+fsSystemApDescMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents ap system information."
+    ::= { fsSystemApDeviceDescriptionEntry 1 } 
+
+fsSystemApMemoryType OBJECT-TYPE
+    SYNTAX INTEGER {
+        reserved(0),
+        sdram(1),
+        ddram(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the memory type of the lank ap system."
+    ::= { fsSystemApDeviceDescriptionEntry 2 } 
+
+fsSystemApMemorySize OBJECT-TYPE
+    SYNTAX        Gauge
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the memory card storage of the lank ap system, unit is MB."
+    ::= { fsSystemApDeviceDescriptionEntry 3 } 
+
+fsSystemAPFlashType OBJECT-TYPE
+    SYNTAX INTEGER {
+        reserved(0),
+        nor(1),
+        non-nor(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents ap system information."
+    ::= { fsSystemApDeviceDescriptionEntry 4 } 
+
+fsSystemAPFlashSize OBJECT-TYPE
+    SYNTAX        Gauge
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the flash size of the lank ap system, unit is MB."
+    ::= { fsSystemApDeviceDescriptionEntry 5 } 
+
+fsSystemApNVRAMSize OBJECT-TYPE
+    SYNTAX        Gauge
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the NVRAM size of the lank ap system, unit is MB."
+    ::= { fsSystemApDeviceDescriptionEntry 6 } 
+
+fsSystemApCFSize OBJECT-TYPE
+    SYNTAX        Gauge
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the CF size of the lank ap system, unit is MB."
+    ::= { fsSystemApDeviceDescriptionEntry 7 } 
+
+fsSystemApCPUType OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the cpu type of the lank ap system."
+    ::= { fsSystemApDeviceDescriptionEntry 8 } 
+
+fsSystemApDeviceStatisticsTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemApDeviceStatisticsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of lank ap system entries. Each object displays 
+     the lank ap system information."
+  ::= { fsSystemMIBObjects 49 }
+  
+fsSystemApDeviceStatisticsEntry OBJECT-TYPE
+  SYNTAX      FSSystemApDeviceStatisticsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays the ap Device Statistics."
+  INDEX { fsSystemApStatMacAddr }
+  ::= { fsSystemApDeviceStatisticsTable 1 }
+
+FSSystemApDeviceStatisticsEntry ::=
+  SEQUENCE {
+    fsSystemApStatMacAddr                   MacAddress,
+    fsSystemApInterfaceNum                  Integer32,
+    fsSystemApUptime                        TimeTicks,
+    fsSystemApCPUUtilizationCurrent         Percent,
+    fsSystemApCPUUtilizationAverage         Percent, 
+    fsSystemApMemoryPoolCurrentUtilization  Percent,
+    fsSystemApMemoryPoolAverageUtilization  Percent,
+    fsSystemApFlashFreeSize                 Unsigned32,
+    fsSystemAPDeviceTemperature             Integer32
+  }
+    
+fsSystemApStatMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents ap system information."
+    ::= { fsSystemApDeviceStatisticsEntry 1 }    
+
+fsSystemApInterfaceNum OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the interface number of the lank ap system."
+    ::= { fsSystemApDeviceStatisticsEntry 2 }  
+
+fsSystemApUptime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SysUptime of lank ap equipment, unit is ticks."
+    ::= { fsSystemApDeviceStatisticsEntry 3 } 
+
+fsSystemApCPUUtilizationCurrent OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the collection of current lank ap cpu using rate."
+    ::= { fsSystemApDeviceStatisticsEntry 4 }
+
+fsSystemApCPUUtilizationAverage OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the average cpu using rate currently."
+    ::= { fsSystemApDeviceStatisticsEntry 5 }
+
+fsSystemApMemoryPoolCurrentUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization currently."
+    ::= { fsSystemApDeviceStatisticsEntry 6 }
+
+fsSystemApMemoryPoolAverageUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the average memory pool utilization currently."
+    ::= { fsSystemApDeviceStatisticsEntry 7 } 
+
+fsSystemApFlashFreeSize OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the free size of the flash device, unit is MB."
+    ::= { fsSystemApDeviceStatisticsEntry 8 }
+
+fsSystemAPDeviceTemperature OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the temperature of the ap.But the ap is no support
+         this information, so it will return 35 in perpetuity"
+    ::= { fsSystemApDeviceStatisticsEntry 9 }   
+    
+fsSystemUptimeMsLow OBJECT-TYPE
+  SYNTAX        Unsigned32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "Return the equipment SysUptime Low 32-bit,unit is tick."
+  ::={ fsSystemMIBObjects 50 }
+  
+fsSystemUptimeMsHigh OBJECT-TYPE
+  SYNTAX        Unsigned32
+  MAX-ACCESS    read-only
+  STATUS        current
+  DESCRIPTION
+    "Return the equipment SysUptime High 32-bit,unit is tick."
+  ::={ fsSystemMIBObjects 51 }      
+ 
+fsSystemFanSNTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemFanSNEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of fan's serial number"
+  ::= { fsSystemMIBObjects 52 }
+
+fsSystemFanSNEntry OBJECT-TYPE
+  SYNTAX      FSSystemFanSNEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays fan SN."
+  INDEX { fsSystemFanPadIndex }
+  ::= { fsSystemFanSNTable 1 }
+
+FSSystemFanSNEntry ::=
+  SEQUENCE {
+    fsSystemFanPadIndex          Integer32,
+    fsSystemFanPadName           DisplayString,
+    fsSystemFanPadSN             DisplayString
+  }
+
+fsSystemFanPadIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the index of the fan pad."
+    ::= { fsSystemFanSNEntry 1 }  
+
+fsSystemFanPadName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the name of the fan pad."
+    ::= { fsSystemFanSNEntry 2 } 
+
+fsSystemFanPadSN OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SN of the fan pad."
+    ::= { fsSystemFanSNEntry 3 } 
+
+fsSystemDsfSNTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemDsfSNEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of dsf's serial number"
+  ::= { fsSystemMIBObjects 53 }
+
+fsSystemDsfSNEntry OBJECT-TYPE
+  SYNTAX      FSSystemDsfSNEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays dsf SN."
+  INDEX { fsSystemDsfIndex }
+  ::= { fsSystemDsfSNTable 1 }
+
+FSSystemDsfSNEntry ::=
+  SEQUENCE {
+    fsSystemDsfIndex          Integer32,  
+    fsSystemDsfName           DisplayString,
+    fsSystemDsfSN             DisplayString
+  }
+
+fsSystemDsfIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the index of the dsf."
+    ::= { fsSystemDsfSNEntry 1 }  
+
+fsSystemDsfName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the name of the dsf."
+    ::= { fsSystemDsfSNEntry 2 } 
+
+fsSystemDsfSN OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SN of the dsf."
+    ::= { fsSystemDsfSNEntry 3 } 
+
+fsSystemPowerSNTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemPowerSNEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of power's serial number"
+  ::= { fsSystemMIBObjects 54 }
+
+fsSystemPowerSNEntry OBJECT-TYPE
+  SYNTAX      FSSystemPowerSNEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays power SN."
+  INDEX { fsSystemPowerSNIndex }
+  ::= { fsSystemPowerSNTable 1 }
+
+FSSystemPowerSNEntry ::=
+  SEQUENCE {
+    fsSystemPowerSNIndex          Integer32,
+    fsSystemPowerSNName           DisplayString,  
+    fsSystemPowerSN               DisplayString
+  }
+
+fsSystemPowerSNIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the index of the power."
+    ::= { fsSystemPowerSNEntry 1 }  
+
+fsSystemPowerSNName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the name of the power."
+    ::= { fsSystemPowerSNEntry 2 } 
+
+fsSystemPowerSN OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the SN of the power."
+    ::= { fsSystemPowerSNEntry 3 } 
+ 
+ fsSystemFanPad1SpeedTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemFanPad1SpeedEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of fan's speed on fan pad1."
+  ::= { fsSystemMIBObjects 55 }
+
+fsSystemFanPad1SpeedEntry OBJECT-TYPE
+  SYNTAX      FSSystemFanPad1SpeedEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays fan's speed on same fan pad"
+  INDEX { fsSystemOamFanPad1Index }
+  ::= { fsSystemFanPad1SpeedTable 1 }
+
+FSSystemFanPad1SpeedEntry ::=
+  SEQUENCE {
+    fsSystemOamFanPad1Index    Integer32,
+    fsSystemOamFanPad1Name	  DisplayString,
+    fsSystemFanPad1Speed1         Integer32,
+    fsSystemFanPad1Speed2         Integer32,
+    fsSystemFanPad1Speed3         Integer32,
+    fsSystemFanPad1Speed4         Integer32,
+    fsSystemFanPad1Speed5         Integer32,
+    fsSystemFanPad1Speed6         Integer32,
+    fsSystemFanPad1Speed7         Integer32,
+    fsSystemFanPad1Speed8         Integer32,    
+    fsSystemFanPad1Speed9         Integer32
+  }
+
+fsSystemOamFanPad1Index OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the index of the fan pad."
+    ::= { fsSystemFanPad1SpeedEntry 1 }
+
+fsSystemOamFanPad1Name OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the name of the fan pad."
+    ::= { fsSystemFanPad1SpeedEntry 2 }
+
+fsSystemFanPad1Speed1 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan1."
+    ::= { fsSystemFanPad1SpeedEntry 3 }
+
+fsSystemFanPad1Speed2 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan2."
+    ::= { fsSystemFanPad1SpeedEntry 4 }
+
+fsSystemFanPad1Speed3 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan3."
+    ::= { fsSystemFanPad1SpeedEntry 5 }
+
+fsSystemFanPad1Speed4 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan4."
+    ::= { fsSystemFanPad1SpeedEntry 6 }
+
+fsSystemFanPad1Speed5 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan5."
+    ::= { fsSystemFanPad1SpeedEntry 7 }
+
+fsSystemFanPad1Speed6 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan6."
+    ::= { fsSystemFanPad1SpeedEntry 8 }
+
+fsSystemFanPad1Speed7 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan7."
+    ::= { fsSystemFanPad1SpeedEntry 9 }
+
+fsSystemFanPad1Speed8 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan8."
+    ::= { fsSystemFanPad1SpeedEntry 10 }
+   
+fsSystemFanPad1Speed9 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan9."
+    ::= { fsSystemFanPad1SpeedEntry 11 }
+
+fsSystemFanPad2SpeedTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemFanPad2SpeedEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of fan's speed on fan pad2."
+  ::= { fsSystemMIBObjects 56 }
+
+fsSystemFanPad2SpeedEntry OBJECT-TYPE
+  SYNTAX      FSSystemFanPad2SpeedEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays fan's speed on same fan pad2"
+  INDEX { fsSystemOamFanPad2Index }
+  ::= { fsSystemFanPad2SpeedTable 1 }
+
+FSSystemFanPad2SpeedEntry ::=
+  SEQUENCE {
+    fsSystemOamFanPad2Index    Integer32,
+    fsSystemOamFanPad2Name	  DisplayString,
+    fsSystemFanPad2Speed1         Integer32,
+    fsSystemFanPad2Speed2         Integer32,
+    fsSystemFanPad2Speed3         Integer32
+  }
+
+fsSystemOamFanPad2Index OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the index of the fan pad2."
+    ::= { fsSystemFanPad2SpeedEntry 1 }
+
+fsSystemOamFanPad2Name OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the name of the fan pad."
+    ::= { fsSystemFanPad2SpeedEntry 2 }
+
+fsSystemFanPad2Speed1 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan1."
+    ::= { fsSystemFanPad2SpeedEntry 3 }
+
+fsSystemFanPad2Speed2 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan2."
+    ::= { fsSystemFanPad2SpeedEntry 4 }
+
+fsSystemFanPad2Speed3 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan3."
+    ::= { fsSystemFanPad2SpeedEntry 5 }
+
+fsSystemFanPad3SpeedTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSSystemFanPad3SpeedEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of fan's speed on fan pad3."
+  ::= { fsSystemMIBObjects 57 }
+
+fsSystemFanPad3SpeedEntry OBJECT-TYPE
+  SYNTAX      FSSystemFanPad3SpeedEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry displays fan's speed on same fan pad3"
+  INDEX { fsSystemOamFanPad3Index }
+  ::= { fsSystemFanPad3SpeedTable 1 }
+
+FSSystemFanPad3SpeedEntry ::=
+  SEQUENCE {
+    fsSystemOamFanPad3Index    Integer32,
+    fsSystemOamFanPad3Name	  DisplayString,
+    fsSystemFanPad3Speed1         Integer32,
+    fsSystemFanPad3Speed2         Integer32,
+    fsSystemFanPad3Speed3         Integer32,
+    fsSystemFanPad3Speed4         Integer32,
+    fsSystemFanPad3Speed5         Integer32
+  }
+
+fsSystemOamFanPad3Index OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the index of the fan pad3."
+    ::= { fsSystemFanPad3SpeedEntry 1 }
+
+fsSystemOamFanPad3Name OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the name of the fan pad."
+    ::= { fsSystemFanPad3SpeedEntry 2 }
+
+fsSystemFanPad3Speed1 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan1."
+    ::= { fsSystemFanPad3SpeedEntry 3 }
+
+fsSystemFanPad3Speed2 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan2."
+    ::= { fsSystemFanPad3SpeedEntry 4 }
+
+fsSystemFanPad3Speed3 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan3."
+    ::= { fsSystemFanPad3SpeedEntry 5 }
+
+fsSystemFanPad3Speed4 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan4."
+    ::= { fsSystemFanPad3SpeedEntry 6 }
+
+fsSystemFanPad3Speed5 OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Return the speed of the fan5."
+    ::= { fsSystemFanPad3SpeedEntry 7 }
+
+fsSystemParamSaveErrIdx  OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Param Save Err Idx."
+    ::= { fsSystemMIBObjects 58 }
+
+fsSystemParamSaveErrMsg  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Param Save Err Msg."
+    ::= { fsSystemMIBObjects 59 }
+
+fsSystemMIBTraps OBJECT IDENTIFIER ::= { fsSystemMIB 2 }
+
+fsSystemHardChangeDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+          "The description of hard change"
+        ::= { fsSystemMIBTraps 1 }       
+        
+fsSystemHardChangeDetected NOTIFICATION-TYPE
+        OBJECTS   {fsSystemHardChangeDesc}
+        STATUS     current
+        DESCRIPTION
+                "System hardware has changed include number of devices or number of modules 
+                 or the place or type of the module is change."
+        ::= { fsSystemMIBTraps 2 }
+        
+fsSystemPowerStateChange NOTIFICATION-TYPE
+        OBJECTS   {fsSystemHwPower}
+        STATUS     current
+        DESCRIPTION
+                "while the state of power changed, then this trap will be sent."
+        ::= { fsSystemMIBTraps 3 }
+        
+fsSystemFanStateChange NOTIFICATION-TYPE
+        OBJECTS   {fsSystemHwFan}
+        STATUS     current
+        DESCRIPTION
+                "while the state of fan changed, then this trap will be sent."
+        ::= { fsSystemMIBTraps 4 }                
+
+--2010-05    
+fsSystemCPUusageTooHighTrap NOTIFICATION-TYPE
+        OBJECTS   {fsCPUUtilization1Min}
+        STATUS     current
+        DESCRIPTION
+                "CPU usage Too High warning."
+        ::= { fsSystemMIBTraps 5 }
+                      
+--2010-05 
+fsSystemCPUusageTooHighRecovTrap NOTIFICATION-TYPE
+        OBJECTS   {fsCPUUtilization1Min}
+        STATUS     current
+        DESCRIPTION
+                "clear the warning of CPU usage too high and report the current CPU usage."
+        ::= { fsSystemMIBTraps 6 }
+        
+--2010-05 
+fsSystemTmpTooHighTrap NOTIFICATION-TYPE
+        OBJECTS   {fsSystemTemperatureCurrent}
+        STATUS     current
+        DESCRIPTION
+                "Temperature Too High warning."
+        ::= { fsSystemMIBTraps 7 }   
+           
+--Temperature Too High Recover Trap 2010-05 
+fsSystemTmpTooHighRecovTrap NOTIFICATION-TYPE
+        OBJECTS   {fsSystemTemperatureCurrent}
+        STATUS     current
+        DESCRIPTION
+                "clear the warning of temperature too high and report the current temperature."
+        ::= { fsSystemMIBTraps 8 }
+                
+--Memory usage too high trap 2010-05 
+fsSystemMemusageTooHighTrap NOTIFICATION-TYPE
+        OBJECTS   {fsMemoryPoolCurrentUtilization}
+        STATUS     current
+        DESCRIPTION
+                "Memory usage too high warning."
+        ::= { fsSystemMIBTraps 9 }   
+        
+--Memory usage too high recover trap 2010-05 
+fsSystemMemusageTooHighRecovTrap NOTIFICATION-TYPE
+        OBJECTS   {fsMemoryPoolCurrentUtilization}
+        STATUS     current
+        DESCRIPTION
+                "clear the warning of Memory usage too high and report the current Memory usage."
+        ::= { fsSystemMIBTraps 10 }  
+        
+--lank ap 2010-7     
+fsSystemLankApCPUusageTooHighTrap NOTIFICATION-TYPE
+        OBJECTS   {
+           fsApMacAddr,
+           fsCPUUtilization1Min
+        }
+        STATUS     current
+        DESCRIPTION
+                "lank ap CPU usage Too High warning."
+        ::= { fsSystemMIBTraps 11 }
+                      
+--lank ap 2010-7 
+fsSystemLankApCPUusageTooHighRecovTrap NOTIFICATION-TYPE
+        OBJECTS   {
+           fsApMacAddr,
+           fsCPUUtilization1Min
+        }
+        STATUS     current
+        DESCRIPTION
+                "clear the warning of lank ap CPU usage too high and report the current CPU usage."
+        ::= { fsSystemMIBTraps 12 }
+        
+--lank ap 2010-7
+fsSystemLankApMemusageTooHighTrap NOTIFICATION-TYPE
+        OBJECTS   {
+           fsApMacAddr,
+           fsMemoryPoolCurrentUtilization
+        }
+        STATUS     current
+        DESCRIPTION
+                "lank ap Memory usage too high warning."
+        ::= { fsSystemMIBTraps 13 }   
+        
+--lank ap 2010-7
+fsSystemLankApMemusageTooHighRecovTrap NOTIFICATION-TYPE
+        OBJECTS   {
+           fsApMacAddr,
+           fsMemoryPoolCurrentUtilization
+        }
+        STATUS     current
+        DESCRIPTION
+                "clear the warning of lank ap Memory usage too high and report the current Memory usage."
+        ::= { fsSystemMIBTraps 14 }    
+
+--System reset trap 2010-7
+fsSystemResetTrap NOTIFICATION-TYPE
+        STATUS     current
+        DESCRIPTION
+                "send a trap while system reset"
+        ::= { fsSystemMIBTraps 15 }
+        
+--lank ap reset trap 2010-8
+fsSystemLankApResetTrap NOTIFICATION-TYPE
+        OBJECTS   {fsApMacAddr}
+        STATUS     current
+        DESCRIPTION
+                "send a trap while lank ap system reset"
+        ::= { fsSystemMIBTraps 16 }
+   
+fsSystemPowerOnTrap NOTIFICATION-TYPE
+        OBJECTS   {fsSystemPowerIndex}
+        STATUS     current
+        DESCRIPTION
+                "send a trap while power on."
+        ::= { fsSystemMIBTraps 17 }
+                      
+fsSystemPowerOffTrap NOTIFICATION-TYPE
+        OBJECTS   {fsSystemPowerIndex}
+        STATUS     current
+        DESCRIPTION
+                "send a trap while power off."
+        ::= { fsSystemMIBTraps 18 }
+
+fsSystemPowerOnTrapInVSU NOTIFICATION-TYPE
+        OBJECTS   { 
+            fsSystemSwitchID,
+            fsSystemPowerIndex
+        }
+        STATUS     current
+        DESCRIPTION
+                "send a trap while power on in VSU."
+        ::= { fsSystemMIBTraps 19 }
+                      
+fsSystemPowerOffTrapInVSU NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemSwitchID,
+            fsSystemPowerIndex
+        }
+        STATUS     current
+        DESCRIPTION
+                "send a trap while power off in VSU."
+        ::= { fsSystemMIBTraps 20 }
+
+fsSystemTmpTableTooHighTrap NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemMultipleTemperatureSlotIndex
+        }
+        STATUS     current
+        DESCRIPTION
+                "Temperature Too High warning with the slot index."
+        ::= { fsSystemMIBTraps 21 }
+
+fsSystemTmpTableTooHighRecovTrap NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemMultipleTemperatureSlotIndex
+        }
+        STATUS     current
+        DESCRIPTION
+                "clear the warning of Temperature too high with the slot index."
+        ::= { fsSystemMIBTraps 22 }
+
+fsSystemTmpTableTooHighTrapVSU NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemMultipleTemperatureDeviceIndex,
+            fsSystemMultipleTemperatureSlotIndex
+        }
+        STATUS     current
+        DESCRIPTION
+                "Temperature Too High warning with the slot index in VSU."
+        ::= { fsSystemMIBTraps 23 }
+ 
+fsSystemTmpTableTooHighRecovTrapVSU NOTIFICATION-TYPE
+        OBJECTS   {            
+            fsSystemMultipleTemperatureDeviceIndex,
+            fsSystemMultipleTemperatureSlotIndex
+        }
+        STATUS     current
+        DESCRIPTION
+                "clear the warning of Temperature too high with the slot index."
+        ::= { fsSystemMIBTraps 24 }
+
+fsSystemFanTableStateChange  NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemFanStatusFanIndex,
+            fsSystemFanStatusIndex,
+            fsSystemFanStatus
+        }
+        STATUS     current
+        DESCRIPTION
+                "while the state of fan changed, then this trap will be sent."
+        ::= { fsSystemMIBTraps 25 }                
+
+fsSystemFanTableStateChangeVSU NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemFanStatusDeviceIndex,  
+            fsSystemFanStatusFanIndex,
+            fsSystemFanStatusIndex,
+            fsSystemFanStatus
+        }
+        STATUS     current
+        DESCRIPTION
+                "In VSU, while the state of fan changed, then this trap will be sent."
+        ::= { fsSystemMIBTraps 26 }                
+
+fsSystemParamSaveErr NOTIFICATION-TYPE
+        OBJECTS   {
+        fsSystemParamSaveErrIdx,
+        fsSystemParamSaveErrMsg
+        }
+        STATUS     current
+        DESCRIPTION
+                "while call exec write, then this trap will be sent."
+        ::= { fsSystemMIBTraps 27 }                
+        
+fsSystemFanTableOn  NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemFanStatusFanIndex,
+            fsSystemFanStatusIndex,
+            fsSystemFanStatus
+        }
+        STATUS     current
+        DESCRIPTION
+                "while fan is turned on, then this trap will be sent."
+        ::= { fsSystemMIBTraps 28 }                
+
+fsSystemFanTableOff  NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemFanStatusFanIndex,
+            fsSystemFanStatusIndex,
+            fsSystemFanStatus
+        }
+        STATUS     current
+        DESCRIPTION
+                "while fan is turned off, then this trap will be sent."
+        ::= { fsSystemMIBTraps 29 }   
+
+fsSystemFanTableOnVSU NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemFanStatusDeviceIndex,  
+            fsSystemFanStatusFanIndex,
+            fsSystemFanStatusIndex,
+            fsSystemFanStatus
+        }
+        STATUS     current
+        DESCRIPTION
+                "In VSU, while fan is turned on, then this trap will be sent."
+        ::= { fsSystemMIBTraps 30 }   
+
+fsSystemFanTableOffVSU NOTIFICATION-TYPE
+        OBJECTS   {
+            fsSystemFanStatusDeviceIndex,  
+            fsSystemFanStatusFanIndex,
+            fsSystemFanStatusIndex,
+            fsSystemFanStatus
+        }
+        STATUS     current
+        DESCRIPTION
+                "In VSU, while fan is turned off, then this trap will be sent."
+        ::= { fsSystemMIBTraps 31 }  		
+fsSystemMIBConformance OBJECT IDENTIFIER ::= { fsSystemMIB 3 }
+fsSystemMIBCompliances OBJECT IDENTIFIER ::= { fsSystemMIBConformance 1 }
+fsSystemMIBGroups      OBJECT IDENTIFIER ::= { fsSystemMIBConformance 2 }
+
+
+-- compliance statements
+
+fsSystemMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the FS System MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { fsSystemMIBGroup
+                 }
+        ::= { fsSystemMIBCompliances 1 }
+                
+-- units of conformance
+
+fsSystemMIBGroup OBJECT-GROUP
+        OBJECTS {
+               fsSystemHwVersion, 
+               fsSystemSwVersion,
+               fsSystemBootVersion,
+               fsSystemSysCtrlVersion,
+               fsSystemParametersSave,
+               fsSystemReset,
+               fsSystemOutBandRate,
+               fsSwitchLayer 
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing system information and
+                opertion to a FS agent."
+        ::= { fsSystemMIBGroups 1 } 
+  
+END

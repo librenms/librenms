@@ -1,0 +1,3959 @@
+-- RITTAL GmbH & Co. KG, Herborn
+-- CMC-TC-MIB Version 1.1h
+-- CMC-TC - DK7320.100
+--
+-- Management Information Base for SNMP Network Management
+--
+-- Copyright 2002 - 2007 Rittal Herborn.
+-- All Rights Reserved.
+--
+-- The information in this document is subject to change without notice.
+-- Refer to document "AGB_Software_Rittal.pdf"
+--
+--*********************************************************************
+-- Release History
+-- Date: October 17, 2002 (Version 1.0)
+-- Revised by MHain
+-- Date: April 1, 2003 (Version 1.1)
+-- Added: unitXMsgQuit, cmcTcControl, Sensor types, Output types, Unit types
+-- Date: November 3, 2003 (Version 1.1a)
+-- Added: new sensors, new outputs (FCS, RTT)
+-- Date: March 11, 2004 (Version 1.1b)
+-- Added: new sensors, new outputs, new messages (RCT, PSM)
+-- Date: Jan 11, 2006 (Version 1.1c)
+-- Changed: sysName... FROM RFC1213-MIB, seperate lines, for HP SIM
+-- Date: Jan 24, 2006 (Version 1.1d)
+-- Added: new unit type (ActivePSM8)
+-- Added: new output type (power output 16/20A)
+-- Date: Dec 5, 2006 (Version 1.1e)
+-- Added: sensor/output types MeteredPSM, LCP
+-- Date: March 8, 2007 (Version 1.1f)
+-- Changed: Output names (RTT, Power Out)
+-- Date: March 22, 2007 (Version 1.1g)
+-- Changed: New sensor units, wireless sensors, timer function SMS
+-- Date: July 23, 2007 (Version 1.1h)
+-- Added: New sensors/outputs LCP
+--*********************************************************************
+
+          RITTAL-CMC-TC-MIB DEFINITIONS ::= BEGIN
+
+          IMPORTS
+           enterprises FROM RFC1155-SMI
+           DisplayString FROM RFC1213-MIB
+           sysName FROM RFC1213-MIB  
+           sysDescr FROM RFC1213-MIB  
+           sysContact FROM RFC1213-MIB  
+           sysLocation FROM RFC1213-MIB  
+
+           OBJECT-TYPE FROM RFC-1212
+           TRAP-TYPE FROM RFC-1215;
+
+    rittal                         OBJECT IDENTIFIER ::= { enterprises 2606 }
+     cmcTc                         OBJECT IDENTIFIER ::= { rittal 4 }
+       cmcTcMibRev                 OBJECT IDENTIFIER ::= { cmcTc 1 }
+       cmcTcStatus                 OBJECT IDENTIFIER ::= { cmcTc 2 }
+         cmcTcStatusSensorUnit1    OBJECT IDENTIFIER ::= { cmcTcStatus  3 }
+           cmcTcStatusUnit1Sensors OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit1 5 }
+           cmcTcStatusUnit1Outputs OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit1 6 }
+           cmcTcStatusUnit1Msg     OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit1 7 }
+         cmcTcStatusSensorUnit2    OBJECT IDENTIFIER ::= { cmcTcStatus  4 }
+           cmcTcStatusUnit2Sensors OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit2 5 }
+           cmcTcStatusUnit2Outputs OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit2 6 }
+           cmcTcStatusUnit2Msg     OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit2 7 }
+         cmcTcStatusSensorUnit3    OBJECT IDENTIFIER ::= { cmcTcStatus  5 }
+           cmcTcStatusUnit3Sensors OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit3 5 }
+           cmcTcStatusUnit3Outputs OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit3 6 }
+           cmcTcStatusUnit3Msg     OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit3 7 }
+         cmcTcStatusSensorUnit4    OBJECT IDENTIFIER ::= { cmcTcStatus  6 }
+           cmcTcStatusUnit4Sensors OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit4 5 }
+           cmcTcStatusUnit4Outputs OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit4 6 }
+           cmcTcStatusUnit4Msg     OBJECT IDENTIFIER ::= { cmcTcStatusSensorUnit4 7 }
+         cmcTcStatusExtUnit        OBJECT IDENTIFIER ::= { cmcTcStatus  7 }
+       cmcTcSetup                  OBJECT IDENTIFIER ::= { cmcTc 3 }
+         cmcTcSetupGeneral         OBJECT IDENTIFIER ::= { cmcTcSetup 1 }
+            cmcTcTimerTable1       OBJECT IDENTIFIER ::= { cmcTcSetupGeneral 8 }
+       cmcTcTrapControl            OBJECT IDENTIFIER ::= { cmcTc 4 }
+         cmcTcTraps                OBJECT IDENTIFIER ::= { cmcTcTrapControl 7 }
+        cmcTcControl               OBJECT IDENTIFIER ::= { cmcTc 5 }
+                
+
+--*****************************************************************************
+--CMC-TC ComputerMultiControl-TopConcept DK7320.100
+--*****************************************************************************
+--cmcTcMibRev-group
+          
+        cmcTcMibMajRev          OBJECT-TYPE
+              SYNTAX  INTEGER (1..65535)
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "The Major Revision level.
+               A change in the major revision level represents a major change
+               in the architecture of the MIB. A change in the major revision 
+               level may indicate a significant change in the information,
+               correct interpretation of data may require a MIB document
+               with the same major revision level."
+              ::= { cmcTcMibRev 1 }
+
+        cmcTcMibMinRev          OBJECT-TYPE
+              SYNTAX  INTEGER (0..65535)
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "The Minor Revision level.
+               A change in the minor revision level may represent some minor
+               additional support, no changes to any pre-existing information
+               has occurred."
+              ::= { cmcTcMibRev 2 }
+
+        cmcTcMibCondition        OBJECT-TYPE
+              SYNTAX  INTEGER {
+                other (1),
+                ok (2),
+                degraded (3),
+                failed (4),
+                configChanged (5)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "The overall condition (status) of the system represented by
+               this MIB. 
+               (2) OK
+               (3) a minor problem, warning condition (yellow LED on CMC)
+               (4) a major problem (red LED on CMC)
+               (5) configuration of sensor units changed or
+                   unit detected (red/yellow/green LED on CMC)"
+              ::= { cmcTcMibRev 3 }
+
+
+          
+--status-group
+        cmcTcStatusDeviceCMC OBJECT-TYPE
+              SYNTAX INTEGER {
+                failed(1),
+                ok(2)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "General Status of CMC-TC unit itself
+              (1) failed
+              (2) OK"
+              ::= { cmcTcStatus  1 }
+
+        cmcTcUnitsConnected OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of sensor units connected to the CMC, Port 1 to 4"
+              ::= { cmcTcStatus  2 }
+
+
+--status sensor units-group
+
+--unit 1
+        cmcTcUnit1TypeOfDevice  OBJECT-TYPE
+              SYNTAX INTEGER {
+                notAvail (1),
+                unitIO (2),
+                unitAccess (3),
+                unitClimate (4),
+                unitFCS (5),
+                unitRTT (6),
+                unitRCT (7),
+                unitPSM (8),
+                unitPSM8 (9),
+                unitPSMMetered (10),
+                unitIOWireless (11),
+                unitPSM6Schuko (12),
+                unitPSM6C19 (13)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Type of sensor unit connected to port 1"
+              ::= { cmcTcStatusSensorUnit1  1 }
+
+        cmcTcUnit1Text  OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..10))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+              "Descriptional text for sensor unit connected to port 1"
+              ::= { cmcTcStatusSensorUnit1 2 }
+
+        cmcTcUnit1Serial  OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Serialnumber of sensor unit connected to port 1"
+              ::= { cmcTcStatusSensorUnit1  3 }
+
+        cmcTcUnit1Status OBJECT-TYPE
+              SYNTAX INTEGER {
+                ok(1),
+                error(2),
+                changed(3),
+                quit(4),
+                timeout(5),
+                detected(6),
+                notAvail(7),
+                lowPower(8)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "General Status sensor unit connected to port 1
+              (1) OK
+              (2) error, e. g. value overflow
+              (3) configuration of sensor unit has changed, confirmation required
+              (4) Quit from sensor unit to confirm configuration changes
+              (5) timeout of sensor unit, confirmation required to unload this unit
+              (6) sensor unit detected, needs to be confirmed
+              (7) unit is not available
+              (8) supply voltage is too low"
+              ::= { cmcTcStatusSensorUnit1  4 }
+
+-- Sensors              
+        cmcTcUnit1NumberOfSensors OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of sensors connected to sensor unit 1"
+              ::= { cmcTcStatusUnit1Sensors  1 }
+
+-- table with entry for each sensor available on this unit              
+        cmcTcUnit1SensorTable     OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit1SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of sensor table"
+              ::= { cmcTcStatusUnit1Sensors 2 }
+
+        cmcTcUnit1SensorEntry     OBJECT-TYPE
+              SYNTAX  CmcTcUnit1SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of sensor table"
+              INDEX   { unit1SensorIndex }
+              ::= { cmcTcUnit1SensorTable 1 }
+
+              CmcTcUnit1SensorEntry ::=
+              SEQUENCE {
+              unit1SensorIndex
+                INTEGER,
+              unit1SensorType
+                INTEGER,
+              unit1SensorText
+                DisplayString,                
+              unit1SensorStatus
+                INTEGER,
+              unit1SensorValue
+                INTEGER,
+              unit1SensorSetHigh
+                INTEGER,
+              unit1SensorSetLow
+                INTEGER,
+              unit1SensorSetWarn
+                INTEGER                
+              }
+
+        unit1SensorIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of value entries. Its value ranges
+              between 1 and the value of cmcTcUnit1NumberOfSensors." 
+             ::= { cmcTcUnit1SensorEntry 1 }
+
+        unit1SensorType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                access (4),
+                vibration (5),
+                motion (6),
+                smoke (7),
+                airFlow (8),
+                type6 (9),
+                temperature(10),
+                current4to20(11),
+                humidity(12),
+                userNO (13),
+                userNC (14),
+                lock (15),
+                unlock (16),
+                voltOK (17),
+                voltage (18),
+                fanOK (19),
+                readerKeypad (20),
+                dutyPWM (21),
+                fanStatus (22),
+                leakage (23),
+                warningRTT (24),
+                alarmRTT (25),
+                filterRTT (26),
+                heatflowRCT (27),
+                alarmRCT (28),
+                warningRCT (29),
+                currentPSM (30),
+                statusPSM (31),
+                positionPSM (32),
+                airFlap (33),
+                acoustic (34),
+                detACfault (35),
+                detACfirstAlarm (36),
+                detACmainAlarm (37),
+                rpm11LCP (40),
+                rpm12LCP (41),
+                rpm21LCP (42),
+                rpm22LCP (43),
+                rpm31LCP (44),
+                rpm32LCP (45),
+                rpm41LCP (46),
+                rpm42LCP (47),
+                airTemp11LCP (48),
+                airTemp12LCP (49),
+                airTemp21LCP (50),
+                airTemp22LCP (51),
+                airTemp31LCP (52),
+                airTemp32LCP (53),
+                airTemp41LCP (54),
+                airTemp42LCP (55),
+		temp1LCP (56),
+		temp2LCP (57),
+		waterInTemp (58),
+		waterOutTemp (59),
+		waterFlow (60),
+		fanSpeed (61),
+		valve (62),
+		statusLCP (63),
+		waterDelta (64),
+		valveActual (65),
+		contrTemp2 (66),
+		condensateDuration (67), 
+		condensateCycles (68),
+		totalKWhPSM (72),
+		totalKWPSM (73),
+		frequencyPSM (74),
+		voltagePSM (75),
+		voltStatusPSM (76),
+		amperePSM (77),
+		ampStatusPSM (78),
+		kWPSM (79),
+		kWhPSM (80),
+		kWhTempPSM (81),
+		temperatureWL (100),
+		temperature1WL (101),
+		humidityWL (102),
+		accessWL (103),
+		userNOWL (104),
+		userNCWL (105),
+		analogWL (106)
+                }
+
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of sensor which is connected to sensor unit 1 to sensor[unit1SensorIndex]
+              1:        no sensor connected
+              2:        sensor failure
+              3:        value overflow
+              4:        sensor type 1, access sensor
+              5:        sensor type 2, vibration sensor
+              6:        sensor type 3, motion sensor
+              7:        sensor type 4, smoke sensor
+              8:        sensor type 5, air flow sensor
+              9:        sensor type 6, reserved
+              10:       sensor type 7, temperature sensor
+              11:       sensor type 8, 4..20mA sensor
+              12:       sensor type 9, humidity sensor  
+              13:       user sensor with normally opened contact
+              14:       user sensor with normally closed contact
+              15:       door locked sensor from locking device
+              16:       remote unlock sensor (e.g. external keypad)
+              17:       voltage sensor, indicates status of main voltage (OK, NOK)
+              18:	voltage value
+              19:	fan status, from CMC-TC-FAS-Unit
+              20:       cardreader or keypad, connected to I2C port
+              21:	duty cycle of fan, FCS-Unit
+              22:	status of fan, FCS-Unit
+              23:	leakage sensor
+              24:	warning, RittalTopTherm(RTT)-Unit
+              25:	alarm, RittalTopTherm-Unit
+              26:	temperature difference filter monitor, RTT-Unit
+              27:	heatflow RCT-Unit
+              28:	alarm RCT-Unit
+              29:	warning RCT-Unit
+              30:	actual current*10, PSM-Unit
+              31:	status PSM-Unit
+              32:	position PSM-Unit, normal/reversed = circuit 1/2
+              33:	air Flap
+              34:	acoustic sensor
+              35:	DET-AC fault (extinguisher)
+              36:	DET-AC first alarm (extinguisher)
+              37:	DET-AC main alarm (extinguisher)
+              40-47:	RPM Fan 1.1 - Fan 4.2, LCP
+              48-55:	Air temperature 1.1 - 4.2, LCP
+              56,57:	actual temperature 1,2, LCP
+              58:	water inlet temperature, LCP
+              59:	water outlet temperature, LCP
+              60:	water flow
+              61:	fan speed (desired value)
+              62:	status valve, LCP
+              63:	status LCP
+              64:	temperature difference water temperatures
+              65:	control temperature 1, LCP
+              66:	control temperature 2, LCP
+              67:	condensate pump, duration, LCP
+              68:	condensate pump, cycles, LCP
+              72:	total energy*10 (kWh), PSM
+              73:	total power*10 (kW), PSM
+              74:	frequency*10 (Hz), PSM
+              75:	voltage*10 (V), PSM
+              76:	voltage status, PSM
+              77:	current*10 (A), PSM
+              78:	current status, PSM
+              79:	power*10 (kW) per phase, PSM
+              80:	energy*10 (kWh) per phase, PSM
+              81:	temporary energy*10 (kWh) per phase, PSM 
+	     100:	temperature sensor, wireless
+	     101:	temperature sensor (combi), wireless
+	     102:	humidity sensor, wireless
+	     103:	access sensor, wireless
+	     104:	user sensor with normally opened contact, wireless
+	     105:	user sensor with normally closed contact, wireless
+	     106:	analog sensor 4..20mA, wireless"
+             ::= { cmcTcUnit1SensorEntry 2 }
+        
+        unit1SensorText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each sensor (entry in the table)"
+             ::= { cmcTcUnit1SensorEntry 3 }
+              
+        unit1SensorStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             warning(7),
+             tooLow(8),
+             tooHigh(9)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the sensor"
+             ::= { cmcTcUnit1SensorEntry 4 }
+
+        unit1SensorValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Value of sensor"
+             ::= { cmcTcUnit1SensorEntry 5 }
+
+        unit1SensorSetHigh OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for high setpoint of sensor"
+             ::= { cmcTcUnit1SensorEntry 6 }
+
+        unit1SensorSetLow OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for low setpoint of sensor,
+              also used as alarm delay"
+             ::= { cmcTcUnit1SensorEntry 7 }
+
+        unit1SensorSetWarn OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for warning setpoint of sensor, 
+             also used as fan threshold"
+             ::= { cmcTcUnit1SensorEntry 8 }
+
+
+-- table END            
+                
+-- Outputs              
+        cmcTcUnit1NumberOfOutputs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of outputs available on sensor unit 1"
+              ::= { cmcTcStatusUnit1Outputs  1 }
+
+-- table with entry for each output available on this unit              
+                
+        cmcTcUnit1OutputTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit1OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of output table"
+              ::= { cmcTcStatusUnit1Outputs 2 }
+
+        cmcTcUnit1OutputEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit1OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of output table"
+              INDEX   { unit1OutputIndex }
+              ::= { cmcTcUnit1OutputTable 1 }
+
+              CmcTcUnit1OutputEntry ::=
+              SEQUENCE {
+              unit1OutputIndex
+                INTEGER,
+              unit1OutputType
+                INTEGER,
+              unit1OutputText
+                DisplayString,                
+              unit1OutputStatus
+                INTEGER,
+              unit1OutputValue
+                INTEGER,
+              unit1OutputSet
+                INTEGER,
+              unit1OutputConfig
+                INTEGER,                
+              unit1OutputDelay
+                INTEGER,
+              unit1OutputTimeoutAction
+                INTEGER
+              }
+
+        unit1OutputIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of output entries. Its value ranges
+              between 1 and the value of cmcTcUnit1NumberOfOutputs." 
+             ::= { cmcTcUnit1OutputEntry 1 }
+
+        unit1OutputType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                doorLock (4),
+                univLock1 (5),
+                univLock2 (6),
+                fan (7),
+                fanSpeedContr (8),
+                universalOut (9),
+                roomLock(10),
+                powerOut(11),
+                doorLockMaster(12),
+                doorLockFRi (13),
+                setpoint (14),
+                setpointTimax (15),
+                hysteresisRCT (16),
+                commandRCT (17),
+                relayPSM (18),
+                setHighPSM (19),
+                setLowPSM (20),
+                setpointRTT (21),
+                setTimaxRTT (22),
+                powerOut1(23),
+                controlModeLCP (30),
+                minFanSpeedLCP (31),
+                minDeltaTLCP (32),
+                maxDeltaTLCP (33),
+                kPLCP (34),
+                kILCP (35),
+                kDLCP (36),
+                flowRateLCP(37),
+                cwValueLCP (38),
+		deltaTLCP (39),
+		ctrModLCP (40),
+                voltHighPSM (42),
+                voltLowPSM (43),
+                ampHighPSM (44),
+                ampLowPSM (45),
+                commandPSM (46)
+                }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of output which is connected to sensor unit 1 to output[unit1OutputIndex]
+              1:        no output connected
+              2:        output failure
+              3:        value overflow
+              4:        output type 1, door locking TS8,Ergoform
+              5:        output type 2, universal lock 1, lock with power
+              6:        output type 3, universal lock 2, unlock with power
+              7:        output type 4, fan relay
+              8:        output type 5, fan controlled
+              9:        output type 6, universal relay output
+              10:       output type 7, room door lock 
+              11:       output type 8, power output
+              12:       output type 9, door lock with Master key
+              13:       output type 10, door lock FR(i)
+              14:	setpoint (FCS, LCP)
+              15:	setpoint temperature monitoring (LCP)
+              16:	hysteresis of setpoint (LCP)
+              17:	command for remote control of RCT
+              18:	relay PSM, 1=On, 0=Off
+              19:	high setpoint current monitoring PSM
+              20:	low setpoint current monitoring PSM
+              21:	setpoint temperature RTT
+              22:	setpoint temperature monitoring RTT
+              23:	power output 20A
+              30:	control mode, LCP
+              31:	min fan speed (fan control), LCP
+              32:	min delta T (fan control), LCP
+              33:	max delta T (fan control), LCP
+              34:	PID controller, KP, LCP
+              35:	PID controller, KI, LCP
+              36	PID controller, KD, LCP
+              37	flowrate flowmeter, LCP
+              38:	cw value of water (default: 4187), LCP
+              39:	deltaT, LCP
+              40:	control mode, LCP
+              42:	setpoint high voltage PSM
+              43:	setpoint low voltage PSM
+              44:	setpoint high current PSM
+              45:	setpoint low current PSM
+              46:	command PSM" 
+             ::= { cmcTcUnit1OutputEntry 2 }
+
+        
+        unit1OutputText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each output (entry in the table)"
+             ::= { cmcTcUnit1OutputEntry 3 }
+              
+        unit1OutputStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             setOff(7),
+             setOn(8)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the output"
+             ::= { cmcTcUnit1OutputEntry 4 }
+
+        unit1OutputValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for output"
+             ::= { cmcTcUnit1OutputEntry 5 }
+
+        unit1OutputSet OBJECT-TYPE
+             SYNTAX INTEGER {
+             off (1),
+             on (2),
+             lock (3),
+             unlock (4),
+             unlockDelay (5)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Command for output"
+             ::= { cmcTcUnit1OutputEntry 6 }
+
+        unit1OutputConfig OBJECT-TYPE
+             SYNTAX INTEGER {
+             disRemote (1),
+             enRemote (2)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Configuration for output
+             1: 	disable remote control (e.g. keypad)
+             2: 	enable remote control "
+             ::= { cmcTcUnit1OutputEntry 7 }
+
+        unit1OutputDelay OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Unsigned Value for delay, 
+             after this time the output will fall into the previous state"
+             ::= { cmcTcUnit1OutputEntry 8 }
+
+        unit1OutputTimeoutAction OBJECT-TYPE
+             SYNTAX INTEGER {
+                stay (1),
+                off (2),
+                on (3)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "State for output if timeout (RS422) occurs"
+             ::= { cmcTcUnit1OutputEntry 9 }
+
+ 
+-- Messages
+              
+        cmcTcUnit1NumberOfMsgs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of messages that can be created with sensor unit 1"
+              ::= { cmcTcStatusUnit1Msg  1 }
+
+-- table with entry for each alarm available on this unit               
+                
+        cmcTcUnit1MsgTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit1MsgEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of message table"
+              ::= { cmcTcStatusUnit1Msg 2 }
+
+        cmcTcUnit1MsgEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit1MsgEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of message table"
+              INDEX   { unit1MsgIndex }
+              ::= { cmcTcUnit1MsgTable 1 }
+
+              CmcTcUnit1MsgEntry ::=
+              SEQUENCE {
+              unit1MsgIndex
+                INTEGER, 
+              unit1MsgText
+                DisplayString,                
+              unit1MsgStatus
+                INTEGER,                
+              unit1MsgRelay
+                INTEGER,
+              unit1MsgBeeper
+                INTEGER,
+              unit1MsgTrap1
+                INTEGER,
+              unit1MsgTrap2
+                INTEGER,
+              unit1MsgTrap3
+                INTEGER,
+              unit1MsgTrap4
+                INTEGER,                 
+              unit1MsgQuit
+                INTEGER
+              }
+
+        unit1MsgIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of message entries. Its value ranges
+              between 1 and the value of cmcTcUnit1NumberOfMsgs." 
+             ::= { cmcTcUnit1MsgEntry 1 }
+
+       unit1MsgText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each message (entry in the table)"
+             ::= { cmcTcUnit1MsgEntry 2 }
+              
+        unit1MsgStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             configChanged(2),
+             error(3),
+             ok(4),
+             alarm(5),
+             warning(6),
+             tooLow(7),
+             tooHigh(8),
+             setOff(9),
+             setOn(10),
+             open(11),
+             closed(12),
+             locked(13),
+             unlRemote(14),
+             unlReaderKeypad(15),
+             unlSNMP(16),
+             unlWEB(17),
+             unlTimer(18),
+             noAccess(19),
+             circuit1 (20),
+             circuit2 (21),
+             lowBatt (22)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual message status
+             1: not available
+             2: configuration has changed (sensor new, changed, lost)
+             3: error
+             4: OK
+             5: alarm, e.g. smoke, vibration...
+             6: warning of analog value, value reached warning threshold
+             7: analog value too low, value reached low threshold
+             8: analog value too high, value reached high threshold
+             9: output is set to OFF
+             10: output is set to ON
+             11: door is open
+             12: door is closed
+             13: door is locked
+             14: door is unlocked by remote input, e.g. external cardreader
+             15: door is unlocked by reader or keypad connected to I2C
+             16: door is unlocked by SNMP set command (unit1OutputSet)
+             17: door is unlocked by WEB
+             18: door is unlocked by timer
+             19: no access, wrong keycode or cardnumber
+             20: orientation of PSM-Unit is circuit 1
+             21: orientation of PSM-Unit is circuit 2
+             22: battery low, wireless sensor"
+             ::= { cmcTcUnit1MsgEntry 3 }
+        
+        unit1MsgRelay OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm relay for this message/alarm
+              1:        no switching of alarm relay             
+              2:        switching of alarm relay" 
+             ::= { cmcTcUnit1MsgEntry 4 }
+
+        unit1MsgBeeper OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm beeper for this alarm
+              1:        no audible alarm
+              2:        audible alarm" 
+             ::= { cmcTcUnit1MsgEntry 5 }
+
+        unit1MsgTrap1 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 1 activated"
+             ::= { cmcTcUnit1MsgEntry 6 }
+
+        unit1MsgTrap2 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 2 activated"
+             ::= { cmcTcUnit1MsgEntry 7 }
+ 
+        unit1MsgTrap3 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 3 activated"
+             ::= { cmcTcUnit1MsgEntry 8 }
+
+        unit1MsgTrap4 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 4 and Event Logging activated"
+             ::= { cmcTcUnit1MsgEntry 9 }
+
+        unit1MsgQuit OBJECT-TYPE
+             SYNTAX INTEGER {
+                auto (1),
+                manual (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Reset of this alarm
+             1:		auto
+             2:		manual, alarm needs confirmation, e. g. with 'C' key"
+             ::= { cmcTcUnit1MsgEntry 10 }
+-- table unit 1 END             
+
+-- unit2
+        cmcTcUnit2TypeOfDevice  OBJECT-TYPE
+              SYNTAX INTEGER {
+                notAvail (1),
+                unitIO (2),
+                unitAccess (3),
+                unitClimate (4),
+                unitFCS (5),
+                unitRTT (6),
+                unitRCT (7),
+                unitPSM (8),
+                unitPSM8 (9),
+                unitPSMMetered (10),
+                unitIOWireless (11),
+                unitPSM6Schuko (12),
+                unitPSM6C19 (13)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Type of sensor unit connected to port 2"
+              ::= { cmcTcStatusSensorUnit2  1 }
+
+        cmcTcUnit2Text  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..10))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for sensor unit connected to port 2"
+             ::= { cmcTcStatusSensorUnit2 2 }
+
+        cmcTcUnit2Serial  OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Serialnumber of sensor unit connected to port 2"
+              ::= { cmcTcStatusSensorUnit2  3 }
+
+        cmcTcUnit2Status OBJECT-TYPE
+              SYNTAX INTEGER {
+                ok(1),
+                error(2),
+                changed(3),
+                quit(4),
+                timeout(5),
+                detected(6),
+                notAvail(7),
+                lowPower(8)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "General Status sensor unit connected to port 2
+              (1) OK
+              (2) error
+              (3) configuration of sensor unit has changed, confirmation required
+              (4) Quit from sensor unit to confirm configuration changes
+              (5) timeout of sensor unit, confirmation required
+              (6) sensor unit detected, needs to be confirmed
+              (8) supply voltage is too low"              
+              ::= { cmcTcStatusSensorUnit2  4 }
+
+-- unit 2 table
+
+-- Sensors              
+        cmcTcUnit2NumberOfSensors OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of sensors connected to sensor unit 2"
+              ::= { cmcTcStatusUnit2Sensors  1 }
+
+-- table with entry for each sensor available on this unit              
+        cmcTcUnit2SensorTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit2SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of sensor table"
+              ::= { cmcTcStatusUnit2Sensors 2 }
+
+        cmcTcUnit2SensorEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit2SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of sensor table"
+              INDEX   { unit2SensorIndex }
+              ::= { cmcTcUnit2SensorTable 1 }
+
+              CmcTcUnit2SensorEntry ::=
+              SEQUENCE {
+              unit2SensorIndex
+                INTEGER,
+              unit2SensorType
+                INTEGER,
+              unit2SensorText
+                DisplayString,                
+              unit2SensorStatus
+                INTEGER,
+              unit2SensorValue
+                INTEGER,
+              unit2SensorSetHigh
+                INTEGER,
+              unit2SensorSetLow
+                INTEGER,                 
+              unit2SensorSetWarn
+                INTEGER  
+              }
+
+        unit2SensorIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of value entries. Its value ranges
+              between 1 and the value of cmcTcUnit2NumberOfSensors." 
+             ::= { cmcTcUnit2SensorEntry 1 }
+
+        unit2SensorType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                access (4),
+                vibration (5),
+                motion (6),
+                smoke (7),
+                airFlow (8),
+                type6 (9),
+                temperature(10),
+                current4to20(11),
+                humidity(12),
+                userNO (13),
+                userNC (14),
+                lock (15),
+                unlock (16),
+                voltOK (17),
+                voltage (18),
+                fanOK (19),
+                readerKeypad (20),
+                dutyPWM (21),
+                fanStatus (22),
+                leakage (23),
+                warningRTT (24),
+                alarmRTT (25),
+                filterRTT (26),
+                heatflowRCT (27),
+                alarmRCT (28),
+                warningRCT (29),
+                currentPSM (30),
+                statusPSM (31),
+                positionPSM (32),               
+                airFlap (33),
+                detACfault (35),
+                detACfirstAlarm (36),
+                detACmainAlarm (37),
+                acoustic (34),
+                rpm11LCP (40),
+                rpm12LCP (41),
+                rpm21LCP (42),
+                rpm22LCP (43),
+                rpm31LCP (44),
+                rpm32LCP (45),
+                rpm41LCP (46),
+                rpm42LCP (47),
+                airTemp11LCP (48),
+                airTemp12LCP (49),
+                airTemp21LCP (50),
+                airTemp22LCP (51),
+                airTemp31LCP (52),
+                airTemp32LCP (53),
+                airTemp41LCP (54),
+                airTemp42LCP (55),
+		temp1LCP (56),
+		temp2LCP (57),
+		waterInTemp (58),
+		waterOutTemp (59),
+		waterFlow (60),
+		fanSpeed (61),
+		valve (62),
+		statusLCP (63),
+		waterDelta (64),
+		valveActual (65),
+		contrTemp2 (66),
+		condensateDuration (67), 
+		condensateCycles (68),
+		totalKWhPSM (72),
+		totalKWPSM (73),
+		frequencyPSM (74),
+		voltagePSM (75),
+		voltStatusPSM (76),
+		amperePSM (77),
+		ampStatusPSM (78),
+		kWPSM (79),
+		kWhPSM (80),
+		kWhTempPSM (81),
+		temperatureWL (100),
+		temperature1WL (101),
+		humidityWL (102),
+		accessWL (103),
+		userNOWL (104),
+		userNCWL (105),
+		analogWL (106)
+		}
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of sensor which is connected to sensor unit 2 to sensor[unit2SensorIndex]
+              1:        no sensor connected
+              2:        sensor failure
+              3:        value overflow
+              4:        sensor type 1, access sensor
+              5:        sensor type 2, vibration sensor
+              6:        sensor type 3, motion sensor
+              7:        sensor type 4, smoke sensor
+              8:        sensor type 5, air flow sensor
+              9:        sensor type 6, reserved
+              10:       sensor type 7, temperature sensor
+              11:       sensor type 8, 4..20mA sensor
+              12:       sensor type 9, humidity sensor  
+              13:       user sensor with normally opened contact
+              14:       user sensor with normally closed contact
+              15:       door locked sensor from locking device
+              16:       remote unlock sensor (e.g. external keypad)
+              17:       voltage sensor, indicates status of main voltage
+              18:	voltage value
+              19:	fan status
+              20:       cardreader or keypad, connected to I2C port              
+              21:	duty cycle of fan, FCS-Unit
+              22:	status of fan, FCS-Unit
+              23:	leakage sensor
+              24:	warning, RittalTopTherm(RTT)-Unit
+              25:	alarm, RittalTopTherm-Unit
+              26:	temperature difference filter monitor, RTT-Unit
+              27:	heatflow RCT-Unit
+              28:	alarm RCT-Unit
+              29:	warning RCT-Unit
+              30:	actual current*10, PSM-Unit
+              31:	status PSM-Unit
+              32:	position PSM-Unit, normal/reversed = circuit 1/2
+              33:	air Flap
+              34:	acoustic sensor
+              35:	DET-AC fault (extinguisher)
+              36:	DET-AC first alarm (extinguisher)
+              37:	DET-AC main alarm (extinguisher)
+              40-47:	RPM Fan 1.1 - Fan 4.2, LCP
+              48-55:	Air temperature 1.1 - 4.2, LCP
+              56,57:	actual temperature 1,2, LCP
+              58:	water inlet temperature, LCP
+              59:	water outlet temperature, LCP
+              60:	water flow
+              61:	fan speed (desired value)
+              62:	status valve, LCP
+              63:	status LCP
+              64:	temperature difference water temperatures
+              65:	control temperature 1, LCP
+              66:	control temperature 2, LCP
+              67:	condensate pump, duration, LCP
+              68:	condensate pump, cycles, LCP
+              72:	total energy*10 (kWh), PSM
+              73:	total power*10 (kW), PSM
+              74:	frequency*10 (Hz), PSM
+              75:	voltage*10 (V), PSM
+              76:	voltage status, PSM
+              77:	current*10 (A), PSM
+              78:	current status, PSM
+              79:	power*10 (kW) per phase, PSM
+              80:	energy*10 (kWh) per phase, PSM
+              81:	temporary energy*10 (kWh) per phase, PSM              
+	     100:	temperature sensor, wireless
+	     101:	temperature sensor (combi), wireless
+	     102:	humidity sensor, wireless
+	     103:	access sensor, wireless
+	     104:	user sensor with normally opened contact, wireless
+	     105:	user sensor with normally closed contact, wireless
+	     106:	analog sensor 4..20mA, wireless"
+             ::= { cmcTcUnit2SensorEntry 2 }
+
+        unit2SensorText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each sensor (entry in the table)"
+             ::= { cmcTcUnit2SensorEntry 3 }
+              
+        unit2SensorStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             warning(7),
+             tooLow(8),
+             tooHigh(9)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the sensor"
+             ::= { cmcTcUnit2SensorEntry 4 }
+
+        unit2SensorValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Value of sensor"
+             ::= { cmcTcUnit2SensorEntry 5 }
+
+        unit2SensorSetHigh OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for high setpoint of sensor"
+             ::= { cmcTcUnit2SensorEntry 6 }
+
+        unit2SensorSetLow OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for low setpoint of sensor,
+              also used as alarm delay"
+             ::= { cmcTcUnit2SensorEntry 7 }
+
+        unit2SensorSetWarn OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for warning setpoint of sensor,
+              also used as fan threshold"
+             ::= { cmcTcUnit2SensorEntry 8 }
+
+-- table END            
+                
+-- Outputs              
+        cmcTcUnit2NumberOfOutputs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of outputs available on sensor unit 2"
+              ::= { cmcTcStatusUnit2Outputs  1 }
+
+-- table with entry for each output available on this unit              
+                
+        cmcTcUnit2OutputTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit2OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of output table"
+              ::= { cmcTcStatusUnit2Outputs 2 }
+
+        cmcTcUnit2OutputEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit2OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of output table"
+              INDEX   { unit2OutputIndex }
+              ::= { cmcTcUnit2OutputTable 1 }
+
+              CmcTcUnit2OutputEntry ::=
+              SEQUENCE {
+              unit2OutputIndex
+                INTEGER,
+              unit2OutputType
+                INTEGER,
+              unit2OutputText
+                DisplayString,                
+              unit2OutputStatus
+                INTEGER,
+              unit2OutputValue
+                INTEGER,
+              unit2OutputSet
+                INTEGER,
+              unit2OutputConfig
+                INTEGER,                
+              unit2OutputDelay
+                INTEGER,
+              unit2OutputTimeoutAction
+                INTEGER
+              }
+
+        unit2OutputIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+              "Index for the list of output entries. Its value ranges
+               between 1 and the value of cmcTcUnit2NumberOfOutputs." 
+              ::= { cmcTcUnit2OutputEntry 1 }
+
+        unit2OutputType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                doorLock (4),
+                univLock1 (5),
+                univLock2 (6),
+                fan (7),
+                fanSpeedContr (8),
+                universalOut (9),
+                roomLock(10),
+                powerOut(11),
+                doorLockMaster(12),
+                doorLockFRi (13),
+                setpoint (14),
+                setpointTimax (15),
+                hysteresisRCT (16),
+                commandRCT (17),
+                relayPSM (18),
+                setHighPSM (19),
+                setLowPSM (20),
+                setpointRTT (21),
+                setTimaxRTT (22),
+                powerOut1(23),
+                controlModeLCP (30),
+                minFanSpeedLCP (31),
+                minDeltaTLCP (32),
+                maxDeltaTLCP (33),
+                kPLCP (34),
+                kILCP (35),
+                kDLCP (36),
+                flowRateLCP(37),
+                cwValueLCP (38),
+		deltaTLCP (39),
+		ctrModLCP (40),
+                voltHighPSM (42),
+                voltLowPSM (43),
+                ampHighPSM (44),
+                ampLowPSM (45),
+                commandPSM (46)
+                }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of output which is connected to sensor unit 2 to output[unit2OutputIndex]
+              1:        no output connected
+              2:        output failure                         
+              3:        value overflow
+              4:        output type 1, door locking TS8,Ergoform
+              5:        output type 2, universal lock 1, lock with power
+              6:        output type 3, universal lock 2, unlock with power
+              7:        output type 4, fan relay
+              8:        output type 5, fan controlled
+              9:        output type 6, universal relay output
+              10:       output type 7, room door lock 
+              11:       output type 8, power output
+              12:       output type 9, door lock with Master key
+              13:       output type 10, door lock FR(i)
+              14:	setpoint (FCS, RTT)
+              15:	setpoint temperature monitoring (RTT)
+              16:	hysteresis of setpoint (RCT)
+              17:	command for remote control of RCT
+              18:	relay PSM, 1=On, 0=Off
+              19:	high setpoint current monitoring PSM
+              20:	low setpoint current monitoring PSM
+              21:	setpoint temperature RTT
+              22:	setpoint temperature monitoring RTT
+              23:	power output 20A
+              30:	control mode LCP
+              31:	min fan speed (fan control) LCP
+              32:	min delta T (fan control) LCP
+              33:	max delta T (fan control) LCP
+              34:	PID controller, KP, LCP
+              35:	PID controller, KI, LCP
+              36	PID controller, KD, LCP
+              37	flowrate flowmeter, LCP
+              38:	cw value of water (default: 4187) LCP
+              39:	deltaT, LCP
+              40:	control mode, LCP
+              42:	setpoint high voltage PSM
+              43:	setpoint low voltage PSM
+              44:	setpoint high current PSM
+              45:	setpoint low current PSM
+              46:	command PSM" 
+             ::= { cmcTcUnit2OutputEntry 2 }
+
+        
+        unit2OutputText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each output (entry in the table)"
+             ::= { cmcTcUnit2OutputEntry 3 }
+              
+        unit2OutputStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             setOff(7),
+             setOn(8)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the output"
+             ::= { cmcTcUnit2OutputEntry 4 }
+
+        unit2OutputValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Signed value for output"
+             ::= { cmcTcUnit2OutputEntry 5 }
+
+        unit2OutputSet OBJECT-TYPE
+             SYNTAX INTEGER {
+             off (1),
+             on (2),
+             lock (3),
+             unlock (4),
+             unlockDelay (5)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Command for output"
+             ::= { cmcTcUnit2OutputEntry 6 }
+
+        unit2OutputConfig OBJECT-TYPE
+             SYNTAX INTEGER {
+             disRemote (1),
+             enRemote (2)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Configuration for output
+             1: 	disable remote control (e.g. keypad)
+             2: 	enable remote control "
+             ::= { cmcTcUnit2OutputEntry 7 }
+
+        unit2OutputDelay OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Unsigned Value for delay, 
+             after this time the output will fall into the previous state"
+             ::= { cmcTcUnit2OutputEntry 8 }
+
+        unit2OutputTimeoutAction OBJECT-TYPE
+             SYNTAX INTEGER {
+                stay (1),
+                off (2),
+                on (3)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "State for output if timeout (RS422) occurs"
+             ::= { cmcTcUnit2OutputEntry 9 }
+
+-- Alarms
+              
+        cmcTcUnit2NumberOfMsgs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of alarms that can be created with sensor unit 2"
+              ::= { cmcTcStatusUnit2Msg  1 }
+
+-- table with entry for each alarm available on this unit               
+                
+        cmcTcUnit2MsgTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit2MsgEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of message table"
+              ::= { cmcTcStatusUnit2Msg 2 }
+
+        cmcTcUnit2MsgEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit2MsgEntry
+              ACCESS  not-accessible
+                  STATUS  mandatory
+              DESCRIPTION
+              "Entries of message table"
+              INDEX   { unit2MsgIndex }
+              ::= { cmcTcUnit2MsgTable 1 }
+
+              CmcTcUnit2MsgEntry ::=
+              SEQUENCE {
+              unit2MsgIndex
+                INTEGER,
+              unit2MsgText
+                DisplayString,
+              unit2MsgStatus
+                INTEGER, 
+              unit2MsgRelay
+                INTEGER,
+              unit2MsgBeeper
+                INTEGER,
+              unit2MsgTrap1
+                INTEGER,
+              unit2MsgTrap2
+                INTEGER,
+              unit2MsgTrap3
+                INTEGER,
+              unit2MsgTrap4
+                INTEGER,                 
+              unit2MsgQuit
+                INTEGER
+              }
+
+        unit2MsgIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of alarm entries. Its value ranges
+              between 1 and the value of cmcTcUnit2NumberOfMsgs." 
+             ::= { cmcTcUnit2MsgEntry 1 }
+
+        unit2MsgText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each message (entry in the table)"
+             ::= { cmcTcUnit2MsgEntry 2 }
+
+         unit2MsgStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             configChanged(2),
+             error(3),
+             ok(4),
+             alarm(5),
+             warning(6),
+             tooLow(7),
+             tooHigh(8),
+             setOff(9),
+             setOn(10),
+             open(11),
+             closed(12),
+             locked(13),
+             unlRemote(14),
+             unlReaderKeypad(15),
+             unlSNMP(16),
+             unlWEB(17),
+             unlTimer(18),
+             noAccess(19),
+             circuit1 (20),
+             circuit2 (21),             
+             lowBatt (22)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual message status
+             1: not available
+             2: configuration has changed (sensor new, changed, lost)
+             3: error
+             4: OK
+             5: alarm, e.g. smoke, vibration...
+             6: warning of analog value, value reached warning threshold
+             7: analog value too low, value reached low threshold
+             8: analog value too high, value reached high threshold
+             9: output is set to OFF
+             10: output is set to ON
+             11: door is open
+             12: door is closed
+             13: door is locked
+             14: door is unlocked by remote input, e.g. external cardreader
+             15: door is unlocked by reader or keypad connected to I2C
+             16: door is unlocked by SNMP set command (unit1OutputSet)
+             17: door is unlocked by WEB
+             18: door is unlocked by timer
+             19: no access, wrong keycode or cardnumber
+             20: orientation of PSM-Unit is circuit 1
+             21: orientation of PSM-Unit is circuit 2
+             22: battery low, wireless sensor"
+             ::= { cmcTcUnit2MsgEntry 3 }
+
+        unit2MsgRelay OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm relay for this alarm
+              2:        no switching of alarm relay             
+              1:        switching of alarm relay" 
+             ::= { cmcTcUnit2MsgEntry 4 }
+
+        unit2MsgBeeper OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm beeper for this alarm
+              2:        no audible alarm
+              1:        audible alarm" 
+             ::= { cmcTcUnit2MsgEntry 5 }
+
+        unit2MsgTrap1 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 1 activated"
+             ::= { cmcTcUnit2MsgEntry 6 }
+
+        unit2MsgTrap2 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 2 activated"
+             ::= { cmcTcUnit2MsgEntry 7 }
+ 
+        unit2MsgTrap3 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 3 activated"
+             ::= { cmcTcUnit2MsgEntry 8 }
+
+        unit2MsgTrap4 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 4 and Event Logging activated"
+             ::= { cmcTcUnit2MsgEntry 9 }
+
+        unit2MsgQuit OBJECT-TYPE
+             SYNTAX INTEGER {
+                auto (1),
+                manual (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Reset of this alarm
+             1:		auto
+             2:		manual, alarm needs confirmation, e. g. with 'C' key"
+             ::= { cmcTcUnit2MsgEntry 10 }
+-- table END            
+
+-- unit 3
+        cmcTcUnit3TypeOfDevice  OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                unitIO (2),
+                unitAccess (3),
+                unitClimate (4),
+                unitFCS (5),
+                unitRTT (6),
+                unitRCT (7),
+                unitPSM (8),
+                unitPSM8 (9),
+                unitPSMMetered (10),
+                unitIOWireless (11),
+                unitPSM6Schuko (12),
+                unitPSM6C19 (13)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Type of sensor unit connected to port 3"
+              ::= { cmcTcStatusSensorUnit3  1 }
+
+        cmcTcUnit3Text  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..10))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for sensor unit connected to port 3"
+             ::= { cmcTcStatusSensorUnit3 2 }
+
+        cmcTcUnit3Serial  OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Serialnumber of sensor unit connected to port 3"
+              ::= { cmcTcStatusSensorUnit3  3 }
+
+        cmcTcUnit3Status OBJECT-TYPE
+              SYNTAX INTEGER {
+                ok(1),
+                error(2),
+                changed(3),
+                quit(4),
+                timeout(5),
+                detected(6),
+                notAvail(7),
+                lowPower(8)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "General Status sensor unit connected to port 3
+              (1) OK
+              (2) error, e. g. value overflow
+              (3) configuration of sensor unit has changed, confirmation required
+              (4) Quit from sensor unit to confirm configuration changes
+              (5) timeout of sensor unit, confirmation required to unload this unit
+              (6) sensor unit detected, needs to be confirmed
+              (7) unit is not available
+              (8) supply voltage is too low"
+              ::= { cmcTcStatusSensorUnit3  4 }
+
+-- Sensors              
+        cmcTcUnit3NumberOfSensors OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of sensors connected to sensor unit 3"
+              ::= { cmcTcStatusUnit3Sensors  1 }
+
+-- table with entry for each sensor available on this unit              
+        
+        cmcTcUnit3SensorTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit3SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of sensor table"
+              ::= { cmcTcStatusUnit3Sensors 2 }
+
+        cmcTcUnit3SensorEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit3SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of sensor table"
+              INDEX   { unit3SensorIndex }
+              ::= { cmcTcUnit3SensorTable 1 }
+
+              CmcTcUnit3SensorEntry ::=
+              SEQUENCE {
+              unit3SensorIndex
+                INTEGER,
+              unit3SensorType
+                INTEGER,
+              unit3SensorText
+                DisplayString,                
+              unit3SensorStatus
+                INTEGER,
+              unit3SensorValue
+                INTEGER,
+              unit3SensorSetHigh
+                INTEGER,
+              unit3SensorSetLow
+                INTEGER,                 
+              unit3SensorSetWarn
+                INTEGER  
+              }
+
+        unit3SensorIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of value entries. Its value ranges
+              between 1 and the value of cmcTcUnit3NumberOfSensors." 
+             ::= { cmcTcUnit3SensorEntry 1 }
+
+        unit3SensorType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                access (4),
+                vibration (5),
+                motion (6),
+                smoke (7),
+                airFlow (8),
+                type6 (9),
+                temperature(10),
+                current4to20(11),
+                humidity(12),
+                userNO (13),
+                userNC (14),
+                lock (15),
+                unlock (16),
+                voltOK (17),
+                voltage (18),
+                fanOK (19),
+                readerKeypad (20),
+                dutyPWM (21),
+                fanStatus (22),
+                leakage (23),
+                warningRTT (24),
+                alarmRTT (25),
+                filterRTT (26),
+                heatflowRCT (27),
+                alarmRCT (28),
+                warningRCT (29),
+                currentPSM (30),
+                statusPSM (31),
+                positionPSM (32),                
+                airFlap (33),
+                acoustic (34),
+                detACfault (35),
+                detACfirstAlarm (36),
+                detACmainAlarm (37),
+                rpm11LCP (40),
+                rpm12LCP (41),
+                rpm21LCP (42),
+                rpm22LCP (43),
+                rpm31LCP (44),
+                rpm32LCP (45),
+                rpm41LCP (46),
+                rpm42LCP (47),
+                airTemp11LCP (48),
+                airTemp12LCP (49),
+                airTemp21LCP (50),
+                airTemp22LCP (51),
+                airTemp31LCP (52),
+                airTemp32LCP (53),
+                airTemp41LCP (54),
+                airTemp42LCP (55),
+		temp1LCP (56),
+		temp2LCP (57),
+		waterInTemp (58),
+		waterOutTemp (59),
+		waterFlow (60),
+		fanSpeed (61),
+		valve (62),
+		statusLCP (63),
+		waterDelta (64),
+		valveActual (65),
+		contrTemp2 (66),
+		condensateDuration (67), 
+		condensateCycles (68),
+		totalKWhPSM (72),
+		totalKWPSM (73),
+		frequencyPSM (74),
+		voltagePSM (75),
+		voltStatusPSM (76),
+		amperePSM (77),
+		ampStatusPSM (78),
+		kWPSM (79),
+		kWhPSM (80),
+		kWhTempPSM (81),
+		temperatureWL (100),
+		temperature1WL (101),
+		humidityWL (102),
+		accessWL (103),
+		userNOWL (104),
+		userNCWL (105),
+		analogWL (106)
+		}
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of sensor which is connected to sensor unit 3 to sensor[unit3SensorIndex]
+              1:        no sensor connected
+              2:        sensor failure
+              3:        value overflow
+              4:        sensor type 1, access sensor
+              5:        sensor type 2, vibration sensor
+              6:        sensor type 3, motion sensor
+              7:        sensor type 4, smoke sensor
+              8:        sensor type 5, air flow sensor
+              9:        sensor type 6, reserved
+              10:       sensor type 7, temperature sensor
+              11:       sensor type 8, 4..20mA sensor
+              12:       sensor type 9, humidity sensor  
+              13:       user sensor with normally opened contact
+              14:       user sensor with normally closed contact
+              15:       door locked sensor from locking device
+              16:       remote unlock sensor (e.g. external keypad)
+              17:       voltage sensor, indicates status of main voltage
+              18:	voltage value
+              19:	fan status
+              20:       cardreader or keypad, connected to I2C port              
+              21:	duty cycle of fan, FCS-Unit
+              22:	status of fan, FCS-Unit
+              23:	leakage sensor
+              24:	warning, RittalTopTherm(RTT)-Unit
+              25:	alarm, RittalTopTherm-Unit
+              26:	temperature difference filter monitor, RTT-Unit
+              27:	heatflow RCT-Unit
+              28:	alarm RCT-Unit
+              29:	warning RCT-Unit
+              30:	actual current*10, PSM-Unit
+              31:	status PSM-Unit
+              32:	position PSM-Unit, normal/reversed = circuit 1/2
+              33:	air Flap
+              34:	acoustic sensor
+              35:	DET-AC fault (extinguisher)
+              36:	DET-AC first alarm (extinguisher)
+              37:	DET-AC main alarm (extinguisher)
+              40-47:	RPM Fan 1.1 - Fan 4.2, LCP
+              48-55:	Air temperature 1.1 - 4.2, LCP
+              56,57:	actual temperature 1,2, LCP
+              58:	water inlet temperature, LCP
+              59:	water outlet temperature, LCP
+              60:	water flow
+              61:	fan speed (desired value)
+              62:	status valve, LCP
+              63:	status LCP
+              64:	temperature difference water temperatures
+              65:	control temperature 1, LCP
+              66:	control temperature 2, LCP
+              67:	condensate pump, duration, LCP
+              68:	condensate pump, cycles, LCP
+              72:	total energy*10 (kWh), PSM
+              73:	total power*10 (kW), PSM
+              74:	frequency*10 (Hz), PSM
+              75:	voltage*10 (V), PSM
+              76:	voltage status, PSM
+              77:	current*10 (A), PSM
+              78:	current status, PSM
+              79:	power*10 (kW) per phase, PSM
+              80:	energy*10 (kWh) per phase, PSM
+              81:	temporary energy*10 (kWh) per phase, PSM
+ 	     100:	temperature sensor, wireless
+	     101:	temperature sensor (combi), wireless
+	     102:	humidity sensor, wireless
+	     103:	access sensor, wireless
+	     104:	user sensor with normally opened contact, wireless
+	     105:	user sensor with normally closed contact, wireless
+	     106:	analog sensor 4..20mA, wireless"
+            ::= { cmcTcUnit3SensorEntry 2 }
+
+        
+        unit3SensorText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each sensor (entry in the table)"
+             ::= { cmcTcUnit3SensorEntry 3 }
+              
+        unit3SensorStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             warning(7),
+             tooLow(8),
+             tooHigh(9)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the sensor"
+             ::= { cmcTcUnit3SensorEntry 4 }
+
+        unit3SensorValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Value of sensor"
+             ::= { cmcTcUnit3SensorEntry 5 }
+
+        unit3SensorSetHigh OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for high setpoint of sensor"
+             ::= { cmcTcUnit3SensorEntry 6 }
+
+        unit3SensorSetLow OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for low setpoint of sensor"
+             ::= { cmcTcUnit3SensorEntry 7 }
+
+        unit3SensorSetWarn OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for warning setpoint of sensor,
+              also used as fan threshold"
+             ::= { cmcTcUnit3SensorEntry 8 }
+-- table END            
+                
+-- Outputs              
+        cmcTcUnit3NumberOfOutputs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of outputs available on sensor unit 3"
+              ::= { cmcTcStatusUnit3Outputs  1 }
+
+-- table with entry for each output available on this unit              
+                
+        cmcTcUnit3OutputTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit3OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of output table"
+              ::= { cmcTcStatusUnit3Outputs 2 }
+
+        cmcTcUnit3OutputEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit3OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of output table"
+              INDEX   { unit3OutputIndex }
+              ::= { cmcTcUnit3OutputTable 1 }
+
+              CmcTcUnit3OutputEntry ::=
+              SEQUENCE {
+              unit3OutputIndex
+                INTEGER,
+              unit3OutputType
+                INTEGER,
+              unit3OutputText
+                DisplayString,                
+              unit3OutputStatus
+                INTEGER,
+              unit3OutputValue
+                INTEGER,
+              unit3OutputSet
+                INTEGER,
+              unit3OutputConfig
+                INTEGER,
+              unit3OutputDelay
+                INTEGER,
+              unit3OutputTimeoutAction
+                INTEGER
+              }
+
+        unit3OutputIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of output entries. Its value ranges
+              between 1 and the value of cmcTcUnit3NumberOfOutputs." 
+             ::= { cmcTcUnit3OutputEntry 1 }
+
+        unit3OutputType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                doorLock (4),
+                univLock1 (5),
+                univLock2 (6),
+                fan (7),
+                fanSpeedContr (8),
+                universalOut (9),
+                roomLock(10),
+                powerOut(11),
+                doorLockMaster(12),
+                doorLockFRi (13),
+                setpoint (14),
+                setpointTimax (15),
+                hysteresisRCT (16),
+                commandRCT (17),
+                relayPSM (18),
+                setHighPSM (19),
+                setLowPSM (20),
+                setpointRTT (21),
+                setTimaxRTT (22),
+                powerOut1(23),
+                controlModeLCP (30),
+                minFanSpeedLCP (31),
+                minDeltaTLCP (32),
+                maxDeltaTLCP (33),
+                kPLCP (34),
+                kILCP (35),
+                kDLCP (36),
+                flowRateLCP(37),
+                cwValueLCP (38),
+		deltaTLCP (39),
+		ctrModLCP (40),
+                voltHighPSM (42),
+                voltLowPSM (43),
+                ampHighPSM (44),
+                ampLowPSM (45),
+                commandPSM (46)
+                }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of output which is connected to sensor unit 3 to output[unit3OutputIndex]
+              1:        no output connected
+              2:        output failure
+              3:        value overflow
+              4:        output type 1, door locking TS8,Ergoform
+              5:        output type 2, universal lock 1, lock with power
+              6:        output type 3, universal lock 2, unlock with power
+              7:        output type 4, fan relay
+              8:        output type 5, fan controlled
+              9:        output type 6, universal relay output
+              10:       output type 7, room door lock 
+              11:       output type 8, power output
+              12:       output type 9, door lock with Master key
+              13:       output type 10, door lock FR(i)
+              14:	setpoint (FCS, RTT)
+              15:	setpoint temperature monitoring (RTT)
+              16:	hysteresis of setpoint (RCT)
+              17:	command for remote control of RCT
+              18:	relay PSM, 1=On, 0=Off
+              19:	high setpoint current monitoring PSM
+              20:	low setpoint current monitoring PSM
+              21:	setpoint temperature RTT
+              22:	setpoint temperature monitoring RTT
+              23:	power output 20A
+              30:	control mode LCP
+              31:	min fan speed (fan control) LCP
+              32:	min delta T (fan control) LCP
+              33:	max delta T (fan control) LCP
+              34:	PID controller, KP, LCP
+              35:	PID controller, KI, LCP
+              36	PID controller, KD, LCP
+              37	flowrate flowmeter, LCP
+              38:	cw value of water (default: 4187) LCP
+              39:	deltaT, LCP
+              40:	control mode, LCP
+              42:	setpoint high voltage PSM
+              43:	setpoint low voltage PSM
+              44:	setpoint high current PSM
+              45:	setpoint low current PSM
+              46:	command PSM" 
+             ::= { cmcTcUnit3OutputEntry 2 }
+
+        
+        unit3OutputText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each output (entry in the table)"
+             ::= { cmcTcUnit3OutputEntry 3 }
+              
+        unit3OutputStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             setOff(7),
+             setOn(8)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the output"
+             ::= { cmcTcUnit3OutputEntry 4 }
+
+        unit3OutputValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for output"
+             ::= { cmcTcUnit3OutputEntry 5 }
+
+        unit3OutputSet OBJECT-TYPE
+             SYNTAX INTEGER {
+             off (1),
+             on (2),
+             lock (3),
+             unlock (4),
+             unlockDelay (5)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Command for output"
+             ::= { cmcTcUnit3OutputEntry 6 }
+
+        unit3OutputConfig OBJECT-TYPE
+             SYNTAX INTEGER {
+             disRemote (1),
+             enRemote (2)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Configuration for output
+             1: 	disable remote control (e.g. keypad)
+             2: 	enable remote control "
+             ::= { cmcTcUnit3OutputEntry 7 }
+
+        unit3OutputDelay OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Unsigned Value for delay, 
+             after this time the output will fall into the previous state"
+             ::= { cmcTcUnit3OutputEntry 8 }
+
+        unit3OutputTimeoutAction OBJECT-TYPE
+             SYNTAX INTEGER {
+                stay (1),
+                off (2),
+                on (3)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "State for output if timeout (RS422) occurs"
+             ::= { cmcTcUnit3OutputEntry 9 }
+
+
+-- Msgs
+              
+        cmcTcUnit3NumberOfMsgs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of alarms that can be created with sensor unit 3"
+              ::= { cmcTcStatusUnit3Msg  1 }
+
+-- table with entry for each alarm available on this unit               
+                
+        cmcTcUnit3MsgTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit3MsgEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of message table"
+              ::= { cmcTcStatusUnit3Msg 2 }
+
+        cmcTcUnit3MsgEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit3MsgEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of message table"
+              INDEX   { unit3MsgIndex }
+              ::= { cmcTcUnit3MsgTable 1 }
+
+              CmcTcUnit3MsgEntry ::=
+              SEQUENCE {
+              unit3MsgIndex
+                INTEGER,
+              unit3MsgText
+                DisplayString,
+              unit3MsgStatus
+                INTEGER, 
+              unit3MsgRelay
+                INTEGER,
+              unit3MsgBeeper
+                INTEGER,
+              unit3MsgTrap1
+                INTEGER,
+              unit3MsgTrap2
+                INTEGER,
+              unit3MsgTrap3
+                INTEGER,
+              unit3MsgTrap4
+                INTEGER,                 
+              unit3MsgQuit
+                INTEGER
+              }
+
+        unit3MsgIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of alarm entries. Its value ranges
+              between 1 and the value of cmcTcUnit3NumberOfMsgs." 
+             ::= { cmcTcUnit3MsgEntry 1 }
+
+        unit3MsgText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each message (entry in the table)"
+             ::= { cmcTcUnit3MsgEntry 2 }
+
+         unit3MsgStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             configChanged(2),
+             error(3),
+             ok(4),
+             alarm(5),
+             warning(6),
+             tooLow(7),
+             tooHigh(8),
+             setOff(9),
+             setOn(10),
+             open(11),
+             closed(12),
+             locked(13),
+             unlRemote(14),
+             unlReaderKeypad(15),
+             unlSNMP(16),
+             unlWEB(17),
+             unlTimer(18),
+             noAccess(19),
+             circuit1 (20),
+             circuit2 (21),             
+             lowBatt (22)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual message status
+             1: not available
+             2: configuration has changed (sensor new, changed, lost)
+             3: error
+             4: OK
+             5: alarm, e.g. smoke, vibration...
+             6: warning of analog value, value reached warning threshold
+             7: analog value too low, value reached low threshold
+             8: analog value too high, value reached high threshold
+             9: output is set to OFF
+             10: output is set to ON
+             11: door is open
+             12: door is closed
+             13: door is locked
+             14: door is unlocked by remote input, e.g. external cardreader
+             15: door is unlocked by reader or keypad connected to I2C
+             16: door is unlocked by SNMP set command (unit1OutputSet)
+             17: door is unlocked by WEB
+             18: door is unlocked by timer
+             19: no access, wrong keycode or cardnumber
+             20: orientation of PSM-Unit is circuit 1
+             21: orientation of PSM-Unit is circuit 2
+             22: battery low, wireless sensor"
+             ::= { cmcTcUnit3MsgEntry 3 }
+
+        unit3MsgRelay OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm relay for this alarm
+              1:        no switching of alarm relay             
+              2:        switching of alarm relay" 
+             ::= { cmcTcUnit3MsgEntry 4 }
+
+        unit3MsgBeeper OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm beeper for this alarm
+              1:        no audible alarm
+              2:        audible alarm" 
+             ::= { cmcTcUnit3MsgEntry 5 }
+
+        unit3MsgTrap1 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 1 activated"
+             ::= { cmcTcUnit3MsgEntry 6 }
+
+        unit3MsgTrap2 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 2 activated"
+             ::= { cmcTcUnit3MsgEntry 7 }
+ 
+        unit3MsgTrap3 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 3 activated"
+             ::= { cmcTcUnit3MsgEntry 8 }
+
+        unit3MsgTrap4 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 4 and Event Logging activated"
+             ::= { cmcTcUnit3MsgEntry 9 }
+
+        unit3MsgQuit OBJECT-TYPE
+             SYNTAX INTEGER {
+                auto (1),
+                manual (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Reset of this alarm
+             1:		auto
+             2:		manual, alarm needs confirmation, e. g. with 'C' key"
+             ::= { cmcTcUnit3MsgEntry 10 }
+-- table END            
+
+-- unit4
+        cmcTcUnit4TypeOfDevice  OBJECT-TYPE
+              SYNTAX INTEGER {
+                notAvail (1),
+                unitIO (2),
+                unitAccess (3),
+                unitClimate (4),
+                unitFCS (5),
+                unitRTT (6),
+                unitRCT (7),
+                unitPSM (8),
+                unitPSM8 (9),
+                unitPSMMetered (10),
+                unitIOWireless (11),
+                unitPSM6Schuko (12),
+                unitPSM6C19 (13)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Type of sensor unit connected to port 4"
+              ::= { cmcTcStatusSensorUnit4  1 }
+
+        cmcTcUnit4Text  OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..10))
+              ACCESS read-write
+              STATUS mandatory
+              DESCRIPTION
+              "Descriptional text for sensor unit connected to port 4"
+              ::= { cmcTcStatusSensorUnit4 2 }
+
+        cmcTcUnit4Serial  OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Serialnumber of sensor unit connected to port 4"
+              ::= { cmcTcStatusSensorUnit4  3 }
+
+        cmcTcUnit4Status OBJECT-TYPE
+              SYNTAX INTEGER {
+                ok(1),
+                error(2),
+                changed(3),
+                quit(4),
+                timeout(5),
+                detected(6),
+                notAvail(7),
+                lowPower(8)
+                }
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "General Status sensor unit connected to port 4
+              (1) OK
+              (2) error, e. g. value overflow
+              (3) configuration of sensor unit has changed, confirmation required
+              (4) Quit from sensor unit to confirm configuration changes
+              (5) timeout of sensor unit, confirmation required to unload this unit
+              (6) sensor unit detected, needs to be confirmed
+              (7) unit is not available
+              (8) supply voltage is too low"
+
+              ::= { cmcTcStatusSensorUnit4  4 }
+
+-- Sensors              
+        cmcTcUnit4NumberOfSensors OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of sensors connected to sensor unit 4"
+              ::= { cmcTcStatusUnit4Sensors  1 }
+
+-- table with entry for each sensor available on this unit              
+                
+        cmcTcUnit4SensorTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit4SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of sensor table"
+              ::= { cmcTcStatusUnit4Sensors 2 }
+
+        cmcTcUnit4SensorEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit4SensorEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of sensor table"
+              INDEX   { unit4SensorIndex }
+              ::= { cmcTcUnit4SensorTable 1 }
+
+              CmcTcUnit4SensorEntry ::=
+              SEQUENCE {
+              unit4SensorIndex
+                INTEGER,
+              unit4SensorType
+                INTEGER,
+              unit4SensorText
+                DisplayString,                
+              unit4SensorStatus
+                INTEGER,
+              unit4SensorValue
+                INTEGER,
+              unit4SensorSetHigh
+                INTEGER,
+              unit4SensorSetLow
+                INTEGER,                 
+              unit4SensorSetWarn
+                INTEGER  
+              }
+
+        unit4SensorIndex OBJECT-TYPE
+              SYNTAX INTEGER (1..65535)
+              ACCESS read-only
+              STATUS mandatory
+              DESCRIPTION
+              "Index for the list of value entries. Its value ranges
+               between 1 and the value of cmcTcUnit4NumberOfSensors." 
+              ::= { cmcTcUnit4SensorEntry 1 }
+
+        unit4SensorType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                access (4),
+                vibration (5),
+                motion (6),
+                smoke (7),
+                airFlow (8),
+                type6 (9),
+                temperature(10),
+                current4to20(11),
+                humidity(12),
+                userNO (13),
+                userNC (14),
+                lock (15),
+                unlock (16),
+                voltOK (17),
+                voltage (18),
+                fanOK (19),
+                readerKeypad (20),
+                dutyPWM (21),
+                fanStatus (22),
+                leakage (23),
+                warningRTT (24),
+                alarmRTT (25),
+                filterRTT (26),
+                heatflowRCT (27),
+                alarmRCT (28),
+                warningRCT (29),
+                currentPSM (30),
+                statusPSM (31),
+                positionPSM (32),                
+                airFlap (33),
+                acoustic (34),
+                detACfault (35),
+                detACfirstAlarm (36),
+                detACmainAlarm (37),
+                rpm11LCP (40),
+                rpm12LCP (41),
+                rpm21LCP (42),
+                rpm22LCP (43),
+                rpm31LCP (44),
+                rpm32LCP (45),
+                rpm41LCP (46),
+                rpm42LCP (47),
+                airTemp11LCP (48),
+                airTemp12LCP (49),
+                airTemp21LCP (50),
+                airTemp22LCP (51),
+                airTemp31LCP (52),
+                airTemp32LCP (53),
+                airTemp41LCP (54),
+                airTemp42LCP (55),
+		temp1LCP (56),
+		temp2LCP (57),
+		waterInTemp (58),
+		waterOutTemp (59),
+		waterFlow (60),
+		fanSpeed (61),
+		valve (62),
+		statusLCP (63),
+		waterDelta (64),
+		valveActual (65),
+		contrTemp2 (66),
+		condensateDuration (67), 
+		condensateCycles (68),
+		totalKWhPSM (72),
+		totalKWPSM (73),
+		frequencyPSM (74),
+		voltagePSM (75),
+		voltStatusPSM (76),
+		amperePSM (77),
+		ampStatusPSM (78),
+		kWPSM (79),
+		kWhPSM (80),
+		kWhTempPSM (81),
+		temperatureWL (100),
+		temperature1WL (101),
+		humidityWL (102),
+		accessWL (103),
+		userNOWL (104),
+		userNCWL (105),
+		analogWL (106)
+		}
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of sensor which is connected to sensor unit 4 to sensor[unit4SensorIndex]
+              1:        no sensor connected
+              2:        sensor failure
+              3:        value overflow
+              4:        sensor type 1, access sensor
+              5:        sensor type 2, vibration sensor
+              6:        sensor type 3, motion sensor
+              7:        sensor type 4, smoke sensor
+              8:        sensor type 5, air flow sensor
+              9:        sensor type 6, reserved
+              10:       sensor type 7, temperature sensor
+              11:       sensor type 8, 4..20mA sensor
+              12:       sensor type 9, humidity sensor  
+              13:       user sensor with normally opened contact
+              14:       user sensor with normally closed contact
+              15:       door locked sensor from locking device
+              16:       remote unlock sensor (e.g. external keypad)
+              17:       voltage sensor, indicates status of main voltage
+              18:	voltage value
+              19:	fan status
+              20:       cardreader or keypad, connected to I2C port              
+              21:	duty cycle of fan, FCS-Unit
+              22:	status of fan, FCS-Unit
+              23:	leakage sensor
+              24:	warning, RittalTopTherm(RTT)-Unit
+              25:	alarm, RittalTopTherm-Unit
+              26:	temperature difference filter monitor, RTT-Unit
+              27:	heatflow RCT-Unit
+              28:	alarm RCT-Unit
+              29:	warning RCT-Unit
+              30:	actual current*10, PSM-Unit
+              31:	status PSM-Unit
+              32:	position PSM-Unit, normal/reversed = circuit 1/2
+              33:	air Flap
+              34:	acoustic sensor
+              35:	DET-AC fault (extinguisher)
+              36:	DET-AC first alarm (extinguisher)
+              37:	DET-AC main alarm (extinguisher)
+              40-47:	RPM Fan 1.1 - Fan 4.2, LCP
+              48-55:	Air temperature 1.1 - 4.2, LCP
+              56,57:	actual temperature 1,2, LCP
+              58:	water inlet temperature, LCP
+              59:	water outlet temperature, LCP
+              60:	water flow
+              61:	fan speed (desired value)
+              62:	status valve, LCP
+              63:	status LCP
+              64:	temperature difference water temperatures
+              65:	control temperature 1, LCP
+              66:	control temperature 2, LCP
+              67:	condensate pump, duration, LCP
+              68:	condensate pump, cycles, LCP
+              72:	total energy*10 (kWh), PSM
+              73:	total power*10 (kW), PSM
+              74:	frequency*10 (Hz), PSM
+              75:	voltage*10 (V), PSM
+              76:	voltage status, PSM
+              77:	current*10 (A), PSM
+              78:	current status, PSM
+              79:	power*10 (kW) per phase, PSM
+              80:	energy*10 (kWh) per phase, PSM
+              81:	temporary energy*10 (kWh) per phase, PSM
+	     100:	temperature sensor, wireless
+	     101:	temperature sensor (combi), wireless
+	     102:	humidity sensor, wireless
+	     103:	access sensor, wireless
+	     104:	user sensor with normally opened contact, wireless
+	     105:	user sensor with normally closed contact, wireless
+	     106:	analog sensor 4..20mA, wireless"
+             ::= { cmcTcUnit4SensorEntry 2 }
+
+        
+        unit4SensorText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each sensor (entry in the table)"
+             ::= { cmcTcUnit4SensorEntry 3 }
+              
+        unit4SensorStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             warning(7),
+             tooLow(8),
+             tooHigh(9)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the sensor"
+             ::= { cmcTcUnit4SensorEntry 4 }
+
+        unit4SensorValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Value of sensor"
+             ::= { cmcTcUnit4SensorEntry 5 }
+
+        unit4SensorSetHigh OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for high setpoint of sensor"
+             ::= { cmcTcUnit4SensorEntry 6 }
+
+        unit4SensorSetLow OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for low setpoint of sensor"
+             ::= { cmcTcUnit4SensorEntry 7 }
+
+        unit4SensorSetWarn OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for warning setpoint of sensor,
+              also used as fan threshold"
+             ::= { cmcTcUnit4SensorEntry 8 }
+
+-- table END            
+                
+-- Outputs              
+        cmcTcUnit4NumberOfOutputs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of outputs available on sensor unit 4"
+              ::= { cmcTcStatusUnit4Outputs  1 }
+
+-- table with entry for each output available on this unit              
+                
+        cmcTcUnit4OutputTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit4OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of output table"
+              ::= { cmcTcStatusUnit4Outputs 2 }
+
+        cmcTcUnit4OutputEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit4OutputEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of output table"
+              INDEX   { unit4OutputIndex }
+              ::= { cmcTcUnit4OutputTable 1 }
+
+              CmcTcUnit4OutputEntry ::=
+              SEQUENCE {
+              unit4OutputIndex
+                INTEGER,
+              unit4OutputType
+                INTEGER,
+              unit4OutputText
+                DisplayString,                
+              unit4OutputStatus
+                INTEGER,
+              unit4OutputValue
+                INTEGER,
+              unit4OutputSet
+                INTEGER,
+              unit4OutputConfig
+                INTEGER,
+              unit4OutputDelay
+                INTEGER,
+              unit4OutputTimeoutAction
+                INTEGER
+              }
+
+        unit4OutputIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of output entries. Its value ranges
+              between 1 and the value of cmcTcUnit4NumberOfOutputs." 
+             ::= { cmcTcUnit4OutputEntry 1 }
+
+        unit4OutputType OBJECT-TYPE
+             SYNTAX INTEGER {
+                notAvail (1),
+                failure (2),
+                overflow (3),
+                doorLock (4),
+                univLock1 (5),
+                univLock2 (6),
+                fan (7),
+                fanSpeedContr (8),
+                universalOut (9),
+                roomLock(10),
+                powerOut(11),
+                doorLockMaster(12),
+                doorLockFRi (13),
+                setpoint (14),
+                setpointTimax (15),
+                hysteresisRCT (16),
+                commandRCT (17),
+                relayPSM (18),
+                setHighPSM (19),
+                setLowPSM (20),
+                setpointRTT (21),
+                setTimaxRTT (22),
+                powerOut1(23),
+                controlModeLCP (30),
+                minFanSpeedLCP (31),
+                minDeltaTLCP (32),
+                maxDeltaTLCP (33),
+                kPLCP (34),
+                kILCP (35),
+                kDLCP (36),
+                flowRateLCP(37),
+                cwValueLCP (38),
+		deltaTLCP (39),
+		ctrModLCP (40),
+                voltHighPSM (42),
+                voltLowPSM (43),
+                ampHighPSM (44),
+                ampLowPSM (45),
+                commandPSM (46)
+                }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Type of output which is connected to sensor unit 4 to output[unit4OutputIndex]
+              1:        no output connected
+              2:        output failure
+              3:        value overflow
+              4:        output type 1, door locking TS8,Ergoform
+              5:        output type 2, universal lock 1, lock with power
+              6:        output type 3, universal lock 2, unlock with power
+              7:        output type 4, fan relay
+              8:        output type 5, fan controlled
+              9:        output type 6, universal relay output
+              10:       output type 7, room door lock 
+              11:       output type 8, power output
+              12:       output type 9, door lock with Master key 
+              13:       output type 10, door lock FR(i)
+              14:	setpoint (FCS, RTT)
+              15:	setpoint temperature monitoring (RTT)
+              16:	hysteresis of setpoint (RCT)
+              17:	command for remote control of RCT
+              18:	relay PSM, 1=On, 0=Off
+              19:	high setpoint current monitoring PSM
+              20:	low setpoint current monitoring PSM
+              21:	setpoint temperature RTT
+              22:	setpoint temperature monitoring RTT
+              23:	power output 20A
+              30:	control mode LCP
+              31:	min fan speed (fan control) LCP
+              32:	min delta T (fan control) LCP
+              33:	max delta T (fan control) LCP
+              34:	PID controller, KP, LCP
+              35:	PID controller, KI, LCP
+              36	PID controller, KD, LCP
+              37	flowrate flowmeter, LCP
+              38:	cw value of water (default: 4187) LCP
+              39:	deltaT, LCP
+              40:	control mode, LCP
+              42:	setpoint high voltage PSM
+              43:	setpoint low voltage PSM
+              44:	setpoint high current PSM
+              45:	setpoint low current PSM
+              46:	command PSM" 
+             ::= { cmcTcUnit4OutputEntry 2 }
+
+        
+        unit4OutputText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each output (entry in the table)"
+             ::= { cmcTcUnit4OutputEntry 3 }
+              
+        unit4OutputStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             off(5),
+             on(6),
+             setOff(7),
+             setOn(8)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the output"
+             ::= { cmcTcUnit4OutputEntry 4 }
+
+        unit4OutputValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for output"
+             ::= { cmcTcUnit4OutputEntry 5 }
+
+        unit4OutputSet OBJECT-TYPE
+             SYNTAX INTEGER {
+             off (1),
+             on (2),
+             lock (3),
+             unlock (4),
+             unlockDelay (5)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Command for output"
+             ::= { cmcTcUnit4OutputEntry 6 }
+
+        unit4OutputConfig OBJECT-TYPE
+             SYNTAX INTEGER {
+             disRemote (1),
+             enRemote (2)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Configuration for output
+             1: 	disable remote control (e.g. keypad)
+             2: 	enable remote control "
+             ::= { cmcTcUnit4OutputEntry 7 }
+
+        unit4OutputDelay OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Unsigned Value for delay, 
+             after this time the output will fall into the previous state"
+             ::= { cmcTcUnit4OutputEntry 8 }
+
+        unit4OutputTimeoutAction OBJECT-TYPE
+             SYNTAX INTEGER {
+                stay (1),
+                off (2),
+                on (3)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "State for output if timeout (RS422) occurs"
+             ::= { cmcTcUnit4OutputEntry 9 }
+
+
+-- Msgs
+              
+        cmcTcUnit4NumberOfMsgs OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of alarms that can be created with sensor unit 4"
+              ::= { cmcTcStatusUnit4Msg  1 }
+
+-- table with entry for each alarm available on this unit               
+                
+        cmcTcUnit4MsgTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcUnit4MsgEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of message table"
+              ::= { cmcTcStatusUnit4Msg 2 }
+
+        cmcTcUnit4MsgEntry            OBJECT-TYPE
+              SYNTAX  CmcTcUnit4MsgEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of message table"
+              INDEX   { unit4MsgIndex }
+              ::= { cmcTcUnit4MsgTable 1 }
+
+              CmcTcUnit4MsgEntry ::=
+              SEQUENCE {
+              unit4MsgIndex
+                INTEGER,
+              unit4MsgText
+                DisplayString,                
+              unit4MsgStatus
+                INTEGER, 
+              unit4MsgRelay
+                INTEGER,
+              unit4MsgBeeper
+                INTEGER,
+              unit4MsgTrap1
+                INTEGER,
+              unit4MsgTrap2
+                INTEGER,
+              unit4MsgTrap3
+                INTEGER,
+              unit4MsgTrap4
+                INTEGER,                 
+              unit4MsgQuit
+                INTEGER
+              }
+
+        unit4MsgIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of alarm entries. Its value ranges
+              between 1 and the value of cmcTcUnit4NumberOfMsgs." 
+             ::= { cmcTcUnit4MsgEntry 1 }
+
+        unit4MsgText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each message (entry in the table)"
+             ::= { cmcTcUnit4MsgEntry 2 }
+
+        unit4MsgStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             configChanged(2),
+             error(3),
+             ok(4),
+             alarm(5),
+             warning(6),
+             tooLow(7),
+             tooHigh(8),
+             setOff(9),
+             setOn(10),
+             open(11),
+             closed(12),
+             locked(13),
+             unlRemote(14),
+             unlReaderKeypad(15),
+             unlSNMP(16),
+             unlWEB(17),
+             unlTimer(18),
+             noAccess(19),
+             circuit1 (20),
+             circuit2 (21),             
+             lowBatt (22)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual message status
+             1: not available
+             2: configuration has changed (sensor new, changed, lost)
+             3: error
+             4: OK
+             5: alarm, e.g. smoke, vibration...
+             6: warning of analog value, value reached warning threshold
+             7: analog value too low, value reached low threshold
+             8: analog value too high, value reached high threshold
+             9: output is set to OFF
+             10: output is set to ON
+             11: door is open
+             12: door is closed
+             13: door is locked
+             14: door is unlocked by remote input, e.g. external cardreader
+             15: door is unlocked by reader or keypad connected to I2C
+             16: door is unlocked by SNMP set command (unit1OutputSet)
+             17: door is unlocked by WEB
+             18: door is unlocked by timer
+             19: no access, wrong keycode or cardnumber
+             20: orientation of PSM-Unit is circuit 1
+             21: orientation of PSM-Unit is circuit 2
+             22: battery low, wireless sensor"
+             ::= { cmcTcUnit4MsgEntry 3 }
+
+        unit4MsgRelay OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm relay for this alarm
+              1:        no switching of alarm relay             
+              2:        switching of alarm relay" 
+             ::= { cmcTcUnit4MsgEntry 4 }
+
+        unit4MsgBeeper OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm beeper for this alarm
+              1:        no audible alarm
+              2:        audible alarm" 
+             ::= { cmcTcUnit4MsgEntry 5 }
+
+        unit4MsgTrap1 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 1 activated"
+             ::= { cmcTcUnit4MsgEntry 6 }
+
+        unit4MsgTrap2 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 2 activated"
+             ::= { cmcTcUnit4MsgEntry 7 }
+ 
+        unit4MsgTrap3 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 3 activated"
+             ::= { cmcTcUnit4MsgEntry 8 }
+
+        unit4MsgTrap4 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 4 and Event Logging activated"
+             ::= { cmcTcUnit4MsgEntry 9 }
+
+        unit4MsgQuit OBJECT-TYPE
+             SYNTAX INTEGER {
+                auto (1),
+                manual (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Reset of this alarm
+             1:		auto
+             2:		manual, alarm needs confirmation, e. g. with 'C' key"
+             ::= { cmcTcUnit4MsgEntry 10 }
+-- table END            
+
+
+--Status extension unit
+        cmcTcValuesRelay OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm relay for alarm ext. unit(s)
+              1:        no switching of alarm relay             
+              2:        switching of alarm relay" 
+             ::= { cmcTcStatusExtUnit 1 }
+
+        cmcTcValuesBeeper OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Setup of Alarm beeper for alarm ext. unit(s)
+              1:        no audible alarm
+              2:        audible alarm" 
+             ::= { cmcTcStatusExtUnit 2 }
+
+        cmcTcValuesTrap1 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 1 activated"
+             ::= { cmcTcStatusExtUnit 3 }
+
+        cmcTcValuesTrap2 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 2 activated"
+             ::= { cmcTcStatusExtUnit 4 }
+ 
+        cmcTcValuesTrap3 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 3 activated"
+             ::= { cmcTcStatusExtUnit 5 }
+
+        cmcTcValuesTrap4 OBJECT-TYPE
+             SYNTAX INTEGER {
+                disable (1),
+                enable (2)
+                }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Trap receiver 4 and Event Logging activated"
+             ::= { cmcTcStatusExtUnit 6 }
+ 
+        cmcTcNumberOfValues OBJECT-TYPE
+              SYNTAX INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of values availabel on extension units connected to the CMC"
+              ::= { cmcTcStatusExtUnit  7 }
+
+-- table with entry for each value available on extension units              
+        cmcTcValuesTable     OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcValuesEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of values-table"
+              ::= { cmcTcStatusExtUnit 8 }
+
+        cmcTcValuesEntry     OBJECT-TYPE
+              SYNTAX  CmcTcValuesEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of values-table"
+              INDEX   { valuesIndex }
+              ::= { cmcTcValuesTable 1 }
+
+              CmcTcValuesEntry ::=
+              SEQUENCE {
+              valuesIndex
+                INTEGER,
+              valuesText
+                DisplayString,                
+              valuesStatus
+                INTEGER,
+              valuesValue
+                INTEGER,
+              valuesSetHigh
+                INTEGER,
+              valuesSetLow
+                INTEGER
+              }
+
+        valuesIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of value entries. Its value ranges
+              between 1 and the value of cmcTcNumberOfValues." 
+             ::= { cmcTcValuesEntry 1 }
+
+        
+        valuesText  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..20))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Descriptional text for each value (entry in the table)
+             of the extension card"
+             ::= { cmcTcValuesEntry 2 }
+              
+        valuesStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             notAvail(1),
+             lost(2),
+             changed(3),
+             ok(4),
+             tooLow(5),
+             tooHigh(6),
+             error(7)
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the value of the extension card"
+             ::= { cmcTcValuesEntry 3 }
+
+        valuesValue OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Value of sensor"
+             ::= { cmcTcValuesEntry 4 }
+
+        valuesSetHigh OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for high setpoint of sensor"
+             ::= { cmcTcValuesEntry 5 }
+
+        valuesSetLow OBJECT-TYPE
+             SYNTAX INTEGER 
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Value for low setpoint of sensor"
+             ::= { cmcTcValuesEntry 6 }
+-- table END 
+
+
+--setupGeneral-group
+          cmcTcSetTempUnit          OBJECT-TYPE
+              SYNTAX  INTEGER {
+              celsius(1),
+              fahrenheit(2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+              "Unit of all temperature values and setpoints, Celsius or Fahrenheit"
+              ::= { cmcTcSetupGeneral 1 }
+
+          cmcTcSetBeeper             OBJECT-TYPE
+              SYNTAX  INTEGER {
+              off(1),
+              on(2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+              "Audible alarm in CMC-TC unit:
+                (2): beeper is on
+                (1): beeper is off (general)"
+              ::= { cmcTcSetupGeneral 2 }
+
+
+          cmcTcQuitRelay         OBJECT-TYPE
+              SYNTAX  INTEGER {
+              disabled(1),
+              enabled(2)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+              "Enable or disable acknowledging currently active alarm relay 
+               (with 'C' on CMC-TC)."
+              ::= { cmcTcSetupGeneral 3 }
+
+
+          cmcTcLogicRelay         OBJECT-TYPE
+              SYNTAX  INTEGER {
+              closeAtAlarm(1),
+              openAtAlarm(2),
+              off(3)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+              "Logic of alarm relay: 
+                (1) Relay will pick up in case of an alarm
+                (2) Relay will release in case of an alarm
+                (3) Relay off (general)"
+              ::= { cmcTcSetupGeneral 4 }
+
+          cmcTcWebAccess         OBJECT-TYPE
+              SYNTAX  INTEGER {
+              viewOnly(1),
+              fullAccess(2),
+              off(3)
+              }
+              ACCESS  read-write
+              STATUS  mandatory
+              DESCRIPTION
+              "Web access via HTTP: 
+                (1) view only
+                (2) full Access, read and set
+                (3) Web disabled (general)"
+              ::= { cmcTcSetupGeneral 5 }
+ 
+  
+-- SetupClock
+          cmcTcSetupDate     OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..10))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "actual Date in format DD.MM.YYYY"
+             ::= { cmcTcSetupGeneral 6 }
+
+          cmcTcSetupTime     OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..8))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "actual Time in format HH:MM:SS, HH (0-23), MM (0-59), SS (0-59)"
+             ::= { cmcTcSetupGeneral 7 }
+ 
+-- table for timer function
+ 
+          cmcTcTimerNumber            OBJECT-TYPE
+              SYNTAX  INTEGER 
+              ACCESS  read-only
+              STATUS  mandatory
+              DESCRIPTION
+              "Number of value-table entries=number of outlets available on this unit"
+              ::= { cmcTcTimerTable1 1 }
+
+          cmcTcTimerTable          OBJECT-TYPE
+              SYNTAX  SEQUENCE OF CmcTcTimerEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Headline of status-table"
+              ::= { cmcTcTimerTable1 2 }
+
+          cmcTcTimerEntry            OBJECT-TYPE
+              SYNTAX  CmcTcTimerEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+              "Entries of timer-table"
+              INDEX   { cmcTcTimerIndex }
+              ::= { cmcTcTimerTable 1 }
+
+              CmcTcTimerEntry ::=
+              SEQUENCE {
+              cmcTcTimerIndex
+                INTEGER,
+              cmcTcTimerStatus
+                INTEGER,
+              cmcTcTimerDayOfWeek
+              	INTEGER,  
+              cmcTcTimeOn 
+                DisplayString,                              
+              cmcTcTimeOff 
+                DisplayString,                              
+              cmcTcTimeControl
+                INTEGER,
+              cmcTcTimerFunction
+                INTEGER
+              }
+
+          cmcTcTimerIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the list of timer entries. Its value ranges
+              between 1 and the value of cmcTcTimerNumber." 
+             ::= { cmcTcTimerEntry 1 }
+
+          cmcTcTimerStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+             switchedOff(1),
+             switchedOn(2),
+             noTime(3) 
+             }
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Actual status of the timer"
+             ::= { cmcTcTimerEntry 2 }
+
+          cmcTcTimerDayOfWeek OBJECT-TYPE
+             SYNTAX INTEGER {
+             sun(1),
+             mon(2),
+             tue(3) ,
+             wed(4),
+             thu(5),
+             fri(6),
+             sat(7),
+             sat-sun(8),
+             mon-fri(9),
+             mon-sun(10)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Selection of day of week for timer to switch"
+             ::= { cmcTcTimerEntry 3 }
+             
+          cmcTcTimeOn  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..5))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Time to switch on current function, 
+             Format: HH:MM"
+             ::= { cmcTcTimerEntry 4 }
+
+          cmcTcTimeOff  OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..5))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Time to switch off current function,
+             Format: HH:MM"
+             ::= { cmcTcTimerEntry 5 }
+
+          cmcTcTimeControl OBJECT-TYPE
+             SYNTAX INTEGER  {
+             disabled(1),
+             enabled(2)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Control via RTC"
+             ::= { cmcTcTimerEntry 6 }
+
+          cmcTcTimerFunction OBJECT-TYPE
+             SYNTAX INTEGER {
+             disKeypad1-1 (1),
+             disKeypad2-1 (2),
+             disKeypad1-2 (3),
+             disKeypad2-2 (4),
+             disKeypad1-3 (5),
+             disKeypad2-3 (6),
+             disKeypad1-4 (7),
+             disKeypad2-4 (8),
+             unlDoor1-1 (9),
+             unlDoor2-1 (10),
+             unlDoor1-2 (11),
+             unlDoor2-2 (12),
+             unlDoor1-3 (13),
+             unlDoor2-3 (14),
+             unlDoor1-4 (15),
+             unlDoor2-5 (16),
+             disTrapRec1 (17),
+             disTrapRec2 (18),
+             disTrapRec3 (19),
+             disTrapRec4 (20),
+             disSMS (21),
+             schedule1 (22),
+             schedule2 (23),
+             schedule3 (24),
+             schedule4 (25),
+             disSMS1 (26),
+             disSMS2 (27),
+             disSMS3 (28),
+             disSMS4 (29)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Function which is controlled via timer
+             1:	unlock via keypad 1 on unit 1 or remote input lock 1 is disabled
+             2: unlock via keypad 2 on unit 1 or remote input lock 2 is disabled
+             3	unlock via keypad 1 on unit 2 or remote input lock 1 is disabled
+             4: unlock via keypad 2 on unit 2 or remote input lock 2 is disabled
+             5:	unlock via keypad 1 on unit 3 or remote input lock 1 is disabled
+             6: unlock via keypad 2 on unit 3 or remote input lock 2 is disabled
+             7:	unlock via keypad 1 on unit 4 or remote input lock 1 is disabled
+             8: unlock via keypad 2 on unit 4 or remote input lock 2 is disabled
+             9: Lock of door 1 on unit 1 will be unlocked
+             10: Lock of door 2 on unit 1 will be unlocked
+             11: Lock of door 1 on unit 2 will be unlocked
+             12: Lock of door 2 on unit 2 will be unlocked
+             13: Lock of door 1 on unit 3 will be unlocked
+             14: Lock of door 2 on unit 3 will be unlocked
+             15: Lock of door 1 on unit 4 will be unlocked
+             16: Lock of door 2 on unit 4 will be unlocked
+             17-20: sending Traps to this Trap receiver will be disabled
+             21: sending SMS will be disabled generally
+             22-25: Scheduled alarm off
+             26-29: sending SMS to phone number 1..4 will be disabled"
+             ::= { cmcTcTimerEntry 7 }
+
+ 
+
+--cmcTcTrapTable-group
+
+          cmcTcTraptableNumber            OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+              "Number of trapTable entries. The number of trap-receiver"
+              ::= { cmcTcTraps 1 }
+
+          cmcTcTrapTableTable          OBJECT-TYPE    
+            SYNTAX  SEQUENCE OF CmcTcTrapTableEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+              "A list of trap-receiver entries"
+              ::= { cmcTcTraps 2 }
+
+          cmcTcTrapTableEntry            OBJECT-TYPE
+            SYNTAX  CmcTcTrapTableEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+              "Entries of trapTable"
+            INDEX   { trapIndex }
+              ::= { cmcTcTrapTableTable 1 }      
+              
+          CmcTcTrapTableEntry ::=
+              SEQUENCE {
+              trapIndex
+                INTEGER,
+              trapStatus
+                INTEGER,
+              trapIPaddress
+                DisplayString
+              }
+
+          trapIndex OBJECT-TYPE
+             SYNTAX INTEGER (1..65535)
+             ACCESS read-only
+             STATUS mandatory
+             DESCRIPTION
+             "Index for the trap-receiver-table. Its value ranges between
+              1 and the value of traptableNumber "
+             ::= { cmcTcTrapTableEntry 1 }
+
+          trapStatus OBJECT-TYPE
+             SYNTAX INTEGER  {
+             disabled(1),
+             enabled(2)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Enable or disable trap receiver"
+             ::= { cmcTcTrapTableEntry 2 }
+
+          trapIPaddress OBJECT-TYPE
+             SYNTAX DisplayString (SIZE (0..15))
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "IP-address of trap-receiver"
+             ::= { cmcTcTrapTableEntry 3 }
+
+
+--cmcTcControl-group (Added in Version 1.1)
+          cmcTcQuitUnit OBJECT-TYPE
+             SYNTAX INTEGER  {
+             noQuit(1),
+             quit(2)
+             }
+             ACCESS read-write
+             STATUS mandatory
+             DESCRIPTION
+             "Command to quit (acknowledge) alarms of CMC-TC unit.
+             Setting to 'quit' (2) will have same result as pressing 'C' on Units.
+             Variable is automatically set back to 'noQuit' (1)."
+             ::= { cmcTcControl 1 }
+
+
+--Traps
+          alarmSensorUnit1 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          unit1MsgIndex, unit1MsgText, unit1MsgStatus, unit1SensorValue }
+              DESCRIPTION
+              "Alarm of sensor unit 1"
+--
+--#TYPE         "Sensor unit alarm"
+--#SUMMARY      "Location: %s, Alarm[%s]: %s, Status: %s, from: %s, contact %s"
+--#ARGUMENTS    {3,4,6,5,2,1}
+--#SEVERITY     MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--                      
+              ::= 1
+
+          alarmSensorUnit2 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          unit2MsgIndex, unit2MsgText, unit2MsgStatus, unit2SensorValue }
+              DESCRIPTION 
+              "Alarm of sensor unit 2"
+--
+--#TYPE         "Sensor unit alarm"
+--#SUMMARY      "Location: %s, Message: %s from: %s, contact %s"
+--#ARGUMENTS    {3,4,2,1}
+--#SEVERITY      MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--
+              ::= 2
+
+      
+          alarmSensorUnit3 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          unit3MsgIndex, unit3MsgText, unit3MsgStatus, unit3SensorValue }
+              DESCRIPTION 
+              "Alarm of sensor unit 3"
+--
+--#TYPE         "Sensor unit alarm"
+--#SUMMARY      "Location: %s, Message: %s from: %s, contact %s"
+--#ARGUMENTS    {3,4,2,1}
+--#SEVERITY      MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--
+              ::= 3
+
+          alarmSensorUnit4 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          unit4MsgIndex, unit4MsgText, unit4MsgStatus, unit4SensorValue }
+              DESCRIPTION
+              "Alarm of sensor unit 4"
+--
+--#TYPE         "Sensor unit alarm"
+--#SUMMARY      "Location: %s, Message: %s from: %s, contact %s"
+--#ARGUMENTS    {3,4,2,1}
+--#SEVERITY      MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--
+              ::= 4
+
+
+          alarmUnit1 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          cmcTcUnit1Text, cmcTcUnit1Status }
+              DESCRIPTION
+              "Alarm of unit 1"
+--
+--#TYPE         "Unit alarm"
+--#SUMMARY      "Location: %s, Status: %s, from: %s, contact %s"
+--#ARGUMENTS    {3,4,2,1}
+--#SEVERITY     MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--                      
+              ::= 5
+
+          alarmUnit2 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          cmcTcUnit2Text, cmcTcUnit2Status }
+              DESCRIPTION 
+               "Alarm of unit 2"
+--
+--#TYPE         "Unit alarm"
+--#SUMMARY      "Location: %s, Status: %s, from: %s, contact %s"
+--#ARGUMENTS    {3,4,2,1}
+--#SEVERITY     MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--                      
+              ::= 6
+
+      
+          alarmUnit3 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          cmcTcUnit3Text, cmcTcUnit3Status }
+              DESCRIPTION 
+               "Alarm of unit 3"
+--
+--#TYPE         "Unit alarm"
+--#SUMMARY      "Location: %s, Status: %s, from: %s, contact %s"
+--#ARGUMENTS    {3,4,2,1}
+--#SEVERITY     MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--                      
+              ::= 7
+
+
+          alarmUnit4 TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          cmcTcUnit4Text, cmcTcUnit4Status }
+              DESCRIPTION 
+               "Alarm of unit 4"
+--
+--#TYPE         "Unit alarm"
+--#SUMMARY      "Location: %s, Status: %s, from: %s, contact %s"
+--#ARGUMENTS    {3,4,2,1}
+--#SEVERITY     MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--                      
+              ::= 8
+
+
+          alarmValues TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysContact, sysName, sysLocation, 
+                          valuesIndex, valuesText, valuesStatus }
+              DESCRIPTION
+              "Alarm of values measured by external card"
+--
+--#TYPE         "Values alarm"
+--#SUMMARY      "Location: %s, Message: %s, Status: %s from: %s, contact %s"
+--#ARGUMENTS    {3,5,6,2,1}
+--#SEVERITY      MAJOR
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--
+              ::= 9
+
+           configChanged TRAP-TYPE
+              ENTERPRISE cmcTc
+              VARIABLES { sysDescr, sysContact, sysName, sysLocation } 
+              DESCRIPTION
+              "The configuration of the cmc has changed, 
+               this trap is send if new setup is saved.
+               Configuration can be changed by Terminal, Telnet, Web or SNMP
+               *** NOT IMPLEMENTED *** "
+--
+--#TYPE         "Configuration is changed"
+--#SUMMARY      "Location: %s, Configuration of %s, unit %s has changed, contact %s"
+--#ARGUMENTS    {3,2,0,1}
+--#SEVERITY     INFORMATIONAL
+--#TIMEINDEX    6
+--#STATE        OPERATIONAL
+--
+              ::= 10
+
+
+            END
+

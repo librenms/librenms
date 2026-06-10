@@ -1,0 +1,504 @@
+-- ****************************************************************************
+--  COLUBRIS-DEVICE-EVENT-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Device Event MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-DEVICE-EVENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32
+        FROM    SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisSSIDOrNone
+        FROM    COLUBRIS-TC
+    coDevDisIndex
+        FROM    COLUBRIS-DEVICE-MIB
+    ColubrisNotificationEnable
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisDeviceEventMIB MODULE-IDENTITY
+    LAST-UPDATED    "200607050000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Device Event MIB."
+
+    ::= { colubrisMgmtV2 26 }
+
+
+-- colubrisDeviceEventMIB definition
+colubrisDeviceEventMIBObjects OBJECT IDENTIFIER ::= { colubrisDeviceEventMIB 1 }
+
+-- colubris Device Event groups
+coDeviceEventConfigGroup OBJECT IDENTIFIER ::= { colubrisDeviceEventMIBObjects 1 }
+coDeviceEventInfoGroup   OBJECT IDENTIFIER ::= { colubrisDeviceEventMIBObjects 2 }
+
+-- The Device Event Config Group
+coDevEvSuccessfulAssociationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventSuccessfulAssociation notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 1 }
+
+coDevEvAssociationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventAssociationFailure notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 2 }
+
+coDevEvSuccessfulReAssociationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventSuccessfulReAssociation
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 3 }
+
+coDevEvReAssociationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventReAssociationFailure notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 4 }
+
+coDevEvSuccessfulAuthenticationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventSuccessfulAuthentication
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 5 }
+
+coDevEvAuthenticationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventAuthenticationFailure
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 6 }
+
+coDevEvSuccessfulDisAssociationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventSuccessfulDisAssociation notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 7 }
+
+coDevEvDisAssociationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventDisAssociationFailure notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 8 }
+
+coDevEvSuccessfulDeAuthenticationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventSuccessfulDeAuthentication
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 9 }
+
+coDevEvDeAuthenticationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if coDeviceEventDeAuthenticationFailure
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { coDeviceEventConfigGroup 10 }
+
+-- The Device Event Info Group
+coDeviceEventTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The list of devices available in the Event system."
+    ::= { coDeviceEventInfoGroup 1 }
+
+coDeviceEventEntry OBJECT-TYPE
+    SYNTAX      CoDeviceEventEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceEventTable.
+                 coDevDisIndex - Uniquely identify a device in the
+                                 MultiService Access Controller.
+                 coDevEvIndex - Uniquely identify a device in the
+                                Event system."
+    INDEX       { coDevDisIndex, coDevEvIndex }
+    ::= { coDeviceEventTable 1 }
+
+CoDeviceEventEntry ::= SEQUENCE
+{
+    coDevEvIndex       Integer32,
+    coDevEvMacAddress  MacAddress
+}
+
+coDevEvIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index associated to a device in the
+                 Event system."
+    ::= { coDeviceEventEntry 1 }
+
+coDevEvMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the device's generating the events."
+    ::= { coDeviceEventEntry 2 }
+
+coDeviceEventDetailTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceEventDetailEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The Event for each devices."
+    ::= { coDeviceEventInfoGroup 2 }
+
+coDeviceEventDetailEntry OBJECT-TYPE
+    SYNTAX      CoDeviceEventDetailEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceEventDetailTable.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Access Controller.
+                 coDevEvIndex - Uniquely identifies a device on the
+                                Event system.
+                 coDevEvLogIndex - Uniquely identifies a log for a
+                                   specific device in the Event
+                                   system. "
+    INDEX       { coDevDisIndex, coDevEvIndex, coDevEvLogIndex }
+    ::= { coDeviceEventDetailTable 1 }
+
+CoDeviceEventDetailEntry ::= SEQUENCE
+{
+    coDevEvLogIndex        Integer32,
+    coDevEvDetMacAddress   MacAddress,
+    coDevEvTime            DisplayString,
+    coDevEvSSID            ColubrisSSIDOrNone,
+    coDevEvRadioIndex      Integer32,
+    coDevEvDuplicateCount  Unsigned32,
+    coDevEvCategory        INTEGER,
+    coDevEvOperation       INTEGER,
+    coDevEvStatus          DisplayString,
+    coDevEvOptionalData    DisplayString
+}
+
+coDevEvLogIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Uniquely identifies a log for a specific device in the
+                 Event system."
+    ::= { coDeviceEventDetailEntry 1 }
+
+coDevEvDetMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the device generating the events."
+    ::= { coDeviceEventDetailEntry 2 }
+
+coDevEvTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Date and time of the event."
+    ::= { coDeviceEventDetailEntry 3 }
+
+coDevEvSSID OBJECT-TYPE
+    SYNTAX      ColubrisSSIDOrNone
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The SSID used by the wireless device."
+    ::= { coDeviceEventDetailEntry 4 }
+
+coDevEvRadioIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio index where the wireless device is connected."
+    ::= { coDeviceEventDetailEntry 5 }
+
+coDevEvDuplicateCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of times this event is repeated."
+    ::= { coDeviceEventDetailEntry 6 }
+
+coDevEvCategory OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    wireless(1),
+                    ieee802dot1x(2),
+                    wpa(3),
+                    macAuthentication(4),
+                    dhcpServer(5),
+                    pptpL2tp(6),
+                    ipSec(7),
+                    unknown(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The module that sent the message."
+    ::= { coDeviceEventDetailEntry 7 }
+
+coDevEvOperation OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    association(1),
+                    authentication(2),
+                    authorization(3),
+                    encryption(4),
+                    addressAllocation(5),
+                    vpnAuthentication(6),
+                    vpnAddressAllocation(7),
+                    unknown(8)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The action that has occured."
+    ::= { coDeviceEventDetailEntry 8 }
+
+coDevEvStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The status itself."
+    ::= { coDeviceEventDetailEntry 9 }
+
+coDevEvOptionalData OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Additional data that may be supplied (reason codes,
+                 etc)."
+    ::= { coDeviceEventDetailEntry 10 }
+
+
+-- Device Event notifications
+colubrisDeviceEventMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisDeviceEventMIB 2 }
+colubrisDeviceEventMIBNotifications OBJECT IDENTIFIER ::= { colubrisDeviceEventMIBNotificationPrefix 0 }
+
+
+coDeviceEventSuccessfulAssociation NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station is successfully associated with the AP."
+    ::= { colubrisDeviceEventMIBNotifications 1 }
+
+coDeviceEventAssociationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station has failed to associate with the AP."
+    ::= { colubrisDeviceEventMIBNotifications 2 }
+
+coDeviceEventSuccessfulReAssociation NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station is successfully reassociated with the AP."
+    ::= { colubrisDeviceEventMIBNotifications 3 }
+
+coDeviceEventReAssociationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station has failed to reassociate with the AP."
+    ::= { colubrisDeviceEventMIBNotifications 4 }
+
+coDeviceEventSuccessfulAuthentication NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station is successfully authenticated."
+    ::= { colubrisDeviceEventMIBNotifications 5 }
+
+coDeviceEventAuthenticationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station has failed to authenticate."
+    ::= { colubrisDeviceEventMIBNotifications 6 }
+
+coDeviceEventSuccessfulDisAssociation NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station is successfully disassociated from the AP."
+    ::= { colubrisDeviceEventMIBNotifications 7 }
+
+coDeviceEventDisAssociationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station has failed to disassociate from the AP."
+    ::= { colubrisDeviceEventMIBNotifications 8 }
+
+coDeviceEventSuccessfulDeAuthentication NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station is successfully deauthenticated."
+    ::= { colubrisDeviceEventMIBNotifications 9 }
+
+coDeviceEventDeAuthenticationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvSSID,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a client station has failed to deauthenticate."
+    ::= { colubrisDeviceEventMIBNotifications 10 }
+
+
+-- conformance information
+colubrisDeviceEventMIBConformance OBJECT IDENTIFIER ::= { colubrisDeviceEventMIB 3 }
+colubrisDeviceEventMIBCompliances OBJECT IDENTIFIER ::= { colubrisDeviceEventMIBConformance 1 }
+colubrisDeviceEventMIBGroups      OBJECT IDENTIFIER ::= { colubrisDeviceEventMIBConformance 2 }
+
+
+-- compliance statements
+colubrisDeviceEventMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the Event Log MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisDeviceEventConfigMIBGroup,
+                        colubrisDeviceEventInfoMIBGroup,
+                        colubrisDeviceEventNotificationGroup
+                    }
+    ::= { colubrisDeviceEventMIBCompliances 1 }
+
+-- units of conformance
+colubrisDeviceEventConfigMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevEvSuccessfulAssociationNotificationEnabled,
+                    coDevEvAssociationFailureNotificationEnabled,
+                    coDevEvSuccessfulReAssociationNotificationEnabled,
+                    coDevEvReAssociationFailureNotificationEnabled,
+                    coDevEvSuccessfulAuthenticationNotificationEnabled,
+                    coDevEvAuthenticationFailureNotificationEnabled,
+                    coDevEvSuccessfulDisAssociationNotificationEnabled,
+                    coDevEvDisAssociationFailureNotificationEnabled,
+                    coDevEvSuccessfulDeAuthenticationNotificationEnabled,
+                    coDevEvDeAuthenticationFailureNotificationEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for Device Event configuration."
+    ::= { colubrisDeviceEventMIBGroups 1 }
+
+colubrisDeviceEventInfoMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevEvMacAddress,
+                    coDevEvDetMacAddress,
+                    coDevEvTime,
+                    coDevEvSSID,
+                    coDevEvRadioIndex,
+                    coDevEvDuplicateCount,
+                    coDevEvCategory,
+                    coDevEvOperation,
+                    coDevEvStatus,
+                    coDevEvOptionalData
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for Device Event status."
+    ::= { colubrisDeviceEventMIBGroups 2 }
+
+colubrisDeviceEventNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        coDeviceEventSuccessfulAssociation,
+                        coDeviceEventAssociationFailure,
+                        coDeviceEventSuccessfulReAssociation,
+                        coDeviceEventReAssociationFailure,
+                        coDeviceEventSuccessfulAuthentication,
+                        coDeviceEventAuthenticationFailure,
+                        coDeviceEventSuccessfulDisAssociation,
+                        coDeviceEventDisAssociationFailure,
+                        coDeviceEventSuccessfulDeAuthentication,
+                        coDeviceEventDeAuthenticationFailure
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported Device Event
+                 notifications."
+    ::= { colubrisDeviceEventMIBGroups 3 }
+
+END

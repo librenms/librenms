@@ -1,0 +1,106 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "i2pd",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "i2pd",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "OK",
+                    "app_instance": "",
+                    "data": "{\"net_stat_code\":0,\"net_stat_msg\":\"OK\"}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "active_peers",
+                    "value": 6786,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "bw_in_15s",
+                    "value": 1171506,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "bw_in_1s",
+                    "value": 1117439,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "bw_out_15s",
+                    "value": 1222119,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "bw_out_1s",
+                    "value": 1138790,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "known_peers",
+                    "value": 17593,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "net_status",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "total_rx_bytes",
+                    "value": 409639317959,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "total_tx_bytes",
+                    "value": 421342772467,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "tunnels_participating",
+                    "value": 7186,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "tunnels_successrate",
+                    "value": 17,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                },
+                {
+                    "metric": "uptime",
+                    "value": 387357000,
+                    "value_prev": null,
+                    "app_type": "i2pd"
+                }
+            ]
+        }
+    }
+}

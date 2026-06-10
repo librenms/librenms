@@ -1,0 +1,320 @@
+WATCHGUARD-POLICY-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, 
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, TimeTicks               FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        watchguard                         FROM WATCHGUARD-SMI;
+        
+    wgPolicyMIB MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "  WatchGuard Technologies, Inc.
+                  
+                     505 Fifth Avenue South
+                     Suite 500
+                     Seattle, WA 98104
+                     United States
+                     
+                     +1.206.613.6600 " 
+
+          DESCRIPTION
+               "The MIB module describes various policy objects
+               of WatchGuard system."
+
+
+          REVISION      "200701251200Z"
+          DESCRIPTION
+                   "Initial revision."
+          ::= { watchguard 4 }
+
+    wgPolicyToTunnel OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all tunnels
+             information of the policies."
+        ::= {wgPolicyMIB 1}
+
+    wgPolicyStatistics OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION 
+            "This is the base object identifier for all policy related
+            statistical counters."
+        ::= { wgPolicyMIB 2 }
+
+    wgPolicyToTunnelNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of tunnels in the policytotunnel table. "
+        ::= { wgPolicyToTunnel 1 }
+
+    wgPolicyToTunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGPolicyToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the policytotunnel table of all the policies."
+        ::= { wgPolicyToTunnel 2 }
+
+    wgPolicyToTunnelEntry OBJECT-TYPE
+        SYNTAX      WGPolicyToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the tunnels
+            information."
+        INDEX {
+            wgPolicyToTunnelPolicyID,
+            wgPolicyToTunnelTunnelID
+        }
+        ::= { wgPolicyToTunnelTable 1 }
+
+    WGPolicyToTunnelEntry ::= SEQUENCE {
+
+        wgPolicyToTunnelPolicyID    Integer32,
+        wgPolicyToTunnelTunnelID    Integer32
+    }
+    
+    wgPolicyToTunnelPolicyID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The policy identifier of this entity."
+        ::= {wgPolicyToTunnelEntry 1}
+            
+    wgPolicyToTunnelTunnelID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel identifier of this entity."
+        ::= {wgPolicyToTunnelEntry 2}
+        
+-- counter ID 
+-- per policy counter 
+-- 1-24 is reserved 
+
+    wgPolicyTableNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of policies in the policy table. "
+        ::= { wgPolicyStatistics 1 }
+
+    wgPolicyTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the policytotunnel table of the policies."
+        ::= { wgPolicyStatistics 2 }
+
+    wgPolicyEntry OBJECT-TYPE
+        SYNTAX      WGPolicyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the policy
+            information."
+        INDEX{
+            wgPolicyID
+        }
+        ::= { wgPolicyTable 1 }
+
+    WGPolicyEntry ::= SEQUENCE {
+
+        wgPolicyID                 Integer32,
+        wgPolicyName               OCTET STRING (SIZE(32)),
+        wgPolicyBytes              Counter64,
+        wgPolicyPackets            Counter64,
+        wgPolicyIpsecDecryptErr    Counter64,
+        wgPolicyIpsecAuthErr       Counter64,
+        wgPolicyIpsecReplayErr     Counter64,
+        wgPolicyIpsecPadErr        Counter64,
+        wgPolicyIpsecPolicyErr     Counter64,
+        wgPolicyFwDisc             Counter64,
+        wgPolicyOtherDisc          Counter64,
+        wgPolicyActiveStreams      Counter64,
+        wgPolicyIpsecDisc          Counter64,
+        wgPolicyDisc               Counter64,
+        wgPolicyNumTunl            Counter64,
+        wgPolicySingleCntrNum      Counter64,
+        wgPolicyLogging            Unsigned32,
+        wgPolicyCurrActiveConns    Counter64
+    }
+    
+
+    wgPolicyID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The policy identifier of this policy."
+        ::= {wgPolicyEntry 1}
+
+    wgPolicyName OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The policy name of this policy"
+        ::= {wgPolicyEntry 2}
+
+    wgPolicyL3PackageBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total traffic in bytes (counted from L3 head) since setting up this policy."
+        ::= {wgPolicyEntry 3}
+
+    wgPolicyPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total traffic in packets since setting up this policy."
+        ::= {wgPolicyEntry 4}
+
+    wgPolicyIpsecDecryptErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to decryption 
+             errors since setting up this policy."
+        ::= {wgPolicyEntry 5}
+
+    wgPolicyIpsecAuthErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication  
+             errors since setting up this policy."
+        ::= {wgPolicyEntry 6}
+
+    wgPolicyIpsecReplayErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay 
+             errors since setting up this policy."
+        ::= {wgPolicyEntry 7}
+
+    wgPolicyIpsecPadErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to pad value 
+             errors since setting up this policy."
+        ::= {wgPolicyEntry 8}
+
+    wgPolicyIpsecPolicyErr OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to policy 
+             errors since setting up this policy."
+        ::= {wgPolicyEntry 9}
+
+    wgPolicyFwDisc  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded by firewall policies 
+             since setting up this policy."
+        ::= {wgPolicyEntry 10}
+
+    wgPolicyOtherDisc OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to errors 
+             other than firewall errors, ipsec errors since setting up
+             this policy."
+        ::= {wgPolicyEntry 11}
+
+    wgPolicyActiveStreams OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of the active connections since setting 
+             up this policy."
+        ::= {wgPolicyEntry 12}
+
+    wgPolicyIpsecDisc OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded by IPSEC errors 
+             (decryption error, authentication error, replay error) 
+             since setting up this policy."
+        ::= {wgPolicyEntry 13}
+
+    wgPolicyDisc    OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded since setting up 
+             this policy."
+        ::= {wgPolicyEntry 14}
+
+    wgPolicyNumTunl OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of tunnels belong to this policy"
+        ::= {wgPolicyEntry 15}
+
+    wgPolicySingleCntrNum OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of single counters handled by this policy."
+        ::= {wgPolicyEntry 16}
+
+    wgPolicyLogging OBJECT-TYPE
+        SYNTAX      Unsigned32 {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether if the logging of this policy has been enabled. "
+        ::= { wgPolicyEntry 17 }
+
+    wgPolicyCurrActiveConns OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of currently active connections for this policy."
+        ::= {wgPolicyEntry 18}
+
+    wgPolicyL2PackageBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Total traffic in bytes(counted from L2 head) since setting up this policy."
+        ::= {wgPolicyEntry 19}
+
+END

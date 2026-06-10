@@ -1,0 +1,1078 @@
+NETTRACK-E3METER-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Integer32,
+	enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION,
+	TruthValue
+		FROM SNMPv2-TC
+	;
+
+nettrack OBJECT IDENTIFIER
+	::= { enterprises 21695 }
+
+public OBJECT IDENTIFIER
+	::= { nettrack 1 }
+
+e3Mib
+	MODULE-IDENTITY
+	LAST-UPDATED	"201810090000Z"
+	ORGANIZATION	"net-track GmbH"
+	CONTACT-INFO	"net-track GmbH
+			Duensstrasse 1
+			3186 Duedingen
+			Switzerland
+			www.net-track.ch"
+	DESCRIPTION	"Management Information for E3METER IPM products
+			www.e3meter.com"
+	REVISION        "201810090000Z"
+        DESCRIPTION     "Added RCM traps."
+	REVISION        "201810080000Z"
+        DESCRIPTION     "Added RCM-related stuff."
+	REVISION	"201604180000Z"
+	DESCRIPTION	"Added e3IpmAlarmTable."
+	REVISION	"201602030000Z"
+	DESCRIPTION	"Added traps."
+	REVISION	"201204120000Z"
+	DESCRIPTION	"Added import of TEXTUAL-CONVENTION."
+	REVISION	"201111020000Z"
+	DESCRIPTION	"Added channel type and channel groups."
+	REVISION	"201108190000Z"
+	DESCRIPTION	"Added e3IpmChannelName."
+	REVISION	"201101260000Z"
+	DESCRIPTION	"Corrected some syntax errors for very picky parsers."
+	REVISION	"201012060000Z"
+	DESCRIPTION	"Added sensor data."
+	REVISION	"201010200000Z"
+	DESCRIPTION	"Initial version of this MIB module."
+	::= { public 10 }
+
+e3Ipm OBJECT IDENTIFIER
+	::= { e3Mib 7 }
+
+-- ===========================================================================
+-- Textual conventions
+--
+
+Watts ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Watts"
+	SYNTAX		INTEGER
+
+VoltAmpereReactives ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-ampere reactives"
+	SYNTAX		Integer32
+
+VoltAmperes ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-amperes"
+	SYNTAX		Integer32
+
+WattHours ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Watt hours"
+	SYNTAX		Integer32
+
+VoltAmpereReactiveHours ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-ampere reactive hours"
+	SYNTAX		Integer32
+
+VoltAmpereHours ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Volt-ampere hours"
+	SYNTAX		Integer32
+
+MilliAmperes ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Milli-amperes"
+	SYNTAX		Integer32
+
+MilliVolts ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Milli-volts"
+	SYNTAX		Integer32
+
+MilliHertz ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Milli-hertz"
+	SYNTAX		Integer32
+
+DeciDegreesCelsius ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Deci-degrees celsius"
+        SYNTAX		Integer32
+
+Permil ::= TEXTUAL-CONVENTION
+    	STATUS		current
+	DESCRIPTION
+	    	"Per mil"
+        SYNTAX		INTEGER
+
+-- ===========================================================================
+-- Agent information
+--
+
+e3IpmInfo OBJECT IDENTIFIER
+	::= { e3Ipm 1 }
+
+e3IpmInfoSerial OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Serial number."
+	::= { e3IpmInfo 1 }
+
+e3IpmInfoModel OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Model number."
+	::= { e3IpmInfo 2 }
+
+e3IpmInfoHWVersion OBJECT-TYPE
+	SYNTAX		INTEGER {
+		rev-a (0),
+		rev-b (1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Hardware revision."
+	::= { e3IpmInfo 3 }
+
+e3IpmInfoFWVersion OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Integer representation of the firmware revision
+		(major.minor) represented as a 16 bit integer."
+	::= { e3IpmInfo 4 }
+
+e3IpmInfoMeters OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of power meters in this IPS."
+	::= { e3IpmInfo 5 }
+
+-- ===========================================================================
+-- IPM meters
+--
+
+e3IpmMeterTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmMeterTable holds information related to the
+		powermeters of all IPS nodes."
+	::= { e3Ipm 2 }
+
+e3IpmMeterEntry OBJECT-TYPE
+	SYNTAX		E3IpmMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific powermeter."
+	INDEX		{ e3IpmMeter }
+	::=		{ e3IpmMeterTable 1 }
+
+E3IpmMeterEntry ::= SEQUENCE {
+		e3IpmMeter	 Integer32,
+		e3IpmEnergyP	 WattHours,
+		e3IpmEnergyQ	 VoltAmpereReactiveHours,
+		e3IpmEnergyS	 VoltAmpereHours,
+		e3IpmPowerP	 Watts,
+		e3IpmPowerQ	 VoltAmpereReactives,
+		e3IpmPowerS	 VoltAmperes,
+		e3IpmUrms        MilliVolts,
+		e3IpmIrms        MilliAmperes,
+		e3IpmFrequency   MilliHertz,
+		e3IpmChannelName OCTET STRING,
+		e3IpmChannelType INTEGER
+	}
+
+e3IpmMeter OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Number of the powermeter of this IPS."
+	::= { e3IpmMeterEntry 1 }
+
+e3IpmEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active energy in watt hours."
+	::= { e3IpmMeterEntry 2 }
+
+e3IpmEnergyQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive energy in volt-ampere reactives hours."
+	::= { e3IpmMeterEntry 3 }
+
+e3IpmEnergyS OBJECT-TYPE
+	SYNTAX		VoltAmpereHours
+	UNITS		"VAh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Apparent energy in volt-ampere hours."
+	::= { e3IpmMeterEntry 4 }
+
+e3IpmPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active power at a given instant."
+	::= { e3IpmMeterEntry 5 }
+
+e3IpmPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive power at a given instant."
+	::= { e3IpmMeterEntry 6 }
+
+e3IpmPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Apparent power at a given instant."
+	::= { e3IpmMeterEntry 7 }
+
+e3IpmUrms OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RMS voltage at a given instant."
+	::= { e3IpmMeterEntry 8 }
+
+e3IpmIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RMS current at a given instant."
+	::= { e3IpmMeterEntry 9 }
+
+e3IpmFrequency OBJECT-TYPE
+	SYNTAX		MilliHertz
+	UNITS		"mHz"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Frequency measured a given instant."
+	::= { e3IpmMeterEntry 10 }
+
+e3IpmChannelName OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Channel name."
+        ::= { e3IpmMeterEntry 11 }
+
+e3IpmChannelType OBJECT-TYPE
+        SYNTAX		INTEGER {
+		live-wire (0),
+		neutral-wire (1)
+        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel type: For neutral wire channels, only I_rms will
+		contain meaningful values."
+	::= { e3IpmMeterEntry 12 }
+
+-- ===========================================================================
+-- IPM sensors
+--
+
+e3IpmSensorTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmSensorTable holds information related to the
+		sensor of this IPM."
+	::= { e3Ipm 3 }
+
+e3IpmSensorEntry OBJECT-TYPE
+	SYNTAX		E3IpmSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific sensor."
+	INDEX		{ e3IpmSensor }
+	::=		{ e3IpmSensorTable 1 }
+
+E3IpmSensorEntry ::= SEQUENCE {
+		e3IpmSensor		Integer32,
+		e3IpmSensorType		INTEGER,
+		e3IpmSensorVersion	OCTET STRING,
+		e3IpmSensorTemperatureCelsius	DeciDegreesCelsius,
+		e3IpmSensorHumidity	Permil
+	}
+
+e3IpmSensor OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor port number."
+	::= { e3IpmSensorEntry 1 }
+
+e3IpmSensorType OBJECT-TYPE
+        SYNTAX		INTEGER {
+		none (0),
+		temp (1),
+		temp-humidity (2)
+        }
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor type."
+	::= { e3IpmSensorEntry 2 }
+
+e3IpmSensorVersion OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Sensor version."
+        ::= { e3IpmSensorEntry 3 }
+
+e3IpmSensorTemperatureCelsius OBJECT-TYPE
+        SYNTAX          DeciDegreesCelsius
+        UNITS           "deg-C/10"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Temperature in tenth degrees."
+        ::= { e3IpmSensorEntry 4 }
+
+e3IpmSensorHumidity OBJECT-TYPE
+        SYNTAX          Permil
+        UNITS           "/1000"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Relative humidity in per mil."
+        ::= { e3IpmSensorEntry 5 }
+
+-- ===========================================================================
+-- IPM predefined channel groups
+--
+
+e3IpmPGroupTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmPGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmPGroupTable holds information related to predefined
+		channel groups."
+	::= { e3Ipm 4 }
+
+e3IpmPGroupEntry OBJECT-TYPE
+	SYNTAX		E3IpmPGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific group."
+	INDEX		{ e3IpmPGroup }
+	::=		{ e3IpmPGroupTable 1 }
+
+E3IpmPGroupEntry ::= SEQUENCE {
+		e3IpmPGroup	 Integer32,
+		e3IpmPGName	 OCTET STRING,
+		e3IpmPGMembers	 Integer32,
+		e3IpmPGEnergyP	 WattHours,
+		e3IpmPGEnergyQ	 VoltAmpereReactiveHours,
+		e3IpmPGEnergyS	 VoltAmpereHours,
+		e3IpmPGPowerP	 Watts,
+		e3IpmPGPowerQ	 VoltAmpereReactives,
+		e3IpmPGPowerS	 VoltAmperes,
+		e3IpmPGIrms      MilliAmperes
+	}
+
+e3IpmPGroup OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Predefined channel group number."
+	::= { e3IpmPGroupEntry 1 }
+
+e3IpmPGName OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Channel group name."
+        ::= { e3IpmPGroupEntry 2 }
+
+e3IpmPGMembers OBJECT-TYPE
+        SYNTAX		Integer32
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"A bit set specifying the channels which are
+		members of this channel group. If bit 0 is set,
+		this means that channel CH1 is member of this
+		group. Bit 1 stands for CH2 and so on."
+        ::= { e3IpmPGroupEntry 3 }
+
+e3IpmPGEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active energy in watt hours."
+	::= { e3IpmPGroupEntry 4 }
+
+e3IpmPGEnergyQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive energy in volt-ampere reactives hours."
+	::= { e3IpmPGroupEntry 5 }
+
+e3IpmPGEnergyS OBJECT-TYPE
+	SYNTAX		VoltAmpereHours
+	UNITS		"VAh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent energy in volt-ampere hours."
+	::= { e3IpmPGroupEntry 6 }
+
+e3IpmPGPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active power at a given instant."
+	::= { e3IpmPGroupEntry 7 }
+
+e3IpmPGPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive power at a given instant."
+	::= { e3IpmPGroupEntry 8 }
+
+e3IpmPGPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent power at a given instant."
+	::= { e3IpmPGroupEntry 9 }
+
+e3IpmPGIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group RMS current at a given instant."
+	::= { e3IpmPGroupEntry 10 }
+
+-- ===========================================================================
+-- IPM user defined channel groups
+--
+
+e3IpmUGroupTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmUGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The e3IpmUGroupTable holds information related to user
+		defined channel groups."
+	::= { e3Ipm 5 }
+
+e3IpmUGroupEntry OBJECT-TYPE
+	SYNTAX		E3IpmUGroupEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific group."
+	INDEX		{ e3IpmUGroup }
+	::=		{ e3IpmUGroupTable 1 }
+
+E3IpmUGroupEntry ::= SEQUENCE {
+		e3IpmUGroup	 Integer32,
+		e3IpmUGName	 OCTET STRING,
+		e3IpmUGMembers	 Integer32,
+		e3IpmUGEnergyP	 WattHours,
+		e3IpmUGEnergyQ	 VoltAmpereReactiveHours,
+		e3IpmUGEnergyS	 VoltAmpereHours,
+		e3IpmUGPowerP	 Watts,
+		e3IpmUGPowerQ	 VoltAmpereReactives,
+		e3IpmUGPowerS	 VoltAmperes,
+		e3IpmUGIrms      MilliAmperes
+	}
+
+e3IpmUGroup OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"User defined channel group number."
+	::= { e3IpmUGroupEntry 1 }
+
+e3IpmUGName OBJECT-TYPE
+        SYNTAX		OCTET STRING (SIZE(0..15))
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"Channel group name."
+        ::= { e3IpmUGroupEntry 2 }
+
+e3IpmUGMembers OBJECT-TYPE
+        SYNTAX		Integer32
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION
+	    	"A bit set specifying the channels which are
+		members of this channel group. If bit 0 is set,
+		this means that channel CH1 is member of this
+		group. Bit 1 stands for CH2 and so on. If no
+		members are configured, the group is inactive."
+        ::= { e3IpmUGroupEntry 3 }
+
+e3IpmUGEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active energy in watt hours."
+	::= { e3IpmUGroupEntry 4 }
+
+e3IpmUGEnergyQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive energy in volt-ampere reactives hours."
+	::= { e3IpmUGroupEntry 5 }
+
+e3IpmUGEnergyS OBJECT-TYPE
+	SYNTAX		VoltAmpereHours
+	UNITS		"VAh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent energy in volt-ampere hours."
+	::= { e3IpmUGroupEntry 6 }
+
+e3IpmUGPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group active power at a given instant."
+	::= { e3IpmUGroupEntry 7 }
+
+e3IpmUGPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group reactive power at a given instant."
+	::= { e3IpmUGroupEntry 8 }
+
+e3IpmUGPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group apparent power at a given instant."
+	::= { e3IpmUGroupEntry 9 }
+
+e3IpmUGIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Channel group RMS current at a given instant."
+	::= { e3IpmUGroupEntry 10 }
+
+-- ===========================================================================
+-- IPM Alarm Settings
+--
+
+e3IpmAlarmTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF E3IpmAlarmTableEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds alarm settings."
+	::= { e3Ipm 6 }
+
+e3IpmAlarmTableEntry OBJECT-TYPE
+	SYNTAX		E3IpmAlarmTableEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds alarm settings for one specific measured value."
+	INDEX		{ e3IpmAlarmIndex }
+	::=		{ e3IpmAlarmTable 1 }
+
+E3IpmAlarmTableEntry ::= SEQUENCE {
+		e3IpmAlarmIndex		INTEGER,
+		e3IpmAlarmState		INTEGER,
+		e3IpmAlarmCritLowSet	TruthValue,
+		e3IpmAlarmCritLow	Integer32,
+		e3IpmAlarmWarnLowSet	TruthValue,
+		e3IpmAlarmWarnLow	Integer32,
+		e3IpmAlarmWarnHighSet	TruthValue,
+		e3IpmAlarmWarnHigh	Integer32,
+		e3IpmAlarmCritHighSet	TruthValue,
+		e3IpmAlarmCritHigh	Integer32
+	}
+
+e3IpmAlarmIndex OBJECT-TYPE
+	SYNTAX		INTEGER {
+		current-l1 (0),
+		current-l2 (1),
+		current-l3 (2),
+		current-n (3),
+		temp-int (4),
+		temp-ext1 (5),
+		temp-ext2 (6),
+		rh-ext1 (7),
+		rh-ext2 (8)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Defines the alarm described by the current entry. There
+		are alarms for the current of all phases, for the
+		temperature and the relative humidity."
+	::= { e3IpmAlarmTableEntry 1 }
+
+e3IpmAlarmState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		critical-low (0),
+		warn-low (1),
+		normal (2),
+		warn-high (3),
+		critical-high (4),
+		unknown (5)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Shows this alarm entries' state. If no alarm settings
+		are defined, the state is unknown."
+	::= { e3IpmAlarmTableEntry 2 }
+
+e3IpmAlarmCritLowSet OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if a 'critical low' alarm level for the current
+		entry is defined, false otherwise."
+	::= { e3IpmAlarmTableEntry 3 }
+
+e3IpmAlarmCritLow OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The 'critical low' alarm level for the current entry
+		in hundredths of the relevant unit (i.e. amperes, degrees
+		celsius and %RH). If no alarm level is configured, this
+		reads 0."
+	::= { e3IpmAlarmTableEntry 4 }
+
+e3IpmAlarmWarnLowSet OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if a 'warn low' alarm level for the current
+		entry is defined, false otherwise."
+	::= { e3IpmAlarmTableEntry 5 }
+
+e3IpmAlarmWarnLow OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The 'warn low' alarm level for the current entry
+		in hundredths of the relevant unit (i.e. amperes, degrees
+		celsius and %RH). If no alarm level is configured, this
+		reads 0."
+	::= { e3IpmAlarmTableEntry 6 }
+
+e3IpmAlarmWarnHighSet OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if a 'warn high' alarm level for the current
+		entry is defined, false otherwise."
+	::= { e3IpmAlarmTableEntry 7 }
+
+e3IpmAlarmWarnHigh OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The 'warn high' alarm level for the current entry
+		in hundredths of the relevant unit (i.e. amperes, degrees
+		celsius and %RH). If no alarm level is configured, this
+		reads 0."
+	::= { e3IpmAlarmTableEntry 8 }
+
+e3IpmAlarmCritHighSet OBJECT-TYPE
+	SYNTAX		TruthValue
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"True if a 'critical high' alarm level for the current
+		entry is defined, false otherwise."
+	::= { e3IpmAlarmTableEntry 9 }
+
+e3IpmAlarmCritHigh OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The 'critical high' alarm level for the current entry
+		in hundredths of the relevant unit (i.e. amperes, degrees
+		celsius and %RH). If no alarm level is configured, this
+		reads 0."
+	::= { e3IpmAlarmTableEntry 10 }
+
+-- ===========================================================================
+-- IPM RCM Data
+--
+
+e3IpmRcmTable OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Table holding all residual current monitoring (RCM)
+		data of this IPS."
+	::= { e3Ipm 7 }
+
+e3IpmRcmTableEntry OBJECT-TYPE
+	SYNTAX		E3IpmRcmTableEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"One entry in the RCM table."
+	INDEX		{ e3IpmRcmChannel }
+	::=		{ e3IpmRcmTable 1 }
+
+E3IpmRcmTableEntry ::= SEQUENCE {
+		e3IpmRcmChannel		Integer32,
+		e3IpmRcmAcLimit		MilliAmperes,
+		e3IpmRcmDcLimit		MilliAmperes,
+		e3IpmRcmStatus		Integer32,
+		e3IpmRcmAc		MilliAmperes,
+		e3IpmRcmDc		MilliAmperes
+	}
+
+e3IpmRcmChannel OBJECT-TYPE
+	SYNTAX		INTEGER {
+		total(0)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RCM channel: 0 (total) is the total of all phases in this IPS."
+	::= { e3IpmRcmTableEntry 1 }
+
+e3IpmRcmAcLimit OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The factory configured AC RCM limit. Any measurement
+		higher than this limit is considered a critical problem."
+	::= { e3IpmRcmTableEntry 2 }
+
+e3IpmRcmDcLimit OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The factory configured DC RCM limit. Any measurement
+		higher than this limit is considered a critical problem."
+	::= { e3IpmRcmTableEntry 3 }
+
+e3IpmRcmStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+		unknown(0),
+		valid(1)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Status of the RcmAc/RcmDc data. If the residual
+		current cannot be measured, 0 (unknown) is signalled
+		here, otherwise 1 (valid)."
+	::= { e3IpmRcmTableEntry 4 }
+
+e3IpmRcmAc OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The latest AC RCM measurement."
+	::= { e3IpmRcmTableEntry 5 }
+
+e3IpmRcmDc OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The latest DC RCM measurement."
+	::= { e3IpmRcmTableEntry 6 }
+
+-- ===========================================================================
+-- IPM Traps
+--
+
+e3IpmTraps OBJECT IDENTIFIER
+	::= { e3Mib 8 }
+
+-- Current
+
+e3IpmCurrentCritLow NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmMeter, e3IpmIrms }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmCurrentCritLow is triggered when the current
+		on the given channel is less than or equal to the configured
+		critical low threshold."
+	::= { e3IpmTraps 1 }
+
+e3IpmCurrentWarnLow NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmMeter, e3IpmIrms }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmCurrentWarnLow is triggered when the current
+		on the given channel is less than or equal to the configured
+		warn low threshold."
+	::= { e3IpmTraps 2 }
+
+e3IpmCurrentNormal NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmMeter, e3IpmIrms }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmCurrentNormal is triggered when the current
+		on the given channel is not outside any configured
+		limits."
+	::= { e3IpmTraps 3 }
+
+e3IpmCurrentWarnHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmMeter, e3IpmIrms }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmCurrentWarnHigh is triggered when the current
+		on the given channel is greater than or equal to the
+		configured warn high threshold."
+	::= { e3IpmTraps 4 }
+
+e3IpmCurrentCritHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmMeter, e3IpmIrms  }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmCurrentCritHigh is triggered when the current
+		on the given channel is greater than or equal to the
+		configured critical high threshold."
+	::= { e3IpmTraps 5 }
+
+-- Temperature
+
+e3IpmTempCritLow NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorTemperatureCelsius }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmTempCritLow is triggered when the temperature
+		on the given sensor is less than or equal to the configured
+		critical low threshold."
+	::= { e3IpmTraps 6 }
+
+e3IpmTempWarnLow NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorTemperatureCelsius }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmTempWarnLow is triggered when the temperature
+		on the given sensor is less than or equal to the configured
+		warn low threshold."
+	::= { e3IpmTraps 7 }
+
+e3IpmTempNormal NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorTemperatureCelsius }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmTempNormal is triggered when the temperature
+		on the given sensor is not outside any configured
+		limits."
+	::= { e3IpmTraps 8 }
+
+e3IpmTempWarnHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorTemperatureCelsius }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmTempWarnHigh is triggered when the temperature
+		on the given sensor is greater than or equal to the
+		configured warn high threshold."
+	::= { e3IpmTraps 9 }
+
+e3IpmTempCritHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorTemperatureCelsius }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmTempCritHigh is triggered when the temperature
+		on the given sensor is greater than or equal to the
+		configured critical high threshold."
+	::= { e3IpmTraps 10 }
+
+-- Relative Humidity
+
+e3IpmRHCritLow NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorHumidity }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRHCritLow is triggered when the relative humidity
+		on the given sensor is less than or equal to the configured
+		critical low threshold."
+	::= { e3IpmTraps 11 }
+
+e3IpmRHWarnLow NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorHumidity }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRHWarnLow is triggered when the relative humidity
+		on the given sensor is less than or equal to the configured
+		warn low threshold."
+	::= { e3IpmTraps 12 }
+
+e3IpmRHNormal NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorHumidity }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRHNormal is triggered when the relative humidity
+		on the given sensor is not outside any configured
+		limits."
+	::= { e3IpmTraps 13 }
+
+e3IpmRHWarnHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorHumidity }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRHWarnHigh is triggered when the relative humidity
+		on the given sensor is greater than or equal to the
+		configured warn high threshold."
+	::= { e3IpmTraps 14 }
+
+e3IpmRHCritHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmSensor, e3IpmSensorHumidity }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRHCritHigh is triggered when the relative humidity
+		on the given sensor is greater than or equal to the
+		configured critical high threshold."
+	::= { e3IpmTraps 15 }
+
+-- RCM Alarms
+
+e3IpmRcmAcNormal NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmRcmChannel, e3IpmRcmAc }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRcmAcNormal is triggered when the AC part of
+		the residual current falls below the
+		factory-configured limit."
+	::= { e3IpmTraps 16 }
+
+e3IpmRcmAcCritHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmRcmChannel, e3IpmRcmAc }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRcmAcCritHigh is triggered when the AC part
+		of the residual current is greater than the
+		factory-configured limit."
+	::= { e3IpmTraps 17 }
+
+e3IpmRcmDcNormal NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmRcmChannel, e3IpmRcmDc }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRcmDcNormal is triggered when the DC part of
+		the residual current falls below the
+		factory-configured limit."
+	::= { e3IpmTraps 18 }
+
+e3IpmRcmDcCritHigh NOTIFICATION-TYPE
+	OBJECTS { e3IpmInfoSerial, e3IpmRcmChannel, e3IpmRcmDc }
+	STATUS current
+	DESCRIPTION
+		"The e3IpmRcmDcCritHigh is triggered when the DC part
+		of the residual current is greater than the
+		factory-configured limit."
+	::= { e3IpmTraps 19 }
+
+END

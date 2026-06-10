@@ -1,0 +1,363 @@
+CTRON-RATE-POLICING-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-rate-policing-mib.txt
+--
+--  This module provides authoritative definitions for Enterasys
+--  Network's CTRON-RATE-POLICING-MIB.
+
+--  This module will be extended, as needed.
+--
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys products.
+--
+--  Copyright November 2001-2003 Enterasys Networks, Inc.
+
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    dot1dBasePort
+        FROM BRIDGE-MIB
+    ctPriorityExt
+        FROM CTRON-MIB-NAMES;
+
+ctRatePolicing MODULE-IDENTITY
+    LAST-UPDATED "200304101518Z"  -- Thu Apr 10 15:18 GMT 2003
+    ORGANIZATION "Enterasys Networks, Inc"
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+
+    DESCRIPTION
+        "The Enterasys Rate Policing MIB module allows the user to
+        set maximum ingress rates on a per port, per priority basis."
+    
+    REVISION    "200304101518Z"  -- Thu Apr 10 15:18 GMT 2003
+    DESCRIPTION "Added display hint to CtPriList."
+
+    REVISION    "200303111553Z"  -- Tue Mar 11 15:53 GMT 2003
+    DESCRIPTION "Changed the definitions of the CtRatePolActionList and
+                 CtRatePolDirectionList textual conventions.  The syntax
+                 was also changed from Integer32 to INTEGER with
+                 enumeration values that map to the prior bit positions."
+
+    REVISION    "200011281551Z"  
+    DESCRIPTION "Changed the CONTACT-INFO portion of the MODULE-IDENTITY
+                 to reflect the company name change to Enterasys Networks.
+                 Added ranges to the ctRatePolicingThreshHoldMin and 
+                 ctRatePolicingThreshHold leaves."
+
+    REVISION    "199906210000Z"
+    DESCRIPTION "The initial version of this MIB module"
+    ::= { ctPriorityExt 7 }
+
+ctRatePolicingObjects OBJECT IDENTIFIER ::= { ctRatePolicing 1 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+CtPriList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "x"
+    STATUS      current
+    DESCRIPTION
+        "The least significant octet within this integer specifies
+        a set of eight priorities.  Within this octet, the most
+        significant bit represents the highest priority(7), and
+        the least significant bit represents the lowest priority(0).
+        Thus, each priority is represented by a single bit within
+        the value of this object.  If that bit has a value of '1'
+        then that priority is included in the set of priorities; the
+        priority is not included if its bit has a value of '0'."
+    SYNTAX      INTEGER (0..255) 
+
+CtRatePolActionList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value represents a list of rate policing actions."
+    SYNTAX      INTEGER {
+        none(0),
+        dropPacket(1),
+        flowCtrlPacketAndDrop(2),
+        dropPacketOrFlowCtrlAndDrop(3)
+    }
+
+CtRatePolDirectionList ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This value represents the possible traffic flow directions."
+    SYNTAX      INTEGER {
+        none(0),
+        inbound(1),
+        outbound(2),
+        inboundAndOutbound(3)
+    }
+
+-- -------------------------------------------------------------
+-- Rate Policing Configuration
+-- -------------------------------------------------------------
+
+ctRatePolicingAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Allows the rate policing feature to be globally
+        enabled/disabled.  A value of disable(2), functionally
+        supersedes the ctRatePolicingRuleStatus of individual
+        entries in the ctRatePolicingConfigTable, but does not
+        change their actual values."
+    DEFVAL { disable }
+    ::= { ctRatePolicingObjects 1}
+
+ctRatePolicingConfigLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime the last time anything in the
+        ctRatePolicingConfigTable changed."
+    ::= { ctRatePolicingObjects 2 }
+
+ctRatePolicingConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CtRatePolicingConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table allows configuration of rate policing rules
+        on this device.  Their are a limited number of resources
+        available for rate policing, and this directly limits the
+        number of rate policing rules that may be configured on
+        each port.  As a result this table does not support dynamic
+        row creation, rather, all possible rows exist in either an
+        active or disabled state.  A manager application should not,
+        however, infer that this configuration is necessarily fixed
+        during the lifetime of the managed entity.  The allocation
+        of resources could theoretically be shifted.  For example
+        port 20 could have 3 resources and at some point suddenly
+        have 4 or 2.  Any such change would of course cause the
+        value of ctRatePolicingConfigLastChange to change.  At this
+        time their is no defined mechanism to move these resources
+        and there very likely never will be.  This is merely a
+        warning that manager applications should not count on this."
+    ::= { ctRatePolicingObjects 3 }
+
+ctRatePolicingConfigEntry  OBJECT-TYPE
+    SYNTAX      CtRatePolicingConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Describes a particular entry of ctRatePolicingConfigTable."
+    INDEX { dot1dBasePort, ctRatePolicingResourceIndex }
+    ::= { ctRatePolicingConfigTable 1 }
+
+CtRatePolicingConfigEntry ::= 
+   SEQUENCE {
+      ctRatePolicingResourceIndex
+            INTEGER,
+      ctRatePolicingActionsAllowed
+            CtRatePolActionList,
+      ctRatePolicingAction
+            CtRatePolActionList, 
+      ctRatePolicingThreshHoldMin
+            Integer32,
+      ctRatePolicingThreshHold
+            Integer32,
+      ctRatePolicingPriorityList
+            CtPriList, 
+      ctRatePolicingRuleStatus
+            INTEGER,
+      ctRatePolicingActionsTaken
+            Integer32,
+      ctRatePolicingDirectionsAllowed
+            CtRatePolDirectionList,
+      ctRatePolicingDirection
+            CtRatePolDirectionList
+   }
+
+ctRatePolicingResourceIndex OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This specifies a unique resource available for configuring
+        a rate policing rule on this port.  Each port has a limited
+        number of resources available for rate policing.  This index
+        simply provides a mechanism for uniquely addressing each of
+        these resources."
+    ::= { ctRatePolicingConfigEntry 1 }
+
+ctRatePolicingActionsAllowed OBJECT-TYPE
+    SYNTAX      CtRatePolActionList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies the valid policing actions that may be
+        taken for this port upon exceeding the threshold specified
+        in ctRatePolicingThreshHold."
+    ::= { ctRatePolicingConfigEntry 2 }
+
+ctRatePolicingAction OBJECT-TYPE
+    SYNTAX      CtRatePolActionList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the action to be taken if the rate limit is
+        exceeded.  This value must be a valid action as specified
+        by the corresponding ctRatePolicingActionsAllowed object.
+        Also, no more than one action may be specified.  Attempts
+        to set this value outside of the aforementioned guidelines
+        will fail."
+    ::= { ctRatePolicingConfigEntry 3 }
+
+ctRatePolicingThreshHoldMin OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647) 
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum rate limit value for this entry in kB per second."
+    ::= { ctRatePolicingConfigEntry 4 }
+
+ctRatePolicingThreshHold OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647) 
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The rate limit value for this entry in kB per second.  If the
+        rate is exceeded the defined action in ctRatePolicingAction
+        will be enforced.  This value may not be set below the minimum
+        rate specified in ctRatePolicingThreshHoldMin."
+    ::= { ctRatePolicingConfigEntry 5 }
+
+ctRatePolicingPriorityList OBJECT-TYPE
+    SYNTAX      CtPriList 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This specifies the list of priorities to which this rule applies."
+    ::= { ctRatePolicingConfigEntry 6 }
+
+ctRatePolicingRuleStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+        active(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object provides both control and status for the
+        associated conceptual row in the table.  The value of
+        active(1) indicates that device is actively applying
+        the rate policing rule defined by the other leaves
+        in this row.  All other read-write leaves in this row
+        have an effective value of read-only while the row
+        is in the active state.  The value of disabled(2)
+        indicates that this row is essentially an available
+        resource which MAY be configured and activated."
+    ::= { ctRatePolicingConfigEntry 7 }
+
+ctRatePolicingActionsTaken OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+
+    DESCRIPTION
+        "This object counts the number of times the
+        ctRatePolicingAction has been enforced for this
+        particular entry."
+    ::= { ctRatePolicingConfigEntry 8 }
+
+ctRatePolicingDirectionsAllowed OBJECT-TYPE
+    SYNTAX      CtRatePolDirectionList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies the valid policing directions that may be
+        taken for this port."
+    ::= { ctRatePolicingConfigEntry 9 }
+
+ctRatePolicingDirection OBJECT-TYPE
+    SYNTAX      CtRatePolDirectionList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This specifies the direction of the traffic flow that 
+        will be limited."
+    ::= { ctRatePolicingConfigEntry 10 }
+
+
+-- -------------------------------------------------------------
+-- Conformance Information
+-- -------------------------------------------------------------
+
+ctRatePolicingConformance OBJECT IDENTIFIER ::= { ctRatePolicing 2 }
+
+ctRatePolicingGroups      OBJECT IDENTIFIER ::= { ctRatePolicingConformance 1 }
+ctRatePolicingCompliances OBJECT IDENTIFIER ::= { ctRatePolicingConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+ctRatePolicingConfigGroup OBJECT-GROUP
+    OBJECTS {
+        ctRatePolicingAdminStatus,
+        ctRatePolicingConfigLastChange,
+        ctRatePolicingActionsAllowed,
+        ctRatePolicingAction,
+        ctRatePolicingThreshHold,
+        ctRatePolicingPriorityList,
+        ctRatePolicingRuleStatus,
+        ctRatePolicingActionsTaken,
+        ctRatePolicingDirectionsAllowed,
+        ctRatePolicingDirection
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing device level control
+        and status information for rate policing."
+    ::= { ctRatePolicingGroups 1 }
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+ctRatePolicingCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for devices that support
+        rate policing."
+
+    MODULE
+        MANDATORY-GROUPS { ctRatePolicingConfigGroup }
+
+    ::= { ctRatePolicingCompliances 1 }
+
+END

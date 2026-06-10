@@ -1,0 +1,2462 @@
+-- =============================================================================
+-- Copyright (c) 2004-2012 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide wireless detection service feature.
+-- Reference:
+-- Version: V1.7
+-- History:
+--   V1.0 created by shiyang (Richard)
+--     Initial version 2006-08-20
+--   V1.1 2007-05-16 modified by shiyang (Richard)
+--     Add new objects of hh3cDot11UnauthorSSIDName and hh3cDot11WIDSAPID.
+--   V1.2 2007-06-19 modified by Deepthi
+--        Changed the hh3cDot11RogueAPVendorOUI to hh3cDot11RogueAPVendorName,
+--        Type : OCTET STRING and the Size list: 1: 3 should be removed.
+--        Changed the hh3cDot11RogueStaVendorOUI to hh3cDot11RogueStaVendorName,
+--        Type : OCTET STRING and the Size list: 1: 3 should be removed.
+--        Changed the field hh3cDot11DetectMaxAPSigStrength in
+--        hh3cDot11WIDSRogueAPExtTable to hh3cDot11DetectCurAPSigStrength to
+--        hh3cDot11DetectCurAPSigStrength
+--        Changed the field hh3cDot11DetectMaxStaSigStrength
+--        Hh3cDot11WIDSRogueStaExtEntry in hh3cDot11WIDSRogueStaExtTable to
+--        hh3cDot11DetectCurStaSigStrength
+--        Add new node hh3cDot11WIDSPermitVendorName in
+--        hh3cDot11WIDSPermitVendorEntry
+--        Remove the field Country Spec(2), ChannelSpec(3) in
+--        hh3cDot11WIDSGlobalConfigGroup in hh3cDot11WIDSScanMode.
+--        Obsolete the node hh3cDot11WIDSScanChannelList in
+--        hh3cDot11WIDSGlobalConfigGroup
+--        Add the node hh3cDot11WIDSScanType to hh3cDot11WIDSGlobalConfigGroup
+--  V1.3  2008-07-25 modified by heziqi
+--        Add new node hh3cDot11CntMsrEnable, hh3cDot11CntMsrMode,
+--        hh3cDot11DevAgingTime, hh3cDot11DynBlkListEnable,
+--        hh3cDot11DynBlkListLifeTime, hh3cDot11FloodAtkDctEnable,
+--        hh3cDot11SpoofAtkDctEnable, hh3cDot11WeakIVAtkDctEnable,
+--        hh3cDot11ResetWIDSRogueHistory, hh3cDot11ResetWIDSHistroy,
+--        hh3cDot11ResetWIDSStatistics, hh3cDot11ResetAllDynBlkList,
+--        hh3cDot11ResetAllStcBlkList, hh3cDot11ResetAllWhtBlkList,
+--        hh3cDot11ResetAllDctRogueAP, hh3cDot11ResetAllDctRogueSta,
+--        hh3cDot11ResetAllDctAdhoc, hh3cDot11ResetAllDctDevice,
+--        hh3cDot11ResetAllDctSSID in hh3cDot11WIDSGlobalConfigGroup.
+--        Add new node hh3cDot11PermitSSIDDetected
+--        in hh3cDot11WIDSPermitSSIDTable.
+--        Add new node hh3cDot11IgnoreMACDetected, hh3cDot11IgnoreDevType
+--        in hh3cDot11WIDSIgnoreListTable.
+--        Add new table hh3cDot11StaticWhiteListTable,
+--        hh3cDot11StaticBlackListTable, hh3cDot11WIDSRogueAPTable,
+--        hh3cDot11WIDSRogueStaTable, hh3cDot11WIDSDetectedDevTable,
+--        hh3cDot11WIDSRptAPTable, hh3cDot11DynBlackListTable,
+--        hh3cDot11WIDSRogueHistoryTable, hh3cDot11WIDSAtkHistroyTable
+--        in hh3cDot11WIDSDetectGroup.
+--        Add hh3cDot11WIDSAtkStatis in hh3cDot11WIDSDetectGroup.
+--        Add notification hh3cDot11WIDSDetectAttack and
+--        hh3cDot11WIDSDetectWBridge.
+--  V1.4  2009-05-07 modified by Li Yugang, Wang Shaojie, Sun Shuai
+--        Add hh3cDot11WidsFloodInterval, hh3cDot11WidsBlackListThreshold,
+--        hh3cDot11SSIDFilterOnOff, hh3cDot11BSSIDFilterOnOff to
+--        hh3cDot11WIDSGlobalConfigGroup.
+--        Add hh3cDot11WIDSPermitBSSIDTable to hh3cDot11WIDSConfigGroup.
+--        Add hh3cDot11WIDSFloodTrap, hh3cDot11WIDSSpoofTrap,
+--        hh3cDot11WIDSWeakIVTrap to hh3cDot11WIDSTraps.
+--        Add hh3cDot11MonitorAPID,hh3cDot11MonitorApRadioID,
+--        hh3cDot11WIDSAtkMac, hh3cDot11WIDSAtkFrameType
+--        to hh3cDot11WIDSTrapVarObjects.
+--  V1.5  2009-07-29 modified by heziqi
+--        Add new node hh3cDot11WIDSDevSnr for hh3cDot11WIDSDetectedDevTable.
+--  V1.6  2010-01-07 modified by Wang Shaojie
+--        Add new node hh3cDot11RogueAPFirstDetectTmStr,
+--        hh3cDot11RogueAPLastDetectTmStr to hh3cDot11WIDSRogueAPTable
+--        Add new node hh3cDot11RogueStaFirstDetectTmStr,
+--        hh3cDot11RogueStaLastDetectTmStr to hh3cDot11WIDSRogueStaTable
+--        Add hh3cDot11WIDSAtkChannel, hh3cDot11WIDSAtkTime,
+--        hh3cDot11WIDSAtkDestMac to hh3cDot11WIDSTrapVarObjects.
+--        2010-03-18 Modified by Deng Gaoliang
+--        Add hh3cDot11BlackListTable
+--        2010-05-31 Modified by LiuChen
+--        Add new node hh3cDot11DynBlackListTimeTicks to
+--        hh3cDot11DynBlackListTable.
+--        Add new node hh3cDot11BlackListTimeTicks to
+--        hh3cDot11BlackListTable.
+--  V1.7  2011-10-28 modified by jiaolibin
+--        Add hh3cDot11WIDSFirstTrapTime to hh3cDot11WIDSTrapVarObjects and
+--        varialbe bingings hh3cDot11WIDSFirstTrapTime for hh3cDot11WIDSFloodTrap,
+--        hh3cDot11WIDSSpoofTrap,hh3cDot11WIDSWeakIVTrap.
+-- =============================================================================
+HH3C-DOT11-WIDS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TruthValue,
+        MacAddress,
+        RowStatus,
+        DateAndTime,
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Unsigned32,
+        TimeTicks
+    FROM SNMPv2-SMI
+        hh3cDot11,
+        Hh3cDot11SSIDStringType,
+        Hh3cDot11ChannelScopeType,
+        Hh3cDot11RadioScopeType,
+        Hh3cDot11ObjectIDType,
+        Hh3cDot11RadioType
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11WIDS MODULE-IDENTITY
+    LAST-UPDATED "201005311800Z"        -- May 31, 2010 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB provides information about WIDS feature.
+
+        GLOSSARY
+
+        Wireless Intrusion Detection Sensor (WIDS)
+        WIDS is designed to be employed in an area that is serviced
+        by an existing wireless network.
+        It aids in the early detection of malicious outsider attacks
+        and intrusions via wireless networks.
+
+        Rogue AP
+        A rogue access point is any Wi-Fi access point connected to
+        the network without authorization.
+        As it is not authorized, if there is any weakness in
+        the AP, the hacker will have chance to compromise the
+        network.
+
+        Rogue Station
+        It is similiar to Rogue AP, while it is a station.
+
+        Monitor AP
+        An AP will scan or listen to the air, and try to detect
+        wireless attack in the network.
+        Some AP products will work only in monitor role, while some
+        AP products could switch between normal AP role (only
+        provide wireless access service)and monitor AP role.
+
+        Ad Hoc Mode
+        Station could work under Ad hoc mode, then they
+        could directly do peer-to-peer communication without
+        other device support."
+
+    REVISION "201005311800Z"        -- May 31, 2010 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200907291800Z"        -- Jul 29, 2009 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200905072000Z"        -- May 7, 2009 at 20:00 GMT
+    DESCRIPTION
+        "Add new nodes and table to support new featrues of WIDS."
+    REVISION "200807251900Z"        -- July 23, 2008 at 19:00 GMT
+    DESCRIPTION
+        "Add new nodes to support new featrues of WIDS."
+    REVISION "200706191900Z"        -- June 19, 2007 at 19:00 GMT
+    DESCRIPTION
+        "To fix bugs in the MIB file."
+    REVISION "200705161900Z"        -- May 16, 2007 at 19:00 GMT
+    DESCRIPTION
+        "To fix bugs in the MIB file."
+    REVISION "200608201900Z"        -- August 20, 2006 at 19:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 5 }
+
+-- ==================================================================
+-- Textual Conventions
+-- ==================================================================
+
+Hh3cDot11WIDSDevType ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of device detected."
+    SYNTAX      INTEGER
+        {
+            client(1),
+            ap(2),
+            adhoc(3),
+            wirelessBridge(4),
+            unknown(5)
+        }
+
+Hh3cDot11WIDSDevPermitType ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the detected device is permitted or a rogue."
+    SYNTAX      INTEGER
+        {
+            permit(1),
+            rogue(2)
+        }
+
+Hh3cDot11WIDSAtkType ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The type of attack.
+         This object has following defined values:
+         'act': Action Frame
+         'asr': Association Request
+         'aur': Authentication Request
+         'daf': Deauthentication Frame
+         'dar': Disassociation Request
+         'ndf': Null Data Frame
+         'pbr': Probe Request
+         'rar': Reassociation Request
+         'saf': Spoofed Disassociation Frame
+         'sdf': Spoofed Deauthentication Frame
+         'wiv': Weak IV Detected"
+    SYNTAX      INTEGER
+        {
+            act(1),
+            asr(2),
+            aur(3),
+            daf(4),
+            dar(5),
+            ndf(6),
+            pbr(7),
+            rar(8),
+            saf(9),
+            sdf(10),
+            wiv(11),
+            unknown(12)
+        }
+
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+--  WIDS Configuration Group
+--  DEFINED AS "The group to provide the configuration information
+--  for WIDS."
+hh3cDot11WIDSConfigGroup OBJECT IDENTIFIER       ::= { hh3cDot11WIDS 1 }
+--  The Configuration Group has the following children:
+hh3cDot11WIDSGlobalConfigGroup OBJECT IDENTIFIER
+    ::= { hh3cDot11WIDSConfigGroup 1 }
+--  hh3cDot11WIDSPermitVendorTable         ::= { hh3cDot11WIDSConfigGroup 2 }
+--  hh3cDot11WIDSPermitSSIDTable           ::= { hh3cDot11WIDSConfigGroup 3 }
+--  hh3cDot11WIDSIgnoreListTable           ::= { hh3cDot11WIDSConfigGroup 4 }
+--  hh3cDot11WIDSAttackListTable           ::= { hh3cDot11WIDSConfigGroup 5 }
+
+--  WIDS detection Group
+--  DEFINED AS "The group to provide the detection information
+--  for WIDS."
+hh3cDot11WIDSDetectGroup OBJECT IDENTIFIER ::= { hh3cDot11WIDS 2 }
+--  The detection Group has the following children:
+--  hh3cDot11WIDSRogueAPTable              ::= { hh3cDot11WIDSDetectGroup 1 }
+--  hh3cDot11WIDSRogueAPExtTable           ::= { hh3cDot11WIDSDetectGroup 2 }
+--  hh3cDot11WIDSRogueStaTable             ::= { hh3cDot11WIDSDetectGroup 3 }
+--  hh3cDot11WIDSRogueStaExtTable          ::= { hh3cDot11WIDSDetectGroup 4 }
+
+--  WIDS Notification
+--  DEFINED AS "The notification for WIDS feature."
+hh3cDot11WIDSNotifyGroup OBJECT IDENTIFIER ::= { hh3cDot11WIDS 3 }
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSGlobalConfigGroup Definition
+-- *****************************************************************************
+hh3cDot11WIDSScanMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            all(1),
+            auto(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the scope of channels to be scanned.
+        The following value are supported
+        all(1)            - Do scan on all the channels.
+        auto(2)           - Do scan for the channels that automatically
+        selected by WIDS."
+    DEFVAL      { auto }
+    ::= { hh3cDot11WIDSGlobalConfigGroup 1 }
+
+hh3cDot11WIDSScanChannelList OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION
+        "Represents the channel scope to be scanned when
+        hh3cDot11WIDSScanMode is configurated as channelSpec mode.
+        Each channel value will be separated by comma character."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 2 }
+
+hh3cDot11CntMsrMode OBJECT-TYPE
+    SYNTAX      BITS
+        {
+            rogue(0),
+            adhoc(1),
+            config(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the countermeasures mode."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 3 }
+
+hh3cDot11DevAgingTime OBJECT-TYPE
+    SYNTAX      Integer32(300..1800)
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the age time for entries in the detected device table.
+         If an entry is not detected within the interval, it is deleted from
+         the detected device table.  If the deleted entry is that of a rogue, it
+         is added into the rogue history table."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 4 }
+
+hh3cDot11DynBlkListEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the dynamic blacklist feature is enabled or not.
+         'true'  : Enable the dynamic blacklist feature to filter out unwanted
+                   clients, which will not get associated.
+         'false' : Disable the dynamic blacklist feature."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 5 }
+
+hh3cDot11DynBlkListLifeTime OBJECT-TYPE
+    SYNTAX      Integer32(60..3600)
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the lifetime for dynamic blacklist entries.
+         If a dynamic blacklist entry is not detected within the lifetime, the
+         entry will be removed from the dynamic blacklist.
+         The lifetime becomes active only if dynamic blacklist feature is
+         enabled."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 6 }
+
+hh3cDot11FloodAtkDctEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether detection of flood attack is enabled or not.
+         'true'  : Enable the detection of flood attack.
+         'false' : Disable the detection of flood attack."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 7 }
+
+hh3cDot11SpoofAtkDctEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether detection of Spoof attack is enabled or not.
+         'true'  : Enable the detection of Spoof attack.
+         'false' : Disable the detection of Spoof attack."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 8 }
+
+hh3cDot11WeakIVAtkDctEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether detection of weak-iv attack is enabled or not.
+         'true'  : Enable the detection of weak-iv attack.
+         'false' : Disable the detection of weak-iv attack."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 9 }
+
+hh3cDot11ResetWIDSRogueHistory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear all entries from the rogue history table.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 10 }
+
+hh3cDot11ResetWIDSHistroy OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear the history information of attacks
+         detected in the WLAN system.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 11 }
+
+hh3cDot11ResetWIDSStatistics OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear the statistics of attacks detected in the
+         WLAN system.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 12 }
+
+hh3cDot11ResetAllDynBlkList OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to remove all entries from the dynamic blacklist.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 13 }
+
+hh3cDot11ResetAllStcBlkList OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to remove all entries from the static blacklist.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 14 }
+
+hh3cDot11ResetAllWhtBlkList OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to remove all entries from the static whitelist.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 15 }
+
+hh3cDot11ResetAllDctRogueAP OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear the information of all detected rogue APs.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 16 }
+
+hh3cDot11ResetAllDctRogueSta OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear the information of all detected rogue
+         clients.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 17 }
+
+hh3cDot11ResetAllDctAdhoc OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear the information of all detected ad hoc
+         devices.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 18 }
+
+hh3cDot11ResetAllDctDevice OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear the information of all detected devices.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 19 }
+
+hh3cDot11ResetAllDctSSID OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear the information of all detected SSIDs.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSGlobalConfigGroup 20 }
+
+hh3cDot11WidsFloodInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval of WIDS flood detection."
+    DEFVAL      { 1 }
+    ::= { hh3cDot11WIDSGlobalConfigGroup 21 }
+
+hh3cDot11WidsBlackListThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When flood attack exceeds the value of this node,
+         the MAC address will be added into black list."
+    DEFVAL      { 100 }
+    ::= { hh3cDot11WIDSGlobalConfigGroup 22 }
+
+hh3cDot11SSIDFilterOnOff OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            on(1),
+            off(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the SSID permit feature is enabled or not."
+    DEFVAL      { on }
+    ::= { hh3cDot11WIDSGlobalConfigGroup 23 }
+
+hh3cDot11BSSIDFilterOnOff OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            on(1),
+            off(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the BSSID permit feature is enabled or not."
+    DEFVAL      { on }
+    ::= { hh3cDot11WIDSGlobalConfigGroup 24 }
+
+-- **********************************************************************
+-- * End of hh3cDot11WIDSGlobalConfigGroup Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSPermitVendorTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSPermitVendorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSPermitVendorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table provides the permitted vendor list, and each vendor
+        will be identified by OUI.
+        The legal device should be made by the permitted vendors."
+    ::= { hh3cDot11WIDSConfigGroup 2 }
+
+hh3cDot11WIDSPermitVendorEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSPermitVendorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides the information of permitted vendor."
+    INDEX
+        {
+            hh3cDot11VendorOUI
+        }
+    ::= { hh3cDot11WIDSPermitVendorTable 1 }
+
+Hh3cDot11WIDSPermitVendorEntry ::= SEQUENCE
+    {
+        hh3cDot11VendorOUI                OCTET STRING,
+        hh3cDot11PermitVendorRowStatus    RowStatus,
+        hh3cDot11VendorName               OCTET STRING
+    }
+
+hh3cDot11VendorOUI OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(3))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the vendor OUI information of the wireless device."
+    ::= { hh3cDot11WIDSPermitVendorEntry 1 }
+
+hh3cDot11PermitVendorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11WIDSPermitVendorEntry 2 }
+
+hh3cDot11VendorName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the vendor name of the wireless device."
+    ::= { hh3cDot11WIDSPermitVendorEntry 3 }
+-- *****************************************************************************
+-- * End of hh3cDot11WIDSPermitVendorTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSPermitSSIDTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSPermitSSIDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSPermitSSIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table represents the list of SSID could be permitted in
+         the wireless network."
+    ::= { hh3cDot11WIDSConfigGroup 3 }
+
+hh3cDot11WIDSPermitSSIDEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSPermitSSIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides the information of permitted SSID."
+    INDEX
+        {
+            hh3cDot11PermitSSID
+        }
+    ::= { hh3cDot11WIDSPermitSSIDTable 1 }
+
+Hh3cDot11WIDSPermitSSIDEntry ::= SEQUENCE
+    {
+        hh3cDot11PermitSSID             Hh3cDot11SSIDStringType,
+        hh3cDot11PermitSSIDRowStatus    RowStatus,
+        hh3cDot11PermitSSIDDetected     TruthValue
+    }
+
+hh3cDot11PermitSSID OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the permitted SSID in the wireless network."
+    ::= { hh3cDot11WIDSPermitSSIDEntry 1 }
+
+hh3cDot11PermitSSIDRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11WIDSPermitSSIDEntry 2 }
+
+hh3cDot11PermitSSIDDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the permitted SSID is detected or not."
+    ::= { hh3cDot11WIDSPermitSSIDEntry 3 }
+-- *****************************************************************************
+-- * End of hh3cDot11WIDSPermitSSIDTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSIgnoreListTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSIgnoreListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSIgnoreListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table provides the MAC address list of stations or APs,
+        and WIDS always take them as legal stations or APs."
+    ::= { hh3cDot11WIDSConfigGroup 4 }
+
+hh3cDot11WIDSIgnoreListEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSIgnoreListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the MAC address of station or AP,
+        and WIDS always take it as legal station or AP."
+    INDEX
+        {
+            hh3cDot11IgnoreMAC
+        }
+    ::= { hh3cDot11WIDSIgnoreListTable 1 }
+
+Hh3cDot11WIDSIgnoreListEntry ::= SEQUENCE
+    {
+        hh3cDot11IgnoreMAC              MacAddress,
+        hh3cDot11IgnoreListRowStatus    RowStatus,
+        hh3cDot11IgnoreMACDetected      TruthValue,
+        hh3cDot11IgnoreDevType          Hh3cDot11WIDSDevType
+    }
+
+hh3cDot11IgnoreMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of station or AP, and WIDS always
+        take it as legal station or AP."
+    ::= { hh3cDot11WIDSIgnoreListEntry 1 }
+
+hh3cDot11IgnoreListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11WIDSIgnoreListEntry 2 }
+
+hh3cDot11IgnoreMACDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the MAC address detected or not."
+    ::= { hh3cDot11WIDSIgnoreListEntry 3 }
+
+hh3cDot11IgnoreDevType OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSDevType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of the MAC address detected.
+         The value of this object always is unknown if the MAC address is not
+         detected."
+    ::= { hh3cDot11WIDSIgnoreListEntry 4 }
+-- *****************************************************************************
+-- * End of hh3cDot11WIDSIgnoreListTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSAttackListTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSAttackListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSAttackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table provides the MAC address list of rogue APs or rogue
+        stations, the WIDS will take countermeasure as per the MAC
+        address list."
+    ::= { hh3cDot11WIDSConfigGroup 5 }
+
+hh3cDot11WIDSAttackListEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSAttackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the MAC address of rogue AP or rogue station,
+        and the countermeasure will be taken for it."
+    INDEX
+        {
+            hh3cDot11AttackDeviceMac
+        }
+    ::= { hh3cDot11WIDSAttackListTable 1 }
+
+Hh3cDot11WIDSAttackListEntry ::= SEQUENCE
+    {
+        hh3cDot11AttackDeviceMac        MacAddress,
+        hh3cDot11AttackListRowStatus    RowStatus,
+        hh3cDot11AttackDevDetected      TruthValue,
+        hh3cDot11AttackDevType          Hh3cDot11WIDSDevType
+    }
+
+hh3cDot11AttackDeviceMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of rogue AP or rogue station,
+        and the countermeasure will be taken for it."
+    ::= { hh3cDot11WIDSAttackListEntry 1 }
+
+hh3cDot11AttackListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11WIDSAttackListEntry 2 }
+
+hh3cDot11AttackDevDetected OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the assigned MAC address in attack list is detected
+         or not."
+    ::= { hh3cDot11WIDSAttackListEntry 3 }
+
+hh3cDot11AttackDevType OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSDevType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of detected MAC address in attack list.  If the
+         MAC address is not detected, it will return unknown(5) for get
+         operation."
+    ::= { hh3cDot11WIDSAttackListEntry 4 }
+-- *****************************************************************************
+-- * End of hh3cDot11WIDSAttackListTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11StaticWhiteListTable Definition
+-- *****************************************************************************
+hh3cDot11StaticWhiteListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11StaticWhiteListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table provides the information of whitelist."
+    ::= { hh3cDot11WIDSConfigGroup 6 }
+
+hh3cDot11StaticWhiteListEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11StaticWhiteListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the information of whitelist."
+    INDEX
+        {
+            hh3cDot11StaticWhiteListMAC
+        }
+    ::= { hh3cDot11StaticWhiteListTable 1 }
+
+Hh3cDot11StaticWhiteListEntry ::= SEQUENCE
+    {
+        hh3cDot11StaticWhiteListMAC          MacAddress,
+        hh3cDot11StaticWhiteListRowStatus    RowStatus
+    }
+
+hh3cDot11StaticWhiteListMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC addresses in whitelist."
+    ::= { hh3cDot11StaticWhiteListEntry 1 }
+
+hh3cDot11StaticWhiteListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11StaticWhiteListEntry 2 }
+-- *****************************************************************************
+-- * End of hh3cDot11StaticWhiteListTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11StaticBlackListTable Definition
+-- *****************************************************************************
+hh3cDot11StaticBlackListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11StaticBlackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table provides the information of static blacklist."
+    ::= { hh3cDot11WIDSConfigGroup 7 }
+
+hh3cDot11StaticBlackListEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11StaticBlackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains the information of static blacklist."
+    INDEX
+        {
+            hh3cDot11StaticBlackListMAC
+        }
+    ::= { hh3cDot11StaticBlackListTable 1 }
+
+Hh3cDot11StaticBlackListEntry ::= SEQUENCE
+    {
+        hh3cDot11StaticBlackListMAC          MacAddress,
+        hh3cDot11StaticBlackListRowStatus    RowStatus
+    }
+
+hh3cDot11StaticBlackListMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC addresses in static blacklist."
+    ::= { hh3cDot11StaticBlackListEntry 1 }
+
+hh3cDot11StaticBlackListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cDot11StaticBlackListEntry 2 }
+-- *****************************************************************************
+-- * End of hh3cDot11StaticBlackListTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSPermitBSSIDTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSPermitBSSIDTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSPermitBSSIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table represents the list of BSSID could be permitted in
+         the wireless network."
+    ::= { hh3cDot11WIDSConfigGroup 8 }
+
+hh3cDot11WIDSPermitBSSIDEntry  OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSPermitBSSIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry provides the information of permitted BSSID."
+    INDEX
+        {
+            hh3cDot11PermitBSSID
+        }
+    ::= { hh3cDot11WIDSPermitBSSIDTable 1 }
+
+Hh3cDot11WIDSPermitBSSIDEntry ::= SEQUENCE
+    {
+        hh3cDot11PermitBSSID                 MacAddress,
+        hh3cDot11PermitBSSIDDetected         TruthValue,
+        hh3cDot11PermitBSSIDRowStatus        RowStatus
+    }
+
+hh3cDot11PermitBSSID  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the permitted BSSID in the wireless network."
+    ::= { hh3cDot11WIDSPermitBSSIDEntry 1 }
+
+hh3cDot11PermitBSSIDDetected  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the permitted BSSID is detected or not."
+    ::= { hh3cDot11WIDSPermitBSSIDEntry 2 }
+
+hh3cDot11PermitBSSIDRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the row status of permit BSSID table."
+    ::= { hh3cDot11WIDSPermitBSSIDEntry 3 }
+-- *****************************************************************************
+-- * End of hh3cDot11StaticBlackListTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSRogueAPTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSRogueAPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSRogueAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table represents the list of possible BSS information for
+        rogue APs detected by the WIDS."
+    ::= { hh3cDot11WIDSDetectGroup 1 }
+
+hh3cDot11WIDSRogueAPEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSRogueAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains possible BSS information of each rogue AP
+        detected by WIDS."
+    INDEX
+        {
+            hh3cDot11RogueAPBSSMAC
+        }
+    ::= { hh3cDot11WIDSRogueAPTable 1 }
+
+Hh3cDot11WIDSRogueAPEntry ::= SEQUENCE
+    {
+        hh3cDot11RogueAPBSSMAC            MacAddress,
+        hh3cDot11RogueAPVendorName        OCTET STRING,
+        hh3cDot11RogueAPMonitorNum        Integer32,
+        hh3cDot11RogueAPFirstDetectTm     TimeTicks,
+        hh3cDot11RogueAPLastDetectTm      TimeTicks,
+        hh3cDot11RogueAPSSID              Hh3cDot11SSIDStringType,
+        hh3cDot11RogueAPMaxSigStrength    Integer32,
+        hh3cDot11RogueAPChannel           Hh3cDot11ChannelScopeType,
+        hh3cDot11RogueAPBeaconInterval    Integer32,
+        hh3cDot11RogueAPAttackedStatus    TruthValue,
+        hh3cDot11RogueAPToIgnore          TruthValue,
+        hh3cDot11RogueAPEncryptStatus     TruthValue,
+        hh3cDot11RogueAPReset             TruthValue,
+        hh3cDot11RogueAPFirstDetectTmStr  OCTET STRING,
+        hh3cDot11RogueAPLastDetectTmStr   OCTET STRING
+    }
+
+hh3cDot11RogueAPBSSMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the BSS MAC address of rogue AP."
+    ::= { hh3cDot11WIDSRogueAPEntry 1 }
+
+hh3cDot11RogueAPVendorName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the vendor name of rogue AP."
+    ::= { hh3cDot11WIDSRogueAPEntry 2 }
+
+hh3cDot11RogueAPMonitorNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of monitor APs which detected the
+        rogue AP."
+    ::= { hh3cDot11WIDSRogueAPEntry 3 }
+
+hh3cDot11RogueAPFirstDetectTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that AP was detected as a rogue AP for
+        the first time."
+    ::= { hh3cDot11WIDSRogueAPEntry 4 }
+
+hh3cDot11RogueAPLastDetectTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that AP was detected as a rogue AP for
+        the last time."
+    ::= { hh3cDot11WIDSRogueAPEntry 5 }
+
+hh3cDot11RogueAPSSID OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the SSID broadcasted by rogue AP."
+    ::= { hh3cDot11WIDSRogueAPEntry 6 }
+
+hh3cDot11RogueAPMaxSigStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximal value of signal strength that WIDS received
+        from the rogue AP."
+    ::= { hh3cDot11WIDSRogueAPEntry 7 }
+
+hh3cDot11RogueAPChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents on which radio channel of the rogue AP the maximal signal
+        strength was received."
+    ::= { hh3cDot11WIDSRogueAPEntry 8 }
+
+hh3cDot11RogueAPBeaconInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millisecond"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the interval for Beacon management frame of rogue AP."
+    ::= { hh3cDot11WIDSRogueAPEntry 9 }
+
+hh3cDot11RogueAPAttackedStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the countermeasure have taken for the rogue AP."
+    ::= { hh3cDot11WIDSRogueAPEntry 10 }
+
+hh3cDot11RogueAPToIgnore OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the rogue AP will be taken as a rogue AP.
+        If the value is true, NMS should not display the rogue AP
+        as NMS display rogue AP list, and the MAC address will be
+        automatically added into hh3cDot11WIDSIgnoreListTable.
+        If the value is false, NMS will take it as a rogue AP. "
+    DEFVAL      { false }
+    ::= { hh3cDot11WIDSRogueAPEntry 11 }
+
+hh3cDot11RogueAPEncryptStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the rogue AP encrypt the frame or not."
+    ::= { hh3cDot11WIDSRogueAPEntry 12 }
+
+hh3cDot11RogueAPReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear information of assigned AP.  The
+         information of AP which detect assigned rogue AP will be cleared
+         together.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSRogueAPEntry 13 }
+
+hh3cDot11RogueAPFirstDetectTmStr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that AP was detected as a rogue AP for
+         the first time."
+    ::= { hh3cDot11WIDSRogueAPEntry 14 }
+
+hh3cDot11RogueAPLastDetectTmStr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that AP was detected as a rogue AP for
+         the last time."
+    ::= { hh3cDot11WIDSRogueAPEntry 15 }
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSRogueAPTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSRogueAPExtTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSRogueAPExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSRogueAPExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "As each rogue AP could be detected by multiple monitor APs, each
+        monitor AP could have some kind of detailed information about
+        a specific rogue AP.
+        In the hh3cDot11WIDSRogueAPTable table, the detailed
+        information for a specific rogue AP will be summarized from
+        information in the hh3cDot11WIDSRogueAPExtTable table.
+        For example, multiple monitor APs could receive RF signal of
+        one rogue AP, and each monitor AP has its maximum signal strength by
+        itself. The information will be kept as
+        hh3cDot11DetectMaxAPSigStrength in the hh3cDot11WIDSRogueAPExtTable
+        table. While only the maximum value among all the
+        hh3cDot11DetectMaxAPSigStrength for each monitor AP will be
+        kept in the hh3cDot11WIDSRogueAPTable as
+        hh3cDot11RogueAPMaxSigStrength."
+    ::= { hh3cDot11WIDSDetectGroup 2 }
+
+hh3cDot11WIDSRogueAPExtEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSRogueAPExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of the rogue AP detected
+        by each monitor AP."
+    INDEX
+        {
+            hh3cDot11RogueAPBSSMAC,
+            hh3cDot11WIDSAPID
+        }
+    ::= { hh3cDot11WIDSRogueAPExtTable 1 }
+
+Hh3cDot11WIDSRogueAPExtEntry ::= SEQUENCE
+    {
+        hh3cDot11WIDSAPID                  Hh3cDot11ObjectIDType,
+        hh3cDot11DetectCurAPSigStrength    Integer32,
+        hh3cDot11DetectAPByChannel         Hh3cDot11ChannelScopeType,
+        hh3cDot11DetectAPByRadioID         Hh3cDot11RadioScopeType,
+        hh3cDot11AttackAPStatus            TruthValue,
+        hh3cDot11DetectAPFirstTm           TimeTicks,
+        hh3cDot11DetectAPLastTm            TimeTicks
+    }
+
+hh3cDot11WIDSAPID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "To uniquely identify each AP, and relation-ship between
+        hh3cDot11WIDSAPID and AP device will be static."
+    ::= { hh3cDot11WIDSRogueAPExtEntry 1 }
+
+hh3cDot11DetectCurAPSigStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current value of signal strength that WIDS monitor
+        AP received from the rogue AP."
+    ::= { hh3cDot11WIDSRogueAPExtEntry 2 }
+
+hh3cDot11DetectAPByChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents on which radio channel that WIDS monitor AP detected
+        the rogue AP."
+    ::= { hh3cDot11WIDSRogueAPExtEntry 3 }
+
+hh3cDot11DetectAPByRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents on which radio the monitor AP has detected the rogue
+        AP."
+    ::= { hh3cDot11WIDSRogueAPExtEntry 4 }
+
+hh3cDot11AttackAPStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether monitor AP have taken countermeasure on the
+        rogue AP."
+    ::= { hh3cDot11WIDSRogueAPExtEntry 5 }
+
+hh3cDot11DetectAPFirstTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that monitor AP detected the rogue AP for
+        the first time."
+    ::= { hh3cDot11WIDSRogueAPExtEntry 6 }
+
+hh3cDot11DetectAPLastTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that monitor AP detected the rogue AP for
+        the last time."
+    ::= { hh3cDot11WIDSRogueAPExtEntry 7 }
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSRogueAPExtTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSRogueStaTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSRogueStaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSRogueStaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table represents the list of rogue stations detected by
+        the WIDS."
+    ::= { hh3cDot11WIDSDetectGroup 3 }
+
+hh3cDot11WIDSRogueStaEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSRogueStaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of each rogue station."
+    INDEX
+        {
+            hh3cDot11RogueStaMAC
+        }
+    ::= { hh3cDot11WIDSRogueStaTable 1 }
+
+Hh3cDot11WIDSRogueStaEntry ::= SEQUENCE
+    {
+        hh3cDot11RogueStaMAC               MacAddress,
+        hh3cDot11RogueStaVendorName        OCTET STRING,
+        hh3cDot11RogueStaMonitorNum        Integer32,
+        hh3cDot11RogueStaFirstDetectTm     TimeTicks,
+        hh3cDot11RogueStaLastDetectTm      TimeTicks,
+        hh3cDot11RogueStaAccessBSSID       MacAddress,
+        hh3cDot11RogueStaMaxSigStrength    Integer32,
+        hh3cDot11RogueStaChannel           Hh3cDot11ChannelScopeType,
+        hh3cDot11RogueStaAttackedStatus    TruthValue,
+        hh3cDot11RogueStaToIgnore          TruthValue,
+        hh3cDot11RogueStaAdHocStatus       TruthValue,
+        hh3cDot11RogueStaReset             TruthValue,
+        hh3cDot11RogueStaFirstDetectTmStr  OCTET STRING,
+        hh3cDot11RogueStaLastDetectTmStr   OCTET STRING
+    }
+
+hh3cDot11RogueStaMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of rogue station."
+    ::= { hh3cDot11WIDSRogueStaEntry 1 }
+
+hh3cDot11RogueStaVendorName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the vendor name of rogue station."
+    ::= { hh3cDot11WIDSRogueStaEntry 2 }
+
+hh3cDot11RogueStaMonitorNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of monitor APs which detected the
+         rogue station."
+    ::= { hh3cDot11WIDSRogueStaEntry 3 }
+
+hh3cDot11RogueStaFirstDetectTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that station was detected as a rogue station for
+         the first time."
+    ::= { hh3cDot11WIDSRogueStaEntry 4 }
+
+hh3cDot11RogueStaLastDetectTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that station was detected as a rogue station for
+         the last time."
+    ::= { hh3cDot11WIDSRogueStaEntry 5 }
+
+hh3cDot11RogueStaAccessBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents BSS MAC address that rogue station try to access."
+    ::= { hh3cDot11WIDSRogueStaEntry 6 }
+
+hh3cDot11RogueStaMaxSigStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximal value of signal strength that WIDS received
+         from the rogue station."
+    ::= { hh3cDot11WIDSRogueStaEntry 7 }
+
+hh3cDot11RogueStaChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents on which radio channel the maximal signal strength
+         was received."
+    ::= { hh3cDot11WIDSRogueStaEntry 8 }
+
+hh3cDot11RogueStaAttackedStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the countermeasure have taken for the rogue
+         station."
+    ::= { hh3cDot11WIDSRogueStaEntry 9 }
+
+hh3cDot11RogueStaToIgnore OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the rogue AP will be taken as a rogue station.
+         If the value is true, NMS should not display the rogue station
+         as NMS display rogue station list, and the MAC address will be
+         automatically added into hh3cDot11WIDSIgnoreListTable.
+         If the value is false, NMS will take it as a rogue station. "
+    DEFVAL      { false }
+    ::= { hh3cDot11WIDSRogueStaEntry 10 }
+
+hh3cDot11RogueStaAdHocStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the rogue station work on the Ad Hoc mode
+         or not."
+    ::= { hh3cDot11WIDSRogueStaEntry 11 }
+
+hh3cDot11RogueStaReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clear information of assigned station.  The
+         information of AP which detects assigned rogue station will be cleared
+         together.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSRogueStaEntry 12 }
+
+hh3cDot11RogueStaFirstDetectTmStr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that station was detected as a rogue station for
+         the first time."
+    ::= { hh3cDot11WIDSRogueStaEntry 13 }
+
+hh3cDot11RogueStaLastDetectTmStr OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that station was detected as a rogue station for
+         the last time."
+    ::= { hh3cDot11WIDSRogueStaEntry 14 }
+-- *****************************************************************************
+-- * End of hh3cDot11WIDSRogueStaTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSRogueStaExtTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSRogueStaExtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSRogueStaExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "As each rogue station could be detected by multiple monitor APs, each
+        monitor AP could have some kind of detailed information about
+        a specific rogue station.
+        In the hh3cDot11WIDSRogueStaTable table, the detailed
+        information for a specific rogue station will be summarized from
+        information in the hh3cDot11WIDSRogueStaExtTable table.
+        For example, multiple monitor APs could receive RF signal of one rogue
+        station, and each monitor AP has its maximum signal strength by
+        itself. The information will be kept as
+        hh3cDot11DetectMaxStaSigStrength in the hh3cDot11WIDSRogueStaExtTable
+        table. While only the maximum value among all the
+        hh3cDot11DetectMaxStaSigStrength for each monitor AP will be
+        kept in the hh3cDot11WIDSRogueStaTable as
+        hh3cDot11RogueStaMaxSigStrength."
+    ::= { hh3cDot11WIDSDetectGroup 4 }
+
+hh3cDot11WIDSRogueStaExtEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSRogueStaExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of rogue station detected
+        by each monitor AP."
+    INDEX
+        {
+            hh3cDot11RogueStaMAC,
+            hh3cDot11WIDSAPID
+        }
+    ::= { hh3cDot11WIDSRogueStaExtTable 1 }
+
+Hh3cDot11WIDSRogueStaExtEntry ::= SEQUENCE
+    {
+        hh3cDot11DetectCurStaSigStrength    Integer32,
+        hh3cDot11DetectStaByChannel         Hh3cDot11ChannelScopeType,
+        hh3cDot11DetectStaByRadioID         Hh3cDot11RadioScopeType,
+        hh3cDot11AttackStaStatus            TruthValue,
+        hh3cDot11DetectStaFirstTm           TimeTicks,
+        hh3cDot11DetectStaLastTm            TimeTicks
+    }
+
+hh3cDot11DetectCurStaSigStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current value of signal strength that WIDS monitor
+        AP received from the rogue station."
+    ::= { hh3cDot11WIDSRogueStaExtEntry 1 }
+
+hh3cDot11DetectStaByChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents on which radio channel the maximal signal strength
+        was received."
+    ::= { hh3cDot11WIDSRogueStaExtEntry 2 }
+
+hh3cDot11DetectStaByRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents which radio on the monitor AP has detected the
+        rogue station."
+    ::= { hh3cDot11WIDSRogueStaExtEntry 3 }
+
+hh3cDot11AttackStaStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether monitor AP have taken countermeasure for the
+        rogue station."
+    ::= { hh3cDot11WIDSRogueStaExtEntry 4 }
+
+hh3cDot11DetectStaFirstTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that monitor AP detected the rogue station
+        for the first time."
+    ::= { hh3cDot11WIDSRogueStaExtEntry 5 }
+
+hh3cDot11DetectStaLastTm OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time that monitor AP detected the rogue station
+        for the last time."
+    ::= { hh3cDot11WIDSRogueStaExtEntry 6 }
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSRogueStaExtTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSDetectedDevTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSDetectedDevTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSDetectedDevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This Table contains information of detected devices."
+    ::= { hh3cDot11WIDSDetectGroup 5 }
+
+hh3cDot11WIDSDetectedDevEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSDetectedDevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of detected devices."
+    INDEX
+        {
+            hh3cDot11WIDSDevMAC
+        }
+    ::= { hh3cDot11WIDSDetectedDevTable 1 }
+
+Hh3cDot11WIDSDetectedDevEntry ::= SEQUENCE
+    {
+        hh3cDot11WIDSDevMAC           MacAddress,
+        hh3cDot11WIDSDevType          Hh3cDot11WIDSDevType,
+        hh3cDot11WIDSDevPermitType    Hh3cDot11WIDSDevPermitType,
+        hh3cDot11WIDSDevVendor        OCTET STRING,
+        hh3cDot11WIDSDevMonitorNum    Integer32,
+        hh3cDot11WIDSDevSSID          OCTET STRING,
+        hh3cDot11WIDSDevBSSID         MacAddress,
+        hh3cDot11WIDSDevChannel       Hh3cDot11ChannelScopeType,
+        hh3cDot11WIDSDevMaxRSSI       Integer32,
+        hh3cDot11WIDSDevBeaconIntvl   Integer32,
+        hh3cDot11WIDSDevFstDctTime    DateAndTime,
+        hh3cDot11WIDSDevLstDctTime    DateAndTime,
+        hh3cDot11WIDSDevReset         TruthValue,
+        hh3cDot11WIDSDevSnr           Integer32
+    }
+
+hh3cDot11WIDSDevMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents MAC address of the device detected."
+    ::= { hh3cDot11WIDSDetectedDevEntry 1 }
+
+hh3cDot11WIDSDevType OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSDevType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents type of the device detected."
+    ::= { hh3cDot11WIDSDetectedDevEntry 2 }
+
+hh3cDot11WIDSDevPermitType OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSDevPermitType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents whether the device detected is a rogue device or not."
+    ::= { hh3cDot11WIDSDetectedDevEntry 3 }
+
+hh3cDot11WIDSDevVendor OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents Vendor of the detected device."
+    ::= { hh3cDot11WIDSDetectedDevEntry 4 }
+
+hh3cDot11WIDSDevMonitorNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of active APs that detect the device."
+    ::= { hh3cDot11WIDSDetectedDevEntry 5 }
+
+hh3cDot11WIDSDevSSID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the service set identifier for the ESS of the device."
+    ::= { hh3cDot11WIDSDetectedDevEntry 6 }
+
+hh3cDot11WIDSDevBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the basic service set identifier of the detected device."
+    ::= { hh3cDot11WIDSDetectedDevEntry 7 }
+
+hh3cDot11WIDSDevChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the channel in which the device was last detected."
+    ::= { hh3cDot11WIDSDetectedDevEntry 8 }
+
+hh3cDot11WIDSDevMaxRSSI OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dbm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum detected RSSI of the device."
+    ::= { hh3cDot11WIDSDetectedDevEntry 9 }
+
+hh3cDot11WIDSDevBeaconIntvl OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "millionsecond"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the beacon interval for the detected AP."
+    ::= { hh3cDot11WIDSDetectedDevEntry 10 }
+
+hh3cDot11WIDSDevFstDctTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the device was first detected."
+    ::= { hh3cDot11WIDSDetectedDevEntry 11 }
+
+hh3cDot11WIDSDevLstDctTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the rogue AP was detected last time."
+    ::= { hh3cDot11WIDSDetectedDevEntry 12 }
+
+hh3cDot11WIDSDevReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to clears the information of the device detected
+         in the WLAN.
+         It will return false for get operation."
+    ::= { hh3cDot11WIDSDetectedDevEntry 13 }
+
+hh3cDot11WIDSDevSnr OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents SNR of the device detected."
+    ::= { hh3cDot11WIDSDetectedDevEntry 14 }
+
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSDetectedDevTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSRptAPTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSRptAPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSRptAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This Table contains information of the AP which detected device in the
+         WLAN."
+    ::= { hh3cDot11WIDSDetectGroup 6 }
+
+hh3cDot11WIDSRptAPEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSRptAPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of the AP which detected device in the
+         WLAN."
+    INDEX
+        {
+            hh3cDot11WIDSDevMAC,
+            hh3cDot11WIDSRptAPMAC
+        }
+    ::= { hh3cDot11WIDSRptAPTable 1 }
+
+Hh3cDot11WIDSRptAPEntry ::= SEQUENCE
+    {
+        hh3cDot11WIDSRptAPMAC           MacAddress,
+        hh3cDot11WIDSRptAPName          OCTET STRING,
+        hh3cDot11WIDSRptAPRadioID       Hh3cDot11RadioScopeType,
+        hh3cDot11WIDSRptAPMaxRSSI       Integer32,
+        hh3cDot11WIDSRptAPFstDctTime    DateAndTime,
+        hh3cDot11WIDSRptAPLstDctTime    DateAndTime
+    }
+
+hh3cDot11WIDSRptAPMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of the AP that detected the device."
+    ::= { hh3cDot11WIDSRptAPEntry 1 }
+
+hh3cDot11WIDSRptAPName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of the AP that detected the device."
+    ::= { hh3cDot11WIDSRptAPEntry 2 }
+
+hh3cDot11WIDSRptAPRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the radio index of the AP that detected the device."
+    ::= { hh3cDot11WIDSRptAPEntry 3 }
+
+hh3cDot11WIDSRptAPMaxRSSI OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the maximum detected RSSI of the device."
+    ::= { hh3cDot11WIDSRptAPEntry 4 }
+
+hh3cDot11WIDSRptAPFstDctTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the rogue AP was detected first time."
+    ::= { hh3cDot11WIDSRptAPEntry 5 }
+
+hh3cDot11WIDSRptAPLstDctTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the rogue AP was detected last time."
+    ::= { hh3cDot11WIDSRptAPEntry 6 }
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSRptAPTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11DynBlackListTable Definition
+-- *****************************************************************************
+hh3cDot11DynBlackListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11DynBlackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information of dynamic blacklist entries."
+    ::= { hh3cDot11WIDSDetectGroup 7 }
+
+hh3cDot11DynBlackListEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11DynBlackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of dynamic blacklist."
+    INDEX
+        {
+            hh3cDot11DynBlackListMAC
+        }
+    ::= { hh3cDot11DynBlackListTable 1 }
+
+Hh3cDot11DynBlackListEntry ::= SEQUENCE
+    {
+        hh3cDot11DynBlackListMAC        MacAddress,
+        hh3cDot11DynBlackListTime       Unsigned32,
+        hh3cDot11DynBlackListReason     OCTET STRING,
+        hh3cDot11DynBlackListReset      TruthValue,
+        hh3cDot11DynBlackListTimeTicks  TimeTicks
+    }
+
+hh3cDot11DynBlackListMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of the device inserted into the dynamic
+         blacklist."
+    ::= { hh3cDot11DynBlackListEntry 1 }
+
+hh3cDot11DynBlackListTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time elapsed since the entry was last updated."
+    ::= { hh3cDot11DynBlackListEntry 2 }
+
+hh3cDot11DynBlackListReason OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason why the entry was added into the dynamic
+         blacklist."
+    ::= { hh3cDot11DynBlackListEntry 3 }
+
+hh3cDot11DynBlackListReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to remove designated entry from the dynamic
+         blacklist.
+         The value which read from this object always is false."
+    ::= { hh3cDot11DynBlackListEntry 4 }
+
+hh3cDot11DynBlackListTimeTicks OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time elapsed since the entry was last updated in units TimeTicks."
+    ::= { hh3cDot11DynBlackListEntry 5 }
+
+-- *****************************************************************************
+-- * end of hh3cDot11DynBlackListTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSRogueHistoryTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSRogueHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSRogueHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information of all expired rogue devices which
+         have been deleted from the list of detected rogue devices because
+         they could not be detected within the device aging duration."
+    ::= { hh3cDot11WIDSDetectGroup 8 }
+
+hh3cDot11WIDSRogueHistoryEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSRogueHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of an expired rogue device which
+         has been deleted from the list of detected rogue devices because
+         they could not be detected within the device aging duration."
+    INDEX
+        {
+            hh3cDot11WIDSRogueHisIndex
+        }
+    ::= { hh3cDot11WIDSRogueHistoryTable 1 }
+
+Hh3cDot11WIDSRogueHistoryEntry ::= SEQUENCE
+    {
+        hh3cDot11WIDSRogueHisIndex        Integer32,
+        hh3cDot11WIDSRogueHisMAC          MacAddress,
+        hh3cDot11WIDSRogueHisVendor       OCTET STRING,
+        hh3cDot11WIDSRogueHisType         Hh3cDot11WIDSDevType,
+        hh3cDot11WIDSRogueHisChl          Hh3cDot11ChannelScopeType,
+        hh3cDot11WIDSRogueHisSSID         OCTET STRING,
+        hh3cDot11WIDSRogueHisLastDctTime  DateAndTime
+    }
+
+hh3cDot11WIDSRogueHisIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents index of this entry."
+    ::= { hh3cDot11WIDSRogueHistoryEntry 1 }
+
+hh3cDot11WIDSRogueHisMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of the device."
+    ::= { hh3cDot11WIDSRogueHistoryEntry 2 }
+
+hh3cDot11WIDSRogueHisVendor OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the vendor for the device."
+    ::= { hh3cDot11WIDSRogueHistoryEntry 3 }
+
+hh3cDot11WIDSRogueHisType OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSDevType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of the device."
+    ::= { hh3cDot11WIDSRogueHistoryEntry 4 }
+
+hh3cDot11WIDSRogueHisChl OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the channel in which the device was last detected."
+    ::= { hh3cDot11WIDSRogueHistoryEntry 5 }
+
+hh3cDot11WIDSRogueHisSSID OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the service set identifier for the ESS of the device."
+    ::= { hh3cDot11WIDSRogueHistoryEntry 6 }
+
+hh3cDot11WIDSRogueHisLastDctTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the device was last detected."
+    ::= { hh3cDot11WIDSRogueHistoryEntry 7 }
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSRogueHistoryTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSAtkHistroyTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSAtkHistroyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSAtkHistroyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information of the history of attacks detected in
+         the WLAN system."
+    ::= { hh3cDot11WIDSDetectGroup 9 }
+
+hh3cDot11WIDSAtkHistroyEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSAtkHistroyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of the history of attacks detected in
+         the WLAN system."
+    INDEX
+        {
+            hh3cDot11WIDSAtkHisIndex
+        }
+    ::= { hh3cDot11WIDSAtkHistroyTable 1 }
+
+Hh3cDot11WIDSAtkHistroyEntry ::= SEQUENCE
+    {
+        hh3cDot11WIDSAtkHisIndex       Integer32,
+        hh3cDot11WIDSAtkHisMAC         MacAddress,
+        hh3cDot11WIDSAtkHisType        Hh3cDot11WIDSAtkType,
+        hh3cDot11WIDSAtkHisChl         Hh3cDot11ChannelScopeType,
+        hh3cDot11WIDSAtkHisRSSI        Integer32,
+        hh3cDot11WIDSAtkHisDctTime     DateAndTime,
+        hh3cDot11WIDSAtkHisAPName      OCTET STRING
+    }
+
+hh3cDot11WIDSAtkHisIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents index of this entry."
+    ::= { hh3cDot11WIDSAtkHistroyEntry 1 }
+
+hh3cDot11WIDSAtkHisMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the Mac address.  In case of spoof attacks, this field
+         provides the BSSID which was spoofed.  In case of other attacks,
+         this field provides the MAC address of the device which initiated
+         the attack."
+    ::= { hh3cDot11WIDSAtkHistroyEntry 2 }
+
+hh3cDot11WIDSAtkHisType OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSAtkType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of attack."
+    ::= { hh3cDot11WIDSAtkHistroyEntry 3 }
+
+hh3cDot11WIDSAtkHisChl OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the channel in which the attack was detected."
+    ::= { hh3cDot11WIDSAtkHistroyEntry 4 }
+
+hh3cDot11WIDSAtkHisRSSI OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the average RSSI of the designated attack."
+    ::= { hh3cDot11WIDSAtkHistroyEntry 5 }
+
+hh3cDot11WIDSAtkHisDctTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which this attack was detected."
+    ::= { hh3cDot11WIDSAtkHistroyEntry 6 }
+
+hh3cDot11WIDSAtkHisAPName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the name of the AP which detected this attack."
+    ::= { hh3cDot11WIDSAtkHistroyEntry 7 }
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSAtkHistroyTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSAtkStatis Definition
+-- *****************************************************************************
+hh3cDot11WIDSAtkStatis OBJECT IDENTIFIER       ::= { hh3cDot11WIDSDetectGroup 10 }
+
+hh3cDot11WIDSAtkStasStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents current attack tracking time.  It is started at the system
+         startup and is refreshed each hour subsequently."
+    ::= { hh3cDot11WIDSAtkStatis 1 }
+
+-- *****************************************************************************
+-- *  hh3cDot11WIDSAtkStasTable Definition
+-- *****************************************************************************
+hh3cDot11WIDSAtkStasTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11WIDSAtkStasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information of the counts of attacks detected."
+    ::= { hh3cDot11WIDSAtkStatis 2 }
+
+hh3cDot11WIDSAtkStasEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSAtkStasEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of the counts of attacks detected."
+    INDEX
+        {
+            hh3cDot11WIDSAtkStasType
+        }
+    ::= { hh3cDot11WIDSAtkStasTable 1 }
+
+Hh3cDot11WIDSAtkStasEntry ::= SEQUENCE
+    {
+        hh3cDot11WIDSAtkStasType       Hh3cDot11WIDSAtkType,
+        hh3cDot11WIDSAtkStasCurCnt     Unsigned32,
+        hh3cDot11WIDSAtkStasTotalCnt   Unsigned32
+    }
+
+hh3cDot11WIDSAtkStasType OBJECT-TYPE
+    SYNTAX      Hh3cDot11WIDSAtkType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of attack."
+    ::= { hh3cDot11WIDSAtkStasEntry 1 }
+
+hh3cDot11WIDSAtkStasCurCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of attacks detected since the time
+         specified by the current attack tracking time.  The current
+         attack tracking time is started at the system startup and
+         is refreshed each hour subsequently."
+    ::= { hh3cDot11WIDSAtkStasEntry 2 }
+
+hh3cDot11WIDSAtkStasTotalCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total count of the attacks detected since
+         the system startup."
+    ::= { hh3cDot11WIDSAtkStasEntry 3 }
+-- *****************************************************************************
+-- *  end of hh3cDot11WIDSAtkStasTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11BlackListTable Definition
+-- *****************************************************************************
+hh3cDot11BlackListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11BlackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information of blacklist entries, including
+         dynamic and static."
+    ::= { hh3cDot11WIDSDetectGroup 11 }
+
+hh3cDot11BlackListEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11BlackListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of blacklist."
+    INDEX
+        {
+            hh3cDot11BlackListMAC
+        }
+    ::= { hh3cDot11BlackListTable 1 }
+
+Hh3cDot11BlackListEntry ::= SEQUENCE
+    {
+        hh3cDot11BlackListMAC        MacAddress,
+        hh3cDot11BlackListTime       Unsigned32,
+        hh3cDot11BlackListReason     OCTET STRING,
+        hh3cDot11BlackListRowStatus  RowStatus,
+        hh3cDot11BlackListTimeTicks  TimeTicks
+    }
+
+hh3cDot11BlackListMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MAC address of the device inserted into
+         the table."
+    ::= { hh3cDot11BlackListEntry 1 }
+
+hh3cDot11BlackListTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time elapsed since the entry was last updated.
+         If it is static blacklist, the value is always 0."
+    ::= { hh3cDot11BlackListEntry 2 }
+
+hh3cDot11BlackListReason OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the reason why the entry was added into the blacklist."
+    ::= { hh3cDot11BlackListEntry 3 }
+
+hh3cDot11BlackListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of this table entry."
+    ::= { hh3cDot11BlackListEntry 4 }
+
+hh3cDot11BlackListTimeTicks OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time elapsed since the entry was last updated in timetick.
+         If it is static blacklist, the value is always 0."
+    ::= { hh3cDot11BlackListEntry 5 }
+-- *****************************************************************************
+-- * end of hh3cDot11BlackListTable Definition
+-- *****************************************************************************
+
+
+-- *****************************************************************************
+-- * end of hh3cDot11WIDSAtkStatis Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *     Notifications OF hh3cDot11WIDSNotifyGroup
+-- *****************************************************************************
+-- WIDS Notification
+        hh3cDot11WIDSTraps OBJECT IDENTIFIER
+    ::= { hh3cDot11WIDSNotifyGroup 1 }
+
+hh3cDot11WIDSDetectRogueTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11WIDSRogueMAC,
+            hh3cDot11WIDSRogueType,
+            hh3cDot11WIDSMonitorMAC,
+            hh3cDot11MonitorAPID,
+            hh3cDot11MonitorApRadioID
+        }
+    STATUS      current
+    DESCRIPTION
+        "The notification represents that a rogue AP or a station was
+        detected by WIDS.
+        The NMS would refer to MIB table under hh3cDot11WIDSDetectGroup
+        group to get more detailed information."
+    ::= { hh3cDot11WIDSTraps 1 }
+
+hh3cDot11WIDSAdHocTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11WIDSAdHocMAC,
+            hh3cDot11WIDSMonitorMAC
+        }
+    STATUS      current
+    DESCRIPTION
+        "The notification represents a rogue Ad hoc station was detected."
+    ::= { hh3cDot11WIDSTraps 2 }
+
+hh3cDot11WIDSUnauthorSSIDTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11UnauthorSSIDName,
+            hh3cDot11WIDSMonitorMAC,
+            hh3cDot11MonitorAPID,
+            hh3cDot11MonitorApRadioID
+        }
+    STATUS      current
+    DESCRIPTION
+        "The notification represents which unauthorized SSID are
+        accessed in the network.
+        The notification will be sent to NMS when an
+        unauthorized SSID is detected on the network for the
+        first time."
+    ::= { hh3cDot11WIDSTraps 3 }
+
+hh3cDot11WIDSDisappearRogueTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11WIDSRogueMAC
+        }
+    STATUS      current
+    DESCRIPTION
+        "The notification represents that a rogue device has aged out
+        and moved to history table or the device type has been changed
+        to friendly.
+        The notification will be sent to NMS whenever a rogue disappears."
+    ::= { hh3cDot11WIDSTraps 4 }
+
+hh3cDot11WIDSDetectAttack NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDot11WIDSAtkHisType,
+        hh3cDot11WIDSAtkHisChl,
+        hh3cDot11WIDSAtkHisDctTime,
+        hh3cDot11WIDSAtkHisAPName
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification occurs when some type of attack is detected.
+        "
+    ::= { hh3cDot11WIDSTraps 5 }
+
+hh3cDot11WIDSDetectWBridge NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDot11WIDSRptAPName,
+        hh3cDot11WIDSRptAPRadioID,
+        hh3cDot11WIDSRptAPLstDctTime
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification occurs whenever a detected device is classified
+        as rogue wireless-bridge.
+        "
+    ::= { hh3cDot11WIDSTraps 6 }
+
+hh3cDot11WIDSFloodTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDot11WIDSAtkMac,
+        hh3cDot11WIDSAtkFrameType,
+        hh3cDot11WIDSFirstTrapTime
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification occurs when flood attack is detected.
+        "
+    ::= { hh3cDot11WIDSTraps 7 }
+
+hh3cDot11WIDSSpoofTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDot11WIDSAtkMac,
+        hh3cDot11WIDSAtkFrameType,
+        hh3cDot11WIDSAtkChannel,
+        hh3cDot11WIDSAtkTime,
+        hh3cDot11WIDSAtkDestMac,
+        hh3cDot11WIDSFirstTrapTime
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification occurs when spoof attack is detected.
+        "
+    ::= { hh3cDot11WIDSTraps 8 }
+
+hh3cDot11WIDSWeakIVTrap NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cDot11WIDSAtkMac,
+        hh3cDot11WIDSAtkChannel,
+        hh3cDot11WIDSAtkTime,
+        hh3cDot11WIDSAtkDestMac,
+        hh3cDot11WIDSFirstTrapTime
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification occurs when weak IV attack is detected.
+        "
+    ::= { hh3cDot11WIDSTraps 9 }
+
+-- WIDS Notification variable object
+
+        hh3cDot11WIDSTrapVarObjects OBJECT IDENTIFIER
+    ::= { hh3cDot11WIDSNotifyGroup 2 }
+
+hh3cDot11WIDSRogueMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents which rogue AP or station."
+    ::= { hh3cDot11WIDSTrapVarObjects 1 }
+
+hh3cDot11WIDSRogueType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            rogueAp(1),
+            rogueStation(2)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the rogue type.
+        The following value are supported
+        rogueAp(1)        - A rogue AP
+        rogueStation(2)   - A rogue Station"
+    ::= { hh3cDot11WIDSTrapVarObjects 2 }
+
+hh3cDot11WIDSMonitorMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents which monitor detected the rogue AP or station."
+    ::= { hh3cDot11WIDSTrapVarObjects 3 }
+
+hh3cDot11WIDSAdHocMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of Ad hoc station."
+    ::= { hh3cDot11WIDSTrapVarObjects 4 }
+
+hh3cDot11UnauthorSSIDName OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents an unauthorized SSID."
+    ::= { hh3cDot11WIDSTrapVarObjects 5 }
+
+hh3cDot11MonitorAPID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents monitor AP's APID."
+    ::= { hh3cDot11WIDSTrapVarObjects 6 }
+
+hh3cDot11MonitorApRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents monitor AP's radio ID"
+    ::= { hh3cDot11WIDSTrapVarObjects 7 }
+
+hh3cDot11WIDSAtkMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents mac address of attack source."
+    ::= { hh3cDot11WIDSTrapVarObjects 8 }
+
+hh3cDot11WIDSAtkFrameType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents attack frame type."
+    ::= { hh3cDot11WIDSTrapVarObjects 9 }
+
+hh3cDot11WIDSAtkChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents attack channel."
+    ::= { hh3cDot11WIDSTrapVarObjects 10 }
+
+hh3cDot11WIDSAtkTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents when attacking happened."
+    ::= { hh3cDot11WIDSTrapVarObjects 11 }
+
+hh3cDot11WIDSAtkDestMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents mac address of attack destination."
+    ::= { hh3cDot11WIDSTrapVarObjects 12 }
+
+hh3cDot11WIDSFirstTrapTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the first trap time."
+    ::= { hh3cDot11WIDSTrapVarObjects 13 }
+-- *****************************************************************************
+-- *     End OF hh3cDot11WIDSNotifyGroup
+-- *****************************************************************************
+END

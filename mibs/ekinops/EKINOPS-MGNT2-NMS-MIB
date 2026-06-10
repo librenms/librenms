@@ -1,0 +1,1531 @@
+-- *****************************************************************
+-- MGNT2-NMS.TXT:  MIB
+--
+--MIB Part Number: 3MI01003AAAE
+--MIB Version:01
+--
+-- Copyright (c) 2009 by Ekinops
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+EKINOPS-MGNT2-NMS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        ekinops,
+        EkiOnOff
+                FROM EKINOPS-MIB
+
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Unsigned32,
+        Counter32,
+        Integer32,
+        IpAddress
+                FROM SNMPv2-SMI
+
+	SnmpUDPAddress
+		FROM SNMPv2-TM
+
+        TEXTUAL-CONVENTION,
+        DisplayString,
+        DateAndTime,
+        RowStatus
+                FROM SNMPv2-TC
+
+         OBJECT-GROUP,
+	 NOTIFICATION-GROUP,
+         MODULE-COMPLIANCE
+                FROM SNMPv2-CONF;
+
+mgnt2NMS MODULE-IDENTITY
+        LAST-UPDATED "201511120000Z"
+        ORGANIZATION "Ekinops"
+        CONTACT-INFO
+         "Ekinops
+          3, rue Blaise Pascal
+          F-22300 Lannion / FRANCE
+
+          Tel : +33 (0)2 96 05 00 30
+          Fax : +33 (0)2 96 48 62 39
+
+          E-mail: support@ekinops.fr"
+        DESCRIPTION
+          "MIB for managing Ekinops 360 Network Element via a NMS."
+        REVISION "200907261500Z"
+        DESCRIPTION
+          "Initial version."
+        REVISION "201504130000Z"
+        DESCRIPTION
+          "Add bindings for Node Controller
+           Add objects for Linux download
+	   Add objects for SoftwareDownload"
+        REVISION "201511120000Z"
+        DESCRIPTION
+          "Appropriate Limits on SYNTAX of some OBJECT-TYPE)"
+        REVISION "201606060000Z"
+        DESCRIPTION
+          "new synthesisAlarm alarmtype "
+
+        ::= { ekinops 1000 }
+
+
+
+mgnt2NMSMibObject  OBJECT IDENTIFIER ::= { mgnt2NMS 1 }
+
+mgnt2SupportMCConf       OBJECT IDENTIFIER ::= { mgnt2NMS 2 }
+mgnt2SupportMCCompl      OBJECT IDENTIFIER ::= { mgnt2SupportMCConf 1 }
+mgnt2SupportMCGroup      OBJECT IDENTIFIER ::= { mgnt2SupportMCConf 2 }
+
+--
+--     TEXTUAL-CONVENTION
+
+-- Mgnt2NotificationId
+
+Mgnt2NotificationId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object contains a unique event/alarm numbering."
+    SYNTAX Counter32
+
+
+-- Mgnt2AlmProbableCause
+
+Mgnt2AlmProbableCause ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object is used to specify the OID of the probable cause of the 
+         generated notification."
+    SYNTAX INTEGER { 
+        other (1),
+        adapterError (2),
+        applicationSubsystemFailure (3),
+        bandwidthReduced (4),
+        callEstablishmentError (5),
+        communicationsProtocolError (6),
+        communicationsSubsystemFailure (7),
+        configurationOrCustomizationError (8),
+        congestion (9),
+        corruptData (10),
+        cpuCyclesLimitExceeded (11),
+        dataSetOrModemError (12),
+        degradedSignal (13),
+        dteDceInterfaceError (14),
+        enclosureDoorOpen (15),
+        equipmentMalfunction (16),
+        excessiveVibration (17),
+        fileError (18),
+        fireDetected (19),
+        floodDetected (20),
+        framingError (21),
+        heatingVentCoolingSystemProblem (22),
+        humidityUnacceptable (23),
+        inputOutputDeviceError (24),
+        inputDeviceError (25),
+        lanError (26),
+        leakDetected (27),
+        localNodeTransmissionError (28),
+        lossOfFrame (29),
+        lossOfSignal (30),
+        materialSupplyExhausted (31),
+        multiplexerProblem (32),
+        outOfMemory (33),
+        ouputDeviceError (34),
+        performanceDegraded (35),
+        powerProblem (36),
+        pressureUnacceptable (37),
+        processorProblem (38),
+        pumpFailure (39),
+        queueSizeExceeded (40),
+        receiveFailure (41),
+        receiverFailure (42),
+        remoteNodeTransmissionError (43),
+        resourceAtOrNearingCapacity (44),
+        responseTimeExecessive (45),
+        retransmissionRateExcessive (46),
+        softwareError (47),
+        softwareProgramAbnormallyTerminated (48),
+        softwareProgramError (49),
+        storageCapacityProblem (50),
+        temperatureUnacceptable (51),
+        thresholdCrossed (52),
+        timingProblem (53),
+        toxicLeakDetected (54),
+        transmitFailure (55),
+        transmitterFailure (56),
+        underlyingResourceUnavailable (57),
+        versionMismatch (58),
+        authenticationFailure (59),
+        breachOfConfidentiality (60),
+        cableTamper (61),
+        delayedInformation (62),
+        denialOfService (63),
+        duplicateInformation (64),
+        informationMissing (65),
+        informationModificationDetected (66),
+        informationOutOfSequence (67),
+        intrusionDetection (68),
+        keyExpired (69),
+        nonRepudiationFailure (70),
+        outOfHoursActivity (71),
+        outOfService (72),
+        proceduralError (73),
+        unauthorizedAccessAttempt (74),
+        unexpectedInformation (75),
+	  informationalStatus(1000)
+    }
+
+-- Mgnt2ObjectClassId
+
+Mgnt2ObjectClassId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object represents the SNMP entry table 
+         object identity (Managed Object Class) of the instance 
+         where the event/alarm occured."
+    -- SYNTAX Integer32
+    SYNTAX INTEGER {
+        other(1),
+        unknown(2),
+        chassis(3),
+        backplane(4),
+        container(5),     -- e.g., chassis slot or daughter-card holder
+        powerSupply(6),
+        fan(7),
+        sensor(8),
+        module(9),        -- e.g., plug-in card or daughter-card
+        port(10),
+        stack(11),        -- e.g., stack of multiple chassis entities
+        cpu(12),
+        mgnt(13)
+    }
+
+
+-- Mgnt2AlmSeverity
+Mgnt2AlmSeverity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+         "The value of this object identifies the severity of
+          an alarm stored in alarm Table. 
+          The cleared severity is not foreseen inside APT table."
+    SYNTAX INTEGER { 
+        critical(1),
+        major(2),
+        minor(3),
+        warning(4),
+        indeterminate(5),
+        cleared(6)
+    }
+
+
+-- Mgnt2AlmType
+Mgnt2AlmType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+         "The value of this object identifies the type of
+          an alarm stored in alarm Table."
+    SYNTAX INTEGER { 
+        other (1),
+        communicationsAlarm (2),
+        qualityOfServiceAlarm (3),
+        processingErrorAlarm (4),
+        equipmentAlarm (5),
+        environmentalAlarm (6),
+        integrityViolation (7),
+        operationalViolation (8),
+        physicalViolation (9),
+        securityServiceOrMechanismViolation (10),
+        timeDomainViolation (11),
+	synthesisAlarm (12)
+    }
+
+
+-- Mgnt2EventType
+Mgnt2EventType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+         "The value of this object identifies the type of
+          an event stored in event log Table."
+    SYNTAX INTEGER { 
+        objectCreation       (1),
+        objectDeletion       (2),
+        attributeValueChange (3),
+        stateChange          (4),
+        activityLog          (5) 
+   }        
+
+
+Mgnt2EventSourceType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object indicates the event source."
+    SYNTAX INTEGER {
+        event      (1),
+        control    (2),
+        config     (3)
+}
+
+
+-- Mgnt2LacState
+Mgnt2LacState ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "This is the State attribute for the Local Access Control.
+         This attribute can be set:
+         - by Agent at creation time to accessRequested 
+         - by EML to the values accessGranted or accessDenied"
+    SYNTAX INTEGER {
+        accessDenied (0),
+        accessRequested (1), 
+        accessGrantedCraft (2),
+        accessGrantedCli (3),
+        accessGrantedSnmp (4)
+    }
+
+
+-- Mgnt2ServerAddress
+Mgnt2ServerAddress ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+    "This textual convention define a server adress.
+         It can be either only the IP address of the server if 
+         server is running on default port. ex : '10.0.17.57'
+         or IP adress and server port separated by ':' allowing to
+         connect a server running on unusual port. ex : '10.0.17.57:5041'
+         "
+    SYNTAX OCTET STRING
+
+-- Mgnt2UploadDownloadFileEncoding
+Mgnt2UploadDownloadFileEncoding ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+           "This describes the agent's capability in term of which
+           file encoding styles it supports."
+       SYNTAX INTEGER {
+        other(1),
+        ascii(2),
+        xml(3),
+        bin(4),
+        data(5)
+}
+
+-- Mgnt2UploadDownloadFileCompression
+Mgnt2UploadDownloadFileCompression ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "This describes the agent's capability in term of which
+           file compression styles it supports."
+    SYNTAX INTEGER {
+       noCompression(1),
+       bzip(2),
+       gzip(3)
+}
+
+
+-- Mgnt2UploadDownloadActionStatus
+Mgnt2UploadDownloadActionStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object indicates the download status and allow to start download."
+    SYNTAX INTEGER {
+        success       (0),
+        start         (1), -- (value set by a manager to start ftp)
+        inProgress    (2),
+        failed        (3),
+        automatic     (4),  -- used when NE is master to download file(s) (ie : load software packages)
+        abort         (5) -- (value set by a manager to abort ftp)
+}
+
+
+-- Mgnt2UploadDownloadErrorCode
+Mgnt2UploadDownloadErrorCode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object indicates the upload/download error code."
+    SYNTAX INTEGER {
+        noError            (0),
+        missingLogin       (1),
+        missingPassword    (2),
+        missingFile        (3),
+        serverUnreachable  (4),
+        badPassword        (5),
+        noSpaceLeft        (6),
+        corruptedFile      (7),
+        canceled           (8),  -- Error code when ftp has been aborted by manager
+        noWriteAccess      (9)   -- Manager has no write access
+	  undefinedError     (10), -- internal agent error
+	  accessViolation    (11), -- tftp error
+	  fileExist	         (12), -- tftp error : file already exists
+	  wrongDirection     (13), -- cannot send to NMS a pmPackage 
+	  wrongName          (14),
+	  wrongCompression   (15)
+}
+
+
+-- Mgnt2SoftwareDownloadActionStatus
+Mgnt2SoftwareDownloadActionStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object indicates the upload/download error code."
+    SYNTAX INTEGER {
+        noError            (0),
+        missingLogin       (1),
+        missingPassword    (2),
+        missingFile        (3),
+        serverUnreachable  (4),
+        badPassword        (5),
+        noSpaceLeft        (6),
+        corruptedFile      (7),
+        canceled           (8),  -- Error code when ftp has been aborted by manager
+        noWriteAccess      (9)   -- Manager has no write access
+}
+
+
+Mgnt2DownloadFileType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION 
+        "This object indicates the the file type to download/upload."
+    SYNTAX INTEGER {
+        pmPackage             (0),
+        mgntPackage           (1),
+        configurationFile     (2),
+        logFile               (3),
+        perfFile              (4),
+	wavePlan	      (5),
+        adminPackage          (6)
+}
+
+--
+-- Alarm Management
+
+-- Active Alarm List: mgnt2ActiveAlarmTable
+
+mgnt2ActiveAlmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Mgnt2ActiveAlmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "This table defines the MGNT2-NMS Active Alarm table
+          This table is used by Agent in order to store the active alarms,
+          managing system can only read them."
+::= { mgnt2NMSMibObject 1 }        
+
+
+mgnt2ActiveAlmEntry OBJECT-TYPE
+    SYNTAX Mgnt2ActiveAlmEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Information about a single alarm in the Active Alarm table.
+         Entries in this table are created by SNMP NE and will be
+         automatically deleted by SNMP NE when it is 
+         genereted a cleared-alarm."
+    INDEX { mgnt2ActiveAlmNotificationId}
+::= { mgnt2ActiveAlmTable 1 }  
+     
+
+Mgnt2ActiveAlmEntry ::= SEQUENCE {
+    mgnt2ActiveAlmNotificationId     Mgnt2NotificationId,
+    mgnt2ActiveAlmObjectClassIdentifier Mgnt2ObjectClassId,
+    -- mgnt2ActiveAlmObjectClassInstance Mgnt2ObjectInstanceId,  OBJECT IDENTIFIER
+    -- ekinops addressing
+    mgnt2ActiveAlmSourcePm           DisplayString,
+    mgnt2ActiveAlmBoardNumber        Integer32,
+    mgnt2ActiveAlmSourcePortType     DisplayString,
+    mgnt2ActiveAlmSourcePortNumber   Integer32,
+    mgnt2ActiveAlmProbableCause      Mgnt2AlmProbableCause, 
+    mgnt2ActiveAlmSeverity           Mgnt2AlmSeverity,
+    mgnt2ActiveAlmSpecificProblem    DisplayString, 
+    mgnt2ActiveAlmAdditionalText     DisplayString,
+    mgnt2ActiveAlmType               Mgnt2AlmType,
+    mgnt2ActiveAlmTime               DateAndTime,
+
+--Rajout binding Node Controller 1 avril 2015
+
+    mgnt2ActiveAlmNodeControllerIpAddress	IpAddress,
+    mgnt2ActiveAlmChassisId             	DisplayString
+
+--Fin
+}
+
+
+mgnt2ActiveAlmNotificationId OBJECT-TYPE
+    SYNTAX Mgnt2NotificationId 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  
+        "See textual conventions."
+::= { mgnt2ActiveAlmEntry 1 }
+
+mgnt2ActiveAlmProbableCause OBJECT-TYPE
+    SYNTAX Mgnt2AlmProbableCause 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "See textual conventions."
+::= { mgnt2ActiveAlmEntry 2 }
+
+mgnt2ActiveAlmObjectClassIdentifier OBJECT-TYPE
+     SYNTAX Mgnt2ObjectClassId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { mgnt2ActiveAlmEntry 3 }
+
+
+mgnt2ActiveAlmSourcePm OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "See textual conventions."
+::= {  mgnt2ActiveAlmEntry 4 }
+
+
+mgnt2ActiveAlmBoardNumber OBJECT-TYPE
+        SYNTAX Integer32(1..32)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "See textual conventions."
+::= {  mgnt2ActiveAlmEntry 5 }
+
+
+mgnt2ActiveAlmSourcePortType OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This OID gives the type of the port who sent a trap"
+::= { mgnt2ActiveAlmEntry 6 }
+
+
+mgnt2ActiveAlmSourcePortNumber OBJECT-TYPE
+        SYNTAX Integer32(1..32)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This OID gives the port number of the PM that sent the last trap"
+        ::= { mgnt2ActiveAlmEntry 7 }
+
+mgnt2ActiveAlmSeverity OBJECT-TYPE
+    SYNTAX Mgnt2AlmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { mgnt2ActiveAlmEntry 8 }
+
+mgnt2ActiveAlmSpecificProblem OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "This object contains the alarm specific problem description. 
+          Indicates further refinements to the problem identified 
+          by the alarm type.  If more than one specific problem 
+          is described in this object, the problem descriptions are 
+          separated by <;> characters. The format of the displayString 
+          is for further study."
+::= { mgnt2ActiveAlmEntry 9 }
+
+
+mgnt2ActiveAlmAdditionalText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { mgnt2ActiveAlmEntry 10 }
+
+--mgnt2ActiveAlmType OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        ""
+--::= { mgnt2ActiveAlmEntry 11 }
+
+mgnt2ActiveAlmType OBJECT-TYPE
+    SYNTAX Mgnt2AlmType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual convention"
+::= { mgnt2ActiveAlmEntry 11 }
+
+
+mgnt2ActiveAlmTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates when the alarm has been generated."
+::= { mgnt2ActiveAlmEntry 12 }
+
+
+--Rajout binding Node Controller 1 avril 2015
+
+mgnt2ActiveAlmNodeControllerIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This OID gives the IP address of the Node Controller"
+::= { mgnt2ActiveAlmEntry 13 }
+
+
+mgnt2ActiveAlmChassisId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This OID gives the chassis ID "
+::= { mgnt2ActiveAlmEntry 14 }
+
+-- Fin
+
+
+
+
+
+-- Alarm log table: mgnt2AlmLogTable
+
+mgnt2AlmLogTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Mgnt2AlmLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+         "This table defines the Alarm Log table.
+          It is used to store the alarms generated by SNMP NE."
+::= { mgnt2NMSMibObject 2 }    
+
+mgnt2AlmLogEntry OBJECT-TYPE
+    SYNTAX Mgnt2AlmLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about single alarm notification.
+         Entries in this table are created automatically by
+         Agent and they are never deleted because the Log behavior is 
+         automatically set to Wrap, hence when no more entry will be
+         created (log full) new log entry will cause the deletion 
+         of the oldest one."    
+    INDEX { mgnt2AlmLogNotificationId }
+::= { mgnt2AlmLogTable 1 }  
+
+
+Mgnt2AlmLogEntry ::= SEQUENCE {
+    mgnt2AlmLogNotificationId        Mgnt2NotificationId,
+    mgnt2AlmLogObjectClassIdentifier Mgnt2ObjectClassId,
+    -- mgnt2AlmLogObjectInstanceIdentifier Mgnt2ObjectInstanceId,
+    mgnt2AlmLogSourcePm              DisplayString,
+    mgnt2AlmLogBoardNumber           Integer32,
+    mgnt2AlmLogSourcePortType        DisplayString,
+    mgnt2AlmLogSourcePortNumber      Integer32,
+    mgnt2AlmLogProbableCause         Mgnt2AlmProbableCause,
+    mgnt2AlmLogSeverity              Mgnt2AlmSeverity,
+    mgnt2AlmLogSpecificProblem       DisplayString,
+    mgnt2AlmLogAdditionalText        DisplayString,
+    mgnt2AlmLogAlarmType             Mgnt2AlmType,
+    mgnt2AlmLogTime                  DateAndTime,
+
+--Rajout binding Node Controller 1 avril 2015
+
+    mgnt2AlmLogNodeControllerIpAddress	IpAddress,
+    mgnt2AlmLogChassisId             DisplayString
+
+--Fin
+   }
+
+
+
+mgnt2AlmLogNotificationId OBJECT-TYPE
+    SYNTAX Mgnt2NotificationId 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  
+        "See textual conventions."
+::= { mgnt2AlmLogEntry 1 }
+
+mgnt2AlmLogProbableCause OBJECT-TYPE
+    SYNTAX Mgnt2AlmProbableCause
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+         "See textual conventions."
+::= { mgnt2AlmLogEntry 2 }
+
+mgnt2AlmLogObjectClassIdentifier OBJECT-TYPE
+    SYNTAX Mgnt2ObjectClassId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { mgnt2AlmLogEntry 3 }
+
+
+mgnt2AlmLogSourcePm OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "See textual conventions."
+::= {  mgnt2AlmLogEntry 4 }
+
+
+mgnt2AlmLogBoardNumber OBJECT-TYPE
+        SYNTAX Integer32(1..32)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "See textual conventions."
+::= {  mgnt2AlmLogEntry 5 }
+
+
+mgnt2AlmLogSourcePortType OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This OID gives the type of the port who sent a trap"
+::= { mgnt2AlmLogEntry 6 }
+
+
+mgnt2AlmLogSourcePortNumber OBJECT-TYPE
+        SYNTAX Integer32(1..32)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This OID gives the port number of the PM that sent the last trap"
+        ::= { mgnt2AlmLogEntry 7 }
+
+
+mgnt2AlmLogSeverity OBJECT-TYPE
+    SYNTAX Mgnt2AlmSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The perceived severity of the alarm, as specified by
+         the agent that generated it."
+::= { mgnt2AlmLogEntry 8 }
+
+mgnt2AlmLogSpecificProblem OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions.
+         This object is only present if it was included in the
+         alarm trap corresponding to this AlarmLog entry."
+::= { mgnt2AlmLogEntry 9 }
+
+mgnt2AlmLogAdditionalText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { mgnt2AlmLogEntry 10 }
+
+mgnt2AlmLogAlarmType OBJECT-TYPE
+    SYNTAX Mgnt2AlmType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { mgnt2AlmLogEntry 11 }
+              
+mgnt2AlmLogTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates when the alarm has been generated."
+::= { mgnt2AlmLogEntry 13 }
+
+
+
+
+
+--Rajout binding Node Controller 1 avril 2015
+
+mgnt2AlmLogNodeControllerIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This OID gives the IP address of the Node Controller"
+::= { mgnt2AlmLogEntry 14 }
+
+
+mgnt2AlmLogChassisId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This OID gives the chassis ID "
+::= { mgnt2AlmLogEntry 15 }
+
+-- Fin
+
+
+
+
+
+--
+-- Event Management
+
+-- Event log table: mgnt2EventLogTable
+
+mgnt2EventLogTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF Mgnt2EventLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION 
+        "This table contain information about single event notification
+         not alarm. Entries in this table are created automatically by
+         Agent and they are never deleted because the Log behavior is 
+         automatically set to Wrap, hence when no more entry will be
+         created (log full) new log entry will cause the deletion 
+         of the oldest one."
+::= { mgnt2NMSMibObject 3 }
+
+mgnt2EventLogEntry OBJECT-TYPE
+    SYNTAX Mgnt2EventLogEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION  
+        "An entry in the mgnt2EventLogTable"
+    INDEX { mgnt2EventLogNotificationId }
+::= { mgnt2EventLogTable 1 }
+
+Mgnt2EventLogEntry ::= SEQUENCE {
+    mgnt2EventLogNotificationId           Mgnt2NotificationId,
+    mgnt2EventLogObjectClassIdentifier    Mgnt2ObjectClassId,
+    -- mgnt2EventLogObjectInstanceIdentifier Mgnt2ObjectInstanceId,
+    mgnt2EventLogSourcePm                   DisplayString,
+    mgnt2EventLogBoardNumber                Integer32,
+    mgnt2EventLogSourcePortType             DisplayString,
+    mgnt2EventLogSourcePortNumber           Integer32,    
+    mgnt2EventLogEventType                Mgnt2EventType,
+    mgnt2EventLogSourceType               Mgnt2EventSourceType,
+    mgnt2EventLogReason                   DisplayString,
+    mgnt2EventLogAdditionalText           DisplayString,
+    mgnt2EventLogTime                     DateAndTime,
+
+--Rajout binding Node Controller 1 avril 2015
+
+    mgnt2EventLogNodeControllerIpAddress	IpAddress,
+    mgnt2EventLogChassisId             DisplayString
+
+--Fin
+
+
+   }
+
+
+mgnt2EventLogNotificationId OBJECT-TYPE
+    SYNTAX Mgnt2NotificationId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  
+        "See textual conventions."
+::= { mgnt2EventLogEntry 1 }
+
+mgnt2EventLogObjectClassIdentifier OBJECT-TYPE
+    SYNTAX Mgnt2ObjectClassId 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual conventions."
+::= { mgnt2EventLogEntry 2 }
+
+--mgnt2EventLogObjectInstanceIdentifier OBJECT-TYPE
+--    SYNTAX Mgnt2ObjectInstanceId
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "See textual conventions."
+--::= { mgnt2EventLogEntry 3 }
+
+mgnt2EventLogSourcePm OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "See textual conventions."
+::= {  mgnt2EventLogEntry 4 }
+
+
+mgnt2EventLogBoardNumber OBJECT-TYPE
+        SYNTAX Integer32(1..32)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "See textual conventions."
+::= {  mgnt2EventLogEntry 5 }
+
+
+mgnt2EventLogSourcePortType OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This OID gives the type of the port who sent a trap"
+::= { mgnt2EventLogEntry 6 }
+
+
+mgnt2EventLogSourcePortNumber OBJECT-TYPE
+        SYNTAX Integer32(1..32)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "This OID gives the port number of the PM that sent the last trap"
+        ::= { mgnt2EventLogEntry 7 }
+
+mgnt2EventLogEventType OBJECT-TYPE
+    SYNTAX Mgnt2EventType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  
+        "This object describes the type of the event logged."
+::= { mgnt2EventLogEntry 8 }
+
+mgnt2EventLogSourceType OBJECT-TYPE
+    SYNTAX Mgnt2EventSourceType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION  
+        "This object describes the source type of the event logged."
+::= { mgnt2EventLogEntry 9 }
+
+
+mgnt2EventLogReason OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { mgnt2EventLogEntry 10 }
+
+
+mgnt2EventLogAdditionalText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        ""
+::= { mgnt2EventLogEntry 11 }
+
+mgnt2EventLogTime OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object indicates when the event has been generated."
+::= { mgnt2EventLogEntry 12 }
+
+
+
+
+--Rajout binding Node Controller 1 avril 2015
+
+mgnt2EventLogNodeControllerIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This OID gives the IP address of the Node Controller"
+::= { mgnt2EventLogEntry 13 }
+
+
+mgnt2EventLogChassisId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This OID gives the chassis ID "
+::= { mgnt2EventLogEntry 14 }
+
+-- Fin
+
+
+
+
+--
+-- Re
+
+--
+-- Upload/Download file
+
+mgnt2UploadDownload OBJECT IDENTIFIER ::= { mgnt2NMSMibObject 5 }
+
+mgnt2UploadDownloadFilename OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "software file name including eventually file path"
+::= { mgnt2UploadDownload 1 }
+
+mgnt2UploadDownloadAddress OBJECT-TYPE
+   SYNTAX Mgnt2ServerAddress
+   -- SYNTAX SnmpUDPAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    --      "Address of the server on which software file is located
+    --	Represents a UDP address:
+    --             octets   contents        encoding
+    --            1-4     IP-address      network-byte order
+    --          5-6     UDP-port        network-byte order"
+    "See textual convention"
+::= { mgnt2UploadDownload 2 }
+
+mgnt2UploadDownloadLogin OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Login for ftp"
+::= { mgnt2UploadDownload 3 }
+
+
+mgnt2UploadDownloadPasswd OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Password for ftp.
+        A manager sets this value with ftp account password using SNMP.
+        For security reasons if a manager reads this entry, NE must return an empty string (instead of password).
+        "
+::= { mgnt2UploadDownload 4 }
+
+mgnt2UploadDownloadTxRetries OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Communication retries between the Client and Server. 
+        <0> denotes one (first) transmission and no retries in case of failure 
+        no re-transmissions are required."
+::= { mgnt2UploadDownload 5 }
+
+
+mgnt2UploadDownloadActionStatus OBJECT-TYPE
+    SYNTAX Mgnt2UploadDownloadActionStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Entry used to know status of upload/ download to start 
+        upload/download operation (Action)"
+::= { mgnt2UploadDownload 6 }
+
+
+mgnt2UploadDownloadErrorCode OBJECT-TYPE
+    SYNTAX Mgnt2UploadDownloadErrorCode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "See textual convention"
+::= { mgnt2UploadDownload 7 }
+
+mgnt2UploadDownloadDirection OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        FTP direction : 
+        0 : From NE to external server
+        1 : From external server to NE
+        "
+::= { mgnt2UploadDownload 8 }
+
+
+mgnt2UploadDownloadProgress OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Percentage of software file(s) downloaded.
+         Only significant in case mgnt2UploadDownloadActionStatus is 'inProgress' or 'automatic'
+        "
+::= { mgnt2UploadDownload 9 }
+
+mgnt2UploadDownloadReceivedFiles OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of files received during upload/download (significant when status is 'automatic')"
+::= { mgnt2UploadDownload 10 }
+
+
+mgnt2UploadDownloadRemainingFiles OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Number of files remaining for upload/download (significant when status is 'automatic')"
+::= { mgnt2UploadDownload 11 }
+
+mgnt2UploadDownloadFileType OBJECT-TYPE
+    SYNTAX Mgnt2DownloadFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "File type to download/upload :
+             - 0 : pmPackage
+             - 1 : mgntPackage
+             - 2 : configurationFile
+             - 3 : logFile
+             - 4 : perfFile"
+::= { mgnt2UploadDownload 12 }
+
+
+mgnt2UploadDownloadFileCompression OBJECT-TYPE
+    SYNTAX Mgnt2UploadDownloadFileCompression
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "See Textual convention"
+::= { mgnt2UploadDownload 13 }
+
+
+mgnt2UploadDownloadDeleteLastFile OBJECT-TYPE
+    SYNTAX EkiOnOff
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        ""
+::= { mgnt2UploadDownload 14 }
+
+
+--
+-- Configuration Management
+
+mgnt2Configuration OBJECT IDENTIFIER ::= { mgnt2NMSMibObject 6 }
+
+mgnt2ConfigurationChecksum OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS not-accessible
+    STATUS  deprecated
+    DESCRIPTION
+        "Entry used to identify uniquely configuration file content.
+        (Used to check alignement between NE configuration and configuration known by NM)"
+::= { mgnt2Configuration 1 }
+
+
+mgnt2ConfigurationActionStatus OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        0 : activate
+        1 : activated
+        2 : failed"
+::= { mgnt2Configuration 2 }
+
+mgnt2ConfigurationActivationErrorCode OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        0 : noError
+        1 : badValue
+        2 : missingFile
+        3 : emptyFile
+		4 : wrong file"
+::= { mgnt2Configuration 3 }
+
+mgnt2ConfigurationActivationErrorString OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "String explaining Error code.
+         For example, in case of bad value(s), faulty parameter(s) name(s) are given"
+::= { mgnt2Configuration 4 }
+
+
+--
+-- SW Management
+
+mgnt2SoftwareDownload OBJECT IDENTIFIER ::= { mgnt2NMSMibObject 7 }
+
+mgnt2SoftwareDownloadActionStatus OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        0 : activate
+        1 : downgrade
+        2 : abort
+        3 : activated
+        4 : downgraded
+        5 : failed"
+::= { mgnt2SoftwareDownload 2 }
+
+mgnt2SoftwareDownloadActivationErrorCode OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        0 : noError
+        1 : badValue
+        2 : missingFile
+        3 : emptyFile
+		4 : wrong file"
+::= { mgnt2SoftwareDownload 3 }
+
+mgnt2SoftwareDownloadActivationErrorString OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "String explaining Error code.
+         For example, in case of bad value(s), faulty parameter(s) name(s) are given"
+::= { mgnt2SoftwareDownload 4 }
+
+
+mgnt2SoftwareDownloadActivationSlotNumber OBJECT-TYPE
+    SYNTAX Integer32 (1..32)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        ""
+::= { mgnt2SoftwareDownload 5 }
+
+mgnt2SoftwareDownloadActivationClearFile OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        0 : keepfile
+        1 : clearfile
+	"
+::= { mgnt2SoftwareDownload 6 }
+
+
+-- Add for Linux / 5EK package
+
+mgnt2SoftwareDownloadActivationFilename OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "software file name including eventually file path"
+::= { mgnt2SoftwareDownload 7 }
+
+
+mgnt2SoftwareDownloadActivationAutoRestart OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "
+        0 : norestart
+        1 : autorestart
+	"
+::= { mgnt2SoftwareDownload 8 }
+
+mgnt2SoftwareDownloadActivationFileType OBJECT-TYPE
+    SYNTAX Mgnt2DownloadFileType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "File type to download/upload :
+             - 0 : pmPackage
+             - 1 : mgntPackage
+             - 2 : configurationFile
+             - 3 : logFile
+             - 4 : perfFile"
+::= { mgnt2SoftwareDownload 9 }
+
+
+
+-- End Add for Linux / 5EK package
+
+--
+-- Local Access Control
+
+-- mgnt2LacTable
+
+mgnt2LacTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Mgnt2LacEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MGNT2 Local Access control table.
+         This table is used to give access to the Craft Terminals or/and NMS."
+::= {mgnt2NMSMibObject 8 }
+
+mgnt2LacEntry OBJECT-TYPE
+    SYNTAX Mgnt2LacEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry is automatically created by Agent at start-up time."
+     INDEX { mgnt2LacIndex }
+::= { mgnt2LacTable 1 }
+
+
+Mgnt2LacEntry ::= SEQUENCE {
+     mgnt2LacIndex Integer32,
+     mgnt2LacState Mgnt2LacState,
+     mgnt2LacNoResponseTimeOutPeriod Integer32
+   }
+
+
+mgnt2LacIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This is the index for the Local Access Control table."
+::= { mgnt2LacEntry 1 }
+
+mgnt2LacState OBJECT-TYPE
+    SYNTAX Mgnt2LacState
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "See textual convention"
+::= { mgnt2LacEntry 2 }
+
+mgnt2LacNoResponseTimeOutPeriod OBJECT-TYPE
+    SYNTAX Integer32 (0..3600)
+    UNITS "seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This is the No Response TimeOut Period attribute for the
+         Local Access Control."
+::= { mgnt2LacEntry 3 }
+
+
+
+-- NM Registration table
+-- See MGNT2-MIB table mgnt2GigmManagerIpAddressTable 
+
+--
+-- NM Polled Info
+
+mgnt2PolledInfo OBJECT IDENTIFIER ::= { mgnt2NMSMibObject 10 }
+
+mgnt2PolledInfoLastAlarmNotificationId OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the notification identifier of the last alarm
+         stored inside AlarmLog."
+::= { mgnt2PolledInfo 1 }
+
+mgnt2PolledInfoLastEventNotificationId OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This object contains the notification identifier of the last Event
+         stored inside EventLog."
+::= { mgnt2PolledInfo 2 }
+
+
+mgnt2PolledInfoConfigurationChecksum OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Entry used to identify uniquely configuration file content.
+        (Used to check alignement between NE configuration and configuration known by NM)"
+::= { mgnt2PolledInfo 3 }
+
+-- 
+-- Notification/Traps
+
+-- mgnt2TrapNMSAlarm
+
+mgnt2TrapNMSAlarm NOTIFICATION-TYPE
+    OBJECTS { 
+	   mgnt2AlmLogNotificationId, 
+           mgnt2AlmLogObjectClassIdentifier,
+	   -- mgnt2AlmLogObjectInstanceIdentifier,
+	   mgnt2AlmLogSourcePm,
+    	   mgnt2AlmLogBoardNumber,
+    	   mgnt2AlmLogSourcePortType,
+    	   mgnt2AlmLogSourcePortNumber,
+           mgnt2AlmLogProbableCause,
+	   mgnt2AlmLogSeverity,
+	   mgnt2AlmLogSpecificProblem,
+	   mgnt2AlmLogAdditionalText,
+	   mgnt2AlmLogAlarmType,
+	   mgnt2AlmLogTime,
+
+--Rajout binding Node Controller 1 avril 2015
+
+	   mgnt2AlmLogNodeControllerIpAddress,		
+	   mgnt2AlmLogChassisId
+
+--Fin
+	}
+    STATUS current
+  
+  --&FILTNAME    "critical"
+	--&ACTIONS     { log, critical }
+	--&MATCH       { mgnt2AlmLogSeverity "critical", mgnt2AlmLogSourcePm "$3", mgnt2AlmLogBoardNumber "$4", mgnt2AlmLogSourcePortType "$5", mgnt2AlmLogSpecificProblem "$9"}
+	--&MESG        "Critical Alarms ($9) detected on $5 on $3 (Slot $4) ($A)"
+
+	--&FILTNAME    "major"
+	--&ACTIONS     { log, major }
+	--&MATCH       { mgnt2AlmLogSeverity "major", mgnt2AlmLogSourcePm "$3", mgnt2AlmLogBoardNumber "$4", mgnt2AlmLogSourcePortType "$5", mgnt2AlmLogSpecificProblem "$9"}
+	--&MESG        "Major Alarms ($9) detected on $5 on $3 (Slot $4) ($A)"
+
+	--&FILTNAME    "minor"
+	--&ACTIONS     { log, minor }
+	--&MATCH       { mgnt2AlmLogSeverity "minor", mgnt2AlmLogSourcePm "$3", mgnt2AlmLogBoardNumber "$4", mgnt2AlmLogSourcePortType "$5", mgnt2AlmLogSpecificProblem "$9"}
+	--&MESG        "Minor Alarms ($9) detected on $5 on $3 (Slot $4) ($A)"
+
+	--&FILTNAME    "warning"
+	--&ACTIONS     { log, warning }
+	--&MATCH       { mgnt2AlmLogSeverity "warning", mgnt2AlmLogSourcePm "$3", mgnt2AlmLogBoardNumber "$4", mgnt2AlmLogSourcePortType "$5", mgnt2AlmLogSpecificProblem "$9"}
+	--&MESG        "Warning ($9) detected on $5 on $3 (Slot $4) ($A)"
+
+	--&FILTNAME    "indeterminate"
+	--&ACTIONS     { log, info }
+	--&MATCH       { mgnt2AlmLogSeverity "indeterminate", mgnt2AlmLogSourcePm "$3", mgnt2AlmLogBoardNumber "$4", mgnt2AlmLogSourcePortType "$5", mgnt2AlmLogSpecificProblem "$9"}
+	--&MESG        "Indeterminate Alarms ($9) detected on $5 on $3 (Slot $4) ($A)"
+  
+	--&FILTNAME    "clear"
+	--&ACTIONS     { log, normal }
+  --&CLEARS      { "critical", "major", "minor", "warning", "indeterminate" }
+	--&MATCH       { mgnt2AlmLogSeverity "cleared", mgnt2AlmLogSourcePm "$3", mgnt2AlmLogBoardNumber "$4", mgnt2AlmLogSourcePortType "$5", mgnt2AlmLogSpecificProblem "$9"}
+	--&MESG        "Alarms ($9) cleared on $5 on $3 (Slot $4) ($A)"
+  
+
+    DESCRIPTION 
+        "This notification reports Alarm event."
+::= { mgnt2NMSMibObject 11 }
+
+
+
+-- mgnt2TrapNMSEvent
+
+mgnt2TrapNMSEvent NOTIFICATION-TYPE
+    OBJECTS { 
+	mgnt2EventLogNotificationId,
+    	mgnt2EventLogObjectClassIdentifier,
+    	-- mgnt2EventLogObjectInstanceIdentifier,
+    	mgnt2EventLogSourcePm,
+    	mgnt2EventLogBoardNumber,
+    	mgnt2EventLogSourcePortType,
+    	mgnt2EventLogSourcePortNumber,    
+    	mgnt2EventLogEventType,
+	mgnt2EventLogSourceType,
+	mgnt2EventLogReason,
+    	mgnt2EventLogAdditionalText,
+    	mgnt2EventLogTime,
+
+--Rajout binding Node Controller 1 avril 2015
+
+	mgnt2EventLogNodeControllerIpAddress,		
+	mgnt2EventLogChassisId
+
+--Fin
+    }
+    STATUS current
+
+
+  --&FILTNAME    "config"
+	--&ACTIONS     { log, info }
+	--&MATCH       {mgnt2EventLogSourceType "config"}
+	--&MESG        "Configuration ($9) set to $10 on $5 on $3 (Slot $4) ($A)"
+
+  --&FILTNAME    "event"
+	--&ACTIONS     { log, info }
+	--&MATCH       {mgnt2EventLogSourceType "event"}
+	--&MESG        "$9 ($10) on $5 on $3 (Slot $4) ($A)"
+    
+  --&FILTNAME    "control"
+	--&ACTIONS     { log, info }
+	--&MATCH       {mgnt2EventLogSourceType "control"}
+	--&MESG        "Maintenance ($9) set to $10 on $5 on $3 (Slot $4) ($A)"
+
+
+
+    DESCRIPTION 
+        "This notification reports an Event."
+::= { mgnt2NMSMibObject 12 }
+
+
+-- 
+-- MODULE-COMPLIANCE  To be completed
+
+mgnt2SupportMc MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "This module compliance describes a set of objects required for
+         MGNT2-NMS SNMP Agent implementation."
+
+    MODULE -- mgnt2NMS
+
+   MANDATORY-GROUPS { mgnt2ActiveAlmGroup,
+                      mgnt2AlmLogGroup,
+                      mgnt2EventLogGroup
+                    }
+
+  ::= { mgnt2SupportMCCompl 1 }
+
+
+mgnt2ActiveAlmGroup OBJECT-GROUP
+    OBJECTS { mgnt2ActiveAlmProbableCause,
+        mgnt2ActiveAlmObjectClassIdentifier,
+        mgnt2ActiveAlmSourcePm,
+        mgnt2ActiveAlmBoardNumber,
+        mgnt2ActiveAlmSourcePortType,
+        mgnt2ActiveAlmSourcePortNumber,
+        mgnt2ActiveAlmSeverity,
+        mgnt2ActiveAlmType,
+        mgnt2ActiveAlmTime
+        }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Active Alarm management configuration."
+::= { mgnt2SupportMCCompl 2 }
+
+
+mgnt2AlmLogGroup OBJECT-GROUP
+    OBJECTS { mgnt2AlmLogProbableCause,
+        mgnt2AlmLogObjectClassIdentifier,
+        mgnt2AlmLogSourcePm,
+        mgnt2AlmLogBoardNumber,
+        mgnt2AlmLogSourcePortType,
+        mgnt2AlmLogSourcePortNumber,
+        mgnt2AlmLogSeverity,
+        mgnt2AlmLogAlarmType,
+        mgnt2AlmLogTime
+        }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Alarm log management configuration."
+::= { mgnt2SupportMCCompl 3 }
+
+
+mgnt2EventLogGroup OBJECT-GROUP
+    OBJECTS { mgnt2EventLogObjectClassIdentifier,
+        mgnt2EventLogSourcePm,
+        mgnt2EventLogBoardNumber,
+        mgnt2EventLogSourcePortType,
+        mgnt2EventLogSourcePortNumber,
+        mgnt2EventLogEventType,
+        mgnt2EventLogSourceType,
+        mgnt2EventLogTime
+        }
+    STATUS current
+    DESCRIPTION
+        "This group describes the mandatory objects needed for the
+         Event log management configuration."
+::= { mgnt2SupportMCCompl 4 }
+
+
+END

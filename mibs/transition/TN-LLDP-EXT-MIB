@@ -1,0 +1,71 @@
+-- *****************************************************************
+-- TN-LLDP-EXT-MIB.smi:  Transition Networks Enterprise MIB for LLDP
+-- extension
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+--
+TN-LLDP-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    lldpPortConfigEntry
+        FROM LLDP-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+tnExtLldpMIB MODULE-IDENTITY
+    LAST-UPDATED    "2013030251930Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO    "Transition Networks
+                      Technical Support
+
+                      10900 Red Circle Drive
+                      Minnetonka, MN 55343 USA
+                      Tel: +1-800-526-9267
+
+                      E-mail: techsupport@transition.com"
+    DESCRIPTION     "Management Information Base module for LLDP configuration."
+    REVISION        "201203250000Z"
+    DESCRIPTION     "Published as part of IEEE Std 802.1AB-2005 initial version"
+    ::= { tnProducts 137 }
+
+tnExtLldpMIBNotifications  OBJECT IDENTIFIER ::= { tnExtLldpMIB 1 }
+tnExtLldpMgmtObjects       OBJECT IDENTIFIER ::= { tnExtLldpMIB 2 }
+tnExtLldpMIBConformance    OBJECT IDENTIFIER ::= { tnExtLldpMIB 3 }
+
+--Ext LLDP  table
+tnLldpExtPortConfigTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF  TnLldpExtPortConfigEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "The table that controls extension LLDP on individual
+                    ports."
+   ::= { tnExtLldpMgmtObjects 1 }
+
+tnLldpExtPortConfigEntry OBJECT-TYPE
+    SYNTAX         TnLldpExtPortConfigEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Extension LLDP configuration information for a particular port."
+    AUGMENTS       { lldpPortConfigEntry }
+    ::= { tnLldpExtPortConfigTable 1 }
+
+TnLldpExtPortConfigEntry ::= SEQUENCE {
+    lldpPortConfigCdpAwareEnabled    TruthValue
+}
+
+lldpPortConfigCdpAwareEnabled OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "This object control whether the LLDP can work with CDP well or not
+                    on this port. true means the lldp can aware the CDP, else is false."
+    DEFVAL         { false }
+    ::= { tnLldpExtPortConfigEntry 1 }
+END

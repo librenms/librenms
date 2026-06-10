@@ -1,0 +1,4 @@
+modules:
+  os:
+    hardware: SA-HARDWARE-MIB::saHwDescrModel.0
+    serial: SA-HARDWARE-MIB::saHwDescrSerialNumber.0

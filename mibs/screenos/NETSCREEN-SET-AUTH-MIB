@@ -1,0 +1,404 @@
+-- This module defines enterprise MIBs for Authentication
+-- Configuration
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-AUTH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetAuthMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200411102022Z" -- Nov 10, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         the configuration info"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Added nsSetAuthCfgEntry attributes"
+    REVISION      "200411102022Z" -- Nov 10, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200204270000Z" -- April 27, 2002
+    DESCRIPTION
+        "More than one auth setting allowed in one system"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 2 }
+
+NsSetAuthCfgEntry ::= SEQUENCE
+{
+    nsSetAuthCfgIdx             Integer32,
+    nsSetAuthCfgVsys            Integer32,
+    nsSetAuthCfgName            DisplayString,
+    nsSetAuthCfgPrimary         DisplayString,
+    nsSetAuthCfgBackup1         DisplayString,
+    nsSetAuthCfgBackup2         DisplayString,
+    nsSetAuthCfgConnIdleTimeout Integer32,
+    nsSetAuthCfgAuthAccount     INTEGER,
+    nsSetAuthCfgIkeAccount      INTEGER,
+    nsSetAuthCfgL2tpAccount     INTEGER,
+    nsSetAuthCfgAdminAccount    INTEGER,
+    nsSetAuthCfgXauthAccount    INTEGER,
+    nsSetAuthCfgMethod          INTEGER,
+    nsSetAuthCfgPort            Integer32,
+    nsSetAuthCfgSecCliRetry     Integer32,
+    nsSetAuthCfgSecCliTimeout   Integer32,
+    nsSetAuthCfgSecEncType      INTEGER,
+    nsSetAuthCfgSecUseDuress    INTEGER,
+    nsSetAuthCfgLDAPCni         DisplayString,
+    nsSetAuthCfgLDAPDn          DisplayString,
+    nsSetAuthCfgSepChar     	DisplayString,
+    nsSetAuthCfgSepNumber   	Integer32,
+    nsSetAuthCfgRevInterval 	Integer32,
+    nsSetAuthCfgRadRetries      Integer32,  	  
+    nsSetAuthCfgEnableStnID	    INTEGER,
+    nsSetAuthCfgDomainName  	DisplayString,
+    nsSetAuthCfgAcctSessIdLen   Integer32,
+    nsSetAuthCfgRFC2138Compatibility INTEGER,
+    nsSetAuthCfgSourceIfName    DisplayString,
+    nsSetAuthCfgAcctPort        Integer32,
+    nsSetAuthCfgAcctListActn    INTEGER, 
+    nsSetAuthCfgSourceIfInfo    Integer32
+}
+
+nsSetAuth OBJECT IDENTIFIER ::= { netscreenSetting 2 }
+
+nsSetAuthCfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSetAuthCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The authentication configuration of NetScreen device."
+    ::= { nsSetAuth 1 }
+
+nsSetAuthCfgEntry OBJECT-TYPE
+    SYNTAX        NsSetAuthCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen admin user authentication setting table."
+    INDEX
+        { nsSetAuthCfgIdx }
+    ::= { nsSetAuthCfgTable 1 }
+
+nsSetAuthCfgIdx OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Authentication server config index."
+    ::= { nsSetAuthCfgEntry 1 }
+
+nsSetAuthCfgVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtural system the setting belongs to."
+    ::= { nsSetAuthCfgEntry 2 }
+
+nsSetAuthCfgName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Authentication server setting entry name."
+    ::= { nsSetAuthCfgEntry 3 }
+
+nsSetAuthCfgPrimary OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Primary authentication server IP or domain name."
+    ::= { nsSetAuthCfgEntry 4 }
+
+nsSetAuthCfgBackup1 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "First backup authentication server IP or domain name.It's
+         optional."
+    ::= { nsSetAuthCfgEntry 5 }
+
+nsSetAuthCfgBackup2 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secondary backup authentication server IP or domain name.It's
+         optional."
+    ::= { nsSetAuthCfgEntry 6 }
+
+nsSetAuthCfgConnIdleTimeout OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "connection timeout threshold setting. 0 means no timeout
+         setting."
+    ::= { nsSetAuthCfgEntry 7 }
+
+nsSetAuthCfgAuthAccount OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allow authentication account."
+    ::= { nsSetAuthCfgEntry 8 }
+
+nsSetAuthCfgIkeAccount OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allow IKE account."
+    ::= { nsSetAuthCfgEntry 9 }
+
+nsSetAuthCfgL2tpAccount OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allow L2tp account."
+    ::= { nsSetAuthCfgEntry 10 }
+
+nsSetAuthCfgAdminAccount OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allow administration account."
+    ::= { nsSetAuthCfgEntry 11 }
+
+nsSetAuthCfgXauthAccount OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allow Xauth account."
+    ::= { nsSetAuthCfgEntry 12 }
+
+nsSetAuthCfgMethod OBJECT-TYPE
+    SYNTAX        INTEGER {
+        build-in-user-db(0),
+        radius-server(1),
+        secureId-server(2),
+        ldap-server(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "NetScreen device admin user authentication method."
+    ::= { nsSetAuthCfgEntry 13 }
+
+nsSetAuthCfgPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Server listening port number."
+    ::= { nsSetAuthCfgEntry 14 }
+
+nsSetAuthCfgSecCliRetry OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SecureID client client retry times"
+    ::= { nsSetAuthCfgEntry 15 }
+
+nsSetAuthCfgSecCliTimeout OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SecureID client timeout threshold."
+    ::= { nsSetAuthCfgEntry 16 }
+
+nsSetAuthCfgSecEncType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        sdi(0),
+        des(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SecureID traffic encryption type."
+    ::= { nsSetAuthCfgEntry 17 }
+
+nsSetAuthCfgSecUseDuress OBJECT-TYPE
+    SYNTAX        INTEGER {
+        no(0),
+        yes(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Use duress in SecureID authentication."
+    ::= { nsSetAuthCfgEntry 18 }
+
+nsSetAuthCfgLDAPCni OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..2))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "LDAP server common name identifier"
+    ::= { nsSetAuthCfgEntry 19 }
+
+nsSetAuthCfgLDAPDn OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "LDAP server distinguished name"
+    ::= { nsSetAuthCfgEntry 20 } 
+    
+nsSetAuthCfgSepChar OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..2))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Seperator character for this entry"
+        ::= { nsSetAuthCfgEntry 21 }             
+        
+nsSetAuthCfgSepNumber OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Seperator number for this entry"
+        ::= { nsSetAuthCfgEntry 22 }                          
+        
+nsSetAuthCfgRevInterval OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Revert interval for this entry"
+        ::= { nsSetAuthCfgEntry 23 }                                        
+nsSetAuthCfgRadRetries OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Radius retries for this entries"
+        ::= { nsSetAuthCfgEntry 24 }                                        
+nsSetAuthCfgEnableStnID OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		no(0),
+        		yes(1)
+        } 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Enable/Disable call station ID for this entry."
+        ::= { nsSetAuthCfgEntry 25 }
+                   	  
+nsSetAuthCfgDomainName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Domain name for this entry"
+        ::= { nsSetAuthCfgEntry 26 }                      	  
+
+nsSetAuthCfgAcctSessIdLen OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Acct session identifier length for this entry"
+        ::= { nsSetAuthCfgEntry 27 }                                        
+nsSetAuthCfgRFC2138Compatibility OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		no(0),
+        		yes(1)
+        } 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Is RFC2138 compatible for this entry"
+        ::= { nsSetAuthCfgEntry 28 }
+        
+nsSetAuthCfgSourceIfName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE(0..255))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Source interface name for this entry"
+        ::= { nsSetAuthCfgEntry 29 }   
+
+nsSetAuthCfgAcctPort OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Radius accounting port for this entry"
+        ::= { nsSetAuthCfgEntry 30 }
+        
+nsSetAuthCfgAcctListActn  OBJECT-TYPE
+        SYNTAX  INTEGER {
+        		none(0),
+        		cleanup-sess(1)
+        } 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Radius accounting action for this entry"
+        ::= { nsSetAuthCfgEntry 31 }
+  
+nsSetAuthCfgSourceIfInfo OBJECT-TYPE
+        SYNTAX  Integer32
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+             "Source interface info for this entry. Returns -1 if no interface is selected"
+        ::= { nsSetAuthCfgEntry 32 }  
+
+END
+
+

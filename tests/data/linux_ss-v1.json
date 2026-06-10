@@ -1,0 +1,769 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64",
+                    "sysContact": "<private>",
+                    "version": "3.10.0-693.5.2.el7.x86_64",
+                    "hardware": "Generic x86 64-bit",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "ss",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "ss",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"allowed_afs\":[\"inet\",\"inet6\",\"link\",\"netlink\",\"unix\"],\"allowed_sockets\":[\"raw\",\"tcp\",\"udp\",\"unknown\",\"icmp6\",\"raw\",\"tcp\",\"udp\",\"unknown\",\"p_dgr\",\"p_raw\",\"unknown\",\"raw\",\"tcp\",\"udp\",\"u_dgr\",\"u_seq\",\"u_str\"]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "inet_raw_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_raw_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_raw_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_raw_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_raw_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_close-wait",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_closing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_established",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_fin-wait-1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_fin-wait-2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_last-ack",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_listening",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_syn-recv",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_syn-sent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_time-wait",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_total",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_tcp_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_udp_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_udp_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_udp_total",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_udp_unconnected",
+                    "value": 9,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_udp_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_unknown_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_unknown_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_unknown_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_unknown_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet_unknown_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_icmp6_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_icmp6_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_icmp6_total",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_icmp6_unconnected",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_icmp6_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_raw_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_raw_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_raw_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_raw_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_raw_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_close-wait",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_closing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_established",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_fin-wait-1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_fin-wait-2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_last-ack",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_listening",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_syn-recv",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_syn-sent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_time-wait",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_total",
+                    "value": 17,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_tcp_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_udp_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_udp_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_udp_total",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_udp_unconnected",
+                    "value": 7,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_udp_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_unknown_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_unknown_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_unknown_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_unknown_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "inet6_unknown_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_dgr_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_dgr_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_dgr_total",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_dgr_unconnected",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_dgr_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_raw_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_raw_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_raw_total",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_raw_unconnected",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_p_raw_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_unknown_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_unknown_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_unknown_total",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_unknown_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "link_unknown_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "netlink_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "netlink_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "netlink_total",
+                    "value": 49,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "netlink_unconnected",
+                    "value": 49,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "netlink_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "raw_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "raw_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "raw_total",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "raw_unconnected",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "raw_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_close-wait",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_closing",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_established",
+                    "value": 4,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_fin-wait-1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_fin-wait-2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_last-ack",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_listening",
+                    "value": 13,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_syn-recv",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_syn-sent",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_time-wait",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_total",
+                    "value": 23,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "tcp_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "udp_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "udp_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "udp_total",
+                    "value": 16,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "udp_unconnected",
+                    "value": 16,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "udp_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_dgr_established",
+                    "value": 43,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_dgr_listening",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_dgr_total",
+                    "value": 61,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_dgr_unconnected",
+                    "value": 18,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_dgr_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_seq_established",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_seq_listening",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_seq_total",
+                    "value": 2,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_seq_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_seq_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_str_established",
+                    "value": 236,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_str_listening",
+                    "value": 56,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_str_total",
+                    "value": 292,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_str_unconnected",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                },
+                {
+                    "metric": "unix_u_str_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ss"
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,2757 @@
+-- Revision 3.01 10/21/2018
+MERIDIAN2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   Counter32, enterprises                           FROM SNMPv2-SMI
+   DisplayString                                    FROM SNMPv2-TC;
+
+endRunTechnologies MODULE-IDENTITY
+   LAST-UPDATED
+      "1810210000Z"
+   ORGANIZATION
+      "EndRun Technologies LLC"
+   CONTACT-INFO
+      "Technical Support 1-877-749-3878, support@endruntechnologies.com"
+   DESCRIPTION
+      "EndRun Technologies Enterprise MIB"
+                                  ::= { endRunTechnologiesMIB 0 }
+
+endRunTechnologiesMIB OBJECT IDENTIFIER ::= { enterprises 13827 }
+
+-- Meridian2 GPS Product Group
+
+meridian2GPS      OBJECT IDENTIFIER ::= { endRunTechnologiesMIB 14 }
+
+gntp             OBJECT IDENTIFIER ::= { meridian2GPS 1 }
+
+gntptrap         OBJECT IDENTIFIER ::= { gntp 0 }
+
+gps              OBJECT IDENTIFIER ::= { meridian2GPS 2 }
+
+gpstrap          OBJECT IDENTIFIER ::= { gps 0 }
+
+gCPUIO           OBJECT IDENTIFIER ::= { meridian2GPS 3 }
+
+gPlugInOptions   OBJECT IDENTIFIER ::= { meridian2GPS 4 }
+
+goptSlot1        OBJECT IDENTIFIER ::= { gPlugInOptions 1 }
+
+goptSlot2        OBJECT IDENTIFIER ::= { gPlugInOptions 2 }
+
+goptSlot3        OBJECT IDENTIFIER ::= { gPlugInOptions 3 }
+
+goptSlot4        OBJECT IDENTIFIER ::= { gPlugInOptions 4 }
+
+goptSlot5        OBJECT IDENTIFIER ::= { gPlugInOptions 5 }
+
+gptp0            OBJECT IDENTIFIER ::= { meridian2GPS 5 }
+
+gptp1            OBJECT IDENTIFIER ::= { meridian2GPS 6 }
+
+-- gntp branch of the Meridian2 GPS subtree
+
+gntpTrapLeapIndBitsChange NOTIFICATION-TYPE
+   OBJECTS { gntpLeapIndBits }
+   STATUS current
+   DESCRIPTION
+   "A gntpTrapNTPLeapIndBitsChange trap signifies that the value of the leap
+   indicator bits contained in the NTP reply packets sent by the time server
+   has changed.  The current value of these bits is contained in the included
+   gntpLeapIndBits.  The decimal value of these bits ranges from 0 to 3:
+
+   0   is the no fault, no leap warning condition
+   1   is the no fault, leap second insertion warning condition
+   2   is the no fault, leap second deletion warning condition
+   3   is the unsynchronized, alarm condition"
+   ::= { gntptrap 1 }
+
+gntpTrapStratumChange NOTIFICATION-TYPE
+   OBJECTS { gntpStratum }
+   STATUS current
+   DESCRIPTION
+   "A gntpTrapStratumChange trap signifies that the value of the stratum
+   field contained in the NTP reply packets sent by the time server
+   has changed.  The current value is contained in the included
+   variable, gntpStratum.  The decimal value of this field ranges from 1 to 16:
+
+   1   is the synchronized, actively locked to the reference UTC source stratum
+   2   is the synchronized, actively locked to a network stratum 1 server stratum
+   16  is the unsynchronized stratum level"
+   ::= { gntptrap 2 }
+
+gntpTimeSinceRst OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Time since NTP daemon restart."
+   ::= { gntp 1 }
+
+gntpIRQsHandled OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of Interrupts handled by the NTP daemon."
+   ::= { gntp 2 }
+
+gntpRxPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets received by the NTP daemon."
+   ::= { gntp 3 }
+
+gntpRxPktsByIRQ OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets received via IRQ by the NTP daemon."
+   ::= { gntp 4 }
+
+gntpTxPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP reply packets transmitted by the NTP daemon."
+   ::= { gntp 5 }
+
+gntpSentPktsPerSecond OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "NTP reply packets sent per second by the NTP daemon."
+   ::= { gntp 6 }
+
+gntpUnSentPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP reply packets unsent by the NTP daemon."
+   ::= { gntp 7 }
+
+gntpIgnoredPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets ignored by the NTP daemon."
+   ::= { gntp 8 }
+
+gntpDroppedPkts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of NTP request packets dropped by the NTP daemon."
+   ::= { gntp 9 }
+
+gntpAuthFail OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Total number of authentication failures detected by the NTP daemon."
+   ::= { gntp 10 }
+
+gntpTimeFigureOfMerit OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lessthan100ns       (3),
+      lessthan1us         (4),
+      lessthan10us        (5),
+      lessthan100us       (6),
+      lessthan1ms         (7),
+      lessthan10ms        (8),
+      greaterthan10ms     (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Time Figure of Merit (TFOM) value ranges from 3 to 9 and indicates the
+   current estimate of the worst case time error.  It is a logarithmic scale,
+   with each increment indicating a tenfold increase in the worst case time
+   error boundaries.
+
+   The scale is referenced to a worst case time error of 100 picoseconds,
+   equivalent to a TFOM of zero.  During normal locked operation with GPS the
+   TFOM is 3 and implies a worst case time error of 100 nanoseconds.
+
+   During periods of signal loss, the GPS sub-system will compute an
+   extrapolated worst case time error.  One hour after the worst case time error
+   has reached the value equivalent to a TFOM of TFOM Fault Level, the NTP server
+   will cease to send stratum 1 reply packets and an Alarm LED will be energized."
+   ::= { gntp 11 }
+
+gntpLeapIndBits OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      noFaultorLeap   (0),
+      leapInsWarning  (1),
+      leapDelWarning  (2),
+      unSynchronized  (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a status code indicating:  normal operation, a leap second to
+   be inserted in the last minute of the current day, a leap second to be
+   deleted in the last second of the day or an alarm condition indicating
+   loss of timing synchronization.  The leap indicator field of NTP reply
+   packets sent from this server is set to gntpLeapIndBits."
+   ::= { gntp 12 }
+
+gntpSyncSource OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..4))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string identifying the synchronization source for this
+   NTP server.  It is one of GPS, an IP address of a stratum 1 server, or NONE.
+   If it is NONE, then the server is not synchronized, has its Leap Indicator
+   Bits in the Alarm state and is running at Stratum 16.  If it is an IP
+   address, then the server is operating as a stratum 2 server synchronized to
+   the network connected stratum 1 server whose IP address is shown.
+
+   Check the Stratum, Leap Indicator Bits and Time Figure of Merit for further
+   information.  NTP reply packets from this server will have the reference
+   identifier field set to gntpSyncSource if it is GPS.  Otherwise
+   it will be set to either an IP address or 0.0.0.0 (NONE)."
+   ::= { gntp 13 }
+
+gntpOffsetToGPSReference OBJECT-TYPE
+   SYNTAX DisplayString (SIZE (0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string containing the floating value of the current
+   offset in units of seconds of the NTP server CPU clock to the GPS
+   reference time.  Positive values imply that the NTP server clock is
+   ahead of the GPS reference time."
+   ::= { gntp 14 }
+
+gntpStratum OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gntpStratumOne          (1),
+      gntpStratumTwo          (2),
+      gntpStratumUnsync      (16)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an integer showing the current stratum level being reported by
+   the NTP daemon in its reply packets to clients.  If it is 1, then the server
+   is fully synchronized and delivering Stratum 1 accuracy.  If it is greater
+   than 1 and less than 16, it is synchronized to a network connected NTP
+   server operating at one stratum lower.  If it is 16, then the server is
+   unambiguously unsynchronized.
+
+   NTP clients on the network should be configured to not use the time from
+   this server if the stratum is 16."
+   ::= { gntp 15 }
+
+gntpVersion OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the system root file system firmware version."
+   ::= { gntp 16 }
+
+gntpKernelVersion OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the system Linux kernel firmware version."
+   ::= { gntp 17 }
+
+gntpOscType OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..32))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the installed oscillator type.  It is
+   one of TCXO, MS-OCXO, HS-OCXO, US-OCXO, Rubidium, HS-Rubidium, US-Rubidium,
+   Cesium or US-Cesium."
+   ::= { gntp 18 }
+
+gntpTimeMode OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..8))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is an ASCII string showing the time mode of operation for any
+   optional IRIG timecode outputs or the optional front panel vacuum
+   fluorescent display.  It DOES NOT indicate the time mode of the Linux
+   OS clock or the NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It can be LOCAL, GPS or UTC."
+   ::= { gntp 19 }
+
+gntpLocalOffset OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the local time offset configured for any optional IRIG
+   timecode outputs or the optional front panel vacuum fluorescent display.
+   It is only pertinent when gntpTimeMode is set to LOCAL.  It DOES NOT
+   indicate the local time offset of the Linux OS clock or the NTP sub-system.
+   Both of these are ALWAYS UTC.
+
+   Its units are half-hours, ranging from -25 to 25, where negative values
+   imply that the local time is behind UTC."
+   ::= { gntp 20 }
+
+gntpDSTStartMonth OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled (0),
+      jan      (1),
+      feb      (2),
+      mar      (3),
+      apr      (4),
+      may      (5),
+      jun      (6),
+      jul      (7),
+      aug      (8),
+      sep      (9),
+      oct      (10),
+      nov      (11),
+      dec      (12)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the month that Daylight Savings Time begins.  It affects
+   the local time operation of any optional IRIG timecode outputs or the
+   optional front panel vacuum fluorescent display.  It is only pertinent
+   when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS
+   clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 21 }
+
+gntpDSTStartSunday OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled  (0),
+      firstSunday (1),
+      secondSunday (2),
+      thirdSunday (3),
+      fourthSunday (4),
+      lastSunday (5)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Sunday of the month that Daylight Savings Time begins.
+   It affects the local time operation of any optional IRIG timecode outputs
+   or the optional front panel vacuum fluorescent display.  It is only
+   pertinent when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux
+   OS clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 22 }
+
+gntpDSTStartHour OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the hour that Daylight Savings Time begins.  It affects the
+   local time operation of any optional IRIG timecode outputs or the optional
+   front panel vacuum fluorescent display.  It is only pertinent when
+   gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS clock or the
+   NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It ranges from 0 to 23, where 0 is midnight."
+   ::= { gntp 23 }
+
+gntpDSTStopMonth OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled (0),
+      jan      (1),
+      feb      (2),
+      mar      (3),
+      apr      (4),
+      may      (5),
+      jun      (6),
+      jul      (7),
+      aug      (8),
+      sep      (9),
+      oct      (10),
+      nov      (11),
+      dec      (12)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the month that Daylight Savings Time ends.  It affects
+   the local time operation of any optional IRIG timecode outputs or the
+   optional front panel vacuum fluorescent display.  It is only pertinent
+   when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS
+   clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 24 }
+
+gntpDSTStopSunday OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      disabled  (0),
+      firstSunday (1),
+      secondSunday (2),
+      thirdSunday (3),
+      fourthSunday (4),
+      lastSunday (5)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Sunday of the month that Daylight Savings Time ends.
+   It affects the local time operation of any optional IRIG timecode outputs
+   or the optional front panel vacuum fluorescent display.  It is only
+   pertinent when gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux
+   OS clock or the NTP sub-system.  Both of these are ALWAYS UTC."
+   ::= { gntp 25 }
+
+gntpDSTStopHour OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the hour that Daylight Savings Time ends.  It affects the
+   local time operation of any optional IRIG timecode outputs or the optional
+   front panel vacuum fluorescent display.  It is only pertinent when
+   gntpTimeMode is set to LOCAL.  It DOES NOT affect the Linux OS clock or the
+   NTP sub-system.  Both of these are ALWAYS UTC.
+
+   It ranges from 0 to 23, where 0 is midnight."
+   ::= { gntp 26 }
+
+gntpCPUDieTemperature OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current CPU internal die temperature, in
+   units of Celsius degrees in floating point notation."
+   ::= { gntp 27 }
+
+gntpCPUFreeMemory OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the CPU Free Memory in kiloBytes."
+   ::= { gntp 28 }
+
+gntpCPULoadAveragePerCent OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the CPU Load Average as percent of total load."
+   ::= { gntp 29 }
+
+-- gps branch of the Meridian2 GPS subtree
+
+gpsTrapFaultStatusChange NOTIFICATION-TYPE
+   OBJECTS { gpsFaultStatus }
+   STATUS current
+   DESCRIPTION
+   "A gpsTrapFaultStatusChange trap signifies that the value of the least
+   significant two nibbles of th fault status word reported by the GPS
+   sub-system has changed.  The current value is contained in the included
+   gpsFaultStatus."
+   ::= { gpstrap 1 }
+
+gpsTrapFault2StatusChange NOTIFICATION-TYPE
+   OBJECTS { gpsFault2Status }
+   STATUS current
+   DESCRIPTION
+   "A gpsTrapFault2StatusChange trap signifies that the value of the most
+   significant two nibbles of the fault status word reported by the GPS
+   sub-system has changed.  The current value is contained in the included
+   gpsFault2Status."
+   ::= { gpstrap 2 }
+
+gpsTrapTimeFigureOfMeritChange NOTIFICATION-TYPE
+   OBJECTS { gpsTimeFigureOfMerit }
+   STATUS current
+   DESCRIPTION
+   "A gpsTrapTimeFigureOfMeritChange trap signifies that the value of the TFOM
+   reported by the GPS sub-system has changed.  The current value is
+   contained in the included gpsTimeFigureOfMerit."
+   ::= { gpstrap 3 }
+
+gpsFaultStatus OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsReceiverFlt     (0),
+      gpsNTPNotPolling   (1),
+      gpsRefTimeFlt      (2),
+      gpsReceiverCommFlt (3),
+      gpsFLASHWriteFlt   (4),
+      gpsFPGACfgFlt      (5),
+      gpsNoSignalTimeout (6),
+      gpsDACNearLimit    (7)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   least significant two nibbles of the GPS fault status word.  Unfortunately,
+   SNMP numbers the bits in the reverse order, so that the enumerated values
+   are backwards from the description contained in the User's Manual for the
+   fault status field returned by the gpsstat command.  Each bit indicates
+   a fault when set.  Currently defined fault states encoded in this value:
+
+   Bit 7:    DAC controlling the TCXO is near the high or low limit.
+   Bit 6:    Time Figure of Merit has been >= TFOM Fault Level for 1 hour.
+   Bit 5:    Field Programmable Gate Array (FPGA) did not configure properly.
+   Bit 4:    FLASH memory had a write fault.
+   Bit 3:    GPS receiver communication fault.
+   Bit 2:    GPS reference time fault (fails sanity checks).
+   Bit 1:    NTP daemon is not polling the GPS reference clock.
+   Bit 0:    GPS receiver fault.
+
+   ATTENTION:  This object is deprecated for use in snmpget queries
+   due to a defect in reporting for one specific combination of bits.  It
+   remains in this MIB for use with the gpsTrapFaultStatusChange object,
+   where it reports accurately.
+
+   Use the new gpsFaultNibble0Status and gpsFaultNibble1Status objects
+   for querying via snmpget."
+   ::= { gps 1 }
+
+gpsFault2Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsSysPwrOvld      (0),
+      gpsNotUsed1        (1),
+      gpsHP5071a         (2),
+      gpsPlugInOpts      (3),
+      gpsAntennaFlt      (4),
+      gpsOscPLLFlt       (5),
+      gpsSecPwrSplyFlt   (6),
+      gpsPriPwrSplyFlt   (7)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   most significant two nibbles of the GPS fault status word.  Unfortunately,
+   SNMP numbers the bits in the reverse order, so that the enumerated values
+   are backwards from the description contained in the User's Manual for the
+   fault status field returned by the gpsstat command.  Each bit indicates
+   a fault when set.  Currently defined fault states encoded in this value:
+
+   Bit 7:    Primary Redundant Power Supply is Faulting.
+   Bit 6:    Secondary Redundant Power Supply is Faulting.
+   Bit 5:    Oscillator PLL Faulting.
+   Bit 4:    GPS Antenna or Feedline is Shorted or Open.
+   Bit 3:    Plug-In Option Fault.
+   Bit 2:    HP5071A Cesium Option Fault.
+   Bit 1:    Not Used.
+   Bit 0:    Installed System Power Exceeds Maximum.
+
+   ATTENTION:  This object is deprecated for use in snmpget queries
+   due to a defect in reporting for one specific combination of bits.  It
+   remains in this MIB for use with the gpsTrapFaultStatusChange object,
+   where it reports accurately.
+
+   Use the new gpsFaultNibble2Status and gpsFaultNibble3Status objects
+   for querying via snmpget."
+   ::= { gps 2 }
+
+gpsReceiverFaultNibble0Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsFLASHWriteFlt   (0),
+      gpsFPGACfgFlt      (1),
+      gpsNoSignalTimeout (2),
+      gpsDACNearLimit    (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   least significant nibble of the GPS receiver fault status word.
+   Unfortunately, SNMP numbers the bits in the reverse order, so that the
+   enumerated values are backwards from the description contained in the
+   User's Manual for the fault status field returned by the cdmastat
+   command.  Each bit indicates a fault when set.  Currently defined fault states
+   encoded in this value:
+
+   Bit 3:    GPS Receiver Main Oscillator Frequency Control DAC near high or low limit.
+   Bit 2:    Time Figure of Merit has been >= TFOM Fault Level for 1 hour.
+   Bit 1:    Field Programmable Gate Array (FPGA) Configuration Fault.
+   Bit 0:    FLASH Memory Write Fault."
+   ::= { gps 3 }
+
+gpsReceiverFaultNibble1Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsMainOscFlt      (0),
+      gpsRefTimeFlt      (1),
+      gpsSynthFlt        (2),
+      gpsSynthNearLimit  (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   second nibble of the GPS receiver fault status word.  Unfortunately, SNMP 
+   numbers the bits in the reverse order, so that the enumerated values are 
+   backwards from the description contained in the User's Manual for the fault 
+   status field returned by the cdmastat command.  Each bit indicates a fault 
+   when set.  Currently defined fault states encoded in this value:
+
+   Bit 3:    GPS Receiver Local Oscillator Synthesizer Fault.
+   Bit 2:    GPS Receiver Local Oscillator Synthesizer Near Tuning Limit.
+   Bit 1:    GPS Decoded Time Fails Sanity Checks.
+   Bit 0:    GPS Receiver Main Oscillator Fault."
+   ::= { gps 4 }
+
+gpsReceiverFaultNibble2Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsNotUsed0        (0),
+      gpsOscPLLFlt       (1),
+      gpsAntennaOpen     (2),
+      gpsAntennaShort    (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   third nibble of the GPS receiver fault status word.  Unfortunately, SNMP 
+   numbers the bits in the reverse order, so that the enumerated values are
+   backwards from the description contained in the User's Manual for the fault 
+   status field returned by the gpsstat command.  Each bit indicates a fault 
+   when set.  Currently defined fault states encoded in this value:
+
+   Bit 3:    GPS antenna is shorted.
+   Bit 2:    GPS antenna is open.
+   Bit 1:    Oscillator PLL Faulting.
+   Bit 0:    Not Used."
+   ::= { gps 5 }
+
+gpsReceiverFaultNibble3Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsNotUsed0        (0),
+      gpsNotUsed1        (1),
+      gpsNotUsed2        (2),
+      gpsNotUsed3        (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   most significant nibble of the GPS fault status word.  Unfortunately,
+   SNMP numbers the bits in the reverse order, so that the enumerated values
+   are backwards from the description contained in the User's Manual for the
+   fault status field returned by the gpsstat command.  Each bit indicates
+   a fault when set.  Currently defined fault states encoded in this value:
+
+   Bit 3:    Not Used.
+   Bit 2:    Not Used.
+   Bit 1:    Not Used.
+   Bit 0:    Not Used."
+   ::= { gps 6}
+
+gpsTimeFigureOfMerit OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lessthan100ns       (3),
+      lessthan1us         (4),
+      lessthan10us        (5),
+      lessthan100us       (6),
+      lessthan1ms         (7),
+      lessthan10ms        (8),
+      greaterthan10ms     (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Time Figure of Merit (TFOM) value ranges from 3 to 9 and indicates
+   the current estimate of the worst case time error.  It is a logarithmic
+   scale, with each increment indicating a tenfold increase in the worst case
+   time error boundaries.  The scale is referenced to a worst case time error
+   of 100 picoseconds, equivalent to a TFOM of zero.  During normal locked
+   operation the TFOM is 3 and implies a worst case time error of 100 nanoseconds.
+
+   During periods of signal loss, the GPS sub-system will compute an
+   extrapolated worst case time error.  One hour after the worst case time error
+   has reached the value equivalent to a TFOM of TFOM Fault Level, the NTP server
+   will cease to send stratum 1 reply packets and an Alarm LED will be energized."
+   ::= { gps 7 }
+
+gpsSigProcState OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..5))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current GPS signal processor state.  One of WRM, ACQ, LKG or LKD with
+   WRM indicating either an OCXO or Rubidium is warming up, ACQ indicating
+   the acquisition state and LKD the fully locked on state.  This is the
+   status of the lock of the main system timing signals to the GPS Receiver."
+   ::= { gps 8 }
+
+gpsReceiverSigProcState OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..5))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current GPS Receiver signal processor state.  One of ACQ, DET, LKG, TKG
+   or LKD with ACQ indicating the acquisition state and LKD the fully locked
+   on state."
+   ::= { gps 9 }
+
+gpsNumTrackSats OBJECT-TYPE
+   SYNTAX INTEGER (0..8)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current number of GPS satellites being tracked."
+   ::= { gps 10 }
+
+gpsAGC OBJECT-TYPE
+   SYNTAX INTEGER (0..255)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current 8 bit, Automatic Gain Control (AGC) DAC value.  Typical values
+   are around 150, but antenna cable length, preamplifiers and signal splitters
+   will affect this parameter.  More positive values have the effect of 
+   increasing the RF gain."
+   ::= { gps 11 }
+
+gpsAvgCarrierToNoiseRatiodB OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..4))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current average carrier to noise ratio of all
+   tracked satellites, in units of dB.  Values less than 35 indicate weak
+   signal conditions."
+   ::= { gps 12 }
+
+gpsChannelTrkStat1 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 1 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 13 }
+
+gpsChannelTrkStat2 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 2 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 14 }
+
+gpsChannelTrkStat3 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 3 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 15 }
+
+gpsChannelTrkStat4 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 4 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 16 }
+
+gpsChannelTrkStat5 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 5 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 17 }
+
+gpsChannelTrkStat6 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 6 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 18 }
+
+gpsChannelTrkStat7 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 7 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 19 }
+
+gpsChannelTrkStat8 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 8 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 20 }
+
+gpsChannelTrkStat9 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 9 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 21 }
+
+gpsChannelTrkStat10 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 10 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 22 }
+
+gpsChannelTrkStat11 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 11 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 23 }
+
+gpsChannelTrkStat12 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Channel 12 tracking status of the GPS receiver.  Information includes the
+   Satellite ID #, the Azimuth angle in degrees, the Elevation angle in degrees
+   and the Carrier to Noise ratio, C/No in dB.  If the Satellite ID # is 0,
+   then no satellite is being tracked in this channel."
+   ::= { gps 24 }
+
+gpsLastPositionFix OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "WGS-84 latitude, longitude and height above the reference ellipsoid of the
+   GPS antenna.  Ellipsoid height may deviate from local Mean Sea Level by as
+   much as 100 meters.  This value is the last instantaneous position fix as
+   reported by the GPS receiver.  It is not averaged.
+   The Dilution of Precision metrics, PDOP, HDOP, VDOP and TDOP are also
+   shown.  The last item, OORCnt is the Out-Of-Range count of fixes that are
+   too far from the current user-entered or averaged reference position.  If
+   this value is non-zero, then the TRAIM algorithm is functioning to ensure
+   that system time and output signals are not affected by erroneous data
+   currently being received from the satellites."
+   ::= { gps 25 }
+
+gpsReferencePosition OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "WGS-84 latitude, longitude and height above the reference ellipsoid of the
+   GPS antenna.  Ellipsoid height may deviate from local Mean Sea Level by as
+   much as 100 meters.  When the GPS Dynamic Mode is OFF or Static, this value
+   is the result of a 24 hour average of fixes that is used to establish the
+   precise timing reference position.  It may also have been user-entered.
+   The RMS PDOP and Average Count for the current position average are also
+   shown.  These will be zero if the unit is not operating in the position
+   average mode."
+   ::= { gps 26 }
+
+gpsRefPosSource OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..3))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string indicating the source of the GPS antenna reference position.
+   It is one of:
+   USR (user-supplied),
+   AVG (automatically determined by averaging thousands of 3-D position fixes),
+   DYN (current un-averaged 3-D position fix, operation is in dynamic mode),
+   UNK (unknown)."
+   ::= { gps 27 }
+
+gpsCurrentLeapSeconds OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the current difference in seconds between GPS time and UTC
+   time.  GPS time is ahead of UTC time by this amount."
+   ::= { gps 28 }
+
+gpsFutureLeapSeconds OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the future difference in seconds between GPS time and UTC
+   time.  Leap seconds may be inserted or deleted from the UTC timescale twice
+   during the year:  Dec 31 and June 30 at UTC midnight.  If this value is the
+   same as gpsCurrentLeapSeconds, then no leap second insertion or deletion
+   will occur at the next possible time.  If it is different, then the change
+   will take affect at the next possible time.  GPS time will be ahead of UTC
+   time by this amount."
+   ::= { gps 29 }
+
+gpsAlmanacLS OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, LS is the current difference in seconds between GPS time and UTC
+   time as contained in the GPS Almanac UTC data.  GPS time is ahead of UTC time
+   by this amount.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 30 }
+
+gpsAlmanacLSF OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, LSF is the future difference in seconds between GPS time and UTC
+   time as contained in the GPS Almanac UTC data.  Leap seconds may be inserted
+   or deleted from the UTC timescale twice during the year:  Dec 31 and June 30
+   at UTC midnight.  If this value is the same as gpsAlmLS, then no leap second
+   insertion or deletion will occur at the next possible time.  If it is different,
+   then the change will take affect at the time defined by the GPS Almanac
+   parameters, WN_lsf and DN.  GPS time will be ahead of UTC time by this amount.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 31 }
+
+gpsAlmanacUTCWNlsf OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, WN_lsf is the GPS Week Number during which the UTC leap second offset
+   to GPS time will transition to the Leap Second Future value.  The GPS week
+   numbers began on January 6, 1980 with week number 0.  If a leap second has
+   recently been inserted, this week number could be in the past, in which case
+   the current and future leap seconds values will be equal.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 32 }
+
+gpsAlmanacUTCDN OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, DN is the Day Number of the week in which the UTC leap second offset
+   to GPS time will transition to the Leap Second Future value.  The GPS day numbers
+   begin on Sunday with day number 1.  The leap second insertion occurs at the end
+   of the given day.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 33 }
+
+gpsAlmanacA0 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the value of the a0 coefficient of the linear fit
+   of the UTC offset to GPS time.  a0 is the constant term in the equation,
+   in units of seconds, in scientific floating point notation.  The GPS and UTC
+   timescales are separated by leap seconds and another small error, typically
+   less than 10 nanoseconds, which is estimated using this linear fit.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 34 }
+
+gpsAlmanacA1 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the value of the a1 coefficient of the linear fit
+   of the UTC offset to GPS time.  a1 is the slope term in the equation, in units
+   of seconds per second, in scientific floating point notation.  The GPS and UTC
+   timescales are separated by leap seconds and another small error, typically
+   less than 10 nanoseconds, which is estimated using this linear fit.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 35 }
+
+gpsAlmanacUTCWNt OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, WN_t is the GPS Week Number during which the reference time for the
+   linear fit equation defined by a0 and a1 occurs.  It is used along with t_ot
+   to calculate a value of GPS seconds to offset the linear fit in the time domain.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 36 }
+
+gpsAlmanacUTCtot OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, t_ot is the second of the GPS week WN_t at which time the linear fit
+   equation defined by a0 and a1 will evaluate to a0.  The seconds range from 0 at the
+   beginning of day number 1 to 604799 at the end of day number 7.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 37 }
+
+gpsGPSminusUTCOffsetPicoSecs OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, (GPS - UTC) is the current sub-seconds offset of the GPS timescale to
+   the UTC timescale, computed using the received GPS almanac parameters (WN_t, t_ot, a0
+   and a1) and the current GPS week number and time-of-week.  The units are in picoseconds.
+   This value must be added to the current leap seconds offset to fully quantify the
+   amount that the GPS timescale is ahead of the UTC timescale.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 38 }
+
+gpsSubsystemVersion OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the GPS subsystem firmware and FPGA versions."
+   ::= { gps 39 }
+
+gpsReceiverVersion OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the GPS receiver firmware and FPGA versions."
+   ::= { gps 40 }
+
+gpsDynamicMode OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gpsDynModeOFF (0),
+      gpsDynModeON  (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The GPS dynamic mode is either on or off.  When it is off, the server is
+   assumed to be in a static installation.  In this case, single satellite mode
+   of operation is supported and Timing Receiver Autonomous Integrity Monitoring
+   (TRAIM) is supported.  When the setting is on, the server is assumed to be on
+   a moving platform.  In this case, minimum four satellite, 3-D operation is
+   required and the TRAIM functionality is minimal."
+   ::= { gps 41 }
+
+gpsCalibrationDelayNanoSecs OBJECT-TYPE
+   SYNTAX INTEGER (-500000..500000)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Signed integer representing the current calibration delay being applied to the
+   timing outputs, in units of nanoseconds.  Positive values indicate that the
+   timing outputs are advanced."
+   ::= { gps 42 }
+
+gpsCoastDuration OBJECT-TYPE
+   SYNTAX INTEGER (0..2147483647)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Unsigned integer representing the current elapsed time since the unit lost
+   GPS reception in units of seconds."
+   ::= { gps 43 }
+
+gpsEstimatedTimeError OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the magnitude of the estimated time error since
+   the unit lost GPS reception, in units of seconds in scientific floating point
+   notation.  While locked, the value is the magnitude of the measured time
+   error relative to GPS."
+   ::= { gps 44 }
+
+gpsMeasuredTimeError OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the measured time error of the timing outputs
+   relative to GPS, in units of seconds in scientific floating point
+   notation.  While coasting, the value is the last measured value prior to
+   losing GPS reception."
+   ::= { gps 45 }
+
+gpsMeasurementTimeDeviation OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the time deviation (TDEV) of the GPS measurement
+   data, in units of seconds in scientific floating point notation.  While
+   coasting, the value is the last computed value prior to losing GPS reception."
+   ::= { gps 46 }
+
+gpsOSCDAC OBJECT-TYPE
+   SYNTAX INTEGER (0..1048575)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Current 20 bit, System Voltage Controlled Oscillator DAC value.  Typical
+   range is 320000 to 640000, where more positive numbers have the effect of
+   raising the oscillator frequency."
+   ::= { gps 47 }
+
+gpsMeasuredOscillatorAgeing OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the ageing rate per day of the installed osc-
+   illator, in scientific floating point notation.  It is computed via linear
+   regression and requires several hours following initial lock to GPS to see
+   the first update.  While coasting, the value is the last computed value
+   prior to losing GPS reception."
+   ::= { gps 48 }
+
+gpsControlLoopTimeConstant OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current equivalent averaging time of the
+   oscillator control loop, in units of seconds in floating point notation.
+   The value is dynamically updated based on the stability of the oscillator."
+   ::= { gps 49 }
+
+gpsInternalTemperature OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current internal chassis temperature, in
+   units of Celsius degrees in floating point notation.  A value is only
+   available when the installed oscillator is an OCXO or Rubidium."
+   ::= { gps 50 }
+
+gpsAntennaFaultMask OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The GPS antenna fault mask is either on or off.  When it is off, the server will
+   set the Antenna Fault Bit in the Fault Status Byte if an improper antenna impedance
+   is detected.  When the setting is on, the server will not set the Antenna Fault Bit
+   in the Fault Status Byte if an improper antenna impedance is detected."
+   ::= { gps 51 }
+
+gpsSignalLossFaultMask OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The GPS signal loss fault mask is either on or off.  When it is off, the server will
+   set the Signal Loss Fault Bit in the Fault Status Byte one hour after TFOM reaches the
+   TFOM Fault Level.  When the setting is on, the server will not set the Signal Loss
+   Fault Bit in the Fault Status Byte one hour or more after TFOM reaches TFOM Fault level."
+   ::= { gps 52 }
+
+gpsPrimaryPowerFaultAlarmMask OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Primary Power input fault alarm mask is either on or off.  When it is on,
+   the server will not assert an Alarm condition on a fault in the Primary Power supply.
+   Unlike other fault masks, the fault condition will continue to be visible in the
+   Fault Status Byte.  This mask capability is useful when performing system tests when
+   only a single power input is available and an alarm would be undesirable.  When the
+   setting is off, the server will assert an Alarm condition in addition to setting
+   the appropriate bit in the Fault Status Byte."
+   ::= { gps 53 }
+
+gpsSecondaryPowerFaultAlarmMask OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Secondary Power input fault alarm mask is either on or off.  When it is on,
+   the server will not assert an Alarm condition on a fault in the Secondary Power supply.
+   Unlike other fault masks, the fault condition will continue to be visible in the
+   Fault Status Byte.  This mask capability is useful when performing system tests when
+   only a single power input is available and an alarm would be undesirable.  When the
+   setting is off, the server will assert an Alarm condition in addition to setting
+   the appropriate bit in the Fault Status Byte."
+   ::= { gps 54 }
+
+gpsTimeFigureOfMeritFaultLevel OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lessthan1us     (4),
+      lessthan10us    (5),
+      lessthan100us   (6),
+      lessthan1ms     (7),
+      lessthan10ms    (8),
+      greaterthan10ms (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Time Figure of Merit (TFOM) Fault Level ranges from 4 to 9 and indicates the
+   current threshold TFOM value for setting the Signal Loss Bit in the Fault Status
+   byte. During normal locked operation the TFOM is 3 and implies a worst case time
+   error of 100 nanoseconds.  The factory default TFOM Fault Level is 9.
+
+   During periods of signal loss, the GPS sub-system will compute an
+   extrapolated worst case time error.  One hour after the worst case time error
+   has reached the value equivalent to a TFOM of TFOM Fault Level, the NTP server
+   will cease to send stratum 1 reply packets and an Alarm LED will be energized."
+   ::= { gps 55 }
+
+gpsInhibitOutputsMode OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gpsInhibitOutputsModeOFF (0),
+      gpsInhibitOutputsModeON  (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "The Inhibit Outputs mode is either on or off.  When it is on, the timebase
+   will inhibit the timing signal outputs prior to initial lock to the GPS receiver.
+   When it is off, all timings outputs will be on at all times, even prior to
+   to initial lock."
+   ::= { gps 56 }
+
+gpsAlmanacIonoAlpha0 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient alpha0 in floating point notation."
+   ::= { gps 57 }
+
+gpsAlmanacIonoAlpha1 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient alpha1 in floating point notation."
+   ::= { gps 58 }
+
+gpsAlmanacIonoAlpha2 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient alpha2 in floating point notation."
+   ::= { gps 59 }
+
+gpsAlmanacIonoAlpha3 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient alpha3 in floating point notation."
+   ::= { gps 60 }
+
+gpsAlmanacIonoBeta0 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient beta0 in floating point notation."
+   ::= { gps 61 }
+
+gpsAlmanacIonoBeta1 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient beta1 in floating point notation."
+   ::= { gps 62 }
+
+gpsAlmanacIonoBeta2 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient beta2 in floating point notation."
+   ::= { gps 63 }
+
+gpsAlmanacIonoBeta3 OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current GPS broadcast ionospheric model
+   coefficient beta3 in floating point notation."
+   ::= { gps 64 }
+
+gpsAlmanacIonoWNa OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, WN_a is the GPS Week Number of the almanac containing
+   the current set of Ionospheric model coefficients.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 65 }
+
+gpsAlmanacIonotoa OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value, t_oa is the second of the GPS week WN_a of the almanac
+   containing the current set of Ionospheric model coefficients.
+   For more detailed information, consult the GPS-ICD-200."
+   ::= { gps 66 }
+
+gpsRTICMode OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gpsRTICModeOFF  (0),
+      gpsRTICModeON   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the operating mode of the optional Real-Time Ionospheric 
+   Correction algorithm, which when On, indicates that the Real-Time Ionospheric
+   Correction delay measurements are enabled to be used in the time transfer 
+   calculations to compensate for the GPS signal delay through the ionosphere.
+   When Off, it is not active and the standard GPS broadcast Klobuchar model delay is 
+   used in the time transfer calculations."
+   ::= { gps 67 }
+
+gpsRTICValid OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      gpsRTICValidFALSE  (0),
+      gpsRTICValidTRUE   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the Validity state of the optional Real-Time Ionospheric 
+   Correction algorithm, which when True, indicates that the Real-Time Ionospheric 
+   Correction delay measurements are valid and could be used in the time transfer 
+   calculations to compensate for the GPS signal delay through the ionosphere.  
+   When False, they are not valid and the standard GPS broadcast Klobuchar model 
+   delay must be used in the time transfer calculations.
+
+   A twenty-four hour period of continuous satellite tracking is required before the 
+   Real-Time Ionospheric Correction algorithm will set this validity indicator to 
+   the True state."
+   ::= { gps 68 }
+
+gpsKlobucharEnsembleDelay OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current ensemble ionospheric delay as calculated 
+   using the standard GPS broadcast Klobuchar model, in units of nanoseconds, in
+   floating point notation."
+   ::= { gps 69 }
+
+gpsRTICEnsembleDelay OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..16))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string representing the current ensemble ionospheric delay as calculated 
+   using the optional Real-Time Ionospheric Correction algorithm, in units of
+   nanoseconds, in floating point notation.  If the Real-Time Ionospheric
+   Correction option is not installed, NOT_INSTALLED is returned."
+   ::= { gps 70 }
+
+gpsFaultNibble0Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsFLASHWriteFlt   (0),
+      gpsFPGACfgFlt      (1),
+      gpsNoSignalTimeout (2),
+      gpsDACNearLimit    (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the least
+   significant nibbles of the GPS fault status word.  Unfortunately,
+   SNMP numbers the bits in the reverse order, so that the enumerated values
+   are backwards from the description contained in the User's Manual for the
+   fault status field returned by the gpsstat command.  Each bit indicates
+   a fault when set.  Currently defined fault states encoded in this value:
+
+   Bit 3:    DAC controlling the TCXO is near the high or low limit.
+   Bit 2:    Time Figure of Merit has been >= TFOM Fault Level for 1 hour.
+   Bit 1:    Field Programmable Gate Array (FPGA) did not configure properly.
+   Bit 0:    FLASH memory had a write fault."
+   ::= { gps 71 }
+
+gpsFaultNibble1Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsReceiverFlt     (0),
+      gpsNTPNotPolling   (1),
+      gpsRefTimeFlt      (2),
+      gpsReceiverCommFlt (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the second
+   nibble of the GPS fault status word.  Unfortunately, SNMP numbers the bits 
+   in the reverse order, so that the enumerated values are backwards from the 
+   description contained in the User's Manual for the fault status field returned 
+   by the gpsstat command.  Each bit indicates a fault when set.  Currently 
+   defined fault states encoded in this value:
+
+   Bit 3:    GPS receiver communication fault.
+   Bit 2:    GPS reference time fault (fails sanity checks).
+   Bit 1:    NTP daemon is not polling the GPS reference clock.
+   Bit 0:    GPS receiver fault."
+   ::= { gps 72 }
+
+gpsFaultNibble2Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsAntennaFlt      (0),
+      gpsOscPLLFlt       (1),
+      gpsSecPwrSplyFlt   (2),
+      gpsPriPwrSplyFlt   (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the third
+   nibble of the GPS fault status word.  Unfortunately, SNMP numbers the bits 
+   in the reverse order, so that the enumerated values are backwards from the 
+   description contained in the User's Manual for the fault status field returned 
+   by the gpsstat command.  Each bit indicates a fault when set.  Currently 
+   defined fault states encoded in this value:
+
+   Bit 3:    Primary Redundant Power Supply is Faulting.
+   Bit 2:    Secondary Redundant Power Supply is Faulting.
+   Bit 1:    Oscillator PLL Faulting.
+   Bit 0:    GPS Antenna or Feedline is Shorted or Open."
+   ::= { gps 73 }
+
+gpsFaultNibble3Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      gpsSysPwrOvld      (0),
+      gpsNotUsed1        (1),
+      gpsHP5071a         (2),
+      gpsPlugInOpts      (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the
+   most significant nibble of the GPS fault status word.  Unfortunately,
+   SNMP numbers the bits in the reverse order, so that the enumerated values
+   are backwards from the description contained in the User's Manual for the
+   fault status field returned by the gpsstat command.  Each bit indicates
+   a fault when set.  Currently defined fault states encoded in this value:
+
+   Bit 3:    Plug-In Option Fault.
+   Bit 2:    HP5071A Cesium Option Fault.
+   Bit 1:    Not Used.
+   Bit 0:    Installed System Power Exceeds Maximum."
+   ::= { gps 74 }
+
+gpsHP5071AOperNibble0Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      csNotUsed0        (0),
+      csNotUsed1        (1),
+      csNotUsed2        (2),
+      csCalibrating     (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the least
+   significant nibble of the optional HP5071A Cesium Operation status word.  
+   Unfortunately, SNMP numbers the bits in the reverse order, so that the 
+   enumerated values are backwards from the description contained in the HP5071A 
+   User's Manual for the Operation status register.  Each bit indicates a state 
+   when set.
+
+   NOTE:  If no bits are set in this OID and the gpsHP5071AOperNibble2Status
+   and gpsHP5071AOperNibble3Status OIDs, that is an indication of an RS-232 
+   communications fault with the HP5071A. 
+
+   Currently defined states encoded in this value:
+
+   Bit 3:    HP5071A is in Calibrating State.
+   Bit 2:    Not Used.
+   Bit 1:    Not Used.
+   Bit 0:    Not Used."
+   ::= { gps 75 }
+
+gpsHP5071AOperNibble2Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      csFatal           (0),
+      csNormal          (1),
+      csOnBattery       (2),
+      csStandby         (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the third
+   nibble of the optional HP5071A Cesium Operation status word.  Unfortunately, 
+   SNMP numbers the bits in the reverse order, so that the enumerated values 
+   are backwards from the description contained in the HP5071A User's Manual 
+   for the Operation status register.  Each bit indicates an Operation state 
+   when set.  
+   
+   NOTE:  If no bits are set in this OID and the gpsHP5071AOperNibble0Status
+   and gpsHP5071AOperNible3Status OIDs, that is an indication of an RS-232 
+   communications fault with the HP5071A. 
+
+   Currently defined states encoded in this value:
+
+   Bit 3:    HP5071A is operating in Standby mode.
+   Bit 2:    HP5071A is operating on Battery power.
+   Bit 1:    HP5071A is operating Normally.
+   Bit 0:    HP5071A has a Fatal error."
+   ::= { gps 76 }
+
+gpsHP5071AOperNibble3Status OBJECT-TYPE
+   SYNTAX BITS
+   {
+      csNotUsed0        (0),
+      csNotUsed1        (1),
+      csNotUsed2        (2),
+      csSteered         (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the most
+   significant nibble of the optional HP5071A Cesium Operation status word.  
+   Unfortunately, SNMP numbers the bits in the reverse order, so that the 
+   enumerated values are backwards from the description contained in the HP5071A 
+   User's Manual for the Operation status register.  Each bit indicates an
+   Operation state when set.  
+   
+   NOTE:  If no bits are set in this OID and the gpsHP5071AOperNibble0Status
+   and gpsHP5071AOperNibble2Status OIDs, that is an indication of an RS-232 
+   communications fault with the HP5071A. 
+
+   Currently defined states encoded in this value:
+
+   Bit 3:    HP5071A is operating with Steered frequency.
+   Bit 2:    Not Used.
+   Bit 1:    Not Used.
+   Bit 0:    Not Used."
+   ::= { gps 77 }
+
+gpsHP5071AQuesNibble0Data OBJECT-TYPE
+   SYNTAX BITS
+   {
+      csNotUsed0        (0),
+      csTime            (1),
+      csNotUsed2        (2),
+      csNotUsed3        (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the least
+   significant nibble of the optional HP5071A Cesium Questionable Data word.
+   Unfortunately, SNMP numbers the bits in the reverse order, so that the
+   enumerated values are backwards from the description contained in the
+   HP5071A User's Manual for the Questionable status register.  Each bit 
+   indicates a Questionable state when set.  Currently defined states encoded 
+   in this value:
+
+   Bit 3:    Not Used.
+   Bit 2:    Not Used.
+   Bit 1:    HP5071A Time-of-Day Clock has not been set.
+   Bit 0:    Not Used."
+   ::= { gps 78 }
+
+gpsHP5071AQuesNibble1Data OBJECT-TYPE
+   SYNTAX BITS
+   {
+      csNotUsed0        (0),
+      csPhase           (1),
+      csFrequency       (2),
+      csNotUsed3        (3)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This is a bit string contained in one character representing the second
+   nibble of the optional HP5071A Cesium Questionable Data word.  Unfortunately, 
+   SNMP numbers the bits in the reverse order, so that the enumerated values are 
+   backwards from the description contained in the HP5071A User's Manual for the 
+   Questionable status register.  Each bit indicates a Questionable state when set.  
+   Currently defined states encoded in this value:
+
+   Bit 3:    Not Used.
+   Bit 2:    HP5071A Frequency is unlocked.
+   Bit 1:    HP5071A Phase has perturbations.
+   Bit 0:    Not Used."
+   ::= { gps 79 }
+
+gpsHP5071ACsBeamI OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium Beam current in uA.  It may be NOT
+   INSTALLED if the HP5071A Cesium oscillator option is not installed."
+   ::= { gps 80 }
+
+gpsHP5071ACFieldI OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium C-Field current in mA, typical range
+   is 10.0 to 14.05 mA.  It may be NOT INSTALLED if the HP5071A Cesium 
+   oscillator option is not installed."
+   ::= { gps 81 }
+
+gpsHP5071AIonPumpI OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium Ion Pump current in uA, typical range
+   is 0 to 40 uA.  It may be NOT INSTALLED if the HP5071A Cesium oscillator 
+   option is not installed."
+   ::= { gps 82 }
+
+gpsHP5071AEMultiplierV OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium Electron-Multiplier voltage, typical
+   range is 1000 to 2553 V.  It may be NOT INSTALLED if the HP5071A Cesium 
+   oscillator option is not installed."
+   ::= { gps 83 }
+
+gpsHP5071ACsOvenV OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium Oven voltage, typical range is 0 to 10V.
+   It may be NOT INSTALLED if the HP5071A Cesium oscillator option is not 
+   installed."
+   ::= { gps 84 }
+
+gpsHP5071ASignalGainPerCent OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium Signal Gain in percent of maximum,
+   typical range is 14.4 to 58 %.  It may be NOT INSTALLED if the HP5071A 
+   Cesium oscillator option is not installed."
+   ::= { gps 85 }
+
+gpsHP5071ARFAmplitude1PerCent OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium microwave RF Amplitude 1 in percent of 
+   maximum, typical range is 0 to 100 %.  It may be NOT INSTALLED if the 
+   HP5071A Cesium oscillator option is not installed."
+   ::= { gps 86 }
+
+gpsHP5071ARFAmplitude2PerCent OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Cesium microwave RF Amplitude 2 in percent of 
+   maximum, typical range is 0 to 100 %.  It may be NOT INSTALLED if the 
+   HP5071A Cesium oscillator option is not installed."
+   ::= { gps 87 }
+
+gpsHP5071AOscillatorOvenV OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Reference Oscillator Oven voltage, typical
+   range is -5 to -10 V.  It may be NOT INSTALLED if the HP5071A Cesium 
+   oscillator option is not installed."
+   ::= { gps 88 }
+
+gpsHP5071AOscillatorControlPerCent OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Reference Oscillator Control in percent of
+   maximum, typical range is -95 to +95 %.  It may be NOT INSTALLED if the 
+   HP5071A Cesium oscillator option is not installed."
+   ::= { gps 89 }
+
+-- gCPUIO branch of the Meridian2 GPS subtree
+
+gsysio1PPSWidth OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Settable PulseWidth, 1PPS Output,
+   system-wide I/O signal.  It may be NOT INSTALLED, or a string showing the current
+   pulsewidth setting."
+   ::= { gCPUIO 1 }
+
+gsysioTimeCodeFormat OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the Selectable Format, Time Code
+   Output, system-wide I/O signal.  It may be NOT INSTALLED, or a string showing
+   the current time code output format setting."
+   ::= { gCPUIO 2 }
+
+gsysioSynthesizerHz OBJECT-TYPE
+   SYNTAX INTEGER (0..10000000)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "Integer showing the current frequency setting of the 1 Hz resolution, Direct
+   Digital Synthesizer (DDS) Output, system-wide I/O signal.  If this option is
+   not installed the value is -1, otherwise the value ranges from 0 to 10000000 Hz."
+   ::= { gCPUIO 3 }
+
+gsysioSerialTimeOutputBaudrate OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Baudrate of the Serial Time Output, system-wide
+   I/O signal.  It may be NOT INSTALLED, or a string showing one of 4800,
+   9600, 19200 or 57600."
+   ::= { gCPUIO 4 }
+
+gsysioSerialTimeOutputFormat OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Format of the Serial Time Output, system-wide
+   I/O signal.  It may be NOT INSTALLED, or a string showing one of SYSPLEX,
+   TRUETIME, NENA0, NENA1, NENA8, ENDRUN, ENDRUNX or NMEA."
+   ::= { gCPUIO 5 }
+
+gsysioSerialTimeOutputParity OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the Parity of the Serial Time Output, system-wide
+   I/O signal.  It may be NOT INSTALLED, or a string showing one of ODD,
+   EVEN or NONE."
+   ::= { gCPUIO 6 }
+
+gsysioSerialTimeNMEASentence1 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the first NMEA sentence selected for output from
+   the Serial Time Output, system-wide I/O signal.  This sentence is only
+   output from the Meridian2 when the Serial Time Output Format is set
+   to NMEA.  It may be NOT INSTALLED, or a string showing one of GGA, GLL,
+   GSA, GSV1, GSV2, RMC, VTG, ZDA or NONE."
+   ::= { gCPUIO 7 }
+
+gsysioSerialTimeNMEASentence2 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the second NMEA sentence selected for output from
+   the Serial Time Output, system-wide I/O signal.  This sentence is only
+   output from the Meridian2 when the Serial Time Output Format is set
+   to NMEA.  It may be NOT INSTALLED, or a string showing one of GGA, GLL,
+   GSA, GSV1, GSV2, RMC, VTG, ZDA or NONE."
+   ::= { gCPUIO 8 }
+
+gsysioSerialTimeNMEASentence3 OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the third NMEA sentence selected for output from
+   the Serial Time Output, system-wide I/O signal.  This sentence is only
+   output from the Meridian2 when the Serial Time Output Format is set
+   to NMEA.  It may be NOT INSTALLED, or a string showing one of GGA, GLL,
+   GSA, GSV1, GSV2, RMC, VTG, ZDA or NONE."
+   ::= { gCPUIO 9 }
+
+gcpuioConnA OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the CPU I/O Connector A.
+   It may be NOT INSTALLED, or a string showing the current I/O selection."
+   ::= { gCPUIO 10 }
+
+gcpuioConnB OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the CPU I/O Connector B.
+   It may be NOT INSTALLED, or a string showing the current I/O selection."
+   ::= { gCPUIO 11 }
+
+gcpuioConnC OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string showing the status of the CPU I/O Connector C.
+   It may be NOT INSTALLED, or a string showing the current I/O selection."
+   ::= { gCPUIO 12 }
+
+-- gPlugInOptions branch of the Meridian2 GPS subtree
+
+goptSlot1Desc OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the Plug-In Option that is installed in
+   this slot, or NOT INSTALLED if no Plug-In is detected.  It includes the
+   part number and serial number of any detected Plug-In."
+   ::= { goptSlot1 1 }
+
+goptSlot1A OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port A on
+   the Plug-In Option in this slot."
+   ::= { goptSlot1 2 }
+
+goptSlot1B OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port B on
+   the Plug-In Option in this slot."
+   ::= { goptSlot1 3 }
+
+goptSlot1C OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port C on
+   the Plug-In Option in this slot."
+   ::= { goptSlot1 4}
+
+goptSlot1D OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port D on
+   the Plug-In Option in this slot."
+   ::= { goptSlot1 5 }
+
+goptSlot1E OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port E on
+   the Plug-In Option in this slot."
+   ::= { goptSlot1 6}
+
+goptSlot1F OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port F on
+   the Plug-In Option in this slot."
+   ::= { goptSlot1 7 }
+
+goptSlot2Desc OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the Plug-In Option that is installed in
+   this slot, or NOT INSTALLED if no Plug-In is detected.  It includes the
+   part number and serial number of any detected Plug-In."
+   ::= { goptSlot2 1 }
+
+goptSlot2A OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port A on
+   the Plug-In Option in this slot."
+   ::= { goptSlot2 2 }
+
+goptSlot2B OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port B on
+   the Plug-In Option in this slot."
+   ::= { goptSlot2 3 }
+
+goptSlot2C OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port C on
+   the Plug-In Option in this slot."
+   ::= { goptSlot2 4}
+
+goptSlot2D OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port D on
+   the Plug-In Option in this slot."
+   ::= { goptSlot2 5 }
+
+goptSlot2E OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port E on
+   the Plug-In Option in this slot."
+   ::= { goptSlot2 6}
+
+goptSlot2F OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port F on
+   the Plug-In Option in this slot."
+   ::= { goptSlot2 7 }
+
+goptSlot3Desc OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the Plug-In Option that is installed in
+   this slot, or NOT INSTALLED if no Plug-In is detected.  It includes the
+   part number and serial number of any detected Plug-In."
+   ::= { goptSlot3 1 }
+
+goptSlot3A OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port A on
+   the Plug-In Option in this slot."
+   ::= { goptSlot3 2 }
+
+goptSlot3B OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port B on
+   the Plug-In Option in this slot."
+   ::= { goptSlot3 3 }
+
+goptSlot3C OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port C on
+   the Plug-In Option in this slot."
+   ::= { goptSlot3 4}
+
+goptSlot3D OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port D on
+   the Plug-In Option in this slot."
+   ::= { goptSlot3 5 }
+
+goptSlot3E OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port E on
+   the Plug-In Option in this slot."
+   ::= { goptSlot3 6}
+
+goptSlot3F OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port F on
+   the Plug-In Option in this slot."
+   ::= { goptSlot3 7 }
+
+goptSlot4Desc OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the Plug-In Option that is installed in
+   this slot, or NOT INSTALLED if no Plug-In is detected.  It includes the
+   part number and serial number of any detected Plug-In."
+   ::= { goptSlot4 1 }
+
+goptSlot4A OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port A on
+   the Plug-In Option in this slot."
+   ::= { goptSlot4 2 }
+
+goptSlot4B OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port C on
+   the Plug-In Option in this slot."
+   ::= { goptSlot4 3 }
+
+goptSlot4C OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port C on
+   the Plug-In Option in this slot."
+   ::= { goptSlot4 4}
+
+goptSlot4D OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port D on
+   the Plug-In Option in this slot."
+   ::= { goptSlot4 5 }
+
+goptSlot4E OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port E on
+   the Plug-In Option in this slot."
+   ::= { goptSlot4 6}
+
+goptSlot4F OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port F on
+   the Plug-In Option in this slot."
+   ::= { goptSlot4 7 }
+
+goptSlot5Desc OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the Plug-In Option that is installed in
+   this slot, or NOT INSTALLED if no Plug-In is detected.  It includes the
+   part number and serial number of any detected Plug-In."
+   ::= { goptSlot5 1 }
+
+goptSlot5A OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port A on
+   the Plug-In Option in this slot."
+   ::= { goptSlot5 2 }
+
+goptSlot5B OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port B on
+   the Plug-In Option in this slot."
+   ::= { goptSlot5 3 }
+
+goptSlot5C OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port C on
+   the Plug-In Option in this slot."
+   ::= { goptSlot5 4}
+
+goptSlot5D OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port D on
+   the Plug-In Option in this slot."
+   ::= { goptSlot5 5 }
+
+goptSlot5E OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port E on
+   the Plug-In Option in this slot."
+   ::= { goptSlot5 6}
+
+goptSlot5F OBJECT-TYPE
+   SYNTAX DisplayString (SIZE(0..80))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "ASCII string that describes the current setting for BNC I/O Port F on
+   the Plug-In Option in this slot."
+   ::= { goptSlot5 7 }
+
+-- ptp branch of the Meridian2 GPS subtree
+
+gptp0Version OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Version of the Precise Time Protocol, which is 2."
+   ::= { gptp0 1 }
+
+gptp0SyncInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      msec8    (-7),
+      msec16   (-6),
+      msec31   (-5),
+      msec63   (-4),
+      msec125  (-3),
+      msec250  (-2),
+      msec500  (-1),
+      sec1      (0)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the log base 2 of the PTP Sync Interval in
+   seconds.  Values range from -7 to 0, which covers the range from
+   1/128 to 1 second."
+   ::= { gptp0 2 }
+
+gptp0AnnounceInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      sec1       (0),
+      sec2       (1),
+      sec4       (2),
+      sec8       (3),
+      sec16      (4)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the log base 2 of the PTP Announce Interval in
+   seconds.  Values range from 0 to 4, which covers the range from
+   1 to 16 seconds."
+   ::= { gptp0 3 }
+
+gptp0Priority1 OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP Priority1 parameter.  It ranges from 0 to 255."
+   ::= { gptp0 4 }
+
+gptp0Priority2 OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP Priority2 parameter.  It ranges from 0 to 255."
+   ::= { gptp0 5 }
+
+gptp0DelayMechanism OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      e2e        (0),
+      p2p        (1),
+      disabled (254)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Delay Mechanism, one of E2E, P2P or disabled."
+   ::= { gptp0 6 }
+
+gptp0Domain OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP Domain parameter.  It ranges from 0 to 255."
+   ::= { gptp0 7}
+
+gptp0TimeMode OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      utc        (0),
+      ptp        (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Time Mode, one of UTC or PTP."
+   ::= { gptp0 8 }
+
+gptp0TTL OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP multicast Time-To-Live parameter.  It ranges from 1 to 255."
+   ::= { gptp0 9 }
+
+gptp0ClockClass OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lockedPTP        (6),
+      holdoverPTP      (7),
+      lockedARB       (13),
+      holdoverARB     (14),
+      unlockedPTP     (52),
+      unlockedARB     (58)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Clock Class, one of Locked, Holdover or Unlocked
+   on either the PTP or arbitrary, i.e. UTC time scale."
+   ::= { gptp0 10 }
+
+gptp0TimeScale OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      arb        (0),
+      ptp        (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Time Scale, one of ARB or PTP.
+   When operating in other than PTP Time Mode, this value is
+   always ARB, arbitrary."
+   ::= { gptp0 11 }
+
+gptp0PortState OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      init          (1),
+      faulty        (2),
+      disabled      (3),
+      listening     (4),
+      preMaster     (5),
+      master        (6),
+      passive       (7),
+      unCalibrated  (8),
+      slave         (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Port State, one of Initializing, Faulty,
+   Disabled, Listening, PreMaster, Master, Passive, Uncalibrated or
+   Slave."
+   ::= { gptp0 12 }
+
+gptp0TimeSource OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      atom          (16),
+      gps           (32),
+      radio         (48),
+      ptp           (64),
+      ntp           (80),
+      hand          (96),
+      other        (144),
+      oscillator   (160)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Time Source, one of Atom, GPS, Radio, PTP,
+   NTP, Hand, Other or Oscillator."
+   ::= { gptp0 13 }
+
+gptp0UTCOffset OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the UTC offset from Atomic Time in seconds.
+   It is currently 35 seconds."
+   ::= { gptp0 14 }
+
+gptp0UTCOffsetValid OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the validity of the UTC offset from Atomic Time in seconds.
+   It is either False or True."
+   ::= { gptp0 15 }
+
+gptp0ClockAccuracy OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      nsec25        (32),
+      nsec100       (33),
+      nsec250       (34),
+      nsec1000      (35),
+      nsec2500      (36),
+      usec10        (37),
+      usec25        (38),
+      usec100       (39),
+      usec250       (40),
+      usec1000      (41),
+      usec2500      (42),
+      msec10        (43),
+      unknown      (254)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Clock Accuracy, with values ranging from
+   25 nanoseconds to Unknown."
+   ::= { gptp0 16 }
+
+gptp0Leap59 OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the Leap 59 second indicator, which when True,
+   indicates that a UTC leap second deletion event is imminent.
+   It is either False or True."
+   ::= { gptp0 17 }
+
+gptp0Leap61 OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the Leap 61 second indicator, which when True,
+   indicates that a UTC leap second insertion event is imminent.
+   It is either False or True."
+   ::= { gptp0 18 }
+
+gptp0TimeTraceable OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the PTP Time Traceable indicator, which when True,
+   indicates that the time of the PTP synchronization messages is traceable to the
+   designated time scale.  It is either False or True."
+   ::= { gptp0 19 }
+
+gptp0FreqTraceable OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the PTP Frequency Traceable indicator, which when True,
+   indicates that the frequency of the PTP synchronization messages is traceable to the
+   designated time scale.  It is either False or True."
+   ::= { gptp0 20 }
+
+gptp1Version OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the Version of the Precise Time Protocol, which is 2."
+   ::= { gptp1 1 }
+
+gptp1SyncInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      msec8    (-7),
+      msec16   (-6),
+      msec31   (-5),
+      msec63   (-4),
+      msec125  (-3),
+      msec250  (-2),
+      msec500  (-1),
+      sec1      (0)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the log base 2 of the PTP Sync Interval in
+   seconds.  Values range from -7 to 0, which covers the range from
+   1/128 to 1 second."
+   ::= { gptp1 2 }
+
+gptp1AnnounceInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      sec1       (0),
+      sec2       (1),
+      sec4       (2),
+      sec8       (3),
+      sec16      (4)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the log base 2 of the PTP Announce Interval in
+   seconds.  Values range from 0 to 4, which covers the range from
+   1 to 16 seconds."
+   ::= { gptp1 3 }
+
+gptp1Priority1 OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP Priority1 parameter.  It ranges from 0 to 255."
+   ::= { gptp1 4 }
+
+gptp1Priority2 OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP Priority2 parameter.  It ranges from 0 to 255."
+   ::= { gptp1 5 }
+
+gptp1DelayMechanism OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      e2e        (0),
+      p2p        (1),
+      disabled (254)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Delay Mechanism, one of E2E, P2P or disabled."
+   ::= { gptp1 6 }
+
+gptp1Domain OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP Domain parameter.  It ranges from 0 to 255."
+   ::= { gptp1 7}
+
+gptp1TimeMode OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      utc        (0),
+      ptp        (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Time Mode, one of UTC or PTP."
+   ::= { gptp1 8 }
+
+gptp1TTL OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the PTP multicast Time-To-Live parameter.  It ranges from 1 to 255."
+   ::= { gptp1 9 }
+
+gptp1ClockClass OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      lockedPTP        (6),
+      holdoverPTP      (7),
+      lockedARB       (13),
+      holdoverARB     (14),
+      unlockedPTP     (52),
+      unlockedARB     (58)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Clock Class, one of Locked, Holdover or Unlocked
+   on either the PTP or arbitrary, i.e. UTC time scale."
+   ::= { gptp1 10 }
+
+gptp1TimeScale OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      arb        (0),
+      ptp        (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Time Scale, one of ARB or PTP.
+   When operating in other than PTP Time Mode, this value is
+   always ARB, arbitrary."
+   ::= { gptp1 11 }
+
+gptp1PortState OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      init          (1),
+      faulty        (2),
+      disabled      (3),
+      listening     (4),
+      preMaster     (5),
+      master        (6),
+      passive       (7),
+      unCalibrated  (8),
+      slave         (9)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Port State, one of Initializing, Faulty,
+   Disabled, Listening, PreMaster, Master, Passive, Uncalibrated or
+   Slave."
+   ::= { gptp1 12 }
+
+gptp1TimeSource OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      atom          (16),
+      gps           (32),
+      radio         (48),
+      ptp           (64),
+      ntp           (80),
+      hand          (96),
+      other        (144),
+      oscillator   (160)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Time Source, one of Atom, GPS, Radio, PTP,
+   NTP, Hand, Other or Oscillator."
+   ::= { gptp1 13 }
+
+gptp1UTCOffset OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value is the UTC offset from Atomic Time in seconds.
+   It is currently 35 seconds."
+   ::= { gptp1 14 }
+
+gptp1UTCOffsetValid OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the validity of the UTC offset from Atomic Time in seconds.
+   It is either False or True."
+   ::= { gptp1 15 }
+
+gptp1ClockAccuracy OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      nsec25        (32),
+      nsec100       (33),
+      nsec250       (34),
+      nsec1000      (35),
+      nsec2500      (36),
+      usec10        (37),
+      usec25        (38),
+      usec100       (39),
+      usec250       (40),
+      usec1000      (41),
+      usec2500      (42),
+      msec10        (43),
+      unknown      (254)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the PTP Clock Accuracy, with values ranging from
+   25 nanoseconds to Unknown."
+   ::= { gptp1 16 }
+
+gptp1Leap59 OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the Leap 59 second indicator, which when True,
+   indicates that a UTC leap second deletion event is imminent.
+   It is either False or True."
+   ::= { gptp1 17 }
+
+gptp1Leap61 OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the Leap 61 second indicator, which when True,
+   indicates that a UTC leap second insertion event is imminent.
+   It is either False or True."
+   ::= { gptp1 18 }
+
+gptp1TimeTraceable OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the PTP Time Traceable indicator, which when True,
+   indicates that the time of the PTP synchronization messages is traceable to the
+   designated time scale.  It is either False or True."
+   ::= { gptp1 19 }
+
+gptp1FreqTraceable OBJECT-TYPE
+   SYNTAX INTEGER
+   {
+      false  (0),
+      true   (1)
+   }
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+   "This value maps to the state of the PTP Frequency Traceable indicator, which when True,
+   indicates that the frequency of the PTP synchronization messages is traceable to the
+   designated time scale.  It is either False or True."
+   ::= { gptp1 20 }
+
+END

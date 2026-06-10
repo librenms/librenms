@@ -1,0 +1,42 @@
+-- ============================================================================
+-- Copyright (C) 2010 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  The wlan root mib file.
+-- Reference:
+-- Version: V1.00
+-- 
+-- ============================================================================
+
+	HUAWEI-WLAN-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+        TimeTicks, IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, 
+        NOTIFICATION-TYPE            
+            FROM SNMPv2-SMI    
+        DisplayString, DateAndTime, RowStatus                
+            FROM SNMPv2-TC
+        huaweiUtility            
+            FROM HUAWEI-MIB;
+            	
+	    hwWlan MODULE-IDENTITY
+		LAST-UPDATED "201006080000Z"
+			ORGANIZATION "Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+				"Huawei Industrial Base
+				Bantian, Longgang
+				Shenzhen 518129
+				People's Republic of China
+				Website: http://www.huawei.com
+				Email: support@huawei.com
+				"
+			    DESCRIPTION 
+				    "This mib defines the root node of the wlan mib"     
+				    
+					        REVISION     "201006080000Z"
+                            DESCRIPTION  
+                            "
+                            V1.00, Inital version.
+                            "     
+                            
+		 ::= { huaweiUtility 139 }
+		
+	END

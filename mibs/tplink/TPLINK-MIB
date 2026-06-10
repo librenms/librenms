@@ -1,0 +1,40 @@
+TPLINK-MIB DEFINITIONS ::= BEGIN
+
+--iso             OBJECT IDENTIFIER ::= { 1 }
+--org             OBJECT IDENTIFIER ::= { iso 3 }
+--dod             OBJECT IDENTIFIER ::= { org 6 }
+--internet        OBJECT IDENTIFIER ::= { dod 1 }
+--private         OBJECT IDENTIFIER ::= { internet 4 }
+--enterprises     OBJECT IDENTIFIER ::= { private 1 }
+
+    IMPORTS
+        enterprises 
+					FROM RFC1155-SMI
+		OBJECT-IDENTITY
+					FROM SNMPv2-SMI;
+
+	tplink 			OBJECT IDENTIFIER ::= { enterprises 11863 }
+
+	switch			OBJECT IDENTIFIER ::= { tplink 1 }
+	router			OBJECT IDENTIFIER ::= { tplink 2 }
+	wireless		OBJECT IDENTIFIER ::= { tplink 3 }
+	adsl			OBJECT IDENTIFIER ::= { tplink 4 }
+	
+	
+	tplinkProducts	OBJECT-IDENTITY
+		STATUS  	current
+		DESCRIPTION
+			"tplinkProducts is the root OBJECT IDENTIFIER from
+			which sysObjectID values are assigned.  Actual
+			values are defined in TPLINK-PRODUCTS-MIB."
+		::= { tplink 5 }
+		
+	tplinkMgmt	OBJECT-IDENTITY		
+		STATUS	current
+		DESCRIPTION
+			"tplinkMgmt is the main subtree for new mib development."
+
+		::= { tplink 6 }
+
+END
+

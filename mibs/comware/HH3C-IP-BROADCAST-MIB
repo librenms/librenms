@@ -1,0 +1,97 @@
+-- =================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Ip broadcast mib
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 Created by Gao Long and Zhou Xin
+--     Initial version 2004-12-13
+-- =================================================================
+HH3C-IP-BROADCAST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI;
+
+        hh3cIpBroadcast MODULE-IDENTITY
+        LAST-UPDATED "200412131936Z"        -- December 13, 2004 at 19:36 GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "This MIB is objects used to describe IP broadcast features or
+            functions.
+
+            Some objects in this may be used only for some specific products,
+            so users should refer to the related documents to acquire more
+            detail information.
+            "
+        REVISION "200412131936Z"        -- December 13, 2004 at 19:36 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hh3cCommon 33 }
+
+
+--
+-- Node definitions
+--
+
+-- Scalar MIB objects, which are considered as global variables
+-- in a device, are defined in this section.
+    hh3cIpBdstScalarGroup OBJECT IDENTIFIER ::= { hh3cIpBroadcast 1 }
+
+    hh3cIpBdstForwardBroadcast OBJECT-TYPE
+    SYNTAX  INTEGER
+        {
+            forwarding(1),    -- forwarding direct broadcast
+            notForwarding(2)  -- not forwarding direct broadcast
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION "This object indicates whether a device forwards direct
+            broadcast datagrams or not.
+            More details of this object, please refers to RFC2644.
+            "
+    ::= { hh3cIpBdstScalarGroup 1 }
+
+    hh3cIpReceiveBroadcast OBJECT-TYPE
+    SYNTAX  INTEGER
+        {
+            receive(1),    -- receiving direct broadcast
+            notReceive(2)  -- not receiving direct broadcast
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION "This objects indicates whether a device receives direct
+            broadcast datagrams or not.
+            More details of this object, please refers to RFC2644.
+            "
+    ::= { hh3cIpBdstScalarGroup 2 }
+
+
+-- =================================================================
+-- All other groups are defined below. Of course, scalar objects can
+-- also be defined in a sub section, but they must be one part of
+-- that sub section.
+-- Note that a scalar group should be defined firstly and all
+-- scalar objects are placed under that group when doing so.
+    hh3cIpBdstGroup OBJECT IDENTIFIER ::= { hh3cIpBroadcast 2 }
+
+
+-- =================================================================
+-- Traps are defined below.
+    hh3cIpBdstTrap OBJECT IDENTIFIER ::= { hh3cIpBroadcast 3 }
+
+-- All traps should be placed under this object.
+    hh3cIpBdstTrapPrex OBJECT IDENTIFIER ::= { hh3cIpBdstTrap 0 }
+
+
+END

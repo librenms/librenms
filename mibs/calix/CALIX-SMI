@@ -1,0 +1,78 @@
+-- *****************************************************************
+-- CALIX-SMI.my: Calix Networks Structure of Management Information
+--
+-- Calix confidential and proprietary.
+--
+-- Copyright (c) 2000 Calix Networks, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CALIX-SMI DEFINITIONS ::= BEGIN
+    IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+	    FROM SNMPv2-SMI;
+
+    calixNetworks MODULE-IDENTITY
+        LAST-UPDATED "200008310026Z"
+        ORGANIZATION "Calix Networks, Inc."
+        CONTACT-INFO
+	    "        Calix Networks, Inc.
+
+	     Postal: 1035 North McDowell Boulevard
+		     Petaluma, CA  94954-1173
+		     USA
+
+	      Phone: +1 707 766 3000
+	        Fax: +1 707 766 3100
+
+	     E-mail: tech.support@calix.com"
+	DESCRIPTION
+	    "The Structure of Management Information for
+	    Calix Networks"
+
+	REVISION "200008310026Z"
+	DESCRIPTION
+	    "Initial release."
+
+	::= { enterprises 6321 }
+
+    calixRegistrations OBJECT-IDENTITY
+    	STATUS current
+	DESCRIPTION
+	    "Sub-tree for product registrations."
+	::= { calixNetworks 1 }
+
+    calixModules OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Sub-tree to register the values assigned to modules with 
+	    the MODULE-IDENTITY construct."
+	::= { calixRegistrations 1 }
+
+    calixProducts OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Sub-tree to register the values product families."
+	::= { calixRegistrations 2 }
+
+    calixManagement OBJECT-IDENTITY
+	STATUS current
+	DESCRIPTION
+	    "Sub-tree for specific object and event definitions."
+	::= { calixNetworks 2 }
+
+--    calixCapabilities OBJECT-IDENTITY
+--	STATUS current
+--	DESCRIPTION
+--	    "Sub-tree for agent profiles."
+--	::= { calixNetworks 3 }
+
+--  calixExperimental OBJECT-IDENTITY
+--	STATUS current
+--	DESCRIPTION
+--	    "Sub-tree for experimental definitions."
+--	::= { calixNetworks 4 }
+
+END

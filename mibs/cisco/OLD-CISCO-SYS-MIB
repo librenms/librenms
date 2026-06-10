@@ -1,0 +1,1043 @@
+-- *****************************************************************
+-- OLD-CISCO-SYS-MIB.my:  Cisco System MIB file
+--
+-- July 1994, Jeffrey T. Johnson
+--
+-- Copyright (c) 1994-1996 by cisco Systems, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+-- Prior to 10.2, Cisco's lsystem mib group contained a curious
+-- assortment of mib objects.  For 10.2, in order to allow similar
+-- objects to be compiled separately with the mib compiler, the
+-- lsystem group was separated into an envmon group (lenv), a cpu
+-- group (lcpu), a memory group (lmem), and a system group (lsystem).
+-- In order to preserve the OBJECT IDENTIFIERS from release 10.1 to
+-- 10.2, however, all four groups are still based at { local 1 }.
+-- This is fine from the mib compiler point-of-view, but causes
+-- problems for some test tools which don't like the fact that
+-- lsystem, lenv, lmem, and lcpu all have the same OBJECT IDENTIFIER.
+-- In order to work around this problem, this file exists which
+-- is a combination of the four 10.2 "system" mibs, with everything
+-- falling under the lsystem group (as it did in 10.1).
+--
+-- This mib should only be used as a replacement for the four separate
+-- system mibs (OLD-CISCO-CPU.my, OLD-CISCO-ENVMON-MIB.my,
+-- OLD-CISCO-MEMORY-MIB.my, OLD-CISCO-SYSTEM-MIB.my) in test tool
+-- environments.  The aforementioned mibs should always be used in
+-- code generation
+
+               OLD-CISCO-SYS-MIB DEFINITIONS ::= BEGIN
+
+               IMPORTS
+                    IpAddress
+			FROM RFC1155-SMI
+		    OBJECT-TYPE
+			FROM RFC-1212
+                    DisplayString
+			FROM RFC1213-MIB
+		    local
+			FROM CISCO-SMI;
+          
+               lsystem             OBJECT IDENTIFIER ::= { local 1 }
+
+          -- Local Variable Section
+
+          -- This section describes the local variables within the cisco
+          -- product line.  Groups may or may not be present depending
+          -- on the software options present in the managed device.
+
+
+          -- Local System Group
+
+          -- This group is present in all products.
+
+               romId OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable contains a printable octet
+                           string which contains the System Bootstrap
+                           description and version identification."
+                   ::= { lsystem 1 }
+
+               whyReload OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable contains a printable octet
+                           string which contains the reason why the
+                           system was last restarted."
+                   ::= { lsystem 2 }
+
+               hostName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable represents the name of the
+                           host in printable ascii characters."
+                   ::= { lsystem 3 }
+
+               domainName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable is the domain portion of the
+                           domain name of the host."
+                   ::= { lsystem 4 }
+
+               authAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "This variable contains the last SNMP
+                           authorization failure IP address."
+                   ::= { lsystem 5 }
+
+               bootHost OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the IP address of the host that
+                           supplied the currently running software."
+                   ::= { lsystem 6 }
+
+               ping OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "The ping mib object is obsolete as of IOS 10.2
+			   It has been superseded by the Cisco Ping MIB"
+                   ::= { lsystem 7 }
+
+               freeMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "The freeMem mib object is obsolete as of IOS 11.1
+			   It has been replaced with the cisco memory pool mib"
+                   ::= { lsystem 8 }
+
+               bufferElFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free buffer
+                           elements."
+                   ::= { lsystem 9 }
+
+               bufferElMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of buffer
+                           elements."
+                   ::= { lsystem 10 }
+
+               bufferElHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element hits."
+                   ::= { lsystem 11 }
+
+               bufferElMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element
+                           misses."
+                   ::= { lsystem 12 }
+
+               bufferElCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of buffer element
+                           creates."
+                   ::= { lsystem 13 }
+
+               bufferSmSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of small buffers."
+                   ::= { lsystem 14 }
+
+               bufferSmTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of small buffers."
+                   ::= { lsystem 15 }
+
+               bufferSmFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free small buffers."
+                   ::= { lsystem 16 }
+
+               bufferSmMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of small
+                           buffers."
+                   ::= { lsystem 17 }
+
+               bufferSmHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer hits."
+                   ::= { lsystem 18 }
+
+               bufferSmMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer misses."
+                   ::= { lsystem 19 }
+
+               bufferSmTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer trims."
+                   ::= { lsystem 20 }
+
+               bufferSmCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of small buffer
+                           creates."
+                   ::= { lsystem 21 }
+
+               bufferMdSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of medium buffers."
+                   ::= { lsystem 22 }
+
+               bufferMdTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of medium
+                           buffers."
+                   ::= { lsystem 23 }
+
+               bufferMdFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free medium buffers."
+                   ::= { lsystem 24 }
+
+               bufferMdMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of medium
+                           buffers."
+                   ::= { lsystem 25 }
+
+               bufferMdHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer hits."
+                   ::= { lsystem 26 }
+
+               bufferMdMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer
+                           misses."
+                   ::= { lsystem 27 }
+
+               bufferMdTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer trims."
+                   ::= { lsystem 28 }
+
+               bufferMdCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of medium buffer
+                           creates."
+                   ::= { lsystem 29 }
+
+               bufferBgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of big buffers."
+                   ::= { lsystem 30 }
+
+               bufferBgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of big buffers."
+                   ::= { lsystem 31 }
+
+               bufferBgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free big buffers."
+                   ::= { lsystem 32 }
+
+               bufferBgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of big buffers."
+                   ::= { lsystem 33 }
+
+               bufferBgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer hits."
+                   ::= { lsystem 34 }
+
+               bufferBgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer misses."
+                   ::= { lsystem 35 }
+
+               bufferBgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer trims."
+                   ::= { lsystem 36 }
+
+               bufferBgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of big buffer creates."
+                   ::= { lsystem 37 }
+
+               bufferLgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of large buffers."
+                   ::= { lsystem 38 }
+
+               bufferLgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of large buffers."
+                   ::= { lsystem 39 }
+
+               bufferLgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free large buffers."
+                   ::= { lsystem 40 }
+
+               bufferLgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of large
+                           buffers."
+                   ::= { lsystem 41 }
+
+               bufferLgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer hits."
+                   ::= { lsystem 42 }
+
+               bufferLgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer misses."
+                   ::= { lsystem 43 }
+
+               bufferLgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer trims."
+                   ::= { lsystem 44 }
+
+               bufferLgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of large buffer
+                           creates."
+                   ::= { lsystem 45 }
+
+               bufferFail OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of the number of buffer allocation
+                           failures."
+                   ::= { lsystem 46 }
+
+               bufferNoMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Count of the number of buffer create
+                           failures due to no free memory."
+                   ::= { lsystem 47 }
+
+               netConfigAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the address of the host that supplied
+                           the network-confg file."
+                   ::= { lsystem 48 }
+
+               netConfigName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the name of the network configuration
+                           file."
+                   ::= { lsystem 49 }
+
+               netConfigSet OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Cause the loading of a new network-confg
+                           file using TFTP."
+                   ::= { lsystem 50 }
+
+               hostConfigAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "Contains the address of the host that
+                           provided the host-config file."
+                   ::= { lsystem 51 }
+
+               hostConfigName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "Contains the name of the last configured
+                           host-confg file."
+                   ::= { lsystem 52 }
+
+               hostConfigSet OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  obsolete
+                   DESCRIPTION
+                           "Cause the loading of a new host-confg file
+                           using TFTP."
+                   ::= { lsystem 53 }
+
+               writeMem OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Write configuration into non-volatile memory
+                           / erase config memory if 0."
+                   ::= { lsystem 54 }
+
+               writeNet OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Write configuration to host using TFTP."
+                   ::= { lsystem 55 }
+
+               busyPer OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "CPU busy percentage in the last 5 second
+                           period. Not the last 5 realtime seconds but
+                           the last 5 second period in the scheduler."
+                   ::= { lsystem 56 }
+
+               avgBusy1 OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "1 minute exponentially-decayed moving
+                           average of the CPU busy percentage."
+                   ::= { lsystem 57 }
+
+               avgBusy5 OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "5 minute exponentially-decayed moving
+                           average of the CPU busy percentage."
+                   ::= { lsystem 58 }
+
+               idleCount OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "cisco internal variable. not to be used"
+                   ::= { lsystem 59 }
+
+               idleWired OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-write
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "cisco internal variable. not to be used"
+                   ::= { lsystem 60 }
+
+               ciscoContactInfo OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "cisco's name and address"
+                   ::= { lsystem 61 }
+
+               bufferHgSize OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the size of huge buffers."
+                   ::= { lsystem 62 }
+
+               bufferHgTotal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the total number of huge buffers."
+                   ::= { lsystem 63 }
+
+               bufferHgFree OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of free huge buffers."
+                   ::= { lsystem 64 }
+
+               bufferHgMax OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the maximum number of huge
+                           buffers."
+                   ::= { lsystem 65 }
+
+               bufferHgHit OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer hits."
+                   ::= { lsystem 66 }
+
+               bufferHgMiss OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer misses."
+                   ::= { lsystem 67 }
+
+               bufferHgTrim OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer trims."
+                   ::= { lsystem 68 }
+
+               bufferHgCreate OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Contains the number of huge buffer creates."
+                   ::= { lsystem 69 }
+
+               netConfigProto OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the protocol that supplied the
+                           network-confg file."
+                   ::= { lsystem 70 }
+
+               hostConfigProto OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the protocol that supplied the host-
+                           confg file."
+                   ::= { lsystem 71 }
+
+               sysConfigAddr OBJECT-TYPE
+                   SYNTAX  IpAddress
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the address of the host that supplied
+                           the system boot image."
+                   ::= { lsystem 72 }
+
+               sysConfigName OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the name of the system boot image."
+                   ::= { lsystem 73 }
+
+               sysConfigProto OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Holds the protocol that supplied the system
+                           boot image."
+                   ::= { lsystem 74 }
+
+               sysClearARP OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Perform a clearing of the entire ARP cache
+                           and invalidation of route caches."
+                   ::= { lsystem 75 }
+
+               sysClearInt OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  write-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Clear interface given IfIndex as value."
+                   ::= { lsystem 76 }
+
+               envPresent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is there an environmental monitor card in
+                           this box?, 0 - No, 1-AGS card present, wrong
+                           firmware, 2-AGS CARD present, firmware ok,
+                           3-7000 support"
+                   ::= { lsystem 77 }
+
+               envTestPt1Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 1. Typically
+                           ambient air or the temperature of air
+                           entering the router"
+                   ::= { lsystem 78 }
+
+               envTestPt1Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 1. Typically a
+                           temperature in centigrade."
+                   ::= { lsystem 79 }
+
+               envTestPt2Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 2. Typically
+                           airflow or the temperature of air leaving the
+                           router"
+                   ::= { lsystem 80 }
+
+               envTestPt2Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 2. Typically a
+                           temperature in centigrade."
+                   ::= { lsystem 81 }
+
+               envTestPt3Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 3. Typically
+                           +5 volt"
+                   ::= { lsystem 82 }
+
+               envTestPt3Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 3. Typically the
+                           value in millivolts of the +5v supply"
+                   ::= { lsystem 83 }
+
+               envTestPt4Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 4. Typically
+                           +12 volt"
+                   ::= { lsystem 84 }
+
+               envTestPt4Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 4. Typically the
+                           value in millivolts of the +12v supply"
+                   ::= { lsystem 85 }
+
+               envTestPt5Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 5. Typically
+                           -12 volt"
+                   ::= { lsystem 86 }
+
+               envTestPt5Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 5. Typically the
+                           value in millivolts of the -12v supply"
+                   ::= { lsystem 87 }
+
+               envTestPt6Descr OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of the test point 6. Typically
+                           -5 volt"
+                   ::= { lsystem 88 }
+
+               envTestPt6Measure OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Current value of test point 6. Typically the
+                           value in millivolts of the -5v supply"
+                   ::= { lsystem 89 }
+
+               envTestPt1MarginVal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value at which the router will shutdown.
+                           Typically the ambient air temperature that
+                           will shut the router down. (e.g. 43)"
+                   ::= { lsystem 90 }
+
+               envTestPt2MarginVal OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value at which the router will shutdown.
+                           Typically the airflow air temperature that
+                           will shut the router down. (e.g. 58)"
+                   ::= { lsystem 91 }
+
+               envTestPt3MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 10%) typically +5 volt"
+                   ::= { lsystem 92 }
+
+               envTestPt4MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 15%) typically +12 volt"
+                   ::= { lsystem 93 }
+
+               envTestPt5MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 15%) typically -12 volt"
+                   ::= { lsystem 94 }
+
+               envTestPt6MarginPercent OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "+/- Percentage that will shut the router
+                           down, (e.g. 10%) typically -5 volt"
+                   ::= { lsystem 95 }
+
+               envTestPt1last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt1 when last shutdown
+                           occurred."
+                   ::= { lsystem 96 }
+
+               envTestPt2last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt2 when last shutdown
+                           occurred."
+                   ::= { lsystem 97 }
+
+               envTestPt3last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt3 when last shutdown
+                           occurred."
+                   ::= { lsystem 98 }
+
+               envTestPt4last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt4 when last shutdown
+                           occurred."
+                   ::= { lsystem 99 }
+
+               envTestPt5last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt5 when last shutdown
+                           occurred."
+                   ::= { lsystem 100 }
+
+               envTestPt6last OBJECT-TYPE
+                   SYNTAX  INTEGER
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Value of TestPt6 when last shutdown
+                           occurred."
+                   ::= { lsystem 101 }
+
+               envTestPt1warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { lsystem 102 }
+
+               envTestPt2warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { lsystem 103 }
+
+               envTestPt3warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { lsystem 104 }
+
+               envTestPt4warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { lsystem 105 }
+
+               envTestPt5warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { lsystem 106 }
+
+               envTestPt6warn OBJECT-TYPE
+                   SYNTAX  INTEGER {
+                        warning(1),
+                        noWarning(2)
+                   }
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Is this test point at a warning level?"
+                   ::= { lsystem 107 }
+
+               envFirmVersion OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Description of Environmental Card firmware"
+                   ::= { lsystem 108 }
+
+               envTechnicianID OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Technician ID"
+                   ::= { lsystem 109 }
+
+               envType OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The type of environmental card"
+                   ::= { lsystem 110 }
+
+               envBurnDate OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "The calibration / burn in date"
+                   ::= { lsystem 111 }
+
+               envSerialNumber OBJECT-TYPE
+                   SYNTAX  DisplayString
+                   ACCESS  read-only
+                   STATUS  mandatory
+                   DESCRIPTION
+                           "Serial Number of environmental monitor card"
+                   ::= { lsystem 112 }
+
+
+	 END

@@ -1,0 +1,199 @@
+-- =====================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--     This MIB Module defines the textual conventions of Fibre Channel related
+--  elements.
+-- Reference:
+--     Version: V1.0
+-- History:
+--     V1.0 Initial version created by qiaoxinghua 2013-02-27
+-- =====================================================================
+HH3C-FC-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+Hh3cFcAddressType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Identifies Fibre Channel address type, World Wide Name or Fibre
+         Channel ID."
+    SYNTAX      INTEGER {
+                         wwn(1),
+                         fcid(2)
+                        }
+
+Hh3cFcAddress ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents either the Fibre Channel ID or the World
+         Wide Name associated with a Fibre Channel entity."
+    SYNTAX      OCTET STRING (SIZE (3 | 8))
+
+Hh3cFcAddressId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents Fibre Channel ID, a 24-bit value unique
+         within the address space of a fabric."
+    SYNTAX      OCTET STRING (SIZE (3))
+
+Hh3cFcAddressIdOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A Fibre Channel ID, a 24-bit value unique within the
+         address space of a fabric.  The zero-length string value
+         is used in circumstances in which the Fibre Channel ID
+         is unassigned/unknown."
+    SYNTAX      OCTET STRING (SIZE (0 | 3))
+
+Hh3cFcNameId ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the World Wide Name (WWN) associated with
+         a Fibre Channel entity.  A WWN is a 64-bit address
+         to uniquely identify each entity within a Fibre Channel
+         fabric."
+    SYNTAX      OCTET STRING (SIZE (8))
+
+Hh3cFcNameIdOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The World Wide Name (WWN) associated with a Fibre Channel
+         entity.  WWNs are initially defined as 64 bits in length.
+         The latest definition (for future use) is 128 bits.
+         The zero-length string value is used in circumstances in
+         which the WWN is unassigned/unknown."
+    SYNTAX      OCTET STRING (SIZE (0 | 8 | 16))
+
+Hh3cFcClassOfServices ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Represents the class of service capability of an Nx_Port or
+         Fx_Port."
+    SYNTAX      BITS { classF(0), class1(1), class2(2), class3(3),
+                       class4(4), class5(5), class6(6) }
+
+Hh3cFcBbCredit ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "Represents the buffer-to-buffer credit of a port."
+    SYNTAX       Integer32 (0..32767)
+
+Hh3cFcRxMTU ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "Represents the maximum size of payload that a port can receive."
+    SYNTAX       Integer32 (128..2112)
+
+Hh3cFcVsanIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "Used as a unique index value to identify a particular VSAN
+         (Virtual Storage Area Network)."
+    SYNTAX       Unsigned32 (1..4095)
+
+Hh3cFcStartOper ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Enable/disable an operation.
+            enable  - enable the operation.
+            disable - disable the operation."
+    SYNTAX       INTEGER {
+                          enable(1),
+                          disable(2)
+                         }
+
+Hh3cFcDomainId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "Represents the domain ID of the switch.  Domain IDs can be
+         assigned automatically by the principal switch or manually
+         configured by the user."
+    SYNTAX       Integer32 (1..239)
+
+Hh3cFcDomainIdOrZero ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "Represents the domain ID of the switch.
+         The zero value is used in circumstances in which the domain
+         ID is unassigned/unknown."
+    SYNTAX       Integer32 (0..239)
+
+Hh3cFcDomainPriority ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "Priority of the switch which is used during principal switch
+         selection to cause one Switch to befavored over another.
+
+         The priority value for FC switches is in the range of 1 to 254.
+         The smaller the value, the higher the priority."
+    SYNTAX       Unsigned32 (1..254)
+
+Hh3cFcDmState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represents the state of domain:
+
+         disabledWithNoDomain    - initialling with domain configuration
+                                   disabled and no manual domain
+                                   configuration.
+         disabledWithDomainCfg   - initialling with configuration disabled
+                                   and manual domain configuration.
+         stableWithNoEports      - stable with no E_Port UP.
+         stableWithDomainCfg     - stable with domain ID configured.
+         stableWithNoDomain      - stable with no domain ID configured.
+         principalSwitchInSelect - progressing principal switch selection.
+         domainIdRequesting      - requesting for the domain ID.
+         buildFabricPhase        - processing building fabric.
+         reconfigureFabricPhase  - processing fabric reconfiguration.
+         unknown                 - unknown state."
+
+    SYNTAX          INTEGER  {
+                              disabledWithNoDomain(1),
+                              disabledWithDomainCfg(2),
+                              stableWithNoEports(3),
+                              stableWithDomainCfg(4),
+                              stableWithNoDomain(5),
+                              principalSwitchInSelect(6),
+                              domainIdRequesting(7),
+                              buildFabricPhase(8),
+                              reconfigureFabricPhase(9),
+                              unknown(10)
+                             }
+
+Hh3cFcDomainIdList  ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "This object indicates the list of domain IDs that are
+         allowed.
+         Each octet within this value specifies a set of eight
+         domains, with the first octet specifying domain ID
+         through 1 through 8, the second octet specifying 9
+         through 16, etc.
+         Within each octet, the most significant bit represents
+         the lowest numbered ID, and the least significant bit
+         represents the highest numbered ID.  Thus, each domain
+         ID of the VSAN is represented by a single bit within the
+         value of this object.  If that bit has a value of '1',
+         then that domain ID is included, or else the domain ID
+         is not included if its bit has a value of '0'.
+
+         If this object has a value which is less than 32 bytes
+         long, the domains not represented are not considered to
+         be in the list.
+
+         If this object has a value of zero-length, no domains
+         will be allowed in this VSAN."
+    SYNTAX       OCTET STRING (SIZE (0..32))
+
+END

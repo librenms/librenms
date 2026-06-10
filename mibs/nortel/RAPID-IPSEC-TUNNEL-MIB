@@ -1,0 +1,566 @@
+RAPID-IPSEC-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, 
+        OBJECT-IDENTITY, enterprises, 
+        IpAddress, TimeTicks               FROM SNMPv2-SMI
+        DateAndTime                        FROM SNMPv2-TC
+        rapidstream                        FROM RAPID-MIB;
+        
+    rsInfoModule MODULE-IDENTITY
+        LAST-UPDATED "0103061200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                  "   Ella Yu
+                      WatchGuard Technologies, Inc.
+                      1841 Zanker Road
+                      San Jose, CA 95112
+                      USA
+
+                      408-519-4888
+                      ella.yu@watchguard.com "
+
+        DESCRIPTION
+            "The MIB module describes various tunnel objects
+            of RapidStream system."
+
+
+        REVISION      "200104201200Z"
+        DESCRIPTION
+            "Initial revision."
+        REVISION      "200211011200Z"
+        DESCRIPTION
+            "Changed CONTACT-INFO."
+        ::= { rapidstream 6 }
+
+    rsIpsecTunnelMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all tunnel
+             branches."
+        ::= { rsInfoModule 5 }
+
+    rsIpsecTunnel OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all 
+            tunnel information."
+        ::= { rsIpsecTunnelMIB 1 }
+
+    rsIpsecTunnelNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of entries in the rsIpsecTunnelTable. "
+        ::= { rsIpsecTunnel 1 }
+
+    rsIpsecTunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RSIpsecTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the connection table describing all current
+             tunnels exist on this entity."
+        ::= { rsIpsecTunnel 2 }
+
+
+    rsIpsecTunnelEntry OBJECT-TYPE
+        SYNTAX      RSIpsecTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+             tunnel between two security gateways."
+        INDEX{ rsIpsecTunnelID }
+        ::= { rsIpsecTunnelTable 1 }
+
+    RSIpsecTunnelEntry ::= SEQUENCE {
+
+        rsIpsecTunnelID                      Integer32,
+
+        rsIpsecTunnelLocalAddr               IpAddress,
+        rsIpsecTunnelPeerAddr                IpAddress,
+
+
+        rsIpsecTunnelInSpi                   Integer32,
+        rsIpsecTunnelOutSpi                  Integer32,
+        rsIpsecTunnelCreateTime              DateAndTime,
+        rsIpsecTunnelDeviceID                Unsigned32,
+        rsIpsecTunnelEspEncryptAlg           INTEGER,
+        rsIpsecTunnelEspAuthAlg              INTEGER,
+        rsIpsecTunnelAhAuthAlg               INTEGER,
+        rsIpsecTunnelMode                    INTEGER,
+        rsIpsecTunnelKeyMode                 INTEGER,
+        rsIpsecTunnelLifeTime                TimeTicks,
+        rsIpsecTunnelLifeLength              Counter32,
+        rsIpsecTunnelInSaBytes               Counter32,
+        rsIpsecTunnelOutSaBytes              Counter32,
+        rsIpsecTunnelAccSecs                 Counter32,
+        rsIpsecTunnelSelectorProtocol        INTEGER,
+        rsIpsecTunnelSelectorRemoteIPType    INTEGER,
+        rsIpsecTunnelSelectorRemoteIPOne     IpAddress,
+        rsIpsecTunnelSelectorRemoteIPTwo     IpAddress,
+        rsIpsecTunnelSelectorRemotePort      INTEGER,
+        rsIpsecTunnelSelectorLocalIPType     INTEGER,
+        rsIpsecTunnelSelectorLocalIPOne      IpAddress,
+        rsIpsecTunnelSelectorLocalIPTwo      IpAddress,
+        rsIpsecTunnelSelectorLocalPort       INTEGER,
+        rsIpsecTunnelNumRekey                Counter32,
+        rsIpsecTunnelInKbytes                Counter32,
+        rsIpsecTunnelOutKbytes               Counter32,
+        rsIpsecTunnelInPackets               Counter32,
+        rsIpsecTunnelOutPackets              Counter32,
+        rsIpsecTunnelInDecryptErrors         Counter32,
+        rsIpsecTunnelInAuthErrors            Counter32,
+        rsIpsecTunnelInReplayErrors          Counter32,
+        rsIpsecTunnelInOtherErrors           Counter32,
+        rsIpsecTunnelOutDecryptErrors        Counter32,
+        rsIpsecTunnelOutAuthErrors           Counter32,
+        rsIpsecTunnelOutReplayErrors         Counter32,
+        rsIpsecTunnelOutOtherErrors          Counter32,
+        rsIpsecTunnelUdpEncap                INTEGER,
+        rsIpsecTunnelPeerUdpPort             INTEGER,
+        rsIpsecTunnelOrigPeerAddr            IpAddress
+    }
+
+    rsIpsecTunnelID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The running index of this tunnel."
+        ::= { rsIpsecTunnelEntry 1 }
+
+    rsIpsecTunnelLocalAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local IP address of the current tunnel."
+        ::= { rsIpsecTunnelEntry 2 }
+
+    rsIpsecTunnelPeerAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The remote IP address of the current tunnel."
+        ::= { rsIpsecTunnelEntry 3 }
+
+    rsIpsecTunnelInSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of inbound  SA's within this 
+             tunnel."
+        ::= { rsIpsecTunnelEntry 4 }
+
+    rsIpsecTunnelOutSpi OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The security parameters index of outbound  SA's within this 
+            tunnel."
+        ::= { rsIpsecTunnelEntry 5 }
+
+    rsIpsecTunnelCreateTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The date and time when the tunnel is created."
+        ::= { rsIpsecTunnelEntry 6 }
+
+    rsIpsecTunnelDeviceID OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The identifier of target device where the SA resides."
+        ::= { rsIpsecTunnelEntry 7 }
+
+    rsIpsecTunnelEspEncryptAlg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        des(2),
+                        three-des(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The encryption algorithm used in the tunnel. It's 0
+            if ESP is not used."
+        ::= { rsIpsecTunnelEntry 8 }
+
+    rsIpsecTunnelEspAuthAlg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        md5(2),
+                        sha(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The authentication algorithm used in the tunnel. It's
+            0 if ESP is not used."
+        ::= { rsIpsecTunnelEntry 9 }
+
+    rsIpsecTunnelAhAuthAlg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        md5(2),
+                        sha(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The AH authentication algorithm used in the tunnel.
+            It's 0 if AH is not used."
+        ::= { rsIpsecTunnelEntry 10 }
+        
+    rsIpsecTunnelMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        tunnel(1),
+                        transport(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel/transport mode of the tunnel."
+        ::= { rsIpsecTunnelEntry 11 }
+
+    rsIpsecTunnelKeyMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(0),
+                        manual(1),
+                        auto-ike(2),
+                        other(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The key mode of the tunnel."
+        ::= { rsIpsecTunnelEntry 12 }
+
+    rsIpsecTunnelLifeTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The life time (in hundredths of a second) of the tunnel."
+        ::= { rsIpsecTunnelEntry 13 }
+
+    rsIpsecTunnelLifeLength OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum traffic in bytes that the tunnel is allowed to support."
+        ::= { rsIpsecTunnelEntry 14 }
+
+    rsIpsecTunnelInSaBytes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current active inbound SA bytes of the tunnel."
+        ::= { rsIpsecTunnelEntry 15 }
+        
+    rsIpsecTunnelOutSaBytes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current active outbound SA bytes of the tunnel."
+        ::= { rsIpsecTunnelEntry 16 }
+        
+    rsIpsecTunnelAccSecs OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of seconds that the tunnel has existed."
+        ::= { rsIpsecTunnelEntry 17 }
+        
+    rsIpsecTunnelSelectorProtocol OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        any(0),
+                        icmp(1),
+                        igmp(2),
+                        ipip(4),
+                        tcp(6),
+                        egp(8),
+                        pup(12),
+                        udp(17),
+                        idp(22),
+                        tp(29),
+                        ipv6(41),
+                        ipv6-routing(43),
+                        ipv6-fragmentation(44),
+                        rsvp(46),
+                        gre(47),
+                        esp(50),
+                        ah(51),
+                        icmpv6(58),
+                        none(59),
+                        dstopts(60),
+                        mtp(92),
+                        encap(98),
+                        pim(103),
+                        raw(255)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The ip protocol number that this SA selector carries, or
+            0 if it carries any protocol."
+        ::= { rsIpsecTunnelEntry 18 }
+        
+    rsIpsecTunnelSelectorRemoteIPType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ip-addr-single(1),
+                        ip-addr-subnet(2),
+                        ip-addr-range(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of remote IP address of the SA selector in 
+            the entity."
+        ::= { rsIpsecTunnelEntry 19 }
+
+    rsIpsecTunnelSelectorRemoteIPOne OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The first remote IP address of the SA selector in the entity.
+            It's IP address if remote IP of this selector only has one address.
+            It's IP address of subnet if the remote IP of this selector is IP subnet.
+            It's the start IP address if the remote IP of this selector 
+            has a range of addresses."
+        ::= { rsIpsecTunnelEntry 20 }
+        
+    rsIpsecTunnelSelectorRemoteIPTwo OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The second remote IP address of the SA selector in the entity.
+            It's 0 if remote IP of this selector only has one address.
+            It's netmask of subnet if the remote IP of this selector is IP subnet.
+            It's the end IP address if the remote IP of this selector 
+            has a range of addresses."
+        ::= { rsIpsecTunnelEntry 21 }
+
+    rsIpsecTunnelSelectorRemotePort OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The remote port used by this selector in the entity."
+        ::= { rsIpsecTunnelEntry 22 }
+
+    rsIpsecTunnelSelectorLocalIPType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ip-addr-single(1),
+                        ip-addr-subnet(2),
+                        ip-addr-range(3)
+                           }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of local IP address of the SA selector in 
+            the entity."
+        ::= { rsIpsecTunnelEntry 23 }
+
+    rsIpsecTunnelSelectorLocalIPOne OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The first local IP address of the SA selector in the entity.
+            It's IP address if local IP of this selector only has one address.
+            It's IP address of subnet if the local IP of this selector is IP subnet.
+            It's the start IP address if the local IP of this selector 
+             has a range of IP addresses."
+        ::= { rsIpsecTunnelEntry 24 }
+        
+    rsIpsecTunnelSelectorLocalIPTwo OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The second local IP address of the SA selector in the entity.
+            It's 0 if local IP of this selector only has one address.
+            It's netmask of subnet if the local IP of this selector is IP subnet.
+            It's the end IP address if the local IP of this selector 
+            has a range of IP addresses."
+        ::= { rsIpsecTunnelEntry 25 }
+
+    rsIpsecTunnelSelectorLocalPort OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local port used by this selector in the entity."
+        ::= { rsIpsecTunnelEntry 26 }
+        
+    rsIpsecTunnelNumRekey OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of rekeys of the tunnel."
+        ::= { rsIpsecTunnelEntry 27 }
+        
+    rsIpsecTunnelInKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS            "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total inbound traffic in Kbytes since the establish of
+            this tunnel."
+        ::= { rsIpsecTunnelEntry 28 }
+
+    rsIpsecTunnelOutKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS            "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total outound traffic in Kbytes since the establish of
+            this connection."
+        ::= { rsIpsecTunnelEntry 29 }
+
+    rsIpsecTunnelInPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of inbound packets since the establish of
+            this connection."
+        ::= { rsIpsecTunnelEntry 30 }
+
+    rsIpsecTunnelOutPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of outound packets since the establish of
+            this connection."
+        ::= { rsIpsecTunnelEntry 31 }
+
+    rsIpsecTunnelInDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to decryption
+            error since the establish of this connection."
+        ::= { rsIpsecTunnelEntry 32 }
+
+    rsIpsecTunnelInAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication
+            error since the establish of this connection."
+        ::= { rsIpsecTunnelEntry 33 }
+
+    rsIpsecTunnelInReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay
+            error since the establish of this connection."
+        ::= { rsIpsecTunnelEntry 34}
+
+    rsIpsecTunnelInOtherErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded  due to errors
+            other than decryption, authentication or replay errors. This
+            may include packets dropped due to a lack of receive
+            buffers, and may include packets dropped due to congestion
+            at the decryption element."
+        ::= { rsIpsecTunnelEntry 35 }
+
+    rsIpsecTunnelOutDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to decryption
+            error since the establish of this connection."
+        ::= { rsIpsecTunnelEntry 36 }
+
+    rsIpsecTunnelOutAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication
+            error since the establish of this connection."
+        ::= { rsIpsecTunnelEntry 37 }
+
+    rsIpsecTunnelOutReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay
+            error since the establish of this connection."
+        ::= { rsIpsecTunnelEntry 38 } 
+
+    rsIpsecTunnelOutOtherErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of packets discarded due to errors
+            other than decryption, authentication or replay errors. This
+            may include packets dropped due to a lack of receive
+            buffers, and may include packets dropped due to congestion
+            at the decryption element."
+        ::= { rsIpsecTunnelEntry 39 }
+
+    rsIpsecTunnelUdpEncap  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        disabled(0),
+                        enabled(1)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether if UDP encapsulated IPSec has been enabled."
+        ::= { rsIpsecTunnelEntry 40 }
+
+    rsIpsecTunnelPeerUdpPort  OBJECT-TYPE
+        SYNTAX      INTEGER (0..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peer's UDP port of current tunnel when UDP encapsulated IPSec
+             is enabled."
+        ::= { rsIpsecTunnelEntry 41 }
+
+    rsIpsecTunnelOrigPeerAddr  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The original peer ip address of current tunnel when UDP encapsulated
+             IPSec is enabled"
+        ::= { rsIpsecTunnelEntry 42 }
+
+END

@@ -1,0 +1,808 @@
+
+-- ===========================================================================
+
+--
+-- APS POS definitions
+--
+EXTREME-POS-MIB DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+		OBJECT-TYPE     FROM SNMPv2-SMI
+                Unsigned32	FROM SNMPv2-SMI
+                TruthValue      FROM SNMPv2-TC
+		DisplayString   FROM RFC1213-MIB
+		IpAddress	FROM SNMPv2-SMI
+                extremeAgent    FROM EXTREME-BASE-MIB
+		PortList	FROM EXTREME-BASE-MIB;
+
+        extremePOSMib MODULE-IDENTITY
+                LAST-UPDATED "0007240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme POS objects: objects common to POS MIBs"
+        ::= { extremeAgent 20 }
+
+
+	extremeAps OBJECT IDENTIFIER
+        ::= { extremePOSMib 1 }
+
+        extremeApsConfig OBJECT IDENTIFIER
+        ::= { extremeAps 1 }
+
+        extremeApsConfigEnabled                         OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                "Global APS enablement"
+        ::= { extremeApsConfig 1  }
+
+--
+-- APS Group Configuration Table
+--
+
+        extremeApsGroupConfigTable                      OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeApsGroupConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains configuration information
+                         by defined APS group."
+                ::= { extremeApsConfig 2 }
+
+        extremeApsGroupConfigEntry                      OBJECT-TYPE
+                SYNTAX  ExtremeApsGroupConfigEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeApsGroupConfigGroupNumber}
+                ::= {extremeApsGroupConfigTable 1}
+
+        ExtremeApsGroupConfigEntry ::= SEQUENCE {
+                extremeApsGroupConfigGroupNumber        INTEGER (1..65535),
+                extremeApsGroupConfigRevertMode         INTEGER,
+                extremeApsGroupConfigRevertMinutes      INTEGER (0..12),
+                extremeApsGroupConfigDirection          INTEGER,
+                extremeApsGroupConfigTimerInterval      INTEGER,
+                extremeApsGroupConfigTimerMisses        INTEGER,
+                extremeApsGroupConfigAuthenticate       TruthValue,
+                extremeApsGroupConfigAuthString         DisplayString
+        }
+
+        extremeApsGroupConfigGroupNumber                OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The group number which uniquely identifies
+                         the APS group."
+                ::= { extremeApsGroupConfigEntry 1 }
+
+        extremeApsGroupConfigRevertMode                 OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                revertive (1),
+                                nonRevertive (2)
+                                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The revertive mode configured for the APS
+                         group.  This indicates whether APS will
+                         switch-back automatically after the working
+                         line error is cleared.  In non-revertive
+                         mode, manual intervention is required for
+                         switch-back."
+                ::= { extremeApsGroupConfigEntry 2 }
+
+        extremeApsGroupConfigRevertMinutes              OBJECT-TYPE
+                SYNTAX  INTEGER (0..12)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of minutes APS will wait after
+                         the error has been cleared before switching
+                         back to the working line.  During this
+                         interval, the K1 request will indicate
+                         WTR (wait-to-restore).  This field is only
+                         valid in revertive mode."
+                ::= { extremeApsGroupConfigEntry 3 }
+
+        extremeApsGroupConfigDirection                  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                bidirectional (1),
+                                unidirectional (2)
+                                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The directional mode configured for the
+                         APS group.  This indicates whether protection
+                         switches are coordinated between both POS
+                         equipment and ADM (bidirectional) or not
+                         (unidirectional)."
+                ::= { extremeApsGroupConfigEntry 4 }
+
+        extremeApsGroupConfigTimerInterval              OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of seconds between APS out-of-band
+                         peer protocol hello messages.  This value is
+                         relevant when the working line and protection
+                         line exist is physically different chassis."
+                ::= { extremeApsGroupConfigEntry 5 }
+
+        extremeApsGroupConfigTimerMisses                OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of APS out-of-band peer protocol
+                         messages transmitted without receiving a
+                         response before the protection switch declares
+                         the working switch inoperable.  When this occurs
+                         the protection switch initiates a line switch
+                         over via APS."
+                ::= { extremeApsGroupConfigEntry 6 }
+
+        extremeApsGroupConfigAuthenticate               OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "When enabled, the authentication string on both
+                         working and protection switches must match."
+                ::= { extremeApsGroupConfigEntry 7 }
+
+        extremeApsGroupConfigAuthString                 OBJECT-TYPE
+                SYNTAX  DisplayString (SIZE(0..8))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "If configured, this is the authentication string
+                         that must match between working and protection
+                         switches.  This field is relevant if the APS group
+                         is configured to authenticate."
+                ::= { extremeApsGroupConfigEntry 8 }
+
+--
+-- APS Port Configuration Table
+--
+
+        extremeApsPortConfigTable                       OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeApsPortConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains configuration information
+                         for APS ports."
+                ::= { extremeApsConfig 3 }
+
+        extremeApsPortConfigEntry                       OBJECT-TYPE
+                SYNTAX  ExtremeApsPortConfigEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeApsPortConfigGroupNumber,
+                       extremeApsPortConfigPortNumber}
+                ::= {extremeApsPortConfigTable 1}
+
+        ExtremeApsPortConfigEntry ::= SEQUENCE {
+                extremeApsPortConfigGroupNumber         INTEGER (1..65535),
+                extremeApsPortConfigPortNumber          INTEGER,
+                extremeApsPortConfigPortType            INTEGER
+        }
+
+        extremeApsPortConfigGroupNumber                 OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The group number which uniquely identifies
+                         the APS group."
+                ::= { extremeApsPortConfigEntry 1 }
+
+        extremeApsPortConfigPortNumber                  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The value of ifIndex that identifies the port."
+                ::= { extremeApsPortConfigEntry 2 }
+
+        extremeApsPortConfigPortType                    OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                working (1),
+                                protection (2)
+                                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The port type designation."
+                ::= { extremeApsPortConfigEntry 3 }
+
+--
+-- APS Protection Port Additional Configuration Table
+--
+
+        extremeApsProtectPortConfigTable                OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeApsProtectPortConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains configuration information
+                         for APS protection ports."
+                ::= { extremeApsConfig 4 }
+
+        extremeApsProtectPortConfigEntry                OBJECT-TYPE
+                SYNTAX  ExtremeApsProtectPortConfigEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeApsProtectPortConfigGroupNumber,
+                       extremeApsProtectPortConfigPortNumber}
+                ::= {extremeApsProtectPortConfigTable 1}
+
+        ExtremeApsProtectPortConfigEntry ::= SEQUENCE {
+                extremeApsProtectPortConfigGroupNumber   INTEGER (1..65535),
+                extremeApsProtectPortConfigPortNumber    INTEGER,
+                extremeApsProtectPortConfigWorkingIpAddr IpAddress
+        }
+
+        extremeApsProtectPortConfigGroupNumber          OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The group number which uniquely identifies
+                         the APS group."
+                ::= { extremeApsProtectPortConfigEntry 1 }
+
+        extremeApsProtectPortConfigPortNumber           OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The value of ifIndex that identifies
+                         the protection port."
+                ::= { extremeApsProtectPortConfigEntry 2 }
+
+        extremeApsProtectPortConfigWorkingIpAddr        OBJECT-TYPE
+                SYNTAX  IpAddress
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The IP address of the working switch.  If the
+                         working and protection lines reside on the same
+                         chassis, this IP address will be a local address."
+                ::= { extremeApsProtectPortConfigEntry 3 }
+
+        extremeApsStatus OBJECT IDENTIFIER
+        ::= { extremeAps 2 }
+
+--
+-- APS Group Status Table
+--
+        extremeApsGroupTable                            OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeApsGroupEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains run-time information
+                         by defined APS group."
+                ::= { extremeApsStatus 1 }
+
+        extremeApsGroupEntry                            OBJECT-TYPE
+                SYNTAX  ExtremeApsGroupEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeApsGroupGroupNumber}
+                ::= {extremeApsGroupTable 1}
+
+        ExtremeApsGroupEntry ::= SEQUENCE {
+                extremeApsGroupGroupNumber              INTEGER (1..65535),
+                extremeApsGroupActivePort               INTEGER,
+                extremeApsGroupEffectiveDirection       INTEGER,
+                extremeApsGroupPeerProtoStatus          INTEGER
+        }
+
+        extremeApsGroupGroupNumber                      OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The group number which uniquely identifies
+                         the APS group."
+                ::= { extremeApsGroupEntry 1 }
+
+        extremeApsGroupActivePort                       OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                working (1),
+                                protection (2)
+                                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The APS port which is currently carrying the
+                         network traffic."
+                ::= { extremeApsGroupEntry 2 }
+
+        extremeApsGroupEffectiveDirection               OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                bidirectional (1),
+                                unidirectional (2)
+                                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The effective directional mode for the APS
+                         group.  When this value differs from the
+                         configured directional mode, check the
+                         ADM and switch provisioning for a mis-
+                         configuration."
+                ::= { extremeApsGroupEntry 3 }
+
+        extremeApsGroupPeerProtoStatus                  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                established (1),
+                                closed (2)
+                                }
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The APS out-of-band peer protocol status
+                         for a group."
+                ::= { extremeApsGroupEntry 4 }
+
+--
+-- APS Protection Port Table
+--
+
+        extremeApsProtectPortTable                      OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeApsProtectPortEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains run-time information
+                         by defined APS protection port."
+                ::= { extremeApsStatus 2 }
+
+        extremeApsProtectPortEntry                      OBJECT-TYPE
+                SYNTAX  ExtremeApsProtectPortEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeApsProtectPortGroupNumber,
+                       extremeApsProtectPortPortNumber}
+                ::= {extremeApsProtectPortTable 1}
+
+        ExtremeApsProtectPortEntry ::= SEQUENCE {
+                extremeApsProtectPortGroupNumber         INTEGER (1..65535),
+                extremeApsProtectPortPortNumber          INTEGER,
+                extremeApsProtectPortTransmitK1          OCTET STRING,
+                extremeApsProtectPortTransmitK2          OCTET STRING,
+                extremeApsProtectPortReceiveK1           OCTET STRING,
+                extremeApsProtectPortReceiveK2           OCTET STRING,
+                extremeApsProtectPortSwitchInitByWorking INTEGER,
+                extremeApsProtectPortSwitchInitByProtect INTEGER,
+                extremeApsProtectPortSwitchInitByADM     INTEGER,
+                extremeApsProtectPortSwitchInitByCmd     INTEGER,
+                extremeApsProtectPortSuccessfulSwitches  INTEGER,
+                extremeApsProtectPortHelloProtFails      INTEGER
+
+        }
+
+        extremeApsProtectPortGroupNumber                OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The group number which uniquely identifies
+                         the APS group."
+                ::= { extremeApsProtectPortEntry 1 }
+
+        extremeApsProtectPortPortNumber                 OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The value of ifIndex that identifies
+                          the protection port."
+                ::= { extremeApsProtectPortEntry 2 }
+
+        extremeApsProtectPortTransmitK1                 OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE(1))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The K1 overhead byte currently being transmitted
+                          on the indicated protection port."
+                ::= { extremeApsProtectPortEntry 3 }
+
+        extremeApsProtectPortTransmitK2                 OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE(1))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The K2 overhead byte currently being transmitted
+                          on the indicated protection port."
+                ::= { extremeApsProtectPortEntry 4 }
+
+        extremeApsProtectPortReceiveK1                  OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE(1))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The K1 overhead byte currently being received
+                          on the indicated protection port."
+                ::= { extremeApsProtectPortEntry 5 }
+
+        extremeApsProtectPortReceiveK2                  OBJECT-TYPE
+                SYNTAX  OCTET STRING (SIZE(1))
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The K2 overhead byte currently being received
+                          on the indicated protection port."
+                ::= { extremeApsProtectPortEntry 6 }
+
+        extremeApsProtectPortSwitchInitByWorking        OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The number of switches that have been
+                          initiated by the working-line router."
+                ::= { extremeApsProtectPortEntry 7 }
+
+        extremeApsProtectPortSwitchInitByProtect        OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The number of switches that have been
+                          initiated by the protection-line router."
+                ::= { extremeApsProtectPortEntry 8 }
+
+        extremeApsProtectPortSwitchInitByADM            OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The number of switches that have been
+                          initiated by the ADM."
+                ::= { extremeApsProtectPortEntry 9 }
+        extremeApsProtectPortSwitchInitByCmd            OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The number of switches that have been
+                          initiated by an external CLI command."
+                ::= { extremeApsProtectPortEntry 10 }
+        extremeApsProtectPortSuccessfulSwitches         OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The number of successful APS line switches."
+                ::= { extremeApsProtectPortEntry 11 }
+        extremeApsProtectPortHelloProtFails             OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                         "The number of APS out-of-band peer protocol
+                          failures recorded.  This situation causes
+                          the protection-line router to initiate a
+                          line switch."
+                ::= { extremeApsProtectPortEntry 12 }
+
+        extremeApsErrors OBJECT IDENTIFIER
+        ::= { extremeAps 3 }
+
+--
+-- APS Line Errors Table
+--
+
+        extremeApsLineErrorTable                        OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeApsLineErrorEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains APS line error
+                         information."
+                ::= { extremeApsErrors 1 }
+
+        extremeApsLineErrorEntry                        OBJECT-TYPE
+                SYNTAX  ExtremeApsLineErrorEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeApsLineErrorGroupNumber,
+                       extremeApsLineErrorPortNumber}
+                ::= {extremeApsLineErrorTable 1}
+
+        ExtremeApsLineErrorEntry ::= SEQUENCE {
+                extremeApsLineErrorGroupNumber            INTEGER (1..65535),
+                extremeApsLineErrorPortNumber             INTEGER,
+                extremeApsLineErrorSignalDegradeActive    TruthValue,
+                extremeApsLineErrorBERSignalDegradeActive TruthValue,
+                extremeApsLineErrorSignalFailActive       TruthValue,
+                extremeApsLineErrorBERSignalFailActive    TruthValue,
+                extremeApsLineErrorSignalDegrades         INTEGER,
+                extremeApsLineErrorBERSignalDegrades      INTEGER,
+                extremeApsLineErrorSignalFails            INTEGER,
+                extremeApsLineErrorBERSignalFails         INTEGER
+        }
+
+        extremeApsLineErrorGroupNumber                  OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The group number which uniquely identifies the
+                         APS group."
+                ::= { extremeApsLineErrorEntry 1 }
+
+        extremeApsLineErrorPortNumber                   OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The ifIndex value which identifies the APS port."
+                ::= { extremeApsLineErrorEntry 2 }
+
+        extremeApsLineErrorSignalDegradeActive          OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a signal degrade condition
+                         currently exists on the line."
+                ::= { extremeApsLineErrorEntry 3 }
+
+        extremeApsLineErrorBERSignalDegradeActive       OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a signal degrade condition
+                         due to excessive Bit-Error-Rate currently exists
+                         on the line."
+                ::= { extremeApsLineErrorEntry 4 }
+
+        extremeApsLineErrorSignalFailActive             OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a signal fail condition
+                         currently exists on the line."
+                ::= { extremeApsLineErrorEntry 5 }
+
+        extremeApsLineErrorBERSignalFailActive          OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a signal fail condition
+                         due to excessive Bit-Error-Rate currently
+                         exists on the line."
+                ::= { extremeApsLineErrorEntry 6 }
+
+        extremeApsLineErrorSignalDegrades               OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of signal degrades that have
+                         been recorded on the line."
+                ::= { extremeApsLineErrorEntry 7 }
+
+        extremeApsLineErrorBERSignalDegrades            OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of signal degrades due to excessive
+                         Bit-Error-Rate that have been recorded on the
+                         line."
+                ::= { extremeApsLineErrorEntry 8 }
+
+        extremeApsLineErrorSignalFails                  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of signal fails that have
+                         been recorded on the line."
+                ::= { extremeApsLineErrorEntry 9 }
+
+        extremeApsLineErrorBERSignalFails               OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of signal fails due to excessive
+                         Bit-Error-Rate that have been recorded on the
+                         line."
+                ::= { extremeApsLineErrorEntry 10 }
+
+--
+-- APS Protocol Errors Table
+--
+
+        extremeApsProtocolErrorTable                    OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeApsProtocolErrorEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                        "This table contains APS protocol error
+                         information.  These errors are relevant
+                         for APS protection ports."
+                ::= { extremeApsErrors 2 }
+
+        extremeApsProtocolErrorEntry                    OBJECT-TYPE
+                SYNTAX  ExtremeApsProtocolErrorEntry
+                MAX-ACCESS      not-accessible
+                STATUS  current
+                DESCRIPTION
+                        ""
+                INDEX {extremeApsProtocolErrorGroupNumber,
+                       extremeApsProtocolErrorPortNumber}
+                ::= {extremeApsProtocolErrorTable 1}
+
+        ExtremeApsProtocolErrorEntry ::= SEQUENCE {
+                extremeApsProtocolErrorGroupNumber             INTEGER (1..65535),
+                extremeApsProtocolErrorPortNumber              INTEGER,
+                extremeApsProtocolErrorModeMismatchDefect      TruthValue,
+                extremeApsProtocolErrorProtSwitchByteDefect    TruthValue,
+                extremeApsProtocolErrorChannelMismatchDefect   TruthValue,
+                extremeApsProtocolErrorFarEndProtectDefect     TruthValue,
+                extremeApsProtocolErrorModeMismatchFailure     TruthValue,
+                extremeApsProtocolErrorProtSwitchByteFailure   TruthValue,
+                extremeApsProtocolErrorChannelMismatchFailure  TruthValue,
+                extremeApsProtocolErrorFarEndProtectFailure    TruthValue,
+                extremeApsProtocolErrorModeMismatchNumFails    INTEGER,
+                extremeApsProtocolErrorProtSwitchByteNumFails  INTEGER,
+                extremeApsProtocolErrorChannelMismatchNumFails INTEGER,
+                extremeApsProtocolErrorFarEndProtectNumFails   INTEGER
+        }
+
+        extremeApsProtocolErrorGroupNumber              OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The group number which uniquely identifies the
+                         APS group."
+                ::= { extremeApsProtocolErrorEntry 1 }
+
+        extremeApsProtocolErrorPortNumber               OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The ifIndex value which identifies the APS
+                         protection port."
+                ::= { extremeApsProtocolErrorEntry 2 }
+
+        extremeApsProtocolErrorModeMismatchDefect       OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Mode Mismatch defect currently
+                         exists on the port."
+                ::= { extremeApsProtocolErrorEntry 3 }
+
+        extremeApsProtocolErrorProtSwitchByteDefect     OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Protection Switching Byte defect
+                         currently exists on the port."
+                ::= { extremeApsProtocolErrorEntry 4 }
+
+        extremeApsProtocolErrorChannelMismatchDefect    OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Channel Mismatch defect currently
+                         exists on the port."
+                ::= { extremeApsProtocolErrorEntry 5 }
+
+        extremeApsProtocolErrorFarEndProtectDefect      OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Far-End Protection defect currently
+                         exists on the port."
+                ::= { extremeApsProtocolErrorEntry 6 }
+
+        extremeApsProtocolErrorModeMismatchFailure      OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Mode Mismatch failure currently
+                         exists on the port."
+                ::= { extremeApsProtocolErrorEntry 7 }
+
+        extremeApsProtocolErrorProtSwitchByteFailure    OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Protection Switching Byte failure
+                         currently exists on the port."
+                ::= { extremeApsProtocolErrorEntry 8 }
+
+        extremeApsProtocolErrorChannelMismatchFailure   OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Channel Mismatch failure currently
+                         exists on the port."
+                ::= { extremeApsProtocolErrorEntry 9 }
+
+        extremeApsProtocolErrorFarEndProtectFailure     OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "Indicates whether a Far-End Protection failure currently
+                         exists on the port."
+                ::= { extremeApsProtocolErrorEntry 10 }
+
+        extremeApsProtocolErrorModeMismatchNumFails     OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of Mode Mismatch failures that have
+                         been recorded."
+                ::= { extremeApsProtocolErrorEntry 11 }
+
+        extremeApsProtocolErrorProtSwitchByteNumFails   OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of Protection Switching Byte failures
+                         that have been recorded."
+                ::= { extremeApsProtocolErrorEntry 12 }
+
+        extremeApsProtocolErrorChannelMismatchNumFails  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of Channel Mismatch failures that have
+                         been recorded."
+                ::= { extremeApsProtocolErrorEntry 13 }
+
+        extremeApsProtocolErrorFarEndProtectNumFails    OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS      read-only
+                STATUS  current
+                DESCRIPTION
+                        "The number of Far-End Protection failures that have
+                         been recorded."
+                ::= { extremeApsProtocolErrorEntry 14 }
+
+END

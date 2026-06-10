@@ -1,0 +1,513 @@
+-- *****************************************************************
+-- UBQS-AUTO-RESET-MIB:  Ubiquoss Auto Reset MIB file
+--
+-- June 2011, Hyung Eun Park
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.                        
+--                                               
+-- *****************************************************************
+--
+
+UBQS-AUTO-RESET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212
+	DisplayString, 
+	TruthValue
+		FROM SNMPv2-TC
+	ubiMgmtv2
+		FROM UBQS-SMI;
+          
+ubiAutoResetMIB MODULE-IDENTITY
+    LAST-UPDATED    "201108050000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-AUTO-RESET-MIB is used for getting
+         information about the Auto-reset of system."             
+    ::= { ubiMgmtv2 27 }
+                          
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+-- ***************************************************************
+-- ubiAutoResetMIB
+-- ***************************************************************
+
+ubiAutoResetMIBNotificationPrefix 	OBJECT IDENTIFIER 	::= { ubiAutoResetMIB 0 }
+ubiAutoResetMIBObjects  			OBJECT IDENTIFIER	::= { ubiAutoResetMIB 1 }    
+ubiAutoResetMIBConformance    		OBJECT IDENTIFIER 	::= { ubiAutoResetMIB 2 }
+                    
+
+ubiAutoResetCpu                     OBJECT IDENTIFIER	::= { ubiAutoResetMIBObjects 3 }    
+ubiAutoResetMemory                  OBJECT IDENTIFIER	::= { ubiAutoResetMIBObjects 4 } 
+ubiAutoResetIcmp                  	OBJECT IDENTIFIER	::= { ubiAutoResetMIBObjects 5 }	   
+
+           
+-- *****************************************************************   
+-- ubiAutoResetMIBNotificationPrefix
+-- *****************************************************************
+    
+          
+	ubiAutoResetCpuNotification NOTIFICATION-TYPE
+    	OBJECTS         {            
+    					  ubiAutoResetCpuAction,     
+      					  ubiAutoResetCpuUsage,    
+	  					  ubiAutoResetCpuResetReason,
+                          ubiAutoResetCpuLogThreshold,   
+                          ubiAutoResetCpuReloadThreshold,
+                          ubiAutoResetDelayTime,
+                          ubiAutoResetSuppressReloadLimit,
+                          ubiAutoResetCpuSuppressReloadCount
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	""
+   	::= { ubiAutoResetMIBNotificationPrefix 1 }
+
+	ubiAutoResetMemoryNotification NOTIFICATION-TYPE
+    	OBJECTS         {                      
+    					  ubiAutoResetMemoryAction, 
+    					  ubiAutoResetMemoryfree,
+    					  ubiAutoResetMemoryResetReason,
+    					  ubiAutoResetMemoryLogThreshold,     
+                          ubiAutoResetMemoryReloadThreshold,
+                          ubiAutoResetDelayTime,
+                          ubiAutoResetSuppressReloadLimit,
+                          ubiAutoResetMemorySuppressReloadCount
+    	}
+    	STATUS          current
+    	DESCRIPTION
+        	""
+   	::= { ubiAutoResetMIBNotificationPrefix  2 }
+
+	ubiAutoResetIcmpNotification NOTIFICATION-TYPE
+    	OBJECTS         {     
+    					  ubiAutoResetIcmpAction,            
+    					  ubiAutoResetIcmpFailCount,
+    					  ubiAutoResetIcmpResetReason, 
+    					  ubiAutoResetIcmpLogThreshold,  
+                          ubiAutoResetIcmpReloadThreshold,
+                          ubiAutoResetDelayTime,    
+                          ubiAutoResetSuppressReloadLimit,
+                          ubiAutoResetIcmpSuppressReloadCount
+        }
+    	STATUS          current
+    	DESCRIPTION
+        	""
+   	::= { ubiAutoResetMIBNotificationPrefix  3 }
+            
+             
+-- *****************************************************************   
+-- ubiAutoResetMIBObjects
+-- *****************************************************************
+
+    ubiAutoResetDelayTime   OBJECT-TYPE
+         SYNTAX  Integer32     
+         UNITS	"minutes"
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "When Auto-reset is occured, system is reboot after delaytime."
+         ::= { ubiAutoResetMIBObjects 1 }   
+
+    ubiAutoResetEnabled   OBJECT-TYPE
+         SYNTAX  BITS {
+          	   cpu(0),
+          	   memory(1),
+          	   icmp(2)
+         }     
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "It is enable to sending auto-reset SNMP trap message.
+           cpu(0)     : Auto-reset by CPU
+           memory(1)  : Auto-reset by MEMORY
+           icmp(2)    : Auto-reset by ICMP"
+         ::= { ubiAutoResetMIBObjects 2 }          
+        
+    ubiAutoResetSuppressReloadLimit OBJECT-TYPE
+         SYNTAX  Integer32
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "It is limit of Auto-reset.
+          If number of auto-reset exceed SuppressReloadLimit,
+          Auto-reset is suppressed."
+         ::= { ubiAutoResetMIBObjects 6 }   
+
+    ubiAutoResetClearDelayReload OBJECT-TYPE
+         SYNTAX  INTEGER {
+          	none(0),
+          	clear(1)
+         }
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Cancel delayed Auto-reset."
+         ::= { ubiAutoResetMIBObjects 7 }   
+                       
+                       
+-- *****************************************************************   
+-- ubiAutoResetCpu
+-- *****************************************************************
+         
+    ubiAutoResetCpuInterval OBJECT-TYPE
+         SYNTAX  Integer32    
+         UNITS	"seconds"
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Monitoring period of CPU usage."
+         ::= { ubiAutoResetCpu 1 }   
+
+	ubiAutoResetCpuUsage OBJECT-TYPE
+         SYNTAX  Counter32        
+         UNITS	 "%"
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "Current CPU usage"
+         ::= { ubiAutoResetCpu 2 }   
+
+         
+    ubiAutoResetCpuAction OBJECT-TYPE
+         SYNTAX  INTEGER {
+			none(0),
+            delay(1),
+            reset(2),
+            suppress(3),
+            cancel_delay(4),
+         }        
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "CPU Auto-reset Action type.
+          If Auto-reset is supressed, Action is suppress(4),
+          othrewise, none(0).
+          It is used by trap message.
+            Delay(1)       : Delayed Auto-reset is occurrd.
+            reset(2)       : Auto-reset is occurrd.
+            supress(3)     : Auto-reset is suppressed.
+            cancel_delay(4): Delayed Auto-reset is canceled."
+         ::= { ubiAutoResetCpu 3 }          
+         
+    ubiAutoResetCpuLogThreshold OBJECT-TYPE
+         SYNTAX  Integer32 
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "CPU auto-reset LOG threshold.
+          If CPU usage exceed LogThreshold for Cpu interval,
+          Warning message is printed."
+         ::= { ubiAutoResetCpu 4 }   
+                      
+    ubiAutoResetCpuReloadThreshold OBJECT-TYPE
+         SYNTAX  Integer32
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "CPU auto-reset Reload threshold.
+          If CPU usage exceed ReloadThreshold for Cpu interval,
+          Auto-reset is occured."            
+         ::= { ubiAutoResetCpu 5 }          
+
+    ubiAutoResetCpuResetReason OBJECT-TYPE
+         SYNTAX  INTEGER {
+			log(1),
+			reload(2)         
+         }        
+         MAX-ACCESS accessible-for-notify
+         STATUS     current
+         DESCRIPTION
+         "CPU auto-reset Warning message reason.
+         It indicate warning message by LogThreshold, 
+         or by ReloadThershold."
+         ::= { ubiAutoResetCpu 6 }         
+      
+    ubiAutoResetCpuExecute OBJECT-TYPE
+         SYNTAX  INTEGER {
+         	none(0),
+         	start(1)
+         }
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "It indicate whether CPU auto-reset is enabled."
+         ::= { ubiAutoResetCpu 7 }        
+
+    ubiAutoResetCpuSuppressReloadCount OBJECT-TYPE
+         SYNTAX  Counter32        
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "Nunber of CPU auto-reset occurrence."
+         ::= { ubiAutoResetCpu 8 }   
+      
+      
+-- *****************************************************************   
+-- ubiAutoResetMemory
+-- *****************************************************************
+         
+    ubiAutoResetMemoryInterval OBJECT-TYPE
+         SYNTAX  Integer32    
+         UNITS	"seconds"
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Monitoring period of free memory."
+         ::= { ubiAutoResetMemory 1 }   
+
+
+    ubiAutoResetMemoryfree OBJECT-TYPE
+         SYNTAX  Counter32        
+         UNITS	 "Kbytes"
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "Current Free memory."
+         ::= { ubiAutoResetMemory 2 }   
+          
+    ubiAutoResetMemoryAction OBJECT-TYPE
+         SYNTAX  INTEGER {
+			none(0),
+            delay(1),
+            reset(2),
+            suppress(3),
+            cancel_delay(4),
+         }        
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "Memory Auto-reset Action type.
+          If Auto-reset is supressed, Action is suppress(4),
+          othrewise, none(0).
+          It is used by trap message.
+            Delay(1)       : Delayed Auto-reset is occured.
+            reset(2)       : Auto-reset is occured.
+            supress(3)     : Auto-reset is suppressed.
+            cancel_delay(4): Delayed Auto-reset is canceled."
+         ::= { ubiAutoResetMemory 3 }  
+
+         
+    ubiAutoResetMemoryLogThreshold OBJECT-TYPE
+         SYNTAX  Integer32 
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Memory auto-reset LOG threshold.
+          If Free Memory lower LogThreshold for Memory interval,
+          Warning message is printed."
+         ::= { ubiAutoResetMemory 4 }   
+
+    ubiAutoResetMemoryReloadThreshold OBJECT-TYPE
+         SYNTAX  Integer32
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "Memory auto-reset Reload threshold.
+          If Free memory lower ReloadThreshold for Memory interval,
+          Auto-reset is occured."            
+         ::= { ubiAutoResetMemory 5 }   
+    
+    ubiAutoResetMemoryResetReson OBJECT-TYPE
+         SYNTAX  INTEGER {
+			log(1),
+			reload(2)         
+         }        
+         MAX-ACCESS accessible-for-notify
+         STATUS     current
+         DESCRIPTION
+         "Memory auto-reset Warning message reason.
+         It indicate warning message by LogThreshold, 
+         or by ReloadThershold."
+         ::= { ubiAutoResetMemory 6 }          
+                   
+    ubiAutoResetMemoryExecute OBJECT-TYPE
+         SYNTAX  INTEGER {
+         	none(0),
+         	start(1)
+         }
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "It indicate whether Memory auto-reset is enabled."
+         ::= { ubiAutoResetMemory 7 }    
+
+    ubiAutoResetMemorySuppressReloadCount OBJECT-TYPE
+         SYNTAX  Counter32        
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "Nunber of Memory auto-reset occurrence."
+         ::= { ubiAutoResetMemory 8 }    
+ 
+-- *****************************************************************   
+-- ubiAutoResetIcmp
+-- *****************************************************************
+         
+    ubiAutoResetIcmpInterval OBJECT-TYPE
+         SYNTAX  Integer32
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "ICMP Echo request interval."
+         ::= { ubiAutoResetIcmp 1 }   
+         
+    ubiAutoResetIcmpTimeout OBJECT-TYPE
+         SYNTAX  Integer32 
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "ICMP Echo request timeout."
+         ::= { ubiAutoResetIcmp 2 }   
+ 
+    ubiAutoResetIcmpFailCount OBJECT-TYPE
+         SYNTAX  Counter32        
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "ICMP Echo request failed count."
+         ::= { ubiAutoResetIcmp 3 }   
+
+    ubiAutoResetIcmpAction OBJECT-TYPE
+         SYNTAX  INTEGER {
+			none(0),
+            delay(1),
+            reset(2),
+            suppress(3),
+            cancel_delay(4),
+         }        
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "ICMP Auto-reset Action type.
+          If Auto-reset is supressed, Action is suppress(4),
+          othrewise, none(0).
+          It is used by trap message.
+            Delay(1)       : Delayed Auto-reset is occurred.
+            reset(2)       : Auto-reset is occurred.
+            supress(3)     : Auto-reset is suppressed.
+            cancel_delay(4): Delayed Auto-reset is canceled."
+         ::= { ubiAutoResetIcmp 4 }  
+
+    ubiAutoResetIcmpLogThreshold OBJECT-TYPE
+         SYNTAX  Integer32
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "ICMP auto-reset LOG threshold.
+          If ICMP echo request fail count exceed LogThreshold,
+          Warning message is printed."            
+         ::= { ubiAutoResetIcmp 5 }   
+
+    ubiAutoResetIcmpReloadThreshold OBJECT-TYPE
+         SYNTAX  Integer32
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "ICMP auto-reset LOG threshold.
+          If ICMP echo request fail count exceed ReloadThreshold,
+          Auto-reset is occured."            
+         ::= { ubiAutoResetIcmp 6 }   
+ 
+     ubiAutoResetIcmpDstAddr OBJECT-TYPE
+         SYNTAX  DisplayString
+         MAX-ACCESS read-write
+         STATUS     current
+         DESCRIPTION
+         "ICMP echo request Target Address."            
+         ::= { ubiAutoResetIcmp 7 }  
+           
+    ubiAutoResetIcmpResetReason OBJECT-TYPE
+         SYNTAX  INTEGER {
+			normal(0),
+			log(1),
+			reload(2)         
+         }        
+         MAX-ACCESS accessible-for-notify
+         STATUS     current
+         DESCRIPTION
+         "ICMP auto-reset Warning message reason.
+         It indicate warning message by LogThreshold, 
+         or by ReloadThershold."
+         ::= { ubiAutoResetIcmp 8 }     
+                    
+    ubiAutoResetIcmpExecute OBJECT-TYPE
+         SYNTAX  INTEGER {
+         	none(0),
+         	start(1)
+         }
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "It indicate whether ICMP auto-reset is enabled."
+         ::= { ubiAutoResetIcmp 9 } 
+                
+ 
+    ubiAutoResetIcmpSuppressReloadCount OBJECT-TYPE
+         SYNTAX  Counter32        
+         MAX-ACCESS read-only
+         STATUS     current
+         DESCRIPTION
+         "Nunber of ICMP auto-reset occurrence."
+         ::= { ubiAutoResetIcmp 10 }                   
+
+	                                           
+-- *****************************************************************   
+-- ubiAutoResetMIBConformance
+-- *****************************************************************
+	
+-- 
+-- conformance information         
+--
+ubiAutoResetMIBCompliances 	OBJECT IDENTIFIER ::= { ubiAutoResetMIBConformance 1 }
+ubiAutoResetMIBGroups      	OBJECT IDENTIFIER ::= { ubiAutoResetMIBConformance 2 }      
+
+
+
+-- compliance statements
+
+	ubiAutoResetMIBCompliance MODULE-COMPLIANCE
+        STATUS  current     
+        DESCRIPTION
+                "The compliance statement for entities which
+        	    implement the UBQS-AUTO-RESET-MIB"
+        MODULE  
+                MANDATORY-GROUPS {  ubiAutoResetGroup }
+
+       GROUP    ubiAutoResetGroup
+       DESCRIPTION  
+       	         "The ubiAutoResetGroup is applicable for implementations which
+ 			     need to get the Auto-reset information."     
+      	::= { ubiAutoResetMIBCompliances 1 }
+
+
+ 
+-- units of conformance
+
+	ubiAutoResetGroup OBJECT-GROUP
+        OBJECTS {       
+        	         
+        	    }
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the Auto-reset of system."
+    	::= { ubiAutoResetMIBGroups 1 }
+
+
+END

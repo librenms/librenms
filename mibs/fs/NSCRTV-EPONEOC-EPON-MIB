@@ -1,0 +1,312 @@
+
+NSCRTV-EPONEOC-EPON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    BridgeId, Timeout     
+      FROM BRIDGE-MIB       
+    IpAddress, Unsigned32, Integer32, Counter32,OBJECT-TYPE, TimeTicks, Gauge32, Counter64,
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises     
+      FROM SNMPv2-SMI     
+    DateAndTime, MacAddress, TimeStamp, RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC;
+
+
+nscrtvRoot  OBJECT IDENTIFIER ::= { enterprises 17409 }
+
+-- DESCRIPTION
+--     "nscrtvRoot定义全国广电设备管理MIB根节点。"
+
+nscrtvHFCemsTree  OBJECT IDENTIFIER  ::= { nscrtvRoot 1 }
+nscrtvEponEocTree  OBJECT IDENTIFIER  ::= { nscrtvRoot 2}
+-- DESCRIPTION
+--     "nscrtvEponEocTree定义EPON、EoC管理系统MIB根节点,"
+--     "所有EPON、EoC系统的MIB均应在该节点下定义。"
+
+propertyIdent  OBJECT IDENTIFIER  ::= { nscrtvEponEocTree 1}
+--     DESCRIPTION
+--     "属性(Property)MIB的分支节点标识。"
+
+alarmsIdent   OBJECT IDENTIFIER ::= { nscrtvEponEocTree 2}
+
+--     DESCRIPTION
+--     "告警(Alarms)MIB的分支节点标识。"
+
+eponTree   OBJECT IDENTIFIER ::= { nscrtvEponEocTree 3}
+
+--     DESCRIPTION
+--     "EPON MIB的分支节点标识。"
+
+eoCTree   OBJECT IDENTIFIER ::= { nscrtvEponEocTree 4}
+
+--     DESCRIPTION
+--     "EoC MIB的分支节点标识。"
+
+
+    eponAlarmTree OBJECT IDENTIFIER ::= { alarmsIdent 11 }
+
+      eponTrapObjectGroup OBJECT IDENTIFIER ::= { eponAlarmTree 1 }
+
+      eponAlarmObjGroup OBJECT IDENTIFIER ::= { eponAlarmTree 2 }
+
+      eponManagementObjGroup OBJECT IDENTIFIER ::= { eponAlarmTree 3 }
+
+
+      systemObjects OBJECT IDENTIFIER ::= { eponTree 1 }
+
+      sniObjects OBJECT IDENTIFIER ::= { eponTree 2 }
+
+      ponPortObjects OBJECT IDENTIFIER ::= { eponTree 3 }
+
+      onuObjects OBJECT IDENTIFIER ::= { eponTree 4 }
+
+      uniObjects OBJECT IDENTIFIER ::= { eponTree 5 }
+
+      igmpManagementObjects OBJECT IDENTIFIER ::= { eponTree 6 }
+
+      vlanManagementObjects OBJECT IDENTIFIER ::= { eponTree 7 }
+
+      qosManagementObjects OBJECT IDENTIFIER ::= { eponTree 8 }
+
+      stpManagementObjects OBJECT IDENTIFIER ::= { eponTree 9 }
+
+      performanceStatisticObjects OBJECT IDENTIFIER ::= { eponTree 10 }
+
+      eponLinkedEoCManagementObjects OBJECT IDENTIFIER ::= { eponTree 11 }
+
+    EponDeviceIndex ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "
+        Epon olt/onu设备索引号。       
+        ONU ID的组成（4字节）（高--低）          
+        Olt device-8bit OLT Card-8bit Pon port-8bit OnuNUM-8bit        
+        Note: 
+        ----        
+        1. OLT device must not be 0.        
+        2. Card here shall confirm the last byte definition of EponCardIndex
+           to indicate the main-slot and sub-slot index.         
+        3. Pon port must not be 0.
+        4. The useful ONU logical ID MUST never be set to 0, where NUM of 0 has
+           another meaning, to indicate that the ONU logical ID is meaningless,
+           or said to not applied.
+                
+        Usage guide:
+        -----------        
+        This TC could be used for OLT SNI, OLT PON port, OLT ONU ID
+        ONU UNI, OLT device, trunk.         
+        If the refered MIB object does not have clear definition,
+        refer to the following:
+        Applied Obj  - Descriptions of Index
+        ------------------------------------------------------------------
+        OLT Pon Port - OnuNum shall be set to 0,
+        OLT SNI    - Same as OLT Pon Port         
+        OLT onu ID   - Set OnuNUM to corresponding ONU logical ID         
+        ONU UNI    - Same as OLT ONU ID
+        OLT device   - Set card, pon port and OnuNUM to 0
+        Trunk    - Card to 0x3F, pon port to trunk ID, OnuNUM to 0
+                 Olt device to corresponding ONU device       
+        "
+      SYNTAX Unsigned32
+  
+    EponCardIndex ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "
+        板卡索引号        
+        For easy presenting the chassis view by NMS, bCardIndex shall be formatted
+        in a following manner:                        
+            Four bytes of INTEGER, from the most significant byte to the least significant
+            bytes
+                -----------------------------------------------------------------------------
+        Reserved byte Reserved byte   Reserved byte Sub-slot 2-bit Main-slot 6-bit        
+        Notes:
+        -----         
+        1. Reserved bytes shall be set to 0.        
+        2. The main-slot shall be started from 1, and shall be in a consecutive manner,
+           for all slots, including service slots, control slots, switch slots, power
+ slots,FAN slots, etc.For example, 1, 2, 3          
+        3. The sub-slot shall be started from 1, and shall be in a consecutive manner.
+           For example, 1, 2. If no sub-slot concept of a main-slot, set to 0.        
+4. For fixed device, if no slot concept, NE shall set both main-slot and sub-slot
+   to 0, to indicate this is meaningless. For modulized device, they MUST not be
+ set to 0.This definition shall applied to both OLT and ONU.        
+5. For trunk, since there is no slot concept, set main-slot to all-1 and sub-slot
+ to 0. This definition shall applied to both OLT and ONU.
+        
+        For example, 
+        0x00 00 00 0A, represents main-slot 10, no sub-slot
+        0x00 00 00 42, represents main-slot 2, sub-slot 1
+        0x00 00 00 3F, represents a trunk
+        "
+      SYNTAX Unsigned32
+      
+    EponPortIndex ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "
+        Epon端口索引号        
+        The device port number shall start from 1. Nunber 0 had specific meaning, stands
+        for portIndex is meaningless, for the situation defined.
+        "
+      SYNTAX INTEGER (0..255)
+
+    EponAlarmCode ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "Alarm codes, uniquely indentifies each kind of alarm.
+        Refer to EPON alarm definition table"
+      SYNTAX INTEGER (1..65535)
+
+    EponAlarmInstance ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "
+        Alarm instance, which define the detailed management object
+        reported the alarm. For example, OLT device 1, slot 2, port 3
+        reports a port down alarm.
+        It is represents in OCTET STRING format.
+        1. The first four OCTET has same definition as EponDeviceIndex TC.
+        2. The fifth OCTET is the slot definition of ONU, which shall 
+           have same definition as last byte definition in EponCardIndex
+           TC.
+        3. The sixth OCTET is the UNI port ID of ONU, which is similar to
+           EponPortIndex TC.
+        4. The seventh and eighth OCTETS are reserved and shall be set to 
+           0 at any time, and shall be ignored by maangement system.        
+        For example,        
+        0x01 02 03 04 05 06 00 00, represents OLT device 1, slot 2, port 3, 
+        ONU logical ID 4, slot 5 UNI port 6 of the connected ONU.        
+        "
+      SYNTAX OCTET STRING ( SIZE (8) )
+
+    EponSeverityType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "
+        告警严重程度"
+      SYNTAX INTEGER
+        {
+        critical(1),
+        major(2),
+        minor(3),
+        warning(4),
+        info(5),
+        clear(6)
+        }
+
+    AutoNegotiationTechAbility ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "Technology ability of auto negotiation. Refer to 
+        clause 30.6.1.1.5 of IEEE 802.3 2005 edition"
+      SYNTAX BITS
+        {
+        tenBaseTFullDuplex(1),
+        tenBaseTHalfDuplex(2),
+        hundredBaseTFullDuplex(3),
+        hundredBaseTHalfDuplex(4),
+        thousandBaseTFullDuplex(5),
+        thousandBaseTHalfDuplex(6),
+        thousandBaseXFullDuplex(7),
+        thousandBaseXHalfDuplex(8),          
+        fdxPause(9),
+        fdxApause(10),
+        fdxSpause(11),
+        fdxBpause(12)
+        }
+
+    TAddress ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "
+        First four octets sames definition of IpAddress, stands for NMS IP address
+        The last four octets same definition of INTEGER, stands for trap UDP port "
+      SYNTAX OCTET STRING (SIZE (8))
+
+    EponStats15MinRecordType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "15分钟性能统计记录的索引号
+        索引号为0表示当前15分钟性能数据
+        1..96表示历史的15分钟性能，1代表最新的数据，96代表最老的数据"
+      SYNTAX INTEGER (0..96)
+
+    EponStats24HourRecordType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "24小时性能统计记录的索引号
+        索引号为0表示当前24小时性能数据
+        1..30表示历史的24小时性能, 1代表最新的数据，30代表最老的数据"
+      SYNTAX INTEGER (0..30)
+
+    EponStatsThresholdType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION 
+        "门限类型，见 性能量定义表
+        1-  InOctets                 
+        2 InPkts                   
+        3 InBroadcastPkts          
+        4 InMulticastPkts          
+        5 InPkts64Octets           
+        6 InPkts65to127Octets      
+        7 InPkts128to255Octets     
+        8 InPkts256to511Octets     
+        9 InPkts512to1023Octets    
+        10  InPkts1024to1518Octets 
+        11  InPkts1519to1522Octets 
+        12  InUndersizePkts        
+        13  InOversizePkts         
+        14  InFragments            
+        15  InMpcpFrames           
+        16  InMpcpOctets           
+        17  InOAMFrames            
+        18  InOAMOctets            
+        19  InCRCErrorPkts         
+        20  InDropEvents           
+        21  InJabbers              
+        22  InCollision            
+        23  OutOctets              
+        24  OutPkts                
+        25  OutBroadcastPkts       
+        26  OutMulticastPkts       
+        27  OutPkts64Octets        
+        28  OutPkts65to127Octets   
+        29  OutPkts128to255Octets  
+        30  OutPkts256to511Octets  
+        31  OutPkts512to1023Octets 
+        32  OutPkts1024to1518Octets
+        33  OutPkts1519o1522Octets 
+        34  OutUndersizePkts       
+        35  OutOversizePkts        
+        36  OutFragments           
+        37  OutMpcpFrames          
+        38  OutMpcpOctets          
+        39  OutOAMFrames           
+        40  OutOAMOctets           
+        41  OutCRCErrorPkts        
+        42  OutDropEvents          
+        43  OutJabbers             
+        44  OutCollision
+        50  Temperature
+        
+        Note:
+        ----------------------------------------------------------------
+        1. For 50 Temperature, this parameter shall only applied to
+           a. Slot level, for each service/switch/management card, for
+              chassis-based system.
+           b. Node-level, for fixed box.
+        2. For 50 Temperature, shall be applied to both OLT and ONU
+        3. For 50 Temperature, since no 15-min performance data collection
+           are required, system shall ensure the temperature polling interval
+           no less than 5 seconds. The alarm shall be only generated when the
+           threshold is acrossed for three continuous intervals, and shall be 
+           cleared, when the threshold is not accrossed any more, for three 
+           continous intervals.
+        "
+      SYNTAX INTEGER (1..1024)
+
+--
+-- END of NSCRTV-EPONEOC-EPON-MIB
+--
+
+END

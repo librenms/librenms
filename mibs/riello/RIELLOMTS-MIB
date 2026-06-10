@@ -1,0 +1,592 @@
+-- RPS S.p.A enterprise MIB definition
+
+-- Copyright (c) RPS S.p.A.
+-- Version: 1.0.1 by Michele Marcon
+-- Date: 07.06.2017
+
+-- Title: RIELLOMTS-MIB
+
+-- MDU-MIB { iso org(3) dod(6) internet(1) private(4)
+-- enterprises(1) riello(5491) }
+
+-- ************************************************************************
+-- ************************************************************************
+
+RIELLOMTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+     DisplayString
+         FROM RFC1213-MIB
+     OBJECT-TYPE
+         FROM RFC-1212
+     TRAP-TYPE
+         FROM RFC-1215
+     rielloMIB
+             FROM RIELLO-MIB;
+
+
+mtsMIB              OBJECT IDENTIFIER ::= { rielloMIB 12 }
+                                    
+mtsIdent              OBJECT IDENTIFIER ::= { mtsMIB 1 }
+
+mtsIdentManufacturer OBJECT-TYPE
+    SYNTAX     DisplayString
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The name of the mts manufacturer."
+    ::= { mtsIdent 1 }
+
+mtsIdentModel OBJECT-TYPE
+    SYNTAX     DisplayString 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mts Model designation."
+    ::= { mtsIdent 2 }
+
+mtsIdentSoftwareVersion OBJECT-TYPE
+    SYNTAX     DisplayString 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mts Software version."
+    ::= { mtsIdent 3 }
+
+mtsIdentIOConfiguration OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mts input/output configuration (1 for Mono/mono, 4 for Tri/tri)."
+    ::= { mtsIdent 4 }
+
+mtsIdentType OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mts type (5 for ATS, 6 for STS)."
+    ::= { mtsIdent 5 }
+
+mtsIdentInputSockets OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of mts input sockets."
+    ::= { mtsIdent 6 }
+
+mtsIdentOutputSockets OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of mts output sockets."
+    ::= { mtsIdent 7 }
+
+mtsIdentNominalCurrent OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mts nominal current (A)."
+    ::= { mtsIdent 8 }
+
+mtsIdentNominalVoltage OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mts nominal voltage (V)."
+    ::= { mtsIdent 9 }
+
+mtsIdentNominalFrequency OBJECT-TYPE
+    SYNTAX     INTEGER 
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The mts nominal frequency (0.1 Hz)."
+    ::= { mtsIdent 10 }
+
+mtsStatus             OBJECT IDENTIFIER ::= { mtsMIB 2 }
+
+mtsS1Frequency OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The frequency of source 1 (0.1 Hz)."
+    ::= { mtsStatus 1 }
+
+mtsS1VoltageL1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The voltage of source 1, line 1 (V)."
+    ::= { mtsStatus 2 }
+
+mtsS1VoltageL2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The voltage of source 1, line 2 (V)."
+    ::= { mtsStatus 3 }
+
+mtsS1VoltageL3 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The voltage of source 1, line 3 (V)."
+    ::= { mtsStatus 4 }
+
+mtsS2Frequency OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The frequency of source 2 (0.1 Hz)."
+    ::= { mtsStatus 5 }
+
+mtsS2VoltageL1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The voltage of source 2, line 1 (V)."
+    ::= { mtsStatus 6 }
+
+mtsS2VoltageL2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The voltage of source 2, line 2 (V)."
+    ::= { mtsStatus 7 }
+
+mtsS2VoltageL3 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The voltage of source 2, line 3 (V)."
+    ::= { mtsStatus 8 }
+
+mtsPhaseDifference OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "Phase difference between sources (degrees)."
+    ::= { mtsStatus 9 }
+
+mtsLoadL1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The output load of line 1 (%)."
+    ::= { mtsStatus 10 }
+
+mtsLoadL2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The output load of line 2 (%)."
+    ::= { mtsStatus 11 }
+
+mtsLoadL3 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The output load of line 3 (%)."
+    ::= { mtsStatus 12 }
+
+mtsOutputCurrentL1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The output load current of line 1 (0.1 A)."
+    ::= { mtsStatus 13 }
+
+mtsOutputCurrentL2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The output load current of line 2 (0.1 A)."
+    ::= { mtsStatus 14 }
+
+mtsOutputCurrentL3 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The output load current of line 3 (0.1 A)."
+    ::= { mtsStatus 15 }
+
+mtsTemperature OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The temperature (degrees C)."
+    ::= { mtsStatus 16 }
+
+mtsSoundOff OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= sound on, 0= sound off."
+    ::= { mtsStatus 17 }
+
+mtsTestInProgress OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= test in progress, 0= test not in progress."
+    ::= { mtsStatus 18 }
+
+mtsAuxPower2fail OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= fail, 0= not fail."
+    ::= { mtsStatus 19 }
+
+mtsAuxPower1fail OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= fail, 0= not fail."
+    ::= { mtsStatus 20 }
+
+mtsSynchrobad OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= bad, 0= not bad."
+    ::= { mtsStatus 21 }
+
+mtsPreferredSource OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= S2, 0= S1."
+    ::= { mtsStatus 22 }
+
+mtsTransferhinibit OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= hinibit, 0= not hinibit."
+    ::= { mtsStatus 23 }
+
+mtsNonSynchInibit OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 24 }
+
+mtsSourceS2bad OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= bad, 0= not bad."
+    ::= { mtsStatus 25 }
+
+mtsSourceS1bad OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= bad, 0= not bad."
+    ::= { mtsStatus 26 }
+
+mtsOnSourceS2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 27 }
+
+mtsOnSourceS1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 28 }
+
+mtsLocked OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= locked, 0= not locked."
+    ::= { mtsStatus 29 }
+
+mtsOutputSwitchOff OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 30 }
+
+mtsS2Blackout OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= blackout, 0= no blackout."
+    ::= { mtsStatus 31 }
+
+mtsS2PhaseseqNotok OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 32 }
+
+mtsS2VoltOutoftolerance OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 33 }
+
+mtsS1SCRAlternateLoss OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 34 }
+
+mtsS1InputSWOff OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 35 }
+
+mtsS1Frequencybad OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= bad, 0= not bad."
+    ::= { mtsStatus 36 }
+
+mtsS1Balancebad OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 37 }
+
+mtsS1Blackout OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 38 }
+
+mtsS1PhaseseqNotok OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 39 }
+
+mtsS1VoltOutoftolerance OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 40 }
+
+mtsUserlogin OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 41 }
+
+mtsAlarmTemperature OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 42 }
+
+mtsAlarmOverload OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 43 }
+
+mtsGeneralFailure OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 44 }
+
+mtsS2InputMCCBtrip OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 45 }
+
+mtsS1InputMCCBtrip OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 46 }
+
+mtsServicelogin OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 47 }
+
+mtsOutputSCRalternanceloss OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 48 }
+
+mtsManBypassS2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 49 }
+
+mtsManBypassS1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 50 }
+
+mtsManTransferS2 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 51 }
+
+mtsManTransferS1 OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 52 }
+
+mtsS2SCRalternanceloss OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 53 }
+
+mtsS2InputSWoff OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 54 }
+
+mtsS2Frequencybad OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 55 }
+
+mtsS2Balancebad OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "1= yes, 0= no."
+    ::= { mtsStatus 56 }
+
+       
+mtsTraps OBJECT IDENTIFIER ::= { mtsMIB 4 }
+
+
+mtsNormal TRAP-TYPE
+       ENTERPRISE  mtsTraps
+       DESCRIPTION "This trap is sent when STS is on normal status"
+       ::= 1
+
+mtsAnomaly TRAP-TYPE
+       ENTERPRISE  mtsTraps
+       DESCRIPTION "This trap is sent when STS is has some anomaly and is resent every minute"
+       ::= 2
+           
+mtsFault TRAP-TYPE
+       ENTERPRISE  mtsTraps
+       DESCRIPTION "This trap is sent when STS is has some fault and is resent every minute"
+       ::= 3
+
+mtsLock TRAP-TYPE
+       ENTERPRISE  mtsTraps
+       DESCRIPTION "This trap is sent when STS is locked and is resent every minute"
+       ::= 4
+
+mtsManualBypassEnabled TRAP-TYPE
+       ENTERPRISE  mtsTraps
+       DESCRIPTION "This trap is sent when STS is on manual bypass and is resent every minute"
+       ::= 5
+           
+END
+

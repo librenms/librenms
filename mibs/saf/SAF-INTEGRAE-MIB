@@ -1,0 +1,2187 @@
+SAF-INTEGRAE-MIB DEFINITIONS ::= BEGIN
+
+-- Definitions for include by other SAF Tehnika mib modules
+
+IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter64,
+      TimeTicks
+          FROM SNMPv2-SMI                -- [RFC2578]
+      pointToPoint
+          FROM SAF-ENTERPRISE
+      DateAndTime, TEXTUAL-CONVENTION
+          FROM SNMPv2-TC
+      DisplayString, PhysAddress
+          FROM RFC1213-MIB
+      safIntegra
+          FROM SAF-INTEGRA-MIB
+      OBJECT-GROUP, MODULE-COMPLIANCE
+          FROM SNMPv2-CONF               -- [RFC2580]
+      IpAddress
+          FROM SNMPv2-SMI                -- [RFC2578]
+      IANAifType
+          FROM IANAifType-MIB;
+	
+-- saf   	        OBJECT IDENTIFIER ::= { enterprises 7571 }
+-- microwaveRadio   OBJECT IDENTIFIER ::= { tehnika 1 }
+-- pointToPoint     OBJECT IDENTIFIER ::= { microwaveRadio 1 }
+-- safIntegra       OBJECT IDENTIFIER ::= { pointToPoint 7 }
+
+integraE MODULE-IDENTITY
+       LAST-UPDATED "202004250000Z" --  25 apr 2020
+       ORGANIZATION "SAF Tehnika"
+       CONTACT-INFO
+               "SAF Tehnika technical support
+                <techsupport@saftehnika.com>"
+       DESCRIPTION
+               "SAF Integra-E device management base"
+-- Revision history
+       REVISION "202004250000Z" -- 25 apr 2020
+       DESCRIPTION
+               "ACMB min/max modem modulation read-only support"
+       REVISION   "202004220000Z" -- 22 apr 2020
+       DESCRIPTION
+               "ATPC read-only support"
+       REVISION   "202001140000Z" --  14 jan 2020
+       DESCRIPTION
+               "Added LSP/Backup port status."
+       REVISION   "201911210000Z" --  21 nov 2019
+       DESCRIPTION
+               "Added system service sensors."
+       REVISION   "201906110000Z" --  11 jun 2019
+       DESCRIPTION
+               "Added device fan error status."
+       REVISION   "201904230000Z" --  23 apr 2019
+       DESCRIPTION
+               "Added device type, serial number and product code."
+       REVISION   "201903120000Z" --  12 mar 2019
+       DESCRIPTION
+               "Changed integraEifPortSpeed to integraEifPortHighSpeed, that will use Mbps instead of bps."
+       REVISION   "201902040000Z" --  04 feb 2019
+       DESCRIPTION
+               "FEC load parameter type changed to Integer32"
+       REVISION   "201811150000Z" --  15 nov 2018
+       DESCRIPTION
+               "FEC locked modem parameter added"
+       REVISION   "201811140000Z" --  14 nov 2018
+       DESCRIPTION
+               "Public Release 1.0"
+        ::= { safIntegra 9 }
+
+
+
+FixedDiv20 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "Fixed point, two decimals"
+    SYNTAX       Integer32
+
+FixedDiv10 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "Fixed point, two decimals"
+    SYNTAX       Integer32
+
+
+
+integraEtimestamp OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Last data update time"
+   ::= { integraE 1 }
+
+integraEradio		OBJECT IDENTIFIER ::=   { integraE 2 }
+
+integraEradioTxPower OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Output power of radio transmitter"
+              ::= { integraEradio 1 }
+
+integraEradioTxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION "Frequency of radio transmitter"
+              ::= { integraEradio 2 }
+
+integraEradioRxLevel OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Level of the received signal"
+              ::= { integraEradio 3 }
+
+integraEradioSide     OBJECT-TYPE
+              SYNTAX  INTEGER {
+                high(1),
+                low(2),
+                error(3)
+                }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Radio side: Low/High"
+              ::= { integraEradio 4 }
+
+integraEradioTxMute   OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 on(1),
+                 off(2),
+                 error(3)
+                 }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Status of 'Tx mute'
+					  1 - Tx is muted,
+					  2 - Tx is not muted.
+                      3 - Status information unavailable"
+              ::= { integraEradio 5 }
+
+integraEradioDuplexShift OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                    "Utilized duplex shift in kHz"
+              ::= { integraEradio 6 }
+
+integraEradioRxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Frequency of radio receiver"
+              ::= { integraEradio 7 }
+
+integraEradioTemperature OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Radio module temperature"
+              ::= { integraEradio 8 }
+
+integraEradioTxMuteDuration OBJECT-TYPE
+              SYNTAX  Integer32(0..214748364)
+              UNITS   "s"
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                    "Time remaning for Tx to be muted in seconds.
+                    To turn mute on send number of seconds between 10 and MAX.
+                    To turn mute off send 0.
+                    GET will retrieve remaining duration for mute or 
+                    0 if Tx mute is turned off."
+              ::= { integraEradio 9 }
+
+--Settable radio parameter range values
+
+integraEradioRangesTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraEradioRangeEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port status data."
+              ::= { integraEradio 10 }
+
+integraEradioRangeEntry OBJECT-TYPE
+              SYNTAX IntegraEradioRangeEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port status info."
+              INDEX { integraEradioRangeEntryIndex }
+              ::= { integraEradioRangesTable 1 }
+
+IntegraEradioRangeEntry   ::=
+              SEQUENCE {
+                    integraEradioRangeEntryIndex
+                        Integer32,
+                    integraEradioRangeDescr
+                        DisplayString,
+                    integraEradioRangeTxPower
+                        Integer32,
+                    integraEradioRangeTxFrequency
+                        Integer32
+              }
+
+integraEradioRangeEntryIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..2)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each range 
+                      entry. Starts with 1 and is equal to a number of all range 
+                      parameters."
+              ::= { integraEradioRangeEntry 1 }
+
+integraEradioRangeDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "'Minimal' and 'maximal' labels"
+              ::= { integraEradioRangeEntry 2 }
+
+integraEradioRangeTxPower OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Output power ranges for radio transmitter"
+              ::= { integraEradioRangeEntry 3 }
+
+integraEradioRangeTxFrequency OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Frequency ranges for radio transmitter"
+              ::= { integraEradioRangeEntry 4 }
+
+integraEradioPLL OBJECT-TYPE
+              SYNTAX  INTEGER {
+                error(1),
+		        ok(2)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "PLL state of local-oscillator generator"
+              ::= { integraEradio 11 }
+
+integraEradioRxLevelState OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ok(1),
+                low(2),
+                high(3),
+                error(4)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Received signal level state"
+              ::= { integraEradio 12 }
+
+integraEradioAtpcState OBJECT-TYPE
+              SYNTAX  INTEGER {
+                off(1),
+                on(2),
+                unknown(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "ATPC state"
+              ::= { integraEradio 13 }
+
+integraEradioAtpcUpdatePeriod OBJECT-TYPE
+              SYNTAX  Integer32(0..214748364)
+              UNITS   "s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "ATPC update period"
+              ::= { integraEradio 14 }
+
+integraEradioAtpcRxLevelMin OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "ATPC Minimal level of the received signal"
+              ::= { integraEradio 15 }
+
+integraEradioAtpcRxLevelMax OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "dBm"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "ATPC Maximal level of the received signal"
+              ::= { integraEradio 16 }
+
+
+integraEmodem		OBJECT IDENTIFIER ::=   { integraE 3 }
+
+integraEmodemAcquireStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 acquireInProgress(1),
+                 acquireLocked(2),
+                 acquireFailed(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "This is the current status of modem data acquire
+                           when queried modem status.
+                           For detailed info use modemAcquireLastStatusDetails."
+              ::= { integraEmodem 1 }
+
+integraEmodemNormalizedMse OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "dB"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current normalized MSE value"
+              ::= { integraEmodem 2 }
+
+-- ldpcDecoderStress OBJECT-TYPE
+integraEmodemFECload OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "dB"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Decoder stress or FEC load value"
+              ::= { integraEmodem 3 }
+
+integraEmodemFEClocked OBJECT-TYPE
+              SYNTAX INTEGER {
+                 no(1),
+                 yes(2),
+                 unknown(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "FEC locked status"
+              ::= { integraEmodem 4 }
+
+integraEmodemAcquireLastStatusDetails OBJECT-TYPE
+              SYNTAX INTEGER {
+                 acquireLocked(1),
+                 acquireSweep(4),
+                 acquireMSEerror(5),
+                 acquireBITerror(6),
+                 acquireStopped(12),
+                 acquireSMerror(13)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "This is the last status of successfull or unsuccessful modem data acquire"
+              ::= { integraEmodem 5 }
+
+integraEmodemTemperature OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Modem DSP temperature"
+              ::= { integraEmodem 6 }
+
+integraEmodemBandwidth OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kHz"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Signal bandwidth"
+              ::= { integraEmodem 7 }
+
+integraEmodemModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Modulation (preferred)"
+              ::= { integraEmodem 8 }
+
+integraEmodemRxModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current (actual) Rx Modulation"
+              ::= { integraEmodem 9 }
+
+integraEmodemTxModulation    OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Current (actual) Tx Modulation"
+              ::= { integraEmodem 10 }
+
+integraEmodemRxCapacity OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kb/s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Rx ethernet capacity in kilobits per second"
+              ::= { integraEmodem 11 }
+
+integraEmodemTxCapacity OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "kb/s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Tx ethernet capacity in kilobits per second"
+              ::= { integraEmodem 12 }
+
+integraEmodemACMBengine OBJECT-TYPE
+              SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 error(3)
+              }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "ACMB engine status"
+              ::= { integraEmodem 13 }
+
+integraEmodemCarrierOffset OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "Hz"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem carrier offset"
+              ::= { integraEmodem 14 }
+
+integraEmodemCountTime OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance count time"
+              ::= { integraEmodem 15 }
+
+integraEmodemErroredBlock OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance errored blocks"
+              ::= { integraEmodem 16 }
+
+integraEmodemErroredSecond OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance errored seconds"
+              ::= { integraEmodem 17 }
+
+integraEmodemSeverelyErroredSecond OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance severely errored seconds"
+              ::= { integraEmodem 18 }
+
+integraEmodemBackgroundBlockError OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance background block errors"
+              ::= { integraEmodem 19 }
+
+integraEmodemTotalBlockNumber OBJECT-TYPE
+              SYNTAX Counter64
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance total block number"
+              ::= { integraEmodem 20 }
+
+integraEmodemErroredSecondRatio OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance errored second ratio"
+              ::= { integraEmodem 21 }
+
+integraEmodemSeverelyErroredSecondRatio OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance severely errored second ratio"
+              ::= { integraEmodem 22 }
+
+integraEmodemBackgroundBlockErrorRatio OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance background block error ratio"
+              ::= { integraEmodem 23 }
+
+integraEmodemUptime OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance : uptime"
+              ::= { integraEmodem 24 }
+
+integraEmodemUnavailtime OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "s"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Modem performance : unavailtime"
+              ::= { integraEmodem 25 }
+
+integraEmodemModulationACMBmin OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Minimal modulation for ACMB enabled profile"
+              ::= { integraEmodem 26 }
+
+integraEmodemModulationACMBmax OBJECT-TYPE
+              SYNTAX  DisplayString
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Maximal modulation for ACMB enabled profile"
+              ::= { integraEmodem 27 }
+
+
+integraEsystem		OBJECT IDENTIFIER ::=   { integraE 4 }
+
+integraEsysCPUtemperature OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System CPU temperature"
+              ::= { integraEsystem 2 }
+
+integraEsysLicenseExpire OBJECT-TYPE
+              SYNTAX  Gauge32
+              UNITS   "s"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "License expires after number of seconds. 
+                           In the case of -1, check licenseGenStatus status"
+              ::= { integraEsystem 3 }
+integraEsysLicenseGenStatus OBJECT-TYPE
+              SYNTAX  INTEGER {
+                ok(1),
+                expired(2),
+                unknown(3),
+                unlimitedTime(4)
+                }
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "License General status."
+              ::= { integraEsystem 4 }
+
+integraEsysPSUvoltage    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mV"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power voltage in mV"
+              ::= { integraEsystem 5 }
+
+integraEsysPSUcurrent    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mA"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power current in mA"
+              ::= { integraEsystem 6 }
+integraEsysPSUpower    OBJECT-TYPE
+              SYNTAX  Integer32
+              UNITS   "mW"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Power consumption in mW"
+              ::= { integraEsystem 7 }
+integraEsysBoardTemperature OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System temperature"
+              ::= { integraEsystem 8 }
+integraEsysFreeMemory OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "%"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System free memory"
+              ::= { integraEsystem 9 }
+integraEsysCPUidle OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "%"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "System CPU idle"
+              ::= { integraEsystem 10 }
+
+integraEsysDeviceType OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Device type name"
+              ::= { integraEsystem 11 }
+
+integraEsysDeviceSerial OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Device serial number"
+              ::= { integraEsystem 12 }
+
+integraEsysDeviceProductModel OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Device product model code"
+              ::= { integraEsystem 13 }
+
+integraEsysFanError OBJECT-TYPE
+              SYNTAX BITS {
+                no(0),
+                fan1(1),
+                unknown(3)
+              }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Device fan 1 error status"
+              ::= { integraEsystem 14 }
+
+-- service sensors
+integraEsysXADCtemperature OBJECT-TYPE
+              SYNTAX  FixedDiv10
+              UNITS   "C"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC Temperature"
+              ::= { integraEsystem 15 }
+
+integraEsysVCCint OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Vcc INT"
+              ::= { integraEsystem 16 }
+
+integraEsysVCCaux OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Vcc AUX"
+              ::= { integraEsystem 17 }
+
+integraEsysVCCbram OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Vcc BRAM"
+              ::= { integraEsystem 18 }
+
+integraEsysVCCpint OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Vcc PINT"
+              ::= { integraEsystem 19 }
+
+integraEsysVCCpaux OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Vcc PAUX"
+              ::= { integraEsystem 20 }
+
+integraEsysVCCoddr OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "Vcc ODDR"
+              ::= { integraEsystem 21 }
+
+integraEsysXadc6v0AvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_6V0_AVDD_M - Modem Analog"
+              ::= { integraEsystem 22 }
+
+integraEsysXadc1v0AvddSwAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_1V0_AVDD_S - Switch Analog"
+              ::= { integraEsystem 23 }
+
+integraEsysXadc1v0AvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_1V0_AVDD_M - Modem Analog"
+              ::= { integraEsystem 24 }
+
+integraEsysXadc1v0DvddMdmDig OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_1V0_DVDD_M - Modem Digital"
+              ::= { integraEsystem 25 }
+
+integraEsysXadc1v0CoreMdmDig OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_1V0_CORE_M - Modem Digital"
+              ::= { integraEsystem 26 }
+
+integraEsysXadc2v5EnvAdcAvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_2V5_ENVADC_AVDD - Modem Analog"
+              ::= { integraEsystem 27 }
+
+integraEsysXadc1v0CoreSwDig OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_1V0_CORE_S - Switch Digital"
+              ::= { integraEsystem 28 }
+
+integraEsysXadc5v0IqAvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_5V0_IQ_AVDD - Modem Analog"
+              ::= { integraEsystem 29 }
+
+integraEsysXadc2v5WbDacClAvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_2V5_WBDAC_CL_AVDD - Modem Analog"
+              ::= { integraEsystem 30 }
+
+integraEsysXadc1v2VccPhyDig OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_1V2_VCC - PHY Digital"
+              ::= { integraEsystem 31 }
+
+integraEsysXadc4v6AfeDacAvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_4V6_AFE_DAC_AVDD - Modem Analog"
+              ::= { integraEsystem 32 }
+
+integraEsysXadc2v5WbDacAvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_2V5_WBDAC_AVDD - Modem Analog"
+              ::= { integraEsystem 33 }
+
+integraEsysXadc2v5VccSysDig OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_2V5_VCC - System Digital"
+              ::= { integraEsystem 34 }
+
+integraEsysXadc3v3VccSysDig OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_3V3_VCC - System Digital"
+              ::= { integraEsystem 35 }
+
+integraEsysXadc1v5Ddr3Sw OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_1V5_DDR3_S - Switch DDR3"
+              ::= { integraEsystem 36 }
+
+integraEsysXadc2v5WbAdcAvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_2V5_WBADC_AVDD - Modem Analog"
+              ::= { integraEsystem 37 }
+
+integraEsysXadc2v5WbDacPllAvddMdmAna OBJECT-TYPE
+              SYNTAX  FixedDiv20
+              UNITS   "V"
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION "XADC_2V5_WBDAC_PLL_AVDD - Modem Analog"
+              ::= { integraEsystem 38 }
+
+-- Ethernet
+integraEethernet      OBJECT IDENTIFIER ::=   { integraE 5 }
+   -- Port status
+integraEifStatusTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraEifPortEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port status data."
+              ::= { integraEethernet 1 }
+
+integraEifPortEntry  OBJECT-TYPE
+              SYNTAX IntegraEifPortEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port status info."
+              INDEX  { integraEifPortStatIndex }
+              ::= { integraEifStatusTable 1 }
+
+IntegraEifPortEntry   ::=
+              SEQUENCE {
+                    integraEifPortStatIndex
+                        Integer32,
+                    integraEifPortStatDescr
+                        DisplayString,
+                    integraEifPortType
+                        IANAifType,
+                    integraEifPortMtu
+                        Integer32,
+                    integraEifPortHighSpeed
+                        Gauge32,
+                    integraEifPortPhysAddress
+                        PhysAddress,
+                    integraEifPortAdminStatus
+                        INTEGER,
+                    integraEifPortOperStatus
+                        INTEGER,
+                    integraEifPortLastChange
+                        TimeTicks,
+                    integraEifPortAutoneg
+                        INTEGER,
+                    integraEifPortDuplex
+                        INTEGER,
+                    integraEifPortSyncEthActive
+                        INTEGER,
+                    integraEifPortSyncEthPrio
+                        Integer32,
+		    integraEifPortFlowControl
+			INTEGER
+              }
+
+integraEifPortStatIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..4)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each physical
+                      network interface. It is recommended that
+                      values are assigned contiguously starting from 1."
+              ::= { integraEifPortEntry 1 }
+
+integraEifPortStatDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Physical network interface description.
+                      LAN1 is electrical, LAN2 and LAN3 are SFP
+                      and WAN is radio port."
+              ::= { integraEifPortEntry 2 }
+
+integraEifPortType OBJECT-TYPE
+              SYNTAX IANAifType
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The type of interface, distinguished according to
+                      the physical/link protocol(s) immediately `below'
+                      the network layer in the protocol stack."
+              ::= { integraEifPortEntry 3 }
+
+integraEifPortMtu OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Maximum transmission unit value in bytes."
+              ::= { integraEifPortEntry 4 }
+
+integraEifPortHighSpeed OBJECT-TYPE
+              SYNTAX Gauge32
+              UNITS "Mbps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Link speed in 1 000 000 * bits per second."
+              ::= { integraEifPortEntry 5 }
+
+integraEifPortPhysAddress OBJECT-TYPE
+              SYNTAX PhysAddress
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The interface's address at the protocol layer
+                      immediately `below' the network layer in the
+                      protocol stack.  For interfaces which do not have
+                      such an address (e.g., a serial line), this object
+                      should contain an octet string of zero length."
+              ::= { integraEifPortEntry 6 }
+
+integraEifPortAdminStatus OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Desired state of network interfaces. Interfaces
+                      can be enabled(1), disabled(2), unknown(3) (no info received)."
+              ::= { integraEifPortEntry 7 }
+
+integraEifPortOperStatus OBJECT-TYPE
+              SYNTAX INTEGER {
+                         up(1),
+                         down(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Actual state of interfaces. Link can be up(1),
+                      down(2) or in unknown(3) state."
+              ::= { integraEifPortEntry 8 }
+
+integraEifPortLastChange OBJECT-TYPE
+              SYNTAX TimeTicks
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "This parameter value is always 0 at the moment."
+              ::= { integraEifPortEntry 9 }
+
+integraEifPortAutoneg OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Auto-negotiation status. Unknown means no info was received."
+              ::= { integraEifPortEntry 10 }
+
+integraEifPortDuplex  OBJECT-TYPE
+              SYNTAX INTEGER {
+                         full(1),
+                         half(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Duplex status for the interface."
+              ::= { integraEifPortEntry 11 }
+
+integraEifPortSyncEthActive OBJECT-TYPE
+              SYNTAX INTEGER {
+                         off(0),
+                         on(1)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Synchronous Ethernet status.
+                      Can be active(1) or inactive(0)."
+              ::= { integraEifPortEntry 12 }
+
+integraEifPortSyncEthPrio OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Synchronous Ethernet priority."
+              ::= { integraEifPortEntry 13 }
+
+integraEifPortFlowControl OBJECT-TYPE
+              SYNTAX INTEGER {
+                         enabled(1),
+                         disabled(2),
+                         unknown(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Flow control status."
+              ::= { integraEifPortEntry 14 }
+
+
+   -- Port statistics
+integraEifStatisticsTable OBJECT-TYPE
+              SYNTAX SEQUENCE OF IntegraEifPortStcEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "Network interface port statistics data."
+              ::= { integraEethernet 2 }
+
+integraEifPortStcEntry OBJECT-TYPE
+              SYNTAX IntegraEifPortStcEntry
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                      "An entry containing network physical port statistics counter data."
+              INDEX  { integraEifPortStcIndex }
+              ::= { integraEifStatisticsTable 1 }
+
+IntegraEifPortStcEntry    ::=
+              SEQUENCE {
+                    integraEifPortStcIndex
+                        Integer32,
+                    integraEifPortStcDescr
+                        DisplayString,
+                    integraEifTimePassed
+                        TimeTicks,
+                    integraEifIngressPackets
+                        Counter64,
+                    integraEifIngressBytes
+                        Counter64,
+                    integraEifEgressPackets
+                        Counter64,
+                    integraEifEgressBytes
+                        Counter64,
+                    integraEifEtherStatsMulticastPkts
+                        Counter64,
+                    integraEifEtherStatsBroadcastPkts
+                        Counter64,
+                    integraEifEtherStatsPkts64Octets
+                        Counter64,
+                    integraEifEtherStatsPkts65to127Octets
+                        Counter64,
+                    integraEifEtherStatsPkts128to255Octets
+                        Counter64,
+                    integraEifEtherStatsPkts256to511Octets
+                        Counter64,
+                    integraEifEtherStatsPkts512to1023Octets
+                        Counter64,
+                    integraEifEtherStatsPkts1024to1518Octets
+                        Counter64,
+                    integraEifEtherStatsOversizePkts
+                        Counter64,
+                    integraEifEtherRxOversizePkts
+                        Counter64,
+                    integraEifEtherTxOversizePkts
+                        Counter64,
+                    integraEifEtherStatsOctets
+                        Counter64,
+                    integraEifEtherStatsPkts
+                        Counter64,
+                    integraEifEtherStatsTXNoErrors
+                        Counter64,
+                    integraEifEtherStatsRXNoErrors
+                        Counter64,
+                    integraEifEtherStatsPkts1519to1522Octets
+                        Counter64,
+                    integraEifIfInOctets
+                        Counter64,
+                    integraEifIfOutOctets
+                        Counter64,
+                    integraEifDot1dTpPortInFrames
+                        Counter64,
+                    integraEifDot1dTpPortOutFrames
+                        Counter64,
+                    integraEifReceivedPkts64Octets
+                        Counter64,
+                    integraEifTransmittedPkts64Octets
+                        Counter64,
+                    integraEifReceivedPkts65to127Octets
+                        Counter64,
+                    integraEifTransmittedPkts65to127Octets
+                        Counter64,
+                    integraEifReceivedPkts128to255Octets
+                        Counter64,
+                    integraEifTransmittedPkts128to255Octets
+                        Counter64,
+                    integraEifReceivedPkts256to511Octets
+                        Counter64,
+                    integraEifTransmittedPkts256to511Octets
+                        Counter64,
+                    integraEifReceivedPkts512to1023Octets
+                        Counter64,
+                    integraEifTransmittedPkts512to1023Octets
+                        Counter64,
+                    integraEifReceivedPkts1024to1518Octets
+                        Counter64,
+                    integraEifTransmittedPkts1024to1518Octets
+                        Counter64,
+                    integraEifIfInBroadcastPkts
+                        Counter64,
+                    integraEifIfOutBroadcastPkts
+                        Counter64,
+                    integraEifIfInMulticastPkts
+                        Counter64,
+                    integraEifIfOutMulticastPkts
+                        Counter64,
+                    integraEifDot3InPauseFrames
+                        Counter64,
+                    integraEifDot3OutPauseFrames
+                        Counter64,
+                    integraEifEtherStatsUndersizePkts
+                        Counter64,
+                    integraEifEtherStatsFragments
+                        Counter64,
+                    integraEifEtherStatsCRCAlignErrors
+                        Counter64,
+                    integraEifEtherStatsJabbers
+                        Counter64,
+                    integraEifIngressBPS
+                        Integer32,
+                    integraEifIngressPPS
+                        Integer32,
+                    integraEifEgressBPS
+                        Integer32,
+                    integraEifEgressPPS
+                        Integer32,
+                    integraEifAllCoSQoutPackets
+                        Counter64,
+                    integraEifAllCoSQoutBytes
+                        Counter64,
+                    integraEifAllCoSQdroppedPackets
+                        Counter64,
+                    integraEifAllCoSQdroppedBytes
+                        Counter64,
+                    integraEifProcessedRxPackets
+                        Counter64,
+                    integraEifProcessedRxBytes
+                        Counter64
+              }
+
+integraEifPortStcIndex OBJECT-TYPE
+              SYNTAX Integer32 (1..5)
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A unique value, greater than zero, for each physical
+                      network interface. It is recommended that
+                      values are assigned contiguously starting from 1."
+              ::= { integraEifPortStcEntry 1 }
+
+integraEifPortStcDescr OBJECT-TYPE
+              SYNTAX DisplayString (SIZE (0..255))
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Physical network interface description.
+                      LAN1 is electrical, LAN2 and LAN3 are SFP,
+                      WAN is radio port and MNG is internal management interface."
+              ::= { integraEifPortStcEntry 2 }
+
+integraEifTimePassed  OBJECT-TYPE
+              SYNTAX TimeTicks
+              UNITS "s/100"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Statistics collection time."
+              ::= { integraEifPortStcEntry 3 }
+
+integraEifIngressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Packets that ingress on the port."
+              ::= { integraEifPortStcEntry 4 }
+
+integraEifIngressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Bytes that ingress on the port."
+              ::= { integraEifPortStcEntry 5 }
+
+integraEifEgressPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Packets that egress on the port."
+              ::= { integraEifPortStcEntry 6 }
+
+integraEifEgressBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Bytes that egress on the port."
+              ::= { integraEifPortStcEntry 7 }
+
+integraEifEtherStatsMulticastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of good packets (both received and 
+                     transmitted) that were directed to a multicast address.  
+                     Note that this number does not include packets directed 
+                     to the broadcast address."
+              ::= { integraEifPortStcEntry 8 }
+
+integraEifEtherStatsBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of good packets (both received and 
+                     transmitted) that were directed to the broadcast address.
+                     Note that this does not include multicast packets."
+              ::= { integraEifPortStcEntry 9 }
+
+integraEifEtherStatsPkts64Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of packets (including bad
+                     packets) (both received and transmitted)
+                     that were 64 octets in length
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 10 }
+
+integraEifEtherStatsPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of packets (including bad
+                     packets) (both received and transmitted)
+                     that were between 65 and 127 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 11 }
+
+integraEifEtherStatsPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of packets (including bad
+                     packets) (both received and transmitted) that were
+                     between 128 and 255 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 12 }
+
+integraEifEtherStatsPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 256 and 511 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 13 }
+
+integraEifEtherStatsPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 512 and 1023 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 14 }
+
+integraEifEtherStatsPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 1024 and 1518 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 15 }
+
+integraEifEtherStatsOversizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The number of packets (both received and 
+                    transmitted) that were longer than 1518
+                    octets (excluding framing bits but including
+                    FCS octets) but were otherwise well formed."
+              ::= { integraEifPortStcEntry 16 }
+
+integraEifEtherRxOversizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The number of packets received
+                    that were longer than 1518 octets
+                    (excluding framing bits but including
+                    FCS octets) but were otherwise well formed."
+              ::= { integraEifPortStcEntry 17 }
+
+integraEifEtherTxOversizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The number of packets transmitted
+                    that were longer than 1518 octets
+                    (excluding framing bits but including
+                    FCS octets) but were otherwise well formed."
+              ::= { integraEifPortStcEntry 18 }
+
+integraEifEtherStatsOctets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of octets of data (including
+                    those in bad packets) both received and 
+                    transmitted."
+              ::= { integraEifPortStcEntry 19 }
+
+integraEifEtherStatsPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of packets (including bad packets)
+                    both received and transmitted."
+              ::= { integraEifPortStcEntry 20 }
+
+integraEifEtherStatsTXNoErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Number of packets that were transmitted
+                    without errors."
+              ::= { integraEifPortStcEntry 21 }
+
+integraEifEtherStatsRXNoErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Number of packets that were received
+                    without errors."
+              ::= { integraEifPortStcEntry 22 }
+
+integraEifEtherStatsPkts1519to1522Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "The total number of packets (including bad
+                    packets) (both received and transmitted) that were
+                    between 1519 and 1522 octets in length inclusive
+                    (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 23 }
+
+integraEifIfInOctets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "octet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of octets of data (including
+                    those in bad packets) that were received."
+              ::= { integraEifPortStcEntry 24 }
+
+integraEifIfOutOctets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "octet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                    "Total number of octets of data (including
+                    those in bad packets) that were transmitted."
+              ::= { integraEifPortStcEntry 25 }
+
+integraEifDot1dTpPortInFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The number of frames that have been received by
+                     this port from its segment."
+              ::= { integraEifPortStcEntry 26 }
+
+integraEifDot1dTpPortOutFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The number of frames that have been transmitted by
+                     this port to its segment."
+              ::= { integraEifPortStcEntry 27 }
+
+integraEifReceivedPkts64Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     64 octets in length (excluding framing bits
+                     but including FCS octets)."
+              ::= { integraEifPortStcEntry 28 }
+
+integraEifTransmittedPkts64Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     64 octets in length (excluding framing bits
+                     but including FCS octets)."
+              ::= { integraEifPortStcEntry 29 }
+
+integraEifReceivedPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 65 and 127 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 30 }
+
+integraEifTransmittedPkts65to127Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 65 and 127 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 31 }
+
+integraEifReceivedPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 128 and 255 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 32 }
+
+integraEifTransmittedPkts128to255Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 128 and 255 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 33 }
+
+integraEifReceivedPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 256 and 511 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 34 }
+
+integraEifTransmittedPkts256to511Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 256 and 511 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 35 }
+
+integraEifReceivedPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 512 and 1023 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 36 }
+
+integraEifTransmittedPkts512to1023Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 512 and 1023 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 37 }
+
+integraEifReceivedPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of received packets that were
+                     between 1024 and 1518 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 38 }
+
+integraEifTransmittedPkts1024to1518Octets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "Total number of transmitted packets that were
+                     between 1024 and 1518 octets in length inclusive
+                     (excluding framing bits but including FCS octets)."
+              ::= { integraEifPortStcEntry 39 }
+
+integraEifIfInBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of received good packets
+                     that were directed to the broadcast address.
+                     Note that this does not include multicast packets."
+              ::= { integraEifPortStcEntry 40 }
+
+integraEifIfOutBroadcastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of transmitted good packets
+                     that were directed to the broadcast address.
+                     Note that this does not include multicast packets."
+              ::= { integraEifPortStcEntry 41 }
+
+integraEifIfInMulticastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of received good packets
+                     that were directed to a multicast address.  
+                     Note that this number does not include broadcast packets."
+              ::= { integraEifPortStcEntry 42 }
+
+integraEifIfOutMulticastPkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                     "The total number of transmitted good packets
+                     that were directed to a multicast address.  
+                     Note that this number does not include broadcast packets."
+              ::= { integraEifPortStcEntry 43 }
+
+integraEifDot3InPauseFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A count of MAC Control frames received on this
+                      interface with an opcode indicating the PAUSE
+                      operation.
+                      This counter does not increment when the
+                      interface is operating in half-duplex mode."
+              ::= { integraEifPortStcEntry 44 }
+
+integraEifDot3OutPauseFrames OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "frame"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "A count of MAC Control frames transmitted on
+                      this interface with an opcode indicating the
+                      PAUSE operation.
+                      This counter does not increment when the
+                      interface is operating in half-duplex mode."
+              ::= { integraEifPortStcEntry 45 }
+
+integraEifEtherStatsUndersizePkts OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that were
+                      less than 64 octets long (excluding framing bits,
+                      but including FCS octets) and were otherwise well
+                      formed."
+              ::= { integraEifPortStcEntry 46 }
+
+integraEifEtherStatsFragments OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that were less than
+                      64 octets in length (excluding framing bits but including
+                      FCS octets) and had either a bad Frame Check Sequence
+                      (FCS) with an integral number of octets (FCS Error) or a
+                      bad FCS with a non-integral number of octets (Alignment
+                      Error).
+                      Note that it is entirely normal for etherStatsFragments to
+                      increment.  This is because it counts both runts (which are
+                      normal occurrences due to collisions) and noise hits."
+              ::= { integraEifPortStcEntry 47 }
+
+integraEifEtherStatsCRCAlignErrors OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that
+                      had a length (excluding framing bits, but
+                      including FCS octets) of between 64 and 1518
+                      octets, inclusive, but had either a bad
+                      Frame Check Sequence (FCS) with an integral
+                      number of octets (FCS Error) or a bad FCS with
+                      a non-integral number of octets (Alignment Error)."
+              ::= { integraEifPortStcEntry 48 }
+
+integraEifEtherStatsJabbers OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "The total number of packets received that were
+                      longer than 1518 octets (excluding framing bits,
+                      but including FCS octets), and had either a bad
+                      Frame Check Sequence (FCS) with an integral number
+                      of octets (FCS Error) or a bad FCS with a non-integral
+                      number of octets (Alignment Error).
+                      Note that this definition of jabber is different
+                      than the definition in IEEE-802.3 section 8.2.1.5
+                      (10BASE5) and section 10.3.1.4 (10BASE2).  These
+                      documents define jabber as the condition where any
+                      packet exceeds 20 ms.  The allowed range to detect
+                      jabber is between 20 ms and 150 ms."
+              ::= { integraEifPortStcEntry 49 }
+
+integraEifIngressBPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "Bps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Ingoing data transfer rate in bytes per second."
+              ::= { integraEifPortStcEntry 50 }
+
+integraEifIngressPPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "pps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Ingoing data transfer rate in packets per second."
+              ::= { integraEifPortStcEntry 51 }
+
+integraEifEgressBPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "Bps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Outgoing data transfer rate in bytes per second."
+              ::= { integraEifPortStcEntry 52 }
+
+integraEifEgressPPS OBJECT-TYPE
+              SYNTAX Integer32
+              UNITS "pps"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Outgoing data transfer rate in packets per second."
+              ::= { integraEifPortStcEntry 53 }
+
+integraEifAllCoSQoutPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ outgoing packets."
+              ::= { integraEifPortStcEntry 54 }
+
+integraEifAllCoSQoutBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ outgoing bytes."
+              ::= { integraEifPortStcEntry 55 }
+
+integraEifAllCoSQdroppedPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ dropped packets."
+              ::= { integraEifPortStcEntry 56 }
+
+integraEifAllCoSQdroppedBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "All CoSQ dropped bytes."
+              ::= { integraEifPortStcEntry 57 }
+
+integraEifProcessedRxPackets OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "packet"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Processed received packets."
+              ::= { integraEifPortStcEntry 58 }
+
+integraEifProcessedRxBytes OBJECT-TYPE
+              SYNTAX Counter64
+              UNITS "B"
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "Processed received bytes."
+              ::= { integraEifPortStcEntry 59 }
+
+
+integraEifLspPortAdminState OBJECT-TYPE
+              SYNTAX INTEGER {
+                         disabled(1),
+                         lsp(2),
+                         backup(3),
+                         unknown(4)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "LSP port status."
+              ::= { integraEethernet 3 }
+
+integraEifLspPortList OBJECT-TYPE
+              SYNTAX BITS {
+                         none(0),
+                         lan1(1),
+                         lan2(2),
+                         lan3(3)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "LSP port status."
+              ::= { integraEethernet 4 }
+
+integraEifLspPortStatus OBJECT-TYPE
+              SYNTAX INTEGER {
+                         lspPortOK(1),
+                         lspPortDownBlockedByLSP(2),
+                         backupNoLink(3),
+                         backupLinkActive(4),
+                         backupLinkReady(5),
+                         unknown(6)
+                     }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                      "LSP port status."
+              ::= { integraEethernet 5 }
+
+-- Configuration applying/saving objects
+
+integraEexecuteConfig OBJECT-TYPE
+              SYNTAX INTEGER {
+                 execute(1)
+              }
+              MAX-ACCESS  read-write
+              STATUS current
+              DESCRIPTION "This object can only be set to 1.
+                           It initiates new running configuration 
+                           applying using values, that have been set before.
+                           Setting it when no new changes are available
+                           will do nothing and return an error.
+                           GET will return 0 if there were no errors,
+                           while executing configuration or will return
+                           a bitmask, that shows which SET requests have failed.
+                           Those failed requests will be shown bit wise
+                           from LSB as follows:
+                           BIT0 radioTxMuteDuration
+                           BIT1 radioTxFrequency
+                           BIT2 radioTxPower"
+              ::= { integraE 6 }
+
+integraEneedStore OBJECT-TYPE
+              SYNTAX INTEGER {
+                 no(0)
+              }
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "This object shows if there is unsaved,
+                           but executed (running) configuration.
+                           Unsaved changes will be lost after
+                           device reboot. Unsaved entities are shown
+                           bit wise, starting from LSB as follows:
+                           BIT0 Aggregation
+                           BIT1 Event log
+                           BIT2 Modem
+                           BIT3 Network
+                           BIT4 Performance
+                           BIT5 Radio
+                           BIT6 SNMP
+                           BIT7 Synchronous Ethernet
+                           BIT8 System"
+              ::= { integraE 7 }
+
+integraEstoreConfig OBJECT-TYPE
+              SYNTAX INTEGER {
+                 store(1)
+              }
+              MAX-ACCESS  read-write
+              STATUS current
+              DESCRIPTION "This object can only be set to 1.
+                           It initiates saving of running configuration.
+                           It will only work if there are unsaved,
+                           but executed (running) changes (configuration).
+                           Setting it when no new running configuration
+                           is available will do nothing and return an error."
+              ::= { integraE 8 }
+
+
+-- IP settings
+
+integraEnetCfg OBJECT IDENTIFIER ::= { integraE 9 }
+
+integraEnetCfgIPaddress OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "Local IP address"
+              ::= { integraEnetCfg 1 }
+
+integraEnetCfgIPmask OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "Local IP mask"
+              ::= { integraEnetCfg 2 }
+
+integraEnetCfgIPgateway OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-write
+              STATUS current
+              DESCRIPTION "IP gateway
+                          Send '0' or '255.255.255.255' to clear."
+              ::= { integraEnetCfg 3 }
+
+integraEnetCfgRemoteIPaddress OBJECT-TYPE
+              SYNTAX DisplayString
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION "Remote IP address"
+              ::= { integraEnetCfg 4 }
+
+
+-- Conformance
+
+integraEConformance OBJECT IDENTIFIER ::= { integraE 10 }
+integraECompliances OBJECT IDENTIFIER ::= { integraEConformance 1 }
+
+integraECompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for SNMP engine which
+                 implements the SAF Tehnika Integra-E device."
+    MODULE -- this module
+      MANDATORY-GROUPS { 
+                integraEMiscGroup,
+                integraERadioGroup,
+                integraEModemGroup,
+                integraESystemGroup,
+                integraEEthernetGeneralGroup,
+                integraEEthernetMiiPortGroup }
+    ::= { integraECompliances 1 }
+integraEGroups  OBJECT IDENTIFIER ::= { integraEConformance 2 }
+
+integraEMiscGroup OBJECT-GROUP
+   OBJECTS {
+          integraEtimestamp
+   }
+   STATUS   current
+   DESCRIPTION "misc data"
+   ::= { integraEGroups 1 }
+
+integraERadioGroup OBJECT-GROUP
+   OBJECTS {
+          integraEradioTxPower,
+          integraEradioTxFrequency,
+          integraEradioRxLevel,
+          integraEradioSide,
+          integraEradioTxMute,
+          integraEradioDuplexShift,
+          integraEradioRxFrequency,
+          integraEradioTemperature,
+          integraEradioTxMuteDuration,
+          integraEradioRangeEntryIndex,
+          integraEradioRangeDescr,
+          integraEradioRangeTxPower,
+          integraEradioRangeTxFrequency,
+          integraEradioPLL,
+          integraEradioRxLevelState,
+          integraEradioAtpcState,
+          integraEradioAtpcUpdatePeriod,
+          integraEradioAtpcRxLevelMin,
+          integraEradioAtpcRxLevelMax
+   }
+   STATUS   current
+   DESCRIPTION "Radio group."
+   ::= { integraEGroups 2 }
+
+integraEModemGroup OBJECT-GROUP
+   OBJECTS {
+          integraEmodemAcquireStatus,
+          integraEmodemNormalizedMse,
+          integraEmodemFECload,
+          integraEmodemFEClocked,
+          integraEmodemAcquireLastStatusDetails,
+          integraEmodemTemperature,
+          integraEmodemBandwidth,
+          integraEmodemModulation,
+          integraEmodemRxModulation,
+          integraEmodemTxModulation,
+          integraEmodemRxCapacity,
+          integraEmodemTxCapacity,
+          integraEmodemACMBengine,
+          integraEmodemCarrierOffset,
+          integraEmodemCountTime,
+          integraEmodemErroredBlock,
+          integraEmodemErroredSecond,
+          integraEmodemSeverelyErroredSecond,
+          integraEmodemBackgroundBlockError,
+          integraEmodemTotalBlockNumber,
+          integraEmodemErroredSecondRatio,
+          integraEmodemSeverelyErroredSecondRatio,
+          integraEmodemBackgroundBlockErrorRatio,
+          integraEmodemUptime,
+          integraEmodemUnavailtime,
+          integraEmodemModulationACMBmin,
+          integraEmodemModulationACMBmax
+   }
+   STATUS   current
+   DESCRIPTION "Modem group."
+   ::= { integraEGroups 3 }
+
+integraESystemGroup OBJECT-GROUP
+   OBJECTS {
+          integraEsysCPUtemperature,
+          integraEsysLicenseExpire,
+          integraEsysLicenseGenStatus,
+          integraEsysPSUvoltage,
+          integraEsysPSUcurrent,
+          integraEsysPSUpower,
+          integraEsysBoardTemperature,
+          integraEsysFreeMemory,
+          integraEsysCPUidle,
+          integraEsysDeviceType,
+          integraEsysDeviceSerial,
+          integraEsysDeviceProductModel,
+          integraEsysFanError,
+          integraEexecuteConfig,
+          integraEneedStore,
+          integraEstoreConfig,
+          integraEsysXADCtemperature,
+          integraEsysVCCint,
+          integraEsysVCCaux,
+          integraEsysVCCbram,
+          integraEsysVCCpint,
+          integraEsysVCCpaux,
+          integraEsysVCCoddr,
+          integraEsysXadc6v0AvddMdmAna,
+          integraEsysXadc1v0AvddSwAna,
+          integraEsysXadc1v0AvddMdmAna,
+          integraEsysXadc1v0DvddMdmDig,
+          integraEsysXadc1v0CoreMdmDig,
+          integraEsysXadc2v5EnvAdcAvddMdmAna,
+          integraEsysXadc1v0CoreSwDig,
+          integraEsysXadc5v0IqAvddMdmAna,
+          integraEsysXadc2v5WbDacClAvddMdmAna,
+          integraEsysXadc1v2VccPhyDig,
+          integraEsysXadc4v6AfeDacAvddMdmAna,
+          integraEsysXadc2v5WbDacAvddMdmAna,
+          integraEsysXadc2v5VccSysDig,
+          integraEsysXadc3v3VccSysDig,
+          integraEsysXadc1v5Ddr3Sw,
+          integraEsysXadc2v5WbAdcAvddMdmAna,
+          integraEsysXadc2v5WbDacPllAvddMdmAna
+   }
+   STATUS   current
+   DESCRIPTION "System group."
+   ::= { integraEGroups 4 }
+
+integraEEthernetGeneralGroup OBJECT-GROUP
+   OBJECTS {
+          integraEifPortStatIndex,
+          integraEifPortStatDescr,
+          integraEifPortType,
+          integraEifPortMtu,
+          integraEifPortHighSpeed,
+          integraEifPortPhysAddress,
+          integraEifPortAdminStatus,
+          integraEifPortOperStatus,
+          integraEifPortLastChange,
+          integraEifPortAutoneg,
+          integraEifPortDuplex,
+          integraEifPortSyncEthActive,
+          integraEifPortSyncEthPrio,
+          integraEifPortFlowControl,
+          integraEifPortStcIndex,
+          integraEifPortStcDescr,
+          integraEifTimePassed,
+          integraEifIngressPackets,
+          integraEifIngressBytes,
+          integraEifEgressPackets,
+          integraEifEgressBytes,
+          integraEifEtherRxOversizePkts,
+          integraEifEtherTxOversizePkts,
+          integraEifReceivedPkts64Octets,
+          integraEifTransmittedPkts64Octets,
+          integraEifReceivedPkts65to127Octets,
+          integraEifTransmittedPkts65to127Octets,
+          integraEifReceivedPkts128to255Octets,
+          integraEifTransmittedPkts128to255Octets,
+          integraEifReceivedPkts256to511Octets,
+          integraEifTransmittedPkts256to511Octets,
+          integraEifReceivedPkts512to1023Octets,
+          integraEifTransmittedPkts512to1023Octets,
+          integraEifReceivedPkts1024to1518Octets,
+          integraEifTransmittedPkts1024to1518Octets,
+          integraEifIfInBroadcastPkts,
+          integraEifIfOutBroadcastPkts,
+          integraEifIfInMulticastPkts,
+          integraEifIfOutMulticastPkts,
+          integraEifIngressBPS,
+          integraEifIngressPPS,
+          integraEifEgressBPS,
+          integraEifEgressPPS,
+          integraEifAllCoSQoutPackets,
+          integraEifAllCoSQoutBytes,
+          integraEifAllCoSQdroppedPackets,
+          integraEifAllCoSQdroppedBytes,
+          integraEifProcessedRxPackets,
+          integraEifProcessedRxBytes,
+          integraEnetCfgIPaddress,
+          integraEnetCfgIPmask,
+          integraEnetCfgIPgateway,
+          integraEnetCfgRemoteIPaddress,
+          integraEifLspPortAdminState,
+          integraEifLspPortList,
+          integraEifLspPortStatus
+   }
+   STATUS current
+   DESCRIPTION "A collection to objects, providing info applicable to
+               all network interfaces."
+   ::= { integraEGroups 5 }
+
+integraEEthernetMiiPortGroup OBJECT-GROUP
+   OBJECTS {
+          integraEifEtherStatsMulticastPkts,
+          integraEifEtherStatsBroadcastPkts,
+          integraEifEtherStatsPkts64Octets,
+          integraEifEtherStatsPkts65to127Octets,
+          integraEifEtherStatsPkts128to255Octets,
+          integraEifEtherStatsPkts256to511Octets,
+          integraEifEtherStatsPkts512to1023Octets,
+          integraEifEtherStatsPkts1024to1518Octets,
+          integraEifEtherStatsOversizePkts,
+          integraEifEtherStatsOctets,
+          integraEifEtherStatsPkts,
+          integraEifEtherStatsTXNoErrors,
+          integraEifEtherStatsRXNoErrors,
+          integraEifEtherStatsPkts1519to1522Octets,
+          integraEifIfInOctets,
+          integraEifIfOutOctets,
+          integraEifDot1dTpPortInFrames,
+          integraEifDot1dTpPortOutFrames,
+          integraEifDot3InPauseFrames,
+          integraEifDot3OutPauseFrames,
+          integraEifEtherStatsUndersizePkts,
+          integraEifEtherStatsFragments,
+          integraEifEtherStatsCRCAlignErrors,
+          integraEifEtherStatsJabbers
+   }
+   STATUS current
+   DESCRIPTION "A collection of objects, providing info applicable 
+               only to MII group interfaces."
+   ::= { integraEGroups 6 }
+
+
+END

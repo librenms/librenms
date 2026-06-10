@@ -1,0 +1,369 @@
+--  =====================================================================================================
+--  File              : FIBROLAN-MIB-DEVICECONVERTERS.mib
+--  Description       : Private MIB file for FibroLAN MetroStar I system converters - F.CON1/MA, H.CON/MA
+--  By                : Tal Katz-Touaf
+--  MIB Version       : 2.0
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : January 17, 2008
+--  =====================================================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-DEVICECONVERTER   DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		enterprises, OBJECT-TYPE, MODULE-IDENTITY       FROM SNMPv2-SMI --FROM RFC-1212
+		MODULE-COMPLIANCE, OBJECT-GROUP			FROM SNMPv2-CONF
+		DisplayString					FROM SNMPv2-TC --FROM RFC1213-MIB
+		flMsChassisMvIndex, flMsChassisModuleMvIndex	FROM FIBROLAN-MIB-METRO-STAR-MV
+		flMsModuleMvChannelIndex			FROM FIBROLAN-MIB-MSMODULE;
+
+
+ flConverter  MODULE-IDENTITY
+       LAST-UPDATED "0801170000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe FibroLAN HCON1/MA and FCON1MA converters.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 50 10 }
+
+
+    -- conformance information
+     flConverterMIBConformance
+                   OBJECT IDENTIFIER ::= { flConverter  1 }
+
+     flConverterMIBCompliances		OBJECT IDENTIFIER ::= { flConverterMIBConformance 1 }
+     flConverterMIBGroups		OBJECT IDENTIFIER ::= { flConverterMIBConformance 2 }
+
+
+	-- compliance statements
+     flConverterMIBCompliance MODULE-COMPLIANCE
+              STATUS  current
+              DESCRIPTION
+                      "The compliance statement for flMetroStar entities
+                      which implement the converters MIB."
+              MODULE  -- this module
+                  MANDATORY-GROUPS {	flConverterDeviceGroup,
+					flConverterChannelGroup  }
+              ::= { flConverterMIBCompliances 1 }
+
+     flConverterDeviceGroup	OBJECT-GROUP
+	        OBJECTS		{	flConverterDeviceReset,
+					flConverterDeviceRestoreDefaults,
+					flConverterDeviceFirmRevision,
+					flConverterDeviceSerialNumber,
+					flConverterDeviceTemperature }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing basic
+                    instrumentation of the MetroStar HCON/MA and FCON1/MA entity."
+            ::= { flConverterMIBGroups 1 }
+
+     flConverterChannelGroup	OBJECT-GROUP
+	        OBJECTS		{	flConverterChannelConfigIndex,
+					flConverterTpLink,
+					flConverterFoLink,
+					flConverterPortDescription,
+					flConverterDuplex,     -- only for HCON/MA
+					flConverterTpAutoNego, -- only for HCON/MA
+					flConverterTpDatarate, -- only for HCON/MA
+					flConverterUpstreamBw,
+					flConverterEnableTpPort,
+					flConverterPause,
+					flConverterFo2TpFp }
+            STATUS  current
+            DESCRIPTION
+                    "A collection of objects providing extended
+                    instrumentation of the MetroStar  HCON/MA and FCON1/MA entity."
+            ::= { flConverterMIBGroups 2 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan             OBJECT IDENTIFIER ::= { enterprises           4467 }
+
+fibrolanSNMP         OBJECT IDENTIFIER ::= { fibrolan               100 }
+
+flMaRemoteDevice     OBJECT IDENTIFIER ::= { fibrolanSNMP	         50 }
+
+--flConverter 		OBJECT IDENTIFIER ::= { flMaRemoteDevice        10 }
+
+
+flConverterDevice			OBJECT IDENTIFIER ::= { flConverter	    10 }
+flConverterChannel			OBJECT IDENTIFIER ::= { flConverter	    20 }
+
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+-- Device configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flConverterDeviceConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlConverterDeviceConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the device's general configuration"
+     ::= { flConverterDevice 1 }
+
+     flConverterDeviceConfigEntry				OBJECT-TYPE
+         SYNTAX  FlConverterDeviceConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex }
+     ::= { flConverterDeviceConfigTable 1 }
+
+		FlConverterDeviceConfigEntry ::= SEQUENCE
+		{
+			 flConverterDeviceReset			INTEGER,
+			 flConverterDeviceRestoreDefaults	INTEGER,
+			 flConverterDeviceFirmRevision		DisplayString,
+			 flConverterDeviceSerialNumber		DisplayString,
+			 flConverterDeviceTemperature		INTEGER
+		}
+
+     flConverterDeviceReset				OBJECT-TYPE
+		 SYNTAX    INTEGER {                     
+						  	  normal   (1), 
+						  	  reset	   (2)  
+						   }                     
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Reset device" 
+     ::= { flConverterDeviceConfigEntry 2 }
+
+     flConverterDeviceRestoreDefaults				OBJECT-TYPE
+		 SYNTAX    INTEGER {                     
+						  	  normal	(1), 
+						  	  restore	(2)  
+						   }                     
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Restore the device's defaults configuration" 
+     ::= { flConverterDeviceConfigEntry 3 }
+
+     flConverterDeviceFirmRevision				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "The device's Firmware revision" 
+     ::= { flConverterDeviceConfigEntry 4 }
+
+     flConverterDeviceSerialNumber				OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-only
+		 STATUS		current
+		 DESCRIPTION
+		 "The device's serial number (non supporting models will show N/A" 
+     ::= { flConverterDeviceConfigEntry 5 }
+
+     flConverterDeviceTemperature				OBJECT-TYPE
+		 SYNTAX    INTEGER 
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Device's temperature in degrees Celsius (for supporting devices)" 
+     ::= { flConverterDeviceConfigEntry 6 }
+     
+
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+--  Channel configuration group
+-- ************************************************************
+-- ************************************************************
+-- ************************************************************
+     flConverterChannelConfigTable               OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlConverterChannelConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table provides the channel's configuration"
+     ::= { flConverterChannel 1 }
+
+     flConverterChannelConfigEntry				OBJECT-TYPE
+         SYNTAX  FlConverterChannelConfigEntry
+         MAX-ACCESS   not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the channel table"
+         INDEX { flMsChassisMvIndex,
+		 flMsChassisModuleMvIndex,
+		 flMsModuleMvChannelIndex,
+		 flConverterChannelConfigIndex }
+     ::= { flConverterChannelConfigTable 1 }
+
+		FlConverterChannelConfigEntry ::= SEQUENCE
+		{
+			 flConverterChannelConfigIndex		INTEGER,
+			 flConverterTpLink			INTEGER,
+			 flConverterFoLink			INTEGER,
+			 flConverterPortDescription		DisplayString,
+			 flConverterDuplex			INTEGER, -- only for HCON/MA
+			 flConverterTpAutoNego			INTEGER, -- only for HCON/MA
+			 flConverterTpDatarate			INTEGER, -- only for HCON/MA
+			 flConverterUpstreamBw			INTEGER,
+			 flConverterEnableTpPort		INTEGER,
+			 flConverterPause			INTEGER,
+			 flConverterFo2TpFp			INTEGER
+		}
+
+
+     flConverterChannelConfigIndex				OBJECT-TYPE
+		 SYNTAX    INTEGER
+		 MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "Table index" 
+     ::= { flConverterChannelConfigEntry 1 }
+
+    flConverterTpLink				OBJECT-TYPE
+		SYNTAX	  INTEGER	{
+					off     (1),
+					on	(2),
+					killed  (3)
+					}
+         MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "TP link status"
+    ::= { flConverterChannelConfigEntry 2 }
+
+    flConverterFoLink				OBJECT-TYPE
+		SYNTAX	  INTEGER	{
+         				off  (1),
+					on   (2)
+					}
+         MAX-ACCESS     read-only
+		 STATUS    current
+		 DESCRIPTION
+		 "FO link status"
+    ::= { flConverterChannelConfigEntry 3 }
+
+    flConverterPortDescription			OBJECT-TYPE
+		 SYNTAX    DisplayString
+		 MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Port's textual description - up to 40 characters" 
+    ::= { flConverterChannelConfigEntry 4 }
+
+    -- only for HCON/MA
+    flConverterDuplex					OBJECT-TYPE  
+		 SYNTAX    INTEGER	{
+					hdx	(1),
+					fdx	(2)
+					}
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's Duplex mode"
+    ::= { flConverterChannelConfigEntry 5 }
+
+    -- only for HCON/MA
+    flConverterTpAutoNego				OBJECT-TYPE  
+		 SYNTAX    INTEGER	{
+					disabled	(1),
+					enabled		(2)
+					}
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's Auto-Negotiation mode"
+    ::= { flConverterChannelConfigEntry 6 }
+
+	-- only for HCON/MA
+    flConverterTpDatarate				OBJECT-TYPE
+		 SYNTAX    INTEGER	{
+					m10	(1),
+					m100	(2)
+					}
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's data rate mode - 10/100Mbps"
+    ::= { flConverterChannelConfigEntry 7 }
+
+    flConverterUpstreamBw				OBJECT-TYPE
+		 SYNTAX    INTEGER {
+								k256			(129),
+								k512			(130),
+								m01			(1),
+								m02			(2),
+								m03			(3),
+								m04			(4),
+								m05			(5),
+								m06			(6),
+								m07			(7),
+								m08			(8),
+								m09			(9),
+								m10			(10),
+								m20			(20),
+								m30			(30),
+								m40			(40),
+								m50			(50),
+								m60			(60),
+								m70			(70),
+								m80			(80),
+								m90			(90),
+								m100			(100)
+						   }
+         MAX-ACCESS     read-write
+         STATUS    current
+         DESCRIPTION
+         "Port's upstream Bandwidth "
+    ::= { flConverterChannelConfigEntry  8 }
+
+    flConverterEnableTpPort				OBJECT-TYPE
+		SYNTAX	  INTEGER	{
+					disable  (1),
+					enable   (2)
+					}
+         MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Disable/Enable TP port"
+    ::= { flConverterChannelConfigEntry  9 }
+
+   flConverterPause				OBJECT-TYPE
+		SYNTAX	  INTEGER	{		                                               
+					off  (1),
+					on   (2)
+					}
+         MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		 "Turn Pause Mode on/off"
+    ::= { flConverterChannelConfigEntry  10 }                   
+			
+    flConverterFo2TpFp				OBJECT-TYPE
+		SYNTAX	  INTEGER	{
+					off  (1),
+					on   (2)
+					}
+         MAX-ACCESS     read-write
+		 STATUS    current
+		 DESCRIPTION
+		"FO to TP Fp Mode"
+    ::= { flConverterChannelConfigEntry  11 }
+
+END

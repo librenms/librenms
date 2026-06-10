@@ -1,0 +1,352 @@
+-- *****************************************************************
+-- INFINERA-PM-OSCCTP-MIB
+-- 
+-- October 2008, Sharfuddin Syed / Narendra Gupta
+-- 
+-- 
+-- Copyright (c) 2008-2012 by Infinera Inc.
+-- All rights reserved.
+-- ****************************************************************
+
+INFINERA-PM-OSCCTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Counter64                        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP             FROM SNMPv2-CONF
+    TruthValue                                  FROM SNMPv2-TC
+    ifIndex                                     FROM IF-MIB
+    FloatHundredths                                 FROM INFINERA-TC-MIB
+    perfMon                                         FROM INFINERA-REG-MIB;
+
+
+oscCtpPmMIB MODULE-IDENTITY
+    LAST-UPDATED  "200810200000Z"
+    ORGANIZATION  "Infinera"
+    CONTACT-INFO
+        "Infinera
+        1322 Bordeaux Drive
+        Sunnyvale, CA - 94089
+
+        Contact : Technical Support
+        Email   : support@infinera.com
+        Phone   : 1-877-INF-5288"
+    DESCRIPTION
+        " "
+    REVISION      "200810200000Z" 
+    DESCRIPTION
+        "First Version"
+    ::= { perfMon 10 }
+
+
+
+oscCtpPmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OscCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of OscCtpPm entries. Each entry is uniquely identified by the value of ifIndex, sampleDuration and oscCtpPmTimestamp."
+    ::= { oscCtpPmMIB 2 } 
+
+oscCtpPmEntry  OBJECT-TYPE
+    SYNTAX      OscCtpPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A OscCtp entry containing historical performance information pertaining to Infinera OscCtp interfaces.
+        This table is a subclass of IfCommon. Entries will exist in this table only for interfaces
+        of type OSC CTP.
+        Each interface may have a number of entries in this table, each with a different combination
+        of timestamp and sample duration."
+    INDEX { ifIndex, oscCtpPmSampleDuration, oscCtpPmTimestamp }
+    ::= { oscCtpPmTable 1 }
+
+
+OscCtpPmEntry  ::= SEQUENCE {
+    oscCtpPmTimestamp        Integer32,
+    oscCtpPmSampleDuration   INTEGER,
+    oscCtpPmValidity         TruthValue,
+    oscCtpPmOscLBCMin        FloatHundredths,
+    oscCtpPmOscLBCMax        FloatHundredths,
+    oscCtpPmOscLBCAve        FloatHundredths,
+    oscCtpPmOscOPTMin        FloatHundredths,
+    oscCtpPmOscOPTMax        FloatHundredths,
+    oscCtpPmOscOPTAve        FloatHundredths,
+    oscCtpPmOscOPRMin        FloatHundredths,
+    oscCtpPmOscOPRMax        FloatHundredths,
+    oscCtpPmOscOPRAve        FloatHundredths
+}
+
+oscCtpPmTimestamp OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "End Time stamp for this interval. If this time is later than the current time,
+        then the data for this bucket is currently being collected."
+    ::= { oscCtpPmEntry  1 }
+
+
+oscCtpPmSampleDuration OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    fifteenMinutes(1),
+                    day(2)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The duration of this sample."
+    ::= { oscCtpPmEntry  2 }
+
+
+oscCtpPmValidity OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flag indicating if data was valid for the entire interval"
+    ::= { oscCtpPmEntry  3 }
+
+
+oscCtpPmOscLBCMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Laser Bias Current, minimum (mA)"
+    ::= { oscCtpPmEntry  4 }
+
+
+oscCtpPmOscLBCMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Laser Bias Current, maximum (mA)"
+    ::= { oscCtpPmEntry  5 }
+
+
+oscCtpPmOscLBCAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Laser Bias Current, average (mA)"
+    ::= { oscCtpPmEntry  6 }
+
+
+oscCtpPmOscOPTMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Transmitted, minimum (dBm)"
+    ::= { oscCtpPmEntry  7 }
+
+
+oscCtpPmOscOPTMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Transmitted, maximum (dBm)"
+    ::= { oscCtpPmEntry  8 }
+
+
+oscCtpPmOscOPTAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Transmitted, average (dBm)"
+    ::= { oscCtpPmEntry  9 }
+
+
+oscCtpPmOscOPRMin OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Received, minimum (dBm)"
+    ::= { oscCtpPmEntry  10 }
+
+
+oscCtpPmOscOPRMax OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Received, maximum (dBm)"
+    ::= { oscCtpPmEntry  11 }
+
+
+oscCtpPmOscOPRAve OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only 
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Received, average (dBm)"
+    ::= { oscCtpPmEntry  12 }
+
+
+
+oscCtpPmRealTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OscCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of OscCtpPmReal entries. Each entry is uniquely identified by the value of ifIndex."
+    ::= { oscCtpPmMIB 1 } 
+
+oscCtpPmRealEntry  OBJECT-TYPE
+    SYNTAX      OscCtpPmRealEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A OscCtp entry containing real-time performance information pertaining to Infinera OscCtp interfaces.
+        This table is a subclass of IfCommon. Entries will exist in this table only for interfaces
+        of type OSC CTP."
+    INDEX { ifIndex }
+    ::= { oscCtpPmRealTable 1 }
+
+
+OscCtpPmRealEntry  ::= SEQUENCE {
+    oscCtpPmRealOscLBC              FloatHundredths,
+    oscCtpPmRealOscOPT              FloatHundredths,
+    oscCtpPmRealOscOPR              FloatHundredths,
+    oscCtpPmRealOscTxBytes          Counter64,
+    oscCtpPmRealOscTxPkts           Counter64,
+    oscCtpPmRealOscTxPktsDropped    Counter64,
+    oscCtpPmRealOscRxBytes          Counter64,
+    oscCtpPmRealOscRxPkts           Counter64,
+    oscCtpPmRealOscRxPktsDropped    Counter64,
+    oscCtpPmRealOscXOverOPR         FloatHundredths
+}
+
+oscCtpPmRealOscLBC OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Laser Bias Current"
+    ::= { oscCtpPmRealEntry  1 }
+
+
+oscCtpPmRealOscOPT OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Transmitted"
+    ::= { oscCtpPmRealEntry  2 }
+
+
+oscCtpPmRealOscOPR OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC Optical Power Received"
+    ::= { oscCtpPmRealEntry  3 }
+
+
+oscCtpPmRealOscTxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Tranmitted packets."
+    ::= { oscCtpPmRealEntry  4 }
+
+
+oscCtpPmRealOscTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of transmited packets."
+    ::= { oscCtpPmRealEntry  5 }
+
+
+oscCtpPmRealOscTxPktsDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of packets dropped in the transmit direction."
+    ::= { oscCtpPmRealEntry  6 }
+
+
+oscCtpPmRealOscRxBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OscRxBytes"
+    ::= { oscCtpPmRealEntry  7 }
+
+
+oscCtpPmRealOscRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of packets received."
+    ::= { oscCtpPmRealEntry  8 }
+
+
+oscCtpPmRealOscRxPktsDropped OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of packets dropped in the receive direction."
+    ::= { oscCtpPmRealEntry  9 }
+    
+oscCtpPmRealOscXOverOPR OBJECT-TYPE
+    SYNTAX      FloatHundredths
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSC cross over optical power recived. This osc pm is availavle on OAM and ORM cards."
+    ::= { oscCtpPmRealEntry  10 }    
+
+-- Conformance Statements
+oscCtpPmConformance    OBJECT IDENTIFIER ::= { oscCtpPmMIB 3 }
+oscCtpPmCompliances    OBJECT IDENTIFIER ::= { oscCtpPmConformance 1 }
+oscCtpPmGroups         OBJECT IDENTIFIER ::= { oscCtpPmConformance 2 }
+
+oscCtpPmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the PM-OSCCTP-MIB"
+    MODULE
+        MANDATORY-GROUPS { oscCtpPmGroup }
+    ::= { oscCtpPmCompliances 1 }
+
+oscCtpPmRealCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+    "Describes the requirements for conformance to the oscCtpPmReal-MIB"
+    MODULE
+        MANDATORY-GROUPS { oscCtpPmRealGroup }
+    ::= { oscCtpPmCompliances 2 }
+
+oscCtpPmGroup OBJECT-GROUP
+    OBJECTS {
+        oscCtpPmValidity,
+        oscCtpPmOscLBCMin,
+        oscCtpPmOscLBCMax,
+        oscCtpPmOscLBCAve,
+        oscCtpPmOscOPTMin,
+        oscCtpPmOscOPTMax,
+        oscCtpPmOscOPTAve,
+        oscCtpPmOscOPRMin,
+        oscCtpPmOscOPRMax,
+        oscCtpPmOscOPRAve
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the performance of the oscCtp."
+    ::= { oscCtpPmGroups 1 }
+
+oscCtpPmRealGroup OBJECT-GROUP
+    OBJECTS {
+        oscCtpPmRealOscLBC,
+        oscCtpPmRealOscOPT,
+        oscCtpPmRealOscOPR,
+        oscCtpPmRealOscTxBytes,
+        oscCtpPmRealOscTxPkts,
+        oscCtpPmRealOscTxPktsDropped,
+        oscCtpPmRealOscRxBytes,
+        oscCtpPmRealOscRxPkts,
+        oscCtpPmRealOscRxPktsDropped,
+        oscCtpPmRealOscXOverOPR
+    }
+    STATUS current
+    DESCRIPTION
+        " A collection of objects for reading the real-time performance of the oscCtp."
+    ::= { oscCtpPmGroups 2 }
+
+
+END

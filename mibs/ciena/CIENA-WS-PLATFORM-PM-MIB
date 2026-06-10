@@ -1,0 +1,4680 @@
+
+CIENA-WS-PLATFORM-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    EnabledDisabledEnum
+        FROM CIENA-WS-PLATFORM-TYPEDEFS-MIB
+    ifIndex                     
+        FROM IF-MIB
+    cienaWsPlatformConfig
+        FROM CIENA-WS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, DisplayString
+        FROM SNMPv2-TC;
+
+cienaWsPlatformPmMIB MODULE-IDENTITY
+    LAST-UPDATED "201909090000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+       Hanover, Maryland 21076
+       U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "Added support for TCA and OTDR feature for waveserverAi R1.5."
+    REVISION "201909090000Z"
+    DESCRIPTION "This module defines performance monitoring data for the Waveserver Platform."
+    REVISION "201812200000Z"
+    DESCRIPTION "Extend Optical Power profile. Add Photonics profile. "
+    REVISION "201809200000Z"
+    DESCRIPTION "Corrected Gcm15minHistory table description. Changed qFecStdev to qStDev "
+    REVISION "201808280000Z"
+    DESCRIPTION "Added support for new Encryption GCM profile. "
+    REVISION "201808150000Z"
+    DESCRIPTION "Added new PM counter Q-STDEV for Modem Profile. "
+    REVISION "201807240000Z"
+    DESCRIPTION "Added the missing FEC Error Count lanes used in Ethernet Profile. "
+    REVISION "201804200000Z"
+    DESCRIPTION "Added MIB Definition"
+    ::= { cienaWsPlatformConfig 22 }
+
+PmConfigurationMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), autoCreated(1), userCreated(2) }
+
+PmTcaNotificationType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { tcaAlarm(0), tcaEvent(1), tcaSummaryAlarm(2), tcaSummaryEvent(3) }
+
+PmTcaActiveFlag ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "To show if TCA is supported or not, or threshold value is crossed or not"
+    SYNTAX INTEGER { inactive(0), active(1), notSupported(2) }
+
+PmEthernetMonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        rxBytes (0) ,
+        rxPkts (1),
+        rxCrcErrorPkts(2) ,
+        rxMcastPkts (3),
+        rxBcastPkts (4),
+        rxUndersizePkts(5) ,
+        rxOversizePkts (6),
+        rxFragmentPkts (7),
+        rxJabberPkts (8),
+        rxLenOutRangePkts (9),
+        rxPausePkts (10),
+        rx64OctsPkts (11),
+        rx65To127OctsPkts (12) ,
+        rx128To255OctsPkts (13),
+        rx256To511Octs (14),
+        rx512To1023OctsPkts (15),
+        rx1024To1518OctsPkts (16),
+        rx1519ToJumboOctsPkts (17),
+        rxJumboOctsPkts (18),
+        rxBytesPerSec (19),
+        rxFramesPerSec (20),
+        rxAverageLinkUtilization (21) ,
+        rxMinLinkUtilization (22),
+        rxMaxLinkUtilization (23),
+        rxBlockErrorCount (24),
+        rxPcsLaneBipErrorCount (25),
+        rxFrameErrorRatio (26),
+        txBytes (27),
+        txPkts (28),
+        txExcessiveDeferredPkts(29) ,
+        txUnderRunPkts (30),
+        txCrcErrorPkts (31),
+        txLenCheckErrorPkts (32),
+        txLenOutOfRangePkts (33),
+        txPausePkts (34),
+        txGiantPkts (35),
+        txMcastPkts (36),
+        txBcastPkts (37),
+        txPacketsDropCountSummary(38) ,
+        tx64OctsPkts (39),
+        tx65To127OctsPkts (40),
+        tx128To255OctsPkts (41),
+        tx256To511OctsPkts (42),
+        tx512To1023OctsPkts (43),
+        tx1024To1518OctsPkts (44),
+        tx1519ToJumboOctsPkts (45),
+        txJumboOctsPkts (46),
+        txBytesPerSec (47),
+        txFramesPerSec (48),
+        txAverageLinkUtilization (49) ,
+        txBlockErrorCount (50),
+        txPcsLaneBipErrorCount (51),
+        txMinLinkUtilization (52),
+        txMaxLinkUtilization (53),
+        txFrameErrorRatio (54),
+        pcsES (55),
+        pcsSES (56),
+        pcsUAS (57),
+        syncHeaderErrorCount (58) ,
+        fecCorrCodewordCount (59),
+        fecUncorrCodewordCount (60),
+        fecErrorCount0 (61),
+        fecErrorCount1 (62),
+	fecErrorCount2 (63),
+	fecErrorCount3 (64) 
+}
+
+PmOtuMonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        otuBBE (0),
+        otuES (1),
+        otuSES (2),
+        otuUAS (3),
+        otuFeBBE (4),
+        otuFeES (5),
+        otuFeSES (6),
+        otuFeUAS (7)
+}
+
+PmOpticalPowerMonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        rxMinimum (0),
+        rxMaximum (1),
+        rxAverage (2),
+        txMinimum (3),
+        txMaximum (4),
+        txAverage (5),
+        chanRxMinimum (6),
+        chanRxMaximum (7),
+        chanRxAverage (8),
+        aggregateRxMinimum (9),
+        aggregateRxMaximum (10),
+        aggregateRxAverage (11),
+        aggregateTxMinimum (12),
+        aggregateTxMaximum (13),
+        aggregateTxAverage (14)
+}
+
+PmOduMonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        oduBBE (0),
+        oduES (1),
+        oduSES (2),
+        oduUAS (3),
+        oduFeBBE (4),
+        oduFeES (5),
+        oduFeSES (6),
+        oduFeUAS (7)
+}
+
+PmModemMonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        bitErrorRate (0),
+        berMaximum (1),
+        qFactor (2),
+        qMinimum (3),
+        qMaximum (4),
+        fecUncorrectedSecs (5),
+	     unCorrectedBlockCount (6),
+        highCorrectionCountSeconds (7),
+        dgdMaximum (8),
+        dgdAverage (9),
+        pdlMaximum (10),
+        pdlAverage (11),
+	     esnrAvg (12),
+	     esnrMax (13),
+	     esnrMin (14),
+	     osnrAvg (15),
+	     osnrMax (16),
+	     osnrMin (17),
+	     cdAvg (18),
+	     cdMax (19),
+	     cdMin (20), 
+	     qStdev(21),
+        snrExtAvg(22),
+        snrExtMax(23),
+        snrExtMin(24),
+        csiAvg(25),
+        csiMax(26)
+}
+
+PmGcmMonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        gcmErrorCount (0),
+        gcmSES (1),
+        gcmUAS (2)
+}
+
+PmPhotonicsMonType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER {
+        returnLossMinimum (0),
+        returnLossMaximum (1),
+        returnLossAverage (2),
+        rxSpanLossMinimum (3),
+        rxSpanLossMaximum (4),
+        rxSpanLossAverage (5),
+        txSpanLossMinimum (6),
+        txSpanLossMaximum (7),
+        txSpanLossAverage (8),
+        txECshortMax(9),
+        txECshort(10),
+        txECshortMin(11),
+        txEMLshortMax(12),
+        txEMLshort(13),
+        txEMLshortMin(14),
+        txEMLDshortMax(15),
+        txEMLDshort(16),
+        txEMLDshortMin(17),
+        txEMRshortMax(18),
+        txEMRshort(19),
+        txEMRshortMin(20),
+        txEMRDshortMax(21),
+        txEMRDshort(22),
+        txEMRDshortMin(23),
+        txCLshortMax(24),
+        txCLshort(25),
+        txCLshortMin(26),
+        txCRshortMax(27),
+        txCRshort(28),
+        txCRshortMin(29),
+        txEClongMax(30),
+        txEClong(31),
+        txEClongMin(32),
+        txEMLlongMax(33),
+        txEMLlong(34),
+        txEMLlongMin(35),
+        txEMLDlongMax(36),
+        txEMLDlong(37),
+        txEMLDlongMin(38),
+        txEMRlongMax(39),
+        txEMRlong(40),
+        txEMRlongMin(41),
+        txEMRDlongMax(42),
+        txEMRDlong(43),
+        txEMRDlongMin(44),
+        txCLlongMax(45),
+        txCLlong(46),
+        txCLlongMin(47),
+        txCRlongMax(48),
+        txCRlong(49),
+        txCRlongMin(50),
+        rxECshortMax(51),
+        rxECshort(52),
+        rxECshortMin(53),
+        rxEMLshortMax(54),
+        rxEMLshort(55),
+        rxEMLshortMin(56),
+        rxEMLDshortMax(57),
+        rxEMLDshort(58),
+        rxEMLDshortMin(59),
+        rxEMRshortMax(60),
+        rxEMRshort(61),
+        rxEMRshortMin(62),
+        rxEMRDshortMax(63),
+        rxEMRDshort(64),
+        rxEMRDshortMin(65),
+        rxCLshortMax(66),
+        rxCLshort(67),
+        rxCLshortMin(68),
+        rxCRshortMax(69),
+        rxCRshort(70),
+        rxCRshortMin(71),
+        rxEClongMax(72),
+        rxEClong(73),
+        rxEClongMin(74),
+        rxEMLlongMax(75),
+        rxEMLlong(76),
+        rxEMLlongMin(77),
+        rxEMLDlongMax(78),
+        rxEMLDlong(79),
+        rxEMLDlongMin(80),
+        rxEMRlongMax(81),
+        rxEMRlong(82),
+        rxEMRlongMin(83),
+        rxEMRDlongMax(84),
+        rxEMRDlong(85),
+        rxEMRDlongMin(86),
+        rxCLlongMax(87),
+        rxCLlong(88),
+        rxCLlongMin(89),
+        rxCRlongMax(90),
+        rxCRlong(91),
+        rxCRlongMin(92)
+}
+
+pmGlobalConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmGlobalConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Performance monitoring global configuration on the Waveserver."
+    ::= { cienaWsPlatformPmMIB 3 }
+
+pmGlobalConfigEntry OBJECT-TYPE
+    SYNTAX PmGlobalConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmGlobalConfigTable."
+    INDEX { pmGlobalConfigTableSnmpKey }
+    ::= { pmGlobalConfigTable 1 }
+
+PmGlobalConfigEntry ::= SEQUENCE { 
+    pmGlobalConfigTableSnmpKey Integer32,
+    pmAdminState EnabledDisabledEnum,
+    pmTcaAdminState EnabledDisabledEnum,
+    pmTcaNotificationType PmTcaNotificationType 
+}
+
+pmGlobalConfigTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for pmGlobalConfig"
+    ::= { pmGlobalConfigEntry 1 }
+
+pmAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Global admin state."
+    ::= { pmGlobalConfigEntry 2 }
+
+pmTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Global TCA admin state."
+    ::= { pmGlobalConfigEntry 3 }
+
+pmTcaNotificationType OBJECT-TYPE
+    SYNTAX PmTcaNotificationType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Global TCA Notification Type"
+    ::= { pmGlobalConfigEntry 4 }
+
+pmEthernetCurrent15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmEthernetCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 4 }
+
+pmEthernetCurrent15minStatsEntry OBJECT-TYPE
+    SYNTAX PmEthernetCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmEthernetCurrent15minStatsTable."
+    INDEX { ifIndex, pmEthernet15minMonType }
+    ::= { pmEthernetCurrent15minStatsTable 1 }
+
+PmEthernetCurrent15minStatsEntry ::= SEQUENCE { 
+    pmEthernet15minMonType                 PmEthernetMonType,
+    pmEthernet15minMonTypeDescr            DisplayString,
+    pmEthernet15minIfIndexDescr            DisplayString,
+    pmEthernet15minMonValue                DisplayString,
+    pmEthernet15minMonIDF                  DisplayString,
+    pmEthernet15minMonSupported            TruthValue,
+    pmEthernet15minAdminState              EnabledDisabledEnum,
+    pmEthernet15minMonStartDateTime        DisplayString,
+    pmEthernet15minTcaAdminState           EnabledDisabledEnum,
+    pmEthernet15minTHValue                 DisplayString,
+    pmEthernet15minTcaProfileId            Integer32,
+    pmEthernet15minTcaActive               PmTcaActiveFlag
+}
+
+pmEthernet15minMonType OBJECT-TYPE
+    SYNTAX PmEthernetMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmEthernetCurrent15minStatsTable. This is the PM counter Type"
+    ::= { pmEthernetCurrent15minStatsEntry 1 }
+
+pmEthernet15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmEthernetCurrent15minStatsEntry 2 }
+
+pmEthernet15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmEthernetCurrent15minStatsEntry 3 }
+
+pmEthernet15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmEthernetCurrent15minStatsEntry 4 }
+
+pmEthernet15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmEthernetCurrent15minStatsEntry 5 }
+
+pmEthernet15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmEthernetCurrent15minStatsEntry 6 }
+
+pmEthernet15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmEthernetCurrent15minStatsEntry 7 }
+
+pmEthernet15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmEthernetCurrent15minStatsEntry 8 }
+
+pmEthernet15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmEthernetCurrent15minStatsEntry 9 }
+
+pmEthernet15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmEthernetCurrent15minStatsEntry 10 }
+
+pmEthernet15minTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmEthernetCurrent15minStatsEntry 11 }
+
+pmEthernet15minTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmEthernetCurrent15minStatsEntry 12 }
+
+pmEthernetCurrent24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmEthernetCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current 24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 5 }
+
+pmEthernetCurrent24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmEthernetCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmEthernetCurrent24HrStatsTable."
+    INDEX { ifIndex, pmEthernet24HrMonType }
+    ::= { pmEthernetCurrent24HrStatsTable 1 }
+
+PmEthernetCurrent24HrStatsEntry ::= SEQUENCE { 
+    pmEthernet24HrMonType                 PmEthernetMonType,
+    pmEthernet24HrMonTypeDescr            DisplayString,
+    pmEthernet24HrIfIndexDescr            DisplayString,
+    pmEthernet24HrMonValue                DisplayString,
+    pmEthernet24HrMonIDF                  DisplayString,
+    pmEthernet24HrMonSupported            TruthValue,
+    pmEthernet24HrAdminState              EnabledDisabledEnum,
+    pmEthernet24HrMonStartDateTime        DisplayString,  
+    pmEthernet24HrTcaAdminState           EnabledDisabledEnum,
+    pmEthernet24HrTHValue                 DisplayString,
+    pmEthernet24HrTcaProfileId            Integer32,
+    pmEthernet24HrTcaActive               PmTcaActiveFlag
+}
+
+pmEthernet24HrMonType OBJECT-TYPE
+    SYNTAX PmEthernetMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmEthernetCurrent24HrStatsTable. This is the PM counter Type"
+    ::= { pmEthernetCurrent24HrStatsEntry 1 }
+
+pmEthernet24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmEthernetCurrent24HrStatsEntry 2 }
+
+pmEthernet24HrIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmEthernetCurrent24HrStatsEntry 3 }
+
+pmEthernet24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmEthernetCurrent24HrStatsEntry 4 }
+
+pmEthernet24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmEthernetCurrent24HrStatsEntry 5 }
+
+pmEthernet24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmEthernetCurrent24HrStatsEntry 6 }
+
+pmEthernet24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmEthernetCurrent24HrStatsEntry 7 }
+
+pmEthernet24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmEthernetCurrent24HrStatsEntry 8 }
+
+pmEthernet24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmEthernetCurrent24HrStatsEntry 9 }
+
+pmEthernet24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmEthernetCurrent24HrStatsEntry 10 }
+
+pmEthernet24HrTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmEthernetCurrent24HrStatsEntry 11 }
+
+pmEthernet24HrTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmEthernetCurrent24HrStatsEntry 12 }
+
+
+pmEthernetUntimedStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmEthernetUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current Untimed stats table."
+    ::= { cienaWsPlatformPmMIB 6 }
+
+pmEthernetUntimedStatsEntry OBJECT-TYPE
+    SYNTAX PmEthernetUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmEthernetUntimedStatsTable."
+    INDEX { ifIndex, pmEthernetUntimedMonType }
+    ::= { pmEthernetUntimedStatsTable 1 }
+
+PmEthernetUntimedStatsEntry ::= SEQUENCE { 
+    pmEthernetUntimedMonType                 PmEthernetMonType,
+    pmEthernetUntimedMonTypeDescr            DisplayString,
+    pmEthernetUntimedIfIndexDescr            DisplayString,
+    pmEthernetUntimedMonValue                DisplayString,
+    pmEthernetUntimedMonIDF                  DisplayString,
+    pmEthernetUntimedMonSupported            TruthValue,
+    pmEthernetUntimedAdminState              EnabledDisabledEnum,
+    pmEthernetUntimedMonStartDateTime        DisplayString,
+    pmEthernetUntimedTcaAdminState           EnabledDisabledEnum,
+    pmEthernetUntimedTHValue                 DisplayString,
+    pmEthernetUntimedTcaProfileId            Integer32,
+    pmEthernetUntimedTcaActive               PmTcaActiveFlag
+}
+
+pmEthernetUntimedMonType OBJECT-TYPE
+    SYNTAX PmEthernetMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmEthernetUntimedStatsTable. This is the PM counter Type"
+    ::= { pmEthernetUntimedStatsEntry 1 }
+
+pmEthernetUntimedMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmEthernetUntimedStatsEntry 2 }
+
+pmEthernetUntimedIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmEthernetUntimedStatsEntry 3 }
+
+pmEthernetUntimedMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena Untimed monitored value."
+    ::= { pmEthernetUntimedStatsEntry 4 }
+
+pmEthernetUntimedMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmEthernetUntimedStatsEntry 5 }
+
+pmEthernetUntimedMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmEthernetUntimedStatsEntry 6 }
+
+pmEthernetUntimedAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmEthernetUntimedStatsEntry 7 }
+
+pmEthernetUntimedMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmEthernetUntimedStatsEntry 8 }
+
+pmEthernetUntimedTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmEthernetUntimedStatsEntry 9 }
+
+pmEthernetUntimedTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmEthernetUntimedStatsEntry 10 }
+
+pmEthernetUntimedTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmEthernetUntimedStatsEntry 11 }
+
+pmEthernetUntimedTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmEthernetUntimedStatsEntry 12 }
+
+pmEthernetHistory15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmEthernetHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current EthernetHistory15min stats table."
+    ::= { cienaWsPlatformPmMIB 7 }
+
+pmEthernetHistory15minStatsEntry OBJECT-TYPE
+    SYNTAX PmEthernetHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmEthernetHistory15minStatsTable."
+    INDEX { ifIndex, pmEthernetHistory15minBinIndex, pmEthernetHistory15minMonType }
+    ::= { pmEthernetHistory15minStatsTable 1 }
+
+PmEthernetHistory15minStatsEntry ::= SEQUENCE { 
+    pmEthernetHistory15minBinIndex                Integer32,
+    pmEthernetHistory15minMonType                 PmEthernetMonType,
+    pmEthernetHistory15minMonTypeDescr            DisplayString,
+    pmEthernetHistory15minIfIndexDescr            DisplayString,
+    pmEthernetHistory15minMonValue                DisplayString,
+    pmEthernetHistory15minMonIDF                  DisplayString,
+    pmEthernetHistory15minMonSupported            TruthValue,
+    pmEthernetHistory15minAdminState              EnabledDisabledEnum,
+    pmEthernetHistory15minMonStartDateTime        DisplayString,
+    pmEthernetHistory15minTHValue                 DisplayString,
+    pmEthernetHistory15minTcaActive               PmTcaActiveFlag
+}
+
+pmEthernetHistory15minBinIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second index for pmEthernetHistory15minStatsTable ."
+    ::= { pmEthernetHistory15minStatsEntry 1 }
+
+pmEthernetHistory15minMonType OBJECT-TYPE
+    SYNTAX PmEthernetMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third index for pmEthernetHistory15minStatsTable. This is the PM counter Type"
+    ::= { pmEthernetHistory15minStatsEntry 2 }
+
+pmEthernetHistory15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmEthernetHistory15minStatsEntry 3 }
+
+pmEthernetHistory15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmEthernetHistory15minStatsEntry 4 }
+
+pmEthernetHistory15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 15 min monitored value."
+    ::= { pmEthernetHistory15minStatsEntry 5 }
+
+pmEthernetHistory15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmEthernetHistory15minStatsEntry 6 }
+
+pmEthernetHistory15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmEthernetHistory15minStatsEntry 7 }
+
+pmEthernetHistory15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmEthernetHistory15minStatsEntry 8 }
+
+pmEthernetHistory15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmEthernetHistory15minStatsEntry 9 }
+    
+pmEthernetHistory15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmEthernetHistory15minStatsEntry 10 }
+
+pmEthernetHistory15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmEthernetHistory15minStatsEntry 11 }
+
+pmEthernetHistory24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmEthernetHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current EthernetHistory24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 8 }
+
+pmEthernetHistory24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmEthernetHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmEthernetHistory24HrStatsTable."
+    INDEX { ifIndex, pmEthernetHistory24HrMonType }
+    ::= { pmEthernetHistory24HrStatsTable 1 }
+
+PmEthernetHistory24HrStatsEntry ::= SEQUENCE { 
+    pmEthernetHistory24HrMonType                 PmEthernetMonType,
+    pmEthernetHistory24HrMonTypeDescr            DisplayString,
+    pmEthernetHistory24HrIndexDescr              DisplayString,
+    pmEthernetHistory24HrMonValue                DisplayString,
+    pmEthernetHistory24HrMonIDF                  DisplayString,
+    pmEthernetHistory24HrMonSupported            TruthValue,
+    pmEthernetHistory24HrAdminState              EnabledDisabledEnum,
+    pmEthernetHistory24HrMonStartDateTime        DisplayString,
+    pmEthernetHistory24HrTHValue                 DisplayString,
+    pmEthernetHistory24HrTcaActive               PmTcaActiveFlag
+}
+
+pmEthernetHistory24HrMonType OBJECT-TYPE
+    SYNTAX PmEthernetMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmEthernetUntimedStatsTable. This is the PM counter Type"
+    ::= { pmEthernetHistory24HrStatsEntry 1 }
+
+pmEthernetHistory24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmEthernetHistory24HrStatsEntry 2 }
+
+pmEthernetHistory24HrIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmEthernetHistory24HrStatsEntry 3 }
+
+pmEthernetHistory24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmEthernetHistory24HrStatsEntry 4 }
+
+pmEthernetHistory24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmEthernetHistory24HrStatsEntry 5 }
+
+pmEthernetHistory24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmEthernetHistory24HrStatsEntry 6 }
+
+pmEthernetHistory24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmEthernetHistory24HrStatsEntry 7 }
+
+pmEthernetHistory24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmEthernetHistory24HrStatsEntry 8 }
+
+pmEthernetHistory24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmEthernetHistory24HrStatsEntry 9 }
+
+pmEthernetHistory24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmEthernetHistory24HrStatsEntry 10 }
+
+pmModemCurrent15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmModemCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 9 }
+
+pmModemCurrent15minStatsEntry OBJECT-TYPE
+    SYNTAX PmModemCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmModemCurrent15minStatsTable."
+    INDEX { ifIndex, pmModem15minMonType }
+    ::= { pmModemCurrent15minStatsTable 1 }
+
+PmModemCurrent15minStatsEntry ::= SEQUENCE { 
+    pmModem15minMonType                 PmModemMonType,
+    pmModem15minMonTypeDescr            DisplayString,
+    pmModem15minIfIndexDescr            DisplayString,
+    pmModem15minMonValue                DisplayString,
+    pmModem15minMonIDF                  DisplayString,
+    pmModem15minMonSupported            TruthValue,
+    pmModem15minAdminState              EnabledDisabledEnum,
+    pmModem15minMonStartDateTime        DisplayString,
+    pmModem15minTcaAdminState           EnabledDisabledEnum,
+    pmModem15minTHValue                 DisplayString,
+    pmModem15minTcaProfileId            Integer32,
+    pmModem15minTcaActive               PmTcaActiveFlag
+}
+
+pmModem15minMonType OBJECT-TYPE
+    SYNTAX PmModemMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmModemCurrent15minStatsTable. This is the PM counter Type"
+    ::= { pmModemCurrent15minStatsEntry 1 }
+
+pmModem15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmModemCurrent15minStatsEntry 2 }
+
+pmModem15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmModemCurrent15minStatsEntry 3 }
+
+pmModem15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmModemCurrent15minStatsEntry 4 }
+
+pmModem15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmModemCurrent15minStatsEntry 5 }
+
+pmModem15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmModemCurrent15minStatsEntry 6 }
+
+pmModem15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmModemCurrent15minStatsEntry 7 }
+
+pmModem15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmModemCurrent15minStatsEntry 8 }
+
+pmModem15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmModemCurrent15minStatsEntry 9 }
+
+pmModem15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmModemCurrent15minStatsEntry 10 }
+
+pmModem15minTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmModemCurrent15minStatsEntry 11 }
+
+pmModem15minTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmModemCurrent15minStatsEntry 12 }
+
+pmModemCurrent24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmModemCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current 24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 10 }
+
+pmModemCurrent24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmModemCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmModemCurrent24HrStatsTable."
+    INDEX { ifIndex, pmModem24HrMonType }
+    ::= { pmModemCurrent24HrStatsTable 1 }
+
+PmModemCurrent24HrStatsEntry ::= SEQUENCE { 
+    pmModem24HrMonType                 PmModemMonType,
+    pmModem24HrMonTypeDescr            DisplayString,
+    pmModem24HrIfIndexDescr            DisplayString,
+    pmModem24HrMonValue                DisplayString,
+    pmModem24HrMonIDF                  DisplayString,
+    pmModem24HrMonSupported            TruthValue,
+    pmModem24HrAdminState              EnabledDisabledEnum,
+    pmModem24HrMonStartDateTime        DisplayString,
+    pmModem24HrTcaAdminState           EnabledDisabledEnum,
+    pmModem24HrTHValue                 DisplayString,
+    pmModem24HrTcaProfileId            Integer32,
+    pmModem24HrTcaActive               PmTcaActiveFlag
+}
+
+pmModem24HrMonType OBJECT-TYPE
+    SYNTAX PmModemMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmModemCurrent24HrStatsTable. This is the PM counter Type"
+    ::= { pmModemCurrent24HrStatsEntry 1 }
+
+pmModem24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmModemCurrent24HrStatsEntry 2 }
+
+pmModem24HrIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmModemCurrent24HrStatsEntry 3 }
+
+pmModem24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmModemCurrent24HrStatsEntry 4 }
+
+pmModem24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmModemCurrent24HrStatsEntry 5 }
+
+pmModem24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmModemCurrent24HrStatsEntry 6 }
+
+pmModem24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmModemCurrent24HrStatsEntry 7 }
+
+pmModem24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmModemCurrent24HrStatsEntry 8 }
+
+pmModem24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmModemCurrent24HrStatsEntry 9 }
+
+pmModem24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmModemCurrent24HrStatsEntry 10 }
+
+pmModem24HrTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmModemCurrent24HrStatsEntry 11 }
+
+pmModem24HrTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmModemCurrent24HrStatsEntry 12 }
+
+pmModemUntimedStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmModemUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current Untimed stats table."
+    ::= { cienaWsPlatformPmMIB 11 }
+
+pmModemUntimedStatsEntry OBJECT-TYPE
+    SYNTAX PmModemUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmModemUntimedStatsTable."
+    INDEX { ifIndex, pmModemUntimedMonType }
+    ::= { pmModemUntimedStatsTable 1 }
+
+PmModemUntimedStatsEntry ::= SEQUENCE { 
+    pmModemUntimedMonType                 PmModemMonType,
+    pmModemUntimedMonTypeDescr            DisplayString,
+    pmModemUntimedIfIndexDescr            DisplayString,
+    pmModemUntimedMonValue                DisplayString,
+    pmModemUntimedMonIDF                  DisplayString,
+    pmModemUntimedMonSupported            TruthValue,
+    pmModemUntimedAdminState              EnabledDisabledEnum,
+    pmModemUntimedMonStartDateTime        DisplayString,
+    pmModemUntimedTcaAdminState           EnabledDisabledEnum,
+    pmModemUntimedTHValue                 DisplayString,
+    pmModemUntimedTcaProfileId            Integer32,
+    pmModemUntimedTcaActive               PmTcaActiveFlag
+}
+
+pmModemUntimedMonType OBJECT-TYPE
+    SYNTAX PmModemMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmModemUntimedStatsTable. This is the PM counter Type"
+    ::= { pmModemUntimedStatsEntry 1 }
+
+pmModemUntimedMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmModemUntimedStatsEntry 2 }
+
+pmModemUntimedIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmModemUntimedStatsEntry 3 }
+
+pmModemUntimedMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena Untimed monitored value."
+    ::= { pmModemUntimedStatsEntry 4 }
+
+pmModemUntimedMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmModemUntimedStatsEntry 5 }
+
+pmModemUntimedMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmModemUntimedStatsEntry 6 }
+
+pmModemUntimedAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmModemUntimedStatsEntry 7 }
+
+pmModemUntimedMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmModemUntimedStatsEntry 8 }
+
+pmModemUntimedTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmModemUntimedStatsEntry 9 }
+
+pmModemUntimedTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmModemUntimedStatsEntry 10 }
+
+pmModemUntimedTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmModemUntimedStatsEntry 11 }
+
+pmModemUntimedTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmModemUntimedStatsEntry 12 }
+
+
+pmModemHistory15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmModemHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current ModemHistory15min stats table."
+    ::= { cienaWsPlatformPmMIB 12 }
+
+pmModemHistory15minStatsEntry OBJECT-TYPE
+    SYNTAX PmModemHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmModemHistory15minStatsTable."
+    INDEX { ifIndex, pmModemHistory15minBinIndex, pmModemHistory15minMonType }
+    ::= { pmModemHistory15minStatsTable 1 }
+
+PmModemHistory15minStatsEntry ::= SEQUENCE { 
+    pmModemHistory15minBinIndex                Integer32,
+    pmModemHistory15minMonType                 PmModemMonType,
+    pmModemHistory15minMonTypeDescr            DisplayString,
+    pmModemHistory15minIfIndexDescr            DisplayString,
+    pmModemHistory15minMonValue                DisplayString,
+    pmModemHistory15minMonIDF                  DisplayString,
+    pmModemHistory15minMonSupported            TruthValue,
+    pmModemHistory15minAdminState              EnabledDisabledEnum,
+    pmModemHistory15minMonStartDateTime        DisplayString,
+    pmModemHistory15minTHValue                 DisplayString,
+    pmModemHistory15minTcaActive               PmTcaActiveFlag
+}
+
+pmModemHistory15minBinIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second index for pmModemHistory15minStatsTable ."
+    ::= { pmModemHistory15minStatsEntry 1 }
+
+pmModemHistory15minMonType OBJECT-TYPE
+    SYNTAX PmModemMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmModemHistory15minStatsTable. This is the PM counter Type"
+    ::= { pmModemHistory15minStatsEntry 2 }
+
+pmModemHistory15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmModemHistory15minStatsEntry 3 }
+
+pmModemHistory15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmModemHistory15minStatsEntry 4 }
+
+pmModemHistory15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 15 min monitored value."
+    ::= { pmModemHistory15minStatsEntry 5 }
+
+pmModemHistory15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmModemHistory15minStatsEntry 6 }
+
+pmModemHistory15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmModemHistory15minStatsEntry 7 }
+
+pmModemHistory15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmModemHistory15minStatsEntry 8 }
+
+pmModemHistory15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmModemHistory15minStatsEntry 9 }
+
+pmModemHistory15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmModemHistory15minStatsEntry 10 }
+
+pmModemHistory15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmModemHistory15minStatsEntry 11 }
+
+pmModemHistory24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmModemHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current ModemHistory24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 13 }
+
+pmModemHistory24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmModemHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmModemHistory24HrStatsTable."
+    INDEX { ifIndex, pmModemHistory24HrMonType }
+    ::= { pmModemHistory24HrStatsTable 1 }
+
+PmModemHistory24HrStatsEntry ::= SEQUENCE { 
+    pmModemHistory24HrMonType                 PmModemMonType,
+    pmModemHistory24HrMonTypeDescr            DisplayString,
+    pmModemHistory24HrIndexDescr              DisplayString,
+    pmModemHistory24HrMonValue                DisplayString,
+    pmModemHistory24HrMonIDF                  DisplayString,
+    pmModemHistory24HrMonSupported            TruthValue,
+    pmModemHistory24HrAdminState              EnabledDisabledEnum,
+    pmModemHistory24HrMonStartDateTime        DisplayString,
+    pmModemHistory24HrTHValue                 DisplayString,
+    pmModemHistory24HrTcaActive               PmTcaActiveFlag
+}
+
+pmModemHistory24HrMonType OBJECT-TYPE
+    SYNTAX PmModemMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmModemUntimedStatsTable. This is the PM counter Type"
+    ::= { pmModemHistory24HrStatsEntry 1 }
+
+pmModemHistory24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmModemHistory24HrStatsEntry 2 }
+
+pmModemHistory24HrIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmModemHistory24HrStatsEntry 3 }
+
+pmModemHistory24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 24Hr monitored value."
+    ::= { pmModemHistory24HrStatsEntry 4 }
+
+pmModemHistory24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmModemHistory24HrStatsEntry 5 }
+
+pmModemHistory24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmModemHistory24HrStatsEntry 6 }
+
+pmModemHistory24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmModemHistory24HrStatsEntry 7 }
+
+pmModemHistory24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmModemHistory24HrStatsEntry 8 }
+
+pmModemHistory24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmModemHistory24HrStatsEntry 9 }
+
+pmModemHistory24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmModemHistory24HrStatsEntry 10 }
+
+
+pmOtuCurrent15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOtuCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 14 }
+
+pmOtuCurrent15minStatsEntry OBJECT-TYPE
+    SYNTAX PmOtuCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOtuCurrent15minStatsTable."
+    INDEX { ifIndex, pmOtu15minMonType }
+    ::= { pmOtuCurrent15minStatsTable 1 }
+
+PmOtuCurrent15minStatsEntry ::= SEQUENCE { 
+    pmOtu15minMonType                 PmOtuMonType,
+    pmOtu15minMonTypeDescr            DisplayString,
+    pmOtu15minIfIndexDescr            DisplayString,
+    pmOtu15minMonValue                DisplayString,
+    pmOtu15minMonIDF                  DisplayString,
+    pmOtu15minMonSupported            TruthValue,
+    pmOtu15minAdminState              EnabledDisabledEnum,
+    pmOtu15minMonStartDateTime        DisplayString,
+    pmOtu15minTcaAdminState           EnabledDisabledEnum,
+    pmOtu15minTHValue                 DisplayString,
+    pmOtu15minTcaProfileId            Integer32,
+    pmOtu15minTcaActive               PmTcaActiveFlag
+}
+
+pmOtu15minMonType OBJECT-TYPE
+    SYNTAX PmOtuMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOtuCurrent15minStatsTable. This is the PM counter Type"
+    ::= { pmOtuCurrent15minStatsEntry 1 }
+
+pmOtu15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOtuCurrent15minStatsEntry 2 }
+
+pmOtu15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOtuCurrent15minStatsEntry 3 }
+
+pmOtu15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmOtuCurrent15minStatsEntry 4 }
+
+pmOtu15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOtuCurrent15minStatsEntry 5 }
+
+pmOtu15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOtuCurrent15minStatsEntry 6 }
+
+pmOtu15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOtuCurrent15minStatsEntry 7 }
+
+pmOtu15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOtuCurrent15minStatsEntry 8 }
+
+pmOtu15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOtuCurrent15minStatsEntry 9 }
+
+pmOtu15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOtuCurrent15minStatsEntry 10 }
+
+pmOtu15minTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOtuCurrent15minStatsEntry 11 }
+
+pmOtu15minTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOtuCurrent15minStatsEntry 12 }
+
+pmOtuCurrent24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOtuCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 15 }
+
+pmOtuCurrent24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmOtuCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOtuCurrent24HrStatsTable."
+    INDEX { ifIndex, pmOtu24HrMonType }
+    ::= { pmOtuCurrent24HrStatsTable 1 }
+
+PmOtuCurrent24HrStatsEntry ::= SEQUENCE { 
+    pmOtu24HrMonType                 PmOtuMonType,
+    pmOtu24HrMonTypeDescr            DisplayString,
+    pmOtu24HrIfIndexDescr            DisplayString,
+    pmOtu24HrMonValue                DisplayString,
+    pmOtu24HrMonIDF                  DisplayString,
+    pmOtu24HrMonSupported            TruthValue,
+    pmOtu24HrAdminState              EnabledDisabledEnum,
+    pmOtu24HrMonStartDateTime        DisplayString,
+    pmOtu24HrTcaAdminState           EnabledDisabledEnum,
+    pmOtu24HrTHValue                 DisplayString,
+    pmOtu24HrTcaProfileId            Integer32,
+    pmOtu24HrTcaActive               PmTcaActiveFlag
+}
+
+pmOtu24HrMonType OBJECT-TYPE
+    SYNTAX PmOtuMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOtuCurrent24HrStatsTable. This is the PM counter Type"
+    ::= { pmOtuCurrent24HrStatsEntry 1 }
+
+pmOtu24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOtuCurrent24HrStatsEntry 2 }
+
+pmOtu24HrIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOtuCurrent24HrStatsEntry 3 }
+
+pmOtu24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmOtuCurrent24HrStatsEntry 4 }
+
+pmOtu24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOtuCurrent24HrStatsEntry 5 }
+
+pmOtu24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOtuCurrent24HrStatsEntry 6 }
+
+pmOtu24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOtuCurrent24HrStatsEntry 7 }
+
+pmOtu24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOtuCurrent24HrStatsEntry 8 }
+
+pmOtu24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOtuCurrent24HrStatsEntry 9 }
+
+pmOtu24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOtuCurrent24HrStatsEntry 10 }
+
+pmOtu24HrTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOtuCurrent24HrStatsEntry 11 }
+
+pmOtu24HrTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOtuCurrent24HrStatsEntry 12 }
+
+pmOtuUntimedStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOtuUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current Untimed stats table."
+    ::= { cienaWsPlatformPmMIB 16 }
+
+pmOtuUntimedStatsEntry OBJECT-TYPE
+    SYNTAX PmOtuUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOtuUntimedStatsTable."
+    INDEX { ifIndex, pmOtuUntimedMonType }
+    ::= { pmOtuUntimedStatsTable 1 }
+
+PmOtuUntimedStatsEntry ::= SEQUENCE { 
+    pmOtuUntimedMonType                 PmOtuMonType,
+    pmOtuUntimedMonTypeDescr            DisplayString,
+    pmOtuUntimedIfIndexDescr            DisplayString,
+    pmOtuUntimedMonValue                DisplayString,
+    pmOtuUntimedMonIDF                  DisplayString,
+    pmOtuUntimedMonSupported            TruthValue,
+    pmOtuUntimedAdminState              EnabledDisabledEnum,
+    pmOtuUntimedMonStartDateTime        DisplayString,
+    pmOtuUntimedTcaAdminState           EnabledDisabledEnum,
+    pmOtuUntimedTHValue                 DisplayString,
+    pmOtuUntimedTcaProfileId            Integer32,
+    pmOtuUntimedTcaActive               PmTcaActiveFlag
+}
+
+pmOtuUntimedMonType OBJECT-TYPE
+    SYNTAX PmOtuMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOtuUntimedStatsTable. This is the PM counter Type"
+    ::= { pmOtuUntimedStatsEntry 1 }
+
+pmOtuUntimedMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOtuUntimedStatsEntry 2 }
+
+pmOtuUntimedIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOtuUntimedStatsEntry 3 }
+
+pmOtuUntimedMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena Untimed monitored value."
+    ::= { pmOtuUntimedStatsEntry 4 }
+
+pmOtuUntimedMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOtuUntimedStatsEntry 5 }
+
+pmOtuUntimedMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOtuUntimedStatsEntry 6 }
+
+pmOtuUntimedAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOtuUntimedStatsEntry 7 }
+
+pmOtuUntimedMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOtuUntimedStatsEntry 8 }
+
+pmOtuUntimedTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOtuUntimedStatsEntry 9 }
+
+pmOtuUntimedTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOtuUntimedStatsEntry 10 }
+
+pmOtuUntimedTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOtuUntimedStatsEntry 11 }
+
+pmOtuUntimedTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOtuUntimedStatsEntry 12 }
+
+pmOtuHistory15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOtuHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current OtuHistory15min stats table."
+    ::= { cienaWsPlatformPmMIB 17 }
+
+pmOtuHistory15minStatsEntry OBJECT-TYPE
+    SYNTAX PmOtuHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOtuHistory15minStatsTable."
+    INDEX { ifIndex, pmOtuHistory15minBinIndex, pmOtuHistory15minMonType }
+    ::= { pmOtuHistory15minStatsTable 1 }
+
+PmOtuHistory15minStatsEntry ::= SEQUENCE { 
+    pmOtuHistory15minBinIndex                Integer32,
+    pmOtuHistory15minMonType                 PmOtuMonType,
+    pmOtuHistory15minMonTypeDescr            DisplayString,
+    pmOtuHistory15minIndexDescr              DisplayString,
+    pmOtuHistory15minMonValue                DisplayString,
+    pmOtuHistory15minMonIDF                  DisplayString,
+    pmOtuHistory15minMonSupported            TruthValue,
+    pmOtuHistory15minAdminState              EnabledDisabledEnum,
+    pmOtuHistory15minMonStartDateTime        DisplayString,
+    pmOtuHistory15minTHValue                 DisplayString,
+    pmOtuHistory15minTcaActive               PmTcaActiveFlag
+}
+
+pmOtuHistory15minBinIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Index for pmOtuHistory15minStatsTable ."
+    ::= { pmOtuHistory15minStatsEntry 1 }
+
+pmOtuHistory15minMonType OBJECT-TYPE
+    SYNTAX PmOtuMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmOtuUntimedStatsTable. This is the PM counter Type"
+    ::= { pmOtuHistory15minStatsEntry 2 }
+
+pmOtuHistory15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOtuHistory15minStatsEntry 3 }
+
+pmOtuHistory15minIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOtuHistory15minStatsEntry 4 }
+
+pmOtuHistory15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 15 min monitored value."
+    ::= { pmOtuHistory15minStatsEntry 5 }
+
+pmOtuHistory15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOtuHistory15minStatsEntry 6 }
+
+pmOtuHistory15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOtuHistory15minStatsEntry 7 }
+
+pmOtuHistory15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOtuHistory15minStatsEntry 8 }
+
+pmOtuHistory15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOtuHistory15minStatsEntry 9 }
+ 
+pmOtuHistory15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOtuHistory15minStatsEntry 10 }
+
+pmOtuHistory15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOtuHistory15minStatsEntry 11 }
+
+pmOtuHistory24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOtuHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current OtuHistory24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 18 }
+
+pmOtuHistory24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmOtuHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOtuHistory24HrStatsTable."
+    INDEX { ifIndex, pmOtuHistory24HrMonType }
+    ::= { pmOtuHistory24HrStatsTable 1 }
+
+PmOtuHistory24HrStatsEntry ::= SEQUENCE { 
+    pmOtuHistory24HrMonType                 PmOtuMonType,
+    pmOtuHistory24HrMonTypeDescr            DisplayString,
+    pmOtuHistory24HrIndexDescr              DisplayString,
+    pmOtuHistory24HrMonValue                DisplayString,
+    pmOtuHistory24HrMonIDF                  DisplayString,
+    pmOtuHistory24HrMonSupported            TruthValue,
+    pmOtuHistory24HrAdminState              EnabledDisabledEnum,
+    pmOtuHistory24HrMonStartDateTime        DisplayString,
+    pmOtuHistory24HrTHValue                 DisplayString,
+    pmOtuHistory24HrTcaActive               PmTcaActiveFlag
+}
+
+pmOtuHistory24HrMonType OBJECT-TYPE
+    SYNTAX PmOtuMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOtuUntimedStatsTable. This is the PM counter Type"
+    ::= { pmOtuHistory24HrStatsEntry 1 }
+
+pmOtuHistory24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOtuHistory24HrStatsEntry 2 }
+
+pmOtuHistory24HrIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOtuHistory24HrStatsEntry 3 }
+
+pmOtuHistory24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 24Hr monitored value."
+    ::= { pmOtuHistory24HrStatsEntry 4 }
+
+pmOtuHistory24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOtuHistory24HrStatsEntry 5 }
+
+pmOtuHistory24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOtuHistory24HrStatsEntry 6 }
+
+pmOtuHistory24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOtuHistory24HrStatsEntry 7 }
+
+pmOtuHistory24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOtuHistory24HrStatsEntry 8 }
+
+pmOtuHistory24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOtuHistory24HrStatsEntry 9 }
+
+pmOtuHistory24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOtuHistory24HrStatsEntry 10 }
+
+
+pmOduCurrent15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOduCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 19 }
+
+pmOduCurrent15minStatsEntry OBJECT-TYPE
+    SYNTAX PmOduCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOduCurrent15minStatsTable."
+    INDEX { ifIndex, pmOdu15minMonType }
+    ::= { pmOduCurrent15minStatsTable 1 }
+
+PmOduCurrent15minStatsEntry ::= SEQUENCE { 
+    pmOdu15minMonType                 PmOduMonType,
+    pmOdu15minMonTypeDescr            DisplayString,
+    pmOdu15minIfIndexDescr            DisplayString,
+    pmOdu15minMonValue                DisplayString,
+    pmOdu15minMonIDF                  DisplayString,
+    pmOdu15minMonSupported            TruthValue,
+    pmOdu15minAdminState              EnabledDisabledEnum,
+    pmOdu15minMonStartDateTime        DisplayString,
+    pmOdu15minTcaAdminState           EnabledDisabledEnum,
+    pmOdu15minTHValue                 DisplayString,
+    pmOdu15minTcaProfileId            Integer32,
+    pmOdu15minTcaActive               PmTcaActiveFlag
+}
+
+pmOdu15minMonType OBJECT-TYPE
+    SYNTAX PmOduMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOduCurrent15minStatsTable. This is the PM counter Type"
+    ::= { pmOduCurrent15minStatsEntry 1 }
+
+pmOdu15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOduCurrent15minStatsEntry 2 }
+
+pmOdu15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOduCurrent15minStatsEntry 3 }
+
+pmOdu15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmOduCurrent15minStatsEntry 4 }
+
+pmOdu15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOduCurrent15minStatsEntry 5 }
+
+pmOdu15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOduCurrent15minStatsEntry 6 }
+
+pmOdu15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOduCurrent15minStatsEntry 7 }
+
+pmOdu15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOduCurrent15minStatsEntry 8 }
+
+pmOdu15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOduCurrent15minStatsEntry 9 }
+
+pmOdu15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOduCurrent15minStatsEntry 10 }
+
+pmOdu15minTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOduCurrent15minStatsEntry 11 }
+
+pmOdu15minTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOduCurrent15minStatsEntry 12 }
+
+pmOduCurrent24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOduCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 20 }
+
+pmOduCurrent24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmOduCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOduCurrent24HrStatsTable."
+    INDEX { ifIndex, pmOdu24HrMonType }
+    ::= { pmOduCurrent24HrStatsTable 1 }
+
+PmOduCurrent24HrStatsEntry ::= SEQUENCE { 
+    pmOdu24HrMonType                 PmOduMonType,
+    pmOdu24HrMonTypeDescr            DisplayString,
+    pmOdu24HrIfIndexDescr            DisplayString,
+    pmOdu24HrMonValue                DisplayString,
+    pmOdu24HrMonIDF                  DisplayString,
+    pmOdu24HrMonSupported            TruthValue,
+    pmOdu24HrAdminState              EnabledDisabledEnum,
+    pmOdu24HrMonStartDateTime        DisplayString,
+    pmOdu24HrTcaAdminState           EnabledDisabledEnum,
+    pmOdu24HrTHValue                 DisplayString,
+    pmOdu24HrTcaProfileId            Integer32,
+    pmOdu24HrTcaActive               PmTcaActiveFlag
+}
+
+pmOdu24HrMonType OBJECT-TYPE
+    SYNTAX PmOduMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOduCurrent24HrStatsTable. This is the PM counter Type"
+    ::= { pmOduCurrent24HrStatsEntry 1 }
+
+pmOdu24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOduCurrent24HrStatsEntry 2 }
+
+pmOdu24HrIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOduCurrent24HrStatsEntry 3 }
+
+pmOdu24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmOduCurrent24HrStatsEntry 4 }
+
+pmOdu24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOduCurrent24HrStatsEntry 5 }
+
+pmOdu24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOduCurrent24HrStatsEntry 6 }
+
+pmOdu24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOduCurrent24HrStatsEntry 7 }
+
+pmOdu24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOduCurrent24HrStatsEntry 8 }
+
+pmOdu24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOduCurrent24HrStatsEntry 9 }
+
+pmOdu24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOduCurrent24HrStatsEntry 10 }
+
+pmOdu24HrTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOduCurrent24HrStatsEntry 11 }
+
+pmOdu24HrTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOduCurrent24HrStatsEntry 12 }
+
+pmOduUntimedStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOduUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current Untimed stats table."
+    ::= { cienaWsPlatformPmMIB 21 }
+
+pmOduUntimedStatsEntry OBJECT-TYPE
+    SYNTAX PmOduUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOduUntimedStatsTable."
+    INDEX { ifIndex, pmOduUntimedMonType }
+    ::= { pmOduUntimedStatsTable 1 }
+
+PmOduUntimedStatsEntry ::= SEQUENCE { 
+    pmOduUntimedMonType                 PmOduMonType,
+    pmOduUntimedMonTypeDescr            DisplayString,
+    pmOduUntimedIfIndexDescr            DisplayString,
+    pmOduUntimedMonValue                DisplayString,
+    pmOduUntimedMonIDF                  DisplayString,
+    pmOduUntimedMonSupported            TruthValue,
+    pmOduUntimedAdminState              EnabledDisabledEnum,
+    pmOduUntimedMonStartDateTime        DisplayString,
+    pmOduUntimedTcaAdminState           EnabledDisabledEnum,
+    pmOduUntimedTHValue                 DisplayString,
+    pmOduUntimedTcaProfileId            Integer32,
+    pmOduUntimedTcaActive               PmTcaActiveFlag
+}
+
+pmOduUntimedMonType OBJECT-TYPE
+    SYNTAX PmOduMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOduUntimedStatsTable. This is the PM counter Type"
+    ::= { pmOduUntimedStatsEntry 1 }
+
+pmOduUntimedMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOduUntimedStatsEntry 2 }
+
+pmOduUntimedIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOduUntimedStatsEntry 3 }
+
+pmOduUntimedMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena Untimed monitored value."
+    ::= { pmOduUntimedStatsEntry 4 }
+
+pmOduUntimedMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOduUntimedStatsEntry 5 }
+
+pmOduUntimedMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOduUntimedStatsEntry 6 }
+
+pmOduUntimedAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOduUntimedStatsEntry 7 }
+
+pmOduUntimedMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOduUntimedStatsEntry 8 }
+
+pmOduUntimedTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOduUntimedStatsEntry 9 }
+
+pmOduUntimedTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOduUntimedStatsEntry 10 }
+
+pmOduUntimedTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOduUntimedStatsEntry 11 }
+
+pmOduUntimedTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOduUntimedStatsEntry 12 }
+
+pmOduHistory15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOduHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current OduHistory15min stats table."
+    ::= { cienaWsPlatformPmMIB 22 }
+
+pmOduHistory15minStatsEntry OBJECT-TYPE
+    SYNTAX PmOduHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOduHistory15minStatsTable."
+    INDEX { ifIndex, pmOduHistory15minBinIndex, pmOduHistory15minMonType }
+    ::= { pmOduHistory15minStatsTable 1 }
+
+PmOduHistory15minStatsEntry ::= SEQUENCE { 
+    pmOduHistory15minBinIndex                Integer32,
+    pmOduHistory15minMonType                 PmOduMonType,
+    pmOduHistory15minMonTypeDescr            DisplayString,
+    pmOduHistory15minIndexDescr              DisplayString,
+    pmOduHistory15minMonValue                DisplayString,
+    pmOduHistory15minMonIDF                  DisplayString,
+    pmOduHistory15minMonSupported            TruthValue,
+    pmOduHistory15minAdminState              EnabledDisabledEnum,
+    pmOduHistory15minMonStartDateTime        DisplayString,
+    pmOduHistory15minTHValue                 DisplayString,
+    pmOduHistory15minTcaActive               PmTcaActiveFlag
+}
+
+pmOduHistory15minBinIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Index for pmOduHistory15minStatsTable ."
+    ::= { pmOduHistory15minStatsEntry 1 }
+
+pmOduHistory15minMonType OBJECT-TYPE
+    SYNTAX PmOduMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmOduHistory15minStatsTable. This is the PM counter Type"
+    ::= { pmOduHistory15minStatsEntry 2 }
+
+pmOduHistory15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOduHistory15minStatsEntry 3 }
+
+pmOduHistory15minIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOduHistory15minStatsEntry 4 }
+
+pmOduHistory15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 15 min monitored value."
+    ::= { pmOduHistory15minStatsEntry 5 }
+
+pmOduHistory15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOduHistory15minStatsEntry 6 }
+
+pmOduHistory15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOduHistory15minStatsEntry 7 }
+
+pmOduHistory15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOduHistory15minStatsEntry 8 }
+
+pmOduHistory15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOduHistory15minStatsEntry 9 }
+ 
+pmOduHistory15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOduHistory15minStatsEntry 10 }
+
+pmOduHistory15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOduHistory15minStatsEntry 11 }
+
+pmOduHistory24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOduHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current OduHistory24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 23 }
+
+pmOduHistory24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmOduHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOduHistory24HrStatsTable."
+    INDEX { ifIndex, pmOduHistory24HrMonType }
+    ::= { pmOduHistory24HrStatsTable 1 }
+
+PmOduHistory24HrStatsEntry ::= SEQUENCE { 
+    pmOduHistory24HrMonType                 PmOduMonType,
+    pmOduHistory24HrMonTypeDescr            DisplayString,
+    pmOduHistory24HrIndexDescr              DisplayString,
+    pmOduHistory24HrMonValue                DisplayString,
+    pmOduHistory24HrMonIDF                  DisplayString,
+    pmOduHistory24HrMonSupported            TruthValue,
+    pmOduHistory24HrAdminState              EnabledDisabledEnum,
+    pmOduHistory24HrMonStartDateTime        DisplayString,
+    pmOduHistory24HrTHValue                 DisplayString,
+    pmOduHistory24HrTcaActive               PmTcaActiveFlag
+}
+
+pmOduHistory24HrMonType OBJECT-TYPE
+    SYNTAX PmOduMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOdu24HrStatsTable. This is the PM counter Type"
+    ::= { pmOduHistory24HrStatsEntry 1 }
+
+pmOduHistory24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOduHistory24HrStatsEntry 2 }
+
+pmOduHistory24HrIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOduHistory24HrStatsEntry 3 }
+
+pmOduHistory24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 24Hr monitored value."
+    ::= { pmOduHistory24HrStatsEntry 4 }
+
+pmOduHistory24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOduHistory24HrStatsEntry 5 }
+
+pmOduHistory24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOduHistory24HrStatsEntry 6 }
+
+pmOduHistory24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOduHistory24HrStatsEntry 7 }
+
+pmOduHistory24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOduHistory24HrStatsEntry 8 }
+
+pmOduHistory24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOduHistory24HrStatsEntry 9 }
+
+pmOduHistory24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOduHistory24HrStatsEntry 10 }
+
+pmOpticalPowerCurrent15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOpticalPowerCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 24 }
+
+pmOpticalPowerCurrent15minStatsEntry OBJECT-TYPE
+    SYNTAX PmOpticalPowerCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOpticalPowerCurrent15minStatsTable."
+    INDEX { ifIndex, pmOpticalPower15minLaneIndex, pmOpticalPower15minMonType }
+    ::= { pmOpticalPowerCurrent15minStatsTable 1 }
+
+PmOpticalPowerCurrent15minStatsEntry ::= SEQUENCE { 
+    pmOpticalPower15minLaneIndex               Integer32,
+    pmOpticalPower15minMonType                 PmOpticalPowerMonType,
+    pmOpticalPower15minMonTypeDescr            DisplayString,
+    pmOpticalPower15minIfIndexDescr            DisplayString,
+    pmOpticalPower15minMonValue                DisplayString,
+    pmOpticalPower15minMonIDF                  DisplayString,
+    pmOpticalPower15minMonSupported            TruthValue,
+    pmOpticalPower15minAdminState              EnabledDisabledEnum,
+    pmOpticalPower15minMonStartDateTime        DisplayString,
+    pmOpticalPower15minTcaAdminState           EnabledDisabledEnum,
+    pmOpticalPower15minTHValue                 DisplayString,
+    pmOpticalPower15minTcaProfileId            Integer32,
+    pmOpticalPower15minBaseLineValue           DisplayString,
+    pmOpticalPower15minTcaActive               PmTcaActiveFlag
+}
+
+pmOpticalPower15minLaneIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOpticalPowerCurrent15minStatsTable."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 1 }
+
+pmOpticalPower15minMonType OBJECT-TYPE
+    SYNTAX PmOpticalPowerMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmOpticalPowerCurrent15minStatsTable. This is the PM counter Type"
+    ::= { pmOpticalPowerCurrent15minStatsEntry 2 }
+
+pmOpticalPower15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 3 }
+
+pmOpticalPower15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOpticalPowerCurrent15minStatsEntry 4 }
+
+pmOpticalPower15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 5 }
+
+pmOpticalPower15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOpticalPowerCurrent15minStatsEntry 6 }
+
+pmOpticalPower15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOpticalPowerCurrent15minStatsEntry 7 }
+
+pmOpticalPower15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 8 }
+
+pmOpticalPower15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 9 }
+
+pmOpticalPower15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 10 }
+
+pmOpticalPower15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOpticalPowerCurrent15minStatsEntry 11 }
+
+pmOpticalPower15minTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 12 }
+
+pmOpticalPower15minTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOpticalPowerCurrent15minStatsEntry 13 }
+
+pmOpticalPower15minBaseLineValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "BaseLine value for threshold."
+    ::= { pmOpticalPowerCurrent15minStatsEntry 14 }
+
+pmOpticalPowerCurrent24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOpticalPowerCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 25 }
+
+pmOpticalPowerCurrent24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmOpticalPowerCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOpticalPowerCurrent24HrStatsTable."
+    INDEX { ifIndex, pmOpticalPower24HrLaneIndex, pmOpticalPower24HrMonType }
+    ::= { pmOpticalPowerCurrent24HrStatsTable 1 }
+
+PmOpticalPowerCurrent24HrStatsEntry ::= SEQUENCE { 
+    pmOpticalPower24HrLaneIndex               Integer32,
+    pmOpticalPower24HrMonType                 PmOpticalPowerMonType,
+    pmOpticalPower24HrMonTypeDescr            DisplayString,
+    pmOpticalPower24HrIfIndexDescr            DisplayString,
+    pmOpticalPower24HrMonValue                DisplayString,
+    pmOpticalPower24HrMonIDF                  DisplayString,
+    pmOpticalPower24HrMonSupported            TruthValue,
+    pmOpticalPower24HrAdminState              EnabledDisabledEnum,
+    pmOpticalPower24HrMonStartDateTime        DisplayString,
+    pmOpticalPower24HrTcaAdminState           EnabledDisabledEnum,
+    pmOpticalPower24HrTHValue                 DisplayString,
+    pmOpticalPower24HrTcaProfileId            Integer32,
+    pmOpticalPower24HrBaseLineValue           DisplayString,
+    pmOpticalPower24HrTcaActive               PmTcaActiveFlag
+}
+
+pmOpticalPower24HrLaneIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOpticalPowerCurrent24HrStatsTable."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 1 }
+
+pmOpticalPower24HrMonType OBJECT-TYPE
+    SYNTAX PmOpticalPowerMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmOpticalPowerCurrent24HrStatsTable. This is the PM counter Type"
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 2 }
+
+pmOpticalPower24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 3 }
+
+pmOpticalPower24HrIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 4 }
+
+pmOpticalPower24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 5 }
+
+pmOpticalPower24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 6 }
+
+pmOpticalPower24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 7 }
+
+pmOpticalPower24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 8 }
+
+pmOpticalPower24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 9 }
+
+pmOpticalPower24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 10 }
+
+pmOpticalPower24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 11 }
+
+pmOpticalPower24HrTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 12 }
+
+pmOpticalPower24HrTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 13 }
+
+pmOpticalPower24HrBaseLineValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "BaseLine value for threshold."
+    ::= { pmOpticalPowerCurrent24HrStatsEntry 14 }
+
+pmOpticalPowerUntimedStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOpticalPowerUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current Untimed stats table."
+    ::= { cienaWsPlatformPmMIB 26 }
+
+pmOpticalPowerUntimedStatsEntry OBJECT-TYPE
+    SYNTAX PmOpticalPowerUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOpticalPowerUntimedStatsTable."
+    INDEX { ifIndex, pmOpticalPowerUntimedLaneIndex, pmOpticalPowerUntimedMonType }
+    ::= { pmOpticalPowerUntimedStatsTable 1 }
+
+PmOpticalPowerUntimedStatsEntry ::= SEQUENCE {
+    pmOpticalPowerUntimedLaneIndex	         Integer32,
+    pmOpticalPowerUntimedMonType                 PmOpticalPowerMonType,
+    pmOpticalPowerUntimedMonTypeDescr            DisplayString,
+    pmOpticalPowerUntimedIfIndexDescr            DisplayString,
+    pmOpticalPowerUntimedMonValue                DisplayString,
+    pmOpticalPowerUntimedMonIDF                  DisplayString,
+    pmOpticalPowerUntimedMonSupported            TruthValue,
+    pmOpticalPowerUntimedAdminState              EnabledDisabledEnum,
+    pmOpticalPowerUntimedMonStartDateTime        DisplayString,
+    pmOpticalPowerUntimedTcaAdminState           EnabledDisabledEnum,
+    pmOpticalPowerUntimedTHValue                 DisplayString,
+    pmOpticalPowerUntimedTcaProfileId            Integer32,
+    pmOpticalPowerUntimedBaseLineValue           DisplayString,
+    pmOpticalPowerUntimedTcaActive               PmTcaActiveFlag
+}
+
+
+pmOpticalPowerUntimedLaneIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOpticalPowerUntimedStatsTable. "
+    ::= { pmOpticalPowerUntimedStatsEntry 1 }
+
+pmOpticalPowerUntimedMonType OBJECT-TYPE
+    SYNTAX PmOpticalPowerMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmOpticalPowerUntimedStatsTable. This is the PM counter Type"
+    ::= { pmOpticalPowerUntimedStatsEntry 2 }
+
+pmOpticalPowerUntimedMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOpticalPowerUntimedStatsEntry 3 }
+
+pmOpticalPowerUntimedIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOpticalPowerUntimedStatsEntry 4 }
+
+pmOpticalPowerUntimedMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena untimed monitored value."
+    ::= { pmOpticalPowerUntimedStatsEntry 5 }
+
+pmOpticalPowerUntimedMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOpticalPowerUntimedStatsEntry 6 }
+
+pmOpticalPowerUntimedMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOpticalPowerUntimedStatsEntry 7 }
+
+pmOpticalPowerUntimedAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOpticalPowerUntimedStatsEntry 8 }
+
+pmOpticalPowerUntimedMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOpticalPowerUntimedStatsEntry 9 }
+
+pmOpticalPowerUntimedTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOpticalPowerUntimedStatsEntry 10 }
+
+pmOpticalPowerUntimedTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOpticalPowerUntimedStatsEntry 11 }
+
+pmOpticalPowerUntimedTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmOpticalPowerUntimedStatsEntry 12 }
+
+pmOpticalPowerUntimedTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmOpticalPowerUntimedStatsEntry 13 }
+
+pmOpticalPowerUntimedBaseLineValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "BaseLine value for threshold."
+    ::= { pmOpticalPowerUntimedStatsEntry 14 }
+
+pmOpticalPowerHistory15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOpticalPowerHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current OpticalPowerHistory15min stats table."
+    ::= { cienaWsPlatformPmMIB 27 }
+
+pmOpticalPowerHistory15minStatsEntry OBJECT-TYPE
+    SYNTAX PmOpticalPowerHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOpticalPowerHistory15minStatsTable."
+    INDEX { ifIndex, pmOpticalPowerHistory15minBinIndex, pmOpticalPowerHistory15minLaneIndex, pmOpticalPowerHistory15minMonType }
+    ::= { pmOpticalPowerHistory15minStatsTable 1 }
+
+PmOpticalPowerHistory15minStatsEntry ::= SEQUENCE { 
+    pmOpticalPowerHistory15minBinIndex                Integer32,
+    pmOpticalPowerHistory15minLaneIndex               Integer32,
+    pmOpticalPowerHistory15minMonType                 PmOpticalPowerMonType,
+    pmOpticalPowerHistory15minMonTypeDescr            DisplayString,
+    pmOpticalPowerHistory15minIndexDescr              DisplayString,
+    pmOpticalPowerHistory15minMonValue                DisplayString,
+    pmOpticalPowerHistory15minMonIDF                  DisplayString,
+    pmOpticalPowerHistory15minMonSupported            TruthValue,
+    pmOpticalPowerHistory15minAdminState              EnabledDisabledEnum,
+    pmOpticalPowerHistory15minMonStartDateTime        DisplayString,
+    pmOpticalPowerHistory15minTHValue                 DisplayString,
+    pmOpticalPowerHistory15minTcaActive               PmTcaActiveFlag
+}
+
+pmOpticalPowerHistory15minBinIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Index for pmOpticalPowerHistory15minStatsTable ."
+    ::= { pmOpticalPowerHistory15minStatsEntry 1 }
+
+pmOpticalPowerHistory15minLaneIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Index for pmOpticalPowerHistory15minStatsTable ."
+    ::= { pmOpticalPowerHistory15minStatsEntry 2 }
+
+pmOpticalPowerHistory15minMonType OBJECT-TYPE
+    SYNTAX PmOpticalPowerMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmOpticalPowerUntimedStatsTable. This is the PM counter Type"
+    ::= { pmOpticalPowerHistory15minStatsEntry 3 }
+
+pmOpticalPowerHistory15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOpticalPowerHistory15minStatsEntry 4 }
+
+pmOpticalPowerHistory15minIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOpticalPowerHistory15minStatsEntry 5 }
+
+pmOpticalPowerHistory15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 15 min monitored value."
+    ::= { pmOpticalPowerHistory15minStatsEntry 6 }
+
+pmOpticalPowerHistory15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOpticalPowerHistory15minStatsEntry 7 }
+
+pmOpticalPowerHistory15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOpticalPowerHistory15minStatsEntry 8 }
+
+pmOpticalPowerHistory15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOpticalPowerHistory15minStatsEntry 9 }
+
+pmOpticalPowerHistory15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOpticalPowerHistory15minStatsEntry 10 }
+    
+pmOpticalPowerHistory15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOpticalPowerHistory15minStatsEntry 11 }
+
+pmOpticalPowerHistory15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOpticalPowerHistory15minStatsEntry 12 }
+
+pmOpticalPowerHistory24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmOpticalPowerHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current OpticalPowerHistory24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 28 }
+
+pmOpticalPowerHistory24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmOpticalPowerHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmOpticalPowerHistory24HrStatsTable."
+    INDEX { ifIndex, pmOpticalPowerHistory24HrLaneIndex, pmOpticalPowerHistory24HrMonType }
+    ::= { pmOpticalPowerHistory24HrStatsTable 1 }
+
+PmOpticalPowerHistory24HrStatsEntry ::= SEQUENCE { 
+    pmOpticalPowerHistory24HrLaneIndex               Integer32,
+    pmOpticalPowerHistory24HrMonType                 PmOpticalPowerMonType,
+    pmOpticalPowerHistory24HrMonTypeDescr            DisplayString,
+    pmOpticalPowerHistory24HrIndexDescr              DisplayString,
+    pmOpticalPowerHistory24HrMonValue                DisplayString,
+    pmOpticalPowerHistory24HrMonIDF                  DisplayString,
+    pmOpticalPowerHistory24HrMonSupported            TruthValue,
+    pmOpticalPowerHistory24HrAdminState              EnabledDisabledEnum,
+    pmOpticalPowerHistory24HrMonStartDateTime        DisplayString,
+    pmOpticalPowerHistory24HrTHValue                 DisplayString,
+    pmOpticalPowerHistory24HrTcaActive               PmTcaActiveFlag
+}
+
+pmOpticalPowerHistory24HrLaneIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Index for pmOpticalPowerHistory24HrStatsTable ."
+    ::= { pmOpticalPowerHistory24HrStatsEntry 1 }
+
+pmOpticalPowerHistory24HrMonType OBJECT-TYPE
+    SYNTAX PmOpticalPowerMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmOpticalPowerUntimedStatsTable. This is the PM counter Type"
+    ::= { pmOpticalPowerHistory24HrStatsEntry 2 }
+
+pmOpticalPowerHistory24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmOpticalPowerHistory24HrStatsEntry 3 }
+
+pmOpticalPowerHistory24HrIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmOpticalPowerHistory24HrStatsEntry 4 }
+
+pmOpticalPowerHistory24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmOpticalPowerHistory24HrStatsEntry 5 }
+
+pmOpticalPowerHistory24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmOpticalPowerHistory24HrStatsEntry 6 }
+
+pmOpticalPowerHistory24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmOpticalPowerHistory24HrStatsEntry 7 }
+
+pmOpticalPowerHistory24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmOpticalPowerHistory24HrStatsEntry 8 }
+
+pmOpticalPowerHistory24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmOpticalPowerHistory24HrStatsEntry 9 }
+
+pmOpticalPowerHistory24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmOpticalPowerHistory24HrStatsEntry 10 }
+
+pmOpticalPowerHistory24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmOpticalPowerHistory24HrStatsEntry 11 }
+
+pmGcmCurrent15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmGcmCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 29 }
+
+pmGcmCurrent15minStatsEntry OBJECT-TYPE
+    SYNTAX PmGcmCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmGcmCurrent15minStatsTable."
+    INDEX { ifIndex, pmGcm15minMonType }
+    ::= { pmGcmCurrent15minStatsTable 1 }
+
+PmGcmCurrent15minStatsEntry ::= SEQUENCE { 
+    pmGcm15minMonType                 PmGcmMonType,
+    pmGcm15minMonTypeDescr            DisplayString,
+    pmGcm15minIfIndexDescr            DisplayString,
+    pmGcm15minMonValue                DisplayString,
+    pmGcm15minMonIDF                  DisplayString,
+    pmGcm15minMonSupported            TruthValue,
+    pmGcm15minAdminState              EnabledDisabledEnum,
+    pmGcm15minMonStartDateTime        DisplayString,
+    pmGcm15minTcaAdminState           EnabledDisabledEnum,
+    pmGcm15minTHValue                 DisplayString,
+    pmGcm15minTcaProfileId            Integer32,
+    pmGcm15minTcaActive               PmTcaActiveFlag
+}
+
+pmGcm15minMonType OBJECT-TYPE
+    SYNTAX PmGcmMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmGcmCurrent15minStatsTable. This is the PM counter Type"
+    ::= { pmGcmCurrent15minStatsEntry 1 }
+
+pmGcm15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmGcmCurrent15minStatsEntry 2 }
+
+pmGcm15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmGcmCurrent15minStatsEntry 3 }
+
+pmGcm15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmGcmCurrent15minStatsEntry 4 }
+
+pmGcm15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmGcmCurrent15minStatsEntry 5 }
+
+pmGcm15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmGcmCurrent15minStatsEntry 6 }
+
+pmGcm15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmGcmCurrent15minStatsEntry 7 }
+
+pmGcm15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmGcmCurrent15minStatsEntry 8 }
+
+pmGcm15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmGcmCurrent15minStatsEntry 9 }
+
+pmGcm15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmGcmCurrent15minStatsEntry 10 }
+
+pmGcm15minTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmGcmCurrent15minStatsEntry 11 }
+
+pmGcm15minTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmGcmCurrent15minStatsEntry 12 }
+
+pmGcmCurrent24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmGcmCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 30 }
+
+pmGcmCurrent24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmGcmCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmGcmCurrent24HrStatsTable."
+    INDEX { ifIndex, pmGcm24HrMonType }
+    ::= { pmGcmCurrent24HrStatsTable 1 }
+
+PmGcmCurrent24HrStatsEntry ::= SEQUENCE { 
+    pmGcm24HrMonType                 PmGcmMonType,
+    pmGcm24HrMonTypeDescr            DisplayString,
+    pmGcm24HrIfIndexDescr            DisplayString,
+    pmGcm24HrMonValue                DisplayString,
+    pmGcm24HrMonIDF                  DisplayString,
+    pmGcm24HrMonSupported            TruthValue,
+    pmGcm24HrAdminState              EnabledDisabledEnum,
+    pmGcm24HrMonStartDateTime        DisplayString,
+    pmGcm24HrTcaAdminState           EnabledDisabledEnum,
+    pmGcm24HrTHValue                 DisplayString,
+    pmGcm24HrTcaProfileId            Integer32,
+    pmGcm24HrTcaActive               PmTcaActiveFlag
+
+}
+
+pmGcm24HrMonType OBJECT-TYPE
+    SYNTAX PmGcmMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmGcmCurrent24HrStatsTable. This is the PM counter Type"
+    ::= { pmGcmCurrent24HrStatsEntry 1 }
+
+pmGcm24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmGcmCurrent24HrStatsEntry 2 }
+
+pmGcm24HrIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmGcmCurrent24HrStatsEntry 3 }
+
+pmGcm24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmGcmCurrent24HrStatsEntry 4 }
+
+pmGcm24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmGcmCurrent24HrStatsEntry 5 }
+
+pmGcm24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmGcmCurrent24HrStatsEntry 6 }
+
+pmGcm24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmGcmCurrent24HrStatsEntry 7 }
+
+pmGcm24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmGcmCurrent24HrStatsEntry 8 }
+
+pmGcm24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmGcmCurrent24HrStatsEntry 9 }
+
+pmGcm24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmGcmCurrent24HrStatsEntry 10 }
+
+pmGcm24HrTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmGcmCurrent24HrStatsEntry 11 }
+
+pmGcm24HrTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmGcmCurrent24HrStatsEntry 12 }
+
+pmGcmUntimedStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmGcmUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current Untimed stats table."
+    ::= { cienaWsPlatformPmMIB 31 }
+
+pmGcmUntimedStatsEntry OBJECT-TYPE
+    SYNTAX PmGcmUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmGcmUntimedStatsTable."
+    INDEX { ifIndex, pmGcmUntimedMonType }
+    ::= { pmGcmUntimedStatsTable 1 }
+
+PmGcmUntimedStatsEntry ::= SEQUENCE { 
+    pmGcmUntimedMonType                 PmGcmMonType,
+    pmGcmUntimedMonTypeDescr            DisplayString,
+    pmGcmUntimedIfIndexDescr            DisplayString,
+    pmGcmUntimedMonValue                DisplayString,
+    pmGcmUntimedMonIDF                  DisplayString,
+    pmGcmUntimedMonSupported            TruthValue,
+    pmGcmUntimedAdminState              EnabledDisabledEnum,
+    pmGcmUntimedMonStartDateTime        DisplayString,
+    pmGcmUntimedTcaAdminState           EnabledDisabledEnum,
+    pmGcmUntimedTHValue                 DisplayString,
+    pmGcmUntimedTcaProfileId            Integer32,
+    pmGcmUntimedTcaActive               PmTcaActiveFlag
+}
+
+pmGcmUntimedMonType OBJECT-TYPE
+    SYNTAX PmGcmMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmGcmUntimedStatsTable. This is the PM counter Type"
+    ::= { pmGcmUntimedStatsEntry 1 }
+
+pmGcmUntimedMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmGcmUntimedStatsEntry 2 }
+
+pmGcmUntimedIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmGcmUntimedStatsEntry 3 }
+
+pmGcmUntimedMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena Untimed monitored value."
+    ::= { pmGcmUntimedStatsEntry 4 }
+
+pmGcmUntimedMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmGcmUntimedStatsEntry 5 }
+
+pmGcmUntimedMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmGcmUntimedStatsEntry 6 }
+
+pmGcmUntimedAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmGcmUntimedStatsEntry 7 }
+
+pmGcmUntimedMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmGcmUntimedStatsEntry 8 }
+
+pmGcmUntimedTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmGcmUntimedStatsEntry 9 }
+
+pmGcmUntimedTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmGcmUntimedStatsEntry 10 }
+
+pmGcmUntimedTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmGcmUntimedStatsEntry 11 }
+
+pmGcmUntimedTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmGcmUntimedStatsEntry 12 }
+
+pmGcmHistory15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmGcmHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current GcmHistory15min stats table."
+    ::= { cienaWsPlatformPmMIB 32 }
+
+pmGcmHistory15minStatsEntry OBJECT-TYPE
+    SYNTAX PmGcmHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmGcmHistory15minStatsTable."
+    INDEX { ifIndex, pmGcmHistory15minBinIndex, pmGcmHistory15minMonType }
+    ::= { pmGcmHistory15minStatsTable 1 }
+
+PmGcmHistory15minStatsEntry ::= SEQUENCE { 
+    pmGcmHistory15minBinIndex                Integer32,
+    pmGcmHistory15minMonType                 PmGcmMonType,
+    pmGcmHistory15minMonTypeDescr            DisplayString,
+    pmGcmHistory15minIndexDescr              DisplayString,
+    pmGcmHistory15minMonValue                DisplayString,
+    pmGcmHistory15minMonIDF                  DisplayString,
+    pmGcmHistory15minMonSupported            TruthValue,
+    pmGcmHistory15minAdminState              EnabledDisabledEnum,
+    pmGcmHistory15minMonStartDateTime        DisplayString,
+    pmGcmHistory15minTHValue                 DisplayString,
+    pmGcmHistory15minTcaActive               PmTcaActiveFlag
+}
+
+pmGcmHistory15minBinIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Index for pmGcmHistory15minStatsTable ."
+    ::= { pmGcmHistory15minStatsEntry 1 }
+
+pmGcmHistory15minMonType OBJECT-TYPE
+    SYNTAX PmGcmMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmGcmHistory15minStatsTable. This is the PM counter Type"
+    ::= { pmGcmHistory15minStatsEntry 2 }
+
+pmGcmHistory15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmGcmHistory15minStatsEntry 3 }
+
+pmGcmHistory15minIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmGcmHistory15minStatsEntry 4 }
+
+pmGcmHistory15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 15 min monitored value."
+    ::= { pmGcmHistory15minStatsEntry 5 }
+
+pmGcmHistory15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmGcmHistory15minStatsEntry 6 }
+
+pmGcmHistory15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmGcmHistory15minStatsEntry 7 }
+
+pmGcmHistory15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmGcmHistory15minStatsEntry 8 }
+
+pmGcmHistory15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmGcmHistory15minStatsEntry 9 }
+
+pmGcmHistory15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmGcmHistory15minStatsEntry 10 }
+
+pmGcmHistory15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmGcmHistory15minStatsEntry 11 }
+
+pmGcmHistory24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmGcmHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current OduHistory24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 33 }
+
+pmGcmHistory24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmGcmHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmGcmHistory24HrStatsTable."
+    INDEX { ifIndex, pmGcmHistory24HrMonType }
+    ::= { pmGcmHistory24HrStatsTable 1 }
+
+PmGcmHistory24HrStatsEntry ::= SEQUENCE { 
+    pmGcmHistory24HrMonType                 PmGcmMonType,
+    pmGcmHistory24HrMonTypeDescr            DisplayString,
+    pmGcmHistory24HrIndexDescr              DisplayString,
+    pmGcmHistory24HrMonValue                DisplayString,
+    pmGcmHistory24HrMonIDF                  DisplayString,
+    pmGcmHistory24HrMonSupported            TruthValue,
+    pmGcmHistory24HrAdminState              EnabledDisabledEnum,
+    pmGcmHistory24HrMonStartDateTime        DisplayString,
+    pmGcmHistory24HrTHValue                 DisplayString,
+    pmGcmHistory24HrTcaActive               PmTcaActiveFlag
+}
+
+pmGcmHistory24HrMonType OBJECT-TYPE
+    SYNTAX PmGcmMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmGcm24HrStatsTable. This is the PM counter Type"
+    ::= { pmGcmHistory24HrStatsEntry 1 }
+
+pmGcmHistory24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmGcmHistory24HrStatsEntry 2 }
+
+pmGcmHistory24HrIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmGcmHistory24HrStatsEntry 3 }
+
+pmGcmHistory24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 24Hr monitored value."
+    ::= { pmGcmHistory24HrStatsEntry 4 }
+
+pmGcmHistory24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmGcmHistory24HrStatsEntry 5 }
+
+pmGcmHistory24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmGcmHistory24HrStatsEntry 6 }
+
+pmGcmHistory24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmGcmHistory24HrStatsEntry 7 }
+
+pmGcmHistory24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmGcmHistory24HrStatsEntry 8 }
+
+pmGcmHistory24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmGcmHistory24HrStatsEntry 9 }
+
+pmGcmHistory24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmGcmHistory24HrStatsEntry 10 }
+
+pmPhotonicsCurrent15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmPhotonicsCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 34 }
+
+pmPhotonicsCurrent15minStatsEntry OBJECT-TYPE
+    SYNTAX PmPhotonicsCurrent15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmPhotonicsCurrent15minStatsTable."
+    INDEX { ifIndex, pmPhotonics15minMonType }
+    ::= { pmPhotonicsCurrent15minStatsTable 1 }
+
+PmPhotonicsCurrent15minStatsEntry ::= SEQUENCE {
+    pmPhotonics15minMonType                 PmPhotonicsMonType,
+    pmPhotonics15minMonTypeDescr            DisplayString,
+    pmPhotonics15minIfIndexDescr            DisplayString,
+    pmPhotonics15minMonValue                DisplayString,
+    pmPhotonics15minMonIDF                  DisplayString,
+    pmPhotonics15minMonSupported            TruthValue,
+    pmPhotonics15minAdminState              EnabledDisabledEnum,
+    pmPhotonics15minMonStartDateTime        DisplayString,
+    pmPhotonics15minTcaAdminState           EnabledDisabledEnum,
+    pmPhotonics15minTHValue                 DisplayString,
+    pmPhotonics15minTcaProfileId            Integer32,
+    pmPhotonics15minBaseLineValue           DisplayString,
+    pmPhotonics15minTcaActive               PmTcaActiveFlag
+}
+
+pmPhotonics15minMonType OBJECT-TYPE
+    SYNTAX PmPhotonicsMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmPhotonicsCurrent15minStatsTable. This is the PM counter Type"
+    ::= { pmPhotonicsCurrent15minStatsEntry 1 }
+
+pmPhotonics15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmPhotonicsCurrent15minStatsEntry 2 }
+
+pmPhotonics15minIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmPhotonicsCurrent15minStatsEntry 3 }
+
+pmPhotonics15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmPhotonicsCurrent15minStatsEntry 4 }
+
+pmPhotonics15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmPhotonicsCurrent15minStatsEntry 5 }
+
+pmPhotonics15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmPhotonicsCurrent15minStatsEntry 6 }
+
+pmPhotonics15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmPhotonicsCurrent15minStatsEntry 7 }
+
+pmPhotonics15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmPhotonicsCurrent15minStatsEntry 8 }
+
+pmPhotonics15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmPhotonicsCurrent15minStatsEntry 9 }
+
+pmPhotonics15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmPhotonicsCurrent15minStatsEntry 10 }
+
+pmPhotonics15minTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmPhotonicsCurrent15minStatsEntry 11 }
+
+pmPhotonics15minTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmPhotonicsCurrent15minStatsEntry 12 }
+
+pmPhotonics15minBaseLineValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "BaseLine value for threshold."
+    ::= { pmPhotonicsCurrent15minStatsEntry 13 }
+
+pmPhotonicsCurrent24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmPhotonicsCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current stats table."
+    ::= { cienaWsPlatformPmMIB 35 }
+
+pmPhotonicsCurrent24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmPhotonicsCurrent24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmPhotonicsCurrent24HrStatsTable."
+    INDEX { ifIndex, pmPhotonics24HrMonType }
+    ::= { pmPhotonicsCurrent24HrStatsTable 1 }
+
+PmPhotonicsCurrent24HrStatsEntry ::= SEQUENCE {
+    pmPhotonics24HrMonType                 PmPhotonicsMonType,
+    pmPhotonics24HrMonTypeDescr            DisplayString,
+    pmPhotonics24HrIfIndexDescr            DisplayString,
+    pmPhotonics24HrMonValue                DisplayString,
+    pmPhotonics24HrMonIDF                  DisplayString,
+    pmPhotonics24HrMonSupported            TruthValue,
+    pmPhotonics24HrAdminState              EnabledDisabledEnum,
+    pmPhotonics24HrMonStartDateTime        DisplayString,
+    pmPhotonics24HrTcaAdminState           EnabledDisabledEnum,
+    pmPhotonics24HrTHValue                 DisplayString,
+    pmPhotonics24HrTcaProfileId            Integer32,
+    pmPhotonics24HrBaseLineValue           DisplayString,
+    pmPhotonics24HrTcaActive               PmTcaActiveFlag
+}
+
+pmPhotonics24HrMonType OBJECT-TYPE
+    SYNTAX PmPhotonicsMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmPhotonicsCurrent24HrStatsTable. This is the PM counter Type"
+    ::= { pmPhotonicsCurrent24HrStatsEntry 1 }
+
+pmPhotonics24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmPhotonicsCurrent24HrStatsEntry 2 }
+
+pmPhotonics24HrIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmPhotonicsCurrent24HrStatsEntry 3 }
+
+pmPhotonics24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 24Hr monitored value."
+    ::= { pmPhotonicsCurrent24HrStatsEntry 4 }
+
+pmPhotonics24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmPhotonicsCurrent24HrStatsEntry 5 }
+
+pmPhotonics24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmPhotonicsCurrent24HrStatsEntry 6 }
+
+pmPhotonics24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmPhotonicsCurrent24HrStatsEntry 7 }
+
+pmPhotonics24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmPhotonicsCurrent24HrStatsEntry 8 }
+
+pmPhotonics24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmPhotonicsCurrent24HrStatsEntry 9 }
+
+pmPhotonics24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmPhotonicsCurrent24HrStatsEntry 10 }
+
+pmPhotonics24HrTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmPhotonicsCurrent24HrStatsEntry 11 }
+
+pmPhotonics24HrTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmPhotonicsCurrent24HrStatsEntry 12 }
+
+pmPhotonics24HrBaseLineValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "BaseLine value for threshold."
+    ::= { pmPhotonicsCurrent24HrStatsEntry 13 }
+
+pmPhotonicsUntimedStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmPhotonicsUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current Untimed stats table."
+    ::= { cienaWsPlatformPmMIB 36 }
+
+pmPhotonicsUntimedStatsEntry OBJECT-TYPE
+    SYNTAX PmPhotonicsUntimedStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmPhotonicsUntimedStatsTable."
+    INDEX { ifIndex, pmPhotonicsUntimedMonType }
+    ::= { pmPhotonicsUntimedStatsTable 1 }
+
+PmPhotonicsUntimedStatsEntry ::= SEQUENCE {
+    pmPhotonicsUntimedMonType                 PmPhotonicsMonType,
+    pmPhotonicsUntimedMonTypeDescr            DisplayString,
+    pmPhotonicsUntimedIfIndexDescr            DisplayString,
+    pmPhotonicsUntimedMonValue                DisplayString,
+    pmPhotonicsUntimedMonIDF                  DisplayString,
+    pmPhotonicsUntimedMonSupported            TruthValue,
+    pmPhotonicsUntimedAdminState              EnabledDisabledEnum,
+    pmPhotonicsUntimedMonStartDateTime        DisplayString,
+    pmPhotonicsUntimedTcaAdminState           EnabledDisabledEnum,
+    pmPhotonicsUntimedTHValue                 DisplayString,
+    pmPhotonicsUntimedTcaProfileId            Integer32,
+    pmPhotonicsUntimedBaseLineValue           DisplayString,
+    pmPhotonicsUntimedTcaActive               PmTcaActiveFlag
+}
+
+pmPhotonicsUntimedMonType OBJECT-TYPE
+    SYNTAX PmPhotonicsMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmPhotonicsUntimedStatsTable. This is the PM counter Type"
+    ::= { pmPhotonicsUntimedStatsEntry 1 }
+
+pmPhotonicsUntimedMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmPhotonicsUntimedStatsEntry 2 }
+
+pmPhotonicsUntimedIfIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmPhotonicsUntimedStatsEntry 3 }
+
+pmPhotonicsUntimedMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena untimed monitored value."
+    ::= { pmPhotonicsUntimedStatsEntry 4 }
+
+pmPhotonicsUntimedMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmPhotonicsUntimedStatsEntry 5 }
+
+pmPhotonicsUntimedMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmPhotonicsUntimedStatsEntry 6 }
+
+pmPhotonicsUntimedAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmPhotonicsUntimedStatsEntry 7 }
+
+pmPhotonicsUntimedMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmPhotonicsUntimedStatsEntry 8 }
+
+pmPhotonicsUntimedTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmPhotonicsUntimedStatsEntry 9 }
+
+pmPhotonicsUntimedTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmPhotonicsUntimedStatsEntry 10 }
+
+pmPhotonicsUntimedTcaAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile admin state."
+    ::= { pmPhotonicsUntimedStatsEntry 11 }
+
+pmPhotonicsUntimedTcaProfileId OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "TCA Profile Id"
+    ::= { pmPhotonicsUntimedStatsEntry 12 }
+
+pmPhotonicsUntimedBaseLineValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "BaseLine value for threshold."
+    ::= { pmPhotonicsUntimedStatsEntry 13 }
+
+
+pmPhotonicsHistory15minStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmPhotonicsHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current PhotonicsHistory15min stats table."
+    ::= { cienaWsPlatformPmMIB 37 }
+
+pmPhotonicsHistory15minStatsEntry OBJECT-TYPE
+    SYNTAX PmPhotonicsHistory15minStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmPhotonicsHistory15minStatsTable."
+    INDEX { ifIndex, pmPhotonicsHistory15minBinIndex, pmPhotonicsHistory15minMonType }
+    ::= { pmPhotonicsHistory15minStatsTable 1 }
+
+PmPhotonicsHistory15minStatsEntry ::= SEQUENCE {
+    pmPhotonicsHistory15minBinIndex                Integer32,
+    pmPhotonicsHistory15minMonType                 PmPhotonicsMonType,
+    pmPhotonicsHistory15minMonTypeDescr            DisplayString,
+    pmPhotonicsHistory15minIndexDescr              DisplayString,
+    pmPhotonicsHistory15minMonValue                DisplayString,
+    pmPhotonicsHistory15minMonIDF                  DisplayString,
+    pmPhotonicsHistory15minMonSupported            TruthValue,
+    pmPhotonicsHistory15minAdminState              EnabledDisabledEnum,
+    pmPhotonicsHistory15minMonStartDateTime        DisplayString,
+    pmPhotonicsHistory15minTHValue                 DisplayString,
+    pmPhotonicsHistory15minTcaActive               PmTcaActiveFlag
+}
+
+pmPhotonicsHistory15minBinIndex OBJECT-TYPE
+    SYNTAX Integer32(1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmPhotonicsHistory15minStatsTable."
+    ::= { pmPhotonicsHistory15minStatsEntry 1 }
+
+pmPhotonicsHistory15minMonType OBJECT-TYPE
+    SYNTAX PmPhotonicsMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Third Index for pmPhotonicsUntimedStatsTable. This is the PM counter Type"
+    ::= { pmPhotonicsHistory15minStatsEntry 2 }
+
+pmPhotonicsHistory15minMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmPhotonicsHistory15minStatsEntry 3 }
+
+pmPhotonicsHistory15minIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmPhotonicsHistory15minStatsEntry 4 }
+
+pmPhotonicsHistory15minMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena History 15 min monitored value."
+    ::= { pmPhotonicsHistory15minStatsEntry 5 }
+
+pmPhotonicsHistory15minMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmPhotonicsHistory15minStatsEntry 6 }
+
+pmPhotonicsHistory15minMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmPhotonicsHistory15minStatsEntry 7 }
+
+pmPhotonicsHistory15minAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmPhotonicsHistory15minStatsEntry 8 }
+
+pmPhotonicsHistory15minMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmPhotonicsHistory15minStatsEntry 9 }
+
+pmPhotonicsHistory15minTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmPhotonicsHistory15minStatsEntry 10 }
+
+pmPhotonicsHistory15minTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmPhotonicsHistory15minStatsEntry 11 }
+
+pmPhotonicsHistory24HrStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PmPhotonicsHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Current PhotonicsHistory24Hr stats table."
+    ::= { cienaWsPlatformPmMIB 38 }
+
+pmPhotonicsHistory24HrStatsEntry OBJECT-TYPE
+    SYNTAX PmPhotonicsHistory24HrStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for pmPhotonicsHistory24HrStatsTable."
+    INDEX { ifIndex, pmPhotonicsHistory24HrMonType }
+    ::= { pmPhotonicsHistory24HrStatsTable 1 }
+
+PmPhotonicsHistory24HrStatsEntry ::= SEQUENCE {
+    pmPhotonicsHistory24HrMonType                 PmPhotonicsMonType,
+    pmPhotonicsHistory24HrMonTypeDescr            DisplayString,
+    pmPhotonicsHistory24HrIndexDescr              DisplayString,
+    pmPhotonicsHistory24HrMonValue                DisplayString,
+    pmPhotonicsHistory24HrMonIDF                  DisplayString,
+    pmPhotonicsHistory24HrMonSupported            TruthValue,
+    pmPhotonicsHistory24HrAdminState              EnabledDisabledEnum,
+    pmPhotonicsHistory24HrMonStartDateTime        DisplayString,
+    pmPhotonicsHistory24HrTHValue                 DisplayString,
+    pmPhotonicsHistory24HrTcaActive               PmTcaActiveFlag
+}
+
+pmPhotonicsHistory24HrMonType OBJECT-TYPE
+    SYNTAX PmPhotonicsMonType
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Second Index for pmPhotonicsUntimedStatsTable. This is the PM counter Type"
+    ::= { pmPhotonicsHistory24HrStatsEntry 1 }
+
+pmPhotonicsHistory24HrMonTypeDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM Monitor Type description."
+    ::= { pmPhotonicsHistory24HrStatsEntry 2 }
+
+pmPhotonicsHistory24HrIndexDescr OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena PM If Index description"
+    ::= { pmPhotonicsHistory24HrStatsEntry 3 }
+
+pmPhotonicsHistory24HrMonValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Ciena 15 min monitored value."
+    ::= { pmPhotonicsHistory24HrStatsEntry 4 }
+
+pmPhotonicsHistory24HrMonIDF OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Invalid flag value for the MonType"
+    ::= { pmPhotonicsHistory24HrStatsEntry 5 }
+
+pmPhotonicsHistory24HrMonSupported OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag indicating if PM Mon Value is supported or not"
+    ::= { pmPhotonicsHistory24HrStatsEntry 6 }
+
+pmPhotonicsHistory24HrAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Profile admin state."
+    ::= { pmPhotonicsHistory24HrStatsEntry 7 }
+
+pmPhotonicsHistory24HrMonStartDateTime OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Start date and time."
+    ::= { pmPhotonicsHistory24HrStatsEntry 8 }
+
+pmPhotonicsHistory24HrTHValue OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Thershold value."
+    ::= { pmPhotonicsHistory24HrStatsEntry 9 }
+
+pmPhotonicsHistory24HrTcaActive OBJECT-TYPE
+    SYNTAX PmTcaActiveFlag
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Flag to show if TCA is supported or TCA is active"
+    ::= { pmPhotonicsHistory24HrStatsEntry 10 }
+
+-- Conformance statements
+pmObjects OBJECT IDENTIFIER
+    ::= { cienaWsPlatformPmMIB 1 }
+
+pmConformance OBJECT IDENTIFIER
+    ::= { cienaWsPlatformPmMIB 2 }
+
+pmGroups OBJECT IDENTIFIER
+    ::= { pmConformance 1 }
+
+pmGroup OBJECT-GROUP
+    OBJECTS { 
+  pmAdminState,
+  pmTcaAdminState,
+  pmTcaNotificationType,
+  pmEthernet15minMonTypeDescr ,
+  pmEthernet15minIfIndexDescr ,
+  pmEthernet15minMonValue ,
+  pmEthernet15minMonIDF ,
+  pmEthernet15minMonSupported ,
+  pmEthernet15minAdminState,
+  pmEthernet15minMonStartDateTime ,
+  pmEthernet15minTcaAdminState,
+  pmEthernet15minTHValue,
+  pmEthernet15minTcaProfileId,
+  pmEthernet15minTcaActive,
+  pmEthernet24HrMonTypeDescr ,
+  pmEthernet24HrIfIndexDescr ,
+  pmEthernet24HrMonValue ,
+  pmEthernet24HrMonIDF ,
+  pmEthernet24HrMonSupported ,
+  pmEthernet24HrAdminState,
+  pmEthernet24HrMonStartDateTime ,
+  pmEthernet24HrTcaAdminState,
+  pmEthernet24HrTHValue,
+  pmEthernet24HrTcaProfileId,
+  pmEthernet24HrTcaActive,
+  pmEthernetUntimedMonTypeDescr ,
+  pmEthernetUntimedIfIndexDescr ,
+  pmEthernetUntimedMonValue ,
+  pmEthernetUntimedMonIDF ,
+  pmEthernetUntimedMonSupported ,
+  pmEthernetUntimedAdminState,
+  pmEthernetUntimedMonStartDateTime ,
+  pmEthernetUntimedTcaAdminState,
+  pmEthernetUntimedTHValue,
+  pmEthernetUntimedTcaProfileId,
+  pmEthernetUntimedTcaActive,
+  pmEthernetHistory15minMonTypeDescr ,
+  pmEthernetHistory15minIfIndexDescr ,
+  pmEthernetHistory15minMonValue ,
+  pmEthernetHistory15minMonIDF ,
+  pmEthernetHistory15minMonSupported ,
+  pmEthernetHistory15minAdminState,
+  pmEthernetHistory15minMonStartDateTime ,
+  pmEthernetHistory15minTHValue,
+  pmEthernetHistory15minTcaActive,
+  pmEthernetHistory24HrMonTypeDescr ,
+  pmEthernetHistory24HrIndexDescr ,
+  pmEthernetHistory24HrMonValue ,
+  pmEthernetHistory24HrMonIDF ,
+  pmEthernetHistory24HrMonSupported ,
+  pmEthernetHistory24HrAdminState,
+  pmEthernetHistory24HrMonStartDateTime ,
+  pmEthernetHistory24HrTHValue,
+  pmEthernetHistory24HrTcaActive,
+  pmModem15minMonTypeDescr ,
+  pmModem15minIfIndexDescr ,
+  pmModem15minMonValue ,
+  pmModem15minMonIDF ,
+  pmModem15minMonSupported ,
+  pmModem15minAdminState,
+  pmModem15minMonStartDateTime ,
+  pmModem15minTcaAdminState,
+  pmModem15minTHValue,
+  pmModem15minTcaProfileId,
+  pmModem15minTcaActive,
+  pmModem24HrMonTypeDescr ,
+  pmModem24HrIfIndexDescr ,
+  pmModem24HrMonValue ,
+  pmModem24HrMonIDF ,
+  pmModem24HrMonSupported ,
+  pmModem24HrAdminState,
+  pmModem24HrMonStartDateTime ,
+  pmModem24HrTcaAdminState,
+  pmModem24HrTHValue,
+  pmModem24HrTcaProfileId,
+  pmModem24HrTcaActive,
+  pmModemUntimedMonTypeDescr ,
+  pmModemUntimedIfIndexDescr ,
+  pmModemUntimedMonValue ,
+  pmModemUntimedMonIDF ,
+  pmModemUntimedMonSupported ,
+  pmModemUntimedAdminState,
+  pmModemUntimedMonStartDateTime ,
+  pmModemUntimedTcaAdminState,
+  pmModemUntimedTHValue,
+  pmModemUntimedTcaProfileId,
+  pmModemUntimedTcaActive,
+  pmModemHistory15minMonTypeDescr ,
+  pmModemHistory15minIfIndexDescr ,
+  pmModemHistory15minMonValue ,
+  pmModemHistory15minMonIDF ,
+  pmModemHistory15minAdminState,
+  pmModemHistory15minMonSupported ,
+  pmModemHistory15minMonStartDateTime ,
+  pmModemHistory15minTHValue,
+  pmModemHistory15minTcaActive,
+  pmModemHistory24HrMonTypeDescr ,
+  pmModemHistory24HrIndexDescr ,
+  pmModemHistory24HrMonValue ,
+  pmModemHistory24HrMonIDF ,
+  pmModemHistory24HrMonSupported ,
+  pmModemHistory24HrAdminState,
+  pmModemHistory24HrMonStartDateTime ,
+  pmModemHistory24HrTHValue,
+  pmModemHistory24HrTcaActive,
+  pmOtu15minMonTypeDescr ,
+  pmOtu15minIfIndexDescr ,
+  pmOtu15minMonValue ,
+  pmOtu15minMonIDF ,
+  pmOtu15minMonSupported ,
+  pmOtu15minAdminState,
+  pmOtu15minMonStartDateTime ,
+  pmOtu15minTcaAdminState,
+  pmOtu15minTHValue,
+  pmOtu15minTcaProfileId,
+  pmOtu15minTcaActive,
+  pmOtu24HrMonTypeDescr ,
+  pmOtu24HrIfIndexDescr ,
+  pmOtu24HrMonValue ,
+  pmOtu24HrMonIDF ,
+  pmOtu24HrMonSupported ,
+  pmOtu24HrAdminState,
+  pmOtu24HrMonStartDateTime ,
+  pmOtu24HrTcaAdminState,
+  pmOtu24HrTHValue,
+  pmOtu24HrTcaProfileId,
+  pmOtu24HrTcaActive,
+  pmOtuUntimedMonTypeDescr ,
+  pmOtuUntimedIfIndexDescr ,
+  pmOtuUntimedMonValue ,
+  pmOtuUntimedMonIDF ,
+  pmOtuUntimedMonSupported ,
+  pmOtuUntimedAdminState,
+  pmOtuUntimedMonStartDateTime ,
+  pmOtuUntimedTcaAdminState,
+  pmOtuUntimedTHValue,
+  pmOtuUntimedTcaProfileId,
+  pmOtuUntimedTcaActive,
+  pmOtuHistory15minMonTypeDescr ,
+  pmOtuHistory15minIndexDescr ,
+  pmOtuHistory15minMonValue ,
+  pmOtuHistory15minMonIDF ,
+  pmOtuHistory15minMonSupported ,
+  pmOtuHistory15minAdminState,
+  pmOtuHistory15minMonStartDateTime ,
+  pmOtuHistory15minTHValue,
+  pmOtuHistory15minTcaActive,
+  pmOtuHistory24HrMonTypeDescr ,
+  pmOtuHistory24HrIndexDescr ,
+  pmOtuHistory24HrMonValue ,
+  pmOtuHistory24HrMonIDF ,
+  pmOtuHistory24HrMonSupported ,
+  pmOtuHistory24HrAdminState,
+  pmOtuHistory24HrMonStartDateTime ,
+  pmOtuHistory24HrTHValue,
+  pmOtuHistory24HrTcaActive,
+  pmOdu15minMonTypeDescr ,
+  pmOdu15minIfIndexDescr ,
+  pmOdu15minMonValue ,
+  pmOdu15minMonIDF ,
+  pmOdu15minMonSupported ,
+  pmOdu15minAdminState,
+  pmOdu15minMonStartDateTime ,
+  pmOdu15minTcaAdminState,
+  pmOdu15minTHValue,
+  pmOdu15minTcaProfileId,
+  pmOdu15minTcaActive,
+  pmOdu24HrMonTypeDescr ,
+  pmOdu24HrIfIndexDescr ,
+  pmOdu24HrMonValue ,
+  pmOdu24HrMonIDF ,
+  pmOdu24HrMonSupported ,
+  pmOdu24HrAdminState,
+  pmOdu24HrMonStartDateTime ,
+  pmOdu24HrTcaAdminState,
+  pmOdu24HrTHValue,
+  pmOdu24HrTcaProfileId,
+  pmOdu24HrTcaActive,
+  pmOduUntimedMonTypeDescr ,
+  pmOduUntimedIfIndexDescr ,
+  pmOduUntimedMonValue ,
+  pmOduUntimedMonIDF ,
+  pmOduUntimedMonSupported ,
+  pmOduUntimedAdminState,
+  pmOduUntimedMonStartDateTime ,
+  pmOduUntimedTcaAdminState,
+  pmOduUntimedTHValue,
+  pmOduUntimedTcaProfileId,
+  pmOduUntimedTcaActive,
+  pmOduHistory15minMonTypeDescr ,
+  pmOduHistory15minIndexDescr ,
+  pmOduHistory15minMonValue ,
+  pmOduHistory15minMonIDF ,
+  pmOduHistory15minMonSupported ,
+  pmOduHistory15minAdminState,
+  pmOduHistory15minMonStartDateTime ,
+  pmOduHistory15minTHValue,
+  pmOduHistory15minTcaActive,
+  pmOduHistory24HrMonTypeDescr ,
+  pmOduHistory24HrIndexDescr ,
+  pmOduHistory24HrMonValue ,
+  pmOduHistory24HrMonIDF ,
+  pmOduHistory24HrMonSupported ,
+  pmOduHistory24HrAdminState,
+  pmOduHistory24HrMonStartDateTime ,
+  pmOduHistory24HrTHValue,
+  pmOduHistory24HrTcaActive,
+  pmOpticalPower15minMonTypeDescr ,
+  pmOpticalPower15minIfIndexDescr ,
+  pmOpticalPower15minMonValue ,
+  pmOpticalPower15minMonIDF ,
+  pmOpticalPower15minMonSupported ,
+  pmOpticalPower15minAdminState,
+  pmOpticalPower15minMonStartDateTime ,
+  pmOpticalPower15minTcaAdminState,
+  pmOpticalPower15minTHValue,
+  pmOpticalPower15minTcaProfileId,
+  pmOpticalPower15minTcaActive,
+  pmOpticalPower15minBaseLineValue,
+  pmOpticalPower24HrMonTypeDescr ,
+  pmOpticalPower24HrIfIndexDescr ,
+  pmOpticalPower24HrMonValue ,
+  pmOpticalPower24HrMonIDF ,
+  pmOpticalPower24HrMonSupported ,
+  pmOpticalPower24HrAdminState,
+  pmOpticalPower24HrMonStartDateTime ,
+  pmOpticalPower24HrTcaAdminState,
+  pmOpticalPower24HrTHValue,
+  pmOpticalPower24HrTcaProfileId,
+  pmOpticalPower24HrTcaActive,
+  pmOpticalPower24HrBaseLineValue,
+  pmOpticalPowerUntimedMonTypeDescr ,
+  pmOpticalPowerUntimedIfIndexDescr ,
+  pmOpticalPowerUntimedMonValue ,
+  pmOpticalPowerUntimedMonIDF ,
+  pmOpticalPowerUntimedMonSupported ,
+  pmOpticalPowerUntimedAdminState,
+  pmOpticalPowerUntimedMonStartDateTime ,
+  pmOpticalPowerUntimedTcaAdminState,
+  pmOpticalPowerUntimedTHValue,
+  pmOpticalPowerUntimedTcaProfileId,
+  pmOpticalPowerUntimedTcaActive,
+  pmOpticalPowerUntimedBaseLineValue,
+  pmOpticalPowerHistory15minMonTypeDescr ,
+  pmOpticalPowerHistory15minIndexDescr ,
+  pmOpticalPowerHistory15minMonValue ,
+  pmOpticalPowerHistory15minMonIDF ,
+  pmOpticalPowerHistory15minMonSupported ,
+  pmOpticalPowerHistory15minAdminState,
+  pmOpticalPowerHistory15minMonStartDateTime ,
+  pmOpticalPowerHistory15minTHValue,
+  pmOpticalPowerHistory15minTcaActive,
+  pmOpticalPowerHistory24HrMonTypeDescr ,
+  pmOpticalPowerHistory24HrIndexDescr ,
+  pmOpticalPowerHistory24HrMonValue ,
+  pmOpticalPowerHistory24HrMonIDF ,
+  pmOpticalPowerHistory24HrMonSupported ,
+  pmOpticalPowerHistory24HrMonStartDateTime,
+  pmOpticalPowerHistory24HrAdminState,
+  pmOpticalPowerHistory24HrTHValue,
+  pmOpticalPowerHistory24HrTcaActive,
+  pmGcm15minMonTypeDescr ,
+  pmGcm15minIfIndexDescr ,
+  pmGcm15minMonValue ,
+  pmGcm15minMonIDF ,
+  pmGcm15minMonSupported ,
+  pmGcm15minAdminState,
+  pmGcm15minMonStartDateTime ,
+  pmGcm15minTcaAdminState,
+  pmGcm15minTHValue,
+  pmGcm15minTcaProfileId,
+  pmGcm15minTcaActive,
+  pmGcm24HrMonTypeDescr ,
+  pmGcm24HrIfIndexDescr ,
+  pmGcm24HrMonValue ,
+  pmGcm24HrMonIDF ,
+  pmGcm24HrMonSupported ,
+  pmGcm24HrAdminState,
+  pmGcm24HrMonStartDateTime ,
+  pmGcm24HrTcaAdminState,
+  pmGcm24HrTHValue,
+  pmGcm24HrTcaProfileId,
+  pmGcm24HrTcaActive,
+  pmGcmUntimedMonTypeDescr ,
+  pmGcmUntimedIfIndexDescr ,
+  pmGcmUntimedMonValue ,
+  pmGcmUntimedMonIDF ,
+  pmGcmUntimedMonSupported ,
+  pmGcmUntimedAdminState,
+  pmGcmUntimedMonStartDateTime ,
+  pmGcmUntimedTcaAdminState,
+  pmGcmUntimedTHValue,
+  pmGcmUntimedTcaProfileId,
+  pmGcmUntimedTcaActive,
+  pmGcmHistory15minMonTypeDescr ,
+  pmGcmHistory15minIndexDescr ,
+  pmGcmHistory15minMonValue ,
+  pmGcmHistory15minMonIDF ,
+  pmGcmHistory15minMonSupported ,
+  pmGcmHistory15minAdminState,
+  pmGcmHistory15minMonStartDateTime ,
+  pmGcmHistory15minTHValue,
+  pmGcmHistory15minTcaActive,
+  pmGcmHistory24HrMonTypeDescr ,
+  pmGcmHistory24HrIndexDescr ,
+  pmGcmHistory24HrMonValue ,
+  pmGcmHistory24HrMonIDF ,
+  pmGcmHistory24HrMonSupported ,
+  pmGcmHistory24HrAdminState ,
+  pmGcmHistory24HrMonStartDateTime ,
+  pmGcmHistory24HrTHValue,
+  pmGcmHistory24HrTcaActive,
+  pmPhotonics15minMonTypeDescr ,
+  pmPhotonics15minIfIndexDescr ,
+  pmPhotonics15minMonValue ,
+  pmPhotonics15minMonIDF ,
+  pmPhotonics15minMonSupported ,
+  pmPhotonics15minAdminState,
+  pmPhotonics15minMonStartDateTime ,
+  pmPhotonics15minTcaAdminState,
+  pmPhotonics15minTHValue,
+  pmPhotonics15minTcaProfileId,
+  pmPhotonics15minTcaActive,
+  pmPhotonics15minBaseLineValue,
+  pmPhotonics24HrMonTypeDescr ,
+  pmPhotonics24HrIfIndexDescr ,
+  pmPhotonics24HrMonValue ,
+  pmPhotonics24HrMonIDF ,
+  pmPhotonics24HrMonSupported ,
+  pmPhotonics24HrAdminState,
+  pmPhotonics24HrMonStartDateTime ,
+  pmPhotonics24HrTcaAdminState,
+  pmPhotonics24HrTHValue,
+  pmPhotonics24HrTcaProfileId,
+  pmPhotonics24HrTcaActive,
+  pmPhotonics24HrBaseLineValue,
+  pmPhotonicsUntimedMonTypeDescr ,
+  pmPhotonicsUntimedIfIndexDescr ,
+  pmPhotonicsUntimedMonValue ,
+  pmPhotonicsUntimedMonIDF ,
+  pmPhotonicsUntimedMonSupported ,
+  pmPhotonicsUntimedAdminState,
+  pmPhotonicsUntimedMonStartDateTime ,
+  pmPhotonicsUntimedTcaAdminState,
+  pmPhotonicsUntimedTHValue,
+  pmPhotonicsUntimedTcaProfileId,
+  pmPhotonicsUntimedTcaActive,
+  pmPhotonicsUntimedBaseLineValue,
+  pmPhotonicsHistory15minMonTypeDescr ,
+  pmPhotonicsHistory15minIndexDescr ,
+  pmPhotonicsHistory15minMonValue ,
+  pmPhotonicsHistory15minMonIDF ,
+  pmPhotonicsHistory15minMonSupported ,
+  pmPhotonicsHistory15minAdminState,
+  pmPhotonicsHistory15minMonStartDateTime ,
+  pmPhotonicsHistory15minTHValue,
+  pmPhotonicsHistory15minTcaActive,
+  pmPhotonicsHistory24HrMonTypeDescr ,
+  pmPhotonicsHistory24HrIndexDescr ,
+  pmPhotonicsHistory24HrMonValue ,
+  pmPhotonicsHistory24HrMonIDF ,
+  pmPhotonicsHistory24HrMonSupported ,
+  pmPhotonicsHistory24HrMonStartDateTime,
+  pmPhotonicsHistory24HrAdminState,
+  pmPhotonicsHistory24HrTHValue,
+  pmPhotonicsHistory24HrTcaActive
+}
+
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { pmGroups 1 }
+
+pmCompliances OBJECT IDENTIFIER
+    ::= { pmConformance 2 }
+
+pmCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { pmGroup }
+    ::= { pmCompliances 1 }
+
+END

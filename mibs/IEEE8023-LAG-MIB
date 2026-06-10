@@ -1,0 +1,3643 @@
+IEEE8023-LAG-MIB DEFINITIONS ::= BEGIN
+
+-- -------------------------------------------------------------
+-- IEEE 802.1AX MIB
+-- -------------------------------------------------------------
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Counter64, Integer32,
+            TimeTicks, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    InterfaceIndex
+        FROM IF-MIB
+    PortList
+        FROM Q-BRIDGE-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ;
+
+
+lagMIB MODULE-IDENTITY
+    LAST-UPDATED "201610120000Z"
+    ORGANIZATION "IEEE 802.1 Working Group"
+    CONTACT-INFO
+        "  WG-URL: http://www.ieee802.org/1/index.html
+         WG-EMail: stds-802-1@ieee.org
+
+          Contact: IEEE 802.1 Working Group Chair
+           Postal: C/O IEEE 802.1 Working Group
+                   IEEE Standards Association
+                   445 Hoes Lane
+                   Piscataway
+                   NJ 08854
+                   USA
+           E-mail: STDS-802-1-L@LISTSERV.IEEE.ORG"
+    DESCRIPTION
+        "The Link Aggregation module for managing IEEE 802.1AX-2014 as
+        updated by 802.1AX-2014-Cor1."
+    REVISION "201610120000Z"
+    DESCRIPTION
+        "The Link Aggregation module for managing IEEE 802.1AX-REV."
+    REVISION "201412180000Z"
+    DESCRIPTION
+        "The Link Aggregation module for managing IEEE 802.1AX."
+    REVISION "201201160000Z"
+    DESCRIPTION
+        "Updated for IEEE 802.1AXbk"
+    REVISION "200706290000Z"
+    DESCRIPTION
+        "References updated 04 Jun 2007 for IEEE 802.1AX"
+    REVISION "200006270000Z"
+    DESCRIPTION
+        "Original publication IEEE 802.3ad"
+    ::= { iso(1) member-body(2) us(840) ieee802dot3(10006) snmpmibs(300) 43 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+
+LacpKey ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "The Actor or Partner Key value."
+    SYNTAX      Integer32 (0..65535)
+
+LacpState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The Actor and Partner State values from the LACPDU."
+    REFERENCE
+        "7.3.2.1.20"
+    SYNTAX      BITS {
+                    lacpActivity(0),
+                    lacpTimeout(1),
+                    aggregation(2),
+                    synchronization(3),
+                    collecting(4),
+                    distributing(5),
+                    defaulted(6),
+                    expired(7)
+                }
+ 
+DrcpState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Administrative values of DRCP state."
+    SYNTAX      BITS {
+                    homeGateway(0),
+                    neighborGateway(1),
+                    otherGateway(2),
+                    ippActivity(3),
+                    timeout(4), 
+                    gatewaySync(5),
+                    portSync(6),
+                    expired(7)
+                }
+
+ChurnState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The state of the Churn Detection machine."
+    SYNTAX      INTEGER {
+                    noChurn(1),
+                    churn(2),
+                    churnMonitor(3) -- deprecated
+}
+
+AggState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "The state of the object entry."
+    SYNTAX     INTEGER {
+                    up(1),
+                    down(2)
+                }
+
+DrniConvAdminGatewayList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x,"
+    STATUS     current
+    DESCRIPTION
+        "The three elements of the octet string represent the
+        three portal system numbers in order of priority with
+        highest priority first."
+    SYNTAX     OCTET STRING (SIZE (3))
+	
+PortalLinkList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4d,"
+    STATUS     current
+    DESCRIPTION
+        "Each four octets of the octet string represent an
+        ifIndex for an Intra-Port Link. The first ifIndex is
+        to Portal System 1, the second ifIndex is to Portal
+        System 2 and the third ifIndex is to portal System 3.
+        The ifIndex of the current portal system is set to zero."
+    SYNTAX     OCTET STRING (SIZE (12))
+ 
+ServiceIdList ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4d,"
+    STATUS     current
+    DESCRIPTION
+        "A list which contains, in general, a set of Service IDs
+        (8.2.2). If the Service IDs are representing VIDs, only a
+        single VID is applicable, while in the case that Service IDs
+        are representing I-SIDs, more than one I-SIDs are possible.
+        Each four octets represent a Service ID which may either be
+        I-SID or VID. An empty set is represented as an octet string
+        of size zero."
+    SYNTAX     OCTET STRING
+
+-- -------------------------------------------------------------
+-- subtrees in the LAG MIB
+-- -------------------------------------------------------------
+
+lagMIBNotifications OBJECT IDENTIFIER   ::= { lagMIB 0 }
+lagMIBObjects OBJECT IDENTIFIER         ::= { lagMIB 1 }
+dot3adAggConformance OBJECT IDENTIFIER  ::= { lagMIB 2 }
+
+dot3adAgg OBJECT IDENTIFIER             ::= { lagMIBObjects 1 }
+dot3adAggPort OBJECT IDENTIFIER         ::= { lagMIBObjects 2 }
+dot3adDrni OBJECT IDENTIFIER            ::= { lagMIBObjects 4 }
+dot3adIPP OBJECT IDENTIFIER             ::= { lagMIBObjects 5 }
+
+-- -------------------------------------------------------------
+-- The Tables Last Changed Object
+-- -------------------------------------------------------------
+
+dot3adTablesLastChanged OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the time of the
+        most recent change to the dot3adAggTable,
+        dot3adAggPortTable, dot3adDrniTable and
+        dot3adIPPAttributeTable."
+
+::= { lagMIBObjects 3 }
+
+-- -------------------------------------------------------------
+-- The Aggregator Configuration Table
+-- -------------------------------------------------------------
+
+dot3adAggTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information about every
+        Aggregator that is associated with this System."
+    REFERENCE
+        "7.3.1"
+    ::= { dot3adAgg 1 }
+
+dot3adAggEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the Aggregator parameters. This is indexed
+        by the ifIndex of the Aggregator."
+    INDEX { dot3adAggIndex }
+    ::= { dot3adAggTable 1 }
+
+Dot3adAggEntry ::=
+    SEQUENCE {
+        dot3adAggIndex
+            InterfaceIndex,
+        dot3adAggMACAddress
+            MacAddress,
+        dot3adAggActorSystemPriority
+            Integer32,
+        dot3adAggActorSystemID
+            MacAddress,
+        dot3adAggAggregateOrIndividual
+            TruthValue,
+        dot3adAggActorAdminKey
+            LacpKey,
+        dot3adAggActorOperKey
+            LacpKey,
+        dot3adAggPartnerSystemID
+            MacAddress,
+        dot3adAggPartnerSystemPriority
+            Integer32,
+        dot3adAggPartnerOperKey
+            LacpKey,
+        dot3adAggCollectorMaxDelay
+            Integer32
+    }
+
+dot3adAggIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The unique identifier allocated to this Aggregator by the
+        local System. This attribute identifies an Aggregator instance
+        among the subordinate managed objects of the containing object.
+        This value is read-only. NOTE-The aAggID is represented in the
+        SMIv2 MIB as an ifIndex-see D.4.1."
+    REFERENCE
+        "7.3.1.1.1"
+    ::= { dot3adAggEntry 1 }
+
+
+dot3adAggMACAddress OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A 6-octet read-only value carrying the individual
+        MAC address assigned to the Aggregator."
+    REFERENCE
+        "7.3.1.1.9"
+    ::= { dot3adAggEntry 2 }
+
+
+dot3adAggActorSystemPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-write value indicating the priority value
+        associated with the Actor's System ID."
+    REFERENCE
+        "7.3.1.1.5"
+    ::= { dot3adAggEntry 3 }
+
+
+dot3adAggActorSystemID OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 6-octet read-write MAC address value used as a unique
+        identifier for the System that contains this Aggregator.
+        NOTE-From the perspective of the Link Aggregation
+        mechanisms described in Clause 6, only a single
+        combination of Actor's System ID and System Priority are
+        considered, and no distinction is made between the
+        values of these parameters for an Aggregator and the
+        port(s) that are associated with it; i.e., the protocol
+        is described in terms of the operation of aggregation
+        within a single System. However, the managed objects
+        provided for the Aggregator and the port both allow
+        management of these parameters. The result of this is to
+        permit a single piece of equipment to be configured by
+        management to contain more than one System from the
+        point of view of the operation of Link Aggregation. This
+        may be of particular use in the configuration of
+        equipment that has limited aggregation capability (see 6.7)."
+    REFERENCE
+        "7.3.1.1.4"
+    ::= { dot3adAggEntry 4 }
+
+
+dot3adAggAggregateOrIndividual OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A read-only Boolean value indicating whether the
+        Aggregator represents an Aggregate ('TRUE') or
+        an Individual link ('FALSE')."
+    REFERENCE
+        "7.3.1.1.6"
+    ::= { dot3adAggEntry 5 }
+
+
+dot3adAggActorAdminKey OBJECT-TYPE
+    SYNTAX       LacpKey
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The current administrative value of the Key for the
+        Aggregator. The administrative Key value may differ from the
+        operational Key value for the reasons discussed in 6.7.2. This
+        is a 16-bit read-write value. The meaning of particular Key
+        values is of local significance. For an Aggregator that is
+        associated with a Portal, the aAggActorAdminKey has to be
+        different for each Portal System. Specifically the two most
+        significant bits are set to aDrniPortalSystemNumber
+        (7.4.1.1.7). The lower 14 bits may be any value, have 
+        to be the same in each Portal System within the same Portal,
+		and have a default of zero."
+    REFERENCE
+        "7.3.1.1.7"
+    ::= { dot3adAggEntry 6 }
+
+
+dot3adAggActorOperKey OBJECT-TYPE
+    SYNTAX       LacpKey
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current operational value of the Key for the Aggregator.
+        The administrative Key value may differ from the operational
+        Key value for the reasons discussed in 6.7.2. This is a 16-bit
+        read-only value. The meaning of particular Key values is of
+        local significance."
+    REFERENCE
+        "7.3.1.1.8"
+    ::= { dot3adAggEntry 7 }
+
+
+dot3adAggPartnerSystemID OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A 6-octet read-only MAC address value consisting of the
+        unique identifier for the current protocol Partner of this
+        Aggregator. A value of zero indicates that there is no known
+        Partner. If the aggregation is manually configured, this 
+        System ID value will be a value assigned by the local System."
+    REFERENCE
+        "7.3.1.1.10"
+    ::= { dot3adAggEntry 8 }
+
+
+dot3adAggPartnerSystemPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-only value that indicates the priority
+        value associated with the Partner's System ID. If the
+        aggregation is manually configured, this System Priority value
+        will be a value assigned by the local System."
+    REFERENCE
+        "7.3.1.1.11"
+    ::= { dot3adAggEntry 9 }
+
+
+dot3adAggPartnerOperKey OBJECT-TYPE
+    SYNTAX       LacpKey
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current operational value of the Key for the
+        Aggregator's current protocol Partner. This is a 16-bit
+        read-only value. If the aggregation is manually configured,
+        this Key value will be a value assigned by the local System."
+    REFERENCE
+        "7.3.1.1.12"
+    ::= { dot3adAggEntry 10 }
+
+
+dot3adAggCollectorMaxDelay OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value of this 16-bit read-write attribute defines
+        the maximum delay, in tens of microseconds, that
+        may be imposed by the Frame Collector between
+        receiving a frame from an Aggregator Parser, and
+        either delivering the frame to its Aggregator Client
+        or discarding the frame (see 6.2.3.1.1)."
+    REFERENCE
+        "7.3.1.1.32"
+    ::= { dot3adAggEntry 11 }
+
+-- -------------------------------------------------------------
+-- The Aggregation Port List Table
+-- -------------------------------------------------------------
+
+
+
+dot3adAggPortListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggPortListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains a list of all the ports
+        associated with each Aggregator."
+    REFERENCE
+        "7.3.1.1.30"
+    ::= { dot3adAgg 2 }
+
+dot3adAggPortListEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggPortListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the ports associated with a given Aggregator.
+        This is indexed by the ifIndex of the Aggregator."
+    INDEX { dot3adAggIndex }
+    ::= { dot3adAggPortListTable 1 }
+
+Dot3adAggPortListEntry ::=
+    SEQUENCE {
+        dot3adAggPortListPorts
+            PortList
+    }
+
+dot3adAggPortListPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports currently associated with
+        this Aggregator.  Each bit set in this list represents
+        an Actor Port member of this Link Aggregation."
+    REFERENCE
+        "7.3.1.1.30"
+    ::= { dot3adAggPortListEntry 1 }
+
+-- -------------------------------------------------------------
+-- The Aggregation Extension Table
+-- -------------------------------------------------------------
+
+dot3adAggXTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that extends dot3adAggTable."
+    REFERENCE
+        "7.3.1.1"
+    ::= { dot3adAgg 3 }
+
+dot3adAggXEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of extension parameters for the Aggregator
+        Configuration Table"
+    AUGMENTS { dot3adAggEntry }
+    ::= { dot3adAggXTable 1 }
+
+Dot3adAggXEntry ::=
+    SEQUENCE {
+        dot3adAggDescription
+            DisplayString,
+        dot3adAggName
+            DisplayString,
+        dot3adAggAdminState
+            AggState,
+        dot3adAggOperState
+            AggState,
+        dot3adAggTimeOfLastOperChange
+            Integer32,
+        dot3adAggDataRate
+            Integer32,
+        dot3adAggOctetsTxOK
+            Counter64,
+        dot3adAggOctetsRxOK
+            Counter64,
+        dot3adAggFramesTxOK
+            Counter64,
+        dot3adAggFramesRxOK
+            Counter64,
+        dot3adAggMulticastFramesTxOK
+            Counter64,
+        dot3adAggMulticastFramesRxOK
+            Counter64,
+        dot3adAggBroadcastFramesTxOK
+            Counter64,
+        dot3adAggBroadcastFramesRxOK
+            Counter64,
+        dot3adAggFramesDiscardedOnTx
+            Counter64,
+        dot3adAggFramesDiscardedOnRx
+            Counter64,
+        dot3adAggFramesWithTxErrors
+            Counter64,
+        dot3adAggFramesWithRxErrors
+            Counter64,
+        dot3adAggUnknownProtocolFrames
+            Counter64,
+        dot3adAggLinkUpDownNotificationEnable
+            Integer32,
+        dot3adAggPortAlgorithm
+            OCTET STRING,
+        dot3adAggPartnerAdminPortAlgorithm
+            OCTET STRING,
+        dot3adAggPartnerAdminPortConversationListDigest
+            OCTET STRING,
+        dot3adAggAdminDiscardWrongConversation
+            TruthValue,
+        dot3adAggPartnerAdminConvServiceMappingDigest
+            OCTET STRING,
+	dot3adAggAdminDiscardWrongConversation2
+	    INTEGER
+    }
+
+dot3adAggDescription OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A human-readable text string containing information about
+        the Aggregator. This string could include information about
+        the distribution algorithm in use on this Aggregator; for
+        example, 'Aggregator 1, Dist Alg=Dest MAC address.' This
+        string is read-only. The contents are vendor specific."
+    REFERENCE
+        "7.3.1.1.2"
+    ::= { dot3adAggXEntry 1 }
+
+dot3adAggName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A human-readable text string containing a locally significant
+        name for the Aggregator. This string is read-write."
+    REFERENCE
+        "7.3.1.1.3"
+    ::= { dot3adAggXEntry 2 }
+
+dot3adAggAdminState OBJECT-TYPE
+    SYNTAX       AggState
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This read-write value defines the administrative state of
+        the Aggregator. A value of 'up' indicates that the operational
+        state of the Aggregator (aAggOperState) is permitted to be
+        either up or down. A value of 'down' forces the operational
+        state of the Aggregator to be down. Changes to the
+        administrative state affect the operational state of the
+        Aggregator only, not the operational state of the Aggregation
+        Ports that are attached to the Aggregator. A GET operation
+        returns the current administrative state. A SET operation
+        changes the administrative state to a new value."
+    REFERENCE
+        "7.3.1.1.13"
+    ::= { dot3adAggXEntry 3 }
+
+dot3adAggOperState OBJECT-TYPE
+    SYNTAX       AggState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This read-only value defines the operational state of the
+        Aggregator. An operational state of 'up' indicates that the
+        Aggregator is available for use by the Aggregator Client;
+        a value of 'down' indicates that the Aggregator is not
+        available for use by the Aggregator Client."
+    REFERENCE
+        "7.3.1.1.14"
+    ::= { dot3adAggXEntry 4 }
+
+dot3adAggTimeOfLastOperChange OBJECT-TYPE
+    SYNTAX       Integer32 
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The time at which the interface entered its current
+        operational state, in terms of centiseconds since the
+        system was last reset. If the current state was entered
+        prior to the last reinitialization of the local network
+        management subsystem, then this object contains a value of
+        zero. The ifLastChange object in the Interfaces MIB defined
+        in IETF RFC 2863 is a suitable object for supplying a value
+        for aAggTimeOfLastOperChange. This value is read-only.
+		Note - aAggTimeOfLastOperChange was defined in terms of
+        the aTimeSinceSystemReset variable of IEEE Std 802.3-2008,
+        F.2.1, in earlier versions of this standard.
+        aTimeSinceSystemReset and ifLastChange have the same meaning."
+    REFERENCE
+        "7.3.1.1.15"
+    ::= { dot3adAggXEntry 5 }
+
+dot3adAggDataRate OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current data rate, in bits per second, of the aggregate
+        link. The value is calculated as the sum of the data rate of
+        each link in the aggregation. This attribute is read-only."
+    REFERENCE
+        "7.3.1.1.16"
+    ::= { dot3adAggXEntry 6 }
+   
+dot3adAggOctetsTxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "octets"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the data and padding octets transmitted by this
+        Aggregator on all Aggregation Ports that are (or have been)
+        members of the aggregation. The count does not include octets
+        transmitted by the Aggregator in frames that carry LACPDUs or
+        Marker PDUs (7.3.3.1.7, 7.3.3.1.8, 7.3.3.1.9). However, it
+        includes frames discarded by the Frame Distribution function of
+        the Aggregator (7.3.1.1.25). This value is read-only."
+    REFERENCE
+        "7.3.1.1.17"
+    ::= { dot3adAggXEntry 7 }
+
+dot3adAggOctetsRxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "octets"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the data and padding octets received by this
+        Aggregator, from the Aggregation Ports that are (or have been)
+        members of the aggregation. The count does not include octets
+        received in frames that carry LACP or Marker PDUs (7.3.3.1.2,
+        7.3.3.1.3, 7.3.3.1.4), or frames discarded by the Frame
+        Collection function of the Aggregator (7.3.1.1.26). This value
+        is read-only."
+    REFERENCE
+        "7.3.1.1.18"
+    ::= { dot3adAggXEntry 8 }
+
+dot3adAggFramesTxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the data frames transmitted by this Aggregator on
+        all Aggregation Ports that are (or have been) members of the
+        aggregation. The count does not include frames transmitted by
+        the Aggregator that carry LACP or Marker PDUs (7.3.3.1.7,
+        7.3.3.1.8, 7.3.3.1.9). However, it includes frames discarded
+        by the Frame Distribution function of the Aggregator
+        (7.3.1.1.25). This value is read-only."
+    REFERENCE
+        "7.3.1.1.19"
+    ::= { dot3adAggXEntry 9 }
+
+dot3adAggFramesRxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the data frames received by this Aggregator, from
+        the Aggregation Ports that are (or have been) members of the
+        aggregation. The count does not include frames that carry LACP
+        or Marker PDUs (7.3.3.1.2, 7.3.3.1.3, 7.3.3.1.4), or frames
+        discarded by the Frame Collection function of the Aggregator
+        (7.3.1.1.26). This value is read-only."
+    REFERENCE
+        "7.3.1.1.20"
+    ::= { dot3adAggXEntry 10 }
+        
+dot3adAggMulticastFramesTxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the data frames transmitted by this Aggregator on
+        all Aggregation Ports that are (or have been) members of the
+        aggregation, to a group DA other than the broadcast address.
+        The count does not include frames transmitted by the
+        Aggregator that carry LACP or Marker PDUs (7.3.3.1.7,
+        7.3.3.1.8, 7.3.3.1.9). However, it includes frames discarded
+        by the Frame Distribution function of the Aggregator
+        (7.3.1.1.25). This value is read-only."
+    REFERENCE
+        "7.3.1.1.21"
+    ::= { dot3adAggXEntry 11 }
+
+dot3adAggMulticastFramesRxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the data frames received by this Aggregator, from
+        the Aggregation Ports that are (or have been) members of the
+        aggregation, that were addressed to an active group address
+        other than the broadcast address. The count does not include
+        frames that carry LACP or Marker PDUs (7.3.3.1.2, 7.3.3.1.3,
+        7.3.3.1.4), or frames discarded by the Frame Collection
+        function of the Aggregator (7.3.1.1.26). This value is
+        read-only."
+    REFERENCE
+        "7.3.1.1.22"
+    ::= { dot3adAggXEntry 12 }
+
+dot3adAggBroadcastFramesTxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the broadcast data frames transmitted by this
+        Aggregator on all Aggregation Ports that are (or have been)
+        members of the aggregation. The count does not include frames
+        transmitted by the Aggregator that carry LACP or Marker PDUs
+        (7.3.3.1.7, 7.3.3.1.8, 7.3.3.1.9). However, it includes frames
+        discarded by the Frame Distribution function of the Aggregator
+        (7.3.1.1.25). This value is read-only."
+    REFERENCE
+        "7.3.1.1.23"
+    ::= { dot3adAggXEntry 13 }
+
+dot3adAggBroadcastFramesRxOK OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of the broadcast data frames received by this
+        Aggregator, from the Aggregation Ports that are (or have been)
+        members of the aggregation. The count does not include frames
+        that carry LACP or Marker PDUs (7.3.3.1.2, 7.3.3.1.3,
+        7.3.3.1.4), illegal or unknown protocol frames (7.3.3.1.5,
+        7.3.3.1.6), or frames discarded by the Frame Collection
+        function of the Aggregator (7.3.1.1.26). This value is
+        read-only."
+    REFERENCE
+        "7.3.1.1.24"
+    ::= { dot3adAggXEntry 14 }
+
+dot3adAggFramesDiscardedOnTx OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of data frames requested to be transmitted by this
+        Aggregator that were discarded by the Frame Distribution
+        function of the Aggregator when conversations are reallocated
+        to different Aggregation Ports, due to the requirement to
+        ensure that the conversations are flushed on the old
+        Aggregation Ports in order to maintain proper frame ordering
+        (B.3), or discarded as a result of excessive collisions by
+        Aggregation Ports that are (or have been) members of the
+        aggregation. This value is read-only."
+    REFERENCE
+        "7.3.1.1.25"
+    ::= { dot3adAggXEntry 15 }
+
+dot3adAggFramesDiscardedOnRx OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of data frames, received on all Aggregation Ports
+        that are (or have been) members of the aggregation, that
+        were discarded by the Frame Collection function of the
+        Aggregator as they were received on Aggregation Ports whose
+        Frame Collection function was disabled. This value is
+        read-only."
+    REFERENCE
+        "7.3.1.1.26"
+    ::= { dot3adAggXEntry 16 }
+
+dot3adAggFramesWithTxErrors OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of data frames requested to be transmitted by this
+        Aggregator that experienced transmission errors on Aggregation
+        Ports that are (or have been) members of the aggregation. This
+        count does not include frames discarded due to excess
+        collisions. This value is read-only."
+    REFERENCE
+        "7.3.1.1.27"
+    ::= { dot3adAggXEntry 17 }
+
+dot3adAggFramesWithRxErrors OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of data frames discarded on reception by all
+        Aggregation Ports that are (or have been) members of the
+        aggregation, or that were discarded by the Frame Collection
+        function of the Aggregator, or that were discarded by the
+        Aggregator due to the detection of an illegal Slow Protocols
+        PDU (7.3.3.1.6). This value is read-only."
+    REFERENCE
+        "7.3.1.1.28"
+    ::= { dot3adAggXEntry 18 }
+
+dot3adAggUnknownProtocolFrames OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A count of data frames discarded on reception by all
+        Aggregation Ports that are (or have been) members of the
+        aggregation, due to the detection of an unknown Slow Protocols
+        PDU (7.3.3.1.5). This value is read-only."
+    REFERENCE
+        "7.3.1.1.29"
+    ::= { dot3adAggXEntry 19 }
+        
+dot3adAggLinkUpDownNotificationEnable OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    enabled(1),
+                    disabled(2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "When set to 'enabled', Link Up and Link Down notifications are
+        enabled for this Aggregator. When set to 'disabled', Link Up
+        and Link Down notifications are disabled for this Aggregator.
+        This value is read-write."
+    REFERENCE
+        "7.3.1.1.31"
+    ::= { dot3adAggXEntry 20 }
+
+dot3adAggPortAlgorithm OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the algorithm used by the Aggregator to
+        assign frames to a Port Conversation ID. Table 6-4 provides the
+        IEEE 802.1 OUI (00-80-C2) Port Algorithm encodings. A SEQUENCE
+		OF OCTETS consisting of a 3-octet OUI or CID and one
+        following octet."
+    REFERENCE
+        "7.3.1.1.33"
+    ::= { dot3adAggXEntry 21 }
+
+dot3adAggPartnerAdminPortAlgorithm OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the value for the algorithm of the
+        Partner System, assigned by administrator or System policy
+        for use when the Partner's information is unknown. Table 6-4
+        provides the IEEE 802.1 OUI (00-80-C2) Port Algorithm
+        encodings. Its default value is set to the 'Unspecified' value 
+	in Table 6-4. A SEQUENCE OF OCTETS consisting of a 3-octet OUI 
+	or CID and one following octet."
+    REFERENCE
+        "7.3.1.1.34"
+    DEFVAL  { '0080C200'H }
+    ::= { dot3adAggXEntry 22 }
+
+dot3adAggPartnerAdminPortConversationListDigest OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (16))
+    MAX-ACCESS	 read-write
+    STATUS       current
+    DESCRIPTION
+        "The value for the digest of the prioritized Port Conversation
+        ID-to-Link Number ID assignments of the Partner System, assigned
+        by administrator or System policy for use when the Partner's
+        information is unknown. Its default value is set to NULL."
+    REFERENCE
+        "7.3.1.1.36"
+    DEFVAL  { ''H }
+    ::= { dot3adAggXEntry 23 }
+
+dot3adAggAdminDiscardWrongConversation OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       deprecated
+    DESCRIPTION
+        "The administrative value that determines what the Aggregator
+		does with a frame that is received from an Aggregation Port
+		with a Port Conversation ID that is not included in the
+        Collection_Conversation_Mask. The value 'TRUE' indicates that
+		such frames are to be discarded, and the value 'FALSE' that
+		they are to be forwarded. This variable needs to be set to
+		'TRUE', if bidirectional congruity (8.2.1) is required. Its
+		value is set to 'TRUE' by default.
+	This object has been replaced by 
+		dot3adAggAdminDiscardWrongConversation2."
+    REFERENCE
+        "7.3.1.1.37"
+    ::= { dot3adAggXEntry 24 }        
+
+dot3adAggPartnerAdminConvServiceMappingDigest OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (16))
+    MAX-ACCESS	 read-write
+    STATUS       current
+    DESCRIPTION
+        "The value for the digest of the Port Conversation ID-to-Service
+        ID assignments of the Partner System, assigned by administrator
+        or System policy for use when the Partner's information is unknown.
+        Its default value is set to NULL."
+    REFERENCE
+        "7.3.1.1.39"
+    DEFVAL  { ''H }
+    ::= { dot3adAggXEntry 25 }
+	
+dot3adAggAdminDiscardWrongConversation2 OBJECT-TYPE
+    SYNTAX       INTEGER {
+			forceTrue(1),
+			forceFalse(2),
+			auto(3)
+		 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The administrative value that determines whether an Aggregator
+		discards a frame that is received from an Aggregation Port
+		with a Port Conversation ID that is not included in the
+        	Collection_Conversation_Mask. The value 'forceTrue' 
+		indicates that such frames are to be discarded, the value 
+		'forceFalse' indicates that such frames are to be forwarded,
+		and the value 'auto' indicates that such frames are to be 
+		forwarded only whe the actor and partner agree on the 
+		algorithms and mapping tables used to map frames to 
+		Aggregation Ports. Its value is set to 'auto' by default."
+    REFERENCE
+        "7.3.1.1.37"
+    DEFVAL  { auto }
+    ::= { dot3adAggXEntry 26 }        
+
+-- -------------------------------------------------------------
+-- The Aggregation Conversation Admin Link Table
+-- -------------------------------------------------------------
+
+dot3adAggConversationAdminLinkTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF Dot3adAggConversationAdminLinkEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "There are 4096 aAggConversationAdminPort[] variables,
+        aAggConversationAdminLink[0] through
+        aAggConversationAdminLink[4095], indexed by Port Conversation
+        ID. Each contains administrative values of the link selection
+        priority list for the referenced Port Conversation ID. This
+        selection priority list is a sequence of Link-Number IDs for
+        each Port Conversation ID, in the order of preference, highest
+        to lowest, for the corresponding link to carry that Port
+        Conversation ID. A 16-bit zero value is used to indicate
+        that no link is assigned to carry the associated Port
+        Conversation ID. NOTE - This mapping of Port Conversation
+        IDs to Link Number IDs is the fundamental administrative input.
+        An equivalent mapping of Port Conversation IDs to Port 
+        IDs [Conversation_PortList[]] is derived from this and 
+        used internally. NOTE - When a network administrator 
+        issues a command for selection rules, provided by
+        aAggConversationAdminLink[], the ChangeActorOperDist is set as 
+        specified in 6.6.2.2."
+    REFERENCE
+        "7.3.1.1.35"
+    ::= { dot3adAgg 4 }
+
+dot3adAggConversationAdminLinkEntry OBJECT-TYPE
+    SYNTAX       Dot3adAggConversationAdminLinkEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry contains administrative values of the link selection
+        priority list for the referenced Port Conversation ID. This
+        selection priority list is a sequence of Link-Number IDs for
+        each Port Conversation ID, in the order of preference, highest
+        to lowest, for the corresponding link to carry that Port
+        Conversation ID. A 16 bit zero value is used to indicate
+        that no link is assigned to carry the associated Port
+        Conversation ID."
+    REFERENCE
+        "7.3.1.1.35"
+    INDEX { dot3adAggConversationAdminLinkId, dot3adAggIndex}
+    ::= { dot3adAggConversationAdminLinkTable 1 }
+
+
+Dot3adAggConversationAdminLinkEntry ::=
+    SEQUENCE {
+        dot3adAggConversationAdminLinkId
+            Integer32,
+        dot3adAggConversationAdminLinkList
+            OCTET STRING
+    }
+
+dot3adAggConversationAdminLinkId OBJECT-TYPE
+    SYNTAX      Integer32 (0..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An identifier for Port Conversation."
+    ::= { dot3adAggConversationAdminLinkEntry 1 }
+
+
+dot3adAggConversationAdminLinkList OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Each two octets of the octet string represent the agreed
+        Link Number ID that is assigned to an Aggregation Port
+        (7.3.2.1.27). The list is in the order of preference,
+        highest to lowest, for corresponding preferred link to
+        carry that Port Conversation ID."
+    REFERENCE
+        "7.3.1.1.35"
+    ::= { dot3adAggConversationAdminLinkEntry 2 }
+
+-- -------------------------------------------------------------
+-- The Aggregation Admin Service Conversation Map Table
+-- -------------------------------------------------------------
+        
+dot3adAggAdminServiceConversationMapTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF Dot3adAggAdminServiceConversationMapEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "There are 4096 aAggAdminServiceConversationMap[] variables,
+        aAggAdminServiceConversationMap[0] through
+        aAggAdminServiceConversationMap[4095], indexed by Port
+        Conversation ID. Each contains, in general, a set of Service
+        IDs (8.2.2), unique within the array. If the Service IDs are
+        representing VIDs, only a single VID is used, while in the case
+        that Service IDs are representing I-SIDs, more than one I-SIDs
+        are possible. Service IDs not contained in the map are not
+        mapped to any Port Conversation ID and will be discarded."
+    REFERENCE
+        "7.3.1.1.38"
+    ::= { dot3adAgg 5 }
+
+dot3adAggAdminServiceConversationMapEntry OBJECT-TYPE
+    SYNTAX Dot3adAggAdminServiceConversationMapEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "An entry contains, in general, a set of Service IDs (8.2.2),
+        unique within the array. If the Service IDs are representing
+        VIDs, only a single VID is applicable, while in the case that
+        Service IDs are representing I-SIDs, more than one I-SIDs are
+        possible."
+    REFERENCE
+        "7.3.1.1.38"
+    INDEX { dot3adAggAdminServiceConversationMapId, dot3adAggIndex }
+    ::= { dot3adAggAdminServiceConversationMapTable 1 }
+
+
+
+Dot3adAggAdminServiceConversationMapEntry ::=
+    SEQUENCE {
+        dot3adAggAdminServiceConversationMapId
+            Integer32,
+        dot3adAggAdminServiceConversationServiceIDList
+            ServiceIdList
+    }
+
+dot3adAggAdminServiceConversationMapId OBJECT-TYPE
+    SYNTAX      Integer32 (0..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port Conversation ID used to index Conversation Map
+        entries."
+    ::= { dot3adAggAdminServiceConversationMapEntry 1}
+
+dot3adAggAdminServiceConversationServiceIDList OBJECT-TYPE
+    SYNTAX      ServiceIdList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A list contains, in general, a set of Service IDs (8.2.2),
+        unique within the array."
+    ::= { dot3adAggAdminServiceConversationMapEntry 2}
+
+
+-- -------------------------------------------------------------
+-- The Aggregation Port Table
+-- -------------------------------------------------------------
+
+dot3adAggPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains Link Aggregation Control
+        configuration information about every
+        Aggregation Port associated with this device.
+        A row appears in this table for each physical port."
+    REFERENCE
+        "7.3.2"
+    ::= { dot3adAggPort 1 }
+
+
+dot3adAggPortEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Link Aggregation Control configuration
+        parameters for each Aggregation Port on this device."
+    INDEX      { dot3adAggPortIndex }
+    ::= { dot3adAggPortTable 1 }
+
+
+Dot3adAggPortEntry ::=
+    SEQUENCE {
+        dot3adAggPortIndex
+            InterfaceIndex,
+        dot3adAggPortActorSystemPriority
+            Integer32,
+        dot3adAggPortActorSystemID
+            MacAddress,
+        dot3adAggPortActorAdminKey
+            LacpKey,
+        dot3adAggPortActorOperKey
+            LacpKey,
+        dot3adAggPortPartnerAdminSystemPriority
+            Integer32,
+        dot3adAggPortPartnerOperSystemPriority
+            Integer32,
+        dot3adAggPortPartnerAdminSystemID
+            MacAddress,
+        dot3adAggPortPartnerOperSystemID
+            MacAddress,
+        dot3adAggPortPartnerAdminKey
+            LacpKey,
+        dot3adAggPortPartnerOperKey
+            LacpKey,
+        dot3adAggPortSelectedAggID
+            InterfaceIndex,
+        dot3adAggPortAttachedAggID
+            InterfaceIndex,
+        dot3adAggPortActorPort
+            Integer32,
+        dot3adAggPortActorPortPriority
+            Integer32,
+        dot3adAggPortPartnerAdminPort
+            Integer32,
+        dot3adAggPortPartnerOperPort
+            Integer32,
+        dot3adAggPortPartnerAdminPortPriority
+            Integer32,
+        dot3adAggPortPartnerOperPortPriority
+            Integer32,
+        dot3adAggPortActorAdminState
+            LacpState,
+        dot3adAggPortActorOperState
+            LacpState,
+        dot3adAggPortPartnerAdminState
+            LacpState,
+        dot3adAggPortPartnerOperState
+            LacpState,
+        dot3adAggPortAggregateOrIndividual
+            TruthValue
+    }
+
+
+dot3adAggPortIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The unique identifier allocated to this Aggregation Port by
+        the local System. This attribute identifies an Aggregation
+        Port instance among the subordinate managed objects of the
+        containing object. This value is read-only. NOTE-The aAggPortID
+        is represented in the SMIv2 MIB as an ifIndex-see D.4.1."
+    REFERENCE
+        "7.3.2.1.1"
+    ::= { dot3adAggPortEntry 1 }
+
+
+dot3adAggPortActorSystemPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-write value used to define the priority
+        value associated with the Actor's System ID."
+    REFERENCE
+        "7.3.2.1.2"
+    ::= { dot3adAggPortEntry 2 }
+
+
+dot3adAggPortActorSystemID OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A 6-octet read-only MAC address value that defines the
+        value of the System ID for the System that contains this 
+        Aggregation Port."
+    REFERENCE
+        "7.3.2.1.3"
+    ::= { dot3adAggPortEntry 3 }
+
+
+dot3adAggPortActorAdminKey OBJECT-TYPE
+    SYNTAX       LacpKey
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The current administrative value of the Key for the
+        Aggregation Port. This is a 16-bit read-write value.
+        The meaning of particular Key values is of local significance."
+    REFERENCE
+        "7.3.2.1.4"
+    ::= { dot3adAggPortEntry 4 }
+
+
+
+dot3adAggPortActorOperKey OBJECT-TYPE
+    SYNTAX       LacpKey
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current operational value of the Key for the
+        Aggregation Port. This is a 16-bit read-only value.
+        The meaning of particular Key values is of local significance."
+    REFERENCE
+        "7.3.2.1.5"
+    ::= { dot3adAggPortEntry 5 }
+
+
+
+dot3adAggPortPartnerAdminSystemPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-write value used to define the administrative
+        value of priority associated with the Partner's System ID. The
+        assigned value is used, along with the value of
+        aAggPortPartnerAdminSystemID, aAggPortPartnerAdminKey,
+        aAggPortPartnerAdminPort, and aAggPortPartnerAdminPortPriority,
+        in order to achieve manually configured aggregation."
+    REFERENCE
+        "7.3.2.1.6"
+    ::= { dot3adAggPortEntry 6 }
+
+
+
+dot3adAggPortPartnerOperSystemPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-only value indicating the operational value
+        of priority associated with the Partner's System ID. The
+        value of this attribute may contain the manually configured
+        value carried in aAggPortPartnerAdminSystemPriority if there
+        is no protocol Partner."
+    REFERENCE
+        "7.3.2.1.7"
+    ::= { dot3adAggPortEntry 7 }
+
+
+
+dot3adAggPortPartnerAdminSystemID OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 6-octet read-write MACAddress value representing
+        the administrative value of the Aggregation Port's protocol
+        Partner's System ID. The assigned value is used, along with
+        the value of aAggPortPartnerAdminSystemPriority,
+        aAggPortPartnerAdminKey, aAggPortPartnerAdminPort,
+        and aAggPortPartnerAdminPortPriority, in order to
+        achieve manually configured aggregation."
+    REFERENCE
+        "7.3.2.1.8"
+    ::= { dot3adAggPortEntry 8 }
+
+
+dot3adAggPortPartnerOperSystemID OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A 6-octet read-only MACAddress value representing
+        the current value of the Aggregation Port's protocol Partner's
+        System ID. A value of zero indicates that there is no known
+        protocol Partner. The value of this attribute may contain the
+        manually configured value carried in
+        aAggPortPartnerAdminSystemID if there is no protocol Partner."
+    REFERENCE
+        "7.3.2.1.9"
+    ::= { dot3adAggPortEntry 9 }
+
+
+dot3adAggPortPartnerAdminKey OBJECT-TYPE
+    SYNTAX       LacpKey
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The current administrative value of the Key for the
+        protocol Partner. This is a 16-bit read-write value.
+        The assigned value is used, along with the value of
+        aAggPortPartnerAdminSystemPriority,
+        aAggPortPartnerAdminSystemID, aAggPortPartnerAdminPort,
+        and aAggPortPartnerAdminPortPriority, in order to achieve
+        manually configured aggregation."
+    REFERENCE
+        "7.3.2.1.10"
+    ::= { dot3adAggPortEntry 10 }
+
+
+dot3adAggPortPartnerOperKey OBJECT-TYPE
+    SYNTAX       LacpKey
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The current operational value of the Key for the
+        protocol Partner. The value of this attribute may contain
+        the manually configured value carried in
+        aAggPortPartnerAdminKey if there is no protocol Partner.
+        This is a 16-bit read-only value."
+    REFERENCE
+        "7.3.2.1.11"
+    ::= { dot3adAggPortEntry 11 }
+
+
+dot3adAggPortSelectedAggID OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The identifier value of the Aggregator that this Aggregation
+        Port has currently selected. Zero indicates that the
+        Aggregation Port has not selected an Aggregator, either because
+        it is in the process of detaching from an Aggregator or because
+        there is no suitable Aggregator available for it to select.
+        This value is read-only."
+    REFERENCE
+        "7.3.2.1.12"
+    ::= { dot3adAggPortEntry 12 }
+
+
+dot3adAggPortAttachedAggID OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The identifier value of the Aggregator that this Aggregation
+        Port is currently attached to. Zero indicates that the
+        Aggregation Port is not currently attached to an Aggregator.
+        This value is read-only."
+    REFERENCE
+        "7.3.2.1.13"
+    ::= { dot3adAggPortEntry 13 }
+
+
+dot3adAggPortActorPort OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The port number locally assigned to the Aggregation Port.
+        The port number is communicated in LACPDUs as the
+        Actor_Port. This value is read-only."
+    REFERENCE
+        "7.3.2.1.14"
+    ::= { dot3adAggPortEntry 14 }
+
+
+dot3adAggPortActorPortPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The priority value assigned to this Aggregation Port.
+        This 16-bit value is read-write. NOTE-In the case of DRNI
+        (Clause 9), the two least significant bits of the priority
+        for each Aggregation Port in a Distributed Relay's Aggregator
+        Port will be ignored because these bits are used to encode
+        the Portal System Number [item e) in 9.3.3]."
+    REFERENCE
+        "7.3.2.1.15"
+    ::= { dot3adAggPortEntry 15 }
+
+
+dot3adAggPortPartnerAdminPort OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The current administrative value of the port number
+        for the protocol Partner. This is a 16-bit read-write value.
+        The assigned value is used, along with the value of
+        aAggPortPartnerAdminSystemPriority,
+        aAggPortPartnerAdminSystemID, aAggPortPartnerAdminKey,
+        and aAggPortPartnerAdminPortPriority,
+        in order to achieve manually configured aggregation."
+    REFERENCE
+        "7.3.2.1.16"
+    ::= { dot3adAggPortEntry 16 }
+
+
+dot3adAggPortPartnerOperPort OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The operational port number assigned to this Aggregation
+        Port by the Aggregation Port's protocol Partner. The value
+        of this attribute may contain the manually configured value
+        carried in aAggPortPartnerAdminPort if there is no protocol
+        Partner. This 16-bit value is read-only."
+    REFERENCE
+        "7.3.2.1.17"
+    ::= { dot3adAggPortEntry 17 }
+
+
+dot3adAggPortPartnerAdminPortPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The current administrative value of the port priority
+        for the protocol Partner. This is a 16-bit read-write value.
+        The assigned value is used, along with the value of
+        aAggPortPartnerAdminSystemPriority,
+        aAggPortPartnerAdminSystemID, aAggPortPartnerAdminKey, and
+        aAggPortPartnerAdminPort, in order to achieve manually
+        configured aggregation."
+    REFERENCE
+        "7.3.2.1.18"
+    ::= { dot3adAggPortEntry 18 }
+
+
+dot3adAggPortPartnerOperPortPriority OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The priority value assigned to this Aggregation Port
+        by the Partner. The value of this attribute may contain the
+        manually configured value carried in
+        aAggPortPartnerAdminPortPriority if there is no
+        protocol Partner. This 16-bit value is read-only."
+    REFERENCE
+        "7.3.2.1.19"
+    ::= { dot3adAggPortEntry 19 }
+
+
+dot3adAggPortActorAdminState OBJECT-TYPE
+    SYNTAX       LacpState
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A string of 8 bits, corresponding to the administrative
+        values of Actor_State (5.4.2) as transmitted by the Actor
+        in LACPDUs. The first bit corresponds to bit 0 of Actor_State
+        (LACP_Activity), the second bit corresponds to bit 1
+        (LACP_Timeout), the third bit corresponds to bit 2
+        (Aggregation), the fourth bit corresponds to bit 3
+        (Synchronization), the fifth bit corresponds to bit 4
+        (Collecting), the sixth bit corresponds to bit 5
+        (Distributing), the seventh bit corresponds to bit 6
+        (Defaulted), and the eighth bit corresponds to bit 7
+        (Expired). These values allow administrative control over
+        the values of LACP_Activity, LACP_Timeout and Aggregation.
+        This attribute value is read-write."
+    REFERENCE
+        "7.3.2.1.20"
+    ::= { dot3adAggPortEntry 20 }
+
+
+dot3adAggPortActorOperState OBJECT-TYPE
+    SYNTAX       LacpState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A string of 8 bits, corresponding to the current
+        operational values of Actor_State as transmitted by the
+        Actor in LACPDUs. The bit allocations are as defined in
+        7.3.2.1.20. This attribute value is read-only."
+    REFERENCE
+        "7.3.2.1.21"
+    ::= { dot3adAggPortEntry 21 }
+
+
+dot3adAggPortPartnerAdminState OBJECT-TYPE
+    SYNTAX       LacpState
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A string of 8 bits, corresponding to the current
+        administrative value of Actor_State for the protocol Partner.
+        The bit allocations are as defined in 7.3.2.1.20. This
+        attribute value is read-write. The assigned value is used in
+        order to achieve manually configured aggregation."
+    REFERENCE
+        "7.3.2.1.22"
+    ::= { dot3adAggPortEntry 22 }
+
+
+dot3adAggPortPartnerOperState OBJECT-TYPE
+    SYNTAX       LacpState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A string of 8 bits, corresponding to the current values of
+        Actor_State in the most recently received LACPDU transmitted
+        by the protocol Partner. The bit allocations are as defined in
+        7.3.2.1.20. In the absence of an active protocol Partner, this
+        value may reflect the manually configured value
+        aAggPortPartnerAdminState. This attribute value is read-only."
+    REFERENCE
+        "7.3.2.1.23"
+    ::= { dot3adAggPortEntry 23 }
+
+
+dot3adAggPortAggregateOrIndividual OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A read-only Boolean value indicating whether the
+        Aggregation Port is able to Aggregate ('TRUE') or is
+        only able to operate as an Individual link ('FALSE')."
+    REFERENCE
+        "7.3.2.1.24"
+    ::= { dot3adAggPortEntry 24 }
+
+
+-- -------------------------------------------------------------
+-- LACP Statistics Table
+-- -------------------------------------------------------------
+
+
+dot3adAggPortStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains Link Aggregation information
+        about every port that is associated with this device.
+        A row appears in this table for each physical port."
+    REFERENCE
+        "7.3.3"
+    ::= { dot3adAggPort 2 }
+
+
+dot3adAggPortStatsEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of Link Aggregation Control Protocol statistics
+        for each port on this device."
+    INDEX { dot3adAggPortIndex }
+    ::= { dot3adAggPortStatsTable 1 }
+
+
+Dot3adAggPortStatsEntry ::=
+    SEQUENCE {
+        dot3adAggPortStatsLACPDUsRx
+            Counter32,
+        dot3adAggPortStatsMarkerPDUsRx
+            Counter32,
+        dot3adAggPortStatsMarkerResponsePDUsRx
+            Counter32,
+        dot3adAggPortStatsUnknownRx
+            Counter32,
+        dot3adAggPortStatsIllegalRx
+            Counter32,
+        dot3adAggPortStatsLACPDUsTx
+            Counter32,
+        dot3adAggPortStatsMarkerPDUsTx
+            Counter32,
+        dot3adAggPortStatsMarkerResponsePDUsTx
+            Counter32
+    }
+
+
+dot3adAggPortStatsLACPDUsRx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of valid LACPDUs received on this
+        Aggregation Port. This value is read-only."
+    REFERENCE
+        "7.3.3.1.2"
+    ::= { dot3adAggPortStatsEntry 1 }
+
+
+dot3adAggPortStatsMarkerPDUsRx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of valid Marker PDUs received on this
+        Aggregation Port. This value is read-only."
+    REFERENCE
+        "7.3.3.1.3"
+    ::= { dot3adAggPortStatsEntry 2 }
+
+
+dot3adAggPortStatsMarkerResponsePDUsRx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of valid Marker Response PDUs received on this
+        Aggregation Port. This value is read-only."
+    REFERENCE
+        "7.3.3.1.4"
+    ::= { dot3adAggPortStatsEntry 3 }
+
+
+dot3adAggPortStatsUnknownRx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of frames received that either:
+        - carry the Slow Protocols Ethernet Type value
+          (IEEE Std 802.3-2008, Annex 57A.4), but
+          contain an unknown PDU, or:
+        - are addressed to the Slow Protocols group MAC
+          Address (IEEE Std 802.3-2008, Annex 57A.3),
+          but do not carry the Slow Protocols Ethernet
+          Type.
+        This value is read-only."
+    REFERENCE
+        "7.3.3.1.5"
+    ::= { dot3adAggPortStatsEntry 4 }
+
+
+dot3adAggPortStatsIllegalRx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of frames received that carry the Slow
+        Protocols Ethernet Type value (IEEE Std 802.3-2008,
+        Annex 57A.4), but contain a badly formed PDU or an
+        illegal value of Protocol Subtype (IEEE Std
+        802.3-2008, Annex 57A.3). This value is read-only."
+    REFERENCE
+        "7.3.3.1.6"
+    ::= { dot3adAggPortStatsEntry 5 }
+
+
+dot3adAggPortStatsLACPDUsTx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of LACPDUs transmitted on this
+        Aggregation Port. This value is read-only."
+    REFERENCE
+        "7.3.3.1.7"
+    ::= { dot3adAggPortStatsEntry 6 }
+
+
+dot3adAggPortStatsMarkerPDUsTx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of Marker PDUs transmitted on this
+        Aggregation Port. This value is read-only."
+    REFERENCE
+        "7.3.3.1.8"
+    ::= { dot3adAggPortStatsEntry 7 }
+
+
+dot3adAggPortStatsMarkerResponsePDUsTx OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of Marker Response PDUs transmitted
+        on this Aggregation Port. This value is read-only."
+    REFERENCE
+        "7.3.3.1.9"
+    ::= { dot3adAggPortStatsEntry 8 }
+
+
+-- -------------------------------------------------------------
+-- LACP Debug Table
+-- -------------------------------------------------------------
+dot3adAggPortDebugTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggPortDebugEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains Link Aggregation debug
+        information about every port that is associated with
+        this device.  A row appears in this table for each
+        physical port."
+    REFERENCE
+        "7.3.4"
+    ::= { dot3adAggPort 3 }
+
+
+dot3adAggPortDebugEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggPortDebugEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the debug parameters for a port."
+    INDEX { dot3adAggPortIndex }
+    ::= { dot3adAggPortDebugTable 1 }
+
+
+Dot3adAggPortDebugEntry ::=
+    SEQUENCE {
+        dot3adAggPortDebugRxState
+            Integer32,
+        dot3adAggPortDebugLastRxTime
+            TimeTicks,
+        dot3adAggPortDebugMuxState
+            Integer32,
+        dot3adAggPortDebugMuxReason
+            DisplayString,
+        dot3adAggPortDebugActorChurnState
+            ChurnState,
+        dot3adAggPortDebugPartnerChurnState
+            ChurnState,
+        dot3adAggPortDebugActorChurnCount
+            Counter32,
+        dot3adAggPortDebugPartnerChurnCount
+            Counter32,
+        dot3adAggPortDebugActorSyncTransitionCount
+            Counter32,
+        dot3adAggPortDebugPartnerSyncTransitionCount
+            Counter32,
+        dot3adAggPortDebugActorChangeCount
+            Counter32,
+        dot3adAggPortDebugPartnerChangeCount
+            Counter32
+    }
+
+
+dot3adAggPortDebugRxState OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    currentRx(1),
+                    expired(2),
+                    defaulted(3),
+                    initialize(4),
+                    lacpDisabled(5),
+                    portDisabled(6)
+                }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This attribute holds the value 'currentRx' if the Receive
+        state machine for the Aggregation Port is in the 
+        CURRENT state, 'expired' if the Receive state machine
+        is in the EXPIRED state, 'defaulted' if the Receive state
+        machine is in the DEFAULTED state, 'initialize' if the
+        Receive state machine is in the INITIALIZE state,
+        'lacpDisabled' if the Receive state machine is in the
+        LACP_DISABLED state, or 'portDisabled' if the Receive
+        state machine is in the PORT_DISABLED state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.2"
+    ::= { dot3adAggPortDebugEntry 1 }
+
+
+dot3adAggPortDebugLastRxTime OBJECT-TYPE
+    SYNTAX       TimeTicks
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The time at which the last LACPDU was received by this
+        Aggregation Port, in terms of centiseconds since the system
+        was last reset. The ifLastChange object in the Interfaces MIB
+        defined in IETF RFC 2863 is a suitable object for supplying a
+        value for aAggPortDebugLastRxTime. This value is read-only.
+        NOTE - aAggPortDebugLastRxTime was defined in terms of the
+        aTimeSinceSystemReset variable of IEEE Std 802.3-2008,
+        Annex F, F.2.1, in earlier versions of this standard.
+        aTimeSinceSystemReset and ifLastChange have the same meaning."
+    REFERENCE
+        "7.3.4.1.3"
+    ::= { dot3adAggPortDebugEntry 2 }
+
+
+dot3adAggPortDebugMuxState OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    detached(1),
+                    waiting(2),
+                    attached(3),
+                    collecting(4),
+                    distributing(5),
+                    collectingDistributing(6)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This attribute holds the value 'detached' if the Mux
+        state machine (5.4.14) for the Aggregation Port is
+        in the DETACHED state, 'waiting' if the Mux state machine
+        is in the WAITING state, 'attached' if the Mux state
+        machine for the Aggregation Port is in the ATTACHED
+        state, 'collecting' if the Mux state machine for the
+        Aggregation Port is in the COLLECTING state, 'distributing'
+        if the Mux state machine for the Aggregation Port is
+        in the DISTRIBUTING state, and 'collectingDistributing'
+        if the Mux state machine for the Aggregation Port is in
+        the COLLECTING_DISTRIBUTING state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.4"
+    ::= { dot3adAggPortDebugEntry 3 }
+
+
+dot3adAggPortDebugMuxReason OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A human-readable text string indicating the reason
+        for the most recent change of Mux machine state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.5"
+    ::= { dot3adAggPortDebugEntry 4 }
+
+
+dot3adAggPortDebugActorChurnState OBJECT-TYPE
+    SYNTAX       ChurnState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The state of the Actor Churn Detection machine
+        (6.4.17) for the Aggregation Port. A value of 'noChurn'
+        indicates that the state machine is in either the
+        NO_ACTOR_CHURN or the ACTOR_CHURN_MONITOR
+        state, and 'churn' indicates that the state machine is in the
+        ACTOR_CHURN state. This value is read-only."
+    REFERENCE
+        "7.3.4.1.6"
+    ::= { dot3adAggPortDebugEntry 5 }
+
+
+dot3adAggPortDebugPartnerChurnState OBJECT-TYPE
+    SYNTAX       ChurnState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The state of the Partner Churn Detection machine
+        (6.4.17) for the Aggregation Port. A value of 'noChurn'
+        indicates that the state machine is in either the
+        NO_PARTNER_CHURN or the PARTNER_CHURN_MONITOR
+        state, and 'churn' indicates that the state machine is
+        in the PARTNER_CHURN state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.7"
+    ::= { dot3adAggPortDebugEntry 6 }
+
+
+dot3adAggPortDebugActorChurnCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Count of the number of times the Actor Churn state
+        machine has entered the ACTOR_CHURN state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.8"
+    ::= { dot3adAggPortDebugEntry 7 }
+
+
+dot3adAggPortDebugPartnerChurnCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Count of the number of times the Partner Churn
+        state machine has entered the PARTNER_CHURN state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.9"
+    ::= { dot3adAggPortDebugEntry 8 }
+
+
+dot3adAggPortDebugActorSyncTransitionCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Count of the number of times the Actor's Mux state
+        machine (6.4.15) has entered the IN_SYNC state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.10"
+    ::= { dot3adAggPortDebugEntry 9 }
+
+
+dot3adAggPortDebugPartnerSyncTransitionCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Count of the number of times the Partner's Mux
+        state machine (6.4.15) has entered the IN_SYNC state.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.11"
+    ::= { dot3adAggPortDebugEntry 10 }
+
+
+dot3adAggPortDebugActorChangeCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Count of the number of times the Actor's perception of
+        the LAG ID for this Aggregation Port has changed.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.12"
+    ::= { dot3adAggPortDebugEntry 11 }
+
+
+dot3adAggPortDebugPartnerChangeCount OBJECT-TYPE
+    SYNTAX       Counter32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Count of the number of times the Partner's perception of
+        the LAG ID (see 6.3.6.1) for this Aggregation Port has changed.
+        This value is read-only."
+    REFERENCE
+        "7.3.4.1.13"
+    ::= { dot3adAggPortDebugEntry 12 }
+
+
+
+-- -------------------------------------------------------------
+-- Extension of the Aggregation Port Table
+-- -------------------------------------------------------------
+dot3adAggPortXTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggPortXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that extends dot3adAggPortTable."
+    REFERENCE
+        "7.3.2.2"
+    ::= { dot3adAggPort 4 }
+
+
+dot3adAggPortXEntry OBJECT-TYPE
+    SYNTAX          Dot3adAggPortXEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of extension parameters for Aggregation Port."
+    AUGMENTS { dot3adAggPortEntry }
+    ::= { dot3adAggPortXTable 1 }
+
+
+Dot3adAggPortXEntry ::=
+    SEQUENCE {
+        dot3adAggPortProtocolDA
+            MacAddress
+    }
+
+dot3adAggPortProtocolDA OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A 6-octet read-write MACAddress value specifying the
+        DA to be used when sending Link  Aggregation Control
+        and Marker PDUs on this Aggregation Port, corresponding
+        to the value of Protocol_DA in 6.2.8.1.2, 6.2.10.1.3 and
+        6.5.4.2.1. The default value shall be the IEEE 802.3
+        Slow_Protocols_Multicast address."
+    REFERENCE
+        "7.3.2.2.1"
+    DEFVAL { '0180C2000002'H }
+    ::= { dot3adAggPortXEntry 1 }
+
+-- -------------------------------------------------------------
+-- Second extension of the Aggregation Port Table
+-- -------------------------------------------------------------
+dot3adAggPortSecondXTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggPortSecondXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that extends dot3adAggPortTable."
+    REFERENCE
+        "7.3.2"
+    ::= { dot3adAggPort 5 }
+
+
+dot3adAggPortSecondXEntry OBJECT-TYPE
+    SYNTAX          Dot3adAggPortSecondXEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of extension parameters for Aggregation Port."
+    AUGMENTS { dot3adAggPortEntry }
+    ::= { dot3adAggPortSecondXTable 1 }
+
+Dot3adAggPortSecondXEntry ::=
+    SEQUENCE {
+        dot3adAggPortOperConversationPasses
+            OCTET STRING,
+        dot3adAggPortOperConversationCollected
+            OCTET STRING,
+        dot3adAggPortLinkNumberId
+            Integer32,
+        dot3adAggPortPartnerAdminLinkNumberId
+	    Integer32,
+        dot3adAggPortWTRTime
+            Integer32,
+	dot3adAggPortEnableLongPDUXmit
+	    TruthValue
+    }
+
+dot3adAggPortOperConversationPasses OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (512))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A read-only current operational vector of Boolean
+        values, with one value for each possible Port
+        Conversation ID. A 1 indicates that the Port
+        Conversation ID is distributed through this Aggregation
+        Port, and a 0 indicates that it cannot.
+        aAggPortOperConversationPasses is referencing the
+        current value of Port_Oper_Conversation_Mask (6.6.2.2)."
+    REFERENCE
+        "7.3.2.1.25"
+    ::= { dot3adAggPortSecondXEntry 1 }
+
+dot3adAggPortOperConversationCollected OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (512))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A read-only current operational vector of Boolean values,
+        with one value for each possible Port Conversation ID. A 1
+        indicates that the Port Conversation ID is collected through
+        this Aggregation Port, and a 0 indicates that it cannot.
+        aAggPortOperConversationPasses is referencing the current
+        value of Collection_Conversation_Mask (6.6.1.1.2)."
+    REFERENCE
+        "7.3.2.1.26"
+    ::= { dot3adAggPortSecondXEntry 2 }
+
+dot3adAggPortLinkNumberId OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The Link Number ID value configured for this Aggregation
+        Port by the System's administrator. When the Link Number
+        ID value matches one of the non zero values in the selection
+        prioritized lists in aAggConversationAdminLink[] (7.3.1.1.35),
+        then this Aggregation Port must be configured to have an
+        aAggPortActorAdminKey value that matches the aAggActorAdminKey
+        of the Aggregator used by the LAG of the links specified
+        in aAggConversationAdminLink[]. Its default value is set to
+		aAggPortActorPort (7.3.2.1.14). NOTE - In the case of DRNI,
+        the match of the aAggActorAdminKey to aAggPortActorAdminKey
+        values excludes the first two bits identifying the individual
+        Portal System in the Portal. If the network administrator fails
+        to configure the proper values for the aAggPortActorAdminKey
+        variables in all of the Aggregators Ports attached to a Portal,
+        the DRCP (9.4) and the variable Port_Oper_Conversation_Mask
+        (6.6.2.2) prevent looping and/or duplicate delivery, if
+        necessary, by discarding frames belonging to misconfigured
+        Conversations."
+    REFERENCE
+        "7.3.2.1.27"
+    ::= { dot3adAggPortSecondXEntry 3 }
+
+dot3adAggPortPartnerAdminLinkNumberId OBJECT-TYPE
+    SYNTAX       Integer32 (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       deprecated
+    DESCRIPTION
+        "The value for the Link Number ID of the Partner System for
+        this Aggregation Port, assigned by administrator or System
+        policy for use when the Partner's information is unknown. Its
+        default value is set to 0."
+    REFERENCE
+        "7.3.2.1.28"
+    DEFVAL  { 0 }
+    ::= { dot3adAggPortSecondXEntry 4 }
+
+dot3adAggPortWTRTime OBJECT-TYPE
+    SYNTAX       Integer32 (0 | 5..12 | 100)
+    MAX-ACCESS   read-write 
+    STATUS       current
+    DESCRIPTION
+        "The wait-to-restore (WTR) period accompanying selection
+		rules set by aAggConversationAdminLink[] in a command issued
+		by a network administrator. It may be configured in steps of
+		1 min between 5 min and 12 min, while two additional special
+		values are also used. The value 0 indicates revertive and is
+		the default value. The value 100 indicates non-revertive mode
+		of operation, and the WTR_timer will be kept to the value 100."
+    REFERENCE
+        "7.3.2.1.29"
+    DEFVAL  { 0 }
+    ::= { dot3adAggPortSecondXEntry 5 }	
+
+dot3adAggPortEnableLongPDUXmit OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write 
+    STATUS       current
+    DESCRIPTION
+        "A read-write Boolean value indicating whether the Aggregation Port
+		is able to transmit LACPDUs longer than 110 octets ('TRUE')
+		or is only able to transmit fixed size 110 octet LACPDUs 
+		('FALSE'). Its default value is 'TRUE'."
+    REFERENCE
+        "7.3.2.1.30"
+    DEFVAL  { true }
+    ::= { dot3adAggPortSecondXEntry 6 }	
+
+-- -------------------------------------------------------------
+-- Extension of the LACP Debug Table
+-- -------------------------------------------------------------
+dot3adAggPortDebugXTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adAggPortDebugXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that extends dot3adAggPortDebugTable."
+    REFERENCE
+        "7.3.4"
+    ::= { dot3adAggPort 6 }
+
+
+dot3adAggPortDebugXEntry OBJECT-TYPE
+    SYNTAX      Dot3adAggPortDebugXEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of extension parameters for the LACP Port Debug table."
+    AUGMENTS { dot3adAggPortDebugEntry }
+    ::= { dot3adAggPortDebugXTable 1 }
+
+
+Dot3adAggPortDebugXEntry ::=
+    SEQUENCE {
+        dot3adAggPortDebugActorCDSChurnState
+            ChurnState,
+        dot3adAggPortDebugPartnerCDSChurnState
+            ChurnState,
+        dot3adAggPortDebugActorCDSChurnCount
+            Counter64,
+        dot3adAggPortDebugPartnerCDSChurnCount
+            Counter64
+    }
+
+dot3adAggPortDebugActorCDSChurnState OBJECT-TYPE
+    SYNTAX       ChurnState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This managed object is applicable only when
+        Conversation-sensitive frame collection and distribution
+        as specified in 6.6 is supported. The state of the Actor
+        CDS Churn Detection machine (6.6.2.7) for the Aggregation
+        Port. A value of 'noChurn' indicates that the state machine
+        is in either the NO_ACTOR_CDS_CHURN or the
+        ACTOR_CHURN_CDS_MONITOR state, and 'churn' indicates that
+        the state machine is in the ACTOR_CDS_CHURN state. This value
+        is read-only."
+    REFERENCE
+        "7.3.4.1.14"
+    ::= { dot3adAggPortDebugXEntry 1 }
+
+dot3adAggPortDebugPartnerCDSChurnState OBJECT-TYPE
+    SYNTAX       ChurnState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This managed object is applicable only when
+        Conversation-sensitive frame collection and distribution
+        as specified in 6.6 is supported. The state of the Partner
+        CDS Churn Detection machine (6.6.2.7) for the Aggregation
+        Port. A value of 'noChurn' indicates that the state machine
+        is in either the NO_PARTNER_CDS_CHURN or the
+        PARTNER_CDS_CHURN_MONITOR state, and 'churn' indicates that
+        the state machine is in the PARTNER_CDSCHURN state. This value
+        is read-only."
+    REFERENCE
+        "7.3.4.1.15"
+    ::= { dot3adAggPortDebugXEntry 2 }
+
+dot3adAggPortDebugActorCDSChurnCount OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "times entered ACTOR_CDS_CHURN"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This managed object is applicable only when
+        Conversation-sensitive frame collection and distribution
+        as specified in 6.6 is supported. Count of the number of
+        times the Actor CDS Churn state machine has entered the
+        ACTOR_CDS_CHURN state. This value is read-only."
+    REFERENCE
+        "7.3.4.1.16"
+    ::= { dot3adAggPortDebugXEntry 3 }
+
+dot3adAggPortDebugPartnerCDSChurnCount OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "times entered PARTNER_CDS_CHURN"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This managed object is applicable only when
+        Conversation-sensitive frame collection and distribution
+        as specified in 6.6 is supported. Count of the number of
+        times the Partner CDS Churn state machine has entered the
+        PARTNER_CDS_CHURN state. This value is read-only."
+    REFERENCE
+        "7.3.4.1.7"
+    ::= { dot3adAggPortDebugXEntry 4 }
+
+
+-- -------------------------------------------------------------
+-- The DRNI Configuration Table
+-- -------------------------------------------------------------
+
+dot3adDrniTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adDrniEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information about every
+        DRNI that is associated with this System."
+    REFERENCE
+        "7.4.1"
+    ::= { dot3adDrni 1 }
+
+dot3adDrniEntry OBJECT-TYPE
+    SYNTAX      Dot3adDrniEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the DRNI parameters. This is indexed
+        by the DRNI Portal ID."
+    INDEX { dot3adDrniIndex }
+    ::= { dot3adDrniTable 1 }
+
+Dot3adDrniEntry ::=
+    SEQUENCE {
+        dot3adDrniIndex
+            InterfaceIndex,
+        dot3adDrniDescription
+            SnmpAdminString,
+        dot3adDrniName
+            SnmpAdminString,
+        dot3adDrniPortalAddr
+            MacAddress,
+        dot3adDrniPortalPriority
+            Integer32,
+		dot3adDrniThreePortalSystem
+		    TruthValue,
+        dot3adDrniPortalSystemNumber
+            Integer32,
+        dot3adDrniIntraPortalLinkList 
+            PortalLinkList,
+        dot3adDrniAggregator
+            InterfaceIndex,
+        dot3adDrniNeighborAdminConvGatewayListDigest
+            OCTET STRING,
+        dot3adDrniNeighborAdminConvPortListDigest
+            OCTET STRING,
+        dot3adDrniGatewayAlgorithm
+            OCTET STRING,
+        dot3adDrniNeighborAdminGatewayAlgorithm
+            OCTET STRING,
+        dot3adDrniNeighborAdminPortAlgorithm
+            OCTET STRING,
+        dot3adDrniNeighborAdminDRCPState
+            DrcpState,
+        dot3adDrniEncapsulationMethod
+            OCTET STRING,
+        dot3adDrniDRPortConversationPasses
+            OCTET STRING,
+        dot3adDrniDRGatewayConversationPasses
+            OCTET STRING,
+        dot3adDrniPSI
+            TruthValue,            
+        dot3adDrniPortConversationControl
+            TruthValue,
+        dot3adDrniIntraPortalPortProtocolDA
+            MacAddress
+    }
+
+dot3adDrniIndex OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "The unique identifier allocated to this Distributed Relay by
+        the local System. This attribute identifies a Distributed Relay
+        instance among the subordinate managed objects of the
+        containing object. This value is read-only. NOTE - The aDrniID
+        is represented in the SMIv2 MIB as an ifIndex-see D.5."
+    REFERENCE
+        "7.4.1.1.1"
+    ::= { dot3adDrniEntry 1 }
+
+dot3adDrniDescription OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A human-readable text string containing information about the
+        Distribute Relay. This string is read-only. The contents are
+        vendor specific."
+    REFERENCE
+        "7.4.1.1.2"
+    ::= { dot3adDrniEntry 2 }
+
+dot3adDrniName OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A human-readable text string containing a locally significant
+        name for the Distributed Relay. This string is read-write."
+    REFERENCE
+        "7.4.1.1.3"
+    ::= { dot3adDrniEntry 3 }
+
+dot3adDrniPortalAddr OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A read-write identifier of a particular Portal.
+        aDrniPortalAddr has to be unique among at least all of the
+        potential Portal Systems to which a given Portal System might
+        be attached via an IPL Intra-Portal Link. Also used as the
+        Actor's System ID (6.3.2) for the emulated system."
+    REFERENCE
+        "7.4.1.1.4"
+    ::= { dot3adDrniEntry 4 }
+
+
+dot3adDrniPortalPriority OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-write value indicating the priority value
+        associated with the Portal's System ID. Also used as the
+        Actor's System Priority (6.3.2) for the emulated system."
+    REFERENCE
+        "7.4.1.1.5"
+    ::= { dot3adDrniEntry 5 }
+
+dot3adDrniThreePortalSystem OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A read-write Boolean value indicating whether this
+        Portal System is part of a Portal consisting of three
+        Portal Systems or not. Value 1 stands for a Portal of
+        three Portal Systems, value 0 stands for a Portal of
+        two Portal Systems. The default value is 0."
+    REFERENCE
+        "7.4.1.1.6"
+    ::= { dot3adDrniEntry 6 }
+
+dot3adDrniPortalSystemNumber OBJECT-TYPE
+    SYNTAX       Integer32 (1..3)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A read-write identifier of this particular Portal System
+        within a Portal. It is the responsibility of the network
+        administrator to ensure that these numbers are unique among
+        the Portal Systems with the same aDrniPortalAddr (7.4.1.1.4)."
+    REFERENCE
+        "7.4.1.1.7"
+    ::= { dot3adDrniEntry 7 }
+
+dot3adDrniIntraPortalLinkList OBJECT-TYPE
+    SYNTAX       PortalLinkList
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "Read-write list of the Interface Identifiers of the Ports to
+        the Intra-Portal Links assigned to this Distributed Relay. Each
+        Interface Identifier, a Port ID (6.3.4), has the two least
+        significant bits of its Port Priority (7.3.2.1.15) configured
+        to match the Portal System Number of the attached Portal
+        System. The number of IPLs in the list depends on the Portal
+        topology. For a Portal of three Portal Systems two or three
+        IPLs can be used, for a Portal of two Portal Systems a single
+        IPL is required and for a single Portal System no IPL is
+        required."
+    REFERENCE
+        "7.4.1.1.8"
+    ::= { dot3adDrniEntry 8 }
+
+dot3adDrniAggregator OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "An INTEGER that matches the syntax of an Interface Identifier.
+        Read-write Interface Identifier of the Aggregator Port assigned
+        to this Distributed Relay."
+    REFERENCE
+        "7.4.1.1.9"
+    ::= { dot3adDrniEntry 9 }
+
+
+dot3adDrniNeighborAdminConvGatewayListDigest OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (16))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value for the digest of the prioritized Gateway
+        Conversation ID-to-Gateway assignments of the Neighbor
+        Portal System, assigned by administrator or System
+        policy for use when the Neighbor Portal System's
+        information is unknown. Its default value is set to NULL."
+    REFERENCE
+        "7.4.1.1.11"
+    DEFVAL  { ''H }
+    ::= { dot3adDrniEntry 10 }
+
+
+dot3adDrniNeighborAdminConvPortListDigest OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (16))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The value for the digest of the prioritized Port Conversation
+        ID-to-Aggregation Port assignments of the Neighbor Portal
+        System, assigned by administrator or System policy for use when
+        the Neighbor Portal System's information is unknown. Its default
+        value is set to NULL."
+    REFERENCE
+        "7.4.1.1.12"
+    DEFVAL  { ''H }
+    ::= { dot3adDrniEntry 11 }
+
+dot3adDrniGatewayAlgorithm OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (4))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object identifies the algorithm used by the DR Function
+        to assign frames to a Gateway Conversation ID. Table 9-7
+        provides the IEEE 802.1 OUI (00-80-C2) Gateway Algorithm
+        encodings. A SEQUENCE OF OCTETS consisting of an OUI or CID
+        and one following octet."
+    REFERENCE
+        "7.4.1.1.13"
+    ::= { dot3adDrniEntry 12 }
+
+dot3adDrniNeighborAdminGatewayAlgorithm OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (16))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object identifies the value for the Gateway algorithm
+        of the Neighbor Portal System, assigned by administrator or
+        System policy for use when the Neighbor Portal System's
+        information is unknown. Table 9-7 provides the IEEE 802.1
+        OUI (00-80-C2) Gateway Algorithm encodings. Its default value
+        is set to NULL. A SEQUENCE OF OCTETS consisting of a 3-octet
+        OUI or CID and one following octet."
+    REFERENCE
+        "7.4.1.1.14"
+    DEFVAL  { ''H }
+    ::= { dot3adDrniEntry 13 }
+
+dot3adDrniNeighborAdminPortAlgorithm OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (16))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object identifies the value for the Port Algorithm of
+        the Neighbor Portal System, assigned by administrator or
+        System policy for use when the Neighbor Portal System's
+        information is unknown. Table 6-4 provides the IEEE 802.1
+        OUI (00-80-C2) Port Algorithm encodings. Its default value
+        is set to NULL. A SEQUENCE OF OCTETS consisting of a
+        3-octet OUI or CID and one following octet."
+    REFERENCE
+        "7.4.1.1.15"
+    DEFVAL  { ''H }
+    ::= { dot3adDrniEntry 14 }
+
+dot3adDrniNeighborAdminDRCPState OBJECT-TYPE
+    SYNTAX       DrcpState
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A string of 8 bits, corresponding to the administrative
+        values of DRCP_State [item s) in 9.4.3.2] as transmitted by
+        this Portal System in DRCPDUs. The first bit corresponds to
+        bit 0 of DRCP_State (HomeGateway), the second bit corresponds
+        to bit 1 (NeighborGateway), the third bit corresponds to bit 2
+        (OtherGateway), the fourth bit corresponds to bit 3
+        (IppActivity), the fifth bit corresponds to bit 4 (Timeout),
+        the sixth bit corresponds to bit 5 (GatewaySync), the seventh
+        bit corresponds to bit 6 (PortSync), and the eighth bit 
+        corresponds to bit 7 (Expired). These values allow
+        administrative control over the values of HomeGateway,
+        NeighborGateway, OtherGateway, IppActivity, and Timeout. Their
+        values are by default set to FALSE. This attribute value is
+        read-write."
+    REFERENCE
+        "7.4.1.1.16"
+    ::= { dot3adDrniEntry 15 }
+
+dot3adDrniEncapsulationMethod OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (4))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This managed object is applicable only when Network / IPL
+        sharing by time (9.3.2.1) or Network / IPL sharing by tag
+        (9.3.2.2) or Network / IPL sharing by encapsulation (9.3.2.3)
+        is supported. The object identifies the value representing the
+        encapsulation method that is used to transport IPL frames to
+        the Neighbor Portal System when the IPL and network link are
+        sharing the same physical link. It consists of the 3-octet OUI
+        or CID identifying the organization that is responsible for
+        this encapsulation and one following octet used to identify the
+        encapsulation method defined by that organization. Table 9-11
+        provides the IEEE 802.1 OUI (00-80-C2) encapsulation method
+        encodings. A Default value of 0x00-80-C2-00 indicates that the
+        IPL is using a separate physical or Aggregation link. A value
+        of 1 indicates that Network / IPL sharing by time (9.3.2.1) is
+        used. A value of 2 indicates that the encapsulation method used
+        is the same as the one used by network frames and that Network /
+        IPL sharing by tag (9.3.2.2) is used."
+    REFERENCE
+        "7.4.1.1.17"
+    DEFVAL { '0080C200'H }
+    ::= { dot3adDrniEntry 16 }
+
+dot3adDrniDRPortConversationPasses OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (512))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A read-only current operational vector of Boolean values, with
+        one value for each possible Port Conversation ID. A 1 indicates
+        that the Port Conversation ID is allowed to be distributed
+        through this DR Function's Aggregator, and a 0 indicates that
+        it cannot. aDrniDRPortConversationPasses is referencing the
+        current value of Drni_Portal_System_Port_Conversation
+        (9.3.4.2)."
+    REFERENCE
+        "7.4.1.1.20"
+    ::= { dot3adDrniEntry 17 }
+
+dot3adDrniDRGatewayConversationPasses OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE (512))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A read-only current operational vector of Boolean values,
+        with one value for each possible Gateway Conversation ID. A
+        1 indicates that the Gateway Conversation ID is allowed to pass
+        through this DR Function's Gateway, and a 0 indicates that it
+        cannot. aDrniDRGatewayConversationPasses is referencing the
+        current value of Drni_Portal_System_Gateway_Conversation
+        (9.3.4.2)."
+    REFERENCE
+        "7.4.1.1.21"
+    ::= { dot3adDrniEntry 18 }
+
+dot3adDrniPSI OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A read-only Boolean value providing the value of PSI, which
+		indicates whether this Portal System is isolated from the
+		other Portal Systems within the same Portal ('TRUE') or not
+        ('FALSE')."
+    REFERENCE
+        "7.4.1.1.22"
+    ::= { dot3adDrniEntry 19 }
+
+dot3adDrniPortConversationControl OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A read-write Boolean value that controls the operation of the
+		updateDRFHomeState (9.4.11). When set to 'TRUE' the Home Gateway
+		Vector is set equal to Drni_Portal_System_Port_Conversation.
+		Setting this object to 'TRUE' is only possible when the Gateway
+        algorithm and the Port algorithm use the same distributions
+        methods. The default is 'FALSE', indicating that the Home Gateway
+        Vector is controlled by the network control protocol."
+    REFERENCE
+        "7.4.1.1.23"
+    DEFVAL { false }
+    ::= { dot3adDrniEntry 20 }
+
+	
+dot3adDrniIntraPortalPortProtocolDA OBJECT-TYPE
+    SYNTAX       MacAddress
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 6-octet read-write MAC Address value specifying the
+        destination address to be used when sending DRCPDUs,
+        corresponding to the value of DRCP_Protocol_DA in 9.4.4.1.3.
+        Its values is one of the addresses selected from Table 9-4
+        and its default shall be the IEEE 802.1 Nearest non-TPMR
+        Bridge group address (01-80-C2-00-00-03)."
+    REFERENCE
+        "7.4.1.1.24"
+    DEFVAL { '0180C2000003'H }
+    ::= { dot3adDrniEntry 21 }
+
+-- -------------------------------------------------------------
+-- DRNI Conversation Admin Gateway Table
+-- -------------------------------------------------------------
+
+dot3adDrniConvAdminGatewayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adDrniConvAdminGatewayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "There are 4096 aDrniConvAdminGateway[] variables,
+        aDrniConvAdminGateway[0] through aDrniConvAdminGateway[4095],
+        indexed by Gateway Conversation ID. Each contains
+        administrative values of the Gateway selection priority list
+        for the Distributed Relay for the referenced Gateway
+        Conversation ID. This selection priority list, a sequence of
+        integers for each Gateway Conversation ID, is a list of Portal
+        System Numbers in the order of preference, highest to lowest,
+        for the corresponding preferred Portal System's Gateway to
+        carry that Conversation. NOTE - To the extent that the network
+        administrator fails to configure the same values for the
+        aDrniConvAdminGateway[] variables in all of the DR Functions
+        of a Portal, frames can be misdirected. The DRCP (9.4) detects
+        such misconfiguration."
+    REFERENCE
+        "7.4.1.1.10"
+    ::= { dot3adDrni 2 }
+
+
+dot3adDrniConvAdminGatewayEntry OBJECT-TYPE
+    SYNTAX      Dot3adDrniConvAdminGatewayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A Gateway selection priority list for the Distributed Relay
+        for the referenced Gateway Conversation ID. This selection
+        priority list, a sequence of integers for each Gateway
+        Conversation ID, is a list of Portal System Numbers in the
+        order of preference, highest to lowest, for the corresponding
+        preferred Portal System's Gateway to carry that Conversation."
+    INDEX       { dot3adDrniGatewayConversationID, dot3adDrniIndex }
+    ::= { dot3adDrniConvAdminGatewayTable 1}
+
+Dot3adDrniConvAdminGatewayEntry ::=
+    SEQUENCE {
+       dot3adDrniGatewayConversationID
+           Integer32,
+       dot3adDrniConvAdminGatewayList
+           DrniConvAdminGatewayList
+    }
+
+dot3adDrniGatewayConversationID OBJECT-TYPE
+    SYNTAX      Integer32 (0..4095)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An identifer for a Gateway Conversation."
+    ::= { dot3adDrniConvAdminGatewayEntry 1}
+
+dot3adDrniConvAdminGatewayList OBJECT-TYPE
+    SYNTAX      DrniConvAdminGatewayList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Priority list of Portal System Numbers in order of preference
+        from highest to lowest."
+    REFERENCE
+        "7.4.1.1.10"
+    ::= { dot3adDrniConvAdminGatewayEntry 2 }
+
+-- -------------------------------------------------------------
+-- DRNI IPL Encap Map Table
+-- -------------------------------------------------------------
+
+dot3adDrniIPLEncapMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adDrniIPLEncapMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This managed object is applicable only when Network / IPL
+        sharing by tag (9.3.2.2) or Network / IPL sharing by encapsulation
+        (9.3.2.3) is supported. Each entry represents the value of the
+        identifier used for an IPL frame associated with that Gateway
+        Conversation ID for the encapsulation method specified in
+        7.4.1.1.17."
+    REFERENCE
+        "7.4.1.1.18"
+    ::= { dot3adDrni 3 }
+
+dot3adDrniIPLEncapMapEntry OBJECT-TYPE
+    SYNTAX      Dot3adDrniIPLEncapMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry represents the value of the identifier used for an
+        IPL frame associated with that Gateway Conversation ID for the
+        encapsulation method specified in 7.4.1.1.17."
+    INDEX       { dot3adDrniGatewayConversationID, dot3adDrniIndex }
+    ::= { dot3adDrniIPLEncapMapTable 1 }
+
+Dot3adDrniIPLEncapMapEntry ::=
+    SEQUENCE {
+       dot3adDrniIPLFrameIdValue
+           Integer32
+    }
+
+dot3adDrniIPLFrameIdValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the identifier used for an IPL frame associated
+        with that Gateway Conversation ID for the encapsulation
+        method."
+    REFERENCE
+        "7.4.1.1.18"
+    ::= { dot3adDrniIPLEncapMapEntry 2 }
+
+-- -------------------------------------------------------------
+-- DRNI Net Encap Map Table
+-- -------------------------------------------------------------
+
+dot3adDrniNetEncapMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adDrniNetEncapMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This managed object is applicable only when Network /
+        IPL sharing by tag (9.3.2.2) is supported. Each entry
+        represents the translated value of the identifier used
+        for a network frame associated with that Gateway
+        Conversation ID when the method specified in 7.4.1.1.17
+        is the Network / IPL sharing by tag method specified in
+        9.3.2.2 and the network frames need to share the tag
+        space used by IPL frames."
+    REFERENCE
+        "7.4.1.1.19"
+    ::= { dot3adDrni 4 }
+
+dot3adDrniNetEncapMapEntry OBJECT-TYPE
+    SYNTAX      Dot3adDrniNetEncapMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry represents the translated value of the identifier
+        used for a network frame associated with that Gateway
+        Conversation ID when the method specified in 7.4.1.1.12 is the
+        Network / IPL sharing by tag method specified in 9.3.2.2 and
+        the network frames need to share the tag space used by IPL
+        frames."
+    INDEX       { dot3adDrniGatewayConversationID, dot3adDrniIndex }
+    ::= { dot3adDrniNetEncapMapTable 1}
+
+Dot3adDrniNetEncapMapEntry ::=
+    SEQUENCE {
+       dot3adDrniNetFrameIdValue
+           Integer32
+    }
+
+dot3adDrniNetFrameIdValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The translated value of the identifier used for a network
+        frame associated that Gateway Conversation ID."
+    REFERENCE
+        "7.4.1.1.19"
+    ::= { dot3adDrniNetEncapMapEntry 1 }
+
+-- -------------------------------------------------------------
+-- IPP Attribute Table
+-- -------------------------------------------------------------
+
+dot3adIPPAttributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adIPPAttributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information about every
+        IPP that is associated with this System."
+    REFERENCE
+        "7.4.2"
+    ::= { dot3adIPP 1 }
+
+dot3adIPPAttributeEntry OBJECT-TYPE
+    SYNTAX      Dot3adIPPAttributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing Attributes for an IPP."
+    INDEX { dot3adIPPIndex }
+    ::= { dot3adIPPAttributeTable 1 }
+
+Dot3adIPPAttributeEntry ::=
+    SEQUENCE {
+        dot3adIPPIndex
+            InterfaceIndex,
+        dot3adIPPPortConversationPasses
+            OCTET STRING,
+        dot3adIPPGatewayConversationDirection
+            OCTET STRING,
+        dot3adIPPAdminState
+            AggState,
+        dot3adIPPOperState
+            AggState,
+        dot3adIPPTimeOfLastOperChange
+            Integer32
+    }        
+
+dot3adIPPIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique identifier allocated to this IPP by the
+        local Portal System. This attribute identifies an
+        IPP instance among the subordinate managed objects of
+        the containing object. This value is read-only.
+        NOTE-The aIPPID is represented in the SMIv2 MIB as
+        an ifIndex-see D.5."
+    REFERENCE
+        "7.4.2.1.1"
+    ::= { dot3adIPPAttributeEntry 1 }
+
+dot3adIPPPortConversationPasses OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (512))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A read-only current operational vector of Boolean values,
+        with one value for each possible Port Conversation ID. A 1
+        indicates that the Port Conversation ID is allowed to be
+        transmitted through this IPP Intra-Portal Port, and a 0
+        indicates that it cannot. aDrniIPPPortConversationPasses is
+        referencing the current value of Ipp_Port_Conversation_Passes
+        (9.3.4.3)."
+    REFERENCE
+        "7.4.2.1.2"
+    ::= { dot3adIPPAttributeEntry 2 }
+
+dot3adIPPGatewayConversationDirection OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (512))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A read-only current operational vector of Boolean values, with
+        one value for each possible Gateway Conversation ID. A 1
+        indicates that the Gateway Conversation ID is assigned to
+        Gateways reachable through this IPP Intra-Portal Port, and a 0
+        indicates that the Gateway for the indexed Gateway Conversation
+        ID is not reachable through this IPP Intra-Portal Port.
+        aIPPGatewayConversationDirection is referencing the current value of
+Ipp_Gateway_Conversation_Direction (9.3.4.3)."
+    REFERENCE
+        "7.4.2.1.3"
+    ::= { dot3adIPPAttributeEntry 3 }
+
+dot3adIPPAdminState OBJECT-TYPE
+    SYNTAX      AggState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This read-write value defines the administrative state of
+        the IPP. A value of 'up' indicates that the operational state
+        of the IPP (aIPPOperState) is permitted to be either up or
+        down. A value of 'down' forces the operational state of the IPP
+        to be down. A GET operation returns the current administrative
+        state. A SET operation changes the administrative state to a
+        new value."
+    REFERENCE
+        "7.4.2.1.4"
+    ::= { dot3adIPPAttributeEntry 4 }
+
+dot3adIPPOperState OBJECT-TYPE
+    SYNTAX      AggState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This read-only value defines the operational state of the
+        IPP. The operational state is 'up' if the IPL is operational,
+        and if the value of aIPPAdminState for the IPP is also 'up'.
+        If the IPL is not operational, or if the administrative state
+        of the IPP (aIPPAdminState) is 'down', then the operational
+        state is 'down.' An operational state of 'up' indicates that
+        the IPP is available for use by the DR Function; a value of
+        'down' indicates that the IPP is not available for use by the
+        DR Function."
+    REFERENCE
+        "7.4.2.1.5"
+    ::= { dot3adIPPAttributeEntry 5 }
+
+dot3adIPPTimeOfLastOperChange OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time at which the interface entered its current
+        operational state, in terms of centiseconds since the
+        system was last reset. If the current state was entered
+        prior to the last reinitialization of the local network
+        management subsystem, then this object contains a value of
+        zero. The ifLastChange object in the Interfaces MIB defined
+        in IETF RFC 2863 is a suitable object for supplying a
+        value for aIPPTimeOfLastOperChange. This value is read-only."
+    REFERENCE
+        "7.4.2.1.6"
+    ::= { dot3adIPPAttributeEntry 6 }
+
+
+-- -------------------------------------------------------------
+-- IPP Statistics Table
+-- -------------------------------------------------------------
+
+dot3adIPPStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adIPPStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains information for IPP
+        statistics. A row appears in this table for
+        each IPP in the system."
+    REFERENCE
+        "7.4.3"
+    ::= { dot3adIPP 2 }
+
+dot3adIPPStatsEntry OBJECT-TYPE
+    SYNTAX      Dot3adIPPStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing Statistics for an IPP."
+    INDEX { dot3adIPPIndex }
+    ::= { dot3adIPPStatsTable 1 }
+
+Dot3adIPPStatsEntry ::=
+    SEQUENCE {
+        dot3adIPPStatsDRCPDUsRx
+            Counter64,
+        dot3adIPPStatsIllegalRx
+            Counter64,
+        dot3adIPPStatsDRCPDUsTx
+            Counter64
+    }        
+
+dot3adIPPStatsDRCPDUsRx OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of valid DRCPDUs received on this IPP. This value
+        is read-only."
+    REFERENCE
+        "7.4.3.1.2"
+    ::= { dot3adIPPStatsEntry 1 }
+
+dot3adIPPStatsIllegalRx OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of frames received that carry the DRCP Ethernet
+        Type value (9.4.2.4), but contain a badly formed PDU. This
+        value is read-only."
+    REFERENCE
+        "7.4.3.1.3"
+    ::= { dot3adIPPStatsEntry 2 }
+
+
+dot3adIPPStatsDRCPDUsTx OBJECT-TYPE
+    SYNTAX       Counter64
+    UNITS
+        "frames"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The number of DRCPDUs transmitted on this IPP. This value
+        is read-only."
+    REFERENCE
+        "7.4.3.1.4"
+    ::= { dot3adIPPStatsEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- IPP Debug Table
+-- -------------------------------------------------------------
+
+dot3adIPPDebugTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot3adIPPDebugEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains IPP debug information.
+        A row appears in this table for each IPP in
+        the system."
+    REFERENCE
+        "7.4.4"
+    ::= { dot3adIPP 3 }
+
+dot3adIPPDebugEntry OBJECT-TYPE
+    SYNTAX      Dot3adIPPDebugEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing Debug Information for an IPP."
+    INDEX { dot3adIPPIndex }
+    ::= { dot3adIPPDebugTable 1 }
+
+Dot3adIPPDebugEntry ::=
+    SEQUENCE {
+        dot3adIPPDebugDRCPRxState
+            Integer32,
+        dot3adIPPDebugLastRxTime
+            TimeTicks,
+        dot3adIPPDebugDifferPortalReason
+            SnmpAdminString 
+    }        
+
+dot3adIPPDebugDRCPRxState OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    current(1),
+                    expired(2),
+                    defaulted(3),
+                    initialize(4),
+                    reportToManagement(5)
+                }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This attribute holds the value 'current' if the DRCPDU
+        Receive state machine for the IPP is in the CURRENT state,
+        'expired' if the DRCPDU Receive state machine is in the
+        EXPIRED state, 'defaulted' if the DRCPDU Receive state machine
+        is in the DEFAULTED state, 'initialize' if the DRCPDU Receive
+        state machine is in the INITIALIZE state, or
+        'reportToManagement' if the Receive state machine is in the
+        REPORT_TO_MANAGEMENT state. This value is read-only."
+    REFERENCE
+        "7.4.4.1.2"
+    ::= { dot3adIPPDebugEntry 1 }
+
+
+dot3adIPPDebugLastRxTime OBJECT-TYPE
+    SYNTAX       TimeTicks
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The time at which the last DRCPDU was received by this IPP,
+        in terms of centiseconds since the system was last reset.
+        The ifLastChange object in the Interfaces MIB defined in IETF
+        RFC 2863 is a suitable object for supplying a value for
+        aDrniIPPDebugLastRxTime. This value is read-only."
+    REFERENCE
+        "7.4.4.1.3"
+    ::= { dot3adIPPDebugEntry 2 }
+
+dot3adIPPDebugDifferPortalReason OBJECT-TYPE
+    SYNTAX       SnmpAdminString
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "A human-readable text string indicating the most recent set
+        of variables that are responsible for setting the variable
+        Differ_Portal or Differ_Conf_Portal (9.4.8) on this IPP to
+        TRUE. This value is read-only."
+    REFERENCE
+        "7.4.4.1.4"
+    ::= { dot3adIPPDebugEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- Aggregator Notifications
+-- -------------------------------------------------------------
+
+dot3adAggLinkUpNotification NOTIFICATION-TYPE
+    -- OBJECTS {  }
+    STATUS       current
+    DESCRIPTION
+            "When aAggLinkUpDownNotificationEnable is set to
+            'enabled,' a Link Up notification is generated when
+            the Operational State of the Aggregator changes from
+            'down' to 'up.' When aAggLinkUpDownNotificationEnable
+            is set to 'disabled,' no Link Up notifications are
+            generated. The notification carries the identifier of
+            the Aggregator whose state has changed."
+    ::= { lagMIBNotifications 1 }
+
+dot3adAggLinkDownNotification NOTIFICATION-TYPE
+    STATUS       current
+    DESCRIPTION
+            "When aAggLinkUpDownNotificationEnable is set to
+            'enabled,' a Link Down notification is generated when
+            the Operational State of the Aggregator changes from
+            'up' to 'down.' When aAggLinkUpDownNotificationEnable
+            is set to 'disabled,' no Link Down notifications are
+            generated. The notification carries the identifier of
+            the Aggregator whose state has changed."
+    ::= { lagMIBNotifications 2 }
+
+
+-- -------------------------------------------------------------
+-- IEEE 802.3ad MIB - Conformance Information
+-- -------------------------------------------------------------
+
+dot3adAggGroups OBJECT IDENTIFIER
+    ::= { dot3adAggConformance 1 }
+
+dot3adAggCompliances OBJECT IDENTIFIER
+    ::= { dot3adAggConformance 2 }
+
+-- -------------------------------------------------------------
+-- units of conformance
+-- -------------------------------------------------------------
+
+dot3adAggGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggActorSystemID,
+        dot3adAggActorSystemPriority,
+        dot3adAggAggregateOrIndividual, 
+        dot3adAggActorAdminKey,
+        dot3adAggMACAddress,
+        dot3adAggActorOperKey,
+        dot3adAggPartnerSystemID,
+        dot3adAggPartnerSystemPriority,
+        dot3adAggPartnerOperKey,
+        dot3adAggCollectorMaxDelay
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about an
+        aggregation."
+    ::= { dot3adAggGroups 1 }
+
+dot3adAggPortListGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggPortListPorts
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about every
+        port in an aggregation."
+    ::= { dot3adAggGroups 2 }
+
+dot3adAggPortGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggPortActorSystemPriority,
+        dot3adAggPortActorSystemID,
+        dot3adAggPortActorAdminKey,
+        dot3adAggPortActorOperKey,
+        dot3adAggPortPartnerAdminSystemPriority,
+        dot3adAggPortPartnerOperSystemPriority,
+        dot3adAggPortPartnerAdminSystemID,
+        dot3adAggPortPartnerOperSystemID,
+        dot3adAggPortPartnerAdminKey,
+        dot3adAggPortPartnerOperKey,
+        dot3adAggPortSelectedAggID,
+        dot3adAggPortAttachedAggID,
+        dot3adAggPortActorPort,
+        dot3adAggPortActorPortPriority,
+        dot3adAggPortPartnerAdminPort,
+        dot3adAggPortPartnerOperPort,
+        dot3adAggPortPartnerAdminPortPriority,
+        dot3adAggPortPartnerOperPortPriority,
+        dot3adAggPortActorAdminState,
+        dot3adAggPortActorOperState,
+        dot3adAggPortPartnerAdminState,
+        dot3adAggPortPartnerOperState,
+        dot3adAggPortAggregateOrIndividual
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about every
+        port in an aggregation."
+    ::= { dot3adAggGroups 3 }
+
+
+dot3adAggPortStatsGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggPortStatsLACPDUsRx,
+        dot3adAggPortStatsMarkerPDUsRx,
+        dot3adAggPortStatsMarkerResponsePDUsRx,
+        dot3adAggPortStatsUnknownRx,
+        dot3adAggPortStatsIllegalRx,
+        dot3adAggPortStatsLACPDUsTx,
+        dot3adAggPortStatsMarkerPDUsTx,
+        dot3adAggPortStatsMarkerResponsePDUsTx   
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information about every
+        port in an aggregation."
+    ::= { dot3adAggGroups 4 }
+
+
+dot3adAggPortDebugGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggPortDebugRxState,
+        dot3adAggPortDebugLastRxTime,
+        dot3adAggPortDebugMuxState,
+        dot3adAggPortDebugMuxReason,
+        dot3adAggPortDebugActorChurnState,
+        dot3adAggPortDebugPartnerChurnState,
+        dot3adAggPortDebugActorChurnCount,
+        dot3adAggPortDebugPartnerChurnCount,
+        dot3adAggPortDebugActorSyncTransitionCount,
+        dot3adAggPortDebugPartnerSyncTransitionCount,
+        dot3adAggPortDebugActorChangeCount,
+        dot3adAggPortDebugPartnerChangeCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing debug information about 
+        every aggregated port."
+    ::= { dot3adAggGroups 5 }
+
+dot3adTablesLastChangedGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adTablesLastChanged
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects providing information about the time
+        of changes to the configuration of aggregations and their
+        ports."
+    ::= { dot3adAggGroups 6 }
+
+dot3adAggPortProtocolDAGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggPortProtocolDA
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects providing information about the
+        protocol destination address in use for ports in an
+        aggregation."
+    ::= { dot3adAggGroups 7 }
+
+dot3adAggNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        dot3adAggLinkUpNotification,
+        dot3adAggLinkDownNotification
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of notifications providing information about 
+        the aggregation."
+    ::= { dot3adAggGroups 8 }
+
+dot3adAggXGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggDescription,
+        dot3adAggName,
+        dot3adAggAdminState,
+        dot3adAggOperState,
+        dot3adAggTimeOfLastOperChange,
+        dot3adAggDataRate,
+        dot3adAggFramesTxOK,
+        dot3adAggFramesRxOK,
+        dot3adAggLinkUpDownNotificationEnable
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of extension entries providing information on an
+        aggregation."
+    ::= { dot3adAggGroups 9 }
+
+dot3adAggRecommendedGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggOctetsTxOK,
+        dot3adAggOctetsRxOK,
+        dot3adAggFramesDiscardedOnTx,
+        dot3adAggFramesDiscardedOnRx,
+        dot3adAggFramesWithTxErrors,
+        dot3adAggFramesWithRxErrors,
+        dot3adAggUnknownProtocolFrames
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of recommended objects providing information
+        about an aggregation."
+    ::= { dot3adAggGroups 10 }
+
+dot3adAggOptionalGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggMulticastFramesTxOK,
+        dot3adAggMulticastFramesRxOK,
+        dot3adAggBroadcastFramesTxOK,
+        dot3adAggBroadcastFramesRxOK
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of optional objects providing information about
+        an aggregation."
+    ::= { dot3adAggGroups 11 }
+
+dot3adPerServiceFrameDistGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggConversationAdminLinkList,
+        dot3adAggPortAlgorithm,
+	dot3adAggPartnerAdminPortAlgorithm,
+        dot3adAggPartnerAdminPortConversationListDigest,
+        dot3adAggAdminDiscardWrongConversation,
+        dot3adAggPartnerAdminConvServiceMappingDigest,
+        dot3adAggAdminServiceConversationServiceIDList,
+        dot3adAggPortLinkNumberId,
+        dot3adAggPortPartnerAdminLinkNumberId,
+        dot3adAggPortOperConversationPasses,
+        dot3adAggPortOperConversationCollected,
+	dot3adAggPortWTRTime
+    }
+    STATUS   deprecated
+    DESCRIPTION
+        "A collection of objects providing information about
+        Per-Service Frame Distribution.
+	Replaced by dot3adPerServiceFrameDistGroup2."
+    ::= { dot3adAggGroups 12 }
+
+dot3adAggPortDebugXGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adAggPortDebugActorCDSChurnState,
+        dot3adAggPortDebugPartnerCDSChurnState,
+        dot3adAggPortDebugActorCDSChurnCount,
+        dot3adAggPortDebugPartnerCDSChurnCount
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects extending aggregator port debug."
+    ::= { dot3adAggGroups 13 }
+
+
+dot3adDrniGroup OBJECT-GROUP
+    OBJECTS {
+        dot3adDrniDescription,
+        dot3adDrniName,
+        dot3adDrniPortalAddr,
+        dot3adDrniPortalPriority,
+        dot3adDrniThreePortalSystem,
+        dot3adDrniPortalSystemNumber,
+        dot3adDrniIntraPortalLinkList,
+        dot3adDrniAggregator,
+        dot3adDrniNeighborAdminConvGatewayListDigest,
+        dot3adDrniNeighborAdminConvPortListDigest,
+        dot3adDrniGatewayAlgorithm,
+        dot3adDrniNeighborAdminGatewayAlgorithm,
+        dot3adDrniNeighborAdminPortAlgorithm,
+        dot3adDrniNeighborAdminDRCPState,
+        dot3adDrniEncapsulationMethod,
+        dot3adDrniDRPortConversationPasses,
+        dot3adDrniDRGatewayConversationPasses,
+        dot3adDrniConvAdminGatewayList,
+        dot3adDrniIPLFrameIdValue,
+        dot3adDrniNetFrameIdValue, 
+		dot3adDrniPSI,
+		dot3adDrniPortConversationControl,
+        dot3adDrniIntraPortalPortProtocolDA
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects providing information about DRNI."
+    ::= { dot3adAggGroups 14 }
+
+dot3adIPPGroup  OBJECT-GROUP
+    OBJECTS {
+        dot3adIPPPortConversationPasses,
+        dot3adIPPGatewayConversationDirection,
+        dot3adIPPAdminState,
+        dot3adIPPOperState,
+        dot3adIPPTimeOfLastOperChange
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects providing IPP information."
+    ::= { dot3adAggGroups 15 }
+
+dot3adIPPStatsGroup  OBJECT-GROUP
+    OBJECTS {
+        dot3adIPPStatsDRCPDUsRx,
+        dot3adIPPStatsIllegalRx,
+        dot3adIPPStatsDRCPDUsTx
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects providing IPP statistics information."
+    ::= { dot3adAggGroups 16 }
+
+dot3adIPPDebugGroup  OBJECT-GROUP
+    OBJECTS {
+        dot3adIPPDebugDRCPRxState,
+        dot3adIPPDebugLastRxTime,
+        dot3adIPPDebugDifferPortalReason
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects providing IPP debug information."
+    ::= { dot3adAggGroups 17 }
+
+dot3adPerServiceFrameDistGroup2 OBJECT-GROUP
+    OBJECTS {
+        dot3adAggConversationAdminLinkList,
+        dot3adAggPortAlgorithm,
+	dot3adAggPartnerAdminPortAlgorithm,
+        dot3adAggPartnerAdminPortConversationListDigest,
+        dot3adAggAdminDiscardWrongConversation2,
+        dot3adAggPartnerAdminConvServiceMappingDigest,
+        dot3adAggAdminServiceConversationServiceIDList,
+        dot3adAggPortLinkNumberId,
+        dot3adAggPortOperConversationPasses,
+        dot3adAggPortOperConversationCollected,
+	dot3adAggPortWTRTime,
+        dot3adAggPortEnableLongPDUXmit
+    }
+    STATUS   current
+    DESCRIPTION
+        "A collection of objects providing information about
+        Per-Service Frame Distribution."
+    ::= { dot3adAggGroups 18 }
+
+
+-- -------------------------------------------------------------
+-- compliance statements
+-- -------------------------------------------------------------
+
+dot3adAggCompliance MODULE-COMPLIANCE
+    STATUS  deprecated
+    DESCRIPTION
+        "The compliance statement for device support of
+        Link Aggregation.
+	Replaced by dot3adAggCompliance2."
+
+    MODULE
+        MANDATORY-GROUPS {
+            dot3adAggGroup,
+            dot3adAggPortGroup,
+            dot3adAggNotificationGroup,
+            dot3adTablesLastChangedGroup
+        }
+
+        GROUP       dot3adAggPortListGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggXGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortStatsGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortDebugGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortDebugXGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortProtocolDAGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggOptionalGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggRecommendedGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adPerServiceFrameDistGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adDrniGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adIPPGroup
+        DESCRIPTION
+            "This group is optional."
+
+			GROUP       dot3adIPPStatsGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adIPPDebugGroup
+        DESCRIPTION
+            "This group is optional."
+
+    ::= { dot3adAggCompliances 1 }
+
+dot3adAggCompliance2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for device support of
+        Link Aggregation."
+
+    MODULE
+        MANDATORY-GROUPS {
+            dot3adAggGroup,
+            dot3adAggPortGroup,
+            dot3adAggNotificationGroup,
+            dot3adTablesLastChangedGroup
+        }
+
+        GROUP       dot3adAggPortListGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggXGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortStatsGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortDebugGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortDebugXGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggPortProtocolDAGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggOptionalGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adAggRecommendedGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adPerServiceFrameDistGroup2
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adDrniGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adIPPGroup
+        DESCRIPTION
+            "This group is optional."
+
+			GROUP       dot3adIPPStatsGroup
+        DESCRIPTION
+            "This group is optional."
+
+        GROUP       dot3adIPPDebugGroup
+        DESCRIPTION
+            "This group is optional."
+
+    ::= { dot3adAggCompliances 2 }
+
+END

@@ -1,0 +1,215 @@
+SO-MUX-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Solid Optics EDFAMUX MIB
+--
+
+IMPORTS
+	MODULE-IDENTITY, enterprises, OBJECT-TYPE, Integer32 FROM SNMPv2-SMI
+	MODULE-COMPLIANCE,OBJECT-GROUP FROM SNMPv2-CONF
+;
+
+solidOptics MODULE-IDENTITY
+    LAST-UPDATED "202007030000Z"
+    ORGANIZATION "Solid Optics"
+    CONTACT-INFO
+    	"Solid Optics EU
+        solid-optics.com
+ 
+        EMail: thijs@solid-optics.eu"
+    DESCRIPTION
+        "This MIB contains definition of the SNMP objects
+        and traps to interface with SO products."
+        
+    REVISION      "202007030000Z"
+    DESCRIPTION
+            "RFurch minor adjustments"    
+                
+::= { enterprises 51628 }
+
+edfaMux	OBJECT IDENTIFIER ::= { solidOptics 1 }
+--moniMux OBJECT IDENTIFIER ::= { solidOptics 2 }
+
+---
+--- EdfaMux definitions
+---
+
+dcmDistance OBJECT-TYPE
+	SYNTAX Integer32(1..999)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The current dispersion in kilometers."
+::= {edfaMux 1}	
+
+preEdfaSeqTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PreEdfaSeq
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table for iterator"
+    ::= { edfaMux 2 }
+
+preEdfaSeqEntry OBJECT-TYPE
+	SYNTAX PreEdfaSeq
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Descriptive and Status Information for the pre EDFA."
+	INDEX  { preIndex }
+::= {preEdfaSeqTable 1}
+
+postEdfaSeqTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PostEdfaSeq
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"Table for iterator"
+    ::= { edfaMux 3 }
+
+postEdfaSeqEntry OBJECT-TYPE
+	SYNTAX PostEdfaSeq
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Descriptive and Status Information for the post EDFA."
+	INDEX  { postIndex }
+::= {postEdfaSeqTable	 1}
+
+PreEdfaSeq	::= SEQUENCE	{
+	preIndex			Integer32,
+	prePowerGainValue	OCTET STRING,
+	prePowerIn			OCTET STRING,
+	prePowerOut			OCTET STRING,
+	preTemperature		OCTET STRING
+}
+
+preIndex OBJECT-TYPE
+	SYNTAX Integer32 (0..100)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Column index."
+::= { preEdfaSeqEntry 1}
+
+prePowerGainValue OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Gain value in dBm."
+::= { preEdfaSeqEntry 2 }
+
+prePowerIn OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Power in in dBm"
+::= { preEdfaSeqEntry 3 }
+
+prePowerOut OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Power out in dBm."
+::= { preEdfaSeqEntry 4 }
+
+
+preTemperature OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Current temperature in degrees Celsius."
+::= { preEdfaSeqEntry 5 }
+
+PostEdfaSeq	::= SEQUENCE	{
+	postIndex			Integer32,
+	postPowerGainValue	OCTET STRING,
+	postPowerIn			OCTET STRING,
+	postPowerOut		OCTET STRING,
+	postTemperature		OCTET STRING
+}
+
+postIndex OBJECT-TYPE
+SYNTAX Integer32 (0..100)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "Column index."
+::= { postEdfaSeqEntry 1}
+
+postPowerGainValue OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Gain value in dBm."
+::= { postEdfaSeqEntry 2 }
+
+postPowerIn OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Power in in dBm"
+::= { postEdfaSeqEntry 3 }
+
+postPowerOut OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Power out in dBm."
+::= { postEdfaSeqEntry 4 }
+
+
+postTemperature OBJECT-TYPE
+	SYNTAX	OCTET STRING
+	MAX-ACCESS read-only
+	STATUS	current
+	DESCRIPTION
+	  "Current temperature in degrees Celsius."
+::= { postEdfaSeqEntry 5 }
+
+-- conformance information
+
+edfaConformance OBJECT IDENTIFIER ::= { edfaMux 4 }
+
+edfaGroups      OBJECT IDENTIFIER ::= { edfaConformance 1 }
+edfaCompliances OBJECT IDENTIFIER ::= { edfaConformance 2 }
+
+-- compliance statements
+
+
+edfaCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP  SolidOptics EDFA devices"
+
+    MODULE  -- this module
+        MANDATORY-GROUPS { edfaGroup }
+
+-- here we can add optional groups!
+--	GROUP       edfaGroup
+--        DESCRIPTION
+--            "All EDFA values must be in this group"
+
+    ::= { edfaCompliances 1 }
+
+
+-- units of conformance
+
+-- groups 
+
+edfaGroup    OBJECT-GROUP
+    OBJECTS { 
+    dcmDistance, prePowerGainValue, prePowerIn, prePowerOut, preTemperature,
+    postPowerGainValue, postPowerIn, postPowerOut, postTemperature
+	}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects"
+    ::= { edfaGroups 1 }
+
+END

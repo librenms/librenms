@@ -1,0 +1,31 @@
+BENU-PLATFORM-SERVICE-MIB DEFINITIONS ::= BEGIN 
+IMPORTS 
+        MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        benu
+            FROM BENU-ENTERPRISE-MIB;
+
+
+benuPlatSerMIB  MODULE-IDENTITY 
+            LAST-UPDATED "201212120000Z" -- December  12, 2012
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "The MIB module defines all platform services
+                mibs that are specific to benu enterprise
+
+                Copyright (C)  2012 by Benu Networks, Inc.
+                All rights reserved."
+            REVISION "201212120000Z" -- 12 December 2012 
+            DESCRIPTION "Initial Version" 
+    ::= { benu 2 } 
+
+   
+END
+

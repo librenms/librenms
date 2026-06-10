@@ -1,0 +1,14 @@
+os: gude-esb
+text: 'Expert Sensor Box'
+type: power
+icon: gude
+group: gude
+mib_dir: gude
+over:
+    - { graph: device_humidity, text: 'Humidity' }
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.28507.66
+            - .1.3.6.1.4.1.28507.67

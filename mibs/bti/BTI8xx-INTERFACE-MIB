@@ -1,0 +1,735 @@
+BTI8xx-INTERFACE-MIB
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    IpAddress,
+    Unsigned32,
+    Integer32,
+    Gauge32,
+    TimeTicks,
+    Counter32               FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    MacAddress,
+    TruthValue,
+    DateAndTime,
+    RowStatus               FROM SNMPv2-TC          -- [RFC2579]
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP            FROM SNMPv2-CONF
+    InterfaceIndex,
+    ifIndex                 FROM IF-MIB             -- [RFC2863]
+    PerfCurrentCount,
+    PerfIntervalCount,
+    PerfTotalCount          FROM PerfHist-TC-MIB    -- [RFC3593]
+    mainSystem              FROM BTI8xx-TC-MIB;
+
+    interfaceConfig   MODULE-IDENTITY
+
+    LAST-UPDATED "201511201200Z"  -- Friday, Nov 20, 12:00:00 KST 2015
+    ORGANIZATION "Actus Networks Ltd."
+    CONTACT-INFO "
+    Support:  +82-2-26535666
+    R&D:      +82-2-26535666
+    Fax:      +82-2-26534662
+    Email:    ymkim@actusnetworks.com
+    "
+
+    DESCRIPTION  "This is a top-level MIB for Actus whose purpose is to lay out
+    the top-level objects in the OID hierarchy from which
+    BTI8xx MIB OIDs descend."
+
+    REVISION     "201511201200Z"  -- Friday, Nov 20, 12:00:00 KST 2015
+    DESCRIPTION  "
+            *1. Change the MAX-ACCESS(for silvercreek tool).
+              'not-accessible' -> 'read-only'
+                -interfaceConfigIndex
+                -interfaceStatisticsIndex
+                -remotePortIdLocalPort
+                -remotePortIdLocalType
+                -rateLimitPort
+                -stormCtrlPort
+
+            *2. Change the syntax.
+              2.1. syntax value range
+                interfaceStatisticsIndex (1..13) -> (1..8191)
+
+              2.2. DisplayString -> OCTET STRING
+                interfaceConfigPort
+                interfaceConfigDescription
+                interfaceConfigLag
+                remotePortIdLocalPort
+                remotePortIdLocalType
+                remotePortIdDesc
+                rateLimitPort
+                stormCtrlPort
+
+            *3. MIB code sorting.
+            "
+
+    REVISION     "201502251500Z"  -- Wednesday, Feb 25, 15:00:00 KST 2015
+    DESCRIPTION  "
+        *1. Change the access to interfaceStatisticsTable
+          > R/W -> R/O
+            interfaceStatisticsIndex
+            interfaceStatisticsInOctets
+            interfaceStatisticsInFrames
+            interfaceStatisticsInUcastPkts
+            interfaceStatisticsInMulticastPkts
+            interfaceStatisticsInBroadcastPkts
+            interfaceStatisticsOutOctets
+            interfaceStatisticsOutFrames
+            interfaceStatisticsOutUcastPkts
+            interfaceStatisticsOutMulticastPkts
+            interfaceStatisticsOutBroadcastPkts
+            interfaceStatisticsDropEvents
+            interfaceStatisticsFCSErrors
+            interfaceStatisticsUndersizePkts
+            interfaceStatisticsOversizePkts
+            interfaceStatisticsFragments
+            interfaceStatisticsJabbers
+            interfaceStatisticsSymbolErrors
+        "     
+
+    REVISION     "201411141200Z"  -- Friday, Nov 14, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. This item value is changed syntax 
+          interfaceConfigIndex  Integer32 (1..255) -> Integer32 (1..8191)
+        "     
+
+    REVISION     "201410291200Z"  -- Wednesday, Oct 29, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. Change the sytax size
+          DisplayString(SIZE(0..256)) -> DisplayString(SIZE(0..255))
+        "
+
+    REVISION     "201406131200Z"  -- Friday, Jun 13, 12:00:00 KST 2014
+    DESCRIPTION  "
+        *1. This value range is changed the 13312 to 9600.
+          interfaceConfigMTU
+
+        *2. This value access is changed the read-write to read-only.
+          interfaceConfigOperStatus
+          interfaceConfigOperFlowCtrl
+          interfaceConfigAct
+
+        *3. This value range is changed the 1953125 to 1000000000.
+          stormCtrlBroadcastPps
+          stormCtrlMulticastPps
+          stormCtrlDlfPps
+        "     
+        
+    REVISION     "201312271200Z"  -- Monday, Dec 30, 12:00:00 KST 2013
+    DESCRIPTION  "Initial version of MIB."   
+        
+    ::= { mainSystem 5 }
+
+-- =================================================================
+-- privateManagement:configManagement:mainSystem:interfaceConfig  ==
+-- =================================================================
+interfaceConfigTable        OBJECT-TYPE
+  SYNTAX                  SEQUENCE OF InterfaceConfigEntry
+  MAX-ACCESS              not-accessible
+  STATUS                  current
+  DESCRIPTION
+    "Table that contains Interface Config Table."
+  ::= { interfaceConfig 1 }
+
+  interfaceConfigEntry OBJECT-TYPE
+    SYNTAX               InterfaceConfigEntry
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+      "A list of information for Interface Config."
+    INDEX   { interfaceConfigIndex }
+    ::= { interfaceConfigTable 1 }
+
+    InterfaceConfigEntry ::=
+      SEQUENCE    {
+      interfaceConfigIndex    		  Integer32,
+      interfaceConfigPort     		  OCTET STRING,
+      interfaceConfigMTU     			  Integer32,
+      interfaceConfigTPID     		  OCTET STRING,
+      interfaceConfigPVID     		  Integer32,
+      interfaceConfigAdminStatus    INTEGER,
+      interfaceConfigOperStatus  		INTEGER,
+      interfaceConfigMode     		  INTEGER,
+      interfaceConfigDuplex   		  INTEGER,
+      interfaceConfigSpeed    		  Integer32,
+      interfaceConfigAdminFlowCtrl	INTEGER,
+      interfaceConfigOperFlowCtrl		INTEGER,
+--      interfaceConfigInstalled   		INTEGER,
+      interfaceConfigAct         		INTEGER,
+      interfaceConfigDescription		OCTET STRING,
+      interfaceConfigPriority			  Integer32,
+      interfaceConfigLag				    OCTET STRING,
+      interfaceConfigLearning			  INTEGER	
+      }
+
+      interfaceConfigIndex        OBJECT-TYPE
+        SYNTAX                      Integer32 (1..8191)
+        MAX-ACCESS                  read-only
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 1 }
+
+     interfaceConfigPort         OBJECT-TYPE
+        SYNTAX                      OCTET STRING(SIZE (1..32))
+        MAX-ACCESS                  read-only
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 2 }
+
+      interfaceConfigMTU        OBJECT-TYPE
+        SYNTAX                      Integer32 (64..9600)
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The MTU value of interface Config entry."
+        ::= { interfaceConfigEntry 3 }
+
+      interfaceConfigTPID         OBJECT-TYPE
+        SYNTAX                      OCTET STRING(SIZE (1..6))
+--        SYNTAX                      INTEGER{ 0x8100(1), 0x88a8(2), 0x9100(3), 0x9200(4) }
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry.
+          ex)8800, 88a8, 9100, 9200 
+          "
+        ::= { interfaceConfigEntry 4 }
+
+      interfaceConfigPVID         OBJECT-TYPE
+        SYNTAX                      Integer32(1..4094)
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 5 }
+
+      interfaceConfigAdminStatus  OBJECT-TYPE
+        SYNTAX                      INTEGER{ up(1), down(2) }
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 6 }
+
+      interfaceConfigOperStatus   OBJECT-TYPE
+        SYNTAX                      INTEGER{ up(1), down(2) }
+        MAX-ACCESS                  read-only
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 7 }
+
+      interfaceConfigMode         OBJECT-TYPE
+        SYNTAX                      INTEGER{ auto(1), force(2) }
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 8 }
+
+      interfaceConfigDuplex       OBJECT-TYPE
+        SYNTAX                      INTEGER{ full(1), half(2), auto(3) }
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 9 }
+
+      interfaceConfigSpeed        OBJECT-TYPE
+        SYNTAX                      Integer32(1..10000) 
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 10 }
+
+      interfaceConfigAdminFlowCtrl	OBJECT-TYPE
+        SYNTAX                      	INTEGER{ enable(1), disable(2) }
+        MAX-ACCESS                  	read-write
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 11 }
+
+      interfaceConfigOperFlowCtrl     OBJECT-TYPE
+        SYNTAX                      	INTEGER{ enable(1), disable(2) }
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Config entry."
+        ::= { interfaceConfigEntry 12 }
+
+      interfaceConfigAct          OBJECT-TYPE
+        SYNTAX                      INTEGER{ act(1), deAct(2) }
+        MAX-ACCESS                  read-only
+        STATUS                      current
+        DESCRIPTION
+          "The act value of interface Config entry."
+        ::= { interfaceConfigEntry 13 }
+
+      interfaceConfigDescription  OBJECT-TYPE
+        SYNTAX                      OCTET STRING(SIZE(0..32))
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The description value of interface Config entry."
+        ::= { interfaceConfigEntry 14 }
+
+      interfaceConfigPriority     OBJECT-TYPE
+        SYNTAX                      Integer32(0..7)
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          "The prioryty value of interface Config entry."
+        ::= { interfaceConfigEntry 15 }
+
+      interfaceConfigLag   OBJECT-TYPE
+        SYNTAX                      OCTET STRING(SIZE(0..16))
+        MAX-ACCESS                  read-only
+        STATUS                      current
+        DESCRIPTION
+          "The Link Aggregation Group of interface Config entry."
+        ::= { interfaceConfigEntry 16 }
+
+      interfaceConfigLearning	    OBJECT-TYPE
+        SYNTAX                      INTEGER{ enable(1), disable(2) }
+        MAX-ACCESS                  read-write
+        STATUS                      current
+        DESCRIPTION
+          " "
+        ::= { interfaceConfigEntry 17 }
+
+
+-- ======================================================================
+-- pManagement:configManagement:interfaceConfig:interfaceConfigTable   ==
+-- ======================================================================
+interfaceStatisticsTable        OBJECT-TYPE
+  SYNTAX                  SEQUENCE OF InterfaceStatisticsEntry
+  MAX-ACCESS              not-accessible
+  STATUS                  current
+  DESCRIPTION
+    "Table that contains Interface Statistics Table."
+  ::= { interfaceConfig 2 }
+
+  interfaceStatisticsEntry OBJECT-TYPE
+    SYNTAX               InterfaceStatisticsEntry
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+      "A list of information for Interface Statistics."
+    INDEX   { interfaceStatisticsIndex }
+    ::= { interfaceStatisticsTable 1 }
+
+    InterfaceStatisticsEntry ::=
+      SEQUENCE    {
+      interfaceStatisticsIndex    				Integer32,
+      interfaceStatisticsInOctets 				Unsigned32,
+      interfaceStatisticsInFrames				Unsigned32,
+      interfaceStatisticsInUcastPkts			Unsigned32,
+      interfaceStatisticsInMulticastPkts		Unsigned32,
+      interfaceStatisticsInBroadcastPkts		Unsigned32,
+      interfaceStatisticsOutOctets				Unsigned32,
+      interfaceStatisticsOutFrames				Unsigned32,
+      interfaceStatisticsOutUcastPkts			Unsigned32,
+      interfaceStatisticsOutMulticastPkts		Unsigned32,
+      interfaceStatisticsOutBroadcastPkts		Unsigned32,
+      interfaceStatisticsDropEvents				Unsigned32,
+      interfaceStatisticsFCSErrors				Unsigned32,
+      interfaceStatisticsUndersizePkts			Unsigned32,
+      interfaceStatisticsOversizePkts			Unsigned32,
+      interfaceStatisticsFragments				Unsigned32,
+      interfaceStatisticsJabbers				Unsigned32,
+      interfaceStatisticsSymbolErrors		  	Unsigned32	
+      }
+
+      interfaceStatisticsIndex        OBJECT-TYPE
+        SYNTAX                      Integer32 (1..8191)
+        MAX-ACCESS                  read-only
+        STATUS                      current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 1 }
+
+      interfaceStatisticsInOctets        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 2 }
+
+      interfaceStatisticsInFrames        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 3 }
+
+      interfaceStatisticsInUcastPkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 4 }
+
+      interfaceStatisticsInMulticastPkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 5 }
+
+      interfaceStatisticsInBroadcastPkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 6 }
+
+      interfaceStatisticsOutOctets        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 7 }
+
+      interfaceStatisticsOutFrames        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 8 }
+
+      interfaceStatisticsOutUcastPkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 9 }
+
+      interfaceStatisticsOutMulticastPkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 10 }
+
+      interfaceStatisticsOutBroadcastPkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 11 }
+
+      interfaceStatisticsDropEvents        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 12 }
+
+      interfaceStatisticsFCSErrors        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 13 }
+
+      interfaceStatisticsUndersizePkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 14 }
+
+      interfaceStatisticsOversizePkts        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 15 }
+
+      interfaceStatisticsFragments        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 16 }
+
+      interfaceStatisticsJabbers        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 17 }
+
+      interfaceStatisticsSymbolErrors        OBJECT-TYPE
+        SYNTAX                      	Unsigned32(1..4294967295)
+        MAX-ACCESS                  	read-only
+        STATUS                      	current
+        DESCRIPTION
+          "The index value of interface Statistics entry."
+        ::= { interfaceStatisticsEntry 18 }
+
+
+-- ==============================================================
+-- pManagement:configManagement:interfaceConfig:remoteConfig   ==
+-- ==============================================================
+remotePortIdTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RemotePortIdEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A table that contains informations for Remote Port ID ."
+	::= { interfaceConfig 3 }
+	
+  remotePortIdEntry		OBJECT-TYPE
+    SYNTAX		RemotePortIdEntry
+    MAX-ACCESS	not-accessible
+    STATUS		current
+    DESCRIPTION
+      "A list of information for Remote Port ID Table."
+    INDEX  { ifIndex }
+    ::= { remotePortIdTable 1 }
+
+  RemotePortIdEntry ::= 
+    SEQUENCE	{
+      remotePortIdLocalPort		OCTET STRING,
+      remotePortIdLocalType		OCTET STRING,
+      remotePortIdDesc			  OCTET STRING
+    }
+
+    remotePortIdLocalPort		OBJECT-TYPE
+      SYNTAX				  OCTET STRING(SIZE(1..64))
+      MAX-ACCESS			read-only
+      STATUS				  current
+      DESCRIPTION
+        "The Interface Local Port value of Remote Port ID Table."
+      ::= { remotePortIdEntry 1 }
+
+    remotePortIdLocalType	OBJECT-TYPE
+      SYNTAX				  OCTET STRING(SIZE(1..64))
+      MAX-ACCESS			read-only
+      STATUS				  current
+      DESCRIPTION
+        "The Interface Local Port Type value of Remote Port ID Table."
+      ::= { remotePortIdEntry 2 }
+
+    remotePortIdDesc		OBJECT-TYPE
+      SYNTAX				  OCTET STRING(SIZE(0..255))
+      MAX-ACCESS			read-write
+      STATUS				  current
+      DESCRIPTION
+        "The Interface Port Description value of Remote Port ID  Table."
+      ::= { remotePortIdEntry 3 }
+
+
+-- ===============================================================
+-- pManagement:configManagement:interfaceConfig:rateLimitTable  ==
+-- ===============================================================
+rateLimitTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RateLimitEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A table that contains informations for rate-limit ."
+	::= { interfaceConfig 4 }
+	
+  rateLimitEntry		OBJECT-TYPE
+    SYNTAX		RateLimitEntry
+    MAX-ACCESS	not-accessible
+    STATUS		current
+    DESCRIPTION
+      "A list of information for Rate Limit Table."
+    INDEX  { ifIndex }
+    ::= { rateLimitTable 1 }
+
+  RateLimitEntry ::= 
+    SEQUENCE	{
+      rateLimitPort           OCTET STRING,
+      rateLimitIngressRate    Integer32,
+      rateLimitIngressBurst   Integer32,
+      rateLimitIngressState   INTEGER,
+      rateLimitEgressRate     Integer32,
+      rateLimitEgressBurst    Integer32,
+      rateLimitEgressState    INTEGER,
+      rateLimitShapingMode    INTEGER
+    }
+
+    rateLimitPort			OBJECT-TYPE
+      SYNTAX					OCTET STRING(SIZE(1..64))
+      MAX-ACCESS			read-only
+      STATUS					current
+      DESCRIPTION
+        "The Interface Local Port value of Rate Limit Table."
+      ::= { rateLimitEntry 1 }
+
+    rateLimitIngressRate	OBJECT-TYPE
+      SYNTAX					Integer32(0..1000000)
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Rate Limit Ingress Rate value of Rate Limit Table."
+      ::= { rateLimitEntry 2 }
+
+    rateLimitIngressBurst	OBJECT-TYPE
+      SYNTAX					Integer32(0..1000000)
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Rate Limit Ingress Burst value of Rate Limit Table."
+      ::= { rateLimitEntry 3 }
+
+    rateLimitIngressState	OBJECT-TYPE
+      SYNTAX					INTEGER{ disable(0), enable(1) }	
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION				
+        "The Rate Limit Ingress State value of Rate Limit Table."
+      ::= { rateLimitEntry 4 }
+
+    rateLimitEgressRate		OBJECT-TYPE
+      SYNTAX					Integer32(0..1000000)
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Rate Limit Egress Rate value of Rate Limit Table."
+      ::= { rateLimitEntry 5 }
+
+    rateLimitEgressBurst	OBJECT-TYPE
+      SYNTAX					Integer32(0..1000000)
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Rate Limit Egress Burst value of Rate Limit Table."
+      ::= { rateLimitEntry 6 }
+
+    rateLimitEgressState	OBJECT-TYPE
+      SYNTAX					INTEGER{ disable(0), enable(1) }
+      MAX-ACCESS      read-write
+      STATUS					current
+      DESCRIPTION				
+        "The Rate Limit Egress State value of Rate Limit Table."
+      ::= { rateLimitEntry 7 }
+
+    rateLimitShapingMode	OBJECT-TYPE
+      SYNTAX					INTEGER{ layer1(0), layer2(1) }
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION				
+        "The Rate Limit Mode value of Rate Limit Table."
+      ::= { rateLimitEntry 8 }
+
+
+-- ===============================================================
+-- pManagement:configManagement:interfaceConfig:stormCtrlTable  ==
+-- ===============================================================
+stormCtrlTable		OBJECT-TYPE
+	SYNTAX		SEQUENCE OF StormCtrlEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A table that contains informations for rate-limit ."
+	::= { interfaceConfig 5 }
+	
+  stormCtrlEntry		OBJECT-TYPE
+    SYNTAX		StormCtrlEntry
+    MAX-ACCESS	not-accessible
+    STATUS		current
+    DESCRIPTION
+      "A list of information for Rate Limit Table."
+    INDEX  { ifIndex }
+    ::= { stormCtrlTable 1 }
+
+  StormCtrlEntry ::= 
+    SEQUENCE	{
+      stormCtrlPort             OCTET STRING,
+      stormCtrlBroadcastPps     Integer32,
+      stormCtrlBroadcastState	  INTEGER,
+      stormCtrlMulticastPps	    Integer32,
+      stormCtrlMulticastState   INTEGER,
+      stormCtrlDlfPps           Integer32,
+      stormCtrlDlfState         INTEGER
+    }
+
+    stormCtrlPort			OBJECT-TYPE
+      SYNTAX					  OCTET STRING(SIZE(1..64))
+      MAX-ACCESS				read-only
+      STATUS					  current
+      DESCRIPTION
+        "The  Port value of Storm Control Table."
+      ::= { stormCtrlEntry 1 }
+
+    stormCtrlBroadcastPps	OBJECT-TYPE
+      SYNTAX					Integer32(0..1000000000)
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Broadcast PPS  value of Storm Control Table."
+      ::= { stormCtrlEntry 2 }
+
+    stormCtrlBroadcastState	OBJECT-TYPE
+      SYNTAX					INTEGER{ disable(0), enable(1) }
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Broadcast State  value of Storm Control Table."
+      ::= { stormCtrlEntry 3 }
+
+    stormCtrlMulticastPps	OBJECT-TYPE
+      SYNTAX					Integer32(0..1000000000)
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Broadcast PPS  value of Storm Control Table."
+      ::= { stormCtrlEntry 4 }
+
+    stormCtrlMulticastState	OBJECT-TYPE
+      SYNTAX					INTEGER{ disable(0), enable(1) }
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Multicast State  value of Storm Control Table."
+      ::= { stormCtrlEntry 5 }
+
+    stormCtrlDlfPps			OBJECT-TYPE
+      SYNTAX					Integer32(0..1000000000)
+      MAX-ACCESS			read-write
+      STATUS					current
+      DESCRIPTION
+        "The Dlf PPS  value of Storm Control Table."
+      ::= { stormCtrlEntry 6 }
+
+    stormCtrlDlfState		OBJECT-TYPE
+      SYNTAX					INTEGER{ disable(0), enable(1) }
+      MAX-ACCESS      read-write
+      STATUS					current
+      DESCRIPTION
+        "The dlf State  value of Storm Control Table."
+      ::= { stormCtrlEntry 7 }
+
+
+END

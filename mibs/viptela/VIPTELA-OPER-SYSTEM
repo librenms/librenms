@@ -1,0 +1,5992 @@
+-- Namespace: http://viptela.com/oper-system
+
+VIPTELA-OPER-SYSTEM DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-oper-system MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for system operational data"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 11 }
+
+UnsignedByte ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedByte"
+    SYNTAX      Unsigned32 (0 .. 255)
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+InetAddressIP ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:inetAddressIP"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+Permission1 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+Permission ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      OCTET STRING
+
+-- Display system status information
+-- tagpath /system-status
+systemStatus OBJECT IDENTIFIER ::= { viptela-oper-system 1 }
+
+-- tagpath /system-status/personality
+systemStatusPersonality OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 1 }
+
+-- tagpath /system-status/version
+systemStatusVersion OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 2 }
+
+-- tagpath /system-status/loghost_status
+systemStatusLoghostStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 3 }
+
+-- tagpath /system-status/loghost_name
+systemStatusLoghostName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 4 }
+
+-- tagpath /system-status/disk_status
+systemStatusDiskStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 5 }
+
+-- tagpath /system-status/reboot_reason
+systemStatusRebootReason OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 6 }
+
+-- tagpath /system-status/core_files_status
+systemStatusCoreFilesStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 7 }
+
+-- tagpath /system-status/uptime
+systemStatusUptime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 8 }
+
+-- tagpath /system-status/min1_avg
+systemStatusMin1Avg OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 9 }
+
+-- tagpath /system-status/min5_avg
+systemStatusMin5Avg OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 10 }
+
+-- tagpath /system-status/min15_avg
+systemStatusMin15Avg OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 11 }
+
+-- tagpath /system-status/totalp
+systemStatusTotalp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 12 }
+
+-- tagpath /system-status/runningp
+systemStatusRunningp OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 13 }
+
+-- tagpath /system-status/cpu_user
+systemStatusCpuUser OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 14 }
+
+-- tagpath /system-status/cpu_system
+systemStatusCpuSystem OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 15 }
+
+-- tagpath /system-status/cpu_idle
+systemStatusCpuIdle OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 16 }
+
+-- tagpath /system-status/mem_total
+systemStatusMemTotal OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 17 }
+
+-- tagpath /system-status/mem_used
+systemStatusMemUsed OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 18 }
+
+-- tagpath /system-status/mem_free
+systemStatusMemFree OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 19 }
+
+-- tagpath /system-status/mem_buffers
+systemStatusMemBuffers OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 20 }
+
+-- tagpath /system-status/mem_cached
+systemStatusMemCached OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 21 }
+
+-- tagpath /system-status/disk_fs
+systemStatusDiskFs OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 22 }
+
+-- tagpath /system-status/disk_size
+systemStatusDiskSize OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 23 }
+
+-- tagpath /system-status/disk_used
+systemStatusDiskUsed OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 24 }
+
+-- tagpath /system-status/disk_avail
+systemStatusDiskAvail OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 25 }
+
+-- tagpath /system-status/disk_use
+systemStatusDiskUse OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 26 }
+
+-- tagpath /system-status/disk_total_bytes
+systemStatusDiskTotalBytes OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 27 }
+
+-- tagpath /system-status/disk_used_bytes
+systemStatusDiskUsedBytes OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 28 }
+
+-- tagpath /system-status/disk_avail_bytes
+systemStatusDiskAvailBytes OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 29 }
+
+-- tagpath /system-status/disk_mount
+systemStatusDiskMount OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 30 }
+
+-- tagpath /system-status/services
+systemStatusServices OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 31 }
+
+-- tagpath /system-status/board_type
+systemStatusBoardType OBJECT-TYPE
+    SYNTAX      INTEGER {vedge-1000(0),
+                        vedge-2000(1),
+                        sim(2),
+                        none(3),
+                        unknown(4),
+                        vedge-100(5), 
+                        vedge-100-B(6), 
+                        vedge-5000(7), 
+                        vedge-CSR(8), 
+                        vedge-ISR(9), 
+                        vedge-ASR(10), 
+                        vedge-101-B(11), 
+                        vedge-1001(12), 
+                        vedge-101-m(13), 
+                        vedge-ISR1100-4G(14), 
+                        vedge-ISR1100-4GLTE(15), 
+                        vedge-ISR1100-6G(16), 
+                        vedge-encs(17), 
+                        vedge-ISR1100X-4G(18), 
+                        vedge-ISR1100X-6G(19)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 32 }
+
+-- tagpath /system-status/config_date/date-time-string
+systemStatusConfigDateDateTimeString OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Pretty string version of date and time"
+    ::= { systemStatus 33 }
+
+-- tagpath /system-status/current_date/date-time-string
+systemStatusCurrentDateDateTimeString OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Pretty string version of date and time"
+    ::= { systemStatus 34 }
+
+-- tagpath /system-status/procs
+systemStatusProcs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 100 }
+
+-- tagpath /system-status/disk_bsize
+systemStatusDiskBsize OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 101 }
+
+-- tagpath /system-status/disk_blocks
+systemStatusDiskBlocks OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 102 }
+
+-- tagpath /system-status/disk_bused
+systemStatusDiskBused OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 103 }
+
+-- tagpath /system-status/disk_bavail
+systemStatusDiskBavail OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 104 }
+
+-- tagpath /system-status/standalone_vbond
+systemStatusStandaloneVbond OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 35 }
+
+-- tagpath /system-status/vmanaged
+systemStatusVmanaged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device is managed by the vmanage"
+    ::= { systemStatus 36 }
+
+-- tagpath /system-status/pseudo-confirm-commit
+systemStatusPseudoConfirmCommit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Only valid for vmanage .. is always hidden"
+    ::= { systemStatus 37 }
+
+-- tagpath /system-status/config-template-name
+systemStatusConfigTemplateName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configuration template assigned by the vManage"
+    ::= { systemStatus 38 }
+
+-- tagpath /system-status/policy-template-name
+systemStatusPolicyTemplateName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policy template assigned by the vManage"
+    ::= { systemStatus 39 }
+
+-- tagpath /system-status/policy-template-version
+systemStatusPolicyTemplateVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Policy template version assigned by the vManage"
+    ::= { systemStatus 40 }
+
+-- tagpath /system-status/vmanage-storage-disk-fs
+systemStatusVmanageStorageDiskFs OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 41 }
+
+-- tagpath /system-status/vmanage-storage-disk-size
+systemStatusVmanageStorageDiskSize OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 42 }
+
+-- tagpath /system-status/vmanage-storage-disk-used
+systemStatusVmanageStorageDiskUsed OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 43 }
+
+-- tagpath /system-status/vmanage-storage-disk-avail
+systemStatusVmanageStorageDiskAvail OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 44 }
+
+-- tagpath /system-status/vmanage-storage-disk-use
+systemStatusVmanageStorageDiskUse OBJECT-TYPE
+    SYNTAX      ConfdString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 45 }
+
+-- tagpath /system-status/vmanage-storage-disk-mount
+systemStatusVmanageStorageDiskMount OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 46 }
+
+-- tagpath /system-status/model
+systemStatusModel OBJECT-TYPE
+    SYNTAX      INTEGER {vsmart(1),
+                         vmanage(2),
+                         vbond(3),
+                         vedge-1000(4),
+                         vedge-2000(5),
+                         vedge-100(6),
+                         vedge-100-W2(7),
+                         vedge-100-WM(8),
+                         vedge-100-M2(9),
+                         vedge-100-M(10),
+                         vedge-100-B(11),
+                         vedge-cloud(12),
+                         vcontainer(13),
+                         vedge-5000(14),
+                         vedge-CSR-1000v(15),
+                         vedge-ISR-4331(16),
+                         vedge-ISR-4321(17),
+                         vedge-ISR-4351(18),
+                         vedge-ISR-4221(19),
+                         vedge-ASR-1001-X(20),
+                         vedge-ASR-1001-HX(21),
+                         vedge-ASR-1002-X(22),
+                         vedge-ASR-1002-HX(23),
+                         vedge-C1111-8PLTEEA(24),
+                         vedge-C1111-8PLTELA(25),
+                         vedge-C1117-4PLTEEA(26),
+                         vedge-C1117-4PLTELA(27),
+                         vedge-C1116-4PLTEEA(28),
+                         vedge-C1116-4PLTELA(29),
+                         vedge-ISRv(30),
+                         vedge-C1111-8P(31),
+                         vedge-C1111-4PLTEEA(32),
+                         vedge-C1111-4PLTELA(33),
+                         vedge-C1117-4PMLTEEA(34),
+                         vedge-C1111-4P(35),
+                         vedge-C1116-4P(36),
+                         vedge-C1117-4P(37),
+                         vedge-C1117-4PM(38),
+                         vedge-C1101-4P(39),
+                         vedge-C1101-4PLTEP(40),
+                         vedge-C1111X-8P(41),
+                         vedge-C1111-8PLTEEAW(42),
+                         vedge-C1111-8PW(43),
+                         vedge-ISR-4431(44),
+                         vedge-ISR-4451-X(45),
+                         vedge-ISR-4221X(46),
+                         vedge-ISR-4461(47),
+                         vedge-C8300-1N1S-6G(48),
+                         vedge-C8300-1N1S-4G2X(49),
+                         vedge-CE-9515(54),
+                         vedge-CE-9511(55),
+                         vedge-IR-1101(56),
+                         vedge-C1121X-8PLTEPW(57),
+                         vedge-C1161X-8P(60),
+                         vedge-C1161X-8PLTEP(61),
+                         vedge-C1111-8PLTEAEAW(62),
+                         vedge-C1121-8P(63),
+                         vedge-C1121-8PLTEP(64),
+                         vedge-C1121X-8PLTEPWA(65),
+                         vedge-C1127X-8PMLTEP(66),
+                         vedge-C1109-4PLTE2P(68),
+                         vedge-C1101-4PLTEPW(69),
+                         vedge-C1109-4PLTE2PW(70),
+                         vedge-C1111-8PLTELAW(71),
+                         vedge-C1121X-8P(72),
+                         vedge-C1121X-8PLTEP(73),
+                         vedge-C1126X-8PLTEP(74),
+                         vedge-C1127X-8PLTEP(75),
+                         vedge-C8500-12X4QC(76),
+                         vedge-C8500-12X(77),
+                         vedge-C1121-8PLTEPW(78),
+                         vedge-C1113-8PMLTEEA(79),
+                         vedge-ISR1100-4G(80),
+                         vedge-ISR1100-4GLTE(81),
+                         vedge-ISR1100-6G(82),
+                         vedge-C8300-2N2S-6G(84),
+                         vedge-C8300-2N2S-4G2X(85),
+                         vedge-C8500L-8G4X(86),
+                         vedge-sim(100),
+                         vedge-NFVIS-ENCS5100(200),
+                         vedge-NFVIS-ENCS5400(201),
+                         vedge-NFVIS-UCSC-M5(202),
+                         vedge-NFVIS-UCSC-E(203),
+                         vedge-NFVIS-CSP2100(204),
+                         vedge-NFVIS-CSP2100-X1(205),
+                         vedge-NFVIS-CSP2100-X2(206),
+                         vedge-NFVIS-CSP2100-CSP-5444(207),
+                         vedge-C1161-8P(212),
+                         vedge-C1161-8PLTEP(213),
+                         vedge-C1126-8PLTEP(214),
+                         vedge-C1127-8PLTEP(215),
+                         vedge-C1127-8PMLTEP(216),
+                         vedge-C1121-4P(217),
+                         vedge-C1121-4PLTEP(218),
+                         vedge-C1128-8PLTEP(219),
+                         vedge-C1111-4PW(220),
+                         vedge-C1112-8P(221),
+                         vedge-C1112-8PLTEEA(222),
+                         vedge-C1112-8PLTEEAW(223),
+                         vedge-C1112-8PW(224),
+                         vedge-C1113-8P(225),
+                         vedge-C1113-8PLTEEA(226),
+                         vedge-C1113-8PLTEEAW(227),
+                         vedge-C1113-8PLTELAW(228),
+                         vedge-C1113-8PLTELA(229),
+                         vedge-C1113-8PM(230),
+                         vedge-C1113-8PMW(231),
+                         vedge-C1113-8PW(232),
+                         vedge-C1116-4PLTEEAW(233),
+                         vedge-C1116-4PW(234),
+                         vedge-C1117-4PLTEEAW(235),
+                         vedge-C1117-4PMLTEEAW(236),
+                         vedge-C1117-4PMW(237),
+                         vedge-C1117-4PW(238),
+                         vedge-C1118-8P(239),
+                         vedge-C1109-2PLTEGB(240),
+                         vedge-C1109-2PLTEUS(241),
+                         vedge-C1109-2PLTEVZ(242),
+                         vedge-C1113-8PLTEW(243),
+                         vedge-C1112-8PLTEEAWE(244),
+                         vedge-C1112-8PWE(245),
+                         vedge-C1113-8PLTELAWZ(246),
+                         vedge-C1113-8PMWE(247),
+                         vedge-C1116-4PLTEEAWE(248),
+                         vedge-C1116-4PWE(249),
+                         vedge-C1117-4PLTEEAWA(250),
+                         vedge-C1117-4PMLTEEAWE(251),
+                         vedge-C1117-4PMWE(252),
+                         vedge-C8200-1N-4G(253),
+                         vedge-ISR1100-4GLTE-XE(254),
+                         vedge-ISR1100-4G-XE(255),
+                         vedge-ISR1100-6G-XE(256),
+                         vedge-NFVIS-C8200-UCPE(257),
+                         vedge-C8300-1N1S-6T(258),
+                         vedge-C8300-1N1S-4T2X(259),
+                         vedge-C8300-2N2S-6T(260),
+                         vedge-C8300-2N2S-4T2X(261),
+                         vedge-C8200-1N-4T(262),
+                         vedge-ESR-6300(263),
+                         vedge-C8000V(264),
+                         vedge-ISR1100X-4G(265),
+                         vedge-ISR1100X-6G(266),
+                         vedge-ISR1100X-4G-XE(267),
+                         vedge-ISR1100X-6G-XE(268)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 47 }
+
+-- tagpath /system-status/reboot_type
+systemStatusRebootType OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 48 }
+
+-- tagpath /system-status/total_cpu_count
+systemStatusTotalCpuCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 49 }
+
+-- tagpath /system-status/fp_cpu_count
+systemStatusFpCpuCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 50 }
+
+-- tagpath /system-status/linux_cpu_count
+systemStatusLinuxCpuCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 51 }
+
+-- tagpath /system-status/bootloader_version
+systemStatusBootloaderVersion OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 52 }
+
+
+-- tagpath /system-status/build_number
+systemStatusBuildNumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 53 }
+
+-- tagpath /system-status/state
+systemStatusState OBJECT-TYPE
+    SYNTAX      INTEGER {blkng-green(0),green(1),yellow(2),red(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 54 }
+
+-- tagpath /system-status/state_description
+systemStatusSystemStateDescription OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 55 }
+
+-- tagpath /system-status/model_sku
+systemStatusSystemModelSku OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 56 }
+
+-- tagpath /system-status/tcpd_cpu_count
+systemStatusTcpdCpuCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 57 }
+
+-- tagpath /system-status/fips_mode
+systemStatusSystemFipsMode OBJECT-TYPE
+    SYNTAX      INTEGER {unavailable(0),disabled(1),enabled(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 58 }
+
+-- tagpath /system-status/testbed_mode
+systemStatusSystemTestbedMode OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 59 }
+
+-- tagpath /system-status/ctrl_compatibility
+systemStatusSystemCtrlCompatibility OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 60 }
+
+-- tagpath /system-status/timezone
+systemStatusSystemTimezone OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 61 }
+
+-- tagpath /system-status/engineering_signed
+systemStatusSystemEngineeringSigned OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 62 }
+
+-- tagpath /system-status/li_license_enabled
+systemStatusSystemLiLicenseEnabled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 63 }
+
+-- tagpath /system-status/chassis_serial_number
+systemStatusSystemChassisSerialNumber OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatus 64 }
+
+-- Display system statistics
+-- tagpath /system-statistics
+systemStatistics OBJECT IDENTIFIER ::= { viptela-oper-system 2 }
+
+-- tagpath /system-statistics/rx_pkts
+systemStatisticsRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 1 }
+
+-- tagpath /system-statistics/rx_drops
+systemStatisticsRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 2 }
+
+-- tagpath /system-statistics/ip_fwd
+systemStatisticsIpFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 3 }
+
+-- tagpath /system-statistics/ip_fwd_mirror_pkts
+systemStatisticsIpFwdMirrorPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 4 }
+
+-- tagpath /system-statistics/ip_fwd_arp
+systemStatisticsIpFwdArp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 5 }
+
+-- tagpath /system-statistics/ip_fwd_to_egress
+systemStatisticsIpFwdToEgress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 6 }
+
+-- tagpath /system-statistics/ip_fwd_invalid_oil
+systemStatisticsIpFwdInvalidOil OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 7 }
+
+-- tagpath /system-statistics/ip_v6_mcast_drops
+systemStatisticsIpV6McastDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 8 }
+
+-- tagpath /system-statistics/ip_fwd_mcast_invalid_iif
+systemStatisticsIpFwdMcastInvalidIif OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 9 }
+
+-- tagpath /system-statistics/ip_fwd_mcast_life_exceeded_drops
+systemStatisticsIpFwdMcastLifeExceededDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 10 }
+
+-- tagpath /system-statistics/rx_mcast_threshold_exceeded
+systemStatisticsRxMcastThresholdExceeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 11 }
+
+-- tagpath /system-statistics/ip_fwd_invalid_tun_oil
+systemStatisticsIpFwdInvalidTunOil OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 12 }
+
+-- tagpath /system-statistics/rx_mcast_policy_fwd_drops
+systemStatisticsRxMcastPolicyFwdDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 13 }
+
+-- tagpath /system-statistics/rx_mcast_mirror_fwd_drops
+systemStatisticsRxMcastMirrorFwdDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 14 }
+
+-- tagpath /system-statistics/ip_fwd_null_mcast_group
+systemStatisticsIpFwdNullMcastGroup OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 15 }
+
+-- tagpath /system-statistics/ip_fwd_null_nhop
+systemStatisticsIpFwdNullNhop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 16 }
+
+-- tagpath /system-statistics/ip_fwd_unknown_nh_type
+systemStatisticsIpFwdUnknownNhType OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 17 }
+
+-- tagpath /system-statistics/ip_fwd_nat_on_tunnel
+systemStatisticsIpFwdNatOnTunnel OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 18 }
+
+-- tagpath /system-statistics/ip_fwd_to_cpu
+systemStatisticsIpFwdToCpu OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 19 }
+
+-- tagpath /system-statistics/ip_fwd_to_cpu_nat_xlates
+systemStatisticsIpFwdToCpuNatXlates OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 20 }
+
+-- tagpath /system-statistics/ip_fwd_from_cpu_nat_xlates
+systemStatisticsIpFwdFromCpuNatXlates OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 21 }
+
+-- tagpath /system-statistics/ip_fwd_to_cpu_nat_drops
+systemStatisticsIpFwdToCpuNatDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 22 }
+
+-- tagpath /system-statistics/ip_fwd_from_cpu_non_local
+systemStatisticsIpFwdFromCpuNonLocal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 23 }
+
+-- tagpath /system-statistics/ip_fwd_rx_ipsec
+systemStatisticsIpFwdRxIpsec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 24 }
+
+-- tagpath /system-statistics/ip_fwd_mcast_pkts
+systemStatisticsIpFwdMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 25 }
+
+-- tagpath /system-statistics/ip_fwd_rx_gre
+systemStatisticsIpFwdRxGre OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 26 }
+
+-- tagpath /system-statistics/nat_xlate_outbound
+systemStatisticsNatXlateOutbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 27 }
+
+-- tagpath /system-statistics/nat_xlate_outbound_drops
+systemStatisticsNatXlateOutboundDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 28 }
+
+-- tagpath /system-statistics/nat_xlate_inbound
+systemStatisticsNatXlateInbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 29 }
+
+-- tagpath /system-statistics/nat_xlate_inbound_fail
+systemStatisticsNatXlateInboundFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 30 }
+
+-- tagpath /system-statistics/cflowd_pkts
+systemStatisticsCflowdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 31 }
+
+-- tagpath /system-statistics/no_nat_nexthop
+systemStatisticsNoNatNexthop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 32 }
+
+-- tagpath /system-statistics/rx_bcast
+systemStatisticsRxBcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 33 }
+
+-- tagpath /system-statistics/rx_mcast
+systemStatisticsRxMcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 34 }
+
+-- tagpath /system-statistics/rx_mcast_link_local
+systemStatisticsRxMcastLinkLocal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 35 }
+
+-- tagpath /system-statistics/rx_mcast_filter_to_cpu
+systemStatisticsRxMcastFilterToCpu OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 36 }
+
+-- tagpath /system-statistics/rx_mcast_filter_to_cpu_and_fwd
+systemStatisticsRxMcastFilterToCpuAndFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 37 }
+
+-- tagpath /system-statistics/rx_gre_decap
+systemStatisticsRxGreDecap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 38 }
+
+-- tagpath /system-statistics/rx_gre_drops
+systemStatisticsRxGreDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 39 }
+
+-- tagpath /system-statistics/rx_gre_policer_drops
+systemStatisticsRxGrePolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 40 }
+
+-- tagpath /system-statistics/rx_implicit_acl_drops
+systemStatisticsRxImplicitAclDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 41 }
+
+-- tagpath /system-statistics/rx_ipsec_decap
+systemStatisticsRxIpsecDecap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 42 }
+
+-- tagpath /system-statistics/rx_ip6_ipsec_drops
+systemStatisticsRxIp6IpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 43 }
+
+-- tagpath /system-statistics/rx_sa_ipsec_drops
+systemStatisticsRxSaIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 44 }
+
+-- tagpath /system-statistics/rx_invalid_ipsec_pkt_size
+systemStatisticsRxInvalidIpsecPktSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 45 }
+
+-- tagpath /system-statistics/rx_spi_ipsec_drops
+systemStatisticsRxSpiIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 46 }
+
+-- tagpath /system-statistics/rx_replay_drops
+systemStatisticsRxReplayDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 47 }
+
+-- tagpath /system-statistics/rx_replay_integrity_drops
+systemStatisticsRxReplayIntegrityDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 48 }
+
+-- tagpath /system-statistics/rx_unexpected_replay_drops
+systemStatisticsRxUnexpectedReplayDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 49 }
+
+-- tagpath /system-statistics/rx_next_hdr_ipsec_drops
+systemStatisticsRxNextHdrIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 50 }
+
+-- tagpath /system-statistics/rx_mac_compare_ipsec_drops
+systemStatisticsRxMacCompareIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 51 }
+
+-- tagpath /system-statistics/rx_err_pad_ipsec_drops
+systemStatisticsRxErrPadIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 52 }
+
+-- tagpath /system-statistics/rx_ipsec_policer_drops
+systemStatisticsRxIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 53 }
+
+-- tagpath /system-statistics/rx_pre_ipsec_pkts
+systemStatisticsRxPreIpsecPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 54 }
+
+-- tagpath /system-statistics/rx_pre_ipsec_drops
+systemStatisticsRxPreIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 55 }
+
+-- tagpath /system-statistics/rx_pre_ipsec_policer_drops
+systemStatisticsRxPreIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 56 }
+
+-- tagpath /system-statistics/rx_pre_ipsec_decap
+systemStatisticsRxPreIpsecDecap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 57 }
+
+-- tagpath /system-statistics/openssl_aes_decrypt
+systemStatisticsOpensslAesDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 58 }
+
+-- tagpath /system-statistics/rx_ipsec_bad_inner
+systemStatisticsRxIpsecBadInner OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 59 }
+
+-- tagpath /system-statistics/rx_bad_label
+systemStatisticsRxBadLabel OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 60 }
+
+-- tagpath /system-statistics/service_label_fwd
+systemStatisticsServiceLabelFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 61 }
+
+-- tagpath /system-statistics/rx_host_local_pkt
+systemStatisticsRxHostLocalPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 62 }
+
+-- tagpath /system-statistics/rx_host_mirror_drops
+systemStatisticsRxHostMirrorDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 63 }
+
+-- tagpath /system-statistics/rx_tunneled_pkts
+systemStatisticsRxTunneledPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 64 }
+
+-- tagpath /system-statistics/rx_cp_non_local
+systemStatisticsRxCpNonLocal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 65 }
+
+-- tagpath /system-statistics/tx_if_not_preferred
+systemStatisticsTxIfNotPreferred OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 66 }
+
+-- tagpath /system-statistics/tx_vsmart_drop
+systemStatisticsTxVsmartDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 67 }
+
+-- tagpath /system-statistics/rx_invalid_port
+systemStatisticsRxInvalidPort OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 68 }
+
+-- tagpath /system-statistics/port_disabled_rx
+systemStatisticsPortDisabledRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 69 }
+
+-- tagpath /system-statistics/ip_disabled_rx
+systemStatisticsIpDisabledRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 70 }
+
+-- tagpath /system-statistics/rx_invalid_qtags
+systemStatisticsRxInvalidQtags OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 71 }
+
+-- tagpath /system-statistics/rx_non_ip_drops
+systemStatisticsRxNonIpDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 72 }
+
+-- tagpath /system-statistics/rx_ip_errs
+systemStatisticsRxIpErrs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 73 }
+
+-- tagpath /system-statistics/pko_wred_drops
+systemStatisticsPkoWredDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 74 }
+
+-- tagpath /system-statistics/tx_queue_exceeded
+systemStatisticsTxQueueExceeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 75 }
+
+-- tagpath /system-statistics/rx_policer_drops
+systemStatisticsRxPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 76 }
+
+-- tagpath /system-statistics/route_to_host
+systemStatisticsRouteToHost OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 77 }
+
+-- tagpath /system-statistics/ttl_expired
+systemStatisticsTtlExpired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 78 }
+
+-- tagpath /system-statistics/icmp_redirect
+systemStatisticsIcmpRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 79 }
+
+-- tagpath /system-statistics/bfd_rx_non_ip
+systemStatisticsBfdRxNonIp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 80 }
+
+-- tagpath /system-statistics/bfd_tx_record_changed
+systemStatisticsBfdTxRecordChanged OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 81 }
+
+-- tagpath /system-statistics/bfd_rx_record_invalid
+systemStatisticsBfdRxRecordInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 82 }
+
+-- tagpath /system-statistics/bfd_rx_parse_err
+systemStatisticsBfdRxParseErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 83 }
+
+-- tagpath /system-statistics/rx_arp_rate_limit_drops
+systemStatisticsRxArpRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 84 }
+
+-- tagpath /system-statistics/rx_arp_non_local_drops
+systemStatisticsRxArpNonLocalDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 85 }
+
+-- tagpath /system-statistics/rx_arp_reqs
+systemStatisticsRxArpReqs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 86 }
+
+-- tagpath /system-statistics/rx_arp_replies
+systemStatisticsRxArpReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 87 }
+
+-- tagpath /system-statistics/arp_add_fail
+systemStatisticsArpAddFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 88 }
+
+-- tagpath /system-statistics/unknown_nh_type
+systemStatisticsUnknownNhType OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 89 }
+
+-- tagpath /system-statistics/buf_alloc_fails
+systemStatisticsBufAllocFails OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 90 }
+
+-- tagpath /system-statistics/ecmp_discards
+systemStatisticsEcmpDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 91 }
+
+-- tagpath /system-statistics/app_route_policy_discards
+systemStatisticsAppRoutePolicyDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 92 }
+
+-- tagpath /system-statistics/cbf_discards
+systemStatisticsCbfDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 93 }
+
+-- tagpath /system-statistics/filter_drops
+systemStatisticsFilterDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 94 }
+
+-- tagpath /system-statistics/invalid_back_ptr
+systemStatisticsInvalidBackPtr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 95 }
+
+-- tagpath /system-statistics/tunnel_loop_drops
+systemStatisticsTunnelLoopDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 96 }
+
+-- tagpath /system-statistics/to_cpu_policer_drops
+systemStatisticsToCpuPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 97 }
+
+-- tagpath /system-statistics/mirror_drops
+systemStatisticsMirrorDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 98 }
+
+-- tagpath /system-statistics/split_horizon_drops
+systemStatisticsSplitHorizonDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 99 }
+
+-- tagpath /system-statistics/rx_no_tun_if
+systemStatisticsRxNoTunIf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 100 }
+
+-- tagpath /system-statistics/tx_pkts
+systemStatisticsTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 101 }
+
+-- tagpath /system-statistics/tx_errors
+systemStatisticsTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 102 }
+
+-- tagpath /system-statistics/tx_bcast
+systemStatisticsTxBcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 103 }
+
+-- tagpath /system-statistics/tx_mcast
+systemStatisticsTxMcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 104 }
+
+-- tagpath /system-statistics/port_disabled_tx
+systemStatisticsPortDisabledTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 105 }
+
+-- tagpath /system-statistics/ip_disabled_tx
+systemStatisticsIpDisabledTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 106 }
+
+-- tagpath /system-statistics/tx_fragment_needed
+systemStatisticsTxFragmentNeeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 107 }
+
+-- tagpath /system-statistics/tx_mcast_fragment_needed
+systemStatisticsTxMcastFragmentNeeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 108 }
+
+-- tagpath /system-statistics/fragment_df_drops
+systemStatisticsFragmentDfDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 109 }
+
+-- tagpath /system-statistics/tx_fragments
+systemStatisticsTxFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 110 }
+
+-- tagpath /system-statistics/tx_fragment_drops
+systemStatisticsTxFragmentDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 111 }
+
+-- tagpath /system-statistics/tx_fragment_fail
+systemStatisticsTxFragmentFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 112 }
+
+-- tagpath /system-statistics/tx_fragment_alloc_fail
+systemStatisticsTxFragmentAllocFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 113 }
+
+-- tagpath /system-statistics/tunnel_pmtu_lowered
+systemStatisticsTunnelPmtuLowered OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 114 }
+
+-- tagpath /system-statistics/tx_gre_pkts
+systemStatisticsTxGrePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 115 }
+
+-- tagpath /system-statistics/tx_gre_drops
+systemStatisticsTxGreDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 116 }
+
+-- tagpath /system-statistics/tx_gre_policer_drops
+systemStatisticsTxGrePolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 117 }
+
+-- tagpath /system-statistics/tx_gre_encap
+systemStatisticsTxGreEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 118 }
+
+-- tagpath /system-statistics/tx_ipsec_pkts
+systemStatisticsTxIpsecPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 119 }
+
+-- tagpath /system-statistics/tx_ipsec_mcast_pkts
+systemStatisticsTxIpsecMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 120 }
+
+-- tagpath /system-statistics/tx_ip6_ipsec_drops
+systemStatisticsTxIp6IpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 121 }
+
+-- tagpath /system-statistics/tx_no_out_sa_ipsec_drops
+systemStatisticsTxNoOutSaIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 122 }
+
+-- tagpath /system-statistics/tx_no_tunn_ipsec_drops
+systemStatisticsTxNoTunnIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 123 }
+
+-- tagpath /system-statistics/tx_ipsec_policer_drops
+systemStatisticsTxIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 124 }
+
+-- tagpath /system-statistics/tx_ipsec_encap
+systemStatisticsTxIpsecEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 125 }
+
+-- tagpath /system-statistics/tx_ipsec_mcast_encap
+systemStatisticsTxIpsecMcastEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 126 }
+
+-- tagpath /system-statistics/tx_pre_ipsec_pkts
+systemStatisticsTxPreIpsecPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 127 }
+
+-- tagpath /system-statistics/tx_no_out_sa_pre_ipsec_drops
+systemStatisticsTxNoOutSaPreIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 128 }
+
+-- tagpath /system-statistics/tx_no_tunn_pre_ipsec_drops
+systemStatisticsTxNoTunnPreIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 129 }
+
+-- tagpath /system-statistics/openssl_aes_encrypt
+systemStatisticsOpensslAesEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 130 }
+
+-- tagpath /system-statistics/tx_pre_ipsec_policer_drops
+systemStatisticsTxPreIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 131 }
+
+-- tagpath /system-statistics/tx_pre_ipsec_encap
+systemStatisticsTxPreIpsecEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 132 }
+
+-- tagpath /system-statistics/tx_arp_replies
+systemStatisticsTxArpReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 133 }
+
+-- tagpath /system-statistics/tx_arp_reqs
+systemStatisticsTxArpReqs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 134 }
+
+-- tagpath /system-statistics/tx_arp_req_fail
+systemStatisticsTxArpReqFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 135 }
+
+-- tagpath /system-statistics/tx_no_arp_drop
+systemStatisticsTxNoArpDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 136 }
+
+-- tagpath /system-statistics/tx_arp_rate_limit_drops
+systemStatisticsTxArpRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 137 }
+
+-- tagpath /system-statistics/tx_icmp_policer_drops
+systemStatisticsTxIcmpPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 138 }
+
+-- tagpath /system-statistics/tx_icmp_mirrored_drops
+systemStatisticsTxIcmpMirroredDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 139 }
+
+-- tagpath /system-statistics/bfd_tx_fail
+systemStatisticsBfdTxFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 140 }
+
+-- tagpath /system-statistics/bfd_alloc_fail
+systemStatisticsBfdAllocFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 141 }
+
+-- tagpath /system-statistics/bfd_timer_add_fail
+systemStatisticsBfdTimerAddFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 142 }
+
+-- tagpath /system-statistics/bfd_tx_pkts
+systemStatisticsBfdTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 143 }
+
+-- tagpath /system-statistics/bfd_rx_pkts
+systemStatisticsBfdRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 144 }
+
+-- tagpath /system-statistics/bfd_rec_down
+systemStatisticsBfdRecDown OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 145 }
+
+-- tagpath /system-statistics/bfd_rec_invalid
+systemStatisticsBfdRecInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 146 }
+
+-- tagpath /system-statistics/bfd_lkup_fail
+systemStatisticsBfdLkupFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 147 }
+
+-- tagpath /system-statistics/rx_icmp_echo_requests
+systemStatisticsRxIcmpEchoRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 148 }
+
+-- tagpath /system-statistics/rx_icmp_echo_replies
+systemStatisticsRxIcmpEchoReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 149 }
+
+-- tagpath /system-statistics/rx_icmp_network_unreach
+systemStatisticsRxIcmpNetworkUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 150 }
+
+-- tagpath /system-statistics/rx_icmp_host_unreach
+systemStatisticsRxIcmpHostUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 151 }
+
+-- tagpath /system-statistics/rx_icmp_port_unreach
+systemStatisticsRxIcmpPortUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 152 }
+
+-- tagpath /system-statistics/rx_icmp_protocol_unreach
+systemStatisticsRxIcmpProtocolUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 153 }
+
+-- tagpath /system-statistics/rx_icmp_fragment_required
+systemStatisticsRxIcmpFragmentRequired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 154 }
+
+-- tagpath /system-statistics/rx_icmp_dst_unreach_other
+systemStatisticsRxIcmpDstUnreachOther OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 155 }
+
+-- tagpath /system-statistics/rx_icmp_ttl_expired
+systemStatisticsRxIcmpTtlExpired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 156 }
+
+-- tagpath /system-statistics/rx_icmp_redirect
+systemStatisticsRxIcmpRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 157 }
+
+-- tagpath /system-statistics/rx_icmp_src_quench
+systemStatisticsRxIcmpSrcQuench OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 158 }
+
+-- tagpath /system-statistics/rx_icmp_bad_ip_hdr
+systemStatisticsRxIcmpBadIpHdr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 159 }
+
+-- tagpath /system-statistics/rx_icmp_other_types
+systemStatisticsRxIcmpOtherTypes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 160 }
+
+-- tagpath /system-statistics/tx_icmp_echo_requests
+systemStatisticsTxIcmpEchoRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 161 }
+
+-- tagpath /system-statistics/tx_icmp_echo_replies
+systemStatisticsTxIcmpEchoReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 162 }
+
+-- tagpath /system-statistics/tx_icmp_network_unreach
+systemStatisticsTxIcmpNetworkUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 163 }
+
+-- tagpath /system-statistics/tx_icmp_host_unreach
+systemStatisticsTxIcmpHostUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 164 }
+
+-- tagpath /system-statistics/tx_icmp_port_unreach
+systemStatisticsTxIcmpPortUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 165 }
+
+-- tagpath /system-statistics/tx_icmp_protocol_unreach
+systemStatisticsTxIcmpProtocolUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 166 }
+
+-- tagpath /system-statistics/tx_icmp_fragment_required
+systemStatisticsTxIcmpFragmentRequired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 167 }
+
+-- tagpath /system-statistics/tx_icmp_dst_unreach_other
+systemStatisticsTxIcmpDstUnreachOther OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 168 }
+
+-- tagpath /system-statistics/tx_icmp_ttl_expired
+systemStatisticsTxIcmpTtlExpired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 169 }
+
+-- tagpath /system-statistics/tx_icmp_redirect
+systemStatisticsTxIcmpRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 170 }
+
+-- tagpath /system-statistics/tx_icmp_src_quench
+systemStatisticsTxIcmpSrcQuench OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 171 }
+
+-- tagpath /system-statistics/tx_icmp_bad_ip_hdr
+systemStatisticsTxIcmpBadIpHdr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 172 }
+
+-- tagpath /system-statistics/tx_icmp_other_types
+systemStatisticsTxIcmpOtherTypes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 173 }
+
+-- tagpath /system-statistics/gre_ka_tx_pkts
+systemStatisticsGreKaTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 174 }
+
+-- tagpath /system-statistics/gre_ka_rx_pkts
+systemStatisticsGreKaRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 175 }
+
+-- tagpath /system-statistics/gre_ka_tx_ipv4_options_drop
+systemStatisticsGreKaTxIpv4OptionsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 176 }
+
+-- tagpath /system-statistics/gre_ka_tx_non_ip
+systemStatisticsGreKaTxNonIp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 177 }
+
+-- tagpath /system-statistics/gre_ka_tx_parse_err
+systemStatisticsGreKaTxParseErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 178 }
+
+-- tagpath /system-statistics/gre_ka_tx_record_changed
+systemStatisticsGreKaTxRecordChanged OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 179 }
+
+-- tagpath /system-statistics/gre_ka_tx_fail
+systemStatisticsGreKaTxFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 180 }
+
+-- tagpath /system-statistics/gre_ka_alloc_fail
+systemStatisticsGreKaAllocFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 181 }
+
+-- tagpath /system-statistics/gre_ka_timer_add_fail
+systemStatisticsGreKaTimerAddFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 182 }
+
+-- tagpath /system-statistics/gre_ka_rx_non_ip
+systemStatisticsGreKaRxNonIp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 183 }
+
+-- tagpath /system-statistics/gre_ka_rx_rec_invalid
+systemStatisticsGreKaRxRecInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 184 }
+
+-- tagpath /system-statistics/dot1x_rx_pkts
+systemStatisticsDot1xRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 185 }
+
+-- tagpath /system-statistics/dot1x_tx_pkts
+systemStatisticsDot1xTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 186 }
+
+-- tagpath /system-statistics/dot1x_rx_drops
+systemStatisticsDot1xRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 187 }
+
+-- tagpath /system-statistics/dot1x_tx_drops
+systemStatisticsDot1xTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 188 }
+
+-- tagpath /system-statistics/dot1x_vlan_if_not_found_drops
+systemStatisticsDot1xVlanIfNotFoundDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 189 }
+
+-- tagpath /system-statistics/dot1x_mac_learn_drops
+systemStatisticsDot1xMacLearnDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 190 }
+
+-- tagpath /system-statistics/rx_policer_remark
+systemStatisticsRxPolicerRemark OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 191 }
+
+-- tagpath /system-statistics/bfd_tx_octets
+systemStatisticsBfdTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 192 }
+
+-- tagpath /system-statistics/bfd_rx_octets
+systemStatisticsBfdRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 193 }
+
+-- tagpath /system-statistics/bfd_pmtu_tx_pkts
+systemStatisticsBfdPmtuTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 194 }
+
+-- tagpath /system-statistics/bfd_pmtu_rx_pkts
+systemStatisticsBfdPmtuRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 195 }
+
+-- tagpath /system-statistics/bfd_pmtu_tx_octets
+systemStatisticsBfdPmtuTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 196 }
+
+-- tagpath /system-statistics/bfd_pmtu_rx_octets
+systemStatisticsBfdPmtuRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 197 }
+
+-- tagpath /system-statistics/dns_req_snoop
+systemStatisticsDnsReqSnoop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 198 }
+
+-- tagpath /system-statistics/dns_res_snoop
+systemStatisticsDnsResSnoop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 199 }
+
+-- tagpath /system-statistics/ctrl_loop_fwd
+systemStatisticsCtrlLoopFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 200 }
+
+-- tagpath /system-statistics/ctrl_loop_fwd_drops
+systemStatisticsCtrlLoopFwdDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 201 }
+
+-- FIXME: missing stats here for tx_zero_spi_ipsec_drops? also redirect_dns_req must be 203
+
+-- tagpath /system-statistics/redirect_dns_req
+systemStatisticsRedirectDnsReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 202 }
+
+-- tagpath /system-statistics/qat_aes_decrypt
+systemStatisticsQatAesDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 204 }
+
+-- tagpath /system-statistics/qat_aes_encrypt
+systemStatisticsQatAesEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 205 }
+
+-- tagpath /system-statistics/qat_gcm_decrypt
+systemStatisticsQatGcmDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 206 }
+
+-- tagpath /system-statistics/qat_gcm_encrypt
+systemStatisticsQatGcmEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 207 }
+
+-- tagpath /system-statistics/openssl_gcm_decrypt
+systemStatisticsOpensslGcmDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 208 }
+
+-- tagpath /system-statistics/openssl_gcm_encrypt
+systemStatisticsOpensslGcmEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 209 }
+
+-- tagpath /system-statistics/rx_replay_drops_tc0
+systemStatisticsRxReplayDropsTc0 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 210 }
+
+-- tagpath /system-statistics/rx_replay_drops_tc1
+systemStatisticsRxReplayDropsTc1 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 211 }
+
+-- tagpath /system-statistics/rx_replay_drops_tc2
+systemStatisticsRxReplayDropsTc2 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 212 }
+
+-- tagpath /system-statistics/rx_replay_drops_tc3
+systemStatisticsRxReplayDropsTc3 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 213 }
+
+-- tagpath /system-statistics/rx_replay_drops_tc4
+systemStatisticsRxReplayDropsTc4 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 214 }
+
+-- tagpath /system-statistics/rx_replay_drops_tc5
+systemStatisticsRxReplayDropsTc5 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 215 }
+
+-- tagpath /system-statistics/rx_replay_drops_tc6
+systemStatisticsRxReplayDropsTc6 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 216 }
+
+
+-- tagpath /system-statistics/rx_replay_drops_tc7
+systemStatisticsRxReplayDropsTc7 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 217 }
+
+-- tagpath /system-statistics/rx_window_drops_tc0
+systemStatisticsRxWindowDropsTc0 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 218 }
+
+-- tagpath /system-statistics/rx_window_drops_tc1
+systemStatisticsRxWindowDropsTc1 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 219 }
+
+-- tagpath /system-statistics/rx_window_drops_tc2
+systemStatisticsRxWindowDropsTc2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 220 }
+
+-- tagpath /system-statistics/rx_window_drops_tc3
+systemStatisticsRxWindowDropsTc3 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 221 }
+
+-- tagpath /system-statistics/rx_window_drops_tc4
+systemStatisticsRxWindowDropsTc4 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 222 }
+
+-- tagpath /system-statistics/rx_window_drops_tc5
+systemStatisticsRxWindowDropsTc5 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 223 }
+
+-- tagpath /system-statistics/rx_window_drops_tc6
+systemStatisticsRxWindowDropsTc6 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 224 }
+
+-- tagpath /system-statistics/rx_window_drops_tc7
+systemStatisticsRxWindowDropsTc7 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 225 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc0
+systemStatisticsRxUnexpectedReplayDropsTc0 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 226 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc1
+systemStatisticsRxUnexpectedReplayDropsTc1 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 227 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc2
+systemStatisticsRxUnexpectedReplayDropsTc2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 228 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc3
+systemStatisticsRxUnexpectedReplayDropsTc3 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 229 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc4
+systemStatisticsRxUnexpectedReplayDropsTc4 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 230 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc5
+systemStatisticsRxUnexpectedReplayDropsTc5 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 231 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc6
+systemStatisticsRxUnexpectedReplayDropsTc6 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 232 }
+
+--tagpath /system-statistics/rx_unexpected_replay_drops_tc7
+systemStatisticsRxUnexpectedReplayDropsTc7 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 233 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc0
+systemStatisticsRxReplayIntegrityDropsTc0 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 234 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc1
+systemStatisticsRxReplayIntegrityDropsTc1 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 235 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc2
+systemStatisticsRxReplayIntegrityDropsTc2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 236 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc3
+systemStatisticsRxReplayIntegrityDropsTc3 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 237 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc4
+systemStatisticsRxReplayIntegrityDropsTc4 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 238 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc5
+systemStatisticsRxReplayIntegrityDropsTc5 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 239 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc6
+systemStatisticsRxReplayIntegrityDropsTc6 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 240 }
+
+--tagpath /system-statistics/rx_replay_integrity_drops_tc7
+systemStatisticsRxReplayIntegrityDropsTc7 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 241 }
+
+-- tagpath /system-statistics/icmp_redirect_tx_drops
+systemStatisticsIcmpRedirectTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 242 }
+
+-- tagpath /system-statistics/icmp_redirect_rx_drops
+systemStatisticsIcmpRedirectRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 243 }
+
+--tagpath /system-statistics/rx_l2mtu_exceeded
+systemStatisticsRxL2MtuExceeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "rx l2 mtu exceeded value deprecated from 17.2"
+    ::= { systemStatistics 244 }
+
+--tagpath /system-statistics/tcpopt_timeout_state_err
+systemStatisticsTcpOptTimeoutStateErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 245 }
+
+--tagpath /system-statistics/tcpopt_third_syn_pt
+systemStatisticsTcpOptThirdSynPt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 246 }
+
+--tagpath /system-statistics/tcpopt_init_limit_pt
+systemStatisticsTcpOptInitLimitPt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 247 }
+
+--tagpath /system-statistics/tcpopt_to_cpu
+systemStatisticsTcpOptToCpu OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 248 }
+
+--tagpath /system-statistics/tcpopt_from_cpu
+systemStatisticsTcpOptFromCpu OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 249 }
+
+--tagpath /system-statistics/tcpopt_ctrl_invalid_seq
+systemStatisticsTcpOptCtrlInvalidSeq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 250 }
+
+--tagpath /system-statistics/tcpopt_mbox_total
+systemStatisticsTcpOptMboxTotal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 251 }
+
+--tagpath /system-statistics/tcpopt_new_flow
+systemStatisticsTcpOptNewFlow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 252 }
+
+--tagpath /system-statistics/tcpopt_del_flow
+systemStatisticsTcpOptDelFlow OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS	current 
+    DESCRIPTION ""
+    ::= { systemStatistics 253 }
+
+--tagpath /system-statistics/ip_direct_bcast_tx_drops
+systemStatisticsIpDirectBcastTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 254 }
+
+--tagpath /system-statistics/ip_direct_bcast_tx_l2_bcast
+systemStatisticsIpDirectBcastTxL2Bcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 255 }
+
+--tagpath /system-statistics/rx_invalid_ip_hdr
+systemStatisticsRxInvalidIpHdr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 256 }
+
+--tagpath /system-statistics/nat_dst_nat_map_invalid
+systemStatisticsNatDstNatMapInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 257 }
+
+--tagpath /system-statistics/device_policy_drops
+systemStatisticsDevicePolicyDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 258 }
+
+-- tagpath /system-statistics/invalid_loop_hdr_drops
+systemStatisticsInvalidLoopHdrDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 259 }
+
+-- tagpath /system-statistics/zbf_frag_cache_drops
+systemStatisticsZbfFragCacheDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 260 }
+
+-- tagpath /system-statistics/nat_frag_cache_drops
+systemStatisticsNatFragCacheDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 261 }
+
+-- tagpath /system-statistics/tx_tracker_if_not_preferred
+systemStatisticsTxTrackerIfNotPreferred OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 262 }
+
+-- tagpath /system-statistics/ipfrag_allfrags_seen
+systemStatisticsIpfragAllfragsSeen OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 263 }
+
+-- tagpath /system-statistics/ipfrag_many_frags
+systemStatisticsIpfragManyFrags OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 264 }
+
+-- tagpath /system-statistics/l2_vrrp_promisc_mismatch_dmac_drops
+systemStatisticsVRRPMismatchedDMACDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatistics 265 }
+
+-- Display system statistics information
+
+-- tagpath /system-statistics-diff
+systemStatisticsDiff OBJECT IDENTIFIER ::= { viptela-oper-system 3 }
+
+-- tagpath /system-statistics-diff/rx_pkts
+systemStatisticsDiffRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 1 }
+
+-- tagpath /system-statistics-diff/rx_drops
+systemStatisticsDiffRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 2 }
+
+-- tagpath /system-statistics-diff/ip_fwd
+systemStatisticsDiffIpFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 3 }
+
+-- tagpath /system-statistics-diff/ip_fwd_mirror_pkts
+systemStatisticsDiffIpFwdMirrorPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 4 }
+
+-- tagpath /system-statistics-diff/ip_fwd_arp
+systemStatisticsDiffIpFwdArp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 5 }
+
+-- tagpath /system-statistics-diff/ip_fwd_to_egress
+systemStatisticsDiffIpFwdToEgress OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 6 }
+
+-- tagpath /system-statistics-diff/ip_fwd_invalid_oil
+systemStatisticsDiffIpFwdInvalidOil OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 7 }
+
+-- tagpath /system-statistics-diff/ip_v6_mcast_drops
+systemStatisticsDiffIpV6McastDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 8 }
+
+-- tagpath /system-statistics-diff/ip_fwd_mcast_invalid_iif
+systemStatisticsDiffIpFwdMcastInvalidIif OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 9 }
+
+-- tagpath /system-statistics-diff/ip_fwd_mcast_life_exceeded_drops
+systemStatisticsDiffIpFwdMcastLifeExceededDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 10 }
+
+-- tagpath /system-statistics-diff/rx_mcast_threshold_exceeded
+systemStatisticsDiffRxMcastThresholdExceeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 11 }
+
+-- tagpath /system-statistics-diff/ip_fwd_invalid_tun_oil
+systemStatisticsDiffIpFwdInvalidTunOil OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 12 }
+
+-- tagpath /system-statistics-diff/rx_mcast_policy_fwd_drops
+systemStatisticsDiffRxMcastPolicyFwdDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 13 }
+
+-- tagpath /system-statistics-diff/rx_mcast_mirror_fwd_drops
+systemStatisticsDiffRxMcastMirrorFwdDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 14 }
+
+-- tagpath /system-statistics-diff/ip_fwd_null_mcast_group
+systemStatisticsDiffIpFwdNullMcastGroup OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 15 }
+
+-- tagpath /system-statistics-diff/ip_fwd_null_nhop
+systemStatisticsDiffIpFwdNullNhop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 16 }
+
+-- tagpath /system-statistics-diff/ip_fwd_unknown_nh_type
+systemStatisticsDiffIpFwdUnknownNhType OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 17 }
+
+-- tagpath /system-statistics-diff/ip_fwd_nat_on_tunnel
+systemStatisticsDiffIpFwdNatOnTunnel OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 18 }
+
+-- tagpath /system-statistics-diff/ip_fwd_to_cpu
+systemStatisticsDiffIpFwdToCpu OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 19 }
+
+-- tagpath /system-statistics-diff/ip_fwd_to_cpu_nat_xlates
+systemStatisticsDiffIpFwdToCpuNatXlates OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 20 }
+
+-- tagpath /system-statistics-diff/ip_fwd_from_cpu_nat_xlates
+systemStatisticsDiffIpFwdFromCpuNatXlates OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 21 }
+
+-- tagpath /system-statistics-diff/ip_fwd_to_cpu_nat_drops
+systemStatisticsDiffIpFwdToCpuNatDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 22 }
+
+-- tagpath /system-statistics-diff/ip_fwd_from_cpu_non_local
+systemStatisticsDiffIpFwdFromCpuNonLocal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 23 }
+
+-- tagpath /system-statistics-diff/ip_fwd_rx_ipsec
+systemStatisticsDiffIpFwdRxIpsec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 24 }
+
+-- tagpath /system-statistics-diff/ip_fwd_mcast_pkts
+systemStatisticsDiffIpFwdMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 25 }
+
+-- tagpath /system-statistics-diff/ip_fwd_rx_gre
+systemStatisticsDiffIpFwdRxGre OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 26 }
+
+-- tagpath /system-statistics-diff/nat_xlate_outbound
+systemStatisticsDiffNatXlateOutbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 27 }
+
+-- tagpath /system-statistics-diff/nat_xlate_outbound_drops
+systemStatisticsDiffNatXlateOutboundDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 28 }
+
+-- tagpath /system-statistics-diff/nat_xlate_inbound
+systemStatisticsDiffNatXlateInbound OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 29 }
+
+-- tagpath /system-statistics-diff/nat_xlate_inbound_fail
+systemStatisticsDiffNatXlateInboundFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 30 }
+
+-- tagpath /system-statistics-diff/cflowd_pkts
+systemStatisticsDiffCflowdPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 31 }
+
+-- tagpath /system-statistics-diff/rx_bcast
+systemStatisticsDiffRxBcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 32 }
+
+-- tagpath /system-statistics-diff/rx_mcast
+systemStatisticsDiffRxMcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 33 }
+
+-- tagpath /system-statistics-diff/rx_mcast_link_local
+systemStatisticsDiffRxMcastLinkLocal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 34 }
+
+-- tagpath /system-statistics-diff/rx_mcast_filter_to_cpu
+systemStatisticsDiffRxMcastFilterToCpu OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 35 }
+
+-- tagpath /system-statistics-diff/rx_mcast_filter_to_cpu_and_fwd
+systemStatisticsDiffRxMcastFilterToCpuAndFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 36 }
+
+-- tagpath /system-statistics-diff/rx_gre_decap
+systemStatisticsDiffRxGreDecap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 37 }
+
+-- tagpath /system-statistics-diff/rx_gre_drops
+systemStatisticsDiffRxGreDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 38 }
+
+-- tagpath /system-statistics-diff/rx_gre_policer_drops
+systemStatisticsDiffRxGrePolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 39 }
+
+-- tagpath /system-statistics-diff/rx_implicit_acl_drops
+systemStatisticsDiffRxImplicitAclDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 40 }
+
+-- tagpath /system-statistics-diff/rx_ipsec_decap
+systemStatisticsDiffRxIpsecDecap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 41 }
+
+-- tagpath /system-statistics-diff/rx_ip6_ipsec_drops
+systemStatisticsDiffRxIp6IpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 42 }
+
+-- tagpath /system-statistics-diff/rx_sa_ipsec_drops
+systemStatisticsDiffRxSaIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 43 }
+
+-- tagpath /system-statistics-diff/rx_invalid_ipsec_pkt_size
+systemStatisticsDiffRxInvalidIpsecPktSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 44 }
+
+-- tagpath /system-statistics-diff/rx_spi_ipsec_drops
+systemStatisticsDiffRxSpiIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 45 }
+
+-- tagpath /system-statistics-diff/rx_replay_drops
+systemStatisticsDiffRxReplayDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 46 }
+
+-- tagpath /system-statistics-diff/rx_replay_integrity_drops
+systemStatisticsDiffRxReplayIntegrityDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 47 }
+
+-- tagpath /system-statistics-diff/rx_unexpected_replay_drops
+systemStatisticsDiffRxUnexpectedReplayDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 48 }
+
+-- tagpath /system-statistics-diff/rx_next_hdr_ipsec_drops
+systemStatisticsDiffRxNextHdrIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 49 }
+
+-- tagpath /system-statistics-diff/rx_mac_compare_ipsec_drops
+systemStatisticsDiffRxMacCompareIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 50 }
+
+-- tagpath /system-statistics-diff/rx_err_pad_ipsec_drops
+systemStatisticsDiffRxErrPadIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 51 }
+
+-- tagpath /system-statistics-diff/rx_ipsec_policer_drops
+systemStatisticsDiffRxIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 52 }
+
+-- tagpath /system-statistics-diff/rx_pre_ipsec_pkts
+systemStatisticsDiffRxPreIpsecPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 53 }
+
+-- tagpath /system-statistics-diff/rx_pre_ipsec_drops
+systemStatisticsDiffRxPreIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 54 }
+
+-- tagpath /system-statistics-diff/rx_pre_ipsec_policer_drops
+systemStatisticsDiffRxPreIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 55 }
+
+-- tagpath /system-statistics-diff/rx_pre_ipsec_decap
+systemStatisticsDiffRxPreIpsecDecap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 56 }
+
+-- tagpath /system-statistics-diff/openssl_aes_decrypt
+systemStatisticsDiffOpensslAesDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 57 }
+
+-- tagpath /system-statistics-diff/rx_ipsec_bad_inner
+systemStatisticsDiffRxIpsecBadInner OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 58 }
+
+-- tagpath /system-statistics-diff/rx_bad_label
+systemStatisticsDiffRxBadLabel OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 59 }
+
+-- tagpath /system-statistics-diff/service_label_fwd
+systemStatisticsDiffServiceLabelFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 60 }
+
+-- tagpath /system-statistics-diff/rx_host_local_pkt
+systemStatisticsDiffRxHostLocalPkt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 61 }
+
+-- tagpath /system-statistics-diff/rx_host_mirror_drops
+systemStatisticsDiffRxHostMirrorDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 62 }
+
+-- tagpath /system-statistics-diff/rx_tunneled_pkts
+systemStatisticsDiffRxTunneledPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 63 }
+
+-- tagpath /system-statistics-diff/rx_cp_non_local
+systemStatisticsDiffRxCpNonLocal OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 64 }
+
+-- tagpath /system-statistics-diff/tx_if_not_preferred
+systemStatisticsDiffTxIfNotPreferred OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 65 }
+
+-- tagpath /system-statistics-diff/tx_vsmart_drop
+systemStatisticsDiffTxVsmartDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 66 }
+
+-- tagpath /system-statistics-diff/rx_invalid_port
+systemStatisticsDiffRxInvalidPort OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 67 }
+
+-- tagpath /system-statistics-diff/port_disabled_rx
+systemStatisticsDiffPortDisabledRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 68 }
+
+-- tagpath /system-statistics-diff/ip_disabled_rx
+systemStatisticsDiffIpDisabledRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 69 }
+
+-- tagpath /system-statistics-diff/rx_invalid_qtags
+systemStatisticsDiffRxInvalidQtags OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 70 }
+
+-- tagpath /system-statistics-diff/rx_non_ip_drops
+systemStatisticsDiffRxNonIpDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 71 }
+
+-- tagpath /system-statistics-diff/rx_ip_errs
+systemStatisticsDiffRxIpErrs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 72 }
+
+-- tagpath /system-statistics-diff/pko_wred_drops
+systemStatisticsDiffPkoWredDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 73 }
+
+-- tagpath /system-statistics-diff/tx_queue_exceeded
+systemStatisticsDiffTxQueueExceeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 74 }
+
+-- tagpath /system-statistics-diff/rx_policer_drops
+systemStatisticsDiffRxPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 75 }
+
+-- tagpath /system-statistics-diff/route_to_host
+systemStatisticsDiffRouteToHost OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 76 }
+
+-- tagpath /system-statistics-diff/ttl_expired
+systemStatisticsDiffTtlExpired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 77 }
+
+-- tagpath /system-statistics-diff/icmp_redirect
+systemStatisticsDiffIcmpRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 78 }
+
+-- tagpath /system-statistics-diff/bfd_rx_non_ip
+systemStatisticsDiffBfdRxNonIp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 79 }
+
+-- tagpath /system-statistics-diff/bfd_tx_record_changed
+systemStatisticsDiffBfdTxRecordChanged OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 80 }
+
+-- tagpath /system-statistics-diff/bfd_rx_record_invalid
+systemStatisticsDiffBfdRxRecordInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 81 }
+
+-- tagpath /system-statistics-diff/bfd_rx_parse_err
+systemStatisticsDiffBfdRxParseErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 82 }
+
+-- tagpath /system-statistics-diff/rx_arp_rate_limit_drops
+systemStatisticsDiffRxArpRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 83 }
+
+-- tagpath /system-statistics-diff/rx_arp_non_local_drops
+systemStatisticsDiffRxArpNonLocalDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 84 }
+
+-- tagpath /system-statistics-diff/rx_arp_reqs
+systemStatisticsDiffRxArpReqs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 85 }
+
+-- tagpath /system-statistics-diff/rx_arp_replies
+systemStatisticsDiffRxArpReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 86 }
+
+-- tagpath /system-statistics-diff/arp_add_fail
+systemStatisticsDiffArpAddFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 87 }
+
+-- tagpath /system-statistics-diff/unknown_nh_type
+systemStatisticsDiffUnknownNhType OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 88 }
+
+-- tagpath /system-statistics-diff/buf_alloc_fails
+systemStatisticsDiffBufAllocFails OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 89 }
+
+-- tagpath /system-statistics-diff/ecmp_discards
+systemStatisticsDiffEcmpDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 90 }
+
+-- tagpath /system-statistics-diff/app_route_policy_discards
+systemStatisticsDiffAppRoutePolicyDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 91 }
+
+-- tagpath /system-statistics-diff/cbf_discards
+systemStatisticsDiffCbfDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 92 }
+
+-- tagpath /system-statistics-diff/filter_drops
+systemStatisticsDiffFilterDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 93 }
+
+-- tagpath /system-statistics-diff/invalid_back_ptr
+systemStatisticsDiffInvalidBackPtr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 94 }
+
+-- tagpath /system-statistics-diff/tunnel_loop_drops
+systemStatisticsDiffTunnelLoopDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 95 }
+
+-- tagpath /system-statistics-diff/to_cpu_policer_drops
+systemStatisticsDiffToCpuPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 96 }
+
+-- tagpath /system-statistics-diff/mirror_drops
+systemStatisticsDiffMirrorDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 97 }
+
+-- tagpath /system-statistics-diff/split_horizon_drops
+systemStatisticsDiffSplitHorizonDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 98 }
+
+-- tagpath /system-statistics-diff/rx_no_tun_if
+systemStatisticsDiffRxNoTunIf OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 99 }
+
+-- tagpath /system-statistics-diff/tx_pkts
+systemStatisticsDiffTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 100 }
+
+-- tagpath /system-statistics-diff/tx_errors
+systemStatisticsDiffTxErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 101 }
+
+-- tagpath /system-statistics-diff/tx_bcast
+systemStatisticsDiffTxBcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 102 }
+
+-- tagpath /system-statistics-diff/tx_mcast
+systemStatisticsDiffTxMcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 103 }
+
+-- tagpath /system-statistics-diff/port_disabled_tx
+systemStatisticsDiffPortDisabledTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 104 }
+
+-- tagpath /system-statistics-diff/ip_disabled_tx
+systemStatisticsDiffIpDisabledTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 105 }
+
+-- tagpath /system-statistics-diff/tx_fragment_needed
+systemStatisticsDiffTxFragmentNeeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 106 }
+
+-- tagpath /system-statistics-diff/tx_mcast_fragment_needed
+systemStatisticsDiffTxMcastFragmentNeeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 107 }
+
+-- tagpath /system-statistics-diff/fragment_df_drops
+systemStatisticsDiffFragmentDfDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 108 }
+
+-- tagpath /system-statistics-diff/tx_fragments
+systemStatisticsDiffTxFragments OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 109 }
+
+-- tagpath /system-statistics-diff/tx_fragment_drops
+systemStatisticsDiffTxFragmentDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 110 }
+
+-- tagpath /system-statistics-diff/tx_fragment_fail
+systemStatisticsDiffTxFragmentFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 111 }
+
+-- tagpath /system-statistics-diff/tx_fragment_alloc_fail
+systemStatisticsDiffTxFragmentAllocFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 112 }
+
+-- tagpath /system-statistics-diff/tunnel_pmtu_lowered
+systemStatisticsDiffTunnelPmtuLowered OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 113 }
+
+-- tagpath /system-statistics-diff/tx_gre_pkts
+systemStatisticsDiffTxGrePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 114 }
+
+-- tagpath /system-statistics-diff/tx_gre_drops
+systemStatisticsDiffTxGreDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 115 }
+
+-- tagpath /system-statistics-diff/tx_gre_policer_drops
+systemStatisticsDiffTxGrePolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 116 }
+
+-- tagpath /system-statistics-diff/tx_gre_encap
+systemStatisticsDiffTxGreEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 117 }
+
+-- tagpath /system-statistics-diff/tx_ipsec_pkts
+systemStatisticsDiffTxIpsecPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 118 }
+
+-- tagpath /system-statistics-diff/tx_ipsec_mcast_pkts
+systemStatisticsDiffTxIpsecMcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 119 }
+
+-- tagpath /system-statistics-diff/tx_ip6_ipsec_drops
+systemStatisticsDiffTxIp6IpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 120 }
+
+-- tagpath /system-statistics-diff/tx_no_out_sa_ipsec_drops
+systemStatisticsDiffTxNoOutSaIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 121 }
+
+-- tagpath /system-statistics-diff/tx_no_tunn_ipsec_drops
+systemStatisticsDiffTxNoTunnIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 122 }
+
+-- tagpath /system-statistics-diff/tx_ipsec_policer_drops
+systemStatisticsDiffTxIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 123 }
+
+-- tagpath /system-statistics-diff/tx_ipsec_encap
+systemStatisticsDiffTxIpsecEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 124 }
+
+-- tagpath /system-statistics-diff/tx_ipsec_mcast_encap
+systemStatisticsDiffTxIpsecMcastEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 125 }
+
+-- tagpath /system-statistics-diff/tx_pre_ipsec_pkts
+systemStatisticsDiffTxPreIpsecPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 126 }
+
+-- tagpath /system-statistics-diff/tx_no_out_sa_pre_ipsec_drops
+systemStatisticsDiffTxNoOutSaPreIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 127 }
+
+-- tagpath /system-statistics-diff/tx_no_tunn_pre_ipsec_drops
+systemStatisticsDiffTxNoTunnPreIpsecDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 128 }
+
+-- tagpath /system-statistics-diff/openssl_aes_encrypt
+systemStatisticsDiffOpensslAesEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 129 }
+
+-- tagpath /system-statistics-diff/tx_pre_ipsec_policer_drops
+systemStatisticsDiffTxPreIpsecPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 130 }
+
+-- tagpath /system-statistics-diff/tx_pre_ipsec_encap
+systemStatisticsDiffTxPreIpsecEncap OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 131 }
+
+-- tagpath /system-statistics-diff/tx_arp_replies
+systemStatisticsDiffTxArpReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 132 }
+
+-- tagpath /system-statistics-diff/tx_arp_reqs
+systemStatisticsDiffTxArpReqs OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 133 }
+
+-- tagpath /system-statistics-diff/tx_arp_req_fail
+systemStatisticsDiffTxArpReqFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 134 }
+
+-- tagpath /system-statistics-diff/tx_no_arp_drop
+systemStatisticsDiffTxNoArpDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 135 }
+
+-- tagpath /system-statistics-diff/tx_arp_rate_limit_drops
+systemStatisticsDiffTxArpRateLimitDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 136 }
+
+-- tagpath /system-statistics-diff/tx_icmp_policer_drops
+systemStatisticsDiffTxIcmpPolicerDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 137 }
+
+-- tagpath /system-statistics-diff/tx_icmp_mirrored_drops
+systemStatisticsDiffTxIcmpMirroredDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 138 }
+
+-- tagpath /system-statistics-diff/bfd_tx_fail
+systemStatisticsDiffBfdTxFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 139 }
+
+-- tagpath /system-statistics-diff/bfd_alloc_fail
+systemStatisticsDiffBfdAllocFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 140 }
+
+-- tagpath /system-statistics-diff/bfd_timer_add_fail
+systemStatisticsDiffBfdTimerAddFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 141 }
+
+-- tagpath /system-statistics-diff/bfd_tx_pkts
+systemStatisticsDiffBfdTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 142 }
+
+-- tagpath /system-statistics-diff/bfd_rx_pkts
+systemStatisticsDiffBfdRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 143 }
+
+-- tagpath /system-statistics-diff/bfd_rec_down
+systemStatisticsDiffBfdRecDown OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 144 }
+
+-- tagpath /system-statistics-diff/bfd_rec_invalid
+systemStatisticsDiffBfdRecInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 145 }
+
+-- tagpath /system-statistics-diff/bfd_lkup_fail
+systemStatisticsDiffBfdLkupFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 146 }
+
+-- tagpath /system-statistics-diff/rx_icmp_echo_requests
+systemStatisticsDiffRxIcmpEchoRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 147 }
+
+-- tagpath /system-statistics-diff/rx_icmp_echo_replies
+systemStatisticsDiffRxIcmpEchoReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 148 }
+
+-- tagpath /system-statistics-diff/rx_icmp_network_unreach
+systemStatisticsDiffRxIcmpNetworkUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 149 }
+
+-- tagpath /system-statistics-diff/rx_icmp_host_unreach
+systemStatisticsDiffRxIcmpHostUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 150 }
+
+-- tagpath /system-statistics-diff/rx_icmp_port_unreach
+systemStatisticsDiffRxIcmpPortUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 151 }
+
+-- tagpath /system-statistics-diff/rx_icmp_protocol_unreach
+systemStatisticsDiffRxIcmpProtocolUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 152 }
+
+-- tagpath /system-statistics-diff/rx_icmp_fragment_required
+systemStatisticsDiffRxIcmpFragmentRequired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 153 }
+
+-- tagpath /system-statistics-diff/rx_icmp_dst_unreach_other
+systemStatisticsDiffRxIcmpDstUnreachOther OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 154 }
+
+-- tagpath /system-statistics-diff/rx_icmp_ttl_expired
+systemStatisticsDiffRxIcmpTtlExpired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 155 }
+
+-- tagpath /system-statistics-diff/rx_icmp_redirect
+systemStatisticsDiffRxIcmpRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 156 }
+
+-- tagpath /system-statistics-diff/rx_icmp_src_quench
+systemStatisticsDiffRxIcmpSrcQuench OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 157 }
+
+-- tagpath /system-statistics-diff/rx_icmp_bad_ip_hdr
+systemStatisticsDiffRxIcmpBadIpHdr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 158 }
+
+-- tagpath /system-statistics-diff/rx_icmp_other_types
+systemStatisticsDiffRxIcmpOtherTypes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 159 }
+
+-- tagpath /system-statistics-diff/tx_icmp_echo_requests
+systemStatisticsDiffTxIcmpEchoRequests OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 160 }
+
+-- tagpath /system-statistics-diff/tx_icmp_echo_replies
+systemStatisticsDiffTxIcmpEchoReplies OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 161 }
+
+-- tagpath /system-statistics-diff/tx_icmp_network_unreach
+systemStatisticsDiffTxIcmpNetworkUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 162 }
+
+-- tagpath /system-statistics-diff/tx_icmp_host_unreach
+systemStatisticsDiffTxIcmpHostUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 163 }
+
+-- tagpath /system-statistics-diff/tx_icmp_port_unreach
+systemStatisticsDiffTxIcmpPortUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 164 }
+
+-- tagpath /system-statistics-diff/tx_icmp_protocol_unreach
+systemStatisticsDiffTxIcmpProtocolUnreach OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 165 }
+
+-- tagpath /system-statistics-diff/tx_icmp_fragment_required
+systemStatisticsDiffTxIcmpFragmentRequired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 166 }
+
+-- tagpath /system-statistics-diff/tx_icmp_dst_unreach_other
+systemStatisticsDiffTxIcmpDstUnreachOther OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 167 }
+
+-- tagpath /system-statistics-diff/tx_icmp_ttl_expired
+systemStatisticsDiffTxIcmpTtlExpired OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 168 }
+
+-- tagpath /system-statistics-diff/tx_icmp_redirect
+systemStatisticsDiffTxIcmpRedirect OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 169 }
+
+-- tagpath /system-statistics-diff/tx_icmp_src_quench
+systemStatisticsDiffTxIcmpSrcQuench OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 170 }
+
+-- tagpath /system-statistics-diff/tx_icmp_bad_ip_hdr
+systemStatisticsDiffTxIcmpBadIpHdr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 171 }
+
+-- tagpath /system-statistics-diff/tx_icmp_other_types
+systemStatisticsDiffTxIcmpOtherTypes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 172 }
+
+-- tagpath /system-statistics-diff/gre_ka_tx_pkts
+systemStatisticsDiffGreKaTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 174 }
+
+-- tagpath /system-statistics-diff/gre_ka_rx_pkts
+systemStatisticsDiffGreKaRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 175 }
+
+-- tagpath /system-statistics-diff/gre_ka_tx_ipv4_options_drop
+systemStatisticsDiffGreKaTxIpv4OptionsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 176 }
+
+-- tagpath /system-statistics-diff/gre_ka_tx_non_ip
+systemStatisticsDiffGreKaTxNonIp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 177 }
+
+-- tagpath /system-statistics-diff/gre_ka_tx_parse_err
+systemStatisticsDiffGreKaTxParseErr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 178 }
+
+-- tagpath /system-statistics-diff/gre_ka_tx_record_changed
+systemStatisticsDiffGreKaTxRecordChanged OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 179 }
+
+-- tagpath /system-statistics-diff/gre_ka_tx_fail
+systemStatisticsDiffGreKaTxFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 180 }
+
+-- tagpath /system-statistics-diff/gre_ka_alloc_fail
+systemStatisticsDiffGreKaAllocFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 181 }
+
+-- tagpath /system-statistics-diff/gre_ka_timer_add_fail
+systemStatisticsDiffGreKaTimerAddFail OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 182 }
+
+-- tagpath /system-statistics-diff/gre_ka_rx_non_ip
+systemStatisticsDiffGreKaRxNonIp OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 183 }
+
+-- tagpath /system-statistics-diff/gre_ka_rx_rec_invalid
+systemStatisticsDiffGreKaRxRecInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 184 }
+
+-- tagpath /system-statistics-diff/dot1x_rx_pkts
+systemStatisticsDiffDot1xRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 185 }
+
+-- tagpath /system-statistics-diff/dot1x_tx_pkts
+systemStatisticsDiffDot1xTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 186 }
+
+-- tagpath /system-statistics-diff/dot1x_rx_drops
+systemStatisticsDiffDot1xRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 187 }
+
+-- tagpath /system-statistics-diff/dot1x_tx_drops
+systemStatisticsDiffDot1xTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 188 }
+
+-- tagpath /system-statistics-diff/dot1x_vlan_if_not_found_drops
+systemStatisticsDiffDot1xVlanIfNotFoundDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 189 }
+
+-- tagpath /system-statistics-diff/dot1x_mac_learn_drops
+systemStatisticsDiffDot1xMacLearnDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 190 }
+
+-- tagpath /system-statistics-diff/rx_policer_remark
+systemStatisticsDiffRxPolicerRemark OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 191 }
+
+-- tagpath /system-statistics-diff/bfd_tx_octets
+systemStatisticsDiffBfdTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 192 }
+
+-- tagpath /system-statistics-diff/bfd_rx_octets
+systemStatisticsDiffBfdRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 193 }
+
+-- tagpath /system-statistics-diff/bfd_pmtu_tx_pkts
+systemStatisticsDiffBfdPmtuTxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 194 }
+
+-- tagpath /system-statistics-diff/bfd_pmtu_rx_pkts
+systemStatisticsDiffBfdPmtuRxPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 195 }
+
+-- tagpath /system-statistics-diff/bfd_pmtu_tx_octets
+systemStatisticsDiffBfdPmtuTxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 196 }
+
+-- tagpath /system-statistics-diff/bfd_pmtu_rx_octets
+systemStatisticsDiffBfdPmtuRxOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 197 }
+
+-- tagpath /system-statistics-diff/dns_req_snoop
+systemStatisticsDiffDnsReqSnoop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 198 }
+
+-- tagpath /system-statistics-diff/dns_res_snoop
+systemStatisticsDiffDnsResSnoop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 199 }
+
+-- tagpath /system-statistics-diff/ctrl_loop_fwd
+systemStatisticsDiffCtrlLoopFwd OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 200 }
+
+-- tagpath /system-statistics-diff/ctrl_loop_fwd_drops
+systemStatisticsDiffCtrlLoopFwdDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 201 }
+
+-- FIXME: missing stats here?
+
+-- tagpath /system-statistics-diff/qat_aes_decrypt
+systemStatisticsDiffQatAesDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 204 }
+
+-- tagpath /system-statistics-diff/qat_aes_encrypt
+systemStatisticsDiffQatAesEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 205 }
+
+-- tagpath /system-statistics-diff/qat_gcm_decrypt
+systemStatisticsDiffQatGcmDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 206 }
+
+-- tagpath /system-statistics-diff/qat_gcm_encrypt
+systemStatisticsDiffQatGcmEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 207 }
+
+-- tagpath /system-statistics-diff/openssl_gcm_decrypt
+systemStatisticsDiffOpensslGcmDecrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 208 }
+
+-- tagpath /system-statistics-diff/openssl_gcm_encrypt
+systemStatisticsDiffOpensslGcmEncrypt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 209 }
+
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc0
+systemStatisticsDiffRxReplayDropsTc0 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 210 }
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc1
+systemStatisticsDiffRxReplayDropsTc1 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 211 }
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc2
+systemStatisticsDiffRxReplayDropsTc2 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 212 }
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc3
+systemStatisticsDiffRxReplayDropsTc3 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 213 }
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc4
+systemStatisticsDiffRxReplayDropsTc4 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 214 }
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc5
+systemStatisticsDiffRxReplayDropsTc5 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 215 }
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc6
+systemStatisticsDiffRxReplayDropsTc6 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 216 }
+
+
+-- tagpath /system-statistics-diff/rx_replay_drops_tc7
+systemStatisticsDiffRxReplayDropsTc7 OBJECT-TYPE
+   SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 217 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc0
+systemStatisticsDiffRxWindowDropsTc0 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 218 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc1
+systemStatisticsDiffRxWindowDropsTc1 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 219 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc2
+systemStatisticsDiffRxWindowDropsTc2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 220 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc3
+systemStatisticsDiffRxWindowDropsTc3 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 221 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc4
+systemStatisticsDiffRxWindowDropsTc4 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 222 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc5
+systemStatisticsDiffRxWindowDropsTc5 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 223 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc6
+systemStatisticsDiffRxWindowDropsTc6 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 224 }
+
+-- tagpath /system-statistics-diff/rx_window_drops_tc7
+systemStatisticsDiffRxWindowDropsTc7 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 225 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc0
+systemStatisticsDiffRxUnexpectedReplayDropsTc0 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 226 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc1
+systemStatisticsDiffRxUnexpectedReplayDropsTc1 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 227 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc2
+systemStatisticsDiffRxUnexpectedReplayDropsTc2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 228 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc3
+systemStatisticsDiffRxUnexpectedReplayDropsTc3 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 229 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc4
+systemStatisticsDiffRxUnexpectedReplayDropsTc4 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 230 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc5
+systemStatisticsDiffRxUnexpectedReplayDropsTc5 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 231 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc6
+systemStatisticsDiffRxUnexpectedReplayDropsTc6 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 232 }
+
+--tagpath /system-statistics-diff/rx_unexpected_replay_drops_tc7
+systemStatisticsDiffRxUnexpectedReplayDropsTc7 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 233 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc0
+systemStatisticsDiffRxReplayIntegrityDropsTc0 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 234 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc1
+systemStatisticsDiffRxReplayIntegrityDropsTc1 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 235 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc2
+systemStatisticsDiffRxReplayIntegrityDropsTc2 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 236 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc3
+systemStatisticsDiffRxReplayIntegrityDropsTc3 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 237 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc4
+systemStatisticsDiffRxReplayIntegrityDropsTc4 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 238 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc5
+systemStatisticsDiffRxReplayIntegrityDropsTc5 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 239 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc6
+systemStatisticsDiffRxReplayIntegrityDropsTc6 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 240 }
+
+--tagpath /system-statistics-diff/rx_replay_integrity_drops_tc7
+systemStatisticsDiffRxReplayIntegrityDropsTc7 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 241 }
+
+-- tagpath /system-statistics-diff/icmp_redirect_tx_drops
+systemStatisticsDiffIcmpRedirectTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 242 }
+
+-- tagpath /system-statistics-diff/icmp_redirect_rx_drops
+systemStatisticsDiffIcmpRedirectRxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 243 }
+
+-- tagpath /system-statistics-diff/rx_l2mtu_exceeded
+systemStatisticsDiffRxL2MtuExceeded OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION "rx l2 mtu exceeded value deprecated from 17.2"
+    ::= { systemStatisticsDiff 244 }
+
+-- tagpath /system-statistics-diff/ip_direct_bcast_tx_drops
+systemStatisticsDiffIpDirectBcastTxDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 245 }
+
+-- tagpath /system-statistics-diff/ip_direct_bcast_tx_l2_bcast
+systemStatisticsDiffIpDirectBcastTxL2Bcast OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 246 }
+
+-- tagpath /system-statistics-diff/rx_invalid_ip_hdr
+systemStatisticsDiffRxInvalidIpHdr OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 247 }
+
+-- tagpath /system-statistics-diff/nat_dst_nat_map_invalid
+systemStatisticsDiffNatDstNatMapInvalid OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 248 }
+
+-- tagpath /system-statistics-diff/device_policy_drops
+systemStatisticsDiffDevicePolicyDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 249 }
+
+-- tagpath /system-statistics-diff/invalid_loop_hdr_drops
+systemStatisticsDiffInvalidLoopHdrDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 250 }
+
+-- tagpath /system-statistics-diff/zbf_frag_cache_drops
+systemStatisticsDiffZbfFragCacheDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 251 }
+
+-- tagpath /system-statistics-diff/nat_frag_cache_drops
+systemStatisticsDiffNatFragCacheDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 252 }
+
+-- tagpath /system-statistics-diff/tx_tracker_if_not_preferred
+systemStatisticsDiffTxTrackerIfNotPreferred OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 253 }
+
+-- tagpath /system-statistics-diff/ipfrag_allfrags_seen
+systemStatisticsDiffIpfragAllfragsSeen OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 254 }
+
+-- tagpath /system-statistics-diff/ipfrag_many_frags
+systemStatisticsDiffIpfragManyFrags OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 255 }
+
+-- tagpath /system-statistics-diff/l2_vrrp_promisc_mismatch_dmac_drops
+systemStatisticsDiffVRRPMismatchedDMACDrops OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { systemStatisticsDiff 256 }
+
+-- Display system reboot related information
+-- tagpath /reboot
+reboot OBJECT IDENTIFIER ::= { viptela-oper-system 4 }
+
+-- Display AAA information
+-- tagpath /aaa
+aaa OBJECT IDENTIFIER ::= { viptela-oper-system 7 }
+
+-- Display logging information
+-- tagpath /logging
+logging OBJECT IDENTIFIER ::= { viptela-oper-system 9 }
+
+-- tagpath /logging/host_status
+loggingHostStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 1 }
+
+-- tagpath /logging/host_name
+loggingHostName OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 2 }
+
+-- tagpath /logging/host_priority
+loggingHostPriority OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 3 }
+
+-- tagpath /logging/host_vpn_id
+loggingHostVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 4 }
+
+-- tagpath /logging/disk_status
+loggingDiskStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 5 }
+
+-- tagpath /logging/disk_priority
+loggingDiskPriority OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 6 }
+
+-- tagpath /logging/disk_filename
+loggingDiskFilename OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 7 }
+
+-- tagpath /logging/disk_filesize
+loggingDiskFilesize OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 8 }
+
+-- tagpath /logging/disk_filerotate
+loggingDiskFilerotate OBJECT-TYPE
+    SYNTAX      UnsignedByte
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { logging 9 }
+
+-- Display NTP information
+-- tagpath /ntp
+ntp OBJECT IDENTIFIER ::= { viptela-oper-system 10 }
+
+-- tagpath /ntp/refid
+ntpRefid OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Current source of synchronization. Obsoleted in Release 15.4.0"
+    ::= { ntp 3 }
+
+-- tagpath /ntp/reftime
+ntpReftime OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Time when the system clock was last set or corrected. Obsoleted in Release 15.4.0"
+    ::= { ntp 4 }
+
+-- tagpath /ntp/stratum
+ntpStratum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Stratum. Obsoleted in Release 15.4.0"
+    ::= { ntp 5 }
+
+-- tagpath /ntp/rootdelay
+ntpRootdelay OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Total round-trip delay to currently selected reference clock. Obsoleted in Release 15.4.0"
+    ::= { ntp 6 }
+
+-- tagpath /ntp/rootdisp
+ntpRootdisp OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Total dispersion to currently selected reference clock. Obsoleted in Release 15.4.0"
+    ::= { ntp 7 }
+
+-- tagpath /ntp/freq_drift_ppm
+ntpFreqDriftPpm OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Kernel frequency drift. Obsoleted in Release 15.4.0"
+    ::= { ntp 8 }
+
+-- tagpath /ntp/poll_interval
+ntpPollInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Polling interval. Obsoleted in Release 15.4.0"
+    ::= { ntp 9 }
+
+-- tagpath /ntp/offset
+ntpOffset OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Offset. Obsoleted in Release 15.4.0"
+    ::= { ntp 10 }
+
+-- Display transport connection information
+-- tagpath /transport
+transport OBJECT IDENTIFIER ::= { viptela-oper-system 11 }
+
+-- tagpath /reboot/history
+rebootHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RebootHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display system reboot history"
+    ::= { reboot 1 }
+
+-- tagpath /reboot/history
+rebootHistoryEntry OBJECT-TYPE
+    SYNTAX      RebootHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { rebootHistoryRebootDateTime }
+        ::= { rebootHistoryTable 1 }
+
+RebootHistoryEntry ::=
+    SEQUENCE {
+        rebootHistoryRebootDateTime DateAndTime,
+        rebootHistoryRebootReason String
+    }
+
+-- tagpath /reboot/history/reboot_date_time
+rebootHistoryRebootDateTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Reboot date and time in confd format"
+    ::= { rebootHistoryEntry 1 }
+
+-- tagpath /reboot/history/reboot_reason
+rebootHistoryRebootReason OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Reboot reason"
+    ::= { rebootHistoryEntry 3 }
+
+-- tagpath /boot-partition
+bootPartitionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BootPartitionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display boot partition information"
+    ::= { viptela-oper-system 5 }
+
+-- tagpath /boot-partition
+bootPartitionEntry OBJECT-TYPE
+    SYNTAX      BootPartitionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bootPartitionPartition }
+        ::= { bootPartitionTable 1 }
+
+BootPartitionEntry ::=
+    SEQUENCE {
+        bootPartitionPartition INTEGER,
+        bootPartitionActive TruthValue,
+        bootPartitionVersion String,
+        bootPartitionTimestamp DateAndTime
+    }
+
+-- tagpath /boot-partition/partition
+bootPartitionPartition OBJECT-TYPE
+    SYNTAX      INTEGER {a1(0),a2(1)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Partition number"
+    ::= { bootPartitionEntry 1 }
+
+-- tagpath /boot-partition/active
+bootPartitionActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Whether partition is active"
+    ::= { bootPartitionEntry 2 }
+
+-- tagpath /boot-partition/version
+bootPartitionVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Version"
+    ::= { bootPartitionEntry 3 }
+
+-- tagpath /boot-partition/timestamp
+bootPartitionTimestamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Date and time created"
+    ::= { bootPartitionEntry 4 }
+
+-- tagpath /users
+usersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF UsersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display users currently logged in"
+    ::= { viptela-oper-system 6 }
+
+-- tagpath /users
+usersEntry OBJECT-TYPE
+    SYNTAX      UsersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { usersSession }
+        ::= { usersTable 1 }
+
+UsersEntry ::=
+    SEQUENCE {
+        usersSession Unsigned32,
+        usersUser String,
+        usersContext String,
+        usersFrom InetAddressIP,
+        usersProto INTEGER,
+        usersAuthGroup String,
+        usersLoginTime DateAndTime
+    }
+
+-- tagpath /users/session
+usersSession OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "User session ID"
+    ::= { usersEntry 1 }
+
+-- tagpath /users/user
+usersUser OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "User name"
+    ::= { usersEntry 2 }
+
+-- tagpath /users/context
+usersContext OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "CLI | NETCONF | WEBUI"
+    ::= { usersEntry 3 }
+
+-- tagpath /users/from
+usersFrom OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address from which user session originates"
+    ::= { usersEntry 4 }
+
+-- tagpath /users/proto
+usersProto OBJECT-TYPE
+    SYNTAX      INTEGER {unknown(0),tcp(1),ssh(2),system(3),console(4),ssl(5),http(6),https(7),udp(8)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Protocol used by user to log in"
+    ::= { usersEntry 5 }
+
+-- tagpath /users/auth-group
+usersAuthGroup OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "User group"
+    ::= { usersEntry 6 }
+
+-- tagpath /users/login-time
+usersLoginTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Login time of a user"
+    ::= { usersEntry 7 }
+
+-- tagpath /aaa/usergroup
+aaaUsergroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AaaUsergroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display user group information"
+    ::= { aaa 1 }
+
+-- tagpath /aaa/usergroup
+aaaUsergroupEntry OBJECT-TYPE
+    SYNTAX      AaaUsergroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED aaaUsergroupName }
+        ::= { aaaUsergroupTable 1 }
+
+AaaUsergroupEntry ::=
+    SEQUENCE {
+        aaaUsergroupName String
+    }
+
+-- tagpath /aaa/usergroup/name
+aaaUsergroupName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name of the user group"
+    ::= { aaaUsergroupEntry 1 }
+
+-- tagpath /aaa/usergroup/task
+aaaUsergroupTaskTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AaaUsergroupTaskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Tasks and permissions"
+    ::= { viptela-oper-system 8 }
+
+-- tagpath /aaa/usergroup/task
+aaaUsergroupTaskEntry OBJECT-TYPE
+    SYNTAX      AaaUsergroupTaskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { aaaUsergroupName, aaaUsergroupTaskMode }
+        ::= { aaaUsergroupTaskTable 1 }
+
+AaaUsergroupTaskEntry ::=
+    SEQUENCE {
+        aaaUsergroupTaskMode INTEGER,
+        aaaUsergroupTaskPermission Permission1
+    }
+
+-- tagpath /aaa/usergroup/task/mode
+aaaUsergroupTaskMode OBJECT-TYPE
+    SYNTAX      INTEGER {system(0),interface(1),policy(2),routing(3),security(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Task mode"
+    ::= { aaaUsergroupTaskEntry 1 }
+
+-- tagpath /aaa/usergroup/task/permission
+aaaUsergroupTaskPermission OBJECT-TYPE
+    SYNTAX      Permission1
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Permissions"
+    ::= { aaaUsergroupTaskEntry 2 }
+
+-- tagpath /ntp/peer
+ntpPeerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NtpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display NTP peer information"
+    ::= { ntp 1 }
+
+-- tagpath /ntp/peer
+ntpPeerEntry OBJECT-TYPE
+    SYNTAX      NtpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ntpPeerIndex }
+        ::= { ntpPeerTable 1 }
+
+NtpPeerEntry ::=
+    SEQUENCE {
+        ntpPeerIndex Unsigned32,
+        ntpPeerRemote String,
+        ntpPeerRefid String,
+        ntpPeerSt Integer32,
+        ntpPeerType String,
+        ntpPeerWhen String,
+        ntpPeerPoll Integer32,
+        ntpPeerReach String,
+        ntpPeerDelay String,
+        ntpPeerOffset String,
+        ntpPeerJitter String
+    }
+
+-- tagpath /ntp/peer/index
+ntpPeerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index on this list"
+    ::= { ntpPeerEntry 1 }
+
+-- tagpath /ntp/peer/remote
+ntpPeerRemote OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NTP server"
+    ::= { ntpPeerEntry 2 }
+
+-- tagpath /ntp/peer/refid
+ntpPeerRefid OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current source of synchronization"
+    ::= { ntpPeerEntry 3 }
+
+-- tagpath /ntp/peer/st
+ntpPeerSt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stratum"
+    ::= { ntpPeerEntry 4 }
+
+-- tagpath /ntp/peer/type
+ntpPeerType OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Type"
+    ::= { ntpPeerEntry 5 }
+
+-- tagpath /ntp/peer/when
+ntpPeerWhen OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "When"
+    ::= { ntpPeerEntry 6 }
+
+-- tagpath /ntp/peer/poll
+ntpPeerPoll OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Polling interval, in seconds"
+    ::= { ntpPeerEntry 7 }
+
+-- tagpath /ntp/peer/reach
+ntpPeerReach OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Status of reachability register, in octal"
+    ::= { ntpPeerEntry 8 }
+
+-- tagpath /ntp/peer/delay
+ntpPeerDelay OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Latest delay"
+    ::= { ntpPeerEntry 9 }
+
+-- tagpath /ntp/peer/offset
+ntpPeerOffset OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Latest offset"
+    ::= { ntpPeerEntry 10 }
+
+-- tagpath /ntp/peer/jitter
+ntpPeerJitter OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Latest jitter"
+    ::= { ntpPeerEntry 11 }
+
+-- tagpath /ntp/associations
+ntpAssociationsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NtpAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display NTP peer association"
+    ::= { ntp 2 }
+
+-- tagpath /ntp/associations
+ntpAssociationsEntry OBJECT-TYPE
+    SYNTAX      NtpAssociationsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { ntpAssociationsIdx }
+        ::= { ntpAssociationsTable 1 }
+
+NtpAssociationsEntry ::=
+    SEQUENCE {
+        ntpAssociationsIdx Integer32,
+        ntpAssociationsAssocid String,
+        ntpAssociationsStatus String,
+        ntpAssociationsConf String,
+        ntpAssociationsReachability String,
+        ntpAssociationsAuth String,
+        ntpAssociationsCondition String,
+        ntpAssociationsLastEvent String,
+        ntpAssociationsCount Integer32
+    }
+
+-- tagpath /ntp/associations/idx
+ntpAssociationsIdx OBJECT-TYPE
+    SYNTAX      Integer32 (0 .. 2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index on this list"
+    ::= { ntpAssociationsEntry 1 }
+
+-- tagpath /ntp/associations/associd
+ntpAssociationsAssocid OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Association ID"
+    ::= { ntpAssociationsEntry 2 }
+
+-- tagpath /ntp/associations/status
+ntpAssociationsStatus OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer status word, in hexadecimal"
+    ::= { ntpAssociationsEntry 3 }
+
+-- tagpath /ntp/associations/conf
+ntpAssociationsConf OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configuration (persistent or ephemeral)"
+    ::= { ntpAssociationsEntry 4 }
+
+-- tagpath /ntp/associations/reachability
+ntpAssociationsReachability OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Reachability (yes or no)"
+    ::= { ntpAssociationsEntry 5 }
+
+-- tagpath /ntp/associations/auth
+ntpAssociationsAuth OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authentication (ok, yes, bad, or none)"
+    ::= { ntpAssociationsEntry 6 }
+
+-- tagpath /ntp/associations/condition
+ntpAssociationsCondition OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Selection status"
+    ::= { ntpAssociationsEntry 7 }
+
+-- tagpath /ntp/associations/last_event
+ntpAssociationsLastEvent OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Event report"
+    ::= { ntpAssociationsEntry 8 }
+
+-- tagpath /ntp/associations/count
+ntpAssociationsCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Event count"
+    ::= { ntpAssociationsEntry 9 }
+
+-- tagpath /transport/connection
+transportConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TransportConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { transport 1 }
+
+-- tagpath /transport/connection
+transportConnectionEntry OBJECT-TYPE
+    SYNTAX      TransportConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { transportConnectionTrackType, transportConnectionSource, transportConnectionDestination }
+        ::= { transportConnectionTable 1 }
+
+TransportConnectionEntry ::=
+    SEQUENCE {
+        transportConnectionTrackType INTEGER,
+        transportConnectionSource InetAddressIP,
+        transportConnectionDestination InetAddressIP,
+        transportConnectionHost String
+    }
+
+-- tagpath /transport/connection/track-type
+transportConnectionTrackType OBJECT-TYPE
+    SYNTAX      INTEGER {system(0),tloc(1)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Tracking Type"
+    ::= { transportConnectionEntry 1 }
+
+-- tagpath /transport/connection/source
+transportConnectionSource OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Source address"
+    ::= { transportConnectionEntry 2 }
+
+-- tagpath /transport/connection/destination
+transportConnectionDestination OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Destination address"
+    ::= { transportConnectionEntry 3 }
+
+-- tagpath /transport/connection/host
+transportConnectionHost OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Host IP/DNS"
+    ::= { transportConnectionEntry 4 }
+
+-- tagpath /transport/connection/history
+transportConnectionHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TransportConnectionHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display transport connection history"
+    ::= { viptela-oper-system 12 }
+
+-- tagpath /transport/connection/history
+transportConnectionHistoryEntry OBJECT-TYPE
+    SYNTAX      TransportConnectionHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { transportConnectionTrackType, transportConnectionSource, transportConnectionDestination, transportConnectionHistoryIndex }
+        ::= { transportConnectionHistoryTable 1 }
+
+TransportConnectionHistoryEntry ::=
+    SEQUENCE {
+        transportConnectionHistoryIndex Unsigned32,
+        transportConnectionHistoryTime String,
+        transportConnectionHistoryState INTEGER
+    }
+
+-- tagpath /transport/connection/history/index
+transportConnectionHistoryIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index"
+    ::= { transportConnectionHistoryEntry 1 }
+
+-- tagpath /transport/connection/history/time
+transportConnectionHistoryTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time of log (Days:Hours:Minutes:Seconds)"
+    ::= { transportConnectionHistoryEntry 2 }
+
+-- tagpath /transport/connection/history/state
+transportConnectionHistoryState OBJECT-TYPE
+    SYNTAX      INTEGER {down(0),up(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State"
+    ::= { transportConnectionHistoryEntry 3 }
+
+-- tagpath /crash
+crashTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CrashEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display system crash log list"
+    ::= { viptela-oper-system 13 }
+
+-- tagpath /crash
+crashEntry OBJECT-TYPE
+    SYNTAX      CrashEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { crashIndex }
+        ::= { crashTable 1 }
+
+CrashEntry ::=
+    SEQUENCE {
+        crashIndex Integer32,
+        crashCoreTime String,
+        crashCoreFilename String
+    }
+
+-- tagpath /crash/index
+crashIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0 .. 15)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Index on this list"
+    ::= { crashEntry 1 }
+
+-- tagpath /crash/core-time
+crashCoreTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time core file was generated"
+    ::= { crashEntry 2 }
+
+-- tagpath /crash/core-filename
+crashCoreFilename OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Core file name"
+    ::= { crashEntry 3 }
+
+-- tagpath /software
+softwareTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SoftwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display software versions"
+    ::= { viptela-oper-system 14 }
+
+-- tagpath /software
+softwareEntry OBJECT-TYPE
+    SYNTAX      SoftwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { IMPLIED softwareVersion }
+        ::= { softwareTable 1 }
+
+SoftwareEntry ::=
+    SEQUENCE {
+        softwareVersion String,
+        softwareActive TruthValue,
+        softwareDefault TruthValue,
+        softwarePrevious TruthValue,
+        softwareTimestamp DateAndTime,
+        softwareConfirmed String,
+        softwareNext TruthValue
+    }
+
+-- tagpath /software/version
+softwareVersion OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Version"
+    ::= { softwareEntry 1 }
+
+-- tagpath /software/active
+softwareActive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Is active"
+    ::= { softwareEntry 2 }
+
+-- tagpath /software/default
+softwareDefault OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Is default"
+    ::= { softwareEntry 3 }
+
+-- tagpath /software/previous
+softwarePrevious OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Is previous"
+    ::= { softwareEntry 4 }
+
+-- tagpath /software/timestamp
+softwareTimestamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Date and time created"
+    ::= { softwareEntry 5 }
+
+-- tagpath /software/confirmed
+softwareConfirmed OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Confirmed by"
+    ::= { softwareEntry 6 }
+
+-- tagpath /software/next
+softwareNext OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Is next based image"
+    ::= { softwareEntry 7 }
+
+-- tagpath /system/local-on-demand
+systemLocalOnDemandTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemLocalOnDemandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display system on-demand info"
+    ::= { viptela-oper-system 15 }
+
+-- tagpath /system/local-on-demand
+systemLocalOnDemandEntry OBJECT-TYPE
+    SYNTAX      SystemLocalOnDemandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "local system on demand status"
+    INDEX {IMPLIED  systemLocalOnDemandSystemIP}
+        ::= { systemLocalOnDemandTable 1 }
+
+SystemLocalOnDemandEntry ::=
+    SEQUENCE {
+        systemLocalOnDemandSystemIP InetAddressIP,
+        systemLocalOnDemandSiteID  Unsigned32,
+        systemLocalOnDemandOnDemand String,
+        systemLocalOnDemandStatus String,
+        systemLocalOnDemandIdleTimeoutExpiry String
+    }
+
+-- tagpath /system/local-on-demand/system-ip
+systemLocalOnDemandSystemIP OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "system-ip"
+    ::= { systemLocalOnDemandEntry 1 }
+
+-- tagpath /system/local-on-demand/site-id
+systemLocalOnDemandSiteID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "site-id"
+    ::= {systemLocalOnDemandEntry 2}
+
+-- tagpath /system/local-on-demand/on-demand
+systemLocalOnDemandOnDemand OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "on-demand"
+    ::= {systemLocalOnDemandEntry 3}
+
+-- tagpath /system/local-on-demand/status
+systemLocalOnDemandStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "status"
+    ::= {systemLocalOnDemandEntry 4}
+
+-- tagpath /system/local-on-demand/idle-timeout-expiry
+systemLocalOnDemandIdleTimeoutExpiry OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "idle-timeout-expiry"
+    ::= {systemLocalOnDemandEntry 5}
+
+-- tagpath /system/remote-on-demand
+systemRemoteOnDemandTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SystemRemoteOnDemandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display system on-demand info"
+    ::= { viptela-oper-system 16 }
+
+-- tagpath /system/remote-on-demand
+systemRemoteOnDemandEntry OBJECT-TYPE
+    SYNTAX      SystemRemoteOnDemandEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "remote system on demand status"
+    INDEX { IMPLIED  systemRemoteOnDemandSystemIP}
+        ::= { systemRemoteOnDemandTable 1 }
+
+SystemRemoteOnDemandEntry ::=
+    SEQUENCE {
+        systemRemoteOnDemandSystemIP InetAddressIP,
+        systemRemoteOnDemandSiteID  Unsigned32,
+        systemRemoteOnDemandOnDemand String,
+        systemRemoteOnDemandStatus String,
+        systemRemoteOnDemandIdleTimeoutExpiry String
+    }
+
+-- tagpath /system/remote-on-demand/system-ip
+systemRemoteOnDemandSystemIP OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "system-ip"
+    ::= { systemRemoteOnDemandEntry 1 }
+
+-- tagpath /system/remote-on-demand/site-id
+systemRemoteOnDemandSiteID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "site-id"
+    ::= {systemRemoteOnDemandEntry 2}
+
+-- tagpath /system/remote-on-demand/on-demand
+systemRemoteOnDemandOnDemand OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "on-demand"
+    ::= {systemRemoteOnDemandEntry 3}
+
+-- tagpath /system/remote-on-demand/status
+systemRemoteOnDemandStatus OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "status"
+    ::= {systemRemoteOnDemandEntry 4}
+
+-- tagpath /system/remote-on-demand/idle-timeout-expiry
+systemRemoteOnDemandIdleTimeoutExpiry OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "idle-timeout-expiry"
+    ::= {systemRemoteOnDemandEntry 5}
+END

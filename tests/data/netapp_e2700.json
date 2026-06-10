@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.789.1123.2",
+                    "sysDescr": "NETAPP   INF-01-00        0852",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "location": "<private>",
+                    "os": "netapp",
+                    "type": "storage",
+                    "serial": null,
+                    "icon": "netapp.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

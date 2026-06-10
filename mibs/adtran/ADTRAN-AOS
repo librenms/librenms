@@ -1,0 +1,138 @@
+       ADTRAN-AOS DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           adShared, adIdentityShared
+               FROM ADTRAN-MIB;
+
+       adGenAOSMib MODULE-IDENTITY
+        LAST-UPDATED "201409100000Z" -- September 10, 2014
+	ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                901 Explorer Blvd.
+                Huntsville, AL 35806
+
+                Tel: +1 800 726-8663
+                Fax: +1 256 963 6217
+                E-mail: support@adtran.com"
+
+            DESCRIPTION
+                        "This MIB defines the Adtran OS enterprise tree node.  It
+                         provides a basis for the definition of all other Adtran OS
+                         MIBs."
+            
+            REVISION    "201409100000Z" -- September 10, 2014
+            DESCRIPTION
+                    "Added adGenAOSMef OID."
+
+            REVISION    "201204270000Z"  -- April 27, 2012
+            DESCRIPTION
+                    "Added adGenAOSApplications OID."
+
+            REVISION    "201007050000Z"  -- July 5, 2010
+            DESCRIPTION
+                    "Added adGenAOSPower OID."
+                    
+            REVISION    "200410200000Z"  -- October 20, 2004
+            DESCRIPTION
+                    "Initial version of this MIB module."
+            
+           ::= { adIdentityShared 53 }
+
+        adGenAOS               OBJECT IDENTIFIER ::= {  adShared 53 }
+	    adGenAOSCommon         OBJECT IDENTIFIER ::= {  adGenAOS 1 }
+        adGenAOSRouter         OBJECT IDENTIFIER ::= {  adGenAOS 2 }
+        adGenAOSSecurity       OBJECT IDENTIFIER ::= {  adGenAOS 3 }
+        adGenAOSSwitch         OBJECT IDENTIFIER ::= {  adGenAOS 4 }
+        adGenAOSVoice          OBJECT IDENTIFIER ::= {  adGenAOS 5 }
+        adGenAOSWan            OBJECT IDENTIFIER ::= {  adGenAOS 6 }
+        adGenAOSPower          OBJECT IDENTIFIER ::= {  adGenAOS 7 }
+        adGenAOSConformance    OBJECT IDENTIFIER ::= {  adGenAOS 99 }
+        adGenAOSApplications   OBJECT IDENTIFIER ::= {  adGenAOS 8 }
+        adGenAOSMef            OBJECT IDENTIFIER ::= {  adGenAOS 9 }
+
+    --
+    -- adGenAOS
+    --
+    -- The features in Adtran OS products that support SNMP
+    -- management appear in a list under the "adGenAOS" node.
+    --
+
+    --
+    -- AOS Common Section - adGenAOSCommon
+    --
+    -- Contains general information and config for AOS products
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.1
+    --
+
+    --
+    -- AOS Common Section - adGenAOSRouter
+    --
+    -- Contains general information and config for routing functions.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.2
+    --
+
+    --
+    -- AOS Common Section - adGenAOSSecurity
+    --
+    -- Contains general information and config for Security specific
+    -- functions.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.3
+    --
+
+    --
+    -- AOS Common Section - adGenAOSSwitch
+    --
+    -- Contains general information and config for Switch-specific
+    -- functions.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.4
+    --
+
+    --
+    -- AOS Common Section - adGenAOSVoice
+    --
+    -- Contains general information and config for Voice-specific
+    -- functions.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.5
+    --
+
+    --
+    -- AOS Common Section - adGenAOSWan
+    --
+    -- Contains general information and config for WAN functions.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.6
+    --                                                 
+    
+    -- 
+    -- AOS Power Section - AdGenAOSPower    
+    --
+    -- Contains general information and config for power monitoring.
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.7
+    --
+
+    --
+    -- AOS Common Section - adGenAOSConformance
+    --
+    -- Contains general information and config for AOS Conformance
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.99
+    --
+
+    --
+    -- AOS Common Section - adGenAOSApplications
+    --
+    -- Contains general information and config for Applications
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.8
+    --
+
+    --
+    -- AOS Common Section - adGenAOSMef
+    --
+    -- Contains general information and config for MEF
+    -- identifier sequence - 1.3.6.1.4.1.664.5.53.9
+    --
+
+       END
+

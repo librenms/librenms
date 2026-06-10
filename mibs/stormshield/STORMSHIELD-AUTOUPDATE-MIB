@@ -1,0 +1,86 @@
+STORMSHIELD-AUTOUPDATE-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32   FROM SNMPv2-SMI
+      DisplayString                             FROM RFC1213-MIB
+      SnmpAdminString                           FROM SNMP-FRAMEWORK-MIB
+      stormshieldMIB                            FROM STORMSHIELD-SMI-MIB;
+
+   snsAutoupdate MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield autoupdate"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 9 }
+
+   snsAutoupdateTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SnsAutoupdateEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "State of autoupdate subsystems"
+      ::= { snsAutoupdate 1 }
+
+   snsAutoupdateEntry OBJECT-TYPE
+      SYNTAX  SnsAutoupdateEntry
+      MAX-ACCESS  not-accessible
+      STATUS  current
+      DESCRIPTION
+         "Each entry in the snsAutoupdateTable holds a set of information
+         (subsystem, state, last run)."
+      INDEX   { snsAutoupdateIndex }
+      ::= {  snsAutoupdateTable 1 }
+
+   SnsAutoupdateEntry ::= SEQUENCE {
+      snsAutoupdateIndex   Integer32,
+      snsAutoupdateSubsys  SnmpAdminString,
+      snsAutoupdateState   DisplayString,
+      snsAutoupdateLast    DisplayString
+   }
+
+   snsAutoupdateIndex OBJECT-TYPE
+      SYNTAX  Integer32 (1..65535)
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "A unique value for the table.  Its value
+         ranges between 1 and 65535 and may not be contigous.
+         the index has no other meaning but a pure index"
+      ::= {  snsAutoupdateEntry 1 }
+
+   snsAutoupdateSubsys OBJECT-TYPE
+      SYNTAX SnmpAdminString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Subsystem name"
+      ::= { snsAutoupdateEntry 2 }
+
+   snsAutoupdateState OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "state of the update of a subsystem"
+      ::= { snsAutoupdateEntry 3 }
+
+   snsAutoupdateLast OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+         "Date of the last update of a subsystem"
+      ::= { snsAutoupdateEntry 4 }
+
+END

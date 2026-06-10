@@ -1,0 +1,787 @@
+-- Namespace: http://viptela.com/dot1x
+
+VIPTELA-DOT1X DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-dot1x MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for 802.1x Network Access Control"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201608080000Z"
+    DESCRIPTION "@REVISION-DESCRIPTION"
+    ::= { viptela 19 }
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+InetAddressIP ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "confd:inetAddressIP"
+    SYNTAX      OCTET STRING (SIZE (4|16))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+Dot1xAuthMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {radius(0),radius-MAB(1),local-MAB(2),local-Auth(3)}
+
+EapMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {unknown(0),mD5(1),pEAP-MS-CHAPv2(2),eAP-TLS(3)}
+
+Dot1xAuthState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      INTEGER {none(0),authenticated(1),authenticating(2),exception(3),guest(4),authFail(5),authReject(6)}
+
+-- Display 802.1x related information
+-- tagpath /dot1x
+dot1x OBJECT IDENTIFIER ::= { viptela-dot1x 1 }
+
+-- tagpath /dot1x/interfaces
+dot1xInterfacesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1xInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display 802.1x interface information"
+    ::= { dot1x 1 }
+
+-- tagpath /dot1x/interfaces
+dot1xInterfacesEntry OBJECT-TYPE
+    SYNTAX      Dot1xInterfacesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { dot1xInterfacesIfName }
+        ::= { dot1xInterfacesTable 1 }
+
+Dot1xInterfacesEntry ::=
+    SEQUENCE {
+        dot1xInterfacesIfName String,
+        dot1xInterfacesOperState INTEGER,
+        dot1xInterfacesHostMode INTEGER,
+        dot1xInterfacesCtrlDir INTEGER,
+        dot1xInterfacesMabServer TruthValue,
+        dot1xInterfacesMabLocal TruthValue,
+        dot1xInterfacesWakeOnLan TruthValue,
+        dot1xInterfacesReauthTimeout UnsignedShort,
+        dot1xInterfacesInactivityTimeout UnsignedShort,
+        dot1xInterfacesGuestVlan Integer32,
+        dot1xInterfacesAuthFailVlan Integer32,
+        dot1xInterfacesAuthRejectVlan Integer32,
+        dot1xInterfacesDefaultVlan Integer32,
+        dot1xInterfacesPrimaryRadiusServer InetAddressIP,
+        dot1xInterfacesSecondaryRadiusServer InetAddressIP,
+        dot1xInterfacesAccountingInterval UnsignedShort,
+        dot1xInterfacesNasIdentifier String,
+        dot1xInterfacesNasIPAddr InetAddressIP,
+        dot1xInterfacesNumClients Unsigned32
+    }
+
+-- tagpath /dot1x/interfaces/if-name
+dot1xInterfacesIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Interface name"
+    ::= { dot1xInterfacesEntry 1 }
+
+-- tagpath /dot1x/interfaces/oper-state
+dot1xInterfacesOperState OBJECT-TYPE
+    SYNTAX      INTEGER {down(0),up(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational state"
+    ::= { dot1xInterfacesEntry 2 }
+
+-- tagpath /dot1x/interfaces/host-mode
+dot1xInterfacesHostMode OBJECT-TYPE
+    SYNTAX      INTEGER {single-Host(0),multi-Auth(1),multi-Host(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Host mode"
+    ::= { dot1xInterfacesEntry 3 }
+
+-- tagpath /dot1x/interfaces/ctrl-dir
+dot1xInterfacesCtrlDir OBJECT-TYPE
+    SYNTAX      INTEGER {in(0),both(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "802.1x port access control direction"
+    ::= { dot1xInterfacesEntry 4 }
+
+-- tagpath /dot1x/interfaces/mab-server
+dot1xInterfacesMabServer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC authentication bypass configured to use RADIUS server"
+    ::= { dot1xInterfacesEntry 5 }
+
+-- tagpath /dot1x/interfaces/mab-local
+dot1xInterfacesMabLocal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC authentication bypass configured locally on the interface"
+    ::= { dot1xInterfacesEntry 6 }
+
+-- tagpath /dot1x/interfaces/wake-on-lan
+dot1xInterfacesWakeOnLan OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Allow wake-on-lan packets to egress the port"
+    ::= { dot1xInterfacesEntry 7 }
+
+-- tagpath /dot1x/interfaces/reauth-timeout
+dot1xInterfacesReauthTimeout OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Timeout for reauthentication, in minutes"
+    ::= { dot1xInterfacesEntry 8 }
+
+-- tagpath /dot1x/interfaces/inactivity-timeout
+dot1xInterfacesInactivityTimeout OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Timeout for inactivity, in minutes"
+    ::= { dot1xInterfacesEntry 9 }
+
+-- tagpath /dot1x/interfaces/guest-vlan
+dot1xInterfacesGuestVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VLAN to drop non-802.1x enabled clients into if client is not in MAB list"
+    ::= { dot1xInterfacesEntry 10 }
+
+-- tagpath /dot1x/interfaces/auth-fail-vlan
+dot1xInterfacesAuthFailVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VLAN to drop 802.1x enabled clients into if authentication server is unreachable"
+    ::= { dot1xInterfacesEntry 11 }
+
+-- tagpath /dot1x/interfaces/auth-reject-vlan
+dot1xInterfacesAuthRejectVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VLAN to drop 802.1x enabled clients into if authentication is rejected"
+    ::= { dot1xInterfacesEntry 12 }
+
+-- tagpath /dot1x/interfaces/default-vlan
+dot1xInterfacesDefaultVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "VLAN to drop clients into when VLAN not specified by RADIUS"
+    ::= { dot1xInterfacesEntry 13 }
+
+-- tagpath /dot1x/interfaces/primary-radius-server
+dot1xInterfacesPrimaryRadiusServer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Primary RADIUS server IP address"
+    ::= { dot1xInterfacesEntry 14 }
+
+-- tagpath /dot1x/interfaces/secondary-radius-server
+dot1xInterfacesSecondaryRadiusServer OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Secondary RADIUS server IP address"
+    ::= { dot1xInterfacesEntry 15 }
+
+-- tagpath /dot1x/interfaces/accounting-interval
+dot1xInterfacesAccountingInterval OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Interim accounting interval, in minutes"
+    ::= { dot1xInterfacesEntry 16 }
+
+-- tagpath /dot1x/interfaces/nas-identifier
+dot1xInterfacesNasIdentifier OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NAS Identifier sent to RADIUS server"
+    ::= { dot1xInterfacesEntry 17 }
+
+-- tagpath /dot1x/interfaces/nas-ipaddr
+dot1xInterfacesNasIPAddr OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "NAS IP address sent to RADIUS server"
+    ::= { dot1xInterfacesEntry 18 }
+
+-- tagpath /dot1x/interfaces/num-clients
+dot1xInterfacesNumClients OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of connected clients"
+    ::= { dot1xInterfacesEntry 19 }
+
+-- tagpath /dot1x/clients
+dot1xClientsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1xClientsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display 802.1x client information"
+    ::= { dot1x 2 }
+
+-- tagpath /dot1x/clients
+dot1xClientsEntry OBJECT-TYPE
+    SYNTAX      Dot1xClientsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { dot1xClientsIfName, dot1xClientsMacAddress }
+        ::= { dot1xClientsTable 1 }
+
+Dot1xClientsEntry ::=
+    SEQUENCE {
+        dot1xClientsIfName String,
+        dot1xClientsMacAddress String,
+        dot1xClientsAuthState Dot1xAuthState,
+        dot1xClientsAuthMethod Dot1xAuthMethod,
+        dot1xClientsVlan Integer32,
+        dot1xClientsVpn Integer32,
+        dot1xClientsEapMethod String,
+        dot1xClientsUsername String,
+        dot1xClientsSessionTime Unsigned32,
+        dot1xClientsConnectedTime Unsigned32,
+        dot1xClientsInactiveTime Unsigned32,
+        dot1xClientsSessionId String,
+        dot1xClientsEapolFramesRx Unsigned32,
+        dot1xClientsEapolFramesTx Unsigned32,
+        dot1xClientsEapolStartFramesRx Unsigned32,
+        dot1xClientsEapolLogoffFramesRx Unsigned32,
+        dot1xClientsEapolRequestIdFramesTx Unsigned32,
+        dot1xClientsEapolResponseIdFramesRx Unsigned32,
+        dot1xClientsEapolRequestFramesTx Unsigned32,
+        dot1xClientsEapolResponseFramesRx Unsigned32
+    }
+
+-- tagpath /dot1x/clients/if-name
+dot1xClientsIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "802.1x interface name"
+    ::= { dot1xClientsEntry 1 }
+
+-- tagpath /dot1x/clients/mac-address
+dot1xClientsMacAddress OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "MAC address of the client"
+    ::= { dot1xClientsEntry 2 }
+
+-- tagpath /dot1x/clients/auth-state
+dot1xClientsAuthState OBJECT-TYPE
+    SYNTAX      Dot1xAuthState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "802.1x authentication state of the client"
+    ::= { dot1xClientsEntry 3 }
+
+-- tagpath /dot1x/clients/auth-method
+dot1xClientsAuthMethod OBJECT-TYPE
+    SYNTAX      Dot1xAuthMethod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "802.1x authentication method of the client"
+    ::= { dot1xClientsEntry 4 }
+
+-- tagpath /dot1x/clients/vlan
+dot1xClientsVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational VLAN of the client"
+    ::= { dot1xClientsEntry 5 }
+
+-- tagpath /dot1x/clients/vpn
+dot1xClientsVpn OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Operational VPN of the client"
+    ::= { dot1xClientsEntry 6 }
+
+-- tagpath /dot1x/clients/eap-method
+dot1xClientsEapMethod OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authenticated EAP method"
+    ::= { dot1xClientsEntry 7 }
+
+-- tagpath /dot1x/clients/username
+dot1xClientsUsername OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Username for client session"
+    ::= { dot1xClientsEntry 8 }
+
+-- tagpath /dot1x/clients/session-time
+dot1xClientsSessionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Session time, in seconds"
+    ::= { dot1xClientsEntry 9 }
+
+-- tagpath /dot1x/clients/connected-time
+dot1xClientsConnectedTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Connected time, in seconds"
+    ::= { dot1xClientsEntry 10 }
+
+-- tagpath /dot1x/clients/inactive-time
+dot1xClientsInactiveTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time client has been inactive, in seconds"
+    ::= { dot1xClientsEntry 11 }
+
+-- tagpath /dot1x/clients/session-id
+dot1xClientsSessionId OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Client Session ID"
+    ::= { dot1xClientsEntry 12 }
+
+-- tagpath /dot1x/clients/eapol-frames-rx
+dot1xClientsEapolFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL frames received"
+    ::= { dot1xClientsEntry 13 }
+
+-- tagpath /dot1x/clients/eapol-frames-tx
+dot1xClientsEapolFramesTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL frames sent"
+    ::= { dot1xClientsEntry 14 }
+
+-- tagpath /dot1x/clients/eapol-start-frames-rx
+dot1xClientsEapolStartFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL start frames received"
+    ::= { dot1xClientsEntry 15 }
+
+-- tagpath /dot1x/clients/eapol-logoff-frames-rx
+dot1xClientsEapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL logoff frames received"
+    ::= { dot1xClientsEntry 16 }
+
+-- tagpath /dot1x/clients/eapol-request-id-frames-tx
+dot1xClientsEapolRequestIdFramesTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL identity request frames sent"
+    ::= { dot1xClientsEntry 17 }
+
+-- tagpath /dot1x/clients/eapol-response-id-frames-rx
+dot1xClientsEapolResponseIdFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL identity response frames received"
+    ::= { dot1xClientsEntry 18 }
+
+-- tagpath /dot1x/clients/eapol-request-frames-tx
+dot1xClientsEapolRequestFramesTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL request frames sent"
+    ::= { dot1xClientsEntry 19 }
+
+-- tagpath /dot1x/clients/eapol-response-frames-rx
+dot1xClientsEapolResponseFramesRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EAPoL response frames received"
+    ::= { dot1xClientsEntry 20 }
+
+-- tagpath /dot1x/radius
+dot1xRadiusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Dot1xRadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Display 802.1x radius server information"
+    ::= { dot1x 3 }
+
+-- tagpath /dot1x/radius
+dot1xRadiusEntry OBJECT-TYPE
+    SYNTAX      Dot1xRadiusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { dot1xRadiusIfName, dot1xRadiusIpAddress }
+        ::= { dot1xRadiusTable 1 }
+
+Dot1xRadiusEntry ::=
+    SEQUENCE {
+        dot1xRadiusIfName String,
+        dot1xRadiusIpAddress InetAddressIP,
+        dot1xRadiusVpn Unsigned32,
+        dot1xRadiusIsPrimary TruthValue,
+        dot1xRadiusAuthPort Unsigned32,
+        dot1xRadiusAuthIsCurrent TruthValue,
+        dot1xRadiusAuthRoundTripTime Unsigned32,
+        dot1xRadiusAuthAccessRequests Unsigned32,
+        dot1xRadiusAuthAccessRetransmissions Unsigned32,
+        dot1xRadiusAuthAccessAccepts Unsigned32,
+        dot1xRadiusAuthAccessRejects Unsigned32,
+        dot1xRadiusAuthAccessChallenges Unsigned32,
+        dot1xRadiusAuthMalformedAccessResponses Unsigned32,
+        dot1xRadiusAuthBadAuthenticators Unsigned32,
+        dot1xRadiusAuthPendingRequests Unsigned32,
+        dot1xRadiusAuthTimeouts Unsigned32,
+        dot1xRadiusAuthUnknownTypes Unsigned32,
+        dot1xRadiusAuthPacketsDropped Unsigned32,
+        dot1xRadiusAcctPort Unsigned32,
+        dot1xRadiusAcctIsCurrent TruthValue,
+        dot1xRadiusAcctRoundTripTime Unsigned32,
+        dot1xRadiusAcctRequests Unsigned32,
+        dot1xRadiusAcctRetransmissions Unsigned32,
+        dot1xRadiusAcctResponses Unsigned32,
+        dot1xRadiusAcctMalformedResponses Unsigned32,
+        dot1xRadiusAcctBadAuthenticators Unsigned32,
+        dot1xRadiusAcctPendingRequests Unsigned32,
+        dot1xRadiusAcctTimeouts Unsigned32,
+        dot1xRadiusAcctUnknownTypes Unsigned32,
+        dot1xRadiusAcctPacketsDropped Unsigned32
+    }
+
+-- tagpath /dot1x/radius/if-name
+dot1xRadiusIfName OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "802.1x interface name"
+    ::= { dot1xRadiusEntry 1 }
+
+-- tagpath /dot1x/radius/ip-address
+dot1xRadiusIpAddress OBJECT-TYPE
+    SYNTAX      InetAddressIP
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "RADIUS server IP address"
+    ::= { dot1xRadiusEntry 2 }
+
+-- tagpath /dot1x/radius/vpn
+dot1xRadiusVpn OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server VPN"
+    ::= { dot1xRadiusEntry 3 }
+
+-- tagpath /dot1x/radius/is-primary
+dot1xRadiusIsPrimary OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server is configured to be the primary one"
+    ::= { dot1xRadiusEntry 4 }
+
+-- tagpath /dot1x/radius/auth-port
+dot1xRadiusAuthPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server authentication port number"
+    ::= { dot1xRadiusEntry 5 }
+
+-- tagpath /dot1x/radius/auth-is-current
+dot1xRadiusAuthIsCurrent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server is the currently active one for authentication"
+    ::= { dot1xRadiusEntry 6 }
+
+-- tagpath /dot1x/radius/auth-round-trip-time
+dot1xRadiusAuthRoundTripTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Authentication server round trip time for last message, in seconds"
+    ::= { dot1xRadiusEntry 7 }
+
+-- tagpath /dot1x/radius/auth-access-requests
+dot1xRadiusAuthAccessRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access requests sent"
+    ::= { dot1xRadiusEntry 8 }
+
+-- tagpath /dot1x/radius/auth-access-retransmissions
+dot1xRadiusAuthAccessRetransmissions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access request retransmissions"
+    ::= { dot1xRadiusEntry 9 }
+
+-- tagpath /dot1x/radius/auth-access-accepts
+dot1xRadiusAuthAccessAccepts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access accepts received"
+    ::= { dot1xRadiusEntry 10 }
+
+-- tagpath /dot1x/radius/auth-access-rejects
+dot1xRadiusAuthAccessRejects OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access rejects received"
+    ::= { dot1xRadiusEntry 11 }
+
+-- tagpath /dot1x/radius/auth-access-challenges
+dot1xRadiusAuthAccessChallenges OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of access challenges received"
+    ::= { dot1xRadiusEntry 12 }
+
+-- tagpath /dot1x/radius/auth-malformed-access-responses
+dot1xRadiusAuthMalformedAccessResponses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of malformed access responses received"
+    ::= { dot1xRadiusEntry 13 }
+
+-- tagpath /dot1x/radius/auth-bad-authenticators
+dot1xRadiusAuthBadAuthenticators OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of authentication requests with bad authentication"
+    ::= { dot1xRadiusEntry 14 }
+
+-- tagpath /dot1x/radius/auth-pending-requests
+dot1xRadiusAuthPendingRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of un-acknowledged access requests"
+    ::= { dot1xRadiusEntry 15 }
+
+-- tagpath /dot1x/radius/auth-timeouts
+dot1xRadiusAuthTimeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of authentication request timeouts"
+    ::= { dot1xRadiusEntry 16 }
+
+-- tagpath /dot1x/radius/auth-unknown-types
+dot1xRadiusAuthUnknownTypes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of authentication messages of unknown type"
+    ::= { dot1xRadiusEntry 17 }
+
+-- tagpath /dot1x/radius/auth-packets-dropped
+dot1xRadiusAuthPacketsDropped OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of dropped authentication packets"
+    ::= { dot1xRadiusEntry 18 }
+
+-- tagpath /dot1x/radius/acct-port
+dot1xRadiusAcctPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server accounting port number"
+    ::= { dot1xRadiusEntry 19 }
+
+-- tagpath /dot1x/radius/acct-is-current
+dot1xRadiusAcctIsCurrent OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RADIUS server is the currently active one for accounting"
+    ::= { dot1xRadiusEntry 20 }
+
+-- tagpath /dot1x/radius/acct-round-trip-time
+dot1xRadiusAcctRoundTripTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Accounting server round trip time for last message, in seconds"
+    ::= { dot1xRadiusEntry 21 }
+
+-- tagpath /dot1x/radius/acct-requests
+dot1xRadiusAcctRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting requests sent"
+    ::= { dot1xRadiusEntry 22 }
+
+-- tagpath /dot1x/radius/acct-retransmissions
+dot1xRadiusAcctRetransmissions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting request restransmissions"
+    ::= { dot1xRadiusEntry 23 }
+
+-- tagpath /dot1x/radius/acct-responses
+dot1xRadiusAcctResponses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting responses received"
+    ::= { dot1xRadiusEntry 24 }
+
+-- tagpath /dot1x/radius/acct-malformed-responses
+dot1xRadiusAcctMalformedResponses OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of malformed accounting responses received"
+    ::= { dot1xRadiusEntry 25 }
+
+-- tagpath /dot1x/radius/acct-bad-authenticators
+dot1xRadiusAcctBadAuthenticators OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting requests with bad authentication"
+    ::= { dot1xRadiusEntry 26 }
+
+-- tagpath /dot1x/radius/acct-pending-requests
+dot1xRadiusAcctPendingRequests OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of un-acknowledged accounting requests"
+    ::= { dot1xRadiusEntry 27 }
+
+-- tagpath /dot1x/radius/acct-timeouts
+dot1xRadiusAcctTimeouts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting request timeouts"
+    ::= { dot1xRadiusEntry 28 }
+
+-- tagpath /dot1x/radius/acct-unknown-types
+dot1xRadiusAcctUnknownTypes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of accounting responses of unknown type"
+    ::= { dot1xRadiusEntry 29 }
+
+-- tagpath /dot1x/radius/acct-packets-dropped
+dot1xRadiusAcctPacketsDropped OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of dropped accounting packets"
+    ::= { dot1xRadiusEntry 30 }
+
+END

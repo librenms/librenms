@@ -1,0 +1,23 @@
+CET-TSI-SMI DEFINITIONS ::= BEGIN
+
+ -- the path to the root
+
+ internet      OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+
+ directory     OBJECT IDENTIFIER ::= { internet 1 }
+
+ mgmt          OBJECT IDENTIFIER ::= { internet 2 }
+
+ experimental  OBJECT IDENTIFIER ::= { internet 3 }
+
+ private       OBJECT IDENTIFIER ::= { internet 4 }
+ enterprises   OBJECT IDENTIFIER ::= { private 1 }
+ cetMIB        OBJECT IDENTIFIER ::= { enterprises 12551 } -- assigned by IANA
+
+ -- Other CE+T products
+
+ cetBip        OBJECT IDENTIFIER ::= { cetMIB 1 } -- BIP
+ cetMiniBip    OBJECT IDENTIFIER ::= { cetMIB 2 } -- Mini-BIP
+ bipRdiMIB     OBJECT IDENTIFIER ::= { cetMIB 3 } -- BIP-RDI
+
+ END

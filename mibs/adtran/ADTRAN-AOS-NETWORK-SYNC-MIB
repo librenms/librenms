@@ -1,0 +1,191 @@
+ADTRAN-AOS-NETWORK-SYNC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    adIdentity
+        FROM ADTRAN-MIB
+    adGenAOSConformance, adGenAOSCommon
+        FROM ADTRAN-AOS;
+
+adGenAOSNetSyncMib MODULE-IDENTITY
+    LAST-UPDATED "201509180000Z"
+    ORGANIZATION "ADTRAN, Inc."
+    CONTACT-INFO
+           "        Technical Support Dept.
+                    Postal: ADTRAN, Inc.
+                    901 Explorer Blvd.
+                    Huntsville, AL 35806
+
+               Tel: +1 800 726-8663
+               Fax: +1 256 963 6217
+            E-mail: support@adtran.com"
+    DESCRIPTION
+            "The MIB module defines Network Sync configuration information and traps for AdtranOS products."
+   REVISION    "201509180000Z" -- September 18, 2015
+   DESCRIPTION "The following changes have been made in this version:
+                1. Add a trap for the T4 interface output squelch."
+   REVISION    "201403050000Z" -- March 5, 2014
+   DESCRIPTION "The following changes have been made in this version:
+                1. Removed the LTI State from the clock defects trap.
+                2. Added a new trap for the LTI State change."
+    REVISION "201311070000Z"  -- November 7, 2013 / YYYYMMDDHHMMZ
+    DESCRIPTION
+            "Created the adGenAosNetSync MIB. Revision R10.11"
+            
+
+    ::= { adIdentity 10000 53 1 9 }
+
+adGenAOSNetSync OBJECT IDENTIFIER ::= { adGenAOSCommon 9 }
+adGenAOSNetSyncTrap OBJECT IDENTIFIER ::= { adGenAOSNetSync 0 }
+adGenAOSNetSyncTrapControl OBJECT IDENTIFIER ::= { adGenAOSNetSync 1 }
+adGenAOSNetSyncInfo OBJECT IDENTIFIER ::= { adGenAOSNetSync 2 }
+
+adGenAOSNetSyncTrapEnable OBJECT-TYPE
+        SYNTAX  INTEGER     { enabled(1), disabled(2) }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "This variable indicates whether the system produces
+            the Network Sync trap."
+        DEFVAL { disabled }
+     ::= { adGenAOSNetSyncTrapControl 1 }
+
+adGenAOSNetSyncLTIState OBJECT-TYPE
+        SYNTAX INTEGER    { inactive(1), active(2) }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+           "A numerical representation of the chassis's LTI(Loss of Timing Info) state."
+        ::= { adGenAOSNetSyncInfo 1 }
+
+adGenAOSNetSyncClockNumber OBJECT-TYPE
+        SYNTAX INTEGER    { primary(1), secondary(2) }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+           "A numerical representation of the chassis's Network Sync Clock source."
+        ::= { adGenAOSNetSyncInfo 2 }
+
+adGenAOSNetSyncClockDefectStatus OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "This variable indicates the Network Sync clock defect status.
+             The adGenAOSNetSyncClockDefectStatus is a bit map represented as a
+             sum, therefore, it can represent multiple defects simultaneously.
+             Bit 1 which represents no defects  must be set if and only if no other
+             bits are set.
+             
+              The various bit positions are:
+              1     NONE      No defects
+              2     LOS       Loss of signal
+              4     EFD       Exceeded frequency deviation
+              8     LO_ESMC   Loss of ESMC
+             16     QL_FAILED Quality level failed "
+        ::= { adGenAOSNetSyncInfo 3 }
+
+adGenAOSNetSyncT4SquelchState OBJECT-TYPE
+        SYNTAX INTEGER    { inactive(1), active(2) }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+           "A numerical representation of the T4 interface squelch state."
+        ::= { adGenAOSNetSyncInfo 4 }
+
+adGenAOSNetSyncClockDefectTrap NOTIFICATION-TYPE
+        OBJECTS { adGenAOSNetSyncClockNumber, adGenAOSNetSyncClockDefectStatus }
+        STATUS  current
+        DESCRIPTION
+            "A Network Sync trap signifies a change in clock defect status."
+        ::= { adGenAOSNetSyncTrap 1 }
+
+adGenAOSNetSyncLTIStateChangeTrap NOTIFICATION-TYPE
+        OBJECTS { adGenAOSNetSyncLTIState }
+        STATUS  current
+        DESCRIPTION
+            "A Network Sync trap signifies a change in Loss of timing state."
+        ::= { adGenAOSNetSyncTrap 2 }
+    
+adGenAOSNetSyncT4SquelchStateChangeTrap NOTIFICATION-TYPE
+        OBJECTS { adGenAOSNetSyncT4SquelchState }
+        STATUS  current
+        DESCRIPTION
+            "A Network Sync trap signifies a change in T4 interface squelch state."
+        ::= { adGenAOSNetSyncTrap 3 }
+    
+-- Conformance information
+--
+adGenAOSNetSyncConformance OBJECT IDENTIFIER
+        ::= { adGenAOSConformance 18 }
+    
+adGenAOSNetSyncGroups OBJECT IDENTIFIER
+        ::= { adGenAOSNetSyncConformance 1 }
+
+adGenAOSNetSyncCompliances OBJECT IDENTIFIER
+        ::= { adGenAOSNetSyncConformance 2 }
+
+-- Compliance statements
+--
+
+-- Full compliance statement
+     adGenAOSNetSyncFullCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+        "The compliance statement for SNMP entities which implement
+        version 2 of the adGenAosNetSync MIB. When this MIB is implemented
+        with support for read-write, then such an implementation can claim
+        full compliance."
+
+        MODULE  -- this module
+
+        GROUP adGenAOSNetSyncTrapCfgGroup
+        DESCRIPTION
+           "A collection of objects providing configuration for the Network Sync trap."
+         
+        GROUP adGenAOSNetSyncTrapGroup
+        DESCRIPTION
+            "This group is used for the management of
+            asynchronous notifications of Network Sync traps."
+        
+        GROUP  adGenAOSNetSyncNotificationGroup
+        DESCRIPTION
+            "This optional group defines the asynchronous
+            notifications generated by Network Sync traps."
+        ::= { adGenAOSNetSyncCompliances 1 }
+     
+        adGenAOSNetSyncTrapCfgGroup    OBJECT-GROUP
+        OBJECTS {
+                     adGenAOSNetSyncTrapEnable
+                }
+        STATUS  current
+        DESCRIPTION
+            "This group contains the objects necessary to enable/disable
+            NetSync failure traps."
+        ::= { adGenAOSNetSyncGroups 1 }
+         
+         adGenAOSNetSyncTrapGroup    OBJECT-GROUP
+        OBJECTS {
+                     adGenAOSNetSyncLTIState,
+                     adGenAOSNetSyncClockNumber,
+                     adGenAOSNetSyncClockDefectStatus,
+                     adGenAOSNetSyncT4SquelchState
+                 }
+        STATUS  current
+        DESCRIPTION
+            "The objects necessary to control NetSync notification messages."
+        ::= { adGenAOSNetSyncGroups 2 }
+
+         adGenAOSNetSyncNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { adGenAOSNetSyncClockDefectTrap, adGenAOSNetSyncLTIStateChangeTrap, adGenAOSNetSyncT4SquelchStateChangeTrap }
+        STATUS  current
+        DESCRIPTION
+            "Traps which may be used to enhance event driven
+            management of the chassis's Network Sync."
+        ::= { adGenAOSNetSyncGroups 3 }
+    
+END

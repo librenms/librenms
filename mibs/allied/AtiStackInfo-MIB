@@ -1,0 +1,231 @@
+
+-- Copyright 2001-2010 by Allied Telesis International, Inc.
+--
+-- Name: AtiStackInfo-MIB
+--
+-- Version: 1.3 - MIB 2.4.1.5
+-- 
+-- Products using this MIB:
+-- AT9000-28SP
+-- At9000-28T
+-- At9000-52T
+-- At9100-28SP
+--
+-- History:
+-- Praveen Donthi (ATI)       04/04/02        Created the mib and added Enhanced Stacking
+--                                            group for S39 2.0
+-- Praveen Donthi (ATI)       07/24/03        Changed data type of atiswitchEnhStackTable index
+--                                            from Integer32 to INTEGER
+-- Youn-Mor Steven Chen       05/25/10        Copy from ATS63 and change name to at-stackinfo.mib
+--
+-- Youn-Mor Steven Chen       06/01/10        Change name back to atistackinfo.mib
+--
+
+
+AtiStackInfo-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, Integer32
+                        FROM SNMPv2-SMI
+                DisplayString, TruthValue
+                        FROM SNMPv2-TC
+                enterprises
+                        FROM RFC1155-SMI;
+
+
+-- MODULE IDENTITY for the private mib
+
+        alliedTelesis MODULE-IDENTITY
+                LAST-UPDATED "200407270000Z"
+                ORGANIZATION "Allied Telesis International"
+                CONTACT-INFO "Allied Telesis International"
+                DESCRIPTION
+                    "Private MIB for ATI next generation layer 2
+                    switches. This MIB contains stacking related
+                    groups."
+        ::= { enterprises 207 }
+
+-- OID tree for Allied Telesis MIBs
+
+        mibObject       OBJECT IDENTIFIER ::= { alliedTelesis 8 }
+        atiStackInfoMib OBJECT IDENTIFIER ::= { mibObject 16 }
+
+
+
+
+-- General Definitions
+
+        MACAddress      ::= OCTET STRING (SIZE (6))  -- a 6 octet
+
+
+-- Groups supported in this version of the MIB
+
+        atiswitchEnhancedStacking       OBJECT IDENTIFIER ::= { atiStackInfoMib 1 }
+
+
+--
+-- atiswitchEnhancedStacking
+--
+
+atiswitchEnhStackMode   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                master(1),
+                                slave(2),
+                                unavailable(3)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "Enhanced stacking mode of the switch.
+                - Master: You will be able to access the user interface
+                of other switches from this switch and be able to
+                configure the remote switch. Other Masters can also
+                access this switch.
+
+                - Slave: This switch will not be able to access and
+                configure other switches but Masters can access this
+                switch remotely.
+
+                - Unavailable: It cannot access any other switches and
+                also no Masters can access this switch. It can only be
+                configured locally."
+        ::= { atiswitchEnhancedStacking 1 }
+
+--
+-- atiswitchEnhStackDiscover      OBJECT-TYPE
+--        SYNTAX          INTEGER {
+--                                discover(1),
+--                                do-not-discover(2)
+--                                }
+--        MAX-ACCESS      read-only
+--        STATUS          current
+--        DESCRIPTION
+--                "Before accessing the enhanced stack, the stack has to
+--                be discovered by setting this object to 'discover'.
+--                The user is requested to wait for a couple of seconds
+--                before accessing the stack as it takes some time for
+--                all the remote switches to be identified. Setting the
+--                value to 'do-not-discover' has no effect."
+--        ::= { atiswitchEnhancedStacking 2 }
+--
+
+atiswitchEnhStackRemoteNumber   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Total number of remote switches detected by the Master.
+                It will also be equal to the number of entries in
+                atiswitchEnhStackTable."
+        ::= { atiswitchEnhancedStacking 3 }
+
+
+atiswitchEnhStackTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AtiswitchEnhStackEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table contains the list of all remote switches
+                accessible from a Master switch."
+        ::= { atiswitchEnhancedStacking 4 }
+
+
+atiswitchEnhStackEntry  OBJECT-TYPE
+        SYNTAX          AtiswitchEnhStackEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An entry in the atiswitchEnhStackTable describing the
+                remote switch."
+        INDEX   { atiswitchEnhStackSwId }
+        ::= { atiswitchEnhStackTable 1 }
+
+
+AtiswitchEnhStackEntry   ::=   SEQUENCE  {
+                atiswitchEnhStackSwId
+                        INTEGER,
+                atiswitchEnhStackSwMacAddr
+                        MACAddress,
+                atiswitchEnhStackSwName
+                        DisplayString,
+                atiswitchEnhStackSwMode
+                        DisplayString,
+                atiswitchEnhStackSwSoftwareVersion
+                        DisplayString,
+                atiswitchEnhStackSwModel
+                        DisplayString
+--                atiswitchEnhStackConnect
+--                        TruthValue
+                }
+
+
+atiswitchEnhStackSwId   OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Entry number of the remote switch in the table. It is
+                also the index into the table."
+        ::= { atiswitchEnhStackEntry 1 }
+
+
+atiswitchEnhStackSwMacAddr   OBJECT-TYPE
+        SYNTAX          MACAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "MAC address of the remote switch."
+        ::= { atiswitchEnhStackEntry 2 }
+
+
+atiswitchEnhStackSwName         OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..20))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Name of the remote switch."
+        ::= { atiswitchEnhStackEntry 3 }
+
+
+atiswitchEnhStackSwMode   OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..20))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Mode of the remote switch - whether it is a Master or
+                a Slave."
+        ::= { atiswitchEnhStackEntry 4 }
+
+
+atiswitchEnhStackSwSoftwareVersion   OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..20))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Software version running in the remote switch."
+        ::= { atiswitchEnhStackEntry 5 }
+
+
+atiswitchEnhStackSwModel   OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..20))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Model name of the remote switch."
+        ::= { atiswitchEnhStackEntry 6 }
+
+--
+-- atiswitchEnhStackConnect   OBJECT-TYPE
+--        SYNTAX          TruthValue
+--        MAX-ACCESS      read-only
+--        STATUS          current
+--        DESCRIPTION
+--                "Setting this to 'true' will establish a connection
+--                with the remote switch. Only one entry in the table
+--                can have this value set to 'true' at any point of time.
+--                During a remote access, setting its value to 'false'
+--                will terminate the remote access."
+--        ::= { atiswitchEnhStackEntry 7 }
+
+END
+

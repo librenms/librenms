@@ -1,0 +1,2565 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  HUAWEI Layer Two MAC management MIB
+-- Reference:
+-- Version: V2.18
+-- History:
+-- ==================================================================
+-- HUAWEI-MPLSOAM-MIB.mib
+-- ==================================================================
+-- 
+-- Variables and types to be imported
+--
+-- ==================================================================
+
+    HUAWEI-MPLSOAM-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwMpls            
+                FROM HUAWEI-MIB            
+            IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            DisplayString, TruthValue, TimeStamp, RowStatus, TEXTUAL-CONVENTION       
+                FROM SNMPv2-TC
+            hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName
+		FROM HUAWEI-MPLS-EXTEND-MIB
+            InterfaceIndex
+                FROM IF-MIB;
+    
+    
+-- April 27, 2005 at 17:24 GMT
+        hwMplsOam MODULE-IDENTITY 
+            LAST-UPDATED "201712181700Z" 
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
+            DESCRIPTION 
+                "The HUAWEI-MPLSOAM-MIB contains objects to configure OAM module. 
+                The Operation, Administration and Maintenance (OAM) 
+                is an effective means for decreasing the cost of network maintenance. 
+                The MPLS OAM is used to administrate and maintain MPLS.  "        
+          
+-- Revision history
+
+        REVISION    "201712181700Z"
+        DESCRIPTION "V2.18,  add import hwMplsTunnelSignalledTunnelName, and modify related alarm"
+
+        REVISION    "201708171655Z"
+        DESCRIPTION "V2.17,  modify hwMplsOamL2vcOutDefect, hwMplsOamL2vcInDefect, hwMplsOamL2vcAva, hwMplsOamL2vcUnAva"
+
+        REVISION    "201707051048Z"    
+        DESCRIPTION "V2.16,  modify hwMplsOamBidirectionalTunnelInDefect, hwMplsOamL2vcInDefect, hwMplsOamL2vcAva, hwMplsOamBidirectionalTunnelAva"
+
+        REVISION    "201701101505Z"    
+        DESCRIPTION "V2.15,  add hwMplsApsPathMisMatch,  hwMplsApsPathMisMatchRecovery, hwMplsApsTypeMisMatch, hwMplsApsTypeMisMatchRecovery"
+
+        REVISION    "201701091728Z"    
+        DESCRIPTION "V2.14,  add hwMplsApsPathMisMatch,  hwMplsApsPathMisMatchRecovery, hwMplsApsTypeMisMatch, hwMplsApsTypeMisMatchRecovery" 
+
+        REVISION    "201408211052Z"    
+        DESCRIPTION "V2.13,  add hwMplsApsDegraded,  hwMplsApsDegradedRecovery, hwMplsApsSwitchFail, hwMplsApsSwitchFailRecovery" 
+ 
+        REVISION    "201308271600Z"   
+        DESCRIPTION "V2.12,  modify the scope of hwMplsOamL2vcVcType."
+
+        REVISION    "201302181600Z"   
+        DESCRIPTION "V2.11,  modify the MAX-ACCESS of hwMplsPsRowStatus to read-create."
+
+        REVISION    "200504271600Z"   
+        DESCRIPTION "V1.00, initial version."
+        
+        ::= { hwMpls 7 }
+
+
+    
+--
+-- Node definitions
+--
+    
+--  Node definitions
+-- 
+
+        hwMplsOamPs OBJECT IDENTIFIER ::= { hwMplsOam 1 }
+
+        
+        hwMplsOamObjects OBJECT IDENTIFIER ::= { hwMplsOamPs 1 }
+        hwMplsOamCapability OBJECT-TYPE
+            SYNTAX Unsigned32 (0..2)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Whether OAM is globally capable.
+                0: incapable;
+                1: capable;
+                2: capable(basedItu);
+                The default value is incapable."
+            ::= { hwMplsOamObjects 1 }
+
+
+        hwMplsOamIgrTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsOamIgrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies per-LSP MPLS OAM capability and 
+                associated information, such as IgrTunnName and IgrDetType."
+            ::= { hwMplsOamObjects 2 }
+
+        
+        hwMplsOamIgrEntry OBJECT-TYPE
+            SYNTAX HwMplsOamIgrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by an LSR for every LSP
+                capable of supporting MPLS OAM at ingress."
+            INDEX { hwMplsOamIgrIndex }
+            ::= { hwMplsOamIgrTable 1 }
+
+        
+        HwMplsOamIgrEntry ::=
+            SEQUENCE { 
+                hwMplsOamIgrIndex
+                    Unsigned32,
+                hwMplsOamIgrTunnName
+                    OCTET STRING,
+                hwMplsOamIgrDetType
+                    INTEGER,
+                hwMplsOamIgrDetFreq
+                    INTEGER,
+                hwMplsOamIgrRevType
+                    INTEGER,
+                hwMplsOamIgrRevLspName
+                    OCTET STRING,
+                hwMplsOamIgrRevLsrId
+                    IpAddress,
+                hwMplsOamIgrRevSessTunnId
+                    Integer32,
+                hwMplsOamIgrEnable
+                    INTEGER,
+                hwMplsOamIgrValid
+                    INTEGER,
+                hwMplsOamIgrAvaState
+                    INTEGER,
+                hwMplsOamIgrDefectType
+                    INTEGER,
+                hwMplsOamIgrCompatibilityMode
+                    INTEGER,
+                hwMplsOamIgrBDIFreq
+                INTEGER,
+                hwMplsOamIgrRowStatus
+                    RowStatus
+             }
+
+
+        hwMplsOamIgrIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The interface index of the detected tunnel."
+            ::= { hwMplsOamIgrEntry 1 }
+
+        
+        hwMplsOamIgrTunnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name of a tunnel.
+                For ingress, it means the tunnel name of the detected LSP.
+                For egress, it means the tunnel name of the reverse LSP."
+            ::= { hwMplsOamIgrEntry 2 }
+
+        
+        hwMplsOamIgrDetType OBJECT-TYPE     
+            SYNTAX INTEGER {                                            
+                       cv(1),
+                       ffd(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "There are two types of OAM packets, CV and FFD.
+                The CV flow is generated at the source LSR of the LSP with
+                a nominal frequency of 1/s and terminated at the sink LSR of the LSP.
+                FFD provides failure detection option for an LSP independent 
+                of the CV based availability model and is not tied to the 
+                CV insertion rate. Insertion rates at 1/s or faster may 
+                also be used.
+                The CV/FFD packet contains a network-unique identifier (TTSI) 
+                so that all types of defects can be detected.    
+                1: CV;
+                2: FFD."
+            ::= { hwMplsOamIgrEntry 3 }
+
+        
+        hwMplsOamIgrDetFreq OBJECT-TYPE
+            SYNTAX INTEGER {                   
+                cv1000ms(0),                     
+                ffd10ms2(1),           
+                ffd20ms3(2),
+                ffd50ms4(3),
+                ffd100ms5(4),
+                ffd200ms6(5),
+                ffd500ms7(6),
+                ffd3ms8(7)   
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "For CV: the frequency is static, per second.
+                For FFD: the frequency is set by user. The value 
+                can be 10ms, 20ms, 50ms,100ms,200ms,500ms,3ms.
+                Any other frequency is wrong.
+                0: 1000ms(only for cv);
+                1: 10ms;
+                2: 20ms;
+                3: 50ms;
+                4: 100ms;
+                5: 200ms;
+                6: 500ms;
+                7: 3ms."
+            ::= { hwMplsOamIgrEntry 4 }
+
+        
+        hwMplsOamIgrRevType OBJECT-TYPE
+            SYNTAX INTEGER {  
+                 private(1),
+                 share(2)
+            }           
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "When an LSP is found to be in defect, the sink LSR if the LSP
+                should send BDI to inform the source LSR of the LSP, the BDI is 
+                transferred through the reverse LSP.
+                The type of reverse LSP can be private or shared.
+                If private, then the reverse LSP can be used only when the only 
+                LSP is in defect;
+                If shared, the reverse LSP which is shared between many forward 
+                LSPs, whose source LSRs are the same and sink LSRs are the same.
+                1: private;
+                2: share."
+            ::= { hwMplsOamIgrEntry 5 }
+
+        
+        hwMplsOamIgrRevLspName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object indicates name of the reverse LSP."
+            ::= { hwMplsOamIgrEntry 6 }
+
+        
+        hwMplsOamIgrRevLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Only for ingress, the object indicates the ingress LSR ID of the 
+                reverse LSP,, expressed in IP address."
+            ::= { hwMplsOamIgrEntry 7 }
+
+        
+        hwMplsOamIgrRevSessTunnId OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Only for ingress, the object indicates the session tunnel ID of
+                 the reverse LSP."
+            ::= { hwMplsOamIgrEntry 8 }
+
+        
+        hwMplsOamIgrEnable OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Whether one LSP is OAM enable.
+                If disable, LSP is not monitored;
+                If enable, CV/FFD is generated at the source LSR of the LSP and 
+                checked at the sink LSR of the LSP,and user can set 
+                other configuration.
+                0: The OAM function is disabled on the ingress;
+                1: The OAM function is enabled on the ingress."
+            ::= { hwMplsOamIgrEntry 9 }
+
+        
+        hwMplsOamIgrValid OBJECT-TYPE
+            SYNTAX INTEGER {
+                stop(0),
+                start(1)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: stop detect;
+                 1: start detect."
+            ::= { hwMplsOamIgrEntry 10 }
+
+        
+        hwMplsOamIgrAvaState OBJECT-TYPE
+            SYNTAX INTEGER {
+                available(0),
+                unavailable(1)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If the LSP Timer (T1) expires, then the LSP enters the 
+                Unavailable state. The start point of the Unavailable state 
+                is deemed to be at the entry into the LSP defect state.
+                An LSP re-enters the Available state after the LSP Defect state
+                exists first.
+                T1 defines the length of time the LSP is in the Defect state 
+                before declaring an LSP Unavailable or returning to defect 
+                free state. 
+                0: available state;
+                1: unavailable state."
+            ::= { hwMplsOamIgrEntry 11 }
+
+        
+        hwMplsOamIgrDefectType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                nondefect(0),
+                dServer(1),
+                dPeerMe(2),
+                dLOCV(3),
+                dTTSIMismatch(4),
+                dTTSIMismerge(5),
+                dExcess(6),
+                dUnknown(7),
+                dOamFail(8),
+                dIngressDown(9)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Defect is defined as interruption of the capability of a 
+                transport entity (e.g., network connection) to transfer user 
+                or OAM information. There are six types of defect:
+                0: no defect;
+                1: dServer;
+                2: dPeerMe;
+                3: dLOCV, Loss of Connectivity Verification defect;
+                4: dTTSIMismatch, Trail Termination Source Identifier Mismatch defect;
+                5: dTTSIMismerge, Trail Termination Source Identifier Mismerge defect;
+                6: dExcess, Receiving excess rate of CV/FFD;
+                7: dUnknown, Unknown defect in the MPLS network..
+                8: dOamFail, AutoProtocal timer expires.
+                9: dIngressDown."
+            ::= { hwMplsOamIgrEntry 12 }
+            
+        hwMplsOamIgrRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create, modify, and
+                         delete a row in this table."
+            ::= { hwMplsOamIgrEntry 13 }
+            
+        hwMplsOamIgrCompatibilityMode OBJECT-TYPE
+            SYNTAX INTEGER { 
+                   ptnMode(1),
+                   routerMode(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                 1: PtnMode;
+                 2: RouterMode;
+                Valid only for the ingress configuration."
+            ::= { hwMplsOamIgrEntry 14 }
+
+        hwMplsOamIgrBDIFreq OBJECT-TYPE
+            SYNTAX INTEGER { 
+                   perSecond(1),
+                   detectFrequency(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "BDI is generated at the trail termination source point of 
+                a return path in response to a defect detected at the trail 
+                termination sink point of an LSP in the forwarding direction. 
+                The frequency of BDI can be set by user.
+                1: perSecond;
+                2: same as detect frequency."
+            ::= { hwMplsOamIgrEntry 15 }
+            
+        hwMplsOamEgrTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsOamEgrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies per-LSP MPLS OAM capability and 
+                 associated information, such as DetectType, DetectFrequency."
+            ::= { hwMplsOamObjects 3 }
+
+        
+        hwMplsOamEgrEntry OBJECT-TYPE
+            SYNTAX HwMplsOamEgrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by an LSR for every LSP
+                 capable of supporting MPLS OAM at egress."
+            INDEX { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId }
+            ::= { hwMplsOamEgrTable 1 }
+
+        
+        HwMplsOamEgrEntry ::=
+            SEQUENCE { 
+                hwMplsOamEgrLspName
+                    OCTET STRING,
+                hwMplsOamEgrLsrId
+                    IpAddress,
+                hwMplsOamEgrSessTunnId
+                    Integer32,
+                hwMplsOamEgrDetType
+                    INTEGER,
+                hwMplsOamEgrDetFreq
+                    INTEGER,
+                hwMplsOamEgrRevType
+                    INTEGER,
+                hwMplsOamEgrRevTunnName
+                    OCTET STRING,
+                hwMplsOamEgrAutoEn
+                    INTEGER,
+                hwMplsOamEgrAutoOvertime
+                    Integer32,
+                hwMplsOamEgrBDIFreq
+                    INTEGER,
+                hwMplsOamEgrEnable
+                    INTEGER,
+                hwMplsOamEgrValid
+                    INTEGER,
+                hwMplsOamEgrAvaState
+                    INTEGER,
+                hwMplsOamEgrDefectType
+                    INTEGER,
+                hwMplsOamEgrRowStatus
+                    RowStatus
+             }
+
+        hwMplsOamEgrLspName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object indicates the name of static LSP at egress."
+            ::= { hwMplsOamEgrEntry 1 }
+
+        
+        hwMplsOamEgrLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object indicates the Ingress LSR ID of the LSP."
+            ::= { hwMplsOamEgrEntry 2 }
+
+        
+        hwMplsOamEgrSessTunnId OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object indicates the the Ingress session tunnel ID of the LSP.."
+            ::= { hwMplsOamEgrEntry 3 }
+
+        
+        hwMplsOamEgrDetType OBJECT-TYPE
+            SYNTAX INTEGER {
+                   invalid(0),
+                   cv(1),
+                   ffd(2)
+             }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: invalid, if auto-protocol, this detect type is invalid;
+                 1: CV;
+                 2: FFD."
+            ::= { hwMplsOamEgrEntry 4 }
+
+        
+        hwMplsOamEgrDetFreq OBJECT-TYPE
+            SYNTAX INTEGER{ 
+                cv1000ms(0),                     
+                ffd10ms2(1),           
+                ffd20ms3(2),
+                ffd50ms4(3),
+                ffd100ms5(4),
+                ffd200ms6(5),
+                ffd500ms7(6),
+                invalid8(7),
+                ffd3ms9(8)   
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: 1000ms(only for cv);
+                 1: 10ms;
+                 2: 20ms;
+                 3: 50ms;
+                 4: 100ms;
+                 5: 200ms;
+                 6: 500ms;
+                 7: invalid;
+                 8: 3ms."
+            ::= { hwMplsOamEgrEntry 5 }
+
+        
+        hwMplsOamEgrRevType OBJECT-TYPE
+            SYNTAX INTEGER {
+                 invalid(0),
+                 private(1),
+                 share(2) 
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "When an LSP is found to be in defect, the sink LSR of the LSP 
+                should send BDI to inform the source LSR of the LSP,the BDI is 
+                transferred through the reverse LSP.
+                The type of reverse LSP can be private or shared.
+                If private, then the reverse LSP can be used only when the only 
+                LSP in defect;
+                If shared, the reverse LSP, which is shared between many forward 
+                LSPs that have the same source LSRs and sink LSRs.
+                0: invalid, when the reverse LSR does not exist;
+                1: private;
+                2: share."
+            ::= { hwMplsOamEgrEntry 6 }
+
+        
+        hwMplsOamEgrRevTunnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object indicates the name of a reverse tunnel."
+            ::= { hwMplsOamEgrEntry 7 }
+
+        
+        hwMplsOamEgrAutoEn OBJECT-TYPE
+            SYNTAX INTEGER { 
+                   disable(0),
+                   enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If autoprotocol,  then the egress can process extended FDI sent 
+                by ingress.
+                0: disable;
+                1: enable;
+                Valid only for the egress configuration."
+            ::= { hwMplsOamEgrEntry 8 }
+
+        
+        hwMplsOamEgrAutoOvertime OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This time is set at the egress.
+                If the egress receives CV/FFD, it records the parameters 
+                included in the packet, such as OAM type and frequency.
+                If the egress does not receive any OAM packet before the timer
+                expires, the sink LSR will send BDI with dLOCV defect.
+                Valid only for the egress configuration."
+            ::= { hwMplsOamEgrEntry 9 }
+
+        
+        hwMplsOamEgrBDIFreq OBJECT-TYPE
+            SYNTAX INTEGER { 
+                   perSecond(0),
+                   detectFrequency(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "BDI is generated at the trail termination source point of 
+                a return path in response to a defect detected at the trail 
+                termination sink point of an LSP in the forwarding direction. 
+                The frequency of BDI can be set by user.
+                Only valid for egress configuration.
+                The default value is detect frequency and it is valid only when a 
+                backward-LSP exists.
+                0: perSecond;
+                1: same as detect frequency."
+            ::= { hwMplsOamEgrEntry 10 }
+
+        
+        hwMplsOamEgrEnable OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Whether one LSP is enabled with OAM.
+                If disable, LSP is not monitored;
+                If enable, CV/FFD is generated at the source LSR of the LSP and 
+                checked at the sink LSR of the LSP, and user can set 
+                other configuration.
+                0: The OAM function is disabled on the egress;
+                1: The OAM function is enabled on the egress."
+            ::= { hwMplsOamEgrEntry 11 }
+
+        
+        hwMplsOamEgrValid OBJECT-TYPE
+            SYNTAX INTEGER { 
+                stop(1),
+                start(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "1: stop detect;
+                 2: start detect."
+            ::= { hwMplsOamEgrEntry 12 }
+
+        
+        hwMplsOamEgrAvaState OBJECT-TYPE
+            SYNTAX INTEGER { 
+                available(0),
+                unavailable(1)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "If the LSP Timer (T1) expires, then the LSP enters the 
+                Unavailable state. The start point of the Unavailable state 
+                is deemed to be at the entry into the LSP defect state.
+                An LSP re-enters the Available state after the LSP Defect State.
+                first exists.
+                T1 defines the length of time the LSP is in the Defect state 
+                before declaring an LSP Unavailable or returning to defect 
+                free state
+                0: available state;
+                1: unavailable state."
+            ::= { hwMplsOamEgrEntry 13 }
+
+        
+        hwMplsOamEgrDefectType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                nondefect(0),
+                dServer(1),
+                dPeerMe(2),
+                dLOCV(3),
+                dTTSIMismatch(4),
+                dTTSIMismerge(5),
+                dExcess(6),
+                dUnknown(7),
+                dOamFail(8),
+                dEgressDown(9)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: no defect;
+                 1: dServer,
+                 2: dPeerMe,
+                 3: dLOCV, Loss of Connectivity Verification defect;
+                 4: dTTSIMismatch, Trail Termination Source Identifier Mismatch defect;
+                 5: dTTSIMismerge, Trail Termination Source Identifier Mismerge defect.;
+                 6: dExcess, Receiving excess rate of CV/FFD;
+                 7: dUnknown, Unknown defect in the MPLS network.
+                 8: dOamFail, AutoProtocal timer expires.
+                 9: dEgressDown."
+            ::= { hwMplsOamEgrEntry 14 }
+
+            
+            
+        hwMplsOamEgrRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create, modify, and
+                 delete a row in this table."
+            ::= { hwMplsOamEgrEntry 15 }
+
+        
+        hwMplsOamRlsnTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsOamRlsnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies RLSN capability and 
+                 associated information, such as RlsnLsrId and RlsnLsrId."
+            ::= { hwMplsOamObjects 4 }
+
+        
+        hwMplsOamRlsnEntry OBJECT-TYPE
+            SYNTAX HwMplsOamRlsnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by an LSR to binding the name,                lsr-id and tunnel-id of the LSP at egress."
+            INDEX { hwMplsOamRlsnLspName, hwMplsOamRlsnLsrId, hwMplsOamRlsnSessTunnId, hwMplsOamRlsnIfIndex }
+            ::= { hwMplsOamRlsnTable 1 }
+
+        
+        HwMplsOamRlsnEntry ::=
+            SEQUENCE { 
+                hwMplsOamRlsnLspName
+                    OCTET STRING,
+                hwMplsOamRlsnLsrId
+                    IpAddress,
+                hwMplsOamRlsnSessTunnId
+                    Integer32,
+                hwMplsOamRlsnIfIndex
+                    Integer32,
+                hwMplsOamRlsnIfName
+                    OCTET STRING,
+                hwMplsOamRlsnIsDown
+                    INTEGER,
+                hwMplsOamRlsnRowStatus
+                    RowStatus
+             }
+
+
+        hwMplsOamRlsnLspName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "For egress, the object indicates name of the LSP."
+            ::= { hwMplsOamRlsnEntry 1 }
+
+        
+        hwMplsOamRlsnLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "For egress, the object indicates the Ingress LSR ID of the LSP"
+            ::= { hwMplsOamRlsnEntry 2 }
+
+        
+        hwMplsOamRlsnSessTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "For egress, the object indicates the Ingress session tunnel ID 
+                of the LSP"
+            ::= { hwMplsOamRlsnEntry 3 }
+
+        
+        hwMplsOamRlsnIfIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object indicates the index of outbound interface."
+            ::= { hwMplsOamRlsnEntry 4 }
+
+        
+        hwMplsOamRlsnIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object indicates the name of outbound interface."
+            ::= { hwMplsOamRlsnEntry 5 }
+
+        
+        hwMplsOamRlsnIsDown OBJECT-TYPE
+            SYNTAX INTEGER {
+                   up(1),
+                   down(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "1: up
+                 2: down"
+            ::= { hwMplsOamRlsnEntry 6 }
+
+        
+        hwMplsOamRlsnRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create, modify, and
+                delete a row in this table. "
+            ::= { hwMplsOamRlsnEntry 7 }
+
+        hwMplsOamView OBJECT-TYPE
+            SYNTAX INTEGER {
+                mplsOam(1),
+                null(0)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Create or delete the MPLS OAM view.
+                1: create mplsOam;
+                0: delete mplsOam;"
+            ::= { hwMplsOamObjects 5 }
+
+          
+        hwMplsOamL2vcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsOamL2vcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies PW MPLS OAM capability and 
+                 associated information, such as DetType and DetFrequence."
+            ::= { hwMplsOamObjects 6 }
+
+        
+        hwMplsOamL2vcEntry OBJECT-TYPE
+            SYNTAX HwMplsOamL2vcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by binding the peer-ip,
+                vc-type and vc-id."
+            INDEX { hwMplsOamL2vcPeerIp,hwMplsOamL2vcVcType,hwMplsOamL2vcVcId }
+            ::= { hwMplsOamL2vcTable 1 }
+
+        
+        HwMplsOamL2vcEntry ::=
+            SEQUENCE {
+                hwMplsOamL2vcPeerIp
+                    IpAddress,
+                hwMplsOamL2vcVcType
+                    INTEGER,
+                hwMplsOamL2vcVcId
+                    Unsigned32,
+                hwMplsOamL2vcRemotePeerIp
+                    IpAddress,
+                hwMplsOamL2vcRemoteVcType
+                    INTEGER,
+                hwMplsOamL2vcRemoteVcId
+                    Unsigned32,
+                hwMplsOamL2vcDetType
+                    INTEGER,
+                hwMplsOamL2vcDetFreq
+                    INTEGER,
+                hwMplsOamL2vcRevDetType
+                    INTEGER,
+                hwMplsOamL2vcRevDetFreq
+                    INTEGER,                                
+                hwMplsOamL2vcSendEnable
+                    INTEGER,
+                hwMplsOamL2vcReceiveEnable
+                    INTEGER,                                                    
+                hwMplsOamL2vcAutoProlEn
+                    INTEGER,
+                hwMplsOamL2vcAutoOvertime
+                    Integer32,                                
+                hwMplsOamL2vcValid
+                    INTEGER,
+                hwMplsOamL2vcAvaState
+                    INTEGER,
+                hwMplsOamL2vcDefectType
+                    INTEGER,                                
+                hwMplsOamL2vcBdiDefectType
+                    INTEGER,    
+                hwMplsOamL2vcCompatibilityMode
+                    INTEGER,
+                hwMplsOamL2vcBDIFreq
+                    INTEGER,
+                hwMplsOamL2vcRowStatus
+                    RowStatus
+             }
+
+
+        hwMplsOamL2vcPeerIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the peer ip address."
+            ::= { hwMplsOamL2vcEntry 1 }
+
+            
+        hwMplsOamL2vcVcType OBJECT-TYPE
+            SYNTAX INTEGER {                                            
+                fr(1),
+                atmAal5Sdu(2),
+                atmTransCell(3),
+                vlan(4),
+                ethernet(5),
+                hdlc(6),
+                ppp(7),
+                atmNto1Vcc(9),
+                atmNto1Vpc(10),
+                ipLayer2(11),
+                atm1to1Vcc(12),
+                atm1to1Vpc(13),
+                atmAal5Pdu(14),
+                cep(16),
+                satopE1(17),
+                satopT1(18),
+                cesopsnBasic(21),
+                ipInterworking(64),
+                unknown(0)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "There are seventeen types of vc.
+                1: fr;
+                2: atmAal5Sdu;
+                3: atmTransCell;
+                4: vlan;
+                5: ethernet;
+                6: hdlc;
+                7: ppp;
+                9: atmNto1Vcc;
+                10:atmNto1Vpc;
+                11:ipLayer2;
+                12:atm1to1Vcc;
+                13:atm1to1Vpc;
+                14:atmAal5Pdu;
+                16:cep;
+                17:satopE1;
+                18:satopT1;
+                21:cesopsnBasic;
+                64:ipInterworking;
+                0:unknown."
+            ::= { hwMplsOamL2vcEntry 2 }
+
+        
+        hwMplsOamL2vcVcId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the vc id of pw type."
+            ::= { hwMplsOamL2vcEntry 3 }
+
+
+        hwMplsOamL2vcRemotePeerIp OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote peer ip address."
+            ::= { hwMplsOamL2vcEntry 4 }                        
+
+
+        hwMplsOamL2vcRemoteVcType OBJECT-TYPE
+            SYNTAX INTEGER {                                            
+                fr(1),
+                atmAal5Sdu(2),
+                atmTransCell(3),
+                vlan(4),
+                ethernet(5),
+                hdlc(6),
+                ppp(7),
+                atmNto1Vcc(9),
+                atmNto1Vpc(10),
+                ipLayer2(11),
+                atm1to1Vcc(12),
+                atm1to1Vpc(13),
+                atmAal5Pdu(14),
+                cep(16),
+                satopE1(17),
+                satopT1(18),
+                cesopsnBasic(21),
+                ipInterworking(64),
+                unknown(0)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "There are seventeen types of vc.
+                1: fr;
+                2: atmAal5Sdu;
+                3: atmTransCell;
+                4: vlan;
+                5: ethernet;
+                6: hdlc;
+                7: ppp;
+                9: atmNto1Vcc;
+                10:atmNto1Vpc;
+                11:ipLayer2;
+                12:atm1to1Vcc;
+                13:atm1to1Vpc;
+                14:atmAal5Pdu;
+                16:cep;
+                17:satopE1;
+                18:satopT1;
+                21:cesopsnBasic;
+                64:ipInterworking;
+                0:unknown."
+            ::= { hwMplsOamL2vcEntry 5 }
+
+        
+        hwMplsOamL2vcRemoteVcId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote vc id of pw type."
+            ::= { hwMplsOamL2vcEntry 6 }
+
+
+        hwMplsOamL2vcDetType OBJECT-TYPE     
+            SYNTAX INTEGER {                                            
+                cv(1),
+                ffd(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "There are two types of OAM packets, CV and FFD.
+                1: CV;
+                2: FFD."
+            ::= { hwMplsOamL2vcEntry 7 }
+
+            
+        hwMplsOamL2vcDetFreq OBJECT-TYPE
+            SYNTAX INTEGER {                   
+                cv1000ms(0),                     
+                ffd10ms2(1),           
+                ffd20ms3(2),
+                ffd50ms4(3),
+                ffd100ms5(4),
+                ffd200ms6(5),
+                ffd500ms7(6),
+                ffd3ms8(7)   
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "For CV: the frequency is static, per second.
+                For FFD: the frequency is set by user. The value 
+                can be 10ms, 20ms, 50ms,100ms,200ms,500ms,3ms.
+                Any other frequency is wrong.
+                0: 1000ms(only for cv);
+                1: 10ms;
+                2: 20ms;
+                3: 50ms;
+                4: 100ms;
+                5: 200ms;
+                6: 500ms;
+                7: 3ms."
+            ::= { hwMplsOamL2vcEntry 8 }
+
+
+        hwMplsOamL2vcRevDetType OBJECT-TYPE     
+            SYNTAX INTEGER {
+               invalid(0),
+               cv(1),
+               ffd(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: invalid;
+                 1: CV;
+                 2: FFD."
+            ::= { hwMplsOamL2vcEntry 9 }
+
+            
+        hwMplsOamL2vcRevDetFreq OBJECT-TYPE
+            SYNTAX INTEGER{ 
+                cv1000ms(0),                     
+                ffd10ms2(1),           
+                ffd20ms3(2),
+                ffd50ms4(3),
+                ffd100ms5(4),
+                ffd200ms6(5),
+                ffd500ms7(6),
+                invalid8(7),
+                ffd3ms9(8)   
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "For CV: the frequency is static, per second.
+                For FFD: the frequency is set by user. The value 
+                can be 10ms, 20ms, 50ms,100ms,200ms,500ms,3ms.
+                Any other frequency is wrong.
+                 0: 1000ms(only for cv);
+                 1: 10ms;
+                 2: 20ms;
+                 3: 50ms;
+                 4: 100ms;
+                 5: 200ms;
+                 6: 500ms;
+                 7: invalid;
+                 8: 3ms."
+            ::= { hwMplsOamL2vcEntry 10 }
+
+
+        hwMplsOamL2vcSendEnable OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: The OAM Send function is Disabled;
+                 1: The OAM Send function is Eabled;"
+            ::= { hwMplsOamL2vcEntry 11 }
+
+        hwMplsOamL2vcReceiveEnable OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: The OAM Receive function is Disabled;
+                 1: The OAM Receive function is Eabled;"
+            ::= { hwMplsOamL2vcEntry 12 }
+                                                
+        hwMplsOamL2vcAutoProlEn OBJECT-TYPE
+            SYNTAX INTEGER { 
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: disable;
+                 1: enable;"
+            ::= { hwMplsOamL2vcEntry 13 }                    
+                
+                
+        hwMplsOamL2vcAutoOvertime OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If the oam receives CV/FFD, it records the parameters 
+                 included in the packet, such as OAM type and frequency.
+                 If the oam does not receive any CV/FFD packet before the timer
+                 expires, It will send BDI with dLOCV defect."
+            ::= { hwMplsOamL2vcEntry 14 }
+
+
+        hwMplsOamL2vcValid OBJECT-TYPE
+            SYNTAX INTEGER { 
+                stop(1),
+                start(2),
+                ready(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "1: stop detect;                    
+                 2: start detect; 
+                 3: ready."
+            ::= { hwMplsOamL2vcEntry 15 }
+
+
+        hwMplsOamL2vcAvaState OBJECT-TYPE
+            SYNTAX INTEGER { 
+                available(0),
+                unavailable(1)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: available state;
+                 1: unavailable state."
+            ::= { hwMplsOamL2vcEntry 16 }
+
+
+        hwMplsOamL2vcDefectType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                nondefect(0),
+                dServer(1),
+                dPeerMe(2),
+                dLOCV(3),
+                dTTSIMismatch(4),
+                dTTSIMismerge(5),
+                dExcess(6),
+                dUnknown(7),
+                dOamFail(8),
+                pwDown(9)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: no defect;
+                 1: dServer,
+                 2: dPeerMe,
+                 3: dLOCV, Loss of Connectivity Verification defect;
+                 4: dTTSIMismatch, Trail Termination Source Identifier Mismatch defect;
+                 5: dTTSIMismerge, Trail Termination Source Identifier Mismerge defect.;
+                 6: dExcess, Receiving excess rate of CV/FFD;
+                 7: dUnknown, Unknown defect in the MPLS network.
+                 8: dOamFail, AutoProtocal timer expires.
+                 9: pwDown, PW down."
+            ::= { hwMplsOamL2vcEntry 17 }
+
+
+        hwMplsOamL2vcBdiDefectType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                nondefect(0),
+                dServer(1),
+                dPeerMe(2),
+                dLOCV(3),
+                dTTSIMismatch(4),
+                dTTSIMismerge(5),
+                dExcess(6),
+                dUnknown(7),
+                dOamFail(8)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: no defect;
+                 1: dServer,
+                 2: dPeerMe,
+                 3: dLOCV, Loss of Connectivity Verification defect;
+                 4: dTTSIMismatch, Trail Termination Source Identifier Mismatch defect;
+                 5: dTTSIMismerge, Trail Termination Source Identifier Mismerge defect.;
+                 6: dExcess, Receiving excess rate of CV/FFD;
+                 7: dUnknown, Unknown defect in the MPLS network.
+                 8: dOamFail, AutoProtocal timer expires."
+            ::= { hwMplsOamL2vcEntry 18 }
+
+       
+        hwMplsOamL2vcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create, modify, and
+                 delete a row in this table. "
+            ::= { hwMplsOamL2vcEntry 30 }
+
+
+        hwMplsOamL2vcCompatibilityMode OBJECT-TYPE
+            SYNTAX INTEGER { 
+                   ptnMode(1),
+                   routerMode(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                 1: ptnMode;
+                 2: routerMode;
+                Valid only for the l2vc configuration."
+            ::= { hwMplsOamL2vcEntry 31 }
+
+
+        hwMplsOamL2vcBDIFreq OBJECT-TYPE
+        SYNTAX INTEGER { 
+               perSecond(1),
+               detectFrequency(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "BDI is generated at the trail termination source point of 
+            a return path in response to a defect detected at the trail 
+            termination sink point of an LSP in the forwarding direction. 
+            The frequency of BDI can be set by user.
+            1: perSecond;
+            2: same as detect frequency."
+        ::= { hwMplsOamL2vcEntry 32 }   
+        
+
+        hwMplsOamBidirectionalTunnelTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsOamBidirectionalTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies Static Co-Route MPLS OAM capability and 
+                 associated information, such as DetType and DetFrequence."
+            ::= { hwMplsOamObjects 7 }
+
+        
+        hwMplsOamBidirectionalTunnelEntry OBJECT-TYPE
+            SYNTAX HwMplsOamBidirectionalTunnelEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by binding the tunnel ifindex."
+            INDEX { hwMplsOamBidirectionalTunnelIndex }
+            ::= { hwMplsOamBidirectionalTunnelTable 1 }
+
+        
+        HwMplsOamBidirectionalTunnelEntry ::=
+            SEQUENCE {
+		hwMplsOamBidirectionalTunnelIndex
+		    Unsigned32,
+	        hwMplsOamBidirectionalTunnelTunnName
+		    OCTET STRING,
+                hwMplsOamBidirectionalTunnelDetType
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelDetFreq
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelRevDetType
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelRevDetFreq
+                    INTEGER,                                
+                hwMplsOamBidirectionalTunnelSendEnable
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelReceiveEnable
+                    INTEGER,                                                    
+                hwMplsOamBidirectionalTunnelAutoProtocolEnable
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelAutoOvertime
+                    Integer32,                                
+                hwMplsOamBidirectionalTunnelValid
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelAvaState
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelDefectType
+                    INTEGER,                                
+                hwMplsOamBidirectionalTunnelBdiDefectType
+                    INTEGER,                             
+                hwMplsOamBidirectionalTunnelCompatibilityMode
+                    INTEGER,
+                hwMplsOamBidirectionalTunnelBDIFreq
+                    INTEGER,                                   
+                hwMplsOamBidirectionalTunnelRowStatus
+                    RowStatus
+             }
+
+
+        hwMplsOamBidirectionalTunnelIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This is a unique index for an OAM entry in the OAM table."
+            ::= { hwMplsOamBidirectionalTunnelEntry 1 }
+
+
+	hwMplsOamBidirectionalTunnelTunnName OBJECT-TYPE
+	    SYNTAX OCTET STRING
+	    MAX-ACCESS read-create
+	    STATUS current
+	    DESCRIPTION
+		"The name of a tunnel."
+	    ::= { hwMplsOamBidirectionalTunnelEntry 2 }
+
+
+        hwMplsOamBidirectionalTunnelDetType OBJECT-TYPE     
+            SYNTAX INTEGER {                                            
+                cv(1),
+                ffd(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "There are two types of OAM packets, CV and FFD.
+                1: CV;
+                2: FFD."
+            ::= { hwMplsOamBidirectionalTunnelEntry 3 }
+
+            
+        hwMplsOamBidirectionalTunnelDetFreq OBJECT-TYPE
+            SYNTAX INTEGER {                   
+                cv1000ms(0),                     
+                ffd10ms2(1),           
+                ffd20ms3(2),
+                ffd50ms4(3),
+                ffd100ms5(4),
+                ffd200ms6(5),
+                ffd500ms7(6),
+                ffd3ms8(7)   
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "For CV: the frequency is static, per second.
+                For FFD: the frequency is set by user. The value 
+                can be 10ms, 20ms, 50ms,100ms,200ms,500ms,3ms.
+                Any other frequency is wrong.
+                0: 1000ms(only for cv);
+                1: 10ms;
+                2: 20ms;
+                3: 50ms;
+                4: 100ms;
+                5: 200ms;
+                6: 500ms;
+                7: 3ms."
+            ::= { hwMplsOamBidirectionalTunnelEntry 4 }
+
+
+        hwMplsOamBidirectionalTunnelRevDetType OBJECT-TYPE     
+            SYNTAX INTEGER {
+               invalid(0),
+               cv(1),
+               ffd(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: invalid;
+                 1: CV;
+                 2: FFD."
+            ::= { hwMplsOamBidirectionalTunnelEntry 5 }
+
+            
+        hwMplsOamBidirectionalTunnelRevDetFreq OBJECT-TYPE
+            SYNTAX INTEGER{ 
+                cv1000ms(0),                     
+                ffd10ms2(1),           
+                ffd20ms3(2),
+                ffd50ms4(3),
+                ffd100ms5(4),
+                ffd200ms6(5),
+                ffd500ms7(6),
+                invalid8(7),
+                ffd3ms9(8)   
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "For CV: the frequency is static, per second.
+                For FFD: the frequency is set by user. The value 
+                can be 10ms, 20ms, 50ms,100ms,200ms,500ms,3ms.
+                Any other frequency is wrong.
+                 0: 1000ms(only for cv);
+                 1: 10ms;
+                 2: 20ms;
+                 3: 50ms;
+                 4: 100ms;
+                 5: 200ms;
+                 6: 500ms;
+                 7: invalid;
+                 8: 3ms."
+            ::= { hwMplsOamBidirectionalTunnelEntry 6 }
+
+
+        hwMplsOamBidirectionalTunnelSendEnable OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: The OAM Send function is Disabled;
+                 1: The OAM Send function is Eabled;"
+            ::= { hwMplsOamBidirectionalTunnelEntry 7 }
+
+        hwMplsOamBidirectionalTunnelReceiveEnable OBJECT-TYPE
+            SYNTAX INTEGER {
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: The OAM Receive function is Disabled;
+                 1: The OAM Receive function is Eabled;"
+            ::= { hwMplsOamBidirectionalTunnelEntry 8 }
+                                                
+        hwMplsOamBidirectionalTunnelAutoProtocolEnable OBJECT-TYPE
+            SYNTAX INTEGER { 
+                disable(0),
+                enable(1)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "0: disable;
+                 1: enable;"
+            ::= { hwMplsOamBidirectionalTunnelEntry 9 }                    
+                
+                
+        hwMplsOamBidirectionalTunnelAutoOvertime OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If the oam receives CV/FFD, it records the parameters 
+                 included in the packet, such as OAM type and frequency.
+                 If the oam does not receive any CV/FFD packet before the timer
+                 expires, It will send BDI with dLOCV defect."
+            ::= { hwMplsOamBidirectionalTunnelEntry 10 }
+
+
+        hwMplsOamBidirectionalTunnelValid OBJECT-TYPE
+            SYNTAX INTEGER { 
+                stop(1),
+                start(2),
+                ready(3)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "1: stop detect;                    
+                 2: start detect; 
+                 3: ready."
+            ::= { hwMplsOamBidirectionalTunnelEntry 11 }
+
+
+        hwMplsOamBidirectionalTunnelAvaState OBJECT-TYPE
+            SYNTAX INTEGER { 
+                available(0),
+                unavailable(1)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: available state;
+                 1: unavailable state."
+            ::= { hwMplsOamBidirectionalTunnelEntry 12 }
+
+
+        hwMplsOamBidirectionalTunnelDefectType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                nondefect(0),
+                dServer(1),
+                dPeerMe(2),
+                dLOCV(3),
+                dTTSIMismatch(4),
+                dTTSIMismerge(5),
+                dExcess(6),
+                dUnknown(7),
+                dOamFail(8),
+                corouteDown(9)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: no defect;
+                 1: dServer,
+                 2: dPeerMe,
+                 3: dLOCV, Loss of Connectivity Verification defect;
+                 4: dTTSIMismatch, Trail Termination Source Identifier Mismatch defect;
+                 5: dTTSIMismerge, Trail Termination Source Identifier Mismerge defect.;
+                 6: dExcess, Receiving excess rate of CV/FFD;
+                 7: dUnknown, Unknown defect in the MPLS network.
+                 8: dOamFail, AutoProtocal timer expires.
+                 9: corouteDown, coroute down."
+            ::= { hwMplsOamBidirectionalTunnelEntry 13 }
+
+
+        hwMplsOamBidirectionalTunnelBdiDefectType OBJECT-TYPE
+            SYNTAX INTEGER { 
+                nondefect(0),
+                dServer(1),
+                dPeerMe(2),
+                dLOCV(3),
+                dTTSIMismatch(4),
+                dTTSIMismerge(5),
+                dExcess(6),
+                dUnknown(7),
+                dOamFail(8)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "0: no defect;
+                 1: dServer,
+                 2: dPeerMe,
+                 3: dLOCV, Loss of Connectivity Verification defect;
+                 4: dTTSIMismatch, Trail Termination Source Identifier Mismatch defect;
+                 5: dTTSIMismerge, Trail Termination Source Identifier Mismerge defect.;
+                 6: dExcess, Receiving excess rate of CV/FFD;
+                 7: dUnknown, Unknown defect in the MPLS network.
+                 8: dOamFail, AutoProtocal timer expires."
+            ::= { hwMplsOamBidirectionalTunnelEntry 14 }
+
+
+        hwMplsOamBidirectionalTunnelRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create, modify, and
+                 delete a row in this table. "
+            ::= { hwMplsOamBidirectionalTunnelEntry 15 }
+
+
+        hwMplsOamBidirectionalTunnelCompatibilityMode OBJECT-TYPE
+            SYNTAX INTEGER { 
+                   ptnMode(1),
+                   routerMode(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                 1: ptnMode;
+                 2: routerMode;
+                Valid only for the bidirectional tunnel configuration."
+            ::= { hwMplsOamBidirectionalTunnelEntry 16 }
+
+
+        hwMplsOamBidirectionalTunnelBDIFreq OBJECT-TYPE
+        SYNTAX INTEGER { 
+               perSecond(1),
+               detectFrequency(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "BDI is generated at the trail termination source point of 
+            a return path in response to a defect detected at the trail 
+            termination sink point of an LSP in the forwarding direction. 
+            The frequency of BDI can be set by user.
+            1: perSecond;
+            2: same as detect frequency."
+        ::= { hwMplsOamBidirectionalTunnelEntry 17 }   
+
+
+        hwMplsOamTrapOpen OBJECT-TYPE
+            SYNTAX Unsigned32 (0..1)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "0: disable                 
+                 1: enable"                
+            ::= { hwMplsOamObjects 8 }
+                    
+        hwMplsOamNotifications OBJECT IDENTIFIER ::= { hwMplsOamPs 2 }
+
+        
+        hwMplsOamIgrLSPOutDefect NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 not in the defect state at the LSP ingress."
+            ::= { hwMplsOamNotifications 1 }
+
+        
+        hwMplsOamIgrLSPInDefect NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 in the defect state at the LSP ingress."
+            ::= { hwMplsOamNotifications 2 }
+
+        
+        hwMplsOamIgrLSPAva NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 in the available state at the LSP ingress."
+            ::= { hwMplsOamNotifications 3 }
+
+        
+
+        hwMplsOamIgrLSPUnAva NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrAvaState, hwMplsOamIgrDefectType }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 in the unavailable state at the LSP ingress."
+            ::= { hwMplsOamNotifications 4 }
+
+        
+        hwMplsOamEgrLSPOutDefect NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+                 }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 not in the defect state at the LSP egress."
+            ::= { hwMplsOamNotifications 5 }
+
+        
+        hwMplsOamEgrLSPInDefect NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+                 }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 in the defect state at the LSP egress."
+            ::= { hwMplsOamNotifications 6 }
+
+        
+        hwMplsOamEgrLSPAva NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+                 }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 in the available state at the LSP egress."
+            ::= { hwMplsOamNotifications 7 }
+
+        
+        hwMplsOamEgrLSPUnAva NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType
+                 }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the LSP is found
+                 in the unavailable state at the LSP egress."
+            ::= { hwMplsOamNotifications 8 }
+
+        
+        hwMplsOamEgrFirstPkt NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrDetType, hwMplsOamEgrDetFreq
+                 }
+            STATUS current
+            DESCRIPTION 
+                "If autoprotocol is enabled, this notification is generated when 
+                 egress receives the first CV/FFD packet."
+            ::= { hwMplsOamNotifications 9 }
+
+        
+        hwMplsOamEgrAutoProFDI NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrEnable }
+            STATUS current
+            DESCRIPTION 
+                "The FDI packet is used by the upstream node in an LSP 
+                to inform the egress of the defect information.
+                It is also generated when the auto protocol is enabled, 
+                with which the LSP ingress notifies the egress to stop 
+                the OAM detection."
+            ::= { hwMplsOamNotifications 10 }
+
+        
+        hwMplsOamEgrRlsnDown NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamRlsnLspName, hwMplsOamRlsnLsrId, hwMplsOamRlsnIsDown, hwMplsOamRlsnIfName, hwMplsOamRlsnSessTunnId
+                    }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when the Rlsn is down."
+            ::= { hwMplsOamNotifications 11 }
+
+        hwMplsOamL2vcOutDefect NOTIFICATION-TYPE
+            OBJECTS { hwMplsOamL2vcPeerIp, hwMplsOamL2vcVcType, hwMplsOamL2vcVcId, hwMplsOamL2vcAvaState, hwMplsOamL2vcDefectType, hwMplsOamL2vcBdiDefectType
+                    }
+            STATUS current
+            DESCRIPTION 
+                "OAM detected that the local L2VC exited the defect state."
+            ::= { hwMplsOamNotifications 12 }
+
+
+       hwMplsOamL2vcInDefect NOTIFICATION-TYPE
+           OBJECTS { hwMplsOamL2vcPeerIp, hwMplsOamL2vcVcType, hwMplsOamL2vcVcId, hwMplsOamL2vcAvaState, hwMplsOamL2vcDefectType, hwMplsOamL2vcBdiDefectType
+                   }
+           STATUS current
+           DESCRIPTION 
+               "OAM detected that the local L2VC entered the defect state."
+           ::= { hwMplsOamNotifications 13 }
+
+
+       hwMplsOamL2vcAva NOTIFICATION-TYPE
+           OBJECTS { hwMplsOamL2vcPeerIp, hwMplsOamL2vcVcType, hwMplsOamL2vcVcId, hwMplsOamL2vcAvaState, hwMplsOamL2vcDefectType, hwMplsOamL2vcBdiDefectType
+                   }
+           STATUS current
+           DESCRIPTION 
+                "OAM detected that the local L2VC entered the available state."
+           ::= { hwMplsOamNotifications 14 }
+
+
+      hwMplsOamL2vcUnAva NOTIFICATION-TYPE
+          OBJECTS { hwMplsOamL2vcPeerIp, hwMplsOamL2vcVcType, hwMplsOamL2vcVcId, hwMplsOamL2vcAvaState, hwMplsOamL2vcDefectType, hwMplsOamL2vcBdiDefectType
+                   }
+          STATUS current
+          DESCRIPTION 
+                "OAM detected that the local L2VC entered the unavailable state."
+          ::= { hwMplsOamNotifications 15 }
+
+      hwMplsOamBidirectionalTunnelOutDefect NOTIFICATION-TYPE
+          OBJECTS { hwMplsOamBidirectionalTunnelIndex, hwMplsOamBidirectionalTunnelAvaState, hwMplsOamBidirectionalTunnelDefectType, hwMplsOamBidirectionalTunnelBdiDefectType
+                  }
+          STATUS current
+          DESCRIPTION 
+              "This notification is generated when the CO-ROUTE is found
+               not in the defect state."
+          ::= { hwMplsOamNotifications 16 }
+
+
+     hwMplsOamBidirectionalTunnelInDefect NOTIFICATION-TYPE
+         OBJECTS { hwMplsOamBidirectionalTunnelIndex, hwMplsOamBidirectionalTunnelAvaState, hwMplsOamBidirectionalTunnelDefectType, hwMplsOamBidirectionalTunnelBdiDefectType
+                 }
+         STATUS current
+         DESCRIPTION 
+             "This notification is generated when the CO-ROUTE is found
+              in the defect state."
+         ::= { hwMplsOamNotifications 17 }
+
+
+     hwMplsOamBidirectionalTunnelAva NOTIFICATION-TYPE
+         OBJECTS { hwMplsOamBidirectionalTunnelIndex, hwMplsOamBidirectionalTunnelAvaState, hwMplsOamBidirectionalTunnelDefectType, hwMplsOamBidirectionalTunnelBdiDefectType
+                   }
+         STATUS current
+         DESCRIPTION 
+              "This notification is generated when the CO-ROUTE is found
+               in the available state."
+         ::= { hwMplsOamNotifications 18 }
+
+
+    hwMplsOamBidirectionalTunnelUnAva NOTIFICATION-TYPE
+        OBJECTS { hwMplsOamBidirectionalTunnelIndex, hwMplsOamBidirectionalTunnelAvaState, hwMplsOamBidirectionalTunnelDefectType, hwMplsOamBidirectionalTunnelBdiDefectType
+                 }
+        STATUS current
+        DESCRIPTION 
+              "This notification is generated when the CO-ROUTE is found
+              in the unavailable state."
+        ::= { hwMplsOamNotifications 19 } 
+        
+ 
+ --HUAWEI-MPLSOAM-PS-MIB
+        hwMplsPsObjects OBJECT IDENTIFIER ::= { hwMplsOamPs 3 }
+
+        
+        hwMplsPsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies per-protection-group MPLS PS 
+                capability and associated information.
+                "
+            ::= { hwMplsPsObjects 1 }
+
+        
+        hwMplsPsEntry OBJECT-TYPE
+            SYNTAX HwMplsPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by an LSR for every 
+                protection group capable of supporting mpls ps."
+            INDEX { hwMplsPsIndex }
+            ::= { hwMplsPsTable 1 }
+
+        
+        HwMplsPsEntry ::=
+            SEQUENCE { 
+                hwMplsPsIndex
+                    Unsigned32,
+                hwMplsPsType
+                    Integer32,
+                hwMplsPsWorkTunnName
+                    OCTET STRING,
+                hwMplsPsWorkTunnId
+                    Integer32,
+                hwMplsPsProtectTunnName
+                    OCTET STRING,
+                hwMplsPsProtectTunnId
+                    Integer32,
+                hwMplsPsRevertiveMode
+                    Integer32,
+                hwMplsPsWTR
+                    Integer32,
+                hwMplsPsHoldOff
+                    Integer32,
+                hwMplsPsSwitchCondition
+                    Integer32,
+                hwMplsPsWorkTunnelState
+                    Integer32,
+                hwMplsPsProtTunnelState
+                    Integer32,
+                hwMplsPsSwitchResult
+                    Integer32,
+                hwMplsPsCfgType
+                    Integer32,
+                hwMplsPsCfgProtectTunnId
+                    Integer32,
+                hwMplsPsCfgRevertiveMode
+                    Integer32,
+                hwMplsPsCfgWTR
+                    Integer32,
+                hwMplsPsCfgHoldOff
+                    Integer32,
+                hwMplsPsRowStatus
+                    RowStatus,
+                hwMplsPsLocalState
+                    Integer32
+             }
+
+        hwMplsPsIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This is a unique index for an entry in the mplspsEntry.
+                
+                "
+            ::= { hwMplsPsEntry 1 }
+
+        
+        hwMplsPsType OBJECT-TYPE
+            SYNTAX Integer32 (1..4)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of protection switch,can be 1:1,1+1,shared mesh,
+                packet 1+1,the default choice is 1:1.
+                In the 1+1 architecture type, a protection LSP is dedicated to 
+                each working LSP with the working LSP bridged onto the 
+                protection LSP at the source of the protection domain. 
+                The traffic on working and protection LSPs is transmitted 
+                simultaneously to the sink of the protection domain, 
+                where a selection between the working and protection LSP is 
+                made, based on some predetermined criteria, such as defect 
+                indication.
+                In the 1:1 architecture type, a protection LSP is dedicated to 
+                each working LSP. The working traffic is transmitted either by 
+                working or protection LSP.
+                In the shared mesh architecture type, possible sharing of 
+                protection capacity between disjoint link, node in the network 
+                is achieved while guaranteeing recovery from a single failure.
+                In the packet 1+1 architecture type, the traffic is transmitted 
+                simultaneously onto two possibly disjoint routed LSPs to the 
+                sink of the protection domain. Each pair of duplicate 
+                transmitted packets is assigned the same identifier (sequence 
+                number) but distinct from the other pairs of duplicate packets. 
+                At the sink of the protection domain packet level selection 
+                mechanism is employed to select one of the two possibly 
+                received copies of each packet. 
+                1:  1:1 protection switching,;
+                2:  1+1 protection switching;
+                3:  shared mesh protection swiching;
+                4:  packet 1+1 protection switching.
+                "
+            ::= { hwMplsPsEntry 2 }
+
+        
+        hwMplsPsWorkTunnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of work-tunnel."
+            ::= { hwMplsPsEntry 3 }
+
+        
+        hwMplsPsWorkTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Work-tunnel id(session-tunnel-id)."
+            ::= { hwMplsPsEntry 4 }
+
+        
+        hwMplsPsProtectTunnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of protect-tunnel."
+            ::= { hwMplsPsEntry 5 }
+
+        
+        hwMplsPsProtectTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Protect-tunnel id(session-tunnel-id)."
+            ::= { hwMplsPsEntry 6 }
+
+        
+        hwMplsPsRevertiveMode OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Revertive mode is a protection switching mode where revertive 
+                action (switch back to the working LSP) is taken after the 
+                working LSP is repaired.And switching does not occur in a
+                non-revertive mode.
+                1: revertive;
+                2: non-revertive;
+                "
+            ::= { hwMplsPsEntry 7 }
+
+        
+        hwMplsPsWTR OBJECT-TYPE
+            SYNTAX Integer32 (0..60)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Wait to Restore timer is only applicable for the revertive mode 
+                and applies to a working LSP,It prevents reversion back to 
+                select the working LSP until the Wait to Restore timer has 
+                expired.The default value is 12 minutes.step is 30s."
+            ::= { hwMplsPsEntry 8 }
+
+        
+        hwMplsPsHoldOff OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time between declaration of signal degrade or signal fail, 
+                and the initialization of the protection switching algorithm.
+                step is 100ms.maximum is 10s."
+            ::= { hwMplsPsEntry 9 }
+
+        
+        hwMplsPsSwitchCondition OBJECT-TYPE
+            SYNTAX Integer32 (1..9)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current switch condition of the protection group.
+                1: clear,This command clears all of the externally 
+                   initiated switch commands listed below;
+                2: lockout of protection,Fix the selector position on the 
+                   working LSP,Prevents the selector from switching to the 
+                   protection LSP when it is selecting the working LSP. 
+                   Switches the selector from the protection to the working LSP 
+                   when it is selecting the protection LSP;
+                3: forced protection,Switches the selector from the working LSP 
+                   to the protection LSP (unless a higher priority switch 
+                   request (i.e., LoP) is in effect);
+                4: signal fail,for 1:1,Signal Fail (SF) is declared when the 
+                   source of the protection domain enters the Defect State by 
+                   receiving a BDI packet (from the return LSP or out of band).
+                5: manual switch for working-lsp,Switches the selector from the 
+                   working LSP to the protection LSP (unless an equal or higher 
+                   priority switch request (i.e., LoP, FS, SF or MS) is in 
+                   effect);
+                6: manual switch for protection-lsp,Switches the selector from 
+                   the protection LSP to the working LSP (unless an equal or 
+                   higher priority switch request (i.e., LoP, FS, SF or MS) is 
+                   in effect).
+                7: WTR-timer;
+                8: HoldOff-timer;
+                9: Others;
+                The pripority of the commands are:
+                clear > lockout of protection > force switch > manual switch for working
+                lsp = manual switch for protection lsp"
+            ::= { hwMplsPsEntry 10 }
+
+        
+        hwMplsPsWorkTunnelState OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The state of working tunnel state in one protection group,
+                whether it is in detection,
+                1: it is outof defect
+                2: it enters defect
+                "
+            ::= { hwMplsPsEntry 11 }
+
+        
+        hwMplsPsProtTunnelState OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The state of protection tunnel state in one protection group,
+                whether it is in detection,
+                1: it is outof defect
+                2: it enters defect"
+            ::= { hwMplsPsEntry 12 }
+
+        
+        hwMplsPsSwitchResult OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Which tunnel is used to transfer the data stream.
+                1: working-tunnel
+                2: protection-tunnel"
+            ::= { hwMplsPsEntry 13 }
+
+        
+        hwMplsPsCfgType OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of protection switch which is configured.
+                1: 1:1
+                2: 1+1
+                3: shared mesh
+                4: packet 1:1"
+            ::= { hwMplsPsEntry 14 }
+
+        
+        hwMplsPsCfgProtectTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Protect-tunnel id(session-tunnel-id)."
+            ::= { hwMplsPsEntry 15 }
+
+        
+        hwMplsPsCfgRevertiveMode OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Revertive mode is a protection switching mode where revertive 
+                action (switch back to the working LSP) is taken after the 
+                working LSP is repaired.And switching does not occur in a
+                non-revertive mode.
+                1: revertive;
+                2: non-revertive;
+                
+                "
+            ::= { hwMplsPsEntry 16 }
+
+        
+        hwMplsPsCfgWTR OBJECT-TYPE
+            SYNTAX Integer32 (0..60)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Wait to Restore timer is only applicable for the revertive mode 
+                and applies to a working LSP,It prevents reversion back to 
+                select the working LSP until the Wait to Restore timer has 
+                expired.The default value is 12 minutes.step is 30s."
+            ::= { hwMplsPsEntry 17 }
+
+        
+        hwMplsPsCfgHoldOff OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time between declaration of signal degrade or signal fail, 
+                and the initialization of the protection switching algorithm.
+                step is 100ms.maximum is 10s."
+            ::= { hwMplsPsEntry 18 }
+
+        
+        hwMplsPsRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create, modify, and
+                delete a row in this table.
+                1: active
+                2: not in service
+                3: not ready
+                4: create and go
+                5: create and wait
+                6: destroy"
+            ::= { hwMplsPsEntry 19 }
+
+        
+        hwMplsPsLocalState OBJECT-TYPE
+            SYNTAX Integer32 (0..11)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current local state of the protection group.
+                0: Lockout of Protection (LO)
+                1: Signal Fail for Protection (SF-P)
+                2: Forced Switch (FS) 
+                3: Signal Fail for Working (SF) 
+                4: Signal Degrade for Protection(SD-P)
+                5: Signal Degrade for Working(SD) 
+                6: Manual Switch (MS) 
+                7: Wait-to-Restore (WTR) 
+                8: Exercise (EXER)
+                9: Reverse Request(RR)
+                10: Do Not Revert (DNR)
+                11: No Request (NR) 
+                The pripority of the commands are:
+                LO > SF-P > FS > SF > SD-P > SD > MS > WTR > EXER > RR > DNR > NR"
+            ::= { hwMplsPsEntry 20 }
+
+ 
+        hwTunnPsTrapOpen OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "1:enable;
+                2:disable;"
+            ::= { hwMplsPsObjects 2 }
+
+        
+        hwMplsVCPsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsVCPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            ::= { hwMplsPsObjects 3 }
+
+        hwMplsApsMismatchReason OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            bridge(1),
+            channel(2),
+            switching(3),
+            operation(4),
+            traffic(5)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the alarm reason as below:
+                1. Bridge type mismatch, one side is 1:1 (Selector Bridge) protection, 
+                   the other side is 1+1 (Permanent Bridge) protection;
+                2. Channel type mismatch, one side has APS channel, the other side has no APS channel;
+                3. Switching type mismatch, one side is bidirectional switching, 
+                   the other side is unidirectional switching;
+                4. Operation type mismatch, one side is revertive operation, 
+                   the other side is non-revertive operation; 
+                5. Traffic request mismatch, one side selects working connection, 
+                   the other side selects protection connection;
+                "
+                DEFVAL { 1 }
+            ::= { hwMplsPsObjects 4 }
+
+        
+        hwMplsVCPsEntry OBJECT-TYPE
+            SYNTAX HwMplsVCPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "this table for these commands
+                1.mpls te protection tunnel XXX
+                2. mpls te reverse-lsp { lsp-name XXXX | lsr-id X.X.X.X tunnel-id x }                                               
+                3. mpls te reserved-for-binding  "
+            INDEX { hwMplsVCPsIfIndex }
+            ::= { hwMplsVCPsTable 1 }
+
+        
+        HwMplsVCPsEntry ::=
+            SEQUENCE { 
+                hwMplsVCPsIfIndex
+                    InterfaceIndex,
+                hwMplsVCPsTNLBinding
+                    TruthValue,
+                hwMplsTeReverseLspName
+                    OCTET STRING,
+                hwMplsVcPsRowStatus
+                    RowStatus,
+                hwMplsTeReverseLspLsrId
+                    IpAddress,
+                hwMplsTeReverseLspTunnId
+                    Integer32
+             }
+
+        hwMplsVCPsIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The  index of working tunnel interface of Protection group  "
+            ::= { hwMplsVCPsEntry 1 }
+
+        
+        hwMplsVCPsTNLBinding OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is used by command ' mpls te reserved-for-binding '"
+            ::= { hwMplsVCPsEntry 2 }
+
+        
+        hwMplsTeReverseLspName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is used for command ' mpls te reverse-lsp lspname'"
+            ::= { hwMplsVCPsEntry 3 }
+
+        
+        hwMplsVcPsRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                1: active;
+                2: notInservice;
+                3: notReady;
+                4: CreateAndGo;
+                5: CreateAndWait;
+                6: destroy;"
+            ::= { hwMplsVCPsEntry 4 }
+
+        
+        hwMplsTeReverseLspLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is used for command ' mpls te reverse-lsp lsr-id X.X.X.X tunnel-id XX'"
+            ::= { hwMplsVCPsEntry 5 }
+
+        
+        hwMplsTeReverseLspTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "It is used for command ' mpls te reverse-lsp lsr-id X.X.X.X tunnel-id XX'"
+            ::= { hwMplsVCPsEntry 6 }
+
+        
+        hwMplsPsNotifications OBJECT IDENTIFIER ::= { hwMplsOamPs 4 }
+
+        
+        hwMplsPsSwitchPtoW NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsPsWorkTunnId, hwMplsPsProtectTunnName, hwMplsPsProtectTunnId, hwMplsPsSwitchResult, 
+                 hwMplsPsWorkTunnelState, hwMplsPsProtTunnelState, hwMplsPsLocalState}
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when switching from
+                protection-lsp to working-lsp occured."
+            ::= { hwMplsPsNotifications 1 }
+
+        
+        hwMplsPsSwitchWtoP NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsPsWorkTunnId, hwMplsPsProtectTunnName, hwMplsPsProtectTunnId, hwMplsPsSwitchResult, 
+                 hwMplsPsWorkTunnelState, hwMplsPsProtTunnelState, hwMplsPsLocalState}
+
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when switching from woking-lsp
+                to protection-lsp occured.
+                "
+            ::= { hwMplsPsNotifications 2 }
+
+        hwMplsApsMismatch NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                Trap information indicates fully incompatible provisioning and 
+                working/protection configuration mismatch are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 3 }
+
+
+        hwMplsApsMismatchRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason }
+            STATUS current
+            DESCRIPTION 
+                "
+                Trap information indicates fully incompatible provisioning and 
+                working/protection configuration mismatch recovery are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 4 }
+
+        hwMplsApsLost NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Tunnel protection group did not receive APS frames from protection tunnel.
+                "
+            ::= { hwMplsPsNotifications 5 }
+
+
+        hwMplsApsLostRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Tunnel protection group received APS frames from protection tunnel.
+                "
+            ::= { hwMplsPsNotifications 6 }
+
+        hwMplsApsOutage NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Tunnel protection group changed to defect state.
+                "
+            ::= { hwMplsPsNotifications 7 }
+
+
+        hwMplsApsOutageRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Tunnel protection group recovered from defect state.
+                "
+            ::= { hwMplsPsNotifications 8 }
+
+         hwMplsApsDegraded NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Protection tunnel changed to defect state.
+                "
+            ::= { hwMplsPsNotifications 9 }
+
+        hwMplsApsDegradedRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Protection tunnel recovered from defect state.
+                "
+            ::= { hwMplsPsNotifications 10 }
+
+        hwMplsApsSwitchFail NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Tunnel protection group changed to defect state.
+                "
+            ::= { hwMplsPsNotifications 11 }
+
+        hwMplsApsSwitchFailRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsTunnelSignalProto, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Tunnel protection group recovered from defect state.
+                "
+            ::= { hwMplsPsNotifications 12 }
+			
+        hwMplsApsPathMisMatch NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection path mismatch are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 13 }
+
+        hwMplsApsPathMisMatchRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection path mismatch recovery are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 14 }
+        hwMplsApsTypeMisMatch NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection type mismatch are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 15 }
+
+        hwMplsApsTypeMisMatchRecovery NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsApsMismatchReason, hwMplsTunnelSignalledTunnelName }
+            STATUS current
+            DESCRIPTION 
+                "
+                Working or protection type mismatch recovery are detected by APS frame.
+                "
+            ::= { hwMplsPsNotifications 16 }
+        
+        hwMplsOamPsConformance OBJECT IDENTIFIER ::= { hwMplsOamPs 100 }
+
+        
+        hwMplsOamPsCompliances OBJECT IDENTIFIER ::= { hwMplsOamPsConformance 1 }
+
+        
+        hwMplsOamPsGroupCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for mpls oam ps."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwMplsPsGroup, hwMplsVcPsGroup }
+            ::= { hwMplsOamPsCompliances 1 }
+
+        
+        hwMplsOamPsGroups OBJECT IDENTIFIER ::= { hwMplsOamPsConformance 2 }
+
+        
+        hwMplsPsGroup OBJECT-GROUP
+             OBJECTS { hwMplsPsType, hwMplsPsWorkTunnName, hwMplsPsWorkTunnId, hwMplsPsProtectTunnName, hwMplsPsProtectTunnId, 
+                hwMplsPsRevertiveMode, hwMplsPsWTR, hwMplsPsHoldOff, hwMplsPsSwitchCondition, hwMplsPsWorkTunnelState, 
+                hwMplsPsProtTunnelState, hwMplsPsSwitchResult, hwMplsPsCfgType, hwMplsPsCfgProtectTunnId, hwMplsPsCfgRevertiveMode, 
+                hwMplsPsCfgWTR, hwMplsPsCfgHoldOff, hwMplsPsRowStatus, hwMplsPsLocalState, hwTunnPsTrapOpen, hwMplsVCPsIfIndex, 
+                hwMplsPsIndex, hwMplsApsMismatchReason }
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for mpls oam ps management."
+            ::= { hwMplsOamPsGroups 1 }
+
+        
+        hwMplsVcPsGroup OBJECT-GROUP
+            OBJECTS { hwMplsVCPsTNLBinding, hwMplsTeReverseLspName, hwMplsVcPsRowStatus, hwMplsTeReverseLspLsrId, hwMplsTeReverseLspTunnId
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for mpls oam ps reverse lsp."
+            ::= { hwMplsOamPsGroups 2 }
+
+        
+        hwMplsPsNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsPsSwitchPtoW, hwMplsPsSwitchWtoP, hwMplsApsMismatch, hwMplsApsMismatchRecovery, hwMplsApsLost, hwMplsApsLostRecovery, hwMplsApsOutage, hwMplsApsOutageRecovery, hwMplsApsDegraded,  hwMplsApsDegradedRecovery, hwMplsApsSwitchFail, hwMplsApsSwitchFailRecovery }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMplsOamPsGroups 3 }
+         
+        hwMplsOamObjectConformance OBJECT IDENTIFIER ::= { hwMplsOamPs 101 }			
+
+        hwMplsOamObjectGroups OBJECT IDENTIFIER ::= { hwMplsOamObjectConformance 1 }
+
+        hwMplsOamObjectGroup OBJECT-GROUP
+            OBJECTS { hwMplsOamCapability, hwMplsOamView, hwMplsOamTrapOpen, hwMplsOamIgrIndex, hwMplsOamIgrTunnName, hwMplsOamIgrDetType, hwMplsOamIgrDetFreq, hwMplsOamIgrRevType, 
+			hwMplsOamIgrRevLspName, hwMplsOamIgrRevLsrId, hwMplsOamIgrRevSessTunnId, hwMplsOamIgrEnable, hwMplsOamIgrValid, 
+			hwMplsOamIgrAvaState, hwMplsOamIgrDefectType, hwMplsOamIgrCompatibilityMode, hwMplsOamIgrBDIFreq, hwMplsOamIgrRowStatus, 
+			hwMplsOamEgrLspName, hwMplsOamEgrLsrId, hwMplsOamEgrSessTunnId, hwMplsOamEgrDetType, hwMplsOamEgrDetFreq, hwMplsOamEgrRevType, 
+			hwMplsOamEgrRevTunnName, hwMplsOamEgrAutoEn, hwMplsOamEgrAutoOvertime, hwMplsOamEgrBDIFreq, hwMplsOamEgrEnable, 
+			hwMplsOamEgrValid, hwMplsOamEgrAvaState, hwMplsOamEgrDefectType, hwMplsOamEgrRowStatus, hwMplsOamRlsnLspName, hwMplsOamRlsnLsrId, 
+			hwMplsOamRlsnSessTunnId, hwMplsOamRlsnIfIndex, hwMplsOamRlsnIfName, hwMplsOamRlsnIsDown, hwMplsOamRlsnRowStatus, 
+			hwMplsOamL2vcPeerIp, hwMplsOamL2vcVcType, hwMplsOamL2vcVcId, hwMplsOamL2vcRemotePeerIp, hwMplsOamL2vcRemoteVcType, hwMplsOamL2vcRemoteVcId, 
+			hwMplsOamL2vcDetType, hwMplsOamL2vcDetFreq, hwMplsOamL2vcRevDetType, hwMplsOamL2vcRevDetFreq, hwMplsOamL2vcSendEnable, hwMplsOamL2vcReceiveEnable, 
+			hwMplsOamL2vcAutoProlEn, hwMplsOamL2vcAutoOvertime, hwMplsOamL2vcValid, hwMplsOamL2vcAvaState, hwMplsOamL2vcDefectType, hwMplsOamL2vcBdiDefectType, 
+			hwMplsOamL2vcCompatibilityMode, hwMplsOamL2vcBDIFreq, hwMplsOamL2vcRowStatus, hwMplsOamBidirectionalTunnelIndex, hwMplsOamBidirectionalTunnelTunnName, hwMplsOamBidirectionalTunnelDetType, 
+			hwMplsOamBidirectionalTunnelDetFreq, hwMplsOamBidirectionalTunnelRevDetType, hwMplsOamBidirectionalTunnelRevDetFreq, hwMplsOamBidirectionalTunnelSendEnable, hwMplsOamBidirectionalTunnelReceiveEnable, hwMplsOamBidirectionalTunnelAutoProtocolEnable, 				
+			hwMplsOamBidirectionalTunnelAutoOvertime, hwMplsOamBidirectionalTunnelValid, hwMplsOamBidirectionalTunnelAvaState, hwMplsOamBidirectionalTunnelDefectType, hwMplsOamBidirectionalTunnelBdiDefectType, hwMplsOamBidirectionalTunnelCompatibilityMode, 				
+			hwMplsOamBidirectionalTunnelBDIFreq, hwMplsOamBidirectionalTunnelRowStatus }
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for mpls oam all."
+        ::= { hwMplsOamObjectGroups 1 }
+		
+        hwMplsOamNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsOamIgrLSPOutDefect, hwMplsOamIgrLSPInDefect, hwMplsOamIgrLSPAva, hwMplsOamIgrLSPUnAva, 				
+			hwMplsOamEgrLSPOutDefect, hwMplsOamEgrLSPInDefect, hwMplsOamEgrLSPAva, hwMplsOamEgrLSPUnAva, hwMplsOamEgrFirstPkt, hwMplsOamEgrAutoProFDI, 				
+			hwMplsOamEgrRlsnDown, hwMplsOamL2vcOutDefect, hwMplsOamL2vcInDefect, hwMplsOamL2vcAva, hwMplsOamL2vcUnAva, hwMplsOamBidirectionalTunnelOutDefect, 				
+			hwMplsOamBidirectionalTunnelInDefect, hwMplsOamBidirectionalTunnelAva, hwMplsOamBidirectionalTunnelUnAva }
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for mpls oam trap."
+        ::= { hwMplsOamObjectGroups 2 }
+
+        hwMplsOamObjectCompliances OBJECT IDENTIFIER ::= { hwMplsOamObjectConformance 2 }
+		
+    END
+
+--
+-- HUAWEI-MPLSOAM-MIB.mib
+--

@@ -1,0 +1,346 @@
+-- ****************************************************************
+-- *  Moxa Fiber Check - Fiber Check PRIVATE MIB
+-- *
+-- *  Copyright (c) 2019 by Moxa Inc.
+-- *  All rights reserved.
+-- *****************************************************************
+
+MOXA-FIBER-CHECK-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Integer32, Unsigned32
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus, DisplayString, TruthValue
+            FROM SNMPv2-TC
+        layer2Diagnosic
+            FROM MOXA-SWITCHING-MIB;
+
+    mxFiberCheck   MODULE-IDENTITY
+        LAST-UPDATED "202202170000Z"
+        ORGANIZATION "Moxa Inc."
+        CONTACT-INFO
+            "
+            Postal: Moxa Inc.
+            13F., No. 3, Sec. 4, New Taipei Blvd.
+            Xinzhuang Dist., New Taipei City 242032, Taiwan, R.O.C.
+
+            Tel: +866-2-89191230
+            Web: http://www.moxa.com/
+            "
+        DESCRIPTION
+            "The MIB module defines Moxa Fiber Check"
+
+        REVISION    "202202170000Z"
+        DESCRIPTION "update CONTACT-INFO"
+
+        REVISION    "202108020000Z"
+        DESCRIPTION    "Initial Revision"
+        ::= { layer2Diagnosic 3 }
+
+-- -------------------------------------------------------------
+-- groups in the MOXA-FIBER-CHECK-MIB MIB
+-- -------------------------------------------------------------
+
+    fiberCheckNotification       OBJECT IDENTIFIER ::= { mxFiberCheck 0 }
+    fiberCheckConfiguration      OBJECT IDENTIFIER ::= { mxFiberCheck 1 }
+    fiberCheckStatus             OBJECT IDENTIFIER ::= { mxFiberCheck 2 }
+    -- fiberCheckExtensions         OBJECT IDENTIFIER ::= { mxFiberCheck 3 }
+
+-- -------------------------------------------------------------
+-- configuration group
+-- -------------------------------------------------------------
+
+    fiberCheckConfigGeneral             OBJECT IDENTIFIER ::= {fiberCheckConfiguration 1}
+
+-- -------------------------------------------------------------
+-- fiberCheck general
+-- -------------------------------------------------------------
+
+fiberCheckConfigPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FiberCheckConfigPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Fiber Check table of general config function."
+        ::= { fiberCheckConfigGeneral 1 }
+
+    fiberCheckConfigPortEntry OBJECT-TYPE
+        SYNTAX FiberCheckConfigPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The Fiber Check table entry of general config function."
+        INDEX { fiberCheckConfigPortIndex }
+        ::= { fiberCheckConfigPortTable 1 }
+
+    FiberCheckConfigPortEntry ::=
+        SEQUENCE {
+            fiberCheckConfigPortIndex
+                INTEGER,
+            fiberCheckConfigMode
+                INTEGER,
+            fiberCheckConfigTemperatureWarnC
+                DisplayString,
+            fiberCheckConfigTemperatureWarnF
+                DisplayString,
+            fiberCheckConfigTxPowerWarnHigh
+                DisplayString,
+            fiberCheckConfigTxPowerWarnLow
+                DisplayString,
+            fiberCheckConfigRxPowerWarnHigh
+                DisplayString,
+            fiberCheckConfigRxPowerWarnLow
+                DisplayString,
+            fiberCheckConfigResetToDefault
+                TruthValue
+        }
+
+    fiberCheckConfigPortIndex OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The fiber index of config function."
+         ::= { fiberCheckConfigPortEntry 1 }
+
+    fiberCheckConfigMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            auto(0),
+            user-defined(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure mode to define threshold by user."
+        ::= { fiberCheckConfigPortEntry 2 }
+
+    fiberCheckConfigTemperatureWarnC OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users configure the high warning value of fiber temperature (Celsius) to determine which value issue the fiber check warning."
+        ::= { fiberCheckConfigPortEntry 3 }
+
+    fiberCheckConfigTemperatureWarnF OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure the high warning value of fiber temperature (Fahrenheit) to determine which value issue the fiber check warning."
+        ::= { fiberCheckConfigPortEntry 4 }
+
+    fiberCheckConfigTxPowerWarnHigh OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure the high warning value of fiber tx power to determine which value issue the fiber check warning."
+        ::= { fiberCheckConfigPortEntry 5 }
+
+    fiberCheckConfigTxPowerWarnLow OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Users configure the low warning value of fiber tx power to determine which value issue the fiber check warning."
+        ::= { fiberCheckConfigPortEntry 6 }
+
+    fiberCheckConfigRxPowerWarnHigh OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users configure the high warning value of fiber rx power to determine which value issue the fiber check warning."
+        ::= { fiberCheckConfigPortEntry 7 }
+
+    fiberCheckConfigRxPowerWarnLow OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Users configure the low warning value of fiber rx power to determine which value issue the fiber check warning."
+        ::= { fiberCheckConfigPortEntry 8 }
+
+    fiberCheckConfigResetToDefault OBJECT-TYPE
+        SYNTAX    TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Writing true(1) to this object forces the system to 
+             reset this port's fiber check configuration to default.
+             Any other operation on this object has no effect and it
+             always returns false(2) when read."
+        ::= { fiberCheckConfigPortEntry 9 }
+
+-- -------------------------------------------------------------
+-- Status group
+-- -------------------------------------------------------------
+
+    fiberCheckStatMonitor             OBJECT IDENTIFIER ::= {fiberCheckStatus 1}
+
+-- -------------------------------------------------------------
+-- Monitor
+-- -------------------------------------------------------------
+
+    fiberCheckStatPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF FiberCheckStatPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The fiber check table."
+        ::= { fiberCheckStatMonitor 1 }
+
+    fiberCheckStatPortEntry OBJECT-TYPE
+        SYNTAX FiberCheckStatPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The fiber check table entry."
+        INDEX { fiberCheckStatPortIndex }
+        ::= { fiberCheckStatPortTable 1 }
+
+    FiberCheckStatPortEntry ::=
+        SEQUENCE {
+            fiberCheckStatPortIndex
+                INTEGER,
+            fiberCheckStatModelName
+                DisplayString,
+            fiberCheckStatSN
+                DisplayString,
+            fiberCheckStatWaveLength
+                INTEGER,
+            fiberCheckStatTemperatureC
+                DisplayString,
+            fiberCheckStatTemperatureF
+                DisplayString,
+            fiberCheckStatVoltage
+                DisplayString,
+            fiberCheckStatTxPower
+                DisplayString,
+            fiberCheckStatRxPower
+                DisplayString,
+            fiberCheckStatTemperatureLimitC
+                DisplayString,
+            fiberCheckStatTemperatureLimitF
+                DisplayString,
+            fiberCheckStatTxPowerLimit
+                DisplayString,
+            fiberCheckStatRxPowerLimit
+                DisplayString
+        }
+
+    fiberCheckStatPortIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The port index fiber module."
+        ::= { fiberCheckStatPortEntry 1 }
+
+    fiberCheckStatModelName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The model name of fiber module."
+        ::= { fiberCheckStatPortEntry 2 }
+
+    fiberCheckStatSN OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The serial number of fiber module."
+        ::= { fiberCheckStatPortEntry 3 }
+
+    fiberCheckStatWaveLength OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The wavelength of fiber module."
+        ::= { fiberCheckStatPortEntry 4 }
+
+    fiberCheckStatTemperatureC OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature(Celsius) of fiber module."
+        ::= { fiberCheckStatPortEntry 5 }
+
+    fiberCheckStatTemperatureF OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature(Fahrenheit) of fiber module."
+        ::= { fiberCheckStatPortEntry 6 }
+
+    fiberCheckStatVoltage OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The voltage of fiber module."
+        ::= { fiberCheckStatPortEntry 7 }
+
+    fiberCheckStatTxPower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tx power of fiber module."
+        ::= { fiberCheckStatPortEntry 8 }
+
+    fiberCheckStatRxPower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rx power of fiber module."
+        ::= { fiberCheckStatPortEntry 9 }
+
+    fiberCheckStatTemperatureLimitC OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature(Celsius) warning limit of fiber module."
+        ::= { fiberCheckStatPortEntry 10 }
+
+    fiberCheckStatTemperatureLimitF OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The temperature(Fahrenheit) warning limit of fiber module."
+        ::= { fiberCheckStatPortEntry 11 }
+
+    fiberCheckStatTxPowerLimit OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tx power warning limit of fiber module."
+        ::= { fiberCheckStatPortEntry 12 }
+
+    fiberCheckStatRxPowerLimit OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The rx power warning limit of fiber module."
+        ::= { fiberCheckStatPortEntry 13 }
+
+-- -------------------------------------------------------------
+-- Notification group
+-- -------------------------------------------------------------
+
+    fiberCheckNotifyFiberCheckWarning NOTIFICATION-TYPE
+        OBJECTS     { fiberCheckStatPortIndex }
+        STATUS      current
+        DESCRIPTION
+            "Notification indicates fiber check warning."
+        ::= { fiberCheckNotification 1 }
+END

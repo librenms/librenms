@@ -1,0 +1,2435 @@
+-- SOCOMEC MIB
+-- UPS MIB for SOCOMEC UPS - Uninterruptible Power Supplies
+--
+-- { iso org(3) dod(6) internet(1) private(4) enterprises(1) socomec(4555)
+-- software(1) network(1) netvision(7) }
+-- ==============================================================================================
+
+-- vers. 7.00: new version for Net Vision 7 platform by NVO.
+-- vers. 7.10: release.
+-- vers. 7.11: OutputGlobalkW
+-- vers. 7.12: add upsSystemName upsSystemContact upsSystemLocation
+-- vers. 7.13: add upsBatterySOC
+-- vers. 7.14: add upsOutputSource type lineInteractive(9)
+-- vers. 8.00: NET VISION 8
+-- vers. 8.01: modify upsControlDelay, upsControlFirstWarning, upsControlWarningInterval, upsAgentPollRate, upsAgentBaudRate, receiverCommunityString data range.
+--             modify upsControlWeeklyShutdownTime, upsControlWeeklyRestartTime, upsControlSpecialShutdownTime, upsControlSpecialRestartTime, upsControlEcoModeStartTime, upsControlEcoModeEndTime display format.
+-- vers. 8.11: add trap upsTrapSessionLogin, upsTrapLoginUnsuccesfulTentative, upsTrapTest
+--             add upsOutputSource type lineInteractive(10)
+
+SOCOMECUPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  DisplayString, TimeStamp, TimeInterval, TestAndIncr,
+  AutonomousType
+    FROM SNMPv2-TC
+  enterprises
+    FROM RFC1155-SMI
+  OBJECT-TYPE
+    FROM RFC-1212
+  DisplayString
+    FROM RFC1213-MIB
+  TRAP-TYPE
+    FROM RFC-1215;
+
+PositiveInteger ::= INTEGER (1..2147483647)
+NonNegativeInteger ::= INTEGER (1..2147483647)
+
+
+socomec          OBJECT IDENTIFIER ::= { enterprises 4555 }
+software         OBJECT IDENTIFIER ::= { socomec 1 }
+network          OBJECT IDENTIFIER ::= { software 1 }
+netvision7       OBJECT IDENTIFIER ::= { network 7 }
+upsObjects       OBJECT IDENTIFIER ::= { netvision7 1 }
+upsTraps         OBJECT IDENTIFIER ::= { netvision7 2 }
+
+
+upsIdent         OBJECT IDENTIFIER ::= { upsObjects 1 }
+upsBattery       OBJECT IDENTIFIER ::= { upsObjects 2 }
+upsInput         OBJECT IDENTIFIER ::= { upsObjects 3 }
+upsOutput        OBJECT IDENTIFIER ::= { upsObjects 4 }
+upsBypass        OBJECT IDENTIFIER ::= { upsObjects 5 }
+upsAlarm         OBJECT IDENTIFIER ::= { upsObjects 6 }
+upsControl       OBJECT IDENTIFIER ::= { upsObjects 7 }
+upsConfig        OBJECT IDENTIFIER ::= { upsObjects 8 }
+upsAgent         OBJECT IDENTIFIER ::= { upsObjects 9 }
+emdStatus        OBJECT IDENTIFIER ::= { upsObjects 10 }
+
+
+-- ===========================================================================
+--
+-- upsIdentification
+--
+--     All objects in this group except for upsIdentUserRef and
+--     upsIdentUserLocation are set at device initialization
+--     and remain static.
+--
+-- ===========================================================================
+
+upsIdentModel OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..31))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Model designation."
+      ::= { upsIdent 1 }
+
+upsIdentSerialNumber OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..19))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Serial number."
+      ::= { upsIdent 2 }
+
+upsIdentUserRef OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..11))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Reference."
+      ::= { upsIdent 3 }
+
+upsIdentUserLocation OBJECT-TYPE
+      SYNTAX DisplayString (SIZE (0..11))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Location."
+      ::= { upsIdent 4 }
+
+upsIdentAgentSoftwareVersion OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..31))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Net Vision software version."
+      ::= { upsIdent 5 }
+
+upsSystemName OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..127))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Net Vision system name."
+      ::= { upsIdent 6 }
+
+upsSystemContact OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..127))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Net Vision system contact."
+      ::= { upsIdent 7 }
+
+upsSystemLocation  OBJECT-TYPE
+      SYNTAX DisplayString (SIZE(0..127))
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The UPS Net Vision system location."
+      ::= { upsIdent 8 }
+
+
+-- ===========================================================================
+-- upsBattery
+--
+--     The Battery group.
+-- ===========================================================================
+
+upsBatteryStatus OBJECT-TYPE
+     SYNTAX     INTEGER {
+           unknown(1),
+           batteryNormal(2),
+           batteryCharging(3),
+           batteryTest(4),
+           batteryDischarging(5),
+           batteryLow(6),
+           batteryDepleted(7),
+           batteryFailure(8),
+           batteryDisconnected(9)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present battery status"
+     ::= { upsBattery 1 }
+
+upsSecondsOnBattery OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+        "If the unit is on battery power, the elapsed time
+        since the UPS last switched to battery power, or the
+        time since the network management subsystem was last
+        restarted, whichever is less.  -1 shall be returned
+        if the unit is not on battery power."
+     ::= { upsBattery 2 }
+
+upsEstimatedMinutesRemaining OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+        "An estimate of the time to battery charge depletion
+        under the present load conditions. Compute when UPS is 
+        on battery power"
+     ::= { upsBattery 3 }
+
+upsEstimatedChargeRemaining OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+        "An estimate of the battery charge remaining expressed
+         as a percent of full charge."
+     ::= { upsBattery 4 }
+
+upsBatteryVoltage OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The magnitude of the present battery voltage in 0.1 Volt DC."
+     ::= { upsBattery 5 }
+
+upsBatteryTemperature OBJECT-TYPE
+    SYNTAX     INTEGER    
+    ACCESS read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ambient temperature at or near the UPS Battery casing in 0.1 degree"
+    ::= { upsBattery 6 }
+
+-- vers. 7.10
+
+
+upsAmbientTemperature OBJECT-TYPE
+    SYNTAX     INTEGER    
+    ACCESS read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The ambient temperature inside the UPS in 0.1 degree"
+    ::= { upsBattery 7 }
+
+-- vers. 7.10
+
+upsBatteryCurrent OBJECT-TYPE
+    SYNTAX     INTEGER    
+    ACCESS read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The battry current in 0.1 Amp"
+    ::= { upsBattery 8 }
+
+-- vers. 7.13
+
+upsBatterySOC OBJECT-TYPE
+    SYNTAX     INTEGER    
+    ACCESS read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The battry SOC"
+    ::= { upsBattery 9 }
+
+
+-- ===========================================================================
+-- upsInput
+--
+-- Input group.
+-- ===========================================================================
+
+upsInputNumLines OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of input lines utilized in this device.
+          This variable indicates the number of rows in the
+          input table."
+     ::= { upsInput 1 }
+
+upsInputFrequency OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The current input frequency to the UPS system in 0.1 HZ."
+     ::= { upsInput 2 }
+
+
+upsInputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsInputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of input table entries.  The number of entries
+         is given by the value of upsInputNumLines."
+    ::= { upsInput  3 }
+
+upsInputEntry OBJECT-TYPE
+    SYNTAX  UpsInputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry containing information applicable to a
+         particular input line."
+    INDEX { upsInputLineIndex }
+    ::= { upsInputTable  1 }
+
+UpsInputEntry ::= SEQUENCE {
+             upsInputLineIndex INTEGER,
+             upsInputVoltage INTEGER,
+             upsInputCurrent INTEGER,
+             upsInputVoltageMax INTEGER,
+             upsInputVoltageMin INTEGER
+             }
+
+upsInputLineIndex OBJECT-TYPE
+     SYNTAX INTEGER (0..65535)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         ""
+     ::= { upsInputEntry 1 }
+
+upsInputVoltage OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The input utility line voltage in 0.1 volts."
+     ::= { upsInputEntry 2 }
+
+upsInputCurrent OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The magnitude of the present input current in 0.1 A."
+     ::= { upsInputEntry 3 }
+
+upsInputVoltageMax OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The maximum utility line voltage in 0.1 VAC for last 1 minute."
+     ::= { upsInputEntry 4 }
+
+upsInputVoltageMin OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The minimum utility line voltage in 0.1 VAC for last 1 minute."
+     ::= { upsInputEntry 5 }
+
+-- ===========================================================================
+-- upsOutput
+--
+-- Output group
+-- ===========================================================================
+
+upsOutputSource OBJECT-TYPE
+     SYNTAX     INTEGER {
+           unknown(1),
+           onMaintenBypass(2),
+           onInverter(3),
+           normalMode(4),
+           ecoMode(5),
+           onBypass(6),
+           standby(7),
+           upsOff(8),
+           lineInteractive(9),
+           flexMode(10)
+     }
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present source of output power."
+     ::= { upsOutput 1 }
+
+upsOutputFrequency OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The current output frequency of the UPS system in 0.1 of HZ."
+     ::= { upsOutput 2 }
+
+upsOutputNumLines OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of output lines utilized in this device.
+          This variable indicates the number of rows in the
+          output table."
+     ::= { upsOutput 3 }
+
+upsOutputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsOutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of output table entries.  The number of
+         entries is given by the value of upsOutputNumLines."
+    ::= { upsOutput  4 }
+
+upsOutputEntry OBJECT-TYPE
+    SYNTAX  UpsOutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry containing information applicable to a
+         particular output line."
+    INDEX { upsOutputLineIndex }
+    ::= { upsOutputTable  1 }
+
+UpsOutputEntry ::=
+    SEQUENCE {
+             upsOutputLineIndex          INTEGER,
+             upsOutputVoltage            INTEGER,
+             upsOutputCurrent            INTEGER,
+             upsOutputPercentLoad        INTEGER,
+             upsOutputKva                INTEGER,
+             upsOutputKw                 INTEGER
+             }
+
+upsOutputLineIndex OBJECT-TYPE
+     SYNTAX INTEGER (0..65535)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output line identifier."
+     ::= { upsOutputEntry 1 }
+
+upsOutputVoltage OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output voltage of the UPS system in 0.1 volts."
+     ::= { upsOutputEntry 2 }
+
+upsOutputCurrent OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output current of the UPS system in 0.1 Amps."
+     ::= { upsOutputEntry 3 }
+
+upsOutputPercentLoad OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The percentage of the UPS power capacity presently
+             being used on this output line"
+     ::= { upsOutputEntry 4 }
+
+upsOutputKva OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Output apparent power of the UPS in 0.1 kVA."
+     ::= { upsOutputEntry 5 }
+
+upsOutputKw OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Output apparent power of the UPS in 0.1 kW."
+     ::= { upsOutputEntry 6 }
+
+-- vers. 7.10
+
+upsOutputGlobalkVA OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Output global apparent power of the UPS in 0.1 kVA."
+     ::= { upsOutput 5 }
+
+-- vers. 7.11
+
+upsOutputGlobalkW OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Output global apparent power of the UPS in 0.1 kW."
+     ::= { upsOutput 6 }
+
+-- vers. 7.10
+
+upsOutputLoadRate OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Output global Load Rate."
+     ::= { upsOutput 7 }
+     
+-- ===========================================================================
+-- upsBypass
+-- ===========================================================================
+
+upsBypassFrequency OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present bypass frequency in 0.1 Hz."
+     ::= { upsBypass 1 }
+
+upsBypassNumLines OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The number of bypass lines utilized in this device.
+             This entry indicates the number of rows in the bypass
+             table."
+     ::= { upsBypass 2 }
+
+upsBypassTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsBypassEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of bypass table entries.  The number of
+         entries is given by the value of upsBypassNumLines."
+    ::= { upsBypass  3 }
+
+upsBypassEntry OBJECT-TYPE
+    SYNTAX  UpsBypassEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+               particular bypass input."
+    INDEX { upsBypassLineIndex }
+    ::= { upsBypassTable  1 }
+
+UpsBypassEntry ::=
+    SEQUENCE {
+             upsBypassLineIndex          INTEGER,
+             upsBypassVoltage            INTEGER,
+             upsBypassCurrent            INTEGER
+             }
+
+upsBypassLineIndex OBJECT-TYPE
+     SYNTAX INTEGER (0..65535)
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The bypass line identifier."
+     ::= { upsBypassEntry 1 }
+
+upsBypassVoltage OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present bypass voltage of the UPS system in 0.1 volts."
+     ::= { upsBypassEntry 2 }
+
+upsBypassCurrent OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present bypass current of the UPS system in 0.1 Amps."
+     ::= { upsBypassEntry 3 }
+
+-- ===========================================================================
+-- upsAlarm
+
+-- See Section 4 for Status/Alarm details for all variables
+-- ===========================================================================
+
+upsAlarmsPresent OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The present number of active alarm conditions."
+     ::= { upsAlarm 1 }
+
+upsAlarmTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF UpsAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of alarm table entries.  The table contains
+               zero, one, or many rows at any moment, depending upon
+               the number of alarm conditions in effect.  The table
+               is initially empty at agent startup.  The agent
+               creates a row in the table each time a condition is
+               detected and deletes that row when that condition no
+               longer pertains.  The agent creates the first row with
+               upsAlarmId equal to 1, and increments the value of
+               upsAlarmId each time a new row is created, wrapping to
+               the first free value greater than or equal to 1 when
+               the maximum value of upsAlarmId would otherwise be
+               exceeded.  Consequently, after multiple operations,
+               the table may become sparse, e.g., containing entries
+               for rows 95, 100, 101, and 203 and the entries should
+               not be assumed to be in chronological order because
+               upsAlarmId might have wrapped.
+
+               Alarms are named by an OBJECT IDENTIFIER,
+               upsAlarmDescr, to allow a single table to
+               reflect well known alarms plus alarms defined by a
+               particular implementation, i.e., as documented in the
+               private enterprise MIB definition for the device.  No
+               two rows will have the same value of upsAlarmDescr,
+               since alarms define conditions.  In order to meet this
+               requirement, care should be taken in the definition of
+               alarm conditions to insure that a system cannot enter
+               the same condition multiple times simultaneously.
+
+               The number of rows in the table at any given time is
+               reflected by the value of upsAlarmsPresent."
+    ::= { upsAlarm  2 }
+
+upsAlarmEntry OBJECT-TYPE
+    SYNTAX      UpsAlarmEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "An entry containing information applicable to a
+         particular alarm."
+    INDEX { upsAlarmId }
+    ::= { upsAlarmTable  1 }
+
+UpsAlarmEntry ::=
+    SEQUENCE {
+             upsAlarmId          PositiveInteger,
+             upsAlarmDescr       AutonomousType,
+             upsAlarmTime        TimeStamp,
+             upsAlarmExtDes      DisplayString
+             }
+
+-- ===========================================================================
+--  Agent item
+-- upsAlarmTable/upsAlarmEntry/upsAlarmId
+-- ===========================================================================
+
+   upsAlarmId OBJECT-TYPE
+       SYNTAX     PositiveInteger
+       ACCESS     read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "A unique identifier for an alarm condition.  This
+               value must remain constant."
+       ::= { upsAlarmEntry 1 }
+
+   upsAlarmDescr OBJECT-TYPE
+       SYNTAX     AutonomousType
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "A reference to an alarm description object.  The
+               object referenced should not be accessible, but rather
+               be used to provide a unique description of the alarm
+               condition."
+       ::= { upsAlarmEntry 2 }
+
+   upsAlarmTime OBJECT-TYPE
+       SYNTAX     TimeStamp
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "The value of sysUpTime when the alarm condition was
+               detected.  If the alarm condition was detected at the
+               time of agent startup and presumably existed before
+               agent startup, the value of upsAlarmTime shall equal
+               0."
+       ::= { upsAlarmEntry 3 }
+
+   upsAlarmExtDes OBJECT-TYPE
+       SYNTAX     DisplayString
+       ACCESS read-only
+       STATUS     mandatory
+       DESCRIPTION
+               "Extra description."
+       ::= { upsAlarmEntry 4 }
+
+upsWellKnownAlarms OBJECT IDENTIFIER ::= { upsAlarm  3 }
+
+upsAlarmImminentStop OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "UPS in imminent stop. Load will switch off. (A000)"
+     ::= { upsWellKnownAlarms 1 }
+
+upsAlarmOverload OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output load exceeds the UPS output capacity. (A001)"
+     ::= { upsWellKnownAlarms 2 }
+
+upsAlarmTemperature OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "UPS temperature is out of tolerance. (A002)"
+     ::= { upsWellKnownAlarms 3 }
+
+upsAlarmTransferLock OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Automatic and manual transfer are locked. (A003)"
+     ::= { upsWellKnownAlarms 4 }
+
+upsAlarmAutoTransferImpossible OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Automatic transfer is disabled. 
+         Inverter and bypass sources are not synchronized (A004)"
+     ::= { upsWellKnownAlarms 5 }
+
+     upsAlarmInsufficientResources OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Insufficient resources alarm. 
+         The load cannot by supplied by alternate source (A005)"
+     ::= { upsWellKnownAlarms 6 }
+
+upsAlarmRedundancyLost OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Redundancy lost alarm. (A006)"
+     ::= { upsWellKnownAlarms 7 }
+
+upsAlarmOutputShortCircuit OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "An output short-circuit has been detected by UPS. (A007)"
+     ::= { upsWellKnownAlarms 8 }
+
+upsAlarmMaintenance OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS requests a maintenance service check. (A012)"
+     ::= { upsWellKnownAlarms 9 }
+
+upsAlarmRemoteService OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS requests a remote service action. (A013)"
+     ::= { upsWellKnownAlarms 10 }
+
+upsAlarmGeneralFault OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "A general fault in the UPS has been detected.
+         One of UPS alarm is present. (A015)"
+     ::= { upsWellKnownAlarms 11 }
+
+upsAlarmBatteryCircuitOpen OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Battery circuit open. Battery breaker or fuse open. (A016)"
+     ::= { upsWellKnownAlarms 12 }
+
+upsAlarmBatteryDischarged OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS will be unable to sustain the present load
+          when and if the utility power is lost. 
+          The Battery is discharched. (A017)"
+     ::= { upsWellKnownAlarms 13 }
+
+upsAlarmLowBattery OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The remaining battery run-time is less than or equal
+         to battery low threshold. (A018)"
+     ::= { upsWellKnownAlarms 14 }
+
+upsAlarmOnBattery OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS is drawing power from the batteries. (A019)"
+     ::= { upsWellKnownAlarms 15 }
+
+upsAlarmBatteryTemperature OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Battery Temperature Alarm. (A020)"
+     ::= { upsWellKnownAlarms 16 }
+
+upsAlarmBatteryRoom OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "An external alarm has been detected in the Battery room.
+         This alarm depends on external sensor: gaz, temperature, 
+         humidity or dry-contact. (A021)"
+     ::= { upsWellKnownAlarms 17 }
+
+upsAlarmBatteryTest OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The battery has been detected as weak during the test. (A022)"
+     ::= { upsWellKnownAlarms 18 }
+
+upsAlarmBatteryFault OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "One or more batteries have been determined to require replacement. (A027)"
+     ::= { upsWellKnownAlarms 19 }
+
+upsAlarmRectifierFault OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Rectifier Critical alarm. (A032)"
+     ::= { upsWellKnownAlarms 20 }
+
+upsAlarmRectifierAlarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Rectifier Preventive alarm. (A033)"
+     ::= { upsWellKnownAlarms 21 }
+
+upsAlarmRecInputBad OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "rectifier Input power supply is out of tolerance or absent. (A035)"
+     ::= { upsWellKnownAlarms 22 }
+
+upsAlarmGenSetGeneral OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Gen-set general alarm.
+         coming from external dry-contact. (A036)"
+     ::= { upsWellKnownAlarms 23 }
+
+upsAlarmBatteryChargerFault OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Battery charger Critical Alarm. (A037)"
+     ::= { upsWellKnownAlarms 24 }
+
+upsAlarmBatteryChargerAlarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Battery charger Preventive Alarm. (A038)"
+     ::= { upsWellKnownAlarms 25 }
+
+upsAlarmInverterFault OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Inverter Critical alarm. (A040)"
+     ::= { upsWellKnownAlarms 26 }
+
+upsAlarmInverterAlarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Inverter preventive alarm. (A041)"
+     ::= { upsWellKnownAlarms 27 }
+
+upsAlarmBypassFault OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Inverter Critical alarm. (A048)"
+     ::= { upsWellKnownAlarms 28 }
+
+upsAlarmBypassAlarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Inverter preventive alarm. (A049)"
+     ::= { upsWellKnownAlarms 29 }
+
+upsAlarmBypInputBad OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Bypass Input power supply is out of tolerance or absent. (A050)"
+     ::= { upsWellKnownAlarms 30 }
+
+upsAlarmPhaseRotationFault OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Phase rotation fault. (A051)"
+     ::= { upsWellKnownAlarms 31 }
+
+upsAlarmFansFailure OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Fans failure. (A054)"
+     ::= { upsWellKnownAlarms 32 }
+
+upsAlarmMaintenanceBypass OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Maintenance bypass alarm. 
+         Output breaker and manual bypass breaker closed together. (A056)"
+     ::= { upsWellKnownAlarms 33 }
+
+upsAlarmUPSPowerOffActive OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "UPS power off has been activated by external device. (A059)"
+     ::= { upsWellKnownAlarms 34 }
+
+upsAlarmWrongConfiguration OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Configuration data map corrupted, or wrong configuration. (A060)"
+     ::= { upsWellKnownAlarms 35 }
+
+upsAlarmInternalFailure OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Internal failure, or internal communication failure. (A061)"
+     ::= { upsWellKnownAlarms 36 }
+
+upsAlarmOptionalBoards OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Optional boards alarm. 
+         Board not present or wrong configuration (A062)"
+     ::= { upsWellKnownAlarms 37 }
+
+upsAlarmExternalAlarm1 OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "External Alarm 1. 
+         Coming from ADC Card: Input set as alarm (A064)"
+     ::= { upsWellKnownAlarms 38 }
+
+upsAlarmExternalAlarm2 OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "External Alarm 2. 
+         Coming from ADC Card: Input set as alarm (A065)"
+     ::= { upsWellKnownAlarms 39 }
+
+upsAlarmExternalAlarm3 OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "External Alarm 3. 
+         Coming from ADC Card: Input set as alarm (A066)"
+     ::= { upsWellKnownAlarms 40 }
+
+upsAlarmExternalAlarm4 OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "External Alarm 4.
+         Coming from ADC Card: Input set as alarm (A067)"
+     ::= { upsWellKnownAlarms 41 }
+
+upsAlarmModule1Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 1 in parallel general alarm."
+     ::= { upsWellKnownAlarms 42 }
+
+upsAlarmModule2Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 2 in parallel general alarm."
+     ::= { upsWellKnownAlarms 43 }
+
+upsAlarmModule3Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 3 in parallel general alarm."
+     ::= { upsWellKnownAlarms 44 }
+
+upsAlarmModule4Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 4 in parallel general alarm."
+     ::= { upsWellKnownAlarms 45 }
+
+upsAlarmModule5Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 5 in parallel general alarm."
+     ::= { upsWellKnownAlarms 46 }
+
+upsAlarmModule6Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 6 in parallel general alarm."
+     ::= { upsWellKnownAlarms 47 }
+
+upsAlarmModule7Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 7 in parallel general alarm."
+     ::= { upsWellKnownAlarms 48 }
+
+upsAlarmModule8Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 8 in parallel general alarm."
+     ::= { upsWellKnownAlarms 49 }
+
+upsAlarmModule9Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 9 in parallel general alarm."
+     ::= { upsWellKnownAlarms 50 }
+
+upsAlarmModule10Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 10 in parallel general alarm."
+     ::= { upsWellKnownAlarms 51 }
+
+upsAlarmModule11Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 11 in parallel general alarm."
+     ::= { upsWellKnownAlarms 52 }
+
+upsAlarmModule12Alarm OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Unit or Module 12 in parallel general alarm."
+     ::= { upsWellKnownAlarms 53 }
+
+upsAlarmAutoTestRunning OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS has launched the auto-test. (S030)"
+     ::= { upsWellKnownAlarms 54 }
+
+upsAlarmOnBypass OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Load supplied by automatic bypass.
+         Load not protected."
+     ::= { upsWellKnownAlarms 55 }
+
+upsAlarmUpsOutputOff OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The output of the UPS is in the off state. 
+         Load OFF or UPS on standby mode."
+     ::= { upsWellKnownAlarms 56 }
+
+upsAlarmUpsSystemOff OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS system is in the off state. 
+         Rectifier and Inverter are off."
+     ::= { upsWellKnownAlarms 57 }
+
+upsAlarmCommunicationLost OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The communication with UPS has been lost."
+     ::= { upsWellKnownAlarms 58 }
+
+upsAlarmShutdownPending OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The condition to shutdown servers has been detected. 
+         The shutdown delay in underway."
+     ::= { upsWellKnownAlarms 59 }
+
+upsAlarmShutdownRequestt OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The shutdown command has been sent to servers agent."
+     ::= { upsWellKnownAlarms 60 }
+
+upsAlarmShutdownImminent OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS will turn OFF,
+         according the standby schedule settings."
+     ::= { upsWellKnownAlarms 61 }
+
+upsAlarmAwaitingPower OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "The UPS output is in standby,
+         and the UPS is awaiting the return of input power."
+     ::= { upsWellKnownAlarms 62 }
+
+
+-- ===========================================================================
+-- upsControl
+--
+-- ===========================================================================
+
+upsControlStatusControl OBJECT-TYPE
+     SYNTAX INTEGER {
+            upsStandbyOn (1),
+            upsStandbyOff (2),
+            upsEcoMode (3),
+            upsNormalMode (4),
+            upsAlarmReset (5),
+            upsOnBypass (6),
+            upsOnInverter (7)
+     }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "This object Control UPS status"
+     ::= { upsControl 1 }
+
+upsShutdownDelay OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "This object set the delay time (in seconds) to turn UPS off after
+          Net Vision broadcast shutdown request to connected clients"
+     ::= { upsControl 2 }
+
+upsTurnOffAfterShutdown OBJECT-TYPE
+     SYNTAX INTEGER {
+            enable (1),
+            disable (2)
+     }
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+         "This object enable/disable UPS turn off function after shutdown
+          process complete"
+     ::= { upsControl 3 }
+
+upsControlShutdownParamTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ShutdownParamEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "Table which describes the parameters for shutdown process
+                 when shutdown event occurs"
+                ::= { upsControl 4 }
+
+shutdownParamEntry OBJECT-TYPE
+        SYNTAX ShutdownParamEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        INDEX { upsControlEventIndex }
+                ::= { upsControlShutdownParamTable 1 }
+
+ShutdownParamEntry  ::= SEQUENCE {                
+                upsControlEventIndex        
+                    INTEGER,
+                upsControlEventStatus       
+                    INTEGER,
+                upsControlDelay             
+                    INTEGER,
+                upsControlFirstWarning      
+                    INTEGER,
+                upsControlWarningInterval
+                    INTEGER
+                }
+
+upsControlEventIndex OBJECT-TYPE
+        SYNTAX INTEGER (0..65535)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                " The shutdown event identification "
+                ::= { shutdownParamEntry 1 }
+
+upsControlEventStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            disable(1),
+            warning(2),
+            clientShutdown(3)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Status of the corresponding shutdown Event.
+                 When set to disable(), shutdown process will not start when
+                 corresponding event occurred."
+                 ::= { shutdownParamEntry 2 }
+
+upsControlDelay OBJECT-TYPE
+        SYNTAX INTEGER (0..10080)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The Delay after the occurrence of the corresponding shutdown
+                 event that Net Vision should issue shutdown request to
+                 connected clients. For WeeklyScheduledShutdown and
+                 SpecialScheduledShutdown, this is the time before the
+                 configured Shutdown time when Net Vision will start sending the
+                 warning message to the connected clients. The value is in
+                 units of minutes."
+                 ::= { shutdownParamEntry 3 }
+
+upsControlFirstWarning OBJECT-TYPE
+        SYNTAX INTEGER (0..3600)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The delay after the occurrence of the corresponding shutdown
+                 event that the Net Vision will start sending the warning
+                 message to the connected clients. The value is in units of
+                 seconds"
+                 ::= { shutdownParamEntry 4 }
+
+upsControlWarningInterval OBJECT-TYPE
+        SYNTAX INTEGER (0..3600)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The frequency of sending warning messages to the connected
+                clients when the corresponding shutdown event occurs.
+                The value is in units of seconds."
+                ::= { shutdownParamEntry 5 }
+
+upsControlWeeklyScheduleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsControlWeeklyScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The table to schedule shutting down the ups by weekly."
+        ::= { upsControl 5 }
+
+upsControlWeeklyScheduleEntry OBJECT-TYPE
+        SYNTAX UpsControlWeeklyScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The entries for each day."
+        INDEX  { upsControlWeeklyIndex }
+        ::= {upsControlWeeklyScheduleTable 1 }
+
+UpsControlWeeklyScheduleEntry ::= SEQUENCE {
+                upsControlWeeklyIndex
+                        INTEGER,
+                upsControlWeeklyShutdownDay
+                        INTEGER,
+                upsControlWeeklyShutdownTime
+                        DisplayString,
+                upsControlWeeklyRestartDay
+                        INTEGER,
+                upsControlWeeklyRestartTime
+                        DisplayString
+        }
+
+upsControlWeeklyIndex OBJECT-TYPE
+        SYNTAX INTEGER(1..7)    
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of scheduled events."
+        ::= { upsControlWeeklyScheduleEntry 1 }
+
+upsControlWeeklyShutdownDay    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sunday(1),
+                monday(2),
+                tuesday(3),
+                wednesday(4),
+                thursday(5),
+                friday(6),
+                saturday(7),
+                none(8)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The weekday on which the UPS should shut down."
+        ::= { upsControlWeeklyScheduleEntry 2 }
+
+upsControlWeeklyShutdownTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+         "The time that the process of shutting down the UPS will be initiated
+          in hh:mm format."
+        ::= { upsControlWeeklyScheduleEntry 3 }
+
+upsControlWeeklyRestartDay     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sunday(1),
+                monday(2),
+                tuesday(3),
+                wednesday(4),
+                thursday(5),
+                friday(6),
+                saturday(7),
+                none(8)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The weekday on which the UPS should restart"
+
+        ::= { upsControlWeeklyScheduleEntry 4 }
+
+upsControlWeeklyRestartTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time the UPS will restart in hh:mm format."
+        ::= { upsControlWeeklyScheduleEntry 5 }
+
+upsControlSpecialScheduleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsControlSpecialScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The table to schedule shutting down the ups."
+        ::= { upsControl 6 }
+
+upsControlSpecialScheduleEntry OBJECT-TYPE
+        SYNTAX UpsControlSpecialScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The entries for each day."
+        INDEX  { upsControlSpecialIndex }
+        ::= {upsControlSpecialScheduleTable 1 }
+
+UpsControlSpecialScheduleEntry ::= SEQUENCE {
+                upsControlSpecialIndex
+                        INTEGER,
+                upsControlSpecialShutdownDay
+                        DisplayString,
+                upsControlSpecialShutdownTime
+                        DisplayString,
+                upsControlSpecialRestartDay
+                        DisplayString,
+                upsControlSpecialRestartTime
+                        DisplayString
+        }
+
+upsControlSpecialIndex OBJECT-TYPE
+        SYNTAX INTEGER(1..8)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of scheduled events."
+        ::= { upsControlSpecialScheduleEntry 1 }
+
+upsControlSpecialShutdownDay    OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date on which the UPS should shut down in dd/mm/yyyy
+                 format."
+         ::= { upsControlSpecialScheduleEntry 2 }
+
+upsControlSpecialShutdownTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+         "The time that the process of shutting down the UPS will be initiated
+          in hh:mm format"
+        ::= { upsControlSpecialScheduleEntry 3 }
+
+upsControlSpecialRestartDay     OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date on which the UPS should restart in dd/mm/yyyy format"
+
+        ::= { upsControlSpecialScheduleEntry 4 }
+
+upsControlSpecialRestartTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time the UPS will restart in hh:mm format."
+        ::= { upsControlSpecialScheduleEntry 5 }
+
+
+upsControlEcoModeScheduleTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsControlEcoModeScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The table to schedule enable/disable ups eco/mode by weekly."
+        ::= { upsControl 7 }
+
+upsControlEcoModeScheduleEntry OBJECT-TYPE
+        SYNTAX UpsControlEcoModeScheduleEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The entries for each day."
+        INDEX  { upsControlEcoModeIndex }
+        ::= {upsControlEcoModeScheduleTable 1 }
+
+UpsControlEcoModeScheduleEntry ::= SEQUENCE {
+                upsControlEcoModeIndex
+                        INTEGER,
+                upsControlEcoModeStartDay
+                        INTEGER,
+                upsControlEcoModeStartTime
+                        DisplayString,
+                upsControlEcoModeEndDay
+                        INTEGER,
+                upsControlEcoModeEndTime
+                        DisplayString
+        }
+
+upsControlEcoModeIndex OBJECT-TYPE
+        SYNTAX INTEGER(1..7)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of scheduled events."
+        ::= { upsControlEcoModeScheduleEntry 1 }
+
+upsControlEcoModeStartDay    OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sunday(1),
+                monday(2),
+                tuesday(3),
+                wednesday(4),
+                thursday(5),
+                friday(6),
+                saturday(7),
+                none(8)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The weekday on which the UPS Eco/Mode should enable."
+        ::= { upsControlEcoModeScheduleEntry 2 }
+
+upsControlEcoModeStartTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+         "The time that the UPS Eco/Mode will be enabled, in hh:mm format."
+        ::= { upsControlEcoModeScheduleEntry 3 }
+
+upsControlEcoModeEndDay     OBJECT-TYPE
+        SYNTAX  INTEGER {
+                sunday(1),
+                monday(2),
+                tuesday(3),
+                wednesday(4),
+                thursday(5),
+                friday(6),
+                saturday(7),
+                none(8)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The weekday on which the UPS Eco/Mode should disable"
+
+        ::= { upsControlEcoModeScheduleEntry 4 }
+
+upsControlEcoModeEndTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (5..5))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time the UPS Eco/Mode will disabled,  in hh:mm format."
+        ::= { upsControlEcoModeScheduleEntry 5 }
+
+
+-- ===========================================================================
+--
+-- upsConfig
+--
+-- ===========================================================================
+
+upsConfigNomKva OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "UPS Nominal in 0.1 kVA"
+     ::= { upsConfig 1 }
+
+upsConfigNbrUnit OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Number of Units installed in the system"
+     ::= { upsConfig 2 }
+
+upsConfigUnitKva OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "UNIT Nominal kVA"
+     ::= { upsConfig 3 }
+
+upsConfigRemoteCtrl OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-only
+     STATUS mandatory
+     DESCRIPTION
+         "Set to 1 if remote controls are enabled by UPS"
+     ::= { upsConfig 4 }
+
+upsDevicesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsDevicesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The devices powered by UPS and registered to NET VISION"
+        ::= { upsConfig 5 }
+
+upsDevicesEntry OBJECT-TYPE
+        SYNTAX UpsDevicesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The devices protected by NET VISION"
+        INDEX  { indexOfDevice}
+        ::= { upsDevicesTable 1 }
+
+UpsDevicesEntry ::=
+        SEQUENCE {
+                indexOfDevice
+                        NonNegativeInteger,
+                addrOfDevice
+                        DisplayString,
+                nameOfDevice
+                        DisplayString,
+                timeOfConnection
+                        DisplayString,
+                statusOfConnection
+                        INTEGER,
+                severityOfConnection
+                        INTEGER
+        }
+
+indexOfDevice OBJECT-TYPE
+        SYNTAX NonNegativeInteger
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index of the device that is powered from UPS."
+        ::= { upsDevicesEntry 1 }
+
+addrOfDevice OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The ip address of the device."
+        ::= { upsDevicesEntry 2 }
+
+nameOfDevice OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The name/description of the device powered from UPS."
+        ::= { upsDevicesEntry 3 }
+
+timeOfConnection OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The device registered to NET VISION"
+        ::= { upsDevicesEntry 4 }
+
+statusOfConnection OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The device status connection"
+        ::= { upsDevicesEntry 5 }
+
+severityOfConnection OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The device severity"
+        ::= { upsDevicesEntry 6 }
+
+-- ===========================================================================
+--
+-- upsAgent
+--
+-- ===========================================================================
+
+upsAgentIpaddress OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " The ip address that NMS can identify the managed
+                device"
+        ::= { upsAgent 1}
+
+upsAgentGateway OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " The default gateway that allow device managed
+                through routers "
+        ::= { upsAgent 2}
+
+upsAgentSubnetMask OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " Internet address subnet mask"
+        ::= { upsAgent 3}
+
+upsAgentDate OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (10..10))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The date in agent, format is (dd/mm/yyyy)"
+        ::= { upsAgent 4}
+
+upsAgentTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (8..8))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The time in agent, format is (hh:mm:ss)"
+        ::= { upsAgent 5}
+
+
+upsAgentNtpTimeServer       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { upsAgent 6 }
+
+upsAgentNtpTimeZone         OBJECT-TYPE
+        SYNTAX  INTEGER {
+            gmt1200dateLineWest(1),
+            gmt1200kwajalein(2),
+            gmt1100samoa(3),
+            gmt1000hawaii(4),
+            gmt0900alaska(5),
+            gmt0800tijuana(6),
+            gmt0700arizona(7),
+            gmt0700chihuahua(8),
+            gmt0700mountain(9),
+            gmt0600camerica(10),
+            gmt0600ctime(11), 
+            gmt0600guadalajara(12),
+            gmt0600saskatchewan(13),
+            gmt0500quito(14),
+            gmt0500etime(15), 
+            gmt0500indiana(16), 
+            gmt0400atime(17),
+            gmt0400caracas(18),
+            gmt0400santiago(19),
+            gmt0330newfoundland(20),
+            gmt0300brasilia(21),
+            gmt0300georgetown(22),
+            gmt0300greenland(23),
+            gmt0200atlantic(24),
+            gmt0100azores(25),
+            gmt0100cvi(26),
+            gmt0000monrovia(27),
+            gmt0000london(28),
+            gmt0100vienna(29),
+            gmt0100prague(30),
+            gmt0100paris(31),
+            gmt0100zagreb(32),
+            gmt0100wcafrica(33),
+            gmt0200minsk(34),
+            gmt0200bucharest(35),
+            gmt0200cairo(36),
+            gmt0200pretoria(37),
+            gmt0200vilnius(38),
+            gmt0200jerusalem(39),
+            gmt0300maghdad(40),
+            gmt0300riyadh(41),
+            gmt0300volgograd(42),
+            gmt0300nairobi(43),
+            gmt0330tehran(44),
+            gmt0400muscat(45),
+            gmt0400yerevan(46),
+            gmt0430kabul(47),
+            gmt0500ekaterinburg(48),
+            gmt0500tashkent(49),
+            gmt0530calcutta(50),
+            gmt0530mumbai(51),
+            gmt0545kathmandu(52),
+            gmt0600novosibirsk(53),
+            gmt0600dhaka(54),
+            gmt0600jayawardenepura(55),
+            gmt0630rangoon(56),
+            gmt0700bangkok(57),
+            gmt0700krasnoyarsk(58),
+            gmt0800beijing(59),
+            gmt0800irkutsk(60),
+            gmt0800singapore(61),
+            gmt0800perth(62),
+            gmt0800taipei(63),
+            gmt0900tokyo(64),
+            gmt0900seoul(65),
+            gmt0900yakutsk(66),
+            gmt0930adelaide(67),
+            gmt0930darwin(68),
+            gmt1000brisbane(69),
+            gmt1000canberra(70),
+            gmt1000guam(71),
+            gmt1000hobart(72),
+            gmt1000vladivostok(73),
+            gmt1100magadan(74),
+            gmt1200auckland(75),
+            gmt1200fiji(76),
+            gmt1300alofa(77)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { upsAgent 7 }
+
+upsAgentHistoryLogFrequency OBJECT-TYPE
+        SYNTAX INTEGER (5..28800) -- in seconds
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The frequency of the updation of the history log. The value
+                 is in seconds"
+        ::= { upsAgent 8 }
+
+upsAgentExtHistoryLogFrequency      OBJECT-TYPE
+        SYNTAX INTEGER (3..10080) -- in minutes
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                 "The ups parameters are sampled at the rate governed by the
+                  mconfigHistroyLogFrequency. These sampled values are further
+                  conslidated over period of time which is determined by this
+                  object."
+        ::= { upsAgent 9 }
+
+upsAgentPollRate OBJECT-TYPE
+        SYNTAX INTEGER (1..60) -- in seconds
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                " The frequency that proxy agent polls the connected
+                UPS in JBUS protocol. (unit : second)"
+        ::= { upsAgent 10}
+
+upsAgentBaudRate OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The serial port communication speed. 2400,9600,19200,57600 allowed"
+        ::= { upsAgent 11}
+
+upsAgentDhcpStatue OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable DHCP/BootP capability"
+        ::= { upsAgent 12}
+
+upsAgentTelnetStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable telnet access"
+        ::= { upsAgent 13}
+
+upsAgentTftpStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Enable or disable network upgrade capability"
+        ::= { upsAgent 14}
+
+upsAgentResetToDefault OBJECT-TYPE
+        SYNTAX  INTEGER {
+                reset(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Reset all parameters of Net Vision to default value"
+        ::= { upsAgent 15}
+
+upsAgentRestart OBJECT-TYPE
+        SYNTAX  INTEGER {
+                restart(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Restart Net Vision"
+        ::= { upsAgent 16}
+
+upsAgentClearAgentLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear agent log data"
+        ::= { upsAgent 17}
+
+upsAgentClearEventLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear event log data"
+        ::= { upsAgent 18}
+
+upsAgentClearExtHistoryLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear extented history log data"
+        ::= { upsAgent 19}
+
+upsAgentClearHistoryLog OBJECT-TYPE
+        SYNTAX  INTEGER {
+                clear(1),
+                nothing(2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "Clear history log data"
+        ::= { upsAgent 20}
+
+upsAgentTrapsReceiversTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsAgentTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers to send traps to.  The number of
+                 entries is given by the value of upsAgentNumTrapReceivers"
+        ::= { upsAgent 21}
+
+upsAgentTrapsReceiversEntry OBJECT-TYPE
+        SYNTAX UpsAgentTrapsReceiversEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers to send traps to."
+        INDEX  { trapsIndex}
+        ::= { upsAgentTrapsReceiversTable 1 }
+
+UpsAgentTrapsReceiversEntry ::= SEQUENCE{
+                trapsIndex
+                    INTEGER,
+                trapsReceiverAddr
+                    DisplayString,
+                receiverCommunityString
+                    DisplayString,
+                receiverNmstype
+                    INTEGER
+--                receiverDescription
+--                    DisplayString
+        }
+
+trapsIndex OBJECT-TYPE
+        SYNTAX INTEGER(1..8)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a trap receiver entry."
+        ::= { upsAgentTrapsReceiversEntry 1 }
+
+trapsReceiverAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the manager to send a trap to."
+        ::= { upsAgentTrapsReceiversEntry 2 }
+
+receiverCommunityString OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..31))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The community name to use in the trap when sent to the manager."
+        ::= { upsAgentTrapsReceiversEntry 3 }
+
+receiverNmstype OBJECT-TYPE
+        SYNTAX  INTEGER {
+                none(1),
+                rfc1628-trap(2),
+                netVision-trap(3)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The trap group that NMS desired."
+        ::= { upsAgentTrapsReceiversEntry 4 }
+
+--receiverDescription OBJECT-TYPE
+--        SYNTAX DisplayString (SIZE(0..31))
+--        ACCESS read-write
+--        STATUS mandatory
+--        DESCRIPTION
+--                "Description of trap receivers"
+--        ::= { upsAgentTrapsReceiversEntry 5 }
+
+upsAgentFirewallControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UpsAgentFirewallControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "A list of managers which can access Net Vision with private
+                community string."
+        ::= { upsAgent 22}
+
+upsAgentFirewallControlEntry OBJECT-TYPE
+        SYNTAX UpsAgentFirewallControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+                "The managers."
+        INDEX  { trapsIndex}
+        ::= { upsAgentFirewallControlTable 1 }
+
+UpsAgentFirewallControlEntry ::= SEQUENCE {
+                firewallIndex           INTEGER,
+                firewallControlAddr     DisplayString,
+                firewallPrefixLength    INTEGER,
+                firewallActionMode      INTEGER
+                }
+
+
+firewallIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The index to a firewall entry."
+        ::= { upsAgentFirewallControlEntry 1 }
+
+firewallControlAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The IP address of the firewall "
+        ::= { upsAgentFirewallControlEntry 2 }
+
+
+firewallPrefixLength      OBJECT-TYPE
+        SYNTAX INTEGER (1..64)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                 "The firewall prefix length."
+        ::= { upsAgentFirewallControlEntry 3 }
+
+firewallActionMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                accept (1),
+                reject (2)
+                }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+                "The firewall action mode"
+        ::= { upsAgentFirewallControlEntry 4 }
+
+
+upsAgentMibVersion OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The version of MIB spec."
+        ::= { upsAgent 23 }
+        
+-- ===========================================================================
+--
+-- emdStatus
+--
+-- ===========================================================================
+
+emdSatatusTemperature OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The measurement of EMD temperature, in 0.1 degree"
+        ::= { emdStatus 1}
+
+emdSatatusHumidity OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The measurement of EMD humidity, in 0.1 degree"
+        ::= { emdStatus 2}
+
+emdStatusIn1Active OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                notActived(2),
+                actived(3)
+                }        
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input 1 has been detected as Active"
+        ::= { emdStatus 3}
+
+emdStatusIn2Active OBJECT-TYPE
+        SYNTAX  INTEGER {
+                disabled(1),
+                notActived(2),
+                actived(3)
+                }        
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+                "The input 2 has been detected as Active"
+        ::= { emdStatus 4}
+
+-- ===========================================================================
+-- upsTraps
+--
+-- Traps group
+-- ===========================================================================
+
+   -- This section defines the well-known notifications sent by
+   -- UPS agents.
+   -- Care must be taken to insure that no particular notification
+   -- is sent to a single receiving entity more often than once
+   -- every five seconds.
+
+   upsTrapOnBattery TRAP-TYPE
+       ENTERPRISE upsTraps
+       VARIABLES { upsEstimatedMinutesRemaining, upsSecondsOnBattery }
+       DESCRIPTION
+               "WARNING:The UPS is operating on battery power.  This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or is no longer running on
+               battery."
+     ::= 1
+
+   upsTrapTestCompleted TRAP-TYPE
+       ENTERPRISE upsTraps
+       DESCRIPTION
+               "INFORMATION:This trap is sent upon completion of a UPS diagnostic
+               test."
+     ::= 2
+
+   upsTrapAlarmEntryAdded TRAP-TYPE
+       ENTERPRISE upsTraps
+       VARIABLES { upsAlarmId, upsAlarmDescr }
+       DESCRIPTION
+               "WARNING:This trap is sent each time an alarm is inserted into
+               to the alarm table.  It is sent on the insertion of
+               all alarms except for upsAlarmOnBattery and
+               upsAlarmTestInProgress."
+     ::= 3
+
+   upsTrapAlarmEntryRemoved TRAP-TYPE
+       ENTERPRISE upsTraps
+       VARIABLES { upsAlarmId, upsAlarmDescr }
+       DESCRIPTION
+               "INFORMATION:This trap is sent each time an alarm is removed from
+               the alarm table.  It is sent on the removal of all
+               alarms except for upsAlarmTestInProgress."
+     ::= 4
+     
+
+   upsTrapImminentStop TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: The UPS is near to switch off the output power."
+     ::= 5
+
+   upsTrapOverload TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: The UPS output is in overload. Output load rate more than 100%"
+     ::= 6
+
+   upsTrapRedundancyLost TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: Redundancy is lost."
+     ::= 7
+
+   upsTrapBatteryCircuitOpen TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: The battery has been disconnected from UPS"
+     ::= 8
+
+   upsTrapBatteryDischarged TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: The battery has been detected as discharged."
+     ::= 9
+
+   upsTrapBatteryLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: The battery is near of the end of backup time."
+     ::= 10
+
+   upsTrapBatteryAlarm TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: The battery is in alarm."
+     ::= 11
+
+   upsTrapUpsCriticalAlarm TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: A critical alarm has been detected on the UPS."
+     ::= 12
+     
+   upsTrapLoadOFF TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: The load has been disconnected from the UPS. LOAD OFF."
+     ::= 13
+
+   upsTrapCommunicationLost TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: UPS is no more communicating with the agent."
+     ::= 14
+
+   upsTrapOnBatteryPower TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: The UPS has switched to battery backup power."
+     ::= 15
+
+   upsTrapBatteryTestfailed TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: The Battery test has detected a weak battery."
+     ::= 16
+
+   upsTrapTemperatureAlarm TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: The UPS internal temperature has reached the threshold."
+     ::= 17
+
+   upsTrapOnBypass TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: Load supplied by automatic Bypass."
+     ::= 18
+
+   upsTrapUpsPreventiveAlarm TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: A preventive alarm has been detected by the UPS."
+     ::= 19
+
+   upsTrapShutdownWarning TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: A warning message has be sent to shutdown agent."
+     ::= 20
+
+   upsTrapShutdownrequest TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "WARNING: A shutdown command has been sent to agent."
+     ::= 21
+     
+   upsTrapUpsNormal TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+          "INFORMATION: The UPS status is normal. Load protected by UPS"
+     ::= 22
+
+   upsTrapPowerRestored TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+          "INFORMATION: The Input supply has been restored"
+     ::= 23
+
+  upsTrapAlarmCancelled TRAP-TYPE
+       ENTERPRISE upsTraps
+       DESCRIPTION
+          "INFORMATION: Alarm cancelled. All alarms are disabled"
+     ::= 24
+
+  upsTrapComEstablished TRAP-TYPE
+       ENTERPRISE upsTraps
+       DESCRIPTION
+          "INFORMATION: The communication between UPS and the agent has been restored"
+     ::= 25
+
+  upsTrapShutdwonCancelled TRAP-TYPE
+       ENTERPRISE upsTraps
+       DESCRIPTION
+          "INFORMATION: The UPS has cancelled the shutdown procedure to agent"
+     ::= 26
+
+  upsTrapAgentRestarting TRAP-TYPE
+       ENTERPRISE upsTraps
+       DESCRIPTION
+          "INFORMATION: NET VISION is restarting"
+     ::= 27
+ 
+    upsTrapEmdTempLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: EMD Sensor detected low temperature."
+    ::= 28
+
+    upsTrapEmdTempNotLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "INFORMATION: EMD Sensor Not under low temperature."
+    ::= 29
+
+    upsTrapEmdTempHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+    DESCRIPTION
+            "CRITICAL: EMD Sensor detected high temperature."
+    ::= 30
+
+    upsTrapEmdTempNotHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+    DESCRIPTION
+            "INFORMATION: EMD Sensor Not over high temperature."
+    ::= 31
+
+    upsTrapEmdHumidityLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: EMD Sensor detected low humidity."
+    ::= 32
+
+    upsTrapEmdHumidityNotLow TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "INFORMATION: EMD Sensor Not under low humidity."
+    ::= 33
+
+    upsTrapEmdHumidityHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: EMD Sensor detected high humidity."
+    ::= 34
+
+    upsTrapEmdHumidityNotHigh TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "INFORMATION: EMD Sensor Not over high humidity."
+    ::= 35
+
+    upsTrapEmdFirstInputActive TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: The <customized> input is active."
+    ::= 36
+
+    upsTrapEmdFirstInputRestored TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "INFORMATION: The <customized> input is restored."
+    ::= 37
+
+    upsTrapEmdSecondInputActive TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "CRITICAL: The <customized> input is active."
+    ::= 38
+
+    upsTrapEmdSecondInputRestored TRAP-TYPE
+        ENTERPRISE upsTraps
+        DESCRIPTION
+            "INFORMATION: The <customized> input is restored."
+    ::= 39
+
+    upsTrapSessionLogin TRAP-TYPE
+        ENTERPRISE       upsTraps
+        DESCRIPTION
+            "INFORMATION: New Admin or User session opened."
+    ::= 40
+
+    upsTrapLoginUnsuccesfulTentative TRAP-TYPE
+        ENTERPRISE       upsTraps
+        DESCRIPTION
+            "WARNING: Admin or User account locked."
+    ::= 41
+
+    upsTrapTest TRAP-TYPE
+        ENTERPRISE       upsTraps
+        DESCRIPTION
+            "INFORMATION: Send test trap."
+    ::= 42
+
+    END

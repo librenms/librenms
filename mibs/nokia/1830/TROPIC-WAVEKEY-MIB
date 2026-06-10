@@ -1,0 +1,2323 @@
+TROPIC-WAVEKEY-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      Unsigned32, Integer32                   FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TruthValue, TimeStamp                   FROM SNMPv2-TC
+      TnOchStatus,
+      AluWdmDisabledEnabled,
+      TnCommand                               FROM TROPIC-TC
+      tnShelfIndex                            FROM TROPIC-SHELF-MIB
+      tnSlotIndex                             FROM TROPIC-SLOT-MIB
+      InterfaceIndexOrZero,
+      ifIndex                                 FROM IF-MIB
+      tnCardModules, tnWaveKeyMIB             FROM TROPIC-GLOBAL-REG;
+
+  tnWaveKeyMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202102191200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "The WT MIB."
+
+      REVISION    "202102191200Z"
+      DESCRIPTION "Added the following to tnWtKeyTable:
+                   tnWtKeyCidCarrierChannelWidth."
+
+      REVISION    "202101291200Z"
+      DESCRIPTION "Added the following to tnWtKeyTable:
+                   tnWtKeyExpectedPSDPower
+                   tnWtKeyPresentPSDPower."
+
+      REVISION    "202012241200Z"
+      DESCRIPTION "Added the following to tnWtKeyTable:
+                   tnWtKeyCidChannelLoading."
+
+      REVISION    "201906071200Z"
+      DESCRIPTION "Added the following to tnWtKeySummaryTable:
+                   tnWtKeySummaryReceivedWKMaskInL
+                   tnWtKeySummaryReceivedWKMaskOutL."
+
+      REVISION    "201812141200Z"
+      DESCRIPTION "Added the following to tnWaveKeyDecodeTable:
+                   tnWaveKeyDecodeUpstreamDetectIfIndexInL
+                   tnWaveKeyDecodeUpstreamDetectIfIndexOutL."
+
+      REVISION    "201804061200Z"
+      DESCRIPTION "Added the following to tnWtKeyDecodeInfoTable:
+                   tnWtKeyDecodeInfoMaxSupportedExpectedPowerOutL
+                   tnWtKeyDecodeInfoMinSupportedExpectedPowerOutL."
+
+      REVISION    "201803091200Z"
+      DESCRIPTION "Changed SYNTAX of the following from (SIZE(0..80)) to (SIZE(0..276)):
+                   tnWaveKeyEncodeTrailName
+                   tnWtKeyTrailName."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201710201200Z"
+      DESCRIPTION "Added the following to tnWaveKeyDecodeTable:
+                   tnWaveKeyDecodeSupportedTrxBands."
+
+      REVISION    "201710031200Z"
+      DESCRIPTION "Added the following to tnWaveKeyDecodeTable:
+                   tnWaveKeyDecodeCurrentUpstreamLossInL
+                   tnWaveKeyDecodeUpstreamLossInL
+                   tnWaveKeyDecodeMaxPlannedLossInL
+                   tnWaveKeyDecodeMinPlannedLossInL
+                   tnWaveKeyDecodeTypicalPlannedLossInL
+                   tnWaveKeyDecodeCurrentUpstreamLossOutL
+                   tnWaveKeyDecodeUpstreamLossOutL
+                   tnWaveKeyDecodeMaxPlannedLossOutL
+                   tnWaveKeyDecodeMinPlannedLossOutL
+                   tnWaveKeyDecodeTypicalPlannedLossOutL."
+
+      REVISION    "201707191200Z"
+      DESCRIPTION "Modified the range from (SIZE(0..514)) to (SIZE(0..1286))
+                   for the following attributes:
+                   tnWtKeySummaryExpectedWKMaskIn
+                   tnWtKeySummaryExpectedWKMaskOut
+                   tnWtKeySummaryReceivedWKMaskIn
+                   tnWtKeySummaryReceivedWKMaskOut
+                   tnWtKeySummaryUnexpectedWKMaskIn
+                   tnWtKeySummaryUnexpectedWKMaskOut
+                   tnWtocmChanInfoSummaryExpectedWKMask
+                   tnWtocmChanInfoSummaryNoLosWKMask
+                   tnWtocmChanInfoSummaryConfirmWKMask
+                   tnWtocmChanInfoSummaryUnexpectedWKMask
+                   tnWtocmChanInfoSummaryProcessedWKMask."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Fixed MIB compile issues."
+
+      REVISION    "201705051200Z"
+      DESCRIPTION "Added the following to tnWtocmChanInfoTable:
+                   tnWtocmChanInfoUnkeyed."
+
+      REVISION    "201703241200Z"
+      DESCRIPTION "Added the following to tnWtKeyTable:
+                   tnWtKeyCidUnkeyed."
+
+      REVISION    "201701031200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnWtocmScreenedUnexpectedChannelInfoTable."
+
+      REVISION    "201612151200Z"
+      DESCRIPTION "Changed the syntax from InterfaceIndex to InterfaceIndexOrZero
+                   for the following:
+                   tnWaveKeyDecodeUpstreamDetectIfIndexIn
+                   tnWaveKeyDecodeUpstreamDetectIfIndexOut."
+
+      REVISION    "201611231200Z"
+      DESCRIPTION "Added the following table:
+                   tnWtocmUnexpectedKeysInfoTable."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201609301200Z"
+      DESCRIPTION "1) Changed SYNTAX of the following from (SIZE(0..12))
+                      to (SIZE(0..514)):
+                      tnWtocmChanInfoSummaryExpectedWKMask
+                      tnWtocmChanInfoSummaryNoLosWKMask
+                      tnWtocmChanInfoSummaryConfirmWKMask
+                      tnWtocmChanInfoSummaryUnexpectedWKMask
+                      tnWtocmChanInfoSummaryProcessedWKMask
+                   2) Added  SYNTAX to the following of Range (SIZE(0..514))
+                      tnWtKeySummaryExpectedWKMaskIn
+                      tnWtKeySummaryExpectedWKMaskOut
+                      tnWtKeySummaryReceivedWKMaskIn
+                      tnWtKeySummaryReceivedWKMaskOut
+                      tnWtKeySummaryUnexpectedWKMaskIn
+                      tnWtKeySummaryUnexpectedWKMaskOut."
+
+      REVISION    "201608261200Z"
+      DESCRIPTION "Added the following to tnWtocmScreenedUnexpectedChannelInfoTable:
+                   tnUnexpectedWtKeyIndex."
+
+      REVISION    "201608091200Z"
+      DESCRIPTION "Added the following table:
+                   tnWtocmScreenedUnexpectedChannelInfoTable."
+
+      REVISION    "201605121200Z"
+      DESCRIPTION "1) Added the following table:
+                      tnWaveKeyUseInDomainTable.
+                   2) Marked the following as deprecated:
+                      tnDomainWaveKeyTable."
+
+      REVISION    "201602101200Z"
+      DESCRIPTION "Added the following to tnWtEncodePortCapabilityTable:
+                   tnWtEncodePortCapabilityEnabledByUser."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "Added ranges and DEFVAL to attributes."
+
+      REVISION    "201308021200Z"
+      DESCRIPTION "Added the following to tnWtocmChanInfoTable:
+                   tnWtocmChanInfoOSNRTimeStamp."
+
+      REVISION    "201304121200Z"
+      DESCRIPTION "1) Added the following table:
+                      tnDomainWaveKeyTable.
+                   2) Marked the following as obsolete:
+                      tnWaveKeyScalars
+                      tnAlarmPanelEvents."
+
+      REVISION    "201303141200Z"
+      DESCRIPTION "Added the following table:
+                   tnWtocmaChanConfigTable."
+
+      REVISION    "201209011200Z"
+      DESCRIPTION "Added the following to tnWtocmChanInfoTable:
+                   tnWtocmChanInfoPresentOSNR."
+
+      REVISION    "201111301200Z"
+      DESCRIPTION "Updated description of the following:
+                   tnWtKeyExpectedPower."
+
+      REVISION    "201106211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnWtocmUnexpectedChanInfoTable
+                   tnWtocmChanInfoApplicability."
+
+      REVISION    "201105311200Z"
+      DESCRIPTION "1) Added tnWtocmUnexpectedChannelInfoTable.
+                   2) Marked the following as deprecated:
+                      tnWtocmUnexpectedChanInfoTable."
+
+      REVISION    "201105231200Z"
+      DESCRIPTION "Added DEFVAL for the following attributes:
+                   tnWaveKeyDecodeMinPlannedLossIn, -9900
+                   tnWaveKeyDecodeMinPlannedLossOut, -9900
+                   tnWaveKeyDecodeMaxPlannedLossIn, 9900
+                   tnWaveKeyDecodeMaxPlannedLossOut, 9900
+                   tnWaveKeyDecodeTypicalPlannedLossIn, -9900
+                   tnWaveKeyDecodeTypicalPlannedLossOut, -9900
+                   tnWtEncodeCardExpectedPowerDev, 100
+                   tnWtEncodeCardExpectedPowerTolerance, 0
+                   tnWtKeyExpectedWK1, 0
+                   tnWtKeyExpectedWK2, 0
+                   tnWtKeyExpectedPower, -9900
+                   tnWtKeyExpectedPowerDev, 250
+                   tnWtKeyExpectedPowerTol, 0
+                   tnWtocmChanInfoExpectedWK1, 0
+                   tnWtocmChanInfoExpectedWK2, 0."
+
+      REVISION    "201012021200Z"
+      DESCRIPTION "1) Marked the following as deprecated:
+                      tnWtocmChanInfoApplicability.
+                   2) Added the following to tnWtocmChanInfoTable:
+                      tnWtocmChanInfoProcessingState."
+
+      REVISION    "201007291200Z"
+      DESCRIPTION "Updated ranges of tnWaveKeyEncodeProgrammedNwOutputPower
+                   for 10 Gig, 40 Gig, and 100 Gig transponders."
+
+      REVISION    "201007211200Z"
+      DESCRIPTION "1) Added a new MIB table, tnWtocmChanInfoTable, with
+                      the following MIB attributes:
+                      tnWtocmChanInfoExpectedWK1
+                      tnWtocmChanInfoExpectedWK2
+                      tnWtocmChanInfoPresentPower
+                      tnWtocmChanInfoPresentPowerMonitoredPort
+                      tnWtocmChanInfoApplicability.
+                   2) Added a new MIB table, tnWtocmUnexpectedChanInfoTable,
+                      with the following MIB attributes:
+                      tnWtocmUnexpectedChanInfoUnexpectedWtKey.
+                   3) Added a new MIB table, tnWtocmChanInfoSummaryTable,
+                      with the following MIB attributes:
+                      tnWtocmChanInfoSummaryExpectedWKMask
+                      tnWtocmChanInfoSummaryNoLosWKMask
+                      tnWtocmChanInfoSummaryConfirmWKMask
+                      tnWtocmChanInfoSummaryUnexpectedWKMask
+                      tnWtocmChanInfoSummaryProcessedWKMask."
+
+      REVISION    "201006231200Z"
+      DESCRIPTION "Added the following to tnWaveKeyDecodeTable:
+                   tnWaveKeyDecodeCurrentUpstreamLossIn
+                   tnWaveKeyDecodeCurrentUpstreamLossOut."
+
+      REVISION    "200907171200Z"
+      DESCRIPTION "Marked the following as obsoleted:
+                   tnWaveKeyCoherentNoiseTable and
+                   tnWaveKeyCoherentNoiseBinTable."
+
+      REVISION    "200904101200Z"
+      DESCRIPTION "Added range for 4DPA4 for
+                   tnWaveKeyEncodeProgrammedNwOutputPower."
+
+      REVISION    "200904071200Z"
+      DESCRIPTION "Changed upper range of Wave Key MIB attributes to 4096
+                   for 88 channels."
+
+      REVISION    "200903031200Z"
+      DESCRIPTION "Used AluWdmDisabledEnabled common enum in TROPIC-TC."
+
+      REVISION    "200902271200Z"
+      DESCRIPTION "Used AluWdmDisabledEnabled common enum in SNMPv2-TC."
+
+      REVISION    "200901061200Z"
+      DESCRIPTION "Changed upper bound of tnWtKeyExpectedPowerDev from
+                   500 to 1000."
+
+      REVISION    "200805021200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Updated the description of tnWtKeySummaryTable to
+                      include an explanation of how the octet string
+                      attribute values are formatted."
+
+      ::= { tnCardModules 2 }
+
+  tnWaveKeyConf        OBJECT IDENTIFIER ::= { tnWaveKeyMIB 1 }
+  tnWaveKeyGroups      OBJECT IDENTIFIER ::= { tnWaveKeyConf 1 }
+  tnWaveKeyCompliances OBJECT IDENTIFIER ::= { tnWaveKeyConf 2 }
+  tnWaveKeyObjs        OBJECT IDENTIFIER ::= { tnWaveKeyMIB 2 }
+  tnWaveKeyBasics      OBJECT IDENTIFIER ::= { tnWaveKeyObjs 1 }
+--  obsolete
+--  tnWaveKeyScalars     OBJECT IDENTIFIER ::= { tnWaveKeyObjs 2 }
+--  tnWaveKeyEvents      OBJECT IDENTIFIER ::= { tnWaveKeyMIB 3 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnWaveKeyTable           OBJECT-TYPE ::= { tnWaveKeyBasics 1 }
+--    tnUnexpectedWaveKeyTable OBJECT-TYPE ::= { tnWaveKeyBasics 2 }
+--    tnWaveKeySummaryTable    OBJECT-TYPE ::= { tnWaveKeyBasics 3 }
+
+--------------------------------------------------------------------------------
+-- Wave Key Encode Table
+--------------------------------------------------------------------------------
+    tnWaveKeyEncodeTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWaveKeyEncodeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table is a compilation of attributes
+                        associated with Wave Key encode capable ports."
+        ::= { tnWaveKeyBasics 4 }
+
+    tnWaveKeyEncodeEntry OBJECT-TYPE
+        SYNTAX         TnWaveKeyEncodeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnWaveKeyEncodeTable 1 }
+
+    TnWaveKeyEncodeEntry ::=
+        SEQUENCE {
+            tnWaveKeyEncodeProgrammedWK1           Unsigned32,
+            tnWaveKeyEncodeProgrammedWK2           Unsigned32,
+            tnWaveKeyEncodeTransmitState           AluWdmDisabledEnabled,
+            tnWaveKeyEncodeTrailName               SnmpAdminString,
+            tnWaveKeyEncodeProgrammedNwOutputPower Integer32,
+            tnWaveKeyEncodePresentNwOutputPower    Integer32,
+            tnWaveKeyEncodeMaxAttainablePower      Integer32,
+            tnWaveKeyEncodeMinAttainablePower      Integer32,
+            tnWaveKeyEncodePowerUpperMargin        Unsigned32,
+            tnWaveKeyEncodePowerLowerMargin        Unsigned32
+        }
+
+    tnWaveKeyEncodeProgrammedWK1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected.
+
+                        Sets are not supported.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyEncodeEntry 1 }
+
+    tnWaveKeyEncodeProgrammedWK2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected.
+
+                        Sets are not supported.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyEncodeEntry 2 }
+
+    tnWaveKeyEncodeTransmitState OBJECT-TYPE
+        SYNTAX         AluWdmDisabledEnabled
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not Wave Keys are
+                        transmitted.
+
+                        Sets are not supported."
+        DEFVAL         { disabled }
+        ::= { tnWaveKeyEncodeEntry 3 }
+
+    tnWaveKeyEncodeTrailName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..276))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The trail name of the encode point."
+        DEFVAL         { "" }
+        ::= { tnWaveKeyEncodeEntry 4 }
+
+    tnWaveKeyEncodeProgrammedNwOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The programmed AC output power of the port
+                        (EVOA), measured in mBm.  It is the power of the
+                        full optical signal.
+
+                        Current configurable range:
+                        -2000 to -300 (CAD or COF)
+                        -2000 to  200 (2.5 Gig transponders)
+                        -2000 to  400 (10 Gig and 40 Gig non-coherent transponders)
+                        -2000 to -550 (4 Gig dual port transponders)
+                        -1700 to  400 (40 Gig and 100 Gig coherent transponders)."
+        ::= { tnWaveKeyEncodeEntry 5 }
+
+    tnWaveKeyEncodePresentNwOutputPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The present AC output power of the port (EVOA),
+                        measured in mBm.  It is the power of the full
+                        optical signal.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyEncodeEntry 6 }
+
+    tnWaveKeyEncodeMaxAttainablePower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The maximum attainable AC output power of the
+                        port, measured in mBm.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyEncodeEntry 7 }
+
+    tnWaveKeyEncodeMinAttainablePower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The minimum attainable AC output power of the
+                        port, measured in mBm.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyEncodeEntry 8 }
+
+    tnWaveKeyEncodePowerUpperMargin OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The amount that the input power could fluctuate
+                        by, measured in mB.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyEncodeEntry 9 }
+
+    tnWaveKeyEncodePowerLowerMargin OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The amount that the input power could fluctuate
+                        by; measured in mB.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyEncodeEntry 10 }
+
+--------------------------------------------------------------------------------
+-- Wave Key Decode Table
+--------------------------------------------------------------------------------
+    tnWaveKeyDecodeTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWaveKeyDecodeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table is a compilation of attributes
+                        associated with Wave Key decode capable ports."
+        ::= { tnWaveKeyBasics 5 }
+
+    tnWaveKeyDecodeEntry OBJECT-TYPE
+        SYNTAX         TnWaveKeyDecodeEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnWaveKeyDecodeTable 1 }
+
+    TnWaveKeyDecodeEntry ::=
+        SEQUENCE {
+            tnWaveKeyDecodeSupportedDirections           INTEGER,
+--            obsolete
+--            tnWaveKeyDecodeMaxSupportedExpectedPowerIn   Integer32,
+--            tnWaveKeyDecodeMaxSupportedExpectedPowerOut  Integer32,
+--            tnWaveKeyDecodeMinSupportedExpectedPowerIn   Integer32,
+--            tnWaveKeyDecodeMinSupportedExpectedPowerOut  Integer32,
+            tnWaveKeyDecodeMinPlannedLossIn              Integer32,
+            tnWaveKeyDecodeMinPlannedLossOut             Integer32,
+            tnWaveKeyDecodeMaxPlannedLossIn              Integer32,
+            tnWaveKeyDecodeMaxPlannedLossOut             Integer32,
+            tnWaveKeyDecodeTypicalPlannedLossIn          Integer32,
+            tnWaveKeyDecodeTypicalPlannedLossOut         Integer32,
+            tnWaveKeyDecodeUpstreamLossIn                Integer32,
+            tnWaveKeyDecodeUpstreamLossOut               Integer32,
+            tnWaveKeyDecodeUpstreamDetectIfIndexIn       InterfaceIndexOrZero,
+            tnWaveKeyDecodeUpstreamDetectIfIndexOut      InterfaceIndexOrZero,
+            tnWaveKeyDecodeInferredIn                    TruthValue,
+            tnWaveKeyDecodeInferredOut                   TruthValue,
+            tnWaveKeyDecodeModifyPowerIn                 TruthValue,
+            tnWaveKeyDecodeModifyPowerOut                TruthValue,
+            tnWaveKeyDecodeCurrentUpstreamLossIn         Integer32,
+            tnWaveKeyDecodeCurrentUpstreamLossOut        Integer32,
+            tnWaveKeyDecodeCurrentUpstreamLossInL        Integer32,
+            tnWaveKeyDecodeUpstreamLossInL               Integer32,
+            tnWaveKeyDecodeMaxPlannedLossInL             Integer32,
+            tnWaveKeyDecodeMinPlannedLossInL             Integer32,
+            tnWaveKeyDecodeTypicalPlannedLossInL         Integer32,
+            tnWaveKeyDecodeCurrentUpstreamLossOutL       Integer32,
+            tnWaveKeyDecodeUpstreamLossOutL              Integer32,
+            tnWaveKeyDecodeMaxPlannedLossOutL            Integer32,
+            tnWaveKeyDecodeMinPlannedLossOutL            Integer32,
+            tnWaveKeyDecodeTypicalPlannedLossOutL        Integer32,
+            tnWaveKeyDecodeSupportedTrxBands             INTEGER,
+            tnWaveKeyDecodeUpstreamDetectIfIndexInL      InterfaceIndexOrZero,
+            tnWaveKeyDecodeUpstreamDetectIfIndexOutL     InterfaceIndexOrZero
+        }
+
+    tnWaveKeyDecodeSupportedDirections OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         in(1),
+                         out(2),
+                         both(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The supported directions."
+        ::= { tnWaveKeyDecodeEntry 1 }
+
+--    obsolete
+--    tnWaveKeyDecodeMaxSupportedExpectedPowerIn  OBJECT-TYPE ::= { tnWaveKeyDecodeEntry 2 }
+--    tnWaveKeyDecodeMaxSupportedExpectedPowerOut OBJECT-TYPE ::= { tnWaveKeyDecodeEntry 3 }
+--    tnWaveKeyDecodeMinSupportedExpectedPowerIn  OBJECT-TYPE ::= { tnWaveKeyDecodeEntry 4 }
+--    tnWaveKeyDecodeMinSupportedExpectedPowerOut OBJECT-TYPE ::= { tnWaveKeyDecodeEntry 5 }
+
+    tnWaveKeyDecodeMinPlannedLossIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 6 }
+
+    tnWaveKeyDecodeMinPlannedLossOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 7 }
+
+    tnWaveKeyDecodeMaxPlannedLossIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 8 }
+
+    tnWaveKeyDecodeMaxPlannedLossOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 9 }
+
+    tnWaveKeyDecodeTypicalPlannedLossIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 10 }
+
+    tnWaveKeyDecodeTypicalPlannedLossOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 11 }
+
+    tnWaveKeyDecodeUpstreamLossIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss in, calculated
+                        at commissioning time.
+
+                        Current configurable range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 12 }
+
+    tnWaveKeyDecodeUpstreamLossOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss out, calculated
+                        at commissioning time.
+
+                        Current configurable range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 13 }
+
+    tnWaveKeyDecodeUpstreamDetectIfIndexIn OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyDecodeEntry 14 }
+
+    tnWaveKeyDecodeUpstreamDetectIfIndexOut OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyDecodeEntry 15 }
+
+    tnWaveKeyDecodeInferredIn OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the Detect point is
+                        inferred."
+        ::= { tnWaveKeyDecodeEntry 16 }
+
+    tnWaveKeyDecodeInferredOut OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the Detect point is
+                        inferred."
+        ::= { tnWaveKeyDecodeEntry 17 }
+
+    tnWaveKeyDecodeModifyPowerIn OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the Detect point power
+                        can be modified."
+        ::= { tnWaveKeyDecodeEntry 18 }
+
+    tnWaveKeyDecodeModifyPowerOut OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the Detect point power
+                        can be modified."
+        ::= { tnWaveKeyDecodeEntry 19 }
+
+    tnWaveKeyDecodeCurrentUpstreamLossIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss in, calculated
+                        most recently.
+
+                        Current range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 20 }
+
+    tnWaveKeyDecodeCurrentUpstreamLossOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss out, calculated
+                        most recently.
+
+                        Current range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 21 }
+
+    tnWaveKeyDecodeCurrentUpstreamLossInL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss in, calculated
+                        most recently.
+
+                        Current range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 22 }
+
+    tnWaveKeyDecodeUpstreamLossInL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss in, calculated
+                        at commissioning time.
+
+                        Current configurable range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 23 }
+
+    tnWaveKeyDecodeMaxPlannedLossInL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 24 }
+
+    tnWaveKeyDecodeMinPlannedLossInL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 25 }
+
+    tnWaveKeyDecodeTypicalPlannedLossInL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 26 }
+
+    tnWaveKeyDecodeCurrentUpstreamLossOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss out, calculated
+                        most recently.
+
+                        Current range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 27 }
+
+    tnWaveKeyDecodeUpstreamLossOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Detect point to detect point loss out, calculated
+                        at commissioning time.
+
+                        Current configurable range: -9900 to 9900."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 28 }
+
+    tnWaveKeyDecodeMaxPlannedLossOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 29 }
+
+    tnWaveKeyDecodeMinPlannedLossOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 30 }
+
+    tnWaveKeyDecodeTypicalPlannedLossOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: -9900 to 5000."
+        DEFVAL         { -9900 }
+        ::= { tnWaveKeyDecodeEntry 31 }
+
+    tnWaveKeyDecodeSupportedTrxBands OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         c(1),
+                         l(2),
+                         cAndL(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The transmission bands supported."
+        ::= { tnWaveKeyDecodeEntry 32 }
+
+    tnWaveKeyDecodeUpstreamDetectIfIndexInL OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyDecodeEntry 33 }
+
+    tnWaveKeyDecodeUpstreamDetectIfIndexOutL OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyDecodeEntry 34 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnWaveKeyCoherentNoiseTable OBJECT-TYPE ::= { tnWaveKeyBasics 6 }
+--    tnWaveKeyCoherentNoiseBinTable OBJECT-TYPE ::= { tnWaveKeyBasics 7 }
+
+--------------------------------------------------------------------------------
+-- Wavelength Tracker Encode Port Capability Table
+--------------------------------------------------------------------------------
+    tnWtEncodePortCapabilityTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtEncodePortCapabilityEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyBasics 8 }
+
+    tnWtEncodePortCapabilityEntry OBJECT-TYPE
+        SYNTAX         TnWtEncodePortCapabilityEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnWtEncodePortCapabilityTable 1 }
+
+    TnWtEncodePortCapabilityEntry ::=
+        SEQUENCE {
+            tnWtEncodePortCapabilityProgrammed TruthValue,
+            tnWtEncodePortCapabilityPresent    TruthValue,
+            tnWtEncodePortCapabilityInUse      TruthValue,
+            tnWtEncodePortCapabilityEnabledByUser   TruthValue
+        }
+
+    tnWtEncodePortCapabilityProgrammed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the Wavelength Tracker
+                        feature is programmed."
+        ::= { tnWtEncodePortCapabilityEntry 1 }
+
+    tnWtEncodePortCapabilityPresent OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the port is equipped
+                        with the Wavelength Tracker feature."
+        ::= { tnWtEncodePortCapabilityEntry 2 }
+
+    tnWtEncodePortCapabilityInUse OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the port Wavelength
+                        Tracker feature is in use by the system for
+                        services."
+        ::= { tnWtEncodePortCapabilityEntry 3 }
+
+    tnWtEncodePortCapabilityEnabledByUser OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the user has enabled a
+                        port with optional Wavelength Tracker Encode to be used
+                        as an encoder. Requires pluggable XFP type programmed for
+                        port to support WT encode in order to be set to true.  "
+        DEFVAL         { false }
+        ::= { tnWtEncodePortCapabilityEntry 4 }
+
+--------------------------------------------------------------------------------
+-- Wavelength Tracker Encode Card Table
+--------------------------------------------------------------------------------
+    tnWtEncodeCardTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtEncodeCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "A table of Wavelength Tracker encode card
+                        attributes."
+        ::= { tnWaveKeyBasics 9 }
+
+    tnWtEncodeCardEntry OBJECT-TYPE
+        SYNTAX         TnWtEncodeCardEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnWtEncodeCardTable 1 }
+
+    TnWtEncodeCardEntry ::= SEQUENCE {
+        tnWtEncodeCardExpectedPowerDev       Unsigned32,
+        tnWtEncodeCardExpectedPowerTolerance Unsigned32
+    }
+
+    tnWtEncodeCardExpectedPowerDev OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: 0 to 1000."
+        DEFVAL         { 100 }
+        ::= { tnWtEncodeCardEntry 1 }
+
+    tnWtEncodeCardExpectedPowerTolerance OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Current configurable range: 0 to 1000."
+        DEFVAL         { 0 }
+        ::= { tnWtEncodeCardEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Wavelength Tracker Encode Card Capability Table
+--------------------------------------------------------------------------------
+    tnWtEncodeCardCapabilityTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtEncodeCardCapabilityEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyBasics 10 }
+
+    tnWtEncodeCardCapabilityEntry OBJECT-TYPE
+        SYNTAX         TnWtEncodeCardCapabilityEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnShelfIndex,
+                tnSlotIndex }
+        ::= { tnWtEncodeCardCapabilityTable 1 }
+
+    TnWtEncodeCardCapabilityEntry ::=
+        SEQUENCE {
+            tnWtEncodeCardCapabilityProgrammed TruthValue,
+            tnWtEncodeCardCapabilityPresent    TruthValue,
+            tnWtEncodeCardCapabilityInUse      TruthValue
+        }
+
+    tnWtEncodeCardCapabilityProgrammed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the Wavelength Tracker
+                        feature is programmed on any port on the card."
+        ::= { tnWtEncodeCardCapabilityEntry 1 }
+
+    tnWtEncodeCardCapabilityPresent OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not any port on the card
+                        is equipped with the Wavelength Tracker feature."
+        ::= { tnWtEncodeCardCapabilityEntry 2 }
+
+    tnWtEncodeCardCapabilityInUse OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether or not the Wavelength Tracker
+                        feature of any port on the card is in use by the
+                        system for services."
+        ::= { tnWtEncodeCardCapabilityEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Wavelength Tracker Key Table
+--------------------------------------------------------------------------------
+    tnWtKeyTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtKeyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Through this table, a network operator may
+                        configure, with direction/channel granularity,
+                        expected Wave Keys and the power level of the
+                        Wave Keys.  The network operator can also read
+                        back the present power level of the Wave Keys
+                        on a particular channel, if they are present."
+        ::= { tnWaveKeyBasics 11 }
+
+    tnWtKeyEntry OBJECT-TYPE
+        SYNTAX         TnWtKeyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnDirection,
+                tnChannel }
+        ::= { tnWtKeyTable 1 }
+
+    TnWtKeyEntry ::=
+        SEQUENCE {
+            tnDirection                       INTEGER,
+            tnChannel                         Unsigned32,
+            tnWtKeyExpectedWK1                Unsigned32,
+            tnWtKeyExpectedWK2                Unsigned32,
+            tnWtKeyExpectedPower              Integer32,
+            tnWtKeyExpectedPowerDev           Unsigned32,
+            tnWtKeyPresentPower               Integer32,
+            tnWtKeyReceived                   TruthValue,
+            tnWtKeyExpectedPowerTol           Unsigned32,
+            tnWtKeySynchronizePower           TnCommand,
+            tnWtKeyTrailName                  SnmpAdminString,
+            tnWtKeyStatus                     TnOchStatus,
+            tnWtKeyApplicability              INTEGER,
+            tnWtKeyCidUnkeyed                 TruthValue,
+            tnWtKeyCidChannelLoading          INTEGER,
+            tnWtKeyExpectedPSDPower           Integer32,
+            tnWtKeyPresentPSDPower            Integer32,
+            tnWtKeyCidCarrierChannelWidth     Integer32
+        }
+
+    tnDirection OBJECT-TYPE
+        SYNTAX         INTEGER{
+                         out(1),
+                         in(2)
+                       }
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The signal direction."
+        ::= { tnWtKeyEntry 1 }
+
+    tnChannel OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The ITU channel."
+        ::= { tnWtKeyEntry 2 }
+
+    tnWtKeyExpectedWK1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be riding
+                        on a particular channel.  A value of zero indicates
+                        no Wave Key expected.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWtKeyEntry 3 }
+
+    tnWtKeyExpectedWK2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be riding
+                        on a particular channel.  A value of zero indicates
+                        no Wave Key expected.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWtKeyEntry 4 }
+
+    tnWtKeyExpectedPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The power, expressed in units of mBm, is associated
+                        with the expected Wave Keys.  It is the average power
+                        of the Wave Keys.  Note that this attribute can be
+                        changed by SCOT relatively frequently.  So to avoid
+                        the possibility of too many change notifications, they
+                        will not be sent when this attribute is changed.  It
+                        must be retrieved when needed.
+
+                        Current configurable range: -9900 to 1100."
+        DEFVAL         { -9900 }
+        ::= { tnWtKeyEntry 5 }
+
+    tnWtKeyExpectedPowerDev OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The allowed deviation of the expected power, expressed
+                        in units of mB.
+
+                        Current configurable range: 0 to 1000."
+        DEFVAL         { 250 }
+        ::= { tnWtKeyEntry 6 }
+
+    tnWtKeyPresentPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The power, expressed in units of mBm, associated with
+                        the received Wave Keys.  The value will be the average,
+                        over the sampling interval, of the Wave Keys."
+        DEFVAL         { -9900 }
+        ::= { tnWtKeyEntry 7 }
+
+    tnWtKeyReceived OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "A indication that the two expected Wave Keys are
+                        present on a particular channel."
+        DEFVAL         { false }
+        ::= { tnWtKeyEntry 8 }
+
+    tnWtKeyExpectedPowerTol OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The allowed tolerance of the expected power,
+                        expressed in units of mB.
+
+                        Current configurable range: 0 to 500."
+        DEFVAL         { 0 }
+        ::= { tnWtKeyEntry 9 }
+
+    tnWtKeySynchronizePower OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Setting this attribute to a value of execute sets the
+                        expected power equal to the present power.  If the
+                        present power is unavailable the set will be failed
+                        back to the user.  When read, this attribute always
+                        returns noCmd."
+        ::= { tnWtKeyEntry 10 }
+
+    tnWtKeyTrailName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..276))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The trail name of the encode point."
+        ::= { tnWtKeyEntry 11 }
+
+    tnWtKeyStatus OBJECT-TYPE
+        SYNTAX         TnOchStatus
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { unassigned }
+        ::= { tnWtKeyEntry 12 }
+
+    tnWtKeyApplicability OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         applicableAndAvailable(2),
+                         applicableAndUnavailable(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Values include:
+
+                       notApplicable - no wave keys configured
+                       applicableAndAvailable - wave keys configured and
+                         power is available
+                       applicableAndUnavailable - wave keys configured
+                         and power is unavailable
+
+                       Reasons for a value of applicableAndUnavailable
+                       include (but are not restricted to):
+
+                       - The WSS Add Amplet is in a bad area (i.e., input
+                         power too high or too low).
+                       - There is a module failure."
+        ::= { tnWtKeyEntry 13 }
+
+    tnWtKeyCidUnkeyed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates Unkeyed channel."
+        DEFVAL         { false }
+        ::= { tnWtKeyEntry 14 }
+
+    tnWtKeyCidChannelLoading OBJECT-TYPE
+        SYNTAX         INTEGER{
+                         mediaChannel(1),
+                         noiseChannel(2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWtKeyEntry 15 }
+
+    tnWtKeyExpectedPSDPower OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PSD target power with units mBm/GHz.
+                        Internal Calculations:
+                        PSD(dBm/GHz) = power (dBm) - 10 * log (width(GHz))."
+        ::= { tnWtKeyEntry 16 }
+
+    tnWtKeyPresentPSDPower OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "PSD measured power with units mBm/GHz.
+                        Internal Calculations:
+                        PSD(dBm/GHz) = power (dBm) - 10 * log (width(GHz))."
+        ::= { tnWtKeyEntry 17 }
+
+    tnWtKeyCidCarrierChannelWidth OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "MHz"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Channel width."
+        ::= { tnWtKeyEntry 18 }
+
+--------------------------------------------------------------------------------
+-- Unexpected Wave Key Table
+--------------------------------------------------------------------------------
+    tnUnexpectedWtKeyTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnUnexpectedWtKeyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides a complete list of all
+                        unexpected received Wave Keys."
+        ::= { tnWaveKeyBasics 12 }
+
+    tnUnexpectedWtKeyEntry OBJECT-TYPE
+        SYNTAX         TnUnexpectedWtKeyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnDirection,
+                tnChannel,
+                tnUnexpectedWtKeyIndex }
+        ::= { tnUnexpectedWtKeyTable 1 }
+
+    TnUnexpectedWtKeyEntry ::=
+        SEQUENCE {
+            tnUnexpectedWtKeyIndex Unsigned32,
+            tnUnexpectedWtKey      Unsigned32,
+            tnUnexpectedWtKeyPower Integer32
+        }
+
+    tnUnexpectedWtKeyIndex OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "An arbitrary id given to each of the unexpected
+                        Wave Keys."
+        ::= { tnUnexpectedWtKeyEntry 1 }
+
+    tnUnexpectedWtKey OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys."
+        ::= { tnUnexpectedWtKeyEntry 2 }
+
+    tnUnexpectedWtKeyPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The power, expressed in units of mBm, associated
+                        with the unexpected Wave Key."
+        ::= { tnUnexpectedWtKeyEntry 3 }
+
+--------------------------------------------------------------------------------
+-- Wave Key Summary Table
+--------------------------------------------------------------------------------
+    tnWtKeySummaryTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtKeySummaryEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides a quick summary of the state
+                        of the Wavelength Tracker functionality on all
+                        Wavelength Tracker decode ports.
+
+                        The summary attributes are octet strings.  As an
+                        example, the following 6 octets are returned in
+                        summary MIB attribute tnWtKeySummaryExpectedWKMaskIn:
+
+                        00000100 00000000 00001000 01000010 00000000 11000000
+                        |    |   |      |     |     |    |            |
+                        60   55  52     45    40    35   30           19
+
+                        Each bit represents an ITU channel.  The ITU
+                        channel numbers decrement from the MSB of the 1st
+                        octet.  In the above data, there are expected wave
+                        keys on ITU channels 55, 40, 35, 30, 20, 19.  The
+                        remaining ITU channels have no expected wave keys."
+        ::= { tnWaveKeyBasics 13 }
+
+    tnWtKeySummaryEntry OBJECT-TYPE
+        SYNTAX         TnWtKeySummaryEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnWtKeySummaryTable 1 }
+
+    TnWtKeySummaryEntry ::=
+        SEQUENCE {
+            tnWtKeySummaryExpectedWKMaskIn    OCTET STRING,
+            tnWtKeySummaryExpectedWKMaskOut   OCTET STRING,
+            tnWtKeySummaryReceivedWKMaskIn    OCTET STRING,
+            tnWtKeySummaryReceivedWKMaskOut   OCTET STRING,
+            tnWtKeySummaryUnexpectedWKMaskIn  OCTET STRING,
+            tnWtKeySummaryUnexpectedWKMaskOut OCTET STRING,
+            tnWtKeySummarySupportedDirections INTEGER,
+            tnWtKeySummaryReceivedWKMaskInL   OCTET STRING,
+            tnWtKeySummaryReceivedWKMaskOutL  OCTET STRING
+        }
+
+    tnWtKeySummaryExpectedWKMaskIn OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels in the IN direction against
+                        which expected Wave Keys have been programmed."
+        ::= { tnWtKeySummaryEntry 1 }
+
+    tnWtKeySummaryExpectedWKMaskOut OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels in the OUT direction against
+                        which expected Wave Keys have been programmed."
+        ::= { tnWtKeySummaryEntry 2 }
+
+    tnWtKeySummaryReceivedWKMaskIn OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels in the IN direction against
+                        which Wave Keys have been received."
+        ::= { tnWtKeySummaryEntry 3 }
+
+    tnWtKeySummaryReceivedWKMaskOut OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels in the OUT direction against
+                        which Wave Keys have been received."
+        ::= { tnWtKeySummaryEntry 4 }
+
+    tnWtKeySummaryUnexpectedWKMaskIn OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels in the IN direction against
+                        which unexpected Wave Keys have been received."
+        ::= { tnWtKeySummaryEntry 5 }
+
+    tnWtKeySummaryUnexpectedWKMaskOut OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels in the OUT direction against
+                        which unexpected Wave Keys have been received."
+        ::= { tnWtKeySummaryEntry 6 }
+
+    tnWtKeySummarySupportedDirections OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         in(1),
+                         out(2),
+                         both(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The supported directions."
+        ::= { tnWtKeySummaryEntry 7 }
+
+    tnWtKeySummaryReceivedWKMaskInL OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "L Band Summary of channels in the IN direction against
+                        which Wave Keys have been received."
+        ::= { tnWtKeySummaryEntry 8 }
+
+    tnWtKeySummaryReceivedWKMaskOutL OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "L Band Summary of channels in the OUT direction against
+                        which Wave Keys have been received."
+        ::= { tnWtKeySummaryEntry 9 }
+
+--------------------------------------------------------------------------------
+-- Wavelength Tracker Key Decode Info Table
+--------------------------------------------------------------------------------
+    tnWtKeyDecodeInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtKeyDecodeInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table is a compilation of read-only line
+                        card attributes associated with Wavelength
+                        Tracker key decode capable ports."
+        ::= { tnWaveKeyBasics 14 }
+
+    tnWtKeyDecodeInfoEntry OBJECT-TYPE
+        SYNTAX         TnWtKeyDecodeInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnWtKeyDecodeInfoTable 1 }
+
+    TnWtKeyDecodeInfoEntry ::=
+        SEQUENCE {
+            tnWtKeyDecodeInfoSupportedDirections            INTEGER,
+            tnWtKeyDecodeInfoMaxSupportedExpectedPowerIn    Integer32,
+            tnWtKeyDecodeInfoMaxSupportedExpectedPowerOut   Integer32,
+            tnWtKeyDecodeInfoMinSupportedExpectedPowerIn    Integer32,
+            tnWtKeyDecodeInfoMinSupportedExpectedPowerOut   Integer32,
+            tnWtKeyDecodeInfoMaxSupportedExpectedPowerOutL  Integer32,
+            tnWtKeyDecodeInfoMinSupportedExpectedPowerOutL  Integer32
+        }
+
+    tnWtKeyDecodeInfoSupportedDirections OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         in(1),
+                         out(2),
+                         both(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The supported directions."
+        ::= { tnWtKeyDecodeInfoEntry 1 }
+
+    tnWtKeyDecodeInfoMaxSupportedExpectedPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWtKeyDecodeInfoEntry 2 }
+
+    tnWtKeyDecodeInfoMaxSupportedExpectedPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWtKeyDecodeInfoEntry 3 }
+
+    tnWtKeyDecodeInfoMinSupportedExpectedPowerIn OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWtKeyDecodeInfoEntry 4 }
+
+    tnWtKeyDecodeInfoMinSupportedExpectedPowerOut OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWtKeyDecodeInfoEntry 5 }
+
+    tnWtKeyDecodeInfoMaxSupportedExpectedPowerOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWtKeyDecodeInfoEntry 6 }
+
+    tnWtKeyDecodeInfoMinSupportedExpectedPowerOutL OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWtKeyDecodeInfoEntry 7 }
+
+--------------------------------------------------------------------------------
+-- WTOCM Optical Channel Info Table
+--------------------------------------------------------------------------------
+    tnWtocmChanInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtocmChanInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Through this table, a network operator may read
+                        back, with channel granularity, expected Wave
+                        Keys and the power level of the channels."
+        ::= { tnWaveKeyBasics 15 }
+
+    tnWtocmChanInfoEntry OBJECT-TYPE
+        SYNTAX         TnWtocmChanInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnChannel }
+        ::= { tnWtocmChanInfoTable 1 }
+
+    TnWtocmChanInfoEntry ::=
+        SEQUENCE {
+            tnWtocmChanInfoExpectedWK1                Unsigned32,
+            tnWtocmChanInfoExpectedWK2                Unsigned32,
+            tnWtocmChanInfoPresentPower               Integer32,
+            tnWtocmChanInfoPresentPowerMonitoredPort  Integer32,
+--            obsolete
+--            tnWtocmChanInfoApplicability              INTEGER,
+            tnWtocmChanInfoProcessingState            INTEGER,
+            tnWtocmChanInfoPresentOSNR                Integer32,
+            tnWtocmChanInfoOSNRTimeStamp              TimeStamp,
+            tnWtocmChanInfoUnkeyed                    TruthValue
+        }
+
+    tnWtocmChanInfoExpectedWK1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWtocmChanInfoEntry 1 }
+
+    tnWtocmChanInfoExpectedWK2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected.
+
+                        Current range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnWtocmChanInfoEntry 2 }
+
+    tnWtocmChanInfoPresentPower OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The power, expressed in units of mBm, associated
+                        with the received channel at the WTOCM input port.
+                        A value of -9900 is reported if power < input
+                        threshold."
+        DEFVAL         { -9900 }
+        ::= { tnWtocmChanInfoEntry 3 }
+
+    tnWtocmChanInfoPresentPowerMonitoredPort OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mBm"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The power, expressed in units of mBm, associated
+                        with the received channel at the associated
+                        monitored port.  A value of -9900 is reported if
+                        power < input threshold."
+        DEFVAL         { -9900 }
+        ::= { tnWtocmChanInfoEntry 4 }
+
+--    obsolete
+--    tnWtocmChanInfoApplicability OBJECT-TYPE ::= { tnWtocmChanInfoEntry 5 }
+
+    tnWtocmChanInfoProcessingState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notProvisionedAndNotPresent(1),
+                         notProvisionedAndUnconfirmed(2),
+                         notProvisionedAndChannelPresentNoKeys(3),
+                         notProvisionedAndUnexpected(4),
+                         notProvisionedAndHardwareFault(5),
+                         provisionedAndNotPresent(6),
+                         provisionedAndUnconfirmed(7),
+                         provisionedAndChannelPresentNoKeys(8),
+                         provisionedAndUnexpected(9),
+                         provisionedWithExpectedAndUnexpected(10),
+                         provisionedAndConfirmed(11),
+                         provisionedAndHardwareFault(12)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Values include:
+                        notProvisionedAndNotPresent - not provisioned,
+                          no channel power present
+                        notProvisionedAndUnconfirmed - not prov, wavekey
+                          processing in progress
+                        notProvisionedAndChannelPresentNoKeys - not prov,
+                          wavekey processing complete, channel power
+                          present, no wavekeys
+                        notProvisionedAndUnexpected - not prov, wavekey
+                          processing complete, channel power present,
+                          with wavekeys
+                        notProvisionedAndHardwareFault - not prov, h/w
+                          fault
+                        provisionedAndNotPresent - prov, no channel power
+                          present
+                        provisionedAndUnconfirmed - prov, wavekey processing
+                          in progress
+                        provisionedAndChannelPresentNoKeys - prov, wavekey
+                          processing complete, channel power present, no
+                          wavekeys
+                        provisionedAndUnexpected - prov, wavekey processing
+                          complete, channel power present, unexpected
+                          wavekeys
+                        provisionedWithExpectedAndUnexpected - prov,
+                          wavekey processing complete, channel power
+                          present, expected and unexpected wavekeys
+                        provisionedAndConfirmed - prov, wavekey processing
+                          complete, channel power present, expected wavekeys
+                        provisionedAndHardwareFault - prov, h/w fault."
+        DEFVAL         { notProvisionedAndNotPresent }
+        ::= { tnWtocmChanInfoEntry 6 }
+
+    tnWtocmChanInfoPresentOSNR OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The OSNR, expressed in units of mB, associated
+                        with the received channel at the WTOCMA IN port.
+                        A value of -9900 is reported if power < input
+                        threshold."
+        DEFVAL         { -9900 }
+        ::= { tnWtocmChanInfoEntry 7 }
+
+    tnWtocmChanInfoOSNRTimeStamp OBJECT-TYPE
+        SYNTAX         TimeStamp
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The attribute indicates the time of the latest
+                        OSNR for each channel in LC."
+        DEFVAL         { 0 }
+        ::= { tnWtocmChanInfoEntry 8 }
+
+    tnWtocmChanInfoUnkeyed OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates Unkeyed channel."
+        DEFVAL         { false }
+        ::= { tnWtocmChanInfoEntry 9 }
+
+--------------------------------------------------------------------------------
+-- WTOCM Unexpected Channel Info Table
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnWtocmUnexpectedChanInfoTable OBJECT-TYPE ::= { tnWaveKeyBasics 16 }
+
+--------------------------------------------------------------------------------
+-- Wtocm Channel Info Summary Table
+--------------------------------------------------------------------------------
+    tnWtocmChanInfoSummaryTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtocmChanInfoSummaryEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides a quick summary of the state
+                        of the Wavelength Tracker functionality within
+                        the WTOCM.  The summary attributes are octet
+                        strings.  As an example, the following 6 octets
+                        are returned in summary MIB attribute
+                        tnChanInfoSummaryExpectedWKMaskIn:
+                        00000100 00000000 00001000 01000010 00000000
+                        11000000
+                        | | | | | | | |
+                        60 55 52 45 40 35 30 19
+
+                        Each bit represents an ITU channel. The ITU
+                        channel numbers decrement from the MSB of the
+                        first octet.  In the above data, there are
+                        expected wave keys on ITU channels 55, 40, 35,
+                        30, 20, 19.  The remaining ITU channels have no
+                        expected wave keys."
+        ::= { tnWaveKeyBasics 17 }
+
+    tnWtocmChanInfoSummaryEntry OBJECT-TYPE
+        SYNTAX         TnWtocmChanInfoSummaryEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnWtocmChanInfoSummaryTable 1 }
+
+    TnWtocmChanInfoSummaryEntry ::=
+        SEQUENCE {
+            tnWtocmChanInfoSummaryExpectedWKMask    OCTET STRING,
+            tnWtocmChanInfoSummaryNoLosWKMask       OCTET STRING,
+            tnWtocmChanInfoSummaryConfirmWKMask     OCTET STRING,
+            tnWtocmChanInfoSummaryUnexpectedWKMask  OCTET STRING,
+            tnWtocmChanInfoSummaryProcessedWKMask   OCTET STRING
+        }
+
+    tnWtocmChanInfoSummaryExpectedWKMask OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels against which expected Wave
+                        Keys have been programmed.
+                        0 = channels have no keys provisioned
+                        1 = channels have keys provisioned."
+        ::= { tnWtocmChanInfoSummaryEntry 1 }
+
+    tnWtocmChanInfoSummaryNoLosWKMask OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels against which channels have
+                        power greater than WTOCM input LOS threshold.
+                        0 = channels have no detected power
+                        1 = channels have power detected."
+        ::= { tnWtocmChanInfoSummaryEntry 2 }
+
+    tnWtocmChanInfoSummaryConfirmWKMask OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels against which channels have
+                        EXPECTED keys for PROVISIONED channels.
+                        0 = keys not provisioned OR keys are provisioned
+                            but keys are not processed yet
+                        1 = keys are provisioned, processed, and present."
+        ::= { tnWtocmChanInfoSummaryEntry 3 }
+
+    tnWtocmChanInfoSummaryUnexpectedWKMask OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels against which unexpected Wave
+                        Keys have been received.
+                        0 = keys not processed OR keys processed and no
+                            UNEXPECTED found
+                        1 = keys processed and UNEXPECTED found."
+        ::= { tnWtocmChanInfoSummaryEntry 4}
+
+    tnWtocmChanInfoSummaryProcessedWKMask OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(0..1286))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of channels against which Wave Keys have
+                        been processed.
+                        0 = no need to process, no power measured OR power
+                            measured and processing not complete
+                        1 = power is received and processing is complete."
+        ::= { tnWtocmChanInfoSummaryEntry 5 }
+
+--------------------------------------------------------------------------------
+-- WTOCM Unexpected Channel Info Table
+--------------------------------------------------------------------------------
+    tnWtocmUnexpectedChannelInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtocmUnexpectedChannelInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides a complete list of all
+                        unexpected received Wave Keys."
+        ::= { tnWaveKeyBasics 18 }
+
+    tnWtocmUnexpectedChannelInfoEntry OBJECT-TYPE
+        SYNTAX         TnWtocmUnexpectedChannelInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnChannel,
+                tnUnexpectedWtKeyIndex }
+        ::= { tnWtocmUnexpectedChannelInfoTable 1 }
+
+    TnWtocmUnexpectedChannelInfoEntry ::=
+        SEQUENCE {
+            tnWtocmUnexpectedChannelInfoUnexpectedWtKey  Unsigned32
+        }
+
+    tnWtocmUnexpectedChannelInfoUnexpectedWtKey OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The list of all unexpected tones on the channel,
+                        up to a maximum of 16."
+        ::= { tnWtocmUnexpectedChannelInfoEntry 1 }
+
+--------------------------------------------------------------------------------
+-- WTOCMA Optical Channel Config Table
+--------------------------------------------------------------------------------
+    tnWtocmaChanConfigTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtocmaChanConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Through this table, a network operator may create
+                        and read back, with channel granularity, the scan
+                        selected status."
+        ::= { tnWaveKeyBasics 19 }
+
+    tnWtocmaChanConfigEntry OBJECT-TYPE
+        SYNTAX         TnWtocmaChanConfigEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnChannel }
+        ::= { tnWtocmaChanConfigTable 1 }
+
+    TnWtocmaChanConfigEntry ::=
+        SEQUENCE {
+            tnWtocmaChanConfigOndemandScan     TruthValue
+        }
+
+    tnWtocmaChanConfigOndemandScan OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Selected for On-demand OSNR scan."
+        DEFVAL         { false }
+        ::= { tnWtocmaChanConfigEntry 1 }
+
+--------------------------------------------------------------------------------
+-- Domain Wavekey Table
+--------------------------------------------------------------------------------
+    tnDomainWaveKeyTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnDomainWaveKeyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        ::= { tnWaveKeyBasics 20 }
+
+    tnDomainWaveKeyEntry OBJECT-TYPE
+        SYNTAX         TnDomainWaveKeyEntry
+        MAX-ACCESS     not-accessible
+        STATUS         deprecated
+        DESCRIPTION    "."
+        INDEX { ifIndex,
+                tnChannel }
+        ::= { tnDomainWaveKeyTable 1 }
+
+    TnDomainWaveKeyEntry ::=
+        SEQUENCE {
+            tnDomainWaveKeyOchKeysUsedPercent        Unsigned32,
+            tnDomainWaveKeyOchUnlockedForDuplicates  TruthValue
+        }
+
+    tnDomainWaveKeyOchKeysUsedPercent OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         deprecated
+        DESCRIPTION    "Percentage of unique WT key combinations that
+                        have been utilized for a given Och frequency.
+                        Percentage greater than 100 indicates re-use of
+                        combinations.  Only applicable where the
+                        WtDomainNumber applies."
+        DEFVAL         { 0 }
+        ::= { tnDomainWaveKeyEntry 1 }
+
+    tnDomainWaveKeyOchUnlockedForDuplicates OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         deprecated
+        DESCRIPTION    "Indicates whether the OCH frequency is unlocked
+                        for use of duplicate Wave Keys.  Only applicable
+                        where the WtDomainNumber applies."
+        DEFVAL         { false }
+        ::= { tnDomainWaveKeyEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Wavekey Use In Domain Table
+--------------------------------------------------------------------------------
+    tnWaveKeyUseInDomainTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWaveKeyUseInDomainEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyBasics 21 }
+
+    tnWaveKeyUseInDomainEntry OBJECT-TYPE
+        SYNTAX         TnWaveKeyUseInDomainEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnWaveKeyUseInDomain,
+                tnWaveKeyUseInDomainTrxBand,
+                tnWaveKeyUseInDomainBin }
+        ::= { tnWaveKeyUseInDomainTable 1 }
+
+    TnWaveKeyUseInDomainEntry ::=
+        SEQUENCE {
+            tnWaveKeyUseInDomain                          Unsigned32,
+            tnWaveKeyUseInDomainTrxBand                   INTEGER,
+            tnWaveKeyUseInDomainBin                       Integer32,
+            tnWaveKeyUseInDomainBinLowerFreq              Unsigned32,
+            tnWaveKeyUseInDomainOchKeysUsedPercent        Unsigned32,
+            tnWaveKeyUseInDomainOchUnlockedForDuplicates  TruthValue
+        }
+
+    tnWaveKeyUseInDomain OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The number for the Wavelength Tracker domain.
+                        Currently restricted to 0."
+        ::= { tnWaveKeyUseInDomainEntry 1 }
+
+    tnWaveKeyUseInDomainTrxBand OBJECT-TYPE
+        SYNTAX         INTEGER{
+                         cBand(1),
+                         lBand(2)
+                       }
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The transmission band of the system. C-Band and
+                        L-Band usage of Wave Keys tracked by transmission band."
+        ::= { tnWaveKeyUseInDomainEntry 2 }
+
+    tnWaveKeyUseInDomainBin OBJECT-TYPE
+        SYNTAX         Integer32(1..191)
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "Bin number from 1 to 191, with 1 representing the lowest frequency
+                        bin in the transmission band and 191 representing the highest frequency
+                        bin in the transmission band."
+        ::= { tnWaveKeyUseInDomainEntry 3 }
+
+    tnWaveKeyUseInDomainBinLowerFreq OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "MHz"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The lower edge frequency in MHz for the bin of
+                        center frequencies for channels. Bins are 25 GHz
+                        in size and don't include the upper edge frequency."
+        ::= { tnWaveKeyUseInDomainEntry 4 }
+
+    tnWaveKeyUseInDomainOchKeysUsedPercent OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Percentage of unique WT key combinations that have been
+                        utilized from the bin."
+        DEFVAL         { 0 }
+        ::= { tnWaveKeyUseInDomainEntry 5 }
+
+    tnWaveKeyUseInDomainOchUnlockedForDuplicates OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether the OCH frequencies from the bin are
+                        unlocked for use of duplicate Wave Keys."
+        DEFVAL         { false }
+        ::= { tnWaveKeyUseInDomainEntry 6 }
+
+--------------------------------------------------------------------------------
+-- WTOCM Unexpected Channel Info Table
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnWtocmScreenedUnexpectedChannelInfoTable OBJECT-TYPE ::= { tnWaveKeyBasics 22 }
+
+--------------------------------------------------------------------------------
+-- WTOCM Unexpected Key Info Table
+--------------------------------------------------------------------------------
+    tnWtocmUnexpectedKeysInfoTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnWtocmUnexpectedKeysInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides a list of unexpected keys
+                        detected by the WTOCM port. Depending on the number of
+                        channels detecting unexpected keys, the number of
+                        keys may be limited to fewer than the maximum of 16 per
+                        channel. Note that for keys detected on unprovisioned channel
+                        slots, the channel frequency reference is approximate only."
+
+        ::= { tnWaveKeyBasics 23 }
+
+    tnWtocmUnexpectedKeysInfoEntry OBJECT-TYPE
+        SYNTAX         TnWtocmUnexpectedKeysInfoEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { ifIndex }
+        ::= { tnWtocmUnexpectedKeysInfoTable 1 }
+
+    TnWtocmUnexpectedKeysInfoEntry ::=
+        SEQUENCE {
+            tnWtocmUnexpectedKeysInfoPowerSummary    SnmpAdminString,
+            tnWtocmUnexpectedKeysInfoKeysSummary     SnmpAdminString
+        }
+
+    tnWtocmUnexpectedKeysInfoPowerSummary OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of power values for channel frequencies
+                        on the WTOCM type card port detecting unexpected keys.
+                        The power info is reported in string format with the
+                        following organization:
+                        First channel in ITU channel number format.
+                        First channel power value in signed mBm format.
+                        Second channel in ITU channel number format.
+                        Second channel power value in signed mBm format.
+
+                        ... and so on for the remaining channels detecting unexpected keys.
+                        Terminating sequence indicating no further channels.
+
+                        If there are no channels with unexpected keys, only
+                        the terminating sequence is returned."
+
+        ::= { tnWtocmUnexpectedKeysInfoEntry 1 }
+
+    tnWtocmUnexpectedKeysInfoKeysSummary OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..2048))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Summary of unexpected Wavelength Tracker keys
+                        detected on the WTOCM type card port.
+                        The unexpected key info is reported in string format with the
+                        following organization:
+                        First channel in ITU channel number format.
+                        First channel first key number being detected.
+                        First channel next key number being detected (if any).
+                        ... and so on for remaining keys being detected.
+                        Delimiting sequence of 0000.
+                        Second channel in ITU channel number format.
+                        Second channel first key number being detected.
+                        First channel next key number being detected (if any).
+                        ... and so on for remaining keys being detected.
+                        Delimiting sequence of 0000.
+                        Second channel power value in signed mBm format.
+
+                        ... and so on for the remaining channels detecting unexpected keys.
+                        Terminating sequence indicating no further channels.
+
+                        Key values are hex values of N+10000, where N is the
+                        actual key value (in decimal).
+                        If there are no channels with unexpected keys, only the
+                        terminating sequence is returned."
+
+        ::= { tnWtocmUnexpectedKeysInfoEntry 2 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnWaveKeyGroup OBJECT-GROUP ::= { tnWaveKeyGroups 1 }
+--    tnUnexpectedWaveKeyGroup OBJECT-GROUP ::= { tnWaveKeyGroups 2 }
+--    tnWaveKeySummaryGroup OBJECT-GROUP ::= { tnWaveKeyGroups 3 }
+
+    tnWaveKeyEncodeGroup OBJECT-GROUP
+        OBJECTS {
+            tnWaveKeyEncodeProgrammedWK1,
+            tnWaveKeyEncodeProgrammedWK2,
+            tnWaveKeyEncodeTransmitState,
+            tnWaveKeyEncodeTrailName,
+            tnWaveKeyEncodeProgrammedNwOutputPower,
+            tnWaveKeyEncodePresentNwOutputPower,
+            tnWaveKeyEncodeMaxAttainablePower,
+            tnWaveKeyEncodeMinAttainablePower,
+            tnWaveKeyEncodePowerUpperMargin,
+            tnWaveKeyEncodePowerLowerMargin
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 4 }
+
+    tnWaveKeyDecodeGroup OBJECT-GROUP
+        OBJECTS {
+            tnWaveKeyDecodeSupportedDirections,
+--            obsolete
+--            tnWaveKeyDecodeMaxSupportedExpectedPowerIn,
+--            tnWaveKeyDecodeMaxSupportedExpectedPowerOut,
+--            tnWaveKeyDecodeMinSupportedExpectedPowerIn,
+--            tnWaveKeyDecodeMinSupportedExpectedPowerOut,
+            tnWaveKeyDecodeMinPlannedLossIn,
+            tnWaveKeyDecodeMinPlannedLossOut,
+            tnWaveKeyDecodeMaxPlannedLossIn,
+            tnWaveKeyDecodeMaxPlannedLossOut,
+            tnWaveKeyDecodeTypicalPlannedLossIn,
+            tnWaveKeyDecodeTypicalPlannedLossOut,
+            tnWaveKeyDecodeUpstreamLossIn,
+            tnWaveKeyDecodeUpstreamLossOut,
+            tnWaveKeyDecodeUpstreamDetectIfIndexIn,
+            tnWaveKeyDecodeUpstreamDetectIfIndexOut,
+            tnWaveKeyDecodeInferredIn,
+            tnWaveKeyDecodeInferredOut,
+            tnWaveKeyDecodeModifyPowerIn,
+            tnWaveKeyDecodeModifyPowerOut,
+            tnWaveKeyDecodeCurrentUpstreamLossIn,
+            tnWaveKeyDecodeCurrentUpstreamLossOut,
+            tnWaveKeyDecodeCurrentUpstreamLossInL,
+            tnWaveKeyDecodeUpstreamLossInL,
+            tnWaveKeyDecodeMaxPlannedLossInL,
+            tnWaveKeyDecodeMinPlannedLossInL,
+            tnWaveKeyDecodeTypicalPlannedLossInL,
+            tnWaveKeyDecodeCurrentUpstreamLossOutL,
+            tnWaveKeyDecodeUpstreamLossOutL,
+            tnWaveKeyDecodeMaxPlannedLossOutL,
+            tnWaveKeyDecodeMinPlannedLossOutL,
+            tnWaveKeyDecodeTypicalPlannedLossOutL,
+            tnWaveKeyDecodeSupportedTrxBands,
+            tnWaveKeyDecodeUpstreamDetectIfIndexInL,
+            tnWaveKeyDecodeUpstreamDetectIfIndexOutL
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 5 }
+
+--------------------------------------------------------------------------------
+-- Obsoleted OIDs
+--------------------------------------------------------------------------------
+--    tnWaveKeyCoherentNoiseGroup OBJECT-GROUP ::= { tnWaveKeyGroups 6 }
+--    tnWaveKeyCoherentNoiseBinGroup OBJECT-GROUP ::= { tnWaveKeyGroups 7 }
+
+    tnWtEncodePortCapabilityGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtEncodePortCapabilityProgrammed,
+            tnWtEncodePortCapabilityPresent,
+            tnWtEncodePortCapabilityInUse,
+            tnWtEncodePortCapabilityEnabledByUser
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 8 }
+
+    tnWtEncodeCardGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtEncodeCardExpectedPowerDev,
+            tnWtEncodeCardExpectedPowerTolerance
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 9 }
+
+    tnWtEncodeCardCapabilityGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtEncodeCardCapabilityProgrammed,
+            tnWtEncodeCardCapabilityPresent,
+            tnWtEncodeCardCapabilityInUse
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 10 }
+
+    tnWtKeyGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtKeyExpectedWK1,
+            tnWtKeyExpectedWK2,
+            tnWtKeyExpectedPower,
+            tnWtKeyExpectedPowerDev,
+            tnWtKeyPresentPower,
+            tnWtKeyReceived,
+            tnWtKeyExpectedPowerTol,
+            tnWtKeySynchronizePower,
+            tnWtKeyTrailName,
+            tnWtKeyStatus,
+            tnWtKeyApplicability,
+            tnWtKeyCidUnkeyed,
+            tnWtKeyCidChannelLoading,
+            tnWtKeyExpectedPSDPower,
+            tnWtKeyPresentPSDPower,
+            tnWtKeyCidCarrierChannelWidth
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 11 }
+
+    tnUnexpectedWtKeyGroup OBJECT-GROUP
+        OBJECTS {
+            tnUnexpectedWtKey,
+            tnUnexpectedWtKeyPower
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 12 }
+
+    tnWtKeySummaryGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtKeySummaryExpectedWKMaskIn,
+            tnWtKeySummaryExpectedWKMaskOut,
+            tnWtKeySummaryReceivedWKMaskIn,
+            tnWtKeySummaryReceivedWKMaskOut,
+            tnWtKeySummaryUnexpectedWKMaskIn,
+            tnWtKeySummaryUnexpectedWKMaskOut,
+            tnWtKeySummarySupportedDirections,
+            tnWtKeySummaryReceivedWKMaskInL,
+            tnWtKeySummaryReceivedWKMaskOutL
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 13 }
+
+    tnWtKeyDecodeInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtKeyDecodeInfoSupportedDirections,
+            tnWtKeyDecodeInfoMaxSupportedExpectedPowerIn,
+            tnWtKeyDecodeInfoMaxSupportedExpectedPowerOut,
+            tnWtKeyDecodeInfoMinSupportedExpectedPowerIn,
+            tnWtKeyDecodeInfoMinSupportedExpectedPowerOut,
+            tnWtKeyDecodeInfoMaxSupportedExpectedPowerOutL,
+            tnWtKeyDecodeInfoMinSupportedExpectedPowerOutL
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 14 }
+
+    tnWtocmChanInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtocmChanInfoExpectedWK1,
+            tnWtocmChanInfoExpectedWK2,
+            tnWtocmChanInfoPresentPower,
+            tnWtocmChanInfoPresentPowerMonitoredPort,
+--            obsolete
+--            tnWtocmChanInfoApplicability,
+            tnWtocmChanInfoProcessingState,
+            tnWtocmChanInfoPresentOSNR,
+            tnWtocmChanInfoOSNRTimeStamp,
+            tnWtocmChanInfoUnkeyed
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 15 }
+
+--    obsolete
+--    tnWtocmUnexpectedChanInfoGroup OBJECT-GROUP ::= { tnWaveKeyGroups 16 }
+
+    tnWtocmChanInfoSummaryGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtocmChanInfoSummaryExpectedWKMask,
+            tnWtocmChanInfoSummaryNoLosWKMask,
+            tnWtocmChanInfoSummaryConfirmWKMask,
+            tnWtocmChanInfoSummaryUnexpectedWKMask,
+            tnWtocmChanInfoSummaryProcessedWKMask
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 17 }
+
+    tnWtocmUnexpectedChannelInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtocmUnexpectedChannelInfoUnexpectedWtKey
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 18 }
+
+    tnWtocmaChanConfigGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtocmaChanConfigOndemandScan
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 19 }
+
+    tnDomainWaveKeyGroup OBJECT-GROUP
+        OBJECTS {
+            tnDomainWaveKeyOchKeysUsedPercent,
+            tnDomainWaveKeyOchUnlockedForDuplicates
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 20 }
+
+    tnWaveKeyUseInDomainKeyGroup OBJECT-GROUP
+        OBJECTS {
+            tnWaveKeyUseInDomainBinLowerFreq,
+            tnWaveKeyUseInDomainOchKeysUsedPercent,
+            tnWaveKeyUseInDomainOchUnlockedForDuplicates
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 21 }
+
+--    obsolete
+--    tnWtocmScreenedUnexpectedChannelInfoGroup OBJECT-GROUP ::= { tnWaveKeyGroups 22 }
+
+    tnWtocmUnexpectedKeysInfoGroup OBJECT-GROUP
+        OBJECTS {
+            tnWtocmUnexpectedKeysInfoPowerSummary,
+            tnWtocmUnexpectedKeysInfoKeysSummary
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnWaveKeyGroups 23 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnWaveKeyCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+--            obsolete
+--            tnWaveKeyGroup,
+--            tnUnexpectedWaveKeyGroup,
+--            tnWaveKeySummaryGroup,
+            tnWaveKeyEncodeGroup,
+            tnWaveKeyDecodeGroup,
+--            obsolete
+--            tnWaveKeyCoherentNoiseGroup,
+--            tnWaveKeyCoherentNoiseBinGroup,
+            tnWtEncodePortCapabilityGroup,
+            tnWtEncodeCardGroup,
+            tnWtEncodeCardCapabilityGroup,
+            tnWtKeyGroup,
+            tnUnexpectedWtKeyGroup,
+            tnWtKeySummaryGroup,
+            tnWtKeyDecodeInfoGroup,
+            tnWtocmChanInfoGroup,
+--            obsolete
+--            tnWtocmUnexpectedChanInfoGroup,
+            tnWtocmChanInfoSummaryGroup,
+            tnWtocmUnexpectedChannelInfoGroup,
+            tnWtocmaChanConfigGroup,
+            tnDomainWaveKeyGroup,
+            tnWaveKeyUseInDomainKeyGroup,
+--            obsolete
+--            tnWtocmScreenedUnexpectedChannelInfoGroup,
+            tnWtocmUnexpectedKeysInfoGroup
+        }
+        ::= { tnWaveKeyCompliances 1 }
+
+END -- DEFINITION OF TROPIC-WAVEKEY-MIB

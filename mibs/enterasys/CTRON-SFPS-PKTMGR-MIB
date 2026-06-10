@@ -1,0 +1,721 @@
+CTRON-SFPS-PKTMGR-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-pktmgr.mib.txt
+--  Revision: 0.0.15
+--
+--  Cabletron Systems, Inc.
+--  35 Industria Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+--      DisplayString
+--              FROM RFC1213-MIB
+--      enterprises, 
+--      IpAddress, 
+--      Counter, TimeTicks, Gauge
+--              FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.12
+        sfpsSwitchSfpsPacket, sfpsCSPPacket, sfpsPktDispatchStats
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+ 
+--  Textual Conventions
+
+SfpsSwitchInstance ::= INTEGER
+--  this will map to chassis.module index value
+
+HexInteger ::= INTEGER
+--  display this integer in hex format
+
+
+--
+
+
+--  SFPS PacketManager Stats Table
+--  this table keeps track of the packets in the packetmanager
+--
+
+sfpsPacketMgrTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsPacketMgrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table keeps the statistics on all packets in the
+                 packetmanager"
+        ::= { sfpsSwitchSfpsPacket 1 }
+
+sfpsPacketMgrEntry    OBJECT-TYPE
+        SYNTAX  SfpsPacketMgrEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry describes part of the packetmanager table"
+        INDEX   { sfpsPacketMgrSwitchID, sfpsPacketMgrPacketType }
+        ::= { sfpsPacketMgrTable 1 }
+
+SfpsPacketMgrEntry ::=
+        SEQUENCE {
+                sfpsPacketMgrSwitchID           INTEGER,
+                sfpsPacketMgrPacketType         HexInteger,
+                sfpsPacketMgrTotalPackets       INTEGER,
+                sfpsPacketMgrPktsUsed           INTEGER,
+                sfpsPacketMgrPktsAvailable      INTEGER,
+                sfpsPacketMgrPktsInUse          INTEGER,
+                sfpsPacketMgrNotFound           INTEGER,
+                sfpsPacketMgrTooLarge           INTEGER,
+                sfpsPacketMgrToCreate           INTEGER,
+                sfpsPacketMgrReInit             INTEGER
+        }
+
+sfpsPacketMgrSwitchID    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The switch instance of the switch"
+        ::= { sfpsPacketMgrEntry 1 }
+
+sfpsPacketMgrPacketType    OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The packet type"
+        ::= { sfpsPacketMgrEntry 2 }
+
+sfpsPacketMgrTotalPackets       OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The total number of packets created in the packetmanager"
+        ::= { sfpsPacketMgrEntry 3 }
+
+sfpsPacketMgrPktsUsed           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The total number of pkts used since beginning of
+                switch uptime"
+        ::= { sfpsPacketMgrEntry 4 }
+
+sfpsPacketMgrPktsAvailable              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets left in the packetmanager"
+        ::= { sfpsPacketMgrEntry 5 }
+
+sfpsPacketMgrPktsInUse          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets created minus the number of
+                packets left"
+        ::= { sfpsPacketMgrEntry 6 }
+
+sfpsPacketMgrNotFound           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of times a packet was requested and the
+                 packetmanager did not have a packet of its size or
+                 larger" 
+        ::= { sfpsPacketMgrEntry 8 }
+
+sfpsPacketMgrTooLarge           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "" 
+        ::= { sfpsPacketMgrEntry 9 }
+
+sfpsPacketMgrToCreate           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Changes the number of packets in the PacketManager" 
+        ::= { sfpsPacketMgrEntry 10 }
+
+sfpsPacketMgrReInit             OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  other(1),
+                  reinit(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The lowest number of packets ever in the
+                packetmanager" 
+        ::= { sfpsPacketMgrEntry 11 }
+--
+--
+--
+
+sfpsPacketListTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsPacketListEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table keeps the statistics on all packets in the
+                 packetmanager"
+        ::= { sfpsSwitchSfpsPacket 2 }
+
+sfpsPacketListEntry    OBJECT-TYPE
+        SYNTAX  SfpsPacketListEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry describes part of the packetmanager table"
+        INDEX   { sfpsPacketListPacketType, sfpsPacketListSize }
+        ::= { sfpsPacketListTable 1 }
+
+SfpsPacketListEntry ::=
+        SEQUENCE 
+        {
+        sfpsPacketListPacketType    HexInteger,
+        sfpsPacketListSize                      INTEGER,
+                sfpsPacketListTotalPackets      INTEGER,
+                sfpsPacketListPktsUsed          INTEGER,
+                sfpsPacketListPktsLeft          INTEGER,
+                sfpsPacketListPktsInUse         INTEGER,
+                sfpsPacketListLowWater          INTEGER,
+                sfpsPacketListNotFound          INTEGER,
+        sfpsPacketListStatus        INTEGER
+        }
+
+sfpsPacketListPacketType    OBJECT-TYPE
+        SYNTAX  HexInteger
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The switch instance of the switch"
+        ::= { sfpsPacketListEntry 1 }
+
+sfpsPacketListSize              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The size of the packets that are located in this
+                particular sfpspacketlist"
+        ::= { sfpsPacketListEntry 2 }
+
+
+sfpsPacketListTotalPackets      OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The total number of packets created in the packetmanager"
+        ::= { sfpsPacketListEntry 3 }
+
+sfpsPacketListPktsUsed          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The total number of pkts used since beginning of
+                switch uptime"
+        ::= { sfpsPacketListEntry 4 }
+
+sfpsPacketListPktsLeft          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets left in the packetmanager"
+        ::= { sfpsPacketListEntry 5 }
+
+sfpsPacketListPktsInUse         OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of packets created minus the number of
+                packets left"
+        ::= { sfpsPacketListEntry 6 }
+
+sfpsPacketListLowWater          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The lowest number of packets ever in the
+                packetmanager" 
+        ::= { sfpsPacketListEntry 7 }
+
+sfpsPacketListNotFound          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of times a packet was requested and the
+                 packetmanager did not have a packet of its size or
+                 larger" 
+        ::= { sfpsPacketListEntry 8 }
+
+sfpsPacketListStatus            OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  other(1),
+                  enabled(2),
+                  disabled(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "Sets the administrative state of the packet list
+                 for which the entry exists."
+       ::= { sfpsPacketListEntry 9 }
+
+--
+--
+--
+
+sfpsPacketSizeTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsPacketSizeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "This table keeps the statistics on all packets in the
+                 packetmanager"
+        ::= { sfpsSwitchSfpsPacket 3 }
+
+sfpsPacketSizeEntry    OBJECT-TYPE
+        SYNTAX  SfpsPacketSizeEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Each entry describes part of the packetmanager table"
+        INDEX   { sfpsPacketSizeSwitchInstance, sfpsPacketSizeSize }
+        ::= { sfpsPacketSizeTable 1 }
+
+SfpsPacketSizeEntry ::=
+        SEQUENCE 
+        {
+        sfpsPacketSizeSwitchInstance    SfpsSwitchInstance,
+        sfpsPacketSizeSize                  INTEGER,
+                sfpsPacketSizePktsUsed          INTEGER,
+                sfpsPacketSizeNotFound          INTEGER
+        }
+
+sfpsPacketSizeSwitchInstance    OBJECT-TYPE
+        SYNTAX  SfpsSwitchInstance
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The switch instance of the switch"
+        ::= { sfpsPacketSizeEntry 1 }
+
+sfpsPacketSizeSize              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The size of the packets that are located in this
+                particular sfpspacketSize"
+        ::= { sfpsPacketSizeEntry 2 }
+
+sfpsPacketSizePktsUsed          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The total number of pkts used since beginning of
+                switch uptime"
+        ::= { sfpsPacketSizeEntry 3 }
+
+sfpsPacketSizeNotFound          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The number of times a packet was requested and the
+                 packetmanager did not have a packet of its size or 
+                 Larger"                 
+        ::= { sfpsPacketSizeEntry 4 }
+
+--
+--
+sfpsPacketQTable     OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsPacketQEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        ::= { sfpsSwitchSfpsPacket 4 }
+
+sfpsPacketQEntry    OBJECT-TYPE
+        SYNTAX  SfpsPacketQEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsPacketQPriorityQ }
+        ::= { sfpsPacketQTable 1 }
+
+SfpsPacketQEntry ::=
+        SEQUENCE 
+        {
+        sfpsPacketQPriorityQ            INTEGER,
+                sfpsPacketQTotalPackets INTEGER,
+                sfpsPacketQCurrent      INTEGER,
+                sfpsPacketQHighWater    INTEGER
+        }
+        
+sfpsPacketQPriorityQ            OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  low(1),
+                  medium(2),
+                  high(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPacketQEntry 1 }
+ 
+
+sfpsPacketQTotalPackets         OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPacketQEntry 2 }
+ 
+
+sfpsPacketQCurrent              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPacketQEntry 3 }
+ 
+sfpsPacketQHighWater            OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPacketQEntry 4 }
+ 
+--  CSP Packet Statistics
+
+sfpsCSPPacketStatsPacketsSentBad                OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsCSPPacket 1 }
+ 
+sfpsCSPPacketStatsPacketsSentGood               OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsCSPPacket 2 }
+ 
+sfpsCSPPacketStatsPacketsReceivedBad    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsCSPPacket 3 }
+ 
+sfpsCSPPacketStatsPacketsReceivedGood   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsCSPPacket 4 }
+
+-- SFPS Packet Dispatch Statistics keeps track of all packets dropped
+
+sfpsPktDispatchStatsVerb        OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        other(1),
+                        resetAllStats(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 1 }
+
+
+numHPMInvalidFrameTypeDrops             OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 2 }
+
+numHPMFilterMgtPortDrops                OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 3 }
+
+numHPMPhysToLogPortDrops                OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 4 }
+
+numHPMNullSFPSPktDrops          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 5 }
+
+numHPM81fdThrottleDrops         OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 6 }
+
+numHPM81ffThrottleDrops         OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 7 }
+
+numHPMPhysStandbyMaskDrops              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 8 }
+
+numBSInvSrcPortDrops            OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 9 }
+
+numBSSourceBlockDrops           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 10 }
+
+numBSViolationDrops             OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 11 }
+
+numBSUnknownPortDrops           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 12 }
+
+numBSStandbyPortDrops           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 13 }
+
+numBSFabricNghbrPortDrops               OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 14 }
+
+numBSGoingToAccessPortDrops             OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 15 }
+
+numBSInvPortTypeDrops           OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 16 }
+
+numBSNullCallDrops              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 17 }
+
+numBSNullBottomCPDrops          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 18 }
+
+numBSInvCSPTypeDrops            OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 19 }
+
+numBSNonHello81fdDrops          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 20 }
+
+numBSCSPCtrlDisableDrops                OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 21 }
+
+numBSCSPCtrlIndexDrops          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 22 }
+
+numBCPNullCallDrops             OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 23 }
+
+numBCPCPFaultedDrops            OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 24 }
+
+numBCPGleanFailDrops            OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 25 }
+
+numBCPCPHaltedDrops             OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 26 }
+
+numBCPSwitchedBCADrops          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 27 }
+
+numBCPCallNotAcceptedDrops              OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 28 }
+
+ 
+numHPM81fdNullPktDrops          OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 29 }
+
+numHPM81fdHelloNullPktDrops             OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                ""               
+        ::= { sfpsPktDispatchStats 30 }
+
+END

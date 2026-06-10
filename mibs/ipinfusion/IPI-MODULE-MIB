@@ -1,0 +1,28 @@
+IPI-MODULE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,
+        Gauge32, Counter32, Integer32, Unsigned32,
+        IpAddress, Counter64,
+        TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DateAndTime, DisplayString,
+        PhysAddress, RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        snmpTraps
+            FROM SNMPv2-MIB
+        enterprises, OBJECT-IDENTITY
+            FROM SNMPv2-SMI;
+ipi  MODULE-IDENTITY
+LAST-UPDATED "201603301200Z"
+ORGANIZATION "IP Infusion"
+CONTACT-INFO "support@ipinfusion.com"
+
+DESCRIPTION
+  "The IPI enterprise Module Identity."
+
+::= { enterprises 36673 } -- assigned by IANA
+
+END

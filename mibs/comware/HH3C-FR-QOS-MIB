@@ -1,0 +1,614 @@
+-- =================================================================
+-- Copyright (C) 2004 New H3C Tech. Co., Ltd. All rights reserved.
+-- 
+-- Description:This MIB file is used for management of Class Based 
+--             FR QoS information. 
+-- Reference:
+-- Version: V1.1
+-- History:      
+-- 			V1.0 caolei,2004.7.12,publish 
+--          V1.1 2004-10-12 updated by gaolong
+--               Relocate hh3cFrQoSMib MODULE-IDENTITY.
+-- =================================================================
+
+	HH3C-FR-QOS-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			hh3cQoS
+				FROM HH3C-OID-MIB
+		
+			ifIndex			
+				FROM RFC1213-MIB
+			
+			OBJECT-GROUP, MODULE-COMPLIANCE                 
+				FROM SNMPv2-CONF
+			
+			Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY                   
+				FROM SNMPv2-SMI
+			
+			TEXTUAL-CONVENTION, RowStatus
+				FROM SNMPv2-TC;        
+
+            hh3cFrQoSMib MODULE-IDENTITY 
+                    LAST-UPDATED "200407120000Z"            -- JULY 12, 2004 at 00:00 GMT
+                    ORGANIZATION
+                        "New H3C Tech. Co., Ltd."
+                    CONTACT-INFO
+                        "Platform Team New H3C Tech. Co., Ltd.
+                        Hai-Dian District Beijing P.R. China
+                        http://www.h3c.com
+                        Zip:100085
+                        "
+                    DESCRIPTION 
+                            "This MIB contains objects to 
+                            Manage configuration and Monitor running state 
+                            for Class Based FR QoS feature.
+                            
+                           	    *********************************
+                        			MIB Tables
+                           	    **********************************
+                        	This MIB consists of the following tables:
+                        	     1 :  hh3cFrClassCfgInfoTable
+                        	     2 :  hh3cCirCfgInfoTable
+                        	     3 :  hh3cIfApplyFrClassTable
+                        	     4 :  hh3cPvcApplyFrClassTable
+                        	     5 :  hh3cFrPvcBandwidthTable
+                        	     5 :  hh3cRTPFrClassApplyTable
+                        	     6 :  hh3cRTPFrPvcQueueRunInfoTable  	             	 
+                            "
+                    ::= { hh3cQoS 3 } -- need modification later
+
+--            
+--type definitions in the policy 
+--
+				
+--Direction         
+				
+			Hh3cCirAllowDirection ::= TEXTUAL-CONVENTION
+			        STATUS  current  
+			        DESCRIPTION
+			              "The Packet Direction apply on."				 
+					SYNTAX  INTEGER { 
+						inbound (1),
+						outbound (2),
+						inboundAndOutbound (3)
+					}                  
+	
+--            
+--end of type definitions in policy 
+--				 
+
+--
+-- Node definitions
+--     
+	hh3cFrQoSObjects OBJECT IDENTIFIER ::= { hh3cFrQoSMib 1 } 
+                                                                                                           
+--hh3cFrClassObjects 
+		
+	hh3cFrClassObjects OBJECT IDENTIFIER ::= { hh3cFrQoSObjects 1 } 
+		
+-- Fr Class Next Index 
+	hh3cFrClassIndexNext OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This object contains an appropriate value to be used for 
+			hh3cFrClassIndex when creating rows in the 
+			hh3cFrClassCfgInfoTable. Begin with 0.
+			"                                
+		::= { hh3cFrClassObjects 1 }
+		                                                                                         
+-- Fr Class               
+	hh3cFrClassCfgInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cFrClassCfgInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of Fr Class configuration information."
+		::= { hh3cFrClassObjects 2 }
+
+	hh3cFrClassCfgInfoEntry OBJECT-TYPE
+		SYNTAX Hh3cFrClassCfgInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Fr Class Configuration Information Entry."
+		INDEX { hh3cFrClassIndex }
+		::= { hh3cFrClassCfgInfoTable 1 }
+		
+	Hh3cFrClassCfgInfoEntry ::=
+		SEQUENCE { 
+			hh3cFrClassIndex
+				Integer32,
+			hh3cFrClassName
+				OCTET STRING,
+			hh3cFrClassRowStatus
+				RowStatus
+		} 	
+
+		
+	hh3cFrClassIndex OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index of Fr Class. Begin with 0."
+		::= { hh3cFrClassCfgInfoEntry 1 }
+		        
+	hh3cFrClassName OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE (1..31))
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Name of Fr Class."
+		::= { hh3cFrClassCfgInfoEntry 2 }                                  
+		
+	hh3cFrClassRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"RowStatus. Three actions are used: active,
+			createAndGo, destroy"
+		::= { hh3cFrClassCfgInfoEntry 3 }
+
+-- Cir Allow on the Fr Class               
+	hh3cCirAllowCfgInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cCirAllowCfgInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of DCE allowed rate Configuration information."
+		::= { hh3cFrClassObjects 3 }
+		
+	hh3cCirAllowCfgInfoEntry OBJECT-TYPE
+		SYNTAX Hh3cCirAllowCfgInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"DCE allowed ratee Configuration Information Entry."
+		INDEX { hh3cCirAllowFrClassIndex,
+				hh3cCirAllowDirection}
+		::= { hh3cCirAllowCfgInfoTable 1 }
+		
+	Hh3cCirAllowCfgInfoEntry ::=
+		SEQUENCE { 
+			hh3cCirAllowFrClassIndex
+				Integer32,  
+			hh3cCirAllowDirection 
+				Hh3cCirAllowDirection,                                        
+			hh3cCirAllowValue
+				Integer32, 
+			hh3cCirAllowRowStatus
+				RowStatus
+		} 
+		
+	hh3cCirAllowFrClassIndex OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index of Fr Class. Begin with 0.Equal to hh3cFrClassIndex"
+		::= { hh3cCirAllowCfgInfoEntry 1 }
+		        
+	hh3cCirAllowDirection OBJECT-TYPE
+		SYNTAX Hh3cCirAllowDirection     
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Packet Direction. 		
+			inbound (1)
+			outbound (2)
+			inbound and outbound (3)  
+			"
+		::= { hh3cCirAllowCfgInfoEntry 2 }                                  
+		
+	hh3cCirAllowValue OBJECT-TYPE
+		SYNTAX Integer32(1..45000000) 
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"DCE allowed rate (value greater than CIR) 
+			Unit : Bits per second. 
+			Value : <1-45000000> ."
+		::= { hh3cCirAllowCfgInfoEntry 3 } 
+		
+	hh3cCirAllowRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"RowStatus. Three actions are used: active,
+			createAndGo, destroy"
+		::= { hh3cCirAllowCfgInfoEntry 4 }
+		                                    
+-- Cir on the Fr Class               
+	hh3cCirCfgInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cCirCfgInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of Committed Information Rate Configuration information."
+		::= { hh3cFrClassObjects 4 }
+		
+	hh3cCirCfgInfoEntry OBJECT-TYPE
+		SYNTAX Hh3cCirCfgInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Committed Information Rate Configuration Information Entry."
+		INDEX { hh3cCirFrClassIndex }
+		::= { hh3cCirCfgInfoTable 1 }
+		
+	Hh3cCirCfgInfoEntry ::=
+		SEQUENCE { 
+			hh3cCirFrClassIndex
+				Integer32,  
+			hh3cCirValue
+				Integer32,		
+			hh3cCirRowStatus
+				RowStatus
+		} 
+		
+	hh3cCirFrClassIndex OBJECT-TYPE
+		SYNTAX Integer32 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Index of Fr Class. Begin with 0.Equal to hh3cFrClassIndex"
+		::= { hh3cCirCfgInfoEntry 1 }
+		        
+	hh3cCirValue OBJECT-TYPE
+		SYNTAX Integer32(1000..45000000)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			" CIR in packet output direction ,bps. 
+			Value : <1000-45000000>."
+		::= { hh3cCirCfgInfoEntry 2 } 
+		                               
+	hh3cCirRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"RowStatus. Three actions are used: active,
+			createAndGo, destroy"
+		::= { hh3cCirCfgInfoEntry 3 }
+		
+		                                  
+-- Fr Class Instance on interface Table
+	hh3cIfApplyFrClassTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cIfApplyFrClassEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of QoS Fr Class instance."
+		::= { hh3cFrClassObjects 5 }
+		
+	hh3cIfApplyFrClassEntry OBJECT-TYPE
+		SYNTAX Hh3cIfApplyFrClassEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"FrClass applied on interface Configuration Information Entry."
+		INDEX { hh3cIfApplyFrClassIfIndex }
+		::= { hh3cIfApplyFrClassTable 1 }
+		
+	Hh3cIfApplyFrClassEntry ::=
+			SEQUENCE {        
+				hh3cIfApplyFrClassIfIndex
+			Integer32,                                                                                                                                              
+				hh3cIfApplyFrClassIndex
+			Integer32,    
+				hh3cIfApplyFrClassRowStatus
+			RowStatus                            	                                            
+		}    
+			                                 
+	hh3cIfApplyFrClassIfIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Interface Index, equal to ifIndex."
+		::= { hh3cIfApplyFrClassEntry 1 }    
+		
+	hh3cIfApplyFrClassIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Index of Fr Class, equal to hh3cFrClassIndex"
+		::= { hh3cIfApplyFrClassEntry 2 }    
+		
+	hh3cIfApplyFrClassRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"RowStatus. Three actions are used: active,
+			createAndGo, destroy"
+		::= { hh3cIfApplyFrClassEntry 3 }
+		         
+-- Fr Class Instance on fr pvc Table                        
+	hh3cPvcApplyFrClassTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cPvcApplyFrClassEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of QoS Fr Class instance."
+		::= { hh3cFrClassObjects 6 }
+		
+	hh3cPvcApplyFrClassEntry OBJECT-TYPE
+		SYNTAX Hh3cPvcApplyFrClassEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Fr Class applied on FR Pvc Configuration Information Entry."
+		INDEX { hh3cPvcApplyFrClassIfIndex, 
+			hh3cPvcApplyFrClassDlciNum 
+		}
+		::= { hh3cPvcApplyFrClassTable 1 }
+		
+	Hh3cPvcApplyFrClassEntry ::=
+		SEQUENCE {            
+			hh3cPvcApplyFrClassIfIndex
+				Integer32,
+			hh3cPvcApplyFrClassDlciNum
+				Integer32,                                                                                                                                        
+			hh3cPvcApplyFrClassIndex
+				Integer32,
+			hh3cPvcApplyFrClassRowStatus
+				RowStatus                           		                              	                                            
+		}    
+			                                 
+	hh3cPvcApplyFrClassIfIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Fr Interface Index, equal to ifIndex."
+		::= { hh3cPvcApplyFrClassEntry 1 }
+		
+	hh3cPvcApplyFrClassDlciNum OBJECT-TYPE
+		SYNTAX Integer32 (16..1007)
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Fr DLCI number."
+		::= { hh3cPvcApplyFrClassEntry 2 }                            
+		
+	hh3cPvcApplyFrClassIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Index of Fr Class, equal to hh3cFrClassIndex"
+		::= { hh3cPvcApplyFrClassEntry 3 }    
+		
+	hh3cPvcApplyFrClassRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"RowStatus. Three actions are used: active,
+			createAndGo, destroy"
+		::= { hh3cPvcApplyFrClassEntry 4 }
+
+
+-- bandwidth parameter on interface                        
+                       
+	hh3cFrPvcBandwidthTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cFrPvcBandwidthEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of Running statistics for bandwidth.
+			"
+		::= { hh3cFrClassObjects 7 }
+		
+	hh3cFrPvcBandwidthEntry OBJECT-TYPE
+		SYNTAX Hh3cFrPvcBandwidthEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Bandwidth Running statistics"
+		INDEX { hh3cPvcApplyFrClassIfIndex, 
+			hh3cPvcApplyFrClassDlciNum 
+		}
+
+		::= { hh3cFrPvcBandwidthTable 1 }
+		
+	Hh3cFrPvcBandwidthEntry ::=
+			SEQUENCE {                                                                                                                                                                          
+				hh3cFrPvcBandwidthMaxReservedBW
+					Integer32,
+				hh3cFrPvcBandwidthAvailable
+					Integer32					                                	                                            
+				}    		 		                                                       
+					
+	hh3cFrPvcBandwidthMaxReservedBW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Max reserved bandWidth. Unit : Kbps"
+		::= { hh3cFrPvcBandwidthEntry 1 }	
+		
+	hh3cFrPvcBandwidthAvailable OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Available bandWidth. Unit : Kbps"
+		::= { hh3cFrPvcBandwidthEntry 2 }  			
+		
+                                                                                                       
+--hh3cRTPQoSObjects 
+		
+	hh3cRTPQoSObjects OBJECT IDENTIFIER ::= { hh3cFrQoSObjects 2 } 
+		
+-- Rtpq applied on the Fr Class 
+		
+	hh3cRTPFrClassApplyTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cRTPFrClassApplyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of RTP(Realtime Transport Protocol) Queue instance."
+		::= { hh3cRTPQoSObjects 1 }
+		
+	hh3cRTPFrClassApplyEntry OBJECT-TYPE
+		SYNTAX Hh3cRTPFrClassApplyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"RTP(Realtime Transport Protocol) Queue Configuration Information Entry."
+		INDEX { hh3cRTPFrClassApplyFrClassIndex }
+		::= { hh3cRTPFrClassApplyTable 1 }
+		
+	Hh3cRTPFrClassApplyEntry ::=
+		SEQUENCE { 
+			hh3cRTPFrClassApplyFrClassIndex
+				Integer32,
+			hh3cRTPFrClassApplyStartPort
+				Integer32,
+			hh3cRTPFrClassApplyEndPort 
+				Integer32,
+			hh3cRTPFrClassApplyBandWidth 
+				Integer32,
+			hh3cRTPFrClassApplyCbs 
+				Integer32,				
+			hh3cRTPFrClassApplyRowStatus 
+				RowStatus                               		 
+		}  
+		
+	hh3cRTPFrClassApplyFrClassIndex OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Fr Class Index, equal to Hh3cFrClassIndex."
+		::= { hh3cRTPFrClassApplyEntry 1 }    
+		
+	hh3cRTPFrClassApplyStartPort OBJECT-TYPE
+		SYNTAX Integer32(2000..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"                                                                                        
+			RTP-PORT(3): start-port: 2000~65535   
+			"                         
+		::= { hh3cRTPFrClassApplyEntry 2 }
+		
+	hh3cRTPFrClassApplyEndPort OBJECT-TYPE
+		SYNTAX Integer32(2000..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"                         
+			RTP-PORT(3): end-port: 2000~65535
+			"                         
+		::= { hh3cRTPFrClassApplyEntry 3 }
+		
+	hh3cRTPFrClassApplyBandWidth OBJECT-TYPE
+		SYNTAX Integer32 (8..1000000)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Max bandWidth Value:
+			Absolute value: 8~1000000. Unit: Kbps             
+			"                
+		::= { hh3cRTPFrClassApplyEntry 4 }  
+		
+	hh3cRTPFrClassApplyCbs OBJECT-TYPE
+		SYNTAX Integer32 (1500..2000000)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"
+			Committed Burst Size: 1500~2000000. Unit: byte             
+			"                
+		::= { hh3cRTPFrClassApplyEntry 5 }  		
+		
+	hh3cRTPFrClassApplyRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"RowStatus for RTPFrClassApply Table. 
+			Three actions are used: active, createAndGo, destroy"
+		::= { hh3cRTPFrClassApplyEntry 6 } 
+
+-- RTPQ statistics on the Fr Pvc 
+		                 
+	hh3cRTPFrPvcQueueRunInfoTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF Hh3cRTPFrPvcQueueRunInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of Running statistics for RTP(Realtime Transport Protocol) Queue
+			applied on the FR PVC"
+		::= { hh3cRTPQoSObjects 2 }
+		
+	hh3cRTPFrPvcQueueRunInfoEntry OBJECT-TYPE
+		SYNTAX Hh3cRTPFrPvcQueueRunInfoEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"RTP(Realtime Transport Protocol) Queue statistics entry."
+		INDEX { hh3cPvcApplyFrClassIfIndex,                        		
+			hh3cPvcApplyFrClassDlciNum                      	    
+		}
+		::= { hh3cRTPFrPvcQueueRunInfoTable 1 }
+		
+	Hh3cRTPFrPvcQueueRunInfoEntry ::=
+		SEQUENCE {
+			hh3cRTPFrPvcQueueSize
+				Integer32,
+			hh3cRTPFrPvcQueueMaxSize
+				Integer32, 
+			hh3cRTPFrPvcQueueOutputs
+				Counter32,
+			hh3cRTPFrPvcQueueDiscards
+				Counter32                                                                                                                                                                                                                                    
+		}  
+		    
+	hh3cRTPFrPvcQueueSize OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"the packet number of RTP(Realtime Transport Protocol) Queue now."
+		::= { hh3cRTPFrPvcQueueRunInfoEntry 1 }    
+		    		         
+	hh3cRTPFrPvcQueueMaxSize OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"the Max packet number of RTP(Realtime Transport Protocol) Queue."
+		::= { hh3cRTPFrPvcQueueRunInfoEntry 2 }
+		
+	hh3cRTPFrPvcQueueOutputs OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"the Output packet number of RTP(Realtime Transport Protocol) Queue."
+		::= { hh3cRTPFrPvcQueueRunInfoEntry 3 } 
+		         
+	hh3cRTPFrPvcQueueDiscards OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"the Discarded packet number of RTP(Realtime Transport Protocol) Queue."
+		::= { hh3cRTPFrPvcQueueRunInfoEntry 4 }
+											        
+END
+
+       
+                             
+                                                                                                       

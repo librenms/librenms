@@ -1,0 +1,591 @@
+--/* 
+-- *
+-- * Copyright (c) 1997 - 2002 by Extreme Networks Inc.
+-- * 
+-- *	  Extreme Networks
+-- *      http://www.extremenetworks.com
+-- *
+-- * extracted from $Extreme_Id: extreme.mib,v 1.24.6.35 2006/01/09 15:15:18 build-sc Exp $
+-- *
+-- */
+
+
+EXTREME-V2TRAP-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS 
+	extremeV2Traps				FROM EXTREME-BASE-MIB
+    sysDescr,sysUpTime                      FROM RFC1213-MIB
+	extremeCpuTaskUtilPair,
+    extremeCpuAggregateUtilization,
+    extremeCpuUtilRisingThreshold		FROM EXTREME-SYSTEM-MIB
+	extremeNPModuleProcessorState	        FROM EXTREME-NP-MIB
+	extremeEsrpGroup, extremeEsrpState      FROM EXTREME-ESRP-MIB
+	extremeVlanIfIndex, extremeVlanIfDescr  FROM EXTREME-VLAN-MIB
+ 	extremeHealthCheckErrorType, extremeSlotNumber, 	
+	extremeHealthCheckAction, extremeHealthCheckMaxRetries,	
+    extremeMasterMSMSlot, extremeMsmFailoverCause FROM EXTREME-SYSTEM-MIB
+    ifIndex                 FROM RFC1213-MIB
+    extremeIQosProfileIndex FROM EXTREME-QOS-MIB
+    bgpPeerRemoteAddr                       FROM BGP4-MIB
+	extremeEapsName, extremeEapsMode, extremeEapsState,
+	extremeEapsPrevState			FROM EXTREME-EAPS-MIB
+    extremePethSlotPSUActive            FROM EXTREME-POE-MIB
+    extremePethSlotMainPseIndex         FROM EXTREME-POE-MIB
+
+	NOTIFICATION-TYPE, OBJECT-TYPE , IpAddress            FROM SNMPv2-SMI
+    ClientAuthType                          FROM EXTREME-BASE-MIB
+    DisplayString                    FROM RFC1213-MIB
+    MacAddress ,TimeStamp            FROM SNMPv2-TC;
+
+    extremeCoreSCTraps     OBJECT IDENTIFIER
+	::= { extremeV2Traps 1 }
+
+    extremeCoreSCTrapPrefix	OBJECT IDENTIFIER
+	::= { extremeCoreSCTraps 0 }
+
+    extremeHealthCheckFailed NOTIFICATION-TYPE
+        OBJECTS {	
+          	     sysDescr, 
+         		 extremeSlotNumber, 
+		    	 extremeHealthCheckErrorType,
+			     extremeHealthCheckAction, 
+			     extremeHealthCheckMaxRetries
+                }
+	    STATUS current
+        DESCRIPTION
+                "Cpu HealthCheck has failed."
+                ::= { extremeCoreSCTrapPrefix 1 }
+
+-- Aggregate CPU utilization Trap definition
+--
+    extremeCpuUtilizationRisingTrap NOTIFICATION-TYPE
+            OBJECTS   { extremeCpuTaskUtilPair,
+                          extremeCpuAggregateUtilization,
+                          extremeCpuUtilRisingThreshold}
+            STATUS    current
+        	DESCRIPTION "CPU Utilizations Rising trap generated when
+                        extremeCpuUtilRisingThreshold is touched/crossed "
+	        ::= { extremeCoreSCTrapPrefix 2 }
+
+    extremeCpuUtilizationFallingTrap NOTIFICATION-TYPE
+            OBJECTS   { extremeCpuTaskUtilPair,
+                          extremeCpuAggregateUtilization,
+                          extremeCpuUtilRisingThreshold}
+            STATUS    current
+        	DESCRIPTION "CPU Utilization Falling Trap is generated when the
+                    extremeCpuAggregateUtilization falls below 80% of the
+                    extremeCpuUtilRisingThreshold"
+            ::= { extremeCoreSCTrapPrefix 3 }
+
+    extremeProcessorStateChangeTrap NOTIFICATION-TYPE
+            OBJECTS {sysDescr,               
+                     extremeSlotNumber,
+                     extremeNPModuleProcessorState}
+            STATUS      current
+            DESCRIPTION
+            "Failed processor on module has been detected."
+            ::= { extremeCoreSCTrapPrefix 4 }
+
+    extremeMsmFailoverTrap NOTIFICATION-TYPE
+            OBJECTS {sysDescr,
+                     extremeMasterMSMSlot,
+                     extremeMsmFailoverCause}
+            STATUS      current
+            DESCRIPTION
+            "MSM failover occurred."
+            ::= { extremeCoreSCTrapPrefix 5 }
+
+
+    extremeEsrpTimedOutFailedOverMaster NOTIFICATION-TYPE
+            OBJECTS {sysDescr, 
+                     extremeVlanIfIndex,
+                     extremeVlanIfDescr,                     
+                     extremeEsrpState}
+            STATUS      current
+            DESCRIPTION
+            "The master node performed a hitless MSM failover, but the 
+            master failed to resume normal operation within the reelect timeout.
+            Thus, a new master (this switch) was elected." 
+            ::= { extremeCoreSCTrapPrefix 6 }
+
+
+-- Triumph support
+--        
+
+      extremeRateLimitExceededTrap NOTIFICATION-TYPE
+            OBJECTS {extremeRateLimitExceededTrapType,
+                     extremeRateLimitExceededTrapIndicator,
+                     ifIndex ,
+                     extremeIQosProfileIndex,
+                     extremeExceededByteCount}
+            STATUS      current
+            DESCRIPTION
+            "Committed Information Rate exceeded."
+        ::= { extremeCoreSCTrapPrefix 7 }
+        
+      extremeRateLimitExceededTrapType OBJECT-TYPE
+                SYNTAX INTEGER {
+			exceededCIR(1),
+			droppedBytes(2)
+                        }
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                "The trap condition being reported."
+            ::= { extremeRateLimitExceededTrap 1 }
+            
+      extremeRateLimitExceededTrapIndicator OBJECT-TYPE
+                SYNTAX INTEGER {
+			clear(0),
+			set(1)
+                        }
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                "The trap condition being reported."
+            ::= { extremeRateLimitExceededTrap 2 }
+            
+      extremeExceededByteCount OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                "The number of bytes that exceeded the rate."
+            ::= { extremeRateLimitExceededTrap 4 }
+
+-- end Triumph support
+--
+
+    extremeBgpTraps     OBJECT IDENTIFIER
+		    ::= { extremeV2Traps 2 }
+
+	extremeBgpTrapsPrefix     OBJECT IDENTIFIER
+            ::= { extremeBgpTraps 0 }
+
+    extremeBgpPrefixReachedThreshold NOTIFICATION-TYPE
+            OBJECTS { bgpPeerRemoteAddr}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeBgpPrefixReachedThreshold notification is generated
+                     when the number of prefixes received over this 
+                     peer session reaches the threshold limit."
+                ::= { extremeBgpTrapsPrefix 1 }
+
+    extremeBgpPrefixMaxExceeded NOTIFICATION-TYPE
+            OBJECTS { bgpPeerRemoteAddr}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeBgpPrefixMaxExceeded notification is generated
+                     when the number of prefixes received over this 
+                     peer session reaches the maximum configured limit."
+                ::= { extremeBgpTrapsPrefix 2 }
+
+    extremeSecurityTraps     OBJECT IDENTIFIER
+		::= { extremeV2Traps 3 }
+
+	extremeSecurityTrapsPrefix     OBJECT IDENTIFIER
+          ::= { extremeSecurityTraps 0 }
+
+
+	extremeMacLimitExceeded NOTIFICATION-TYPE
+        OBJECTS { extremeMacSecurityVlanIfIndex, 
+                  extremeMacSecurityVlanDescr, 
+                  extremeMacSecurityMacAddress, 
+                  extremeMacSecurityPortIfIndex,
+                  extremeMacSecurityVlanId }
+	    STATUS      current
+		DESCRIPTION
+		    "This trap will be generated, for a port on which limit-learning has been 
+             configured,  when a new MAC address exceeding the limit is learnt on that 
+             port."
+       ::= { extremeSecurityTrapsPrefix 1 }
+
+    extremeUnauthorizedPortForMacDetected NOTIFICATION-TYPE
+                   OBJECTS { extremeMacSecurityVlanIfIndex, 
+                             extremeMacSecurityVlanDescr, 
+                             extremeMacSecurityVlanId,
+                             extremeMacSecurityMacAddress, 
+                             extremeMacSecurityPortIfIndex }
+                             
+	    STATUS      current
+		DESCRIPTION
+		    "This trap will be generated when a MAC Address is learnt on a port on which 
+             it is not not authorized. This will happen when the MAC address is statically 
+             configured  as a 'secure mac' on some other port(s)."
+        ::= { extremeSecurityTrapsPrefix 2 }
+
+	extremeMacDetectedOnLockedPort NOTIFICATION-TYPE
+                   OBJECTS { extremeMacSecurityVlanIfIndex, 
+                             extremeMacSecurityVlanDescr, 
+                             extremeMacSecurityVlanId,
+                             extremeMacSecurityMacAddress, 
+                             extremeMacSecurityPortIfIndex }
+                             
+	   	STATUS      current
+		DESCRIPTION
+		    "This trap will be generated on a port for which lock-learning has been 
+		    configured, when a new MAC address is learnt on that port."
+            ::= { extremeSecurityTrapsPrefix 3 }
+
+    extremeMacSecurityVlanIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                "The ifIndex of the VLAN on which the MAC address was received."
+        ::= { extremeSecurityTraps 1 }
+
+    extremeMacSecurityVlanDescr OBJECT-TYPE
+         SYNTAX DisplayString (SIZE(0..32))
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "The description(name) of the VLAN on which the MAC address was received."
+         ::= { extremeSecurityTraps 2 }
+
+    extremeMacSecurityMacAddress  OBJECT-TYPE
+         SYNTAX MacAddress
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "The received MAC address."
+         ::= { extremeSecurityTraps 3 }
+
+    extremeMacSecurityPortIfIndex  OBJECT-TYPE
+         SYNTAX INTEGER
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "The ifIndex of the port on which the MAC address was received."
+         ::= { extremeSecurityTraps 4 }
+
+     extremeMacSecurityVlanId  OBJECT-TYPE
+         SYNTAX INTEGER
+         MAX-ACCESS accessible-for-notify
+         STATUS current
+         DESCRIPTION
+             "The VLAN ID of the VLAN on which the MAC address was received."
+        ::= { extremeSecurityTraps 5 }
+                
+
+      extremeNetloginUserLogin NOTIFICATION-TYPE
+            OBJECTS { 	extremeNetloginStationMac,
+		                extremeNetloginStationAddr,
+		                extremeNetloginPortIfIndex,
+                        extremeNetloginAuthType,
+                        extremeNetloginSystemTime,
+                        extremeNetloginUser, 
+                        extremeNetloginSrcVlan,
+                        extremeNetloginDestVlan,
+                        extremeNetloginSessionStatus
+                    }
+	    	STATUS      current
+		    DESCRIPTION
+		    "This trap will be generated when a netlogin supplicant passes 
+            authentication and logs in successfully into the network."
+            ::= { extremeSecurityTrapsPrefix 4}
+
+
+
+      extremeNetloginUserLogout NOTIFICATION-TYPE
+            OBJECTS { 	extremeNetloginStationMac,
+		                extremeNetloginStationAddr,
+		                extremeNetloginPortIfIndex,
+                        extremeNetloginAuthType,
+                        extremeNetloginSystemTime,
+                        extremeNetloginUser, 
+                        extremeNetloginSrcVlan,
+                        extremeNetloginDestVlan,
+                        extremeNetloginSessionStatus
+                    }
+	    	STATUS      current
+		    DESCRIPTION
+            "This trap will be generated when a netlogin supplicant logs out. 
+            This trap is meant to notify logout event only for already 
+            authenticated and logged in supplicant. "
+            ::= { extremeSecurityTrapsPrefix 5}
+
+
+      extremeNetloginAuthFailure NOTIFICATION-TYPE
+            OBJECTS { 	extremeNetloginStationMac,
+		                extremeNetloginStationAddr,
+		                extremeNetloginPortIfIndex,
+                        extremeNetloginAuthType,
+                        extremeNetloginSystemTime,
+                        extremeNetloginUser, 
+                        extremeNetloginSrcVlan,
+                        extremeNetloginDestVlan,
+                        extremeNetloginSessionStatus
+                    }
+	    	STATUS      current
+		    DESCRIPTION
+            "This trap will be generated upon authentication failure for a 
+             netlogin supplicant"
+            ::= { extremeSecurityTrapsPrefix 6 }
+
+
+      extremeNetloginStationMac  OBJECT-TYPE
+            SYNTAX  MacAddress
+            MAX-ACCESS accessible-for-notify
+      	    STATUS       current
+     	    DESCRIPTION
+            "MAC address of netlogin supplicant"
+            ::= { extremeSecurityTraps 6 }
+
+      extremeNetloginStationAddr  OBJECT-TYPE
+            SYNTAX  IpAddress
+            MAX-ACCESS accessible-for-notify
+      	    STATUS       current
+     	    DESCRIPTION
+            "MAC address of netlogin supplicant"
+            ::= { extremeSecurityTraps 7 }
+
+
+      extremeNetloginPortIfIndex   OBJECT-TYPE
+            SYNTAX  INTEGER
+            MAX-ACCESS accessible-for-notify
+      	    STATUS       current
+     	    DESCRIPTION
+            "IfIndex of authenticator port to which the netlogin supplicant is 
+            connected"
+            ::= { extremeSecurityTraps 8}
+
+      extremeNetloginAuthType  OBJECT-TYPE
+	        SYNTAX      ClientAuthType 
+            MAX-ACCESS accessible-for-notify
+      	    STATUS       current
+     	    DESCRIPTION
+            "IF supplicant is authenticated using remote authentication server
+            as RADIUS or locally using authenticator local user database"
+            ::= { extremeSecurityTraps 9}
+
+      extremeNetloginSystemTime OBJECT-TYPE
+            SYNTAX  TimeStamp
+            MAX-ACCESS accessible-for-notify
+            STATUS  current
+            DESCRIPTION
+                "The time when a netlogin event occurs and  is 
+                meaningful for accounting purposes."
+            ::= { extremeSecurityTraps 10}
+
+        extremeNetloginUser  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS accessible-for-notify
+      	STATUS       current
+     	DESCRIPTION
+	    "Information containing type of session as NETLOGIN or DOT1X
+        concatenated with userName  i,e  '[NETLOGIN | DOT1X]:<username>' "
+        ::= { extremeSecurityTraps 11}
+
+        extremeNetloginSrcVlan  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS accessible-for-notify
+      	STATUS       current
+     	DESCRIPTION
+        "Upon successful login this vlan will represent the one in which 
+        user resides before authentication while upon logout this vlan will 
+        be the one in which user resides before logout. "
+        ::= { extremeSecurityTraps 12}
+
+        extremeNetloginDestVlan  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..64))
+        MAX-ACCESS accessible-for-notify
+      	STATUS       current
+     	DESCRIPTION
+        "The description (name) of the VLAN in which user moves after 
+        successful login or logout."
+        ::= { extremeSecurityTraps 13}
+        
+        extremeNetloginSessionStatus   OBJECT-TYPE
+     	SYNTAX       INTEGER {
+                        success (1),
+                        sessionReset (2),
+         				fDBAgingInitiatedLogout    (3),
+         				userInitiatedLogout    (4),
+				        sessionRefreshInitiatedLogout (5),
+				        authenticationFailure  (6),
+				        remoteAuthenticationServerFailure (7)
+				}
+ 		MAX-ACCESS accessible-for-notify
+   		STATUS       current
+   		DESCRIPTION
+        "
+        -success (1) 
+            Successful login
+ 	    -sessionReset (2)
+            Administrator has initialized Authentication State.
+	    -fDBAgingInitiatedLogout (3)
+ 	        Logout initiated due to FDB aging of client MAC
+	    -userInitiatedLogout(4)
+            Graceful logout attempt from user
+        -sessionRefreshInitiatedLogout (5)
+            (Valid for web-based mode only) Logout initiated by 
+            session-refresh mechanism.
+	   -authenticationFailure(6)
+            Authentication Failure
+	    -remoteAuthenticationServerFailure (7)
+            Remote Authentication server Failure.
+	    "
+   	 ::= { extremeSecurityTraps 14 }
+
+        extremeNMSTraps     OBJECT IDENTIFIER
+		    ::= { extremeV2Traps 4 }
+
+	    extremeNMSTrapsPrefix     OBJECT IDENTIFIER
+            ::= { extremeNMSTraps 0 }
+
+        extremeNMSDeviceAddress  OBJECT-TYPE
+              SYNTAX IpAddress
+              MAX-ACCESS  accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "The IP address of the device modified by Extreme's Network Management Application."
+	          ::= { extremeNMSTraps 1 }
+
+	    extremeNMSInventoryChanged NOTIFICATION-TYPE
+            OBJECTS { extremeNMSDeviceAddress }
+	    	STATUS      current
+		    DESCRIPTION
+		    "This trap is sent by Extreme's Network Management Applications when a change
+                    in its inventory database occurs. This trap is not send by a router or switch."
+		    ::= { extremeNMSTrapsPrefix 1 }
+
+        extremeNMSTopologyChanged NOTIFICATION-TYPE
+	    	STATUS      current
+		    DESCRIPTION
+		    "This trap is sent by Extreme's Network Management Applications when a change 
+                    in its Topology database occurs. This trap is not send by a router or switch."
+		    ::= { extremeNMSTrapsPrefix 2 }
+
+        
+
+
+    extremeEapsTraps     OBJECT IDENTIFIER
+		::= { extremeV2Traps 7 }
+
+	extremeEapsTrapsPrefix     OBJECT IDENTIFIER
+          ::= { extremeEapsTraps 0 }
+
+        extremeEapsStateChange NOTIFICATION-TYPE
+            OBJECTS {	extremeEapsName, 
+			extremeEapsMode, 
+			extremeEapsPrevState,
+			extremeEapsState}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeEapsStateChange notification is generated
+                     when the EAPS domain has a state change."
+                ::= { extremeEapsTrapsPrefix 1 }
+
+        extremeEapsFailTimerExpFlagSet NOTIFICATION-TYPE
+            OBJECTS {	extremeEapsName, 
+			extremeEapsMode, 
+			extremeEapsPrevState,
+			extremeEapsState}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeEapsFailTimerExpFlagSet notification is 
+                     generated when the EAPS domain's fail timer expires
+                     for the first time, while its state is not in Fail state."
+                ::= { extremeEapsTrapsPrefix 2 }
+
+        extremeEapsFailTimerExpFlagClear NOTIFICATION-TYPE
+            OBJECTS {	extremeEapsName, 
+			extremeEapsMode, 
+			extremeEapsPrevState,
+			extremeEapsState}
+            STATUS  current
+            DESCRIPTION
+                    "The extremeEapsFailTimerExpFlagClear notification is 
+                     generated when the EAPS domain's Fail timer expired flag 
+                     is cleared."
+                ::= { extremeEapsTrapsPrefix 3 }
+
+
+        extremeEapsLinkDownRingComplete NOTIFICATION-TYPE
+            OBJECTS {	extremeEapsName, 
+			extremeEapsMode, 
+			extremeEapsPrevState,
+			extremeEapsState}
+            STATUS  current
+            DESCRIPTION
+                    "If a Transit is in Link-Down state, and it receives a 
+                     Health-Check-Pdu from the Master indicating the ring is
+                     Complete, it means there is some problem with the Transit
+                     switch that has issued this trap message."
+                ::= { extremeEapsTrapsPrefix 4 }
+
+-- Extreme PoE Notifications
+extremePethTraps  OBJECT IDENTIFIER ::= {extremeV2Traps 12}
+
+extremePethNotificationPrefix     OBJECT IDENTIFIER
+		::= { extremePethTraps 0 }
+
+        extremePethPSUStatusNotification NOTIFICATION-TYPE
+            OBJECTS     { extremePethSlotPSUActive, extremePethSlotMainPseIndex }
+            STATUS      current
+            DESCRIPTION
+                " This Notification indicates a change in the PoE PSU for the slot."
+            ::= { extremePethNotificationPrefix 1 }
+
+ extremeElrpTraps       OBJECT IDENTIFIER
+                ::= { extremeV2Traps 6 }
+
+        extremeElrpTrapsPrefix  OBJECT IDENTIFIER
+          ::= { extremeElrpTraps 0 }
+
+        extremeElrpVlanLoopDetected NOTIFICATION-TYPE
+            OBJECTS { extremeVlanIfDescr}
+            STATUS  current
+            DESCRIPTION
+                     " The extremeElrpVlanLoopDetected notification is generated
+                       when the ELRP client detects a loop in the vlan."
+                ::= { extremeElrpTrapsPrefix 1 }
+
+
+
+    extremeEapsSharedLinkTraps     OBJECT IDENTIFIER
+		::= { extremeV2Traps 9 }
+
+	extremeEapsSharedLinkTrapsPrefix     OBJECT IDENTIFIER
+          ::= { extremeEapsSharedLinkTraps 0 }
+
+        extremeSegmentPort  OBJECT-TYPE
+              SYNTAX INTEGER (0..65535)
+              MAX-ACCESS  accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "The EAPS Shared Link's Segment Id."
+	          ::= { extremeEapsSharedLinkTraps 1 }
+
+        extremeSharedPort  OBJECT-TYPE
+              SYNTAX INTEGER (0..65535)
+              MAX-ACCESS  accessible-for-notify
+              STATUS current
+              DESCRIPTION
+                  "The EAPS Shared Link's Shared port."
+	          ::= { extremeEapsSharedLinkTraps 2 }
+
+        extremeEapsSegmentTimerExpFlagSet NOTIFICATION-TYPE
+            OBJECTS {	extremeSegmentPort, 
+                        extremeSharedPort
+                    }
+            STATUS  current
+            DESCRIPTION
+                    "The extremeEapsFailTimerExpFlagSet notification is 
+                     generated when the EAPS domain's segment timer expires
+                     for the first time."
+                ::= { extremeEapsSharedLinkTrapsPrefix 1 }
+
+        extremeEapsSegmentTimerExpFlagClear NOTIFICATION-TYPE
+            OBJECTS {	extremeSegmentPort,
+                        extremeSharedPort
+                    }
+            STATUS  current
+            DESCRIPTION
+                    "The extremeEapsSegmentTimerExpFlagClear notification is 
+                     generated when the EAPS domain's Segment Fail timer 
+                     expired flag is cleared."
+                ::= { extremeEapsSharedLinkTrapsPrefix 2 }
+     
+END

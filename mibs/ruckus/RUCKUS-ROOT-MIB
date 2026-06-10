@@ -1,0 +1,108 @@
+--
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises,
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+ruckusRootMIB MODULE-IDENTITY
+    LAST-UPDATED "201405191100Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
+    DESCRIPTION
+        "Ruckus top level mib."
+    ::= { enterprises 25053 }
+
+
+-- Groups
+--
+
+ruckusObjects OBJECT IDENTIFIER  ::= { ruckusRootMIB 1 }
+
+ruckusCommon OBJECT IDENTIFIER   ::= { ruckusObjects 1 }
+
+ruckusCommonTCModule OBJECT IDENTIFIER      ::= { ruckusCommon 1 }
+
+ruckusCommonHwInfoModule OBJECT IDENTIFIER  ::= { ruckusCommon 2 }
+
+ruckusCommonSwInfoModule OBJECT IDENTIFIER  ::= { ruckusCommon 3 }
+
+ruckusCommonDeviceModule OBJECT IDENTIFIER  ::= { ruckusCommon 4 }
+
+ruckusCommonUpgradeModule OBJECT IDENTIFIER ::= { ruckusCommon 5 }
+
+ruckusCommonWLANModule OBJECT IDENTIFIER    ::= { ruckusCommon 6 }
+
+ruckusCommonDHCPModule OBJECT IDENTIFIER    ::= { ruckusCommon 7 }
+
+ruckusCommonPPPOEModule OBJECT IDENTIFIER   ::= { ruckusCommon 8 }
+
+ruckusCommonAdapterModule OBJECT IDENTIFIER ::= { ruckusCommon 9 }
+
+ruckusCommonQosModule OBJECT IDENTIFIER     ::= { ruckusCommon 10 }
+
+ruckusCommonSystemModule OBJECT IDENTIFIER  ::= { ruckusCommon 11 }
+
+ruckusCommonRadioModule OBJECT IDENTIFIER   ::= { ruckusCommon 12 }
+
+ruckusCommonEthModule OBJECT IDENTIFIER     ::= { ruckusCommon 13 }
+
+ruckusCommonL2TPModule OBJECT IDENTIFIER    ::= { ruckusCommon 14 }
+
+ruckusCommonWLINKModule OBJECT IDENTIFIER   ::= { ruckusCommon 15 }
+
+ruckusZD OBJECT IDENTIFIER   ::= { ruckusObjects 2 }
+
+ruckusZDSystemModule OBJECT IDENTIFIER      ::= { ruckusZD 1 }
+
+ruckusZDWLANModule OBJECT IDENTIFIER        ::= { ruckusZD 2 }
+
+ruckusSCG OBJECT IDENTIFIER   ::= { ruckusObjects 3 }
+
+ruckusSCGSystemModule OBJECT IDENTIFIER      ::= { ruckusSCG 1 }
+
+ruckusSCGWLANModule OBJECT IDENTIFIER        ::= { ruckusSCG 2 }
+
+ruckusSCGTTGModule OBJECT IDENTIFIER        ::= { ruckusSCG 3 }
+
+ruckusSZ OBJECT IDENTIFIER   ::= { ruckusObjects 4 }
+
+ruckusSZSystemModule OBJECT IDENTIFIER      ::= { ruckusSZ 1 }
+
+ruckusSZWLANModule OBJECT IDENTIFIER        ::= { ruckusSZ 2 }
+
+ruckusCTRL OBJECT IDENTIFIER   ::= { ruckusObjects 8 }
+
+ruckusCTRLWLANModule OBJECT IDENTIFIER      ::= { ruckusCTRL 1 }
+
+ruckusUnleashed OBJECT IDENTIFIER   ::= { ruckusObjects 15 }
+
+ruckusUnleashedSystemModule OBJECT IDENTIFIER      ::= { ruckusUnleashed 1 }
+
+ruckusUnleashedWLANModule OBJECT IDENTIFIER        ::= { ruckusUnleashed 2 }
+
+ruckusEvents OBJECT IDENTIFIER    ::= { ruckusRootMIB 2 }
+
+ruckusProducts OBJECT IDENTIFIER  ::= { ruckusRootMIB 3 }
+
+END

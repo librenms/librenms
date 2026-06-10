@@ -1,0 +1,157 @@
+-- *****************************************************************
+-- Retimer Module MIB
+-- *****************************************************************
+
+SL-RETIMER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Gauge32, 
+	Counter64     	                    FROM SNMPv2-SMI
+	DisplayString, TruthValue,
+	DateAndTime							FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	slService				      		FROM SL-NE-MIB;
+
+slRetimer MODULE-IDENTITY
+	LAST-UPDATED "200508171200Z"   -- 17 Jan. 2005  12:00:00 EST
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Retimer"
+	::= { slService 14 }
+
+-- The Retimer MIB consists of the following groups:
+--    Configuration
+--	  Status
+--    Pm
+--    Traps
+
+slRetimerConfig		OBJECT IDENTIFIER ::= { slRetimer 1 }
+slRetimerStat	 	OBJECT IDENTIFIER ::= { slRetimer 2 }
+slRetimerPm	 		OBJECT IDENTIFIER ::= { slRetimer 3 }
+slRetimerTraps 		OBJECT IDENTIFIER ::= { slRetimer 7 }
+
+-- Textual Conventions  
+
+
+--
+-- The Retimer Configuration Table
+--
+
+slRetimerConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlRetimerConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Retimer Configuration table."
+	::= { slRetimerConfig 1 }
+
+slRetimerConfigEntry OBJECT-TYPE
+	SYNTAX  SlRetimerConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the Retimer Configuration table."
+	INDEX   { slRetimerLineIndex }
+	::= { slRetimerConfigTable 1 }
+
+SlRetimerConfigEntry ::=
+	SEQUENCE {
+		slRetimerLineIndex			InterfaceIndex,
+		slRetimerResetPmCounters	INTEGER
+	}
+
+slRetimerLineIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"This object should be made equal to the ifIndex of the SFP."
+	::= { slRetimerConfigEntry 1 }
+
+slRetimerResetPmCounters OBJECT-TYPE
+	SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+    	"Setting this object to 1 reset the current interval PM
+    	counters of the retimer."
+    ::= { slRetimerConfigEntry 2 }
+
+
+
+--
+-- The PM Current Table
+--
+
+slRetimerCurrentTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlRetimerCurrentEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The Ethernet current table contains various statistics
+		being collected for the current 15 minute
+		interval."
+	::= { slRetimerPm 1 }
+
+slRetimerCurrentEntry OBJECT-TYPE
+	SYNTAX  		SlRetimerCurrentEntry
+	MAX-ACCESS  	not-accessible
+	STATUS  		current
+	DESCRIPTION
+		"An entry in the Retimer Current table."
+	INDEX   { slRetimerCurrentIndex }
+	::= { slRetimerCurrentTable 1 }
+
+SlRetimerCurrentEntry ::=
+	SEQUENCE {
+		slRetimerCurrentIndex            InterfaceIndex,
+		slRetimerCurrentRxRllES           INTEGER,
+		slRetimerCurrentRxK285ES          INTEGER
+	}
+
+slRetimerCurrentIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The index value which uniquely identifies  the
+		Ethernet interface to which this entry is applicable.
+		The interface identified by a particular value of
+		this index is the same interface as identified by
+		the same value as a the ifIndex of the SFP."
+	::= { slRetimerCurrentEntry 1 }
+
+slRetimerCurrentRxRllES            OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of Errored Seconds with RLL error."
+	::= { slRetimerCurrentEntry 2 }
+
+slRetimerCurrentRxK285ES                OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of Errored Seconds with K28.5 error."
+	::= { slRetimerCurrentEntry 3 }
+
+
+-- ---------------------------------------------
+-- Retimer Traps
+-- ---------------------------------------------
+
+slRetimerStatusChange NOTIFICATION-TYPE
+	OBJECTS { slRetimerLineIndex }
+	STATUS  current
+	DESCRIPTION
+		""
+	::= { slRetimerTraps 1 }
+
+END

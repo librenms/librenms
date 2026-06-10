@@ -1,0 +1,285 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-VRRP-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-VRRP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    IpAddress, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+prvtVrrpMIB MODULE-IDENTITY
+    LAST-UPDATED "201411100000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This MIB describes objects used for managing Virtual Router Redundancy Protocol (VRRP) routers."
+    REVISION    "201411100000Z"
+    DESCRIPTION 
+        "Initial version"
+    ::= { switch 167 }
+
+
+prvtVrrpObjects OBJECT IDENTIFIER
+    ::= { prvtVrrpMIB 1 }
+
+prvtVrrpVirtualRouterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtVrrpVirtualRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpObjects 1 }
+
+prvtVrrpVirtualRouterEntry OBJECT-TYPE
+    SYNTAX      PrvtVrrpVirtualRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "NONE"
+    INDEX       { prvtVrrpVirtualRouterId }
+    ::= { prvtVrrpVirtualRouterTable 1 }
+
+PrvtVrrpVirtualRouterEntry ::= SEQUENCE {
+    prvtVrrpVirtualRouterId                     Unsigned32,
+    prvtVrrpVirtualRouterRowStatus              RowStatus,
+    prvtVrrpVirtualRouterShutdown               TruthValue,
+    prvtVrrpVirtualRouterPreempt                TruthValue,
+    prvtVrrpVirtualRouterPriority               Unsigned32,
+    prvtVrrpVirtualRouterVersion                Unsigned32,
+    prvtVrrpVirtualRouterAdvertisedInterval     Unsigned32,
+    prvtVrrpVirtualRouterAcceptMode             INTEGER,
+    prvtVrrpVirtualRouterInterface              OCTET STRING,
+    prvtVrrpVirtualRouterTraceUplinkThreshold   Unsigned32,
+    prvtVrrpVirtualRouterTraceUplinkFlushTimer  Unsigned32,
+    prvtVrrpVirtualRouterStateVrrp              INTEGER
+}
+
+prvtVrrpVirtualRouterId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 1 }
+
+prvtVrrpVirtualRouterRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 2 }
+
+prvtVrrpVirtualRouterShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 3 }
+
+prvtVrrpVirtualRouterPreempt OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 4 }
+
+prvtVrrpVirtualRouterPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..254)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 5 }
+
+prvtVrrpVirtualRouterVersion OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 6 }
+
+prvtVrrpVirtualRouterAdvertisedInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 10..4095)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 7 }
+
+prvtVrrpVirtualRouterAcceptMode OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), icmp(1), all(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 8 }
+
+prvtVrrpVirtualRouterInterface OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 9 }
+
+prvtVrrpVirtualRouterTraceUplinkThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 10 }
+
+prvtVrrpVirtualRouterTraceUplinkFlushTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..101)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 11 }
+
+prvtVrrpVirtualRouterStateVrrp OBJECT-TYPE
+    SYNTAX      INTEGER { init(1), backup(2), master(3), initWait(4), 
+                    none(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualRouterEntry 12 }
+
+prvtVrrpVirtualIpAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtVrrpVirtualIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpObjects 2 }
+
+prvtVrrpVirtualIpAddressEntry OBJECT-TYPE
+    SYNTAX      PrvtVrrpVirtualIpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { prvtVrrpVirtualRouterId, prvtVrrpVirtualIpAddress }
+    ::= { prvtVrrpVirtualIpAddressTable 1 }
+
+PrvtVrrpVirtualIpAddressEntry ::= SEQUENCE {
+    prvtVrrpVirtualIpAddress            IpAddress,
+    prvtVrrpVirtualIpAddressRowStatus   RowStatus,
+    prvtVrrpVirtualIpAddressRange       Unsigned32
+}
+
+prvtVrrpVirtualIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualIpAddressEntry 1 }
+
+prvtVrrpVirtualIpAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualIpAddressEntry 2 }
+
+prvtVrrpVirtualIpAddressRange OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpVirtualIpAddressEntry 3 }
+
+prvtVrrpTraceUplinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtVrrpTraceUplinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpObjects 3 }
+
+prvtVrrpTraceUplinkEntry OBJECT-TYPE
+    SYNTAX      PrvtVrrpTraceUplinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { prvtVrrpVirtualRouterId, prvtVrrpTraceUplinkName }
+    ::= { prvtVrrpTraceUplinkTable 1 }
+
+PrvtVrrpTraceUplinkEntry ::= SEQUENCE {
+    prvtVrrpTraceUplinkName         OCTET STRING,
+    prvtVrrpTraceUplinkRowStatus    RowStatus
+}
+
+prvtVrrpTraceUplinkName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpTraceUplinkEntry 1 }
+
+prvtVrrpTraceUplinkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtVrrpTraceUplinkEntry 2 }
+
+END -- end of module PRVT-VRRP-MIB.

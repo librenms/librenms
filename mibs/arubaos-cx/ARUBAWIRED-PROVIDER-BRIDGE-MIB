@@ -1,0 +1,262 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-PROVIDER-BRIDGE-MIB.mib
+--*
+--* (c) Copyright 2021-2022 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-PROVIDER-BRIDGE-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-PROVIDER-BRIDGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    VlanId
+        FROM Q-BRIDGE-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredProviderBridgeMIB MODULE-IDENTITY
+    LAST-UPDATED "202111120000Z"  -- Nov 12, 2021
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett-Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION  "This MIB module contains the HPE 'version'
+                  of the standard Provider Bridge MIB and
+                  the proprietary extensions to it."
+
+    REVISION     "202111120000Z"  -- Nov 12, 2021
+    DESCRIPTION  "Initial revision."
+
+    ::= { wndFeatures 23 }
+
+--**********************************************************************
+-- The ProviderBridge MIB Objects
+-- **********************************************************************
+    arubaWiredProviderBridgeNotifications OBJECT IDENTIFIER
+                     ::= { arubaWiredProviderBridgeMIB 0 }
+
+    arubaWiredProviderBridgeObjects OBJECT IDENTIFIER
+                     ::= { arubaWiredProviderBridgeMIB 1 }
+
+    arubaWiredProviderBridgeConformance OBJECT IDENTIFIER
+                     ::= { arubaWiredProviderBridgeMIB 2 }
+
+    arubaWiredProviderBridgeBase OBJECT IDENTIFIER
+                     ::= { arubaWiredProviderBridgeObjects 0 }
+
+-- **********************************************************************
+-- Scalar Objects
+-- **********************************************************************
+
+-- This is a HPE specific define - where we can configure a device as a
+-- regular vlanBridge, s-vlan bridge, provider edge bridge or a vlanSvlanBridge.
+
+    arubaWiredProviderBridgeType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        vlanBridge(1),
+                        svlanBridge(2),
+                        providerEdgeBridge(3),
+                        vlanSvlanBridge(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "arubaWiredProviderBridgeType controls bridge mode configuration.
+                     A device can function in one of the 4 modes defined above.
+
+                     vlanBridge         - provider bridge feature disabled mode,
+                                          all VLANs are cvlans.
+
+                     svlanBridge        - provider bridge mode with only svlans.
+
+                     providerEdgeBridge - provider bridge mode with cvlans and
+                                          svlans and mappings between them.
+
+                     vlanSvlanBridge    - provider bridge mode with independent
+                                          cvlans and svlans on the same device.
+
+                     Changing from one mode to another will empty out the
+                     current configuration information and reboot the device."
+        DEFVAL     { vlanBridge }
+        ::= { arubaWiredProviderBridgeBase 1 }
+
+-- This is a HPE specific define - to configure the EtherType for Provider
+-- tagged frames. Applicable to s-vlan bridge, provider edge bridge or
+-- a vlanSvlanBridge.
+
+    arubaWiredProviderBridgeEtherType OBJECT-TYPE
+        SYNTAX      Integer32 (1536..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Defines the 2-byte ethertype for provider tagged frames.
+                     The default is 0x88a8.
+                     Changing from one tag-type to another with a given
+                     arubaWiredProviderBridgeType configuration will save
+                     current configurations and reboot the device, the
+                     new tag-type will take effect subsequently."
+        DEFVAL     { 34984 }
+        ::= { arubaWiredProviderBridgeBase 2 }
+
+
+-- **********************************************************************
+-- Tabular Objects
+-- **********************************************************************
+
+-- ------------------------------------------------------------------------
+-- VLAN Classification Table
+-- ------------------------------------------------------------------------
+
+    arubaWiredProviderBridgeVlanTypeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredProviderBridgeVlanTypeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HPE proprietary table to classify a
+                     VLAN as a cvlan or an svlan"
+        ::= { arubaWiredProviderBridgeBase 3}
+
+    arubaWiredProviderBridgeVlanTypeEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredProviderBridgeVlanTypeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry for HPE Specific extension table"
+        INDEX    { arubaWiredProviderBridgeVlanTypeVlanID }
+        ::= { arubaWiredProviderBridgeVlanTypeTable 1 }
+
+    ArubaWiredProviderBridgeVlanTypeEntry ::= SEQUENCE {
+        arubaWiredProviderBridgeVlanTypeVlanID VlanId,
+        arubaWiredProviderBridgeVlanType INTEGER
+        }
+
+    arubaWiredProviderBridgeVlanTypeVlanID OBJECT-TYPE
+        SYNTAX    VlanId
+        MAX-ACCESS  not-accessible
+        STATUS    current
+        DESCRIPTION "The VLAN ID to which this entry belongs."
+        ::= { arubaWiredProviderBridgeVlanTypeEntry 1 }
+
+    arubaWiredProviderBridgeVlanType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                       cvlan(1),
+                       svlan(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the VLANtype."
+
+        ::= { arubaWiredProviderBridgeVlanTypeEntry 2 }
+
+-- ------------------------------------------------------------------------
+-- Provider Bridge Port Table
+-- -------------------------------------------------------------
+
+    arubaWiredProviderBridgePortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredProviderBridgePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This specifies the designated type of an externally
+                    accessible port on a Provider Bridge."
+        ::= { arubaWiredProviderBridgeBase 4 }
+
+    arubaWiredProviderBridgePortEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredProviderBridgePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry that specifies the designated type of an
+                    externally accessible port on a Provider Bridge."
+        INDEX       { arubaWiredProviderBridgePortifIndex }
+        ::= { arubaWiredProviderBridgePortTable 1 }
+
+    ArubaWiredProviderBridgePortEntry ::=
+        SEQUENCE {
+            arubaWiredProviderBridgePortifIndex InterfaceIndex,
+            arubaWiredProviderBridgePortType INTEGER
+        }
+
+    arubaWiredProviderBridgePortifIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "The index value that uniquely identifies the interface to
+                which this entry is applicable.  The interface identified by
+                a particular value of this index is the same interface as
+                identified by the same value of the IF-MIB's ifIndex."
+        ::= { arubaWiredProviderBridgePortEntry 1 }
+
+    arubaWiredProviderBridgePortType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        customerEdge(1),
+                        customerNetwork(2),
+                        providerNetwork (3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The type of an externally accessible port on
+                     a Provider Bridge.
+                     A customer-edge port is a C-VLAN component Port
+                     on a Provider Edge Bridge that is connected to
+                     customer owned equipment and receives and transmits
+                     frames for a single customer. Designating a port as a
+                     Customer Edge Port implies Provider Edge Bridge
+                     functionality and, specifically, the existence of a
+                     C-VLAN component associated with that port. This
+                     C-VLAN component is uniquely identified within the
+                     Bridge by the port number of the associated Customer
+                     Edge Port.
+                     A customer-network port is an S-VLAN component Port
+                     on a Provider Bridge or within a Provider Edge
+                     Bridge that receives and transmits frame for a
+                     single customer.
+                     A provider-network port is an S-VLAN component Port
+                     on a Provider Bridge that can transmit and
+                     receive frames for multiple customers."
+        REFERENCE
+          "IEEE 802.1ad Sec 3"
+        DEFVAL     { customerEdge }
+
+        ::= { arubaWiredProviderBridgePortEntry 2 }
+
+
+-- **********************************************************************
+-- Conformance information
+-- **********************************************************************
+
+    arubaWiredProviderBridgeCompliances OBJECT IDENTIFIER
+                      ::= { arubaWiredProviderBridgeConformance 1 }
+
+    arubaWiredProviderBridgeGroups OBJECT IDENTIFIER
+                      ::= { arubaWiredProviderBridgeConformance 2 }
+
+    arubaWiredProviderBridgeBaseGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredProviderBridgeType,
+                      arubaWiredProviderBridgeEtherType,
+                      arubaWiredProviderBridgePortType,
+                      arubaWiredProviderBridgeVlanType
+                     }
+        STATUS      current
+        DESCRIPTION "Basic Provider Bridge configuration information."
+        ::= { arubaWiredProviderBridgeGroups 1 }
+
+    arubaWiredProviderBridgeCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HPE Switches with IEEE
+                    standard Provider Bridge MIBs."
+        MODULE
+            MANDATORY-GROUPS { arubaWiredProviderBridgeBaseGroup }
+
+        ::= { arubaWiredProviderBridgeCompliances 1 }
+
+END

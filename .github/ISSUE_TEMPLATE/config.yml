@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Device request
+    url: https://community.librenms.org/c/device-requests/12
+    about: To request support for a new device type or add additional data
+  - name: Feature request
+    url: https://community.librenms.org/c/feature-requests/3
+    about: Please use our Community Forum for making feature requests. 
+  - name: I have a question or need support
+    url: https://www.librenms.org/#support
+    about: We use GitHub for tracking bugs, check our website for resources on getting help.

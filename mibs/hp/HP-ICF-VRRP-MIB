@@ -1,0 +1,659 @@
+HP-ICF-VRRP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, Counter32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        ifIndex
+            FROM IF-MIB
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        vrrpOperEntry, vrrpAssoIpAddrEntry, vrrpOperVrId
+            FROM VRRP-MIB
+        TruthValue, RowStatus
+            FROM SNMPv2-TC
+        hpSwitch
+            FROM HP-ICF-OID;
+
+    hpicfVrrpMIB MODULE-IDENTITY 
+        
+        LAST-UPDATED "202106100000Z"  -- June 10, 2021
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO "Hewlett Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     extensions to the standard VRRP MIB (RFC 2787)."
+
+        REVISION     "202106100000Z"  -- June 10, 2021
+        DESCRIPTION  "Added hpicfVrrpVrMainPreempt mib object"
+
+        REVISION     "201211150000Z"  -- November 15, 2012
+        DESCRIPTION  "Deprecate mib objects
+                      hpicfVrrpRespondToPing,
+                      hpicfVrrpRemoveConfig,
+                      hpicfVrrpStatsNearFailovers,
+                      hpicfVrrpNonstop,
+                      hpicfVrrpAdminStatus"
+        
+        REVISION     "201306120000Z"  -- June 12, 2013
+        DESCRIPTION  "Deprecate mib objects
+                      hpicfVrrpAdminStatus,
+                      hpicfVrrpRespondToPing,
+                      hpicfVrrpRemoveConfig,
+                      hpicfVrrpNonstop.Deprecated groups
+                      hpicfVrrpOperGroup,hpicfVrrpOperationsGroup and
+                      added hpicfVrrpOperGroup1, hpicfVrrpOperationsGroup.
+                      Deprecated compliances hpicfVrrpMIBCompliance3, 
+                      hpicfVrrpMIBCompliance4,hpicfVrrpMIBCompliance5
+                      and added hpicfVrrpMIBCompliance6
+                      and hpicfVrrpMIBCompliance7. "
+
+	REVISION     "201202220000Z"  -- Feb 22, 2012
+        DESCRIPTION  "Added hpicfVrrpTrackState, hpicfVrrpTrackGroup1
+                      and hpicfVrrpMIBCompliance5.deprecated 
+                      hpicfVrrpMIBCompliance1."
+
+        REVISION     "201010200000Z"  -- October 20, 2010
+        DESCRIPTION  "Added hpicfVrrpNonstop to the 
+                      hpicfVrrpOperations object"
+
+        REVISION     "201007280000Z"  -- July 28, 2010
+        DESCRIPTION  "Added hpicfVrrpRemoveConfig to disable VRRP and
+                      remove its entire config schema from the switch.
+                      hpicfVrrpRemoveConfig to the
+                      hpicfVrrpOperations object"
+
+        REVISION     "200905190000Z"  -- May 19, 2009
+        DESCRIPTION  "Added hpicfVrrpRespondToPing to enable/disable 
+                      response to ping in the global context and added  
+                      hpicfVrrpVrRespondToPing to the 
+                      hpicfVrrpOperEntry object"  
+        
+        REVISION     "200802200000Z"  -- February 22, 2008
+        DESCRIPTION  "Added hpicfVrrpVrControl, to the
+                      hpicfVrrpOperEntry object.
+                      Added hpicfVrrpTrackTable containing
+                      hpicfVrrpTrackEntry to hpicfVrrpOperations."
+
+        REVISION     "200712120000Z"  -- December 12, 2007
+        DESCRIPTION  "Added hpicfVrrpStatsTable, which contains
+                      hpicfVrrpStatsNearFailovers."
+
+        REVISION     "200708220000Z"  -- AUGUST 22, 2007
+        DESCRIPTION  "Added hpicfVrrpVrPreemptDelayTime to the 
+                      hpicfVrrpOperEntry object."
+
+        REVISION      "200507140000Z"  -- July 14, 2005
+        DESCRIPTION   "Initial revision."
+        
+        ::= { hpSwitch 31 }
+
+-- **********************************************************************
+-- VRRP MIB Groups
+-- **********************************************************************
+
+    hpicfVrrpOperations  OBJECT IDENTIFIER ::= { hpicfVrrpMIB 1 }
+    hpicfVrrpConformance OBJECT IDENTIFIER ::= { hpicfVrrpMIB 2 }
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+    hpicfVrrpAdminStatus OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION "When set to TRUE, this enables VRRP ipv4 globally on the
+                    router. If set to FALSE, this would disable VRRP.
+                    Default is FALSE.
+                    This mib Object is deprecated and alternate mib object
+                    is hpicfVrrpv3IPv4AdminStatus."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperations 1 }
+
+-- **********************************************************************
+-- Extensions to the VRRP Operations Table (RFC 2787)
+-- **********************************************************************
+
+    hpicfVrrpOperTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfVrrpOperEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the vrrpOperTable (RFC 2787)."
+        ::= { hpicfVrrpOperations 2 }
+
+    hpicfVrrpOperEntry OBJECT-TYPE
+        SYNTAX      HpicfVrrpOperEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the vrrpOperTable."
+        AUGMENTS    { vrrpOperEntry }
+        ::= { hpicfVrrpOperTable 1 }
+
+    HpicfVrrpOperEntry ::=
+        SEQUENCE {
+            hpicfVrrpVrMode             INTEGER,
+            hpicfVrrpVrMasterPreempt    TruthValue,
+            hpicfVrrpVrTransferControl  TruthValue,
+            hpicfVrrpVrPreemptDelayTime Integer32,
+            hpicfVrrpVrControl          INTEGER,
+            hpicfVrrpVrRespondToPing    TruthValue,
+            hpicfVrrpVrMainPreempt      TruthValue
+        }
+
+    hpicfVrrpVrMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        owner(1),
+                        backup(2),
+                        uninitialized(3)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object denotes whether this VR has been
+                    designated as an owner or as a backup. On VR 
+                    creation, this field is set to uninitialized. 
+                    The user cannot set the value of this object to 
+                    uninitialized."
+        DEFVAL      { uninitialized }
+        ::= { hpicfVrrpOperEntry 1 }
+
+    hpicfVrrpVrMasterPreempt OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object, when set to TRUE, would enable the 
+                    Master Preemption mode wherein a virtual router 
+                    even though an owner will not preempt a lower 
+                    priority Backup."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperEntry 2 }
+
+    hpicfVrrpVrTransferControl OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object, when set to TRUE, would serve as 
+                    trigger to enable a virtual router owner to take
+                    control of its IP address. When this value is read 
+                    it always returns FALSE."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperEntry 3 }
+
+    hpicfVrrpVrPreemptDelayTime OBJECT-TYPE
+        SYNTAX      Integer32(0..600)  
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object specifies the time that the owner 
+                     virtual router will wait before taking control of 
+                     its virtual IP address. A value of 0 indicates 
+                     that the pre-empt delay timer is not active"
+        DEFVAL      { 0 }
+        ::= { hpicfVrrpOperEntry 4 }
+
+    hpicfVrrpVrControl OBJECT-TYPE
+        SYNTAX       INTEGER {
+                        failback(1),
+                        failover(2),
+                        failoverWithMonitoring(3),
+                        invalid(4)
+                     }
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  "When this object is set to failback (1), it acts
+                     as a trigger to intimate VRRP to failback
+                     to this router from another.
+                     When this object is set to failover (2), it acts
+                     as a trigger to intimate VRRP to failover
+                     from this router to another.
+                     When this object is set to
+                     failoverWithMonitoring (3), in addition to
+                     triggering VRRP to failover, it triggers VR to
+                     monitor for presence of a main router.
+                     When read, this object always returns
+                     invalid (4)."
+        DEFVAL      { invalid }
+        ::= { hpicfVrrpOperEntry 5 }
+
+    hpicfVrrpVrRespondToPing OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION  "If set to FALSE, prevents a response to ping requests to 
+                      the virtual router IP addresses configured on the backup
+                      router. If set to TRUE allows response to ping requests
+                      to virtual IP addresses configured when virtual router 
+                      become main router. hpicfVrrpRespondToPing must also be
+                      configured globally to respond to virtual IP ping 
+                      requests. By default hpicfVrrpVrRespondToPing is enabled." 
+        DEFVAL       { true }
+        ::= { hpicfVrrpOperEntry 6 }
+
+    hpicfVrrpVrMainPreempt OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This object, when set to TRUE, would enable the 
+                    Main Preemption mode wherein a virtual router 
+                    even though an owner will not preempt a lower 
+                    priority Backup."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperEntry 7 }
+
+-- **********************************************************************
+-- Extensions to the VRRP Associated IP Address Table (RFC 2787)
+-- **********************************************************************
+
+    hpicfVrrpAssoIpAddrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfVrrpAssoIpAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the vrrpAssoIpAddrTable (RFC 2787)."
+        ::= { hpicfVrrpOperations 3 }
+
+    hpicfVrrpAssoIpAddrEntry OBJECT-TYPE
+        SYNTAX      HpicfVrrpAssoIpAddrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the vrrpAssoIpAddrTable."
+        AUGMENTS    { vrrpAssoIpAddrEntry }
+        ::= { hpicfVrrpAssoIpAddrTable 1 }
+
+    HpicfVrrpAssoIpAddrEntry ::=
+        SEQUENCE {
+            hpicfVrrpAssoIpMask  IpAddress
+        }
+
+    hpicfVrrpAssoIpMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The subnet mask to be used in conjunction with
+                    the 'vrrpAssoIpAddr' object to uniquely identify 
+                    a subnet."
+	DEFVAL      { '00000000'H } -- 0.0.0.0
+        ::= { hpicfVrrpAssoIpAddrEntry 1 }
+
+    hpicfVrrpTrackTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfVrrpTrackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for supporting tracking."
+        ::= { hpicfVrrpOperations 5 }
+
+    hpicfVrrpTrackEntry OBJECT-TYPE
+        SYNTAX      HpicfVrrpTrackEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for supporting tracking."
+        INDEX       { ifIndex, vrrpOperVrId,
+                      hpicfVrrpVrTrackType, hpicfVrrpVrTrackEntity }
+        ::= { hpicfVrrpTrackTable 1 }
+
+    HpicfVrrpTrackEntry ::=
+        SEQUENCE {
+            hpicfVrrpVrTrackType        INTEGER,
+            hpicfVrrpVrTrackEntity      SnmpAdminString,
+            hpicfVrrpTrackRowStatus     RowStatus,
+            hpicfVrrpTrackState         INTEGER
+        }
+
+    hpicfVrrpVrTrackType OBJECT-TYPE
+        SYNTAX       INTEGER {
+            port(1),
+            trunk(2),
+            vlan(3)
+        }
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "This object specifies the type of interface specified by
+            'hpicfVrrpVrTrackEntity'."
+        ::= { hpicfVrrpTrackEntry 1 }
+
+    hpicfVrrpVrTrackEntity OBJECT-TYPE
+        SYNTAX       SnmpAdminString (SIZE (1..255))
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "This object specifies interface details. Interface detail
+            is interpreted Based on type specified by
+            'hpicfVrrpVrTrackType'. Valid values for different track
+            types are -
+            ------------------------------------
+            hpicfVrrpVrTrackType    range
+            ------------------------------------
+            port                    '1'..'65535'
+            trunk                   '1'..'65535'
+            vlan                    '1'..'65535'
+            ------------------------------------"
+        ::= { hpicfVrrpTrackEntry 2 }
+
+    hpicfVrrpTrackRowStatus OBJECT-TYPE
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "The row status of given track entity."
+        ::= { hpicfVrrpTrackEntry 3 }
+   
+    hpicfVrrpTrackState  OBJECT-TYPE
+        SYNTAX       INTEGER {
+            down(0),
+            up(1)
+                  }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "This object specifies the state of the Vrrp track."
+        ::= { hpicfVrrpTrackEntry 4 }
+
+
+-- **********************************************************************
+-- Extensions to the VRRP Router Statistics Table (RFC 2787)
+-- **********************************************************************
+
+    hpicfVrrpStatsTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF HpicfVrrpStatsEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "Table of virtual router statistics."
+        ::= { hpicfVrrpOperations 6 }
+
+    hpicfVrrpRespondToPing OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION "If this object is set to FALSE globally, it prevents a
+                    response to ping requests to the virtual router IP 
+                    addresses configured on all backup routers.If set to TRUE, 
+                    allows response to ping requests to virtual IP addresses 
+                    configured on backup virtual routers when they become 
+                    main router. hpicfVrrpVrRespondToPing object must also be configured 
+                    on a Virtual router to respond to virtual IP ping requests.
+                    By default hpicfVrrpRespondToPing is disabled.
+                    This MIB object is deprecated and the alternate MIB object
+                    is hpicfVrrpv3RespondToPing." 
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperations 7 }
+
+    hpicfVrrpRemoveConfig OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION "This objects clears all existing vrrp
+                    configuration and again intializes it with default
+                    values when this is set with value 'true'.  It also
+                    clears (disables) the global VRRP enable flag.
+                    SnmpGet on this will always return false.
+                    This MIB object is deprecated and the alternate MIB object
+                    is hpicfVrrpv3RemoveConfig."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperations 8 }
+
+    hpicfVrrpNonstop OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION "This object defines the operation of VRRP on
+                    redundant platforms. When set to TRUE, the VRRP
+                    Main router will retain control of virtual-IP
+                    addresses across a management card failure on
+                    redundant platforms. When set to FALSE, the VRRP
+                    Backup router will take control of virtual-IP
+                    addresses on the network on the occurrence of a 
+                    management card failure on the Main VRRP router.
+                    This MIB object is deprecated and the alternate MIB object
+                    is hpicfVrrpv3Nonstop."
+        DEFVAL      { false }
+        ::= { hpicfVrrpOperations 9 }
+
+    hpicfVrrpStatsEntry OBJECT-TYPE
+        SYNTAX       HpicfVrrpStatsEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION "An entry in the table, containing statistics information
+                     about a given virtual router."
+        AUGMENTS    { vrrpOperEntry }
+        ::= { hpicfVrrpStatsTable 1 }
+
+    HpicfVrrpStatsEntry ::=
+        SEQUENCE {
+            hpicfVrrpStatsNearFailovers     Counter32
+        }
+
+    hpicfVrrpStatsNearFailovers OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This object reports the number of near failovers
+                     for backup virtual routers.  A near failover occurs
+                     when a backup virtual router has not received an 
+                     advertisement packet from the main virtual router
+                     for two advertisement intervals."
+        DEFVAL      { 0 }
+        ::= { hpicfVrrpStatsEntry 1 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfVrrpMIBCompliances  OBJECT IDENTIFIER ::= { hpicfVrrpConformance 1 }
+    hpicfVrrpMIBGroups       OBJECT IDENTIFIER ::= { hpicfVrrpConformance 2 }
+
+-- ......................................................................
+-- Compliance statements
+-- ......................................................................
+
+    hpicfVrrpMIBCompliance MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP routers running
+                    VRRP (RFC 3768) and implementing the HP-ICF-VRRP-MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfVrrpOperGroup }
+
+            GROUP       hpicfVrrpOperGroup
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support VRRP (RFC 3768)."
+        ::= { hpicfVrrpMIBCompliances 1 }
+
+    hpicfVrrpMIBCompliance1 MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP routers running
+                    VRRP (RFC 3768) and implementing the HP-ICF-VRRP-MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfVrrpOperGroup,
+                               hpicfVrrpTrackGroup }
+
+            GROUP       hpicfVrrpOperGroup
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support VRRP (RFC 3768)."
+
+            GROUP       hpicfVrrpTrackGroup
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support Tracking in VRRP."
+
+        ::= { hpicfVrrpMIBCompliances 2 }
+     
+    hpicfVrrpMIBCompliance2 MODULE-COMPLIANCE
+        STATUS       current
+        DESCRIPTION  "Support for this group is required for HP backup
+                      routers to respond to ping request."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS { hpicfVrrpVrPingGroup }
+
+            GROUP       hpicfVrrpVrPingGroup
+            DESCRIPTION "Support for this group is required for HP backup
+                         routers to respond to ping request."
+
+        ::= { hpicfVrrpMIBCompliances 3}
+
+    hpicfVrrpMIBCompliance3 MODULE-COMPLIANCE
+        STATUS       deprecated
+        DESCRIPTION  "Support for this group is required for HP routers
+                      that supports non-stop vrrp."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS { hpicfVrrpNonstopGroup }
+
+            GROUP       hpicfVrrpNonstopGroup
+            DESCRIPTION "Support for this group is required for HP
+                         routers that supports non-stop vrrp."
+
+        ::= { hpicfVrrpMIBCompliances 4}
+
+    hpicfVrrpMIBCompliance4 MODULE-COMPLIANCE
+        STATUS       deprecated
+        DESCRIPTION  "Support for this group is required for HP routers
+                      that supports non-stop vrrp."
+        MODULE  -- this module
+
+            MANDATORY-GROUPS { hpicfVrrpOperationsGroup }
+
+        ::= { hpicfVrrpMIBCompliances 5}
+    
+    hpicfVrrpMIBCompliance5 MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP routers running
+                    VRRP (RFC 3768) and implementing the HP-ICF-VRRP-MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfVrrpOperGroup,
+                               hpicfVrrpTrackGroup1 }
+
+            GROUP       hpicfVrrpOperGroup
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support VRRP (RFC 3768)."
+
+            GROUP       hpicfVrrpTrackGroup1
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support Tracking in VRRP."
+
+        ::= { hpicfVrrpMIBCompliances 6 }
+    hpicfVrrpMIBCompliance6 MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP routers running
+                    VRRP (RFC 3768) and implementing the HP-ICF-VRRP-MIB."
+        MODULE  -- this module
+             MANDATORY-GROUPS { hpicfVrrpOperGroup1,
+                               hpicfVrrpTrackGroup1 }
+            GROUP       hpicfVrrpOperGroup1
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support VRRP (RFC 3768)."
+            GROUP       hpicfVrrpTrackGroup1
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support Tracking in VRRP."
+        ::= { hpicfVrrpMIBCompliances 7 }
+   hpicfVrrpMIBCompliance7 MODULE-COMPLIANCE
+        STATUS       current
+        DESCRIPTION  "Support for this group is required for HP routers
+                      that supports non-stop vrrp."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfVrrpOperationsGroup1 }
+        ::= { hpicfVrrpMIBCompliances 8}
+    hpicfVrrpMIBCompliance8 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    VRRP (RFC 3768) and implementing the HP-ICF-VRRP-MIB."
+        MODULE  -- this module
+             MANDATORY-GROUPS { hpicfVrrpOperGroup2,
+                               hpicfVrrpTrackGroup1 }
+            GROUP       hpicfVrrpOperGroup2
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support VRRP (RFC 3768)."
+            GROUP       hpicfVrrpTrackGroup1
+            DESCRIPTION "Support for this group is required for HP routers
+                        that support Tracking in VRRP."
+        ::= { hpicfVrrpMIBCompliances 9 }
+-- ......................................................................
+-- Conformance Groups
+-- ......................................................................
+
+    hpicfVrrpOperGroup OBJECT-GROUP
+        OBJECTS     { hpicfVrrpAdminStatus,
+                      hpicfVrrpVrMode,
+                      hpicfVrrpVrMasterPreempt,
+                      hpicfVrrpVrTransferControl,
+                      hpicfVrrpVrPreemptDelayTime,
+                      hpicfVrrpAssoIpMask
+                    }
+        STATUS      deprecated
+        DESCRIPTION "A collection of HP proprietary objects to support 
+                    VRRP configuration on HP routers."
+        ::= { hpicfVrrpMIBGroups 1 }
+
+    hpicfVrrpTrackGroup OBJECT-GROUP
+        OBJECTS     { hpicfVrrpTrackRowStatus,
+                      hpicfVrrpVrControl }
+        STATUS      deprecated
+        DESCRIPTION "A collection of HP proprietary objects to support 
+                    VRRP configuration on HP routers."
+        ::= { hpicfVrrpMIBGroups 2 }
+
+    hpicfVrrpVrPingGroup OBJECT-GROUP
+        OBJECTS    { hpicfVrrpVrRespondToPing }
+        STATUS      current
+        DESCRIPTION "A HP proprietary object to support VRRP Virtual IP
+                     Ping on a backup router."
+        ::= { hpicfVrrpMIBGroups 3 } 
+
+    hpicfVrrpNonstopGroup OBJECT-GROUP
+        OBJECTS    { hpicfVrrpNonstop }
+        STATUS      deprecated
+        DESCRIPTION "A HP proprietary object to support nonstop VRRP
+                     on HP routers."
+        ::= { hpicfVrrpMIBGroups 4 }
+
+    hpicfVrrpOperationsGroup OBJECT-GROUP
+        OBJECTS    { hpicfVrrpRespondToPing,
+                     hpicfVrrpRemoveConfig,
+                     hpicfVrrpStatsNearFailovers
+                   }
+        STATUS      deprecated
+        DESCRIPTION "A HP proprietary object to support nonstop VRRP
+                     on HP routers."
+        ::= { hpicfVrrpMIBGroups 5 }
+
+    hpicfVrrpTrackGroup1 OBJECT-GROUP
+        OBJECTS     { hpicfVrrpTrackRowStatus,
+                      hpicfVrrpVrControl,
+                      hpicfVrrpTrackState }
+        STATUS      current
+        DESCRIPTION "A collection of HP proprietary objects to support 
+                    VRRP configuration on HP routers."
+        ::= { hpicfVrrpMIBGroups 6 }
+
+    hpicfVrrpOperGroup1 OBJECT-GROUP
+        OBJECTS     { hpicfVrrpVrMode,
+                      hpicfVrrpVrMasterPreempt,
+                      hpicfVrrpVrTransferControl,
+                      hpicfVrrpVrPreemptDelayTime,
+                      hpicfVrrpAssoIpMask
+                    }
+        STATUS      deprecated
+        DESCRIPTION "A collection of HP proprietary objects to support 
+                    VRRP configuration on HP routers."
+        ::= { hpicfVrrpMIBGroups 7 }
+
+  hpicfVrrpOperationsGroup1 OBJECT-GROUP
+        OBJECTS    { hpicfVrrpStatsNearFailovers }
+        STATUS      current
+        DESCRIPTION "A HP proprietary object to support nonstop VRRP
+                     on HP routers."
+        ::= { hpicfVrrpMIBGroups 8 }
+
+    hpicfVrrpOperGroup2 OBJECT-GROUP
+        OBJECTS     { hpicfVrrpVrMode,
+                      hpicfVrrpVrMasterPreempt,
+                      hpicfVrrpVrTransferControl,
+                      hpicfVrrpVrPreemptDelayTime,
+                      hpicfVrrpAssoIpMask,
+                      hpicfVrrpVrMainPreempt
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of HP proprietary objects to support 
+                    VRRP configuration on HP routers."
+        ::= { hpicfVrrpMIBGroups 9 }
+
+END

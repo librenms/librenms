@@ -1,0 +1,757 @@
+-- ***********************************************************************************************
+-- TN-DEV-SYS-IPMGMT-MIB.smi:  Transition Networks Enterprise MIB for TN device IP management feature
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TN-DEV-SYS-IPMGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC
+        InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    entPhysicalIndex FROM ENTITY-MIB
+    tnProducts FROM TRANSITION-SMI
+    IpAddressOriginTC FROM IP-MIB
+    InterfaceIndex FROM IF-MIB;
+
+tnDevSysIpMgmtMIB MODULE-IDENTITY
+    LAST-UPDATED "201208060000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+                "       Transition Networks
+                        Technical Support
+
+                        10900 Red Circle Drive
+                        Minnetonka, MN 55343 USA
+                        Tel: +1-800-526-9267
+
+                    E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib provides functionalities for managing the IP DHCP, IPv6 and DNS."
+
+    REVISION      "201208070000Z"
+    DESCRIPTION
+        "Initial Revision of this module"
+        ::= { tnProducts 10 }
+
+tnDevSysIpmgmt            OBJECT IDENTIFIER ::= { tnDevSysIpMgmtMIB 1 }
+
+
+tnIpMgmtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnIpMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage IP status for each device."
+    ::= { tnDevSysIpmgmt 1 }
+
+tnIpMgmtEntry OBJECT-TYPE
+    SYNTAX TnIpMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing IP status for each device."
+    INDEX   { entPhysicalIndex }
+    ::= { tnIpMgmtTable 1 }
+
+TnIpMgmtEntry ::=
+    SEQUENCE {
+       tnIpAddressMode          INTEGER,
+       tnIpMgmtAccess           INTEGER,
+       tnIpAddrType             InetAddressType,
+       tnIpAddr                 InetAddress,
+       tnSubnetMask             InetAddress,
+       tnDefaultGateway         InetAddress
+    }
+
+tnIpAddressMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    notApplicable(0),
+                    dhcp(1),
+                    static(2),
+                    bootpc(3),
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The status of DHCP client. The value of
+                 notApplicable(0) indicating the device don't support DHCP client,
+                 set this value to dhcp(1) to enable DHCP client,
+                 set this value to static(2) to enable static ip.
+                 set this value to bootpc(3) to enable bootp client"
+    ::= { tnIpMgmtEntry 1 }
+
+tnIpMgmtAccess OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    notApplicable(0),
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "(0)IP management access is not applicable.
+                 (1)Enable IP management access.
+                 (2)Disable IP management access.
+                 Use this OID to Enable/Disable IP management access for the device."
+    ::= { tnIpMgmtEntry 2 }
+
+tnIpAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address type of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIpMgmtEntry 3 }
+
+tnIpAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIpMgmtEntry 4 }
+
+tnSubnetMask OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The subnet the ipAddr belongs to."
+    ::= { tnIpMgmtEntry 5 }
+
+tnDefaultGateway OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default gateway for the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIpMgmtEntry 6 }
+
+--
+-- DNS Server
+--
+tnDnsServerTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDnsServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of DNS server.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnDevSysIpmgmt 2 }
+
+tnDnsServerEntry  OBJECT-TYPE
+    SYNTAX      TnDnsServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table, containing inforamtion
+                 about a DNS server."
+    INDEX       { entPhysicalIndex, tnDnsServerIndex }
+    ::= { tnDnsServerTable 1 }
+
+TnDnsServerEntry ::= SEQUENCE
+{
+    tnDnsServerIndex       Integer32,
+    tnDnsServerIPAddrType  InetAddressType,
+    tnDnsServerIPAddr      InetAddress,
+    tnDnsServerStatus      RowStatus
+}
+
+tnDnsServerIndex  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of DNS server table."
+    ::= { tnDnsServerEntry 1 }
+
+tnDnsServerIPAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address type of the DNS server.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnDnsServerEntry 2 }
+
+tnDnsServerIPAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address of the DNS server.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnDnsServerEntry 3 }
+
+tnDnsServerStatus  OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION "For a detailed description of this object, please refer to
+                 SNMPv2-TC MIB."
+    ::= { tnDnsServerEntry 4 }
+
+--
+-- IP Extension table
+--
+tnIpextMgmtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIpextMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of IPv6 status."
+    ::= { tnDevSysIpmgmt 3 }
+
+
+tnIpextMgmtEntry OBJECT-TYPE
+    SYNTAX TnIpextMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing IPv6 status for each device."
+    INDEX   { entPhysicalIndex }
+    ::= { tnIpextMgmtTable 1 }
+
+TnIpextMgmtEntry ::=
+    SEQUENCE {
+       tnIpv6status              INTEGER,
+       tnIpv6AddressLinklocal    InetAddress,
+       tnIpv6Method              INTEGER,
+       tnIpv6Addr                InetAddress,
+       tnIpv6prefix              INTEGER,
+       tnIpv6DupAddrDetected     INTEGER,
+       tnIpv6GwMethod            INTEGER,
+       tnIpv6defaultGW           InetAddress
+     }
+
+tnIpv6status OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "(1)enable IPv6
+                 (2)disable IPv6
+                 Use this OID to change the method of IP management access for the device."
+    ::= { tnIpextMgmtEntry 1 }
+
+tnIpv6AddressLinklocal OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link-local IPv6 address"
+    ::= { tnIpextMgmtEntry 2 }
+
+tnIpv6Method OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    static(1),
+                    dhcpv6(2),
+                    stateless(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "(1)Static ip access, the default value is Static ip.
+                 (2)dhcpv6 autoconfig.
+                 (3)stateless autoconfig.
+                 Use this OID to change the method of IP management access for the device."
+    ::= { tnIpextMgmtEntry 3 }
+
+tnIpv6Addr  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Global IPv6 address"
+    ::= { tnIpextMgmtEntry 4 }
+
+tnIpv6prefix OBJECT-TYPE
+    SYNTAX      INTEGER(1..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "IPv6 prefix value"
+    ::= { tnIpextMgmtEntry 5 }
+
+tnIpv6DupAddrDetected OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "(1)true: duplicate address detected
+                 (2)false: no duplicate
+                 Use this OID to get the status of IPv6 address for the device."
+    ::= { tnIpextMgmtEntry 6 }
+
+tnIpv6GwMethod OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    static(1),
+                    routeDisc(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "(1)static gateway address defined by ipv6defaultGW node.
+                 (2)route discovery.
+                 Use this OID to change the method of gateway address for the device.
+                 Default value is static"
+    ::= { tnIpextMgmtEntry 7 }
+
+tnIpv6defaultGW OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "ipv6 default gateway address"
+    ::= { tnIpextMgmtEntry 8 }
+
+--
+-- IPv6 Dynamic routes
+--
+tnIpv6DynRouteTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnIpv6DynRouteEntry
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "This entity's IPv6 dynamic routing table."
+    ::= { tnDevSysIpmgmt 4 }
+
+tnIpv6DynRouteEntry OBJECT-TYPE
+    SYNTAX     TnIpv6DynRouteEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "A particular route to a particular destination.
+           This table is specially for the result of route discovery
+           which is needed for stateless auto-configuration feature."
+    INDEX {
+        tnIpv6DynRouteIndex
+        }
+    ::= { tnIpv6DynRouteTable 1 }
+
+TnIpv6DynRouteEntry ::= SEQUENCE {
+        tnIpv6DynRouteIndex        Gauge32,
+        tnIpv6DynRouteDest         InetAddress,
+        tnIpv6DynRoutePfxLen       Gauge32,
+        tnIpv6DynRouteNextHop      InetAddress,
+        tnIpv6DynRouteAge          Gauge32,
+    }
+
+tnIpv6DynRouteIndex OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The Index value that identifies this route. "
+    ::= { tnIpv6DynRouteEntry 1 }
+
+tnIpv6DynRouteDest OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The destination IP address of this route."
+
+    ::= { tnIpv6DynRouteEntry 2 }
+
+tnIpv6DynRoutePfxLen OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Indicates the number of leading one bits that form the
+            mask to be logical-ANDed with the destination address
+            before being compared to the value in the
+            tnIpv6DynRouteDest field."
+
+    ::= { tnIpv6DynRouteEntry 3 }
+
+tnIpv6DynRouteNextHop OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "On remote routes, the address of the next system en
+            route.  For non-remote routes, a zero length string."
+    ::= { tnIpv6DynRouteEntry 4 }
+
+tnIpv6DynRouteAge OBJECT-TYPE
+    SYNTAX     Gauge32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of seconds since this route was last updated
+            or otherwise determined to be correct.  Note that no
+            semantics of 'too old' can be implied, except through
+            knowledge of the routing protocol by which the route
+            was learned."
+    ::= { tnIpv6DynRouteEntry 5 }
+
+--
+-- Host to IP Table
+--
+tnHostToIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnHostToIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of host name to IP mapping."
+    ::= { tnDevSysIpmgmt 7 }
+
+tnHostToIpEntry OBJECT-TYPE
+    SYNTAX      TnHostToIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table, containing inforamtion
+                 about a host name mapping to an IP address."
+    INDEX       { tnHostToIpIndex }
+    ::= { tnHostToIpTable 1 }
+
+TnHostToIpEntry ::= SEQUENCE
+{
+    tnHostToIpIndex    Integer32,
+    tnHostIPAddrType   InetAddressType,
+    tnHostIPAddr       InetAddress,
+    tnHostName          DisplayString,
+    tnAliasName        DisplayString,
+    tnEntryStatus      RowStatus
+}
+
+tnHostToIpIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of DNS server table."
+    ::= { tnHostToIpEntry 1 }
+
+tnHostIPAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address type of the host.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnHostToIpEntry 2 }
+
+tnHostIPAddr      OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address of the host."
+    ::= { tnHostToIpEntry 3 }
+
+tnHostName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The host name."
+    ::= { tnHostToIpEntry 4 }
+
+tnAliasName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The alias name of the host."
+    ::= { tnHostToIpEntry 5 }
+
+tnEntryStatus  OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION "For a detailed description of this object, please refer to
+                 SNMPv2-TC MIB."
+    ::= { tnHostToIpEntry 6 }
+
+tnIPv4MgmtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnIPv4MgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage IP status for each device."
+    ::= { tnDevSysIpmgmt 8 }
+
+tnIPv4MgmtEntry OBJECT-TYPE
+    SYNTAX TnIPv4MgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing IP status for each device."
+    INDEX   { tnIpv4Interface, tnIPv4Index }
+    ::= { tnIPv4MgmtTable 1 }
+
+TnIPv4MgmtEntry ::=
+    SEQUENCE {
+       tnIpv4Interface            InterfaceIndex,
+       tnIPv4Index                INTEGER,
+       tnIPv4ConfigMode           INTEGER,
+       tnIPv4Origin               IpAddressOriginTC,
+       tnIPv4AddrType             InetAddressType,
+       tnIPv4Addr                 InetAddress,
+       tnIPv4SubnetMask           InetAddress,
+       tnIPv4DefaultGateway       InetAddress,
+       tnIPv4Status               INTEGER
+    }
+
+tnIpv4Interface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The ifIndex for the IP interface."
+    ::= { tnIPv4MgmtEntry 1 }
+
+tnIPv4Index OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of server table."
+    ::= { tnIPv4MgmtEntry 2 }
+
+tnIPv4ConfigMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    dhcp(1),
+                    static(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The status of DHCP client. The value of
+                 set this value to dhcp(1) to enable DHCP client,
+                 set this value to static(2) to enable static ip."
+    ::= { tnIPv4MgmtEntry 3 }
+
+tnIPv4Origin OBJECT-TYPE
+    SYNTAX      IpAddressOriginTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The origin of the address.
+                For a detailed description of this type, please refer to IP-MIB.
+                manual(2) indicates that the address was manually configured
+                to a specified address, e.g., by user configuration.
+                dhcp(4) indicates an address that was assigned to this
+                system by a DHCP server.
+                other(1) indicates that the dhcp is processing or failed"
+    ::= { tnIPv4MgmtEntry 4 }
+
+tnIPv4AddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address type of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIPv4MgmtEntry 5 }
+
+tnIPv4Addr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIPv4MgmtEntry 6 }
+
+tnIPv4SubnetMask OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The subnet the ipAddr belongs to."
+    ::= { tnIPv4MgmtEntry 7 }
+
+tnIPv4DefaultGateway OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The default gateway for the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIPv4MgmtEntry 8 }
+
+tnIPv4Status OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    active(1),
+                    disabled(2),
+                    renew(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "'Renew' restarts ipv4 interfaces the status changes to active/disable
+                 depending on the success of the ‘renew’ operation."
+    ::= { tnIPv4MgmtEntry 9 }
+
+
+--
+-- IP Extension table
+--
+tnIPv6MgmtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIPv6MgmtEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Table of IPv6 status."
+    ::= { tnDevSysIpmgmt 9 }
+
+
+tnIPv6MgmtEntry OBJECT-TYPE
+    SYNTAX TnIPv6MgmtEntry
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "An entry containing IPv6 status for each device."
+    INDEX   { tnIpv6Interface, tnIPv6Index }
+    ::= { tnIPv6MgmtTable 1 }
+
+TnIPv6MgmtEntry ::=
+    SEQUENCE {
+       tnIpv6Interface           InterfaceIndex,
+       tnIPv6Index               INTEGER,
+       tnIPv6Origin              IpAddressOriginTC,
+       tnIPv6CfgMethod           INTEGER,
+       tnIPv6AddressType         INTEGER,
+       tnIPv6Prefix              InetAddress,
+       tnIPv6PrefixLen           INTEGER,
+       tnIPv6Address             InetAddress,
+       tnIPv6RouterAddr          InetAddress,
+       tnIPv6DupAddressDetected  INTEGER,
+       tnIPv6Scope               INTEGER,
+       tnIPv6MTU                 INTEGER,
+       tnIPv6LinkMTU             INTEGER,
+       tnIPv6Status              INTEGER
+     }
+
+tnIpv6Interface OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The ifIndex for the IP interface."
+    ::= { tnIPv6MgmtEntry 1 }
+
+tnIPv6Index OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of server table."
+    ::= { tnIPv6MgmtEntry 2 }
+
+tnIPv6Origin OBJECT-TYPE
+    SYNTAX      IpAddressOriginTC
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The origin of the address.
+                For a detailed description of this type, please refer to IP-MIB.
+                manual(2) indicates that the address was manually configured
+                to a specified address, e.g., by user configuration.
+                linklayer(5) indicates an address created by IPv6 stateless"
+    ::= { tnIPv6MgmtEntry 3 }
+
+tnIPv6CfgMethod OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    link-local(1),
+                    stateless(2),
+                    auto(3),
+                    manual(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "(1)link-local.
+                 (2)auto stateless.
+                 (3)auto state.
+                 (4) manual
+                 Use this OID to change the method of IP management access for the device."
+    ::= { tnIPv6MgmtEntry 4 }
+
+tnIPv6AddressType  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    anycast(1),
+                    unicast(2),
+                    multicast(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The address type of ipAddressPrefix."
+    ::= { tnIPv6MgmtEntry 5 }
+
+tnIPv6Prefix OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The prefix associated with the this interface."
+    ::= { tnIPv6MgmtEntry 6 }
+
+tnIPv6PrefixLen OBJECT-TYPE
+    SYNTAX      INTEGER(1..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The length of the prefix (in bits)."
+    ::= { tnIPv6MgmtEntry 7 }
+
+tnIPv6Address  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Global IPv6 address."
+    ::= { tnIPv6MgmtEntry 8 }
+
+tnIPv6RouterAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "ipv6 default router address."
+    ::= { tnIPv6MgmtEntry 9 }
+
+tnIPv6DupAddressDetected OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "(1)true: duplicate address detected
+                 (2)false: no duplicate"
+    ::= { tnIPv6MgmtEntry 10 }
+
+tnIPv6Scope OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    node(1),
+                    link(2),
+                    site(3),
+                    organization(4),
+                    host(5),
+                    global(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Scope value used to limit the scope of the address.
+                 unicast address only have scopes of link or global"
+    ::= { tnIPv6MgmtEntry 11 }
+
+tnIPv6MTU OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MTU maximum transmission unit.  Size (in bytes) of the largest protocol data unit."
+    ::= { tnIPv6MgmtEntry 12 }
+
+tnIPv6LinkMTU OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Link MTU maximum transmission unit.  Size (in bytes) of the largest protocol data unit."
+    ::= { tnIPv6MgmtEntry 13 }
+
+tnIPv6Status OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    active(1),
+                    disabled(2),
+                    renew(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "'Renew' restarts ipv6 interfaces. Active sets the status to enabled
+                 Disable sets the status to disabled."
+    ::= { tnIPv6MgmtEntry 14 }
+END

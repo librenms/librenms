@@ -1,0 +1,367 @@
+
+-- *****************************************************************************
+-- Juniper-TSM-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Tunnel Server Management (TSM) MIB
+--
+-- Copyright (c) 2003, 2005 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-TSM-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs
+    JuniIfType
+        FROM Juniper-UNI-IF-MIB;
+
+juniTsmMIB  MODULE-IDENTITY
+    LAST-UPDATED "200505231437Z"  -- 23-May-05 10:37 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Tunnel Server Management (TSM) MIB for the Juniper Networks
+        enterprise."
+    -- Revision History
+    REVISION    "200505231437Z"  -- 23-May-05 10:37 AM EDT  - JUNOSe 6.1
+    DESCRIPTION
+       "Changed enum names for juniTsmPortType: from 'generalPurposeDedicated'
+       to 'generalPurposeStatic' and from 'scurityDedicated' to 
+       'securityStatic' and added enum 'securityDynamic'. Expanded range
+       of juniTsmPortProvisionedInterfaces."
+    REVISION    "200504272257Z"  -- 27-Apr-05 06:57 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+       "Added addtional values to JuniTsmLocationType."
+    REVISION    "200310232045Z"  -- 23-Oct-03 04:45 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+       "Initial version of this MIB module."
+    ::= { juniMibs 72 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniTsmLocationType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the platform-dependent interpretation of a
+        JuniTsmLocationValue object:
+            unknown          Unspecified/unknown
+            slotPort         Two octets in length; first octet is 'slot',
+                             second octet is 'port'
+            slotAdapterPort  Three octets in length; first octet is 'slot',
+                             second octet is 'adapter', third octet is 'port'
+            adapterPort      Two octets in length; first octet is 'adapter',
+                             second octet is 'port' "
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    slotPort(1),
+                    slotAdapterPort(2),
+                    adapterPort(3) }
+
+JuniTsmLocationValue  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of a platform-dependent interface location, represented as an
+        OCTET STRING.  A corresponding JuniTsmLocationType object will identify
+        the mapping of octets to location elements, e.g. 'slot.port'.
+
+        Note, when the value of an object having this syntax is encoded as a MIB
+        table INDEX, the rules for encoding a variable-length OCTET STRING are
+        observed."
+    SYNTAX      OCTET STRING (SIZE(1..16))
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed object groups
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTsmObjects  OBJECT IDENTIFIER  ::= {juniTsmMIB 1}
+
+-- Functional groups
+
+juniTsmData     OBJECT IDENTIFIER ::= {juniTsmObjects 1}
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Tunnel server configuration and status
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTsmLocationType  OBJECT-TYPE
+    SYNTAX      JuniTsmLocationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the interpretation of JuniTsmLocationValue object values into
+        platform-dependent interface location components, e.g., 'slot.port'."
+    ::= { juniTsmData 1 }
+
+
+--
+-- The TSM Port table
+--
+juniTsmPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTsmPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table allows dynamic server ports to be configured and also
+        provides information about static ports available in the system.
+        This table represents all ports known to the system.  The presence
+        of a port in this table does not guarantee that a card with this port
+        is present in the chassis."
+    ::= { juniTsmData 2 }
+
+juniTsmPortEntry  OBJECT-TYPE
+    SYNTAX      JuniTsmPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration data."
+    INDEX     { juniTsmPortLocation }
+    ::= { juniTsmPortTable 1 }
+
+JuniTsmPortEntry  ::= SEQUENCE {
+    juniTsmPortLocation                 JuniTsmLocationValue,
+    juniTsmPortType                     INTEGER,
+    juniTsmPortHwPresent                TruthValue,
+    juniTsmPortAvailableInterfaces      Integer32,
+    juniTsmPortProvisionedInterfaces    Integer32 }
+
+juniTsmPortLocation  OBJECT-TYPE
+    SYNTAX      JuniTsmLocationValue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of a port location."
+    ::= { juniTsmPortEntry 1 }
+
+juniTsmPortType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    generalPurposeStatic(1),
+                    generalPurposeDynamic(2),
+                    securityStatic(3),
+                    securityDynamic(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port type:
+            generalPurposeStatic  - statically configured (always on) port,
+            generalPurposeDynamic - dynamic port, which could be both
+                                    configured with different maximum number
+                                    of interfaces and unconfigured,
+            securityStatic        - static port equipped with encryption
+                                    (IPSEC) hardware.
+            securityDynamic       - dynamic port with encryption (IPSEC)
+                                    hardware, which could be both
+                                    configured with different maximum number
+                                    of interfaces and unconfigured."
+    ::= { juniTsmPortEntry 2 }
+
+juniTsmPortHwPresent  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The port hardware is inserted."
+    ::= { juniTsmPortEntry 3 }
+
+juniTsmPortAvailableInterfaces  OBJECT-TYPE
+    SYNTAX      Integer32 (1..16000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of interfaces available on the port."
+    ::= { juniTsmPortEntry 4 }
+
+juniTsmPortProvisionedInterfaces  OBJECT-TYPE
+    SYNTAX      Integer32 (-1..16000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of interfaces provisioned on the port. '-1' means all
+        available interfaces. If port is static this value cannot be
+        changed.  If the number of provisioned interfaces is decreased 
+        it may require a lengthy 'draining' process to bring number of
+        allocated interfaces into compliance."
+
+    ::= { juniTsmPortEntry 5 }
+
+
+--
+-- The TSM Application Registry table
+--
+juniTsmAppRegistryTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTsmAppRegistryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table describes currently registered applications."
+    ::= { juniTsmData 3 }
+
+juniTsmAppRegistryEntry  OBJECT-TYPE
+    SYNTAX      JuniTsmAppRegistryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Application data."
+    INDEX     { juniTsmAppRegistryIndex }
+    ::= { juniTsmAppRegistryTable 1 }
+
+JuniTsmAppRegistryEntry  ::= SEQUENCE {
+    juniTsmAppRegistryIndex             Integer32,
+    juniTsmAppRegistryIfType            JuniIfType,
+    juniTsmAppRegistryName              DisplayString,
+    juniTsmAppRegistryInterfaceLimit    Integer32 }
+
+juniTsmAppRegistryIndex  OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A small integer identifying registered application.  Once an
+        application is registered, this integer will be associated with the
+        application until the next reboot."
+    ::= { juniTsmAppRegistryEntry 1 }
+
+juniTsmAppRegistryIfType  OBJECT-TYPE
+    SYNTAX      JuniIfType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface type associated with the application."
+    ::= { juniTsmAppRegistryEntry 2 }
+
+juniTsmAppRegistryName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the application used by the system."
+    ::= { juniTsmAppRegistryEntry 3 }
+
+juniTsmAppRegistryInterfaceLimit  OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of interfaces per port this application supports.
+        (The number of interfaces could be further limited by the port
+        capacity.)"
+    ::= { juniTsmAppRegistryEntry 4 }
+
+
+--
+-- The TSM Application table
+--
+juniTsmApplicationTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniTsmApplicationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entries in this table describe application load on tunnel servers.
+        This table includes only applications which are actually being used."
+    ::= { juniTsmData 4 }
+
+juniTsmApplicationEntry  OBJECT-TYPE
+    SYNTAX      JuniTsmApplicationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Configuration data."
+    INDEX     { juniTsmPortLocation,
+                juniTsmAppRegistryIndex }
+    ::= { juniTsmApplicationTable 1 }
+
+JuniTsmApplicationEntry ::= SEQUENCE {
+    juniTsmApplicationMaxInterfaces     Integer32,
+    juniTsmApplicationActiveInterfaces  Gauge32 }
+
+juniTsmApplicationMaxInterfaces  OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of interfaces available on the port for the application.
+        Applications allocate interfaces from a common pool, so this is not the
+        only limit of application level interfaces.  This value could be greater
+        than juniTsmPortProvisionedInterfaces when the port is draining
+        interfaces."
+    ::= { juniTsmApplicationEntry 1 }
+
+juniTsmApplicationActiveInterfaces  OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of application interfaces in use on the port.  This value could
+        be greater than juniTsmPortProvisionedInterfaces when the port is
+        draining interfaces."
+    ::= { juniTsmApplicationEntry 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniTsmTrapControl      OBJECT IDENTIFIER ::= { juniTsmMIB 2 }
+-- juniTsmTraps            OBJECT IDENTIFIER ::= { juniTsmMIB 3 }
+-- juniTsmTrapPrefix       OBJECT IDENTIFIER ::= { juniTsmTraps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniTsmMIBConformance   OBJECT IDENTIFIER  ::= { juniTsmMIB 4 }
+juniTsmMIBCompliances   OBJECT IDENTIFIER  ::= { juniTsmMIBConformance 1 }
+juniTsmMIBGroups        OBJECT IDENTIFIER  ::= { juniTsmMIBConformance 2 }
+
+--
+-- compliance statements
+--
+juniTsmCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for TSM mib."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniTsmGroup }
+    ::= { juniTsmMIBCompliances 1 }                                -- JUNOSe 5.3
+
+
+--
+-- units of conformance
+--
+juniTsmGroup  OBJECT-GROUP
+    OBJECTS {
+        juniTsmLocationType,
+
+        juniTsmPortType,
+        juniTsmPortHwPresent,
+        juniTsmPortAvailableInterfaces,
+        juniTsmPortProvisionedInterfaces,
+
+        juniTsmAppRegistryIfType,
+        juniTsmAppRegistryName,
+        juniTsmAppRegistryInterfaceLimit,
+
+        juniTsmApplicationMaxInterfaces,
+        juniTsmApplicationActiveInterfaces }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of TSM functionality in a
+        Juniper product."
+    ::= { juniTsmMIBGroups 1 }                                     -- JUNOSe 5.3
+
+END

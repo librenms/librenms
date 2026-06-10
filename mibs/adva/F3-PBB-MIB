@@ -1,0 +1,503 @@
+F3-PBB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-COMPLIANCE, OBJECT-GROUP 
+                FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32
+                FROM SNMPv2-SMI
+        DisplayString, TruthValue, MacAddress, VariablePointer
+                FROM SNMPv2-TC
+        cmEthernetAccPortEntry, cmEthernetNetPortEntry, cmFlowEntry,
+        FlowTagControl
+                FROM CM-FACILITY-MIB
+        ipManagementTunnelEntry
+                FROM CM-IP-MIB
+        PerfCounter64
+             FROM  CM-COMMON-MIB
+        cmEthernetNetPortStatsEntry, cmEthernetNetPortHistoryEntry
+             FROM  CM-PERFORMANCE-MIB
+        fsp150cm
+             FROM  ADVA-MIB;
+
+f3PBBMIB MODULE-IDENTITY
+    LAST-UPDATED        "201210080000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the Facility MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201210080000Z"
+    DESCRIPTION
+             "Notes from release 201210080000Z. "
+    ::= {fsp150cm 21}
+-- 
+-- OID definitions
+-- 
+f3PBBConfigObjects            OBJECT IDENTIFIER ::= {f3PBBMIB 1}
+f3PBBPerformanceObjects       OBJECT IDENTIFIER ::= {f3PBBMIB 2}
+f3PBBConformance              OBJECT IDENTIFIER ::= {f3PBBMIB 3}
+
+--
+--  f3PbbEthernetAccPortTable
+--
+f3PbbEthernetAccPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PbbEthernetAccPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to PBB function on the net port"
+    ::= { f3PBBConfigObjects 1 }
+
+f3PbbEthernetAccPortEntry OBJECT-TYPE
+    SYNTAX      F3PbbEthernetAccPortEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PbbEthernetAccPortTable."
+    AUGMENTS { cmEthernetAccPortEntry }
+    ::= { f3PbbEthernetAccPortTable 1 }
+    
+F3PbbEthernetAccPortEntry ::= SEQUENCE {  
+    f3PbbEthernetAccPortITagLoopbackMask                INTEGER,
+    f3PbbEthernetAccPortITagLoopback1                   DisplayString,
+    f3PbbEthernetAccPortITagLoopback2                   DisplayString,
+    f3PbbEthernetAccPortITagLoopback3                   DisplayString   
+}
+    
+f3PbbEthernetAccPortITagLoopbackMask OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "This object allows to specify which itag loopback has been enabled.
+             1: Itag 1 loopback enabled, 2: Itag 2 loopback enabled, 4: Itag 4 loopback enabled."
+     ::= { f3PbbEthernetAccPortEntry 1 }
+     
+f3PbbEthernetAccPortITagLoopback1 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows specification of the Itag 1 to be looped back when port is in
+            vlan(terminal/facility) loopback configuration. This is valid only if the
+            corresponding bit in f3PbbEthernetAccPortITagLoopbackMask is set.  The value
+            to be specified should be in the form X-Y where X is the ISID and Y is the ITAG Priority. 
+            If Y is specified as a *, all Priorities (0 to 7) are looped back."
+     ::= { f3PbbEthernetAccPortEntry 2 }
+     
+f3PbbEthernetAccPortITagLoopback2 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows specification of the Itag 2 to be looped back when port is in
+            vlan(terminal/facility) loopback configuration. This is valid only if the
+            corresponding bit in f3PbbEthernetAccPortITagLoopbackMask is set.  The value
+            to be specified should be in the form X-Y where X is the ISID and Y is the ITAG Priority. 
+            If Y is specified as a *, all Priorities (0 to 7) are looped back."
+     ::= { f3PbbEthernetAccPortEntry 3 }
+     
+f3PbbEthernetAccPortITagLoopback3 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows specification of the Itag 3 to be looped back when port is in
+            vlan(terminal/facility) loopback configuration. This is valid only if the
+            corresponding bit in f3PbbEthernetAccPortITagLoopbackMask is set.  The value
+            to be specified should be in the form X-Y where X is the ISID and Y is the ITAG Priority. 
+            If Y is specified as a *, all Priorities (0 to 7) are looped back."
+     ::= { f3PbbEthernetAccPortEntry 4 }
+
+--
+--  f3PbbEthernetNetPortTable
+--
+f3PbbEthernetNetPortTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PbbEthernetNetPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to PBB function on the net port"
+    ::= { f3PBBConfigObjects 2 }
+
+f3PbbEthernetNetPortEntry OBJECT-TYPE
+    SYNTAX      F3PbbEthernetNetPortEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PbbEthernetNetPortTable."
+    AUGMENTS { cmEthernetNetPortEntry }
+    ::= { f3PbbEthernetNetPortTable 1 }
+    
+F3PbbEthernetNetPortEntry ::= SEQUENCE {
+    f3PbbEthernetNetPortBackboneMacAddress              MacAddress,    
+    f3PbbEthernetNetPortITagLoopbackMask                INTEGER,
+    f3PbbEthernetNetPortITagLoopback1                   DisplayString,
+    f3PbbEthernetNetPortITagLoopback2                   DisplayString,
+    f3PbbEthernetNetPortITagLoopback3                   DisplayString   
+}
+
+f3PbbEthernetNetPortBackboneMacAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "This object is mac address of backbone network port." 
+     ::= { f3PbbEthernetNetPortEntry 1 }
+    
+f3PbbEthernetNetPortITagLoopbackMask OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+             "This object allows to specify which itag loopback has been enabled.
+             1: Itag 1 loopback enabled, 2: Itag 2 loopback enabled, 4: Itag 4 loopback enabled."
+     ::= { f3PbbEthernetNetPortEntry 2 }
+     
+f3PbbEthernetNetPortITagLoopback1 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows specification of the Itag 1 to be looped back when port is in
+            vlan(terminal/facility) loopback configuration. This is valid only if the
+            corresponding bit in f3PbbEthernetNetPortITagLoopbackMask is set.  The value
+            to be specified should be in the form X-Y where X is the ISID and Y is the ITAG Priority. 
+            If Y is specified as a *, all Priorities (0 to 7) are looped back."
+     ::= { f3PbbEthernetNetPortEntry 3 }
+     
+f3PbbEthernetNetPortITagLoopback2 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows specification of the Itag 2 to be looped back when port is in
+            vlan(terminal/facility) loopback configuration. This is valid only if the
+            corresponding bit in f3PbbEthernetNetPortITagLoopbackMask is set.  The value
+            to be specified should be in the form X-Y where X is the ISID and Y is the ITAG Priority. 
+            If Y is specified as a *, all Priorities (0 to 7) are looped back."
+     ::= { f3PbbEthernetNetPortEntry 4 }
+     
+f3PbbEthernetNetPortITagLoopback3 OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows specification of the Itag 3 to be looped back when port is in
+            vlan(terminal/facility) loopback configuration. This is valid only if the
+            corresponding bit in f3PbbEthernetNetPortITagLoopbackMask is set.  The value
+            to be specified should be in the form X-Y where X is the ISID and Y is the ITAG Priority. 
+            If Y is specified as a *, all Priorities (0 to 7) are looped back."
+     ::= { f3PbbEthernetNetPortEntry 5 }
+
+--
+--  f3PbbFlowTable
+--
+f3PbbFlowTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PbbFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to PBB function on the flow"
+    ::= { f3PBBConfigObjects 3 }
+
+f3PbbFlowEntry OBJECT-TYPE
+    SYNTAX      F3PbbFlowEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PbbFlowTable."
+    AUGMENTS { cmFlowEntry }
+    ::= { f3PbbFlowTable 1 }
+    
+F3PbbFlowEntry ::= SEQUENCE {
+    f3PbbFlowITagControl                     FlowTagControl,
+    f3PbbFlowITagISID                        Integer32,
+    f3PbbFlowITagPriority                    Integer32,
+    f3PbbFlowBackboneMacDestinationEnabled   TruthValue,
+    f3PbbFlowBackboneMacDestinationAddress   MacAddress,
+    f3PbbFlowA2NPbbCapableFlag               TruthValue
+}
+
+f3PbbFlowITagControl  OBJECT-TYPE
+    SYNTAX     FlowTagControl
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the tag management 
+          operation on the I-TAG.  Supported types are 'none', 'push', and 'pushisid'.
+          and it must be none while ctagcontrol or stagcontrol is not none."
+     ::= { f3PbbFlowEntry 1 }
+     
+f3PbbFlowITagISID OBJECT-TYPE 
+    SYNTAX     Integer32 (256..16777214)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object is used to specify the ITagISID. Its rang from 256 to 16777214."
+     ::= { f3PbbFlowEntry 2 }
+
+f3PbbFlowITagPriority OBJECT-TYPE 
+    SYNTAX     Integer32 (0..7)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object is used to specify the priority of ITag. Its rang from 0 to 7."
+     ::= { f3PbbFlowEntry 3 }
+     
+f3PbbFlowBackboneMacDestinationEnabled  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object indicates whether can assign BMAC value.
+          When enabled, user can assign a  unicast BMAC as B_DA for this EVC
+          When disabled, 01-1E-83-<I-SID> will be used as B-DA."
+     ::= { f3PbbFlowEntry 4 }
+     
+f3PbbFlowBackboneMacDestinationAddress OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Customer can configure the backbone MAC destination address, the
+         default value is 01-1E-83-<I-SID>."
+    ::= { f3PbbFlowEntry 5 }
+    
+f3PbbFlowA2NPbbCapableFlag  OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "When it is false, Drop PBB frames in the A2N direction (FPGA function),
+         Allow to PUSH I-TAG on this flow;
+         When A2NPbbCapableFlag is TRUE,
+         Pass PBB frames in the A2N direction (FPGA function), Software allow PUSH I-TAG on this flow(normal)
+         will not allow to PUSH S-TAG on this flow, will not allow to PUSH C-TAG on this flow,
+         Software will allow to PUSH C-TAG/S-TAG on this flow."
+     ::= { f3PbbFlowEntry 6 }
+     
+--
+--  f3PbbIpManagementTunnelTable
+--
+f3PbbIpManagementTunnelTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PbbIpManagementTunnelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to PBB function on the mngt tunnel"
+    ::= { f3PBBConfigObjects 4 }
+
+f3PbbIpManagementTunnelEntry OBJECT-TYPE
+    SYNTAX      F3PbbIpManagementTunnelEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PbbIpManagementTunnelTable."
+    AUGMENTS { ipManagementTunnelEntry }
+    ::= { f3PbbIpManagementTunnelTable 1 }
+    
+F3PbbIpManagementTunnelEntry ::= SEQUENCE {
+    f3PbbIpManagementTunnelItagEnabled         TruthValue,
+    f3PbbIpManagementTunnelISID                Integer32,
+    f3PbbIpManagementTunnelIPriority           Integer32,
+    f3PbbIpManagementTunnelBackboneMacDestinationEnabled         TruthValue,
+    f3PbbIpManagementTunnelBackboneMacDestinationAddress         MacAddress
+}
+
+f3PbbIpManagementTunnelItagEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "This object ITAG whether enabled, It is Enabled only When management tunnel type is ISID based.
+        By default it is disabled"
+    ::= { f3PbbIpManagementTunnelEntry 1 }
+    
+f3PbbIpManagementTunnelISID OBJECT-TYPE
+    SYNTAX     Integer32(256..16777214)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "Only applicable when iTagEnabled =  enabled (ISID is shown to user, but in IFM data type here is ITAG)."
+    ::= { f3PbbIpManagementTunnelEntry 2 }
+    
+f3PbbIpManagementTunnelIPriority OBJECT-TYPE
+    SYNTAX     Integer32(0..7)
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "Only applicable when iTagEnabled =  enabled (ISID is shown to user, but in IFM data type here is ITAG, no use at present)."
+    ::= { f3PbbIpManagementTunnelEntry 3 }
+
+f3PbbIpManagementTunnelBackboneMacDestinationEnabled OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "When enabled, we will use provisioned B-MAC for ARP and for management packets.
+        When disabled, we will use backbone group MAC address for ARP and get B-DA from ARP response
+        By default, it is disabled"
+    ::= { f3PbbIpManagementTunnelEntry 4 }
+
+f3PbbIpManagementTunnelBackboneMacDestinationAddress OBJECT-TYPE
+    SYNTAX     MacAddress 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "User must set a valid MAC address, Only applicable when iTagEnabled =  enabled
+        By default, it is 00:00:00:00:00:00"
+    ::= { f3PbbIpManagementTunnelEntry 5 }
+    
+--
+-- PBB Net Port Statistics Table
+--
+f3PbbEthernetNetPortStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PbbEthernetNetPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of pbb Ethernet Network Port related statistics.  
+             These reflect the current data."
+    ::= { f3PBBPerformanceObjects 1 }
+
+f3PbbEthernetNetPortStatsEntry OBJECT-TYPE
+    SYNTAX      F3PbbEthernetNetPortStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PbbEthernetNetPortStatsTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetNetPortStatsEntry }
+    ::= { f3PbbEthernetNetPortStatsTable 1 }
+
+F3PbbEthernetNetPortStatsEntry ::= SEQUENCE {
+    f3PbbEthernetNetPortStatsPbbUniBdaDiscard      PerfCounter64,
+    f3PbbEthernetNetPortStatsPbbGroupBdaDiscard    PerfCounter64
+}
+
+f3PbbEthernetNetPortStatsPbbUniBdaDiscard OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of PBB frames (BDA is not backbone group MAC) 
+         discarded due to receive BDA which is not matching the 
+         port's PBB MAC address when port is non-promiscuous mode."
+     ::= { f3PbbEthernetNetPortStatsEntry 1 }
+     
+f3PbbEthernetNetPortStatsPbbGroupBdaDiscard OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of PBB frames discarded due to mismatch of I-SID in I-TAG and I-SID 
+         in backbone group MAC in the B-DA when port is non-promiscuous mode."
+     ::= { f3PbbEthernetNetPortStatsEntry 2 }
+
+--
+-- PBB Net Port History Statistics Table
+--
+f3PbbEthernetNetPortHistoryStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PbbEthernetNetPortHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of pbb Ethernet Network Port related statistics.  
+             These reflect the current data."
+    ::= { f3PBBPerformanceObjects 2 }
+
+f3PbbEthernetNetPortHistoryStatsEntry OBJECT-TYPE
+    SYNTAX      F3PbbEthernetNetPortHistoryStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PbbEthernetNetPortHistoryStatsTable.
+             Entries exist in this table for each Ethernet interface/port."
+    AUGMENTS { cmEthernetNetPortHistoryEntry }
+    ::= { f3PbbEthernetNetPortHistoryStatsTable 1 }
+
+F3PbbEthernetNetPortHistoryStatsEntry ::= SEQUENCE {
+    f3PbbEthernetNetPortHistoryStatsPbbUniBdaDiscard      PerfCounter64,
+    f3PbbEthernetNetPortHistoryStatsPbbGroupBdaDiscard    PerfCounter64
+}
+
+f3PbbEthernetNetPortHistoryStatsPbbUniBdaDiscard OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of PBB frames (BDA is not backbone group MAC) 
+         discarded due to receive BDA which is not matching the 
+         port's PBB MAC address when port is non-promiscuous mode."
+     ::= { f3PbbEthernetNetPortHistoryStatsEntry 1 }
+     
+f3PbbEthernetNetPortHistoryStatsPbbGroupBdaDiscard OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Number of PBB frames discarded due to mismatch of I-SID in I-TAG and I-SID 
+         in backbone group MAC in the B-DA when port is non-promiscuous mode."
+     ::= { f3PbbEthernetNetPortHistoryStatsEntry 2 }
+
+--
+--Conformance
+--
+f3PBBCompliances      OBJECT IDENTIFIER ::= {f3PBBConformance 1}
+f3PBBGroups           OBJECT IDENTIFIER ::= {f3PBBConformance 2}
+
+f3PBBCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the PBB Object
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3PbbConfigGroup, f3PbbStatsGroup
+        }
+    ::= { f3PBBCompliances 1 }
+
+f3PbbConfigGroup OBJECT-GROUP
+    OBJECTS {
+        f3PbbEthernetAccPortITagLoopbackMask, f3PbbEthernetAccPortITagLoopback1,
+        f3PbbEthernetAccPortITagLoopback2, f3PbbEthernetAccPortITagLoopback3,
+        
+        f3PbbEthernetNetPortBackboneMacAddress, f3PbbEthernetNetPortITagLoopbackMask,
+        f3PbbEthernetNetPortITagLoopback1, f3PbbEthernetNetPortITagLoopback2,
+        f3PbbEthernetNetPortITagLoopback3,
+        
+        f3PbbFlowITagControl, f3PbbFlowITagISID,
+        f3PbbFlowITagPriority, f3PbbFlowBackboneMacDestinationEnabled,
+        f3PbbFlowBackboneMacDestinationAddress, f3PbbFlowA2NPbbCapableFlag,
+        
+        f3PbbIpManagementTunnelItagEnabled, f3PbbIpManagementTunnelISID,
+        f3PbbIpManagementTunnelIPriority, f3PbbIpManagementTunnelBackboneMacDestinationEnabled,
+        f3PbbIpManagementTunnelBackboneMacDestinationAddress
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the F3 PBB Functionality
+             ."
+    ::= { f3PBBGroups 1 }
+
+f3PbbStatsGroup OBJECT-GROUP
+    OBJECTS {
+        f3PbbEthernetNetPortStatsPbbUniBdaDiscard, f3PbbEthernetNetPortStatsPbbGroupBdaDiscard,	
+        
+        f3PbbEthernetNetPortHistoryStatsPbbUniBdaDiscard, f3PbbEthernetNetPortHistoryStatsPbbGroupBdaDiscard
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the F3 PBB Functionality
+            ."
+    ::= { f3PBBGroups 2 }
+
+END

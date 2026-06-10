@@ -1,0 +1,1412 @@
+PT-TRAP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        Integer32,
+        Counter32                   FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        DisplayString, DateAndTime  FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        NOTIFICATION-GROUP,
+        OBJECT-GROUP                FROM SNMPv2-CONF
+        pt                          FROM PT-MIB;
+
+--
+-- Module identity part.
+--
+
+    ptTrap MODULE-IDENTITY
+        LAST-UPDATED "201711221500Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            " "
+
+        DESCRIPTION
+            "The MIB module describes the enterprise specific traps
+             for PT products."
+
+        REVISION      "201711221500Z"
+        DESCRIPTION
+            "Added alarms under NotificationId and ProbableCause:
+	  	licMissingCriticalFAL* and licMissingMajor*"
+
+
+        REVISION      "201609231200Z"
+        DESCRIPTION
+            "Added alarms:
+            carrierTerminationConfigMismatch (397)
+            wifiIncompatibleHardware (398)
+            icccDown (399)
+            radioLinkTerminalReducedCapacity (400)"
+
+        REVISION      "201603091200Z"
+        DESCRIPTION
+            "Validated"
+
+        REVISION      "201506240800Z"
+        DESCRIPTION
+            "Support for PT trap OIDs."
+
+         ::= { pt 2 }
+
+--
+--PT-TRAP groups.
+--
+
+    ptTraps          OBJECT IDENTIFIER ::= { ptTrap 1 }
+    ptTrapContents   OBJECT IDENTIFIER ::= { ptTrap 2 }
+ --   ptTrapsPrefix    OBJECT IDENTIFIER ::= { ptTrap 0 }
+    ptTrapsConformance OBJECT IDENTIFIER ::= { ptTrap 3 }
+
+
+--
+-- Local data types.
+--
+EventCause ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for event causes."
+    SYNTAX     INTEGER
+    {
+        swdlOk                             (50),
+        loopOpended                        (53),
+        loopClosed                         (54),
+        mcu                                (56),
+        mcd                                (57),
+        rstpNewRoot                        (58),
+        rstpTopologyChange                 (59),
+        rmonRisingThreshold                (60),
+        rmonFallingThreshold               (61),
+        pingCompleted                      (62),
+        modIns                             (63),
+        cdbBackupOk                        (64),
+        cdbRestoreOk                       (65),
+        information                        (66),
+        fileTransferStart                  (67),
+        fileTransferEnd                    (68),
+        modOos                             (70),
+        modOosMaint                        (71),
+        moduleRestart                      (72),
+        moduleShutdown                     (73),
+        slotUnequipped                     (74),
+        emergencyPassword                  (75),
+        cdbEraseLimitedOk                  (77),
+        lkfInstallOk                       (78),
+        lkfRemoveOk                        (79),
+        ccmLoopbackCompletion              (80),
+        ccmLinktraceCompletion             (81),
+        erpProtectionStateChange           (82),
+        portLoopDisabled                   (83),
+        portLoopEnabled                    (84),
+        t0SourceSwitched                   (86),
+        ptpModeSwitch                      (87),
+        cdbEraseOk                         (88),
+        ptpMasterSwitched                  (89),
+        bfdSessionUp                       (90),
+        bfdSessionStateChanged             (91),
+        licInServiceUnlockPeriod           (347),
+        licInUnlockedMode                  (348),
+        deleteUserEvent                    (386),
+        wifiModuleInserted                 (389),
+        wifiModuleRemoved                  (390),
+        spectrumDiagnosticScanStarted      (391),
+        spectrumDiagnosticScanFinished     (392),
+        aaaLocal                           (506),
+        aaaTacacs                          (507),
+        aaaRadius                          (508),
+        deleteNotificationSubscriber       (509),
+        disableNotificationSubscriber      (510),
+        disableNotificationReporting       (511)
+    }
+
+EventType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for event types."
+    SYNTAX     INTEGER
+    {
+        information            (1),
+        warning                (2)
+    }
+
+NotificationId ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for notification ids."
+    SYNTAX     INTEGER
+    {
+        objectCreate                        (  1),
+        objectDelete                        (  2),
+        avc                                 (  3),
+        protectionSwitch                    ( 10),
+        swdlOk                              ( 50),
+        loopOpended                         ( 53),
+        loopClosed                          ( 54),
+        mcu                                 ( 56),
+        mcd                                 ( 57),
+        rstpNewRoot                         ( 58),
+        rstpTopologyChange                  ( 59),
+        rmonRisingThreshold                 ( 60),
+        rmonFallingThreshold                ( 61),
+        pingCompleted                       ( 62),
+        modIns                              ( 63),
+        cdbBackupOk                         ( 64),
+        cdbRestoreOk                        ( 65),
+        information                         ( 66),
+        fileTransferStart                   ( 67),
+        fileTransferEnd                     ( 68),
+        modOos                              ( 70),
+        modOosMaint                         ( 71),
+        moduleRestart                       ( 72),
+        moduleShutdown                      ( 73),
+        slotUnequipped                      ( 74),
+        emergencyPassword                   ( 75),
+        cdbEraseLimitedOk                   ( 77),
+        lkfInstallOk                        ( 78),
+        lkfRemoveOk                         ( 79),
+        ccmLoopbackCompletion               ( 80),
+        ccmLinktraceCompletion              ( 81),
+        erpProtectionStateChange            ( 82),
+        portLoopDisabled                    ( 83),
+        portLoopEnabled                     ( 84),
+        t0SourceSwitched                    ( 86),
+        ptpModeSwitch                       ( 87),
+        cdbEraseOk                          ( 88),
+        ptpMasterSwitched                   ( 89),
+        bfdSessionUp                        ( 90),
+        bfdSessionStateChanged              ( 91),
+        mid                                 (100),
+        linkDown                            (141),
+        alarmInp                            (142),
+        temp                                (154),
+        tempCri                             (155),
+        arc                                 (157),
+        t0HoldOver                          (158),
+        pwrLow                              (162),
+        pwrHigh                             (163),
+        pwrOff                              (164),
+        ifmodMismatch                       (166),
+        ifmodNotProv                        (168),
+        nrMismatch                          (170),
+        ntpUnreachable                      (171),
+        cdbDiskNearFull                     (172),
+        tmpDiskNearFull                     (176),
+        invFailure                          (189),
+        syncAutoLockout                     (191),
+        nrNotCommitted                      (192),
+        acMstTimeout                        (202),
+        rsAckTimeout                        (203),
+        swdlAborted                         (204),
+        cdbRestoreFail                      (207),
+        cdbBackupFail                       (208),
+        fileTransferFail                    (209),
+        swdlFail                            (210),
+        swdlRollbackFail                    (211),
+        standbySWDLFail                     (212),
+        haLogReset                          (213),
+        cdbErased                           (214),
+        nrAutoRollback                      (215),
+        lkgCdbRollback                      (218),
+        hwDiagError                         (219),
+        swError                             (220),
+        oamErrorSymPeriod                   (221),
+        oamErrorFramePeriod                 (222),
+        oamErrorFrame                       (223),
+        oamErrorFrameSecsSummary            (224),
+        oamCritical                         (225),
+        oamDyingGasp                        (226),
+        lkfInstallFail                      (227),
+        lkfRemoveFail                       (228),
+        dhcpError                           (242),
+        hardwareFail                        (252),
+        ifmodFail                           (253),
+        defXconnCCM                         (257),
+        defErrorCCM                         (258),
+        defRemoteCCM                        (259),
+        defMacStatus                        (260),
+        defRDICCM                           (261),
+        y1731DMRttDeg                       (273),
+        y1731DMOneWayDegReverse             (274),
+        y1731DMOneWayDegForward             (275),
+        y1731DMVRttDeg                      (276),
+        y1731DMVOneWayDegReverse            (277),
+        y1731DMVOneWayDegForward            (278),
+        y1731LMFrameLossNearEnd             (279),
+        y1731LMFrameLossFarEnd              (280),
+        syncSourceLossRedundancy            (281),
+        xpicCableDisconnected               (282),
+        ipIfHardwareFail                    (300),
+        arpHardwareFail                     (301),
+        rtTableHardwareFail                 (302),
+        remoteMepHardwareFail               (303),
+        rfInputLow                          (328),
+        rfOutputATPCMaxTooLong              (329),
+        radioLinkConnectionDefect           (330),
+        radioLinkIDMismatch                 (331),
+        radioLinkHardwareDefect             (332),
+        rlts115MinThresholdCrossing         (333),
+        rlts124HourThresholdCrossing        (334),
+        rlts215MinThresholdCrossing         (335),
+        rlts224HourThresholdCrossing        (336),
+        rltm15MinThresholdCrossing          (337),
+        rltm24HourThresholdCrossing         (338),
+        tlts115MinThresholdCrossing         (339),
+        tlts124HourThresholdCrossing        (340),
+        tltm15MinThresholdCrossing          (341),
+        tltm24HourThresholdCrossing         (342),
+        psac15MinThresholdCrossing          (343),
+        psac24HourThresholdCrossing         (344),
+        ams15MinThresholdCrossing           (345),
+        ams24HourThresholdCrossing          (346),
+        licInServiceUnlockPeriod            (347),
+        licInUnlockedMode                   (348),
+        licUnlockPeriodExpired              (349),
+        licMissingCritical                  (350),
+        licMissingMajor                     (351),
+        licMaintenanceUnlockTokenWarning    (352),
+        licMaintenanceUnlockTokenMajor      (353),
+        licEmergencyUnlockTokenWarning      (354),
+        licEmergencyUnlockTokenMajor        (355),
+        licIntegrationUnlockPeriodExpired   (365),
+        licMaintenanceUnlockPeriodExpired   (366),
+        licEmergencyUnlockPeriodExpired     (367),
+        licSystemUnlockPeriodExpired        (368),
+        rmmMissing                          (369),
+        rmmFaulty                           (370),
+        cdbCompressedFileTooLarge           (371),
+        ifModTemperatureTooHigh             (375),
+        ifModTemperatureTooLow              (376),
+        ifModVoltageTooHigh                 (377),
+        ifModVoltageTooLow                  (378),
+        ifModTxBiasTooHigh                  (379),
+        ifModTxBiasTooLow                   (380),
+        ifModTxPowerTooHigh                 (381),
+        ifModTxPowerTooLow                  (382),
+        ifModRxPowerTooLow                  (383),
+        tempLow                             (384),
+        deleteUserAlarm                     (385),
+        deleteUserEvent                     (386),
+        alignmentModeEnabled                (387),
+        wifiModuleNotResponding             (388),
+        wifiModuleInserted                  (389),
+        wifiModuleRemoved                   (390),
+        spectrumDiagnosticScanStarted       (391),
+        spectrumDiagnosticScanFinished      (392),
+        ber                                 (393),
+        wifiDefaultPasswordNotChanged       (394),
+        wifiSoftwareMismatch                (395),
+        managementPortOpened                (396),
+        carrierTerminationConfigMismatch    (397),
+        wifiIncompatibleHardware            (398),
+        icccDown                            (399),
+        radioLinkTerminalReducedCapacity    (400),
+        licMissingCriticalFAL1241762        (402),
+        licMissingMajorFAL1241762           (403),
+        licMissingCriticalFAL1241669        (404),
+        licMissingMajorFAL1241669           (405),
+        licMissingCriticalFAL1242293        (406),
+        licMissingMajorFAL1242293           (407),
+        licMissingCriticalFAL1242339        (408),
+        licMissingMajorFAL1242339           (409),
+        licMissingCriticalFAL1242322        (412),
+        licMissingMajorFAL1242322           (413),
+        licMissingCriticalFAL1242378        (414),
+        licMissingMajorFAL1242378           (415),
+        licMissingCriticalFAL1241778        (416),
+        licMissingMajorFAL1241778           (417),
+        licMissingCriticalFAL1241764        (418),
+        licMissingMajorFAL1241764           (419),
+        licMissingCriticalFAL1241885        (420),
+        licMissingMajorFAL1241885           (421),
+        licMissingCriticalFAL1241801        (422),
+        licMissingMajorFAL1241801           (423),
+        licMissingCriticalFAL1242043        (424),
+        licMissingMajorFAL1242043           (425),
+        licMissingCriticalFAL1242088        (426),
+        licMissingMajorFAL1242088           (427),
+        licMissingCriticalFAL1241726        (428),
+        licMissingMajorFAL1241726           (429),
+        licMissingCriticalFAL1241884        (430),
+        licMissingMajorFAL1241884           (431),
+        licMissingCriticalFAL1242186        (432),
+        licMissingMajorFAL1242186           (433),
+        licMissingCriticalFAL1242044        (434),
+        licMissingMajorFAL1242044           (435),
+        licMissingCriticalFAL1242089        (436),
+        licMissingMajorFAL1242089           (437),
+        licMissingCriticalFAL1242295        (438),
+        licMissingMajorFAL1242295           (439),
+        licMissingCriticalFAL1242297        (440),
+        licMissingMajorFAL1242297           (441),
+        licMissingCriticalFAL1242298        (442),
+        licMissingMajorFAL1242298           (443),
+        licMissingCriticalFAL1242299        (444),
+        licMissingMajorFAL1242299           (445),
+        licMissingCriticalFAL1242342        (446),
+        licMissingMajorFAL1242342           (447),
+        licMissingCriticalFAL1242343        (448),
+        licMissingMajorFAL1242343           (449),
+        licMissingCriticalFAL1242345        (450),
+        licMissingMajorFAL1242345           (451),
+        licMissingCriticalFAL1242346        (452),
+        licMissingMajorFAL1242346           (453),
+        licMissingCriticalFAL1242347        (454),
+        licMissingMajorFAL1242347           (455),
+        licMissingCriticalFAL1242348        (456),
+        licMissingMajorFAL1242348           (457),
+        licMissingCriticalFAL1242402        (458),
+        licMissingMajorFAL1242402           (459),
+        licMissingCriticalFAL1242364        (460),
+        licMissingMajorFAL1242364           (461),
+        licMissingCriticalFAL1242365        (462),
+        licMissingMajorFAL1242365           (463),
+        licMissingCriticalFAL1242880        (464),
+        licMissingMajorFAL1242880           (465),
+        licMissingCriticalFAL1242323        (486),
+        licMissingMajorFAL1242323           (487),
+        licMissingCriticalFAL1242324        (488),
+        licMissingMajorFAL1242324           (489),
+        licMissingCriticalFAL1242325        (490),
+        licMissingMajorFAL1242325           (491),
+        licMissingCriticalFAL1242326        (492),
+        licMissingMajorFAL1242326           (493),
+        licMissingCriticalFAL1242401        (494),
+        licMissingMajorFAL1242401           (495),
+        licMissingCriticalFAL1242400        (496),
+        licMissingMajorFAL1242400           (497),
+        licMissingCriticalFAL1242885        (498),
+        licMissingMajorFAL1242885           (499),
+        licMissingCriticalFAL1242615        (500),
+        licMissingMajorFAL1242615           (501),
+        licMissingCriticalFAL1241765        (502),
+        licMissingMajorFAL1241765           (503),
+        aaaLocal                            (506),
+        aaaTacacs                           (507),
+        aaaRadius                           (508),
+        deleteNotificationSubscriber        (509),
+        disableNotificationSubscriber       (510),
+        disableNotificationReporting        (511),
+        licMissingCriticalFAL1241767        (516),
+        licMissingMajorFAL1241767           (517),
+        licMissingCriticalFAL1241768        (518),
+        licMissingMajorFAL1241768           (519),
+        licMissingCriticalFAL1241769        (520),
+        licMissingMajorFAL1241769           (521),
+        licMissingCriticalFAL1241770        (522),
+        licMissingMajorFAL1241770           (523),
+        licMissingCriticalFAL1241771        (524),
+        licMissingMajorFAL1241771           (525),
+        licMissingCriticalFAL1241772        (526),
+        licMissingMajorFAL1241772           (527),
+        licMissingCriticalFAL1241773        (528),
+        licMissingMajorFAL1241773           (529),
+        licMissingCriticalFAL1241774        (530),
+        licMissingMajorFAL1241774           (531),
+        licMissingCriticalFAL1241670        (532),
+        licMissingMajorFAL1241670           (533),
+        licMissingCriticalFAL1241707        (534),
+        licMissingMajorFAL1241707           (535),
+        licMissingCriticalFAL1241708        (536),
+        licMissingMajorFAL1241708           (537),
+        licMissingCriticalFAL1241709        (538),
+        licMissingMajorFAL1241709           (539),
+        licMissingCriticalFAL1241710        (540),
+        licMissingMajorFAL1241710           (541),
+        licMissingCriticalFAL1241711        (542),
+        licMissingMajorFAL1241711           (543),
+        licMissingCriticalFAL1241712        (544),
+        licMissingMajorFAL1241712           (545),
+        licMissingCriticalFAL1241713        (546),
+        licMissingMajorFAL1241713           (547),
+        licMissingCriticalFAL1242300        (548),
+        licMissingMajorFAL1242300           (549),
+        licMissingCriticalFAL1242301        (550),
+        licMissingMajorFAL1242301           (551),
+        licMissingCriticalFAL1242302        (552),
+        licMissingMajorFAL1242302           (553),
+        licMissingCriticalFAL1242303        (554),
+        licMissingMajorFAL1242303           (555),
+        licMissingCriticalFAL1242304        (556),
+        licMissingMajorFAL1242304           (557),
+        licMissingCriticalFAL1242305        (558),
+        licMissingMajorFAL1242305           (559),
+        licMissingCriticalFAL1242306        (560),
+        licMissingMajorFAL1242306           (561),
+        licMissingCriticalFAL1242307        (562),
+        licMissingMajorFAL1242307           (563),
+        licMissingCriticalFAL1242308        (564),
+        licMissingMajorFAL1242308           (565),
+        licMissingCriticalFAL1242309        (566),
+        licMissingMajorFAL1242309           (567),
+        licMissingCriticalFAL1242310        (568),
+        licMissingMajorFAL1242310           (569),
+        licMissingCriticalFAL1242311        (570),
+        licMissingMajorFAL1242311           (571),
+        licMissingCriticalFAL1242312        (572),
+        licMissingMajorFAL1242312           (573),
+        licMissingCriticalFAL1242313        (574),
+        licMissingMajorFAL1242313           (575),
+        licMissingCriticalFAL1242314        (576),
+        licMissingMajorFAL1242314           (577),
+        licMissingCriticalFAL1242350        (578),
+        licMissingMajorFAL1242350           (579),
+        licMissingCriticalFAL1242351        (580),
+        licMissingMajorFAL1242351           (581),
+        licMissingCriticalFAL1242352        (582),
+        licMissingMajorFAL1242352           (583),
+        licMissingCriticalFAL1242353        (584),
+        licMissingMajorFAL1242353           (585),
+        licMissingCriticalFAL1242354        (586),
+        licMissingMajorFAL1242354           (587),
+        licMissingCriticalFAL1242355        (588),
+        licMissingMajorFAL1242355           (589),
+        licMissingCriticalFAL1242356        (590),
+        licMissingMajorFAL1242356           (591),
+        licMissingCriticalFAL1242357        (592),
+        licMissingMajorFAL1242357           (593),
+        licMissingCriticalFAL1242358        (594),
+        licMissingMajorFAL1242358           (595),
+        licMissingCriticalFAL1242359        (596),
+        licMissingMajorFAL1242359           (597),
+        licMissingCriticalFAL1242360        (598),
+        licMissingMajorFAL1242360           (599),
+        licMissingCriticalFAL1242361        (600),
+        licMissingMajorFAL1242361           (601),
+        licMissingCriticalFAL1242362        (602),
+        licMissingMajorFAL1242362           (603),
+        licMissingCriticalFAL1242363        (604),
+        licMissingMajorFAL1242363           (605),
+        licMissingCriticalFAL1242874        (606),
+        licMissingMajorFAL1242874           (607),
+        licMissingCriticalFAL1242875        (608),
+        licMissingMajorFAL1242875           (609),
+        licMissingCriticalFAL1242876        (610),
+        licMissingMajorFAL1242876           (611),
+        licMissingCriticalFAL1242877        (612),
+        licMissingMajorFAL1242877           (613),
+        licMissingCriticalFAL1242878        (614),
+        licMissingMajorFAL1242878           (615),
+        licMissingCriticalFAL1241127        (648),
+        licMissingMajorFAL1241127           (649),
+        licMissingCriticalFAL1241766        (650),
+        licMissingMajorFAL1241766           (651)
+    }
+
+ProbableCause ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for probable causes."
+    SYNTAX     INTEGER
+    {
+        swdlOk                              ( 50),
+        loopOpended                         ( 53),
+        loopClosed                          ( 54),
+        mcu                                 ( 56),
+        mcd                                 ( 57),
+        rstpNewRoot                         ( 58),
+        rstpTopologyChange                  ( 59),
+        rmonRisingThreshold                 ( 60),
+        rmonFallingThreshold                ( 61),
+        pingCompleted                       ( 62),
+        modIns                              ( 63),
+        cdbBackupOk                         ( 64),
+        cdbRestoreOk                        ( 65),
+        information                         ( 66),
+        fileTransferStart                   ( 67),
+        fileTransferEnd                     ( 68),
+        modOos                              ( 70),
+        modOosMaint                         ( 71),
+        moduleRestart                       ( 72),
+        moduleShutdown                      ( 73),
+        slotUnequipped                      ( 74),
+        emergencyPassword                   ( 75),
+        cdbEraseLimitedOk                   ( 77),
+        lkfInstallOk                        ( 78),
+        lkfRemoveOk                         ( 79),
+        ccmLoopbackCompletion               ( 80),
+        ccmLinktraceCompletion              ( 81),
+        erpProtectionStateChange            ( 82),
+        portLoopDisabled                    ( 83),
+        portLoopEnabled                     ( 84),
+        t0SourceSwitched                    ( 86),
+        ptpModeSwitch                       ( 87),
+        cdbEraseOk                          ( 88),
+        ptpMasterSwitched                   ( 89),
+        bfdSessionUp                        ( 90),
+        bfdSessionStateChanged              ( 91),
+        mid                                 (100),
+        linkDown                            (141),
+        alarmInp                            (142),
+        temp                                (154),
+        tempCri                             (155),
+        arc                                 (157),
+        t0HoldOver                          (158),
+        pwrLow                              (162),
+        pwrHigh                             (163),
+        pwrOff                              (164),
+        ifmodMismatch                       (166),
+        ifmodNotProv                        (168),
+        nrMismatch                          (170),
+        ntpUnreachable                      (171),
+        cdbDiskNearFull                     (172),
+        tmpDiskNearFull                     (176),
+        invFailure                          (189),
+        syncAutoLockout                     (191),
+        nrNotCommitted                      (192),
+        acMstTimeout                        (202),
+        rsAckTimeout                        (203),
+        swdlAborted                         (204),
+        cdbRestoreFail                      (207),
+        cdbBackupFail                       (208),
+        fileTransferFail                    (209),
+        swdlFail                            (210),
+        swdlRollbackFail                    (211),
+        standbySWDLFail                     (212),
+        haLogReset                          (213),
+        cdbErased                           (214),
+        nrAutoRollback                      (215),
+        lkgCdbRollback                      (218),
+        hwDiagError                         (219),
+        swError                             (220),
+        oamErrorSymPeriod                   (221),
+        oamErrorFramePeriod                 (222),
+        oamErrorFrame                       (223),
+        oamErrorFrameSecsSummary            (224),
+        oamCritical                         (225),
+        oamDyingGasp                        (226),
+        lkfInstallFail                      (227),
+        lkfRemoveFail                       (228),
+        dhcpError                           (242),
+        hardwareFail                        (252),
+        ifmodFail                           (253),
+        defXconnCCM                         (257),
+        defErrorCCM                         (258),
+        defRemoteCCM                        (259),
+        defMacStatus                        (260),
+        defRDICCM                           (261),
+        y1731DMRttDeg                       (273),
+        y1731DMOneWayDegReverse             (274),
+        y1731DMOneWayDegForward             (275),
+        y1731DMVRttDeg                      (276),
+        y1731DMVOneWayDegReverse            (277),
+        y1731DMVOneWayDegForward            (278),
+        y1731LMFrameLossNearEnd             (279),
+        y1731LMFrameLossFarEnd              (280),
+        syncSourceLossRedundancy            (281),
+        xpicCableDisconnected               (282),
+        ipIfHardwareFail                    (300),
+        arpHardwareFail                     (301),
+        rtTableHardwareFail                 (302),
+        remoteMepHardwareFail               (303),
+        rfInputLow                          (328),
+        rfOutputATPCMaxTooLong              (329),
+        radioLinkConnectionDefect           (330),
+        radioLinkIDMismatch                 (331),
+        radioLinkHardwareDefect             (332),
+        rlts115MinThresholdCrossing         (333),
+        rlts124HourThresholdCrossing        (334),
+        rlts215MinThresholdCrossing         (335),
+        rlts224HourThresholdCrossing        (336),
+        rltm15MinThresholdCrossing          (337),
+        rltm24HourThresholdCrossing         (338),
+        tlts115MinThresholdCrossing         (339),
+        tlts124HourThresholdCrossing        (340),
+        tltm15MinThresholdCrossing          (341),
+        tltm24HourThresholdCrossing         (342),
+        psac15MinThresholdCrossing          (343),
+        psac24HourThresholdCrossing         (344),
+        ams15MinThresholdCrossing           (345),
+        ams24HourThresholdCrossing          (346),
+        licInServiceUnlockPeriod            (347),
+        licInUnlockedMode                   (348),
+        licUnlockPeriodExpired              (349),
+        licMissingCritical                  (350),
+        licMissingMajor                     (351),
+        licMaintenanceUnlockTokenWarning    (352),
+        licMaintenanceUnlockTokenMajor      (353),
+        licEmergencyUnlockTokenWarning      (354),
+        licEmergencyUnlockTokenMajor        (355),
+        licIntegrationUnlockPeriodExpired   (365),
+        licMaintenanceUnlockPeriodExpired   (366),
+        licEmergencyUnlockPeriodExpired     (367),
+        licSystemUnlockPeriodExpired        (368),
+        rmmMissing                          (369),
+        rmmFaulty                           (370),
+        cdbCompressedFileTooLarge           (371),
+        ifModTemperatureTooHigh             (375),
+        ifModTemperatureTooLow              (376),
+        ifModVoltageTooHigh                 (377),
+        ifModVoltageTooLow                  (378),
+        ifModTxBiasTooHigh                  (379),
+        ifModTxBiasTooLow                   (380),
+        ifModTxPowerTooHigh                 (381),
+        ifModTxPowerTooLow                  (382),
+        ifModRxPowerTooLow                  (383),
+        tempLow                             (384),
+        deleteUserAlarm                     (385),
+        deleteUserEvent                     (386),
+        alignmentModeEnabled                (387),
+        wifiModuleNotResponding             (388),
+        wifiModuleInserted                  (389),
+        wifiModuleRemoved                   (390),
+        spectrumDiagnosticScanStarted       (391),
+        spectrumDiagnosticScanFinished      (392),
+        ber                                 (393),
+        wifiDefaultPasswordNotChanged       (394),
+        wifiSoftwareMismatch                (395),
+        managementPortOpened                (396),
+        carrierTerminationConfigMismatch    (397),
+        wifiIncompatibleHardware            (398),
+        icccDown                            (399),
+        radioLinkTerminalReducedCapacity    (400),
+        licMissingCriticalFAL1241762        (402),
+        licMissingMajorFAL1241762           (403),
+        licMissingCriticalFAL1241669        (404),
+        licMissingMajorFAL1241669           (405),
+        licMissingCriticalFAL1242293        (406),
+        licMissingMajorFAL1242293           (407),
+        licMissingCriticalFAL1242339        (408),
+        licMissingMajorFAL1242339           (409),
+        licMissingCriticalFAL1242322        (412),
+        licMissingMajorFAL1242322           (413),
+        licMissingCriticalFAL1242378        (414),
+        licMissingMajorFAL1242378           (415),
+        licMissingCriticalFAL1241778        (416),
+        licMissingMajorFAL1241778           (417),
+        licMissingCriticalFAL1241764        (418),
+        licMissingMajorFAL1241764           (419),
+        licMissingCriticalFAL1241885        (420),
+        licMissingMajorFAL1241885           (421),
+        licMissingCriticalFAL1241801        (422),
+        licMissingMajorFAL1241801           (423),
+        licMissingCriticalFAL1242043        (424),
+        licMissingMajorFAL1242043           (425),
+        licMissingCriticalFAL1242088        (426),
+        licMissingMajorFAL1242088           (427),
+        licMissingCriticalFAL1241726        (428),
+        licMissingMajorFAL1241726           (429),
+        licMissingCriticalFAL1241884        (430),
+        licMissingMajorFAL1241884           (431),
+        licMissingCriticalFAL1242186        (432),
+        licMissingMajorFAL1242186           (433),
+        licMissingCriticalFAL1242044        (434),
+        licMissingMajorFAL1242044           (435),
+        licMissingCriticalFAL1242089        (436),
+        licMissingMajorFAL1242089           (437),
+        licMissingCriticalFAL1242295        (438),
+        licMissingMajorFAL1242295           (439),
+        licMissingCriticalFAL1242297        (440),
+        licMissingMajorFAL1242297           (441),
+        licMissingCriticalFAL1242298        (442),
+        licMissingMajorFAL1242298           (443),
+        licMissingCriticalFAL1242299        (444),
+        licMissingMajorFAL1242299           (445),
+        licMissingCriticalFAL1242342        (446),
+        licMissingMajorFAL1242342           (447),
+        licMissingCriticalFAL1242343        (448),
+        licMissingMajorFAL1242343           (449),
+        licMissingCriticalFAL1242345        (450),
+        licMissingMajorFAL1242345           (451),
+        licMissingCriticalFAL1242346        (452),
+        licMissingMajorFAL1242346           (453),
+        licMissingCriticalFAL1242347        (454),
+        licMissingMajorFAL1242347           (455),
+        licMissingCriticalFAL1242348        (456),
+        licMissingMajorFAL1242348           (457),
+        licMissingCriticalFAL1242402        (458),
+        licMissingMajorFAL1242402           (459),
+        licMissingCriticalFAL1242364        (460),
+        licMissingMajorFAL1242364           (461),
+        licMissingCriticalFAL1242365        (462),
+        licMissingMajorFAL1242365           (463),
+        licMissingCriticalFAL1242880        (464),
+        licMissingMajorFAL1242880           (465),
+        licMissingCriticalFAL1242323        (486),
+        licMissingMajorFAL1242323           (487),
+        licMissingCriticalFAL1242324        (488),
+        licMissingMajorFAL1242324           (489),
+        licMissingCriticalFAL1242325        (490),
+        licMissingMajorFAL1242325           (491),
+        licMissingCriticalFAL1242326        (492),
+        licMissingMajorFAL1242326           (493),
+        licMissingCriticalFAL1242401        (494),
+        licMissingMajorFAL1242401           (495),
+        licMissingCriticalFAL1242400        (496),
+        licMissingMajorFAL1242400           (497),
+        licMissingCriticalFAL1242885        (498),
+        licMissingMajorFAL1242885           (499),
+        licMissingCriticalFAL1242615        (500),
+        licMissingMajorFAL1242615           (501),
+        licMissingCriticalFAL1241765        (502),
+        licMissingMajorFAL1241765           (503),
+        aaaLocal                            (506),
+        aaaTacacs                           (507),
+        aaaRadius                           (508),
+        deleteNotificationSubscriber        (509),
+        disableNotificationSubscriber       (510),
+        disableNotificationReporting        (511),
+        licMissingCriticalFAL1241767        (516),
+        licMissingMajorFAL1241767           (517),
+        licMissingCriticalFAL1241768        (518),
+        licMissingMajorFAL1241768           (519),
+        licMissingCriticalFAL1241769        (520),
+        licMissingMajorFAL1241769           (521),
+        licMissingCriticalFAL1241770        (522),
+        licMissingMajorFAL1241770           (523),
+        licMissingCriticalFAL1241771        (524),
+        licMissingMajorFAL1241771           (525),
+        licMissingCriticalFAL1241772        (526),
+        licMissingMajorFAL1241772           (527),
+        licMissingCriticalFAL1241773        (528),
+        licMissingMajorFAL1241773           (529),
+        licMissingCriticalFAL1241774        (530),
+        licMissingMajorFAL1241774           (531),
+        licMissingCriticalFAL1241670        (532),
+        licMissingMajorFAL1241670           (533),
+        licMissingCriticalFAL1241707        (534),
+        licMissingMajorFAL1241707           (535),
+        licMissingCriticalFAL1241708        (536),
+        licMissingMajorFAL1241708           (537),
+        licMissingCriticalFAL1241709        (538),
+        licMissingMajorFAL1241709           (539),
+        licMissingCriticalFAL1241710        (540),
+        licMissingMajorFAL1241710           (541),
+        licMissingCriticalFAL1241711        (542),
+        licMissingMajorFAL1241711           (543),
+        licMissingCriticalFAL1241712        (544),
+        licMissingMajorFAL1241712           (545),
+        licMissingCriticalFAL1241713        (546),
+        licMissingMajorFAL1241713           (547),
+        licMissingCriticalFAL1242300        (548),
+        licMissingMajorFAL1242300           (549),
+        licMissingCriticalFAL1242301        (550),
+        licMissingMajorFAL1242301           (551),
+        licMissingCriticalFAL1242302        (552),
+        licMissingMajorFAL1242302           (553),
+        licMissingCriticalFAL1242303        (554),
+        licMissingMajorFAL1242303           (555),
+        licMissingCriticalFAL1242304        (556),
+        licMissingMajorFAL1242304           (557),
+        licMissingCriticalFAL1242305        (558),
+        licMissingMajorFAL1242305           (559),
+        licMissingCriticalFAL1242306        (560),
+        licMissingMajorFAL1242306           (561),
+        licMissingCriticalFAL1242307        (562),
+        licMissingMajorFAL1242307           (563),
+        licMissingCriticalFAL1242308        (564),
+        licMissingMajorFAL1242308           (565),
+        licMissingCriticalFAL1242309        (566),
+        licMissingMajorFAL1242309           (567),
+        licMissingCriticalFAL1242310        (568),
+        licMissingMajorFAL1242310           (569),
+        licMissingCriticalFAL1242311        (570),
+        licMissingMajorFAL1242311           (571),
+        licMissingCriticalFAL1242312        (572),
+        licMissingMajorFAL1242312           (573),
+        licMissingCriticalFAL1242313        (574),
+        licMissingMajorFAL1242313           (575),
+        licMissingCriticalFAL1242314        (576),
+        licMissingMajorFAL1242314           (577),
+        licMissingCriticalFAL1242350        (578),
+        licMissingMajorFAL1242350           (579),
+        licMissingCriticalFAL1242351        (580),
+        licMissingMajorFAL1242351           (581),
+        licMissingCriticalFAL1242352        (582),
+        licMissingMajorFAL1242352           (583),
+        licMissingCriticalFAL1242353        (584),
+        licMissingMajorFAL1242353           (585),
+        licMissingCriticalFAL1242354        (586),
+        licMissingMajorFAL1242354           (587),
+        licMissingCriticalFAL1242355        (588),
+        licMissingMajorFAL1242355           (589),
+        licMissingCriticalFAL1242356        (590),
+        licMissingMajorFAL1242356           (591),
+        licMissingCriticalFAL1242357        (592),
+        licMissingMajorFAL1242357           (593),
+        licMissingCriticalFAL1242358        (594),
+        licMissingMajorFAL1242358           (595),
+        licMissingCriticalFAL1242359        (596),
+        licMissingMajorFAL1242359           (597),
+        licMissingCriticalFAL1242360        (598),
+        licMissingMajorFAL1242360           (599),
+        licMissingCriticalFAL1242361        (600),
+        licMissingMajorFAL1242361           (601),
+        licMissingCriticalFAL1242362        (602),
+        licMissingMajorFAL1242362           (603),
+        licMissingCriticalFAL1242363        (604),
+        licMissingMajorFAL1242363           (605),
+        licMissingCriticalFAL1242874        (606),
+        licMissingMajorFAL1242874           (607),
+        licMissingCriticalFAL1242875        (608),
+        licMissingMajorFAL1242875           (609),
+        licMissingCriticalFAL1242876        (610),
+        licMissingMajorFAL1242876           (611),
+        licMissingCriticalFAL1242877        (612),
+        licMissingMajorFAL1242877           (613),
+        licMissingCriticalFAL1242878        (614),
+        licMissingMajorFAL1242878           (615),
+        licMissingCriticalFAL1241127        (648),
+        licMissingMajorFAL1241127           (649),
+        licMissingCriticalFAL1241766        (650),
+        licMissingMajorFAL1241766           (651)
+    }
+
+Severity ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for Severity."
+    SYNTAX     INTEGER
+    {
+        indeterminate (1),
+        critical      (2),
+        major         (3),
+        minor         (4),
+        warning       (5),
+        cleared       (6)
+    }
+
+SwitchReason ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for switch reason."
+    SYNTAX     INTEGER
+    {
+        na                      ( 1),
+        restored                ( 2),
+        signalFail              ( 3),
+        signalMismatch          ( 4),
+        signalDegrade           ( 5),
+        automaticSwitch         ( 6),
+        manual                  ( 7),
+        remoteRequest           ( 8),
+        protectionDisabled      ( 9),
+        moduleFail              (10)
+    }
+
+SwitchType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for switch types."
+    SYNTAX     INTEGER
+    {
+        sdhMsp                 (1),
+        sdhSncp                (2),
+        equipememtProtection   (3),
+        synchronisation        (4),
+        scSwitchover           (5)
+    }
+
+--   MARGE - extended ALARM-INFO - LayerRate
+--
+--
+--   Id (TMF513)    Layer identifier (TMF513)             Managed objects (AXXTMN)    Presented value (AXXTMN)
+--   ===========   =========================              ========================    ========================
+--
+--   1              LR_Not_Applicable                     all not specified below     not applicable
+--
+--   5              LR_E1_2M                              PDHPort                     E1
+--                                                        E1
+--
+--   7              LR_E3_34M                             PDHPort                     E3
+--                                                        E3
+--
+--   11             LR_VT2_and_TU12_VC12                  TU12                        VC12  TU12/VC12
+--
+--   13             LR_Low_Order_TU3_VC3                  TU3                         VC3 TU3/VC3
+--
+--   15             LR_STS3c_and_AU4_VC4                  AU4                         VC4 AU4/VC4
+--
+--   16             LR_STS12c_VC4_4c                      AU4_4c                      AU4_4C
+--
+--   20             LR_Section_OC3_STS3_and_RS_STM1       RS                          RS_STM1
+--
+--   21             LR_Section_OC12_STS12_and_RS_STM4     RS                          RS_STM4
+--
+--   22             LR_Section_OC48_STS48_and_RS_STM16    RS                          RS_STM16
+--
+--   25             LR_Line_OC3_STS3_and_MS_STM1          MS                          MS_STM1
+--
+--   26             LR_Line_OC12_STS12_and_MS_STM4        MS                          MS_STM4
+--
+--   27             LR_Line_OC48_STS48_and_MS_STM16       MS                          MS_STM16
+--
+--   46             LR_PHYSICAL_ELECTRICAL                LANx                        ELECTRICAL
+--                                                        SDHPort
+--
+--   47             LR_PHYSICAL_OPTICAL                   SDHPort                     OPTICAL
+--                                                        PDHPort
+--                                                        LANx
+--
+--   73             LR_DSR_OC3_STM1                       SDHPort                     STM1
+--
+--   74             LR_DSR_OC12_STM4                      SDHPort                     STM4
+--
+--   76             LR_DSR_OC48_STM16                     SDHPort                     STM16
+--
+--   87             LR_DSR_Gigabit_Ethernet               LANx                        GE
+--
+--   96             LR_Ethernet                           LANx                        Ethernet
+--                                                        WANx
+--
+--   97             LR_DSR_Fast_Ethernet                  LANx                        FE
+--                                                        WANx
+--
+--   98             LR_Encapsulation                      VCGroup (?) or              ENCAP
+--                                                        LANx/WANx
+--
+--   99             LR_Fragment                           LANx (if in L1)             Fragment
+--                                                        WANx
+--
+
+LayerRate ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Used for LayerRate."
+    SYNTAX     INTEGER
+    {
+      lrNotApplicable                        (1),
+      lrT3AndDs345m                          (4),
+      lrE1or2M                               (5),
+      lrE3or34M                              (7),
+      lrVt2andTu12Vc12                       (11),
+      lrLowOrderTu3Vc3                       (13),
+      lrSts3candAu4Vc4                       (15),
+      lrSts12cVc44c                          (16),
+      lrSectionOc3Sts3andRsStm1              (20),
+      lrSectionOc12Sts12andRsStm4            (21),
+      lrSectionOc48Sts48andRsStm16           (22),
+      lrLineOc3Sts3andMsStm1                 (25),
+      lrLineOc12Sts12andMsStm4               (26),
+      lrLineOc48Sts48andMsStm16              (27),
+      lrDsrOc3Stm1                           (73),
+      lrDsrOc12Stm4                          (74),
+      lrDsrOc48Stm16                         (76),
+      lrDsrGigabitEthernet                   (87),
+      lrEncapsulation                        (98),
+      lrFragment                             (99)
+    }
+
+--
+-- PT-TRAP trap group.
+--
+
+    ptTrapAlarmNotificationClear NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSeverity,
+            ptTrapContentsProbableCause,
+            ptTrapContentsProbableCauseQualifier,
+            ptTrapContentsLayerRate,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An alarm notification clear trap indicates that a clearable alarm condition has occurred."
+        ::= { ptTraps 1 }
+
+    ptTrapAlarmNotificationNonClear NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSeverity,
+            ptTrapContentsProbableCause,
+            ptTrapContentsProbableCauseQualifier,
+            ptTrapContentsLayerRate,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An alarm notification non-clear trap indicates that a non-clearable alarm condition has occurred."
+        ::= { ptTraps 2 }
+
+    ptTrapEventNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsEventType,
+            ptTrapContentsEventCause,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An event notification trap indicates that an event has occurred."
+        ::= { ptTraps 3 }
+
+    ptTrapProtectionSwitchNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSwitchType,
+            ptTrapContentsSwitchReason,
+            ptTrapContentsSwitchAwayFromMo,
+            ptTrapContentsSwitchToMo,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "A protection switch notification trap indicates that a protection
+             switch has occurred."
+        ::= { ptTraps 4 }
+
+    ptTrapObjectCreateNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An object create notification trap indicates that an object has
+             been created."
+        ::= { ptTraps 5 }
+
+    ptTrapObjectDeleteNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An object delete notification trap indicates that an object has
+             been deleted."
+        ::= { ptTraps 6 }
+
+    ptTrapAvcNotification NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsAvc,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "An attribute value change notification trap indicates that
+             attributes has been changed."
+        ::= { ptTraps 7 }
+
+
+--
+-- ptTRAP trap objects group.
+--
+--  ptTrapContentsTables   OBJECT IDENTIFIER ::= { ptTrapContents 1 }
+    ptTrapContentsObjects  OBJECT IDENTIFIER ::= { ptTrapContents 2 }
+
+-------------------------------------------------------------------------------
+-- ptTRAP contents group tables.
+-------------------------------------------------------------------------------
+
+-- Currently none
+
+
+-------------------------------------------------------------------------------
+-- ptTRAP contents group objects.
+-------------------------------------------------------------------------------
+
+    ptTrapContentsTimeStamp OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the time stamp of notification traps (seconds since Epoch).
+            , that is the number of seconds that have elapsed since 1970-01-01 UTC."
+        ::= { ptTrapContentsObjects 1 }
+
+    ptTrapContentsNotificationId OBJECT-TYPE
+        SYNTAX      NotificationId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the notification id of notification traps."
+        ::= { ptTrapContentsObjects 2 }
+
+    ptTrapContentsSequenceNumber OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the sequence number of notification traps."
+        ::= { ptTrapContentsObjects 3 }
+
+    ptTrapContentsAdditionalText  OBJECT-TYPE
+        SYNTAX      DisplayString ( SIZE (0..80) )
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the additional text of notification traps."
+        ::= { ptTrapContentsObjects 4 }
+
+    ptTrapContentsManagedObjectId  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of notification traps.
+             The managed object id uniquely identifies the source of the
+             notification and consists of class and instance information
+             for the source. It is represented by a formated text string
+             which first contains the class and depending on the class a list
+             of attribute name and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 5 }
+
+    ptTrapContentsReferenceObjectId  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the referenced object id for the
+             managed object id in cases where the managed object id is
+             not physical object.
+             It has the same format as 'ptTrapContentsManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 6 }
+
+    ptTrapContentsSeverity  OBJECT-TYPE
+        SYNTAX      Severity
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the severity number of alarm notification
+             traps."
+        ::= { ptTrapContentsObjects 7 }
+
+    ptTrapContentsProbableCause  OBJECT-TYPE
+        SYNTAX      ProbableCause
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the probable cause of alarm notification
+             traps."
+        ::= { ptTrapContentsObjects 8 }
+
+    ptTrapContentsProbableCauseQualifier  OBJECT-TYPE
+        SYNTAX      DisplayString ( SIZE (0..80) )
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the probable cause qualifier of alarm
+             notification traps."
+        ::= { ptTrapContentsObjects 9 }
+
+    ptTrapContentsEventType  OBJECT-TYPE
+        SYNTAX      EventType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the event type of event notification
+             traps."
+        ::= { ptTrapContentsObjects 10 }
+
+    ptTrapContentsEventCause  OBJECT-TYPE
+        SYNTAX      EventCause
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the event cause of event notification
+             traps."
+        ::= { ptTrapContentsObjects 11 }
+
+    ptTrapContentsSwitchType  OBJECT-TYPE
+        SYNTAX      SwitchType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the switch type of protection switch
+             notification traps."
+        ::= { ptTrapContentsObjects 12 }
+
+    ptTrapContentsSwitchReason  OBJECT-TYPE
+        SYNTAX      SwitchReason
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the switch reason of protection switch
+             notification traps."
+        ::= { ptTrapContentsObjects 13 }
+
+    ptTrapContentsSwitchAwayFromMo  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of the switch
+             away from object of a protection switch.
+             It has the same format as 'ptTrapContentsManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 14 }
+
+    ptTrapContentsSwitchToMo  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of the switch
+             to object of a protection switch.
+             It has the same format as 'ptTrapContentsManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 15 }
+
+    ptTrapContentsAvc OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the AVC of attribute value change
+             notification traps.
+             The AVC is a list of attribute names and values. It is
+             represented by a formated text string with attribute name and
+             value pairs:
+
+             '<name>=<value>;<name>=<value>;...'
+
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { ptTrapContentsObjects 16 }
+
+    ptTrapContentsLayerRate  OBJECT-TYPE
+        SYNTAX      LayerRate
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the LayerRate translation of the alarm
+             point of the alarm.
+             0 means not applicable for the alarm."
+        ::= { ptTrapContentsObjects 17 }
+
+    ptTrapContentsDateAndTime OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the Local date and time with UTC Time zone information of notification traps."
+        ::= { ptTrapContentsObjects 18 }
+
+
+--
+-- Conformance
+--
+
+    ptTrapsCompliances OBJECT IDENTIFIER ::= { ptTrapsConformance 1 }
+    ptTrapsGroups      OBJECT IDENTIFIER ::= { ptTrapsConformance 2 }
+
+    ptTRAPSFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptTrapsCompleteGroup, ptTrapsNotificationGroup }
+        ::= { ptTrapsCompliances 1 }
+
+    ptTrapsCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            ptTrapContentsTimeStamp,
+            ptTrapContentsNotificationId,
+            ptTrapContentsSequenceNumber,
+            ptTrapContentsAdditionalText,
+            ptTrapContentsManagedObjectId,
+            ptTrapContentsReferenceObjectId,
+            ptTrapContentsSeverity,
+            ptTrapContentsProbableCause,
+            ptTrapContentsProbableCauseQualifier,
+            ptTrapContentsEventType,
+            ptTrapContentsEventCause,
+            ptTrapContentsSwitchType,
+            ptTrapContentsSwitchReason,
+            ptTrapContentsSwitchAwayFromMo,
+            ptTrapContentsSwitchToMo,
+            ptTrapContentsAvc,
+            ptTrapContentsLayerRate,
+            ptTrapContentsDateAndTime
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptTrapsGroups 1 }
+
+ptTrapsNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+            ptTrapAlarmNotificationClear,
+            ptTrapAlarmNotificationNonClear,
+            ptTrapEventNotification,
+            ptTrapProtectionSwitchNotification,
+            ptTrapObjectCreateNotification,
+            ptTrapObjectDeleteNotification,
+            ptTrapAvcNotification
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current notifications in this MIB module."
+        ::= { ptTrapsGroups 2 }
+
+END
+

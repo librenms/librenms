@@ -1,0 +1,814 @@
+TACHYON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    -- Note that import order matters: already imported objects are
+    -- not overwritten.
+
+    -- 1. SNMP MIB-2 System Group
+    -- 2. SNMP MIB-2 Interfaces Group
+    ifMIB FROM IF-MIB
+
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Gauge32,
+    Counter32,
+    Counter64,
+    enterprises
+        FROM SNMPv2-SMI
+;
+
+tachyon MODULE-IDENTITY
+    LAST-UPDATED  "202410200837Z"
+    ORGANIZATION  "Tachyon Networks"
+    CONTACT-INFO  "support@tachyon-networks.com"
+    DESCRIPTION  "MIB for TNA 300 series"
+        REVISION  "202410200837Z"
+        DESCRIPTION  "Revision for firmware 1.12.1"
+    ::= { enterprises 57344 }
+
+tna30xMIB OBJECT IDENTIFIER ::= { tachyon 1 }
+
+-- tachyon/ethernet.lua group
+
+ethernet OBJECT IDENTIFIER ::= { tna30xMIB 1 }
+
+physicalPortCount OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The number of physical ethernet interfaces."
+    ::= { ethernet 1 }
+
+internalSwitchMac OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The internal switch's MAC address, to which the ethernet ports are connected."
+    ::= { ethernet 2 }
+
+ethernetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EthernetEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A list of ethernet entries (interfaces). 
+                The number of entries is given by the value of physicalPortCount."
+    ::= { ethernet 3 }
+
+ethernetName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's physical name. 
+                    Possible responses: eth0 | eth1 | 
+                    n/a (for disabled internal switch ports)."
+    ::= { ethernetEntry 1 }
+
+ethernetIfaceName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's corresponding interface name 
+                in the internal switch. 
+                Possible responses: eth0p0 - eth0p4."
+    ::= { ethernetEntry 2 }
+
+ethernetParentIface OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's parent interface. 
+                Possible responses: eth0."
+    ::= { ethernetEntry 3 }
+
+ethernetSwitchPortId OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's switch port id"
+    ::= { ethernetEntry 4 }
+
+ethernetLink OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's link status. 
+                Possible responses: 0 (not linked) | 1 (linked)."
+    ::= { ethernetEntry 5 }
+
+ethernetAutoNeg OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's autonegotiation status. 
+                Possible responses: 0 (not auto-negotiated) | 1 (auto-neg'd). "
+    ::= { ethernetEntry 6 }
+
+ethernetSpeed OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's speed. 
+                Possible responses: 0 (not linked) | 10 | 100 | 1000 | 2500."
+    ::= { ethernetEntry 7 }
+
+ethernetDuplex OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's duplex mode. 
+                Possible responses: n/a | half | full."
+    ::= { ethernetEntry 8 }
+
+ethernetPoe OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet port's PoE mode (if applicable).
+                 Possible responses: not implemented."
+    ::= { ethernetEntry 9 }
+
+ethernetEnabled OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The ethernet switch port enabled status. 
+                Possible responses: 0 (disabled) | 1 (enabled) "
+    ::= { ethernetEntry 10 }
+
+ethernetEntry OBJECT-TYPE
+    SYNTAX  EthernetEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "An ethernet entry containing interface's statistics."
+    INDEX  { ethernetIfaceName }
+    ::= { ethernetTable 1 }
+
+EthernetEntry ::= SEQUENCE {
+    ethernetName  DisplayString,
+    ethernetIfaceName  DisplayString,
+    ethernetParentIface  DisplayString,
+    ethernetSwitchPortId  Integer32,
+    ethernetLink  Integer32,
+    ethernetAutoNeg  Integer32,
+    ethernetSpeed  Gauge32,
+    ethernetDuplex  DisplayString,
+    ethernetPoe  DisplayString,
+    ethernetEnabled  Integer32
+}
+
+-- tachyon/wireless.lua group
+
+wireless OBJECT IDENTIFIER ::= { tna30xMIB 2 }
+
+wirelessRadioCount OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The number of wireless radios."
+    ::= { wireless 1 }
+
+wirelessRadioTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WirelessRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A list of wireless radios. 
+                The number of entries is given by the value of wirelessRadioCount."
+    ::= { wireless 2 }
+
+wirelessRadioMac OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's MAC address."
+    ::= { wirelessRadioEntry 1 }
+
+wirelessRadioName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's interface name. 
+                Possible responses: wlan0."
+    ::= { wirelessRadioEntry 2 }
+
+wirelessRadioTxPower OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's transmission power (EIRP) including antenna gain."
+    ::= { wirelessRadioEntry 3 }
+
+wirelessRadioChannel OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's operating channel. 
+                Possible responses: 1-6 for full channel, 1-12 when using half. 
+                See wirelessRadioChannelLabel for half channel label mappings.
+                A value of 0 means no connection in station mode."
+    ::= { wirelessRadioEntry 4 }
+
+wirelessRadioFrequency OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's operating frequency."
+    ::= { wirelessRadioEntry 5 }
+
+wirelessRadioChannelWidth OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's channel width. 
+                Possible responses: 2160 | 1080."
+    ::= { wirelessRadioEntry 6 }
+
+wirelessRadioFailoverState OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's failover state.
+                Possible responses: off | disabled | normal | active"
+    ::= { wirelessRadioEntry 7 }
+
+wirelessRadioAntennaKit OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's configured antenna kit (where applicable).
+                Possible responses: none | ak-100 | ak-300 | ak-s-45 | ak-s-90 "
+    ::= { wirelessRadioEntry 8 }
+
+wirelessRadioChannelLabel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's channel label.
+                This is useful to map half channels from (1-12) to the value shown in the GUI (1-low, 1-high, etc)"
+    ::= { wirelessRadioEntry 9 }
+
+wirelessRadioModemTemperature OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's modem temperature in Celsius."
+    ::= { wirelessRadioEntry 10 }
+
+wirelessRadioTemperature OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless radio's temperature in Celsius."
+    ::= { wirelessRadioEntry 11 }
+
+wirelessRadioEntry OBJECT-TYPE
+    SYNTAX  WirelessRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A wireless radio entry containing interface's statistics."
+    INDEX  { wirelessRadioName }
+    ::= { wirelessRadioTable 1 }
+
+WirelessRadioEntry ::= SEQUENCE {
+    wirelessRadioMac  DisplayString,
+    wirelessRadioName  DisplayString,
+    wirelessRadioTxPower  Gauge32,
+    wirelessRadioChannel  Integer32,
+    wirelessRadioFrequency  Integer32,
+    wirelessRadioChannelWidth  Integer32,
+    wirelessRadioFailoverState DisplayString,
+    wirelessRadioAntennaKit DisplayString,
+    wirelessRadioChannelLabel DisplayString,
+    wirelessRadioModemTemperature Integer32,
+    wirelessRadioTemperature Integer32
+}
+
+wirelessVapsCount OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The number of wireless VAPs."
+    ::= { wireless 3 }
+
+wirelessVapsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WirelessVapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A list of wireless VAPs. 
+                The number of entries is given by the value of wirelessVapsCount."
+    ::= { wireless 4 }
+
+wirelessVapIfIndex OBJECT-TYPE
+    SYNTAX  Integer32  (0..255)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless interface's numeric index."
+    ::= { wirelessVapEntry 1 }
+
+wirelessVapName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless VAP's name. Possible responses: wlan0."
+    ::= { wirelessVapEntry 2 }
+
+wirelessVapMac OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless VAP's MAC address."
+    ::= { wirelessVapEntry 3 }
+
+wirelessVapRadio OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless VAP's radio."
+    ::= { wirelessVapEntry 4 }
+
+wirelessVapOperationMode OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless VAP's operation mode. Master is equivalent to 'access point' mode.
+                Possible responses: master | station | no-connection (station mode, not connected)."
+    ::= { wirelessVapEntry 5 }
+
+wirelessVapSsid OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless VAP's SSID."
+    ::= { wirelessVapEntry 6 }
+
+wirelessVapPeerCount OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless VAP's peers count."
+    ::= { wirelessVapEntry 7 }
+
+wirelessVapSecurity OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless VAP's security mode. 
+                Possible responses: WPA2-PSK (GCMP) | Open"
+    ::= { wirelessVapEntry 8 }
+
+wirelessVapPtpEnabled OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Whether point-to-point mode is enabled on this VAP.
+                Possible responses: 0 (disabled) | 1 (enabled)"
+    ::= { wirelessVapEntry 9 }
+
+wirelessVapEntry OBJECT-TYPE
+    SYNTAX  WirelessVapEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A wireless VAP entry containing VAP's statistics."
+    INDEX  { wirelessVapIfIndex }
+    ::= { wirelessVapsTable 1 }
+
+WirelessVapEntry ::= SEQUENCE {
+    wirelessVapIfIndex  Integer32,
+    wirelessVapName  DisplayString,
+    wirelessVapMac  DisplayString,
+    wirelessVapRadio  DisplayString,
+    wirelessVapOperationMode  DisplayString,
+    wirelessVapSsid  DisplayString,
+    wirelessVapPeerCount  Counter32,
+    wirelessVapSecurity  DisplayString,
+    wirelessVapPtpEnabled Integer32
+}
+
+wirelessPeersCount OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The number of wireless peers."
+    ::= { wireless 5 }
+
+wirelessPeersTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WirelessPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A list of wireless peers. 
+    The number of entries is given by the value of wirelessPeersCount."
+    ::= { wireless 6 }
+
+wirelessPeersByMacTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF WirelessPeerByMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A list of wireless peers indexed by MAC. 
+                The number of entries is given by the value of wirelessPeersCount."
+    ::= { wireless 7 }
+
+wirelessPeerMac OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's MAC address."
+    ::= { wirelessPeerEntry 1 }
+
+wirelessPeerVap OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's VAP."
+    ::= { wirelessPeerEntry 2 }
+
+wirelessPeerVapIfIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's VAP interface index."
+    ::= { wirelessPeerEntry 3 }
+
+wirelessPeerRxPackets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's packets received."
+    ::= { wirelessPeerEntry 4 }
+
+wirelessPeerTxPackets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's packets transmitted."
+    ::= { wirelessPeerEntry 5 }
+
+wirelessPeerRxPower OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx power."
+    ::= { wirelessPeerEntry 6 }
+
+wirelessPeerTxRate OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's tx data rate."
+    ::= { wirelessPeerEntry 7 }
+
+wirelessPeerSnr OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's snr."
+    ::= { wirelessPeerEntry 8 }
+
+wirelessPeerRxRate OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx data rate."
+    ::= { wirelessPeerEntry 9 }
+
+wirelessPeerTxMcs OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's tx mcs."
+    ::= { wirelessPeerEntry 10 }
+
+wirelessPeerRxMcs OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx mcs."
+    ::= { wirelessPeerEntry 11 }
+
+wirelessPeerLinkUptime OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's link up time."
+    ::= { wirelessPeerEntry 12 }
+
+wirelessPeerLinkDistance OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's estimated link distance, in meters."
+    ::= { wirelessPeerEntry 13 }
+
+wirelessPeerRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's bytes received."
+    ::= { wirelessPeerEntry 14 }
+
+wirelessPeerTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's bytes transmitted."
+    ::= { wirelessPeerEntry 15 }
+
+wirelessPeerTxSector OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's tx sector."
+    ::= { wirelessPeerEntry 16 }
+
+wirelessPeerRxSector OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx sector."
+    ::= { wirelessPeerEntry 17 }
+
+wirelessPeerModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's model."
+    ::= { wirelessPeerEntry 18 }
+
+wirelessPeerAntennaKit OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's antenna kit."
+    ::= { wirelessPeerEntry 19 }
+
+wirelessPeerName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's system name."
+    ::= { wirelessPeerEntry 20 }
+
+wirelessPeerXMac OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's MAC address."
+    ::= { wirelessPeerByMacEntry 1 }
+
+wirelessPeerXVap OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's VAP."
+    ::= { wirelessPeerByMacEntry 2 }
+
+wirelessPeerXVapIfIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's VAP interface index."
+    ::= { wirelessPeerByMacEntry 3 }
+
+wirelessPeerXRxPackets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's packets received."
+    ::= { wirelessPeerByMacEntry 4 }
+
+wirelessPeerXTxPackets OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's packets transmitted."
+    ::= { wirelessPeerByMacEntry 5 }
+
+wirelessPeerXRxPower OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx power."
+    ::= { wirelessPeerByMacEntry 6 }
+
+wirelessPeerXTxRate OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's tx data rate."
+    ::= { wirelessPeerByMacEntry 7 }
+
+wirelessPeerXSnr OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's snr."
+    ::= { wirelessPeerByMacEntry 8 }
+
+wirelessPeerXRxRate OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx data rate."
+    ::= { wirelessPeerByMacEntry 9 }
+
+wirelessPeerXTxMcs OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's tx mcs."
+    ::= { wirelessPeerByMacEntry 10 }
+
+wirelessPeerXRxMcs OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx mcs."
+    ::= { wirelessPeerByMacEntry 11 }
+
+wirelessPeerXLinkUptime OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's link up time."
+    ::= { wirelessPeerByMacEntry 12 }
+
+wirelessPeerXLinkDistance OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's estimated link distance, in meters."
+    ::= { wirelessPeerByMacEntry 13 }
+
+wirelessPeerXRxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's bytes received."
+    ::= { wirelessPeerByMacEntry 14 }
+
+wirelessPeerXTxBytes OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's bytes transmitted."
+    ::= { wirelessPeerByMacEntry 15 }
+
+wirelessPeerXTxSector OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's tx sector."
+    ::= { wirelessPeerByMacEntry 16 }
+
+wirelessPeerXRxSector OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's rx sector."
+    ::= { wirelessPeerByMacEntry 17 }
+
+wirelessPeerXModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's model."
+    ::= { wirelessPeerByMacEntry 18 }
+
+wirelessPeerXAntennaKit OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's antenna kit."
+    ::= { wirelessPeerByMacEntry 19 }
+
+wirelessPeerXName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Wireless peer's system name."
+    ::= { wirelessPeerByMacEntry 20 }
+
+wirelessPeerEntry OBJECT-TYPE
+    SYNTAX  WirelessPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A wireless peer entry containing peer's statistics."
+    INDEX  { wirelessPeerMac }
+    ::= { wirelessPeersTable 1 }
+
+wirelessPeerByMacEntry OBJECT-TYPE
+    SYNTAX  WirelessPeerByMacEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A wireless peer entry containing peer's statistics."
+    INDEX  { wirelessPeerXMac }
+    ::= { wirelessPeersByMacTable 1 }
+
+WirelessPeerEntry ::= SEQUENCE {
+    wirelessPeerMac  DisplayString,
+    wirelessPeerVap  DisplayString,
+    wirelessPeerVapIfIndex  Integer32,
+    wirelessPeerRxPackets  Counter64,
+    wirelessPeerTxPackets  Counter64,
+    wirelessPeerRxPower  Integer32,
+    wirelessPeerTxRate  Gauge32,
+    wirelessPeerSnr  Integer32,
+    wirelessPeerRxRate  Gauge32,
+    wirelessPeerTxMcs  Integer32,
+    wirelessPeerRxMcs  Integer32,
+    wirelessPeerLinkUptime  Integer32,
+    wirelessPeerLinkDistance  Integer32,
+    wirelessPeerRxBytes  Counter64,
+    wirelessPeerTxBytes  Counter64,
+    wirelessPeerTxSector  Integer32,
+    wirelessPeerRxSector  Integer32,
+    wirelessPeerModel DisplayString,
+    wirelessPeerAntennaKit DisplayString,
+    wirelessPeerName DisplayString
+}
+
+-- Same as WirelessPeerEntry
+WirelessPeerByMacEntry ::= SEQUENCE {
+    wirelessPeerXMac  DisplayString,
+    wirelessPeerXVap  DisplayString,
+    wirelessPeerXVapIfIndex  Integer32,
+    wirelessPeerXRxPackets  Counter64,
+    wirelessPeerXTxPackets  Counter64,
+    wirelessPeerXRxPower  Integer32,
+    wirelessPeerXTxRate  Gauge32,
+    wirelessPeerXSnr  Integer32,
+    wirelessPeerXRxRate  Gauge32,
+    wirelessPeerXTxMcs  Integer32,
+    wirelessPeerXRxMcs  Integer32,
+    wirelessPeerXLinkUptime  Integer32,
+    wirelessPeerXLinkDistance  Integer32,
+    wirelessPeerXRxBytes  Counter64,
+    wirelessPeerXTxBytes  Counter64,
+    wirelessPeerXTxSector  Integer32,
+    wirelessPeerXRxSector  Integer32,
+    wirelessPeerXModel DisplayString,
+    wirelessPeerXAntennaKit DisplayString,
+    wirelessPeerXName DisplayString
+}
+
+-- tachyon/system-ext.lua group
+
+system-ext OBJECT IDENTIFIER ::= { tna30xMIB 3 }
+
+deviceModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The device's product model."
+    ::= { system-ext 1 }
+
+deviceSerialNo OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The serial number of this device."
+    ::= { system-ext 2 }
+
+cpuTemperature OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The temperature of the system CPU in Celsius."
+    ::= { system-ext 3 }
+
+firmwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The firmware version currently running on this device."
+    ::= { system-ext 4 }
+
+firmwareAlterateVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "The firmware version currently flashed on the alternate bootbank."
+    ::= { system-ext 5 }
+
+cpuUsagePercent OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "CPU usage percentage, (0-100)."
+    ::= { system-ext 6 } 
+
+memoryUsagePercent OBJECT-TYPE
+    SYNTAX  Gauge32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Memory usage percentage, (0-100)."
+    ::= { system-ext 7 } 
+
+deviceUptime OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION  "Number of seconds since this device was last rebooted."
+    ::= { system-ext 8 } 
+END

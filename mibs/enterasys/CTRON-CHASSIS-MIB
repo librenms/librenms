@@ -1,0 +1,247 @@
+CTRON-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+        --  ################################
+        --  ctenvir-mib.txt
+        --  ################################
+        --  Revision: 1.05.01
+        --  Part Number:  2170553
+        --  Date: May 23, 1997
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific chassis MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright October 95 Cabletron Systems
+
+        -- This mib contains objects that are an extenstion to the
+        -- standard chassis MIB.
+
+        IMPORTS
+                ctronChassis                    FROM CTRON-MIB-NAMES
+                OBJECT-TYPE                     FROM RFC-1212;
+
+
+        -- chassis group.  Implementation of this group is mandatory.
+
+        ctChas             OBJECT IDENTIFIER ::= { ctronChassis 1 }
+
+        -- the environment group.  Implementation of this group is
+        -- mandatory for power supply monitoring.
+
+        ctEnviron          OBJECT IDENTIFIER ::= { ctronChassis 2 }
+
+
+        -- the fan module group. Implementation of this group is
+        -- mandatory for fan module monitoring.
+          
+        ctFanModule        OBJECT IDENTIFIER ::= { ctronChassis 3 }
+     
+        ctChasFNB  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                        absent(1),
+                        present(2)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the presence or absence of the FNB."
+            ::= { ctChas 1 }
+
+        ctChasAlarmEna  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                        disable(1),
+                        enable(2),
+                        notSupported(3)  -- Object is not supported
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Allow an audible alarm to be either enabled or dis-
+                    abled.  Setting this object to disable(1) will prevent an
+                    audible alarm from being heard and will also stop the
+                    sound from a current audible alarm.  Setting this object
+                    to enable(2) will allow an audible alarm to be heard and
+                    will also enable the sound from a current audible alarm,
+                    if it has previously been disabled.  This object will read
+                    with the current setting."
+            ::= { ctChas 2 }
+
+        chassisAlarmState  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                        chassisNoFaultCondition(1),
+                        chassisFaultCondition(2),
+                        notSupported(3)  -- Object is not supported
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the current condition of the power supply
+                    fault detection circuit.  This object will read with
+                    the value of chassisNoFaultCondition(1) when the chassis
+                    is currently operating with no power faults detected.
+
+                    This object will read with the value of
+                    chassisFaultCondition(2) when the chassis is currently in
+                    a power fault condition."
+            ::= { ctChas 3 }
+
+
+        --  The environment group
+
+        --  Implementation of this group is mandatory for devices that
+        --  incorporate environmental support.
+
+        ctChasPowerTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CtChasPowerEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of power supply entries."
+            ::= { ctEnviron 1 }
+
+        ctChasPowerEntry  OBJECT-TYPE
+            SYNTAX  CtChasPowerEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An entry in the powerTable providing objects for a
+                    power supply."
+            INDEX  { ctChasPowerSupplyNum }
+            ::= { ctChasPowerTable 1 }
+
+        CtChasPowerEntry ::=
+            SEQUENCE  {
+                ctChasPowerSupplyNum
+                    INTEGER,
+                ctChasPowerSupplyState
+                    INTEGER,
+                ctChasPowerSupplyType
+                    INTEGER,
+                ctChasPowerSupplyRedundancy
+                    INTEGER
+            }
+
+        ctChasPowerSupplyNum  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the power supply."
+            ::= { ctChasPowerEntry 1 }
+
+        ctChasPowerSupplyState  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                        infoNotAvailable(1),
+                        notInstalled(2),
+                        installedAndOperating(3),
+                        installedAndNotOperating(4)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the power supply's state."
+            ::= { ctChasPowerEntry 2 }
+
+        ctChasPowerSupplyType  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                        ac-dc(1),
+                        dc-dc(2),
+                        notSupported(3),  -- Object is not supported
+                        highOutput(4)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the power supply type."
+            ::= { ctChasPowerEntry 3 }
+
+        ctChasPowerSupplyRedundancy  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                        redundant(1),
+                        notRedundant(2),
+                        notSupported(3)  -- Object is not supported
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes whether or not the power supply is redundant."
+            ::= { ctChasPowerEntry 4 }
+
+
+        --  The fan module group
+
+        --  Implementation of this group is mandatory for devices that
+        --  incorporate fan module monitoring support.
+
+        ctChasFanModuleTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CtChasFanModuleEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of fan module entries."
+            ::= { ctFanModule 1 }
+
+        ctChasFanModuleEntry  OBJECT-TYPE
+            SYNTAX  CtChasFanModuleEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An entry in the fan module Table providing objects for a
+                     fan module."
+            INDEX  { ctChasFanModuleNum }
+            ::= { ctChasFanModuleTable 1 }
+
+        CtChasFanModuleEntry ::=
+            SEQUENCE  {
+                ctChasFanModuleNum
+                     INTEGER,
+                ctChasFanModuleState
+                     INTEGER
+            }
+
+        ctChasFanModuleNum  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the Fan module that may have failed."
+            ::= { ctChasFanModuleEntry 1 }
+
+        ctChasFanModuleState  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                        infoNotAvailable(1),
+                        notInstalled(2),
+                        installedAndOperating(3),
+                        installedAndNotOperating(4)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the fan modules state."
+            ::= { ctChasFanModuleEntry 2 }
+
+END

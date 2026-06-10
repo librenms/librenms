@@ -1,0 +1,394 @@
+STORMSHIELD-ASQ-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      OBJECT-TYPE, Integer32, Counter32, Counter64, MODULE-IDENTITY   FROM SNMPv2-SMI
+      TruthValue                                                      FROM SNMPv2-TC
+      DisplayString                                                   FROM RFC1213-MIB
+      stormshieldMIB                                                  FROM STORMSHIELD-SMI-MIB;
+
+   snsASQStats MODULE-IDENTITY
+      LAST-UPDATED  "201702200000Z"
+      ORGANIZATION  "Stormshield"
+      CONTACT-INFO
+         "Customer Support
+
+         22 rue du Gouverneur General Eboue
+         92130 Issy-les-Moulineaux
+         FRANCE
+
+         Tel: +33 (0)9 69 32 96 29
+         E-mail: support@stormshield.eu
+         http://www.stormshield.eu"
+      DESCRIPTION   "stormshield ASQ Statistics"
+      REVISION      "201702200000Z"
+      DESCRIPTION   "Initial"
+      ::= { stormshieldMIB 12 }
+
+   snsASQStatsStateful       OBJECT IDENTIFIER ::= { snsASQStats 1 }
+   snsASQStatsGlobal         OBJECT IDENTIFIER ::= { snsASQStats 2 }
+
+   -----------------------------------
+   -- ASQ Statistics stateful Group --
+   -----------------------------------
+
+   snsASQStatsStatefulPktBlocked OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 1 }
+
+   snsASQStatsStatefulPktBlockedAsync OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 2 }
+
+   snsASQStatsStatefulPktBlockedSynProxy OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 3 }
+
+   snsASQStatsStatefulPktAccepted OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 4 }
+
+   snsASQStatsStatefulLogged OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 5 }
+
+   snsASQStatsStatefulLogOverflow OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 6 }
+
+   snsASQStatsStatefulFilterOverflow OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 7 }
+
+   snsASQStatsStatefulAlarmOverflow OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 8 }
+
+   snsASQStatsStatefulSeismoFacts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 9 }
+
+   snsASQStatsStatefulSeismoOverflow OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 10 }
+
+   snsASQStatsStatefulMinorAlarm OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 11 }
+
+   snsASQStatsStatefulMajorAlarm OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 12 }
+
+   snsASQStatsStatefulPktFragmented OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 13 }
+
+   snsASQStatsStatefulInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Incoming traffic"
+      ::= { snsASQStatsStateful 14 }
+
+   snsASQStatsStatefulOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Outgoing traffic"
+      ::= { snsASQStatsStateful 15 }
+
+   snsASQStatsStatefulNatFailures OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 16 }
+
+   snsASQStatsStatefulFlowConflicts OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 17 }
+
+   snsASQStatsStatefulFlowFailures OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 18 }
+
+   snsASQStatsStatefulInterfaceMute OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 19 }
+
+   snsASQStatsStatefulTcpPkt OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 20 }
+
+   snsASQStatsStatefulTcpInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Incoming TCP traffic"
+      ::= { snsASQStatsStateful 21 }
+
+   snsASQStatsStatefulTcpOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Outgoing TCP traffic"
+      ::= { snsASQStatsStateful 22 }
+
+   snsASQStatsStatefulTcpConn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 23 }
+
+   snsASQStatsStatefulTcpNatConnSrc OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 24 }
+
+   snsASQStatsStatefulTcpNatConnDst OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 25 }
+
+   snsASQStatsStatefulTcpNoNatConnSrc OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 26 }
+
+   snsASQStatsStatefulTcpNoNatConnDst OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 27 }
+
+   snsASQStatsStatefulTcpSmallWindowRst OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 28 }
+
+   snsASQStatsStatefulTcpEmptyDupAckBlk OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 29 }
+
+   snsASQStatsStatefulUdpPkt OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 30 }
+
+   snsASQStatsStatefulUdpInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Incoming UDP traffic"
+      ::= { snsASQStatsStateful 31 }
+
+   snsASQStatsStatefulUdpOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Outgoing UDP traffic"
+      ::= { snsASQStatsStateful 32 }
+
+   snsASQStatsStatefulUdpConn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+         ::= { snsASQStatsStateful 33 }
+
+   snsASQStatsStatefulUdpNatConnSrc OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 34 }
+
+   snsASQStatsStatefulUdpNatConnDst OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 35 }
+
+   snsASQStatsStatefulUdpNoNatConnSrc OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 36 }
+
+   snsASQStatsStatefulUdpNoNatConnDst OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 37 }
+
+   snsASQStatsStatefulIcmpPkt OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 38 }
+
+   snsASQStatsStatefulIcmpInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Incoming ICMP traffic"
+      ::= { snsASQStatsStateful 39 }
+
+   snsASQStatsStatefulIcmpOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Outgoing ICMP traffic"
+      ::= { snsASQStatsStateful 40 }
+
+   snsASQStatsStatefulHttpTimeoutRst OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 41 }
+
+   snsASQStatsStatefulNatUnusable OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 42 }
+
+   snsASQStatsStatefulSctpAssoc OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "SCTP associations"
+      ::= { snsASQStatsStateful 43 }
+
+   snsASQStatsStatefulSctpPackets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "SCTP packets"
+      ::= { snsASQStatsStateful 44 }
+
+   snsASQStatsStatefulSctpInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Incoming SCTP traffic"
+      ::= { snsASQStatsStateful 45 }
+
+   snsASQStatsStatefulSctpOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Outgoing SCTP traffic"
+      ::= { snsASQStatsStateful 46 }
+
+   snsASQStatsStatefulEtherstateConn OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 47 }
+
+   snsASQStatsStatefulEtherstatePackets OBJECT-TYPE
+      SYNTAX Counter64
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 48 }
+
+   snsASQStatsStatefulEtherstateInBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 49 }
+
+   snsASQStatsStatefulEtherstateOutBytes OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION ""
+      ::= { snsASQStatsStateful 50 }
+   -----------------------------------
+   -- ASQ Statistics Global Group --
+   -----------------------------------
+
+   snsASQStatsGlobalTimeSinceReset OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION "Time elapsed since last reset in seconds"
+      ::= { snsASQStatsGlobal 1 }
+
+END

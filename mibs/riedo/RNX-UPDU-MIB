@@ -1,0 +1,735 @@
+-- ===========================================================================
+-- Riedo Networks (RNX) UPDU MIB
+-- ===========================================================================
+
+RNX-UPDU-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Counter64,
+	Integer32,
+	enterprises
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	MODULE-COMPLIANCE,
+	OBJECT-GROUP
+		FROM SNMPv2-CONF;
+
+rnx	MODULE-IDENTITY
+	LAST-UPDATED	"202209090000Z"
+	ORGANIZATION	"Riedo Networks Ltd."
+	CONTACT-INFO	"Riedo Networks Ltd."
+	DESCRIPTION	"UPDU MIB"
+
+	REVISION	"202209090000Z"
+		DESCRIPTION	"Add upduMeterDataQuality."
+	REVISION	"202207060000Z"
+		DESCRIPTION	"Add upduMeterDescription."
+	REVISION	"202206220000Z"
+		DESCRIPTION	"Add upduMeterSystemName, upduMeterCustomName."
+	REVISION	"202012160000Z"
+		DESCRIPTION	"Add upduSensorTable."
+	REVISION	"202006180000Z"
+		DESCRIPTION	"Initial version."
+	::= { enterprises 55108 }
+
+upduMib OBJECT IDENTIFIER
+	::= { rnx 1 }
+
+-- ===========================================================================
+-- Textual conventions
+-- ===========================================================================
+
+Watts ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Watts"
+	SYNTAX		Integer32
+
+VoltAmpereReactives ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Volt-ampere reactives"
+	SYNTAX		Integer32
+
+VoltAmperes ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Volt-amperes"
+	SYNTAX		Integer32
+
+WattHours ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Watt hours"
+	SYNTAX		Counter64
+
+VoltAmpereReactiveHours ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Volt-ampere reactive hours"
+	SYNTAX		Counter64
+
+MilliAmperes ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Milli-amperes"
+	SYNTAX		Integer32
+
+TenthMilliAmperes ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Tenth of Milli-amperes"
+	SYNTAX		Integer32
+
+MilliVolts ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Milli-volts"
+	SYNTAX		Integer32
+
+TenthDegreesCelsius ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Deci-degrees celsius"
+	SYNTAX		Integer32
+
+Permil ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT	"d"
+	STATUS		current
+	DESCRIPTION
+		"Per mil"
+	SYNTAX		Integer32
+
+-- ===========================================================================
+-- Subtrees
+-- ===========================================================================
+
+upduInfo OBJECT IDENTIFIER
+	::= { upduMib 1 }
+
+upduInventory OBJECT IDENTIFIER
+	::= { upduMib 2 }
+
+upduMeasurements OBJECT IDENTIFIER
+	::= { upduMib 3 }
+
+upduControl OBJECT IDENTIFIER
+	::= { upduMib 4 }
+
+upduConformance OBJECT IDENTIFIER
+	::= { upduMib 5 }
+
+-- ===========================================================================
+-- Info: UPDU information
+-- ===========================================================================
+
+upduInfoPartNumber OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Part number"
+	::= { upduInfo 1 }
+
+upduInfoSerialNumber OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Serial number"
+	::= { upduInfo 2 }
+
+upduInfoLotNumber OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Lot number"
+	::= { upduInfo 3 }
+
+-- ===========================================================================
+-- Inventory: Per module information
+-- ===========================================================================
+
+upduModuleTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF UpduModuleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A list of module entries."
+	::= { upduInventory 1 }
+
+upduModuleEntry OBJECT-TYPE
+	SYNTAX		UpduModuleEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry containing information for a particular module."
+	INDEX		{ upduModuleIndex }
+	::= { upduModuleTable 1 }
+
+UpduModuleEntry ::= SEQUENCE {
+		upduModuleIndex		Integer32,
+		upduModuleType		INTEGER,
+		upduModulePartNumber	OCTET STRING,
+		upduModuleSerialNumber	Integer32,
+		upduModuleLotNumber	OCTET STRING
+	}
+
+upduModuleIndex OBJECT-TYPE
+	SYNTAX		Integer32 (0..8)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Module index."
+	::= { upduModuleEntry 1 }
+
+upduModuleType OBJECT-TYPE
+	SYNTAX		INTEGER {
+			unknown (0),
+			icm (1),
+			meterModule (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Module type: tells what type of module it is."
+	::= { upduModuleEntry 2 }
+
+upduModulePartNumber OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Part number"
+	::= { upduModuleEntry 3 }
+
+upduModuleSerialNumber OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Module serial number."
+	::= { upduModuleEntry 4 }
+
+upduModuleLotNumber OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Module lot number."
+	::= { upduModuleEntry 5 }
+
+-- ===========================================================================
+-- Measurements: Per meter data
+-- ===========================================================================
+
+upduMeterTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF UpduMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds information about each Power module."
+	::= { upduMeasurements 1 }
+
+upduMeterEntry OBJECT-TYPE
+	SYNTAX		UpduMeterEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry provides a power data"
+	INDEX {
+		upduModuleIndex,
+		upduMeterIndex
+	}
+	::= { upduMeterTable 1 }
+
+UpduMeterEntry ::= SEQUENCE {
+		upduMeterIndex		Integer32,
+		upduMeterName		OCTET STRING,
+		upduMeterType		INTEGER,
+		upduMeterEnergyP	WattHours,
+		upduMeterEnergyR1	VoltAmpereReactiveHours,
+		upduMeterEnergyR4	VoltAmpereReactiveHours,
+		upduMeterPowerP		Watts,
+		upduMeterPowerQ		VoltAmpereReactives,
+		upduMeterPowerS		VoltAmperes,
+		upduMeterUrms		MilliVolts,
+		upduMeterIrms		MilliAmperes,
+		upduMeterSystemName     OCTET STRING,
+		upduMeterCustomName     OCTET STRING,
+	        upduMeterDescription    OCTET STRING,
+		upduMeterDataQuality    INTEGER
+	}
+
+upduMeterIndex OBJECT-TYPE
+	SYNTAX		Integer32 (0..11)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Number of the meter on the Module."
+	::= { upduMeterEntry 1 }
+
+upduMeterName OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..15))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Meter name."
+	::= { upduMeterEntry 2 }
+
+upduMeterType OBJECT-TYPE
+	SYNTAX		INTEGER {
+			pduTotal (0),
+			pduTotalCalc (1),
+			phaseTotal (2),
+			phaseTotalCalc (3),
+			moduleTotal (4),
+			moduleTotalCalc (5),
+			outlet (6),
+			outletGroup (7)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Meter type: Tell if the meter is per-phase, per PDU,
+		per module or for a single outlet or outlet group. For
+		pduTotalCalc, phaseTotalCalc, moduleTotalCalc, the
+		total is calculated (sum of the measurements of the
+		underlying objects). For the other totals, it is
+		measured."
+	::= { upduMeterEntry 3 }
+
+upduMeterEnergyP OBJECT-TYPE
+	SYNTAX		WattHours
+	UNITS		"Wh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Positive active energy in watt hours."
+	::= { upduMeterEntry 4 }
+
+upduMeterEnergyR1 OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive energy from quadrant R1 in volt-ampere reactives hours."
+	::= { upduMeterEntry 5 }
+
+upduMeterEnergyR4 OBJECT-TYPE
+	SYNTAX		VoltAmpereReactiveHours
+	UNITS		"varh"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive energy from quadrant R4 in volt-ampere reactives hours."
+	::= { upduMeterEntry 6 }
+
+upduMeterPowerP OBJECT-TYPE
+	SYNTAX		Watts
+	UNITS		"W"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Active power at a given instant."
+	::= { upduMeterEntry 7 }
+
+upduMeterPowerQ OBJECT-TYPE
+	SYNTAX		VoltAmpereReactives
+	UNITS		"var"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Reactive power at a given instant."
+	::= { upduMeterEntry 8 }
+
+upduMeterPowerS OBJECT-TYPE
+	SYNTAX		VoltAmperes
+	UNITS		"VA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Apparent power at a given instant."
+	::= { upduMeterEntry 9 }
+
+upduMeterUrms OBJECT-TYPE
+	SYNTAX		MilliVolts
+	UNITS		"mV"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RMS voltage at a given instant."
+	::= { upduMeterEntry 10 }
+
+upduMeterIrms OBJECT-TYPE
+	SYNTAX		MilliAmperes
+	UNITS		"mA"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RMS current at a given instant."
+	::= { upduMeterEntry 11 }
+
+upduMeterSystemName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"System-defined object name."
+	::= { upduMeterEntry 12 }
+
+upduMeterCustomName OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..23))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"User-configured unique object name. Write access has to be
+		explicitly enabled in the UPDU configuration (see SNMP
+		options)."
+	::= { upduMeterEntry 13 }
+
+upduMeterDescription OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..127))
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"User-configured description. Write access has to be
+		explicitly enabled in the UPDU configuration (see SNMP
+		options)."
+	::= { upduMeterEntry 14 }
+
+upduMeterDataQuality OBJECT-TYPE
+	SYNTAX		INTEGER {
+			ok (0),
+			expired (1),
+			noData (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Describes the measurement data quality: ok if all is
+		well and measurements are up to date, expired when
+		measurements are not updated and represent the last
+		known measurement, noData when no measurements of that
+		meter are available (e.g. because of a missing license).
+		When noData, 0 is returned for all measurement values."
+	::= { upduMeterEntry 15 }
+
+-- ===========================================================================
+-- Measurements: Per sensor data
+-- ===========================================================================
+
+upduSensorTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF UpduSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds information about sensors connected to the PDU."
+	::= { upduMeasurements 2 }
+
+upduSensorEntry OBJECT-TYPE
+	SYNTAX		UpduSensorEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds the information related to one specific sensor."
+	INDEX	{ upduSensorPort }
+	::= { upduSensorTable 1 }
+
+UpduSensorEntry ::= SEQUENCE {
+		upduSensorPort					Integer32,
+		upduSensorPortName				OCTET STRING,
+		upduSensorType					INTEGER,
+		upduSensorTemperatureCelsius	TenthDegreesCelsius,
+		upduSensorHumidity				Permil
+	}
+
+upduSensorPort OBJECT-TYPE
+	SYNTAX		Integer32 (1..3)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Sensor port number."
+	::= { upduSensorEntry 1 }
+
+upduSensorPortName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor port name as printed on the front plate."
+	::= { upduSensorEntry 2 }
+
+upduSensorType OBJECT-TYPE
+	SYNTAX		INTEGER {
+		none (0),
+		temp (1),
+		tempHumidity (2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Sensor type."
+	::= { upduSensorEntry 3 }
+
+upduSensorTemperatureCelsius OBJECT-TYPE
+	SYNTAX		TenthDegreesCelsius
+	UNITS		"deg-C/10"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Temperature in tenth degrees."
+	::= { upduSensorEntry 4 }
+
+upduSensorHumidity OBJECT-TYPE
+	SYNTAX		Permil
+	UNITS		"/1000"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Relative humidity in per mil. Set to 0 for temperature only sensor."
+	::= { upduSensorEntry 5 }
+
+
+-- ===========================================================================
+-- Measurements: Per RCM data
+-- ===========================================================================
+
+upduRcmTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF UpduRcmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds information about embedded residual current monitors."
+	::= { upduMeasurements 3 }
+
+upduRcmEntry OBJECT-TYPE
+	SYNTAX		UpduRcmEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry provides Residual current data"
+	INDEX {
+		upduModuleIndex,
+		upduRcmIndex
+	}
+	::= { upduRcmTable 1 }
+
+UpduRcmEntry ::= SEQUENCE {
+		upduRcmIndex			Integer32,
+		upduRcmName				OCTET STRING,
+		upduRcmCurrentRms		TenthMilliAmperes,
+		upduRcmCurrentDc		TenthMilliAmperes,
+		upduRcmSensorQuality	INTEGER
+	}
+
+upduRcmIndex OBJECT-TYPE
+	SYNTAX		Integer32 (0..11)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"RCM index."
+	::= { upduRcmEntry 1 }
+
+upduRcmName OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..15))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RCM name."
+	::= { upduRcmEntry 2 }
+
+upduRcmCurrentRms OBJECT-TYPE
+	SYNTAX		TenthMilliAmperes
+	UNITS		"mA/10"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RMS residual current."
+	::= { upduRcmEntry 3 }
+
+upduRcmCurrentDc OBJECT-TYPE
+	SYNTAX		TenthMilliAmperes
+	UNITS		"mA/10"
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"DC residual current."
+	::= { upduRcmEntry 4 }
+
+upduRcmSensorQuality OBJECT-TYPE
+	SYNTAX		INTEGER {
+		ok (0),
+		nodata (1),
+		timeout (2),
+		internalerror (3),
+		selftestfailed (4)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"RCM sensor health"
+	::= { upduRcmEntry 5 }
+
+-- ===========================================================================
+-- Control: Relay status
+-- ===========================================================================
+
+upduRelayTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF UpduRelayEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Holds Relay state."
+	::= { upduControl 1 }
+
+upduRelayEntry OBJECT-TYPE
+	SYNTAX		UpduRelayEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry provides the status for a relay."
+	INDEX {
+		upduModuleIndex,
+		upduRelayIndex
+	}
+	::= { upduRelayTable 1 }
+
+UpduRelayEntry ::= SEQUENCE {
+		upduRelayIndex		Integer32,
+		upduRelayMeterNames	OCTET STRING,
+		upduRelayAdminStatus	INTEGER,
+		upduRelayOperStatus	INTEGER,
+		upduRelayCondition	INTEGER
+	}
+
+upduRelayIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..12)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"Relay index."
+	::= { upduRelayEntry 1 }
+
+upduRelayMeterNames OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Comma-separated list of meter names this relay controls."
+	::= { upduRelayEntry 2 }
+
+upduRelayAdminStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			off (0),
+			on (1),
+			unknown(2)
+	}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Defines the desired state of the relay."
+	::= { upduRelayEntry 3 }
+
+upduRelayOperStatus OBJECT-TYPE
+	SYNTAX		INTEGER {
+			off (0),
+			on (1),
+			unknown(2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Defines the operational state of the relay."
+	::= { upduRelayEntry 4 }
+
+upduRelayCondition OBJECT-TYPE
+	SYNTAX		INTEGER {
+			ok (0),
+			failed (1),
+			unknown(2)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Gives the relay condition. Ok if the desired state
+		corresponds to the operational state, failed if it
+		differs and unknown if the operational state is not
+		known."
+	::= { upduRelayEntry 5 }
+
+-- ===========================================================================
+-- Compliance groups
+-- ===========================================================================
+
+upduMibCompliances OBJECT IDENTIFIER ::= { upduConformance 1 }
+
+upduMibGroups OBJECT IDENTIFIER ::= { upduConformance 2 }
+
+upduMibCompliance MODULE-COMPLIANCE
+	STATUS		current
+	DESCRIPTION
+		"The compliance statement for SNMP entities which
+		implement the RNX-UPDU-MIB."
+	MODULE
+	MANDATORY-GROUPS {
+		upduMibGroupRev1
+	}
+	::= { upduMibCompliances 1 }
+
+upduMibGroupRev1 OBJECT-GROUP
+	OBJECTS {
+		upduInfoPartNumber,
+		upduInfoSerialNumber,
+		upduInfoLotNumber,
+		upduModuleType,
+		upduModulePartNumber,
+		upduModuleSerialNumber,
+		upduModuleLotNumber,
+		upduMeterName,
+		upduMeterType,
+		upduMeterEnergyP,
+		upduMeterEnergyR1,
+		upduMeterEnergyR4,
+		upduMeterPowerP,
+		upduMeterPowerQ,
+		upduMeterPowerS,
+		upduMeterUrms,
+		upduMeterIrms,
+		upduMeterSystemName,
+		upduMeterCustomName,
+		upduMeterDescription,
+		upduMeterDataQuality,
+		upduRelayMeterNames,
+		upduRelayAdminStatus,
+		upduRelayOperStatus,
+		upduRelayCondition,
+		upduSensorPortName,
+		upduSensorType,
+		upduSensorTemperatureCelsius,
+		upduSensorHumidity,
+		upduRcmName,
+		upduRcmCurrentRms,
+		upduRcmCurrentDc,
+		upduRcmSensorQuality
+	}
+	STATUS		current
+	DESCRIPTION
+		"rev 1"
+	::= { upduMibGroups 1 }
+
+END

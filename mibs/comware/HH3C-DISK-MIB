@@ -1,0 +1,262 @@
+-- ===========================================================
+-- Copyright (C) 2004 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: The MIB is designed to manage the disk.
+-- Reference:
+-- Version: V1.1
+-- History:
+--   V1.0 2007-09-04 created by lizhicheng
+--   V1.1 2010-02-05
+--        Add hh3cDiskPowerOffReason to hh3cDiskEntry
+-- =================================================================
+HH3C-DISK-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY
+    FROM SNMPv2-SMI
+        hh3cStorageRef, Hh3cStorageEnableState, Hh3cStorageActionType
+    FROM HH3C-STORAGE-REF-MIB;
+
+hh3cDisk MODULE-IDENTITY
+    LAST-UPDATED "200709041452Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB describes the general information of disk device, include
+        the running status, disk interface, and chche management."
+    ::= { hh3cStorageRef 3 }
+
+hh3cDiskMibObjects OBJECT IDENTIFIER ::= { hh3cDisk 1 }
+
+
+-- Disk Entity Extend Table
+-- This table described some entity extend information about the disk.
+hh3cDiskTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains some entity extend information of the disk."
+    ::= { hh3cDiskMibObjects 1 }
+
+hh3cDiskEntry OBJECT-TYPE
+    SYNTAX      Hh3cDiskEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to the disk."
+    INDEX
+        {
+            hh3cDiskIndex
+        }
+
+    ::= { hh3cDiskTable 1 }
+
+Hh3cDiskEntry ::= SEQUENCE
+    {
+        hh3cDiskIndex               Integer32,
+        hh3cDiskPortType            INTEGER,
+        hh3cDiskPortSpeed           Integer32,
+        hh3cDiskSize                Integer32,
+        hh3cDiskFreeSpace           Integer32,
+        hh3cDiskLocationState       Hh3cStorageEnableState,
+        hh3cDiskRunLedState         INTEGER,
+        hh3cDiskFaultLedState       INTEGER,
+        hh3cDiskInitialize          Hh3cStorageActionType,
+        hh3cDiskGlobalSpare         INTEGER,
+        hh3cDiskLocalSpare          INTEGER,
+        hh3cDiskReadCache           Hh3cStorageEnableState,
+        hh3cDiskWriteCache          Hh3cStorageEnableState,
+        hh3cDiskPowerOffReason      INTEGER
+    }
+
+hh3cDiskIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the entity index of disk. The object
+        identified by this index is the same object as identified by the
+        same value of entPhysicalIndex."
+    ::= { hh3cDiskEntry 1 }
+
+hh3cDiskPortType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            sata(1),
+            pata(2),
+            sas(3),
+            scsi(4),
+            ieee1394(5),
+            fcal(6)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the interface type of disk.
+        The value 'sata' means serial advanced technology attachment.
+        The value 'pata' means parallel advanced technology attachment.
+        The value 'sas' means serial attached SCSI.
+        The value 'scsi' means small computer system interface.
+        The value 'ieee1394' means a type of bus standard.
+        The value 'fcal' means fiber channel arbitrated loop."
+    ::= { hh3cDiskEntry 2 }
+
+hh3cDiskPortSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB/second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the speed of disk interface.
+        The units is million bytes per second."
+    ::= { hh3cDiskEntry 3 }
+
+hh3cDiskSize OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the size of disk's total space. The units
+        is million bytes."
+    ::= { hh3cDiskEntry 4 }
+
+
+hh3cDiskFreeSpace OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the size of spare space of the disk. The
+        units is million bytes."
+    ::= { hh3cDiskEntry 5 }
+
+hh3cDiskLocationState OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies if the led used to confirm the
+        position of disk is enable."
+    DEFVAL { enable }
+    ::= { hh3cDiskEntry 6 }
+
+hh3cDiskRunLedState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            on(1),
+            blink(2),
+            fastblink(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the runing state of the disk.
+        The value of 'on' means the blue led is on, and the disk works well.
+        The value of 'blink' means the blue led is blinking, and the disk
+        is being readed or writed.
+        The value of 'fastblink' means the blue led is blinking very fast,
+        and the disk is being located.
+        This object can not be 'fastblink' when the value of associated
+        hh3cDiskLocationState object is equal to 'disable'."
+    ::= { hh3cDiskEntry 7 }
+
+hh3cDiskFaultLedState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            off(1),
+            on(2),
+            blink(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the fault state of the disk.
+        The value of 'off' means the yellow led is go out, and the disk
+        works well.
+        The value of 'on' means the yellow led is on, and the disk break
+        down.
+        The value of 'blink' means the yellow led is blinking, and a group
+        of raid disk is being synchronized."
+    ::= { hh3cDiskEntry 8 }
+
+hh3cDiskInitialize OBJECT-TYPE
+    SYNTAX      Hh3cStorageActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The operation of initialize the disk. When the value of this object
+        is set to 'action', the operation of disk initialize are touched off."
+    ::= { hh3cDiskEntry 9 }
+
+hh3cDiskGlobalSpare OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            globalSpare(1),
+            nonglobalSpare(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies if the disk is a global hot spare disk.
+        The value 'globalSpare' means it is a global spare disk, and
+        the value 'nonglobalSpare' means not."
+    ::= { hh3cDiskEntry 10 }
+
+hh3cDiskLocalSpare OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            localSpare(1),
+            nonlocalSpare(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies if the disk is a specific hot spare disk.
+        The value 'localSpare' means it is a local spare disk, and
+        'nonlocalSpare' means not."
+    ::= { hh3cDiskEntry 11 }
+
+hh3cDiskReadCache OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of read cache."
+    DEFVAL { enable }
+    ::= { hh3cDiskEntry 12 }
+
+
+hh3cDiskWriteCache OBJECT-TYPE
+    SYNTAX      Hh3cStorageEnableState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of write cache."
+    DEFVAL { enable }
+    ::= { hh3cDiskEntry 13 }
+
+hh3cDiskPowerOffReason OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            environmentUnstable(1),
+            mediumError(2),
+            smartCheckError(3),
+            generalError(4)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object describes the reason of disk poweroff.
+        The value 'environmentUnstable' means disk poweroff and may poweron again.
+        The value 'mediumError' means disk poweroff and never poweron.
+        The value 'smartCheckError' means disk's SMART check failed and poweroff.
+        The value 'generalError' means disk poweroff because of general error."
+    ::= { hh3cDiskEntry 14 }
+
+END

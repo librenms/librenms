@@ -1,0 +1,148 @@
+-- ****************************************************************************
+--  COLUBRIS-LICENSE-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Licensing Information MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32
+        FROM    SNMPv2-SMI
+    DisplayString
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+;
+
+
+colubrisLicenseMIB MODULE-IDENTITY
+    LAST-UPDATED    "200606070000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Licensing Information MIB."
+
+    ::= { colubrisMgmtV2 29 }
+
+
+-- colubrisLicenseMIB definition
+colubrisLicenseMIBObjects OBJECT IDENTIFIER ::= { colubrisLicenseMIB 1 }
+
+-- colubris License Information groups
+coLicenseGroup OBJECT IDENTIFIER ::= { colubrisLicenseMIBObjects 1 }
+
+-- The License Group
+coLicenseFeatureTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoLicenseFeatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "License information attributes."
+    ::= { coLicenseGroup 1 }
+
+coLicenseFeatureEntry OBJECT-TYPE
+    SYNTAX      CoLicenseFeatureEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coLicenseFeatureTable.
+                 coLicenseFeatureIndex - Uniquely identify a license
+                                         feature in a Colubris product."
+    INDEX       { coLicenseFeatureIndex }
+    ::= { coLicenseFeatureTable 1 }
+
+CoLicenseFeatureEntry ::= SEQUENCE
+{
+    coLicenseFeatureIndex          Integer32,
+    coLicenseFeatureName           DisplayString,
+    coLicenseFeatureState          INTEGER,
+    coLicenseFeatureEndingDate     OCTET STRING,
+    coLicenseFeatureRemainingDays  Integer32
+}
+
+coLicenseFeatureIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Uniquely identify a license feature in a
+                 Colubris product."
+    ::= { coLicenseFeatureEntry 1 }
+
+coLicenseFeatureName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Friendly name of the license feature."
+    ::= { coLicenseFeatureEntry 2 }
+
+coLicenseFeatureState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the feature is enabled or disabled."
+    ::= { coLicenseFeatureEntry 3 }
+
+coLicenseFeatureEndingDate OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the date when the feature will be
+                deactivated. The format of the date is YYYY/MM/DD."
+    ::= { coLicenseFeatureEntry 4 }
+
+coLicenseFeatureRemainingDays OBJECT-TYPE
+    SYNTAX      Integer32 (0..9999)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the number of days when the feature will be
+                deactivated. If the feature is permanent, the value
+                9999 is returned."
+    ::= { coLicenseFeatureEntry 5 }
+
+
+-- conformance information
+colubrisLicenseMIBConformance OBJECT IDENTIFIER ::= { colubrisLicenseMIB 2 }
+colubrisLicenseMIBCompliances OBJECT IDENTIFIER ::= { colubrisLicenseMIBConformance 1 }
+colubrisLicenseMIBGroups      OBJECT IDENTIFIER ::= { colubrisLicenseMIBConformance 2 }
+
+
+-- compliance statements
+colubrisLicenseMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the License Information MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisLicenseMIBGroup
+                    }
+    ::= { colubrisLicenseMIBCompliances 1 }
+
+-- units of conformance
+colubrisLicenseMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                        coLicenseFeatureName,
+                        coLicenseFeatureState,
+                        coLicenseFeatureEndingDate,
+                        coLicenseFeatureRemainingDays
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the license information status."
+    ::= { colubrisLicenseMIBGroups 1 }
+
+END

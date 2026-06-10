@@ -1,0 +1,889 @@
+CTRON-VLAN-EXTENSIONS-MIB DEFINITIONS ::= BEGIN
+
+--  ctron-vlan-extensions-mib.txt
+--  Revision: 01.05.00
+--  Part Number: 
+--  Date: December 15, 1998
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise-specific 802.1Q VLAN extensions MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in 
+--  specification and other information contained in this document 
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental, 
+--  indirect, special, or consequential damages whatsoever (including 
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the 
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright December 1998 Cabletron Systems
+
+IMPORTS
+
+      OBJECT-TYPE
+            FROM RFC-1212
+      DisplayString
+            FROM RFC1213-MIB
+      ctVlanExt
+            FROM CTRON-MIB-NAMES;
+
+-- The ctVlanExt MIB is used to manage VLAN information for an 
+-- IEEE 802.1Q compliant switch.  This managed object is based on
+-- the IEEE 802.1Q/D9 specification. 
+
+ctVlanBridgeConfig  OBJECT IDENTIFIER ::= { ctVlanExt 1 }
+
+-- The ctVlanBridgeConfig group manages the overall configuration
+-- of the bridge's VLAN resources.
+--
+-- The implementation of this group is MANDATORY.
+
+ctVlanVersionNumber OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "Specifies the IEEE 802.1Q VLAN version number."
+    ::= { ctVlanBridgeConfig 1 }
+
+ctVlanSupportedOperationalMode OBJECT-TYPE
+    SYNTAX INTEGER {
+      static(1),
+      configurable(2)
+      }
+    ACCESS read-only
+    STATUS deprecated
+    DESCRIPTION
+      "This value indicates whether the device allows for flexible
+       VLAN configuration as specified by ctVlanCurrentOperationalMode.
+
+       A value of static(1) indicates that the device does not allow
+       for user configuration.  
+
+       A value of configurable(2) indicates that the device supports 
+       the functionality described in the ctVlanCurrentOperationalMode 
+       object."
+    DEFVAL { static }
+    ::= { ctVlanBridgeConfig 2 }
+       
+ctVlanCurrentOperationalMode OBJECT-TYPE
+    SYNTAX INTEGER (0..12)
+    ACCESS read-write
+    STATUS deprecated
+    DESCRIPTION
+       "This value indicates the number of bits in a VLAN Id
+        that are considered significant in the forwarding decision
+        of a packet.  This allows VLANs to be grouped together into
+        logical units.  Within the scope of these VLAN groups, unicast
+        traffic may be bridged between VLANs, but, multicast and broadcast
+        traffic is scoped to a specific VLAN.
+
+        In the following depiction M represents the number of
+        significant bits as specified by a set of the object.
+        An X in a box represents that the bit is considered
+        significant based on the value of M.
+
+               11  10  9   8   7   6   5   4  3    2   1   0
+             +===============================================+
+        M=0  |   |   |   |   |   |   |   |   |   |   |   |   |
+             +===============================================+
+
+               11  10  9   8   7   6   5   4  3    2   1   0
+             +===============================================+
+        M=4  |   |   |   |   |   |   |   |   | X | X | X | X |
+             +===============================================+
+
+               11  10  9   8   7   6   5   4  3    2   1   0
+             +===============================================+
+        M=9  |   |   |   | X | X | X | X | X | X | X | X | X |
+             +===============================================+
+
+
+        Significant bits are assigned sequentially starting with bit
+        zero and ending with bit M-1.
+
+        For a set value of M, (2 ^ M) VLAN groups will be created.  Each
+        group will contain (2 ^ (12 - M)) VLAN Ids, with the exception
+        of the first group and last group which will each have
+        ((2 ^ (12 - M)) - 1) VLAN Ids (VLAN Ids 0 and 4095 are reserved).
+        VLAN groups are numbered sequentially from 0 through ((2 ^ M) - 1).
+        The VLAN Ids assigned to each group, N, are assigned sequentially
+        starting with (N * (2 ^ (12 - M))) through
+        ((N * (2 ^ (12 - M))) + ((2 ^ (12 - M)) - 1)), with the exception
+        of group zero which always starts with VLAN Id 1 and group
+        ((2 ^ M) -1) which always ends with VLAN Id 4094.
+
+        The number of bits specified allows the maximum amount of
+        flexibility in the scoping of traffic, without compromising
+        security between VLANS.  For example, a set value of 0 would
+        create a single VLAN group with 4094 VLAN Ids.  This configuration
+        would allow all unicast traffic to be bridged between VLANS,
+        while scoping all multicast and broadcast traffic to a specific VLAN.
+        A set value of 12 would restrict all unicast, multicast and broadcast
+        traffic to a specific VLAN.  In this configuration no traffic
+        would be bridged between VLANS.
+
+        Setting of this object is limited to devices which support
+        configurable(2) operational modes as specified by
+        ctVlanSupportedOperationalMode.  A set of this object for a
+        device which only supports static(1) operational mode will fail.
+        A read of this object for a device that only supports
+        static(1) operational mode will always return 12."
+    DEFVAL { 12 }
+    ::= { ctVlanBridgeConfig 3 }
+
+ctVlanResetDefaults OBJECT-TYPE
+    SYNTAX INTEGER {
+      current(1),
+      reset(2)
+      }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A set of the value reset(2) will cause the
+       ctVlanTriggerPortSet table to contain no entries, delete
+       all objects from the ctVlanConfig group, and reset the
+       ctVlanPortVID for each port to the default port VLAN Identifier.
+       A read of this object will return current(1).
+       A set of current(1) has no effect."
+    ::= { ctVlanBridgeConfig 4 }
+
+ctVlanDefaultVIDStickyEgress OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+       }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A set of the value enable(1) will cause
+       a port, as specified by ctVlanPortNum, to remain in the
+       egress list for the DEFAULT VLAN (VID 1) when the port's
+       VID, specified by ctVlanPortVID, is changed.  A set of disable(2)
+       will cause the port to be removed from the egress list of the
+       DEFAULT VLAN when the ports VID is changed."
+    DEFVAL { disable }
+    ::= { ctVlanBridgeConfig 5 }
+
+ctVlanSupportedPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtVlanSupportedPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "This table specifies which bridge ports on the device
+       support VLANs."
+    ::= { ctVlanBridgeConfig 6 }
+
+ctVlanSupportedPortEntry OBJECT-TYPE
+    SYNTAX CtVlanSupportedPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Specifies the bridge ports in the ctVlanSupportedPortTable."
+    INDEX { ctVlanSupportedSlotNum }
+    ::= { ctVlanSupportedPortTable 1 }
+
+CtVlanSupportedPortEntry ::= SEQUENCE {
+      ctVlanSupportedSlotNum
+            INTEGER,
+      ctVlanSupportedPortNum
+            OCTET STRING
+      }
+
+ctVlanSupportedSlotNum OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The slot number of the device that the bridge port is located on."
+    ::= { ctVlanSupportedPortEntry 1 }
+
+ctVlanSupportedPortNum OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The set of ports on the device, specified by
+       ctVlanSupportedSlotNum, that support VLANs.
+       Each octet within the value of this object specifies
+       a set of eight ports, with the first octet specifying
+       ports 1 through 8, the second octet specifying ports 9
+       through 16, etc.  Within each octet, the most significant
+       bit represents the lowest numbered port, and the least
+       significant bit represents the highest numbered port.
+       Thus, each port of the VLAN bridge is represented by a
+       single bit within the value of this object.  If that bit
+       has a value of '1' then that port is included in the set
+       of ports; the port is not included if its bit has a value of '0'."
+    ::= { ctVlanSupportedPortEntry 2 }
+
+ctVlanLearningMode OBJECT-TYPE
+    SYNTAX INTEGER {
+      ivl(1),
+      svl(2),
+      svlivl(3)
+     }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This value indicates the type of VLAN learning the device supports.
+
+       A value of ivl(1) indicates the device supports Independent VLAN
+       Learning (IVL).  Configuration and operation of the Learning Process
+       and the Filtering Database such that, for a given set of VLANs, if a
+       given individual MAC address is learnt in one VLAN, that learnt 
+       information is not used in forwarding decisions taken for the same 
+       address relative to any other VLAN in the given set.  This 
+       operational mode indicates that all unicast, multicast and broadcast 
+       traffic is scoped to a specific VLAN.
+
+       A value of svl(2) indicates the device supports Shared VLAN
+       Learning (SVL).  Configuration and operation of the Learning Process
+       and the Filtering Database such that, for a given set of VLANs, if a
+       given individual MAC address is learnt in one VLAN, that learnt
+       information is used in forwarding decisions taken for the same
+       address relative to any other VLAN in the given set.  In a bridge
+       that supports SVL operation, the `given set of VLANS' is the set
+       of all VLANS (1 - 4094).  This operational mode allows all unicast 
+       traffic to be bridged between VLANS, while scoping all unknown, 
+       multicast and broadcast traffic to a specific VLAN.
+
+       A value of svlivl(3) indicates the device supports both Shared
+       and Independent VLAN learning simultaneously.  This operational
+       mode allows learnt information to be shared between those VLANS for
+       which SVL is necessary while also allowing learnt information not to 
+       be shared between those VLANS for which IVL is necessary.  
+
+       All three of the aforementioned modes operate by placing VLANs in 
+       `sets'.  In IVL each VLAN is mapped to a separate set while in SVL 
+       each VLAN is mapped to the same set.  Accordingly, svlivl is a 
+       combination of both.  Each set is realized as a separate filter 
+       database.  Each filter database is uniquely identified by a Filter 
+       Database Identifier (FID).  The mapping of VLANs to filter databases 
+       is defined in the ctVlanIdToFidMapping leaf of the ctVlanConfigTable."
+    REFERENCE
+      "IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 3.5
+       IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 3.9
+       IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 3.11
+       IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 6.4"
+    DEFVAL { svl }
+    ::= { ctVlanBridgeConfig 7 }
+
+ctVlanTriggerPortConfig  OBJECT IDENTIFIER ::= { ctVlanExt 2 }
+
+-- The ctVlanTriggerPortConfig group manages the configuration
+-- of the bridge's GARP VLAN Registration Protocol (GVRP)
+-- Triggering Function.  GVRP allows automatic configuration
+-- of Egress Port lists to occur on ports where the attached LAN
+-- segment carries VLAN traffic generated by devices that are unable to
+-- participate in GVRP protocol exchanges.
+--
+-- The implementation of this group is OPTIONAL.
+
+ctVlanTriggerPortSetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtVlanTriggerPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "This table provides information pertaining to the ports 
+       participating in the GVRP triggering function."
+    ::= { ctVlanTriggerPortConfig 1 }
+
+ctVlanTriggerPortEntry OBJECT-TYPE
+    SYNTAX CtVlanTriggerPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Specifies the bridge ports in the ctVlanTriggerPortSet table."
+    INDEX { ctVlanTriggerSlotNum }
+    ::= { ctVlanTriggerPortSetTable 1 }
+
+CtVlanTriggerPortEntry ::= SEQUENCE {
+      ctVlanTriggerSlotNum
+            INTEGER,
+      ctVlanTriggerStatus
+            OCTET STRING
+      }
+
+ctVlanTriggerSlotNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The slot number of the device that the bridge port is located on."
+    ::= { ctVlanTriggerPortEntry 1 }
+
+ctVlanTriggerStatus OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The set of ports that will participate in GVRP
+       trigger functions.  Each octet within the value of
+       this object specifies a set of eight ports, with the
+       first octet specifying ports 1 through 8, the second
+       octet specifying ports 9 through 16, etc.  Within each
+       octet, the most significant bit represents the lowest
+       numbered port, and the least significant bit represents
+       the highest numbered port.  Thus, each port of the VLAN
+       bridge is represented by a single bit within the value
+       of this object.  If that bit has a value of '1' then
+       that port is included in the set of ports; the port is
+       not included if its bit has a value of '0'.  A set of '1'
+       for a port that does not have a '1' for the corresponding
+       bit in the ctVlanSupportedPortNum will be ignored."
+    ::= { ctVlanTriggerPortEntry 2 }
+
+
+ctVlanPortConfig     OBJECT IDENTIFIER ::= { ctVlanExt 3 }
+
+-- The ctVlanPortConfig group manages the overall configuration
+-- of a specific port's VLAN resources.
+--
+-- The implementation of this group is MANDATORY.
+
+ctVlanPortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtVlanPortConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "This table provides general information about the VLAN 
+       configuration of all bridge ports on a device."
+    ::= { ctVlanPortConfig 1 }
+
+ctVlanPortConfigEntry OBJECT-TYPE
+    SYNTAX CtVlanPortConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Describes a particular VLAN port configuration entry."
+    INDEX { ctVlanPortSlotNum, ctVlanPortNum }
+    ::= { ctVlanPortConfigTable 1 }
+
+CtVlanPortConfigEntry ::= SEQUENCE {
+      ctVlanPortSlotNum
+            INTEGER,
+      ctVlanPortNum
+            INTEGER,
+      ctVlanPortVID
+            INTEGER,
+      ctVlanPortDiscardFrame
+            INTEGER,
+      ctVlanPortOperationalMode
+            INTEGER,
+      ctVlanPortIngressFiltering
+            INTEGER
+}
+
+ctVlanPortSlotNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The slot number of the device that the bridge port is located on."
+    ::= { ctVlanPortConfigEntry 1 }
+
+ctVlanPortNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The port number for which the information is requested."
+    ::= { ctVlanPortConfigEntry 2 }
+
+ctVlanPortVID OBJECT-TYPE
+    SYNTAX INTEGER (1..4094)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The 12 bit Port VLAN Identifier (PVID) associated with the configured
+       VLAN for received untagged packets on the port specified by 
+       ctVlanPortNum.  The port specified by ctVlanPortNum will be added to 
+       the egress list (ctVlanEgressList) for the specified VLAN with 
+       the frame type of untagged, via ctVlanEgressUntaggedList.  The port will 
+       be removed from the egress list of the previous PVID.  The exception to 
+       this is the DEFAULT VLAN (VID 1) when the ctVlanDefaultVIDStickyEgress
+       is set to a value of enable(1).  Additionally the ctVlanStatus
+       of the specified VLAN will be set to a value of enable(1).  A set of 
+       value that does not exist in the ctVlanConfigTable will fail
+       with a NO-INSTANCE error."
+    ::= { ctVlanPortConfigEntry 3 }
+
+ctVlanPortDiscardFrame OBJECT-TYPE
+    SYNTAX INTEGER {
+         noDiscard(1),
+         discardUntagged(2),
+         discardTagged(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A set of noDiscard(1) causes the port to submit all packets
+       received on the port to the forwarding process, regardless,
+       of the absence or presence of a VLAN tag in the packet.
+       A set of discardUntagged(2) causes the port specified by ctVlanPortNum
+       to discard all frames received that carry no VLAN classification
+       (i.e. any untagged frames or priority tagged frames).  A set of
+       discardTagged(3) has no effect."
+    DEFVAL { noDiscard }
+    ::= { ctVlanPortConfigEntry 4 }
+
+ctVlanPortOperationalMode OBJECT-TYPE
+    SYNTAX INTEGER {
+         dot1QTrunk(1),
+         hybrid(2),
+         dot1dTrunk(3)
+         }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A set of dot1QTrunk(1) causes the port specified by ctVlanPortNum 
+       to transmit tagged frames exclusively, and ctVlanPortDiscardFrame 
+       is set to a value of discardUntagged(2).  Additionally the specified
+       port is added to the egress list of all existing VLANS, and all 
+       existing VLANS are enabled as specified by ctVlanStatus.  If new 
+       VLANS are established and any port is configured as a dot1QTrunk(1) 
+       then the newly created VLAN will automatically be added to the 
+       egress list (ctVlanEgressList) for the port specified by 
+       ctVlanPortNum.  A set of hybrid(2) allows the port to transmit 
+       both tagged and untagged frames.  Additionally the specified 
+       port is removed from all VLANS except the the VLAN as specified 
+       by ctVlanPortVID.  A set of hybrid(2) will also set 
+       ctVlanPortDiscardFrame to a value of noDiscard(1).  A set of 
+       dot1dTrunk(3) causes the port specified by ctVlanPortNum to
+       transmit untagged frames exclusively, and ctVlanPortDiscardFrame 
+       is set to a value of noDiscard(1).  Additionally the specified 
+       port is added to the egress list and the untagged list of all 
+       existing VLANS, and all existing VLANS are enabled as specified 
+       by ctVlanStatus.  If new VLANS are established and any port is 
+       configured as a dot1dTrunk(3) then the newly created VLAN will 
+       automatically be added to the egress list (ctVlanEgressList) and 
+       the untagged list (ctVlanEgressUntaggedList) for the port specified 
+       by ctVlanPortNum."
+    DEFVAL { hybrid }
+    ::= { ctVlanPortConfigEntry 5 }
+
+ctVlanPortIngressFiltering OBJECT-TYPE
+    SYNTAX INTEGER {
+         enable(1),
+         disable(2)
+         }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A set of enable(1) causes the forwarding process to discard any frame
+       received on the port, specified by ctVlanPortNum, that is not a member
+       of the classified VLANs' egress list, as specified bt ctVlanEgressList.
+       VLAN classification may be accomplished via the PVID, as specified by 
+       ctVlanPortVID, for untagged frames, or the VLAN Id specified in the
+       VLAN tag for tagged packets.  A set of disable(2) causes the port to 
+       submit all frames to the forwarding process that have not already been 
+       discarded by ctVlanPortDiscardFrame." 
+    DEFVAL { disable }
+    ::= { ctVlanPortConfigEntry 6 }
+
+
+ctVlanConfig     OBJECT IDENTIFIER ::= { ctVlanExt 4 }
+
+-- The ctVlanConfig group manages the configuration of a specific
+-- VLAN within a bridge.  Each VLAN will have an entry in both the
+-- ctVlanConfigTable and ctVlanConfigEgressPorts tables.
+--
+-- The implementation of this group is MANDATORY.
+
+ctVlanNumActiveEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of active VLAN entries for the device."
+    ::= { ctVlanConfig 1 }
+
+ctVlanNumConfiguredEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The number of configured VLAN entries for the device.  This value
+       includes active entries."
+    ::= { ctVlanConfig 2 }
+
+ctVlanMaxNumEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The maximum number of VLAN entries for the device."
+    ::= { ctVlanConfig 3 }
+
+ctVlanConfigTable     OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtVlanConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "This table allows for the creation, deletion, and modification of
+       specific VLANs."
+    ::= { ctVlanConfig 4 }
+
+ctVlanConfigEntry    OBJECT-TYPE
+    SYNTAX CtVlanConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Allows for configuration of specific VLAN entries."
+    INDEX { ctVlanVID }
+    ::= { ctVlanConfigTable 1 }
+
+CtVlanConfigEntry ::= SEQUENCE {
+      ctVlanVID
+            INTEGER,
+      ctVlanName
+            DisplayString,
+      ctVlanStatus
+            INTEGER,
+      ctVlanEstablish
+            INTEGER,
+      ctVlanIdToFidMapping
+            INTEGER,
+      ctVlanType
+            INTEGER
+      }
+
+ctVlanVID OBJECT-TYPE
+    SYNTAX INTEGER (1..4094)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The 12 bit VLAN Identifier associated with the configured VLAN."
+    ::= { ctVlanConfigEntry 1 }
+
+ctVlanName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (0..32))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The ASCII name associated with the configured VLAN.
+       A set of this object prior to creating an entry by 
+       setting ctVlanEstablish will fail with a NO-INSTANCE error."
+    ::= { ctVlanConfigEntry 2 }
+
+ctVlanStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      enable(1),
+      disable(2)
+      }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A set with the value of enable(1), enables all associated entries
+      in ctVlanEgressPorts table for the specified VLAN.  A set of
+      disable(2), disables all ctVlanEgressPorts entries associated with
+      the specified VLAN.  On ports for which the ctVlanVID specifies
+      the PVID, the operation causes the PVID to be set to the default
+      PVID value.  A set of this object prior to creating an entry by
+      setting ctVlanEstablish will fail with a NO-INSTANCE error."  
+    DEFVAL { disable }
+    ::= { ctVlanConfigEntry 3 }
+
+ctVlanEstablish OBJECT-TYPE
+    SYNTAX INTEGER {
+      create(1),
+      delete(2)
+      }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "A set of the value create(1), causes an entry to be created in
+       the ctVlanConfigTable as specified by the instancing information
+       of ctVlanVID.  Additionally, an entry is created in the
+       ctVlanEgressPortsTable for the specified VLAN. A set of delete(2)
+       causes the specified entry to be removed from both tables.  A read
+       of this object will always return create(1)."
+    ::= { ctVlanConfigEntry 4 }
+
+ctVlanIdToFidMapping OBJECT-TYPE
+    SYNTAX INTEGER (1..4094)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+      "The 12 bit Filter Database Identifier (FID) associated with the
+       configured VLAN as specified by ctVlanVID.
+
+       For devices operating in Independent VLAN Learning (IVL) mode, as 
+       specified by a value of ivl(1) for ctVlanLearningMode, each VLAN 
+       will be mapped to a FID value equal to the VLAN Id specified
+       by ctVlanId.
+
+       For devices operating in Shared VLAN Learning (SVL) mode, as specified 
+       by a value of svl(2) for ctVlanLearningMode, all VLANs will be to the 
+       same FID (1).  On a device operating in SVL mode, sets to this object 
+       will have no effect.
+
+       For devices operating in Shared and Independent VLAN Learning
+       (SIVL) mode, as specified by a value of svlivl(3) for 
+       ctVlanLearningMode, one or more VLANs can be mapped to each FID.  Each 
+       VLAN can only be uniquely mapped to one FID.  When more than one VLAN 
+       is mapped to a single FID they will operate together under the SVL mode 
+       of operation.  When a single VLAN is mapped to a FID it will operate 
+       under the IVL mode of operation.  The default value for this object, 
+       while the device is svlivl(3) mode, will be equal to the VLAN Id 
+       specified by ctVlanId."
+    REFERENCE
+      "IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 3.6
+       IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 3.10
+       IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 3.11
+       IEEE Draft Standard P802.1Q/D9, February 20, 1998: Section 8.11.7"
+    ::= { ctVlanConfigEntry 5 }
+
+ctVlanType OBJECT-TYPE
+    SYNTAX INTEGER {
+      other(1),
+      static(2),
+      dynamicGvrp(3)
+      }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object indicates the type for this entry.
+
+         A value of other(1) indicates that this entry is currently in use 
+         but the conditions under which it will remain so differ from the 
+         following values.
+
+         A value of static(2) indicates that this entry has been statically
+         configured by management, is currently in use and will remain so after
+         the next reset of the device.  
+
+         A value of dynamicGvrp(3) indicates that this entry is currently in use
+         and will remain so until removed by GVRP.  There is no static entry for 
+         this VLAN and it will be removed when the last port leaves the VLAN."
+    ::= { ctVlanConfigEntry 6 }
+
+ctVlanEgressPortsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CtVlanEgressPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "This table provides information pertaining to the egress ports 
+       for a particular VLAN."
+    ::= { ctVlanConfig 5 }
+
+ctVlanEgressPortEntry OBJECT-TYPE
+    SYNTAX CtVlanEgressPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+      "Specifies the egress ports and frame types per port for the 
+       specified VLAN."
+    INDEX { ctVlanEgressPortSlotNum, ctVlanEgressVID }
+    ::= { ctVlanEgressPortsTable 1 }
+
+CtVlanEgressPortEntry ::= SEQUENCE {
+      ctVlanEgressPortSlotNum
+            INTEGER,
+      ctVlanEgressVID
+            INTEGER,
+      ctVlanEgressList
+            OCTET STRING,
+      ctVlanEgressUntaggedList
+            OCTET STRING
+      }
+
+ctVlanEgressPortSlotNum OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The slot number of the device that the VLAN is configured on."
+    ::= { ctVlanEgressPortEntry 1 }
+
+ctVlanEgressVID OBJECT-TYPE
+    SYNTAX INTEGER (1..4094)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "The 12 bit VLAN Identifier associated with the configured VLAN."
+    ::= { ctVlanEgressPortEntry 2 }
+
+ctVlanEgressList OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The set of ports to which traffic destined for
+       the VLAN specified by ctVlanEgressVID
+       on the device specified by ctVlanEgressPortSlotNum
+       may be transmitted. Each octet within the value of
+       this object specifies a set of eight ports, with the
+       first octet specifying ports 1 through 8, the second
+       octet specifying ports 9 through 16, etc.  Within each
+       octet, the most significant bit represents the lowest
+       numbered port, and the least significant bit represents
+       the highest numbered port.  Thus, each port of the VLAN
+       bridge is represented by a single bit within the value
+       of this object.  If that bit has a value of '1' then
+       that port is included in the set of ports; the port is
+       not included if its bit has a value of '0'.  A set of '1'
+       for a port that does not have a '1' for the corresponding
+       bit in the ctVlanSupportedPortNum will be ignored."
+    ::= { ctVlanEgressPortEntry 3 }
+
+  ctVlanEgressUntaggedList OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+      "The set of ports to which traffic destined for
+       the VLAN specified by ctVlanEgressVID
+       on the device specified by ctVlanEgressPortSlotNum
+       should be untagged. Each octet within the value of
+       this object specifies a set of eight ports, with the
+       first octet specifying ports 1 through 8, the second
+       octet specifying ports 9 through 16, etc.  Within each
+       octet, the most significant bit represents the lowest
+       numbered port, and the least significant bit represents
+       the highest numbered port.  Thus, each port of the VLAN
+       bridge is represented by a single bit within the value
+       of this object.  If that bit has a value of '1' then
+       that port is included in the set of ports; the port is
+       not included if its bit has a value of '0'.  All egress
+       ports, as specified by ctVlanEgressList, that do not have
+       a value of '1' for the corresponding bit in this object
+       will be tagged. A set of '1' for a port that does not have
+       a '1' for the corresponding bit in the ctVlanEgressList will
+       be ignored."
+    ::= { ctVlanEgressPortEntry 4 }
+
+ctVlanProtocolAssign  OBJECT IDENTIFIER ::= { ctVlanExt 5 }
+-- The ctVlanProtocolAssign group manages the overall mapping
+-- of protocol and Ether types to VLAN Ids for "untagged" packets.
+--
+-- The implementation of this group is OPTIONAL.
+
+ ctVlanProtocolStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "This object allows the Protocol/Vlan feature to be disabled."
+    DEFVAL { disable }
+    ::= { ctVlanProtocolAssign 1}
+
+ctMaxNumVlanProtoEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number of entries allowed for the ctVlanProtoAssignTable 
+         table."
+    ::= { ctVlanProtocolAssign 2}
+
+ctVlanProtoAssignTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CtVlanProtoAssignEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table provides a mapping of protocol or Ether types to 
+         VLAN Ids for 'untagged' packets."
+    ::= { ctVlanProtocolAssign 3}
+
+ctVlanProtoAssignEntry OBJECT-TYPE
+    SYNTAX CtVlanProtoAssignEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Describes a particular protocol VLAN ID configuration entry."
+    INDEX { ctVlanVID, ctVlanProtoEtherType }
+    ::= { ctVlanProtoAssignTable 1 }
+
+CtVlanProtoAssignEntry ::= SEQUENCE {
+    ctVlanProtoEtherType
+        INTEGER,
+    ctVlanProtoEstablish
+        INTEGER,
+    ctVlanProtoPortList
+        OCTET STRING
+    }
+
+ctVlanProtoEtherType OBJECT-TYPE
+    SYNTAX INTEGER 
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object returns the protocol or Ether type that is mapped to
+         the VLAN specified in it's instancing.  This object takes the 
+         value of any valid Ether type(0x0600..0xFFFF).
+
+         In addition to the previously mentioned range of Ether types, the 
+         following values hold special meaning:
+            
+         Value        Description        DSAP/SSAP/Control
+        -------     ---------------    ----------------------
+         0x100        LLC_IPX1            0xE0E003   
+         0x101        LLC_IPX2            0xFFFF
+         0x102        LLC_NETBIOS         0xF0F003
+         0x103        LLC_BANYAN          0xBCBC03
+        "
+    ::= { ctVlanProtoAssignEntry 1}
+                                                                  
+ctVlanProtoEstablish OBJECT-TYPE
+    SYNTAX INTEGER {
+        create(1),
+        delete(2)
+     }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "A set of the value create(1), causes an entry to be added to the 
+         ctVlanProtoAssignTable as specified by the instancing information
+         of ctVlanVID and ctVlanProtoEtherType.  This has the result 
+         of mapping the specified protocol or Ether type to a VLAN
+         for all received untagged traffic on the ports specified by
+         ctVlanProtoPortList.  A set of the value delete(2), 
+         causes the specified entry information to be removed from the table. 
+         A read of this object will always return create(1)." 
+        ::= { ctVlanProtoAssignEntry 2 }
+
+ctVlanProtoPortList OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The set of ports on the device, specified by ctVlanVID and 
+         ctVlanProtoEtherType, that will classify received 'untagged' 
+         packets of ctVlanProtoEtherType type, to the VLAN specified
+         by ctVlanVID.  Each octet within the value of this object
+         specifies a set of eight ports, with the first octet specifying ports 1
+         through 8, the second octet specifying ports 9 through 16, etc.  Within
+         each octet, the most significant bit represents the lowest numbered 
+         port, and the least significant bit represents the highest numbered 
+         port.  Thus, each port on this device is represented by a single bit
+         within the value of this object.  If that bit has a
+         value of '1' then that port is included in the set of ports; the port 
+         is not included if its bit has a value of '0'.  A set of this object 
+         prior to creating an entry by setting ctVlanProtoEstablish will fail 
+         with a NO-INSTANCE error.  This object will have an initial value '0' 
+         for each port that is represented."
+     ::= { ctVlanProtoAssignEntry 3 }
+
+END

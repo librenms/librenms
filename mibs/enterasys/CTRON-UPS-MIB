@@ -1,0 +1,208 @@
+CTRON-UPS-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-ups-mib.txt
+        --  Revision: 1.03.00
+        --  Part Number:  2170564
+        --  Date: May 1, 1996
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific UPS MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright October 95 Cabletron Systems
+
+        -- This MIB is implemented whenever a uninterruptable power
+        -- supply is implemented.
+
+        IMPORTS
+                ctUPowerSupply          FROM CTRON-MIB-NAMES
+                OBJECT-TYPE             FROM RFC-1212;
+
+        ctUPS           OBJECT IDENTIFIER ::= { ctUPowerSupply 1 }
+
+
+        --  The ups group
+
+        --  Implementation of this group is mandatory for devices that
+        --  incorporate uninterruptible power supplies.
+
+
+        ctUpsID  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                    other(1),       -- none of the following
+                    aPCModel370(257),
+                    aPCModel400(258),
+                    aPCModel600(259),
+                    aPCModel900(260),
+                    aPCModel1250(261),
+                    aPCModel2000(262),
+                    matrix3000(263),
+                    matrix5000(264),
+                    su700(265),
+                    su1400(266),
+                    su2000XL(267),
+                    aPCGeneric(268)  -- Generic APC for use when APC is not 
+                                     -- otherwise defined.
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes a type code which refers to the
+                     manufacturers and model of the UPS."
+            ::= { ctUPS 1 }
+
+        ctUpsUpTime  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  deprecated
+            DESCRIPTION
+                    "Denotes the operating time, in hours, since the UPS
+                    was last powered on."
+            ::= { ctUPS 2 }
+
+        ctUpsDisable  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                    "Allows the UPS to be disabled.  A set turns of the
+                    UPS for those systems, so equipped.  A get/get-next
+                    always returns 0."
+            ::= { ctUPS 3 }
+
+        ctUpsDisconnect  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Allows the UPS backup power system to conserve its
+                    battery.  A set turns off the power system.  A
+                    get/get-next always returns a 0."
+            ::= { ctUPS 4 }
+
+        ctUpsTest  OBJECT-TYPE
+            SYNTAX  INTEGER  {
+                    unitOK(1),
+                    unitFailed(2),
+                    badBattery(3),
+                    noRecentTest(4),  --  no test performed in the last five
+                                      --  minutes
+                    underTest(5)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the status performed on the UPS.  A write
+                    initiates the test.  A read indicates status of
+                    test."
+            ::= { ctUPS 5 }
+
+        ctUpsBatteryCapacity  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the percentage of battery capacity left,
+                    100% being a fully-charged battery."
+            ::= { ctUPS 6 }
+
+        ctUpsACLineVoltsIn  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the input AC utility line voltage."
+            ::= { ctUPS 7 }
+
+        ctUpsBatteryVoltsOut  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the battery voltage."
+            ::= { ctUPS 8 }
+
+        --  Enterprise specific trap definitions
+
+--        aPCLineFail  OBJECT-TYPE
+--            ENTERPRISE  cabletron
+--            DESCRIPTION
+--                    "This trap is generated in the event of an AC
+--                    utility line failure."
+--            ::= 0x1101
+--
+--        aPCLineFailRecovery  OBJECT-TYPE
+--            ENTERPRISE  cabletron
+--            DESCRIPTION
+--                    "This trap is generated when the UPS switches back
+--                    to line, and only if the aPCLineFail trap was issued
+--                    first."
+--            ::= 0x1102
+--
+--        aPCLowBattery  OBJECT-TYPE
+--            ENTERPRISE  cabletron
+--            DESCRIPTION
+--                    "This trap is generated in the event that the UPS'
+--                    battery is found to be low."
+--            ::= 0x1103
+--
+--        aPCLowBatteryRecovery  OBJECT-TYPE
+--            ENTERPRISE  cabletron
+--            DESCRIPTION
+--                    "This trap is generated when the UPS' battery has
+--                    charged above the low-battery point, and only if the
+--                    aPCLowBattery trap was issued first."
+--            ::= 0x1104
+--
+--        aPCAbnormalCondition  OBJECT-TYPE
+--            ENTERPRISE  cabletron
+--            DESCRIPTION
+--                   "This trap is generated in the event that the UPS
+--                    has entered an abnormal condition, such as an 
+--                    overload or trip on low battery.  This trap is also
+--                    sent, when the UPS is first turned on."
+--            ::= 0x1105
+--
+--        aPCAbnormalConditionRecovery  OBJECT-TYPE
+--            ENTERPRISE  cabletron
+--            DESCRIPTION
+--                    "This trap is generated when the UPS has recovered
+--                    from an abnormal condition, and only if the 
+--                    aPCAb-normalCondition trap was issued first."
+--            ::= 0x1106
+--
+--        aPCShuttingDown  OBJECT-TYPE
+--            ENTERPRISE  cabletron
+--            DESCRIPTION
+--                    "This trap is generated in the event that the UPS
+--                    has been ordered to shut itself, or the load, off
+--                    over the serial line."
+--            ::= 0x1107
+--
+--
+
+END

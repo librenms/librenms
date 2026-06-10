@@ -1,0 +1,188 @@
+-- *****************************************************************
+-- DLINKSW-ASP-MIB: D-Link ARP Spoofing Prevention MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-ASP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,
+        IpAddress
+            FROM SNMPv2-SMI
+        MacAddress, RowStatus, TruthValue
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        PortList
+            FROM Q-BRIDGE-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+    dlinkSwArpSpoofingPreventMIB MODULE-IDENTITY
+        LAST-UPDATED "201607050000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+                Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                        Taipei City 114, Taiwan, R.O.C
+                Tel:     +886-2-66000123
+                E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "The MIB module configures ARP spoofing prevention feature.
+            "
+
+        REVISION     "201607050000Z"
+        DESCRIPTION
+            "added dAspLoggingEnabled, dAspLoggingGroup and dAspCompliance2.
+            deprecated dAspCompliance" 
+
+        REVISION     "201307180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file." 
+        ::= { dlinkIndustrialCommon 76 }
+
+-- ----------------------------------------------------------------------------- 
+    dAspMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwArpSpoofingPreventMIB 0 }
+    dAspMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwArpSpoofingPreventMIB 1 }
+    dAspMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwArpSpoofingPreventMIB 2 }
+
+-- -----------------------------------------------------------------------------    
+    dAspGatewayTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAspGatewayEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of gateways for ARP spoofing 
+            prevention (ASP) to prevent ARP poisoning attacking."
+           ::= { dAspMIBObjects 1 }
+
+    dAspGatewayEntry OBJECT-TYPE
+        SYNTAX          DAspGatewayEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the information for a protected gateway."
+        INDEX {
+            dAspGatewayIP,
+            dAspGatewayMAC 
+        }
+        ::= { dAspGatewayTable 1 }
+
+    DAspGatewayEntry ::=           SEQUENCE {
+        dAspGatewayIP           IpAddress,
+        dAspGatewayMAC          MacAddress,
+        dAspActivePortList      PortList,
+        dAspGatewayRowStatus    RowStatus
+    }
+
+    dAspGatewayIP  OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The gateway IP address of the entry."
+        ::= { dAspGatewayEntry 1 }
+
+    dAspGatewayMAC OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The gateway MAC address of the entry."
+        ::= { dAspGatewayEntry 2 }
+
+    dAspActivePortList      OBJECT-TYPE
+        SYNTAX          PortList
+        MAX-ACCESS      read-create
+        STATUS         current
+        DESCRIPTION
+            "This object indicates the port-list on which the ARP Spoofing
+            Prevention is active.
+            " 
+        ::= { dAspGatewayEntry 3 }
+
+    dAspGatewayRowStatus     OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { dAspGatewayEntry 99 }
+
+    dAspLoggingEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Setting to 'true' to enable ARP spoofing prevention logging feature.
+            Setting the object to 'false' will disable logging feature."
+           ::= { dAspMIBObjects 2 }
+
+-- conformance information
+
+    dAspMIBCompliances  OBJECT IDENTIFIER ::= { dAspMIBConformance 1 }
+    
+    dAspCompliance MODULE-COMPLIANCE
+        STATUS          deprecated
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-ASP-MIB.
+            "
+        MODULE      -- this module
+        MANDATORY-GROUPS
+        {
+          dAspMgtGroup
+        }
+        ::= { dAspMIBCompliances  1 }
+
+    dAspCompliance2 MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+            DLINKSW-ASP-MIB.
+            "
+        MODULE      -- this module
+        MANDATORY-GROUPS
+        {
+          dAspMgtGroup
+        }
+
+        GROUP  dAspLoggingGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            logging state configurable.
+            "
+
+        ::= { dAspMIBCompliances  2 }
+
+-- units of conformance
+    dAspMIBGroups       OBJECT IDENTIFIER ::= { dAspMIBConformance 2 }
+    dAspMgtGroup OBJECT-GROUP
+        OBJECTS {
+            dAspActivePortList,
+            dAspGatewayRowStatus
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects configures protected gateways for ARP spoofing
+            prevention.
+            "
+        ::= { dAspMIBGroups 1 }
+
+    dAspLoggingGroup OBJECT-GROUP
+        OBJECTS {
+            dAspLoggingEnabled
+        }
+        STATUS      current
+        DESCRIPTION
+            "A collection of objects configures logging state of ARP spoofing
+            prevention.
+            "
+        ::= { dAspMIBGroups 2 }
+
+END

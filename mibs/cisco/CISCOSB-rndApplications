@@ -1,0 +1,1337 @@
+CISCOSB-rndApplications DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Application Private Extension
+-- Version:    7.37.00.00
+-- Date:       17 May 2004
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    InterfaceIndexOrZero, InterfaceIndex, ifIndex           FROM IF-MIB
+    TEXTUAL-CONVENTION,
+    DisplayString, RowStatus, TruthValue                    FROM SNMPv2-TC
+    Unsigned32, Counter32, IpAddress,
+    MODULE-IDENTITY, OBJECT-TYPE                            FROM SNMPv2-SMI
+    InetAddressType, InetAddress                            FROM INET-ADDRESS-MIB;
+
+rndApplications  MODULE-IDENTITY
+                 LAST-UPDATED "200406010000Z"
+                 ORGANIZATION "Cisco Systems, Inc."
+
+                 CONTACT-INFO
+                 "Postal: 170 West Tasman Drive
+                 San Jose , CA 95134-1706
+                 USA
+
+                 
+                 Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                 DESCRIPTION
+                      "The private MIB module definition for switch001 applications MIB."
+                 REVISION "200406010000Z"
+                 DESCRIPTION
+                      "Initial version of this MIB."
+                 ::= { switch001 35 }
+
+
+-- Obsolete
+-- rsServerDispatcher  OBJECT IDENTIFIER ::= { rndApplications 1}
+
+-- rndMidLevelManagement group contains variables which direct the mid-level
+-- management stations how to monitor and manage their domains.
+
+rndMidLevelManagement  OBJECT IDENTIFIER ::= { rndApplications 2} -- NEW Group
+
+rndAlarmOptions  OBJECT IDENTIFIER ::= { rndMidLevelManagement 2}
+
+rndAlarmEnabling OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether alarms should be issued to the high-level
+         NMS "
+     ::=  { rndAlarmOptions 1 }
+
+rndAlarmInterval OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates the minimal period of time which must pass after issuing
+         an alarm before issuing the same alarm again."
+     ::=  { rndAlarmOptions 2 }
+
+rndMonitoredElementsTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndMonitoredElementEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "The table of monitored elements of the network"
+    ::= {rndMidLevelManagement 3}
+
+rndMonitoredElementEntry  OBJECT-TYPE
+   SYNTAX RndMonitoredElementEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndMonitoredElementAddress }
+    ::= {rndMonitoredElementsTable 1}
+
+RndMonitoredElementEntry ::= SEQUENCE {
+
+rndMonitoredElementAddress    IpAddress,
+rndMonitoredElementCommunity  DisplayString(SIZE(1..20)),
+rndMonitoredElementLabel      DisplayString(SIZE(1..20)),
+rndDefaultPollingInterval     INTEGER,
+rndDefaultLogFile             DisplayString,
+rndMonitoredElementStatus     RowStatus
+}
+rndMonitoredElementAddress OBJECT-TYPE
+   SYNTAX IpAddress
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+    "The IP address of the monitored element"
+     ::=  {rndMonitoredElementEntry  1 }
+
+rndMonitoredElementCommunity OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The community of the monitored element"
+     ::=  {rndMonitoredElementEntry 2  }
+
+rndMonitoredElementLabel OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The label assigned by the network manager to the monitored element"
+     ::=  {rndMonitoredElementEntry 3}
+
+rndDefaultPollingInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The default period of time between two consecutive pollings of the
+     monitored element for the value of an object instance. If no other polling
+     interval is specifically assigned to the monitored object instance, this
+     one will be used"
+     ::=  {rndMonitoredElementEntry 4}
+
+rndDefaultLogFile OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The default file path of the log-file which will contain the polling
+     results for the monitored element. If no other file path is specifically
+     assigned to the monitored object instance, this log-file will be used."
+
+     ::=  {rndMonitoredElementEntry  5}
+
+rndMonitoredElementStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+         "It is used to manage the monitored elements table and indicates
+          the current monitoring status of an element."
+     ::=  {rndMonitoredElementEntry  6}
+
+rndMonitoringTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndMonitoringEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "The table of monitored object instances. Each monitored object instance
+     belongs to a monitored element previously entered in the
+     rndMonitoredElementsTable. "
+    ::= {rndMidLevelManagement 4}
+
+rndMonitoringEntry OBJECT-TYPE
+   SYNTAX RndMonitoringEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndMonitoredElement, IMPLIED rndMonitoredObjectInstanceLabel }
+    ::= {rndMonitoringTable 1}
+
+RndMonitoringEntry ::= SEQUENCE {
+
+rndMonitoredElement             DisplayString(SIZE(1..20)),
+rndMonitoredObjectInstanceLabel DisplayString,
+rndMonitoredObjectName          DisplayString,
+rndMonitoredObjectIdentifier    OBJECT IDENTIFIER,
+rndMonitoredObjectInstance      OBJECT IDENTIFIER,
+rndMonitoredObjectSyntax        INTEGER,
+rndMonitoringInterval           INTEGER,
+rndAlarmMaxTreshold             INTEGER,
+rndAlarmMinTreshold             INTEGER,
+rndMonitoringLogfile            DisplayString,
+rndMonitoringEntryStatus        RowStatus,
+rndMonitoredIntegerInstance     INTEGER
+}
+
+rndMonitoredElement OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+    "A label assigned by the network manager to a monitored element to
+     which this monitored object instance belongs. This label must have
+     been previously entered in an instance of rndMonitoredElementLabel"
+    ::=  {rndMonitoringEntry  1}
+
+rndMonitoredObjectInstanceLabel OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..20))
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+    "The label assigned by the network manager to the monitored object instance"
+    ::=  {rndMonitoringEntry  2}
+
+rndMonitoredObjectName OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(0..20))
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The symbolic object type name of the object to which the monitored object
+     instance belongs (as it appears the MIB module definition). In case of
+     ambiguity the <MIB module name> : <object type name> format should be used.
+     An instance of rndMonitoredObjectName need not be assigned any value, if
+     the corresponding instance of rndMonitoredObjectIdentifier is assigned a
+     value, since any one of these, together with the object instance
+     identifier, suffices to unambigously identify the monitored object
+     instance."
+
+    ::=  {rndMonitoringEntry  3}
+
+rndMonitoredObjectIdentifier OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The object identifier of the object to which the monitored object
+     instance belongs.
+     An instance of rndMonitoredObjectIdentifier need not be assigned any value, if
+     the corresponding instance of rndMonitoredObjectName is assigned a value,
+     since any one of these, together with the object instance identifier,
+     suffices to unambigously identify the monitored object instance."
+
+    ::=  {rndMonitoringEntry  4}
+
+rndMonitoredObjectInstance OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+        "The instance identifier (key) of the monitored object instance."
+    ::=  {rndMonitoringEntry  5}
+
+rndMonitoredObjectSyntax OBJECT-TYPE
+   SYNTAX INTEGER {
+       integer(1),
+       octet-string(2),
+       ip-address(3),
+       object-identifier(4)
+     }
+
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The syntax of the monitored object instance (i.e., the syntax of the object
+     type of the object to which the monitored instance belongs).
+     Need not be assigned any value if the corresponding instance of
+     rndMonitoredObjectName has been assigned a value"
+    ::=  {rndMonitoringEntry  6}
+
+rndMonitoringInterval OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The period of time between two consecutive retrievals of the monitored
+     object instance's value."
+    ::=  {rndMonitoringEntry  7}
+
+
+rndAlarmMaxTreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The value of the monitored object instance, the exceeding of which
+     will cause the generation of an alarm to the high-level management
+     station."
+    ::=  {rndMonitoringEntry 8}
+
+rndAlarmMinTreshold OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "If the value of the monitored object instance falls below the value
+     assigned to rndAlarmMinTreshold, an alarm to the high-level management
+     station will be issued."
+    ::=  {rndMonitoringEntry  9}
+
+
+rndMonitoringLogfile OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The entire path of the file in which the results of the monitoring
+     of this object instance should be recorded."
+    ::=  {rndMonitoringEntry  10}
+
+rndMonitoringEntryStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+         "It is used to manage the monitored object instances table and
+          indicates the current monitoring status of an object instance."
+    ::=  {rndMonitoringEntry  11}
+
+rndMonitoredIntegerInstance OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+         ""
+    ::=  {rndMonitoringEntry  12}
+
+rndMibFilesTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndMibFileEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "The table of monitored object instances. Each monitored object instance
+     belongs to a monitored element previously entered in the
+     rndMonitoredElementsTable. "
+    ::= {rndMidLevelManagement 5}
+
+rndMibFileEntry OBJECT-TYPE
+   SYNTAX RndMibFileEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for this table."
+   INDEX { rndMibFileIndex }
+    ::= {rndMibFilesTable 1}
+
+RndMibFileEntry ::= SEQUENCE {
+
+rndMibFileIndex                 INTEGER,
+rndMibFilePath                  DisplayString,
+rndMibFileRefresh               INTEGER,
+rndMibFileEntryStatus           RowStatus
+}
+rndMibFileIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+    "The number of the MIB file in the list MIB files supported by the
+     Mid-Level management station. The order of the MIB files in this
+     list must reflect the the IMPORT relation between the MIBS contained
+     in the MIB files, i.e., if MIB A IMPORTS FROM MIB B, the file containing
+     MIB A must have a lesser index in this table than the file containing
+     MIB B."
+    ::=  {rndMibFileEntry  1}
+
+
+rndMibFilePath OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The path of the MIB file in the MIB file server."
+    ::=  {rndMibFileEntry  2}
+
+rndMibFileRefresh OBJECT-TYPE
+   SYNTAX INTEGER {
+      no(1),
+      yes(2)
+   }
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "Indicates if the file should be fetched after setting this entry from the
+     MIB file server."
+    ::=  {rndMibFileEntry  3}
+
+rndMibFileEntryStatus OBJECT-TYPE
+   SYNTAX RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+         "It is used to manage the MIB files table."
+    ::=  {rndMibFileEntry  4}
+
+rndHardwareConfiguration OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the current SET SNMP PDU contains hardware
+         configuration (i.e., normally read-only variables). SET of such
+         variables in the Mid-level management station will be allowed only
+         if this variable is included in the SNMP PDU and its value is true.
+         Its value as returned in  a GET SNMP PDU will always be false."
+    ::= {rndMidLevelManagement 6}
+
+rndEraseSimulatedConfiguration OBJECT-TYPE
+    SYNTAX INTEGER {
+        eraseSimulatedConfiguration(1),
+        simulatedConfigurationPresent(2),
+        simulatedConfigurationErased(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "eraseSimulatedConfiguration instructs the MLNMS to erase all the
+         simulated configuration from its configuration data-base (CDB). This
+         the only accepted value for SNMP SET statements and will never be
+         returned in SNMP GET statements.
+         simulatedConfigurationPresent indicates that the MLNMS currently has
+         a simulated configuration.
+         simulatedConfigurationErased indicates that the MLNMS currently has
+         no simulated configuration."
+    ::= {rndMidLevelManagement 7}
+
+rndDeleteValuesTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndDeleteValuesEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "This table indicates which MIB variables are row status fields which
+     control the status of the entry to which they belong. This table also
+     indicates which (integer!) value of these MIB variables will cause, if
+     present in a SNMP SET PDU, the deletion of the conceptual row instance
+     to which the SET MIB variable instance belongs."
+    ::= {rndMidLevelManagement 8}
+
+rndDeleteValuesEntry  OBJECT-TYPE
+   SYNTAX RndDeleteValuesEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for the rndDeleteValuesTable table."
+   INDEX { IMPLIED rndRowStatusVariableName }
+    ::= {rndDeleteValuesTable 1}
+
+RndDeleteValuesEntry ::= SEQUENCE {
+
+rndRowStatusVariableName    DisplayString,
+rndRowStatusObjectId        OBJECT IDENTIFIER,
+rndRowDeleteValue           INTEGER,
+rndDeleteValueEntryStatus   RowStatus
+}
+
+rndRowStatusVariableName OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..80))
+--   MAX-ACCESS         read-only
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The name of the row status field. This name may not necessarily be any
+     name which is present in the MIBs loaded into the MLNMS station."
+
+     ::=  {rndDeleteValuesEntry 1}
+
+rndRowStatusObjectId OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The object id of the row status field. If the rndRowStatusVariableName is
+     a name present in the MIBs loaded into the MLNMS, this MIB
+     variable is not required, but if given, it must match the object id known
+     to the MLNMS.
+     The variable identified by rndRowStatusVariableName and/or rndRowStatusObjectId
+     must be a read-write MIB variable of type INTEGER which belongs to an
+     entry (i.e, is a child of a MIB variable of type SEQUENCE)."
+
+     ::=  {rndDeleteValuesEntry 2}
+
+rndRowDeleteValue OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The value of the variable identified by rndRowStatusVariableName and/or
+     rndRowStatusObjectId, which, if present in a SNMP SET PDU, will cause
+     the deletion of the conceptual row instance which the SET MIB variable
+     instance belongs."
+     ::=  {rndDeleteValuesEntry 3}
+
+rndDeleteValueEntryStatus  OBJECT-TYPE
+   SYNTAX  RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+         "It is used to delete an entry from this table."
+     ::=  {rndDeleteValuesEntry 4}
+
+snmpTesting  OBJECT IDENTIFIER ::= { rndMidLevelManagement 9}
+
+rndSimulatedVariablesTable  OBJECT-TYPE
+   SYNTAX SEQUENCE OF RndSimulatedVariablesEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "This table indicates which MIB variables are simulated."
+    ::= {snmpTesting 1}
+
+rndSimulatedVariablesEntry  OBJECT-TYPE
+   SYNTAX RndSimulatedVariablesEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " The row definition for the rndSimulatedVariablesTable table."
+   INDEX { rndSimulatedVariableEntryIndex }
+    ::= {rndSimulatedVariablesTable 1}
+
+RndSimulatedVariablesEntry ::= SEQUENCE {
+
+rndSimulatedVariableEntryIndex  INTEGER,
+rndSimulatedVariableObjectId    OBJECT IDENTIFIER,
+rndNotSupportedField            INTEGER,
+rndSimulatedVariableEntryStatus RowStatus
+}
+
+rndSimulatedVariableEntryIndex OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+    "The index entry."
+
+     ::=  {rndSimulatedVariablesEntry 1}
+
+rndSimulatedVariableObjectId OBJECT-TYPE
+   SYNTAX OBJECT IDENTIFIER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "The object id of the simulated variable. If the simulated variable belongs
+     to a table entry, the entire entry is henceforth supported."
+
+     ::=  {rndSimulatedVariablesEntry 2}
+
+rndNotSupportedField OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+    "Variable for not supported simulation."
+     ::=  {rndSimulatedVariablesEntry 3}
+
+rndSimulatedVariableEntryStatus  OBJECT-TYPE
+   SYNTAX  RowStatus
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+         "It is used to delete an entry from this table."
+     ::=  {rndSimulatedVariablesEntry 4}
+
+rndSnmpTestPassword  OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "This variable enables the user supplying the correct code to use the
+     SNMP test feature."
+    ::= {snmpTesting 2}
+
+rndSnmpTests  OBJECT-TYPE
+   SYNTAX INTEGER {
+                   noSimulation(1),
+                   simulateSetFailure(2),
+                   simulateAppGet(3),
+                   simulateAppGetNext(4)
+                  }
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "This variable enables the authorized user to test various SNMP features."
+    ::= {snmpTesting 3}
+
+rndSimulateUndo  OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "This variable enables the authorized user to test the SNMP UNDO feature."
+    ::= {snmpTesting 4}
+
+rlSnmpServTestRequest  OBJECT-TYPE
+   SYNTAX INTEGER
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "This variable enables the authorized user to test the SNMP SERV package."
+    ::= {snmpTesting 5}
+
+rlSnmpServTestResponse  OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS   read-only
+   STATUS       current
+   DESCRIPTION
+    "This variable enables the authorized user to retrieve the results of
+    a the SNMP SERV package test."
+   ::= {snmpTesting 6}
+
+rlSnmpServCreateTestPool  OBJECT-TYPE
+   SYNTAX INTEGER { create(1), no-create(2) }
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+    "This variable enables the authorized user to indicate that after its reset
+     the device should create a buffer pool for SNMPServ process PDU
+     testing."
+   ::= {snmpTesting 7}
+
+rlSnmpServITCbindClients  OBJECT-TYPE
+    SYNTAX OBJECT IDENTIFIER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable enables the authorized user to to indicate that after
+         its reset the device should create ITC clients for SnmpServ data
+         requests clients.
+         The semantics of this variable is as follows:
+            subidentifier 2*n indicates whether the client n is synchronous(1) or
+            asynchronous(2)
+            subidentifier 2*n+1 indicates the number of simulatneous requests
+            expected by client n."
+    ::= {snmpTesting 8}
+
+rlSnmpTestSimulatedVariables  OBJECT IDENTIFIER ::= {snmpTesting 9}
+
+rlTstBasicRateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlTstBasicRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for testing SNMP agent."
+    ::= { snmpTesting 10 }
+
+rlTstBasicRateEntry OBJECT-TYPE
+    SYNTAX RlTstBasicRateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlTstBasicRateTable."
+    INDEX { ifIndex }
+    ::= { rlTstBasicRateTable 1 }
+
+RlTstBasicRateEntry ::= SEQUENCE {
+    rlTstBasicRateIfType INTEGER,
+    rlTstBasicRateLineTopology INTEGER,
+    rlTstBasicRateIfMode INTEGER,
+    rlTstBasicRateSignalMode INTEGER
+    }
+
+rlTstBasicRateIfType OBJECT-TYPE
+    SYNTAX INTEGER {
+        isdns(75),
+        isdnu(76)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rlTstBasicRateEntry 1 }
+
+rlTstBasicRateLineTopology OBJECT-TYPE
+    SYNTAX INTEGER {
+        pointToPoint(1),
+        pointToMultipoint(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rlTstBasicRateEntry 2 }
+
+rlTstBasicRateIfMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        te(1),
+        nt(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rlTstBasicRateEntry 3 }
+
+rlTstBasicRateSignalMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        active(1),
+        inactive(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { rlTstBasicRateEntry 4 }
+
+rlMibTree OBJECT IDENTIFIER ::= {rndMidLevelManagement 10 }
+
+rlMibTreeTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlMibTreeEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "This reflects the MIB tree of the device."
+   ::= {rlMibTree 1 }
+
+
+rlMibTreeEntry OBJECT-TYPE
+   SYNTAX RlMibTreeEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       " Each row shows a tree relationsship in the MIB."
+   INDEX { rlMibTreeFather, rlMibTreeSonIndex }
+   ::= {rlMibTreeTable 1 }
+
+   RlMibTreeEntry ::= SEQUENCE {
+
+     rlMibTreeFather                 DisplayString,
+     rlMibTreeSonIndex               INTEGER,
+     rlMibTreeSon                    DisplayString,
+     rlMibTreeSonObjectId            OBJECT IDENTIFIER,
+     rlMibTreeGrandFather            DisplayString
+}
+
+
+ rlMibTreeFather OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS         not-accessible
+     STATUS     current
+     DESCRIPTION
+       " The father in a tree relation ship."
+     ::= {rlMibTreeEntry 1 }
+
+ rlMibTreeSonIndex OBJECT-TYPE
+     SYNTAX INTEGER
+     MAX-ACCESS         not-accessible
+     STATUS     current
+     DESCRIPTION
+       " Running index for this table."
+     ::= {rlMibTreeEntry 2 }
+
+ rlMibTreeSon OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS         read-only
+     STATUS     current
+     DESCRIPTION
+       " The son in a tree relation ship."
+     ::= {rlMibTreeEntry 3 }
+
+ rlMibTreeSonObjectId OBJECT-TYPE
+     SYNTAX OBJECT IDENTIFIER
+     MAX-ACCESS         read-only
+     STATUS     current
+     DESCRIPTION
+       " The object identifier of the son in a tree relation ship."
+     ::= {rlMibTreeEntry 4}
+
+ rlMibTreeGrandFather OBJECT-TYPE
+     SYNTAX DisplayString
+     MAX-ACCESS         read-only
+     STATUS     current
+     DESCRIPTION
+       " The grand father (i.e father's father) in a tree relation ship."
+     ::= {rlMibTreeEntry 5 }
+
+
+rlMibInstances OBJECT IDENTIFIER ::= {rndMidLevelManagement 11 }
+
+rlMibTableInstancesInfoTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF RlMibTableInstancesInfoEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+    "A table for retreiving information on the current instances in a requested MIB table."
+   ::= {rlMibInstances 1 }
+
+
+rlMibTableInstancesInfoEntry OBJECT-TYPE
+   SYNTAX RlMibTableInstancesInfoEntry
+   MAX-ACCESS   not-accessible
+   STATUS       current
+   DESCRIPTION
+       "A row with index rlMibTableInstancesInfoTableName = 'xTable' contains
+        information on current instances in 'xTable'."
+   INDEX { IMPLIED rlMibTableInstancesInfoTableName }
+   ::= {rlMibTableInstancesInfoTable 1 }
+
+   RlMibTableInstancesInfoEntry ::= SEQUENCE {
+
+     rlMibTableInstancesInfoTableName       DisplayString,
+     rlMibTableInstancesInfoNumOfInstances  INTEGER
+}
+
+
+rlMibTableInstancesInfoTableName OBJECT-TYPE
+   SYNTAX DisplayString(SIZE(1..160))
+   MAX-ACCESS     not-accessible
+   STATUS         current
+   DESCRIPTION
+       "The name of the MIB table (for examle: snmpCommunityTable)"
+     ::= {rlMibTableInstancesInfoEntry 1 }
+
+rlMibTableInstancesInfoNumOfInstances OBJECT-TYPE
+   SYNTAX         INTEGER
+   MAX-ACCESS     read-only
+   STATUS         current
+   DESCRIPTION
+       "Get operation on this object will retreive the current number of instances
+        in the MIB table specified by the index rlMibTableInstancesInfoTableName."
+     ::= {rlMibTableInstancesInfoEntry 2 }
+
+-- Obsolete
+-- rsIpZeroHopRouting  OBJECT IDENTIFIER ::= { rndApplications 3}
+
+
+rsPingMIB OBJECT IDENTIFIER ::= { rndApplications 4} -- NEW Group
+
+--------------------------------------------------------------------------------
+-- rsPingTable
+--------------------------------------------------------------------------------
+
+--
+-- Textual Conventions
+--
+
+PingCompletionStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION  "If all the echo request packets in this sequence have been
+                 responded by valid echo responses, this object is set to ok.
+                 Otherwise this status indicates the problem. bad-reply-data indicates
+                 that the reply data is not equal to the response data."
+   SYNTAX INTEGER {
+                 ok(1),
+                 timeout(2),
+                 net-unreachable(3),
+                 host-unreachable(4),
+                 protocol-unreachable(5),
+                 time-to-live-exceeded(6),
+                 reassembly-time-exceeded(7),
+                 unable-to-send(8),
+                 bad-reply-data(9),
+                 incomplete(10)
+                 }
+
+rsPingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsPingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of ping request entries."
+    ::= { rsPingMIB 1 }
+
+rsPingEntry OBJECT-TYPE
+    SYNTAX RsPingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A ping request entry.
+
+        A management station wishing to create an entry should
+        first generate a pseudo-random serial number to be used
+        as the index to this sparse table. It must also create in the same
+        PDU the associated instance of the address object. It should also
+        modify in the same PDU the default values for the other configuration
+        objects if the defaults are not appropriate.
+
+        Once the sequence completes, the management station should
+        retrieve the values of the status objects of interest, and
+        should then delete the entry.  In order to prevent old
+        entries from clogging the table, entries will be aged out,
+        but an entry will never be deleted within 5 minutes of
+        completing."
+    INDEX { rsPingAddress }
+    ::= { rsPingTable 1 }
+
+RsPingEntry ::= SEQUENCE {
+    rsPingAddress          IpAddress,
+    rsPingPacketCount      INTEGER,
+    rsPingPacketSize       INTEGER,
+    rsPingPacketTimeout    INTEGER,
+    rsPingDelay            INTEGER,
+    rsPingTrapOnCompletion TruthValue,
+    rsPingSentPackets      Counter32,
+    rsPingReceivedPackets  Counter32,
+    rsPingMinReturnTime    INTEGER,
+    rsPingAvgReturnTime    INTEGER,
+    rsPingMaxReturnTime    INTEGER,
+    rsPingCompletionStatus PingCompletionStatus,
+    rsPingTimeStamp        DisplayString,
+    rsPingEntryStatus      RowStatus
+    }
+
+rsPingAddress OBJECT-TYPE
+    SYNTAX IpAddress
+--    Rsyntax OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The address of the device to be pinged.
+         Once an instance of this object is created, its
+         value can not be changed."
+    ::= { rsPingEntry 1 }
+
+rsPingPacketCount OBJECT-TYPE
+    SYNTAX INTEGER(1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the number of ping packets to send to the target
+        in this sequence."
+--    DEFVAL { 5 }
+    ::= { rsPingEntry 2 }
+
+ rsPingPacketSize OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the size of ping packets to send to the target
+        in this sequence.  The lower and upper boundaries of this
+        object are implementation dependent."
+--    DEFVAL { 100 }
+    ::= { rsPingEntry 3 }
+
+rsPingPacketTimeout OBJECT-TYPE
+    SYNTAX INTEGER(0..3600000)
+--  Units
+--    milliseconds
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the amount of time to wait for a response to a
+        transmitted packet before declaring the packet 'dropped.'"
+--    DEFVAL { 2000 }
+    ::= { rsPingEntry 4 }
+
+rsPingDelay OBJECT-TYPE
+    SYNTAX INTEGER(0..3600000)
+--  Units
+--    milliseconds
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Specifies the minimum amount of time to wait before sending
+        the next packet in a sequence after receiving a response.
+        The actual delay may be greater due to internal task scheduling."
+--    DEFVAL { 0 }
+    ::= { rsPingEntry 5 }
+
+rsPingTrapOnCompletion OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether or not a rsPingCompletion trap should
+         be issued on completion of the sequence of pings.  If such a
+         trap is desired, the NMS should ensure that the community table
+         contains an instance specified by the NMSs IP address with
+         rndCommunityTrapsEnable = trapsEnable."
+--  DEFVAL { false }
+    ::= { rsPingEntry 6 }
+
+rsPingSentPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ping packets that have been sent to the target
+        in this sequence."
+    ::= { rsPingEntry 7 }
+
+rsPingReceivedPackets OBJECT-TYPE
+    SYNTAX Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of ping packets that have been received from the
+        target in this sequence."
+    ::= { rsPingEntry 8 }
+
+rsPingMinReturnTime OBJECT-TYPE
+    SYNTAX INTEGER
+--  Units
+--    milliseconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimum round trip time of all the packets that have
+         been sent in this sequence. The value returned to a GET request
+         is meaningless if no ping response in a sequence has been received
+         yet."
+    ::= { rsPingEntry 9 }
+
+rsPingAvgReturnTime OBJECT-TYPE
+    SYNTAX INTEGER
+--  Units
+--    milliseconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average round trip time of all the packets that have
+         been sent in this sequence.The value returned to a GET request
+         is meaningless if no ping response in a sequence has been received
+         yet."
+    ::= { rsPingEntry 10 }
+
+rsPingMaxReturnTime OBJECT-TYPE
+    SYNTAX INTEGER
+--  Units
+--    milliseconds
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum round trip time of all the packets that have
+         been sent in this sequence.The value returned to a GET request
+         is meaningless if no ping response in a sequence has been received
+         yet."
+    ::= { rsPingEntry 11 }
+
+rsPingCompletionStatus OBJECT-TYPE
+    SYNTAX         PingCompletionStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If all the echo request packets in this sequence have been
+         responded by valid echo responses, this object is set to ok.
+         Otherwise this status indicates the problem. bad-reply-data indicates
+         that the reply data is not equal to the response data."
+    ::= { rsPingEntry 12 }
+
+rsPingTimeStamp OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(19))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time-stamp indicating the time and date of creation or last
+         update of this request. The format of the time-stamp is
+         dd/mm/yyyy hh:mm:ss"
+    ::= { rsPingEntry 13 }
+
+
+rsPingEntryStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { rsPingEntry 14 }
+
+--------------------------------------------------------------------------------
+-- rsPingInetTable
+--------------------------------------------------------------------------------
+
+-- For IPv6 support
+-- Must replace old rsPingTable MIB
+
+rsPingInetTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsPingInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of ping request entries."
+    ::= { rsPingMIB 2 }
+
+rsPingInetEntry OBJECT-TYPE
+    SYNTAX      RsPingInetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A ping request entry.
+
+        A management station wishing to create an entry should
+        first generate a pseudo-random serial number to be used
+        as the index to this sparse table. It must also create in the same
+        PDU the associated instance of the address object. It should also
+        modify in the same PDU the default values for the other configuration
+        objects if the defaults are not appropriate.
+
+        Once the sequence completes, the management station should
+        retrieve the values of the status objects of interest, and
+        should then delete the entry.  In order to prevent old
+        entries from clogging the table, entries will be aged out,
+        but an entry will never be deleted within 5 minutes of
+        completing."
+    INDEX { rsPingInetAddressType, rsPingInetAddress }
+    ::= { rsPingInetTable 1 }
+
+RsPingInetEntry ::= SEQUENCE {
+    rsPingInetAddressType      InetAddressType,
+    rsPingInetAddress          InetAddress,
+    rsPingInetPacketCount      INTEGER,
+    rsPingInetPacketSize       INTEGER,
+    rsPingInetPacketTimeout    INTEGER,
+    rsPingInetDelay            INTEGER,
+    rsPingInetTrapOnCompletion TruthValue,
+    rsPingInetSentPackets      Counter32,
+    rsPingInetReceivedPackets  Counter32,
+    rsPingInetMinReturnTime    INTEGER,
+    rsPingInetAvgReturnTime    INTEGER,
+    rsPingInetMaxReturnTime    INTEGER,
+    rsPingInetCompletionStatus PingCompletionStatus,
+    rsPingInetTimeStamp        DisplayString,
+    rsPingInetEntryStatus      RowStatus,
+    rsPingInetSourceAddr       InetAddress
+    }
+
+rsPingInetAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The address type of the device to be pinged.
+                Once an instance of this object is created, its
+                value can not be changed."
+    ::= { rsPingInetEntry 1 }
+
+rsPingInetAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The address of the device to be pinged.
+                Once an instance of this object is created, its
+                value can not be changed."
+    ::= { rsPingInetEntry 2 }
+
+rsPingInetPacketCount OBJECT-TYPE
+    SYNTAX      INTEGER(1..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the number of ping packets to send to the target
+                in this sequence."
+    ::= { rsPingInetEntry 3 }
+
+ rsPingInetPacketSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the size of ping packets to send to the target
+                in this sequence.  The lower and upper boundaries of this
+                object are implementation dependent."
+    ::= { rsPingInetEntry 4 }
+
+rsPingInetPacketTimeout OBJECT-TYPE
+    SYNTAX      INTEGER(0..3600000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the amount of time (in milliseconds) to wait for a response to a
+                transmitted packet before declaring the packet 'dropped.'"
+    ::= { rsPingInetEntry 5 }
+
+rsPingInetDelay OBJECT-TYPE
+    SYNTAX      INTEGER(0..3600000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the minimum amount of time (in milliseconds) to wait before sending
+                the next packet in a sequence after receiving a response.
+                The actual delay may be greater due to internal task scheduling."
+    ::= { rsPingInetEntry 6 }
+
+rsPingInetTrapOnCompletion OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies whether or not a rsPingCompletion trap should
+                 be issued on completion of the sequence of pings.  If such a
+                 trap is desired, the NMS should ensure that the community table
+                 contains an instance specified by the NMSs IP address with
+                 rndCommunityTrapsEnable = trapsEnable."
+    ::= { rsPingInetEntry 7 }
+
+rsPingInetSentPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of ping packets that have been sent to the target
+                in this sequence."
+    ::= { rsPingInetEntry 8 }
+
+rsPingInetReceivedPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of ping packets that have been received from the
+                target in this sequence."
+    ::= { rsPingInetEntry 9 }
+
+rsPingInetMinReturnTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The minimum round trip time (in milliseconds) of all the packets that have
+                been sent in this sequence. The value returned to a GET request
+                is meaningless if no ping response in a sequence has been received yet."
+    ::= { rsPingInetEntry 10 }
+
+rsPingInetAvgReturnTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The average round trip time (in milliseconds) of all the packets that have
+                been sent in this sequence.The value returned to a GET request
+                is meaningless if no ping response in a sequence has been received yet."
+    ::= { rsPingInetEntry 11 }
+
+rsPingInetMaxReturnTime OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The maximum round trip time (in milliseconds) of all the packets that have
+                been sent in this sequence.The value returned to a GET request
+                is meaningless if no ping response in a sequence has been received yet."
+    ::= { rsPingInetEntry 12 }
+
+rsPingInetCompletionStatus OBJECT-TYPE
+    SYNTAX      PingCompletionStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "If all the echo request packets in this sequence have been
+                responded by valid echo responses, this object is set to ok.
+                Otherwise this status indicates the problem. bad-reply-data indicates
+                that the reply data is not equal to the response data."
+    ::= { rsPingInetEntry 13 }
+
+rsPingInetTimeStamp OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(19))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The time-stamp indicating the time and date of creation or last
+                update of this request. The format of the time-stamp is
+                dd/mm/yyyy hh:mm:ss"
+    ::= { rsPingInetEntry 14 }
+
+rsPingInetEntryStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The status of this table entry."
+    ::= { rsPingInetEntry 15 }
+
+rsPingInetSourceAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The status of this table entry."
+    ::= { rsPingInetEntry 16 }
+
+--------------------------------------------------------------------------------
+
+rsPowerSupplyRedundacy OBJECT IDENTIFIER ::= { rndApplications 5} -- NEW Group
+rsPowerSupplyRedundacyTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsPowerSupplyRedundacyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The power supply redundancy table."
+    ::=  { rsPowerSupplyRedundacy 1  }
+
+rsPowerSupplyRedundacyEntry OBJECT-TYPE
+    SYNTAX RsPowerSupplyRedundacyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The status of power supply redundancy for this table."
+    INDEX { rsPowerSupplyRedundacyReNumber}
+    ::= { rsPowerSupplyRedundacyTable 1}
+
+RsPowerSupplyRedundacyEntry ::= SEQUENCE {
+    rsPowerSupplyRedundacyReNumber       INTEGER,
+    rsPowerSupplyRedundacyStatus         INTEGER
+    }
+
+rsPowerSupplyRedundacyReNumber OBJECT-TYPE
+    SYNTAX INTEGER  (1..31)
+    MAX-ACCESS          read-only
+    STATUS      current
+    DESCRIPTION
+        "This number identifies the module backed up
+         by power supply redundancy in the stack."
+    ::= { rsPowerSupplyRedundacyEntry 1}
+
+rsPowerSupplyRedundacyStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+        notExist(1),
+        existButNotWorking(2),
+        bothWorking(3),
+        internalOnlyWorking(4),
+        externalOnlyWorking(5)
+        }
+    MAX-ACCESS          read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of a power supply redundancy of the entry."
+    ::= { rsPowerSupplyRedundacyEntry 2}
+
+rsNvram  OBJECT IDENTIFIER ::= { rndApplications 6 }
+rsEraseNvramAfterReset OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..20))
+    MAX-ACCESS          read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of NVRAM application that will be erased
+         after reset or ALL if all NVRAM should be erased."
+    ::=  { rsNvram 1 }
+
+rsNvramApplTable   OBJECT-TYPE
+    SYNTAX SEQUENCE OF RsNvramApplEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The NVRAM application table."
+    ::=  { rsNvram 2 }
+
+rsNvramApplEntry OBJECT-TYPE
+    SYNTAX RsNvramApplEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The status of NVRAM application table."
+    INDEX { rsNvramApplIndex}
+    ::= { rsNvramApplTable 1}
+
+RsNvramApplEntry ::= SEQUENCE {
+    rsNvramApplIndex       INTEGER,
+    rsNvramApplName        DisplayString
+    }
+
+rsNvramApplIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS          read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of NVRAM application table."
+    ::= { rsNvramApplEntry 1}
+
+rsNvramApplName OBJECT-TYPE
+    SYNTAX DisplayString  (SIZE(0..20))
+    MAX-ACCESS          read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of application used NVRAM."
+    ::= { rsNvramApplEntry 2}
+
+END
+

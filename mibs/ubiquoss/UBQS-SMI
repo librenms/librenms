@@ -1,0 +1,125 @@
+-- *****************************************************************
+-- UBQS-SMI.mib:  Ubiquoss Enterprise Structure of Management Information
+-- Obsoletes: LNS-SMI.mib, UBIQUOSS-SMI.mib
+--
+-- May 2009, Park Hyung Eun
+-- 
+-- The fllowing is not compatible with UBQS-SMI.mib.
+--                               
+-- UBIQUOSS-SMI.mib: Ubiquoss Enterprise Structure of Management Information 
+-- Obsoletes: LNS-BASE-MIB.mib  
+--
+-- LNS-SMI.mib:  LocusNetworks Enterprise Structure of Management Information
+-- Obsoletes: LNS-BASE-MIB.mib
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBQS-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+ubiquoss MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+	ORGANIZATION "Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"
+
+--		E-mail: khpark@locusnet.com  
+		
+	DESCRIPTION
+		"The Structure of Management Information for the
+		Ubiquoss enterprise."
+      
+	::= { enterprises 7800 }	-- assigned by IANA
+
+-------------------------------------------------------------------------------
+ubqsProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ubqsProducts is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned.  Actual
+		values are defined in UBQS-PRODUCTS-MIB."
+	::= { ubiquoss 1 }	
+	
+	   
+ubiMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for use by the Workgroup Business Unit"
+	::= { ubiquoss 2 }   
+	   
+	   
+ubiMgmtv2 OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"ubiMgmtv2 is the main subtree for new mib development.
+	 	The mibs of this subtree contains the extended information 
+	 	compared to ubiMgmt. For example, IPv6."
+	::= { ubiquoss 100 }
+		                       
+-------------------------------------------------------------------------------
+	                                                                     
+lnsKtEmsAgnt	OBJECT-IDENTITY   
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for LNS-KT Ems Agent"
+		::=  {  ubiMgmt  1  }
+
+-- added by janghee choi (2013.01.21) for Epon Group MIB                                                        
+ubiEponGroupMIB		OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for Epon Group MIB"
+		::=	{ ubiMgmt 500 }		
+
+-- added by Hangil Won (2013.07.03) for 10G Epon Group MIB                                                        
+ubi10GEponGroupMIB		OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for 10G Epon Group MIB"
+		::=	{ ubiMgmt 510 }		
+
+switchAgent		OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for switch agent"
+		::=  {  ubiMgmt  2  }
+		
+-- added by Bokyung Shin (2010-04-05) for Gpon Group MIB
+ubiGponGroupMIB OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for Gpon Group MIB"
+	::= { ubiMgmtv2 500 }        
+
+-- added by HyungEun Park (20110621)
+ubiMplsGroupMIB OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for MPLS Group MIB"
+	::= { ubiMgmtv2 24 }      
+	
+ubiPonCommonGroupMIB OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"subtree reserved for Pon Common Group MIB"
+	::= { ubiMgmtv2 600 }         
+	              
+END
+

@@ -1,0 +1,533 @@
+-- *****************************************************************
+-- UBIQUOSS-PORT-MIB.mib:  
+-- Ubiquoss Enterprise Port Structure of Management Information
+--
+-- July 2006, Jisoo Kim
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBIQUOSS-INTERFACE-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		
+		DisplayString 
+		FROM RFC1213-MIB
+		
+		TruthValue
+		FROM SNMPv2-TC           -- [RFC2579]
+		
+		IANAifType                               
+		FROM IANAifType-MIB
+		
+		ubiSysIndex
+        FROM UBIQUOSS-SYSINFO-MIB
+        
+		ubiMgmt
+		FROM UBIQUOSS-SMI;     
+
+ubiInterfaceMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  jisoo Kim
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3100"
+    DESCRIPTION
+        "This MIB module defines port information" 
+   	::= { ubiMgmt  102 }
+   				
+	ubiInterfaceMIBObjects	OBJECT IDENTIFIER ::= { ubiInterfaceMIB  1 }      
+		 	                 	
+-- ***********************************************************
+-- uniPortTable
+-- ***********************************************************
+	
+	ubiPortTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiPortEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		::= { ubiInterfaceMIBObjects 1 }
+
+	ubiPortEntry OBJECT-TYPE
+		SYNTAX  UbiPortEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		INDEX  { ubiSysIndex, ubiPortIndex }
+		::= { ubiPortTable 1 } 
+
+	UbiPortEntry  ::=
+		SEQUENCE {
+			ubiPortIndex       			INTEGER, 
+			ubiPortType           		IANAifType,
+			ubiPortOperStatus      		INTEGER,
+			ubiPortAdminStatus     		INTEGER,
+			ubiPortBlockStatus			INTEGER,
+			ubiPortEquipStatus			INTEGER,
+			ubiPortUpSpeedCurrent  		Gauge32,
+			ubiPortDownSpeedCurrent  	Gauge32,
+			ubiPortFlowControl		  	INTEGER,
+			ubiPortControl				INTEGER
+		}			
+
+	ubiPortIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port id "
+		::= { ubiPortEntry  1 }   
+		
+	ubiPortType	 OBJECT-TYPE
+		SYNTAX  IANAifType 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Port type"
+		::= { ubiPortEntry  2 }
+                    
+	ubiPortOperStatus	 OBJECT-TYPE
+		SYNTAX  INTEGER {
+				none(0),
+				up(1), 
+				down(2)		
+			}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"link Up/Down "
+		::= { ubiPortEntry  3 }
+	         
+	ubiPortAdminStatus	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+				none(0),  
+				up(1),
+				down(2)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"administrator state"
+		::= { ubiPortEntry  4 }
+	
+	ubiPortBlockStatus	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+				none(0),				
+				unblock(1),
+				block(2)
+		}
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"block state"
+		::= { ubiPortEntry  5 }
+		         
+	ubiPortEquipStatus	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+				none(0),				  
+				equiped(1),
+				notequiped(2),
+				gbicequip(3)
+		}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"administrator state"
+		::= { ubiPortEntry  6 }
+	 	         
+	ubiPortUpSpeedCurrent	 OBJECT-TYPE  
+		SYNTAX  Gauge32
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { ubiPortEntry  7 }
+	         
+	ubiPortDownSpeedCurrent	 OBJECT-TYPE  
+		SYNTAX  Gauge32
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			""
+		::= { ubiPortEntry  8 }
+    
+    ubiPortFlowControl	 OBJECT-TYPE  
+		SYNTAX  INTEGER {  
+				notavailable(0),
+				enable(1),
+				disable(2)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			""
+		::= { ubiPortEntry  9 }
+
+	ubiPortControl	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+				none(0),  
+				reset(1),
+				loopback-test(2)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The port control"
+		::= { ubiPortEntry  10 }
+
+-- ***********************************************************
+-- uniPortTestResultTable
+-- ***********************************************************
+	
+	ubiPortTestResultTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF UbiPortTestResultEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		::= { ubiInterfaceMIBObjects 2 }
+
+	ubiPortTestResultEntry OBJECT-TYPE
+		SYNTAX  UbiPortTestResultEntry
+		ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"information of port"
+		INDEX  { ubiSysIndex, ubiPortIndex }
+		::= { ubiPortTestResultTable 1 } 
+
+	UbiPortTestResultEntry  ::=
+		SEQUENCE {
+			ubiPortTestResultTx      		Counter32,
+			ubiPortTestResultRx     		Counter32,
+			ubiPortTestResultMinRTT     	Gauge32,
+			ubiPortTestResultAvgRTT     	Gauge32,
+			ubiPortTestResultMaxRTT     	Gauge32,
+			ubiPortTestResultTime     		OCTET STRING,
+			ubiPortTestResultStatus     	INTEGER
+		}			
+
+	ubiPortTestResultTx OBJECT-TYPE
+		SYNTAX  Counter32
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Test tx count"
+		::= { ubiPortTestResultEntry  1 }   
+		
+	ubiPortTestResultRx	 OBJECT-TYPE
+		SYNTAX  Counter32 
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Test rx count"
+		::= { ubiPortTestResultEntry  2 }
+                    
+	ubiPortTestResultMinRTT	 OBJECT-TYPE
+		SYNTAX  Gauge32
+		UNITS   "micro seconds"
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Mininum Round Trip Time"
+		::= { ubiPortTestResultEntry  3 }
+	         
+	ubiPortTestResultAvgRTT	 OBJECT-TYPE  
+		SYNTAX  Gauge32
+		UNITS   "micro seconds"
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Avarage Round Trip Time"
+		::= { ubiPortTestResultEntry  4 }
+	
+	ubiPortTestResultMaxRTT	 OBJECT-TYPE  
+		SYNTAX  Gauge32
+		UNITS   "micro seconds"
+		ACCESS  read-write
+		STATUS  current
+		DESCRIPTION
+			"Maximum Round Trip Time"
+		::= { ubiPortTestResultEntry  5 }
+		         
+	ubiPortTestResultTime	 OBJECT-TYPE  
+		SYNTAX  OCTET STRING
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Tested result time"
+		::= { ubiPortTestResultEntry  6 }
+	 	         
+	ubiPortTestResultStatus	 OBJECT-TYPE  
+		SYNTAX  INTEGER {
+					notavailable(0),
+					sucess(1),
+					fail(2)
+				}
+		ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Test result status sucess or fail or notavailable"
+		::= { ubiPortTestResultEntry  7 }
+	
+				              
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiInterfaceMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiInterfaceMIB 2 }
+ubiInterfaceMIBNotifications OBJECT IDENTIFIER ::= { ubiInterfaceMIBNotificationPrefix 0 }
+
+ubiPortAlarmNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortAlarmNotification is sent 
+                if port is function fail"
+        ::= { ubiInterfaceMIBNotifications 1 }
+                
+ubiPortOperStatusChangeNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortOperStatusChangeNotification is sent 
+                if port operational status change."
+        ::= { ubiInterfaceMIBNotifications 2 }
+        
+ubiPortAdminStatusChangeNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortOperStatusChangeNotification is sent 
+                if port administravie status change."
+        ::= { ubiInterfaceMIBNotifications 3 }
+
+ubiPortBlockStatusChangeNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortBlockStatusChangeNotification is sent 
+                if port administravie status change."
+        ::= { ubiInterfaceMIBNotifications 4 }
+        
+ubiPortGbicStatusChangeNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortGbicStatusChangeNotification is sent 
+                if port administravie status change."
+        ::= { ubiInterfaceMIBNotifications 5 }
+                
+ubiPortSelfLoopDetectNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortOperStatusChangeNotification is sent 
+                if port operational status change."
+        ::= { ubiInterfaceMIBNotifications 6 }
+
+ubiChampConnectorStatusChangeNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiChampConnectorStatusChangeNotification is sent 
+                if champ connector equip status change."
+        ::= { ubiInterfaceMIBNotifications 7 }
+        
+ubiPortLoopBackStatusChangeNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortLoopBackStatusNotification is sent 
+                if port loopback test status change."
+        ::= { ubiInterfaceMIBNotifications 8 }
+        
+ubiPortLoopBackFailNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiPortLoopBackFailNotification is sent 
+                if port loopback test failed."
+        ::= { ubiInterfaceMIBNotifications 9 }                         
+-- conformance information
+
+ubiInterfaceMIBConformance OBJECT IDENTIFIER ::= { ubiInterfaceMIB 3 }
+ubiInterfaceMIBCompliances OBJECT IDENTIFIER ::= { ubiInterfaceMIBConformance 1 }
+ubiInterfaceMIBGroups      OBJECT IDENTIFIER ::= { ubiInterfaceMIBConformance 2 }
+
+
+-- compliance statements
+ubiInterfaceMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss port MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiInterfaceMIBGroup,
+                				   ubiInterfaceMIBNotifGroup	
+                                  }
+
+        GROUP   ubiInterfaceMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for port."
+        
+        GROUP   ubiInterfaceMIBNotifGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need notification for port."
+                         
+        ::= { ubiInterfaceMIBCompliances 1 }
+
+-- ports of conformance
+ubiInterfaceMIBGroup OBJECT-GROUP
+        OBJECTS {
+				ubiPortType,
+				ubiPortOperStatus,
+				ubiPortAdminStatus,
+				ubiPortBlockStatus,
+				ubiPortGBICStatus,
+				ubiPortUpSpeedCurrent,
+				ubiPortDownSpeedCurrent,
+				ubiPortFlowControl,
+				ubiPortControl     
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss port."
+        ::= { ubiInterfaceMIBGroups 1 }
+        
+ubiInterfaceMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        		ubiPortAlarmNotification,
+				ubiPortOperStatusChangeNotification,
+				ubiPortAdminStatusChangeNotification,
+				ubiPortBlockStatusChangeNotification,
+				ubiPortGbicStatusChangeNotification,
+				ubiPortSelfLoopDetectNotification,
+				ubiChampConnectorStatusChangeNotification
+        }
+        STATUS   current
+        DESCRIPTION
+                 "A collection of notifications providing the 
+                 notification for port."
+        ::= { ubiInterfaceMIBGroups 2 }
+
+END

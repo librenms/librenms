@@ -1,0 +1,168 @@
+
+-- *****************************************************************************
+-- Juniper-Ethernet-CONF
+--
+-- SNMP Agent Capabilities definitions for the Ethernet MIBs.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Ethernet-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniEthernetAgent  MODULE-IDENTITY
+    LAST-UPDATED "200309291618Z"  -- 29-Sep-03 12:18 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Ethernet component of the
+        SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200309291618Z"  -- 29-Sep-03 12:18 PM EDT  - JUNOSe 5.2
+	DESCRIPTION
+	    "Juniper-ETHERNET-MIB:
+         Added Ethernet interface statistics support."
+    REVISION    "200210012210Z"  -- 01-Oct-02 06:10 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-ETHERNET-MIB:
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200210011802Z"  -- 01-Oct-02 02:02 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Juniper-ETHERNET-MIB:
+         Added MAU type and length support."
+    REVISION    "200204052033Z"  -- 05-Apr-02 03:33 PM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Juniper-ETHERNET-MIB:
+         Added VLAN stack support."
+    REVISION    "200110252136Z"  -- 25-Oct-01 05:36 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 14 }
+
+
+-- *****************************************************************************
+-- Ethernet interface SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniEthernetAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the Ethernet component of the JUNOSe SNMP agent.  This
+        version of the Ethernet component was supported in JUNOSe 2.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Ethernet application in
+        JUNOSe.  These capabilities became obsolete when VLAN support was add."
+    SUPPORTS    EtherLike-MIB
+        INCLUDES {
+            etherStatsGroup,
+            etherStats100MbsGroup }
+    SUPPORTS    Juniper-ETHERNET-MIB
+        INCLUDES {
+            juniEthernetGroup,
+            juniEthernetSubIfGroup }
+    ::= { juniEthernetAgent 1 }
+
+juniEthernetAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the Ethernet component of the JUNOSe SNMP agent.  This
+        version of the Ethernet component was supported in JUNOSe 3.x system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Ethernet application in
+        JUNOSe.  These capabilities became obsolete when VLAN stack support was
+        added."
+    SUPPORTS    EtherLike-MIB
+        INCLUDES {
+            etherStatsGroup,
+            etherStats100MbsGroup }
+    SUPPORTS    Juniper-ETHERNET-MIB
+        INCLUDES {
+            juniEthernetGroup,
+            juniEthernetSubIfGroup,
+            juniVlanGroup,
+            juniVlanSubIfGroup }
+    ::= { juniEthernetAgent 2 }
+
+juniEthernetAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the Ethernet component of the JUNOSe SNMP agent.  This
+        version of the Ethernet component was supported in JUNOSe 4.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Ethernet application in
+        JUNOSe.  These capabilities became obsolete when VLAN stack support was
+        added."
+    SUPPORTS    EtherLike-MIB
+        INCLUDES  {
+            etherStatsGroup,
+            etherStats100MbsGroup }
+    SUPPORTS    Juniper-ETHERNET-MIB
+        INCLUDES  {
+            juniEthernetGroup,
+            juniEthernetSubIfGroup,
+            juniVlanGroup,
+            juniVlanSubIfGroup2 }
+    ::= { juniEthernetAgent 3 }
+
+juniEthernetAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the Ethernet component of the JUNOSe SNMP agent.  This
+        version of the Ethernet component was supported in JUNOSe 4.1 through
+        5.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Ethernet application in
+        JUNOSe.  These capabilities became obsolete when Ethernet interface
+        statistics support was added."
+    SUPPORTS    EtherLike-MIB
+        INCLUDES {
+            etherStatsGroup,
+            etherStats100MbsGroup }
+    SUPPORTS    Juniper-ETHERNET-MIB
+        INCLUDES  {
+            juniEthernetGroup2,
+            juniEthernetSubIfGroup,
+            juniVlanGroup,
+            juniVlanSubIfGroup2 }
+    ::= { juniEthernetAgent 4 }
+
+juniEthernetAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the Ethernet component of the JUNOSe SNMP agent.  This
+        version of the Ethernet component is supported in JUNOSe 5.2 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the Ethernet application in
+        JUNOSe."
+    SUPPORTS    EtherLike-MIB
+        INCLUDES {
+            etherStatsGroup,
+            etherStats100MbsGroup }
+    SUPPORTS    Juniper-ETHERNET-MIB
+        INCLUDES  {
+            juniEthernetGroup2,
+            juniEthernetSubIfGroup,
+            juniVlanGroup,
+            juniVlanSubIfGroup2,
+            juniEthernetIfStatsGroup }
+    ::= { juniEthernetAgent 5 }
+
+END

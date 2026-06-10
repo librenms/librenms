@@ -1,0 +1,145 @@
+--  ==============================================================================
+--  File              : FIBROLAN-MIB-MSM100U.mib
+--  Description       : Private MIB file for FIBROLAN MetroStar I system - MSM100U
+--  By                : Shamir Stein
+--  MIB Version       : 1.2
+--  MetroStar Version : 1.6.2/build 12
+--  Date              : March 27, 2008
+--  ==============================================================================
+--
+--
+-- Copyright Fibrolan, 2008. All rights reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.
+--
+FIBROLAN-MIB-MSM100U     DEFINITIONS ::= BEGIN
+
+	 IMPORTS
+		OBJECT-TYPE, MODULE-IDENTITY, enterprises				  FROM SNMPv2-SMI 
+		--enterprises                                       FROM RFC1155-SMI
+		flMsChassisModuleMvEntry						  FROM FIBROLAN-MIB-METRO-STAR-MV;
+
+
+   flMsm100UMv  MODULE-IDENTITY
+       LAST-UPDATED "0803270000Z"  
+       ORGANIZATION "Fibrolan ltd"
+       CONTACT-INFO
+         "http://www.fibrolan.com"
+       DESCRIPTION
+         "The MIB module to describe MSM100U interface objects.
+          Copyright (C) Fibrolan Ltd (2008)."
+	::= { enterprises 4467 100 500 10 30 130 }
+      		
+	
+-- ************************************************************
+-- ************************************************************
+-- FibroLan Object Identifier Definition
+-- ************************************************************
+-- ************************************************************
+
+fibrolan            OBJECT IDENTIFIER ::= { enterprises       4467 }
+
+fibrolanSNMP        OBJECT IDENTIFIER ::= { fibrolan           100 }
+
+flMetroStarMv 		OBJECT IDENTIFIER ::=  { fibrolanSNMP      500 }
+
+flMsChassisMv		OBJECT IDENTIFIER ::=  { flMetroStarMv	    10 }
+
+flMsModuleMv		OBJECT IDENTIFIER ::=  { flMsChassisMv	    30 }
+
+--flMsm100UMv			OBJECT IDENTIFIER ::=  { flMsModuleMv      130 }
+
+flMsm100UModuleMv	OBJECT IDENTIFIER ::=  { flMsm100UMv         1 }
+
+
+
+-- ************************************************************
+-- ************************************************************
+--   Module extended table 
+-- ************************************************************
+-- ************************************************************
+     flMsm100UModuleExtMvTable           OBJECT-TYPE
+         SYNTAX  SEQUENCE OF FlMcm100UModuleExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "This table shows the MSM100U module's status"
+     ::= { flMsm100UModuleMv  1 }
+
+     flMcm100UModuleExtMvEntry       OBJECT-TYPE
+         SYNTAX  FlMcm100UModuleExtMvEntry
+         MAX-ACCESS  not-accessible
+         STATUS  current
+         DESCRIPTION
+         "The entries of the table."
+         AUGMENTS { flMsChassisModuleMvEntry }
+     ::= { flMsm100UModuleExtMvTable   1 }
+
+		FlMcm100UModuleExtMvEntry ::= SEQUENCE
+		{
+			 flMsm100UModuleExtMvSignalDetectP1	        INTEGER,
+			 flMsm100UModuleExtMvSignalDetectP2	        INTEGER,
+			 flMsm100UModuleExtMvLoopbackP1				INTEGER,
+			 flMsm100UModuleExtMvLoopbackP2				INTEGER,
+			 flMsm100UModuleExtMvEnableMode				INTEGER
+		}
+
+    flMsm100UModuleExtMvSignalDetectP1				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM100U P1 signal detect"
+    ::= { flMcm100UModuleExtMvEntry  1 }
+
+    flMsm100UModuleExtMvSignalDetectP2				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-only
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM100U P2 signal detect"
+    ::= { flMcm100UModuleExtMvEntry  2 }
+
+    flMsm100UModuleExtMvLoopbackP1				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM100U P1 Loopback state"
+    ::= { flMcm100UModuleExtMvEntry  3 }
+
+    flMsm100UModuleExtMvLoopbackP2				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM100U P2 Loopback state"
+    ::= { flMcm100UModuleExtMvEntry  4 }
+
+    flMsm100UModuleExtMvEnableMode				   OBJECT-TYPE
+		SYNTAX	  INTEGER {
+                             off	 (1),
+						     on		 (2)
+						  }
+         MAX-ACCESS    read-write
+		 STATUS    current
+		 DESCRIPTION
+	     "MSM100U enable mode"
+    ::= { flMcm100UModuleExtMvEntry  5 }
+
+
+
+END

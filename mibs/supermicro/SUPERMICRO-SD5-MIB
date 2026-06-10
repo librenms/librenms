@@ -1,0 +1,2291 @@
+-- *****************************************************************
+-- SUPERMICRO-SSM.mib: Super Micro Enterprise Structure of Management Information
+--
+-- December 21 2017, Software Dept.
+--
+-- Copyright (c) 1993-2019 Super Micro Computer, Inc.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+SUPERMICRO-SD5-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC
+	smSSMInfo
+		FROM SUPERMICRO-SMI;
+		
+smSuperDoctor5MIB MODULE-IDENTITY
+	LAST-UPDATED "201307020000Z"
+	ORGANIZATION "Super Micro Computer Inc."
+	CONTACT-INFO
+		"	Software Dept.
+
+		Postal: 980 Rock Avenue
+			San Jose, CA  95131
+			USA
+
+		   Tel: +1 408 503 8000
+
+		E-mail: SoftLab@supermicro.com"
+	DESCRIPTION
+		"MIB module for sd5 information"
+	::= { smSSMInfo 1 }		
+
+-- sd5
+sd5Table OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF SD5Entry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of sd5 entries."
+	::= { smSuperDoctor5MIB 1 }
+	
+sd5Entry OBJECT-TYPE
+	SYNTAX	    SD5Entry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the sd5 table. 
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { sd5Idx }
+	::= { sd5Table 1 }
+
+SD5Entry ::=
+	SEQUENCE {
+		sd5Idx					Integer32,
+		sd5Version				DisplayString,
+		sd5MIBVersion			DisplayString
+	}
+
+sd5Idx OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The unique value identifies this sd5."
+	::= { sd5Entry 1 }
+	
+sd5Version OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The version of the sd5."
+	::= { sd5Entry 2 }
+	
+sd5MIBVersion OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The MIB version of the sd5."
+	::= { sd5Entry 3 }
+	
+-- cpu	
+cpuTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF CpuEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of processor entries."
+	::= { smSuperDoctor5MIB 2 }
+	
+cpuEntry OBJECT-TYPE
+	SYNTAX	    CpuEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the processor table. 
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { cpuIndex }
+	::= { cpuTable 1 }
+	
+CpuEntry ::=
+	SEQUENCE {
+		cpuIndex		DisplayString,
+		cpuName			DisplayString,
+		cpuDescription		DisplayString,
+		cpuManufacturer		DisplayString,
+		cpuDeviceStatus		Integer32,
+		cpuMaxSpeed		DisplayString,
+		cpuCurrentSpeed		DisplayString,
+		cpuLoadingPercentage	DisplayString,
+		cpuCoreEnabled		Integer32,
+		cpuCoreCount		Integer32,
+		cpuThreadCount		Integer32,
+		cpuSocketDesignation	DisplayString,
+		cpuDeviceVersion	DisplayString,
+		cpuDeviceID		DisplayString,
+		cpuID			DisplayString
+	}
+
+	
+cpuIndex OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The unique value which identifies this processor."
+	::= { cpuEntry 1 }
+	
+cpuName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The name of the processor."
+	::= { cpuEntry 2 }
+	
+cpuDescription OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of the processor."
+	::= { cpuEntry 3 }
+	
+cpuManufacturer OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The manufacturer of the processor."
+	::= { cpuEntry 4 }
+	
+cpuDeviceStatus OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of the processor.
+		The status depends on the cpu failure check via BIOS.
+		 0: OK
+		 2: Critical			"
+	::= { cpuEntry 5 }	
+	
+cpuMaxSpeed OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The maximum speed (MHz) of the processor."
+	::= { cpuEntry 6 }	
+
+cpuCurrentSpeed OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The current speed (MHz) of the processor."
+	::= { cpuEntry 7 }
+	
+cpuLoadingPercentage OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The loading percentage of the processor."
+	::= { cpuEntry 9 }
+	
+	
+cpuCoreEnabled OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The core enabled count of the processor."
+	::= { cpuEntry 10 }
+	
+cpuCoreCount OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The core count of the processor."
+	::= { cpuEntry 11 }
+	
+cpuThreadCount OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The thread count of the processor."
+	::= { cpuEntry 12 }
+	
+	
+cpuSocketDesignation OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The socket designation of the processor."
+	::= { cpuEntry 14 }
+	
+cpuDeviceVersion OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The device version of the processor."
+	::= { cpuEntry 18 }
+	
+cpuDeviceID OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The device ID of the processor."
+	::= { cpuEntry 20 }
+	
+cpuID OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The ID of the processor."
+	::= { cpuEntry 21 }
+
+
+-- memory	
+memTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF MemEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of physical memory entries."
+	::= { smSuperDoctor5MIB 3 }
+	
+memEntry OBJECT-TYPE
+	SYNTAX	    MemEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the physical memory table. 
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { memTag }
+	::= { memTable 1 }
+
+MemEntry ::=
+	SEQUENCE {
+		memTag						DisplayString,
+		memDescription				DisplayString,
+		memDeviceStatus				Integer32,
+		memLabeledBank				DisplayString,
+		memDeviceLocator			DisplayString,
+		memModel					DisplayString,
+		memManufacturer				DisplayString,
+		memPartNumber 				DisplayString,
+		memSerialNumber 			DisplayString,
+		memCapacity					Integer32,
+		memDataWidth				DisplayString,
+		memTotalWidth				DisplayString,
+		memErrorCount				Integer32,
+		memECCErrorCount			Integer32,
+		memUECCErrorCount			Integer32
+	}
+
+	
+memTag OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The tag of the physical memory. The unique value identifies this physical memory."
+	::= { memEntry 1 }
+	
+memDescription OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The description of the physical memory."
+	::= { memEntry 2 }
+
+memDeviceStatus OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the physical memory. 
+		The status depends on the ECC check result on the physical memory.
+		 0: OK
+		 2: Critical			"
+	::= { memEntry 3 }
+	
+memLabeledBank OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The labeled bank of the physical memory."
+	::= { memEntry 4 }
+	
+memDeviceLocator OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The device locator of the physical memory."
+	::= { memEntry 5 }
+	
+memModel OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The model name of the physical memory."
+	::= { memEntry 7 }	
+	
+memManufacturer OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The manufacturer's name of the physical memory."
+	::= { memEntry 8 }	
+
+memPartNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The part number of the physical memory."
+	::= { memEntry 9 }	
+	
+memSerialNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The serial number of the physical memory."
+	::= { memEntry 10 }
+
+memCapacity OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The capacity of the physical memory. (Unit: MB)"
+	::= { memEntry 11 }	
+
+memDataWidth OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The data width of the physical memory. (Unit: bit)"
+	::= { memEntry 12 }		
+
+memTotalWidth OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The total width of the physical memory. (Unit: bit)"
+	::= { memEntry 13 }			
+	
+memErrorCount OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The error count of the physical memory. 
+		It's the summary of the ECC error count and UECC error count."
+	::= { memEntry 15 }	
+	
+memECCErrorCount OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The ECC error count of the physical memory."
+	::= { memEntry 16 }	
+	
+memUECCErrorCount OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The UECC error count of the physical memory."
+	::= { memEntry 17 }	
+	
+-- disk
+diskTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF DiskEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of physical disk entries."
+	::= { smSuperDoctor5MIB 4 }
+	
+diskEntry OBJECT-TYPE
+	SYNTAX	    DiskEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the physical disk table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { diskName }
+	::= { diskTable 1 }
+
+DiskEntry ::=
+	SEQUENCE {
+		diskSerialNumber			DisplayString,
+		diskName					DisplayString,
+		diskVendor					DisplayString,
+		diskSmartStatus				Integer32,
+		diskModel					DisplayString,
+		diskSize					Integer32,
+		diskMediaType				DisplayString,
+		diskInterfaceType			DisplayString,
+		diskController				DisplayString,
+		diskSlotID					DisplayString
+	}	
+	
+diskSerialNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The serial number of the disk."
+	::= { diskEntry 1 }
+	
+diskName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The name of the disk. The unique value identifies this disk."
+	::= { diskEntry 2 }
+	
+diskVendor OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The vendor name of the disk."
+	::= { diskEntry 3 }
+	
+diskSmartStatus OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the disk. 
+		The status depends on the SMART check result on the disk.
+		 0: OK
+		 2: Critical			"
+	::= { diskEntry 4 }
+
+
+diskModel OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The model of the disk."
+	::= { diskEntry 5 }	
+
+diskSize OBJECT-TYPE
+	SYNTAX	    Integer32 (0..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The size of the disk. (Unit: MB)"
+	::= { diskEntry 6 }
+	
+	
+diskMediaType OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The media type of the disk includes
+		 External hard disk media	
+		 Removable media other than floppy
+		 Fixed hard disk media and Unknown format"
+	::= { diskEntry 8 }	
+	
+diskInterfaceType OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The disk interface types includes IDE, HDC, USB, and SCSI."
+	::= { diskEntry 9 }	
+	
+diskController OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The controller name of the disk."
+	::= { diskEntry 10 }
+	
+diskSlotID OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The Slot ID of the disk."
+	::= { diskEntry 11 }
+
+
+-- system bios
+sysBIOSTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF SysBIOSEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of System BIOS entries."
+	::= { smSuperDoctor5MIB 5 }
+	
+sysBIOSEntry OBJECT-TYPE
+	SYNTAX	    SysBIOSEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the System BIOS table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { sysBIOSIndex }
+	::= { sysBIOSTable 1 }
+
+SysBIOSEntry ::=
+	SEQUENCE {
+		sysBIOSIndex				Integer32,
+		sysBIOSReleaseDate			DisplayString,
+		sysBIOSVersion			DisplayString,
+		sysBIOSManufacturer			DisplayString
+	}	
+
+sysBIOSIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The unique value identifies this BIOS."
+	::= { sysBIOSEntry 1 }
+	
+sysBIOSReleaseDate OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The release date of BIOS."
+	::= { sysBIOSEntry 7 }
+	
+sysBIOSVersion OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The version of BIOS."
+	::= { sysBIOSEntry 8 }
+	
+sysBIOSManufacturer OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The manufacturer's name of BIOS."
+	::= { sysBIOSEntry 11 }
+	
+-- baseboard
+mbTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF MBEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of baseboard entries."
+	::= { smSuperDoctor5MIB 6 }
+	
+mbEntry OBJECT-TYPE
+	SYNTAX	    MBEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the baseboard table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { mbIndex }
+	::= { mbTable 1 }
+
+MBEntry ::=
+	SEQUENCE {
+		mbIndex				Integer32,
+		mbManufacturer			DisplayString,
+		mbProductName			DisplayString,
+		mbVersionName			DisplayString,
+		mbAssetTag			DisplayString,
+		mbSerialNumber			DisplayString
+	}	
+
+mbIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The unique value identifies this baseboard."
+	::= { mbEntry 1 }
+	
+mbManufacturer OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The manufacturer's name of the baseboard."
+	::= { mbEntry 10 }
+	
+mbProductName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The product name of the baseboard."
+	::= { mbEntry 11 }
+	
+mbVersionName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The version of the baseboard."
+	::= { mbEntry 12 }
+
+mbAssetTag OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The asset tag of the baseboard."
+	::= { mbEntry 15 }	
+
+mbSerialNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The serial number of the baseboard."
+	::= { mbEntry 16 }	
+
+-- operation system
+osTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF OSEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of operation system entries."
+	::= { smSuperDoctor5MIB 7 }
+	
+osEntry OBJECT-TYPE
+	SYNTAX	    OSEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the operation system table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { osIndex }
+	::= { osTable 1 }
+
+OSEntry ::=
+	SEQUENCE {
+		osIndex			Integer32,
+		osName			DisplayString,
+		osVersion		DisplayString,
+		osManufacturer		DisplayString,
+		osSerialNumber		DisplayString,
+		osCSDVersion		DisplayString
+	}	
+
+
+osIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The unique value identifies this Operation System."
+	::= { osEntry 1 }
+
+osName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The name of the Operation System."
+	::= { osEntry 6 }
+	
+osVersion OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The version of the operation system."
+	::= { osEntry 7 }
+	
+osManufacturer OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The manufacturer's name of the Operation System."
+	::= { osEntry 8 }
+
+osSerialNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The serial number of the operation system."
+	::= { osEntry 9 }	
+
+osCSDVersion OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { osEntry 10 }	
+	
+	
+-- dmi event logs
+
+dmiLogTable OBJECT IDENTIFIER ::= { smSuperDoctor5MIB 8 }
+	
+ceccLogTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF CeccLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of operation system entries."
+	::= { dmiLogTable 1 }
+	
+ceccLogEntry OBJECT-TYPE
+	SYNTAX	    CeccLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the operation system table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { ceccLogIndex }
+	::= { ceccLogTable 1 }
+
+CeccLogEntry ::=
+	SEQUENCE {
+		ceccLogDatetime		DisplayString,
+		ceccLogInfo		DisplayString,
+		ceccLogIndex		Integer32
+	}
+	
+ceccLogDatetime OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { ceccLogEntry 1 }
+	
+ceccLogInfo OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { ceccLogEntry 2 }
+	
+ceccLogIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { ceccLogEntry 10 }
+	
+
+ueccLogTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF UeccLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of operation system entries."
+	::= { dmiLogTable 2 }
+	
+ueccLogEntry OBJECT-TYPE
+	SYNTAX	    UeccLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the operation system table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { ceccLogIndex }
+	::= { ueccLogTable 1 }
+
+UeccLogEntry ::=
+	SEQUENCE {
+		ueccLogDatetime		DisplayString,
+		ueccLogInfo		DisplayString,
+		ueccLogIndex		Integer32
+	}
+	
+ueccLogDatetime OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { ueccLogEntry 1 }
+	
+ueccLogInfo OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { ueccLogEntry 2 }
+	
+ueccLogIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { ueccLogEntry 10 }
+
+postLogTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF PostLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of operation system entries."
+	::= { dmiLogTable 8 }
+	
+postLogEntry OBJECT-TYPE
+	SYNTAX	    PostLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the operation system table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { postLogIndex }
+	::= { postLogTable 1 }
+
+PostLogEntry ::=
+	SEQUENCE {
+		postLogDatetime		DisplayString,
+		postLogInfo		DisplayString,
+		postLogIndex		Integer32
+	}
+	
+postLogDatetime OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { postLogEntry 1 }
+	
+postLogInfo OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { postLogEntry 2 }
+	
+postLogIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { postLogEntry 10 }
+
+	
+cpuLogTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF CpuLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of operation system entries."
+	::= { dmiLogTable 11 }
+	
+cpuLogEntry OBJECT-TYPE
+	SYNTAX	    CpuLogEntry
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the operation system table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { cpuLogIndex }
+	::= { cpuLogTable 1 }
+
+CpuLogEntry ::=
+	SEQUENCE {
+		cpuLogDatetime		DisplayString,
+		cpuLogInfo		DisplayString,
+		cpuLogIndex		Integer32
+	}
+	
+cpuLogDatetime OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { cpuLogEntry 1 }
+	
+cpuLogInfo OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { cpuLogEntry 2 }
+	
+cpuLogIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The CSD version of the operation system."
+	::= { cpuLogEntry 10 }
+
+	
+-- RAID Controller
+raidAdapterTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RaidAdapterEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of raid controller entries."
+	::= { smSuperDoctor5MIB 9 }
+	
+raidAdapterEntry OBJECT-TYPE
+	SYNTAX	    RaidAdapterEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the raid controller table. 
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { raidAdapterIndex }
+	::= { raidAdapterTable 1 }
+
+RaidAdapterEntry ::=
+	SEQUENCE {
+		raidAdapterIndex 		Integer32,
+		raidAdapterGroup 		DisplayString,
+		raidAdapterId			DisplayString,
+		raidAdapterProductName		DisplayString,
+		raidAdapterSerialNumber		DisplayString,
+		raidAdapterFWPackageBuild	DisplayString,
+		raidAdapterFWVersion		DisplayString,
+		raidAdapterBIOSVersion		DisplayString,
+		raidAdapterVendorId		DisplayString,
+		raidAdapterDeviceId		DisplayString,
+		raidAdapterSubVendorId		DisplayString,
+		raidAdapterSubDeviceId		DisplayString,
+		raidIsBBUAbsent 		DisplayString,
+		raidIsBBUAbsentIgnored		DisplayString,
+		raidAdapterAllinoneStatus	Integer32,
+		raidAdapterAllinoneMsg		DisplayString
+	}	
+
+
+raidAdapterIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Raid controller index. The unique value which identifies this raid controller."
+	::= { raidAdapterEntry 1 }
+
+raidAdapterGroup OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The group of the raid controller. Values: 
+		LSI-MegaRAID
+		LSI-Fusion-MPT
+		"
+	::= { raidAdapterEntry 2 }
+	
+
+raidAdapterId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The id of the raid controller. The id is unique in one adapter group."
+	::= { raidAdapterEntry 3 }
+
+raidAdapterProductName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The product name of the raid controller."
+	::= { raidAdapterEntry 4 }
+
+raidAdapterSerialNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The serial number of the raid controller."
+	::= { raidAdapterEntry 5 }
+
+raidAdapterFWPackageBuild OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The build number of the firmware package of the raid controller."
+	::= { raidAdapterEntry 6 }
+
+raidAdapterFWVersion OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The firmware version of the raid controller."
+	::= { raidAdapterEntry 7 }
+
+raidAdapterBIOSVersion OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The bios version of the raid controller."
+	::= { raidAdapterEntry 8 }
+
+raidAdapterVendorId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The PCI vendor id of the raid controller."
+	::= { raidAdapterEntry 9 }
+
+raidAdapterDeviceId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The PCI device id of the raid controller."
+	::= { raidAdapterEntry 10 }
+
+raidAdapterSubVendorId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The PCI sub-vendor id of the raid controller."
+	::= { raidAdapterEntry 11 }
+
+raidAdapterSubDeviceId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The PCI sub-device id of the raid controller."
+	::= { raidAdapterEntry 12 }
+
+
+raidIsBBUAbsent OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Is the BBU absent or present? 
+		Values: Absent, Present."
+	::= { raidAdapterEntry 13 }
+
+raidIsBBUAbsentIgnored OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Does the raid controller ignore the absent BBU? 
+		Values: YES, NO. 
+		If the value is No then the absent BBU will affect the all-in-one status of the raid controller."
+	::= { raidAdapterEntry 14 }
+
+raidAdapterAllinoneStatus OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the raid controller. Values:
+		 0: OK
+		 1: Warning
+		 2: Critical			
+		"
+	::= { raidAdapterEntry 15 }
+
+
+raidAdapterAllinoneMsg OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status message of the raid controller."
+	::= { raidAdapterEntry 16 }
+
+
+-- RAID BBU
+raidBBUTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RaidBBUEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of raid BBU entries."
+	::= { smSuperDoctor5MIB 10 }
+	
+raidBBUEntry OBJECT-TYPE
+	SYNTAX	    RaidBBUEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the raid BBU table. 
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { raidBBUIndex }
+	::= { raidBBUTable 1 }
+
+RaidBBUEntry ::=
+	SEQUENCE {
+		raidBBUIndex 			Integer32,
+		raidAdapterGroup-BBU	DisplayString,
+		raidAdapterId-BBU		DisplayString,
+		raidBBUStatus			DisplayString,
+		raidBBUAllinoneStatus		Integer32,
+		raidBBUAllinoneMsg		DisplayString
+	}	
+
+
+raidBBUIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Raid BBU index. 
+		The unique value which identifies this raid BBU."
+	::= { raidBBUEntry 1 }
+
+raidAdapterGroup-BBU OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The group of the raid controller. Values: 
+		LSI-MegaRAID
+		LSI-Fusion-MPT
+		"
+	::= { raidBBUEntry 2 }
+	
+
+raidAdapterId-BBU OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The id of the raid controller. The id is unique in one adapter group."
+	::= { raidBBUEntry 3 }
+
+
+raidBBUStatus OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the properties of the BBU. 
+		Values: Passed, Failed."
+	::= { raidBBUEntry 8 }
+
+
+raidBBUAllinoneStatus OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the BBU. Values:
+		 0: OK
+		 1: Warning
+		 2: Critical			
+		"
+	::= { raidBBUEntry 9}
+
+
+raidBBUAllinoneMsg OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status message of the BBU."
+	::= { raidBBUEntry 10}
+
+
+-- RAID VD
+raidVDTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RaidVDEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of virtual drive entries."
+	::= { smSuperDoctor5MIB 11 }
+	
+raidVDEntry OBJECT-TYPE
+	SYNTAX	    RaidVDEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the virtual drive table. 
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { raidVDIndex }
+	::= { raidVDTable 1 }
+
+RaidVDEntry ::=
+	SEQUENCE {
+		raidVDIndex 			Integer32,
+		raidAdapterGroup-VD		DisplayString,
+		raidAdapterId-VD		DisplayString,
+		raidDiskGroupId			DisplayString,
+		raidVDId			DisplayString,
+		raidVDTargetId			DisplayString,
+		raidVDName			DisplayString,
+		raidVDRaidLevel			DisplayString,
+		raidVDSize			DisplayString,
+		raidVDMirrorDataSize		DisplayString,
+		raidVDStripSize			DisplayString,
+		raidVDNumDrives			DisplayString,
+		raidVDSpanDepth			DisplayString,
+		raidVDDefaultCachePolicy	DisplayString,
+		raidVDCurrentCachePolicy	DisplayString,
+		raidVDDefaultAccessPolicy	DisplayString,                
+		raidVDCurrentAccessPolicy	DisplayString,
+		raidVDDiskCachePolicy		DisplayString,
+		raidVDEncryptionType		DisplayString,
+		raidVDDefaultPSPolicy		DisplayString,
+		raidVDCurrentPSPolicy		DisplayString,
+		raidVDCanSpinUpIn1Min		DisplayString,
+		raidVDSupportT10Power		DisplayString,
+		raidVDSupportsMaxPS		DisplayString,
+		raidVDBadBlocksExist		DisplayString,
+		raidVDCached			DisplayString,
+		raidVDState			DisplayString,
+		raidVDAllinoneStatus		Integer32,
+		raidVDAllinoneMsg		DisplayString
+
+	}	
+
+
+raidVDIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Raid virtual drive index. 
+		The unique value which identifies this raid virtual drive."
+	::= { raidVDEntry 1 }
+
+raidAdapterGroup-VD	 OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The group of the raid controller. Values: 
+		LSI-MegaRAID
+		LSI-Fusion-MPT
+		"
+	::= { raidVDEntry 2 }
+	
+
+raidAdapterId-VD OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The id of the raid controller. The id is unique in one adapter group."
+	::= { raidVDEntry 3 }
+
+
+raidDiskGroupId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The disk group id of the virtual drive."
+	::= { raidVDEntry 4 }
+
+
+raidVDId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The id of the virtual drive."
+	::= { raidVDEntry 5 }
+
+
+raidVDTargetId OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The target id of the virtual drive."
+	::= { raidVDEntry 6 }
+
+
+raidVDName OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The name of the virtual drive."
+	::= { raidVDEntry 7 }
+
+
+raidVDRaidLevel OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The raid level of the virtual drive."
+	::= { raidVDEntry 8 }
+
+
+raidVDSize OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The size of the virtual drive."
+	::= { raidVDEntry 9 }
+
+
+raidVDMirrorDataSize OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The mirror data size of the virtual drive."
+	::= { raidVDEntry 10 }
+
+
+raidVDStripSize OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The stripe size of the virtual drive."
+	::= { raidVDEntry 11 }
+
+
+raidVDNumDrives OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The number of physical drives of the virtual drive."
+	::= { raidVDEntry 12 }
+
+
+raidVDSpanDepth OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The span depth of the virtual drive."
+	::= { raidVDEntry 13 }
+
+
+raidVDDefaultCachePolicy OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The default cache policy of the virtual drive."
+	::= { raidVDEntry 14 }
+
+
+raidVDCurrentCachePolicy OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The current cache policy of the virtual drive."
+	::= { raidVDEntry 15 }
+
+
+raidVDDefaultAccessPolicy OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The default access policy of the virtual drive."
+	::= { raidVDEntry 16 }
+
+raidVDCurrentAccessPolicy OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The current access policy of the virtual drive."
+	::= { raidVDEntry 17 }
+
+
+raidVDDiskCachePolicy OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The disk cache policy of the virtual drive."
+	::= { raidVDEntry 18 }
+
+
+raidVDEncryptionType OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The encryption type of the virtual drive."
+	::= { raidVDEntry 19 }
+
+
+raidVDDefaultPSPolicy OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The default power savings policy of the virtual drive."
+	::= { raidVDEntry 20 }
+
+
+raidVDCurrentPSPolicy OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The default current savings policy of the virtual drive."
+	::= { raidVDEntry 21 }
+
+
+raidVDCanSpinUpIn1Min OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Can the physical drive spin up in 1 minute?"
+	::= { raidVDEntry 22 }
+
+
+raidVDSupportT10Power OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Does the VD have drives that support T10 power conditions?"
+	::= { raidVDEntry 23 }
+
+
+raidVDSupportsMaxPS OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Does the VD's IO profile supports MAX power savings with cached writes?"
+	::= { raidVDEntry 24 }
+
+raidVDBadBlocksExist OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Does the virtual drive have bad blocks?"
+	::= { raidVDEntry 25 }
+
+
+raidVDCached OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Is the virtual drive cached?"
+	::= { raidVDEntry 26 }
+
+
+raidVDState OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The state of the virtual drive. Values:
+		Offline, Partially-degraded, Degraded, Optimal.
+		"
+	::= { raidVDEntry 27 }
+
+
+raidVDAllinoneStatus OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the virtual drive. Values: 
+		0: OK
+		1: Warning
+		2: Critical
+		"
+	::= { raidVDEntry 28}
+
+
+raidVDAllinoneMsg OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status message of the virtual drive."
+	::= { raidVDEntry 29}
+
+-- RAID PD
+raidPDTable OBJECT-TYPE
+	SYNTAX	    SEQUENCE OF RaidPDEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"A table of physical drive entries."
+	::= { smSuperDoctor5MIB 12 }
+	
+raidPDEntry OBJECT-TYPE
+	SYNTAX	    RaidPDEntry 
+	MAX-ACCESS  not-accessible
+	STATUS	    current
+	DESCRIPTION
+		"An entry in the physical drive table.
+		Entries cannot be created or deleted via SNMP operations."
+	INDEX	    { raidPDIndex }
+	::= { raidPDTable 1 }
+
+RaidPDEntry ::=
+	SEQUENCE {
+		raidPDIndex 			Integer32,
+		raidAdapterGroup-PD		DisplayString,
+		raidAdapterId-PD		DisplayString,
+		raidDiskGroupId-PD		DisplayString,
+		raidPDSlotNumber		DisplayString,
+		raidPDFirmwareState		DisplayString,
+		raidPDMediaErrorCount		DisplayString,
+		raidPDOtherErrorCount		DisplayString,
+		raidPDPredFailCount		DisplayString,
+		raidPDLastPredFailEventSeqNo	DisplayString,
+		raidPDRawSize			DisplayString,
+		raidPDDeviceFwLevel		DisplayString,
+		raidPDInquiryData		DisplayString,
+		raidPDDeviceSpeed		DisplayString,
+		raidPDLinkSpeed			DisplayString,
+		raidPDMediaType			DisplayString,
+		raidPDWriteCache		DisplayString,
+		raidPDNCQSetting		DisplayString,
+		raidPDPort0Linkspeed		DisplayString,
+		raidPDPort0Status		DisplayString,
+		raidPDPort1Linkspeed		DisplayString,
+		raidPDPort1Status		DisplayString,
+		raidPDEnclosureDeviceID		DisplayString,
+		raidPDOpProgress		DisplayString,
+		raidPDSpan			DisplayString,
+		raidPDAllinoneStatus		Integer32,
+		raidPDAllinoneMsg		DisplayString,
+		raidPDModel			DisplayString,
+		raidPDSerialNumber		DisplayString,
+		raidPDFirmwareRevision		DisplayString
+
+	}	
+
+
+raidPDIndex OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Raid physical drive index. 
+		The unique value which identifies this raid physical drive."
+	::= { raidPDEntry 1 }
+
+raidAdapterGroup-PD	OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The group of the raid controller. Values: 
+		LSI-MegaRAID
+		LSI-Fusion-MPT
+		"
+	::= { raidPDEntry 2 }
+	
+
+raidAdapterId-PD OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The id of the raid controller. The id is unique in one adapter group."
+	::= { raidPDEntry 3 }
+
+
+raidDiskGroupId-PD OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The disk group id of the virtual drive."
+	::= { raidPDEntry 4 }
+
+raidPDSlotNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The slot number of the physical drive."
+	::= { raidPDEntry 5 }
+
+
+raidPDFirmwareState OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The firmware state of the physical drive. Values: 
+		unconfigured-good, unconfigured-bad, hot-spare, offline, failed, rebuild, online, and copyback"
+	::= { raidPDEntry 6 }
+
+
+raidPDMediaErrorCount OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The media error count of the physical drive."
+	::= { raidPDEntry 7 }
+
+
+raidPDOtherErrorCount OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The other error count of the physical drive."
+	::= { raidPDEntry 8 }
+
+
+raidPDPredFailCount OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The predictive failure count of the physical drive."
+	::= { raidPDEntry 9 }
+
+raidPDLastPredFailEventSeqNo OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The last predictive failure event sequence number of the physical drive."
+	::= { raidPDEntry 10 }
+
+raidPDRawSize OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The raw size of the physical drive."
+	::= { raidPDEntry 11 }
+
+raidPDDeviceFwLevel OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The device firmware level of the physical drive."
+	::= { raidPDEntry 12 }
+
+raidPDInquiryData OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The inquiry data of the physical drive."
+	::= { raidPDEntry 13 }
+
+raidPDDeviceSpeed OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The device speed of the physical drive."
+	::= { raidPDEntry 14 }
+
+raidPDLinkSpeed OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The link speed of the physical drive."
+	::= { raidPDEntry 15 }
+
+raidPDMediaType OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The media type of the physical drive."
+	::= { raidPDEntry 16 }
+
+raidPDWriteCache OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The write cache of the physical drive."
+	::= { raidPDEntry 17 }
+
+raidPDNCQSetting OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The NCQ setting of the physical drive."
+	::= { raidPDEntry 18 }
+
+raidPDPort0Linkspeed OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The link speed of port 0 of the physical drive."
+	::= { raidPDEntry 19 }
+
+raidPDPort0Status OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of port 0 of the physical drive."
+	::= { raidPDEntry 20 }
+
+raidPDPort1Linkspeed OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The link speed of port 1 of the physical drive."
+	::= { raidPDEntry 21 }
+
+raidPDPort1Status OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status of port 1 of the physical drive."
+	::= { raidPDEntry 22 }
+
+raidPDEnclosureDeviceID OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The enclosure id of the physical drive."
+	::= { raidPDEntry 23 }
+
+raidPDOpProgress OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The operation progress of the physical drive."
+	::= { raidPDEntry 24 }
+
+raidPDSpan OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The span of the physical drive."
+	::= { raidPDEntry 25 }
+
+raidPDAllinoneStatus OBJECT-TYPE
+	SYNTAX	    Integer32 (1..65535)
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"Indicates the status of the physical drive. Values: 
+		0: OK
+		1: Warning
+		2: Critical
+		"
+	::= { raidPDEntry 26}
+
+
+raidPDAllinoneMsg OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The status message of the physical drive."
+	::= { raidPDEntry 27}
+
+
+raidPDModel OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The model of the physical drive."
+	::= { raidPDEntry 28}
+
+
+raidPDSerialNumber OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The serial number of the physical drive."
+	::= { raidPDEntry 29}
+
+
+raidPDFirmwareRevision OBJECT-TYPE
+	SYNTAX	    DisplayString
+	MAX-ACCESS  read-only
+	STATUS	    current
+	DESCRIPTION
+		"The firmware revision of the physical drive."
+	::= { raidPDEntry 30}
+
+
+smSD5TrapMIB  		OBJECT IDENTIFIER ::= { smSSMInfo 3 }
+
+trapFanNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Fan Speed has returned to Normal"
+
+	--#TYPE       "FAN Event"
+	--#SUMMARY    "Fan Speed has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 101
+
+trapFanWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Fan Speed is Warning"
+
+	--#TYPE       "FAN Event"
+	--#SUMMARY    "Fan Speed is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 102
+	
+trapFanCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Fan Speed is Critical"
+
+	--#TYPE       "FAN Event"
+	--#SUMMARY    "Fan Speed is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 103
+	
+trapVoltageNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Voltage has returned to Normal"
+
+	--#TYPE       "Voltage Event"
+	--#SUMMARY    "Voltage has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 201
+
+trapVoltageWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Voltage is Warning"
+
+	--#TYPE       "Voltage Event"
+	--#SUMMARY    "Voltage is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 202
+	
+trapVoltageCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Voltage is Critical"
+
+	--#TYPE       "Voltage Event"
+	--#SUMMARY    "Voltage is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 203
+
+trapTemperatureNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Temperature has returned to Normal"
+
+	--#TYPE       "Temperature Event"
+	--#SUMMARY    "Temperature has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 301
+
+trapTemperatureWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Temperature is Warning"
+
+	--#TYPE       "Temperature Event"
+	--#SUMMARY    "Temperature is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 302
+	
+trapTemperatureCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Temperature is Critical"
+
+	--#TYPE       "Temperature Event"
+	--#SUMMARY    "Temperature is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 303
+	
+trapChassisIntrusionCleared TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Chassis Intrusion has cleared"
+
+	--#TYPE       "Chassis Intrusion Event"
+	--#SUMMARY    "Chassis Intrusion has cleared"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 401
+	
+trapChassisIntrusion TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Chassis Intrusion has triggered"
+
+	--#TYPE       "Chassis Intrusion Event"
+	--#SUMMARY    "Chassis Intrusion has triggered"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 403
+
+trapStorageSMARTCheckNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Storage SMART Check has returned to Normal"
+
+	--#TYPE       "Storage SMART Check Event"
+	--#SUMMARY    "Storage SMART Check has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 601
+
+trapStorageSMARTCheckWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Storage SMART Check is Warning"
+
+	--#TYPE       "Storage SMART Check Event"
+	--#SUMMARY    "Storage SMART Check is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 602
+	
+trapStorageSMARTCheckCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Storage SMART Check is Critical"
+
+	--#TYPE       "Storage SMART Check Event"
+	--#SUMMARY    "Storage SMART Check is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 603
+
+trapPowerSupplyNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Power Supply has returned to Normal"
+
+	--#TYPE       "Power Supply Event"
+	--#SUMMARY    "Power Supply has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 701
+
+trapPowerSupplyWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Power Supply is Warning"
+
+	--#TYPE       "Power Supply Event"
+	--#SUMMARY    "Power Supply is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 702
+	
+trapPowerSupplyCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Power Supply is Critical"
+
+	--#TYPE       "Power Supply Event"
+	--#SUMMARY    "Power Supply is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 703
+
+trapMemoryCeccNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Memory CECC has returned to Normal"
+
+	--#TYPE       "Memory CECC Event"
+	--#SUMMARY    "Memory CECC has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 801
+
+trapMemoryCeccWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Memory CECC is Warning"
+
+	--#TYPE       "Memory CECC Event"
+	--#SUMMARY    "Memory CECC is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 802
+	
+trapMemoryCeccCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Memory CECC is Critical"
+
+	--#TYPE       "Memory CECC Event"
+	--#SUMMARY    "Memory CECC is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 803
+	
+trapMemoryUeccNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Memory UECC has returned to Normal"
+
+	--#TYPE       "Memory UECC Event"
+	--#SUMMARY    "Memory UECC has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 901
+
+trapMemoryUeccWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Memory UECC is Warning"
+
+	--#TYPE       "Memory UECC Event"
+	--#SUMMARY    "Memory UECC is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 902
+	
+trapMemoryUeccCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Memory UECC Critical"
+
+	--#TYPE       "Memory UECC Event"
+	--#SUMMARY    "Memory UECC is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 903
+
+
+trapGenericNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Monitored item has returned to Normal"
+
+	--#TYPE       "Generic Event"
+	--#SUMMARY    "Monitored item has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 1001
+
+trapGenericWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Monitored item is Warning"
+
+	--#TYPE       "Generic Event"
+	--#SUMMARY    "Monitored item is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 1002
+	
+trapGenericCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Monitored item Critical"
+
+	--#TYPE       "Generic Event"
+	--#SUMMARY    "Monitored item is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 1003
+
+
+trapBbpStatusNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "BBP has returned to Normal"
+
+	--#TYPE       "BBP Event"
+	--#SUMMARY    "BBP has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 1101
+
+trapBbpStatusWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "BBP is Warning"
+
+	--#TYPE       "BBP Event"
+	--#SUMMARY    "BBP is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 1102
+	
+trapBbpStatusCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "BBP is Critical"
+
+	--#TYPE       "BBP Event"
+	--#SUMMARY    "BBP is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 1103
+
+trapCpuFaultNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Processor Fault has returned to Normal"
+
+	--#TYPE       "Processor Fault Event"
+	--#SUMMARY    "Processor Fault has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 1201
+
+trapCpuFaultWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Processor Fault is Warning"
+
+	--#TYPE       "Processor Fault Event"
+	--#SUMMARY    "Processor Fault is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 1202
+	
+trapCpuFaultCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Processor Fault is Critical"
+
+	--#TYPE       "Processor Fault Event"
+	--#SUMMARY    "Processor Fault is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 1203
+
+trapStorageAdapterStatusNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Storage Adapter has returned to Normal"
+
+	--#TYPE       "Storage Adapter Event"
+	--#SUMMARY    "Storage Adapter has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 1301
+
+trapStorageAdapterStatusWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Storage Adapter is Warning"
+
+	--#TYPE       "Storage Adapter Event"
+	--#SUMMARY    "Storage Adapter is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 1302
+	
+trapStorageAdapterStatusCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Storage Adapter is Critical"
+
+	--#TYPE       "Storage Adapter Event"
+	--#SUMMARY    "Storage Adapter is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 1303
+	
+trapBatteryStatusNormal TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Battery has returned to Normal"
+
+	--#TYPE       "Battery Event"
+	--#SUMMARY    "Battery has returned to Normal"
+	--#ARGUMENTS  {}
+	--#SEVERITY   INFORMATIONAL
+
+	::= 1401
+
+trapBatteryStatusWarning TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Battery is Warning"
+
+	--#TYPE       "Battery Event"
+	--#SUMMARY    "Battery is Warning"
+	--#ARGUMENTS  {}
+	--#SEVERITY   WARNING
+
+	::= 1402
+	
+trapBatteryStatusCritical TRAP-TYPE
+	ENTERPRISE smSD5TrapMIB
+	DESCRIPTION "Battery is Critical"
+
+	--#TYPE       "Battery Event"
+	--#SUMMARY    "Battery is Critical"
+	--#ARGUMENTS  {}
+	--#SEVERITY   CRITICAL
+
+	::= 1403
+
+	
+END

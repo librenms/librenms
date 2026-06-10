@@ -1,0 +1,212 @@
+CTINB2-MIB DEFINITIONS ::= BEGIN 
+
+        --  ctinb2-mib.txt
+        --  Revision:   00.00.02
+        --  Date: October 23, 1998
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  INB2 MIB.
+        --
+        --  This module will be extended, as needed.
+
+        --  Cabletron Systems reserves the right to make changes in
+        --  specification and other information contained in this document
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental,
+        --  indirect, special, or consequential damages whatsoever (including
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright September 98 Cabletron Systems
+ 
+IMPORTS 
+        OBJECT-TYPE                  FROM RFC-1212
+        ctINBinfo2                   FROM CTRON-MIB-NAMES ;
+
+--
+-- The Utilization group 
+--
+
+   ctInbUtil             OBJECT IDENTIFIER ::= { ctINBinfo2 1 }
+
+   ctInbUtilInterval OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-write
+       STATUS  mandatory
+       DESCRIPTION
+           "The length of the sampling interval in seconds used for all INB
+            utilization measurements and calculations."
+       DEFVAL { 1 }
+       ::= { ctInbUtil 1 }
+
+
+   ctInbUtilTable OBJECT-TYPE 
+       SYNTAX  SEQUENCE OF CtInbUtilEntry
+       ACCESS  not-accessible 
+       STATUS  mandatory 
+       DESCRIPTION 
+          "A list of byte counts and absolute utilization percentages reflecting
+           data transferred via the INB during the last sampling interval."
+       ::= { ctInbUtil 2 } 
+
+   ctInbUtilEntry OBJECT-TYPE 
+       SYNTAX  CtInbUtilEntry
+       ACCESS  not-accessible 
+       STATUS  mandatory 
+       DESCRIPTION 
+           "Byte counts and utilization percentages reflecting data transferred
+            from a source module to a destination module via the INB."
+       INDEX { ctInbUtilSrcSlot, ctInbUtilDestSlot }
+       ::= { ctInbUtilTable 1 } 
+
+   CtInbUtilEntry ::= 
+       SEQUENCE { 
+           ctInbUtilSrcSlot
+               INTEGER,
+           ctInbUtilDestSlot
+               INTEGER,
+           ctInbUtilHiByteCountA
+               INTEGER,
+           ctInbUtilLoByteCountA
+               INTEGER,
+           ctInbUtilHiByteCountB
+               INTEGER,
+           ctInbUtilLoByteCountB
+               INTEGER,
+           ctInbUtilAbsoluteA
+               INTEGER,
+           ctInbUtilAbsoluteB
+               INTEGER,
+           ctInbUtilAbsoluteTotal
+               INTEGER
+       }
+
+   ctInbUtilSrcSlot OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The chassis slot number containing the module from which bytes are
+            transmitted onto the INB."
+       ::= { ctInbUtilEntry 1 }
+
+   ctInbUtilDestSlot OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The chassis slot number containing the module to which bytes are
+            transmitted across the INB."
+       ::= { ctInbUtilEntry 2 }
+
+   ctInbUtilHiByteCountA OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The high-order 32 bits of the 64-bit entity which represents the number
+            of bytes transferred from the source module to the destination module
+            across INB channel A during the last sampling interval.  This 64-bit
+            byte count may be calculated as:
+              ctInbUtilByteCountA = (ctInbUtilHiByteCountA * 2**32) + ctInbUtilLoByteCountA "
+       ::= { ctInbUtilEntry 3 }
+
+   ctInbUtilLoByteCountA OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The low-order 32 bits of the 64-bit entity which represents the number
+            of bytes transferred from the source module to the destination module
+            across INB channel A during the last sampling interval.  This 64-bit
+            byte count may be calculated as:
+              ctInbUtilByteCountA = (ctInbUtilHiByteCountA * 2**32) + ctInbUtilLoByteCountA "
+       ::= { ctInbUtilEntry 4 }
+
+   ctInbUtilHiByteCountB OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The high-order 32 bits of the 64-bit entity which represents the number
+            of bytes transferred from the source module to the destination module
+            across INB channel B during the last sampling interval.  This 64-bit
+            byte count may be calculated as:
+              ctInbUtilByteCountB = (ctInbUtilHiByteCountB * 2**32) + ctInbUtilLoByteCountB "
+       ::= { ctInbUtilEntry 5 }
+
+   ctInbUtilLoByteCountB OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The low-order 32 bits of the 64-bit entity which represents the number
+            of bytes transferred from the source module to the destination module
+            across INB channel B during the last sampling interval.  This 64-bit
+            byte count may be calculated as:
+              ctInbUtilByteCountB = (ctInbUtilHiByteCountB * 2**32) + ctInbUtilLoByteCountB "
+       ::= { ctInbUtilEntry 6 }
+
+   ctInbUtilAbsoluteA OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The percentage of absolute utilization of INB channel A by data transferred
+            from the source module to the destination module during the last sampling
+            interval.  This percentage is calculated by dividing ctInbUtilByteCountA
+            (a 64-bit entity which is calculated as specified above) by
+            the theoretical maximum number of bytes that could have traversed INB
+            channel A during the interval.  Note that in order to increase precision,
+            the value of this object is the actual percentage multiplied by 100 (that
+            is, to determine the actual percentage, divide the value of this object by
+            100)."
+       ::= { ctInbUtilEntry 7 }
+
+   ctInbUtilAbsoluteB OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The percentage of absolute utilization of INB channel B by data transferred
+            from the source module to the destination module during the last sampling
+            interval.  This percentage is calculated by dividing ctInbUtilByteCountB
+            (a 64-bit entity which is calculated as specified above) by
+            the theoretical maximum number of bytes that could have traversed INB
+            channel B during the interval.  Note that in order to increase precision,
+            the value of this object is the actual percentage multiplied by 100 (that
+            is, to determine the actual percentage, divide the value of this object by
+            100)."
+       ::= { ctInbUtilEntry 8 }
+
+   ctInbUtilAbsoluteTotal OBJECT-TYPE
+       SYNTAX  INTEGER
+       ACCESS  read-only
+       STATUS  mandatory
+       DESCRIPTION
+           "The percentage of absolute utilization of the total INB by data transferred
+            from the source module to the destination module during the last sampling
+            interval.  This percentage is calculated by dividing the sum of
+            ctInbUtilByteCountA and ctInbUtilByteCountB by the theoretical maximum number
+            of bytes that could have traversed both INB channels during the interval.
+            Note that in order to increase precision, the value of this object is the
+            actual percentage multiplied by 100 (that is, to determine the actual
+            percentage, divide the value of this object by 100)."
+       ::= { ctInbUtilEntry 9 }
+
+
+END

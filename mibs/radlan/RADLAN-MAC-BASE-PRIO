@@ -1,0 +1,252 @@
+RADLAN-MAC-BASE-PRIO DEFINITIONS ::= BEGIN
+
+-- Title:      RADLAN MAC BASE PRIO
+-- Version:    7.36
+-- Date:       1 Apr 2004
+--
+IMPORTS
+    OBJECT-TYPE                                 FROM SNMPv2-SMI
+    rnd                                         FROM RADLAN-MIB
+    MacAddress                                  FROM SNMPv2-TC
+    RowStatus                                   FROM RADLAN-SNMPv2;
+
+rlMacBasePrio OBJECT IDENTIFIER ::= { rnd 101 }
+
+rlMacBasePrioMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the snmp support version that is supported by
+        this device."
+    ::= { rlMacBasePrio 1 }
+
+rlMacBasePrioSupport OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "indicates which features of the max base prio
+        are supported:
+            (bit 0 is the most significant bit)
+            bit 0 - ForceL3Cos
+            bit 1 - SADA_TC
+        "
+    ::= { rlMacBasePrio 2 }
+
+rlMacBasePrioForceL3CosEnable   OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable controlls the activation of ForceL3Cos feature in Mac base
+        priority"
+    ::= { rlMacBasePrio 3 }
+
+rlMacBasePrioForceL3CosTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlMacBasePrioForceL3CosEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains information about ranges
+        of addresses that are used in the mac based ptiority
+        with the ForceL3Cos feature."
+    ::= { rlMacBasePrio 4 }
+
+rlMacBasePrioForceL3CosEntry OBJECT-TYPE
+    SYNTAX  RlMacBasePrioForceL3CosEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about ranges of  MAC addresses
+        that are used in the mac based priority with
+        the ForeL3Cos feature"
+    INDEX   { rlMacBasePrioForceL3CosAddress,rlMacBasePrioForceL3CosMask }
+    ::= { rlMacBasePrioForceL3CosTable 1 }
+
+RlMacBasePrioForceL3CosEntry ::=
+    SEQUENCE {
+        rlMacBasePrioForceL3CosAddress
+            MacAddress,
+        rlMacBasePrioForceL3CosMask
+            MacAddress,
+        rlMacBasePrioForceL3CosRowStatus
+            RowStatus
+    }
+
+rlMacBasePrioForceL3CosAddress OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The range of address of this entry.
+        The range may not hold MAC multicast addresses. "
+    ::= { rlMacBasePrioForceL3CosEntry 1 }
+
+rlMacBasePrioForceL3CosMask OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicate the mask to be logical-ANDed with the
+        learned  address  before  being compared to
+        the value  in  the  rlMacBasePrioForceL3CosAddress  field."
+    ::= { rlMacBasePrioForceL3CosEntry 2 }
+
+rlMacBasePrioForceL3CosRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { rlMacBasePrioForceL3CosEntry 3 }
+
+rlMacBasePrioForceL3CosParamsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlMacBasePrioForceL3CosParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The table holds the global parameters of
+        the L3 cos :TC, UP,DSCP."
+    ::= { rlMacBasePrio 5 }
+
+rlMacBasePrioForceL3CosParamsEntry OBJECT-TYPE
+    SYNTAX  RlMacBasePrioForceL3CosParamsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        ""
+    INDEX   { rlMacBasePrioForceL3CosParamsEntryIndex }
+    ::= { rlMacBasePrioForceL3CosParamsTable 1 }
+
+RlMacBasePrioForceL3CosParamsEntry ::=
+    SEQUENCE {
+        rlMacBasePrioForceL3CosParamsEntryIndex
+            INTEGER,
+        rlMacBasePrioForceL3CosParamsEntryTC
+            INTEGER,
+        rlMacBasePrioForceL3CosParamsEntryUP
+            INTEGER,
+        rlMacBasePrioForceL3CosParamsEntryDSCP
+            INTEGER
+    }
+
+rlMacBasePrioForceL3CosParamsEntryIndex   OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Index of the ForceL3Cos parameters table."
+    ::= { rlMacBasePrioForceL3CosParamsEntry 1 }
+
+rlMacBasePrioForceL3CosParamsEntryTC   OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The value of the globla TC"
+    ::= { rlMacBasePrioForceL3CosParamsEntry 2 }
+
+rlMacBasePrioForceL3CosParamsEntryUP   OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The value of the globla UP"
+    ::= { rlMacBasePrioForceL3CosParamsEntry 3 }
+
+rlMacBasePrioForceL3CosParamsEntryDSCP   OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The value of the globla DSCP"
+    ::= { rlMacBasePrioForceL3CosParamsEntry 4 }
+
+rlMacBasePrioSADATCEnable   OBJECT-TYPE
+    SYNTAX INTEGER {
+        enable(1),
+        disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This variable controlls the activation of SA/DA priority feature in Mac base
+        priority"
+    ::= { rlMacBasePrio 6 }
+
+rlMacBasePrioSADATCTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlMacBasePrioSADATCEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table that contains information about ranges
+        of addresses that are used in the mac based ptiority
+        with the ForceL3Cos feature."
+    ::= { rlMacBasePrio 7 }
+
+rlMacBasePrioSADATCEntry OBJECT-TYPE
+    SYNTAX  RlMacBasePrioSADATCEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Information about ranges of  MAC addresses
+        that are used in the mac based priority with
+        the ForeL3Cos feature"
+    INDEX   { rlMacBasePrioSADATCAddress,rlMacBasePrioSADATCMask }
+    ::= { rlMacBasePrioSADATCTable 1 }
+
+RlMacBasePrioSADATCEntry ::=
+    SEQUENCE {
+        rlMacBasePrioSADATCAddress
+            MacAddress,
+        rlMacBasePrioSADATCMask
+            MacAddress,
+        rlMacBasePrioSADATCPrio
+            INTEGER,
+        rlMacBasePrioSADATCRowStatus
+            RowStatus
+    }
+
+rlMacBasePrioSADATCAddress OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The range of address of this entry.
+        The range may not hold MAC multicast addresses. "
+    ::= { rlMacBasePrioSADATCEntry 1 }
+
+rlMacBasePrioSADATCMask OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Indicate the mask to be logical-ANDed with the
+        learned  address  before  being compared to
+        the value  in  the  rlMacBasePrioSADATCAddress  field."
+    ::= { rlMacBasePrioSADATCEntry 2 }
+
+    rlMacBasePrioSADATCPrio OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The priority that will assign to all MAC
+        addresses that are match the range of this entry."
+    ::= { rlMacBasePrioSADATCEntry 3 }
+
+rlMacBasePrioSADATCRowStatus OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { rlMacBasePrioSADATCEntry 4 }
+
+END

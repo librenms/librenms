@@ -1,0 +1,925 @@
+--  *****************************************************************
+--  DLINKSW-DDM-MIB.mib : Digital Diagnostics Monitoring (DDM) MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-DDM-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        DisplayString,TruthValue,RowStatus
+            FROM SNMPv2-TC
+        MODULE-IDENTITY,OBJECT-TYPE,Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,OBJECT-GROUP
+	    FROM SNMPv2-CONF
+        SnmpAdminString					
+            FROM SNMP-FRAMEWORK-MIB
+        ifIndex, InterfaceIndex
+            FROM IF-MIB    
+        dlink-mgmt, dlink-DGS-1250SeriesProj, dlink-dgs-1250-Common
+            FROM DLINK-ID-REC-MIB;
+   
+    dlinkSwDdmMIB	MODULE-IDENTITY
+	LAST-UPDATED "201811010000Z"
+	ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for DDM."
+            
+        REVISION "201302040000Z"
+        DESCRIPTION
+	    "The structure of DDM for the proprietary enterprise."
+	    
+        REVISION "201309050000Z"
+        DESCRIPTION
+            "Modified the object dDdmAlarmTrap and dDdmWarningTrap to
+            support to send traps when transceiver monitoring recovers from an
+            abnormal warning/alarm situation to normal status."
+            
+        REVISION "201407310000Z"
+        DESCRIPTION
+            "Add dDdmIfInfoCurrentTxPowerdBm,dDdmIfInfoHighAlarmTxPowerdBm,
+         dDdmIfInfoHighWarnTxPowerdBm,dDdmIfInfoLowWarnTxPowerdBm,
+         dDdmIfInfoLowAlarmTxPowerdBm,dDdmIfInfoCurrentRxPowerdBm,        
+         dDdmIfInfoHighAlarmRxPowerdBm,dDdmIfInfoHighWarnRxPowerdBm,              
+         dDdmIfInfoLowWarnRxPowerdBm and dDdmIfInfoLowAlarmRxPowerdBm 
+         in dDdmIfInfoEntry to support to get the value in units of 
+         dbm of TX/RX power."
+        ::={ dlink-dgs-1250-Common 72 } 
+
+
+    DlinkThresholdState ::= TEXTUAL-CONVENTION
+        STATUS  current
+        DESCRIPTION
+            "Represents the state of a current monitoring value.
+             Valid values are:
+            
+            normal(0): the current value is within normal range.
+
+            higherAlarm(1):  the current value is higher than the high alarm threshold.
+
+            higherWarning(2): the current value is higher than the high warning threshold.       
+
+            lowerWarning(3):  the current value is lower than the low warning threshold.   
+
+            lowerAlarm(4): the current value is lower than the low alarm threshold.       
+            "
+        SYNTAX  INTEGER {
+            normal(0),
+            higherAlarm(1),
+            higherWarning(2),
+            lowerWarning(3),
+            lowerAlarm(4)                      
+        }
+                
+    dDdmMIBNotifications 		OBJECT IDENTIFIER ::= { dlinkSwDdmMIB 0 }
+    dDdmMIBObjects 			    OBJECT IDENTIFIER ::= { dlinkSwDdmMIB 1 }
+    dDdmMIBConformance		    OBJECT IDENTIFIER ::= { dlinkSwDdmMIB 2 }
+
+-- -------------------------------------------------------------------------- 
+    dDdmCtrl			OBJECT IDENTIFIER ::= { dDdmMIBObjects 1 }
+    
+    dDdmNotifyEnable OBJECT-TYPE
+        SYNTAX          BITS {
+            alarm(0),
+            warning(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object indicates whether a specified notification is enabled or not.
+            If a bit corresponding to a notification is set to 1, then 
+            the specified notification can be generated.
+
+            alarm(0)   - sending an alarm level notification. 
+            warning(1) - sending an warning level notification.              
+            "
+        ::= { dDdmCtrl 1 }
+        
+
+-- -------------------------------------------------------------------------- 		
+     dDdmIfCtrl			OBJECT IDENTIFIER ::= { dDdmMIBObjects 2 }
+            
+     dDdmIfCfgTable	OBJECT-TYPE
+	SYNTAX          SEQUENCE OF DDdmIfCfgEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of interface-specific DDM configuration."
+        ::= {dDdmIfCtrl 1}
+      
+    dDdmIfCfgEntry	OBJECT-TYPE
+	SYNTAX	        DDdmIfCfgEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry manages DDM state and action on an interface."
+        INDEX  {  ifIndex }
+      ::= {dDdmIfCfgTable 1}
+      
+    DDdmIfCfgEntry ::=
+        SEQUENCE {
+            dDdmIfCfgEnabled     TruthValue,
+            dDdmShutdownLevel    INTEGER     
+        }  
+             
+    dDdmIfCfgEnabled OBJECT-TYPE
+	SYNTAX          TruthValue 	 	 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of optical transceiver-monitoring
+            function for a SFP port.
+            When a SFP with transceiver-monitoring capability is plugged in a
+            port but the transceiver-monitoring function of the port is
+            disabled, system will not detect the SFP's abnormal status but user
+            still can check the current status via dDdmIfInfoTable."
+        ::= {dDdmIfCfgEntry 1} 
+    
+    dDdmShutdownLevel OBJECT-TYPE
+	SYNTAX  INTEGER {					
+            none(1),
+            alarm(2),
+            warning(3)
+        }
+        MAX-ACCESS      read-write
+        STATUS           current
+        DESCRIPTION
+             "This object indicates the abnormal level which causes a port
+             enter into errDisabled state.
+             A value of 'none' indicates the shutdown action is disabled.
+             "
+        ::= {dDdmIfCfgEntry 2}    
+              
+-- --------------------------------------------------------------------------
+    dDdmThresholdMgmt			OBJECT IDENTIFIER ::= { dDdmMIBObjects 3 }
+    
+    dDdmThresholdCfgTable	OBJECT-TYPE
+	SYNTAX          SEQUENCE OF DDdmThresholdCfgEntry
+	MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of interface-specific threshold configuration for
+            DDM."
+        ::= {dDdmThresholdMgmt 1}
+        
+    dDdmThresholdCfgEntry OBJECT-TYPE
+	SYNTAX          DDdmThresholdCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in this table conists of one threshold configuration on an interface.
+            An entry is created/removed when a configuration is added/deleted.
+            "
+        INDEX  { 
+            ifIndex,
+            dDdmThresholdComponent,
+            dDmThresholdAbnormalLevel
+        }
+        ::= { dDdmThresholdCfgTable 1 }
+
+    DDdmThresholdCfgEntry	::=
+        SEQUENCE {
+            dDdmThresholdComponent          INTEGER,
+            dDmThresholdAbnormalLevel       INTEGER,
+	    dDdmThresholdCfgValue           Integer32,
+	    dDdmThresholdCfgRowStatus       RowStatus
+        }
+    	                 
+    dDdmThresholdComponent	OBJECT-TYPE
+	SYNTAX	INTEGER {
+            temperature(1),
+            voltage(2),
+            biasCurrent(3),
+            txPowerMw(4),
+            txPowerDbm(5),            
+            rxPowerMw(6),
+            rxPowerDbm(7)
+        }  
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the monitoring type.
+            Note:
+            Either txPowerMw(4) or txPowerDbm(5) can be configured on an interface.
+            Either rxPowerMw(6) or rxPowerDbm(7) can be configured on an interface.
+            In the above two cases, the existed entry will be deleted when the 
+            other new entry is created.
+            "
+        ::= {dDdmThresholdCfgEntry 1}  
+            
+    dDmThresholdAbnormalLevel	OBJECT-TYPE
+	SYNTAX	INTEGER {
+            highAlarm(1),
+            highWarning(2),
+            lowWarning(3),
+            lowAlarm(4)       
+        }  
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the threshold type."
+        ::= { dDdmThresholdCfgEntry 2 }      
+        
+   dDdmThresholdCfgValue	OBJECT-TYPE
+	SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the configured threshold. The value is
+            interpreted within the context of dDdmThresholdComponent and
+            dDmThresholdAbnormalLevel in the same row. The unit and valid range
+            are as follows:
+            Threshold Type     Unit                           Valid Range
+            =============      =====================          =================
+            Temperature        milli-degrees Celsius          -128,000 ~ 127,996 
+            voltage            centi-Volt                     0 ~ 655
+            biasCurrent        milli-amperes                  0 ~ 131 
+            txPowerMw          tenths of a microwatt            0 ~ 65,535
+            txPowerDbm         ten-thousandths of DBM         -400,000 ~ 81,647
+            rxPowerMw          tenths of a microwatt            0 ~ 65,535
+            rxPowerDbm         ten-thousandths of DBM         -400,000 ~ 81,647            
+            "
+        ::= { dDdmThresholdCfgEntry 3 }  
+        
+    dDdmThresholdCfgRowStatus 	OBJECT-TYPE
+	SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dDdmThresholdCfgEntry 4 }  
+                         
+-- -------------------------------------------------------------------------- 
+    dDdmInfo  OBJECT IDENTIFIER ::= {  dDdmMIBObjects 4 }
+
+    dDdmIfInfoTable	OBJECT-TYPE
+	SYNTAX	        SEQUENCE OF DDdmIfInfoEntry
+	MAX-ACCESS      not-accessible
+	STATUS          current
+        DESCRIPTION
+            "This table contains a list of information about current operating
+            parameters of interfaces. Only the applicable interfaces (i.e.SFP
+            module with DDM capability is plugged-in. ) will appear in this table.
+            Note: 
+            1. The threshold may be administratively configured or factory
+               preset value defined by vendors. dDdmThresholdCfgTable provides
+               the administrative threshold configuration.
+            2. It doesn't necessarily means the DDM is enabled on the interface
+               when an entry appears in this table. dDdmIfCfgTable provides such
+               information."
+        ::= {dDdmInfo 1}
+        
+    dDdmIfInfoEntry OBJECT-TYPE
+	SYNTAX	        DDdmIfInfoEntry
+	MAX-ACCESS      not-accessible
+	STATUS	        current
+	DESCRIPTION
+	    "An entry appears in this table contains current operating parameters
+	    for transceiver monitoring of a port."       
+	INDEX  { ifIndex  }
+	::= { dDdmIfInfoTable 1}
+	
+    DDdmIfInfoEntry ::=
+	SEQUENCE {		    
+	   dDdmIfInfoCurrentTemperature         Integer32,
+	   dDdmIfInfoTemperatureState           DlinkThresholdState,
+	   dDdmIfInfoHighAlarmTemperature       Integer32,
+	   dDdmIfInfoHighWarnTemperature        Integer32,           
+	   dDdmIfInfoLowWarnTemperature         Integer32,	
+	   dDdmIfInfoLowAlarmTemperature        Integer32,	   
+	   dDdmIfInfoCurrentVoltage             Integer32,
+	   dDdmIfInfoVoltageState               DlinkThresholdState,
+	   dDdmIfInfoHighAlarmVoltage           Integer32,
+	   dDdmIfInfoHighWarnVoltage            Integer32,           
+	   dDdmIfInfoLowWarnVoltage             Integer32,
+	   dDdmIfInfoLowAlarmVoltage            Integer32,		   
+	   dDdmIfInfoCurrentBiasCurrent         Integer32,
+	   dDdmIfInfoBiasCurrentState           DlinkThresholdState,
+	   dDdmIfInfoHighAlarmBiasCurrent       Integer32,
+	   dDdmIfInfoHighWarnBiasCurrent        Integer32,
+	   dDdmIfInfoLowWarnBiasCurrent         Integer32,   
+           dDdmIfInfoLowAlarmBiasCurrent        Integer32,		  
+	   dDdmIfInfoCurrentTxPower             Integer32,
+	   dDdmIfInfoTxPowerState               DlinkThresholdState,
+	   dDdmIfInfoHighAlarmTxPower           Integer32,
+	   dDdmIfInfoHighWarnTxPower            Integer32,
+	   dDdmIfInfoLowWarnTxPower             Integer32,
+           dDdmIfInfoLowAlarmTxPower            Integer32,           
+	   dDdmIfInfoCurrentRxPower             Integer32,
+	   dDdmIfInfoRxPowerState               DlinkThresholdState,		   
+	   dDdmIfInfoHighAlarmRxPower           Integer32,
+	   dDdmIfInfoHighWarnRxPower            Integer32,           
+	   dDdmIfInfoLowWarnRxPower             Integer32,
+	   dDdmIfInfoLowAlarmRxPower            Integer32,		   
+	   dDdmIfInfoCurrentTxPowerdBm          Integer32,
+	   dDdmIfInfoHighAlarmTxPowerdBm        Integer32,
+	   dDdmIfInfoHighWarnTxPowerdBm         Integer32,
+	   dDdmIfInfoLowWarnTxPowerdBm          Integer32,
+               dDdmIfInfoLowAlarmTxPowerdBm         Integer32,           
+	   dDdmIfInfoCurrentRxPowerdBm          Integer32,
+	   dDdmIfInfoHighAlarmRxPowerdBm        Integer32,
+	   dDdmIfInfoHighWarnRxPowerdBm         Integer32,           
+	   dDdmIfInfoLowWarnRxPowerdBm          Integer32,
+	   dDdmIfInfoLowAlarmRxPowerdBm         Integer32
+        }
+ 
+    dDdmIfInfoCurrentTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-degrees Celsius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current temperature in unit of 
+            'milli-degrees Celsius' on the interface."
+        ::= { dDdmIfInfoEntry 1 }
+        
+    dDdmIfInfoTemperatureState OBJECT-TYPE
+        SYNTAX          DlinkThresholdState   
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of current temperature."
+        ::= { dDdmIfInfoEntry 2 }
+    
+    dDdmIfInfoHighAlarmTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-degrees Celsius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high alarm threshold, when the operating
+            temperature rises above this value, it indicates an alarm status.           
+            The value is in unit of 'milli-degrees Celsius'."
+        ::= { dDdmIfInfoEntry 3 }     
+      
+      
+    dDdmIfInfoHighWarnTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-degrees Celsius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high warning threshold, when the operating
+            temperature rises above this value, it indicates a warning status.
+            The value is in unit of 'milli-degrees Celsius'."
+        ::= { dDdmIfInfoEntry 4 }       
+    
+    dDdmIfInfoLowWarnTemperature OBJECT-TYPE       
+        SYNTAX          Integer32
+        UNITS           "milli-degrees Celsius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low warning threshold, when the operating
+            temperature falls below this value, it indicates a warning status.
+            The value is in unit of 'milli-degrees Celsius'."
+        ::= { dDdmIfInfoEntry 5 }     
+      
+    dDdmIfInfoLowAlarmTemperature OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-degrees Celsius"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low alarm threshold, when the operating
+            temperature falls below this value, it indicates an alarm status.
+            The value is in unit of 'milli-degrees Celsius'."
+        ::= { dDdmIfInfoEntry 6 }            
+   
+    dDdmIfInfoCurrentVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "centi-Volt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current voltage in unit of 
+            'centi-Volt' on the interface."
+        ::= { dDdmIfInfoEntry 7 }
+        
+    dDdmIfInfoVoltageState OBJECT-TYPE
+        SYNTAX          DlinkThresholdState             
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of current voltage."
+        ::= { dDdmIfInfoEntry 8 }
+    
+    dDdmIfInfoHighAlarmVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "centi-Volt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high alarm threshold, when the operating
+            voltage rises above this value, it indicates an alarm status.
+            The value is in unit of 'centi-Volt'."
+        ::= { dDdmIfInfoEntry 9 }     
+      
+    dDdmIfInfoHighWarnVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "centi-Volt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high warning threshold, when the operating
+            voltage rises above this value, it indicates a warning status.
+            The value is in unit of 'centi-Volt'."
+        ::= { dDdmIfInfoEntry 10 }       
+    
+    dDdmIfInfoLowWarnVoltage OBJECT-TYPE       
+        SYNTAX          Integer32
+        UNITS           "centi-Volt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low warning threshold, when the operating
+            voltage falls below this value, it indicates a warning status.
+            The value is in unit of 'centi-Volt'."
+        ::= { dDdmIfInfoEntry 11 }     
+      
+    dDdmIfInfoLowAlarmVoltage OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "centi-Volt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low alarm threshold, when the operating
+            voltage falls below this value, it indicates an alarm status.
+            The value is in unit of 'centi-Volt'."
+        ::= { dDdmIfInfoEntry 12 }             
+   
+   dDdmIfInfoCurrentBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-amperes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current bias current in unit of 
+            'milli-amperes' on the interface."
+        ::= { dDdmIfInfoEntry 13 }
+        
+    dDdmIfInfoBiasCurrentState OBJECT-TYPE
+        SYNTAX          DlinkThresholdState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of current BiasCurrent."
+        ::= { dDdmIfInfoEntry 14 }
+    
+    dDdmIfInfoHighAlarmBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-amperes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high alarm threshold, when the operating
+            bias current rises above this value, it indicates an alarm status.
+            The value is in unit of 'milli-amperes'."
+        ::= { dDdmIfInfoEntry 15 }     
+      
+    dDdmIfInfoHighWarnBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-amperes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high warning threshold, when the operating
+            bias current rises above this value, it indicates a warning status.
+            The value is in unit of 'milli-amperes'."
+        ::= { dDdmIfInfoEntry 16 }       
+    
+    dDdmIfInfoLowWarnBiasCurrent OBJECT-TYPE       
+        SYNTAX          Integer32
+        UNITS           "milli-amperes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low warning threshold, when the operating
+            bias current falls below this value, it indicates a warning status.
+            The value is in unit of 'milli-amperes'."
+        ::= { dDdmIfInfoEntry 17 }     
+      
+    dDdmIfInfoLowAlarmBiasCurrent OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "milli-amperes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low alarm threshold, when the operating
+            bias current falls below this value, it indicates an alarm status.
+            The value is in unit of 'milli-amperes'."
+        ::= { dDdmIfInfoEntry 18 }            
+
+    dDdmIfInfoCurrentTxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current output power in unit of 
+            'tenths of a microwatt' on the interface."
+        ::= { dDdmIfInfoEntry 19 }
+        
+    dDdmIfInfoTxPowerState OBJECT-TYPE
+        SYNTAX          DlinkThresholdState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of current output power."
+        ::= { dDdmIfInfoEntry 20 }
+    
+    dDdmIfInfoHighAlarmTxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high alarm threshold, when the operating
+            output power rises above this value, it indicates an alarm status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 21 }     
+      
+    dDdmIfInfoHighWarnTxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high warning threshold, when the operating
+            output power rises above this value, it indicates a warning status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 22 }       
+    
+    dDdmIfInfoLowWarnTxPower OBJECT-TYPE       
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low warning threshold, when the operating
+            output power falls below this value, it indicates a warning status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 23 }     
+      
+    dDdmIfInfoLowAlarmTxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low alarm threshold, when the operating
+            output power falls below this value, it indicates an alarm status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 24 }  
+        
+    dDdmIfInfoCurrentRxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current input power in unit of 
+            'tenths of a microwatt' on the interface."
+        ::= { dDdmIfInfoEntry 25 }
+        
+    dDdmIfInfoRxPowerState OBJECT-TYPE
+        SYNTAX          DlinkThresholdState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of current input power."
+        ::= { dDdmIfInfoEntry 26 }
+    
+    dDdmIfInfoHighAlarmRxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high alarm threshold, when the operating
+            input power rises above this value, it indicates an alarm status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 27 }     
+      
+    dDdmIfInfoHighWarnRxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high warning threshold, when the operating
+            input power rises above this value, it indicates a warning status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 28 }       
+    
+    dDdmIfInfoLowWarnRxPower OBJECT-TYPE       
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low warning threshold, when the operating
+            input power falls below this value, it indicates a warning status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 29 }     
+      
+    dDdmIfInfoLowAlarmRxPower OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "tenths of a microwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low alarm threshold, when the operating
+            input power falls below this value, it indicates an alarm status.
+            The value is in unit of 'tenths of a microwatt'."
+        ::= { dDdmIfInfoEntry 30 }  
+
+    dDdmIfInfoCurrentTxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current output power in unit of 
+            'decibel relative to one milliwatt' on the interface.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 31 }
+    
+    dDdmIfInfoHighAlarmTxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high alarm threshold, when the operating
+            output power rises above this value, it indicates an alarm status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 32 }     
+      
+    dDdmIfInfoHighWarnTxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high warning threshold, when the operating
+            output power rises above this value, it indicates a warning status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 33 }       
+    
+    dDdmIfInfoLowWarnTxPowerdBm OBJECT-TYPE       
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low warning threshold, when the operating
+            output power falls below this value, it indicates a warning status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 34 }     
+      
+    dDdmIfInfoLowAlarmTxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low alarm threshold, when the operating
+            output power falls below this value, it indicates an alarm status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 35 }  
+        
+    dDdmIfInfoCurrentRxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current input power in unit of 
+            'decibel relative to one milliwatt' on the interface.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 36 }
+    
+    dDdmIfInfoHighAlarmRxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high alarm threshold, when the operating
+            input power rises above this value, it indicates an alarm status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 37 }     
+      
+    dDdmIfInfoHighWarnRxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the high warning threshold, when the operating
+            input power rises above this value, it indicates a warning status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 38 }       
+    
+    dDdmIfInfoLowWarnRxPowerdBm OBJECT-TYPE       
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low warning threshold, when the operating
+            input power falls below this value, it indicates a warning status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 39 }     
+      
+    dDdmIfInfoLowAlarmRxPowerdBm OBJECT-TYPE
+        SYNTAX          Integer32
+        UNITS           "decibel relative to one milliwatt"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the low alarm threshold, when the operating
+            input power falls below this value, it indicates an alarm status.
+            The value is in unit of 'decibel relative to one milliwatt'.
+            when the value is 0x80000000 means that the value is 0 in
+            unit of 'tenths of a microwatt'"
+        ::= { dDdmIfInfoEntry 40 }  
+                
+-- --------------------------------------------------------------------------
+   dDdmNotifyInfo  OBJECT IDENTIFIER ::= {  dDdmMIBObjects 5 }
+
+   dDdmNotifyInfoIfIndex OBJECT-TYPE
+	SYNTAX 	        InterfaceIndex
+	MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+              "This object is used by dDdmAlarmTrap and dDdmWarningTrap to indicate 
+              the ifIndex on which the monitoring value rises above or falls below
+              the corresponding threshold."
+              ::= { dDdmNotifyInfo 1 }
+  
+    dDdmNotifyInfoComponent OBJECT-TYPE
+	SYNTAX 	INTEGER{
+	    temperature(1),
+            voltage(2),
+            biasCurrent(3),
+            txPowerMw(4),                        
+            rxPowerMw(5)           
+        }
+	MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+              "This object is used by dDdmAlarmTrap and dDdmWarningTrap to indicate  
+              the abnormal component."
+        ::= { dDdmNotifyInfo 2 }
+         
+    dDdmNotifyInfoAbnormalLevel OBJECT-TYPE
+	SYNTAX 	INTEGER{
+	    high(1),
+	    low(2)
+	}
+	MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "This object is used by dDdmAlarmTrap and dDdmWarningTrap to indicate  
+            the abnormal level."
+        ::= { dDdmNotifyInfo 3 }
+        
+    dDdmNotifyInfoThresholdExceedOrRecover OBJECT-TYPE
+	SYNTAX 	INTEGER{
+		    exceed(1),
+		    recover(2)
+	    }
+	MAX-ACCESS  accessible-for-notify
+    STATUS  current
+    DESCRIPTION
+        "This object is used by dDdmAlarmTrap and dDdmWarningTrap to indicate the
+        GBIC is exceeding its threshold or recover to
+        normal status."
+        ::= {dDdmNotifyInfo 4}
+             
+ 
+-- --------------------------------------------------------------------------
+
+    dDdmAlarmTrap NOTIFICATION-TYPE
+        OBJECTS  {
+            dDdmNotifyInfoIfIndex,
+            dDdmNotifyInfoComponent,
+            dDdmNotifyInfoAbnormalLevel,
+            dDdmNotifyInfoThresholdExceedOrRecover    					
+        }        
+        STATUS          current
+        DESCRIPTION
+            "The trap is sent when dDdmNotifyEnable is 'true' and an abnormal 
+            alarm situation occurs or recovers from an abnormal alarm situation
+            to normal status."
+      ::= { dDdmMIBNotifications 1 }
+      
+    dDdmWarningTrap NOTIFICATION-TYPE
+        OBJECTS         {
+	    dDdmNotifyInfoIfIndex,
+	    dDdmNotifyInfoComponent, 
+	    dDdmNotifyInfoAbnormalLevel,
+            dDdmNotifyInfoThresholdExceedOrRecover   						  					
+       }        
+       STATUS              current
+       DESCRIPTION
+            "The trap is sent when dDdmNotifyEnable is 'true' and an abnormal 
+            warning situation occurs or recovers from an abnormal warning
+            situation to normal status."
+      ::= { dDdmMIBNotifications 2 }
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+    dDdmCompliances OBJECT IDENTIFIER ::= { dDdmMIBConformance 1 }
+	
+    dDdmCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION 
+	    "The compliance statement for entities which implement the 
+	    DLINKSW-DDM-MIB."
+	MODULE -- this module
+	MANDATORY-GROUPS { 
+	    dDdmInfoGroup,
+	    dDdmCfgGroup,
+	    dDdmNotifyGroup        		   
+	}						
+	::= { dDdmCompliances 1 }
+	
+    dDdmGroups OBJECT IDENTIFIER ::= { dDdmMIBConformance 2 }
+    
+    dDdmInfoGroup OBJECT-GROUP
+	OBJECTS { 
+             dDdmIfInfoCurrentTemperature, dDdmIfInfoTemperatureState,
+             dDdmIfInfoHighAlarmTemperature, dDdmIfInfoHighWarnTemperature,              
+             dDdmIfInfoLowWarnTemperature, dDdmIfInfoLowAlarmTemperature,              
+             dDdmIfInfoCurrentVoltage, dDdmIfInfoVoltageState,        
+             dDdmIfInfoHighAlarmVoltage, dDdmIfInfoHighWarnVoltage,                  
+             dDdmIfInfoLowWarnVoltage, dDdmIfInfoLowAlarmVoltage,     
+             dDdmIfInfoCurrentBiasCurrent, dDdmIfInfoBiasCurrentState,    
+             dDdmIfInfoHighAlarmBiasCurrent, dDdmIfInfoHighWarnBiasCurrent, 
+             dDdmIfInfoLowWarnBiasCurrent, dDdmIfInfoLowAlarmBiasCurrent, 
+             dDdmIfInfoCurrentTxPower, dDdmIfInfoTxPowerState,
+             dDdmIfInfoHighAlarmTxPower, dDdmIfInfoHighWarnTxPower,
+             dDdmIfInfoLowWarnTxPower, dDdmIfInfoLowAlarmTxPower,
+             dDdmIfInfoCurrentRxPower, dDdmIfInfoRxPowerState,
+             dDdmIfInfoHighAlarmRxPower, dDdmIfInfoHighWarnRxPower,
+             dDdmIfInfoLowWarnRxPower, dDdmIfInfoLowAlarmRxPower,
+             dDdmNotifyInfoIfIndex, dDdmNotifyInfoComponent,
+             dDdmNotifyInfoAbnormalLevel,
+             dDdmNotifyInfoThresholdExceedOrRecover    						
+	}
+	STATUS current
+	DESCRIPTION 
+	    "A collection of objects provides DDM operating information."
+	::= { dDdmGroups 1 }
+        
+    dDdmCfgGroup OBJECT-GROUP
+	OBJECTS { 
+	    dDdmNotifyEnable,
+	    dDdmIfCfgEnabled, dDdmShutdownLevel,
+	    dDdmThresholdCfgValue,	dDdmThresholdCfgRowStatus 
+	    
+	}
+	STATUS current
+	DESCRIPTION 
+	    "A collection of objects provides DDM configuration."
+	::= { dDdmGroups 2 }    
+    
+    dDdmNotifyGroup NOTIFICATION-GROUP
+	NOTIFICATIONS { 
+	    dDdmAlarmTrap,
+	    dDdmWarningTrap
+	}
+	STATUS current
+	DESCRIPTION 
+	    "The collection of notifications used for DDM."
+	::= { dDdmGroups 3 }      
+      
+END

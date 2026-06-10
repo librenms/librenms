@@ -1,0 +1,378 @@
+ZTE-AN-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises    FROM SNMPv2-SMI
+    TimeStamp                                        FROM SNMPv2-TC;
+  
+  
+  
+  zxAccessNode MODULE-IDENTITY
+      LAST-UPDATED    "201610190000Z"
+      ORGANIZATION    "ZTE Corporation"
+      CONTACT-INFO    "Chen AiMin
+                       Mail: chen.aimin@zte.com.cn
+                       Tel : 021-68897128"
+      DESCRIPTION     "The mib architecture for management of ZTE access nodes.
+                       The OID of zxAccessNode is assigned by huang.yanyan,
+                       tech. depart of ZTE China."
+      REVISION        "201610190000Z"
+      DESCRIPTION
+          "Add the subtree oid definition of zxAnVideo."
+      REVISION        "201504010000Z"
+      DESCRIPTION
+          "Add the subtree oid definition of zxAnCes."   
+      REVISION        "201107040000Z"
+      DESCRIPTION
+          "Add the subtree oid definition of zxAnAgentCapability.
+           There two subnodes of zxAnAgentCapability:
+              - zxAnStandardMibAgentCapability
+                The subnodes of this node provide the standard mibs agent
+                capability.
+              - zxAnPrivateMibAgentCapability
+                The subnodes of this node provide the private mibs agent
+                capability.
+                The structure of subnodes is same with the subnodes 
+                of zxAnAccessNode.
+           "
+      REVISION        "201105160000Z"
+      DESCRIPTION
+          "Initial version of this MIB module."
+      ::= { zte 1082 }
+
+  zte           OBJECT IDENTIFIER ::= { enterprises 3902 }
+  zxAnWireless  OBJECT IDENTIFIER ::= { zxAccessNode 510 }
+  
+  
+  zxAnEquipment OBJECT-IDENTITY
+      STATUS      current
+      DESCRIPTION
+          "The main subtree for equipment management,
+           following functionalities included.
+            -- Chassis management
+            -- Enviromental monitoring
+            -- Watchdog management
+            -- Environment device software management
+            "
+      ::= { zxAccessNode 10 }
+  
+
+  zxAnSystem OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+          "The main subtree for system management,
+           following functionalities included.
+            -- NE(such as OLT) system management
+            -- SNMP user, erroring management
+            -- CLI user management
+            -- LCT management
+            -- SSH management
+            -- System RTC(Real-time Clock) management
+            -- System NTP management
+            -- Alarm and event management
+            -- SYSLOG management
+            -- NE(such as OLT) software version management
+            -- Hardware detection management
+            -- System broadband management        
+            -- Remote Unit(such as ONU) software version management
+            -- Remote Unit(such as ONU) channel management
+            -- Remote Unit(such as ONU) file management
+            -- Remote Unit(such as CPE) access control management
+            -- Data backup management
+            -- File management, File server management
+            -- Configuration synchronization management
+            -- Flash and Configuration data management
+            -- AAA, Radius, Tacacs+ management
+            -- Performance management
+            -- Log management
+            -- DNS management
+           "
+      ::= { zxAccessNode 20 }
+  
+
+    zxAnInterface OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+           "The main subtree for interface management,
+            following functionalities included.
+             -- Physical interface
+             -- Ethernet-like interface
+             -- Bridge interface
+             -- VLAN interface
+             -- Optical module
+             -- Optical module performance
+             -- Interface loopback
+            "
+        ::= { zxAccessNode 30 }
+
+
+    zxAnBridge OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+           "The main subtree for bridge management, it is an extending of
+            IEEE 802.XXX mib,
+            following functionalities included.
+             -- MAC forwarding
+             -- MSTP
+             -- PAE
+             -- Interface protection, e.g. LACP, UAPS etc. .
+             -- Ring protection, e.g. ZESR, ERPS
+             -- VLAN, VLAN statistic
+             -- LLDP
+            "
+        ::= { zxAccessNode 40 }
+
+
+    zxAnQos OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for QoS management,
+            following functionalities included.
+             -- QoS management
+             -- ACL-based QoS management
+            "
+        ::= { zxAccessNode 50 }
+
+
+    zxAnMulticast OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for multicast management.,
+            following functionalities included.
+             -- IGMP management
+             -- MLD management
+             -- Multicast test 
+             -- Multicast statistics 
+             -- Multicast base management
+             -- IPTV management
+            "
+        ::= { zxAccessNode 60 }
+
+        
+    zxAnServiceSecurity OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for multicast management,
+            following functionalities included.
+             -- Protocol-based rate limiting for packets from user-side
+             -- CPU defend management
+             -- Anti-attack management
+             -- ACL management
+             -- MAC anti-spoofing management
+             -- User isolation in layer 2 switch  
+             -- Layer 3 security management
+             -- DHCP snooping and IP source guard
+             -- DHCP test
+             -- DHCP filtering
+             -- ARP
+             -- Port identification, such as DHCP option82, PPPoE intermediate 
+                agent, VMAC etc.
+             -- DHCP layer 2 relay agent
+             -- NDP line identification option(NDP-LIO) management
+             -- ND snooping management
+             -- NS management
+             -- 802.1X PAE management
+             -- Access service profile
+             -- PPPoE test
+             -- PPPoE filter
+            "
+        ::= { zxAccessNode 70 }
+
+
+    zxAnOam OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for protocol adaption management,
+            following functionalities included.
+            -- LSP Ping test
+            -- LSP Trace route
+            -- BFD
+            -- SPAN            
+            -- ATM ping test            
+            -- Loopback detect
+            -- CFM2
+            -- CFM
+            -- EFM
+            -- EFM performance
+            -- Network interconnection test
+            "
+        ::= { zxAccessNode 80 }
+
+
+    zxAnLayer3 OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for layer 3 management,
+            following functionalities included.
+            -- Layer3 interface
+            -- Layer3 interface ND(neighbor discovery)
+            -- IP static route
+            -- IP Fast Reroute Framework
+            -- OSPF
+            -- IS-IS
+            -- BGP
+            -- RIP
+            -- DHCP L3
+            -- DHCP Relay
+            -- L3 ARP
+            -- L3 Forward
+            "
+        ::= { zxAccessNode 90 }
+
+
+    zxAnVoice OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for voice service management,
+            following functionalities included.
+            -- VoIP
+            -- V5 interface
+            -- DDN
+            "
+        ::= { zxAccessNode 100 }
+
+
+    zxAnServiceProvision OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for service provisioning management,
+            following functionalities included.
+            -- Service port management
+            -- Service profile management
+            -- Service bulk pre-defination,pre-confuration,provisioning
+            
+            "
+        ::= { zxAccessNode 110 }
+
+
+    zxAnClockSync OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for service clock and timing synchronization 
+            management, following functionalities included.
+             -- Clock management
+             -- IEEE1588 management
+            "
+        ::= { zxAccessNode 120 }
+    
+    zxAnDsl OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for DSL management, following functionalities 
+             included.
+             -- xDSL management
+             -- ADSL management             
+             -- SHDSL management
+            "
+        ::= { zxAccessNode 130 }
+
+    zxAnCes OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for CES management, following functionalities 
+             included.
+             -- CES management             
+            "
+        ::= { zxAccessNode 140 }
+
+    zxAnVideo OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for video management, following functionalities 
+             included.
+             -- MDI monitor
+            "
+        ::= { zxAccessNode 150 }
+    
+    zxAnPon OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for PON management, following functionalities 
+             included.
+             -- PON basic configuration
+             -- PON service management             
+             -- PON remote ONU service management
+             -- PON performance management
+             -- PON protection management
+             -- GPON service management
+             -- GPON ONU service management
+             -- GPON remote ONU performance management
+             -- EPON service management
+             -- EPON remote service management
+            "
+        ::= { zxAccessNode 500 }
+        
+    zxAnMpls OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for MPLS management, following functionalities 
+             included.
+             -- multiprotocol label switching and label distribution
+                protocol management
+             -- L2VPN PW management             
+             -- CIP and class map management
+             -- Route table management
+             -- MPLS global configuration
+            "
+        ::= { zxAccessNode 505 }
+        
+    zxAnVrg OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for VRG management, following functionalities 
+             included.
+             -- VRG card management
+            "
+        ::= { zxAccessNode 515 }   
+
+    zxAnVnd OBJECT-IDENTITY 
+        STATUS        current
+        DESCRIPTION 
+            "The main subtree for VND management, following functionalities 
+             included.
+             -- Resource Profile management
+             -- Virtual ethernet port management
+            "
+        ::= { zxAccessNode 530 }          
+
+    zxAnAgentCapability OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "The main subtree for AGENT-CAPABILITIES."
+        ::= { zxAccessNode 1000 }
+
+
+    zxAnProducts OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "SysOids of zte Access Node products."
+        ::= { zxAccessNode 1001 }
+
+
+        
+    zxAnStandardMibAgentCapability  OBJECT IDENTIFIER ::= { zxAnAgentCapability 10 }
+    zxAnPrivateMibAgentCapability   OBJECT IDENTIFIER ::= { zxAnAgentCapability 20 }
+    
+    zxAnEquipmentCapability         OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 10 }
+    zxAnSystemCapability            OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 20 }
+    zxAnInterfaceCapability         OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 30 }
+    zxAnBridgeCapability            OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 40 }
+    zxAnQosAgentCapability          OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 50 }
+    zxAnMulticastCapability         OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 60 }
+    zxAnServiceSecurityCapability   OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 70 }
+    zxAnOamCapability               OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 80 }
+    zxAnLayer3Capability            OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 90 }
+    zxAnVoiceCapability             OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 100 }
+    zxAnServiceProvisionCapability  OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 110 }
+    zxAnClockSyncCapability         OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 120 }
+    zxAnPonCapability               OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 500 }
+    zxAnMplsCapability              OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 505 }
+    zxAnWirelessCapability          OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 510 }
+    zxAnVrgCapability               OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 515 }
+    znAnVndCapability               OBJECT IDENTIFIER ::= { zxAnPrivateMibAgentCapability 530 }
+    
+    ipCapability                    OBJECT IDENTIFIER ::= { zxAnStandardMibAgentCapability 10 }
+    
+END
+
+
+

@@ -1,0 +1,2976 @@
+TRIPPLITE-12X DEFINITIONS ::= BEGIN
+
+IMPORTS
+  TRAP-TYPE
+     FROM RFC-1215
+  DisplayString,
+  TruthValue,
+  TimeStamp,
+  TimeInterval,
+  DateAndTime,
+  AutonomousType,
+  VariablePointer,
+  RowStatus
+    FROM SNMPv2-TC
+  OBJECT-GROUP,
+  NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+  MODULE-IDENTITY,
+  OBJECT-IDENTITY,
+  OBJECT-TYPE,
+  NOTIFICATION-TYPE,
+  Gauge32,
+  Integer32,
+  IpAddress
+    FROM SNMPv2-SMI
+  PositiveInteger,
+  NonNegativeInteger
+    FROM UPS-MIB
+  tripplite
+    FROM TRIPPLITE;
+
+tlPowerAlert MODULE-IDENTITY
+  LAST-UPDATED "201702281600Z"
+  ORGANIZATION "Tripp Lite"
+  CONTACT-INFO
+    "Software Engineering
+    Tripp Lite
+    1111 W. 35th St.
+    Chicago, IL 60609"
+  DESCRIPTION
+    "This MIB module defines MIB objects which provide mechanisms for
+    remote management capabilities of Tripplite PowerAlert and related
+    software."
+  REVISION "201702281600Z"
+    "Corrected spelling errors"
+  REVISION "201507290000Z"
+  DESCRIPTION
+    "Removed obsolete legacy PowerAlert 11 sections"
+  REVISION "201410170930Z"
+  DESCRIPTION
+    "Added tlUpsAggregatePowerFactor"
+  REVISION "201409181000Z"
+  DESCRIPTION
+    "Added additional tlUpsInputSource... elements"
+  REVISION "201408060830Z"
+  DESCRIPTION
+    "Added additional elements to tlUpsOutputCircuitTable"
+  REVISION "201405080830Z"
+  DESCRIPTION
+    "Added tlUpsInputSourceSelect"
+  REVISION "201404091000Z"
+  DESCRIPTION
+    "Added missing well known alarms"
+  REVISION "201310301300Z"
+  DESCRIPTION
+    "Consolidated and Released for PAL v12.06.006x"
+  
+  ::= { tripplite 90 }
+
+
+--------------------------------------------------------------------------
+-- Enumerations
+--------------------------------------------------------------------------
+
+tlEnumerations OBJECT IDENTIFIER  ::= { tripplite 2 }
+
+tlOperatingSystems OBJECT IDENTIFIER ::= { tlEnumerations 1 }
+
+hpux9 OBJECT IDENTIFIER   ::= { tlOperatingSystems 1 }
+
+sunos4 OBJECT IDENTIFIER  ::= { tlOperatingSystems 2 }
+
+solaris OBJECT IDENTIFIER   ::= { tlOperatingSystems 3 }
+
+osf OBJECT IDENTIFIER   ::= { tlOperatingSystems 4 }
+
+ultrix OBJECT IDENTIFIER  ::= { tlOperatingSystems 5 }
+
+hpux10 OBJECT IDENTIFIER  ::= { tlOperatingSystems 6 }
+
+netbsd1 OBJECT IDENTIFIER   ::= { tlOperatingSystems 7 }
+
+freebsd OBJECT IDENTIFIER   ::= { tlOperatingSystems 8 }
+
+irix OBJECT IDENTIFIER  ::= { tlOperatingSystems 9 }
+
+linux OBJECT IDENTIFIER   ::= { tlOperatingSystems 10 }
+
+bsdi OBJECT IDENTIFIER  ::= { tlOperatingSystems 11 }
+
+openbsd OBJECT IDENTIFIER   ::= { tlOperatingSystems 12 }
+
+win32 OBJECT IDENTIFIER   ::= { tlOperatingSystems 13 }
+
+hpux11 OBJECT IDENTIFIER  ::= { tlOperatingSystems 14 }
+
+win9x OBJECT IDENTIFIER   ::= { tlOperatingSystems 50 }
+
+winnt OBJECT IDENTIFIER   ::= { tlOperatingSystems 51 }
+
+solspark OBJECT IDENTIFIER  ::= { tlOperatingSystems 52 }
+
+solintel OBJECT IDENTIFIER  ::= { tlOperatingSystems 53 }
+
+aix OBJECT IDENTIFIER   ::= { tlOperatingSystems 54 }
+
+sco OBJECT IDENTIFIER   ::= { tlOperatingSystems 55 }
+
+osx OBJECT IDENTIFIER   ::= { tlOperatingSystems 56 }
+
+unknown OBJECT IDENTIFIER   ::= { tlOperatingSystems 255 }
+
+--------------------------------------------------------------------------
+-- Power Alert System Settings
+--------------------------------------------------------------------------
+-- tlPowerAlert OBJECT IDENTIFIER ::= { tripplite 90 }
+
+tlPASystem OBJECT IDENTIFIER ::= { tlPowerAlert 1 }
+
+tlPAContacts OBJECT IDENTIFIER ::= { tlPASystem 1 }
+
+tlPAEmailContacts OBJECT IDENTIFIER   ::= { tlPAContacts 1 }
+
+tlPANumberOfEmailContacts OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The number email contacts currently defined."
+  ::= { tlPAEmailContacts 1 }
+
+tlPAEmailContactsTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlPAEmailContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list email contact entries. The number of entries is
+    given by the value of tlPANumberOfEmailContacts."
+  ::= { tlPAEmailContacts 2 }
+  
+tlPAEmailContactEntry OBJECT-TYPE
+  SYNTAX TlPAEmailContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing email contacts information."
+  INDEX { tlPAEmailContactIndex }
+  ::= { tlPAEmailContactsTable 1 }
+
+TlPAEmailContactEntry ::= SEQUENCE {
+  tlPAEmailContactIndex		PositiveInteger,
+  tlPAEmailContactRowStatus	RowStatus,
+  tlPAEmailContactName			DisplayString,
+  tlPAEmailContactAddress		DisplayString
+   }
+
+tlPAEmailContactIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of the email contact."
+  ::= { tlPAEmailContactEntry 1 }
+
+tlPAEmailContactRowStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The row status for the tlPAEmailContactTable row"
+  ::= { tlPAEmailContactEntry 2 }
+  
+tlPAEmailContactName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The name of the email contact."
+  ::= { tlPAEmailContactEntry 3 }
+
+tlPAEmailContactAddress OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The address of the email contact."
+  ::= { tlPAEmailContactEntry 4 }
+
+tlPASnmpContacts OBJECT IDENTIFIER   ::= { tlPAContacts 2 }
+
+tlPANumberOfSnmpContacts OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The number SNMP contacts currently defined."
+  ::= { tlPASnmpContacts 1 }
+
+tlPASnmpContactsTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlPASnmpContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list SNMP contact entries. The number of entries is
+    given by the value of tlPANumberOfSnmpContacts."
+  ::= { tlPASnmpContacts 2 }
+  
+tlPASnmpContactEntry OBJECT-TYPE
+  SYNTAX TlPASnmpContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing SNMP contacts information."
+  INDEX { tlPASnmpContactIndex }
+  ::= { tlPASnmpContactsTable 1 }
+
+TlPASnmpContactEntry ::= SEQUENCE {
+  tlPASnmpContactIndex			PositiveInteger,
+  tlPASnmpContactRowStatus		RowStatus,
+  tlPASnmpContactName			DisplayString,
+  tlPASnmpContactIpAddress		DisplayString,
+  tlPASnmpContactPort			PositiveInteger,
+  tlPASnmpContactSnmpVersion	INTEGER,
+  tlPASnmpContactSecurityName	DisplayString,
+  tlPASnmpContactPrivPassword	DisplayString,
+  tlPASnmpContactAuthPassword	DisplayString
+   }
+
+tlPASnmpContactIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of this SNMP contact."
+  ::= { tlPASnmpContactEntry 1 }
+
+tlPASnmpContactRowStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The row status for the tlPASnmpContactTable row"
+  ::= { tlPASnmpContactEntry 2 }
+  
+tlPASnmpContactName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The name of the SNMP contact."
+  ::= { tlPASnmpContactEntry 3 }
+
+tlPASnmpContactIpAddress OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The IP address of the SNMP contact."
+  ::= { tlPASnmpContactEntry 4 }
+  
+tlPASnmpContactPort OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The port of the SNMP contact."
+  ::= { tlPASnmpContactEntry 5 }
+  
+tlPASnmpContactSnmpVersion OBJECT-TYPE
+  SYNTAX INTEGER {
+      snmpv1(1),
+      snmpv2c(2),
+      snmpv3(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The SNMP contact version to use for sending traps."
+  ::= { tlPASnmpContactEntry 6 }
+  
+tlPASnmpContactSecurityName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The SNMP contact security name."
+  ::= { tlPASnmpContactEntry 7 }
+    
+tlPASnmpContactPrivPassword OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The SNMP contact priv password to use for sending V3 traps."
+  ::= { tlPASnmpContactEntry 8 }
+  
+tlPASnmpContactAuthPassword OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The SNMP contact auth password to use for sending V3 traps."
+  ::= { tlPASnmpContactEntry 9 }
+
+--------------------------------------------------------------------------
+-- UPS Device
+--------------------------------------------------------------------------
+
+tlUPS OBJECT IDENTIFIER   ::= { tripplite 100 }
+
+tlUpsObjects OBJECT IDENTIFIER  ::= { tlUPS 1 }
+
+tlUpsIdent OBJECT IDENTIFIER  ::= { tlUpsObjects 1 }
+
+tlUpsIdentUpsSoftwareChecksum OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A checksum for the UPS software."
+  ::= { tlUpsIdent 1 }
+
+tlUpsIdentSerialNum OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Serial number for the UPS."
+  ::= { tlUpsIdent 2 }
+
+tlUpsIdentID OBJECT-TYPE
+  SYNTAX Integer32 (0..65535)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A user-supplied ID for the UPS."
+  ::= { tlUpsIdent 3 }
+
+tlUpsSnmpCardSerialNum OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Serial number for the UPS."
+  ::= { tlUpsIdent 4 }
+
+tlUpsSelectedDeviceID OBJECT-TYPE
+  SYNTAX Integer32 (0..65535)
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The device ID selected to be used for retrieving data for this mib. 
+    As the snmp web card has only one device, this is read only for it"
+  ::= { tlUpsIdent 5 }
+
+tlUpsLocation OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The device location string."
+  ::= { tlUpsIdent 6 }
+
+tlUpsBattery OBJECT IDENTIFIER  ::= { tlUpsObjects 2 }
+
+tlUpsBatteryAge OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The age of the battery in years.  This is equal to
+    the current date minus tlConfigBattReplDate."
+  ::= { tlUpsBattery 1 }
+
+
+tlUpsTemperatureF OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The temperature of the battery, in Farenheight degrees.  This is
+    calculated from upsBatteryTemperature, which is in Celsius degrees."
+  ::= { tlUpsBattery 2 }
+
+tlUpsExternalBatteryAge OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The age of external battery in years.  This is equal to
+    the current date minus tlConfigExternalBattReplDate."
+  ::= { tlUpsBattery 3 }
+
+tlUpsInput OBJECT IDENTIFIER  ::= { tlUpsObjects 3 }
+
+tlUpsInputNumVoltages OBJECT-TYPE
+  SYNTAX     NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "The number of input voltages. Phase to phase 
+    or phase to neutral.  This variable indicates the 
+    number of rows in the input table."
+  ::= { tlUpsInput 1 }
+
+tlUpsInputVoltageTable OBJECT-TYPE
+  SYNTAX     SEQUENCE OF TlUpsInputVoltageEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "A list of voltage input table entries.  The number of entries
+    is given by the value of tlUpsInputNumVoltages."
+  ::= { tlUpsInput 2 }
+
+tlUpsInputVoltageEntry OBJECT-TYPE
+  SYNTAX     TlUpsInputVoltageEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "An entry containing information applicable to a
+    particular input voltage."
+  INDEX { tlUpsInputVoltageIndex }
+  ::= { tlUpsInputVoltageTable 1 }
+
+TlUpsInputVoltageEntry ::= SEQUENCE {
+  tlUpsInputVoltageIndex   PositiveInteger,
+  tlUpsInputVoltageType	   NonNegativeInteger,
+  tlUpsInputVoltage        NonNegativeInteger
+}
+
+tlUpsInputVoltageIndex OBJECT-TYPE
+  SYNTAX     PositiveInteger
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "The input voltage identifier."
+  ::= { tlUpsInputVoltageEntry 1 }
+
+tlUpsInputVoltageType OBJECT-TYPE
+  SYNTAX INTEGER {
+      phaseToNeutral(0),
+      phaseToPhase(1) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Whether voltage measured is phase to 
+    phase or phase to neutral."
+  ::= { tlUpsInputVoltageEntry 2 }
+
+tlUpsInputVoltage OBJECT-TYPE
+  SYNTAX     NonNegativeInteger
+  UNITS      "RMS Volts"
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "The magnitude of the present input voltage.
+    A value of 6553 indicates Unknown."
+  ::= { tlUpsInputVoltageEntry 3 }
+
+tlUpsInputSourceSelect OBJECT-TYPE
+  SYNTAX INTEGER {
+      inputSourceA(0),
+      inputSourceB(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The determination as to which of two AC input
+	lines is designated as the primary input source.
+	The other is designated as the secondary input
+	source. This value will always return inputSourceA(0)
+	for devices with a single input source. Setting
+	this value is supported only on selected models."
+  ::= { tlUpsInput 3 }
+
+tlUpsPhaseImbalance OBJECT-TYPE
+  SYNTAX INTEGER
+  UNITS "Percent"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Percentage of imbalance of the 3 phases."
+  ::= { tlUpsInput 4 }
+
+tlUpsInputSourceAvailability OBJECT-TYPE
+  SYNTAX INTEGER {
+    none(0),
+    inputSourceA(1),
+    inputSourceB(2),
+    inputSourceAB(3) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The determination as to which of two AC input lines
+    are available. The agent will return either inputSourceA(1)
+    or inputSourceB(2) if only one line is available, or
+    inputSourceAB(3) if both lines are available. The agent
+    will never return none(0) since the device will be powered
+    off if neither line is available."
+  ::= { tlUpsInput 5 }
+
+tlUpsInputSourceInUse OBJECT-TYPE
+  SYNTAX INTEGER {
+    inputSourceA(0),
+    inputSourceB(1) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The determination as to which one of two AC input lines is
+    in use."
+  ::= { tlUpsInput 6 }
+
+tlUpsInputSourceTransitionCount OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The number of times the device transitions between primary and
+    secondary sources. Most devices are limied to 65533 transitions,
+    after which the value will not increment."
+  ::= { tlUpsInput 7 }
+
+tlUpsOutput OBJECT IDENTIFIER   ::= { tlUpsObjects 4 }
+
+tlUpsOutputPowerTotal OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The power capacity of the device."
+  ::= { tlUpsOutput 5 }
+
+tlUpsOutputCircuits OBJECT-TYPE
+  SYNTAX     NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "The number of output circuits.  This variable 
+    indicates the number of rows in the output circuit table."
+  ::= { tlUpsOutput 6 }
+
+tlUpsOutputCircuitTable OBJECT-TYPE
+  SYNTAX     SEQUENCE OF TlUpsOutputCircuitEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "A list of output currents table entries.  The number of entries
+     is given by the value of tlUpsOutputNumCircuits."
+  ::= { tlUpsOutput 7 }
+
+tlUpsOutputCircuitEntry OBJECT-TYPE
+  SYNTAX     TlUpsOutputCircuitEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "An entry containing information applicable to a
+    particular output circuit."
+  INDEX { tlUpsOutputCircuitIndex }
+  ::= { tlUpsOutputCircuitTable 1 }
+
+TlUpsOutputCircuitEntry ::= SEQUENCE {
+  tlUpsOutputCircuitIndex       PositiveInteger,
+  tlUpsOutputCircuitStatus      INTEGER,
+  tlUpsOutputCircuitLoadCurrent NonNegativeInteger,
+  tlUpsOutputCircuitVoltage     NonNegativeInteger,
+  tlUpsOutputCircuitPower       NonNegativeInteger,
+  tlUpsOutputCircuitPowerFactor NonNegativeInteger
+}
+
+tlUpsOutputCircuitIndex OBJECT-TYPE
+  SYNTAX     PositiveInteger
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "The output circuit identifier."
+  ::= { tlUpsOutputCircuitEntry 1 }
+
+tlUpsOutputCircuitStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+      open(0),
+      closed(1) }
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "Whether the breaker is open or closed."
+  ::= { tlUpsOutputCircuitEntry 2 }
+
+tlUpsOutputCircuitLoadCurrent OBJECT-TYPE
+  SYNTAX     NonNegativeInteger
+  UNITS      "0.1 Amperes"
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "The magnitude of the present output current in
+    tenths of an amp. A value of 65534 indicates Unknown."
+  ::= { tlUpsOutputCircuitEntry 3 }
+
+tlUpsOutputCircuitVoltage OBJECT-TYPE
+  SYNTAX     NonNegativeInteger
+  UNITS      "0.1 Volts"
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "The magnitude of the present circuit voltage in
+    tenths of an volt."
+  ::= { tlUpsOutputCircuitEntry 4 }
+
+tlUpsOutputCircuitPower OBJECT-TYPE
+  SYNTAX     NonNegativeInteger
+  UNITS      "Watts"
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "The magnitude of the present power in watts.
+    tenths of an amp."
+  ::= { tlUpsOutputCircuitEntry 5 }
+
+tlUpsOutputCircuitPowerFactor OBJECT-TYPE
+  SYNTAX     NonNegativeInteger
+  UNITS      "Percent"
+  MAX-ACCESS read-only
+  STATUS     current
+  DESCRIPTION
+    "The power factor of all receptacles in a given circuit as
+    a %."
+  ::= { tlUpsOutputCircuitEntry 6 }
+
+tlUpsAggregatePowerFactor OBJECT-TYPE
+  SYNTAX PositiveInteger
+  UNITS "0.1 Watts"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The aggregrate power factor of all phases."
+  ::= { tlUpsOutput 8 }
+
+-- tlUpsBypass [unused] OBJECT IDENTIFIER   ::= { tlUpsObjects 5 }
+
+tlUpsAlarm OBJECT IDENTIFIER  ::= { tlUpsObjects 6 }
+
+tlUpsAlarmsPresent OBJECT-TYPE
+  SYNTAX Gauge32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The present number of active alarm conditions."
+  ::= { tlUpsAlarm 1 }
+  
+tlUpsAlarmTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsAlarmEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of alarm table entries."
+  ::= { tlUpsAlarm 2 }
+  
+tlUpsAlarmEntry OBJECT-TYPE
+  SYNTAX TlUpsAlarmEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing information applicable to a particular alarm."
+  INDEX { tlUpsAlarmId }
+  ::= { tlUpsAlarmTable 1 }
+    
+TlUpsAlarmEntry ::= SEQUENCE {
+  tlUpsAlarmId         PositiveInteger,
+  tlUpsAlarmDescr      AutonomousType,
+  tlUpsAlarmTime       TimeStamp,
+  tlUpsAlarmDetail     DisplayString,
+  tlUpsAlarmDeviceId   PositiveInteger,
+  tlUpsAlarmDeviceName DisplayString,
+  tlUpsAlarmLocation   DisplayString,
+  tlUpsAlarmGroup      INTEGER,
+  tlUpsAlarmIp         IpAddress,
+  tlUpsAlarmMac        DisplayString
+}
+
+tlUpsAlarmId OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A unique identifier for an alarm condition."
+  ::= { tlUpsAlarmEntry 1 }
+  
+tlUpsAlarmDescr OBJECT-TYPE
+  SYNTAX AutonomousType
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A description of the alarm condition."
+  ::= { tlUpsAlarmEntry 2 }
+  
+tlUpsAlarmTime OBJECT-TYPE
+  SYNTAX TimeStamp
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The value of sysUpTime when the alarm condition was detected."
+  ::= { tlUpsAlarmEntry 3 }
+  
+tlUpsAlarmDetail OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A textual description of the alarm condition."
+  ::= { tlUpsAlarmEntry 4 }
+  
+tlUpsAlarmDeviceId OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A numeric identifier for the device on which the alarm is active."
+  ::= { tlUpsAlarmEntry 5 }
+  
+tlUpsAlarmDeviceName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "A string identifier for the device on which the alarm is active."
+  ::= { tlUpsAlarmEntry 6 }
+  
+tlUpsAlarmLocation OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The location of the device on which the alarm is active."
+  ::= { tlUpsAlarmEntry 7 }
+  
+tlUpsAlarmGroup OBJECT-TYPE
+  SYNTAX INTEGER {
+      critical(1),
+      warning(2),
+      info(3),
+      status(4),
+      offline(5),
+      custom(6) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The category/group of this alarm."
+  ::= { tlUpsAlarmEntry 8 }
+
+tlUpsAlarmIp OBJECT-TYPE
+  SYNTAX IpAddress
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The originating IP address associated with this alarm."
+  ::= { tlUpsAlarmEntry 9 }
+
+tlUpsAlarmMac OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The originating mac address associated with this alarm."
+  ::= { tlUpsAlarmEntry 10 }
+
+tlUpsWellKnownAlarms OBJECT IDENTIFIER  ::= { tlUpsAlarm 3 }
+
+tlUpsAlarmPrimaryPowerOutage OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The primary power source is not present."
+    ::= { tlUpsWellKnownAlarms 1 }
+
+tlUpsAlarmSecondaryPowerOutage OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The secondary power source is not present."
+    ::= { tlUpsWellKnownAlarms 2 }
+    
+tlUpsAlarmLoadLevelAboveThreshold OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The load level is above the designated threshold."
+  ::= { tlUpsWellKnownAlarms 3 }
+
+tlUpsAlarmOutputCurrentChanged OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The output current changed from its last known value."
+  ::= { tlUpsWellKnownAlarms 4 }
+
+tlUpsAlarmBatteryAgeAboveThreshold OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "One or more batteries have been determined to require
+    replacement."
+  ::= { tlUpsWellKnownAlarms 5 }
+
+tlUpsAlarmLoadOff OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The load is off."
+  ::= { tlUpsWellKnownAlarms 6 }
+
+tlUpsAlarmUserDefined OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "A user-defined event is in alarm."
+  ::= { tlUpsWellKnownAlarms 7 }
+
+tlUpsAlarmBatteryBad OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "One or more batteries have been determined to require
+    replacement."
+  ::= { tlUpsWellKnownAlarms  8 }
+
+tlUpsAlarmOnBattery OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The UPS is drawing power from the batteries."
+  ::= { tlUpsWellKnownAlarms  9 }
+
+tlUpsAlarmLowBattery OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The remaining battery run-time is less than or equal
+    to upsConfigLowBattTime."
+  ::= { tlUpsWellKnownAlarms  10 }
+
+tlUpsAlarmDepletedBattery OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The UPS will be unable to sustain the present load
+    when and if the utility power is lost."
+  ::= { tlUpsWellKnownAlarms  11 }
+
+tlUpsAlarmTempBad OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "A temperature is out of tolerance."
+  ::= { tlUpsWellKnownAlarms  12 }
+
+tlUpsAlarmInputBad OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "An input condition is out of tolerance."
+  ::= { tlUpsWellKnownAlarms  13 }
+
+tlUpsAlarmOutputBad OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "An output condition (other than OutputOverload) is
+    out of tolerance."
+  ::= { tlUpsWellKnownAlarms  14 }
+
+tlUpsAlarmOutputOverload OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The output load exceeds the UPS output capacity."
+  ::= { tlUpsWellKnownAlarms  15 }
+
+tlUpsAlarmOnBypass OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The Bypass is presently engaged on the UPS."
+  ::= { tlUpsWellKnownAlarms  16 }
+
+tlUpsAlarmBypassBad OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The Bypass is out of tolerance."
+  ::= { tlUpsWellKnownAlarms 17 }
+
+tlUpsAlarmOutputOffAsRequested OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The UPS has shutdown as requested, i.e., the output
+    is off."
+  ::= { tlUpsWellKnownAlarms 18 }
+
+tlUpsAlarmUpsOffAsRequested OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The entire UPS has shutdown as commanded."
+  ::= { tlUpsWellKnownAlarms 19 }
+
+tlUpsAlarmChargerFailed OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "An uncorrected problem has been detected within the
+    UPS charger subsystem."
+  ::= { tlUpsWellKnownAlarms 20 }
+
+tlUpsAlarmUpsOutputOff OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The output of the UPS is in the off state."
+  ::= { tlUpsWellKnownAlarms 21 }
+
+tlUpsAlarmUpsSystemOff OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The UPS system is in the off state."
+  ::= { tlUpsWellKnownAlarms 22 }
+
+tlUpsAlarmFanFailure OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The failure of one or more fans in the UPS has been
+    detected."
+  ::= { tlUpsWellKnownAlarms 23 }
+
+tlUpsAlarmFuseFailure OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The failure of one or more fuses has been detected."
+  ::= { tlUpsWellKnownAlarms 24 }
+
+tlUpsAlarmGeneralFault OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "A general fault in the UPS has been detected."
+  ::= { tlUpsWellKnownAlarms 25 }
+
+tlUpsAlarmDiagnosticTestFailed OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The result of the last diagnostic test indicates a
+    failure."
+  ::= { tlUpsWellKnownAlarms 26 }
+
+tlUpsAlarmCommunicationsLost OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "A problem has been encountered in the communications
+    between the agent and the UPS."
+  ::= { tlUpsWellKnownAlarms 27 }
+
+tlUpsAlarmAwaitingPower OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The UPS output is off and the UPS is awaiting the
+    return of input power."
+  ::= { tlUpsWellKnownAlarms 28 }
+
+tlUpsAlarmShutdownPending OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "A upsShutdownAfterDelay countdown is underway."
+  ::= { tlUpsWellKnownAlarms 29 }
+
+tlUpsAlarmShutdownImminent OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The UPS will turn off power to the load in less than
+    5 seconds; this may be either a timed shutdown or a
+    low battery shutdown."
+  ::= { tlUpsWellKnownAlarms 30 }
+
+tlUpsAlarmTestInProgress OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "A test is in progress, as initiated and indicated by
+    the Test Group.  Tests initiated via other
+    implementation-specific mechanisms can indicate the
+    presence of the testing in the alarm table, if
+    desired, via a OBJECT-IDENTITY macro in the MIB
+    document specific to that implementation and are
+    outside the scope of this OBJECT-IDENTITY."
+  ::= { tlUpsWellKnownAlarms 31 }
+
+tlUpsAlarmCircuitBreaker1Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #1 is open."
+  ::= { tlUpsWellKnownAlarms 32 }
+
+tlUpsAlarmCircuitBreaker2Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #2 is open."
+  ::= { tlUpsWellKnownAlarms 33 }
+
+tlUpsAlarmCircuitBreaker3Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #3 is open."
+  ::= { tlUpsWellKnownAlarms 34 }
+
+tlUpsAlarmCircuitBreaker4Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #4 is open."
+  ::= { tlUpsWellKnownAlarms 35 }
+
+tlUpsAlarmCircuitBreaker5Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #5 is open."
+  ::= { tlUpsWellKnownAlarms 36 }
+
+tlUpsAlarmCircuitBreaker6Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #6 is open."
+  ::= { tlUpsWellKnownAlarms 37 }
+
+tlUpsAlarmCircuitBreaker7Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #7 is open."
+  ::= { tlUpsWellKnownAlarms 38 }
+
+tlUpsAlarmCircuitBreaker8Open OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "Circuit breakers #8 is open."
+  ::= { tlUpsWellKnownAlarms 39 }
+
+tlUpsAlarmCurrent1AboveThreshold OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The output current on line 1 exceeds load limits."
+  ::= { tlUpsWellKnownAlarms  40 }
+
+tlUpsAlarmCurrent2AboveThreshold OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The output current on line 2 exceeds load limits."
+  ::= { tlUpsWellKnownAlarms  41 }
+
+tlUpsAlarmCurrent3AboveThreshold OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The output current on line 3 exceeds load limits."
+  ::= { tlUpsWellKnownAlarms  42 }
+
+tlUpsAlarmRuntimeBelowWarningLevel OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The battery seconds remaining is below warning level."
+  ::= { tlUpsWellKnownAlarms  43 }
+
+tlUpsAlarmBusStartVoltageLow OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter start up bus voltage is too low."
+  ::= { tlUpsWellKnownAlarms  44 }
+
+tlUpsAlarmBusOverVoltage OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter bus voltage is too high."
+  ::= { tlUpsWellKnownAlarms  45 }
+
+tlUpsAlarmBusUnderVoltage OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter bus voltage is too low."
+  ::= { tlUpsWellKnownAlarms  46 }
+
+tlUpsAlarmBusVoltageUnbalanced OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter bus voltage is not balanced."
+  ::= { tlUpsWellKnownAlarms  47 }
+
+tlUpsAlarmInverterSoftStartBad OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter bus voltage cannot reach desired voltage within a
+    specified duration."
+  ::= { tlUpsWellKnownAlarms  48 }
+
+tlUpsAlarmInverterOverVoltage OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter voltage is too high."
+  ::= { tlUpsWellKnownAlarms  49 }
+
+tlUpsAlarmInverterUnderVoltage OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter voltage is too low."
+  ::= { tlUpsWellKnownAlarms  50 }
+
+tlUpsAlarmInverterCircuitBad OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The inverter output is shorted."
+  ::= { tlUpsWellKnownAlarms  51 }
+
+tlUpsAlarmBatteryOverVoltage OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The battery voltage is too high."
+  ::= { tlUpsWellKnownAlarms  52 }
+
+tlUpsAlarmBatteryUnderVoltage OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The battery voltage is too low."
+  ::= { tlUpsWellKnownAlarms  53 }
+
+tlUpsAlarmSiteWiringFault OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The utility input wiring is faulty."
+  ::= { tlUpsWellKnownAlarms  54 }
+
+tlUpsAlarmOverTemperatureProtection OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The over temperature protection is activated."
+  ::= { tlUpsWellKnownAlarms  55 }
+
+tlUpsAlarmOverCharged OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The UPS is over charged."
+  ::= { tlUpsWellKnownAlarms  56 }
+
+tlUpsAlarmEPOActive OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The EPO is currently activate."
+  ::= { tlUpsWellKnownAlarms  57 }
+
+tlUpsAlarmBypassFrequencyBad OBJECT-IDENTITY
+  STATUS current
+  DESCRIPTION
+    "The bypass frequency is out of tolerance."
+  ::= { tlUpsWellKnownAlarms  58 }
+
+tlUpsAlarmExternalSmartBatteryAgeAboveThreshold OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "One or more external smart batteries have been determined to require
+    replacement."
+  ::= { tlUpsWellKnownAlarms 59 }
+
+tlUpsAlarmExternalNonSmartBatteryAgeAboveThreshold OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "One or more external non-smart batteries have been determined to require
+    replacement."
+  ::= { tlUpsWellKnownAlarms 60 }
+
+tlUpsAlarmSmartBatteryCommLost OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "Communications with the smart batteries was lost."
+  ::= { tlUpsWellKnownAlarms 61 }
+
+tlUpsAlarmSourceAOutage OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "Input power source A is not present."
+    ::= { tlUpsWellKnownAlarms 62 }
+
+tlUpsAlarmSourceBOutage OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "Input power source B is not present."
+    ::= { tlUpsWellKnownAlarms 63 }
+
+tlUpsAlarmWatchdogReset OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The internal watchdog triggered a reset of the device."
+    ::= { tlUpsWellKnownAlarms 64 }
+
+tlUpsAlarmDevName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "The name of the device, tlDevName, corresponding to the device that is
+    associated with this alarm."
+  ::= { tlUpsAlarm 7 }
+
+tlUpsAlarmDevLocation OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "The location of the device, tlDevLocation, corresponding to the device
+    that is associated with this alarm."
+  ::= { tlUpsAlarm 8 }
+
+tlUpsAlarmCategory OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS deprecated
+  DESCRIPTION
+    "The category, tlDevEvtCategory, of this alarm."
+  ::= { tlUpsAlarm 9 }
+
+tlUpsTest OBJECT IDENTIFIER   ::= { tlUpsObjects 7 }
+
+tlUpsTestDate OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The date of the last self-test run on the ups, in the
+    format YYYYMMDD."
+  ::= { tlUpsTest 1 }
+
+tlUpsTestResultsDetail OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Result of the last self-test run on the ups."
+  ::= { tlUpsTest 2 }
+
+tlUpsControl OBJECT IDENTIFIER  ::= { tlUpsObjects 8 }
+
+tlUpsWatchdogSupported OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates whether or not this UPS supports a watchdog reboot."
+  ::= { tlUpsControl 1 }
+
+
+tlUpsWatchdogSecsBeforeReboot OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The maximum number of seconds that can expire between polls that
+    the engine makes to the UPS for data.  If this time runs out, then
+    the UPS will cycle its outputs.  Set this to zero to turns disable
+    this feature."
+  ::= { tlUpsControl 2 }
+
+tlUpsWellKnownControls OBJECT IDENTIFIER  ::= { tlUpsControl 3 }
+
+tlUpsControlSelfTest OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to initiate Self Test"
+  ::= { tlUpsWellKnownControls 1 }
+  
+tlUpsControlRamp OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to initiate Ramp"
+  ::= { tlUpsWellKnownControls 2 }
+  
+tlUpsControlShed OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to initiate Shed"
+  ::= { tlUpsWellKnownControls 3 }
+  
+tlUpsControlUpsOn OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to turn UPS on"
+  ::= { tlUpsWellKnownControls 4 }
+
+tlUpsControlUpsOff OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set to TRUE to turn UPS off"
+  ::= { tlUpsWellKnownControls 5 }
+  
+tlUpsConfig OBJECT IDENTIFIER   ::= { tlUpsObjects 9 }
+
+tlUpsConfigBattReplDate OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The date on which the battery was last replaced, in the format
+    YYYYMMDD."
+  ::= { tlUpsConfig 1 }
+
+-- Deprecated, interface no longer supported.
+--
+-- tlUpsConfigTftpGetAddr OBJECT-TYPE
+--  SYNTAX IpAddress
+--  MAX-ACCESS read-write
+--  STATUS current
+--  DESCRIPTION
+--    "The IP address of the TFTP server you wish to acquire a config ini file from, non persistent, 0.0.0.0 when empty"
+--  ::= { tlUpsConfig 2 }
+--
+-- tlUpsConfigTftpGetAcction OBJECT-TYPE
+--  SYNTAX INTEGER {
+--      get(1),
+--      getting(2),
+--      idle(3) }
+--  MAX-ACCESS read-write
+--  STATUS current
+--  DESCRIPTION
+--    "setting this entry to get(1) will start a down load from the specified address, during the download this entry
+--    will read getting(2), when finished, the card will reboot to the new ini supplied parms. At all other times this 
+--    entry will read idle(3)"
+--  ::= { tlUpsConfig 3 }
+
+tlUpsConfigDisplayUnits OBJECT-TYPE
+  SYNTAX INTEGER {
+      english(0),
+      metric(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Selects English or Metric display for all readings. This selection may not
+    be available on all devices. Further, some devices may support this selection,
+    but not via a software selector. In this latter case, selections must be
+    performed on the device itself."
+  ::= { tlUpsConfig 4 }
+
+tlUpsConfigExternalBattReplDate OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The date on which the external battery was last replaced, in the format
+    YYYYMMDD."
+  ::= { tlUpsConfig 5 }
+  
+tlUpsOutlet OBJECT IDENTIFIER   ::= { tlUpsObjects 10 }
+
+tlUpsOutletNumOutlets OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The number of available Outlets in this device."
+  ::= { tlUpsOutlet 1 }
+
+tlUpsOutletTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsOutletEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of all device Outlets for all devices."
+  ::= { tlUpsOutlet 2 }
+
+tlUpsOutletEntry OBJECT-TYPE
+  SYNTAX TlUpsOutletEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing Outlet information applicable to a particular
+    device managed by this agent."
+  INDEX {
+    tlUpsOutletIndex }
+  ::= { tlUpsOutletTable 1 }
+
+TlUpsOutletEntry ::= SEQUENCE {
+  tlUpsOutletIndex        PositiveInteger,
+  tlUpsOutletState        INTEGER,
+  tlUpsOutletType         Integer32,
+  tlUpsOutletControl      INTEGER,
+  tlUpsOutletName         DisplayString,
+  tlUpsOutletRampAction   INTEGER,
+  tlUpsOutletRampDataType INTEGER,
+  tlUpsOutletRampData     Integer32,
+  tlUpsOutletShedAction   INTEGER,
+  tlUpsOutletShedDataType INTEGER,
+  tlUpsOutletShedData     Integer32,
+  tlUpsOutletGroupNdx     Integer32,
+  tlUpsOutletCurrent      PositiveInteger,
+  tlUpsOutletPower        PositiveInteger }
+
+tlUpsOutletIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of this Outlet for the device
+    indicated by tlDeviceIndex."
+  ::= { tlUpsOutletEntry 1 }
+
+tlUpsOutletState OBJECT-TYPE
+  SYNTAX INTEGER {
+      unknown(0),
+      off(1),
+      on(2) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current state of the Outlet."
+  ::= { tlUpsOutletEntry 2 }
+
+tlUpsOutletType OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is a bit field that indicates the type of this Outlet.
+    When 0, the outlet is not controllable and has none of the
+    other features indicated in the bit map.  When non-zero,
+    the features present for this outlet can be interpreted with the 
+    definition.
+
+    Bit   Display
+     0    Reserved, may be 1 or 0
+     1    Controllable
+     2
+     3
+     4
+     5
+     6
+     7
+     8
+     9
+    10
+    11
+    12
+    13
+    14
+    15
+    "
+  ::= { tlUpsOutletEntry 3 }
+
+tlUpsOutletControl OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOff(1),
+      turnOn(2),
+      cycle(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Controls the state of the Outlet."
+  ::= { tlUpsOutletEntry 4 }
+
+tlUpsOutletName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A string identifying the devices attached to the
+    output(s) of the device."
+  ::= { tlUpsOutletEntry 5 }
+
+
+tlUpsOutletRampAction OBJECT-TYPE
+  SYNTAX INTEGER {
+      remainOff(0),
+      turnOnAfterDelay(1)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The ramp action to take on the Outlet."
+  ::= { tlUpsOutletEntry 6 }
+
+tlUpsOutletRampDataType OBJECT-TYPE
+  SYNTAX INTEGER {
+      delayInSeconds(0)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The type of data associated with ramp action."
+  ::= { tlUpsOutletEntry 7 }
+
+tlUpsOutletRampData OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The data value associated with type of ramp data."
+  ::= { tlUpsOutletEntry 8 }
+
+tlUpsOutletShedAction OBJECT-TYPE
+  SYNTAX INTEGER {
+      remainOn(0),
+      turnOffAfterDelay(1)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The shed action to take on the Outlet."
+  ::= { tlUpsOutletEntry 9 }
+
+tlUpsOutletShedDataType OBJECT-TYPE
+  SYNTAX INTEGER {
+      delayInSeconds(0)
+   }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The type of data associated with shed action."
+  ::= { tlUpsOutletEntry 10 }
+
+tlUpsOutletShedData OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The data value associated with type of shed data."
+  ::= { tlUpsOutletEntry 11 }
+
+tlUpsOutletGroupNdx OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "tlUpsOutletGroupIndex of corresponding outlet group, or 0 if ungrouped."
+  ::= { tlUpsOutletEntry 12 }
+
+tlUpsOutletCurrent OBJECT-TYPE
+  SYNTAX PositiveInteger
+  UNITS      "0.1 RMS Amp"
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The value of this outlet's current, represented as 0.1A."
+  ::= { tlUpsOutletEntry 13 }
+
+tlUpsOutletPower OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The value of this outlet's power in watts."
+  ::= { tlUpsOutletEntry 14 }
+
+
+tlUpsOutletGroup OBJECT IDENTIFIER   ::= { tlUpsObjects 11 }
+
+tlUpsOutletNumOutletGroups OBJECT-TYPE
+  SYNTAX NonNegativeInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The number of available Outlet Groups in this device."
+  ::= { tlUpsOutletGroup 1 }
+
+tlUpsOutletGroupTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlUpsOutletGroupEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A list of device outlet group entries. The number of entries is
+    given by the value of tlUpsOutletNumOutletGroups."
+  ::= { tlUpsOutletGroup 2 }
+  
+tlUpsOutletGroupEntry OBJECT-TYPE
+  SYNTAX TlUpsOutletGroupEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing outlet group information applicable
+     to a particular device managed by this agent"
+  INDEX { tlUpsOutletGroupIndex }
+  ::= { tlUpsOutletGroupTable 1 }
+
+TlUpsOutletGroupEntry ::= SEQUENCE {
+  tlUpsOutletGroupIndex     PositiveInteger,
+  tlUpsOutletGroupRowStatus	RowStatus,
+  tlUpsOutletGroupName      DisplayString,
+  tlUpsOutletGroupDesc      DisplayString,
+  tlUpsOutletGroupState     INTEGER,
+  tlUpsOutletGroupControl   INTEGER }
+
+tlUpsOutletGroupIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "This is the index number of this load group for the device."
+  ::= { tlUpsOutletGroupEntry 1 }
+
+tlUpsOutletGroupRowStatus OBJECT-TYPE
+  SYNTAX RowStatus
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Row status for the tlUpsOutletGroupTable"
+  ::= { tlUpsOutletGroupEntry 2 }
+
+tlUpsOutletGroupName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The name of this outlet group."
+  ::= { tlUpsOutletGroupEntry 3 }
+
+tlUpsOutletGroupDesc OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "A description for this outlet group."
+  ::= { tlUpsOutletGroupEntry 4 }
+
+tlUpsOutletGroupState OBJECT-TYPE
+  SYNTAX INTEGER {
+      unknown(0),
+      off(1),
+      on(2),
+      mixed(3) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current state of the outlet group."
+  ::= { tlUpsOutletGroupEntry 5 }
+
+tlUpsOutletGroupControl OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOff(1),
+      turnOn(2),
+      cycle(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Controls the state of every outlet associated with the group."
+  ::= { tlUpsOutletGroupEntry 6 }
+  
+tlUpsMainOutlet OBJECT IDENTIFIER   ::= { tlUpsObjects 12 }
+
+tlUpsMainOutletState OBJECT-TYPE
+  SYNTAX INTEGER {
+      unknown(0),
+      off(1),
+      on(2),
+      mixed(3) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current state of the main output of the device."
+  ::= { tlUpsMainOutlet 1 }
+
+
+tlUpsMainOutletControllable OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates if this device has controllable outlets"
+  ::= { tlUpsMainOutlet 2 }
+
+tlUpsMainOutletControl OBJECT-TYPE
+  SYNTAX INTEGER {
+      idle(0),
+      turnOff(1),
+      turnOn(2),
+      cycle(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Controls the state of the main outlet of the device."
+  ::= { tlUpsMainOutlet 3 }
+
+tlUpsEnvironment OBJECT IDENTIFIER   ::= { tlUpsObjects 13 }
+
+tlUpsTemperature OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The ambient temperature. The measurement returned will either be in
+    units of Celsius (C) or Fahrenheit (F) depending upon whether Metric
+    or English was selected for the reading by tlUpsConfigDisplayUnits."
+  ::= { tlUpsEnvironment 1 }
+
+  
+---------------------------------------------------------------
+-- UPS traps
+---------------------------------------------------------------
+
+tlUpsTraps              OBJECT IDENTIFIER ::= { tlUPS 2 }
+
+tlUpsTrapAlarmEntryAddedV1 TRAP-TYPE
+    ENTERPRISE tlUpsTraps
+    VARIABLES { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+                tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    DESCRIPTION
+            "This trap is sent each time an alarm is inserted into
+            to the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+ ::= 3
+
+tlUpsTrapAlarmEntryAdded NOTIFICATION-TYPE
+    OBJECTS { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+              tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an alarm is inserted into
+            to the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+    ::= { tlUpsTraps 3 }
+
+tlUpsTrapAlarmEntryRemovedV1 TRAP-TYPE
+    ENTERPRISE tlUpsTraps
+    VARIABLES { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+                tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    DESCRIPTION
+            "This trap is sent each time an alarm is removed from
+            the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+ ::= 4
+
+tlUpsTrapAlarmEntryRemoved NOTIFICATION-TYPE
+    OBJECTS { tlUpsAlarmId, tlUpsAlarmDescr, tlUpsAlarmDetail, tlUpsAlarmDeviceId,
+              tlUpsAlarmDeviceName, tlUpsAlarmLocation, tlUpsAlarmGroup }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time an alarm is removed from
+            the alarm table."
+    --#SUMMARY "UPS Alarm: %s - %s."
+    --#ARGUMENTS {6, 2}
+    --#SEVERITY WARNING
+    ::= { tlUpsTraps 4 }
+
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- begin new traps
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+
+tlUpsTrapSystemStartup NOTIFICATION-TYPE
+  STATUS current
+  DESCRIPTION
+    "Used to inform another entity of an engine's startup. The varbinds that follow are:
+
+    OBJ1      = tlEngineType
+    Obj1Value = The type of engine providing this data
+    OBJ2      = tlEngineSoftwareVersion
+    Obj2Value = The current version of the engine
+    OBJ3      = tlEngineMACAddr
+    Obj3Value = The MAC address of the engine
+    OBJ4      = tlUpsSnmpCardSerialNum
+    Obj4Value = The serial number of the SNMPWEBCARD [should be 0 on PC]
+    
+    --- if this trap is extended, place all static OIDs above this mark. all objects below
+    --- the number of devices (tlNumDevices) is explicit as per device for enumeration by
+    --- the target receiver
+    
+    OBJ5      = tlNumDevices
+    Obj5Value = The number of devices attached
+
+    --- The following objects will be replicated per each device:
+
+    OBJ6      = The OID for an entry of tlDevManufacturer, indexed by device
+    Obj6Value = The device's manufacturer
+    OBJ7      = The OID for an entry of tlDevModel, indexed by device
+    Obj7Value = The device's model name
+    OBJ8      = The OID for an entry of tlDevName, indexed by device
+    Obj8Value = The device's display name
+    OBJ9      = The OID for an entry of tlDevLocation, indexed by device
+    Obj9Value = The device's location
+    OBJ10     = The OID for an entry of tlDevRegion, indexed by device
+    Obj10Value= The device's region
+    OBJ11     = The OID for an entry of tlDevProtocol, indexed by device
+    Obj11Value= The device's protocol (display string format)
+    "
+  ::= { tlUpsTraps 5 }
+
+tlUpsTrapSystemShutdown NOTIFICATION-TYPE
+  STATUS current
+  DESCRIPTION
+    "Used to inform another entity of an engine's startup. The varbinds that follow are:
+
+    OBJ1      = tlEngineType
+    Obj1Value = The type of engine providing this data
+    OBJ2      = tlEngineSoftwareVersion
+    Obj2Value = The current version of the engine
+    OBJ3      = tlEngineMACAddr
+    Obj3Value = The MAC address of the engine
+    OBJ4      = tlUpsSnmpCardSerialNum
+    Obj4Value = The serial number of the SNMPWEBCARD [should be 0 on PC]
+    
+    --- if this trap is extended, place all static OIDs above this mark. all objects below
+    --- the number of devices (tlNumDevices) is explicit as per device for enumeration by
+    --- the target receiver
+    
+    OBJ5      = tlNumDevices
+    Obj5Value = The number of devices attached
+
+    --- The following objects will be replicated per each device:
+
+    OBJ6      = The OID for an entry of tlDevManufacturer, indexed by device
+    Obj6Value = The device's manufacturer
+    OBJ7      = The OID for an entry of tlDevModel, indexed by device
+    Obj7Value = The device's model name
+    OBJ8      = The OID for an entry of tlDevName, indexed by device
+    Obj8Value = The device's display name
+    OBJ9      = The OID for an entry of tlDevLocation, indexed by device
+    Obj9Value = The device's location
+    OBJ10     = The OID for an entry of tlDevRegion, indexed by device
+    Obj10Value= The device's region
+    OBJ11     = The OID for an entry of tlDevProtocol, indexed by device
+    Obj11Value= The device's protocol (display string format)
+    "
+  ::= { tlUpsTraps 6 }
+
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+--- end new traps
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+--------------------------------------------------------------------------
+-- EnviroSense Device
+--------------------------------------------------------------------------
+
+tlEnviroSense OBJECT IDENTIFIER   ::= { tripplite 101 }
+
+tlEnvEnvironment OBJECT IDENTIFIER   ::= { tlEnviroSense 1 }
+
+tlEnvTemperatureData OBJECT IDENTIFIER   ::= { tlEnvEnvironment 1 }
+
+tlEnvTemperatureC OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The ambient temperature (C)."
+  ::= { tlEnvTemperatureData 1 }
+
+tlEnvTemperatureF OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The ambient temperature (F)."
+  ::= { tlEnvTemperatureData 2 }
+
+tlEnvTemperatureLowLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The lower alarm limit for ambient temperature (F)."
+  ::= { tlEnvTemperatureData 3 }
+
+tlEnvTemperatureHighLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The upper alarm limit for ambient temperature (F)."
+  ::= { tlEnvTemperatureData 4 }
+
+tlEnvTemperatureInAlarm OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates whether or not temperature is in alarm."
+  ::= { tlEnvTemperatureData 5 }
+
+tlEnvHumidityData OBJECT IDENTIFIER   ::= { tlEnvEnvironment 2 }
+
+tlEnvHumidity OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The ambient humidity (%)."
+  ::= { tlEnvHumidityData 1 }
+
+tlEnvHumidityLowLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The lower alarm limit for ambient humidity (%)."
+  ::= { tlEnvHumidityData 2 }
+
+tlEnvHumidityHighLimit OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The upper alarm limit for ambient humidity (%)."
+  ::= { tlEnvHumidityData 3 }
+
+tlEnvHumidityInAlarm OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates whether or not humidity is in alarm."
+  ::= { tlEnvHumidityData 4 }
+
+tlEnvContacts OBJECT IDENTIFIER  ::= { tlEnviroSense 2 }
+
+tlEnvContactTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF TlEnvContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "A table of contacts."
+  ::= { tlEnvContacts 1 }
+
+tlEnvContactEntry OBJECT-TYPE
+  SYNTAX TlEnvContactEntry
+  MAX-ACCESS not-accessible
+  STATUS current
+  DESCRIPTION
+    "An entry containing information applicable to a particular contact."
+  INDEX {
+    tlEnvContactIndex }
+  ::= { tlEnvContactTable 1 }
+
+TlEnvContactEntry ::= SEQUENCE {
+  tlEnvContactIndex    PositiveInteger,
+  tlEnvContactName     DisplayString,
+  tlEnvContactStatus   INTEGER,
+  tlEnvContactConfig   INTEGER }
+
+tlEnvContactIndex OBJECT-TYPE
+  SYNTAX PositiveInteger
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The table row index for the contact."
+  ::= { tlEnvContactEntry 1 }
+
+tlEnvContactName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The name or description of the contact."
+  ::= { tlEnvContactEntry 2 }
+
+tlEnvContactStatus OBJECT-TYPE
+  SYNTAX INTEGER {
+      normal(0),
+      alarm(1) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current status of the contact."
+  ::= { tlEnvContactEntry 3 }
+
+tlEnvContactConfig OBJECT-TYPE
+  SYNTAX INTEGER {
+      normallyOpen(0),
+      normallyClosed(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The configuration of the contact."
+  ::= { tlEnvContactEntry 4 }
+
+
+--------------------------------------------------------------------------
+-- KVM over IP Device
+--------------------------------------------------------------------------
+
+-- this is a 3rd party MIB structure located at { tripplite 102 }
+
+--------------------------------------------------------------------------
+-- SR Cooling Device
+--------------------------------------------------------------------------
+
+tlCooling OBJECT IDENTIFIER   ::= { tripplite 103 }
+
+tlCoolingEnvironment OBJECT IDENTIFIER   ::= { tlCooling 1 }
+
+tlCoolingIdent  OBJECT IDENTIFIER   ::= { tlCoolingEnvironment 1 }
+  
+tlCoolingModel OBJECT-TYPE
+  SYNTAX DisplayString 
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The model name for the AC Unit."
+  ::= { tlCoolingIdent 1}
+  
+tlCoolingManufacturer OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The manufacturer of the AC Unit."
+  ::= { tlCoolingIdent 2 }
+
+tlCoolingSerialNumber OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The serial number of the AC unit."
+  ::= { tlCoolingIdent 3 }
+  
+tlCoolingFirmwareVersion OBJECT-TYPE
+  SYNTAX DisplayString 
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The firmware version of the AC Unit."
+  ::= { tlCoolingIdent 4 }
+  
+tlCoolingHostSoftwareVersion OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The hardware version of the AC unit."
+  ::= { tlCoolingIdent 5 }
+  
+tlCoolingName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The user defined name for the AC Unit."
+  ::= { tlCoolingIdent 6 }
+  
+tlCoolingLocation OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The user defined location of the AC Unit."
+  ::= { tlCoolingIdent 7 }
+
+tlCoolingStatus  OBJECT IDENTIFIER   ::= { tlCoolingEnvironment 2 }
+
+tlCoolingCondOutletTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The condenser outlet air stream temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 1 }
+
+tlCoolingCondInletTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The condenser inlet air stream temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 2 }
+  
+tlCoolingRefrigerantTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The temperature of the refrigerant in the suction line.  This is displayed in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 3 }
+  
+tlCoolingEvapSurfaceTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The surface temperature of the evaporator in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 4}
+  
+tlCoolingSuctionPressure OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The pressure of the compressor suction line in tenths of (Mpa/psi) depending on the value of tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 5}
+  
+tlCoolingDischargePressure OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The pressure of the compressor discharge line in tenths of (Mpa/psi) depending on the value of tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 6}
+  
+tlCoolingEvapFanSpeed OBJECT-TYPE
+  SYNTAX INTEGER {
+      off(0),
+      low(1),
+      medLow(2),
+      med (3),
+      medHi (4),
+      hi (5) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current speed of the evaporator fan."
+  ::= { tlCoolingStatus 7}
+  
+tlCoolingCondFanSpeed OBJECT-TYPE
+  SYNTAX INTEGER {
+      off(0),
+      low(1),
+      hi (2) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current speed of the condenser fan."
+  ::= { tlCoolingStatus 8}
+  
+tlCoolingCompFrequency OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The operating frequency of the compressor in tenths of Arms."
+  ::= { tlCoolingStatus 9}
+  
+tlCoolingEEVPercentage OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The opening percentage of the EEV."
+  ::= { tlCoolingStatus 10}
+  
+tlCoolingUnitCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The the total current draw of the unit in tenths of Arms."
+  ::= { tlCoolingStatus 11}
+  
+tlCoolingFanCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Thethe current draw of the Evaporator and Condenser fans in tents of Arms."
+  ::= { tlCoolingStatus 12 }
+  
+tlCoolingCompCurrent OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The operating current of the compressor in Arms."
+  ::= { tlCoolingStatus 13}
+  
+tlCoolingReturnAirTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The return air temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 14 }
+
+tlCoolingSuctionTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The temperature of the compressor suction line in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 15 }
+
+tlCoolingSupplyAirTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The supply air temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlCoolingDisplayUnits."
+  ::= { tlCoolingStatus 16 }
+
+tlCoolingRunTimes OBJECT IDENTIFIER   ::= { tlCoolingEnvironment 3 }
+
+tlCoolingAirFilterRunHours OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Total hours the air filter has been under operation."
+  ::= { tlCoolingRunTimes 1 }
+
+tlCoolingEvapFanRunDays OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Total days the evaporator fan has been under operation."
+  ::= { tlCoolingRunTimes 2 }
+
+tlCoolingCondFanRunDays OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Total days the condenser fan has been under operation."
+  ::= { tlCoolingRunTimes 3 }
+  
+tlCoolingCompressorRunDays OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Total days the compressor has been under operation."
+  ::= { tlCoolingRunTimes 4 }
+
+tlCoolingCondPumpRunDays OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Total days the condensate pump has been under operation."
+  ::= { tlCoolingRunTimes 5 }
+  
+tlCoolingAtomizerRunDays OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Total days the atomizer has been under operation."
+  ::= { tlCoolingRunTimes 6 }
+
+tlCoolingConfig  OBJECT IDENTIFIER   ::= { tlCoolingEnvironment 4 }
+
+tlCoolingOnOff OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOffUnit(0),
+      turnOnUnit(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Turn the unit off or on."
+  ::= { tlCoolingConfig 1 }
+
+tlCoolingSetPointTemp OBJECT-TYPE
+  SYNTAX INTEGER 
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The set point temperature the unit will control the temperature to in tenths of degrees in Celsius or Fahrenheit based upon tleCoolDisplayUnits."
+  ::= { tlCoolingConfig 2 }
+
+tlCoolingAutoStart OBJECT-TYPE
+  SYNTAX INTEGER {
+      disabled(0),
+      enabled(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Specified if the unit should start automatically on power up."
+  ::= { tlCoolingConfig 3 }
+
+tlCoolingFanSpeedOverride OBJECT-TYPE
+  SYNTAX INTEGER {
+      autoFanSpeed(0),
+      low(1),
+      medLow(2),
+      med(3),
+      medHi(4),
+      hi(5) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Speed of evaporator fan set by the user."
+  ::= { tlCoolingConfig 4 }
+
+tlCoolingControlType OBJECT-TYPE
+  SYNTAX INTEGER {
+      returnAirTemp(0),
+      remoteTemperature(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Which temperature to be used as a control point."
+  ::= { tlCoolingConfig 5 }
+
+tlCoolingCurrentRemoteTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The external remote temperature in tenths of degrees in Celsius or Fahrenheit depending upon value of tlCoolingDisplayUnits"
+  ::= { tlCoolingConfig 6 }
+
+tlCoolingDisplayUnits OBJECT-TYPE
+  SYNTAX INTEGER {
+      metric(0),
+      english(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Selects English or Metric display for all readings."
+  ::= { tlCoolingConfig 7 }
+
+tlCoolingBeepOnKey OBJECT-TYPE
+  SYNTAX INTEGER {
+      noBeep(0),
+      beepOn(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Indicates if the display sounds a beep when a key is pressed."
+  ::= { tlCoolingConfig 8 }
+
+tlCoolingOutputRelaySource OBJECT-TYPE
+  SYNTAX INTEGER {
+      disabled(0),
+      allAlarmsAndWarnings(1),
+      criticalAlarmsOnly(2) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The alarm level that causes the ouput relay to activate."
+  ::= { tlCoolingConfig 9 }
+
+tlCoolingOffOnLeak OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOff(0),
+      alarmOnly(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Indicates if the unit should stop cooling when leak input is activated."
+  ::= { tlCoolingConfig 10 }
+
+tlCoolingOffOnInputContact OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOff(0),
+      alarmOnly(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Indicates if the unit should stop cooling when input contact is activated."
+  ::= { tlCoolingConfig 11 }
+
+tlCoolingInputContactType OBJECT-TYPE
+  SYNTAX INTEGER {
+      ncRelay(0),
+      noRelay(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The input contact type."
+  ::= { tlCoolingConfig 12 }
+
+tlCoolingOutputRelayDefault OBJECT-TYPE
+  SYNTAX INTEGER {
+      nc(0),
+      no(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Type of contact to make when output relay is activated."
+  ::= { tlCoolingConfig 13 }
+
+tlCoolingAirFilterInterval OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The number of weeks before the air filter needs to be changed."
+  ::= { tlCoolingConfig 14 }
+
+tlCoolingWaterLeakContactType OBJECT-TYPE
+  SYNTAX INTEGER {
+      noRelay(0),
+      ncRelay(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The input contact type."
+  ::= { tlCoolingConfig 15 }
+
+tlCoolingThresholds  OBJECT IDENTIFIER   ::= { tlCoolingEnvironment 5 }
+
+tlCoolingMaxAirFilterRunHours OBJECT-TYPE
+  SYNTAX Integer32
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The maximum interval for air filter run hours before warning is annunciated."
+  ::= { tlCoolingThresholds 1 }
+  
+tlCoolingEnableAirFilterAlarm OBJECT-TYPE
+  SYNTAX INTEGER {
+      disabled(0),
+      enabled(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "When enabled indicated that an alarm should occur when the maximum number of air filter run hours has been exceeded."
+  ::= { tlCoolingThresholds 2 }
+  
+tlCoolingMaxSupplyTemp  OBJECT-TYPE
+  SYNTAX INTEGER 
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Maximum allowed supply air temperature before firing an alarm."
+  ::= { tlCoolingThresholds 3 }
+  
+tlCoolingMinSupplyTemp  OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Minimum allowed supply air temperature allowed before firing an alarm."
+  ::= { tlCoolingThresholds 4 }
+  
+tlCoolingTempDiffAlarm  OBJECT-TYPE
+  SYNTAX INTEGER 
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Maximum allowed air temperature deviation from set allowed before firing an alarm."
+  ::= { tlCoolingThresholds 5 }
+  
+tlCoolingMaxReturnAirTemp  OBJECT-TYPE
+  SYNTAX INTEGER 
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "When enabled indicated that an alarm should occur when the maximum number of air filter run hours has been exceeded."
+  ::= { tlCoolingThresholds 6 }
+
+tlCoolingAlarm OBJECT IDENTIFIER   ::= { tlCooling 6 }
+
+tlCoolingWellKnownAlarms OBJECT IDENTIFIER   ::= { tlCoolingAlarm 3 }
+
+tlCoolingSupplyAirSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The supply air sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 1 }
+
+tlCoolingReturnAirSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The return air sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 2 }
+
+tlCoolingCondenserInletAirSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The condenser inlet air sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 3 }
+
+tlCoolingCondenserOutletAirSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The condenser outlet air sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 4 }
+
+tlCoolingSuctionTemperatureSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The suction temperature sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 5 }
+
+tlCoolingEvaporatorTemperatureSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The evaporator temperature sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 6 }
+
+tlCoolingAirFilterClogged OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The air filter is clogged."
+    ::= { tlCoolingWellKnownAlarms 7 }
+
+tlCoolingAirFilterRunHoursViolation OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The air filter run hours was violated."
+    ::= { tlCoolingWellKnownAlarms 8 }
+
+tlCoolingSuctionPressureSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The suction pressure sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 9 }
+
+tlCoolingInverterCommunicationsFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The inverter communications is in fault."
+    ::= { tlCoolingWellKnownAlarms 10 }
+
+tlCoolingRemoteShutdownViaInputContact OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "A remote shutdown was triggerd by an input contact."
+    ::= { tlCoolingWellKnownAlarms 11 }
+
+tlCoolingCondensatePumpFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The condensate pump is in fault."
+    ::= { tlCoolingWellKnownAlarms 12 }
+
+tlCoolingLowRefrigerantStartupFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The low refrigerant startup is in fault."
+    ::= { tlCoolingWellKnownAlarms 13 }
+
+tlCoolingCondenserFanFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The condenser fan is in fault."
+    ::= { tlCoolingWellKnownAlarms 14 }
+
+tlCoolingCondenserFailure OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The condenser has failed."
+    ::= { tlCoolingWellKnownAlarms 15 }
+
+tlCoolingEvaporatorCoolingFailure OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The evaporator cooling is in fault."
+    ::= { tlCoolingWellKnownAlarms 16 }
+
+tlCoolingReturnAirTempHigh OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The return air temperature is high."
+    ::= { tlCoolingWellKnownAlarms 17 }
+
+tlCoolingSupplyAirTempHigh OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The supply air temperature is high."
+    ::= { tlCoolingWellKnownAlarms 18 }
+
+tlCoolingEvaporatorFailure OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The evaporator has failed."
+    ::= { tlCoolingWellKnownAlarms 19 }
+
+tlCoolingEvaporatorFreezeUp OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The evaporator is frozen."
+    ::= { tlCoolingWellKnownAlarms 20 }
+
+tlCoolingDischargePressureHigh OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The discharge pressure is high."
+    ::= { tlCoolingWellKnownAlarms 21 }
+
+tlCoolingPressureGaugeFailure OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The pressure gauge has failed."
+    ::= { tlCoolingWellKnownAlarms 22 }
+
+tlCoolingDischargePressurePersistentHigh OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The discharge pressure is persistently high."
+    ::= { tlCoolingWellKnownAlarms 23 }
+
+tlCoolingSuctionPressureLowStartFailure OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "Cannot start due to low suction pressure."
+    ::= { tlCoolingWellKnownAlarms 24 }
+
+tlCoolingSuctionPressureLow OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The suction pressure is low."
+    ::= { tlCoolingWellKnownAlarms 25 }
+
+tlCoolingSuctionPressurePersistentLow OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The suction pressure is persistently low."
+    ::= { tlCoolingWellKnownAlarms 26 }
+
+tlCoolingStartupLinePressureImbalance OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The startup line pressure is in imbalance."
+    ::= { tlCoolingWellKnownAlarms 27 }
+
+tlCoolingCompressorFailure OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The compressor has failed."
+    ::= { tlCoolingWellKnownAlarms 28 }
+
+tlCoolingCurrentLimit OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The current is out of range."
+    ::= { tlCoolingWellKnownAlarms 29 }
+
+tlCoolingWaterLeak OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "Water is leaking."
+    ::= { tlCoolingWellKnownAlarms 30 }
+
+tlCoolingFanUnderCurrent OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The fan is under current."
+    ::= { tlCoolingWellKnownAlarms 31 }
+
+tlCoolingFanOverCurrent OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The fan is over current."
+    ::= { tlCoolingWellKnownAlarms 32 }
+
+tlCoolingDischargePressureSensorFault OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "The discharge pressure sensor is in fault."
+    ::= { tlCoolingWellKnownAlarms 33 }
+
+tlCoolingWaterFull OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "Water is Full."
+    ::= { tlCoolingWellKnownAlarms 34 }
+
+tlCoolingAutoCoolingOn OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "Automatic cooling was activated to lower the temperature below the
+    remote set point."
+  ::= { tlCoolingWellKnownAlarms 35 }
+
+tlCoolingPowerButtonPressed OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "Power button was pressed on the front panel."
+  ::= { tlCoolingWellKnownAlarms 36 }
+
+tlCoolingDisconnectedFromDevice OBJECT-IDENTITY
+  STATUS     current
+  DESCRIPTION
+    "The device communications is disconnected."
+  ::= { tlCoolingWellKnownAlarms 37 }
+
+
+--------------------------------------------------------------------------
+-- SRCOOLNET Device
+--------------------------------------------------------------------------
+
+tlSrCoolNet OBJECT IDENTIFIER   		::= { tripplite 104}
+
+tlSrCoolNetData OBJECT IDENTIFIER   		::= { tlSrCoolNet 1 }
+
+tlSrCoolNetIdent  OBJECT IDENTIFIER   		::= { tlSrCoolNetData 1 }
+  
+tlSrCoolNetModel OBJECT-TYPE
+  SYNTAX DisplayString 
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The model name for the device attached to the SRCOOLNET."
+  ::= { tlSrCoolNetIdent 1}
+  
+tlSrCoolNetManufacturer OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The manufacturer of the AC Unit."
+  ::= { tlSrCoolNetIdent 2 }
+
+tlSrCoolNetSerialNumber OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The serial number of the SRCOOLNET device."
+  ::= { tlSrCoolNetIdent 3 }
+  
+tlSrCoolNetHostSoftwareVersion OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The software version of the SRCOOLNET device."
+  ::= { tlSrCoolNetIdent 4 }
+  
+tlSrCoolNetName OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The user defined name for the AC Unit."
+  ::= { tlSrCoolNetIdent 5 }
+  
+tlSrCoolNetLocation OBJECT-TYPE
+  SYNTAX DisplayString
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The user defined location of the AC Unit."
+  ::= { tlSrCoolNetIdent 6 }
+
+tlSrCoolNetStatus  OBJECT IDENTIFIER   		::= { tlSrCoolNetData 2 }
+
+tlSrCoolNetMode OBJECT-TYPE
+  SYNTAX INTEGER {
+      off (0),
+      idle (1),
+      cooling (2),
+      unknown (3),
+      dehumidifying (4),
+      defrost (5),
+      notconnected(6) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current mode of SRCOOLNET."
+  ::= { tlSrCoolNetStatus 1}
+
+tlSrCoolNetFanSpeed OBJECT-TYPE
+  SYNTAX INTEGER {
+      off (0),
+      low (1),
+      med (2),
+      hi  (3) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The current speed of the fan."
+  ::= { tlSrCoolNetStatus 2}
+
+tlSrCoolNetReturnAirTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The return air stream temperature in tenths of degrees in the units Celsius/Fahrenheit as specified in tlSrCoolNetDisplayUnits."
+  ::= { tlSrCoolNetStatus 3 }
+
+tlSrCoolNetWaterFull OBJECT-TYPE
+  SYNTAX INTEGER {
+      waterNotFull(0),
+      waterFull(1) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Indicates the water reservoir is full or not full."
+  ::= { tlSrCoolNetStatus 4 }
+
+tlSrCoolNetCurrentRemoteTemp OBJECT-TYPE
+  SYNTAX INTEGER
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "The EnviroSense temperature in tenths of degrees in Celsius or Fahrenheit depending upon value of tlSrCoolNetDisplayUnits.
+    Only available if EnviroSense is connected to SRCOOLNET."
+  ::= { tlSrCoolNetStatus 5 }
+
+  tlSrCoolNetDisplayUnits OBJECT-TYPE
+  SYNTAX INTEGER {
+      metric(0),
+      english(1) }
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "Selects English or Metric display for all readings. AC unit must be manually configured to match this setting."
+  ::= { tlSrCoolNetStatus 6 }
+
+
+tlSrCoolNetConfig  OBJECT IDENTIFIER   		::= { tlSrCoolNetData 3 }
+
+tlSrCoolNetOnOff OBJECT-TYPE
+  SYNTAX INTEGER {
+      turnOffUnit(0),
+      turnOnUnit (1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Turn the unit off or on."
+  ::= { tlSrCoolNetConfig 1 }
+
+tlSrCoolSetMode OBJECT-TYPE
+  SYNTAX INTEGER {
+      cooling(0),
+      dehumidifying (1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set the operating mode of cooling unit.  Unit must be ON to set mode."
+  ::= { tlSrCoolNetConfig 2 }
+
+tlSrCoolNetSetPointTemp OBJECT-TYPE
+  SYNTAX INTEGER 
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The local set point temperature in tenths of degrees in Celsius or Fahrenheit based upon tlSrCoolNetDisplayUnits."
+  ::= { tlSrCoolNetConfig 3 }
+
+tlSrCoolNetRemoteSetPointTemp OBJECT-TYPE
+  SYNTAX INTEGER 
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The remote set point temperature in tenths of degrees in Celsius or Fahrenheit based upon tlSrCoolNetDisplayUnits.
+    Only available when EnviroSense is connected to SRCOOLNET."
+  ::= { tlSrCoolNetConfig 4 }
+
+tlSrCoolNetFanSpeedSetting OBJECT-TYPE
+  SYNTAX INTEGER {
+      auto(0),
+      low(1),
+      med(2), 
+      high(3) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Set the fan speed of the AC unit."
+  ::= { tlSrCoolNetConfig 5 }
+
+tlSrCoolNetRemoteSetpointEnable OBJECT-TYPE
+  SYNTAX INTEGER {
+      disable(0),
+      enable(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Use remote temperature setpoint for control point versus return air temp.  Only available when EnviroSense is connected
+    to SRCOOLNET."
+  ::= { tlSrCoolNetConfig 6 }
+
+tlSrCoolNetFanAlwaysOn OBJECT-TYPE
+  SYNTAX INTEGER {
+      disable(0),
+      enable(1) }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Leave fans on when not cooling.  Only available when EnviroSense is connected to SRCOOLNET."
+  ::= { tlSrCoolNetConfig 7 }
+
+
+
+tlSrCoolNetAlarm OBJECT IDENTIFIER   			::= { tlSrCoolNet 2 }
+
+tlSrCoolNetWellKnownAlarms OBJECT IDENTIFIER   		::= { tlSrCoolNetAlarm 1 }
+
+tlSrCoolNetWaterFullAlarm OBJECT-IDENTITY
+    STATUS     current
+    DESCRIPTION
+            "Water reservoir full."
+    ::= { tlSrCoolNetWellKnownAlarms 1 }
+
+--------------------------------------------------------------------------
+-- Conformance definitions
+--------------------------------------------------------------------------
+
+tlConformance OBJECT IDENTIFIER   ::= { tripplite 20 }
+
+tlCompliances OBJECT IDENTIFIER   ::= { tlConformance 1 }
+
+tlGroups OBJECT IDENTIFIER  ::= { tlConformance 2 }
+
+tlSubsetGroups OBJECT IDENTIFIER  ::= { tlGroups 1 }
+
+tlBasicGroups OBJECT IDENTIFIER   ::= { tlGroups 2 }
+
+tlFullGroups OBJECT IDENTIFIER  ::= { tlGroups 3 }
+
+tlUpsFullGroups OBJECT IDENTIFIER   ::= { tlFullGroups 100 }
+
+tlUpsFullIdentGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsIdentUpsSoftwareChecksum,
+    tlUpsIdentSerialNum,
+    tlUpsIdentID,
+    tlUpsSelectedDeviceID }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullIdentGroup defines objects which are common to the Ident
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 1 }
+
+tlUpsFullBatteryGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsBatteryAge,
+    tlUpsTemperatureF }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullBatteryGroup defines objects which are common to the Battery
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 2 }
+
+tlUpsFullAlarmGroup OBJECT IDENTIFIER   ::= { tlUpsFullGroups 6 }
+
+tlUpsFullAlarmObjsGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsAlarmDevName,
+    tlUpsAlarmDevLocation,
+    tlUpsAlarmCategory }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullAlarmObjsGroup defines objects which are common to
+    the Alarm group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullAlarmGroup 1 }
+
+--tlUpsFullAlarmsGroup NOTIFICATION-GROUP
+--  NOTIFICATIONS { }
+--  STATUS current
+--  DESCRIPTION
+--    "The tlUpsFullAlarmGroup defines notifications which are
+--    common to the Alarm group of fully compliant Tripplite UPS's"
+--  ::= { tlUpsFullAlarmGroup 2 }
+
+tlUpsFullTestGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsTestDate,
+    tlUpsTestResultsDetail }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullTestGroup defines objects which are common to the Test
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 7 }
+
+tlUpsFullControlGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsWatchdogSupported,
+    tlUpsWatchdogSecsBeforeReboot }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullControlGroup defines objects which are common to the Control
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 8 }
+
+tlUpsFullConfigGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsConfigBattReplDate }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullConfigGroup defines objects which are common to the Config
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 9 }
+
+tlUpsFullOutletGroup OBJECT-GROUP
+  OBJECTS {
+    tlUpsOutletNumOutlets }
+  STATUS current
+  DESCRIPTION
+    "The tlUpsFullOutletGroup defines objects which are common to the Outlet
+    group of fully compliant Tripplite UPS's"
+  ::= { tlUpsFullGroups 10 }
+
+
+END

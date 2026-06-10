@@ -1,0 +1,3 @@
+modules:
+    os:
+      hardware: PERLE-MCR-MGT-MIB::chassisModelName.1

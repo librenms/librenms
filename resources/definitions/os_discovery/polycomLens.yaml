@@ -1,0 +1,217 @@
+modules:
+    os:
+        hardware: POLYCOM-ENDPOINT-MIB::identityDeviceModel.0
+        version: POLYCOM-ENDPOINT-MIB::identitySoftwareInfo.0
+        serial: POLYCOM-ENDPOINT-MIB::identityDeviceSerialNumber.0
+    sensors:
+        state:
+            data:
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::identity
+                    value: POLYCOM-ENDPOINT-MIB::identityStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.1.6.{{ $index }}'
+                    descr: 'Overall System status'
+                    index: "identityStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::serviceH323
+                    value: POLYCOM-ENDPOINT-MIB::serviceH323Status
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.2.7.1.{{ $index }}'
+                    descr: 'H323 Status'
+                    index: "serviceH323Status.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::serviceH323
+                    value: POLYCOM-ENDPOINT-MIB::serviceH323RegistrationStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.2.7.2.{{ $index }}'
+                    descr: 'H323 Status'
+                    index: "serviceH323RegistrationStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::serviceSip
+                    value: POLYCOM-ENDPOINT-MIB::serviceSipStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.2.8.1.{{ $index }}'
+                    descr: 'Sip overall Status'
+                    index: "serviceSipStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::serviceSipRegistrationTable
+                    value: POLYCOM-ENDPOINT-MIB::serviceSipRegistrationStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.2.8.3.1.2.{{ $index }}'
+                    descr: 'Sip Status Line {{ $index }}'
+                    index: "serviceSipRegistrationStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::serviceIsdn
+                    value: POLYCOM-ENDPOINT-MIB::serviceIsdnStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.2.9.1.{{ $index }}'
+                    descr: 'ISDN Status'
+                    index: "serviceIsdnStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::hardware
+                    value: POLYCOM-ENDPOINT-MIB::hardwareOverallStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.3.1.{{ $index }}'
+                    descr: 'Hardware Status'
+                    index: "hardwareOverallStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareMicrophone
+                    value: POLYCOM-ENDPOINT-MIB::hardwareMicrophoneStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.3.5.1.{{ $index }}'
+                    descr: 'Microphone Status'
+                    index: "hardwareMicrophoneStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareCamera
+                    value: POLYCOM-ENDPOINT-MIB::hardwareCameraStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.3.6.1.{{ $index }}'
+                    descr: 'Camera Status'
+                    index: "hardwareCameraStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareNIC
+                    value: POLYCOM-ENDPOINT-MIB::hardwareNICStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.3.10.1.{{ $index }}'
+                    descr: 'NIC Status'
+                    index: "hardwareNICStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::hardwarePTC
+                    value: POLYCOM-ENDPOINT-MIB::hardwarePTCStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.3.11.1.{{ $index }}'
+                    descr: 'PTC Status'
+                    index: "hardwarePTCStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::hardwareUcBoard
+                    value: POLYCOM-ENDPOINT-MIB::hardwareUcBoardStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.3.12.1.{{ $index }}'
+                    descr: 'Uc Board Status'
+                    index: "hardwareUcBoardStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationPresence
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationPresenceStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.6.7.1.{{ $index }}'
+                    descr: 'Poly Presence Service Status'
+                    index: "externalIntegrationPresenceStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationCDR
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationCDRStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.6.8.1.{{ $index }}'
+                    descr: 'Poly CDR Service Status'
+                    index: "externalIntegrationCDRStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationSyslog
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationSyslogStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.6.9.1.{{ $index }}'
+                    descr: 'Syslog Service Status'
+                    index: "externalIntegrationSyslogStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationSoftwareUpdate
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationSoftwareUpdateStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.6.10.1.{{ $index }}'
+                    descr: 'Poly Software Update Status'
+                    index: "externalIntegrationSoftwareUpdateStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationProvisioning
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationProvisioningStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.6.11.1.{{ $index }}'
+                    descr: 'Poly Provisioning Status'
+                    index: "externalIntegrationProvisioningStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationExchange
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationExchangeStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.6.12.1.{{ $index }}'
+                    descr: 'Exchange Integration Status'
+                    index: "externalIntegrationExchangeStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }
+                -
+                    oid: POLYCOM-ENDPOINT-MIB::externalIntegrationDirectorySvcs
+                    value:  POLYCOM-ENDPOINT-MIB::externalIntegrationDirectorySvcsStatus
+                    num_oid: '.1.3.6.1.4.1.13885.101.1.6.13.1.{{ $index }}'
+                    descr: 'Directory Integration Status'
+                    index: "externalIntegrationDirectorySvcsStatus.{{ $index }}"
+                    state_name: polycomEndpointGeneric
+                    states:
+                        - { value: 1, descr: disabled, generic: 3 }
+                        - { value: 2, descr: ok, generic: 0 }
+                        - { value: 3, descr: failed, generic: 2 }

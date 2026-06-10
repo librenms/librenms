@@ -1,0 +1,158 @@
+PACKETLOGIC-HW-SENSORS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	hw FROM PACKETLOGIC-HW-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+sensors MODULE-IDENTITY
+	LAST-UPDATED "201909121500Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "PacketLogic2 MIB which describes BMC sensor properties"
+	REVISION "201909121500Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={hw 3}
+
+TempSensorEntry ::= SEQUENCE {
+	tempSensorId DisplayString,
+	tempSensorReading Unsigned32,
+	tempSensorStatus DisplayString,
+	tempSensorUnit DisplayString,
+	tempSensorEntryIndex Integer32
+}
+
+tempSensors	OBJECT-TYPE
+	SYNTAX SEQUENCE OF TempSensorEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {sensors 1}
+
+tempSensorEntry	OBJECT-TYPE
+	SYNTAX TempSensorEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { tempSensorEntryIndex }
+	::= {tempSensors 1}
+
+tempSensorEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={tempSensorEntry 999}
+
+
+
+
+
+
+FanSensorEntry ::= SEQUENCE {
+	fanSensorId DisplayString,
+	fanSensorSpeed Unsigned32,
+	fanSensorStatus DisplayString,
+	fanSensorUnit DisplayString,
+	fanSensorEntryIndex Integer32
+}
+
+fanSensors	OBJECT-TYPE
+	SYNTAX SEQUENCE OF FanSensorEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {sensors 4}
+
+fanSensorEntry	OBJECT-TYPE
+	SYNTAX FanSensorEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { fanSensorEntryIndex }
+	::= {fanSensors 1}
+
+fanSensorEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={fanSensorEntry 999}
+
+
+
+
+
+
+tempSensorId	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Sensor ID"
+
+	::={tempSensorEntry 1}
+
+tempSensorReading	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Sensor Temperature"
+
+	::={tempSensorEntry 2}
+
+tempSensorStatus	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Temperature Sensor Status"
+
+	::={tempSensorEntry 3}
+
+tempSensorUnit	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Temperature Sensor Reading Unit"
+
+	::={tempSensorEntry 4}
+
+fanSensorId	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Fan ID"
+
+	::={fanSensorEntry 1}
+
+fanSensorSpeed	OBJECT-TYPE
+	SYNTAX	 Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Fan Speed"
+
+	::={fanSensorEntry 2}
+
+fanSensorStatus	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Fan Sensor Status"
+
+	::={fanSensorEntry 3}
+
+fanSensorUnit	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Fan Sensor Reading Unit"
+
+	::={fanSensorEntry 4}
+
+
+
+END

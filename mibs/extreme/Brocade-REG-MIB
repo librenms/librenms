@@ -1,0 +1,93 @@
+-- MIB File: BROCADE-REG-MIB.mib
+-- *******************************************************************
+-- Brocade-REG-MIB.my: Extreme Products MIB.
+--
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- *******************************************************************
+Brocade-REG-MIB DEFINITIONS ::= BEGIN
+IMPORTS        
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,                        
+    enterprises                     FROM SNMPv2-SMI;
+
+bcsi MODULE-IDENTITY
+        LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+        ORGANIZATION "Extreme Networks, Inc."
+        CONTACT-INFO
+             "Postal:  Extreme Networks, Inc.
+                       6480 Via Del Oro
+                       San Jose, CA 95119 USA
+              Phone:   +1 408 579-2800
+              E-mail:  support@extremenetworks.com
+              WWW:     http://www.extremenetworks.com"
+        DESCRIPTION
+                "This MIB module defines Structure of Management 
+                Information for the Extreme enterprise and serves as 
+                central repository of all the OIDs under Extreme 
+                enterprise OID tree."
+
+        REVISION        "201805291200Z" -- May 29, 2018 12:00pm
+        DESCRIPTION	
+                "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+        REVISION        "201609270000Z"  -- 27th September, 2016
+        DESCRIPTION
+                "Removed nos OID from commDev OID tree."
+
+        REVISION        "201202030000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { enterprises 1588 }	-- assigned by IANA
+
+commDev OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Communication devices of Extreme."
+    ::= { bcsi 2 }
+    
+fibrechannel   OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Fibre Channel Devices of Extreme."
+    ::= { commDev 1 }
+
+fcSwitch OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Fibre Channel Switches of Extreme."
+    ::= { fibrechannel 1 }
+    
+bcsiReg OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for Extreme Global Registry."
+    ::= { bcsi 3 }
+
+bcsiModules OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION   
+        "The root OID sub-tree for all the Extreme management MIBs."
+    ::= { bcsiReg 1 }
+
+-- reserved for: brocadeTrapsMIB MODULE-IDENTITY  	::= { bcsiModules 1 }
+-- bcsiModuleTC MODULE-IDENTITY  					::= { bcsiModules 2 }
+-- swMibModule MODULE-IDENTITY 						::= { bcsiModules 3 }
+-- maps MODULE-IDENTITY 							::= { bcsiModules 4 }
+-- brocadeContextMappingMIB  MODULE-IDENTITY 		::= { bcsiModules 7 }
+-- brocadeOpticalMonitoringMIB  MODULE-IDENTITY 	::= { bcsiModules 8 }
+-- brocadeUdldMIB  MODULE-IDENTITY                  ::= { bcsiModules 9 }
+-- brocadeMplsMIB  MODULE-IDENTITY     				::= { bcsiModules 10 }
+-- brocadeInterfaceStatsMIB MODULE-IDENTITY         ::= { bcsiModules 11 }
+-- brocadeModuleCpuUtilMIB MODULE-IDENTITY          ::= { bcsiModules 12 }
+-- brocadeModuleMemUtilMIB MODULE-IDENTITY          ::= { bcsiModules 13 } 
+    
+brocadeAgentCapability OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"This provides a root object identifier from which 
+        AGENT-CAPABILITIES values may be assigned."
+	::= { bcsiReg 2 }
+END
+
+

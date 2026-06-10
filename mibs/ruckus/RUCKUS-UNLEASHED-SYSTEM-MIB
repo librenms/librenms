@@ -1,0 +1,421 @@
+--
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-UNLEASHED-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusUnleashedSystemModule
+        FROM RUCKUS-ROOT-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusUnleashedSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201510150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus Unleashed System mib"
+    ::= { ruckusUnleashedSystemModule 1 }
+
+ruckusUnleashedSystemObjects OBJECT IDENTIFIER     ::= { ruckusUnleashedSystemMIB 1 }
+
+ruckusUnleashedSystemInfo OBJECT IDENTIFIER    ::= { ruckusUnleashedSystemObjects 1 }
+
+ruckusUnleashedSystemName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "System name"
+    ::= { ruckusUnleashedSystemInfo 1 }
+
+ruckusUnleashedSystemIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "IP Address"
+    ::= { ruckusUnleashedSystemInfo 2 }
+
+ruckusUnleashedSystemMacAddr OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (6))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "MAC Address"
+    ::= { ruckusUnleashedSystemInfo 3 }
+
+ruckusUnleashedSystemUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Up time"
+    ::= { ruckusUnleashedSystemInfo 8 }
+
+ruckusUnleashedSystemModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Model"
+    ::= { ruckusUnleashedSystemInfo 9 }
+
+ruckusUnleashedSystemLicensedAPs OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Licensed APs"
+    ::= { ruckusUnleashedSystemInfo 12 }
+
+ruckusUnleashedSystemMaxSta OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of max stations allowed."
+    ::= { ruckusUnleashedSystemInfo 13 }
+
+ruckusUnleashedSystemSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Serial number"
+    ::= { ruckusUnleashedSystemInfo 15 }
+
+ruckusUnleashedSystemVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Software version"
+    ::= { ruckusUnleashedSystemInfo 18 }
+
+ruckusUnleashedSystemCountryCode OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (2))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the country code.
+         Each country represented as a two character.
+
+        Here is the lsit:
+
+        ALBANIA            ->    AL
+        ALGERIA            ->    DZ
+        ARGENTINA          ->    AR
+        ARMENIA            ->    AM
+        AUSTRALIA          ->    AU
+        AUSTRIA            ->    AT
+        AZERBAIJAN         ->    AZ
+        BAHRAIN            ->    BH
+        BELARUS            ->    BY
+        BELGIUM            ->    BE
+        BELIZE             ->    BZ
+        BOLIVIA            ->    BO
+        BRAZIL             ->    BR
+        BRUNEI_DARUSSALAM  ->    BN
+        BULGARIA           ->    BG
+        CANADA             ->    CA
+        CHILE              ->    CL
+        CHINA              ->    CN
+        COLOMBIA           ->    CO
+        COSTA_RICA         ->    CR
+        CROATIA            ->    HR
+        CYPRUS             ->    CY
+        CZECH              ->    CZ
+        DENMARK            ->    DK
+        DOMINICAN_REPUBLIC ->    DO
+        ECUADOR            ->    EC
+        EGYPT              ->    EG
+        EL_SALVADOR        ->    SV
+        ESTONIA            ->    EE
+        FINLAND            ->    FI
+        FRANCE             ->    FR
+        FRANCE2            ->    F2
+        GEORGIA            ->    GE
+        GERMANY            ->    DE
+        GREECE             ->    GR
+        GUATEMALA          ->    GT
+        HONDURAS           ->    HN
+        HONG_KONG          ->    HK
+        HUNGARY            ->    HU
+        ICELAND            ->    IS
+        INDIA              ->    IN
+        INDONESIA          ->    ID
+        IRAN               ->    IR
+        IRELAND            ->    IE
+        ISRAEL             ->    IL
+        ITALY              ->    IT
+        JAPAN              ->    JP
+        JAPAN1             ->    J1
+        JAPAN2             ->    J2
+        JAPAN3             ->    J3
+        JAPAN4             ->    J4
+        JAPAN5             ->    J5
+        JAPAN6             ->    J6
+        JAPAN7             ->    JP
+        JAPAN8             ->    JP
+        JAPAN9             ->    JP
+        JAPAN10            ->    JP
+        JAPAN11            ->    JP
+        JAPAN12            ->    JP
+        JAPAN13            ->    JP
+        JAPAN14            ->    JP
+        JAPAN15            ->    JP
+        JAPAN16            ->    JP
+        JAPAN17            ->    JP
+        JAPAN18            ->    JP
+        JAPAN19            ->    JP
+        JAPAN20            ->    JP
+        JAPAN21            ->    JP
+        JAPAN22            ->    JP
+        JAPAN23            ->    JP
+        JAPAN24            ->    JP
+        JORDAN             ->    JO
+        KAZAKHSTAN         ->    KZ
+        KOREA_NORTH        ->    KP
+        KOREA_ROC          ->    KR
+        KOREA_ROC2         ->    K2
+        KUWAIT             ->    KW
+        LATVIA             ->    LV
+        LEBANON            ->    LB
+        LIECHTENSTEIN      ->    LI
+        LITHUANIA          ->    LT
+        LUXEMBOURG         ->    LU
+        MACAU              ->    MO
+        MACEDONIA          ->    MK
+        MALAYSIA           ->    MY
+        MEXICO             ->    MX
+        MONACO             ->    MC
+        MOROCCO            ->    MA
+        NETHERLANDS        ->    NL
+        NEW_ZEALAND        ->    NZ
+        NORWAY             ->    NO
+        OMAN               ->    OM
+        PAKISTAN           ->    PK
+        PANAMA             ->    PA
+        PERU               ->    PE
+        PHILIPPINES        ->    PH
+        POLAND             ->    PL
+        PORTUGAL           ->    PT
+        PUERTO_RICO        ->    PR
+        QATAR              ->    QA
+        ROMANIA            ->    RO
+        RUSSIA             ->    RU
+        SAUDI_ARABIA       ->    SA
+        SINGAPORE          ->    SG
+        SLOVAKIA           ->    SK
+        SLOVENIA           ->    SI
+        SOUTH_AFRICA       ->    ZA
+        SPAIN              ->    ES
+        SWEDEN             ->    SE
+        SWITZERLAND        ->    CH
+        SYRIA              ->    SY
+        TAIWAN             ->    TW
+        THAILAND           ->    TH
+        TRINIDAD_Y_TOBAGO  ->    TT
+        TUNISIA            ->    TN
+        TURKEY             ->    TR
+        UKRAINE            ->    UA
+        UAE                ->    AE
+        UNITED_KINGDOM     ->    GB
+        UNITED_STATES      ->    US
+        UNITED_STATES_FCC49 ->   US
+        URUGUAY             ->   UY
+        UZBEKISTAN          ->   UZ
+        VENEZUELA           ->   VE
+        VIET_NAM            ->   VN
+        YEMEN               ->   YE
+        ZIMBABWE            ->   ZW"
+        
+    ::= { ruckusUnleashedSystemInfo 20 }
+    
+
+--
+-- Unleashed System Statistics, Operation Status
+--
+ruckusUnleashedSystemStats OBJECT IDENTIFIER    ::= { ruckusUnleashedSystemObjects 15 }
+
+ruckusUnleashedSystemStatsNumAP OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of AP"
+    ::= { ruckusUnleashedSystemStats 1 }
+
+ruckusUnleashedSystemStatsNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of authorized client devices"
+    ::= { ruckusUnleashedSystemStats 2 }
+
+ruckusUnleashedSystemStatsWLANTotalRxPkts OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received packets of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 5 }
+
+ruckusUnleashedSystemStatsWLANTotalRxBytes OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received bytes of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 6 }
+
+ruckusUnleashedSystemStatsWLANTotalRxMulticast OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total received multicast packets of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 7 }
+
+ruckusUnleashedSystemStatsWLANTotalTxPkts OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted packets of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 8 }
+
+ruckusUnleashedSystemStatsWLANTotalTxBytes OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted bytes of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 9 }
+
+ruckusUnleashedSystemStatsWLANTotalTxMulticast OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted multicast packets of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 10 }
+
+ruckusUnleashedSystemStatsWLANTotalTxFail OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted fail packets of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 11 }
+
+ruckusUnleashedSystemStatsWLANTotalTxRetry OBJECT-TYPE
+    SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Total transmitted retry packets of wireless interfaces"
+    ::= { ruckusUnleashedSystemStats 12 }
+
+ruckusUnleashedSystemStatsCPUUtil OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU utilization"
+    ::= { ruckusUnleashedSystemStats 13 }
+
+ruckusUnleashedSystemStatsMemoryUtil OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Memory utilization"
+    ::= { ruckusUnleashedSystemStats 14 }
+
+ruckusUnleashedSystemStatsNumRegisteredAP OBJECT-TYPE
+	SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of registered AP"
+    ::= { ruckusUnleashedSystemStats 15 }
+
+ruckusUnleashedSystemStatsWLANTotalAssocFail OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of failed station associations."
+    ::= { ruckusUnleashedSystemStats 16 }
+
+ruckusUnleashedSystemStatsWLANTotalRxErrFrm OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of errornous downlink frames."
+    ::= { ruckusUnleashedSystemStats 17 }
+    
+ruckusUnleashedSystemStatsWLANTotalTxDroppedPkt OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of dropped downlink packets."
+    ::= { ruckusUnleashedSystemStats 19 }
+
+ruckusUnleashedSystemStatsWLANTotalTxErrFrm OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of errornous downlink frames."
+    ::= { ruckusUnleashedSystemStats 20 }
+
+ruckusUnleashedSystemStatsWLANTotalTxDroppedFrm OBJECT-TYPE
+	SYNTAX  Counter64 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Total number of dropped downlink frames."
+    ::= { ruckusUnleashedSystemStats 21 }
+    
+ruckusUnleashedSystemStatsAllNumSta OBJECT-TYPE
+    SYNTAX  Unsigned32 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Number of All client devices"
+    ::= { ruckusUnleashedSystemStats 30 }
+
+
+END

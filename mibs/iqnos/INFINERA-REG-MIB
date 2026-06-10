@@ -1,0 +1,112 @@
+--------------------------------------------------------------------------
+-- INFINERA-REG-MIB.txt:  Infinera Registration MIB file
+--
+-- Sep 2008, Sharfuddin Syed / Narendra Gupta
+--
+-- (c) Copyright 2012 Infinera Corporation. All rights reserved.
+--------------------------------------------------------------------------
+INFINERA-REG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-IDENTITY, MODULE-IDENTITY, org          FROM SNMPv2-SMI
+    iso                                            FROM RFC1155-SMI;
+
+infinera MODULE-IDENTITY
+	LAST-UPDATED "200809051700Z"
+	ORGANIZATION
+		"Infinera"
+	CONTACT-INFO
+		"Infinera
+		                        1322 Bordeaux Drive
+		                        Sunnyvale, CA - 94089
+
+		                        Contact : Technical Support
+		                        Email   : support@infinera.com
+		                        Phone   : 1-877-INF-5288"
+	DESCRIPTION
+		"This module defines the Infinera Registration for
+		SNMP enterprise hierarchy."
+
+	REVISION "200809051700Z"
+	DESCRIPTION
+		"Organized the regristration MIB tree for SNMP support on the network element. "
+::= { enterprises 21296 }
+
+std                  OBJECT IDENTIFIER ::= { iso 0 }
+dod                  OBJECT IDENTIFIER ::= { org 6 }
+internet             OBJECT IDENTIFIER ::= { dod 1 }
+private              OBJECT IDENTIFIER ::= { internet 4 }
+enterprises          OBJECT IDENTIFIER ::= { private 1 }
+
+don  OBJECT-IDENTITY
+	STATUS     current
+	DESCRIPTION
+		"Represents the DON product line"
+	::= { infinera 2 }
+
+base  OBJECT-IDENTITY
+	STATUS     current
+	DESCRIPTION
+		"Represents the base node that can be used to define any common mibs across Infinera Products."
+	::= { don 1 }
+
+ne  OBJECT-IDENTITY
+	STATUS     current
+	DESCRIPTION
+		"Represent the Network Element object ID in the Infinera MIB tree."
+	::= { don 2 }
+
+-- The node in the tree represents the common mibs that are applicable to all the Infinera don network elements.
+
+common               OBJECT IDENTIFIER ::= { ne 1 }
+
+-- common 1 is TC-MIB, 2 to 7 is infinera trap/alarm mibs
+
+infnNE                   OBJECT IDENTIFIER ::= { common 8 }
+commonEquipment          OBJECT IDENTIFIER ::= { common 9 }
+commonTerminationPoint   OBJECT IDENTIFIER ::= { common 10 }
+commonPerfMon            OBJECT IDENTIFIER ::= { common 11 }
+commonProfile            OBJECT IDENTIFIER ::= { common 12 }
+syslog                   OBJECT IDENTIFIER ::= { common 13 }
+ntpServer                OBJECT IDENTIFIER ::= { common 14 }
+featureX                 OBJECT IDENTIFIER ::= { common 15 }
+
+
+
+-- The node in the tree represents the mibs that are applicable to the Infinera dtn network element.
+
+dtn                  OBJECT IDENTIFIER ::= { ne 2 }
+equipment            OBJECT IDENTIFIER ::= { dtn 1 }
+terminationPoint     OBJECT IDENTIFIER ::= { dtn 2 }
+perfMon              OBJECT IDENTIFIER ::= { dtn 3 }
+pxmOthers            OBJECT IDENTIFIER ::= { dtn 4 }
+
+-- The node in the tree represents the mibs that are applicable to the Infinera ola network element.
+
+ola                  OBJECT IDENTIFIER ::= { ne 3 }
+
+security             OBJECT IDENTIFIER ::= { ne 4 }
+
+macsec               OBJECT IDENTIFIER ::= { security 1 }
+
+macsecTP             OBJECT IDENTIFIER ::= { macsec 2 }
+macsecPerfMon        OBJECT IDENTIFIER ::= { macsec 3 }
+
+cert                 OBJECT IDENTIFIER ::= { ne 5 }
+
+ike                  OBJECT IDENTIFIER ::= { security 2 }
+
+acf                  OBJECT IDENTIFIER ::= { security 3 }
+
+signedImages         OBJECT IDENTIFIER ::= { security 5 }
+
+ems  OBJECT-IDENTITY
+	STATUS     current
+	DESCRIPTION
+		"This Object Identity represents the EMS Product suite."
+	::= { don 3 }
+END
+
+
+-- This MIB was created using NuDesign Team's Visual MIBuilder (Ver 4.7).
+

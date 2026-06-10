@@ -1,0 +1,115 @@
+NSCRTV-HFCEMS-ALARMS-MIB DEFINITIONS ::= BEGIN
+-- *****************************************************************************
+--                                附录D 告警MIB
+-- *****************************************************************************
+
+IMPORTS
+    TRAP-TYPE
+        FROM RFC-1215
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB
+    commonPhysAddress
+        FROM NSCRTV-HFCEMS-COMMON-MIB
+    commonNELogicalID
+        FROM NSCRTV-HFCEMS-COMMON-MIB
+    nscrtvHFCemsTree
+        FROM NSCRTV-ROOT
+    alarmsIdent
+        FROM NSCRTV-ROOT;
+
+alarmLogNumberOfEntries OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "告警记录表中的记录数量。"
+    ::= { alarmsIdent 1 }
+
+alarmLogLastIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "最近一条告警记录的索引值。"
+    ::= { alarmsIdent 2 }
+
+alarmLogTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AlarmLogEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "告警记录表，至少支持16条记录。每次在表中登记一条新的记录时，管理代理（即
+        应答器）应向管理者发送陷阱消息。"
+    ::= { alarmsIdent 3 }
+
+alarmLogEntry OBJECT-TYPE
+    SYNTAX AlarmLogEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "告警记录表目。"
+    INDEX { alarmLogIndex }
+    ::= { alarmLogTable 1 }
+
+AlarmLogEntry ::=
+    SEQUENCE
+    {
+    alarmLogIndex
+        INTEGER,
+    alarmLogInformation
+        OCTET STRING
+    }
+
+alarmLogIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..32767)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "索引唯一标识告警记录表中的一条记录，索引值从1开始每次增加新纪录时加1，
+        直到32767，下一条记录索引值重新从1开始。管理代理可根据存储容量选择删除最
+        早的那些记录，具体实现细节在此不做规定。"
+    ::= { alarmLogEntry 1 }
+
+alarmLogInformation OBJECT-TYPE
+    SYNTAX OCTET STRING ( SIZE ( 17..255 ) )
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "告警记录信息，多字节串，定义如下：
+        字节 1～4: 告警发生时间(POSIX格式，最高有效字节在前)
+        字节 5: 告警类型(枚举，定义见后)
+        字节 6: 告警发生后commonNeStatus的值
+        字节 7～m: 告警参数的对象标识符(基本编码规则（ASN.1）)
+        字节 n～z: 告警参数值 (基本编码规则（ASN.1）)
+        告警枚举类型：
+        1 NOMINAL
+        2 HIHI
+        3 HI
+        4 LO
+        5 LOLO
+        6 Discrete Major
+        7 Discrete Minor "
+    ::= { alarmLogEntry 2 }
+
+alarmText OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS optional
+    DESCRIPTION
+        "此对象对于需要在陷阱消息中包含一个文本信息字段的应答器是应实现的。
+        该字段中包含的文本内容取决于告警参数对象的定义，因此是不确定的，所以
+        规定此对象不能访问。"
+    ::= { alarmsIdent 4 }
+
+hfcAlarmEvent TRAP-TYPE
+    ENTERPRISE nscrtvHFCemsTree
+    VARIABLES { commonPhysAddress, commonNELogicalID, alarmLogInformation, alarmText }
+    DESCRIPTION
+        "当检测到告警事件时发送此陷阱消息，是否绑定alarmText变量根据告警参数对象来确
+        定。某些参数的告警只需要绑定前三个变量。"
+    ::= 1
+
+-- *****************************************************************************
+END

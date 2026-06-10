@@ -1,0 +1,1203 @@
+-- ************************************************************************
+-- Copyright (c) 2004-2018 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: WAPI extension mib
+-- Reference:
+-- Version: V1.5
+-- History:
+--   V1.0 created by zhanglianglun
+--     Initial version 2007-5-20
+--   V1.1 2009-06-04 modified by caizibin
+--        Add hh3cwapiCertificateInstalled, hh3cwapiConfigTable,
+--        hh3cwapiUserwithInvalidCertificate,
+--        hh3cwapiStationReplayAttack, hh3cwapiTamperAttack,
+--        hh3cwapiLowSafeLevelAttack, hh3cwapiAddressRedirectionAttack,
+--        hh3cwapiTrapInfoMacAddr, hh3cwapiTrapInfoAPId,
+--        hh3cwapiTrapInfoRadioId, hh3cwapiTrapInfoBSSId
+--   V1.2 2010-03-06 modified by xuyonggang
+--        Add hh3cwapiConfigExtTable
+--   V1.3 2010-11-23 modified by xuyonggang
+--        Add hh3cwapiCfgExtASIPAddressType
+--        Add hh3cwapiCfgExtASIPAddress
+--        Add hh3cwapiCfgExtASName
+--        Add hh3cwapiCfgExtCertDomain
+--        Add hh3cwapiCfgExtCertInstalled
+--   V1.4 2013-01-10 modified by xuyonggang
+--        Add hh3cwapiTrapInfoAPMacAddr
+--   V1.5 2018-05-07 modified by muzhuqing
+--        Add node hh3cwapiConfigVersion to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiControlledAuthControl to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiControlledPortControl to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiOptionImplemented to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiPreauthImplemented to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiEnabled to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiPreauthEnabled to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgUniKeysSupported to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgUniRekeyMethod to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgUniRekeyTime to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgUniRekeyPackets to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgMultiCipher to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgMultiRekeyMethod to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgMultiRekeyTime to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgMultiRekeyPackets to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgMultiRekeyStrict to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgPSKValue to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgPSKPassPhrase to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgCertUpdateCount to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgMultiUpdateCount to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgUniUpdateCount to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgMultiCipherSize to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgBKLifetime to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgBKReauthThreshold to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiCfgSATimeout to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiAuthenSuiteSelected to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiUniCipherSelected to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiMultiCipherSelected to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiBKIDUsed to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiAuthenSuiteRequested to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiUniCipherRequested to hh3cwapiConfigExtTable.
+--        Add node hh3cwapiMultiCipherRequested to hh3cwapiConfigExtTable.
+--        Add table hh3cwapiStatsTable.
+-- ************************************************************************
+HH3C-WAPI-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Counter32, Integer32, Unsigned32,
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TruthValue, MacAddress
+            FROM SNMPv2-TC
+        ifIndex, ifDescr
+            FROM IF-MIB
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+    hh3cwapiMIB MODULE-IDENTITY
+        LAST-UPDATED "201012011757Z"
+        ORGANIZATION
+            "New H3C Technologies Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Technologies Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "HH3C-WAPI-MIB is an extension of MIB in WAPI
+            protocol.  This MIB contains objects to
+            manage configuration and monitor running state
+            for WAPI feature."
+        REVISION "201012011757Z"
+        DESCRIPTION
+            "Add node hh3cwapiConfigVersion to hh3cwapiConfigExtTable.
+            Add node hh3cwapiControlledAuthControl to hh3cwapiConfigExtTable.
+            Add node hh3cwapiControlledPortControl to hh3cwapiConfigExtTable.
+            Add node hh3cwapiOptionImplemented to hh3cwapiConfigExtTable.
+            Add node hh3cwapiPreauthImplemented to hh3cwapiConfigExtTable.
+            Add node hh3cwapiEnabled to hh3cwapiConfigExtTable.
+            Add node hh3cwapiPreauthEnabled to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgUniKeysSupported to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgUniRekeyMethod to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgUniRekeyTime to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgUniRekeyPackets to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgMultiCipher to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgMultiRekeyMethod to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgMultiRekeyTime to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgMultiRekeyPackets to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgMultiRekeyStrict to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgPSKValue to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgPSKPassPhrase to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgCertUpdateCount to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgMultiUpdateCount to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgUniUpdateCount to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgMultiCipherSize to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgBKLifetime to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgBKReauthThreshold to hh3cwapiConfigExtTable.
+            Add node hh3cwapiCfgSATimeout to hh3cwapiConfigExtTable.
+            Add node hh3cwapiAuthenSuiteSelected to hh3cwapiConfigExtTable.
+            Add node hh3cwapiUniCipherSelected to hh3cwapiConfigExtTable.
+            Add node hh3cwapiMultiCipherSelected to hh3cwapiConfigExtTable.
+            Add node hh3cwapiBKIDUsed to hh3cwapiConfigExtTable.
+            Add node hh3cwapiAuthenSuiteRequested to hh3cwapiConfigExtTable.
+            Add node hh3cwapiUniCipherRequested to hh3cwapiConfigExtTable.
+            Add node hh3cwapiMultiCipherRequested to hh3cwapiConfigExtTable.
+            Add table hh3cwapiStatsTable."
+        ::= { hh3cCommon 77 }
+
+    hh3cwapiMIBObjects OBJECT IDENTIFIER ::= { hh3cwapiMIB 1 }
+    hh3cwapiMIBStatsObjects OBJECT IDENTIFIER ::= { hh3cwapiMIB 2 }
+    hh3cwapiMIBTableObjects OBJECT IDENTIFIER ::= { hh3cwapiMIB 3 }
+    hh3cwapiTrap OBJECT IDENTIFIER ::= { hh3cwapiMIB 4 }
+
+-- ************************************************************************
+-- * hh3cwapiModeEnabled OBJECT
+-- ************************************************************************
+    hh3cwapiModeEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When this object is set to TRUE, it shall indicate that WAPI
+            is enabled.  Otherwise, it shall indicate that WAPI is disabled."
+        ::= { hh3cwapiMIBObjects 1 }
+
+-- ************************************************************************
+-- * hh3cwapiASIPAddress OBJECT
+-- ************************************************************************
+    hh3cwapiASIPAddressType OBJECT-TYPE
+        SYNTAX  InetAddressType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set global IP addresses
+            type (IPv4 or IPv6) of AS."
+        DEFVAL { ipv4 }
+        ::= { hh3cwapiMIBObjects 2 }
+
+    hh3cwapiASIPAddress OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the global IP address of AS."
+        ::= { hh3cwapiMIBObjects 3 }
+
+-- ************************************************************************
+-- * hh3cwapiCertificateInstalled OBJECT
+-- ************************************************************************
+    hh3cwapiCertificateInstalled OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the entity has installed
+            certificate.  When the value is TRUE, it shall indicate that
+            the entity has installed certificate.  Otherwise, it shall
+            indicate that the entity hasn't installed certificate."
+        ::= { hh3cwapiMIBObjects 4 }
+
+-- ************************************************************************
+-- * 9 statistics OBJECTS
+-- ************************************************************************
+    hh3cwapiStatsWAISignatureErrors OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the received packet of
+            WAI signature is wrong."
+        ::= { hh3cwapiMIBStatsObjects 1 }
+
+    hh3cwapiStatsWAIHMACErrors OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the received packet of
+            WAI message authentication key checking error occurs."
+        ::= { hh3cwapiMIBStatsObjects 2 }
+
+    hh3cwapiStatsWAIAuthRsltFailures OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the WAI authentication result is
+            unsuccessful."
+        ::= { hh3cwapiMIBStatsObjects 3 }
+
+    hh3cwapiStatsWAIDiscardCounters OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the received packet of WAI are
+            discarded."
+        ::= { hh3cwapiMIBStatsObjects 4 }
+
+    hh3cwapiStatsWAITimeoutCounters OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the packet of WAI overtime are
+            detected."
+        ::= { hh3cwapiMIBStatsObjects 5 }
+
+    hh3cwapiStatsWAIFormatErrors OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the WAI packet of WAI format
+            error is detected."
+        ::= { hh3cwapiMIBStatsObjects 6 }
+
+    hh3cwapiStatsWAICtfHskFailures OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the WAI certificate authenticates
+            unsuccessfully."
+        ::= { hh3cwapiMIBStatsObjects 7 }
+
+    hh3cwapiStatsWAIUniHskFailures OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the WAI unicast cipher key
+            negotiates unsuccessfully."
+        ::= { hh3cwapiMIBStatsObjects 8 }
+
+    hh3cwapiStatsWAIMulHskFailures OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the WAI multicast cipher key
+            announces unsuccessfully."
+        ::= { hh3cwapiMIBStatsObjects 9 }
+
+-- ************************************************************************
+-- * hh3cwapiConfigTable Table
+-- ************************************************************************
+    hh3cwapiConfigTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cwapiConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table containing WAPI configuration objects."
+        ::= { hh3cwapiMIBTableObjects 1 }
+
+    hh3cwapiConfigEntry OBJECT-TYPE
+        SYNTAX Hh3cwapiConfigEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the hh3cwapiConfigTable."
+        INDEX { ifIndex }
+        ::= { hh3cwapiConfigTable 1 }
+
+    Hh3cwapiConfigEntry ::= SEQUENCE
+        {
+            hh3cwapiConfigASIPAddressType InetAddressType,
+            hh3cwapiConfigASIPAddress InetAddress,
+            hh3cwapiConfigAuthMethod INTEGER,
+            hh3cwapiConfigAuthMode INTEGER,
+            hh3cwapiConfigISPDomain OCTET STRING,
+            hh3cwapiConfigCertificateDomain OCTET STRING,
+            hh3cwapiConfigASName OCTET STRING,
+            hh3cwapiConfigBKRekeyEnabled TruthValue
+        }
+
+    hh3cwapiConfigASIPAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set IP addresses type of AS."
+        ::= { hh3cwapiConfigEntry 1 }
+
+    hh3cwapiConfigASIPAddress OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the IP address of AS."
+        ::= { hh3cwapiConfigEntry 2 }
+
+    hh3cwapiConfigAuthMethod OBJECT-TYPE
+        SYNTAX INTEGER {
+            certificate(1),
+            psk(2),
+            certificatePsk(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object selects a mechanism for WAPI authentication.
+            The default is certificate."
+        DEFVAL { certificate }
+        ::= { hh3cwapiConfigEntry 3 }
+
+    hh3cwapiConfigAuthMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            standard(1),
+            radiusExtension(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object selects a mechanism for WAPI authentication.
+            When the value is standard, it shall indicate that the entity
+            acts based on the official definition. Otherwise, it shall
+            indicate that the entity finishes authentication by means of RADIUS.
+            The default is standard."
+        DEFVAL { standard }
+        ::= { hh3cwapiConfigEntry 4 }
+
+    hh3cwapiConfigISPDomain OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..24))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The ISP domain name."
+        ::= { hh3cwapiConfigEntry 5 }
+
+    hh3cwapiConfigCertificateDomain OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The PKI domain name."
+        ::= { hh3cwapiConfigEntry 6 }
+
+    hh3cwapiConfigASName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The name of AS."
+        ::= { hh3cwapiConfigEntry 7 }
+
+    hh3cwapiConfigBKRekeyEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the BK rekey function is
+            supported. When the value is TRUE, it shall indicate that
+            the BK rekey function is supported. Otherwise, it shall
+            indicate that the BK rekey function is not supported."
+        ::= { hh3cwapiConfigEntry 8 }
+
+-- *************************************************************************
+-- * hh3cwapiConfigExtTable Table
+-- *************************************************************************
+
+    hh3cwapiConfigExtTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cwapiConfigExtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table containing WAPI configuration objects for SSID."
+        ::= { hh3cwapiMIBTableObjects 2 }
+
+    hh3cwapiConfigExtEntry OBJECT-TYPE
+        SYNTAX Hh3cwapiConfigExtEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An extend entry in the hh3cwapiConfigExtTable."
+        INDEX { hh3cwapiConfigServicePolicyID }
+        ::= { hh3cwapiConfigExtTable 1 }
+
+    Hh3cwapiConfigExtEntry ::= SEQUENCE
+    {
+        hh3cwapiConfigServicePolicyID Integer32,
+        hh3cwapiConfigUnicastCipherEnabled TruthValue,
+        hh3cwapiConfigUnicastCipherSize Unsigned32,
+        hh3cwapiConfigAuthenticationSuiteEnabled TruthValue,
+        hh3cwapiConfigAuthenticationSuite  OCTET STRING,
+        hh3cwapiCfgExtASIPAddressType InetAddressType,
+        hh3cwapiCfgExtASIPAddress InetAddress,
+        hh3cwapiCfgExtASName OCTET STRING,
+        hh3cwapiCfgExtCertDomain OCTET STRING,
+        hh3cwapiCfgExtCertInstalled TruthValue,
+        hh3cwapiConfigVersion Integer32,
+        hh3cwapiControlledAuthControl TruthValue,
+        hh3cwapiControlledPortControl Integer32,
+        hh3cwapiOptionImplemented TruthValue,
+        hh3cwapiPreauthImplemented TruthValue,
+        hh3cwapiEnabled TruthValue,
+        hh3cwapiPreauthEnabled TruthValue,
+        hh3cwapiCfgUniKeysSupported Unsigned32,
+        hh3cwapiCfgUniRekeyMethod INTEGER,
+        hh3cwapiCfgUniRekeyTime Unsigned32,
+        hh3cwapiCfgUniRekeyPackets Unsigned32,
+        hh3cwapiCfgMultiCipher OCTET STRING,
+        hh3cwapiCfgMultiRekeyMethod INTEGER,
+        hh3cwapiCfgMultiRekeyTime Unsigned32,
+        hh3cwapiCfgMultiRekeyPackets Unsigned32,
+        hh3cwapiCfgMultiRekeyStrict TruthValue,
+        hh3cwapiCfgPSKValue OCTET STRING,
+        hh3cwapiCfgPSKPassPhrase OCTET STRING,
+        hh3cwapiCfgCertUpdateCount Unsigned32,
+        hh3cwapiCfgMultiUpdateCount Unsigned32,
+        hh3cwapiCfgUniUpdateCount Unsigned32,
+        hh3cwapiCfgMultiCipherSize Unsigned32,
+        hh3cwapiCfgBKLifetime Unsigned32,
+        hh3cwapiCfgBKReauthThreshold Unsigned32,
+        hh3cwapiCfgSATimeout Unsigned32,
+        hh3cwapiAuthenSuiteSelected OCTET STRING,
+        hh3cwapiUniCipherSelected OCTET STRING,
+        hh3cwapiMultiCipherSelected OCTET STRING,
+        hh3cwapiBKIDUsed OCTET STRING,
+        hh3cwapiAuthenSuiteRequested OCTET STRING,
+        hh3cwapiUniCipherRequested OCTET STRING,
+        hh3cwapiMultiCipherRequested OCTET STRING
+    }
+
+    hh3cwapiConfigServicePolicyID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the ID of each service policy."
+    ::= { hh3cwapiConfigExtEntry 1 }
+
+   hh3cwapiConfigUnicastCipherEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object enables or disables the unicast cipher."
+        ::= { hh3cwapiConfigExtEntry 2 }
+
+   hh3cwapiConfigUnicastCipherSize OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the length in bits of the unicast cipher
+            key.  This should be 256 for SMS4, first 128 bits for encrypting,
+            last 128 bits for integrity checking."
+        ::= { hh3cwapiConfigExtEntry 3 }
+
+    hh3cwapiConfigAuthenticationSuiteEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This variable indicates the corresponding AKM suite is enabled
+            or disabled."
+        ::= { hh3cwapiConfigExtEntry 4 }
+
+    hh3cwapiConfigAuthenticationSuite OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of an AKM suite.  It consists of an OUI (the first 3
+            octets) and a cipher suite identifier (the last octet)."
+        ::= { hh3cwapiConfigExtEntry 5 }
+
+    hh3cwapiCfgExtASIPAddressType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set IP addresses type of AS."
+        ::= { hh3cwapiConfigExtEntry 6 }
+
+    hh3cwapiCfgExtASIPAddress OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the IP address of AS."
+        ::= { hh3cwapiConfigExtEntry 7 }
+
+    hh3cwapiCfgExtASName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the name of AS."
+        ::= { hh3cwapiConfigExtEntry 8 }
+
+    hh3cwapiCfgExtCertDomain OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..15))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to set the PKI domain name."
+        ::= { hh3cwapiConfigExtEntry 9 }
+
+    hh3cwapiCfgExtCertInstalled OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the entity has installed
+            certificate.  When the value is TRUE, it shall indicate that
+            the SSID has installed certificate. Otherwise, it shall
+            indicate that the SSID hasn't installed certificate."
+        ::= { hh3cwapiConfigExtEntry 10 }
+
+    hh3cwapiConfigVersion OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The highest WAPI version this entity supports."
+        ::= { hh3cwapiConfigExtEntry 11 }
+
+    hh3cwapiControlledAuthControl OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the entity is enabled with
+            authentication. When the value is FALSE, it shall indicate that
+            authentication is not enabled on this entity, and the status of
+            the controlled port is 'authenticated'. When the value is TRUE,
+            it shall indicate that authentication is enabled, and the status
+            of controlled port is decided by
+            hh3cwapiControlledPortControl."
+        ::= { hh3cwapiConfigExtEntry 12 }
+
+    hh3cwapiControlledPortControl OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the controlling type of the entity's port.
+            This object is available when
+            hh3cwapiControlledAuthControl is TRUE. When the value is
+            zero, it means 'automatic', and the status of the controlled port
+            is decided by authentication result. When the value is one,
+            it means 'forcibly unauthenticated', and the status of the
+            controlled port is 'unauthenticated'."
+        ::= { hh3cwapiConfigExtEntry 13 }
+
+    hh3cwapiOptionImplemented OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the entity supports WAPI. When the
+            value is TRUE, it shall indicate that the entity supports WAPI.
+            Otherwise, it shall indicate that the entity does not support WAPI."
+        ::= { hh3cwapiConfigExtEntry 14 }
+
+    hh3cwapiPreauthImplemented OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates whether the entity supports WAPI
+            preauthentication. This object can't be set to TRUE, unless
+            hh3cwapiOptionImplemented is TRUE."
+        ::= { hh3cwapiConfigExtEntry 15 }
+
+    hh3cwapiEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When this object is set to TRUE, it shall indicate that WAPI is
+            enabled on this entity. The entity will advertise the WAPI
+            information element in its beacon and probe response frames."
+        ::= { hh3cwapiConfigExtEntry 16 }
+
+    hh3cwapiPreauthEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When this object is set to TRUE, it shall indicate that WAPI
+            preauthentication is enabled on this entity. Otherwise, it shall
+            indicate that WAPI preauthentication is disabled on this entity.
+            This object requires that hh3cWAPIEnabled also be set to
+            TRUE."
+        ::= { hh3cwapiConfigExtEntry 17 }
+
+    hh3cwapiCfgUniKeysSupported OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates how many unicast keys the entity supports
+            for WAPI."
+        ::= { hh3cwapiConfigExtEntry 18 }
+
+    hh3cwapiCfgUniRekeyMethod OBJECT-TYPE
+        SYNTAX INTEGER {
+            disabled(1),
+            timeBased(2),
+            packetBased(3),
+            timepacketBased(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object selects a mechanism for rekeying the WAPI USK. The
+            default is time-based, once per day. Rekeying the USK is only
+            applicable to an entity acting as an AE or ASUE."
+        DEFVAL { timeBased }
+        ::= { hh3cwapiConfigExtEntry 19 }
+
+    hh3cwapiCfgUniRekeyTime OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Time in seconds after which the WAPI USK shall be refreshed.
+            The timer shall start at the moment the USK was set using the
+            MLME-SETWPIKEYS request primitive."
+        DEFVAL { 86400 }
+        ::= { hh3cwapiConfigExtEntry 20 }
+
+    hh3cwapiCfgUniRekeyPackets OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        UNITS "1000 packets"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A packet count (a multiple of 1000) after which the WAPI USK
+            shall be refreshed. The packet counter shall start at the moment
+            the USK was set using the MLME-SETKEYS request primitive and it
+            shall count all packets encrypted using the current USK."
+        ::= { hh3cwapiConfigExtEntry 21 }
+
+    hh3cwapiCfgMultiCipher OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the multicast cipher suite selector the
+            entity must use. The multicast cipher suite in the WAPI
+            information element shall take its value from this variable.
+            It contains an OUI (the first 3 octets) and a cipher suite
+            identifier (the last octet)."
+        ::= { hh3cwapiConfigExtEntry 22 }
+
+    hh3cwapiCfgMultiRekeyMethod OBJECT-TYPE
+        SYNTAX INTEGER {
+            disabled(1),
+            timeBased(2),
+            packetBased(3),
+            timepacketBased(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object selects a mechanism for rekeying the WAPI MSK. The
+            default is time-based, once per day. Rekeying the MSK is only
+            applicable to an entity acting as an AE or ASUE."
+        DEFVAL { timeBased }
+        ::= { hh3cwapiConfigExtEntry 23 }
+
+    hh3cwapiCfgMultiRekeyTime OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Time in seconds after which the WAPI MSK shall be refreshed.
+            The timer shall start at the moment the MSK was set using the
+            MLME-SETWPIKEYS request primitive."
+        DEFVAL { 86400 }
+        ::= { hh3cwapiConfigExtEntry 24 }
+
+    hh3cwapiCfgMultiRekeyPackets OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        UNITS "1000 packets"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "A packet count (a multiple of 1000) after which the WAPI MSK
+            shall be refreshed. The packet counter shall start at the moment
+            the MSK was set using the MLME-SETKEYS request primitive and it
+            shall count all packets encrypted using the current MSK."
+        ::= { hh3cwapiConfigExtEntry 25 }
+
+    hh3cwapiCfgMultiRekeyStrict OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the MSK shall be refreshed whenever an
+            STA leaves the BSS that has the MSK."
+        ::= { hh3cwapiConfigExtEntry 26 }
+
+    hh3cwapiCfgPSKValue OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(2..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The PSK value when WAPI in PSK mode is the selected AKM suite.
+            In that case, the BK will obtain its value from this object.
+            This object is logically write-only. Reading this variable shall
+            return unsuccessful status or null or zero."
+        ::= { hh3cwapiConfigExtEntry 27 }
+
+    hh3cwapiCfgPSKPassPhrase OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..16))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The PSK value when WAPI in PSK mode is the selected AKM suite,
+            which is configured by hh3cwapiCfgPSKValue.
+            An alternative method of setting the PSK is to
+            use the password-to-key algorithm.
+            This variable provides a means to enter a pass-phrase.
+            When this object is written, the WAPI entity shall
+            use the password-to-key algorithm to derive a preshared key
+            and populate hh3cwapiCfgPSKValue with this key.
+            This object is logically write-only. Reading this variable shall
+            return unsuccessful status or null or zero."
+        ::= { hh3cwapiConfigExtEntry 28 }
+
+    hh3cwapiCfgCertUpdateCount OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of times message in the WAPI certificate
+            authentication handshake will be retried per certificate
+            authentication handshake attempt."
+        DEFVAL { 3 }
+        ::= { hh3cwapiConfigExtEntry 29 }
+
+    hh3cwapiCfgMultiUpdateCount OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of times message in the WAPI multicast key handshake
+            will be retried per MSK handshake attempt."
+        DEFVAL { 3 }
+        ::= { hh3cwapiConfigExtEntry 30 }
+
+    hh3cwapiCfgUniUpdateCount OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The number of times message in the WAPI unicast key handshake
+            will be retried per 3-way handshake attempt."
+        DEFVAL { 3 }
+        ::= { hh3cwapiConfigExtEntry 31 }
+
+    hh3cwapiCfgMultiCipherSize OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the length in bits of the multicast cipher
+            key. This should be 256 for SMS4, where the first 128 bits are
+            for encryption, and the last 128 bits for integrity check."
+        ::= { hh3cwapiConfigExtEntry 32 }
+
+    hh3cwapiCfgBKLifetime OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum lifetime of a BK in the BK cache."
+        DEFVAL { 43200 }
+        ::= { hh3cwapiConfigExtEntry 33 }
+
+    hh3cwapiCfgBKReauthThreshold OBJECT-TYPE
+        SYNTAX Unsigned32 (1..100)
+        UNITS "percentage"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The percentage of the BK lifetime that should expire before a
+            reauthentication occurs."
+        DEFVAL { 70 }
+        ::= { hh3cwapiConfigExtEntry 34 }
+
+    hh3cwapiCfgSATimeout OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        UNITS "seconds"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum time a security association shall take to set up."
+        DEFVAL { 60 }
+        ::= { hh3cwapiConfigExtEntry 35 }
+
+    hh3cwapiAuthenSuiteSelected OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of the last negotiated AKM suite."
+        ::= { hh3cwapiConfigExtEntry 36 }
+
+    hh3cwapiUniCipherSelected OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of the last negotiated unicast cipher."
+        ::= { hh3cwapiConfigExtEntry 37 }
+
+    hh3cwapiMultiCipherSelected OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of the last negotiated multicast cipher."
+        ::= { hh3cwapiConfigExtEntry 38 }
+
+    hh3cwapiBKIDUsed OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of the last BKID used in the last unicast
+            cipher key handshake."
+        ::= { hh3cwapiConfigExtEntry 39 }
+
+    hh3cwapiAuthenSuiteRequested OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of the last requested AKM suite."
+        ::= { hh3cwapiConfigExtEntry 40 }
+
+    hh3cwapiUniCipherRequested OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of the last requested unicast cipher."
+        ::= { hh3cwapiConfigExtEntry 41 }
+
+    hh3cwapiMultiCipherRequested OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The selector of the last requested multicast cipher."
+        ::= { hh3cwapiConfigExtEntry 42 }
+
+    hh3cwapiStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cwapiStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table maintains per-STA statistics in a WAPI. The entry
+            with hh3cwapiStatsSTAAddress set to FF-FF-FF-FF-FF-FF
+            shall contain statistics for broadcast/multicast traffic."
+        ::= { hh3cwapiMIBTableObjects 3 }
+
+    hh3cwapiStatsEntry OBJECT-TYPE
+        SYNTAX Hh3cwapiStatsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry in the hh3cwapiStatsTable."
+        INDEX { hh3cwapiStationMAC }
+        ::= { hh3cwapiStatsTable 1 }
+
+    Hh3cwapiStatsEntry ::=
+        SEQUENCE {
+            hh3cwapiStationMAC MacAddress,
+            hh3cwapiStatsSTAAddress MacAddress,
+            hh3cwapiStatsVersion Unsigned32,
+            hh3cwapiStatsCtrlPortStatus TruthValue,
+            hh3cwapiStatsSelectedUniCipher OCTET STRING,
+            hh3cwapiStatsWPIReplayCnt Counter32,
+            hh3cwapiStatsWPIDecryptErr Counter32,
+            hh3cwapiStatsWPIMICErr Counter32,
+            hh3cwapiStatsWAISignatureErr Counter32,
+            hh3cwapiStatsWAIHMACErr Counter32,
+            hh3cwapiStatsWAIAuthenFail Counter32,
+            hh3cwapiStatsWAIDiscardCnt Counter32,
+            hh3cwapiStatsWAITimeoutCnt Counter32,
+            hh3cwapiStatsWAIFormatErr Counter32,
+            hh3cwapiStatsWAICertFail Counter32,
+            hh3cwapiStatsWAIUniFail Counter32,
+            hh3cwapiStatsWAIMultiFail Counter32
+        }
+
+    hh3cwapiStationMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique MAC Address of station."
+    ::= { hh3cwapiStatsEntry 1 }
+
+    hh3cwapiStatsSTAAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The MAC address of the STA to which the statistics in this
+            conceptual row belong."
+        ::= { hh3cwapiStatsEntry 2 }
+
+    hh3cwapiStatsVersion OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4294967295)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The WAPI version with which the STA is associated."
+        ::= { hh3cwapiStatsEntry 3 }
+
+    hh3cwapiStatsCtrlPortStatus OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the status of the authentication
+            entity's controlled port. When the value is TRUE, it means
+            'authenticated'. Otherwise, it means 'unauthenticated'."
+        ::= { hh3cwapiStatsEntry 4 }
+
+    hh3cwapiStatsSelectedUniCipher OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The unicast cipher suite selector used during association."
+        ::= { hh3cwapiStatsEntry 5 }
+
+    hh3cwapiStatsWPIReplayCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of WPI MPDUs discarded by the replay mechanism."
+        ::= { hh3cwapiStatsEntry 6 }
+
+    hh3cwapiStatsWPIDecryptErr OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of WPI MPDUs discarded because of unavailable cipher
+            key during WPI-SMS4 decryption."
+        ::= { hh3cwapiStatsEntry 7 }
+
+    hh3cwapiStatsWPIMICErr OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of WPI MPDUs discarded because of MIC checking
+            failure during WPI-SMS4 decryption."
+        ::= { hh3cwapiStatsEntry 8 }
+
+    hh3cwapiStatsWAISignatureErr OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the received WAI packets' signature
+            is wrong."
+        ::= { hh3cwapiStatsEntry 9 }
+
+    hh3cwapiStatsWAIHMACErr OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when message authentication key
+            checking error occurs on the received WAI packets."
+        ::= { hh3cwapiStatsEntry 10 }
+
+    hh3cwapiStatsWAIAuthenFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the WAI authentication result
+            is unsuccessful."
+        ::= { hh3cwapiStatsEntry 11 }
+
+    hh3cwapiStatsWAIDiscardCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the received WAI packet is
+            discarded."
+        ::= { hh3cwapiStatsEntry 12 }
+
+    hh3cwapiStatsWAITimeoutCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when a WAI packet timeout is
+            detected."
+        ::= { hh3cwapiStatsEntry 13 }
+
+    hh3cwapiStatsWAIFormatErr OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when WAI packet format error occurs"
+        ::= { hh3cwapiStatsEntry 14 }
+
+    hh3cwapiStatsWAICertFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when WAI certificate authentication
+            fails."
+        ::= { hh3cwapiStatsEntry 15 }
+
+    hh3cwapiStatsWAIUniFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when WAI unicast cipher key
+            negotiation succeeds."
+        ::= { hh3cwapiStatsEntry 16 }
+
+    hh3cwapiStatsWAIMultiFail OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This counter increases when the WAI multicast cipher key
+            announcement failure occurs."
+        ::= { hh3cwapiStatsEntry 17 }
+
+-- ************************************************************************
+-- * trap OBJECT
+-- ************************************************************************
+    hh3cwapiTrapPrefix OBJECT IDENTIFIER ::= { hh3cwapiTrap 0 }
+    hh3cwapiUserwithInvalidCertificate NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cwapiTrapInfoMacAddr,
+            hh3cwapiTrapInfoAPId,
+            hh3cwapiTrapInfoRadioId,
+            hh3cwapiTrapInfoBSSId,
+            hh3cwapiTrapInfoAPMacAddr
+        }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when a user intrudes upon network with invalid
+            certificate."
+        ::= { hh3cwapiTrapPrefix 1 }
+
+    hh3cwapiStationReplayAttack NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cwapiTrapInfoMacAddr,
+            hh3cwapiTrapInfoAPId,
+            hh3cwapiTrapInfoRadioId,
+            hh3cwapiTrapInfoBSSId,
+            hh3cwapiTrapInfoAPMacAddr
+        }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when an attacker records and replays network
+            transactions."
+        ::= { hh3cwapiTrapPrefix 2 }
+
+    hh3cwapiTamperAttack NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cwapiTrapInfoMacAddr,
+            hh3cwapiTrapInfoAPId,
+            hh3cwapiTrapInfoRadioId,
+            hh3cwapiTrapInfoBSSId,
+            hh3cwapiTrapInfoAPMacAddr
+        }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when an attacker monitors network traffic and
+            maliciously changes data in transit(for example, an attacker may
+            modify the contents of a WAI message)."
+        ::= { hh3cwapiTrapPrefix 3 }
+
+    hh3cwapiLowSafeLevelAttack NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cwapiTrapInfoMacAddr,
+            hh3cwapiTrapInfoAPId,
+            hh3cwapiTrapInfoRadioId,
+            hh3cwapiTrapInfoBSSId,
+            hh3cwapiTrapInfoAPMacAddr
+        }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when a station associates AP(Access Point),
+            creates packet of Unicast Key Negotiation Response with wrong
+            WIE(WAPI Information Element) of ASUE(Authentication Supplicant
+            Entity)."
+        ::= { hh3cwapiTrapPrefix 4 }
+
+    hh3cwapiAddressRedirectionAttack NOTIFICATION-TYPE
+        OBJECTS
+        {
+            ifIndex,
+            ifDescr,
+            hh3cwapiTrapInfoMacAddr,
+            hh3cwapiTrapInfoAPId,
+            hh3cwapiTrapInfoRadioId,
+            hh3cwapiTrapInfoBSSId,
+            hh3cwapiTrapInfoAPMacAddr
+        }
+        STATUS current
+        DESCRIPTION
+            "This trap is sent when an attacker maliciously changes destination
+            MAC address of WPI(WLAN Privacy Infrastructure) frame."
+        ::= { hh3cwapiTrapPrefix 5 }
+
+-- ************************************************************************
+-- * The following objects are used for binding informations when sending traps.
+-- ************************************************************************
+
+hh3cwapiTrapInfo OBJECT IDENTIFIER ::= { hh3cwapiTrap 1 }
+
+hh3cwapiTrapInfoMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The MAC address of the WAPI user."
+        ::= { hh3cwapiTrapInfo 1 }
+
+hh3cwapiTrapInfoAPId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "To uniquely identify each AP."
+        ::= { hh3cwapiTrapInfo 2 }
+
+hh3cwapiTrapInfoRadioId OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Represents each radio."
+        ::= { hh3cwapiTrapInfo 3 }
+
+hh3cwapiTrapInfoBSSId OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "As MAC Address format, it is to identify BSS."
+        ::= { hh3cwapiTrapInfo 4 }
+
+hh3cwapiTrapInfoAPMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "As MAC Address format, it is to identify AP"
+        ::= { hh3cwapiTrapInfo 5 }
+END

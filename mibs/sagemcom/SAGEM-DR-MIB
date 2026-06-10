@@ -1,0 +1,59 @@
+--*******************************************************************
+--*    SAGEM, IONOS 	 							  				*
+--*******************************************************************
+--*******************************************************************
+--
+--  Filename: Sagem
+--
+--  File type: .mib    
+-- 
+--  Description:	SNMP source Mib file.
+--
+--			The MIB module defines enterprises/sagemDr entry
+--			Replace SAT-MIB
+--             
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Version: MIB-P0-301199	Date: 30 11 1999 
+-- 
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+
+
+--*******************************************************************
+-- MIB: EQUIPMENT-MIB
+--*******************************************************************
+SAGEM-DR-MIB DEFINITIONS ::= BEGIN
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+
+   IMPORTS
+   enterprises                                    FROM RFC1155-SMI
+   MODULE-IDENTITY                                FROM SNMPv2-SMI;
+
+   sagemDr MODULE-IDENTITY
+      LAST-UPDATED "0211150000Z"
+      ORGANIZATION "SAGEM-Tolbiac"
+      CONTACT-INFO
+        "    "
+      DESCRIPTION
+        "The MIB module defines enterprises/sagem-r entry"
+   ::= { enterprises 1038 }
+
+END
+

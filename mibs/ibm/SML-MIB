@@ -1,0 +1,918 @@
+
+-- SML MIB Rev 1.12
+-- ASN.1 code created using dot2asn
+-- by Jeff Bain
+-- Hewlett Packard, Storage Systems Division
+-- Greeley, CO
+-- jeff_bain@hp.com
+
+SML-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+
+                OBJECT-TYPE
+                        FROM RFC-1212
+                      enterprises
+                        FROM RFC1155-SMI
+                DisplayString
+                        FROM RFC1213-MIB
+                ;
+
+-- Textual Conventions
+
+UShortReal ::= INTEGER (0..'ffff'h)
+-- This textual convention can be used to represent short
+-- unsigned 'real' numbers.  Using this variable type,
+-- a 3 digit number with 2 decimal places (xxx.xx)
+-- can be represented.  For example, 321.45 would be
+-- represented as 32145"
+
+CimDateTime ::= OCTET STRING (SIZE (24))
+-- This textual convention can be used to represent a date
+-- and time using the CIM DateTime convention.  The bytes are
+-- as follows:
+
+--      octets  contents                range
+--      ======  ========                =====
+--      1-4     year                    0000-9999
+--      5-6     month                   01-12
+--      7-8     day                     01-31
+--      9-10    hour                    00-23
+--      11-12   minute                  00-59
+--      13-14   second                  00-59
+--      15-20   microseconds            000000-999999
+--      21      sign                    '+' or '-'
+--      22-24   UTC offset in minutes   000-839
+
+-- For example, Monday, May 25, 1998, at 1:30:15 PM EST would be
+-- represented as  19980525133015000000-300
+
+-- Note that values must be zero-padded so that the entire
+-- string is always the same 25-character length.  Fields that
+-- are not significant can be replaced with asterisk characters"
+
+UINT64 ::= OCTET STRING (SIZE (8))
+-- This textual convention can be used to represent 64-bit
+-- numbers using the OCTET STRING type.  SNMPv2 supports a
+-- Counter64 type, but there is no C-language mapping for a
+-- 64-bit variable that's much better than an array of 8 bytes
+
+UINT32 ::= INTEGER (0..'7fffffff'h)
+UINT16 ::= INTEGER (0..'ffff'h)
+-- MIB Fields
+
+
+ibm OBJECT IDENTIFIER  ::= { enterprises 2 }
+
+ibmProd OBJECT IDENTIFIER        ::= { ibm 6 }
+
+ibm3584 OBJECT IDENTIFIER        ::= { ibmProd 182 }
+
+
+smlRoot OBJECT IDENTIFIER ::= { ibm3584 3 }
+
+
+
+smlMibVersion OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..4))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This string contains version information for the MIB file"
+        ::= { smlRoot 1 }
+
+smlCimVersion OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..4))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This string contains information about the CIM version that corresponds to
+                the MIB. The decriptions in this MIB file are based on CIM version 2.7, as
+                documented by Steve Jerman for HP."
+        ::= { smlRoot 2 }
+
+productGroup
+        OBJECT IDENTIFIER
+        ::= { smlRoot 3 }
+
+product-Name OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Commonly used Product name."
+        ::= { productGroup 1 }
+
+product-IdentifyingNumber OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Product identification such as a serial number on software, a die
+                number on a hardware chip, or (for non-commercial Products) a project number."
+        ::= { productGroup 2 }
+
+product-Vendor OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The name of the Product's supplier, or entity selling the Product
+                (the manufacturer, reseller, OEM, etc.). Corresponds to the Vendor
+                property in the Product object in the DMTF Solution Exchange Standard."
+        ::= { productGroup 3 }
+
+product-Version OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Product version information. Corresponds to the Version property in the
+                Product object in the DMTF Solution Exchange Standard."
+        ::= { productGroup 4 }
+
+chassisGroup
+        OBJECT IDENTIFIER
+
+        ::= { smlRoot 4 }
+
+chassis-Manufacturer OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The name of the organization responsible for producing the PhysicalElement.
+                This may be the entity from whom the Element is purchased, but this is not
+                necessarily true. The latter information is contained in the Vendor property
+                of CIM_Product."
+        ::= { chassisGroup 1 }
+
+chassis-Model OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The name by which the PhysicalElement is generally known."
+        ::= { chassisGroup 2 }
+
+chassis-SerialNumber OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A manufacturer-allocated number used to identify the Physical Element."
+        ::= { chassisGroup 3 }
+
+chassis-LockPresent OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Boolean indicating whether the Frame is protected with a lock."
+        ::= { chassisGroup 4 }
+
+chassis-SecurityBreach OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                other (1),
+                                noBreach (2),
+                                breachAttempted (3) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "SecurityBreach is an enumerated, integer-valued property indicating whether
+                a physical breach of the Frame was attempted but unsuccessful (value=4) or
+                attempted and successful (5). Also, the values, 'Unknown', 'Other' or 'No Breach',
+                can be specified."
+        ::= { chassisGroup 5 }
+
+chassis-IsLocked OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Boolean indicating that the Frame is currently locked."
+        ::= { chassisGroup 6 }
+
+storageLibraryGroup
+        OBJECT IDENTIFIER
+        ::= { smlRoot 5 }
+
+storageLibrary-Name OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The inherited Name serves as key of a System instance in an enterprise environment."
+        ::= { storageLibraryGroup 1 }
+
+storageLibrary-Description OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The Description property provides a textual description of the object."
+        ::= { storageLibraryGroup 2 }
+
+storageLibrary-Caption OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The Caption property is a short textual description (one- line string) of the object."
+        ::= { storageLibraryGroup 3 }
+
+storageLibrary-Status OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..10))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A string indicating the current status of the object.
+                Various operational and non-operational statuses are defined.
+                This property is deprecated in lieu of OperationalStatus, which includes
+                the same semantics in its enumeration. This change is made for three reasons:
+                1) Status is more correctly defined as an array property. This overcomes the
+                limitation of describing status via a single value, when it is really a
+                multi-valued property (for example, an element may be OK AND Stopped.
+                2) A MaxLen of 10 is too restrictive and leads to unclear enumerated values. And,
+                3) The change to a uint16 data type was discussed when CIM V2.0 was defined.
+                However, existing V1.0 implementations used the string property and did not want
+                to modify their code. Therefore, Status was grandfathered into the Schema. Use
+                of the Deprecated qualifier allows the maintenance of the existing property, but
+                also permits an improved definition using OperationalStatus."
+        ::= { storageLibraryGroup 4 }
+
+storageLibrary-InstallDate OBJECT-TYPE
+        SYNTAX          CimDateTime
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A datetime value indicating when the object was installed. A lack of a value
+                does not indicate that the object is not installed."
+        ::= { storageLibraryGroup 5 }
+
+mediaAccessDeviceGroup
+        OBJECT IDENTIFIER
+        ::= { smlRoot 6 }
+
+numberOfMediaAccessDevices OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This value specifies the number of MediaAccessDevices that are present."
+        ::= { mediaAccessDeviceGroup 1 }
+
+mediaAccessDeviceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TableInfo-1
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "A MediaAccessDevice represents the ability to access one or more media
+                and use this media to store and retrieve data."
+        ::= { mediaAccessDeviceGroup 2 }
+
+mediaAccessDeviceEntry OBJECT-TYPE
+        SYNTAX          TableInfo-1
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry in the table contains information about a MediaAccessDevice
+                that is present in the library."
+        INDEX { mediaAccessDeviceIndex }
+        ::= { mediaAccessDeviceTable 1 }
+
+TableInfo-1 ::= SEQUENCE
+{
+        mediaAccessDeviceIndex UINT32,
+        mediaAccessDeviceObjectType INTEGER,
+        mediaAccessDevice-Name DisplayString,
+        mediaAccessDevice-Status DisplayString,
+        mediaAccessDevice-Availability INTEGER,
+        mediaAccessDevice-NeedsCleaning INTEGER
+}
+
+mediaAccessDeviceIndex OBJECT-TYPE
+        SYNTAX          UINT32
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The current index value for the MediaAccessDevice."
+        ::= { mediaAccessDeviceEntry 1 }
+
+mediaAccessDeviceObjectType OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                wormDrive (1),
+                                magnetoOpticalDrive (2),
+                                tapeDrive (3),
+                                dvdDrive (4),
+                                cdromDrive (5) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "In the 2.7 CIM Schema a Type property is no longer associated with
+                MediaAccessDevice. However, it can be used here to specify the type of drive
+                that is present."
+        ::= { mediaAccessDeviceEntry 2 }
+
+mediaAccessDevice-Name OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The Name property defines the label by which the object is
+                known. When subclassed, the Name property can be overridden
+                to be a Key property."
+        ::= { mediaAccessDeviceEntry 3 }
+
+mediaAccessDevice-Status OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..10))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A string indicating the current status of the object. Various
+                operational and non-operational statuses are defined. This
+                property is deprecated in lieu of OperationalStatus, which
+                includes the same semantics in its enumeration. This change
+                is made for three reasons:
+                1) Status is more correctly defined
+                as an array property. This overcomes the limitation of describing
+                status via a single value, when it is really a multi-valued property
+                (for example, an element may be OK AND Stopped.
+                2) A MaxLen of 10 is too restrictive and leads to unclear enumerated
+                values. And,
+                3) The change to a uint16 data type was discussed when CIM V2.0 was
+                defined. However, existing V1.0 implementations used the string property
+                and did not want to modify their code. Therefore, Status was grandfathered
+                into the Schema. Use of the Deprecated qualifier allows the maintenance
+                of the existing property, but also permits an improved definition using
+                OperationalStatus."
+        ::= { mediaAccessDeviceEntry 4 }
+
+mediaAccessDevice-Availability OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                other (1),
+                                runningFullPower (2),
+                                warning (3),
+                                inTest (4),
+                                notApplicable (5),
+                                powerOff (6),
+                                offLine (7),
+                                offDuty (8),
+                                degraded (9),
+                                notInstalled (10),
+                                installError (11),
+                                powerSaveUnknown (12),
+                                powerSaveLowPowerMode (13),
+                                powerSaveStandby (14),
+                                powerCycle (15),
+                                powerSaveWarning (16),
+                                paused (17),
+                                notReady (18) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The primary availability and status of the Device. (Additional status
+                information can be specified using the AdditionalAvailability array property.)
+                For example, the Availability property indicates that the Device is running and
+                has full power (value=3), or is in a warning (4), test (5), degraded (10) or
+                power save state (values 13-15 and 17). Regarding the Power Save states, these
+                are defined as follows: Value 13 ('Power Save - Unknown') indicates that the
+                Device is known to be in a power save mode, but its exact status in this mode
+                is unknown; 14 ('Power Save - Low Power Mode') indicates that the Device is in
+                a power save state but still functioning, and may exhibit degraded performance;
+                15 ('Power Save - Standby') describes that the Device is not functioning but
+                could be brought to full power 'quickly'; and value 17 ('Power Save - Warning')
+                indicates that the Device is in a warning state, though also in a power save mode."
+        ::= { mediaAccessDeviceEntry 5 }
+
+mediaAccessDevice-NeedsCleaning OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Boolean indicating that the MediaAccessDevice needs cleaning. Whether manual
+                or automatic cleaning is possible is indicated in the Capabilities array property. "
+        ::= { mediaAccessDeviceEntry 6 }
+
+physicalMediaGroup
+        OBJECT IDENTIFIER
+        ::= { smlRoot 7 }
+
+numberOfPhysicalMedias OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This value specifies the number of PhysicalMedia that are present."
+        ::= { physicalMediaGroup 1 }
+
+physicalMediaTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TableInfo-2
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "The PhysicalMedia class represents any type of documentation or storage
+                medium, such as tapes, CDROMs, etc. This class is typically used to locate
+                and manage Removable Media (versus Media sealed with the MediaAccessDevice,
+                as a single Package, as is the case with hard disks). However, 'sealed' Media
+                can also be modeled using this class, where the Media would then be associated
+                with the PhysicalPackage using the PackagedComponent relationship."
+        ::= { physicalMediaGroup 2 }
+
+physicalMediaEntry OBJECT-TYPE
+        SYNTAX          TableInfo-2
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry in the table contains information about a PhysicalMedia
+                that is present in the library."
+        INDEX { physicalMediaIndex }
+        ::= { physicalMediaTable 1 }
+
+TableInfo-2 ::= SEQUENCE
+{
+        physicalMediaIndex UINT32,
+        physicalMediaObjectType INTEGER,
+        physicalMedia-Removable INTEGER,
+        physicalMedia-Replaceable INTEGER,
+        physicalMedia-HotSwappable INTEGER,
+        physicalMedia-Capacity UINT64,
+        physicalMedia-MediaType INTEGER,
+        physicalMedia-MediaDescription DisplayString,
+        physicalMedia-CleanerMedia INTEGER,
+        physicalMedia-DualSided INTEGER,
+        physicalMedia-PhysicalLabel DisplayString
+}
+
+physicalMediaIndex OBJECT-TYPE
+        SYNTAX          UINT32
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The current index value for the PhysicalMedia."
+        ::= { physicalMediaEntry 1 }
+
+physicalMediaObjectType OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                tape (0),
+                                other (1) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "In the 2.7 CIM Schema a Type property is no longer associated with
+                physicalMedia. The MediaType property provides more detailed information."
+        ::= { physicalMediaEntry 2 }
+
+physicalMedia-Removable OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A PhysicalComponent is Removable if it is designed to be taken in and out
+                of the physical container in which it is normally found, without impairing
+                the function of the overall packaging. A Component can still be Removable
+                if power must be 'off' in order to perform the removal. If power can be
+                'on' and the Component removed, then the Element is both Removable and
+                HotSwappable. For example, an upgradeable Processor chip is Removable."
+        ::= { physicalMediaEntry 3 }
+
+physicalMedia-Replaceable OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A PhysicalComponent is Replaceable if it is possible to replace (FRU or
+                upgrade) the Element with a physically different one. For example, some
+                ComputerSystems allow the main Processor chip to be upgraded to one of
+                a higher clock rating. In this case, the Processor is said to be Replaceable.
+                All Removable Components are inherently Replaceable."
+        ::= { physicalMediaEntry 4 }
+
+physicalMedia-HotSwappable OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A PhysicalComponent is HotSwappable if it is possible to replace the Element
+                with a physically different but equivalent one while the containing Package
+                has power applied to it (ie, is 'on'). For example, a fan Component may be
+                designed to be HotSwappable. All HotSwappable Components are inherently Removable
+                and Replaceable."
+        ::= { physicalMediaEntry 5 }
+
+physicalMedia-Capacity OBJECT-TYPE
+        SYNTAX          UINT64
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The number of bytes that can be read from or written to a Media. This
+                property is not applicable to 'Hard Copy' (documentation) or cleaner Media.
+                Data compression should not be assumed, as it would increase the value in
+                this property. For tapes, it should be assumed that no filemarks or blank
+                space areas are recorded on the Media."
+        ::= { physicalMediaEntry 6 }
+
+physicalMedia-MediaType OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                other (1),
+                                tape (2),
+                                qic (3),
+                                ait (4),
+                                dtf (5),
+                                dat (6),
+                                eightmmTape (7),
+                                nineteenmmTape (8),
+                                dlt (9),
+                                halfInchMO (10),
+                                catridgeDisk (11),
+                                jazDisk (12),
+                                zipDisk (13),
+                                syQuestDisk (14),
+                                winchesterDisk (15),
+                                cdRom (16),
+                                cdRomXA (17),
+                                cdI (18),
+                                cdRecordable (19),
+                                dvd (20),
+                                dvdRWPlus (21),
+                                dvdRAM (22),
+                                dvdROM (23),
+                                dvdVideo (24),
+                                divx (25),
+                                cdRW (26),
+                                cdDA (27),
+                                cdPlus (28),
+                                dvdRecordable (29),
+                                dvdRW (30),
+                                dvdAudio (31),
+                                dvd5 (32),
+                                dvd9 (33),
+                                dvd10 (34),
+                                dvd18 (35),
+                                moRewriteable (36),
+                                moWriteOnce (37),
+                                moLIMDOW (38),
+                                phaseChangeWO (39),
+                                phaseChangeRewriteable (40),
+                                phaseChangeDualRewriteable (41),
+                                ablativeWriteOnce (42),
+                                nearField (43),
+                                miniQic (44),
+                                travan (45),
+                                eightmmMetal (46),
+                                eightmmAdvanced (47),
+                                nctp (48),
+                                ltoUltrium (49),
+                                ltoAccelis (50),
+                                tape9Track (51),
+                                tape18Track (52),
+                                tape36Track (53),
+                                magstar3590 (54),
+                                magstarMP (55),
+                                d2Tape (56),
+                                dstSmall (57),
+                                dstMedium (58),
+                                dstLarge (59) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Specifies the type of the PhysicalMedia, as an enumerated integer. The
+                MediaDescription property is used to provide more explicit definition of
+                the Media type, whether it is pre-formatted, compatability features, etc."
+        ::= { physicalMediaEntry 7 }
+
+physicalMedia-MediaDescription OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Additional detail related to the MediaType enumeration. For example, if
+                value 3 ('QIC Cartridge') is specified, this property could indicate whether
+                the tape is wide or 1/4 inch, whether it is pre-formatted, whether it is Travan
+                compatible, etc."
+        ::= { physicalMediaEntry 8 }
+
+physicalMedia-CleanerMedia OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Boolean indicating that the PhysicalMedia is used for cleaning purposes and
+                not data storage."
+        ::= { physicalMediaEntry 9 }
+
+physicalMedia-DualSided OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                unknown (0),
+                                true (1),
+                                false (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Boolean indicating that the Media has two recording sides (TRUE) or only a
+                single side (FALSE). Examples of dual sided Media include DVD-ROM and some
+                optical disks. Examples of single sided Media are tapes and CD-ROM."
+        ::= { physicalMediaEntry 10 }
+
+physicalMedia-PhysicalLabel OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "One or more strings on 'labels' on the PhysicalMedia. The format of the
+                labels and their state (readable, unreadable, upside-down) are indicated in
+                the LabelFormats and LabelStates array properties."
+        ::= { physicalMediaEntry 11 }
+
+physicalPackageGroup
+        OBJECT IDENTIFIER
+        ::= { smlRoot 8 }
+
+numberOfPhysicalPackages OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This value specifies the number of PhysicalPackages that are present."
+        ::= { physicalPackageGroup 1 }
+
+physicalPackageTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TableInfo-3
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "The PhysicalPackage class represents PhysicalElements that contain or host
+                other components. Examples are a Rack enclosure or an adapter Card. (also a
+                tape magazine inside an auto-loader)"
+        ::= { physicalPackageGroup 2 }
+
+physicalPackageEntry OBJECT-TYPE
+        SYNTAX          TableInfo-3
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry in the table contains information about a PhysicalPackage
+                that is present in the library."
+        INDEX { physicalPackageIndex }
+        ::= { physicalPackageTable 1 }
+
+TableInfo-3 ::= SEQUENCE
+{
+        physicalPackageIndex UINT32,
+        physicalPackage-Manufacturer DisplayString,
+        physicalPackage-Model DisplayString,
+        physicalPackage-SerialNumber DisplayString,
+        physicalPackage-Realizes-MediaAccessDeviceIndex INTEGER
+}
+
+physicalPackageIndex OBJECT-TYPE
+        SYNTAX          UINT32
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The current index value for the PhysicalPackage."
+        ::= { physicalPackageEntry 1 }
+
+physicalPackage-Manufacturer OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The name of the organization responsible for producing the PhysicalElement.
+                This may be the entity from whom the Element is purchased, but this is not
+                necessarily true. The latter information is contained in the Vendor property
+                of CIM_Product."
+        ::= { physicalPackageEntry 2 }
+
+physicalPackage-Model OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The name by which the PhysicalElement is generally known."
+        ::= { physicalPackageEntry 3 }
+
+physicalPackage-SerialNumber OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "A manufacturer-allocated number used to identify the Physical Element."
+        ::= { physicalPackageEntry 4 }
+
+physicalPackage-Realizes-MediaAccessDeviceIndex OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The index value of the the MediaAccess device that is associated with
+                this physical package.'"
+        ::= { physicalPackageEntry 5 }
+
+softwareElementGroup
+        OBJECT IDENTIFIER
+        ::= { smlRoot 9 }
+
+numberOfSoftwareElements OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This value specifies the number of SoftwareElements that are present."
+        ::= { softwareElementGroup 1 }
+
+softwareElementTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF TableInfo-4
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "The CIM_SoftwareElement class is used to decompose a CIM_SoftwareFeature
+                object into a set of individually manageable or deployable parts for a
+                particular platform. A software element's platform is uniquely identified
+                by its underlying hardware architecture and operating system (for example
+                Sun Solaris on Sun Sparc or Windows NT on Intel). As such, to understand
+                the details of how the functionality of a particular software feature is
+                provided on a particular platform, the CIM_SoftwareElement objects referenced
+                by CIM_SoftwareFeatureSoftwareElement associations are organized in disjoint
+                sets based on the TargetOperatingSystem property. A CIM_SoftwareElement
+                object captures the management details of a part or component in one of four
+                states characterized by the SoftwareElementState property. "
+        ::= { softwareElementGroup 2 }
+
+softwareElementEntry OBJECT-TYPE
+        SYNTAX          TableInfo-4
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Each entry in the table contains information about a SoftwareElement
+                that is present in the library."
+        INDEX { softwareElementIndex }
+        ::= { softwareElementTable 1 }
+
+TableInfo-4 ::= SEQUENCE
+{
+        softwareElementIndex UINT32,
+        softwareElement-Name DisplayString,
+        softwareElement-Version DisplayString,
+        softwareElement-SoftwareElementID DisplayString,
+        softwareElement-Manufacturer DisplayString,
+        softwareElement-BuildNumber DisplayString,
+        softwareElement-SerialNumber DisplayString,
+        softwareElement-CodeSet DisplayString,
+        softwareElement-IdentificationCode DisplayString,
+        softwareElement-LanguageEdition DisplayString,
+        softwareElement-Associations OBJECT IDENTIFIER,
+        softwareElement-DeviceSoftware-LogicalDeviceAssociation-ObjectT INTEGER,
+        softwareElement-DeviceSoftware-LogicalDeviceAssociationId INTEGER
+}
+
+softwareElementIndex OBJECT-TYPE
+        SYNTAX          UINT32
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The current index value for the SoftwareElement."
+        ::= { softwareElementEntry 1 }
+
+softwareElement-Name OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The name used to identify this software element"
+        ::= { softwareElementEntry 2 }
+
+softwareElement-Version OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Version should be in the form .. or . "
+        ::= { softwareElementEntry 3 }
+
+softwareElement-SoftwareElementID OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "This is an identifier for this software element and is designed to be used
+                in conjunction with other keys to create a unique representation of this
+                SoftwareElement"
+        ::= { softwareElementEntry 4 }
+
+softwareElement-Manufacturer OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Manufacturer of this software element"
+        ::= { softwareElementEntry 5 }
+
+softwareElement-BuildNumber OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The internal identifier for this compilation of this software element."
+        ::= { softwareElementEntry 6 }
+
+softwareElement-SerialNumber OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The assigned serial number of this software element."
+        ::= { softwareElementEntry 7 }
+
+softwareElement-CodeSet OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The code set used by this software element. "
+        ::= { softwareElementEntry 8 }
+
+softwareElement-IdentificationCode OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The value of this property is the manufacturer's identifier for this
+                software element. Often this will be a stock keeping unit (SKU) or a
+                part number."
+        ::= { softwareElementEntry 9 }
+
+softwareElement-LanguageEdition OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..32))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "The value of this property identifies the language edition of this software
+                element. The language codes defined in ISO 639 should be used. Where the
+                software element represents multi-lingual or international version of a
+                product, the string multilingual should be used."
+        ::= { softwareElementEntry 10 }
+
+softwareElement-Associations OBJECT-TYPE
+        SYNTAX          OBJECT IDENTIFIER
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Use this value to associate a SoftwareElement with another object in the MIB"
+        ::= { softwareElementEntry 11 }
+
+softwareElement-DeviceSoftware-LogicalDeviceAssociation-ObjectT OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                mediaAccessDevice (0),
+                                storageLibrary (1),
+                                other (2) }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Use this value to associate a SoftwareElement with a specific media access
+                device or the library itself."
+        ::= { softwareElementEntry 12 }
+
+softwareElement-DeviceSoftware-LogicalDeviceAssociationId OBJECT-TYPE
+        SYNTAX          INTEGER
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                "Further clarification required."
+        ::= { softwareElementEntry 13 }
+
+endOfSmlMib OBJECT-TYPE
+        SYNTAX          OBJECT IDENTIFIER
+        ACCESS          not-accessible
+        STATUS          mandatory
+        DESCRIPTION
+                "Description here"
+        ::= { smlRoot 10 }
+
+END

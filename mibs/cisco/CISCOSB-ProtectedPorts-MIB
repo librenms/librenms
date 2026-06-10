@@ -1,0 +1,141 @@
+CISCOSB-ProtectedPorts-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      Cisco Switch Interfaces Private
+-- Version:    7.46
+-- Date:       13 Apr 2008
+
+IMPORTS
+    ifIndex                                         FROM IF-MIB
+    Unsigned32, MODULE-IDENTITY, OBJECT-TYPE        FROM SNMPv2-SMI
+    RowStatus, TruthValue, TEXTUAL-CONVENTION       FROM SNMPv2-TC
+    PortList                                        FROM Q-BRIDGE-MIB
+    switch001                                       FROM CISCOSB-MIB;
+
+
+rlProtectedPorts MODULE-IDENTITY
+        LAST-UPDATED "200805031234Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+            "<description>"
+        REVISION "200805031234Z"
+        DESCRIPTION
+            "The private MIB module definition for Protected Ports MIB."
+        ::= { switch001 132 }
+
+
+
+-- rlProtectedPortsTable
+
+rlProtectedPortsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlProtectedPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing entries of protected ports configuration information"
+    ::= { rlProtectedPorts 1 }
+
+rlProtectedPortsEntry OBJECT-TYPE
+    SYNTAX      RlProtectedPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry of protected ports configuration information"
+    INDEX   { ifIndex }
+    ::= { rlProtectedPortsTable 1 }
+
+RlProtectedPortsEntry ::= SEQUENCE {
+        rlProtectedPortType             INTEGER,
+        rlProtectedPortCommunity        INTEGER
+    }
+
+rlProtectedPortType OBJECT-TYPE
+    SYNTAX INTEGER {
+        not-protected(1),
+        protected(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set port protected mode: not-protected, protected
+         protected ports filter layer 2 traffic from other protected ports"
+    DEFVAL  { not-protected }
+    ::= { rlProtectedPortsEntry 1 }
+
+rlProtectedPortCommunity OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+
+        "Associate protected port with community number which becoming active only when
+         rlProtectedPortsStatus changed to protected
+         protected community ports filter layer 2 traffic from protected ports
+         and from other protected community ports, but do not filter layer 2
+         traffic from same community ports.
+
+         value of 0 disassociate port from its community.
+         "
+    DEFVAL  { 0 }
+    ::= { rlProtectedPortsEntry 2 }
+
+--------------------------------------------------------------------------------
+
+-- rlProtectedPortsStatusTable
+
+rlProtectedPortsStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlProtectedPortsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing entries of protected ports status"
+    ::= { rlProtectedPorts 2 }
+
+rlProtectedPortsStatusEntry OBJECT-TYPE
+    SYNTAX      RlProtectedPortsStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry containing protected ports DB status information"
+    INDEX   { ifIndex }
+    ::= { rlProtectedPortsStatusTable 1 }
+
+RlProtectedPortsStatusEntry ::= SEQUENCE {
+        rlProtectedPortEgressPorts PortList
+    }
+
+rlProtectedPortEgressPorts OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "list of ports which are not filtered by protected port mechanism when traffic is forwarded from
+         the specified ifIndex"
+    ::= { rlProtectedPortsStatusEntry 1 }
+
+--------------------------------------------------------------------------------
+
+-- rlProtectedPortsGroup
+
+rlProtectedPortsGlobalEnable  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "true  - set all system fast ethernet ports to protected state
+         false - set all system fast ethernet ports to not protected state"
+    DEFVAL { false }
+    ::= { rlProtectedPorts 3 }
+
+    
+END
+
+

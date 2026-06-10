@@ -1,0 +1,214 @@
+CTRON-CSMACD-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-csmacd-mib.txt
+        --  Revision: 1.06.00
+        --  Part Number:  2170554-01
+        --  Date: August 11, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific CSMACD MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright October 95 Cabletron Systems
+
+        --  The contents of this MIB is obsolete.  Existing products
+        --  still utilize it but all future products will implement
+        --  other MIBs that contain much of this information.
+
+        IMPORTS
+                Counter                         FROM RFC1155-SMI
+                ctCSMACD                        FROM CTRON-MIB-NAMES
+                OBJECT-TYPE                     FROM RFC-1212;
+
+        --  The fnbCSMACD group
+        --  Implementation of this group is mandatory for CSMA/CD
+        --  subsystems on devices that incorporate the FNB.
+
+        ctFnbCSMACD     OBJECT IDENTIFIER ::= { ctCSMACD 1 }
+        ctFnbPortConnect OBJECT IDENTIFIER ::= { ctCSMACD 2 }
+
+        ctFnbCSMACDTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CtFnbCSMACDEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of entries that provide connection status of
+                    CSMA/CD subsystems, for the FNB."
+            ::= { ctFnbCSMACD 1 }
+
+        ctFnbCSMACDEntry  OBJECT-TYPE
+            SYNTAX  CtFnbCSMACDEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An entry in the ctFnbCSMACDTable containing objects
+                    that provide FNB connection status for a CSMA/CD
+                    subsystem."
+            INDEX  { ctFnbCSMACDIndex }
+            ::= { ctFnbCSMACDTable 1 }
+
+        CtFnbCSMACDEntry ::=
+            SEQUENCE {
+                 ctFnbCSMACDIndex
+                      INTEGER,
+                 ctFnbConnect
+                      INTEGER,
+                ctFnbPortChanges
+                        Counter
+            }
+
+        ctFnbCSMACDIndex  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "An unique value for each CSMACD subsystem.  Its
+                    value ranges between 1 and chassisSlots.  The value
+                    for each interface must remain constant, at least,
+                    from one re-initialization of the entity's network
+                    management system to the next re-initialization."
+            ::= { ctFnbCSMACDEntry 1 }
+
+        ctFnbConnect  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        connectB(1),
+                        connectC(2),
+                        disconnect(3),
+                        connectA(4),
+                        subnetB(5),
+                        subnetC(6),
+                        multiChannel(7),
+                        frontpanel(8)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the connection status of the CSMA/CD board
+                    to the inter-RIC bus.  The values of 1, 2, and 4 define
+                    connection status of connect for the subsystem, values 5
+                    and 6 define connection status of subnet connect for
+                    the subsystem, value 8 is defined as a front panel
+                    connection on the module, and a value of 3 defines
+                    disconnect status."
+            ::= { ctFnbCSMACDEntry 2 }
+
+        ctFnbPortChanges        OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Denotes the number of times any port on the
+                        given MIM has changed it's connection to the
+                        inter-RIC bus."
+                ::= { ctFnbCSMACDEntry 3 }
+
+
+
+        ctFnbPortConnectTable   OBJECT-TYPE
+                SYNTAX  SEQUENCE OF CtFnbPortConnectEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                        "This table is used to control port
+                        association on ethernet devices.  Only
+                        those boards that support port switching
+                        will be listed in this table."
+                ::= { ctFnbPortConnect 1 }
+
+        ctFnbPortConnectEntry   OBJECT-TYPE
+                SYNTAX  CtFnbPortConnectEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                        "Describes a specific port connection entry."
+                INDEX { ctFnbPortConnectBoardIndex, ctFnbPortConnectPortIndex }
+                ::= { ctFnbPortConnectTable 1 }
+
+        CtFnbPortConnectEntry   ::= SEQUENCE {
+                ctFnbPortConnectBoardIndex
+                        INTEGER,
+                ctFnbPortConnectPortIndex
+                        INTEGER,
+                ctFnbPortConnectPortAssignment
+                        INTEGER,
+                ctFnbPortCompID
+                        INTEGER
+        }
+
+        ctFnbPortConnectBoardIndex      OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "An instance of a board for which this port
+                        assignment relationship exists."
+                ::= { ctFnbPortConnectEntry 1 }
+
+        ctFnbPortConnectPortIndex               OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "An instance of a port for which this
+                        assignment relationship exists."
+                ::= { ctFnbPortConnectEntry 2 }
+
+        ctFnbPortConnectPortAssignment  OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        connectA(1),
+                        connectB(2),
+                        connectC(3)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The specific channel that the port is
+                        assigned."
+                ::= { ctFnbPortConnectEntry 3 }
+
+        ctFnbPortCompID OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the component ID as defined in the chassis
+                        MIB that this port is associated with.  These
+                        components will be repeater components."
+                ::= { ctFnbPortConnectEntry 4 }
+
+
+        ctFnbPortConnectionChanges      OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Maintains the number of times any port within
+                        the mangement domain of this MIM changes it's
+                        port assignment."
+                ::= { ctFnbPortConnect 2 }
+
+END

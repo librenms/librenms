@@ -1,0 +1,83 @@
+-- *****************************************************************
+-- MERU-SMI:  Meru Enterprise Structure of Management Information
+--
+-- 04/25/2005
+-- Copyright (c) 2005 by MeruNetworks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+
+meru MODULE-IDENTITY
+    LAST-UPDATED "200504250000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+                "The Structure of Management Information for the
+                Meru enterprise. All Meru MIBs are located under this subtree."
+    ::= { enterprises 15983 }
+
+meru-reg           OBJECT IDENTIFIER ::= { meru 1 }
+meru-wlan          OBJECT IDENTIFIER ::= { meru-reg 1 }
+meru-modules       OBJECT IDENTIFIER ::= { meru-reg 2 }
+
+mwStatistics OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+       "Wlan Statisstics"
+    ::= { meru-wlan 3 }
+
+mwConfiguration OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+       "Wlan system configuration"
+    ::= { meru-wlan 4 }
+
+mwDiagnostics OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+       "Wlan system monitoring"
+    ::= { meru-wlan 5 }
+
+meruAgentCapability OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+       "Meru agent capability"
+    ::= { meru-wlan 6 }
+
+mwControllers OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+       "This object defines identity of mobility and
+        wireless controllers."
+    ::= { meru-wlan 7 }
+
+mc500   OBJECT IDENTIFIER ::= {mwControllers 1}
+mc1000  OBJECT IDENTIFIER ::= {mwControllers 2}
+mc1100  OBJECT IDENTIFIER ::= {mwControllers 3}
+mc3000  OBJECT IDENTIFIER ::= {mwControllers 4}
+mc500a  OBJECT IDENTIFIER ::= {mwControllers 5}
+mc5000  OBJECT IDENTIFIER ::= {mwControllers 6}
+mc4000  OBJECT IDENTIFIER ::= {mwControllers 7}
+mc4100  OBJECT IDENTIFIER ::= {mwControllers 8}
+mc1500  OBJECT IDENTIFIER ::= {mwControllers 9}
+mc3200  OBJECT IDENTIFIER ::= {mwControllers 10}
+mc4200  OBJECT IDENTIFIER ::= {mwControllers 11}
+mc6000  OBJECT IDENTIFIER ::= {mwControllers 12}
+mc1500v  OBJECT IDENTIFIER ::= {mwControllers 13}
+mc3200v  OBJECT IDENTIFIER ::= {mwControllers 14}
+mc4200v  OBJECT IDENTIFIER ::= {mwControllers 15}
+mc1550  OBJECT IDENTIFIER ::= {mwControllers 16}
+mc1550v  OBJECT IDENTIFIER ::= {mwControllers 17}
+fwc50d   OBJECT IDENTIFIER ::= {mwControllers 18}
+fwc2hd   OBJECT IDENTIFIER ::= {mwControllers 19}
+fwc5hd   OBJECT IDENTIFIER ::= {mwControllers 20}
+
+END

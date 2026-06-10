@@ -1,0 +1,843 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-SFP-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             TEXTUAL-CONVENTION,
+             DisplayString, TruthValue
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    sfp MODULE-IDENTITY
+        LAST-UPDATED "201612150000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: info@siaemic.com
+            "
+        DESCRIPTION
+            " This MIB contains objects & alarms for a SFP
+              (Small Form-Factor Pluggable) module.
+              Reference documentation:
+               1) Small Form-factor Pluggable (SFP) Transceiver MultiSource
+                  Agreement (MSA)
+               2) Finisar's Application Note AN-2030, Rev. D.
+               3) SFF 8472 - Diagnostic Monitoring Interface for Optical 
+                             Transceivers
+                             Rev 12.2 November 21, 2014
+               4) SFF 8024 - SFF Cross Reference to Industry Products
+                             Rev 4.0 June 27, 2016
+            "
+        REVISION "201612150000Z"
+        DESCRIPTION
+            "MIB version 01.00.02
+             - Added TEXTUAL-CONVENTION Temperature and PhysicalQuantity
+             - Added sfpAlarmTable, sfpDiagnosticTable, sfpHighAlarmSeverityCode,
+               sfpHighWarningAlarmSeverityCode, sfpLowWarningAlarmSeverityCode
+               and sfpLowWarningAlarmSeverityCode
+            "
+        REVISION "201609290000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             - Added sfpBasePX, sfpBaseBX10, sfp100BaseFX, sfp100BaseLX to
+               sfpCompliance
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of sfpMibVersion
+            "
+        REVISION "201312050000Z"
+        DESCRIPTION
+            "Initial version 01.00.00
+            "
+      ::= { siaeMib 74 }
+
+----------------------------------------------------------------------------------
+--  Textual Conventions
+----------------------------------------------------------------------------------
+
+
+    Temperature ::= TEXTUAL-CONVENTION
+        STATUS        current
+        DESCRIPTION
+            "Temperature in tenth of degrees C"
+        SYNTAX        Integer32 (-2000..2000)
+
+    PhysicalQuantity ::= TEXTUAL-CONVENTION
+        STATUS        current
+        DESCRIPTION
+            "Measured physical quantity"
+        SYNTAX        INTEGER {
+                                phyQtTemperature  (1),
+                                phyQtVoltage      (2),
+                                phyQtTxBias       (3),
+                                phyQtTxPower      (4),
+                                phyQtRxPower      (5)
+                              }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--  sfp GROUP
+----------------------------------------------------------------------------------
+--
+-- This group is used to manage Small Form-Factor Pluggable Modules
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    sfpMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {sfp 1}
+
+-------  Begin of sfpModuleTable
+--
+    sfpSerialIdTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     SfpSerialIdEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+             "Each SFP contains a 95+32 byte block of ID data fields.
+              This table contains the items found in this data block.
+              Fields in this data block is filled in by the SFP manufactor.
+              The table shows the contents of this data block without further
+              processing."
+    ::= {sfp 2}
+
+    sfpSerialIdEntry  OBJECT-TYPE
+        SYNTAX      SfpSerialIdEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "SFP module record."
+        INDEX       { sfpModuleId }
+    ::= {sfpSerialIdTable 1}
+
+    SfpSerialIdEntry  ::=
+        SEQUENCE {
+            sfpModuleId             Integer32,
+            sfpSerialIdValid        TruthValue,
+            sfpVendorName           OCTET STRING,
+            sfpVendorPartNumber     OCTET STRING,
+            sfpVendorRev            OCTET STRING,
+            sfpVendorSN             OCTET STRING,
+            sfpVendorDateCode       OCTET STRING,
+            sfpDiagMonitorCode      BITS,
+            sfpEnhancedOptionsCode  BITS,
+            sfpOptions              BITS,
+            sfpFibreChannelMedia    BITS,
+            sfpCompliance           BITS,
+            sfpWavelength           Integer32,
+            sfpNominalBitRate       Integer32,
+            sfpLinkLength9u         Integer32,
+            sfpLinkLength50u        Integer32,
+            sfpLinkLength62u5       Integer32,
+            sfpLinkLengthCopper     Integer32,
+            sfpLabel                DisplayString,
+            sfpFailAlarm            AlarmStatus
+         }
+
+    sfpModuleId OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This index identifies a unique SFP module in the system"
+    ::= {sfpSerialIdEntry 1}
+
+    sfpSerialIdValid OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "When false the SFP data in this table is not valid. This
+             will be set to False if the SFP module is not installed or if
+             the EEPROM check code is wrong. The data in this table should
+             not be used unless this element is True."
+    ::= {sfpSerialIdEntry 2}
+
+    sfpVendorName OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE(0..16))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFP vendor name.
+             Located at I2C address 0xa0, bytes: 20 - 35"
+    ::= {sfpSerialIdEntry 3}
+
+    sfpVendorPartNumber OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE(0..16))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFP vendor part number.
+             Located at I2C address 0xa0, bytes: 40 - 55"
+    ::= {sfpSerialIdEntry 4}
+
+    sfpVendorRev OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE(0..4))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFP vendor's product revision number.
+             Located at I2C address 0xa0, bytes: 56 - 59"
+    ::= {sfpSerialIdEntry 5}
+
+    sfpVendorSN OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE(0..16))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFP vendor serial number.
+             Located at I2C address 0xa0, bytes: 68 - 83"
+    ::= {sfpSerialIdEntry 6}
+
+    sfpVendorDateCode OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE(0..8))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SFP vendor date code.
+             Format: YYMMDDLL
+                     - YY: year,  00 = 2000
+                     - MM: month, 01 = January
+                     - DD_ day,   01 to 31
+                     - LL: vendor lot code, or blank.
+             Located at I2C address 0xa0, bytes: 84 - 91"
+    ::= {sfpSerialIdEntry 7}
+
+    sfpDiagMonitorCode OBJECT-TYPE
+        SYNTAX        BITS {
+            -- must be 0
+            sfpDMCtypeLegacy(0),
+            -- Digital Diagnostic monitoring is implemented
+            sfpDMCtypeImplemented(1),
+            -- Internally Calibrated
+            sfpDMCtypeInternalCal(2),
+            -- Externally Calibrated
+            sfpDMCtypeExternalCal(3),
+            -- Rx Power Meas. Type, 0=OMA, 1=Average
+            sfpDMCtypeRxAvgPwr(4),
+            -- Special Addressing required
+            sfpDMCtypeAddrChngReqrd(5)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This indicates which type of diagnostic monitoring is
+             implemented (if any) in the SFP.
+             -bit 7: = 0 legacy diagnostic implementations (should be 0)
+             -bit 6: = 1 digital diagnostic monitoring implemented (should be 1)
+             -bit 5: = 1 internal calibration
+             -bit 4: = 1 external calibration mask
+             -bit 3: = 0 OMA received power measurment,
+                     = 1 average received power
+             -bit 2: = 1 I2C addressing option.
+             Located at I2C address 0xa0, byte: 92"
+    ::= {sfpSerialIdEntry 8}
+
+    sfpEnhancedOptionsCode OBJECT-TYPE
+        SYNTAX        BITS {
+            -- Alarms & Warnings are implemented
+            sfpEOCalarmsImplemented(0),
+            -- Soft TX_DISABLE is implemented
+            sfpEOCSoftTxDisable(1),
+            -- Soft TX_FAULT is implemented
+            sfpEOCSoftTxFault(2),
+            -- Soft RX_LOS is implemented
+            sfpEOCSoftRxLOS(3),
+            -- Soft RATE_SELECT is implemented
+            sfpEOCSoftRateSelect(4)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This indicates which optional enhanced features are
+             implemented (if any) in the SFP.
+             Located at I2C address 0xa0, byte: 93"
+    ::= {sfpSerialIdEntry 9}
+
+    sfpOptions OBJECT-TYPE
+        SYNTAX        BITS {
+            -- RATE_SELECT is implemented
+            sfpOPTRateSelect(0),
+            -- TX_DISABLE is implemented
+            sfpOPTTxDisable(1),
+            -- TX_FAULT is implemented
+            sfpOPTTxFault(2),
+            -- LOS implemented but inverted
+            sfpOPTInvertedLOS(3),
+            -- LOS implemented
+            sfpOPTlos(4)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Implemented transceiver options:
+             -bit 5: = 1 RATE_SELECT implemented.
+             -bit 4: = 1 TX_DISABLE implemented
+             -bit 3: = 1 TX_FAULT implemented
+             -bit 2: = 1 LOS Implemented, inverted
+             -bit 1: = 1 LOS Implemented
+             Located at I2C address 0xa0, byte: 65"
+    ::= {sfpSerialIdEntry 10}
+
+    sfpFibreChannelMedia OBJECT-TYPE
+        SYNTAX        BITS {
+            -- Multi-mode 62.5 micron (M6): byte 9 bit 3
+            sfpMultiMode62u5(0),
+            -- Multi-mode 50.0 micron (M5): byte 9 bit 2
+            sfpMultiMode50u0(1),
+            -- Single mode (SM): byte 9 bit 0
+            sfpSingleMode(2),
+            -- Twin Axial Pair (TW): byte 9 bit 7
+            sfpTwistedAxialPair(3),
+            -- Shielded Twisted Pair (TP): byte 9 bit 6
+            sfpShieldedTwistedPair(4),
+            -- Miniature Coax (MI): byte 9 bit 5
+            sfpMiniatureCoax(5),
+            -- Video Coax (TV): byte 9 bit 4
+            sfpVideoCoax(6)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Fiber Channel transmission media.
+             Located at I2C address 0xa0, byte: 9"
+    ::= {sfpSerialIdEntry 11}
+
+
+    sfpCompliance OBJECT-TYPE
+        SYNTAX        BITS {
+            -- SONET reach specifier bit 1: byte 4 bit 4
+            sfpSonetReachSpecifier1(0),
+            -- SONET reach specifier bit 1: byte 4 bit 3
+            sfpSonetReachSpecifier2(1),
+            -- OC48 long reach: byte 4 bit 2
+            sfpSonetOC48LongReach(2),
+            -- OC48 intermediate reach: byte 4 bit 1
+            sfpSonetOC48IntermediateReach(3),
+            -- OC48 short reach: byte 4 bit 0
+            sfpSonetOC48ShortReach(4),
+            -- OC-12 long reach: byte 5 bit 6
+            sfpSonetOC12LongReach(5),
+            -- OC-12 intermediate reach: byte 5 bit 5
+            sfpSonetOC12IntermediateReach(6),
+            -- OC-12 short reach: byte 5 bit 4
+            sfpSonetOC12ShortReach(7),
+            -- OC-3 long reach: byte 5 bit 2
+            sfpSonetOC3LongReach(8),
+            -- OC-3 intermediate reach: byte 5 bit 1
+            sfpSonetOC3IntermediateReach(9),
+            -- OC-3 short reach: byte 5 bit 0
+            sfpSonetOC3ShortReach(10),
+            -- 1000base-T: byte 6 bit 3
+            sfp1000BaseT(11),
+            -- 1000base-CX: byte 6 bit 2
+            sfp1000BaseCX(12),
+            -- 1000base-LX: byte 6 bit 1
+            sfp1000BaseLX(13),
+            -- 1000base-SX: byte 6 bit 0
+            sfp1000baseSX(14),
+            -- base-PX: byte 6 bit 7
+            sfpBasePX(15),
+            -- base-BX10: byte 6 bit 6
+            sfpBaseBX10(16),
+            -- 100base-FX: byte 6 bit 5
+            sfp100BaseFX(17),
+            -- 100base-LX/LX10: byte 6 bit 4
+            sfp100BaseLX(18)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Electronic or optical interfaces that are supported by the
+             transceiver.
+             Located at I2C address 0xa0, bytes: 4,5 & 6"
+    ::= {sfpSerialIdEntry 12}
+
+    sfpWavelength OBJECT-TYPE
+        SYNTAX        Integer32
+        UNITS         "nm"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Nominal transmiter output wavelength at room temperature.
+             Units are in nm (nanometers).
+             Located at I2C address 0xa0, bytes: 60 & 61 (endianess: big)"
+    ::= {sfpSerialIdEntry 13}
+
+    sfpNominalBitRate OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Nominal bit rate (in megabit per second) supported from this
+             SFP module rouded to the nearest 100 megabits per second.
+             Located at I2C address 0xa0, byte: 12"
+    ::= {sfpSerialIdEntry 14}
+
+    sfpLinkLength9u OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link length (in meters) supported from this SFP module while
+             operating in compliance with the applicable standards using single
+             mode fiber. A value of zero means that the transceiver does not
+             support single mode fiber.
+             Located at I2C address 0xa0, bytes: 14-15"
+    ::= {sfpSerialIdEntry 15}
+
+    sfpLinkLength50u OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link length (in meters) supported from this SFP module while
+             operating in compliance with the applicable standards using
+             50 micron multi-mode fiber. A value of zero means that the
+             transceiver does not support 50 micron multi-mode mode fiber.
+             Located at I2C address 0xa0, byte: 16"
+    ::= {sfpSerialIdEntry 16}
+
+    sfpLinkLength62u5 OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link length (in meters) supported from this SFP module while
+             operating in compliance with the applicable standards using
+             62.5 micron multi-mode fiber. A value of zero means that the
+             transceiver does not support 62.5 micron multi-mode mode fiber.
+             Located at I2C address 0xa0, byte: 17"
+    ::= {sfpSerialIdEntry 17}
+
+    sfpLinkLengthCopper OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "m"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link length (in meters) supported from this SFP module while
+             operating in compliance with the applicable standards using
+             copper cable. A value of zero means that the transceiver does
+             not support copper cable.
+             Located at I2C address 0xa0, byte: 18"
+    ::= {sfpSerialIdEntry 18}
+
+    sfpLabel OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE(0..32))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This is an ASCII string that identifies this SFP in the
+             system."
+    ::= {sfpSerialIdEntry 19}
+
+    sfpFailAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "SFP Module fail (module missing included)"
+    ::= {sfpSerialIdEntry 20}
+
+--
+-------  End of sfpModuleTable
+
+    sfpFailAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the sfpFailAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {sfp 6}
+
+-------  Begin of sfpDiagnosticTable
+--
+    sfpDiagnosticTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF SfpDiagnosticEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "Each SFP may contain a 256 byte block of diagnostic data
+             fields. This table contains the items found in this data block.
+             The data block is located at I2C address 0xa2."
+        ::= { sfp 7 }
+
+    sfpDiagnosticEntry OBJECT-TYPE
+        SYNTAX        SfpDiagnosticEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This describes a row in the diagnostic table."
+        INDEX         { sfpModuleId }
+        ::= { sfpDiagnosticTable 1 }
+
+    SfpDiagnosticEntry ::= SEQUENCE
+    {
+        sfpDiagnosticValid  TruthValue,
+        sfpLOSPinOut        TruthValue,
+        sfpTxFaultPinOut    TruthValue,
+        sfpRateSelectPinIn  TruthValue,
+        sfpTxDisablePinIn   TruthValue,
+        sfpTemperature      Temperature,
+        sfpVoltage          Integer32,
+        sfpTxBias           Integer32,
+        sfpTxPower          Integer32,
+        sfpRxPower          Integer32,
+        sfpInternalAlarms   BITS,
+        sfpInternalWarnings BITS
+    }
+
+    sfpDiagnosticValid OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "if False, then the SFP data in this table is not valid. This
+             will be set to False if the SFP module is not installed, or if
+             the I/O card that contains the SFP is not installed or if
+             the EEPROM check code is wrong. The data in the table should
+             not be used unless this element is True."
+        ::= { sfpDiagnosticEntry 1 }
+
+    sfpLOSPinOut OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the T/F state of the SFP LOS (output) pin. It is
+             True if the SFP has detected Loss-Of-Signal. located at I2c
+             address 0xa2, address: 110, mask 0x02"
+        ::= { sfpDiagnosticEntry 2 }
+
+    sfpTxFaultPinOut OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the T/F state of the SFP Tx Fault (output) pin.
+             It is True if the SFP has detected a Tx fault condition.
+             located at I2C address 0xa2, Byte 110, mask 0x04"
+        ::= { sfpDiagnosticEntry 3 }
+
+    sfpRateSelectPinIn OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the T/F state of the SFP RX Rate Select (input)
+             pin. This function is not implemented on Finisar SFPs. located
+             at I2C address 0xa2, Byte 110, mask 0x10"
+        ::= { sfpDiagnosticEntry 4 }
+
+    sfpTxDisablePinIn OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the T/F state of the SFP TX Disable (input) pin.
+             located at I2C address 0xa2, Byte 110, mask 0x80"
+        ::= { sfpDiagnosticEntry 5 }
+
+    sfpTemperature OBJECT-TYPE
+        SYNTAX        Temperature
+        UNITS         "C/10"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the internal temperature of the SFP in tehnth of 
+             Celsius degrees. Range is from -128.0C to +128.0C, but is only
+             valid from -40.0C to +125.0C with an accuracy of +/- 3C. 
+             Located at I2C address 0xa2, Bytes 96 & 97 (MSB, LSB)"
+        ::= { sfpDiagnosticEntry 6 }
+
+    sfpVoltage OBJECT-TYPE
+        SYNTAX        Integer32 (0..65535)
+        UNITS         "milliVolts (mV)"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the internally measured SFP supply voltage
+             (Vcc). Units are in milliVolts (3210 = 3.21V). Range is 0 to
+             6.554V. Located at I2C address 0xa2, Bytes 98 & 99 (MSB, LSB)"
+        ::= { sfpDiagnosticEntry 7 }
+
+    sfpTxBias OBJECT-TYPE
+        SYNTAX        Integer32 (0..131000)
+        UNITS         "microAmps (uA)"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the internally measured SFP TX laser bias
+             current. Units are in microAmps, and range from 0 to 131000uA
+             (131mA). Located at I2C address 0xa2, Bytes 100 & 101 (MSB, LSB)"
+        ::= { sfpDiagnosticEntry 8 }
+
+    sfpTxPower OBJECT-TYPE
+        SYNTAX        Integer32 (0..65535)
+        UNITS         "microWatts (uW)"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the internally measured TX output power. Units
+             are in uW (micro Watts), and range from 0 to 6554uW (6.535mW).
+             This value is not valid if the transmitter is disabled. Located
+             at I2C address 0xa2, Bytes 102 & 103 (MSB, LSB)"
+        ::= { sfpDiagnosticEntry 9 }
+
+    sfpRxPower OBJECT-TYPE
+        SYNTAX        Integer32 (0..65535)
+        UNITS         "microWatts (uW)"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the internally measured RX optical power. Units
+             are in uW (micro Watts), and range from 0 to 6554uW (6.535mW).
+             Located at I2C address 0xa2, Bytes 104 & 105 (MSB, LSB)"
+        ::= { sfpDiagnosticEntry 10 }
+
+    sfpInternalAlarms OBJECT-TYPE
+        SYNTAX        BITS {
+            sfpIntAlarmTempHigh(0),
+            sfpIntAlarmTempLow(1),
+            sfpIntAlarmVoltageHigh(2),
+            sfpIntAlarmVoltageLow(3),
+            sfpIntAlarmTxBiasHigh(4),
+            sfpIntAlarmTxBiasLow(5),
+            sfpIntAlarmTxPowerHigh(6),
+            sfpIntAlarmTxPowerLow(7),
+            sfpIntAlarmRxPowerHigh(8),
+            sfpIntAlarmRxPowerLow(9)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the state of the SFP internal alarm register. A
+             bit is set for each alarm that is active. located at I2C
+             address 0xa2, Byte 112 & 113  (MSB, LSB) mask 0xffc0"
+        ::= { sfpDiagnosticEntry 11 }
+
+    sfpInternalWarnings OBJECT-TYPE
+        SYNTAX        BITS {
+            sfpIntWarnTempHigh(0),
+            sfpIntWarnTempLow(1),
+            sfpIntWarnVoltageHigh(2),
+            sfpIntWarnVoltageLow(3),
+            sfpIntWarnTxBiasHigh(4),
+            sfpIntWarnTxBiasLow(5),
+            sfpIntWarnTxPowerHigh(6),
+            sfpIntWarnTxPowerLow(7),
+            sfpIntWarnRxPowerHigh(8),
+            sfpIntWarnRxPowerLow(9)
+        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This contains the state of the SFP internal warning register.
+             A bit is set for each warning that is active. located at I2C
+             address 0xa2, Byte 116 & 117  (MSB, LSB) mask 0xffc0"
+        ::= { sfpDiagnosticEntry 12 }
+
+--
+-------  End of sfpDiagnosticTable
+
+-------  Begin of sfpAlarmTable
+--
+    sfpAlarmTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF SfpAlarmEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table contains the SFP alarm and warning threshold
+             values."
+        ::= { sfp 10 }
+
+    sfpAlarmEntry OBJECT-TYPE
+        SYNTAX        SfpAlarmEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry into the Threshold table."
+        INDEX         { sfpModuleId, sfpPhysicalQuantity }
+        ::= { sfpAlarmTable 1 }
+
+    SfpAlarmEntry ::= SEQUENCE
+    {
+        sfpPhysicalQuantity            PhysicalQuantity,
+        sfpThresholdHighAlarm          Integer32,
+        sfpThresholdHighWarning        Integer32,
+        sfpThresholdLowAlarm           Integer32,
+        sfpThresholdLowWarning         Integer32,
+        sfpHighAlarm                   AlarmStatus,
+        sfpHighWarningAlarm            AlarmStatus,
+        sfpLowAlarm                    AlarmStatus,
+        sfpLowWarningAlarm             AlarmStatus
+    }
+
+    sfpPhysicalQuantity OBJECT-TYPE
+        SYNTAX        PhysicalQuantity
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Measured physical quantity.
+             Units of temperature are tenth of Celsius degrres,
+             units of Power supply voltage (Vcc) are microVolts,
+             units of Tx laser bias current are microAmps (uA),
+             units of Rx optical power are microWatts (uW),
+             units of Tx output power are microWatts (uW).
+            "
+        ::= { sfpAlarmEntry 1 }
+
+    sfpThresholdHighAlarm OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A reading at or above this temperature will trigger a high
+             measured physical quantity alarm."
+        ::= { sfpAlarmEntry 2 }
+
+    sfpThresholdHighWarning OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A reading at or above this temperature will trigger a high
+             measured physical quantity warning."
+        ::= { sfpAlarmEntry 3 }
+
+    sfpThresholdLowAlarm OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A reading at or above this temperature will trigger a low
+             measured physical quantity alarm."
+        ::= { sfpAlarmEntry 4 }
+
+    sfpThresholdLowWarning OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A reading at or above this temperature will trigger a low
+             measured physical quantity warning."
+        ::= { sfpAlarmEntry 5 }
+
+    sfpHighAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Measured physical quantity has crossed sfpThresholdHighAlarm."
+        ::= {sfpAlarmEntry 6}
+
+    sfpHighWarningAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Measured physical quantity has crossed sfpThresholdHighWarning."
+        ::= {sfpAlarmEntry 7}
+
+    sfpLowAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Measured physical quantity has crossed sfpThresholdLowAlarm."
+        ::= {sfpAlarmEntry 8}
+
+    sfpLowWarningAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Measured physical quantity has crossed sfpThresholdLowWarning."
+        ::= {sfpAlarmEntry 9}
+
+--
+-------  End of sfpAlarmTable
+
+    sfpHighAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the sfpHighAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {sfp 11}
+
+    sfpHighWarningAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the sfpHighWarningAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {sfp 12}
+
+    sfpLowAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the sfpLowAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {sfp 13}
+
+    sfpLowWarningAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the sfpLowWarningAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {warningTrapEnable}
+    ::= {sfp 14}
+
+END

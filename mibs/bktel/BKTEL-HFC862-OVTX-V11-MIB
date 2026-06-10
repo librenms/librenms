@@ -1,0 +1,2000 @@
+--- ****************************************************************************
+-- *
+-- * Description:   Implements definitions for the Ovtx-modul
+-- *                (External Modulated Optical Transmitters)
+-- *
+-- * Copyright 2003 by BKtel communications GmbH
+-- *
+-- *     V.0.1   18.02.03  J. Anhorn  first draft
+-- *     V.0.2   17.03.03  M. Heldmann ovtxStates group changed completely, more changes
+-- *     V.0.3   23.04.03  M. Heldmann ovtxDisplay group shrinked, removed J.Anhorns comments
+-- *     V.0.4   30.04.03  M. Heldmann ovtxControlReset, ovtxControlModuleLedBlink added
+-- *     V.0.5   05.05.03  M. Heldmann ovtxStatesLaserShutdown, ovtxStatesInitializing added
+-- *     V.0.6   23.07.03  M. Heldmann added descriptions for the states
+-- *     V.0.7   16.09.03  M. Heldmann adjusted description for the state ovtxStatesInputLow
+-- *     V.1.0   17.12.03  M. Heldmann added ovtxRfInputMin..ovtxRfInputMax
+-- *                                         ovtxStatesInputHigh, ovtxStatesRedundancySwitch
+-- *                                         ovtxConfigurationRfInputLimitLoLo..ovtxConfigurationMaskExtIO
+-- *                                         ovtxDisplayOmiNominal
+-- *                                   renamed ovtxControlLaserShutdown to ovtxControlLaserOutputMode and expanded it
+-- *                                   renamed ..ItuFrequency.. to ..LaserFrequency..
+-- *                                   adjusted some descriptions
+-- *     V.1.1   27.02.04  M. Heldmann changed ExtIOmask parameter name from maskUnknown(3) to maskSpecial(3)
+-- *     V.1.2   01.09.04  M. Heldmann ovtxConfigurationSbsSuppression expanded to SBS on/off settings
+-- *     V.1.3   18.04.05  M. Heldmann ovtxConfigurationSbsSuppression changed description
+-- *     V.1.4   04.10.06  M. Heldmann NESlotWriteValue expanded due to new 2G6 platform needs
+-- *     V.2.0   14.01.08  M. Heldmann renamed threshold parameters in ovtxMeasuringValuesTable
+-- *                                   renamed ovtxStatesDefective -> ovtxStatesCommLoss
+-- *                                   some threshold parameters in ovtxMeasuringValuesTable made read-write
+-- *                                   parameters needed for new transmitter hardware with extended features:
+-- *                                      - ovtxConfigurationCsoRegulationMode, ovtxConfigurationSlope
+-- *                                        ovtxConfigurationFiberLength configuration parameters
+-- *                                      - ovtxDisplayRegulationState, ovtxDisplayExtendedCapabilities
+-- *                                   parameters needed for new transmitter hardware with SAT RF input:
+-- *                                      - ovtxSatRfInputValue, ovtxSatOmiMeasuredValue, 
+-- *                                        ovtxSatRfGainMeasuredValue measuring values and their thresholds
+-- *                                      - ovtxStatesSatInputLow, ovtxStatesSatInputHigh. 
+-- *                                        ovtxStatesSatOmiOrRfgainLow. ovtxStatesSatOmiOrRfgainHigh alarm states
+-- *                                      - ovtxConfigurationSatModeAGC, ovtxConfigurationSatOmi, ovtxConfigurationSatRfGain    
+-- *                                        ovtxConfigurationSatSlope, ovtxConfigurationRfInputMode configuration parameters
+-- *                                      - ovtxDisplaySatOmiNominal, ovtxDisplayRfInputCapabilities
+-- *     V.2.1   26.06.09  M. Heldmann added ovtxConfigurationSatLnbSupply and ovtxDisplaySatLnbSupplySupported
+-- *     V.2.1b  14.05.10  M. Heldmann renamed ovtxConfigurationModeExtIO and ovtxConfigurationMaskExtIO  
+-- *                                        to ovtxConfigurationRedundancyMode and ovtxConfigurationRedundancyMask
+-- *     V.2.2   27.04.12  M. Heldmann added ovtxStatesSatLnbShortCircuit, ovtxStatesSbs1Level, ovtxStatesSbs2Level
+-- *                                         ovtxStatesSbs1PllNotLocked ovtxStatesSbs2PllNotLocked  
+-- *                                         ovtxConfigurationSbsSuppressionMode,
+-- *                                         ovtxDisplaySbsExtensionsSupported, ovtxDisplaySbsSuppressionModeSupported
+-- *     V.2.2b  03.12.12  M. Heldmann added ovtxStatesInternalAlarm
+-- *     V.2.2c  20.03.13  M. Heldmann changed ovtxConfigurationSbsSuppressionMode to ovtxConfigurationSbsSuppressionMode
+-- *                                   added ovtxConfigurationSbsFiberType, ovtxConfigurationSbsFiberLength and 
+-- *                                         ovtxDisplaySbsFiberParametersSupported
+-- *     V.2.3   11.07.13  M. Heldmann adjusted syntax of "CommonEntry" to remove MIB compiler warnings
+-- *     V.2.4   05.09.14  M. Heldmann changed CommonModuleWidth and ConfigurationNESlotWrite STATUS to optional
+-- ****************************************************************************
+
+BKTEL-HFC862-OVTX-V11-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        experimental, enterprises, TimeTicks, IpAddress, Counter
+                 FROM RFC1155-SMI
+    OBJECT-TYPE
+                 FROM RFC-1212
+        TRAP-TYPE
+                 FROM RFC-1215
+        modules, DisplayString, TruthValue, PerceivedSeverityValue, NESlotValue, ModuleWidthValue
+                 FROM   BKTEL-HFC862-BASE-MIB
+    ;
+
+    ovtx                  OBJECT IDENTIFIER ::= { modules 101 }
+    ovtxCommon            OBJECT IDENTIFIER ::= { ovtx 1 }
+    ovtxStates            OBJECT IDENTIFIER ::= { ovtx 2 }
+    ovtxConfiguration     OBJECT IDENTIFIER ::= { ovtx 3 }
+    ovtxControl           OBJECT IDENTIFIER ::= { ovtx 4 }
+    ovtxMeasuringValues   OBJECT IDENTIFIER ::= { ovtx 5 }
+    ovtxDisplay           OBJECT IDENTIFIER ::= { ovtx 6 }
+
+
+--
+-- Type definitions
+--
+
+        AGCmode ::= INTEGER
+            {
+            modeAgcOff(1),
+            modeUnmodulatedAgcOn(2),
+            modeModulatedAgcOn(3)
+            }
+
+        SatAGCmode ::= INTEGER
+            {
+            satAgcOff(1),
+            satAgcOn(2)
+            }
+
+        RedundancyMode ::= INTEGER
+            {
+            modeActiveLowOutput(1),
+            modeActiveHighOutput(2),
+            modeNominalMasterIrreversible(3),
+            modeNominalMasterFallback(4),
+            modeRedundantSlave(5)
+            }
+
+        RedundancyMask ::= INTEGER
+            {
+            maskAlarmsOnly(1),
+            maskAlarmsAndWarnings(2),
+            maskSpecialAdjusted(3)           -- This item is NOT writable !!
+            }
+
+        LaserOutputMode ::= INTEGER
+            {
+            laserShutdown(1),
+            laserActive(2),
+            laserShutdownOnMaskedError(3)  -- Automatic laser shutdown on RedundancyMask'ed error condition
+            }
+
+        CsoRegulationMode ::= INTEGER
+            {
+            csoRegModeChannelControlled(1),
+            csoRegModePilotControlled(2)
+            }
+
+        RegulationState ::= INTEGER
+            {
+            regulationStateUnknownOrNotSupported(1),
+            regulationStateOutputpowerBased(2),
+            regulationStateCsoBasedRough(3),
+            regulationStateCsoBasedFine(4),
+            regulationStatePilotBased(5)
+            }
+
+        RfInputCapabilities ::= INTEGER
+            {
+            rfInputCatvOnlySupported(1),
+            rfInputSatOnlySupported(2),
+            rfInputCatvAndSatSupported(3)
+            }
+
+        RfInputAlarmMode ::= INTEGER
+            {
+            alarmEnableAll(1),
+            alarmCatvEnableSatDisable(2),
+            alarmSatEnableCatvDisable(3)
+            }
+
+        LnbSupplyValue ::= INTEGER
+            {
+            lnbSupplyOff(1),
+            lnbSupply14V(2),
+            lnbSupply18V(3),
+            lnbSupply14V_22kHz(4),
+            lnbSupply18V_22kHz(5)
+            }
+
+        LnbSupplySupportedValue ::= INTEGER
+            {
+            notSupported(1),
+            lnbSupply14V18VSwitchSupported(2),
+            lnbSupply14V18VAnd22kHzSwitchSupported(3)
+            }
+
+        SbsSuppressionModeValue ::= INTEGER
+            {
+            modeStandard(1),
+            modeCatvOnly(2)
+            }
+
+        SbsFiberTypeValue ::= INTEGER
+            {
+            typeStandardFiber(1),
+            typeSbsOptimizedFiber(2)
+            }
+
+        SbsFiberLengthValue ::= INTEGER
+            {
+            length10km(1),
+            length25km(2),
+            length40km(3),
+            length65km(4)
+            }
+
+
+        NESlotWriteValue ::= INTEGER (-1..99)
+
+--*****************************************************************************************
+-- OVTX ( Optical Transmitter with design release V11 )
+
+--*****************************************************************************************
+-- ovtxCommon group
+
+    ovtxCommonNumberOfModules OBJECT-TYPE
+        SYNTAX  INTEGER(0..50)
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Number of modules in table."
+    ::= { ovtxCommon 1 }
+
+    ovtxCommonTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OvtxCommonEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "The table contains all modules of the OVTX-type in the NE"
+    ::= { ovtxCommon 2 }
+
+-- table of states entry(ro/rw)
+
+    ovtxCommonEntry OBJECT-TYPE
+        SYNTAX OvtxCommonEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Common-Values for a module."
+        INDEX { ovtxNESlot }
+    ::= { ovtxCommonTable 1 }
+
+-- the structure of the entry
+
+    OvtxCommonEntry ::= SEQUENCE
+    {
+        ovtxNESlot                      NESlotValue,
+        ovtxCommonType                  DisplayString,
+        ovtxCommonDescr                 DisplayString,
+        ovtxCommonFirmwareId            DisplayString,
+        ovtxCommonModuleWidth           ModuleWidthValue
+    }
+
+    ovtxNESlot OBJECT-TYPE
+        SYNTAX  NESlotValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "The slot number of the chassis for which this
+        entry contains management information.
+        Equal to: modOVTXv11UniqueID"
+    ::= { ovtxCommonEntry 1 }
+
+    ovtxCommonType OBJECT-TYPE
+        SYNTAX  DisplayString  (SIZE(0..32))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+        "The type of physical module. modSlotEmpty indicates
+         an empty slot.  A Value of modSlotUnknown indicates
+         that the type of module is unknown."
+    ::= { ovtxCommonEntry 2 }
+
+    ovtxCommonDescr OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "A textual description of the module.
+        If not available, this Value should be
+        set to a zero length string."
+    ::= { ovtxCommonEntry 3 }
+
+    ovtxCommonFirmwareId OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The firmware Id of the module."
+    ::= { ovtxCommonEntry 4 }
+
+    ovtxCommonModuleWidth OBJECT-TYPE
+        SYNTAX ModuleWidthValue
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION "The width of the module in multiples of slots (1, 2, ...)"
+    ::= { ovtxCommonEntry 5 }
+
+--*****************************************************************************************
+-- ovtxMeasuringValues group
+
+-- table of measuring Values
+
+    ovtxMeasuringValuesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OvtxMeasuringValuesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { ovtxMeasuringValues 1 }
+
+-- table of measuring Values entry
+
+    ovtxMeasuringValuesEntry OBJECT-TYPE
+        SYNTAX OvtxMeasuringValuesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Common-Values for a module."
+        INDEX { ovtxNESlot }
+    ::= { ovtxMeasuringValuesTable 1 }
+
+--  the structure of the entry
+
+    OvtxMeasuringValuesEntry ::= SEQUENCE
+    {
+        ovtxOmiMeasuredLoLo             INTEGER,
+        ovtxOmiMeasuredLo               INTEGER,
+        ovtxOmiMeasuredValue            INTEGER,
+        ovtxOmiMeasuredHi               INTEGER,
+        ovtxOmiMeasuredHiHi             INTEGER,
+
+        ovtxRfGainMeasuredLoLo          INTEGER,
+        ovtxRfGainMeasuredLo            INTEGER,
+        ovtxRfGainMeasuredValue         INTEGER,
+        ovtxRfGainMeasuredHi            INTEGER,
+        ovtxRfGainMeasuredHiHi          INTEGER,
+
+        ovtxLaserCurrentRelLoLo         INTEGER,
+        ovtxLaserCurrentRelLo           INTEGER,
+        ovtxLaserCurrentRelValue        INTEGER,
+        ovtxLaserCurrentRelHi           INTEGER,
+        ovtxLaserCurrentRelHiHi         INTEGER,
+
+        ovtxTecCurrentRelLoLo           INTEGER,
+        ovtxTecCurrentRelLo             INTEGER,
+        ovtxTecCurrentRelValue          INTEGER,
+        ovtxTecCurrentRelHi             INTEGER,
+        ovtxTecCurrentRelHiHi           INTEGER,
+
+        ovtxOutputPowerLoLo             INTEGER,
+        ovtxOutputPowerLo               INTEGER,
+        ovtxOutputPowerValue            INTEGER,
+        ovtxOutputPowerHi               INTEGER,
+        ovtxOutputPowerHiHi             INTEGER,
+
+        ovtxPlus3p3VLoLo                INTEGER,
+        ovtxPlus3p3VLo                  INTEGER,
+        ovtxPlus3p3VValue               INTEGER,
+        ovtxPlus3p3VHi                  INTEGER,
+        ovtxPlus3p3VHiHi                INTEGER,
+
+        ovtxPlus5VLoLo                  INTEGER,
+        ovtxPlus5VLo                    INTEGER,
+        ovtxPlus5VValue                 INTEGER,
+        ovtxPlus5VHi                    INTEGER,
+        ovtxPlus5VHiHi                  INTEGER,
+
+        ovtxPlus12VLoLo                 INTEGER,
+        ovtxPlus12VLo                   INTEGER,
+        ovtxPlus12VValue                INTEGER,
+        ovtxPlus12VHi                   INTEGER,
+        ovtxPlus12VHiHi                 INTEGER,
+
+        ovtxPlus24VLoLo                 INTEGER,
+        ovtxPlus24VLo                   INTEGER,
+        ovtxPlus24VValue                INTEGER,
+        ovtxPlus24VHi                   INTEGER,
+        ovtxPlus24VHiHi                 INTEGER,
+
+        ovtxMinus5VLoLo                 INTEGER,
+        ovtxMinus5VLo                   INTEGER,
+        ovtxMinus5VValue                INTEGER,
+        ovtxMinus5VHi                   INTEGER,
+        ovtxMinus5VHiHi                 INTEGER,
+
+        ovtxMinus12VLoLo                INTEGER,
+        ovtxMinus12VLo                  INTEGER,
+        ovtxMinus12VValue               INTEGER,
+        ovtxMinus12VHi                  INTEGER,
+        ovtxMinus12VHiHi                INTEGER,
+
+        ovtxTemperatureLoLo             INTEGER,
+        ovtxTemperatureLo               INTEGER,
+        ovtxTemperatureValue            INTEGER,
+        ovtxTemperatureHi               INTEGER,
+        ovtxTemperatureHiHi             INTEGER,
+
+        ovtxRfInputLoLo                 INTEGER,
+        ovtxRfInputLo                   INTEGER,
+        ovtxRfInputValue                INTEGER,
+        ovtxRfInputHi                   INTEGER,
+        ovtxRfInputHiHi                 INTEGER,
+
+        ovtxSatRfInputLoLo              INTEGER,
+        ovtxSatRfInputLo                INTEGER,
+        ovtxSatRfInputValue             INTEGER,
+        ovtxSatRfInputHi                INTEGER,
+        ovtxSatRfInputHiHi              INTEGER,
+
+        ovtxSatOmiMeasuredLoLo          INTEGER,
+        ovtxSatOmiMeasuredLo            INTEGER,
+        ovtxSatOmiMeasuredValue         INTEGER,
+        ovtxSatOmiMeasuredHi            INTEGER,
+        ovtxSatOmiMeasuredHiHi          INTEGER,
+
+        ovtxSatRfGainMeasuredLoLo       INTEGER,
+        ovtxSatRfGainMeasuredLo         INTEGER,
+        ovtxSatRfGainMeasuredValue      INTEGER,
+        ovtxSatRfGainMeasuredHi         INTEGER,
+        ovtxSatRfGainMeasuredHiHi       INTEGER
+    }
+
+-- *****
+    ovtxOmiMeasuredLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset low alarm threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 1 }
+
+    ovtxOmiMeasuredLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset low warning threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 2 }
+
+    ovtxOmiMeasuredValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The offset from nominal OMI in steps of 0.1dB (CATV input).
+                If AGC is on this parameter is equal to ovtxConfigurationOmi.
+                If AGC is off this paramters shows the Measured-OMI for the adjusted gain."
+    ::= { ovtxMeasuringValuesEntry 3 }
+
+    ovtxOmiMeasuredHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset high warning threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 4 }
+
+    ovtxOmiMeasuredHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset high alarm threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 5 }
+
+-- *****
+    ovtxRfGainMeasuredLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset low alarm threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 6 }
+
+    ovtxRfGainMeasuredLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset low warning threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 7 }
+
+    ovtxRfGainMeasuredValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The offset from nominal gain in steps of 0.1dB (CATV input).
+                If AGC is off this parameter is equal to ovtxConfigurationRfGain.
+                If AGC is on this paramters shows the Measured-Rf-Gain for the adjusted omi."
+    ::= { ovtxMeasuringValuesEntry 8 }
+
+    ovtxRfGainMeasuredHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset high warning threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 9 }
+
+    ovtxRfGainMeasuredHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset high alarm threshold in steps of 0.1dB (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 10 }
+
+-- *****
+    ovtxLaserCurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser current low alarm threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 11 }
+
+    ovtxLaserCurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser current low warning threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 12 }
+
+    ovtxLaserCurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser current relative to the current at begin of life in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 13 }
+
+    ovtxLaserCurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser current high warning threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 14 }
+
+    ovtxLaserCurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Relative laser current high alarm threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 15 }
+
+-- *****
+    ovtxTecCurrentRelLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current low alarm threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 16 }
+
+    ovtxTecCurrentRelLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current low warning threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 17 }
+
+    ovtxTecCurrentRelValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The thermo-electric-cooler current relative to
+                     its absolute high alarm threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 18 }
+
+    ovtxTecCurrentRelHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current high warning threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 19 }
+
+    ovtxTecCurrentRelHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Thermo-electric-cooler current high alarm threshold in steps of 0.1%."
+    ::= { ovtxMeasuringValuesEntry 20 }
+
+-- *****
+    ovtxOutputPowerLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power low alarm threshold in steps of 0.1dBm."
+    ::= { ovtxMeasuringValuesEntry 21 }
+
+    ovtxOutputPowerLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power low warning threshold in steps of 0.1dBm."
+    ::= { ovtxMeasuringValuesEntry 22 }
+
+    ovtxOutputPowerValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Output power in steps of 0.1dBm."
+    ::= { ovtxMeasuringValuesEntry 23 }
+
+    ovtxOutputPowerHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power high warning threshold in steps of 0.1dBm."
+    ::= { ovtxMeasuringValuesEntry 24 }
+
+    ovtxOutputPowerHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Output power high alarm threshold in steps of 0.1dBm."
+    ::= { ovtxMeasuringValuesEntry 25 }
+
+-- *****
+    ovtxPlus3p3VLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +3.3V supply voltage low alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 26 }
+
+    ovtxPlus3p3VLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +3.3V supply voltage low warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 27 }
+
+    ovtxPlus3p3VValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +3.3V supply voltage in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 28 }
+
+    ovtxPlus3p3VHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +3.3V supply voltage high warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 29 }
+
+    ovtxPlus3p3VHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +3.3V supply voltage high alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 30 }
+
+-- *****
+    ovtxPlus5VLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +5V supply voltage low alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 31 }
+
+    ovtxPlus5VLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +5V supply voltage low warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 32 }
+
+    ovtxPlus5VValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +5V supply voltage in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 33 }
+
+    ovtxPlus5VHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +5V supply voltage high warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 34 }
+
+    ovtxPlus5VHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +5V supply voltage high alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 35 }
+
+-- *****
+    ovtxPlus12VLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +12V supply voltage low alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 36 }
+
+    ovtxPlus12VLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +12V supply voltage low warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 37 }
+
+    ovtxPlus12VValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +12V supply voltage in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 38 }
+
+    ovtxPlus12VHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +12V supply voltage high warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 39 }
+
+    ovtxPlus12VHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +12V supply voltage high alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 40 }
+
+-- *****
+    ovtxPlus24VLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +24V supply voltage low alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 41 }
+
+    ovtxPlus24VLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +24V supply voltage low warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 42 }
+
+    ovtxPlus24VValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +24V supply voltage in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 43 }
+
+    ovtxPlus24VHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +24V supply voltage high warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 44 }
+
+    ovtxPlus24VHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The +24V supply voltage high alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 45 }
+
+-- *****
+    ovtxMinus5VLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -5V supply voltage low alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 46 }
+
+    ovtxMinus5VLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -5V supply voltage low warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 47 }
+
+    ovtxMinus5VValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -5V supply voltage in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 48 }
+
+    ovtxMinus5VHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -5V supply voltage high warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 49 }
+
+    ovtxMinus5VHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -5V supply voltage high alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 50 }
+
+-- *****
+    ovtxMinus12VLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -12V supply voltage low alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 51 }
+
+    ovtxMinus12VLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -12V supply voltage low warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 52 }
+
+    ovtxMinus12VValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -12V supply voltage in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 53 }
+
+    ovtxMinus12VHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -12V supply voltage high warning threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 54 }
+
+    ovtxMinus12VHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The -12V supply voltage high alarm threshold in steps of 0.1V."
+    ::= { ovtxMeasuringValuesEntry 55 }
+
+-- *****
+     ovtxTemperatureLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature low alarm threshold in steps of 0.1 celsius degrees."
+    ::= { ovtxMeasuringValuesEntry 56 }
+
+    ovtxTemperatureLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature low warning threshold in steps of 0.1 celsius degrees."
+    ::= { ovtxMeasuringValuesEntry 57 }
+
+    ovtxTemperatureValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature in steps of 0.1 celsius degrees."
+    ::= { ovtxMeasuringValuesEntry 58 }
+
+    ovtxTemperatureHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature high warning threshold in steps of 0.1 celsius degrees."
+    ::= { ovtxMeasuringValuesEntry 59 }
+
+    ovtxTemperatureHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The module temperature high alarm threshold in steps of 0.1 celsius degrees."
+    ::= { ovtxMeasuringValuesEntry 60 }
+
+-- *****
+    ovtxRfInputLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) low alarm threshold in steps of 0.1 dBm (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 61 }
+
+    ovtxRfInputLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) low warning threshold in steps of 0.1 dBm (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 62 }
+
+    ovtxRfInputValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) in steps of 0.1 dBm (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 63 }
+
+    ovtxRfInputHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) high warning threshold in steps of 0.1 dBm (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 64 }
+
+    ovtxRfInputHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) high alarm threshold in steps of 0.1 dBm (CATV input)."
+    ::= { ovtxMeasuringValuesEntry 65 }
+
+-- *****
+    ovtxSatRfInputLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) low alarm threshold in steps of 0.1 dBm (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 66 }
+
+    ovtxSatRfInputLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) low warning threshold in steps of 0.1 dBm (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 67 }
+
+    ovtxSatRfInputValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) in steps of 0.1 dBm (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 68 }
+
+    ovtxSatRfInputHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) high warning threshold in steps of 0.1 dBm (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 69 }
+
+    ovtxSatRfInputHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) high alarm threshold in steps of 0.1 dBm (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 70 }
+
+-- *****
+    ovtxSatOmiMeasuredLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset low alarm threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 71 }
+
+    ovtxSatOmiMeasuredLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset low warning threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 72 }
+
+    ovtxSatOmiMeasuredValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The offset from nominal OMI in steps of 0.1dB (SAT input).
+           If SAT AGC is on this parameter is equal to ovtxConfigurationSatOmi.
+           If SAT AGC is off this paramters shows the measured-OMI for the adjusted gain.
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 73 }
+
+    ovtxSatOmiMeasuredHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset high warning threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 74 }
+
+    ovtxSatOmiMeasuredHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-OMI offset high alarm threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 75 }
+
+-- *****
+    ovtxSatRfGainMeasuredLoLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset low alarm threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 76 }
+
+    ovtxSatRfGainMeasuredLo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset low warning threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 77 }
+
+    ovtxSatRfGainMeasuredValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The offset from nominal gain in steps of 0.1dB (SAT input).
+           If AGC is off this parameter is equal to ovtxConfigurationSatRfGain.
+           If AGC is on this paramters shows the measured-Rf-Gain for the adjusted omi.
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 78 }
+
+    ovtxSatRfGainMeasuredHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset high warning threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 79 }
+
+    ovtxSatRfGainMeasuredHiHi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "Measured-Rf-Gain offset high alarm threshold in steps of 0.1dB (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero."
+    ::= { ovtxMeasuringValuesEntry 80 }
+
+
+--*****************************************************************************************
+--  ovtxStates group
+
+-- Note: For every control OId there must be a correspondant alarm OId!
+
+    ovtxStatesTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OvtxStatesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { ovtxStates 1 }
+
+-- table of states entry(ro/rw)
+
+    ovtxStatesEntry OBJECT-TYPE
+        SYNTAX OvtxStatesEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Alarms for a module."
+        INDEX { ovtxNESlot }
+    ::= { ovtxStatesTable 1 }
+
+-- the structure of the entry
+
+    OvtxStatesEntry ::= SEQUENCE
+    {
+        ovtxStatesOutputLow           PerceivedSeverityValue,
+        ovtxStatesOutputHigh          PerceivedSeverityValue,
+        ovtxStatesInputLow            PerceivedSeverityValue,
+        ovtxStatesLaserAging          PerceivedSeverityValue,
+        ovtxStatesTecHigh             PerceivedSeverityValue,
+        ovtxStatesLaserTempLow        PerceivedSeverityValue,
+        ovtxStatesLaserTempHigh       PerceivedSeverityValue,
+        ovtxStatesOmiOrRfgainLow      PerceivedSeverityValue,
+        ovtxStatesOmiOrRfgainHigh     PerceivedSeverityValue,
+        ovtxStatesPowerSupplyLeft     PerceivedSeverityValue,
+        ovtxStatesPowerSupplyRight    PerceivedSeverityValue,
+        ovtxStatesFanLeft             PerceivedSeverityValue,
+        ovtxStatesFanRight            PerceivedSeverityValue,
+        ovtxStatesTemperatureLow      PerceivedSeverityValue,
+        ovtxStatesTemperatureHigh     PerceivedSeverityValue,
+        ovtxStatesPlus3p3VLow         PerceivedSeverityValue,
+        ovtxStatesPlus3p3VHigh        PerceivedSeverityValue,
+        ovtxStatesPlus5VLow           PerceivedSeverityValue,
+        ovtxStatesPlus5VHigh          PerceivedSeverityValue,
+        ovtxStatesPlus12VLow          PerceivedSeverityValue,
+        ovtxStatesPlus12VHigh         PerceivedSeverityValue,
+        ovtxStatesPlus24VLow          PerceivedSeverityValue,
+        ovtxStatesPlus24VHigh         PerceivedSeverityValue,
+        ovtxStatesMinus5VLow          PerceivedSeverityValue,
+        ovtxStatesMinus5VHigh         PerceivedSeverityValue,
+        ovtxStatesMinus12VLow         PerceivedSeverityValue,
+        ovtxStatesMinus12VHigh        PerceivedSeverityValue,
+        ovtxStatesLaserShutdown       PerceivedSeverityValue,
+        ovtxStatesInitializing        PerceivedSeverityValue,
+        ovtxStatesBootloader          PerceivedSeverityValue,
+        ovtxStatesCommLoss            PerceivedSeverityValue,
+        ovtxStatesInputHigh           PerceivedSeverityValue,
+        ovtxStatesRedundancySwitch    PerceivedSeverityValue,
+        ovtxStatesSatInputLow         PerceivedSeverityValue,
+        ovtxStatesSatInputHigh        PerceivedSeverityValue,
+        ovtxStatesSatOmiOrRfgainLow   PerceivedSeverityValue,
+        ovtxStatesSatOmiOrRfgainHigh  PerceivedSeverityValue,
+        ovtxStatesSatLnbShortCircuit  PerceivedSeverityValue,
+        ovtxStatesSbs1Level           PerceivedSeverityValue,
+        ovtxStatesSbs2Level           PerceivedSeverityValue,
+        ovtxStatesSbs1PllNotLocked    PerceivedSeverityValue,
+        ovtxStatesSbs2PllNotLocked    PerceivedSeverityValue,
+        ovtxStatesInternalAlarm       PerceivedSeverityValue
+    }
+
+    ovtxStatesOutputLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Optical output power low"
+    ::= { ovtxStatesEntry 1 }
+
+    ovtxStatesOutputHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Optical output power high"
+    ::= { ovtxStatesEntry 2 }
+
+    ovtxStatesInputLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "RF input power low (CATV input)"
+    ::= { ovtxStatesEntry 3 }
+
+    ovtxStatesLaserAging OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The laser is aging"
+    ::= { ovtxStatesEntry 4 }
+
+    ovtxStatesTecHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser cooler limit reached"
+    ::= { ovtxStatesEntry 5 }
+
+    ovtxStatesLaserTempLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser temperature low"
+    ::= { ovtxStatesEntry 6 }
+
+    ovtxStatesLaserTempHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser temperature high"
+    ::= { ovtxStatesEntry 7 }
+
+    ovtxStatesOmiOrRfgainLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Omi or rf-gain (depending on mode) low (CATV input)"
+    ::= { ovtxStatesEntry 8 }
+
+    ovtxStatesOmiOrRfgainHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Omi or rf-gain (depending on mode) high (CATV input)"
+    ::= { ovtxStatesEntry 9 }
+
+    ovtxStatesPowerSupplyLeft OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The left (looking from front) power supply unit fails"
+    ::= { ovtxStatesEntry 10 }
+
+    ovtxStatesPowerSupplyRight OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The right (looking from front) power supply unit fails"
+    ::= { ovtxStatesEntry 11 }
+
+    ovtxStatesFanLeft OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The left (looking from front) fan unit fails"
+    ::= { ovtxStatesEntry 12 }
+
+    ovtxStatesFanRight OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The right (looking from front) fan unit fails"
+    ::= { ovtxStatesEntry 13 }
+
+    ovtxStatesTemperatureLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device internal temperature low"
+    ::= { ovtxStatesEntry 14 }
+
+    ovtxStatesTemperatureHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Device internal temperature high"
+    ::= { ovtxStatesEntry 15 }
+
+    ovtxStatesPlus3p3VLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "3.3 Volt supply low"
+    ::= { ovtxStatesEntry 16 }
+
+    ovtxStatesPlus3p3VHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "3.3 Volt supply high"
+    ::= { ovtxStatesEntry 17 }
+
+    ovtxStatesPlus5VLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "5 Volt supply low"
+    ::= { ovtxStatesEntry 18 }
+
+    ovtxStatesPlus5VHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "5 Volt supply high"
+    ::= { ovtxStatesEntry 19 }
+
+    ovtxStatesPlus12VLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "12 Volt supply low"
+    ::= { ovtxStatesEntry 20 }
+
+    ovtxStatesPlus12VHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "12 Volt supply high"
+    ::= { ovtxStatesEntry 21 }
+
+    ovtxStatesPlus24VLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "24 Volt supply low"
+    ::= { ovtxStatesEntry 22 }
+
+    ovtxStatesPlus24VHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "24 Volt supply high"
+    ::= { ovtxStatesEntry 23 }
+
+    ovtxStatesMinus5VLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "-5 Volt supply low"
+    ::= { ovtxStatesEntry 24 }
+
+    ovtxStatesMinus5VHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "-5 Volt supply high"
+    ::= { ovtxStatesEntry 25 }
+
+    ovtxStatesMinus12VLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "-12 Volt supply low"
+    ::= { ovtxStatesEntry 26 }
+
+    ovtxStatesMinus12VHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "-12 Volt supply high"
+    ::= { ovtxStatesEntry 27 }
+
+    ovtxStatesLaserShutdown OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Laser is shutdown, no optical output"
+    ::= { ovtxStatesEntry 28 }
+
+    ovtxStatesInitializing OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "The device is initializing"
+    ::= { ovtxStatesEntry 29 }
+
+    ovtxStatesBootloader OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The device is running in bootloader mode
+             without a legal application software."
+    ::= { ovtxStatesEntry 30 }
+
+    ovtxStatesCommLoss OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The NEC has lost the connection to the device.
+             Reason may be a removed or defective device.
+             Note that this state is set by the NEC and not
+             by the device"
+    ::= { ovtxStatesEntry 31 }
+
+    ovtxStatesInputHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "RF input power high (CATV input)"
+    ::= { ovtxStatesEntry 32 }
+
+    ovtxStatesRedundancySwitch OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "This (redundant) device has been activated (redundancy switchover)"
+    ::= { ovtxStatesEntry 33 }
+
+    ovtxStatesSatInputLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "RF input power low (SAT input)
+           Only used if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 34 }
+
+    ovtxStatesSatInputHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "RF input power high (SAT input)
+           Only used if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 35 }
+
+    ovtxStatesSatOmiOrRfgainLow OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Omi or rf-gain (depending on mode) low (SAT input)
+           Only used if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 36 }
+
+    ovtxStatesSatOmiOrRfgainHigh OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Omi or rf-gain (depending on mode) high (SAT input)
+           Only used if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 37 }
+
+    ovtxStatesSatLnbShortCircuit OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Short-circuit at SAT LNB
+           Only used if ovtxDisplaySatLnbSupplySupported != notSupported(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 38 }
+
+    ovtxStatesSbs1Level OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SBS #1 level alarm
+           Only used if ovtxDisplaySbsExtensionsSupported == true(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 39 }
+
+    ovtxStatesSbs2Level OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SBS #2 level alarm
+           Only used if ovtxDisplaySbsExtensionsSupported == true(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 40 }
+
+    ovtxStatesSbs1PllNotLocked OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SBS #1 PLL not locked
+           Only used if ovtxDisplaySbsExtensionsSupported == true(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 41 }
+
+    ovtxStatesSbs2PllNotLocked OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "SBS #2 PLL not locked
+           Only used if ovtxDisplaySbsExtensionsSupported == true(1), 
+           otherwise always reports clear(5)."
+    ::= { ovtxStatesEntry 42 }
+
+    ovtxStatesInternalAlarm OBJECT-TYPE
+        SYNTAX PerceivedSeverityValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "Internal hardware failure"
+    ::= { ovtxStatesEntry 43 }
+
+
+--*****************************************************************************************
+--  ovtxControl group
+
+    ovtxControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OvtxControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { ovtxControl 1 }
+
+-- table of control entry(ro/rw)
+
+    ovtxControlEntry OBJECT-TYPE
+        SYNTAX OvtxControlEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION "Alarms for a module."
+        INDEX { ovtxNESlot }
+    ::= { ovtxControlTable 1 }
+
+-- the structure of the entry
+
+    OvtxControlEntry ::= SEQUENCE
+    {
+        ovtxControlLaserOutputMode  LaserOutputMode,
+        ovtxControlReset            TruthValue,
+        ovtxControlModuleLedBlink   TruthValue
+    }
+
+    ovtxControlLaserOutputMode OBJECT-TYPE
+        SYNTAX LaserOutputMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION  "The output mode of the laser.
+         NOTE: The error mask used for parameter 'laserShutdownOnMaskedError(3)'
+               is the same mask used for external IO port, 'ovtxConfigurationRedundancyMask'"
+    ::= { ovtxControlEntry 1 }
+
+    ovtxControlReset OBJECT-TYPE
+      SYNTAX TruthValue
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION "Reset the module."
+    ::= { ovtxControlEntry 2 }
+
+    ovtxControlModuleLedBlink OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "Writing this variable to true(1) lets the device's
+        modul LED blink green for 10 seconds.
+        Writing this variable to false(2) stops blinking at once.
+        This variable always returns false(2) on read requests"
+    ::= { ovtxControlEntry 3 }
+
+--*****************************************************************************************
+-- ovtxConfiguration group
+
+    ovtxConfigurationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OvtxConfigurationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { ovtxConfiguration 1 }
+
+-- table of configuration entry(ro/rw)
+
+    ovtxConfigurationEntry OBJECT-TYPE
+        SYNTAX OvtxConfigurationEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { ovtxNESlot  }
+    ::= { ovtxConfigurationTable 1 }
+
+-- the structure of the entry
+
+    OvtxConfigurationEntry ::= SEQUENCE
+    {
+        ovtxConfigurationNESlotWrite             NESlotWriteValue,
+        ovtxConfigurationModeAGC                 AGCmode,
+        ovtxConfigurationOmi                     INTEGER,
+        ovtxConfigurationRfGain                  INTEGER,
+        ovtxConfigurationSbsSuppression          INTEGER,
+        ovtxConfigurationChannelDistance         INTEGER,
+        ovtxConfigurationLaserFrequency          INTEGER,
+
+        ovtxConfigurationRfInputLimitLoLo        INTEGER,
+        ovtxConfigurationRfInputLimitLo          INTEGER,
+        ovtxConfigurationRfInputLimitHi          INTEGER,
+        ovtxConfigurationRfInputLimitHiHi        INTEGER,
+
+        ovtxConfigurationRfGainMeasuredLimitLoLo INTEGER,
+        ovtxConfigurationRfGainMeasuredLimitLo   INTEGER,
+        ovtxConfigurationRfGainMeasuredLimitHi   INTEGER,
+        ovtxConfigurationRfGainMeasuredLimitHiHi INTEGER,
+
+        ovtxConfigurationOmiMeasuredLimitLoLo    INTEGER,
+        ovtxConfigurationOmiMeasuredLimitLo      INTEGER,
+        ovtxConfigurationOmiMeasuredLimitHi      INTEGER,
+        ovtxConfigurationOmiMeasuredLimitHiHi    INTEGER,
+
+        ovtxConfigurationOutputPwrLimitLoLo      INTEGER,
+        ovtxConfigurationOutputPwrLimitLo        INTEGER,
+        ovtxConfigurationOutputPwrLimitHi        INTEGER,
+        ovtxConfigurationOutputPwrLimitHiHi      INTEGER,
+
+        ovtxConfigurationRedundancyMode          RedundancyMode,
+        ovtxConfigurationRedundancyMask          RedundancyMask,
+
+        ovtxConfigurationCsoRegulationMode       CsoRegulationMode,
+        ovtxConfigurationSlope                   INTEGER,
+        ovtxConfigurationFiberLength             INTEGER,
+
+        ovtxConfigurationSatModeAGC              SatAGCmode,
+        ovtxConfigurationSatOmi                  INTEGER,
+        ovtxConfigurationSatRfGain               INTEGER,
+        ovtxConfigurationSatSlope                INTEGER,
+        ovtxConfigurationRfInputAlarmMode        RfInputAlarmMode,
+
+        ovtxConfigurationSatLnbSupply            LnbSupplyValue,
+
+        ovtxConfigurationSbsSuppressionMode      SbsSuppressionModeValue,
+        ovtxConfigurationSbsFiberType            SbsFiberTypeValue,
+        ovtxConfigurationSbsFiberLength          SbsFiberLengthValue
+    }
+
+    ovtxConfigurationNESlotWrite OBJECT-TYPE
+        SYNTAX NESlotWriteValue
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION "By writing this variable a slot can be assigned
+            for devices that dont support hardware slot detection.
+            Reading '-1' means that the slot position is NOT writable."
+   ::= { ovtxConfigurationEntry 1 }
+
+    ovtxConfigurationModeAGC OBJECT-TYPE
+        SYNTAX AGCmode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The AGC mode of the optical transmitter (CATV input)."
+    ::= { ovtxConfigurationEntry 2 }
+
+    ovtxConfigurationOmi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The desired offset from nominal OMI in 0.1dB units (CATV input).
+            This parameter is only used if AGC is on."
+    ::= { ovtxConfigurationEntry 3 }
+
+    ovtxConfigurationRfGain OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "The desired offset from nominal gain in 0.1dB units (CATV input).
+            This parameter is only used if AGC is off."
+    ::= { ovtxConfigurationEntry 4 }
+
+    ovtxConfigurationSbsSuppression OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+        "The sbs suppression in 0.1dBm units."
+    ::= { ovtxConfigurationEntry 5 }
+
+    ovtxConfigurationChannelDistance OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "The channel raster in MHz units."
+    ::= { ovtxConfigurationEntry 6 }
+
+    ovtxConfigurationLaserFrequency OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "The laser frequency in GHz units."
+    ::= { ovtxConfigurationEntry 7 }
+
+-- *****
+    ovtxConfigurationRfInputLimitLoLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The rf input power low alarm limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 8 }
+
+    ovtxConfigurationRfInputLimitLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The rf input power low warning limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 9 }
+
+    ovtxConfigurationRfInputLimitHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The rf input power high warning limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 10 }
+
+    ovtxConfigurationRfInputLimitHiHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The rf input power high alarm limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 11 }
+
+-- *****
+    ovtxConfigurationRfGainMeasuredLimitLoLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-Rf-Gain offset low alarm limit in 0.1 dB units (in AGC ON mode)"
+    ::={ ovtxConfigurationEntry 12 }
+
+    ovtxConfigurationRfGainMeasuredLimitLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-Rf-Gain offset low warning limit in 0.1 dB units (in AGC ON mode)"
+    ::={ ovtxConfigurationEntry 13 }
+
+    ovtxConfigurationRfGainMeasuredLimitHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-Rf-Gain offset high warning limit in 0.1 dB units (in AGC ON mode)"
+    ::={ ovtxConfigurationEntry 14 }
+
+    ovtxConfigurationRfGainMeasuredLimitHiHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-Rf-Gain offset high alarm limit in 0.1 dB units (in AGC ON mode)"
+    ::={ ovtxConfigurationEntry 15 }
+
+-- *****
+    ovtxConfigurationOmiMeasuredLimitLoLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-OMI offset low alarm limit in 0.1 dB units (in AGC OFF mode)"
+    ::={ ovtxConfigurationEntry 16 }
+
+    ovtxConfigurationOmiMeasuredLimitLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-OMI offset low warning limit in 0.1 dB units(in AGC OFF mode)"
+    ::={ ovtxConfigurationEntry 17 }
+
+    ovtxConfigurationOmiMeasuredLimitHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-OMI offset high warning limit in 0.1 dB units(in AGC OFF mode)"
+    ::={ ovtxConfigurationEntry 18 }
+
+    ovtxConfigurationOmiMeasuredLimitHiHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The Measured-OMI offset high alarm limit in 0.1 dB units(in AGC OFF mode)"
+    ::={ ovtxConfigurationEntry 19 }
+
+-- *****
+    ovtxConfigurationOutputPwrLimitLoLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The output power low alarm limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 20 }
+
+    ovtxConfigurationOutputPwrLimitLo OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The output power low warning limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 21 }
+
+    ovtxConfigurationOutputPwrLimitHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The output power high warning limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 22 }
+
+    ovtxConfigurationOutputPwrLimitHiHi OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The output power high alarm limit in 0.1 dBm units"
+    ::={ ovtxConfigurationEntry 23 }
+
+-- *****
+    ovtxConfigurationRedundancyMode OBJECT-TYPE
+        SYNTAX RedundancyMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "The device's redundancy mode."
+    ::= { ovtxConfigurationEntry 24 }
+
+    ovtxConfigurationRedundancyMask OBJECT-TYPE
+        SYNTAX RedundancyMask
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "The device's redundancy mask setings."
+    ::= { ovtxConfigurationEntry 25 }
+
+-- *****
+    ovtxConfigurationCsoRegulationMode OBJECT-TYPE
+        SYNTAX CsoRegulationMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+          "The desired CSO regulation mode of the optical transmitter.
+           Only usable if ovtxDisplayExtendedCapabilities == true(1), 
+           otherwise always reports csoRegModeChannelControlled(1)"
+    ::= { ovtxConfigurationEntry 26 }
+
+    ovtxConfigurationSlope OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+          "The desired slope in 0.1 dB units (CATV input).
+           Only usable if ovtxDisplayExtendedCapabilities == true(1), 
+           otherwise always reports zero"
+    ::= { ovtxConfigurationEntry 27 }
+
+    ovtxConfigurationFiberLength OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+          "The optical fiber length in meter units.
+           Only usable if ovtxDisplayExtendedCapabilities == true(1), 
+           otherwise always reports zero"
+    ::= { ovtxConfigurationEntry 28 }
+
+    ovtxConfigurationSatModeAGC OBJECT-TYPE
+        SYNTAX SatAGCmode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The AGC mode of the optical transmitter (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports satAgcOff(1)"
+    ::= { ovtxConfigurationEntry 29 }
+
+    ovtxConfigurationSatOmi OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION "The desired offset from nominal OMI in 0.1dB units (SAT input).
+           This parameter is only used if AGC is on.
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero"
+    ::= { ovtxConfigurationEntry 30 }
+
+    ovtxConfigurationSatRfGain OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION   "The desired offset from nominal gain in 0.1dB units (SAT input).
+           This parameter is only used if AGC is off.
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero"
+    ::= { ovtxConfigurationEntry 31 }
+
+    ovtxConfigurationSatSlope OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+          "The desired slope in 0.1 dB units (SAT input).
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero"
+    ::= { ovtxConfigurationEntry 32 }
+
+    ovtxConfigurationRfInputAlarmMode OBJECT-TYPE
+        SYNTAX RfInputAlarmMode
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+          "The RF input alarm mode (Can be used to disable alarms of unused RF inputs)
+           Only usable if ovtxDisplayRfInputCapabilities == rfInputCatvAndSatSupported(3), 
+           otherwise always reports alarmEnableAll(1)"
+    ::= { ovtxConfigurationEntry 33 }
+
+    ovtxConfigurationSatLnbSupply OBJECT-TYPE
+        SYNTAX LnbSupplyValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+          "SAT LNB supply control.
+          This feature is not supported by all transmitter devices,
+          see ovtxDisplaySatLnbSupplySupported"
+    ::= { ovtxConfigurationEntry 34 }
+
+    ovtxConfigurationSbsSuppressionMode OBJECT-TYPE
+        SYNTAX SbsSuppressionModeValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+          "SBS suppression mode.
+          This feature is not supported by all transmitter devices,
+          see ovtxDisplaySbsSuppressionModeSupported"
+    ::= { ovtxConfigurationEntry 35 }
+
+    ovtxConfigurationSbsFiberType OBJECT-TYPE
+        SYNTAX SbsFiberTypeValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+          "SBS fiber type.
+          This feature is not supported by all transmitter devices,
+          see ovtxDisplaySbsFiberParametersSupported"
+    ::= { ovtxConfigurationEntry 36 }
+
+    ovtxConfigurationSbsFiberLength OBJECT-TYPE
+        SYNTAX SbsFiberLengthValue
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION 
+          "SBS suppression mode.
+          This feature is not supported by all transmitter devices,
+          see ovtxDisplaySbsFiberParametersSupported"
+    ::= { ovtxConfigurationEntry 37 }
+
+
+--*****************************************************************************************
+-- Display group
+
+    ovtxDisplayTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF OvtxDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+    ::= { ovtxDisplay 1 }
+
+-- table of configuration entry(ro/rw)
+
+    ovtxDisplayEntry OBJECT-TYPE
+        SYNTAX OvtxDisplayEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION ""
+        INDEX { ovtxNESlot  }
+    ::= { ovtxDisplayTable 1 }
+
+-- the structure of the entry
+
+    OvtxDisplayEntry ::= SEQUENCE
+    {
+        ovtxDisplayRfInputValue                INTEGER,
+        ovtxDisplayLaserFrequencyMin           INTEGER,
+        ovtxDisplayLaserFrequencyMax           INTEGER,
+        ovtxDisplayLaserFrequencyStep          INTEGER,
+        ovtxDisplayOmiNominal                  INTEGER,
+        ovtxDisplaySatOmiNominal               INTEGER,
+        ovtxDisplayRegulationState             RegulationState,
+        ovtxDisplayExtendedCapabilities        TruthValue,
+        ovtxDisplayRfInputCapabilities         RfInputCapabilities,
+        ovtxDisplaySatLnbSupplySupported       LnbSupplySupportedValue,
+        ovtxDisplaySbsExtensionsSupported      TruthValue,
+        ovtxDisplaySbsSuppressionModeSupported TruthValue,
+        ovtxDisplaySbsFiberParametersSupported TruthValue
+    }
+
+    ovtxDisplayRfInputValue OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION "RfInput (total rms) in steps of 0.1 dBm."
+      ::= { ovtxDisplayEntry 1 }
+
+-- *****
+    ovtxDisplayLaserFrequencyMin OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The minimum adjustable laser frequency in GHz units."
+    ::={ ovtxDisplayEntry 2 }
+
+    ovtxDisplayLaserFrequencyMax OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The maximum adjustable laser frequency in GHz units."
+    ::={ ovtxDisplayEntry 3 }
+
+    ovtxDisplayLaserFrequencyStep OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "The supported laser frequency stepsize in GHz units."
+    ::={ ovtxDisplayEntry 4 }
+
+-- *****
+    ovtxDisplayOmiNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The nominal OMI in 0.1 percent units (CATV input)"
+    ::={ ovtxDisplayEntry 5 }
+
+-- *****
+    ovtxDisplaySatOmiNominal OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The nominal OMI in 0.1 percent units (SAT input)
+           Only usable if ovtxDisplayRfInputCapabilities != rfInputCatvOnlySupported(1), 
+           otherwise always reports zero"
+    ::={ ovtxDisplayEntry 6 }
+
+    ovtxDisplayRegulationState OBJECT-TYPE
+        SYNTAX  RegulationState
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "The transmitters current regulation state
+           Only usable if ovtxDisplayExtendedCapabilities == true(1),
+           otherwise always reports regulationStateUnknownOrNotSupported(1)"
+    ::={ ovtxDisplayEntry 7 }
+
+    ovtxDisplayExtendedCapabilities OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Returns true(1) if the transmitter supports the extended features
+             represented by the variables ovtxConfigurationCsoRegulationMode,
+             ovtxConfigurationSlope and ovtxConfigurationFiberLength"
+    ::={ ovtxDisplayEntry 8 }
+
+    ovtxDisplayRfInputCapabilities OBJECT-TYPE
+        SYNTAX  RfInputCapabilities
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "Returns the transmitter supported RF input capabilities"
+    ::={ ovtxDisplayEntry 9 }
+
+    ovtxDisplaySatLnbSupplySupported OBJECT-TYPE
+        SYNTAX  LnbSupplySupportedValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Returns the supported SAT LNB supply features"
+    ::={ ovtxDisplayEntry 10 }
+
+-- *****
+    ovtxDisplaySbsExtensionsSupported OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Returns true(1) if the transmitter supports the extended SBS alarm features"
+    ::={ ovtxDisplayEntry 11 }
+
+    ovtxDisplaySbsSuppressionModeSupported OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Returns true(1) if the transmitter supports the SbsSuppressionMode configuration feature"
+    ::={ ovtxDisplayEntry 12 }
+
+    ovtxDisplaySbsFiberParametersSupported OBJECT-TYPE
+        SYNTAX  TruthValue
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Returns true(1) if the transmitter supports the SbsFiber configuration feature"
+    ::={ ovtxDisplayEntry 13 }
+
+
+END

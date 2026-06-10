@@ -1,0 +1,262 @@
+WRI-POWER-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE,Unsigned32                    
+							FROM SNMPv2-SMI       
+			TEXTUAL-CONVENTION
+							FROM SNMPv2-TC
+			wri,wriProducts			
+							FROM WRI-SMI;
+	
+	-- power monitor
+	msppPower			MODULE-IDENTITY
+        LAST-UPDATED    "201001110000Z"
+        ORGANIZATION    "Wuhan FiberHome Networks Co.,Ltd."
+        CONTACT-INFO
+                "  FHN Customer Service
+                   Tel: 027-87693784"
+        DESCRIPTION
+                "The MIB module to describe the monitor for power."
+        REVISION        "201001110000Z" 
+        DESCRIPTION
+                "Add some attributes for power table"
+        REVISION        "200901110000Z" 
+        DESCRIPTION
+                "Init version for power monitor."
+        ::=   {msppChassis 2}
+
+	
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	
+
+	-- mspp power table
+		
+--		msppPower			OBJECT IDENTIFIER ::=   {msppChassis 2}
+		
+		powerTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF PowerEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Power information table."
+			::= { msppPower 1 }
+
+		powerEntry OBJECT-TYPE
+			SYNTAX PowerEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the power table."
+			INDEX {powerIndex }
+			::= { powerTable 1 }
+		
+		PowerEntry ::=
+		    SEQUENCE {
+		    powerIndex          		Unsigned32,
+		    powerType           		INTEGER,
+		    powerState          		INTEGER,
+		    powerValue          		INTEGER,
+		    powerRole	          		INTEGER,
+		    powerDescr					OCTET STRING,
+		    powerSerial					OCTET STRING,
+		    powerTemperature			INTEGER,
+			powerFuseStatus 			INTEGER,		
+			powerStateBits				INTEGER, 
+			powerTrapEna				INTEGER, 			
+			powerAllSetting				OCTET STRING,
+			--xf add 2014-7-2
+			powerIndexDescr				OCTET STRING
+			}
+		-- The following section describes the components of the table.
+
+			powerIndex OBJECT-TYPE
+				SYNTAX  Unsigned32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power index."
+				::= { powerEntry 1 }
+
+			powerType OBJECT-TYPE
+				SYNTAX  INTEGER{
+					dcdc(0),
+					acdc(1)
+				}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power type, 0:DC/DC,1:AC/DC."
+				::= { powerEntry 2 }
+				
+			powerState OBJECT-TYPE
+				SYNTAX  INTEGER{
+					normal(0),
+				 	voltagelack(1),
+					voltageoverload(2)
+		    	}				
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power state, 0:normal,1:voltage lack,2:voltage overload."
+				::= { powerEntry 3 }
+				
+			powerValue OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power value."
+				::= { powerEntry 4 }
+				
+				
+			powerRole OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"power role."
+				::= { powerEntry 5 }
+				
+			powerDescr OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"power description."
+				::= { powerEntry 6 }
+				
+			powerSerial OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power serial."
+				::= { powerEntry 7 }
+			
+			powerTemperature OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power temperature."
+				::= { powerEntry 8 }
+			
+			powerFuseStatus OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power fuse status."
+				::= { powerEntry 9 }	
+				
+			powerStateBits OBJECT-TYPE
+				SYNTAX  INTEGER {
+					normal(0),
+				 	voltagelack(1),
+					voltageoverload(2)
+		    	}
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"bits description for power states, redundance of powerState."
+				::= { powerEntry 10 }	
+				
+			powerTrapEna OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable power trap or not."
+				::= { powerEntry 11 }    				
+			
+			powerAllSetting OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"All oid operation of this table."
+				::= { powerEntry 12 }		
+				
+			powerIndexDescr	OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Power index descrption."
+				::= { powerEntry 13 }	
+				
+				
+		powerTrap			OBJECT IDENTIFIER ::=   {msppPower 2}
+
+		powerUp NOTIFICATION-TYPE
+       		OBJECTS {powerState}
+       		STATUS  current
+       		DESCRIPTION
+               	"power up trap."
+			::= { powerTrap 1}
+		
+		
+		powerDown NOTIFICATION-TYPE
+	       	OBJECTS {powerState}
+       		STATUS  current
+       		DESCRIPTION
+               	"power down trap."
+			::= { powerTrap 2}
+		
+		powerFault NOTIFICATION-TYPE
+	       	OBJECTS {powerState}
+       		STATUS  current
+       		DESCRIPTION
+               	"power abnoraml trap."
+			::= { powerTrap 3}
+		
+		powerOk NOTIFICATION-TYPE
+	       	OBJECTS {powerState}
+       		STATUS  current
+       		DESCRIPTION
+               	"power ok trap."
+			::= { powerTrap 4}		
+
+
+		powerGeneral			OBJECT IDENTIFIER ::=   {msppPower 3}
+		powerBits OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Bitsmap for all power being on."
+				::= { powerGeneral 1 }
+		powerNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"power numbers."
+				::= { powerGeneral 2 }
+		powerTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable fan trap or not."
+				::= { powerGeneral 3 }
+		powerMonitorEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable power monitor or not."
+				::= { powerGeneral 4 }
+
+END

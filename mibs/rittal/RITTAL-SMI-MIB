@@ -1,0 +1,48 @@
+-- ********************************************************************
+-- RITTAL GmbH & Co. KG, Herborn
+-- RITTAL-SMI Version 1.0
+--
+-- Management Information Base for SNMP Network Management
+--
+-- Copyright 2011 Rittal Herborn.
+-- All Rights Reserved.
+--
+-- The information in this document is subject to change without notice.
+-- Refer to document "AGB_Software_Rittal.pdf"
+--
+-- ********************************************************************
+-- File   : $RCSfile: RITTAL-SMI.txt,v $
+-- Rev.   : $Revision: 1.2 $
+-- Date   : $Date: 2013/10/24 13:33:49 $
+-- Author : $Author: fis $
+-- Id     : $Id: RITTAL-SMI.txt,v 1.2 2013/10/24 13:33:49 fis Exp $
+-- ********************************************************************
+
+RITTAL-SMI-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                                enterprises,
+                                MODULE-IDENTITY
+        FROM                SNMPv2-SMI;
+
+rittal  MODULE-IDENTITY
+        LAST-UPDATED        "201104010000Z"
+        ORGANIZATION        "RITTAL GmbH & Co. KG"
+        CONTACT-INFO        "www.rittal.de
+
+                            RITTAL GmbH & Co. KG
+                            Forschung & Entwicklung
+                            Auf dem Stuetzelberg
+                            D-35745 Herborn
+                            Germany, Europe
+
+                            +49(0)2772 5050
+                            info@rittal.de"
+        DESCRIPTION         "The Structure of Management Information Base for the Rittal enterprise."
+        REVISION            "201104010000Z"
+        DESCRIPTION         "Initial version of this MIB module."
+        ::=                 { enterprises       2606 }
+--      ::=                 { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) rittal(2606) }
+--                            as assigned by IANA
+
+END

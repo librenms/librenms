@@ -1,0 +1,742 @@
+--  *****************************************************************
+--  DLINKSW-SURVEILLANCE-VLAN-MIB.mib : Surveillance VLAN MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- ----------------------------
+-- MODIFICTION HISTORY:
+-- ----------------------------
+-- Version 2.0, 2016/3/28, Fanny He
+-- [New Object]
+-- Add new objects to support auto surveillance vlan v2.0.
+-- Request by Fanny He for project DGS-1510
+--
+-- Version 2.01, 2016/10/18, Fanny He
+-- Remove the objects "dsvLocation". Add the new objects "dsvOnvifIpcIpAddress",
+--  "dsvOnvifNvrIpAddress", "dsvOnvifNvrGroupNvrIpAddress", "dsvOnvifNvrGroupIpcIpAddress"
+--  *****************************************************************
+DLINKSW-SURVEILLANCE-VLAN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,Counter64
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        MacAddress, TruthValue, RowStatus, DateAndTime, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        InetAddress  
+            FROM INET-ADDRESS-MIB
+        PortList, VlanIdOrNone
+            FROM Q-BRIDGE-MIB
+        InterfaceIndex
+            FROM IF-MIB
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwSurveillanceVlanMIB MODULE-IDENTITY
+        LAST-UPDATED "201610180000Z"
+        ORGANIZATION "D-Link Corp."
+            CONTACT-INFO
+                "       D-Link Corporation
+
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:    +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+        DESCRIPTION
+            "The MIB module for managing surveillance VLAN feature."
+        REVISION    "201304080000Z"
+        DESCRIPTION
+            "Initial version of this MIB module."
+
+ 	REVISION    "201603280000Z"
+        DESCRIPTION
+            "Add new objects dsvOnvifGlobal, dsvOnvifInterface, dsvOnvifIpcInfo,
+             dsvOnvifNvrInfo and dsvOnvifNvrAdminIpcInfo to support auto surveillance vlan v2.0."
+
+ 	REVISION    "201610180000Z"
+        DESCRIPTION
+            "Remove the objects dsvLocation. Add the new objects dsvOnvifIpcIpAddress,
+	    dsvOnvifNvrIpAddress, dsvOnvifNvrGroupNvrIpAddress, dsvOnvifNvrGroupIpcIpAddress."
+        ::= { dlinkIndustrialCommon 34 }
+
+    OuiComponentType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "Represents an OUI component type.
+            Note: The component type 'dlink' indicates default OUI and is not
+            used for setting.
+            " 
+        SYNTAX       INTEGER {
+            other(1),
+            dlink(2),
+            vms(3),
+            vmsClient(4),
+            videoEncoder(5),
+            networkStorage(6)      
+        }
+
+-- -----------------------------------------------------------------------------
+-- Node definitions
+-- -----------------------------------------------------------------------------
+
+    dsvMIBNotifications   OBJECT IDENTIFIER ::= { dlinkSwSurveillanceVlanMIB 0 }
+    dsvMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwSurveillanceVlanMIB 1 }
+    dsvMIBConformance     OBJECT IDENTIFIER ::= { dlinkSwSurveillanceVlanMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dsvGlobal OBJECT IDENTIFIER ::= { dsvMIBObjects 1 }
+
+    dsvVlanId OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The object specifies the surveillance VLAN on a switch.
+            A value of zero indicates that no surveillance VLAN has been
+            configured.
+            It is required to configure the global dsvVlanId and enable
+            dsvIfEnabled to start the surveillance VLAN function
+            on a port."
+        DEFVAL  { 0 }
+        ::= { dsvGlobal 1 }
+
+    dsvQos OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..7)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The priority for the surveillance VLAN, which is used to distinguish
+            the QoS of the surveillance traffic from data traffic."
+        DEFVAL  { 5 }
+        ::= { dsvGlobal 2 }
+
+    dsvAgingTime OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        UNITS           "minutes"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The aging time for the surveillance VLAN, for aging out the surveillance
+            device and the surveillance VLAN automatically learned member ports.
+            "
+        DEFVAL  { 720 }
+        ::= { dsvGlobal 3 }
+
+-- -----------------------------------------------------------------------------
+    dsvOuiTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DsvOuiEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains a list of the surveillance VLAN OUI configuration."
+        ::= { dsvGlobal 4 }
+
+    dsvOuiEntry OBJECT-TYPE
+        SYNTAX          DsvOuiEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates an OUI information, which is used to classify
+            surveillance traffic into the surveillance VLAN. If the source MAC addresses of
+            the received packet matches any of the OUI pattern, the received
+            packet is determined as surveillance packet. "
+        INDEX { 
+            dsvOuiAddr, 
+            dsvOuiMask
+        }
+        ::= { dsvOuiTable 1 }
+
+    DsvOuiEntry ::=
+        SEQUENCE {
+            dsvOuiAddr            MacAddress,
+            dsvOuiMask            MacAddress,
+            dsvOuiComponentType   OuiComponentType,
+            dsvOuiDescription     SnmpAdminString,
+            dsvOuiRowStatus       RowStatus
+        }
+
+    dsvOuiAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The MAC address of the OUI referring to this entry."
+        ::= { dsvOuiEntry 1 }
+
+    dsvOuiMask OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the OUI MAC address matching bitmask."
+        ::= { dsvOuiEntry 2 }
+
+    dsvOuiComponentType OBJECT-TYPE
+        SYNTAX          OuiComponentType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The Component type of the OUI.
+             Note: The component type 'dlink' is not allowed to set."
+        ::= { dsvOuiEntry 3 }
+
+    dsvOuiDescription OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The description of the OUI. A zero length string of this object 
+             indicates there is no description for this OUI."
+        ::= { dsvOuiEntry 4 }
+
+    dsvOuiRowStatus   OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { dsvOuiEntry 5 }
+
+-- -----------------------------------------------------------------------------
+    dsvOnvifDiscoverPort OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The UDP and TCP port for snoop RTSP streaming."
+        DEFVAL  { 554 }
+        ::= { dsvGlobal 5 }
+
+-- -----------------------------------------------------------------------------
+
+    dsvInterface OBJECT IDENTIFIER ::= { dsvMIBObjects 2 }
+
+    dsvInterfaceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DsvInterfaceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the interface-specific surveillance VLAN parameters."
+        ::= { dsvInterface 1 }
+
+    dsvInterfaceEntry OBJECT-TYPE
+        SYNTAX          DsvInterfaceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the surveillance VLAN parameters for a port/port-channel."
+        INDEX { dsvIfIndex }
+        ::= { dsvInterfaceTable 1 }
+
+    DsvInterfaceEntry ::=
+    	SEQUENCE {
+            dsvIfIndex		InterfaceIndex,
+            dsvIfEnabled    TruthValue
+        }
+
+    dsvIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the physical port/port-channel interface."
+        ::= { dsvInterfaceEntry 1 }
+
+    dsvIfEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates whether the surveillance VLAN is enabled at the port."
+        ::= { dsvInterfaceEntry 2 }  
+        
+-- -----------------------------------------------------------------------------
+    dsvInfo OBJECT IDENTIFIER ::= { dsvMIBObjects 3 }
+
+    dsvMemberPorts OBJECT-TYPE
+        SYNTAX          PortList
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The surveillance VLAN's member ports, includes the dynamically
+            learned ports."
+        ::= { dsvInfo 1 }
+
+    dsvDynamicPorts OBJECT-TYPE
+        SYNTAX          PortList
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The dynamically learned member ports of the surveillance VLAN."
+        ::= { dsvInfo 2 }
+
+    dsvDeviceTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DsvDeviceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the information about the learned surveillance devices."
+        ::= { dsvInfo 3 }
+
+    dsvDeviceEntry OBJECT-TYPE
+        SYNTAX          DsvDeviceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the information of the connected surveillance device."
+        INDEX {
+            dsvDevicePortIfIdx,
+            dsvDeviceAddr 
+        }
+        ::= { dsvDeviceTable 1 }
+
+    DsvDeviceEntry ::=
+        SEQUENCE {
+            dsvDevicePortIfIdx      InterfaceIndex,
+            dsvDeviceAddr           MacAddress,
+            dsvDeviceCompType       OuiComponentType,
+            dsvDeviceDescr          SnmpAdminString,
+            dsvDeviceStartTime      DateAndTime,
+            dsvDeviceStatus         INTEGER
+        }
+
+    dsvDevicePortIfIdx OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the port to which the surveillance device connects."
+        ::= { dsvDeviceEntry 1 }
+
+    dsvDeviceAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the MAC address of the surveillance device."
+        ::= { dsvDeviceEntry 2 }            
+        
+    dsvDeviceCompType OBJECT-TYPE
+        SYNTAX          OuiComponentType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The component type of the surveillance device."
+        ::= { dsvDeviceEntry 3 }
+
+    dsvDeviceDescr OBJECT-TYPE
+        SYNTAX          SnmpAdminString (SIZE (0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The description of the surveillance device. A zero length string
+            of this object indicates there is no description for this OUI."
+        ::= { dsvDeviceEntry 4 }
+
+     dsvDeviceStartTime OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the start time of the connected surveillance device."
+        ::= { dsvDeviceEntry 5 }
+
+    dsvDeviceStatus OBJECT-TYPE
+        SYNTAX          INTEGER {
+            active(1),
+            aging(2)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the status of the connected surveillance device."
+        ::= { dsvDeviceEntry 6 }
+
+
+-- -----------------------------------------------------------------------------
+    dsvOnvifIpcInfo OBJECT IDENTIFIER ::= { dsvMIBObjects 4 }
+
+    dsvOnvifIpcTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DsvOnvifIpcEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the IPC information and configurations."
+        ::= { dsvOnvifIpcInfo 1 }
+
+    dsvOnvifIpcEntry OBJECT-TYPE
+        SYNTAX          DsvOnvifIpcEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the IPC information and configurations."
+        INDEX { dsvOnvifIpcIfIndex,
+		dsvOnvifIpcAddress
+	}
+        ::= { dsvOnvifIpcTable 1 }
+
+    DsvOnvifIpcEntry::=
+    	SEQUENCE {
+            dsvOnvifIpcIfIndex		InterfaceIndex,
+	    dsvOnvifIpcAddress		MacAddress,
+            dsvOnvifIpcIpAddress	InetAddress,
+	    dsvOnvifIpcState		TruthValue,
+            dsvOnvifIpcModel		SnmpAdminString,
+	    dsvOnvifIpcManufacturer	SnmpAdminString,
+	    dsvOnvifIpcDescription	SnmpAdminString,
+	    dsvOnvifIpcThroughput	Counter64
+        }
+
+    dsvOnvifIpcIfIndex	OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the physical port/port-channel interface."
+        ::= { dsvOnvifIpcEntry 1 }
+
+    dsvOnvifIpcAddress	OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the MAC address of the ONVIF IP-Camera."
+        ::= { dsvOnvifIpcEntry 2 }
+
+    dsvOnvifIpcIpAddress	OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the Ip address of the ONVIF IP-Camera."
+        ::= { dsvOnvifIpcEntry 3 }
+
+    dsvOnvifIpcState		OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates the state of the ONVIF IP-Camera on this port."
+        ::= { dsvOnvifIpcEntry 4 }
+
+    dsvOnvifIpcModel		OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE (0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the model name of the ONVIF IP-Camera."
+        ::= { dsvOnvifIpcEntry 5 }
+
+    dsvOnvifIpcManufacturer	OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE (0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the manufacturer of the ONVIF IP-Camera."
+        ::= { dsvOnvifIpcEntry 6 }
+
+    dsvOnvifIpcDescription	OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates the description of the ONVIF IP-Camera added by user."
+        ::= { dsvOnvifIpcEntry 7 }
+
+
+    dsvOnvifIpcThroughput	OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Mbps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates traffic throughput of the ONVIF IP-Camera."
+        ::= { dsvOnvifIpcEntry 8 }
+
+-- -----------------------------------------------------------------------------
+    dsvOnvifNvrInfo OBJECT IDENTIFIER ::= { dsvMIBObjects 5 }
+
+    dsvOnvifNvrTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DsvOnvifNvrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the IPC information and configurations."
+        ::= { dsvOnvifNvrInfo 1 }
+
+    dsvOnvifNvrEntry  OBJECT-TYPE
+        SYNTAX          DsvOnvifNvrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the NVR information and configurations."
+        INDEX { dsvOnvifNvrIfIndex,
+		dsvOnvifNvrAddress
+	}
+        ::= { dsvOnvifNvrTable 1 }
+
+    DsvOnvifNvrEntry ::=
+    	SEQUENCE {
+            dsvOnvifNvrIfIndex		InterfaceIndex,
+            dsvOnvifNvrAddress		MacAddress,
+            dsvOnvifNvrIpAddress	InetAddress,
+	    dsvOnvifNvrIpcNumber	Unsigned32,
+	    dsvOnvifNvrThroughput	Counter64,
+	    dsvOnvifNvrGroup		Unsigned32, 
+ 	    dsvOnvifNvrDescription	SnmpAdminString
+        }
+
+    dsvOnvifNvrIfIndex	OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the physical port/port-channel interface."
+        ::= { dsvOnvifNvrEntry  1 }
+
+    dsvOnvifNvrAddress	OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the MAC address of the ONVIF NVR."
+        ::= { dsvOnvifNvrEntry  2 }
+
+    dsvOnvifNvrIpAddress	OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the Ip address of the ONVIF NVR."
+        ::= { dsvOnvifNvrEntry  3 }
+
+    dsvOnvifNvrIpcNumber	OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of the ONVIF IP-Camera administrated by this NVR."
+        ::= { dsvOnvifNvrEntry  4 }
+
+    dsvOnvifNvrThroughput	OBJECT-TYPE
+        SYNTAX          Counter64
+        UNITS           "Mbps"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates traffic throughput of the ONVIF NVR."
+        ::= { dsvOnvifNvrEntry  5 }
+
+    dsvOnvifNvrGroup		OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the group ID of the ONVIF NVR."
+        ::= { dsvOnvifNvrEntry  6 }
+
+    dsvOnvifNvrDescription	OBJECT-TYPE
+        SYNTAX          SnmpAdminString(SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates the description of the ONVIF NVR added by user."
+        ::= { dsvOnvifNvrEntry  7 }
+
+-- -----------------------------------------------------------------------------
+    dsvOnvifNvrGroupInfo  OBJECT IDENTIFIER ::= { dsvMIBObjects 6 }
+
+    dsvOnvifNvrGroupTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DsvOnvifNvrGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains the IPC list in NVR group on the interface."
+        ::= { dsvOnvifNvrGroupInfo  1 }
+
+    dsvOnvifNvrGroupEntry OBJECT-TYPE
+        SYNTAX          DsvOnvifNvrGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the NVR group information."
+        INDEX { 
+		dsvOnvifNvrGroupIfIndex,
+		dsvOnvifNvrGroupNvrAddress,
+		dsvOnvifNvrGroupIpcAddress
+	}
+        ::= { dsvOnvifNvrGroupTable  1 }
+
+    DsvOnvifNvrGroupEntry ::=
+    	SEQUENCE {
+  	    dsvOnvifNvrGroupIfIndex	InterfaceIndex,
+	    dsvOnvifNvrGroupNvrAddress		MacAddress,
+	    dsvOnvifNvrGroupIpcAddress		MacAddress,
+	    dsvOnvifNvrGroupNvrIpAddress 	InetAddress,
+	    dsvOnvifNvrGroupIpcIpAddress	InetAddress,
+	    dsvOnvifNvrGroupNvrGroup		Unsigned32
+        }
+
+    dsvOnvifNvrGroupIfIndex	OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the physical port/port-channel interface."
+        ::= { dsvOnvifNvrGroupEntry 1 }
+
+    dsvOnvifNvrGroupNvrAddress	OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the MAC address of the ONVIF NVR."
+        ::= { dsvOnvifNvrGroupEntry 2 }
+
+    dsvOnvifNvrGroupIpcAddress	OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the MAC address of the ONVIF IP-Camera."
+        ::= { dsvOnvifNvrGroupEntry 3 }
+
+    dsvOnvifNvrGroupNvrIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the Ip address of the ONVIF NVR."
+        ::= { dsvOnvifNvrGroupEntry 4 }
+
+    dsvOnvifNvrGroupIpcIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the Ip address of the ONVIF IP-Camera."
+        ::= { dsvOnvifNvrGroupEntry 5 }
+
+    dsvOnvifNvrGroupNvrGroup	OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the group ID of the ONVIF NVR."
+        ::= { dsvOnvifNvrGroupEntry 6 }
+
+-- -----------------------------------------------------------------------------
+-- MIB Conformance statements
+-- -----------------------------------------------------------------------------
+    dsvMIBCompliances OBJECT IDENTIFIER
+        ::= { dsvMIBConformance 1 }
+
+    dsvMIBGroups  OBJECT IDENTIFIER
+        ::= { dsvMIBConformance 2 }
+
+    dsvMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+            DLINKSW-SURVEILLANCE-VLAN-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS    { dsvBasicGroup }
+
+        GROUP dsvOUICfgGroup
+        DESCRIPTION
+            "This group is required for entities that implement classifying
+            surveillance traffic based on OUI patterns." 
+            
+        GROUP dsvDeviceInfoGroup
+        DESCRIPTION
+            "This group is required for entities that display surveillance
+             vlan device infomation."
+        ::= { dsvMIBCompliances 1 }
+
+    dsvBasicGroup OBJECT-GROUP
+        OBJECTS {
+            dsvVlanId,
+            dsvQos,
+            dsvAgingTime,
+            dsvOnvifDiscoverPort,
+            dsvIfEnabled,
+            dsvMemberPorts,
+            dsvDynamicPorts 
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to configure or display the status
+            of surveillance VLAN feature."
+        ::= { dsvMIBGroups 1 }
+
+    
+    dsvOUICfgGroup OBJECT-GROUP
+        OBJECTS {
+            dsvOuiComponentType,
+            dsvOuiDescription,
+            dsvOuiRowStatus 
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to configure surveillance device OUI(s)."
+        ::= { dsvMIBGroups 2 }   
+        
+	dsvDeviceInfoGroup OBJECT-GROUP
+        OBJECTS {
+            dsvDeviceCompType,
+            dsvDeviceDescr,
+            dsvDeviceStartTime,
+            dsvDeviceStatus
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to display surveillance device(s)."
+        ::= { dsvMIBGroups 3 }
+
+
+    dsvOnvifIpcCfgGroup OBJECT-GROUP
+        OBJECTS {
+		dsvOnvifIpcIpAddress,	
+		dsvOnvifIpcState,
+		dsvOnvifIpcModel,
+                dsvOnvifIpcManufacturer,
+		dsvOnvifIpcDescription,
+		dsvOnvifIpcThroughput
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to display ONVIF-based surveillance vlan IPC information."
+        ::= { dsvMIBGroups 4 } 
+
+    dsvOnvifNvrCfgGroup OBJECT-GROUP
+        OBJECTS {
+		dsvOnvifNvrIpAddress,	
+		dsvOnvifNvrIpcNumber,
+		dsvOnvifNvrThroughput,
+		dsvOnvifNvrGroup,
+		dsvOnvifNvrDescription
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to display ONVIF-based surveillance vlan NVR information."
+        ::= { dsvMIBGroups 5 } 
+
+
+    dsvOnvifNvrGroupCfgGroup OBJECT-GROUP
+        OBJECTS {
+            dsvOnvifNvrGroupNvrIpAddress,
+            dsvOnvifNvrGroupIpcIpAddress,
+	    dsvOnvifNvrGroupNvrGroup
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects to display IPC in the NVR group on the interface."
+        ::= { dsvMIBGroups 6 } 
+
+END 
+   

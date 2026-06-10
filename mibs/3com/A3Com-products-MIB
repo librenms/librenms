@@ -1,0 +1,2678 @@
+-- **********************************************************************
+--      Copyright 3Com Limited. (1991- 2004)
+-- **********************************************************************
+
+-- This is the 3Com Enterprise MIB.
+--
+-- 3com-045 lists 3Com product IDs, as returned by the
+-- mibII.system.sysObject MIB Object. sysObject IDs are used by Network
+-- Management applications to identify devices and must match exactly an
+-- assigned ID. New product and trap IDs are registered through the web.
+--
+-- Please apply to:
+-- http://www.pdd.3com.com/cgi-bin/oid_request.asp
+-- to:  1. request a new product ID from 3com-45
+--      2. request a top-level private MIB branch from 3com-45
+--      3. request a new Superstack product or unit id from 3com-025
+
+-- Please apply to:
+-- http://www.pdd.3com.com/cgi-bin/trap_request.asp
+-- to:  request a new trap ID.
+
+-- SysObject and trap ID guidelines are fully documented in 3com-368. Below is
+-- a brief explanation.
+--
+-- 3com-045 contains all 3Com product IDs except for Superstack products,
+-- which are assigned from 3com-025.
+-- For example the sysoid for the Wireless
+-- Access Point 8000 is 1.3.6.1.4.1.43.1.20.1, derived as follows:
+--
+-- iso                  OBJECT IDENTIFIER ::= { 1 }
+-- org                  OBJECT IDENTIFIER ::= { iso 3 }
+-- dod                  OBJECT IDENTIFIER ::= { org 6 }
+-- internet             OBJECT IDENTIFIER ::= { dod 1 }
+-- private              OBJECT IDENTIFIER ::= { internet 4 }
+-- enterprises          OBJECT IDENTIFIER ::= { private 1 }
+-- a3Com                OBJECT IDENTIFIER ::= { enterprises 43 }
+-- products             OBJECT IDENTIFIER ::= { a3Com 1 }
+-- wirelessDevices      OBJECT IDENTIFIER ::= { products 20 }
+-- wLanAP8000           OBJECT IDENTIFIER ::= { wirelessDevices 1 }
+--
+--
+-- 3com-045 additionally contains device-specific MIBs.  These
+-- are top-level branches of private MIBs defined in other 3FCs.
+-- For example, the Access Pointer 8000 uses the private MIB branch:
+--
+-- wlan-mib            OBJECT IDENTIFIER ::= { a3Com 35 }
+--
+--
+--
+-- **********************************************************************
+-- MIB Version:
+--
+-- Comments:            This defines the structure of the 3Com branch.
+--
+-- History:
+-- Date         Author          Reason for Change
+-- 1 Sep 94     Paul J Moran        Created
+-- 28 Nov 94    Paul J Moran        Added LinkSwitch100 OIDs
+-- 10 Jan 95    Ed Heiner           Added LANplex Systems MIB,
+--                                  LANplex Optional FDDI MIB,
+--                                  LANplex 2500/2016 sysOids, and
+--                                  new LANplex 6000 sysOids.
+-- 31 Jan 95    Paul J Moran        Added more LinkSwitch100 OIDs
+-- 21 Feb 95    Danny Propp         Added NCD products -
+--                                    New atm product group including
+--                                    CELLplex 7000,7200 OIDs.
+--                                    New linkSwitch500 and
+--                                    linkSwitch2700Atm OIDs.
+-- 27 Feb 95    David Chuang,Srinath Candadai
+--                                  Added FMS100(Fast Ethernet Hub) OIDs
+--
+-- 15 Mar 95    Kiho Yum            Added NSD products -
+--                                    NbroTrLarge, NbroTrHuge, mp6EthFl,
+--                                    ethV3, mp6EthFl, and ethV3Fl
+--
+--  8 May 95    Danny Propp         Added NCD product - LinkSwitch2700Tli.
+--                                  Updated LinkSwitch2700Atm's name.
+--                                  Added ncdMibs OID.
+--
+-- 15 May 95    Kiho Yum            Added NSD products -
+--                                    cs2x00to, cs2x00tlo, cs3x00to, cs3x00tlo
+--                                    series2500, series3000, nbroFw,
+--                                    added AA sw pkg to all brouter products
+--                                    added AB sw pkg to all brouter products
+--                                    added BF sw pkg to all brouter products
+--
+-- 16 May 95    Ed Heiner           Added SD products -
+--                                    lss2000, linkSwitch-2200-2,
+--                                    lanplex-60xx-System-2,
+--                                    lanplex-60xx-Chassis-2,
+--                                    lanplex-60xx-ESM-2,
+--                                    lanplex-60xx-EFSM-2
+--                                    Revised new switching module names
+--                                    (lps60xxFESM -> lps60xxEFSM).
+--
+-- 19 Jun 95    Ed Heiner           Added SD products -
+--                                    lanplex-2500-3, lanplex-2016-3, and
+--                                    linkSwitch-2200-3.
+--
+-- 22 Jun 95    David Chuang & Srinath Candadai, Added NAD products -
+--                                    FMS100 management only system
+--
+-- 26 Jun 95    Paul J Moran    Added linkBuilderPresley
+--                              rename linkSwitch100 to linkSwitch1000
+--                              Added linkSwitch3000
+--
+--  3 Jul 95    Ed Heiner           Added SD products -
+--                                    lanplex-60xx-System-3,
+--                                    lanplex-60xx-Chassis-3,
+--                                    lanplex-60xx-ESM-3, and
+--                                    lanplex-60xx-EFSM-3.
+-- 8 Aug 95     Paul J Moran
+-- rename linkBuilderPresley to officeStack-Hub8M
+--
+-- 28 Nov 95    Danny Propp           CELLplex7200 replaced by
+--                                      CELLplex7000-modules;
+--                                    New NCD CELLplex7000 modules added -
+--                                      - CELLplex7x00-moduleBridge
+--                                      - CELLplex7200-module
+--                                      - CELLplex7200F-module
+--                                      - CELLplex7400-module
+--
+-- 06 Dec 95    Kiho Yum              Added OIDs for NETBuilder
+--                                    Remote Office Token Ring Isdn
+--                                    products.  Added nbro numbers to
+--                                    OID descriptors.
+--
+-- 06 Dec 95    Kiho Yum              Swapped OIDs for nbroTrHuge and
+--                                    nbroTrIsdn
+--
+-- 30 Jan 96    Paul J Moran
+-- rename officeStack to officeConnect
+-- add extra linkSwitch3000 module
+--
+-- 6 Feb 96     Paul J Moran
+-- add linkSwitch1000MSH sysObjID
+--
+-- 08 Feb 96    Danny Propp           Changed all CELLplex names to cELLplex.
+--                                    Changed cELLplex7000 modules/cards
+--                                    names.
+--                                    Added cELLplex-7600card.
+--
+-- 13 Feb 96    Paul J Moran
+-- add superStack card ids
+--
+--
+-- 29 Feb 96  David Chuang & Srinath Candadai
+-- Added rptrGroupObjectID for FMS 100
+-- (100BaseT4) repeater.
+--
+-- 06 Mar 96    Kiho Yum
+-- Added OIDs for new NETBuilder
+-- ATM board, nbro2Eth, and nbro2EthIsdn.
+--
+-- 07 Mar 96 John Scano Added OIDs for
+--                                      TRSM Module
+--                                      TMM Module
+--                                      FSM Module
+--                                      SS-2
+--                              For agent revisions 4,5,6,7
+--
+-- 15 March 96 Paul J Moran
+-- Added linkswitch cards for the OnCore
+--
+-- 20 March 96 Paul J Moran
+-- ATMO module for superStack Switch1000/3000
+--
+-- 20 March 96 Kiho Yum               Added OIDs for new NETBuilder
+--                                    flat FDDI boards
+--
+-- 15 April 96 Paul J Moran
+-- Add oids for the LinkSwitch2000/Token Ring
+--
+-- 25 April 96 Paul J Moran
+-- Changed linkSwitch1000MSH to mshSwitch1005
+--
+-- 29 April 96 Paul J Moran
+-- Added main branch for the VLAN Server
+--
+-- 23 May 96 Kiho Yum
+-- Added main branch for terminal servers
+--
+-- 29 May 96 Kiho Yum
+-- Added product oids for Office Connect Routers
+--
+-- 3 June 96 Paul J Moran
+-- Added more linkswitch cards for the OnCore
+--
+-- 21June 96 Paul J Moran
+-- Added yet more linkswitch card ids for the OnCore
+-- Added sysObjectId for new SuperStack Desktop Switch
+--
+-- 8 July 1996 Paul J Moran
+-- Added card id for new SuperStack Desktop Switch
+--
+-- 6 September 1996 Paul J Moran
+-- Added card id for new SuperStack Switch 3000
+--
+-- 16 September 96 Paul J Moran
+-- Added more linkswitch cards for the OnCore
+--
+-- 11 October 96 Paul J Moran
+-- Added new mib branch for a new RPS product - rpsIIMgmtModule-mib
+--
+-- 7 Nov 96 Kiho Yum
+-- Added nb platform oids for nbr2e, nbr2eIsdn, and Office Conn. Family
+-- Also added board OIDs for nboc cpu boards.
+--
+-- 15 October 96 Evan McGinnis
+-- Corrected problems with linkSwitch/linkswitch naming
+-- confusion
+--
+--
+-- 6 November 96 Paul J Moran
+-- Added new OfficeConnet product, sysObjId and card types
+--
+-- 7 Nov 96 Kiho Yum
+-- Added nb platform oids for nbr2e, nbr2eIsdn, and Office Conn. Family
+-- Also added board OIDs for nboc cpu boards.
+--
+-- 20 Nov 96 Evan McGinnis
+-- Added ten100 card for LS1000 (As per Paul Moran's request)
+--
+-- 19 Dec 96 Evan McGinnis
+-- Added Power supply branch & Power supply (As per Paul Moran's request)
+--
+-- 21 Feb 97 Kiho Yum
+-- Added dpe Fw OID branch
+-- Also added brouterBoard OIDs for nbocST, nbocU, nboc56kCSU, nbocT1CSU,
+-- nboc1x1 and nboc2FlexWAN
+-- Also added brouterPlatform for ocT1CsuDsu.
+--
+-- 18 Mar 97 Evan McGinnis
+-- Added section for NOVA project
+--
+-- 17 Apr 97 Evan McGinnis
+-- Added branches for BAD (TDM)
+--
+-- 28 May 97 Kiho Yum
+-- Added sysOID, brouterBoard OIDs, brouterPlatform OIDs, &
+-- brouterBrdFwVers for Intrepid family of products.
+-- Added brouterBoard & brouterBrdFwVers OIDs for MbriSt, MbriU
+-- (8port ISDN boards) & QuadWAN
+--
+-- 3 Jun 97 Evan McGinnis/Paola Biti
+-- Added branch for SuperStack Switch 9000 Product and MIB
+--
+-- 4 Sep 97 Evan McGinnis/Srinath Candadai
+-- Added FMS100 cards
+--
+-- 30 Sep 97 Evan McGinnis
+-- Added Cable Modems
+-- Added Eclipse chassis and module definitions
+--
+-- 8 Oct 97 Evan McGinnis/Kiho Yum
+-- Added Office Connect 1x2
+-- Added new Brouter Board
+--
+-- 20 Oct 97 Evan McGinnis/Alan Peak
+-- Added EME board
+--
+-- 20 Nov 97 Evan McGinnis/Ahu Cohen
+-- Added cb7000sip
+--
+-- 20 Nov 97 Evan McGinnis/Trevor Warwick
+-- Added placeholder for OEM switch
+--
+-- 12 Dec 97 Evan McGinnis/Pei-Chen Lin
+-- Added Cable Modem MIB branch
+--
+-- 05 Jan 98 Evan McGinnis/Tim Mancour
+-- Added Switch 2000 OIDs
+--
+-- 08 Jan 98 Evan McGinnis/Tom McBrine
+-- Added new CB9000 layer-2 card
+--
+-- 17 Mar 98 Evan McGinnis/Ira Wolf/Pei-Chen Lin
+-- Replaced Cable Modem MIB/Inserted Switching
+-- System
+--
+-- 18 Mar 98 Evan McGinnis/Solomon Chulski
+-- Replace CB9000 Cell cards
+--
+-- 23 Mar 98 Evan McGinnis/Paul Moran
+-- Assigned SS Switch 1100/Router ID
+--
+-- 28 Mar 98 Kiho Yum
+-- Assigned Score IDs
+--
+-- 7 Apr 98 Evan McGinnis/Annie Dang
+-- Renamed atmAccess to pathBuilder
+--
+-- 28 Apr 98 Evan McGinnis/Doug Johnson
+-- Registered top level USR
+--
+-- 18 Jun 98 Evan McGinnis/Solomon Chulski
+-- New CB 7000 registrations
+--
+-- 18 Jun 98 Evan McGinnis/Prakash Banthia
+-- Edge Monitor MIB
+--
+-- 18 Jun 98 Evan McGinnis/Gilbert Yeung
+-- NIC/DMTF MIB
+--
+-- 22 Jun 98 Evan McGinnis/Paul Hardak
+-- 7000 Series Updates
+--
+-- 28 Aug 98 Evan McGinnis/Steve Chaump
+-- Added Grand Prix placeholder
+--
+-- 28 Aug 98 Evan McGinnis/Michael Melnicki
+-- Added Palm MIB subtree
+--
+-- 23 Nov 98 Evan McGinnis/Bill Friedeborn
+-- Added 9000 cards & 8 slot chassis
+--
+-- 14 Jan 99 Evan McGinnis
+-- Added 9000 card
+--
+-- 28 Jan 99 Evan McGinnis/David Plain
+-- Added Phones & 3300 Card subtree
+--
+-- 09 Mar 99 Evan McGinnis/Erez Geva
+-- Added new cb9000 cell card
+--
+-- 29 Mar 99 Evan McGinnis/Wai-Yin Cheung
+-- Added new brouter boads
+--
+-- 29 Mar 99 Evan McGinnis/Bill Friedeborn
+-- Additional 9000 Blades
+--
+-- 29 Mar 99 Evan McGinnis/Racheli Meiri
+-- 3300 ATM uplink
+--
+-- 8 Apr 99 Tom Butler/Bill Friedeborn
+-- Added cb9000-cards-fabric-36
+--
+-- 3 May 99 Tom Butler/Itsu Gross
+-- Added cELLplex-7800card, cELLplex-7900card
+--
+-- 12 May 99 Tom Butler/Wai-Yin Cheung
+-- Added scorePri4port.  Added product names to comments for OIDs
+-- under brouter and brouterPlatform.
+--
+-- 23 July 99 Tom Butler/Paola Biti
+-- Added superStackSwitch9100.
+--
+-- 25 Oct 99 Prathibha Nagvar/Joe Tsai
+-- Added wlan-mib under a3Com for Wireless LAN Access Point
+--
+-- 23 Dec 99 Prathibha Nagvar/Ian Patridge
+-- Added nbx100 for 3Com NBX 100 Call Processor Card, 3C10110
+-- Earlier, {phones 1} was assigned to livingston, but it has
+-- has been re-issued to nbx100 based on Ian Partridge's
+-- suggestion to re-use livingston OID for nbx100
+--
+-- 25th Jan 2000 Prathibha Nagvar/Paul Simunek
+-- Added icdSipProxy-mib for Session Initiation Protocol Proxy Server
+--
+-- 23rd Feb 2000 Prathibha Nagvar/Bill Friedeborn
+-- Added coreBuilder9000-app-cards for set of applications that are to be
+-- included on the NSM boards (NCD product) and residing in the CB9000 chassis
+--
+-- 25th Feb 2000 Prathibha Nagvar/Ian Partridge/David Plain
+-- Replaced phones with voice to give a orthogonal structure for voIP products
+-- including phones, gateways and call processors.
+--
+-- 28 Feb 2000 Bill Friedeborn
+-- Added CB9K 4 slot chassis, layer 3 fabric class, layer3 fabric modules
+-- 8 port and a 16 port
+-- 9 port L2 LX module,12 port L2 module, L3 18 port TX/FX,
+--
+-- 20 March 2000 Prathibha Nagvar/Paola Biti
+-- New OID for SuperStack Layer 4 switch Soyuz
+--
+-- 20 March 2000 Prathibha Nagvar/Neil Harrison
+-- Added banff under the products category. Banff is policy application
+-- for LAN edge solution. Banff will be used to create new objectClasses
+-- and attributeTypes for policy while being sure that the OIDs will not
+-- clash with any other objectClasses and attributeTypes that are stored
+-- within the LDAP directory.
+--
+-- May 10th 2000 Prathibha Nagvar/Eugene Lee
+-- Added sysOID for SuperStack II Router 400 product
+-- Added brouter board EasterRtr (for SuperStack II Router 400 product).
+-- Added brouterPlatform OIDs EasterST and EasterU
+-- Also assigned two oids Rtr400Hw and Rtr400Hs under EasterRtr
+--
+-- May 23rd 2000 Prathibha Nagvar/Ian Patridge
+-- Added intranetAppliances under products category
+-- Also changes phones which was assigned { products 17} to
+-- voice { products 17}
+--
+-- May 23rd 2000 Prathibha Nagvar/Mike Pan
+-- Added airConnect { products 20 }
+-- for AirConnect Wireless Products
+--
+-- June 1st 2000 Prathibha Nagvar/Ian Patridge
+-- Deleted banff sysoid since the project has been dropped
+-- Reused bnaff sysoid { products 18 } for intranetAppliances instead
+-- Added object identifiers for voice products
+--
+-- Sept 8th 2000 Paola Biti/Dave Bill/Phil Crooks/Julian Palmer
+-- added intranetAppliances.servers branch
+-- added storageServer, internetServer, emailServer, superStackwebCache
+-- changed firewallOne to superstackFireWall
+--
+-- Sept 20th 2000 Paola Biti/Tom Shippey
+-- renamed callProcessors 3 branch to superStackNbxCallProcessor
+-- added nbx250, nbx500, nbx750
+-- to this branch
+--
+-- Sept 21st 2000 Paola Biti/Julian Palmer
+-- renamed web caches superStackWebCache1000, superStac3WebCache3000
+
+-- October 11 2000 Paola Biti/Hazem Kabbara
+-- added Minicore II.
+-- merged the switches branch (renamed from grand-prix) from ESD file
+
+-- November 6 2000 Paola Biti/Jeff Young
+-- added Office Connect Gateway
+-- added products 19, the xDSL branch
+
+-- November 6 2000 Paola Biti/Bill Sheil
+-- added Office Connect NBX Call Processor
+
+-- Dec 05 2000 Paola Biti/Julian Palmer
+-- obsoleted web cache ids.  Do not reassign.
+-- added the webCache-mib proprietary branch
+
+-- Dec 05 2000 Paola Biti/Jeff Livermore
+-- added the xDSLCommon-mib proprietary branch
+
+-- Dec 06 2000 Paola Biti/Paul Moran
+-- added the superStackSwitch4300
+-- added the superStack4300-mib proprietary branch
+
+-- Dec 12 2000 Paola Biti/Amy Lingley
+-- added ldap branch under a3Com and assigned
+-- ldapGeneric for common ids and
+-- ldapCommWorks, specific branch for Carrier
+
+-- Jan 15 2001 Paola Biti/Chris Caldwell
+-- added ssServerLoadBalancers branch
+
+-- Jan 31 2001 Paola Biti/William Power
+-- added storageServer150
+
+-- Jan 31 2001 Paola Biti/Alex Finkelshtein
+-- added vCNMultiAccessConcentrator
+
+-- Jan 31 2001 Paola Biti/Jeff Livermore
+-- added aDSLRouterVoDSLPorts, aDSLRouterNoVoDSLPorts,
+-- gSHDSLRouterVoDSLPorts, gSHDSLRouterNoVoDSLPorts
+
+-- March 20th 2001 Paola Biti/Yuli Hou
+-- added wLanAP to wireless branch. Renamed airConnect branch wirelessDevices
+
+-- March 26th 2001 Paola Biti/Davide Berti
+-- added SSL Acceleration Network Appliance
+
+-- April 26th 2001 Paola Biti/Yuli Hou
+-- corrected non-standard capitalisation for easterRouter and
+-- ssServerLoadBalancers branches
+
+-- April 27th 2001 Paola Biti/Yuli Hou
+-- added wLanAP6000 to wirelessDevices branch.
+
+-- July 2 2001 Paola Biti/Yuli Hou
+-- renamed wlanAP to wLanAP8000.
+-- renamed wlanAP-mib to wlan-mib.
+
+-- July 2 2001 Paola Biti
+-- Improved comments in header and copyright
+
+-- Oct 10 2001 Paola Biti
+-- Andy Everson - added cableDSLGateway, OfficeConnect Cable/DSL Gateway
+
+-- Oct 15 2001 Paola Biti
+-- Isabelle Lecoeuche - added cableDSLSecureGateway
+
+-- Jan 8th 2002 Paola Biti/Samer Darras
+-- added wLanAP2000 to wirelessDevices branch
+
+-- Jan 29th 2002 Paola Biti/Andy Everson
+-- added cableWirelessDSLGateway
+
+-- Jan 29th 2002 Paola Biti/Philippe Moutarlier
+-- added wLanWrkgrpBridge
+
+-- Mar 26th 2002 Paola Biti/Philippe Moutarlier
+-- added wLantoLanBridge
+
+-- Mar 26th 2002 Paola Biti/Manjunath Padmanabha
+-- added networkJacks branch (products 21) and nj200
+
+-- Jun 28th 2002 Paola Biti/Harry Bryant
+-- added firewall-mib (a3com 48)
+
+-- July 2 2002 Paola Biti/Samer Darras
+-- added wLanAP8500 (wirelessDevices 6)
+
+-- October 24 2002 Paola Biti/Hazem Kabbara
+-- added coreProducts (switches 4) and coreChassisSwitch4008
+
+-- October 25 2002 Paola Biti/James Freeman
+-- added wLanAPOfficeConnect11Mbps (wirelessDevices 7)
+
+-- October 25 2002 Paola Biti/Samer Darras
+-- added wLanAP8200 (wirelessDevices 8)
+
+-- November 15 2002 Paola Biti/Hazem Kabbara
+-- added coreChassis-mib (a3Com 45)
+
+-- December 01 2002 Les Bell/Steve Mancey
+-- added a3ComPoe-mib (a3Com 46)
+-- (from draft-ietf-hubmib-power-ethernet-mib-03.txt)
+
+-- January 08 2003 Paola Biti/Iain Kenney
+-- added a3ComXXX-mib (a3Com 47)
+-- added superStackSwitchXXX OBJECT IDENTIFIER ::= { hub 39 }
+
+-- March 11 2003 Paola Biti/Iain Kenney
+-- renamed a3Com496-mib (a3Com 47)
+
+-- March 12 2003 Paola Biti/Andy Everson
+-- cableWireless54Mbps11gDSLGateway { xDSL 10 }
+-- wLanAPOfficeConnect54Mbps11g (wirelessDevices 9}
+
+-- March 12 2003 Paola Biti/Mark Price
+-- wlanAP8700 (wirelessDevices 10}
+
+-- May 1 2003 Paola Biti/Harry Bryson
+-- coreWanRouter5200 { coreProducts 2 }
+
+-- May 7 2003 Paola Biti/Harry Bryson
+-- renamed coreProducts branch jvProducts
+-- added jvRouters { jvProducts 2 }
+-- deleted coreWanRouter5200
+-- added jvWanRouter5009 {jvRouters 1}
+-- added jvWanRouter5231 {jvRouters 2}
+-- added jvWanRouter5640 {jvRouters 3}
+-- added jvWanRouter5680 {jvRouters 4}
+-- added jvWanRouter3012 {jvRouters 5}
+-- added jvWanRouter3013 {jvRouters 6}
+-- added jvWanRouter3014 {jvRouters 7}
+-- added jvWanRouter3015 {jvRouters 8}
+
+-- May 31 2003 Paola Biti/Hazem Kabbara
+-- added jvSwitches branch  { jvProducts 3 }
+-- added jvSwitchxxxx       { jvSwitches 1 }
+
+-- May 31 2003 Paola Biti/Sarwar Raza
+-- added voiceCoreExchange-mib  { a3Com 48 }
+
+-- June 06 2003 Paola Biti/Iain Kenney
+-- renamed switch3824 { hub 39 }
+-- added switch3812   { hub 40 }
+
+-- June 06 2003 Paola Biti/Jon Burgess
+-- added switch3226 { hub 41 }
+-- added switch3250 { hub 42 }
+
+-- June 20 2003 Paola Biti/Isabelle Lecoeuche
+
+-- added xdslvpnFirewall   { xDSL 11 }
+-- added xdslsecureRouter  { xDSL 12 }
+
+-- June 20 2003 Paola Biti/Paul Moran
+-- changed coreChassis-mib (a3Com 45) to jv-mib
+
+-- July 3 2003 Paola Biti/Harry Bryson
+-- added jvWanRouter3016 {jvRouters 9}
+
+-- August 20 2003 Paola Biti/Mark Price
+-- added wlanAP8250 { wirelessDevices 11 }
+-- added wlanAP8750 { wirelessDevices 12 }
+-- added wlanAP7250 { wirelessDevices 13 }
+
+-- August 20 2003 Paola Biti/Manjunath Padmanabha
+-- added nj205 { networkJacks 2 }
+-- added nj220 { networkJacks 3 }
+-- added nj225 { networkJacks 4 }
+
+-- September 09 2003 Paola Biti/Hazem Kabbara
+-- renamed jvSwitchxxxx jvSwitch7700-8
+
+-- October 13 2003 Paola Biti/Malcolm Dodds
+-- added secureIX50  { fireWalls 2 }
+-- added secureIX100 { fireWalls 3 }
+-- added secureIX500 { fireWalls 4 }
+
+
+-- October 27 2003 Paola Biti/Jim Urso
+-- added switch4824 { hub 43 }
+-- added switch4848 { hub 44 }
+
+-- November 5 2003 Paola Biti/Dave Maxwell
+-- added securitySwitches branch{ products 22 }
+-- added securitySwitch6200 { securitySwitches 1 }
+-- added jvWanRouter3018 {  jvRouters 10}
+-- added jvWanRouter6040 {  jvRouters 11}
+-- added jvWanRouter6080 {  jvRouters 12}
+-- added jvWanRouter3030 {  jvRouters 13}
+-- added jvWanRouter3031 {  jvRouters 14}
+-- added jvWanRouter3032 {  jvRouters 15}
+-- added jvWanRouter3033 {  jvRouters 16}
+-- added jvWanRouter3034 {  jvRouters 17}
+
+-- November 5 2003 Paola Biti/Sharon Foster
+-- added jvSwitch7700-4 { jvSwitches 2 }
+
+-- November 14 2003 Paola Biti/Andy Everson
+-- added wireless11gAdslRouter { xDSL 13 }
+
+-- December 19 2003 Paola Biti/Tsingwei
+-- added  jvSwitch5500 { jvSwitches 3 }
+
+-- February 4 2004 Paola Biti/Jim Urso
+-- changes to integrate 3fc-496
+-- renamed switch4824 switch3870-24-port { hub 43 }
+-- renamed switch4848 switch3870-48-port { hub 44 }
+-- renamed superStackSwitch3824
+-- renamed superStackSwitch3812
+-- renamed a3Com496-mib a3Com496MIB
+
+-- February 4 2004 Paola Biti/Maurice Goodfellow
+-- wlan800  		{ wirelessDevices 14 }
+-- wlan4008 	      { wirelessDevices 15 }
+-- wlan4100 	      { wirelessDevices 16 }
+
+-- February 4 2004 Paola Biti/Sharon Foster
+-- added jvSwitch8807  { jvSwitches 4 }
+-- added jvSwitch8810  { jvSwitches 5 }
+-- added jvSwitch8814  { jvSwitches 6 }
+
+-- February 12 2004 Paola Biti/Peter Saunderson
+-- renamed jvSwitch5500 jvSwitch5570
+
+-- added jvSwitch5505-24e    { jvSwitches 7 }
+-- added jvSwitch5505-48e    { jvSwitches 8 }
+
+-- added jvSwitch4500-24si     { jvSwitches 9 }
+-- added jvSwitch4500-28tsi    { jvSwitches 10 }
+-- added jvSwitch4500-28si     { jvSwitches 11 }
+-- added jvSwitch4500-52si     { jvSwitches 12 }
+-- added jvSwitch4505-28ei     { jvSwitches 13 }
+-- added jvSwitch4505-52ei     { jvSwitches 14 }
+-- added jvSwitch4505-28pwrei  { jvSwitches 15 }
+-- added jvSwitch4505-52pwrei  { jvSwitches 16 }
+-- added jvSwitch4505-28fxei   { jvSwitches 17 }
+
+-- February 13 2004 Paola Biti/Sharon Foster
+-- added jvSwitch8807  { jvSwitches 4 }
+-- added jvSwitch8810  { jvSwitches 5 }
+-- added jvSwitch8814  { jvSwitches 6 }
+
+-- March 9 2004 Paola Biti/Jim Urso
+-- added switch3848 { hub 45 }
+
+
+-- April 1st 1 2004 Paola Biti/Dave Maxwell
+-- added jvRouter3035  { jvRouters 18 }
+-- added jvRouterxxxx  { jvRouters 19 }
+-- added jvRouteryyyy  { jvRouters 20 }
+-- added jvRouter5012  { jvRouters 21 }
+-- added jvRouter5232  { jvRouters 22 }
+-- added jvRouter5642  { jvRouters 23 }
+-- added jvRouter5682  { jvRouters 24 }
+
+-- April 1st 1 2004 Paola Biti/Manjunath Padmanabha
+-- added nj225FXSC { networkJacks 5 }
+-- added nj225FXST { networkJacks 6 }
+
+-- April 14th 2004 Peter Saunderson / Paola Biti 3Com changed the names of 
+-- 4500 and 5500 ei to 4505 and 5505 and 5700 is the 5570
+
+-- April 20th 2004 Paola Biti/Kent Lin
+-- added wlan80211agWBridge OBJECT IDENTIFIER ::= { wirelessDevices 17 }
+
+-- May 4th 2004 Paola Biti/Mike Corrigan
+-- added a3ComLdapVcx OBJECT IDENTIFIER ::= { ldap3Com 3 }
+
+-- May 4th 2004 Paola Biti/Paola Biti
+-- added a3ComEntityIdentifier-mib OBJECT IDENTIFIER ::= { a3Com 49 }
+
+-- May 4th 2004 Paola Biti/Maurice Goodfellow
+-- added a3ComTrpz-mib OBJECT IDENTIFIER ::= { a3Com 50 }
+
+-- May 28th 2004 Paola Biti/Harry Bryson
+-- secureIX3100-10    OBJECT IDENTIFIER ::= { fireWalls 2 }
+-- secureIX3100-50    OBJECT IDENTIFIER ::= { fireWalls 3 }
+-- secureIX3100       OBJECT IDENTIFIER ::= { fireWalls 4 }
+-- secureIX4100       OBJECT IDENTIFIER ::= { fireWalls 5 }
+-- secureIX5100       OBJECT IDENTIFIER ::= { fireWalls 6 }
+
+-- May 28th 2004 Paola Biti/Maurice Goodfellow
+
+-- changed wlan800  to	wlanWXR104
+-- changed wlan4008 to	wlanWX1108
+-- changed wlan4100 to	wlanWX4400
+
+-- June 2nd Paola Biti/Manjunath Padmanabha
+-- a3ComNetworkJack-mib    OBJECT IDENTIFIER ::= { a3Com 51 }
+
+-- June 4th Paola Biti/Peter Saunderson
+-- jvSwitch5500G-ei-24           OBJECT IDENTIFIER ::= { jvSwitches 7 }
+-- jvSwitch5500G-ei-48           OBJECT IDENTIFIER ::= { jvSwitches 8 }
+
+-- jvSwitch5500-si-24          OBJECT IDENTIFIER ::= { jvSwitches 9 }
+-- jvSwitch5500-si-28t         OBJECT IDENTIFIER ::= { jvSwitches 10 }
+-- jvSwitch5500-si-28          OBJECT IDENTIFIER ::= { jvSwitches 11 }
+-- jvSwitch5500-si-52          OBJECT IDENTIFIER ::= { jvSwitches 12 }
+-- jvSwitch5500-ei-28          OBJECT IDENTIFIER ::= { jvSwitches 13 }
+-- jvSwitch5500-ei-52          OBJECT IDENTIFIER ::= { jvSwitches 14 }
+-- jvSwitch5500-eipwr-28       OBJECT IDENTIFIER ::= { jvSwitches 15 }
+-- jvSwitch5500-eipwr-52       OBJECT IDENTIFIER ::= { jvSwitches 16 }
+-- jvSwitch5500-ei-28fx        OBJECT IDENTIFIER ::= { jvSwitches 17 }
+
+-- July 19th 2004 Paola Biti/Kent Lin
+
+-- wlan11gOutdoorBtoBBridge    OBJECT IDENTIFIER ::= { wirelessDevices 18 }
+-- wlan11gIndoorBtoBBridge     OBJECT IDENTIFIER ::= { wirelessDevices 19 }
+
+-- July 22nd 2004 Paola Biti/Paola Biti
+
+-- modified jvswitch5700 to jvSwitch5500-MC6-EI
+
+-- July 26 2004 Paola Biti/Maurice Goodfellow
+-- wlanWX1108 renamed wlanWX1206
+
+-- September 4th Paola Biti/Peter Saunderson
+
+-- switch3228           OBJECT IDENTIFIER ::= { hub 46}
+-- switch3252           OBJECT IDENTIFIER ::= { hub 47}
+
+-- November 16th 2004 Paola Biti/Tom Kinahan
+-- wlanAP11gPoE          OBJECT IDENTIFIER ::= { wirelessDevices 20 }
+
+-- November 17th 2004 Paola Biti/Anne Pelagatti
+-- nbxv3000   OBJECT IDENTIFIER ::= { callProcessors 5}
+
+
+-- November 30th 2004 Paola Biti/Sarwar Raza
+-- renamed phone branches
+
+-- basicPhone               OBJECT IDENTIFIER ::= { phones 1 }
+-- businessPhone            OBJECT IDENTIFIER ::= { phones 2 }
+-- executivePhone           OBJECT IDENTIFIER ::= { phones 3 }
+-- wirelessPhone            OBJECT IDENTIFIER ::= { phones 4 }
+-- added business phones
+
+-- bp3104ProfessionalPhone OBJECT IDENTIFIER ::= { businessPhone 1 }
+
+A3Com-products-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        enterprises FROM RFC1155-SMI;
+
+a3Com                   OBJECT IDENTIFIER ::= { enterprises 43 }
+products                OBJECT IDENTIFIER ::= { a3Com 1 }
+brouterMIB              OBJECT IDENTIFIER ::= { a3Com 2 }
+amp-mib                 OBJECT IDENTIFIER ::= { a3Com 3 }
+genericTrap             OBJECT IDENTIFIER ::= { a3Com 4 }
+viewBuilderApps         OBJECT IDENTIFIER ::= { a3Com 5 }
+specificTrap            OBJECT IDENTIFIER ::= { a3Com 6 }
+linkBuilder3GH-mib      OBJECT IDENTIFIER ::= { a3Com 7 }
+linkBuilder10BTi-mib    OBJECT IDENTIFIER ::= { a3Com 8 }
+linkBuilderECS-mib      OBJECT IDENTIFIER ::= { a3Com 9 }
+generic                 OBJECT IDENTIFIER ::= { a3Com 10 }
+netBuilder-mib          OBJECT IDENTIFIER ::= { a3Com 11 }
+lBridgeECS-mib          OBJECT IDENTIFIER ::= { a3Com 12 }
+deskMan                 OBJECT IDENTIFIER ::= { a3Com 13 }
+linkBuilderMSH-mib      OBJECT IDENTIFIER ::= { a3Com 14 }
+a3ComUnused15           OBJECT IDENTIFIER ::= { a3Com 15 }
+a3comFddiWGHubMib       OBJECT IDENTIFIER ::= { a3Com 16 }
+linkSwitch-mib          OBJECT IDENTIFIER ::= { a3Com 17 }
+linkSwitch1000-mib      OBJECT IDENTIFIER ::= { a3Com 18 }
+linkBuilderFMS100-mib   OBJECT IDENTIFIER ::= { a3Com 19 }
+ncdMibs                 OBJECT IDENTIFIER ::= { a3Com 20 }
+officeConnect-Hub8M-mib OBJECT IDENTIFIER ::= { a3Com 21 }
+linkSwitch2000TR-mib    OBJECT IDENTIFIER ::= { a3Com 22 }
+vlanServer-mib          OBJECT IDENTIFIER ::= { a3Com 23 }
+terminalServerMib       OBJECT IDENTIFIER ::= { a3Com 24 }
+rpsIIMgmtModule-mib     OBJECT IDENTIFIER ::= { a3Com 25 }
+transcendEnterpriseMgr  OBJECT IDENTIFIER ::= { a3Com 26 }
+superStackSwitch9000SX-mib OBJECT IDENTIFIER ::= { a3Com 27 }
+coreBuilder9000-mib     OBJECT IDENTIFIER ::= { a3Com 28 }
+switchingSystemsMibs    OBJECT IDENTIFIER ::= { a3Com 29 }
+cableModem-mib          OBJECT IDENTIFIER ::= { a3Com 30 }
+edgemonitor-mib         OBJECT IDENTIFIER ::= { a3Com 31 }
+nic-mib                 OBJECT IDENTIFIER ::= { a3Com 32 }
+palm-mib                OBJECT IDENTIFIER ::= { a3Com 33 }
+grand-prix-mib          OBJECT IDENTIFIER ::= { a3Com 34 }
+wlan-mib                OBJECT IDENTIFIER ::= { a3Com 35 }
+icdSipProxy-mib         OBJECT IDENTIFIER ::= { a3Com 36 }
+webCache-mib            OBJECT IDENTIFIER ::= { a3Com 37 }
+xDSLCommon-mib          OBJECT IDENTIFIER ::= { a3Com 38 }
+superStack4300-mib      OBJECT IDENTIFIER ::= { a3Com 39 }
+ldap3Com                OBJECT IDENTIFIER ::= { a3Com 40 }
+sslAcceleration-mib     OBJECT IDENTIFIER ::= { a3Com 41 }
+networkManagement-mib   OBJECT IDENTIFIER ::= { a3Com 42 }
+componentMgmtModule-mib OBJECT IDENTIFIER ::= { a3Com 43 }
+firewall-mib            OBJECT IDENTIFIER ::= { a3Com 44 }
+jv-mib                  OBJECT IDENTIFIER ::= { a3Com 45 }
+a3ComPoe-mib            OBJECT IDENTIFIER ::= { a3Com 46 }
+a3Com496MIB             OBJECT IDENTIFIER ::= { a3Com 47 }
+voiceCoreExchange-mib   OBJECT IDENTIFIER ::= { a3Com 48 }
+a3ComEntityIdentifier-mib OBJECT IDENTIFIER ::= { a3Com 49 }
+a3ComTrpz-mib           OBJECT IDENTIFIER ::= { a3Com 50 }
+a3ComNetworkJack-mib    OBJECT IDENTIFIER ::= { a3Com 51 }
+
+
+--
+-- Start of the products branch for sysObjectIds
+--
+
+terminalServer          OBJECT IDENTIFIER ::= { products 1 }
+dedicatedBridgeServer   OBJECT IDENTIFIER ::= { products 2 }
+dedicatedRouteServer    OBJECT IDENTIFIER ::= { products 3 }
+brouter                 OBJECT IDENTIFIER ::= { products 4 }
+genericMSWorkstation    OBJECT IDENTIFIER ::= { products 5 }
+genericMSServer         OBJECT IDENTIFIER ::= { products 6 }
+genericUnixServer       OBJECT IDENTIFIER ::= { products 7 }
+hub                     OBJECT IDENTIFIER ::= { products 8 }
+cards                   OBJECT IDENTIFIER ::= { products 9 }
+chipSets                OBJECT IDENTIFIER ::= { products 10 }
+oem                     OBJECT IDENTIFIER ::= { products 11 }
+atm                     OBJECT IDENTIFIER ::= { products 12 }
+powerSupplies           OBJECT IDENTIFIER ::= { products 13 }
+tdm                     OBJECT IDENTIFIER ::= { products 14 }
+cableModems             OBJECT IDENTIFIER ::= { products 15 }
+switches                OBJECT IDENTIFIER ::= { products 16 }
+voice                   OBJECT IDENTIFIER ::= { products 17 }
+intranetAppliances      OBJECT IDENTIFIER ::= { products 18 }
+xDSL                    OBJECT IDENTIFIER ::= { products 19 }
+wirelessDevices         OBJECT IDENTIFIER ::= { products 20 }
+networkJacks            OBJECT IDENTIFIER ::= { products 21 }
+securitySwitches        OBJECT IDENTIFIER ::= { products 22 }
+
+
+--
+-- the following identifiers are assigned to 3com terminal servers
+--
+
+cs2500                  OBJECT IDENTIFIER ::= { terminalServer 1 }
+cs2600                  OBJECT IDENTIFIER ::= { terminalServer 2 }
+cs2000                  OBJECT IDENTIFIER ::= { terminalServer 3 }
+cs1                     OBJECT IDENTIFIER ::= { terminalServer 4 }
+cs210                   OBJECT IDENTIFIER ::= { terminalServer 5 }
+cs2100                  OBJECT IDENTIFIER ::= { terminalServer 6 }
+cs3000                  OBJECT IDENTIFIER ::= { terminalServer 7 }
+cs3100                  OBJECT IDENTIFIER ::= { terminalServer 8 }
+callisto                OBJECT IDENTIFIER ::= { terminalServer 9 }
+termServerPlatform      OBJECT IDENTIFIER ::= { terminalServer 10 }
+
+--
+-- the following ids are assigned under a3Com.products.terminalServer.cs2500
+--
+
+cs2500to                OBJECT IDENTIFIER ::= { cs2500 1 }
+cs2500tlo               OBJECT IDENTIFIER ::= { cs2500 2 }
+
+--
+-- the following ids are assigned under a3Com.products.terminalServer.cs2600
+--
+
+cs2600to                OBJECT IDENTIFIER ::= { cs2600 1 }
+cs2600tlo               OBJECT IDENTIFIER ::= { cs2600 2 }
+
+--
+-- the following ids are assigned under a3Com.products.terminalServer.cs2000
+--
+
+cs2000to                OBJECT IDENTIFIER ::= { cs2000 1 }
+cs2000tlo               OBJECT IDENTIFIER ::= { cs2000 2 }
+
+--
+-- the following ids are assigned under a3Com.products.terminalServer.cs2100
+--
+
+cs2100to                OBJECT IDENTIFIER ::= { cs2100 1 }
+cs2100tlo               OBJECT IDENTIFIER ::= { cs2100 2 }
+
+--
+-- the following ids are assigned under a3Com.products.terminalServer.cs3000
+--
+
+cs3000to                OBJECT IDENTIFIER ::= { cs3000 1 }
+cs3000tlo               OBJECT IDENTIFIER ::= { cs3000 2 }
+
+--
+-- the following ids are assigned under a3Com.products.terminalServer.cs3100
+--
+
+cs3100to                OBJECT IDENTIFIER ::= { cs3100 1 }
+cs3100tlo               OBJECT IDENTIFIER ::= { cs3100 2 }
+
+--
+-- the following identifiers are assigned to 3com terminal server platforms
+--
+
+series1                 OBJECT IDENTIFIER ::= { termServerPlatform 1 }
+series200               OBJECT IDENTIFIER ::= { termServerPlatform 2 }
+callistoPlatfor         OBJECT IDENTIFIER ::= { termServerPlatform 3 }
+series2500              OBJECT IDENTIFIER ::= { termServerPlatform 4 }
+series3000              OBJECT IDENTIFIER ::= { termServerPlatform 5 }
+
+
+--
+-- the following identifiers are assigned to 3com brouters
+--
+
+netbuilder1        OBJECT IDENTIFIER ::= { brouter 1 }  -- not used
+netbuilder2        OBJECT IDENTIFIER ::= { brouter 2 }  -- >= 6.2
+lBridgeECS         OBJECT IDENTIFIER ::= { brouter 3 }
+netbuilderTrRA     OBJECT IDENTIFIER ::= { brouter 4 }  -- 2 port nbtr NBTR Remote Access
+brouterPlatform    OBJECT IDENTIFIER ::= { brouter 5 }
+netbuilderRem      OBJECT IDENTIFIER ::= { brouter 6 }  -- 4 port nb1 NB Remote
+netbuilderRA       OBJECT IDENTIFIER ::= { brouter 7 }  -- 2 port nb1 NB Remote Access
+netbuilderRC       OBJECT IDENTIFIER ::= { brouter 8 }  -- 2 port boundary rtr NB Remote Control
+netbuilderTrRem    OBJECT IDENTIFIER ::= { brouter 9 }  -- 4 port tok.ring nb1 NBTR Remote
+netbuilderTrRC     OBJECT IDENTIFIER ::= { brouter 10 } -- tok.ring boundary rtr NBTR Remote Control
+nb2-4              OBJECT IDENTIFIER ::= { brouter 11 } -- nb2 4-slot chassis
+nb2-8              OBJECT IDENTIFIER ::= { brouter 12 } -- nb2 8-slot chassis
+nbro               OBJECT IDENTIFIER ::= { brouter 13 } -- netbuilder Rem. Office (spectre)
+brouterBoards      OBJECT IDENTIFIER ::= { brouter 14 }
+netbuilderLocal    OBJECT IDENTIFIER ::= { brouter 15 } -- 2 Lan nb1 NB Local
+netbuilderTrLocal  OBJECT IDENTIFIER ::= { brouter 16 } -- 2 Lan nbtr NBTR Local
+netbuilderRC1x2    OBJECT IDENTIFIER ::= { brouter 17 } -- NB Rem Ctl w/2 wan ports
+netbuilderTrRC1x2  OBJECT IDENTIFIER ::= { brouter 18 } -- NBTR Rem Ctl w/2 wan ports
+casper             OBJECT IDENTIFIER ::= { brouter 19 } -- Spectre Large (SuperStackII 22x)
+spectreHuge        OBJECT IDENTIFIER ::= { brouter 20 } -- Spectre Huge (SuperStackII 22x)
+spectreIsdn        OBJECT IDENTIFIER ::= { brouter 21 } -- Spectre ISDN (SuperStackII 42x)
+nb2-8-4fddi        OBJECT IDENTIFIER ::= { brouter 22 } -- 8 slot nb2 capable of 4 fddi sets
+nb2-8-dualwide     OBJECT IDENTIFIER ::= { brouter 23 } -- 8 slot nb2 w/dual wide slots 4 crew
+brouterBrdFwVers   OBJECT IDENTIFIER ::= { brouter 24 } -- fw versions
+brouterBrdSwVers   OBJECT IDENTIFIER ::= { brouter 25 } -- sw versions
+spectreIsdnHuge    OBJECT IDENTIFIER ::= { brouter 26 } -- Spectre ISDN
+nbroTrHuge         OBJECT IDENTIFIER ::= { brouter 27 } -- SpectreTR4x8 (superStackII 32x TR)
+nbroTrIsdn         OBJECT IDENTIFIER ::= { brouter 28 } -- SpectreTrIsdn4x8 (SSII 52x TR/ISDN)
+nbroTrNext         OBJECT IDENTIFIER ::= { brouter 29 } -- SpectreTrxxx (SSII 32x TR)
+nbro2Eth           OBJECT IDENTIFIER ::= { brouter 30 } -- Spectre2Eth (SSII 22x Eth sw ver>9.1)
+nbro2EthIsdn       OBJECT IDENTIFIER ::= { brouter 31 } -- Spectre2EthIsdn (SSII 42x Eth/ISDN sw ver > 9.1)
+officeConnRtr      OBJECT IDENTIFIER ::= { brouter 32 } -- officeConnect
+intrepidRtr        OBJECT IDENTIFIER ::= { brouter 33 } -- Intrepid (SuperStackII NBSI 2xWan:intrepid, 4xWan:blueridge)
+superStackSwitch1100Router  OBJECT IDENTIFIER ::= {brouter 34}
+scoreRtr           OBJECT IDENTIFIER ::= { brouter 35 } -- Score (PB S5xx tunnel switch)
+copperRtr          OBJECT IDENTIFIER ::= { brouter 36 } -- Copper (PB S4xx WAN convergence switch)
+easterRtr          OBJECT IDENTIFIER ::= { brouter 37 } -- Easter (SuperStack II Router 400)
+
+--
+-- the following ids are assigned under a3Com.products.brouter.netbuilderTrRA
+--
+netbuilderTrRAbp   OBJECT IDENTIFIER ::= { netbuilderTrRA 1 }  -- NBTR Rem. Acc. w/Basic Prot. SW
+netbuilderTrRAcp   OBJECT IDENTIFIER ::= { netbuilderTrRA 2 }  -- NBTR Rem. Acc. w/Compl. Prot. SW
+netbuilderTrRAxw   OBJECT IDENTIFIER ::= { netbuilderTrRA 3 }  -- NBTR Rem. Acc w/Ext. WAN SW
+netbuilderTrRAcx   OBJECT IDENTIFIER ::= { netbuilderTrRA 4 }  -- NBTR Rem. Acc. w/Con Svc SW
+netbuilderTrRAba   OBJECT IDENTIFIER ::= { netbuilderTrRA 5 }  -- NBTR Rem. Acc. w/Bndry Rtg Clnt
+netbuilderTrRAar   OBJECT IDENTIFIER ::= { netbuilderTrRA 6 }  -- NBTR Rem. Acc. w/Acc. Rtr SW
+netbuilderTrRAsn   OBJECT IDENTIFIER ::= { netbuilderTrRA 7 }  -- NBTR Rem. Acc. w/SNA SW
+netbuilderTrRArb   OBJECT IDENTIFIER ::= { netbuilderTrRA 8 }  -- NBTR RA w/RB SW
+netbuilderTrRAff   OBJECT IDENTIFIER ::= { netbuilderTrRA 9 }  -- NBTR RA w/Full Feature SW
+netbuidlerTrRAcf   OBJECT IDENTIFIER ::= { netbuilderTrRA 10 } -- NBTR RA w/CF SW
+netbuilderTrRAbx   OBJECT IDENTIFIER ::= { netbuilderTrRA 11 } -- NBTR Rem Acc w/BX SW
+netbuilderTrRAappn OBJECT IDENTIFIER ::= { netbuilderTrRA 12 } -- NBTR RAAcc w/Appn SW
+netbuilderTrRAlm   OBJECT IDENTIFIER ::= { netbuilderTrRA 13 } -- NBTR RA w/Lm Sw
+netbuilderTrRAlt   OBJECT IDENTIFIER ::= { netbuilderTrRA 14 } -- NBTR RA w/Lt Sw
+netbuilderTrRAwm   OBJECT IDENTIFIER ::= { netbuilderTrRA 15 } -- NBTR RA w/Wm Sw
+netbuilderTrRAwt   OBJECT IDENTIFIER ::= { netbuilderTrRA 16 } -- NBTR RA w/Wt Sw
+netbuilderTrRAae   OBJECT IDENTIFIER ::= { netbuilderTrRA 17 } -- NBTR RA w/Ae Sw
+netbuilderTrRAap   OBJECT IDENTIFIER ::= { netbuilderTrRA 18 } -- NBTR RA w/Ap Sw
+netbuilderTrRAan   OBJECT IDENTIFIER ::= { netbuilderTrRA 19 } -- NBTR RA w/An Sw
+netbuilderTrRAla   OBJECT IDENTIFIER ::= { netbuilderTrRA 20 } -- NBTR RA w/La Sw
+netbuilderTrRAwa   OBJECT IDENTIFIER ::= { netbuilderTrRA 21 } -- NBTR RA w/Wa Sw
+netbuilderTrRAaa   OBJECT IDENTIFIER ::= { netbuilderTrRA 22 } -- NBTR RA w/Aa Sw
+netbuilderTrRAab   OBJECT IDENTIFIER ::= { netbuilderTrRA 23 } -- NBTR RA w/Ab Sw
+netbuilderTrRAbf   OBJECT IDENTIFIER ::= { netbuilderTrRA 24 } -- NBTR RA w/Bf Sw
+
+
+--
+-- the following identifiers are assigned to brouterPlatform
+--
+
+nb1                OBJECT IDENTIFIER ::= { brouterPlatform 1 } -- nb1 platform (NETbuilder)
+nb2                OBJECT IDENTIFIER ::= { brouterPlatform 2 } -- nb2 platform (NETBuilder II)
+nbroPlatform       OBJECT IDENTIFIER ::= { brouterPlatform 3 } -- netbuilder remote office platform (SuperStack II NB 2xx)
+casperPlatform     OBJECT IDENTIFIER ::= { brouterPlatform 4 } -- Casper platform (SS II NB)
+spectreIsdnPform   OBJECT IDENTIFIER ::= { brouterPlatform 5 } -- spec.isdn pf (SS II NB 42x)
+spectreIITr        OBJECT IDENTIFIER ::= { brouterPlatform 6 }--spec.IITr pf (SS II NB32x)
+nbroIITrIsdnPform  OBJECT IDENTIFIER ::= { brouterPlatform 7 }--sp.IITr Isdn pf (SS II NB 52x)
+nbroIIEthPform     OBJECT IDENTIFIER ::= { brouterPlatform 8 }--spec.IITr pf (SS II NB 22x)
+nbroIIEthIsdnPform OBJECT IDENTIFIER ::= { brouterPlatform 9 }--sp.IITr Isdn pf (SS II NB 42x)
+ocGen              OBJECT IDENTIFIER ::= { brouterPlatform 10 }--Office Connect (OCNB 11x)
+ocIsdnSt           OBJECT IDENTIFIER ::= { brouterPlatform 11 }--Office Conn w/ISDN s/t (OCNB 14x S/T)
+ocIsdnU            OBJECT IDENTIFIER ::= { brouterPlatform 12 }--Office Conn w/ISDN U (OCNB 14x U)
+ocCsuDsu           OBJECT IDENTIFIER ::= { brouterPlatform 13 }--Office Conn w/56K CSU/DSU (OCNB 12x K)
+ocWanOnly          OBJECT IDENTIFIER ::= { brouterPlatform 14 }--Office Conn w/WAN only (OCNB 12x KF)
+ocT1CsuDsu         OBJECT IDENTIFIER ::= { brouterPlatform 15 }--Office Conn w/T1 CSU/DSU (OCNB 12x T)
+intrepidGen        OBJECT IDENTIFIER ::= { brouterPlatform 16 }--intrepid Generic (SS II SI 4xx)
+intrepidIsdnSt     OBJECT IDENTIFIER ::= { brouterPlatform 17 }--intrepid w/ISDN s/t (SS II SI 43x S/T)
+intrepidIsdnU      OBJECT IDENTIFIER ::= { brouterPlatform 18 }--intrepid w/ISDN u (SS II SI 44x U)
+intrepid56kCsuDsu  OBJECT IDENTIFIER ::= { brouterPlatform 19 }--intrepid w/56k csu/dsu (SS II SI 54x k)
+intrepidT1CsuDsu   OBJECT IDENTIFIER ::= { brouterPlatform 20 }--intrepid w/T1/FT1 csu/dsu (SS II SI 64x T)
+oc1x2              OBJECT IDENTIFIER ::= { brouterPlatform 21 }--Office Connect 1x2 (OCNB 13x)
+scorePform         OBJECT IDENTIFIER ::= { brouterPlatform 22 }--Score (not used)
+blueridgeGen       OBJECT IDENTIFIER ::= { brouterPlatform 23 }--Blueridge (SS II SI 5xx)
+blueridgeIsdnSt    OBJECT IDENTIFIER ::= { brouterPlatform 24 }--Blueridge (SS II SI 53x S/T)
+blueridgeIsdnU     OBJECT IDENTIFIER ::= { brouterPlatform 25 }--Blueridge (SS II SI 54x U)
+blueridge56kCsuDsu OBJECT IDENTIFIER ::= { brouterPlatform 26 }--Blueridge (SS II SI 55x K)
+blueridgeT1CsuCsu  OBJECT IDENTIFIER ::= { brouterPlatform 27 }--Blueridge (SS II SI 56x T)
+scoreLanToLan      OBJECT IDENTIFIER ::= { brouterPlatform 28 }--Score Lan to Lan (PB S500)
+scoreFlex          OBJECT IDENTIFIER ::= { brouterPlatform 29 }--Score T1/Eq (PB S580)
+scoreFlexPri       OBJECT IDENTIFIER ::= { brouterPlatform 30 }--Score Pri (PB S590)
+scoreDualT3        OBJECT IDENTIFIER ::= { brouterPlatform 31 }--Score T3 (PB S593)
+scoreDualE3        OBJECT IDENTIFIER ::= { brouterPlatform 32 }--Score E3 (PB S594)
+scoreDualPri       OBJECT IDENTIFIER ::= { brouterPlatform 33 }--Score dual Pri (PB S598)
+copperHead         OBJECT IDENTIFIER ::= { brouterPlatform 34 }--copperHead platform (PB S4xx)
+scoreMMATM         OBJECT IDENTIFIER ::= { brouterPlatform 35 }--Score Multi-mode ATM (PB S574)
+scoreSMATM         OBJECT IDENTIFIER ::= { brouterPlatform 36 }--Score Single-mode ATM (PB S78)
+scoreFlexPri2port  OBJECT IDENTIFIER ::= { brouterPlatform 37 }--Score 2Port Flex/Pri (PB S59x)
+oc10St             OBJECT IDENTIFIER ::= { brouterPlatform 38 }--Office Conn 10 s/t
+oc10U              OBJECT IDENTIFIER ::= { brouterPlatform 39 }--Office Conn 10 U
+scorePri4port      OBJECT IDENTIFIER ::= { brouterPlatform 40 }--Score Pri 4-port(PB S599)
+easterST           OBJECT IDENTIFIER ::= { brouterPlatform 41 }-- Easter (SS II R400 2 LAN, 2 ISDN, ST)
+easterU            OBJECT IDENTIFIER ::= { brouterPlatform 42 }-- Easter (SS II R400 2 LAN, 2 ISDN, U)
+
+--
+-- the following id are assigned under a3Com.products.brouter.netbuilderRem
+--
+
+netbuilderRemBp   OBJECT IDENTIFIER ::= { netbuilderRem 1 }  -- nb Rem. w/Basic Prot
+netbuilderRemCp   OBJECT IDENTIFIER ::= { netbuilderRem 2 }  -- nb Rem w/Compl Prot
+netbuilderRemXw   OBJECT IDENTIFIER ::= { netbuilderRem 3 }  -- nb Rem w/Ext WAN
+netbuilderRemCx   OBJECT IDENTIFIER ::= { netbuilderRem 4 }  -- nb Rem w/X25 Con Svc
+netbuilderRemBa   OBJECT IDENTIFIER ::= { netbuilderRem 5 }  -- nb Rem w/Bndry Rtg
+netbuilderRemAr   OBJECT IDENTIFIER ::= { netbuilderRem 6 }  -- nb Rem w/Acc Rtr SW
+netbuilderRemSn   OBJECT IDENTIFIER ::= { netbuilderRem 7 }  -- nb Rem w/SNA SW
+netbuilderRemRb   OBJECT IDENTIFIER ::= { netbuilderRem 8 }  -- nb Rem w/RB SW
+netbuilderRemFf   OBJECT IDENTIFIER ::= { netbuilderRem 9 }  -- nb Remw/FF SW
+netbuilderRemCf   OBJECT IDENTIFIER ::= { netbuilderRem 10 } -- nb Rem w/CF SW
+netbuilderRemBx   OBJECT IDENTIFIER ::= { netbuilderRem 11 } -- nb Rem w/BX SW
+netbuilderRemAppn OBJECT IDENTIFIER ::= { netbuilderRem 12 } -- nb Rem w/Appn SW
+netbuilderRemLm   OBJECT IDENTIFIER ::= { netbuilderRem 13 } -- nb Rem w/Lm Sw
+netbuilderRemLt   OBJECT IDENTIFIER ::= { netbuilderRem 14 } -- nb Rem w/Lt Sw
+netbuilderRemWm   OBJECT IDENTIFIER ::= { netbuilderRem 15 } -- nb Rem w/Wm Sw
+netbuilderRemWt   OBJECT IDENTIFIER ::= { netbuilderRem 16 } -- nb Rem w/Wt Sw
+netbuilderRemAe   OBJECT IDENTIFIER ::= { netbuilderRem 17 } -- nb Rem w/Ae Sw
+netbuilderRemAp   OBJECT IDENTIFIER ::= { netbuilderRem 18 } -- nb Rem w/Ap Sw
+netbuilderRemAn   OBJECT IDENTIFIER ::= { netbuilderRem 19 } -- nb Rem w/An Sw
+netbuilderRemLa   OBJECT IDENTIFIER ::= { netbuilderRem 20 } -- nb Rem w/La Sw
+netbuilderRemWa   OBJECT IDENTIFIER ::= { netbuilderRem 21 } -- nb Rem w/Wa Sw
+netbuilderRemAa   OBJECT IDENTIFIER ::= { netbuilderRem 22 } -- nb Rem w/Aa Sw
+netbuilderRemAb   OBJECT IDENTIFIER ::= { netbuilderRem 23 } -- nb Rem w/Ab Sw
+netbuilderRemBf   OBJECT IDENTIFIER ::= { netbuilderRem 24 } -- nb Rem w/Bf Sw
+
+--
+-- the following ids are assigned under a3Com.products.brouter.netbuilderRA
+--
+
+netbuilderRAbp   OBJECT IDENTIFIER ::= { netbuilderRA 1 }  -- nb RA w/Basic Prot
+netbuilderRAcp   OBJECT IDENTIFIER ::= { netbuilderRA 2 }  -- nb RA w/Compl Prot
+netbuilderRAxw   OBJECT IDENTIFIER ::= { netbuilderRA 3 }  -- nb RA w/Ext WAN
+netbuilderRAcx   OBJECT IDENTIFIER ::= { netbuilderRA 4 }  -- nb RA w/Conn Svc
+netbuilderRAba   OBJECT IDENTIFIER ::= { netbuilderRA 5 }  -- nb RA w/Bndry Rtg
+netbuilderRAar   OBJECT IDENTIFIER ::= { netbuilderRA 6 }  -- nb RA w/AccRtr SW
+netbuilderRAsn   OBJECT IDENTIFIER ::= { netbuilderRA 7 }  -- nb RA w/SNA SW
+netbuilderRArb   OBJECT IDENTIFIER ::= { netbuilderRA 8 }  -- nb RA w/RB SW
+netbuilderRAff   OBJECT IDENTIFIER ::= { netbuilderRA 9 }  -- nb RA/FF SW
+netbuilderRAcf   OBJECT IDENTIFIER ::= { netbuilderRA 10 } -- nb RA w/CF SW
+netbuilderRAbx   OBJECT IDENTIFIER ::= { netbuilderRA 11 } -- nb RA w/BX SW
+netbuilderRAappn OBJECT IDENTIFIER ::= { netbuilderRA 12 } -- nb RA w/Appn SW
+netbuilderRAlm   OBJECT IDENTIFIER ::= { netbuilderRA 13 } -- nb RA w/Lm Sw
+netbuilderRAlt   OBJECT IDENTIFIER ::= { netbuilderRA 14 } -- nb RA w/Lt Sw
+netbuilderRAwm   OBJECT IDENTIFIER ::= { netbuilderRA 15 } -- nb RA w/Wm Sw
+netbuilderRAwt   OBJECT IDENTIFIER ::= { netbuilderRA 16 } -- nb RA w/Wt Sw
+netbuilderRAae   OBJECT IDENTIFIER ::= { netbuilderRA 17 } -- nb RA w/Ae Sw
+netbuilderRAap   OBJECT IDENTIFIER ::= { netbuilderRA 18 } -- nb RA w/Ap Sw
+netbuilderRAan   OBJECT IDENTIFIER ::= { netbuilderRA 19 } -- nb RA w/An Sw
+netbuilderRAla   OBJECT IDENTIFIER ::= { netbuilderRA 20 } -- nb RA w/La Sw
+netbuilderRAwa   OBJECT IDENTIFIER ::= { netbuilderRA 21 } -- nb RA w/Wa Sw
+netbuilderRAaa   OBJECT IDENTIFIER ::= { netbuilderRA 22 } -- nb RA w/Aa Sw
+netbuilderRAab   OBJECT IDENTIFIER ::= { netbuilderRA 23 } -- nb RA w/Ab Sw
+netbuilderRAbf   OBJECT IDENTIFIER ::= { netbuilderRA 24 } -- nb RA w/Bf Sw
+
+--
+-- the following ids are assigned under a3Com.products.brouter.netbuilderRC
+--
+
+netbuilderRCbp   OBJECT IDENTIFIER ::= { netbuilderRC 1 }  -- nb RC w/Basic Prot
+netbuilderRCcp   OBJECT IDENTIFIER ::= { netbuilderRC 2 }  -- nb RC w/Compl Prot
+netbuilderRCxw   OBJECT IDENTIFIER ::= { netbuilderRC 3 }  -- nb RC w/Ext WAN
+netbuilderRCcx   OBJECT IDENTIFIER ::= { netbuilderRC 4 }  -- nb RC w/Conn Svc
+netbuilderRCba   OBJECT IDENTIFIER ::= { netbuilderRC 5 }  -- nb RC w/Bndry Rtg
+netbuilderRCar   OBJECT IDENTIFIER ::= { netbuilderRC 6 }  -- nb RC w/AccRtr SW
+netbuilderRCsn   OBJECT IDENTIFIER ::= { netbuilderRC 7 }  -- nb RC w/SNA SW
+netbuilderRCrb   OBJECT IDENTIFIER ::= { netbuilderRC 8 }  -- nb RC w/RB SW
+netbuilderRCff   OBJECT IDENTIFIER ::= { netbuilderRC 9 }  -- nb RC w/FF SW
+netbuilderRCcf   OBJECT IDENTIFIER ::= { netbuilderRC 10 } -- nb RC w/CF SW
+netbuilderRCbx   OBJECT IDENTIFIER ::= { netbuilderRC 11 } -- nb RC w/BX SW
+netbuilderRCappn OBJECT IDENTIFIER ::= { netbuilderRC 12 } -- nb RC w/Appn SW
+netbuilderRClm   OBJECT IDENTIFIER ::= { netbuilderRC 13 } -- nb RC w/Lm Sw
+netbuilderRClt   OBJECT IDENTIFIER ::= { netbuilderRC 14 } -- nb RC w/Lt Sw
+netbuilderRCwm   OBJECT IDENTIFIER ::= { netbuilderRC 15 } -- nb RC w/Wm Sw
+netbuilderRCwt   OBJECT IDENTIFIER ::= { netbuilderRC 16 } -- nb RC w/Wt Sw
+netbuilderRCae   OBJECT IDENTIFIER ::= { netbuilderRC 17 } -- nb RC w/Ae Sw
+netbuilderRCap   OBJECT IDENTIFIER ::= { netbuilderRC 18 } -- nb RC w/Ap Sw
+netbuilderRCan   OBJECT IDENTIFIER ::= { netbuilderRC 19 } -- nb RC w/An Sw
+netbuilderRCla   OBJECT IDENTIFIER ::= { netbuilderRC 20 } -- nb RC w/La Sw
+netbuilderRCwa   OBJECT IDENTIFIER ::= { netbuilderRC 21 } -- nb RC w/Wa Sw
+netbuilderRCaa   OBJECT IDENTIFIER ::= { netbuilderRC 22 } -- nb RC w/Aa Sw
+netbuilderRCab   OBJECT IDENTIFIER ::= { netbuilderRC 23 } -- nb RC w/Ab Sw
+netbuilderRCbf   OBJECT IDENTIFIER ::= { netbuilderRC 24 } -- nb RC w/Bf Sw
+
+--
+-- the following ids are assigned under a3Com.products.brouter.netbuilderTrRem
+--
+
+netbuilderTrRemBp   OBJECT IDENTIFIER ::= { netbuilderTrRem 1 }  -- nbtr Rem w/BP
+netbuilderTrRemCp   OBJECT IDENTIFIER ::= { netbuilderTrRem 2 }  -- nbtr Rem w/CP
+netbuilderTrRemXw   OBJECT IDENTIFIER ::= { netbuilderTrRem 3 }  -- nbtr Rem w/XW
+netbuilderTrRemCx   OBJECT IDENTIFIER ::= { netbuilderTrRem 4 }  -- nbtr Rem w/CX
+netbuilderTrRemBa   OBJECT IDENTIFIER ::= { netbuilderTrRem 5 }  -- nbtr Rem w/BA
+netbuilderTrRemAr   OBJECT IDENTIFIER ::= { netbuilderTrRem 6 }  -- nbtr Rem w/AR
+netbuilderTrRemSn   OBJECT IDENTIFIER ::= { netbuilderTrRem 7 }  -- nbtr Rem w/SNA
+netbuilderTrRemRb   OBJECT IDENTIFIER ::= { netbuilderTrRem 8 }  -- nb TrRem w/RB
+netbuilderTrRemFf   OBJECT IDENTIFIER ::= { netbuilderTrRem 9 }  -- nb TrRem w/FF
+netbuilderTrRemCf   OBJECT IDENTIFIER ::= { netbuilderTrRem 10 } -- nb TrRem w/CF
+netbuilderTrRemBx   OBJECT IDENTIFIER ::= { netbuilderTrRem 11 } -- nbtr Rem w/BX
+netbuilderTrRemAppn OBJECT IDENTIFIER ::= { netbuilderTrRem 12 } -- nb TrRem w/Appn SW
+netbuilderTrRemLm   OBJECT IDENTIFIER ::= { netbuilderTrRem 13 } -- nb TrRem w/Lm
+netbuilderTrRemLt   OBJECT IDENTIFIER ::= { netbuilderTrRem 14 } -- nb TrRem w/Lt
+netbuilderTrRemWm   OBJECT IDENTIFIER ::= { netbuilderTrRem 15 } -- nb TrRem w/Wm
+netbuilderTrRemWt   OBJECT IDENTIFIER ::= { netbuilderTrRem 16 } -- nb TrRem w/Wt
+netbuilderTrRemAe   OBJECT IDENTIFIER ::= { netbuilderTrRem 17 } -- nb TrRem w/Ae
+netbuilderTrRemAp   OBJECT IDENTIFIER ::= { netbuilderTrRem 18 } -- nb TrRem w/Ap
+netbuilderTrRemAn   OBJECT IDENTIFIER ::= { netbuilderTrRem 19 } -- nb TrRem w/An
+netbuilderTrRemLa   OBJECT IDENTIFIER ::= { netbuilderTrRem 20 } -- nb TrRem w/La
+netbuilderTrRemWa   OBJECT IDENTIFIER ::= { netbuilderTrRem 21 } -- nb TrRem w/La
+netbuilderTrRemAa   OBJECT IDENTIFIER ::= { netbuilderTrRem 22 } -- nb TrRem w/Aa
+netbuilderTrRemAb   OBJECT IDENTIFIER ::= { netbuilderTrRem 23 } -- nb TrRem w/Ab
+netbuilderTrRemBf   OBJECT IDENTIFIER ::= { netbuilderTrRem 24 } -- nb TrRem w/Bf
+
+
+--
+-- the following ids are assigned under a3Com.products.brouter.netbuilderTrRC
+--
+
+netbuilderTrRCbp   OBJECT IDENTIFIER ::= { netbuilderTrRC 1 }  -- NBTR RC w/Basic Prot
+netbuilderTrRCcp   OBJECT IDENTIFIER ::= { netbuilderTrRC 2 }  -- NBTR Rc w/Compl Prot
+netbuilderTrRCxw   OBJECT IDENTIFIER ::= { netbuilderTrRC 3 }  -- NBTR Rc w/Ext WAN
+netbuilderTrRCcx   OBJECT IDENTIFIER ::= { netbuilderTrRC 4 }  -- NBTR RC w/CX
+netbuilderTrRCba   OBJECT IDENTIFIER ::= { netbuilderTrRC 5 }  -- NBTR RC w/BA
+netbuilderTrRCar   OBJECT IDENTIFIER ::= { netbuilderTrRC 6 }  -- NBTR RC w/AR
+netbuilderTrRCsn   OBJECT IDENTIFIER ::= { netbuilderTrRC 7 }  -- NBTR RC w/SNA
+netbuilderTrRCrb   OBJECT IDENTIFIER ::= { netbuilderTrRC 8 }  -- NBTR RC w/RB
+netbuilderTrRCff   OBJECT IDENTIFIER ::= { netbuilderTrRC 9 }  -- NBTR RC w/FF
+netbuilderTrRCcf   OBJECT IDENTIFIER ::= { netbuilderTrRC 10 } -- NBTR RC w/CF
+netbuilderTrRCbx   OBJECT IDENTIFIER ::= { netbuilderTrRC 11 } -- NBTR RC w/BX
+netbuilderTrRCappn OBJECT IDENTIFIER ::= { netbuilderTrRC 12 } -- NBTR RC w/Appn SW
+netbuilderTrRClm   OBJECT IDENTIFIER ::= { netbuilderTrRC 13 } -- NBTR RC w/Lm
+netbuilderTrRClt   OBJECT IDENTIFIER ::= { netbuilderTrRC 14 } -- NBTR RC w/Lt
+netbuilderTrRCwm   OBJECT IDENTIFIER ::= { netbuilderTrRC 15 } -- NBTR RC w/Wm
+netbuilderTrRCwt   OBJECT IDENTIFIER ::= { netbuilderTrRC 16 } -- NBTR RC w/Wt
+netbuilderTrRCae   OBJECT IDENTIFIER ::= { netbuilderTrRC 17 } -- NBTR RC w/Ae
+netbuilderTrRCap   OBJECT IDENTIFIER ::= { netbuilderTrRC 18 } -- NBTR RC w/Ap
+netbuilderTrRCan   OBJECT IDENTIFIER ::= { netbuilderTrRC 19 } -- NBTR RC w/An
+netbuilderTrRCla   OBJECT IDENTIFIER ::= { netbuilderTrRC 20 } -- NBTR RC w/La
+netbuilderTrRCwa   OBJECT IDENTIFIER ::= { netbuilderTrRC 21 } -- NBTR RC w/Wa
+netbuilderTrRCaa   OBJECT IDENTIFIER ::= { netbuilderTrRC 22 } -- NBTR RC w/Aa
+netbuilderTrRCab   OBJECT IDENTIFIER ::= { netbuilderTrRC 23 } -- NBTR RC w/Ab
+netbuilderTrRCbf   OBJECT IDENTIFIER ::= { netbuilderTrRC 24 } -- NBTR RC w/Bf
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nb2-4
+--
+
+nb2-4Bp   OBJECT IDENTIFIER ::= { nb2-4 1 }  -- nb2 4 slot w/Basic Prot SW
+nb2-4Cp   OBJECT IDENTIFIER ::= { nb2-4 2 }  -- nb2 4 slot w/Compl Prot SW
+nb2-4Xw   OBJECT IDENTIFIER ::= { nb2-4 3 }  -- nb2 4 slot w/Ext WAN SW
+nb2-4Cx   OBJECT IDENTIFIER ::= { nb2-4 4 }  -- nb2 4 slot w/Conn Svc SW
+nb2-4Ba   OBJECT IDENTIFIER ::= { nb2-4 5 }  -- nb2 4 slot w/BA
+nb2-4Ar   OBJECT IDENTIFIER ::= { nb2-4 6 }  -- nb2 4 slot w/AR
+nb2-4Sn   OBJECT IDENTIFIER ::= { nb2-4 7 }  -- nb2 4 slot w/SNA
+nb2-4Rb   OBJECT IDENTIFIER ::= { nb2-4 8 }  -- nb2 4 slot w/RB
+nb2-4Ff   OBJECT IDENTIFIER ::= { nb2-4 9 }  -- nb2 4 slot w/Full Feature SW
+nb2-4Cf   OBJECT IDENTIFIER ::= { nb2-4 10 } -- nb2 4 slot w/CF
+nb2-4Bx   OBJECT IDENTIFIER ::= { nb2-4 11 } -- nb2 4 slot w/BX
+nb2-4Appn OBJECT IDENTIFIER ::= { nb2-4 12 } -- nb2 4 slot w/Appn SW
+nb2-4Lm   OBJECT IDENTIFIER ::= { nb2-4 13 } -- nb2 4 slot w/Lm Sw
+nb2-4Lt   OBJECT IDENTIFIER ::= { nb2-4 14 } -- nb2 4 slot w/Lt Sw
+nb2-4Wm   OBJECT IDENTIFIER ::= { nb2-4 15 } -- nb2 4 slot w/Wm Sw
+nb2-4Wt   OBJECT IDENTIFIER ::= { nb2-4 16 } -- nb2 4 slot w/Wt Sw
+nb2-4Ae   OBJECT IDENTIFIER ::= { nb2-4 17 } -- nb2 4 slot w/Ae Sw
+nb2-4Ap   OBJECT IDENTIFIER ::= { nb2-4 18 } -- nb2 4 slot w/Ap Sw
+nb2-4An   OBJECT IDENTIFIER ::= { nb2-4 19 } -- nb2 4 slot w/An Sw
+nb2-4La   OBJECT IDENTIFIER ::= { nb2-4 20 } -- nb2 4 slot w/La Sw
+nb2-4Wa   OBJECT IDENTIFIER ::= { nb2-4 21 } -- nb2 4 slot w/Wa Sw
+nb2-4Aa   OBJECT IDENTIFIER ::= { nb2-4 22 } -- nb2 4 slot w/Aa Sw
+nb2-4Ab   OBJECT IDENTIFIER ::= { nb2-4 23 } -- nb2 4 slot w/Ab Sw
+nb2-4Bf   OBJECT IDENTIFIER ::= { nb2-4 24 } -- nb2 4 slot w/Bf Sw
+
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nb2-8
+--
+
+nb2-8Bp   OBJECT IDENTIFIER ::= { nb2-8 1 }  -- nb2 8 slot w/Basic Prot SW
+nb2-8Cp   OBJECT IDENTIFIER ::= { nb2-8 2 }  -- nb2 8 slot w/Compl Prot SW
+nb2-8Xw   OBJECT IDENTIFIER ::= { nb2-8 3 }  -- nb2 8 slot w/Ext WAN SW
+nb2-8Cx   OBJECT IDENTIFIER ::= { nb2-8 4 }  -- nb2 8 slot w/Conn Svc SW
+nb2-8Ba   OBJECT IDENTIFIER ::= { nb2-8 5 }  -- nb2 8 slot w/BA
+nb2-8Ar   OBJECT IDENTIFIER ::= { nb2-8 6 }  -- nb2 8 slot w/AR
+nb2-8Sn   OBJECT IDENTIFIER ::= { nb2-8 7 }  -- nb2 8 slot w/SNA
+nb2-8Rb   OBJECT IDENTIFIER ::= { nb2-8 8 }  -- nb2 8 slot w/RB
+nb2-8Ff   OBJECT IDENTIFIER ::= { nb2-8 9 }  -- nb2 8 slot w/Full Feature SW
+nb2-8Cf   OBJECT IDENTIFIER ::= { nb2-8 10 } -- nb2 8 slot w/CF
+nb2-8Bx   OBJECT IDENTIFIER ::= { nb2-8 11 } -- nb2 8 slot w/BX
+nb2-8Appn OBJECT IDENTIFIER ::= { nb2-8 12 } -- nb2 8 slot w/Appn SW
+nb2-8Lm   OBJECT IDENTIFIER ::= { nb2-8 13 } -- nb2 8 slot w/Lm Sw
+nb2-8Lt   OBJECT IDENTIFIER ::= { nb2-8 14 } -- nb2 8 slot w/Lt Sw
+nb2-8Wm   OBJECT IDENTIFIER ::= { nb2-8 15 } -- nb2 8 slot w/Wm Sw
+nb2-8Wt   OBJECT IDENTIFIER ::= { nb2-8 16 } -- nb2 8 slot w/Wt Sw
+nb2-8Ae   OBJECT IDENTIFIER ::= { nb2-8 17 } -- nb2 8 slot w/Ae Sw
+nb2-8Ap   OBJECT IDENTIFIER ::= { nb2-8 18 } -- nb2 8 slot w/Ap Sw
+nb2-8An   OBJECT IDENTIFIER ::= { nb2-8 19 } -- nb2 8 slot w/An Sw
+nb2-8La   OBJECT IDENTIFIER ::= { nb2-8 20 } -- nb2 8 slot w/La Sw
+nb2-8Wa   OBJECT IDENTIFIER ::= { nb2-8 21 } -- nb2 8 slot w/Wa Sw
+nb2-8Aa   OBJECT IDENTIFIER ::= { nb2-8 22 } -- nb2 8 slot w/Aa Sw
+nb2-8Ab   OBJECT IDENTIFIER ::= { nb2-8 23 } -- nb2 8 slot w/Ab Sw
+nb2-8Bf   OBJECT IDENTIFIER ::= { nb2-8 24 } -- nb2 8 slot w/Bf Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nbro
+--
+
+nbroBp   OBJECT IDENTIFIER ::= { nbro 1 }  -- nbro w/Basic Prot SW
+nbroCp   OBJECT IDENTIFIER ::= { nbro 2 }  -- nbro w/Compl Prot SW
+nbroXw   OBJECT IDENTIFIER ::= { nbro 3 }  -- nbro w/Ext WAN SW
+nbroCx   OBJECT IDENTIFIER ::= { nbro 4 }  -- nbro w/Conn Svc SW
+nbro201  OBJECT IDENTIFIER ::= { nbro 5 }  -- nbro w/Bndry Rtg. SW
+nbroAr   OBJECT IDENTIFIER ::= { nbro 6 }  -- nbro w/AR
+nbroSn   OBJECT IDENTIFIER ::= { nbro 7 }  -- nbro w/SNA
+nbro200  OBJECT IDENTIFIER ::= { nbro 8 }  -- nbro w/Bridge Prd. SW
+nbroFf   OBJECT IDENTIFIER ::= { nbro 9 }  -- nbro w/Full Feature SW
+nbroCf   OBJECT IDENTIFIER ::= { nbro 10 } -- nbro w/CF
+nbroBx   OBJECT IDENTIFIER ::= { nbro 11 } -- nbro w/BX
+nbroAppn OBJECT IDENTIFIER ::= { nbro 12 } -- nbro w/Appn SW
+nbroLm   OBJECT IDENTIFIER ::= { nbro 13 } -- nbro w/Lm Sw
+nbroLt   OBJECT IDENTIFIER ::= { nbro 14 } -- nbro w/Lt Sw
+nbroWm   OBJECT IDENTIFIER ::= { nbro 15 } -- nbro w/Wm Sw
+nbroWt   OBJECT IDENTIFIER ::= { nbro 16 } -- nbro w/Wt Sw
+nbroAe   OBJECT IDENTIFIER ::= { nbro 17 } -- nbro w/Ae Sw
+nbroAp   OBJECT IDENTIFIER ::= { nbro 18 } -- nbro w/Ap Sw
+nbroAn   OBJECT IDENTIFIER ::= { nbro 19 } -- nbro w/An Sw
+nbroLa   OBJECT IDENTIFIER ::= { nbro 20 } -- nbro w/La Sw
+nbroWa   OBJECT IDENTIFIER ::= { nbro 21 } -- nbro w/Wa Sw
+nbro224  OBJECT IDENTIFIER ::= { nbro 22 } -- nbro w/Aa Sw
+nbroAb   OBJECT IDENTIFIER ::= { nbro 23 } -- nbro w/Ab Sw
+nbro223  OBJECT IDENTIFIER ::= { nbro 24 } -- nbro w/Bf Sw
+
+--
+-- the following identifier are assigned under a3Com.products.brouter.netbuilderLocal
+--
+
+netbuilderLocalBp   OBJECT IDENTIFIER ::= { netbuilderLocal 1 }  -- nb Local w/BP
+netbuilderLocalCp   OBJECT IDENTIFIER ::= { netbuilderLocal 2 }  -- nb Local w/CP
+netbuilderLocalXw   OBJECT IDENTIFIER ::= { netbuilderLocal 3 }  -- nb Local w/XW
+netbuilderLocalCx   OBJECT IDENTIFIER ::= { netbuilderLocal 4 }  -- nb Local w/CX
+netbuilderLocalBa   OBJECT IDENTIFIER ::= { netbuilderLocal 5 }  -- nb Local w/BA
+netbuilderLocalAr   OBJECT IDENTIFIER ::= { netbuilderLocal 6 }  -- nb Local w/AR
+netbuilderLocalSn   OBJECT IDENTIFIER ::= { netbuilderLocal 7 }  -- nb Local w/SN
+netbuilderLocalRb   OBJECT IDENTIFIER ::= { netbuilderLocal 8 }  -- nb Local w/RB
+netbuilderLocalFf   OBJECT IDENTIFIER ::= { netbuilderLocal 9 }  -- nb Local w/FF
+netbuilderLocalCf   OBJECT IDENTIFIER ::= { netbuilderLocal 10 } -- nb Local w/CF
+netbuilderLocalBx   OBJECT IDENTIFIER ::= { netbuilderLocal 11 } -- nb Local w/BX
+netbuilderLocalAppn OBJECT IDENTIFIER ::= { netbuilderLocal 12 } -- nb Local w/Appn SW
+netbuilderLocalLm   OBJECT IDENTIFIER ::= { netbuilderLocal 13 } -- nb Local w/Lm
+netbuilderLocalLt   OBJECT IDENTIFIER ::= { netbuilderLocal 14 } -- nb Local w/Lt
+netbuilderLocalWm   OBJECT IDENTIFIER ::= { netbuilderLocal 15 } -- nb Local w/Wm
+netbuilderLocalWt   OBJECT IDENTIFIER ::= { netbuilderLocal 16 } -- nb Local w/Wt
+netbuilderLocalAe   OBJECT IDENTIFIER ::= { netbuilderLocal 17 } -- nb Local w/Ae
+netbuilderLocalAp   OBJECT IDENTIFIER ::= { netbuilderLocal 18 } -- nb Local w/Ap
+netbuilderLocalAn   OBJECT IDENTIFIER ::= { netbuilderLocal 19 } -- nb Local w/An
+netbuilderLocalLa   OBJECT IDENTIFIER ::= { netbuilderLocal 20 } -- nb Local w/La
+netbuilderLocalWa   OBJECT IDENTIFIER ::= { netbuilderLocal 21 } -- nb Local w/Wa
+netbuilderLocalAa   OBJECT IDENTIFIER ::= { netbuilderLocal 22 } -- nb Local w/Aa
+netbuilderLocalAb   OBJECT IDENTIFIER ::= { netbuilderLocal 23 } -- nb Local w/Ab
+netbuilderLocalBf   OBJECT IDENTIFIER ::= { netbuilderLocal 24 } -- nb Local w/Bf
+
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.netbuilderTrLocal
+--
+
+netbuilderTrLocalBp   OBJECT IDENTIFIER ::= { netbuilderTrLocal 1 }  -- nbtr Local w/Basic Prot SW
+netbuilderTrLocalCp   OBJECT IDENTIFIER ::= { netbuilderTrLocal 2 }  -- nbtr Local w/Compl Prot SW
+netbuilderTrLocalXw   OBJECT IDENTIFIER ::= { netbuilderTrLocal 3 }  -- nbtr Local w/XW
+netbuilderTrLocalCx   OBJECT IDENTIFIER ::= { netbuilderTrLocal 4 }  -- nbtr Local w/CX
+netbuilderTrLocalBa   OBJECT IDENTIFIER ::= { netbuilderTrLocal 5 }  -- nbtr Local w/BA
+netbuilderTrLocalAr   OBJECT IDENTIFIER ::= { netbuilderTrLocal 6 }  -- nbtr Local w/Acc Rtr SW
+netbuilderTrLocalSn   OBJECT IDENTIFIER ::= { netbuilderTrLocal 7 }  -- nbtr Local w/SNA Acc Rtr SW
+netbuilderTrLocalRb   OBJECT IDENTIFIER ::= { netbuilderTrLocal 8 }  -- nbtr Local w/RB
+netbuilderTrLocalFf   OBJECT IDENTIFIER ::= { netbuilderTrLocal 9 }  -- nbtr Local w/FF
+netbuilderTrLocalCf   OBJECT IDENTIFIER ::= { netbuilderTrLocal 10 } -- nbtr Local w/CF
+netbuilderTrLocalBx   OBJECT IDENTIFIER ::= { netbuilderTrLocal 11 } -- nbtr Local w/BX SW
+netbuilderTrLocalAppn OBJECT IDENTIFIER ::= { netbuilderTrLocal 12 } -- nb TrLocal w/Appn SW
+netbuilderTrLocalLm   OBJECT IDENTIFIER ::= { netbuilderTrLocal 13 } -- nbtr Local w/Lm
+netbuilderTrLocalLt   OBJECT IDENTIFIER ::= { netbuilderTrLocal 14 } -- nbtr Local w/Lt
+netbuilderTrLocalWm   OBJECT IDENTIFIER ::= { netbuilderTrLocal 15 } -- nbtr Local w/Wm
+netbuilderTrLocalWt   OBJECT IDENTIFIER ::= { netbuilderTrLocal 16 } -- nbtr Local w/Wt
+netbuilderTrLocalAe   OBJECT IDENTIFIER ::= { netbuilderTrLocal 17 } -- nbtr Local w/Ae
+netbuilderTrLocalAp   OBJECT IDENTIFIER ::= { netbuilderTrLocal 18 } -- nbtr Local w/Ap
+netbuilderTrLocalAn   OBJECT IDENTIFIER ::= { netbuilderTrLocal 19 } -- nbtr Local w/An
+netbuilderTrLocalLa   OBJECT IDENTIFIER ::= { netbuilderTrLocal 20 } -- nbtr Local w/La
+netbuilderTrLocalWa   OBJECT IDENTIFIER ::= { netbuilderTrLocal 21 } -- nbtr Local w/Wa
+netbuilderTrLocalAa   OBJECT IDENTIFIER ::= { netbuilderTrLocal 22 } -- nbtr Local w/Aa
+netbuilderTrLocalAb   OBJECT IDENTIFIER ::= { netbuilderTrLocal 23 } -- nbtr Local w/Ab
+netbuilderTrLocalBf   OBJECT IDENTIFIER ::= { netbuilderTrLocal 24 } -- nbtr Local w/Bf
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.netbuilderRC1x2
+--
+
+netbuilderRC1x2bp   OBJECT IDENTIFIER ::= { netbuilderRC1x2 1 }  -- nbRC1x2 w/BP
+netbuilderRC1x2cp   OBJECT IDENTIFIER ::= { netbuilderRC1x2 2 }  -- nbRC1x2 w/CP
+netbuilderRC1x2xw   OBJECT IDENTIFIER ::= { netbuilderRC1x2 3 }  -- nbRC1x2 w/XW
+netbuilderRC1x2cx   OBJECT IDENTIFIER ::= { netbuilderRC1x2 4 }  -- nbRC1x2 w/CX
+netbuilderRC1x2ba   OBJECT IDENTIFIER ::= { netbuilderRC1x2 5 }  -- nbRC1x2 w/BA
+netbuilderRC1x2ar   OBJECT IDENTIFIER ::= { netbuilderRC1x2 6 }  -- nb RC1x2 w/AR
+netbuilderRC1x2sn   OBJECT IDENTIFIER ::= { netbuilderRC1x2 7 }  -- nb RC1x2 w/SN
+netbuilderRC1x2rb   OBJECT IDENTIFIER ::= { netbuilderRC1x2 8 }  -- nb RC1x2 w/RB
+netbuilderRC1x2ff   OBJECT IDENTIFIER ::= { netbuilderRC1x2 9 }  -- nb RC1x2 w/FF
+netbuilderRC1x2cf   OBJECT IDENTIFIER ::= { netbuilderRC1x2 10 } -- nb RC1x2 w/CF
+netbuilderRC1x2bx   OBJECT IDENTIFIER ::= { netbuilderRC1x2 11 } -- nb RC1x2 w/BX
+netbuilderRC1x2appn OBJECT IDENTIFIER ::= { netbuilderRC1x2 12 } -- RC1x2 w/Appn
+netbuilderRC1x2lm   OBJECT IDENTIFIER ::= { netbuilderRC1x2 13 } -- RC1x2 w/Lm
+netbuilderRC1x2lt   OBJECT IDENTIFIER ::= { netbuilderRC1x2 14 } -- RC1x2 w/Lt Sw
+netbuilderRC1x2wm   OBJECT IDENTIFIER ::= { netbuilderRC1x2 15 } -- RC1x2 w/Wm Sw
+netbuilderRC1x2wt   OBJECT IDENTIFIER ::= { netbuilderRC1x2 16 } -- RC1x2 w/Wt Sw
+netbuilderRC1x2ae   OBJECT IDENTIFIER ::= { netbuilderRC1x2 17 } -- RC1x2 w/Ae Sw
+netbuilderRC1x2ap   OBJECT IDENTIFIER ::= { netbuilderRC1x2 18 } -- RC1x2 w/Ap Sw
+netbuilderRC1x2an   OBJECT IDENTIFIER ::= { netbuilderRC1x2 19 } -- RC1x2 w/An Sw
+netbuilderRC1x2la   OBJECT IDENTIFIER ::= { netbuilderRC1x2 20 } -- RC1x2 w/La Sw
+netbuilderRC1x2wa   OBJECT IDENTIFIER ::= { netbuilderRC1x2 21 } -- RC1x2 w/Wa Sw
+netbuilderRC1x2aa   OBJECT IDENTIFIER ::= { netbuilderRC1x2 22 } -- RC1x2 w/Aa Sw
+netbuilderRC1x2ab   OBJECT IDENTIFIER ::= { netbuilderRC1x2 23 } -- RC1x2 w/Ab Sw
+netbuilderRC1x2bf   OBJECT IDENTIFIER ::= { netbuilderRC1x2 24 } -- RC1x2 w/Bf Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.netbuilderTrRC1x2
+--
+
+netbuilderTrRC1x2bp   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 1 }
+netbuilderTrRC1x2cp   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 2 }
+netbuilderTrRC1x2xw   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 3 }
+netbuilderTrRC1x2cx   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 4 }
+netbuilderTrRC1x2ba   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 5 }
+netbuilderTrRC1x2ar   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 6 }
+netbuilderTrRC1x2sn   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 7 }
+netbuilderTrRC1x2rb   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 8 }
+netbuilderTrRC1x2ff   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 9 }
+netbuilderTrRC1x2cf   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 10 }
+netbuilderTrRC1x2bx   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 11 }
+netbuilderTrRC1x2appn OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 12 }
+netbuilderTrRC1x2lm   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 13 }
+netbuilderTrRC1x2lt   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 14 }
+netbuilderTrRC1x2wm   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 15 }
+netbuilderTrRC1x2wt   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 16 }
+netbuilderTrRC1x2ae   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 17 }
+netbuilderTrRC1x2ap   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 18 }
+netbuilderTrRC1x2an   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 19 }
+netbuilderTrRC1x2la   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 20 }
+netbuilderTrRC1x2wa   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 21 }
+netbuilderTrRC1x2aa   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 22 }
+netbuilderTrRC1x2ab   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 23 }
+netbuilderTrRC1x2bf   OBJECT IDENTIFIER ::= { netbuilderTrRC1x2 24 }
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.casper
+-- (casper aka "nbro Large" )
+--
+
+nbrolBp   OBJECT IDENTIFIER ::= { casper 1 }  -- casper w/Basic Prot SW
+nbrolCp   OBJECT IDENTIFIER ::= { casper 2 }  -- casper w/Compl Prot SW
+nbrolXw   OBJECT IDENTIFIER ::= { casper 3 }  -- casper w/Ext WAN SW
+nbrol228  OBJECT IDENTIFIER ::= { casper 4 }  -- casper w/Conn Svc SW
+nbrol201  OBJECT IDENTIFIER ::= { casper 5 }  -- casper w/Bndry Rtg. SW
+nbro222   OBJECT IDENTIFIER ::= { casper 6 }  -- casper w/AR SW
+nbrolSn   OBJECT IDENTIFIER ::= { casper 7 }  -- casper w/SNA
+nbrol200  OBJECT IDENTIFIER ::= { casper 8 }  -- casper w/RB. SW
+nbrolFf   OBJECT IDENTIFIER ::= { casper 9 }  -- casper w/Full Feature SW
+nbro227   OBJECT IDENTIFIER ::= { casper 10 } -- casper w/CF SW
+nbro221   OBJECT IDENTIFIER ::= { casper 11 } -- casper w/BX SW
+nbrolAppn OBJECT IDENTIFIER ::= { casper 12 } -- casper w/Appn SW
+nbrolLm   OBJECT IDENTIFIER ::= { casper 13 } -- casper w/Lm Sw
+nbrolLt   OBJECT IDENTIFIER ::= { casper 14 } -- casper w/Lt Sw
+nbrolWm   OBJECT IDENTIFIER ::= { casper 15 } -- casper w/Wm Sw
+nbrolWt   OBJECT IDENTIFIER ::= { casper 16 } -- casper w/Wt Sw
+nbrolAe   OBJECT IDENTIFIER ::= { casper 17 } -- casper w/Ae Sw
+nbrolAp   OBJECT IDENTIFIER ::= { casper 18 } -- casper w/Ap Sw
+nbrolAn   OBJECT IDENTIFIER ::= { casper 19 } -- casper w/An Sw
+nbrolLa   OBJECT IDENTIFIER ::= { casper 20 } -- casper w/La Sw
+nbrolWa   OBJECT IDENTIFIER ::= { casper 21 } -- casper w/Wa Sw
+nbrol224  OBJECT IDENTIFIER ::= { casper 22 } -- casper w/Aa Sw
+nbrolAb   OBJECT IDENTIFIER ::= { casper 23 } -- casper w/Ab Sw
+nbrol223  OBJECT IDENTIFIER ::= { casper 24 } -- casper w/Bf Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.spectreHuge
+-- (spectre Huge aka nbro Huge )
+--
+
+nbrohBp   OBJECT IDENTIFIER ::= { spectreHuge 1 }  -- spectreHuge w/BP SW
+nbrohCp   OBJECT IDENTIFIER ::= { spectreHuge 2 }  -- spectreHuge w/CP SW
+nbrohXw   OBJECT IDENTIFIER ::= { spectreHuge 3 }  -- spectreHuge w/Ext WAN SW
+nbro228   OBJECT IDENTIFIER ::= { spectreHuge 4 }  -- spectreHuge w/CX SW
+nbroh201  OBJECT IDENTIFIER ::= { spectreHuge 5 }  -- casper w/Bndry Rtg. SW
+nbroh222  OBJECT IDENTIFIER ::= { spectreHuge 6 }  -- spectreHuge w/AR SW
+nbrohSn   OBJECT IDENTIFIER ::= { spectreHuge 7 }  -- spectreHuge w/SNA
+nbroh200  OBJECT IDENTIFIER ::= { spectreHuge 8 }  -- spectreHuge w/RB SW
+nbrohFf   OBJECT IDENTIFIER ::= { spectreHuge 9 }  -- spectreHuge w/FF SW
+nbroh227  OBJECT IDENTIFIER ::= { spectreHuge 10 } -- spectreHuge w/CF SW
+nbroh221  OBJECT IDENTIFIER ::= { spectreHuge 11 } -- spectreHuge w/BX SW
+nbrohAppn OBJECT IDENTIFIER ::= { spectreHuge 12 } -- spectreHuge w/Appn SW
+nbrohLm   OBJECT IDENTIFIER ::= { spectreHuge 13 } -- spectreHuge w/Lm Sw
+nbrohLt   OBJECT IDENTIFIER ::= { spectreHuge 14 } -- spectreHuge w/Lt Sw
+nbrohWm   OBJECT IDENTIFIER ::= { spectreHuge 15 } -- spectreHuge w/Wm Sw
+nbrohWt   OBJECT IDENTIFIER ::= { spectreHuge 16 } -- spectreHuge w/Wt Sw
+nbrohAe   OBJECT IDENTIFIER ::= { spectreHuge 17 } -- spectreHuge w/Ae Sw
+nbrohAp   OBJECT IDENTIFIER ::= { spectreHuge 18 } -- spectreHuge w/Ap Sw
+nbrohAn   OBJECT IDENTIFIER ::= { spectreHuge 19 } -- spectreHuge w/An Sw
+nbrohLa   OBJECT IDENTIFIER ::= { spectreHuge 20 } -- spectreHuge w/La Sw
+nbrohWa   OBJECT IDENTIFIER ::= { spectreHuge 21 } -- spectreHuge w/Wa Sw
+nbroh224  OBJECT IDENTIFIER ::= { spectreHuge 22 } -- spectreHuge w/Aa Sw
+nbrohAb   OBJECT IDENTIFIER ::= { spectreHuge 23 } -- spectreHuge w/Ab Sw
+nbroh223  OBJECT IDENTIFIER ::= { spectreHuge 24 } -- spectreHuge w/Bf Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.spectreIsdn
+--
+
+nbroiBp   OBJECT IDENTIFIER ::= { spectreIsdn 1 }  -- spectreIsdn w/BP SW
+nbroiCp   OBJECT IDENTIFIER ::= { spectreIsdn 2 }  -- spectreIsdn w/CP SW
+nbroiXw   OBJECT IDENTIFIER ::= { spectreIsdn 3 }  -- spectreIsdn w/Ext WAN SW
+nbroiCX   OBJECT IDENTIFIER ::= { spectreIsdn 4 }  -- spectreIsdn w/CX SW
+nbroiBA   OBJECT IDENTIFIER ::= { spectreIsdn 5 }  -- spectreIsdn w/Bndry Rtg. SW
+nbro422   OBJECT IDENTIFIER ::= { spectreIsdn 6 }  -- spectreIsdn w/AR SW
+nbroiSn   OBJECT IDENTIFIER ::= { spectreIsdn 7 }  -- spectreIsdn w/SNA
+nbroi200  OBJECT IDENTIFIER ::= { spectreIsdn 8 }  -- spectreIsdn w/RB SW
+nbroiFf   OBJECT IDENTIFIER ::= { spectreIsdn 9 }  -- spectreIsdn w/FF SW
+nbroil427 OBJECT IDENTIFIER ::= { spectreIsdn 10 } -- spectreIsdn w/CF SW
+nbro421   OBJECT IDENTIFIER ::= { spectreIsdn 11 } -- spectreIsdn w/BX SW
+nbroiAppn OBJECT IDENTIFIER ::= { spectreIsdn 12 } -- spectreIsdn w/Appn SW
+nbroiLm   OBJECT IDENTIFIER ::= { spectreIsdn 13 } -- spectreIsdn w/Lm Sw
+nbroiLt   OBJECT IDENTIFIER ::= { spectreIsdn 14 } -- spectreIsdn w/Lt Sw
+nbroiWm   OBJECT IDENTIFIER ::= { spectreIsdn 15 } -- spectreIsdn w/Wm Sw
+nbroiWt   OBJECT IDENTIFIER ::= { spectreIsdn 16 } -- spectreIsdn w/Wt Sw
+nbroiAe   OBJECT IDENTIFIER ::= { spectreIsdn 17 } -- spectreIsdn w/Ae Sw
+nbroiAp   OBJECT IDENTIFIER ::= { spectreIsdn 18 } -- spectreIsdn w/Ap Sw
+nbroiAn   OBJECT IDENTIFIER ::= { spectreIsdn 19 } -- spectreIsdn w/An Sw
+nbroiLa   OBJECT IDENTIFIER ::= { spectreIsdn 20 } -- spectreIsdn w/La Sw
+nbroiWa   OBJECT IDENTIFIER ::= { spectreIsdn 21 } -- spectreIsdn w/Wa Sw
+nbroi424  OBJECT IDENTIFIER ::= { spectreIsdn 22 } -- spectreIsdn w/Aa Sw
+nbroiAb   OBJECT IDENTIFIER ::= { spectreIsdn 23 } -- spectreIsdn w/Ab Sw
+nbroi423  OBJECT IDENTIFIER ::= { spectreIsdn 24 } -- spectreIsdn w/Bf Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nb2-8-4fddi
+--
+
+nb2-8-4fddiBp   OBJECT IDENTIFIER ::= { nb2-8-4fddi 1 }  -- crew 4fddi w/BP
+nb2-8-4fddiCp   OBJECT IDENTIFIER ::= { nb2-8-4fddi 2 }  -- crew 4fddi w/CP
+nb2-8-4fddiXw   OBJECT IDENTIFIER ::= { nb2-8-4fddi 3 }  -- crew 4fddi w/XW
+nb2-8-4fddiCx   OBJECT IDENTIFIER ::= { nb2-8-4fddi 4 }  -- crew 4fddi w/CX
+nb2-8-4fddiBa   OBJECT IDENTIFIER ::= { nb2-8-4fddi 5 }  -- crew 4fddi w/BA
+nb2-8-4fddiAr   OBJECT IDENTIFIER ::= { nb2-8-4fddi 6 }  -- crew 4fddi w/AR
+nb2-8-4fddiSn   OBJECT IDENTIFIER ::= { nb2-8-4fddi 7 }  -- crew 4fddi w/SNA
+nb2-8-4fddiRb   OBJECT IDENTIFIER ::= { nb2-8-4fddi 8 }  -- crew 4fddi w/RB
+nb2-8-4fddiFf   OBJECT IDENTIFIER ::= { nb2-8-4fddi 9 }  -- crew 4fddi w/FF
+nb2-8-4fddiCf   OBJECT IDENTIFIER ::= { nb2-8-4fddi 10 } -- crew 4fddi w/CF
+nb2-8-4fddiBx   OBJECT IDENTIFIER ::= { nb2-8-4fddi 11 } -- crew 4fddi w/BX
+nb2-8-4fddiAppn OBJECT IDENTIFIER ::= { nb2-8-4fddi 12 } -- crew 4fddi w/Appn
+nb2-8-4fddiLm   OBJECT IDENTIFIER ::= { nb2-8-4fddi 13 } -- crew 4fddi w/Lm
+nb2-8-4fddiLt   OBJECT IDENTIFIER ::= { nb2-8-4fddi 14 } -- crew 4fddi w/Lt
+nb2-8-4fddiWm   OBJECT IDENTIFIER ::= { nb2-8-4fddi 15 } -- crew 4fddi w/Wm
+nb2-8-4fddiWt   OBJECT IDENTIFIER ::= { nb2-8-4fddi 16 } -- crew 4fddi w/Wt
+nb2-8-4fddiAe   OBJECT IDENTIFIER ::= { nb2-8-4fddi 17 } -- crew 4fddi w/Ae
+nb2-8-4fddiAp   OBJECT IDENTIFIER ::= { nb2-8-4fddi 18 } -- crew 4fddi w/Ap
+nb2-8-4fddiAn   OBJECT IDENTIFIER ::= { nb2-8-4fddi 19 } -- crew 4fddi w/An
+nb2-8-4fddiLa   OBJECT IDENTIFIER ::= { nb2-8-4fddi 20 } -- crew 4fddi w/La
+nb2-8-4fddiWa   OBJECT IDENTIFIER ::= { nb2-8-4fddi 21 } -- crew 4fddi w/Wa
+nb2-8-4fddiAa   OBJECT IDENTIFIER ::= { nb2-8-4fddi 22 } -- crew 4fddi w/Aa
+nb2-8-4fddiAb   OBJECT IDENTIFIER ::= { nb2-8-4fddi 23 } -- crew 4fddi w/Ab
+nb2-8-4fddiBf   OBJECT IDENTIFIER ::= { nb2-8-4fddi 24 } -- crew 4fddi w/Bf
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nb2-8-dualwide
+--
+
+nb2-8-dualwideBp   OBJECT IDENTIFIER ::= { nb2-8-dualwide 1 }  -- crew dualwide w/BP
+nb2-8-dualwideCp   OBJECT IDENTIFIER ::= { nb2-8-dualwide 2 }  -- crew dualwide w/CP
+nb2-8-dualwideXw   OBJECT IDENTIFIER ::= { nb2-8-dualwide 3 }  -- crew dualwide w/XW
+nb2-8-dualwideCx   OBJECT IDENTIFIER ::= { nb2-8-dualwide 4 }  -- crew dualwide w/CX
+nb2-8-dualwideBa   OBJECT IDENTIFIER ::= { nb2-8-dualwide 5 }  -- crew dualwide w/BA
+nb2-8-dualwideAr   OBJECT IDENTIFIER ::= { nb2-8-dualwide 6 }  -- crew dualwide w/AR
+nb2-8-dualwideSn   OBJECT IDENTIFIER ::= { nb2-8-dualwide 7 }  -- crew dualwide w/SNA
+nb2-8-dualwideRb   OBJECT IDENTIFIER ::= { nb2-8-dualwide 8 }  -- crew dualwide w/RB
+nb2-8-dualwideFf   OBJECT IDENTIFIER ::= { nb2-8-dualwide 9 }  -- crew dualwide w/FF
+nb2-8-dualwideCf   OBJECT IDENTIFIER ::= { nb2-8-dualwide 10 } -- crew dualwide w/CF
+nb2-8-dualwideBx   OBJECT IDENTIFIER ::= { nb2-8-dualwide 11 } -- crew dualwide w/BX
+nb2-8-dualwideAppn OBJECT IDENTIFIER ::= { nb2-8-dualwide 12 } -- crew dualwide w/Appn
+nb2-8-dualwideLm   OBJECT IDENTIFIER ::= { nb2-8-dualwide 13 } -- crew dualwide w/Lm
+nb2-8-dualwideLt   OBJECT IDENTIFIER ::= { nb2-8-dualwide 14 } -- crew dualwide w/Lt
+nb2-8-dualwideWm   OBJECT IDENTIFIER ::= { nb2-8-dualwide 15 } -- crew dualwide w/Wm
+nb2-8-dualwideWt   OBJECT IDENTIFIER ::= { nb2-8-dualwide 16 } -- crew dualwide w/Wt
+nb2-8-dualwideAe   OBJECT IDENTIFIER ::= { nb2-8-dualwide 17 } -- crew dualwide w/Ae
+nb2-8-dualwideAp   OBJECT IDENTIFIER ::= { nb2-8-dualwide 18 } -- crew dualwide w/Ap
+nb2-8-dualwideAn   OBJECT IDENTIFIER ::= { nb2-8-dualwide 19 } -- crew dualwide w/An
+nb2-8-dualwideLa   OBJECT IDENTIFIER ::= { nb2-8-dualwide 20 } -- crew dualwide w/La
+nb2-8-dualwideWa   OBJECT IDENTIFIER ::= { nb2-8-dualwide 21 } -- crew dualwide w/Wa
+nb2-8-dualwideAa   OBJECT IDENTIFIER ::= { nb2-8-dualwide 22 } -- crew dualwide w/Aa
+nb2-8-dualwideAb   OBJECT IDENTIFIER ::= { nb2-8-dualwide 23 } -- crew dualwide w/Ab
+nb2-8-dualwideBf   OBJECT IDENTIFIER ::= { nb2-8-dualwide 24 } -- crew dualwide w/Bf
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.spectreIs dnHuge
+--
+
+nbroihBp   OBJECT IDENTIFIER ::= { spectreIsdnHuge 1 } --spectreIsdn w/BP SW
+nbroihCp   OBJECT IDENTIFIER ::= { spectreIsdnHuge 2 } --spectreIsdn w/CP SW
+nbroihXw   OBJECT IDENTIFIER ::= { spectreIsdnHuge 3 } -- spectreIsdn w/Ext WAN SW
+nbroihCx   OBJECT IDENTIFIER ::= { spectreIsdnHuge 4 } -- spectreIsdn w/CX SW
+nbroihBa   OBJECT IDENTIFIER ::= { spectreIsdnHuge 5 } --spectreIsdn w/Bndry Rtg . SW
+nbroih422  OBJECT IDENTIFIER ::= { spectreIsdnHuge 6 } --spectreIsdn w/AR SW
+nbroihSn   OBJECT IDENTIFIER ::= { spectreIsdnHuge 7 } --spectreIsdn w/SNA
+nbroihRb   OBJECT IDENTIFIER ::= { spectreIsdnHuge 8 } --spectreIsdn w/RB SW
+nbroihFf   OBJECT IDENTIFIER ::= { spectreIsdnHuge 9 } -- spectreIsdn w/FF SW
+nbroih427  OBJECT IDENTIFIER ::= { spectreIsdnHuge 10 }--spectreIsdn w/CF SW
+nbroih421  OBJECT IDENTIFIER ::= { spectreIsdnHuge 11 }--spectreIsdn w/BX SW
+nbroihAppn OBJECT IDENTIFIER ::= { spectreIsdnHuge 12 } -- spectreIsdn w/Appn
+nbroihLm   OBJECT IDENTIFIER ::= { spectreIsdnHuge 13 } -- spectreIsdn w/Lm Sw
+nbroihLt   OBJECT IDENTIFIER ::= { spectreIsdnHuge 14 } -- spectreIsdn w/Lt Sw
+nbroihWm   OBJECT IDENTIFIER ::= { spectreIsdnHuge 15 } -- spectreIsdn w/Wm Sw
+nbroihWt   OBJECT IDENTIFIER ::= { spectreIsdnHuge 16 } -- spectreIsdn w/Wt Sw
+nbroihAe   OBJECT IDENTIFIER ::= { spectreIsdnHuge 17 } -- spectreIsdn w/Ae Sw
+nbroihAp   OBJECT IDENTIFIER ::= { spectreIsdnHuge 18 } -- spectreIsdn w/Ap Sw
+nbroihAn   OBJECT IDENTIFIER ::= { spectreIsdnHuge 19 } -- spectreIsdn w/An Sw
+nbroihLa   OBJECT IDENTIFIER ::= { spectreIsdnHuge 20 } -- spectreIsdn w/La Sw
+nbroihWa   OBJECT IDENTIFIER ::= { spectreIsdnHuge 21 } -- spectreIsdn w/Wa Sw
+nbroih424  OBJECT IDENTIFIER ::= { spectreIsdnHuge 22 } -- spectreIsdn w/Aa Sw
+nbroihAb   OBJECT IDENTIFIER ::= { spectreIsdnHuge 23 } -- spectreIsdn w/Ab Sw
+nbroih423  OBJECT IDENTIFIER ::= { spectreIsdnHuge 24 } -- spectreIsdn w/Bf Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nbroTrLarge
+--
+
+nbroTrlBp  OBJECT IDENTIFIER ::= { nbroTrHuge 1 } --nbroTrHuge w/BP SW
+nbroTrlCp  OBJECT IDENTIFIER ::= { nbroTrHuge 2 } --nbroTrHuge w/CP SW
+nbroTrlXw  OBJECT IDENTIFIER ::= { nbroTrHuge 3 } -- nbroTrHuge w/Ext WAN SW
+nbroTrlCx OBJECT IDENTIFIER ::= { nbroTrHuge 4 } -- nbroTrHuge w/CX SW
+nbroTrlBa OBJECT IDENTIFIER ::= { nbroTrHuge 5 } --nbroTrHuge w/Bndry Rtg. SW
+nbro322  OBJECT IDENTIFIER ::= { nbroTrHuge 6 } --nbroTrHuge w/AR SW
+nbroTrlSn  OBJECT IDENTIFIER ::= { nbroTrHuge 7 } --nbroTrHuge w/SNA
+nbroTrlRb OBJECT IDENTIFIER ::= { nbroTrHuge 8 } --nbroTrHuge w/RB SW
+nbroTrlFf  OBJECT IDENTIFIER ::= { nbroTrHuge 9 } -- nbroTrHuge w/FF SW
+nbroTrl327  OBJECT IDENTIFIER ::= { nbroTrHuge 10 }--nbroTrHuge w/CF SW
+nbro321     OBJECT IDENTIFIER ::= { nbroTrHuge 11 }--nbroTrHuge w/BX SW
+nbroTrlAppn OBJECT IDENTIFIER ::= { nbroTrHuge 12 } -- nbroTrHuge w/Appn SW
+nbroTrlLm OBJECT IDENTIFIER ::= { nbroTrHuge 13 } -- nbroTrHuge w/Lm Sw
+nbroTrlLt OBJECT IDENTIFIER ::= { nbroTrHuge 14 } -- nbroTrHuge w/Lt Sw
+nbroTrlWm OBJECT IDENTIFIER ::= { nbroTrHuge 15 } -- nbroTrHuge w/Wm Sw
+nbroTrlWt OBJECT IDENTIFIER ::= { nbroTrHuge 16 } -- nbroTrHuge w/Wt Sw
+nbroTrlAe OBJECT IDENTIFIER ::= { nbroTrHuge 17 } -- nbroTrHuge w/Ae Sw
+nbroTrlAp OBJECT IDENTIFIER ::= { nbroTrHuge 18 } -- nbroTrHuge w/Ap Sw
+nbroTrlAn OBJECT IDENTIFIER ::= { nbroTrHuge 19 } -- nbroTrHuge w/An Sw
+nbroTrlLa OBJECT IDENTIFIER ::= { nbroTrHuge 20 } -- nbroTrHuge w/La Sw
+nbroTrlWa OBJECT IDENTIFIER ::= { nbroTrHuge 21 } -- nbroTrHuge w/Wa Sw
+nbroTrlAa OBJECT IDENTIFIER ::= { nbroTrHuge 22 } -- nbroTrHuge w/Aa Sw
+nbroTrlAb OBJECT IDENTIFIER ::= { nbroTrHuge 23 } -- nbroTrHuge w/Ab Sw
+nbroTrl323 OBJECT IDENTIFIER ::= { nbroTrHuge 24 } -- nbroTrHuge w/Bf Sw
+
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nbroTrIsdn
+--
+
+nbroTrIsdnBp   OBJECT IDENTIFIER ::= { nbroTrIsdn 1 } --nbroTrIsdn w/BP SW
+nbroTrIsdnCp   OBJECT IDENTIFIER ::= { nbroTrIsdn 2 } --nbroTrIsdn w/CP SW
+nbroTrIsdnXw   OBJECT IDENTIFIER ::= { nbroTrIsdn 3 } -- nbroTrIsdn w/Ext WAN SW
+nbroTrIsdnCx   OBJECT IDENTIFIER ::= { nbroTrIsdn 4 } -- nbroTrIsdn w/CX SW
+nbroTrIsdnBa   OBJECT IDENTIFIER ::= { nbroTrIsdn 5 } --nbroTrIsdn w/Bndry Rtg. SW
+nbroTrIsdnAr   OBJECT IDENTIFIER ::= { nbroTrIsdn 6 } --nbroTrIsdn w/AR SW
+nbroTrIsdnSn   OBJECT IDENTIFIER ::= { nbroTrIsdn 7 } --nbroTrIsdn w/SNA
+nbroTrIsdnRb   OBJECT IDENTIFIER ::= { nbroTrIsdn 8 } --nbroTrIsdn w/RB SW
+nbroTrIsdnFf   OBJECT IDENTIFIER ::= { nbroTrIsdn 9 } -- nbroTrIsdn w/FF SW
+nbro527        OBJECT IDENTIFIER ::= { nbroTrIsdn 10 }--nbroTrIsdn w/CF SW
+nbroTrIsdnBx   OBJECT IDENTIFIER ::= { nbroTrIsdn 11 }--nbroTrIsdn w/BX SW
+nbroTrIsdnAppn OBJECT IDENTIFIER ::= { nbroTrIsdn 12 } -- nbroTrIsdn w/Appn SW
+nbroTrIsdnLm   OBJECT IDENTIFIER ::= { nbroTrIsdn 13 } -- nbroTrIsdn w/Lm Sw
+nbroTrIsdnLt   OBJECT IDENTIFIER ::= { nbroTrIsdn 14 } -- nbroTrIsdn w/Lt Sw
+nbroTrIsdnWm   OBJECT IDENTIFIER ::= { nbroTrIsdn 15 } -- nbroTrIsdn w/Wm Sw
+nbroTrIsdnWt   OBJECT IDENTIFIER ::= { nbroTrIsdn 16 } -- nbroTrIsdn w/Wt Sw
+nbroTrIsdnAe   OBJECT IDENTIFIER ::= { nbroTrIsdn 17 } -- nbroTrIsdn w/Ae Sw
+nbroTrIsdnAp   OBJECT IDENTIFIER ::= { nbroTrIsdn 18 } -- nbroTrIsdn w/Ap Sw
+nbroTrIsdnAn   OBJECT IDENTIFIER ::= { nbroTrIsdn 19 } -- nbroTrIsdn w/An Sw
+nbroTrIsdnLa   OBJECT IDENTIFIER ::= { nbroTrIsdn 20 } -- nbroTrIsdn w/La Sw
+nbroTrIsdnWa   OBJECT IDENTIFIER ::= { nbroTrIsdn 21 } -- nbroTrIsdn w/Wa Sw
+nbroTrIsdnAa   OBJECT IDENTIFIER ::= { nbroTrIsdn 22 } -- nbroTrIsdn w/Aa Sw
+nbroTrIsdnAb   OBJECT IDENTIFIER ::= { nbroTrIsdn 23 } -- nbroTrIsdn w/Ab Sw
+nbro523        OBJECT IDENTIFIER ::= { nbroTrIsdn 24 } -- nbroTrIsdn w/Bf Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.nbroTrNext
+--
+
+nbroTrhBp  OBJECT IDENTIFIER ::= { nbroTrNext 1 } --nbroTrNext w/BP SW
+nbroTrhCp  OBJECT IDENTIFIER ::= { nbroTrNext 2 } --nbroTrNext w/CP SW
+nbroTrhXw  OBJECT IDENTIFIER ::= { nbroTrNext 3 } -- nbroTrNext w/Ext WAN SW
+nbroTrhCx OBJECT IDENTIFIER ::= { nbroTrNext 4 } -- nbroTrNext w/CX SW
+nbroTrhBa OBJECT IDENTIFIER ::= { nbroTrNext 5 } --nbroTrNext w/Bndry Rtg. SW
+nbroTrh322  OBJECT IDENTIFIER ::= { nbroTrNext 6 } --nbroTrNext w/AR SW
+nbroTrhSn  OBJECT IDENTIFIER ::= { nbroTrNext 7 } --nbroTrNext w/SNA
+nbroTrhRb OBJECT IDENTIFIER ::= { nbroTrNext 8 } --nbroTrNext w/RB SW
+nbroTrhFf  OBJECT IDENTIFIER ::= { nbroTrNext 9 } -- nbroTrNext w/FF SW
+nbroTrh327  OBJECT IDENTIFIER ::= { nbroTrNext 10 }--nbroTrNext w/CF SW
+nbroTrh321     OBJECT IDENTIFIER ::= { nbroTrNext 11 }--nbroTrNext w/BX SW
+nbroTrhAppn OBJECT IDENTIFIER ::= { nbroTrNext 12 } -- nbroTrNext w/Appn SW
+nbroTrhLm OBJECT IDENTIFIER ::= { nbroTrNext 13 } -- nbroTrNext w/Lm Sw
+nbroTrhLt OBJECT IDENTIFIER ::= { nbroTrNext 14 } -- nbroTrNext w/Lt Sw
+nbroTrhWm OBJECT IDENTIFIER ::= { nbroTrNext 15 } -- nbroTrNext w/Wm Sw
+nbroTrhWt OBJECT IDENTIFIER ::= { nbroTrNext 16 } -- nbroTrNext w/Wt Sw
+nbroTrhAe OBJECT IDENTIFIER ::= { nbroTrNext 17 } -- nbroTrNext w/Ae Sw
+nbroTrhAp OBJECT IDENTIFIER ::= { nbroTrNext 18 } -- nbroTrNext w/Ap Sw
+nbroTrhAn OBJECT IDENTIFIER ::= { nbroTrNext 19 } -- nbroTrNext w/An Sw
+nbroTrhLa OBJECT IDENTIFIER ::= { nbroTrNext 20 } -- nbroTrNext w/La Sw
+nbroTrhWa OBJECT IDENTIFIER ::= { nbroTrNext 21 } -- nbroTrNext w/Wa Sw
+nbroTrhAa OBJECT IDENTIFIER ::= { nbroTrNext 22 } -- nbroTrNext w/Aa Sw
+nbroTrhAb OBJECT IDENTIFIER ::= { nbroTrNext 23 } -- nbroTrNext w/Ab Sw
+nbroTrh323 OBJECT IDENTIFIER ::= { nbroTrNext 24 } -- nbroTrNext w/Bf Sw
+
+
+--
+-- the following identifiers are assigned under a3Com.products.brouter.officeConnRtr
+--
+
+ocRtrBp   OBJECT IDENTIFIER ::= { officeConnRtr 1 }  -- officeConnRtr w/BP SW
+ocRtrCp   OBJECT IDENTIFIER ::= { officeConnRtr 2 }  -- officeConnRtr w/CP SW
+ocRtrXw   OBJECT IDENTIFIER ::= { officeConnRtr 3 }  -- officeConnRtr w/Ext WAN SW
+ocRtrCx   OBJECT IDENTIFIER ::= { officeConnRtr 4 }  -- officeConnRtr w/CX SW
+ocRtrBa   OBJECT IDENTIFIER ::= { officeConnRtr 5 }  -- officeConnRtr w/Bndry Rtg. SW
+ocRtrAr   OBJECT IDENTIFIER ::= { officeConnRtr 6 }  -- officeConnRtr w/AR SW
+ocRtrSn   OBJECT IDENTIFIER ::= { officeConnRtr 7 }  -- officeConnRtr w/SNA
+ocRtrRb   OBJECT IDENTIFIER ::= { officeConnRtr 8 }  -- officeConnRtr w/RB SW
+ocRtrFf   OBJECT IDENTIFIER ::= { officeConnRtr 9 }  -- officeConnRtr w/FF SW
+ocRtrCf   OBJECT IDENTIFIER ::= { officeConnRtr 10 } -- officeConnRtr w/CF SW
+ocRtrBx   OBJECT IDENTIFIER ::= { officeConnRtr 11 } -- officeConnRtr w/BX SW
+ocRtrAppn OBJECT IDENTIFIER ::= { officeConnRtr 12 } -- officeConnRtr w/Appn SW
+ocRtrLm   OBJECT IDENTIFIER ::= { officeConnRtr 13 } -- officeConnRtr w/Lm Sw
+ocRtrLt   OBJECT IDENTIFIER ::= { officeConnRtr 14 } -- officeConnRtr w/Lt Sw
+ocRtrWm   OBJECT IDENTIFIER ::= { officeConnRtr 15 } -- officeConnRtr w/Wm Sw
+ocRtrWt   OBJECT IDENTIFIER ::= { officeConnRtr 16 } -- officeConnRtr w/Wt Sw
+ocRtrAe   OBJECT IDENTIFIER ::= { officeConnRtr 17 } -- officeConnRtr w/Ae Sw
+ocRtrAp   OBJECT IDENTIFIER ::= { officeConnRtr 18 } -- officeConnRtr w/Ap Sw
+ocRtrAn   OBJECT IDENTIFIER ::= { officeConnRtr 19 } -- officeConnRtr w/An Sw
+ocRtrLa   OBJECT IDENTIFIER ::= { officeConnRtr 20 } -- officeConnRtr w/La Sw
+ocRtrWa   OBJECT IDENTIFIER ::= { officeConnRtr 21 } -- officeConnRtr w/Wa Sw
+ocRtrAa   OBJECT IDENTIFIER ::= { officeConnRtr 22 } -- officeConnRtr w/Aa Sw
+ocRtrAb   OBJECT IDENTIFIER ::= { officeConnRtr 23 } -- officeConnRtr w/Ab Sw
+ocRtrBf   OBJECT IDENTIFIER ::= { officeConnRtr 24 } -- officeConnRtr w/Bf Sw
+
+--
+-- the following identifiers are assigned to brouterBoards
+--
+
+ethernet      OBJECT IDENTIFIER ::= { brouterBoards 1 }
+fddiPhy       OBJECT IDENTIFIER ::= { brouterBoards 2 }
+fddiMac       OBJECT IDENTIFIER ::= { brouterBoards 3 }
+hss           OBJECT IDENTIFIER ::= { brouterBoards 4 }
+tokenRingBrd  OBJECT IDENTIFIER ::= { brouterBoards 5 }
+hssG703       OBJECT IDENTIFIER ::= { brouterBoards 6 }
+hssRS449      OBJECT IDENTIFIER ::= { brouterBoards 7 }
+t3HSSI        OBJECT IDENTIFIER ::= { brouterBoards 8 }
+dualEth       OBJECT IDENTIFIER ::= { brouterBoards 9 }
+cec           OBJECT IDENTIFIER ::= { brouterBoards 10 }
+fddiPhySm     OBJECT IDENTIFIER ::= { brouterBoards 11 }
+fddiPhyMmSm   OBJECT IDENTIFIER ::= { brouterBoards 12 }
+fddiPhySmMm   OBJECT IDENTIFIER ::= { brouterBoards 13 }
+hdwan         OBJECT IDENTIFIER ::= { brouterBoards 14 }
+hdwan449      OBJECT IDENTIFIER ::= { brouterBoards 15 }
+hdwan232      OBJECT IDENTIFIER ::= { brouterBoards 16 }
+mp6Eth        OBJECT IDENTIFIER ::= { brouterBoards 17 }
+trPlus        OBJECT IDENTIFIER ::= { brouterBoards 18 }
+macPlus       OBJECT IDENTIFIER ::= { brouterBoards 19 }
+cecStar       OBJECT IDENTIFIER ::= { brouterBoards 20 }
+isdnBri       OBJECT IDENTIFIER ::= { brouterBoards 21 }
+isdnPri       OBJECT IDENTIFIER ::= { brouterBoards 22 }
+mpAtm         OBJECT IDENTIFIER ::= { brouterBoards 23 }
+hssI431       OBJECT IDENTIFIER ::= { brouterBoards 24 }
+mpFddi        OBJECT IDENTIFIER ::= { brouterBoards 25 }
+mp6EthFl      OBJECT IDENTIFIER ::= { brouterBoards 26 }
+ethV3         OBJECT IDENTIFIER ::= { brouterBoards 27 }
+ethV3Fl       OBJECT IDENTIFIER ::= { brouterBoards 28 }
+nbroBrd       OBJECT IDENTIFIER ::= { brouterBoards 29 }
+mpAtmFiber    OBJECT IDENTIFIER ::= { brouterBoards 30 }
+dpe           OBJECT IDENTIFIER ::= { brouterBoards 31 }
+flatFddiMm    OBJECT IDENTIFIER ::= { brouterBoards 32 }
+flatFddiSs    OBJECT IDENTIFIER ::= { brouterBoards 33 }
+flatFddiSm    OBJECT IDENTIFIER ::= { brouterBoards 34 }
+flatFddiMs    OBJECT IDENTIFIER ::= { brouterBoards 35 }
+mpAtmFiberMm  OBJECT IDENTIFIER ::= { brouterBoards 36 }
+nbocBrd       OBJECT IDENTIFIER ::= { brouterBoards 37 }
+nbocST        OBJECT IDENTIFIER ::= { brouterBoards 38 }
+nbocU         OBJECT IDENTIFIER ::= { brouterBoards 39 }
+nboc56kCSU    OBJECT IDENTIFIER ::= { brouterBoards 40 }
+nbocT1CSU     OBJECT IDENTIFIER ::= { brouterBoards 41 }
+nboc1x1       OBJECT IDENTIFIER ::= { brouterBoards 42 }
+nboc2FlexWAN  OBJECT IDENTIFIER ::= { brouterBoards 43 }
+intrepidBrd   OBJECT IDENTIFIER ::= { brouterBoards 44 }
+intrepidST    OBJECT IDENTIFIER ::= { brouterBoards 45 } -- Isdn S/T module
+intrepidU     OBJECT IDENTIFIER ::= { brouterBoards 46 } -- Isdn U module
+intrepid56kCSU OBJECT IDENTIFIER ::= { brouterBoards 47 }
+intrepidT1CSU OBJECT IDENTIFIER ::= { brouterBoards 48 }
+mbriSt        OBJECT IDENTIFIER ::= { brouterBoards 49 }
+mbriU         OBJECT IDENTIFIER ::= { brouterBoards 50 }
+qWan          OBJECT IDENTIFIER ::= { brouterBoards 51 }
+dpePlus       OBJECT IDENTIFIER ::= { brouterBoards 52 }
+nboc1x2       OBJECT IDENTIFIER ::= { brouterBoards 53 }
+scoreCpu      OBJECT IDENTIFIER ::= { brouterBoards 54 }
+scoreT1       OBJECT IDENTIFIER ::= { brouterBoards 55 }
+scoreT3       OBJECT IDENTIFIER ::= { brouterBoards 56 }
+scorePRI      OBJECT IDENTIFIER ::= { brouterBoards 57 }
+blueridgeBrd    OBJECT IDENTIFIER ::= { brouterBoards 58 } -- generic bluerige
+blueridgeST     OBJECT IDENTIFIER ::= { brouterBoards 59 } -- Isdn S/T module
+blueridgeU      OBJECT IDENTIFIER ::= { brouterBoards 60 } -- Isdn U module
+blueridge56kCSU OBJECT IDENTIFIER ::= { brouterBoards 61 } -- Frad module
+blueridgeT1CSU  OBJECT IDENTIFIER ::= { brouterBoards 62 } --T1/FT1 Frad module
+scoreE3         OBJECT IDENTIFIER ::= { brouterBoards 63 } -- score E3 (PB S5xx 2-port E3)
+scoreLAN        OBJECT IDENTIFIER ::= { brouterBoards 64 } -- score LAN (PB S5xx 10/100BASE-T)
+copperCPU       OBJECT IDENTIFIER ::= { brouterBoards 65 } -- copperHead CPU module
+voiceFXS        OBJECT IDENTIFIER ::= { brouterBoards 66 } -- copperHead FXS (PB S400 FXS 4-port)
+voiceFXO        OBJECT IDENTIFIER ::= { brouterBoards 67 } -- copperHead FXO (PB S400 FXO 4-port)
+voiceEaM        OBJECT IDENTIFIER ::= { brouterBoards 68 } -- copperHead E&M (PB S400 E&M 4-port)
+copperST        OBJECT IDENTIFIER ::= { brouterBoards 69 } -- copperHead S/T (PB S400 ISDN BRI S/T)
+copperU         OBJECT IDENTIFIER ::= { brouterBoards 70 } -- copperHead U (PB S400 ISDN BRI U)
+copper56kCSU    OBJECT IDENTIFIER ::= { brouterBoards 71 } -- copperHead Frad (PB S400 56/64K CSU/DSU)
+copperT1CSU     OBJECT IDENTIFIER ::= { brouterBoards 72 } -- copperHead T1/FT1 Frad (PB S400 FT1/T1 CSU/DSU)
+scoreATMMm      OBJECT IDENTIFIER ::= { brouterBoards 73 } -- score M/M ATM (PB S5xx ATM OC3/DS3 M/M)
+scoreATMSm      OBJECT IDENTIFIER ::= { brouterBoards 74 } -- score S/M ATM (PB S5xx ATM OC3/DS3 S/M)
+scoreT1x2       OBJECT IDENTIFIER ::= { brouterBoards 75 } -- score 2X T1 (PB S5xx 2-port T1/E1)
+scorePRIx2      OBJECT IDENTIFIER ::= { brouterBoards 76 } -- score 2X Pri (PB S5xx 2-port PRI)
+copperPRI       OBJECT IDENTIFIER ::= { brouterBoards 77 } -- copperHead PB S400  1-port PRI/CT1/CE1/T1/E1
+copperBRIx4     OBJECT IDENTIFIER ::= { brouterBoards 78 } -- copperHead PB S400 BRI 4-port
+copperModem     OBJECT IDENTIFIER ::= { brouterBoards 79 } -- copperHead console Modem
+copperT1x1      OBJECT IDENTIFIER ::= { brouterBoards 80 } -- copperHead PB S400 1-port T1/E1 (no channelize)
+
+--
+-- the following identifiers are assigned to brouterBrdFwVers
+--
+
+noFw          OBJECT IDENTIFIER ::= { brouterBrdFwVers 1 }
+cecFw         OBJECT IDENTIFIER ::= { brouterBrdFwVers 2 }
+hdwanFw       OBJECT IDENTIFIER ::= { brouterBrdFwVers 3 }
+hdwan232Fw    OBJECT IDENTIFIER ::= { brouterBrdFwVers 4 }
+hdwan449Fw    OBJECT IDENTIFIER ::= { brouterBrdFwVers 5 }
+mp6ethFw      OBJECT IDENTIFIER ::= { brouterBrdFwVers 6 }
+cecStarFw     OBJECT IDENTIFIER ::= { brouterBrdFwVers 7 }
+mpAtmFw       OBJECT IDENTIFIER ::= { brouterBrdFwVers 8 }
+mpFddiFw      OBJECT IDENTIFIER ::= { brouterBrdFwVers 9 }
+mp6EthFlFw    OBJECT IDENTIFIER ::= { brouterBrdFwVers 10 }
+nbroFw        OBJECT IDENTIFIER ::= { brouterBrdFwVers 11 }
+nbocFw        OBJECT IDENTIFIER ::= { brouterBrdFwVers 12 }
+dpeFw         OBJECT IDENTIFIER ::= { brouterBrdFwVers 13 }
+intrepidFw    OBJECT IDENTIFIER ::= { brouterBrdFwVers 14 }
+mbriFw        OBJECT IDENTIFIER ::= { brouterBrdFwVers 15 }
+qwanFw        OBJECT IDENTIFIER ::= { brouterBrdFwVers 16 }
+scoreFw       OBJECT IDENTIFIER ::= { brouterBrdFwVers 17 }
+blueridgeFw   OBJECT IDENTIFIER ::= { brouterBrdFwVers 18 }
+
+--
+-- the following identifiers are assigned to brouterBrdSwVers
+--
+
+noSw          OBJECT IDENTIFIER ::= { brouterBrdSwVers 1 }
+mp6eth        OBJECT IDENTIFIER ::= { brouterBrdSwVers 2 }
+
+--
+-- the following identifiers are asigned under a3Com.products.brouter.easterRtr
+--
+
+rtr400Hw            OBJECT IDENTIFIER ::= { easterRtr  1 } -- EasterRtr w/HW Sw
+rtr400Hs            OBJECT IDENTIFIER ::= { easterRtr  2 } -- EasterRtr w/HS Sw
+
+--
+-- the following identifiers are assigned under a3Com.products.genericMSWorkstation
+--
+
+deskManProduct OBJECT IDENTIFIER ::= { genericMSWorkstation 1 }
+
+--
+-- the following identifiers are assigned under a3Com.products.genericMSWorkstation.deskManProduct
+--
+
+ethernetSoftHub  OBJECT IDENTIFIER ::= { deskManProduct 1 }
+ethernetDTAnode  OBJECT IDENTIFIER ::= { deskManProduct 2 }
+tokenRingSoftHub OBJECT IDENTIFIER ::= { deskManProduct 3 }
+tokenRingDTAnode OBJECT IDENTIFIER ::= { deskManProduct 4 }
+
+--
+-- the following identifiers are assigned to 3com hubs
+--
+
+linkBuilder3GH              OBJECT IDENTIFIER ::= { hub 1 }
+linkBuilder10BTi            OBJECT IDENTIFIER ::= { hub 2 }
+linkBuilderECS              OBJECT IDENTIFIER ::= { hub 3 }
+linkBuilderMSH              OBJECT IDENTIFIER ::= { hub 4 }
+linkBuilderFMS              OBJECT IDENTIFIER ::= { hub 5 }
+linkBuilderFddiWorkGroupHub OBJECT IDENTIFIER ::= { hub 6 }
+linkBuilderFMSII            OBJECT IDENTIFIER ::= { hub 7 }
+linkSwitchFMS               OBJECT IDENTIFIER ::= { hub 8 }
+linkSwitchMSH               OBJECT IDENTIFIER ::= { hub 9 }
+linkBuilderFMSLBridge       OBJECT IDENTIFIER ::= { hub 10 }
+linkBuilderTP8i             OBJECT IDENTIFIER ::= { hub 11 }
+linkBuilderMSHFddi          OBJECT IDENTIFIER ::= { hub 12 }
+linkSwitch1000              OBJECT IDENTIFIER ::= { hub 13 }
+linkSwitch500               OBJECT IDENTIFIER ::= { hub 14 }
+linkSwitch2700AU            OBJECT IDENTIFIER ::= { hub 15 }
+linkSwitch2700Bridge        OBJECT IDENTIFIER ::= { hub 16 }
+linkBuilderFMS100LBridge    OBJECT IDENTIFIER ::= { hub 17 }
+linkSwitch2700TliAU         OBJECT IDENTIFIER ::= { hub 18 }
+linkSwitch2700TliBridge     OBJECT IDENTIFIER ::= { hub 19 }
+linkBuilderFMS100           OBJECT IDENTIFIER ::= { hub 20 }
+officeConnect-Hub8M         OBJECT IDENTIFIER ::= { hub 21 }
+linkSwitch3000              OBJECT IDENTIFIER ::= { hub 22 }
+mshSwitch                   OBJECT IDENTIFIER ::= { hub 23 }
+linkSwitch2000TR            OBJECT IDENTIFIER ::= { hub 24 }
+oncoreFastModuleFPA100      OBJECT IDENTIFIER ::= { hub 25 }
+oncoreFastModuleFPA10       OBJECT IDENTIFIER ::= { hub 26 }
+oncoreFastModuleFPA10FX     OBJECT IDENTIFIER ::= { hub 27 }
+oncoreFastModuleBPA         OBJECT IDENTIFIER ::= { hub 28 }
+superStackDesktopSwitch     OBJECT IDENTIFIER ::= { hub 29 }
+oncoreFastModuleFPA100TX    OBJECT IDENTIFIER ::= { hub 30 }
+officeConnect-Switch140M    OBJECT IDENTIFIER ::= { hub 31 }
+superStackSwitch9000SX      OBJECT IDENTIFIER ::= { hub 32 }
+coreBuilder9000             OBJECT IDENTIFIER ::= { hub 33 }
+superStackSwitch3800        OBJECT IDENTIFIER ::= { hub 34 }
+cb5000TRFastModule          OBJECT IDENTIFIER ::= { hub 35 }
+superStackSwitch9100        OBJECT IDENTIFIER ::= { hub 36 }
+superStackSwitchSoyuz       OBJECT IDENTIFIER ::= { hub 37 }
+superStackSwitch4300        OBJECT IDENTIFIER ::= { hub 38 }
+superStackSwitch3824  	    OBJECT IDENTIFIER ::= { hub 39 }
+superStackSwitch3812        OBJECT IDENTIFIER ::= { hub 40 }
+switch3226                  OBJECT IDENTIFIER ::= { hub 41 }
+switch3250                  OBJECT IDENTIFIER ::= { hub 42 }
+switch3870-24-port          OBJECT IDENTIFIER ::= { hub 43 }
+switch3870-48-port          OBJECT IDENTIFIER ::= { hub 44 }
+switch3848                  OBJECT IDENTIFIER ::= { hub 45 }
+switch3228                  OBJECT IDENTIFIER ::= { hub 46 }
+switch3252                  OBJECT IDENTIFIER ::= { hub 47 }
+
+
+
+--
+-- the following identifiers are assigned to 3com atm switching/access products
+--
+
+cELLplex7000             OBJECT IDENTIFIER ::= { atm 1 }
+cELLplex7000-cards       OBJECT IDENTIFIER ::= { atm 2 }
+pathBuilder              OBJECT IDENTIFIER ::= { atm 3 }
+coreBuilderSip7000       OBJECT IDENTIFIER ::= { atm 4 }
+
+--
+-- New sub-tree for CoreBuilder7000
+--
+cb7000Family            OBJECT IDENTIFIER ::= { atm 5 }
+
+
+--
+-- the following identifiers are assigned to 3com cELLplex7000 interface cards
+--
+
+cELLplex-7x00cardBridge       OBJECT IDENTIFIER ::= { cELLplex7000-cards 1 }
+cELLplex-7200card             OBJECT IDENTIFIER ::= { cELLplex7000-cards 2 }
+cELLplex-7200Fcard            OBJECT IDENTIFIER ::= { cELLplex7000-cards 3 }
+cELLplex-7400card             OBJECT IDENTIFIER ::= { cELLplex7000-cards 4 }
+cELLplex-7600card             OBJECT IDENTIFIER ::= { cELLplex7000-cards 5 }
+cELLplex-7800card             OBJECT IDENTIFIER ::= { cELLplex7000-cards 6 }
+cELLplex-7900card             OBJECT IDENTIFIER ::= { cELLplex7000-cards 7 }
+
+--
+-- CoreBuilder7000 Components Types
+--
+
+cb7000-fabric-cards             OBJECT IDENTIFIER ::= { cb7000Family 1 }
+cb7000-accelerator-cards        OBJECT IDENTIFIER ::= { cb7000Family 2 }
+cb7000-carrier-cards            OBJECT IDENTIFIER ::= { cb7000Family 3 }
+cb7000-daughter-cards           OBJECT IDENTIFIER ::= { cb7000Family 4 }
+
+--
+-- CoreBuilder7000 ATM Switches
+--
+
+cb7000-fabric-switch            OBJECT IDENTIFIER ::= { cb7000-fabric-cards 1 }
+cb7000-fabric-switch-hd         OBJECT IDENTIFIER ::= { cb7000-fabric-cards 2 }
+
+--
+-- CoreBuilder7000 accelerator cards (FastBUS, etc.)
+--
+
+cb7000-FastBUS                  OBJECT IDENTIFIER ::= { cb7000-accelerator-cards 1 }
+cb7000-FastBUS-Java             OBJECT IDENTIFIER ::= { cb7000-accelerator-cards 2 }
+cb7000-FastBUS-7600             OBJECT IDENTIFIER ::= { cb7000-accelerator-cards 3 }
+cb7000-FastBUS-7600-Java        OBJECT IDENTIFIER ::= { cb7000-accelerator-cards 4 }
+
+--
+-- CoreBuilder7000 carrier cards (Port Modules, Interface Cards, etc.)
+--
+
+cb7000-4-ports-ifc              OBJECT IDENTIFIER ::= { cb7000-carrier-cards 1 }
+cb7000-8-ports-ifc              OBJECT IDENTIFIER ::= { cb7000-carrier-cards 2 }
+cb7000-OC12-carrier-ifc         OBJECT IDENTIFIER ::= { cb7000-carrier-cards 3 }
+cb7000-7200-ifc                 OBJECT IDENTIFIER ::= { cb7000-carrier-cards 4 }
+cb7000-7200F-ifc                OBJECT IDENTIFIER ::= { cb7000-carrier-cards 5 }
+cb7000-7400-ifc                 OBJECT IDENTIFIER ::= { cb7000-carrier-cards 6 }
+cb7000-7600-ifc                 OBJECT IDENTIFIER ::= { cb7000-carrier-cards 7 }
+cb7000-7800-ifc                 OBJECT IDENTIFIER ::= { cb7000-carrier-cards 8 }
+cb7000-7900-ifc                 OBJECT IDENTIFIER ::= { cb7000-carrier-cards 9 }
+
+--
+-- CoreBuilder7000 daughter cards (piggy and "virtual" piggy)
+--
+
+cb7000-1-OC3-SM                  OBJECT IDENTIFIER ::= { cb7000-daughter-cards 1 }
+cb7000-1-OC3-MM                  OBJECT IDENTIFIER ::= { cb7000-daughter-cards 2 }
+cb7000-1-DS3-BNC                 OBJECT IDENTIFIER ::= { cb7000-daughter-cards 3 }
+cb7000-1-OC3-rj45                OBJECT IDENTIFIER ::= { cb7000-daughter-cards 4 }
+cb7000-1-OC12-SM                 OBJECT IDENTIFIER ::= { cb7000-daughter-cards 5 }
+cb7000-1-OC12-MM                 OBJECT IDENTIFIER ::= { cb7000-daughter-cards 6 }
+cb7000-12-10T-rj45-in-7200       OBJECT IDENTIFIER ::= { cb7000-daughter-cards 7 }
+cb7000-12-fiber-10T-FL-in-7200   OBJECT IDENTIFIER ::= { cb7000-daughter-cards 8 }
+cb7000-12-10T-rj21               OBJECT IDENTIFIER ::= { cb7000-daughter-cards 9 }
+cb7000-2-fiber-100T              OBJECT IDENTIFIER ::= { cb7000-daughter-cards 10 }
+cb7000-2-10T-100T-rj45           OBJECT IDENTIFIER ::= { cb7000-daughter-cards 11 }
+cb7000-4-fiber-1000T-in-7800     OBJECT IDENTIFIER ::= { cb7000-daughter-cards 12 }
+cb7000-36-10T-100T-rj45-in-7900  OBJECT IDENTIFIER ::= { cb7000-daughter-cards 13 }
+cb7000-1-E3-BNC                  OBJECT IDENTIFIER ::= { cb7000-daughter-cards 14 }
+
+
+
+--
+-- the following identifiers are assinged to 3com Broadband Access products
+--
+broadbandAccess               OBJECT IDENTIFIER ::= { tdm 1 }
+
+--
+-- the following identifiers are assigned to 3com modules and cards
+--
+
+linkBuilder3GH-cards              OBJECT IDENTIFIER ::= { cards 1 }
+linkBuilder10BTi-cards            OBJECT IDENTIFIER ::= { cards 2 }
+linkBuilderECS-cards              OBJECT IDENTIFIER ::= { cards 3 }
+linkBuilderMSH-cards              OBJECT IDENTIFIER ::= { cards 4 }
+linkBuilderFMS-cards              OBJECT IDENTIFIER ::= { cards 5 }
+linkBuilderFMSII-cards            OBJECT IDENTIFIER ::= { cards 6 }
+a3C512                            OBJECT IDENTIFIER ::= { cards 7 }
+linkBuilderTP8i-cards             OBJECT IDENTIFIER ::= { cards 8 }
+linkSwitch1000-cards              OBJECT IDENTIFIER ::= { cards 9 }
+linkBuilderFMS100-cards           OBJECT IDENTIFIER ::= { cards 10 }
+officeConnect-Hub8M-cards         OBJECT IDENTIFIER ::= { cards 11 }
+linkSwitch2000TR-cards            OBJECT IDENTIFIER ::= { cards 12 }
+coreBuilder9000-cards             OBJECT IDENTIFIER ::= { cards 13 }
+cb5000TRFastModule-cards          OBJECT IDENTIFIER ::= { cards 14 }
+superStack3300-cards              OBJECT IDENTIFIER ::= { cards 15 }
+
+linkBuilder10BTi-cards-utp        OBJECT IDENTIFIER ::= { linkBuilder10BTi-cards 1 }
+linkBuilder10BT-cards-utp         OBJECT IDENTIFIER ::= { linkBuilder10BTi-cards 2 }
+
+linkBuilderFMS-cards-utp          OBJECT IDENTIFIER ::= { linkBuilderFMS-cards 1 }
+linkBuilderFMS-cards-coax         OBJECT IDENTIFIER ::= { linkBuilderFMS-cards 2 }
+linkBuilderFMS-cards-fiber        OBJECT IDENTIFIER ::= { linkBuilderFMS-cards 3 }
+linkBuilderFMS-cards-12fiber      OBJECT IDENTIFIER ::= { linkBuilderFMS-cards 4 }
+linkBuilderFMS-cards-24utp        OBJECT IDENTIFIER ::= { linkBuilderFMS-cards 5 }
+
+linkBuilderFMSII-cards-12tp-rj45  OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 1 }
+linkBuilderFMSII-cards-10coax-bnc OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 2 }
+linkBuilderFMSII-cards-6fiber-st  OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 3 }
+linkBuilderFMSII-cards-12fiber-st OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 4 }
+linkBuilderFMSII-cards-24tp-rj45  OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 5 }
+linkBuilderFMSII-cards-24tp-telco OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 6 }
+superStackHub10-cards-12tp-rj45   OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 7 }
+superStackHub10-cards-24tp-rj45   OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 8 }
+superStackHub10-cards-6fiber-st   OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 9 }
+superStackHub10-cards-24tp-telco  OBJECT IDENTIFIER ::= { linkBuilderFMSII-cards 10 }
+
+a3C512-withBNC-expn-card          OBJECT IDENTIFIER ::= { a3C512 1 }
+a3C512-withAUI-expn-card          OBJECT IDENTIFIER ::= { a3C512 2 }
+a3C512-withFOIRL-expn-card        OBJECT IDENTIFIER ::= { a3C512 3 }
+
+linkBuilderTP8i-cards-8tp-rj45    OBJECT IDENTIFIER ::= { linkBuilderTP8i-cards 1 }
+
+linkSwitch1000-cards-24tp-rj45    OBJECT IDENTIFIER ::= { linkSwitch1000-cards 1 }
+linkSwitch1000-cards-12tp-rj45    OBJECT IDENTIFIER ::= { linkSwitch1000-cards 2 }
+linkSwitch3000-cards-5fiber-sc    OBJECT IDENTIFIER ::= { linkSwitch1000-cards 3 }
+linkSwitch3000-cards-8tp-rj45     OBJECT IDENTIFIER ::= { linkSwitch1000-cards 4 }
+
+superStackSwitch1000-cards-24tp-rj45    OBJECT IDENTIFIER ::= { linkSwitch1000-cards 5 }
+superStackSwitch1000-cards-12tp-rj45    OBJECT IDENTIFIER ::= { linkSwitch1000-cards 6 }
+superStackSwitch3000-cards-5fiber-sc    OBJECT IDENTIFIER ::= { linkSwitch1000-cards 7 }
+superStackSwitch3000-cards-8tp-rj45     OBJECT IDENTIFIER ::= { linkSwitch1000-cards 8 }
+
+oncore-cards-5fiber-sc-2tp-rj45-blk       OBJECT IDENTIFIER ::= { linkSwitch1000-cards 9}
+oncore-cards-24tp-telco-blk               OBJECT IDENTIFIER ::= { linkSwitch1000-cards 10}
+oncore-cards-24tp-telco-1fiber-sc-blk     OBJECT IDENTIFIER ::= { linkSwitch1000-cards 11}
+oncore-cards-1fiber-sc-7blk               OBJECT IDENTIFIER ::= { linkSwitch1000-cards 12}
+
+superStackSwitch1000-3000-cards-atm       OBJECT IDENTIFIER ::= { linkSwitch1000-cards 13}
+
+oncore-cards-2fiber-sc-7blk               OBJECT IDENTIFIER ::= { linkSwitch1000-cards 14}
+oncore-cards-1fiber-sc-tp-rj45-7blk       OBJECT IDENTIFIER ::= { linkSwitch1000-cards 15}
+oncore-cards-1fiber-sc-atm-7blk           OBJECT IDENTIFIER ::= { linkSwitch1000-cards 16}
+superStackDesktopSwitch-24tp-rj45         OBJECT IDENTIFIER ::= { linkSwitch1000-cards 17}
+
+linkSwitch3000-cards-12tp-rj45            OBJECT IDENTIFIER ::= { linkSwitch1000-cards 18}
+superStackSwitch3000-cards-12tp-rj45      OBJECT IDENTIFIER ::= { linkSwitch1000-cards 19}
+
+oncore-cards-7tp-rj45-blk                 OBJECT IDENTIFIER ::= { linkSwitch1000-cards 20}
+
+officeConnect-Switch140M-5tp-rj45         OBJECT IDENTIFIER ::= { linkSwitch1000-cards 21}
+
+superStackSwitch3000-cards-12tp-rj45-ten100      OBJECT IDENTIFIER ::= { linkSwitch1000-cards 22}
+
+linkBuilderFMS100-cards-12utp     OBJECT IDENTIFIER ::= { linkBuilderFMS100-cards 1 }
+linkBuilderFMS100-cards-12T4      OBJECT IDENTIFIER ::= { linkBuilderFMS100-cards 2 }
+linkBuilderFMS100-cards-24TX      OBJECT IDENTIFIER ::= { linkBuilderFMS100-cards 3 }
+linkBuilderFMS100-cards-12TX      OBJECT IDENTIFIER ::= { linkBuilderFMS100-cards 4 }
+
+officeConnect-Hub8M-cards-8tp-rj45  OBJECT IDENTIFIER ::= { officeConnect-Hub8M-cards 1 }
+
+linkSwitch2000TR-cards-12tp-rj45    OBJECT IDENTIFIER ::= { linkSwitch2000TR-cards 1 }
+
+stanley                             OBJECT IDENTIFIER ::= { superStack3300-cards 1 }
+superStack-3300-atm-uplink          OBJECT IDENTIFIER ::= { superStack3300-cards 2 }
+
+--
+--
+--
+cb5000TRFastModule-card-6508M       OBJECT IDENTIFIER ::= { cb5000TRFastModule-cards 1 }
+cb5000TRFastModule-card-6508M2      OBJECT IDENTIFIER ::= { cb5000TRFastModule-cards 2 }
+cb5000TRFastModule-card-atm         OBJECT IDENTIFIER ::= { cb5000TRFastModule-cards 3 }
+cb5000TRFastModule-card-fddi        OBJECT IDENTIFIER ::= { cb5000TRFastModule-cards 4 }
+cb5000TRFastModule-card-tif-sc      OBJECT IDENTIFIER ::= { cb5000TRFastModule-cards 5 }
+cb5000TRFastModule-card-tif-rj45    OBJECT IDENTIFIER ::= { cb5000TRFastModule-cards 6 }
+
+--
+-- The following identifiers are assigned to CoreBuilder 9000 Chassis types
+--
+coreBuilder9000-chassis          OBJECT IDENTIFIER ::= { coreBuilder9000 2 }
+
+coreBuilder9000-16slot           OBJECT IDENTIFIER ::= { coreBuilder9000-chassis 1}
+coreBuilder9000-7slot            OBJECT IDENTIFIER ::= { coreBuilder9000-chassis 2}
+coreBuilder9000-8slot            OBJECT IDENTIFIER ::= { coreBuilder9000-chassis 3}
+coreBuilder9000-4slot            OBJECT IDENTIFIER ::= { coreBuilder9000-chassis 4}
+
+coreBuilder9000-packet-cards     OBJECT IDENTIFIER ::= { coreBuilder9000-cards 1 }
+coreBuilder9000-cell-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-cards 2 }
+coreBuilder9000-mgmt-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-cards 3 }
+coreBuilder9000-app-cards        OBJECT IDENTIFIER ::= { coreBuilder9000-cards 4 }
+
+--
+-- The following identifiers are assigned to CoreBuilder 9000 Packet Switching Cards
+--
+
+--  Ethernet/Fast Ethernet/Gigabit Ethernet Layer 2 Packet Switching Cards
+
+cb9000-layer2-switch-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-packet-cards 1 }
+cb9000-layer3-switch-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-packet-cards 2 }
+cb9000-layer2-fabric-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-packet-cards 3 }
+cb9000-layer1-cards              OBJECT IDENTIFIER ::= { coreBuilder9000-packet-cards 4 }
+cb9000-layer2-tb-cards           OBJECT IDENTIFIER ::= { coreBuilder9000-packet-cards 5 }
+cb9000-layer3-fabric-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-packet-cards 6 }
+
+cb9000-cards-20-rj45-10T-100T    OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 1 }
+cb9000-cards-36-rj45-10T-100T    OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 2 }
+cb9000-cards-36-rj45-10T         OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 3 }
+cb9000-cards-10-fiber-100T       OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 4 }
+cb9000-cards-36-telco-10T-100T   OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 5 }
+cb9000-cards-9-fiber-1000T       OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 6 }
+cb9000-cards-20-mt-fiber-100T    OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 7 }
+cb9000-cards-tb-36-rj45-10T-100T OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 8}
+cb9000-cards-tb-36-telco-10T-100T OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 9}
+cb9000-cards-20-fiber-1000T      OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 10}
+cb9000-cards-9-fiber-1000LX       OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 11 }
+cb9000-cards-12BT-1000T         OBJECT IDENTIFIER ::= { cb9000-layer2-switch-cards 12}
+-- Multiprotocol Layer 3 Packet Switching Cards
+
+cb9000-cards-12-rj45-100T       OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 1 }
+cb9000-cards-6-fddi             OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 2 }
+cb9000-cards-router             OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 3 }
+cb9000-cards-10-fiber           OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 4 }
+cb9000-cards-4-gbic-1000T       OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 5 }
+cb9000-cards-carrier            OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 6 }
+cb9000-cards-18tx               OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 7 }
+cb9000-cards-18fx               OBJECT IDENTIFIER ::= { cb9000-layer3-switch-cards 8 }
+-- Gigabit Ethernet Layer 2 Packet Switching Fabric Cards
+
+cb9000-cards-fabric-24          OBJECT IDENTIFIER ::= { cb9000-layer2-fabric-cards 1 }
+cb9000-cards-fabric-24T         OBJECT IDENTIFIER ::= { cb9000-layer2-fabric-cards 2 }
+cb9000-cards-fabric-6-3         OBJECT IDENTIFIER ::= { cb9000-layer2-fabric-cards 3 }
+cb9000-cards-fabric-36          OBJECT IDENTIFIER ::= { cb9000-layer2-fabric-cards 4 }
+
+-- Gigabit Ethernet Layer 3 Packet Switching Fabric Cards
+cb9000-cards-fabric-fba8        OBJECT IDENTIFIER ::= { cb9000-layer3-fabric-cards 1 }
+cb9000-cards-fabric-16          OBJECT IDENTIFIER ::= { cb9000-layer3-fabric-cards 2 }
+
+-- Gigabit Ethernet Cards
+
+cb9000-cards-2-fiber-1000T      OBJECT IDENTIFIER ::= { cb9000-layer1-cards 1 }
+cb9000-cards-4-fiber-1000T      OBJECT IDENTIFIER ::= { cb9000-layer1-cards 2 }
+cb9000-cards-2-fiber-lx-1000T   OBJECT IDENTIFIER ::= { cb9000-layer1-cards 3 }
+
+--
+-- Cell Switching Cards (ATM)
+--
+
+cb9000-cell-switch-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-cell-cards 1 }
+cb9000-cell-fabric-cards       OBJECT IDENTIFIER ::= { coreBuilder9000-cell-cards 2 }
+
+--
+-- Card classes
+--
+cb9000-cell-carrier-cards     OBJECT IDENTIFIER ::= { cb9000-cell-switch-cards 1 }
+cb9000-cell-daughter-cards    OBJECT IDENTIFIER ::= { cb9000-cell-switch-cards 2 }
+cb9000-cell-integrated-cards  OBJECT IDENTIFIER ::= { cb9000-cell-switch-cards 3 }
+cb9000-cell-combined-cards    OBJECT IDENTIFIER ::= { cb9000-cell-switch-cards 4 }
+
+
+--
+-- Cell Switch Fabrics
+--
+cb9000-cards-cell-fabric-1     OBJECT IDENTIFIER ::= { cb9000-cell-fabric-cards 1 }
+cb9000-cards-cell-fabric-1-7slot  OBJECT IDENTIFIER ::= { cb9000-cell-fabric-cards 2 }
+
+--
+-- Carrier Modules
+--
+cb9000-cell-modularIfc-2-groups  OBJECT IDENTIFIER ::= { cb9000-cell-carrier-cards 1}
+
+
+--
+-- Daughter Cards
+--
+cb9000-cell-1-OC12-MM          OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 1}
+cb9000-cell-1-OC12-SM          OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 2}
+cb9000-cell-4-OC3-MM           OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 3}
+cb9000-cell-4-OC3-SM           OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 4}
+cb9000-cell-1-OC3-SM-3-OC3-MM  OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 5}
+cb9000-cell-4-OC3-rj45         OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 6}
+cb9000-cell-2-T3-BNC           OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 7}
+cb9000-cell-2-E3-BNC           OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 8}
+cb9000-cell-4-OC3-SM-LR        OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 9}
+cb9000-cell-2-OC3-SM-LR        OBJECT IDENTIFIER ::= { cb9000-cell-daughter-cards 10}
+
+--
+-- Integrated Modules
+--
+cb9000-cell-8-T1-IMA-rj48c     OBJECT IDENTIFIER ::= { cb9000-cell-integrated-cards 1}
+cb9000-cell-8-E1-IMA-rj48c     OBJECT IDENTIFIER ::= { cb9000-cell-integrated-cards 2}
+cb9000-cell-8-T1-CES-rj48c     OBJECT IDENTIFIER ::= { cb9000-cell-integrated-cards 3}
+cb9000-cell-8-E1-CES-rj48c     OBJECT IDENTIFIER ::= { cb9000-cell-integrated-cards 4}
+
+
+--
+-- Combined Modules
+--
+
+-- Gigabit Ethernet
+cb9000-cellsw-4-fiber-1000T     OBJECT IDENTIFIER ::= { cb9000-cell-combined-cards 1 }
+
+-- Ethernet/Fast Ethernet cards
+cb9000-cellsw-20-rj45-10T-100T  OBJECT IDENTIFIER ::= { cb9000-cell-combined-cards 2 }
+cb9000-cellsw-36-rj45-10T-100T  OBJECT IDENTIFIER ::= { cb9000-cell-combined-cards 3 }
+cb9000-cellsw-36-telco-10T-100T OBJECT IDENTIFIER ::= { cb9000-cell-combined-cards 4 }
+cb9000-cellsw-40-telco-10T-100T OBJECT IDENTIFIER ::= { cb9000-cell-combined-cards 5 }
+
+
+--
+-- The following are assigned to CoreBuilder 9000
+-- Enterprise Management Engines and Controllers
+--
+
+cb9000-cards-eme                OBJECT IDENTIFIER ::= { coreBuilder9000-mgmt-cards 1 }
+cb9000-cards-emec               OBJECT IDENTIFIER ::= { coreBuilder9000-mgmt-cards 2 }
+cb9000-cards-emel               OBJECT IDENTIFIER ::= { coreBuilder9000-mgmt-cards 3 }
+
+--
+-- The following are assigned to applications on the CoreBuilder 9000
+-- Applications on the coreBuilder9000-app-cards class
+--
+
+cb9000-app-BIG-ip                OBJECT IDENTIFIER ::= { coreBuilder9000-app-cards 1 }
+cb9000-app-3DNS                  OBJECT IDENTIFIER ::= { coreBuilder9000-app-cards 2 }
+cb9000-app-global-site           OBJECT IDENTIFIER ::= { coreBuilder9000-app-cards 3 }
+
+--
+-- the following identifiers are assigned to 3com chip sets
+--
+
+valcan         OBJECT IDENTIFIER ::= { chipSets 1 }
+
+--
+-- the following identifiers are assigned to 3com oem products
+--
+
+linkConv250   OBJECT IDENTIFIER ::= { oem 1 }
+linkConv251   OBJECT IDENTIFIER ::= { oem 2 }
+linkConv350   OBJECT IDENTIFIER ::= { oem 3 }
+linkConv351   OBJECT IDENTIFIER ::= { oem 4 }
+
+--
+-- the following identifiers are assigned to Synernetics products
+--     (SysOID 1.3.6.1.4.1.114)
+--
+
+synernetics             OBJECT IDENTIFIER ::= { enterprises 114 }
+lanplex                 OBJECT IDENTIFIER ::= { synernetics 1 }
+
+lANplex-12-slot-support OBJECT IDENTIFIER ::= { lanplex 1 }
+lANplex-4-slot-support  OBJECT IDENTIFIER ::= { lanplex 2 }
+
+lpsProducts             OBJECT IDENTIFIER ::= { lanplex 3 }
+
+--
+-- the following identifiers are assigned to the LANplex product line
+--
+
+lps6000                 OBJECT IDENTIFIER ::= { lpsProducts 2 }
+lps2000                 OBJECT IDENTIFIER ::= { lpsProducts 3 }
+
+--
+-- the following identifiers are assigned to the LANplex product types
+--
+
+lps6012                 OBJECT IDENTIFIER ::= { lps6000 1 }
+lps6004                 OBJECT IDENTIFIER ::= { lps6000 2 }
+
+lps2500                 OBJECT IDENTIFIER ::= { lps2000 1 }
+lss2200                 OBJECT IDENTIFIER ::= { lps2000 2 }
+lps2016                 OBJECT IDENTIFIER ::= { lps2000 3 }
+lss2200SS2              OBJECT IDENTIFIER ::= { lps2000 4 }
+
+--
+-- the following identifiers are assigned to the LANplex 6000 devices
+--
+
+lps6012System           OBJECT IDENTIFIER ::= { lps6012 1 }
+lps6012Chassis          OBJECT IDENTIFIER ::= { lps6012 2 }
+lps6012ESM              OBJECT IDENTIFIER ::= { lps6012 3 }
+lps6012EFSM             OBJECT IDENTIFIER ::= { lps6012 4 }
+lps6012TRSM             OBJECT IDENTIFIER ::= { lps6012 5 }
+lps6012TMM              OBJECT IDENTIFIER ::= { lps6012 6 }
+lps6012FSM              OBJECT IDENTIFIER ::= { lps6012 7 }
+
+lps6004System           OBJECT IDENTIFIER ::= { lps6004 1 }
+lps6004Chassis          OBJECT IDENTIFIER ::= { lps6004 2 }
+lps6004ESM              OBJECT IDENTIFIER ::= { lps6004 3 }
+lps6004EFSM             OBJECT IDENTIFIER ::= { lps6004 4 }
+lps6004TRSM             OBJECT IDENTIFIER ::= { lps6004 5 }
+lps6004TMM              OBJECT IDENTIFIER ::= { lps6004 6 }
+lps6004FSM              OBJECT IDENTIFIER ::= { lps6004 7 }
+
+--
+-- the following identifiers are assigned to the LANplex agent versions
+--
+
+lanplex-2500-2          OBJECT IDENTIFIER ::= { lps2500 2 }
+lanplex-2500-3          OBJECT IDENTIFIER ::= { lps2500 3 }
+lanplex-2500-4          OBJECT IDENTIFIER ::= { lps2500 4 }
+lanplex-2500-5          OBJECT IDENTIFIER ::= { lps2500 5 }
+lanplex-2500-6          OBJECT IDENTIFIER ::= { lps2500 6 }
+
+linkSwitch-2200-2       OBJECT IDENTIFIER ::= { lss2200 2 }
+linkSwitch-2200-3       OBJECT IDENTIFIER ::= { lss2200 3 }
+linkSwitch-2200-4       OBJECT IDENTIFIER ::= { lss2200 4 }
+linkSwitch-2200-5       OBJECT IDENTIFIER ::= { lss2200 5 }
+linkSwitch-2200-6       OBJECT IDENTIFIER ::= { lss2200 6 }
+
+lanplex-2016-2          OBJECT IDENTIFIER ::= { lps2016 2 }
+lanplex-2016-3          OBJECT IDENTIFIER ::= { lps2016 3 }
+lanplex-2016-4          OBJECT IDENTIFIER ::= { lps2016 4 }
+lanplex-2016-5          OBJECT IDENTIFIER ::= { lps2016 5 }
+lanplex-2016-6          OBJECT IDENTIFIER ::= { lps2016 6 }
+
+linkSwitch-2200-SS2-7       OBJECT IDENTIFIER ::= { lss2200SS2 7 }
+
+lanplex-6012-System-2   OBJECT IDENTIFIER ::= { lps6012System 2 }
+lanplex-6012-System-3   OBJECT IDENTIFIER ::= { lps6012System 3 }
+lanplex-6012-System-4   OBJECT IDENTIFIER ::= { lps6012System 4 }
+lanplex-6012-System-5   OBJECT IDENTIFIER ::= { lps6012System 5 }
+lanplex-6012-System-6   OBJECT IDENTIFIER ::= { lps6012System 6 }
+
+lanplex-6012-Chassis-2  OBJECT IDENTIFIER ::= { lps6012Chassis 2 }
+lanplex-6012-Chassis-3  OBJECT IDENTIFIER ::= { lps6012Chassis 3 }
+lanplex-6012-Chassis-4  OBJECT IDENTIFIER ::= { lps6012Chassis 4 }
+lanplex-6012-Chassis-5  OBJECT IDENTIFIER ::= { lps6012Chassis 5 }
+lanplex-6012-Chassis-6  OBJECT IDENTIFIER ::= { lps6012Chassis 6 }
+
+lanplex-6012-ESM-2      OBJECT IDENTIFIER ::= { lps6012ESM 2 }
+lanplex-6012-ESM-3      OBJECT IDENTIFIER ::= { lps6012ESM 3 }
+lanplex-6012-ESM-4      OBJECT IDENTIFIER ::= { lps6012ESM 4 }
+lanplex-6012-ESM-5      OBJECT IDENTIFIER ::= { lps6012ESM 5 }
+lanplex-6012-ESM-6      OBJECT IDENTIFIER ::= { lps6012ESM 6 }
+
+lanplex-6012-EFSM-2     OBJECT IDENTIFIER ::= { lps6012EFSM 2 }
+lanplex-6012-EFSM-3     OBJECT IDENTIFIER ::= { lps6012EFSM 3 }
+lanplex-6012-EFSM-4     OBJECT IDENTIFIER ::= { lps6012EFSM 4 }
+lanplex-6012-EFSM-5     OBJECT IDENTIFIER ::= { lps6012EFSM 5 }
+lanplex-6012-EFSM-6     OBJECT IDENTIFIER ::= { lps6012EFSM 6 }
+
+lanplex-6012-TRSM-5     OBJECT IDENTIFIER ::= { lps6012TRSM 5 }
+lanplex-6012-TRSM-6     OBJECT IDENTIFIER ::= { lps6012TRSM 6 }
+
+lanplex-6012-TMM-6      OBJECT IDENTIFIER ::= { lps6012TMM 6 }
+
+lanplex-6012-FSM-7      OBJECT IDENTIFIER ::= { lps6012FSM 7 }
+
+lanplex-6004-System-2   OBJECT IDENTIFIER ::= { lps6004System 2 }
+lanplex-6004-System-3   OBJECT IDENTIFIER ::= { lps6004System 3 }
+lanplex-6004-System-4   OBJECT IDENTIFIER ::= { lps6004System 4 }
+lanplex-6004-System-5   OBJECT IDENTIFIER ::= { lps6004System 5 }
+lanplex-6004-System-6   OBJECT IDENTIFIER ::= { lps6004System 6 }
+
+lanplex-6004-Chassis-2  OBJECT IDENTIFIER ::= { lps6004Chassis 2 }
+lanplex-6004-Chassis-3  OBJECT IDENTIFIER ::= { lps6004Chassis 3 }
+lanplex-6004-Chassis-4  OBJECT IDENTIFIER ::= { lps6004Chassis 4 }
+lanplex-6004-Chassis-5  OBJECT IDENTIFIER ::= { lps6004Chassis 5 }
+lanplex-6004-Chassis-6  OBJECT IDENTIFIER ::= { lps6004Chassis 6 }
+
+lanplex-6004-ESM-2      OBJECT IDENTIFIER ::= { lps6004ESM 2 }
+lanplex-6004-ESM-3      OBJECT IDENTIFIER ::= { lps6004ESM 3 }
+lanplex-6004-ESM-4      OBJECT IDENTIFIER ::= { lps6004ESM 4 }
+lanplex-6004-ESM-5      OBJECT IDENTIFIER ::= { lps6004ESM 5 }
+lanplex-6004-ESM-6      OBJECT IDENTIFIER ::= { lps6004ESM 6 }
+
+lanplex-6004-EFSM-2     OBJECT IDENTIFIER ::= { lps6004EFSM 2 }
+lanplex-6004-EFSM-3     OBJECT IDENTIFIER ::= { lps6004EFSM 3 }
+lanplex-6004-EFSM-4     OBJECT IDENTIFIER ::= { lps6004EFSM 4 }
+lanplex-6004-EFSM-5     OBJECT IDENTIFIER ::= { lps6004EFSM 5 }
+lanplex-6004-EFSM-6     OBJECT IDENTIFIER ::= { lps6004EFSM 6 }
+
+lanplex-6004-TRSM-5     OBJECT IDENTIFIER ::= { lps6004TRSM 5 }
+lanplex-6004-TRSM-6     OBJECT IDENTIFIER ::= { lps6004TRSM 6 }
+
+lanplex-6004-TMM-6     OBJECT IDENTIFIER ::= { lps6004TMM 6 }
+
+lanplex-6004-FSM-7     OBJECT IDENTIFIER ::= { lps6004FSM 7 }
+
+--
+-- the following identifier are assigned to the LANplex MIB modules
+--
+
+lanplexSystemsMib       OBJECT IDENTIFIER ::= { lanplex 4 }
+lanplexOptFddi          OBJECT IDENTIFIER ::= { lanplex 10 }
+
+--
+-- the following identifiers are assigned to Centrum products
+--     (SysOID 1.3.6.1.4.1.327)
+--
+
+centrum        OBJECT IDENTIFIER ::= { enterprises 327 }
+mibDoc         OBJECT IDENTIFIER ::= { centrum 1 }
+centrumRemote  OBJECT IDENTIFIER ::= { mibDoc 1 }
+
+--
+-- The following identifiers are assigned to Cable Modem Products
+--
+
+mcnsCmHeadend   OBJECT IDENTIFIER ::= { cableModems 1 }
+mcnsExt2WayCm   OBJECT IDENTIFIER ::= { cableModems 2 }
+mcnsExtTelcoCm  OBJECT IDENTIFIER ::= { cableModems 3 }
+
+--  switches
+
+corebuilderProductsIII     OBJECT IDENTIFIER ::= { switches 1 }
+superstackProducts         OBJECT IDENTIFIER ::= { switches 2 }
+minicoreProducts           OBJECT IDENTIFIER ::= { switches 3 }
+jvProducts               OBJECT IDENTIFIER ::= { switches 4 }
+
+--  CoreBuilder Products
+--
+corebuilderModularProducts OBJECT IDENTIFIER ::= { corebuilderProductsIII 1 }
+corebuilderSystemProducts  OBJECT IDENTIFIER ::= { corebuilderProductsIII 2 }
+corebuilderChassisProducts OBJECT IDENTIFIER ::= { corebuilderProductsIII 3 }
+
+--  CoreBuilder Families
+--
+cbModular3500Family        OBJECT IDENTIFIER ::= { corebuilderModularProducts 1 }
+cbSystem9400Family         OBJECT IDENTIFIER ::= { corebuilderSystemProducts 1 }
+
+--  CoreBuilder Product Types
+--
+cb3500                     OBJECT IDENTIFIER ::= { cbModular3500Family 1 }
+cb9400                     OBJECT IDENTIFIER ::= { cbSystem9400Family 1 }
+
+--  SuperStack Products
+--
+superstackModularProducts  OBJECT IDENTIFIER ::= { superstackProducts 1 }
+superstackSystemProducts   OBJECT IDENTIFIER ::= { superstackProducts 2 }
+superstackChassisProducts  OBJECT IDENTIFIER ::= { superstackProducts 3 }
+
+--  SuperStack Families
+--
+ssSystem3900Family         OBJECT IDENTIFIER ::= { superstackSystemProducts 1 }
+ssSystem9300Family         OBJECT IDENTIFIER ::= { superstackSystemProducts 2 }
+ssServerLoadBalancers      OBJECT IDENTIFIER ::= { superstackSystemProducts 3 }
+
+baseLoadBalancer           OBJECT IDENTIFIER ::= { ssServerLoadBalancers 1 }
+plusLoadBalancer           OBJECT IDENTIFIER ::= { ssServerLoadBalancers 2 }
+
+
+--  SuperStack Product Types
+--
+ss3900-24                  OBJECT IDENTIFIER ::= { ssSystem3900Family 1 }
+ss3900-36                  OBJECT IDENTIFIER ::= { ssSystem3900Family 2 }
+ss9300                     OBJECT IDENTIFIER ::= { ssSystem9300Family 1 }
+
+
+--  Minicore Product Types
+
+miniChassisSwitch4005      OBJECT IDENTIFIER ::= { minicoreProducts 1 }
+
+--  jv Product Types
+
+coreChassisSwitch7700      OBJECT IDENTIFIER ::= { jvProducts 1 }
+
+--  jv Routers
+
+jvRouters                  OBJECT IDENTIFIER ::= { jvProducts 2 }
+
+jvWanRouter5009            OBJECT IDENTIFIER ::= {  jvRouters 1}
+jvWanRouter5231            OBJECT IDENTIFIER ::= {  jvRouters 2}
+jvWanRouter5640            OBJECT IDENTIFIER ::= {  jvRouters 3}
+jvWanRouter5680            OBJECT IDENTIFIER ::= {  jvRouters 4}
+jvWanRouter3012            OBJECT IDENTIFIER ::= {  jvRouters 5}
+jvWanRouter3013            OBJECT IDENTIFIER ::= {  jvRouters 6}
+jvWanRouter3014            OBJECT IDENTIFIER ::= {  jvRouters 7}
+jvWanRouter3015            OBJECT IDENTIFIER ::= {  jvRouters 8}
+jvWanRouter3016            OBJECT IDENTIFIER ::= {  jvRouters 9}
+jvWanRouter3018            OBJECT IDENTIFIER ::= {  jvRouters 10}
+jvWanRouter6040            OBJECT IDENTIFIER ::= {  jvRouters 11}
+jvWanRouter6080            OBJECT IDENTIFIER ::= {  jvRouters 12}
+jvWanRouter3030            OBJECT IDENTIFIER ::= {  jvRouters 13}
+jvWanRouter3031            OBJECT IDENTIFIER ::= {  jvRouters 14}
+jvWanRouter3032            OBJECT IDENTIFIER ::= {  jvRouters 15}
+jvWanRouter3033            OBJECT IDENTIFIER ::= {  jvRouters 16}
+jvWanRouter3034            OBJECT IDENTIFIER ::= {  jvRouters 17}
+jvRouter3035               OBJECT IDENTIFIER ::= {  jvRouters 18 }
+jvRouterxxxx               OBJECT IDENTIFIER ::= {  jvRouters 19 }
+jvRouteryyyy               OBJECT IDENTIFIER ::= {  jvRouters 20 }
+jvRouter5012               OBJECT IDENTIFIER ::= {  jvRouters 21 }
+jvRouter5232               OBJECT IDENTIFIER ::= {  jvRouters 22 }
+jvRouter5642               OBJECT IDENTIFIER ::= {  jvRouters 23 }
+jvRouter5682               OBJECT IDENTIFIER ::= {  jvRouters 24 }
+
+jvSwitches                 OBJECT IDENTIFIER ::= { jvProducts 3 }
+jvSwitch7700-8             OBJECT IDENTIFIER ::= { jvSwitches 1 }
+jvSwitch7700-4             OBJECT IDENTIFIER ::= { jvSwitches 2 }
+jvSwitch5500-MC6-EI        OBJECT IDENTIFIER ::= { jvSwitches 3 }
+jvSwitch8807  		   OBJECT IDENTIFIER ::= { jvSwitches 4 }
+jvSwitch8810 		   OBJECT IDENTIFIER ::= { jvSwitches 5 }
+jvSwitch8814 		   OBJECT IDENTIFIER ::= { jvSwitches 6 }
+
+jvSwitch5500G-ei-24           OBJECT IDENTIFIER ::= { jvSwitches 7 }
+jvSwitch5500G-ei-48           OBJECT IDENTIFIER ::= { jvSwitches 8 }
+
+jvSwitch5500-si-24          OBJECT IDENTIFIER ::= { jvSwitches 9 }
+jvSwitch5500-si-28t         OBJECT IDENTIFIER ::= { jvSwitches 10 }
+jvSwitch5500-si-28          OBJECT IDENTIFIER ::= { jvSwitches 11 }
+jvSwitch5500-si-52          OBJECT IDENTIFIER ::= { jvSwitches 12 }
+jvSwitch5500-ei-28          OBJECT IDENTIFIER ::= { jvSwitches 13 }
+jvSwitch5500-ei-52          OBJECT IDENTIFIER ::= { jvSwitches 14 }
+jvSwitch5500-eipwr-28       OBJECT IDENTIFIER ::= { jvSwitches 15 }
+jvSwitch5500-eipwr-52       OBJECT IDENTIFIER ::= { jvSwitches 16 }
+jvSwitch5500-ei-28fx        OBJECT IDENTIFIER ::= { jvSwitches 17 }
+
+
+--
+-- The following identifiers are assigned to voice products
+--
+
+phones                  OBJECT IDENTIFIER ::= { voice 1 }
+gateways                OBJECT IDENTIFIER ::= { voice 2 }
+callProcessors          OBJECT IDENTIFIER ::= { voice 3 }
+
+--
+-- The following identifiers are assigned to phones
+--
+
+basicPhone               OBJECT IDENTIFIER ::= { phones 1 }
+businessPhone            OBJECT IDENTIFIER ::= { phones 2 }
+executivePhone           OBJECT IDENTIFIER ::= { phones 3 }
+wirelessPhone            OBJECT IDENTIFIER ::= { phones 4 }
+
+
+-- business phones
+
+bp3104ProfessionalPhone            OBJECT IDENTIFIER ::= { businessPhone 1 }
+--
+-- The following identifiers are assigned to voice call processors
+--
+
+nbx100                        OBJECT IDENTIFIER ::= { callProcessors 1 }
+nbx25                         OBJECT IDENTIFIER ::= { callProcessors 2 }
+superStackNbxCallProcessor    OBJECT IDENTIFIER ::= { callProcessors 3 }
+officeConnectNbxCallProcessor OBJECT IDENTIFIER ::= { callProcessors 4 }
+nbxv3000                      OBJECT IDENTIFIER ::= { callProcessors 5 }
+
+nbx250              OBJECT IDENTIFIER ::= {superStackNbxCallProcessor 1}
+nbx500              OBJECT IDENTIFIER ::= {superStackNbxCallProcessor 2}
+nbx750              OBJECT IDENTIFIER ::= {superStackNbxCallProcessor 3}
+
+
+--
+-- The following identifiers are assigned to Intranet Appliances
+--
+
+fireWalls       OBJECT IDENTIFIER ::= { intranetAppliances 1 }
+--
+-- The following identifier is assigned to web caches.  Now obsoleted.
+-- Do not reassign OIDs
+
+-- webCaches       OBJECT IDENTIFIER ::= { intranetAppliances 2 }
+servers            OBJECT IDENTIFIER ::= { intranetAppliances 3 }
+accelerators       OBJECT IDENTIFIER ::= { intranetAppliances 4 }
+
+--
+-- The following identifiers are assigned to firewalls
+--
+
+superStackFireWall OBJECT IDENTIFIER ::= { fireWalls 1 }
+secureIX3100-10    OBJECT IDENTIFIER ::= { fireWalls 2 }
+secureIX3100-50    OBJECT IDENTIFIER ::= { fireWalls 3 }
+secureIX3100       OBJECT IDENTIFIER ::= { fireWalls 4 }
+secureIX4100       OBJECT IDENTIFIER ::= { fireWalls 5 }
+secureIX5100       OBJECT IDENTIFIER ::= { fireWalls 6 }
+
+
+
+--
+-- The following identifiers are assigned to servers
+--
+
+officeConnectStorageServer   OBJECT IDENTIFIER ::= { servers 1 }
+officeConnectInternetServer  OBJECT IDENTIFIER ::= { servers 2 }
+officeConnectEmailServer     OBJECT IDENTIFIER ::= { servers 3 }
+storageServer150             OBJECT IDENTIFIER ::= { servers 4 }
+
+--
+-- The following identifiers are assigned to accelerators
+--
+
+sslAccelerator     OBJECT IDENTIFIER ::= { accelerators 1 }
+
+--
+-- The following identifiers are assigned to xDSL office connect products
+--
+
+sDSLGateway     OBJECT IDENTIFIER ::= { xDSL 1 }
+vDSL            OBJECT IDENTIFIER ::= { xDSL 2 }
+
+
+aDSLRouterVoDSLPorts     OBJECT IDENTIFIER ::= { xDSL 3 }
+aDSLRouterNoVoDSLPorts   OBJECT IDENTIFIER ::= { xDSL 4 }
+gSHDSLRouterVoDSLPorts   OBJECT IDENTIFIER ::= { xDSL 5 }
+gSHDSLRouterNoVoDSLPorts OBJECT IDENTIFIER ::= { xDSL 6 }
+
+cableDSLGateway                   OBJECT IDENTIFIER ::= { xDSL 7 }
+cableDSLSecureGateway             OBJECT IDENTIFIER ::= { xDSL 8 }
+cableWirelessDSLGateway           OBJECT IDENTIFIER ::= { xDSL 9 }
+cableWireless54Mbps11gDSLGateway  OBJECT IDENTIFIER ::= { xDSL 10 }
+xdslvpnFirewall                   OBJECT IDENTIFIER ::= { xDSL 11 }
+xdslsecureRouter                  OBJECT IDENTIFIER ::= { xDSL 12 }
+wireless11gAdslRouter             OBJECT IDENTIFIER ::= { xDSL 13 }
+
+
+
+vCNMultiAccessConcentrator   OBJECT IDENTIFIER ::= { vDSL 1 }
+
+
+--
+-- The following identifiers are assigned to wireless products
+--
+
+wLanAP8000                      OBJECT IDENTIFIER ::= { wirelessDevices 1 }
+wLanAP6000                      OBJECT IDENTIFIER ::= { wirelessDevices 2 }
+wLanAP2000                      OBJECT IDENTIFIER ::= { wirelessDevices 3 }
+wLanWrkgrpBridge                OBJECT IDENTIFIER ::= { wirelessDevices 4 }
+wLantoLanBridge                 OBJECT IDENTIFIER ::= { wirelessDevices 5 }
+wLanAP8500                      OBJECT IDENTIFIER ::= { wirelessDevices 6 }
+wLanAPOfficeConnect11Mbps       OBJECT IDENTIFIER ::= { wirelessDevices 7 }
+wLanAP8200                      OBJECT IDENTIFIER ::= { wirelessDevices 8 }
+wLanAPOfficeConnect54Mbps11g    OBJECT IDENTIFIER ::= { wirelessDevices 9 }
+wlanAP8700                      OBJECT IDENTIFIER ::= { wirelessDevices 10 }
+wlanAP8250                      OBJECT IDENTIFIER ::= { wirelessDevices 11 }
+wlanAP8750                      OBJECT IDENTIFIER ::= { wirelessDevices 12 }
+wlanAP7250                      OBJECT IDENTIFIER ::= { wirelessDevices 13 }
+wlanWXR104                      OBJECT IDENTIFIER ::= { wirelessDevices 14 }
+wlanWX1206                      OBJECT IDENTIFIER ::= { wirelessDevices 15 }
+wlanWX4400                      OBJECT IDENTIFIER ::= { wirelessDevices 16 }
+wlan80211agWBridge              OBJECT IDENTIFIER ::= { wirelessDevices 17 }
+wlan11gOutdoorBtoBBridge        OBJECT IDENTIFIER ::= { wirelessDevices 18 }
+wlan11gIndoorBtoBBridge         OBJECT IDENTIFIER ::= { wirelessDevices 19 }
+wlanAP11gPoE                    OBJECT IDENTIFIER ::= { wirelessDevices 20 }
+
+--
+-- The following identifiers are assigned to Network Jack products
+--
+
+nj200       OBJECT IDENTIFIER ::= { networkJacks 1 }
+nj205       OBJECT IDENTIFIER ::= { networkJacks 2 }
+nj220       OBJECT IDENTIFIER ::= { networkJacks 3 }
+nj225       OBJECT IDENTIFIER ::= { networkJacks 4 }
+nj225FXSC   OBJECT IDENTIFIER ::= { networkJacks 5 }
+nj225FXST   OBJECT IDENTIFIER ::= { networkJacks 6 }
+
+
+-- security switches
+
+securitySwitch6200    OBJECT IDENTIFIER ::= { securitySwitches 1 }
+
+
+--
+-- for the older ISOLAN equipment
+--
+
+bicc            OBJECT IDENTIFIER ::= { enterprises 170 }
+bdn             OBJECT IDENTIFIER ::= { bicc 1 }
+bdnDevices      OBJECT IDENTIFIER ::= { bdn 1 }
+
+--
+-- Power Supplies
+--
+
+rpsIIMgmtModule OBJECT IDENTIFIER ::= { powerSupplies 1 }
+
+--
+-- Transcend Enterprise Manager
+--
+
+watchModule     OBJECT IDENTIFIER ::= { transcendEnterpriseMgr 1 }
+
+--
+-- US Robotics Products
+--
+usRobotics         OBJECT IDENTIFIER ::= { enterprises 429 }
+usrSysOIDs         OBJECT IDENTIFIER ::= { usRobotics 2 }
+
+netServerII8       OBJECT IDENTIFIER ::= { usrSysOIDs 10 }
+netServerII16      OBJECT IDENTIFIER ::= { usrSysOIDs 11 }
+lanLinkerBRI       OBJECT IDENTIFIER ::= { usrSysOIDs 12 }
+lanLinkerD56k      OBJECT IDENTIFIER ::= { usrSysOIDs 13 }
+netServerII8imdm   OBJECT IDENTIFIER ::= { usrSysOIDs 14 }
+netServerII16imdm  OBJECT IDENTIFIER ::= { usrSysOIDs 15 }
+pilgrimCore        OBJECT IDENTIFIER ::= { usrSysOIDs 16 }
+viper              OBJECT IDENTIFIER ::= { usrSysOIDs 17 }
+alc                OBJECT IDENTIFIER ::= { usrSysOIDs 18 }
+duala              OBJECT IDENTIFIER ::= { usrSysOIDs 21 }
+
+-- LDAP Objects
+--
+ldapGeneric        OBJECT IDENTIFIER ::= { ldap3Com 1 }
+ldapCommWorks      OBJECT IDENTIFIER ::= { ldap3Com 2 }
+a3ComLdapVcx       OBJECT IDENTIFIER ::= { ldap3Com 3 }
+
+
+
+END
+
+

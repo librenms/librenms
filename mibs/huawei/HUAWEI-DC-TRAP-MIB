@@ -1,0 +1,1044 @@
+-- =================================================================
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS
+-- 
+-- Reference:
+-- Version:     V2.01
+-- History:
+-- 
+-- =================================================================
+
+    HUAWEI-DC-TRAP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            entPhysicalName            
+                FROM ENTITY-MIB            
+            hwDatacomm            
+                FROM HUAWEI-MIB
+            ifIndex, ifDescr          
+                FROM RFC1213-MIB
+            DisplayString
+                FROM SNMPv2-TC     
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+                FROM SNMPv2-SMI;
+    
+    
+        hwDCTrapMIB MODULE-IDENTITY 
+            LAST-UPDATED "201507220000Z"        -- April 24, 2006 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION "The HUAWEI-DC-TRAP-MIB provides information about DataComm TRAPS."
+            
+            REVISION    "201507220000Z"
+			      DESCRIPTION "modify name hwFanFail->hwDCFanFail;hwFanFailResume->hwDCFanFailResume"	
+			      
+            ::= { hwDatacomm 37 }
+        
+    
+    
+    
+    
+        hwDCTrapControl OBJECT IDENTIFIER ::= { hwDCTrapMIB 1 }
+        
+        hwDCCtrlTrap OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (32))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "A string serving as a bit  map  for the trap
+                events defined by the hwDatacomm traps. This
+                object is used to enable and  disable  specific
+                hwDatacomm traps where  a  1  in  the  bit  field
+                represents enabled.  The right-most bit  (least
+                significant) represents trap 0."
+            ::= { hwDCTrapControl 1 }
+        
+        hwTunnelGroupID OBJECT-TYPE
+            SYNTAX Integer32 (0..2047)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Tunnel id"
+            ::= { hwDCTrapControl 2 }
+        
+        hwDCTrapReason OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                " For the BTB system to report Trap Reason."
+            ::= { hwDCTrapControl 3 }
+        
+        hwDCTraps OBJECT IDENTIFIER ::= { hwDCTrapMIB 2 }
+        
+--    Traps
+        hwMPUSynClkFaulty NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "MPU sync clock signal faulty!"
+            ::= { hwDCTraps 1 }
+        
+        hwMPUSynClkFaultyResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "MPU sync clock signal faulty resume!"
+            ::= { hwDCTraps 2 }
+        
+        hwSlaveMPUNoResp NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Slave MPU has no response!"
+            ::= { hwDCTraps 3 }
+        
+        hwSlaveMPUNoRespResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Slave MPU has no response resume!"
+            ::= { hwDCTraps 4 }
+        
+        hwBrdChannelFaulty NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board channel faulty!"
+            ::= { hwDCTraps 5 }
+        
+        hwBrdChannelFaultyResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board channel faulty resume!"
+            ::= { hwDCTraps 6 }
+        
+        hwBrdNofullin NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board not full in!"
+            ::= { hwDCTraps 7 }
+        
+        hwBrdNofullinResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board not full in resume!"
+            ::= { hwDCTraps 8 }
+        
+        hwBrdTypeNoMatchReset NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board is reset because of the chip type is not matching!"
+            ::= { hwDCTraps 9 }
+        
+        hwBrdAutoSwtFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board automatically switch syn-clock but it locked failed!"
+            ::= { hwDCTraps 10 }
+        
+        hwBrdAutoSwt NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board automatically switch syn-clock!"
+            ::= { hwDCTraps 11 }
+        
+        hwBrdClkLockERR NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board fabric clock is unlocked!"
+            ::= { hwDCTraps 12 }
+        
+        hwBrdClkLockERRResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board fabric clock unlock to current clock resume!"
+            ::= { hwDCTraps 13 }
+        
+        hwBrdRemoved NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board pulled out!"
+            ::= { hwDCTraps 14 }
+        
+        hwBrdInserted NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board plugged in!"
+            ::= { hwDCTraps 15 }
+        
+        hwBrdUp NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board register!"
+            ::= { hwDCTraps 16 }
+        
+        hwClkSrcMiss NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "CLK source Loss Of Signal!"
+            ::= { hwDCTraps 17 }
+        
+        hwClkAllSrcLost NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "CLK all source lost!"
+            ::= { hwDCTraps 18 }
+        
+        hwClkAllSrcLostResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "CLK all source lost resume!"
+            ::= { hwDCTraps 19 }
+        
+        hwClkFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "CLK hardware failed!"
+            ::= { hwDCTraps 20 }
+        
+        hwClkFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "CLK hardware failed resume!"
+            ::= { hwDCTraps 21 }
+        
+        hwClkNoHeartbeat NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "CLK No Heartbeat!"
+            ::= { hwDCTraps 22 }
+        
+        hwClkNoHeartbeatResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "CLK No Heartbeat resume!"
+            ::= { hwDCTraps 23 }
+        
+        hwLPULostSynAlarm NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LPU SERDES interface is lost synchronization!"
+            ::= { hwDCTraps 24 }
+        
+        hwLPUOpenChannelError NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LPU SERDES interface open error!"
+            ::= { hwDCTraps 25 }
+        
+        hwLPUSlfTstErr NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LPU self test error!"
+            ::= { hwDCTraps 26 }
+        
+        hwLPU3ClkSwitch NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LPU 3 class clock is switch!"
+            ::= { hwDCTraps 27 }
+        
+        hwSFULostHrtReset NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "SFU is reset because of heart beat loss!"
+            ::= { hwDCTraps 28 }
+        
+        hwSFULinkLostReset NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "SFU is reset because of SERDES interface input channel link lost numbers over threshold!"
+            ::= { hwDCTraps 29 }
+        
+        hwSFUChannelLinkLost NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "SFU check SERDES interface input channel link lost!"
+            ::= { hwDCTraps 30 }
+        
+        hwSFUInChannelOpenFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "SFU SERDES interface input channel is opened failed!"
+            ::= { hwDCTraps 31 }
+        
+        hwVoltSensorFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage monitor failure!"
+            ::= { hwDCTraps 32 }
+        
+        hwVoltSensorFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage monitor failure resume!"
+            ::= { hwDCTraps 33 }
+        
+        hwVoltBtmC NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage below fatal threshold!"
+            ::= { hwDCTraps 34 }
+        
+        hwVoltBtmCResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage below fatal threshold resume!"
+            ::= { hwDCTraps 35 }
+        
+        hwVoltSprC NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage over fatal threshold!"
+            ::= { hwDCTraps 36 }
+        
+        hwVoltSprCResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage over fatal threshold resume!"
+            ::= { hwDCTraps 37 }
+        
+        hwVoltBtmM NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage below major threshold!"
+            ::= { hwDCTraps 38 }
+        
+        hwVoltBtmMResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage below major threshold resume!"
+            ::= { hwDCTraps 39 }
+        
+        hwVoltSprM NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage over major threshold!"
+            ::= { hwDCTraps 40 }
+        
+        hwVoltSprMResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board voltage over major threshold resume!"
+            ::= { hwDCTraps 41 }
+        
+        hwTempSensorFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temprature monitor failure!"
+            ::= { hwDCTraps 42 }
+        
+        hwTempSensorFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temperature monitor failure resume!"
+            ::= { hwDCTraps 43 }
+        
+        hwTempMnr NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temperature over minor threshold!"
+            ::= { hwDCTraps 44 }
+        
+        hwTempMnrResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temperature over minor threshold resume!"
+            ::= { hwDCTraps 45 }
+        
+        hwTempMjr NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temperature over major threshold!"
+            ::= { hwDCTraps 46 }
+        
+        hwTempMjrResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temperature over major threshold resume!"
+            ::= { hwDCTraps 47 }
+        
+        hwTempCtl NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temperature over fatal threshold!"
+            ::= { hwDCTraps 48 }
+        
+        hwTempCtlResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temperature over fatal threshold resume!"
+            ::= { hwDCTraps 49 }
+        
+        hwFanHFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan hardware failure!"
+            ::= { hwDCTraps 50 }
+        
+        hwDCFanFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan failure!"
+            ::= { hwDCTraps 51 }
+        
+        hwDCFanFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan failure resume!"
+            ::= { hwDCTraps 52 }
+        
+        hwFanAbsent NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan absent!"
+            ::= { hwDCTraps 53 }
+        
+        hwFanAbsentResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan absent resume!"
+            ::= { hwDCTraps 54 }
+        
+        hwFanCabUN NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan cable unplugged!"
+            ::= { hwDCTraps 55 }
+        
+        hwFanCabUNResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan cable unplugged resume!"
+            ::= { hwDCTraps 56 }
+        
+        hwPwrFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Power failure!"
+            ::= { hwDCTraps 57 }
+        
+        hwPwrFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Power failure resume!"
+            ::= { hwDCTraps 58 }
+        
+        hwPwrAbsent NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Power absent!"
+            ::= { hwDCTraps 59 }
+        
+        hwPwrAbsentResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Power absent resume!"
+            ::= { hwDCTraps 60 }
+        
+        hwPwrCabUN NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Power monitor cable unplugged!"
+            ::= { hwDCTraps 61 }
+        
+        hwPwrCabUNResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Power monitor cable unplugged resume!"
+            ::= { hwDCTraps 62 }
+        
+        hwLCDHFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LCD hardware failure!"
+            ::= { hwDCTraps 63 }
+        
+        hwLCDFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LCD failure!"
+            ::= { hwDCTraps 64 }
+        
+        hwLCDAbsent NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LCD absent!"
+            ::= { hwDCTraps 65 }
+        
+        hwLCDAbsentResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LCD absent resume!"
+            ::= { hwDCTraps 66 }
+        
+        hwLCDCabUN NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LCD cable unplugged!"
+            ::= { hwDCTraps 67 }
+        
+        hwLCDCabUNResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "LCD cable unplugged resume!"
+            ::= { hwDCTraps 68 }
+        
+        hwROMFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "EEPROM failure!"
+            ::= { hwDCTraps 69 }
+        
+        hwMonitorBUSFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "MonitorBUS failure!"
+            ::= { hwDCTraps 70 }
+        
+        hwMonitorBUSFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "MonitorBUS failure resume!"
+            ::= { hwDCTraps 71 }
+        
+        hwBoardOfflineChange NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board power status change!"
+            ::= { hwDCTraps 72 }
+        
+        hwWriteFlashError NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "write flash error!"
+            ::= { hwDCTraps 100 }
+        
+        hwBoardReset NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "board reset!"
+            ::= { hwDCTraps 101 }
+        
+        hwBoardResetSuccess NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "board reset success!"
+            ::= { hwDCTraps 102 }
+        
+        hwSlaveMPUReset NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "slave MPU reset !"
+            ::= { hwDCTraps 103 }
+        
+        hwMasterSlaveSwap NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "master slave swap!"
+            ::= { hwDCTraps 104 }
+        
+        hwRTCFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "RTC failure!"
+            ::= { hwDCTraps 105 }
+        
+        hwExchangeChipFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "5695 exchange chip fail!"
+            ::= { hwDCTraps 106 }
+        
+        hwTempResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board temprature over threshold resume!"
+            ::= { hwDCTraps 107 }
+        
+        hwOpticalModuleInsert NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "optical module plug in !"
+            ::= { hwDCTraps 108 }
+        
+        hwOpticalModuleRemove NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "optical module plug out !"
+            ::= { hwDCTraps 109 }
+        
+        hwFPGAAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "FPGA abnormal !"
+            ::= { hwDCTraps 110 }
+        
+        hwMinMTunnelDownAlarm NOTIFICATION-TYPE
+            OBJECTS { hwTunnelGroupID }
+            STATUS current
+            DESCRIPTION 
+                "
+                For Mac in Mac tunnel. Mac tunnel have two status: up or down, when physical interface is down or some cc package 
+                can't arrive to the other side of mac in mac tunnel, the status of tunnel will be down
+                1 Notice/Trap name: Tunnel down
+                2 Notice/Trap generation cause: when All mac tunnel have been down in the mac tunnel group
+                3 Repair suggestions:
+                    make one of the mac tunnel up in the mac tunnel group
+                "
+            ::= { hwDCTraps 111 }
+        
+        hwMinMTunnelUpAlarm NOTIFICATION-TYPE
+            OBJECTS { hwTunnelGroupID }
+            STATUS current
+            DESCRIPTION 
+                "
+                For Mac in Mac tunnel. Mac tunnel have two status: up or down, if cc package can arrive to the other side of mac
+                in mac tunnel, the status of tunnel will be up
+                1 Notice/Trap name: Tunnel up
+                2 Notice/Trap generation cause: one of the tunnel is up in the mac tunnel group
+                3 Repair suggestion:
+                "
+            ::= { hwDCTraps 112 }
+        
+        hwInterfacePhysicalDown NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifDescr }
+            STATUS current
+            DESCRIPTION 
+                "This trap is to indicate port link down on physical layer."
+            ::= { hwDCTraps 113 }
+        
+        hwInterfacePhysicalUp NOTIFICATION-TYPE
+            OBJECTS { ifIndex, ifDescr }
+            STATUS current
+            DESCRIPTION 
+                "This trap is to indicate port link up on physical layer."
+            ::= { hwDCTraps 114 }
+        
+        hwBTBStartupFileNameDifferent NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "In the BTB system ,the start-up file name of master and slave chassis is different .
+                Used for BTB or its extend system."
+            ::= { hwDCTraps 119 }
+        
+        hwBTBChassisRunningModeConflict NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The Master and Slave chassises running modes conflict.Used for BTB or its extend system."
+            ::= { hwDCTraps 120 }
+        
+        hwBTBCtrlChannelFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The FE control channel failture, as physical link from up to down or channel blocked.
+                Used for BTB or its extend system."
+            ::= { hwDCTraps 121 }
+        
+        hwBTBCtrlChannelFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The FE control channel failture resume.Used for BTB or its extend system."
+            ::= { hwDCTraps 122 }
+        
+        hwBTBDataChannelFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The data channel failture, all optical links down between chassises.Used for BTB or its extend system."
+            ::= { hwDCTraps 123 }
+        
+        hwBTBDataChannelFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The data channel failture resume.Used for BTB or its extend system."
+            ::= { hwDCTraps 124 }
+        
+        hwBTBClkChannelFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The clock channel failture, clock link down between chassises.Used for BTB or its extend system."
+            ::= { hwDCTraps 125 }
+        
+        hwBTBClkChannelFailResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The clock Channel failture resume.Used for BTB or its extend system."
+            ::= { hwDCTraps 126 }
+        
+        hwBTBSFUOpticInterfaceError NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The optical fiber connection error, the connection of SFU fiber between chassises is not correct.
+                Used for BTB or its extend system."
+            ::= { hwDCTraps 127 }
+        
+        hwBTBSFUOpticInterfaceErrorResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The optical fiber connection error resume.Used for BTB or its extend system."
+            ::= { hwDCTraps 128 }
+        
+        hwBTBVSRInterfaceInvalid NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The SFU VSR(very short reach) interface invalid.Used for BTB or its extend system."
+            ::= { hwDCTraps 129 }
+        
+        hwBTBVSRInterfaceInvalidResume NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The SFU VSR(very short reach) interface invalid resume.Used for BTB or its extend system."
+            ::= { hwDCTraps 130 }
+        
+        hwBTBSlaveChassisNoHeart NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The slave chassis no heart.Used for BTB or its extend system."
+            ::= { hwDCTraps 131 }
+        
+        hwBTBNoSlaveChassis NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "No slave chassis connected to the master chassis in the BTB system.Used for BTB or its extend system."
+            ::= { hwDCTraps 132 }
+        
+        hwBTBSlaveChassisRegisted NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The slave chassis registe successful.Used for BTB or its extend system."
+            ::= { hwDCTraps 133 }
+        
+        hwBTBSlaveChassisRegisteFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The slave chassis registe failed.Used for BTB or its extend system."
+            ::= { hwDCTraps 134 }
+        
+        hwBTBChassisTypeConflict NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "The chassis information conflict in the PAF and Nvram.Used for BTB or its extend system."
+            ::= { hwDCTraps 135 }
+        
+        hwSuperChangeSuccesful NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "Super change successful."
+            ::= { hwDCTraps 136 }
+        
+        hwSuperChangeFailure NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "Super change Failure."
+            ::= { hwDCTraps 137 }
+        
+        hwOpticaPowerAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Optical Transceiver power abnormal."
+            ::= { hwDCTraps 138 }
+        
+        hwEpldAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Epld logic abnormal."
+            ::= { hwDCTraps 139 }
+        
+        hwPhyChipAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "PHY chip is abnormal."
+            ::= { hwDCTraps 140 }
+        
+        hwSerdesAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Serdes interface of PHY chip abnormal."
+            ::= { hwDCTraps 141 }
+        
+        hwBoardAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Board is abnormal."
+            ::= { hwDCTraps 142 }
+        
+        hwFeChannelAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "FE data channel is abnormal"
+            ::= { hwDCTraps 143 }
+        
+        hwParityCheckAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Data parity check is abnormal"
+            ::= { hwDCTraps 144 }
+        
+        hwPhyClockAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The clock of PHY chip is abnormal."
+            ::= { hwDCTraps 145 }
+        
+        hwPortAutoNegotiateFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The ethernet port negotiate failed"
+            ::= { hwDCTraps 146 }
+        
+        hwPortSemiduplex NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The ethernet port work at semi duplex state."
+            ::= { hwDCTraps 147 }
+        
+        hwScuStartModeSetFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The start mode of SCU set failed"
+            ::= { hwDCTraps 148 }
+            
+        hwMemoryExhaust NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "MPU memory exhaust."
+            ::= { hwDCTraps 149 }
+        
+        hwMemoryExhaustClear NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "MPU memory usage resume to normal."
+            ::= { hwDCTraps 150 }
+            
+        hwMethAbnormal NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The Meth interface is abnormal."
+            ::= { hwDCTraps 151 }    
+            
+        hwLpuNotTight NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The LPU board is not tightly installed. Install the board again."
+            ::= { hwDCTraps 152 }    
+            
+        hwLicenseFail NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "License fail."
+            ::= { hwDCTraps 153 }
+            
+        hwHaBatchBegin NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "No command line can be entered because batch backup is processing."
+            ::= { hwDCTraps 154 }
+                
+        hwHaBatchEnd NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Command lines can be entered because batch backup ends."
+            ::= { hwDCTraps 155 }
+                
+        hwHaSmoothBegin NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "No command line can be entered because data smooth is processing."
+            ::= { hwDCTraps 156 }
+                
+        hwHaSmoothEnd NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Command lines can be entered because data smooth ends."
+            ::= { hwDCTraps 157 }
+            
+        hwFanUp NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Fan register!"
+            ::= { hwDCTraps 158 }
+    
+        hwDCTrapConformance OBJECT IDENTIFIER ::= { hwDCTrapMIB 3 }
+        
+--    conformance information
+        hwDCTrapGroups OBJECT IDENTIFIER ::= { hwDCTrapConformance 1 }
+        
+--    units of conformance
+        hwDCTrapControlGroup OBJECT-GROUP
+            OBJECTS { hwDCCtrlTrap, hwTunnelGroupID, hwDCTrapReason }
+            STATUS current
+            DESCRIPTION 
+                "These objects are required  to  control  traps
+                from hwDatacomm Traps systems."
+            ::= { hwDCTrapGroups 1 }
+        
+        hwDCNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMPUSynClkFaulty, hwMPUSynClkFaultyResume, hwSlaveMPUNoResp, hwSlaveMPUNoRespResume, hwBrdChannelFaulty, 
+                hwBrdChannelFaultyResume, hwBrdNofullin, hwBrdNofullinResume, hwBrdTypeNoMatchReset, hwBrdAutoSwtFail, 
+                hwBrdAutoSwt, hwBrdClkLockERR, hwBrdClkLockERRResume, hwBrdRemoved, hwBrdUp, 
+                hwClkSrcMiss, hwClkAllSrcLost, hwClkAllSrcLostResume, hwClkFail, hwClkFailResume, 
+                hwClkNoHeartbeat, hwClkNoHeartbeatResume, hwLPULostSynAlarm, hwLPUOpenChannelError, hwLPUSlfTstErr, 
+                hwLPU3ClkSwitch, hwSFULostHrtReset, hwSFULinkLostReset, hwSFUChannelLinkLost, hwSFUInChannelOpenFail, 
+                hwVoltSensorFail, hwVoltSensorFailResume, hwVoltBtmC, hwVoltBtmCResume, hwVoltSprC, 
+                hwVoltSprCResume, hwVoltBtmM, hwVoltBtmMResume, hwVoltSprM, hwVoltSprMResume, 
+                hwTempSensorFail, hwTempSensorFailResume, hwTempMnr, hwTempMnrResume, hwTempMjr, 
+                hwTempMjrResume, hwTempCtl, hwTempCtlResume, hwFanHFail, hwDCFanFail, 
+                hwDCFanFailResume, hwFanAbsent, hwFanAbsentResume, hwFanCabUN, hwFanCabUNResume, 
+                hwPwrFail, hwPwrFailResume, hwPwrAbsent, hwPwrAbsentResume, hwPwrCabUN, 
+                hwPwrCabUNResume, hwLCDHFail, hwLCDFail, hwLCDAbsent, hwLCDAbsentResume, 
+                hwLCDCabUN, hwLCDCabUNResume, hwROMFail, hwMonitorBUSFail, hwMonitorBUSFailResume, 
+                hwWriteFlashError, hwBoardReset, hwBoardResetSuccess, hwSlaveMPUReset, hwMasterSlaveSwap, 
+                hwRTCFail, hwExchangeChipFail, hwTempResume, hwOpticalModuleInsert, hwOpticalModuleRemove, 
+                hwBoardOfflineChange, hwInterfacePhysicalDown, hwInterfacePhysicalUp, hwBTBStartupFileNameDifferent, hwBTBChassisRunningModeConflict, 
+                hwBTBCtrlChannelFail, hwBTBCtrlChannelFailResume, hwBTBDataChannelFail, hwBTBDataChannelFailResume, hwBTBClkChannelFail, 
+                hwBTBClkChannelFailResume, hwBTBSFUOpticInterfaceError, hwBTBSFUOpticInterfaceErrorResume, hwBTBVSRInterfaceInvalid, hwBTBVSRInterfaceInvalidResume, 
+                hwBTBSlaveChassisNoHeart, hwBTBNoSlaveChassis, hwBTBSlaveChassisRegisted, hwBTBSlaveChassisRegisteFail, hwBTBChassisTypeConflict, 
+                hwOpticaPowerAbnormal, hwFPGAAbnormal, hwBrdInserted, hwMinMTunnelDownAlarm, hwMinMTunnelUpAlarm, 
+                hwSuperChangeSuccesful, hwSuperChangeFailure, hwEpldAbnormal, hwPhyChipAbnormal, hwSerdesAbnormal, 
+                hwBoardAbnormal, hwFeChannelAbnormal, hwParityCheckAbnormal, hwPhyClockAbnormal, hwPortAutoNegotiateFail, hwPortSemiduplex,
+                hwScuStartModeSetFail, hwMemoryExhaust, hwMemoryExhaustClear, hwMethAbnormal, hwLpuNotTight,hwLicenseFail,
+                hwHaBatchBegin,hwHaBatchEnd,hwHaSmoothBegin,hwHaSmoothEnd,hwFanUp}
+            STATUS current
+            DESCRIPTION 
+                "The notification group defined for Datacomm products."
+            ::= { hwDCTrapGroups 2 }
+        
+        hwDCTrapCompliances OBJECT IDENTIFIER ::= { hwDCTrapConformance 2 }
+        
+--   compliance statements
+        hwDCTrapCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwDCTrapControlGroup, hwDCNotificationGroup }
+            ::= { hwDCTrapCompliances 1 }
+        
+    
+    END

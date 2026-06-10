@@ -1,0 +1,193 @@
+
+-- ===========================================================================
+
+EXTREME-EDP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY         FROM SNMPv2-SMI
+		OBJECT-TYPE             FROM SNMPv2-SMI
+		IpAddress               FROM SNMPv2-SMI
+		ifIndex                 FROM RFC1213-MIB
+		DisplayString           FROM RFC1213-MIB
+                TruthValue              FROM SNMPv2-TC
+                ExtremeDeviceId         FROM EXTREME-BASE-MIB
+                extremeAgent            FROM EXTREME-BASE-MIB;
+
+
+        extremeEdp MODULE-IDENTITY
+                LAST-UPDATED "9910200000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Discovery Protocol information"
+        ::= { extremeAgent 13 }
+
+	extremeEdpTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEdpEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains EDP information of this device."
+		::= { extremeEdp 2 }
+
+	extremeEdpEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEdpEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An entry in the table of EDP information of this device."
+		INDEX {extremeEdpPortIfIndex, extremeEdpNeighborId}
+		::= {extremeEdpTable 1}
+
+	ExtremeEdpEntry ::= SEQUENCE {
+                extremeEdpPortIfIndex             INTEGER,
+                extremeEdpNeighborId              ExtremeDeviceId,
+                extremeEdpNeighborName            DisplayString,
+                extremeEdpNeighborSoftwareVersion DisplayString,
+                extremeEdpNeighborSlot      	  INTEGER,
+                extremeEdpNeighborPort      	  INTEGER,
+                extremeEdpEntryAge        	  INTEGER
+        }
+
+        extremeEdpPortIfIndex OBJECT-TYPE
+                SYNTAX  INTEGER (1..65535)
+                MAX-ACCESS	accessible-for-notify
+                STATUS	current
+                DESCRIPTION
+                        "The ifIndex of the physical port on which this
+			entry was discovered via edp."
+                ::= { extremeEdpEntry 1 }
+
+        extremeEdpNeighborId  OBJECT-TYPE
+                SYNTAX	ExtremeDeviceId
+                MAX-ACCESS 	accessible-for-notify
+                STATUS	current
+                DESCRIPTION
+                        "The identifier associated with the neighbor."
+                ::= { extremeEdpEntry 2 }
+
+        extremeEdpNeighborName  OBJECT-TYPE
+		SYNTAX	DisplayString
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The identifier associated with the neighbor."
+                ::= { extremeEdpEntry 3 }
+
+        extremeEdpNeighborSoftwareVersion  OBJECT-TYPE
+		SYNTAX	DisplayString
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The identifier associated with the neighbor."
+                ::= { extremeEdpEntry 4 }
+
+        extremeEdpNeighborSlot  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The slot on which this neighbor received the
+			edp message."
+                ::= { extremeEdpEntry 5 }
+
+        extremeEdpNeighborPort  OBJECT-TYPE
+                SYNTAX  INTEGER
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The port on which this neighbor received the
+			edp message."
+                ::= { extremeEdpEntry 6 }
+
+        extremeEdpEntryAge  OBJECT-TYPE
+                SYNTAX	INTEGER
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The time in seconds since this entry was last
+			updated."
+                ::= { extremeEdpEntry 7 }
+
+
+	extremeEdpNeighborTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEdpNeighborEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains EDP neighbor information."
+		::= { extremeEdp 3 }
+
+	extremeEdpNeighborEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEdpNeighborEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			"An entry in the table of EDP Neighbor information."
+		INDEX {extremeEdpPortIfIndex, extremeEdpNeighborId,
+                       extremeEdpNeighborVlanName}
+		::= {extremeEdpNeighborTable 1}
+
+	ExtremeEdpNeighborEntry ::= SEQUENCE {
+                extremeEdpNeighborVlanName      DisplayString,
+                extremeEdpNeighborVlanId        INTEGER,
+                extremeEdpNeighborVlanIpAddress IpAddress
+        }
+
+        extremeEdpNeighborVlanName  OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(1..64))
+                MAX-ACCESS 	not-accessible
+                STATUS	current
+                DESCRIPTION
+                        "The name of the vlan configured on and reported
+			by this edp neighbor."
+                ::= { extremeEdpNeighborEntry 1 }
+
+        extremeEdpNeighborVlanId  OBJECT-TYPE
+		SYNTAX	INTEGER
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The vlan identifier associated with this vlan
+			configured on this neighbor."
+                ::= { extremeEdpNeighborEntry 2 }
+
+        extremeEdpNeighborVlanIpAddress  OBJECT-TYPE
+		SYNTAX	IpAddress
+                MAX-ACCESS 	read-only
+                STATUS	current
+                DESCRIPTION
+                        "The ip address of the reported vlan."
+                ::= { extremeEdpNeighborEntry 3 }
+
+
+	extremeEdpPortTable	OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ExtremeEdpPortEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+			""
+		::= { extremeEdp 4 }
+
+	extremeEdpPortEntry	OBJECT-TYPE
+		SYNTAX	ExtremeEdpPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+			""
+		INDEX {ifIndex}
+		::= {extremeEdpPortTable 1}
+
+	ExtremeEdpPortEntry ::= SEQUENCE {
+                extremeEdpPortState      TruthValue
+        }
+
+        extremeEdpPortState OBJECT-TYPE
+                SYNTAX  TruthValue
+                MAX-ACCESS  read-write
+                STATUS current
+                DESCRIPTION
+                        "Indicates if edp is enabled or disabled on this
+                        port."
+                ::= { extremeEdpPortEntry 1 }
+
+END

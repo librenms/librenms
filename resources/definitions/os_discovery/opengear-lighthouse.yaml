@@ -1,0 +1,63 @@
+modules:
+  os:
+    version:
+      - OG-LIGHTHOUSE-MIB::ogLhVersion.0
+    version_regex: '/(?<version>\S+)/'
+
+  sensors:
+    count:
+      data:
+        - oid: OG-LIGHTHOUSE-MIB::ogLhNodesTotal
+          num_oid: '.1.3.6.1.4.1.25049.18.1.1.2.1.0{{ $noindex }}'
+          index: 'ogLhNodesTotal.0'
+          descr: 'Nodes Total'
+          group: 'Node Totals'
+
+        - oid: OG-LIGHTHOUSE-MIB::ogLhNodesPending
+          num_oid: '.1.3.6.1.4.1.25049.18.1.1.2.2.0{{ $noindex }}'
+          index: 'ogLhNodesPending.0'
+          descr: 'Nodes Pending'
+          group: 'Node Totals'
+
+        - oid: OG-LIGHTHOUSE-MIB::ogLhNodesConnected
+          num_oid: '.1.3.6.1.4.1.25049.18.1.1.2.3.0{{ $noindex }}'
+          index: 'ogLhNodesConnected.0'
+          descr: 'Nodes Connected'
+          group: 'Node Totals'
+
+        - oid: OG-LIGHTHOUSE-MIB::ogLhNodesDisconnected
+          num_oid: '.1.3.6.1.4.1.25049.18.1.1.2.4.0{{ $noindex }}'
+          index: 'ogLhNodesDisconnected.0'
+          descr: 'Nodes Disconnected'
+          group: 'Node Totals'
+
+    state:
+      data:
+        - oid: OG-LIGHTHOUSE-MIB::ogLhNodesTable
+          value: OG-LIGHTHOUSE-MIB::ogLhNodeConnStatus
+          num_oid: '.1.3.6.1.4.1.25049.18.1.1.2.5.1.8.{{ $index }}'
+          index: 'lighthouse-conn.{{ $index }}'
+          descr: '{{ OG-LIGHTHOUSE-MIB::ogLhNodeName }} Connection'
+          group: 'Nodes'
+          state_name: OG-LIGHTHOUSE-MIB::ogLhNodeConnStatus
+          states:
+            - { value: 0, descr: notAvailable, generic: 3,  }
+            - { value: 1, descr: connected,    generic: 0,  }
+            - { value: 2, descr: disconnected, generic: 2,  }
+            - { value: 3, descr: unknown,      generic: 3,  }
+
+        - oid: OG-LIGHTHOUSE-MIB::ogLhNodesTable
+          value: OG-LIGHTHOUSE-MIB::ogLhNodeCellularHealth
+          num_oid: '.1.3.6.1.4.1.25049.18.1.1.2.5.1.11.{{ $index }}'
+          index: 'lighthouse-cell.{{ $index }}'
+          descr: '{{ OG-LIGHTHOUSE-MIB::ogLhNodeName }} Cellular'
+          group: 'Lighthouse Nodes'
+          state_name: OG-LIGHTHOUSE-MIB::ogLhNodeCellularHealth
+          states:
+            - { value: 0, descr: unknown,                generic: 3,  }
+            - { value: 1, descr: pending,                generic: 1,  }
+            - { value: 2, descr: bad,                    generic: 2,  }
+            - { value: 3, descr: moderate,               generic: 1,  }
+            - { value: 4, descr: good,                   generic: 0,  }
+            - { value: 5, descr: simissues,              generic: 2,  }
+            - { value: 6, descr: connectivitytestfailed, generic: 2,  }

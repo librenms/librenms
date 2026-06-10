@@ -1,0 +1,26 @@
+modules:
+    os:
+        version: MWR-ETHERNET-MIB::mwrSwInvOmniRelease.bankA
+        serial: MWR-ETHERNET-MIB::mwrUnitSerialNo.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: MWR-ETHERNET-MIB::mwrSystemTemperature
+                    num_oid: '.1.3.6.1.4.1.7262.4.5.2.2.3.{{ $index }}'
+                    descr: 'Current System Temperature'
+                    index: 'mwrSystemTemperature.{{ $index }}'
+                    skip_value_lt: 0
+        state:
+            data:
+                -
+                    oid: MWR-RADIO-MC-MIB::mwrEmcRadioStatusTable
+                    value: MWR-RADIO-MC-MIB::mwrEmcRadioLinkStatus
+                    num_oid: '.1.3.6.1.4.1.7262.4.5.12.202.1.1.11.{{ $index }}'
+                    descr: 'Wireless Link {{ $index }}'
+                    index: 'mwrEmcRadioLinkStatus.{{ $index }}'
+                    state_name: mwrEmcRadioLinkStatus
+                    states:
+                        - { value: -1, generic: 3, descr: 'null' }
+                        - { value:  1, generic: 0, descr: up }
+                        - { value:  2, generic: 2, descr: down }

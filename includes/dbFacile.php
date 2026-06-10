@@ -1,0 +1,264 @@
+<?php
+
+/**
+ * dbFacile - A Database API that should have existed from the start
+ * Version 0.4.3
+ *
+ * This code is covered by the MIT license http://en.wikipedia.org/wiki/MIT_License
+ *
+ * By Alan Szlosek from http://www.greaterscope.net/projects/dbFacile
+ *
+ * The non-OO version of dbFacile. It's a bit simplistic, but gives you the
+ * really useful bits in non-class form.
+ *
+ * Usage
+ * 1. Connect to MySQL as you normally would ... this code uses an existing connection
+ * 2. Use dbFacile as you normally would, without the object context
+ * 3. Oh, and dbFetchAll() is now dbFetchRows()
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+
+use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Event;
+use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Laravel;
+
+/**
+ * @param  array  $data
+ * @param  string  $table
+ * @return null|int
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
+ * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
+ */
+function dbInsert($data, $table): ?int
+{
+    $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
+
+    try {
+        $result = Eloquent::DB()->insert($sql, (array) $data);
+
+        if ($result) {
+            $lastInsertId = Eloquent::DB()->getPdo()->lastInsertId();
+
+            if ($lastInsertId) {
+                return (int) $lastInsertId;
+            }
+        }
+    } catch (PDOException $pdoe) {
+        dbHandleException(new QueryException('dbFacile', $sql, $data, $pdoe));
+    }
+
+    return null;
+}//end dbInsert()
+
+/**
+ * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
+ * Returns the number of affected rows
+ *
+ * @param  array  $data
+ * @param  string  $table
+ * @param  string  $where
+ * @param  array  $parameters
+ * @return bool|int
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
+ * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
+ */
+function dbUpdate($data, $table, $where = null, $parameters = [])
+{
+    // need field name and placeholder value
+    // but how merge these field placeholders with actual $parameters array for the WHERE clause
+    $sql = 'UPDATE `' . $table . '` set ';
+    foreach ($data as $key => $value) {
+        $sql .= '`' . $key . '`=';
+        if (is_array($value)) {
+            $sql .= reset($value);
+            unset($data[$key]);
+        } else {
+            $sql .= '?';
+        }
+        $sql .= ',';
+    }
+
+    // strip keys
+    $data = array_values($data);
+
+    $sql = substr($sql, 0, -1);
+    // strip off last comma
+    if ($where) {
+        $sql .= ' WHERE ' . $where;
+        $data = array_merge($data, $parameters);
+    }
+
+    try {
+        $result = Eloquent::DB()->update($sql, (array) $data);
+
+        return $result;
+    } catch (PDOException $pdoe) {
+        dbHandleException(new QueryException('dbFacile', $sql, $data, $pdoe));
+    }
+
+    return false;
+}//end dbUpdate()
+
+/**
+ * Fetches all of the rows (associatively) from the last performed query.
+ * Most other retrieval functions build off this
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+function dbFetchRows($sql, $parameters = [])
+{
+    try {
+        $startTime = microtime(true);
+        $connection = DB::connection();
+
+        $query = $connection->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
+        $all = $query->fetchAll(PDO::FETCH_ASSOC);
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
+
+        return $all;
+    } catch (PDOException $pdoe) {
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
+    }
+
+    return [];
+}//end dbFetchRows()
+
+/**
+ * Like fetch(), accepts any number of arguments
+ * The first argument is an sprintf-ready query stringTypes
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+function dbFetchRow($sql = null, $parameters = []): ?array
+{
+    try {
+        $startTime = microtime(true);
+        $connection = DB::connection();
+
+        $query = $connection->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
+        $row = $query->fetch(PDO::FETCH_ASSOC);
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
+
+        return $row === false ? null : $row;
+    } catch (PDOException $pdoe) {
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
+    }
+
+    return [];
+}//end dbFetchRow()
+
+/**
+ * Fetches the first call from the first row returned by the query
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+function dbFetchCell($sql, $parameters = [])
+{
+    try {
+        $startTime = microtime(true);
+        $connection = DB::connection();
+
+        $query = $connection->getPdo()->prepare($sql);
+        $query->execute((array) $parameters);
+        $value = $query->fetchColumn();
+
+        $executionTime = round((microtime(true) - $startTime) * 1000, 2);
+        Event::dispatch(new QueryExecuted($sql, $parameters, $executionTime, $connection));
+
+        return $value === false ? null : $value;
+    } catch (PDOException $pdoe) {
+        dbHandleException(new QueryException('dbFacile', $sql, $parameters, $pdoe));
+    }
+
+    return null;
+}//end dbFetchCell()
+
+/**
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+function dbHandleException(QueryException $exception)
+{
+    $message = $exception->getMessage();
+
+    if ($exception->getCode() == 2002) {
+        $message = 'Could not connect to database! ' . $message;
+    }
+
+    // ? bindings should already be replaced, just replace named bindings
+    foreach ($exception->getBindings() as $key => $value) {
+        if (is_string($key)) {
+            $message = str_replace(":$key", $value, $message);
+        }
+    }
+
+    $message .= $exception->getTraceAsString();
+
+    if (Laravel::isBooted()) {
+        Log::error($message);
+    } else {
+        c_echo('%rSQL Error!%n ');
+        echo $message . PHP_EOL;
+    }
+
+    // TODO remove this
+//    exit;
+}
+
+/**
+ * Given a data array, this returns an array of placeholders
+ * These may be question marks, or ":email" type
+ *
+ * @param  array  $values
+ * @return array
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+function dbPlaceHolders(&$values)
+{
+    $data = [];
+    foreach ($values as $key => $value) {
+        if (is_array($value)) {
+            // array wrapped values are raw sql
+            $data[] = reset($value);
+            unset($values[$key]);
+        } elseif (is_numeric($key)) {
+            $data[] = '?';
+        } else {
+            $data[] = ':' . $key;
+        }
+    }
+
+    return $data;
+}//end dbPlaceHolders()
+
+/**
+ * Generate a string of placeholders to pass to fill in a list
+ * result will look like this: (?, ?, ?, ?)
+ *
+ * @param  $count
+ * @return string placholder list
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
+function dbGenPlaceholders($count)
+{
+    return '(' . implode(',', array_fill(0, $count, '?')) . ')';
+}

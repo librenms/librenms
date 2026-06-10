@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Http\Requests;
+
+use App\Models\CustomMap;
+use Closure;
+use Illuminate\Foundation\Http\FormRequest;
+
+class CustomMapSettingsRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        if ($this->map) {
+            return $this->user()->can('update', $this->map);
+        }
+
+        return $this->user()->can('create', CustomMap::class);
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'name' => 'required|string|max:100',
+            'menu_group' => 'nullable|string|max:100',
+            'node_align' => 'integer',
+            'reverse_arrows' => 'boolean',
+            'edge_separation' => 'integer',
+            'width_type' => 'in:px,%',
+            'width' => [
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if (! preg_match('/^(\d+)(px|%)$/', $value, $matches)) {
+                        $fail(__('map.custom.edit.validate.width_format'));
+                    } elseif ($matches[2] == 'px' && $matches[1] < 200) {
+                        $fail(__('map.custom.edit.validate.width_pixels'));
+                    } elseif ($matches[2] == '%' && ($matches[1] < 10 || $matches[1] > 100)) {
+                        $fail(__('map.custom.edit.validate.width_percent'));
+                    }
+                },
+            ],
+            'height_type' => 'in:px,%',
+            'height' => [
+                function (string $attribute, mixed $value, Closure $fail): void {
+                    if (! preg_match('/^(\d+)(px|%)$/', $value, $matches)) {
+                        $fail(__('map.custom.edit.validate.height_format'));
+                    } elseif ($matches[2] == 'px' && $matches[1] < 200) {
+                        $fail(__('map.custom.edit.validate.height_pixels'));
+                    } elseif ($matches[2] == '%' && ($matches[1] < 10 || $matches[1] > 100)) {
+                        $fail(__('map.custom.edit.validate.height_percent'));
+                    }
+                },
+            ],
+        ];
+    }
+}

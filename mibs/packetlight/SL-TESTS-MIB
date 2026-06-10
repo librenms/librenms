@@ -1,0 +1,207 @@
+-- *****************************************************************
+-- Tests MIB
+-- *****************************************************************
+
+SL-TESTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+	NOTIFICATION-TYPE 			     	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp, DateAndTime, RowStatus	FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+    slMain				        		FROM SL-MAIN-MIB;
+
+slTests MODULE-IDENTITY
+	LAST-UPDATED "200101180000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the available on-demand tests."
+	::= { slMain 13 }
+
+slTestsIfLoop		OBJECT IDENTIFIER 	::= { slTests 1 }
+slTestsTraps		OBJECT IDENTIFIER 	::= { slTests 2 }
+slTestsTraps0		OBJECT IDENTIFIER 	::= { slTestsTraps 0 }
+
+
+
+-- *******************************************
+--
+-- The If Loopback Test Table
+--
+-- *******************************************
+	
+slTestsIfLoopTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlTestsIfLoopEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The port loopback test table. This table controls the 
+		port loopback tests."
+	::= { slTestsIfLoop 1 }
+
+slTestsIfLoopEntry OBJECT-TYPE
+	SYNTAX  SlTestsIfLoopEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"This entry is used to operate an port loopback test."
+	INDEX   { slTestsIfLoopIfIndex }
+	::= { slTestsIfLoopTable 1 }
+
+SlTestsIfLoopEntry ::=
+	SEQUENCE {
+		slTestsIfLoopIfIndex			InterfaceIndex,
+		slTestsIfLoopDuration			INTEGER,
+		slTestsIfLoopStatus				INTEGER,
+		slTestsIfLoopType				INTEGER,
+		slTestsIfLoopMode				INTEGER,
+		slTestsIfLoopErrors				Counter32,
+		slTestsIfLoopResult				INTEGER,
+		slTestsIfLoopPassedSeconds		INTEGER
+	}	
+
+slTestsIfLoopIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Interface Index of the port that should be loopped back."
+    ::= { slTestsIfLoopEntry 1 }
+
+slTestsIfLoopDuration OBJECT-TYPE
+	SYNTAX        INTEGER
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"The test duration in 1/10 Sec. The maximum allowed
+		duration is 1 hour. After this time the port configuration
+		returns to its original setting and the Agent automatically
+		deletes the entry from the table."
+	::= { slTestsIfLoopEntry 2 }
+
+slTestsIfLoopStatus OBJECT-TYPE
+	SYNTAX        INTEGER {
+		start(1),
+		stop(2),
+		fail(3)
+	}
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"This variable is used to start or stop a loopback test.
+		In order to start a test the NMS should set the value to start(1).
+		If the test mode is toggle, the NMS should stop the test by setting the value
+		to stop(2).
+		In the case of prbs test, after the test has stopped, 
+		if the test fails the value of the status shall be fail(3)."
+	::= { slTestsIfLoopEntry 3 }
+
+slTestsIfLoopType OBJECT-TYPE
+	SYNTAX        INTEGER {
+		terminal(1),
+		facility(2),
+		prbs(3),
+		otnPrbs(4)
+	}
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"The loopback type:
+          facility
+             The received signal at this interface is looped back
+             out through the corresponding transmitter in the return
+             direction.
+          terminal 
+             The signal that is about to be transmitted is connected
+             to the associated incoming receiver.
+          prbs 
+             send and recieve prbs pattern.
+          otnPrbs
+          	 send and receive OTN prbs"
+	::= { slTestsIfLoopEntry 5 }
+
+slTestsIfLoopMode OBJECT-TYPE
+	SYNTAX        INTEGER {
+		timeout(1),  
+		toggle(2)    
+	}
+	MAX-ACCESS    read-write
+	STATUS        current
+	DESCRIPTION
+		"The loopback mode:
+          timeout
+             In this mode the duration of the loopback is determined
+             by the slTestsIfLoopDuration object.
+          toggle     
+             In this mode the loopback should be toggled explicitly
+             by the user."
+	::= { slTestsIfLoopEntry 6 }
+
+slTestsIfLoopErrors OBJECT-TYPE
+	SYNTAX        Counter32
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"The prbs errors are counted only of the test succeeded."
+	::= { slTestsIfLoopEntry 7 }
+
+slTestsIfLoopResult OBJECT-TYPE
+	SYNTAX        INTEGER {
+		success(1),
+		fail(2)
+	}
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"This variable is used for prbs test result indication."
+	::= { slTestsIfLoopEntry 8 }
+
+slTestsIfLoopPassedSeconds OBJECT-TYPE
+	SYNTAX        INTEGER 
+	MAX-ACCESS    read-only
+	STATUS        current
+	DESCRIPTION
+		"Number of seconds passed since the test started."
+	::= { slTestsIfLoopEntry 9 }
+
+
+-- *******************************************
+--
+-- The If Tests Traps
+--
+-- *******************************************
+
+slTestsTrapsLoopbackActive OBJECT-TYPE
+       SYNTAX    	 TruthValue
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+          "The Loopback is active Yes/No."
+        ::= { slTestsTraps 1 }
+
+slTestsTrapsLoopbackTableChanged NOTIFICATION-TYPE
+	OBJECTS { slTestsIfLoopIfIndex, slTestsIfLoopType, slTestsTrapsLoopbackActive }
+	STATUS  current
+	DESCRIPTION
+		"A slTestsTrapsLoopbackTableChanged trap is sent when the
+		content of slTestsIfLoopTable changes. When the loop back is deleted
+		the returned value of slTestsIfLoopActivity should be false."
+	::= { slTestsTraps 2 }
+
+slTestsTrapsLoopbackTableChanged0 NOTIFICATION-TYPE
+	OBJECTS { slTestsIfLoopIfIndex, slTestsIfLoopType, slTestsTrapsLoopbackActive }
+	STATUS  current
+	DESCRIPTION
+		"A slTestsTrapsLoopbackTableChanged trap is sent when the
+		content of slTestsIfLoopTable changes. When the loop back is deleted
+		the returned value of slTestsIfLoopActivity should be false."
+	::= { slTestsTraps0 2 }
+
+END

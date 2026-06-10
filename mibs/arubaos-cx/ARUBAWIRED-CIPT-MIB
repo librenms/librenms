@@ -1,0 +1,341 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-CIPT-MIB.mib
+--*
+--* (c) Copyright 2020 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-CIPT-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-CIPT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
+            FROM SNMPv2-SMI
+        TruthValue, TEXTUAL-CONVENTION, MacAddress
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        VlanIndex
+            FROM Q-BRIDGE-MIB
+        wndFeatures
+              FROM ARUBAWIRED-NETWORKING-OID
+        InterfaceIndex
+            FROM IF-MIB
+        InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB;
+
+    arubaWiredCiptMIB MODULE-IDENTITY
+        LAST-UPDATED "202002070000Z" -- February 07, 2020
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                      client IP tracker MIBs."
+
+        REVISION     "202002070000Z" -- February 07, 2020
+        DESCRIPTION  "Initial revision."
+        ::= { wndFeatures 12 }
+
+-- *************************************************************
+-- Textual Conventions
+-- *************************************************************
+
+    VidList ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "512x"
+        STATUS       current
+        DESCRIPTION  "Each octet within this value specifies a set of eight
+                      VlanIndex (VID), with the first octet specifying VIDs
+                      1 through 8, the second octet specifying VIDs 9 through
+                      16, etc. Within each octet, the most significant bit
+                      represents the lowest numbered VID, and the least
+                      significant bit represents the highest numbered VID.
+                      Thus, each VID is represented by a single bit within
+                      the value of this object. If that bit has a value of 1
+                      then that VID is included in the set of VIDs; the VID
+                      is not included if its bit has a value of 0. This list
+                      represents the entire range of VlanIndex values defined
+                      in the scope of IEEE 802.1Q."
+        SYNTAX OCTET STRING (SIZE (512))
+
+-- *************************************************************
+-- Start of MIB Objects
+-- *************************************************************
+
+arubaWiredCiptConfig        OBJECT IDENTIFIER
+                                ::= { arubaWiredCiptMIB 1 }
+
+arubaWiredCiptClients       OBJECT IDENTIFIER
+                                ::= { arubaWiredCiptMIB 2 }
+
+-- ************************************************************
+--  CIPT global configuration
+-- ************************************************************
+arubaWiredCiptGlobalConfig  OBJECT IDENTIFIER
+                                ::= { arubaWiredCiptConfig 1 }
+
+    arubaWiredCiptEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates whether client IP tracker is enabled or disabled.
+                     By default this object will have a value of false(2)."
+        DEFVAL      { false }
+        ::= { arubaWiredCiptGlobalConfig 1 }
+
+    arubaWiredCiptProbeEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object is used to enable client IP tracker probing to
+                     update client IP."
+        DEFVAL      { true }
+        ::= { arubaWiredCiptGlobalConfig 2 }
+
+-- ************************************************************
+--  CIPT VLAN configuration
+-- ************************************************************
+arubaWiredCiptVlanConfig    OBJECT IDENTIFIER
+                                ::= { arubaWiredCiptConfig 2 }
+
+    arubaWiredCiptVidList    OBJECT-TYPE
+        SYNTAX      VidList
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "A list of VLANs on which client IP tracker is enabled."
+        ::= { arubaWiredCiptVlanConfig 1 }
+
+-- ************************************************************
+--  CIPT PORT configuration
+-- ************************************************************
+arubaWiredCiptPortConfig    OBJECT IDENTIFIER
+                                ::= { arubaWiredCiptConfig 3 }
+
+    arubaWiredCiptPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredCiptPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Per-port configuration of Client IP tracker."
+        ::= { arubaWiredCiptPortConfig 1 }
+
+    arubaWiredCiptPortEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredCiptPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Client IP tracker configuration information for
+                     a single port."
+        INDEX       { arubaWiredCiptPortIfIndex }
+        ::= { arubaWiredCiptPortTable 1 }
+
+    ArubaWiredCiptPortEntry ::= SEQUENCE {
+            arubaWiredCiptPortIfIndex         InterfaceIndex,
+            arubaWiredCiptPortEnable          INTEGER,
+            arubaWiredCiptPortUpdateInterval  Unsigned32,
+            arubaWiredCiptPortClientLimit     Unsigned32
+        }
+
+    arubaWiredCiptPortIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index value that uniquely identifies the port on
+                     which the client IP tracker entry is enabled.
+                     The interface identified by a particular value of this
+                     index is the same interface as identified by the same
+                     value of the IF-MIB's ifIndex."
+       ::= { arubaWiredCiptPortEntry 1 }
+
+    arubaWiredCiptPortEnable  OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                      disable (0),
+                      enable  (1),
+                      auto    (2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether client IP tracker is enabled
+                     on a port or not . The default value is auto(2)"
+        DEFVAL      { 2 }
+        ::= { arubaWiredCiptPortEntry 2 }
+
+    arubaWiredCiptPortUpdateInterval OBJECT-TYPE
+        SYNTAX      Unsigned32 (60..28800)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The interval in seconds at which client IP is
+                     refreshed. The default value is 1800 seconds."
+        ::= { arubaWiredCiptPortEntry 3 }
+
+    arubaWiredCiptPortClientLimit OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4096)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Maximum number of clients which can be tracked on this
+                     port.
+                     6100       max clients   -  128
+                     6200, 6300 max clients   - 2048
+                     6400       max client    - 4096"
+        ::= { arubaWiredCiptPortEntry 4 }
+
+-- ************************************************************
+--  CIPT  Tracked client details
+-- ************************************************************
+arubaWiredCiptTrackedClients         OBJECT IDENTIFIER
+                                ::= { arubaWiredCiptClients 1 }
+
+    arubaWiredCiptClientTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredCiptClientEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Client IP tracker learnt IP addresses for a client MAC."
+        ::= { arubaWiredCiptTrackedClients 1 }
+
+    arubaWiredCiptClientEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredCiptClientEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Learnt IP address of a client MAC on a port."
+        INDEX       {
+                      arubaWiredCiptClientMacAddress,
+                      arubaWiredCiptClientVlanId,
+                      arubaWiredCiptClientIpIndex
+                    }
+        ::= { arubaWiredCiptClientTable 1 }
+
+    ArubaWiredCiptClientEntry ::= SEQUENCE {
+            arubaWiredCiptClientMacAddress  MacAddress,
+            arubaWiredCiptClientVlanId      VlanIndex,
+            arubaWiredCiptClientIpIndex     Unsigned32,
+            arubaWiredCiptClientIpAddrType  InetAddressType,
+            arubaWiredCiptClientIpAddress   InetAddress,
+            arubaWiredCiptClientPortIfIndex InterfaceIndex
+        }
+
+    arubaWiredCiptClientMacAddress OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "MAC address of the client whose IP is being tracked."
+
+        ::= { arubaWiredCiptClientEntry 1 }
+
+    arubaWiredCiptClientVlanId OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The VLAN on which the client IP is being tracked."
+        ::= { arubaWiredCiptClientEntry 2 }
+
+    arubaWiredCiptClientIpIndex OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967295)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index of IP when a client being tracked has
+                     multiple IP addresses."
+        ::= { arubaWiredCiptClientEntry 3 }
+
+    arubaWiredCiptClientIpAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The address type of the InetAddress variables in this
+             table."
+        ::= { arubaWiredCiptClientEntry 4 }
+
+    arubaWiredCiptClientIpAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Tracked IP address of the client."
+        ::= { arubaWiredCiptClientEntry 5 }
+
+    arubaWiredCiptClientPortIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "IfIndex of the port on which client IP address is
+                     being tracked."
+        ::= { arubaWiredCiptClientEntry 6 }
+
+-- **********************************************************************
+-- CIPT Conformance information
+-- **********************************************************************
+
+    arubaWiredCiptConformance   OBJECT IDENTIFIER
+                               ::= { arubaWiredCiptMIB 3 }
+
+    arubaWiredCiptGroups        OBJECT IDENTIFIER
+                               ::= { arubaWiredCiptConformance 1 }
+
+    arubaWiredCiptCompliances   OBJECT IDENTIFIER
+                               ::= { arubaWiredCiptConformance 2 }
+
+    arubaWiredCiptConfigGlobalGroup OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredCiptEnable,
+                      arubaWiredCiptProbeEnable
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing global configuration
+                     of client IP tracker."
+
+        ::= {arubaWiredCiptGroups 1 }
+
+    arubaWiredCiptVlanConfigGroup OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredCiptVidList
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing per VLAN configuration
+                     of client IP tracker."
+
+        ::= {arubaWiredCiptGroups 2 }
+
+    arubaWiredCiptPortConfigGroup OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredCiptPortEnable,
+                      arubaWiredCiptPortUpdateInterval,
+                      arubaWiredCiptPortClientLimit
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing per port configuration
+                     of client IP tracker."
+
+        ::= {arubaWiredCiptGroups 3 }
+
+    arubaWiredCiptTrackedClientsGroup OBJECT-GROUP
+        OBJECTS     {
+                      arubaWiredCiptClientIpAddrType,
+                      arubaWiredCiptClientIpAddress,
+                      arubaWiredCiptClientPortIfIndex
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing details of client whose
+                     IP address is being tracked."
+
+        ::= {arubaWiredCiptGroups 4 }
+
+    arubaWiredCiptCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with
+                     support for arubaWired client IP tracker objects."
+
+        MODULE
+            MANDATORY-GROUPS { arubaWiredCiptConfigGlobalGroup,
+                               arubaWiredCiptVlanConfigGroup,
+                               arubaWiredCiptPortConfigGroup,
+                               arubaWiredCiptTrackedClientsGroup}
+
+        ::= { arubaWiredCiptCompliances 1 }
+
+END

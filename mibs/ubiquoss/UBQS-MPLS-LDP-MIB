@@ -1,0 +1,259 @@
+-- *****************************************************************
+-- UBQS-MPLS-LDP-MIB : Ubiquoss LDP MIB
+--   
+-- Jun 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,            
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF         
+    IpAddress,
+    RowStatus,
+    TimeStamp,
+    DisplayString,    
+    TruthValue,       
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC     
+    InetAddress, 
+    InetAddressType,
+    InetAddressPrefixLength,    
+    InetAddressPrefixLength
+    	FROM INET-ADDRESS-MIB      
+    InterfaceIndex                     
+    	FROM IF-MIB    
+   mplsStdMIB, MplsLSPID,
+   MplsTunnelIndex, MplsTunnelInstanceIndex,
+   MplsOwner, TeHopAddressType
+      FROM MPLS-TC-STD-MIB                               -- [RFC3811]    	
+    ubiMplsGroupMIB
+        FROM UBQS-SMI;
+
+
+ubiLdpMIB MODULE-IDENTITY
+        LAST-UPDATED    "201106220000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        ""
+     ::= { ubiMplsGroupMIB 3 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+                              
+                              
+-- ***************************************************************
+--   ubiLdpMIB
+-- ***************************************************************
+ubiLdpMIBNotificationPrefix  	OBJECT IDENTIFIER		::= { ubiLdpMIB 0 } 
+ubiLdpMIBObjects  				OBJECT IDENTIFIER		::= { ubiLdpMIB 1 }     
+ubiLdpMIBConformance  			OBJECT IDENTIFIER		::= { ubiLdpMIB 2 }
+        
+            
+ubiLdpConfig				 	OBJECT IDENTIFIER		::= { ubiLdpMIBObjects 1 } 
+                         
+                         
+ -- ***************************************************************
+--   ubiLdpMIBNotificationPrefix
+-- ***************************************************************
+                                           
+-- ***********************************************************
+-- ubiLdpConfig
+-- ***********************************************************
+ 	ubiLdpEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        "Set the global attribute of LDP whether the LDP performs the operations.
+		 If this attribute is not set, then the LDP does not send any kinds of packets."  
+       	DEFVAL		{ false }
+	   	::= { ubiLdpConfig 1 }   
+
+ 	ubiLdpRouterId OBJECT-TYPE
+    	SYNTAX         	IpAddress
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+       	"This entry set the router-id to the supplied IP address.
+		 The router uses this address to generate the LDP-ID.
+		 If you does not set this feild and the ubiLdpEnable attribute is enabled,
+		 then LDP Module automatically generate the LDP-ID.
+		 The algorithm for making ID is not covered in this description.
+		 please refer to RFC 5036 2.2.2.  LDP Identifiers."         
+	   	::= { ubiLdpConfig 2 }   
+ 
+	ubiLdpFailoverCfmEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        "set the attribute of Connectivity Fault Management(CFM) in LDP.
+		 If you set this field, LDP creates the socket (AF_CFM) to detect 
+		 whether the link associated with the peer is UP or DOWN.
+		 After set this attribute, You MUST enable the property for CFM 
+		 in the interface which you want to check the connectivity."
+       	DEFVAL		{ false }
+	   	::= { ubiLdpConfig 3 }    
+ 
+  	ubiLdpTargetedPeerHelloReceiptEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        "Enable whether LDP accepts the packets from the targeted peer and
+		 cerate the instance for peer.
+		 If you want to configure the targeted-peer in network, 
+		 then MUST enable this field at first."
+       	DEFVAL		{ false }
+	   	::= { ubiLdpConfig 4 }   
+
+ 	ubiLdpAcUpSignalEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        "Enable the field to notify the interface of binded vpls 
+		 to the neighbors for VPLS. If this is reset, then does not quickly send 
+		 the signal to neighbors."
+       	DEFVAL		{ false }
+	   	::= { ubiLdpConfig 5 }  
+	   	 
+
+ 	ubiLdpExceedInitSessionNotiEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        ""
+       	DEFVAL		{ false }
+	   	::= { ubiLdpConfig 6 }  
+
+ 	ubiLdpPathVectorLimitMismatchNotiEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        ""
+       	DEFVAL		{ false }
+	   	::= { ubiLdpConfig 7 }  
+
+ 	ubiLdpLdpSessionUpDownNotiEnable OBJECT-TYPE
+    	SYNTAX         	TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        ""
+       	DEFVAL		{ false }
+	   	::= { ubiLdpConfig 8 }  
+
+
+                                         
+-- ***********************************************************
+-- ubiLdpInterfaceTable
+-- ***********************************************************   
+	ubiLdpInterfaceTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiLdpInterfaceEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+    		"This table specifies the LDP information 
+    		 for each interface." 
+    	::= { ubiLdpMIBObjects 2 }
+
+	ubiLdpInterfaceEntry OBJECT-TYPE
+    	SYNTAX          UbiLdpInterfaceEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A row in this table represents an LDP 
+        	enable/disable status for each interface."
+    	INDEX  { ifIndex } 
+    	::= { ubiLdpInterfaceTable 1 }
+
+	UbiLdpInterfaceEntry ::= SEQUENCE {         
+            ubiLdpIfEnable			INTEGER
+	}
+  
+  	ubiLdpIfEnable OBJECT-TYPE
+    	SYNTAX          INTEGER {    
+    		none(0),
+    		ipv4(1),
+    		ipv6(2),
+    		both(3)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	"If this object is set to ipv4, ipv6, or both, then it is possible 
+        	to transmit Hello packet through a specified interface. 
+        	And LDP adjacencies and session can be created."      
+       	::= { ubiLdpInterfaceEntry 1 }              	
+                           
+
+                          
+-- ***********************************************************
+-- ubiLdpMIBConformance
+-- ***********************************************************
+ubiLdpMIBCompliances  	OBJECT IDENTIFIER		::= { ubiLdpMIBConformance 1 }
+ubiLdpMIBGroups  	 	OBJECT IDENTIFIER		::= { ubiLdpMIBConformance 2 }
+-- Compliance
+
+	ubiLdpMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-MPLS-LDP-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {  
+    			ubiLdpMIBGroup
+        }  
+        GROUP    ubiLdpMIBGroup
+        DESCRIPTION 
+        	"The ubiLdpMIBGroup is applicable for implementations which
+ 			need to get the LDP information."    
+     	::= { ubiLdpMIBCompliances 1 }
+
+
+	ubiLdpMIBGroup OBJECT-GROUP
+    	OBJECTS         {       
+       		ubiLdpEnable,
+    		ubiLdpRouterId,
+    		ubiLdpFailoverCfmEnable,     
+    		ubiLdpTargetedPeerHelloReceiptEnable,
+    		ubiLdpAcUpSignalEnable,
+    		ubiLdpIfEnable
+    	}   
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about the LDP information."
+    	::= { ubiLdpMIBGroups 1 }
+    	                               
+    	                               
+END

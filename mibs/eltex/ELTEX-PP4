@@ -1,0 +1,3605 @@
+--
+-- Eltex pp4 mib
+--
+-- Copyright (c) 2007, Eltex Co
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+
+ELTEX-PP4 DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Gauge32, Counter32, TimeTicks, Unsigned32, IpAddress
+        FROM SNMPv2-SMI
+    TruthValue, DisplayString, TimeStamp, TimeInterval, TEXTUAL-CONVENTION, MacAddress, RowStatus
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+    	FROM SNMPv2-CONF
+    elHardware, eltrapGroup, mcTrapExState, mcTrapID, mcTrapDescr, mcTrapLParam1, mcTrapLParam2,
+	mcTrapLParam3
+        FROM ELTEX-SMI-ACTUAL
+    ifIndex
+		FROM IF-MIB
+	Ipv6Address
+		FROM IPV6-TC;
+
+ pp4 MODULE-IDENTITY
+    LAST-UPDATED "200911240000Z"
+    ORGANIZATION "Eltex Co"
+    CONTACT-INFO "  eltex@gcom.ru "
+    DESCRIPTION  "Mib for pp4 MSAN switches family"
+    REVISION "200911240000Z"
+	DESCRIPTION
+		"Initial revision."
+    ::= { elHardware 13 }
+    
+PP4SysType ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  systemUnknown(0),
+      systemPp4g(1),
+      systemPp4g2x(2),
+      systemPp4x(3)}
+      
+Pp4Link ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  linkDown(0),
+      linkUp(1)}
+      
+Pp4PortSpeed ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  speed10Mbps(0),
+      speed100Mbps(1),
+      speed1Gbps(2),
+      speed10Gbps(3),
+      speed12Gbps(4),
+      speed2500Mbps(5),
+      speed5Gbps(6)}
+      
+Pp4PortDuplex ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  fullDuplex(0),
+      halfDuplex(1)}
+      
+Pp4MacType ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  macStatic(0),
+      macDynamic(1)}
+      
+Pp4MacPort ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  portCPU(255)}
+  	  
+Pp4RebootIndex ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+		master(100),
+		slave(101),
+		system(102)}
+		
+Pp4SlotBoardType ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION ""
+	SYNTAX INTEGER  {
+		none(0),
+		pp4x(1),
+		elc8(2),
+		plc8(3),
+		plc16(4),
+		fxs72sip(5),
+		fxs72megaco(6),
+		tmg16sip(7),
+		invalid(255) }
+
+Pp4FanBreakdownState ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION ""
+	SYNTAX INTEGER  {
+		fanIsNormal(0),
+		fanIsBreakDown(1),
+		fanIsNotDefine(2)}
+		
+Pp4BoardRole ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  notdefine(0),
+  	  slave(1),
+  	  backup(2),
+  	  master(3)}
+      
+Pp4BoardPosition ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  notdefine(0),
+  	  left(1),
+      right(2)}
+      
+Pp4SlotFirmwareVersion ::= TEXTUAL-CONVENTION
+  STATUS current
+  DESCRIPTION ""
+  SYNTAX INTEGER  {
+  	  default(-1),
+  	  embedded(-2)}
+  	  
+Pp4FirmwareUnitStatus ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION ""
+	SYNTAX INTEGER  {
+		undefined(0),
+		invalid(1),
+		timeout(2),
+		isCurrent(3),
+		downloaded(4),
+		testing(5)
+	}
+
+Pp4FeederStatus ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION ""
+	SYNTAX INTEGER  {
+		notInstalled (0),
+		error (1),
+		highVoltage (2),
+		lowVoltage (3),
+		ok (4)
+	}
+
+Pp4FeederActive ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION ""
+	SYNTAX INTEGER  {
+		notAvailable (0),
+		active (1),
+		backup (2)
+	}
+
+Pp4FeederPolarity ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION ""
+	SYNTAX INTEGER  {
+		notAvailable (0),
+		ok (1),
+		mismatch (2)
+	}
+
+    pp4DevName OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		""
+	::= { pp4 1 }
+
+    pp4DevType OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Always = 13"
+	::= { pp4 2 }
+
+    pp4DevCfgBuild OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (0..255))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"os build string: compiling data and other info"
+	::= { pp4 3 }
+
+    pp4FreeSpace OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"percent of free blocks on flash disk"
+	::= { pp4 4 }
+
+    pp4FreeRam OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"free RAM (bytes)"
+	::= { pp4 5 }
+	
+	pp4System OBJECT IDENTIFIER ::= { pp4 10 }
+	
+			pp4SystemType OBJECT-TYPE
+			SYNTAX		PP4SysType
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 1 }
+			
+			pp4SystemInfo OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 2 }
+			
+			pp4SystemUnit1MacAddress OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 3 }
+			
+			pp4SystemUnit2MacAddress OBJECT-TYPE
+			SYNTAX		MacAddress
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 4 }
+			
+			pp4SystemUnit1FirmwareVersion OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 5 }
+			
+			pp4SystemUnit2FirmwareVersion OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 6 }
+			
+			pp4SystemUnit1LinuxVersion OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 7 }
+			
+			pp4SystemUnit2LinuxVersion OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0..255))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 8 }
+			
+			pp4SystemUnit1UpTime OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS  		"sec"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 9 }
+			
+			pp4SystemUnit2UpTime OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS  		"sec"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 10 }
+			
+			pp4SystemUnit1Role OBJECT-TYPE
+			SYNTAX		Pp4BoardRole
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 11 }
+			
+			pp4SystemUnit2Role OBJECT-TYPE
+			SYNTAX		Pp4BoardRole
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 12 }
+			
+			pp4SystemUnit1Position OBJECT-TYPE
+			SYNTAX		Pp4BoardPosition
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 13 }
+			
+			pp4SystemUnit2Position OBJECT-TYPE
+			SYNTAX		Pp4BoardPosition
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				" "
+			::= { pp4System 14 }
+			
+			pp4SystemUnit1SerialNumber OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0..64))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"unique device serial number"
+			::= { pp4System 15 }
+			
+			pp4SystemUnit2SerialNumber OBJECT-TYPE
+			SYNTAX		DisplayString (SIZE (0..64))
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"unique device serial number"
+			::= { pp4System 16 }
+			
+			pp4SynchronizationStateInStack OBJECT-TYPE
+			SYNTAX		TruthValue
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"Synchronization state in the stack : cli
+				msan stack synchronization-enable
+                msan no stack synchronization-enable
+                msan show stack"
+			::= { pp4System 17 }
+			
+			pp4StackMasterChange OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"Set this to 1 to change stack master"
+			::= { pp4System 18 }
+			
+		pp4Services OBJECT IDENTIFIER ::= { pp4System 30 }
+
+	        pp4ACSActive OBJECT-TYPE
+				SYNTAX		TruthValue
+				MAX-ACCESS	read-only
+				STATUS		current
+				DESCRIPTION
+					"Shows if ACS service active."
+				::= { pp4Services 1 }
+
+                        
+	
+	pp4PortsTable OBJECT-TYPE
+	SYNTAX                SEQUENCE OF Pp4PortsEntry
+	MAX-ACCESS        not-accessible
+	STATUS                current
+	DESCRIPTION
+			""
+	::= { pp4 11 }
+
+			pp4PortsEntry OBJECT-TYPE
+			SYNTAX                Pp4PortsEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4PortsEntryID }
+			::= { pp4PortsTable 1 }
+
+			Pp4PortsEntry ::= SEQUENCE {
+					pp4PortsEntryID						Integer32,
+					pp4PortsLink						Pp4Link,					
+					pp4PortsAutoNegotiate				TruthValue,
+					pp4PortsAutoNegotiationError       	TruthValue,
+					pp4PortsSpeed						Pp4PortSpeed,
+					pp4PortsDuplex						Pp4PortDuplex,
+					pp4PortsFlowControlEnabled			TruthValue,
+					pp4PortsEnabled						TruthValue
+			}
+			
+						pp4PortsEntryID  OBJECT-TYPE
+							SYNTAX     Integer32 (0..64)
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION "Index"
+							::= { pp4PortsEntry 1 }
+							
+						pp4PortsLink  OBJECT-TYPE
+							SYNTAX     Pp4Link
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsEntry 2 }
+							
+						pp4PortsAutoNegotiate  OBJECT-TYPE
+							SYNTAX     TruthValue
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsEntry 3 }
+							
+						pp4PortsAutoNegotiationError  OBJECT-TYPE
+							SYNTAX     TruthValue
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsEntry 4 }
+							
+						pp4PortsSpeed  OBJECT-TYPE
+							SYNTAX     Pp4PortSpeed
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsEntry 5 }
+							
+						pp4PortsDuplex  OBJECT-TYPE
+							SYNTAX     Pp4PortDuplex
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsEntry 6 }
+							
+						pp4PortsFlowControlEnabled  OBJECT-TYPE
+							SYNTAX     TruthValue
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsEntry 7 }
+							
+						pp4PortsEnabled  OBJECT-TYPE
+							SYNTAX     TruthValue
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsEntry 8 }
+							
+	pp4MulticastGroupsTable OBJECT-TYPE
+	SYNTAX                SEQUENCE OF Pp4MulticastGroupsEntry
+	MAX-ACCESS        not-accessible
+	STATUS                current
+	DESCRIPTION
+			""
+	::= { pp4 12 }
+
+			pp4MulticastGroupsEntry OBJECT-TYPE
+			SYNTAX                Pp4MulticastGroupsEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4MulticastEntryID }
+			::= { pp4MulticastGroupsTable 1 }
+
+			Pp4MulticastGroupsEntry ::= SEQUENCE {
+					pp4MulticastEntryID					Integer32,
+					pp4MulticastVLAN					Integer32,					
+					pp4MulticastGroupAddress			IpAddress,
+					pp4MulticastMemberPorts		       	DisplayString,
+					pp4MulticastExpires					TimeTicks
+			}
+			
+						pp4MulticastEntryID  OBJECT-TYPE
+							SYNTAX     Integer32 (0..64)
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION "Index"
+							::= { pp4MulticastGroupsEntry 1 }
+							
+						pp4MulticastVLAN  OBJECT-TYPE
+							SYNTAX     Integer32
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MulticastGroupsEntry 2 }
+							
+						pp4MulticastGroupAddress  OBJECT-TYPE
+							SYNTAX     IpAddress
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MulticastGroupsEntry 3 }
+							
+						pp4MulticastMemberPorts  OBJECT-TYPE
+							SYNTAX     DisplayString (SIZE (0..32))
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION "Each octet within this value specifies a set of eight
+										ports, with the first octet specifying ports 1 through
+										8, the second octet specifying ports 9 through 16, etc.
+										Within each octet, the most significant bit represents
+										the lowest numbered port, and the least significant bit
+										represents the highest numbered port.  Thus, each port
+										of the bridge is represented by a single bit within the
+										value of this object.  If that bit has a value of '1',
+										then that port is included in the set of ports; the port
+										is not included if its bit has a value of '0"
+							::= { pp4MulticastGroupsEntry 4 }
+							
+						pp4MulticastExpires  OBJECT-TYPE
+							SYNTAX     TimeTicks
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MulticastGroupsEntry 5 }
+							
+	pp4MacAddressTable OBJECT-TYPE
+	SYNTAX                SEQUENCE OF Pp4MacAddressEntry
+	MAX-ACCESS        not-accessible
+	STATUS                current
+	DESCRIPTION
+			""
+	::= { pp4 13 }
+
+			pp4MacAddressEntry OBJECT-TYPE
+			SYNTAX                Pp4MacAddressEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4MacAddressEntryID }
+			::= { pp4MacAddressTable 1 }
+
+			Pp4MacAddressEntry ::= SEQUENCE {
+					pp4MacAddressEntryID				Integer32,
+					pp4MacAddressVLAN					Integer32,					
+					pp4MacAddressAddress				MacAddress,
+					pp4MacAddressPort			       	Pp4MacPort,
+					pp4MacAddressType					Pp4MacType
+			}
+			
+						pp4MacAddressEntryID  OBJECT-TYPE
+							SYNTAX     Integer32 (0..16384)
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION "Index"
+							::= { pp4MacAddressEntry 1 }
+							
+						pp4MacAddressVLAN OBJECT-TYPE
+							SYNTAX     Integer32
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MacAddressEntry 2 }
+							
+						pp4MacAddressAddress  OBJECT-TYPE
+							SYNTAX     MacAddress
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MacAddressEntry 3 }
+							
+						pp4MacAddressPort  OBJECT-TYPE
+							SYNTAX     Pp4MacPort
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MacAddressEntry 4 }
+							
+						pp4MacAddressType  OBJECT-TYPE
+							SYNTAX     Pp4MacType
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MacAddressEntry 5 }
+							
+	pp4SlotsTable OBJECT-TYPE
+	SYNTAX                SEQUENCE OF Pp4SlotsEntry
+	MAX-ACCESS        not-accessible
+	STATUS                current
+	DESCRIPTION
+			""
+	::= { pp4 14 }
+
+			pp4SlotsEntry OBJECT-TYPE
+			SYNTAX                Pp4SlotsEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4SlotsSlot  }
+			::= { pp4SlotsTable 1 }
+
+			Pp4SlotsEntry ::= SEQUENCE {
+					pp4SlotsSlot						Unsigned32,
+					pp4SlotsBoardType					Pp4SlotBoardType,
+					pp4SlotsLink						INTEGER,				
+					pp4SlotsFirmwareActive				DisplayString,
+					pp4SlotsFirmwareRevision			Unsigned32,
+					pp4SlotsSerialNumber				DisplayString,
+					pp4SlotsState						INTEGER
+			}
+			
+						pp4SlotsSlot  OBJECT-TYPE
+							SYNTAX     Unsigned32 (1..16)
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4SlotsEntry 1 }
+							
+						pp4SlotsBoardType OBJECT-TYPE
+							SYNTAX     Pp4SlotBoardType
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4SlotsEntry 2 }
+							
+						pp4SlotsLink  OBJECT-TYPE
+							SYNTAX	INTEGER {
+										up(1),
+										down(2)}
+							MAX-ACCESS read-only
+							STATUS		current
+							DESCRIPTION ""
+							::= { pp4SlotsEntry 3 }
+							
+						pp4SlotsFirmwareActive  OBJECT-TYPE
+							SYNTAX	DisplayString
+							MAX-ACCESS read-only
+							STATUS		current
+							DESCRIPTION ""
+							::= { pp4SlotsEntry 4 }
+							
+						pp4SlotsFirmwareRevision  OBJECT-TYPE
+							SYNTAX	Unsigned32
+							MAX-ACCESS read-only
+							STATUS		current
+							DESCRIPTION ""
+							::= { pp4SlotsEntry 5 }
+							
+						pp4SlotsSerialNumber  OBJECT-TYPE
+							SYNTAX	DisplayString
+							MAX-ACCESS read-only
+							STATUS		current
+							DESCRIPTION ""
+							::= { pp4SlotsEntry 6 }
+							
+						pp4SlotsState  OBJECT-TYPE
+							SYNTAX	INTEGER {
+								absent(0),
+								discovery(1),
+								booting(2),
+								operational(3),
+								lost(4),
+								sand(5),
+								fail(6),
+								notBooting(7) }
+							MAX-ACCESS read-only
+							STATUS		current
+							DESCRIPTION ""
+							::= { pp4SlotsEntry 7 }
+							
+							
+	pp4ConfigRevisions OBJECT IDENTIFIER ::= { pp4 15 }
+	
+	pp4ConfigRevisionsPp4x  OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION " "
+		::= { pp4ConfigRevisions 1 }
+
+	pp4ConfigRevisionsTable OBJECT-TYPE
+	SYNTAX                SEQUENCE OF Pp4ConfigRevisionsEntry
+	MAX-ACCESS        not-accessible
+	STATUS                current
+	DESCRIPTION
+			""
+	::= { pp4ConfigRevisions 2 }
+
+			pp4ConfigRevisionsEntry OBJECT-TYPE
+			SYNTAX                Pp4ConfigRevisionsEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4ConfigRevisionsSlot  }
+			::= { pp4ConfigRevisionsTable 1 }
+
+			Pp4ConfigRevisionsEntry ::= SEQUENCE {
+					pp4ConfigRevisionsSlot						Unsigned32,
+					pp4ConfigRevisionsRevision					Unsigned32
+			}
+						pp4ConfigRevisionsSlot  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4ConfigRevisionsEntry 1 }
+							
+						pp4ConfigRevisionsRevision OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4ConfigRevisionsEntry 2 }
+							
+	pp4ConfigRevisionsProfilesELC  OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION " "
+		::= { pp4ConfigRevisions 3 }
+		
+	pp4ConfigRevisionsProfilesPLC  OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION " "
+		::= { pp4ConfigRevisions 4 }
+		
+	pp4ConfigRevisionsProfilesPLCOLT  OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION " "
+		::= { pp4ConfigRevisions 5 }
+							
+	pp4RebootTable OBJECT-TYPE
+	SYNTAX                SEQUENCE OF Pp4RebootEntry
+	MAX-ACCESS        not-accessible
+	STATUS                current
+	DESCRIPTION
+			""
+	::= { pp4 20 }
+
+			pp4RebootEntry OBJECT-TYPE
+			SYNTAX                Pp4RebootEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4RebootSlot }
+			::= { pp4RebootTable 1 }
+
+			Pp4RebootEntry ::= SEQUENCE {
+					pp4RebootSlot						Integer32,
+					pp4RebootDescription				DisplayString,
+					pp4RebootCommand					Unsigned32
+			}
+			
+						pp4RebootSlot  OBJECT-TYPE
+							SYNTAX     Integer32 (1..102)
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION "Index, 1-17 - slots, 100 - master, 101 - slave, 102 - system"
+							::= { pp4RebootEntry 1 }
+							
+						pp4RebootDescription  OBJECT-TYPE
+							SYNTAX     DisplayString
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION "Index"
+							::= { pp4RebootEntry 2 }
+							
+						pp4RebootCommand  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Set this to 1 to reboot"
+							::= { pp4RebootEntry 3 }
+	
+	pp4RebootAfterDelay OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS  		"sec"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"GET - pp4x will reboot after in this time
+				 SET - to set delay for reboot"
+			::= { pp4 21 }
+			
+	
+	pp4ChannelGroupMembershipTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4ChannelGroupMembershipEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				""
+		::= { pp4 22 }
+	
+				pp4ChannelGroupMembershipEntry OBJECT-TYPE
+					SYNTAX                Pp4ChannelGroupMembershipEntry
+					MAX-ACCESS        not-accessible
+					STATUS                current
+					DESCRIPTION
+							""
+					INDEX         { ifIndex  }
+					::= { pp4ChannelGroupMembershipTable 1 }
+		
+					Pp4ChannelGroupMembershipEntry ::= SEQUENCE {
+							pp4ChannelGroupMembershipGroupID	Unsigned32
+					}
+					
+				pp4ChannelGroupMembershipGroupID  OBJECT-TYPE
+					SYNTAX     Unsigned32
+					MAX-ACCESS read-write
+					STATUS     current
+					DESCRIPTION "Channel group ID, or 0 - unassigned"
+					::= { pp4ChannelGroupMembershipEntry 1 }
+					
+	pp4ChannelGroupLACPTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4ChannelGroupLACPEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				""
+		::= { pp4 23 }
+	
+				pp4ChannelGroupLACPEntry OBJECT-TYPE
+					SYNTAX                Pp4ChannelGroupLACPEntry
+					MAX-ACCESS        not-accessible
+					STATUS                current
+					DESCRIPTION
+							""
+					INDEX         { pp4ChannelGroupLACPGroupID  }
+					::= { pp4ChannelGroupLACPTable 1 }
+		
+					Pp4ChannelGroupLACPEntry ::= SEQUENCE {
+							pp4ChannelGroupLACPGroupID	Unsigned32,
+							pp4ChannelGroupLACPRunning	TruthValue,
+							pp4ChannelGroupLACPAggregators	OCTET STRING
+					}
+					
+				pp4ChannelGroupLACPGroupID  OBJECT-TYPE
+					SYNTAX     Unsigned32
+					MAX-ACCESS not-accessible
+					STATUS     current
+					DESCRIPTION "Channel group ID"
+					::= { pp4ChannelGroupLACPEntry 1 }
+					
+				pp4ChannelGroupLACPRunning  OBJECT-TYPE
+					SYNTAX     TruthValue
+					MAX-ACCESS read-write
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4ChannelGroupLACPEntry 2 }
+					
+				pp4ChannelGroupLACPAggregators  OBJECT-TYPE
+					SYNTAX     OCTET STRING
+					MAX-ACCESS read-only
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4ChannelGroupLACPEntry 3 }
+					
+	pp4LACPSystemPriority  OBJECT-TYPE
+		SYNTAX     Unsigned32
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION ""
+		::= { pp4 24 }
+		
+	pp4MLDGroupsTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4MLDGroupsEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				""
+		::= { pp4 25 }
+
+			pp4MLDGroupsEntry OBJECT-TYPE
+			SYNTAX                Pp4MLDGroupsEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4MLDEntryID }
+			::= { pp4MLDGroupsTable 1 }
+
+			Pp4MLDGroupsEntry ::= SEQUENCE {
+					pp4MLDEntryID					Integer32,
+					pp4MLDVLAN						Integer32,					
+					pp4MLDGroupAddress				Ipv6Address,
+					pp4MLDMemberPorts		       	DisplayString,
+					pp4MLDExpires					TimeTicks
+			}
+			
+						pp4MLDEntryID  OBJECT-TYPE
+							SYNTAX     Integer32  (1..1024)
+							MAX-ACCESS not-accessible
+							STATUS     current
+							DESCRIPTION "Index"
+							::= { pp4MLDGroupsEntry 1 }
+							
+						pp4MLDVLAN  OBJECT-TYPE
+							SYNTAX     Integer32
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MLDGroupsEntry 2 }
+							
+						pp4MLDGroupAddress  OBJECT-TYPE
+							SYNTAX     Ipv6Address
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MLDGroupsEntry 3 }
+							
+						pp4MLDMemberPorts  OBJECT-TYPE
+							SYNTAX     DisplayString (SIZE (0..32))
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION "Each octet within this value specifies a set of eight
+										ports, with the first octet specifying ports 1 through
+										8, the second octet specifying ports 9 through 16, etc.
+										Within each octet, the most significant bit represents
+										the lowest numbered port, and the least significant bit
+										represents the highest numbered port.  Thus, each port
+										of the bridge is represented by a single bit within the
+										value of this object.  If that bit has a value of '1',
+										then that port is included in the set of ports; the port
+										is not included if its bit has a value of '0"
+							::= { pp4MLDGroupsEntry 4 }
+							
+						pp4MLDExpires  OBJECT-TYPE
+							SYNTAX     TimeTicks
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4MLDGroupsEntry 5 }
+									
+	
+	pp4BoardState OBJECT IDENTIFIER ::= { pp4 30 }	
+	
+		pp4BoardFan1AbsoluteSpeed OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"rpm"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"absolute speed of fan #1 (in rpm)"
+			::= { pp4BoardState 1 }
+			
+		pp4BoardFan2AbsoluteSpeed OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"rpm"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"absolute speed of fan #2 (in rpm)"
+			::= { pp4BoardState 2 }	
+			
+		pp4BoardFan3AbsoluteSpeed OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"rpm"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"absolute speed of fan #3 (in rpm)"
+			::= { pp4BoardState 3 }	
+
+		pp4BoardFanRelativeSpeed OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"relative speed of fans. 0 - stopped, 0xFF - max speed"
+			::= { pp4BoardState 4 }
+			
+		pp4BoardFan1Breakdown OBJECT-TYPE
+			SYNTAX		Pp4FanBreakdownState
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"fan #1 breakdown indication"
+			::= { pp4BoardState 5 }
+			
+		pp4BoardFan2Breakdown OBJECT-TYPE
+			SYNTAX		Pp4FanBreakdownState
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"fan #2 breakdown indication"
+			::= { pp4BoardState 6 }
+			
+		pp4BoardFan3Breakdown OBJECT-TYPE
+			SYNTAX		Pp4FanBreakdownState
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"fan #3 breakdown indication"
+			::= { pp4BoardState 7 }	
+			
+			
+			
+		pp4BoardUnit1TempSfp OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"deg"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"temperature"
+			::= { pp4BoardState 8 }
+			
+		pp4BoardUnit2TempSfp OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"deg"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"temperature"
+			::= { pp4BoardState 9 }
+			
+		pp4BoardUnit1TempProc OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"deg"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"temperature"
+			::= { pp4BoardState 10 }
+		
+		pp4BoardUnit2TempProc OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"deg"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"temperature"
+			::= { pp4BoardState 11 }
+			
+		pp4BoardUnit1TempSwitch OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"deg"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"temperature"
+			::= { pp4BoardState 12 }
+			
+		pp4BoardUnit2TempSwitch OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"deg"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"temperature"
+			::= { pp4BoardState 13 }		
+	
+	
+	
+		pp4BoardUnit1LoadAverage1 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"LoadAverage for 1 minute"
+			::= { pp4BoardState 14 }
+			
+		pp4BoardUnit2LoadAverage1 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"LoadAverage for 1 minute"
+			::= { pp4BoardState 15 }	
+
+		pp4BoardUnit1LoadAverage5 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"LoadAverage for 5 minute"
+			::= { pp4BoardState 16 }
+			
+		pp4BoardUnit2LoadAverage5 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"LoadAverage for 5 minute"
+			::= { pp4BoardState 17 }	
+
+		pp4BoardUnit1LoadAverage15 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"LoadAverage for 15 minute"
+			::= { pp4BoardState 18 }
+			
+		pp4BoardUnit2LoadAverage15 OBJECT-TYPE
+			SYNTAX		Integer32
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"LoadAverage for 15 minute"
+			::= { pp4BoardState 19 }
+			
+			
+		pp4BoardUnit1TotalRam OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"total ram"
+			::= { pp4BoardState 20 }
+			
+		pp4BoardUnit2TotalRam OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"total ram"
+			::= { pp4BoardState 21 }
+			
+		pp4BoardUnit1FreeRam OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"free ram"
+			::= { pp4BoardState 22 }
+		
+		pp4BoardUnit2FreeRam OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"free ram"
+			::= { pp4BoardState 23 }
+			
+		pp4BoardUnit1TotalFilesystemRoot OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 24 }
+			
+		 pp4BoardUnit2TotalFilesystemRoot OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 25 }
+			
+		 pp4BoardUnit1TotalFilesystemTools OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 26 }
+			
+		 pp4BoardUnit2TotalFilesystemTools OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 27 }
+			
+		 pp4BoardUnit1TotalFilesystemConfig OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 28 }
+			
+		 pp4BoardUnit2TotalFilesystemConfig OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 29 }
+			
+		 pp4BoardUnit1TotalFilesystemLog OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 30 }
+			
+		 pp4BoardUnit2TotalFilesystemLog OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"bytes"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 31 }
+			
+		 
+		 pp4BoardUnit1FreeFilesystemRoot OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 32 }
+			
+		 pp4BoardUnit2FreeFilesystemRoot OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 33 }
+			
+		 pp4BoardUnit1FreeFilesystemTools OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 34 }
+			
+		 pp4BoardUnit2FreeFilesystemTools OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 35 }
+			
+		 pp4BoardUnit1FreeFilesystemConfig OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 36 }
+			
+		 pp4BoardUnit2FreeFilesystemConfig OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 37 }
+			
+		 pp4BoardUnit1FreeFilesystemLog OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 38 }
+			
+		 pp4BoardUnit2FreeFilesystemLog OBJECT-TYPE
+			SYNTAX		Integer32
+			UNITS		"%"
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION
+				"Available file system size in bytes"
+			::= { pp4BoardState 39 }
+			
+			
+	pp4FeederState OBJECT IDENTIFIER ::= { pp4 31 }
+	
+	pp4Feeder1Status OBJECT-TYPE
+			SYNTAX		Pp4FeederStatus
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " "
+			::= { pp4FeederState 1 }
+
+	pp4Feeder1Active OBJECT-TYPE
+			SYNTAX		Pp4FeederActive
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " "
+			::= { pp4FeederState 2 }
+			
+	pp4Feeder1Polarity OBJECT-TYPE
+			SYNTAX		Pp4FeederPolarity
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " "
+			::= { pp4FeederState 3 }
+			
+	pp4Feeder1Current OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " XX.XX A "
+			::= { pp4FeederState 4 }
+			
+	pp4Feeder1Voltage OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " +-XX.XX V "
+			::= { pp4FeederState 5 }
+			
+	pp4Feeder2Status OBJECT-TYPE
+			SYNTAX		Pp4FeederStatus
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " "
+			::= { pp4FeederState 6 }
+			
+	pp4Feeder2Active OBJECT-TYPE
+			SYNTAX		Pp4FeederActive
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " "
+			::= { pp4FeederState 7 }
+			
+	pp4Feeder2Polarity OBJECT-TYPE
+			SYNTAX		Pp4FeederPolarity
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " "
+			::= { pp4FeederState 8 }
+			
+	pp4Feeder2Current OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " XX.XX A "
+			::= { pp4FeederState 9 }
+			
+	pp4Feeder2Voltage OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " +-XX.XX V "
+			::= { pp4FeederState 10 }
+
+	pp4StationVoltage OBJECT-TYPE
+			SYNTAX		DisplayString
+			MAX-ACCESS	read-only
+			STATUS		current
+			DESCRIPTION " +-XX.XX V "
+			::= { pp4FeederState 11 }
+	
+			
+	pp4Firmware OBJECT IDENTIFIER ::= { pp4 35 }		
+			
+		pp4FirmwareTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4FirmwareEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				"This table provides info on what firmwares are available."
+		::= { pp4Firmware 1 }
+	
+				pp4FirmwareEntry OBJECT-TYPE
+				SYNTAX                Pp4FirmwareEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         {  pp4FirmwareBoardType, pp4FirmwareIndex }
+				::= { pp4FirmwareTable 1 }
+	
+				Pp4FirmwareEntry ::= SEQUENCE {
+						pp4FirmwareBoardType				Pp4SlotBoardType,
+						pp4FirmwareIndex					Unsigned32,					
+						pp4FirmwareVersion					DisplayString,
+						pp4FirmwareDelete					Unsigned32			
+				}
+				
+								
+							pp4FirmwareBoardType OBJECT-TYPE
+								SYNTAX     Pp4SlotBoardType
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION ""
+								::= { pp4FirmwareEntry 1 }
+							
+							pp4FirmwareIndex  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4FirmwareEntry 2 }
+								
+							pp4FirmwareVersion  OBJECT-TYPE
+								SYNTAX     DisplayString
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION ""
+								::= { pp4FirmwareEntry 3 }
+								
+							pp4FirmwareDelete  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " set 1 to delete firmware "
+								::= { pp4FirmwareEntry 4 }
+								
+				
+							
+	pp4DefaultFirmware OBJECT IDENTIFIER ::= { pp4Firmware 2 }
+	
+		pp4DefaultFirmwareELC OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION "Default firmware for ELC boards. Firmware is choosen by
+							specifying pp4FirmwareIndex from pp4FirmwareTable"
+			::= { pp4DefaultFirmware 1 }
+			
+		pp4DefaultFirmwarePLC OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION "Default firmware for ELC boards. Firmware is choosen by
+							specifying pp4FirmwareIndex from pp4FirmwareTable"
+			::= { pp4DefaultFirmware 2 }
+			
+		pp4ShelfConfigTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4ShelfConfigEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				"This table provides means to configure board types and firmwares."
+		::= { pp4Firmware 3 }
+	
+				pp4ShelfConfigEntry OBJECT-TYPE
+				SYNTAX                Pp4ShelfConfigEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         {  pp4ShelfConfigSlot }
+				::= { pp4ShelfConfigTable 1 }
+	
+				Pp4ShelfConfigEntry ::= SEQUENCE {
+						pp4ShelfConfigSlot					Integer32,
+						pp4ShelfConfigBoardType				Pp4SlotBoardType,					
+						pp4ShelfConfigFirmwareVersion		Pp4SlotFirmwareVersion	
+	
+				}
+				
+								
+							pp4ShelfConfigSlot OBJECT-TYPE
+								SYNTAX     Integer32 (1..16)
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION ""
+								::= { pp4ShelfConfigEntry 1 }							
+							
+							pp4ShelfConfigBoardType  OBJECT-TYPE
+								SYNTAX     Pp4SlotBoardType
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4ShelfConfigEntry 2 }
+								
+							pp4ShelfConfigFirmwareVersion  OBJECT-TYPE
+								SYNTAX     Pp4SlotFirmwareVersion
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION ""
+								::= { pp4ShelfConfigEntry 3 }
+	
+	
+	pp4BootVarTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4BootVarEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				"This table provides means to configure board types and firmwares."
+		::= { pp4Firmware 4 }
+	
+				pp4BootVarEntry OBJECT-TYPE
+				SYNTAX                Pp4BootVarEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION " "
+				INDEX {  pp4BootVarUnit, pp4BootVarIndex }
+				::= { pp4BootVarTable 1 }
+	
+				Pp4BootVarEntry ::= SEQUENCE {
+						pp4BootVarUnit					Integer32,
+						pp4BootVarIndex					Integer32,
+						pp4BootVarValid					TruthValue,
+						pp4BootVarTimestamp				DisplayString,
+						pp4BootVarVersionString			DisplayString
+				}
+				
+				pp4BootVarUnit OBJECT-TYPE
+					SYNTAX     Integer32 (1..2)
+					MAX-ACCESS not-accessible
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4BootVarEntry 1 }
+					
+				pp4BootVarIndex OBJECT-TYPE
+					SYNTAX     Integer32 (1..2)
+					MAX-ACCESS not-accessible
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4BootVarEntry 2 }
+					
+				pp4BootVarValid OBJECT-TYPE
+					SYNTAX     TruthValue
+					MAX-ACCESS read-only
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4BootVarEntry 3 }
+					
+				pp4BootVarTimestamp OBJECT-TYPE
+					SYNTAX     DisplayString
+					MAX-ACCESS read-only
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4BootVarEntry 4 }
+					
+				pp4BootVarVersionString OBJECT-TYPE
+					SYNTAX     DisplayString
+					MAX-ACCESS read-only
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4BootVarEntry 5 }
+	
+	pp4UnitsFirmwareTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4UnitsFirmwareEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				"This table provides means to configure board types and firmwares."
+		::= { pp4Firmware 5 }
+	
+				pp4UnitsFirmwareEntry OBJECT-TYPE
+				SYNTAX                Pp4UnitsFirmwareEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION ""
+				INDEX { pp4BootVarUnit }
+				::= { pp4UnitsFirmwareTable 1 }
+	
+				Pp4UnitsFirmwareEntry ::= SEQUENCE {
+						pp4UnitsStatus 					Pp4FirmwareUnitStatus,
+						pp4UnitsActivePartition			Integer32,
+						pp4UnitsFallbackPartition		Integer32,
+						pp4UnitsRunningPartition		Integer32,
+						pp4UnitsConfirm					TruthValue
+				}
+					
+				pp4UnitsStatus OBJECT-TYPE
+					SYNTAX     Pp4FirmwareUnitStatus
+					MAX-ACCESS read-only
+					STATUS     current
+					DESCRIPTION ""
+					::= { pp4UnitsFirmwareEntry 1 }
+					
+				pp4UnitsActivePartition OBJECT-TYPE
+					SYNTAX     Integer32
+					MAX-ACCESS read-write
+					STATUS     current
+					DESCRIPTION "The version that will be booted the next time
+									(0..FW_MAX_PARTITIONS); any value outside this range
+									should be treated as NotActive."
+					::= { pp4UnitsFirmwareEntry 2 }
+					
+				pp4UnitsFallbackPartition OBJECT-TYPE
+					SYNTAX     Integer32
+					MAX-ACCESS read-write
+					STATUS     current
+					DESCRIPTION "If fw_status is one of FW_STATUS_DOWNLOADED or FW_STATUS_TESTING:
+									the version that will be selected as active
+									if there is no confirmation from the operator."
+					::= { pp4UnitsFirmwareEntry 3 }
+					
+				pp4UnitsRunningPartition OBJECT-TYPE
+					SYNTAX     Integer32
+					MAX-ACCESS read-only
+					STATUS     current
+					DESCRIPTION "The partition that the firmware is currently running from."
+					::= { pp4UnitsFirmwareEntry 4 }
+					
+				pp4UnitsConfirm OBJECT-TYPE
+					SYNTAX     TruthValue
+					MAX-ACCESS read-write
+					STATUS     current
+					DESCRIPTION "set 1 to confirm selected pertition after reboot"
+					::= { pp4UnitsFirmwareEntry 5 }
+					
+		pp4FirmwareDeleteUnused OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION "Set 1 to delete all unused fw"
+			::= { pp4Firmware 6 }
+					
+		pp4FirmwareUpdate OBJECT IDENTIFIER ::= { pp4Firmware 10 }
+		
+			pp4FirmwareUpdateFileName OBJECT-TYPE
+				SYNTAX     DisplayString
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4FirmwareUpdate 1 }
+				
+			pp4FirmwareUpdateIpAddress OBJECT-TYPE
+				SYNTAX     IpAddress
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4FirmwareUpdate 2 }
+				
+			pp4FirmwareUpdateConfigName OBJECT-TYPE
+				SYNTAX     DisplayString
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION "config for new version. keep it empty if special config is not needed"
+				::= { pp4FirmwareUpdate 3 }
+				
+			pp4FirmwareUpdateSwitchVersion OBJECT-TYPE
+				SYNTAX     TruthValue
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION "set true to select new firmware for next boot"
+				::= { pp4FirmwareUpdate 4 }
+				
+			pp4FirmwareUpdateNeedRestart OBJECT-TYPE
+				SYNTAX     TruthValue
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION "set true to restart devices"
+				::= { pp4FirmwareUpdate 5 }
+				
+			pp4FirmwareUpdateNSSU OBJECT-TYPE
+				SYNTAX     TruthValue
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION "not stop software update - set true to restart devices without stop service"
+				::= { pp4FirmwareUpdate 6 }
+				
+			pp4FirmwareUpdateConfigIpAddress OBJECT-TYPE
+				SYNTAX     IpAddress
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4FirmwareUpdate 7 }
+				
+			pp4FirmwareUpdateProtocol OBJECT-TYPE
+				SYNTAX     INTEGER {
+						tftp(1),
+						http(2) }
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4FirmwareUpdate 8 }
+				
+			pp4FirmwareUpdatePort OBJECT-TYPE
+				SYNTAX     Unsigned32
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4FirmwareUpdate 9 }
+				
+			pp4FirmwareUpdateAction OBJECT-TYPE
+				SYNTAX     Unsigned32
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION "Set to 1 to initiate update process"
+				::= { pp4FirmwareUpdate 10 }
+				
+			pp4FirmwareUpdateConfigProtocol OBJECT-TYPE
+				SYNTAX     INTEGER {
+						tftp(1),
+						http(2) }
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4FirmwareUpdate 11 }
+				
+			pp4FirmwareUpdateConfigPort OBJECT-TYPE
+				SYNTAX     Unsigned32
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4FirmwareUpdate 12 }
+				
+			pp4FirmwareUpdateConfirm OBJECT-TYPE
+				SYNTAX     Unsigned32
+				MAX-ACCESS read-write
+				STATUS     current
+				DESCRIPTION "Set to 1 to confirm both units"
+				::= { pp4FirmwareUpdate 20 }
+
+
+	pp4AlarmsJournal OBJECT IDENTIFIER ::= { pp4 40 }	
+			
+		pp4AlarmsJournalCleanJournal OBJECT-TYPE
+			SYNTAX		Unsigned32
+			MAX-ACCESS	read-write
+			STATUS		current
+			DESCRIPTION
+				"On GET-REQUEST device should do nothing.
+				On SET-REQUEST device should clean up alarms journal"
+			::= { pp4AlarmsJournal 1 }
+	
+	
+pp4xIfUtilizTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Pp4xIfUtilizEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	""
+		::= { pp4 16 }
+
+	pp4xIfUtilizEntry OBJECT-TYPE
+		SYNTAX		Pp4xIfUtilizEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION ""
+		INDEX	{ interfaceIndex  }
+		::= { pp4xIfUtilizTable 1 }
+
+		Pp4xIfUtilizEntry ::= SEQUENCE {
+			interfaceIndex			Unsigned32,
+			portName				DisplayString,
+			lastCountersKbitsSent	Unsigned32,
+			lastCountersKbitsRecv	Unsigned32,
+			lastCountersFramesSent	Unsigned32,
+			lastCountersFramesRecv	Unsigned32,
+			averageKbitsSent		Unsigned32,
+			averageKbitsRecv		Unsigned32,
+			averageFramesSent		Unsigned32,
+			averageFramesRecv		Unsigned32
+		}
+	
+		interfaceIndex OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 1 }
+		
+		portName OBJECT-TYPE
+			SYNTAX     DisplayString
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 2 }
+	
+		lastCountersKbitsSent OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 3 }
+	
+		lastCountersKbitsRecv OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 4 }
+			
+		lastCountersFramesSent OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 5 }
+			
+		lastCountersFramesRecv OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 6 }
+			
+		averageKbitsSent OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 7 }
+			
+		averageKbitsRecv OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 8 }
+			
+		averageFramesSent OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 9 }
+			
+		averageFramesRecv OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xIfUtilizEntry 10 }
+			
+	pp4xIfUtilizAverageInterval OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-write
+		STATUS     current
+		DESCRIPTION " "
+		::= { pp4 17 }
+		
+	pp4xSfpInfoTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Pp4xSfpInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	""
+		::= { pp4 18 }
+
+	pp4xSfpInfoEntry OBJECT-TYPE
+		SYNTAX		Pp4xSfpInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION ""
+		INDEX	{ ifIndex  }
+		::= { pp4xSfpInfoTable 1 }
+
+		Pp4xSfpInfoEntry ::= SEQUENCE {
+			sfpInfoStatus			INTEGER,
+			sfpInfoTemperature		Unsigned32,
+			sfpInfoVoltage			Unsigned32,
+			sfpInfoCurrent			Unsigned32,
+			sfpInfoRXPower			Unsigned32,
+			sfpInfoTXPower			Unsigned32
+		}
+	
+		sfpInfoStatus OBJECT-TYPE
+			SYNTAX     INTEGER {
+				ok(0),
+				notAvailable(1),
+				ddmNotSupported(2)
+			}
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4xSfpInfoEntry 1 }
+		
+		sfpInfoTemperature OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION "Temperture measured in celsius degrees."
+			::= { pp4xSfpInfoEntry 2 }
+			
+		sfpInfoVoltage OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION "Measured in mV."
+			::= { pp4xSfpInfoEntry 3 }
+			
+		sfpInfoCurrent OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION "Measured in uA."
+			::= { pp4xSfpInfoEntry 4 }
+			
+		sfpInfoRXPower OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION "Measured in uW."
+			::= { pp4xSfpInfoEntry 5 }
+			
+		sfpInfoTXPower OBJECT-TYPE
+			SYNTAX     Unsigned32
+			MAX-ACCESS read-only
+			STATUS     current
+			DESCRIPTION "Measured in uW."
+			::= { pp4xSfpInfoEntry 6 }
+	
+	pp4PortsConfigTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4PortsConfigEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				""
+		::= { pp4 19 }
+
+			pp4PortsConfigEntry OBJECT-TYPE
+			SYNTAX                Pp4PortsConfigEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4PortsConfigEntryID }
+			::= { pp4PortsConfigTable 1 }
+
+			Pp4PortsConfigEntry ::= SEQUENCE {
+					pp4PortsConfigEntryID						Unsigned32,					
+					pp4PortsConfigAutoNegotiate					TruthValue,
+					pp4PortsConfigSpeed							Pp4PortSpeed,
+					pp4PortsConfigDuplex						Pp4PortDuplex,
+					pp4PortsConfigFlowControlEnabled			TruthValue,
+					pp4PortsConfigEnabled						TruthValue,
+					pp4PortsConfigResetCounters					Unsigned32,
+					pp4PortsConfigRowStatus						RowStatus
+			}
+			
+						pp4PortsConfigEntryID  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS not-accessible
+							STATUS     current
+							DESCRIPTION "Index"
+							::= { pp4PortsConfigEntry 1 }
+							
+						pp4PortsConfigAutoNegotiate  OBJECT-TYPE
+							SYNTAX     TruthValue
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsConfigEntry 2 }
+							
+						pp4PortsConfigSpeed  OBJECT-TYPE
+							SYNTAX     Pp4PortSpeed
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsConfigEntry 3 }
+							
+						pp4PortsConfigDuplex  OBJECT-TYPE
+							SYNTAX     Pp4PortDuplex
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsConfigEntry 4 }
+							
+						pp4PortsConfigFlowControlEnabled  OBJECT-TYPE
+							SYNTAX     TruthValue
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsConfigEntry 5 }
+							
+						pp4PortsConfigEnabled  OBJECT-TYPE
+							SYNTAX     TruthValue
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4PortsConfigEntry 6 }
+							
+						pp4PortsConfigResetCounters  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Set to 1 to reset counters"
+							::= { pp4PortsConfigEntry 7 }
+							
+						pp4PortsConfigRowStatus  OBJECT-TYPE
+							SYNTAX     RowStatus
+							MAX-ACCESS read-create
+							STATUS     current
+							DESCRIPTION "on set active - send data to switchd"
+							::= { pp4PortsConfigEntry 10 }
+		
+		
+	pp4UserTable OBJECT-TYPE
+	SYNTAX                SEQUENCE OF Pp4UserEntry
+	MAX-ACCESS        not-accessible
+	STATUS                current
+	DESCRIPTION
+			""
+	::= { pp4 50 }
+
+			pp4UserEntry OBJECT-TYPE
+			SYNTAX                Pp4UserEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4UserName }
+			::= { pp4UserTable 1 }
+
+			Pp4UserEntry ::= SEQUENCE {
+					pp4UserName						DisplayString,
+					pp4UserPermissions				OCTET STRING,
+					pp4UserOldPassword				DisplayString,
+					pp4UserNewPassword				DisplayString,
+					pp4UserRowStatus				RowStatus
+			}
+			
+						pp4UserName  OBJECT-TYPE
+							SYNTAX     DisplayString
+							MAX-ACCESS read-only
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4UserEntry 1 }
+							
+						pp4UserPermissions  OBJECT-TYPE
+							SYNTAX     OCTET STRING (SIZE (4))
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION ""
+							::= { pp4UserEntry 2 }
+							
+						pp4UserOldPassword  OBJECT-TYPE
+							SYNTAX     DisplayString
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4UserEntry 3 }
+							
+						pp4UserNewPassword  OBJECT-TYPE
+							SYNTAX     DisplayString
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4UserEntry 4 }
+							
+						pp4UserRowStatus  OBJECT-TYPE
+							SYNTAX     RowStatus
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4UserEntry 5 }
+							
+	pp4Privileges OBJECT IDENTIFIER ::= { pp4 51 }
+	
+		pp4PrivilegesNamesTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4PrivilegesNamesEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				""
+		::= { pp4Privileges 1 }
+
+				pp4PrivilegesNamesEntry OBJECT-TYPE
+				SYNTAX                Pp4PrivilegesNamesEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         { pp4PrivilegesNamesIndex }
+				::= { pp4PrivilegesNamesTable 1 }
+
+				Pp4PrivilegesNamesEntry ::= SEQUENCE {
+						pp4PrivilegesNamesIndex				Unsigned32,
+						pp4PrivilegesNamesName				DisplayString
+				}
+				
+							pp4PrivilegesNamesIndex  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS not-accessible
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4PrivilegesNamesEntry 1 }
+								
+							pp4PrivilegesNamesName  OBJECT-TYPE
+								SYNTAX     DisplayString
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION ""
+								::= { pp4PrivilegesNamesEntry 2 }
+								
+		pp4PrivilegesLevelsTable OBJECT-TYPE
+		SYNTAX                SEQUENCE OF Pp4PrivilegesLevelsEntry
+		MAX-ACCESS        not-accessible
+		STATUS                current
+		DESCRIPTION
+				""
+		::= { pp4Privileges 2 }
+
+				pp4PrivilegesLevelsEntry OBJECT-TYPE
+				SYNTAX                Pp4PrivilegesLevelsEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         { pp4PrivilegesLevelsLevel }
+				::= { pp4PrivilegesLevelsTable 1 }
+
+				Pp4PrivilegesLevelsEntry ::= SEQUENCE {
+						pp4PrivilegesLevelsLevel			Unsigned32,
+						pp4PrivilegesLevelsAllowed			OCTET STRING
+				}
+				
+							pp4PrivilegesLevelsLevel  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS not-accessible
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4PrivilegesLevelsEntry 1 }
+								
+							pp4PrivilegesLevelsAllowed  OBJECT-TYPE
+								SYNTAX     OCTET STRING (SIZE (4))
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION ""
+								::= { pp4PrivilegesLevelsEntry 2 }
+							
+	pp4IGMPConfig OBJECT IDENTIFIER ::= { pp4 55 }
+	
+		pp4IGMPSnoopingEnable  OBJECT-TYPE
+			SYNTAX     TruthValue
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4IGMPConfig 1 }
+			
+		pp4IGMPProxyReportEnable  OBJECT-TYPE
+			SYNTAX     TruthValue
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4IGMPConfig 2 }
+			
+		pp4MLDSnoopingEnable  OBJECT-TYPE
+			SYNTAX     TruthValue
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4IGMPConfig 5 }
+			
+		pp4MLDProxyReportEnable  OBJECT-TYPE
+			SYNTAX     TruthValue
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION " "
+			::= { pp4IGMPConfig 6 }
+			
+		pp4IGMPSnoopingVLANTable OBJECT-TYPE
+			SYNTAX                SEQUENCE OF Pp4IGMPSnoopingVLANEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			::= { pp4IGMPConfig 10 }
+		
+				pp4IGMPSnoopingVLANEntry OBJECT-TYPE
+				SYNTAX                Pp4IGMPSnoopingVLANEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         { pp4IGMPSnoopingVLANVID }
+				::= { pp4IGMPSnoopingVLANTable 1 }
+	
+				Pp4IGMPSnoopingVLANEntry ::= SEQUENCE {
+						pp4IGMPSnoopingVLANVID				Unsigned32,
+						pp4IGMPSnoopingVLANEnabled			TruthValue,
+						pp4IGMPSnoopingVLANQuerierEnabled	TruthValue,
+						pp4MLDSnoopingVLANEnabled			TruthValue,
+						pp4MLDSnoopingVLANQuerierEnabled	TruthValue
+				}
+				
+							pp4IGMPSnoopingVLANVID  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPSnoopingVLANEntry 1 }
+								
+							pp4IGMPSnoopingVLANEnabled  OBJECT-TYPE
+								SYNTAX     TruthValue
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPSnoopingVLANEntry 2 }
+								
+							pp4IGMPSnoopingVLANQuerierEnabled  OBJECT-TYPE
+								SYNTAX     TruthValue
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPSnoopingVLANEntry 3 }
+								
+							pp4MLDSnoopingVLANEnabled  OBJECT-TYPE
+								SYNTAX     TruthValue
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPSnoopingVLANEntry 4 }
+								
+							pp4MLDSnoopingVLANQuerierEnabled  OBJECT-TYPE
+								SYNTAX     TruthValue
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPSnoopingVLANEntry 5 }
+								
+		pp4IGMPProxyReportRangesTable OBJECT-TYPE
+			SYNTAX                SEQUENCE OF Pp4IGMPProxyReportRangesEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			::= { pp4IGMPConfig 20 }
+		
+				pp4IGMPProxyReportRangesEntry OBJECT-TYPE
+				SYNTAX                Pp4IGMPProxyReportRangesEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         { pp4IGMPProxyReportRangesID }
+				::= { pp4IGMPProxyReportRangesTable 1 }
+	
+				Pp4IGMPProxyReportRangesEntry ::= SEQUENCE {
+						pp4IGMPProxyReportRangesID	Unsigned32,
+						pp4IGMPProxyReportRangesStart	IpAddress,
+						pp4IGMPProxyReportRangesEnd		IpAddress,
+						pp4IGMPProxyReportRangesFromVLAN	Unsigned32,
+						pp4IGMPProxyReportRangesToVLAN 		Unsigned32,
+						pp4IGMPProxyRowStatus				RowStatus
+				}
+				
+							pp4IGMPProxyReportRangesID  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPProxyReportRangesEntry 1 }
+								
+							pp4IGMPProxyReportRangesStart  OBJECT-TYPE
+								SYNTAX     IpAddress
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPProxyReportRangesEntry 2 }
+								
+							pp4IGMPProxyReportRangesEnd  OBJECT-TYPE
+								SYNTAX     IpAddress
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPProxyReportRangesEntry 3 }
+								
+							pp4IGMPProxyReportRangesFromVLAN  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPProxyReportRangesEntry 4 }
+								
+							pp4IGMPProxyReportRangesToVLAN  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPProxyReportRangesEntry 5 }
+								
+							pp4IGMPProxyRowStatus  OBJECT-TYPE
+								SYNTAX     RowStatus
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4IGMPProxyReportRangesEntry 10 }
+								
+		pp4MLDProxyReportRangesTable OBJECT-TYPE
+			SYNTAX                SEQUENCE OF Pp4MLDProxyReportRangesEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			::= { pp4IGMPConfig 25 }
+		
+				pp4MLDProxyReportRangesEntry OBJECT-TYPE
+				SYNTAX                Pp4MLDProxyReportRangesEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         { pp4MLDProxyReportRangesID }
+				::= { pp4MLDProxyReportRangesTable 1 }
+	
+				Pp4MLDProxyReportRangesEntry ::= SEQUENCE {
+						pp4MLDProxyReportRangesID	Unsigned32,
+						pp4MLDProxyReportRangesStart	Ipv6Address,
+						pp4MLDProxyReportRangesEnd		Ipv6Address,
+						pp4MLDProxyReportRangesFromVLAN	Unsigned32,
+						pp4MLDProxyReportRangesToVLAN 		Unsigned32,
+						pp4MLDProxyRowStatus				RowStatus
+				}
+				
+							pp4MLDProxyReportRangesID  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-only
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4MLDProxyReportRangesEntry 1 }
+								
+							pp4MLDProxyReportRangesStart  OBJECT-TYPE
+								SYNTAX     Ipv6Address
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4MLDProxyReportRangesEntry 2 }
+								
+							pp4MLDProxyReportRangesEnd  OBJECT-TYPE
+								SYNTAX     Ipv6Address
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4MLDProxyReportRangesEntry 3 }
+								
+							pp4MLDProxyReportRangesFromVLAN  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4MLDProxyReportRangesEntry 4 }
+								
+							pp4MLDProxyReportRangesToVLAN  OBJECT-TYPE
+								SYNTAX     Unsigned32
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4MLDProxyReportRangesEntry 5 }
+								
+							pp4MLDProxyRowStatus  OBJECT-TYPE
+								SYNTAX     RowStatus
+								MAX-ACCESS read-write
+								STATUS     current
+								DESCRIPTION " "
+								::= { pp4MLDProxyReportRangesEntry 10 }
+								
+	pp4QOSConfig OBJECT IDENTIFIER ::= { pp4 60 }
+	
+		pp4QOSDefaultQueue  OBJECT-TYPE
+			SYNTAX     Unsigned32 (0..6)
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION "Default priority queue"
+			::= { pp4QOSConfig 1 }
+			
+		pp4QOSType OBJECT-TYPE
+			SYNTAX     INTEGER {
+					typeAllEqual(0),
+					type8021p(1),
+					typeDscpTos(2),
+					typeDscpTos8021p(3)
+					}
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION "Priority field of packet"
+			::= { pp4QOSConfig 2 }
+			
+			
+		pp4QOS8021pMappingTable OBJECT-TYPE
+			SYNTAX                SEQUENCE OF Pp4QOS8021pMappingEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			::= { pp4QOSConfig 3  }
+		
+			pp4QOS8021pMappingEntry OBJECT-TYPE
+			SYNTAX                Pp4QOS8021pMappingEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4QOS8021pMappingQueue }
+			::= { pp4QOS8021pMappingTable 1 }
+
+			Pp4QOS8021pMappingEntry ::= SEQUENCE {
+					pp4QOS8021pMappingQueue		Unsigned32,
+					pp4QOS8021pMappingFields	OCTET STRING
+			}
+			
+						pp4QOS8021pMappingQueue  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS not-accessible
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4QOS8021pMappingEntry 1 }
+							
+						pp4QOS8021pMappingFields  OBJECT-TYPE
+							SYNTAX     OCTET STRING (SIZE (1))
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Bitmask, in which every bit maps corresponding field to queue."
+							::= { pp4QOS8021pMappingEntry 2 }
+							
+		pp4QOSDSCPMappingTable OBJECT-TYPE
+			SYNTAX                SEQUENCE OF Pp4QOSDSCPMappingEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			::= { pp4QOSConfig 4  }
+		
+			pp4QOSDSCPMappingEntry OBJECT-TYPE
+			SYNTAX                Pp4QOSDSCPMappingEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4QOSDSCPMappingQueue }
+			::= { pp4QOSDSCPMappingTable 1 }
+
+			Pp4QOSDSCPMappingEntry ::= SEQUENCE {
+					pp4QOSDSCPMappingQueue		Unsigned32,
+					pp4QOSDSCPMappingFields	OCTET STRING
+			}
+			
+						pp4QOSDSCPMappingQueue  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS not-accessible
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4QOSDSCPMappingEntry 1 }
+							
+						pp4QOSDSCPMappingFields  OBJECT-TYPE
+							SYNTAX     OCTET STRING (SIZE (8))
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Bitmask, in which every bit maps corresponding field to queue."
+							::= { pp4QOSDSCPMappingEntry 2 }
+							
+	pp4AccessList OBJECT IDENTIFIER ::= { pp4 65 }
+	
+		pp4AccessListDefaultPolicyType  OBJECT-TYPE
+			SYNTAX     INTEGER {
+				allow(0),
+				deny(1) }
+			MAX-ACCESS read-write
+			STATUS     current
+			DESCRIPTION "."
+			::= { pp4AccessList 1 }
+		
+		pp4AccessListTable OBJECT-TYPE
+			SYNTAX                SEQUENCE OF Pp4AccessListEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			::= { pp4AccessList 2 }
+		
+			pp4AccessListEntry OBJECT-TYPE
+			SYNTAX                Pp4AccessListEntry
+			MAX-ACCESS        not-accessible
+			STATUS                current
+			DESCRIPTION
+					""
+			INDEX         { pp4AccessListEntryID }
+			::= { pp4AccessListTable 1 }
+
+			Pp4AccessListEntry ::= SEQUENCE {
+					pp4AccessListEntryID				Unsigned32,
+					pp4AccessListPolicyType				INTEGER,
+					pp4AccessListService				INTEGER,
+					pp4AccessListIfIndex				INTEGER,
+					pp4AccessListSourceAddressType		INTEGER,
+					pp4AccessListSourceMacAddress		MacAddress,
+					pp4AccessListSourceIpAddress		IpAddress,
+					pp4AccessListSourceMask				IpAddress,
+					pp4AccessListChangeIndex			Unsigned32,
+					pp4AccessListRowStatus				RowStatus
+			}
+			
+						pp4AccessListEntryID  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS not-accessible
+							STATUS     current
+							DESCRIPTION " "
+							::= { pp4AccessListEntry 1 }
+							
+						pp4AccessListPolicyType  OBJECT-TYPE
+							SYNTAX     INTEGER {
+								allow(0),
+								deny(1) }
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "."
+							::= { pp4AccessListEntry 2 }
+							
+						pp4AccessListService  OBJECT-TYPE
+							SYNTAX     INTEGER {
+								serviceHttp(0),
+								serviceSnmp(1),
+								serviceSsh(2),
+								serviceTelnet(3),
+								serviceAny(4) }
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "."
+							::= { pp4AccessListEntry 3 }
+							
+						pp4AccessListIfIndex  OBJECT-TYPE
+							SYNTAX     INTEGER {
+								any(-1)
+							}
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "."
+							::= { pp4AccessListEntry 4 }
+							
+						pp4AccessListSourceAddressType  OBJECT-TYPE
+							SYNTAX     INTEGER {
+								sourceMacAddress(0),
+								sourceIpAddress(1),
+								sourceAny(2)
+							}
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "."
+							::= { pp4AccessListEntry 5 }
+							
+						pp4AccessListSourceMacAddress  OBJECT-TYPE
+							SYNTAX     MacAddress
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Has sense if pp4AccessListSourceAddressType = sourceMacAddress"
+							::= { pp4AccessListEntry 6 }
+							
+						pp4AccessListSourceIpAddress  OBJECT-TYPE
+							SYNTAX     IpAddress
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Has sense if pp4AccessListSourceAddressType = sourceIpAddress"
+							::= { pp4AccessListEntry 7 }
+							
+						pp4AccessListSourceMask  OBJECT-TYPE
+							SYNTAX     IpAddress
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Has sense if pp4AccessListSourceAddressType = sourceIpAddress"
+							::= { pp4AccessListEntry 8 }
+							
+						pp4AccessListChangeIndex  OBJECT-TYPE
+							SYNTAX     Unsigned32
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "Change entry index, shifting following entries downwards."
+							::= { pp4AccessListEntry 9 }
+							
+						pp4AccessListRowStatus  OBJECT-TYPE
+							SYNTAX     RowStatus
+							MAX-ACCESS read-write
+							STATUS     current
+							DESCRIPTION "."
+							::= { pp4AccessListEntry 10 }
+							
+		pp4ONTLicense OBJECT IDENTIFIER ::= { pp4 70 }
+		
+			pp4ONTLicenseInstalled  OBJECT-TYPE
+				SYNTAX     TruthValue
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 1 }
+				
+			pp4ONTLicenseValid  OBJECT-TYPE
+				SYNTAX     TruthValue
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 2 }
+				
+			pp4ONTLicenseVersion  OBJECT-TYPE
+				SYNTAX     DisplayString
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 3 }
+				
+			pp4ONTLicenseCarrier  OBJECT-TYPE
+				SYNTAX     DisplayString
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 4 }
+				
+			pp4ONTLicenseVendor  OBJECT-TYPE
+				SYNTAX     DisplayString
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 5 }
+				
+			pp4ONTLicenseONTCountLicensed  OBJECT-TYPE
+				SYNTAX     INTEGER {
+							unlimited(2147483647)
+							}
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 6 }
+				
+			pp4ONTLicenseONTCountOnline  OBJECT-TYPE
+				SYNTAX     Unsigned32
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 7 }
+				
+			pp4ONTLicenseSerialNumbers  OBJECT-TYPE
+				SYNTAX     DisplayString
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 8 }
+				
+			pp4ONTLicenseMacAddresses  OBJECT-TYPE
+				SYNTAX     DisplayString
+				MAX-ACCESS read-only
+				STATUS     current
+				DESCRIPTION ""
+				::= { pp4ONTLicense 9 }
+							
+		pp4RawData OBJECT IDENTIFIER ::= { pp4 300 }					
+							
+		pp4RawMacTable OBJECT-TYPE
+				SYNTAX                SEQUENCE OF Pp4RawMacEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						" "
+				::= { pp4RawData 1 }
+			
+			pp4RawMacEntry OBJECT-TYPE
+				SYNTAX                Pp4RawMacEntry
+				MAX-ACCESS        not-accessible
+				STATUS                current
+				DESCRIPTION
+						""
+				INDEX         { pp4RawMacChunkID }
+				::= { pp4RawMacTable 1 }
+			
+			Pp4RawMacEntry ::= SEQUENCE {
+					pp4RawMacChunkID							Unsigned32,
+					pp4RawMacText								OCTET STRING
+			}
+			
+						pp4RawMacChunkID OBJECT-TYPE
+							SYNTAX  Unsigned32
+							MAX-ACCESS not-accessible
+							STATUS  current
+							DESCRIPTION " "
+							::= { pp4RawMacEntry 1 }	
+							
+						pp4RawMacText OBJECT-TYPE
+							SYNTAX  OCTET STRING (SIZE(0..65535))
+							MAX-ACCESS read-write
+							STATUS  current
+							DESCRIPTION " "
+							::= { pp4RawMacEntry 2 }
+
+
+
+ma4000AlarmTraps OBJECT IDENTIFIER         ::= { eltrapGroup 35 }
+ma4000OkTraps OBJECT IDENTIFIER         ::= { eltrapGroup 36 }
+-- all oids defined by alarm_code (uniTrapID.h)
+
+ma4000ConfigSavedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 1 }
+
+ma4000ConfigSaveAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 1 }
+ 
+ma4000ConfigAppliedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 2 }
+ 
+ma4000ConfigApplyAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 2 }
+
+ma4000LoginAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 3 }
+
+ma4000DhcpAckAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 5 }
+
+ma4000DhcpAgentUpAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 6 }
+
+ma4000DhcpServerUpAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 7 }
+
+ma4000DhcpIpGotAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 8 }
+                        
+ma4000Pp4CpuLoadCriticalAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 9 }
+                        
+ma4000Pp4CpuLoadCriticalOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 9 }
+
+ma4000OutOfRamAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 10 }
+
+ma4000MacSyncVlanDuplicateAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 11 }
+
+ma4000LinksPortFlappingPhyOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 12 }
+
+ma4000LinksPortFlappingPhyAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 12 }
+
+ma4000LinkUpOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 13 }
+                        
+ma4000LinkDownAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 13 }
+
+ma4000UnitLostOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 14 }
+
+ma4000UnitLostAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 14 }
+
+ma4000DhcpOfferAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 15 }
+
+ma4000DhcpAgentDownAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 16 }
+
+ma4000DhcpServerAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 17 }
+
+ma4000DhcpIpFailedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 18 }
+
+ma4000SlotOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 19 }
+
+ma4000IgmpSyncFailedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 20 }
+
+ma4000StpSyncFailedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 21 }
+
+ma4000StpLinkChangedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 22 }
+
+ma4000PortCntrErrorsFoundAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 23 }
+
+ma4000CscdMasterChandedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 24 }
+
+ma4000PortCntrErrorsFreeOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 23 }
+
+ma4000SyncDisallowedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 25 }
+
+ma4000SyncDisallowedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 25 }
+
+ma4000SlotInvalidAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 26 }
+
+ma4000SlotErrorAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 27 }
+
+ma4000SlotDownAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 28 }
+
+ma4000BufferIverflowOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 29 }
+
+ma4000ConfigRestoreOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 30 }
+
+ma4000OmsAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 31 }
+
+ma4000OmsOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 31 }
+
+ma4000FanSpeedAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 32 }
+
+ma4000FanSpeedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 32 }
+
+ma4000FanFailAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 33 }
+
+ma4000FanOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 33 }
+
+ma4000FanControllerFailAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 34 }
+
+ma4000FanControllerOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 34 }
+
+ma4000RebootStackAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 35 }
+
+ma4000RebootUnitAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 36 }
+
+ma4000RebootUnitOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 36 }
+
+ma4000RebootFwTimerAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 37 }
+
+ma4000FwUpdateAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 38 }
+
+ma4000FwUpdateOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 38 }
+
+ma4000FwConfirmNeededAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 39 }
+                        
+ma4000CpuLoadHighAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 48 }
+                        
+ma4000CpuLoadHighOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 48 }
+                        
+ma4000ComCopyAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 54 }
+                        
+ma4000ComCopyOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 54 }
+                        
+ma4000FirmwareUpdateStateOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000OkTraps 63 }
+                        
+ma4000CscdDuplicateUnitIdAlarmTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " "
+                        ::= { ma4000AlarmTraps 64 }
+                        
+ma4000SystemColdstartOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                " Close all active alarms on receiving this trap "
+                        ::= { ma4000OkTraps 65 }
+                        
+ma4000FallbackWasInvokedOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Fallback was invoked during firmware update."
+                        ::= { ma4000OkTraps 516 }
+                        
+ma4000NSSRStatusOkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "NSSR status changed. "
+                        ::= { ma4000OkTraps 517 }
+                        
+ma4000FirmwareUpdateStateV2OkTrap NOTIFICATION-TYPE
+                        OBJECTS {
+                                mcTrapExState,
+                                mcTrapLParam1,
+                                mcTrapLParam2,
+                                mcTrapLParam3,
+                                mcTrapID,
+                                mcTrapDescr}
+                        STATUS  current
+                        DESCRIPTION
+                                "Firmware update state message."
+                        ::= { ma4000OkTraps 518 }
+
+	pp4Group  OBJECT-GROUP
+	OBJECTS
+		{
+		 pp4DevName,
+		 pp4DevType,
+		 pp4DevCfgBuild,
+		 pp4FreeSpace,
+		 pp4FreeRam,
+		 
+		 pp4SystemType,
+		 pp4SystemInfo,
+		 
+		 pp4SystemUnit1MacAddress,
+		 pp4SystemUnit2MacAddress,
+		 
+		 pp4SystemUnit1FirmwareVersion,
+		 pp4SystemUnit2FirmwareVersion,
+		 
+		 pp4SystemUnit1LinuxVersion,
+		 pp4SystemUnit2LinuxVersion,
+		 
+		 pp4SystemUnit1UpTime,
+		 pp4SystemUnit2UpTime,
+		 
+		 pp4PortsEntryID,
+		 pp4PortsLink,
+		 pp4PortsAutoNegotiate,
+		 pp4PortsAutoNegotiationError,
+		 pp4PortsSpeed,
+		 pp4PortsDuplex,
+		 pp4PortsFlowControlEnabled,
+		 pp4PortsEnabled,
+		 
+		 pp4MulticastEntryID,
+		 pp4MulticastVLAN,
+		 pp4MulticastGroupAddress,
+		 pp4MulticastMemberPorts,
+		 pp4MulticastExpires,
+		 
+		 pp4MacAddressEntryID,
+		 pp4MacAddressVLAN,
+		 pp4MacAddressAddress,
+		 pp4MacAddressPort,
+		 pp4MacAddressType,
+		 
+		 pp4RebootSlot,
+		 pp4RebootDescription,
+		 pp4RebootCommand,
+		 
+		 pp4RebootAfterDelay,
+		 
+		 pp4BoardFan1AbsoluteSpeed,
+		 pp4BoardFan2AbsoluteSpeed,
+		 pp4BoardFan3AbsoluteSpeed,
+		 pp4BoardFanRelativeSpeed,
+		 pp4BoardFan1Breakdown,
+		 pp4BoardFan2Breakdown,
+		 pp4BoardFan3Breakdown,
+		 
+		 pp4BoardUnit1TempSfp,
+		 pp4BoardUnit2TempSfp,
+		 pp4BoardUnit1TempProc,
+		 pp4BoardUnit2TempProc,
+		 pp4BoardUnit1TempSwitch,
+		 pp4BoardUnit2TempSwitch,
+		 
+		 pp4BoardUnit1LoadAverage1,
+		 pp4BoardUnit2LoadAverage1,
+		 pp4BoardUnit1LoadAverage5,
+		 pp4BoardUnit2LoadAverage5,
+		 pp4BoardUnit1LoadAverage15,
+		 pp4BoardUnit2LoadAverage15,
+		 
+		 pp4BoardUnit1TotalRam,
+		 pp4BoardUnit2TotalRam,
+		 
+		 pp4BoardUnit1FreeRam,
+		 pp4BoardUnit2FreeRam,
+		 
+		 pp4BoardUnit1TotalFilesystemRoot,
+		 pp4BoardUnit2TotalFilesystemRoot,
+		 pp4BoardUnit1TotalFilesystemTools,
+		 pp4BoardUnit2TotalFilesystemTools,
+		 pp4BoardUnit1TotalFilesystemConfig,
+		 pp4BoardUnit2TotalFilesystemConfig,
+		 pp4BoardUnit1TotalFilesystemLog,
+		 pp4BoardUnit2TotalFilesystemLog,
+		 
+		 pp4BoardUnit1FreeFilesystemRoot,
+		 pp4BoardUnit2FreeFilesystemRoot,
+		 pp4BoardUnit1FreeFilesystemTools,
+		 pp4BoardUnit2FreeFilesystemTools,
+		 pp4BoardUnit1FreeFilesystemConfig,
+		 pp4BoardUnit2FreeFilesystemConfig,
+		 pp4BoardUnit1FreeFilesystemLog,
+		 pp4BoardUnit2FreeFilesystemLog,
+		 
+		 pp4AlarmsJournalCleanJournal
+		 
+		}
+			STATUS  current
+	        DESCRIPTION
+		           "none"
+	            ::= { pp4 200 }
+END 

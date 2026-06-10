@@ -1,0 +1,165 @@
+-- =================================================================
+-- Copyright (c) 2004-2012 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  Private MIB File For Loadbalance
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0  2010-12 Initial Version by l05567
+--       2011-11 Add 'hh3cLBRealServerConnectNumber', 'hh3cLBTrap',
+--               'hh3cLBRealServerOverLoad', 'hh3cLBTrapPrex' by l05567
+-- =================================================================
+HH3C-LB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cLB MODULE-IDENTITY
+    LAST-UPDATED "201012010000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The private mib file includes the loadbalance information of
+        the device."
+    REVISION      "201012010000Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 116 }
+
+hh3cLBTables OBJECT IDENTIFIER ::= { hh3cLB 1 }
+
+-- MIB contains 2 groups
+
+-- =================================================================
+--    Real Server Group Table
+-- =================================================================
+
+hh3cLBRealServerGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBRealServerGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Real server group table for loadbalance."
+    ::= { hh3cLBTables 1 }
+
+hh3cLBRealServerGroupEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBRealServerGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the information of the real server group."
+    INDEX {
+            hh3cLBRealServerGroupName
+          }
+    ::= { hh3cLBRealServerGroupTable 1 }
+
+Hh3cLBRealServerGroupEntry  ::=
+    SEQUENCE{
+        hh3cLBRealServerGroupName                DisplayString
+    }
+
+hh3cLBRealServerGroupName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Real server group name."
+    ::= { hh3cLBRealServerGroupEntry 1 }
+
+
+-- =================================================================
+--    Real Server Table
+-- =================================================================
+hh3cLBRealServerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cLBRealServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Real server table for loadbalance."
+    ::= { hh3cLBTables 2 }
+
+hh3cLBRealServerEntry OBJECT-TYPE
+    SYNTAX      Hh3cLBRealServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contains the information of the real server."
+    INDEX {
+            hh3cLBRealServerGroupName,
+            hh3cLBRealServerName
+          }
+    ::= { hh3cLBRealServerTable 1 }
+
+Hh3cLBRealServerEntry  ::=
+    SEQUENCE{
+        hh3cLBRealServerName                DisplayString,
+        hh3cLBRealServerStatus              INTEGER,
+        hh3cLBRealServerConnectNumber       Integer32
+    }
+
+hh3cLBRealServerName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..31))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Real server name."
+    ::= { hh3cLBRealServerEntry 1 }
+
+hh3cLBRealServerStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          enabled(1),
+                          disabled(2),
+                          slowdown(3)
+                        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A list of real server status type.
+         enabled:      the real server is enabled.
+         disabled:     the real server is disabled, the loadbalance device
+                       does not assign any traffic to the real server.
+         slowdown:     the real server continues to process the existed session
+                       previously assigned to it, but the loadbalance device
+                       does not assign any new session to the real server."
+     ::= { hh3cLBRealServerEntry 2 }
+
+hh3cLBRealServerConnectNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The connection number of real server."
+    ::= { hh3cLBRealServerEntry 3 }
+
+-- =================================================================
+--    Traps of Loadbalance
+-- =================================================================
+hh3cLBTrap OBJECT IDENTIFIER ::= {hh3cLB 2}
+
+hh3cLBTrapPrex OBJECT IDENTIFIER ::= {hh3cLBTrap 0}
+
+hh3cLBRealServerOverLoad NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cLBRealServerGroupName,
+            hh3cLBRealServerName,
+            hh3cLBRealServerConnectNumber
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when the real server is overloaded."
+    ::= {hh3cLBTrapPrex 1}
+
+END
+

@@ -1,0 +1,387 @@
+
+-- *****************************************************************************
+-- Juniper-TC
+--
+-- Juniper Networks Enterprise MIB
+--   Textual Conventions
+--
+-- Copyright (c) 1998 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003, 2005 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-TC  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Integer32, IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniTextualConventions  MODULE-IDENTITY
+    LAST-UPDATED "200512212013Z"  -- 21-Dec-05 03:13 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "Textual conventions defined and used by the Juniper Networks
+        enterprise."
+    -- Revision History
+    REVISION    "200512212013Z"  -- 21-Dec-05 03:13 PM EST  - JUNOSe 7.3
+    DESCRIPTION
+        "Added JuniNibbleConfig."
+    REVISION    "200511182230Z"  -- 18-Nov-05 05:30 PM EST  - JUNOSe 7.3
+    DESCRIPTION
+        "Added JuniTimeFilter."
+    REVISION    "200412032212Z"  -- 03-Dec-04 05:12 PM EST  - JUNOSe 6.1
+    DESCRIPTION
+        "Added JuniVrfGroupName."
+    REVISION    "200311122231Z"  -- 12-Nov-03 05:31 PM EST  - JUNOSe 6.0
+    DESCRIPTION
+        "Increased the size of JuniInterfaceLocation.
+         Added JuniInterfaceLocationType and JuniInterfaceLocationValue."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Added JuniInterfaceDescrFormat and JuniInterfaceLocation."
+    REVISION    "200204041635Z"  -- 04-Apr-02 11:35 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Increased the size limits on JuniName and JuniVrfName."
+    REVISION    "200103082226Z"  -- 08-Mar-01 05:26 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Added JuniVrfName and JuniSetMap."
+    REVISION      "9912120000Z"  -- 12-Dec-99               - JUNOSe 1.3
+    DESCRIPTION
+        "Added JuniLogSeverity."
+    REVISION      "9907140000Z"  -- 14-Jul-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Added JuniAcctngAdminType and JuniAcctngOperType."
+    REVISION      "9811130000Z"  -- 13-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniEnable ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Enterprise-standard SYNTAX for MIB objects having enumerated value pair
+        'enable' and 'disable'.  Used for both admin (configurable) and oper
+        (read-only) objects."
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1) }
+
+JuniName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "256a"
+    STATUS      current
+    DESCRIPTION
+        "A virtual router text name of restricted length.  Represents textual
+        information taken from the NVT ASCII graphics character set (codes 32
+        through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    SYNTAX      OCTET STRING (SIZE(0..256))
+
+JuniVrfName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION
+        "A VPN routing forwarding text name of restricted length.  Represents
+        textual information taken from the NVT ASCII graphics character set
+        (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+JuniNextIfIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in an associated
+        ifIndex-ed interface table, by first reading an ifIndex value from this
+        object, then creating an entry, having that ifIndex value, in the
+        associated interface table.
+
+        The DESCRIPTION clause for an object of this type must identify the
+        associated interface table.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously.
+
+        Unless specified otherwise by its MAX-ACCESS and DESCRIPTION clauses, an
+        object of this type is read-only, and a SET of such an object returns a
+        notWritable error."
+    SYNTAX      Integer32 (0..2147483647)
+
+JuniIpAddrLessIf ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Compressed index representation to identify both numbered and
+        unnumbered ('address-less') IP subnetworks.
+
+        One approach is to identify such interfaces with a 2-tuple consisting of
+        <IpAddress, ifIndex>, where only one of the pair is nonzero for a valid
+        interface (IpAddress is nonzero for numbered interfaces, ifIndex is
+        nonzero for unnumbered interfaces).
+
+        As an alternative, this textual convention compresses the 2-tuple
+        information into an IpAddress (32-bit) format a.b.c.d having the
+        following interpretation:
+
+        Format              Interpretation      IP Interface Type
+        ------------------------------------------------------------------
+        0.0.0.0             'null' value        'none' or 'wildcard', etc.
+        a.b.c.d, a != 0     IP Address          Numbered
+        0.b.c.d             ifIndex             Unnumbered
+
+        For the unnumbered case, the value of the ifIndex is given by
+        (b * 65536) + (c * 256) + (d)
+
+        A side-effect of this approach is that ifIndex values for IP network
+        interfaces must fall in the range 1..16777215 (i.e. 24 bits)."
+    SYNTAX      IpAddress
+
+JuniTimeSlotMap ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A bit map representing one or more timeslots of a DS1/E1 interface.
+        Bits are numbered in descending order from 31-0 starting from the most
+        significant bit of the first octet and ending with the least significant
+        bit of the fourth octet.  Bits 1-24 are relevant for DS1 interfaces,
+        bits 0-31 are relevant for E1 interfaces.
+
+        A bit is set if the associated timeslot is in use, and cleared if the
+        associated timeslot is not in use."
+    SYNTAX      OCTET STRING (SIZE(4))
+
+JuniAcctngAdminType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The desired administrative state for the collection of accounting
+        records.  The administrative domain governed by an object of
+        JuniAcctngAdminType is defined in the MIB OBJECT description that uses
+        this type."
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+
+JuniAcctngOperType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the collection of accounting records.  The
+        administrative domain that an object of this type is reporting state
+        for, is defined in the MIB object description that uses this type.
+
+        The notSupported(2) state indicates that accounting data collection is
+        not supported for the entity using an object of JuniAcctngOperType type.
+        If an entity does not support accounting data collection, an object of
+        JuniAcctngOperType type will report notSupported(2) regardless of the
+        value set in the corresponding JuniAcctngAdminType.
+
+        The disabled(0) state indicates that the corresponding
+        JuniAcctngAdminType object has been set to disabled(0).  If a data
+        collection is in process, the value of JuniAcctngOperType will change to
+        disabled(0) after the current collection completes.
+
+        The enabled(1) state indicates that the corresponding
+        JuniAcctngAdminType object has been set to enabled(1) and that the
+        entity is ready to collect accounting records."
+    SYNTAX      INTEGER {
+                    disable(0),
+                    enable(1),
+                    notSupported(2) }
+
+JuniLogSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The log severity level.
+
+        Lower numerical values correspond to higher severity levels.  The value
+        'off' filters all severity levels."
+    SYNTAX      INTEGER {
+                    off(-1),
+                    emergency(0),
+                    alert(1),
+                    critical(2),
+                    error(3),
+                    warning(4),
+                    notice(5),
+                    info(6),
+                    debug(7) }
+
+JuniSetMap ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A bitmap indicating which objects in a table entry have been explicitly
+        configured.
+
+        A 1 in a bit position indicates the corresponding table entry object has
+        been explicitly configured.
+
+        A 0 in a bit position indicates the corresponding table entry has NOT
+        been explicitly configured (and typically contains the default setting
+        defined in the DEFVAL clause for that object).
+
+        Once set, a bit typically remains set until the table entry is
+        destroyed.  The semantics of an object of this type should specify by
+        what circumstances, if any, bits in the map may be cleared.
+
+        If an entry exists in a table but no entry objects have been configured,
+        JuniSetMap will contain a zero-length string.
+
+        The DESCRIPTION clause for an object having this SYNTAX should indicate
+        which, if any, entry objects are excluded from representation in the
+        JuniSetMap.  Typically, index and RowStatus entry objects would not be
+        represented.
+
+        Bit positions correspond to table entry objects as follows:  Objects in
+        the table entry are numbered according to the last OID subidentifier of
+        their object type as defined in the MIB.  For example, an object in a
+        table entry having OID 1.3.6.1.2.1.2.2.1.5 would be object number
+        5. (Instance-identifying OID subidentifiers are ignored.)
+
+        Octets in the map are numbered 1..N beginning with the first octet.
+
+        Bits in an octet are numbered 1..8 beginning with the MOST significant
+        bit.
+
+        Bit B in octet Q represents the entry object numbered E thus:
+            E = (((Q - 1) * 8) + B)
+
+        For example, the third most significant bit in the second octet
+        represents the entry object numbered 11:
+            ((((2 - 1) * 8) + 3) = 11
+
+        Conversely, the octet Q and bit B positions of the corresponding bit for
+        a given entry object numbered E is determined by:
+            Q = (((E - 1) / 8) + 1)     (where '/' means integer division)
+            B = (((E - 1) modulo 8) + 1)
+
+        For example, the octet and bit positions of the entry object numbered 11
+        are:
+            (((11 - 1) / 8) + 1)      = 2 (octet number)
+            (((11 - 1) modulo 8) + 1) = 3 (3rd most sig. bit) "
+    SYNTAX      OCTET STRING (SIZE(0..8))
+
+JuniInterfaceDescrFormat ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The interface description format setting.
+            proprietary(0)      Juniper encoding
+                                Example Column: IP 3/0.1, ATM 3/0.1, ATM 3/0
+            industryCommon(1)                   ATM 3/0.1, ATM3/0.1 ATM 3/0 "
+    SYNTAX      INTEGER {
+                    proprietary(0),
+                    industryCommon(1) }
+
+JuniInterfaceLocation ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An ASCII string representation of an interfaces location in the
+        following forms:
+            slot/port
+            slot/adapter/port
+            adapter/port
+
+        Examples:  3/0, 12/0/1, 0/0 
+
+        The form is determined by the physical architecture of the router
+        platform.  E.g., the ERX family of platforms (first generation E-series)
+        requires the 'slot/port' form."
+    SYNTAX      OCTET STRING (SIZE(0..8))
+
+JuniInterfaceLocationType  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Describes the platform-dependent interpretation of a
+        JuniInterfaceLocationValue object:
+            unknown           - Unspecified/unknown
+            slotPort          - Two octets in length; 1st octet is 'slot', 2nd
+                                octet is 'port' 
+            slotAdapterPort   - Three octets in length; 1st octet is 'slot', 2nd
+                                octet is 'adapter', 3rd octet is 'port' 
+            adapterPort       - Two octets in length; 1st octet is 'adapter',
+                                2nd octet is 'port' "
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    slotPort(1),
+                    slotAdapterPort(2),
+                    adapterPort(3) }
+
+JuniInterfaceLocationValue  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The value of a platform-dependent interface location, represented as an
+        OCTET STRING.  A corresponding JuniInterfaceLocationType object will identify
+        the mapping of octets to location elements, e.g. 'slot.port'.
+
+        Note: When the value of an object having this syntax is encoded as a MIB
+        table INDEX, the rules for encoding a variable-length OCTET STRING are
+        observed."
+    SYNTAX      OCTET STRING (SIZE(1..16))
+
+JuniVrfGroupName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS      current
+    DESCRIPTION
+        "A VPN routing forwarding group name of restricted length.  Represents
+        textual information taken from the NVT ASCII graphics character set
+        (codes 32 through 126)."
+    REFERENCE
+        "RFC 854: NVT ASCII character set."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+JuniTimeFilter ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Used as an index to a table. A TimeFilter variable allows a GetNext
+        or GetBulk request to find rows in a table for which the TimeFilter 
+        index variable is greater than or equal to a specified value.
+        JuniTimeFilter is same as TimeFilter. Detailed description of 
+        TimeFilter variables, their implementation and use is documented in the 
+        RMON2 MIB."
+    REFERENCE
+        "Refer to RFC 2021 for the definition of the TimeFilter, its usage and 
+        implementation notes."
+    SYNTAX    TimeTicks
+
+JuniNibbleConfig ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A configuration variable comprised of nibbles i.e. 4 bits, such that 
+         a client can supply a list of 0 to 8 selections.  The least 
+         significant nibble is the first value of the list, and the most 
+         significant nibble is the last value.  The value in each field 
+         ranges from 0 to 15, however the first nibble with value 0 indicates
+         the end of the list.  Repetition of values is not allowed. 
+         Segregation of values in not allowed.
+
+         Example valid encoding:
+         0x00000321
+         0x00083E12
+
+         Not a valid encoding:
+         0x00000121- will return an error
+         0x01002001- will return an error."
+    SYNTAX INTEGER
+
+END

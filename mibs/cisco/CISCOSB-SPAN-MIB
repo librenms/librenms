@@ -1,0 +1,260 @@
+CISCOSB-SPAN-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB SPAN ROS
+--                       Private SPAN MIB
+-- Version:              8.00
+-- Date:                 15-Mar-2015
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Unsigned32,
+   NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+   TEXTUAL-CONVENTION, TruthValue, RowStatus
+        FROM SNMPv2-TC
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+   switch001, rndNotifications
+        FROM CISCOSB-MIB
+   InterfaceIndex
+        FROM IF-MIB;
+
+
+SpanDestinationPortType  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "SPAN destination mode type:
+                    1 - monitor-only
+                    2 - network."
+    SYNTAX INTEGER {
+        monitor-only(1),
+        network(2)
+}
+
+SpanSourceType  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "SPAN source type:
+                    1 - port
+                    2 - VLAN
+                    3 - flow
+                    4 - remote VLAN."
+    SYNTAX INTEGER {
+        port(1),
+        vlan(2),
+	    flow(3),
+	    remote-vlan(4)
+}
+
+SpanSourceDirection ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "SPAN source direction:
+                    1 - rx
+                    2 - tx
+                    3 - both."
+    SYNTAX INTEGER {
+        rx(1),
+        tx(2),
+	    both(3)
+}
+
+SpanDestinationReflectorType  ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION    "RSPAN reflector port type:
+                    1 - SPAN
+                    2 - RSPAN - start
+                    3 - RSPAN - final."
+    SYNTAX INTEGER {
+        span(1),
+        rspan-start(2),
+		rspan-final(3)
+}
+
+
+rlSpan MODULE-IDENTITY
+    LAST-UPDATED "201503250000Z"
+	ORGANIZATION "Cisco Systems, Inc."
+
+	CONTACT-INFO
+	"Postal: 170 West Tasman Drive
+	San Jose , CA 95134-1706
+	USA
+
+	
+	Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+    DESCRIPTION
+           "This private MIB module for SPAN (Switched Port Analyzer)."
+    REVISION "201503250000Z"
+    DESCRIPTION
+           "Initial revision."
+     ::= { switch001 219 }
+
+
+
+rlSpanMibVersion OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlSpan 1 }
+
+------------------------------------
+-- SPAN - rlSpanDestinationTable
+------------------------------------
+
+rlSpanDestinationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSpanDestinationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds information for SPAN destination per session id."
+    ::= { rlSpan 2 }
+
+rlSpanDestinationEntry OBJECT-TYPE
+    SYNTAX      RlSpanDestinationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry in the rlSpanDestinationTable." 
+    INDEX    { rlSpanDestinationSessionId }
+    ::= {rlSpanDestinationTable 1 }
+
+RlSpanDestinationEntry ::= SEQUENCE {
+    rlSpanDestinationSessionId 	    INTEGER,
+    rlSpanDestinationIfIndex        InterfaceIndex,
+    rlSpanDestinationIsReflector    SpanDestinationReflectorType,
+    rlSpanDestinationPortType       SpanDestinationPortType,
+    rlSpanDestinationRemoteVlanId   InterfaceIndex,
+    rlSpanDestinationRowStatus      RowStatus
+}
+
+rlSpanDestinationSessionId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "SPAN session ID. This variable is the key for SPAN destination table.
+         Uniquely identifies the SPAN destination."
+    ::= { rlSpanDestinationEntry 1 }
+
+
+rlSpanDestinationIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Interface Index. This variable identifies the destination ifIndex"
+    ::= { rlSpanDestinationEntry 2 }               
+
+rlSpanDestinationIsReflector OBJECT-TYPE
+    SYNTAX      SpanDestinationReflectorType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether the current session is SPAN or RSPAN 
+         start or final session."
+    ::= { rlSpanDestinationEntry 3 }         
+
+rlSpanDestinationPortType OBJECT-TYPE
+    SYNTAX      SpanDestinationPortType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates whether the destination port acts as network
+         port or analyzer only port."
+    ::= { rlSpanDestinationEntry 4 }           
+
+rlSpanDestinationRemoteVlanId OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicated the remote vlan id for RSPAN case."
+    ::= { rlSpanDestinationEntry 5 }               
+	
+rlSpanDestinationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { rlSpanDestinationEntry 6 }
+
+
+------------------------------------
+-- SPAN - rlSpanSourceTable
+------------------------------------
+rlSpanSourceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF RlSpanSourceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table holds information for SPAN Source ports per session id."
+    ::= {rlSpan 3 }
+
+rlSpanSourceEntry OBJECT-TYPE
+    SYNTAX      RlSpanSourceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry in the rlSpanSourceTable." 
+    INDEX    { rlSpanSourceSessionId,
+               rlSpanSourceType,
+               rlSpanSourceIndex
+    }
+    ::= {rlSpanSourceTable 1 }
+
+
+RlSpanSourceEntry ::= SEQUENCE {
+    rlSpanSourceSessionId 	INTEGER,
+    rlSpanSourceType            SpanSourceType,
+    rlSpanSourceIndex           INTEGER,
+    rlSpanSourceDirection       SpanSourceDirection,
+    rlSpanSourceRowStatus       RowStatus
+}
+
+rlSpanSourceSessionId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION	
+        "SPAN session ID. This variable is the key for SPAN source table.
+         Identifies the SPAN source."
+    ::= { rlSpanSourceEntry 1 }
+
+
+rlSpanSourceType OBJECT-TYPE
+    SYNTAX      SpanSourceType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the SPAN source type."
+    ::= { rlSpanSourceEntry 2 }                   
+
+rlSpanSourceIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the ifIndex of the SPAN source port
+         or the flow Id of the class map (for flow span source type)."
+    ::= { rlSpanSourceEntry 3 }                         
+
+rlSpanSourceDirection OBJECT-TYPE
+    SYNTAX      SpanSourceDirection
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the source direction for monitoring."
+    ::= { rlSpanSourceEntry 4 } 
+
+rlSpanSourceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The row status variable, used according to
+       row installation and removal conventions."
+    ::= { rlSpanSourceEntry 5 }
+                        
+              
+END

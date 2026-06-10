@@ -1,0 +1,544 @@
+--  *****************************************************************
+--  DLINKSW-SSH-MIB.mib : Secure Shell MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-SSH-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32
+                FROM SNMPv2-SMI
+        RowStatus, TimeStamp,TruthValue,DisplayString
+                FROM SNMPv2-TC               
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF               
+        InetAddressType,InetAddress
+                FROM INET-ADDRESS-MIB                
+        InterfaceIndexOrZero
+                FROM IF-MIB  
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB                             
+        dlinkIndustrialCommon
+                FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwSshMIB MODULE-IDENTITY
+        LAST-UPDATED "201307180000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for Secure Shell (SSH)."
+        REVISION "201307180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'SSH'
+             functionality.
+            "
+    ::= { dlinkIndustrialCommon 17 }
+
+-- -----------------------------------------------------------------------------
+    dSshNotifications    OBJECT IDENTIFIER ::= { dlinkSwSshMIB 0 }
+    dSshObjects          OBJECT IDENTIFIER ::= { dlinkSwSshMIB 1 }
+    dSshConformance      OBJECT IDENTIFIER ::= { dlinkSwSshMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dSshGeneral          OBJECT IDENTIFIER ::= { dSshObjects 1 }
+
+    dSshEnabled OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object enables or disables Secure Shell (SSH) service."
+        DEFVAL      { false }
+        ::= { dSshGeneral 1 }
+
+    dSshVersion OBJECT-TYPE
+        SYNTAX      INTEGER { v1(1), v2(2), v1v2(3) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The version of SSH is running on the switch.
+            The version that is currently supported is v2."
+        ::= { dSshGeneral 2 }
+
+    dSshTimeout OBJECT-TYPE
+        SYNTAX      Integer32 (30..600)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The time interval that the switch waits for the SSH client to respond
+             during the SSH negotiation phase."
+        DEFVAL      { 120 }
+        ::= { dSshGeneral 3 }
+
+    dSshAuthenticationRetries OBJECT-TYPE
+        SYNTAX      Integer32 (1..32)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The number of authentication attempts after the session
+             has reset or authentication failed."
+        DEFVAL      { 3 }
+        ::= { dSshGeneral 4 }
+
+    dSshServicePort OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies the service port, such as 22, which Secure Shell (SSH)
+             needs to connect to."
+        DEFVAL      { 22 }
+        ::= { dSshGeneral 5 }
+
+    dSshSrcIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object specifies the ifIdex value of the source 
+            source address of SSH packets that initiates a SSH connection.
+            The value of this object should be a valid 'ifIndex' value.                        
+            The value of this object being 'zero' implies that the IP address
+            of the closest interface will be used."
+        DEFVAL    {0}
+        ::= { dSshGeneral 6}
+-- -----------------------------------------------------------------------------
+    dSshKeyConfiguration  OBJECT IDENTIFIER ::= { dSshObjects 2 }
+    dSshCryptoKeyPairTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DSshCryptoKeyPairEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION   
+               "dSshCryptokeyTable is a table that lets the user configure 
+                the SSH keys"
+        ::= { dSshKeyConfiguration 1 }
+        
+    dSshCryptoKeyPairEntry OBJECT-TYPE
+        SYNTAX      DSshCryptoKeyPairEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION   
+           "A SSH key table entry. The index specifies which
+            protocol the user wants to generate the key for.
+            
+            An    entry is created/removed when a    key pair for a specific
+            protocol is generated or deleted via CLI or by issuing appropriate 
+            sets to this table using snmp.
+                            
+            To replace the existing key for a protocol 
+
+            1. Specify the Protocol: dSshCryptoKeyPairIndex 
+            2. Specify the modulus size of the key pair(s): dSshCryptoKeyPairNBits
+            3. Set dSshCryptoKeyPairReplace as true(1)."
+        INDEX  { dSshCryptoKeyPairIndex }
+        ::= { dSshCryptoKeyPairTable 1 }
+
+    DSshCryptoKeyPairEntry ::=
+        SEQUENCE {                             
+                   dSshCryptoKeyPairIndex              INTEGER,
+                   dSshCryptoKeyPairNBits              Integer32,
+                   dSshCryptoKeyPairReplace            TruthValue,
+                   dSshCryptoKeyPairLastCreateTime     TimeStamp,
+                   dSshCryptoKeyPairString             DisplayString,
+                   dSshCryptoKeyPairRowStatus          RowStatus
+        }
+
+    dSshCryptoKeyPairIndex OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    rsa(1),                         
+                    dsa(2)
+                }
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   
+            "The SSH Protocol Identifier for which this entry 
+             pertains to. 
+
+             rsa  - A public-key cryptosystem defined by Rivest,
+                  Shamir and Adleman.
+
+             dsa  - Digital Signature Algorithm, a public key
+                  cipher used to generate digital signatures."
+    ::= { dSshCryptoKeyPairEntry 1 }
+
+    dSshCryptoKeyPairNBits OBJECT-TYPE
+        SYNTAX          Integer32 (360|512|768|1024|2048)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION   
+            "Specifies the modulus size of the key pair(s):
+             For RSA, the valid values are 360, 512, 768, 1024, and 2048.
+             For DSA, the valid value is fixed as 1024.
+             For SSH version 2, the minimum recommended key size is 768 bits.
+
+             A key size with a larger number provides higher security but
+             takes longer to generate.
+
+             This object cannot be modified while this row is
+             active, unless the associated dSshCryptoKeyPairReplace 
+             object is set to True in the same Set PDU."
+        ::= { dSshCryptoKeyPairEntry 2 }
+
+    dSshCryptoKeyPairReplace    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object specifies whether a new key should replace 
+             an existing key for the protocol.
+             No action is taken if this object is set to 'false'.
+             The value of this object when read is always 'false'."
+        ::= { dSshCryptoKeyPairEntry 3 }
+
+    dSshCryptoKeyPairLastCreateTime    OBJECT-TYPE
+        SYNTAX          TimeStamp
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The time of the last creation of the key."
+        ::= { dSshCryptoKeyPairEntry 4 }
+
+    dSshCryptoKeyPairString              OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The generated SSH public key string."
+        ::= { dSshCryptoKeyPairEntry 6 }
+
+    dSshCryptoKeyPairRowStatus       OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+               "Status of this SSH key pair."
+        ::= { dSshCryptoKeyPairEntry 99 }
+        
+   dSshCryptoKeyGenerationStatus OBJECT-TYPE
+       SYNTAX   INTEGER {
+                    inProgress(1),
+                    successful(2),
+                    failed(3)
+                }
+       MAX-ACCESS          read-only
+       STATUS              current
+       DESCRIPTION
+           "This object indicates the status of the last key 
+            generation request."
+   ::= { dSshKeyConfiguration 2 }
+
+-- -----------------------------------------------------------------------------
+
+    dSshConnectionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSshConnectionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table to display the status of Secure Shell (SSH) server connections."
+        ::= { dSshObjects 3 }
+
+    dSshConnectionEntry OBJECT-TYPE
+        SYNTAX          DSshConnectionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry (conceptual row) in the dSshConnectionTable object."
+        INDEX  { dSshConnectionSID }
+        ::= { dSshConnectionTable 1 }
+
+    DSshConnectionEntry ::=
+        SEQUENCE {
+            dSshConnectionSID           Integer32,
+            dSshConnectionVersion       INTEGER,
+            dSshConnectionCipher        DisplayString,
+            dSshConnectionUserID        DisplayString,
+            dSshConnectionHostAddrType  InetAddressType,
+            dSshConnectionHostAddr      InetAddress            
+        }
+
+    dSshConnectionSID OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A unique number that identifies the SSH session."
+        ::= { dSshConnectionEntry 1 }
+
+    dSshConnectionVersion OBJECT-TYPE
+        SYNTAX      INTEGER { v1(1), v2(2), v1v2(3) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The protocol version number that the SSH client supports."
+        ::= { dSshConnectionEntry 2}
+    
+    dSshConnectionCipher OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The crypto/Hashed Message Authentication Code (HMAC) algorithm that
+             the SSH client is using."
+        ::= { dSshConnectionEntry 3}
+
+    dSshConnectionUserID OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The login username that has been authenticated for the session."
+        ::= { dSshConnectionEntry 4 }                
+        
+    dSshConnectionHostAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The type of Internet address for client 
+            establised this session."       
+        ::= { dSshConnectionEntry 5 }
+    
+
+    dSshConnectionHostAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "The Internet address assigned for client 
+            establised this session."
+        ::= { dSshConnectionEntry 6 }
+        
+        
+-- -----------------------------------------------------------------------------
+    dSshUserTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSshUserEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table lists all users and their corresponding authentication
+            methods through which SSH client can login."
+        ::= { dSshObjects 4 }
+
+    dSshUserEntry OBJECT-TYPE
+        SYNTAX          DSshUserEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry (conceptual row) in the dSshUserTable."
+        INDEX  { dSshUserName }
+        ::= { dSshUserTable 1 }
+
+    DSshUserEntry ::=
+        SEQUENCE {
+            dSshUserName                SnmpAdminString,
+            dSshUserAuthMethod          INTEGER,
+            dSshUserKeyFilename         SnmpAdminString,
+            dSshUserHostName            DisplayString,
+            dSshUserHostAddrType        InetAddressType,
+            dSshUserHostAddr            InetAddress,
+            dSshUserRowStatus           RowStatus
+        }  
+
+    dSshUserName OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the name of SSH user."
+        ::= { dSshUserEntry 1 }
+
+    dSshUserAuthMethod OBJECT-TYPE
+        SYNTAX   INTEGER {
+                    password(1),
+                    publickey(2),
+                    hostbased(3)
+                }    
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the authentication method for this user account.
+            'password' - use password authentication method for this user account.
+            'publickey' - use public key authentication method for this user account.
+            'hostbased' - use host-based authentication method for this user account.
+
+            "
+        DEFVAL { password }
+        ::= { dSshUserEntry 2 }
+        
+    dSshUserKeyFilename OBJECT-TYPE
+        SYNTAX   SnmpAdminString (SIZE (0..255))    
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the name of the file storing the SSH public key.
+            The SSH public key is used to authenticate the SSH 
+            session for this user.
+            
+            If dSshUserAuthMethod is 'publickey', this object refers to
+            user's public key. 
+            
+            If dSshUserAuthMethod is 'hostbased', this object refers to 
+            client's host key.
+            
+            If dSshUserAuthMethod is 'password', the value of this
+            object will be ignored and a zero-length string is 
+            always returned when read."
+        ::= { dSshUserEntry 3 }        
+        
+
+    dSshUserHostName OBJECT-TYPE
+        SYNTAX   DisplayString (SIZE (0..255))    
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The host name of the SSH client.
+            This object is only valid for host-based authentication method.
+            
+            For password and public key authentication method, a 
+            zero-length string is always returned when read.
+            "
+        ::= { dSshUserEntry 4 }    
+
+    dSshUserHostAddrType OBJECT-TYPE
+        SYNTAX   InetAddressType    
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The host address type of the SSH client.
+            This object is only valid for host-based authentication method.
+            
+            For password and publickey authentication method, unknown(0) 
+            is always returned when read.
+            "
+        ::= { dSshUserEntry 5 }    
+
+    dSshUserHostAddr OBJECT-TYPE
+        SYNTAX   InetAddress    
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The host address of the SSH client.
+            This object is only valid for host-based authentication method.
+            
+            For password and public key authentication method, a 
+            zero-length string is always returned when read.
+            "
+        ::= { dSshUserEntry 6 }       
+
+    dSshUserRowStatus   OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+               "Status of this SSH user entry.
+               
+               When read, active(1) is always returned.
+               
+               If administrator wants to modify the authentication method for
+               a specific user account, setting createAndGo(4) for this node
+               after corresponding parameters are configured:
+               
+               For password, there is no need to specify more parameters.
+               For publickey, dSshUserKeyFilename must be specified.
+               For hostbased, dSshUserKeyFilename and dSshUserHostName
+               must be specified, but parameters dSshUserHostAddrType and dSshUserHostAddr
+               are optional.
+               
+               Other value of this node is not supported.
+               "
+        ::= { dSshUserEntry 99 }        
+        
+-- Conformance
+  
+
+    dSshCompliances    OBJECT IDENTIFIER ::= { dSshConformance 1 }
+
+    dSshGroups      OBJECT IDENTIFIER ::= { dSshConformance 2 }        
+       
+       
+   dSshCompliance MODULE-COMPLIANCE
+        STATUS   deprecated
+        DESCRIPTION
+                "The compliance statement for entities which
+                 implement the DLINKSW-SSH-MIB."
+        MODULE MANDATORY-GROUPS { 
+                 dSshConfigGroup
+        }
+
+       OBJECT          dSshSrcIfIndex       
+       MIN-ACCESS      read-only
+       DESCRIPTION
+            "It is compliant to implement this object as read-only. 
+            Support for configurable source interface is only
+            required on the platform which supports SSH client."
+
+        GROUP dSshUserGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+             configuring SSH authentication method for a user account."
+        ::= { dSshCompliances 1 }
+
+    dSshConfigGroup OBJECT-GROUP
+        OBJECTS 
+            {   dSshEnabled, 
+                dSshVersion, 
+                dSshTimeout, 
+                dSshAuthenticationRetries, 
+                dSshServicePort, 
+                dSshSrcIfIndex, 
+                dSshCryptoKeyPairNBits, 
+                dSshCryptoKeyPairReplace, 
+                dSshCryptoKeyPairLastCreateTime, 
+                dSshCryptoKeyPairRowStatus, 
+                dSshCryptoKeyPairString, 
+                dSshCryptoKeyGenerationStatus 
+            }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects for SSH configuration."
+            ::= { dSshGroups 1 }
+
+        
+    dSshConnectionGroup OBJECT-GROUP
+        OBJECTS
+            {   dSshConnectionVersion, 
+                dSshConnectionCipher, 
+                dSshConnectionUserID,
+                dSshConnectionHostAddrType, 
+                dSshConnectionHostAddr                 
+            }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects to display SSH 
+                connection related information."
+            ::= { dSshGroups 2 }
+            
+    dSshUserGroup OBJECT-GROUP
+        OBJECTS
+            {   dSshUserAuthMethod,
+                dSshUserKeyFilename,
+                dSshUserHostName,
+                dSshUserHostAddrType,
+                dSshUserHostAddr    
+            }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects related to SSH users."
+            ::= { dSshGroups 3 }
+
+END
+

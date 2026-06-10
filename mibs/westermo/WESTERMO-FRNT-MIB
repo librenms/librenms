@@ -1,0 +1,379 @@
+WESTERMO-FRNT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    Integer32,
+    TimeTicks,
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+
+    IfaceRefIndex
+    FROM WESTERMO-INTERFACE-MIB
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+
+    common
+    FROM WESTERMO-OID-MIB
+    ;
+
+-- module
+
+frnt MODULE-IDENTITY
+    LAST-UPDATED "201912110000Z"
+    ORGANIZATION "Westermo"
+    CONTACT-INFO
+    "Copyright (c) 2019:
+    Westermo Network Technologies AB
+    640 40 Stora Sundby
+    Sweden
+    url: http://www.westermo.com
+
+    Contact:  support@westermo.se
+    Description: Westermo Common FRNT MIB-file"
+
+    DESCRIPTION
+    "Westermo Common FRNT MIB-file."
+
+    REVISION "201908300000Z"
+    DESCRIPTION
+    "Initial revision."
+
+    REVISION "201912110000Z"
+    DESCRIPTION
+    "Added ring status notifications"
+
+::= { common 5 }
+
+
+-- ---------------------------------------------------------- --
+-- subtrees in the WESTERMO-FRNT-MIB
+-- ---------------------------------------------------------- --
+
+frntObjects               OBJECT IDENTIFIER ::= { frnt 1 }
+frntConformance           OBJECT IDENTIFIER ::= { frnt 2 }
+frntNotifications         OBJECT IDENTIFIER ::= { frnt 3 }
+frntNotificationPrefix    OBJECT IDENTIFIER ::= { frntNotifications 0 }
+
+-- -------------------------------------------------------------
+-- the frntStatusTable
+-- -------------------------------------------------------------
+frntStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FrntStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table containing a list of FRNT instances/rings."
+    ::= { frntObjects 1 }
+
+frntStatusEntry OBJECT-TYPE
+    SYNTAX      FrntStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The row containing status information for a specific
+    FRNT instance/ring."
+    INDEX   { frntStatusVersion, frntStatusInstance }
+    ::= { frntStatusTable 1 }
+
+FrntStatusEntry ::=
+    SEQUENCE {
+      frntStatusVersion INTEGER,
+      frntStatusInstance Integer32,
+      frntStatusRingId Integer32,
+      frntStatusDeviceMode INTEGER,
+      frntStatusRingStatus INTEGER,
+      frntStatusPort1 IfaceRefIndex,
+      frntStatusPort2 IfaceRefIndex,
+      frntStatusBlockingPort IfaceRefIndex,
+      frntStatusVid1 Integer32,
+      frntStatusVid2 Integer32,
+      frntStatusTopologyChangeCount  Integer32,
+      frntStatusTimeSinceLastChange TimeTicks
+    }
+
+
+frntStatusVersion OBJECT-TYPE
+    SYNTAX  INTEGER { v0(0), v2(2)}
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "FRNT Version"
+    ::= { frntStatusEntry 1 }
+
+frntStatusInstance OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "FRTN Instance"
+    ::= { frntStatusEntry 2 }
+
+
+frntStatusRingId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "FRNT Ring ID"
+    ::= { frntStatusEntry 3 }
+
+frntStatusDeviceMode OBJECT-TYPE
+    SYNTAX      INTEGER {member(1), focalPoint(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "A device (FRNT node) can act as focal point or a member"
+    ::= { frntStatusEntry 4}
+
+frntStatusRingStatus OBJECT-TYPE
+    SYNTAX      INTEGER {broken(0), ok(1)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The current FRNT ring status"
+    ::= { frntStatusEntry 5}
+
+frntStatusPort1 OBJECT-TYPE
+    SYNTAX      IfaceRefIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Reference Index for Port 1 (portM).
+    Reference Index is defined in WESTERMO-INTERFACES-MIB."
+    ::= { frntStatusEntry 6}
+
+frntStatusPort2 OBJECT-TYPE
+    SYNTAX      IfaceRefIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Reference Index for Port 2 (portN).
+    Reference Index is defined in WESTERMO-INTERFACES-MIB."
+    ::= { frntStatusEntry 7}
+
+frntStatusBlockingPort OBJECT-TYPE
+SYNTAX      IfaceRefIndex
+MAX-ACCESS  read-only
+STATUS      current
+DESCRIPTION
+    "The Reference Index for the blocking port.
+    In FRNTv0 this is always port 1 (port M).
+    Only applicable when deviceMode is focalPoint."
+::= { frntStatusEntry 8}
+
+frntStatusVid1 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Vid 1 (Not applicable for FRNTv0 rings)"
+    ::= { frntStatusEntry 9}
+
+frntStatusVid2 OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Vid 2 (Not applicable for FRNTv0 rings)"
+    ::= { frntStatusEntry 10}
+
+frntStatusTopologyChangeCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object indicates the number of topology Changes
+    since FRNT was enabled."
+    ::= { frntStatusEntry 11}
+
+frntStatusTimeSinceLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object indicates the time that have passed since
+    the last change of ring status."
+    ::= { frntStatusEntry 12 }
+
+-- -------------------------------------------------------------
+-- the frntPortStatus table
+-- -------------------------------------------------------------
+frntPortStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FrntPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A list of frntPortStatus entries."
+    ::= { frntObjects 2 }
+
+frntPortStatusEntry OBJECT-TYPE
+    SYNTAX      FrntPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "frntPortStatus entry"
+    INDEX   { frntPortStatusFrntRingId, frntPortStatusRefIndex }
+    ::= { frntPortStatusTable 1 }
+
+FrntPortStatusEntry ::=
+    SEQUENCE {
+       frntPortStatusFrntRingId  Integer32,
+       frntPortStatusRefIndex IfaceRefIndex,
+       frntPortStatusAdminState INTEGER,
+       frntPortStatusOperState INTEGER,
+       frntPortStatusLinkState INTEGER
+    }
+
+frntPortStatusFrntRingId OBJECT-TYPE
+    SYNTAX      Integer32 (0..9999)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "FRNT Ring ID"
+::= { frntPortStatusEntry 1 }
+
+frntPortStatusRefIndex OBJECT-TYPE
+    SYNTAX      IfaceRefIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The Reference Index for Port.
+    Defined in WESTERMO-INTERFACES-MIB"
+::= { frntPortStatusEntry 2 }
+
+frntPortStatusAdminState OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        unknown(0),
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The FRNT port admin status."
+::= { frntPortStatusEntry 3 }
+
+frntPortStatusOperState OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        unknown(0),
+        disabled(1),
+        down(2),
+        notQualified(3),
+        qualified(4),
+        forwarding(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The FRNT port operating status."
+    ::= { frntPortStatusEntry 4}
+
+frntPortStatusLinkState OBJECT-TYPE
+   SYNTAX      INTEGER
+   {
+       unknown(0),
+       up(1),
+       down(2)
+   }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The Port link state."
+    ::= { frntPortStatusEntry 5}
+
+-- ---------------------------------------------------------- --
+-- Conformance Information
+-- ---------------------------------------------------------- --
+
+frntGroups        OBJECT IDENTIFIER ::= { frntConformance 1 }
+frntCompliances   OBJECT IDENTIFIER ::= { frntConformance 2 }
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+frntStatusGroup OBJECT-GROUP
+   OBJECTS {
+       frntStatusRingId,
+       frntStatusDeviceMode,
+       frntStatusRingStatus,
+       frntStatusPort1,
+       frntStatusPort2,
+       frntStatusBlockingPort,
+       frntStatusVid1,
+       frntStatusVid2,
+       frntStatusTopologyChangeCount,
+       frntStatusTimeSinceLastChange
+    }
+    STATUS  current
+    DESCRIPTION
+   "FRNT Status group."
+    ::= { frntGroups 1 }
+
+frntPortStatusGroup OBJECT-GROUP
+    OBJECTS {
+       frntPortStatusAdminState,
+       frntPortStatusOperState,
+       frntPortStatusLinkState
+     }
+     STATUS  current
+     DESCRIPTION
+    "FRNT Port Status group."
+     ::= { frntGroups 2 }
+
+frntNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+       frntRingOK,
+       frntRingBroken
+      }
+      STATUS  current
+      DESCRIPTION
+     "FRNT Notifications group."
+      ::= { frntGroups 3 }
+
+
+-- ---------------------------------------------------------- --
+-- FRNT notifications
+-- ---------------------------------------------------------- --
+frntRingOK NOTIFICATION-TYPE
+    OBJECTS { frntStatusRingId, frntStatusRingStatus, frntStatusDeviceMode, frntStatusPort1, frntStatusPort2 }
+    STATUS  current
+    DESCRIPTION
+    "Notification associated with FRNT ring state"
+::= { frntNotificationPrefix 1 }
+
+frntRingBroken NOTIFICATION-TYPE
+    OBJECTS { frntStatusRingId,frntStatusRingStatus, frntStatusDeviceMode, frntStatusPort1, frntStatusPort2 }
+    STATUS  current
+    DESCRIPTION
+    "Notification associated with FRNT ring state"
+::= { frntNotificationPrefix 2 }
+
+
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+frntCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+    "The compliance statement for SNMP entities that implement
+    the Westermo FRNT MIB."
+    MODULE
+    MANDATORY-GROUPS {
+        frntStatusGroup,
+        frntPortStatusGroup,
+        frntNotificationsGroup
+    }
+    ::= { frntCompliances 1 }
+
+
+END

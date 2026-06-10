@@ -1,0 +1,105 @@
+<?php
+
+use Illuminate\Support\Facades\Log;
+use LibreNMS\Util\StringHelpers;
+
+echo 'Printer Status and Error State ';
+$state = SnmpQuery::get('HOST-RESOURCES-MIB::hrDeviceStatus.1')->value();
+if (is_numeric($state)) {
+    //Create State Index
+    $state_name = 'hrDeviceStatus';
+    create_state_index(
+        $state_name,
+        [
+            ['value' => 1, 'generic' => 3, 'descr' => 'Unknown'],
+            ['value' => 2, 'generic' => 0, 'descr' => 'Running'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'Warning'],
+            ['value' => 4, 'generic' => 0, 'descr' => 'Testing'],
+            ['value' => 5, 'generic' => 2, 'descr' => 'Down'],
+        ]
+    );
+    $sensor_index = 0;
+    discover_sensor(
+        null,
+        'state',
+        $device,
+        '.1.3.6.1.2.1.25.3.2.1.5.1',
+        $sensor_index,
+        $state_name,
+        'Printer Device Status',
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $state,
+        'snmp',
+        0
+    );
+}
+
+$state = SnmpQuery::get('HOST-RESOURCES-MIB::hrPrinterDetectedErrorState.1')->value();
+if ($state) {
+    // https://www.ietf.org/rfc/rfc1759.txt hrPrinterDetectedErrorState
+    //Create State Index
+    $printer_states =
+        [
+            ['value' => 0, 'generic' => 0, 'descr' => 'Normal'],
+            ['value' => 1, 'generic' => 1, 'descr' => 'Paper Low'],
+            ['value' => 2, 'generic' => 2, 'descr' => 'No Paper'],
+            ['value' => 3, 'generic' => 1, 'descr' => 'Toner Low'],
+            ['value' => 4, 'generic' => 2, 'descr' => 'No Toner'],
+            ['value' => 5, 'generic' => 2, 'descr' => 'Door Open'],
+            ['value' => 6, 'generic' => 2, 'descr' => 'Jammed'],
+            ['value' => 7, 'generic' => 2, 'descr' => 'Offline'],
+            ['value' => 8, 'generic' => 2, 'descr' => 'Service Needed'],
+            ['value' => 9, 'generic' => 1, 'descr' => 'Warning, multiple issues'],
+            ['value' => 10, 'generic' => 2, 'descr' => 'Critical, multiple issues'],
+        ];
+    $bit_flags = StringHelpers::bitsToIndices($state);
+    $is_critical = false;
+    if (count($bit_flags) == 0) {
+        $state = 0;
+    } else {
+        for ($i = 0; $i < count($bit_flags); $i++) {
+            // second octet of error flags not reliable, skipping
+            if ($bit_flags[$i] > 8) {
+                continue;
+            }
+            $state = $printer_states[$bit_flags[$i]]['value'];
+            if ($printer_states[$bit_flags[$i]]['generic'] == 2) {
+                $is_critical = true;
+                break;
+            }
+        }
+        // cannot create an index for each bit combination, instead warning or critical
+        if (count($bit_flags) > 1) {
+            $state = $is_critical ? 10 : 9;
+        }
+    }
+
+    $state_name = 'hrPrinterDetectedErrorState';
+    create_state_index($state_name, $printer_states);
+
+    Log::debug('Printer error state: ' . $state_name . ': ' . $state);
+    $sensor_index = 0;
+    discover_sensor(
+        null,
+        'state',
+        $device,
+        '.1.3.6.1.2.1.25.3.5.1.2.1',
+        $sensor_index,
+        $state_name,
+        'Printer Error Status',
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $state,
+        'snmp',
+        0
+    );
+}

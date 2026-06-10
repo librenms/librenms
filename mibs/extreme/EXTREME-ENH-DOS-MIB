@@ -1,0 +1,308 @@
+
+EXTREME-ENH-DOS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+                OBJECT-TYPE     FROM SNMPv2-SMI
+                DisplayString   FROM RFC1213-MIB   
+                TimeTicks		FROM SNMPv2-SMI
+	            TruthValue, RowStatus           FROM SNMPv2-TC
+                extremeAgent    FROM EXTREME-BASE-MIB
+		extremeV2Traps		FROM EXTREME-BASE-MIB;
+
+
+
+        extremeEnhDosMib MODULE-IDENTITY
+                LAST-UPDATED "0401020000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme Enhanced Dos protect objects information"
+        ::= { extremeAgent 29 }
+
+        extremeEnhDosProtect OBJECT IDENTIFIER ::= { extremeEnhDosMib 1 }
+
+
+extremeEnhDosEnableRateLimit    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The Flag indicates whether Enhanced DOS protection with rate limit is enabled or disabled."
+    DEFVAL { false }
+    ::= { extremeEnhDosProtect 1 }
+
+extremeEnhDosEnableIpFdb    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The Flag indicates whether Enhanced DOS protection against IPFDB thrashing is enabled or disabled."
+    DEFVAL { false }
+    ::= { extremeEnhDosProtect 2 }
+
+extremeEnhDosEnableBenchMark    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The Flag indicates whether Enhanced DOS protection with benchmarking  is enabled or disabled."
+    DEFVAL { false }
+    ::= { extremeEnhDosProtect 3 }
+
+extremeEnhDosCacheSize    OBJECT-TYPE
+    SYNTAX      INTEGER(100..262144)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The Enhanced DOS Cache Size. The number of DA/SA pairs"
+    DEFVAL { 262144 }
+    ::= { extremeEnhDosProtect 4 }
+
+
+--------------   The DOS Port Table ------------------------------
+
+extremeEnhDosPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ExtremeEnhDosPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains the port wise listing of Enhanced DOS attributes."
+    ::= { extremeEnhDosProtect 5 }
+
+extremeEnhDosPortEntry       OBJECT-TYPE
+    SYNTAX      ExtremeEnhDosPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about the Dos attributes of a particular port."
+    INDEX   { extremeEnhDosPortIfIndex }
+    ::= { extremeEnhDosPortTable 1 }
+
+ExtremeEnhDosPortEntry ::= SEQUENCE {
+      extremeEnhDosPortIfIndex          	INTEGER,
+      extremeEnhDosPortTrusted			TruthValue,
+      extremeEnhDosPortAlarmState          	TruthValue,
+      extremeEnhDosPortLearnLimit			INTEGER,
+      extremeEnhDosPortLearnWindow         	INTEGER,
+      extremeEnhDosPortAgingTime			INTEGER,
+      extremeEnhDosPortRateLimitEnable		TruthValue,
+      extremeEnhDosPortIpFdbEnable		TruthValue,
+      extremeEnhDosPortBenchMarkEnable		TruthValue,
+      extremeEnhDosPortRateLimitThreshold		INTEGER,
+      extremeEnhDosPortRateLimitDropProbability	INTEGER,
+      extremeEnhDosPortRateLimitLearningWindow	INTEGER,
+      extremeEnhDosPortRateLimitProtocol      	INTEGER
+}
+
+
+extremeEnhDosPortIfIndex    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for this entry."
+    ::= { extremeEnhDosPortEntry 1 }
+
+extremeEnhDosPortTrusted    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether the port is trusted or untrusted."
+    DEFVAL { false }
+    ::= { extremeEnhDosPortEntry 2 }
+
+extremeEnhDosPortAlarmState    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether the port is in alarm state or not."
+    DEFVAL { false }
+    ::= { extremeEnhDosPortEntry 3 }
+
+extremeEnhDosPortLearnLimit    OBJECT-TYPE
+    SYNTAX      INTEGER(1..1953125)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The number of packets allowed on the port before an entry is
+	created in the forwarding table."
+    DEFVAL { 100 }
+    ::= { extremeEnhDosPortEntry 4 }
+
+extremeEnhDosPortLearnWindow    OBJECT-TYPE
+    SYNTAX      INTEGER(1..300)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The duration to be considered to reach the threshold for creating an entry
+	  in the forwarding table."
+    DEFVAL { 60 }
+    ::= { extremeEnhDosPortEntry 5 }
+
+extremeEnhDosPortAgingTime    OBJECT-TYPE
+    SYNTAX      INTEGER(1..300)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The duration to be considered for aging out entries created on this port."
+    DEFVAL { 30 }
+    ::= { extremeEnhDosPortEntry 6 }
+
+extremeEnhDosPortRateLimitEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether the rate limit is enabled for this port."
+    DEFVAL { false }
+    ::= { extremeEnhDosPortEntry 7 }
+
+extremeEnhDosPortIpFdbEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether the DOS protection against IP FDB thrashing is enabled for this port."
+    DEFVAL { false }
+    ::= { extremeEnhDosPortEntry 8 }
+
+
+extremeEnhDosPortBenchMarkEnable    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "Indicates whether the bench marking is enabled for this port."
+    DEFVAL { false }
+    ::= { extremeEnhDosPortEntry 9 }
+
+extremeEnhDosPortRateLimitThreshold    OBJECT-TYPE
+    SYNTAX      INTEGER(100..1953125)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The number of packets allowed on the port within the learning window before the rate limit is applied."
+    DEFVAL { 100 }
+    ::= { extremeEnhDosPortEntry 10 }
+
+extremeEnhDosPortRateLimitDropProbability    OBJECT-TYPE
+    SYNTAX      INTEGER(5..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The probability that the packet is discarded after the reaching the threshold."
+    DEFVAL { 50 }
+    ::= { extremeEnhDosPortEntry 11 }
+
+
+extremeEnhDosPortRateLimitLearningWindow    OBJECT-TYPE
+    SYNTAX      INTEGER(1..300)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The duration to be considered after which the rate limit is applied."
+    DEFVAL { 60 }
+    ::= { extremeEnhDosPortEntry 12 }
+
+extremeEnhDosPortRateLimitProtocol    OBJECT-TYPE
+    SYNTAX      INTEGER {
+		icmp	(1),
+		all	(2)
+	}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The protocol packets to be considered for rate limit filtering."
+    DEFVAL { icmp }
+    ::= { extremeEnhDosPortEntry 13 }
+
+
+------- The DOS Port Statistics Table (READ-ONLY)-----------------
+
+extremeEnhDosPortStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ExtremeEnhDosPortStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains the port wise listing of DOS statistics."
+    ::= { extremeEnhDosProtect 6 }
+
+extremeEnhDosPortStatisticsEntry       OBJECT-TYPE
+    SYNTAX      ExtremeEnhDosPortStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about the DOS statistics of a particular port."
+    INDEX   { extremeEnhDosPortStatisticsIfIndex }
+    ::= { extremeEnhDosPortStatisticsTable 1 }
+
+ExtremeEnhDosPortStatisticsEntry ::= SEQUENCE {
+      extremeEnhDosPortStatisticsIfIndex 		INTEGER,
+      extremeEnhDosPortStatisticsRateLimitFilteredPackets  INTEGER
+}
+
+extremeEnhDosPortStatisticsIfIndex    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The index for this entry."
+    ::= { extremeEnhDosPortStatisticsEntry 1 }
+
+extremeEnhDosPortStatisticsRateLimitFilteredPackets    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets filetered on this port."
+    ::= { extremeEnhDosPortStatisticsEntry 2 }
+  
+                                                 
+                  
+--TRAPS MIB Definitions for ENHDOS
+  
+--   extremeEnhDosThresholdReached	TRAP-TYPE
+--   ENTERPRISE  extremenetworks
+--   VARIABLES   {extremeEnhDosPortIfIndex,extremeEnhDosPortRateLimitThreshold}
+--   DESCRIPTION
+--   	  "The extremeDosThresholdReached notification is generated when the
+--   	  DOS threshold is crossed"
+--   ::= 25
+
+--   extremeEnhDosThresholdCleared	TRAP-TYPE
+--   ENTERPRISE  extremenetworks
+--   VARIABLES   {extremeEnhDosPortIfIndex,extremeEnhDosPortRateLimitThreshold}
+--   DESCRIPTION
+--   	  "The extremeDosThresholdCleared notification is generated when the
+--   	  DOS threshold is Cleared"
+--   ::= 26
+
+                
+
+
+extremeEnhDosTraps 	OBJECT IDENTIFIER
+	::= { extremeV2Traps 11 }
+
+   extremeEnhDosTrapsPrefix   OBJECT IDENTIFIER
+	::= { extremeEnhDosTraps 0 }
+
+   extremeEnhDosThresholdReached NOTIFICATION-TYPE
+	OBJECTS { extremeEnhDosPortIfIndex,
+		  extremeEnhDosPortRateLimitThreshold }
+	STATUS current
+	DESCRIPTION
+		"The extremeDosThresholdReached notification is generated when
+		the DOS threshold is crossed for any of the ports."
+	    ::= { extremeEnhDosTrapsPrefix 1 }
+
+    extremeEnhDosThresholdCleared NOTIFICATION-TYPE
+	OBJECTS { extremeEnhDosPortIfIndex,
+		  extremeEnhDosPortRateLimitThreshold }
+	STATUS current
+	DESCRIPTION
+		"The extremeEnhDosThresholdCleared notification is generated when
+		the DOS threshold is cleared for any of the ports."
+	    ::= { extremeEnhDosTrapsPrefix 2 }
+END

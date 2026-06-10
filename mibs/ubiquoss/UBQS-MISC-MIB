@@ -1,0 +1,176 @@
+-- *****************************************************************
+-- UBQS-MISC-MIB:  Ubiquoss Miscellaneous MIB file
+--
+-- June 2011, Hyung Eun Park
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-MISC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE
+		FROM RFC-1212
+	DisplayString, 
+	PhysAddress,
+	TruthValue
+		FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+	ubiMgmtv2
+		FROM UBQS-SMI;
+          
+ubiMiscMIB MODULE-IDENTITY
+    LAST-UPDATED    "201106010000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-MISC-MIB is used to get 
+        the miscellaneous information of system."             
+    ::= { ubiMgmtv2 22 }
+                          
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+-- ***************************************************************
+-- ubiMiscMIB
+-- ***************************************************************
+
+ubiMiscMIBNotificationPrefix 	OBJECT IDENTIFIER 	::= { ubiMiscMIB 0 }
+ubiMiscMIBObjects  				OBJECT IDENTIFIER	::= { ubiMiscMIB 1 }    
+ubiMiscMIBConformance    		OBJECT IDENTIFIER 	::= { ubiMiscMIB 2 }
+                    
+               
+                            
+ubiMiscRemoteReset			     OBJECT IDENTIFIER	::= { ubiMiscMIBObjects 1 }
+ubiMacSpoofing					 OBJECT IDENTIFIER	::= { ubiMiscMIBObjects 2 }
+ubiMiscStoreHistory				 OBJECT IDENTIFIER	::= { ubiMiscMIBObjects 3 }
+	
+	
+-- ***********************************************************
+-- ubiMiscRemoteReset
+-- *********************************************************** 
+
+ 	ubiMiscRemoteResetEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue      
+    	MAX-ACCESS      read-write
+    	STATUS          current      
+    	DESCRIPTION
+        	"Activate/de-activate function of remote-reload"     
+        DEFVAL { false }
+	   	::= { ubiMiscRemoteReset 1 } 
+    	                 
+    	                 
+	ubiMiscPortRemoteResetTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiMiscPortRemoteResetEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains objects which provide the 
+        	 information about the remote reset of port."
+    	::= { ubiMiscRemoteReset 2 }
+
+	ubiMiscPortRemoteResetEntry OBJECT-TYPE
+    	SYNTAX          UbiMiscPortRemoteResetEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"A entry containing information about 
+        	remote reset of port"
+    	INDEX           { ifIndex } 
+    	::= { ubiMiscPortRemoteResetTable 1 }
+
+	UbiMiscPortRemoteResetEntry ::= SEQUENCE {       
+			ubiMiscPortRemoteReset		INTEGER
+	}
+
+  	ubiMiscPortRemoteReset OBJECT-TYPE
+    	SYNTAX          INTEGER {      
+    		none(0),
+    		reset(1)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"Reload(reset) remote device." 
+    	::= { ubiMiscPortRemoteResetEntry 1 }    
+    
+-- ***********************************************************
+-- ubiMacSpoofing
+-- *********************************************************** 
+	ubiMacSpoofingEnabled 	OBJECT-TYPE
+    	SYNTAX 				TruthValue    	
+    	MAX-ACCESS      	read-write
+    	STATUS          	current      
+    	DESCRIPTION
+        	"It activate/de-activate function of Mac-Spoofing"     
+	   	::= { ubiMacSpoofing 1 }	   	
+
+-- ***********************************************************
+-- ubiMiscHistoryStore
+-- *********************************************************** 
+	ubiMiscStoreHistoryEnabled	OBJECT-TYPE
+    	SYNTAX 				TruthValue
+    	MAX-ACCESS      	read-write
+    	STATUS          	current
+    	DESCRIPTION
+        	"It activates/de-activates function of storing command history."
+	   	::= { ubiMiscStoreHistory 1 }
+	   	
+-- *****************************************************************   
+-- ubiMiscMIBConformance
+-- *****************************************************************
+	
+-- 
+-- conformance information         
+--
+ubiMiscMIBCompliances 	OBJECT IDENTIFIER ::= { ubiMiscMIBConformance 1 }
+ubiMiscMIBGroups      	OBJECT IDENTIFIER ::= { ubiMiscMIBConformance 2 }      
+
+
+
+-- compliance statements
+
+	ubiMiscMIBCompliance MODULE-COMPLIANCE
+        STATUS  current     
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ubiquoss miscellaneous information MIB."
+        MODULE  
+                MANDATORY-GROUPS {  ubiSysRemoteResetGroup }
+
+       GROUP    ubiSysRemoteResetGroup
+       DESCRIPTION  
+       	         ""     
+      	::= { ubiMiscMIBCompliances 1 }
+
+
+ 
+-- units of conformance
+
+	ubiSysRemoteResetGroup OBJECT-GROUP
+        OBJECTS {       
+            ubiMiscRemoteResetEnabled,
+            ubiMiscPortRemoteReset	         
+        	    }
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to manager the
+        	 remote reset funtion of system."
+    	::= { ubiMiscMIBGroups 1 }
+
+END

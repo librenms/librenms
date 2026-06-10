@@ -1,0 +1,11 @@
+modules:
+  os:
+    sysDescr_regex: '/(IBM Networking Operating System|Flex System Fabric|IBM Networking OS) (?<hardware>.*?)\s?( for IBM BladeCenter)?(\([^)]+\))?(, Stack)?$/'
+    version:
+      - IBM-GbTOR-G8264CS-MIB::agSoftwareVersion.0
+      - IBM-GbTOR-G8264T-MIB::agSoftwareVersion.0
+      - ENTITY-MIB::entPhysicalSoftwareRev.1
+    serial:
+      - IBM-GbTOR-G8264-MIB::hardwareSerialNumber.0
+      - IBM-GbTOR-G8264T-MIB::hardwareSerialNumber.0
+      - ENTITY-MIB::entPhysicalSerialNum.1

@@ -1,0 +1,46 @@
+--
+-- ALPINE-ROOT.mib
+--
+
+	ALPINE-ROOT DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			enterprises, OBJECT-IDENTITY			
+				FROM SNMPv2-SMI;
+	
+	
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.52326
+		alpineRoot OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"The root of the OID sub-tree assigned to Alpine Optoelectronics Inc by the Internet Assigned Numbers Authority (IANA)"
+			::= { enterprises 52326 }
+
+		
+		-- 1.3.6.1.4.1.52326.1
+		alpineGeneric OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Sub-tree for general definitions"
+			::= { alpineRoot 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.2
+		alpineProducts OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				"Sub-tree for specific products' definitions."
+			::= { alpineRoot 2 }
+
+		
+	
+	END
+
+--
+-- ALPINE-ROOT.mib
+--

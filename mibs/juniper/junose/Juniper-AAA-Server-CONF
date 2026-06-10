@@ -1,0 +1,708 @@
+
+-- *****************************************************************************
+-- Juniper-AAA-Server-CONF
+--
+-- SNMP Agent Capabilities definitions for the AAA Server MIB.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2003-2008  Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-AAA-Server-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniAaaServerAgent  MODULE-IDENTITY
+    LAST-UPDATED "200810240916Z"  -- 24-Oct-08 02:46 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Authentication,
+        Authorization and Accounting (AAA) Server component of the SNMP agent in
+        the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200810240916Z"  -- 24-Oct-08 02:46 PM EST  - JUNOSe 10.1
+    DESCRIPTION
+        "Added rsAaaDelegatedIpv6PrefixAsDhcpv6DelegatedPrefix and
+        rsAaaFramedIpv6PrefixAsIpv6NdRaPrefix to the rsAaaAssignGeneral object."
+    REVISION    "200809041034Z"  -- 04-Sep-08 02:34 AM EST  - JUNOSe 10.0
+    DESCRIPTION
+        "Added rsAaaAssignDomainBackupPoolName to the rsAaaAssignDomain object."
+    REVISION    "200806050348Z"  -- 04-Jun-08 11:48 PM EDT  - JUNOSe 9.3
+    DESCRIPTION
+        "Added rsAaaMonitorIngressTrafficOnly to the rsAaaTimeoutGeneral object." 
+    REVISION    "200710231934Z"  -- 23-Oct-07 01:34 PM EDT  - JUNOSe 9.1
+    DESCRIPTION
+        "Added rsAaaAssignDomainTunnelSubscriberAuthentication for enable
+        or disable suberscriber to authenticate with configured authentication
+        server when there are tunnel configurations under the domain"
+    REVISION    "200710040133Z"  -- 03-Oct-07 09:33 PM EDT  - JUNOSe 7.3
+    DESCRIPTION
+	"Added rsAaaAssignDomainAuthRouterName, rsAaaAssignDomainIpRouterName,
+        rsAaaAssignDomainRouterName is deprecated and becomes read-only."
+    REVISION    "200707311934Z"  -- 31-Jul-07 01:34 PM EDT  - JUNOSe 8.1
+    DESCRIPTION
+        "Added rsAaaServiceAcctInterval for the default service
+        accounting interval; added rsAaaUserAcctInterval for the
+        default user accounting interval; changed rsAaaAcctInterval
+        to set both rsAaaServiceAcctInterval, and rsAaaUserAcctInterval;
+        get of rsAaaAcctInterval only returns the rsAaaUserAcctInterval
+        value"
+    REVISION    "200608021834Z"  -- 02-Aug-06 02:34 PM EDT  - JUNOSe 8.1
+    DESCRIPTION
+        "Added new values to rsAaaAssignTunnelCallingNumberFormat. Added 
+        rsAaaAssignTunnelCallingNumberFormatFallback "
+    REVISION    "200604261852Z"  -- 26-Apr-06 02:52 PM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "Added rsAaaAssignQosDownstreamRate object to the rsAaaBrasGroup."
+    REVISION    "200509161558Z"  -- 16-Sep-05 11:58 AM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "A new object was added to the tunnel group and domain map."
+    REVISION    "200503241837Z"  -- 24-Mar-05 01:37 PM EST  - JUNOSe 7.1
+    DESCRIPTION
+        "Added rsAAASubscriberExtTable support."
+    REVISION    "200412141837Z"  -- 14-Dec-04 01:37 PM EST  - JUNOSe 7.0
+    DESCRIPTION
+        "Added tunnel group support."
+    REVISION    "200412032212Z"  -- 03-Dec-04 05:12 PM EST  - JUNOSe 6.1
+    DESCRIPTION
+        "Added rsAaaLocalAuthUser, rsAaaLocalAuthUserDb, and
+        rsAaaLocalAuthUserDbAssoc groups to support local authentication.
+        Added broadcast accounting support: rsAaaAcctBcastServerGroupTable,
+        rsAaaAcctBcastServerGroupName, rsAaaOutgoingBcastAcctRequests and
+        rsAaaIncomingBcastAcctResponses."
+    REVISION    "200405202133Z"  -- 20-May-04 05:33 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Updates to tunnel server and bras agents."
+    REVISION    "200407261702Z"  -- 26-Jul-04 01:02 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Added new states to RsSubscriberState.  Added realm and domain
+        parse direction.  Added rsAaaAuthMethodsTable and 
+        rsAaaAcctMethodsTable."
+    REVISION    "200303072051Z"  -- 07-Mar-03 03:51 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added support for IPv6."
+    REVISION    "200212021844Z"  -- 02-Dec-02 01:44 PM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.  Added PADN support."
+    REVISION    "200208161510Z"  -- 16-Aug-02 11:10 AM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added new B-RAS and tunnel objects."
+    REVISION    "200205131932Z"  -- 13-May-02 03:32 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Added new B-RAS and accounting objects."
+    REVISION    "200201032030Z"  -- 03-Jan-02 03:30 PM EDT  - JUNOSe 3.4
+    DESCRIPTION
+        "Added support for subscriber-per-interface-location monitoring."
+    REVISION    "200109182113Z"  -- 18-Sep-01 05:13 PM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "Separated out optional capabilities.  Added the subscriber and
+        capabilities groups."
+    REVISION    "200104101402Z"  -- 10-Apr-01 10:02 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 1 }
+
+
+-- *****************************************************************************
+-- Consolidated AAA Server SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniAaaServerAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the AAA Server component of the JUNOSe SNMP agent.  This
+        version was supported in JUNOSe 1.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the AAA Server application in
+        JUNOSe.  These capabilities became obsolete when new objects were
+        added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaGroup }
+    ::= { juniAaaServerAgent 1 }
+
+juniAaaServerAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the AAA Server component of the JUNOSe SNMP agent.  This
+        version was supported in JUNOSe 2.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the AAA Server application in
+        JUNOSe.  These capabilities became obsolete when new objects were added
+        and new groupings were defined."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaGroup2 }
+    ::= { juniAaaServerAgent 2 }
+
+juniAaaServerAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the AAA Server component of the JUNOSe SNMP agent.  This
+        version was supported in JUNOSe 3.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the AAA Server application in
+        JUNOSe.  These capabilities became obsolete when the
+        juniAaaAssignDomainStripDomain object was added to the B-RAS group."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBasicGroup,
+            juniAaaBrasGroup,
+            juniAaaTunnelGroup,
+            juniAaaAuthenticationGroup,
+            juniAaaAccountingGroup,
+            juniAaaAddressGroup }
+    ::= { juniAaaServerAgent 3 }
+
+juniAaaServerAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the AAA Server component of the JUNOSe SNMP
+        agent.  This version was supported in JUNOSe 3.1 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the AAA Server application in
+        JUNOSe.  These capabilities became obsolete when new
+        assignment delimiter objects were added to the B-RAS group."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBasicGroup,
+            juniAaaBrasGroup2,
+            juniAaaTunnelGroup,
+            juniAaaAuthenticationGroup,
+            juniAaaAccountingGroup,
+            juniAaaAddressGroup }
+    ::= { juniAaaServerAgent 4 }
+
+juniAaaServerAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the AAA Server component of the JUNOSe SNMP agent.  This
+        version was supported in JUNOSe 3.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the AAA Server application in
+        JUNOSe.  These capabilities became obsolete when the groups were
+        separated into multiple statements and the subscriber and capabilties
+        groups were added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBasicGroup,
+            juniAaaBrasGroup3,
+            juniAaaTunnelGroup,
+            juniAaaAuthenticationGroup,
+            juniAaaAccountingGroup,
+            juniAaaAddressGroup }
+    ::= { juniAaaServerAgent 5 }
+
+
+-- *****************************************************************************
+-- The basic AAA Server agent capabilities.
+-- *****************************************************************************
+juniAaaServerBaseAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for the basic AAA Server
+        management."
+    ::= { juniAaaServerAgent 6 }
+
+juniAaaServerBaseAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the basic AAA Server component of the JUNOSe SNMP agent.
+        This version is supported in JUNOSe 3.3 through 5.2."
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete MIB groups supported by the SNMP agent for the basic AAA 
+        Server application in JUNOSe.  These capabilities became obsolete
+        when a new accounting object was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBasicGroup,
+            juniAaaAuthenticationGroup,
+            juniAaaCapabilitiesGroup }
+    ::= { juniAaaServerBaseAgent 1 }
+
+juniAaaServerBaseAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the basic AAA Server component of the JUNOSe SNMP agent.
+        This version is supported in JUNOSe 5.3 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the basic AAA Server
+        application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBasicGroup,
+            juniAaaAuthenticationGroup2,
+            juniAaaCapabilitiesGroup }
+    ::= { juniAaaServerBaseAgent 2 }
+
+juniAaaServerBaseAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the basic AAA Server component of the JUNOSe SNMP agent.
+        This version is supported in JUNOSe 6.1 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the basic AAA Server
+        application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBasicGroup,
+            juniAaaAuthenticationGroup3,
+            juniAaaCapabilitiesGroup }
+    ::= { juniAaaServerBaseAgent 3 }
+
+
+-- *****************************************************************************
+-- The AAA Server B-RAS agent capabilities.
+-- *****************************************************************************
+juniAaaServerBrasAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for AAA Server B-RAS
+        management."
+    ::= { juniAaaServerAgent 7 }
+
+juniAaaServerBrasAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the B-RAS option of the AAA Server component of the JUNOSe
+        SNMP agent.  This version was supported in JUNOSe 3.3 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe.  These capabilities became obsolete
+        when support was added for monitoring subscriber information by
+        interface location."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup3,
+            juniAaaSubscriberGroup }
+    ::= { juniAaaServerBrasAgent 1 }
+
+juniAaaServerBrasAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the B-RAS option of the AAA Server component of the JUNOSe
+        SNMP agent.  This version was supported in JUNOSe 3.4 and subsequent 3.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe.  These capabilities became obsolete
+        when new B-RAS objects were added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup3,
+            juniAaaSubscriberGroup2 }
+    ::= { juniAaaServerBrasAgent 2 }
+
+juniAaaServerBrasAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the B-RAS option of the AAA Server component of the JUNOSe
+        SNMP agent.  This version was supported in JUNOSe 4.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe.  These capabilities became obsolete
+        when a new B-RAS object was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup4,
+            juniAaaSubscriberGroup3 }
+    ::= { juniAaaServerBrasAgent 3 }
+
+juniAaaServerBrasAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the B-RAS option of the AAA Server component of the JUNOSe
+        SNMP agent.  This version was supported in JUNOSe 4.1 and subsequent 4.x
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe.  These capabilities became obsolete
+        when PADN support was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup5,
+            juniAaaSubscriberGroup3 }
+    ::= { juniAaaServerBrasAgent 4 }
+
+juniAaaServerBrasAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the B-RAS option of the AAA Server component of the JUNOSe
+        SNMP agent.  This version was supported in JUNOSe 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup6,
+            juniAaaSubscriberGroup3 }
+    ::= { juniAaaServerBrasAgent 5 }
+
+juniAaaServerBrasAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 5.1
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup7,
+            juniAaaSubscriberGroup4 }
+    ::= { juniAaaServerBrasAgent 6 }
+
+juniAaaServerBrasAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 5.3
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup8,
+            juniAaaSubscriberGroup4 }
+    ::= { juniAaaServerBrasAgent 7 }
+
+juniAaaServerBrasAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Obsolete Version 8 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 6.0
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup9,
+            juniAaaSubscriberGroup4 }
+    ::= { juniAaaServerBrasAgent 8 }
+
+juniAaaServerBrasAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Obsolete Version 9 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 7.1
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup9,
+            juniAaaSubscriberGroup5 }
+    ::= { juniAaaServerBrasAgent 9 }
+
+juniAaaServerBrasAgentV10  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Obsolete Version 10 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 7.3
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup10,
+            juniAaaSubscriberGroup5 }
+    ::= { juniAaaServerBrasAgent 10 }
+
+juniAaaServerBrasAgentV11  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Obsolete Version 11 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 8.1
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup11,
+            juniAaaSubscriberGroup5 }
+    ::= { juniAaaServerBrasAgent 11 }
+
+juniAaaServerBrasAgentV12  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 12 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 9.1
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup12,
+            juniAaaSubscriberGroup5 }
+    ::= { juniAaaServerBrasAgent 12 }
+
+juniAaaServerBrasAgentV13  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 13 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 9.3
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup13,
+            juniAaaSubscriberGroup5 }
+    ::= { juniAaaServerBrasAgent 13 }
+
+juniAaaServerBrasAgentV14  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 14 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 10.0
+        and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup14,
+            juniAaaSubscriberGroup5 }
+    ::= { juniAaaServerBrasAgent 14 }
+
+juniAaaServerBrasAgentV15  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 15 of the B-RAS option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 10.1
+        and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the B-RAS option of the
+        AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaBrasGroup15,
+            juniAaaSubscriberGroup5 }
+    ::= { juniAaaServerBrasAgent 15 }
+
+-- *****************************************************************************
+-- The AAA Server Tunneling agent capabilities.
+-- *****************************************************************************
+juniAaaServerTunnelAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for AAA Server tunneling
+        management."
+    ::= { juniAaaServerAgent 8 }
+
+juniAaaServerTunnelAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the tunneling option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version was supported in JUNOSe 3.3 through 4.0
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the tunneling option of
+        the AAA Server application in JUNOSe.  These capabilities became
+        obsolete when a new tunnel object was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaTunnelGroup }
+    ::= { juniAaaServerTunnelAgent 1 }
+
+juniAaaServerTunnelAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the tunneling option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 4.1 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the tunneling option of
+        the AAA Server application in JUNOSe. These capabilities became
+        obsolete when a new tunnel object was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaTunnelGroup2 }
+    ::= { juniAaaServerTunnelAgent 2 }
+
+juniAaaServerTunnelAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the tunneling option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 6.0 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the tunneling option of
+        the AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaTunnelGroup3 }
+    ::= { juniAaaServerTunnelAgent 3 }
+
+juniAaaServerTunnelAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the tunneling option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 7.0 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the tunneling option of
+        the AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaTunnelGroup4 }
+    ::= { juniAaaServerTunnelAgent 4 }
+
+juniAaaServerTunnelAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the tunneling option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 8.0 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the tunneling option of
+        the AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaTunnelGroup5 }
+    ::= { juniAaaServerTunnelAgent 5 }
+
+-- *****************************************************************************
+-- The AAA Server Accounting agent capabilities.
+-- *****************************************************************************
+juniAaaServerAccountingAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for AAA Server accounting
+        management."
+    ::= { juniAaaServerAgent 9 }
+
+juniAaaServerAccountingAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the accounting option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version was supported in JUNOSe 3.3 and
+        subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the accounting option of
+        the AAA Server application in JUNOSe.  These capabilities became
+        obsolete when a new accounting object was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaAccountingGroup }
+    ::= { juniAaaServerAccountingAgent 1 }
+
+juniAaaServerAccountingAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the accounting option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 4.0 through
+        5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete MIB group supported by the SNMP agent for the accounting
+        option of the AAA Server application in JUNOSe.  These capabilities 
+        became obsolete when a new accounting object was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaAccountingGroup2 }
+    ::= { juniAaaServerAccountingAgent 2 }
+
+juniAaaServerAccountingAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the accounting option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 5.3 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the accounting option of
+        the AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaAccountingGroup3 }
+    ::= { juniAaaServerAccountingAgent 3 }
+
+juniAaaServerAccountingAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the accounting option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 6.1 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the accounting option of
+        the AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaAccountingGroup4 }
+    ::= { juniAaaServerAccountingAgent 4 }
+
+juniAaaServerAccountingAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the accounting option of the AAA Server component of the
+        JUNOSe SNMP agent.  This version is supported in JUNOSe 9.1 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the accounting option of
+        the AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaAccountingGroup5 }
+    ::= { juniAaaServerAccountingAgent 5 }
+
+
+-- *****************************************************************************
+-- The AAA Server Address Assignment agent capabilities.
+-- *****************************************************************************
+juniAaaServerAddressAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for AAA Server address
+        assignment management."
+    ::= { juniAaaServerAgent 10 }
+
+juniAaaServerAddressAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the address assignment option of the AAA Server component
+        of the JUNOSe SNMP agent.  This version was supported in JUNOSe 3.3
+        through 5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the address assignment
+        option of the AAA Server application in JUNOSe.  These capabilities
+        became obsolete when IPv6 support was added."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaAddressGroup }
+    ::= { juniAaaServerAddressAgent 1 }
+
+juniAaaServerAddressAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the address assignment option of the AAA Server component
+        of the JUNOSe SNMP agent.  This version is supported in JUNOSe 5.1 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the address assignment
+        option of the AAA Server application in JUNOSe."
+    SUPPORTS    Juniper-AAA-MIB
+        INCLUDES {
+            juniAaaAddressGroup2 }
+    ::= { juniAaaServerAddressAgent 2 }
+
+END

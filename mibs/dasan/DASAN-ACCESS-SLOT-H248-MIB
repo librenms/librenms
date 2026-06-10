@@ -1,0 +1,934 @@
+-- Made by Jeon, DHL 
+-- at Thu Jan 27 16:50:00 2005
+
+     DASAN-ACCESS-SLOT-H248-MIB DEFINITIONS ::= BEGIN 
+   
+     IMPORTS 
+          BITS, mib-2, Counter32, Gauge32, -- inserted by jeon 20041206
+          MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+          Integer32, IpAddress, Unsigned32 
+                  FROM SNMPv2-SMI 
+          TEXTUAL-CONVENTION, 
+          RowStatus, TestAndIncr, AutonomousType, TimeStamp, DisplayString 
+                  FROM SNMPv2-TC 
+          MODULE-COMPLIANCE, OBJECT-GROUP, 
+          NOTIFICATION-GROUP                          
+                  FROM SNMPv2-CONF 
+          SnmpAdminString                             
+                  FROM SNMP-FRAMEWORK-MIB
+--          Unsigned32
+--          		  FROM DASAN-TC
+          InterfaceIndex                              
+                  FROM IF-MIB
+          dasanMgmt
+          		  FROM DASAN-SMI;
+
+     dasanAccessMib MODULE-IDENTITY 
+   
+         LAST-UPDATED   "200506112100Z" 
+         ORGANIZATION   "DASAN Networks" 
+         CONTACT-INFO 
+          " 
+          Postal: 
+   
+          Phone: 
+   
+          Email: 
+
+          " 
+         DESCRIPTION 
+          "Access Gateway Management Information Base (MIB)" 
+       
+         -- Revision History  
+   
+         REVISION     "200502112100Z"              -- Feb, 2005
+         DESCRIPTION 
+          "Initial Version by Jeon." 
+   
+   
+         --::= { mib-2 64 }
+         ::= { dasanMgmt 100 }
+         -- private oid
+         -- _ should be .... final assignment by IANA at publication time  
+   
+   
+     -- *****************************************************************  
+     --  
+     -- OID For the MIB 
+     -- 
+     -- *****************************************************************  
+     dasanAccGatewayMIBObjects    OBJECT IDENTIFIER::= { dasanAccessMib 2 }
+   
+      
+     -- *****************************************************************  
+     --  
+     -- Group Objects 
+     -- 
+     -- *****************************************************************  
+     dsAccGwyH248       OBJECT IDENTIFIER ::= { dasanAccGatewayMIBObjects 3 }
+ 
+     dsAccGwyH248Configuration		OBJECT IDENTIFIER ::= { dsAccGwyH248 1 }
+     dsAccGwyH248Monitor			OBJECT IDENTIFIER ::= { dsAccGwyH248 2 }
+     dsAccGwyH248Control			OBJECT IDENTIFIER ::= { dsAccGwyH248 3 }
+                                                               
+     -- ***************************************************************** 
+     -- *****************************************************************                                                           
+      
+     dsAccGwyConfigH248Slot 		OBJECT IDENTIFIER ::= { dsAccGwyH248Configuration 1 }
+     dsAccGwyConfigH248Vgw			OBJECT IDENTIFIER ::= { dsAccGwyH248Configuration 2 } 
+     dsAccGwyConfigH248Port			OBJECT IDENTIFIER ::= { dsAccGwyH248Configuration 3 }
+     
+     dsAccGwyMonitorH248Slot		OBJECT IDENTIFIER ::= { dsAccGwyH248Monitor 1 }
+     dsAccGwyMonitorH248Vgw			OBJECT IDENTIFIER ::= { dsAccGwyH248Monitor 2 }
+     dsAccGwyMonitorH248Port		OBJECT IDENTIFIER ::= { dsAccGwyH248Monitor 3 }
+     
+     dsAccGwyControlH248Vgw			OBJECT IDENTIFIER ::= { dsAccGwyH248Control 1 }                                                                                                                                                   
+     
+     -- *****************************************************************  
+     --  
+     -- Textual conventions for the Media Gateway MIB 
+     -- 
+     -- *****************************************************************  
+   
+     MediaGatewayId ::= TEXTUAL-CONVENTION 
+         STATUS      current 
+         DESCRIPTION  
+          "Possible Media Gateway Id that can be used to identify 
+           any media gateway uniquely" 
+         SYNTAX      INTEGER (1..2147483647) 
+    
+     -- *****************************************************************   
+     -- ConfigH248Slot
+     -- *****************************************************************
+     
+--  dsAccGwyConfigH248SlotTable OBJECT-TYPE
+--	 	SYNTAX		SEQUENCE OF DsAccGwyConfigH248SlotEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current
+--	 	DESCRIPTION "A list of accGwyGatewaySlotEntry object."
+--	 ::= { dsAccGwyConfigH248Slot 1 }
+	 
+--	 dsAccGwyConfigH248SlotEntry OBJECT-TYPE
+--	 	SYNTAX		DsAccGwyConfigH248SlotEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current  
+--	 	DESCRIPTION "Config AccessGateway Functions for each slot."
+--	 	INDEX		{ slotindex } 
+--	 ::= { dsAccGwyConfigH248SlotTable 1} 
+	 
+--	 DsAccGwyConfigH248SlotEntry ::= SEQUENCE
+--	 {                       
+--	    dsH248SlotIndex    INTEGER,
+--	 }  
+	 
+--	 dsH248SlotIndex		   	 OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--   	DESCRIPTION	"Config Index of slot"
+--     ::= {dsAccGwyConfigH248SlotEntry 1}  
+     
+     -- *****************************************************************   
+     -- ConfigH248Vgw
+     -- *****************************************************************
+	 
+	 dsAccGwyConfigH248VgwTable OBJECT-TYPE
+	 	SYNTAX		SEQUENCE OF DsAccGwyConfigH248VgwEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current
+	 	DESCRIPTION "A list of accGwyGatewayVgwEntry object."
+	 ::= { dsAccGwyConfigH248Vgw 1 }
+	 
+	 dsAccGwyConfigH248VgwEntry OBJECT-TYPE
+	 	SYNTAX		DsAccGwyConfigH248VgwEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current  
+	 	DESCRIPTION "Config AccessGateway Functions for each virtual gateway."
+	 	INDEX		{ dsH248VgwIndex } 
+	 ::= { dsAccGwyConfigH248VgwTable 1}
+	 
+	 DsAccGwyConfigH248VgwEntry ::= SEQUENCE
+	 {                       
+	    dsH248VgwIndex                        INTEGER,
+	    dsH248VgwGatewayID                    DisplayString,
+	    dsH248VgwGatewayPhyTerminationStart   INTEGER,
+	    dsH248VgwGatewayPhyTerminationEnd     INTEGER,
+	    dsH248VgwGatewayMediaPortStart        INTEGER,
+	    dsH248VgwGatewayMediaPortEnd          INTEGER,
+	    dsH248VgwGatewayAddr                  DisplayString,
+	    dsH248VgwGatewayPort                  Integer32,
+	    dsH248VgwGatewayEncodingScheme        INTEGER,
+	    dsH248VgwGatewayProtocol              INTEGER,
+	    dsH248VgwGatewaySignalingTptProtocol  INTEGER,
+	    dsH248VgwGatewayControllerIPAddress1  DisplayString,
+	    dsH248VgwGatewayControllerIPAddress2  DisplayString,
+	    dsH248VgwGatewayControllerIPAddress3  DisplayString,
+	    dsH248VgwGatewayControllerIPAddress4  DisplayString,
+	    dsH248VgwGatewayControllerIPAddress5  DisplayString,
+	    dsH248VgwGatewayControllerPort1       Integer32,
+	    dsH248VgwGatewayControllerPort2       Integer32,
+	    dsH248VgwGatewayControllerPort3       Integer32,
+	    dsH248VgwGatewayControllerPort4       Integer32,
+	    dsH248VgwGatewayControllerPort5       Integer32,
+	    dsH248VgwPropertyRootMaxContexts      INTEGER,
+	    dsH248VgwPropertyRootMaxTerminations   INTEGER,
+--	    dsH248VgwProfileID                    INTEGER,
+	    dsH248VgwTopology 	    	  INTEGER,
+	 	dsH248VgwTimestamp   	      INTEGER,
+	 	dsH248VgwNamingPhyTermination  DisplayString,
+	 	dsH248VgwNamingRtpTermination  DisplayString,
+        dsH248VgwPkgList  			  DisplayString, 
+        dsH248VgwHeartBeatTime   INTEGER,
+        dsH248VgwRetransmissionTime   INTEGER,
+        dsH248VgwMaxRetransmissionCount   INTEGER,
+        dsH248VgwDigitmap           DisplayString, 
+        dsH248VgwDigitmapLongTime   INTEGER,
+        dsH248VgwDigitmapShortTime   INTEGER,
+        dsH248VgwDigitmapStartTime   INTEGER,
+        dsH248VgwDigitmapZTime   INTEGER,    
+        dsH248VgwStartupType   INTEGER,
+        dsH248VgwConnectionSilencePeriod   INTEGER
+        
+	 }
+	  
+	 dsH248VgwIndex		  	 	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"virtual Gateway Index"
+     ::= {dsAccGwyConfigH248VgwEntry 1}   
+     
+     dsH248VgwGatewayID		   	 OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"The unique Media Gateway ID which identifies this media gateway"
+     ::= {dsAccGwyConfigH248VgwEntry 2}
+                    
+
+               
+     dsH248VgwGatewayPhyTerminationStart  OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	" Physical termination start of the virtual gateway"
+     ::= {dsAccGwyConfigH248VgwEntry 3}
+     
+     dsH248VgwGatewayPhyTerminationEnd    OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	" Physical termination end of the virtual gateway"
+     ::= {dsAccGwyConfigH248VgwEntry 4}
+     
+     dsH248VgwGatewayMediaPortStart	   	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	" Media Port(start port) of the virtual gateway"
+     ::= {dsAccGwyConfigH248VgwEntry 5} 
+     
+     dsH248VgwGatewayMediaPortEnd	   	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	" Media Port(end port) of the virtual gateway"
+     ::= {dsAccGwyConfigH248VgwEntry 6}
+     
+     dsH248VgwGatewayAddr	   	 OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-create
+		STATUS		current
+     	DESCRIPTION	"The IP address that the Media Gateway Controller will use to communicate with
+     				the Media Gateway. The value 0.0.0.0. is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 7}
+     
+     dsH248VgwGatewayPort       	 OBJECT-TYPE
+	 	SYNTAX		Integer32   (0..65535)
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"TCP/UDP port number that the Media Gateway Controller will use to communiacte
+     				with the Media Gateway. The value 0 is returned if the entry is invalid."
+     	DEFVAL		{ 2944 }
+     ::= {dsAccGwyConfigH248VgwEntry 8}
+     
+     dsH248VgwGatewayEncodingScheme	 OBJECT-TYPE
+	 	SYNTAX		INTEGER 
+	 				{
+	 					text	(1),       -- default
+	 					binary  (2)        -- not implemented
+	 				}
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"The encoding scheme that would be used to encode the Megaco messages that are
+     				sent/received to/from the gateway controller"
+     	DEFVAL		{ text }
+     ::= {dsAccGwyConfigH248VgwEntry 9}
+     
+     dsH248VgwGatewayProtocol	  	 OBJECT-TYPE
+	 	SYNTAX		INTEGER 
+	 				{
+	 					megacov1	 (1),   -- default
+	 					megacov2	 (2)    -- not implemented
+	 				}
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Type of the control protocol in use."
+     ::= {dsAccGwyConfigH248VgwEntry 10}
+     
+     dsH248VgwGatewaySignalingTptProtocol 	 OBJECT-TYPE
+	 	SYNTAX		INTEGER      
+	 				{
+	 					tcp		(1),    -- not implemented
+	 					udp		(2),    -- default
+	 					sctp	(3)     -- not implemented
+	 				}
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Type of the transport protocol that is being used to transport 
+     				the megaco signalling traffic"
+     ::= {dsAccGwyConfigH248VgwEntry 11}
+     
+     
+     dsH248VgwGatewayControllerIPAddress1  	 OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"The IP address of the Media Gateway Controller 1 . The 
+                      value 0.0.0.0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 12}
+     
+     dsH248VgwGatewayControllerIPAddress2	 OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"The IP address of the Media Gateway Controller 2 . The 
+                      value 0.0.0.0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 13}
+     
+     dsH248VgwGatewayControllerIPAddress3 	 OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"The IP address of the Media Gateway Controller 3 . The 
+                      value 0.0.0.0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 14}
+     
+     dsH248VgwGatewayControllerIPAddress4  	 OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"The IP address of the Media Gateway Controller 4 . The 
+                      value 0.0.0.0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 15}
+     
+     dsH248VgwGatewayControllerIPAddress5 	 OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"The IP address of the Media Gateway Controller 5 . The 
+                      value 0.0.0.0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 16}  
+     
+     dsH248VgwGatewayControllerPort1	   	 OBJECT-TYPE
+	 	SYNTAX		Integer32 (0..65535)
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"TCP/UDP port of the Media Gateway Controller 1 . The value 
+                      0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 17}
+    
+     dsH248VgwGatewayControllerPort2	   	 OBJECT-TYPE
+	 	SYNTAX		Integer32 (0..65535)
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"TCP/UDP port of the Media Gateway Controller 2 . The value 
+                      0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 18}
+     
+     dsH248VgwGatewayControllerPort3	   	 OBJECT-TYPE
+	 	SYNTAX		Integer32 (0..65535)
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"TCP/UDP port of the Media Gateway Controller 3 . The value 
+                      0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 19}
+     
+     dsH248VgwGatewayControllerPort4	   	 OBJECT-TYPE
+	 	SYNTAX		Integer32 (0..65535)
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"TCP/UDP port of the Media Gateway Controller 4 . The value 
+                      0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 20}
+     
+     dsH248VgwGatewayControllerPort5	   	 OBJECT-TYPE
+	 	SYNTAX		Integer32 (0..65535)
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"TCP/UDP port of the Media Gateway Controller 5. The value 
+                      0 is returned if the entry is invalid."
+     ::= {dsAccGwyConfigH248VgwEntry 21}
+                                    
+     dsH248VgwPropertyRootMaxContexts	   	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"Max contexts in a message"
+     ::= {dsAccGwyConfigH248VgwEntry 22} 
+    
+     dsH248VgwPropertyRootMaxTerminations  	 OBJECT-TYPE
+	 	SYNTAX		INTEGER  
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"Max terminations in a context"
+     ::= {dsAccGwyConfigH248VgwEntry 23} 
+
+   
+     dsH248VgwTopology			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 				{
+	 					nouse	(0),
+	 					use		(1)
+	 				}
+
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"it is decided to use the topology(a relationship of terminations in contexts)"
+     ::= {dsAccGwyConfigH248VgwEntry 24}
+     
+     dsH248VgwTimestamp			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 				{
+	 					nouse	(0),
+	 					use		(1)
+	 				}
+
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"when a message is sended, it is decided to include the current time(Timestamp) 
+     				in the message."
+     ::= {dsAccGwyConfigH248VgwEntry 25}
+    
+    dsH248VgwNamingPhyTermination	OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"the format of physical termination in h248 message"
+     ::= {dsAccGwyConfigH248VgwEntry 26}
+     
+     dsH248VgwNamingRtpTermination	OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"the format of RTP termination in h248 message"
+     ::= {dsAccGwyConfigH248VgwEntry 27}     
+     
+     dsH248VgwPkgList				OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 Package list"
+     ::= {dsAccGwyConfigH248VgwEntry 28} 
+                                                 
+     dsH248VgwHeartBeatTime				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW HeartBeatTime"
+     ::= {dsAccGwyConfigH248VgwEntry 29} 
+ 
+     dsH248VgwRetransmissionTime				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW RetransmissionTime"
+     ::= {dsAccGwyConfigH248VgwEntry 30} 
+     
+      dsH248VgwMaxRetransmissionCount				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW MaxRetransmissionCount"
+     ::= {dsAccGwyConfigH248VgwEntry 31} 
+  
+       dsH248VgwDigitmap				OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW Digitmap"
+     ::= {dsAccGwyConfigH248VgwEntry 32}                                       
+                                         
+                                         
+     dsH248VgwDigitmapLongTime				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW DigitmapLongTime : last-digit-time"
+     ::= {dsAccGwyConfigH248VgwEntry 33} 
+
+     dsH248VgwDigitmapShortTime				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW DigitmapShortTime : inter-digit-time"
+     ::= {dsAccGwyConfigH248VgwEntry 34} 
+     
+     dsH248VgwDigitmapStartTime				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW DigitmapStartTime : first-digit-time"
+     ::= {dsAccGwyConfigH248VgwEntry 35} 
+     
+     dsH248VgwDigitmapZTime				OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"H.248 VGW DigitmapZTime"
+     ::= {dsAccGwyConfigH248VgwEntry 36}      
+     
+     dsH248VgwStartupType			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 				{
+	 					normal(1),
+	 					expedited(2)
+	 				}
+
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"Startup type of MG:
+     	            normal : MG joins into only a MGC.
+     	            expedited : MG joins into two MGCs. 
+     				"
+     ::= {dsAccGwyConfigH248VgwEntry 37}
+
+    dsH248VgwConnectionSilencePeriod			OBJECT-TYPE
+	 	SYNTAX		INTEGER	 	
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"Connection Silence Period between MG and MGC"
+     ::= {dsAccGwyConfigH248VgwEntry 38} 
+     
+                                                 
+     -- *****************************************************************   
+     -- ConfigH248Port
+     -- *****************************************************************
+              
+--  DsAccGwyConfigH248PortTable OBJECT-TYPE
+--	 	SYNTAX		SEQUENCE OF DsAccGwyConfigH248PortEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current
+--	 	DESCRIPTION "A list of accGwyGatewayPortEntry object."
+--	 ::= { dsAccGwyConfigH248Port 1 }
+	 
+--	 dsAccGwyConfigH248PortEntry OBJECT-TYPE
+--	 	SYNTAX		DsAccGwyConfigH248PortEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current  
+--	 	DESCRIPTION "Config AccessGateway Functions for each termination"
+--	 	INDEX		{ portindex } 
+--	 ::= { dsAccGwyConfigH248PortTable 1} 
+	 
+--	 DsAccGwyConfigH248PortEntry ::= SEQUENCE
+--	 {                       
+--	    dsH248PortIndex      INTEGER,
+--      dsH248PortTerminationOperation   INTEGER,
+--	 }  
+	 
+--	 dsH248PortIndex		   	 OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--   	DESCRIPTION	"Index of port "
+--     ::= {dsAccGwyConfigH248PortEntry 1}  
+     
+--     dsH248PortTerminationOperation 	 OBJECT-TYPE
+--	 	SYNTAX		INTEGER  
+--	 				{ 
+--                       up    (1), 
+--                      down  (2) 
+--                    } 
+--	 	MAX-ACCESS	read-write 
+--		STATUS		current
+--     	DESCRIPTION	"The desired state of the termination. "
+--    ::= {dsAccGwyConfigH248PortEntry 2} 
+     
+     -- *****************************************************************   
+     -- MonitorH248Slot
+     -- *****************************************************************     
+--     dsAccGwyMonitorH248SlotTable OBJECT-TYPE
+--	 	SYNTAX		SEQUENCE OF DsAccGwyMonitorH248SlotEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current
+--	 	DESCRIPTION "A list of accGwyGatewaySlotEntry object."
+--	 ::= { dsAccGwyMonitorH248Slot 1 }
+	 
+--	 dsAccGwyMonitorH248SlotEntry OBJECT-TYPE
+--	 	SYNTAX		DsAccGwyMonitorH248SlotEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current  
+--	 	DESCRIPTION "Config AccessGateway Functions for each slot."
+--	 	INDEX		{ slotindex } 
+--	 ::= { dsAccGwyMonitorH248SlotTable 1} 
+	  
+--		 DsAccGwyMonitorH248SlotEntry ::= SEQUENCE
+--	 {                       
+--	    dsH248SlotIndex      INTEGER,
+--   }   
+       
+     -- *****************************************************************   
+     -- MonitorH248Vgw
+     -- *****************************************************************  
+     
+     dsAccGwyMonitorH248VgwTable OBJECT-TYPE
+	 	SYNTAX		SEQUENCE OF DsAccGwyMonitorH248VgwEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current
+	 	DESCRIPTION "A list of dsAccGwyMonitorH248VgwEntry object. "
+	 ::= { dsAccGwyMonitorH248Vgw 1 }
+	 
+	 dsAccGwyMonitorH248VgwEntry OBJECT-TYPE
+	 	SYNTAX		DsAccGwyMonitorH248VgwEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current    
+	 	DESCRIPTION "Monitor AccessGateway Functions for each virtual gateway. "
+	 	INDEX		{ dsH248MonitorVgwIndex } 
+	 ::= { dsAccGwyMonitorH248VgwTable 1} 
+	 
+	 DsAccGwyMonitorH248VgwEntry ::= SEQUENCE
+	 {                       
+	    dsH248MonitorVgwIndex      INTEGER,
+	    dsH248MonitorVgwGatewayOperStatus			INTEGER,
+        dsH248MonitorVgwGatewayNumInMessages		Unsigned32,
+        dsH248MonitorVgwGatewayNumInOctets			Unsigned32,
+        dsH248MonitorVgwGatewayNumOutMessage		Unsigned32,
+        dsH248MonitorVgwGatewayNumOutOctets			Unsigned32,
+        dsH248MonitorVgwGatewayNumErrors			Unsigned32,
+        dsH248MonitorVgwGatewayNumTimerRecovery		Unsigned32,
+        dsH248MonitorVgwGatewayTransportNumLosses			Unsigned32,
+        dsH248MonitorVgwGatewayTransportNumSwitchover		Unsigned32,
+        dsH248MonitorVgwGatewayTransportTotalNumAlarms		Unsigned32,
+        dsH248MonitorVgwGatewayTransportLastEvent 			INTEGER,  
+        dsH248MonitorVgwGatewayTransportLastEventTime		TimeStamp,
+        dsH248MonitorVgwGatewayLastStatisticsReset			TimeStamp, 
+        dsH248MonitorVgwGatewayContexts						DisplayString
+ --       dsH248MonitorVgwInvalidControllerAddress			DisplayString,
+ --       dsH248MonitorVgwGatewayHandoff						DisplayString,
+ --       dsH248MonitorVgwProtocolError						DisplayString,     	 
+     }  
+	 
+	 dsH248MonitorVgwIndex 		   	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Monitor Index of Virtual Gateway"
+     ::= {dsAccGwyMonitorH248VgwEntry 1} 
+ 
+      dsH248MonitorVgwGatewayOperStatus 		   	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 				{ 
+                		 up     (1),   
+                 		 down   (2) 
+                    }
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"The current operational state of the virtual gateway. "
+     ::= {dsAccGwyMonitorH248VgwEntry 2}
+     
+     dsH248MonitorVgwGatewayNumInMessages 	   	 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Total number of messages received on the link."
+     ::= {dsAccGwyMonitorH248VgwEntry 3}
+     
+     dsH248MonitorVgwGatewayNumInOctets		   		 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Total number of octets received on the link."
+     ::= {dsAccGwyMonitorH248VgwEntry 4}
+     
+     dsH248MonitorVgwGatewayNumOutMessage		   	 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Total number of messages sent on the link."
+     ::= {dsAccGwyMonitorH248VgwEntry 5}
+     
+     dsH248MonitorVgwGatewayNumOutOctets 		   	 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Total number of octets sent on the link."
+     ::= {dsAccGwyMonitorH248VgwEntry 6}
+     
+     dsH248MonitorVgwGatewayNumErrors 		   		 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Total number of signaling-level errors encountered. 
+                     Includes, but is not limited to, number of bad 
+                     messages received, number of failures to sent a 
+                     message and number of other errors."
+     ::= {dsAccGwyMonitorH248VgwEntry 7}
+     
+     dsH248MonitorVgwGatewayNumTimerRecovery 	   	 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Total Number of timer recovery events since the 
+                     statistics was last reset. This reflects all protocol 
+                     timers that are supported (For Megaco, T - start timer,  
+                     S - short timer, L - long timer, and Z - long duration  
+                     timer etc)"
+     ::= {dsAccGwyMonitorH248VgwEntry 8}
+     
+     dsH248MonitorVgwGatewayTransportNumLosses	   	 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Number of times a transport link was lost 
+                 	 (excluding switch-over cases). A link loss is defined 
+                  	 as loss of communication with the entity (MGC) due to 
+                 	 hardware/transient problems in the interface or other 
+                     related hardware/software"
+     ::= {dsAccGwyMonitorH248VgwEntry 9}
+     
+     dsH248MonitorVgwGatewayTransportNumSwitchover 	 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Number of times when the signaling was switched 
+                     over to an alternative link. This includes  
+                     switchover due to the Handoffs initiated by the 
+                     gateway controllers"
+     ::= {dsAccGwyMonitorH248VgwEntry 10}
+     
+     dsH248MonitorVgwGatewayTransportTotalNumAlarms	 OBJECT-TYPE
+	 	SYNTAX		Unsigned32
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Total number of all alarms issued for the transport layer."
+     ::= {dsAccGwyMonitorH248VgwEntry 11}
+     
+     dsH248MonitorVgwGatewayTransportLastEvent	   	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 				{ 
+                       notApplicable   (1), 
+                       other           (2), 
+                       linkUp          (3), 
+                       linkLoss        (4),  
+                       persistentError (5),  
+                       linkShutdown    (6),  
+                       switchOver      (7)   
+                    }
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Last event reported by the transport layer."
+     ::= {dsAccGwyMonitorH248VgwEntry 12}
+                                                
+     dsH248MonitorVgwGatewayTransportLastEventTime	   	 OBJECT-TYPE
+	 	SYNTAX		TimeStamp
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Last event time reported by the transport layer."
+     ::= {dsAccGwyMonitorH248VgwEntry 13}
+                                           
+     dsH248MonitorVgwGatewayLastStatisticsReset	   	 OBJECT-TYPE
+	 	SYNTAX		TimeStamp 
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"The value of sysUpTime at the time when the statistics were reset. "
+     ::= {dsAccGwyMonitorH248VgwEntry 14}
+         
+     dsH248MonitorVgwGatewayContexts	   	 OBJECT-TYPE
+	 	SYNTAX		DisplayString 
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"contexts in transaction message"
+     ::= {dsAccGwyMonitorH248VgwEntry 15}
+                                         
+     -- *****************************************************************   
+     -- MonitorH248Port
+     -- *****************************************************************                                   
+                                        
+   --  dsAccGwyMonitorH248PortTable OBJECT-TYPE
+--	 	SYNTAX		SEQUENCE OF DsAccGwyMonitorH248PortEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current
+--	 	DESCRIPTION "A list of AccGwyMonitorH248PortEntry object."
+--	 ::= { dsAccGwyMonitorH248Port 1 }
+	                                    
+--	 dsAccGwyMonitorH248PortEntry OBJECT-TYPE
+--	 	SYNTAX		DsAccGwyMonitorH248PortEntry
+--	 	MAX-ACCESS 	not-accessible
+--	 	STATUS		current  
+--	 	DESCRIPTION "Monitor AccessGateway Functions for each port"
+--	 	INDEX		{ portindex } 
+--	 ::= { dsAccGwyMonitorH248PortTable 1} 
+	 
+--	 DsAccGwyMonitorH248PortEntry ::= SEQUENCE
+--	 {                       
+--	    dsH248MonitorPortIndex      INTEGER, 
+--	    dsH248MonitorPortTerminationOperStatus      INTEGER,
+--       dsH248MonitorPortTerminationStatsDur        Unsigned32,
+--        dsH248MonitorPortTerminationStatsOs	        Unsigned32,
+--        dsH248MonitorPortTerminationStatsOr	        Unsigned32,
+--        dsH248MonitorPortTerminationStatsPs	        Unsigned32,
+--        dsH248MonitorPortTerminationStatsPr	        Unsigned32,
+--        dsH248MonitorPortTerminationStatsPl	        Unsigned32,
+--        dsH248MonitorPortTerminationStatsJitter	    Unsigned32,
+--        dsH248MonitorPortTerminationStatsDelay      Unsigned32,
+--   	 }                                      
+   	  
+--	 dsH248MonitorPortIndex		 OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"Monitor Index of Port"
+--     ::= {dsAccGwyMonitorH248PortEntry 1}  
+     
+--     dsH248MonitorPortTerminationOperStatus	   	 OBJECT-TYPE
+--	 	SYNTAX		INTEGER
+--	 				{ 
+--                       up      (1), 
+--                       down    (2) 
+--                      }
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current operational state of the termination."
+--     ::= {dsAccGwyMonitorH248PortEntry 2}
+     
+--     dsH248MonitorPortTerminationStatsDur	   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of the termination:
+--     		duration time (msec) of last call"
+--     ::= {dsAccGwyMonitorH248PortEntry 3}
+     
+--     dsH248MonitorPortTerminationStatsOs	   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of  the termination :
+--     	(Octects of send)"
+--     ::= {dsAccGwyMonitorH248PortEntry 4}         
+     
+--     dsH248MonitorPortTerminationStatsOr	   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of  the termination :
+--     	(Octects of received)"
+--     ::= {dsAccGwyMonitorH248PortEntry 5}
+     
+--     dsH248MonitorPortTerminationStatsPs	   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of  the termination :
+--     	(Octects of received)"
+--     ::= {dsAccGwyMonitorH248PortEntry 6}
+     
+--     dsH248MonitorPortTerminationStatsPr	   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of  the termination :
+--     	(Pakcets of send)"
+--     ::= {dsAccGwyMonitorH248PortEntry 7}
+     
+--     dsH248MonitorPortTerminationStatsPl	   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of  the termination :
+--     	(Pakcets of received)"
+--     ::= {dsAccGwyMonitorH248PortEntry 8}
+     
+--     dsH248MonitorPortTerminationStatsJitter   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of  the termination :
+--     		delay jitter(msec) of last call"
+--     ::= {dsAccGwyMonitorH248PortEntry 9}
+     
+--     dsH248MonitorPortTerminationStatsDelay   	 OBJECT-TYPE
+--	 	SYNTAX		Unsigned32
+--	 	MAX-ACCESS	read-only
+--		STATUS		current
+--     	DESCRIPTION	"The current statistics of the termination :
+--     		delay time(msec) of last call"
+--     ::= {dsAccGwyMonitorH248PortEntry 10}
+     
+     -- *****************************************************************   
+     -- ControlH248Vgw
+     -- *****************************************************************
+	 
+	 dsAccGwyControlH248VgwTable OBJECT-TYPE
+	 	SYNTAX		SEQUENCE OF DsAccGwyControlH248VgwEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current
+	 	DESCRIPTION "A list of accGwyGatewayVgwEntry object."
+	 ::= { dsAccGwyControlH248Vgw 1 }
+	 
+	 dsAccGwyControlH248VgwEntry OBJECT-TYPE
+	 	SYNTAX		DsAccGwyControlH248VgwEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current  
+	 	DESCRIPTION "Config AccessGateway Functions for each virtual gateway."
+	 	INDEX		{ dsH248ControlVgwIndex } 
+	 ::= { dsAccGwyControlH248VgwTable 1}
+	 
+	 DsAccGwyControlH248VgwEntry ::= SEQUENCE
+	 {                
+		 dsH248ControlVgwIndex      INTEGER,  
+		 dsH248ControlVgwGatewayOperation			  INTEGER,
+		 dsH248ControlVgwGatewayResetStatistics  	INTEGER
+	 }
+	  
+	 dsH248ControlVgwIndex	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"Control Index of Virtual Gateway"
+     ::= {dsAccGwyControlH248VgwEntry 1}   
+                                        
+      dsH248ControlVgwGatewayOperation		   	 OBJECT-TYPE
+	 	SYNTAX		INTEGER     
+	 				{
+	 					start		(1),
+	 					stop		(2),
+	 					restart		(3),
+	 					restart-idle (4)                   
+	 				}
+	 	MAX-ACCESS	read-write
+		STATUS		current
+     	DESCRIPTION	"The desired control of the virtual gateway : 
+     				start : start of h248 stack
+     				stop  : stop of h248 stack
+     				restart : restart of h248 stack
+     				restart-dile : daemon restart after call-service
+     				"
+     ::= {dsAccGwyControlH248VgwEntry 2}
+
+                                        
+     dsH248ControlVgwGatewayResetStatistics	 OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 				{ 
+                       reset         (1)   
+                    }
+	 	MAX-ACCESS	read-create
+		STATUS		current
+     	DESCRIPTION	"This object can be used to reset all statistics 
+                     collected for this media gateway link so far. 
+                     Statistics will be reset when the object is SET 
+                     to 'reset'.  Upon reset, the agent changes the value 
+                     of this object to 'notApplicable'."
+     ::= {dsAccGwyControlH248VgwEntry 3}
+    
+     END                         

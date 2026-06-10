@@ -1,0 +1,1380 @@
+--**MOD+***********************************************************************
+--* Module:    hpicfBridge.mib
+--*
+--* Copyright (C) 2000-2013, 2018, 2020, 2021 Hewlett Packard Enterprise
+--* Development LP  All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett Packard Enterprise Development LP.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett Packard Enterprise Development LP.
+--*
+--* Purpose: This file contains MIB definition of HP-ICF-BRIDGE  MIB
+--*
+--**MOD-***********************************************************************
+
+HP-ICF-BRIDGE DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32,
+        Counter32
+            FROM SNMPv2-SMI
+        TruthValue, TimeStamp, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        dot1dBasePortEntry
+            FROM BRIDGE-MIB
+        VlanIndex,VlanId
+            FROM Q-BRIDGE-MIB
+        hpSwitch
+            FROM HP-ICF-OID
+        ConfigStatus
+            FROM HP-ICF-TC
+        dot1qVlanStaticEntry
+            FROM Q-BRIDGE-MIB    
+        ifIndex
+            FROM IF-MIB
+        portCopyEntry
+            FROM SMON-MIB
+	VidList
+	    FROM HP-ICF-FTRCO;
+
+
+    hpicfBridge MODULE-IDENTITY
+        LAST-UPDATED "202011180000Z"  -- November 18, 2020
+        ORGANIZATION  "HP Networking"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                      extensions to the standard Bridge MIBs."
+
+        REVISION     "202011180000Z"  -- November 18, 2020
+        DESCRIPTION  "A new textual convention disableRx(4) is added for the
+                      hpicfBridgeLoopProtectPortReceiverAction MIB."
+
+        REVISION     "201811220000Z"  -- November 22, 2018
+        DESCRIPTION  "The range of the MIB object hpicfBridgeRstpPortPathCost
+                      is modified from 1..200000000 to 0..200000000."
+
+        REVISION     "201310110000Z"  -- October 11, 2013
+        DESCRIPTION  "The description of selected MIB objects is modified for  
+                      clarity and usability."
+
+        REVISION     "201207130000Z"  -- Jul 13, 2012
+        DESCRIPTION  "A new textual convention disableTxRx(3) is added for the
+                      hpicfBridgeLoopProtectPortReceiverAction MIB."       	
+        
+	REVISION     "201205300000Z"  -- Apr 30, 2012
+        DESCRIPTION  "Added 'hpicfBridgeGvrpStateMachineTable'with the following mib objects:
+		      hpicfGenericVlanId,hpicfApplicantStateMachine,hpicfApplicantStateMachine.
+		      Added hpicfBridgeGvrpPortGroup1, hpicfBridgeComplianceRevFour1 and
+                      deprecated hpicfBridgeGvrpPortGroup, hpicfBridgeComplianceRevFour."
+
+	REVISION     "201006260000Z"  -- Jun 26, 2010
+        DESCRIPTION  "This MIB module supports loop protect per vlan feature."
+	
+        REVISION     "200912150000Z"  -- Dec 15, 2009
+        DESCRIPTION  "Added 'hpicfBridgeMirrorSessionType' MIB object."
+
+        REVISION     "200902110000Z"  -- Feb 11, 2009
+        DESCRIPTION  "Added 'hpicfBridgeVoiceVlanConfigTable',
+                      'hpicfBridgeJumboInterfaceConfigTable'
+                      'hpicfBridgeManagementInterfaceConfigTable' objects."
+
+        REVISION     "200609300000Z"  -- September 30, 2006
+        DESCRIPTION  "Added 'hpicfBridgeMirrorSessionID' MIB object."
+
+        REVISION     "200609260000Z"  -- September 26, 2006
+        DESCRIPTION  "Added 'hpicfBridgeRstpAutoEdgePort' MIB object."
+       
+        REVISION     "200608131738Z"  -- Aug 08, 2006
+        DESCRIPTION  "Added hpicfLoopProtect MIB and 
+                      updated conformance statements."  
+
+        REVISION     "200302200000Z"  -- February 20, 2003
+        DESCRIPTION
+                     "Added 'mstpOperation' option to the
+                     'hpicfBridgeRstpForceVersion' MIB object.
+                      Added 'ieee8021s' option to the 
+                      'hpicfBridgeRstpProtocolVersion' MIB object."
+
+
+        REVISION     "200205231738Z"  -- May 23, 2002
+        DESCRIPTION  "Added conformance information."
+
+        REVISION     "200110032050Z"  -- October 3, 2001
+        DESCRIPTION  "Modified hpicfBridgeRstp MIB to contain
+                      ConfigStatus."
+
+        REVISION     "200011030642Z"  -- November 3, 2000
+        DESCRIPTION  "Initial revision."
+        ::= { hpSwitch 12 }
+
+    BridgeId ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION  "The Bridge Identifier as used in the Spanning Tree
+                      Protocol to uniquely identify a bridge."
+        SYNTAX OCTET STRING (SIZE (8))
+
+    hpicfBridgeObjects 
+        OBJECT IDENTIFIER ::= { hpicfBridge 1 }
+    hpicfBridgeBase 
+        OBJECT IDENTIFIER ::= { hpicfBridgeObjects 1 }
+-- **********************************************************************
+-- VLAN Objects
+-- **********************************************************************
+
+    hpicfBridgeMaxVlans OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Defines the number of VLANs that the switch will
+                    support for dynamic use without requiring a reboot."
+        ::= { hpicfBridgeBase 1 }
+
+    hpicfBridgeVlanEnable OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Administrative status of VLAN support on this
+                    switch."
+        ::= { hpicfBridgeBase 2 }
+
+    hpicfBridgePrimaryVlan OBJECT-TYPE
+        SYNTAX      VlanIndex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The 802.1Q VLAN ID of the primary VLAN for this
+                    switch."
+        ::= { hpicfBridgeBase 3 }
+
+    hpicfBridgeVlanConfigStatus OBJECT-TYPE
+        SYNTAX      ConfigStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "If one or more variables in this group has been
+                    reconfigured since the last reboot in such a way
+                    as to require a reboot to take effect, the value
+                    of this variable will be set to 'notInService'."
+        ::= { hpicfBridgeBase 4 }
+
+-- **********************************************************************
+-- GVRP Objects
+-- **********************************************************************
+    hpicfBridgeGvrp OBJECT IDENTIFIER ::= { hpicfBridgeObjects 2 }
+
+    hpicfBridgeGvrpPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeGvrpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table that contains information about the
+                    GVRP port configurations on this switch."
+        ::= { hpicfBridgeGvrp 1 }
+
+    hpicfBridgeGvrpPortEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeGvrpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "GVRP information associated with a single port."
+        AUGMENTS    { dot1dBasePortEntry }
+        ::= { hpicfBridgeGvrpPortTable 1 }
+
+    HpicfBridgeGvrpPortEntry ::= 
+        SEQUENCE {
+            hpicfBridgeGvrpRestrictedVlanReg TruthValue
+        }
+
+    hpicfBridgeGvrpRestrictedVlanReg OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Controls GVRP's ability to learn new VLANs on
+                    this port.  When set to 'false', GVRP will accept
+                    JOIN requests for new VLANs on this port.  When
+                    set to 'true', GVRP will only process protocol
+                    packets that concern themselves with known VLANs."
+        ::= { hpicfBridgeGvrpPortEntry 1 }
+
+    hpicfBridgeGvrpStateMachineTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeGvrpStateMachineEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table that contains information about the
+                    GVRP state Machine(s) configuration."
+        ::= { hpicfBridgeGvrp 2 }
+   
+    hpicfBridgeGvrpStateMachineEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeGvrpStateMachineEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A row in a table, containing the VLAN ID and Portlist."
+        INDEX   {hpicfGenericVlanId,
+                 ifIndex}
+        ::= { hpicfBridgeGvrpStateMachineTable 1 }
+
+    HpicfBridgeGvrpStateMachineEntry ::=
+        SEQUENCE
+          {     hpicfGenericVlanId                VlanId,
+                hpicfApplicantStateMachine        INTEGER,
+                hpicfRegistarStateMachine         INTEGER
+          }    
+    hpicfGenericVlanId OBJECT-TYPE
+        SYNTAX      VlanId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The VLAN ID to which this entry belongs."
+        ::= { hpicfBridgeGvrpStateMachineEntry 1}
+
+    hpicfApplicantStateMachine OBJECT-TYPE
+        SYNTAX      INTEGER {
+         va(0),
+         aa(1),
+         qa(2),
+         la(3),
+         vp(4),
+         ap(5),
+         qp(6),
+         vo(7),
+         ao(8),
+         qo(9),
+         lo(10),
+         von(11),
+         aon(12),
+         qon(13)
+          }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+                   "This MIB provides the Applicant State Machine values of 
+                    the GVRP enabled port as follows,0 = va, 1 = aa,2 = qa,
+                    3 = la,4 = vp,5 = ap,6 = qp,7 = vo,8 = ao,9 = qo,10 = lo,
+                    11 = von,12 = aon,13 = qon. Whereas, the  first letter 
+                    indicates the state: V for Very anxious, A for Anxious, 
+                    Q for Quiet, and L for Leaving. The second letter indicates 
+                    the membership state: A for Active member,P for Passive member, 
+                    O for Observer. And the third letter N (if any) stands for
+                    Non-participant." 
+        ::= { hpicfBridgeGvrpStateMachineEntry 2}
+
+     hpicfRegistarStateMachine OBJECT-TYPE
+        SYNTAX      INTEGER {
+         inn(0),
+         lv(1),
+         l3(2),
+         l2(3),
+         l1(4),
+         mt(5),
+         inr(6),
+         lvr(7),
+         l3r(8),
+         l2r(9),
+         l1r(10),
+         mtr(11),
+         inf(12),
+         lvf(13),
+         l3f(14),
+         l2f(15),
+         l1f(16),
+         mtf(17)
+          }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION 
+                    "This MIB provides the Registrar state machine value for the 
+                     GVRP enabled port as follows,0 = inn,1 = lv,2 = l3,3 = l2,
+                     4 = l1,5 = mt,6 = inr,7 = lvr,8 = l3r,9 = l2r,10 = l1r,11 = mtr,
+                     12 = inf,13 = lvf,14 = l3f,15 = l2f,16 = l1f,17 = mtf . Whereas,
+                     the first two letters/numbers indicate the state: IN stands for
+                     In; LV, L3, L2, and L1 all stand for Leaving, and L3, L2, L1 are
+                     three sub-states of LV; MT stands for Empty. And the third letter
+                     indicates the registration mode: N (or the third letter being 
+                     absent) for normal registration,R for Registration fixed, and F
+                     for Registration forbidden..  indicating the fixed registration 
+                     mode in Empty state."
+         ::= { hpicfBridgeGvrpStateMachineEntry 3}
+-- **********************************************************************
+-- Rapid Reconfiguration Spanning Tree Objects
+-- **********************************************************************
+
+    hpicfBridgeRstp OBJECT IDENTIFIER ::= { hpicfBridgeObjects 4 }
+
+    hpicfBridgeRstpForceVersion OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        stpCompatibility(0),
+                        rstpOperation(2),
+                        mstpOperation(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational mode of the Spanning Tree Protocol.
+
+                     A value of stpCompatibility (0) indicates that the Spanning Tree Protocol 
+                     operates in IEEE 802.1d mode on all ports.
+
+                     A value of rstpOperation (2) indicates that the Spanning Tree Protocol 
+                     operates in IEEE 802.1w mode on all ports, except for the ports to which bridges are 
+                     connected. The ports to which bridges are connected operate in IEEE 802.1d mode for
+                     backward compatibility.
+
+                     A value of mstpOperation (3) indicates that the Spanning Tree Protocol 
+                     operates in IEEE 802.1s mode on all ports, except for the ports to which bridges are 
+                     connected. The ports to which bridges are connected operate in IEEE 802.1d mode for
+                     backward compatibility.
+
+                     This option is available only if object 'hpicfBridgeRstpProtocolVersion' is set to 'ieee8021s'."
+        ::= { hpicfBridgeRstp 1 }
+        
+    hpicfBridgeRstpConfigStatus OBJECT-TYPE
+        SYNTAX      ConfigStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The configuration status of this group of objects. The value of this object is set to
+                     'notInService' if any variable in this group is reconfigured since the last reboot and 
+                     a system reboot is required for the configuration to take effect."
+        ::= { hpicfBridgeRstp 2 }
+
+    hpicfBridgeRstpProtocolVersion OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        ieee8021d(0),
+                        ieee8021w(2),
+                        ieee8021s(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The version of Spanning Tree Protocol currently running on the switch.
+                     - ieee8021d is the version of Spanning Tree Protocol defined as IEEE 802.1d (STP).
+                     - ieee8021w is the version of Spanning Tree Protocol defined as IEEE 802.1w (RSTP).
+                     - ieee8021s is the version of Spanning Tree Protocol defined as IEEE 802.1s (MSTP)."
+        ::= { hpicfBridgeRstp 3 }
+
+    hpicfBridgeRstpAdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the Spanning Tree Protocol"
+        ::= { hpicfBridgeRstp 4 }
+
+     hpicfBridgeRstpPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeRstpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A table that contains information about STP configuration on all ports."
+        ::= { hpicfBridgeRstp 5 }
+
+    hpicfBridgeRstpPortEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeRstpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the hpicfBridgeRstpPortTable which holds the information of STP
+                     configuration of a port. An entry is available for each port in this table."
+        INDEX       { hpicfBridgeRstpPortIndex }
+        ::= { hpicfBridgeRstpPortTable 1 }
+
+    HpicfBridgeRstpPortEntry ::=
+        SEQUENCE {
+            hpicfBridgeRstpPortIndex                    Integer32,
+            hpicfBridgeRstpAdminEdgePort                INTEGER,
+            hpicfBridgeRstpOperEdgePort                 INTEGER,
+            hpicfBridgeRstpAdminPointToPointMac         INTEGER,
+            hpicfBridgeRstpOperPointToPointMac          TruthValue,
+            hpicfBridgeRstpPortPathCost                 Integer32,
+            hpicfBridgeRstpForceBpduMigrationCheck      TruthValue,
+            hpicfBridgeRstpAutoEdgePort	              TruthValue,
+            hpicfBridgeRstpPortBpduFiltering            TruthValue
+        }
+
+    hpicfBridgeRstpPortIndex OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The port number of the port for which this entry
+                    contains Spanning Tree Protocol management
+                    information."
+        REFERENCE
+             "IEEE 802.1w"
+        ::= { hpicfBridgeRstpPortEntry 1 }
+
+    hpicfBridgeRstpAdminEdgePort OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicate that port is connected to LAN segment that don't 
+                     have any bridge connected to it"
+        REFERENCE
+             "IEEE P802.1w Clause 17.3; IEEE P802.1t Clause 18"
+        ::= { hpicfBridgeRstpPortEntry 2 }
+
+    hpicfBridgeRstpOperEdgePort OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Reflects the value of the operEdgePort parameter, as 
+                     defined by the operation of the Bridge Detection state
+                     machine (Clause 18 of P802.1t). The value of this parameter
+                     is used by a Designated Port in order to determine how 
+                     rapidly it may transition to the Forwarding Port State 
+                     (see 17.23, Port Role Transitions state machine). 
+                     The Bridge Detection state machine sets this parameter to 
+                     the value of adminEdgePort (P802.1t 18.1.3) on 
+                     initialization, and forces its value to FALSE if any BPDUs
+                     are received on the Port."
+        REFERENCE
+             "IEEE P802.1w Clause 17.3; IEEE P802.1t Clause 18"
+        ::= { hpicfBridgeRstpPortEntry 3 }
+
+    hpicfBridgeRstpAdminPointToPointMac OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        forceTrue(1),
+                        forceFalse(2),
+                        auto(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "
+        forceTrue: This value indicates that the administrator requires the MAC
+                   to be treated as if it is connected to a point-to-point LAN 
+                   segment, regardless of any indications to the contrary that 
+                   are generated by the MAC entity.
+        forceFalse: This value indicates that the administrator requires the MAC
+                    to be treated as if it is connected to a non-point-to-point
+                    LAN segment, regardless of any indications to the contrary 
+                    that are generated by the MAC entity.
+        auto:   This value indicates that the administrator requires the 
+                point-to-point status of the MAC to be determined in accordance
+                with the specific MAC procedures defined in 6.5."
+        REFERENCE
+             "IEEE P802.1w; IEEE P802.1t"
+        ::= { hpicfBridgeRstpPortEntry 4 }
+
+    hpicfBridgeRstpOperPointToPointMac OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "
+        true: This value indicates that the MAC is connected to a 
+              point-to-point LAN segment; i.e., there is at most one other 
+              system attached to the LAN segment.
+        false: This value indicates that the MAC is connected to a 
+               non-point-to-point LAN segment; i.e., there can be more than one
+               other system attached to the LAN segment."
+        REFERENCE
+             "IEEE P802.1w; IEEE P802.1t"
+        ::= { hpicfBridgeRstpPortEntry 5 }
+
+    hpicfBridgeRstpPortPathCost OBJECT-TYPE
+        SYNTAX      Integer32 (0..200000000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The administratively assigned value for the contribution
+                     of this port to the path cost of paths toward the spanning
+                     tree root.
+
+                     Writing a value of '0' assigns the automatically calculated
+                     default Path Cost value to the port.  If the default Path
+                     Cost is being used, this object returns '0' when read."
+        REFERENCE
+                     "IEEE 802.1D-1998: Section 8.5.5.3"
+        DEFVAL      { 0 }
+        ::= { hpicfBridgeRstpPortEntry 6 }
+
+    hpicfBridgeRstpForceBpduMigrationCheck OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When operating in RSTP version 2 or later,
+                     writing TRUE(1) to this object forces this port to 
+                     transmit RSTP BPDUs. Any other operation on this object
+                     always returns FALSE(2) when read."
+        REFERENCE
+             "IEEE P802.1w"
+        ::= { hpicfBridgeRstpPortEntry 7 }
+
+    hpicfBridgeRstpAutoEdgePort OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object determines the identification of edge ports.
+                     When set to TRUE, it is used by the bridge detection state
+                     machine for automatic identification of edge ports.
+                     The default value is FALSE."
+        REFERENCE
+             "IEEE 802.1D-2004"
+        ::= { hpicfBridgeRstpPortEntry 8 }
+
+    hpicfBridgeRstpPortBpduFiltering OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This objects determines the BPDU filtering on ports. 
+                     When set to TRUE, the port does not transmit any BPDU and all the 
+                     received BPDUs are dropped. When set to FALSE, all the BPDUs are 
+                     processed normally. The default is false."
+        REFERENCE
+             "IEEE P802.1w"
+        ::= { hpicfBridgeRstpPortEntry 9 }
+
+
+    hpicfBridgeStpBpduThrottleConfig OBJECT IDENTIFIER ::=
+                           { hpicfBridgeRstp 6 }
+
+    hpicfBridgeStpBpduThrottleStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enable(1),
+                        disable(2)
+                    }    
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object is used to enable or disable the BPDU Throttling 
+                     feature on the device."
+        DEFVAL      { enable }
+        ::= { hpicfBridgeStpBpduThrottleConfig 1 }
+
+    hpicfBridgeStpBpduThrottleValue OBJECT-TYPE
+        SYNTAX      Integer32 (0..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object provides the inbound rate limit value to throttle 
+                     the MSTP BPDUs on the device. The valid throttle values are 
+                     64, 128, and 256 packets per second (pps). 
+                     The default throttle value is 256 pps"
+        DEFVAL      { 256 }
+        ::= { hpicfBridgeStpBpduThrottleConfig 2 }
+
+
+-- **********************************************************************
+-- Loop Protection Objects
+-- **********************************************************************
+
+-- Port Remediation Textual Convention
+    LoopProtectReceiverAction ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+            " This TC describes the actions a port that receives a Loop
+              Protection Protocol packet can take.
+            
+              The disableTx(1) enumeration indicates that the sender of
+              the Loop Protect packet will be disabled.
+
+              The noDisable(2) enumeration indicates that no port is to
+              be disabled.
+
+              The disableTxRx(3) enumeration indicates that the senders
+              and receivers of the Loop Protect packets will be disabled.
+
+              The disableRx(4) enumeration indicates that the receiver of
+              the Loop Protect packet will be disabled."
+    SYNTAX   INTEGER  
+             {
+                disableTx(1),
+                noDisable(2),
+                disableTxRx(3),
+                disableRx(4)
+             }
+
+
+    hpicfBridgeLoopProtect   OBJECT IDENTIFIER ::= { hpicfBridgeObjects 5 }
+
+    hpicfBridgeLoopProtectNotifications
+                             OBJECT IDENTIFIER ::= { hpicfBridgeLoopProtect 0 }
+    hpicfBridgeLoopProtectBase 
+                             OBJECT IDENTIFIER ::= { hpicfBridgeLoopProtect 1 }
+    hpicfBridgeLoopProtectPort 
+                             OBJECT IDENTIFIER ::= { hpicfBridgeLoopProtect 2 }
+
+    hpicfBridgeLoopProtectInterval OBJECT-TYPE
+        SYNTAX      Integer32 (1..10) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The interval in seconds at which Loop Protection packets are
+                     transmitted. The default value is 5 seconds."
+        ::= { hpicfBridgeLoopProtectBase 1 }
+
+    hpicfBridgeLoopProtectTrapLoopDetectEnable OBJECT-TYPE
+        SYNTAX      TruthValue 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates whether notifications should be sent when a loop
+                     is detected on a port.  By default this object will
+                     have a value of false(2)."
+        ::= { hpicfBridgeLoopProtectBase 2 }
+
+    hpicfBridgeLoopProtectEnableTimer OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647) 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The time in seconds to wait before re-enabling a port
+                     disabled by Loop Protection. When a port is disabled by 
+                     Loop Protection, a re-enable timer for the port is initialized.
+                     If the re-enable timer value is specified as zero seconds the port remains
+                     disabled, else the port is re-enabled after the specified time."
+        ::= { hpicfBridgeLoopProtectBase 3 }
+
+    hpicfBridgeLoopProtectMode OBJECT-TYPE
+        SYNTAX INTEGER
+	    {
+	    port (1), 
+	    vlan (2)
+	    }		    
+        MAX-ACCESS  read-write
+        STATUS      current
+	DESCRIPTION "This object is used to configure the operational mode of Loop Protection
+                     feature. The Loop Protection feature can be configured to operate in port mode
+                     or VLAN mode."
+        DEFVAL      { port } 
+        ::= { hpicfBridgeLoopProtectBase 4 }
+
+    hpicfBridgeLoopProtectVIDList    OBJECT-TYPE
+        SYNTAX      VidList
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "A list of VLANs on which Loop Protection is enabled." 
+	::= { hpicfBridgeLoopProtectBase 5 }
+
+    hpicfBridgeLoopProtectPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeLoopProtectPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Per-interface configuration for Loop Protection."
+        ::= { hpicfBridgeLoopProtectPort 1 }
+
+    hpicfBridgeLoopProtectPortEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeLoopProtectPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Loop Protection configuration information for
+                     a single port."
+        INDEX       { ifIndex }
+        ::= { hpicfBridgeLoopProtectPortTable 1 }
+
+    HpicfBridgeLoopProtectPortEntry ::=
+        SEQUENCE {
+            hpicfBridgeLoopProtectPortEnable          TruthValue,
+            hpicfBridgeLoopProtectPortLoopDetected    TruthValue,
+            hpicfBridgeLoopProtectPortLastLoopTime    TimeStamp,
+            hpicfBridgeLoopProtectPortLoopCount       Counter32,    
+            hpicfBridgeLoopProtectPortReceiverAction  LoopProtectReceiverAction,
+            hpicfBridgeLoopDetectedVlan               Integer32
+	    
+        }
+
+    hpicfBridgeLoopProtectPortEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object indicates whether the Loop Protection is enabled
+                     on a port. The default value is FALSE"
+        ::= { hpicfBridgeLoopProtectPortEntry 1 }
+
+    hpicfBridgeLoopProtectPortLoopDetected OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This object will be set to TRUE when a loop is detected on 
+                     the port. The value of this object will be reset to FALSE when 
+                     the port's hpicfBridgeLoopProtectPortEnable is set to 
+                     FALSE." 
+        ::= { hpicfBridgeLoopProtectPortEntry 2 }
+    
+    hpicfBridgeLoopProtectPortLastLoopTime OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The value of sysUpTime when a loop was last detected
+                     on this port. A value of 0 means that the timestamp has
+                     not been set."
+        ::= { hpicfBridgeLoopProtectPortEntry 3 }
+
+    hpicfBridgeLoopProtectPortLoopCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This object provides the number of loops detected on a Loop Protection enabled
+                     port. The value of this object is set to zero when Loop Protection is disabled on
+                     a port."
+        ::= { hpicfBridgeLoopProtectPortEntry 4 } 
+        
+   hpicfBridgeLoopProtectPortReceiverAction OBJECT-TYPE
+        SYNTAX      LoopProtectReceiverAction 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Controls the action taken when a Loop Protection packet is
+                     received on this port.
+                     When set to 'disableTx' the port that transmitted the packet is disabled.
+
+                     When set to 'noDisable' the transmitting port is not disabled.
+
+                     When set to 'disableTxRx' the ports transmitting and receiving the packets are disabled.
+
+                     When set to 'disableRx' the port that received the packet is disabled."
+        ::= { hpicfBridgeLoopProtectPortEntry 5 }
+
+   
+   hpicfBridgeLoopDetectedVlan OBJECT-TYPE
+        SYNTAX      Integer32(1..4096) 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Refers to this object for the port on which loop is 
+	             detected."
+        ::= { hpicfBridgeLoopProtectPortEntry 6 } 
+        
+-- **********************************************************************
+-- hpicfBridgeLoopProtect Notifications 
+-- **********************************************************************
+
+    hpicfBridgeLoopProtectLoopDetectedNotification NOTIFICATION-TYPE
+        OBJECTS     { ifIndex,
+                      hpicfBridgeLoopProtectPortLoopCount,       
+                      hpicfBridgeLoopProtectPortReceiverAction
+                    }
+        STATUS      current
+        DESCRIPTION "A hpicfBridgeLoopProtectLoopDetectedNotification signifies
+                     that a loop is detected by the Loop Protection Protocol.
+                     Generation of this notification is controlled by 
+                     hpicfBridgeLoopProtectTrapLoopDetectEnable. 
+                     
+                     To prevent excessive notifications, this trap allows only 
+                     one notifications every 30 seconds.
+                     Notifications that are missed due to this limitation are
+                     dropped and are not sent later."
+        ::= { hpicfBridgeLoopProtectNotifications 1 }
+                 
+    hpicfBridgeVlanLoopProtectLoopDetectedNotification NOTIFICATION-TYPE
+        OBJECTS     { ifIndex,
+                      hpicfBridgeLoopProtectPortLoopCount,       
+                      hpicfBridgeLoopProtectPortReceiverAction,
+                      hpicfBridgeLoopDetectedVlan
+                    }
+        STATUS      current
+        DESCRIPTION "A hpicfBridgeLoopProtectLoopDetectedNotification signifies
+                     that a loop is detected by the Loop Protection feature while 
+                     operating in VLAN  mode. Generation of this notification is
+                     controlled by hpicfBridgeLoopProtectTrapLoopDetectEnable. 
+                     
+                     To prevent excessive notifications, this trap allows only 
+                     one notifications every 30 seconds.
+                     Notifications that are missed due to this limitation are
+                     dropped and are not sent later."
+        ::= { hpicfBridgeLoopProtectNotifications 2 }
+ 
+
+-- **********************************************************************
+-- Local Mirror Session  Objects
+-- **********************************************************************
+
+    hpicfBridgeMirrorSession     OBJECT IDENTIFIER 
+                                             ::= { hpicfBridgeObjects 6 } 
+    hpicfBridgeMirrorSessionBase OBJECT IDENTIFIER 
+                                             ::= { hpicfBridgeMirrorSession 1 } 
+    hpicfBridgeMirrorSessionDestination OBJECT IDENTIFIER 
+                                             ::= { hpicfBridgeMirrorSession 2 } 
+
+    hpicfBridgeMirrorSessionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeMirrorSessionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains mirror session information 
+                     related to a given specified destination. A mirror 
+                     session is a group of one or more portCopyEntries 
+                     all having the same specified destination. A given
+                     specified destination may be associated with more
+                     then one mirror session."
+        ::= { hpicfBridgeMirrorSessionDestination 1 }
+
+
+    hpicfBridgeMirrorSessionEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeMirrorSessionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the hpicfBridgeMirrorSessionEntry contains
+                     mirror session specific identification
+                     information."
+        AUGMENTS    { portCopyEntry }
+        ::= { hpicfBridgeMirrorSessionTable 1 }
+
+
+    HpicfBridgeMirrorSessionEntry ::=
+        SEQUENCE {
+            hpicfBridgeMirrorSessionID                Integer32,
+	    hpicfBridgeDontTagWithVlan                INTEGER,
+            hpicfBridgeMirrorSessionType              INTEGER
+        }
+
+    hpicfBridgeMirrorSessionID OBJECT-TYPE
+        SYNTAX      Integer32 (0..2147483647)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "This variable is valid only for mirroring
+                     transfers. It allows mirroring destinations
+                     to be grouped. A given hpicfBridgeMirrorSessionID
+                     can only be used with 1 destination. However,
+                     multiple sources may be related to the same
+                     hpicfBridgeMirrorSessionID. To ensure that the
+                     hpicfBridgeMirrorSessionID is properly assigned,
+                     it can only be updated when the respective
+                     portCopyEntry object is in the notReady state.
+                     For non-mirroring transfers, the value should
+                     be set to 0. "
+        DEFVAL { 1 }
+        ::= { hpicfBridgeMirrorSessionEntry 1 }
+
+  hpicfBridgeDontTagWithVlan OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            enabled(1),
+            disabled(2)
+            }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "This objects determines whether to include IEEE 802.1Q 
+           tag in the mirrored copy of the packet. 
+
+           When the value of this object is set to 1 ('enabled'),
+           the IEEE 802.1Q VLAN tag is not included in the
+           mirrored packet.
+
+           When the value of this object is set to 2 ('disabled'),
+           the IEEE 802.1Q VLAN tag is included in the
+           mirrored packet.  
+           
+           After this value is set, it is retained even after system reboot."
+        DEFVAL { 2 }
+       ::= { hpicfBridgeMirrorSessionEntry 2 }
+
+  hpicfBridgeMirrorSessionType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            noMirror(1),
+            mirrorAddresses(2),
+            mirrorPolicies(3),
+            mirrorPorts(4),
+            mirrorVlan(5)
+            }
+       MAX-ACCESS   read-write
+       STATUS       current
+       DESCRIPTION
+          "This oid mentions what is the source type of traffic
+           associated with mirror session.
+           noMirror        Not associated with any mirroring.
+           mirrorAddresses Mirror traffic based on addresses
+           mirrorPolicies  Mirror traffic based on policies.
+           mirrorPorts     Mirror traffic based on ports.
+           mirrorVlan      Mirror traffic based on vlan.
+          "
+        DEFVAL { 1 }
+       ::= { hpicfBridgeMirrorSessionEntry 3 }
+
+
+-- **********************************************************************
+-- Objects for enabling/disabling voice on vlan
+-- **********************************************************************
+
+ hpicfBridgeVoiceVlanConfig OBJECT IDENTIFIER 
+                                          ::= { hpicfBridgeObjects 7 } 
+
+    hpicfBridgeVoiceVlanConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeVoiceVlanConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An HP proprietary extension to the dot1qVlanStaticTable to 
+                     configure a Voice VLAN." 
+        ::= { hpicfBridgeVoiceVlanConfig 1 }
+
+   hpicfBridgeVoiceVlanConfigEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeVoiceVlanConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry for HP Specific extension table."
+        AUGMENTS    { dot1qVlanStaticEntry }
+        ::= { hpicfBridgeVoiceVlanConfigTable 1 }
+ 
+  
+   HpicfBridgeVoiceVlanConfigEntry ::= 
+       SEQUENCE
+       {
+           hpicfBridgeVoiceVlanEnable         TruthValue
+       }
+
+     hpicfBridgeVoiceVlanEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Labels the VLAN as a Voice VLAN which allows
+                     to separate, prioritize, and authenticate voice
+                     traffic moving through the network."
+        DEFVAL {false}             
+        ::= { hpicfBridgeVoiceVlanConfigEntry 1 }
+
+-- **********************************************************************
+-- Objects for enabling/disabling JUMBO on interface
+-- **********************************************************************
+
+ hpicfBridgeJumboInterfaceConfig OBJECT IDENTIFIER 
+                                          ::= { hpicfBridgeObjects 8 } 
+
+     hpicfBridgeJumboInterfaceConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeJumboInterfaceConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains the jumbo frame configuration of
+                     all interfaces."
+        ::= { hpicfBridgeJumboInterfaceConfig 1 }
+
+    hpicfBridgeJumboInterfaceConfigEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeJumboInterfaceConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the hpicfBridgeJumboInterfaceConfigTable, which contains
+                     the jumbo frame configuration of an interface."
+        INDEX    { ifIndex }
+        ::= { hpicfBridgeJumboInterfaceConfigTable 1 }
+
+    HpicfBridgeJumboInterfaceConfigEntry ::= 
+       SEQUENCE
+       {
+           hpicfBridgeJumboInterfaceEnable             TruthValue
+       }
+
+     
+      hpicfBridgeJumboInterfaceEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object enables or disables the support for jumbo frames. This configuration
+                     is supported only on VLAN interfaces."
+        DEFVAL {false}             
+        ::= { hpicfBridgeJumboInterfaceConfigEntry 1 }
+
+-- **********************************************************************
+-- Objects for manangement interface configuration
+-- **********************************************************************
+
+ hpicfBridgeManagementInterfaceConfig OBJECT IDENTIFIER 
+                                          ::= { hpicfBridgeObjects 9 } 
+
+     hpicfBridgeManagementInterfaceConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfBridgeManagementInterfaceConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains objects for configuring interface as
+                     Management interface."
+        ::= { hpicfBridgeManagementInterfaceConfig 1 }
+
+    hpicfBridgeManagementInterfaceConfigEntry OBJECT-TYPE
+        SYNTAX      HpicfBridgeManagementInterfaceConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the hpicfBridgeManagementInterfaceConfigEntry
+                     contains objects for configuring interface as management
+                     interface."
+        INDEX    { ifIndex }
+        ::= { hpicfBridgeManagementInterfaceConfigTable 1 }
+
+    HpicfBridgeManagementInterfaceConfigEntry ::= 
+       SEQUENCE
+       {
+           hpicfBridgeManagementInterfaceEnable             TruthValue
+       }
+
+      hpicfBridgeManagementInterfaceEnable  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This object configures a VLAN as a Secure Management VLAN.
+                     When the value of this object is set to TRUE, a VLAN acts as a Secure 
+                     Management VLAN. The default value of this object is FALSE for all VLANs.
+                     For VLAN with VID 1, which is the Secure Management VLAN of the switch
+                     by default, the value is TRUE.
+                     Only one VLAN can be configured as a Secure Management VLAN at any given time."
+        DEFVAL {false}            
+        ::= { hpicfBridgeManagementInterfaceConfigEntry 1 }
+
+
+
+-- **********************************************************************
+-- Conformance information
+-- **********************************************************************
+
+    hpicfBridgeConformance   OBJECT IDENTIFIER ::= { hpicfBridge 2 }
+    hpicfBridgeGroups        OBJECT IDENTIFIER ::= { hpicfBridgeConformance 1 }
+    hpicfBridgeCompliances   OBJECT IDENTIFIER ::= { hpicfBridgeConformance 2 }
+    hpicfBridgeNotGroups     OBJECT IDENTIFIER ::= { hpicfBridgeConformance 3 }
+
+    hpicfBridgeVlanBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeMaxVlans,
+                      hpicfBridgeVlanEnable,
+                      hpicfBridgePrimaryVlan,
+                      hpicfBridgeVlanConfigStatus }
+        STATUS      current
+        DESCRIPTION "Basic VLAN configuration information that is not
+                    in the standard 802.1Q Bridge MIB."
+        ::= { hpicfBridgeGroups 1 }
+
+    hpicfBridgeGvrpPortGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeGvrpRestrictedVlanReg }
+        STATUS      deprecated 
+        DESCRIPTION 
+		   "********* THIS GROUP IS DEPRECATED *********
+		    GVRP configuration information that is not (yet)
+                    in the standard 802.1Q Bridge MIB.
+
+                    Note that this information is very likely to be added
+                    to a future update of the 802.1Q Bridge MIB, at which
+                    time, support for objects in this group will most
+                    likely be deprecated.
+                    This object has been deprecated and replaced with
+                    hpicfBridgeGvrpPortGroup1"
+        ::= { hpicfBridgeGroups 2 }
+
+    hpicfBridgeRstpBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeRstpForceVersion,
+                      hpicfBridgeRstpConfigStatus,
+                      hpicfBridgeRstpProtocolVersion,
+                      hpicfBridgeRstpAdminStatus
+                      }
+        STATUS      current
+        DESCRIPTION "Rapid Spanning Tree Protocol (RSTP) configuration
+                    information that is in neither the standard 802.1w
+                    MIB, nor the standard 802.1d (STP) MIB.
+
+                    Note that as RSTP improves compatibility, some 
+                    objects in this MIB will likely be deprecated."
+        ::= {hpicfBridgeGroups 3 }
+
+    hpicfBridgeLoopProtectBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeLoopProtectInterval,
+                      hpicfBridgeLoopProtectEnableTimer,
+                      hpicfBridgeLoopProtectTrapLoopDetectEnable, 
+                      hpicfBridgeLoopProtectPortEnable,
+                      hpicfBridgeLoopProtectPortLoopDetected,
+                      hpicfBridgeLoopProtectPortLastLoopTime,
+                      hpicfBridgeLoopProtectPortLoopCount,
+                      hpicfBridgeLoopProtectPortReceiverAction
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing basic instrumentation
+                     and control of the HP Loop protection entity."
+
+        ::= {hpicfBridgeGroups 4 }
+       
+
+    hpicfBridgeVoiceVlanConfigGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeVoiceVlanEnable }
+        STATUS      current
+        DESCRIPTION "A collection of objects for voice configuration 
+                     on vlan."
+
+        ::= {hpicfBridgeGroups 7 }
+        
+    
+   hpicfBridgeJumboInterfaceConfigGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeJumboInterfaceEnable }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing Jumbo configuration 
+                     on a interface."
+
+        ::= {hpicfBridgeGroups 8 }
+        
+    hpicfBridgeManagementInterfaceConfigGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeManagementInterfaceEnable }
+        STATUS      current
+        DESCRIPTION "A collection of objects for management interface 
+                     configuration."
+
+        ::= {hpicfBridgeGroups 9 }
+    
+hpicfBridgeLoopProtectVLANGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeLoopProtectMode,
+                      hpicfBridgeLoopProtectVIDList,
+                      hpicfBridgeLoopDetectedVlan
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing support for Loop Protect
+	             per VLAN feature."
+
+        ::= {hpicfBridgeGroups 10 }
+
+hpicfBridgeRstpPortEntryGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeRstpAdminEdgePort,
+                      hpicfBridgeRstpOperEdgePort,
+                      hpicfBridgeRstpAdminPointToPointMac,
+                      hpicfBridgeRstpOperPointToPointMac,
+                      hpicfBridgeRstpPortPathCost,
+                      hpicfBridgeRstpForceBpduMigrationCheck,
+                      hpicfBridgeRstpAutoEdgePort,
+                      hpicfBridgeRstpPortBpduFiltering 
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing support for Rstp."
+
+        ::= {hpicfBridgeGroups 11 }     
+
+hpicfBridgeMirrorSessionEntryGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeDontTagWithVlan,
+                      hpicfBridgeMirrorSessionType
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing mirror session 
+                     information related to a given specific destination."
+
+        ::= {hpicfBridgeGroups 12 }        
+
+hpicfBridgeRstpPortEntryGroup1 OBJECT-GROUP
+        OBJECTS     { hpicfBridgeRstpPortIndex}
+        STATUS      current
+        DESCRIPTION "A collection of objects providing support for Rstp."
+
+        ::= {hpicfBridgeGroups 13 }
+
+hpicfBridgeGvrpPortGroup1 OBJECT-GROUP
+        OBJECTS     { hpicfBridgeGvrpRestrictedVlanReg,
+		      hpicfApplicantStateMachine,
+		      hpicfRegistarStateMachine	 }
+        STATUS      current 
+        DESCRIPTION 
+                    "GVRP configuration information that is not (yet)
+                    in the standard 802.1Q Bridge MIB.
+
+                    Note that this information is very likely to be added
+                    to a future update of the 802.1Q Bridge MIB, at which
+                    time, support for objects in this group will most
+                    likely be deprecated."
+        ::= { hpicfBridgeGroups 14 }       
+
+hpicfBridgeStpBpduThrottleConfigGroup OBJECT-GROUP
+       OBJECTS                         {
+          hpicfBridgeStpBpduThrottleStatus,
+          hpicfBridgeStpBpduThrottleValue
+       }
+       STATUS       current
+       DESCRIPTION  "A group of objects that are used to configure the BPDU  
+                     Throttling feature."
+       ::= { hpicfBridgeGroups 15}
+
+
+-- **********************************************************************
+-- Notification groups
+-- **********************************************************************
+
+       hpicfBridgeLoopProtectNotGrp NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfBridgeLoopProtectLoopDetectedNotification }
+           STATUS      current
+           DESCRIPTION "Notifications for Loop protection."
+           ::= { hpicfBridgeNotGroups 1 }
+  
+       hpicfBridgeVlanLoopProtectNotGrp NOTIFICATION-GROUP
+           NOTIFICATIONS { hpicfBridgeVlanLoopProtectLoopDetectedNotification }
+           STATUS      current
+           DESCRIPTION "Notifications for Loop protect per VLAN"
+           ::= { hpicfBridgeNotGroups 2 }
+        
+     hpicfBridgeMirrorSessionBaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfBridgeMirrorSessionID 
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects providing identification
+                     of a mirroring session entity."
+
+        ::= {hpicfBridgeGroups 5 }
+       
+        
+-- **********************************************************************
+-- Compliance statements
+-- **********************************************************************
+
+    hpicfBridgeCompliance MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP Switches with IEEE
+                    802.1Q VLAN support for bridging objects not found
+                    in the standard Bridge MIBs."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeVlanBaseGroup }
+
+            GROUP       hpicfBridgeGvrpPortGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that support GVRP until such time as support for
+                        these objects is added to a standard MIB."
+
+        ::= { hpicfBridgeCompliances 1 }
+
+    hpicfBridgeComplianceRevTwo MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP Switches with IEEE
+                    802.1W Rapid Spanning Tree Protocol support for 
+                    bridging objects not found in the standard Bridge 
+                    MIBs."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeVlanBaseGroup }
+
+            GROUP       hpicfBridgeGvrpPortGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that support GVRP until such time as support for
+                        these objects is added to a standard MIB."
+            GROUP       hpicfBridgeRstpBaseGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that implement RSTP until such time as support for
+                        these objects is added to a standard MIB."
+
+        ::= { hpicfBridgeCompliances 2 }
+
+    hpicfBridgeComplianceRevThree MODULE-COMPLIANCE
+        STATUS      deprecated
+        DESCRIPTION "The compliance statement for HP Switches with IEEE
+                    802.1W Rapid Spanning Tree Protocol support for 
+                    bridging objects not found in the standard Bridge 
+                    MIBs."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeVlanBaseGroup }
+
+            GROUP       hpicfBridgeGvrpPortGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that support GVRP until such time as support for
+                        these objects is added to a standard MIB."
+            GROUP       hpicfBridgeRstpBaseGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that implement RSTP until such time as support for
+                        these objects is added to a standard MIB."
+
+        ::= { hpicfBridgeCompliances 3 }
+
+    hpicfBridgeComplianceRevFour MODULE-COMPLIANCE
+        STATUS      deprecated 
+        DESCRIPTION "The compliance statement for HP Switches with IEEE
+                    802.1W Rapid Spanning Tree Protocol support for 
+                    bridging objects not found in the standard Bridge 
+                    MIBs."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeVlanBaseGroup }
+
+            GROUP       hpicfBridgeGvrpPortGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that support GVRP until such time as support for
+                        these objects is added to a standard MIB."
+            GROUP       hpicfBridgeRstpBaseGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that implement RSTP until such time as support for
+                        these objects is added to a standard MIB."
+            GROUP       hpicfBridgeMirrorSessionBaseGroup
+            DESCRIPTION "Support for this group is mandatory for switches
+                        that implement the multi session mirroring
+                        (intelligent mirroring) feature." 
+        ::= { hpicfBridgeCompliances 4 }
+
+    hpicfBridgeLoopProtectCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with 
+                     support for hpicfBridge loop protection objects."
+                      
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeLoopProtectBaseGroup, 
+                               hpicfBridgeLoopProtectNotifications }
+            GROUP       hpicfBridgeLoopProtectBaseGroup
+            DESCRIPTION "Support for this group is mandatory for switches
+                        that implement the loop protection feature." 
+
+            GROUP       hpicfBridgeLoopProtectNotifications
+            DESCRIPTION "Implementation of this group is mandatory
+                         for switches that implement the loop protection
+                         feature."
+        ::= { hpicfBridgeCompliances 5 }
+
+     hpicfBridgeVlanBaseConfigCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches that 
+                     support basic vlan configuration."
+                      
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeVoiceVlanConfigGroup } 
+        ::= { hpicfBridgeCompliances 6 }
+
+    hpicfBridgeInterfaceConfigCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches that 
+                     support basic interface configuration."
+                      
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeJumboInterfaceConfigGroup,
+                              hpicfBridgeManagementInterfaceConfigGroup } 
+        ::= { hpicfBridgeCompliances 7 }
+        
+    hpicfBridgeVlanLoopProtConfigCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches that 
+                     support loop protect per VLAN feature."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeLoopProtectVLANGroup,
+                               hpicfBridgeVlanLoopProtectNotGrp,
+                               hpicfBridgeLoopProtectNotGrp } 
+        ::= { hpicfBridgeCompliances 8 }
+
+    hpicfBridgeRstpPortEntryCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches that 
+                     support Rstp."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeRstpPortEntryGroup } 
+        ::= { hpicfBridgeCompliances 9 }
+        
+    hpicfBridgeMirrorSessionEntryCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches that 
+                     support mirror sessions."
+                      
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeMirrorSessionEntryGroup } 
+        ::= { hpicfBridgeCompliances 10 }
+
+    hpicfBridgeRstpPortEntryCompliance1 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches that 
+                     support Rstp."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeRstpPortEntryGroup1 }
+        ::= { hpicfBridgeCompliances 11 }
+
+    hpicfBridgeComplianceRevFour1 MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP Switches with IEEE
+                    802.1W Rapid Spanning Tree Protocol support for 
+                    bridging objects not found in the standard Bridge 
+                    MIBs."
+        MODULE
+            MANDATORY-GROUPS { hpicfBridgeVlanBaseGroup }
+
+            GROUP       hpicfBridgeGvrpPortGroup1
+            DESCRIPTION "Support for this group is required for switches
+                        that support GVRP until such time as support for
+                        these objects is added to a standard MIB."
+            GROUP       hpicfBridgeRstpBaseGroup
+            DESCRIPTION "Support for this group is required for switches
+                        that implement RSTP until such time as support for
+                        these objects is added to a standard MIB."
+            GROUP       hpicfBridgeMirrorSessionBaseGroup
+            DESCRIPTION "Support for this group is mandatory for switches
+                        that implement the multi session mirroring
+                        (intelligent mirroring) feature." 
+        ::= { hpicfBridgeCompliances 12 }
+
+   hpicfBridgeStpBpduThrottleConfigCompliance  MODULE-COMPLIANCE
+       STATUS           current
+       DESCRIPTION      "The compliance statement for the MSTP BPDU 
+                         Throttling feature."
+       MODULE
+       MANDATORY-GROUPS { hpicfBridgeStpBpduThrottleConfigGroup }
+    ::= {hpicfBridgeCompliances 13}
+END

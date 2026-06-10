@@ -1,0 +1,434 @@
+-- =====================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Device link detection protocol (DLDP) MIB.
+-- Device Link Detection Protocol is private Layer2 protocol,
+-- which is used for automatically detecting unidirectional link to
+-- prevent a loop communication.
+-- Reference:
+-- Version: V1.3
+-- History:
+-- V1.0 2004-12-13 created by tangshun
+-- V1.1 2006-11-24 modify SYNTAX and DEFVAL of hh3cDLDPInterval by yubo
+-- V1.2 2011-11-23 modify SYNTAX and DESCRIPTION of
+--                 hh3cDLDPAuthenticationPassword by zhangwei
+-- V1.3 2021-01-06 modify SYNTAX and DESCRIPTION of
+--                 hh3cDLDPUnidirectionalShutdown by wangmeng
+-- =====================================================================
+HH3C-DLDP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    TruthValue, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    ifIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+-- ==================================================================
+--
+-- module identity part
+--
+-- ==================================================================
+hh3cDldp MODULE-IDENTITY
+    LAST-UPDATED
+        "202101060000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION "DLDP (Device Link Detection Protocol) MIB"
+    REVISION
+        "202101060000Z"
+    DESCRIPTION
+        "Modify hh3cDLDPUnidirectionalShutdown."
+    REVISION
+        "200412130000Z"
+    DESCRIPTION
+        "The initial version of this MIB module."
+    ::= { hh3cCommon 43 }
+
+-- ==================================================================
+-- Textual Conventions
+-- ==================================================================
+EnabledStatus ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Ethernet port.
+        This object has two defined values:
+        - 'enabled', which indicates that the Ethernet port enables DLDP.
+        - 'disabled', which indicates that the Ethernet port does not enable DLDP.
+        "
+    SYNTAX      INTEGER
+        {
+            enabled(1),
+            disabled(2)
+        }
+
+
+DLDPStatus ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Operating state of DLDP on the port.
+        This object has six defined values:
+        - 'initial', which indicates that the Ethernet port does not enable DLDP.
+        This status does not appear in the 'hh3cDLDPPortDLDPState' object (below)
+        because the port which is not enabled DLDP does not appear in
+        'hh3cDLDPPortDLDPTable', it appears in 'hh3cDLDPPortStateTable'.
+        - 'inactive', which indicates that the Ethernet port enables DLDP and
+        the link status of the port is down.
+        - 'active', which indicates that the Ethernet port enables DLDP and
+        the link status of the port is up.
+        - 'advertisement', which indicates that all neighbors of the port are
+        bidirectional communication.
+        - 'probe', which indicates that the port sends PDU to detect
+        the communication mode between it and it's neighbors.
+        - 'disable', which indicates that an unidirectional communication
+        between the port and it's neighbor.
+
+        When the user get or walk the 'hh3cDLDPPortDLDPState' objects (below)
+        these status will output."
+    SYNTAX      INTEGER
+        {
+            initial(1),
+            inactive(2),
+            active(3),
+            advertisement(4),
+            probe(5),
+            disable(6)
+        }
+
+
+DLDPNeighborStatus ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The current state of the neighbor of a port.
+        This object has three defined values:
+        - 'unidirection', which indicates an unidirectional communication
+        between the port and it's neighbor.
+        - 'bidirection', which indicates a bidirectional communication
+        between the port and it's neighbor.
+        - 'unknown', which indicates that the port does not know
+        the communication mode between it and it's neighbor.
+
+        When the user get or walk the 'hh3cDLDPNeighborState' objects (below)
+        these status will output. "
+    SYNTAX      INTEGER
+        {
+            unidirection(1),
+            bidirection(2),
+            unknown(3)
+        }
+
+-- ==================================================================
+--
+-- =====================object definition begin======================
+--
+-- ==================================================================
+hh3cDLDPMibObject        OBJECT IDENTIFIER ::= { hh3cDldp 1 }
+hh3cDLDPConfigGroup      OBJECT IDENTIFIER ::= { hh3cDLDPMibObject 1 }
+
+hh3cDLDPWorkMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            normal(1),
+            enhance(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The work mode of DLDP.
+        Normal mode means DLDP does not detect neighbor on its own initiative
+        when all neighbors aged.
+        Enhance mode means DLDP detects neighbor on its own initiative
+        when all neighbors aged.
+        "
+    DEFVAL          { normal }
+    ::= { hh3cDLDPConfigGroup 1 }
+
+hh3cDLDPSystemEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DLDP enable or disable systematically.
+        This node only supports set operation.
+        If setting it to true, all the fiber ports will enable DLDP and
+        the agent automatically creates new rows for each port in
+        hh3cDLDPPortDLDPTable.
+        If setting it to false, all the fiber ports will disable DLDP
+        and the agent automatically destroy the corresponding rows in
+        hh3cDLDPPortDLDPTable."
+    ::= { hh3cDLDPConfigGroup 2 }
+
+hh3cDLDPSystemReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DLDP reset systematically.
+        This node only supports set operation.
+        If the value of hh3cDLDPSystemReset is true,
+        and the current state is disable,
+        it will change to inactive while the port is down
+        or active while the port is up.
+        If hh3cDLDPPortDLDPState is not disable, it does not change.
+        "
+    ::= { hh3cDLDPConfigGroup 3 }
+
+hh3cDLDPInterval OBJECT-TYPE
+    SYNTAX      Integer32(1..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval of sending an advertisement PDU.
+        unit : second
+        "
+    DEFVAL          { 5 }
+    ::= { hh3cDLDPConfigGroup 4 }
+
+hh3cDLDPAuthenticationMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            none(1),        --DLDP exchanges are not authenticated.
+            simple(2),      --DLDP exchanges are authenticated by a clear text password.
+            md5(3)          --DLDP exchanges are authenticated by a MD5 digest.
+
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Type of authentication mode."
+    DEFVAL          { none }
+    ::= { hh3cDLDPConfigGroup 5 }
+
+hh3cDLDPAuthenticationPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..53))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the password for authentication.
+        If the value of hh3cDLDPAuthenticationMode is null,
+        the user cannot set this node.
+        If the value of hh3cDLDPAuthenticationMode is simple or MD5,
+        the user must set this node with a string.
+
+        When the user gets or walks this node,
+        it displays a cipher password if hh3cDLDPAuthenticationMode is MD5 or
+        simple or a zero-length string if hh3cDLDPAuthenticationMode is null.
+        "
+    ::= { hh3cDLDPConfigGroup 6 }
+
+hh3cDLDPUnidirectionalShutdown OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            auto(1),
+            manual(2),
+            hybird(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The mode of unidirectional shutdown and bidirectional startup.
+        It indicates the port shutdown mode when a link becomes unidirectional
+        and port startup mode when the link becomes bidirectional.
+        In auto mode, DLDP shuts down a port when detecting a unidirectional
+        link and brings up the port when the link becomes bidirectional.
+        In manual mode, a port requires manual shutdown when DLDP detects a
+        unidirectional link and the port requires manual startup when the
+        link becomes bidirectional.In hybrid mode, DLDP shuts down a port when
+        detecting a unidirectional link and the port requires manual startup
+        when the link becomes bidirectional.
+        "
+    DEFVAL  { auto }
+    ::= { hh3cDLDPConfigGroup 7 }
+
+--hh3cDLDPPortStateTable--
+hh3cDLDPPortStateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDLDPPortStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table of the Ethernet ports of a LAN switch."
+    ::= { hh3cDLDPMibObject 2 }
+
+hh3cDLDPPortStateEntry OBJECT-TYPE
+    SYNTAX      Hh3cDLDPPortStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about a hh3cDLDPPortDLDPTable entity."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cDLDPPortStateTable 1 }
+
+Hh3cDLDPPortStateEntry ::= SEQUENCE
+    {
+        hh3cDLDPPortState    EnabledStatus
+    }
+
+hh3cDLDPPortState OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "State of a port.
+        If setting it to enabled, the port will enable DLDP and a new row
+        will be added in hh3cDLDPPortDLDPTable for this port.
+        If setting it to disabled, the port will disable DLDP and the
+        corresponding row will be destroyed in hh3cDLDPPortDLDPTable."
+    DEFVAL          { disabled }
+    ::= { hh3cDLDPPortStateEntry 1 }
+
+--hh3cDLDPPortDLDPTable--
+hh3cDLDPPortDLDPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDLDPPortDLDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of a LAN switch's ports, which enable DLDP."
+    ::= { hh3cDLDPMibObject  3 }
+
+hh3cDLDPPortDLDPEntry OBJECT-TYPE
+    SYNTAX      Hh3cDLDPPortDLDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The information of a port, which enable DLDP."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cDLDPPortDLDPTable 1 }
+
+Hh3cDLDPPortDLDPEntry ::= SEQUENCE
+    {
+        hh3cDLDPPortDLDPState    DLDPStatus,
+        hh3cDLDPLinkState        INTEGER,
+        hh3cDLDPPortDLDPReset    TruthValue
+    }
+
+hh3cDLDPPortDLDPState OBJECT-TYPE
+    SYNTAX      DLDPStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Operating state of DLDP on the port.
+        It is relational with hh3cDLDPPortState and hh3cDLDPLinkState."
+    ::= { hh3cDLDPPortDLDPEntry 1 }
+
+hh3cDLDPLinkState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            down(1),
+            up(2),
+            unknown(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The link state of the port."
+    ::= { hh3cDLDPPortDLDPEntry 2 }
+
+hh3cDLDPPortDLDPReset OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DLDP reset systematically.
+        This node only supports set operation.
+        If the value of hh3cDLDPPortDLDPReset is true,
+        and the current state is disable,
+        it will change to inactive while the port is down
+        or active while the port is up.
+        "
+    ::= { hh3cDLDPPortDLDPEntry 3 }
+
+
+
+--hh3cDLDPNeighborTable--
+hh3cDLDPNeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDLDPNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of a port's neighbors."
+    ::= { hh3cDLDPMibObject  4 }
+
+hh3cDLDPNeighborEntry OBJECT-TYPE
+    SYNTAX      Hh3cDLDPNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The information of a neighbor."
+    INDEX
+        {
+            ifIndex,
+            hh3cDLDPNeighborBridgeMac,
+            hh3cDLDPNeighborPortIndex
+        }
+    ::= { hh3cDLDPNeighborTable 1 }
+
+Hh3cDLDPNeighborEntry ::= SEQUENCE
+    {
+        hh3cDLDPNeighborBridgeMac    MacAddress,
+        hh3cDLDPNeighborPortIndex    Integer32,
+        hh3cDLDPNeighborState        DLDPNeighborStatus,
+        hh3cDLDPNeighborAgingTime    Integer32
+    }
+hh3cDLDPNeighborBridgeMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The bridge MAC address of a neighbor."
+    ::= { hh3cDLDPNeighborEntry 1 }
+
+hh3cDLDPNeighborPortIndex OBJECT-TYPE
+    SYNTAX      Integer32(0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The port index of a neighbor."
+    ::= { hh3cDLDPNeighborEntry 2 }
+
+hh3cDLDPNeighborState OBJECT-TYPE
+    SYNTAX      DLDPNeighborStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of a neighbor."
+    ::= { hh3cDLDPNeighborEntry 3 }
+
+hh3cDLDPNeighborAgingTime OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The aging time of a neighbor. unit: second."
+    ::= { hh3cDLDPNeighborEntry 4 }
+
+--trap--
+hh3cDLDPTrapObject OBJECT IDENTIFIER ::= {  hh3cDldp 2  }
+
+hh3cDLDPNotification OBJECT IDENTIFIER ::= { hh3cDLDPTrapObject 1 }
+
+hh3cDLDPUnidirectionalPort NOTIFICATION-TYPE
+    OBJECTS
+        {
+            ifIndex
+        }
+    STATUS      current
+    DESCRIPTION
+        "It will send a SNMP trap when the state of a port
+        has changed to unidirectional-link."
+    ::= { hh3cDLDPNotification 1 }
+
+END

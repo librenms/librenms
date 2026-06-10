@@ -1,0 +1,208 @@
+FOUNDRY-SN-IGMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,IpAddress,Integer32
+		FROM SNMPv2-SMI
+	router
+		FROM FOUNDRY-SN-ROOT-MIB
+		;
+		
+snIgmp MODULE-IDENTITY
+	LAST-UPDATED "201708070000Z" -- Aug 7, 2017
+	ORGANIZATION "Ruckus Wireless, Inc."
+	CONTACT-INFO
+			"
+			Technical Support Center, Ruckus Wireless, Inc,
+			350 West Java Drive,
+			Sunnyvale, CA 94089, USA
+			Support URL: https://support.ruckuswireless.com
+			Phone: +1-855-782-5871
+			ROW TF Numbers: https://support.ruckuswireless.com/contact-us"
+	DESCRIPTION
+			"
+			Copyright 1996-2017 Ruckus Wireless, Inc..
+			All rights reserved.
+			This Ruckus Wireless, Inc SNMP Management Information Base Specification
+			embodies Ruckus Wireless, Inc' confidential and proprietary
+			intellectual property. Ruckus Wireless, Inc retains all
+			title and ownership in the Specification, including any
+			revisions.
+			
+			This Specification is supplied AS IS, and Ruckus Wireless, Inc makes
+			no warranty, either express or implied, as to the use,
+			operation, condition, or performance of the Specification.			
+			"            
+	REVISION     "200909300000Z" -- September 30, 2009
+	DESCRIPTION
+			""
+	REVISION     "201708070000Z" -- Aug 7, 2017
+	DESCRIPTION
+             "Modified contact Info, Organization and Decscription"
+   ::= { router 6}
+
+
+-- SECTION 2: MIB 
+
+-- IGMP MIB
+
+snIgmpMIBObjects OBJECT IDENTIFIER ::= { snIgmp 1 }
+
+snIgmpQueryInterval OBJECT-TYPE
+	SYNTAX     INTEGER (0..3600)
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"This is the time interval at which this entity sends out
+			IGMP host query packets. For a router, snDvmrpEnable must
+			have been set to 'enabled' before this object is writen.
+			For a switch, snSwGroupIpMcastMode must have been set to
+			'enabled' and snSwIpMcastQuerierMode must have been set
+			to 'querier' before this object is writen.
+			Value 0 cannot be used for SET operations. This value
+			is returned if IGMP is not configured within the system.
+			For FI platform the configurable range for this object is 
+			10 .. 3600"
+	DEFVAL     { 60 }
+	::= { snIgmpMIBObjects 1 }
+
+snIgmpGroupMembershipTime OBJECT-TYPE
+	SYNTAX     INTEGER (0..7200)
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"This is the time interval after which a group is considered
+			inactive. For a router, snDvmrpEnable must have been set to
+			'enabled' before this object is writen. For a switch,
+			snSwGroupIpMcastMode must have been set to 'enabled' before
+			this object is writen.
+			Value 0 cannot be used for SET operations. This value
+			is returned if IGMP is not configured within the system.
+			For FI platform the configurable range for this object is 
+			20 .. 7200"
+	DEFVAL     { 140 }
+	::= { snIgmpMIBObjects 2 }
+
+-- The IGMP Interface Table
+
+snIgmpIfTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF SnIgmpIfEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"This table comprises of a list of IGMP interface entries."
+	::= { snIgmpMIBObjects 3 }
+
+snIgmpIfEntry OBJECT-TYPE
+	SYNTAX     SnIgmpIfEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"An entry (conceptual row) contains the group
+			membership information for that port."
+	INDEX      { snIgmpIfEntryIndex }
+	::= { snIgmpIfTable 1 }
+
+SnIgmpIfEntry ::= SEQUENCE {
+	snIgmpIfEntryIndex         Integer32,
+	snIgmpIfPortNumber         Integer32,
+	snIgmpIfGroupAddress       IpAddress,
+	snIgmpIfGroupAge           Integer32 }
+
+snIgmpIfEntryIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The table entry index."
+	::= { snIgmpIfEntry 1 }
+
+snIgmpIfPortNumber OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"This is the interface on which the group was learnt."
+	::= { snIgmpIfEntry 2 }
+
+snIgmpIfGroupAddress OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The group address learnt from the interface."
+	::= { snIgmpIfEntry 3 }
+
+snIgmpIfGroupAge OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"This is the interval (seconds) after which the group
+			information will be aged out."
+	::= { snIgmpIfEntry 4 }
+
+-- The IGMP Static Group Table
+
+snIgmpStaticGroupTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF SnIgmpStaticGroupEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"This table comprises of a list of IGMP static group entries."
+	::= { snIgmpMIBObjects 4 }
+
+snIgmpStaticGroupEntry OBJECT-TYPE
+	SYNTAX     SnIgmpStaticGroupEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+			"An entry (conceptual row) contains the IGMP static group
+			membership information."
+	INDEX      { snIgmpStaticGroupIfIndex, snIgmpStaticGroupAddress }
+	::= { snIgmpStaticGroupTable 1 }
+
+SnIgmpStaticGroupEntry ::= SEQUENCE {
+	snIgmpStaticGroupIfIndex    Integer32,
+	snIgmpStaticGroupAddress    IpAddress,
+	snIgmpStaticGroupPortList   OCTET STRING,
+	snIgmpStaticGroupRowStatus  INTEGER }
+
+snIgmpStaticGroupIfIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The interface of which the static group was configured."
+	::= { snIgmpStaticGroupEntry 1 }
+
+snIgmpStaticGroupAddress OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS     read-only
+	STATUS     current
+	DESCRIPTION
+			"The group address of which the static group was configured."
+	::= { snIgmpStaticGroupEntry 2 }
+
+snIgmpStaticGroupPortList OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"A list of ports which are the port membership of the
+			static group. Each port is a 16-bit integer ifIndex."
+	::= { snIgmpStaticGroupEntry 3 }
+
+snIgmpStaticGroupRowStatus OBJECT-TYPE
+	SYNTAX     INTEGER {
+				 other(1),
+				 valid(2),
+				 delete(3),
+				 create(4),
+				 modify(5) }
+	MAX-ACCESS     read-write
+	STATUS     current
+	DESCRIPTION
+			"To create or delete a static group entry."
+	::= { snIgmpStaticGroupEntry 4 }
+
+END

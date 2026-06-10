@@ -1,0 +1,629 @@
+-- ==========================================================
+-- Copyright (c) 2004-2009 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This file describes the mib implementation of ISDN
+-- Reference:
+-- Version: V1.4
+-- History:
+--  V1.0 Initial version
+--  V1.1 2004-10-27 updated by gaolong
+--       Modify IMPORTS clause.
+--       Remove object oid comments from MIB
+--       Correct DEFVAL value of hh3cChanbIsdnPermit
+--  V1.2 2005-03-22 updated by songjie
+--       Add table: hh3cQ931IsdnTable.
+--       Add traps: hh3cQ931IsdnCallSetup, hh3cQ931IsdnCallClear.
+--  V1.3 2009-05-22 updated by chengtiesheng
+--       Add table: hh3cLapdIsdnTable.
+--  V1.4 2009-10-15 updated by chengtiesheng
+--       Modify leaf node: hh3cLapdIsdnProtocol, add value ni(9).
+--       Change MAX-ACCESS of hh3cLapdIsdnIf.
+--       Add leaf node: hh3cLapdStatusTrapEnable.
+--       Add trap:  hh3cLapdIsdnStatusChange.
+-- ==============================================================
+HH3C-ISDN-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hh3cmlsr
+                FROM HH3C-OID-MIB
+            Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY,
+            NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString, TimeStamp, DateAndTime, RowStatus
+                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+
+        hh3cIsdnMib MODULE-IDENTITY
+            LAST-UPDATED "200112200000Z"
+            ORGANIZATION
+                "New H3C Technologies Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Technologies Co., Ltd.
+                 Hai-Dian District Beijing P.R. China
+                 http://www.h3c.com
+                 Zip: 100085"
+            DESCRIPTION
+                "This file describes the MIB implementation of ISDN"
+            ::= { hh3cmlsr 9 }
+
+--  Isdn Mib objects definitions
+        hh3cIsdnMibObjects OBJECT IDENTIFIER ::= { hh3cIsdnMib 1 }
+
+        hh3cisdnChannelB OBJECT IDENTIFIER ::= { hh3cIsdnMibObjects 1 }
+
+        hh3cChanbIsdnTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HH3CChanbIsdnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to describe the router's B Channels
+                 infomation"
+            ::= { hh3cisdnChannelB 1 }
+
+        hh3cChanbIsdnEntry OBJECT-TYPE
+            SYNTAX HH3CChanbIsdnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                " A single B channels"
+            INDEX { hh3cChanbIsdnIf }
+            ::= { hh3cChanbIsdnTable 1 }
+
+        HH3CChanbIsdnEntry ::=
+            SEQUENCE {
+                hh3cChanbIsdnIf
+                    INTEGER,
+                hh3cChanbIsdnPermit
+                    INTEGER,
+                hh3cChanbIsdnAddr
+                    DisplayString,
+                hh3cChanbIsdnCallerAddr
+                    DisplayString,
+                hh3cChanbIsdnCallType
+                    INTEGER,
+                hh3cChanbIsdnInfoType
+                    INTEGER,
+                hh3cChanbIsdnState
+                    INTEGER,
+                hh3cChanbIsdnCallFreeReason
+                    DisplayString,
+                hh3cChanbIsdnCallFreeCode
+                    INTEGER,
+                hh3cChanbIsdnCallAccept
+                    Counter32,
+                hh3cChanbIsdnCallReject
+                    Counter32,
+                hh3cChanbIsdnCallSuccess
+                    Counter32,
+                hh3cChanbIsdnCallFailure
+                    Counter32,
+                hh3cChanbIsdnMaxKeepTime
+                    Integer32,
+                hh3cChanbIsdnLastKeepTime
+                    Integer32,
+                hh3cChanbIsdnLastCallTime
+                    TimeStamp
+             }
+
+        hh3cChanbIsdnIf OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " this object is used to describe the virtual
+                interface value associated with one neighbor.   "
+            ::= { hh3cChanbIsdnEntry 1 }
+
+        hh3cChanbIsdnPermit OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                callOut(1),
+                callIn(2),
+                callBidirection(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                " this object is used to describe the call permissions."
+            DEFVAL { callBidirection }
+            ::= { hh3cChanbIsdnEntry 2 }
+
+        hh3cChanbIsdnAddr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to descirbe the call address
+                by which we call one nieghbor."
+            ::= { hh3cChanbIsdnEntry 3 }
+
+        hh3cChanbIsdnCallerAddr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the callser address
+                which will be known by B channels."
+            ::= { hh3cChanbIsdnEntry 4 }
+
+        hh3cChanbIsdnCallType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                nocall(0),
+                call(1),
+                answer(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe that whether it is an
+                incoming call or an outging call."
+            ::= { hh3cChanbIsdnEntry 5 }
+
+        hh3cChanbIsdnInfoType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                unknown(1),
+                speech(2),
+                unrestrDigit(3),
+                unrestrDigit56(4),
+                restrictDigit(5),
+                audio31(6),
+                audio7(7),
+                video(8),
+                swithchedPacket(9)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the information type
+                on the call"
+            ::= { hh3cChanbIsdnEntry 6 }
+
+        hh3cChanbIsdnState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                idle(1),
+                connecting(2),
+                active(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to manage the call by NMS"
+            ::= { hh3cChanbIsdnEntry 7 }
+
+        hh3cChanbIsdnCallFreeReason OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the reason why last
+                call is cleard"
+            ::= { hh3cChanbIsdnEntry 8 }
+
+        hh3cChanbIsdnCallFreeCode OBJECT-TYPE
+            SYNTAX INTEGER
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the reason code for
+                the last call down."
+            ::= { hh3cChanbIsdnEntry 9 }
+
+        hh3cChanbIsdnCallAccept OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the accepted call
+                number from the B channels"
+            ::= { hh3cChanbIsdnEntry 10 }
+
+        hh3cChanbIsdnCallReject OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the refused call
+                number from B channels ."
+            ::= { hh3cChanbIsdnEntry 11 }
+
+        hh3cChanbIsdnCallSuccess OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the successful call
+                number to B channels after
+                system restart."
+            ::= { hh3cChanbIsdnEntry 12 }
+
+        hh3cChanbIsdnCallFailure OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the failing call number
+                 to B channels after system restart"
+            ::= { hh3cChanbIsdnEntry 13 }
+
+        hh3cChanbIsdnMaxKeepTime OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "milliseconds"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object is used to descirbe the maximum duration
+                time in milliseconds."
+            DEFVAL { 2147483647 }
+            ::= { hh3cChanbIsdnEntry 14 }
+
+        hh3cChanbIsdnLastKeepTime OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "milliseconds"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the last call duration
+                 time in milliseconds"
+            ::= { hh3cChanbIsdnEntry 15 }
+
+        hh3cChanbIsdnLastCallTime OBJECT-TYPE
+            SYNTAX TimeStamp
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "this object is used to describe the sysUpTime after
+                last call attempt was made."
+            ::= { hh3cChanbIsdnEntry 16 }
+
+        hh3cChanbTrapEnable OBJECT-TYPE
+            SYNTAX INTEGER { enabled(1), disabled(2) }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to control  sending trap"
+            ::= { hh3cisdnChannelB 2 }
+
+        hh3cisdnQ931 OBJECT IDENTIFIER ::= { hh3cIsdnMibObjects 2 }
+
+        hh3cQ931IsdnControl OBJECT IDENTIFIER ::= { hh3cisdnQ931 1 }
+
+        hh3cQ931CallSetupTrapEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enabled(1),
+                disabled(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to control sending callsetup trap."
+            ::= { hh3cQ931IsdnControl 1 }
+
+        hh3cQ931CallClearTrapEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enabled(1),
+                disabled(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to control sending callclear trap"
+            ::= { hh3cQ931IsdnControl 2 }
+
+        hh3cQ931IsdnTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cQ931IsdnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes B channel information for the
+                use of Q931"
+            ::= { hh3cisdnQ931 2 }
+
+        hh3cQ931IsdnEntry OBJECT-TYPE
+            SYNTAX Hh3cQ931IsdnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A B channel entry in the Q931."
+            INDEX {  hh3cQ931IsdnOpIndex }
+            ::= { hh3cQ931IsdnTable 1 }
+
+        Hh3cQ931IsdnEntry ::=
+            SEQUENCE
+            {
+                hh3cQ931IsdnOpIndex
+                    Integer32,
+                hh3cQ931IsdnLastCalled
+                    DisplayString,
+                hh3cQ931IsdnLastCalling
+                    DisplayString,
+                hh3cQ931IsdnLastCauseDisc
+                    INTEGER,
+                hh3cQ931IsdnCallDirection
+                    INTEGER,
+                hh3cQ931IsdnCallTimeOpen
+                    DateAndTime,
+                hh3cQ931IsdnCallTimeClose
+                    DateAndTime
+            }
+
+        hh3cQ931IsdnOpIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Index of the B ISDN channel interface managed by Q93"
+            ::= { hh3cQ931IsdnEntry 1 }
+
+        hh3cQ931IsdnLastCalled OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object describes the called ISDN number.
+                When an outgoing call is established successfully, the
+                value of this node is the call number of this device,
+                otherwise the value is null string"
+            ::= { hh3cQ931IsdnEntry 2 }
+
+        hh3cQ931IsdnLastCalling OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object describes the calling ISDN number.
+                When an incoming call is established successfully, the
+                value of this node is the call number of peer device,
+                otherwise the value is null string."
+            ::= { hh3cQ931IsdnEntry 3 }
+
+        hh3cQ931IsdnLastCauseDisc OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                unknown(1),
+                normCallClr(2),
+                noRouteToTransNet(3),
+                noRouteToDest(4),
+                switchEquCongest(5),
+                netOutofOrder(6)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object describes last cause of disconnection.
+                In hh3cQ931IsdnCallClear trap, the value of this node is
+                the reason of disconnection, this node is only valid
+                for hh3cQ931IsdnCallClear trap, the value of this node
+                is unknown in other situation.
+                unknown:            unknown error.
+                normCallClr:        normal call clearing.
+                noRouteToTransNet:  no route to specified transit network.
+                noRouteToDest:      no route to destination.
+                switchEquCongest:   switching equipment congestion.
+                netOutofOrder:      network out of order."
+            ::= { hh3cQ931IsdnEntry 4 }
+
+        hh3cQ931IsdnCallDirection OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                incoming(1),
+                outgoing(2)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object describes the direction of the current call."
+            ::= { hh3cQ931IsdnEntry 5 }
+
+        hh3cQ931IsdnCallTimeOpen OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object describes the start time of this call.
+                start time is the time of an existent call that
+                has just been established."
+            ::= { hh3cQ931IsdnEntry 6 }
+
+        hh3cQ931IsdnCallTimeClose OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object describes the close time of this call.
+                This node is only vaild for hh3cQ931IsdnCallClear trap.
+                In other situation the value of this node is zero.
+                In hh3cQ931IsdnCallClear trap, this node provides the
+                time of an existent call that the call has just been
+                cleared."
+            ::= { hh3cQ931IsdnEntry 7 }
+
+-- Define hh3cLapdIsdnTable
+
+        hh3cIsdnLapd OBJECT IDENTIFIER ::= { hh3cIsdnMibObjects 3 }
+
+        hh3cLapdIsdnTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF Hh3cLapdIsdnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to describe the config of ISDN D channel."
+            ::= { hh3cIsdnLapd 1 }
+
+        hh3cLapdIsdnEntry OBJECT-TYPE
+            SYNTAX Hh3cLapdIsdnEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "ISDN D channel config"
+            INDEX { hh3cLapdIsdnIf }
+            ::= { hh3cLapdIsdnTable 1 }
+
+        Hh3cLapdIsdnEntry ::=
+            SEQUENCE {
+                hh3cLapdIsdnIf
+                    Integer32,
+                hh3cLapdIsdnProtocol
+                    INTEGER,
+                hh3cLapdIsdnIfMode
+                    INTEGER,
+                hh3cLapdIsdnLinkStatus
+                    INTEGER
+             }
+
+        hh3cLapdIsdnIf OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object is used to describe the D channel
+                interface value associated with one neighbor."
+            ::= { hh3cLapdIsdnEntry 1 }
+
+        hh3cLapdIsdnProtocol OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                dss1(1),
+                qsig(2),
+                etsi(3),
+                ess5(4),
+                ansi(5),
+                ni2(6),
+                ntt(7),
+                att(8),
+                ni(9)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to describe the protocol D channel applied.
+                For E1, the protocol may be dss1, qsig, etsi.
+                For T1, the protocol may be ess5, ansi, att, dss1, etsi, ni2,
+                ntt, qsig.
+                For BRI, the protocol may be ansi, dss1, etsi, ni, ntt."
+            DEFVAL { dss1 }
+            ::= { hh3cLapdIsdnEntry 2 }
+
+        hh3cLapdIsdnIfMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                userSide(1),
+                networkSide(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The physical interface mode.  For TE mode, the value
+                of this object is userSide.  For NT mode, the value of this
+                object is networkSide."
+            ::= { hh3cLapdIsdnEntry 3 }
+
+        hh3cLapdIsdnLinkStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                inactive(1),
+                l1Active(2),
+                l2Active(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The operational status of this interface:
+                 inactive  all layers are inactive.
+                 l1Active  layer 1 is activated,
+                           layer 2 datalink not established.
+                 l2Active  layer 1 is activated,
+                           layer 2 datalink established.
+               "
+            ::= { hh3cLapdIsdnEntry 4 }
+
+        hh3cLapdIsdnControl OBJECT IDENTIFIER ::= { hh3cIsdnLapd 2 }
+        hh3cLapdStatusTrapEnable OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                enabled(1),
+                disabled(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to control sending hh3cLapdIsdnStatusChange
+                trap."
+            DEFVAL { enabled }
+            ::= { hh3cLapdIsdnControl 1 }
+
+--  Traps related to Connection management
+        hh3cIsdnMibTraps OBJECT IDENTIFIER ::= { hh3cIsdnMib 2 }
+
+        hh3cChanbIsdnCall NOTIFICATION-TYPE
+        OBJECTS { hh3cChanbIsdnIf,
+            hh3cChanbIsdnAddr,
+            hh3cChanbIsdnCallType,
+            hh3cChanbIsdnCallerAddr,
+            hh3cChanbIsdnInfoType,
+            hh3cChanbIsdnLastKeepTime,
+            hh3cChanbIsdnCallFreeReason,
+            hh3cChanbIsdnCallFreeCode
+            }
+        STATUS current
+        DESCRIPTION
+        "When one call is setup ,cleard or determined , the trap
+        is sent to NMS"
+        ::= { hh3cIsdnMibTraps 1 }
+
+        hh3cQ931IsdnCallSetup NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cQ931IsdnOpIndex,
+                hh3cQ931IsdnLastCalled,
+                hh3cQ931IsdnLastCalling,
+                hh3cQ931IsdnCallDirection,
+                hh3cQ931IsdnCallTimeOpen
+            }
+            STATUS      current
+            DESCRIPTION
+                "This trap/inform is sent to the manager whenever a call
+                is established successfully."
+            ::= { hh3cIsdnMibTraps 2 }
+
+        hh3cQ931IsdnCallClear NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cQ931IsdnOpIndex,
+                hh3cQ931IsdnLastCalled,
+                hh3cQ931IsdnLastCalling,
+                hh3cQ931IsdnLastCauseDisc,
+                hh3cQ931IsdnCallDirection,
+                hh3cQ931IsdnCallTimeOpen,
+                hh3cQ931IsdnCallTimeClose
+            }
+            STATUS current
+            DESCRIPTION
+                "This trap/inform is sent to the manager under the following
+                conditions:
+                - an existent call is normally cleared.
+                - an existent call is determined to have ultimately
+                  failed, and has been cleared.
+                - the existent call is cleared when the BRI/PRI port is
+                  down.
+                - the existent call is cleared when the dialer rule is
+                  down."
+            ::= { hh3cIsdnMibTraps 3 }
+
+        hh3cLapdIsdnStatusChange NOTIFICATION-TYPE
+            OBJECTS {
+                hh3cLapdIsdnIf,
+                hh3cLapdIsdnLinkStatus
+            }
+            STATUS current
+            DESCRIPTION
+                "This trap/inform is sent to the manager whenever the
+                 D-channel of an interface changes state."
+            ::= { hh3cIsdnMibTraps 4 }
+
+    END

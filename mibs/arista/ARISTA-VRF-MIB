@@ -1,0 +1,232 @@
+ARISTA-VRF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE      FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP   FROM SNMPv2-CONF
+    ifIndex                           FROM IF-MIB
+    TEXTUAL-CONVENTION                FROM SNMPv2-TC
+    aristaMibs                        FROM ARISTA-SMI-MIB;
+
+aristaVrfMIB MODULE-IDENTITY
+    LAST-UPDATED "201501110000Z"
+    ORGANIZATION "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+         Postal: 5453 Great America Parkway
+                 Santa Clara, CA 95054
+
+         Tel: +1 408 547-5500
+
+         E-mail: snmp@arista.com"
+    DESCRIPTION
+           "This MIB contains information related to Virtual 
+           Routing and Forwarding (VRF).
+           
+           VRF is a mechanism by which a single device can provide
+           independent routing instances. This allows customers to 
+           virtually isolate network traffic, and also use overlapping
+           IP addresses.
+
+           Layer3 or routed interfaces in the system will belong to
+           one VRF at a time. The datapath forwarding logic uses the
+           VRF membership of the input interface to determine a
+           specific forwarding table to use for routing the traffic.
+
+           VRF can also be used to isolate management traffic from
+           the rest of the data plane traffic.
+           
+           This MIB module provides the following pieces of
+           information:
+               * A table of all VRFs configured in the system
+               * A table that contains the VRF membership information
+               for all routed interfaces in the system by sparsely
+               augmenting the ifTable."
+
+    REVISION      "201501110000Z"
+    DESCRIPTION
+           "Initial revision of this MIB module."
+    ::= { aristaMibs 18 }
+
+
+aristaVrfMibObjects  OBJECT IDENTIFIER
+    ::= { aristaVrfMIB 1 }
+
+aristaVrfMibConformance  OBJECT IDENTIFIER
+    ::= { aristaVrfMIB 2 }
+
+
+-- Textual Convention
+
+VrfName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "100t"
+    STATUS       current
+    DESCRIPTION  
+        "A human-readable identifier assigned to every VRF. The
+        identifier is unique across all VRFs in the system."
+    SYNTAX  OCTET STRING (SIZE (0..100))
+       
+VrfRouteDistinguisher ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "256a"
+    STATUS       current
+    DESCRIPTION
+        "A route distinguisher as defined in [RFC4364], in the form
+        '<admin>:<local>', where <admin> is the administrator ID
+        (e.g., an AS number) and <local> is the locally assigned
+        number."
+    REFERENCE
+        "[RFC4364]"
+    SYNTAX  OCTET STRING(SIZE (0..256))
+
+VrfState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The state of a specific VRF. When the administrator
+        configures a VRF on the system, it stays inactive until a
+        route distinguisher is assigned to it. Also, when the
+        administrator deletes a VRF, there can be a small delay
+        before the VRF is completely unconfigured from the system,
+        during which time its status becomes inactive."
+    SYNTAX       INTEGER { 
+       active(1),
+       inactive(2)
+    }
+
+
+-- VRF Table
+
+aristaVrfTable   OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AristaVrfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+           "This table contains information about VRFs currently
+           configured in the system."
+    ::= { aristaVrfMibObjects 1 }
+  
+aristaVrfEntry   OBJECT-TYPE
+    SYNTAX       AristaVrfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+           "A single row containing information for one VRF that is
+           configured in the system."
+    INDEX       { aristaVrfName }
+    ::= { aristaVrfTable 1 }
+
+AristaVrfEntry ::= SEQUENCE {
+    aristaVrfName               VrfName,
+    aristaVrfRoutingStatus      BITS,
+    aristaVrfRouteDistinguisher VrfRouteDistinguisher,
+    aristaVrfState              VrfState
+}
+
+aristaVrfName    OBJECT-TYPE
+    SYNTAX       VrfName
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+           "The name of the VRF that is represented by this row."
+    ::= { aristaVrfEntry 1 }
+
+aristaVrfRoutingStatus  OBJECT-TYPE
+    SYNTAX       BITS {
+                      ipv4(0),
+                      ipv6(1)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+           "The current status of data path routing in this VRF.
+           Routing for IPv4 and IPv6 packets can be independently
+           enabled by the administrator for a given VRF. This object
+           carries the routing status for both the protocol versions.
+           If data path routing is enabled for a protocol, the bit
+           for the protocol is 1."
+    ::= { aristaVrfEntry 2 }
+
+aristaVrfRouteDistinguisher  OBJECT-TYPE
+    SYNTAX       VrfRouteDistinguisher
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+           "The route distinguisher for this VRF."
+    ::= { aristaVrfEntry 3 }
+
+aristaVrfState              OBJECT-TYPE
+    SYNTAX       VrfState
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+           "The state of the VRF."
+    ::= { aristaVrfEntry 4 }
+
+-- Interface Table
+
+aristaVrfIfTable   OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AristaVrfIfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+           "This table augments the ifTable and contains the 
+           VRF membership information for every routed interface
+           in the system. A row is present only for each active
+           routed (or layer3) interface."
+    ::= { aristaVrfMibObjects 2 }
+  
+aristaVrfIfEntry   OBJECT-TYPE
+    SYNTAX       AristaVrfIfEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+           "VRF membership information for a single routed interface."
+    INDEX        { ifIndex }
+    ::= { aristaVrfIfTable 1 }
+
+AristaVrfIfEntry ::= SEQUENCE {
+    aristaVrfIfMembership   VrfName
+}
+
+aristaVrfIfMembership    OBJECT-TYPE
+    SYNTAX       VrfName
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+           "The name of the VRF that this routed interface is currently
+           part of."
+    ::= { aristaVrfIfEntry 1 }
+
+-- Conformance and Compliance
+
+aristaVrfMibCompliances  OBJECT IDENTIFIER
+    ::= { aristaVrfMibConformance 1 }
+
+aristaVrfMibGroups       OBJECT IDENTIFIER
+    ::= { aristaVrfMibConformance 2 }
+
+aristaVrfMibCompliance   MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for Arista switches that implement
+        the ARISTA-VRF-MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS {
+        aristaVrfInformationGroup
+    }
+    ::= { aristaVrfMibCompliances 1 }
+
+aristaVrfInformationGroup  OBJECT-GROUP
+    OBJECTS {
+        aristaVrfRoutingStatus,
+        aristaVrfRouteDistinguisher,
+        aristaVrfState,
+        aristaVrfIfMembership
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects that provide VRF information in the
+        system."
+    ::= { aristaVrfMibGroups 1 }
+
+
+END

@@ -1,0 +1,247 @@
+modules:
+    os:
+        version:
+            - EPPC-MIB::upsEIdentityUPSFirmwareVerison.0
+            - EPPC-MIB::upsEIdentityAgentSoftwareVerison.0
+        version_template: 'FW: {{ EPPC-MIB::upsEIdentityUPSFirmwareVerison.0 }}, NMC: {{ EPPC-MIB::upsEIdentityAgentSoftwareVerison.0 }}'
+    sensors:
+        runtime:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: EPPC-MIB::upsEBatteryEstimatedMinutesRemaining
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.3.{{ $index }}'
+                    index: 'upsEBatteryEstimatedMinutesRemaining.{{ $index }}'
+                    descr: Battery time remaining
+        voltage:
+            options:
+                divisor: 10
+                skip_value_lt: 0
+            data:
+                -
+                    oid: EPPC-MIB::upsEPositiveBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.5.{{ $index }}'
+                    index: 'upsEPositiveBatteryVoltage.{{ $index }}'
+                    descr: Postitive Battery Voltage
+                -
+                    oid: EPPC-MIB::upsENegativeBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.6.{{ $index }}'
+                    index: 'upsENegativeBatteryVoltage.{{ $index }}'
+                    descr: Negative Battery Voltage
+                -
+                    oid: EPPC-MIB::upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.3.{{ $index }}'
+                    value: EPPC-MIB::upsESystemInputVoltage
+                    index: 'upsESystemInputVoltage.{{ $index }}'
+                    descr: Input
+                -
+                    oid: EPPC-MIB::upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.3.{{ $index }}'
+                    value: EPPC-MIB::upsESystemOutputVoltage
+                    index: 'upsESystemOutputVoltage.{{ $index }}'
+                    descr: Output
+                -
+                    oid: EPPC-MIB::upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.3.{{ $index }}'
+                    value: EPPC-MIB::upsESystemBypassVoltage
+                    index: 'upsESystemBypassVoltage.{{ $index }}'
+                    descr: System Bypass
+                -
+                    oid: EPPC-MIB::upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.3.{{ $index }}'
+                    value: EPPC-MIB::positiveChargeVotlage
+                    index: 'positiveChargeVotlage.{{ $index }}'
+                    descr: Positive Charge
+                -
+                    oid: EPPC-MIB::upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.4.{{ $index }}'
+                    value: EPPC-MIB::negativeChargeVotlage
+                    index: 'negativeChargeVotlage.{{ $index }}'
+                    descr: Negative Charge
+                -
+                    oid: EPPC-MIB::upsEModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.4.2.1.3.{{ $index }}'
+                    value: EPPC-MIB::upsEModulePositiveBusVolt
+                    index: 'upsEModulePositiveBusVolt.{{ $index }}'
+                    descr: Module Positive Charge
+                -
+                    oid: EPPC-MIB::upsEModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.4.2.1.4.{{ $index }}'
+                    value: EPPC-MIB::upsEModuleNegativeBusVolt
+                    index: 'upsEModuleNegativeBusVolt.{{ $index }}'
+                    descr: Module Negative Charge
+        frequency:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: EPPC-MIB::upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.2.{{ $index }}'
+                    value: EPPC-MIB::upsESystemInputFrequency
+                    index: 'upsESystemInputFrequency.{{ $index }}'
+                    descr: System Input
+                -
+                    oid: EPPC-MIB::upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.2.{{ $index }}'
+                    value: EPPC-MIB::upsESystemOutputFrequency
+                    index: 'upsESystemOutputFrequency.{{ $index }}'
+                    descr: System Output
+                -
+                    oid: EPPC-MIB::upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.2.{{ $index }}'
+                    value: EPPC-MIB::upsESystemBypassFrequency
+                    index: 'upsESystemBypassFrequency.{{ $index }}'
+                    descr: System Bypass
+        charge:
+            data:
+                -
+                    oid: EPPC-MIB::upsEBatteryEstimatedChargeRemaining
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.4.{{ $index }}'
+                    index: 'upsEBatteryEstimatedChargeRemaining.{{ $index }}'
+                    descr: Battery charge remaining
+        temperature:
+            options:
+                divisor: 10
+                skip_value_lt: 0
+            data:
+                -
+                    oid: EPPC-MIB::upsESystemTemperature
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.2.{{ $index }}'
+                    index: 'upsESystemTemperature.{{ $index }}'
+                    descr: Ambient Temperature
+                -
+                    oid: EPPC-MIB::upsEBatteryTemperature
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.8.{{ $index }}'
+                    index: 'upsEBatteryTemperature.{{ $index }}'
+                    descr: Battery
+                -
+                    oid: EPPC-MIB::upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.8.{{ $index }}'
+                    value: EPPC-MIB::chargerModulesTemperature
+                    index: 'chargerModulesTemperature.{{ $index }}'
+                    descr: Charger Module
+                -
+                    oid: EPPC-MIB::upsEModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.4.2.1.5.{{ $index }}'
+                    value: EPPC-MIB::upsEModuleTemperature
+                    index: 'upsEModuleTemperature.{{ $index }}'
+                    descr: Module
+                -
+                    oid: EPPC-MIB::upsEEnvironmentTemperature
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.6.1.{{ $index }}'
+                    value: EPPC-MIB::upsEEnvironmentCurrentTemperature
+                    index: 'upsEEnvironmentCurrentTemperature.{{ $index }}'
+                    descr: Env Current Temp
+                    low_limit: EPPC-MIB::upsEEnvironmentTemperatureLowSetPoint
+                    high_limit: EPPC-MIB::upsEEnvironmentTemperatureHighSetPoint
+        current:
+            options:
+                skip_value_lt: 0
+                divisor: 10
+            data:
+                -
+                    oid: EPPC-MIB::upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.4.{{ $index }}'
+                    value: EPPC-MIB::upsESystemInputCurrent
+                    index: 'upsESystemInputCurrent.{{ $index }}'
+                    descr: System Input Current
+                -
+                    oid: EPPC-MIB::upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.4.{{ $index }}'
+                    value: EPPC-MIB::upsESystemOutputCurrent
+                    index: 'upsESystemOutputCurrent.{{ $index }}'
+                    descr: System Output Current
+                -
+                    oid: EPPC-MIB::upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.4.{{ $index }}'
+                    value: EPPC-MIB::upsESystemBypassCurrent
+                    index: 'upsESystemBypassCurrent.{{ $index }}'
+                    descr: System Bypass
+                -
+                    oid: EPPC-MIB::upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.5.{{ $index }}'
+                    value: EPPC-MIB::positiveChargeCurrent
+                    index: 'positiveChargeCurrent.{{ $index }}'
+                    descr: Postitive Charge
+                -
+                    oid: EPPC-MIB::upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.6.{{ $index }}'
+                    value: EPPC-MIB::negativeChargeCurrent
+                    index: 'negativeChargeCurrent.{{ $index }}'
+                    descr: Negative Charge
+        humidity:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: EPPC-MIB::upsEEnvironmentHumidity
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.6.2.1.{{ $index }}'
+                    value: EPPC-MIB::upsEEnvironmentCurrentHumidity
+                    index: 'upsEEnvironmentCurrentHumidity.{{ $index }}'
+                    descr: Environment Current
+        power:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: EPPC-MIB::upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.5.{{ $index }}'
+                    value: EPPC-MIB::upsESystemInputWatts
+                    index: 'upsESystemInputWatts.{{ $index }}'
+                    descr: System Input Watts
+                -
+                    oid: EPPC-MIB::upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.5.{{ $index }}'
+                    value: EPPC-MIB::upsESystemOutputWatts
+                    index: 'upsESystemOutputWatts.{{ $index }}'
+                    descr: System Output Watts
+                -
+                    oid: EPPC-MIB::upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.5.{{ $index }}'
+                    value: EPPC-MIB::upsESystemBypassWatts
+                    index: 'upsESystemBypassWatts.{{ $index }}'
+                    descr: System Bypass
+                    divisor: 10
+        load:
+            data:
+                -
+                    oid: EPPC-MIB::upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.7.{{ $index }}'
+                    value: EPPC-MIB::upsESystemOutputLoad
+                    index: 'upsESystemOutputLoad.{{ $index }}'
+                    descr: System Output Load
+        state:
+            data:
+                -
+                    oid: EPPC-MIB::upsESystemStatus
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.1.{{ $index }}'
+                    descr: System Status
+                    state_name: upsESystemStatus
+                    states:
+                        - { value: 1, generic: 0, descr: 'power-on' }
+                        - { value: 2, generic: 0, descr: 'stand-by' }
+                        - { value: 3, generic: 0, descr: 'by-pass' }
+                        - { value: 4, generic: 0, descr: 'line' }
+                        - { value: 5, generic: 2, descr: 'battery' }
+                        - { value: 6, generic: 1, descr: 'battery-test' }
+                        - { value: 7, generic: 2, descr: 'fault' }
+                        - { value: 8, generic: 0, descr: 'converter' }
+                        - { value: 9, generic: 0, descr: 'eco' }
+                        - { value: 10, generic: 1, descr: 'shutdown' }
+                        - { value: 11, generic: 0, descr: 'on-boosters' }
+                        - { value: 12, generic: 0, descr: 'on-reducer' }
+                        - { value: 13, generic: 3, descr: 'other' }
+                -
+                    oid: EPPC-MIB::upsEBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.1.{{ $index }}'
+                    index: 'upsEBatteryStatus.{{ $index }}'
+                    descr: Battery Status
+                    state_name: upsEBatteryStatus
+                    states:
+                        - { descr: unknown, value: 1, generic: 3 }
+                        - { descr: batteryNormal, value: 2, generic: 0 }
+                        - { descr: batteryLow, value: 3, generic: 1 }
+                        - { descr: batteryDepleted, value: 4, generic: 2 }
+                        - { descr: batteryDischarging, value: 5, generic: 1 }
+                        - { descr: batteryFailure, value: 6, generic: 2 }

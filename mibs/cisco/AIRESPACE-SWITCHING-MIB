@@ -1,0 +1,4068 @@
+-- *******************************************************************
+-- Airespace Switching MIB
+-- Copyright 2001 Airespace, Inc.  All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Airespace's confidential and proprietary
+-- intellectual property.  LVL7 Systems retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Airespace
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+-- Status: Release
+-- Version: 3.2
+-- Internal Source Code Version:1.75
+-- Date: 19 Dec 2005
+-- *******************************************************************
+
+
+AIRESPACE-SWITCHING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress,
+    Counter32, Integer32, Unsigned32, TimeTicks
+                                        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+    DisplayString, PhysAddress,           
+    RowStatus, MacAddress, TruthValue   FROM SNMPv2-TC
+    airespace                           FROM AIRESPACE-REF-MIB
+    dot1qVlanIndex, dot1qFdbId          FROM Q-BRIDGE-MIB
+    IANAifType                          FROM IANAifType-MIB;
+
+--********************************************************************
+--*  MODULE IDENTITY
+--********************************************************************
+
+     bsnSwitching MODULE-IDENTITY
+        LAST-UPDATED "200604100000Z"
+        ORGANIZATION "Airespace, Inc."
+        CONTACT-INFO
+            "        Cisco Systems,
+                     Customer Service
+             Postal: 170 West Tasman Drive
+                     San Jose, CA  95134
+                     USA
+                Tel: +1 800 553-NETS
+
+              Email: cs-wnbu-snmp@cisco.com"
+        DESCRIPTION             
+                "This MIB is intended to be implemented on all those
+                devices operating as Central Controllers (CC) that
+                terminate the Light Weight Access Point Protocol
+                tunnel from Light-weight LWAPP Access Points.
+
+                This MIB provides configuration, statistics and 
+                status information about the controller. 
+                This includes controller statistics and provides 
+                information such as Inventory, Trap logs, memory and 
+                CPU. This MIB also provides configuration of CLI, 
+                SNMP, LAG, DHCP, Spanning Tree, etc. 
+                
+                The relationship between controller and the LWAPP APs
+                can be depicted as follows:
+
+        +......+     +......+     +......+           +......+
+        +      +     +      +     +      +           +      +
+        +  CC  +     +  CC  +     +  CC  +           +  CC  +
+        +      +     +      +     +      +           +      +
+        +......+     +......+     +......+           +......+
+          ..            .             .                 .
+          ..            .             .                 .
+         .  .            .             .                 .
+        .    .            .             .                 .
+       .      .            .             .                 .
+      .        .            .             .                 .
+   +......+ +......+     +......+      +......+          +......+
+   +      + +      +     +      +      +      +          +      +
+   +  AP  + +  AP  +     +  AP  +      +  AP  +          +  AP  +
+   +      + +      +     +      +      +      +          +      +
+   +......+ +......+     +......+      +......+          +......+
+              .              .             .                 .
+            .  .              .             .                 .
+           .    .              .             .                 .
+          .      .              .             .                 .
+         .        .              .             .                 .
+      +......+ +......+     +......+      +......+          +......+
+      +      + +      +     +      +      +      +          +      +
+      +  MN  + +  MN  +     +  MN  +      +  MN  +          +  MN  +
+      +      + +      +     +      +      +      +          +      +
+      +......+ +......+     +......+      +......+          +......+
+
+
+                The LWAPP tunnel exists between the controller and
+                the APs.  The MNs communicate with the APs through
+                the protocol defined by the 802.11 standard.
+
+                LWAPP APs, upon bootup, discover and join one of the
+                controllers and the controller pushes the configuration,
+                that includes the WLAN parameters, to the LWAPP APs.
+                The APs then encapsulate all the 802.11 frames from
+                wireless clients inside LWAPP frames and forward
+                the LWAPP frames to the controller.
+               
+                                   GLOSSARY
+ 
+                Access Point ( AP )
+
+                An entity that contains an 802.11 medium access
+                control ( MAC ) and physical layer ( PHY ) interface
+                and provides access to the distribution services via
+                the wireless medium for associated clients.  
+
+                LWAPP APs encapsulate all the 802.11 frames in
+                LWAPP frames and sends it to the controller to which
+                it is logically connected.
+
+                Basic Service Set Identifier (BSSID)
+
+                The identifier for the service set comprising of
+                all the 802.11 stations under the control of
+                one coordinating Access Point.  This identifier
+                happens to be the MAC address of the dot11 radio
+                interface of the Access Point.  The wireless
+                clients that associate with the Access Point
+                get the wired uplink through this particular 
+                dot11 interface. 
+
+                Central Controller ( CC )
+
+                The central entity that terminates the LWAPP protocol
+                tunnel from the LWAPP APs.  Throughout this MIB,
+                this entity also referred to as 'controller'. 
+
+                Light Weight Access Point Protocol ( LWAPP ) 
+
+                This is a generic protocol that defines the 
+                communication between the Access Points and the
+                Central Controller. 
+
+                Mobile Node ( MN )
+
+                A roaming 802.11 wireless device in a wireless
+                network associated with an access point. 
+
+                Station Management (SMT)
+
+                This term refers to the internal management of the
+                802.11 protocol operations by the AP to work
+                cooperatively with the other APs and 802.11
+                devices in the network.
+ 
+                REFERENCE
+ 
+                [1] Part 11 Wireless LAN Medium Access Control ( MAC )
+                and Physical Layer ( PHY ) Specifications.
+  
+                [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
+                Weight Access Point Protocol. "
+
+        REVISION    "200604100000Z"
+
+        DESCRIPTION
+                   "Updated MIB with description and format"
+
+      ::= { airespace 1 }
+
+--********************************************************************
+--    Major sections
+--********************************************************************
+
+    agentInfoGroup           OBJECT IDENTIFIER ::= { bsnSwitching 1 }
+    agentConfigGroup         OBJECT IDENTIFIER ::= { bsnSwitching 2 }
+    agentSystemGroup         OBJECT IDENTIFIER ::= { bsnSwitching 3 }
+    stats                    OBJECT IDENTIFIER ::= { bsnSwitching 4 }
+    switchingTraps           OBJECT IDENTIFIER ::= { bsnSwitching 50 }
+    bsnSwitchingGroups       OBJECT IDENTIFIER ::= { bsnSwitching 51 }
+    bsnSwitchingCompliances  OBJECT IDENTIFIER ::= { bsnSwitching 52 }
+
+
+--********************************************************************
+-- agentInventoryGroup
+--********************************************************************
+
+
+    agentInventoryGroup     OBJECT IDENTIFIER ::= { agentInfoGroup 1 }
+
+
+    agentInventorySysDescription OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Inventory system description."
+         ::= { agentInventoryGroup 1 }
+
+    agentInventoryMachineType OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Type of the Machine used in the Switch."
+         ::= { agentInventoryGroup 2 }
+
+    agentInventoryMachineModel OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Machine Model. "
+         ::= { agentInventoryGroup 3 }
+
+    agentInventorySerialNumber OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Serial number of the switch."
+         ::= { agentInventoryGroup 4 }
+
+
+    agentInventoryMaintenanceLevel OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Inventory Maintenance Level"
+         ::= { agentInventoryGroup 6 }
+
+
+    agentInventoryBurnedInMacAddress OBJECT-TYPE
+         SYNTAX      PhysAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Burned-In MAC Address"
+
+         ::= { agentInventoryGroup 9 }
+
+    agentInventoryOperatingSystem OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Operating System running on this unit"
+         ::= { agentInventoryGroup 10 }
+
+    agentInventoryManufacturerName OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Name of the switch manufacturer."
+         ::= { agentInventoryGroup 12 }
+
+    agentInventoryProductName OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Name of the product."
+         ::= { agentInventoryGroup 13 }
+
+    agentInventoryProductVersion OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "Version of the product."
+         ::= { agentInventoryGroup 14 }
+
+    agentInventoryIsGigECardPresent OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "True if the Switch contains a Gigabit ethernet
+                    card
+                    ."
+         ::= { agentInventoryGroup 15 }
+
+     agentInventoryIsCryptoCardPresent OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "True if the switch is carrying a Crypto card."
+         ::= { agentInventoryGroup 16 }
+
+     agentInventoryIsForeignAPSupported OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "States whether the switch supports third party
+                     Access Points."
+         ::= { agentInventoryGroup 17 }
+
+
+    agentInventoryMaxNumberOfAPsSupported OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Maximum number of APs supported with this
+                      Controller."
+
+         ::= { agentInventoryGroup 18 }
+
+     agentInventoryIsCryptoCard2Present OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "True if the switch is carrying second Crypto
+                     card for 4400 controller."
+         ::= { agentInventoryGroup 19 }
+
+     agentInventoryFipsModeEnabled OBJECT-TYPE
+         SYNTAX      TruthValue
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                    "True if FIPS (Federal Information Processing
+                     Standards) mode has been enabled on the
+                     controller.False if FIPS mode has not been
+                     enabled. FIPS mode can only be enabled through
+                     console."
+         DEFVAL {false}
+         ::= { agentInventoryGroup 20 }
+
+
+--********************************************************************
+-- agentTrapLogGroup
+--********************************************************************
+
+    agentTrapLogGroup       OBJECT IDENTIFIER ::= { agentInfoGroup 2}
+
+    agentTrapLogTotal OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The total number of traps sent since last
+                      reset."
+         ::= { agentTrapLogGroup 1 }
+
+    agentTrapLogTotalSinceLastViewed OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of traps sent since last viewed."
+         ::= { agentTrapLogGroup 3 }
+
+    agentRadioUpDownTrapCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The total number of AP Up/Down traps sent since
+                      last reset."
+         ::= { agentTrapLogGroup 5 }
+
+    agentApAssociateDisassociateTrapCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The total number of AP Associate/Disassociate
+                      traps sent since last reset."
+         ::= { agentTrapLogGroup 6 }
+
+    agentApLoadProfileFailTrapCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The total number of AP Load Profile Failure
+                      traps sent since last reset."
+         ::= { agentTrapLogGroup 7 }
+
+    agentApNoiseProfileFailTrapCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The total number of AP Noise Profile Failure
+                      traps sent since last reset."
+         ::= { agentTrapLogGroup 8 }
+
+
+    agentApInterferenceProfileFailTrapCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The total number of AP Interference Profile
+                      Failure traps sent since last reset."
+         ::= { agentTrapLogGroup 9 }
+
+    agentApCoverageProfileFailTrapCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The total number of AP Coverge Profile Failure
+                      traps sent since last reset."
+         ::= { agentTrapLogGroup 10 }
+
+
+--********************************************************************
+-- agentTrapLogTable
+--********************************************************************
+
+    agentTrapLogTable OBJECT-TYPE
+         SYNTAX SEQUENCE OF AgentTrapLogEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Agent Trap Log"
+         ::= { agentTrapLogGroup 4 }
+
+    agentTrapLogEntry OBJECT-TYPE
+         SYNTAX      AgentTrapLogEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Agent trap log entry"
+         INDEX { agentTrapLogIndex }
+         ::= { agentTrapLogTable 1 }
+
+    AgentTrapLogEntry ::= SEQUENCE {
+          agentTrapLogIndex        Integer32,
+          agentTrapLogSystemTime   DisplayString,
+          agentTrapLogTrap         OCTET STRING
+          }
+
+    agentTrapLogIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Unique index of trap entry"
+         ::= { agentTrapLogEntry 1 }
+
+    agentTrapLogSystemTime OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "System uptime when trap was sent. This entry
+                      shows how long the system has been up when the
+                      trap occurred."
+         ::= { agentTrapLogEntry 2 }
+
+    agentTrapLogTrap OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE (0..512))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Description of the trap sent."
+         ::= { agentTrapLogEntry 22 }
+
+
+--********************************************************************
+-- agentSwitchInfoGroup
+--********************************************************************
+
+    agentSwitchInfoGroup    OBJECT IDENTIFIER ::= { agentInfoGroup 3 }
+
+
+    agentSwitchInfoLwappTransportMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     layer2(1),
+                     layer3(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The LWAPP transport mode specifies if the switch
+                      is operating in Layer2 or Layer3 mode.  This
+                      attribute gives the current mode the switch is
+                      operating on."
+         ::= { agentSwitchInfoGroup 1 }
+
+    agentSwitchInfoPowerSupply1Present OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     false(0),
+                     true(1)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This is to indicate if the switch has Power
+                      Supply 1 present on it.  This is applicable to
+                      the 4200 series and will always return true for
+                      the earlier device versions."
+         ::= { agentSwitchInfoGroup 2 }
+
+    agentSwitchInfoPowerSupply1Operational OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     false(0),
+                     true(1)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This is to indicate if the switch's Power Supply
+                      1 is operational.  This is applicable to the
+                      4200 series and will always return true for the
+                      earlier device versions."
+         ::= { agentSwitchInfoGroup 3 }
+
+    agentSwitchInfoPowerSupply2Present OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     false(0),
+                     true(1)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This is to indicate if the switch has Power
+                      Supply 2 present on it.  This is applicable to
+                      the 4200 series and will always return false for
+                      the earlier device versions."
+         ::= { agentSwitchInfoGroup 4 }
+
+    agentSwitchInfoPowerSupply2Operational OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     false(0),
+                     true(1)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This is to indicate if the switch's Power Supply
+                      2 is operational.This is applicable to the 4200
+                      series and will always return false for the
+                      earlier device versions."
+         ::= { agentSwitchInfoGroup 5 }
+
+
+--********************************************************************
+-- agentResourceInfoGroup
+--********************************************************************
+
+    agentResourceInfoGroup  OBJECT IDENTIFIER ::= { agentInfoGroup 5 }
+
+    agentCurrentCPUUtilization OBJECT-TYPE
+         SYNTAX      INTEGER(0..100)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Current CPU Load of the switch in percentage."
+         ::= { agentResourceInfoGroup 1 }
+
+    agentTotalMemory OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Total RAM of the switch in Kbytes."
+         ::= { agentResourceInfoGroup 2 }
+
+    agentFreeMemory OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+         "Free RAM of the switch in Kbytes."
+         ::= { agentResourceInfoGroup 3 }
+
+--********************************************************************
+-- agentWcpInfoGroup
+--********************************************************************
+
+
+    agentWcpInfoGroup    OBJECT IDENTIFIER ::= { agentInfoGroup 6 }
+
+    agentWcpDeviceName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE (0..32))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This is the name of the device this controller
+                      is residing on."
+         ::= { agentWcpInfoGroup 1 }
+
+    agentWcpSlotNumber OBJECT-TYPE
+         SYNTAX      Unsigned32(1..16)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The slot number on the Wcp Device that this
+                      controller is residing on."
+         ::= { agentWcpInfoGroup 2 }
+
+    agentWcpPortNumber OBJECT-TYPE
+         SYNTAX      Unsigned32(1..2)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The port number on the Wcp Device that this
+                      controller is residing on."
+         ::= { agentWcpInfoGroup 3 }
+
+    agentWcpPeerPortNumber OBJECT-TYPE
+         SYNTAX      Unsigned32(1..2)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The port number of this controller's peer on the
+                      same slot on Wcp Device that this controller is
+                      residing on."
+         ::= { agentWcpInfoGroup 4 }
+
+    agentWcpPeerIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The IP Address of this controller's peer on the
+                      same slot on Wcp Device that this controller is
+                      residing on."
+         ::= { agentWcpInfoGroup 5 }
+
+    agentWcpControllerTableChecksum OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This is the checksum that tracks the changes in
+                      the agentWcpControllerInfoTable. If there is any
+                      change in the information on this table, the
+                      checksum changes."
+         ::= { agentWcpInfoGroup 6 }
+
+    agentWcpControllerInfoTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentWcpControllerInfoEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the wireless controllers on a WCP
+                      device."
+         ::= { agentWcpInfoGroup 7 }
+
+    agentWcpControllerInfoEntry OBJECT-TYPE
+         SYNTAX      AgentWcpControllerInfoEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Entry for a wireless controller on a WCP
+                     device."
+         INDEX { agentWcpControllerInfoSlotNumber,
+                 agentWcpControllerInfoPortNumber }
+         ::= { agentWcpControllerInfoTable 1 }
+
+    AgentWcpControllerInfoEntry ::= SEQUENCE {
+           agentWcpControllerInfoSlotNumber        Unsigned32,
+           agentWcpControllerInfoPortNumber        Unsigned32,
+           agentWcpControllerInfoIpAddress         IpAddress
+       }
+
+    agentWcpControllerInfoSlotNumber OBJECT-TYPE
+         SYNTAX      Unsigned32(1..16)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The slot number on the Wcp device that a
+                      controller is residing on."
+         ::= { agentWcpControllerInfoEntry 1 }
+
+    agentWcpControllerInfoPortNumber OBJECT-TYPE
+         SYNTAX      Unsigned32(1..2)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The port number on the Wcp Device that a
+                      controller is residing on."
+         ::= { agentWcpControllerInfoEntry 2 }
+
+    agentWcpControllerInfoIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The management IP Address of a controller."
+         ::= { agentWcpControllerInfoEntry 10 }
+
+
+--********************************************************************
+-- agentProductGroup
+--********************************************************************
+
+    agentProductGroup     OBJECT IDENTIFIER ::= { agentInfoGroup 4 }
+
+--********************************************************************
+-- productGroup1. This includes the 4000 switch series: 4012, 4024 and
+-- the 4100 appliance series: 4101 and 4102
+--********************************************************************
+
+    productGroup1        OBJECT IDENTIFIER ::= { agentProductGroup 1 }
+
+--********************************************************************
+-- productGroup2. This includes the Branch Office Switch series
+--********************************************************************
+
+    productGroup2        OBJECT IDENTIFIER ::= { agentProductGroup 2 }
+
+--********************************************************************
+-- productGroup3. This includes the 4200 switch series: 4202 and 4204
+--
+--********************************************************************
+
+    productGroup3        OBJECT IDENTIFIER ::= { agentProductGroup 3 }
+
+--********************************************************************
+-- productGroup4. This includes the Catalyst 6k series with 2
+-- 4204s on a single blade
+--********************************************************************
+
+    productGroup4        OBJECT IDENTIFIER ::= { agentProductGroup 4 }
+
+--********************************************************************
+   agentCLIConfigGroup    OBJECT IDENTIFIER ::= { agentConfigGroup 1 }
+
+--********************************************************************
+-- agentLoginSessionTable
+--********************************************************************
+
+    agentLoginSessionTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentLoginSessionEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the switch's login session"
+         ::= { agentCLIConfigGroup 1 }
+
+    agentLoginSessionEntry OBJECT-TYPE
+         SYNTAX      AgentLoginSessionEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Login Session Entry"
+         INDEX { agentLoginSessionIndex }
+         ::= { agentLoginSessionTable 1 }
+
+    AgentLoginSessionEntry ::= SEQUENCE {
+           agentLoginSessionIndex              Integer32,
+           agentLoginSessionUserName           DisplayString,
+           agentLoginSessionIPAddress          IpAddress,
+           agentLoginSessionConnectionType     INTEGER,
+           agentLoginSessionIdleTime           TimeTicks,
+           agentLoginSessionSessionTime        TimeTicks,
+           agentLoginSessionStatus             RowStatus
+       }
+
+    agentLoginSessionIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Agent Login Session Index of the switch"
+         ::= { agentLoginSessionEntry 1 }
+
+    agentLoginSessionUserName OBJECT-TYPE
+         SYNTAX      DisplayString
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Agent Login Session UserName of the switch"
+         ::= { agentLoginSessionEntry 2 }
+
+    agentLoginSessionIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Agent Login Session IP Address of the switch"
+         ::= { agentLoginSessionEntry 3 }
+
+    agentLoginSessionConnectionType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      serial(1),
+                      telnet(2),
+                      web(3),
+                      ssl(4)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Agent Login Session Connection Type of the
+                     switch"
+         ::= { agentLoginSessionEntry 4 }
+
+    agentLoginSessionIdleTime OBJECT-TYPE
+         SYNTAX      TimeTicks
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Agent Login Session Idle Time of the switch"
+         ::= { agentLoginSessionEntry 5 }
+
+    agentLoginSessionSessionTime OBJECT-TYPE
+         SYNTAX      TimeTicks
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Agent Login Session Time of the switch"
+         ::= { agentLoginSessionEntry 6 }
+
+    agentLoginSessionStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Status of the user.
+                     active(1)  - This connection is active.
+                     destroy(6) - Set to this value to disconnect
+                                  this user."
+         ::= { agentLoginSessionEntry 26 }
+
+
+--********************************************************************
+-- agentTelnetConfigGroup
+--********************************************************************
+
+  agentTelnetConfigGroup OBJECT IDENTIFIER ::= {agentCLIConfigGroup 2}
+
+    agentTelnetLoginTimeout OBJECT-TYPE
+         SYNTAX      Integer32 (0..160)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Telnet login timeout (minutes)
+                     Config telnet timeout  will set the telnet
+                     session timeout value.  A session is active as
+                     long as the session has not remained idle for
+                     the value set. Specify a value from 0 to 160.
+                     A value of 0 indicates that a Telnet session
+                     remains active indefinitely.
+                     Note: Changing the timeout value for active
+                     sessions does not become effective until the
+                     session is reaccessed. Any keystroke will
+                     also activate the new timeout duration."
+         ::= { agentTelnetConfigGroup 1 }
+
+    agentTelnetMaxSessions OBJECT-TYPE
+         SYNTAX      Integer32 (0..5)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Maximum number of Telnet Sessions
+                     Config telnet maxsessions is an integer value
+                     from 0 to 5 that specifies the maximum number of
+                     telnet sessions that can be established. If the
+                     value is 0, no Telnet session can be established."
+         ::= { agentTelnetConfigGroup 2 }
+
+    agentTelnetAllowNewMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Allow new telnet sessions (enable or disable)
+                     Config telnet disable means that no new Telnet
+                     sessions are to be established. Any already
+                     established session remains active until
+                     the session is ended or an abnormal network error
+                     ends it. "
+          ::= { agentTelnetConfigGroup 3 }
+
+    agentSSHAllowNewMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Allow new SSH sessions (enable or disable)
+                     Config SSH disable means that no new SSH sessions
+                     are to be established. Any already established
+                     session remains active until the session is ended
+                     or an abnormal network error ends it."
+          ::= { agentTelnetConfigGroup 4 }
+
+--********************************************************************
+-- agentSerialGroup
+--********************************************************************
+
+    agentSerialGroup   OBJECT IDENTIFIER ::= { agentCLIConfigGroup 5 }
+
+    agentSerialTimeout OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Agent Serial Timeout "
+         ::= { agentSerialGroup 1 }
+
+    agentSerialBaudrate OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      baud1200(1),
+                      baud2400(2),
+                      baud4800(3),
+                      baud9600(4),
+                      baud19200(5),
+                      baud38400(6),
+                      baud57600(7),
+                      baud115200(8)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     " Agent Serial Baudrate"
+         ::= { agentSerialGroup 2 }
+
+    agentSerialCharacterSize OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     " Agent Serial Character Size"
+         ::= { agentSerialGroup 3 }
+
+    agentSerialHWFlowControlMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      enable(1),
+                      disable(2)
+                      }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     " Agent Serial Hardware Flow Control."
+         ::= { agentSerialGroup 4 }
+
+    agentSerialStopBits OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     " Agent Serial Stop Bits"
+         ::= { agentSerialGroup 5 }
+
+    agentSerialParityType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      even(1),
+                      odd(2),
+                      none(3)
+                      }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     " Agent Serial Parity Type"
+         ::= { agentSerialGroup 6 }
+
+--*******************************************************************
+-- agentLagConfigGroup
+--********************************************************************
+    agentLagConfigGroup   OBJECT IDENTIFIER ::= { agentConfigGroup 2 }
+
+    agentLagConfigCreate OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..15))
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Create.
+                     When this object is set with a non-empty string,
+                     a new lag will be created.if possible with the
+                     entered string as it's name."
+         ::= { agentLagConfigGroup 1 }
+
+    agentLagSummaryConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentLagSummaryConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "A summary table of the switch's lag config
+                     entries"
+         ::= { agentLagConfigGroup 2 }
+
+    agentLagSummaryConfigEntry OBJECT-TYPE
+         SYNTAX      AgentLagSummaryConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "Switch's lag config entry"
+         INDEX       { agentLagSummaryName }
+         ::= { agentLagSummaryConfigTable 1 }
+
+    AgentLagSummaryConfigEntry ::= SEQUENCE {
+             agentLagSummaryName           DisplayString,
+             agentLagSummaryLagIndex       Integer32,
+             agentLagSummaryFlushTimer     Integer32,
+             agentLagSummaryLinkTrap       INTEGER,
+             agentLagSummaryAdminMode      INTEGER,
+             agentLagSummaryStpMode        INTEGER,
+             agentLagSummaryAddPort        Integer32,
+             agentLagSummaryDeletePort     Integer32,
+             agentLagSummaryPortsBitMask   Unsigned32,
+             agentLagSummaryStatus         RowStatus
+             }
+    agentLagSummaryName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..15))
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Name"
+         ::= { agentLagSummaryConfigEntry 1 }
+
+    agentLagSummaryLagIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag If Index"
+         ::= { agentLagSummaryConfigEntry 2 }
+
+
+    agentLagSummaryFlushTimer OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Flush Timer"
+         ::= { agentLagSummaryConfigEntry 3 }
+
+    agentLagSummaryLinkTrap OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      enable(1),
+                      disable(2)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Link Trap"
+         ::= { agentLagSummaryConfigEntry 4 }
+
+    agentLagSummaryAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      enable(1),
+                      disable(2)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Admin Mode"
+         ::= { agentLagSummaryConfigEntry 5 }
+
+    agentLagSummaryStpMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      dot1d(1),
+                      fast(2),
+                      off(3)
+                     }
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag STP Mode"
+         ::= { agentLagSummaryConfigEntry 6 }
+
+    agentLagSummaryAddPort OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Add Port.
+                      Note: agentPortType for the port to be added
+                      must be full duplex and the same speed as
+                      previously added port(s), if any."
+         ::= { agentLagSummaryConfigEntry 7 }
+
+    agentLagSummaryDeletePort OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Delete Port"
+         ::= { agentLagSummaryConfigEntry 8 }
+
+    agentLagSummaryPortsBitMask OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Member Ports in bit mask
+                     representation"
+         ::= { agentLagSummaryConfigEntry 9 }
+
+    agentLagSummaryStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Agent Lag Status.
+                      active(1)  - This Lag is enabled.
+                      destroy(6) - Set to this value to remove the
+                      Lag."
+         ::= { agentLagSummaryConfigEntry 30 }
+
+
+--*******************************************************************
+-- agentLagDetailedConfigTable
+--*******************************************************************
+
+    agentLagDetailedConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentLagDetailedConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "A detailed table of the switch's lag config
+                      entries"
+         ::= { agentLagConfigGroup 3 }
+
+    agentLagDetailedConfigEntry OBJECT-TYPE
+         SYNTAX      AgentLagDetailedConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "Switch's lag config entry"
+         INDEX       { agentLagDetailedLagIndex,
+                       agentLagDetailedIfIndex }
+         ::= { agentLagDetailedConfigTable 1 }
+
+    AgentLagDetailedConfigEntry ::= SEQUENCE {
+             agentLagDetailedLagIndex  Integer32,
+             agentLagDetailedIfIndex   Integer32,
+             agentLagDetailedPortSpeed OBJECT IDENTIFIER
+             }
+
+    agentLagDetailedLagIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION
+                     "Lag index"
+         ::= { agentLagDetailedConfigEntry 1 }
+
+    agentLagDetailedIfIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION
+                     "Lag port index"
+         ::= { agentLagDetailedConfigEntry 2 }
+
+    agentLagDetailedPortSpeed OBJECT-TYPE
+         SYNTAX      OBJECT IDENTIFIER
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION
+                     "Lag port speed. See agentPortType for
+                      description and list of valid values."
+         ::= { agentLagDetailedConfigEntry 22 }
+
+
+    agentLagConfigMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      off(1),
+                      on(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "The Lag Mode on the 4400 series controller. When
+                      it is on, all the gigabit ports are bound to one
+                      aggregated link."
+         ::= { agentLagConfigGroup 4 }
+
+
+--********************************************************************
+-- agentNetworkConfigGroup
+--********************************************************************
+
+  agentNetworkConfigGroup OBJECT IDENTIFIER ::= { agentConfigGroup 3 }
+
+    agentNetworkIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's network ip address"
+         ::= { agentNetworkConfigGroup 1 }
+
+    agentNetworkSubnetMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's network subnet mask"
+         ::= { agentNetworkConfigGroup 2 }
+
+    agentNetworkDefaultGateway OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's network default gateway"
+         ::= { agentNetworkConfigGroup 3 }
+
+    agentNetworkBurnedInMacAddress OBJECT-TYPE
+         SYNTAX      PhysAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Burned-In MAC address"
+         ::= { agentNetworkConfigGroup 4 }
+
+    agentNetworkConfigProtocol OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(1),
+                     bootp(2),
+                     dhcp(3)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's network config protocol"
+         ::= { agentNetworkConfigGroup 7 }
+
+    agentNetworkWebMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's web access mode."
+          ::= { agentNetworkConfigGroup 8 }
+
+    agentNetworkSecureWebMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "If https is enable or not provided web mode is
+                      enabled"
+          ::= { agentNetworkConfigGroup 9 }
+
+    agentNetworkMulticastMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     disable(0),
+                     unicast(1),
+                     multicast(2)
+                }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Switch's ethernet multicast support.
+                      disable- multicast is disabled
+                      multicast - Multicast is enabled.
+                      unicast- Controller will convert multicast to
+                               unicast packet."
+          ::= { agentNetworkConfigGroup 10 }
+
+    agentNetworkDsPortNumber OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's distribution port number."
+          ::= { agentNetworkConfigGroup 11 }
+
+    agentNetworkUserIdleTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(10..2147483647)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the idle user timeout."
+          ::= { agentNetworkConfigGroup 12 }
+
+
+    agentNetworkArpTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(10..2147483647)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Sets the ARP entry timeout."
+          ::= { agentNetworkConfigGroup 13 }
+
+    agentNetworkManagementVlan OBJECT-TYPE
+         SYNTAX      Unsigned32(0..4095)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "VLAN ID of the network management interface."
+          ::= { agentNetworkConfigGroup 14 }
+
+    agentNetworkGvrpStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(0) }
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+        DESCRIPTION
+            "The state of GVRP operation on the Switch.  The value
+            enabled(1) indicates that GVRP is enabled on this port,
+            as long as dot1qGvrpStatus is also enabled for this
+            device.  When disabled(2) but dot1qGvrpStatus is still
+            enabled for the device, GVRP is disabled on this port:
+            any GVRP packets received will be silently discarded and
+            no GVRP registrations will be propagated from other
+            ports.  This object affects all GVRP Applicant and
+            Registrar state machines on this port.  A transition
+            from disabled(2) to enabled(1) will cause a reset of all
+            GVRP state machines on this port.(Attribute No longer
+            supported)"
+        DEFVAL      { enabled }
+        ::= { agentNetworkConfigGroup 15 }
+
+    agentNetworkAllowMgmtViaWireless OBJECT-TYPE
+         SYNTAX INTEGER {enable(1),disable(0)}
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This states whether Management via wireless is
+                      allowed or not."
+          ::= { agentNetworkConfigGroup 16 }
+
+    agentNetworkBroadcastSsidMode OBJECT-TYPE
+         SYNTAX INTEGER {enable(1),disable(0)}
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This mode when enabled allows WLAN SSIDs to be
+                      broadcasted."
+          ::= { agentNetworkConfigGroup 17 }
+
+    agentNetworkSecureWebPassword OBJECT-TYPE
+         SYNTAX  OCTET STRING(SIZE(1..32))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                    "SSL Certificate Password. This can be optionally
+                     set while downloading SSL certificates of type
+                     Web Admin and Web Authentication"
+          ::= { agentNetworkConfigGroup 18 }
+
+    agentNetworkWebAdminCertType OBJECT-TYPE
+         SYNTAX  DisplayString (SIZE(1..80))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+               "Type of currently existing Web Admin Certificate
+                installed on the Switch. It could be 'Empty' if the
+                certificate is not present, 'Locally Generated' if
+                the certificate is locally generated or it could
+                have a name if it is downloaded externally."
+          ::= { agentNetworkConfigGroup 19 }
+
+    agentNetworkWebAdminCertRegenerateCmdInvoke OBJECT-TYPE
+         SYNTAX INTEGER { default (0), activate (1) }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                "This command when set to 'activate' will regenerate
+                 a Web Administration Certificate Locally that will
+                 replace the existing certificate."
+          ::= { agentNetworkConfigGroup 20 }
+
+    agentNetworkWebAuthCertType OBJECT-TYPE
+         SYNTAX  DisplayString (SIZE(1..80))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+               "Type of currently exisitng Web Authentication
+               Certificate installed on the Switch. It could be
+               'Empty' if the certificate is not present, 'Locally
+               Generated' if the certificate is locally generated or
+               it could have a name if it is downloaded externally."
+          ::= { agentNetworkConfigGroup 21 }
+
+    agentNetworkWebAuthCertRegenerateCmdInvoke OBJECT-TYPE
+         SYNTAX INTEGER { default (0), activate (1) }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               "This command when set to 'activate' will regenerate a
+                Web Authentication Certificate Locally that will
+                replace the existing certificate."
+          ::= { agentNetworkConfigGroup 22 }
+
+    agentNetworkPeerToPeerBlockingMode OBJECT-TYPE
+         SYNTAX INTEGER {enable(1),disable(0)}
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                    "Mobile Peer to Peer Blocking mode on the switch."
+          ::= { agentNetworkConfigGroup 24 }
+
+    agentNetworkMulticastGroupAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Multicast group address for access points."
+         ::= { agentNetworkConfigGroup 25 }
+
+
+--********************************************************************
+-- agentNeworkRouteTable
+--********************************************************************
+
+     agentNetworkRouteConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentNetworkRouteConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the switch's Network Route entries"
+         ::= { agentNetworkConfigGroup 23 }
+
+    agentNetworkRouteConfigEntry OBJECT-TYPE
+         SYNTAX      AgentNetworkRouteConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Switch's Network Route entry"
+         INDEX       {agentNetworkRouteIPAddress }
+         ::= { agentNetworkRouteConfigTable 1 }
+
+    AgentNetworkRouteConfigEntry ::= SEQUENCE {
+           agentNetworkRouteIPAddress   IpAddress,
+           agentNetworkRouteIPNetmask   IpAddress,
+           agentNetworkRouteGateway     IpAddress,
+           agentNetworkRouteStatus      RowStatus
+       }
+
+    agentNetworkRouteIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                "Network Route IP Address."
+         ::= { agentNetworkRouteConfigEntry 1 }
+
+    agentNetworkRouteIPNetmask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+           "   Network Route IP Netmask."
+         ::= { agentNetworkRouteConfigEntry 2 }
+
+    agentNetworkRouteGateway OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+           "  Network Route IP Gateway."
+         ::= { agentNetworkRouteConfigEntry 3 }
+
+    agentNetworkRouteStatus OBJECT-TYPE
+         SYNTAX    RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Network Route Row Status."
+         ::= { agentNetworkRouteConfigEntry 23 }
+
+
+
+--********************************************************************
+-- agentInterfaceConfigTable
+--********************************************************************
+
+     agentInterfaceConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentInterfaceConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                "A table of the switch's Interface Config entries
+                 Typically, it will contain entries for Service
+                 Port Interface, DS Port Interface and Virtual
+                 Gateway Interface apart from other entries."
+         ::= { agentConfigGroup 13 }
+
+    agentInterfaceConfigEntry OBJECT-TYPE
+         SYNTAX      AgentInterfaceConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Switch's Interface Config entry"
+         INDEX       { agentInterfaceName }
+         ::= { agentInterfaceConfigTable 1 }
+
+    AgentInterfaceConfigEntry ::= SEQUENCE {
+           agentInterfaceName                    OCTET STRING,
+           agentInterfaceVlanId                  Integer32,
+           agentInterfaceType                    INTEGER,
+           agentInterfaceMacAddress              MacAddress,
+           agentInterfaceIPAddress               IpAddress,
+           agentInterfaceIPNetmask               IpAddress,
+           agentInterfaceIPGateway               IpAddress,
+           agentInterfacePortNo                  Integer32,
+           agentInterfaceActivePortNo            Integer32,
+           agentInterfaceBackupPortNo            Integer32,
+           agentInterfacePrimaryDhcpAddress      IpAddress,
+           agentInterfaceSecondaryDhcpAddress    IpAddress,
+           agentInterfaceDhcpProtocol            INTEGER,
+           agentInterfaceDnsHostName             DisplayString,
+           agentInterfaceAclName                 DisplayString,
+           agentInterfaceAPManagementFeature     INTEGER,
+           agentInterfaceRowStatus               RowStatus,
+           agentInterfaceVlanQuarantine          TruthValue
+       }
+
+    agentInterfaceName OBJECT-TYPE
+        SYNTAX     OCTET STRING(SIZE(1..32))
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+                "Interace Name. This values is 'management' for DS
+                 port, 'service-port' for service port and 'virtual'
+                 for virtual gateway. For other interfaces, the name
+                 can be anything. These interfaces are already created
+                 by default."
+        ::= { agentInterfaceConfigEntry 1 }
+
+    agentInterfaceVlanId OBJECT-TYPE
+        SYNTAX Integer32(0..4094)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "Vlan ID configured for the Interface."
+        DEFVAL{ 0 }
+        ::= { agentInterfaceConfigEntry 2 }
+
+    agentInterfaceType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     static(0),
+                     dynamic(1)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+               "The interface's type. The static type is set for
+                the interfaces that are created by default on the
+                switch and these cannot be deleted. Any other
+                interface that is created is of type dynamic
+                which can be deleted."
+         ::= { agentInterfaceConfigEntry 3 }
+
+    agentInterfaceMacAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Interface MAC Address. This is only applicable in
+                case of management and service-port interfaces."
+        ::= { agentInterfaceConfigEntry 4 }
+
+    agentInterfaceIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                "IP Address of the interface."
+         ::= { agentInterfaceConfigEntry 5 }
+
+    agentInterfaceIPNetmask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                "IP Netmask of the interface. This is 0 for the
+                 virtual interface."
+         ::= { agentInterfaceConfigEntry 6 }
+
+    agentInterfaceIPGateway OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                "IP Gateway of the interface. This is 0 for virtual
+                and service-port interface."
+         ::= { agentInterfaceConfigEntry 7 }
+
+    agentInterfacePortNo OBJECT-TYPE
+        SYNTAX Integer32(0..25)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "A value 0 means the port is not set. The valid value
+                 can be any one of the physical ports on the switch.
+                 This is the primary port configured on the
+                 interface."
+        DEFVAL{ 0 }
+        ::= { agentInterfaceConfigEntry 8 }
+
+    agentInterfacePrimaryDhcpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                "Primary DHCP Server IP Address for the interface
+                 This applies to the management interface and other
+                 dynamic interfaces."
+         ::= { agentInterfaceConfigEntry 9 }
+
+    agentInterfaceSecondaryDhcpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                "Secondary DHCP Server IP Address for the interface.
+                 This applies to the management interface and other
+                 dynamic interfaces."
+         ::= { agentInterfaceConfigEntry 10 }
+
+    agentInterfaceDhcpProtocol OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     disabled(0),
+                     enabled(1)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The interface's DHCP protocol. This applies only
+                      to the service port interface."
+          ::= { agentInterfaceConfigEntry 11 }
+
+    agentInterfaceDnsHostName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..80))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The DNS host name for the Virtual Interface.
+                     This attribute is not valid for other
+                     interfaces."
+         ::= { agentInterfaceConfigEntry 12 }
+
+    agentInterfaceAclName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Name of the Access Control List applied to the
+                      interface. This attribute is applicable only to
+                      the management interface and other dynamic
+                      interfaces. If it is required to remove the ACL
+                      name for an interface, it should be set to an
+                      empty string."
+         ::= { agentInterfaceConfigEntry 13 }
+
+    agentInterfaceAPManagementFeature OBJECT-TYPE
+         SYNTAX      INTEGER { disable(0), enable(1) }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+             "When enabled, the dynamic interface can be used for AP
+              management. SNMP support for AP management through
+              dynamic interfaces has been introduced since '3.0.21.0'
+              release.  Only applicable to dynamic interfaces in 4200
+              series. In static interfaces, 'disable' value 0
+              is returned. In 4000/3500 series of switches, 'disable'
+              value 0 is returned."
+         ::= { agentInterfaceConfigEntry 14 }
+
+    agentInterfaceActivePortNo OBJECT-TYPE
+        SYNTAX Integer32(0..25)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the currently active port for this
+                interface."
+        DEFVAL{ 0 }
+        ::= { agentInterfaceConfigEntry 15 }
+
+    agentInterfaceBackupPortNo OBJECT-TYPE
+        SYNTAX Integer32(0..4)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+                "This values is valid only for the 4200 series of
+                 switches. The backup port is the port this interface
+                 is moved to once the primary port fails.  A value 0
+                 means the port is not set.  The valid value can be
+                 any one of the physical ports on the 4200 switch."
+        DEFVAL{ 0 }
+        ::= { agentInterfaceConfigEntry 16 }
+
+agentInterfaceVlanQuarantine OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+                "This object is used to configure the health of the
+                interface identified by agentInterfaceName.
+
+                A value of 'true' is used to indicate that this
+                particular interface is unhealthy.  In this case,
+                the data packets of the clients, that are assigned
+                the VLAN Id corresponding to this interface, must
+                be tunneled to the Controller by the REAP AP.
+
+                A value of 'false' indicates that the VLAN configured
+                against the interface is healthy and that the REAP
+                AP can switch the clients of this VLAN locally rather
+                than tunneling them to the Controller. "
+        DEFVAL  { false }
+        ::= { agentInterfaceConfigEntry 17 }
+
+    agentInterfaceRowStatus OBJECT-TYPE
+         SYNTAX    RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The interface entry Row status."
+         ::= { agentInterfaceConfigEntry 31 }
+
+
+--********************************************************************
+-- agentNtpConfigGroup - Configuration of Switch Network Time Protocol
+--********************************************************************
+   agentNtpConfigGroup   OBJECT IDENTIFIER ::= { agentConfigGroup 14 }
+
+    agentNtpPollingInterval OBJECT-TYPE
+         SYNTAX      Integer32(3600..604800)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+               "Network Time Protocol polling interval. Min value
+                is one hour and maximum is a week."
+         ::= { agentNtpConfigGroup 1 }
+
+--********************************************************************
+-- agentNtpServerTable - Configuration of Network Time Protocol Server
+--********************************************************************
+
+    agentNtpServerTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentNtpServerEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A summary table for switch's lag config entries"
+         ::= { agentNtpConfigGroup 2 }
+
+    agentNtpServerEntry OBJECT-TYPE
+         SYNTAX      AgentNtpServerEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Switch's NTP Server entry. Upto 4 entries may be
+                      added."
+         INDEX       { agentNtpServerIndex }
+         ::= { agentNtpServerTable 1 }
+
+    AgentNtpServerEntry ::= SEQUENCE {
+             agentNtpServerIndex      Integer32,
+             agentNtpServerAddress    IpAddress,
+             agentNtpServerRowStatus  RowStatus
+             }
+
+    agentNtpServerIndex OBJECT-TYPE
+         SYNTAX      Integer32(1..3)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "NTP Server priority index."
+         ::= { agentNtpServerEntry 1 }
+
+
+    agentNtpServerAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the NTP Server"
+         ::= { agentNtpServerEntry 2 }
+
+    agentNtpServerRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "NTP server entry row status."
+         ::= { agentNtpServerEntry 20 }
+
+
+--********************************************************************
+-- agentDhcpConfigGroup - Configuration of Switch DHCP Server and
+--                        its Scopes
+--********************************************************************
+  agentDhcpConfigGroup   OBJECT IDENTIFIER ::= { agentConfigGroup 15 }
+
+    agentDhcpScopeTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDhcpScopeEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table listing the Scopes defined on the
+                      switch's DHCP Server."
+         ::= { agentDhcpConfigGroup 1 }
+
+    agentDhcpScopeEntry OBJECT-TYPE
+         SYNTAX      AgentDhcpScopeEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Switch's DHCP Server Scope entry."
+         INDEX       { agentDhcpScopeIndex }
+         ::= { agentDhcpScopeTable 1 }
+
+    AgentDhcpScopeEntry ::= SEQUENCE {
+             agentDhcpScopeIndex                        Unsigned32,
+             agentDhcpScopeName                         DisplayString,
+             agentDhcpScopeLeaseTime                    Integer32,
+             agentDhcpScopeNetwork                      IpAddress,
+             agentDhcpScopeNetmask                      IpAddress,
+             agentDhcpScopePoolStartAddress             IpAddress,
+             agentDhcpScopePoolEndAddress               IpAddress,
+             agentDhcpScopeDefaultRouterAddress1        IpAddress,
+             agentDhcpScopeDefaultRouterAddress2        IpAddress,
+             agentDhcpScopeDefaultRouterAddress3        IpAddress,
+             agentDhcpScopeDnsDomainName                DisplayString,
+             agentDhcpScopeDnsServerAddress1            IpAddress,
+             agentDhcpScopeDnsServerAddress2            IpAddress,
+             agentDhcpScopeDnsServerAddress3            IpAddress,
+             agentDhcpScopeNetbiosNameServerAddress1    IpAddress,
+             agentDhcpScopeNetbiosNameServerAddress2    IpAddress,
+             agentDhcpScopeNetbiosNameServerAddress3    IpAddress,
+             agentDhcpScopeState                        INTEGER,
+             agentDhcpScopeRowStatus                    RowStatus
+             }
+
+    agentDhcpScopeIndex OBJECT-TYPE
+         SYNTAX      Unsigned32(0..15)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "DHCP Scope Identifier Index."
+         ::= { agentDhcpScopeEntry 1 }
+
+    agentDhcpScopeName OBJECT-TYPE
+         SYNTAX      DisplayString(SIZE(1..79))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "DHCP Scope Name."
+         ::= { agentDhcpScopeEntry 2 }
+
+    agentDhcpScopeLeaseTime OBJECT-TYPE
+         SYNTAX      Integer32(120..8640000)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "DHCP Scope Lease time in seconds."
+         ::= { agentDhcpScopeEntry 3 }
+
+    agentDhcpScopeNetwork OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the DHCP Scope Network. This is
+                     the address which is used to determine the DHCP
+                     scope a remote Switch is attaching to."
+         ::= { agentDhcpScopeEntry 4 }
+
+    agentDhcpScopeNetmask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The DHCP Scope Netmask. This the subnet mask for
+                      the address pool."
+         ::= { agentDhcpScopeEntry 5 }
+
+    agentDhcpScopePoolStartAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The DHCP Scope address pool start IP address."
+         ::= { agentDhcpScopeEntry 6 }
+
+    agentDhcpScopePoolEndAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The DHCP Scope address pool end IP address."
+         ::= { agentDhcpScopeEntry 7 }
+
+    agentDhcpScopeDefaultRouterAddress1 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the DHCP Scope's default Router
+                     1."
+         ::= { agentDhcpScopeEntry 8 }
+
+    agentDhcpScopeDefaultRouterAddress2 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the DHCP Scope's default Router
+                     2."
+         ::= { agentDhcpScopeEntry 9 }
+
+    agentDhcpScopeDefaultRouterAddress3 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the DHCP Scope's default Router
+                     3."
+         ::= { agentDhcpScopeEntry 10 }
+
+    agentDhcpScopeDnsDomainName OBJECT-TYPE
+         SYNTAX      DisplayString(SIZE(0..79))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "DNS Domain name for the DHCP Scope."
+         ::= { agentDhcpScopeEntry 11 }
+
+    agentDhcpScopeDnsServerAddress1 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the DHCP Scope's DNS Server 1."
+         ::= { agentDhcpScopeEntry 12 }
+
+    agentDhcpScopeDnsServerAddress2 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the DHCP Scope's DNS Server 2."
+         ::= { agentDhcpScopeEntry 13 }
+
+    agentDhcpScopeDnsServerAddress3 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of the DHCP Scope's DNS Server 3."
+         ::= { agentDhcpScopeEntry 14 }
+
+    agentDhcpScopeNetbiosNameServerAddress1 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of DHCP Scope's Netbios Name Server
+                     1."
+         ::= { agentDhcpScopeEntry 15 }
+
+    agentDhcpScopeNetbiosNameServerAddress2 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of DHCP Scope's Netbios Name Server
+                     2."
+         ::= { agentDhcpScopeEntry 16 }
+
+    agentDhcpScopeNetbiosNameServerAddress3 OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "IP Address of DHCP Scope's Netbios Name Server
+                     3."
+         ::= { agentDhcpScopeEntry 17 }
+
+    agentDhcpScopeState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                     disable(0),
+                     enable(1)
+                 }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                      "DHCP Scope's State."
+         ::= { agentDhcpScopeEntry 18 }
+
+    agentDhcpScopeRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Dhcp Scope entry row status."
+         ::= { agentDhcpScopeEntry 30 }
+
+
+--********************************************************************
+-- agentServicePortConfigGroup
+-- (Interface of type service-port in agentInterfaceConfigTable
+--        use is recommended instead of this group.)
+--********************************************************************
+
+    agentServicePortConfigGroup  OBJECT IDENTIFIER ::=
+                                           { agentConfigGroup 4 }
+
+    agentServicePortIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "The switch's Service Port IP address.
+                      (Service-port interface use is recommended
+                      instead
+                       of this group)"
+         ::= { agentServicePortConfigGroup 1 }
+
+    agentServicePortSubnetMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "The switch's Service Port subnet mask.
+                      (Service-port interface in
+                       agentInterfaceConfigTable is recommended
+                       instead
+                       of this group)"
+         ::= { agentServicePortConfigGroup 2 }
+
+    agentServicePortDefaultGateway OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Not Supported for release 1.0.  The switch's
+                      Service Port default gateway.  (Service-port
+                      interface in agentInterfaceConfigTable is
+                      recommended instead of this group)"
+         ::= { agentServicePortConfigGroup 3 }
+
+    agentServicePortBurnedInMacAddress OBJECT-TYPE
+         SYNTAX      PhysAddress
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION
+                     "The switch's Service Port Burned-In MAC address
+                      (Service-port interface in
+                       agentInterfaceConfigTable is recommended
+                       instead
+                       of this group)"
+         ::= { agentServicePortConfigGroup 4 }
+
+    agentServicePortConfigProtocol OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(1),
+                     dhcp(3)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "The switch's Service Port config protocol
+                      (Service-port interface in
+                       agentInterfaceConfigTable is recommended
+                       instead
+                       of this group)"
+          ::= { agentServicePortConfigGroup 5 }
+
+
+--********************************************************************
+-- agentSnmpConfigGroup
+--********************************************************************
+
+    agentSnmpConfigGroup  OBJECT IDENTIFIER  ::=  {agentConfigGroup 5}
+
+
+    agentSnmpTrapPortNumber OBJECT-TYPE
+         SYNTAX  Unsigned32(1..65534)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+        "Snmp Trap Port Number"
+         ::= { agentSnmpConfigGroup 1 }
+
+    agentSnmpVersion1Status OBJECT-TYPE
+         SYNTAX  INTEGER{disable(0),enable(1)}
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+        "Snmp Version 1 Status"
+         ::= { agentSnmpConfigGroup 2 }
+
+    agentSnmpVersion2cStatus OBJECT-TYPE
+         SYNTAX  INTEGER{disable(0),enable(1)}
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+        "Snmp Version 2c Status"
+         ::= { agentSnmpConfigGroup 3 }
+
+
+--********************************************************************
+-- agentSnmpCommunityConfigTable
+--********************************************************************
+    agentSnmpCommunityConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentSnmpCommunityConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the switch's SNMP community Config
+                      entries"
+         ::= { agentSnmpConfigGroup 5 }
+
+    agentSnmpCommunityConfigEntry OBJECT-TYPE
+         SYNTAX      AgentSnmpCommunityConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Switch's SNMP community Config entry"
+         INDEX       {agentSnmpCommunityName }
+         ::= { agentSnmpCommunityConfigTable 1 }
+
+    AgentSnmpCommunityConfigEntry ::= SEQUENCE {
+           agentSnmpCommunityName         DisplayString,
+           agentSnmpCommunityIPAddress    IpAddress,
+           agentSnmpCommunityIPMask       IpAddress,
+           agentSnmpCommunityAccessMode   INTEGER,
+           agentSnmpCommunityEnabled      INTEGER,
+           agentSnmpCommunityStatus       RowStatus
+       }
+
+    agentSnmpCommunityName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE (1..16))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Snmp Community Name
+                     This name identifies each SNMP community;
+                     the name can be up to 16 characters, and it is
+                     case-sensitive. Community names in the SNMP
+                     community must be unique.  If you make multiple
+                     entries using the same community name, the first
+                     entry is kept and processed and all duplicate
+                     entries are ignored. "
+         ::= { agentSnmpCommunityConfigEntry 1 }
+
+    agentSnmpCommunityIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Snmp Community IP Address
+                     Client IP Address - This attribute is an IP
+                     address (or portion thereof) from which this
+                     device will accept SNMP packets with the
+                     associated community. The requesting entity's IP
+                     address is logical-ANDed with the Client IP Mask
+                     and the result must match the Client IP Address.
+                     Note: If the Client IP Mask is set to 0.0.0.0, a
+                     Client IP Address of 0.0.0.0 matches all IP
+                     addresses."
+         ::= { agentSnmpCommunityConfigEntry 2 }
+
+    agentSnmpCommunityIPMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                    "The switch's Snmp Community
+                     IP Mask Client IP Mask - This attribute is a mask
+                     to be logical-ANDed with the requesting entity's
+                     IP address before comparison with the Client IP
+                     Address. If the result matches with Client IP
+                     Address then the address is an authenticated IP
+                     address. For example, if the Client IP Address
+                     is 9.47.128.0 and the corresponding Client IP
+                     Mask is 255.255.255.0, a range of incoming IP
+                     addresses would match, that is, the incoming IP
+                     addresses could be a value in the following
+                     range: 9.47.128.0 to 9.47.128.255.  To have a
+                     specific IP address be the only authenticated IP
+                     address, set the Client IP Address to the
+                     required IP address and set the Client IP Mask to
+                     255.255.255.255."
+         ::= { agentSnmpCommunityConfigEntry 3 }
+
+    agentSnmpCommunityAccessMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     readOnly(1),
+                     readWrite(2)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Snmp Community Access Mode
+                     Access Mode - This value can be readOnly or
+                     readWrite.  A community with a read-only access
+                     allows for switch information to be displayed.
+                     A community with a readWrite access allows for
+                     configuration changes to be made and for
+                     information to be displayed. "
+         DEFVAL {readOnly}
+         ::= { agentSnmpCommunityConfigEntry 4 }
+
+    agentSnmpCommunityEnabled OBJECT-TYPE
+         SYNTAX      INTEGER { no(0), yes(1) }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                   "If community is Enabled  "
+    DEFVAL { no }
+         ::= { agentSnmpCommunityConfigEntry 5 }
+
+    agentSnmpCommunityStatus OBJECT-TYPE
+         SYNTAX    RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Snmp Community Status.
+                     active(1)        - This community is active,
+                                        allowing SNMP manager
+                                        associated
+                                        with this community to manage
+                                        the switch according to its
+                                        access right.
+
+                     notInService(2)  - This community is not active;
+                     no
+                                        SNMP requests using this
+                                        community will be accepted. In
+                                        this case the SNMP manager
+                                        associated with this community
+                                        cannot manage the switch until
+                                        the Status is changed back to
+                                        active(1).
+
+                     config(3)        - The community Status must be
+                                        set to this value in order to
+                                        configure it.  When creating a
+                                        new community entry, initial
+                                        Status will be set to this
+                                        value.
+
+                     destroy(4)       - Set to this value to remove
+                     the
+                                        community from the agent."
+         ::= { agentSnmpCommunityConfigEntry 25 }
+
+
+--********************************************************************
+-- agentSnmpTrapReceiverConfigTable
+--********************************************************************
+
+    agentSnmpTrapReceiverConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentSnmpTrapReceiverConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                "Trap messages are sent across a network to an SNMP
+                 Network Manager. These messages alert the manager to
+                 events occurring within the switch or on the network.
+                 Up to six simultaneous trap receivers are supported."
+         ::= { agentSnmpConfigGroup 6 }
+
+    agentSnmpTrapReceiverConfigEntry OBJECT-TYPE
+         SYNTAX      AgentSnmpTrapReceiverConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                "Switch's Snmp Trap Receiver Config entry"
+         INDEX   { agentSnmpTrapReceiverName }
+         ::= { agentSnmpTrapReceiverConfigTable 1 }
+
+    AgentSnmpTrapReceiverConfigEntry ::= SEQUENCE {
+           agentSnmpTrapReceiverName       OCTET STRING,
+           agentSnmpTrapReceiverIPAddress  IpAddress,
+           agentSnmpTrapReceiverEnabled    INTEGER,
+           agentSnmpTrapReceiverStatus     RowStatus
+       }
+
+    agentSnmpTrapReceiverName OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(1..16))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Snmp Trap Receiver Name.
+                     This is the name of the remote network manager.
+                     the name can be up to 16 characters,
+                     and is case-sensitive."
+         ::= { agentSnmpTrapReceiverConfigEntry 1 }
+
+    agentSnmpTrapReceiverIPAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMP network Manager IP Address. The  IP Address
+                     traps will be sent to. Each IP address parameter
+                     is four  integer numbers.  The numbers range from
+                     0 to 255.  After creation of entry IP Address
+                     cannot be changed."
+         ::= { agentSnmpTrapReceiverConfigEntry 2 }
+
+    agentSnmpTrapReceiverEnabled OBJECT-TYPE
+         SYNTAX      INTEGER{no(0),yes(1)}
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The flag to enable the trap receiver. If
+                      disabled, no traps are sent to this receiver's
+                      IP Address. "
+         DEFVAL{ no }
+         ::= { agentSnmpTrapReceiverConfigEntry 3 }
+
+    agentSnmpTrapReceiverStatus OBJECT-TYPE
+         SYNTAX   RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                "This object is used to create and delete instances
+                of this table.
+                The row, when created with the row status value
+                of 'createAndGo' or 'createAndWait' is moved to the
+                'active' state automatically by the agent and remains
+                in that state till the time the row is removed through
+                the 'destroy' option."
+         ::= { agentSnmpTrapReceiverConfigEntry 23 }
+
+--********************************************************************
+-- agentSnmpTrapFlagsConfigGroup
+--********************************************************************
+
+    agentSnmpTrapFlagsConfigGroup OBJECT IDENTIFIER ::=
+                                    { agentSnmpConfigGroup 7  }
+
+    agentSnmpAuthenticationTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Authentication Flag - Enable/Disable
+                      authentication Flag."
+         ::= { agentSnmpTrapFlagsConfigGroup 1 }
+
+    agentSnmpLinkUpDownTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Link Up/Down Flag - Enable/Disable Link Up/Link
+                      Down traps for the entire switch. When set to
+                      Enable, the Link Up/Down traps will be sent only
+                      if the Link Trap flag setting associated with
+                      the port (Port Configuration Menu) is set to
+                      Enable."
+         ::= { agentSnmpTrapFlagsConfigGroup 2 }
+
+    agentSnmpMultipleUsersTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Multiple Users Flag - Enable/Disable Multiple
+                     User traps. When the value is set to Enable, a
+                     Multiple User Trap is sent whenever someone logs
+                     in to the terminal interface (EIA 232 or Telnet)
+                     and there is already an existing terminal
+                     interface session"
+         ::= { agentSnmpTrapFlagsConfigGroup 3 }
+
+    agentSnmpSpanningTreeTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Spanning Tree Flag - This flag enables the
+                      sending of new root traps and topology change
+                      notification traps."
+         ::= { agentSnmpTrapFlagsConfigGroup 4 }
+
+    agentSnmpBroadcastStormTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Broadcast Storm Flag - This flag enables or
+                     disables the broadcast storm trap. You must also
+                     enable Broadcast Storm Recovery Mode
+                     (see the Switch Configuration Menu). When this
+                     value is set to Enable and Broadcast Storm
+                     Recovery mode is set to Enable, the Broadcast
+                     Storm Start/End traps are sent when the switch
+                     enters and leaves Broadcast Storm Recovery."
+         ::= { agentSnmpTrapFlagsConfigGroup 5 }
+
+--********************************************************************
+-- agentSnmpV3ConfigGroup
+--********************************************************************
+
+ agentSnmpV3ConfigGroup   OBJECT IDENTIFIER  ::=  {agentConfigGroup 6}
+
+
+    agentSnmpVersion3Status OBJECT-TYPE
+         SYNTAX  INTEGER{disable(0),enable(1)}
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+        "Snmp Version 3 Status"
+         ::= { agentSnmpV3ConfigGroup 1 }
+
+--********************************************************************
+-- agentSnmpV3UserConfigTable
+--********************************************************************
+
+    agentSnmpV3UserConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentSnmpV3UserConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "User Config Table. Only creation and deletion of
+                      users is supported.  All individual updates are
+                      not supported."
+         ::= { agentSnmpV3ConfigGroup 2 }
+
+    agentSnmpV3UserConfigEntry OBJECT-TYPE
+         SYNTAX      AgentSnmpV3UserConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "User Config Entry"
+         INDEX { agentSnmpV3UserName }
+         ::= { agentSnmpV3UserConfigTable 1 }
+
+    AgentSnmpV3UserConfigEntry ::= SEQUENCE {
+                 agentSnmpV3UserName                    OCTET STRING,
+                 agentSnmpV3UserAccessMode              INTEGER,
+                 agentSnmpV3UserAuthenticationType      INTEGER,
+                 agentSnmpV3UserEncryptionType          INTEGER,
+                 agentSnmpV3UserAuthenticationPassword  OCTET STRING,
+                 agentSnmpV3UserEncryptionPassword      OCTET STRING,
+                 agentSnmpV3UserStatus                  RowStatus
+             }
+
+    agentSnmpV3UserName OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(1..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Agent User Name."
+         ::= { agentSnmpV3UserConfigEntry 1 }
+
+    agentSnmpV3UserAccessMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     readonly(1),
+                     readwrite(2)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Agent User Access Mode"
+         ::= { agentSnmpV3UserConfigEntry 2 }
+
+
+    agentSnmpV3UserAuthenticationType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(1),
+                     hmacmd5(2),
+                     hmacsha(3)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 User Authentication
+                     none(1)      - no authentication used
+                     hmacmd5(1)   - Use HMAC-MD5 authentication
+                     hmacsha(1)   - Use HMAC-SHA authentication"
+         ::= { agentSnmpV3UserConfigEntry 3 }
+
+    agentSnmpV3UserEncryptionType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(1),
+                     des(2)
+                  }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 User Encryption Must be set to none(1) if
+                     agentSnmpV3UserAuthenticationType is set to
+                     none(1).  Setting this object will set the
+                     encryption password to an empty string.
+                     none(1) - no encryption used
+                     des(1)  - DES encryption used"
+         ::= { agentSnmpV3UserConfigEntry 4 }
+
+    agentSnmpV3UserAuthenticationPassword OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(0..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 User Encryption Password"
+         ::= { agentSnmpV3UserConfigEntry 5 }
+
+    agentSnmpV3UserEncryptionPassword OBJECT-TYPE
+         SYNTAX      OCTET STRING (SIZE(0..32))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "SNMPv3 User Encryption Password"
+         ::= { agentSnmpV3UserConfigEntry 6 }
+
+    agentSnmpV3UserStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Agent User Status.
+                     active(1)  - This user account is active.
+                     destroy(6) - Set to this value to remove this
+                     user account."
+         ::= { agentSnmpV3UserConfigEntry 26 }
+
+
+--********************************************************************
+-- agentSpanningTreePortTable
+--********************************************************************
+    agentSpanningTreeConfigGroup  OBJECT IDENTIFIER ::=
+                                       { agentConfigGroup 7 }
+
+
+    agentSpanningTreeMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Spanning Tree Switch Status"
+         ::= { agentSpanningTreeConfigGroup 1 }
+
+
+--********************************************************************
+-- agentSwitchConfigGroup
+--********************************************************************
+
+    agentSwitchConfigGroup  OBJECT IDENTIFIER ::= { agentConfigGroup 8
+    }
+
+    agentSwitchAddressAgingTimeoutTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentSwitchAddressAgingTimeoutEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The switch's address aging timeout table"
+         ::= { agentSwitchConfigGroup 4 }
+
+    agentSwitchAddressAgingTimeoutEntry OBJECT-TYPE
+         SYNTAX      AgentSwitchAddressAgingTimeoutEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Aging information about a specific Filtering
+                      Database."
+         INDEX       { dot1qFdbId }
+         ::= { agentSwitchAddressAgingTimeoutTable 1 }
+
+    AgentSwitchAddressAgingTimeoutEntry ::=
+         SEQUENCE {
+             agentSwitchAddressAgingTimeout
+                 Integer32
+         }
+
+    agentSwitchAddressAgingTimeout OBJECT-TYPE
+         SYNTAX   Integer32 (10..1000000)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The FDB entry's address aging timeout(in
+                     seconds)"
+         DEFVAL { 300 }
+         ::= { agentSwitchAddressAgingTimeoutEntry 10 }
+
+    agentSwitchBroadcastControlMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch config broadcast allows you to enable
+                      or disable broadcast storm recovery mode. When
+                      you specify Enable for Broadcast Storm Recovery
+                      and the broadcast traffic on any Ethernet port
+                      exceeds 20 percent of the link speed, the switch
+                      blocks (discards) the broadcast traffic until
+                      the broadcast traffic returns to 10 percent or
+                      less.Upper limit for 10M link is 20% and lower
+                      limit is 10%.  For 100M link Upper limit is 5%
+                      and lower limit is 2%"
+         ::= { agentSwitchConfigGroup 2 }
+
+    agentSwitchDot3FlowControlMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Config switchconfig flowcontrol allows you to
+                      enable or disable 802.3x flow control for the
+                      switch. This value applies to only full-duplex
+                      mode ports. "
+         ::= { agentSwitchConfigGroup 3 }
+
+    agentSwitchLwappTransportMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     layer2(1),
+                     layer3(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The LWAPP transport mode decides if the switch
+                      is operating in the Layer2 or Layer3 mode.
+                      The switch needs to be rebooted for the mode
+                      change to take effect."
+         ::= { agentSwitchConfigGroup 5 }
+
+
+--********************************************************************
+-- agentTransferConfigGroup
+--********************************************************************
+
+    agentTransferConfigGroup    OBJECT IDENTIFIER ::=
+                                       { agentConfigGroup 9 }
+
+
+--*******************************************************************
+-- agentTransferUploadGroup
+--*******************************************************************
+
+    agentTransferUploadGroup    OBJECT IDENTIFIER ::=
+                                { agentTransferConfigGroup 1 }
+
+    agentTransferUploadMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     tftp(1),
+                     xmodem(2),
+                     ymodem(3),
+                     zmodem(4)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer upload mode configures the mode to use
+                      when uploading from the switch. The mode is
+                      either X/Y/ZMODEM or TFTP. X/Y/ZMODEM is valid
+                      only when the file transfer is initiated by the
+                      serial EIA 232 port."
+         ::= { agentTransferUploadGroup 1 }
+
+    agentTransferUploadServerIP OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer upload tftpserverip configures the IP
+                      address of the server where the file will be
+                      uploaded. It is valid only when the Transfer
+                      Mode is TFTP. The address is 4 integer bytes
+                      ranging from 0 to 255."
+         ::= { agentTransferUploadGroup 2 }
+
+    agentTransferUploadPath OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..63))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer upload tftppath configures the
+                     directory
+                      path where the file is to be uploaded to. The
+                      switch remembers the last file path used."
+         ::= { agentTransferUploadGroup 3 }
+
+    agentTransferUploadFilename OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..63))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer upload tftpfilename configures the
+                      file name for the file being uploaded from the
+                      switch. It can be up to 32 alphanumeric
+                      characters. The switch remembers the last file
+                      name used. File path can be appended to the file
+                      name if the string is less than 17 characters.
+                      Otherwise, the File Path field will need to be
+                      used and the File Name will be appended to the
+                      File Path as is. An example would be File Path
+                      set to c:\tftp\code\ and File Name set to
+                      e1r1v1.opr.
+                      Note: File Name, File Path, and TFTP Server IP
+                      Address are applicable only if the Transfer Mode
+                      is TFTP."
+         ::= { agentTransferUploadGroup 4 }
+
+    agentTransferUploadDataType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      config(2),
+                      errorlog(3),
+                      systemtrace(4),
+                      traplog(5),
+                      crashfile(6),
+                      signatures(7),
+                      unknown(99)
+                    }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer upload datatype configures the type of
+                      file to upload from the switch.
+                      The types for upload are:
+                        -   Configuration File
+                        -   Error log
+                        -   System trace
+                        -   Trap log
+                        -   Crash File
+                     "
+         ::= { agentTransferUploadGroup 5 }
+
+
+    agentTransferUploadStart OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer upload start will start an upload
+                      transfer. The agentTransferUploadMode object
+                      must not be set to xmodem(2), ymodem(3), or
+                      zmodem(4) to initiate a transfer via SNMP."
+         ::= { agentTransferUploadGroup 6 }
+
+    agentTransferUploadStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     notInitiated(1),
+                     transferStarting(2),
+                     errorStarting(3),
+                     wrongFileType(4),
+                     updatingConfig(5),
+                     invalidConfigFile(6),
+                     writingToFlash(7),
+                     failureWritingToFlash(8),
+                     checkingCRC(9),
+                     failedCRC(10),
+                     unknownDirection(11),
+                     transferSuccessful(12),
+                     transferFailed(13),
+                     unknown(99)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the current status of an upload
+                      transfer."
+         ::= { agentTransferUploadGroup 7 }
+
+    agentTransferConfigurationFileEncryption OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     disable(0),
+                     enable(1)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The configuration file can be encrypted before
+                      tftp upload from the switch and then decrypted
+                      before downloading to the switch when this
+                      option is enabled."
+         ::= { agentTransferConfigGroup 3 }
+
+    agentTransferConfigurationFileEncryptionKey OBJECT-TYPE
+         SYNTAX      DisplayString(SIZE(0..16))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This is the key to be used when encrypting the
+                      configuration file while upload from the switch
+                      or while decrypting the file after download to
+                      the switch."
+         ::= { agentTransferConfigGroup 4 }
+
+
+
+--********************************************************************
+-- agentTransferDownloadGroup
+--********************************************************************
+
+    agentTransferDownloadGroup   OBJECT IDENTIFIER ::=
+                                   { agentTransferConfigGroup 2 }
+
+    agentTransferDownloadMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     tftp(1),
+                     xmodem(2),
+                     ymodem(3),
+                     zmodem(4)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer download mode configures the mode to
+                     use when downloading to the switch. The mode is
+                     either X/Y/ZMODEM or TFTP. X/Y/ZMODEM is valid
+                     only when the file transfer is initiated by the
+                     serial EIA 232 port."
+         ::= { agentTransferDownloadGroup 1 }
+
+    agentTransferDownloadServerIP OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer download tftpserverip configures the IP
+                      address of the server where the file is located.
+                      It is valid only when the Transfer Mode is TFTP.
+                      The address is 4 integer bytes ranging from 0 to
+                      255."
+         ::= { agentTransferDownloadGroup 2 }
+
+    agentTransferDownloadPath OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..63))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer download tftppath configures the
+                      directory path where the file is located. The
+                      switch remembers the last file path used."
+         ::= { agentTransferDownloadGroup 3 }
+
+    agentTransferDownloadFilename OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..63))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer download tftpfilename configures the
+                      file name for the file being downloaded to the
+                      switch. It can be up to 32 alphanumeric
+                      characters. The switch remembers the last file
+                      name used.  File path can be appended to the
+                      file name if the string is less than 33
+                      characters. Otherwise, the File Path field will
+                      need to be used and the File Name will be
+                      appended to the File Path as is. An example
+                      would be File Path set to c:\tftp\code\
+                      and File Name set to e1r1v1.opr. Note: File
+                      Name, File Path, and TFTP Server IP Address are
+                      applicable only if the Transfer Mode is TFTP."
+
+         ::= { agentTransferDownloadGroup 4 }
+
+    agentTransferDownloadDataType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     code(2),
+                     config(3),
+                     webauthcert(4),
+                     webadmincert(5),
+                     signatures(6),
+                     customWebAuth(7),
+                     unknown(99)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer download datatype configures the type
+                      of file to downloaded to the switch.
+                      The types for download are:
+                        -   Code
+                        -   Configuration
+                        -   Certificates
+                        -   Signatures
+                        -   customWebauth- custom webauth tar ball"
+         ::= { agentTransferDownloadGroup 5 }
+
+
+    agentTransferDownloadStart OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Transfer download start will start an download
+                      transfer. The agentTransferDownloadMode object
+                      must not be set to xmodem(2), ymodem(3), or
+                      zmodem(4) to initiate a transfer via SNMP."
+         ::= { agentTransferDownloadGroup 6 }
+
+    agentTransferDownloadStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     notInitiated(1),
+                     transferStarting(2),
+                     errorStarting(3),
+                     wrongFileType(4),
+                     updatingConfig(5),
+                     invalidConfigFile(6),
+                     writingToFlash(7),
+                     failureWritingToFlash(8),
+                     checkingCRC(9),
+                     failedCRC(10),
+                     unknownDirection(11),
+                     transferSuccessful(12),
+                     transferFailed(13),
+                     bootBreakOff(14),
+                     invalidTarFile(15),
+                     unknown(99)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indicates the current status of an download
+                      transfer."
+         ::= { agentTransferDownloadGroup 7 }
+
+    agentTransferDownloadTftpMaxRetries OBJECT-TYPE
+         SYNTAX      Unsigned32(1..254)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Maximum number of retries to be allowed for a
+                      TFTP message packet."
+         DEFVAL{ 10 }
+          ::= { agentTransferDownloadGroup 8 }
+
+    agentTransferDownloadTftpTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(1..254)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Timeout in seconds for a TFTP message packet."
+         DEFVAL{ 6 }
+          ::= { agentTransferDownloadGroup 9 }
+
+--********************************************************************
+    -- agentDot3adAggPortTable
+--********************************************************************
+
+    agentDot3adAggPortTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentDot3adAggPortEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "This table provides 802.3ad link aggregation
+                      information for each physical port that is not
+                      available through the standard MIB."
+         ::= { agentConfigGroup 11 }
+
+    agentDot3adAggPortEntry OBJECT-TYPE
+         SYNTAX      AgentDot3adAggPortEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "Information about a table entry.  The
+                      agentDot3adAggPort identifies the external
+                      interface number of the port."
+         INDEX       { agentDot3adAggPort }
+         ::= { agentDot3adAggPortTable 1 }
+
+    AgentDot3adAggPortEntry ::= SEQUENCE {
+         agentDot3adAggPort           Integer32,
+         agentDot3adAggPortLACPMode   INTEGER
+         }
+
+    agentDot3adAggPort OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION
+                     "ifIndex of this physical port"
+         ::= { agentDot3adAggPortEntry 1 }
+
+    agentDot3adAggPortLACPMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "Enable/disable 802.3ad LACP on this port"
+         ::= { agentDot3adAggPortEntry 21 }
+
+
+--********************************************************************
+    -- agentPortConfigTable
+    --
+--********************************************************************
+
+    agentPortConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentPortConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of the switch's physical port config
+                      entries"
+         ::= { agentConfigGroup 12 }
+
+    agentPortConfigEntry OBJECT-TYPE
+         SYNTAX      AgentPortConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Switch's physical port config entry"
+         INDEX       { agentPortDot1dBasePort }
+         ::= { agentPortConfigTable 1 }
+
+    AgentPortConfigEntry ::= SEQUENCE {
+          agentPortDot1dBasePort         Integer32,
+          agentPortIfIndex               Integer32,
+          agentPortIanaType              IANAifType,
+          agentPortSTPMode               INTEGER,
+          agentPortSTPState              INTEGER,
+          agentPortAdminMode             INTEGER,
+          agentPortPhysicalMode          INTEGER,
+          agentPortPhysicalStatus        INTEGER,
+          agentPortLinkTrapMode          INTEGER,
+          agentPortClearStats            INTEGER,
+          agentPortDefaultType           OBJECT IDENTIFIER,
+          agentPortType                  OBJECT IDENTIFIER,
+          agentPortAutoNegAdminStatus    INTEGER,
+          agentPortDot3FlowControlMode   INTEGER,
+          agentPortPowerMode             INTEGER,
+          agentPortGvrpStatus            INTEGER,
+          agentPortGarpJoinTime          Unsigned32,
+          agentPortGarpLeaveTime         Unsigned32,
+          agentPortGarpLeaveAllTime      Unsigned32,
+          agentPortMirrorMode            INTEGER,
+          agentPortMulticastApplianceMode  INTEGER,
+          agentPortOperationalStatus       INTEGER
+          }
+
+    agentPortDot1dBasePort OBJECT-TYPE
+         SYNTAX  Integer32 (1..65535)
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                 "The port number of this port."
+         ::= { agentPortConfigEntry 1 }
+
+    agentPortIfIndex OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port IfIndex"
+         ::= { agentPortConfigEntry 2 }
+
+    agentPortIanaType OBJECT-TYPE
+         SYNTAX      IANAifType
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port Type"
+         ::= { agentPortConfigEntry 3 }
+
+    agentPortSTPMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      dot1d(1),
+                      fast(2),
+                      off(3)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port Spanning Tree Protocol Mode
+                      STP mode values are:
+                      dot1d (the default)
+                      fast, indicates you want to use the fast
+                      spanning tree mode
+                      off, indicates the STP mode is turned off for a
+                      particular port"
+         ::= { agentPortConfigEntry 4 }
+
+    agentPortSTPState OBJECT-TYPE
+         SYNTAX      INTEGER {
+                      blocking(1),
+                      listening(2),
+                      learning(3),
+                      forwarding(4),
+                      disabled(5)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port Spanning Tree Protocol State"
+         ::= { agentPortConfigEntry 5 }
+
+    agentPortAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                 }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port Admin Mode"
+         ::= { agentPortConfigEntry 6 }
+
+    agentPortPhysicalMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     autoNegotiate(1),
+                     half10(2),
+                     full10(3),
+                     half100(4),
+                     full100(5),
+                     full1000sx(8)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port Speed Mode.  This is the
+                      configured physical mode.This object is
+                      read-only for gigabit ports"
+         ::= { agentPortConfigEntry 7 }
+
+    agentPortPhysicalStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     autonegotiate(1),
+                     half10(2),
+                     full10(3),
+                     half100(4),
+                     full100(5),
+                     full1000sx(8),
+                     unknown(9)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port Physical Speed Status.This
+                      is the current actual speed."
+         ::= { agentPortConfigEntry 8 }
+
+    agentPortLinkTrapMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "If enabled, link up and link down traps will be
+                      sent for this port."
+         ::= { agentPortConfigEntry 9 }
+
+     agentPortClearStats OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Clear stats for this port only"
+         ::= { agentPortConfigEntry 10 }
+
+    agentPortDefaultType OBJECT-TYPE
+         SYNTAX  OBJECT IDENTIFIER
+         MAX-ACCESS  read-write
+         STATUS  current
+         DESCRIPTION
+                 "This object identifies the default administrative
+                  port type, to be used in conjunction with the
+                  operational port type denoted by agentPortType.
+
+                  The set of possible values for this object is
+                  the same as the set defined for the agentPortType
+                  object.
+
+                  This object represents the administratively-
+                  configured
+                  type of the MAU.  If auto-negotiation is not enabled
+                  or is not implemented for this MAU, the value of
+                  this object determines the operational type of the
+                  MAU.  In this case, a set to this object will force
+                  the MAU into the specified operating mode.
+
+                  If auto-negotiation is implemented and enabled for
+                  this MAU, the operational type of the MAU is
+                  determined by auto-negotiation, and the value of
+                  this object denotes the type to which the MAU will
+                  automatically revert if/when auto-negotiation is
+                  later disabled.
+
+                  The valid values for this object are:
+                       dot3MauType10BaseTHD
+                       dot3MauType10BaseTFD
+                       dot3MauType100BaseTXHD
+                       dot3MauType100BaseTXFD
+                       dot3MauType100BaseFXFD
+                       dot3MauType1000BaseSXFD"
+
+         REFERENCE "RFC 2668"
+         ::= { agentPortConfigEntry 11 }
+
+    agentPortType OBJECT-TYPE
+         SYNTAX  OBJECT IDENTIFIER
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+                 "This object identifies the port type.
+                  An initial set of MAU types are defined in RFC 2668.
+                  The assignment of OBJECT IDENTIFIERs to new types of
+                  MAUs is managed by the IANA.
+
+                  If the MAU type is unknown, the object identifier
+                  unknownMauType OBJECT IDENTIFIER ::= { 0 0 }
+                  is returned.  Note that unknownMauType is a
+                  syntactically valid object identifier, and any
+                  conformant implementation of ASN.1 and the BER must
+                  be able to generate and recognize this value.
+                  This object represents the operational type of the
+                  MAU, as determined by either (1) the result of the
+                  auto-negotiation function or (2) if auto-negotiation
+                  is not enabled or is not implemented for this MAU,
+                  by the value of the object qbEnetDefaultType, or (3)
+                  for the GigE card a value determined by the GBIC
+                  connected to the card.  In case (2), a set to the
+                  object qbEnetPortDefaultType will force the MAU into
+                  the new operating mode.
+
+                  The valid values for this object are:
+
+                       dot3MauType10BaseTHD
+                       dot3MauType10BaseTFD
+                       dot3MauType100BaseTXHD
+                       dot3MauType100BaseTXFD
+                       dot3MauType100BaseFXFD
+                       dot3MauType1000BaseSXFD"
+
+         REFERENCE "RFC 2668"
+         ::= { agentPortConfigEntry 12 }
+
+    agentPortAutoNegAdminStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                    enable(1),
+                    disable(2)
+                 }
+         MAX-ACCESS  read-write
+         STATUS  current
+         DESCRIPTION
+                 "This object identifies the administration status of
+                  auto negotiation for this port."
+         ::= { agentPortConfigEntry 13 }
+
+
+    agentPortDot3FlowControlMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Config flowcontrol allows you to enable or
+                     disable 802.3x flow control for this port. This
+                     value applies to only full-duplex mode ports."
+         ::= { agentPortConfigEntry 14 }
+
+    agentPortPowerMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(0)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+        " Enable/Disable the port's Power over ethernet. This doesn't
+          apply to appliances that have no POE controller."
+         ::= { agentPortConfigEntry 15 }
+
+    agentPortGvrpStatus OBJECT-TYPE
+        SYNTAX      INTEGER { enabled(1), disabled(2) }
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+        DESCRIPTION
+            "The state of GVRP operation on this port.  The value
+            enabled(1) indicates that GVRP is enabled on this port,
+            as long as dot1qGvrpStatus is also enabled for this
+            device.  When disabled(2) but dot1qGvrpStatus is still
+            enabled for the device, GVRP is disabled on this port:
+            any GVRP packets received will be silently discarded and
+            no GVRP registrations will be propagated from other
+            ports.  This object affects all GVRP Applicant and
+            Registrar state machines on this port.  A transition
+            from disabled(2) to enabled(1) will cause a reset of all
+            GVRP state machines on this port.(Attribute no longer
+            supported)"
+        DEFVAL      { enabled }
+        ::= { agentPortConfigEntry 16 }
+
+    agentPortGarpJoinTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+        DESCRIPTION
+            "The GARP Join time, in centiseconds.(Attribute no longer
+             supported)"
+        DEFVAL      { 20 }
+        ::= { agentPortConfigEntry 17 }
+
+    agentPortGarpLeaveTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+        DESCRIPTION
+            "The GARP Leave time, in centiseconds.(Attribute no
+             longer supported)"
+        DEFVAL      { 60 }
+        ::= { agentPortConfigEntry 18 }
+
+    agentPortGarpLeaveAllTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+        DESCRIPTION
+            "The GARP LeaveAll time, in centiseconds.(Attribute no
+             longer supported)"
+        DEFVAL      { 1000 }
+        ::= { agentPortConfigEntry 19 }
+
+    agentPortMirrorMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     disable(0),
+                     enable(1)
+                 }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The switch's Port Mirror Mode. If enabled, then
+                      this is the port that the packets are mirrored
+                      to."
+         ::= { agentPortConfigEntry 20 }
+
+    agentPortMulticastApplianceMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     disable(0),
+                     enable(1)
+                 }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The Port Multicast Appliance Mode. If enabled,
+                      then this port allows multicast streams through
+                      it. At a time, a maximum of four ports including
+                      the gigabit ethernet port can have this mode
+                      enabled on them.  This is to limit the number of
+                      multicast streams allowed through the switch
+                      at a given time."
+         ::= { agentPortConfigEntry 21 }
+
+  agentPortOperationalStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+                   up(1),        -- ready to pass packets
+                   down(2)
+               }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The current operational state of the port."
+       ::= { agentPortConfigEntry 40 }
+
+
+--********************************************************************
+--    agentSystemGroup
+--********************************************************************
+
+     agentSaveConfig OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "save config to NVRAM"
+         ::= { agentSystemGroup 1 }
+
+     agentClearConfig OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "clear config to factory defaults"
+         ::= { agentSystemGroup 2 }
+
+     agentClearLags OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "clear lag configuration"
+         ::= { agentSystemGroup 3 }
+
+     agentClearLoginSessions OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "close all telnet sessions"
+         ::= { agentSystemGroup 4 }
+
+     agentClearPortStats OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "clear all port statistics"
+         ::= { agentSystemGroup 6 }
+
+     agentClearSwitchStats OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "clear all switch statistics"
+         ::= { agentSystemGroup 7 }
+
+     agentClearTrapLog OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "clear trap log"
+         ::= { agentSystemGroup 8 }
+
+
+     agentResetSystem OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "reset the switch"
+         ::= { agentSystemGroup 10 }
+
+
+--********************************************************************
+ -- portStatsTable
+ -- Enterprise portion of Ethernet Statistics Group
+ -- This augments the etherStatsTable of RMON group.
+--********************************************************************
+
+portStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF PortStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of additional thernet statistics entries."
+     ::= { stats 1 }
+
+portStatsEntry OBJECT-TYPE
+     SYNTAX     PortStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A collection of statistics kept for a particular Ethernet
+         interface."
+     INDEX { portStatsIndex }
+     ::= { portStatsTable 1 }
+
+PortStatsEntry ::= SEQUENCE {
+     portStatsIndex                      Integer32,
+     portStatsPktsTx64Octets             Counter32,
+     portStatsPktsTx65to127Octets        Counter32,
+     portStatsPktsTx128to255Octets       Counter32,
+     portStatsPktsTx256to511Octets       Counter32,
+     portStatsPktsTx512to1023Octets      Counter32,
+     portStatsPktsTx1024to1518Octets     Counter32,
+     portStatsPktsRx1519to1530Octets     Counter32,
+     portStatsPktsTx1519to1530Octets     Counter32,
+     portStatsPktsTxOversizeOctets       Counter32
+ }
+
+   portStatsIndex OBJECT-TYPE
+     SYNTAX     Integer32 (1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object uniquely identifies
+          this portStatsEntry."
+     ::= { portStatsEntry 1 }
+
+   portStatsPktsTx64Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were 64 octets in length
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 2 }
+
+   portStatsPktsTx65to127Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were between
+         65 and 127 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 3 }
+
+   portStatsPktsTx128to255Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were between
+         128 and 255 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 4 }
+
+  portStatsPktsTx256to511Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were between
+         256 and 511 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 5 }
+
+ portStatsPktsTx512to1023Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were between
+         512 and 1023 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 6 }
+
+ portStatsPktsTx1024to1518Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were between
+         1024 and 1518 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 7 }
+
+ portStatsPktsRx1519to1530Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         1519 and 1530 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 8 }
+
+ portStatsPktsTx1519to1530Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were between
+         1519 and 1530 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 9 }
+
+
+ portStatsPktsTxOversizeOctets      OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) transmitted that were more than
+         1530 octets in length.
+         (excluding framing bits but including FCS octets)."
+     ::= { portStatsEntry 30 }
+
+
+--********************************************************************
+--   switchingTraps
+--********************************************************************
+
+     multipleUsersTrap NOTIFICATION-TYPE
+         STATUS             current
+         DESCRIPTION
+             "Multiple Users Log Trap."
+         ::= { switchingTraps 1 }
+
+     broadcastStormStartTrap NOTIFICATION-TYPE
+         STATUS             current
+         DESCRIPTION
+             "Broadcast Storm Start Log Trap."
+         ::= { switchingTraps 2 }
+
+     broadcastStormEndTrap NOTIFICATION-TYPE
+         STATUS             current
+         DESCRIPTION
+             "Broadcast Storm End Log Trap."
+         ::= { switchingTraps 3 }
+
+     linkFailureTrap NOTIFICATION-TYPE
+         STATUS             current
+         DESCRIPTION
+             "trapMgrLinkFailureLogTrap."
+         ::= { switchingTraps 4 }
+
+     vlanRequestFailureTrap NOTIFICATION-TYPE
+         OBJECTS {
+                      dot1qVlanIndex
+                 }
+         STATUS             current
+         DESCRIPTION
+             "Vlan Request Failure Log Trap"
+         ::= { switchingTraps 5 }
+
+     vlanDeleteLastTrap NOTIFICATION-TYPE
+         OBJECTS {
+                      dot1qVlanIndex
+                 }
+         STATUS             current
+         DESCRIPTION
+             "Last Vlan Delete Log Trap"
+         ::= { switchingTraps 6 }
+
+     vlanDefaultCfgFailureTrap NOTIFICATION-TYPE
+         OBJECTS {
+                      dot1qVlanIndex
+                 }
+         STATUS             current
+         DESCRIPTION
+             "Default Vlan Config Failure Log Trap"
+         ::= { switchingTraps 7 }
+
+     vlanRestoreFailureTrap NOTIFICATION-TYPE
+         OBJECTS {
+                      dot1qVlanIndex
+                 }
+         STATUS             current
+         DESCRIPTION
+             "Vlan Restore Failure Log Trap"
+         ::= { switchingTraps 8 }
+
+     fanFailureTrap NOTIFICATION-TYPE
+         STATUS             current
+         DESCRIPTION
+             "Fan Failure Log Trap."
+         ::= { switchingTraps 9 }
+
+     stpInstanceNewRootTrap NOTIFICATION-TYPE
+         OBJECTS {
+                      dot1qVlanIndex
+                 }
+         STATUS             current
+         DESCRIPTION
+             "STP Instance New Root Trap"
+         ::= { switchingTraps 10 }
+
+     stpInstanceTopologyChangeTrap NOTIFICATION-TYPE
+         OBJECTS {
+                      dot1qVlanIndex
+                 }
+         STATUS             current
+         DESCRIPTION
+             "STP Instance Topology Change Trap"
+         ::= { switchingTraps 11 }
+
+     powerSupplyStatusChangeTrap NOTIFICATION-TYPE
+         STATUS             current
+         DESCRIPTION
+             "Power Supply Status Change Trap"
+         ::= { switchingTraps 12 }
+
+
+--********************************************************************
+--*    Compliance statements
+--********************************************************************
+bsnSwitchingCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+         implement the bsnSwitching module"
+
+    MODULE
+        MANDATORY-GROUPS { bsnSwitchingAgentInfoGroup,
+                           bsnSwitchingAgentConfigGroup,
+                           bsnSwitchingAgentSystemGroup,
+                           bsnSwitchingAgentStatsGroup }
+    ::= { bsnSwitchingCompliances 1 }
+
+--********************************************************************
+--*    Units of conformance
+--********************************************************************
+bsnSwitchingAgentInfoGroup OBJECT-GROUP
+    OBJECTS {
+        agentInventorySysDescription,
+        agentInventoryMachineType,
+        agentInventoryMachineModel,
+        agentInventorySerialNumber,
+        agentInventoryMaintenanceLevel,
+        agentInventoryBurnedInMacAddress,
+        agentInventoryOperatingSystem,
+        agentInventoryManufacturerName,
+        agentInventoryProductName,
+        agentInventoryProductVersion,
+        agentInventoryIsGigECardPresent,
+        agentInventoryIsCryptoCardPresent,
+        agentInventoryIsForeignAPSupported,
+        agentInventoryMaxNumberOfAPsSupported,
+        agentInventoryIsCryptoCard2Present,
+        agentInventoryFipsModeEnabled,
+        agentTrapLogTotal,
+        agentTrapLogTotalSinceLastViewed,
+        agentTrapLogIndex,
+        agentTrapLogSystemTime,
+        agentTrapLogTrap,
+        agentRadioUpDownTrapCount,
+        agentApAssociateDisassociateTrapCount,
+        agentApLoadProfileFailTrapCount,
+        agentApNoiseProfileFailTrapCount,
+        agentApInterferenceProfileFailTrapCount,
+        agentApCoverageProfileFailTrapCount,
+        agentSwitchInfoLwappTransportMode,
+        agentSwitchInfoPowerSupply1Present,
+        agentSwitchInfoPowerSupply1Operational,
+        agentSwitchInfoPowerSupply2Present,
+        agentSwitchInfoPowerSupply2Operational,
+        agentCurrentCPUUtilization,
+        agentTotalMemory,
+        agentFreeMemory,
+        agentWcpDeviceName,
+        agentWcpSlotNumber,
+        agentWcpPortNumber,
+        agentWcpPeerPortNumber,
+        agentWcpPeerIpAddress,
+        agentWcpControllerTableChecksum,
+        agentWcpControllerInfoSlotNumber,
+        agentWcpControllerInfoPortNumber,
+        agentWcpControllerInfoIpAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "This collection of objects provide switching information."
+    ::= { bsnSwitchingGroups 1}
+
+
+bsnSwitchingAgentConfigGroup OBJECT-GROUP
+    OBJECTS {
+        agentLoginSessionIndex,
+        agentLoginSessionUserName,
+        agentLoginSessionIPAddress,
+        agentLoginSessionConnectionType,
+        agentLoginSessionIdleTime,
+        agentLoginSessionSessionTime,
+        agentLoginSessionStatus,
+        agentTelnetLoginTimeout,
+        agentTelnetMaxSessions,
+        agentTelnetAllowNewMode,
+        agentSSHAllowNewMode,
+        agentSerialTimeout,
+        agentSerialBaudrate,
+        agentSerialCharacterSize,
+        agentSerialHWFlowControlMode,
+        agentSerialStopBits,
+        agentSerialParityType,
+        agentNetworkIPAddress,
+        agentNetworkSubnetMask,
+        agentNetworkDefaultGateway,
+        agentNetworkBurnedInMacAddress,
+        agentNetworkConfigProtocol,
+        agentNetworkWebMode,
+        agentNetworkSecureWebMode,
+        agentNetworkMulticastMode,
+        agentNetworkDsPortNumber,
+        agentNetworkUserIdleTimeout,
+        agentNetworkArpTimeout,
+        agentNetworkManagementVlan,
+        agentNetworkAllowMgmtViaWireless,
+        agentNetworkBroadcastSsidMode,
+        agentNetworkSecureWebPassword,
+        agentNetworkWebAdminCertType,
+        agentNetworkWebAuthCertRegenerateCmdInvoke,
+        agentNetworkWebAdminCertRegenerateCmdInvoke,
+        agentNetworkWebAuthCertType,
+        agentNetworkRouteIPAddress,
+        agentNetworkRouteIPNetmask,
+        agentNetworkRouteGateway,
+        agentNetworkRouteStatus,
+        agentNetworkPeerToPeerBlockingMode,
+        agentNetworkMulticastGroupAddress,
+        agentInterfaceName,
+        agentInterfaceVlanId,
+        agentInterfaceType,
+        agentInterfaceMacAddress,
+        agentInterfaceIPAddress,
+        agentInterfaceIPNetmask,
+        agentInterfaceIPGateway,
+        agentInterfacePortNo,
+        agentInterfacePrimaryDhcpAddress,
+        agentInterfaceSecondaryDhcpAddress,
+        agentInterfaceDhcpProtocol,
+        agentInterfaceDnsHostName,
+        agentInterfaceAclName,
+        agentInterfaceAPManagementFeature,
+        agentInterfaceActivePortNo,
+        agentInterfaceBackupPortNo,
+        agentInterfaceVlanQuarantine,
+        agentInterfaceRowStatus,
+        agentNtpPollingInterval,
+        agentNtpServerIndex,
+        agentNtpServerAddress,
+        agentNtpServerRowStatus,
+        agentDhcpScopeIndex,
+        agentDhcpScopeName,
+        agentDhcpScopeLeaseTime,
+        agentDhcpScopeNetwork,
+        agentDhcpScopeNetmask,
+        agentDhcpScopePoolStartAddress,
+        agentDhcpScopePoolEndAddress,
+        agentDhcpScopeDefaultRouterAddress1,
+        agentDhcpScopeDefaultRouterAddress2,
+        agentDhcpScopeDefaultRouterAddress3,
+        agentDhcpScopeDnsDomainName,
+        agentDhcpScopeDnsServerAddress1,
+        agentDhcpScopeDnsServerAddress2,
+        agentDhcpScopeDnsServerAddress3,
+        agentDhcpScopeNetbiosNameServerAddress1,
+        agentDhcpScopeNetbiosNameServerAddress2,
+        agentDhcpScopeNetbiosNameServerAddress3,
+        agentDhcpScopeState,
+        agentDhcpScopeRowStatus,
+        agentSnmpTrapPortNumber,
+        agentSnmpVersion1Status,
+        agentSnmpVersion2cStatus,
+        agentSnmpCommunityName,
+        agentSnmpCommunityIPAddress,
+        agentSnmpCommunityIPMask,
+        agentSnmpCommunityAccessMode,
+        agentSnmpCommunityEnabled,
+        agentSnmpCommunityStatus,
+        agentSnmpTrapReceiverName,
+        agentSnmpTrapReceiverIPAddress,
+        agentSnmpTrapReceiverEnabled,
+        agentSnmpTrapReceiverStatus,
+        agentSnmpAuthenticationTrapFlag,
+        agentSnmpLinkUpDownTrapFlag,
+        agentSnmpMultipleUsersTrapFlag,
+        agentSnmpSpanningTreeTrapFlag,
+        agentSnmpVersion3Status,
+        agentSnmpV3UserName,
+        agentSnmpV3UserAccessMode,
+        agentSnmpV3UserAuthenticationType,
+        agentSnmpV3UserEncryptionType,
+        agentSnmpV3UserAuthenticationPassword,
+        agentSnmpV3UserEncryptionPassword,
+        agentSnmpV3UserStatus,
+        agentSpanningTreeMode,
+        agentSwitchAddressAgingTimeout,
+        agentSwitchBroadcastControlMode,
+        agentSwitchDot3FlowControlMode,
+        agentSwitchLwappTransportMode,
+        agentTransferUploadMode,
+        agentTransferUploadServerIP,
+        agentTransferUploadPath,
+        agentTransferUploadFilename,
+        agentTransferUploadDataType,
+        agentTransferUploadStart,
+        agentTransferUploadStatus,
+        agentTransferConfigurationFileEncryption,
+        agentTransferConfigurationFileEncryptionKey,
+        agentTransferDownloadMode,
+        agentTransferDownloadServerIP,
+        agentTransferDownloadPath,
+        agentTransferDownloadFilename,
+        agentTransferDownloadDataType,
+        agentTransferDownloadStart,
+        agentTransferDownloadStatus,
+        agentTransferDownloadTftpMaxRetries,
+        agentTransferDownloadTftpTimeout,
+        agentPortDot1dBasePort,
+        agentPortIfIndex,
+        agentPortIanaType,
+        agentPortSTPMode,
+        agentPortSTPState,
+        agentPortAdminMode,
+        agentPortPhysicalMode,
+        agentPortPhysicalStatus,
+        agentPortLinkTrapMode,
+        agentPortClearStats,
+        agentPortDefaultType,
+        agentPortType,
+        agentPortAutoNegAdminStatus,
+        agentPortDot3FlowControlMode,
+        agentPortPowerMode,
+        agentPortMirrorMode,
+        agentPortMulticastApplianceMode,
+        agentPortOperationalStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "This collection of objects provide switching configuration 
+         information."
+    ::= { bsnSwitchingGroups 2}
+
+bsnSwitchingAgentSystemGroup OBJECT-GROUP
+    OBJECTS {
+        agentSaveConfig,
+        agentClearConfig,
+        agentClearLags,
+        agentClearLoginSessions,
+        agentClearPortStats,
+        agentClearSwitchStats,
+        agentClearTrapLog,
+        agentResetSystem
+    }
+    STATUS      current
+    DESCRIPTION
+        "This collection of objects provide switching system 
+         information and config."
+    ::= { bsnSwitchingGroups 3 }
+
+
+bsnSwitchingAgentStatsGroup OBJECT-GROUP
+    OBJECTS {
+        portStatsIndex,
+        portStatsPktsTx64Octets,
+        portStatsPktsTx65to127Octets,
+        portStatsPktsTx128to255Octets,
+        portStatsPktsTx256to511Octets,
+        portStatsPktsTx512to1023Octets,
+        portStatsPktsTx1024to1518Octets,
+        portStatsPktsRx1519to1530Octets,
+        portStatsPktsTx1519to1530Octets,
+        portStatsPktsTxOversizeOctets
+    }
+    STATUS      current
+    DESCRIPTION
+        "This collection of objects provide switching statistics."
+    ::= { bsnSwitchingGroups 4 }
+
+bsnSwitchingObsGroup OBJECT-GROUP
+    OBJECTS {
+        agentLagConfigCreate,
+        agentLagSummaryName,
+        agentLagSummaryLagIndex,
+        agentLagSummaryLinkTrap,
+        agentLagSummaryAdminMode,
+        agentLagSummaryStpMode,
+        agentLagSummaryAddPort,
+        agentLagSummaryDeletePort,
+        agentLagSummaryPortsBitMask,
+        agentLagSummaryStatus,
+        agentLagDetailedLagIndex,
+        agentLagDetailedIfIndex,
+        agentLagDetailedPortSpeed,
+        agentLagConfigMode,
+        agentServicePortIPAddress,
+        agentServicePortSubnetMask,
+        agentServicePortBurnedInMacAddress,
+        agentServicePortConfigProtocol,
+        agentSnmpBroadcastStormTrapFlag,
+        agentDot3adAggPort,
+        agentDot3adAggPortLACPMode,
+        agentNetworkGvrpStatus,
+        agentPortGvrpStatus,
+        agentPortGarpJoinTime,
+        agentPortGarpLeaveTime,
+        agentPortGarpLeaveAllTime,
+        agentLagSummaryFlushTimer,
+        agentServicePortDefaultGateway
+    }
+    STATUS      obsolete
+    DESCRIPTION
+        "This collection of objects are  obsoleted in bsnSwitching
+         module."
+    ::= { bsnSwitchingGroups 5 }
+
+bsnSwitchingTrap NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        multipleUsersTrap,
+        broadcastStormStartTrap,
+        broadcastStormEndTrap,
+        linkFailureTrap,
+        vlanRequestFailureTrap,
+        vlanDeleteLastTrap,
+        vlanDefaultCfgFailureTrap,
+        vlanRestoreFailureTrap,
+        fanFailureTrap,
+        stpInstanceNewRootTrap,
+        stpInstanceTopologyChangeTrap,
+        powerSupplyStatusChangeTrap
+    }
+    STATUS      current
+    DESCRIPTION
+        "This  collection of objects provides switching related 
+         notification."
+    ::= { bsnSwitchingGroups 6 }
+
+--********************************************************************
+--*   End of units of conformance
+--********************************************************************
+
+
+END
+

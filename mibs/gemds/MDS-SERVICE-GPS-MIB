@@ -1,0 +1,269 @@
+MDS-SERVICE-GPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    mdsServices
+        FROM MDS-ORBIT-SMI-MIB;
+
+mdsGpsMIB MODULE-IDENTITY
+    LAST-UPDATED "201805160000Z" -- May 16, 2018
+    ORGANIZATION 
+        "GE MDS LLC
+        http://www.gemds.com"
+    CONTACT-INFO
+        "T 1-800-474-0694 (Toll Free in North America)
+         T 585-242-9600
+         F 585-242-9620
+
+         175 Science Parkway
+         Rochester, New York 14620
+         USA"
+    DESCRIPTION
+        "The MIB module to describe the system."
+    REVISION      "201805160000Z"
+    DESCRIPTION
+        "Updated conformance statments based on smilint."
+    REVISION      "201606060000Z"
+    DESCRIPTION
+        "Add Satellite status table."
+    REVISION      "201501290000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { mdsServices 12 }
+
+mGpsMIBObjects OBJECT IDENTIFIER
+    ::= { mdsGpsMIB 1 }
+
+mGpsConfig OBJECT IDENTIFIER
+    ::= { mGpsMIBObjects 1 }
+
+mGpsStatus OBJECT IDENTIFIER
+    ::= { mGpsMIBObjects 2 }
+
+-- Textual Conventions
+
+-- Gps Status Objects
+mGpsStatusFixMode OBJECT-TYPE
+    SYNTAX      INTEGER {nofix(0),a2dfix(1), a3dfix(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Fix mode"
+    DEFVAL { nofix }
+    ::= { mGpsStatus 1 }
+
+mGpsStatusTime OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "UTC Time"
+    ::= { mGpsStatus 2 }
+
+mGpsStatusLatitude OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Latitude"
+    ::= { mGpsStatus 3 }
+
+mGpsStatusLongitude OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Longitude"
+    ::= { mGpsStatus 4 }
+
+mGpsStatusAltitude OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Altitude (ft)"
+    ::= { mGpsStatus 5 }
+
+mGpsStatusSpeed OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Speed (mph)"
+    ::= { mGpsStatus 6 }
+
+mGpsStatusHeading OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "True Heading (degree)"
+    ::= { mGpsStatus 7 }
+
+mGpsStatusSatellitesVisible OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of satellites currently visible"
+    ::= { mGpsStatus 8 }
+
+mGpsStatusSatellitesUsed OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The number of satellites being used for GPS fix."
+    ::= { mGpsStatus 9 }
+
+mGpsSatellitesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MGpsSatellitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "The list of all visible satellites, and their status"
+    ::= { mGpsStatus 10 }
+
+mGpsSatellitesEntry OBJECT-TYPE
+    SYNTAX      MGpsSatellitesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Each entry contains information about a visible satellite"
+    INDEX   { mGpsSatellitesPrn }
+    ::= { mGpsSatellitesTable 1 }
+
+MGpsSatellitesEntry ::=
+    SEQUENCE {
+        mGpsSatellitesPrn Unsigned32,
+        mGpsSatellitesUsed TruthValue,
+        mGpsSatellitesElevation Unsigned32,
+        mGpsSatellitesAzimuth Unsigned32,
+        mGpsSatellitesSnr Unsigned32
+    }
+
+mGpsSatellitesPrn OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "PRN (pseudorandom noise code) of satellite."
+    ::= { mGpsSatellitesEntry 1 }
+
+mGpsSatellitesUsed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "True if this satellite is used in current GPS fix."
+    ::= { mGpsSatellitesEntry 2 }
+
+mGpsSatellitesElevation OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Elevation of satellite."
+    ::= { mGpsSatellitesEntry 3 }
+
+mGpsSatellitesAzimuth OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Azimuth of satellite."
+    ::= { mGpsSatellitesEntry 4 }
+
+mGpsSatellitesSnr OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal-to-Noise radio of satellite."
+    ::= { mGpsSatellitesEntry 5 }
+
+-- Gps Sources Objects
+mGpsSourcesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MGpsSourcesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "This table contains gps data sources in the system."
+    ::= { mGpsMIBObjects 3 }
+
+mGpsSourcesEntry OBJECT-TYPE
+    SYNTAX      MGpsSourcesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Each entry contains information about the gps data source."
+    INDEX   { mGpsSourceName }
+    ::= { mGpsSourcesTable 1 }
+
+MGpsSourcesEntry ::=
+    SEQUENCE {
+        mGpsSourceName DisplayString,
+        mGpsSourceDevice OCTET STRING
+    }
+
+mGpsSourceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "GPS data source name."
+    ::= { mGpsSourcesEntry 1 }
+
+mGpsSourceDevice OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "GPS data source device."
+    ::= { mGpsSourcesEntry 2 }
+
+-- conformance information
+mdsGpsMIBConformance   OBJECT IDENTIFIER ::= { mdsGpsMIB 3 }
+mdsGpsMIBCompliances OBJECT IDENTIFIER ::= { mdsGpsMIBConformance 1 }
+mdsGpsMIBGroups      OBJECT IDENTIFIER ::= { mdsGpsMIBConformance 2 }
+
+-- compliance statements
+mGpsCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that 
+            implement the MDS-GPS-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mGpsStatusGroup,
+            mGpsSourcesGroup
+        }
+    ::= { mdsGpsMIBCompliances 1 }
+
+-- units of conformance
+mGpsStatusGroup OBJECT-GROUP
+    OBJECTS {
+        mGpsStatusFixMode,
+        mGpsStatusTime,
+        mGpsStatusLatitude,
+        mGpsStatusLongitude,
+        mGpsStatusAltitude,
+        mGpsStatusSpeed,
+        mGpsStatusHeading,
+        mGpsStatusSatellitesVisible,
+        mGpsStatusSatellitesUsed,
+        mGpsSatellitesUsed ,
+        mGpsSatellitesElevation ,
+        mGpsSatellitesAzimuth ,
+        mGpsSatellitesSnr
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        orbit GPS data status."
+    ::= { mdsGpsMIBGroups 1 }
+
+mGpsSourcesGroup OBJECT-GROUP
+    OBJECTS {
+        mGpsSourceDevice
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        orbit GPS data sources."
+    ::= { mdsGpsMIBGroups 2 }
+
+END

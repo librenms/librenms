@@ -1,0 +1,510 @@
+        ADTRAN-AOS-DS1-EXT DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            Unsigned32, OBJECT-TYPE, OBJECT-IDENTITY,
+            MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+            TimeStamp
+              	FROM SNMPv2-TC
+            InterfaceIndex, ifIndex
+                FROM IF-MIB
+            adIdentity
+                FROM ADTRAN-MIB
+            adGenAOSConformance, adGenAOSWan
+                FROM ADTRAN-AOS;
+
+        adGenAOSDs1ThresholdsMib    MODULE-IDENTITY
+           LAST-UPDATED "200507060000Z"
+           ORGANIZATION "ADTRAN, Inc."
+           CONTACT-INFO
+               "Technical Support Dept.
+                Postal: ADTRAN, Inc.
+                        901 Explorer Blvd.
+                        Huntsville, AL 35806
+
+                        Tel: +1 800 726-8663
+                        Fax: +1 256 963 6217
+                        E-mail: support@adtran.com"
+           DESCRIPTION
+                 "A MIB module for checking different thresholds of DS1 line statistics."
+
+        ::= { adIdentity 10000 53 6 1 }
+
+--  OBJECT IDENTIFIER
+
+    adGenAOSDs1Threshold         OBJECT IDENTIFIER ::= { adGenAOSWan 1 }
+
+    adGenAOSDs1ThresholdTraps    OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION	"This trap indicates that a DS1 threshold status has changed."
+    	::= { adGenAOSDs1Threshold 0 }
+
+adGenAOSDs1ThresholdsReachedTable OBJECT-TYPE
+	SYNTAX	   SEQUENCE OF AdGenAOSDs1ThresholdsReachedEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+	    "This table contains a bitmap showing which thresholds have been exceeded."
+	::= { adGenAOSDs1Threshold 1 }
+
+adGenAOSDs1ThresholdsReachedEntry   OBJECT-TYPE
+	SYNTAX 	AdGenAOSDs1ThresholdsReachedEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"This entry specifies which DS1 Thresholds have been exceeded."
+	INDEX   { ifIndex }
+	::= { adGenAOSDs1ThresholdsReachedTable 1}
+
+	AdGenAOSDs1ThresholdsReachedEntry ::=
+	SEQUENCE {
+	     adGenAOSDs1Index				InterfaceIndex,
+	     adGenAOSDs1ThresholdAlarms		  	BITS,
+	     adGenAOSDs1PreviousThresholdAlarms		BITS,
+	     adGenAOSDs1LastThresholdChange		TimeStamp
+	     }
+
+adGenAOSDs1Index OBJECT-TYPE
+          SYNTAX  InterfaceIndex
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+                 "This value for this object is equal to the value
+ 		  of ifIndex from the Interfaces table of MIB II
+ 		  (RFC 1213)."
+          ::= { adGenAOSDs1ThresholdsReachedEntry 1 }
+
+
+adGenAOSDs1ThresholdAlarms OBJECT-TYPE
+    SYNTAX  BITS {
+            ds1ThresholdReached15MinBES(0),
+            ds1ThresholdReached15MinCSS(1),
+            ds1ThresholdReached15MinDM(2),
+            ds1ThresholdReached15MinES(3),
+            ds1ThresholdReached15MinLCV(4),
+            ds1ThresholdReached15MinLES(5),
+            ds1ThresholdReached15MinPCV(6),
+            ds1ThresholdReached15MinSES(7),
+            ds1ThresholdReached15MinSEFS(8),
+            ds1ThresholdReached15MinUAS(9),
+	        ds1ThresholdReached24HrBES(10),
+            ds1ThresholdReached24HrCSS(11),
+            ds1ThresholdReached24HrDM(12),
+ 	        ds1ThresholdReached24HrES(13),
+	        ds1ThresholdReached24HrLCV(14),
+	        ds1ThresholdReached24HrLES(15),
+	        ds1ThresholdReached24HrPCV(16),
+	        ds1ThresholdReached24HrSES(17),
+	        ds1ThresholdReached24HrSEFS(18),
+	        ds1ThresholdReached24HrUAS(19)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       		"This object describes the various DS1 error thresholds that are presently crossed.
+
+		The bit 'ds1ThresholdReached15MinBES(0)' indicates that the 15 minute threshold for
+		bursty errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached15MinCSS(1)' indicates that the 15 minute threshold for
+		controlled slip seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinDM(2)' indicates that the 15 minute threshold for
+		degraded minutes has been reached
+
+		The bit 'ds1ThresholdReached15MinES(3)' indicates that the 15 minute threshold for
+		errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinLCV(4)' indicates that the 15 minute threshold for
+		line code violations has been reached.
+
+        	The bit 'ds1ThresholdReached15MinLES(5)' indicates that the 15 minute threshold for
+		line errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinPCV(6)' indicates that the 15 minute threshold for
+		path coding violations has been reached.
+
+        	The bit 'ds1ThresholdReached15MinSES(7)' indicates that the 15 minute threshold for
+		severely errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinSEFS(8)' indicates that the 15 minute threshold for
+		serverly errored framing seconds has been reached.
+
+		The bit 'ds1ThresholdReached15MinUAS(9)' indicates that the 15 minute threshold for
+		unavailable seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrBES(10)' indicates that the 24 hour threshold for
+		bursty errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached24HrCSS(11)' indicates that the 24 hour threshold for
+		controlled slip seconds has been reached.
+
+        	The bit 'ds1ThresholdReached24HrDM(12)' indicates that the 24 hour threshold for
+		degraded minutes has been reached.
+
+ 		The bit 'ds1ThresholdReached24HrES(13)' indicates that the 24 hour threshold for
+		errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrLCV(14)' indicates that the 24 hour threshold for
+		line code violations has been reached.
+
+		The bit 'ds1ThresholdReached24HrLES(15)' indicates that the 24 hour threshold for
+		line errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrPCV(16)' indicates that the 24 hour threshold for
+		path code violations has been reached.
+
+		The bit 'ds1ThresholdReached24HrSES(17)' indicates that the 24 hour threshold for
+		severely errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrSEFS(18)' indicates that the 24 hour threshold for
+		severely errored framing seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrUAS(19)' indicates that the 24 hour threshold for
+		unavailable seconds has been reached."
+        ::= { adGenAOSDs1ThresholdsReachedEntry 2 }
+
+adGenAOSDs1PreviousThresholdAlarms OBJECT-TYPE
+    SYNTAX BITS {
+            ds1ThresholdReached15MinBES(0),
+            ds1ThresholdReached15MinCSS(1),
+            ds1ThresholdReached15MinDM(2),
+            ds1ThresholdReached15MinES(3),
+            ds1ThresholdReached15MinLCV(4),
+            ds1ThresholdReached15MinLES(5),
+            ds1ThresholdReached15MinPCV(6),
+            ds1ThresholdReached15MinSES(7),
+            ds1ThresholdReached15MinSEFS(8),
+            ds1ThresholdReached15MinUAS(9),
+	        ds1ThresholdReached24HrBES(10),
+            ds1ThresholdReached24HrCSS(11),
+            ds1ThresholdReached24HrDM(12),
+ 	        ds1ThresholdReached24HrES(13),
+	        ds1ThresholdReached24HrLCV(14),
+	        ds1ThresholdReached24HrLES(15),
+	        ds1ThresholdReached24HrPCV(16),
+	        ds1ThresholdReached24HrSES(17),
+	        ds1ThresholdReached24HrSEFS(18),
+	        ds1ThresholdReached24HrUAS(19)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       		"This object describes the various DS1 error thresholds that were crossed before the last threshold change.
+
+		The bit 'ds1ThresholdReached15MinBES(0)' indicates that the 15 minute threshold for
+		bursty errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached15MinCSS(1)' indicates that the 15 minute threshold for
+		controlled slip seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinDM(2)' indicates that the 15 minute threshold for
+		degraded minutes has been reached
+
+		The bit 'ds1ThresholdReached15MinES(3)' indicates that the 15 minute threshold for
+		errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinLCV(4)' indicates that the 15 minute threshold for
+		line code violations has been reached.
+
+       	 	The bit 'ds1ThresholdReached15MinLES(5)' indicates that the 15 minute threshold for
+		line errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinPCV(6)' indicates that the 15 minute threshold for
+		path coding violations has been reached.
+
+        	The bit 'ds1ThresholdReached15MinSES(7)' indicates that the 15 minute threshold for
+		severely errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached15MinSEFS(8)' indicates that the 15 minute threshold for
+		serverly errored framing seconds has been reached.
+
+		The bit 'ds1ThresholdReached15MinUAS(9)' indicates that the 15 minute threshold for
+		unavailable seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrBES(10)' indicates that the 24 hour threshold for
+		bursty errored seconds has been reached.
+
+        	The bit 'ds1ThresholdReached24HrCSS(11)' indicates that the 24 hour threshold for
+		controlled slip seconds has been reached.
+
+        	The bit 'ds1ThresholdReached24HrDM(12)' indicates that the 24 hour threshold for
+		degraded minutes has been reached.
+
+ 		The bit 'ds1ThresholdReached24HrES(13)' indicates that the 24 hour threshold for
+		errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrLCV(14)' indicates that the 24 hour threshold for
+		line code violations has been reached.
+
+		The bit 'ds1ThresholdReached24HrLES(15)' indicates that the 24 hour threshold for
+		line errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrPCV(16)' indicates that the 24 hour threshold for
+		path code violations has been reached.
+
+		The bit 'ds1ThresholdReached24HrSES(17)' indicates that the 24 hour threshold for
+		severely errored seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrSEFS(18)' indicates that the 24 hour threshold for
+		severely errored framing seconds has been reached.
+
+		The bit 'ds1ThresholdReached24HrUAS(19)' indicates that the 24 hour threshold for
+		unavailable seconds has been reached."
+        ::= { adGenAOSDs1ThresholdsReachedEntry 3 }
+adGenAOSDs1LastThresholdChange OBJECT-TYPE
+	SYNTAX		TimeStamp
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Amount of time router had been up when the threshold status last changed."
+	    ::= { adGenAOSDs1ThresholdsReachedEntry 4 }
+adGenAOSDs1Threshold15MinBES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "BES 15 minute threshold."
+    DEFVAL { 10 }
+    ::= { adGenAOSDs1Threshold  2  }
+
+adGenAOSDs1Threshold15MinCSS OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "CSS 15 minute threshold."
+    DEFVAL { 1 }
+    ::= { adGenAOSDs1Threshold  3  }
+
+adGenAOSDs1Threshold15MinDM OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "DM 15 minute threshold."
+    DEFVAL { 1 }
+    ::= { adGenAOSDs1Threshold  4  }
+
+adGenAOSDs1Threshold15MinES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "ES 15 minute threshold."
+    DEFVAL { 65 }
+    ::= { adGenAOSDs1Threshold  5  }
+
+adGenAOSDs1Threshold15MinLCV OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "LCV 15 minute threshold."
+    DEFVAL { 13340 }
+    ::= { adGenAOSDs1Threshold  6  }
+
+adGenAOSDs1Threshold15MinLES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "LES 15 minute threshold."
+    DEFVAL { 65 }
+    ::= { adGenAOSDs1Threshold  7  }
+
+adGenAOSDs1Threshold15MinPCV OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "PCV 15 minute threshold."
+    DEFVAL { 72 }
+    ::= { adGenAOSDs1Threshold  8  }
+
+adGenAOSDs1Threshold15MinSES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "SES 15 minute threshold."
+    DEFVAL { 10 }
+    ::= { adGenAOSDs1Threshold  9  }
+
+adGenAOSDs1Threshold15MinSEFS OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "SEFS 15 minute threshold."
+    DEFVAL { 2 }
+    ::= { adGenAOSDs1Threshold  10  }
+
+adGenAOSDs1Threshold15MinUAS OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "UAS 15 minute threshold."
+    DEFVAL { 10 }
+    ::= { adGenAOSDs1Threshold  11  }
+
+adGenAOSDs1Threshold24HrBES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "BES 24 hour threshold."
+    DEFVAL { 100 }
+    ::= { adGenAOSDs1Threshold  12  }
+
+adGenAOSDs1Threshold24HrCSS OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "CSS 24 hour threshold."
+    DEFVAL { 4 }
+    ::= { adGenAOSDs1Threshold  13  }
+
+adGenAOSDs1Threshold24HrDM OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "DM 24 hour threshold."
+    DEFVAL { 4 }
+    ::= { adGenAOSDs1Threshold  14  }
+
+adGenAOSDs1Threshold24HrES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "ES 24 hour threshold."
+    DEFVAL { 648 }
+    ::= { adGenAOSDs1Threshold  15  }
+
+adGenAOSDs1Threshold24HrLCV OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "LCV 24 hour threshold."
+    DEFVAL { 133400 }
+    ::= { adGenAOSDs1Threshold  16  }
+
+adGenAOSDs1Threshold24HrLES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "LES 24 hour threshold."
+    DEFVAL { 648 }
+    ::= { adGenAOSDs1Threshold  17  }
+
+adGenAOSDs1Threshold24HrPCV OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "PCV 24 hour threshold."
+    DEFVAL { 691 }
+    ::= { adGenAOSDs1Threshold  18  }
+
+adGenAOSDs1Threshold24HrSES OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "SES 24 hour threshold."
+    DEFVAL { 100 }
+    ::= { adGenAOSDs1Threshold  19  }
+
+adGenAOSDs1Threshold24HrSEFS OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "SEFS 24 hour threshold."
+    DEFVAL { 17 }
+    ::= { adGenAOSDs1Threshold  20  }
+
+adGenAOSDs1Threshold24HrUAS OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "UAS 24 hour threshold."
+    DEFVAL { 10 }
+    ::= { adGenAOSDs1Threshold  21  }
+
+
+-- Traps
+adGenAOSDs1ThresholdReached NOTIFICATION-TYPE
+        OBJECTS  { adGenAOSDs1ThresholdAlarms, adGenAOSDs1PreviousThresholdAlarms, adGenAOSDs1LastThresholdChange }
+        STATUS  current
+        DESCRIPTION
+            "This trap indicates that a DS1 threshold status has changed."
+        ::= { adGenAOSDs1ThresholdTraps 1 }
+
+-- conformance information
+
+       adGenAOSDs1ThresholdConformance
+           OBJECT IDENTIFIER ::= { adGenAOSConformance 6 }
+
+       adAOSDs1ThresholdCompliances
+           OBJECT IDENTIFIER ::= { adGenAOSDs1ThresholdConformance 1 }
+       adAOSDs1ThresholdGroups
+           OBJECT IDENTIFIER ::= { adGenAOSDs1ThresholdConformance 2 }
+
+
+-- compliance statements
+
+       adAOSDs1ThresholdCompliance MODULE-COMPLIANCE
+           STATUS     current
+           DESCRIPTION
+                   "The compliance statement for SNMPv2 entities which
+	            implement the AOS Unit MIB."
+           MODULE
+               MANDATORY-GROUPS { adGenAOSDs1ThresholdGroup }
+
+               ::= { adAOSDs1ThresholdCompliances 1 }
+
+
+-- units of conformance
+    adGenAOSDs1ThresholdGroup OBJECT-GROUP
+    OBJECTS {
+        adGenAOSDs1Index,
+        adGenAOSDs1PreviousThresholdAlarms,
+        adGenAOSDs1LastThresholdChange,
+        adGenAOSDs1ThresholdAlarms,
+        adGenAOSDs1Threshold15MinBES,
+        adGenAOSDs1Threshold15MinCSS,
+        adGenAOSDs1Threshold15MinDM,
+        adGenAOSDs1Threshold15MinES,
+        adGenAOSDs1Threshold15MinLCV,
+        adGenAOSDs1Threshold15MinLES,
+        adGenAOSDs1Threshold15MinPCV,
+        adGenAOSDs1Threshold15MinSES,
+        adGenAOSDs1Threshold15MinSEFS,
+        adGenAOSDs1Threshold15MinUAS,
+        adGenAOSDs1Threshold24HrBES,
+        adGenAOSDs1Threshold24HrCSS,
+        adGenAOSDs1Threshold24HrDM,
+ 	    adGenAOSDs1Threshold24HrES,
+	    adGenAOSDs1Threshold24HrLCV,
+	    adGenAOSDs1Threshold24HrLES,
+        adGenAOSDs1Threshold24HrPCV,
+	    adGenAOSDs1Threshold24HrSES,
+	    adGenAOSDs1Threshold24HrSEFS,
+	    adGenAOSDs1Threshold24HrUAS
+    }
+    STATUS  current
+    DESCRIPTION
+        "The DS1 Threshold Group."
+    ::= { adAOSDs1ThresholdGroups 1 }
+
+END

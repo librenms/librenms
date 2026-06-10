@@ -1,0 +1,13 @@
+os: pfsense
+type: firewall
+group: unix
+text: pfSense
+processor_stacked: true
+config_highlighting: xml
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysDescr:
+            - pfSense

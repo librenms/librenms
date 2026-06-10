@@ -1,0 +1,1795 @@
+
+    -- Teldat, S.A.
+
+    -- Parque Tecnológico de Madrid
+
+    -- 28760, Tres Cantos (Madrid)
+
+    -- Tlf: +34-918076565
+
+    -- Fax: +34-918076521
+
+    -- e-mail: id@teldat.com
+
+
+    -- MIB privada de Teldat
+
+    -- Monitorización del equipo NUCLEOX-PLUS
+
+
+-- Historial:
+    -- 03/02/14       mfadon        Obsolete interface kind field
+    -- 07/02/14       M.A. Pastor   XH 3523. Errors with HP Openview 9.20
+    -- 26-09-13 I. Munoz              XH 3223. Types are completed in tables.
+    -- 2.5  11-01-13    E. Amorena      XH 2610. MIBs compilation.
+    -- 2.4  30-08-11  Benjamín G.   XI 974 Gateway IEC104/101 en CIT.
+    -- 2.3  23-12-10  I. Muñoz      XI-1073. Tabla telProdNpMonPoeCardsTable
+    -- 2.2  31-08-09  N. Moro       Soporte PMP 855. Soporte QoS
+    -- 2.1  03-07-09  B. García     Soporte interfaces gprs
+    -- 2.0  29-09-08  P. Alonso     Soporte interfaces rcellular
+    -- 1.9  12-03-08  J. Herrero    Corregidos errores en Ventiladores
+    -- 1.8  21-12-07  E. Amorena    Elimino Tamano_Heap_Reservado
+    -- 1.7  14-12-07  FdMB          Soporte de Ventiladores
+    -- 1.6  17-07-07  M.A. Berrojo  Soporte interfaces pcmcia mobile
+    -- 1.5  08-05-07  M.A. Berrojo  Soporte interfaces cellular
+    -- 1.4  14/07/06  P. Nogueira   Monitorización DNS
+    -- 1.3  09/06/06  J. Roman      Se elimina POOL0
+    -- 1.2  19/05/06  M. Fadon      Actualización de OIDs reservados
+    -- 1.1  04/10/05  M.A. Pastor   Al eliminar SYSTEM MEMORY POOL deben
+    --                              obsoletarse las variables relacionadas
+    -- 1.0  01/07/04  J. Molina     Archivo procedente de Monitorizacion.mib
+
+
+
+
+-- Historial de Monitorizacion.mib:
+    -- 01/06/04  M.A. Pastor    Se obsoletan las antiguas variables para
+    --                          monitorizar la carga de la CPU, ya que se ha
+    --                          introducido una MIB específica para ello.
+    --                          También se obsoletan las variables de memoria
+    --                          que han dejado de tener sentido.
+    -- 24/06/04  M.A. Pastor    Se obsoletan antiguas variables de memoria que
+    --                          han dejado de tener sentido.
+    -- 27/06/02  M.A. Pastor    Se evita warning en HP OpenView
+    -- 17/12/01  M.A. Pastor    MIBs correspondientes a la nueva implementación
+    --                          del PPP
+    -- 01/10/01  N.Villaseñor   Traducción a inglés
+    -- 20/11/00  J. Alvarez     Implementacion inicial
+
+
+TELDAT-MON-CommonInfo-MIB
+
+    DEFINITIONS ::= BEGIN
+
+    IMPORTS
+            Counter
+        FROM RFC1155-SMI
+            DisplayString
+        FROM RFC1213-MIB
+            OBJECT-TYPE
+        FROM RFC-1212
+            telProdNpMonitSistema, telProdNpMonInterface, telProdNpMonInterfRouter
+        FROM TELDAT-SW-STRUCTURE-MIB;
+
+
+    -- Memory (telProdNpMonitSistema 1)
+
+    telProdNpMonSistemMemory    OBJECT IDENTIFIER ::= {telProdNpMonitSistema 1}
+
+    telProdNpMonSistemMemSize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "System Memory Size."
+        ::={telProdNpMonSistemMemory 1}
+
+    telProdNpMonSistemMemAvailable OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Available System Memory Size."
+        ::={telProdNpMonSistemMemory 2}
+
+    telProdNpMonSistemMemPooldissize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area reserved to the task that manage the disk."
+        ::={telProdNpMonSistemMemory 3}
+
+    telProdNpMonSistemMemPooldisavailable OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Free space in the memory area reserved to the task that manages
+        the disk."
+        ::={telProdNpMonSistemMemory 4}
+
+    telProdNpMonSistemMemPoolmdissize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area reserved to save information messages
+        of the disk task."
+        ::={telProdNpMonSistemMemory 5}
+
+    telProdNpMonSistemMemPoolmdisavailable OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Free space in the memory area reserved to save information messages
+        of the disk task."
+        ::={telProdNpMonSistemMemory 6}
+
+    telProdNpMonSistemMemPooltsize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area reserved to save the application temporal
+        variables."
+        ::={telProdNpMonSistemMemory 7}
+
+    telProdNpMonSistemMemPooltavailable OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Free space in the memory area reserved to save the application temporal
+        variables."
+        ::={telProdNpMonSistemMemory 8}
+
+    telProdNpMonSistemMemPoolpsize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area reserved to save the application permanent
+        variables."
+        ::={telProdNpMonSistemMemory 9}
+
+    telProdNpMonSistemMemPoolpavailable OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Free space in the memory area reserved to save the application permanent
+        variables."
+        ::={telProdNpMonSistemMemory 10}
+
+    telProdNpMonSistemMemPool0size OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area 0 reserved to messages of the node side."
+        ::={telProdNpMonSistemMemory 11}
+
+    telProdNpMonSistemMemPool0restpart OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of partitions of the memory area 0 reserved  to messages
+        of the node side."
+        ::={telProdNpMonSistemMemory 12}
+
+    telProdNpMonSistemMemPool0available OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of available partitions of the memory area 0 reserved  to messages
+        of the node side."
+        ::={telProdNpMonSistemMemory 13}
+
+    telProdNpMonSistemMemPool1size OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Size of the memory area 1 reserved to messages of the node side."
+        ::={telProdNpMonSistemMemory 14}
+
+    telProdNpMonSistemMemPool1restpart OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of partitions of the memory area 1 reserved to messages
+        of the node side."
+        ::={telProdNpMonSistemMemory 15}
+
+    telProdNpMonSistemMemPool1available OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of available partitions of the memory area 1 reserved to
+        messages of the node side."
+        ::={telProdNpMonSistemMemory 16}
+
+    telProdNpMonSistemMemPool2size OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area 2 reserved to messages of the node side."
+        ::={telProdNpMonSistemMemory 17}
+
+    telProdNpMonSistemMemPool2restpart OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of partitions of the memory area 2 reserved  to messages
+        of the node side."
+        ::={telProdNpMonSistemMemory 18}
+
+    telProdNpMonSistemMemPool2available OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of available partitions of the memory area 2 reserved  to messages
+        of the node side."
+        ::={telProdNpMonSistemMemory 19}
+
+    telProdNpMonSistemMemPoolisize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area reserved to messages of the routers side."
+        ::={telProdNpMonSistemMemory 20}
+
+    telProdNpMonSistemMemPoolirestpart OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of partitions of the memory area reserved  to messages
+        of the router side."
+        ::={telProdNpMonSistemMemory 21}
+
+    telProdNpMonSistemMemPooliavailable OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of available partitions of the memory area reserved  to messages
+        of the router side."
+        ::={telProdNpMonSistemMemory 22}
+
+    telProdNpMonSistemMemPooldlssize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the memory area reserved to DLS messages."
+        ::={telProdNpMonSistemMemory 23}
+
+    telProdNpMonSistemMemPooldlsrestpart OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of partitions of the memory area reserved to DLS messages."
+        ::={telProdNpMonSistemMemory 24}
+
+    telProdNpMonSistemMemPooldlsavailable OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Number of available partitions of the memory area reserved to
+        DLS messages."
+        ::={telProdNpMonSistemMemory 25}
+
+    telProdNpMonSistemMemTotal OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Total system memory in bytes."
+        ::={telProdNpMonSistemMemory 26}
+
+    telProdNpMonSistemMemTotalcache OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Total cache memory in bytes."
+        ::={telProdNpMonSistemMemory 27}
+
+    telProdNpMonSistemMemFreecache OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Available free cache memory in bytes."
+        ::={telProdNpMonSistemMemory 28}
+
+    telProdNpMonSistemMemTotalnoncache OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Total non cache memory in bytes."
+        ::={telProdNpMonSistemMemory 29}
+
+    telProdNpMonSistemMemFreenoncache OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Free non cache memory in bytes."
+        ::={telProdNpMonSistemMemory 30}
+
+    telProdNpMonSistemMemCaches OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(30))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Caches."
+        ::={telProdNpMonSistemMemory 31}
+
+    telProdNpMonSistemMemFlash OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "System flash memory in bytes."
+        ::={telProdNpMonSistemMemory 32}
+
+    telProdNpMonSistemMemFreeglobbuffer OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of available public buffers in the system."
+        ::={telProdNpMonSistemMemory 33}
+
+    telProdNpMonSistemMemHeap OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Size of the available heap in bytes."
+        ::={telProdNpMonSistemMemory 34}
+
+    telProdNpMonSistemMemIcused OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Used CPU percentage."
+        ::={telProdNpMonSistemMemory 35}
+
+    telProdNpMonSistemMemIcindex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "CPU index."
+        ::={telProdNpMonSistemMemory 36}
+
+    telProdNpMonSistemMemTc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Cycle Time."
+        ::={telProdNpMonSistemMemory 37}
+
+    -- Grupo telProdNpMonSistemFan
+
+    telProdNpMonSistemFan    OBJECT IDENTIFIER ::= {telProdNpMonitSistema 3}
+
+    telProdNpMonSistemFanCpu OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "CPU Fanspeed in rpm"
+        ::={telProdNpMonSistemFan 1}
+
+    telProdNpMonSistemFanCpuPerCent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "CPU Fanspeed in percentage of nominal value"
+        ::={telProdNpMonSistemFan 2}
+
+    telProdNpMonSistemFanCase OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Case Fanspeed in rpm"
+        ::={telProdNpMonSistemFan 3}
+
+    telProdNpMonSistemFanCasePerCent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Case Fanspeed in percentage of nominal value"
+        ::={telProdNpMonSistemFan 4}
+
+    -- Tabla telProdNpMonPoeCardsTable
+
+    telProdNpMonPoeCardsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelProdNpMonPoeCardsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Table to show if Poe Card are present."
+        ::={telProdNpMonitSistema 4}
+
+    telProdNpMonPoeCardsEntry OBJECT-TYPE
+        SYNTAX TelProdNpMonPoeCardsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Each entry corresponds to POE card."
+        INDEX {telProdNpMonPoeCardsInd}
+        ::={telProdNpMonPoeCardsTable 1}
+
+    TelProdNpMonPoeCardsEntry ::=
+        SEQUENCE {
+            telProdNpMonPoeCardsInd
+                INTEGER,
+            telProdNpMonPoeCardsState
+                DisplayString
+            }
+
+    telProdNpMonPoeCardsInd OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Index number (table index)."
+        ::={telProdNpMonPoeCardsEntry 1}
+
+    telProdNpMonPoeCardsState OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Shows which POE Card is present."
+        ::={telProdNpMonPoeCardsEntry 2}
+
+    -- Grupo telProdNpMonInterface
+
+    -- COMANDOS (telProdNpMonInterface 1)
+
+    telProdNpMonInterfCommandsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelProdNpMonInterfCommandsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Table used to delete general statistics of nets (not of nodes)."
+        ::={telProdNpMonInterface 1}
+
+    telProdNpMonInterfCommandsEntry OBJECT-TYPE
+        SYNTAX TelProdNpMonInterfCommandsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Each entry corresponds to a net interface."
+        INDEX {telProdNpMonInterfCommandsIfc}
+        ::={telProdNpMonInterfCommandsTable 1}
+
+    TelProdNpMonInterfCommandsEntry ::=
+        SEQUENCE {
+            telProdNpMonInterfCommandsIfc
+                INTEGER,
+            telProdNpMonInterfCommandsClear
+                INTEGER
+            }
+
+    telProdNpMonInterfCommandsIfc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface number (table index)."
+        ::={telProdNpMonInterfCommandsEntry 1}
+
+    telProdNpMonInterfCommandsClear OBJECT-TYPE
+        SYNTAX INTEGER{
+            delete(1),
+            valid(2),
+            error(3),
+            undefined(4)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+        "Statistics Delete command for the chosen interface. If the operation
+        successes (2) valid will appear. If the operation could not be
+        performed (3)error will appear. If no delete operation has been
+        performed (4)undefined will appear."
+        ::={telProdNpMonInterfCommandsEntry 2}
+
+
+    -- ROUTER (telProdNpMonInterface 2)
+    -- telProdNpMonInterfRouter OBJECT IDENTIFIER ::= {telProdNpMonInterface 2}
+
+    -- Buffer (telProdNpMonInterfRouter 1)
+
+    telProdNpMonInterfBufferTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelProdNpMonInterfBufferEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "It shows information about the packet buffers assigned to
+        each interface."
+        ::={telProdNpMonInterfRouter 1}
+
+    telProdNpMonInterfBufferEntry OBJECT-TYPE
+        SYNTAX TelProdNpMonInterfBufferEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Each entry corresponds to information about an interface."
+        INDEX {telProdNpMonInterfBufferIfc}
+        ::={telProdNpMonInterfBufferTable 1}
+
+    TelProdNpMonInterfBufferEntry ::=
+        SEQUENCE {
+            telProdNpMonInterfBufferIfc
+                INTEGER,
+            telProdNpMonInterfBufferKind
+                INTEGER,
+            telProdNpMonInterfBufferOrder
+                INTEGER,
+            telProdNpMonInterfBufferReq
+                INTEGER,
+            telProdNpMonInterfBufferAlloc
+                INTEGER,
+            telProdNpMonInterfBufferLow
+                INTEGER,
+            telProdNpMonInterfBufferCurr
+                INTEGER,
+            telProdNpMonInterfBufferHdr
+                INTEGER,
+            telProdNpMonInterfBufferWrap
+                INTEGER,
+            telProdNpMonInterfBufferData
+                INTEGER,
+            telProdNpMonInterfBufferTrail
+                INTEGER,
+            telProdNpMonInterfBufferTotal
+                INTEGER,
+            telProdNpMonInterfBufferAlloc2
+                INTEGER
+            }
+
+    telProdNpMonInterfBufferIfc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Interface number (table index)."
+        ::={telProdNpMonInterfBufferEntry 1}
+
+    telProdNpMonInterfBufferKind OBJECT-TYPE
+        SYNTAX INTEGER{
+            vi(1),
+            pn(2),
+            pri(3),
+            xeth(4),
+            arpa(5),
+            chp(6),
+            osl(7),
+            eth(8),
+            sl(9),
+            x28(10),
+            dmr(11),
+            tkr(12),
+            snk(13),
+            x25(14),
+            man(15),
+            atr(16),
+            fddi(17),
+            srly(18),
+            ippn(19),
+            fr(20),
+            ppp(21),
+            bdg(22),
+            null(23),
+            isdnb(24),
+            sdlc(25),
+            v25b(26),
+            routernode(27),
+            noderouter(28),
+            isdnd(29),
+            xot(30),
+            int270(31),
+            tnip(32),
+            mppp(33),
+            atm(34),
+            subatm(35),
+            ipsec(36),
+            bri(37),
+            x25fak(38),
+            isdnbfak(39),
+            isdndfak(40),
+            xotfak(41),
+            int270fak(42),
+            asdp(43),
+            syncsl(44),
+            asyncsl(45),
+            aptb(46),
+            dialrout(47),
+            arly(48),
+            mem(49),
+            vlaneth(50),
+            voip(51),
+            l2tp(52),
+            bvi(53),
+            scada(54),
+            wlan(55),
+            sepi(56),
+            eibz(57),
+            gpio(58),
+            autosl(59),
+            mdmemu(60),
+            frsub(61),
+            bvisub(62),
+            nic(63),
+            dip(64),
+            iec101gw(65),
+            gps(66),
+            gpsdatasl(67)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface type.
+        VI,                     VI LNI
+        PN,                     ProNET
+        PRI,                    PRI IFC CH, CHAOS Net
+        XETH,                   Experimental EtherNet (3 MBit)
+        ARPA,                   ARPANet
+        CHP,                    CHAOS protocol net
+        OSL,                    Serial line interface
+        Eth,                    EtherNet (10 MBit)
+        SL,                     New serial line link
+        X28,                    X.28
+        DMR,                    DEC DMR interface
+        TKR,                    802.5 token ring
+        SNK,                    Sink network (not a real network)
+        X25,                    X25 network
+        MAN,                    802.6 metro area network
+        ATR,                    Apollo Token Ring
+        FDDI,                   FDDI
+        SRLY,                   SDLC relay int
+        IPPN,                   IP Protocol Net
+        FR,                     Frame Relay network
+        PPP,                    PPP network
+        BDG,                    Bridging pseudo-handler
+        NULL,                   Null device
+        GWT_NTYPE_B_ISDN,       ISDN network B channel
+        SDLC,                   TRUE SDLC int
+        V25B,                   V.25bis base network
+        R->N,                   Teldat Micro-node
+        N->R,                   Teldat Router
+        GWT_NTYPE_D_ISDN,       RDSI D channel
+        270,                    270 Virtual port
+        XOT,                    XOT
+        TNIP,                   IP tunnel
+        MPPP,                   PPP Multilink
+        ATM,                    ATM Interface
+        SUBATM,                 ATM subinterface
+        IPSEC,                  IPSEC
+        BRI,                    RDSI (2Bs)
+        X25_FAK,                X25 fake
+        ISDNB_FAK,              ISDNB fake
+        ISDND_FAK,              ISDND fake
+        XOT_FAK,                XOT fake
+        270_FAK,                270 fake
+        ASDP,                   Asynchronous serial device
+        SYNC_SL,                Synchronous serial line
+        ASYNC_SL,               Asynchronous serial line
+        APTB,                   Asynchronous serial line
+        DIALROUT,               Fake for Dial Routing
+        ARLY,                   AP alarms relay
+        MEM,                    PCI Memory card
+        VLAN_ETH,               VLAN Ethernet
+        VOIP,                   VoIP card
+        L2TP,                   L2TP Virtual Interface
+        BVI,                    Bridge Virtual Interface
+        SCADA,                  SCADA Virtual Interface
+        WLAN,                   Wireless LAN
+        SEPI,                   Serial Event Printing Interface
+        EIB_Z,                  Zennio EIB Adapter
+        GPIO,                   General Parallel I/O
+        AUTO_SL,                Synchronous serial line
+        MDMEMU,                 Modem Emulator Interface
+        FR_SUB,                 FR subinterface
+        BVI_SUB,                BVI subinterface
+        NIC,                    USB_NIC Device
+        DIP,                    Generic DirectIP encapsulation
+        IEC101GW,               SCADA Virtual Interface
+        GPS,                    GPS Receiver Interface
+        GPSDATA_SL,             GPS DATA Serial line"
+        ::={telProdNpMonInterfBufferEntry 2}
+
+    telProdNpMonInterfBufferOrder OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "This type interface number."
+        ::={telProdNpMonInterfBufferEntry 3}
+
+    telProdNpMonInterfBufferReq OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of input buffers requiered."
+        ::={telProdNpMonInterfBufferEntry 4}
+
+    telProdNpMonInterfBufferAlloc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of input buffers assigned."
+        ::={telProdNpMonInterfBufferEntry 5}
+
+    telProdNpMonInterfBufferLow OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Low water mark (flow control)."
+        ::={telProdNpMonInterfBufferEntry 6}
+
+    telProdNpMonInterfBufferCurr OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Current number of input buffers to this device. If the value is 0, the
+        device is disabled. When the packet is received, if the value of Curr
+        in lower than Low, then the flow control can choose it."
+        ::={telProdNpMonInterfBufferEntry 7}
+
+    telProdNpMonInterfBufferHdr OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "It is the maximum value between the following two:
+        The largest LLC, plus MAC, plus the header size of the output device.
+        The MAC plus the header size of the output device."
+        ::={telProdNpMonInterfBufferEntry 8}
+
+    telProdNpMonInterfBufferWrap OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Given range for MAC, LLC, or network layer."
+        ::={telProdNpMonInterfBufferEntry 9}
+
+    telProdNpMonInterfBufferData OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Maximum size of the data link layer packet."
+        ::={telProdNpMonInterfBufferEntry 10}
+
+    telProdNpMonInterfBufferTrail OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Addition of the largest MAC and the hardware trailers."
+        ::={telProdNpMonInterfBufferEntry 11}
+
+    telProdNpMonInterfBufferTotal OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Global size of each packet buffer."
+        ::={telProdNpMonInterfBufferEntry 12}
+
+    telProdNpMonInterfBufferAlloc2 OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Amount of buffer memory bytes for this device. This value is
+        calculated multiplying Curr by Total."
+        ::={telProdNpMonInterfBufferEntry 13}
+
+    -- General (telProdNpMonInterfRouter 2)
+
+    telProdNpMonInterfGeneralTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelProdNpMonInterfGeneralEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Table that shows statistic information about interfaces."
+        ::={telProdNpMonInterfRouter 2}
+
+    telProdNpMonInterfGeneralEntry OBJECT-TYPE
+        SYNTAX TelProdNpMonInterfGeneralEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Each entry corresponds to an interface."
+        INDEX {telProdNpMonInterfGeneralIfc}
+        ::={telProdNpMonInterfGeneralTable 1}
+
+    TelProdNpMonInterfGeneralEntry ::=
+        SEQUENCE{
+            telProdNpMonInterfGeneralIfc
+                INTEGER,
+            telProdNpMonInterfGeneralKind
+                INTEGER,
+            telProdNpMonInterfGeneralOrder
+                INTEGER,
+            telProdNpMonInterfGeneralCsr
+                INTEGER,
+            telProdNpMonInterfGeneralVect
+                INTEGER,
+            telProdNpMonInterfGeneralTestvalid
+                Counter,
+            telProdNpMonInterfGeneralTestfailure
+                Counter,
+            telProdNpMonInterfGeneralMaintenFailure
+                Counter
+            }
+
+    telProdNpMonInterfGeneralIfc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Interface number (table index)."
+        ::={telProdNpMonInterfGeneralEntry 1}
+
+    telProdNpMonInterfGeneralKind OBJECT-TYPE
+        SYNTAX INTEGER{
+            vi(1),
+            pn(2),
+            pri(3),
+            xeth(4),
+            arpa(5),
+            chp(6),
+            osl(7),
+            eth(8),
+            sl(9),
+            x28(10),
+            dmr(11),
+            tkr(12),
+            snk(13),
+            x25(14),
+            man(15),
+            atr(16),
+            fddi(17),
+            srly(18),
+            ippn(19),
+            fr(20),
+            ppp(21),
+            bdg(22),
+            null(23),
+            isdnb(24),
+            sdlc(25),
+            v25b(26),
+            routernode(27),
+            noderouter(28),
+            isdnd(29),
+            xot(30),
+            int270(31),
+            tnip(32),
+            mppp(33),
+            atm(34),
+            subatm(35),
+            ipsec(36),
+            bri(37),
+            x25fak(38),
+            isdnbfak(39),
+            isdndfak(40),
+            xotfak(41),
+            int270fak(42),
+            asdp(43),
+            syncsl(44),
+            asyncsl(45),
+            aptb(46),
+            dialrout(47),
+            arly(48),
+            mem(49),
+            vlaneth(50),
+            voip(51),
+            l2tp(52),
+            bvi(53),
+            scada(54),
+            wlan(55),
+            sepi(56),
+            eibz(57),
+            gpio(58),
+            autosl(59),
+            mdmemu(60),
+            frsub(61),
+            bvisub(62),
+            nic(63),
+            dip(64),
+            iec101gw(65),
+            gps(66),
+            gpsdatasl(67)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface type.
+        VI,                     VI LNI
+        PN,                     ProNET
+        PRI,                    PRI IFC CH, CHAOS Net
+        XETH,                   Experimental EtherNet (3 MBit)
+        ARPA,                   ARPANet
+        CHP,                    CHAOS protocol net
+        OSL,                    Serial line interface
+        Eth,                    EtherNet (10 MBit)
+        SL,                     New serial line link
+        X28,                    X.28
+        DMR,                    DEC DMR interface
+        TKR,                    802.5 token ring
+        SNK,                    Sink network (not a real network)
+        X25,                    X25 network
+        MAN,                    802.6 metro area network
+        ATR,                    Apollo Token Ring
+        FDDI,                   FDDI
+        SRLY,                   SDLC relay int
+        IPPN,                   IP Protocol Net
+        FR,                     Frame Relay network
+        PPP,                    PPP network
+        BDG,                    Bridging pseudo-handler
+        NULL,                   Null device
+        GWT_NTYPE_B_ISDN,       ISDN network B channel
+        SDLC,                   TRUE SDLC int
+        V25B,                   V.25bis base network
+        R->N,                   Teldat Micro-node
+        N->R,                   Teldat Router
+        GWT_NTYPE_D_ISDN,       RDSI D channel
+        270,                    270 Virtual port
+        XOT,                    XOT
+        TNIP,                   IP tunnel
+        MPPP,                   PPP Multilink
+        ATM,                    ATM Interface
+        SUBATM,                 ATM subinterface
+        IPSEC,                  IPSEC
+        BRI,                    RDSI (2Bs)
+        X25_FAK,                X25 fake
+        ISDNB_FAK,              ISDNB fake
+        ISDND_FAK,              ISDND fake
+        XOT_FAK,                XOT fake
+        270_FAK,                270 fake
+        ASDP,                   Asynchronous serial device
+        SYNC_SL,                Synchronous serial line
+        ASYNC_SL,               Asynchronous serial line
+        APTB,                   Asynchronous serial line
+        DIALROUT,               Fake for Dial Routing
+        ARLY,                   AP alarms relay
+        MEM,                    PCI Memory card
+        VLAN_ETH,               VLAN Ethernet
+        VOIP,                   VoIP card
+        L2TP,                   L2TP Virtual Interface
+        BVI,                    Bridge Virtual Interface
+        SCADA,                  SCADA Virtual Interface
+        WLAN,                   Wireless LAN
+        SEPI,                   Serial Event Printing Interface
+        EIB_Z,                  Zennio EIB Adapter
+        GPIO,                   General Parallel I/O
+        AUTO_SL,                Synchronous serial line
+        MDMEMU,                 Modem Emulator Interface
+        FR_SUB,                 FR subinterface
+        BVI_SUB,                BVI subinterface
+        NIC,                    USB_NIC Device
+        DIP,                    Generic DirectIP encapsulation
+        IEC101GW,               SCADA Virtual Interface
+        GPS,                    GPS Receiver Interface
+        GPSDATA_SL,             GPS DATA Serial line"
+        ::={telProdNpMonInterfGeneralEntry 2}
+
+    telProdNpMonInterfGeneralOrder OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "This type interface number."
+        ::={telProdNpMonInterfGeneralEntry 3}
+
+    telProdNpMonInterfGeneralCsr OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Command and Status Register address."
+        ::={telProdNpMonInterfGeneralEntry 4}
+
+    telProdNpMonInterfGeneralVect OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interruption vector."
+        ::={telProdNpMonInterfGeneralEntry 5}
+
+    telProdNpMonInterfGeneralTestvalid OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Times the auto-test has succeded (the interface status changes
+        from down to up)."
+        ::={telProdNpMonInterfGeneralEntry 6}
+
+    telProdNpMonInterfGeneralTestfailure OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Times the auto-test has failed (the interface status changes
+        from up to down)."
+        ::={telProdNpMonInterfGeneralEntry 7}
+
+    telProdNpMonInterfGeneralMaintenFailure OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of maintenance failures."
+        ::={telProdNpMonInterfGeneralEntry 8}
+
+    -- Errores (telProdNpMonInterfRouter 3)
+
+    telProdNpMonInterfErrorsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelProdNpMonInterfErrorsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Error table. It shows error statistics for the network."
+        ::={telProdNpMonInterfRouter 3}
+
+    telProdNpMonInterfErrorsEntry OBJECT-TYPE
+        SYNTAX TelProdNpMonInterfErrorsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Each entry reports the interface errors."
+        INDEX {telProdNpMonInterfErrorsIfc}
+        ::={telProdNpMonInterfErrorsTable 1}
+
+    TelProdNpMonInterfErrorsEntry ::=
+        SEQUENCE {
+            telProdNpMonInterfErrorsIfc
+                INTEGER,
+            telProdNpMonInterfErrorsKind
+                INTEGER,
+            telProdNpMonInterfErrorsOrder
+                INTEGER,
+            telProdNpMonInterfErrorsIdiscard
+                Counter,
+            telProdNpMonInterfErrorsIerrors
+                Counter,
+            telProdNpMonInterfErrorsIunkprot
+                Counter,
+            telProdNpMonInterfErrorsOflowdrop
+                Counter,
+            telProdNpMonInterfErrorsOdiscard
+                Counter,
+            telProdNpMonInterfErrorsOerrors
+                Counter
+            }
+
+    telProdNpMonInterfErrorsIfc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Interface number. Table index."
+        ::={telProdNpMonInterfErrorsEntry 1}
+
+    telProdNpMonInterfErrorsKind OBJECT-TYPE
+        SYNTAX INTEGER{
+            vi(1),
+            pn(2),
+            pri(3),
+            xeth(4),
+            arpa(5),
+            chp(6),
+            osl(7),
+            eth(8),
+            sl(9),
+            x28(10),
+            dmr(11),
+            tkr(12),
+            snk(13),
+            x25(14),
+            man(15),
+            atr(16),
+            fddi(17),
+            srly(18),
+            ippn(19),
+            fr(20),
+            ppp(21),
+            bdg(22),
+            null(23),
+            isdnb(24),
+            sdlc(25),
+            v25b(26),
+            routernode(27),
+            noderouter(28),
+            isdnd(29),
+            xot(30),
+            int270(31),
+            tnip(32),
+            mppp(33),
+            atm(34),
+            subatm(35),
+            ipsec(36),
+            bri(37),
+            x25fak(38),
+            isdnbfak(39),
+            isdndfak(40),
+            xotfak(41),
+            int270fak(42),
+            asdp(43),
+            syncsl(44),
+            asyncsl(45),
+            aptb(46),
+            dialrout(47),
+            arly(48),
+            mem(49),
+            vlaneth(50),
+            voip(51),
+            l2tp(52),
+            bvi(53),
+            scada(54),
+            wlan(55),
+            sepi(56),
+            eibz(57),
+            gpio(58),
+            autosl(59),
+            mdmemu(60),
+            frsub(61),
+            bvisub(62),
+            nic(63),
+            dip(64),
+            iec101gw(65),
+            gps(66),
+            gpsdatasl(67)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface type.
+        VI,                     VI LNI
+        PN,                     ProNET
+        PRI,                    PRI IFC CH, CHAOS Net
+        XETH,                   Experimental EtherNet (3 MBit)
+        ARPA,                   ARPANet
+        CHP,                    CHAOS protocol net
+        OSL,                    Serial line interface
+        Eth,                    EtherNet (10 MBit)
+        SL,                     New serial line link
+        X28,                    X.28
+        DMR,                    DEC DMR interface
+        TKR,                    802.5 token ring
+        SNK,                    Sink network (not a real network)
+        X25,                    X25 network
+        MAN,                    802.6 metro area network
+        ATR,                    Apollo Token Ring
+        FDDI,                   FDDI
+        SRLY,                   SDLC relay int
+        IPPN,                   IP Protocol Net
+        FR,                     Frame Relay network
+        PPP,                    PPP network
+        BDG,                    Bridging pseudo-handler
+        NULL,                   Null device
+        GWT_NTYPE_B_ISDN,       ISDN network B channel
+        SDLC,                   TRUE SDLC int
+        V25B,                   V.25bis base network
+        R->N,                   Teldat Micro-node
+        N->R,                   Teldat Router
+        GWT_NTYPE_D_ISDN,       RDSI D channel
+        270,                    270 Virtual port
+        XOT,                    XOT
+        TNIP,                   IP tunnel
+        MPPP,                   PPP Multilink
+        ATM,                    ATM Interface
+        SUBATM,                 ATM subinterface
+        IPSEC,                  IPSEC
+        BRI,                    RDSI (2Bs)
+        X25_FAK,                X25 fake
+        ISDNB_FAK,              ISDNB fake
+        ISDND_FAK,              ISDND fake
+        XOT_FAK,                XOT fake
+        270_FAK,                270 fake
+        ASDP,                   Asynchronous serial device
+        SYNC_SL,                Synchronous serial line
+        ASYNC_SL,               Asynchronous serial line
+        APTB,                   Asynchronous serial line
+        DIALROUT,               Fake for Dial Routing
+        ARLY,                   AP alarms relay
+        MEM,                    PCI Memory card
+        VLAN_ETH,               VLAN Ethernet
+        VOIP,                   VoIP card
+        L2TP,                   L2TP Virtual Interface
+        BVI,                    Bridge Virtual Interface
+        SCADA,                  SCADA Virtual Interface
+        WLAN,                   Wireless LAN
+        SEPI,                   Serial Event Printing Interface
+        EIB_Z,                  Zennio EIB Adapter
+        GPIO,                   General Parallel I/O
+        AUTO_SL,                Synchronous serial line
+        MDMEMU,                 Modem Emulator Interface
+        FR_SUB,                 FR subinterface
+        BVI_SUB,                BVI subinterface
+        NIC,                    USB_NIC Device
+        DIP,                    Generic DirectIP encapsulation
+        IEC101GW,               SCADA Virtual Interface
+        GPS,                    GPS Receiver Interface
+        GPSDATA_SL,             GPS DATA Serial line"
+        ::={telProdNpMonInterfErrorsEntry 2}
+
+    telProdNpMonInterfErrorsOrder OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "This type interface number."
+        ::={telProdNpMonInterfErrorsEntry 3}
+
+    telProdNpMonInterfErrorsIdiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of discarded packets due to flow control on reception."
+        ::={telProdNpMonInterfErrorsEntry 4}
+
+    telProdNpMonInterfErrorsIerrors OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of faulty packets found in the link layer."
+        ::={telProdNpMonInterfErrorsEntry 5}
+
+    telProdNpMonInterfErrorsIunkprot OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of received packets for an unknown protocol."
+        ::={telProdNpMonInterfErrorsEntry 6}
+
+    telProdNpMonInterfErrorsOflowdrop OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of received packets that have been discarded later due to
+        flow control in transmission."
+        ::={telProdNpMonInterfErrorsEntry 7}
+
+    telProdNpMonInterfErrorsOdiscard OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of discarded packets due to flow control in transmission."
+        ::={telProdNpMonInterfErrorsEntry 8}
+
+    telProdNpMonInterfErrorsOerrors OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of output errors, such as attempts to send to a network that
+        has crashed during transmission."
+        ::={telProdNpMonInterfErrorsEntry 9}
+
+    -- Colas (telProdNpMonInterfRouter 4)
+
+    telProdNpMonInterfQueueTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelProdNpMonInterfQueueEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "It shows statistics about input and output queues in the specified
+        interfaces. The provided information consists of:
+        -Total number of assigned buffers
+        -Value of the low layer buffer
+        -Number of active buffers at present in the interface."
+        ::={telProdNpMonInterfRouter 4}
+
+    telProdNpMonInterfQueueEntry OBJECT-TYPE
+        SYNTAX TelProdNpMonInterfQueueEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "There is an entry per interface."
+        INDEX {telProdNpMonInterfQueueIfc}
+        ::={telProdNpMonInterfQueueTable 1}
+
+    TelProdNpMonInterfQueueEntry ::=
+        SEQUENCE {
+            telProdNpMonInterfQueueIfc
+                INTEGER,
+            telProdNpMonInterfQueueKind
+                INTEGER,
+            telProdNpMonInterfQueueOrder
+                INTEGER,
+            telProdNpMonInterfQueueIalloc
+                INTEGER,
+            telProdNpMonInterfQueueIlow
+                INTEGER,
+            telProdNpMonInterfQueueIcurrent
+                INTEGER,
+            telProdNpMonInterfQueueOfair
+                INTEGER,
+            telProdNpMonInterfQueueOcurrent
+                INTEGER
+            }
+
+    telProdNpMonInterfQueueIfc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Interface number. Table index."
+        ::={telProdNpMonInterfQueueEntry 1}
+
+    telProdNpMonInterfQueueKind OBJECT-TYPE
+        SYNTAX INTEGER{
+            vi(1),
+            pn(2),
+            pri(3),
+            xeth(4),
+            arpa(5),
+            chp(6),
+            osl(7),
+            eth(8),
+            sl(9),
+            x28(10),
+            dmr(11),
+            tkr(12),
+            snk(13),
+            x25(14),
+            man(15),
+            atr(16),
+            fddi(17),
+            srly(18),
+            ippn(19),
+            fr(20),
+            ppp(21),
+            bdg(22),
+            null(23),
+            isdnb(24),
+            sdlc(25),
+            v25b(26),
+            routernode(27),
+            noderouter(28),
+            isdnd(29),
+            xot(30),
+            int270(31),
+            tnip(32),
+            mppp(33),
+            atm(34),
+            subatm(35),
+            ipsec(36),
+            bri(37),
+            x25fak(38),
+            isdnbfak(39),
+            isdndfak(40),
+            xotfak(41),
+            int270fak(42),
+            asdp(43),
+            syncsl(44),
+            asyncsl(45),
+            aptb(46),
+            dialrout(47),
+            arly(48),
+            mem(49),
+            vlaneth(50),
+            voip(51),
+            l2tp(52),
+            bvi(53),
+            scada(54),
+            wlan(55),
+            sepi(56),
+            eibz(57),
+            gpio(58),
+            autosl(59),
+            mdmemu(60),
+            frsub(61),
+            bvisub(62),
+            nic(63),
+            dip(64),
+            iec101gw(65),
+            gps(66),
+            gpsdatasl(67)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface type.
+        VI,                     VI LNI
+        PN,                     ProNET
+        PRI,                    PRI IFC CH, CHAOS Net
+        XETH,                   Experimental EtherNet (3 MBit)
+        ARPA,                   ARPANet
+        CHP,                    CHAOS protocol net
+        OSL,                    Serial line interface
+        Eth,                    EtherNet (10 MBit)
+        SL,                     New serial line link
+        X28,                    X.28
+        DMR,                    DEC DMR interface
+        TKR,                    802.5 token ring
+        SNK,                    Sink network (not a real network)
+        X25,                    X25 network
+        MAN,                    802.6 metro area network
+        ATR,                    Apollo Token Ring
+        FDDI,                   FDDI
+        SRLY,                   SDLC relay int
+        IPPN,                   IP Protocol Net
+        FR,                     Frame Relay network
+        PPP,                    PPP network
+        BDG,                    Bridging pseudo-handler
+        NULL,                   Null device
+        GWT_NTYPE_B_ISDN,       ISDN network B channel
+        SDLC,                   TRUE SDLC int
+        V25B,                   V.25bis base network
+        R->N,                   Teldat Micro-node
+        N->R,                   Teldat Router
+        GWT_NTYPE_D_ISDN,       RDSI D channel
+        270,                    270 Virtual port
+        XOT,                    XOT
+        TNIP,                   IP tunnel
+        MPPP,                   PPP Multilink
+        ATM,                    ATM Interface
+        SUBATM,                 ATM subinterface
+        IPSEC,                  IPSEC
+        BRI,                    RDSI (2Bs)
+        X25_FAK,                X25 fake
+        ISDNB_FAK,              ISDNB fake
+        ISDND_FAK,              ISDND fake
+        XOT_FAK,                XOT fake
+        270_FAK,                270 fake
+        ASDP,                   Asynchronous serial device
+        SYNC_SL,                Synchronous serial line
+        ASYNC_SL,               Asynchronous serial line
+        APTB,                   Asynchronous serial line
+        DIALROUT,               Fake for Dial Routing
+        ARLY,                   AP alarms relay
+        MEM,                    PCI Memory card
+        VLAN_ETH,               VLAN Ethernet
+        VOIP,                   VoIP card
+        L2TP,                   L2TP Virtual Interface
+        BVI,                    Bridge Virtual Interface
+        SCADA,                  SCADA Virtual Interface
+        WLAN,                   Wireless LAN
+        SEPI,                   Serial Event Printing Interface
+        EIB_Z,                  Zennio EIB Adapter
+        GPIO,                   General Parallel I/O
+        AUTO_SL,                Synchronous serial line
+        MDMEMU,                 Modem Emulator Interface
+        FR_SUB,                 FR subinterface
+        BVI_SUB,                BVI subinterface
+        NIC,                    USB_NIC Device
+        DIP,                    Generic DirectIP encapsulation
+        IEC101GW,               SCADA Virtual Interface
+        GPS,                    GPS Receiver Interface
+        GPSDATA_SL,             GPS DATA Serial line"
+        ::={telProdNpMonInterfQueueEntry 2}
+
+    telProdNpMonInterfQueueOrder OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface number."
+        ::={telProdNpMonInterfQueueEntry 3}
+
+    telProdNpMonInterfQueueIalloc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of input buffers assigned to this device."
+        ::={telProdNpMonInterfQueueEntry 4}
+
+    telProdNpMonInterfQueueIlow OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Water mark for flow control in the device."
+        ::={telProdNpMonInterfQueueEntry 5}
+
+    telProdNpMonInterfQueueIcurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Current number of input buffers to this device. The value is 0
+        when the device is disabled."
+        ::={telProdNpMonInterfQueueEntry 6}
+
+    telProdNpMonInterfQueueOfair OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Fair level for output queue in the device."
+        ::={telProdNpMonInterfQueueEntry 7}
+
+    telProdNpMonInterfQueueOcurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of packets currently waiting for transmission in this
+        device."
+        ::={telProdNpMonInterfQueueEntry 8}
+
+    -- Estadísticos (telProdNpMonInterfRouter 5)
+
+    telProdNpMonInterfStatsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelProdNpMonInterfStatsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "It contains statistics information with reference to the network
+        software, such as network configuration in the router."
+        ::={telProdNpMonInterfRouter 5}
+
+    telProdNpMonInterfStatsEntry OBJECT-TYPE
+        SYNTAX TelProdNpMonInterfStatsEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+        "Each register provides information about an interface."
+        INDEX {telProdNpMonInterfStatsIfc}
+        ::={telProdNpMonInterfStatsTable 1}
+
+    TelProdNpMonInterfStatsEntry ::=
+        SEQUENCE {
+            telProdNpMonInterfStatsIfc
+                INTEGER,
+            telProdNpMonInterfStatsKind
+                INTEGER,
+            telProdNpMonInterfStatsOrder
+                INTEGER,
+            telProdNpMonInterfStatsUnipkrcv
+                Counter,
+            telProdNpMonInterfStatsMulpkrcv
+                Counter,
+            telProdNpMonInterfStatsBytesrcv
+                Counter,
+            telProdNpMonInterfStatsPkxt
+                Counter,
+            telProdNpMonInterfStatsBytesxt
+                Counter
+            }
+
+    telProdNpMonInterfStatsIfc OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+        "Interface number. Table index."
+        ::={telProdNpMonInterfStatsEntry 1}
+
+    telProdNpMonInterfStatsKind OBJECT-TYPE
+        SYNTAX INTEGER{
+            vi(1),
+            pn(2),
+            pri(3),
+            xeth(4),
+            arpa(5),
+            chp(6),
+            osl(7),
+            eth(8),
+            sl(9),
+            x28(10),
+            dmr(11),
+            tkr(12),
+            snk(13),
+            x25(14),
+            man(15),
+            atr(16),
+            fddi(17),
+            srly(18),
+            ippn(19),
+            fr(20),
+            ppp(21),
+            bdg(22),
+            null(23),
+            isdnb(24),
+            sdlc(25),
+            v25b(26),
+            routernode(27),
+            noderouter(28),
+            isdnd(29),
+            xot(30),
+            int270(31),
+            tnip(32),
+            mppp(33),
+            atm(34),
+            subatm(35),
+            ipsec(36),
+            bri(37),
+            x25fak(38),
+            isdnbfak(39),
+            isdndfak(40),
+            xotfak(41),
+            int270fak(42),
+            asdp(43),
+            syncsl(44),
+            asyncsl(45),
+            aptb(46),
+            dialrout(47),
+            arly(48),
+            mem(49),
+            vlaneth(50),
+            voip(51),
+            l2tp(52),
+            bvi(53),
+            scada(54),
+            wlan(55),
+            sepi(56),
+            eibz(57),
+            gpio(58),
+            autosl(59),
+            mdmemu(60),
+            frsub(61),
+            bvisub(62),
+            nic(63),
+            dip(64),
+            iec101gw(65),
+            gps(66),
+            gpsdatasl(67)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface type.
+        VI,                     VI LNI
+        PN,                     ProNET
+        PRI,                    PRI IFC CH, CHAOS Net
+        XETH,                   Experimental EtherNet (3 MBit)
+        ARPA,                   ARPANet
+        CHP,                    CHAOS protocol net
+        OSL,                    Serial line interface
+        Eth,                    EtherNet (10 MBit)
+        SL,                     New serial line link
+        X28,                    X.28
+        DMR,                    DEC DMR interface
+        TKR,                    802.5 token ring
+        SNK,                    Sink network (not a real network)
+        X25,                    X25 network
+        MAN,                    802.6 metro area network
+        ATR,                    Apollo Token Ring
+        FDDI,                   FDDI
+        SRLY,                   SDLC relay int
+        IPPN,                   IP Protocol Net
+        FR,                     Frame Relay network
+        PPP,                    PPP network
+        BDG,                    Bridging pseudo-handler
+        NULL,                   Null device
+        GWT_NTYPE_B_ISDN,       ISDN network B channel
+        SDLC,                   TRUE SDLC int
+        V25B,                   V.25bis base network
+        R->N,                   Teldat Micro-node
+        N->R,                   Teldat Router
+        GWT_NTYPE_D_ISDN,       RDSI D channel
+        270,                    270 Virtual port
+        XOT,                    XOT
+        TNIP,                   IP tunnel
+        MPPP,                   PPP Multilink
+        ATM,                    ATM Interface
+        SUBATM,                 ATM subinterface
+        IPSEC,                  IPSEC
+        BRI,                    RDSI (2Bs)
+        X25_FAK,                X25 fake
+        ISDNB_FAK,              ISDNB fake
+        ISDND_FAK,              ISDND fake
+        XOT_FAK,                XOT fake
+        270_FAK,                270 fake
+        ASDP,                   Asynchronous serial device
+        SYNC_SL,                Synchronous serial line
+        ASYNC_SL,               Asynchronous serial line
+        APTB,                   Asynchronous serial line
+        DIALROUT,               Fake for Dial Routing
+        ARLY,                   AP alarms relay
+        MEM,                    PCI Memory card
+        VLAN_ETH,               VLAN Ethernet
+        VOIP,                   VoIP card
+        L2TP,                   L2TP Virtual Interface
+        BVI,                    Bridge Virtual Interface
+        SCADA,                  SCADA Virtual Interface
+        WLAN,                   Wireless LAN
+        SEPI,                   Serial Event Printing Interface
+        EIB_Z,                  Zennio EIB Adapter
+        GPIO,                   General Parallel I/O
+        AUTO_SL,                Synchronous serial line
+        MDMEMU,                 Modem Emulator Interface
+        FR_SUB,                 FR subinterface
+        BVI_SUB,                BVI subinterface
+        NIC,                    USB_NIC Device
+        DIP,                    Generic DirectIP encapsulation
+        IEC101GW,               SCADA Virtual Interface
+        GPS,                    GPS Receiver Interface
+        GPSDATA_SL,             GPS DATA Serial line"
+        ::={telProdNpMonInterfStatsEntry 2}
+
+    telProdNpMonInterfStatsOrder OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Interface number."
+        ::={telProdNpMonInterfStatsEntry 3}
+
+    telProdNpMonInterfStatsUnipkrcv OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of no-multicast, no-broadcast packets specificly addressed
+        in the MAC sub-layer."
+        ::={telProdNpMonInterfStatsEntry 4}
+
+    telProdNpMonInterfStatsMulpkrcv OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of received multicast or broadcast packets."
+        ::={telProdNpMonInterfStatsEntry 5}
+
+    telProdNpMonInterfStatsBytesrcv OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of received bytes  in this interface MAC sub-layer."
+        ::={telProdNpMonInterfStatsEntry 6}
+
+    telProdNpMonInterfStatsPkxt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of unicast, multicast, or broadcast transmitted packets."
+        ::={telProdNpMonInterfStatsEntry 7}
+
+    telProdNpMonInterfStatsBytesxt OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+        "Number of transmitted bytes in the MAC sub-layer."
+        ::={telProdNpMonInterfStatsEntry 8}
+
+END

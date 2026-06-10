@@ -1,0 +1,1897 @@
+-- ***********************************************************************************************
+-- TN-MGMT-MIB.smi:  Transition Networks, Inc. Enterprise MIB for basic management of the ION Platform
+--
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+--                     
+-- ***********************************************************************************************
+--
+
+TN-MGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises FROM SNMPv2-SMI
+	TimeStamp, TruthValue, DisplayString FROM SNMPv2-TC
+	entPhysicalIndex FROM ENTITY-MIB  
+	ifIndex, InterfaceIndexOrZero, InterfaceIndex FROM IF-MIB 
+	PortList FROM Q-BRIDGE-MIB
+	tnProducts FROM TRANSITION-SMI
+    IANAifType    FROM IANAifType-MIB
+	TNEthernetSpeed, TNEthernetDuplex, TNEthernetAutoCross,
+	TNLoopbackModeCapBits,CpsConnector, TNLoopbackModes, TNEthPhyMode FROM TRANSITION-TC;		
+
+tnMgmtMIB MODULE-IDENTITY
+	LAST-UPDATED "200901080000Z"
+	ORGANIZATION "Transition Networks, Inc."
+	CONTACT-INFO
+		"	Transition Networks
+			Technical Support
+
+			10900 Red Circle Drive
+			Minnetonka, MN 55343 USA
+			Tel: +1-800-526-9267
+			
+		    E-mail: techsupport@transition.com"
+	DESCRIPTION
+		"The mib module for managing all transition products."                           
+		
+	REVISION      "200901080000Z"
+	DESCRIPTION  
+		"Initial Revision of this module"     
+
+	REVISION        "201007150000Z"
+	DESCRIPTION
+		"Add private TDM MIB tnIfTDMTable, for T1E1 and DS3E3 card
+		and the corresponding trap tnTDMAlarmIndicationSignalEvt"
+
+	REVISION      "201009020000Z"
+	DESCRIPTION  
+		"Add tnIfL2CPTable"  
+
+	REVISION      "201209020000Z"
+	DESCRIPTION  
+		"Add tnEthMaxFrameSize."  
+	::= { tnProducts 3 }
+ 
+   
+-- 
+-- Section 1 : 
+--                                                         
+tnMgmtNotifications 	OBJECT IDENTIFIER ::= { tnMgmtMIB 0 }       
+tnMgmtObjects 		OBJECT IDENTIFIER ::= { tnMgmtMIB 1 }
+tnMgmtConformance 	OBJECT IDENTIFIER ::= { tnMgmtMIB 2 }
+         
+--
+--  Device management information
+--
+tnDevMgmt	            OBJECT IDENTIFIER ::= { tnMgmtObjects 1 }   
+tnInterfaceMgmt		OBJECT IDENTIFIER ::= { tnMgmtObjects 2 } 
+tnInterfaceDiagMgmt	OBJECT IDENTIFIER ::= { tnMgmtObjects 3 }  
+tnIfMACSecurityMgmt    OBJECT IDENTIFIER ::= { tnMgmtObjects 4 }  
+tnIfQOSMgmt  		OBJECT IDENTIFIER ::= { tnMgmtObjects 5 }
+
+--
+-- Device Management   
+--
+tnDevSysMgmt	        OBJECT IDENTIFIER ::= { tnDevMgmt 1 }    
+tnDevSysLPT			OBJECT IDENTIFIER ::= { tnDevMgmt 2 }    
+tnDevSysDyingGasp			OBJECT IDENTIFIER ::= { tnDevMgmt 3 }    
+tnDevSysMACLearning			OBJECT IDENTIFIER ::= { tnDevMgmt 4 }
+    
+tnDevSysCfgTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnDevSysCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "This table supplements the ENTITY-MIB for each device managed by this Agent."
+        ::= { tnDevSysMgmt 1 }    
+        
+tnDevSysCfgEntry OBJECT-TYPE
+        SYNTAX      TnDevSysCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "A entry in the table contains additional information related to a device."
+        INDEX       { entPhysicalIndex }
+        ::= { tnDevSysCfgTable 1 }
+ 
+TnDevSysCfgEntry ::= SEQUENCE
+{
+    tnDevSysName              OCTET STRING,
+    tnDevSysUptime            TimeTicks,
+    tnDevSysUptimeReset	      INTEGER,
+    tnDevSysReset		      INTEGER,
+    tnDevNumOfPorts	          INTEGER,
+    tnDevClearCounters	      INTEGER,
+    tnDevResetToFactoryConfig INTEGER,
+    tnDevConfigurationMode    INTEGER,
+    tnDevConsoleAccess        INTEGER,
+    tnDevSharedPortMode       INTEGER
+}
+    
+tnDevSysName	OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(0..256))
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "A user-defined string for this device. This can be used to
+    unique identity the device for the user.Some devices may support
+    less than the maximum length specified for this variable."
+	::= { tnDevSysCfgEntry 1 }
+
+tnDevSysUptime	OBJECT-TYPE
+	SYNTAX		TimeTicks
+	MAX-ACCESS	read-only
+    STATUS current
+    DESCRIPTION 
+    "The device's system uptime in milliseconds if supported, 0 otherwise."
+	::= { tnDevSysCfgEntry 2 }
+ 
+tnDevSysUptimeReset	OBJECT-TYPE
+	SYNTAX		INTEGER {reset(1), doNothing(2)}
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "The device's 'tnDevSysUptime' can be reset."
+    ::= { tnDevSysCfgEntry 3 }
+ 
+tnDevSysReset	OBJECT-TYPE
+	SYNTAX		INTEGER { running(1), coldStart(2), warmStart(3)}
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "The device can be reset or rebooted by setting this mib variable.
+    running(1)   - is a read-only value returned when the system is operational.
+    coldStart(2) - This resets all the system states and reinitializes the system.
+                   All configuration is saved during a restart.
+	warmStart(3) - The system restarts but the states are not initialized. Some devices
+	               may not support this operation."
+	::= { tnDevSysCfgEntry 4 }
+
+tnDevNumOfPorts OBJECT-TYPE
+	SYNTAX		INTEGER 
+	MAX-ACCESS	read-only
+    STATUS current
+    DESCRIPTION 
+    "This number of ports on this device."
+	::= { tnDevSysCfgEntry 5 }
+	
+tnDevClearCounters	OBJECT-TYPE
+	SYNTAX		INTEGER { perform(1), doNothing(2)}
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "This mib variable can reset all system counters including port counters."
+	::= { tnDevSysCfgEntry 6 }
+	                        
+tnDevResetToFactoryConfig	OBJECT-TYPE
+	SYNTAX		INTEGER { perform(1), doNothing(2)}
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "This mib variable can reset all system configuration to as it was
+    shipped from the factory."
+	::= { tnDevSysCfgEntry 7 }
+		                                             
+tnDevConfigurationMode	OBJECT-TYPE
+	SYNTAX		INTEGER { software(1), hardware(2)}
+	MAX-ACCESS	read-only
+    STATUS current
+    DESCRIPTION 
+    "This shows the configuration mode of the device. 
+    The device may have a jumper or switch that disables 
+ 	software management of the device. When Configuration Mode is
+ 	hardware(2), the devices take some of the configurations from 
+ 	dip switches or	jumpers on the device. In software(1) mode all
+ 	configurations are controlled by management."
+	::= { tnDevSysCfgEntry 8 }
+		                       
+tnDevConsoleAccess	OBJECT-TYPE
+	SYNTAX		INTEGER { enabled(1), disabled(2), notApplicable(3) }
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "This shows the configuration mode of the device's console access. 
+     Some of the device's have console interface through
+     a USB port or a serial RS232 port through which the command line interface
+     is accessible.
+     When the device is deployed at a remote site, the customer can choose to disable
+     this interface for security."
+	::= { tnDevSysCfgEntry 9 }      
+
+tnDevSharedPortMode OBJECT-TYPE
+    SYNTAX      INTEGER { internal(1), external(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This shows the configuration about the mode of shared port.
+                 internal : Shared Port used as internal
+                 external : Shared Port used as external"
+    ::= { tnDevSysCfgEntry 10 }
+--
+-- system hardware information
+--
+tnDevSysHwInforTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnDevSysHwInforEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "This table shows the information of hardware."
+        ::= { tnDevSysMgmt 2 }
+
+tnDevSysHwInforEntry OBJECT-TYPE
+        SYNTAX      TnDevSysHwInforEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "A entry in the table contains additional information related to a device."
+        INDEX       { entPhysicalIndex }
+        ::= { tnDevSysHwInforTable 1 }
+
+TnDevSysHwInforEntry ::= SEQUENCE
+{
+    tnDevSysHwInforChipID              INTEGER,
+    tnDevSysHwInforBoardRev            OCTET STRING,
+    tnDevSysHwInforFPGAVer             OCTET STRING,
+    tnDevSysHwInforBoardtmp            INTEGER,
+    tnDevSysHwInforCPUtmp              INTEGER
+}
+
+tnDevSysHwInforChipID    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Indicates the ID of Chip."
+    ::= { tnDevSysHwInforEntry 1 }
+
+tnDevSysHwInforBoardRev    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Indicates the reversion of Board ."
+    ::= { tnDevSysHwInforEntry 2 }
+
+tnDevSysHwInforFPGAVer    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Indicates the version of FPGA."
+    ::= { tnDevSysHwInforEntry 3 }
+
+tnDevSysHwInforBoardtmp    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Indicates the temperature of Board."
+    ::= { tnDevSysHwInforEntry 4 }
+
+tnDevSysHwInforCPUtmp    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "Indicates the temperature of CPU."
+    ::= { tnDevSysHwInforEntry 5 }
+		                                             
+--
+-- Link pass through management
+--		                                             
+tnDevSysLPTTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnDevSysLPTEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "This table supplements the ENTITY-MIB for 2-port devices managed by this Agent."
+        ::= { tnDevSysLPT 1 }    
+        
+tnDevSysLPTEntry OBJECT-TYPE
+        SYNTAX      TnDevSysLPTEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "A entry in the table contains additional information related to a device."
+        INDEX       { entPhysicalIndex }
+        ::= { tnDevSysLPTTable 1 }
+ 
+TnDevSysLPTEntry ::= SEQUENCE
+{
+    tnSysLinkPassThro	       INTEGER,
+    tnSysTransparentLPT       INTEGER,
+    tnSysSelectiveLPT         INTEGER,
+    tnSysLPTMonitorPort       InterfaceIndexOrZero,
+    tnSysRemoteFaultDetect    INTEGER   
+}
+
+tnSysLinkPassThro OBJECT-TYPE
+	SYNTAX		INTEGER { enabled(1), disabled(2), notSupported(3) }
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "Devices which support this feature allow write for enabling or disabling the feature.
+    Most 2-port devices support this feature.
+    Link pass through when enabled monitors the link status of one port, any change in its
+    operational state is passed on to the other port and vice-versa.
+    For eg: If Port 1 becomes operationally down, the Port 2 is brought down. When Port 1
+    becomes operational again, Port 2 is also brought up."
+	::= { tnDevSysLPTEntry 1 }    
+
+tnSysTransparentLPT OBJECT-TYPE
+	SYNTAX		INTEGER { enabled(1), disabled(2), notSupported(3) }
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "Devices which support this feature allow write for enabling or disabling the feature.
+    Some of the 2-port devices which are capable of remote management of a similiar device
+    support this feature. This needs a back to back setup of the same type of device.
+    Transparent Link pass through when enabled monitors the link status of one port on device A, any change in its
+    operational state is passed on to the peer device B port to bring down its far end port and vice-versa.
+    For eg: If the devices are connected by Port 2 on each. If Device A - Port 1 becomes operationally down, 
+    the Device B - Port 1 is brought down. The devices can communicate with each other but the link condition is
+    passed on so a network administrator can know of the fault condition. Port 2 is the port that is monitored."
+	::= { tnDevSysLPTEntry 2 }	
+
+tnSysSelectiveLPT OBJECT-TYPE
+	SYNTAX		INTEGER { enabled(1), disabled(2), notSupported(3) }
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "Devices which support this feature allow write for enabling or disabling the feature.
+    Some of the 2-port devices which are capable of remote management of a similiar device
+    support this feature. This is typically supported by devices which support 'tnSysTransparentLPT'.
+    Selective Link pass through when enabled monitors the link status of one port on device A, any change in its
+    operational state is passed on to the device's other port to bring down its link and vice-versa.
+	It is similiar to 'tnSysLinkPassThro' except it only works in one direction from Port 1 to Port 2 or Port 2 to Port 1
+	not both directions."
+	::= { tnDevSysLPTEntry 3 }        
+	
+tnSysLPTMonitorPort OBJECT-TYPE
+	SYNTAX InterfaceIndexOrZero
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION      
+    "This mib variable is applicable only when the device supports 'tnSysSelectiveLPT' and/or 'tnSysTransparentLPT'.
+    This determines which port is monitored for activating the link pass through. 
+    The value is the port number."
+ 	::= { tnDevSysLPTEntry 4 }  
+
+tnSysRemoteFaultDetect OBJECT-TYPE
+	SYNTAX 		INTEGER { enabled(1), disabled(2), notSupported(3) }
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION      
+    "This mib variable is applicable only for some of the devices.
+    When set to enabled(1), loss of fiber receive causes twisted 
+    pair interface to be disabled, and loss twisted pair link causes
+ 	fiber transmit to be disabled. 
+ 	Warning: Must not be enabled at both ends of a fiber"
+ 	::= { tnDevSysLPTEntry 5 }    
+
+--
+-- Dying Gasp management
+--		                                             
+tnDevSysDyingGaspTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnDevSysDyingGaspEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "This table supplements the ENTITY-MIB for 2-port devices managed by this Agent."
+        ::= { tnDevSysDyingGasp 1 }    
+        
+tnDevSysDyingGaspEntry OBJECT-TYPE
+        SYNTAX      TnDevSysDyingGaspEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "A entry in the table contains additional information related to a device."
+        INDEX       { entPhysicalIndex }
+        ::= { tnDevSysDyingGaspTable 1 }
+ 
+TnDevSysDyingGaspEntry ::= SEQUENCE
+{
+    tnSysDyingGaspTrap       INTEGER
+}
+
+tnSysDyingGaspTrap OBJECT-TYPE
+	SYNTAX		INTEGER { enabled(1), disabled(2), notSupported(3) }
+	MAX-ACCESS	read-write
+    STATUS current
+    DESCRIPTION 
+    "Devices which support this feature allow write for enabling or disabling the feature.
+	
+	When a device detects the power is going to be lost, a system dying gasp procedure will be triggered internally. 
+	If this tnSysDyingGaspTrap is set to enabled, a tnDyingGaspEvt will be sent out.
+	Other events may also be sent out in this procedure, e.g. LOAM event.
+	
+	The LOAM event (enabled by dot3OamDyingGaspEnable) and this Trap event will be processed at the same time if both enabled.
+	If LOAM is enabled in multiple ports, the LOAM event will be sent out one port by one port begginning from the smaller port number (e.g. smallest one is copper port, port 1)
+	If multiple trap servers are enabled, the trap will be sent out one server by one server begining from the server 1.
+	
+	Depends on different hardware, the dying gasp's power may be not enough for sending out all the LOAM event and Traps.  
+	So, it is suggested that users should keep as few targets as possible."
+	::= { tnDevSysDyingGaspEntry 1 }    
+
+--
+-- Device MAC address Learning 
+--
+tnDevSysMacLearningTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnDevSysMacLearningEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "This table contols the device MAC address learning ability."
+        ::= { tnDevSysMACLearning 1 }    
+        
+tnDevSysMacLearningEntry OBJECT-TYPE
+        SYNTAX      TnDevSysMacLearningEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "A entry in the table contains additional information related to a device."
+        INDEX       { entPhysicalIndex }
+        ::= { tnDevSysMacLearningTable 1 }
+ 
+TnDevSysMacLearningEntry ::= SEQUENCE
+{
+    tnSysPortMacLearningState PortList
+}
+
+tnSysPortMacLearningState OBJECT-TYPE
+      SYNTAX            PortList
+      MAX-ACCESS  read-write
+      STATUS current
+
+DESCRIPTION
+      "This indicates the port's state on MAC learning. If the bit
+corresponding to the port is set, then learning is enabled else it is
+disabled."
+	::= { tnDevSysMacLearningEntry 1 } 
+	
+--
+-- Ethernet Interface management
+--
+tnEthInterfaceTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnEthInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "This table supplements the ifTable in IF-MIB and ifMauAutoNegTable in MAU-MIB for Ethernet interfaces."
+        ::= { tnInterfaceMgmt 1 }    
+        
+tnEthInterfaceEntry OBJECT-TYPE
+        SYNTAX      TnEthInterfaceEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "A entry in the table contains additional information related to an Ethernet interface."
+        INDEX       { ifIndex }
+        ::= { tnEthInterfaceTable 1 }
+ 
+TnEthInterfaceEntry ::= SEQUENCE
+{
+    tnEthInterfaceSpeed    TNEthernetSpeed,
+    tnEthInterfaceDuplex   TNEthernetDuplex,
+    tnEthAutoCrossCap      TruthValue,
+    tnEthAutoCrossMode     TNEthernetAutoCross,
+    tnEthFarEndFaultCap    TruthValue,
+    tnEthFarEndFaultMode   INTEGER,
+    tnEthPhyModeChangeCap  TruthValue, 
+    tnEthPhyOperMode       TNEthPhyMode,	        
+    tnEthPhyMode           TNEthPhyMode,
+    tnEthMaxFrameSize      INTEGER	    
+}
+                 
+tnEthInterfaceSpeed OBJECT-TYPE
+        SYNTAX      TNEthernetSpeed
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+        "When autonegotiation is disabled, this can be used to set the interface speed.
+        Refer the MAU-MIB is used for autonegotiation configuration."
+        ::= { tnEthInterfaceEntry 1  }
+
+tnEthInterfaceDuplex OBJECT-TYPE
+        SYNTAX      TNEthernetDuplex
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+        "When autonegotiation is disabled, this can be used to set the interface duplex.
+        Refer the MAU-MIB is used for autonegotiation configuration."
+        ::= { tnEthInterfaceEntry 2  }
+
+tnEthAutoCrossCap OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        "This shows the capability of the Ethernet interface to do MDI/MDIX Autocross."
+        ::= { tnEthInterfaceEntry 3  }
+     
+tnEthAutoCrossMode OBJECT-TYPE
+        SYNTAX      TNEthernetAutoCross
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+        "If this Ethernet interface supports MDI/MDIX Autocross, then the mode can be set in this mib variable."
+        ::= { tnEthInterfaceEntry 4  } 
+        
+tnEthFarEndFaultCap OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        "This shows the capability of the Ethernet interface to do Far End Fault Indication."
+        ::= { tnEthInterfaceEntry 5  }
+     
+tnEthFarEndFaultMode OBJECT-TYPE
+        SYNTAX      INTEGER {enabled(1), disabled(2), notApplicable(3)}
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+        "If this Ethernet interface supports Far End Fault Indication, then it can be set in this mib variable."
+        ::= { tnEthInterfaceEntry 6  }               
+
+tnEthPhyModeChangeCap	OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        "This shows the capability of the Ethernet interface to support different PHY modes."
+        ::= { tnEthInterfaceEntry 7  }
+        
+tnEthPhyOperMode OBJECT-TYPE
+        SYNTAX      TNEthPhyMode 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+        "This shows Ethernet PHY mode of this interface."
+        ::= { tnEthInterfaceEntry 8  }
+        
+tnEthPhyMode  OBJECT-TYPE
+        SYNTAX      TNEthPhyMode 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+        "This is used to set the Ethernet PHY mode of this interface if 'tnEthPhyModeChangeCap' is true."
+        ::= { tnEthInterfaceEntry 9  }
+
+tnEthMaxFrameSize  OBJECT-TYPE
+        SYNTAX      INTEGER 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+        "The maximum frame size in bytes that is allowed on this ethernet interface. Not all devices
+         can support write capability."
+        ::= { tnEthInterfaceEntry 10 }
+--
+-- Interface DMI/Sensor management
+--                             
+tnDMIInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnDMIInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "This table has entries for interfaces which are capable of having Diagnostic monitoring capabilities."
+        ::= { tnInterfaceMgmt 2 }    
+        
+tnDMIInfoEntry OBJECT-TYPE
+        SYNTAX      TnDMIInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "A entry in the table represents diagnostic monitoring for an interface."
+        INDEX       { ifIndex }        
+        ::= { tnDMIInfoTable 1 }
+ 
+TnDMIInfoEntry ::= SEQUENCE
+{
+    tnDMIConnectorType	      INTEGER,
+    tnDMIBitRate              INTEGER,
+    tnDMILenFor9x125umKM      INTEGER,
+    tnDMILenFor9x125um100M    INTEGER,
+    tnDMILenFor50x125um10M    INTEGER,
+    tnDMILenFor625x125um10M   INTEGER,
+    tnDMILenForCopper         INTEGER,
+    tnDMIId                   INTEGER,
+    tnDMILaserWavelength      INTEGER,
+    tnDMITemperature          INTEGER,
+    tnDMITempAlarm	          INTEGER,			
+    tnDMITxBiasCurrent        INTEGER,
+    tnDMITxBiasAlarm          INTEGER,			
+    tnDMITxPowerLevel         INTEGER,
+    tnDMITxPowerAlarm         INTEGER,			
+    tnDMIRxPowerLevel         INTEGER,
+    tnDMIRxPowerAlarm         INTEGER,
+    tnDMIRxPwrLvlPreset       INTEGER,
+    tnDMIVendorName           OCTET STRING,
+    tnDMIVendorOUI            OCTET STRING,
+    tnDMIVendorPartNo         OCTET STRING,
+    tnDMIVendorRevision       OCTET STRING,
+    tnDMIVendorSerialNo       OCTET STRING
+}
+                            
+tnDMIConnectorType	OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The DMI connector type indicates the external optical or electrical
+				cable connector provided as the interface. From SFF 8472 Rev 9.5
+					  Value 	Description of connector
+						00h 	Unknown or unspecified
+						01h 	SC
+						02h 	Fibre Channel Style 1 copper connector
+						03h 	Fibre Channel Style 2 copper connector
+						04h 	BNC/TNC
+						05h 	Fibre Channel coaxial headers
+						06h 	FiberJack
+						07h 	LC
+						08h 	MT-RJ
+						09h 	MU
+						0Ah 	SG
+						0Bh 	Optical pigtail
+						0C-1Fh 	Reserved
+						20h 	HSSDC II
+						21h 	Copper Pigtail
+						22h-7Fh Reserved
+						80-FFh 	Vendor specific	"
+	::= { tnDMIInfoEntry 1 }
+
+tnDMIBitRate	OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Bitrate in units of 100Mbps."
+	::= { tnDMIInfoEntry 2 }
+
+tnDMILenFor9x125umKM OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Specifies the link length that is supported by the transceiver
+				while operating in single mode fiber. The value is in units of KM."
+	::= { tnDMIInfoEntry 3 }
+
+tnDMILenFor9x125um100M  OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Specifies the link length that is supported by the transceiver
+				while operating in single mode fiber. The value is in units of 100m."
+	::= { tnDMIInfoEntry 4 }
+
+tnDMILenFor50x125um10M  OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Specifies the link length that is supported by the transceiver
+				while operating in 50 micron multi mode fiber. The value is in units of 10m."
+	::= { tnDMIInfoEntry 5 }
+
+tnDMILenFor625x125um10M  OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Specifies the link length that is supported by the transceiver
+				while operating in 62.5 micron multi mode fiber. The value is in units of 10m."
+	::= { tnDMIInfoEntry 6 }
+
+tnDMILenForCopper   OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Specifies the link length that is supported by the transceiver
+				while operating in copper cable. The value is in units of meters."
+	::= { tnDMIInfoEntry 7 }
+
+tnDMIId	OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Specifies the physical device. The table below
+				from SFF-8472 Rev 9.5 Standard gives description
+				for the values.
+					00h Unknown or unspecified
+					01h GBIC
+					02h Module/connector soldered to motherboard
+					03h SFP
+					04-7Fh Reserved
+					80-FFh Vendor specific."
+	::= { tnDMIInfoEntry 8 }
+
+tnDMILaserWavelength  OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The Nominal transmitter output wavelength at room temperature.
+				The units in nm"
+	::= { tnDMIInfoEntry 9 }
+
+tnDMITemperature  OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "Temperature of fiber transceiver in tenths of 
+ 				degrees C."
+	::= { tnDMIInfoEntry 10 }
+
+tnDMITempAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "."
+	::= { tnDMIInfoEntry 11 }			
+
+tnDMITxBiasCurrent		OBJECT-TYPE
+    SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Transmit bias current on local fiber interface, in 
+ 				microamperes."
+	::= { tnDMIInfoEntry 12 }
+
+tnDMITxBiasAlarm OBJECT-TYPE
+    SYNTAX      INTEGER { normal(1), notSupported(2), lowWarn(3), highWarn(4), lowAlarm(6), highAlarm(7) }
+	MAX-ACCESS  read-only
+	STATUS      current
+		DESCRIPTION "."
+	::= { tnDMIInfoEntry 13 }			
+
+tnDMITxPowerLevel	OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current	
+	DESCRIPTION "DMI: Diagnostic Monitoring Interface for fiber 
+			 	transceivers. Transmit power on local fiber 
+			 	measured in microwatts."
+	::= { tnDMIInfoEntry 14 }
+
+tnDMITxPowerAlarm	OBJECT-TYPE
+    SYNTAX      INTEGER { normal(1), notSupported(2), lowWarn(3), highWarn(4), lowAlarm(6), highAlarm(7) }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "."
+	::= { tnDMIInfoEntry 15 }			
+				    
+tnDMIRxPowerLevel	OBJECT-TYPE
+    SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "DMI: Diagnostic Monitoring Interface for fiber 
+			 	transceivers. Receive power on local fiber 
+			 	measured in microwatts."
+	::= { tnDMIInfoEntry 16 }
+                    
+tnDMIRxPowerAlarm	OBJECT-TYPE
+    SYNTAX      INTEGER { normal(1), notSupported(2), lowWarn(3), highWarn(4), lowAlarm(6), highAlarm(7) }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "."
+	::= { tnDMIInfoEntry 17 }
+
+tnDMIRxPwrLvlPreset OBJECT-TYPE
+    SYNTAX      INTEGER(0..65535)
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION "A preset level for Rx Power on the Fiber port, if the DMI read value 
+				 falls below the preset value, an intrusion is detected, and a trap
+				 is generated."
+	::= { tnDMIInfoEntry 18 }
+ 
+tnDMIVendorName OBJECT-TYPE
+	SYNTAX	    OCTET STRING (SIZE(0..16))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The vendor name is a 16 character field that contains ASCII characters. 
+                 The vendor name shall be the full name of the corporation, a commonly 
+                 accepted abbreviation of the name of the corporation, the SCSI
+                 company code for the corporation, or the stock exchange code for the corporation."
+	::= { tnDMIInfoEntry 19 }
+
+tnDMIVendorOUI OBJECT-TYPE
+	SYNTAX	    OCTET STRING (SIZE(3))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The vendor organizationally unique identifier field (vendor OUI) is a 3-byte field that contains
+                the IEEE Company Identifier for the vendor. A value of all zero in the 3-byte field indicates that
+                the Vendor OUI is unspecified."
+	::= { tnDMIInfoEntry 20 }
+
+tnDMIVendorPartNo OBJECT-TYPE
+	SYNTAX	    OCTET STRING (SIZE(0..16))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The vendor part number is a 16-byte field that contains ASCII characters, 
+                 defining the vendor part number or product name. A value of all zero in the 
+                 16-byte field indicates that the vendor PN is unspecified."
+	::= { tnDMIInfoEntry 21 }
+
+tnDMIVendorRevision OBJECT-TYPE
+	SYNTAX	    OCTET STRING (SIZE(0..4))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The vendor revision number is a 4-byte field that contains ASCII characters, 
+                defining the vendor product revision number. A value of all zero in the 4-byte field 
+                indicates that the vendor revision is unspecified."
+	::= { tnDMIInfoEntry 22 }
+
+tnDMIVendorSerialNo OBJECT-TYPE
+	SYNTAX	    OCTET STRING (SIZE(0..16))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "The vendor serial number is a 16 character field that contains ASCII characters,
+                defining the vendor’s serial number for the transceiver. A value of all zero in the 
+                16-byte field indicates that the vendor SN is unspecified."
+	::= { tnDMIInfoEntry 23 }
+--
+--  Interface level Bandwidth Allocation
+--                             
+tnIfBWAllocTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfBWAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "This table has entries for bandwidth allocation for each interface."
+    ::= { tnInterfaceMgmt 3 }    
+    
+tnIfBWAllocEntry OBJECT-TYPE
+    SYNTAX      TnIfBWAllocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Each entry limits the bandwidth of an interface."
+    INDEX  { ifIndex }        
+    ::= { tnIfBWAllocTable 1 }
+
+TnIfBWAllocEntry ::= SEQUENCE 
+{   
+    tnIfBWAllocType				INTEGER,  
+    tnIfIngressRateLimit		INTEGER,       
+    tnIfEgressRateLimit			INTEGER 
+}
+
+tnIfBWAllocType OBJECT-TYPE
+    SYNTAX      INTEGER   
+            {
+                countAllLayer1(1),
+    			countAllLayer2(2),
+    			countAllLayer3(3)
+    		}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This mib variable allows the user to select what bytes in a frame is to be counted.
+        	countAllLayer1(1) - Counts all Layer 1 bytes.
+        						Preamble(8 bytes) +  DA to CRC + IFG (12 bytes)
+        	countAllLayer2(2) - Counts all Layer 2 bytes.
+        						Frame's  DA to CRC
+			countAllLayer3(3) - Counts all Layer 3 bytes.
+        						Frame's  DA to CRC - 18 (DA+SA+EtherType+CRC) - 4 (If vlan tagged)      	        						
+        	"           
+    ::= { tnIfBWAllocEntry 1 }        
+
+tnIfIngressRateLimit OBJECT-TYPE
+    SYNTAX      INTEGER 
+    			{ 
+    				noLimit(1),
+				 	rate64K(2), 
+					rate128K(3), 
+					rate192K(4),
+					rate256K(5), 
+					rate320K(6),
+					rate384K(7),
+					rate512K(8),
+					rate768K(9),
+					rate1M(10),
+					rate2M(11),
+					rate3M(12),
+					rate4M(13),
+					rate6M(14),
+					rate8M(15),
+					rate10M(16),
+					rate20M(17),
+					rate30M(18),
+					rate40M(19),
+					rate50M(20),
+					rate60M(21),
+					rate70M(22),
+					rate80M(23),
+					rate100M(24),
+					rate200M(25),
+					rate300M(26),
+					rate400M(27),
+					rate500M(28),
+					rate600M(29),
+					rate700M(30),
+					rate800M(31),
+					rate900M(32),
+					rate5M(33),
+					rate7M(34),
+					rate9M(35),	
+	                rate90M(36),
+				    rate15M(37),
+					rate25M(38),
+					rate35M(39),
+					rate45M(40),
+					rate55M(41),
+					rate65M(42),
+					rate75M(43),
+					rate85M(44),
+					rate95M(45),
+					rate150M(46),
+					rate250M(47),
+					rate350M(48),
+					rate450M(49),
+					rate550M(50),
+					rate650M(51),
+					rate750M(52),
+					rate850M(53),
+					rate950M(54)		
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Ingress bandwidth limiting in bits per second, but not faster than port speed. 
+        This is the Committed Information rate (CIR) on this interface for Ingress.
+        Traffic rate which go over the the CIR are discarded.."           
+    ::= { tnIfBWAllocEntry 2 }        
+        
+tnIfEgressRateLimit OBJECT-TYPE
+    SYNTAX      INTEGER 
+    			{ 
+    					noLimit(1),
+					 	rate64K(2), 
+						rate128K(3), 
+						rate192K(4),
+						rate256K(5), 
+						rate320K(6),
+						rate384K(7),
+						rate512K(8),
+						rate768K(9),
+						rate1M(10),
+						rate2M(11),
+						rate3M(12),
+						rate4M(13),
+						rate6M(14),
+						rate8M(15),
+						rate10M(16),
+						rate20M(17),
+						rate30M(18),
+						rate40M(19),
+						rate50M(20),
+						rate60M(21),
+						rate70M(22),
+						rate80M(23),
+						rate100M(24),
+						rate200M(25),
+						rate300M(26),
+						rate400M(27),
+						rate500M(28),
+						rate600M(29),
+						rate700M(30),
+						rate800M(31),
+						rate900M(32),
+						rate5M(33),
+						rate7M(34),
+						rate9M(35),
+						rate90M(36),
+						rate15M(37),
+						rate25M(38),
+						rate35M(39),
+						rate45M(40),
+						rate55M(41),
+						rate65M(42),
+						rate75M(43),
+						rate85M(44),
+						rate95M(45),
+						rate150M(46),
+						rate250M(47),
+						rate350M(48),
+						rate450M(49),
+						rate550M(50),
+						rate650M(51),
+						rate750M(52),
+						rate850M(53),
+						rate950M(54)
+                }    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Egress bandwidth limiting in bits per second, but not faster than port speed. 
+        Traffic which are over the rate are discarded."           
+    ::= { tnIfBWAllocEntry 3 }        
+
+--
+--  Interface redundancy
+--                             
+tnIfRedundancyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfRedundancyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries for interfaces which are capable of redundancy with another port."
+    ::= { tnInterfaceMgmt 4 }    
+        
+tnIfRedundancyEntry OBJECT-TYPE
+    SYNTAX      TnIfRedundancyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents redundancy configuration."
+    INDEX  { tnIfPrimaryPort, tnIfSecondaryPort }        
+    ::= { tnIfRedundancyTable 1 }
+
+TnIfRedundancyEntry ::= SEQUENCE 
+{             
+	tnIfRedundancy			INTEGER,
+	tnIfRedundRevert		INTEGER,
+	tnIfPrimaryPort			InterfaceIndex,
+	tnIfSecondaryPort		InterfaceIndex,
+	tnIfRedundActivePort	InterfaceIndexOrZero
+}
+ 
+tnIfRedundancy 	OBJECT-TYPE
+	SYNTAX INTEGER { enabled(1), disabled(2), notApplicable(3) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This feature is applicable in the devices that
+				have 2 fiber ports and support redundancy on the ports.
+				When set to enabled, the primary and backup fiber 
+                ports are assumed to be connected to the same 
+                destination. Only one of these paths will be active
+                at any given time, and the configuration
+                settings kept in sync between the ports. 
+                When set to disabled, the primary and backup ports 
+                are assumed to be connected to different 
+                destinations, and lose their special functions."    
+	::= { tnIfRedundancyEntry 1 }	
+	
+tnIfRedundRevert	OBJECT-TYPE
+	SYNTAX INTEGER { revert(1), noRevert(2), notApplicable(3) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "This mib variable is applicable only if 
+				'tnIfRedundancy' is enabled. When there
+				is a failure in the primary and secondary fiber
+				takes over, this determines what happens when primary
+				comes back again. Does the link switch back to primary 
+				or the secondary takes over as the primary link."    
+	::= { tnIfRedundancyEntry 2 }	
+
+tnIfPrimaryPort OBJECT-TYPE
+	SYNTAX InterfaceIndex 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION 
+	"The port's ifIndex which take part in the redundancy."
+	::= { tnIfRedundancyEntry 3 }	
+
+tnIfSecondaryPort OBJECT-TYPE
+	SYNTAX InterfaceIndex 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION 
+	"The port's ifIndex which take part in the redundancy."
+	::= { tnIfRedundancyEntry 4 }	
+
+tnIfRedundActivePort OBJECT-TYPE
+	SYNTAX InterfaceIndexOrZero 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"This mib variable is applicable only if 
+	'tnFiberRedundancy' is enabled.
+	This indicates the current active port that 
+	is operational as the primary link."
+	::= { tnIfRedundancyEntry 5 }	
+
+--
+--  Interface forwarding port list (Hardware Port Based VLAN)
+--                             
+tnIfFwdPortListTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfFwdPortListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries each interface and corresponding list of ports that it can forward."
+    ::= { tnInterfaceMgmt 5 }    
+        
+tnIfFwdPortListEntry OBJECT-TYPE
+    SYNTAX      TnIfFwdPortListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents forwarding configuration of each interface."
+    INDEX  { ifIndex }        
+    ::= { tnIfFwdPortListTable 1 }
+
+TnIfFwdPortListEntry ::= SEQUENCE 
+{     
+	tnIfPortifIndextoPortNum			INTEGER,       
+	tnIfFwdPortList					PortList 
+}
+    
+tnIfPortifIndextoPortNum OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This maps the ifIndex to the Port physical number in this device.
+        The 'tnIfFwdPortList' uses this port number for decoding the bitmap."           
+    ::= { tnIfFwdPortListEntry 1 }        
+        
+tnIfFwdPortList OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports, that frames ingressing this interface 
+        can be forwarded to. Each bit represents if it is in the forwarding list of this 
+        port or not according to it is set or cleared. Port 1 is represented by BIT0,
+        Port 2."
+    ::= { tnIfFwdPortListEntry 2 }
+
+
+
+--
+--  Interface Port L2CP processing
+--                             
+tnIfL2CPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfL2CPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries for interfaces to manage its L2CP processing."
+    ::= { tnInterfaceMgmt 7 }    
+        
+tnIfL2CPEntry OBJECT-TYPE
+    SYNTAX      TnIfL2CPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents the configuration of an interface's L2CP processing."
+    INDEX  { ifIndex }        
+    ::= { tnIfL2CPTable 1 }
+
+TnIfL2CPEntry ::= SEQUENCE 
+{             
+    tnIfL2CPSTPProtocolsFwd              INTEGER,
+    tnIfL2CPSlowProtocolsFwd             INTEGER,
+    tnIfL2CPPortAuthProtocolFwd          INTEGER,
+    tnIfL2CPELMIProtocolFwd              INTEGER,
+    tnIfL2CPLLDPProtocolFwd              INTEGER, 
+    tnIfL2CPBridgeMgmtProtocolsFwd       INTEGER,
+    tnIfL2CPGARPBlockProtocolsFwd        INTEGER,			
+    tnIfL2CPBridgeBlkOtherMulticastsFwd  INTEGER
+}
+ 
+tnIfL2CPSTPProtocolsFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "Any STP/RSTP/MSTP protocol frames with destination address
+     of 01-80-C2-00-00-00 is discarded at this port or passed."
+    ::= { tnIfL2CPEntry 1 }
+
+tnIfL2CPSlowProtocolsFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "Any LACP/LAMP protocol frames with destination address
+     of 01-80-C2-00-00-02 is discarded at this port or passed.
+     Since this device pairs link OAM frames, these frames will not
+     be forwarded or discarded."
+    ::= { tnIfL2CPEntry 2 }
+
+tnIfL2CPPortAuthProtocolFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "Port authentication protocol frames with destination address
+     of 01-80-C2-00-00-03 is discarded at this port or passed."
+    ::= { tnIfL2CPEntry 3 }
+
+tnIfL2CPELMIProtocolFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "E-LMI protocol frames with destination address
+     of 01-80-C2-00-00-07 is discarded at this port or passed."
+    ::= { tnIfL2CPEntry 4 }
+
+tnIfL2CPLLDPProtocolFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "LLDP protocol frames with destination address of 01-80-C2-00-00-0E 
+     and ethertype of 0x88CC which are not TN discovery LLDP frames 
+     are discarded at this port or passed."
+    ::= { tnIfL2CPEntry 5 }
+
+tnIfL2CPBridgeMgmtProtocolsFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "Bridge Management protocol frames with destination address
+     of 01-80-C2-00-00-10 is discarded at this port or passed."
+    ::= { tnIfL2CPEntry 6 }
+
+tnIfL2CPGARPBlockProtocolsFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "GARP/MRP with destination address of 01-80-C2-00-00-20 to 01-80-C2-00-00-2F
+     is discarded at this port or passed."
+    ::= { tnIfL2CPEntry 7 }
+
+tnIfL2CPBridgeBlkOtherMulticastsFwd  OBJECT-TYPE
+    SYNTAX        INTEGER  { pass(1), discard(2), notApplicable(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "This mib variable passes or discards all the IEEE multicast
+     frames in the bridge block of addresses [01-80-C2-00-00-04 to 01-80-C2-00-00-0F].
+     The mib variables applies to all addresses in this block that are not covered by 
+     the other mib variables in this table.
+     i.e this is not applicable for STP, slow protocols, etc.,"
+    ::= { tnIfL2CPEntry 8 }
+
+--
+--  Interface Port: TN Topology Discovery Protocol 
+--                             
+tnIfTNDPTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfTNDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "This table has entries for interfaces to manage TN Topology Discovery Protocol processing."
+    ::= { tnInterfaceMgmt 8 }    
+        
+tnIfTNDPEntry OBJECT-TYPE
+    SYNTAX      TnIfTNDPEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    "A entry in the table represents the configuration of an interface's TN Topology Discovery Protocol processing."
+    INDEX  { ifIndex }        
+    ::= { tnIfTNDPTable 1 }
+
+TnIfTNDPEntry ::= SEQUENCE 
+{             
+    tnIfTNDPTxState              INTEGER
+}
+ 
+tnIfTNDPTxState  OBJECT-TYPE
+    SYNTAX        INTEGER  { enabled(1), disabled(2), notSupported(3) }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "If enabled, TN Topology Discovery Data will be sent out from this interface.
+     If disabled, TN Topology Discovery Data will not be sent out from this interface."
+    ::= { tnIfTNDPEntry 1 }
+
+
+-- TDR test
+--
+tnIfTDRTestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnIfTDRTestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION 
+    "A table containing information about TDR 
+     (Time Domain Reflectometery) test on an 
+     interfaces. An entry appears in this table for each
+     interface which is capable to run TDR test."
+	::= { tnInterfaceDiagMgmt 1 }
+
+tnIfTDRTestEntry OBJECT-TYPE
+    SYNTAX TnIfTDRTestEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Each entry represents the an interface capable of TDR test."
+    INDEX { ifIndex }
+    ::= { tnIfTDRTestTable 1 }
+
+TnIfTDRTestEntry ::=  
+	SEQUENCE 
+	{
+      tnIfTDRTestAction	    INTEGER,
+      tnIfTDRTestStatus  		INTEGER,
+      tnIfTDRTestInitTime  	TimeStamp,
+	  tnIfTDRTestResultValid   TruthValue
+	}
+
+tnIfTDRTestAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   perform(1),
+                   doNothing(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Indicates the TDR test action to be executed on the interface
+        and whether the test is currently running or not.
+ 
+        'perform' -- start the TDR test on the interface.
+
+        'doNothing' -- Normal state, test has not been intiated or the test may
+        				have been completed."                 
+    ::= { tnIfTDRTestEntry 1 }
+
+tnIfTDRTestStatus OBJECT-TYPE
+    SYNTAX     INTEGER { 
+                   testSuccess(1),
+                   testFailed(2),
+                   testAlreadyRunning(3),
+                   testUnknownState(4)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the status of the last TDR test action set on the
+        interface." 
+    ::= { tnIfTDRTestEntry 2 }
+
+tnIfTDRTestInitTime OBJECT-TYPE
+    SYNTAX     TimeStamp
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates the timestamp when TDR test is last run 
+        on the interface. If TDR test is never run on an 
+        interface, then this object value will be zero."
+    ::= { tnIfTDRTestEntry 3 }
+
+tnIfTDRTestResultValid OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Indicates whether the TDR test result on the interface
+        is valid for the user to retrieve or not."    
+    ::= { tnIfTDRTestEntry 4 }
+           
+--
+-- TDR Test results table                                
+--
+tnIfTDRResultTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnIfTDRResultEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table containing information about TDR 
+        test result on the device's interfaces. An entry 
+        appears in this table for each cable pair on an interface 
+        which has valid TDR test result, i.e., the value of 
+        tnIfTDRResultValid for the interface is true(1)."
+    ::= { tnInterfaceDiagMgmt 2 }
+    
+tnIfTDRResultEntry OBJECT-TYPE
+    SYNTAX     TnIfTDRResultEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in the tnIfTDRResultTable, containing 
+            the information about TDR test on an interface."
+    INDEX      { ifIndex, tnIfTDRResultPairIndex } 
+    ::= { tnIfTDRResultTable 1 }
+    
+TnIfTDRResultEntry ::= SEQUENCE {
+    tnIfTDRResultPairIndex
+        INTEGER,
+--  tnIfTDRResultPairChannel
+--        INTEGER,
+    tnIfTDRResultPairLength
+        Integer32,
+    tnIfTDRResultPairDistToFault
+        Integer32,
+    tnIfTDRResultPairLengthUnit
+        INTEGER,
+    tnIfTDRResultPairStatus
+        INTEGER
+    }
+
+tnIfTDRResultPairIndex OBJECT-TYPE
+    SYNTAX     INTEGER {
+                         pair1to2(1),
+                         pair3to6(2),
+                         pair4to5(3),
+                         pair7to8(4) 
+               } 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The local cable pair index.
+
+        'pair1to2' -- the pair with cable connectors 1 and 2.
+
+        'pair3to6' -- the pair with cable connectors 3 and 6.
+
+        'pair4to5' -- the pair with cable connectors 4 and 5.
+  
+        'pair7to8' -- the pair with cable connectors 7 and 8." 
+    REFERENCE 
+        "IEEE 802.3-2002: Sections 40.8.1"
+    ::= { tnIfTDRResultEntry 1 }
+
+--tnIfTDRResultPairChannel OBJECT-TYPE
+--    SYNTAX     INTEGER {
+--                         other(1),
+--                         channelA(2),
+--                         channelB(3),
+--                         channelC(4),
+--                         channelD(5)
+--               }  
+--    MAX-ACCESS read-only
+--    STATUS     current
+--    DESCRIPTION
+--        "The channels that the cable pair is connected to.
+--
+--        'other' - none of the following.
+--
+--        'channelA' - channel A.
+--
+--        'channelB' - channel B.
+--
+--        'channelC' - channel C.
+--
+--        'channelD' - channel D."
+--	::= { tnIfTDRResultEntry 2 }
+
+tnIfTDRResultPairLength OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)  
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+        "The length of the cable pair. A value of -1 indicates 
+        the length value is invalid. The unit of this value 
+        is indicated by tnIfTDRResultPairLengthUnit of the same 
+        cable pair." 
+    ::= { tnIfTDRResultEntry 2 }
+
+tnIfTDRResultPairDistToFault OBJECT-TYPE
+    SYNTAX     Integer32 (-1..2147483647)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The distance to the fault point of the cable pair. 
+        A value of -1 indicates this value is invalid. 
+        The unit of this value is indicated by 
+        tnIfTDRResultPairLengthUnit of the same cable pair."
+    ::= { tnIfTDRResultEntry 3 }
+
+tnIfTDRResultPairLengthUnit OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   unknown(1),
+                   meter(2),
+                   centimeter(3),
+                   kilometer(4)
+               } 
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+        "The measurement unit on the length or the distance to fault
+        point for the cable pair.
+
+        'unknown' -- none of the following.
+
+        'meter' -- the unit is meter. 
+
+        'centimeter' -- the unit is centimeter.
+
+        'kilometer' -- the unit is kilometer." 
+    ::= { tnIfTDRResultEntry 4 }
+
+tnIfTDRResultPairStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+                   unknown(1),
+ 				   normal(2),   
+ 				   impedanceMismatch(3),
+                   shorted(4),
+                   open(5)
+                  } 
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+        "The status of the cable pair. 
+       
+        'unknown'      --  none of the  following.
+
+        'normal'   --  the pair is properly terminated at the 
+                           remote end.
+  
+        'open'         --  the pair is open. 
+
+        'shorted'      --  the pair is shorted.
+
+        'impedanceMismatch' -- the impedance of the pair is 
+                               mismatched."
+
+       ::= { tnIfTDRResultEntry 5 }
+             
+--
+-- Loopback 
+--
+tnIfLoopbackTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnIfLoopbackEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION 
+    "A table containing information about loopback testing 
+     on interfaces. An entry appears in this table for each
+     interface which is capable of loopback testing."
+	::= { tnInterfaceDiagMgmt 3 }
+
+tnIfLoopbackEntry OBJECT-TYPE
+    SYNTAX TnIfLoopbackEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Each entry represents the an interface capable of TDR test."
+    INDEX { ifIndex }
+    ::= { tnIfLoopbackTable 1 }
+
+TnIfLoopbackEntry ::=  
+	SEQUENCE 
+	{                
+	  tnIfLoopbackCapability     TNLoopbackModeCapBits,
+      tnIfLoopbackInit	          TNLoopbackModes,
+	  tnIfLoopbackStatus         INTEGER,  
+	  tnIfClearCounters		  INTEGER
+	}
+
+tnIfLoopbackCapability OBJECT-TYPE
+    SYNTAX     TNLoopbackModeCapBits
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This gives the loopback capabilities for this interface."
+    ::= { tnIfLoopbackEntry 1 }
+
+tnIfLoopbackInit OBJECT-TYPE
+    SYNTAX     TNLoopbackModes
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Loopback is used to diagnose any hardware or configuration problem
+        on an interface. It can also be used to verify configurations such as
+        bandwidth limiting.
+        This mib variable allows to enable loopback on this interface. There may be
+        several loopback options supported on this interface, the 'tnIfLoopbackCapability'
+        lists the supported loopback methods on this interface."
+    ::= { tnIfLoopbackEntry 2 } 
+    
+tnIfLoopbackStatus  OBJECT-TYPE 
+	SYNTAX INTEGER { noLoopback(1), intiateLoopback(2), terminateLoopback(3), inProcess(4), localInLoopback(5), remoteInLoopback(6)}
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This gives the loopback status for this interface when enabled. The only two
+        possible values for a SET operation are intiateLoopback(2) and terminateLoopback(3).
+        The rest of the values are read-only to show the status of the loopback operation."
+    ::= { tnIfLoopbackEntry 3 }  
+    
+tnIfClearCounters  OBJECT-TYPE 
+	SYNTAX INTEGER { reset(1), doNothing(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This clears the counters maintained for this interface.
+        This may be useful when doing loopback testing to verify the test frames
+        sent and received counters."
+    ::= { tnIfLoopbackEntry 4 }  
+    
+--
+-- MAC based Security
+--               
+tnIfMACSecurityTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnIfMACSecurityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION 
+    "A table containing port level security configuration."
+	::= { tnIfMACSecurityMgmt 3 }
+
+tnIfMACSecurityEntry OBJECT-TYPE
+    SYNTAX TnIfMACSecurityEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Each entry represents each port's security settings."
+    INDEX { ifIndex }
+    ::= { tnIfMACSecurityTable 1 }
+
+TnIfMACSecurityEntry ::=  
+	SEQUENCE 
+	{                
+	  tnIfSourceAddrLock		      TruthValue,
+	  tnIfSourceAddrLockAction	      INTEGER,    
+	  tnIfFilterUnknownUnicast	  	  TruthValue,
+	  tnIfFilterUnknownMulticast	  TruthValue
+ 	}
+ 
+tnIfSourceAddrLock OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The Source Address Lock when set to true(1) monitors for source MAC
+        address change on this port. 
+        This feature is useful to detect if the device connected to this 
+        port has been changed and also for intrusion when unknown MAC address
+        ingress this port."
+    ::= { tnIfMACSecurityEntry 1 }
+
+tnIfSourceAddrLockAction OBJECT-TYPE
+    SYNTAX     INTEGER { discard(1), discardAndNotify(2), shutdown(3), all(5) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The 'tnIfSourceAddrLock' when set to true(1) monitors for source MAC
+        address change on this port. This MIB variable sets the action to be
+        taken when such an event is detected.
+        This feature is useful to detect if the device connected to this 
+        port has been changed and also for intrusion when unknown MAC address
+        ingress this port.
+        The actions performed on encountering an unknown address :
+        discard(1) - The frame will unknown MAC are discarded. This is the default
+        			value.
+        discardAndNotify(2) - A trap is sent to notify the intrusion/SA change
+        					  and the frame is discarded.
+        shutdown(3) - This will shutdown the interface on receiving the frame.
+        all(4) - All the above actions take place. The frame is discarded, a trap 
+        is sent and the port is shutdown to prevent intrusion attack."
+    ::= { tnIfMACSecurityEntry 2 }
+
+tnIfFilterUnknownUnicast OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This filters all unicast frames with unknown destination address from egressing this Port."
+    ::= { tnIfMACSecurityEntry 3 }   
+
+tnIfFilterUnknownMulticast OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This filters all multicast frames with unknown destination address from egressing this Port."
+    ::= { tnIfMACSecurityEntry 4 }         
+                                        
+--
+-- Dynamic MAC learning : Limit control
+--               
+tnIfLimitDynMACLearningTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnIfLimitDynMACLearningEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION 
+    "A table containing configuration for interface level MAC Learning limits.
+    It allows for limiting the number of users on a given port. A user is identified 
+    by a MAC address and VLAN ID. If Limit Control is enabled on a port, the limit 
+    specifies the maximum number of users on the port.  If this number is exceeded, an action is taken. 
+    The action can be one of the four different actions as described below."
+	::= { tnIfMACSecurityMgmt 4 }
+
+tnIfLimitDynMACLearningEntry OBJECT-TYPE
+    SYNTAX TnIfLimitDynMACLearningEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Each entry represents each interface's MAC limit settings."
+    INDEX { ifIndex }
+    ::= { tnIfLimitDynMACLearningTable 1 }
+
+TnIfLimitDynMACLearningEntry ::=  
+	SEQUENCE 
+	{                
+	  tnIfLimitDynMACMode               TruthValue,
+	  tnIfLimitDynMACMaxCount           INTEGER,    
+	  tnIfLimitDynMACAction             INTEGER,
+	  tnIfLimitDynMACState              INTEGER,
+	  tnIfLimitDynMACReopen             TruthValue
+ 	}
+ 
+tnIfLimitDynMACMode OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Mode Controls whether Limit Control is enabled on this port. 
+        Both this and the Global Mode must be set to Enabled for Limit Control to be in effect." 
+    ::= { tnIfLimitDynMACLearningEntry 1 }
+
+tnIfLimitDynMACMaxCount OBJECT-TYPE
+    SYNTAX     INTEGER(1..1024)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of MAC addresses that can be secured on this port. This number cannot exceed 1024. 
+         If the limit is exceeded, the corresponding action is taken.
+         The switch is set with a total number of MAC addresses from which all ports draw whenever a new MAC address 
+         is seen on a Port Security-enabled port. Since all ports draw from the same pool, it may happen that a 
+         configured maximum cannot be granted, if the remaining ports have already used all available MAC addresses."
+    ::= { tnIfLimitDynMACLearningEntry 2 }
+
+tnIfLimitDynMACAction OBJECT-TYPE
+    SYNTAX     INTEGER { none(0), trap(1), shutdown(2), trapShutdown(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If Limit is reached, the switch can take one of the following actions:
+         none(0)        : Do not allow more than Limit MAC addresses on the port, but take no further action.
+
+         trap(1)        : If tnIfLimitDynMACMaxCount + 1 MAC addresses is seen on the port, send an SNMP trap. If Aging is disabled, 
+                        only one SNMP trap will be sent, but with Aging enabled, new SNMP traps will be sent everytime the limit gets exceeded.
+
+         shutdown(2)    : If tnIfLimitDynMACMaxCount + 1 MAC addresses is seen on the port, shut down the port. This implies that all 
+                        secured MAC addresses will be removed from the port, and no new address will be learned. 
+                        Even if the link is physically disconnected and reconnected on the port (by disconnecting the cable), 
+                        the port will remain shut down. There are three ways to re-open the port:
+                        1) Boot the switch,
+                        2) Disable and re-enable Limit Control on the port or the switch,
+                        3) enable using tnIfLimitDynMACReopen.
+
+        trapShutdown(3) : If tnIfLimitDynMACMaxCount + 1 MAC addresses is seen on the port, both the Trap and the Shutdown actions described above will be taken"
+    ::= { tnIfLimitDynMACLearningEntry 3 }
+
+tnIfLimitDynMACState OBJECT-TYPE
+    SYNTAX     INTEGER { disabled(0), ready(1), limitReached(2), shutdown(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This column shows the current state of the port as seen from the Limit Control's point of view. 
+        
+        The state takes one of four values:
+        disabled(0)     : Limit Control is either globally disabled or disabled on the port.
+        ready(1)        : The limit is not yet reached. This can be shown for all actions.
+        limitReached(2) : Indicates that the limit is reached on this port. This state can only be shown if Action is set to None or Trap.
+        shutdown(3)     : Indicates that the port is shut down by the Limit Control module. This state can only be shown if Action is set to Shutdown or Trap & Shutdown. "
+    ::= { tnIfLimitDynMACLearningEntry 4 }
+
+tnIfLimitDynMACReopen OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If a port is shutdown by this module, you may reopen it by setting this mib variable to enabled." 
+    ::= { tnIfLimitDynMACLearningEntry 5 }
+
+
+tnEgressQueueModeMgmt  		OBJECT IDENTIFIER ::= { tnIfQOSMgmt 1 } 
+
+tnEgressQueueModeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnEgressQueueModeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for Egress queuing method confiration by per port."
+        ::= { tnEgressQueueModeMgmt 1 }   
+        
+tnEgressQueueModeEntry OBJECT-TYPE
+        SYNTAX      TnEgressQueueModeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for Egress queuing method confiration by per port"
+        INDEX       { tnEgressQueueIfIndex}
+        ::= { tnEgressQueueModeTable 1 }   
+        
+TnEgressQueueModeEntry ::= SEQUENCE
+{
+	tnEgressQueueIfIndex	Integer32,
+	tnEgressQueueMode	    INTEGER
+}
+tnEgressQueueIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port interface of the TnEgressQueueModeEntry."
+        ::= { tnEgressQueueModeEntry 1 }     
+        
+tnEgressQueueMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    wrr(1),
+                    strict(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The queuing method for the egress prioQueue.
+                     wrr(1),strict(2)"      
+                     
+        ::= { tnEgressQueueModeEntry 2}
+
+--
+-- NOTIFICATIONS FOR THIS MIB
+--
+
+tnDMIRxIntrusionEvt  NOTIFICATION-TYPE
+    OBJECTS { 
+                ifIndex, tnDMIRxPwrLvlPreset, tnDMIRxPowerLevel
+            }
+    STATUS  current
+    DESCRIPTION            
+    "A tnDMIRxIntrusionEvt event is sent if the tnDMIRxPowerLevel falls
+     below the tnDMIRxPwrLvlPreset indicating an intrusion on the fiber."
+    ::= { tnMgmtNotifications 1 }
+
+tnDMIRxPowerEvt  NOTIFICATION-TYPE
+    OBJECTS { 
+                ifIndex, tnDMIRxPowerAlarm, tnDMIRxPowerLevel
+            }
+    STATUS  current
+    DESCRIPTION            
+    "A tnDMIRxPowerEvt event is sent when there is a warning or alarm on Rx Power."
+    ::= { tnMgmtNotifications 2 }
+  
+tnDMITxPowerEvt  NOTIFICATION-TYPE
+    OBJECTS { 
+                ifIndex, tnDMITxPowerAlarm, tnDMITxPowerLevel
+            }
+    STATUS  current
+    DESCRIPTION            
+    "A tnDMITxPowerEvt event is sent when there is a warning or alarm on Tx Power."
+    ::= { tnMgmtNotifications 3 }
+
+tnDMITxBiasEvt  NOTIFICATION-TYPE
+    OBJECTS { 
+                ifIndex, tnDMITxBiasAlarm, tnDMITxBiasCurrent
+            }
+    STATUS  current
+    DESCRIPTION            
+    "A tnDMITxBiasEvt event is sent when there is a warning or alarm on Tx Bias current."
+    ::= { tnMgmtNotifications 4 }
+    
+tnDMITemperatureEvt  NOTIFICATION-TYPE
+    OBJECTS { 
+                ifIndex, tnDMITempAlarm, tnDMITemperature
+            }
+    STATUS  current
+    DESCRIPTION            
+    "A tnDMITemperatureEvt event is sent when there is a warning or alarm on DMI temperature."
+    ::= { tnMgmtNotifications 5 }  
+    
+tnDyingGaspEvt  NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION            
+    "when the device lost power, this dying gasp trap will be sent out."
+    ::= { tnMgmtNotifications 7 }
+
+tnIfLimitDynMACEvt  NOTIFICATION-TYPE
+    OBJECTS { 
+                ifIndex, tnIfLimitDynMACMaxCount, tnIfLimitDynMACState
+            }
+    STATUS  current
+    DESCRIPTION            
+    "This event is trigger when a port which has Limit control on dynamic MAC is enabled and
+    the limit is reached."
+    ::= { tnMgmtNotifications 8 }       
+    
+--
+-- traps to temperature
+--
+tnMgmtMibBoardTmpNotif    NOTIFICATION-TYPE
+    OBJECTS    {
+                   tnDevSysHwInforBoardtmp
+               }
+    STATUS     current
+    DESCRIPTION
+               "A tnMgmtMibBoardTmpNotif will be sent out will be sent out when temperature of board
+               is out of controlled range (TO BE CONTINUED)."
+    ::= { tnMgmtNotifications 9 }
+
+tnMgmtMibCPUTmpNotif    NOTIFICATION-TYPE
+    OBJECTS    {
+                   tnDevSysHwInforCPUtmp
+               }
+    STATUS     current
+    DESCRIPTION
+               "A tnMgmtMibCPUTmpNotif will be sent out when temperature of CPU
+               is out of controlled range (TO BE CONTINUED)."
+    ::= { tnMgmtNotifications 10 }
+END
+

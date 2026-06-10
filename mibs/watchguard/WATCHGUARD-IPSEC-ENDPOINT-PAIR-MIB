@@ -1,0 +1,437 @@
+WATCHGUARD-IPSEC-ENDPOINT-PAIR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,  Unsigned32, Gauge32,
+        OBJECT-IDENTITY, enterprises,
+        IpAddress                       FROM SNMPv2-SMI
+        watchguard                      FROM WATCHGUARD-SMI;
+
+    wgIpsecEndpointPairModule MODULE-IDENTITY
+        LAST-UPDATED "200701251200Z"
+        ORGANIZATION "WatchGuard Technologies, Inc."
+        CONTACT-INFO
+                   "  WatchGuard Technologies, Inc.
+                   
+                      505 Fifth Avenue South
+                      Suite 500
+                      Seattle, WA 98104
+                      United States
+
+                      +1.206.613.6600 "
+
+        DESCRIPTION
+            "The MIB module describes generic Ipsec Endpoint Pair information
+            of WatchGuard system.  Mainly, the information 
+            obtained from this MIB is used to constructed topological
+            view of IPSec security gateways that are connected by
+            IPSec tunnels. 
+               
+            An IPSec Endpoint Pair is a pair of security gateways that
+            are connected with 0 or more IPSec SA's in tunnel mode.  
+            It contains information of aggregated information 
+            of tunnel mode SA's between two security gateways.
+
+            An IPSec Endpoint Pair is identified by a pair of IP addresses.
+            Therefore, if an IPSec security gateway X has 2 external
+            IP addresses while IPsec secruity gateway Y has 3 external
+            IP addresses, there are potentially 6 IPsec Endpoint Pairs
+            between X and Y."
+
+
+        REVISION      "200701251200Z"
+        DESCRIPTION
+            "Initial revision."
+        ::= { watchguard 5 }
+
+
+    wgIpsecEndpointPairMIB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all IPSec tunnel
+             branches."
+        ::= { wgIpsecEndpointPairModule 1 }
+
+    wgIpsecEndpointPair OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all IPSec
+            tunnel information."
+        ::= { wgIpsecEndpointPairMIB 1 }
+
+    wgIpsecEndpointPairStatistics OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all objects which
+            are global counters for IPSec tunnels."
+        ::= { wgIpsecEndpointPairMIB 2 }
+
+
+    wgIpsecEndpointPairNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of entries in the wgIpsecEndpointPairTable. "
+        ::= { wgIpsecEndpointPair 1 }
+
+    wgIpsecEndpointPairTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecEndpointPairEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the connection table describing all current
+            IPSec tunnels exist on this entity."
+        ::= { wgIpsecEndpointPair 2 }
+
+
+    wgIpsecEndpointPairEntry OBJECT-TYPE
+        SYNTAX      WGIpsecEndpointPairEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the information on a
+            IPSec tunnel between two IPSec security gateways."
+        INDEX{ wgIpsecEndpointPairIndex }
+        ::= { wgIpsecEndpointPairTable 1 }
+
+    WGIpsecEndpointPairEntry ::= SEQUENCE {
+
+        wgIpsecEndpointPairIndex                 Integer32,
+
+        wgIpsecEndpointPairLocalAddr             IpAddress,
+        wgIpsecEndpointPairPeerAddr              IpAddress,
+
+
+        wgIpsecEndpointPairInSAs                 Unsigned32,
+        wgIpsecEndpointPairOutSAs                Unsigned32,
+        wgIpsecEndpointPairInAccKbytes           Counter32,
+        wgIpsecEndpointPairOutAccKbytes          Counter32,
+        wgIpsecEndpointPairInPackets             Counter32,
+        wgIpsecEndpointPairOutPackets            Counter32,
+        wgIpsecEndpointPairDecryptErrors         Counter32,
+        wgIpsecEndpointPairAuthErrors            Counter32,
+        wgIpsecEndpointPairReplayErrors          Counter32,
+        wgIpsecEndpointPairPolicyErrors          Counter32,
+        wgIpsecEndpointPairPadErrors             Counter32,
+        wgIpsecEndpointPairOtherReceiveErrors    Counter32,
+        wgIpsecEndpointPairSendErrors            Counter32
+
+    }
+
+    wgIpsecEndpointPairIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "The running index of this IPSec endpoint pair."
+        ::= { wgIpsecEndpointPairEntry 1 }
+
+    wgIpsecEndpointPairLocalAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The local IP address of the current IPSec ednpoint pair."
+        ::= { wgIpsecEndpointPairEntry 2 }
+
+    wgIpsecEndpointPairPeerAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The remote IP address of the current IPSec endpoint pair."
+        ::= { wgIpsecEndpointPairEntry 3 }
+
+
+    wgIpsecEndpointPairInSAs OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of inbound IPSEC SA's within this
+             IPSec endpoint pair.If IKE rekeys and no data 
+             stream to activate new SA, the SA statistics       
+             may be include the old SA, then the total number 
+             is the double of the active SA"
+        ::= { wgIpsecEndpointPairEntry 4 }
+
+    wgIpsecEndpointPairOutSAs OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of outbound IPSEC SA's within this
+             IPSec endpoint pair.If IKE rekeys and no data 
+             stream to activate new SA, the SA statistics       
+             may be include the old SA, then the total number 
+             is the double of the active SA"
+        ::= { wgIpsecEndpointPairEntry 5 }
+
+    wgIpsecEndpointPairInAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total inbound traffic in Kbytes since the establish of
+             this connection."
+        ::= { wgIpsecEndpointPairEntry 6 }
+
+    wgIpsecEndpointPairOutAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total outound traffic in Kbytes since the establish of
+            this connection."
+        ::= { wgIpsecEndpointPairEntry 7 }
+
+    wgIpsecEndpointPairInPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of inbound packets since the establish of
+            this connection."
+        ::= { wgIpsecEndpointPairEntry 8 }
+
+    wgIpsecEndpointPairOutPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of outound packets since the establish of
+            this connection."
+        ::= { wgIpsecEndpointPairEntry 9 }
+
+    wgIpsecEndpointPairDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairEntry 10 }
+
+    wgIpsecEndpointPairAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to authentication
+            error since the establish of this connection."
+        ::= { wgIpsecEndpointPairEntry 11 }
+
+    wgIpsecEndpointPairReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of packets discarded due to replay
+            error since the establish of this connection."
+        ::= { wgIpsecEndpointPairEntry 12}
+
+    wgIpsecEndpointPairPolicyErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairEntry 13 }
+
+    wgIpsecEndpointPairPadErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairEntry 14 }
+
+    wgIpsecEndpointPairOtherReceiveErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairEntry 15 }
+
+    wgIpsecEndpointPairSendErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairEntry 16 }
+
+
+   -- global statistics
+
+   wgIpsecEndpointPairTotalInSAs  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of active inbound SA's in the entity."
+        ::= { wgIpsecEndpointPairStatistics 1 }
+
+   wgIpsecEndpointPairTotalOutSAs  OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of active outbound SA's in the entity."
+        ::= { wgIpsecEndpointPairStatistics 2 }
+
+   wgIpsecEndpointPairTotalInAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total inbound IPsec traffic of this entity."
+        ::= { wgIpsecEndpointPairStatistics 3 }
+
+   wgIpsecEndpointPairTotalOutAccKbytes  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total outbound IPsec traffic of this entity."
+        ::= { wgIpsecEndpointPairStatistics 4 }
+
+   wgIpsecEndpointPairTotalInPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        UNITS       "Kbytes"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total inbound IPsec packets of this entity."
+        ::= { wgIpsecEndpointPairStatistics 5 }
+
+   wgIpsecEndpointPairTotalOutPackets  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total outbound IPsec packets of this entity."
+        ::= { wgIpsecEndpointPairStatistics 6 }
+
+
+    wgIpsecEndpointPairTotalDecryptErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairStatistics 7 }
+
+    wgIpsecEndpointPairTotalAuthErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Total number of packets on this entity discarded 
+           due to authentication errors."
+        ::= { wgIpsecEndpointPairStatistics 8 }
+
+    wgIpsecEndpointPairTotalReplayErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Total number of packets discarded due to replay
+           errors on this entity."
+        ::= { wgIpsecEndpointPairStatistics 9 }
+
+    wgIpsecEndpointPairTotalPolicyErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairStatistics 10 }
+
+    wgIpsecEndpointPairTotalPadErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+           "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairStatistics 11 }
+
+    wgIpsecEndpointPairTotalOtherReceiveErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairStatistics 12 }
+
+    wgIpsecEndpointPairTotalSendErrors  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Deprecated, currently unused."
+        ::= { wgIpsecEndpointPairStatistics 13 }
+
+    wgIpsecEndpointPairPeerIPToTunnel OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This is the base object identifier for all tunnels
+             information of the policies."
+        ::= {wgIpsecEndpointPairMIB 3}
+
+    wgIpsecEndpointPairPeerIPToTunnelNum OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of tunnels in the peeriptotunnel table. "
+        ::= { wgIpsecEndpointPairPeerIPToTunnel 1 }
+
+    wgIpsecEndpointPairPeerIPToTunnelTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF WGIpsecEndpointPairPeerIPToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The peeriptotunnel table in the endpointpair mib."
+        ::= { wgIpsecEndpointPairPeerIPToTunnel 2 }
+
+    wgIpsecEndpointPairPeerIPToTunnelEntry OBJECT-TYPE
+        SYNTAX      WGIpsecEndpointPairPeerIPToTunnelEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry (conceptual row) containing the peer ip and tunnel
+            information."
+        INDEX {
+            wgIpsecEndpointPairPeerIPToTunnelPeerIP,
+            wgIpsecEndpointPairPeerIPToTunnelTunnelID
+        }
+        ::= { wgIpsecEndpointPairPeerIPToTunnelTable 1 }
+
+    WGIpsecEndpointPairPeerIPToTunnelEntry ::= SEQUENCE {
+
+        wgIpsecEndpointPairPeerIPToTunnelPeerIP      IpAddress,
+        wgIpsecEndpointPairPeerIPToTunnelTunnelID    Unsigned32
+    }
+    
+    wgIpsecEndpointPairPeerIPToTunnelPeerIP  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The peer ip of the peeriptotunnel table."
+        ::= {wgIpsecEndpointPairPeerIPToTunnelEntry 1}
+            
+    wgIpsecEndpointPairPeerIPToTunnelTunnelID  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The tunnel id of the peeriptotunnel table."
+        ::= {wgIpsecEndpointPairPeerIPToTunnelEntry 2}
+        
+END
+

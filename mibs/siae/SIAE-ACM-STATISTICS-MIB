@@ -1,0 +1,616 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-ACM-STATISTICS-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Counter32, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+             TEXTUAL-CONVENTION,
+             DisplayString, RowStatus
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    acmStats MODULE-IDENTITY
+        LAST-UPDATED "201411050000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Adaptive Code Modulation (ACM) Statistics (Performance Monitoring)
+            "
+        REVISION "201411050000Z"
+        DESCRIPTION 
+            "MIB version 01.00.01
+             - Added ACM profilea 4096 QAM and 4096QAM strong
+              (changed AcmProfile TEXTUAL-CONVENTION)
+            "
+        REVISION "201402110000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 75 }
+
+----------------------------------------------------------------------------------
+--  Textual Conventions
+----------------------------------------------------------------------------------
+
+     AcmProfile ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+         "List of supported ACM profiles.
+         "
+       SYNTAX INTEGER {
+              unavailable         (1),  -- This is a virtual profile needed to
+                                        -- create a row in the table of counters
+                                        -- in order to count seconds with modem
+                                        -- not locked.
+              downshift           (2),  -- This is a virtual profile needed to
+                                        -- create a row in the table of counters
+                                        -- in order to count transitions towards
+                                        -- lower profiles. 
+              upshift             (3),  -- This is a virtual profile needed to
+                                        -- create a row in the table of counters
+                                        -- in order to count transitions towards 
+                                        -- upper profiles.
+              acmBPSKstrong       (4),
+              acmBPSK             (5),
+              acm4QAMstrong       (6),
+              acm4QAM             (7),
+              acm8PSKstrong       (8),
+              acm8PSK             (9),
+              acm16QAMstrong      (10),
+              acm16QAM            (11),
+              acm32QAMstrong      (12),
+              acm32QAM            (13),
+              acm64QAMstrong      (14),
+              acm64QAM            (15),
+              acm128QAMstrong     (16),
+              acm128QAM           (17),
+              acm256QAMstrong     (18),
+              acm256QAM           (19),
+              acm512QAMstrong     (20),
+              acm512QAM           (21),
+              acm1024QAMstrong    (22),
+              acm1024QAM          (23),
+              acm2048QAMstrong    (24),
+              acm2048QAM          (25),
+              acm4096QAMstrong    (26),
+              acm4096QAM          (27)
+         }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--  acmStats (PERFORMANCE MONITORING ACM) Group
+----------------------------------------------------------------------------------
+--
+--  The following objects are used to manage the ACM counters.
+--  The  objects of this group are meaningful only if radioEquipAcmEngineEnable
+--  is equal to "enable".
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    acmsMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {acmStats 1}
+
+--
+--  TERMINATION POINT LINK TABLE
+--
+
+--
+-------  The following table contains the records used to manage the P.M.
+
+-------  Begin of acmsTpLinkTable
+--
+    acmsTpLinkTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AcmsTpLinkRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with ACM Termination Point of the radio links.
+             This table contains object to activate and deactivate the
+             buildup of counters.
+            "
+    ::= {acmStats 2}
+
+    acmsTpLinkRecord  OBJECT-TYPE
+        SYNTAX      AcmsTpLinkRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of acmsTpLinkTable.
+            "
+        INDEX {acmsTpLinkId, acmsTpLinkPolId}
+    ::= {acmsTpLinkTable 1}
+
+    AcmsTpLinkRecord  ::=
+        SEQUENCE    {
+            acmsTpLinkId         Integer32,
+            acmsTpLinkPolId      Integer32,
+            acmsTpLinkStartStop  INTEGER,
+            acmsTpLinkLabel      DisplayString,
+            acmsTpLinkRowStatus  RowStatus
+        }
+
+    acmsTpLinkId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the Radio link.
+            "
+    ::= {acmsTpLinkRecord 1}
+
+    acmsTpLinkPolId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the Radio link polarization for XPIC
+             configuration. In non XPIC link this object should be 1.
+            "
+    ::= {acmsTpLinkRecord 2}
+
+    acmsTpLinkStartStop  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             start   (1),
+                             stop    (2)
+                            }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object is used to start and to stop the statistic 
+             (Perfomance Monitoring) counter evaluation.
+            "
+        DEFVAL {stop}
+    ::= {acmsTpLinkRecord 3}
+
+    acmsTpLinkLabel  OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..31))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to identify the ACM Termination Point.
+            "
+    ::= {acmsTpLinkRecord 4}
+
+    acmsTpLinkRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of acmsTpLinkTable.
+
+             When set to notInService, associated acmsTpProfileTable
+             rows may be added, deleted and modified.
+
+             When an attempt is made to set acmsTpLinkRowStatus to
+             active, there is at least a row in acmsTpProfileTable with
+             first index equal to acmsTpLinkId. Otherwise, the error
+             inconsistentValue is returned to the set attempt.
+
+             The creation of a row in this table, creates a row with the
+             same index in of acmsTpMaintTable.
+
+             The deletion of a row in this table, deletes a row with the
+             same index in of acmsTpMaintTable.
+
+             If this object is set to destroy, must not be no rows in 
+             acmsTpProfileTable associated by acmsTpLinkId to the row
+             that is being deleted, otherwise, the error inconsistentValue
+             is returned to the set attempt. Hence, profile instances must
+             be deleted before this link instance.
+            "
+    ::= {acmsTpLinkRecord 5}
+
+--
+-------   End of acmsTpLinkTable
+
+--
+--  PROFILE TABLE
+--
+
+-------  Begin of acmsTpProfileTable
+--
+    acmsTpProfileTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AcmsTpProfileRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "ACM Termination Point Thresholds Class table.
+             Table with AcmsTpProfileRecord records.
+             This table contains alarms and related thresholds to notify them
+             within a specific time interval. 
+            "
+    ::= {acmStats 3}
+
+    acmsTpProfileRecord  OBJECT-TYPE
+        SYNTAX      AcmsTpProfileRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of acmsTpLinkTable.
+             Several instances (a instance for each ACM profile supported by
+             the radio system) of this record is created on creation of
+             acmsTpLinkTable.
+            "
+        INDEX {acmsTpLinkId, acmsTpLinkPolId, acmsTpProfileId}
+    ::= {acmsTpProfileTable 1}
+
+    AcmsTpProfileRecord  ::=
+        SEQUENCE    {
+            acmsTpProfileId            AcmProfile,
+            acmsTpProfile15mAlarm      AlarmStatus,
+            acmsTpProfile24hAlarm      AlarmStatus,
+            acmsTpProfile15mThreshold  Integer32,
+            acmsTpProfile24hThreshold  Integer32,
+            acmsTpProfileRowStatus     RowStatus
+        }
+
+    acmsTpProfileId  OBJECT-TYPE
+        SYNTAX      AcmProfile
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This object identifies the ACM profile of the radio system.
+            "
+    ::= {acmsTpProfileRecord 1}
+
+    acmsTpProfile15mAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If acmsCounteValue crosses the threshold acmsTpProfile15mThreshold,
+             this alarm is notified.
+            "
+    ::= {acmsTpProfileRecord 2}
+
+    acmsTpProfile24hAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If acmsCounteValue crosses the threshold acmsTpProfile24hThreshold,
+             this alarm is notified.
+            "
+    ::= {acmsTpProfileRecord 3}
+
+    acmsTpProfile15mThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within a 15 minutes interval to set 
+             acmsTpProfile15mAlarm. The special value 0 turn off the alarm.
+
+             For downshift and upshift profiles, this threshold reports
+             the number of times a profile must be changed within a 15 minutes
+             interval to set acmsTpProfile15mAlarm.
+            "
+    ::= {acmsTpProfileRecord 4}
+
+    acmsTpProfile24hThreshold  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Number of seconds within a 24 hours interval to set 
+             acmsTpProfile24hAlarm. The special value 0 turn off the alarm.
+
+             For the profiles downshift and upshift, this threshold reports
+             the number of times a profile must be changed within a 24 hours
+             interval to set acmsTpProfile24hAlarm.
+            "
+    ::= {acmsTpProfileRecord 5}
+
+    acmsTpProfileRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of acmsTpProfileTable.
+
+             A row in the acmsTpProfileTable may not be created,
+             deleted, set to notInService or otherwise modified
+             if the there is no a row in acmsTpProfileTable with the 
+             same acmsTpLinkId and the associated acmsTpLinkRowStatus
+             object is equal to active. However, if the acmsTpLinkRowStatus
+             object is equal to notInService, a row may be created, deleted
+             or modified. In other words, a profile may not be added,
+             deleted or modified if the ACM statistics of a radio link
+             is active.
+
+             The creation on a row in this table, creates a row with the same
+             index in of acmsProfileCounterTable.
+
+             If this object is set to destroy, the associated instance
+             of acmsProfileCounterTable will also be deleted by this action.
+            "
+    ::= {acmsTpProfileRecord 6}
+
+--
+--  MAINTENANCE TABLE
+--
+
+-------  Begin of acmsTpMaintTable
+--
+    acmsTpMaintTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AcmsTpMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Command for maintenance of Termination Point.
+             Objects in this table is not persistent.
+            "
+    ::= {acmStats 4}
+
+    acmsTpMaintRecord  OBJECT-TYPE
+        SYNTAX      AcmsTpMaintRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "ACM Termination Point Maintenance record.
+             An Instance of this record is created on creation of
+             acmsTpLinkTable.
+            "
+        INDEX {acmsTpLinkId, acmsTpLinkPolId}
+    ::= {acmsTpMaintTable 1}
+
+    AcmsTpMaintRecord  ::=
+        SEQUENCE    {
+            acmsTpMaintCounterClear INTEGER,
+            acmsTpMaintAlarmClear   INTEGER
+        }
+
+    acmsTpMaintCounterClear  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive   (0),
+                             clear       (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear the statistic (Perfomance Monitoring)
+             counters.
+            "
+    ::= {acmsTpMaintRecord 1}
+
+    acmsTpMaintAlarmClear  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive   (0),
+                             clear       (1)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to clear the threshold cross alarms.
+            "
+    ::= {acmsTpMaintRecord 2}
+--
+-------  End of acmsTpMaintTable
+
+--
+--  COUNTERS TABLE
+--
+
+-------  Begin of acmsBlockTable
+--
+    acmsIntervalTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AcmsIntervalRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with records of block.
+            "
+    ::= {acmStats 5}
+
+    acmsIntervalRecord  OBJECT-TYPE
+        SYNTAX      AcmsIntervalRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of acmsBlockTable.
+             There is an entry in acmsBlockTable for each radio link.
+             Several (up to 19) instances of this record are created since
+             the first time that acmsTpLinkStartStop becomes start.
+            "
+        INDEX {acmsTpLinkId, acmsTpLinkPolId, acmsIntervalId}
+    ::= {acmsIntervalTable 1}
+
+    AcmsIntervalRecord  ::=
+        SEQUENCE    {
+            acmsIntervalId        INTEGER,
+            acmsIntervalType      INTEGER,
+            acmsIntervalStatus    INTEGER,
+            acmsIntervalTimeStamp Unsigned32
+        }
+
+    acmsIntervalId  OBJECT-TYPE
+        SYNTAX      INTEGER (1..19)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object identifies time intervals according to the
+             following code:
+
+             (1)   Current Daily counters
+             (2)   Daily counters of the day before
+             (3)   Current a day counters
+             (4)   a day interval N. 1
+                   (The most recently completed 15 minute interval)
+             ...
+
+             (19)  a day interval N. 16
+                   (The oldest day counters - 4 hours ago).
+
+             The interval identified by 4 is the most recently completed 15
+             minute interval, and the interval identified by N is the interval
+             immediately preceding the one identified by N-1.
+            "
+    ::= {acmsIntervalRecord 1}
+
+    acmsIntervalType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             daily       (1),
+                             fifteen-min (2)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the counter interval: it can describe a daily block
+             counter or a counter related to a 15 minutes interval.
+            "
+    ::= {acmsIntervalRecord 2}
+
+    acmsIntervalStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             meaningless   (1),
+                             meaningfull   (2),
+                             incomplete    (3),
+                             dummy         (4),
+                             lost          (5),
+                             restarted     (6)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Interval status.
+            "
+    ::= {acmsIntervalRecord 3}
+
+    acmsIntervalTimeStamp  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The object is the time when the performance record is closed.
+             The time is shown as the number of seconds since January 1, 1970
+            "
+    ::= {acmsIntervalRecord 4}
+
+--
+-------  End of acmsLinkBlockTable
+-------  The following table contains the records with the counters used to monitor
+-------  the ACM profile (modulation) active on the transmitted frame
+
+-------  Begin of acmsProfileCounterTable
+--
+    acmsProfileCounterTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AcmsCounterRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with records of ACM statistics counters.
+            "
+    ::= {acmStats 6}
+
+    acmsProfileCounterRecord  OBJECT-TYPE
+        SYNTAX      AcmsCounterRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of acmsProfileCounterTable.
+             There is an entry in acmsProfileCounterTable for each profile
+             of each radio link.
+             Several (up to 19) instances of this record are created since
+             the first time that acmsTpLinkStartStop becomes start.
+            "
+        INDEX {acmsTpLinkId, acmsTpLinkPolId, acmsTpProfileId, acmsIntervalId}
+    ::= {acmsProfileCounterTable 1}
+
+    AcmsCounterRecord  ::=
+        SEQUENCE    {
+            acmsProfileCounterValue          Counter32
+        }
+
+    acmsProfileCounterValue  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "When index acmsTpProfileId is downshift, this object counts the
+             number of times that the active profile is moved to a lower one.
+  
+             When index acmsTpProfileId is upshift, this object counts the
+             number of times that the active profile is moved to an upper one.
+             
+             When index acmsTpProfileId is unavailable, this object counts
+             the number of seconds in which the modem is not locked.
+             
+             For all other values of acmsTpProfileId the object counts the
+             number of seconds for which the rx profile relative to this row
+             of the table has been active.
+            "
+    ::= {acmsProfileCounterRecord 1}
+
+--
+-------  End of acmsProfileCounterTable
+
+--
+-------  The following objects are common to all radio branches.
+--
+
+    acmsTpProfile15mAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the acmsTpProfile15mAlarm
+             and enables/disables the trap generation on status change event.
+            "
+        DEFVAL {majorTrapEnable}
+    ::= {acmStats 7}
+
+    acmsTpProfile24hAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Define the severity associated to the acmsTpProfile24hAlarm
+             and enables/disables the trap generation on status change event.
+            "
+        DEFVAL {majorTrapEnable}
+    ::= {acmStats 8}
+
+------ End group -----------------------------------------------------------------
+
+END
+
+
+
+

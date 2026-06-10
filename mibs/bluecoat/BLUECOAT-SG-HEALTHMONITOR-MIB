@@ -1,0 +1,163 @@
+BLUECOAT-SG-HEALTHMONITOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP       
+                FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+bluecoatSGHealthMonMIB MODULE-IDENTITY
+        LAST-UPDATED    "201306100300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The health monitoring MIB is used to monitor
+                         changes in the health of the SG appliance."
+        REVISION        "201306100300Z"
+        DESCRIPTION     "1. Introduced individual traps for states.
+                         2. The overall health monitoring state is made pollable.
+                         3. Renamed 'bluecoatSgHealthMonitor' prefix as 'deviceHealthMon'.
+                         4. Added comformance and compliance statements."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 12 }
+
+deviceHealthMonMIBObjects
+        OBJECT IDENTIFIER ::= { bluecoatSGHealthMonMIB 1 }
+
+deviceHealthMonMIBNotification
+        OBJECT IDENTIFIER ::= { bluecoatSGHealthMonMIB 2 }
+
+deviceHealthMonMIBNotifPrefix
+        OBJECT IDENTIFIER ::= { deviceHealthMonMIBNotification 0 }
+
+deviceHealthMonMIBConformance
+      OBJECT IDENTIFIER ::= { bluecoatSGHealthMonMIB 3 }
+
+--
+-- Textual conventions
+--
+
+HealthMonMessageString ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT     "255a"
+        STATUS           current
+        DESCRIPTION      "The message describing a change in the health
+                          of the SG system."
+        SYNTAX           OCTET STRING (SIZE (0..255))
+
+--
+-- MIB variables
+--
+
+deviceHealthMonValues
+        OBJECT IDENTIFIER ::= { deviceHealthMonMIBObjects 1 }
+
+deviceHealthMonMessage OBJECT-TYPE
+        SYNTAX          HealthMonMessageString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The custom message generated for this change in health."
+        ::= { deviceHealthMonValues 1 }
+
+--
+-- Health monitor states
+--
+
+HealthMonStatus ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "Indicates the current state of the health monitor.
+                (1) - ok
+                (2) - warning
+                (3) - critical
+                (4) - unknown"
+
+        SYNTAX INTEGER {
+                ok(1),
+                warning(2),
+                critical(3),
+                unknown(4)
+        }
+
+deviceHealthMonStatus OBJECT-TYPE
+        SYNTAX          HealthMonStatus
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This shows the current state of health monitor."
+        ::= { deviceHealthMonValues 2 }
+
+--
+-- notifications
+--
+
+deviceHealthMonOkTrap NOTIFICATION-TYPE
+        OBJECTS { deviceHealthMonMessage }
+        STATUS          current
+        DESCRIPTION     "This notifies that the health monitor status changed to OK."
+        ::= { deviceHealthMonMIBNotifPrefix 1 }
+
+deviceHealthMonWarningTrap NOTIFICATION-TYPE
+        OBJECTS { deviceHealthMonMessage }
+        STATUS          current
+        DESCRIPTION     "This notifies that the health monitor status changed to Warning."
+        ::= { deviceHealthMonMIBNotifPrefix 2 }
+
+deviceHealthMonCriticalTrap NOTIFICATION-TYPE
+        OBJECTS { deviceHealthMonMessage }
+        STATUS          current
+        DESCRIPTION     "This notifies that the health monitor status changed to Critical."
+        ::= { deviceHealthMonMIBNotifPrefix 3 }
+
+
+-- Conformance information *******************************************
+
+deviceHealthMonMIBCompliances OBJECT IDENTIFIER
+        ::= {deviceHealthMonMIBConformance 1}
+
+deviceHealthMonMIBGroups OBJECT IDENTIFIER
+        ::= {deviceHealthMonMIBConformance 2}
+
+deviceHealthMonMIBNotifGroups OBJECT IDENTIFIER
+        ::= {deviceHealthMonMIBConformance 3}
+
+-- Compliance statements *********************************************
+
+deviceHealthMonMIBCompliance MODULE-COMPLIANCE
+        STATUS       current
+        DESCRIPTION "The compliance statement for the health monitoring module. "
+        MODULE -- this module
+        MANDATORY-GROUPS { deviceHealthMonMIBGroup }
+        
+        OBJECT        deviceHealthMonStatus
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        deviceHealthMonMessage
+        MIN-ACCESS    read-only
+        DESCRIPTION  "Write access is not required."
+        ::= { deviceHealthMonMIBCompliances 1 }
+
+deviceHealthMonMIBGroup OBJECT-GROUP
+        OBJECTS {
+                deviceHealthMonStatus,
+                deviceHealthMonMessage
+                }
+        STATUS       current
+        DESCRIPTION  "Group of Health Monitoring-related objects implemented in ProxySG appliances."
+        ::= { deviceHealthMonMIBGroups 1 }
+
+deviceHealthMonMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  {
+                deviceHealthMonOkTrap,
+                deviceHealthMonWarningTrap,
+                deviceHealthMonCriticalTrap
+                }
+        STATUS         current
+        DESCRIPTION    "Group of Health Monitoring notifications implemented in ProxySG appliances."
+        ::= { deviceHealthMonMIBNotifGroups 1 }
+
+END
+

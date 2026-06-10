@@ -1,0 +1,285 @@
+HIK-DEVICE-MIB DEFINITIONS ::=BEGIN
+
+IMPORTS     
+
+        enterprises, OBJECT-TYPE, Integer32,
+	    IpAddress                    FROM SNMPv2-SMI;
+
+test OBJECT IDENTIFIER ::= { enterprises 39165}
+devicemib OBJECT IDENTIFIER ::= { test 1 }
+
+deviceType OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The type of device."
+	::= { devicemib 1 }
+
+hardwVersion OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The version of hardware in this device."
+	::= { devicemib 2 }
+
+softwVersion OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The version of software in this device"
+	::= { devicemib 3 }
+
+macAddr OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The MAC address of the device."
+	::= { devicemib 4 }
+
+deviceID OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The code name of manufacturer of this device."
+	::= { devicemib 5 }
+
+manufacturer OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The manufacturer of this device."
+	::= { devicemib 6 }
+
+cpuPercent OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Percentage of cpu used on the device."
+	::= { devicemib 7 }
+
+
+diskSize OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The tatol size of the disk."
+	::= { devicemib 8 }
+
+diskPercent OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Percentage of space used on disk."
+	::= { devicemib 9 }
+
+memSize OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The memory size on the device."
+	::= { devicemib 10 }
+
+memUsed OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The memory used on the device."
+	::= { devicemib 11 }
+
+restartDev  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The support of restarting the device."
+	::= { devicemib 12 }
+
+dynIpAddr OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The dynamic IP address."
+	::= { devicemib 13 }
+
+dynNetMask OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The dynamic subnet mask associated with the IP address."
+	::= { devicemib 14 }
+
+dynGateway OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The dynamic gateway address."
+	::= { devicemib 15 }
+
+staticIpAddr OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The static IP address."
+	::= { devicemib 16 }
+
+staticNetMask OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The static subnet mask associated with the IP address."
+	::= { devicemib 17 }
+
+staticGateway OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The static Gateway."
+	::= { devicemib 18 }
+
+sysTime OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The host's notion of the local date and time of day."
+	::= { devicemib 19 }
+
+
+videoInChanNum OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The number of video input channels."
+	::= { devicemib 20 }
+
+videoEncode OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The type of video coding."
+	::= { devicemib 21 }
+
+videoNetTrans OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The type of video network transmission."
+	::= { devicemib 22 }
+
+audioAbility OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The ability of audio."
+	::= { devicemib 23 }
+
+audioInNum OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The number of audio input."
+	::= { devicemib 24 }
+
+videoOutNum OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The number of video output."
+	::= { devicemib 25 }
+
+clarityChanNum OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The number of clarity channels."
+	::= { devicemib 26 }
+
+localStorage OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The support of local storage."
+	::= { devicemib 27 }
+
+rtspPlayBack OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The support of RTSP lookback."
+	::= { devicemib 28 }
+
+netAccessType OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The type of network access supported."
+	::= { devicemib 29 }
+
+alarmInChanNum OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The num of input channel for alarming."
+	::= { devicemib 30 }
+
+alarmOutChanNum OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The num of output channel for alarming."
+	::= { devicemib 31 }
+
+manageServAddr OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The address of network manage host."
+	::= { devicemib 32 }
+	
+managePort OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The port of network manage host."
+	::= { devicemib 34 }
+	
+ntpServIpAddr OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The IP address of NTP server."
+	::= { devicemib 33 }
+
+END

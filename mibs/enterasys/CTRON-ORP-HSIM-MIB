@@ -1,0 +1,171 @@
+CTRON-ORP-HSIM-MIB DEFINITIONS ::= BEGIN
+     --  ctron-orp-hsim-mib.txt
+     --  Revision: 01.00.00
+     --  Part Number: 
+     --  Date: September 3, 1997
+     
+     --  Cabletron Systems, Inc.
+     --  35 Industrial Way, P.O. Box 5005 
+     --  Rochester, NH 03867-0505
+     --  (603) 332-9400
+     --  support@ctron.com
+     
+     --  This module provides authoritative definitions for Cabletron's 
+     --  enterprise-specific Orp HSIM MIB.
+     --
+     --  This module will be extended, as required. 
+     
+     --  Cabletron Systems reserves the right to make changes in 
+     --  specification and other information contained in this document 
+     --  without prior notice.  The reader should consult Cabletron Systems 
+     --  to determine whether any such changes have been made.
+     --
+     --  In no event shall Cabletron Systems be liable for any incidental, 
+     --  indirect, special, or consequential damages whatsoever (including 
+     --  but not limited to lost profits) arising out of or related to this 
+     --  document or the information contained in it, even if Cabletron
+     --  Systems has been advised of, known, or should have known, the 
+     --  possibility of such damages.
+     --
+     --  Cabletron grants vendors, end-users, and other interested parties 
+     --  a non-exclusive license to use this Specification in connection 
+     --  with the management of Cabletron products.
+     
+     --  Copyright June 1997 Cabletron Systems
+     
+     IMPORTS
+
+     IpAddress
+        FROM RFC1155-SMI
+     OBJECT-TYPE
+        FROM RFC-1212
+     ctOrpHSIM
+        FROM CTRON-MIB-NAMES;
+     
+     MacAddress ::= OCTET STRING (SIZE (6))
+     
+     --
+     -- The Orp HSIM Table
+     --
+     
+     ctOrpHSIMTable  OBJECT-TYPE
+     SYNTAX  SEQUENCE OF CtOrpHSIMEntry 
+     ACCESS  not-accessible
+     STATUS  mandatory
+     DESCRIPTION
+     "This table defines orp HSIMs."
+     ::= { ctOrpHSIM 1 }
+     
+     ctOrpHSIMEntry  OBJECT-TYPE
+     SYNTAX  CtOrpHSIMEntry
+     ACCESS  not-accessible
+     STATUS  mandatory
+     DESCRIPTION
+     "Describes a particular entry."
+     INDEX { ctOrpHSIMSlot, ctOrpHSIMIndex } 
+     ::= { ctOrpHSIMTable 1 }
+     
+     CtOrpHSIMEntry ::=
+     SEQUENCE {
+     ctOrpHSIMSlot
+        INTEGER,
+     ctOrpHSIMIndex
+        INTEGER,
+     ctOrpHSIMIfRef
+        OBJECT IDENTIFIER,
+     ctOrpHSIMMACAddress
+        MacAddress,
+     ctOrpHSIMIPAddress
+        IpAddress,
+     ctOrpHSIMSubnetMask
+        IpAddress,
+     ctOrpHSIMROCommName
+        OCTET STRING,
+     ctOrpHSIMRWCommName
+        OCTET STRING,
+     ctOrpHSIMSUCommName
+        OCTET STRING
+     }
+     
+     ctOrpHSIMSlot OBJECT-TYPE
+     SYNTAX  INTEGER
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+     "In a chassis environment, this object indicates the slot in which 
+     the module, which contains the HSIM resides. In the case of a 
+     stand-alone device the slot will always be 1."
+     ::= { ctOrpHSIMEntry 1 }
+     
+     ctOrpHSIMIndex OBJECT-TYPE
+     SYNTAX  INTEGER
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+     "This object is a unique index referring to a given HSIM on a module 
+     or stand-alone device."
+     ::= { ctOrpHSIMEntry 2 }
+     
+     ctOrpHSIMIfRef OBJECT-TYPE
+     SYNTAX  OBJECT IDENTIFIER
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+     "This object contains an OID which associates this HSIM with a unique 
+     interface.  This OID must be an existing and accessible ifIndex leaf 
+     from ifTable in RFC1213 or RFC1573."
+     ::= { ctOrpHSIMEntry 3 }
+     
+     ctOrpHSIMMACAddress OBJECT-TYPE
+     SYNTAX  MacAddress
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+     "Provides the base Ethernet MAC Address of the installed HSIM."
+     ::= { ctOrpHSIMEntry 4 }
+     
+     ctOrpHSIMIPAddress OBJECT-TYPE
+     SYNTAX  IpAddress
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+     "Provides the base IP address of the installed HSIM."
+     ::= { ctOrpHSIMEntry 5 }
+     
+     ctOrpHSIMSubnetMask OBJECT-TYPE
+     SYNTAX  IpAddress
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+     "Provides the subnet mask of the base IP address of the installed 
+     HSIM."
+     ::= { ctOrpHSIMEntry 6 }
+     
+     ctOrpHSIMROCommName OBJECT-TYPE
+     SYNTAX  OCTET STRING
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+     "Provides the Read-Only Community name associated with the base IP 
+     Address of the installed HSIM."
+     ::= { ctOrpHSIMEntry 7 }
+     
+     ctOrpHSIMRWCommName OBJECT-TYPE
+     SYNTAX  OCTET STRING
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+     "Provides the Read-Write Community name associated with the base IP 
+     Address of the installed HSIM."
+     ::= { ctOrpHSIMEntry 8 }
+     
+     ctOrpHSIMSUCommName OBJECT-TYPE
+     SYNTAX  OCTET STRING
+     ACCESS  read-write
+     STATUS  mandatory
+     DESCRIPTION
+     "Provides the Super-User Community name associated with the base IP 
+     Address of the installed HSIM."
+     ::= { ctOrpHSIMEntry 9 }
+
+END

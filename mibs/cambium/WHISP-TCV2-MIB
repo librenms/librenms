@@ -1,0 +1,69 @@
+--
+-- 	whisp-tc.mib
+--
+--      ********************************************************************
+--	    Copyright 2005 - 2015 (c) Cambium Networks
+--      Cambium Networks Confidential Proprietary
+--      ********************************************************************
+--
+--      Contains SMIv2 Textual conventions for the Canopy Product Line.
+--      
+--      ********************************************************************
+--	$Id: WHISP-TCV2-MIB.txt,v 1.2 2009/10/06 16:45:08 aff003 Exp $
+--
+--      Revision History:
+--
+--      <Date>                  <Author>                <Changes>
+--      17/May/2000             B.M	                Initial release.
+--      05/Nov/2001		        Y.G			        Modification
+--      01/Oct/2009             Nando               Corrected Module name
+--      ********************************************************************
+
+WHISP-TCV2-MIB         DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        whispModules
+                FROM WHISP-GLOBAL-REG-MIB;
+
+whispTextualConventionsModule MODULE-IDENTITY
+	LAST-UPDATED	"200304170000Z"
+	ORGANIZATION	"Motorola"
+	CONTACT-INFO
+		"Canopy Technical Support
+		email: technical-support@canopywireless.com"
+	DESCRIPTION
+		"This module contains textual conventions for the Canopy
+                product line."
+	::= {whispModules 3}
+
+-- -------------------------------------------------------------------------
+-- Start Textual Conventions Definitions. 
+-- -------------------------------------------------------------------------
+ 
+-- Textual convention for MAC address  
+WhispMACAddress ::= TEXTUAL-CONVENTION
+          STATUS        current
+          DESCRIPTION
+                "This a WHiSP MAC address or ESN type."
+          SYNTAX        OCTET STRING(SIZE(6))
+
+--Textual convention for LUID
+WhispLUID ::= TEXTUAL-CONVENTION
+          STATUS        current
+          DESCRIPTION
+                "The 12 LUID (Local Unit Identification) assigned to each Canopy
+                Subscriber Modem (SM)."
+          SYNTAX        INTEGER(0..4095)
+
+-- Textual convention for Event Log      
+EventString ::= TEXTUAL-CONVENTION
+          DISPLAY-HINT "2048a"
+          STATUS        current
+          DESCRIPTION
+                "The string used to display event log."
+          SYNTAX        OCTET STRING(SIZE (0..2048))
+END

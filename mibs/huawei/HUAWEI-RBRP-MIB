@@ -1,0 +1,591 @@
+
+--  ============================================================================
+-- Copyright (C) by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description:  
+-- Reference:  
+-- Version: V1.0
+-- History:
+-- 
+-- 
+-- ============================================================================
+
+    HUAWEI-RBRP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex            
+                FROM IF-MIB            
+            OBJECT-GROUP, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            RowStatus, MacAddress, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+    
+    
+
+        hwRBRPMIB MODULE-IDENTITY 
+            LAST-UPDATED "200703310130Z"        -- March 31, 2007 at 01:30 GMT
+            ORGANIZATION 
+                "Huawei Technologies co.,Ltd."
+            CONTACT-INFO 
+                " R&D BeiJing, Huawei Technologies co.,Ltd.
+                Huawei Bld.,NO.3 Xinxi Rd., 
+                Shang-Di Information Industry Base,
+                Hai-Dian District Beijing P.R. China
+                Zip:100085 
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            DESCRIPTION 
+                "The MIB module for RBRP feature.                          
+                RPR Bridge Redundancy Protocol (RBRP) is the protocol for detecting 
+                and initializing the intersection ring configuration, and providing 
+                protection for data transfer from one rpr ring to another one via 
+                intersection rpr stations."
+            ::= { hwDatacomm 117 }
+        
+    
+
+        EnabledStatus ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "A simple status value for the object."
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            
+    
+
+-- ----------------------------------------------------                 
+        hwRBRPMibObject OBJECT IDENTIFIER ::= { hwRBRPMIB 1 }
+        
+        hwRBRPLocalDeviceID OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set the identity which distinguishes local device 
+                from other devices in a specific group."
+            ::= { hwRBRPMibObject 1 }
+        
+        hwRBRPWrapToNormalTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWRBRPWrapToNormalEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains WrapToNormalDelay information in the  ring-if ."
+            ::= { hwRBRPMibObject 2 }
+        
+        hwRBRPWrapToNormalEntry OBJECT-TYPE
+            SYNTAX HWRBRPWrapToNormalEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry contains WrapToNormalDelay information of ring-if 
+                in the device."
+            INDEX { hwRBRPRingIfIndex }
+            ::= { hwRBRPWrapToNormalTable 1 }
+        
+        HWRBRPWrapToNormalEntry ::=
+            SEQUENCE { 
+                hwRBRPRingIfIndex
+                    InterfaceIndex,
+                hwRBRPWrapToNormalVal
+                    INTEGER
+             }
+
+        hwRBRPRingIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "RPR logic interface index."
+            ::= { hwRBRPWrapToNormalEntry 1 }
+        
+        hwRBRPWrapToNormalVal OBJECT-TYPE
+            SYNTAX INTEGER (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object sets WrapToNormalDelay time of ring-if."
+            ::= { hwRBRPWrapToNormalEntry 11 }
+        
+
+
+        hwRBRPGroupCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWRBRPGroupCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains group based configuration information 
+                for RBRP."
+            ::= { hwRBRPMibObject 3 }
+        
+
+        hwRBRPGroupCfgEntry OBJECT-TYPE
+            SYNTAX HWRBRPGroupCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry, which contains configuration information for
+                a specific group, is created for each group in the device
+                and deleted when the device exit the group."
+            INDEX { hwRBRPGroupCfgGroupID }
+            ::= { hwRBRPGroupCfgTable 1 }
+        
+        HWRBRPGroupCfgEntry ::=
+            SEQUENCE { 
+                hwRBRPGroupCfgGroupID
+                    Integer32,
+                hwRBRPPriorityValue
+                    INTEGER,
+                hwRBRPPreemptedEnable
+                    EnabledStatus,
+                hwRBRPStatePromptSwitchEnable
+                    EnabledStatus,
+                hwRBRPPreemptDelayValue
+                    Integer32,
+                hwRBRPGroupCfgRowStatus
+                    RowStatus
+             }
+
+
+        hwRBRPGroupCfgGroupID OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object distinguishes a specific group from other 
+                groups in the device."
+            ::= { hwRBRPGroupCfgEntry 1 }
+        
+
+        hwRBRPPriorityValue OBJECT-TYPE
+            SYNTAX INTEGER (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the device's priority which 
+                determines the status of a device in a specific group.
+                The non-unready device with the largest priority value 
+                is in active status.
+                When a device's priority is equal to another device's,
+                the DeviceId will be the determining factor of a device's
+                status."
+            DEFVAL { 100 }
+            ::= { hwRBRPGroupCfgEntry 11 }
+        
+
+        hwRBRPPreemptedEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If PreemptedEnable is configured in a device which is
+                in active status in a specific group, its status could
+                be preempted by device with larger priority value."
+            DEFVAL { disabled }
+            ::= { hwRBRPGroupCfgEntry 12 }
+        
+
+        hwRBRPStatePromptSwitchEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If StatePromptSwitchEnable is configured on a common station which 
+                belongs to a specific group, The common station moves from standby 
+                state to active state  promptly when multiple-site faults occur to 
+                the primary ring."
+            DEFVAL { disabled }
+            ::= { hwRBRPGroupCfgEntry 13 }
+        
+
+        hwRBRPPreemptDelayValue OBJECT-TYPE
+            SYNTAX Integer32 (60..1200)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the delay for the station moving from the active state
+                to the ready state after preempted."
+            DEFVAL { 120 }
+            ::= { hwRBRPGroupCfgEntry 14 }
+        
+
+        hwRBRPGroupCfgRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus, Now support three value:CreateAndGo,Active,Destroy."
+            ::= { hwRBRPGroupCfgEntry 51 }
+        
+
+        hwRBRPPGRingIfCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRBRPPGRingIfCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains configuration information of ring-if in
+                specific group."
+            ::= { hwRBRPMibObject 4 }
+        
+
+        hwRBRPPGRingIfCfgEntry OBJECT-TYPE
+            SYNTAX HwRBRPPGRingIfCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry contains configuration information of ring-if in
+                specific group."
+            INDEX { hwRBRPPGGroupID, hwRBRPRingType }
+            ::= { hwRBRPPGRingIfCfgTable 1 }
+        
+        HwRBRPPGRingIfCfgEntry ::=
+            SEQUENCE { 
+                hwRBRPPGGroupID
+                    Integer32,
+                hwRBRPRingType
+                    Integer32,
+                hwRBRPRGRingIfIndex
+                    InterfaceIndex,
+                hwRBRPGroupRowStatus
+                    RowStatus
+             }
+
+
+        hwRBRPPGGroupID OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object distinguishes a specific group from other 
+                groups in the device."
+            ::= { hwRBRPPGRingIfCfgEntry 1 }
+        
+
+        hwRBRPRingType OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates a ring-if is on the primary rpr ring
+                or on the secondary rpr ring."
+            ::= { hwRBRPPGRingIfCfgEntry 2 }
+        
+
+        hwRBRPRGRingIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RPR logic interface index."
+            ::= { hwRBRPPGRingIfCfgEntry 11 }
+        
+
+        hwRBRPGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus, Now support three value:CreateAndGo,Active,Destroy."
+            ::= { hwRBRPPGRingIfCfgEntry 51 }
+        
+
+        hwRBRPPStatisTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWRBRPPStatisEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains statistics information of RBRP packets."
+            ::= { hwRBRPMibObject 5 }
+        
+
+        hwRBRPPStatisEntry OBJECT-TYPE
+            SYNTAX HWRBRPPStatisEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry contains statistics information of RBRP packets."
+            INDEX { hwRBRPStatisGroupID }
+            ::= { hwRBRPPStatisTable 1 }
+        
+        HWRBRPPStatisEntry ::=
+            SEQUENCE { 
+                hwRBRPStatisGroupID
+                    Integer32,
+                hwRBRPStatisRevPacketsNum
+                    Counter32,
+                hwRBRPStatisRevByteNum
+                    Counter32,
+                hwRBRPStatisSendPacketsNum
+                    Counter32,
+                hwRBRPStatisSendByteNum
+                    Counter32,
+                hwRBRPClearStatisticPacket
+                    EnabledStatus
+             }
+
+
+        hwRBRPStatisGroupID OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object distinguishes a specific group from other 
+                groups in the device."
+            ::= { hwRBRPPStatisEntry 1 }
+        
+
+        hwRBRPStatisRevPacketsNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of RBRP packets received 
+                from a specific group."
+            ::= { hwRBRPPStatisEntry 11 }
+        
+
+        hwRBRPStatisRevByteNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of RBRP bytes received 
+                from a specific group."
+            ::= { hwRBRPPStatisEntry 12 }
+        
+
+        hwRBRPStatisSendPacketsNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of RBRP packets sendedd 
+                to a specific group."
+            ::= { hwRBRPPStatisEntry 13 }
+        
+
+        hwRBRPStatisSendByteNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of RBRP bytes sendedd 
+                to a specific group."
+            ::= { hwRBRPPStatisEntry 14 }
+        
+
+        hwRBRPClearStatisticPacket OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Clear the statistics information of RBRP packets."
+            ::= { hwRBRPPStatisEntry 15 }
+        
+
+        hwRBRPGroupInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRBRPGroupInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Table contains RBRP group information."
+            ::= { hwRBRPMibObject 6 }
+        
+
+        hwRBRPGroupInfoEntry OBJECT-TYPE
+            SYNTAX HwRBRPGroupInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry contains RBRP group information."
+            INDEX { hwRBRPGroupID, hwRBRPDeviceId }
+            ::= { hwRBRPGroupInfoTable 1 }
+        
+        HwRBRPGroupInfoEntry ::=
+            SEQUENCE { 
+                hwRBRPGroupID
+                    Integer32,
+                hwRBRPDeviceId
+                    IpAddress,
+                hwRBRPPrimaryRPRMacAddress
+                    MacAddress,
+                hwRBRPSecondaryRPRMacAddress
+                    MacAddress,
+                hwRBRPPriority
+                    Integer32,
+                hwRBRPCurrentStatus
+                    Integer32
+             }
+
+
+        hwRBRPGroupID OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object distinguishes a specific group from other 
+                groups in the device."
+            ::= { hwRBRPGroupInfoEntry 1 }
+        
+
+        hwRBRPDeviceId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object distinguishes a specific device from other 
+                devices in the groups."
+            ::= { hwRBRPGroupInfoEntry 2 }
+        
+
+        hwRBRPPrimaryRPRMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the mac address of rpr station on the 
+                primary rpr ring."
+            ::= { hwRBRPGroupInfoEntry 11 }
+        
+
+        hwRBRPSecondaryRPRMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the mac address of rpr station on the 
+                secondary rpr ring."
+            ::= { hwRBRPGroupInfoEntry 12 }
+        
+
+        hwRBRPPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the priority of a device
+                in specific group."
+            ::= { hwRBRPGroupInfoEntry 13 }
+        
+
+        hwRBRPCurrentStatus OBJECT-TYPE
+            SYNTAX Integer32 (1..4)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the status of a device 
+                in specific group.
+                Now support four state:Unready, Ready, Standby, and Active."
+            ::= { hwRBRPGroupInfoEntry 14 }
+        
+
+        hwRBRPTraps OBJECT IDENTIFIER ::= { hwRBRPMIB 2 }
+        
+
+        hwRBRPDeviceIDConflict NOTIFICATION-TYPE
+            OBJECTS { hwRBRPCurrentStatus }
+            STATUS current
+            DESCRIPTION 
+                "The device id conflict defect.
+                When a device id conflict defect is present,
+                a notification may be generated."
+            ::= { hwRBRPTraps 1 }
+        
+
+        hwRBRPUnreadyStatus NOTIFICATION-TYPE
+            OBJECTS { hwRBRPPreemptedEnable }
+            STATUS current
+            DESCRIPTION 
+                "The Unready status defect.
+                When an Unready status defect is present,
+                a notification may be generated."
+            ::= { hwRBRPTraps 2 }
+        
+
+        hwRBRPClearUnreadyStatus NOTIFICATION-TYPE
+            OBJECTS { hwRBRPPreemptedEnable }
+            STATUS current
+            DESCRIPTION 
+                "The Unready status restore.
+                When a Ready status is present,
+                a notification may be generated."
+            ::= { hwRBRPTraps 3 }
+        
+
+        hwRBRPConformance OBJECT IDENTIFIER ::= { hwRBRPMIB 3 }
+        
+
+        hwRBRPGroups OBJECT IDENTIFIER ::= { hwRBRPConformance 1 }
+        
+
+        hwRBRPLoclaDeveceIDGroup OBJECT-GROUP
+            OBJECTS { hwRBRPLocalDeviceID }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRBRPGroups 1 }
+        
+
+        hwRBRPWrapToNormalGroup OBJECT-GROUP
+            OBJECTS { hwRBRPWrapToNormalVal }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRBRPGroups 2 }
+        
+
+        hwRBRPGroupCfgGroup OBJECT-GROUP
+            OBJECTS { hwRBRPPriorityValue, hwRBRPPreemptDelayValue, hwRBRPGroupCfgRowStatus, hwRBRPStatePromptSwitchEnable, hwRBRPPreemptedEnable
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRBRPGroups 3 }
+        
+
+        hwRBRPPGRingIfCfgGroup OBJECT-GROUP
+            OBJECTS { hwRBRPRGRingIfIndex, hwRBRPGroupRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRBRPGroups 4 }
+        
+
+        hwRBRPPStatisGroup OBJECT-GROUP
+            OBJECTS { hwRBRPStatisRevPacketsNum, hwRBRPStatisRevByteNum, hwRBRPStatisSendPacketsNum, hwRBRPStatisSendByteNum, hwRBRPClearStatisticPacket
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRBRPGroups 5 }
+        
+
+        hwRBRPGroupInfoGroup OBJECT-GROUP
+            OBJECTS { hwRBRPCurrentStatus, hwRBRPPriority, hwRBRPSecondaryRPRMacAddress, hwRBRPPrimaryRPRMacAddress }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRBRPGroups 6 }
+        
+
+        hwRBRPTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwRBRPClearUnreadyStatus, hwRBRPDeviceIDConflict, hwRBRPUnreadyStatus }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwRBRPGroups 7 }
+        
+    
+    END
+
+--
+-- HUAWEI-RBRP-MIB.my
+--

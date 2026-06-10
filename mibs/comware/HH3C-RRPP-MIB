@@ -1,0 +1,746 @@
+-- ==================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: RRPP MIB
+-- Reference:
+-- Version: V1.5
+-- History:
+-- V1.0 2004-12-02 Created by XueCong
+-- V1.1 2006-12-21 Modified by XuPengfei
+--     Add objects: hh3cRrppPortRXEdgeHello, hh3cRrppPortRXMajorFault,
+--     hh3cRrppPortTXEdgeHello, hh3cRrppPortTXMajorFault, hh3cRrppMajorFault.
+-- V1.2 2007-03-01 Modified by ZhouXiaodong
+--     Modify the description of hh3cRrppMajorFault.
+--     Adjust file format.
+-- V1.3 2007-04-26 Modified by GuCe
+--     Add objects: hh3cRrppDomainInstanceListLow, hh3cRrppDomainInstanceListHigh.
+-- V1.4 2007-06-18 Modified by SongJianyong
+--     Modify the description of hh3cRrppDomainInstanceListLow and
+--     hh3cRrppDomainInstanceListHigh.
+--     Add objects: hh3cRrppDomainProtectVlanListLow,
+--     hh3cRrppDomainProtectVlanListHigh, hh3cRrppProtectVlanConfigMode.
+-- V1.5 2016-01-26 Modified by limeng
+--     Modified the range of hh3cRrppDomainID in hh3cRrppDomainTable
+--     Modified the range of hh3cRrppRingID in hh3cRrppRingTable
+-- ==================================================================
+HH3C-RRPP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cRrpp MODULE-IDENTITY
+    LAST-UPDATED "201601260000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The RRPP (Rapid Ring Protection protocol) provides
+        fast protection switching to layer 2 switches
+        interconnected in an Ethernet ring topology.  When
+        a link in the ring breaks, the RRPP can recover the
+        data path quickly.  Its protection switching is
+        similar to what can be achieved with the Spanning
+        Tree Protocol (STP), but the converging time is less
+        than a second after link failure.
+        This MIB defines management information used on
+        products which support RRPP."
+    REVISION "201601260000Z"
+    DESCRIPTION
+        "Modified the range of hh3cRrppDomainID in hh3cRrppDomainTable
+         Modified the range of hh3cRrppRingID in hh3cRrppRingTable"
+    ::= { hh3cCommon  45 }
+
+EnabledStatus ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER{enabled(1),disabled(2)}
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+hh3cRrppScalarGroup OBJECT IDENTIFIER ::= {  hh3cRrpp 1  }
+
+hh3cRrppEnableStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicating whether the RRPP is enabled on this switch."
+    ::= { hh3cRrppScalarGroup 1 }
+
+hh3cRrppPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Password configured for RRPP nodes to identify the validity
+        of a link-down message.  This value must be set together with
+        hh3cRrppPasswordType which indicates whether this value can
+        be got.  This value can not be set alone without configuring
+        hh3cRrppPasswordType."
+    DEFVAL     { '303030464532303346443735'H }
+    ::= { hh3cRrppScalarGroup 2 }
+
+hh3cRrppPasswordType OBJECT-TYPE
+    SYNTAX      INTEGER{simple(1),cipher(2)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicating whether the hh3cRrppPassword can be got.
+        simple(1):hh3cRrppPassword can be got.
+        cipher(2):hh3cRrppPassword can not be got.
+        This value can not be set alone without configuring
+        hh3cRrppPassword."
+    ::= { hh3cRrppScalarGroup 3 }
+
+hh3cRrppProtectVlanConfigMode OBJECT-TYPE
+    SYNTAX      INTEGER{vlan(1),instance(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicating the mode in which the protected VLANs of an RRPP
+        domain are configured. The value 'vlan' indicates that
+        hh3cRrppDomainProtectVlanListLow and hh3cRrppDomainProtectVlanListHigh
+        can be used for setting protected VLANs, while
+        hh3cRrppDomainInstanceListLow and hh3cRrppDomainInstanceListHigh
+        cannot. By contraries, the value 'instance' indicates
+        that 3cRrppDomainInstanceListLow and hh3cRrppDomainInstanceListHigh
+        can be used for setting protected VLANs while the other two cannot."
+    ::= { hh3cRrppScalarGroup 4 }
+
+hh3cRrppTable OBJECT IDENTIFIER ::= {  hh3cRrpp 2  }
+
+hh3cRrppDomainTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRrppDomainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information about configurations
+        and status of a RRPP domain."
+    ::= { hh3cRrppTable  1 }
+
+hh3cRrppDomainEntry OBJECT-TYPE
+    SYNTAX      Hh3cRrppDomainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Detailed information of a specified RRPP domain."
+    INDEX
+        {
+            hh3cRrppDomainID
+        }
+    ::= { hh3cRrppDomainTable 1 }
+
+Hh3cRrppDomainEntry  ::= SEQUENCE
+    {
+        hh3cRrppDomainID               Integer32,
+        hh3cRrppDomainControlVlanID    Integer32,
+        hh3cRrppDomainHelloTime        Integer32,
+        hh3cRrppDomainFailTime         Integer32,
+        hh3cRrppDomainRowStatus        RowStatus,
+        hh3cRrppDomainInstanceListLow  OCTET STRING,
+        hh3cRrppDomainInstanceListHigh OCTET STRING,
+        hh3cRrppDomainProtectVlanListLow  OCTET STRING,
+        hh3cRrppDomainProtectVlanListHigh OCTET STRING
+    }
+
+hh3cRrppDomainID OBJECT-TYPE
+    SYNTAX      Integer32(1..128)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "An index uniquely identifies a RRPP domain,
+        which ranges from 1~128.
+        This value can't be modified after created."
+    ::= { hh3cRrppDomainEntry 1 }
+
+hh3cRrppDomainControlVlanID OBJECT-TYPE
+    SYNTAX      Integer32(2..4094|65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Index of the control VLAN specified to a domain.
+        The value 65535 indicates the control VLAN has
+        not been configured.
+        The VLAN assigned to a RRPP Domain must not have
+        been created.
+        This value can't be modified after created."
+    ::= { hh3cRrppDomainEntry 2 }
+
+hh3cRrppDomainHelloTime OBJECT-TYPE
+    SYNTAX      Integer32(1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value indicates the interval between two hello
+        packets sent by master-node, and its unit is second.
+        The value ranges from 1s~10s."
+    DEFVAL     { 1 }
+    ::= { hh3cRrppDomainEntry 3 }
+
+hh3cRrppDomainFailTime OBJECT-TYPE
+    SYNTAX      Integer32(3..30)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The expiration value of the fail-period timer and its unit
+        is second.  If not receiving hello packets before this
+        expires, the master-node considers the ring is broken.
+        The value of this node ranging from 3s~30s must not be
+        less than triple hh3cRrppDomainHelloTime's value."
+    DEFVAL     { 3 }
+    ::= { hh3cRrppDomainEntry 4 }
+
+hh3cRrppDomainRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is responsible for managing the creation,
+        deletion and modification of rows, which support active
+        status and CreatAndGo, destroy operation."
+    ::= { hh3cRrppDomainEntry 5 }
+
+hh3cRrppDomainInstanceListLow OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Each octet contained in this value specifies an eight-instance
+        group, with the first octet specifying instances 0 through 7,
+        the second octet specifying instances 8 through 15, and so on.
+        Within each octet, the most significant bit represents the
+        highest numbered instance, and the least significant bit represents
+        the lowest numbered instance. Thus, each instance to which the
+        protected VLANs of an RRPP domain are mapped corresponds to a
+        bit within the value of this object. A bit with a value of '1'
+        indicates that the VLANs mapped to the instance are protected
+        VLANs of the RRPP domain. By contraries, the VLANs mapped to the
+        instance are not protected VLANs if the corresponding bit has a
+        value of '0'. The value of this object must be set with
+        hh3cRrppDomainInstanceListHigh at the same time when a SET
+        operation is performed.
+        This object is valid only when the value of hh3cRrppProtectVlanConfigMode
+        is 'instance'. If this object is invalid, it does not respond to SET
+        operation, and it returns all '0' bits in response to GET operation."
+    ::= { hh3cRrppDomainEntry 6 }
+
+hh3cRrppDomainInstanceListHigh OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Each octet contained in this value specifies an eight-instance
+        group, with the first octet specifying instances 2048 through
+        2055, the second octet specifying instances 2056 through 2063,
+        and so on. Within each octet, the most significant bit represents
+        the highest numbered instance, and the least significant bit
+        represents the lowest numbered instance. The most significant bit
+        of the last octet is invalid. Thus, each instance to which the
+        protected VLANs of an RRPP domain are mapped corresponds to a bit
+        within the value of this object. A bit with a value of '1' indicates
+        that the VLANs mapped to the instance are protected VLANs of the
+        RRPP domain. By contraries, the VLANs mapped to the instance are
+        not protected VLANs if the corresponding bit has a value of '0'.
+        The value of this object must be set with hh3cRrppDomainInstanceListLow
+        at the same time when a SET operation is performed.
+        This object is valid only when the value of hh3cRrppProtectVlanConfigMode
+        is 'instance'. If this object is invalid, it does not respond to SET
+        operation, and it returns all '0' bits in response to GET operation."
+    ::= { hh3cRrppDomainEntry 7 }
+
+hh3cRrppDomainProtectVlanListLow OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Each octet contained in this value specifies an eight-VLAN group,
+        with the first octet specifying VLANs 1 through 7, the second
+        octet specifying VLANs 8 through 15, and so on. Within each octet,
+        the most significant bit represents the highest numbered VLAN, and
+        the least significant bit represents the lowest numbered VLAN.
+        The least significant bit of the first octet is invalid. Thus,
+        each protected VLAN of an RRPP domain corresponds to a bit within
+        the value of this object. A bit with a value of '1' indicates that
+        the corresponding VLAN is a protected VLAN of the RRPP domain.
+        By contraries, the VLAN is not a protected VLAN if the
+        corresponding bit has a value of '0'. The value of this object
+        must be set with hh3cRrppDomainProtectVlanListHigh at the same time
+        when a SET operation is performed.
+        This object is valid only when the value of hh3cRrppProtectVlanConfigMode
+        is 'vlan'. If this object is invalid, it does not respond to SET
+        operation, and it returns all '0' bits in response to GET operation."
+    ::= { hh3cRrppDomainEntry 8 }
+
+hh3cRrppDomainProtectVlanListHigh OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Each octet contained in this value specifies an eight-VLAN group,
+        with the first octet specifying VLANs 2048 through 2055, the
+        second octet specifying VLANs 2056 through 2063, and so on. Within
+        each octet, the most significant bit represents the highest
+        numbered VLAN, and the least significant bit represents the lowest
+        numbered VLAN. The most significant bit of the last octet is
+        invalid. Thus, each protected VLAN of an RRPP domain corresponds
+        to a bit within the value of this object. A bit with a value of '1'
+        indicates that the corresponding VLAN is a protected VLAN of the
+        RRPP domain. By contraries, the VLAN is not a protected VLAN if
+        the corresponding bit has a value of '0'. The value of this object
+        must be set with hh3cRrppDomainProtectVlanListLow at the same time
+        when a SET operation is performed.
+        This object is valid only when the value of hh3cRrppProtectVlanConfigMode
+        is 'vlan'. If this object is invalid, it does not respond to SET
+        operation, and it returns all '0' bits in response to GET operation."
+    ::= { hh3cRrppDomainEntry 9 }
+
+hh3cRrppRingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRrppRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information about configurations
+        and status of a RRPP Ring."
+    ::= { hh3cRrppTable  2 }
+
+hh3cRrppRingEntry OBJECT-TYPE
+    SYNTAX      Hh3cRrppRingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Detailed information of a specified RRPP Ring."
+    INDEX
+        {
+            hh3cRrppDomainID,
+            hh3cRrppRingID
+        }
+    ::= { hh3cRrppRingTable 1 }
+
+Hh3cRrppRingEntry  ::= SEQUENCE
+    {
+        hh3cRrppRingID               Integer32,
+        hh3cRrppRingEnableStatus     EnabledStatus,
+        hh3cRrppRingActive           INTEGER,
+        hh3cRrppRingState            INTEGER,
+        hh3cRrppRingNodeMode         INTEGER,
+        hh3cRrppRingPrimaryPort      Integer32,
+        hh3cRrppRingSecondaryPort    Integer32,
+        hh3cRrppRingLevel            INTEGER,
+        hh3cRrppRingRowStatus        RowStatus
+    }
+
+hh3cRrppRingID OBJECT-TYPE
+    SYNTAX      Integer32(1..128)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "An index uniquely identifies a RRPP Ring,
+        which ranges from 1~128.
+        This value can't be modified after created."
+    ::= { hh3cRrppRingEntry 1 }
+
+hh3cRrppRingEnableStatus OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indicating whether the RRPP is enabled on this Ring.
+        NOTE: If major-ring and sub-ring(s) of a domain
+        coexist on a switch, major-ring must be enabled
+        before sub-ring is enabled.  And sub-ring must be
+        disabled before major-ring is disabled."
+    ::= { hh3cRrppRingEntry 2 }
+
+hh3cRrppRingActive OBJECT-TYPE
+    SYNTAX      INTEGER{active(1),inactive(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "As both hh3cRrppEnableStatus and hh3cRrppRingEnableStatus
+        are enabled, the ring is activated.  Whereas either of
+        the two items is disabled, the ring is inactive."
+    ::= { hh3cRrppRingEntry 3 }
+
+hh3cRrppRingState OBJECT-TYPE
+    SYNTAX      INTEGER{unknown(1),health(2),fault(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status (i.e. unknown, health or fault) of the Ethernet
+        ring.
+        This is valid only on the master-node."
+    ::= { hh3cRrppRingEntry 4 }
+
+hh3cRrppRingNodeMode OBJECT-TYPE
+    SYNTAX      INTEGER{master(1),transit(2),edge(3),assistantEdge(4)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "There are four RRPP node modes for the switch on a RRPP
+        ring, such as master, transit, edge and assistant-edge.
+        Each RRPP ring has a single designated master-node.  All
+        other nodes except edge-node and assistant-edge-node on
+        that ring are referred to as transit-nodes.
+        The node mode of edge and assistant-edge should be
+        configured only on sub-ring.  When there is a common link
+        between a sub-ring and its major-ring, the node mode of
+        the sub-ring must be edge or assistant-edge, and they must
+        be configured in pairs.
+        If node mode is designated as edge or assistant-edge,
+        several points should be noticed:
+        Major-ring must be created before a sub-ring is created;
+        Major-ring can't be deleted unless all its sub-rings are
+        deleted;
+        The node mode of the switch on major-ring must be
+        transit;
+        Major-ring and sub-ring must have only a common port.
+        This value can't be modified after created."
+    ::= { hh3cRrppRingEntry 5 }
+
+hh3cRrppRingPrimaryPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the switch is a master-node or transit-node, this value
+        is the primary port ifIndex; otherwise, if the switch is a
+        edge-node or assistant-edge-node, this value is the common
+        port ifIndex.
+        This value can't be modified after created."
+    ::= { hh3cRrppRingEntry 6 }
+
+hh3cRrppRingSecondaryPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If the switch is a master-node or transit-node, this value
+        is the secondary port ifIndex; otherwise, if the switch is
+        an edge-node or assistant-edge-node, this value is the edge
+        port ifIndex.
+        This value can't be modified after created."
+    ::= { hh3cRrppRingEntry 7 }
+
+hh3cRrppRingLevel OBJECT-TYPE
+    SYNTAX      INTEGER{majorRing(1),subRing(2)}
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Level of a ring.  This field should be set 1 on major-ring
+        and 2 on the sub-ring.
+        This value can't be modified after created."
+    ::= { hh3cRrppRingEntry 8 }
+
+hh3cRrppRingRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is responsible for managing the creation,
+        deletion and modification of rows, which support active
+        status and CreatAndGo, destroy operation.
+        To create a new row, hh3cRrppRingNodeMode,
+        hh3cRrppRingPrimaryPort, hh3cRrppRingSecondaryPort and
+        hh3cRrppRingLevel must be specified."
+    ::= { hh3cRrppRingEntry 9 }
+
+hh3cRrppPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cRrppPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information about configurations and
+        status of a RRPP port."
+    ::= { hh3cRrppTable 3 }
+
+hh3cRrppPortEntry OBJECT-TYPE
+    SYNTAX      Hh3cRrppPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Detailed information of a specified RRPP port."
+    INDEX
+        {
+            hh3cRrppDomainID,
+            hh3cRrppRingID,
+            hh3cRrppPortID
+        }
+    ::= { hh3cRrppPortTable 1 }
+
+Hh3cRrppPortEntry  ::= SEQUENCE
+    {
+        hh3cRrppPortID                 Integer32,
+        hh3cRrppPortRole               INTEGER,
+        hh3cRrppPortState              INTEGER,
+        hh3cRrppPortRXError            Counter32,
+        hh3cRrppPortRXHello            Counter32,
+        hh3cRrppPortRXLinkUp           Counter32,
+        hh3cRrppPortRXLinkDown         Counter32,
+        hh3cRrppPortRXCommonFlush      Counter32,
+        hh3cRrppPortRXCompleteFlush    Counter32,
+        hh3cRrppPortTXHello            Counter32,
+        hh3cRrppPortTXLinkUp           Counter32,
+        hh3cRrppPortTXLinkDown         Counter32,
+        hh3cRrppPortTXCommonFlush      Counter32,
+        hh3cRrppPortTXCompleteFlush    Counter32,
+        hh3cRrppPortRXEdgeHello        Counter32,
+        hh3cRrppPortRXMajorFault       Counter32,
+        hh3cRrppPortTXEdgeHello        Counter32,
+        hh3cRrppPortTXMajorFault       Counter32
+    }
+
+hh3cRrppPortID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ifIndex of the port."
+    ::= { hh3cRrppPortEntry 1 }
+
+hh3cRrppPortRole OBJECT-TYPE
+    SYNTAX      INTEGER{primary(1),secondary(2),common(3),edge(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The RRPP role of the port.
+        (i.e. primary, secondary, common or edge port)."
+    ::= { hh3cRrppPortEntry 2 }
+
+hh3cRrppPortState OBJECT-TYPE
+    SYNTAX      INTEGER{unknown(1),unblocked(2),blocked(3),down(4)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "State of RRPP port, including unknown, unblocked, blocked
+        and down."
+    ::= { hh3cRrppPortEntry 3 }
+
+hh3cRrppPortRXError OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of illegal RRPP packets received from
+        this port."
+    ::= { hh3cRrppPortEntry 4 }
+
+hh3cRrppPortRXHello OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of hello packets received from
+        this port on specified ring."
+    ::= { hh3cRrppPortEntry 5 }
+
+hh3cRrppPortRXLinkUp OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of link-up packets received
+        from this port on specified ring."
+    ::= { hh3cRrppPortEntry 6 }
+
+hh3cRrppPortRXLinkDown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of link-down packets received
+        from this port on specified ring."
+    ::= { hh3cRrppPortEntry 7 }
+
+hh3cRrppPortRXCommonFlush OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of common-flush packets received from
+        this port on specified ring.
+        Instruction
+        When master-node receives valid link-down packets
+        or link-up packets, it will send common-flush packets,
+        instructing the other nodes on the ring to flush their
+        forwarding database.
+        When the nodes except master-node receive common-flush,
+        they will flush forwarding database.  If there is any
+        port blocked on that node, it won't be unblocked."
+    ::= { hh3cRrppPortEntry 8 }
+
+hh3cRrppPortRXCompleteFlush OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of complete-flush packets received
+        from this port on specified ring.
+        Instruction
+        When the ring recovers, master-node will receive its own
+        hello packets.  It will send complete-flush packets,
+        instructing the other nodes on the ring to flush their
+        forwarding database.
+        When the nodes except master-node receive complete-flush,
+        they will flush forwarding database.  If there is any port
+        blocked on that node, it will be unblocked."
+    ::= { hh3cRrppPortEntry 9 }
+
+hh3cRrppPortTXHello OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of hello packets sent from
+        this port on specified ring."
+    ::= { hh3cRrppPortEntry 10 }
+
+hh3cRrppPortTXLinkUp OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of link-up packets sent
+        from this port on specified ring."
+    ::= { hh3cRrppPortEntry 11 }
+
+hh3cRrppPortTXLinkDown OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of link-down packets sent
+        from this port on specified ring."
+    ::= { hh3cRrppPortEntry 12 }
+
+hh3cRrppPortTXCommonFlush OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of common-flush packets sent from
+        this port on specified ring."
+    ::= { hh3cRrppPortEntry 13 }
+
+hh3cRrppPortTXCompleteFlush OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of complete-flush packets sent
+        from this port on specified ring."
+    ::= { hh3cRrppPortEntry 14 }
+
+hh3cRrppPortRXEdgeHello OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of edge-hello packets received
+        from this port on specified ring.
+        When edge-node sends edge-hello packets,
+        assistantEdge-node will receive its own edge-hello
+        packets from the common link and the master ring."
+    ::= { hh3cRrppPortEntry 15 }
+
+hh3cRrppPortRXMajorFault OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of major-fault packets received
+        from this port on specified ring.
+        When assistantEdge can't receive edge-hello packets
+        in the specified fault-time,
+        assistantEdge-node will send its own major-fault
+        packets from the edge port around the sub ring.
+        Edge-node will receive the major-fault packets from
+        its edge port. Then Edge-node will block its edge port."
+    ::= { hh3cRrppPortEntry 16 }
+
+hh3cRrppPortTXEdgeHello OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of edge-hello packets sent
+        from this port on specified ring."
+    ::= { hh3cRrppPortEntry 17 }
+
+hh3cRrppPortTXMajorFault OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The statistics of major-fault packets sent
+        from this port on specified ring."
+    ::= { hh3cRrppPortEntry 18 }
+
+hh3cRrppNotifications OBJECT IDENTIFIER ::= {  hh3cRrpp 3  }
+
+hh3cRrppRingRecover NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cRrppDomainID,
+            hh3cRrppRingID
+        }
+    STATUS      current
+    DESCRIPTION
+        "Trap message is generated by master-node on
+        the ring when the ring recovers from fault."
+    ::= { hh3cRrppNotifications 1 }
+
+hh3cRrppRingFail NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cRrppDomainID,
+            hh3cRrppRingID
+        }
+    STATUS      current
+    DESCRIPTION
+        "Trap message is generated by master-node on
+        the ring when the ring fails."
+    ::= { hh3cRrppNotifications 2 }
+
+hh3cRrppMultiMaster NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cRrppDomainID,
+            hh3cRrppRingID
+        }
+    STATUS      current
+    DESCRIPTION
+        "Trap message is generated by master-node when
+        it detects there are more than one master-node
+        on the ring."
+    ::= { hh3cRrppNotifications 3 }
+
+hh3cRrppMajorFault NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cRrppDomainID,
+            hh3cRrppRingID
+        }
+    STATUS      current
+    DESCRIPTION
+        "Trap message is generated by edge-node or assistant-edge-node
+        when it detects major fault."
+    ::= { hh3cRrppNotifications 4 }
+
+END
+

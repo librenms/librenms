@@ -1,0 +1,1268 @@
+--===========================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: This MIB is excerpted from the draft-ietf-hubmib-efm-epon-mib-02 directly
+---             only changed the object name,added the hh3c as prefix.
+-- Reference:  
+-- Version: V1.0
+-- History:
+-- V1.0 created by liyue.  
+--     Define MODULE-IDENTITY for hh3cDot3EfmeponMIB
+--=================================================================
+HH3C-DOT3-EFM-EPON-MIB DEFINITIONS ::= BEGIN          
+   
+   IMPORTS
+        hh3cEpon            
+            FROM HH3C-OID-MIB   
+        MODULE-IDENTITY, mib-2, OBJECT-TYPE, Counter32,
+        Integer32, OBJECT-IDENTITY
+            FROM SNMPv2-SMI
+        TruthValue, MacAddress
+            FROM SNMPv2-TC
+        ifIndex
+            FROM IF-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF;
+
+   hh3cDot3EfmeponMIB MODULE-IDENTITY
+       LAST-UPDATED "200409210000Z"  -- September 21, 2004
+       ORGANIZATION
+           "New H3C Tech. Co., Ltd."
+       CONTACT-INFO
+           "Platform Team New H3C Tech. Co., Ltd.
+           Hai-Dian District Beijing P.R. China
+           http://www.h3c.com
+           Zip:100085
+           "
+       DESCRIPTION
+               "The objects in this MIB module are used to manage the
+                Ethernet in the First Mile (EFM) Multi Point Control
+                Protocol (MPCP) Interfaces as defined in IEEE Draft
+                P802.3ah/D3.0 clause 64,65.
+                The following reference is used throughout this MIB module:
+                [802.3ah] refers to:
+                IEEE Draft P802.3ah/D3.3: 'Draft amendment to -
+                Information technology - Telecommunications and
+                information exchange between systems - Local and
+                metropolitan area networks - Specific requirements -
+                Part 3: Carrier sense multiple access with collision
+                detection (CSMA/CD) access method and physical layer
+                specifications - Media Access Control Parameters,
+                Physical Layers and Management Parameters for
+                subscriber access networks', 22 April 2004.
+
+                Of particular interest are Clause 64(MPCP) 65(P2MP RS) and
+                60 (PON PMDs). Clause 30, 'Management', and Clause 45,
+                'Management Data Input/Output (MDIO) Interface'.
+
+                Copyright (C) The Internet Society (2004).  This version
+                of this MIB module is part of XXXX see the RFC itself for
+                full legal notices."
+
+             -- Editor's Note: Replace XXXX with the actual RFC number
+             -- assigned by RFC Editor and remove this note
+
+       REVISION    "200409210000Z"  -- September 21, 2004
+       DESCRIPTION "Initial version, published as RFC XXXX."
+
+       ::= { hh3cEpon 2 }     
+
+       -- Editor's Note: Replace XXX with a real OID once it is
+       -- assigned by IANA and remove this note.
+
+
+   -- Editor-s note: MPCP MIB modules definitions ([802.3ah]
+   --- clause 30.3.5)
+   -- Editor-s note: Description in attributes with References should be
+   -- minimized in later versions
+
+   hh3cDot3MpcpMIB OBJECT IDENTIFIER ::= { hh3cDot3EfmeponMIB 1 }
+
+   hh3cDot3MpcpObjects OBJECT IDENTIFIER ::= { hh3cDot3MpcpMIB 1 }
+
+   hh3cDot3MpcpConformance OBJECT IDENTIFIER ::= { hh3cDot3MpcpMIB 2 }
+
+   hh3cDot3MpcpTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF Hh3cDot3MpcpEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "Table for dot3 Multi-Point Control Protocol (MPCP)
+               MIB modules."
+       ::= { hh3cDot3MpcpObjects 1 }
+
+   hh3cDot3MpcpEntry OBJECT-TYPE
+       SYNTAX  Hh3cDot3MpcpEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "An entry in the dot3 MPCP MIB modules table."
+       INDEX  { ifIndex }
+       ::= { hh3cDot3MpcpTable 1 }
+
+   Hh3cDot3MpcpEntry ::=
+       SEQUENCE {
+           hh3cDot3MpcpID                           Integer32,
+           hh3cDot3MpcpOperStatus                   TruthValue,
+           hh3cDot3MpcpMode                         INTEGER,
+           hh3cDot3MpcpLinkID                       Integer32,
+           hh3cDot3MpcpRemoteMACAddress             MacAddress,
+           hh3cDot3MpcpRegistrationState            INTEGER,
+           hh3cDot3MpcpTransmitElapsed              Integer32,
+           hh3cDot3MpcpReceiveElapsed               Integer32,
+           hh3cDot3MpcpRoundTripTime                Integer32,
+           hh3cDot3MpcpMaximumPendingGrants         Integer32,
+           hh3cDot3MpcpAdminState                   TruthValue,
+           hh3cDot3MpcpOnTime                       Integer32,
+           hh3cDot3MpcpOffTime                      Integer32,
+           hh3cDot3MpcpSyncTime                     Integer32
+       }
+
+   hh3cDot3MpcpID OBJECT-TYPE
+       SYNTAX  Integer32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "This variable is assigned so as to uniquely identify the
+                Multi-Point MAC  Control (MPCP) entity, as defined in
+                [802.3ah] clause 64, among the subordinate managed
+                objects of the containing object.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.1."
+       ::= { hh3cDot3MpcpEntry 1 }
+
+
+   hh3cDot3MpcpOperStatus OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "This variable can be used to define the operational
+                state of the Multi-Point MAC Control sublayer as
+                defined in [802.3ah] clause 64. Selecting admin for an
+                interface with Multi-Point MAC Control sublayer. When
+                the attribute is True the the interface will act as if
+                Multi-point control protocol is enabled. When the
+                attribute is False the interface will act as if it does
+                not have the Multi-point control protocol. The
+                operational state can be changed using the
+                hh3cDot3MpcpAdminState attribute.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.2."
+       ::= { hh3cDot3MpcpEntry 2 }
+
+   hh3cDot3MpcpMode  OBJECT-TYPE
+       SYNTAX  INTEGER {
+               olt(1),
+               onu(2)
+       }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "This variable can be used to identify the operational
+                state of the Multi-Point MAC Control sublayer as
+                defined in [802.3ah] clause 64. Selecting olt(1) for an
+                OLT (server) mode and onu(2) for an ONU (client) mode.
+                Writing can be done during only during initialization,
+                when hh3cDot3MpcpOperStatus indicates Flase.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.3."
+       DEFVAL { 1 }
+       ::= { hh3cDot3MpcpEntry 3 }
+
+   hh3cDot3MpcpLinkID OBJECT-TYPE
+       SYNTAX  Integer32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that identifies the Logical Link
+                identity (LLID) associated with the MAC port as
+                specified in [802.3ah] clause 65.1.3.2.2.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.4."
+       ::= { hh3cDot3MpcpEntry 4 }
+
+   hh3cDot3MpcpRemoteMACAddress OBJECT-TYPE
+       SYNTAX  MacAddress
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that identifies the source_address
+                parameter of the last MPCPDUs passed to the MAC Control.
+                This value is updated on reception of a valid frame with
+                (1) a destination Field equal to the reserved multicast
+                address for MAC Control specified in [802.3ah] Annex
+                31A, (2) lengthOrType field value equal to the reserved
+                Type for MAC Control as specified in [802.3ah] Annex
+                31A. (3) an MPCP subtype value equal to the subtype
+                reserved for MPCP as specified in [802.3ah] Annex 31A.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.5."
+       ::= { hh3cDot3MpcpEntry 5 }
+
+   hh3cDot3MpcpRegistrationState OBJECT-TYPE
+       SYNTAX  INTEGER {
+               unregistered(1),
+               registering(2),
+               registered(3)
+       }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that identifies the operational state
+                of the Multi-Point MAC Control sublayer as defined in
+                [802.3ah] clause 64. When this attribute has the
+                enumeration unregistered(1) the interface may be used
+                for registering a link partner. When this attribute has
+                the enumeration registering(2) the interface is in the
+                process of registering a link-partner. When this
+                attribute has the enumeration registered(3) the
+                interface has an established link-partner.
+                This attribute is relevant for an OLT and an ONU. For
+                the OLT it provides an indication per LLID."
+       REFERENCE   "[802.3ah], 30.3.5.1.6."
+       ::= { hh3cDot3MpcpEntry 6 }
+
+   hh3cDot3MpcpTransmitElapsed OBJECT-TYPE
+       SYNTAX  Integer32
+       UNITS       "TQ (16nsec)"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that reports the interval from last
+                MPCP frame transmission in increments of Time Quanta
+                (TQ) 16ns. The value returned shall be (interval from
+                last MPCP frame transmission in ns)/16. If this value
+                exceeds (2^32-1) the value (2^32-1) shall be returned.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.19."
+       ::= { hh3cDot3MpcpEntry 7 }
+
+   hh3cDot3MpcpReceiveElapsed OBJECT-TYPE
+       SYNTAX  Integer32
+       UNITS       "TQ (16nsec)"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that reports the interval from last
+                MPCP frame reception in increments of Time Quanta (TQ)
+                16ns. The value returned shall be (interval from last
+                MPCP last MPCP frame reception in ns)/16. If this value
+                exceeds (2^32-1) the value (2^32-1) shall be returned.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.20."
+       ::= { hh3cDot3MpcpEntry 8 }
+
+   hh3cDot3MpcpRoundTripTime OBJECT-TYPE
+       SYNTAX  Integer32
+       UNITS       "TQ (16nsec)"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that reports the MPCP round trip time
+                in increments of Time Quanta (TQ) 16ns. The value
+                returned shall be (round trip time in ns)/16. If this
+                value exceeds (2^16-1) the value (2^16-1)  shall be
+                returned. This attribute is relevant for an OLT and an
+                ONU. For the OLT there is a value per LLID"
+       REFERENCE   "[802.3ah], 30.3.5.1.21."
+       ::= { hh3cDot3MpcpEntry 9 }
+
+   hh3cDot3MpcpMaximumPendingGrants OBJECT-TYPE
+       SYNTAX  Integer32 (0..255)
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that indicates the maximum number of
+                grants an ONU can store. The maximum number of grants an
+                ONU can store has a range of 0 to 255.
+                This attribute is relevant for an OLT and an ONU. For
+                the OLT there is a value per LLID"
+       REFERENCE   "[802.3ah], 30.3.5.1.24."
+       ::= { hh3cDot3MpcpEntry 10 }
+
+   hh3cDot3MpcpAdminState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "This variable can be used to define the operational
+                state of the Multi-Point MAC Control sublayer as defined
+                in [802.3ah] clause 64. Selecting admin for an interface
+                with Multi-Point MAC Control sublayer. When selecting
+                the value as True the interface Multi-Point control
+                protocol is enabled. When selecting the value as False
+                the interface acts as if the Multi-point Control
+                protocol does not exist. Reading reflects the state of
+                the attribute and the operation of the Multi-point
+                control protocol mode of the interface.
+                Writing can be done all the time.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.2.1."
+       DEFVAL { false }
+       ::= { hh3cDot3MpcpEntry 11 }
+
+
+   hh3cDot3MpcpOnTime OBJECT-TYPE
+       SYNTAX  Integer32
+       UNITS       "TQ (16nsec)"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that reports the -on time- for a grant
+                burst in increments of Time Quanta (TQ) 16ns as defined
+                in [802.3ah] 60,64. The value returned shall be (on time
+                ns)/16. If this value exceeds (2^32-1) the value
+                (2^32-1) shall be returned.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 64.3.5.1."
+       ::= { hh3cDot3MpcpEntry 12 }
+
+   hh3cDot3MpcpOffTime OBJECT-TYPE
+       SYNTAX  Integer32
+       UNITS       "TQ (16nsec)"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that reports the -off time- for a
+                grant burst in increments of Time Quanta (TQ) 16ns as
+                defined in [802.3ah] 60,64. The value returned shall be
+                (off time ns)/16. If this value exceeds (2^32-1) the
+                value (2^32-1) shall be returned.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 64.3.5.1."
+       ::= { hh3cDot3MpcpEntry 13 }
+
+   hh3cDot3MpcpSyncTime OBJECT-TYPE
+       SYNTAX  Integer32
+       UNITS       "TQ (16nsec)"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that reports the -sync lock time- for
+                an OLT receiver in increments of Time Quanta (TQ) 16ns
+                as defined in [802.3ah] 60,64,65. The value returned
+                shall be (sync lock time ns)/16. If this value exceeds
+                (2^32-1) the value (2^32-1) shall be returned.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 64.3.3.2."
+      ::= { hh3cDot3MpcpEntry 14 }
+
+
+
+   hh3cDot3MpcpStatTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF Hh3cDot3MpcpStatEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "This table defines the list of statistics counters of
+                [802.3ah] clause 64 MPCP interface."
+   ::= { hh3cDot3MpcpObjects 2 }
+
+   hh3cDot3MpcpStatEntry OBJECT-TYPE
+       SYNTAX     Hh3cDot3MpcpStatEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "Table entries for table of statistics counters of
+                [802.3ah] clause 64 MPCP interface."
+       INDEX       { ifIndex }
+       ::= { hh3cDot3MpcpStatTable 1 }
+
+   Hh3cDot3MpcpStatEntry ::=
+       SEQUENCE {
+               hh3cDot3MpcpMACCtrlFramesTransmitted       Counter32,
+               hh3cDot3MpcpMACCtrlFramesReceived          Counter32,
+               hh3cDot3MpcpDiscoveryWindowsSent           Counter32,
+               hh3cDot3MpcpDiscoveryTimeout               Counter32,
+               hh3cDot3MpcpTxRegRequest                   Counter32,
+               hh3cDot3MpcpRxRegRequest                   Counter32,
+               hh3cDot3MpcpTxRegAck                       Counter32,
+               hh3cDot3MpcpRxRegAck                       Counter32,
+               hh3cDot3MpcpTxReport                       Counter32,
+               hh3cDot3MpcpRxReport                       Counter32,
+               hh3cDot3MpcpTxGate                         Counter32,
+               hh3cDot3MpcpRxGate                         Counter32,
+               hh3cDot3MpcpTxRegister                     Counter32,
+               hh3cDot3MpcpRxRegister                     Counter32,
+               hh3cDot3MpcpRxNotSupportedMPCP             Counter32
+       }
+
+   hh3cDot3MpcpMACCtrlFramesTransmitted OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of MPCP frames passed to the MAC sublayer for
+                transmission. This counter is incremented when a
+                MA_CONTROL.request service primitive is generated within
+                the MAC control sublayer with an opcode indicating a
+                MPCP frame.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.7."
+       ::= { hh3cDot3MpcpStatEntry 1 }
+
+   hh3cDot3MpcpMACCtrlFramesReceived OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of MPCP frames passed by the MAC sublayer to the
+                MAC Control sublayer. This counter is incremented when a
+                ReceiveFrame function call returns a valid frame with:
+                (1) a lengthOrType field value equal to the reserved
+                Type for 802.3_MAC_Control as specified in 31.4.1.3, and
+                (2) an opcode indicating a MPCP frame.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.8."
+       ::= { hh3cDot3MpcpStatEntry 2 }
+
+   hh3cDot3MpcpDiscoveryWindowsSent OBJECT-TYPE
+       SYNTAX  Counter32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of discovery windows generated. The counter is
+                incremented by one for each generated discovery window.
+                This attribute is relevant for an OLT and an ONU. At the
+                ONU value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.22."
+       ::= { hh3cDot3MpcpStatEntry 3 }
+
+   hh3cDot3MpcpDiscoveryTimeout OBJECT-TYPE
+       SYNTAX  Counter32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a discovery timeout
+                occurs. Increment the counter by one for each discovery
+                processing state-machine reset resulting from timeout
+                waiting for message arrival.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.5.1.23."
+       ::= { hh3cDot3MpcpStatEntry 4 }
+
+
+   hh3cDot3MpcpTxRegRequest OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REGISTER_REQ MPCP
+                frames transmission occurs. Increment the counter by one
+                for each REGISTER_REQ MPCP frame transmitted as defined
+                in [802.3ah] clause 64. This counter is mandatory for an
+                ONU. This attribute is relevant for an OLT and an ONU.
+                At the OLT value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.12."
+       ::= { hh3cDot3MpcpStatEntry 5 }
+
+   hh3cDot3MpcpRxRegRequest OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REGISTER_REQ MPCP
+                frames reception occurs. A single counter at the ONU and
+                a set of counters, one for each LLID, at the OLT.
+                Increment the counter by one for each REGISTER_REQ MPCP
+                frame received for each LLID as defined in [802.3ah]
+                clause 64. This counter is mandatory for an ONU and for
+                an OLT. At the ONU value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.17."
+       ::= { hh3cDot3MpcpStatEntry 6 }
+
+   hh3cDot3MpcpTxRegAck OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REGISTER_ACK MPCP
+                frames transmission occurs. Increment the counter by one
+                for each REGISTER_ACK MPCP frame transmitted as defined
+                in [802.3ah] clause 64. This counter is mandatory for an
+                ONU. This attribute is relevant for an OLT and an ONU.
+                At the OLT the value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.10."
+       ::= { hh3cDot3MpcpStatEntry 7 }
+
+   hh3cDot3MpcpRxRegAck OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REGISTER_ACK MPCP
+                frames reception occurs. A single counter at the ONU and
+                a set of counters, one for each LLID, at the OLT.
+                Increment the counter by one for each REGISTER_ACK MPCP
+                frame received for each LLID, as defined in [802.3ah]
+                clause 64. This counter is mandatory for an ONU and for
+                an OLT. At the ONU the value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.15."
+       ::= { hh3cDot3MpcpStatEntry 8 }
+
+   hh3cDot3MpcpTxReport OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REPORT MPCP frames
+                transmission occurs. Increment the counter by one for
+                each REPORT MPCP frame transmitted as defined in
+                [802.3ah] clause 64. This counter is mandatory for an
+                ONU. This attribute is relevant for an OLT and an ONU.
+                At the OLT value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.13."
+       ::= { hh3cDot3MpcpStatEntry 9 }
+
+   hh3cDot3MpcpRxReport OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REPORT MPCP frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each REPORT MPCP frame received
+                for each LLID, as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and for an OLT.
+                At the ONU value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.18."
+       ::= { hh3cDot3MpcpStatEntry 10 }
+
+   hh3cDot3MpcpTxGate OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a GATE MPCP frames
+                transmission occurs. A set of counters, one for each
+                LLID, at the OLT. Increment the counter by one for each
+                GATE MPCP frame transmitted, for each LLID, as defined
+                in [802.3ah] clause 64. This counter is mandatory for an
+                OLT. This attribute is relevant for an OLT and an ONU.
+                At the ONU the value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.9."
+       ::= { hh3cDot3MpcpStatEntry 11 }
+
+   hh3cDot3MpcpRxGate OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a GATE MPCP frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID ,at the OLT. Increment
+                the counter by one for each GATE MPCP frame received,
+                for each LLID, as defined in [802.3ah] clause 64. This
+                counter is mandatory for an ONU and for an OLT. At the
+                OLT the value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.14."
+       ::= { hh3cDot3MpcpStatEntry 12 }
+
+   hh3cDot3MpcpTxRegister OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REGISTER MPCP frames
+                transmission occurs. A set of counters, one for each
+                LLID, at the OLT. Increment the counter by one for each
+                REGISTER MPCP frame transmitted, for each LLID, as
+                defined in [802.3ah] clause 64. This counter is
+                mandatory for an OLT. This attribute is relevant for an
+                OLT and an ONU. At the ONU the value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.11."
+       ::= { hh3cDot3MpcpStatEntry 13 }
+
+   hh3cDot3MpcpRxRegister OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a REGISTER MPCP frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each REGISTER MPCP frame
+                received, for each LLID, as defined in [802.3ah] clause
+                64. This counter is mandatory for an ONU and for an OLT.
+                at the OLT the value should be zero."
+       REFERENCE   "[802.3ah], 30.3.5.1.16."
+       ::= { hh3cDot3MpcpStatEntry 14 }
+
+   hh3cDot3MpcpRxNotSupportedMPCP OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a non-supported MPCP
+                frames reception occurs. A single counter at the ONU and
+                a set of counters, one for each LLID, at the OLT.
+                Increment the counter by one for each non-supported MPCP
+                frame received, for each LLID, as defined in [802.3ah]
+                clause 64. This counter is mandatory for an ONU and for
+                an OLT."
+       ::= { hh3cDot3MpcpStatEntry 15 }
+
+
+
+
+        -- Conformance Statements
+
+   -- Conformance Groups
+
+   hh3cDot3MpcpGroups      OBJECT IDENTIFIER ::= { hh3cDot3MpcpConformance 1 }
+
+   hh3cDot3MpcpGroupBase OBJECT-GROUP
+       OBJECTS {
+               hh3cDot3MpcpID,
+               hh3cDot3MpcpOperStatus,
+               hh3cDot3MpcpMode,
+               hh3cDot3MpcpLinkID,
+               hh3cDot3MpcpRemoteMACAddress,
+               hh3cDot3MpcpRegistrationState,
+               hh3cDot3MpcpMaximumPendingGrants,
+               hh3cDot3MpcpAdminState
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of dot3 Mpcp Basic entity state
+               definition."
+       ::= { hh3cDot3MpcpGroups 1 }
+
+   hh3cDot3MpcpGroupParam OBJECT-GROUP
+       OBJECTS {
+               hh3cDot3MpcpTransmitElapsed,
+               hh3cDot3MpcpReceiveElapsed,
+               hh3cDot3MpcpRoundTripTime,
+               hh3cDot3MpcpOnTime,
+               hh3cDot3MpcpOffTime,
+               hh3cDot3MpcpSyncTime
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of dot3 Mpcp for P2MP
+                parameters."
+       ::= { hh3cDot3MpcpGroups 2 }
+
+   hh3cDot3MpcpGroupStat OBJECT-GROUP
+       OBJECTS {
+               hh3cDot3MpcpMACCtrlFramesTransmitted,
+               hh3cDot3MpcpMACCtrlFramesReceived,
+               hh3cDot3MpcpDiscoveryWindowsSent,
+               hh3cDot3MpcpDiscoveryTimeout ,
+               hh3cDot3MpcpTxRegRequest,
+               hh3cDot3MpcpRxRegRequest,
+               hh3cDot3MpcpTxRegAck,
+               hh3cDot3MpcpRxRegAck,
+               hh3cDot3MpcpTxReport,
+               hh3cDot3MpcpRxReport,
+               hh3cDot3MpcpTxGate,
+               hh3cDot3MpcpRxGate,
+               hh3cDot3MpcpTxRegister,
+               hh3cDot3MpcpRxRegister,
+               hh3cDot3MpcpRxNotSupportedMPCP
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of dot3 Mpcp Statistics"
+       ::= { hh3cDot3MpcpGroups 3 }
+
+
+   -- Compliance
+
+   hh3cDot3MpcpCompliances OBJECT IDENTIFIER ::= { hh3cDot3MpcpConformance 2 }
+
+   hh3cDot3MpcpCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION "The compliance statement for Multi-point
+                    control protocol interfaces."
+
+       MODULE  -- this module
+       MANDATORY-GROUPS { hh3cDot3MpcpGroupBase }
+
+      GROUP       hh3cDot3MpcpGroupParam
+      DESCRIPTION "This group is mandatory for all MPCP supporting
+                   interfaces for configuration of the Multipoint
+                   Parameters."
+      GROUP       hh3cDot3MpcpGroupStat
+      DESCRIPTION "This group is mandatory for all MPCP supporting
+                   interfaces for Statistics collection."
+      ::= { hh3cDot3MpcpCompliances 1 }
+
+
+   -- Editor-s note:   OMPEmulation managed object definitions
+
+
+   hh3cDot3OmpEmulationMIB OBJECT IDENTIFIER ::= { hh3cDot3EfmeponMIB 2 }
+
+   hh3cDot3OmpEmulationObjects OBJECT IDENTIFIER ::= { hh3cDot3OmpEmulationMIB 1 }
+
+   hh3cDot3OmpeConformance OBJECT IDENTIFIER ::= { hh3cDot3OmpEmulationMIB 2 }
+
+
+   hh3cDot3OmpEmulationTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF Hh3cDot3OmpEmulationEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "Table for dot3 OmpEmulation MIB modules."
+       ::= { hh3cDot3OmpEmulationObjects 1 }
+
+   hh3cDot3OmpEmulationEntry OBJECT-TYPE
+       SYNTAX  Hh3cDot3OmpEmulationEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "An entry in the dot3 OmpEmulation MIB modules table."
+       INDEX  { ifIndex }
+       ::= { hh3cDot3OmpEmulationTable 1 }
+
+       Hh3cDot3OmpEmulationEntry ::=
+       SEQUENCE {
+               hh3cDot3OmpEmulationID            Integer32,
+               hh3cDot3OmpEmulationType               INTEGER
+       }
+
+   hh3cDot3OmpEmulationID OBJECT-TYPE
+       SYNTAX  Integer32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "The value of hh3cDot3OmpEmulationID is assigned so as to
+                uniquely identify a OMPEmulation entity among the
+                subordinate managed objects of the containing object.
+                The value is mandated for an ONU."
+       REFERENCE   "[802.3ah], 30.3.7.1.1."
+       ::= { hh3cDot3OmpEmulationEntry 1 }
+
+   hh3cDot3OmpEmulationType OBJECT-TYPE
+       SYNTAX  INTEGER {
+               unknown(1),
+               olt(2),
+               onu(3)
+       }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that indicates that mode of operation
+                of the Reconciliation Sublayer for Point to Point
+                Emulation (see [802.3ah] clause 65.1). unknown(1) value
+                is assigned in initializing, true state or type not yet
+                known. olt(2) value is assigned when Sublayer operating
+                in OLT mode. onu(3) value is assigned when Sublayer
+                operating in ONU mode."
+       REFERENCE   "[802.3ah], 30.3.7.1.2."
+       ::= { hh3cDot3OmpEmulationEntry 2 }
+
+   hh3cDot3OmpEmulationStatTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF Hh3cDot3OmpEmulationStatEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "This table defines the list of statistics counters of
+                [802.3ah] clause 65 OMP interface."
+       ::= { hh3cDot3OmpEmulationObjects 2 }
+
+   hh3cDot3OmpEmulationStatEntry OBJECT-TYPE
+       SYNTAX     Hh3cDot3OmpEmulationStatEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "Table entries for Table of statistics counters of
+                [802.3ah] clause 65 OMP interface."
+       INDEX       { ifIndex }
+       ::= { hh3cDot3OmpEmulationStatTable 1 }
+
+   Hh3cDot3OmpEmulationStatEntry ::=
+       SEQUENCE {
+               hh3cDot3OmpEmulationSLDErrors                 Counter32,
+               hh3cDot3OmpEmulationCRC8Errors                Counter32,
+               hh3cDot3OmpEmulationBadLLID                   Counter32,
+               hh3cDot3OmpEmulationGoodLLID                  Counter32,
+               hh3cDot3OmpEmulationOnuPonCastLLID            Counter32,
+               hh3cDot3OmpEmulationOltPonCastLLID            Counter32,
+               hh3cDot3OmpEmulationBroadcastLLIDNotOnuID     Counter32,
+               hh3cDot3OmpEmulationOnuLLIDNotBroadcast       Counter32,
+               hh3cDot3OmpEmulationBroadcastLLIDPlusOnuId    Counter32,
+               hh3cDot3OmpEmulationNotBroadcastLLIDNotOnuId  Counter32
+       }
+
+   hh3cDot3OmpEmulationSLDErrors OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that do not contain a valid
+                SLD field as defined in [802.3ah] clause 65.1.3.3.1.
+                This attribute is mandatory for an OLT and optional for
+                an ONU."
+       REFERENCE   "[802.3ah], 30.3.7.1.3."
+       ::= { hh3cDot3OmpEmulationStatEntry 1 }
+
+   hh3cDot3OmpEmulationCRC8Errors OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field, as defined in [802.3ah] clause 65.1.3.3.1, but do
+                not pass the CRC-8 check as defined in [802.3ah] clause
+                65.1.3.3.3. This attribute is mandatory for an OLT and
+                for an ONU."
+       REFERENCE   "[802.3ah], 30.3.7.1.4."
+       ::= { hh3cDot3OmpEmulationStatEntry 2 }
+
+
+   hh3cDot3OmpEmulationBadLLID OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field, as defined in [802.3ah] clause 65.1.3.3.1, and
+                pass the CRC-8 check, as defined in [802.3ah] clause
+                65.1.3.3.3, but are discarded due to the LLID check as
+                defined in [802.3ah] clause 65.1.3.3.2.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.7.1.8."
+       ::= { hh3cDot3OmpEmulationStatEntry 3 }
+
+   hh3cDot3OmpEmulationGoodLLID OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field, as defined in [802.3ah] clause 65.1.3.3.1, and
+                pass the CRC-8 check, as defined in [802.3ah] clause
+                65.1.3.3.3.
+                This attribute is relevant for an OLT and an ONU."
+       REFERENCE   "[802.3ah], 30.3.7.1.5."
+       ::= { hh3cDot3OmpEmulationStatEntry 4 }
+
+
+   hh3cDot3OmpEmulationOnuPonCastLLID OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field in an ONU, as defined in [802.3ah] 65.1.3.3.1,
+                passes the CRC-8 check, as defined in [802.3ah]
+                65.1.3.3.3, and the frame meets the rule for acceptance
+                defined in [802.3ah] 65.1.3.3.2."
+       REFERENCE   "[802.3ah], 30.3.7.1.6."
+       ::= { hh3cDot3OmpEmulationStatEntry 5 }
+
+   hh3cDot3OmpEmulationOltPonCastLLID OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field in an OLT, as defined in [802.3ah] 65.1.3.3.1,
+                passes the CRC-8 check, as defined in [802.3ah]
+                65.1.3.3.3, and the frame meets the rule for acceptance
+                defined in [802.3ah] 65.1.3.3.2."
+       REFERENCE   "[802.3ah], 30.3.7.1.7."
+       ::= { hh3cDot3OmpEmulationStatEntry 6 }
+
+   hh3cDot3OmpEmulationBroadcastLLIDNotOnuID OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field in a OLT, as defined in [802.3ah] clause
+                65.1.3.3.1, and pass the CRC-8 check, as defined in
+                [802.3ah] clause 65.1.3.3.3, and contain broadcast LLID
+                as defined in [802.3ah] clause 65.
+                This attribute is mandatory for an OLT and for an ONU."
+       ::= { hh3cDot3OmpEmulationStatEntry 7 }
+
+   hh3cDot3OmpEmulationOnuLLIDNotBroadcast OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field in a OLT, as defined in [802.3ah] clause
+                65.1.3.3.1, and pass the CRC-8 check, as defined in
+                [802.3ah] clause 65.1.3.3.3, and contain the ONU's LLID
+                as defined in [802.3ah] clause 65. This attribute is
+                mandatory for an ONU and mandatory for an OLT (a
+                counter per LLID)."
+       ::= { hh3cDot3OmpEmulationStatEntry 8 }
+
+   hh3cDot3OmpEmulationBroadcastLLIDPlusOnuId OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field in a OLT, as defined in [802.3ah] clause
+                65.1.3.3.1, and pass the CRC-8 check, as defined in
+                [802.3ah] clause 65.1.3.3.3, and contain the broadcast
+                LLID plus ONU's LLID (frame reflected) as defined in
+                [802.3ah] clause 65. This attribute is mandatory for an
+                ONU and mandatory for an OLT (a counter per LLID)."
+       ::= { hh3cDot3OmpEmulationStatEntry 9 }
+
+   hh3cDot3OmpEmulationNotBroadcastLLIDNotOnuId OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of frames received that contain a valid SLD
+                field in a OLT, as defined in [802.3ah] clause
+                65.1.3.3.1, and pass the CRC-8 check, as defined in
+                [802.3ah] clause 65.1.3.3.3, and does not contain the
+                ONU's LLID as defined in [802.3ah] clause 65. This
+                attribute is mandatory for an ONU"
+       ::= { hh3cDot3OmpEmulationStatEntry 10 }
+
+
+        -- Conformance Statements
+
+   -- Conformance Groups
+
+   hh3cDot3OmpeGroups OBJECT IDENTIFIER ::= { hh3cDot3OmpeConformance 1 }
+
+
+   hh3cDot3OmpeGroupID OBJECT-GROUP
+       OBJECTS {
+               hh3cDot3OmpEmulationID,
+               hh3cDot3OmpEmulationType
+
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of dot3 OMP emulation ID entity
+                state definition."
+       ::= { hh3cDot3OmpeGroups 1 }
+
+
+   hh3cDot3OmpeGroupStat OBJECT-GROUP
+       OBJECTS {
+               hh3cDot3OmpEmulationSLDErrors,
+               hh3cDot3OmpEmulationCRC8Errors,
+               hh3cDot3OmpEmulationBadLLID,
+               hh3cDot3OmpEmulationGoodLLID,
+               hh3cDot3OmpEmulationOnuPonCastLLID,
+               hh3cDot3OmpEmulationOltPonCastLLID,
+               hh3cDot3OmpEmulationBroadcastLLIDNotOnuID,
+               hh3cDot3OmpEmulationOnuLLIDNotBroadcast,
+               hh3cDot3OmpEmulationBroadcastLLIDPlusOnuId,
+               hh3cDot3OmpEmulationNotBroadcastLLIDNotOnuId
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of dot3 OMP emulation
+                Statistics"
+       ::= { hh3cDot3OmpeGroups 2 }
+
+
+   -- Compliance
+
+   hh3cDot3OmpeCompliances OBJECT IDENTIFIER ::= { hh3cDot3OmpeConformance 2 }
+
+   hh3cDot3OmpeCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION "The compliance statement for OMPEmulation
+                    interfaces."
+       MODULE  -- this module
+       MANDATORY-GROUPS { hh3cDot3OmpeGroupID }
+
+       GROUP       hh3cDot3OmpeGroupStat
+       DESCRIPTION "This group is mandatory for all OMPemulation
+                    supporting interfaces for Statistics collection."
+
+       ::= { hh3cDot3OmpeCompliances 1 }
+
+
+
+
+   -- Editor-s note:   MAU managed object definitions (30.5.1)
+
+   hh3cDot3EponMauMIB OBJECT IDENTIFIER ::= { hh3cDot3EfmeponMIB 3 }
+
+   hh3cDot3EponMauObjects OBJECT IDENTIFIER ::= { hh3cDot3EponMauMIB 1 }
+
+   hh3cDot3EponMauConformance OBJECT IDENTIFIER ::= { hh3cDot3EponMauMIB 2 }
+
+   hh3cDot3EponMauTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF Hh3cDot3EponMauEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "Table for dot3 MAU EPON MIB modules."
+       ::= { hh3cDot3EponMauObjects 1 }
+
+   hh3cDot3EponMauEntry OBJECT-TYPE
+       SYNTAX  Hh3cDot3EponMauEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "An entry in the dot3 MAU EPON MIB modules table."
+       INDEX  { ifIndex }
+       ::= { hh3cDot3EponMauTable 1 }
+
+   Hh3cDot3EponMauEntry ::=
+       SEQUENCE {
+               hh3cDot3EponMauPCSCodingViolation           Counter32,
+               hh3cDot3EponMauFecAbility                   INTEGER,
+               hh3cDot3EponMauFecMode                      INTEGER,
+               hh3cDot3EponMauFECCorrectedBlocks           Counter32,
+               hh3cDot3EponMauFECUncorrectableBlocks       Counter32,
+               hh3cDot3EponMauBufferHeadCodingViolation    Counter32
+       }
+
+
+   hh3cDot3EponMauPCSCodingViolation OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "octets"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "For 100 Mb/ s operation it is a count of the number of
+                times an invalid code-group is received, other than the
+                /H/ code-group. For 1000 Mb/ s operation it is a count
+                of the number of times an invalid codegroup is received,
+                other than the /V/ code-group."
+       REFERENCE   "[802.3ah], 30.5.1.1.12."
+       ::= { hh3cDot3EponMauEntry 1 }
+
+   hh3cDot3EponMauFecAbility OBJECT-TYPE
+       SYNTAX  INTEGER {
+               unknown (1),
+               nonsupported (2),
+               supported (3)
+       }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only value that indicates the support of
+                operation of the 1000BASE-PX PHY optional FEC Sublayer
+                for Forward error correction see [802.3ah] clause 65.2).
+                unknown(1) value is assigned in initializing, for non
+                FEC support state or type not yet known. nonsupported(2)
+                value is assigned when Sublayer is not support.
+                supported(3) value is assigned when Sublayer is
+                supported."
+       REFERENCE   "[802.3ah], 30.5.1.1.13."
+       ::= { hh3cDot3EponMauEntry 2 }
+
+   hh3cDot3EponMauFecMode OBJECT-TYPE
+       SYNTAX  INTEGER {
+               unknown (1),
+               disabled (2),
+               enabled (3)
+       }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "A read-write value that indicates the mode of operation
+                of the 1000BASE-PX PHY optional FEC Sublayer for Forward
+                error correction see [802.3ah] clause 65.2).
+                A GET operation returns the current mode of operation
+                the PHY. A SET operation changes the mode of operation
+                of the PHY to the indicated value. unknown(1) value is
+                assigned in initializing, for non FEC support state or
+                type not yet known. disabled(2) value is assigned when
+                Sublayer operating in disabled mode. enabled(3) value is
+                assigned when Sublayer operating in FEC mode. writing
+                can be done all the time."
+       REFERENCE   "[802.3ah], 30.5.1.1.14."
+       DEFVAL { 1 }
+       ::= { hh3cDot3EponMauEntry 3 }
+
+   hh3cDot3EponMauFECCorrectedBlocks OBJECT-TYPE
+       SYNTAX  Counter32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "For 10PASS-TS, 2BASE-TL and 1000BASE-PX PHYs, a count
+                of corrected FEC blocks. This counter will not increment
+                for other PHY Types. Increment the counter by one for
+                each received block that is corrected by the FEC
+                function in the PHY."
+       REFERENCE   "[802.3ah], 30.5.1.1.15."
+       ::= { hh3cDot3EponMauEntry 4 }
+
+   hh3cDot3EponMauFECUncorrectableBlocks OBJECT-TYPE
+       SYNTAX  Counter32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "For 10PASS-TS, 2BASE-TL and 1000BASE-PX PHYs, a count of
+                uncorrectable FEC blocks. This counter will not
+                increment for other PHY Types. Increment the counter by
+                one for each FEC block that is determined to be
+                uncorrectable by the FEC function in the PHY."
+       REFERENCE   "[802.3ah], 30.5.1.1.16."
+       ::= { hh3cDot3EponMauEntry 5 }
+
+   hh3cDot3EponMauBufferHeadCodingViolation OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "octets"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "For 1000 Mbps operation it is a counts of the number of
+                invalid code-group received directly from the link."
+       ::= { hh3cDot3EponMauEntry 6 }
+
+
+
+   -- Defining EPON MAU types
+   -- Editor's Note: This section should be added to 802.3 MAU MIB
+   -- module RFC. Preference would be that the MAU MIB module
+   -- structure would change so that it is re-written as an
+   -- IANA-maintained module.
+
+   hh3cDot3EponMauType OBJECT IDENTIFIER ::= { hh3cDot3EponMauMIB 3 }
+
+   hh3cEponMauType1000BasePXOLT OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "Multipoint MAC Control (per 802.3 section 64,65) OLT
+                    (master), unknown PMD"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 1 }
+
+   hh3cEponMauType1000BasePXONU OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "Multipoint MAC Control (per 802.3 section 64,65),ONU
+       (slave), unknown PMD"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 2 }
+
+   hh3cEponMauType1000BasePX10DOLT OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 10K link, downlink (per 802.3 section 60),
+                    OLT side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 3 }
+
+   hh3cEponMauType1000BasePX10DONU OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 10K link, downlink (per 802.3 section 60),
+                    ONU side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 4 }
+
+   hh3cEponMauType1000BasePX10UOLT OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 10K link, uplink (per 802.3 section 60),
+                    OLT side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 5 }
+
+   hh3cEponMauType1000BasePX10UONU OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 10K link, uplink (per 802.3 section 60),
+                    ONU side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 6 }
+
+
+   hh3cEponMauType1000BasePX20DOLT OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 20K link, downlink (per 802.3 section 60),
+                    OLT side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 7 }
+
+   hh3cEponMauType1000BasePX20DONU OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 20K link, downlink (per 802.3 section 60),
+                    ONU side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 8 }
+
+   hh3cEponMauType1000BasePX20UOLT OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 20K link, uplink (per 802.3 section 60),
+                    OLT side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 9 }
+
+   hh3cEponMauType1000BasePX20UONU OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION "EPON over 20K link, uplink (per 802.3 section 60),
+                    ONU side"
+       REFERENCE   "[802.3ah], 30.5.1.1.2."
+       ::= { hh3cDot3EponMauType 10 }
+
+
+        -- Conformance Statements
+
+   -- Conformance Groups
+
+   hh3cDot3EponMauGroups OBJECT IDENTIFIER ::= { hh3cDot3EponMauConformance 1 }
+
+   hh3cDot3EponMauGroupAll OBJECT-GROUP
+       OBJECTS {
+               hh3cDot3EponMauPCSCodingViolation
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of dot3 MAU definition."
+       ::= { hh3cDot3EponMauGroups 1 }
+
+   hh3cDot3EponMauGroupFEC OBJECT-GROUP
+       OBJECTS {
+               hh3cDot3EponMauFecAbility,
+               hh3cDot3EponMauFecMode,
+               hh3cDot3EponMauFECCorrectedBlocks,
+               hh3cDot3EponMauFECUncorrectableBlocks,
+               hh3cDot3EponMauBufferHeadCodingViolation
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of FEC group definition."
+       ::= { hh3cDot3EponMauGroups 2 }
+
+
+   -- Compliance
+
+   hh3cDot3EponMauCompliances OBJECT IDENTIFIER ::= { hh3cDot3EponMauConformance 2 }
+
+   hh3cDot3EponMauCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION "The compliance statement for MAU EPON interfaces."
+
+       MODULE  -- this module
+       MANDATORY-GROUPS { hh3cDot3EponMauGroupAll }
+
+       GROUP       hh3cDot3EponMauGroupFEC
+       DESCRIPTION "This group is mandatory for all EPON MAU devices
+                    Supporting FEC functionality as for Definitions and
+                    BER Statistics collection."
+
+       ::= { hh3cDot3EponMauCompliances 1 }
+
+
+   END

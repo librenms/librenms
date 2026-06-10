@@ -1,0 +1,478 @@
+-- =================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: vnf-device mib
+-- Reference:
+-- Version: V1.1
+-- History:
+--  V1.0 Created by zhoufan
+--      2020-11-18 updated by xuyuanqiang
+--      Add hh3cVnfDeviceTraps
+--          hh3cVmInfoTraps
+--          hh3cVmChannelHealthTraps
+--          hh3cVnfTrapObjects
+--  V1.1 Updated by dongzhijian
+--      Update hh3cVmInconsist
+--          hh3cVmInconsistResume
+--  Initial version 2020-11-18
+-- =================================================================
+HH3C-VNF-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM SNMPv2-TC
+    InetAddressType,InetAddress
+        FROM INET-ADDRESS-MIB;
+
+hh3cVnfDevice MODULE-IDENTITY
+    LAST-UPDATED "202102040000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "The MIB module is used for VM(virtual machine) management."
+    REVISION "202102040000Z"
+    DESCRIPTION
+        "Update hh3cVmInconsist hh3cVmInconsistResume"
+    REVISION "202011180000Z"
+    DESCRIPTION
+        "Add hh3cVmAttr hh3cVmGroup hh3cVnfTrapObjects
+             hh3cVnfDeviceTraps hh3cVmInfoTraps hh3cVmChannelHealthTraps"
+    REVISION    "202010100000Z"
+    DESCRIPTION    "The initial version."
+    ::= { hh3cCommon 196 }
+
+hh3cVnfDeviceTable OBJECT IDENTIFIER ::= { hh3cVnfDevice 1 }
+
+hh3cVmInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVmInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VM information table."
+    ::= { hh3cVnfDeviceTable 1 }
+
+hh3cVmInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cVmInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry of the hh3cVmInfoTable."
+    INDEX    { hh3cVmSlot }
+    ::= { hh3cVmInfoTable 1 }
+
+Hh3cVmInfoEntry ::= SEQUENCE
+    {
+        hh3cVmSlot                 Integer32,
+        hh3cVmName                 DisplayString,
+        hh3cVmType                 INTEGER,
+        hh3cVmState                INTEGER,
+        hh3cVmRole                 INTEGER,
+        hh3cVmRegisterStatus       INTEGER,
+        hh3cVmAttr                 INTEGER,
+        hh3cVmGroup                Integer32
+    }
+
+hh3cVmSlot  OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "VM slot."
+    ::= { hh3cVmInfoEntry 1 }
+
+hh3cVmName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(1..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VM name."
+    ::= { hh3cVmInfoEntry 2 }
+
+hh3cVmType   OBJECT-TYPE
+    SYNTAX   INTEGER
+    {
+        other   (1),
+        ctrlvm  (2),
+        brasvm  (3),
+        fwdvm   (4)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "VM type."
+    ::= { hh3cVmInfoEntry 3 }
+
+hh3cVmState  OBJECT-TYPE
+    SYNTAX   INTEGER
+    {
+        absent (1),
+        normal (2),
+        fault  (3),
+        other  (4)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "VM state."
+    ::= { hh3cVmInfoEntry 4 }
+
+hh3cVmRole  OBJECT-TYPE
+    SYNTAX  INTEGER
+    {
+        master  (1),
+        standby (2),
+        other   (3)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "VM role."
+    ::= { hh3cVmInfoEntry 5 }
+
+hh3cVmRegisterStatus    OBJECT-TYPE
+    SYNTAX              INTEGER
+    {
+        registered               (1),
+        unregistered             (2),
+        unregisteredDestroying   (3),
+        registering              (4),
+        maddown                  (5),
+        unregisteredMaddown      (6),
+        other                    (7)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "VM registration state."
+    ::= { hh3cVmInfoEntry 6 }
+
+hh3cVmAttr    OBJECT-TYPE
+    SYNTAX              INTEGER
+    {
+        initDeploy               (1),
+        manu                     (2),
+        auto                     (3),
+        autoAccept               (4)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "VM attribute."
+    ::= { hh3cVmInfoEntry 7 }
+
+hh3cVmGroup   OBJECT-TYPE
+    SYNTAX       Integer32(1..65535)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "VM belong to group.
+        the Default is a invalid value 65535."
+    ::= { hh3cVmInfoEntry 8 }
+-- ==================================================================
+--
+-- VM trap object
+--
+-- ==================================================================
+hh3cVnfDeviceTraps OBJECT IDENTIFIER ::= { hh3cVnfDevice 2 }
+hh3cVnfmTrapPrefix OBJECT IDENTIFIER ::= { hh3cVnfDeviceTraps 0 }
+
+hh3cVnfmConnectionFault NOTIFICATION-TYPE
+    OBJECTS { hh3cVnfmIPType, hh3cVnfmIP, hh3cVnfmPort }
+    STATUS  current
+    DESCRIPTION
+        "Cp and so communication failure."
+    ::= { hh3cVnfmTrapPrefix 1 }
+
+hh3cVnfmConnectionFaultResume NOTIFICATION-TYPE
+    OBJECTS { hh3cVnfmIPType, hh3cVnfmIP, hh3cVnfmPort }
+    STATUS  current
+    DESCRIPTION
+        "Cp and so communication recovery."
+    ::= { hh3cVnfmTrapPrefix 2 }
+
+hh3cVnvmAuthenFault NOTIFICATION-TYPE
+    OBJECTS { hh3cVnfmIPType, hh3cVnfmIP, hh3cVnfmPort }
+    STATUS  current
+    DESCRIPTION
+        "Cp and so authentication failed."
+    ::= { hh3cVnfmTrapPrefix 3 }
+
+hh3cVmInfoTraps OBJECT IDENTIFIER ::= { hh3cVnfDevice 3 }
+hh3cVmInfoTrapPrefix OBJECT IDENTIFIER ::= { hh3cVmInfoTraps 0 }
+
+hh3cVmCreate NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmAttr, hh3cVmGroup }
+    STATUS  current
+    DESCRIPTION
+        "The event of create VM."
+    ::= { hh3cVmInfoTrapPrefix 1 }
+
+hh3cVmDelete NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmAttr, hh3cVmGroup }
+    STATUS  current
+    DESCRIPTION
+        "The event of delete VM."
+    ::= { hh3cVmInfoTrapPrefix 2 }
+
+hh3cVmCreateSuccess NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmAttr, hh3cVmGroup, hh3cVmRetryTimes }
+    STATUS  current
+    DESCRIPTION
+        "Success to create VM."
+    ::= { hh3cVmInfoTrapPrefix 3 }
+
+hh3cVmCreateFail NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmAttr, hh3cVmGroup, hh3cVmRetryTimes, hh3cVmCreateFailReason }
+    STATUS  current
+    DESCRIPTION
+        "Failed to create VM."
+    ::= { hh3cVmInfoTrapPrefix 4 }
+
+hh3cVmDeleteSuccess NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmAttr, hh3cVmGroup, hh3cVmRetryTimes }
+    STATUS  current
+    DESCRIPTION
+        "Success to delete VM."
+    ::= { hh3cVmInfoTrapPrefix 5 }
+
+hh3cVmDeleteFail NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmAttr, hh3cVmGroup, hh3cVmRetryTimes, hh3cVmDeleteFailReason }
+    STATUS  current
+    DESCRIPTION
+        "Failed to delete VM."
+    ::= { hh3cVmInfoTrapPrefix 6 }
+
+hh3cVmInconsist NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmName, hh3cVmStatusOnVnfm, hh3cVmInconsistFaultReason }
+    STATUS  current
+    DESCRIPTION
+        "The local virtual machine resources are inconsistent with the resources on vnf."
+    ::= { hh3cVmInfoTrapPrefix 7 }
+
+hh3cVmInconsistResume NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmName, hh3cVmStatusOnVnfm, hh3cVmInconsistFaultReason }
+    STATUS  current
+    DESCRIPTION
+        "The local virtual machine resources are the same as those on vnf."
+    ::= { hh3cVmInfoTrapPrefix 8 }
+
+hh3cVmAcceptInconsistVm NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmName, hh3cVmType, hh3cVmGroup }
+    STATUS  current
+    DESCRIPTION
+        "Unconfigured VM claimed on vbras-cp."
+    ::= { hh3cVmInfoTrapPrefix 9 }
+
+hh3cVmReset NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmGroup, hh3cVmResetResult }
+    STATUS  current
+    DESCRIPTION
+        "VM restarts via VNFM."
+    ::= { hh3cVmInfoTrapPrefix 10 }
+
+hh3cVmUnregisterLongtime NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmName, hh3cVmType, hh3cVmGroup }
+    STATUS  current
+    DESCRIPTION
+        "VNFM has been allocated but will not be online for a long time."
+    ::= { hh3cVmInfoTrapPrefix 11 }
+
+hh3cVmIsolate NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSlot, hh3cVmType, hh3cVmGroup }
+    STATUS  current
+    DESCRIPTION
+        "During the shrinking operation, it does not communicate with VNFM, VNFM isolates VM."
+    ::= { hh3cVmInfoTrapPrefix 12 }
+
+hh3cVmChannelHealthTraps OBJECT IDENTIFIER ::= { hh3cVnfDevice 4 }
+hh3cVmChannelHealthTrapPrefix OBJECT IDENTIFIER ::= { hh3cVmChannelHealthTraps 0 }
+
+hh3cVmChannelHealthNormal NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSelfSlot, hh3cVmPeerSlot, hh3cVmChannelType, hh3cVmChannelVlan }
+    STATUS  current
+    DESCRIPTION
+        "The health check result of the control channel or data channel on the specified VM is normal."
+    ::= { hh3cVmChannelHealthTrapPrefix 1 }
+
+hh3cVmChannelHealthMinor NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSelfSlot, hh3cVmPeerSlot, hh3cVmChannelType, hh3cVmChannelVlan }
+    STATUS  current
+    DESCRIPTION
+        "The control channel or data channel on the specified VM is in the minor sub-health state."
+    ::= { hh3cVmChannelHealthTrapPrefix 2 }
+
+hh3cVmChannelHealthSevere NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSelfSlot, hh3cVmPeerSlot, hh3cVmChannelType, hh3cVmChannelVlan }
+    STATUS  current
+    DESCRIPTION
+        "The control channel or data channel on the specified VM is in the severe sub-health state."
+    ::= { hh3cVmChannelHealthTrapPrefix 3 }
+
+hh3cVmChannelLinkSwitch NOTIFICATION-TYPE
+    OBJECTS { hh3cVmSelfSlot, hh3cVmChannelType, hh3cVmChannelVlan, hh3cVmChannelLinkMacAddress }
+    STATUS  current
+    DESCRIPTION
+        "Link switching event."
+    ::= { hh3cVmChannelHealthTrapPrefix 4 }
+-- ==================================================================
+--
+-- VM trap Bind variable
+--
+-- ==================================================================
+hh3cVnfTrapObjects OBJECT IDENTIFIER ::= { hh3cVnfDevice 5 }
+hh3cVnfmTrapObjects OBJECT IDENTIFIER ::= { hh3cVnfTrapObjects 1 }
+
+hh3cVnfmIPType   OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VNFM ip address."
+    ::= { hh3cVnfmTrapObjects 1 }
+
+hh3cVnfmIP   OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VNFM ip address."
+    ::= { hh3cVnfmTrapObjects 2 }
+
+hh3cVnfmPort   OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VNFM port number."
+    ::= { hh3cVnfmTrapObjects 3 }
+
+hh3cVmInfoTrapObjects OBJECT IDENTIFIER ::= { hh3cVnfTrapObjects 2 }
+
+hh3cVmRetryTimes   OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Number of retries."
+    ::= { hh3cVmInfoTrapObjects 1 }
+
+hh3cVmCreateAttr   OBJECT-TYPE
+    SYNTAX              INTEGER
+    {
+        initDeploy               (1),
+        manu                     (2),
+        auto                     (3),
+        autoAccept               (4)
+    }
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The VM creation properties."
+    ::= { hh3cVmInfoTrapObjects 2 }
+
+hh3cVmCreateFailReason   OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(0..128))
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The VM create failed reason."
+    ::= { hh3cVmInfoTrapObjects 3 }
+
+hh3cVmDeleteFailReason   OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(0..128))
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The VM delete failed reason."
+    ::= { hh3cVmInfoTrapObjects 4 }
+
+hh3cVmInconsistFaultReason   OBJECT-TYPE
+    SYNTAX              INTEGER
+    {
+        exisitOnLocal               (1),
+        existOnVnfm                 (2)
+    }
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Reasons for VM inconsistency."
+    ::= { hh3cVmInfoTrapObjects 5 }
+
+hh3cVmResetResult   OBJECT-TYPE
+    SYNTAX         OCTET STRING (SIZE(0..128))
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "Reasons for the failure to restart the virtual machine."
+    ::= { hh3cVmInfoTrapObjects 6 }
+
+hh3cVmStatusOnVnfm   OBJECT-TYPE
+    SYNTAX              INTEGER
+    {
+        building               (1),
+        active                 (2),
+        error                  (3),
+        unknown                (4)
+    }
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The status of the virtual machine on VNFM(virtualized network function managers)."
+    ::= { hh3cVmInfoTrapObjects 7 }
+
+hh3cVmChannelHealthTrapObjects OBJECT IDENTIFIER ::= { hh3cVnfTrapObjects 3 }
+
+hh3cVmSelfSlot   OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VM local slot number."
+    ::= { hh3cVmChannelHealthTrapObjects 1 }
+
+hh3cVmPeerSlot    OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VM opposite slot number."
+    ::= { hh3cVmChannelHealthTrapObjects 2 }
+
+hh3cVmChannelType   OBJECT-TYPE
+    SYNTAX              INTEGER
+    {
+        controlchannel               (1),
+        datachannel                  (2)
+    }
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VM channel type."
+    ::= { hh3cVmChannelHealthTrapObjects 3 }
+
+hh3cVmChannelVlan   OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..4094)
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "VM channel vlan."
+    ::= { hh3cVmChannelHealthTrapObjects 4 }
+
+hh3cVmChannelLinkMacAddress   OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS     accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+        "The mac address of the fault port."
+    ::= { hh3cVmChannelHealthTrapObjects 5 }
+
+END

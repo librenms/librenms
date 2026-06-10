@@ -1,0 +1,72 @@
+<?php
+
+/**
+ * GraylogStreamsController.php
+ *
+ * Select for the available streams from the graylog server.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace App\Http\Controllers\Select;
+
+use App\ApiClients\GraylogApi;
+use App\Http\Controllers\Controller;
+use App\Models\Syslog;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Log;
+
+class GraylogStreamsController extends Controller
+{
+    /**
+     * The default method called by the route handler
+     */
+    public function __invoke(Request $request, GraylogApi $api): JsonResponse
+    {
+        $this->authorize('viewAny', Syslog::class); // Graylog replaces syslog
+
+        $this->validate($request, [
+            'limit' => 'int',
+            'page' => 'int',
+            'term' => 'nullable|string',
+        ]);
+        $search = strtolower((string) $request->input('term'));
+
+        $streams = [];
+        try {
+            $streams = collect($api->getStreams()['streams'])->filter(fn ($stream) => ! $search || Str::contains(strtolower((string) $stream['title']), $search) || Str::contains(strtolower((string) $stream['description']), $search))->map(function ($stream) {
+                $text = $stream['title'];
+                if ($stream['description']) {
+                    $text .= " ({$stream['description']})";
+                }
+
+                return ['id' => $stream['id'], 'text' => $text];
+            });
+        } catch (\Exception $e) {
+            Log::error($e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
+        }
+
+        return response()->json([
+            'results' => $streams,
+            'pagination' => ['more' => false],
+        ]);
+    }
+}

@@ -1,0 +1,1167 @@
+UPS2-MIB DEFINITIONS ::= BEGIN
+
+        --  ctron-ups2-mib.txt  The UPS Revision 2 MIB
+        --  Revision: 1.01.00
+        --  Part Number:  
+        --  Date: September 12, 1995
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific UPS MIB.
+        --
+        --  This module will be extended, as needed.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright August 95 Cabletron Systems
+
+        IMPORTS
+                ctUPS
+                        FROM CTRON-MIB-NAMES
+                DisplayString
+                        FROM RFC1213-MIB
+                OBJECT-TYPE
+                        FROM RFC-1212;
+
+        --  Textual convention
+
+
+        --  DisplayString ::= OCTET STRING
+        --  This data type is used to model textual information taken from
+        --  the NVT ASCII character set.  By convention, objects with this
+        --  syntax, unless explicitly stated, are declared as having:
+        --
+        --  SIZE (0..255)
+
+
+        --===============    group definitions     ====================
+
+        upsSystem               OBJECT IDENTIFIER  ::= { ctUPS 1 }
+        upsId                   OBJECT IDENTIFIER  ::= { ctUPS 2 }
+        upsBattery              OBJECT IDENTIFIER  ::= { ctUPS 3 }
+        upsInput                OBJECT IDENTIFIER  ::= { ctUPS 4 }
+        upsOutput               OBJECT IDENTIFIER  ::= { ctUPS 5 }
+        upsStatus               OBJECT IDENTIFIER  ::= { ctUPS 6 }
+        upsConfig               OBJECT IDENTIFIER  ::= { ctUPS 7 }
+        upsExtMeas              OBJECT IDENTIFIER  ::= { ctUPS 8 }
+        upsAddlFuncs            OBJECT IDENTIFIER  ::= { ctUPS 9 }
+
+
+
+        --================    upsSystem group      ====================
+
+        --  UPS System Group
+        --  Implementation of this group is mandatory
+        --  This group covers system-level information on the UPSs available
+
+        upsNumUPSs  OBJECT-TYPE
+            SYNTAX  INTEGER (0..2)
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The number of UPSs available."
+            ::= { upsSystem 1 }
+
+
+
+        --===============    upsId group          =====================
+
+        --  UPS Identification Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored
+        --  This group covers identification information on the UPSs available
+
+        upsIdTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsIdEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of identification table entries.  The number of
+                 entries is given by the value of upsNumUPSs."
+            ::= { upsId 1 }
+
+        upsIdEntry  OBJECT-TYPE
+            SYNTAX  UpsIdEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsIdTable 1 }
+
+        UpsIdEntry  ::=
+            SEQUENCE {
+                upsIndex
+                    INTEGER,
+                upsName
+                    DisplayString,
+                upsModelType
+                    INTEGER,
+                upsFwVersion
+                    DisplayString,
+                upsSerialNumber
+                    DisplayString,
+                upsManufDate
+                    DisplayString
+            }
+
+        upsIndex  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "A unique value which identifies a particular UPS."
+            ::= { upsIdEntry 1 }
+
+        upsName  OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE(0..8))
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's name.  A maximum of 8 characters may be specified.
+                 This object is initialized to the UPS's model name."
+            ::= { upsIdEntry 2 }
+
+        upsModelType  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        smartUps250(1),
+                        smartUps400(2),
+                        smartUps600(3),
+                        smartUps900(4),
+                        smartUps1250(5),
+                        smartUps2000(6),
+                        matrixUps3000(7),
+                        matrixUps5000(8),
+                        other(9)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's base model type."
+            ::= { upsIdEntry 3 }
+
+        upsFwVersion    OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE(0..8))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's firmware version."
+            ::= { upsIdEntry 4 }
+
+        upsSerialNumber OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE(0..16))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's serial number as set at the factory."
+            ::= { upsIdEntry 5 }
+
+        upsManufDate    OBJECT-TYPE
+            SYNTAX  DisplayString (SIZE(0..8))
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's date of manufacture in the format mm/dd/yy."
+            ::= { upsIdEntry 6 }
+
+
+
+        --===============    upsBattery group          ====================
+
+        --  UPS Battery Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored
+        --  This group covers information on the Batteries within each UPS 
+
+
+        upsBatteryTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsBatteryEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of battery table entries.  The number of
+                 entries is given by the value of upsNumUPSs."
+            ::= { upsBattery 1 }
+
+        upsBatteryEntry  OBJECT-TYPE
+            SYNTAX  UpsBatteryEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsBatteryTable 1 }
+
+        UpsBatteryEntry  ::=
+            SEQUENCE {
+                upsBatteryCapacity 
+                    INTEGER,
+                upsBatteryVoltage 
+                    INTEGER,
+                upsBatteryTest
+                    INTEGER,
+                upsBatteryTestResult
+                    INTEGER,
+                upsRunTimeCalibration
+                    INTEGER,
+                upsEstimatedRunTimeRemaining
+                    INTEGER,
+                upsTransferCause
+                    INTEGER,
+                upsBatteryTestTime 
+                    INTEGER,
+                upsLowBatteryWarning
+                    INTEGER
+            }
+
+        upsBatteryCapacity  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's remaining battery capacity expressed as a percent
+                 of the fully charged condition.  The value of this object is
+                 the actual percentage * 10 (that is, to determine the actual
+                 percentage, divide the value of this object by 10)."
+            ::= { upsBatteryEntry 1 }
+
+        upsBatteryVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's present battery voltage.  The value of this object
+                 is the actual voltage * 100 (that is, to determine the actual
+                 voltage, divide the value of this object by 100)."
+            ::= { upsBatteryEntry 2 }
+
+        upsBatteryTest  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        initiateTest(1)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object may be written to initiate testing of the UPS's
+                 battery packs.  Reading this object will always return a 0."
+            ::= { upsBatteryEntry 3 }
+
+        upsBatteryTestResult  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        batteryOK(1),
+                        batteryBad(2),
+                        noRecentTest(3),
+                        invalidTestDueToOverload(4)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                 "The result of the last battery test performed."
+            ::= { upsBatteryEntry 4 }
+
+        upsRunTimeCalibration  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        performTest(1),
+                        abortTest(2),
+                        testInProgress(3),
+                        testNotInProgress(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object may be written to initiate or terminate the test
+                 used to calibrate the returned run time value.  This test
+                 will only run if battery capacity is 100%.  Results of this 
+                 test can be retrieved by upsEstimatedRunTimeRemaining.  Valid
+                 values for writing are 1 (initiate test) and 2 (terminate test).
+                 In addition, this object may be read to determine whether
+                 the test is currently running.  Valid values for reading
+                 are 3 (test is in progress) and 4 (test is not in progress)."
+            ::= { upsBatteryEntry 5 }
+
+        upsEstimatedRunTimeRemaining  OBJECT-TYPE
+            SYNTAX  INTEGER 
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's estimated remaining run time in minutes.  The UPS
+                 may be queried when operating in the on-line, bypass, or
+                 on-battery modes of operation.  The run time estimate is
+                 based on available battery capacity and output load."
+            ::= { upsBatteryEntry 6 }
+
+        upsTransferCause  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        noTransfer(1),
+                        selfTest(2),
+                        inputLineSpike(3),
+                        inputLowVoltage(4),
+                        inputHighVoltage(5),
+                        inputLineFrequencyBad(6)
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The reason for the most recent transfer to on-battery 
+                 operation."
+            ::= { upsBatteryEntry 7 }
+
+        upsBatteryTestTime  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        twoWeeks(1),
+                        oneWeek(2),
+                        startupOnly(3),
+                        off(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The frequency of execution of the UPS's automatic battery
+                 test.  The test may be run immediately upon startup, upon
+                 startup and every 7 days thereafter, upon startup and every
+                 14 days thereafter, or never."
+            DEFVAL { twoWeeks }
+            ::= { upsBatteryEntry 8 }
+
+        upsLowBatteryWarning  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        twoMinutes(1),
+                        fiveMinutes(2),
+                        sevenMinutes(3),
+                        tenMinutes(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The interval between activation of the UPS's low battery
+                 alarm warnings and shutdown of the UPS."
+            DEFVAL { twoMinutes }
+            ::= { upsBatteryEntry 9 }
+
+
+        --===============    upsInput group          ====================
+
+        --  UPS Input Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored
+        --  This group covers information on the AC Inputs to each UPS 
+
+        upsInputTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsInputEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of input table entries.  The number of
+                 entries is given by the value of upsNumUPSs."
+            ::= { upsInput 1 }
+
+        upsInputEntry  OBJECT-TYPE
+            SYNTAX  UpsInputEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsInputTable 1 }
+
+        UpsInputEntry  ::=
+            SEQUENCE {
+                upsInputUtilityVoltage  
+                    INTEGER,
+                upsInputVoltage  
+                    INTEGER,
+                upsInputFailureSensitivity  
+                    INTEGER,
+                upsInputMaxVoltage  
+                    INTEGER,
+                upsInputMinVoltage  
+                    INTEGER,
+                upsInputFrequency 
+                    INTEGER
+            }
+
+        upsInputUtilityVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        vac100(1),
+                        vac120(2),
+                        vac208(3),
+                        vac220(4)               -- 220/230/240
+                }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's utility voltage version."
+            ::= { upsInputEntry 1 }
+
+        upsInputVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's measured utility input voltage.  The value
+                 of this object is the actual voltage * 10 (that is, to
+                 determine the actual voltage, divide the value of this
+                 object by 10)."
+            ::= { upsInputEntry 2 }
+
+        upsInputFailureSensitivity  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        high(1),
+                        medium(2),
+                        low(3),
+                        auto(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The sensitivity of the UPS to rapid changes in utility
+                 voltage (e.g., blackouts, spikes, or notches) or
+                 abnormal changes in utility frequency."
+            DEFVAL { high }
+            ::= { upsInputEntry 3 }
+
+        upsInputMaxVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's maximum input voltage recorded since this object 
+                 was last read.  The value of this object is the actual 
+                 voltage * 10 (that is, to determine the actual voltage,
+                 divide the value of this object by 10)."
+            ::= { upsInputEntry 4 }
+
+        upsInputMinVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's minimum input voltage recorded since this object 
+                 was last read.  The value of this object is the actual 
+                 voltage * 10 (that is, to determine the actual voltage,
+                 divide the value of this object by 10)."
+            ::= { upsInputEntry 5 }
+
+        upsInputFrequency  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's present internal operating frequency in Hz.
+                 The value of this object is the actual frequency * 100
+                 (that is, to determine the actual frequency, divide
+                 the value of this object by 100)."
+            ::= { upsInputEntry 6 }
+
+
+        --===============    upsOutput group          ===================
+
+        --  UPS Output Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored
+        --  This group covers information on the AC Outputs from each UPS 
+
+        upsOutputTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsOutputEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of output table entries.  The number of
+                 entries is given by the value of upsNumUPSs."
+            ::= { upsOutput 1 }
+
+        upsOutputEntry  OBJECT-TYPE
+            SYNTAX  UpsOutputEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsOutputTable 1 }
+
+        UpsOutputEntry  ::=
+            SEQUENCE {
+                upsOutputVoltage
+                    INTEGER,
+                upsOutputUtilityVoltage 
+                    INTEGER,
+                upsOutputPower  
+                    INTEGER
+            }
+
+        upsOutputVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The measured UPS output voltage.  The value of this
+                 object is the actual voltage * 10 (that is, to determine
+                 the actual voltage, divide the value of this object by
+                 10)."
+            ::= { upsOutputEntry 1 }
+
+        upsOutputUtilityVoltage  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        vac225(1),
+                        vac230(2),
+                        vac240(3),
+                        vac220(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's current on-battery output voltage setting
+                 (valid for 220/230/240 Vac version UPSs only).  For other
+                 version UPSs, reading this object will always return a 0
+                 and writing this object will have no effect."
+            DEFVAL { vac225 }
+            ::= { upsOutputEntry 2 }
+
+        upsOutputPower  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's output load represented as a percentage of full 
+                 rated load in Watts.  The value of this object is the actual 
+                 percentage * 10 (that is, to determine the actual percentage,
+                 divide the value of this object by 10)."
+            ::= { upsOutputEntry 3 }
+
+
+        --==============    upsStatus group          ===================
+
+        --  UPS Status Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored
+        --  This group covers information on the Status of each UPS 
+
+        upsStatusTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsStatusEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of status table entries.  The number of
+                 entries is given by the value of upsNumUPSs."
+            ::= { upsStatus 1 }
+
+        upsStatusEntry  OBJECT-TYPE
+            SYNTAX  UpsStatusEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsStatusTable 1 }
+
+        UpsStatusEntry  ::=
+            SEQUENCE {
+                upsStatusOperational 
+                    INTEGER,
+                upsStatusFault
+                    INTEGER,
+                upsStatusTemp 
+                    INTEGER
+            }
+
+        upsStatusOperational   OBJECT-TYPE
+            SYNTAX  INTEGER         
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object contains 8 bits of information about the current
+                 operational status of the UPS.  The bits are encoded as
+                 follows:
+
+                 BIT 7:  1=replace battery condition
+                 BIT 6:  1=low battery condition
+                 BIT 5:  1=overloaded output condition
+                 BIT 4:  1=on-battery mode of operation
+                 BIT 3:  1=on-line mode of operation
+                 BIT 2:  1=Smart Boost mode of operation (where applicable)
+                 BIT 1:  1=UPS shut down due to low battery, overload,
+                           or `sleep' mode
+                 BIT 0:  1=run time calibration running
+
+                 Note that bit 0 is the low-order bit."
+            ::= { upsStatusEntry 1 }
+
+        upsStatusFault   OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object contains 8 bits of information about the current
+                 fault conditions of the UPS.  The bits are encoded as
+                 follows:
+
+                 BIT 7:  1=UPS fault - internal temperature has exceeded
+                           nominal limits
+                 BIT 6:  1=UPS fault - bypass relay (where applicable) malfunction
+                 BIT 5:  1=UPS fault - battery charger failure
+                 BIT 4:  1=UPS in shut down mode via `S' command
+                 BIT 3:  1=UPS in `sleep' mode via `@ddd' command
+                 BIT 2:  1=UPS fault - main relay malfunction
+                 BIT 1:  1=UPS unable to transfer to on-battery operation
+                           due to overload
+                 BIT 0:  1=UPS's output unpowered due to low battery shut down
+
+                 Note that bit 0 is the low-order bit."
+            ::= { upsStatusEntry 2 }
+
+        upsStatusTemp  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's present internal operating temperature in degrees
+                 Fahrenheit.  The value of this object is the actual
+                 temperature * 10 (that is, to determine the actual
+                 temperature, divide the value of this object by 10)."
+            ::= { upsStatusEntry 3 }
+
+
+        --===============    upsConfig group          ====================
+
+        --  UPS Config Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored
+        --  This group covers information on the Configuration of each UPS 
+
+        upsConfigTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsConfigEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of configuration table entries.  The number of
+                 entries is given by the value of upsNumUPSs."
+            ::= { upsConfig 1 }
+
+        upsConfigEntry  OBJECT-TYPE
+            SYNTAX  UpsConfigEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsConfigTable 1 }
+
+        UpsConfigEntry  ::=
+            SEQUENCE {
+                upsConfigAlarm  
+                    INTEGER,
+                upsConfigRestoreDefaults  
+                    INTEGER
+            }
+
+        upsConfigAlarm  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        uponUtilityFailure(1),
+                        thirtySecondsAfterUtilityFailure(2),
+                        lowBatteryOnly(3),
+                        noAudibleAlarm(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's current audible alarm setting.  The alarm
+                 may be set to activate immediately upon utility failure
+                 and for low battery condition, to activate 30 seconds
+                 after utility failure and immediately upon low battery
+                 condition, to activate upon low battery condition only,
+                 or to not activate under any conditions."
+            DEFVAL { uponUtilityFailure }
+            ::= { upsConfigEntry 1 }
+
+        upsConfigRestoreDefaults  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        restoreDefaults(1)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object may be written to force the UPS to restore
+                 the factory default settings for most of the UPS's
+                 customizable parameters.  Reading this object will always
+                 return a 0."
+            ::= { upsConfigEntry 2 }
+
+
+
+        --===============    upsExtMeas group          ====================
+
+        --  UPS ExtMeas Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored AND an External Measurement Unit is attached
+        --  to at least one UPS
+        --  This group covers information on the External Measurement Unit of
+        --  each UPS 
+
+        upsExtMeasTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsExtMeasEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of external measurement table entries.  The number of
+                 entries is the number of available UPSs to which External
+                 Measurement Units are attached."
+            ::= { upsExtMeas 1 }
+
+        upsExtMeasEntry  OBJECT-TYPE
+            SYNTAX  UpsExtMeasEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsExtMeasTable 1 }
+
+        UpsExtMeasEntry  ::=
+            SEQUENCE {
+                upsExtMeasFwVersion     
+                    DisplayString,
+                upsExtMeasTemp  
+                    INTEGER,
+                upsExtMeasHumidity  
+                    INTEGER,
+                upsExtMeasAlarmStatus
+                    INTEGER,
+                upsExtMeasMaxTemp  
+                    INTEGER,
+                upsExtMeasMinTemp  
+                    INTEGER,
+                upsExtMeasMaxHumidity  
+                    INTEGER,
+                upsExtMeasMinHumidity  
+                    INTEGER,
+                upsExtMeasContact1AlarmControl
+                    INTEGER,
+                upsExtMeasContact2AlarmControl 
+                    INTEGER,
+                upsExtMeasContact3AlarmControl  
+                    INTEGER,
+                upsExtMeasContact4AlarmControl  
+                    INTEGER,
+                upsExtMeasMaxTempAlarmControl 
+                    INTEGER,
+                upsExtMeasMinTempAlarmControl
+                    INTEGER,
+                upsExtMeasMaxHumidityAlarmControl
+                    INTEGER,
+                upsExtMeasMinHumidityAlarmControl  
+                    INTEGER
+            }
+
+        upsExtMeasFwVersion     OBJECT-TYPE
+            SYNTAX      DisplayString (SIZE(0..1))
+            ACCESS      read-only
+            STATUS      mandatory
+            DESCRIPTION
+                "The External Measurement Unit's firmware version letter."
+            ::= { upsExtMeasEntry 1 }
+
+        upsExtMeasTemp  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The local ambient temperature in degrees Fahrenheit as measured
+                 by the External Measurement Unit.  The value of this object
+                 is the actual temperature * 100 (that is, to determine the
+                 actual temperature, divide the value of this object by 100)."
+            ::= { upsExtMeasEntry 2 }
+
+        upsExtMeasHumidity  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The local ambient relative humidity in percent as measured
+                 by the External Measurement Unit.  The value of this object
+                 is the actual humidity * 10 (that is, to determine the
+                 actual humidity, divide the value of this object by 10)."
+            ::= { upsExtMeasEntry 3 }
+
+        upsExtMeasAlarmStatus  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object contains 8 bits of information about the current
+                 alarm status of the External Measurement Unit.  The bits are
+                 encoded as follows:
+
+                 BIT 7:  1=Upper temperature limit exceeded
+                 BIT 6:  1=Lower temperature limit exceeded
+                 BIT 5:  1=Upper relative humidity limit exceeded
+                 BIT 4:  1=Lower relative humidity limit exceeded
+                 BIT 3:  1=Contact input channel #4 alarm state
+                 BIT 2:  1=Contact input channel #3 alarm state
+                 BIT 1:  1=Contact input channel #2 alarm state
+                 BIT 0:  1=Contact input channel #1 alarm state
+
+                 Note that bit 0 is the low-order bit."
+            ::= { upsExtMeasEntry 4 }
+
+        upsExtMeasMaxTemp  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        ninetyDegreesF(1),
+                        oneHundredFifteenDegreesF(2),
+                        oneHundredThirtyDegreesF(3),
+                        oneHundredSeventyFiveDegreesF(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The upper temperature limit at which an alarm will be sent."
+            DEFVAL { ninetyDegreesF }
+            ::= { upsExtMeasEntry 5 }
+
+        upsExtMeasMinTemp  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        fortyDegreesF(1),
+                        fiftyDegreesF(2),
+                        fiftyEightDegreesF(3),
+                        sixtyFiveDegreesF(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The lower temperature limit at which an alarm will be sent."
+            DEFVAL { fortyDegreesF }
+            ::= { upsExtMeasEntry 6 }
+
+        upsExtMeasMaxHumidity  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        seventyPercent(1),
+                        eightyPercent(2),
+                        eightyFivePercent(3),
+                        ninetyPercent(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The upper humidity limit at which an alarm will be sent."
+            DEFVAL { seventyPercent }
+            ::= { upsExtMeasEntry 7 }
+
+        upsExtMeasMinHumidity  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        tenPercent(1),
+                        twentyPercent(2),
+                        thirtyPercent(3),
+                        fortyPercent(4)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The lower humidity limit at which an alarm will be sent."
+            DEFVAL { tenPercent }
+            ::= { upsExtMeasEntry 8 }
+
+        upsExtMeasContact1AlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 contact input channel #1.  If enabled, an alarm will be
+                 sent when contact input channel #1 has changed to abnormal
+                 state."
+            ::= { upsExtMeasEntry 9 }
+        
+        upsExtMeasContact2AlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 contact input channel #2.  If enabled, an alarm will be
+                 sent when contact input channel #2 has changed to abnormal
+                 state."
+            ::= { upsExtMeasEntry 10 }
+        
+        upsExtMeasContact3AlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 contact input channel #3.  If enabled, an alarm will be
+                 sent when contact input channel #3 has changed to abnormal
+                 state."
+            ::= { upsExtMeasEntry 11 }
+        
+        upsExtMeasContact4AlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 contact input channel #4.  If enabled, an alarm will be
+                 sent when contact input channel #4 has changed to abnormal
+                 state."
+            ::= { upsExtMeasEntry 12 }
+
+        upsExtMeasMaxTempAlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 upper temperature limit.  If enabled, an alarm will be
+                 sent when the ambient temperature rises above the upper
+                 temperature limit."
+            ::= { upsExtMeasEntry 13 }
+                
+        upsExtMeasMinTempAlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 lower temperature limit.  If enabled, an alarm will be
+                 sent when the ambient temperature falls below the lower
+                 temperature limit."
+            ::= { upsExtMeasEntry 14 }
+                
+        upsExtMeasMaxHumidityAlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 upper humidity limit.  If enabled, an alarm will be sent
+                 when the ambient relative humidity rises above the upper
+                 humidity limit."
+            ::= { upsExtMeasEntry 15 }
+        
+        upsExtMeasMinHumidityAlarmControl  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        enable(1),
+                        disable(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The alarm enable state for the External Measurement Unit's
+                 lower humidity limit.  If enabled, an alarm will be sent
+                 when the ambient relative humidity falls below the lower
+                 humidity limit."
+            ::= { upsExtMeasEntry 16 }
+        
+
+
+        --===============    upsAddlFuncs group          ====================
+
+        --  UPS AddlFuncs Group
+        --  Implementation of this group is mandatory if one or more UPSs
+        --  are to be monitored AND at least one UPS is capable of supporting
+        --  these additional functions
+        --  This group covers information on the Additional Functions of each
+        --  UPS
+
+        upsAddlFuncsTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF UpsAddlFuncsEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "A list of additional functions table entries.  The number of
+                 entries is the number of available UPSs which are capable of
+                 supporting these additional functions."
+            ::= { upsAddlFuncs 1 }
+
+        upsAddlFuncsEntry  OBJECT-TYPE
+            SYNTAX  UpsAddlFuncsEntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry containing objects for a particular UPS."
+            INDEX  { upsIndex }
+            ::= { upsAddlFuncsTable 1 }
+
+        UpsAddlFuncsEntry  ::=
+            SEQUENCE {
+                upsAddlFuncsNumBatteryPacks 
+                    INTEGER,
+                upsAddlFuncsNumBadBatteryPacks  
+                    INTEGER,
+                upsAddlFuncsOutputCurrent 
+                    INTEGER,
+                upsAddlFuncsOutputApparentPower  
+                    INTEGER,
+                upsAddlFuncsStatusOperational
+                    INTEGER,
+                upsAddlFuncsStatusFault
+                    INTEGER,
+                upsAddlFuncsConfigPassword 
+                    OCTET STRING,
+                upsAddlFuncsConfigDisable
+                    INTEGER,
+                upsAddlFuncsConfigBypass 
+                    INTEGER
+            }
+
+        upsAddlFuncsNumBatteryPacks  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The number of battery pack units connected to the UPS."
+            ::= { upsAddlFuncsEntry 1 }
+
+        upsAddlFuncsNumBadBatteryPacks  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The number of bad (faulty) battery pack units connected 
+                 to the UPS."
+            ::= { upsAddlFuncsEntry 2 }
+
+        upsAddlFuncsOutputCurrent  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The true rms load current drawn from the UPS.  The value
+                 of this object is the actual amperage * 100 (that is, to
+                 determine the actual amperage, divide the value of this
+                 object by 100)."
+            ::= { upsAddlFuncsEntry 3 }
+
+        upsAddlFuncsOutputApparentPower  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "The UPS's output load represented as a percentage of full rated 
+                 load in Volt-Amps.  The value of this object is the actual 
+                 percentage * 10 (that is, to determine the actual percentage,
+                 divide the value of this object by 10)."
+            ::= { upsAddlFuncsEntry 4 }
+
+        upsAddlFuncsStatusOperational  OBJECT-TYPE
+            SYNTAX  INTEGER         
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object contains 8 bits of information about the current
+                 operational status of the UPS.  The bits are encoded as
+                 follows:
+
+                 BIT 7:  1=UPS ready to power load upon return of normal line
+                           or upon user command
+                 BIT 6:  1=UPS ready to power load upon user command
+                 BIT 5:  1=UPS in bypass mode as a result of manual bypass
+                           control
+                 BIT 4:  1=UPS is returning from bypass mode
+                 BIT 3:  1=UPS in bypass mode as a result of UPS-Link or
+                           key command
+                 BIT 2:  1=UPS going to bypass mode as a result of UPS-Link
+                           or key command
+                 BIT 1:  1=not defined
+                 BIT 0:  1=wakeup mode - startup test lasting < 2 sec
+
+                 Note that bit 0 is the low-order bit."
+            ::= { upsAddlFuncsEntry 5 }
+
+        upsAddlFuncsStatusFault  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "This object contains 8 bits of information about the current
+                 fault conditions of the UPS.  The bits are encoded as
+                 follows:
+
+                 BIT 7:  reserved for future use
+                 BIT 6:  reserved for future use
+                 BIT 5:  reserved for future use
+                 BIT 4:  1=UPS fault - DC imbalance, UPS in bypass
+                 BIT 3:  1=UPS fault - output voltage select failure, UPS
+                           in bypass
+                 BIT 2:  1=UPS fault - bypass supply failure
+                 BIT 1:  1=UPS fault - Isolation Unit fan failure
+                 BIT 0:  1=UPS fault - Electronics Unit fan failure, UPS
+                           in bypass
+
+                 Note that bit 0 is the low-order bit."
+            ::= { upsAddlFuncsEntry 6 }
+
+        upsAddlFuncsConfigPassword  OBJECT-TYPE
+            SYNTAX  OCTET STRING
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "The password that controls access to the UPS's LCD display.
+                 A maximum of 4 characters may be entered."
+            ::= { upsAddlFuncsEntry 7 }
+
+        upsAddlFuncsConfigDisable  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        disableUps(1)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object may be written to immediately shut down the
+                 UPS, requiring a manual reset.  Reading this object will
+                 always return a 0."
+            ::= { upsAddlFuncsEntry 8 }
+
+        upsAddlFuncsConfigBypass  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        bypassMode(1),
+                        exitBypassMode(2)
+                }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "This object may be written to cause the UPS to transfer
+                 to or from the bypass mode.  Reading this object will
+                 always return a 0."
+            ::= { upsAddlFuncsEntry 9 }
+
+END

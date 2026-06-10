@@ -1,0 +1,65 @@
+-- *****************************************************************
+-- OA-SMI.my:  Open Access Communications Structure of Management Information
+--
+-- July 2010
+--
+-- Copyright (c) 2010 by Open Access Pty Ltd
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+OA-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+oa MODULE-IDENTITY
+       LAST-UPDATED "9910140000Z"
+	ORGANIZATION "Open Access Pty Ltd"
+	CONTACT-INFO
+		"	Open Access
+			Customer Service
+
+		Postal: PO Box 61 North Ryde Business Centre
+			North Ryde,  1591
+			Australia
+
+		   Tel: +61 9978 7009
+		E-mail: techsupport@oa.com.au"
+	DESCRIPTION
+		"The Structure of Management Information for Open Access entrerprise."
+--	REVISION "9505160000Z"
+--	DESCRIPTION
+--		"Initial version of this MIB module."
+	::= { enterprises 1732 }
+
+
+oadirectory OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Reserved for future use"
+	::= { oa 1 }
+
+oacommon OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree for NetSpire common MIBs."
+	::= { oa 2 }
+
+oaspecific OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree for NetSpire device specific MIBs."
+	::= { oa 3 }
+
+oaexperimental OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Reserved for future use"
+	::= { oa 4 }
+
+END

@@ -1,0 +1,406 @@
+-- *****************************************************************
+-- TRELLIX CONFIDENTIAL
+-- TRELLIX-INTRUVERT-TC:  
+-- Trellix (Textual Conventions)
+--
+-- Copyright (c) 2022 MUSARUBRA US, LLC
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+TRELLIX-INTRUVERT-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+	ivConventions
+		FROM TRELLIX-INTRUVERT-SMI;
+
+ivTextualConventions MODULE-IDENTITY
+LAST-UPDATED "200707090000Z"
+ORGANIZATION 
+"MUSARUBRA US LLC"
+CONTACT-INFO 
+"Trellix Customer Service Department
+
+Postal: 6220 American Center Drive
+        San Jose CA 95002-2563
+       
+
+Tel: +1 800 338 8754
+
+E-mail: support@mcafee.com"
+DESCRIPTION 
+"This module defines textual conventions used throughout the 
+Trellix enterprise MIBs."
+::= { ivConventions 1 }
+
+
+TrellixEventCategory ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		other (0),
+		equipment (1),
+		commnunication (2),
+		qos (3),
+		environment (4),
+		application (5)
+	}
+
+
+TrellixEventSeverity ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		unknown (0),
+		inform (1),
+		clear (2),
+		warning (3),
+		error (4),
+		critical (5)
+	}
+
+
+TrellixFEType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Specify speed for Fast Ethernet ports.
+		example: 10 or 100 Mbps"
+	SYNTAX  INTEGER {
+		other (0),
+		ten-Mbps (1),
+		hundred-Mbps (2),
+		auto-negotiate (3)
+	}
+
+
+TrellixGEType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Specify speed for Gigabit Ethernet ports."
+	SYNTAX  INTEGER {
+		other (0),
+		one-gbps (2),
+		auto-negotiate (3)
+	}
+
+
+TrellixIDSAction ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"These specify IDS-specific actions on the management and sensor/analysis card.
+		"
+	SYNTAX  INTEGER {
+		other (0),
+		enable (1),
+		disable (2),
+		reset (3),
+		sigupdate (4),
+		swupdate (5),
+		sensordown (6),
+		certupdate (7),
+		hitlessreboot (8)
+	}
+
+
+TrellixIDSActionResult ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Bitmap-encoded integer that indicates detailed results of an action"
+	SYNTAX  Integer32 (0..255)
+
+
+TrellixIDSActionStatus ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Status reflecting action outcome."
+	SYNTAX  INTEGER {
+		failed (0),
+		succeeded (1),
+		sigupdated (2),
+		enabled (3),
+		disabled (4)
+	}
+
+
+TrellixIDSCardType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Card type aplicable to Trellix IPS.
+		Current support limted to
+		- Management card 
+		- Sensor Analysis card"
+	SYNTAX  INTEGER {
+		other (0),
+		mgmt (1),
+		sensor (2)
+	}
+
+
+TrellixIDSOperatingMode ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Operating mode for Trellix IPS Sensor
+		
+		inline-fail-open-passive: read and forward packets to destination. This 
+				 will be fail-open (passive kit)
+		monitor-dual-intf: monitor two interfaces using Tap
+		monitor-single-intf: monitor span/hub
+		inline-fail-close: Uses span dongle cables for the 10/100
+				   uses external bypass switch for gigabit
+                inline-fail-open-active:read and forward packets to destination. This
+                          will be fail-open. This is available on M-series only.
+		"
+	SYNTAX  INTEGER {
+		inline-fail-open-passive (1),
+		monitor-dual-intf (2),
+		monitor-single-intf (3),
+		inline-fail-close (4),
+		inline-fail-open-active (5)
+	}
+
+
+TrellixIDSPortType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+      "Indicates type of port. 
+       gigabitEthernet supports only 1000Mbps, fastEthernet supports
+       10/100 Mbps, copperGigabitEthernet supports 10/100/1000 Mbps and 
+       tenGigabitEthernet supports only 10 Gbps."
+	SYNTAX  INTEGER {
+		other (0),
+		gigabitEthernet (1),
+		fastEthernet (2),
+		copperGigabitEthernet (3),
+		tenGigabitEthernet (4),
+        	fortyGigabitEthernet (5), -- support in R-series only
+        	vnic(6) -- support in V-series only
+	}
+
+
+TrellixIDSResponseMode ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		interace-port(0),
+		response-port (1),
+		management-port (2)
+	}
+
+
+TrellixProductType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		ids (0)
+	}
+
+
+TrellixTFTPAction ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		other (0),
+		download-image (1),
+		download-signature (2),
+		upload-dos (3),
+		upload-trace (4),
+		download-dos (5),
+		abort-transfer (6),
+		download-sslcert (7),
+		download-image-and-signature (8),
+		download-mpecert (9),
+    download-sgap-ssl-cert (10),
+    upload-sgap-ssl-csr (11),
+    upload-ibac-ad-file (12),
+    download-ibac-ad-file (13),
+    upload-sw-tlv-file (14),
+    download-PacketCaptureFilter-file(15),
+    upload-PacketCaptureFilter-file(16),
+    download-geolocation-db-file (17),
+    upload-PacketCapturePCAP-file(18),
+    download-usrid-acl-file(19),
+    download-bot-dat-file(20),
+    download-ntba-ssl-cert-file(21),
+    upload-dev-prof-file(22),
+--	values 23 and 24 not used as NSM has reserved them for NTBA 
+    download-matd-ssl-cert-file(25),
+    download-ffp-bulk-update(28),
+    download-zcenter-ssl-cert(33),
+    download-gti-pc-ssl-cert(34),
+    upload-suricata-failed-rules-file(35),
+    upload-ca-sensor-csr (36),
+    download-ca-sensor-cert (37),
+	download-syslog-ssl-cert (38)
+	}
+
+
+TrellixTFTPFailedResult ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"This object defines reasons for TFTP failure. 
+		Applicable only when the corresponding <TrellixTFTPStatus> is set to 'failed'."
+	SYNTAX  INTEGER {
+		other (0),
+		invalidFileName (1),
+		invalidFileType (2),
+		cannotReachServer (3),
+		noResponseFromServer (4),
+		insufficientDiskSpace (5),
+		decryptionError (6),
+		accessViolation (7),
+		fileAlreadyExists (8),
+		channelOutOfSync (9),
+		sensorNotInitialized (10),
+		realtimeUpdateError (11),
+		sigfile1OpenError (12),
+		sigfile1StatError (13),
+		sigfile1MemoryError (14),
+		sigfile1ReadError (15),
+		sigfile1NullError (16),
+		sigfile1MD5Error (17),
+		sigfile1InsufficientSpaceForTotalRules (18),
+		sigfile1ConvertError (19),
+		sigfile1SplitError (20),
+		sigfile2OpenError (21),
+		sigfile2StatError (22),
+		sigfile2MemoryError (23),
+		sigfile2ReadError (24),
+		sigfile2NullError (25),
+		sigfile2MD5Error (26),
+		sigfile2InsufficientSpaceForTotalRules (27),
+		sigfile2ConvertError (28),
+		sigfile2SplitError (29),
+		initIDConvertTablesError (30),
+		sigfileMarkError (31),
+		sigfileUndoMarkError (32),
+		compareSigfilesError (33),
+		updateBaseSigfileError (34),
+		sensorRebootRequired (35),
+		fileParseError (36),
+		sigfile1FormatVersionError (37),
+		sigfile2FormatVersionError (38),
+		fileDoesNotExists (39),
+		outOfMemoryError (40),
+		transferAborted (41),
+		internalApplyError (42),
+		incrSigfileUnspportedError (53),
+		incrSigfileFormatError (61),
+		incrSigfileHasSigsetMismatchError (62),
+		incrSigfileMergeError (63)
+	}
+
+
+TrellixTFTPFileType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		other (0),
+		image (1),
+		signature (2),
+		trace (3),
+		dos (4),
+		configuration (5),
+		sslcert (6),
+		image-and-signature (7),
+		mpecert (8)
+	}
+
+
+TrellixTFTPInProgressResult ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"This object defines user feedback during TFTP progress.
+		Applicable only when corresponding <TrellixTFTPStatus> is set to 'inProgress'.
+		Indicates percentage of TFTP up/download during the inProgress mode "
+	SYNTAX  Integer32 (0..100)
+
+
+TrellixTFTPStatus ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Indicates status of corresponding TFTP action <TrellixTFTPAction> request."
+	SYNTAX  INTEGER {
+		other (0),
+		failed (1),
+		inProgress (2),
+		succeeded (3),
+                dwnldFailed (11),
+                applyFailed (12),
+                dwnlding (21),
+                dwnldingComplete (22),
+                applying (23),
+                applyingComplete (24)
+	}
+
+TrellixCUGEType ::= TEXTUAL-CONVENTION
+	STATUS	current
+	DESCRIPTION 
+		"Specify speed for copper gigabit ethernet ports.
+		example: 10 or 100 or 1000Mbps or auto"
+	SYNTAX  INTEGER {
+		other (0),
+		ten-Mbps (1),
+		hundred-Mbps (2),
+		auto-negotiate (3),
+		one-gbps (4)
+	}
+
+TrellixPortSpeed ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+		"Specify speed for all types of ports.
+		example: 10 or 100 or 1000Mbps or auto or 10Gbps"
+	SYNTAX  INTEGER {
+		other (0),
+		fixed-ten-Mbps (1),
+		fixed-hundred-Mbps (2),
+		auto-negotiate-down-hundred-Mbps(3),
+		fixed-one-Gbps(4),
+		fixed-ten-Gbps(5), -- support in M-series only
+		auto-negotiate-ten-Mbps (6),
+		auto-negotiate-hundred-Mbps (7),
+		auto-negotiate-one-Gbps(8),
+		auto-negotiate-ten-Gbps(9), -- support in M-series only
+		auto-negotiate-down-one-Gbps(10),
+        fixed-forty-Gbps(11) -- support in R-series only
+	}
+
+TrellixPluggableModuleType ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+		"Types of supported pluggable modules."
+	SYNTAX  INTEGER {
+		other (0),
+    pluggable-module-qsfp (1), -- two 40 gig QSFP ports
+    pluggable-module-sfp-plus (2), -- eight SFP+ ports
+    pluggable-module-qsfp-4 (3), -- four port QSFP
+    pluggable-module-sfp-plus-12 (4), -- 12 port SFP+ 
+    pluggable-module-rj45-6 (5), -- 6 port RJ45
+    pluggable-module-sfp-plus-pfo-4-sm (6), -- 4 port SFP+ BPFO single mode
+    pluggable-module-sfp-plus-pfo-4-mm-50um (7), -- 4 port SFP+ BPFO multi mode 50um
+    pluggable-module-sfp-plus-pfo-4-mm-62-5um (8), -- 4 port SFP+ BPFO multi mode 62.5um
+    fixed-ports-sfp-12 (9), -- twelve SFP ports
+    pluggable-module-rj45-4 (10) -- 4 port RJ45
+	}
+
+TrellixPortLinearIndex ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION 
+		"This MIB object type indicates the Linear Index of the monitoring port. This index is 
+		generated by the sensor appliance using the pair of slot index and the port index values.
+		The other MIB tables would directly use this linear index, whereever applicable."
+	SYNTAX  Integer32 (0..1024)
+
+
+END
+

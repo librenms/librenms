@@ -1,0 +1,94 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "borgbackup",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "borgbackup",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"mode\":\"single\",\"errored\":[],\"repos\":[]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "errored",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "locked",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "locked_for",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "time_since_last_modified",
+                    "value": 22960,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "total_chunks",
+                    "value": 24458144,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "total_csize",
+                    "value": 1142736526747,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "total_size",
+                    "value": 1443199915700,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "total_unique_chunks",
+                    "value": 3047462,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "unique_csize",
+                    "value": 177703457808,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                },
+                {
+                    "metric": "unique_size",
+                    "value": 269284630430,
+                    "value_prev": null,
+                    "app_type": "borgbackup"
+                }
+            ]
+        }
+    }
+}

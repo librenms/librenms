@@ -1,0 +1,108 @@
+-- *****************************************************************
+-- FS-TC.mib:  FS Switch MIB Textual Conventions
+--
+-- March 2002, Wuzg
+--
+-- Copyright (c) 2002 by FS.COM Inc..
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+FS-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    fsModules
+        FROM FS-SMI;
+
+fsTextualConventions MODULE-IDENTITY
+        LAST-UPDATED "200203200000Z"
+        ORGANIZATION "FS.COM Inc.."
+        CONTACT-INFO
+                " 
+                Tel: 400-865-2852 
+
+                E-mail: https://www.fs.com/live_chat_service_mail.html"
+        DESCRIPTION
+                "This module defines textual conventions used throughout
+                 fs enterprise mibs."
+        REVISION      "200203200000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { fsModules 1}
+
+IfIndex ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This textual convention is an extension of the interface 
+                index convention. Interface include physical port and
+                aggreate port and switch virtual interface and 
+                loopBack interface,etc."
+       SYNTAX       Integer32 (1..2147483647)
+
+
+FSTrapType ::= TEXTUAL-CONVENTION        
+   STATUS current                          
+   DESCRIPTION                             
+            "Private trap(event) type of fs switch. " 
+   SYNTAX INTEGER {                        
+            coldFS(1),
+            warmFS(2),
+            linkDown(3),
+            linkUp(4),
+            authenFailure(5),
+            newRoot(6),
+            topoChange(7),
+            hardChangeDetected(8),
+            portSecurityViolate(9),
+            stormAlarm(10),
+            macNotification(11),
+            vrrpNewMaster(12),
+            vrrpAuthFailure(13),
+            powerStateChange(14),
+            fanStateChange(15),
+            ospf(16),
+            pim(17),
+            igmp(18),
+            dvmrp(19),
+            entity(20),
+            cluster(21),
+            temperatureWarning(22),
+            sysGuard(23),
+            bgp(24),
+            lineDetect(25),
+            bgpReachMaxPrefix(26),
+            hardwareNotSupport(27)         
+         
+  }                                        
+
+ConfigStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the operational status of an table entry.
+        valid(1) -
+              Indicates this entry's status is valid and active. 
+        invalid(2) -
+              Indicates this entry's status is invalid. It is decided by
+              implementatio whether entry is delete"       
+    SYNTAX      INTEGER { 
+         valid(1), 
+         invalid(2)
+    }
+
+MemberMap ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Each octet indicate a Logic port, and each octect can have 
+        their content means. The lenth of octet string will change along 
+        with change of product."
+    SYNTAX OCTET STRING  
+
+                                                          
+END

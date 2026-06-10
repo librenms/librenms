@@ -1,0 +1,1367 @@
+-- *****************************************************************
+-- CISCO-WAN-CELL-EXT-MIB.MY: Cisco Cellular 4G/LTE WAN MIB file
+-- January 2014. Shankar Garikapati
+--   
+-- Copyright (c) 2014 by cisco Systems, Inc.
+-- All rights reserved.
+--   
+-- *****************************************************************
+
+CISCO-WAN-CELL-EXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32,
+    Unsigned32,
+    Counter64
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    NOTIFICATION-GROUP,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    entPhysicalIndex,
+    entPhysicalName
+        FROM ENTITY-MIB
+    ifIndex
+        FROM IF-MIB
+    RowStatus,
+    StorageType,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    C3gServiceCapability
+        FROM CISCO-WAN-3G-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoWanCellExtMIB MODULE-IDENTITY
+    LAST-UPDATED    "201403050000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-3g@cisco.com
+                    cs-4g@cisco.com"
+    DESCRIPTION
+        "This MIB module is an extension of
+        CISCO-WAN-3G-MIB.my, and it provides
+        network management support for Cisco cellular
+        WAN 4G/LTE products.
+
+        *** ABBREVIATIONS, ACRONYMS, AND SYMBOLS ***
+
+        AMBR         -   Aggregate Maximum Bit Rate
+        APN          -   Access Point Name
+        ARP          -   Allocation and Retention Priority
+        CQI          -   Channel Quality Indicator
+        eNodeB       -   Evolved Node B
+        EPS          -   Evolved Packet System
+        E-UTRAN      -   Evolved Universal Terrestrial Radio Access
+        GBR          -   Guaranteed Bit Rate
+        LTE          -   Long Term Evolution
+        MBR          -   Maximum Bit Rate
+        PCRF         -   Policy and Charging Rules Function
+        PDN          -   Packet Data Network
+        QCI          -   QoS Class Identifier
+        QOS          -   Quality of Service
+        RF           -   Radio Frequency
+        RSRP         -   Reference Signal Receive Power
+        RSRQ         -   Reference Signal Receive Quality
+        SINR         -   Signal-to-Interference plus Noise Ratio
+        SNR          -   Signal-to-Noise Ratio
+        UE           -   User Equipment"
+    REVISION        "201403050000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 817 }
+
+
+ciscoWanCellExtMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtMIB 0 }
+
+ciscoWanCellExtMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtMIB 1 }
+
+ciscoWanCellExtMIBConform  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtMIB 2 }
+
+ciscoWanCellExtLte  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtMIBObjects 1 }
+
+cwceLteRadio  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtLte 1 }
+
+cwceLteProfile  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtLte 2 }
+
+
+CiscoWanCellExtProtocolType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Generic PDN type."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        ipv4(2),
+                        ppp(3),
+                        ipv6(4),
+                        ipv4V6(5)
+                    }
+
+CiscoWanCellExtRsrp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "Reference signal received power (RSRP) is
+        defined as the linear average over the power 
+        contributions and measured in dBm. The reporting 
+        range of RSRP is defined per LTE standard 
+        with 1 dBm resolution."
+    SYNTAX          Integer32
+
+CiscoWanCellExtRsrq ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d-1"
+    STATUS          current
+    DESCRIPTION
+        "Reference Signal Received Quality (RSRQ) is
+        defined as the ratio NxRSRP over (E-UTRAN carrier RSSI) 
+        and measured in dB. The reporting range of 
+        RSRQ is defined per LTE standard with 0.5 dB
+        resolution."
+    SYNTAX          Integer32
+
+CiscoWanCellExtCqiIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "Channel Quality indicator reported to eNodeB
+        which directly translates to Modulation Coding
+        Scheme selected."
+    SYNTAX          Unsigned32
+
+CiscoWanCellExtSNR ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d-1"
+    STATUS          current
+    DESCRIPTION
+        "Signal-to-Noise power Ratio (SNR)
+        is defined as the ratio of signal
+        power to the noise power, measured
+        in dB. It determines the downlink
+        throughput for the UE."
+    SYNTAX          Integer32
+
+CiscoWanCellExtSINR ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d-1"
+    STATUS          current
+    DESCRIPTION
+        "Signal to Interference plus Noise Ratio is
+        the power at the receiver due to the required
+        signal, divided by the power due to noise and
+        interference measured in dB. It is used as a
+        measure of signal quality."
+    SYNTAX          Integer32
+
+cwceLteRadioTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwceLteRadioEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains entPhysicalTable entries which
+        are capable of providing operational Cellular 4G/LTE
+        Radio signal parameters and administrative notification
+        information."
+    ::= { cwceLteRadio 1 }
+
+cwceLteRadioEntry OBJECT-TYPE
+    SYNTAX          CwceLteRadioEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains management information of Cellular
+        4G/LTE Radio signal parameters and  notification
+        information.
+
+        An entry of this table is created if an entity capable
+        of providing operational Cellular 4G/LTE Radio signal
+        parameters and administrative notification information
+        is detected by the agent.
+
+        An entry of this table is deleted by the agent if the
+        corresponding entry in entPhysicalTable is removed."
+    INDEX           { entPhysicalIndex } 
+    ::= { cwceLteRadioTable 1 }
+
+CwceLteRadioEntry ::= SEQUENCE {
+        cwceLteCurrRsrp                CiscoWanCellExtRsrp,
+        cwceLteCurrRsrq                CiscoWanCellExtRsrq,
+        cwceLteCurrSnr                 CiscoWanCellExtSNR,
+        cwceLteCurrSinr                CiscoWanCellExtSINR,
+        cwceLteCurrCqiIndex            CiscoWanCellExtCqiIndex,
+        cwceLteCurrOperatingBand       Unsigned32,
+        cwceLteNotifRsrp               CiscoWanCellExtRsrp,
+        cwceLteNotifRsrq               CiscoWanCellExtRsrq,
+        cwceLteRsrpOnsetNotifThreshold CiscoWanCellExtRsrp,
+        cwceLteRsrpAbateNotifThreshold CiscoWanCellExtRsrp,
+        cwceLteRsrqOnsetNotifThreshold CiscoWanCellExtRsrq,
+        cwceLteRsrqAbateNotifThreshold CiscoWanCellExtRsrq,
+        cwceLteRsrpOnsetNotifFlag      C3gServiceCapability,
+        cwceLteRsrpAbateNotifFlag      C3gServiceCapability,
+        cwceLteRsrqOnsetNotifFlag      C3gServiceCapability,
+        cwceLteRsrqAbateNotifFlag      C3gServiceCapability
+}
+
+cwceLteCurrRsrp OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrp
+    UNITS           "dBm"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the LTE RSRP value reported by 
+        the modem." 
+    ::= { cwceLteRadioEntry 1 }
+
+cwceLteCurrRsrq OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrq
+    UNITS           "dB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the LTE RSRQ value reported by 
+        the modem." 
+    ::= { cwceLteRadioEntry 2 }
+
+cwceLteCurrSnr OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtSNR
+    UNITS           "dB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the LTE SNR value reported by 
+        the modem." 
+    ::= { cwceLteRadioEntry 3 }
+
+cwceLteCurrSinr OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtSINR
+    UNITS           "dB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the LTE SINR value measured in
+        decibels (dB) reported by the modem." 
+    ::= { cwceLteRadioEntry 4 }
+
+cwceLteCurrCqiIndex OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtCqiIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates he LTE CQI Index reported by
+        the modem." 
+    ::= { cwceLteRadioEntry 5 }
+
+cwceLteCurrOperatingBand OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the E-UTRAN Operating Band reported 
+        by the modem." 
+    ::= { cwceLteRadioEntry 6 }
+
+cwceLteNotifRsrp OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the LTE RSRP value reported by
+        the modem which triggered the most recent
+        cwceLteRsrpOnsetNotif or cwceLteRsrpAbateNotif
+        notification." 
+    ::= { cwceLteRadioEntry 7 }
+
+cwceLteNotifRsrq OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrq
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the LTE RSRP value reported by
+        the modem which triggered the most recent
+        cwceLteRsrqOnsetNotif or cwceLteRsrqAbateNotif
+        notification." 
+    ::= { cwceLteRadioEntry 8 }
+
+cwceLteRsrpOnsetNotifThreshold OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrp
+    UNITS           "dBm"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the RSRP onset threshold
+        value.  If the value of cwceLteCurrRsrp goes
+        below the threshold and the service bit in
+        cwceLteRsrpOnsetNotifFlag is set, the
+        cwceLteRsrqOnsetNotif notification for that
+        service will be sent.  The absolute value of
+        cwceLteRsrpAbateNotifThreshold should be less
+        than or equal to the absolute value of
+        cwceLteRsrpOnsetNotifThreshold
+        (|cwceLteRsrpAbateNotifThreshold| <=
+        |cwceLteRsrpOnsetNotifThreshold|)." 
+    ::= { cwceLteRadioEntry 9 }
+
+cwceLteRsrpAbateNotifThreshold OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrp
+    UNITS           "dBm"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the RSRP abate
+        threshold value. If the value of
+        cwceLteCurrRsrp goes above the threshold
+        and the service bit in cwceLteRsrpOnsetNotifFlag
+        is set, the cwceLteRsrpAbateNotif notification
+        for that service will be sent. The absolute
+        value of cwceLteRsrpAbateNotifThreshold should
+        be less than or equal to the absolute value of
+        cwceLteRsrpOnsetNotifThreshold
+        (|cwceLteRsrpAbateNotifThreshold| <=
+        |cwceLteRsrpOnsetNotifThreshold|)." 
+    ::= { cwceLteRadioEntry 10 }
+
+cwceLteRsrqOnsetNotifThreshold OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrq
+    UNITS           "dB"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the RSRQ onset threshold
+        value. If the value of cwceLteCurrRsrq goes below
+        the threshold and the service bit in
+        cwceLteRsrqOnsetNotifFlag is set, the
+        cwceLteRsrqOnsetNotif notification for that
+        service will be sent.  The absolute value of
+        cwceLteRsrqAbateNotifThreshold should be
+        less than or equal to the absolute value of
+        cwceLteRsrqOnsetNotifThreshold
+        (|cwceLteRsrqAbateNotifThreshold| <=
+        |cwceLteRsrqOnsetNotifThreshold|)." 
+    ::= { cwceLteRadioEntry 11 }
+
+cwceLteRsrqAbateNotifThreshold OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtRsrq
+    UNITS           "dB"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the RSRQ abate
+        threshold value.  If the value of
+        cwceLteCurrRsrq goes above the threshold
+        and the service bit in
+        cwceLteRsrqOnsetNotifFlag is set, the
+        cwceLteRsrqAbateNotif notification for that
+        service will be sent.  The absolute value of
+        cwceLteRsrqAbateNotifThreshold should be
+        less than or equal to the absolute value of
+        cwceLteRsrqOnsetNotifThreshold
+        (|cwceLteRsrqAbateNotifThreshold| <=
+        |cwceLteRsrqOnsetNotifThreshold|)." 
+    ::= { cwceLteRadioEntry 12 }
+
+cwceLteRsrpOnsetNotifFlag OBJECT-TYPE
+    SYNTAX          C3gServiceCapability
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the flag bitmap to control
+        the generation of notification cwceLteRsrpOnsetNotif.
+        Each bit represents a service as defined in
+        C3gServiceCapability, set the bit value to 1
+        to enable (and 0 to disable) the generation of
+        notification cwceLteRsrpOnsetNotif for that service.
+        The default value of this object is all bits are 0.
+        Notifications are not generated in technology modes
+        where RSRP is not relevant." 
+    ::= { cwceLteRadioEntry 13 }
+
+cwceLteRsrpAbateNotifFlag OBJECT-TYPE
+    SYNTAX          C3gServiceCapability
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the flag bitmap to control the generation
+        of notification cwceLteRsrpAbateNotif. Each bit
+        represents a service as defined in C3gServiceCapability,
+        set the bit value to 1 to enable (and 0 to disable) the
+        generation of notification cwceLteRsrpAbateNotif
+        for that service.  The default value of this object is
+        all bits are 0. Notifications are not generated in
+        technology modes where RSRP is not relevant." 
+    ::= { cwceLteRadioEntry 14 }
+
+cwceLteRsrqOnsetNotifFlag OBJECT-TYPE
+    SYNTAX          C3gServiceCapability
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the flag bitmap to control the generation
+        of notification cwceLteRsrqOnsetNotif. Each bit
+        represents a service as defined in C3gServiceCapability,
+        set the bit value to 1 to enable (and 0 to disable) the
+        generation of notification cwceLteRsrqOnsetNotif
+        for that service.  The default value of this object is
+        all bits are 0. Notifications are not generated in
+        technology modes where RSRQ is not relevant." 
+    ::= { cwceLteRadioEntry 15 }
+
+cwceLteRsrqAbateNotifFlag OBJECT-TYPE
+    SYNTAX          C3gServiceCapability
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the flag bitmap to control the generation
+        of notification cwceLteRsrqAbateNotif. Each bit
+        represents a service as defined in C3gServiceCapability,
+        set the bit value to 1 to enable (and 0 to disable) the
+        generation of notification cwceLteRsrqAbateNotif
+        for that service.  The default value of this object is
+        all bits are 0. Notifications are not generated in
+        technology modes where RSRQ is not relevant." 
+    ::= { cwceLteRadioEntry 16 }
+ 
+
+cwceLteRadioHistory  OBJECT IDENTIFIER
+    ::= { cwceLteRadio 2 }
+
+
+cwceLteRadioHistoryRsrpTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwceLteRadioHistoryRsrpEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains Cellular 4G/LTE RSRP history.
+        The history of RSRP are carried in an octet of string.
+        Each octet in the octet string has a value from 40 to
+        140 and the 150 value is reserved to indicate an
+        uninitialized (Invalid) value.  The format of
+        the octet string with n octets is as following:
+           [ octet 0 is latest,
+             octet 1 is latest-1,
+             .
+             .
+             octet n-2 is oldest-1,
+             octet n-1 is oldest ]
+
+        To convert the provided value into dBm the following formula
+        should be used:
+           dBm = (-1)*value"
+    ::= { cwceLteRadioHistory 1 }
+
+cwceLteRadioHistoryRsrpEntry OBJECT-TYPE
+    SYNTAX          CwceLteRadioHistoryRsrpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains management information of Cellular 
+        4G/LTE RSRP Radio history parameters.
+
+        An entry of this table is created if an entity capable
+        of providing operational Cellular 4G/LTE RSRP Radio
+        history is detected by the agent.
+
+        An entry of this table is deleted by the agent if the
+        corresponding entry in entPhysicalTable is removed."
+    INDEX           { entPhysicalIndex } 
+    ::= { cwceLteRadioHistoryRsrpTable 1 }
+
+CwceLteRadioHistoryRsrpEntry ::= SEQUENCE {
+        cwceLteRadioHistoryRsrpPerSecond OCTET STRING,
+        cwceLteRadioHistoryRsrpPerMinute OCTET STRING,
+        cwceLteRadioHistoryRsrpPerHour   OCTET STRING
+}
+
+cwceLteRadioHistoryRsrpPerSecond OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (60))
+    UNITS           "-dBm"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates per-second RSRP history.  
+        It contains a per-second history of RSRP values
+        for the last 60 seconds." 
+    ::= { cwceLteRadioHistoryRsrpEntry 1 }
+
+cwceLteRadioHistoryRsrpPerMinute OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (60))
+    UNITS           "-dBm"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates per-minute weakest RSRP value history.  
+        It contains a per-minute history of weakest RSRP values for
+        the last 60 minutes. The octet in the string is the weakest 
+        RSRP value measured in a minute interval." 
+    ::= { cwceLteRadioHistoryRsrpEntry 2 }
+
+cwceLteRadioHistoryRsrpPerHour OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (72))
+    UNITS           "-dBm"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates per-hour weakest RSRP value history.  
+        It contains a per-hour history of weakest RSRP values for 
+        the last 72 hours.  The octet in the string is the weakest 
+        RSRP value measured in an hour interval." 
+    ::= { cwceLteRadioHistoryRsrpEntry 3 }
+ 
+
+
+cwceLteRadioHistoryRsrqTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwceLteRadioHistoryRsrqEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains Cellular 4G/LTE RSRQ history.
+        The history of RSRQ are carried in an octet of string.
+        Each octet in the octet string has a value from 3 to 20
+        and the 25 value is reserved to indicate an uninitialized
+        (Invalid) value.  The format of the octet string with n
+        octets is as following:
+           [ octet 0 is latest,
+             octet 1 is latest-1,
+             .
+             .
+             octet n-2 is oldest-1,
+             octet n-1 is oldest ]
+
+        To convert the provided value into dB the following formula
+        should be used:
+           dB = (-1)*value"
+    ::= { cwceLteRadioHistory 2 }
+
+cwceLteRadioHistoryRsrqEntry OBJECT-TYPE
+    SYNTAX          CwceLteRadioHistoryRsrqEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains management information of Cellular 
+        4G/LTE RSRQ Radio history parameters.
+
+        An entry of this table is created if an entity capable
+        of providing operational Cellular 4G/LTE RSRQ Radio
+        history is detected by the agent.
+
+        An entry of this table is deleted by the agent if the
+        corresponding entry in entPhysicalTable is removed."
+    INDEX           { entPhysicalIndex } 
+    ::= { cwceLteRadioHistoryRsrqTable 1 }
+
+CwceLteRadioHistoryRsrqEntry ::= SEQUENCE {
+        cwceLteRadioHistoryRsrqPerSecond OCTET STRING,
+        cwceLteRadioHistoryRsrqPerMinute OCTET STRING,
+        cwceLteRadioHistoryRsrqPerHour   OCTET STRING
+}
+
+cwceLteRadioHistoryRsrqPerSecond OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (60))
+    UNITS           "-dB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates per-second RSRQ history.  
+        It contains a per-second history of RSRQ values for 
+        the last 60 seconds." 
+    ::= { cwceLteRadioHistoryRsrqEntry 1 }
+
+cwceLteRadioHistoryRsrqPerMinute OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (60))
+    UNITS           "-dB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates per-minute weakest RSRQ value history.  
+        It contains a per-minute history of weakest RSRQ values
+        for the last 60 minutes.  The octet in the string is the 
+        weakest RSRQ value measured in a minute interval." 
+    ::= { cwceLteRadioHistoryRsrqEntry 2 }
+
+cwceLteRadioHistoryRsrqPerHour OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (72))
+    UNITS           "-dB"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates per-hour weakest RSRQ value history.  
+        It contains a per-hour history of weakest RSRQ values
+        for the last 72 hours.  The octet in the string is
+        the weakest RSRQ value measured in an hour interval." 
+    ::= { cwceLteRadioHistoryRsrqEntry 3 }
+ 
+
+
+cwceLteIpv4AddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object indicates the type of Internet address for
+        IPv4 addresses used by profiles and PDNs.
+
+        The valid value for this object is ipv4(1)." 
+    ::= { cwceLteProfile 1 }
+
+cwceLteIpv6AddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The object indicates the type of Internet address for
+        IPv6 addresses used by profiles and PDNs.
+
+        The valid value for this object is ipv6(2)."
+    ::= { cwceLteProfile 2 }
+
+cwceLteProfileTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwceLteProfileEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains Cellular LTE PDN profiles.  
+        Cellular device contains multiple profile entries which can 
+        be used to establish cellular data connections (PDN contexts).
+        Users can choose any of available PDN profiles to establish 
+        data connections. Data connections are described in 
+        cwcePacketLteSessionTable.
+
+        This table is valid only in 4G/LTE Technology mode."
+    ::= { cwceLteProfile 3 }
+
+cwceLteProfileEntry OBJECT-TYPE
+    SYNTAX          CwceLteProfileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains management information of Cellular 
+        4G/LTE profile parameters.
+
+        Entries in this table can be created or deleted using
+        cwceLteProfileRowStatus object.
+
+        An entry of this table is deleted by the agent if the
+        corresponding entry in entPhysicalTable is removed."
+    INDEX           {
+                        entPhysicalIndex,
+                        cwceLteProfileIndex
+                    } 
+    ::= { cwceLteProfileTable 1 }
+
+CwceLteProfileEntry ::= SEQUENCE {
+        cwceLteProfileIndex     Unsigned32,
+        cwceLteProfileType      CiscoWanCellExtProtocolType,
+        cwceLteProfileIPv4Addr  InetAddress,
+        cwceLteProfileIPv6Addr  InetAddress,
+        cwceLteProfileApn       SnmpAdminString,
+        cwceLteProfileApnAmbr   Unsigned32,
+        cwceLteProfileStorage   StorageType,
+        cwceLteProfileRowStatus RowStatus
+}
+
+cwceLteProfileIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object specifies profile index, combined with 
+        entPhysicalIndex to access profile table." 
+    ::= { cwceLteProfileEntry 1 }
+
+cwceLteProfileType OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtProtocolType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configured EPS Bearer type." 
+    ::= { cwceLteProfileEntry 2 }
+
+cwceLteProfileIPv4Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configured EPS Bearer IPv4 address.
+        The type of this address is determined by the value of the
+        cwceLteIpv4AddrType object.
+
+        This object is valid only if the corresponding instance value
+        of cwceLteProfileType is either 'ipv4' or 'ipv4V6'." 
+    ::= { cwceLteProfileEntry 3 }
+
+cwceLteProfileIPv6Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the configured EPS Bearer IPv6 address.
+        The type of this address is determined by the value of the
+        cwceLteIpv6AddrType object.
+
+        This object is valid only if the corresponding instance value
+        of cwceLteProfileType is either 'ipv6' or 'ipv4V6'." 
+    ::= { cwceLteProfileEntry 4 }
+
+cwceLteProfileApn OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (0..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies configured profile of Access Point
+        Name (APN).  The value of this object should be provided
+        by the APN service provider." 
+    ::= { cwceLteProfileEntry 5 }
+
+cwceLteProfileApnAmbr OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the profile APN-AMBR.
+        APN-AMBR is aggregate bit rate across all Non-GBR bearers
+        and across all PDN connections of the same APN. The value
+        APN-AMBR is a parameter which is defined as part of a user's
+        subscription, but may be overridden by the PCRF." 
+    ::= { cwceLteProfileEntry 6 }
+
+cwceLteProfileStorage OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the storage type for this
+        conceptual row." 
+    ::= { cwceLteProfileEntry 7 }
+
+cwceLteProfileRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the status of the conceptual row.
+        It's used to manage creation, modification and deletion
+        of rows in this table.
+
+        When a row is active, user cannot modify the value of the 
+        objects in that row. All objects in this row need to have 
+        valid value before the row can be active." 
+    ::= { cwceLteProfileEntry 8 }
+
+
+
+cwceLtePdnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwceLtePdnEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains Cellular 4G/LTE Packet Data Network(PDN)
+        information of all the PDN capable interfaces in the system."
+    ::= { cwceLteProfile 4 }
+
+cwceLtePdnEntry OBJECT-TYPE
+    SYNTAX          CwceLtePdnEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains management information of Cellular 
+        4G/LTE PDN parameters.
+
+        An entry of this table is created if an interface capable
+        of providing operational Cellular 4G/LTE PDN parameters
+        is detected by the agent.
+
+        An entry of this table is deleted by the agent if the
+        corresponding entry in ifTable is removed."
+    INDEX           { ifIndex } 
+    ::= { cwceLtePdnTable 1 }
+
+CwceLtePdnEntry ::= SEQUENCE {
+        cwceLtePdnProfileUsed    Unsigned32,
+        cwceLtePdnConnStatus     INTEGER,
+        cwceLtePdnType           CiscoWanCellExtProtocolType,
+        cwceLtePdnIpv4Addr       InetAddress,
+        cwceLtePdnIpv6Addr       InetAddress,
+        cwceLtePdnPriDnsIpv4Addr InetAddress,
+        cwceLtePdnSecDnsIpv4Addr InetAddress,
+        cwceLtePdnPriDnsIpv6Addr InetAddress,
+        cwceLtePdnSecDnsIpv6Addr InetAddress
+}
+
+cwceLtePdnProfileUsed OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the cwceLteProfileIndex of
+        the profile used by current EPS bearer to
+        establish data connection." 
+    ::= { cwceLtePdnEntry 2 }
+
+cwceLtePdnConnStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        active(2),
+                        inactive(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates PDN session status
+        of the profile. This is active when the call is
+        established and PDN context has become active."
+    DEFVAL          { inactive } 
+    ::= { cwceLtePdnEntry 3 }
+
+cwceLtePdnType OBJECT-TYPE
+    SYNTAX          CiscoWanCellExtProtocolType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates current session PDN type." 
+    ::= { cwceLtePdnEntry 4 }
+
+cwceLtePdnIpv4Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates current session
+        EPS Bearer IPv4 address.
+        The type of this address is determined by
+        the value of the cwceLteIpv4AddrType object." 
+    ::= { cwceLtePdnEntry 5 }
+
+cwceLtePdnIpv6Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates current session
+        EPS Bearer IPv6 address.
+        The type of this address is determined by
+        the value of the cwceLteIpv6AddrType object." 
+    ::= { cwceLtePdnEntry 6 }
+
+cwceLtePdnPriDnsIpv4Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates current session
+        EPS Bearer Primary DNS IPv4 address.
+        The type of this address is determined by
+        the value of the cwceLteIpv4AddrType object." 
+    ::= { cwceLtePdnEntry 7 }
+
+cwceLtePdnSecDnsIpv4Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates current session
+        EPS Bearer Secondary DNS IPv4 address.
+        The type of this address is determined by
+        the value of the cwceLteIpv4AddrType object." 
+    ::= { cwceLtePdnEntry 8 }
+
+cwceLtePdnPriDnsIpv6Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates current session
+        EPS Bearer Primary DNS IPv6 address.
+        The type of this address is determined by
+        the value of the cwceLteIpv6AddrType object." 
+    ::= { cwceLtePdnEntry 9 }
+
+cwceLtePdnSecDnsIpv6Addr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates current session
+        EPS Bearer Secondary DNS IPv6 address.
+        The type of this address is determined by
+        the value of the cwceLteIpv6AddrType object." 
+    ::= { cwceLtePdnEntry 10 }
+ 
+
+
+cwceLteEpsBearerQosTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CwceLteEpsBearerQosEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains 4G/LTE QoS parameters
+        requested by modem to the cellular network 
+        via PDN Context Activation Request message."
+    ::= { cwceLteProfile 5 }
+
+cwceLteEpsBearerQosEntry OBJECT-TYPE
+    SYNTAX          CwceLteEpsBearerQosEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry contains management information of Cellular 
+        4G/LTE QoS parameters.
+
+        An entry of this table is created if an interface
+        capable of providing operational Cellular 4G/LTE
+        QoS parameters is detected by the agent.
+
+        An entry of this table is deleted by the agent
+        if the corresponding entry in ifTable is removed."
+    INDEX           {
+                        ifIndex,
+                        cwceLteEpsBearerId
+                    } 
+    ::= { cwceLteEpsBearerQosTable 1 }
+
+CwceLteEpsBearerQosEntry ::= SEQUENCE {
+        cwceLteEpsBearerId      Unsigned32,
+        cwceLteEpsBearerType    INTEGER,
+        cwceLteEpsQCI           Unsigned32,
+        cwceLteEpsArp           Unsigned32,
+        cwceLteEpsBearerResType INTEGER,
+        cwceLteEpsGbr           Unsigned32,
+        cwceLteEpsMbr           Unsigned32,
+        cwceLteEpsAmbr          Unsigned32,
+        cwceLteEpsTotalBytesTx  Counter64,
+        cwceLteEpsTotalBytesRx  Counter64,
+        cwceLteEpsPacketsTx     Counter64,
+        cwceLteEpsPacketsRx     Counter64
+}
+
+cwceLteEpsBearerId OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the EPS Bearer Identity which is
+        allocated by the Mobility Management Entity (MME)." 
+    ::= { cwceLteEpsBearerQosEntry 1 }
+
+cwceLteEpsBearerType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        gbr(1),
+                        nonGbr(2),
+                        unknown(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the type of bearers.
+
+        gbr     - Guaranteed Bit Rate(GBR).
+                  GBR bearer has a minimum amount of bandwidth that
+                  is reserved by the network, and these resources are
+                  always consumed in a radio base station regardless
+                  of whether it is used or not.
+
+        nonGbr  - non-Guaranteed Bit Rate(Non-GBR).
+                  Non-GBR bearers are for best-effort services and do
+                  not consume any network
+                  resources.
+
+        unknown - the type of bearers is unknown." 
+    ::= { cwceLteEpsBearerQosEntry 2 }
+
+cwceLteEpsQCI OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the QoS Class Identifier(QCI).
+        The QCI along with the ARP characterizes the QoS of
+        the bearer." 
+    ::= { cwceLteEpsBearerQosEntry 3 }
+
+cwceLteEpsArp OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Allocation and Retention
+        Priority(ARP).
+        ARP is a QoS parameter designed to facilitate decisions
+        as to whether a bearer establishment/modification request
+        can be accepted." 
+    ::= { cwceLteEpsBearerQosEntry 4 }
+
+cwceLteEpsBearerResType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        defaultBearer(1),
+                        dedicatedBearer(2),
+                        unknown(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Bearer resource type." 
+    ::= { cwceLteEpsBearerQosEntry 5 }
+
+cwceLteEpsGbr OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Guaranteed Bit Rate(GBR) which
+        determines the resource reservation to guarantee a
+        given data rate." 
+    ::= { cwceLteEpsBearerQosEntry 6 }
+
+cwceLteEpsMbr OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Maximum Bit Rate(MBR) which is
+        used for policing the user traffic." 
+    ::= { cwceLteEpsBearerQosEntry 7 }
+
+cwceLteEpsAmbr OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the Aggregated Maximum Bit Rate.
+        This object is valid only if the value of the corresponding
+        cwceLteEpsBearerResType is 'defaultBearer'." 
+    ::= { cwceLteEpsBearerQosEntry 8 }
+
+cwceLteEpsTotalBytesTx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total data bytes transmitted
+        by this bearer." 
+    ::= { cwceLteEpsBearerQosEntry 9 }
+
+cwceLteEpsTotalBytesRx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total data bytes received
+        by this bearer." 
+    ::= { cwceLteEpsBearerQosEntry 10 }
+
+cwceLteEpsPacketsTx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of packets transmitted
+        by this bearer." 
+    ::= { cwceLteEpsBearerQosEntry 11 }
+
+cwceLteEpsPacketsRx OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the number of packets received
+        by this bearer." 
+    ::= { cwceLteEpsBearerQosEntry 12 }
+ 
+
+
+cwceLteRsrqOnsetNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalName,
+                        cwceLteRsrqOnsetNotifFlag,
+                        cwceLteNotifRsrq,
+                        cwceLteRsrqOnsetNotifThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "If RSRQ goes below cwceLteRsrqOnsetNotifThreshold
+        and the service bit in cwceLteRsrqOnsetNotifFlag
+        is set, this notification will be generated. Object
+        cwceLteRsrqOnsetNotifFlag will indicate which service
+        generates this notification and the associated RSRQ
+        will be reported in cwceLteNotifRsrq. Please note
+        that cwceLteNotifRsrq is used to indicate the
+        RSRQ value that triggers the notification, user
+        should go to the corresponding radio table to
+        get the current RSRQ value."
+   ::= { ciscoWanCellExtMIBNotifs 1 }
+
+cwceLteRsrqAbateNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalName,
+                        cwceLteRsrqAbateNotifFlag,
+                        cwceLteNotifRsrq,
+                        cwceLteRsrqAbateNotifThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "If RSRQ goes above cwceLteRsrqAbateNotifThreshold
+        and the service bit in cwceLteRsrqOnsetNotifFlag
+        is set, this notification will be generated. Object
+        cwceLteRsrqAbateNotifFlag will indicate which service
+        generates this notification and the associated RSRQ
+        will be reported in cwceLteNotifRsrq. Please
+        note that cwceLteNotifRsrq is used to indicate
+        the RSRQ value that triggers the notification,
+        user should go to the corresponding radio table to
+        get the current RSRQ value."
+   ::= { ciscoWanCellExtMIBNotifs 2 }
+
+cwceLteRsrpOnsetNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalName,
+                        cwceLteRsrpOnsetNotifFlag,
+                        cwceLteNotifRsrp,
+                        cwceLteRsrpOnsetNotifThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "If RSRP goes below cwceLteRsrpOnsetNotifThreshold
+        and the service bit in cwceLteRsrpOnsetNotifFlag
+        is set, this notification will be generated. Object
+        cwceLteRsrpOnsetNotifFlag will indicate which service
+        generates this notification and the associated RSRP
+        will be reported in cwceLteNotifRsrp. Please
+        note that cwceLteNotifRsrp is used to indicate
+        the RSRP value that triggers the notification,
+        user should go to the
+        corresponding radio table to get the current RSRP
+        value."
+   ::= { ciscoWanCellExtMIBNotifs 3 }
+
+cwceLteRsrpAbateNotif NOTIFICATION-TYPE
+    OBJECTS         {
+                        entPhysicalName,
+                        cwceLteRsrpAbateNotifFlag,
+                        cwceLteNotifRsrp,
+                        cwceLteRsrpAbateNotifThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "If RSRP goes above cwceLteRsrqAbateNotifThreshold
+        and the service bit in cwceLteRsrpOnsetNotifFlag
+        is set, this notification will be generated. Object
+        cwceLteRsrpAbateNotifFlag will indicate which service
+        generates this notification and the associated RSRP
+        will be reported in cwceLteNotifRsrp. Please
+        note that cwceLteNotifRsrp is used to indicate
+        the RSRP value that triggers the notification,
+        user should go to the corresponding radio table to
+        get the current RSRP value."
+   ::= { ciscoWanCellExtMIBNotifs 4 }
+-- Conformance
+
+ciscoWanCellExtMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtMIBConform 1 }
+
+ciscoWanCellExtMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoWanCellExtMIBConform 2 }
+
+
+ciscoWanCellExtMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for the
+        CISCO-WAN-CELL-EXT-MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoWanCellExtMIBNotificationGroup,
+                        ciscoWanCellExtMIBLteObjectGroup
+                    }
+
+    OBJECT          cwceLteRsrpOnsetNotifThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteRsrpAbateNotifThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteRsrqOnsetNotifThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteRsrqAbateNotifThreshold
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteRsrpOnsetNotifFlag
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteRsrpAbateNotifFlag
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteRsrqOnsetNotifFlag
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteRsrqAbateNotifFlag
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+
+    OBJECT          cwceLteProfileType
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required."
+
+    OBJECT          cwceLteProfileIPv4Addr
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required."
+
+    OBJECT          cwceLteProfileIPv6Addr
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required."
+
+    OBJECT          cwceLteProfileApn
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required."
+
+    OBJECT          cwceLteProfileApnAmbr
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required."
+
+    OBJECT          cwceLteProfileStorage
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required."
+
+    OBJECT          cwceLteProfileRowStatus
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "read-create access is not required."
+    ::= { ciscoWanCellExtMIBCompliances 1 }
+
+ciscoWanCellExtMIBLteObjectGroup OBJECT-GROUP
+    OBJECTS         {
+                        cwceLteCurrRsrp,
+                        cwceLteCurrRsrq,
+                        cwceLteCurrSnr,
+                        cwceLteCurrSinr,
+                        cwceLteCurrCqiIndex,
+                        cwceLteNotifRsrp,
+                        cwceLteNotifRsrq,
+                        cwceLteRsrpOnsetNotifThreshold,
+                        cwceLteRsrpAbateNotifThreshold,
+                        cwceLteRsrqOnsetNotifThreshold,
+                        cwceLteRsrqAbateNotifThreshold,
+                        cwceLteRsrpOnsetNotifFlag,
+                        cwceLteRsrpAbateNotifFlag,
+                        cwceLteRsrqOnsetNotifFlag,
+                        cwceLteRsrqAbateNotifFlag,
+                        cwceLteCurrOperatingBand,
+                        cwceLteRadioHistoryRsrpPerSecond,
+                        cwceLteRadioHistoryRsrpPerMinute,
+                        cwceLteRadioHistoryRsrpPerHour,
+                        cwceLteRadioHistoryRsrqPerSecond,
+                        cwceLteRadioHistoryRsrqPerMinute,
+                        cwceLteRadioHistoryRsrqPerHour,
+                        cwceLteIpv4AddrType,
+                        cwceLteIpv6AddrType,
+                        cwceLteProfileType,
+                        cwceLteProfileIPv4Addr,
+                        cwceLteProfileIPv6Addr,
+                        cwceLteProfileApn,
+                        cwceLteProfileApnAmbr,
+                        cwceLteProfileStorage,
+                        cwceLteProfileRowStatus,
+                        cwceLtePdnProfileUsed,
+                        cwceLtePdnConnStatus,
+                        cwceLtePdnType,
+                        cwceLtePdnIpv4Addr,
+                        cwceLtePdnIpv6Addr,
+                        cwceLtePdnPriDnsIpv4Addr,
+                        cwceLtePdnSecDnsIpv4Addr,
+                        cwceLtePdnPriDnsIpv6Addr,
+                        cwceLtePdnSecDnsIpv6Addr,
+                        cwceLteEpsBearerType,
+                        cwceLteEpsArp,
+                        cwceLteEpsQCI,
+                        cwceLteEpsBearerResType,
+                        cwceLteEpsGbr,
+                        cwceLteEpsMbr,
+                        cwceLteEpsAmbr,
+                        cwceLteEpsTotalBytesTx,
+                        cwceLteEpsTotalBytesRx,
+                        cwceLteEpsPacketsTx,
+                        cwceLteEpsPacketsRx
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for Cellular 4G/LTE."
+    ::= { ciscoWanCellExtMIBGroups 1 }
+
+ciscoWanCellExtMIBNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cwceLteRsrqOnsetNotif,
+                        cwceLteRsrqAbateNotif,
+                        cwceLteRsrpOnsetNotif,
+                        cwceLteRsrpAbateNotif
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for Cellular WAN
+        notifications."
+    ::= { ciscoWanCellExtMIBGroups 2 }
+
+END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

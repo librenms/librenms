@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.200",
+                    "sysDescr": "Aruba Instant On 1930 48G Class4 PoE 4SFP/SFP  370W Switch JL686A, InstantOn_1930_1.0.5.0 (139), Linux 4.4.120, U-Boot 2013.01 (V1.0.1.29)",
+                    "sysContact": null,
+                    "version": "1.0.5.0",
+                    "hardware": "1930 48G Class4 PoE 4SFP/SFP 370W JL686A",
+                    "features": null,
+                    "location": null,
+                    "os": "procurve",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hpe.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

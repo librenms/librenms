@@ -1,0 +1,682 @@
+CISCOSB-rlBrgMulticast-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB Multicast Bridge Configuration
+-- Version:    7.46
+-- Date:       15-Jan-2007
+--
+
+IMPORTS
+    TEXTUAL-CONVENTION, RowStatus                        FROM SNMPv2-TC
+    VlanIndex,PortList                                   FROM Q-BRIDGE-MIB
+    Unsigned32, IpAddress, OBJECT-TYPE,
+    MODULE-IDENTITY                                      FROM SNMPv2-SMI
+    switch001                                            FROM CISCOSB-MIB
+    InetAddressType, InetAddress                         FROM INET-ADDRESS-MIB;
+
+
+rlBrgMulticast MODULE-IDENTITY
+      LAST-UPDATED "201304010000Z"  -- April 1, 2013
+      ORGANIZATION "Cisco Systems, Inc."
+
+      CONTACT-INFO
+      "Postal: 170 West Tasman Drive
+      San Jose , CA 95134-1706
+      USA
+
+      
+      Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+      DESCRIPTION
+              "The MIB module describes the private MIB for Multicast Bridge 
+               supported by CISCOSB's software and products."   
+      REVISION     "201304010000Z"  -- April 1, 2013
+      DESCRIPTION
+              "Added MODULE-IDENTITY"
+      ::= { switch001 116  }
+
+
+--  rlBrgMulticastMibVersion
+
+rlBrgMulticastMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 4.
+         Snooping supports IGMPv1/v2/v3 and MLDv1/v2."
+::= { rlBrgMulticast 1 }
+
+-- rlBrgStaticIpMulticastTable   (replaced by rlBrgStaticInetMulticastTable)
+
+rlBrgStaticIpMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgStaticIpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for IP Multicast
+         addresses for each VLAN."
+    ::= { rlBrgMulticast 3}
+
+rlBrgStaticIpMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgStaticIpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the device.
+         The set of ports to which frames containing this IP
+         Multicast destination address and IP source address
+         are allowed to be forwarded."
+    INDEX { rlBrgStaticIpMulticastVlanTag,
+            rlBrgStaticIpMulticastGroupAddress,
+            rlBrgStaticIpMulticastSourceAddress }
+    ::= { rlBrgStaticIpMulticastTable 1 }
+
+RlBrgStaticIpMulticastEntry ::= SEQUENCE {
+        rlBrgStaticIpMulticastVlanTag           VlanIndex,
+        rlBrgStaticIpMulticastGroupAddress      IpAddress,
+        rlBrgStaticIpMulticastSourceAddress     IpAddress,
+        rlBrgStaticIpMulticastFrwPorts          PortList,
+        rlBrgStaticIpMulticastForbiddenPorts    PortList,
+        rlBrgStaticIpMulticastStatus            RowStatus
+}
+
+rlBrgStaticIpMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The VLAN tag for which this entry is configured."
+    ::= { rlBrgStaticIpMulticastEntry 1}
+
+rlBrgStaticIpMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The multicast group address for which the filtering information applies "
+    ::= { rlBrgStaticIpMulticastEntry 2}
+
+rlBrgStaticIpMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The unicast group address for which the filtering information applies."
+    ::= { rlBrgStaticIpMulticastEntry 3}
+
+rlBrgStaticIpMulticastFrwPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports the data should be forwarded to "
+    ::= { rlBrgStaticIpMulticastEntry 4}
+
+rlBrgStaticIpMulticastForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports that overrides dynamic configuration and
+          prevents multicast data forwarding for the group or
+          group and source to these ports."
+    ::= { rlBrgStaticIpMulticastEntry 5}
+
+rlBrgStaticIpMulticastStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of the table entry. It's used to add/delete an entry"
+    ::= { rlBrgStaticIpMulticastEntry  6}
+
+-- bridge ip multicast FDB
+-- rlBrgIpMulticastTable  (See rlBrgInetMulticastTable)
+
+rlBrgIpMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgIpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing all filtering information for IP
+         Multicast addresses for each VLAN "
+    ::= { rlBrgMulticast 4}
+
+rlBrgIpMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgIpMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlBrgIpMulticastTable
+         contains IP Multicast FDB data "
+    INDEX { rlBrgIpMulticastVlanTag,
+            rlBrgIpMulticastGroupAddress,
+            rlBrgIpMulticastSourceAddress }
+::= { rlBrgIpMulticastTable 1 }
+
+RlBrgIpMulticastEntry ::= SEQUENCE {
+    rlBrgIpMulticastVlanTag         VlanIndex,
+    rlBrgIpMulticastGroupAddress    IpAddress,
+    rlBrgIpMulticastSourceAddress   IpAddress,
+    rlBrgIpMulticastEgressPorts     PortList,
+    rlBrgIpMulticastLearntPorts     PortList
+}
+
+rlBrgIpMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgIpMulticastEntry 1}
+
+rlBrgIpMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgIpMulticastEntry 2}
+
+rlBrgIpMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgIpMulticastEntry 3}
+
+rlBrgIpMulticastEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports, in this VLAN, to which frames
+         destined for this Group IP address or Group and Source
+         address are currently being explicitly forwarded.  This
+         does not include ports for which this address is only implicitly
+         forwarded, in the dot1qForwardAllPorts list."
+    ::= { rlBrgIpMulticastEntry 4}
+
+rlBrgIpMulticastLearntPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subset of ports in rlBrgIpMulticastEgressPorts which
+         were learnt by IGMP or some other dynamic mechanism,
+         in this Filtering database.."
+    ::= { rlBrgIpMulticastEntry 5}
+
+-- static ipm inet bridge configuration
+--  rlBrgStaticInetMulticastTable  IPM FDB
+
+rlBrgStaticInetMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgStaticInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing filtering information for INET (Pv4 and IPv6)
+        Multicast addresses for each VLAN."
+    ::= { rlBrgMulticast 5}
+
+rlBrgStaticInetMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgStaticInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Filtering information configured into the device.
+         The set of ports to which frames containing this IP
+         Multicast destination address and IP source address
+         are allowed to be forwarded."
+    INDEX { rlBrgStaticInetMulticastVlanTag,
+            rlBrgStaticInetMulticastGroupAddressType, rlBrgStaticInetMulticastGroupAddress,
+            rlBrgStaticInetMulticastSourceAddressType, rlBrgStaticInetMulticastSourceAddress }
+    ::= { rlBrgStaticInetMulticastTable 1 }
+
+RlBrgStaticInetMulticastEntry ::= SEQUENCE {
+        rlBrgStaticInetMulticastVlanTag           VlanIndex,
+        rlBrgStaticInetMulticastGroupAddressType  InetAddressType,
+        rlBrgStaticInetMulticastGroupAddress      InetAddress,
+        rlBrgStaticInetMulticastSourceAddressType InetAddressType,
+        rlBrgStaticInetMulticastSourceAddress     InetAddress,
+        rlBrgStaticInetMulticastFrwPorts          PortList,
+        rlBrgStaticInetMulticastForbiddenPorts    PortList,
+        rlBrgStaticInetMulticastStatus            RowStatus
+}
+
+rlBrgStaticInetMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The VLAN tag for which this entry is configured."
+    ::= { rlBrgStaticInetMulticastEntry 1}
+
+rlBrgStaticInetMulticastGroupAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type ipv6/ipv4."
+    ::= { rlBrgStaticInetMulticastEntry 2}
+
+rlBrgStaticInetMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The multicast group address for which the filtering information applies "
+    ::= { rlBrgStaticInetMulticastEntry 3}
+
+rlBrgStaticInetMulticastSourceAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type ipv6/ipv4."
+    ::= { rlBrgStaticInetMulticastEntry 4}
+
+rlBrgStaticInetMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "The unicast group address for which the filtering information applies."
+    ::= { rlBrgStaticInetMulticastEntry 5}
+
+rlBrgStaticInetMulticastFrwPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports the data should be forwarded to "
+    ::= { rlBrgStaticInetMulticastEntry 6}
+
+rlBrgStaticInetMulticastForbiddenPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "The ports that overrides dynamic configuration and
+          prevents multicast data forwarding for the group or
+          group and source to these ports."
+    ::= { rlBrgStaticInetMulticastEntry 7}
+
+rlBrgStaticInetMulticastStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The status of the table entry. It's used to add/delete an entry"
+    ::= { rlBrgStaticInetMulticastEntry  8}
+
+-- rlBrgInetMulticastTable  IPM FDB
+
+rlBrgInetMulticastTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing all filtering information for IP
+         Multicast addresses for each VLAN "
+    ::= { rlBrgMulticast 6}
+
+rlBrgInetMulticastEntry OBJECT-TYPE
+    SYNTAX      RlBrgInetMulticastEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlBrgInetMulticastTable
+         contains IP Multicast FDB data "
+    INDEX { rlBrgInetMulticastVlanTag,
+            rlBrgInetMulticastGroupAddressType, rlBrgInetMulticastGroupAddress,
+            rlBrgInetMulticastSourceAddressType, rlBrgInetMulticastSourceAddress }
+::= { rlBrgInetMulticastTable 1 }
+
+RlBrgInetMulticastEntry ::= SEQUENCE {
+    rlBrgInetMulticastVlanTag           VlanIndex,
+    rlBrgInetMulticastGroupAddressType  InetAddressType,
+    rlBrgInetMulticastGroupAddress      InetAddress,
+    rlBrgInetMulticastSourceAddressType InetAddressType,
+    rlBrgInetMulticastSourceAddress     InetAddress,
+    rlBrgInetMulticastEgressPorts       PortList,
+    rlBrgInetMulticastLearntPorts       PortList
+}
+
+rlBrgInetMulticastVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgInetMulticastEntry 1}
+
+rlBrgInetMulticastGroupAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type IPv4/IPv6."
+    ::= { rlBrgInetMulticastEntry 2}
+
+rlBrgInetMulticastGroupAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgInetMulticastEntry 3}
+
+rlBrgInetMulticastSourceAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inet type IPv4/IPv6."
+    ::= { rlBrgInetMulticastEntry 4}
+
+rlBrgInetMulticastSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgInetMulticastEntry 5}
+
+rlBrgInetMulticastEgressPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports, in this VLAN, to which frames
+         destined for this Group IP address or Group and Source
+         address are currently being explicitly forwarded.  This
+         does not include ports for which this address is only implicitly
+         forwarded, in the dot1qForwardAllPorts list."
+    ::= { rlBrgInetMulticastEntry 6}
+
+rlBrgInetMulticastLearntPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subset of ports in rlBrgIpMulticastEgressPorts which
+         were learnt by IGMP or some other dynamic mechanism,
+         in this Filtering database.."
+    ::= { rlBrgInetMulticastEntry 7}
+
+
+-- IPM FDB overlapping Reference Table
+
+rlBrgIpmFdbRefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlBrgIpmFdbRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing all information stored in
+         IPM FDB overlapping Reference Table "
+    ::= { rlBrgMulticast 7}
+
+rlBrgIpmFdbRefEntry OBJECT-TYPE
+    SYNTAX      RlBrgIpmFdbRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlBrgIpmFdbRefTable
+         contains overlapping Reference Table FDB data "
+    INDEX { rlBrgIpmFdbRefVlanTag,
+            rlBrgIpmFdbRefGroupAddressType, rlBrgIpmFdbRefGroupAddress,
+            rlBrgIpmFdbRefSourceAddressType, rlBrgIpmFdbRefSourceAddress }
+::= { rlBrgIpmFdbRefTable 1 }
+
+RlBrgIpmFdbRefEntry ::= SEQUENCE {
+    rlBrgIpmFdbRefVlanTag           VlanIndex,
+    rlBrgIpmFdbRefGroupAddressType  InetAddressType,
+    rlBrgIpmFdbRefGroupAddress      InetAddress,
+    rlBrgIpmFdbRefSourceAddressType InetAddressType,
+    rlBrgIpmFdbRefSourceAddress     InetAddress,
+    rlBrgIpmFdbRefPorts             PortList
+}
+
+rlBrgIpmFdbRefVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgIpmFdbRefEntry 1}
+
+rlBrgIpmFdbRefGroupAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgIpmFdbRefEntry 2}
+
+rlBrgIpmFdbRefGroupAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgIpmFdbRefEntry 3}
+
+rlBrgIpmFdbRefSourceAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgIpmFdbRefEntry 4}
+
+rlBrgIpmFdbRefSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgIpmFdbRefEntry 5}
+
+rlBrgIpmFdbRefPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The list of ports represented in IPM FDB overlapping
+            Reference Table"
+    ::= { rlBrgIpmFdbRefEntry 6}
+
+
+-- IPM FDB Dynamic command MIB
+DynamicCmdType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of Dynamic IPM FDB command:
+         Create Entry, Delete Entry, Set ports Pset."
+    SYNTAX  INTEGER {
+        createEntry(0),
+        deleteEntry(1),
+        addPorts(2),
+        deletePorts(3)
+}
+
+rlBrgDynamicCmdTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlBrgDynamicCmdEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The (conceptual) table for Dynamic IPM FDB command. For debugging purposes
+        only. This MIB is prohibited to be used with working IGMP/MLD snooping"
+    ::= {  rlBrgMulticast 8 }
+
+rlBrgDynamicCmdEntry OBJECT-TYPE
+    SYNTAX      RlBrgDynamicCmdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the rlBrgDynamicCmdTable."
+    INDEX  { rlBrgDynamicCmdKey }
+    ::= { rlBrgDynamicCmdTable 1 }
+
+RlBrgDynamicCmdEntry ::= SEQUENCE {
+    rlBrgDynamicCmdKey               INTEGER,
+    rlBrgDynamicCmdVlanTag           VlanIndex,
+    rlBrgDynamicCmdGroupAddressType  InetAddressType,
+    rlBrgDynamicCmdGroupAddress      InetAddress,
+    rlBrgDynamicCmdSourceAddressType InetAddressType,
+    rlBrgDynamicCmdSourceAddress     InetAddress,
+    rlBrgDynamicCmdPorts             PortList,
+    rlBrgDynamicCmdType              DynamicCmdType
+}
+
+rlBrgDynamicCmdKey OBJECT-TYPE
+    SYNTAX      INTEGER (1)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Key of the rlBrgDynamicCmdTable table"
+    ::= { rlBrgDynamicCmdEntry 1 }
+
+rlBrgDynamicCmdVlanTag OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag for which this entry is configured."
+    ::= { rlBrgDynamicCmdEntry 2}
+
+rlBrgDynamicCmdGroupAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgDynamicCmdEntry 3}
+
+rlBrgDynamicCmdGroupAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Multicast group address (destination address) of data frames "
+    ::= { rlBrgDynamicCmdEntry 4}
+
+rlBrgDynamicCmdSourceAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgDynamicCmdEntry 5}
+
+rlBrgDynamicCmdSourceAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Unicast source address of data frames."
+    ::= { rlBrgDynamicCmdEntry 6}
+
+rlBrgDynamicCmdPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The list of ports for them the command is issued"
+    ::= { rlBrgDynamicCmdEntry 7}
+
+rlBrgDynamicCmdType OBJECT-TYPE
+    SYNTAX      DynamicCmdType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Current type of command"
+    ::= { rlBrgDynamicCmdEntry 8 }
+
+
+-------------------------------------------------------------------
+--rlUserAssignedVidx
+-------------------------------------------------------------------
+
+rlUserAssignedVidx  OBJECT IDENTIFIER ::= { rlBrgMulticast 9 }
+
+VidxIndex ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Values of Vidx. 0 means no free Vidx."
+    SYNTAX  Unsigned32 (0|4096..32767)
+
+
+--rlUserAssignedVidxTable
+
+rlUserAssignedVidxConfigTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlUserAssignedVidxConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing entries of User Assigned Vidx configuration information"
+    ::= { rlUserAssignedVidx 1 }
+
+rlUserAssignedVidxConfigEntry       OBJECT-TYPE
+    SYNTAX      RlUserAssignedVidxConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table entry of User Assigned Vidx information table"
+    INDEX   { rlUserAssignedVidxConfigIndex }
+    ::= { rlUserAssignedVidxConfigTable 1 }
+
+RlUserAssignedVidxConfigEntry::= SEQUENCE {
+        rlUserAssignedVidxConfigIndex       VidxIndex,
+        rlUserAssignedVidxConfigPorts       PortList,
+        rlUserAssignedVidxConfigRowStatus   RowStatus
+}
+
+rlUserAssignedVidxConfigIndex       OBJECT-TYPE
+    SYNTAX      VidxIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Vidx index. Values from 4K to 32K"
+    ::= { rlUserAssignedVidxConfigEntry 1 }
+
+rlUserAssignedVidxConfigPorts       OBJECT-TYPE
+    SYNTAX PortList
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "List of ports that belong to the Vidx"
+    ::= { rlUserAssignedVidxConfigEntry 2 }
+
+rlUserAssignedVidxConfigRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the status of this entry."
+    ::= { rlUserAssignedVidxConfigEntry 3 }
+
+--rlUserAssignedVidxGetFreeIndex
+
+rlUserAssignedVidxGetNextFreeIndex OBJECT-TYPE
+    SYNTAX           VidxIndex
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION
+        "Returns the next free Vidx index. Values from 4K to 32K"
+    ::= { rlUserAssignedVidx 2 }
+
+rlBrgMulticastCurrentNumberOfEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current number of multicast entries."
+::= { rlBrgMulticast 10 }
+
+
+END
+
+

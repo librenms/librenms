@@ -1,0 +1,119 @@
+<?php
+
+/**
+ * CustomMap.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2023 Steven Wilton
+ * @author     Steven Wilton <swilton@fluentit.com.au>
+ */
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Gate;
+
+class CustomMap extends BaseModel
+{
+    use HasFactory;
+    protected $primaryKey = 'custom_map_id';
+    protected $fillable = [
+        'name',
+        'menu_group',
+        'width',
+        'height',
+        'node_align',
+        'reverse_arrows',
+        'edge_separation',
+        'legend_x',
+        'legend_y',
+        'legend_steps',
+        'legend_font_size',
+        'legend_hide_invalid',
+        'legend_hide_overspeed',
+        'background_type',
+        'background_data',
+    ];
+
+    /**
+     * @return array{options: 'array', legend_colours: 'array', newnodeconfig: 'array', newedgeconfig: 'array', background_data: 'array'}
+     */
+    protected function casts(): array
+    {
+        return [
+            'options' => 'array',
+            'legend_colours' => 'array',
+            'newnodeconfig' => 'array',
+            'newedgeconfig' => 'array',
+            'background_data' => 'array',
+        ];
+    }
+
+    /**
+     * Get background data intended to be passed to javascript to configure the background
+     */
+    public function getBackgroundConfig(): array
+    {
+        $config = $this->background_data ?? [];
+        $config['engine'] = \App\Facades\LibrenmsConfig::get('geoloc.engine');
+        $config['api_key'] = \App\Facades\LibrenmsConfig::get('geoloc.api_key');
+        $config['tile_url'] = \App\Facades\LibrenmsConfig::get('leaflet.tile_url');
+        $config['image_url'] = route('maps.custom.background', ['map' => $this->custom_map_id]) . '?version=' . ($config['version'] ?? 0);
+
+        return $config;
+    }
+
+    public function scopeHasAccess(Builder $query, User $user): Builder
+    {
+        if (Gate::allows('viewAll', CustomMap::class)) {
+            return $query;
+        }
+
+        // Only show maps where ALL device nodes are accessible by the user
+        return $query->whereHas('nodes', fn ($q) => $q->whereNotNull('device_id'))
+            ->whereDoesntHave('nodes', fn ($q) => $q->whereNotNull('device_id')->whereNotIn('device_id', \Permissions::devicesForUser($user)));
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CustomMapNode, $this>
+     */
+    public function nodes(): HasMany
+    {
+        return $this->hasMany(CustomMapNode::class, 'custom_map_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\CustomMapEdge, $this>
+     */
+    public function edges(): HasMany
+    {
+        return $this->hasMany(CustomMapEdge::class, 'custom_map_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne<\App\Models\CustomMapBackground, $this>
+     */
+    public function background(): HasOne
+    {
+        return $this->hasOne(CustomMapBackground::class, 'custom_map_id');
+    }
+}

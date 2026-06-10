@@ -1,0 +1,67 @@
+name: Docs
+
+on:
+  push:
+    branches:
+      - 'master'
+    paths:
+      - '.github/workflows/doc.yml'
+      - 'doc/**'
+      - 'mkdocs.yml'
+      - 'resources/definitions/os_detection/**'
+  pull_request:
+    branches:
+      - 'master'
+    paths:
+      - '.github/workflows/doc.yml'
+      - 'doc/**'
+      - 'mkdocs.yml'
+      - 'resources/definitions/os_detection/**'
+
+permissions:
+  contents: read # to fetch code (actions/checkout)
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      -
+        name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /resources/definitions/os_detection
+            /doc
+            /mkdocs.yml
+      -
+        name: Build mkdocs Docker image
+        run: |
+          docker build -t mkdocs - < doc/Dockerfile
+      -
+        name: Build docs
+        run: |
+          docker run --rm -v "$(pwd):/docs" mkdocs build --strict 2>&1 | tee output.log
+          sudo chown -R $(id -u):$(id -g) ./out
+          echo "Problems found:" && (grep -F 'no such' output.log && exit 1 || echo "None, Good job :)")
+      -
+        name: Check GitHub Pages status
+        uses: crazy-max/ghaction-github-status@v5
+        with:
+          pages_threshold: major_outage
+      -
+        name: Deploy
+        if: github.event_name != 'pull_request' && endsWith(github.ref, github.event.repository.default_branch)
+        uses: crazy-max/ghaction-github-pages@v4
+        with:
+          repo: librenms/docs.librenms.org
+          target_branch: main
+          keep_history: true
+          build_dir: out
+        env:
+          GH_PAT: ${{ secrets.DOCS_TOKEN }}

@@ -1,0 +1,399 @@
+-- ***********************************************************************************************
+-- TN-DEV-SYS-IPMGMT-MIB.smi:  Transition Networks Enterprise MIB for TN device IP2 management feature
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TN-DEV-SYS-IP2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+                FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC
+    InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+    entPhysicalIndex FROM ENTITY-MIB
+    tnProducts FROM TRANSITION-SMI
+    IpAddressOriginTC FROM IP-MIB
+    TNInterfaceIndex FROM TN-TC
+    InterfaceIndex FROM IF-MIB;
+
+tnDevSysIpMgmtMIB MODULE-IDENTITY
+    LAST-UPDATED "201404090000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+                "       Transition Networks
+                        Technical Support
+
+                        10900 Red Circle Drive
+                        Minnetonka, MN 55343 USA
+                        Tel: +1-800-526-9267
+
+                    E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib provides functionalities for managing the IP DHCP, IPv6 and DNS."
+
+    REVISION      "201404090000Z"
+    DESCRIPTION
+        "Initial Revision of this module"
+        ::= { tnProducts 10 }
+
+tnDevSysIp2mgmt            OBJECT IDENTIFIER ::= { tnDevSysIpMgmtMIB 8 }
+--
+-- IP Configuration
+--
+
+tnIp2Mode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    notApplicable(0),
+                    host(1),
+                    router(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Configure whether the IP stack should act as a Host or a Router.
+    In Host mode, IP traffic between interfaces will not be routed.
+    In Router mode traffic is routed between all interfaces."
+    ::= { tnDevSysIp2mgmt 1 }
+
+tnIp2DnsConfig OBJECT IDENTIFIER
+    ::= { tnDevSysIp2mgmt 2 }
+
+tnIp2DnsProxy OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "When DNS proxy is enabled, system will relay DNS requests to the currently
+    configured DNS server, and reply as a DNS resolver to the client devices on the network."
+    ::= { tnIp2DnsConfig 1 }
+
+tnIp2DnsServerConfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnIp2DnsServerConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage IP configuration."
+    ::= { tnIp2DnsConfig 2 }
+
+tnIp2DnsServerConfEntry OBJECT-TYPE
+    SYNTAX TnIp2DnsServerConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing IP status for each device."
+    INDEX   { tnIp2DnsServerIndex }
+    ::= { tnIp2DnsServerConfTable 1 }
+
+TnIp2DnsServerConfEntry ::=
+    SEQUENCE {
+       tnIp2DnsServerIndex      INTEGER,
+       tnIp2DnsServerMode       INTEGER,
+       tnIp2DnsServerAddr       InetAddress,
+       tnIp2DnsVlan             TNInterfaceIndex
+    }
+
+tnIp2DnsServerIndex OBJECT-TYPE
+    SYNTAX      INTEGER(1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "DNS Server Instance."
+    ::= { tnIp2DnsServerConfEntry 1 }
+
+tnIp2DnsServerMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    noDNS(1),
+                    staticIPv4(2),
+                    staticIPv6(3),
+                    anyDHCPv4(4),
+                    thisDHCPv4(5),
+                    anyDHCPv6(6),
+                    thisDHCPv6(7)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "This setting controls the DNS name resolution done by the switch. The following modes are supported:
+
+    No DNS server: No DNS server will be used.
+    staticIPv4 : Explicitly provide the IPv4 address of the DNS Server in dotted decimal notation.
+    staticIPv6 : Explicitly provide the IPv6 address of the DNS Server in dotted decimal notation.
+    anyDHCPv4  : From any IPv4 DHCP interfaces: The first DNS server offered from a DHCP lease to a DHCP-enabled interface will be used.
+    thisDHCPv4 : From the specified IPv4 DHCP interface. Specify from which DHCP-enabled interface a provided DNS server should be preferred.
+    anyDHCPv6  : From any IPv6 DHCP interfaces: The first DNS server offered from a DHCP lease to a DHCP-enabled interface will be used.
+    thisDHCPv6 : From the specified IPv6 DHCP interface. Specify from which DHCP-enabled interface a provided DNS server should be preferred."
+    ::= { tnIp2DnsServerConfEntry 2 }
+
+tnIp2DnsServerAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The DNS IP address of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIp2DnsServerConfEntry 3 }
+
+
+tnIp2DnsVlan OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specify from which DHCP-enabled interface a provided DNS server should be preferred."
+    ::= { tnIp2DnsServerConfEntry 4 }
+--
+-- IP Interfaces
+--
+tnIp2InterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnIp2InterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage IP Interfaces."
+    ::= { tnDevSysIp2mgmt 3 }
+
+tnIp2InterfaceEntry OBJECT-TYPE
+    SYNTAX TnIp2InterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing IP status for each device."
+    INDEX   { tnIp2IntVlan }
+    ::= { tnIp2InterfaceTable 1 }
+
+TnIp2InterfaceEntry ::=
+    SEQUENCE {
+       tnIp2IntVlan             INTEGER,
+       tnIp2IntDHCPEnable       INTEGER,
+       tnIp2IntFallback         INTEGER,
+       tnIp2AddrType            InetAddressType,
+       tnIp2IntCurrentLease     InetAddress,
+       tnIp2Addr                InetAddress,
+       tnIp2MaskLen             INTEGER,
+       tnIp2Status              RowStatus
+    }
+
+tnIp2IntVlan OBJECT-TYPE
+    SYNTAX      INTEGER(1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The VLAN associated with the IP interface.
+    Only ports in this VLAN will be able to access the IP interface.
+    This field is only available for input when creating an new interface."
+    ::= { tnIp2InterfaceEntry 1 }
+
+tnIp2IntDHCPEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    true(1),
+                    false(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Enable the DHCP client.
+    If this option is enabled, the system will configure the
+    IPv4 address and mask of the interface using the DHCP protocol.
+    The DHCP client will announce the configured System Name
+    as hostname to provide DNS lookup."
+    ::= { tnIp2InterfaceEntry 2 }
+
+tnIp2IntFallback OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The number of seconds for trying to obtain a DHCP lease.
+    After this period expires, a configured IPv4 address will be used as
+    IPv4 interface address. A value of zero disables the fallback mechanism,
+    such that DHCP will keep retrying until a valid lease is obtained."
+    ::= { tnIp2InterfaceEntry 3 }
+
+tnIp2AddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The  IP address type of the device.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIp2InterfaceEntry 4 }
+
+tnIp2IntCurrentLease OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "For DHCP interfaces with an active lease, this column show
+    the current interface address, as provided by the DHCP server."
+    ::= { tnIp2InterfaceEntry 5 }
+
+tnIp2Addr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The IPv4 address of the interface in dotted decimal notation.
+    If DHCP is enabled, this field is not used. The field may also be left blank
+    if IPv4 operation on the interface is not desired."
+    ::= { tnIp2InterfaceEntry 6 }
+
+tnIp2MaskLen OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The IPv4 network mask, in number of bits (prefix length).
+    Valid values are between 0 and 30 bits for a IPv4 address.
+    If DHCP is enabled, this field is not used. The field may also be left blank if
+    IPv4 operation on the interface is not desired."
+    ::= { tnIp2InterfaceEntry 7 }
+
+tnIp2Status OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The status of this conceptual row entry of IP Interface table.
+    This object is used to manage the creation and deletion of conceptual rows.
+
+      The status column has six defined values:
+
+           - 'active', which indicates that the conceptual row is
+           available for use by the managed device;
+
+           - 'notInService', which indicates that the conceptual
+           row exists in the agent, but is unavailable for use by
+           the managed device (see NOTE below);
+
+           - 'notReady', which indicates that the conceptual row
+           exists in the agent, but is missing information
+           necessary in order to be available for use by the
+           managed device;
+
+           - 'createAndGo', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row and to have its status automatically set
+           to active, making it available for use by the managed
+           device;
+
+           - 'createAndWait', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row (but not make it available for use by
+           the managed device); and,
+
+           - 'destroy', which is supplied by a management station
+           wishing to delete all of the instances associated with
+           an existing conceptual row."
+    ::= { tnIp2InterfaceEntry 8 }
+--
+-- IP Routes
+--
+tnIp2RoutesTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnIp2RoutesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage IP Routes."
+    ::= { tnDevSysIp2mgmt 4 }
+
+tnIp2RoutesEntry OBJECT-TYPE
+    SYNTAX TnIp2RoutesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing IP Routes."
+    INDEX   { tnIp2RoutesNetwork, tnIp2RoutesMaskLen, tnIp2RoutesGateway, tnIp2RoutesNextHop }
+    ::= { tnIp2RoutesTable 1 }
+
+TnIp2RoutesEntry ::=
+    SEQUENCE {
+       tnIp2RoutesNetwork       InetAddress,
+       tnIp2RoutesMaskLen       INTEGER,
+       tnIp2RoutesGateway       InetAddress,
+       tnIp2RoutesNextHop       INTEGER,
+       tnIp2RoutesType          InetAddressType,
+       tnIp2RoutesStatus        RowStatus
+    }
+
+tnIp2RoutesNetwork OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The destination IP network or host address of this route.
+    Valid format is dotted decimal notationor a valid IPv6 notation.
+    A default route can use the value 0.0.0.0or IPv6 :: notation."
+    ::= { tnIp2RoutesEntry 1 }
+
+tnIp2RoutesMaskLen OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The destination IP network or host mask, in number of bits (prefix length).
+    It defines how much of a network address that must match, in order to qualify for this route.
+    Valid values are between 0 and 32 bits respectively 128 for IPv6 routes.
+    Only a default route will have a mask length of 0 (as it will match anything)."
+    ::= { tnIp2RoutesEntry 2 }
+
+tnIp2RoutesGateway OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The IP address of the IP gateway. Valid format is dotted decimal notation or
+    a valid IPv6 notation. Gateway and Network must be of the same type."
+    ::= { tnIp2RoutesEntry 3 }
+
+tnIp2RoutesNextHop OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The VLAN ID (VID) of the specific IPv6 interface associated with the gateway.
+    The given VID ranges from 1 to 4094 and will be effective only when the corresponding IPv6
+    interface is valid.  If the IPv6 gateway address is link-local, it must specify the next hop
+    VLAN for the gateway.  If the IPv6 gateway address is not link-local, system ignores the next
+    hop VLAN for the gateway."
+    ::= { tnIp2RoutesEntry 4 }
+
+tnIp2RoutesType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The IP address type of the routes.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnIp2RoutesEntry 5 }
+
+tnIp2RoutesStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The status of this conceptual row entry of IP Interface table.
+    This object is used to manage the creation and deletion of conceptual rows.
+
+      The status column has six defined values:
+
+           - 'active', which indicates that the conceptual row is
+           available for use by the managed device;
+
+           - 'notInService', which indicates that the conceptual
+           row exists in the agent, but is unavailable for use by
+           the managed device (see NOTE below);
+
+           - 'notReady', which indicates that the conceptual row
+           exists in the agent, but is missing information
+           necessary in order to be available for use by the
+           managed device;
+
+           - 'createAndGo', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row and to have its status automatically set
+           to active, making it available for use by the managed
+           device;
+
+           - 'createAndWait', which is supplied by a management
+           station wishing to create a new instance of a
+           conceptual row (but not make it available for use by
+           the managed device); and,
+
+           - 'destroy', which is supplied by a management station
+           wishing to delete all of the instances associated with
+           an existing conceptual row."
+    ::= { tnIp2RoutesEntry 6 }
+END

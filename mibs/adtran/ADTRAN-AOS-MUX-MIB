@@ -1,0 +1,451 @@
+ADTRAN-AOS-MUX-MIB    DEFINITIONS ::= BEGIN
+
+--  TITLE:      THE ADTRAN OPERATING SYSTEM MULTIPLEXING MIB
+--  FILENAME:   AdGenAOSMux.mib
+--  AUTHOR:     Jason Schock
+--  DATE:       10/15/04
+
+--  HISTORY
+--  10/15/04  First draft.
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY
+           FROM SNMPv2-SMI
+    RowStatus
+           FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+           FROM SNMPv2-CONF
+    adIdentity
+           FROM ADTRAN-MIB
+    adGenAOSCommon, adGenAOSConformance
+           FROM ADTRAN-AOS;
+
+
+adGenAOSMuxID    MODULE-IDENTITY
+        LAST-UPDATED "200410150000Z"
+        ORGANIZATION "ADTRAN, Inc."
+        CONTACT-INFO
+                "Technical Support Dept.
+                 Postal: ADTRAN, Inc.
+                         901 Explorer Blvd.
+                         Huntsville, AL 35806
+
+                         Tel: +1 800 726-8663
+                         Fax: +1 256 963 6217
+                         E-mail: support@adtran.com"
+        DESCRIPTION
+                "The MIB module for the management of AOS products with
+                 TDM multiplexing and/or cross-connects."
+        ::= { adIdentity 10000 53 1 5 }
+
+
+-- OBJECT IDENTIFIERS
+
+    adGenAOSMux             OBJECT IDENTIFIER ::= { adGenAOSCommon   5 }
+
+    adGenAOSXConnect        OBJECT IDENTIFIER ::= { adGenAOSMux  1 }
+    adGenAOSTdmGroup        OBJECT IDENTIFIER ::= { adGenAOSMux  2 }
+    adGenAOSMuxConformance  OBJECT IDENTIFIER ::= { adGenAOSMux 99 }
+
+    adGenAOSMuxCompliance   OBJECT IDENTIFIER ::= { adGenAOSMuxConformance 1 }
+    adGenAOSMuxMibGroups    OBJECT IDENTIFIER ::= { adGenAOSMuxConformance 2 }
+
+--
+-- XConnect Configuration Table
+--
+
+adGenAOSXConnectTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSXConnectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The Cross-Connect Configuration Table"
+    ::= { adGenAOSXConnect 1 }
+
+adGenAOSXConnectEntry  OBJECT-TYPE
+    SYNTAX      AdGenAOSXConnectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry in the Cross-Connect Configuration Table"
+    INDEX{ adGenAOSXConnectIndex }
+    ::= { adGenAOSXConnectTable  1 }
+
+AdGenAOSXConnectEntry  ::= SEQUENCE
+{
+    adGenAOSXConnectIndex                   INTEGER,
+    adGenAOSXConnectFirstIfType             INTEGER,
+    adGenAOSXConnectFirstIfNumber           INTEGER,
+    adGenAOSXConnectFirstSubIfNumber        INTEGER,
+    adGenAOSXConnectFirstIfSlot             INTEGER,
+    adGenAOSXConnectFirstIfPort             INTEGER,
+    adGenAOSXConnectFirstTdmGroup           INTEGER,
+    adGenAOSXConnectFirstTdmGroupDS0        INTEGER,
+    adGenAOSXConnectSecondIfType            INTEGER,
+    adGenAOSXConnectSecondIfNumber          INTEGER,
+    adGenAOSXConnectSecondSubIfNumber       INTEGER,
+    adGenAOSXConnectSecondIfSlot            INTEGER,
+    adGenAOSXConnectSecondIfPort            INTEGER,
+    adGenAOSXConnectSecondTdmGroup          INTEGER,
+    adGenAOSXConnectSecondTdmGroupDS0       INTEGER,
+    adGenAOSXConnectPreserveRbs             INTEGER,
+    adGenAOSXConnectRowStatus               RowStatus
+}
+
+adGenAOSXConnectIndex  OBJECT-TYPE
+    SYNTAX      INTEGER (1..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A number that uniquely defines the cross-connect"
+    ::= { adGenAOSXConnectEntry  1 }
+
+adGenAOSXConnectFirstIfType  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  notAssigned(0),
+                  dds(1),                       -- from only
+                  t1E1(2),                      -- from/to
+                  eth(3),                       -- from only
+                  serial(4),                    -- from/to
+                  shdsl(5),                     -- from only
+                  fxs(6),                       -- to only
+                  frameRelay(7),                -- from/to
+                  ppp(8)                        -- to only
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The type of interface from which a cross-connect is being
+     made"
+    ::= { adGenAOSXConnectEntry  2 }
+
+adGenAOSXConnectFirstIfNumber  OBJECT-TYPE
+    SYNTAX      INTEGER (0..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A number that defines the interface described by
+     adGenAOSXConnectFirstIfType -- set to 0 if the interface
+     can be defined by adGenAOSXConnectFirstIfSlot and
+     adGenAOSXConnectFirstIfPort"
+    ::= { adGenAOSXConnectEntry  3 }
+
+adGenAOSXConnectFirstSubIfNumber  OBJECT-TYPE
+    SYNTAX      INTEGER (0..1007)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A number that further defines some interfaces -- set to
+     0 if the interface can be defined by adGenAOSXConnectFirstIfSlot
+     and adGenAOSXConnectFirstIfPort"
+    ::= { adGenAOSXConnectEntry  4 }
+
+adGenAOSXConnectFirstIfSlot  OBJECT-TYPE
+    SYNTAX      INTEGER (0..96)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The slot number containing the interface described by
+     adGenAOSXConnectFirstIfType -- set to 0 if the interface
+     can be defined by adGenAOSXConnectFirstIfNumber (and
+     adGenAOSXConnectFirstSubIfNumber)
+
+     Note: 0 is also a valid slot number."
+    ::= { adGenAOSXConnectEntry  5 }
+
+adGenAOSXConnectFirstIfPort  OBJECT-TYPE
+    SYNTAX      INTEGER (0..48)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The port number of the interface described by
+     adGenAOSXConnectFirstIfType -- set to 0 if the interface
+     can be defined by adGenAOSXConnectFirstIfNumber (and
+     adGenAOSXConnectFirstSubIfNumber)"
+    ::= { adGenAOSXConnectEntry  6 }
+
+adGenAOSXConnectFirstTdmGroup  OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A number uniquely identifying the TDM Group associated
+     with the interface described by adGenAOSXConnectFirstIfType
+     -- set to 0 if it is not necessary that a TDM Group be
+     associated with the interface"
+    ::= { adGenAOSXConnectEntry  7 }
+
+adGenAOSXConnectFirstTdmGroupDS0  OBJECT-TYPE
+    SYNTAX      INTEGER (0..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The specific DS0 of the TDM Group, described by
+     adGenAOSXConnectFirstTdmGroup, from which a cross-
+     connect is being made -- set to 0 if it is not necessary
+     that a specific timeslot be defined"
+    ::= { adGenAOSXConnectEntry  8 }
+
+adGenAOSXConnectSecondIfType  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  notAssigned(0),
+                  dds(1),                       -- from only
+                  t1E1(2),                      -- from/to
+                  eth(3),                       -- from only
+                  serial(4),                    -- from/to
+                  shdsl(5),                     -- from only
+                  fxs(6),                       -- to only
+                  frameRelay(7),                -- from/to
+                  ppp(8)                        -- to only
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The type of interface to which a cross-connect is being
+     made"
+    ::= { adGenAOSXConnectEntry  9 }
+
+adGenAOSXConnectSecondIfNumber  OBJECT-TYPE
+    SYNTAX      INTEGER (0..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A number that defines the interface described by
+     adGenAOSXConnectSecondIfType -- set to 0 if the interface
+     can be defined by adGenAOSXConnectSecondIfSlot and
+     adGenAOSXConnectSecondIfPort"
+    ::= { adGenAOSXConnectEntry  10 }
+
+adGenAOSXConnectSecondSubIfNumber  OBJECT-TYPE
+    SYNTAX      INTEGER (0..1007)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A number that further defines some interfaces -- set to
+     0 if the interface can be defined by adGenAOSXConnectSecondIfSlot
+     and adGenAOSXConnectSecondIfPort"
+    ::= { adGenAOSXConnectEntry  11 }
+
+adGenAOSXConnectSecondIfSlot  OBJECT-TYPE
+    SYNTAX      INTEGER (0..96)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The slot number containing the interface described by
+     adGenAOSXConnectSecondIfType -- set to 0 if the interface
+     can be defined by adGenAOSXConnectSecondIfNumber (and
+     adGenAOSXConnectSecondSubIfNumber)
+
+     Note: 0 is also a valid slot number."
+    ::= { adGenAOSXConnectEntry  12 }
+
+adGenAOSXConnectSecondIfPort  OBJECT-TYPE
+    SYNTAX      INTEGER (0..48)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The port number of the interface described by
+     adGenAOSXConnectSecondIfType -- set to 0 if the interface
+     can be defined by adGenAOSXConnectSecondIfNumber (and
+     adGenAOSXConnectSecondSubIfNumber)"
+    ::= { adGenAOSXConnectEntry  13 }
+
+adGenAOSXConnectSecondTdmGroup  OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "A number uniquely identifying the TDM Group associated
+     with the interface described by adGenAOSXConnectSecondIfType
+     -- set to 0 if it is not necessary that a TDM Group be
+     associated with the interface"
+    ::= { adGenAOSXConnectEntry  14 }
+
+adGenAOSXConnectSecondTdmGroupDS0  OBJECT-TYPE
+    SYNTAX      INTEGER (0..32)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The specific DS0 of the TDM Group, described by
+     adGenAOSXConnectSecondTdmGroup, to which a cross-
+     connect is being made -- set to 0 if it is not necessary
+     that a specific timeslot be defined"
+    ::= { adGenAOSXConnectEntry  15 }
+
+adGenAOSXConnectPreserveRbs  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  enabled(1),
+                  disabled(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The ability of the cross-connect to maintain robbed-bit
+     signaling integrity -- set to disabled if robbed-bit
+     signaling is not a characteristic of the cross-connect."
+    ::= { adGenAOSXConnectEntry  16 }
+
+adGenAOSXConnectRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The status of this conceptual row.  Until instances
+     of appropriate corresponding columns are configured,
+     the value of the corresponding instance of the
+     adGenAOSXConnectStatus column is 'notReady'."
+    ::= { adGenAOSXConnectEntry  17 }
+
+
+--
+-- TDM Group Configuration Table
+--
+
+adGenAOSTdmGroupTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AdGenAOSTdmGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The TDM Group Table that associates DS0s into mappable
+    units"
+    ::= { adGenAOSTdmGroup 1 }
+
+adGenAOSTdmGroupEntry  OBJECT-TYPE
+    SYNTAX      AdGenAOSTdmGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry in the TDM Group Table"
+    INDEX{ adGenAOSTdmGroupIfSlot, adGenAOSTdmGroupIfPort, adGenAOSTdmGroupID }
+    ::= { adGenAOSTdmGroupTable  1 }
+
+
+AdGenAOSTdmGroupEntry  ::= SEQUENCE
+{
+    adGenAOSTdmGroupIfSlot         INTEGER,
+    adGenAOSTdmGroupIfPort         INTEGER,
+    adGenAOSTdmGroupID             INTEGER,
+    adGenAOSTdmGroupMask           INTEGER,
+    adGenAOSTdmGroupUsage          INTEGER
+}
+
+adGenAOSTdmGroupIfSlot  OBJECT-TYPE
+    SYNTAX      INTEGER (0..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The slot number containing the interface for
+    the TDM Group"
+    ::= { adGenAOSTdmGroupEntry  1 }
+
+adGenAOSTdmGroupIfPort  OBJECT-TYPE
+    SYNTAX      INTEGER (0..48)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The port number containing the interface for
+    the TDM Group"
+    ::= { adGenAOSTdmGroupEntry  2 }
+
+
+adGenAOSTdmGroupID  OBJECT-TYPE
+    SYNTAX      INTEGER (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "A number that uniquely defines the TDM Group"
+    ::= { adGenAOSTdmGroupEntry  3 }
+
+adGenAOSTdmGroupMask  OBJECT-TYPE
+    SYNTAX      INTEGER (-2147483648..2147483647)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "A bitmap of the contiguous DS0s included in this TDM Group
+
+     Example: mapping DS0s 1-12:
+        00000000000000000000111111111111 (bin),
+        00000FFF (hex),
+        4095 (dec)
+
+     Note: To create a new row in adGenAOSTdmGroupTable,
+           set adGenAOSTdmGroupMask with the appropriate
+           index values corresponding to the desired slot,
+           port, and TDM group ID"
+    ::= { adGenAOSTdmGroupEntry  4 }
+
+adGenAOSTdmGroupUsage  OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                  fiftySixKbps(1),
+                  sixtyFourKbps(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The speed of the individual DS0s"
+    ::= { adGenAOSTdmGroupEntry  5 }
+
+--
+-- Compliance Statements
+--
+
+adGenAOSMuxConformancemModule MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for SNMPv2 entities which
+         implement the adGenAOSMux MIB."
+
+    MODULE
+    MANDATORY-GROUPS
+    {
+        adGenAOSXConnectGrp,
+        adGenAOSTdmGroupGrp
+    }
+    ::= { adGenAOSMuxCompliance 1 }
+
+-- units of conformance
+
+adGenAOSXConnectGrp OBJECT-GROUP
+    OBJECTS
+    {
+        adGenAOSXConnectIndex,
+        adGenAOSXConnectFirstIfType,
+        adGenAOSXConnectFirstIfNumber,
+        adGenAOSXConnectFirstSubIfNumber,
+        adGenAOSXConnectFirstIfSlot,
+        adGenAOSXConnectFirstIfPort,
+        adGenAOSXConnectFirstTdmGroup,
+        adGenAOSXConnectFirstTdmGroupDS0,
+        adGenAOSXConnectSecondIfType,
+        adGenAOSXConnectSecondIfNumber,
+        adGenAOSXConnectSecondSubIfNumber,
+        adGenAOSXConnectSecondIfSlot,
+        adGenAOSXConnectSecondIfPort,
+        adGenAOSXConnectSecondTdmGroup,
+        adGenAOSXConnectSecondTdmGroupDS0,
+        adGenAOSXConnectPreserveRbs,
+        adGenAOSXConnectRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "The Cross-Connect Group."
+    ::= { adGenAOSMuxMibGroups 1 }
+
+adGenAOSTdmGroupGrp OBJECT-GROUP
+    OBJECTS
+    {
+        adGenAOSTdmGroupIfSlot,
+        adGenAOSTdmGroupIfPort,
+        adGenAOSTdmGroupID,
+        adGenAOSTdmGroupMask,
+        adGenAOSTdmGroupUsage
+    }
+    STATUS  current
+    DESCRIPTION
+        "The TDM Group Group."
+    ::= { adGenAOSMuxMibGroups 2 }
+END

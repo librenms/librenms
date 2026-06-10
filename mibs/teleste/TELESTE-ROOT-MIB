@@ -1,0 +1,206 @@
+	TELESTE-ROOT-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			enterprises			
+				FROM RFC1155-SMI			
+			DisplayString			
+				FROM RFC1213-MIB;
+	
+	
+		TDisplayString ::= OCTET STRING (SIZE (0..255))
+
+		TPhysAddress ::= OCTET STRING (SIZE (6))
+
+		Int8 ::= INTEGER (-128..127)
+
+		Int16 ::= INTEGER (-32768..32768)
+
+		Uint8 ::= INTEGER (0..255)
+
+		Uint16 ::= INTEGER (0..65536)
+
+		Uint32 ::= INTEGER (0..2147483647)
+
+                DateAndTime ::= DisplayString (SIZE (16..28))
+
+-- 'HMS style' value definition for status objects.
+		ValueStatus ::= INTEGER
+			{
+			valueNormal(1),
+			valueHIHI(2),
+			valueHi(3),
+			valueLo(4),
+			valueLOLO(5)
+			}
+
+	
+--
+-- Node definitions
+--
+	
+-- 
+-- TELESTE root object identifier
+-- 
+		-- 1.3.6.1.4.1.3715
+		teleste OBJECT IDENTIFIER ::= { enterprises 3715 }
+
+		
+-- 
+-- EMS server objects (SNMP Wizard)
+-- 
+		-- 1.3.6.1.4.1.3715.1
+		ems OBJECT IDENTIFIER ::= { teleste 1 }
+
+		
+-- 
+-- Objects common to all teleste products/agents.
+-- Deprecated 11.10.2001 and replaced with section Common.
+-- 
+		-- 1.3.6.1.4.1.3715.2
+		gendata OBJECT IDENTIFIER ::= { teleste 2 }
+
+		
+-- 
+-- BK product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.3
+		bk OBJECT IDENTIFIER ::= { teleste 3 }
+
+		
+-- 
+-- BXX product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.4
+		bxx OBJECT IDENTIFIER ::= { teleste 4 }
+
+		
+-- 
+-- DVO product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.5
+		dvo OBJECT IDENTIFIER ::= { teleste 5 }
+
+		
+-- 
+-- DVX product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.6
+		dvx OBJECT IDENTIFIER ::= { teleste 6 }
+
+		
+-- 
+-- INF product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.7
+		inf OBJECT IDENTIFIER ::= { teleste 7 }
+
+		
+-- 
+-- ATMux product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.8
+		atmux OBJECT IDENTIFIER ::= { teleste 8 }
+
+		
+-- 
+-- Edge Access System Interface products.
+-- 
+		-- 1.3.6.1.4.1.3715.9
+		easi OBJECT IDENTIFIER ::= { teleste 9 }
+
+		
+-- 
+-- EMT product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.10
+		emt OBJECT IDENTIFIER ::= { teleste 10 }
+
+		
+-- 
+-- ACx product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.11
+		acx OBJECT IDENTIFIER ::= { teleste 11 }
+
+		
+-- 
+-- EttH product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.12
+		etth OBJECT IDENTIFIER ::= { teleste 12 }
+
+		
+-- 
+-- HDO product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.14
+		hdo OBJECT IDENTIFIER ::= { teleste 14 }
+
+		
+-- 
+-- CFO product family specific objects
+-- 
+		-- 1.3.6.1.4.1.3715.15
+		cfo OBJECT IDENTIFIER ::= { teleste 15 }
+
+		
+-- FTTH product family specific objects
+		-- 1.3.6.1.4.1.3715.16
+		ftth OBJECT IDENTIFIER ::= { teleste 16 }
+
+		
+		-- 1.3.6.1.4.1.3715.17
+		luminato OBJECT IDENTIFIER ::= { teleste 17 }
+
+	
+-- 
+-- Objects common to all teleste products/agents.
+-- 
+		-- 1.3.6.1.4.1.3715.99
+		common OBJECT IDENTIFIER ::= { teleste 99 }
+
+		
+-- 
+-- Functional object groups
+-- 
+		-- 1.3.6.1.4.1.3715.100
+		functional OBJECT IDENTIFIER ::= { teleste 100 }
+
+		
+		-- 1.3.6.1.4.1.3715.100.1
+		hmsModem OBJECT IDENTIFIER ::= { functional 1 }
+
+		
+		-- 1.3.6.1.4.1.3715.100.2
+		spectrumAnalyser OBJECT IDENTIFIER ::= { functional 2 }
+
+		
+		-- 1.3.6.1.4.1.3715.100.3
+		pilotGenerator OBJECT IDENTIFIER ::= { functional 3 }
+
+		
+		-- 1.3.6.1.4.1.3715.100.4
+		ntpcontrol OBJECT IDENTIFIER ::= { functional 4 }
+
+		
+		-- 1.3.6.1.4.1.3715.100.10
+		hfcOptics OBJECT IDENTIFIER ::= { functional 10 }
+
+		
+		-- 1.3.6.1.4.1.3715.100.20
+		headEnd OBJECT IDENTIFIER ::= { functional 20 }
+
+		
+-- 
+-- Placeholder experimental and preliminary MIB modules.
+-- 
+		-- 1.3.6.1.4.1.3715.999
+		experimental OBJECT IDENTIFIER ::= { teleste 999 }
+
+		
+	
+	END
+
+--
+-- TELESTE-ROOT-MIB.mib
+--

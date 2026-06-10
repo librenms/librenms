@@ -1,0 +1,351 @@
+-- *****************************************************************
+-- FS-PROCESS-MIB.mib:  FS Process MIB file
+--
+-- October 2003, Wuzg
+--
+-- Copyright (c) 2003 by FS.COM Inc..
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+FS-PROCESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32
+                FROM SNMPv2-SMI
+        DisplayString,
+        MacAddress,
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        fsMgmt
+                FROM FS-SMI;
+
+fsProcessMIB MODULE-IDENTITY
+        LAST-UPDATED "200310140000Z"
+        ORGANIZATION "FS.COM Inc.."
+        CONTACT-INFO
+                " 
+                Tel: 400-865-2852 
+
+                E-mail: https://www.fs.com/live_chat_service_mail.html"
+        DESCRIPTION
+                "This module defines fs system mibs."
+        REVISION      "200310140000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { fsMgmt 36}
+
+-- Percentage for statistic, etc.
+--
+Percent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An integer that is in the range of a percent value."
+    SYNTAX INTEGER (0..100)
+    
+fsCPUMIBObjects OBJECT IDENTIFIER ::= { fsProcessMIB 1 }
+
+-- general mib
+fsCpuGeneralMibsGroup OBJECT IDENTIFIER ::= { fsCPUMIBObjects 1 }
+
+fsCPUUtilization5Sec OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization for 5 seconds."
+    ::= { fsCpuGeneralMibsGroup 1 }
+
+fsCPUUtilization1Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization for 1 minutes."
+    ::= { fsCpuGeneralMibsGroup 2 }
+
+fsCPUUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization for 5 minutes."
+    ::= { fsCpuGeneralMibsGroup 3 }
+
+fsCPUUtilizationWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of cpu using rate."
+    ::= { fsCpuGeneralMibsGroup 4 }
+    
+fsCPUUtilizationCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection switch of cpu using rate."
+    ::= { fsCpuGeneralMibsGroup 5 } 
+
+fsCPUMaxUtilization5Sec OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU max utilization for 5 seconds."
+    ::= { fsCpuGeneralMibsGroup 6 }
+
+fsCPUMaxUtilization1Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU max utilization for 1 minutes."
+    ::= { fsCpuGeneralMibsGroup 7 }
+
+fsCPUMaxUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU max utilization for 5 minutes."
+    ::= { fsCpuGeneralMibsGroup 8 }
+
+fsCPUUtilizationCollectSwitch OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection of cpu using rate."
+    ::= { fsCpuGeneralMibsGroup 9 } 
+    
+fsCPUUtilizationCurrent OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the collection of current cpu using rate."
+    ::= { fsCpuGeneralMibsGroup 10 } 
+
+---Node's CPU utilization table
+fsNodeCPUTotalTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSNodeCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of line cards's CPU utilization entries. Each of the
+     objects provides a general idea of how much of the CPU resource
+     of a line card has been used over a given period of time."
+  ::= { fsCPUMIBObjects 2 }
+
+fsNodeCPUTotalEntry OBJECT-TYPE
+  SYNTAX      FSNodeCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the node's CPU utilization table."
+  INDEX { fsNodeCPUTotalIndex }
+  ::= { fsNodeCPUTotalTable 1 }
+
+FSNodeCPUTotalEntry ::=
+  SEQUENCE {
+    fsNodeCPUTotalIndex  Integer32,
+    fsNodeCPUTotalName   DisplayString,
+    fsNodeCPUTotal5sec   Percent,
+    fsNodeCPUTotal1min   Percent,
+    fsNodeCPUTotal5min   Percent,
+    fsNodeCPUTotalWarning  Percent,
+    fsNodeCPUTotalCritical Percent
+  }
+    
+fsNodeCPUTotalIndex OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a Memory Pool."
+    ::= { fsNodeCPUTotalEntry 1 }
+   
+fsNodeCPUTotalName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The name of a node, for example, slot x is the x slot."
+    ::= { fsNodeCPUTotalEntry 2 } 
+   
+fsNodeCPUTotal5sec OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization of a node for 5 seconds."
+    ::= { fsNodeCPUTotalEntry 3 }
+
+fsNodeCPUTotal1min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization of a node for 1 minutes."
+    ::= { fsNodeCPUTotalEntry 4 }
+
+fsNodeCPUTotal5min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the CPU utilization of a node for 5 minutes."
+    ::= { fsNodeCPUTotalEntry 5 }
+
+fsNodeCPUTotalWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of the node's cpu using rate."
+    ::= { fsNodeCPUTotalEntry 6 }
+    
+fsNodeCPUTotalCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the second warning of the node's cpu using rate."
+    ::= { fsNodeCPUTotalEntry 7 }  
+
+--lank ap 2010-7 
+fsLankApCPUTotalTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF FSLankApCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of lank ap CPU utilization entries. Each of the
+     objects provides a lank ap CPU utilization information."
+  ::= { fsCPUMIBObjects 3 }
+
+fsLankApCPUTotalEntry OBJECT-TYPE
+  SYNTAX      FSLankApCPUTotalEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in lank ap CPU utilization table."
+  INDEX { fsLankApCPUMacAddr }
+  ::= { fsLankApCPUTotalTable 1 }
+
+FSLankApCPUTotalEntry ::=
+  SEQUENCE {
+    fsLankApCPUMacAddr                   MacAddress,
+    fsLankApCPUUtilizationCollectSwitch  Integer32,
+    fsLankApCPUUtilizationWarning        Percent,
+    fsLankApCPUUtilizationCritical       Percent,
+    fsLankApCPUUtilizationCurrent        Percent,
+    fsLankApCPUUtilization5Min           Percent 
+  }
+    
+fsLankApCPUMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents lank ap CPU."
+    ::= { fsLankApCPUTotalEntry 1 }
+
+fsLankApCPUUtilizationCollectSwitch OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection of lank ap cpu using rate."
+    ::= { fsLankApCPUTotalEntry 2 }  
+
+fsLankApCPUUtilizationWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of lank ap cpu using rate."
+    ::= { fsLankApCPUTotalEntry 3 }
+   
+fsLankApCPUUtilizationCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the realtime collection switch of lank ap cpu using rate."
+    ::= { fsLankApCPUTotalEntry 4 } 
+    
+fsLankApCPUUtilizationCurrent OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the collection of current lank ap cpu using rate."
+    ::= { fsLankApCPUTotalEntry 5 }  
+  
+fsLankApCPUUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the lank ap CPU utilization for 5 minutes."
+    ::= { fsLankApCPUTotalEntry 6 }
+
+           
+fsProcessMIBConformance OBJECT IDENTIFIER ::= { fsProcessMIB 2 }
+fsProcessMIBCompliances OBJECT IDENTIFIER ::= { fsProcessMIBConformance 1 }
+fsProcessMIBGroups      OBJECT IDENTIFIER ::= { fsProcessMIBConformance 2 }
+
+-- compliance statements
+
+fsProcessMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the FS Process MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { fsCPUUtilizationMIBGroup
+                 }
+        ::= { fsProcessMIBCompliances 1 }
+                
+-- units of conformance
+
+fsCPUUtilizationMIBGroup OBJECT-GROUP
+        OBJECTS {
+          fsCPUUtilization5Sec,
+          fsCPUUtilization1Min,
+          fsCPUUtilization5Min,
+          fsCPUMaxUtilization5Sec,
+          fsCPUMaxUtilization1Min,
+          fsCPUMaxUtilization5Min,
+          fsCPUUtilizationCollectSwitch,
+          fsCPUUtilizationCurrent
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing CPU utilization to a FS agent."
+        ::= { fsProcessMIBGroups 1 } 
+
+fsNodeCPUTotalGroups OBJECT-GROUP
+        OBJECTS {
+          fsNodeCPUTotalIndex,
+          fsNodeCPUTotalName,
+          fsNodeCPUTotal5sec,
+          fsNodeCPUTotal1min,
+          fsNodeCPUTotal5min,
+          fsNodeCPUTotalWarning,
+          fsNodeCPUTotalCritical
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing node's CPU utilization to a FS agent."
+        ::= { fsProcessMIBGroups 2 } 
+  
+END

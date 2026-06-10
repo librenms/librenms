@@ -1,0 +1,506 @@
+-- ============================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: 802.1 VLAN Mapping MIB Version 1
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 Initial version Created by XiaoRen Yang, 2013.3.8
+-- V1.1 Updated by zhuhaifeng 2018-12-12.
+--   Add hh3cVMAP1to2RangeNestedPrio to hh3cVMAP1to2RangeTable.
+--   Add hh3cVMAP1to2SingleNestedPrio to hh3cVMAP1to2SingleTable.
+--   Add hh3cVMAP2to1Table.
+-- ==================================================================
+HH3C-VMAP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    ifIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+-- ==================================================================
+--
+-- module identity part
+--
+-- ==================================================================
+hh3cVmap MODULE-IDENTITY
+    LAST-UPDATED
+        "201812120000Z"
+    ORGANIZATION
+       "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+       "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip: 100085"
+    DESCRIPTION
+        "802.1 VLAN Mapping MIB Version"
+    REVISION    "201812120000Z"
+    DESCRIPTION "Add hh3cVMAP1to2RangeNestedPrio to hh3cVMAP1to2RangeTable.
+                 Add hh3cVMAP1to2SingleNestedPrio to hh3cVMAP1to2SingleTable.
+                 Add hh3cVMAP2to1Table."
+    REVISION    "201303080000Z"
+    DESCRIPTION "The initial version of this MIB."
+    ::= { hh3cCommon 138 }
+
+-- ==================================================================
+--
+-- =====================object definition begin======================
+--
+-- ==================================================================
+
+hh3cVMAPNNITable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAPNNIEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN mapping NNI table."
+    ::= { hh3cVmap 1 }
+
+hh3cVMAPNNIEntry OBJECT-TYPE
+    SYNTAX      Hh3cVMAPNNIEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN mapping NNI table entries."
+    INDEX { ifIndex }
+    ::= { hh3cVMAPNNITable 1 }
+
+Hh3cVMAPNNIEntry ::=
+    SEQUENCE
+    {
+        hh3cVMAPNNIState    TruthValue
+    }
+
+hh3cVMAPNNIState    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set the network-side interface for a many-to-one VLAN mapping."
+    ::= { hh3cVMAPNNIEntry 1 }
+
+hh3cVMAP1to1Table  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAP1to1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One-to-one VLAN mapping table."
+    ::= { hh3cVmap 2 }
+
+hh3cVMAP1to1Entry OBJECT-TYPE
+    SYNTAX     Hh3cVMAP1to1Entry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "One-to-one VLAN mapping table entries."
+    INDEX { ifIndex, hh3cVMAP1to1Vlan }
+    ::= { hh3cVMAP1to1Table 1 }
+
+Hh3cVMAP1to1Entry ::=
+    SEQUENCE
+    {
+        hh3cVMAP1to1Vlan             Integer32,
+        hh3cVMAP1to1TranslatedVlan   Integer32,
+        hh3cVMAP1to1RowStatus        RowStatus
+    }
+
+hh3cVMAP1to1Vlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original VLAN for a one-to-one VLAN mapping on the port."
+    ::= { hh3cVMAP1to1Entry 1 }
+
+hh3cVMAP1to1TranslatedVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The translated VLAN for a one-to-one VLAN mapping on the port."
+    ::= { hh3cVMAP1to1Entry 2 }
+
+hh3cVMAP1to1RowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVMAP1to1Entry 3 }
+
+hh3cVMAPNto1RangeTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAPNto1RangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Many-to-one VLAN mapping table.  The original VLANs of each entry
+         should be a range of VLANs (for example, VLAN 20 to 30)."
+    ::= { hh3cVmap 3 }
+
+hh3cVMAPNto1RangeEntry OBJECT-TYPE
+    SYNTAX     Hh3cVMAPNto1RangeEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Many-to-one VLAN mapping table entries.  The original VLANs of each
+         entry should be a range of VLANs (for example, VLAN 20 to 30)."
+    INDEX { ifIndex, hh3cVMAPNto1StartVlan }
+    ::= { hh3cVMAPNto1RangeTable 1 }
+
+Hh3cVMAPNto1RangeEntry ::=
+    SEQUENCE
+    {
+        hh3cVMAPNto1StartVlan              Integer32,
+        hh3cVMAPNto1EndVlan                Integer32,
+        hh3cVMAPNto1RangeTranslatedVlan    Integer32,
+        hh3cVMAPNto1RangeRowStatus         RowStatus
+    }
+
+hh3cVMAPNto1StartVlan   OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original start VLAN for a many-to-one VLAN mapping on the port."
+    ::= { hh3cVMAPNto1RangeEntry 1 }
+
+hh3cVMAPNto1EndVlan   OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The original end VLAN for a many-to-one VLAN mapping on the port."
+    ::= { hh3cVMAPNto1RangeEntry 2 }
+
+hh3cVMAPNto1RangeTranslatedVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The translated VLAN for a many-to-one VLAN mapping on the port."
+    ::= { hh3cVMAPNto1RangeEntry 3 }
+
+hh3cVMAPNto1RangeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVMAPNto1RangeEntry 4 }
+
+hh3cVMAPNto1SingleTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAPNto1SingleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Many-to-one VLAN mapping table.  The original VLANs of each entry
+         should be a group of VLANs listed one by
+         one (for example, VLAN 30, 31, 32)."
+    ::= { hh3cVmap 4 }
+
+hh3cVMAPNto1SingleEntry OBJECT-TYPE
+    SYNTAX     Hh3cVMAPNto1SingleEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Many-to-one VLAN mapping table entries.  The original VLANs of each
+         entry should be a group of VLANs listed one by
+         one (for example, VLAN 30, 31, 32)."
+    INDEX { ifIndex, hh3cVMAPNto1Vlan }
+    ::= { hh3cVMAPNto1SingleTable 1 }
+
+Hh3cVMAPNto1SingleEntry ::=
+    SEQUENCE
+    {
+        hh3cVMAPNto1Vlan                    Integer32,
+        hh3cVMAPNto1SingleTranslatedVlan    Integer32,
+        hh3cVMAPNto1SingleRowStatus         RowStatus
+    }
+
+hh3cVMAPNto1Vlan   OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original VLANs for a many-to-one VLAN mapping on the port."
+    ::= { hh3cVMAPNto1SingleEntry 1 }
+
+hh3cVMAPNto1SingleTranslatedVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The translated VLAN for a many-to-one VLAN mapping on the port."
+    ::= { hh3cVMAPNto1SingleEntry 2 }
+
+hh3cVMAPNto1SingleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVMAPNto1SingleEntry 3 }
+
+hh3cVMAP1to2RangeTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAP1to2RangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One-to-two VLAN mapping table.  The original VLANs of each entry
+         should be a range of VLANs (for example, VLAN 20 to 30)."
+    ::= { hh3cVmap 5 }
+
+hh3cVMAP1to2RangeEntry OBJECT-TYPE
+    SYNTAX      Hh3cVMAP1to2RangeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One-to-two VLAN mapping table entries.  The original VLANs of
+         each entry should be a range of VLANs (for example, VLAN 20 to 30)."
+    INDEX { ifIndex, hh3cVMAP1to2StartVlan }
+    ::= { hh3cVMAP1to2RangeTable 1 }
+
+Hh3cVMAP1to2RangeEntry ::=
+    SEQUENCE
+    {
+        hh3cVMAP1to2StartVlan          Integer32,
+        hh3cVMAP1to2EndVlan            Integer32,
+        hh3cVMAP1to2RangeNestedVlan    Integer32,
+        hh3cVMAP1to2RangeRowStatus     RowStatus,
+        hh3cVMAP1to2RangeNestedPrio    Integer32
+    }
+
+hh3cVMAP1to2StartVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original start VLAN for a one-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP1to2RangeEntry 1 }
+
+hh3cVMAP1to2EndVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The original end VLAN for a one-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP1to2RangeEntry 2 }
+
+hh3cVMAP1to2RangeNestedVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The nested VLAN for a one-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP1to2RangeEntry 3 }
+
+hh3cVMAP1to2RangeRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVMAP1to2RangeEntry 4 }
+
+hh3cVMAP1to2RangeNestedPrio OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The nested VLAN tag's priority for a one-to-two VLAN mapping on the port."
+    DEFVAL { 65535 }
+    ::= { hh3cVMAP1to2RangeEntry 5 }
+
+hh3cVMAP1to2SingleTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAP1to2SingleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One-to-two VLAN mapping table.  The original VLANs of each entry should
+         be a group of VLANs listed one by one (for example, VLAN 30, 31, 32)."
+    ::= { hh3cVmap 6 }
+
+hh3cVMAP1to2SingleEntry OBJECT-TYPE
+    SYNTAX      Hh3cVMAP1to2SingleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "One-to-two VLAN mapping table entries.  The original VLANs of each
+         entry should be a group of VLANs listed one by
+         one (for example, VLAN 30, 31, 32)."
+    INDEX { ifIndex, hh3cVMAP1to2Vlan }
+    ::= { hh3cVMAP1to2SingleTable 1 }
+
+Hh3cVMAP1to2SingleEntry ::=
+    SEQUENCE
+    {
+        hh3cVMAP1to2Vlan                Integer32,
+        hh3cVMAP1to2SingleNestedVlan    Integer32,
+        hh3cVMAP1to2SingleRowStatus     RowStatus,
+        hh3cVMAP1to2SingleNestedPrio    Integer32
+    }
+
+hh3cVMAP1to2Vlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original VLANs for a one-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP1to2SingleEntry 1 }
+
+hh3cVMAP1to2SingleNestedVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The nested VLAN for a one-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP1to2SingleEntry 2 }
+
+hh3cVMAP1to2SingleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVMAP1to2SingleEntry 3 }
+
+hh3cVMAP1to2SingleNestedPrio OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The nested VLAN tag's priority for a one-to-two VLAN mapping on the port."
+    DEFVAL { 65535 }
+    ::= { hh3cVMAP1to2SingleEntry 4 }
+
+hh3cVMAP2to2Table    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAP2to2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two-to-two VLAN mapping table."
+    ::= { hh3cVmap 7 }
+
+hh3cVMAP2to2Entry OBJECT-TYPE
+    SYNTAX      Hh3cVMAP2to2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two-to-two VLAN mapping table entries."
+    INDEX { ifIndex, hh3cVMAP2to2OuterVlan, hh3cVMAP2to2InnerVlan }
+    ::= { hh3cVMAP2to2Table 1 }
+
+Hh3cVMAP2to2Entry ::=
+    SEQUENCE
+    {
+        hh3cVMAP2to2OuterVlan             Integer32,
+        hh3cVMAP2to2InnerVlan             Integer32,
+        hh3cVMAP2to2TranslatedOuterVlan   Integer32,
+        hh3cVMAP2to2TranslatedInnerVlan   Integer32,
+        hh3cVMAP2to2RowStatus             RowStatus
+    }
+
+hh3cVMAP2to2OuterVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original outer VLAN for a two-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP2to2Entry 1 }
+
+hh3cVMAP2to2InnerVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original inner VLAN for a two-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP2to2Entry 2 }
+
+hh3cVMAP2to2TranslatedOuterVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The translated outer VLAN for a two-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP2to2Entry 3 }
+
+hh3cVMAP2to2TranslatedInnerVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The translated inner VLAN for a two-to-two VLAN mapping on the port."
+    ::= { hh3cVMAP2to2Entry 4 }
+
+hh3cVMAP2to2RowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVMAP2to2Entry 5 }
+
+hh3cVMAP2to1Table    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cVMAP2to1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two-to-one VLAN mapping table."
+    ::= { hh3cVmap 8 }
+
+hh3cVMAP2to1Entry OBJECT-TYPE
+    SYNTAX      Hh3cVMAP2to1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Two-to-one VLAN mapping table entries."
+    INDEX { ifIndex, hh3cVMAP2to1OuterVlan, hh3cVMAP2to1InnerVlan }
+    ::= { hh3cVMAP2to1Table 1 }
+
+Hh3cVMAP2to1Entry ::=
+    SEQUENCE
+    {
+        hh3cVMAP2to1OuterVlan             Integer32,
+        hh3cVMAP2to1InnerVlan             Integer32,
+        hh3cVMAP2to1TranslatedOuterVlan   Integer32,
+        hh3cVMAP2to1RowStatus             RowStatus
+    }
+
+hh3cVMAP2to1OuterVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original outer VLAN for a two-to-one VLAN mapping on the port."
+    ::= { hh3cVMAP2to1Entry 1 }
+
+hh3cVMAP2to1InnerVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The original inner VLAN for a two-to-one VLAN mapping on the port."
+    ::= { hh3cVMAP2to1Entry 2 }
+
+hh3cVMAP2to1TranslatedOuterVlan    OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The translated outer VLAN for a two-to-one VLAN mapping on the port."
+    ::= { hh3cVMAP2to1Entry 3 }
+
+hh3cVMAP2to1RowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cVMAP2to1Entry 4 }
+
+END

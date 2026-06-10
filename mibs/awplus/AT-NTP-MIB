@@ -1,0 +1,525 @@
+--============================================================================
+-- at-ntp.mib, Allied Telesis enterprise MIB: Network Time Protocol
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+--===========================================================================
+
+    AT-NTP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC;
+
+
+        atNtp MODULE-IDENTITY
+            LAST-UPDATED "201009070000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects
+                for the Allied Telesis Network Time Protocol configuration. "
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200811110000Z"
+            DESCRIPTION
+                "Initial revision. "
+            ::= { modules 502 }
+
+
+
+
+--
+-- Node definitions
+--
+
+-- oid assignment and reserves
+--    1 accessGroup
+--    2 authenticate
+--    3 authentication-delay
+--    4 broadcastdelay
+--    5 master
+--    6 peer
+--    7 server
+--    8 trusted-key
+--    9 counter
+--   10 associations
+--   11 status
+
+        atNtpPeerIndexNext OBJECT-TYPE
+            SYNTAX INTEGER (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the next available value for
+                the object 'atNtpPeerIndex'.
+
+                For creation of a new entry in the 'atNtpPeerTable',
+                a management application should read this object,
+                get the value and use the same."
+            ::= { atNtp 6 }
+
+
+        atNtpPeerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtNtpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains information on the Network Time
+                Protocol (NTP) peers' configurations in the system."
+            ::= { atNtp 7 }
+
+
+        atNtpPeerEntry OBJECT-TYPE
+            SYNTAX AtNtpPeerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A conceptual entry in atNtpPeerTable."
+            INDEX { atNtpPeerIndex }
+            ::= { atNtpPeerTable 1 }
+
+
+        AtNtpPeerEntry ::=
+            SEQUENCE {
+                atNtpPeerIndex
+                    INTEGER,
+                atNtpPeerNameAddr
+                    DisplayString,
+                atNtpPeerMode
+                    INTEGER,
+                atNtpPeerPreference
+                    INTEGER,
+                atNtpPeerVersion
+                    INTEGER,
+                atNtpPeerKeyNumber
+                    Unsigned32,
+                atNtpPeerRowStatus
+                    RowStatus
+             }
+
+        atNtpPeerIndex OBJECT-TYPE
+            SYNTAX INTEGER (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object represents the index corresponding to
+                a particular NTP server or peer configuration in
+                the system.
+
+                For creation of a new entry, the value of this object
+                should be same as that of the value of
+                'atNtpPeerIndexNext' object. If this is not
+                the case, then the entry creation will fail."
+            ::= { atNtpPeerEntry 1 }
+
+
+        atNtpPeerNameAddr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents host name, or the IP address,
+                of the NTP peer.
+
+                This object is a current object for row creation.
+
+                When a new row is created, this object is set with
+                a default value '0.0.0.0', and the management
+                application should change it to a desired value by
+                a SET operation."
+            DEFVAL { "0.0.0.0" }
+            ::= { atNtpPeerEntry 2 }
+
+
+        atNtpPeerMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                server(1),
+                peer(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents the mode of the peer.
+                It's value is coded as follows:
+                server(1),
+                peer(2)"
+            DEFVAL { peer }
+            ::= { atNtpPeerEntry 3 }
+
+
+        atNtpPeerPreference OBJECT-TYPE
+            SYNTAX INTEGER (0..2)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object specifies whether this peer is the
+                preferred one over the others.
+
+                It's value is encoded as follows:
+                0 - unknown
+                1 - not preferred
+                2 - preferred
+
+                When the value of this object is 'not preferred',
+                NTP chooses the peer with which to synchronize the
+                time on the local system. If this object is set to
+                'preferred', NTP will choose the corresponding peer to
+                synchronize the time with.
+                "
+            DEFVAL { 0 }
+            ::= { atNtpPeerEntry 4 }
+
+
+        atNtpPeerVersion OBJECT-TYPE
+            SYNTAX INTEGER (0..4)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents the NTP version the peer
+                supports. It's value is encoded as follows:
+                0 - unknown
+                1 - version 1
+                2 - version 2
+                3 - version 3
+                4 - version 4
+                "
+            DEFVAL { 0 }
+            ::= { atNtpPeerEntry 5 }
+
+
+        atNtpPeerKeyNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object represents the authentication key number."
+            DEFVAL { 0 }
+            ::= { atNtpPeerEntry 6 }
+
+
+        atNtpPeerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this row.
+
+                The reading of this object should have a value of
+                'active(1)'.
+
+                For creation of new entry, a management application
+                should set this object with value 'createAndGo(4)',
+                and using the same value as that got from reading
+                object 'atNtpPeerIndexNext', as the index for
+                the new entry.
+
+                When an entry is created, the object 'atNtpPeerNameAddr'
+                in the entry is set with a default value '0.0.0.0'.
+                The management application should change it to
+                a desired value with a SET operation.
+
+                The management application may need to take
+                additional SET operations to set values for other
+                objects, to ensure they have desired values.
+
+                For deletion of entry, a management application
+                should set this object with value 'destroy(6)'.
+
+                Once an entry is deleted, other entries in the table
+                which have bigger index than the deleted one, will
+                be indexed again. Therefore a management
+                application can effectively delete multiple entries
+                by repeating the SET operation using the same index."
+            DEFVAL { 1 }
+            ::= { atNtpPeerEntry 7 }
+
+
+        atNtpAssociationTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtNtpAssociationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains NTP association information."
+            ::= { atNtp 10 }
+
+
+        atNtpAssociationEntry OBJECT-TYPE
+            SYNTAX AtNtpAssociationEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An conceptual entry in atNtpAssociationTable."
+            INDEX { atNtpAssociationIndex }
+            ::= { atNtpAssociationTable 1 }
+
+
+        AtNtpAssociationEntry ::=
+            SEQUENCE {
+                atNtpAssociationIndex
+                    Integer32,
+                atNtpAssociationPeerAddr
+                    DisplayString,
+                atNtpAssocaitionStatus
+                    DisplayString,
+                atNtpAssociationConfigured
+                    DisplayString,
+                atNtpAssociationRefClkAddr
+                    DisplayString,
+                atNtpAssociationStratum
+                    Integer32,
+                atNtpAssociationPoll
+                    Integer32,
+                atNtpAssociationReach
+                    Integer32,
+                atNtpAssociationDelay
+                    DisplayString,
+                atNtpAssociationOffset
+                    DisplayString,
+                atNtpAssociationDisp
+                    DisplayString
+             }
+
+        atNtpAssociationIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object represents the index corresponding to
+                a particular NTP association."
+            ::= { atNtpAssociationEntry 1 }
+
+
+        atNtpAssociationPeerAddr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the peer's IP address or host
+                name."
+            ::= { atNtpAssociationEntry 2 }
+
+
+        atNtpAssocaitionStatus OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the association's status.
+                It's value is defined as follows:
+                master(synced),
+                master(unsynced),
+                selected,
+                candidate,
+                configured,
+                unknown.
+                "
+            ::= { atNtpAssociationEntry 3 }
+
+
+        atNtpAssociationConfigured OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the association
+                is from configuration or not. It's value can be
+                either 'configured' or 'dynamic'.
+                "
+            ::= { atNtpAssociationEntry 4 }
+
+
+        atNtpAssociationRefClkAddr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address for the
+                reference clock."
+            ::= { atNtpAssociationEntry 5 }
+
+
+        atNtpAssociationStratum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the stratum of the peer clock."
+            ::= { atNtpAssociationEntry 6 }
+
+
+        atNtpAssociationPoll OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "seconds"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the time between NTP requests
+                from the device to the server."
+            ::= { atNtpAssociationEntry 7 }
+
+
+        atNtpAssociationReach OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reachability status of
+                the peer."
+            ::= { atNtpAssociationEntry 8 }
+
+
+        atNtpAssociationDelay OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the round trip delay between
+                the device and the server."
+            ::= { atNtpAssociationEntry 9 }
+
+
+        atNtpAssociationOffset OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the difference between
+                the device clock and the server clock."
+            ::= { atNtpAssociationEntry 10 }
+
+
+        atNtpAssociationDisp OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the lowest measure of
+                error associated with peer offset based on delay,
+                in seconds."
+            ::= { atNtpAssociationEntry 11 }
+
+
+        atNtpStatus OBJECT IDENTIFIER ::= { atNtp 11 }
+
+
+        atNtpSysClockSync OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the system clock
+                is synchronized."
+            ::= { atNtpStatus 1 }
+
+
+        atNtpSysStratum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the stratum of the local clock."
+            ::= { atNtpStatus 2 }
+
+
+        atNtpSysReference OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the current synchronization
+                source."
+            ::= { atNtpStatus 3 }
+
+
+        atNtpSysFrequency OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "Hz"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object represents the actual clock frequency.
+                source."
+            ::= { atNtpStatus 4 }
+
+
+        atNtpSysPrecision OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Signed integer indicating the precision of the system clock,
+                in seconds to the nearest power of two. The value is rounded
+                to the next larger power of two; for instance, a 50-Hz(20 ms)
+                or 60-Hz (16.67 ms) power-frequency clock would be assigned
+                the value -5 (31.25 ms), while a 1000-Hz (1 ms) crystal-controlled
+                clock would be assigned the value -9 (1.95 ms)."
+            ::= { atNtpStatus 5 }
+
+
+        atNtpSysRefTime OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the local time when the
+                local clock was last updated. If the local clock
+                has never been synchronized, the value is zero"
+            ::= { atNtpStatus 6 }
+
+
+        atNtpSysClkOffset OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "millisecond"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the offset of the local clock
+                relative to the server clock, in milliseconds."
+            ::= { atNtpStatus 7 }
+
+
+        atNtpSysRootDelay OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "millisecond"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicats the total round-trip delay
+                in milliseconds, to the primary reference source
+                at the root of the synchronization subnet."
+            ::= { atNtpStatus 8 }
+
+
+        atNtpSysRootDisp OBJECT-TYPE
+            SYNTAX Integer32
+            UNITS "millisecond"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the maximum error in
+                milliseconds, relative to the primary reference
+                source at the root of the synchronization
+                subnet."
+            ::= { atNtpStatus 9 }
+
+
+
+    END
+
+--
+-- at-ntp.mib
+--
+

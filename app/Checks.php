@@ -1,0 +1,88 @@
+<?php
+
+/**
+ * Checks.php
+ *
+ * Pre-flight checks at various stages of booting
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace App;
+
+use App\Facades\LibrenmsConfig;
+use App\Models\Device;
+use App\Models\Notification;
+use App\Models\User;
+use Cache;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use LibreNMS\Enum\Severity;
+use LibreNMS\Validations\Php;
+
+class Checks
+{
+    /**
+     * Post boot Toast messages
+     */
+    public static function postAuth()
+    {
+        // limit popup messages frequency
+        if (! Auth::check() || Cache::get('checks_popup_timeout')) {
+            return;
+        }
+
+        Cache::put('checks_popup_timeout', true, LibrenmsConfig::get('checks_popup_timer', 5) * 60);
+
+        /** @var User $user */
+        $user = Auth::user();
+
+        if (Gate::allows('notification.update')) { // FIXME correct permission check?
+            $notifications = Notification::isUnread($user)->where('severity', '>', Severity::Ok->value)->get();
+            foreach ($notifications as $notification) {
+                toast()->warning($notification->title, "<a href='notifications/'>$notification->body</a>");
+            }
+
+            if (version_compare(PHP_VERSION, Php::PHP_MIN_VERSION, '<')) {
+                $message = 'Web server PHP version does not meet the minimum requirements. PHP ' . Php::PHP_MIN_VERSION . ' is the minimum supported version as of ' . Php::PHP_MIN_VERSION_DATE . '. We recommend you update PHP to a supported version (' . Php::PHP_RECOMMENDED_VERSION . ' suggested) and check your cli PHP version matches by running ./validate.php on your server.';
+                toast()->warning('PHP unsupported', $message);
+            }
+
+            $warn_sec = LibrenmsConfig::get('rrd.step', 300) * 3;
+            if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
+                $warn_min = $warn_sec / 60;
+                toast()->warning('Devices unpolled', '<a href="poller/log?filter=unpolled">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>');
+            }
+
+            // Directory access checks
+            $rrd_dir = LibrenmsConfig::get('rrd_dir');
+            if (! is_dir($rrd_dir)) {
+                toast()->error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
+            }
+
+            $temp_dir = LibrenmsConfig::get('temp_dir');
+            if (! is_dir($temp_dir)) {
+                toast()->error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
+            } elseif (! is_writable($temp_dir)) {
+                toast()->error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
+            }
+        }
+    }
+}

@@ -1,0 +1,143 @@
+Axos-System-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32,
+    Counter64,
+    IpAddress,
+    mib-2
+                    FROM SNMPv2-SMI
+    RowStatus,
+    DisplayString,
+    MacAddress
+                    FROM SNMPv2-TC
+    InterfaceIndex,
+    ifIndex         FROM IF-MIB
+
+    axosModules
+        FROM CALIX-PRODUCT-MIB;
+		
+    axosSystemModule MODULE-IDENTITY
+        LAST-UPDATED "202010230000Z"
+        ORGANIZATION "Calix"
+        CONTACT-INFO
+            "       Calix Networks, Inc.
+
+	    Postal: 1035 North McDowell Boulevard
+	            Petaluma, CA  94954-1173
+		    USA
+
+	     Phone: +1 707 766 3000
+	       Fax: +1 707 766 3100
+
+	    E-mail: mib-info@calix.com"
+        DESCRIPTION
+            "Describes system table for Calix Axos
+             based products"
+        REVISION "202010230000Z"
+        DESCRIPTION
+            "Initial revision"
+    ::= { axosModules 5 }
+	
+-- System data
+
+axosSystemId OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Unique name of the system"
+   ::= {axosSystemModule 1}
+
+axosSystemLocation OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Location of the system"
+   ::= {axosSystemModule 2}
+
+axosSystemAutoUpgrade OBJECT-TYPE
+   SYNTAX      INTEGER {
+               		no(0),
+                   	yes(1)
+					}
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Auto upgrade out-of-rev cards on arrival"
+   ::= {axosSystemModule 3}
+
+axosSystemTelnetServer OBJECT-TYPE
+   SYNTAX      INTEGER {
+               		no(0),
+                   	yes(1)
+					}
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Enable CLI access via telnet (in addition to ssh)"
+   ::= {axosSystemModule 4}
+
+axosSystemUnsecuredWeb OBJECT-TYPE
+   SYNTAX      INTEGER {
+               		no(0),
+                   	yes(1)
+					}
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Enable unsecured web-access (non-ssh)"
+   ::= {axosSystemModule 5}
+
+axosSystemPasswordExpiry OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Craft user password expiry, in days"
+   ::= {axosSystemModule 6}
+
+axosSystemDnsPrimary OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "IP address of primary DNS server"
+   ::= {axosSystemModule 7}
+
+axosSystemDnsSecondary OBJECT-TYPE
+   SYNTAX      IpAddress
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "IP address of secondary DNS server"
+   ::= {axosSystemModule 8}
+
+axosSystemTimezone OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Timezone for system"
+   ::= {axosSystemModule 9}
+
+axosSystemChassisSerialNumber OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Chassis serial number"
+   ::= {axosSystemModule 10}
+
+axosSystemChassisMacAddress OBJECT-TYPE
+   SYNTAX      OCTET STRING
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "Chassis MAC address"
+   ::= {axosSystemModule 11}
+
+axosSystemTime OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "system time"
+   ::= {axosSystemModule 12}
+
+axosSystemDate OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION "system date"
+   ::= {axosSystemModule 13}
+
+END

@@ -1,0 +1,325 @@
+-- ============================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: FAILOVER GROUP MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- revision 1.0 2015-10-27 created by j03525
+--
+-- ============================================================================
+HH3C-FAILOVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus
+        FROM SNMPv2-TC;
+
+hh3cFailover MODULE-IDENTITY
+    LAST-UPDATED "201510271040Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB file is to provide the definition of failover group.
+
+        Such as:
+        1. Configure Failover Groups for a device and display Failover Groups
+           and their status.
+        2. Assign CPU to the Failover Group, and display their status.
+
+        Failover Group: A failover group contains a primary node and a secondary node.
+        When a failover group is referenced by a service module, the primary node
+        processes services and backs up service data to the secondary node.
+        The secondary node does not process services, but it takes over the services
+        when the primary node fails.
+        When the primary node is recovered, traffic is switched to the primary node again."
+    REVISION "201510271040Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 164 }
+
+
+-- Node definitions
+
+hh3cFailoverScalarObjects OBJECT IDENTIFIER ::= { hh3cFailover 1 }
+
+hh3cFailoverMaxNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of Failover groups which the system supported to create, does not include the AutoBackup."
+    ::= { hh3cFailoverScalarObjects 1 }
+
+
+hh3cFailoverCurrentNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current number of Failover groups which the system has created, does not include the AutoBackup."
+    ::= { hh3cFailoverScalarObjects 2 }
+
+
+hh3cFailoverTables OBJECT IDENTIFIER ::= { hh3cFailover 2 }
+
+hh3cFailoverCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFailoverCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is for configuration of backup group."
+    ::= { hh3cFailoverTables 1 }
+
+
+hh3cFailoverCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cFailoverCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cFailoverGroupCfgTable."
+    INDEX { hh3cFailoverIndex }
+    ::= { hh3cFailoverCfgTable 1 }
+
+
+Hh3cFailoverCfgEntry ::=
+    SEQUENCE
+    {
+        hh3cFailoverIndex
+            Unsigned32,
+        hh3cFailoverName
+            DisplayString,
+        hh3cFailoverPrimaryChassisID
+            Integer32,
+        hh3cFailoverPrimarySlotID
+            Integer32,
+        hh3cFailoverPrimaryCpuID
+            Integer32,
+        hh3cFailoverSecondaryChassisID
+            Integer32,
+        hh3cFailoverSecondarySlotID
+            Integer32,
+        hh3cFailoverSecondaryCpuID
+            Integer32,
+        hh3cFailoverState
+            INTEGER,
+        hh3cFailoverRowStatus
+            RowStatus
+    }
+
+hh3cFailoverIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Failover group ID is used as group index, the value range of failover group ID
+        depends on the device model.
+        The failover GroupIndex cannot be modified after creation."
+    ::= { hh3cFailoverCfgEntry 1 }
+
+
+hh3cFailoverName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..63))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies the backup group name, a case-sensitive string of 1 to 63 characters.
+        The failover group name cannot be modified after creation.
+        The name can not include '?', and can not begin or end with ' '."
+    ::= { hh3cFailoverCfgEntry 2 }
+
+
+hh3cFailoverPrimaryChassisID OBJECT-TYPE
+    SYNTAX Integer32 (-1..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies a card on an IRF member device.  The chassis-number argument represents
+        the member ID of the IRF member device.  (Distributed devices In IRF mode.)
+        On a centralized or distributed device, the value for this node is always zero.
+        Note:The -1 for delete the node."
+    ::= { hh3cFailoverCfgEntry 3 }
+
+
+hh3cFailoverPrimarySlotID OBJECT-TYPE
+    SYNTAX Integer32 (-1..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies a card by its slot number.  (Distributed devices In standalone mode.)
+        Note:The -1 for delete the node."
+    ::= { hh3cFailoverCfgEntry 4 }
+
+
+hh3cFailoverPrimaryCpuID OBJECT-TYPE
+    SYNTAX Integer32 (-1..7)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies a CPU by its number.  This option is available only if multiple CPUs
+        are available on the specified slot.
+        Note:The -1 for delete the node."
+    ::= { hh3cFailoverCfgEntry 5 }
+
+
+hh3cFailoverSecondaryChassisID OBJECT-TYPE
+    SYNTAX Integer32 (-1..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies a card on an IRF member device.  The chassis-number argument represents
+        the member ID of the IRF member device.  (Distributed devices In IRF mode.)
+        On a centralized or distributed device, the value for this node is always zero.
+        Note:The -1 for delete the node."
+    ::= { hh3cFailoverCfgEntry 6 }
+
+
+hh3cFailoverSecondarySlotID OBJECT-TYPE
+    SYNTAX Integer32 (-1..255)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies a card by its slot number.  (Distributed devices In standalone mode.)
+        Note:The -1 for delete the node."
+    ::= { hh3cFailoverCfgEntry 7 }
+
+
+hh3cFailoverSecondaryCpuID OBJECT-TYPE
+    SYNTAX Integer32 (-1..7)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies a CPU by its number.  This option is available only if multiple CPUs
+        are available on the specified slot.
+        Note:The -1 for delete the node."
+    ::= { hh3cFailoverCfgEntry 8 }
+
+
+hh3cFailoverState OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+            initial(1),
+            normal(2),
+            fault(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Backup group state:
+        Initial: No node in the failover group is processing services.
+        Normal: The primary node is processing services.
+        Fault: The secondary node is processing services."
+    ::= { hh3cFailoverCfgEntry 9 }
+
+
+hh3cFailoverRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry.
+        Only support active(1), createAndGo(4) and destroy(6)."
+    ::= { hh3cFailoverCfgEntry 10 }
+
+--
+-- Notification definitions
+--
+-- =================================================================
+-- Traps are defined below.
+hh3cFailoverNotification OBJECT IDENTIFIER ::= { hh3cFailover 3 }
+
+-- All objects used for TRAP only are defined here.
+hh3cFailoverTrap OBJECT IDENTIFIER ::= { hh3cFailoverNotification 0 }
+
+hh3cFailoverCreate  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFailoverIndex,
+            hh3cFailoverName
+        }
+
+    STATUS current
+    DESCRIPTION
+        "The hh3cFailoverCreate trap indicates that the failover group has created."
+    ::= { hh3cFailoverTrap 1 }
+
+hh3cFailoverDelete  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFailoverIndex,
+            hh3cFailoverName
+        }
+    STATUS current
+    DESCRIPTION
+        "The hh3cFailoverDelete trap indicates that the failover group has deleted."
+    ::= { hh3cFailoverTrap 2 }
+
+hh3cFailoverPrimaryNodeAdd  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFailoverIndex,
+            hh3cFailoverName,
+            hh3cFailoverPrimaryChassisID,
+            hh3cFailoverPrimarySlotID,
+            hh3cFailoverPrimaryCpuID
+        }
+    STATUS current
+    DESCRIPTION
+        "The hh3cFailoverPrimaryNodeAdd trap indicates that the failover group has
+        added the primary node."
+    ::= { hh3cFailoverTrap 3 }
+
+hh3cFailoverPrimaryNodeRemove  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFailoverIndex,
+            hh3cFailoverName,
+            hh3cFailoverPrimaryChassisID,
+            hh3cFailoverPrimarySlotID,
+            hh3cFailoverPrimaryCpuID
+        }
+    STATUS current
+    DESCRIPTION
+        "The hh3cFailoverPrimaryNodeRemove trap indicates that the failover group has
+        removed the primary node."
+    ::= { hh3cFailoverTrap 4 }
+
+hh3cFailoverSecondaryNodeAdd  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFailoverIndex,
+            hh3cFailoverName,
+            hh3cFailoverSecondaryChassisID,
+            hh3cFailoverSecondarySlotID,
+            hh3cFailoverSecondaryCpuID
+        }
+    STATUS current
+    DESCRIPTION
+        "The hh3cFailoverSecondaryNodeAdd trap indicates that the failover group has
+        added the secondary node."
+    ::= { hh3cFailoverTrap 5 }
+
+hh3cFailoverSecondaryNodeRemove  NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cFailoverIndex,
+            hh3cFailoverName,
+            hh3cFailoverSecondaryChassisID,
+            hh3cFailoverSecondarySlotID,
+            hh3cFailoverSecondaryCpuID
+        }
+    STATUS current
+    DESCRIPTION
+        "The hh3cFailoverSecondaryNodeRemove trap indicates that the failover group has
+        removed the secondary node."
+    ::= { hh3cFailoverTrap 6 }
+
+END

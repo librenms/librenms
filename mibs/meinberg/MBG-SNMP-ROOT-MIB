@@ -1,0 +1,46 @@
+
+MBG-SNMP-ROOT-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    MODULE-IDENTITY, enterprises
+                                                                FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+      FROM SNMPv2-TC;
+
+mbgSnmpRoot MODULE-IDENTITY
+    LAST-UPDATED "201201250745Z"
+    ORGANIZATION "Meinberg Radio Clocks GmbH & Co. KG"
+    CONTACT-INFO
+         "postal:   Meinberg Funkuhren
+                    Lange Wand 9
+                    31812 Bad Pyrmont
+                    Germany
+
+          email:    info@meinberg.de
+            web:    http://www.meinberg.de
+            tel:    +49 (0) 52 81 / 93 09 - 0
+            fax:    +49 (0) 52 81 / 93 09 - 30"
+    DESCRIPTION
+        " Meinberg SNMP Management Information Root Base "
+
+    REVISION	"201201250745Z"
+    DESCRIPTION
+        " Rev 1.01  25 January 2012 7:45 UTC Philipp Rahns
+          Changed MIB module name"
+
+    REVISION	"201110140630Z"
+    DESCRIPTION
+        " Rev 1.00  14 October 2011 6:30 UTC Philipp Rahns
+          Initial revision"
+
+    ::= { enterprises 5597}
+
+    MeinbergSwitch ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "indicating whether something is actived or not => like a switch"
+        SYNTAX INTEGER { off(0), on(1) }
+
+END
+

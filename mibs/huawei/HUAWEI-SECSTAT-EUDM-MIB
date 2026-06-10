@@ -1,0 +1,1224 @@
+--  =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI-SECSTAT-EUDM-MIB
+-- Reference:
+-- Version:     V1.20
+-- History:
+--  V1.20 2005-05-30 Wei Rixi(22510) added mplsVpnVrfName as table index,
+--              changed the region of ApplyZoneID(hwNatEudmZoneApplyZoneID1
+--              and hwNatEudmZoneApplyZoneID2) from 1~16 to 0~128.
+--              Added defval to some fields.
+--  V1.00 2003-03-18 Yang Yinzhu(28193)  initial version
+-- =================================================================
+
+HUAWEI-SECSTAT-EUDM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP            
+            FROM SNMPv2-CONF            
+        Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY            
+            FROM SNMPv2-SMI            
+        TruthValue            
+            FROM SNMPv2-TC
+        mplsVpnVrfName            
+            FROM MPLS-VPN-MIB
+        hwDatacomm
+            FROM HUAWEI-MIB;
+
+    hwSECSTATEudm MODULE-IDENTITY 
+        LAST-UPDATED "200304101100Z"        -- April 10, 2003 at 11:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            "
+            ADDR: HUAWEI TECHNOLOGY CO.,LTD,SHEZHEN CHINA
+            Tel: 86-755-26540808
+            "
+        DESCRIPTION 
+            "
+            V1.00
+            The HUAWEI-STCSTAT-EUDM-MIB contains objects to manage the security
+            statistics information for firewall product.
+            "
+        ::= { hwSECSTAT 2 }
+    
+    --
+    -- Node definitions
+    --
+    -- 1.3.6.1.4.1.2011.5.25.11
+    hwSECSTAT OBJECT IDENTIFIER ::= { hwDatacomm 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1
+    hwSecStatEudmCfgObjects OBJECT IDENTIFIER ::= { hwSECSTATEudm 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1
+    hwSecStatEudmSessCfgTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSecStatEudmSessCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The configuration informations for security zone."
+        ::= { hwSecStatEudmCfgObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1
+    hwSecStatEudmSessCfgEntry OBJECT-TYPE
+        SYNTAX HwSecStatEudmSessCfgEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The configuration informations for security zone."
+        INDEX { mplsVpnVrfName, hwSecStatEudmSessCfgZoneID }
+        ::= { hwSecStatEudmSessCfgTable 1 }
+    
+    HwSecStatEudmSessCfgEntry ::=
+        SEQUENCE { 
+            hwSecStatEudmSessCfgZoneID
+                Integer32,
+            hwSecStatEudmSessTcpInZoneNumMax
+                Integer32,
+            hwSecStatEudmSessTcpInZoneNumMin
+                Integer32,
+            hwSecStatEudmSessTcpInIPNumMax
+                Integer32,
+            hwSecStatEudmSessTcpInIPNumMin
+                Integer32,
+            hwSecStatEudmSessTcpOutZoneNumMax
+                Integer32,
+            hwSecStatEudmSessTcpOutZoneNumMin
+                Integer32,
+            hwSecStatEudmSessTcpOutIPNumMax
+                Integer32,
+            hwSecStatEudmSessTcpOutIPNumMin
+                Integer32,
+            hwSecStatEudmSessUdpInZoneNumMax
+                Integer32,
+            hwSecStatEudmSessUdpInZoneNumMin
+                Integer32,
+            hwSecStatEudmSessUdpInIPNumMax
+                Integer32,
+            hwSecStatEudmSessUdpInIPNumMin
+                Integer32,
+            hwSecStatEudmSessUdpOutZoneNumMax
+                Integer32,
+            hwSecStatEudmSessUdpOutZoneNumMin
+                Integer32,
+            hwSecStatEudmSessUdpOutIPNumMax
+                Integer32,
+            hwSecStatEudmSessUdpOutIPNumMin
+                Integer32,
+            hwSecStatEudmSessTcpInZoneSpeedMax
+                Integer32,
+            hwSecStatEudmSessTcpInZoneSpeedMin
+                Integer32,
+            hwSecStatEudmSessTcpInIPSpeedMax
+                Integer32,
+            hwSecStatEudmSessTcpInIPSpeedMin
+                Integer32,
+            hwSecStatEudmSessTcpOutZoneSpeedMax
+                Integer32,
+            hwSecStatEudmSessTcpOutZoneSpeedMin
+                Integer32,
+            hwSecStatEudmSessTcpOutIPSpeedMax
+                Integer32,
+            hwSecStatEudmSessTcpOutIPSpeedMin
+                Integer32,
+            hwSecStatEudmSessUdpInZoneSpeedMax
+                Integer32,
+            hwSecStatEudmSessUdpInZoneSpeedMin
+                Integer32,
+            hwSecStatEudmSessUdpInIPSpeedMax
+                Integer32,
+            hwSecStatEudmSessUdpInIPSpeedMin
+                Integer32,
+            hwSecStatEudmSessUdpOutZoneSpeedMax
+                Integer32,
+            hwSecStatEudmSessUdpOutZoneSpeedMin
+                Integer32,
+            hwSecStatEudmSessUdpOutIPSpeedMax
+                Integer32,
+            hwSecStatEudmSessUdpOutIPSpeedMin
+                Integer32,
+            hwSecStatEudmSessCfgSetDefault
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.1
+    hwSecStatEudmSessCfgZoneID OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of security zone."
+        ::= { hwSecStatEudmSessCfgEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.2
+    hwSecStatEudmSessTcpInZoneNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The upper limit of inbound TCP session for a zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.3
+    hwSecStatEudmSessTcpInZoneNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of inbound TCP session for a zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.4
+    hwSecStatEudmSessTcpInIPNumMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of inbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.5
+    hwSecStatEudmSessTcpInIPNumMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of inbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.6
+    hwSecStatEudmSessTcpOutZoneNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of outbound TCP session for a zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.7
+    hwSecStatEudmSessTcpOutZoneNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of outbound TCP session for a zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.8
+    hwSecStatEudmSessTcpOutIPNumMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of outbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.9
+    hwSecStatEudmSessTcpOutIPNumMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of outbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.10
+    hwSecStatEudmSessUdpInZoneNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of inbound UDP session for a zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.11
+    hwSecStatEudmSessUdpInZoneNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of inbound UDP session for a zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.12
+    hwSecStatEudmSessUdpInIPNumMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of inbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.13
+    hwSecStatEudmSessUdpInIPNumMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of inbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.14
+    hwSecStatEudmSessUdpOutZoneNumMax OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of outbound UDP session for one zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.15
+    hwSecStatEudmSessUdpOutZoneNumMin OBJECT-TYPE
+        SYNTAX Integer32 (1..500000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of outbound UDP session for one zone."
+        DEFVAL { 500000 }
+        ::= { hwSecStatEudmSessCfgEntry 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.16
+    hwSecStatEudmSessUdpOutIPNumMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of outbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.17
+    hwSecStatEudmSessUdpOutIPNumMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of outbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.18
+    hwSecStatEudmSessTcpInZoneSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of inbound TCP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.19
+    hwSecStatEudmSessTcpInZoneSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of inbound TCP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.20
+    hwSecStatEudmSessTcpInIPSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of inbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.21
+    hwSecStatEudmSessTcpInIPSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of inbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.22
+    hwSecStatEudmSessTcpOutZoneSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of outbound TCP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.23
+    hwSecStatEudmSessTcpOutZoneSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of outbound TCP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.24
+    hwSecStatEudmSessTcpOutIPSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of outbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.25
+    hwSecStatEudmSessTcpOutIPSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of outbound TCP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.26
+    hwSecStatEudmSessUdpInZoneSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of inbound UDP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 26 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.27
+    hwSecStatEudmSessUdpInZoneSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of inbound UDP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 27 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.28
+    hwSecStatEudmSessUdpInIPSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of inbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 28 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.29
+    hwSecStatEudmSessUdpInIPSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of inbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 29 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.30
+    hwSecStatEudmSessUdpOutZoneSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of outbound UDP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 30 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.31
+    hwSecStatEudmSessUdpOutZoneSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of outbound UDP session for one zone."
+        ::= { hwSecStatEudmSessCfgEntry 31 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.32
+    hwSecStatEudmSessUdpOutIPSpeedMax OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The upper limit of establishing speed of outbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 32 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.33
+    hwSecStatEudmSessUdpOutIPSpeedMin OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The lower limit of establishing speed of outbound UDP session for one host."
+        ::= { hwSecStatEudmSessCfgEntry 33 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.1.1.34
+    hwSecStatEudmSessCfgSetDefault OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This OID is used for setting the session configuration of the zone to default.
+            When you want to set the calue to default, set this OID to 1.
+            "
+        ::= { hwSecStatEudmSessCfgEntry 34 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2
+    hwSecStatEudmCfgEnableTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSecStatEudmCfgEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table for status to indicate whether the statistics is enabled in the zone."
+        ::= { hwSecStatEudmCfgObjects 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2.1
+    hwSecStatEudmCfgEnableEntry OBJECT-TYPE
+        SYNTAX HwSecStatEudmCfgEnableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The entry to indicate whether the statistics is enabled in this zone."
+        INDEX { mplsVpnVrfName,  hwSecStatEudmCfgEnableZoneID }
+        ::= { hwSecStatEudmCfgEnableTable 1 }
+    
+    HwSecStatEudmCfgEnableEntry ::=
+        SEQUENCE { 
+            hwSecStatEudmCfgEnableZoneID
+                Integer32,
+            hwSecStatEudmCfgEnbaleZoneIn
+                TruthValue,
+            hwSecStatEudmCfgEnbaleZoneOut
+                TruthValue,
+            hwSecStatEudmCfgEnbaleIpIn
+                TruthValue,
+            hwSecStatEudmCfgEnbaleIPOut
+                TruthValue,
+            hwSecStatEudmCfgEnableSetDefault
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2.1.1
+    hwSecStatEudmCfgEnableZoneID OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of security zone."
+        ::= { hwSecStatEudmCfgEnableEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2.1.2
+    hwSecStatEudmCfgEnbaleZoneIn OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status to indicate whether the inbound statistics is enabled for the zone."
+        DEFVAL { false }
+        ::= { hwSecStatEudmCfgEnableEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2.1.3
+    hwSecStatEudmCfgEnbaleZoneOut OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status to indicate whether the outbound statistics is enabled for the zone."
+        DEFVAL { false }
+        ::= { hwSecStatEudmCfgEnableEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2.1.4
+    hwSecStatEudmCfgEnbaleIpIn OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status to indicate whether the inbound statistics is enabled for the hosts in the zone."
+        ::= { hwSecStatEudmCfgEnableEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2.1.5
+    hwSecStatEudmCfgEnbaleIPOut OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The status to indicate whether the outbound statistics is enabled for the hosts in the zone."
+        ::= { hwSecStatEudmCfgEnableEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.1.2.1.6
+    hwSecStatEudmCfgEnableSetDefault OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This OID is used for setting the statistics enabling configuration of the zone to default.
+            When you want to set the calue to default, set this OID to 1.
+            "
+        ::= { hwSecStatEudmCfgEnableEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2
+    hwSecStatEudmMonitorObjects OBJECT IDENTIFIER ::= { hwSECSTATEudm 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1
+    hwSecStatZoneInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwSecStatZoneInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The statistics data table for zone."
+        ::= { hwSecStatEudmMonitorObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1
+    hwSecStatZoneInfoEntry OBJECT-TYPE
+        SYNTAX HwSecStatZoneInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The statistics data for a zone."
+        INDEX { mplsVpnVrfName, hwSecStatZoneInfoZoneID }
+        ::= { hwSecStatZoneInfoTable 1 }
+    
+    HwSecStatZoneInfoEntry ::=
+        SEQUENCE { 
+            hwSecStatZoneInfoZoneID
+                Integer32,
+            hwSecStatZoneInTcpSess
+                Counter64,
+            hwSecStatZoneInUdpSess
+                Counter64,
+            hwSecStatZoneInIcmpSess
+                Counter64,
+            hwSecStatZoneInConn
+                Counter64,
+            hwSecStatZoneInHalfConn
+                Counter64,
+            hwSecStatZoneInTcpSessSpeed
+                Counter64,
+            hwSecStatZoneInUdpSessSpeed
+                Counter64,
+            hwSecStatZoneInIcmpSessSpeed
+                Counter64,
+            hwSecStatZoneInConnSpeed
+                Counter64,
+            hwSecStatZoneInHalfConnSpeed
+                Counter64,
+            hwSecStatZoneInAclDenyIcmpPkts
+                Counter64,
+            hwSecStatZoneInAclDenyIcmpOcts
+                Counter64,
+            hwSecStatZoneInAclDenyNonIcmpPkts
+                Counter64,
+            hwSecStatZoneInAclDenyNonIcmpOcts
+                Counter64,
+            hwSecStatZoneInBlsDenyPkts
+                Counter64,
+            hwSecStatZoneInDftAclDenyPkts
+                Counter64,
+            hwSecStatZoneInDftAclDenyIcmpPkts
+                Counter64,
+            hwSecStatZoneInIcmpFloodDropPkts
+                Counter64,
+            hwSecStatZoneInUdpFloodDropPkts
+                Counter64,
+            hwSecStatZoneInFtpPkts
+                Counter64,
+            hwSecStatZoneInSmtpPkts
+                Counter64,
+            hwSecStatZoneInHttpPkts
+                Counter64,
+            hwSecStatZoneInH323Pkts
+                Counter64,
+            hwSecStatZoneInRtspPkts
+                Counter64,
+            hwSecStatZoneOutTcpSess
+                Counter64,
+            hwSecStatZoneOutUdpSess
+                Counter64,
+            hwSecStatZoneOutIcmpSess
+                Counter64,
+            hwSecStatZoneOutConn
+                Counter64,
+            hwSecStatZoneOutHalfConn
+                Counter64,
+            hwSecStatZoneOutTcpSessSpeed
+                Counter64,
+            hwSecStatZoneOutUdpSessSpeed
+                Counter64,
+            hwSecStatZoneOutIcmpSessSpeed
+                Counter64,
+            hwSecStatZoneOutConnSpeed
+                Counter64,
+            hwSecStatZoneOutHalfConnSpeed
+                Counter64,
+            hwSecStatZoneOutAclDenyIcmpPkts
+                Counter64,
+            hwSecStatZoneOutAclDenyIcmpOcts
+                Counter64,
+            hwSecStatZoneOutAclDenyNonIcmpPkts
+                Counter64,
+            hwSecStatZoneOutAclDenyNonIcmpOcts
+                Counter64,
+            hwSecStatZoneOutBlsDenyPkts
+                Counter64,
+            hwSecStatZoneOutDftAclDenyPkts
+                Counter64,
+            hwSecStatZoneOutDftAclDenyIcmpPkts
+                Counter64,
+            hwSecStatZoneOutFtpPkts
+                Counter64,
+            hwSecStatZoneOutSmtpPkts
+                Counter64,
+            hwSecStatZoneOutHttpPkts
+                Counter64,
+            hwSecStatZoneOutH323Pkts
+                Counter64,
+            hwSecStatZoneOutRtspPkts
+                Counter64,
+            hwSecStatClearZoneInfo
+                Integer32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.1
+    hwSecStatZoneInfoZoneID OBJECT-TYPE
+        SYNTAX Integer32 (0..128)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of security zone."
+        ::= { hwSecStatZoneInfoEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.2
+    hwSecStatZoneInTcpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of TCP session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.3
+    hwSecStatZoneInUdpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of UDP session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.4
+    hwSecStatZoneInIcmpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of ICMP session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.5
+    hwSecStatZoneInConn OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.6
+    hwSecStatZoneInHalfConn OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of incomplete session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 6 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.7
+    hwSecStatZoneInTcpSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of TCP session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 7 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.8
+    hwSecStatZoneInUdpSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of UDP session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 8 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.9
+    hwSecStatZoneInIcmpSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of ICMP session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 9 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.10
+    hwSecStatZoneInConnSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 10 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.11
+    hwSecStatZoneInHalfConnSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of incomplete session to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 11 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.12
+    hwSecStatZoneInAclDenyIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped icmp packets by acl to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 12 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.13
+    hwSecStatZoneInAclDenyIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of droped icmp packets by acl to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 13 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.14
+    hwSecStatZoneInAclDenyNonIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped non icmp packets by acl to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 14 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.15
+    hwSecStatZoneInAclDenyNonIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of droped non icmp packets by acl to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 15 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.16
+    hwSecStatZoneInBlsDenyPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped packets by blacklist to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.17
+    hwSecStatZoneInDftAclDenyPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped packets by default acl to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 17 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.18
+    hwSecStatZoneInDftAclDenyIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped ICMP packets by default acl to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 18 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.19
+    hwSecStatZoneInIcmpFloodDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped packets to the hosts in this zone for ICMP flood attack."
+        ::= { hwSecStatZoneInfoEntry 19 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.20
+    hwSecStatZoneInUdpFloodDropPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped UDP packets to the hosts in this zone for UDP flood attack."
+        ::= { hwSecStatZoneInfoEntry 20 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.21
+    hwSecStatZoneInFtpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of FTP packets to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 21 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.22
+    hwSecStatZoneInSmtpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of SMTP packets to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 22 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.23
+    hwSecStatZoneInHttpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of HTTP packets to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 23 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.24
+    hwSecStatZoneInH323Pkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of H323 packets to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 24 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.25
+    hwSecStatZoneInRtspPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of RTSP packets to the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 25 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.26
+    hwSecStatZoneOutTcpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of TCP session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 26 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.27
+    hwSecStatZoneOutUdpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of UDP session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 27 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.28
+    hwSecStatZoneOutIcmpSess OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of ICMP session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 28 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.29
+    hwSecStatZoneOutConn OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 29 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.30
+    hwSecStatZoneOutHalfConn OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of incomplete session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 30 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.31
+    hwSecStatZoneOutTcpSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of TCP session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 31 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.32
+    hwSecStatZoneOutUdpSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of UDP session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 32 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.33
+    hwSecStatZoneOutIcmpSessSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of ICMP session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 33 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.34
+    hwSecStatZoneOutConnSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 34 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.35
+    hwSecStatZoneOutHalfConnSpeed OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current establishing speed of incomplete session from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 35 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.36
+    hwSecStatZoneOutAclDenyIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped icmp packets by acl from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 36 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.37
+    hwSecStatZoneOutAclDenyIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of droped icmp packets by acl from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 37 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.38
+    hwSecStatZoneOutAclDenyNonIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped non icmp packets by acl from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 38 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.39
+    hwSecStatZoneOutAclDenyNonIcmpOcts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total bytes of droped non icmp packets by acl from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 39 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.40
+    hwSecStatZoneOutBlsDenyPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped packets by blacklist from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 40 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.41
+    hwSecStatZoneOutDftAclDenyPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped packets by default acl from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 41 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.42
+    hwSecStatZoneOutDftAclDenyIcmpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of droped icmp packets by default acl from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 42 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.43
+    hwSecStatZoneOutFtpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of FTP packets from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 43 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.44
+    hwSecStatZoneOutSmtpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of SMTP packets from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 44 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.45
+    hwSecStatZoneOutHttpPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of HTTP packets from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 45 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.46
+    hwSecStatZoneOutH323Pkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of H323 packets from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 46 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.47
+    hwSecStatZoneOutRtspPkts OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of RTSP packets from the hosts in this zone."
+        ::= { hwSecStatZoneInfoEntry 47 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.2.1.1.48
+    hwSecStatClearZoneInfo OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "
+            This OID is used for clearing the statistics information of the zone.
+            When you want to clear the information, set this OID to 1.
+            "
+        ::= { hwSecStatZoneInfoEntry 48 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.3
+    hwSECSTATEudmConformance OBJECT IDENTIFIER ::= { hwSECSTATEudm 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.3.1
+    hwSECSTATEudmCompliance OBJECT IDENTIFIER ::= { hwSECSTATEudmConformance 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.3.2
+    hwSECSTATEudmMibGroups OBJECT IDENTIFIER ::= { hwSECSTATEudmConformance 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.3.2.2
+    hwSECSTATEudmZoneCfgGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSecStatEudmSessTcpInZoneNumMax, 
+            hwSecStatEudmSessTcpInZoneNumMin, 
+            hwSecStatEudmSessTcpInIPNumMax, 
+            hwSecStatEudmSessTcpInIPNumMin, 
+            hwSecStatEudmSessTcpOutZoneNumMax, 
+            hwSecStatEudmSessTcpOutZoneNumMin, 
+            hwSecStatEudmSessTcpOutIPNumMax, 
+            hwSecStatEudmSessTcpOutIPNumMin, 
+            hwSecStatEudmSessUdpInZoneNumMax, 
+            hwSecStatEudmSessUdpInZoneNumMin, 
+            hwSecStatEudmSessUdpInIPNumMax, 
+            hwSecStatEudmSessUdpInIPNumMin, 
+            hwSecStatEudmSessUdpOutZoneNumMax, 
+            hwSecStatEudmSessUdpOutZoneNumMin, 
+            hwSecStatEudmSessUdpOutIPNumMax, 
+            hwSecStatEudmSessUdpOutIPNumMin, 
+            hwSecStatEudmSessTcpInZoneSpeedMax, 
+            hwSecStatEudmSessTcpInZoneSpeedMin, 
+            hwSecStatEudmSessTcpInIPSpeedMax, 
+            hwSecStatEudmSessTcpInIPSpeedMin, 
+            hwSecStatEudmSessTcpOutZoneSpeedMax, 
+            hwSecStatEudmSessTcpOutZoneSpeedMin, 
+            hwSecStatEudmSessTcpOutIPSpeedMax, 
+            hwSecStatEudmSessTcpOutIPSpeedMin, 
+            hwSecStatEudmSessUdpInZoneSpeedMax, 
+            hwSecStatEudmSessUdpInZoneSpeedMin, 
+            hwSecStatEudmSessUdpInIPSpeedMax, 
+            hwSecStatEudmSessUdpInIPSpeedMin, 
+            hwSecStatEudmSessUdpOutZoneSpeedMax, 
+            hwSecStatEudmSessUdpOutZoneSpeedMin, 
+            hwSecStatEudmSessUdpOutIPSpeedMax, 
+            hwSecStatEudmSessUdpOutIPSpeedMin, 
+            hwSecStatEudmCfgEnbaleZoneIn, 
+            hwSecStatEudmCfgEnbaleZoneOut, 
+            hwSecStatEudmCfgEnbaleIpIn, 
+            hwSecStatEudmCfgEnbaleIPOut, 
+            hwSecStatEudmSessCfgSetDefault, 
+            hwSecStatEudmCfgEnableSetDefault }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwSECSTATEudmMibGroups 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.25.11.2.3.2.4
+    hwSECSTATEudmZoneMonitorGroup OBJECT-GROUP
+        OBJECTS { 
+            hwSecStatZoneInTcpSess, 
+            hwSecStatZoneInUdpSess, 
+            hwSecStatZoneInIcmpSess, 
+            hwSecStatZoneInConn, 
+            hwSecStatZoneInHalfConn, 
+            hwSecStatZoneInTcpSessSpeed, 
+            hwSecStatZoneInUdpSessSpeed, 
+            hwSecStatZoneInIcmpSessSpeed, 
+            hwSecStatZoneInConnSpeed, 
+            hwSecStatZoneInHalfConnSpeed, 
+            hwSecStatZoneInAclDenyIcmpPkts, 
+            hwSecStatZoneInAclDenyIcmpOcts, 
+            hwSecStatZoneInAclDenyNonIcmpPkts, 
+            hwSecStatZoneInAclDenyNonIcmpOcts, 
+            hwSecStatZoneInIcmpFloodDropPkts, 
+            hwSecStatZoneInUdpFloodDropPkts, 
+            hwSecStatZoneInFtpPkts, 
+            hwSecStatZoneInSmtpPkts, 
+            hwSecStatZoneInHttpPkts, 
+            hwSecStatZoneInH323Pkts, 
+            hwSecStatZoneInRtspPkts, 
+            hwSecStatZoneOutTcpSess, 
+            hwSecStatZoneOutUdpSess, 
+            hwSecStatZoneOutIcmpSess, 
+            hwSecStatZoneOutConn, 
+            hwSecStatZoneOutHalfConn, 
+            hwSecStatZoneOutTcpSessSpeed, 
+            hwSecStatZoneOutUdpSessSpeed, 
+            hwSecStatZoneOutIcmpSessSpeed, 
+            hwSecStatZoneOutConnSpeed, 
+            hwSecStatZoneOutHalfConnSpeed, 
+            hwSecStatZoneOutAclDenyIcmpPkts, 
+            hwSecStatZoneOutAclDenyIcmpOcts, 
+            hwSecStatZoneOutAclDenyNonIcmpPkts, 
+            hwSecStatZoneOutAclDenyNonIcmpOcts, 
+            hwSecStatZoneOutDftAclDenyIcmpPkts, 
+            hwSecStatZoneOutFtpPkts, 
+            hwSecStatZoneOutSmtpPkts, 
+            hwSecStatZoneOutHttpPkts, 
+            hwSecStatZoneOutH323Pkts, 
+            hwSecStatZoneOutRtspPkts, 
+            hwSecStatZoneInDftAclDenyIcmpPkts, 
+            hwSecStatZoneInBlsDenyPkts, 
+            hwSecStatZoneInDftAclDenyPkts, 
+            hwSecStatClearZoneInfo, 
+            hwSecStatZoneOutDftAclDenyPkts, 
+            hwSecStatZoneOutBlsDenyPkts }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwSECSTATEudmMibGroups 4 }
+
+END

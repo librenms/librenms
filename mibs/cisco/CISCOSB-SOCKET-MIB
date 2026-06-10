@@ -1,0 +1,119 @@
+CISCOSB-SOCKET-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private SOCKET MIB
+-- Version:              7.46
+-- Date:                 15-Jan-2007
+
+IMPORTS
+    switch001                                                    FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, TimeTicks                 FROM SNMPv2-SMI;
+
+rlSocket MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+				ORGANIZATION "Cisco Small Business"
+
+				CONTACT-INFO
+				"Postal: 170 West Tasman Drive
+				San Jose , CA 95134-1706
+				USA
+
+				Website: Cisco Small Business Home http://www.cisco.com/smb>;,
+				Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines socket private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 85 }
+
+rlSocketMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB's version, the current version is 1."
+    ::= { rlSocket 1 }
+
+rlSocketTable OBJECT-TYPE
+    SYNTAX
+    SEQUENCE OF RlSocketEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The (conceptual) table listing the sockets which are currently
+        open in the system."
+    ::= { rlSocket 2 }
+
+rlSocketEntry OBJECT-TYPE
+    SYNTAX      RlSocketEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the SocketTable."
+    INDEX      { rlSocketId }
+    ::= { rlSocketTable 1 }
+
+RlSocketEntry ::= SEQUENCE {
+    rlSocketId                      INTEGER,
+    rlSocketType                    INTEGER,
+    rlSocketState                   INTEGER,
+    rlSocketBlockMode               INTEGER,
+    rlSocketUpTime                  TimeTicks
+}
+
+rlSocketId OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The value of the id of the socket. "
+    ::= { rlSocketEntry 1 }
+
+rlSocketType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        stream(1),
+        dgram(2),
+        raw(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies the type of the socket. "
+    ::= { rlSocketEntry 2 }
+
+rlSocketState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        connected(1),
+        notConnected(2),
+        recvClosed(3),
+        sendClosed(4),
+        closed(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies the state in which the socket is in. "
+    ::= { rlSocketEntry 3 }
+
+rlSocketBlockMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+        blocking(1),
+        nonBlocking(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Specifies the blocking mode of the socket. "
+    ::= { rlSocketEntry 4 }
+
+rlSocketUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The time elapsed since this socket was created."
+    ::= { rlSocketEntry 5 }
+
+END

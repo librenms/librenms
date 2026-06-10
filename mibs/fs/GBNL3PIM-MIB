@@ -1,0 +1,336 @@
+-----------------------------------------------------------------------------
+--  File         : gbnL3Pim-Mib.mi2
+--  Description  : ADMIN  Enterprise MIB 
+--  Version      : 1.00
+--  Date         : July 04, 2005     
+--
+--  Copyright (c) 2002-2005 admin Systems, Inc.  All Rights Reserved.
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    GBNL3PIM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, Unsigned32                    FROM SNMPv2-SMI
+        
+        DisplayString, TruthValue,MacAddress,RowStatus    FROM SNMPv2-TC   
+        InterfaceIndex                          FROM IF-MIB
+                     
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB
+        
+	pimBsrCandidateRPAddressType, pimBsrCandidateRPAddress, pimBsrCandidateRPGroupAddress, pimBsrCandidateRPGroupPrefixLength FROM PIM-BSR-MIB;        
+    
+        
+    gbnL3PimMib MODULE-IDENTITY
+        LAST-UPDATED    "0507040001Z"  -- July 04,2005  
+        ORGANIZATION    "ADMIN Systems, Inc."
+        CONTACT-INFO    "ADMIN Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "ADMIN Enterprise MIB definition."
+
+        REVISION        "0507040001Z"  -- July 04,2005
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 8 }
+
+
+   gbnL3PimGroup               OBJECT IDENTIFIER ::= { gbnL3PimMib 1 }   
+    
+   
+    pimCommonTraceOption OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "PIM common trace option, including hello packet debug 
+            switch and event debug switch andtimer debug switch"
+           --PIM-DM和PIM-SM通用调试打印选项开关
+      ::= { gbnL3PimGroup 1 }     
+      
+    pimDmTraceOption OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "PIM dense mode trace option"
+           --PIM-DM调试打印选项开关
+      ::= { gbnL3PimGroup 2 }       
+      
+   pimSmTraceOption OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "PIM sparse mode trace option"
+           --PIM-SM调试打印选项开关
+      ::= { gbnL3PimGroup 3 }           
+           
+    pimSourcePolicy OBJECT-TYPE
+       SYNTAX   Integer32(0..99)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Access control list(ACL) used for PIM multicast source"
+      ::= { gbnL3PimGroup 4 }
+      
+    pimStaticRpAddr OBJECT-TYPE
+       SYNTAX   IpAddress
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "static RP for local router"
+           --静态的RP地址，如果找不到映射的RP，则使用默认RP
+      ::= { gbnL3PimGroup 5 }
+
+    pimSptThreshold OBJECT-TYPE
+       SYNTAX   Unsigned32 { immediately(0), infinity(4294967295)}
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "threshold for join into spt"
+           --切换加入到spt的阀值。默认为infinity，表示用不切换到spt
+      ::= { gbnL3PimGroup 6 }  
+                      
+    pimStaticEntryCount OBJECT-TYPE
+       SYNTAX   Unsigned32
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "The number of static entries in the ipMRouteTable.  This can be used
+            to monitor the multicast routing table size."
+           --静态组播转发表项数
+      ::= { gbnL3PimGroup 7 }
+    
+--  PIM interface extra information
+
+    pimInterfaceExtraTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF PimInterfaceExtraEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "extra information of PIM interface"
+       ::= { gbnL3PimMib 2 }
+
+    pimInterfaceExtraEntry OBJECT-TYPE
+        SYNTAX   PimInterfaceExtraEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Extra information describing the configured  parame-
+           ters  of interface."
+       INDEX { pimInterfaceIndex }
+       ::= { pimInterfaceExtraTable 1 }
+
+    PimInterfaceExtraEntry ::=
+	    SEQUENCE {
+	        pimInterfaceIndex           InterfaceIndex,
+	        pimInterfaceNeighborLimit   Integer32,
+	        pimInterfaceNeighborPolicy  Integer32,
+	        pimInterfaceBsrBorder       TruthValue,
+	        pimInterfaceNeighborCount   Integer32	            
+	              }
+
+    pimInterfaceIndex OBJECT-TYPE
+        SYNTAX   InterfaceIndex
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "PIM interface index"   
+           --PIM接口索引
+       ::= { pimInterfaceExtraEntry 1 }
+
+    pimInterfaceNeighborLimit OBJECT-TYPE
+        SYNTAX   Integer32(1..128)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The max number of neighbors on this interface"    
+           --一个接口上最多可以学习到的邻居数
+       ::= { pimInterfaceExtraEntry 2 }
+
+    pimInterfaceNeighborPolicy OBJECT-TYPE
+        SYNTAX   Integer32(1..99)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The neighbor filter, only neighbors which match the policy 
+            can be thought valid."  
+            --邻居访问控制列表号，标准访问控制列表1~99
+       ::= { pimInterfaceExtraEntry 3 }
+       
+    pimInterfaceBsrBorder OBJECT-TYPE
+        SYNTAX   TruthValue
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "Whether the interface is the bsr border."  
+            --该接口是否bsr border
+       DEFVAL { false }
+       ::= { pimInterfaceExtraEntry 4 }
+       
+    pimInterfaceNeighborCount OBJECT-TYPE
+        SYNTAX   Integer32(1..128)
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+           "The current number of neighbors on this interface"    
+           --当前接口上已学习到的邻居数
+       ::= { pimInterfaceExtraEntry 5 }       
+       
+-- The BSR Candidate-RP extra Table
+
+   pimBsrCRPExtraTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF PimBsrCRPExtraEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "extra information of Candidate-RP Table."
+       ::= { gbnL3PimMib 3 }
+
+   pimBsrCRPExtraEntry OBJECT-TYPE
+       SYNTAX     PimBsrCRPExtraEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "An entry (conceptual row) in the
+                pimBsrCRPExtraTable."
+       INDEX      { pimBsrCandidateRPAddressType,
+                    pimBsrCandidateRPAddress,
+                    pimBsrCandidateRPGroupAddress,
+                    pimBsrCandidateRPGroupPrefixLength }
+       ::= { pimBsrCRPExtraTable 1 }
+
+   PimBsrCRPExtraEntry ::= SEQUENCE {
+       pimBsrCRPAddressType       INTEGER,
+       pimBsrCRPAddress           OCTET STRING,
+       pimBsrCRPGroupAddress      OCTET STRING,
+       pimBsrCRPGroupPrefixLength Unsigned32,
+       pimBsrCRPGroupACL          Integer32
+   }
+
+   pimBsrCRPAddressType OBJECT-TYPE
+       SYNTAX     INTEGER
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The Inet address type of the Candidate-RP."
+               --C-RP的地址类型，IPv4或者IPv6
+       ::= { pimBsrCRPExtraEntry 1 }
+
+   pimBsrCRPAddress OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255)) --(SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The (unicast) address that will be advertised as a
+               Candidate-RP.  The InetAddressType is given by the
+               pimBsrCandidateRPAddressType object."
+               --C-RP的地址，此地址为单播地址
+       ::= { pimBsrCRPExtraEntry 2 }
+
+   pimBsrCRPGroupAddress OBJECT-TYPE
+       SYNTAX     OCTET STRING (SIZE (0..255)) --(SIZE (4|8|16|20))
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The IP multicast group address that, when combined with
+               the corresponding value of
+               pimBsrCandidateRPGroupPrefixLength, identifies a group
+               prefix for which the local router will advertise itself
+               as a Candidate-RP. The InetAddressType is given by the
+               pimBsrCandidateRPAddressType object."
+               --对应本条目的C-RP所管理的组地址
+       ::= { pimBsrCRPExtraEntry 3 }
+
+   pimBsrCRPGroupPrefixLength OBJECT-TYPE
+       SYNTAX     Unsigned32 (4..128)
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The multicast group address mask that, when combined
+               with the corresponding value of
+               pimBsrCandidateRPGroupAddress, identifies a group prefix
+               for which the local router will advertise itself as a
+               Candidate-RP.  The InetAddressType is given by the
+               pimBsrCandidateRPAddressType object."
+               --多播组前缀长度
+       ::= { pimBsrCRPExtraEntry 4 } 
+       
+   pimBsrCRPGroupACL OBJECT-TYPE
+       SYNTAX     Integer32(1..99)
+       MAX-ACCESS read-write
+       STATUS     current
+       DESCRIPTION
+               "ACL of Group"
+               --多播组访问控制列表，标准访问控制列表1~99
+       ::= { pimBsrCRPExtraEntry 5 }      
+       
+--  PIM-SSM information
+    pimSSMGrpRangeTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF PimSSMGrpRangeEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           " Group Range information of PIM-SSM "
+       ::= { gbnL3PimMib 4 }
+
+    pimSSMGrpRangeEntry OBJECT-TYPE
+        SYNTAX   PimSSMGrpRangeEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           " An entry (conceptual row) in the pimSSMGrpRangeTable. "
+       INDEX { pimSSMGrpRangeGrp, pimSSMGrpRangeGrpPrefixLen, pimSSMGrpRangeACL }
+       ::= { pimSSMGrpRangeTable 1 }
+
+    PimSSMGrpRangeEntry ::= SEQUENCE {
+	        	pimSSMGrpRangeGrp        	Integer32,
+	        	pimSSMGrpRangeGrpPrefixLen   	Integer32, 
+			pimSSMGrpRangeACL             	Integer32,
+			pimSSMGrpRangeStatus            RowStatus
+	              }
+
+    pimSSMGrpRangeGrp OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Group Address of the SSM Group Range Entry"   
+           --PIM-SSM组地址范围表项的组IP地址
+	::= { pimSSMGrpRangeEntry 1 }
+
+    pimSSMGrpRangeGrpPrefixLen OBJECT-TYPE
+        SYNTAX   Integer32
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+           "Group Address Prefix Length of the SSM Group Range Entry"   
+           --PIM-SSM组地址范围表项的组IP地址前缀长度
+	::= { pimSSMGrpRangeEntry 2 }
+
+    pimSSMGrpRangeACL OBJECT-TYPE
+        SYNTAX     Integer32(1..100)
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+               "ACL of SSM"
+		--PIM-SSM的组地址范围的访问控制列表号。标准访问控制列表1~99，
+		--100表示使用标准的SSM组地址范围232.0.0.0/8
+	::= { pimSSMGrpRangeEntry 3}
+
+    pimSSMGrpRangeStatus  OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+			"The status of this entry."
+			--表项状态
+	::= { pimSSMGrpRangeEntry 4 }
+  
+
+END
+

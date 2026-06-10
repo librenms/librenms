@@ -1,0 +1,525 @@
+ICOTERA-I6800-SERIES DEFINITIONS ::= BEGIN
+--
+-- Copyright (c) 2015-2016 Icotera A/S --
+--
+
+IMPORTS
+  MODULE-IDENTITY,
+  OBJECT-TYPE,
+  OBJECT-IDENTITY,
+  enterprises 
+	FROM SNMPv2-SMI
+  MacAddress 
+	FROM SNMPv2-TC
+  DisplayString
+        FROM RFC1213-MIB
+  ifIndex,
+  InterfaceIndex
+    	FROM IF-MIB;
+
+--
+-- IcoteraEnterprise SMI --
+--
+
+icotera MODULE-IDENTITY
+    LAST-UPDATED "201603111307Z"
+    ORGANIZATION "Icotera A/S"
+    CONTACT-INFO
+    "Icotera A/S
+     Customer Support
+
+     Mail : Kongevejen 400D
+            2840 Holte
+            Danmark
+
+     Tel  : +45 7010 0033
+
+     E-mail: support@icotera.com
+     Web   : http://icotera.com"
+
+    DESCRIPTION
+    "The Icotera management information base SMI definitions"
+
+    REVISION "201603111307Z"
+    DESCRIPTION
+        "Additional parameters were added to CATV module. OMI and RFlevelOutput.
+	 Parameters are supported by special CATV solution. No data will be provided if CPE is not compatible."
+
+    REVISION "201508261240Z"
+    DESCRIPTION
+        "Rebuilding file, adding missing objects. "
+
+    REVISION "201508260815Z"
+    DESCRIPTION
+        "Small correction in the file done. Improved MacAddress presentation."
+
+    REVISION "201508211012Z"
+    DESCRIPTION
+        "Additional parameters were added to check VOIP service."
+
+    REVISION "201508101433Z"
+    DESCRIPTION
+        "DHCPd leases are now supported and presented, 
+	ictDuplex MIB added "
+
+    REVISION "201506221449Z"
+    DESCRIPTION
+        "Additional parameters were added to CATV module."
+
+    REVISION "201503121227Z"
+    DESCRIPTION
+        "Created from ICOTERA-MIB.mib"
+    
+    ::= { enterprises 29865 }  -- assigned by IANA --
+
+--
+-- All SNMP options supported by i6800-series CPE --
+--
+
+ictIGW4k OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+		"Device related SNMP options"
+		::= { icotera 12 }
+
+ictMgmt		OBJECT IDENTIFIER ::= { ictIGW4k 2 }
+ictServices	OBJECT IDENTIFIER ::= { ictIGW4k 3 }
+ictDuplex	OBJECT IDENTIFIER ::= { ictIGW4k 4 }
+ictReset 	OBJECT IDENTIFIER ::= { ictIGW4k 5 }
+ictDhcp         OBJECT IDENTIFIER ::= { ictIGW4k 6 }
+
+--
+-- CATV detailed status --
+--
+-- CATV definition, VOIP status --
+--
+
+ictCatv OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB module for managing Icotera services"
+       ::= { ictServices 1 }
+
+ictCatvMib OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB module for managing Icotera services"
+       ::= { ictCatv 1 }
+
+--
+-- CATV subtree options --
+--
+
+catvModuleAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+      disabled(0),
+      enabled(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The administrative status of the module, this can be enabled(1) or
+    disabled(0)."
+    DEFVAL { 0 }
+      ::= { ictCatvMib 1 }
+
+catvModuleFilter OBJECT-TYPE
+    SYNTAX INTEGER {
+      none(0),
+      pkg1(1),
+      pkg2(2),
+      pkg3(3),
+      pkg4(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Package filter selected for catv module"
+      ::= { ictCatvMib 2 }
+
+catvModuleRflevel OBJECT-TYPE
+    SYNTAX INTEGER {
+      auto(0),
+      low(1),
+      medium(2),
+      high(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "RF signal amplification on CATV output"
+      ::= { ictCatvMib 3 }
+
+catvModuleLowSignal OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Low signal level of catv led"
+      ::= { ictCatvMib 4 }
+
+catvModuleSignalDetected OBJECT-TYPE
+    SYNTAX INTEGER {
+      no(0),
+      yes(1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Tells whether CATV signal is detected: yes(1) - detected, no(0) - not detected." 
+      ::= { ictCatvMib 5 }
+
+catvModulePowerLevel OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Current CATV power level. It can have one of the following values:
+     - any integer between -1299 and 199 when the power level is higher than -13.00 and lower than 2.00,
+       which is the power level in dBm multiplied by 100.
+     - a value of -2147483648 when the power level is lower than -13 dBm
+     - a value of 2147483647 when the power level is higher than 2 dBm." 
+      ::= { ictCatvMib 6 }
+
+catvModuleRfOutputLevel OBJECT-TYPE
+SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Parameter is supported by special CATV solution. No data will be provided if CPE is not compatible.
+     Calculated RF output value which should be expected.
+     - Expected value is presented in dBuV multiplied by 100.
+     - if value of 0 is received, either CATV fiber is not connected or CATV is turned off." 
+      ::= { ictCatvMib 7 }
+
+catvModuleOmi OBJECT-TYPE
+SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Parameter is supported by special CATV solution. No data will be provided if CPE is not compatible.
+     Currently OMI value set at CPE." 
+      ::= { ictCatvMib 8 }
+
+--
+-- VoIP section
+--
+
+ictVoip OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB module for checking VoIP service"
+       ::= { ictServices 2 }
+
+ictVoipMib OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB module for checking VoIP service status"
+       ::= { ictVoip 1 }
+
+voipFXSport1 OBJECT-TYPE
+    SYNTAX OCTET STRING  (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The administrative status of the FXS port 1"
+      ::= { ictVoipMib 1 }
+
+voipFXSport2 OBJECT-TYPE
+    SYNTAX OCTET STRING  (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The administrative status of the FXS port 2"
+      ::= { ictVoipMib 2 }
+
+-- END of SERVICEs part --
+
+--
+-- RESET detailed status --
+--
+-- Factory reset definition
+--
+
+ictFacRst OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+      "The MIB parent for CPE reset"
+       ::= { ictReset 1 }
+
+ictFacRstMib OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+      "The MIB which makes Factory Reset of CPE"
+       ::= { ictFacRst 1 }
+
+--
+-- FactoryReset subtree options --
+-- 
+
+performFactoryReset OBJECT-TYPE
+  SYNTAX INTEGER {
+    noActionRequested(0),
+    makeFactoryreset(1),
+    someErrorOccured(3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Status of FactoryReset feature."
+  DEFVAL { 0 }
+    ::= { ictFacRstMib 1 }
+
+-- END of RESET part --
+
+--
+-- Management functions --
+--
+-- Management definition --
+--
+
+ictMgmtMib OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB which allows managing the CPE"
+       ::= { ictMgmt 1 }
+
+ictFwUpg OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB of firmware upgrade"
+       ::= { ictMgmtMib 1 }
+
+ictCfgUpdate OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB of configuration update"
+       ::= { ictMgmtMib 2 }
+
+ictReboot OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "The MIB responsible for CPE reboot"
+       ::= { ictMgmtMib 3 }
+
+--
+-- Management subtree options --
+--
+
+upgUrl OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Path to file with firmware."
+    ::= { ictFwUpg 1 }
+
+upgExecute OBJECT-TYPE
+  SYNTAX INTEGER {
+    notUpgrading(0),
+    startUpgrade(1),
+    validatingUpgrade-CheckErrorCodeIfFailed(2),
+    someErrorOccured(3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB responsible for trigerring firmware upgrade."
+    ::= { ictFwUpg 2 }
+
+upgStatus OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "MIB show upgrade status."
+    ::= { ictFwUpg 3 }
+
+cfgTftpPath OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "Path to cofiguration file stored at TFTP server."
+    ::= { ictCfgUpdate 1 }
+
+cfgExecute OBJECT-TYPE
+  SYNTAX INTEGER {
+    notUpdating(0),
+    startUpdate(1),
+    someErrorOccured(3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB responsible for trigerring config upload at CPE."
+    ::= { ictCfgUpdate 2 }
+
+cfgStatus OBJECT-TYPE
+  SYNTAX OCTET STRING  (SIZE(0..255))
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION
+    "MIB show configuration upgrade status."
+    ::= { ictCfgUpdate 3 }
+
+performCpeReboot OBJECT-TYPE
+  SYNTAX INTEGER {
+    noActionRequested(0),
+    makeReboot(1),
+    someErrorOccured(3)
+  }
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "MIB responsible for trigerring CPE reboot."
+  DEFVAL { 0 }
+    ::= { ictReboot 2 }
+
+-- END of MANAGEMENT part -- 
+--
+
+--
+-- ROUTER DHCP leases section --
+--   DHCP Leases --
+--    ictDHCPd leases --
+--
+
+    ictDHCPsrv OBJECT-TYPE
+        SYNTAX    SEQUENCE OF IctDHCPsrvLeases
+        MAX-ACCESS    not-accessible
+        STATUS    current
+        DESCRIPTION
+            "Table of DHCPd leases." 
+        ::= { ictDhcp 1 }
+
+
+	-- Table Entry --
+	ictDHCPsrvLeases OBJECT-TYPE
+		SYNTAX    IctDHCPsrvLeases
+		MAX-ACCESS    not-accessible
+		STATUS    current
+		DESCRIPTION
+			"An entry in the table, 
+			containing information
+			about lease."
+		INDEX    { ictDHCPsrvIndex }
+		::= { ictDHCPsrv 1 }
+
+	IctDHCPsrvLeases ::= SEQUENCE {
+		ictDHCPsrvIndex INTEGER,
+		ictHostName DisplayString,
+		ictMacAddress MacAddress,
+		ictExpire INTEGER,
+		ictIPaddress DisplayString
+		}
+
+	ictDHCPsrvIndex OBJECT-TYPE
+		SYNTAX    INTEGER(1..96)
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+			"A unique value for LEASE index."
+		::= { ictDHCPsrvLeases 1 }
+
+	ictMacAddress OBJECT-TYPE
+		SYNTAX    MacAddress
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+			"MAC address of Lease."
+		::= { ictDHCPsrvLeases 2 }
+
+	ictExpire OBJECT-TYPE
+		SYNTAX    INTEGER 
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+			"Lease time until Expire"
+		::= { ictDHCPsrvLeases 3 }
+
+	ictIPaddress OBJECT-TYPE
+		SYNTAX    DisplayString
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+			"IP address learned from host."
+		::= { ictDHCPsrvLeases 4 }
+
+	ictHostName OBJECT-TYPE
+		SYNTAX   DisplayString
+		MAX-ACCESS    read-only
+		STATUS    current
+		DESCRIPTION
+			"Hostname."
+		::= { ictDHCPsrvLeases 5 }
+
+-- END of DHCP Leases in ROUTER --
+--
+
+--
+-- Duplex MIB section --
+--
+
+ictDuplexMib OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION
+    "Initial release."
+       ::= { ictDuplex 15 }
+
+duplexConfig       OBJECT IDENTIFIER ::= { ictDuplexMib 1 }
+
+ifDuplexTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF IfDuplexEntry
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+  "A table containing interface duplex status."
+    ::= { duplexConfig 1 }
+
+ifDuplexEntry OBJECT-TYPE
+  SYNTAX      IfDuplexEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+              "Status for a specific interface using ethernet-like medium."
+  INDEX       { ifIndex }
+    ::= { ifDuplexTable 1 }
+
+IfDuplexEntry ::= SEQUENCE {
+    ifDuplexIndex     InterfaceIndex,
+    ifDuplexStatus    INTEGER
+  }
+
+ifDuplexIndex OBJECT-TYPE
+  SYNTAX      InterfaceIndex
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+              "An index value that uniquely identifies an
+              interface to an ethernet-like medium.  The
+              interface identified by a particular value of
+              this index is the same interface as identified
+              by the same value of ifIndex."
+  REFERENCE   "RFC 2863, ifIndex"
+    ::= { ifDuplexEntry 1 }
+
+ifDuplexStatus OBJECT-TYPE
+  SYNTAX      INTEGER {
+                unknown(1),
+                halfDuplex(2),
+                fullDuplex(3)
+	      }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+              "The current duplex mode of operation of the interface. 'unknown'
+               indicates that the current duplex mode could not be determined."
+    ::= { ifDuplexEntry 2 }
+
+-- END of Duplex MIB section --
+--
+
+
+END
+

@@ -1,0 +1,14 @@
+support-request:
+  comment: >
+    :wave: @{issue-author} sorry but this is not the place to ask for help.
+
+    For help please use our [Discord server](https://discord.gg/librenms) or the [community site](https://community.librenms.org/c/help): https://docs.librenms.org/Support
+    
+  close: true
+
+'Needs Tests :unicorn:':
+  prs:
+    comment: >
+      Please add test data so we can ensure your change is not broken in the future.
+
+      Read the docs to find out how: https://docs.librenms.org/Developing/os/Test-Units

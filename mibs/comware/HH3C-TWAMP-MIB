@@ -1,0 +1,1258 @@
+-- =================================================================
+-- Copyright (c) 2019-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The MIB is designed to configure the Two-Way Active Measurement Protocol.
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2019-06-22, Lv zhanbaobin, Initial Version
+-- V1.1 2019-12-04 Modified by zhangzheng
+--      Add interval10s in hh3cTwamplightSendAdminTxPeriod.
+-- V1.2 2020-09-10 Modified by zhanbaobin
+--      Complement the MIB of TWAMP-light according to the NETCONF.
+--      Contains Hh3cTwamplightClientEntry,hh3cTwamplightReactionTable.
+-- =================================================================
+HH3C-TWAMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Gauge32, Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime, DisplayString, RowStatus, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+
+hh3cTwamp MODULE-IDENTITY
+    LAST-UPDATED "202009100000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "The private MIB file includes the test information of the
+        device.  It is to configure the Two-Way Active Measurement Protocol."
+    REVISION "202009100000Z"
+    DESCRIPTION
+        "Complement the MIB of TWAMP-light according to the NETCONF.  Contains
+         Hh3cTwamplightClientEntry,hh3cTwamplightReactionTable."
+    REVISION "201912040000Z"
+    DESCRIPTION
+        "Add interval10s in hh3cTwamplightSendAdminTxPeriod."
+    ::= { hh3cCommon 184 }
+
+
+hh3cTwampNotifications OBJECT IDENTIFIER ::= { hh3cTwamp 1 }
+hh3cTwamplightObjects OBJECT IDENTIFIER ::= { hh3cTwamp 2 }
+
+hh3cTwamplightController            OBJECT IDENTIFIER ::= { hh3cTwamplightObjects 1 }
+hh3cTwamplightReponsder             OBJECT IDENTIFIER ::= { hh3cTwamplightObjects 2 }
+
+
+
+
+hh3cTwamplightClientEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control TWAMP-light control-client function.
+            true: Enable TWAMP-light control-client function.
+            false: Delete the TWAMP-light client and all its sessions and statistics."
+    DEFVAL      { false }
+    ::= {hh3cTwamplightController 1 }
+
+
+hh3cTwamplightSenderEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control TWAMP-light control-sender function.
+            true: Enable TWAMP-light control-sender function.
+            false: Stop all TWAMP-light test sessions."
+    DEFVAL      { false }
+    ::= {hh3cTwamplightController 2 }
+
+
+hh3cTwamplightClientTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines TWAMP-light control-client test session parameter configuration."
+    ::= { hh3cTwamplightController 3 }
+
+hh3cTwamplightClientEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightClientEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightClientTable."
+    INDEX {
+              hh3cTwamplightControllerID
+          }
+    ::= { hh3cTwamplightClientTable 1 }
+
+Hh3cTwamplightClientEntry ::=
+    SEQUENCE {
+        hh3cTwamplightControllerID           Integer32,
+        hh3cTwamplightClientSrcAddrType      InetAddressType,
+        hh3cTwamplightClientSrcAddr          InetAddress,
+        hh3cTwamplightClientTrgtAddrType     InetAddressType,
+        hh3cTwamplightClientTrgtAddr         InetAddress,
+        hh3cTwamplightClientSrcPort          Integer32,
+        hh3cTwamplightClientTrgtPort         Integer32,
+        hh3cTwamplightClientVPN              DisplayString,
+        hh3cTwamplightClientDscp             Integer32,
+        hh3cTwamplightClientDataSize         Integer32,
+        hh3cTwamplightClientDescription      DisplayString,
+        hh3cTwamplightClientRowStatus        RowStatus,
+        hh3cTwamplightClientSrcIfName        DisplayString,
+        hh3cTwamplightClientServiceID        Unsigned32,
+        hh3cTwamplightClientDesMac           MacAddress,
+        hh3cTwamplightClientSrcMac           MacAddress,
+        hh3cTwamplightClientTimeFormat       INTEGER,
+        hh3cTwamplightClientDataFill         DisplayString,
+        hh3cTwamplightClientDataFillType     INTEGER,
+        hh3cTwamplightClientSVlanID          Unsigned32,
+        hh3cTwamplightClientCVlanID          Unsigned32,
+        hh3cTwamplightClientVlanPriority     Unsigned32,
+        hh3cTwamplightClientBindIfName       DisplayString
+    }
+
+hh3cTwamplightControllerID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The session ID of the TWAMP-light test."
+    ::= { hh3cTwamplightClientEntry 1 }
+
+hh3cTwamplightClientSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of the source address,
+        hh3cTwamplightClientSrcAddr, to be used at a remote host
+        when performing the TWAMP-light test."
+    ::= { hh3cTwamplightClientEntry 2 }
+
+hh3cTwamplightClientSrcAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Use the specified IP address (which must be given
+        in numeric form, not as a hostname) as the source
+        address in outgoing probe packets.  On hosts with
+        more than one IP address, this option can be used
+        to force the source address to be something other
+        than the primary IP address of the interface the
+        probe packet is sent on.  A zero length octet string
+        value for this object disables source address
+        specification.
+
+        The address type (InetAddressType) that relates to
+        this object is specified by the corresponding value
+        of hh3cTwamplightClientSrcAddrType."
+    DEFVAL { ''H }
+    ::= { hh3cTwamplightClientEntry 3 }
+
+hh3cTwamplightClientTrgtAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of host address to be used at a remote
+        host for performing a TWAMP-light test."
+    ::= { hh3cTwamplightClientEntry 4 }
+
+hh3cTwamplightClientTrgtAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the host address to be used at a remote host for
+        performing a TWAMP-light test.  The host address type is
+        determined by the object value of corresponding
+        hh3cTwamplightClientTrgtAddrType."
+    DEFVAL { ''H }
+    ::= { hh3cTwamplightClientEntry 5 }
+
+hh3cTwamplightClientSrcPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source port be used by a TWAMP-light test."
+    DEFVAL      { 0 }
+    ::= { hh3cTwamplightClientEntry 6 }
+
+hh3cTwamplightClientTrgtPort          OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination port that be used by a TWAMP-light test."
+    DEFVAL      { 0 }
+    ::= { hh3cTwamplightClientEntry 7 }
+
+hh3cTwamplightClientVPN OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VPN name by which system finds route in the specified VPN
+        to send TWAMP probe packets."
+    DEFVAL      { "" }
+    ::= { hh3cTwamplightClientEntry 8 }
+
+hh3cTwamplightClientDscp OBJECT-TYPE
+    SYNTAX      Integer32 (0..63)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the value to store in the Differentiated
+        Services Code Point (DSCP) in the IP packet used to
+        encapsulate the TWAMP probe.  The DSCP field is defined
+        as the Type of Service (TOS) octet in a IPv4 header
+        or as the Traffic Class octet in a IPv6 header.
+
+        The value of this object must be a decimal integer
+        in the range from 0 to 63.  This option can be used
+        to determine what effect an explicit DSCP field setting
+        has on a TWAMP response."
+    DEFVAL { 0 }
+    ::= { hh3cTwamplightClientEntry 9 }
+
+hh3cTwamplightClientDataSize OBJECT-TYPE
+    SYNTAX      Integer32 (44..1518)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the size of the data portion to be
+        transmitted in a TWAMP operation in octets."
+    DEFVAL { 142 }
+    ::= { hh3cTwamplightClientEntry 10 }
+
+hh3cTwamplightClientDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..200))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A comment describing this session."
+    DEFVAL      { "" }
+    ::= { hh3cTwamplightClientEntry 11 }
+
+hh3cTwamplightClientRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the hh3cTwamplightClientTable.  Deletion of an entry
+        in this table results in deletion of all corresponding (same
+        hh3cTwamplightControllerID index values)
+        hh3cTwamplightSenderAdminTable and all related representations
+        entries."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { hh3cTwamplightClientEntry 12 }
+
+hh3cTwamplightClientSrcIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..47))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source interface for the probe packets."
+    DEFVAL      { "" }
+    ::= { hh3cTwamplightClientEntry 13 }
+
+hh3cTwamplightClientServiceID OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4096)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An Ethernet service instance by its ID for test."
+    ::= { hh3cTwamplightClientEntry 14 }
+
+hh3cTwamplightClientDesMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address for the TWAMP-light test."
+    ::= { hh3cTwamplightClientEntry 15 }
+
+hh3cTwamplightClientSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address for the TWAMP-light test."
+    ::= { hh3cTwamplightClientEntry 16 }
+
+hh3cTwamplightClientTimeFormat OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            ntp (1),
+                            ptp (2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The timestamp format for probe packets in
+        the TWAMP-light test."
+    ::= { hh3cTwamplightClientEntry 17 }
+
+hh3cTwamplightClientDataFill OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..200))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The payload fill string for each probe packet in the TWAMP-light
+         test.  If the hh3cTwamplightClientDataFillType is string,
+         the string length is 1 to 200.  When hh3cTwamplightClientDataFillType
+         is hex, the datafill should contain any even number of characters in
+         the range of 2 to 200."
+    ::= { hh3cTwamplightClientEntry 18 }
+
+hh3cTwamplightClientDataFillType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            string (1),
+                            hex (2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the type of hh3cTwamplightClientDataFill."
+    ::= { hh3cTwamplightClientEntry 19 }
+
+hh3cTwamplightClientSVlanID OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the ID of the VLAN to which the
+         probe packets belong."
+    ::= { hh3cTwamplightClientEntry 20 }
+
+hh3cTwamplightClientCVlanID OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the ID of the custom VLAN to which the
+         probe packets belong.
+         The hh3cTwamplightClientSVlanID must be specified
+         first before the hh3cTwamplightClientCVlanID."
+    ::= { hh3cTwamplightClientEntry 21 }
+
+hh3cTwamplightClientVlanPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify set the 802.1p priority for the probe
+         packets."
+    ::= { hh3cTwamplightClientEntry 22 }
+
+hh3cTwamplightClientBindIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..47))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Associate the TWAMP-light test with an interface."
+    DEFVAL      { "" }
+    ::= { hh3cTwamplightClientEntry 23 }
+
+
+hh3cTwamplightSenderAdminTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightSenderAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines TWAMP-light control-sender's management table,
+        starts or stops TWAMP light test function.  When the
+        RowStatus is CreatAndGo, only one among hh3cTwamplightSendAdminContinual,
+        hh3cTwamplightSendAdminDuration, and hh3cTwamplightSendAdminPktCount
+        must be configured."
+    ::= { hh3cTwamplightController 4 }
+
+hh3cTwamplightSenderAdminEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightSenderAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightSenderAdminTable."
+    INDEX {
+              hh3cTwamplightControllerID
+          }
+    ::= { hh3cTwamplightSenderAdminTable 1 }
+
+Hh3cTwamplightSenderAdminEntry ::=
+    SEQUENCE {
+        hh3cTwamplightSendAdminContinual              TruthValue,
+        hh3cTwamplightSendAdminDuration               Integer32,
+        hh3cTwamplightSendAdminPktCount               Integer32,
+        hh3cTwamplightSendAdminTxPeriod               INTEGER,
+        hh3cTwamplightSendAdminTimeOut                Integer32,
+        hh3cTwamplightSendAdminRowStatus              RowStatus
+    }
+
+hh3cTwamplightSendAdminContinual OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Defineds to control the TWAMP test type.
+           true:  Permanent test.
+           false: On demand test."
+    ::= { hh3cTwamplightSenderAdminEntry 1 }
+
+hh3cTwamplightSendAdminDuration OBJECT-TYPE
+    SYNTAX      Integer32 (60..300)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Defines the duration the session runs for TWAMP test
+        before being stopped."
+        ::= { hh3cTwamplightSenderAdminEntry 2 }
+
+hh3cTwamplightSendAdminPktCount OBJECT-TYPE
+    SYNTAX      Integer32 (100..30000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Defines the number of packets to send for TWAMP
+        test before the session is stopped."
+        ::= { hh3cTwamplightSenderAdminEntry 3 }
+
+hh3cTwamplightSendAdminTxPeriod OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          interval10ms(1),
+                          interval100ms(2),
+                          interval1s(3),
+                          interval30s(4),
+                          interval10s(5)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Defines the interval at which probe packets are sent
+        for TWAMP test."
+    DEFVAL      { interval100ms }
+    ::= { hh3cTwamplightSenderAdminEntry 4 }
+
+hh3cTwamplightSendAdminTimeOut OBJECT-TYPE
+    SYNTAX      Integer32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Defines the timeout time for TWAMP response packets."
+    DEFVAL      { 5 }
+        ::= { hh3cTwamplightSenderAdminEntry 5 }
+
+hh3cTwamplightSendAdminRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the hh3cTwamplightSenderAdminTable."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { hh3cTwamplightSenderAdminEntry 6 }
+
+hh3cTwamplightSenderStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightSenderStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines TWAMP-light control-sender's status table."
+    ::= { hh3cTwamplightController 5 }
+
+hh3cTwamplightSenderStatusEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightSenderStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightSenderStatusTable."
+    INDEX {
+              hh3cTwamplightControllerID
+          }
+    ::= { hh3cTwamplightSenderStatusTable 1 }
+
+Hh3cTwamplightSenderStatusEntry ::=
+    SEQUENCE {
+        hh3cTwamplightSenderStatus         INTEGER,
+        hh3cTwamplightSenderStatusType     INTEGER,
+        hh3cTwamplightLastStartTime        DateAndTime,
+        hh3cTwamplightLastStopTime         DateAndTime
+    }
+
+hh3cTwamplightSenderStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            inactive(1),
+                            active(2)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the operational state of a TWAMP test:
+           inactive: TWAMP test is in progress.
+           active: TWAMP test has stopped."
+    ::= { hh3cTwamplightSenderStatusEntry 1 }
+
+hh3cTwamplightSenderStatusType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            init(0),
+                            continual(1),
+                            onDemand(2)
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reflects the operational start type of a TWAMP test:
+           init: Initial status.
+           continual: Permanent test.
+           onDemand: On demand test."
+    ::= { hh3cTwamplightSenderStatusEntry 2 }
+
+hh3cTwamplightLastStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Date and time when the last test started."
+    ::= { hh3cTwamplightSenderStatusEntry 4 }
+
+hh3cTwamplightLastStopTime OBJECT-TYPE
+    SYNTAX      DateAndTime (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Date and time when the last test stopped."
+    ::= { hh3cTwamplightSenderStatusEntry 5 }
+
+
+
+hh3cTwamplightTwoWayDelayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightTwoWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the statistics result table for TWAMP test."
+    ::= { hh3cTwamplightController 6 }
+
+hh3cTwamplightTwoWayDelayEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightTwoWayDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightTwoWayDelayTable."
+    INDEX {
+              hh3cTwamplightControllerID,
+              hh3cTwamplightTWDelaySeq
+          }
+    ::= { hh3cTwamplightTwoWayDelayTable 1 }
+
+Hh3cTwamplightTwoWayDelayEntry ::=
+    SEQUENCE {
+        hh3cTwamplightTWDelaySeq                   Gauge32,
+        hh3cTwamplightTWDelayAvgDelay              Integer32,
+        hh3cTwamplightTWDelayMaxDelay              Integer32,
+        hh3cTwamplightTWDelayMinDelay              Integer32,
+        hh3cTwamplightTWDelayAvgJitter             Integer32,
+        hh3cTwamplightTWDelayMaxJitter             Integer32,
+        hh3cTwamplightTWDelayMinJitter             Integer32,
+        hh3cTwamplightTWDelayAvgJitterSD           Integer32,
+        hh3cTwamplightTWDelayMaxJitterSD           Integer32,
+        hh3cTwamplightTWDelayMinJitterSD           Integer32,
+        hh3cTwamplightTWDelayAvgJitterDS           Integer32,
+        hh3cTwamplightTWDelayMaxJitterDS           Integer32,
+        hh3cTwamplightTWDelayMinJitterDS           Integer32
+        }
+
+hh3cTwamplightTWDelaySeq OBJECT-TYPE
+    SYNTAX      Gauge32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created when the statistics
+        result of a TWAMP test is determined.
+
+        An implementation MUST start assigning
+        hh3cTwamplightTWDelaySeq values at 1 and
+        wrap after exceeding the maximum possible value as
+        defined by the limit of this object ('ffffffff'h)."
+    ::= { hh3cTwamplightTwoWayDelayEntry 1 }
+
+hh3cTwamplightTWDelayAvgDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average two-way-delay
+        value in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 2 }
+
+hh3cTwamplightTWDelayMaxDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximum two-way-delay
+        value in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 3 }
+
+hh3cTwamplightTWDelayMinDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimum two-way-delay
+        value in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 4 }
+
+hh3cTwamplightTWDelayAvgJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value
+        in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 5 }
+
+hh3cTwamplightTWDelayMaxJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximum jitter value
+        in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 6 }
+
+hh3cTwamplightTWDelayMinJitter OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimum jitter value
+        in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 7 }
+
+hh3cTwamplightTWDelayAvgJitterSD OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value from
+        source to destination in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 8 }
+
+hh3cTwamplightTWDelayMaxJitterSD OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximum jitter value from
+        source to destination in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 9 }
+
+hh3cTwamplightTWDelayMinJitterSD OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimum jitter value from
+        source to destination in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 10 }
+
+hh3cTwamplightTWDelayAvgJitterDS OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the average jitter value from
+        destination to source in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 11 }
+
+hh3cTwamplightTWDelayMaxJitterDS OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the maximum jitter value from
+        destination to source in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 12 }
+
+hh3cTwamplightTWDelayMinJitterDS OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of time that records the minimum jitter value from
+        destination to source in the TWAMP test."
+    ::= { hh3cTwamplightTwoWayDelayEntry 13 }
+
+hh3cTwamplightTwoWayLossTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightTwoWayLossEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the TWAMP-light loss statistics result Table for providing,
+        via SNMP."
+    ::= { hh3cTwamplightController 7 }
+
+hh3cTwamplightTwoWayLossEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightTwoWayLossEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightTwoWayLossTable."
+    INDEX {
+              hh3cTwamplightControllerID,
+              hh3cTwamplightTWLossSeq
+          }
+    ::= { hh3cTwamplightTwoWayLossTable 1 }
+
+Hh3cTwamplightTwoWayLossEntry ::=
+    SEQUENCE {
+        hh3cTwamplightTWLossSeq                     Gauge32,
+        hh3cTwamplightTWLossValue                   Integer32,
+        hh3cTwamplightTWSentCount                   Integer32,
+        hh3cTwamplightTWTotalLossValue              Integer32,
+        hh3cTwamplightTWTotalSentCount              Integer32,
+        hh3cTwamplightTWErrorCount                  Unsigned32,
+        hh3cTwamplightTWTotalErrorCount             Unsigned32
+        }
+
+hh3cTwamplightTWLossSeq OBJECT-TYPE
+    SYNTAX      Gauge32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created when statistics
+        result of a TWAMP test is determined.
+
+        An implementation MUST start assigning
+        hh3cTwamplightTWLossSeq values at 1 and
+        wrap after exceeding the maximum possible value as
+        defined by the limit of this object ('ffffffff'h)."
+    ::= { hh3cTwamplightTwoWayLossEntry 1 }
+
+hh3cTwamplightTWLossValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lost packets in a statistical cycle
+        of a TWAMP test."
+    ::= { hh3cTwamplightTwoWayLossEntry 2 }
+
+hh3cTwamplightTWSentCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets were sent in a statistical cycle
+        of a TWAMP test."
+    ::= { hh3cTwamplightTwoWayLossEntry 3 }
+
+hh3cTwamplightTWTotalLossValue OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of lost packets number in last 30 statistical
+        cycle of a TWAMP test."
+    ::= { hh3cTwamplightTwoWayLossEntry 4 }
+
+hh3cTwamplightTWTotalSentCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets sent in last 30 statistical
+        cycle of a TWAMP test."
+    ::= { hh3cTwamplightTwoWayLossEntry 5 }
+
+hh3cTwamplightTWErrorCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of error packets received in a statistical cycle
+        of a TWAMP-light test."
+    ::= { hh3cTwamplightTwoWayLossEntry 6 }
+
+hh3cTwamplightTWTotalErrorCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of error packets received in last 30 statistical
+        cycles of a TWAMP-light test."
+    ::= { hh3cTwamplightTwoWayLossEntry 7 }
+
+
+hh3cTwamplightSenderLossSeqTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightSenderLossSeqEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The largest index value in TWAMP Loss results.
+
+        When a TWAMP test starts, TWAMP will generats
+        a set of statistics at regular intervals, and the
+        index information will be incremented by one for each result."
+    ::= { hh3cTwamplightController 8 }
+
+hh3cTwamplightSenderLossSeqEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightSenderLossSeqEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightSenderLossSeqTable."
+    INDEX {
+              hh3cTwamplightControllerID
+          }
+    ::= { hh3cTwamplightSenderLossSeqTable 1 }
+
+Hh3cTwamplightSenderLossSeqEntry ::=
+    SEQUENCE {
+        hh3cTwamplightLossSeqNumValue                   Gauge32
+        }
+
+hh3cTwamplightLossSeqNumValue OBJECT-TYPE
+    SYNTAX      Gauge32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The largest index value in a TWAMP packet Loss test session."
+    ::= { hh3cTwamplightSenderLossSeqEntry 1 }
+
+
+hh3cTwamplightSendDelaySeqTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightSendDelaySeqEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The largest index value in TWAMP delay results.
+
+        When a TWAMP test startes, TWAMP will generates
+        a set of statistics at regular intervals, and the
+        index information will be incremented by one for each result."
+    ::= { hh3cTwamplightController 9 }
+
+hh3cTwamplightSendDelaySeqEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightSendDelaySeqEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightSendDelaySeqTable.  The
+        operation of this table is same as that of pingResultsTable."
+    INDEX {
+              hh3cTwamplightControllerID
+          }
+    ::= { hh3cTwamplightSendDelaySeqTable 1 }
+
+Hh3cTwamplightSendDelaySeqEntry ::=
+    SEQUENCE {
+        hh3cTwamplightSenderDelaySeqNum                   Gauge32
+        }
+
+hh3cTwamplightSenderDelaySeqNum OBJECT-TYPE
+    SYNTAX      Gauge32 (1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The largest index value in a TWAMP packet delay test session."
+    ::= { hh3cTwamplightSendDelaySeqEntry 1 }
+
+
+
+hh3cTwamplightResetStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightResetStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines to clear TWAMP test statistics."
+    ::= { hh3cTwamplightController 10 }
+
+hh3cTwamplightResetStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightResetStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightResetStatTable."
+    INDEX {
+              hh3cTwamplightControllerID
+          }
+    ::= { hh3cTwamplightResetStatTable 1 }
+
+Hh3cTwamplightResetStatEntry ::=
+    SEQUENCE {
+        hh3cTwamplightResetStatistics                   INTEGER
+        }
+
+hh3cTwamplightResetStatistics OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          single(1),
+                          all(2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Clear TWAMP test statistics.
+          single: reset single.
+          all: reset all."
+    ::= { hh3cTwamplightResetStatEntry 1 }
+
+
+hh3cTwamplightReactionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightReactionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines TWAMP-light control-client test session reaction
+         configuration."
+    ::= { hh3cTwamplightController 11 }
+
+hh3cTwamplightReactionEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightReactionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightReactionTable."
+    INDEX {
+              hh3cTwamplightControllerID,
+              hh3cTwamplightReactItemIndex
+          }
+    ::= { hh3cTwamplightReactionTable 1 }
+
+Hh3cTwamplightReactionEntry ::=
+    SEQUENCE {
+        hh3cTwamplightReactItemIndex           Unsigned32,
+        hh3cTwamplightReactCheckElement        INTEGER,
+        hh3cTwamplightReactUpperLimit          Unsigned32,
+        hh3cTwamplightReactLowerLimit          Unsigned32,
+        hh3cTwamplightReactActionType          INTEGER,
+        hh3cTwamplightReactRowStatus           RowStatus
+    }
+
+hh3cTwamplightReactItemIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The second index of hh3cTwamplightReactionTable, It definitely
+        identifies one of the reaction configurations for TWAMP-light test."
+    ::= { hh3cTwamplightReactionEntry 1 }
+
+hh3cTwamplightReactCheckElement OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          twoWayDelay(1),
+                          twoWayJitter(2),
+                          twoWayLoss(3)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A list of reaction condition type."
+    ::= { hh3cTwamplightReactionEntry 2 }
+
+hh3cTwamplightReactUpperLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..1000000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object defines an administrative upper-threshold value for
+        hh3cTwamplightReactCheckElement."
+    ::= { hh3cTwamplightReactionEntry 3 }
+
+hh3cTwamplightReactLowerLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..999999)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object defines an administrative lower-threshold value for
+        hh3cTwamplightReactCheckElement."
+    ::= { hh3cTwamplightReactionEntry 4 }
+
+hh3cTwamplightReactActionType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                           none(0),
+                           trapOnly(1)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of reaction to generate if the specified
+         violation type occurs for the monitored element:
+
+        none               - No reaction is generated
+        trapOnly           - A trap is generated"
+    DEFVAL { none }
+    ::= { hh3cTwamplightReactionEntry 5 }
+
+hh3cTwamplightReactRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the hh3cTwamplightReactionTable.  Deletion of an entry
+        in this table results in deletion of all corresponding (same
+        hh3cTwamplightControllerID index values)
+        hh3cTwamplightSenderAdminTable and all related representations
+        entries."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { hh3cTwamplightReactionEntry 6 }
+
+
+hh3cTwamplightResponderEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control TWAMP-light responder function.
+            true: Enable TWAMP-light responder function.
+            false: Disable TWAMP-light responder function."
+    DEFVAL      { false }
+    ::= { hh3cTwamplightReponsder 1 }
+
+hh3cTwamplightResponderTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cTwamplightResponderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the TWAMP-light reflector Table, and configures
+        TWAMP test session.  When the RowStatus is Active or CreatAndGo,
+        the source address and target address, source port,
+        target  port must be configured.  When the RowStatus
+        is Destroy, Except for fields ResponderID and RowStatus,
+        The rest can't be configured."
+    ::= { hh3cTwamplightReponsder 2 }
+
+hh3cTwamplightResponderEntry OBJECT-TYPE
+    SYNTAX      Hh3cTwamplightResponderEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the hh3cTwamplightResponderTable."
+    INDEX {
+              hh3cTwamplightRespID
+          }
+    ::= { hh3cTwamplightResponderTable 1 }
+
+Hh3cTwamplightResponderEntry ::=
+    SEQUENCE {
+        hh3cTwamplightRespID               Integer32,
+        hh3cTwamplightRespSrcAddrType      InetAddressType,
+        hh3cTwamplightRespSrcAddr          InetAddress,
+        hh3cTwamplightRespTrgtAddrType     InetAddressType,
+        hh3cTwamplightRespTrgtAddr         InetAddress,
+        hh3cTwamplightRespSrcPort          Integer32,
+        hh3cTwamplightRespTrgtPort         Integer32,
+        hh3cTwamplightRespVPN              DisplayString,
+        hh3cTwamplightRespDescription      DisplayString,
+        hh3cTwamplightRespRowStatus        RowStatus,
+        hh3cTwamplightRespSrcIfName        DisplayString,
+        hh3cTwamplightRespServiceID        Unsigned32,
+        hh3cTwamplightRespDesMac           MacAddress,
+        hh3cTwamplightRespSrcMac           MacAddress,
+        hh3cTwamplightRespTimeFormat       INTEGER,
+        hh3cTwamplightRespSVlanID          Unsigned32,
+        hh3cTwamplightRespCVlanID          Unsigned32
+    }
+
+hh3cTwamplightRespID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "TWAMP test session reflector index."
+    ::= { hh3cTwamplightResponderEntry 1 }
+
+hh3cTwamplightRespSrcAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of the source address,
+        hh3cTwamplightClientSrcAddr, to be used at a remote host
+        when performing the TWAMP-light test."
+    ::= { hh3cTwamplightResponderEntry 2 }
+
+hh3cTwamplightRespSrcAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Use the specified IP address (which must be given
+        in numeric form, not as a hostname) as the source
+        address for outgoing probe packets.  On hosts with
+        more than one IP address, this option can be used
+        to force the source address to be something other
+        than the primary IP address of the interface the
+        probe packet is sent on.  A zero length octet string
+        value for this object disables source address
+        specification.
+
+        The address type (InetAddressType) that relates to
+        this object is specified by the corresponding value
+        of hh3cTwamplightClientSrcAddrType."
+    DEFVAL { ''H }
+    ::= { hh3cTwamplightResponderEntry 3 }
+
+hh3cTwamplightRespTrgtAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of host address to be used at a remote
+        host for performing a TWAMP-light test."
+    ::= { hh3cTwamplightResponderEntry 4 }
+
+hh3cTwamplightRespTrgtAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the host address to be used at a remote host for
+        performing a TWAMP-light test.  The host address type is
+        determined by the object value of corresponding
+        hh3cTwamplightClientTrgtAddrType."
+    DEFVAL { ''H }
+    ::= { hh3cTwamplightResponderEntry 5 }
+
+hh3cTwamplightRespSrcPort          OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source port be used by a TWAMP-light test."
+    ::= { hh3cTwamplightResponderEntry 6 }
+
+hh3cTwamplightRespTrgtPort          OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination port to be used by a TWAMP-light test."
+    ::= { hh3cTwamplightResponderEntry 7 }
+
+hh3cTwamplightRespVPN OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..31))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "VPN name by which the system finds route in the specified VPN
+        to send TWAMP probe packets."
+    DEFVAL      { "" }
+    ::= { hh3cTwamplightResponderEntry 8 }
+
+hh3cTwamplightRespDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..200))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "A comment describing this session."
+    DEFVAL      { "" }
+    ::= { hh3cTwamplightResponderEntry 9 }
+
+hh3cTwamplightRespRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows entries to be created and deleted
+        in the Hh3cTwamplightResponderEntry."
+    REFERENCE
+        "See definition of RowStatus in RFC 2579, 'Textual
+        Conventions for SMIv2.'"
+    ::= { hh3cTwamplightResponderEntry 10 }
+
+
+hh3cTwamplightRespSrcIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..47))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source interface for the response packets."
+    DEFVAL      { "" }
+    ::= { hh3cTwamplightResponderEntry 11 }
+
+hh3cTwamplightRespServiceID OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4096)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An Ethernet service instance by its ID for test."
+    ::= { hh3cTwamplightResponderEntry 12 }
+
+hh3cTwamplightRespDesMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The destination MAC address for the TWAMP-light test."
+    ::= { hh3cTwamplightResponderEntry 13 }
+
+hh3cTwamplightRespSrcMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source MAC address for the TWAMP-light response message."
+    ::= { hh3cTwamplightResponderEntry 14 }
+
+hh3cTwamplightRespTimeFormat OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            auto (0),
+                            ntp  (1),
+                            ptp  (2)
+                        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The timestamp format for probe packets in the TWAMP-light test."
+    ::= { hh3cTwamplightResponderEntry 15 }
+
+hh3cTwamplightRespSVlanID OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the ID of the VLAN to which the
+         probe packets belong."
+    ::= { hh3cTwamplightResponderEntry 16 }
+
+hh3cTwamplightRespCVlanID OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4094)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specify the ID of the custom vlan to which the
+         probe packets belong.
+         The hh3cTwamplightRespSVlanID must be specified
+         first before the hh3cTwamplightRespCVlanID."
+    ::= { hh3cTwamplightResponderEntry 17 }
+
+END

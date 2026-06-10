@@ -1,0 +1,12 @@
+os: mni
+text: 'MNI Microwave Radio'
+type: wireless
+mib_dir: mni
+icon: mni
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_wireless_rate, text: 'Device Rate' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3323.11.1.
+snmp_bulk: false

@@ -1,0 +1,47 @@
+PPVPN-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, experimental
+      FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION  
+      FROM SNMPv2-TC;
+
+ppvpnTcMIB MODULE-IDENTITY
+   LAST-UPDATED "200102281200Z"  -- 28 February 2002 12:00:00 GMT
+   ORGANIZATION "Provider Provisioned Virtual Private
+                 Networks Working Group."
+   CONTACT-INFO
+          "   Benson Schliesser
+              bensons@savvis.net
+
+              Thomas D. Nadeau
+              tnadeau@cisco.com
+
+              Comments and discussion to ppvpn@ietf.org"
+
+   DESCRIPTION
+        "This MIB contains TCs for PPVPN."
+
+  -- Revision history.
+   REVISION "200102281200Z"  -- 28 February 2002 12:00:00 GMT
+   DESCRIPTION
+      "Initial draft version."
+   ::= { experimental 1111 } -- assigned by IANA
+
+-- definition of textual conventions
+
+VPNId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The purpose of a VPN-ID is to identify a VPN.
+         The global VPN Identifier format is:
+         3 octet VPN Authority, Organizationally Unique Identifier
+         followed by
+         4 octet VPN index identifying VPN according to OUI"
+    REFERENCE
+        "RFC 2685, Fox & Gleeson, 'Virtual Private
+         Networks Identifier', September 1999."
+    SYNTAX    OCTET STRING (SIZE (0..7))
+
+END

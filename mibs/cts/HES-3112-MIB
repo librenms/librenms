@@ -1,0 +1,5159 @@
+HES-3112-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		enterprises, Counter, IpAddress         FROM RFC1155-SMI
+		DisplayString, sysLocation              FROM RFC1213-MIB
+		etherStatsBroadcastPkts                 FROM RMON-MIB
+		TRAP-TYPE                               FROM RFC-1215
+		OBJECT-TYPE                             FROM RFC-1212
+		ifIndex                                 FROM IF-MIB
+		Counter64                               FROM SNMPv2-SMI;
+
+	cts OBJECT IDENTIFIER ::= { enterprises 9304 }
+
+	-- This data type is used to model media addresses.  For many
+	-- types of media, this will be in a binary representation.
+	-- For example, an ethernet address would be represented as
+	-- a string of 6 octets.
+
+	-- All representations of MAC addresses in this MIB Module use,
+	-- as a textual convention (i.e., this convention does not affect
+	-- their encoding), the data type:
+
+	MacAddress ::= OCTET STRING (SIZE (6))      -- a 6 octet address in
+	                                            -- the "canonical" order
+
+	cvt
+		OBJECT IDENTIFIER ::= { cts 300 }
+
+	hes3112
+		OBJECT IDENTIFIER ::= { cvt 3002 }
+
+
+-- Main
+
+	cvtSystemInformation
+		OBJECT IDENTIFIER ::= { hes3112 1 }
+	cvtUserAuthentication
+		OBJECT IDENTIFIER ::= { hes3112 2 }
+	cvtNetworkManagement
+		OBJECT IDENTIFIER ::= { hes3112 3 }
+	cvtConverterManagement
+		OBJECT IDENTIFIER ::= { hes3112 4 }
+	cvtConverterMonitor
+		OBJECT IDENTIFIER ::= { hes3112 5 }
+	cvtSystemUtility
+		OBJECT IDENTIFIER ::= { hes3112 6 }
+	cvtSaveConfiguration OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), save(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Save Configuration to Flash ROM
+			 set 1 to execute this function"
+		::= { hes3112 7 }
+	cvtResetSystem OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), reset(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Reset System
+			 set 1 to execute this function"
+		::= { hes3112 8 }
+	converterTraps
+		OBJECT IDENTIFIER ::= { hes3112 9 }
+
+
+-- SystemInformation(1)
+
+	cvtCompanyInfo
+		OBJECT IDENTIFIER ::= { cvtSystemInformation 1 }
+	cvtHardwareInfo
+		OBJECT IDENTIFIER ::= { cvtSystemInformation 2 }
+--	cvtSoftwareInfo
+--		OBJECT IDENTIFIER ::= { cvtSystemInformation 3 }
+	--cvtSaveSystemInformation OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Save SystemInformation to Flash ROM"
+	--	::= { cvtSystemInformation 4 }
+	cvtCATVModuleInfo
+		OBJECT IDENTIFIER ::= { cvtSystemInformation 5 }
+	cvtBatteryModuleInfo
+		OBJECT IDENTIFIER ::= { cvtSystemInformation 6 }
+
+
+-- SystemInformation(1).CompanyInfo(1)
+
+	cvtCompanyName OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Company Name"
+		::= { cvtCompanyInfo 1 }
+
+--	cvtSystemObjectID OBJECT-TYPE
+--		SYNTAX    OBJECT IDENTIFIER
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"System ObjectID, private MIB is under this object id"
+--		::= { cvtCompanyInfo 2 }
+
+--	cvtSystemContact OBJECT-TYPE
+--		SYNTAX    DisplayString (SIZE (0..255))
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"System Contact"
+--		::= { cvtCompanyInfo 3 }
+
+--	cvtSystemName OBJECT-TYPE
+--		SYNTAX    DisplayString (SIZE (0..255))
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"System Name"
+--		::= { cvtCompanyInfo 4 }
+
+--	cvtSystemLocation OBJECT-TYPE
+--		SYNTAX    DisplayString (SIZE (0..255))
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"System Location"
+--		::= { cvtCompanyInfo 5 }
+
+	cvtDHCPVendorID OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"DHCP Vendor ID"
+		::= { cvtCompanyInfo 7 }
+
+	cvtCLIHostname OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"CLI Hostname"
+		::= { cvtCompanyInfo 6 }
+
+
+-- SystemInformation(1).HardwareInfo(2)
+
+	cvtModelName OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Model Name"
+		::= { cvtHardwareInfo 1 }
+
+	cvtFirmwareVersion OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Firmware Version"
+		::= { cvtHardwareInfo 2 }
+
+	--cvtROMSize OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"ROM Size"
+	--	::= { cvtHardwareInfo 3 }
+
+	--cvtFlashSize OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Flash Size"
+	--	::= { cvtHardwareInfo 4 }
+
+	--cvtRAMSize OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"RAM Size"
+	--	::= { cvtHardwareInfo 5 }
+
+	cvtGPortNum OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Giga Port Number"
+		::= { cvtHardwareInfo 6 }
+
+	cvtMPortNum OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"10/100 Meg Port Number"
+		::= { cvtHardwareInfo 7 }
+
+	--cvtCPUVersion OBJECT-TYPE
+	--	SYNTAX    DisplayString (SIZE (0..255))
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"CPU Version"
+	--	::= { cvtHardwareInfo 8 }
+
+	cvtMBVersion OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Main Board Version"
+		::= { cvtHardwareInfo 9 }
+
+	cvtLANFiberType OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"LAN Fiber type"
+		::= { cvtHardwareInfo 10 }
+
+	cvtLANFiberWaveLength OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"LAN Fiber wave length"
+		::= { cvtHardwareInfo 11 }
+
+	cvtWANFiberType OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"WAN Fiber type"
+		::= { cvtHardwareInfo 12 }
+
+	cvtWANFiberWaveLength OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"WAN Fiber wave length"
+		::= { cvtHardwareInfo 13 }
+
+	cvtSerialNumber OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"serial number of this device."
+		::= { cvtHardwareInfo 14 }
+
+	cvtDateCode OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"the day of producing this device"
+		::= { cvtHardwareInfo 15 }
+
+
+-- SystemInformation(1).SoftwareInfo(3)
+
+
+-- SystemInformation(1).CATVModuleInfo(5)
+
+	cvtRFTVOutput OBJECT-TYPE
+		SYNTAX    INTEGER { off(0), on(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Turn on/off CATV module RF Output."
+		::= { cvtCATVModuleInfo 2 }
+
+	cvtRFTVState OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"CATV module RF State."
+		::= { cvtCATVModuleInfo 4 }
+
+
+-- SystemInformation(1).BatteryModuleInfo(6)
+
+	cvtBatteryState OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Battery module State."
+		::= { cvtBatteryModuleInfo 1 }
+
+
+-- UserAuthentication(2).UserTable(1)
+
+	cvtUserTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtUserEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of user information."
+		::= { cvtUserAuthentication 1 }
+
+	-- Table Entry
+	cvtUserEntry OBJECT-TYPE
+		SYNTAX    CvtUserEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about user.
+			Only Administrator can read this table"
+		INDEX    { cvtUserIndex }
+		::= { cvtUserTable 1 }
+
+	CvtUserEntry ::=
+		SEQUENCE {
+			cvtUserIndex
+				INTEGER,
+		--	cvtUserValid
+		--		INTEGER,
+			cvtUserEnable
+				INTEGER,
+			cvtUserName
+				DisplayString,
+			cvtUserPassword
+				DisplayString,
+			cvtUserDescription
+				DisplayString,
+		--	cvtUserIPSecurity
+		--		INTEGER,
+		--	cvtUserIPAddr
+		--		IpAddress,
+		--	cvtUserIPTrapDest
+		--		IpAddress,
+			cvtUserConsoleLevel
+				INTEGER
+		--	cvtUserSNMPLevel
+		--		INTEGER,
+		--	cvtUserWebLevel
+		--		INTEGER
+		}
+
+	cvtUserIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"user index"
+		::= { cvtUserEntry 1 }
+
+--	cvtUserValid OBJECT-TYPE
+--		SYNTAX    INTEGER { invalid(0), valid(1) }
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Valid"
+--		::= { cvtUserEntry 2 }
+
+	cvtUserEnable OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable"
+		::= { cvtUserEntry 3 }
+
+	cvtUserName OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Name"
+		::= { cvtUserEntry 4 }
+
+	cvtUserPassword OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Password"
+		::= { cvtUserEntry 5 }
+
+	cvtUserDescription OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Description"
+		::= { cvtUserEntry 6 }
+
+	--cvtUserIPSecurity OBJECT-TYPE
+	--	SYNTAX    INTEGER { disable(0), enable(1) }
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"IP Security enable,
+	--		 only cvtUserIPAddr could login console"
+	--	::= { cvtUserEntry 7 }
+
+	--cvtUserIPAddr OBJECT-TYPE
+	--	SYNTAX    IpAddress
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"The IP address from which could login console."
+	--	::= { cvtUserEntry 8 }
+
+	--cvtUserIPTrapDest OBJECT-TYPE
+	--	SYNTAX    IpAddress
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"SNMP trap destination IP address"
+	--	::= { cvtUserEntry 9 }
+
+	cvtUserConsoleLevel OBJECT-TYPE
+		SYNTAX    INTEGER { readonly(1), readwrite(2), administrator(3) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Console Level"
+		::= { cvtUserEntry 10 }
+
+	--cvtUserSNMPLevel OBJECT-TYPE
+	--	SYNTAX    INTEGER { readonly(1), readwrite(2), administrator(3) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"SNMP Level"
+	--	::= { cvtUserEntry 11 }
+
+	--cvtUserWebLevel OBJECT-TYPE
+	--	SYNTAX    INTEGER { readonly(1), readwrite(2), administrator(3) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Web Level"
+	--	::= { cvtUserEntry 12 }
+
+
+-- UserAuthentication(2).RADIUSConfiguration(2)
+
+
+-- UserAuthentication(2).TACACSConfiguration(3)
+
+
+-- UserAuthentication(2).UserPasswordEncryption(4)
+
+
+-- NetworkManagement(3)
+
+	cvtNetworkConfiguration
+		OBJECT IDENTIFIER ::= { cvtNetworkManagement 1 }
+	cvtSystemServiceConfiguration
+		OBJECT IDENTIFIER ::= { cvtNetworkManagement 2 }
+	cvtTimeServerConfiguration
+		OBJECT IDENTIFIER ::= { cvtNetworkManagement 7 }
+	cvtDeviceCommunity
+		OBJECT IDENTIFIER ::= { cvtNetworkManagement 4 }
+	cvtTrapDestination
+		OBJECT IDENTIFIER ::= { cvtNetworkManagement 5 }
+	cvtTrapConfiguration
+		OBJECT IDENTIFIER ::= { cvtNetworkManagement 6 }
+	cvtCWMPConfiguration
+		OBJECT IDENTIFIER ::= { cvtNetworkManagement 11 }
+
+
+-- NetworkManagement(3).NetworkConfiguration(1)
+
+	cvtNetMacAddr OBJECT-TYPE
+		SYNTAX    MacAddress
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"The media-dependent `physical' address."
+		::= { cvtNetworkConfiguration 1 }
+
+	cvtNetType OBJECT-TYPE
+		SYNTAX    INTEGER { dhcp(0), manual(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"auto will get ip from DHCP"
+		::= { cvtNetworkConfiguration 2 }
+
+	cvtNetIPAddr OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"The IP address to which this entry's addressing
+			 information pertains."
+		::= { cvtNetworkConfiguration 3 }
+
+	cvtNetIPMask OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"The subnet mask associated with the IP address of
+			 this entry.  The value of the mask is an IP
+			 address with all the network bits set to 1 and all
+			 the hosts bits set to 0."
+		::= { cvtNetworkConfiguration 4 }
+
+	cvtNetGateway OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Gateway"
+		::= { cvtNetworkConfiguration 5 }
+
+	--cvtSaveNetworkConfiguration OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION 
+	--		"Save Network Configuration to Flash ROM."
+	--	::= { cvtNetworkConfiguration 6 }
+
+	--cvtSaveNetworkConfigurationAndReset OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Save Network Configuration to Flash ROM and Reset System"
+	--	::= { cvtNetworkConfiguration 7 }
+
+	cvtNetIPv4En OBJECT-TYPE
+		SYNTAX    INTEGER { enable(1), disable(0) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"enable or disable IPv4 process."
+		::= { cvtNetworkConfiguration 8 }
+
+	cvtNetCurrentIPAddr OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"The Current IP address to which this entry's addressing
+			 information pertains."
+		::= { cvtNetworkConfiguration 10 }
+
+	cvtNetCurrentIPMask OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"The Current subnet mask associated with the IP address of
+			 this entry.  The value of the mask is an IP
+			 address with all the network bits set to 1 and all
+			 the hosts bits set to 0."
+		::= { cvtNetworkConfiguration 11 }
+
+	cvtNetCurrentGateway OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Current Gateway"
+		::= { cvtNetworkConfiguration 12 }
+
+	cvtNetIPSourceBinding OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Security IP enable or disable"
+		::= { cvtNetworkConfiguration 20 }
+
+
+-- NetworkManagement(3).NetworkConfiguration(1).IPSourceBindingTable(21)
+
+	cvtNetIPSourceBindingTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtNetIPSourceBindingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Security IP information."
+		::= { cvtNetworkConfiguration 21 }
+
+	-- Table Entry
+	cvtNetIPSourceBindingEntry OBJECT-TYPE
+		SYNTAX    CvtNetIPSourceBindingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about SNMP agent.
+			 Only Administrator can read this table"
+		INDEX    { cvtNetIPSourceBindingIndex }
+		::= { cvtNetIPSourceBindingTable 1 }
+
+	CvtNetIPSourceBindingEntry ::=
+		SEQUENCE {
+			cvtNetIPSourceBindingIndex
+				INTEGER,
+			cvtNetIPSourceBindingState
+				INTEGER,
+			cvtNetIPSourceBindingIPAddress
+				IpAddress,
+			cvtNetIPSourceBindingIPv6Address
+				DisplayString,
+			cvtNetIPSourceBindingDelete
+				INTEGER
+		}
+
+	cvtNetIPSourceBindingIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Security IP index"
+		::= { cvtNetIPSourceBindingEntry 1 }
+
+	cvtNetIPSourceBindingState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Security IP State"
+		::= { cvtNetIPSourceBindingEntry 3 }
+
+	cvtNetIPSourceBindingIPAddress OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Security IP Address"
+		::= { cvtNetIPSourceBindingEntry 4 }
+
+	cvtNetIPSourceBindingIPv6Address OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Security IPv6 Address"
+		::= { cvtNetIPSourceBindingEntry 5 }
+
+	cvtNetIPSourceBindingDelete OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), delete(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Delete this entry."
+		::= { cvtNetIPSourceBindingEntry 10 }
+
+
+-- NetworkManagement(3).NetworkConfiguration(1).NetCurrentDNSServerIPorIPv6Addr(28)
+
+
+-- NetworkManagement(3).NetworkConfiguration(1).NetDNSServerIPv6(30)
+
+
+-- NetworkManagement(3).NetworkConfiguration(1).NetIPv6(32)
+
+	cvtNetIPv6En OBJECT-TYPE
+		SYNTAX    INTEGER { enable(1), disable(0) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"enable/disable IPv6 address."
+		::= { cvtNetworkConfiguration 32 }
+
+	cvtNetIPv6AutoConfig OBJECT-TYPE
+		SYNTAX    INTEGER { enable(1), disable(0) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Configuration of IPv6 addresses using stateless autoconfig."
+		::= { cvtNetworkConfiguration 33 }
+
+	cvtNetIPv6LinkLocalAddr OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"The IPv6 link-local address to which this entry's addressing
+			 information pertains."
+		::= { cvtNetworkConfiguration 34 }
+
+	cvtNetIPv6GlobalAddr OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"The IPv6 address to which this entry's addressing
+			 information pertains."
+		::= { cvtNetworkConfiguration 35 }
+
+	cvtNetIPv6Gateway OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"IPv6 Gateway."
+		::= { cvtNetworkConfiguration 36 }
+
+	cvtNetDHCPv6 OBJECT-TYPE
+		SYNTAX    INTEGER { force(2), auto(1), disable(0) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"auto will get ipv6 from DHCPv6."
+		::= { cvtNetworkConfiguration 37 }
+
+	cvtNetRapidCommit OBJECT-TYPE
+		SYNTAX    INTEGER { enable(1), disable(0) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"set DHCPv6 rapid-commit"
+		::= { cvtNetworkConfiguration 38 }
+
+	cvtNetCurrentIPv6LinklocalAddr OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of IPv6 current state."
+		::= { cvtNetworkConfiguration 39 }
+
+	cvtNetCurrentIPv6GatewayAddr OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"IPv6 config name"
+		::= { cvtNetworkConfiguration 40 }
+
+	cvtNetCurrentDHCPv6DUID OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"IPv6 config current state."
+		::= { cvtNetworkConfiguration 41 }
+
+
+-- NetworkManagement(3).NetworkConfiguration(1).NetCurrentIPv6GlobalAddrTable(45)
+
+	cvtNetCurrentIPv6GlobalAddrTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtNetCurrentIPv6GlobalAddrEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of IPv6 current state."
+		::= { cvtNetworkConfiguration 45 }
+
+	-- Table Entry
+	cvtNetCurrentIPv6GlobalAddrEntry OBJECT-TYPE
+		SYNTAX    CvtNetCurrentIPv6GlobalAddrEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about IPv6 Current State."
+		INDEX     { cvtNetCurrentIPv6GlobalAddrIndex }
+		::= { cvtNetCurrentIPv6GlobalAddrTable 1 }
+
+	CvtNetCurrentIPv6GlobalAddrEntry ::=
+		SEQUENCE {
+			cvtNetCurrentIPv6GlobalAddrIndex
+				INTEGER,
+			cvtNetCurrentIPv6GlobalAddrState
+				DisplayString
+		}
+
+	cvtNetCurrentIPv6GlobalAddrIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each port."
+		::= { cvtNetCurrentIPv6GlobalAddrEntry 1 }
+
+	cvtNetCurrentIPv6GlobalAddrState OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of IPv6 global addr current state."
+		::= { cvtNetCurrentIPv6GlobalAddrEntry 2 }
+
+
+-- NetworkManagement(3).SystemServiceConfiguration(2)
+
+--	cvtServiceTelnetThreadEn OBJECT-TYPE
+--		SYNTAX    INTEGER { disable(0), enable(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Enable Telnet Thread,
+--			 Only Administrator can write this page"
+--		::= { cvtSystemServiceConfiguration 1 }
+
+--	cvtServiceSNMPThreadEn OBJECT-TYPE
+--		SYNTAX    INTEGER { disable(0), enable(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Enable SNMP Thread
+--			 Only Administrator can write this page"
+--		::= { cvtSystemServiceConfiguration 3 }
+
+	cvtServiceWebThreadEn OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable Web Thread
+			 Only Administrator can write this page"
+		::= { cvtSystemServiceConfiguration 4 }
+
+--	cvtServiceSSHThreadEn OBJECT-TYPE
+--		SYNTAX    INTEGER { disable(0), enable(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Enable SSH Thread,
+--			 Only Administrator can write this page"
+--		::= { cvtSystemServiceConfiguration 10 }
+
+	cvtServiceTypeThread OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), telnet(1), ssh(2) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable Service Type Thread,
+			 Only Administrator can write this page"
+		::= { cvtSystemServiceConfiguration 11 }
+
+
+-- NetworkManagement(3).RS232TelnetConsoleConfiguration(3)
+
+
+-- NetworkManagement(3).DeviceCommunity(4)
+
+	cvtAgentTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtAgentEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Agent information."
+		::= { cvtDeviceCommunity 1 }
+
+	-- Table Entry
+	cvtAgentEntry OBJECT-TYPE
+		SYNTAX    CvtAgentEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about SNMP agent.
+			 Only Administrator can read this table"
+		INDEX    { cvtAgentIndex }
+		::= { cvtAgentTable 1 }
+
+	CvtAgentEntry ::=
+		SEQUENCE {
+			cvtAgentIndex
+				INTEGER,
+			cvtAgentValid
+				INTEGER,
+			cvtAgentEnable
+				INTEGER,
+			cvtAgentCommunity
+				DisplayString,
+		--	cvtAgentPassword
+		--		DisplayString,
+			cvtAgentDescription
+				DisplayString,
+		--	cvtAgentIPSecurity
+		--		INTEGER,
+		--	cvtAgentIPAddr
+		--		IpAddress,
+			cvtAgentSNMPLevel
+				INTEGER,
+			cvtAgentDelete
+				INTEGER
+		}
+
+	cvtAgentIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Agent index"
+		::= { cvtAgentEntry 1 }
+
+	cvtAgentValid OBJECT-TYPE
+		SYNTAX    INTEGER { invalid(0), valid(1) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Valid"
+		::= { cvtAgentEntry 2 }
+
+	cvtAgentEnable OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable"
+		::= { cvtAgentEntry 3 }
+
+	cvtAgentCommunity OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"SNMP community Name"
+		::= { cvtAgentEntry 4 }
+
+	--cvtAgentPassword OBJECT-TYPE
+	--	SYNTAX    DisplayString (SIZE (0..255))
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Password, this field not used, reserve"
+	--	::= { cvtAgentEntry 5 }
+
+	cvtAgentDescription OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Description"
+		::= { cvtAgentEntry 6 }
+
+	--cvtAgentIPSecurity OBJECT-TYPE
+	--	SYNTAX    INTEGER { disable(0), enable(1) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"IP Security, if enable, 
+	--		 only cvtAgentIPAddr could walk or set SNMP"
+	--	::= { cvtAgentEntry 7 }
+
+	--cvtAgentIPAddr OBJECT-TYPE
+	--	SYNTAX    IpAddress
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"The IP address from which could walk or set SNMP."
+	--	::= { cvtAgentEntry 8 }
+
+	cvtAgentSNMPLevel OBJECT-TYPE
+		SYNTAX    INTEGER { readonly(1), readwrite(2), administrator(3) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"SNMP Level"
+		::= { cvtAgentEntry 9 }
+
+	cvtAgentDelete OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), delete(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Delete this entry."
+		::= { cvtAgentEntry 10 }
+
+	--cvtSaveAgentInformation OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Save Agent information to Flash ROM
+	--		 Only Administrator can write this page"
+	--	::= { cvtDeviceCommunity 2  }
+
+
+-- NetworkManagement(3).TrapDestination(5)
+
+	cvtTrapDestTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtTrapDestEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Trap destination."
+		::= { cvtTrapDestination 1 }
+
+	-- Table Entry
+	cvtTrapDestEntry OBJECT-TYPE
+		SYNTAX    CvtTrapDestEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about SNMP Trap Destination.
+			 Only Administrator can read this table"
+		INDEX    { cvtTrapDestIndex }
+		::= { cvtTrapDestTable 1 }
+
+	CvtTrapDestEntry ::=
+		SEQUENCE {
+			cvtTrapDestIndex
+				INTEGER,
+		--	cvtTrapDestValid
+		--		INTEGER,
+			cvtTrapDestEnable
+				INTEGER,
+			cvtTrapDestIPAddr
+				IpAddress,
+			cvtTrapDestCommunity
+				DisplayString,
+			cvtTrapDestIPv6Addr
+				DisplayString
+		}
+
+	cvtTrapDestIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Trap Destination index"
+		::= { cvtTrapDestEntry 1 }
+
+	--cvtTrapDestValid OBJECT-TYPE
+	--	SYNTAX    INTEGER { invalid(0), valid(1) }
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Valid"
+	--	::= { cvtTrapDestEntry 2 }
+
+	cvtTrapDestEnable OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable"
+		::= { cvtTrapDestEntry 3 }
+
+	cvtTrapDestCommunity OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"SNMP community Name"
+		::= { cvtTrapDestEntry 4 }
+
+	cvtTrapDestIPAddr OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"The IP address SNMP TRAP send to"
+		::= { cvtTrapDestEntry 8 }
+
+	cvtTrapDestIPv6Addr OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"The IPv6 address SNMP TRAP send to"
+		::= { cvtTrapDestEntry 9 }
+
+	--cvtSaveTrapDestination OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Save Trap destination to Flash ROM
+	--		 Only Administrator can write this page"
+	--	::= { cvtTrapDestination 2  }
+
+
+-- NetworkManagement(3).TrapConfiguration(6)
+
+	cvtTrapColdStart OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"cold start trap enable or disable"
+		::= { cvtTrapConfiguration 1 }
+
+	cvtTrapWarmStart OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"warm start trap enable or disable"
+		::= { cvtTrapConfiguration 2 }
+
+	cvtTrapAuthenticationFailure OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"authentication failure trap enable or disable"
+		::= { cvtTrapConfiguration 3 }
+
+	cvtTrapPortLink OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"port link up/down trap enable or disable"
+		::= { cvtTrapConfiguration 4 }
+
+	cvtTrapSystemPowerDown OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"local machine system power down trap enable or disable"
+		::= { cvtTrapConfiguration 5 }
+
+--	cvtTrapBroadcastStorm OBJECT-TYPE
+--		SYNTAX    INTEGER { disable(0), enable(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Broadcast storm trap enable or disable, when broadcast packets are over upper limit,
+--			 broadcast storm trap will be sent."
+--		::= { cvtTrapConfiguration 6 }
+
+--	cvtTrapBroadcastUpperLimit OBJECT-TYPE
+--		SYNTAX    INTEGER (0..148810)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Broadcast packets upper limit, unit is Packets/Sec."
+--		::= { cvtTrapConfiguration 7 }
+
+	cvtTrapCATVState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"CATV state trap enable or disable."
+		::= { cvtTrapConfiguration 8 }
+
+	cvtTrapBatteryMode OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Battery mode trap enable or disable"
+		::= { cvtTrapConfiguration 56 }
+
+--	cvtTrapSFPAbnormality OBJECT-TYPE
+--		SYNTAX    INTEGER { disable(0), enable(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"SFP Abnormality trap enable or disable"
+--		::= { cvtTrapConfiguration 57 }
+
+
+-- NetworkManagement(3).TimeServerConfiguration(7)
+
+	cvtTimeSync OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Time Synchronization"
+		::= { cvtTimeServerConfiguration 1 }
+
+	cvtTimeServerIPAddr OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"time server ip address."
+		::= { cvtTimeServerConfiguration 2 }
+
+	cvtTimeServerIPAddr2 OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"2th time server ip address."
+		::= { cvtTimeServerConfiguration 3 }
+
+	cvtTimeSyncInterval OBJECT-TYPE
+		SYNTAX    INTEGER { hour1(1),
+		                    hour2(2),
+		                    hour3(3),
+		                    hour4(4),
+		                    hour6(5),
+		                    hour8(6),
+		                    hour12(7),
+		                    hour24(8)
+		                  }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Time Synchronization Interval, unit is min."
+		::= { cvtTimeServerConfiguration 4 }
+
+	cvtTimeZoneIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"time zone
+			 0:   GMT-11:00  Apia
+			 1:   GMT-10:00  Honolulu
+			 2:   GMT-9:00  Anchorage
+			 3:   GMT-8:00  Vancouver
+			 4:   GMT-8:00  San Francisco
+			 5:   GMT-8:00  Seattle
+			 6:   GMT-8:00  Los Angeles
+			 7:   GMT-7:00  Phoenix
+			 8:   GMT-7:00  Aklavik
+			 9:   GMT-7:00  Edmonton
+			10:   GMT-7:00  Denver
+			11:   GMT-6:00  Guatemala
+			12:   GMT-6:00  San Salvador
+			13:   GMT-6:00  Tegucigalpa
+			14:   GMT-6:00  Managua
+			15:   GMT-6:00  Mexico City
+			16:   GMT-6:00  Winnipeg
+			17:   GMT-6:00  Houston
+			18:   GMT-6:00  Minneapolis
+			19:   GMT-6:00  St. Paul
+			20:   GMT-6:00  New Orleans
+			21:   GMT-6:00  Chicago
+			22:   GMT-6:00  Montgomery
+			23:   GMT-5:00  Indianapolis
+			24:   GMT-5:00  Lima
+			25:   GMT-5:00  Kingston
+			26:   GMT-5:00  Bogota
+			27:   GMT-5:00  Atlanta
+			28:   GMT-5:00  Detroit
+			29:   GMT-5:00  Havana
+			30:   GMT-5:00  Toronto
+			31:   GMT-5:00  Nassau
+			32:   GMT-5:00  Washington DC
+			33:   GMT-5:00  Ottawa
+			34:   GMT-5:00  Philadelphia
+			35:   GMT-5:00  New York
+			36:   GMT-5:00  Montreal
+			37:   GMT-5:00  Boston
+			38:   GMT-4:00  Santo Domingo
+			39:   GMT-4:00  La Paz
+			40:   GMT-4:00  Caracas
+			41:   GMT-4:00  San Juan
+			42:   GMT-4:00  Santiago
+			43:   GMT-4:00  Halifax
+			44:   GMT-4:00  Asuncion
+			45:   GMT-3:00  Buenos Aires
+			46:   GMT-3:00  Montevideo
+			47:   GMT-3:00  Brasilia
+			48:   GMT-3:00  Sao Paulo
+			49:   GMT-3:00  Rio de Janeiro
+			50:   GMT-2:00  Fernando de Noronha
+			51:   GMT-1:00  Praia
+			52:   GMT       Reykjavik
+			53:   GMT       Casablanca
+			54:   GMT       Lisbon
+			55:   GMT       Dublin
+			56:   GMT       London
+			57:   GMT+1:00  Lagos
+			58:   GMT+1:00  Algiers
+			59:   GMT+1:00  Madrid
+			60:   GMT+1:00  Barcelona
+			61:   GMT+1:00  Paris
+			62:   GMT+1:00  Brussels
+			63:   GMT+1:00  Amsterdam
+			64:   GMT+1:00  Geneva
+			65:   GMT+1:00  Zurich
+			66:   GMT+1:00  Frankfurt
+			67:   GMT+1:00  Oslo
+			68:   GMT+1:00  Copenhagen
+			69:   GMT+1:00  Rome
+			70:   GMT+1:00  Berlin
+			71:   GMT+1:00  Prague
+			72:   GMT+1:00  Zagreb
+			73:   GMT+1:00  Vienna
+			74:   GMT+1:00  Stockholm
+			75:   GMT+1:00  Cape Town
+			76:   GMT+1:00  Budapest
+			77:   GMT+1:00  Belgrade
+			78:   GMT+1:00  Warsaw
+			79:   GMT+2:00  Johannesburg
+			80:   GMT+2:00  Harare
+			81:   GMT+2:00  Cairo
+			82:   GMT+2:00  Jerusalem
+			83:   GMT+2:00  Sofia
+			84:   GMT+2:00  Athens
+			85:   GMT+2:00  Tallinn
+			86:   GMT+2:00  Helsinki
+			87:   GMT+2:00  Bucharest
+			88:   GMT+2:00  Minsk
+			89:   GMT+2:00  Istanbul
+			90:   GMT+2:00  Kyiv
+			91:   GMT+2:00  Odesa
+			92:   GMT+2:00  Khartoum
+			93:   GMT+2:00  Ankara
+			94:   GMT+2:00  Beirut
+			95:   GMT+2:00  Amman
+			96:   GMT+3:00  Nairobi
+			97:   GMT+3:00  Addis Ababa
+			98:   GMT+3:00  Baghdad
+			99:   GMT+3:00  Aden
+			100:  GMT+3:00  Riyadh
+			101:  GMT+3:00  Antananarivo
+			102:  GMT+3:00  Kuwait City
+			103:  GMT+3:00  Moscow
+			104:  GMT+4:00  Abu Dhabi
+			105:  GMT+5:00  Karachi
+			106:  GMT+5:00  Tashkent
+			107:  GMT+5:00  Islamabad
+			108:  GMT+5:00  Lahore
+			109:  GMT+5:30  Mumbai
+			110:  GMT+5:30  New Delhi
+			111:  GMT+5:30  Kolkata
+			112:  GMT+6:00  Dhaka
+			113:  GMT+7:00  Bangkok
+			114:  GMT+7:00  Hanoi
+			115:  GMT+7:00  Jakarta
+			116:  GMT+8:00  Kuala Lumpur
+			117:  GMT+8:00  Singapore
+			118:  GMT+8:00  Hong Kong
+			119:  GMT+8:00  Perth
+			120:  GMT+8:00  Beijing
+			121:  GMT+8:00  Manila
+			122:  GMT+8:00  Shanghai
+			123:  GMT+8:00  Taipei
+			124:  GMT+9:00  Seoul
+			125:  GMT+9:00  Tokyo
+			126:  GMT+10:00  Melbourne
+			127:  GMT+10:00  Canberra
+			128:  GMT+10:00  Sydney
+			129:  GMT+10:00  Brisbane
+			130:  GMT+10:00  Vladivostok
+			131:  GMT+11:00  Kolonia
+			132:  GMT+12:00  Suva
+			133:  GMT+12:00  Kamchatka
+			134:  GMT+12:00  Wellington
+			135:  GMT+12:00  Anadyr
+			"
+		::= { cvtTimeServerConfiguration 5 }
+
+	cvtTimeZone OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"TimeZone."
+		::= { cvtTimeServerConfiguration 6 }
+
+--	cvtTimeDST OBJECT-TYPE
+--		SYNTAX    INTEGER { disable(0), enable(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"disable or enable Daylight Saving Time."
+--		::= { cvtTimeServerConfiguration 7 }
+
+--	cvtTimeDSTOffset OBJECT-TYPE
+--		SYNTAX    INTEGER { one-hour(0), two-hours(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"time offset when Daylight Saving Time (cvtTimeDST) is enable"
+--		::= { cvtTimeServerConfiguration 8 }
+
+	cvtTimeServerIPv6Addr OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"time server ipv6 address."
+		::= { cvtTimeServerConfiguration 20 }
+
+	cvtTimeServerIPv6Addr2 OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"2th time server ipv6 address."
+		::= { cvtTimeServerConfiguration 21 }
+
+
+-- NetworkManagement(3).SyslogConfiguration(8)
+
+
+-- NetworkManagement(3).CWMPConfiguration(11)
+
+	cvtCWMPConfigurationCWMPAgent OBJECT-TYPE
+		SYNTAX    INTEGER { disabled(0), enabled(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"CWMP agent Enabled/Disabled"
+		::= { cvtCWMPConfiguration 1 }
+
+	cvtCWMPConfigurationServerURL OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Management server URL"
+		::= { cvtCWMPConfiguration 2 }
+
+	cvtCWMPConfigurationServerUsername OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Management server username"
+		::= { cvtCWMPConfiguration 3 }
+
+	cvtCWMPConfigurationServerPasswrod OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Management server passwrod"
+		::= { cvtCWMPConfiguration 4 }
+
+	cvtCWMPConfigurationParameterChangeNotifications OBJECT-TYPE
+		SYNTAX    INTEGER { disabled(0), enabled(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"parameter change notifications"
+		::= { cvtCWMPConfiguration 5 }
+
+	cvtCWMPConfigurationPeriodicallyInterval OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"periodically send notifications interval(1-86400 Sec)"
+		::= { cvtCWMPConfiguration 6 }
+
+	cvtCWMPConfigurationConnectionRequestUsername OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Connection request username"
+		::= { cvtCWMPConfiguration 7 }
+
+	cvtCWMPConfigurationConnectionRequestPassword OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Connection request password"
+		::= { cvtCWMPConfiguration 8 }
+
+	cvtCWMPConfigurationApply OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), apply(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Apply"
+		::= { cvtCWMPConfiguration 9 }
+
+
+-- ConverterManagement(4)
+
+	cvtConverterConfiguration
+		OBJECT IDENTIFIER ::= { cvtConverterManagement 1 }
+	cvtStormControl
+		OBJECT IDENTIFIER ::= { cvtConverterManagement 16 }
+	cvtPortConfiguration
+		OBJECT IDENTIFIER ::= { cvtConverterManagement 2 }
+	cvtRateLimiting
+		OBJECT IDENTIFIER ::= { cvtConverterManagement 10 }
+	cvtQoSPriority
+		OBJECT IDENTIFIER ::= { cvtConverterManagement 30 }
+	cvtVLANConfiguration
+		OBJECT IDENTIFIER ::= { cvtConverterManagement 4 }
+
+
+-- ConverterManagement(4).ConverterConfiguration(1)
+
+	--cvtConverterMaxFrameSize OBJECT-TYPE
+	--	SYNTAX    INTEGER { size1522(0), size1536(1) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Max frame size."
+	--	::= { cvtConverterConfiguration 1 }
+
+	--cvtConverterAddressLearning OBJECT-TYPE
+	--	SYNTAX    INTEGER { disable(0), enable(1) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"enable address learning"
+	--	::= { cvtConverterConfiguration 2 }
+
+	--cvtConverterAgingTime OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..4080)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Mac address Aging time(secs)
+	--		 0 means never age out"
+	--	::= { cvtConverterConfiguration 3 }
+
+	--cvtConverterAgingTime OBJECT-TYPE
+	--	SYNTAX    INTEGER { diasble(0), 1sec(1), 10sec(2), 300sec(3), 1hour(4), 24hour(5) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Mac address Aging time"
+	--	::= { cvtConverterConfiguration 3 }
+
+	cvtConverterAgingTime OBJECT-TYPE
+		SYNTAX    INTEGER (7..600000)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Mac address Aging time(7-600000 secs)"
+		::= { cvtConverterConfiguration 3 }
+
+	cvtConverterSFPPolling OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"enable or disable SFP Info. and DMI Polling."
+		::= { cvtConverterConfiguration 51 }
+
+	cvtConverterStatisticsPolling OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"enable or disable Statistics Counter Polling."
+		::= { cvtConverterConfiguration 52 }
+
+
+-- ConverterManagement(4).PortConfiguration(2)
+
+	cvtPortConfigTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtPortConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Port descriptive and status information."
+		::= { cvtPortConfiguration 1 }
+
+	--cvtSavePortConfiguration OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Save Port Configuration to Flash ROM"
+	--	::= { cvtPortConfiguration 2 }
+
+	-- Table Entry
+	cvtPortConfigEntry OBJECT-TYPE
+		SYNTAX    CvtPortConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about port config."
+		INDEX    { cvtPortConfigIndex }
+		::= { cvtPortConfigTable 1 }
+
+	CvtPortConfigEntry ::=
+		SEQUENCE {
+			cvtPortConfigIndex
+				INTEGER,
+			cvtPortConfigComboMode
+				INTEGER,
+			cvtPortConfigMediaType
+				INTEGER,
+			cvtPortConfigState
+				INTEGER,
+			cvtPortConfigType
+				INTEGER,
+			cvtPortConfigSpeed
+				INTEGER,
+			cvtPortConfigDuplex
+				INTEGER,
+			cvtPortConfigFlowControl
+				INTEGER,
+			cvtPortConfigDescription
+				DisplayString
+		}
+
+	cvtPortConfigIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each port."
+		::= { cvtPortConfigEntry 1 }
+
+	cvtPortConfigState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"enable or disable port"
+		::= { cvtPortConfigEntry 2 }
+
+	cvtPortConfigType OBJECT-TYPE
+		SYNTAX    INTEGER { auto-negotiation(0), manual(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"port type"
+		::= { cvtPortConfigEntry 3 }
+
+	cvtPortConfigSpeed OBJECT-TYPE
+		SYNTAX    INTEGER { speed10M(0), speed100M(1), speed1000M(2), auto-sense(3) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"port Speed  10 100 1000 auto-sense
+			 it's configuration, NOT current speed, 
+			 current speed is cvtPortStatusSpeed under cvtConverterMonitor"
+		::= { cvtPortConfigEntry 4 }
+
+	cvtPortConfigDuplex OBJECT-TYPE
+		SYNTAX    INTEGER { halfDuplex(0), fullDuplex(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"duplex
+			 it's configuration, NOT current duplex, 
+			 current duplex is cvtPortStatusDuplex under cvtConverterMonitor"
+		::= { cvtPortConfigEntry 5 }
+
+	cvtPortConfigFlowControl OBJECT-TYPE
+		SYNTAX    INTEGER { off(0), on(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"flow control"
+		::= { cvtPortConfigEntry 6 }
+
+	cvtPortConfigDescription OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Description"
+		::= { cvtPortConfigEntry 7 }
+
+	cvtPortConfigMediaType OBJECT-TYPE
+		SYNTAX    INTEGER { copper(0), fiber(1), auto-media(2) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Media Type"
+		::= { cvtPortConfigEntry 8 }
+
+	cvtPortConfigComboMode OBJECT-TYPE
+		SYNTAX    INTEGER { na2(-2), na(-1), fiber-priority(1), copper-priority(2), fiber-only(3), copper-only(4) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Combo Mode"
+		::= { cvtPortConfigEntry 9 }
+
+
+-- ConverterManagement(4).PriorityAndRateLimitConfiguration(3)
+
+
+-- ConverterManagement(4).VLANConfiguration(4)
+
+	cvtPortVLANConfiguration
+		OBJECT IDENTIFIER ::= { cvtVLANConfiguration 1 }
+
+	cvt8021QVLANConfiguration
+		OBJECT IDENTIFIER ::= { cvtVLANConfiguration 2 }
+
+	cvtQinQVLANConfiguration
+		OBJECT IDENTIFIER ::= { cvtVLANConfiguration 5 }
+
+	cvtVLANTranslationConfiguration
+		OBJECT IDENTIFIER ::= { cvtVLANConfiguration 7 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).PortVLANConfiguration(1)
+
+	cvtPortVLANConfigTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtPortVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Port Based VLAN Configuration."
+		::= { cvtPortVLANConfiguration 1 }
+
+	-- Table Entry
+	cvtPortVLANConfigEntry OBJECT-TYPE
+		SYNTAX    CvtPortVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about port based vlan config."
+		INDEX    { cvtPortVLANConfigIndex }
+		::= { cvtPortVLANConfigTable 1 }
+
+	CvtPortVLANConfigEntry ::=
+		SEQUENCE {
+			cvtPortVLANConfigIndex
+				INTEGER,
+			cvtPortVLANConfigValid
+				INTEGER,
+			cvtPortVLANConfigName
+				DisplayString,
+			cvtPortVLANConfigPort1
+				INTEGER,
+			cvtPortVLANConfigPort2
+				INTEGER,
+			cvtPortVLANConfigCPU
+				INTEGER,
+			cvtPortVLANConfigDelete
+				INTEGER
+		}
+
+	cvtPortVLANConfigIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each vlan."
+		::= { cvtPortVLANConfigEntry 1 }
+
+	cvtPortVLANConfigValid OBJECT-TYPE
+		SYNTAX    INTEGER { invalid(0), valid(1) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"This vlan setting is valid or invalid."
+		::= { cvtPortVLANConfigEntry 2 }
+
+	cvtPortVLANConfigName OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port based vlan name."
+		::= { cvtPortVLANConfigEntry 4 }
+
+	cvtPortVLANConfigPort1 OBJECT-TYPE
+		SYNTAX    INTEGER { b(0), v(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"b:Blocked  v:Member"
+		::= { cvtPortVLANConfigEntry 5 }
+
+	cvtPortVLANConfigPort2 OBJECT-TYPE
+		SYNTAX    INTEGER { b(0), v(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"b:Blocked  v:Member"
+		::= { cvtPortVLANConfigEntry 6 }
+
+
+	cvtPortVLANConfigCPU OBJECT-TYPE
+		SYNTAX    INTEGER { b(0), v(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"b:Blocked  v:Member"
+		::= { cvtPortVLANConfigEntry 55 }
+
+	cvtPortVLANConfigDelete OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), delete(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Delete this vlan setting."
+		::= { cvtPortVLANConfigEntry 56 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).8021QVLANConfiguration(2)
+
+	cvt8021QVLANConfig
+		OBJECT IDENTIFIER ::= { cvt8021QVLANConfiguration 1 }
+
+	cvt8021QPortVLANConfig
+		OBJECT IDENTIFIER ::= { cvt8021QVLANConfiguration 2 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).8021QVLANConfiguration(2).8021QVLANConfig(1)
+
+	cvt8021QVLANConfigTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF Cvt8021QVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of 802.1Q VLAN Configuration."
+		::= { cvt8021QVLANConfig 1 }
+
+	-- Table Entry
+	cvt8021QVLANConfigEntry OBJECT-TYPE
+		SYNTAX    Cvt8021QVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about tag vlan config."
+		INDEX    { cvt8021QVLANConfigIndex }
+		::= { cvt8021QVLANConfigTable 1 }
+
+	Cvt8021QVLANConfigEntry ::=
+		SEQUENCE {
+			cvt8021QVLANConfigIndex
+				INTEGER,
+			cvt8021QVLANConfigValid
+				INTEGER,
+			cvt8021QVLANConfigVID
+				INTEGER,
+			cvt8021QVLANConfigName
+				DisplayString,
+			cvt8021QVLANConfigPort1
+				INTEGER,
+			cvt8021QVLANConfigPort2
+				INTEGER,
+			cvt8021QVLANConfigCPU
+				INTEGER,
+			cvt8021QVLANConfigDelete
+				INTEGER
+		}
+
+	cvt8021QVLANConfigIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each vlan."
+		::= { cvt8021QVLANConfigEntry 1 }
+
+	cvt8021QVLANConfigValid OBJECT-TYPE
+		SYNTAX    INTEGER { invalid(0), valid(1) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"This vlan setting is valid or invalid."
+		::= { cvt8021QVLANConfigEntry 2 }
+
+	cvt8021QVLANConfigVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"VLAN ID"
+		::= { cvt8021QVLANConfigEntry 3 }
+
+	cvt8021QVLANConfigName OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Port based vlan name."
+		::= { cvt8021QVLANConfigEntry 4 }
+
+	cvt8021QVLANConfigPort1 OBJECT-TYPE
+		SYNTAX    INTEGER { b(0), v(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"b:Blocked  v:Member"
+		::= { cvt8021QVLANConfigEntry 5 }
+
+	cvt8021QVLANConfigPort2 OBJECT-TYPE
+		SYNTAX    INTEGER { b(0), v(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"b:Blocked  v:Member"
+		::= { cvt8021QVLANConfigEntry 6 }
+
+
+	cvt8021QVLANConfigCPU OBJECT-TYPE
+		SYNTAX    INTEGER { b(0), v(1) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"b:Blocked  v:Member"
+		::= { cvt8021QVLANConfigEntry 55 }
+
+	cvt8021QVLANConfigDelete OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), delete(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Delete this vlan setting."
+		::= { cvt8021QVLANConfigEntry 56 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).8021QVLANConfiguration(2).8021QPortVLANConfig(2)
+
+	cvt8021QCPUPVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"CPU Default Port VLAN ID."
+		::= { cvt8021QPortVLANConfig 1 }
+
+	cvt8021QVLANMode OBJECT-TYPE
+		SYNTAX    INTEGER { portbase(1), tagvlan(2), bypassctag(4) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"802.1Q Tag VLAN Mode."
+		::= { cvt8021QPortVLANConfig 3 }
+
+	cvt8021QManagementVLAN OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify management VLAN ID(1-4094)."
+		::= { cvt8021QPortVLANConfig 10 }
+
+	cvt8021QManagementPriority OBJECT-TYPE
+		SYNTAX    INTEGER (0..7)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify Management Priority(0-7)."
+		::= { cvt8021QPortVLANConfig 11 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).8021QVLANConfiguration(2).8021QPortVLANConfig(2).8021QPortVLANConfigTable(2)
+
+	cvt8021QPortVLANConfigTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF Cvt8021QPortVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of 802.1q VLAN ID."
+		::= { cvt8021QPortVLANConfig 2 }
+
+	-- Table Entry
+	cvt8021QPortVLANConfigEntry OBJECT-TYPE
+		SYNTAX    Cvt8021QPortVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about Port VLAN ID "
+		INDEX    { cvt8021QPortIndex }
+		::= { cvt8021QPortVLANConfigTable 1 }
+
+	Cvt8021QPortVLANConfigEntry ::=
+		SEQUENCE {
+			cvt8021QPortIndex
+				INTEGER,
+			cvt8021QPortPVID
+				INTEGER,
+			cvt8021QPortUserPriority
+				INTEGER,
+			cvt8021QPortVLANMode
+				INTEGER
+		}
+
+	cvt8021QPortIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for port index."
+		::= { cvt8021QPortVLANConfigEntry 1 }
+
+	cvt8021QPortPVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify port VLAN ID(1-4094)."
+		::= { cvt8021QPortVLANConfigEntry 2 }
+
+	cvt8021QPortUserPriority OBJECT-TYPE
+		SYNTAX    INTEGER (0..7)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Set User Priority(0-7)."
+		::= { cvt8021QPortVLANConfigEntry 21 }
+
+	cvt8021QPortVLANMode OBJECT-TYPE
+		SYNTAX    INTEGER { access(0), trunk(1), trunknative(2) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Set VLAN mode."
+		::= { cvt8021QPortVLANConfigEntry 20 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).QinQVLANConfiguration(5)
+
+	cvtQinQVLANMode OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"QinQ Mode"
+		::= { cvtQinQVLANConfiguration 1 }
+
+	cvtQinQVLANEtherType OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"QinQ VLAN Ether Type; 0x0000-0xFFFF"
+		::= { cvtQinQVLANConfiguration 2 }
+
+--	cvtQinQVLANPriority OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"QinQ VLAN Priority 0-7"
+--		::= { cvtQinQVLANConfiguration 3 }
+
+--	cvtQinQVLANVID OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"QinQ VLAN ID"
+--		::= { cvtQinQVLANConfiguration 4 }
+
+--	cvtQinQVLANISPPort1 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 5 }
+--
+--	cvtQinQVLANISPPort2 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 6 }
+--
+--	cvtQinQVLANISPPort3 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 7 }
+--
+--	cvtQinQVLANISPPort4 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 8 }
+--
+--	cvtQinQVLANISPPort5 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 9 }
+--
+--	cvtQinQVLANISPPort6 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 10 }
+--
+--	cvtQinQVLANISPPort7 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 11 }
+--
+--	cvtQinQVLANISPPort8 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 12 }
+--
+--	cvtQinQVLANISPPort9 OBJECT-TYPE
+--		SYNTAX    INTEGER { b(0), v(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"b:Blocked  v:Member"
+--		::= { cvtQinQVLANConfiguration 13 }
+
+--	cvtQinQVLANNode OBJECT-TYPE
+--		SYNTAX    INTEGER { disable(0), enable(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Node"
+--		::= { cvtQinQVLANConfiguration 56 }
+
+	cvtQinQVLANPassThroughMode OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"QinQ Pass Through Mode"
+		::= { cvtQinQVLANConfiguration 57 }
+
+--	cvtQinQVLANPassThroughVLAN8021pbit OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"QinQ Pass Through VLAN 802.1p bit"
+--		::= { cvtQinQVLANConfiguration 58 }
+
+	cvtQinQVLANPassThroughVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"QinQ Pass Through VLAN ID(1-4094)"
+		::= { cvtQinQVLANConfiguration 59 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).QinQVLANConfiguration(5).QinQVLANConfigTable(60)
+
+	cvtQinQVLANConfigTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtQinQVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of 802.1q VLAN ID."
+		::= { cvtQinQVLANConfiguration 60 }
+
+	-- Table Entry
+	cvtQinQVLANConfigEntry OBJECT-TYPE
+		SYNTAX    CvtQinQVLANConfigEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about QinQ VLAN Config"
+		INDEX    { cvtQinQVLANPortIndex }
+		::= { cvtQinQVLANConfigTable 1 }
+
+	CvtQinQVLANConfigEntry ::=
+		SEQUENCE {
+			cvtQinQVLANPortIndex
+				INTEGER,
+			cvtQinQVLANPortName
+				DisplayString,
+		--	cvtQinQVLANPortStagPriority
+		--		INTEGER,
+			cvtQinQVLANPortStagVID
+				INTEGER,
+			cvtQinQVLANPortISPPort
+				INTEGER
+		}
+
+	cvtQinQVLANPortIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for port index."
+		::= { cvtQinQVLANConfigEntry 1 }
+
+	cvtQinQVLANPortName OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Name"
+		::= { cvtQinQVLANConfigEntry 3 }
+
+--	cvtQinQVLANPortStagPriority OBJECT-TYPE
+--		SYNTAX    INTEGER (0..7)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Set Stag Priority(0-7)."
+--		::= { cvtQinQVLANConfigEntry 5 }
+
+	cvtQinQVLANPortStagVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify port Stag VLAN ID(1-4094)."
+		::= { cvtQinQVLANConfigEntry 6 }
+
+	cvtQinQVLANPortISPPort OBJECT-TYPE
+		SYNTAX    INTEGER { b(0), v(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"b:Blocked  v:Member"
+		::= { cvtQinQVLANConfigEntry 7 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).QinQVLANConfiguration(5).QinQVLANManagementStagVID(61)
+
+	cvtQinQVLANManagementStag OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"QinQ Management Stag VLAN ID(1-4094)"
+		::= { cvtQinQVLANConfiguration 61 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).PortIsolationConfiguration(6)
+
+
+-- ConverterManagement(4).VLANConfiguration(4).VLANTranslationConfiguration(7)
+
+	cvtVLANTranslationConfigVLANTranslation OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable or Disable VLAN Translation"
+		::= { cvtVLANTranslationConfiguration 1 }
+
+-- ConverterManagement(4).VLANConfiguration(4).VLANTranslationConfiguration(7).8021QPort1VLANTranslationTable(11)
+
+	cvt8021QPort1VLANTranslationTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF Cvt8021QPort1VLANTranslationEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of 8021Q Port1 VLAN Translation."
+		::= { cvtVLANTranslationConfiguration 11 }
+
+	-- Table Entry
+	cvt8021QPort1VLANTranslationEntry OBJECT-TYPE
+		SYNTAX    Cvt8021QPort1VLANTranslationEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about 8021Q Port1 VLAN Translation"
+		INDEX    { cvt8021QPort1VLANTranslationIndex }
+		::= { cvt8021QPort1VLANTranslationTable 1 }
+
+	Cvt8021QPort1VLANTranslationEntry ::=
+		SEQUENCE {
+			cvt8021QPort1VLANTranslationIndex
+				INTEGER,
+			cvt8021QPort1VLANTranslationState
+				INTEGER,
+			cvt8021QPort1VLANTranslationOriginalVID
+				INTEGER,
+			cvt8021QPort1VLANTranslationTranslatedVID
+				INTEGER,
+			cvt8021QPort1VLANTranslationDelete
+				INTEGER
+		}
+
+	cvt8021QPort1VLANTranslationIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for index."
+		::= { cvt8021QPort1VLANTranslationEntry 1 }
+
+	cvt8021QPort1VLANTranslationState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable VLAN Translation"
+		::= { cvt8021QPort1VLANTranslationEntry 3 }
+
+	cvt8021QPort1VLANTranslationOriginalVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify Source VLAN ID(1-4094)."
+		::= { cvt8021QPort1VLANTranslationEntry 4 }
+
+	cvt8021QPort1VLANTranslationTranslatedVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify Target VLAN ID(1-4094)."
+		::= { cvt8021QPort1VLANTranslationEntry 5 }
+
+	cvt8021QPort1VLANTranslationDelete OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), delete(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Delete this entry."
+		::= { cvt8021QPort1VLANTranslationEntry 10 }
+
+
+-- ConverterManagement(4).VLANConfiguration(4).8021QVLANConfiguration(2).8021QPortVLANConfig(2).8021QPort2VLANTranslationTable(12)
+
+	cvt8021QPort2VLANTranslationTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF Cvt8021QPort2VLANTranslationEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of 8021Q Port2 VLAN Translation."
+		::= { cvtVLANTranslationConfiguration 12 }
+
+	-- Table Entry
+	cvt8021QPort2VLANTranslationEntry OBJECT-TYPE
+		SYNTAX    Cvt8021QPort2VLANTranslationEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about 8021Q Port2 VLAN Translation"
+		INDEX    { cvt8021QPort2VLANTranslationIndex }
+		::= { cvt8021QPort2VLANTranslationTable 1 }
+
+	Cvt8021QPort2VLANTranslationEntry ::=
+		SEQUENCE {
+			cvt8021QPort2VLANTranslationIndex
+				INTEGER,
+			cvt8021QPort2VLANTranslationState
+				INTEGER,
+			cvt8021QPort2VLANTranslationOriginalVID
+				INTEGER,
+			cvt8021QPort2VLANTranslationTranslatedVID
+				INTEGER,
+			cvt8021QPort2VLANTranslationDelete
+				INTEGER
+		}
+
+	cvt8021QPort2VLANTranslationIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for index."
+		::= { cvt8021QPort2VLANTranslationEntry 1 }
+
+	cvt8021QPort2VLANTranslationState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Enable VLAN Translation"
+		::= { cvt8021QPort2VLANTranslationEntry 3 }
+
+	cvt8021QPort2VLANTranslationOriginalVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify Source VLAN ID(1-4094)."
+		::= { cvt8021QPort2VLANTranslationEntry 4 }
+
+	cvt8021QPort2VLANTranslationTranslatedVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify Target VLAN ID(1-4094)."
+		::= { cvt8021QPort2VLANTranslationEntry 5 }
+
+	cvt8021QPort2VLANTranslationDelete OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), delete(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Delete this entry."
+		::= { cvt8021QPort2VLANTranslationEntry 10 }
+
+
+-- ConverterManagement(4).SpanningTreeProtocol(9)
+
+
+-- ConverterManagement(4).RateLimiting(10)
+
+	cvtRateLimitingTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtRateLimitingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Rate Limit Configuration."
+		::= { cvtRateLimiting 2 }
+
+	-- Table Entry
+	cvtRateLimitingEntry OBJECT-TYPE
+		SYNTAX    CvtRateLimitingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about Rate Limit config."
+		INDEX    { cvtRateLimitingIndex }
+		::= { cvtRateLimitingTable 1 }
+
+	CvtRateLimitingEntry ::=
+		SEQUENCE {
+			cvtRateLimitingIndex
+				INTEGER,
+			cvtRateLimitingIngress
+				INTEGER,
+		--	cvtRateLimitingIngressBWName
+		--		DisplayString,
+			cvtRateLimitingIngressBW
+				INTEGER,
+			cvtRateLimitingIngressBandwidth
+				DisplayString,
+			cvtRateLimitingEgress
+				INTEGER,
+		--	cvtRateLimitingEgressBWName
+		--		DisplayString,
+			cvtRateLimitingEgressBW
+				INTEGER,
+			cvtRateLimitingEgressBandwidth
+				DisplayString
+		--	cvtRateLimitingEgressQ0BWName
+		--		DisplayString,
+		--	cvtRateLimitingEgressQ0BW
+		--	    INTEGER,
+		--	cvtRateLimitingEgressQ1BWName
+		--		DisplayString,
+		--	cvtRateLimitingEgressQ1BW
+		--	    INTEGER,
+		--	cvtRateLimitingEgressQ2BWName
+		--		DisplayString,
+		--	cvtRateLimitingEgressQ2BW
+		--	    INTEGER,
+		--	cvtRateLimitingEgressQ3BWName
+		--		DisplayString,
+		--	cvtRateLimitingEgressQ3BW
+		--	    INTEGER
+		}
+
+	cvtRateLimitingIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each port."
+		::= { cvtRateLimitingEntry 1 }
+
+	cvtRateLimitingIngress OBJECT-TYPE
+		SYNTAX    INTEGER { off(0), on(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Ingress Rate is on or off."
+		::= { cvtRateLimitingEntry 2 }
+
+--	cvtRateLimitingIngressBWName OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Ingress Bandwidth Name (bps)."
+--		::= { cvtRateLimitingEntry 3 }
+
+	cvtRateLimitingIngressBW OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Ingress Bandwidth (32-1000000Kbps)"
+		::= { cvtRateLimitingEntry 4 }
+
+	cvtRateLimitingEgress OBJECT-TYPE
+		SYNTAX    INTEGER { off(0), on(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Egress Rate is on or off."
+		::= { cvtRateLimitingEntry 5 }
+
+--	cvtRateLimitingEgressBWName OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Bandwidth Name (bps)."
+--		::= { cvtRateLimitingEntry 6 }
+
+	cvtRateLimitingEgressBW OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Egress Bandwidth (32-1000000Kbps)"
+		::= { cvtRateLimitingEntry 7 }
+
+	-- Queue Rate
+--	cvtRateLimitingEgressQ0BWName OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q0 Bandwidth Name (bps)."
+--		::= { cvtRateLimitingEntry 20 }
+
+--	cvtRateLimitingEgressQ0BW OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q0 Bandwidth(32-1000000Kbps)"
+--		::= { cvtRateLimitingEntry 21 }
+
+--	cvtRateLimitingEgressQ1BWName OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q1 Bandwidth Name (bps)."
+--		::= { cvtRateLimitingEntry 22 }
+
+--	cvtRateLimitingEgressQ1BW OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q1 Bandwidth(32-1000000Kbps)"
+--		::= { cvtRateLimitingEntry 23 }
+
+--	cvtRateLimitingEgressQ2BWName OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q2 Bandwidth Name (bps)."
+--		::= { cvtRateLimitingEntry 24 }
+
+--	cvtRateLimitingEgressQ2BW OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q2 Bandwidth(32-1000000Kbps)"
+--		::= { cvtRateLimitingEntry 25 }
+
+--	cvtRateLimitingEgressQ3BWName OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q3 Bandwidth Name (bps)."
+--		::= { cvtRateLimitingEntry 26 }
+
+--	cvtRateLimitingEgressQ3BW OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Egress Q3 Bandwidth(32-1000000Kbps)"
+--		::= { cvtRateLimitingEntry 27 }
+
+	-- Bandwidth
+	cvtRateLimitingIngressBandwidth OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Ingress Bandwidth(bps)."
+		::= { cvtRateLimitingEntry 40 }
+
+	cvtRateLimitingEgressBandwidth OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Egress Bandwidth(bps)."
+		::= { cvtRateLimitingEntry 41 }
+
+
+-- ConverterManagement(4).StormControl(16)
+
+	cvtStormControlMode OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Storm Control"
+		::= { cvtStormControl 20 }
+
+	cvtStormControlRates OBJECT-TYPE
+		SYNTAX    INTEGER (32..1000000)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Storm Rates (32-1000000Kbps)"
+		::= { cvtStormControl 21 }
+
+	cvtStormControlRatesBandwidth OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Storm Rates Bandwidth(bps)."
+		::= { cvtStormControl 22 }
+
+
+-- ConverterManagement(4).QoSPriority(30)
+
+	cvtQoSMode OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), ieee8021p(2), dscp(3) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify QoS mode"
+		::= { cvtQoSPriority 1 }
+
+	cvtQueuingMode OBJECT-TYPE
+		SYNTAX    INTEGER { weight(0), strict(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify the egress mode is Strict or Weight"
+		::= { cvtQoSPriority 2 }
+
+	cvtQueueWeighted OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify as weight (Q0:Q1:Q2:Q3) , Queue is 1~32"
+		::= { cvtQoSPriority 11 }
+
+	--cvtQueueWeightQ0 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q0 , Queue is 1~32"
+	--	::= { cvtQoSPriority 12 }
+
+	--cvtQueueWeightQ1 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q1 , Queue is 1~32"
+	--	::= { cvtQoSPriority 13 }
+
+	--cvtQueueWeightQ2 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q2 , Queue is 1~32"
+	--	::= { cvtQoSPriority 14 }
+
+	--cvtQueueWeightQ3 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q3 , Queue is 1~32"
+	--	::= { cvtQoSPriority 15 }
+
+	--cvtQueueWeightQ4 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q4 , Queue is 1~32"
+	--	::= { cvtQoSPriority 16 }
+
+	--cvtQueueWeightQ5 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q5 , Queue is 1~32"
+	--	::= { cvtQoSPriority 17 }
+
+	--cvtQueueWeightQ6 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q6 , Queue is 1~32"
+	--	::= { cvtQoSPriority 18 }
+
+	--cvtQueueWeightQ7 OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Specify as weight Q7 , Queue is 1~32"
+	--	::= { cvtQoSPriority 19 }
+
+	--cvtDSCPAllOthersQueue OBJECT-TYPE
+	--	SYNTAX    INTEGER { q0(0), q1(1), q2(2), q3(3) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"all others priority, Q0 Q1 Q2 Q3."
+	--	::= { cvtQoSPriority 3 }
+
+	cvtVIDRemarking OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify VLAN ID Remarking"
+		::= { cvtQoSPriority 50 }
+
+	cvt8021pRemarking OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify 802.1p Remarking"
+		::= { cvtQoSPriority 30 }
+
+	cvtDSCPRemarking OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), by-dscp(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify DSCP Remarking"
+		::= { cvtQoSPriority 40 }
+
+	cvtDSCPRemarkingManagementState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify DSCP Remarking Management State"
+		::= { cvtQoSPriority 43 }
+
+	cvtDSCPRemarkingManagementNewDSCP OBJECT-TYPE
+		SYNTAX    INTEGER (0..63)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify DSCP Remarking Management New DSCP(0-63)"
+		::= { cvtQoSPriority 44 }
+
+
+-- ConverterManagement(4).QoSPriority(30).PortPriorityTable(4)
+
+
+-- ConverterManagement(4).QoSPriority(30).8021pPriorityTable(5)
+
+	cvt8021pPriorityTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF Cvt8021pPriorityEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of 802.1p Priority Map."
+		::= { cvtQoSPriority 5 }
+
+	-- Table Entry
+	cvt8021pPriorityEntry OBJECT-TYPE
+		SYNTAX    Cvt8021pPriorityEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about 802.1p Priority config."
+		INDEX    { cvt8021pPriorityIndex }
+		::= { cvt8021pPriorityTable 1 }
+
+	Cvt8021pPriorityEntry ::=
+		SEQUENCE {
+			cvt8021pPriorityIndex
+				INTEGER,
+			cvt8021pPriorityPriority
+				INTEGER,
+			cvt8021pPriorityQueue
+				INTEGER
+		}
+
+	cvt8021pPriorityIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each 802.1p priority."
+		::= { cvt8021pPriorityEntry 1 }
+
+	cvt8021pPriorityPriority OBJECT-TYPE
+		SYNTAX    INTEGER { ieee8021p-0(0),
+		                    ieee8021p-1(1),
+		                    ieee8021p-2(2),
+		                    ieee8021p-3(3),
+		                    ieee8021p-4(4),
+		                    ieee8021p-5(5),
+		                    ieee8021p-6(6),
+		                    ieee8021p-7(7)
+		                    } 
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"802.1p priority."
+		::= { cvt8021pPriorityEntry 2 }
+
+	cvt8021pPriorityQueue OBJECT-TYPE
+		SYNTAX    INTEGER { q0(0), q1(1), q2(2), q3(3) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify 802.1p bit value, Q0 Q1 Q2 Q3."
+		::= { cvt8021pPriorityEntry 3 }
+
+
+-- ConverterManagement(4).QoSPriority(30).DSCPPriorityTable(6)
+
+	cvtDSCPPriorityTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtDSCPPriorityEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of DSCP Priority Map."
+		::= { cvtQoSPriority 6 }
+
+	-- Table Entry
+	cvtDSCPPriorityEntry OBJECT-TYPE
+		SYNTAX    CvtDSCPPriorityEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about DSCP Priority config."
+		INDEX    { cvtDSCPPriorityIndex }
+		::= { cvtDSCPPriorityTable 1 }
+
+	CvtDSCPPriorityEntry ::=
+		SEQUENCE {
+			cvtDSCPPriorityIndex
+				INTEGER,
+			cvtDSCPPriorityPriority
+				INTEGER,
+			cvtDSCPPriorityQueue
+				INTEGER
+		}
+
+	cvtDSCPPriorityIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each dscp priority."
+		::= { cvtDSCPPriorityEntry 1 }
+
+	cvtDSCPPriorityPriority OBJECT-TYPE
+		SYNTAX    INTEGER { dscp-0(0), dscp-1(1), dscp-2(2), dscp-3(3),
+		                    dscp-4(4), dscp-5(5), dscp-6(6), dscp-7(7),
+		                    dscp-8(8), dscp-9(9), dscp-10(10), dscp-11(11),
+		                    dscp-12(12), dscp-13(13), dscp-14(14), dscp-15(15),
+		                    dscp-16(16), dscp-17(17), dscp-18(18), dscp-19(19),
+		                    dscp-20(20), dscp-21(21), dscp-22(22), dscp-23(23),
+		                    dscp-24(24), dscp-25(25), dscp-26(26), dscp-27(27),
+		                    dscp-28(28), dscp-29(29), dscp-30(30), dscp-31(31),
+		                    dscp-32(32), dscp-33(33), dscp-34(34), dscp-35(35),
+		                    dscp-36(36), dscp-37(37), dscp-38(38), dscp-39(39),
+		                    dscp-40(40), dscp-41(41), dscp-42(42), dscp-43(43),
+		                    dscp-44(44), dscp-45(45), dscp-46(46), dscp-47(47),
+		                    dscp-48(48), dscp-49(49), dscp-50(50), dscp-51(51),
+		                    dscp-52(52), dscp-53(53), dscp-54(54), dscp-55(55),
+		                    dscp-56(56), dscp-57(57), dscp-58(58), dscp-59(59),
+		                    dscp-60(60), dscp-61(61), dscp-62(62), dscp-63(63)
+		                    }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"DSCP priority."
+		::= { cvtDSCPPriorityEntry 2 }
+
+	--cvtDSCPPriorityPriority OBJECT-TYPE
+	--	SYNTAX    INTEGER { invalid(0),
+	--	                    dscp-0(1), dscp-1(2), dscp-2(3), dscp-3(4),
+	--	                    dscp-4(5), dscp-5(6), dscp-6(7), dscp-7(8),
+	--	                    dscp-8(9), dscp-9(10), dscp-10(11), dscp-11(12),
+	--	                    dscp-12(13), dscp-13(14), dscp-14(15), dscp-15(16),
+	--	                    dscp-16(17), dscp-17(18), dscp-18(19), dscp-19(20),
+	--	                    dscp-20(21), dscp-21(22), dscp-22(23), dscp-23(24),
+	--	                    dscp-24(25), dscp-25(26), dscp-26(27), dscp-27(28),
+	--	                    dscp-28(29), dscp-29(30), dscp-30(31), dscp-31(32),
+	--	                    dscp-32(33), dscp-33(34), dscp-34(35), dscp-35(36),
+	--	                    dscp-36(37), dscp-37(38), dscp-38(39), dscp-39(40),
+	--	                    dscp-40(41), dscp-41(42), dscp-42(43), dscp-43(44),
+	--	                    dscp-44(45), dscp-45(46), dscp-46(47), dscp-47(48),
+	--	                    dscp-48(49), dscp-49(50), dscp-50(51), dscp-51(52),
+	--	                    dscp-52(53), dscp-53(54), dscp-54(55), dscp-55(56),
+	--	                    dscp-56(57), dscp-57(58), dscp-58(59), dscp-59(60),
+	--	                    dscp-60(61), dscp-61(62), dscp-62(63), dscp-63(64)
+	--	                    }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"DSCP priority."
+	--	::= { cvtDSCPPriorityEntry 2 }
+
+	cvtDSCPPriorityQueue OBJECT-TYPE
+		SYNTAX    INTEGER { q0(0), q1(1), q2(2), q3(3) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Specify DSCP bit value, Q0 Q1 Q2 Q3."
+		::= { cvtDSCPPriorityEntry 3 }
+
+
+-- ConverterManagement(4).QoSPriority(30).VLANPriorityTable(25)
+
+
+-- ConverterManagement(4).QoSPriority(30).VIDRemarkingTable(51)
+
+	cvtVIDRemarkingTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtVIDRemarkingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of VLAN ID Remarking Map."
+		::= { cvtQoSPriority 51 }
+
+	-- Table Entry
+	cvtVIDRemarkingEntry OBJECT-TYPE
+		SYNTAX    CvtVIDRemarkingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about VLAN ID Remarking config."
+		INDEX    { cvtVIDRemarkingIndex }
+		::= { cvtVIDRemarkingTable 1 }
+
+	CvtVIDRemarkingEntry ::=
+		SEQUENCE {
+			cvtVIDRemarkingIndex
+				INTEGER,
+		--	cvtVIDRemarkingQueue
+		--		INTEGER,
+			cvtVIDRemarkingState
+				INTEGER,
+			cvtVIDRemarkingVID
+				INTEGER,
+			cvtVIDRemarkingPriority
+				INTEGER
+		}
+
+	cvtVIDRemarkingIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each VLAN ID remarking index."
+		::= { cvtVIDRemarkingEntry 1 }
+
+--	cvtVIDRemarkingQueue OBJECT-TYPE
+--		SYNTAX    INTEGER { q0(0), q1(1), q2(2), q3(3) }
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Specify VLAN ID value, Q0 Q1 Q2 Q3."
+--		::= { cvtVIDRemarkingEntry 2 }
+
+	cvtVIDRemarkingPriority OBJECT-TYPE
+		SYNTAX    INTEGER (0..7)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"VLAN ID priority(0-7)."
+		::= { cvtVIDRemarkingEntry 3 }
+
+	cvtVIDRemarkingState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"disable or enable VLAN ID remarking priority"
+		::= { cvtVIDRemarkingEntry 4 }
+
+	cvtVIDRemarkingVID OBJECT-TYPE
+		SYNTAX    INTEGER (1..4094)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"VLAN ID(1-4094)."
+		::= { cvtVIDRemarkingEntry 5 }
+
+
+-- ConverterManagement(4).QoSPriority(30).8021pRemarkingTable(31)
+
+	cvt8021pRemarkingTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF Cvt8021pRemarkingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of 802.1p Remarking Map."
+		::= { cvtQoSPriority 31 }
+
+	-- Table Entry
+	cvt8021pRemarkingEntry OBJECT-TYPE
+		SYNTAX    Cvt8021pRemarkingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about 802.1p Remarking config."
+		INDEX    { cvt8021pRemarkingIndex }
+		::= { cvt8021pRemarkingTable 1 }
+
+	Cvt8021pRemarkingEntry ::=
+		SEQUENCE {
+			cvt8021pRemarkingIndex
+				INTEGER,
+		--	cvt8021pRemarkingQueue
+		--		INTEGER,
+			cvt8021pRemarkingState
+				INTEGER,
+			cvt8021pRemarkingRx8021p
+				INTEGER,
+			cvt8021pRemarkingNew8021p
+				INTEGER
+		}
+
+	cvt8021pRemarkingIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each 802.1p remarking index."
+		::= { cvt8021pRemarkingEntry 1 }
+
+--	cvt8021pRemarkingQueue OBJECT-TYPE
+--		SYNTAX    INTEGER { q0(0), q1(1), q2(2), q3(3) }
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Specify 802.1p bit value, Q0 Q1 Q2 Q3."
+--		::= { cvt8021pRemarkingEntry 2 }
+
+	cvt8021pRemarkingNew8021p OBJECT-TYPE
+		SYNTAX    INTEGER (0..7)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"New-802.1p(0-7)."
+		::= { cvt8021pRemarkingEntry 3 }
+
+	cvt8021pRemarkingState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"disable or enable 802.1p remarking priority"
+		::= { cvt8021pRemarkingEntry 4 }
+
+	cvt8021pRemarkingRx8021p OBJECT-TYPE
+		SYNTAX    INTEGER (0..7)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Rx-802.1p(0-7)."
+		::= { cvt8021pRemarkingEntry 5 }
+
+
+-- ConverterManagement(4).QoSPriority(30).8021pRemarkingDSCPTable(32)
+
+
+-- ConverterManagement(4).QoSPriority(30).DSCPRemarkingTable(41)
+
+	cvtDSCPRemarkingTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtDSCPRemarkingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of DSCP Remarking Map."
+		::= { cvtQoSPriority 41 }
+
+	-- Table Entry
+	cvtDSCPRemarkingEntry OBJECT-TYPE
+		SYNTAX    CvtDSCPRemarkingEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about DSCP Remarking config."
+		INDEX    { cvtDSCPRemarkingIndex }
+		::= { cvtDSCPRemarkingTable 1 }
+
+	CvtDSCPRemarkingEntry ::=
+		SEQUENCE {
+			cvtDSCPRemarkingIndex
+				INTEGER,
+			cvtDSCPRemarkingState
+				INTEGER,
+			cvtDSCPRemarkingRxDSCP
+				INTEGER,
+			cvtDSCPRemarkingNewDSCP
+				INTEGER
+		}
+
+	cvtDSCPRemarkingIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each dscp remarking index."
+		::= { cvtDSCPRemarkingEntry 1 }
+
+--	cvtDSCPRemarkingQueue OBJECT-TYPE
+--		SYNTAX    INTEGER { q0(0), q1(1), q2(2), q3(3) }
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Specify DSCP bit value, Q0 Q1 Q2 Q3."
+--		::= { cvtDSCPRemarkingEntry 2 }
+
+	cvtDSCPRemarkingNewDSCP OBJECT-TYPE
+		SYNTAX    INTEGER (0..63)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"DSCP priority(0-63)."
+		::= { cvtDSCPRemarkingEntry 3 }
+
+	cvtDSCPRemarkingState OBJECT-TYPE
+		SYNTAX    INTEGER { disable(0), enable(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"disable or enable DSCP remarking"
+		::= { cvtDSCPRemarkingEntry 4 }
+
+	cvtDSCPRemarkingRxDSCP OBJECT-TYPE
+		SYNTAX    INTEGER (0..63)
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"DSCP(0-63)."
+		::= { cvtDSCPRemarkingEntry 5 }
+
+
+-- ConverterManagement(4).QoSPriority(30).DSCPPortRemarkingTable(42)
+
+
+-- ConverterManagement(4).QoSPriority(30).VIDRemarkingTable(51)
+
+
+-- ConverterManagement(4).MacAddressManagement(35)
+
+
+-- ConverterManagement(4).IGMPSnooping(50)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80)
+
+--	cvtDHCPOpt82Settings
+--		OBJECT IDENTIFIER ::= { cvtSecurityConfiguration 1 }
+--	cvtDHCPPortSettings
+--		OBJECT IDENTIFIER ::= { cvtSecurityConfiguration 2 }
+--	cvtFilterConfiguration
+--		OBJECT IDENTIFIER ::= { cvtSecurityConfiguration 3 }
+--	cvtStaticIPTableConfiguration
+--		OBJECT IDENTIFIER ::= { cvtSecurityConfiguration 4 }
+--	cvtStormControl
+--		OBJECT IDENTIFIER ::= { cvtSecurityConfiguration 12 }
+--	cvtAntiBcastConfiguration
+--		OBJECT IDENTIFIER ::= { cvtSecurityConfiguration 6 }
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).DHCPOpt82Settings(1)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).DHCPPortSettings(2)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).FilterConfiguration(3)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).FilterConfiguration(3).DHCPServerTrustPort(7)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).FilterConfiguration(3).DHCPServerTrustPort(7).DHCPServerTable(1)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).StaticIPTableConfiguration(4)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).AntiBcast(6)
+
+
+-- ConverterManagement(4).SecurityConfiguration(80).StormControl(12)
+
+
+-- ConverterManagement(4).HTTPAuthentication(90)
+
+
+-- ConverterMonitor(5)
+
+	cvtPortStatus
+		OBJECT IDENTIFIER ::= { cvtConverterMonitor 1 }
+	cvtPortCountersRates
+		OBJECT IDENTIFIER ::= { cvtConverterMonitor 5 }
+	cvtPortCountersEvents
+		OBJECT IDENTIFIER ::= { cvtConverterMonitor 6 }
+	cvtSFPInformation
+		OBJECT IDENTIFIER ::= { cvtConverterMonitor 34 }
+	cvtMacAddressTable
+		OBJECT IDENTIFIER ::= { cvtConverterMonitor 7 }
+
+
+-- ConverterMonitor(5).PortStatus(1)
+
+	cvtPortStatusTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtPortStatusEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Port State."
+		::= { cvtPortStatus 1 }
+
+	-- Table Entry
+	cvtPortStatusEntry OBJECT-TYPE
+		SYNTAX    CvtPortStatusEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			 about Port State."
+		INDEX    { cvtPortStatusIndex }
+		::= { cvtPortStatusTable 1 }
+
+	CvtPortStatusEntry ::=
+		SEQUENCE {
+			cvtPortStatusIndex
+				INTEGER,
+--			cvtPortStatusDescription
+--				DisplayString,
+			cvtPortStatusPortMedia
+				INTEGER,
+			cvtPortStatusPortState
+				INTEGER,
+			cvtPortStatusPortLink
+				INTEGER,
+			cvtPortStatusPortSpeed
+				INTEGER,
+			cvtPortStatusPortDuplex
+				INTEGER,
+			cvtPortStatusPortFlowCtrl
+				INTEGER
+		}
+
+	cvtPortStatusIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each port."
+		::= { cvtPortStatusEntry 1 }
+
+--	cvtPortStatusDescription OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Port Description"
+--		::= { cvtPortStatusEntry 2 }
+
+	cvtPortStatusPortMedia OBJECT-TYPE
+		SYNTAX    INTEGER { na2(-2), na(-1), copper(1), fiber(2) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Media Type"
+		::= { cvtPortStatusEntry 3 }
+
+	cvtPortStatusPortState OBJECT-TYPE
+		SYNTAX    INTEGER { na2(-2), na(-1), disable(0), blocking-listening(1), learning(2), forwarding(3), enable(4) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port State"
+		::= { cvtPortStatusEntry 4 }
+
+	cvtPortStatusPortLink OBJECT-TYPE
+		SYNTAX    INTEGER { na2(-2), na(-1), up(1), down(2) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Link"
+		::= { cvtPortStatusEntry 5 }
+
+	cvtPortStatusPortSpeed OBJECT-TYPE
+		SYNTAX    INTEGER { na2(-2), na(-1) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Speed"
+		::= { cvtPortStatusEntry 6 }
+
+	cvtPortStatusPortDuplex OBJECT-TYPE
+		SYNTAX    INTEGER { na2(-2), na(-1), full(1), half(2) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Duplex"
+		::= { cvtPortStatusEntry 7 }
+
+	cvtPortStatusPortFlowCtrl OBJECT-TYPE
+		SYNTAX    INTEGER { na2(-2), na(-1), enable(1), disable(2) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Flow Control"
+		::= { cvtPortStatusEntry 8 }
+
+
+-- ConverterMonitor(5).PortCountersRates(5)
+
+	cvtCountersRatesTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtCountersRatesEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Port counters rates."
+		::= { cvtPortCountersRates 1 }
+
+	-- Table Entry
+	cvtCountersRatesEntry OBJECT-TYPE
+		SYNTAX    CvtCountersRatesEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about Port counters rates mode."
+		INDEX    { cvtCountersRatesIndex }
+		::= { cvtCountersRatesTable 1 }
+
+	CvtCountersRatesEntry ::=
+		SEQUENCE {
+			cvtCountersRatesIndex
+				INTEGER,
+			cvtCountersRatesBytesReceived
+				Counter,
+			cvtCountersRatesFramesReceived
+				Counter,
+			cvtCountersRatesReceivedUtilization
+				DisplayString,
+			cvtCountersRatesBytesSent
+				Counter,
+			cvtCountersRatesFramesSent
+				Counter,
+			cvtCountersRatesSentUtilization
+				DisplayString,
+			cvtCountersRatesTotalBytes
+				Counter,
+			cvtCountersRatesTotalUtilization
+				DisplayString,
+		--	cvtCountersRatesRxCRCAlignError
+		--		Counter,
+			cvtCountersRatesRxCRCError
+				Counter,
+			cvtCountersRatesRxAlignError
+				Counter,
+			cvtCountersRatesRxUndersizeFrames
+				Counter,
+			cvtCountersRatesRxFragments
+				Counter,
+		--	cvtCountersRatesRxJabbers
+		--		Counter,
+		--	cvtCountersRatesRxOversizeFrames
+		--		Counter,
+		--	cvtCountersRatesRxDroppedFrames
+		--		Counter,
+			cvtCountersRatesTxCollision
+				Counter,
+		--	cvtCountersRatesTxDroppedFrames
+		--		Counter,
+			cvtCountersRatesTotalErrors
+				Counter,
+			cvtCountersRatesRxFrames64
+				Counter,
+			cvtCountersRatesRxFrames65to127
+				Counter,
+			cvtCountersRatesRxFrames128to255
+				Counter,
+			cvtCountersRatesRxFrames256to511
+				Counter,
+			cvtCountersRatesRxFrames512to1023
+				Counter,
+			cvtCountersRatesRxFrames1024to1518
+				Counter,
+		--	cvtCountersRatesRxFrames1527toMaxSize
+		--		Counter,
+			cvtCountersRatesTxMulticastFrames
+				Counter,
+			cvtCountersRatesTxBroadcastFrames
+				Counter,
+			cvtCountersRatesRxMulticastFrames
+				Counter,
+			cvtCountersRatesRxBroadcastFrames
+				Counter,
+			cvtCountersRatesRxFilteredFrames
+				Counter,
+			cvtCountersRatesTxLateCollision
+				Counter,
+			cvtCountersRatesTxDeferred
+				Counter
+		--	cvtCountersRatesTxTotalCollision
+		--		Counter,
+		--	cvtCountersRatesRxFrames1024toMaxSize
+		--		Counter,
+		--	cvtCountersRatesRxUnicastFrames
+		--		Counter,
+		--	cvtCountersRatesTxUnicastFrames
+		--		Counter,
+		--	cvtCountersRatesRxTotalErrors
+		--		Counter,
+		--	cvtCountersRatesTxTotalErrors
+		--		Counter,
+		--	cvtCountersRatesTxTotalCollisions
+		--		Counter
+		}
+
+	cvtCountersRatesIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each Port."
+		::= { cvtCountersRatesEntry 1 }
+
+	cvtCountersRatesBytesReceived OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 2 }
+
+	cvtCountersRatesFramesReceived OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 3 }
+
+	cvtCountersRatesReceivedUtilization OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 4 }
+
+	cvtCountersRatesBytesSent OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 5 }
+
+	cvtCountersRatesFramesSent OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 6 }
+
+	cvtCountersRatesSentUtilization OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 7 }
+
+	cvtCountersRatesTotalBytes OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 8 }
+
+	cvtCountersRatesTotalUtilization OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 9 }
+
+	cvtCountersRatesRxCRCError OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 10 }
+
+	cvtCountersRatesRxFragments OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 11 }
+
+	cvtCountersRatesRxFilteredFrames OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 12 }
+
+	cvtCountersRatesRxAlignError OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 13 }
+
+	cvtCountersRatesRxUndersizeFrames OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 14 }
+
+--	cvtCountersRatesRxOversizeFrames OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 15 }
+
+--	cvtCountersRatesRxJabbers OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 16 }
+
+--	cvtCountersRatesRxDroppedFrames OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 17 }
+
+--	cvtCountersRatesTxDroppedFrames OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 18 }
+
+	cvtCountersRatesTxLateCollision OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 19 }
+
+	cvtCountersRatesTxDeferred OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 20 }
+
+--	cvtCountersRatesTxTotalCollision OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 21 }
+
+	cvtCountersRatesRxFrames64 OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 22 }
+
+	cvtCountersRatesRxFrames65to127 OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 23 }
+
+	cvtCountersRatesRxFrames128to255 OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 24 }
+
+	cvtCountersRatesRxFrames256to511 OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 25 }
+
+	cvtCountersRatesRxFrames512to1023 OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 26 }
+
+--	cvtCountersRatesRxFrames1024toMaxSize OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 27 }
+
+--	cvtCountersRatesRxUnicastFrames OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 28 }
+
+	cvtCountersRatesRxMulticastFrames OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 29 }
+
+	cvtCountersRatesRxBroadcastFrames OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 30 }
+
+--	cvtCountersRatesTxUnicastFrames OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 31 }
+
+	cvtCountersRatesTxMulticastFrames OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 32 }
+
+	cvtCountersRatesTxBroadcastFrames OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 33 }
+
+--	cvtCountersRatesRxTotalErrors OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 34 }
+
+--	cvtCountersRatesTxTotalErrors OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 35 }
+
+--	cvtCountersRatesTxTotalCollisions OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 36 }
+
+--	cvtCountersRatesRxCRCAlignError OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 37 }
+
+	cvtCountersRatesTxCollision OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 38 }
+
+	cvtCountersRatesTotalErrors OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 39 }
+
+	cvtCountersRatesRxFrames1024to1518 OBJECT-TYPE
+		SYNTAX    Counter
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersRatesEntry 40 }
+
+--	cvtCountersRatesRxFrames1527toMaxSize OBJECT-TYPE
+--		SYNTAX    Counter
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersRatesEntry 41 }
+
+--  Counters Rates Traffic
+
+	CvtCountersRatesTraffic ::=
+		SEQUENCE {
+			cvtCountersRatesIndex
+				INTEGER,
+			cvtCountersRatesBytesReceived
+				Counter,
+			cvtCountersRatesFramesReceived
+				Counter,
+			cvtCountersRatesReceivedUtilization
+				DisplayString,
+			cvtCountersRatesBytesSent
+				Counter,
+			cvtCountersRatesFramesSent
+				Counter,
+			cvtCountersRatesSentUtilization
+				DisplayString,
+			cvtCountersRatesTotalBytes
+				Counter,
+			cvtCountersRatesTotalUtilization
+				DisplayString
+		}
+
+--  Counters Rates Error
+
+	CvtCountersRatesError ::=
+		SEQUENCE {
+			cvtCountersRatesIndex
+				INTEGER,
+		--	cvtCountersRatesRxCRCAlignError
+		--		Counter,
+			cvtCountersRatesRxCRCError
+				Counter,
+			cvtCountersRatesRxAlignError
+				Counter,
+			cvtCountersRatesRxUndersizeFrames
+				Counter,
+			cvtCountersRatesRxFragments
+				Counter,
+		--	cvtCountersRatesRxJabbers
+		--		Counter,
+		--	cvtCountersRatesRxOversizeFrames
+		--		Counter,
+		--	cvtCountersRatesRxDroppedFrames
+		--		Counter,
+			cvtCountersRatesTxCollision
+				Counter,
+		--	cvtCountersRatesTxDroppedFrames
+		--		Counter,
+			cvtCountersRatesTotalErrors
+				Counter
+		}
+
+--  Counters Rates Analysis
+
+	CvtCountersRatesAnalysis ::=
+		SEQUENCE {
+			cvtCountersRatesIndex
+				INTEGER,
+			cvtCountersRatesRxFrames64
+				Counter,
+			cvtCountersRatesRxFrames65to127
+				Counter,
+			cvtCountersRatesRxFrames128to255
+				Counter,
+			cvtCountersRatesRxFrames256to511
+				Counter,
+			cvtCountersRatesRxFrames512to1023
+				Counter,
+			cvtCountersRatesRxFrames1024to1518
+				Counter,
+		--	cvtCountersRatesRxFrames1527toMaxSize
+		--		Counter,
+			cvtCountersRatesTxMulticastFrames
+				Counter,
+			cvtCountersRatesTxBroadcastFrames
+				Counter,
+			cvtCountersRatesRxMulticastFrames
+				Counter,
+			cvtCountersRatesRxBroadcastFrames
+				Counter
+		}
+
+
+-- ConverterMonitor(5).PortCountersEvents(6)
+
+	cvtCountersEventsTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtCountersEventsEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Port counters events."
+		::= { cvtPortCountersEvents 1 }
+
+	cvtClearCountersOfAllPort OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), clear(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Clear Counters of All Port"
+		::= { cvtPortCountersEvents 2  }
+
+	-- Table Entry
+	cvtCountersEventsEntry OBJECT-TYPE
+		SYNTAX    CvtCountersEventsEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about Port counter events mode."
+		INDEX    { cvtCountersEventsIndex }
+		::= { cvtCountersEventsTable 1 }
+
+	CvtCountersEventsEntry ::=
+		SEQUENCE {
+			cvtCountersEventsIndex
+				INTEGER,
+			cvtCountersEventsBytesReceived
+				Counter64,
+			cvtCountersEventsFramesReceived
+				Counter64,
+			cvtCountersEventsBytesSent
+				Counter64,
+			cvtCountersEventsFramesSent
+				Counter64,
+			cvtCountersEventsTotalBytes
+				Counter64,
+		--	cvtCountersEventsRxCRCAlignError
+		--		Counter64,
+			cvtCountersEventsRxCRCError
+				Counter64,
+			cvtCountersEventsRxAlignError
+				Counter64,
+			cvtCountersEventsRxUndersizeFrames
+				Counter64,
+			cvtCountersEventsRxFragments
+				Counter64,
+		--	cvtCountersEventsRxJabbers
+		--		Counter64,
+		--	cvtCountersEventsRxOversizeFrames
+		--		Counter64,
+		--	cvtCountersEventsRxDroppedFrames
+		--		Counter64,
+			cvtCountersEventsTxCollision
+				Counter64,
+		--	cvtCountersEventsTxDroppedFrames
+		--		Counter64,
+			cvtCountersEventsRxFrames64
+				Counter64,
+			cvtCountersEventsRxFrames65to127
+				Counter64,
+			cvtCountersEventsRxFrames128to255
+				Counter64,
+			cvtCountersEventsRxFrames256to511
+				Counter64,
+			cvtCountersEventsRxFrames512to1023
+				Counter64,
+			cvtCountersEventsRxFrames1024to1518
+				Counter64,
+		--	cvtCountersEventsRxFrames1527toMaxSize
+		--		Counter64,
+			cvtCountersEventsTxMulticastFrames
+				Counter64,
+			cvtCountersEventsTxBroadcastFrames
+				Counter64,
+			cvtCountersEventsRxMulticastFrames
+				Counter64,
+			cvtCountersEventsRxBroadcastFrames
+				Counter64,
+		--	cvtClearCountersOfThisModule
+		--		INTEGER,
+			cvtCountersEventsTotalErrors
+				Counter64,
+			cvtCountersEventsRxFilteredFrames
+				Counter64,
+			cvtCountersEventsTxLateCollision
+				Counter64,
+			cvtCountersEventsTxDeferred
+				Counter64
+		--	cvtCountersEventsTxTotalCollision
+		--		Counter64,
+		--	cvtCountersEventsRxFrames1024toMaxSize
+		--		Counter64,
+		--	cvtCountersEventsRxUnicastFrames
+		--		Counter64,
+		--	cvtCountersEventsTxUnicastFrames
+		--		Counter64,
+		--	cvtCountersEventsRxTotalErrors
+		--		Counter64,
+		--	cvtCountersEventsTxTotalErrors
+		--		Counter64,
+		--	cvtCountersEventsTxTotalCollisions
+		--		Counter64
+		}
+
+	cvtCountersEventsIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each Port."
+		::= { cvtCountersEventsEntry 1 }
+
+	cvtCountersEventsBytesReceived OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 2 }
+
+	cvtCountersEventsFramesReceived OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 3 }
+
+--	cvtCountersEventsReceivedUtilization OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 4 }
+
+	cvtCountersEventsBytesSent OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 5 }
+
+	cvtCountersEventsFramesSent OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 6 }
+
+--	cvtCountersEventsSentUtilization OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 7 }
+
+	cvtCountersEventsTotalBytes OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 8 }
+
+--	cvtCountersEventsTotalUtilization OBJECT-TYPE
+--		SYNTAX    DisplayString
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 9 }
+
+	cvtCountersEventsRxCRCError OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 10 }
+
+	cvtCountersEventsRxFragments OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 11 }
+
+	cvtCountersEventsRxFilteredFrames OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 12 }
+
+	cvtCountersEventsRxAlignError OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 13 }
+
+	cvtCountersEventsRxUndersizeFrames OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 14 }
+
+--	cvtCountersEventsRxOversizeFrames OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 15 }
+
+--	cvtCountersEventsRxJabbers OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 16 }
+
+--	cvtCountersEventsRxDroppedFrames OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 17 }
+
+--	cvtCountersEventsTxDroppedFrames OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 18 }
+
+	cvtCountersEventsTxLateCollision OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 19 }
+
+	cvtCountersEventsTxDeferred OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 20 }
+
+--	cvtCountersEventsTxTotalCollision OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 21 }
+
+	cvtCountersEventsRxFrames64 OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 22 }
+
+	cvtCountersEventsRxFrames65to127 OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 23 }
+
+	cvtCountersEventsRxFrames128to255 OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 24 }
+
+	cvtCountersEventsRxFrames256to511 OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 25 }
+
+	cvtCountersEventsRxFrames512to1023 OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 26 }
+
+--	cvtCountersEventsRxFrames1024toMaxSize OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 27 }
+
+--	cvtCountersEventsRxUnicastFrames OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 28 }
+
+	cvtCountersEventsRxMulticastFrames OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 29 }
+
+	cvtCountersEventsRxBroadcastFrames OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 30 }
+
+--	cvtCountersEventsTxUnicastFrames OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 31 }
+
+	cvtCountersEventsTxMulticastFrames OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 32 }
+
+	cvtCountersEventsTxBroadcastFrames OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 33 }
+
+--	cvtClearCountersOfThisModule	OBJECT-TYPE
+--		SYNTAX    INTEGER { normal(0), clear(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Clear Counters of This module"
+--		::= { cvtCountersEventsEntry 34  }
+
+--	cvtCountersEventsRxTotalErrors OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 35 }
+
+--	cvtCountersEventsTxTotalErrors OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 36 }
+
+--	cvtCountersEventsTxTotalCollisions OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 37 }
+
+--	cvtCountersEventsRxCRCAlignError OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 38 }
+
+	cvtCountersEventsTxCollision OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 39 }
+
+	cvtCountersEventsRxFrames1024to1518 OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 40 }
+
+--	cvtCountersEventsRxFrames1527toMaxSize OBJECT-TYPE
+--		SYNTAX    Counter64
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			""
+--		::= { cvtCountersEventsEntry 41 }
+
+	cvtCountersEventsTotalErrors  OBJECT-TYPE
+		SYNTAX    Counter64
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			""
+		::= { cvtCountersEventsEntry 42 }
+
+--  Counters Events Traffic
+
+	CvtCountersEventsTraffic ::=
+		SEQUENCE {
+			cvtCountersEventsIndex
+				INTEGER,
+			cvtCountersEventsBytesReceived
+				Counter64,
+			cvtCountersEventsFramesReceived
+				Counter64,
+			cvtCountersEventsBytesSent
+				Counter64,
+			cvtCountersEventsFramesSent
+				Counter64,
+			cvtCountersEventsTotalBytes
+				Counter64
+		--	cvtClearCountersOfThisModule
+		--		INTEGER
+		}
+
+--  Counters Events Error
+
+	CvtCountersEventsError ::=
+		SEQUENCE {
+			cvtCountersEventsIndex
+				INTEGER,
+		--	cvtCountersEventsRxCRCAlignError
+		--		Counter64,
+			cvtCountersEventsRxCRCError
+				Counter64,
+			cvtCountersEventsRxAlignError
+				Counter64,
+			cvtCountersEventsRxUndersizeFrames
+				Counter64,
+			cvtCountersEventsRxFragments
+				Counter64,
+		--	cvtCountersEventsRxJabbers
+		--		Counter64,
+		--	cvtCountersEventsRxOversizeFrames
+		--		Counter64,
+		--	cvtCountersEventsRxDroppedFrames
+		--		Counter64,
+			cvtCountersEventsTxCollision
+				Counter64,
+		--	cvtCountersEventsTxDroppedFrames
+		--		Counter64,
+			cvtCountersEventsTotalErrors
+				Counter64
+		--	cvtClearCountersOfThisModule
+		--		INTEGER
+		}
+
+--  Counters Events Analysis
+
+	CvtCountersEventsAnalysis ::=
+		SEQUENCE {
+			cvtCountersEventsIndex
+				INTEGER,
+			cvtCountersEventsRxFrames64
+				Counter64,
+			cvtCountersEventsRxFrames65to127
+				Counter64,
+			cvtCountersEventsRxFrames128to255
+				Counter64,
+			cvtCountersEventsRxFrames256to511
+				Counter64,
+			cvtCountersEventsRxFrames512to1023
+				Counter64,
+			cvtCountersEventsRxFrames1024to1518
+				Counter64,
+		--	cvtCountersEventsRxFrames1527toMaxSize
+		--		Counter64,
+			cvtCountersEventsTxMulticastFrames
+				Counter64,
+			cvtCountersEventsTxBroadcastFrames
+				Counter64,
+			cvtCountersEventsRxMulticastFrames
+				Counter64,
+			cvtCountersEventsRxBroadcastFrames
+				Counter64
+		--	cvtClearCountersOfThisModule
+		--		INTEGER
+		}
+
+
+-- ConverterMonitor(5).MacAddressStore(40)
+
+
+-- ConverterMonitor(5).MacAddressStore(40).MacStoreTable(6)
+
+
+-- ConverterMonitor(5).MacAddressTable(7)
+
+	cvtMacAddressPortSelect OBJECT-TYPE
+		SYNTAX    INTEGER { all(0),
+		                    port1(1),
+		                    port2(2),
+		                    cpu(3)
+		                    }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Display mac address of the port which is selected."
+		::= { cvtMacAddressTable 1 }
+
+--	cvtMacAddressClear OBJECT-TYPE
+--		SYNTAX    INTEGER { normal(0), clear(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Clear mac address table."
+--		::= { cvtMacAddressTable 2 }
+
+--	cvtMacAddressUpdate OBJECT-TYPE
+--		SYNTAX    INTEGER { normal(0), update(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Update mac address table."
+--		::= { cvtMacAddressTable 3 }
+
+	cvtMacAddressTop OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), top(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Top Mac address table."
+		::= { cvtMacAddressTable 7 }
+
+	cvtMacAddressNext OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), next(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Next mac address table."
+		::= { cvtMacAddressTable 8 }
+
+	cvtMacAddressTotal OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"The amount of total learned mac address."
+		::= { cvtMacAddressTable 4 }
+
+	cvtMacAddressState OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"The state of mac address table."
+		::= { cvtMacAddressTable 5 }
+
+
+-- ConverterMonitor(5).MacAddressTable(7).MacTable(6)
+
+	cvtMacTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtMacTableEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Mac Address."
+		::= { cvtMacAddressTable 6 }
+
+	-- Table Entry
+	cvtMacTableEntry OBJECT-TYPE
+		SYNTAX    CvtMacTableEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about mac address table"
+		INDEX    { cvtMacTableIndex }
+		::= { cvtMacTable 1 }
+
+	CvtMacTableEntry ::=
+		SEQUENCE {
+			cvtMacTableIndex
+				INTEGER,
+			cvtMacTableType
+				DisplayString,
+			cvtMacTableAddr
+				MacAddress,
+			cvtMacTableVID
+				INTEGER,
+			cvtMacTablePort
+				DisplayString
+		}
+
+	cvtMacTableIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for mac address index."
+		::= { cvtMacTableEntry 1 }
+
+	cvtMacTableAddr OBJECT-TYPE
+		SYNTAX    MacAddress
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"MAC address learned."
+		::= { cvtMacTableEntry 2 }
+
+	cvtMacTableVID OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"MAC address learned from which vlan id."
+		::= { cvtMacTableEntry 3 }
+
+	cvtMacTablePort OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"MAC address learned from which port."
+		::= { cvtMacTableEntry 4 }
+
+	cvtMacTableType OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"MAC address learning type."
+		::= { cvtMacTableEntry 5 }
+
+
+-- ConverterMonitor(5).RSTPBridgeOverview(10)
+
+
+-- ConverterMonitor(5).LLDPStatus(11)
+
+
+-- ConverterMonitor(5).IGMPGroupTable(28)
+
+
+-- ConverterMonitor(5).SFPInformation(34)
+
+	cvtSFPPortInfo
+		OBJECT IDENTIFIER ::= { cvtSFPInformation 1 }
+	cvtSFPPortState
+		OBJECT IDENTIFIER ::= { cvtSFPInformation 2 }
+
+
+-- ConverterMonitor(5).SFPInformation(34).SFPPortInfo(1).SFPPortInfoTable(1)
+
+	cvtSFPPortInfoTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtSFPPortInfoEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of SFP Port Info."
+		::= { cvtSFPPortInfo 1 }
+
+	-- Table Entry
+	cvtSFPPortInfoEntry OBJECT-TYPE
+		SYNTAX    CvtSFPPortInfoEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about SFP Port Info."
+		INDEX    { cvtSFPPortInfoIndex }
+		::= { cvtSFPPortInfoTable 1 }
+
+	CvtSFPPortInfoEntry ::=
+		SEQUENCE {
+			cvtSFPPortInfoIndex
+				INTEGER,
+			cvtSFPPortInfoPortName
+				DisplayString,
+			cvtSFPPortInfoSpeed
+				DisplayString,
+			cvtSFPPortInfoDistance
+				DisplayString,
+			cvtSFPPortInfoVendorName
+				DisplayString,
+			cvtSFPPortInfoVendorPN
+				DisplayString,
+			cvtSFPPortInfoVendorSN
+				DisplayString
+		}
+
+	cvtSFPPortInfoIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each port."
+		::= { cvtSFPPortInfoEntry 1 }
+
+	cvtSFPPortInfoPortName OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Name"
+		::= { cvtSFPPortInfoEntry 3 }
+
+	cvtSFPPortInfoSpeed OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Speed"
+		::= { cvtSFPPortInfoEntry 5 }
+
+	cvtSFPPortInfoDistance OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Distance"
+		::= { cvtSFPPortInfoEntry 7 }
+
+	cvtSFPPortInfoVendorName OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Vendor Name"
+		::= { cvtSFPPortInfoEntry 9 }
+
+	cvtSFPPortInfoVendorPN OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Vendor PN"
+		::= { cvtSFPPortInfoEntry 11 }
+
+	cvtSFPPortInfoVendorSN OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Vendor SN"
+		::= { cvtSFPPortInfoEntry 13 }
+
+
+-- ConverterMonitor(5).SFPInformation(34).SFPPortState(2).SFPPortStateTable(1)
+
+	cvtSFPPortStateTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtSFPPortStateEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of SFP Port State."
+		::= { cvtSFPPortState 1 }
+
+	-- Table Entry
+	cvtSFPPortStateEntry OBJECT-TYPE
+		SYNTAX    CvtSFPPortStateEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about SFP Port State."
+		INDEX    { cvtSFPPortStateIndex }
+		::= { cvtSFPPortStateTable 1 }
+
+	CvtSFPPortStateEntry ::=
+		SEQUENCE {
+			cvtSFPPortStateIndex
+				INTEGER,
+			cvtSFPPortStatePortName
+				DisplayString,
+			cvtSFPPortStateTemperature
+				DisplayString,
+			cvtSFPPortStateVoltage
+				DisplayString,
+			cvtSFPPortStateTXBias
+				DisplayString,
+			cvtSFPPortStateTXPower
+				DisplayString,
+			cvtSFPPortStateRXPower
+				DisplayString
+		}
+
+	cvtSFPPortStateIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for each port."
+		::= { cvtSFPPortStateEntry 1 }
+
+	cvtSFPPortStatePortName OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Name"
+		::= { cvtSFPPortStateEntry 3 }
+
+	cvtSFPPortStateTemperature OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Temperature (C)"
+		::= { cvtSFPPortStateEntry 5 }
+
+	cvtSFPPortStateVoltage OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port Voltage (mV)"
+		::= { cvtSFPPortStateEntry 7 }
+
+	cvtSFPPortStateTXBias OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port TX Bias (mA)"
+		::= { cvtSFPPortStateEntry 9 }
+
+	cvtSFPPortStateTXPower OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port TX Power (dbm)"
+		::= { cvtSFPPortStateEntry 11 }
+
+	cvtSFPPortStateRXPower OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Port RX Power (dbm)"
+		::= { cvtSFPPortStateEntry 13 }
+
+
+-- ConverterMonitor(5).LoopDetectionStatus(36)
+
+
+-- ConverterMonitor(5).LoopDetectionStatus(36).LoopDetectionStatusTable(4)
+
+
+-- SystemUtility(6)
+
+	cvtLoadFactorySetting OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), load(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"LoadFactorySetting"
+		::= { cvtSystemUtility 1 }
+
+	cvtLoadFactorySettingExceptNetworkConfiguration OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), load(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"LoadFactorySettingExceptNetworkConfiguration"
+		::= { cvtSystemUtility 2 }
+
+	cvtEventLog
+		OBJECT IDENTIFIER ::= { cvtSystemUtility 3 }
+	cvtUpdateFirmware
+		OBJECT IDENTIFIER ::= { cvtSystemUtility 4 }
+--	cvtBackupConfiguration
+--		OBJECT IDENTIFIER ::= { cvtSystemUtility 5 }
+
+
+-- SystemUtility(6).EventLog(3)
+
+	cvtEventLogTable OBJECT-TYPE
+		SYNTAX    SEQUENCE OF CvtEventLogEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"Table of Event Log."
+		::= { cvtEventLog 1 }
+
+	cvtEventLogClear OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), clear(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Clear Event Log Table"
+		::= { cvtEventLog 2 }
+
+	-- Table Entry
+	cvtEventLogEntry OBJECT-TYPE
+		SYNTAX    CvtEventLogEntry
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"An entry in the table, containing information
+			about Event Log"
+		INDEX    { cvtEventLogIndex }
+		::= { cvtEventLogTable 1 }
+
+	CvtEventLogEntry ::=
+		SEQUENCE {
+			cvtEventLogIndex
+				INTEGER,
+			cvtEventLogType
+				INTEGER,
+			cvtEventLogTime
+				DisplayString,
+			cvtEventLogUpTime
+				DisplayString,
+			cvtEventLogDescription
+				DisplayString,
+			cvtEventLogSource
+				INTEGER,
+			cvtEventLogEvent
+				INTEGER,
+			cvtEventLogNameCommunity
+				DisplayString,
+			cvtEventLogIPAddr
+				IpAddress
+		--	cvtEventLogCategory
+		--		INTEGER
+		}
+
+	cvtEventLogIndex OBJECT-TYPE
+		SYNTAX    INTEGER (0..2147483647)
+		ACCESS    not-accessible
+		STATUS    mandatory
+		DESCRIPTION
+			"A unique value for Event Log  index."
+		::= { cvtEventLogEntry 1 }
+
+	cvtEventLogType OBJECT-TYPE
+		SYNTAX    INTEGER { error(1000), warning(2000), information(3000) }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"event type
+			error: some funtions not work
+			warning: to warn something, ex. login failed
+			information: just something happened
+			"
+		::= { cvtEventLogEntry 2 }
+
+	cvtEventLogTime OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"event happening time,
+			it is local time"
+		::= { cvtEventLogEntry 3 }
+
+	cvtEventLogUpTime OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"event happening time,
+			it is system up time
+			"
+		::= { cvtEventLogEntry 4 }
+
+	cvtEventLogDescription OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"event description"
+		::= { cvtEventLogEntry 5 }
+
+	cvtEventLogSource OBJECT-TYPE
+		SYNTAX    INTEGER { local-machine(4000),
+		                    rs232d(4001),
+		                    rs232(4002),
+		                    telnetd(4003),
+		                    telnet(4004),
+		                    tftpd(4005),
+		                    tftp(4006),
+		                    ftpd(4007),
+		                    ftp(4008),
+		                    snmpd(4009),
+		                    snmp(4010),
+		                    webd(4011),
+		                    web(4012),
+		                    ping(4013),
+		                    watch-dog(4014),
+		                    remote-machine(4015),
+		                    catv-module(4016)
+		                  }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"event source"
+		::= { cvtEventLogEntry 6 }
+
+	cvtEventLogEvent OBJECT-TYPE
+		SYNTAX    INTEGER { boot-failed(1001),
+		                    load-config-failed(1002),
+		                    load-default-config-failed(1003),
+		                    save-config-failed(1004),
+		                    save-default-config-failed(1005),
+		                    login-failed(2001),
+		                    module-down(2002),
+		                    module-power-down(2003),
+		                    power-module-down(2004),
+		                    power-fan-failed(2005),
+		                    auto-provision(2007),
+		                    fan-failed(2008),
+		                    temperature-abnormality(2009),
+		                    voltage-abnormality(2010),
+		                    tx-bias-abnormality(2011),
+		                    loop(2012),
+		                    upgrade(2013),
+		                    cold-start(3001),
+		                    warm-start(3002),
+		                    login(3003),
+		                    logout(3004),
+		                    timeout(3005),
+		                    disconnected(3006),
+		                    link-up(3007),
+		                    link-down(3008),
+		                    fan-ok(3022)
+		                  }
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"event"
+		::= { cvtEventLogEntry 7 }
+
+	cvtEventLogNameCommunity OBJECT-TYPE
+		SYNTAX    DisplayString
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"user name or community name"
+		::= { cvtEventLogEntry 8 }
+
+	cvtEventLogIPAddr OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"event ip address,
+			ex. login user ip address"
+		::= { cvtEventLogEntry 9 }
+
+	--cvtEventLogCategory OBJECT-TYPE
+	--	SYNTAX    INTEGER (0..2147483647)
+	--	ACCESS    read-only
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Category"
+	--	::= { cvtEventLogEntry 10 }
+
+
+-- SystemUtility(6).UpdateFirmware(4)
+
+	cvtUpdateProtocol OBJECT-TYPE
+		SYNTAX    INTEGER { tftp(0), ftp(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Update file from tftp or ftp server."
+		::= { cvtUpdateFirmware 1 }
+
+	cvtUpdateFileType OBJECT-TYPE
+		SYNTAX    INTEGER { firmware(0), configuration(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Update file type."
+		::= { cvtUpdateFirmware 2 }
+
+	cvtUpdateServerIPAddr OBJECT-TYPE
+		SYNTAX    IpAddress
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Tftp/ftp server ip address."
+		::= { cvtUpdateFirmware 3 }
+
+	cvtUpdateServerIPv6Addr OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Tftp/ftp server ipv6 address."
+		::= { cvtUpdateFirmware 13 }
+
+	cvtUpdateUserName OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Ftp server login user name."
+		::= { cvtUpdateFirmware 4 }
+
+	cvtUpdatePassword OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Ftp server login password."
+		::= { cvtUpdateFirmware 5 }
+
+	cvtUpdateFileLocation OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Upate file location."
+		::= { cvtUpdateFirmware 6 }
+
+	--cvtUpdateGet OBJECT-TYPE
+	--	SYNTAX    INTEGER { normal(0), get(1) }
+	--	ACCESS    read-write
+	--	STATUS    mandatory
+	--	DESCRIPTION
+	--		"Get file from server."
+	--	::= { cvtUpdateFirmware 7 }
+
+	cvtUpdateBackup OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), backup(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Backup file to server."
+		::= { cvtUpdateFirmware 8 }
+
+--	cvtUpdateStop OBJECT-TYPE
+--		SYNTAX    INTEGER { normal(0), stop(1) }
+--		ACCESS    read-write
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Stop getting or putting file."
+--		::= { cvtUpdateFirmware 9 }
+
+	cvtUpdateUpdate OBJECT-TYPE
+		SYNTAX    INTEGER { normal(0), update(1) }
+		ACCESS    read-write
+		STATUS    mandatory
+		DESCRIPTION
+			"Get configuration or firmware, then update it.
+			 When update succeeded, system will reboot automatically."
+		::= { cvtUpdateFirmware 10 }
+
+--	cvtUpdateProgress OBJECT-TYPE
+--		SYNTAX    INTEGER (0..2147483647)
+--		ACCESS    read-only
+--		STATUS    mandatory
+--		DESCRIPTION
+--			"Getting or putting file progress(percentage)."
+--		::= { cvtUpdateFirmware 11 }
+
+	cvtUpdateState OBJECT-TYPE
+		SYNTAX    DisplayString (SIZE (0..255))
+		ACCESS    read-only
+		STATUS    mandatory
+		DESCRIPTION
+			"Messages for getting/putting file, updating config/firmware."
+		::= { cvtUpdateFirmware 12 }
+
+
+-- SystemUtility(6).BackupConfiguration(5)
+
+
+-- Traps(9)
+
+	cvtSystemPowerDown TRAP-TYPE
+		ENTERPRISE    converterTraps
+		--&ACTIONS    { critical }
+		--&MESG       "System Power Down"
+		DESCRIPTION
+			"when system power down, send this trap."
+		::=  1
+
+	cvtBroadcastStorm TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, etherStatsBroadcastPkts }
+		--&ACTIONS    { warning }
+		--&MESG       "Interface $1 Broadcast Storm Occurs, $2 packets"
+		DESCRIPTION
+			"when received broadcast packets arrive upper limit, send this trap."
+		::=  2
+
+	cvtBroadcastNormal TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, etherStatsBroadcastPkts }
+		--&ACTIONS    { minor }
+		--&MESG       "Interface $1 Broadcast Packets Normal, $2 packets"
+		DESCRIPTION
+			"when received broadcast packets are normal, send this trap."
+		::=  3
+
+	cvtFaultAlarm TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, sysLocation }
+		--&ACTIONS    { warning }
+		--&MESG       "$2"
+		DESCRIPTION   "when fault Alarm , send this trap."
+		::=  8
+
+	cvtWarningAlarm TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, sysLocation }
+		--&ACTIONS    { warning }
+		--&MESG       "$2"
+		DESCRIPTION   "when Warning Alarm , send this trap."
+		::=  9
+
+	cvtMinorAlarm TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, sysLocation }
+		--&ACTIONS    { minor }
+		--&MESG       "$2"
+		DESCRIPTION   "when Minor Alarm , send this trap."
+		::=  10
+
+	cvtLoopBack TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, sysLocation }
+		--&ACTIONS    { warning }
+		--&MESG       "$2"
+		DESCRIPTION   "when Loop back, send this trap."
+		::=  13
+
+	cvtBatteryMode TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, sysLocation }
+		--&ACTIONS    { warning }
+		--&MESG       "$2"
+		DESCRIPTION
+			"when Battery is discharge electricity, send this trap."
+		::=  14
+
+	cvtCATVPower TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, sysLocation }
+		--&ACTIONS    { warning }
+		--&MESG       "$2"
+		DESCRIPTION
+			"when CATV power, send this trap."
+		::=  15
+
+	cvtPowerExceptional TRAP-TYPE
+		ENTERPRISE    converterTraps
+		VARIABLES     { ifIndex, sysLocation }
+		--&ACTIONS    { warning }
+		--&MESG       "$2"
+		DESCRIPTION
+			"when Power Exceptional, send this trap."
+		::=  17
+
+END

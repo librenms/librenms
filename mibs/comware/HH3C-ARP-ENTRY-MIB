@@ -1,0 +1,46 @@
+-- =================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  ARP entry MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 Initial version created by z09684
+-- =================================================================
+HH3C-ARP-ENTRY-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Counter32
+        FROM SNMPv2-SMI;
+
+hh3cARPEntry MODULE-IDENTITY
+    LAST-UPDATED "201703140000Z"            -- March 14, 2017 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "The MIB module is used for ARP entry."
+    REVISION    "201703140000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { hh3cCommon 168}
+
+--
+-- Define the ARP Entry GLOBAL.
+--
+hh3cARPEntryCountObjects OBJECT IDENTIFIER ::= { hh3cARPEntry 1 }
+
+hh3cARPEntryOpenFlowCount OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Count of ARP entries of type OpenFlow."
+    ::= { hh3cARPEntryCountObjects 1 }
+
+END

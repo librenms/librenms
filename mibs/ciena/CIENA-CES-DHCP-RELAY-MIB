@@ -1,0 +1,526 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-DHCP-RELAY-MIB.my
+ --
+
+ CIENA-CES-DHCP-RELAY-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+   Counter32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+   DisplayString, TruthValue, RowStatus, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+   cienaCesStatistics
+        FROM CIENA-SMI;
+
+
+ cienaCesDhcpRelayMIB MODULE-IDENTITY
+        LAST-UPDATED "201706070000Z"
+        ORGANIZATION "Ciena Corp."
+        CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
+        DESCRIPTION
+            "The MIB module contains MIB objects to manage DHCP Relay."
+
+        REVISION "201706070000Z"
+        DESCRIPTION 
+                "Updated contact info."
+
+        REVISION "201509090000Z"
+        DESCRIPTION
+                "Added new value to DhcpLiType: mplsVc(3).
+                 Added new value to cienaCesDhcpRelayAgentCircuitId: liVs(4).
+                 Added new value to cienaCesDhcpRelayAgentRemoteId: ridString(3).
+                 Added new objects:
+                     cienaCesDhcpRelayAgentReplaceOption82
+                     cienaCesDhcpRelayAgentL2GlobalStatsClear
+                     cienaCesDhcpRelayAgentL2Relayed
+                     cienaCesDhcpRelayAgentL2Dropped
+                     cienaCesDhcpRelayAgentL2Forwarded
+                     cienaCesDhcpRelayAgentL2NotForRelay
+                     cienaCesDhcpRelayAgentCidString
+                     cienaCesDhcpRelayAgentRidString
+                     cienaCesDhcpRelayAgentL2InvalidConfigPktDrop
+                     cienaCesDhcpRelayAgentL2GeneralErrors
+                     cienaCesDhcpRelayAgentL2Option82Replaced
+                     cienaCesDhcpRelayAgentL2ForRelay
+                     cienaCesDhcpRelayAgentL2ClientRelayed
+                     cienaCesDhcpRelayAgentL2ServerRelayed"
+
+        REVISION "201303050000Z"
+        DESCRIPTION
+                "Added port and cidString to cienaCesDhcpRelayAgentCircuitId."
+
+        REVISION "201007220000Z"
+        DESCRIPTION
+                "Initial creation."
+
+        ::= { cienaCesStatistics 6 }
+
+ --
+ -- Node definitions
+ --
+
+ cienaCesDhcpRelayAgent OBJECT IDENTIFIER ::= { cienaCesDhcpRelayMIB 1 }
+
+ cienaCesDhcpRelayAgentGlobalAttrs OBJECT IDENTIFIER ::= { cienaCesDhcpRelayAgent 1 }
+
+ cienaCesDhcpRelayAgentGlobalStats OBJECT IDENTIFIER ::= { cienaCesDhcpRelayAgent 7 }
+
+
+ --
+ -- Textual convention
+ --
+ DhcpLiType ::= TEXTUAL-CONVENTION
+     STATUS         current
+     DESCRIPTION    "Logical Interface Attachment Types."
+     SYNTAX         INTEGER {
+                        subPort(1),
+                        pbt-service(2),
+                        mplsVc(3),
+                        unknown(99)
+                    }
+
+
+ --
+ -- DHCP Relay Agent Functionality
+ --
+ cienaCesDhcpRelayAgentCircuitId OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        li(1),
+                        port(2),
+                        cidString(3),
+                        liVs(4)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the type of circuit ID to be used by the
+              DHCP relay agent. It can be set to li, port, cidString or liVs."
+     ::= { cienaCesDhcpRelayAgentGlobalAttrs 1 }
+
+ cienaCesDhcpRelayAgentRemoteId OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        macAddress(1),
+                        hostName(2),
+                        ridString(3)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the type of remote agent ID to be used by
+              the DHCP relay agent. It can be set to macAddress, hostName or
+              ridString."
+     ::= { cienaCesDhcpRelayAgentGlobalAttrs 2 }
+
+ cienaCesDhcpRelayAgentL2State OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        disabled(1),
+                        enabled(2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Specifies the global administrative state of the DHCP L2 relay agent."
+     ::= { cienaCesDhcpRelayAgentGlobalAttrs 3 }
+
+ cienaCesDhcpRelayAgentReplaceOption82 OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        on(1),
+                        off(2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Specifies whether or not the relay agent should replace an existing option 82."
+     ::= { cienaCesDhcpRelayAgentGlobalAttrs 4 }
+
+ --
+ -- DHCP Relay Agent Global Statistics
+ --
+ cienaCesDhcpRelayAgentL2GlobalStatsClear OBJECT-TYPE
+     SYNTAX         TruthValue
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object, when set to 'true', clears the global statistics for the L2 DHCP relay."
+     ::= { cienaCesDhcpRelayAgentGlobalStats 1 }
+
+ cienaCesDhcpRelayAgentL2Relayed OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports the number of packets that passed through the
+              L2 relays (processed and not dropped)."
+     ::= { cienaCesDhcpRelayAgentGlobalStats 2 }
+
+ cienaCesDhcpRelayAgentL2Dropped OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports the number of packets dropped by the relay.
+              Inspect the detailed statistic on each relay for more details related to dropped frames."
+     ::= { cienaCesDhcpRelayAgentGlobalStats 3 }
+
+ cienaCesDhcpRelayAgentL2Forwarded OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports the number of packets forwarded rather than relayed.
+              These are valid frames that didn't need to be processed by the relay."
+     ::= { cienaCesDhcpRelayAgentGlobalStats 4 }
+
+ cienaCesDhcpRelayAgentL2NotForRelay OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports the number of packets received by the relay but not intended for the relay.
+              Inspect the detailed statistic on each relay for more details related to dropped frames."
+     ::= { cienaCesDhcpRelayAgentGlobalStats 5 }
+ --
+ -- Table to control DHCP relay agent functionality on each L2 VS
+ --
+ cienaCesDhcpRelayAgentL2StateTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesDhcpRelayAgentL2StateEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Tables that allow changing the configuration of DHCP relay agent functionality for
+              each cienaCesDhcpRelayAgentVs."
+     ::= { cienaCesDhcpRelayAgent 2 }
+
+ cienaCesDhcpRelayAgentL2StateEntry OBJECT-TYPE
+     SYNTAX         CienaCesDhcpRelayAgentL2StateEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Entry in the table to configure DHCP relay agent functionality."
+     INDEX { cienaCesDhcpRelayAgentVsIndex, cienaCesDhcpRelayAgentRlan }
+     ::= { cienaCesDhcpRelayAgentL2StateTable 1 }
+
+ CienaCesDhcpRelayAgentL2StateEntry ::= SEQUENCE {
+     cienaCesDhcpRelayAgentVsIndex        INTEGER,
+     cienaCesDhcpRelayAgentRlan           INTEGER,
+     cienaCesDhcpRelayAgentL2AdminState   INTEGER,
+     cienaCesDhcpRelayAgentL2OperState    INTEGER,
+     cienaCesDhcpRelayAgentL2StatsClear   TruthValue,
+     cienaCesDhcpRelayAgentL2RowStatus    RowStatus
+ }
+
+ cienaCesDhcpRelayAgentVsIndex OBJECT-TYPE
+     SYNTAX         INTEGER (1..1048575)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This MIB object specifies the VS on which DHCP relay agent is configured."
+     ::= { cienaCesDhcpRelayAgentL2StateEntry 1 }
+
+ cienaCesDhcpRelayAgentRlan OBJECT-TYPE
+     SYNTAX         INTEGER (0..4095)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This MIB object specifies the RLAN on which the DHCP relay agent is configured."
+     ::= { cienaCesDhcpRelayAgentL2StateEntry 2 }
+
+ cienaCesDhcpRelayAgentL2AdminState OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        disabled(1),
+                        enabled(2)
+                    }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object allows the disabling or enabling of DHCP relay agent functionality on
+              the given VS."
+     ::= { cienaCesDhcpRelayAgentL2StateEntry 3 }
+
+ cienaCesDhcpRelayAgentL2OperState OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        disabled(1),
+                        enabled(2)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object shows the operational state of the DHCP relay agent on the given VS."
+     ::= { cienaCesDhcpRelayAgentL2StateEntry 4 }
+
+ cienaCesDhcpRelayAgentL2StatsClear OBJECT-TYPE
+     SYNTAX         TruthValue
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This MIB object when set to 'true' clears DHCP relay agent statistics for the given VS."
+     ::= { cienaCesDhcpRelayAgentL2StateEntry 5 }
+
+ cienaCesDhcpRelayAgentL2RowStatus OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Set this MIB object to 'Destroy' to terminate DHCP L2 relaying
+              on the VS specified by cienaCesDhcpRelayAgentVs and cienaCesDhcpRelayAgentRlan.
+
+              Set this MIB object to 'CreateAndGo' to create DHCP L2 relaying
+              on the VS along with cienaCesDhcpRelayAgentVsIndex and cienaCesDhcpRelayAgentRlan."
+     ::= { cienaCesDhcpRelayAgentL2StateEntry 6 }
+
+ --
+ -- DHCP Relay Agent Trust Table
+ --
+ cienaCesDhcpRelayAgentTrustTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesDhcpRelayAgentTrustEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This table is used to specify the DHCP relay attributes of
+              logical interfaces to which DHCP relay agents are attached.
+              Entries in this table are created when a DHCP relay agent is
+              created and attached to a VS that already has logical
+              interfaces, or when logical interfaces are added to a VS for
+              which a DHCP relay is already created and attached."
+     ::= { cienaCesDhcpRelayAgent 5 }
+
+ cienaCesDhcpRelayAgentTrustEntry OBJECT-TYPE
+     SYNTAX         CienaCesDhcpRelayAgentTrustEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Each entry in this table can be used to specify the LI and VS to be trusted."
+     INDEX { cienaCesDhcpRelayAgentVsIndex, cienaCesDhcpRelayAgentRlan,
+             cienaCesDhcpRelayAgentTrustedLiType, cienaCesDhcpRelayAgentTrustedLiIndex }
+     ::= { cienaCesDhcpRelayAgentTrustTable 1 }
+
+ CienaCesDhcpRelayAgentTrustEntry ::= SEQUENCE {
+     cienaCesDhcpRelayAgentTrustedLiType    DhcpLiType,
+     cienaCesDhcpRelayAgentTrustedLiIndex   INTEGER,
+     cienaCesDhcpRelayAgentTrustMode        INTEGER,
+     cienaCesDhcpRelayAgentCidString        DisplayString,
+     cienaCesDhcpRelayAgentRidString        DisplayString
+ }
+
+ cienaCesDhcpRelayAgentTrustedLiType OBJECT-TYPE
+     SYNTAX         DhcpLiType
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This MIB object is used as an index in the table and is used to specify the LI type."
+     ::= { cienaCesDhcpRelayAgentTrustEntry 1 }
+
+ cienaCesDhcpRelayAgentTrustedLiIndex OBJECT-TYPE
+     SYNTAX         INTEGER (0..65535)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This MIB object is used as an index in the table and is used to specify the LI index."
+     ::= { cienaCesDhcpRelayAgentTrustEntry 2 }
+
+ cienaCesDhcpRelayAgentTrustMode OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        clientTrust(1),
+                        serverTrust(2),
+                        dualRoleTrust(3),
+                        unTrust(4)
+                    }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This MIB object is used to set the port as client trusted,
+              server trusted, dual-role trusted or not trusted."
+     ::= { cienaCesDhcpRelayAgentTrustEntry 3 }
+
+ cienaCesDhcpRelayAgentCidString OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object is used to get and set the CID string for the
+              logical interface."
+     ::= { cienaCesDhcpRelayAgentTrustEntry 4 }
+
+ cienaCesDhcpRelayAgentRidString OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object is used to get and set the RID string for the
+              logical interface."
+     ::= { cienaCesDhcpRelayAgentTrustEntry 5 }
+
+ --
+ -- DHCP Relay Agent L2 Statistics
+ --
+ cienaCesDhcpRelayAgentL2StatsTable OBJECT-TYPE
+     SYNTAX         SEQUENCE OF CienaCesDhcpRelayAgentL2StatsEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Table to display L2 statistics for each cienaCesDhcpRelayAgentVs."
+     ::= { cienaCesDhcpRelayAgent 6 }
+
+ cienaCesDhcpRelayAgentL2StatsEntry OBJECT-TYPE
+     SYNTAX         CienaCesDhcpRelayAgentL2StatsEntry
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "Entry in the table to display L2 statistics."
+     INDEX { cienaCesDhcpRelayAgentVsIndex, cienaCesDhcpRelayAgentRlan }
+     ::= { cienaCesDhcpRelayAgentL2StatsTable 1 }
+
+ CienaCesDhcpRelayAgentL2StatsEntry ::= SEQUENCE {
+     cienaCesDhcpRelayAgentL2IpSecHeaders               Counter32,
+     cienaCesDhcpRelayAgentL2Option82Added              Counter32,
+     cienaCesDhcpRelayAgentL2Option82Removed            Counter32,
+     cienaCesDhcpRelayAgentL2UntrustedClientPortPktsRx  Counter32,
+     cienaCesDhcpRelayAgentL2UntrustedServerPortPktsRx  Counter32,
+     cienaCesDhcpRelayAgentL2SpoofedDhcpPkts            Counter32,
+     cienaCesDhcpRelayAgentL2Option82ExceedMTU          Counter32,
+     cienaCesDhcpRelayAgentL2NoTrustedServerPktDrop     Counter32,
+     cienaCesDhcpRelayAgentL2NoTrustedClientPktDrop     Counter32,
+     cienaCesDhcpRelayAgentL2InvalidConfigPktDrop       Counter32,
+     cienaCesDhcpRelayAgentL2GeneralErrors              Counter32,
+     cienaCesDhcpRelayAgentL2Option82Replaced           Counter32,
+     cienaCesDhcpRelayAgentL2ForRelay                   Counter32,
+     cienaCesDhcpRelayAgentL2ClientRelayed              Counter32,
+     cienaCesDhcpRelayAgentL2ServerRelayed              Counter32
+ }
+
+ cienaCesDhcpRelayAgentL2IpSecHeaders OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets that include IP Sec headers."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 1 }
+
+ cienaCesDhcpRelayAgentL2Option82Added OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets that have had option 82 added."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 2 }
+
+ cienaCesDhcpRelayAgentL2Option82Removed OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets that have had option 82 removed."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 3 }
+
+ cienaCesDhcpRelayAgentL2UntrustedClientPortPktsRx OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets received on untrusted client ports."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 4 }
+
+ cienaCesDhcpRelayAgentL2UntrustedServerPortPktsRx OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets received from untrusted server ports."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 5 }
+
+ cienaCesDhcpRelayAgentL2SpoofedDhcpPkts OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of spoofed DHCP packets."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 6 }
+
+ cienaCesDhcpRelayAgentL2Option82ExceedMTU OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets with DHCP option
+              82 that would exceed the MTU. The option 82 is not added and the
+              original DHCP packet is forwarded."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 7 }
+
+ cienaCesDhcpRelayAgentL2NoTrustedServerPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of DHCP packets dropped because there are no server trusted ports configured."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 8 }
+
+ cienaCesDhcpRelayAgentL2NoTrustedClientPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of DHCP packets dropped because there are no client trusted ports configured."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 9 }
+
+ cienaCesDhcpRelayAgentL2InvalidConfigPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of DHCP packets dropped
+              because the L2 relay agent configuration is invalid."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 10 }
+
+ cienaCesDhcpRelayAgentL2GeneralErrors OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of general errors encountered by the L2 relay agent."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 11 }
+
+ cienaCesDhcpRelayAgentL2Option82Replaced OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets that have had option 82 replaced."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 12 }
+
+ cienaCesDhcpRelayAgentL2ForRelay OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of packets received by the
+              relay that were actually intended for the relay."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 13 }
+
+ cienaCesDhcpRelayAgentL2ClientRelayed OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of client messages relayed."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 14 }
+
+ cienaCesDhcpRelayAgentL2ServerRelayed OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This MIB object reports the number of server messages relayed."
+     ::= { cienaCesDhcpRelayAgentL2StatsEntry 15 }
+
+ END
+
+ --
+ -- CIENA-CES-DHCP-RELAY-MIB.my
+ --

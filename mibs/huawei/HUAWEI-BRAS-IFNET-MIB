@@ -1,0 +1,143 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-IFNET-MIB DEFINITIONS
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+HUAWEI-BRAS-IFNET-MIB    DEFINITIONS ::= BEGIN
+    
+    IMPORTS
+    hwBRASMib            
+        FROM HUAWEI-MIB
+        InterfaceIndex, ifIndex                  
+            FROM IF-MIB    
+    RowStatus, DisplayString
+        FROM SNMPv2-TC;
+
+        hwSUBINT MODULE-IDENTITY 
+            LAST-UPDATED "200508101200Z"
+            ORGANIZATION 
+                "HAUWEI MIB Standard community
+                "
+            CONTACT-INFO 
+        "Floor 5, Block 4, R&D Building,
+        Huawei Longgang Production Base,
+        Shenzhen,   P.R.C.
+        http://www.huawei.com
+        Zip:518057
+        "
+            DESCRIPTION 
+                "V1.00
+                The IFNET mib is for all datacomm product.
+                "
+            ::= { hwBRASMib 11 }
+
+    
+    hwhwSUBINTMibObjects OBJECT IDENTIFIER ::= { hwSUBINT 1 }    
+
+
+        hwSubIntTable OBJECT-TYPE
+            SYNTAX     SEQUENCE OF HWSubIntEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                       "Sub-interface configuration table."
+            ::= { hwhwSUBINTMibObjects 1 }
+            
+        hwSubIntEntry OBJECT-TYPE
+            SYNTAX     HWSubIntEntry     
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                       "An entry of hwSubIntTable."
+            INDEX      { ifIndex, hwSubInterfaceNo }
+            ::= { hwSubIntTable 1 }
+            
+        HWSubIntEntry ::= SEQUENCE {
+        hwSubInterfaceNo
+            Integer32,
+        hwSubIntRowStatus
+            RowStatus,
+        hwSubIfIndex
+            InterfaceIndex,
+        hwSubIfDescr
+            DisplayString
+        }        
+        
+    hwSubInterfaceNo OBJECT-TYPE
+        SYNTAX Integer32 (1..4096)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The sub-interface number."
+        ::= { hwSubIntEntry 1 }
+
+        hwSubIntRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION            
+            "Row status:
+            1: active
+            2: notInService
+            3: notReady
+            4: createAndGo
+            5: createAndWait
+            6: destroy"
+            ::= { hwSubIntEntry 2 }
+
+        
+        hwSubIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The ifindex of the sub-interface."
+            ::= { hwSubIntEntry 3 }
+
+        
+        hwSubIfDescr OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of the sub-interface."
+            ::= { hwSubIntEntry 4 }
+
+    --  ============== conformance information ==============
+        hwSubIntConformance OBJECT IDENTIFIER ::= { hwSUBINT 2 }
+        
+        
+        hwSubIntCompliances OBJECT IDENTIFIER ::= { hwSubIntConformance 1 }
+        hwSubIntCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for sub-interface supporting 
+                 this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwSubIntTableGroup}  
+                                               
+              ::= { hwSubIntCompliances 1 }  
+              
+          
+        --  ============== groups ==============  
+        hwSubIntTableGroups OBJECT IDENTIFIER ::= { hwSubIntConformance 2 } 
+        
+        hwSubIntTableGroup OBJECT-GROUP
+            OBJECTS { hwSubInterfaceNo,    hwSubIntRowStatus, 
+                      hwSubIfIndex, hwSubIfDescr}                      
+            STATUS current
+            DESCRIPTION 
+                "The sub-interface group."
+            ::= { hwSubIntTableGroups 1 }
+        --  ============== conformance information define end ==============
+END
+
+   
+
+                

@@ -1,0 +1,104 @@
+VENTURI-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    venturiProducts,
+    venturiMgmt
+        FROM VENTURI-WIRELESS-SMI
+;
+
+
+-- ------------------------------------------------------------------------
+-- Module Identity
+-- ------------------------------------------------------------------------
+vServerMgmt MODULE-IDENTITY
+    LAST-UPDATED    "201101030000Z"
+    ORGANIZATION    "Venturi Wireless"
+    CONTACT-INFO
+       "Contact:  Customer Support
+
+        Postal:   Venturi Wireless
+                  490 North McCarthy Boulevard
+                  Milpitas, CA  95035
+
+        Phone:    408-215-5100
+        FAX:      408-215-5105
+
+        Web:      www.venturiwireless.com
+
+        E-mail:   VenturiCustomerOps@venturiwireless.com"
+
+    DESCRIPTION
+        "Venturi Wireless Product Registrations
+
+          Copyright 2004-2011 Venturi Wireless
+          All rights reserved.
+
+          This MIB module contains all Venturi Wireless product 
+          registrations. These OIDs will be returned as the value 
+          of mib2.system.sysObjectId to identify the model of the
+          Venturi server."
+
+    REVISION    "201101030000Z"
+        DESCRIPTION 
+            "1.5 Updated copyright date to 2011"
+
+    REVISION    "201001060000Z"
+        DESCRIPTION 
+            "1.4 - Updated copyright date to 2010"
+
+    REVISION    "200806030000Z"
+        DESCRIPTION
+            "1.3 - Add venturi5220 model OID."
+
+    REVISION    "200805060000Z"
+        DESCRIPTION
+            "1.2 - update copyright to 2008.
+                   Change VBlade1000 to vBlade1000 because SNMP
+                   SMI requires this to start with a lower case
+                   letter."
+
+    REVISION    "200804080000Z"
+        DESCRIPTION
+            "1.1 - Add vBlade1000 model OID."
+
+    REVISION    "200502170000Z"
+        DESCRIPTION
+            "1.0 - Initial document."
+
+    ::= { venturiMgmt 1 }
+
+-- -----------------------------------------------------------------
+-- Product: Venturi Server
+-- Purpose: Content Optimization
+-- -----------------------------------------------------------------
+venturiServer OBJECT-IDENTITY
+        STATUS	current
+        DESCRIPTION
+                "venturiServer is the root OBJECT IDENTIFIER from
+                which sysObjectIDs may be defined."
+        ::= { venturiProducts 1 }
+
+-- -----------------------------------------------------------------
+-- Venturi Server Models
+-- -----------------------------------------------------------------
+venturi3000 OBJECT IDENTIFIER ::= { venturiServer 1 }
+venturi20   OBJECT IDENTIFIER ::= { venturiServer 2 }
+venturi100e OBJECT IDENTIFIER ::= { venturiServer 3 }
+venturiSP   OBJECT IDENTIFIER ::= { venturiServer 4 }
+venturi5000 OBJECT IDENTIFIER ::= { venturiServer 5 }
+vBlade1000  OBJECT IDENTIFIER ::= { venturiServer 6 }
+venturi5220 OBJECT IDENTIFIER ::= { venturiServer 7 }
+
+-- -----------------------------------------------------------------
+-- This identifies the last OID used under vServerMgmt
+--
+-- -----------------------------------------------------------------
+
+-- 1 = vServerTraps (VENTURI-SERVER-TRAPS-MIB)
+-- 2 = vServerSystem (VENTURI-SERVER-SYSTEM-MIB)
+-- 3 = vServerStatistics (VENTURI-SERVER-STATS-MIB)
+
+END

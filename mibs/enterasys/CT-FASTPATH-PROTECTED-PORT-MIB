@@ -1,0 +1,132 @@
+CT-FASTPATH-PROTECTED-PORT-MIB DEFINITIONS ::= BEGIN
+
+-- LVL7 FastPath Protected Port MIB
+-- Copyright LVL7 Systems (2003-2005) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies LVL7 System's confidential and proprietary
+-- intellectual property.  LVL7 Systems retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", LVL7 Systems
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+--  This module provides authoritative definitions for Cabletron's
+--  CT-FASTPATH-PROTECTED-PORT-MIB
+--
+--  This module will be extended, as needed.
+--
+--  Enterasys Networks reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Enterasys Networks
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Enterasys Networks be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Enterasys
+--  Networks has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Enterasys grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Enterasys and Cabletron products.
+--
+--  Copyright March 2006 Enterasys Networks, Inc.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress,
+    Integer32                           FROM SNMPv2-SMI
+    DisplayString                       FROM RFC1213-MIB
+    PortList                            FROM Q-BRIDGE-MIB
+-- Place this MIB on CTRON experimental branch.
+    ctFastPathProtectedPortMib          FROM CTRON-MIB-NAMES;
+
+ctFastPathProtectedPortMIB MODULE-IDENTITY
+    LAST-UPDATED "200603061501Z"  -- Mon Mar  6 15:01 UTC 2006
+    ORGANIZATION "Enterasys Networks, Inc."
+    CONTACT-INFO
+        "Postal:  Enterasys Networks
+                  50 Minuteman Rd.
+                  Andover, MA 01810-1008
+                  USA
+         Phone:   +1 978 684 1000
+         E-mail:  support@enterasys.com
+         WWW:     http://www.enterasys.com"
+    DESCRIPTION
+        "The Enterasys MIB for FASTPATH Protected Port."
+
+    REVISION    "200603061501Z"  -- Mon Mar  6 15:01 UTC 2006
+    DESCRIPTION "The initial version of this MIB module."
+    
+::= { ctFastPathProtectedPortMib 1 }
+
+--**************************************************************************************
+--    ctAgentInfoGroup
+--**************************************************************************************
+
+ctAgentSwitchConfigGroup   OBJECT IDENTIFIER ::= { ctFastPathProtectedPortMIB 1 }
+
+
+--**************************************************************************************
+-- ctAgentSwitchProtectedPortGroup
+--
+--**************************************************************************************
+
+ctAgentSwitchProtectedPortConfigGroup OBJECT IDENTIFIER ::= { ctAgentSwitchConfigGroup 18 }
+
+ctAgentSwitchProtectedPortTable OBJECT-TYPE
+     SYNTAX      SEQUENCE OF AgentSwitchProtectedPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "The switch's protected port mapping table"
+     ::= { ctAgentSwitchProtectedPortConfigGroup 1 }
+
+ctAgentSwitchProtectedPortEntry OBJECT-TYPE
+     SYNTAX      AgentSwitchProtectedPortEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "Protected ports assigned to groups."
+     INDEX       { ctAgentSwitchProtectedPortGroupId }
+     ::= { ctAgentSwitchProtectedPortTable 1 }
+
+AgentSwitchProtectedPortEntry ::=
+SEQUENCE {
+    ctAgentSwitchProtectedPortGroupId
+        Integer32,
+    ctAgentSwitchProtectedPortGroupName
+        DisplayString,
+    ctAgentSwitchProtectedPortPortList
+        PortList
+  }
+
+ctAgentSwitchProtectedPortGroupId  OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+                 "The group that this port belongs to"
+     ::= { ctAgentSwitchProtectedPortEntry 1 }
+
+ctAgentSwitchProtectedPortGroupName  OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE(0..31))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The name of the group"
+     ::= { ctAgentSwitchProtectedPortEntry 2 }
+
+ctAgentSwitchProtectedPortPortList  OBJECT-TYPE
+     SYNTAX      PortList
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION
+                 "The set of ports that are protected in this group"
+     ::= { ctAgentSwitchProtectedPortEntry 3 }
+
+END

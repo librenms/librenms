@@ -1,0 +1,344 @@
+--
+-- DCP-LINKVIEW-MIB.mib
+-- Smartoptics DCP Linkview Enterprise Specific MIB.
+--
+-- Copyright (c) 2018, Smartoptics
+-- All rights reserved
+--
+
+DCP-LINKVIEW-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    dcpGeneric
+        FROM DCP-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    Unsigned32, Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    OpticalPower1Decimal, InterfaceStatus
+        FROM SO-TC-MIB;
+
+
+-- 1.3.6.1.4.1.30826.2.2.3
+dcpLinkview MODULE-IDENTITY 
+    LAST-UPDATED "202102251200Z"
+    ORGANIZATION "Smartoptics."
+    CONTACT-INFO "http://www.smartoptics.com"
+    DESCRIPTION "This is the enterprise specific DCP LINKVIEW MIB for Smartoptics"
+
+    REVISION "202102251200Z"      -- February 25.
+    DESCRIPTION "Update description for dcpLinkviewLocalPower"
+
+    REVISION "201810081444Z"
+    DESCRIPTION "The initial revision"
+::= { dcpGeneric 3 }
+
+
+DcpFiberLoss ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+    "d-1"
+    STATUS current
+    DESCRIPTION
+    "The fiber loss in dB with 1 decimal."
+    SYNTAX Unsigned32 (0..1000)
+
+
+DcpFiberAttenuation ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+    "d-2"
+    STATUS current
+    DESCRIPTION
+    "The fiber attenuation per km with 2 decimals."
+    SYNTAX Unsigned32 (0..10)
+
+
+DcpFiberLength ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+    "d-1"
+    STATUS current
+    DESCRIPTION
+    "The fiber length in km with 1 decimal."
+    SYNTAX Unsigned32 (0..500)
+
+
+
+--  Node definitions
+-- 
+-- 1.3.6.1.4.1.30826.2.2.3.1
+dcpLinkviewObjects OBJECT IDENTIFIER ::= { dcpLinkview 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1
+dcpLinkviewTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DcpLinkviewEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Description."
+::= { dcpLinkviewObjects 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1
+dcpLinkviewEntry OBJECT-TYPE
+    SYNTAX DcpLinkviewEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Description."
+INDEX { dcpLinkviewIndex }
+::= { dcpLinkviewTable 1 }
+
+
+DcpLinkviewEntry ::=
+    SEQUENCE { 
+        dcpLinkviewIndex
+        Unsigned32,
+        dcpLinkviewLocalHostname
+        DisplayString,
+        dcpLinkviewLocalName
+        DisplayString,
+        dcpLinkviewLocalStatus
+        InterfaceStatus,
+        dcpLinkviewLocalPower
+        OpticalPower1Decimal,
+        dcpLinkviewFiberLoss
+        DcpFiberLoss,
+        dcpLinkviewFiberAttenuation
+        DcpFiberAttenuation,
+        dcpLinkviewFiberLength
+        DcpFiberLength,
+        dcpLinkviewFiberDispersion
+        Unsigned32,
+        dcpLinkviewFiberType
+        DisplayString,
+        dcpLinkviewFiberDispComp
+        Integer32,
+        dcpLinkviewFiberDispFinal
+        Integer32,
+        dcpLinkviewFiberUtilization
+        Gauge32,
+        dcpLinkviewRemotePower
+        OpticalPower1Decimal,
+        dcpLinkviewRemoteName
+        DisplayString,
+        dcpLinkviewRemoteHostname
+        DisplayString
+ }
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.1
+dcpLinkviewIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..1000000)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Interface Index in the following format:
+	csiixy where
+	
+	c: chassis.
+	s: slot number.
+	ii: Interface number.
+	x: 1 = line, 2 = client.
+	y: 0 = tx+rx port, 1 = tx port, 2 = rx port.
+	
+	For DCP-M products Slot is always 0.
+	
+	Same Index is used in the IF-MIB."
+::= { dcpLinkviewEntry 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.2
+dcpLinkviewLocalHostname OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The hostname of the local system."
+::= { dcpLinkviewEntry 2 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.3
+dcpLinkviewLocalName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The local interface name. If no interface this value is empty.
+     if-c/channelid-direction where c = chassis and direction = rx or tx."
+::= { dcpLinkviewEntry 3 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.4
+dcpLinkviewLocalStatus OBJECT-TYPE
+    SYNTAX InterfaceStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The operational state of the local port.
+
+        idle - The port is not activated.
+
+        down - The port traffic is lost.
+
+        up - There is traffic on the port."
+::= { dcpLinkviewEntry 4 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.5
+dcpLinkviewLocalPower OBJECT-TYPE
+    SYNTAX OpticalPower1Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The optical power present at the line interface, all wavelengths combined in units of 0.1 dBm."
+::= { dcpLinkviewEntry 5 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.6
+dcpLinkviewFiberLoss OBJECT-TYPE
+    SYNTAX DcpFiberLoss
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The fiber loss in units of 0.1 dB."
+::= { dcpLinkviewEntry 6 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.7
+dcpLinkviewFiberAttenuation OBJECT-TYPE
+    SYNTAX DcpFiberAttenuation
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The fiber attenuation in units of 0.01 dB/km."
+::= { dcpLinkviewEntry 7 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.8
+dcpLinkviewFiberLength OBJECT-TYPE
+    SYNTAX DcpFiberLength
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The fiber length in units of 0.1 km."
+::= { dcpLinkviewEntry 8 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.9
+dcpLinkviewFiberDispersion OBJECT-TYPE
+    SYNTAX Unsigned32 (0..10000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The calculated dispersion based on the measured fiber length in units of 1 ps/nm."
+::= { dcpLinkviewEntry 9 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.10
+dcpLinkviewFiberType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The fiber type configured, currently only G.652 is supported."
+::= { dcpLinkviewEntry 10 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.11
+dcpLinkviewFiberDispComp OBJECT-TYPE
+    SYNTAX Integer32 (-10000..10000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The compensated dispersion value by the system in units of 1 ps/nm."
+::= { dcpLinkviewEntry 11 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.12
+dcpLinkviewFiberDispFinal OBJECT-TYPE
+    SYNTAX Integer32 (-10000..10000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Residiual(remaning) dispersion in units of 1 ps/nm."
+::= { dcpLinkviewEntry 12 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.13
+dcpLinkviewFiberUtilization OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "Wavelength utilization of the system in units of %."
+::= { dcpLinkviewEntry 13 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.14
+dcpLinkviewRemotePower OBJECT-TYPE
+    SYNTAX OpticalPower1Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The optical power of the remote interface in units of 0.1 dBm."
+::= { dcpLinkviewEntry 14 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.15
+dcpLinkviewRemoteName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The remote interface name. If no interface this value is empty.
+     if-c/channelid-direction where c = chassis and direction = rx or tx."
+::= { dcpLinkviewEntry 15 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.1.1.1.16
+dcpLinkviewRemoteHostname OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The hostname of the remote system."
+::= { dcpLinkviewEntry 16 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.3.2
+dcpLinkviewMIBCompliance OBJECT IDENTIFIER ::= { dcpLinkview 2 }
+
+-- 1.3.6.1.4.1.30826.2.2.3.2.1
+dcpLinkviewMIBGroups OBJECT IDENTIFIER ::= { dcpLinkviewMIBCompliance 1 }
+
+-- 1.3.6.1.4.1.30826.2.2.3.2.1.1
+dcpLinkviewTableGroupV1 OBJECT-GROUP
+    OBJECTS { dcpLinkviewLocalHostname, dcpLinkviewLocalName, dcpLinkviewLocalStatus,
+              dcpLinkviewLocalPower, dcpLinkviewFiberLoss, dcpLinkviewFiberAttenuation,
+              dcpLinkviewFiberLength, dcpLinkviewFiberDispersion, dcpLinkviewFiberType, dcpLinkviewFiberDispComp,
+              dcpLinkviewFiberDispFinal, dcpLinkviewFiberUtilization, dcpLinkviewRemotePower,
+              dcpLinkviewRemoteName, dcpLinkviewRemoteHostname }
+    STATUS current
+    DESCRIPTION 
+    "The interface table objects V1."
+::= { dcpLinkviewMIBGroups 1 }
+
+-- 1.3.6.1.4.1.30826.2.2.3.2.2
+dcpLinkviewMIBCompliances OBJECT IDENTIFIER ::= { dcpLinkviewMIBCompliance 2 }
+
+-- 1.3.6.1.4.1.30826.2.2.3.2.2.1
+dcpLinkviewBasicComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the DCP-INTERFACE-MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            dcpLinkviewTableGroupV1 }
+    ::= { dcpLinkviewMIBCompliances 1 }
+
+
+END
+
+--
+-- DCP-LINKVIEW-MIB.mib
+--

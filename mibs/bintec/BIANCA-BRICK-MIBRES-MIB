@@ -1,0 +1,460 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+-- (C)opyright 1991-2014 bintec elmeg GmbH, All Rights Reserved
+-- $RCSfile: mib-resource,v $ 
+-- $Revision: 1.6 $ 
+ 
+BIANCA-BRICK-MIBRES-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            Counter, enterprises
+                FROM RFC1155-SMI
+
+            Unsigned32
+		FROM SNMPv2-SMI
+
+            DisplayString
+                FROM RFC1158-MIB
+ 
+            OBJECT-TYPE
+                FROM RFC-1212
+
+	    resource
+		FROM BINTEC-MIB;
+
+resourceMIB MODULE-IDENTITY
+    LAST-UPDATED "201204120000Z"
+    ORGANIZATION "bintec elmeg GmbH"
+    CONTACT-INFO
+            "EMail:   info@bintec-elmeg.com
+             Web:     www.bintec-elmeg.com
+            "
+    DESCRIPTION
+            "The MIB module for resource administration entities.
+            "
+    ::= { resource 255 }
+
+-- System Resources
+
+	cpuTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF CpuEntry
+	    MAX-ACCESS  not-accessible
+  	    STATUS  current
+
+            DESCRIPTION
+                "The CpuTable contains information about
+		 the processor statistics in the system."
+      	::= { resource 1 }
+	
+	cpuEntry OBJECT-TYPE
+	    SYNTAX  CpuEntry
+	    MAX-ACCESS  not-accessible
+  	    STATUS  current
+
+            DESCRIPTION
+                ""
+	    INDEX { cpuNumber }
+      	::= { cpuTable 1 }
+	
+	CpuEntry ::=
+	    SEQUENCE {
+	        cpuNumber          INTEGER,
+		cpuDescr           DisplayString,
+		cpuTotalUser       INTEGER,
+		cpuTotalSystem     INTEGER,
+		cpuTotalStreams    INTEGER,
+		cpuTotalIdle       INTEGER,
+		cpuLoadUser        INTEGER,
+		cpuLoadSystem      INTEGER,
+		cpuLoadStreams     INTEGER,
+		cpuLoadIdle        INTEGER,
+		cpuLoadUser10s     INTEGER,
+		cpuLoadSystem10s   INTEGER,
+		cpuLoadStreams10s  INTEGER,
+		cpuLoadIdle10s     INTEGER,
+		cpuLoadUser60s     INTEGER,
+		cpuLoadSystem60s   INTEGER,
+		cpuLoadStreams60s  INTEGER,
+		cpuLoadIdle60s     INTEGER
+            }
+
+        cpuNumber OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"CPU Number."
+      	::= { cpuEntry 1 }
+	
+        cpuDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Description of CPU."
+      	::= { cpuEntry 2 }
+
+        cpuTotalUser OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Total time in seconds spent in user mode since booting."
+      	::= { cpuEntry 3 }
+
+        cpuTotalSystem OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Total time in seconds spent in sytem mode since booting."
+      	::= { cpuEntry 4 }
+
+        cpuTotalStreams OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Total time in seconds spent with streams processing since booting."
+      	::= { cpuEntry 5 }
+
+        cpuTotalIdle OBJECT-TYPE
+	    SYNTAX  INTEGER
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Total idle time in seconds since booting."
+      	::= { cpuEntry 6 }
+
+        cpuLoadUser OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent in user mode for the last second."
+      	::= { cpuEntry 7 }
+
+        cpuLoadSystem OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent in system mode for the last second."		
+      	::= { cpuEntry 8 }
+	
+        cpuLoadStreams OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent with streams processing for the last second."
+      	::= { cpuEntry 9 }
+	
+        cpuLoadIdle OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of idle time for the last second."
+      	::= { cpuEntry 10 }
+
+        cpuLoadUser10s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent in user mode for the last 10 seconds."
+      	::= { cpuEntry 11 }
+
+        cpuLoadSystem10s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent in system mode for the last 10 seconds."
+      	::= { cpuEntry 12 }
+	
+        cpuLoadStreams10s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent with streams processing for the last 10 seconds."
+      	::= { cpuEntry 13 }
+	
+        cpuLoadIdle10s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of idle time measured for the last 10 seconds."
+      	::= { cpuEntry 14 }
+	
+        cpuLoadUser60s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent in user mode for the last 60 seconds."
+      	::= { cpuEntry 15 }
+
+        cpuLoadSystem60s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent in system mode for the last 60 seconds."
+      	::= { cpuEntry 16 }
+	
+        cpuLoadStreams60s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of time spent with streams processing for the last 60 seconds."
+      	::= { cpuEntry 17 }
+	
+        cpuLoadIdle60s OBJECT-TYPE
+	    SYNTAX  INTEGER (0..100)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Percentage of idle time measured for the last 60 seconds."
+      	::= { cpuEntry 18 }
+	
+	memoryTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF MemoryEntry
+	    MAX-ACCESS  not-accessible
+  	    STATUS  current
+
+            DESCRIPTION
+                "The memoryTable contains information about
+		 the different memory in the system."
+      	::= { resource 2 }
+	
+	memoryEntry OBJECT-TYPE
+	    SYNTAX  MemoryEntry
+	    MAX-ACCESS  not-accessible
+  	    STATUS  current
+
+            DESCRIPTION
+                ""
+	    INDEX { memoryType }
+      	::= { memoryTable 1 }
+	
+	MemoryEntry ::=
+	    SEQUENCE {
+	        memoryType            INTEGER,
+		memoryDescr           DisplayString,
+		memoryBlockSize       INTEGER,
+		memoryTotal           INTEGER,
+		memoryInuse           INTEGER,
+		memoryDramUse         INTEGER,
+		memoryNAllocs         INTEGER,
+		memoryNFrees          INTEGER,
+		memoryNFails          INTEGER
+            }
+
+	memoryType OBJECT-TYPE
+	    SYNTAX  INTEGER { flash(1), dram(2), dpool(3) }
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Type of memory:
+		    flash (1) : Non volatile memory
+		    dram  (2) : Dynamic memory
+		    dpool (3) : Dynamic pool
+		  "
+      	::= { memoryEntry 1 }
+
+	memoryDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Description of memory."
+      	::= { memoryEntry 2 }
+
+	memoryBlockSize OBJECT-TYPE
+	    SYNTAX  Unsigned32
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Allocation size for memories from dpools."
+      	::= { memoryEntry 3 }
+
+	memoryTotal OBJECT-TYPE
+	    SYNTAX  Unsigned32
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Amount of available units of this memory type measured in
+                 units for dpools and bytes for flash/dram."
+      	::= { memoryEntry 4 }
+
+	memoryInuse OBJECT-TYPE
+	    SYNTAX  Unsigned32
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+                "Used units of this memory type measured in units for dpools
+		 and bytes for flash/dram."
+      	::= { memoryEntry 5 }
+
+	memoryDramUse OBJECT-TYPE
+	    SYNTAX  Unsigned32
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+                "dpools might take memory from dram. This variable gives the
+		 amount in bytes taken from a dram memory."
+      	::= { memoryEntry 6 }
+
+	memoryNAllocs OBJECT-TYPE
+	    SYNTAX  Unsigned32
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+                "Number of memory allocations."
+      	::= { memoryEntry 7 }
+
+	memoryNFrees OBJECT-TYPE
+	    SYNTAX  Unsigned32
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+                "Number of memory free operations."
+      	::= { memoryEntry 8 }
+
+	memoryNFails OBJECT-TYPE
+	    SYNTAX  Unsigned32
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+                "Number of failed memory operations."
+      	::= { memoryEntry 9 } 
+
+	dspTable OBJECT-TYPE
+	    SYNTAX  SEQUENCE OF DspEntry
+	    MAX-ACCESS  not-accessible
+  	    STATUS  current
+
+            DESCRIPTION
+                "The DspTable contains information about
+		 Digital Signal processors in the system."
+      	::= { resource 3 }
+	
+	dspEntry OBJECT-TYPE
+	    SYNTAX  DspEntry
+	    MAX-ACCESS  not-accessible
+  	    STATUS  current
+
+            DESCRIPTION
+                ""
+	    INDEX { dspSlot, dspUnit }
+      	::= { dspTable 1 }
+	
+	DspEntry ::=
+	    SEQUENCE {
+	        dspSlot            INTEGER,
+	        dspUnit            INTEGER,
+		dspDescr           DisplayString,
+		dspCapabilities    BITS,
+		dspTotalChannels   INTEGER,
+		dspUsedChannels    INTEGER
+            }
+
+        dspSlot OBJECT-TYPE
+	    SYNTAX  INTEGER (0..512)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"DSP Slot Number."
+      	::= { dspEntry 1 }
+
+        dspUnit OBJECT-TYPE
+	    SYNTAX  INTEGER (0..9999)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"DSP Unit Number."
+      	::= { dspEntry 2 }
+
+        dspDescr OBJECT-TYPE
+	    SYNTAX  DisplayString
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+		"Description of DSP."
+      	::= { dspEntry 3 }
+
+	dspCapabilities OBJECT-TYPE
+	    SYNTAX  BITS {
+	    	    g711(0),
+	    	    g722(1),
+	    	    g723(2),
+	    	    g728(3),
+	    	    g726(4),
+	    	    g729(5),
+	    	    ilbc(6),
+	    	    clear(7),
+		    t30(8),
+		    t38(9),
+		    dtmf(10)
+            }
+	    MAX-ACCESS  read-only
+	    STATUS  current
+	    DESCRIPTION
+		"This bitfield describes what the DSP supports."
+	::= { dspEntry 4 }
+
+	dspTotalChannels OBJECT-TYPE
+	    SYNTAX  INTEGER (1..1000)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+                "Total number of channels of this DSP."
+      	::= { dspEntry 5 } 
+
+	dspUsedChannels OBJECT-TYPE
+	    SYNTAX  INTEGER (1..1000)
+	    MAX-ACCESS  read-only
+  	    STATUS  current
+
+            DESCRIPTION
+                "Number of used channels of this DSP."
+      	::= { dspEntry 6 } 
+
+END

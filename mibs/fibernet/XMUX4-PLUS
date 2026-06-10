@@ -1,0 +1,644 @@
+--
+--  Snmp V2 SIM expanded // ampliado
+--
+--  Private MIB Fibernet XMUX4+ // MIB privado para el XMUX4+ de Fibernet
+--
+--
+--  Author // Autor : PPB    28/05/2009
+--
+--                    PPB    12/04/2010 Rev. warning
+--
+--                    PPB    16/06/2011 Parte de la MIB CMUX4PLUS
+--
+--  Versión 01.05  Compatibility Hp OPenview.
+--
+
+
+XMUX4-PLUS DEFINITIONS ::= BEGIN
+
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE,
+		NOTIFICATION-TYPE, Integer32   FROM SNMPv2-SMI
+		enterprises                    FROM RFC1155-SMI
+		DisplayString                  FROM RFC1213-MIB;
+
+	fibernet MODULE-IDENTITY
+    		LAST-UPDATED "200804241820Z"
+    		ORGANIZATION "Fibernet S.L."
+		CONTACT-INFO "Fibernet S.L.
+			      Parque Tecnológico de Madrid.
+			      C/ Isaac Newton, número 10.
+			      D.P. 28760 Tres Cantos (Madrid)
+			      Tel: +34 91 807 65 65
+			      Fax: +34 91 807 65 21
+			      E-mail: fibernet@fibernet.es
+			      http://www.fibernet.es"
+		DESCRIPTION
+			"The Structure of Management Information for the Fibernet enterprise"
+		REVISION "200804241820Z"
+		DESCRIPTION
+			"The initial version of the MIB module."
+		::= { enterprises 29003 }
+
+
+
+	fbntransport          OBJECT IDENTIFIER ::= { fibernet 2 }
+	fbnXMux4Plus          OBJECT IDENTIFIER ::= { fbntransport 44 }
+	mux4Plus             OBJECT IDENTIFIER ::= { fbnXMux4Plus 1 }
+
+
+	-- XMUX4+ Information / Datos del xmux4
+
+	dmux4 OBJECT IDENTIFIER ::= { mux4Plus 1 }
+
+
+	identityMux4 OBJECT-TYPE
+		SYNTAX     DisplayString (SIZE (0..255))
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Identification main XMUX : Serial number, product code, configuration extended , hardware and software version //
+ 			 Identificacion del XMUX principal : Numero de serie , codigo de producto, extension de configuracion,version hardware y version software"
+		::= { dmux4 1 }
+
+	numbermux OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Number of xmuxs // Número de xmux gestionados"
+		::= { dmux4 2 }
+
+	numberChannel OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Number of channels // Número de canales totales gestionados"
+		::= { dmux4 3 }
+
+	strTrapsMux4 OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Traps information attached // Información anexa traps"
+		::= { dmux4 4 }
+
+	trapmuxIndex OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"XMux which cause the trap // XMux que genera el Trap "
+		::= { dmux4 5 }
+
+	trapchannelIndex OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel which cause the trap // Canal que genera el Trap "
+		::= { dmux4 6 }
+
+	trapValue OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"(On) (Off)"
+		::= { dmux4 7 }
+
+	strDescription OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Administrative description // Descripción administrativa "
+		::= { dmux4 8 }
+
+	-- XMUX's information // Datos de cada XMUX
+
+	muxTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF muxEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"XMUX information general array // Tabla con la informacion general de los XMUX"
+		::= { dmux4 9 }
+
+	muxEntry OBJECT-TYPE
+		SYNTAX muxEntry
+		ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"XMUX information // Informacion de un solo xmux"
+		INDEX  { muxTableIndex }
+		::= { muxTable 1 }
+
+	muxEntry ::= SEQUENCE {
+		muxTableIndex       Integer32,
+		muxIdentity         DisplayString,
+		muxAlarmStatus      INTEGER,
+		muxFanTemp          DisplayString,
+		muxInteriorTemp     DisplayString,
+		muxVolt3v3          DisplayString,
+		muxVolt2v5          DisplayString,
+		muxVolt1v2          DisplayString,
+		muxLeftPower        INTEGER,
+		muxRightPower       INTEGER,
+		muxLeftPowerIdenti  DisplayString,
+		muxRightPowerIdenti DisplayString,
+		muxOpticalSN        Integer32,
+		muxOpticalPN  	    DisplayString
+	}
+
+	muxTableIndex OBJECT-TYPE
+		SYNTAX Integer32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XMUX order // Número de xmux"
+		::= { muxEntry 1 }
+
+	muxIdentity OBJECT-TYPE
+		SYNTAX DisplayString
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Identification main XMUX : Serial number, product code, configuration extended , hardware and software version //
+ 			 Identificacion del XMUX principal : Numero de serie , codigo de producto, extension de configuracion,version hardware y version software"
+		::= { muxEntry 2 }
+
+	muxAlarmStatus OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel alarm // Indica si esta encendido (On) o no (Off) el led ALARMA de un canal"
+		::= { muxEntry 3 }
+
+	muxFanTemp OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel's fan temperature // Indica la temperatura del canal"
+		::= { muxEntry 4 }
+
+	muxInteriorTemp OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel's interior temperature // Indica la temperatura del canal"
+		::= { muxEntry 5 }
+
+	muxVolt3v3 OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel's 3,3 voltage // Indica el voltaje del 3,3 del canal"
+		::= { muxEntry 6 }
+
+	muxVolt2v5 OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel's 2,5 voltage // Indica el voltaje del 2,5 del canal"
+		::= { muxEntry 7 }
+
+	muxVolt1v2 OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel's 1,2 voltage // Indica el voltaje del 1,2 del canal"
+		::= { muxEntry 8 }
+
+	muxLeftPower OBJECT-TYPE
+		SYNTAX INTEGER { powerOn(1), powerOff(0), unknown(8) }
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Power supply status on the left // Estado de la alimentación interna izquierda"
+		::= { muxEntry 9 }
+
+	muxRightPower OBJECT-TYPE
+		SYNTAX INTEGER { powerOn(1), powerOff(0), unknown(8) }
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Power supply status on the right // Estado de la alimentación externa derecha"
+		::= { muxEntry 10 }
+
+	muxLeftPowerIdenti OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Power supply identification on the left // tipo de la alimentación interna izquierda"
+		::= { muxEntry 11 }
+
+	muxRightPowerIdenti OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Power supply identification on the right // tipo de la alimentación interna derecha"
+		::= { muxEntry 12 }
+
+	muxOpticalSN OBJECT-TYPE
+		SYNTAX Integer32
+		ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Optical serial number // Numero de serie de la optica"
+		::= { muxEntry 13 }
+
+	muxOpticalPN OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Optical part number  // Numero de serie de la optica"
+		::= { muxEntry 14 }
+
+
+	-- Channels information // Datos de cada canal
+
+	channelTable OBJECT-TYPE
+		SYNTAX     SEQUENCE OF ChannelEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"Channels information array // Tabla con la informacion de los canales"
+		::= { mux4Plus 2 }
+
+	channelEntry OBJECT-TYPE
+		SYNTAX     ChannelEntry
+		MAX-ACCESS not-accessible
+		STATUS     current
+		DESCRIPTION
+			"Channel information // Informacion de un solo canal"
+		INDEX  { channelmuxIndex , channelchannelIndex }
+		::= { channelTable 1 }
+
+	ChannelEntry ::= SEQUENCE {
+	    channelmuxIndex               Integer32,
+		channelchannelIndex           Integer32,
+		channelPresent                INTEGER,
+		channelLocalTx                INTEGER,
+		channelLocalRx                INTEGER,
+		channelRemoteTx               INTEGER,
+		channelRemoteRx               INTEGER,
+		channelLocalSfpPresent        INTEGER,
+		channelRemoteXfpPresent       INTEGER,
+		channelBitRate                DisplayString,
+		channelLocalByPass            INTEGER,
+		channelRemoteByPass           INTEGER,
+		channelSDHCompatibility       INTEGER,
+		channelOfc                    INTEGER,
+		channelSir                    INTEGER,
+		channelMTwin                  INTEGER,
+		channelSecondary              INTEGER,
+		channelActive                 INTEGER,
+		channelBackup                 INTEGER,
+		channelLoop                   INTEGER,
+		channelBer                    INTEGER,
+		channelLocalSfpType           DisplayString,
+		channelLocalSfpConector       DisplayString,
+		channelLocalSfpCompatibility  DisplayString,
+		channelLocalSfpBitRate        DisplayString,
+		channelLocalSfpWaveLength     DisplayString,
+		channelRemoteXfpType          DisplayString,
+		channelRemoteXfpConector      DisplayString,
+		channelRemoteXfpCompatibility DisplayString,
+		channelRemoteXfpBitRate       DisplayString,
+		channelRemoteXfpWaveLength    DisplayString,
+		channelDescription            DisplayString,
+		channelManagement             INTEGER
+	}
+
+	channelmuxIndex OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			" XMUX number // Número de orden XMUX"
+		::= { channelEntry 1 }
+
+
+	channelchannelIndex OBJECT-TYPE
+		SYNTAX     Integer32
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel order in XMUX // Número de canal dentro del XMUX"
+		::= { channelEntry 2 }
+
+	channelPresent OBJECT-TYPE
+		SYNTAX     INTEGER { present(1), missing(0) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel is (Present) or (Missing) // Indica si el canal esta (Presente) o (Ausente)"
+		::= { channelEntry 3 }
+
+	channelLocalTx OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Local transmision (On) or (Off) // Indica si el canal tiene transmisión local (On) o no (Off)"
+		::= { channelEntry 4 }
+
+	channelLocalRx OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Local reception (On) or (Off) // Indica si el canal tiene recepcion local (On) o no (Off)"
+		::= { channelEntry 5 }
+
+	channelRemoteTx OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Remote transmision (On) or (Off) //Indica si el canal tiene transmisión remota (On) o no (Off)"
+		::= { channelEntry 6 }
+
+	channelRemoteRx OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Remote reception (On) or (Off) //Indica si el canal tiene recepcion remota (On) o no (Off)"
+		::= { channelEntry 7 }
+
+	channelLocalSfpPresent OBJECT-TYPE
+		SYNTAX     INTEGER { present(1), missing(0) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Local SFP is (Present) or (Missing) // Indica si el SFP local esta (Presente) o (Ausente)"
+		::= { channelEntry 8 }
+
+	channelRemoteXfpPresent  OBJECT-TYPE
+		SYNTAX     INTEGER { present(1), missing(0) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Remote SFP is (Present) or (Missing) // Indica si el SFP remoto esta (Presente) o (Ausente)"
+		::= { channelEntry 9 }
+
+	channelBitRate OBJECT-TYPE
+		SYNTAX      DisplayString
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Channel bitRate // Velocidad del Canal "
+		::= { channelEntry 10 }
+
+	channelLocalByPass OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Off clock to local loop // Off clock hacia bucle local"
+		::= { channelEntry 11 }
+
+	channelRemoteByPass OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Off clock to remote loop // Off clock hacia bucle remoto"
+		::= { channelEntry 12 }
+
+	channelSDHCompatibility OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"SDH compatibility active // Compatibilidad SDH activa "
+		::= { channelEntry 13 }
+
+	channelOfc OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			" OFC active // Pulsos OFC activos "
+		::= { channelEntry 14 }
+
+	channelSir OBJECT-TYPE
+		SYNTAX     INTEGER { on(1), off(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			" SIR // active SIR activo "
+		::= { channelEntry 15 }
+
+	channelMTwin OBJECT-TYPE
+		SYNTAX     INTEGER { yes(1), no(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			" Mode TWIN active // En modo TWIN "
+		::= { channelEntry 16 }
+
+	channelSecondary OBJECT-TYPE
+		SYNTAX     INTEGER { yes(1), no(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			" Secundaria de la pareja TWIN "
+		::= { channelEntry 17 }
+
+	channelActive OBJECT-TYPE
+		SYNTAX     INTEGER { active(1), inactive(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			" Channel status active or not active // Estado del canal. Activo ó Inactivo"
+		::= { channelEntry 18 }
+
+	channelBackup OBJECT-TYPE
+		SYNTAX     INTEGER { yes(1), no(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel in backup // Canal en Backup."
+		::= { channelEntry 19 }
+
+	channelLoop OBJECT-TYPE
+		SYNTAX     INTEGER {yes(1), no(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel in Loop // Canal en bucle."
+		::= { channelEntry 20 }
+
+	channelBer OBJECT-TYPE
+		SYNTAX     INTEGER { yes(1), no(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel in BER // Canal pasando BER "
+		::= { channelEntry 21 }
+
+	channelLocalSfpType OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Kind of transceiver // Tipo de transceiver"
+		::= { channelEntry 22 }
+
+	channelLocalSfpConector OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Kind of the conector // Tipo de conector"
+		::= { channelEntry 23 }
+
+	channelLocalSfpCompatibility OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Compatibility transceiver // Compatibilidad del transceiver"
+		::= { channelEntry 24 }
+
+	channelLocalSfpBitRate OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Transceiver BitRate // Velocidad del transceiver"
+		::= { channelEntry 25 }
+
+	channelLocalSfpWaveLength OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Transceiver WaveLength // Lambda del transceiver"
+		::= { channelEntry 26 }
+
+	channelRemoteXfpType OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Kind of transceiver // Tipo de transceiver"
+		::= { channelEntry 27 }
+
+	channelRemoteXfpConector OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Kind of the conector // Tipo de conector"
+		::= { channelEntry 28 }
+
+	channelRemoteXfpCompatibility OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Compatibility transceiver // Compatibilidad del transceiver"
+		::= { channelEntry 29 }
+
+	channelRemoteXfpBitRate OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Transceiver BitRate // Velocidad del transceiver"
+		::= { channelEntry 30 }
+
+	channelRemoteXfpWaveLength OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Transceiver WaveLength // Lambda del transceiver"
+		::= { channelEntry 31 }
+
+	channelDescription OBJECT-TYPE
+		SYNTAX     DisplayString
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel description // Descripcion del canal"
+		::= { channelEntry 32 }
+
+	channelManagement OBJECT-TYPE
+		SYNTAX     INTEGER { yes(1), no(0), unknown(8) }
+		MAX-ACCESS read-only
+		STATUS     current
+		DESCRIPTION
+			"Channel in/out management // Canal en/fuera de  gestión"
+		::= { channelEntry 33 }
+
+	-- Traps
+
+	mux4PlusTraps        OBJECT IDENTIFIER ::= { mux4Plus 8 }
+
+	channelLocalRxChange NOTIFICATION-TYPE
+		OBJECTS { trapmuxIndex, trapchannelIndex, trapValue, strTrapsMux4 , strDescription }
+		STATUS  current
+		DESCRIPTION
+			" It was caused by a change in local reception //  Se genera al producirse un cambio en la recepcion local de un canal"
+    ::= { mux4PlusTraps 1 }
+
+	channelRemoteRxChange NOTIFICATION-TYPE
+		OBJECTS { trapmuxIndex, trapchannelIndex, trapValue, strTrapsMux4 , strDescription }
+		STATUS  current
+		DESCRIPTION
+			"It was caused by a change in remote reception // Se genera al producirse un cambio en la recepcion remota de un canal"
+    ::= { mux4PlusTraps 2 }
+
+	alarmaStatusChange NOTIFICATION-TYPE
+		OBJECTS { trapmuxIndex, trapchannelIndex, trapValue, strTrapsMux4 , strDescription }
+		STATUS  current
+		DESCRIPTION
+			"It was caused by a change in ALARMA led // Se genera al producirse un cambio en el led ALARMA de un canal"
+    ::= { mux4PlusTraps 3 }
+
+	channelActivoChange NOTIFICATION-TYPE
+		OBJECTS { trapmuxIndex, trapchannelIndex, trapValue, strTrapsMux4 , strDescription }
+		STATUS  current
+		DESCRIPTION
+			"It was caused by a change in active status // Se genera al producirse un cambio en el estado Activo de un canal"
+    ::= { mux4PlusTraps 4 }
+
+	powerLeftChange NOTIFICATION-TYPE
+		OBJECTS { trapmuxIndex, trapchannelIndex, trapValue, strTrapsMux4 , strDescription }
+		STATUS  current
+		DESCRIPTION
+			"It was caused by a change in power supply on the left // Se genera al producirse un cambio en la fuente izquierda del equipo"
+    ::= { mux4PlusTraps 5 }
+
+	powerRightChange NOTIFICATION-TYPE
+		OBJECTS { trapmuxIndex, trapchannelIndex, trapValue, strTrapsMux4 , strDescription }
+		STATUS  current
+		DESCRIPTION
+			"It was caused by a change in power supply on the right // Se genera al producirse un cambio en la fuente derecha del equipo"
+    ::= { mux4PlusTraps 6 }
+
+	configChange NOTIFICATION-TYPE
+		OBJECTS { trapmuxIndex, trapchannelIndex, trapValue, strTrapsMux4 , strDescription }
+		STATUS  current
+		DESCRIPTION
+			"It was caused by a change device's config // Se genera al producirse un cambio en la configuración del equipo"
+    ::= { mux4PlusTraps 7 }
+
+END

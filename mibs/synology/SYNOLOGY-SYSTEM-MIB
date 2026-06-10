@@ -1,0 +1,168 @@
+SYNOLOGY-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-GROUP, MODULE-COMPLIANCE
+				FROM SNMPv2-CONF
+	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+				FROM SNMPv2-SMI;
+
+synoSystem MODULE-IDENTITY
+    LAST-UPDATED "201309110000Z"
+    ORGANIZATION "www.synology.com"
+    CONTACT-INFO
+         "Synology Inc.
+          Email: snmp@synology.com"
+    DESCRIPTION
+        "Characteristics of the system information"
+    REVISION     "201309110000Z"
+    DESCRIPTION
+        "Second draft."
+    ::= { synology 1 }
+
+synology	 OBJECT IDENTIFIER
+	::= { enterprises 6574 }
+
+systemStatus OBJECT-TYPE
+    SYNTAX	  Integer32(1..2)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology system status
+	 Each meanings of status represented describe below.
+	 Normal(1): System functionals normally.
+	 Failed(2): Volume has crashed.
+	"
+    ::= { synoSystem 1 }
+
+temperature OBJECT-TYPE
+    SYNTAX	  Integer32
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology system temperature
+	 The temperature of Disk Station uses Celsius degree.
+	"
+    ::= { synoSystem 2 }
+
+powerStatus OBJECT-TYPE
+    SYNTAX	  Integer32(1..2)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology power status
+	 Each meanings of status represented describe below.
+	 Normal(1): All power supplies functional normally.
+	 Failed(2): One of power supply has failed.
+	"
+    ::= { synoSystem 3 }
+
+fan OBJECT IDENTIFIER ::= { synoSystem 4 }
+
+systemFanStatus OBJECT-TYPE
+    SYNTAX	  Integer32(1..2)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology system fan status
+	 Each meanings of status represented describe below.
+	 Normal(1): All Internal fans functional normally.
+	 Failed(2): One of internal fan stopped.
+	"
+    ::= { fan 1 }
+
+
+cpuFanStatus OBJECT-TYPE
+    SYNTAX	  Integer32(1..2)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology cpu fan status
+	 Each meanings of status represented describe below.
+	 Normal(1): All CPU fans functional normally.
+	 Failed(2): One of CPU fan stopped.
+	"
+    ::= { fan 2 }
+
+dsmInfo OBJECT IDENTIFIER ::= { synoSystem 5 }
+
+modelName OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "The Model name of this NAS"
+    ::= { dsmInfo 1 }
+
+serialNumber OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "The serial number of this NAS"
+    ::= { dsmInfo 2 }
+
+version OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "The version of this DSM"
+    ::= { dsmInfo 3 }
+
+upgradeAvailable OBJECT-TYPE
+    SYNTAX    Integer32(1..5)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "This oid is for checking whether there is a latest DSM can be upgraded.
+	 Available(1): There is version ready for download.
+	 Unavailable(2): The DSM is latest version.
+	 Connecting(3): Checking for the latest DSM.
+	 Disconnected(4): Failed to connect to server.
+	 Others(5): If DSM is upgrading or downloading, the status will show others."
+    ::= { dsmInfo 4 }
+
+controllerNumber OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS  read-only
+    STATUS    current
+    DESCRIPTION
+    "Synology system controller number
+    Controller A(0)
+    Controller B(1)
+	"
+    ::= { synoSystem 6 }
+
+
+systemConformance OBJECT IDENTIFIER ::= { synoSystem 7 }
+systemCompliances OBJECT IDENTIFIER ::= { systemConformance 1 }
+systemGroups 			OBJECT IDENTIFIER ::= { systemConformance 2 }
+
+systemCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for synoSystem entities which
+            implement the SYNOLOGY SYSTEM MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { systemGroup }
+
+    ::= { systemCompliances 1 }
+
+systemGroup OBJECT-GROUP
+    OBJECTS { systemStatus,
+              temperature,
+              powerStatus,
+              systemFanStatus,
+              cpuFanStatus,
+			  modelName,
+			  serialNumber,
+			  version,
+			  upgradeAvailable,
+			  controllerNumber}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic information
+             of an synology system entity."
+    ::= { systemGroups 1 }
+
+END

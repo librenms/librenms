@@ -1,0 +1,12 @@
+os: horizon-duo
+text: 'Dragonwave Horizon Duo'
+type: wireless
+icon: dragonwave
+mib_dir: 'dragonwave'
+over:
+    - { graph: device_wireless_snr, text: 'SNR' }
+    - { graph: device_wireless_rssi, text: 'RSL' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.7262.2.3

@@ -1,0 +1,94 @@
+<?php
+
+/**
+ * Oxidized.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2022 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace App\ApiClients;
+
+use App\Facades\LibrenmsConfig;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Facades\Log;
+
+class Oxidized extends BaseApi
+{
+    private readonly bool $enabled;
+
+    public function __construct()
+    {
+        $this->timeout = 90;
+        $this->base_uri = LibrenmsConfig::get('oxidized.url') ?? '';
+        $this->enabled = LibrenmsConfig::get('oxidized.enabled') === true && $this->base_uri;
+    }
+
+    /**
+     * Ask oxidized to refresh the node list for the source (likely the LibreNMS API).
+     */
+    public function reloadNodes(): void
+    {
+        if ($this->enabled && LibrenmsConfig::get('oxidized.reload_nodes') === true) {
+            try {
+                $this->getClient()->get('/reload.json');
+            } catch (ConnectionException $e) {
+                Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+            }
+        }
+    }
+
+    /**
+     * Queues a hostname to be refreshed by Oxidized
+     */
+    public function updateNode(string $hostname, string $msg, string $username = 'not_provided'): bool
+    {
+        if ($this->enabled) {
+            // Work around https://github.com/rack/rack/issues/337
+            $msg = str_replace('%', '', $msg);
+
+            try {
+                return $this->getClient()
+                    ->put("/node/next/$hostname", ['user' => $username, 'msg' => $msg])
+                    ->successful();
+            } catch (ConnectionException $e) {
+                Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+            }
+        }
+
+        return false;
+    }
+
+    /* Get content of the page */
+    public function getContent(string $uri): string
+    {
+        if ($this->enabled) {
+            try {
+                return $this->getClient()->get($uri);
+            } catch (ConnectionException $e) {
+                Log::warning('Oxidized is not reachable: ' . $e->getMessage());
+
+                return '';
+            }
+        }
+
+        return '';
+    }
+}

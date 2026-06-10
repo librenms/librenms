@@ -1,0 +1,777 @@
+-- =================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+-- Reference:
+-- Version: V2.8
+-- History:
+--  V1.0 Initial version 2004-07-13
+--  V1.1 2004-10-12 updated by gaolong
+--       Remove hyphens from DisplayString definition.
+--  V2.0 2004-12-28 updated by huguohua02576
+--       Add hh3cUserState, hh3cUserInfoRowStatus, hh3cUserIndex under hh3cUserInfoTable
+--   Change index from hh3cUserName to hh3cUserIndex under hh3cUserInfoTable
+--       Modify hh3cUserName, hh3cUserPassword, hh3cAuthMode, hh3cUserLevel's MAX-ACCESS
+--       from read-only to read-create
+--       Add hh3cUserAttributeTable, hh3cUserMaxNum, hh3cUserCurrNum and hh3cUserIndexIndicator
+--  V2.1 2006-02-07 updated by sunludong03130
+--       Modify hh3cFtpService, hh3cLanAccessService, hh3cSshService, hh3cTelnetService,
+--       hh3cTerminalService, hh3cFtpDirectory's description
+--  V2.2 2006-12-26 updated by zhangzhancheng02444
+--       Modify hh3cAccessLimit, hh3cFtpDirectory, hh3cSlotNum, hh3cSubSlotNum,
+--       and hh3cPortNum
+--  V2.3 2008-03-13 updated by w02260
+--       Add hh3cExpirationDate, hh3cUserGroup under hh3cUserAttributeTable,
+--       and add hh3cUserGroupObjects
+--  V2.4 2008-12-29 updated by liubo04367
+--       Add hh3cPortalService under hh3cUserAttributeTable
+--  V2.5 2012-02-28 updated by y02965
+--       Add hh3cUserRoleTable
+--       Add hh3cPPPService, hh3cHttpService and hh3cHttpsService under hh3cUserAttributeTable
+--  V2.6 2012-05-28 updated by y06401
+--       Modify description of hh3cAuthMode.
+--       2012-10-11 updated by l04367
+--       Add hh3cUserIfIndex
+--       Modify hh3cUserRole
+--  V2.7 2013-04-25 updated by q04356
+--       Modified the description of hh3cIdleCut
+--  V2.8 2016-11-19 updated by y06401
+--       Modified the description of hh3cUserGroup
+--       Modified the SYNTAX of hh3cUserGroupName
+-- =================================================================
+HH3C-USER-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    RowStatus, MacAddress, TEXTUAL-CONVENTION, DateAndTime, DisplayString
+        FROM SNMPv2-TC
+    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+hh3cUser MODULE-IDENTITY
+    LAST-UPDATED "201611190000Z"            -- November 19, 2016 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "
+        This MIB contains objects to
+        Manage configuration and Monitor running state
+        for userlog feature.
+        "
+    REVISION "201611190000Z"        -- November 19, 2016 at 00:00 GMT
+    DESCRIPTION
+        "Modified description of hh3cUserGroup.
+        Modified SYNTAX of hh3cUserGroupName"
+    ::= { hh3cCommon 12 }
+
+
+--
+-- type definitions
+--
+
+-- ServiceType
+ServiceType ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "enable (1)
+        disable (2)
+        "
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+--
+-- end of type definitions
+--
+
+-- hh3cUserObjects===============================================================
+hh3cUserObjects OBJECT IDENTIFIER ::= { hh3cUser 1 }
+
+
+-- hh3cUserInfoTable=============================================================
+hh3cUserInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cUserInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        Local User Info Table
+        "
+    ::= { hh3cUserObjects 1 }
+
+hh3cUserInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cUserInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The entry of hh3cUserInfoTable
+        "
+    INDEX
+        {
+            hh3cUserIndex
+        }
+    ::= { hh3cUserInfoTable 1 }
+
+Hh3cUserInfoEntry ::= SEQUENCE
+    {
+        hh3cUserName             DisplayString,
+        hh3cUserPassword         DisplayString,
+        hh3cAuthMode             Integer32,
+        hh3cUserLevel            Integer32,
+        hh3cUserState            INTEGER,
+        hh3cUserInfoRowStatus    RowStatus,
+        hh3cUserIndex            Integer32
+    }
+
+
+hh3cUserName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The name of local user, it must be unique.
+        "
+    ::= { hh3cUserInfoEntry 1 }
+
+hh3cUserPassword OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The password of local user, default is null.
+        When read, hh3cUserPassword always returns an Octet String of length zero.
+        "
+    ::= { hh3cUserInfoEntry 2 }
+
+hh3cAuthMode OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The encrypting type of password:
+        0 : password simple, means password is entered in clean text and saved in cipher text.
+        1 : password hash simple, means password is entered in clean text and saved in hash value.
+        7 : password cipher, means password is entered and saved in cipher text.
+        8 : password hash cipher, means password is entered and saved in hash value.
+        default is 0.
+        "
+    ::= { hh3cUserInfoEntry 3 }
+
+hh3cUserLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The privilege of local user
+        the value range is from 0 to 3, and 0 is minimum, 3 is maximum.
+        default is 0.
+        "
+    ::= { hh3cUserInfoEntry 4 }
+
+hh3cUserState OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            active(0),
+            block(1)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The state of local user
+        0: active, means local user can execute any operations that he has
+           privilege to do.
+        1: block, means local user can not execute any operations.
+        default is active.
+        "
+    ::= { hh3cUserInfoEntry 5 }
+
+hh3cUserInfoRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The status of this conceptual row.  Now only support CreateAndGo and
+        Destroy and Active.
+        "
+    ::= { hh3cUserInfoEntry 6 }
+
+
+hh3cUserIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483646)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The index of local user
+        "
+    ::= { hh3cUserInfoEntry 7 }
+
+-- hh3cUserAttributeTable========================================================
+hh3cUserAttributeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cUserAttributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        Local User Attribute Table.
+        if there are data in hh3cUserInfoTable, this table should have the
+        relevant data.
+        this table only support query and modify, but not support create and
+        delete operations.
+        "
+    ::= { hh3cUserObjects 2 }
+
+hh3cUserAttributeEntry OBJECT-TYPE
+    SYNTAX      Hh3cUserAttributeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cUserAttributeTable "
+    INDEX
+        {
+            hh3cUserIndex
+        }
+    ::= { hh3cUserAttributeTable 1 }
+
+Hh3cUserAttributeEntry ::= SEQUENCE
+    {
+        hh3cAccessLimit         Integer32,
+        hh3cIdleCut             Integer32,
+        hh3cIPAddress           IpAddress,
+        hh3cNasIPAddress        IpAddress,
+        hh3cSlotNum             Integer32,
+        hh3cSubSlotNum          Integer32,
+        hh3cPortNum             Integer32,
+        hh3cMacAddress          MacAddress,
+        hh3cVlan                Integer32,
+        hh3cFtpService          ServiceType,
+        hh3cFtpDirectory        OCTET STRING,
+        hh3cLanAccessService    ServiceType,
+        hh3cSshService          ServiceType,
+        hh3cTelnetService       ServiceType,
+        hh3cTerminalService     ServiceType,
+        hh3cExpirationDate      DateAndTime,
+        hh3cUserGroup           DisplayString,
+        hh3cPortalService       ServiceType,
+        hh3cPPPService          ServiceType,
+        hh3cHttpService         ServiceType,
+        hh3cHttpsService        ServiceType,
+        hh3cUserIfIndex         Integer32
+    }
+
+
+hh3cAccessLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        The maximum user number of current user who can access devices.
+        default is 0, means no limit.
+        "
+    ::= { hh3cUserAttributeEntry 1 }
+
+hh3cIdleCut OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Valid idle time out(second),
+        default is 0, means disable idle time out.
+        "
+    ::= { hh3cUserAttributeEntry 2 }
+
+hh3cIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's ip address.
+        default is 0.0.0.0
+        "
+    ::= { hh3cUserAttributeEntry 3 }
+
+hh3cNasIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's ip address of network access server.
+        default is 127.0.0.1, means local machine.
+        "
+    ::= { hh3cUserAttributeEntry 4 }
+
+hh3cSlotNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's slot.
+        default is 0.
+        "
+    ::= { hh3cUserAttributeEntry 5 }
+
+hh3cSubSlotNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's sub-slot.
+        default is 0.
+        "
+    ::= { hh3cUserAttributeEntry 6 }
+
+hh3cPortNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's port number.
+        0 is an insignificant value for initial status.
+        "
+    ::= { hh3cUserAttributeEntry 7 }
+
+hh3cMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's mac address.
+        default is 0-0-0, means the local user do not bind any mac address.
+        "
+    ::= { hh3cUserAttributeEntry 8 }
+
+hh3cVlan OBJECT-TYPE
+    SYNTAX      Integer32(0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's vlan id.
+        the value range is from 0 to 4094.
+        default is 0, means the local user is not in any vlan.
+        "
+    ::= { hh3cUserAttributeEntry 9 }
+
+hh3cFtpService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        FTP service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the FTP service for the corresponding entry in the
+        hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the FTP service for the corresponding entry in the
+        hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 10 }
+
+hh3cFtpDirectory OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Directory of FTP user.
+        default is null, means if local user has the privilege of ftp service.
+        "
+    ::= { hh3cUserAttributeEntry 11 }
+
+hh3cLanAccessService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Lan Access service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the lan access service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the lan access service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 12 }
+
+hh3cSshService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        SSH service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the SSH service for the corresponding entry in the
+        hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the SSH service for the corresponding entry in the
+        hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 13 }
+
+hh3cTelnetService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Telnet service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the TELNET service for the corresponding entry in the
+        hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the TELNET service for the corresponding entry in the
+        hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 14 }
+
+hh3cTerminalService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Terminal service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the terminal service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the terminal service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 15 }
+
+hh3cExpirationDate OBJECT-TYPE
+    SYNTAX      DateAndTime(SIZE(8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Expired date of user.
+        The default value is 0-0-0,0:0:0.0, and means it doesn't expire for
+        ever.
+        "
+    ::= { hh3cUserAttributeEntry 16 }
+
+hh3cUserGroup      OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..255))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        The user group that user belongs to.
+        Any user must belong to a user group.
+        The default group is the 'system' group.
+        "
+    ::= { hh3cUserAttributeEntry 17 }
+
+hh3cPortalService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Portal service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the portal service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the portal service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 18 }
+
+hh3cPPPService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        PPP service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the PPP service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the PPP service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 19 }
+
+hh3cHttpService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Http service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the Web service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the Web service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 20 }
+
+hh3cHttpsService OBJECT-TYPE
+    SYNTAX      ServiceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Https service:
+        enable
+        Setting this object to the value enable has the
+        effect of enabling the Web service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        disable
+        Setting this object to the value disable has the
+        effect of disabling the Web service for the corresponding entry
+        in the hh3cUserAttributeTable.
+
+        The default value is disable.
+        "
+    ::= { hh3cUserAttributeEntry 21 }
+
+hh3cUserIfIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "
+        Set local user's interface index.  A value of 0 means that the interface
+        index has not been assigned or the interface assigned not exist.
+        The default value is 0.
+        "
+    ::= { hh3cUserAttributeEntry 22 }
+
+-- hh3cUserMaxNum================================================================
+hh3cUserMaxNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "
+        This object contains the maximum number of local users.
+        "
+    ::= { hh3cUserObjects 3 }
+
+-- hh3cUserCurrNum===============================================================
+hh3cUserCurrNum OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "
+        This object contains the current number of local users.
+        "
+    ::= { hh3cUserObjects 4 }
+
+-- hh3cUserIndexIndicator========================================================
+hh3cUserIndexIndicator OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "
+        This object contains an appropriate value to
+        be used for hh3cUserIndex when creating entries in the
+        hh3cUserInfoTable.  The value 0 indicates that no unassigned
+        entries are available.  To obtain the
+        hh3cUserIndex value for a new
+        entry, the manager issues a management
+        protocol retrieval operation to obtain the
+        current value of this object.  After each
+        retrieval, the agent should modify the value
+        to the next unassigned index.
+        After a manager retrieves a value the agent will
+        determine through its local policy when this index
+        value will be made available for reuse.
+        "
+    ::= { hh3cUserObjects 5 }
+
+
+-- hh3cUserRoleTable========================================================
+hh3cUserRoleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cUserRoleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        Local User Role Table.
+        If there is data in hh3cUserInfoTable, this table should has the
+        relevant data.
+        "
+    ::= { hh3cUserObjects 6 }
+
+hh3cUserRoleEntry OBJECT-TYPE
+    SYNTAX      Hh3cUserRoleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of hh3cUserRoleTable."
+    INDEX
+        {
+            hh3cUserIndex,
+            hh3cUserRole
+        }
+    ::= { hh3cUserRoleTable 1 }
+
+Hh3cUserRoleEntry ::= SEQUENCE
+    {
+        hh3cUserRole           DisplayString,
+        hh3cUserRoleStatus     RowStatus
+    }
+
+hh3cUserRole      OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..63))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The user's role determines the user's privilege.
+        The user must be authorized one role at least.
+        The default user role for a local user created by a network-admin user
+        is network-operator, and the default user role for a local user created
+        by an mdc-admin or level-15 user is mdc-operator.
+        "
+    ::= { hh3cUserRoleEntry 1 }
+
+hh3cUserRoleStatus   OBJECT-TYPE
+    SYNTAX   RowStatus
+    MAX-ACCESS  read-create
+    STATUS   current
+    DESCRIPTION
+        "
+        This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.  To create a new row, hh3cUserIndex must be specified.
+        The number of rows with same hh3cUserIndex cann't be more than 64.
+        If the the number of rows with a hh3cUserIndex is 1, this row cann't be
+        destroyed.
+        "
+    ::= { hh3cUserRoleEntry 2 }
+
+
+-- hh3cUserGroupObjects==========================================================
+hh3cUserGroupObjects OBJECT IDENTIFIER ::= { hh3cUser 2 }
+
+
+-- hh3cUserGroupInfoTable========================================================
+hh3cUserGroupInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cUserGroupInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        User group information table.
+        "
+    ::= { hh3cUserGroupObjects 1 }
+
+hh3cUserGroupInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cUserGroupInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The entry of hh3cUserGroupInfoTable.
+        "
+    INDEX
+        {
+            hh3cUserGroupName
+        }
+    ::= { hh3cUserGroupInfoTable 1 }
+
+Hh3cUserGroupInfoEntry ::= SEQUENCE
+    {
+        hh3cUserGroupName             DisplayString,
+        hh3cUserGroupInfoRowStatus    RowStatus
+    }
+
+hh3cUserGroupName OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(1..255))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "
+        The index of user group.
+        "
+    ::= { hh3cUserGroupInfoEntry 1 }
+
+hh3cUserGroupInfoRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "
+        The status of this conceptual row.  Only support createAndGo, destroy
+        and active.
+        "
+    ::= { hh3cUserGroupInfoEntry 2 }
+
+END

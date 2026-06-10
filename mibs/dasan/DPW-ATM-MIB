@@ -1,0 +1,1285 @@
+DPW-ATM-MIB DEFINITIONS ::= BEGIN
+
+      IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE,
+      Counter32, Unsigned32, mib-2
+            FROM SNMPv2-SMI
+
+      MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+
+      TruthValue, RowStatus, RowPointer
+            FROM SNMPv2-TC
+
+      PerfCurrentCount, PerfIntervalCount
+            FROM PerfHist-TC-MIB
+
+      InterfaceIndex
+            FROM IF-MIB
+
+      pwIndex
+          FROM PW-STD-MIB                    -- [PWMIB]
+                                    -- RFC Editor: Please replace
+                                    -- PWMIB with correct RFC
+
+      AtmVpIdentifier, AtmVcIdentifier
+            FROM ATM-TC-MIB
+      ;
+
+
+        dpwAtmMIB MODULE-IDENTITY
+        LAST-UPDATED "200811200000Z"  -- 20 November 2008 12:00:00 GMT 
+        ORGANIZATION "Pseudo-Wire Emulation Edge-to-Edge (PWE3)
+                      Working Group"
+        CONTACT-INFO
+            "Senthilkumar Sathappan
+             Postal: 1000 Marconi Drive
+                     Warrendale PA 15086
+             Tel:    +1-724-742-614
+
+             Email:  senthilkumar.sathappan@marconi.com
+
+
+             Marichetty Venkatesan
+             Postal: 1000 Marconi Drive
+                     Warrendale PA 15086
+             Tel:    +1-724-742-7058
+             Email:  venkatesan.marichetty@marconi.com
+
+
+             Thomas D. Nadeau
+             Postal: Cisco Systems, Inc.
+                     250 Apollo Drive
+                     Chelmsford, MA 01824
+             Tel:    +1-978-497-3051
+             Email:  tnadeau@cisco.com
+
+             Orly Nicklass
+             Postal: Nokia Siemens Networks
+                    3 Hanagar st. Neve Ne'eman
+                    Hod-Hasharon, Israel
+             Email: orly.nicklass@nsn.com
+
+             Discussion and general questions should be posed to
+             the PWE3 Working Group (pwe3@ietf.org)."
+
+        DESCRIPTION
+            "This MIB contains managed object definitions for
+             Pseudo Wire emulation of ATM over Packet Switched
+             Networks (PSN).
+
+             This MIB supplements the PW-STD-MIB module.
+             The PW-STD-MIB contains structures and MIB associations
+             generic to Pseudo-Wire (PW) emulation. PW-specific
+             MIBs (such as this) contain config and stats for specific
+             PW types.
+
+             Copyright (C) The IETF Trust (2008).  This version of
+             this MIB module is part of RFC XXXX; see the RFC itself for
+             full legal notices."
+  -- RFC Ed.: replace XXXX with actual RFC number & remove this
+  --            note"
+
+        -- Revision history.
+
+        REVISION "200811200000Z"  -- 20 November 2008 12:00:00 GMT 
+        DESCRIPTION "Initial version published as RFC XXXX."
+  -- RFC Ed.: replace XXXX with actual RFC number & remove this
+  --          note"
+
+        ::= { mplsATMPWMIB 1 }
+       
+     -- RFC Editor: replace YYY with IANA-assigned number & remove this
+     -- note. Please see IANA considerations section.
+
+
+      -- Top-level components of this MIB
+
+
+      dpwAtmNotifications OBJECT IDENTIFIER 
+                                        ::= { dpwAtmMIB 0 }
+      dpwAtmObjects       OBJECT IDENTIFIER 
+                                        ::= { dpwAtmMIB 1 }
+
+  --Generic ATM PW table for all types of ATM PW connection.
+
+  dpwAtmCfgTable OBJECT-TYPE
+      SYNTAX    SEQUENCE OF DpwAtmCfgEntry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+          "This table specifies generic information for an ATM PW
+           to be carried over PSN in any mode."
+      ::= { dpwAtmObjects 1 }
+
+      dpwAtmCfgEntry OBJECT-TYPE
+      SYNTAX        DpwAtmCfgEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+             "This table contains a set of parameters for
+           the ATM PW that needs to be adapted and carried
+           over PSN. This table is indexed by pwIndex from
+           pwTable. An entry is created for every newly pwIndex
+           in the pwTable. Unless otherwise specified, all
+           read-write objects in this table MAY
+           be changed when the PW is defined as not active
+           and all RW objects values must persist
+           after reboot"
+      REFERENCE
+        "See [PWMIB] "
+
+      INDEX { pwIndex }
+      ::= { dpwAtmCfgTable 1 }
+
+  DpwAtmCfgEntry ::= SEQUENCE {
+          dpwAtmCfgMaxCellConcatenation       Unsigned32,
+          dpwAtmCfgFarEndMaxCellConcatenation Unsigned32,
+          dpwAtmCfgTimeoutMode                INTEGER,
+          dpwAtmMaxCellConcatenationTimer     Unsigned32
+          }
+
+  dpwAtmCfgMaxCellConcatenation OBJECT-TYPE
+       SYNTAX        Unsigned32 (1..29)
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "The maximum number of ATM cells that can be
+            concatenated into one PW packet towards PSN.
+            In non LDP or other signaling protocol environment,
+            this object MAY be changed at anytime, but traffic
+            might be interuppted, otherwise, it may be changed
+            when PW is not active."
+      DEFVAL { 1 }
+      ::= { dpwAtmCfgEntry 1 }
+
+  dpwAtmCfgFarEndMaxCellConcatenation OBJECT-TYPE
+       SYNTAX        Unsigned32 (1..29)
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The maximum number of ATM cells that can be
+            concatenated into one PW packet towards PSN as reported by
+            the far end. If no LDP in use, the object will either
+            return value 0 or allow setting it for calculating
+            protocol overhead."
+      ::= { dpwAtmCfgEntry 2 }
+
+  dpwAtmCfgTimeoutMode OBJECT-TYPE
+       SYNTAX        INTEGER
+                          {
+                           notApplicable (1),
+                           disabled      (2),
+                           enabled       (3)
+                          }
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "This objects determines whether a packet can be
+            transmitted to the PSN based on time out expiration
+            for collecting cells or not. The actual handling of the
+            time out is implementation specific-as such this object
+            may be changed at any time under proper consideration of
+            traffic interupption effect."
+      DEFVAL { 3 }
+      ::= { dpwAtmCfgEntry 3 }
+
+  dpwAtmMaxCellConcatenationTimer OBJECT-TYPE
+       SYNTAX        Unsigned32 (300..4095)
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+            "This timer is used to concatenate the maximum ATM cell 
+             packets in the configured timer value. The unit of the 
+             timer is in microseconds."
+      DEFVAL { 1000 }
+      ::= { dpwAtmCfgEntry 4 }
+
+
+  -- Device capable of implementing N:1, 1:1 and transparent cell
+  -- mode assumes to support the N:1 table for all
+  -- modes with respective applicable setting.
+  -- In such implementation, user can create an entry for either
+  -- 1:1 or transparent cell transport modes only
+  -- in pwAtmInboundNto1Table. The side effect of such
+  -- will be an automatic create of the respective line in the
+  -- pwAtmOutboundNto1Table.
+
+  -- ATM PW Outbound Table for N to 1 connection
+
+  dpwAtmOutboundNto1Table OBJECT-TYPE
+      SYNTAX    SEQUENCE OF DpwAtmOutboundNto1Entry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+          "This table specifies the information for an ATM PW to
+          be carried over PSN in the outbound direction. Up to
+          N entries can be created in this table for every
+          entry in the pwTable with a pwType equal to:
+          atmCellNto1Vcc(9), or atmCellNto1Vpc(10).
+            An entry can be created only when the VP/VC are known.
+          A single entry will be created in this table for every
+          entry in the pwTable with a pwType equal to
+          one of the following: atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13), or atmAal5PduVcc(14), or
+          atmAal5SduVcc(2), or atmTransparent(3).
+          "
+      ::= { dpwAtmObjects 2 }
+
+  dpwAtmOutboundNto1Entry OBJECT-TYPE
+      SYNTAX        DpwAtmOutboundNto1Entry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "A row in this table represents an ATM PW that needs to be
+           adapted and carried over PSN. This table is indexed by
+           pwIndex from pwTable and the ATM interface with VPL/ VCLs.
+           In atmTransparent(3), Vpi and VCi will be 0xFFFF
+           during set operation.
+           Unless otherwise specified, all read-create objects in this
+           table MUST NOT be changed after row activation
+           and SHOULD remain unchanged after reboot."
+      INDEX { pwIndex, dpwAtmOutboundNto1AtmIf ,
+                          dpwAtmOutboundNto1Vpi }
+      ::= { dpwAtmOutboundNto1Table 1 }
+
+  DpwAtmOutboundNto1Entry ::= SEQUENCE {
+        dpwAtmOutboundNto1AtmIf                    InterfaceIndex,
+        dpwAtmOutboundNto1Vpi                      AtmVpIdentifier,
+        dpwAtmOutboundNto1RowStatus                RowStatus,
+        dpwAtmOutboundNto1MappedVpi                INTEGER,
+        dpwAtmOutboundNto1OntId                    OCTET STRING 
+       }
+
+  dpwAtmOutboundNto1AtmIf OBJECT-TYPE
+      SYNTAX        InterfaceIndex
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "The ATM Interface that receives cells from the ATM network."
+      ::= { dpwAtmOutboundNto1Entry 1 }
+
+  dpwAtmOutboundNto1Vpi OBJECT-TYPE
+      SYNTAX        AtmVpIdentifier
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "VPI value of this ATM PW. In atmTransparent(3),
+           Vpi will be the equivalent of 0xFFFF"
+      ::= { dpwAtmOutboundNto1Entry 2 }
+
+  dpwAtmOutboundNto1RowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+          "This Object is used to create, modify or delete a row in
+           this table."
+      ::= { dpwAtmOutboundNto1Entry 3 }
+
+  dpwAtmOutboundNto1MappedVpi         OBJECT-TYPE
+      SYNTAX        INTEGER
+                    {
+                      disable (0),
+                      enable  (1)
+                    } 
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+          "The egress generated VPI value of this ATM PW. The
+          entry is valid for PW type of atmCellNto1Vcc(9),
+          atmCellNto1Vpc(10), atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13). In other types, the value will be the
+          equivalent of 0xFFFF. Value MAY be changed when the
+          PW is defined as not active "
+      DEFVAL { 0 }
+      ::= { dpwAtmOutboundNto1Entry 4 }
+
+  dpwAtmOutboundNto1OntId OBJECT-TYPE
+       SYNTAX        OCTET STRING (SIZE(0..255))
+       MAX-ACCESS    read-write
+       STATUS        current
+       DESCRIPTION
+           "This object specifies the identification of an ONT."
+      ::= { dpwAtmOutboundNto1Entry 5 }
+
+  -- ATM PW Inbound Table for N to 1 connection
+
+  dpwAtmInboundNto1Table OBJECT-TYPE
+      SYNTAX    SEQUENCE OF DpwAtmInboundNto1Entry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+          "This table specifies the information for an ATM PW to
+          be carried over PSN in the Inbound direction. Up to
+          N entries can be created in this table for every
+          entry in the pwTable with a pwType equal to:
+          atmCellNto1Vcc(9), or atmCellNto1Vpc(10).
+            An entry can be created only when the VP/VC are known.
+          A single entry will be created in this table for every
+          entry in the pwTable with a pwType equal to
+          one of the following:atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13), or atmAal5PduVcc(14), or
+          atmAal5SduVcc(2), or atmTransparent(3)."
+      ::= { dpwAtmObjects 3 }
+
+  dpwAtmInboundNto1Entry OBJECT-TYPE
+      SYNTAX        DpwAtmInboundNto1Entry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "A row in this table represents an ATM PW that needs to be
+           adapted and carried over PSN. This table is indexed by
+           pwIndex from pwTable and the ATM interface with VPL/ VCLs.
+           In atmTransparent(3), Vpi and VCi will be 0xFFFF
+           during set operation.
+           Unless otherwise specified, all Read-Creat objects in this
+           table MUST NOT be changed after row activation
+           and SHOULD remain unchanged after reboot."
+      INDEX { pwIndex, dpwAtmInboundNto1AtmIf ,
+                          dpwAtmInboundNto1Vpi }
+      ::= { dpwAtmInboundNto1Table 1 }
+
+  DpwAtmInboundNto1Entry ::= SEQUENCE {
+        dpwAtmInboundNto1AtmIf                InterfaceIndex,
+        dpwAtmInboundNto1Vpi                  AtmVpIdentifier,
+        dpwAtmInboundNto1RowStatus            RowStatus,
+        dpwAtmInboundNto1MappedVpi            INTEGER
+      }
+
+  dpwAtmInboundNto1AtmIf OBJECT-TYPE
+      SYNTAX        InterfaceIndex
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "The ATM Interface that receives cells from the ATM network."
+      ::= { dpwAtmInboundNto1Entry 1 }
+
+  dpwAtmInboundNto1Vpi OBJECT-TYPE
+      SYNTAX        AtmVpIdentifier
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+          "VPI value of this ATM PW. In atmTransparent(3),
+           Vpi will be the equivalent of 0xFFFF."
+      ::= { dpwAtmInboundNto1Entry 2 }
+
+  dpwAtmInboundNto1RowStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+          "This Object is used to modify or delete a row in
+          this table.  This table is associated with dpwAtmOutboundNto1Table. 
+          So a row can be created in this table through dpwAtmOutboundNto1Table"
+      ::= { dpwAtmInboundNto1Entry 3 }
+
+  dpwAtmInboundNto1MappedVpi    OBJECT-TYPE
+      SYNTAX        INTEGER
+                    {
+                      disable (0),
+                      enable  (1)
+                    }
+      MAX-ACCESS    read-create
+      STATUS        current
+      DESCRIPTION
+          "The generated VPI value of this ATM PW. The
+          entry is valid for PW type of atmCellNto1Vcc(9),
+          atmCellNto1Vpc(10), atmCell1to1Vcc(12), or
+          atmCell1to1Vpc(13). In other types, the value will be the
+          equivalent of 0xFFFF. Value MAY be changed when the
+          PW is defined as not active."
+      DEFVAL { 0 }
+      ::= { dpwAtmInboundNto1Entry 4 }
+
+  -- ATM PW QOS VCI-EXP  Table 
+
+  dpwAtmVciExpTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmVciExpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains the ONT downstream VCI-EXP qos mapping
+	 parameters. This  exp value represents the queue-type in 
+	exp-queue table"
+    ::= { dpwAtmObjects 4 }
+
+  dpwAtmVciExpEntry OBJECT-TYPE
+    SYNTAX        DpwAtmVciExpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created for downstream ont qos."
+    INDEX  { dpwAtmOntid, dpwAtmVpi, dpwAtmExpVci }
+    ::= { dpwAtmVciExpTable 1 }
+
+  DpwAtmVciExpEntry ::= SEQUENCE {
+       dpwAtmOntid        Unsigned32,
+       dpwAtmVpi          Unsigned32,
+       dpwAtmExpVci       Unsigned32,
+       dpwAtmVciExp       Unsigned32,
+       dpwAtmExpRowStatus Unsigned32
+    }
+
+  dpwAtmOntid OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "This object represents the identification of an ONT."
+    ::= { dpwAtmVciExpEntry 1 }
+
+  dpwAtmVpi OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object represents the downstream ont qos vpi value."
+    ::= { dpwAtmVciExpEntry 2 }
+
+  dpwAtmExpVci OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+	" The  downstream ont qos vci value for corresponding vpi."
+    ::= { dpwAtmVciExpEntry 3 }
+  
+  dpwAtmVciExp OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " The exp value representing exp-queue table for downstream ont qos."
+    ::= { dpwAtmVciExpEntry 4 }
+
+  dpwAtmExpRowStatus OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This vci-exp table supports only exp value modification. This object becomes active 
+	  with default exp value when vci-qos table entries are created. This Object is
+	  for internal use only and not configurable by user. "
+    ::= { dpwAtmVciExpEntry 5 }
+
+  
+  dpwAtmExpQosTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmExpQosEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains the downstream ont qos EXP Queue related parameters."
+    ::= { dpwAtmObjects 5 }
+
+  dpwAtmExpQosEntry OBJECT-TYPE
+    SYNTAX        DpwAtmExpQosEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created for downstream ont qos with queue-type 
+	 for corresponfing exp ."
+    INDEX  { dpwAtmOntid, dpwAtmQosExp }
+    ::= { dpwAtmExpQosTable 1 }
+
+  DpwAtmExpQosEntry ::= SEQUENCE {
+       dpwAtmQosExp               Unsigned32,
+       dpwAtmExpQosMode           Unsigned32,
+       dpwAtmExpQosPriority       Unsigned32,
+       dpwAtmExpQosWeight         Unsigned32,
+       dpwAtmExpQosRowStatus      Unsigned32
+    }
+
+  dpwAtmQosExp OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object specifies the exp value corresponding to downstream ont qos."
+    ::= { dpwAtmExpQosEntry 1 }
+
+  dpwAtmExpQosMode OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This obejct specifies the exp queue-type for downstream ont qos ."
+    ::= { dpwAtmExpQosEntry 2 }
+
+
+  dpwAtmExpQosPriority OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object specifes the priority for queue-type of strict priority(SP)."
+    ::= { dpwAtmExpQosEntry 3 }
+
+
+  dpwAtmExpQosWeight OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object specifies the weight for queue-type of weighted round robin(WRR)."
+    ::= { dpwAtmExpQosEntry 4 }
+
+  dpwAtmExpQosRowStatus OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "This Object is for internal use only and not configurable by user. This table will
+	 have default values unless modified by the user."
+    ::= { dpwAtmExpQosEntry 5 }
+
+
+
+  dpwAtmVciQosTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmVciQosEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains VCI Queue related parameters for upstream ont qos."
+    ::= { dpwAtmObjects 6 }
+
+  dpwAtmVciQosEntry OBJECT-TYPE
+    SYNTAX        DpwAtmVciQosEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created for upstream ont qos vci-qos."
+    INDEX  { dpwAtmOntid, dpwAtmVpi, dpwAtmExpVci }
+    ::= { dpwAtmVciQosTable 1 }
+
+ DpwAtmVciQosEntry ::= SEQUENCE {
+       dpwAtmVciQosClass               INTEGER,
+       dpwAtmVciQosPCR                 Unsigned32,
+       dpwAtmVciQosSCR                 Unsigned32,
+       dpwAtmVciQosMBS                 Unsigned32,
+       dpwAtmVciQosCDVT                Unsigned32,
+       dpwAtmVciQosRowStatus           Unsigned32
+    }
+
+  dpwAtmVciQosClass OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This objects specifies class type for upstream ont qos vci."
+    ::= { dpwAtmVciQosEntry 1 }
+
+  dpwAtmVciQosPCR OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object specifies the peak cell rate for corresponding upstream ont qos.This value
+          should be in a multiples of 151 only"
+    ::= { dpwAtmVciQosEntry 2 }
+
+  dpwAtmVciQosSCR OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object specifies the substainable cell rate for upstream ont qos.This value 
+          should be in a multiples of 151 only"
+    ::= { dpwAtmVciQosEntry 3 }
+
+
+  dpwAtmVciQosMBS OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object specifies maximum burst size of corresponding vci in upstream ont qos."
+    ::= { dpwAtmVciQosEntry 4 }
+
+
+  dpwAtmVciQosCDVT OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This object specifies cell delay variance tolerance corresponds to vci in upstream ont qos."
+    ::= { dpwAtmVciQosEntry 5 }
+
+  dpwAtmVciQosRowStatus OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This Object is used to create and delete a row in this table.
+	  When the Row status is active, whenever user configures in OLT, ONT is also configured.
+          For row creation, user is suggested to configure the qos parameters after configuring rowstatus 
+	  to create and wait. Then make the row status active. Creation or deletion of vci-qos table 
+	  automatically creates/deletes vci-exp table."
+    ::= { dpwAtmVciQosEntry 6 }
+
+
+  -- The following supplement the counters presented in the
+  -- PW generic MIB
+
+  -- ATM PW Performance Current Table.
+
+  dpwAtmPerfCurrentTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmPerfCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The current 15 minute interval counts are in
+         this table.
+         This table provides performance information per ATM PW."
+    ::= { dpwAtmObjects 7 }
+
+  dpwAtmPerfCurrentEntry OBJECT-TYPE
+    SYNTAX        DpwAtmPerfCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created by the agent for every
+         pwAtmCfgTable entry. After 15 minutes, the contents of this
+         table entry are copied to a new entry in the
+         pwAtmPerfInterval table and the counts in this entry
+         are reset to zero."
+    INDEX  { pwIndex }
+    ::= { dpwAtmPerfCurrentTable 1 }
+
+  DpwAtmPerfCurrentEntry ::= SEQUENCE {
+       dpwAtmPerfCurrentMissingPkts    PerfCurrentCount,
+       dpwAtmPerfCurrentPktsReOrder    PerfCurrentCount,
+       dpwAtmPerfCurrentPktsMisOrder   PerfCurrentCount,
+       dpwAtmPerfCurrentPktsTimeout    PerfCurrentCount,
+       dpwAtmPerfCurrentCellsXmit      PerfCurrentCount,
+       dpwAtmPerfCurrentCellsDropped   PerfCurrentCount,
+       dpwAtmPerfCurrentCellsReceived  PerfCurrentCount,
+       dpwAtmPerfCurrentUnknownCells   PerfCurrentCount
+    }
+
+  dpwAtmPerfCurrentMissingPkts OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of missing packets (as detected via control word
+         sequence number gaps)."
+    ::= { dpwAtmPerfCurrentEntry 1 }
+
+  dpwAtmPerfCurrentPktsReOrder OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of sequence (via control
+         word sequence number), but successfully re-ordered.
+         Note: some implementations may not support this Feature."
+    ::= { dpwAtmPerfCurrentEntry 2 }
+
+  dpwAtmPerfCurrentPktsMisOrder OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of order (via control word
+         sequence numbers)."
+     ::= { dpwAtmPerfCurrentEntry 3 }
+
+  dpwAtmPerfCurrentPktsTimeout OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets transmitted due to timeout expiration
+         while attempting to collect cells."
+     ::= { dpwAtmPerfCurrentEntry 4 }
+
+  dpwAtmPerfCurrentCellsXmit OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of transmitted cells."
+     ::= { dpwAtmPerfCurrentEntry 5 }
+
+  dpwAtmPerfCurrentCellsDropped OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of dropped cells."
+     ::= { dpwAtmPerfCurrentEntry 6 }
+
+  dpwAtmPerfCurrentCellsReceived OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of received cells."
+     ::= { dpwAtmPerfCurrentEntry 7 }
+
+  dpwAtmPerfCurrentUnknownCells OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cells received from the PSN with unknown VPI or
+        VCI values. This object is relevant only in N:1 mode."
+     ::= { dpwAtmPerfCurrentEntry 8 }
+
+  -- End ATM PW Performance Current Interval Table
+
+
+  -- ATM PW Performance Interval Table.
+
+  dpwAtmPerfIntervalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmPerfIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides performance information per ATM PW
+         similar to the pwAtmPerfCurrentTable above. However,
+         these counts represent historical 15 minute intervals.
+         Typically, this table will have a maximum of 96 entries
+         for a 24 hour period. "
+    ::= { dpwAtmObjects 8 }
+
+  dpwAtmPerfIntervalEntry OBJECT-TYPE
+    SYNTAX        DpwAtmPerfIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created by the agent for
+         every pwAtmPerfCurrentEntry that is 15 minutes old.
+         The contents of the Current entry are copied to the new
+         entry here. The Current entry, then resets its counts
+         to zero for the next current 15 minute interval. "
+    INDEX  { pwIndex, dpwAtmPerfIntervalNumber }
+    ::= { dpwAtmPerfIntervalTable 1 }
+
+  DpwAtmPerfIntervalEntry ::= SEQUENCE {
+       dpwAtmPerfIntervalNumber         Unsigned32,
+       dpwAtmPerfIntervalValidData      TruthValue,
+       dpwAtmPerfIntervalDuration       Unsigned32,
+       dpwAtmPerfIntervalMissingPkts    PerfIntervalCount,
+       dpwAtmPerfIntervalPktsReOrder    PerfIntervalCount,
+       dpwAtmPerfIntervalPktsMisOrder   PerfIntervalCount,
+       dpwAtmPerfIntervalPktsTimeout    PerfIntervalCount,
+       dpwAtmPerfIntervalCellsXmit      PerfIntervalCount,
+       dpwAtmPerfIntervalCellsDropped   PerfIntervalCount,
+       dpwAtmPerfIntervalCellsReceived  PerfIntervalCount,
+       dpwAtmPerfIntervalUnknownCells   PerfIntervalCount,
+       dpwAtmPerfIntervalTime           OCTET STRING
+       }
+
+  dpwAtmPerfIntervalNumber OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..96)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A number (normally between 1 and 96 to cover a 24 hour
+         period) which identifies the interval for which the set
+         of statistics is available. The interval identified by 1
+         is the most recently completed 15 minute interval, and
+         the interval identified by N is the interval immediately
+         preceding the one identified by N-1. The minimum range of
+         N is 1 through 4. The default range is 1 through 32. The
+         maximum value of N is 96."
+    ::= { dpwAtmPerfIntervalEntry 1 }
+
+  dpwAtmPerfIntervalValidData OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates if the data for this interval
+         is valid."
+    ::= { dpwAtmPerfIntervalEntry 2 }
+
+  dpwAtmPerfIntervalDuration OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+       "The duration of a particular interval in seconds,
+        Adjustments in the system's time-of-day clock, may
+        cause the interval to be greater or less than, the
+        normal value. Therefore this actual interval value
+        is provided."
+     ::= { dpwAtmPerfIntervalEntry 3 }
+
+  dpwAtmPerfIntervalMissingPkts OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of missing packets (as detected via control
+         word sequence number gaps)."
+    ::= { dpwAtmPerfIntervalEntry 4 }
+
+
+  dpwAtmPerfIntervalPktsReOrder OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of sequence (via control
+         word sequence number), but successfully re-ordered.
+         Note: some implementations may not support this
+         Feature."
+    ::= { dpwAtmPerfIntervalEntry 5 }
+
+   dpwAtmPerfIntervalPktsMisOrder OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of order (via control word
+         sequence numbers)."
+    ::= { dpwAtmPerfIntervalEntry 6 }
+
+  dpwAtmPerfIntervalPktsTimeout OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets transmitted due to timeout expiration."
+     ::= { dpwAtmPerfIntervalEntry 7 }
+
+  dpwAtmPerfIntervalCellsXmit OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of transmitted cells."
+     ::= { dpwAtmPerfIntervalEntry 8 }
+
+  dpwAtmPerfIntervalCellsDropped OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of dropped cells."
+     ::= { dpwAtmPerfIntervalEntry 9 }
+
+  dpwAtmPerfIntervalCellsReceived OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of received cells."
+     ::= { dpwAtmPerfIntervalEntry 10 }
+
+  dpwAtmPerfIntervalUnknownCells OBJECT-TYPE
+    SYNTAX        PerfIntervalCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cells received from the PSN  with unknown VPI or
+        VCI values. This object is relevant only in N:1 mode."
+     ::= { dpwAtmPerfIntervalEntry 11 }
+
+  dpwAtmPerfIntervalTime OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Timestamp value of the system in hours, minutes and seconds 
+         when data is received for particular pseudo-wire for every
+         15-minutes"
+     ::= { dpwAtmPerfIntervalEntry 12 }    
+
+  -- End ATM PW Performance Interval Table
+
+
+  -- ATM PW 1day Performance Table
+
+
+  dpwAtmPerf1DayIntervalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmPerf1DayIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides performance information per ATM PW
+         similar to the pwAtmPerfIntervalTable above. However,
+         these counters represent historical 1 day intervals up to
+         one full month."
+    ::= { dpwAtmObjects 9 }
+
+  dpwAtmPerf1DayIntervalEntry OBJECT-TYPE
+    SYNTAX        DpwAtmPerf1DayIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry is created in this table by the agent
+         for every entry in the pwAtmCfgTable table."
+    INDEX  { pwIndex,dpwAtmPerf1DayIntervalNumber }
+       ::= { dpwAtmPerf1DayIntervalTable 1 }
+
+  DpwAtmPerf1DayIntervalEntry ::= SEQUENCE {
+       dpwAtmPerf1DayIntervalNumber          Unsigned32,
+       dpwAtmPerf1DayIntervalValidData       TruthValue,
+       dpwAtmPerf1DayIntervalDuration        Unsigned32,
+       dpwAtmPerf1DayIntervalMissingPkts     Counter32,
+       dpwAtmPerf1DayIntervalPktsReOrder     Counter32,
+       dpwAtmPerf1DayIntervalPktsMisOrder    Counter32,
+       dpwAtmPerf1DayIntervalPktsTimeout     Counter32,
+       dpwAtmPerf1DayIntervalCellsXmit       Counter32,
+       dpwAtmPerf1DayIntervalCellsDropped    Counter32,
+       dpwAtmPerf1DayIntervalCellsReceived   Counter32,
+       dpwAtmPerf1DayIntervalUnknownCells    Counter32,
+       dpwAtmPerf1DayIntervalTime            OCTET STRING
+       }
+
+  dpwAtmPerf1DayIntervalNumber OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..365)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The number of interval, where 1 indicates current day
+         measured period and 2 and above indicate previous days
+         respectively"
+    ::= { dpwAtmPerf1DayIntervalEntry 1 }
+
+  dpwAtmPerf1DayIntervalValidData OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates if the data for this interval
+         is valid."
+    ::= { dpwAtmPerf1DayIntervalEntry 2 }
+
+  dpwAtmPerf1DayIntervalDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "The duration of a particular interval in seconds,
+       Adjustments in the system's time-of-day clock, may
+       cause the interval to be greater or less than, the
+       normal value. Therefore this actual interval value
+       is provided."
+    ::= { dpwAtmPerf1DayIntervalEntry 3 }
+
+  dpwAtmPerf1DayIntervalMissingPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+      "Number of missing packets (as detected via control word
+       sequence number gaps)."
+    ::= { dpwAtmPerf1DayIntervalEntry 4 }
+
+  dpwAtmPerf1DayIntervalPktsReOrder OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of sequence (via control
+         word sequence number), but successfully re-ordered.
+         Note: some implementations may not support this
+         feature."
+    ::= { dpwAtmPerf1DayIntervalEntry 5 }
+
+  dpwAtmPerf1DayIntervalPktsMisOrder OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets detected out of order(via control word
+         sequence numbers), and could not be re-ordered."
+    ::= { dpwAtmPerf1DayIntervalEntry 6 }
+
+  dpwAtmPerf1DayIntervalPktsTimeout OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of packets transmitted due to timeout expiration."
+     ::= { dpwAtmPerf1DayIntervalEntry 7 }
+
+  dpwAtmPerf1DayIntervalCellsXmit OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of transmitted cells."
+     ::= { dpwAtmPerf1DayIntervalEntry 8 }
+
+  dpwAtmPerf1DayIntervalCellsDropped OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of dropped cells."
+     ::= { dpwAtmPerf1DayIntervalEntry 9 }
+
+  dpwAtmPerf1DayIntervalCellsReceived OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of received cells."
+     ::= { dpwAtmPerf1DayIntervalEntry 10 }
+
+  dpwAtmPerf1DayIntervalUnknownCells OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of cells received from the PSN  with unknown VPI
+        or VCI value. This object is relevant only in N:1 mode."
+     ::= { dpwAtmPerf1DayIntervalEntry 11 }
+
+  dpwAtmPerf1DayIntervalTime OBJECT-TYPE
+    SYNTAX        OCTET STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+       "Timestamp value of the system in hours, minutes and seconds
+        when data is received for particular pseudo-wire for every
+        day" 
+     ::= { dpwAtmPerf1DayIntervalEntry 12 }
+
+  -- End of ATM PW Performance table
+
+-- PW OAM Table
+
+  dpwOamTable OBJECT-TYPE
+      SYNTAX    SEQUENCE OF DpwOamEntry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+         "This table specifies to enable/disable OAM 
+         on the PW associated to the specified pwIndex.
+         It also shows the defects of the PW OAM."
+         
+      ::= { dpwAtmObjects 10 }
+
+  dpwOamEntry OBJECT-TYPE
+      SYNTAX        DpwOamEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "This table is indexed by pwIndex.
+          Unless otherwise specified, all read-create
+          objects in this table MUST NOT be changed 
+          after row activation and SHOULD remain
+          unchanged after reboot."
+
+      INDEX { pwIndex }
+      ::= { dpwOamTable 1}
+
+  DpwOamEntry ::= SEQUENCE {
+        dpwOamEnable               TruthValue,
+        dpwOamDefect               INTEGER,
+        dpwOamRowStatus            RowStatus
+      }
+
+
+  dpwOamEnable  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+         "This variable indicates if OAM is enabled for this PW. 
+          It MAY be changed at any time."
+     DEFVAL { true }
+     ::= { dpwOamEntry 1 }
+
+
+  dpwOamDefect OBJECT-TYPE  
+      SYNTAX        INTEGER   
+      MAX-ACCESS    read-only  
+      STATUS        current  
+      DESCRIPTION  
+           "This specifies the defect states of PW OAM"
+      ::= { dpwOamEntry 2 }  
+ 
+  dpwOamRowStatus OBJECT-TYPE  
+      SYNTAX        RowStatus  
+      MAX-ACCESS    read-create  
+      STATUS        current  
+      DESCRIPTION  
+          "For creating, modifying, and deleting this row. None of the  
+           read-create objects in the conceptual rows may be changed   
+           when this object is in the active(1) state."  
+       ::= { dpwOamEntry 3 } 
+
+  -- End of PW OAM Table
+
+  -- ATMOAM TABLE
+
+  dpwAtmoamTable OBJECT-TYPE
+      SYNTAX    SEQUENCE OF DpwAtmoamEntry
+      MAX-ACCESS        not-accessible
+      STATUS            current
+      DESCRIPTION
+         "This table specifies to enable/disable CC Generation and also
+          to set the Flow Type as E2E / SEG." 
+         
+      ::= { dpwAtmObjects 11 }
+
+  dpwAtmoamEntry OBJECT-TYPE
+      SYNTAX        DpwAtmoamEntry
+      MAX-ACCESS    not-accessible
+      STATUS        current
+      DESCRIPTION
+         "This table is indexed by pwIndex.
+          Unless otherwise specified, all read-create
+          objects in this table MUST NOT be changed 
+          after row activation and SHOULD remain
+          unchanged after reboot."
+
+      INDEX { pwIndex }
+      ::= { dpwAtmoamTable 1 }
+
+  DpwAtmoamEntry ::= SEQUENCE {
+        dpwCcStatus          TruthValue,
+        dpwFlowType          INTEGER,
+        dpwAtmoamRowStatus   RowStatus,
+		dpwFrequencyTimerIntvl INTEGER
+       }
+
+
+  dpwCcStatus  OBJECT-TYPE  
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-write  
+      STATUS        current  
+      DESCRIPTION  
+           "This variable is used to enable / disable the CC Status."
+      DEFVAL { false }
+      ::= { dpwAtmoamEntry 1 } 
+
+  dpwFlowType  OBJECT-TYPE  
+      SYNTAX        INTEGER {  
+             ete    (1),  
+             seg    (2),
+             both   (3)   
+      }  
+      MAX-ACCESS    read-write  
+      STATUS        current  
+      DESCRIPTION  
+           "This variable is used to set the flow type as E2E / SEG / Both."
+      DEFVAL { ete } 
+      ::= { dpwAtmoamEntry 2 } 
+ 
+  dpwAtmoamRowStatus OBJECT-TYPE  
+      SYNTAX        RowStatus  
+      MAX-ACCESS    read-create  
+      STATUS        current  
+      DESCRIPTION  
+          "For creating, modifying, and deleting this row. None of the  
+           read-create objects in the conceptual rows may be changed   
+           when this object is in the active(1) state."  
+       ::= { dpwAtmoamEntry 3 } 
+
+  dpwFrequencyTimerIntvl  OBJECT-TYPE
+      SYNTAX        TruthValue
+      MAX-ACCESS    read-write
+      STATUS        current
+      DESCRIPTION
+           "This variable is used to set the Frequency Timer Interval.
+            The frequency timer interval can be 1 or 2"
+      DEFVAL { 1 }
+      ::= { dpwAtmoamEntry 4 }
+
+  -- End of ATMOAM Table
+
+ -- VP SHAPING Table
+ -- jira id DASAN - 84 
+  dpwAtmVpShapingTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmVpShapingEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table contains VP Shaping related parameters for upstream ont qos."
+    ::= { dpwAtmObjects 12 }
+
+  dpwAtmVpShapingEntry OBJECT-TYPE
+    SYNTAX        DpwAtmVpShapingEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created for upstream ont qos vci-qos."
+    INDEX  { dpwAtmOntid, dpwAtmVpi }
+    ::= { dpwAtmVpShapingTable 1 }
+
+ DpwAtmVpShapingEntry ::= SEQUENCE {
+       dpwAtmVpShapingBandwidth        Unsigned32,
+       dpwAtmVpShapingRowStatus        Unsigned32
+    }
+
+  
+  dpwAtmVpShapingBandwidth OBJECT-TYPE
+       SYNTAX        Unsigned32 (300..358795)
+       MAX-ACCESS    read-create
+       STATUS        current
+       DESCRIPTION
+            "The Vp shaping bandwidth for upstream ATM cell packets.
+             The unit of bandwidth is in cell/seconds."
+       DEFVAL { 10000 }
+       ::= { dpwAtmVpShapingEntry 1 }
+  
+  dpwAtmVpShapingRowStatus OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        " This Object is used to create, modify and delete a row in this table.
+	  When the Row status is active, whenever user configures in OLT, ONT is also configured.
+          For row creation, user is suggested to configure the bandwidth parameter after setting the
+	  row status to create and wait. Then make the row status active."
+    ::= { dpwAtmVpShapingEntry 2 }
+  
+  -- End of VP SHAPING Table
+
+-- ATM OAM Stats Table.
+
+-- JIRAID    : DASAN-664 Implementation of PW OAM Statistics - SNMP support
+
+  dpwAtmOamStatsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF DpwAtmOamStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The OAM statistic counts are in
+         this table.
+         This table provides OAM statistics information per ATM PW."
+    ::= { dpwAtmObjects 13 }
+
+  dpwAtmOamStatsEntry OBJECT-TYPE
+    SYNTAX        DpwAtmOamStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in this table is created when AIS/RDI cells are received.
+         Number of OAM cells Txmitted and received are incremented"
+    INDEX  { pwIndex }
+    ::= { dpwAtmOamStatsTable 1 }
+
+  DpwAtmOamStatsEntry ::= SEQUENCE {
+
+       dpwAtmOamStatsOamCellsRx    PerfCurrentCount,
+       dpwAtmOamStatsOamCellsTx    PerfCurrentCount
+    }
+  dpwAtmOamStatsOamCellsRx OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of OAM Cells received."
+    ::= { dpwAtmOamStatsEntry 1 }
+
+  dpwAtmOamStatsOamCellsTx OBJECT-TYPE
+    SYNTAX        PerfCurrentCount
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of OAM Cells transmitted."
+    ::= { dpwAtmOamStatsEntry 2 }
+
+-- End of ATM OAM Stats Table.
+
+ END

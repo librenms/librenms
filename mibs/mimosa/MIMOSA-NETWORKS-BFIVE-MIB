@@ -1,0 +1,958 @@
+MIMOSA-NETWORKS-BFIVE-MIB DEFINITIONS ::= BEGIN
+
+--  Copyright (C) 2017, Mimosa Networks, Inc. All Rights Reserved.
+--
+--  Mimosa Networks MIB
+--  Revision: 1.02
+--  Date: April 28, 2017
+--
+--  Mimosa Networks, Inc.
+--  469 El Camino Real Ste 100
+--  Santa Clara, CA 95050
+--  support@mimosa.co
+--
+--  This MIB defines the MIB specification for Mimosa Network's Products
+--
+--  Mimosa reserves the right to make changes to this MIB specification as
+--  well as other information related to this specification without prior
+--  notice.  The user of this specification should consult Mimosa Networks,
+--  to determine if any such changes have been made.
+--
+--  Current MIBs are available from Mimosa Networks at the following URLs:
+--
+--		http://help.mimosa.co
+--
+--  In no event shall Mimosa Networks, Inc. be liable for any indirect,
+--  consequential, special or incidental damages whatsoever (including
+--  but not limited to lost profits or lost revenue) arising out of or
+--  related to this specification or the information contained in it.
+--  This non-liability extends to even if Mimosa Networks Inc. has been
+--  advised of, known, or should have known, the potential for such damages.
+
+--  Mimosa Networks, Inc. hereby grants end-users, and other parties a
+--  a non-exclusive license to use this MIB specification in order to
+--  manage products of Mimosa Networks, Inc.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE, Integer32,
+    Counter32, Counter64, Unsigned32,
+    TimeTicks, IpAddress                  FROM SNMPv2-SMI
+
+    DisplayString , MacAddress,
+    RowStatus, TruthValue,
+    PhysAddress, TEXTUAL-CONVENTION       FROM SNMPv2-TC
+
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP 	                  FROM SNMPv2-CONF
+
+    ifIndex                               FROM IF-MIB
+    mimosaWireless,
+    mimosaConformanceGroup                FROM MIMOSA-NETWORKS-BASE-MIB;
+
+mimosaB5Module MODULE-IDENTITY
+    LAST-UPDATED "201506030000Z"
+    ORGANIZATION "Mimosa Networks
+    			  www.mimosa.co"
+    CONTACT-INFO
+    	"postal:
+    	Mimosa Networks, Inc.
+		469 El Camino Real Ste 100
+		Santa Clara, CA 95050
+        email: support@mimosa.co"
+    DESCRIPTION
+		"Mimosa device MIB definitions"
+	REVISION	"201704280000Z"
+    DESCRIPTION
+		"Compatible with Firmware 1.4.5"
+    ::= { mimosaConformanceGroup 1 }
+
+mimosaGeneral       OBJECT IDENTIFIER ::= { mimosaWireless 1 }
+mimosaLocInfo       OBJECT IDENTIFIER ::= { mimosaWireless 2 }
+mimosaWanInfo       OBJECT IDENTIFIER ::= { mimosaWireless 3 }
+mimosaTdmaInfo      OBJECT IDENTIFIER ::= { mimosaWireless 4 }
+mimosaMgmtInfo      OBJECT IDENTIFIER ::= { mimosaWireless 5 }
+mimosaRfInfo        OBJECT IDENTIFIER ::= { mimosaWireless 6 }
+mimosaPerfInfo      OBJECT IDENTIFIER ::= { mimosaWireless 7 }
+mimosaServices      OBJECT IDENTIFIER ::= { mimosaWireless 8 }
+
+
+-- *****************************************************************
+-- ***                   Mimosa Textual Conventions              ***
+-- *****************************************************************
+DecimalOne ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "Fixed point, one decimal"
+    SYNTAX       Integer32
+
+DecimalTwo ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "Fixed point, two decimals"
+    SYNTAX       Integer32
+
+DecimalFive ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-5"
+    STATUS       current
+    DESCRIPTION  "Fixed point, five decimals"
+    SYNTAX       Integer32
+
+-- *****************************************************************
+-- ***       Mimosa General variables are specified below.    ***
+-- *****************************************************************
+
+mimosaDeviceName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the local Mimosa device. This unique identifier could
+         be the same as the sysName object."
+    ::= { mimosaGeneral 1 }
+
+mimosaSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The unique serial number of the Mimosa device."
+    ::= { mimosaGeneral 2 }
+
+mimosaFirmwareVersion OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the currently installed and/or running firmware
+         on the Mimosa device."
+    ::= { mimosaGeneral 3 }
+
+mimosaFirmwareBuildDate OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The creation date of the currently installed and/or running
+         firmware on the Mimosa device."
+    ::= { mimosaGeneral 4 }
+
+mimosaLastRebootTime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last time the Mimosa device rebooted."
+    ::= { mimosaGeneral 5 }
+
+mimosaUnlockCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The code used to unlock the Mimosa device."
+    ::= { mimosaGeneral 6 }
+
+mimosaLEDBrightness OBJECT-TYPE
+    SYNTAX  INTEGER {
+                auto(1),
+                low(2),
+                medium(3),
+                high(4)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the intensity of the status indicator lights on the
+         device exterior. The Auto option adjusts the amount of light
+         based upon ambient conditions. Manual options include Low,
+         Medium, and High."
+    ::= { mimosaGeneral 7 }
+
+mimosaInternalTemp OBJECT-TYPE
+    SYNTAX       DecimalOne
+    UNITS        "C" 
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The internal temperature of the Mimosa device."
+    ::= { mimosaGeneral 8 }
+
+mimosaRegulatoryDomain OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The country in which the Mimosa device has been configured to run."
+    ::= { mimosaGeneral 9 }
+
+
+-- **********************************************************************
+-- ***     Mimosa Device Location variables are specified below.      ***
+-- **********************************************************************
+
+mimosaLongitude OBJECT-TYPE
+    SYNTAX       DecimalFive
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The Longitude of the Mimosa device location, in 5 decimal points."
+    ::= { mimosaLocInfo 1 }
+
+mimosaLatitude OBJECT-TYPE
+    SYNTAX       DecimalFive
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The Latitude of the Mimosa device location, in 5 decimal points."
+    ::= { mimosaLocInfo 2 }
+
+mimosaAltitude OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "meters" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Altitude of the Mimosa device location in meters."
+    ::= { mimosaLocInfo 3 }
+
+mimosaSatelliteSNR OBJECT-TYPE
+    SYNTAX       DecimalOne
+    UNITS        "dB"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The average Signal to Noise Ratio (SNR) amongst all of the satellites
+         detected by the Mimosa device. Display is in 1 decimal point."
+    ::= { mimosaLocInfo 4 }
+
+mimosaSatelliteStrength OBJECT-TYPE
+    SYNTAX  INTEGER {
+                good(1),
+                bad(2)
+            }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Strength of the satellites based on the number of satellites available.
+         It is considered good if more than 2 satellites are available."
+    ::= { mimosaLocInfo 5 }
+
+mimosaGPSSatellites OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Total number of GPS satellites detected."
+    ::= { mimosaLocInfo 6 }
+
+mimosaGlonassSatellites OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Total number of GLONASS satellites detected."
+    ::= { mimosaLocInfo 7 }
+
+mimosaClockAccuracy OBJECT-TYPE
+    SYNTAX       DecimalTwo
+    UNITS        "PPB"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "Timing signal accuracy measured in parts per billion (PPB) by the
+         Mimosa device. Display is in 2 decimal points."
+    ::= { mimosaLocInfo 8 }
+
+
+-- **********************************************************************
+-- ***  Mimosa Device TDMA Information variables are specified below. ***
+-- **********************************************************************
+
+mimosaWirelessMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                accessPoint(1),
+                station(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes wherger the Mimosa device acts as an access point or station."
+    ::= { mimosaTdmaInfo 1 }
+
+mimosaWirelessProtocol OBJECT-TYPE
+    SYNTAX  INTEGER {
+                tdma(1),
+                csma(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the wireless protocol configured on the Mimosa device. 
+	     Both TDMA and CSMA are supported. TDMA is a deterministic protocol
+         where each device is assigned a time slot during which it is allowed
+         to transmit. This allows for collocated radios to utilize the same
+         channel and avoid Tx/Rx collisions and interference."
+    ::= { mimosaTdmaInfo 2 }
+
+mimosaTDMAMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                a(1),
+                b(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the TDMA Gender of the radio (A or B)."
+    ::= { mimosaTdmaInfo 3 }
+
+mimosaTDMAWindow OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the length of the transmit time slot in milliseconds."
+    ::= { mimosaTdmaInfo 4 }
+
+mimosaTrafficSplit OBJECT-TYPE
+    SYNTAX  INTEGER {
+                symmetric(1),
+                asymmetric(2),
+                auto(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The radio can be configured to allocate bandwidth symmetrically (50/50)
+         or asymmetrically (75/25 or 25/75) in environments where traffic
+         direction is expected to be heavier in one direction than the other.
+         With an asymmetrical split, the local radio is represented first in the
+         slash notation, (local/remote). For example, in the (75/25) split, the
+         local radio gets 75, while the remote radio gets 25. If Auto is selected
+         the radio will automatically determine, based upon traffic flow, which
+         ratio will be used. The radio will continue to evaluate the flow and
+         adjust accordingly."
+    ::= { mimosaTdmaInfo 5 }
+
+
+-- **********************************************************************
+-- *** Mimosa Device Radio Information variables are specified below. ***
+-- **********************************************************************
+
+mimosaChainTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaChainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of RF chain entries, which is part of MIMO tables. MIMO stands
+         for Multiple In Multiple Out."
+    ::= { mimosaRfInfo 1 }
+
+mimosaChainEntry OBJECT-TYPE
+    SYNTAX      MimosaChainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing chain information applicable to a particular
+         RF chain."
+    INDEX   { mimosaChain }
+    ::= { mimosaChainTable 1 }
+
+MimosaChainEntry ::=
+    SEQUENCE {
+        mimosaChain        Integer32,
+        mimosaTxPower      DecimalOne,
+        mimosaRxPower      DecimalOne,
+        mimosaRxNoise      DecimalOne,
+        mimosaSNR          DecimalOne,
+        mimosaCenterFreq   Integer32,
+        mimosaPolarization INTEGER
+    }
+
+mimosaChain OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An index which is used to access a particular entry in the chain table."
+    ::= { mimosaChainEntry 1 }
+
+mimosaTxPower OBJECT-TYPE
+    SYNTAX      DecimalOne
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the transmit power of the given RF chain. A value of -8 means
+         this particular TxChain is not a valid entry."
+    ::= { mimosaChainEntry 2 }
+
+mimosaRxPower OBJECT-TYPE
+    SYNTAX      DecimalOne
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the receive power of the given RF chain. A value of -100
+         means this particular RxChain is not a valid entry (SNR must be -100)."
+    ::= { mimosaChainEntry 3 }
+
+mimosaRxNoise OBJECT-TYPE
+    SYNTAX      DecimalOne
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the received noise level for the given RF chain."
+    ::= { mimosaChainEntry 4 }
+
+mimosaSNR OBJECT-TYPE
+    SYNTAX      DecimalOne
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the Signal to Noise Ratio (SNR) for the given RF chain.
+         A value of -100 means this particular RxChain is not a valid entry."
+    ::= { mimosaChainEntry 5 }
+
+mimosaCenterFreq OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The center frequency for the given RF chain. A value of 0 means this
+         particular Chain is not a valid entry."
+    ::= { mimosaChainEntry 6 }
+
+mimosaPolarization OBJECT-TYPE
+    SYNTAX  INTEGER {
+                horizontal(1),
+                vertical(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ploarization of the given RF chain. It could be horizontal or
+         vertical."
+    ::= { mimosaChainEntry 7 }
+
+
+mimosaStreamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaStreamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of data stream entries, which are part of MIMO tables. MIMO
+         stands for Multiple In Multiple Out."
+    ::= { mimosaRfInfo 2 }
+
+mimosaStreamEntry OBJECT-TYPE
+    SYNTAX      MimosaStreamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry containing information applicable to a particular stream."
+    INDEX   { mimosaStream }
+    ::= { mimosaStreamTable 1 }
+
+MimosaStreamEntry ::=
+    SEQUENCE {
+        mimosaStream       Integer32,
+        mimosaTxPhy        Integer32,
+        mimosaTxMCS        Integer32,
+        mimosaTxWidth      Integer32,
+	mimosaRxPhy        Integer32,
+        mimosaRxMCS        Integer32,
+        mimosaRxWidth      Integer32,
+	mimosaRxEVM        DecimalOne
+   }
+
+mimosaStream OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index used to access a particular entry in the stream table."
+    ::= { mimosaStreamEntry 1 }
+
+mimosaTxPhy OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the transmit rate of the given data stream."
+    ::= { mimosaStreamEntry 2 }
+
+mimosaTxMCS OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the transmit MCS of the given data stream. A value of
+         -1 means this particular TxStream is not a valid entry."
+    ::= { mimosaStreamEntry 3 }
+
+mimosaTxWidth OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the channel width based on MCS. A value of 
+	 -1 means this particular TxWidth is not a valid entry"
+    ::= { mimosaStreamEntry 4 }
+
+mimosaRxPhy OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the receive rate of the given data stream."
+    ::= { mimosaStreamEntry 5 }
+
+mimosaRxMCS OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the receive MCS of the given data stream. A value of
+         -1 means this particular RxStream is not a valid entry."
+    ::= { mimosaStreamEntry 6 }
+
+mimosaRxWidth OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS	"MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the receive Rx Width of the given data stream. A value of
+         -1 means this particular RxWidth is not a valid entry."
+    ::= { mimosaStreamEntry 7 }
+
+mimosaRxEVM OBJECT-TYPE
+    SYNTAX      DecimalOne
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the receive Error Vector Magnitude (EVM) of the given data
+         stream."
+    ::= { mimosaStreamEntry 8 }
+
+mimosaChannelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MimosaChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of RF channel entries on the Mimosa device."
+    ::= { mimosaRfInfo 3 }
+
+mimosaChannelEntry OBJECT-TYPE
+    SYNTAX      MimosaChannelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry containing management information applicable to a particular
+         channel."
+    INDEX   { mimosaChannel }
+    ::= { mimosaChannelTable 1 }
+
+MimosaChannelEntry ::=
+    SEQUENCE {
+        mimosaChannel            Integer32,
+        mimosaChannelMode        INTEGER,
+        mimosaChannelWidth       Integer32,
+        mimosaChannelTxPower     DecimalOne,
+        mimosaChannelCenterFreq  Integer32
+    }
+
+mimosaChannel OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index used to access a particular entry in the RF channel table."
+    ::= { mimosaChannelEntry 1 }
+
+mimosaChannelMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                transmit(1),
+                receive(2),
+                bidirectional(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"Specifies the mode for the given channel. The transmit or receive
+	 values indicate Frequency Diversity (FD) mode is in use. The
+	 bidirectional value means that the channel is used for both transmit
+	 and receive in all other single or dual channel modes."
+    ::= { mimosaChannelEntry 2 }
+
+mimosaChannelWidth OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the channel width of the given channel."
+    ::= { mimosaChannelEntry 3 }
+
+mimosaChannelTxPower OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the transmit power level on the channel. If Channel Width
+         is set to 1xN MHz, Channel 2 is not be used. In Frequency Diversity mode,
+         Power 1 and Power 2 represent transmit power on the local and remote
+         sides, respectively."
+    ::= { mimosaChannelEntry 4 }
+
+mimosaChannelCenterFreq OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the center frequency of the channel used on the link. In all
+         modes, the center frequency represents the absolute center of the
+         selected channel width without any offset, and the center can be moved
+         in 5 MHz increments.
+
+         A value of 0 means this particular channel is not a valid entry."
+    ::= { mimosaChannelEntry 5 }
+
+mimosaAntennaGain OBJECT-TYPE
+    SYNTAX       Integer32
+    UNITS        "dBi"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The antenna gain on the Mimosa device."
+    ::= { mimosaRfInfo 4 }
+
+mimosaTotalTxPower OBJECT-TYPE
+    SYNTAX      DecimalOne
+    UNITS        "dBm"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total transmit power for all the channels on the Mimosa device."
+    ::= { mimosaRfInfo 5 }
+
+mimosaTotalRxPower OBJECT-TYPE
+    SYNTAX      DecimalOne
+    UNITS        "dBm"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The total receive power for all the channels on the Mimosa device."
+    ::= { mimosaRfInfo 6 }
+
+mimosaTargetSignalStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS        "dB"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The calculated target receive signal strength based on device coordinates and settings."
+    ::= { mimosaRfInfo 7 }
+
+
+-- **********************************************************************
+-- ***  Mimosa Device WAN Information variables are specified below.  ***
+-- **********************************************************************
+
+mimosaWanSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The wireless link name used by both radios. Both AP and Station must
+         use the same SSID to communicate with each other."
+    ::= { mimosaWanInfo 1 }
+
+mimosaWanMac OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address used for the wireless link."
+    ::= { mimosaWanInfo 2 }
+
+mimosaWanStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                connected(1),
+                disconnected(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The wireless link status between the Mimosa devices."
+    ::= { mimosaWanInfo 3 }
+
+mimosaWanUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The wireless link up time since last reboot."
+    ::= { mimosaWanInfo 4 }
+
+
+-- ****************************************************************************
+-- *** Mimosa Device Performance Information variables are specified below. ***
+-- ****************************************************************************
+
+mimosaPhyTxRate OBJECT-TYPE
+    SYNTAX      DecimalTwo
+    UNITS       "kbps" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmit packet rate at the physical level over a 5 second interval."
+    ::= { mimosaPerfInfo 1 }
+
+mimosaPhyRxRate OBJECT-TYPE
+    SYNTAX      DecimalTwo
+    UNITS       "kbps" 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The receive packet rate at the physical level over a 5 second interval."
+    ::= { mimosaPerfInfo 2 }
+
+mimosaPerTxRate OBJECT-TYPE
+    SYNTAX      DecimalTwo
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The trasnmit Packet Error Rate (PER) over a 5 second interval. It is
+         caluculated as packets with errors versuss packets without errors."
+    ::= { mimosaPerfInfo 3 }
+
+mimosaPerRxRate OBJECT-TYPE
+    SYNTAX      DecimalTwo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The receive Packet Error Rate (PER) over a 5 second interval. It is
+         caluculated as packets with errors versuss packets without errors."
+    ::= { mimosaPerfInfo 4 }
+
+
+-- ****************************************************************************
+-- *** Mimosa Device Management  Information variables are specified below. ***
+-- ****************************************************************************
+
+mimosaNetworkMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2),
+                auto(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the mode for the local 2.4 GHz wireless network operation.
+         If Auto is selected, the 2.4 GHz management network is turned on for a
+         limited time (defined in Console Timeout ) after boot and then turned
+         off if there is no activity. If a user associates with the radio within
+         the timeout period, they will not be disconnected."
+    ::= { mimosaMgmtInfo 1 }
+
+mimosaRecoverySsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The recovery SSID that allows the device to be reset to factory
+         defaults. This is available for 10 minutes after device boot. Disabling
+         the 2.4 GHz management network will not impact availability of this
+         option. The serial number of the device must be known in order to
+         perform the factory reset."
+    ::= { mimosaMgmtInfo 2 }
+
+mimosaLocalSsid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SSID for managing the local 2.4 GHz wireless interface."
+    ::= { mimosaMgmtInfo 3 }
+
+mimosaLocalChannel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The channel used for the local 2.4 GHz wireless interface."
+    ::= { mimosaMgmtInfo 4 }
+
+mimosaConsoleTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "min"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The amount inactivity on the 2.4 GHz wireless interface before
+         turning it off in Auto mode."
+    ::= { mimosaMgmtInfo 5 }
+
+mimosaMaxClients OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+	"The maximum number of wireless clients that can simultaneously access
+         the 2.4 GHz management interface."
+    ::= { mimosaMgmtInfo 6 }
+
+mimosaLocalMac OBJECT-TYPE
+    SYNTAX      PhysAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MAC address used for 2.4 GHz wireless link."
+    ::= { mimosaMgmtInfo 7 }
+
+mimosaLocalIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address assigned to the 2.4 GHz wireless link."
+    ::= { mimosaMgmtInfo 8 }
+
+mimosaLocalNetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP netmask assigned to the 2.4 GHz wireless link."
+    ::= { mimosaMgmtInfo 9 }
+
+mimosaLocalGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The IP address of the gateway for the 2.4 GHz wireless link."
+    ::= { mimosaMgmtInfo 10 }
+
+mimosaFlowControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether Flow Control is enabled on the Mimosa device."
+    ::= { mimosaMgmtInfo 11 }
+ 
+
+
+-- *************************************************************************
+-- *** Mimosa Device Services Information variables are specified below. ***
+-- *************************************************************************
+
+mimosaHttpsEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether HTTPS is enabled on the Mimosa device."
+    ::= { mimosaServices 1 }
+
+mimosaMgmtVlanEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the Management VLAN is enabled on the Mimosa device."
+    ::= { mimosaServices 2 }
+
+mimosaMgmtCloudEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the Management Cloud is enabled on the Mimosa device."
+    ::= { mimosaServices 3 }
+
+mimosaRestMgmtEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the REST management is enabled on the Mimosa device."
+    ::= { mimosaServices 4 }
+
+mimosaPingWatchdogEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the IP Ping watchdog is enabled on the Mimosa device.
+         This is used to reset the device if a configured IP address is
+         not reached in certain number of retries."
+    ::= { mimosaServices 5 }
+
+mimosaSyslogEnabled OBJECT-TYPE
+    SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the Syslog client is enabled on the Mimosa device.
+         Syslog client sends the log messages to configured syslog server."
+    ::= { mimosaServices 6 }
+
+mimosaNtpMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                custom(1),
+                standard(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the NTP client is configured to use standard servers
+         from NIST, NTP organizations or custom NTP server."
+    ::= { mimosaServices 7 }
+
+mimosaNtpServer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the name or address of the custom NTP server."
+    ::= { mimosaServices 8 }
+
+END

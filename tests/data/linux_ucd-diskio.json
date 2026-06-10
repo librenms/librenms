@@ -1,0 +1,66 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux 6.1.0 | DELL SRV #1",
+                    "sysContact": "<private>",
+                    "version": "6.1.0",
+                    "hardware": "Dell Inc. PowerEdge R250",
+                    "features": "Debian 12.11",
+                    "location": "<private>",
+                    "os": "linux",
+                    "type": "server",
+                    "serial": "12/05/2023",
+                    "icon": "debian.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "ucd-diskio": {
+        "discovery": {
+            "disks": [
+                {
+                    "diskio_index": 1,
+                    "diskio_descr": "sda"
+                },
+                {
+                    "diskio_index": 2,
+                    "diskio_descr": "sda1"
+                },
+                {
+                    "diskio_index": 3,
+                    "diskio_descr": "sda2"
+                },
+                {
+                    "diskio_index": 4,
+                    "diskio_descr": "sda3"
+                },
+                {
+                    "diskio_index": 5,
+                    "diskio_descr": "sda4"
+                },
+                {
+                    "diskio_index": 6,
+                    "diskio_descr": "sda5"
+                },
+                {
+                    "diskio_index": 7,
+                    "diskio_descr": "sda6"
+                },
+                {
+                    "diskio_index": 8,
+                    "diskio_descr": "sda7"
+                },
+                {
+                    "diskio_index": 9,
+                    "diskio_descr": "sda8"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

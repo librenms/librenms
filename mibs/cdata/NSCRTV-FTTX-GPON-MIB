@@ -1,0 +1,5507 @@
+--
+-- NSCRTV-FTTX-GPON-MIB.mib
+--
+
+	NSCRTV-FTTX-GPON-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			BridgeId, Timeout			
+				FROM BRIDGE-MIB			
+			enterprises, TimeTicks, IpAddress, Unsigned32, Gauge32, 
+			Counter32, Counter64, OBJECT-TYPE, BITS, OBJECT-IDENTITY,  
+			NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI			
+			DateAndTime, TruthValue, RowStatus, MacAddress, DisplayString, 
+			TimeStamp, TEXTUAL-CONVENTION			
+				FROM SNMPv2-TC;
+	
+	
+	
+--
+-- Textual conventions
+--
+	
+		GponAlarmInstance ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"
+				Alarm instance, which define the detailed management object
+				reported the alarm. For example, OLT device 1, slot 2, port 3
+				reports a port down alarm.
+				It is represents in OCTET STRING format.
+				1. The first four OCTET has same definition as GponDeviceIndex TC.
+				2. The fifth OCTET is the slot definition of ONU, which shall 
+				   have same definition as last byte definition in GponCardIndex
+				   TC.
+				3. The sixth OCTET is the UNI port ID of ONU, which is similar to
+				   GponPortIndex TC.
+				4. The seventh and eighth OCTETS are reserved and shall be set to 
+				   0 at any time, and shall be ignored by maangement system.        
+				For example,        
+				0x01 02 03 04 05 06 00 00, represents OLT device 1, slot 2, port 3, 
+				ONU logical ID 4, slot 5 UNI port 6 of the connected ONU.        
+				"
+			SYNTAX OCTET STRING (SIZE (8))
+
+		GponAlarmCode ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"Alarm codes, uniquely indentifies each kind of alarm.
+				Refer to GPON alarm definition table"
+			SYNTAX INTEGER (1..65535)
+
+		GponSeverityType ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				" "
+			SYNTAX INTEGER
+				{
+				critical(1),
+				major(2),
+				minor(3),
+				warning(4),
+				info(5),
+				clear(6)
+				}
+
+		TAddress ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"
+				First four octets sames definition of IpAddress, stands for NMS IP address
+				The last four octets same definition of INTEGER, stands for trap UDP port "
+			SYNTAX OCTET STRING (SIZE (8))
+
+		GponCardIndex ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"     
+				For easy presenting the chassis view by NMS, bCardIndex shall be formatted
+				in a following manner:                        
+				    Four bytes of INTEGER, from the most significant byte to the least significant bytes
+				        -----------------------------------------------------------------------------
+				Reserved byte Reserved byte   Reserved byte Sub-slot 2-bit Main-slot 6-bit        
+				Notes:
+				-----         
+				1. Reserved bytes shall be set to 0.        
+				2. The main-slot shall be started from 1, and shall be in a consecutive manner,
+				   for all slots, including service slots, control slots, switch slots, power
+				slots,FAN slots, etc.For example, 1, 2, 3          
+				3. The sub-slot shall be started from 1, and shall be in a consecutive manner.
+				   For example, 1, 2. If no sub-slot concept of a main-slot, set to 0.        
+				4. For fixed device, if no slot concept, NE shall set both main-slot and sub-slot
+				to 0, to indicate this is meaningless. For modulized device, they MUST not be
+				set to 0.This definition shall applied to both OLT and ONU.        
+				5. For trunk, since there is no slot concept, set main-slot to all-1 and sub-slot
+				to 0. This definition shall applied to both OLT and ONU.
+				
+				For example, 
+				0x00 00 00 0A, represents main-slot 10, no sub-slot
+				0x00 00 00 42, represents main-slot 2, sub-slot 1
+				0x00 00 00 3F, represents a trunk
+				"
+			SYNTAX Unsigned32
+
+		GponPortIndex ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"       
+				The device port number shall start from 1. Nunber 0 had specific meaning, stands for portIndex is meaningless, for the situation defined.
+				"
+			SYNTAX INTEGER (0..255)
+
+		GponDeviceIndex ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"
+				Gpon olt/onu
+				ONU ID       
+				Olt device-8bit OLT Card-8bit Pon port-8bit OnuNUM-8bit        
+				Note: 
+				----        
+				1. OLT device must not be 0.        
+				2. Card here shall confirm the last byte definition of GponCardIndex
+				   to indicate the main-slot and sub-slot index.         
+				3. Pon port must not be 0.
+				4. The useful ONU logical ID MUST never be set to 0, where NUM of 0 has
+				   another meaning, to indicate that the ONU logical ID is meaningless,
+				   or said to not applied.
+				        
+				Usage guide:
+				-----------        
+				This TC could be used for OLT SNI, OLT PON port, OLT ONU ID
+				ONU UNI, OLT device, trunk.         
+				If the refered MIB object does not have clear definition,
+				refer to the following:
+				Applied Obj  - Descriptions of Index
+				------------------------------------------------------------------
+				OLT Pon Port - OnuNum shall be set to 0,
+				OLT SNI    - Same as OLT Pon Port         
+				OLT onu ID   - Set OnuNUM to corresponding ONU logical ID         
+				ONU UNI    - Same as OLT ONU ID
+				OLT device   - Set card, pon port and OnuNUM to 0
+				Trunk    - Card to 0x3F, pon port to trunk ID, OnuNUM to 0
+				         Olt device to corresponding ONU device       
+				"
+			SYNTAX Unsigned32
+
+		AutoNegotiationTechAbility ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"Technology ability of auto negotiation. Refer to 
+				clause 30.6.1.1.5 of IEEE 802.3 2005 edition"
+			SYNTAX BITS
+				{
+				none(0),
+				tenBaseTFullDuplex(1),
+				tenBaseTHalfDuplex(2),
+				hundredBaseTFullDuplex(3),
+				hundredBaseTHalfDuplex(4),
+				thousandBaseTFullDuplex(5),
+				thousandBaseTHalfDuplex(6),
+				thousandBaseXFullDuplex(7),
+				thousandBaseXHalfDuplex(8),
+				fdxPause(9),
+				fdxApause(10),
+				fdxSpause(11),
+				fdxBpause(12)
+				}
+
+		GponStats15MinRecordType ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				" "
+			SYNTAX INTEGER (0..96)
+
+		GponStats24HourRecordType ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				" "
+			SYNTAX INTEGER (0..30)
+
+		GponStatsThresholdType ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"
+        1-  InOctets                 
+        2 InPkts                   
+        3 InBroadcastPkts          
+        4 InMulticastPkts          
+        5 InPkts64Octets           
+        6 InPkts65to127Octets      
+        7 InPkts128to255Octets     
+        8 InPkts256to511Octets     
+        9 InPkts512to1023Octets    
+        10  InPkts1024to1518Octets 
+        11  InPkts1519to1522Octets 
+        12  InUndersizePkts        
+        13  InOversizePkts         
+        14  InFragments            
+       
+        19  InCRCErrorPkts         
+        20  InDropEvents           
+        21  InJabbers              
+        22  InCollision            
+        23  OutOctets              
+        24  OutPkts                
+        25  OutBroadcastPkts       
+        26  OutMulticastPkts       
+        27  OutPkts64Octets        
+        28  OutPkts65to127Octets   
+        29  OutPkts128to255Octets  
+        30  OutPkts256to511Octets  
+        31  OutPkts512to1023Octets 
+        32  OutPkts1024to1518Octets
+        33  OutPkts1519o1522Octets 
+        34  OutUndersizePkts       
+        35  OutOversizePkts        
+        36  OutFragments           
+         
+        41  OutCRCErrorPkts        
+        42  OutDropEvents          
+        43  OutJabbers             
+        44  OutCollision
+
+45  GemPortOutGemFrames
+46  GemPortInGemFrames
+47  GemPortOutBytes
+48  GemPortInBytes
+
+				50  Temperature
+				51  Voltage
+				52  TXPower
+				53  RXPower
+				
+				
+				Note:
+				----------------------------------------------------------------
+				1. For 50 Temperature, this parameter shall only applied to
+				   a. Slot level, for each service/switch/management card, for
+				      chassis-based system.
+				   b. Node-level, for fixed box.
+				2. For 50 Temperature, shall be applied to both OLT and ONU
+				3. For 50 Temperature, since no 15-min performance data collection
+				   are required, system shall ensure the temperature polling interval
+				   no less than 5 seconds. The alarm shall be only generated when the
+				   threshold is acrossed for three continuous intervals, and shall be 
+				   cleared, when the threshold is not accrossed any more, for three 
+				   continous intervals.
+				"
+			SYNTAX INTEGER (1..1024)
+
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.17409
+		nscrtvRoot OBJECT IDENTIFIER ::= { enterprises 17409 }
+
+		
+--  DESCRIPTION
+-- "nscrtvRoot"
+		-- 1.3.6.1.4.1.17409.1
+		nscrtvHFCemsTree OBJECT IDENTIFIER ::= { nscrtvRoot 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2
+		nscrtvFTTxTree OBJECT IDENTIFIER ::= { nscrtvRoot 2 }
+
+		
+--  DESCRIPTION
+-- "nscrtvFTTxTree define MIB root"
+		-- 1.3.6.1.4.1.17409.2.1
+		propertyIdent OBJECT IDENTIFIER ::= { nscrtvFTTxTree 1 }
+
+		
+--      DESCRIPTION
+		-- 1.3.6.1.4.1.17409.2.2
+		alarmsIdent OBJECT IDENTIFIER ::= { nscrtvFTTxTree 2 }
+
+		
+--      DESCRIPTION
+		-- 1.3.6.1.4.1.17409.2.2.12
+		gponAlarmTree OBJECT IDENTIFIER ::= { alarmsIdent 12 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1
+		gponTrapObjectGroup OBJECT IDENTIFIER ::= { gponAlarmTree 1 }
+
+		
+-- ------------------------------------------------------------------------------
+-- AlarmManagementObjects[](1.3.6.1.4.1.17409.2.2.12)
+-- ------------------------------------------------------------------------------ 
+		-- 1.3.6.1.4.1.17409.2.2.12.1.1
+		gponNotifications OBJECT IDENTIFIER ::= { gponTrapObjectGroup 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.1.1
+		gponAlarmNotification NOTIFICATION-TYPE
+			OBJECTS { gponTrapSequenceNumber, gponTrapOccurTime, gponTrapCode, gponTrapInstance, gponTrapSeverity, 
+				gponTrapCorrelationId, gponTrapAdditionalText }
+			STATUS current
+			DESCRIPTION 
+				"Alarm TRAP definition"
+			::= { gponNotifications 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.1.2
+		gponEventNotification NOTIFICATION-TYPE
+			OBJECTS { gponTrapSequenceNumber, gponTrapOccurTime, gponTrapCode, gponTrapInstance, gponTrapAdditionalText
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Event TRAP definition"
+			::= { gponNotifications 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2
+		gponTrapObjects OBJECT IDENTIFIER ::= { gponTrapObjectGroup 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2.1
+		gponTrapInstance OBJECT-TYPE
+			SYNTAX GponAlarmInstance
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Alarm instance, indicates the detailed managed object, which
+				detects faults.
+				"
+			::= { gponTrapObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2.2
+		gponTrapCorrelationId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The unique sequence number for the alarm to be cleared, for alarm clearing. 
+				Set to 0 for alarm reporting"
+			::= { gponTrapObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2.3
+		gponTrapAdditionalText OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..256))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Additional info to the alarm, for further desciption of the
+				alarm. The format of it shall be related to each kind alarm
+				defined in alarm reference table"
+			::= { gponTrapObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2.4
+		gponTrapCode OBJECT-TYPE
+			SYNTAX GponAlarmCode
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponTrapObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2.5
+		gponTrapSeverity OBJECT-TYPE
+			SYNTAX GponSeverityType
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponTrapObjects 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2.6
+		gponTrapOccurTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponTrapObjects 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.1.2.7
+		gponTrapSequenceNumber OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"
+				A unique sequence number for each trap generated by node. The sequence 
+				number shall be reset to 1 when node restarts.         
+				The alarm sequence number shall be independent of the event sequence 
+				number. Each shall be self-governed.
+				
+				--------------------------------------------------------------------------------            
+				The sequence ID of alarm shall be assigned from the order of transmitting 
+				trap to the NMS, instead of the order of alarm occurance. Therefore the NMS 
+				will receive the continuous sequence ID.
+				    
+				1.  When device is in active/standby mode, sequence ID shall be synchronized 
+				  between active and standby control module.
+				2.  When control module switchover takes place, the current sequence ID shall 
+				  keep the synchronized value.
+				3.  When device restarts, sequence ID shall start from 1.
+				4.  It shall be increased per alarm trap including both alarm raising and clear.
+				5.  Non-zero value shall be used. When reaches the maximum number, it shall 
+				roll back to 1.          
+				
+				--------------------------------------------------------------------------------        
+				The sequence ID of event shall be assigned from the order of transmitting 
+				trap to the NMS. Therefore the NMS will receive the continuous sequence ID.            
+				1.  When device is in active/standby mode, sequence ID shall be synchronized 
+				  between active and standby control module.
+				2.  When control module switchover takes place, the current sequence ID shall 
+				  keep the synchronized value.
+				3.  When device restarts, sequence ID shall start from 1.
+				4.  It shall be increased per event trap.
+				5.  Non-zero value shall be used. When reaches the maximum number, it shall 
+				roll back to 1.        
+				"
+			::= { gponTrapObjects 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2
+		gponAlarmObjGroup OBJECT IDENTIFIER ::= { gponAlarmTree 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1
+		gponActiveAlarmTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponActiveAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Active alarm table
+				
+				The device shall maintain this table, to maintain all outstanding 
+				(not cleared) alarms generated by the device, including:
+				1. Not hit device local alarm filter. That means had been reported to
+				   trap receiver (NMS or EMS)
+				2. Hit local alarm filter. That means not trap is reported to trap receiver
+				   for the alarm.
+				
+				The device shall maintain two numbers:
+				1. Alarm sequence number: As described in gponTrapSequenceNumber, it is initially
+				   set to 1 when device restarts, increases per trap reported to trap receiver,
+				   and rollover to 1 once it reaches the maximum value. 
+				   From NMS's view, traps received from a nodes will be consecutive, by identifying 
+				   the alarm sequence number carried in alarm trap. If breaks, means some trap 
+				   may be lost, since packet loss between NMS and NE. 
+				2. Alarm raising number: This is maintained by NE internally and does not intend for
+				   being acknowledged by external manage system. It is designed to uniquely indentify
+				   each alarm raised by NE, excluding duplicates. Once one alarm raised, despite 
+				   whether it is hit by alarm filter, NE shall assign a raising number to it. So, it
+				   major functionality is to uniquely identify alarms hit NE local alarm filter, since 
+				   this kindly alarm will not be reported to NMS, and hence no alarm sequence number
+				   is assigned to it.
+				   It is initially  set to 1 when device restarts, increases per alarm generation (
+				   excluding duplicates), and rollover to 1 once it reaches the maximum value. 
+				
+				FUNCTION DESCRIPTION OF ACTIVE ALARM TABLE:         
+				ALARM RAISING
+				----------------------        
+				1. When NE detects one fault and associates to one kind of alarm, it shall check whether
+				   there is same alarm in active alarm table, which is indexed by alarm code and alarm
+				   instance. If hits, it means duplicates, update the corresponding entry of the table.
+				   Otherwise,
+				2. The alarm is not a duplicate. Assign an alarm raising number. Check whether the
+				alarm hits local alarm filters. If hits, set alarm sequence number to 0.
+				   Create an entry into active alarm table. Otherwise,
+				3. Assign an alarm sequence number to the alarm. Create an entry into active alarm
+				table. Report the alarm trap to all trap receivers.
+				   
+				ALARM CLEARING
+				----------------------        
+				1. When NE detects one fault is cleared and associates to one kind of alarm, it shall 
+				   check whether there is corresponding alarm in active alarm table, which is indexed
+				by alarm code and alarm instance. If no hit, escape this clear event. Upon a hit,
+				if the alarm sequence number is 0, move the active alarm entry to history alarm
+				table and update the corresponding fields. At this case, historyAlarmCorrelationId
+				and historyAlarmSeqNum will be set to 0.
+				   Otherwise,
+				2. Assign an alarm sequence number to the clear trap. Report the alarm clear trap to 
+				   all trap receivers. Move the active alarm entry to history alarm table and update 
+				   the corresponding fields. At this case, activeAlarmSeqNum shall be copied to 
+				   historyAlarmCorrelationId, and historyAlarmSeqNum shall be set to the new alarm
+				   sequence number for the clear trap.
+				
+				ALARM SYNCHRONIZATION BETWEEN NE AND NMS
+				---------------------------------------------        
+				1. Once NMS finds the alarm sequence number in reported alarm traps is not continuous,
+				   it will walk active or history alarm table of the NE for the lost seuqence number.
+				"
+			::= { gponAlarmObjGroup 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1
+		gponActiveAlarmEntry OBJECT-TYPE
+			SYNTAX GponActiveAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			INDEX { gponActiveAlarmSeqNum, gponActiveAlarmRaisingNumber }
+			::= { gponActiveAlarmTable 1 }
+
+		
+		GponActiveAlarmEntry ::=
+			SEQUENCE { 
+				gponActiveAlarmSeqNum
+					Unsigned32,
+				gponActiveAlarmCode
+					GponAlarmCode,
+				gponActiveAlarmInstance
+					GponAlarmInstance,
+				gponActiveAlarmSeverity
+					GponSeverityType,
+				gponActiveAlarmRaisingNumber
+					Unsigned32,
+				gponActiveAlarmFirstOccurTime
+					DateAndTime,
+				gponActiveAlarmLastOccurTime
+					DateAndTime,
+				gponActiveAlarmRepeats
+					Counter32,
+				gponActiveAlarmConfirm
+					TruthValue,
+				gponActiveAlarmAdditionalText
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.1
+		gponActiveAlarmSeqNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Alarm sequence number
+				
+				The definition refered to the description of activeAlarmTable"
+			::= { gponActiveAlarmEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.2
+		gponActiveAlarmCode OBJECT-TYPE
+			SYNTAX GponAlarmCode
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponActiveAlarmEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.3
+		gponActiveAlarmInstance OBJECT-TYPE
+			SYNTAX GponAlarmInstance
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Alarm instance, indicates the detailed managed object"
+			::= { gponActiveAlarmEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.4
+		gponActiveAlarmSeverity OBJECT-TYPE
+			SYNTAX GponSeverityType
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponActiveAlarmEntry  4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.5
+		gponActiveAlarmRaisingNumber OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Alarm raising number.        
+				The definition refered to the description of activeAlarmTable"
+			::= { gponActiveAlarmEntry  5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.6
+		gponActiveAlarmFirstOccurTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"         
+				The time stamp when alarm occurs, which triggered to create the 
+				active alarm entry."
+			::= { gponActiveAlarmEntry  6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.7
+		gponActiveAlarmLastOccurTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The time stamp when alarm occurs, where the alarm is duplicated 
+				with existed active alarm entry, and it was the latest one. "
+			::= { gponActiveAlarmEntry  7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.8
+		gponActiveAlarmRepeats OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of repeated alarms for this active alarm entry"
+			::= { gponActiveAlarmEntry  8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.9
+		gponActiveAlarmConfirm OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"     
+				Node shall not clear an active alarm, upon the confirmation 
+				of the active alarm, but just mark an acknowledged status.
+				
+				An alarm will only be cleared once the clear condition hits."
+			::= { gponActiveAlarmEntry  9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.1.1.10
+		gponActiveAlarmAdditionalText OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..256))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Additional info to the alarm, for further desciption of the
+				alarm. The format of it shall be related to each kind alarm
+				defined in alarm reference table"
+			::= { gponActiveAlarmEntry  10 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2
+		gponHistoryAlarmTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponHistoryAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"History alarm table.        
+				The device shall maintain this table, to maintain all cleared 
+				alarms generated by the device, including:        
+				1. Not hit device local alarm filter. That means had been reported to
+				   trap receiver (NMS or EMS)
+				2. Hit local alarm filter. That means not trap is reported to trap receiver
+				   for the alarm.        
+				The number of history alarm enteries in the table could be device-specific.
+				However, it is recommended no less than 200 entries.        
+				The detailed function definition refers to that given in description of
+				activeAlarmTable.
+				"
+			::= { gponAlarmObjGroup 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1
+		gponHistoryAlarmEntry OBJECT-TYPE
+			SYNTAX GponHistoryAlarmEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			INDEX { gponHistoryAlarmSeqNum, gponHistoryAlarmRaisingNumber }
+			::= { gponHistoryAlarmTable 1 }
+
+		
+		GponHistoryAlarmEntry ::=
+			SEQUENCE { 
+				gponHistoryAlarmSeqNum
+					Unsigned32,
+				gponHistoryAlarmCode
+					GponAlarmCode,
+				gponHistoryAlarmInstance
+					GponAlarmInstance,
+				gponHistoryAlarmSeverity
+					GponSeverityType,
+				gponHistoryAlarmRaisingNumber
+					Unsigned32,
+				gponHistoryAlarmFirstOccurTime
+					DateAndTime,
+				gponHistoryAlarmLastOccurTime
+					DateAndTime,
+				gponHistoryAlarmRepeats
+					Counter32,
+				gponHistoryAlarmCorrelationId
+					Unsigned32,
+				gponHistoryAlarmAdditionalText
+					OCTET STRING,
+				gponHistoryAlarmClearTime
+					DateAndTime
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.1
+		gponHistoryAlarmSeqNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Alarm sequence number
+				
+				The definition refered to the description of gponHistoryAlarmTable"
+			::= { gponHistoryAlarmEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.2
+		gponHistoryAlarmCode OBJECT-TYPE
+			SYNTAX GponAlarmCode
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponHistoryAlarmEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.3
+		gponHistoryAlarmInstance OBJECT-TYPE
+			SYNTAX GponAlarmInstance
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Alarm instance, indicates the detailed managed object"
+			::= { gponHistoryAlarmEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.4
+		gponHistoryAlarmSeverity OBJECT-TYPE
+			SYNTAX GponSeverityType
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponHistoryAlarmEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.5
+		gponHistoryAlarmRaisingNumber OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Alarm raising number.        
+				The definition refered to the description of gponHistoryAlarmTable"
+			::= { gponHistoryAlarmEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.6
+		gponHistoryAlarmFirstOccurTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"       
+				The time stamp when alarm occurs, which triggered to create the 
+				history alarm entry."
+			::= { gponHistoryAlarmEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.7
+		gponHistoryAlarmLastOccurTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The time stamp when alarm occurs, where the alarm is duplicated 
+				with existed history alarm entry, and it was the latest one. "
+			::= { gponHistoryAlarmEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.8
+		gponHistoryAlarmRepeats OBJECT-TYPE
+			SYNTAX Counter32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Number of repeated alarms for this history alarm entry"
+			::= { gponHistoryAlarmEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.9
+		gponHistoryAlarmCorrelationId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"It is the corresponding sequence ID of the alarm that to
+				be cleared. "
+			::= { gponHistoryAlarmEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.10
+		gponHistoryAlarmAdditionalText OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..256))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Additional info to the alarm, for further desciption of the
+				alarm. The format of it shall be related to each kind alarm
+				defined in alarm reference table"
+			::= { gponHistoryAlarmEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.2.1.11
+		gponHistoryAlarmClearTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Define when the alarm was cleared"
+			::= { gponHistoryAlarmEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.3
+		gponEventLogTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponEventLogEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Event log table.        
+				The device shall maintain this table, to maintain all events had
+				be reported by the device, including:
+				1.  The event table shall be saved in RAM memory and shall be flushed 
+				  when OLT restarts.
+				2.  The event log table shall support no less than 200 entries.  When 
+				  the event log table is full, the oldest entry in the table shall be 
+				  removed first. 
+				3.  When OLT is configured with control module redundancy, active controller
+				  shall automatically synchronize the events in event log table  b/w active 
+				  and standby.
+				"
+			::= { gponAlarmObjGroup 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.3.1
+		gponEventLogEntry OBJECT-TYPE
+			SYNTAX GponEventLogEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			INDEX { gponEventSeqNum }
+			::= { gponEventLogTable 1 }
+
+		
+		GponEventLogEntry ::=
+			SEQUENCE { 
+				gponEventSeqNum
+					Unsigned32,
+				gponEventCode
+					GponAlarmCode,
+				gponEventInstance
+					GponAlarmInstance,
+				gponEventOccurTime
+					DateAndTime,
+				gponEventAdditionalText
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.2.12.2.3.1.1
+		gponEventSeqNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Event sequence number
+				
+				The definition refered to the description of gponTrapSequenceNumber"
+			::= { gponEventLogEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.3.1.2
+		gponEventCode OBJECT-TYPE
+			SYNTAX GponAlarmCode
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponEventLogEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.3.1.3
+		gponEventInstance OBJECT-TYPE
+			SYNTAX GponAlarmInstance
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Event instance, indicates the detailed managed object"
+			::= { gponEventLogEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.3.1.4
+		gponEventOccurTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"
+				The time stamp when event occurs"
+			::= { gponEventLogEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.2.3.1.5
+		gponEventAdditionalText OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..256))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Additional info to the event, for further desciption of the
+				event. The format of it shall be related to each kind event
+				defined in event reference table"
+			::= { gponEventLogEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.3
+		gponManagementObjGroup OBJECT IDENTIFIER ::= { gponAlarmTree 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.3.1
+		gponManagementAddrTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponManagementAddrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A table of transport addresses to be used in the generation
+				of SNMP messages."
+			::= { gponManagementObjGroup 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.3.1.1
+		gponManagementAddrEntry OBJECT-TYPE
+			SYNTAX GponManagementAddrEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A transport address to be used in the generation
+				of SNMP operations.        
+				Entries in the snmpTargetAddrTable are created and
+				deleted using the snmpTargetAddrRowStatus object."
+			INDEX { gponManagementAddrName }
+			::= { gponManagementAddrTable 1 }
+
+		
+		GponManagementAddrEntry ::=
+			SEQUENCE { 
+				gponManagementAddrName
+					OCTET STRING,
+				gponManagementAddrTAddress
+					TAddress,
+				gponManagementAddrCommunity
+					OCTET STRING,
+				gponManagementAddrRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.2.12.3.1.1.1
+		gponManagementAddrName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..32))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponManagementAddrEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.3.1.1.2
+		gponManagementAddrTAddress OBJECT-TYPE
+			SYNTAX TAddress
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponManagementAddrEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.3.1.1.3
+		gponManagementAddrCommunity OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponManagementAddrEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.2.12.3.1.1.4
+		gponManagementAddrRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponManagementAddrEntry 4 }
+
+		
+--      DESCRIPTION
+		-- 1.3.6.1.4.1.17409.2.8
+		gponTree OBJECT IDENTIFIER ::= { nscrtvFTTxTree 8 }
+
+		
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.3
+		gponPonPortObjects OBJECT IDENTIFIER ::= { gponTree 3 }
+
+		
+
+		
+-- ------------------------------------------------------------------------------
+-- gponPonPortObjects(1.3.6.1.4.1.17409.2.8.3)
+-- ------------------------------------------------------------------------------ 
+		
+
+-- 1.3.6.1.4.1.17409.2.8.3.4
+		gponOnuAuthenticationModeTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponOnuAuthenticationModeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponPonPortObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.3.4.1
+		gponOnuAuthenticationModeEntry OBJECT-TYPE
+			SYNTAX GponOnuAuthenticationModeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The gponOnuAuthenticationModeEntry Information"
+			INDEX { gponAuthenDeviceIndex, gponAuthenCardIndex, gponAuthenPortIndex }
+			::= { gponOnuAuthenticationModeTable 1 }
+
+		
+		GponOnuAuthenticationModeEntry ::=
+			SEQUENCE { 
+				gponAuthenDeviceIndex
+					INTEGER,
+				gponAuthenCardIndex
+					GponCardIndex,
+				gponAuthenPortIndex
+					GponPortIndex,
+				gponOnuAuthenMode
+					INTEGER,
+				gponAutoFindEnable
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.3.4.1.1
+		gponAuthenDeviceIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				" "
+			::= { gponOnuAuthenticationModeEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.3.4.1.2
+		gponAuthenCardIndex OBJECT-TYPE
+			SYNTAX GponCardIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponOnuAuthenticationModeEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.3.4.1.3
+		gponAuthenPortIndex OBJECT-TYPE
+			SYNTAX GponPortIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"pon"
+			::= { gponOnuAuthenticationModeEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.3.4.1.4
+		gponOnuAuthenMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				sn(1),
+				sn-pwd(2),
+				loid(3),
+				loid-pwd(4),
+				pwd(5),
+				auto(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Authen mode;This is mode in authen"
+			::= { gponOnuAuthenticationModeEntry 4 }
+			
+		
+		-- 1.3.6.1.4.1.17409.2.8.3.4.1.5
+		gponAutoFindEnable OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"AutoFindEnable."
+			DEFVAL { enable }
+			::= { gponOnuAuthenticationModeEntry 5 }
+
+	
+
+		
+	
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4
+		gponOnuObjects OBJECT IDENTIFIER ::= { gponTree 4 }
+
+		
+-- ------------------------------------------------------------------------------
+-- gponOnuObjects(1.3.6.1.4.1.17409.2.8.4)
+-- ------------------------------------------------------------------------------  
+
+
+		-- 1.3.6.1.4.1.17409.2.8.4.1
+		gponOnuInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponOnuInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A list of gponOnuInfoTable entries. "
+			::= { gponOnuObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1
+		gponOnuInfoEntry OBJECT-TYPE
+			SYNTAX GponOnuInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The gponOnuInfoEntry Information"
+			INDEX { onuDeviceIndex }
+			::= { gponOnuInfoTable 1 }
+
+		
+		GponOnuInfoEntry::=
+			SEQUENCE { 
+				onuDeviceIndex
+					GponDeviceIndex,
+				onuName
+					DisplayString,
+				onuSerialNum
+					OCTET STRING,
+				onuType
+					INTEGER,
+				onuVendorID
+					OCTET STRING,
+				onuEquipmentID
+					OCTET STRING,
+				onuOperationStatus
+					INTEGER,
+				onuAdminStatus
+					INTEGER,
+				onuTestDistance
+					INTEGER,
+				resetONU
+					INTEGER,
+				onuDeactive
+					INTEGER,
+				onuTimeSinceLastRegister
+					Counter32,
+				onuSysUpTime
+					Counter32,
+				onuHardwareVersion
+					DisplayString,
+				onuPerfStats15minuteEnable
+					TruthValue,
+				onuPerfStats24hourEnable
+					TruthValue
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.1
+		onuDeviceIndex OBJECT-TYPE
+			SYNTAX GponDeviceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"onuDevice Index"
+			::= { gponOnuInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.2
+		onuName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"onu Name"
+			::= { gponOnuInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.3
+		onuSerialNum OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (8))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ONU serial number."
+			::= { gponOnuInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.4
+		onuType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				fixed(1),
+				chassisBased(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"onu Type            
+				fixed(1)        - not slot concept
+				chassisBased(2) - port is indexed by coupling slot ID"
+			::= { gponOnuInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.5
+		onuVendorID OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (4))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ONU vendor id."
+			::= { gponOnuInfoEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.6
+		onuEquipmentID OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (20))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"ONU model id."
+			::= { gponOnuInfoEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.7
+		onuOperationStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"onu Operation Status"
+			::= { gponOnuInfoEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.8
+		onuAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"onu Admin Status"
+			::= { gponOnuInfoEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.9
+		onuTestDistance OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "Meter"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"onu Test Distance"
+			::= { gponOnuInfoEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.10
+		resetONU OBJECT-TYPE
+			SYNTAX INTEGER { reset(1) }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"reset ONU"
+			::= { gponOnuInfoEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.11
+		onuDeactive OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				active(1),
+				deactive(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuInfoEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.12
+		onuTimeSinceLastRegister OBJECT-TYPE
+			SYNTAX Counter32
+			UNITS "second"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuInfoEntry 12 }
+		
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.13
+		onuSysUpTime OBJECT-TYPE
+			SYNTAX Counter32
+			UNITS "second"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuInfoEntry 13 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.14
+		onuHardwareVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuInfoEntry 14 }
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.15
+		onuPerfStats15minuteEnable OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuInfoEntry 15 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.1.1.16
+		onuPerfStats24hourEnable OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuInfoEntry 16 }
+
+
+
+
+		-- 1.3.6.1.4.1.17409.2.8.4.2
+		onuInfoSoftwareTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuInfoSoftwareEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1
+		onuInfoSoftwareEntry OBJECT-TYPE
+			SYNTAX OnuInfoSoftwareEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { onuSoftwareDeviceIndex }
+			::= { onuInfoSoftwareTable 1 }
+
+		
+		OnuInfoSoftwareEntry ::=
+			SEQUENCE { 
+				onuSoftwareDeviceIndex
+					INTEGER,
+				onuSoftware0Version
+					DisplayString,
+				onuSoftware0Valid
+					INTEGER,
+				onuSoftware0Active
+					INTEGER,
+				onuSoftware0Commited
+					INTEGER,
+				onuSoftware1Version
+					DisplayString,
+				onuSoftware1Valid
+					INTEGER,
+				onuSoftware1Active
+					INTEGER,
+				onuSoftware1Commited
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.1
+		onuSoftwareDeviceIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.2
+		onuSoftware0Version OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.3
+		onuSoftware0Valid OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				invalid(0),
+				valid(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.4
+		onuSoftware0Active OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inactive(0),
+				active(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.5
+		onuSoftware0Commited OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				uncommitted(0),
+				committed(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.6
+		onuSoftware1Version OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.7
+		onuSoftware1Valid OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				invalid(0),
+				valid(1)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.8
+		onuSoftware1Active OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				inactive(0),
+				active(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.2.1.9
+		onuSoftware1Commited OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				uncommitted(0),
+				committed(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuInfoSoftwareEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3
+		onuIpHostTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuIpHostEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1
+		onuIpHostEntry OBJECT-TYPE
+			SYNTAX OnuIpHostEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { onuIpHostDeviceIndex, onuIpHostIndex }
+			::= { onuIpHostTable 1 }
+
+		
+		OnuIpHostEntry ::=
+			SEQUENCE { 
+				onuIpHostDeviceIndex
+					INTEGER,
+				onuIpHostIndex
+					INTEGER,
+				onuIpHostAddressConfigMode
+					INTEGER,
+				onuIpHostAddress
+					IpAddress,
+				onuIpHostSubnetMask
+					IpAddress,
+				onuIpHostGateway
+					IpAddress,
+				onuIpHostPrimaryDNS
+					IpAddress,
+				onuIpHostSecondaryDNS
+					IpAddress,
+				onuIpHostVlanTagPriority
+					INTEGER,
+				onuIpHostVlanPvid
+					INTEGER,
+				onuIpHostMacAddress
+					MacAddress,
+				onuIpHostRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.1
+		onuIpHostDeviceIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.2
+		onuIpHostIndex OBJECT-TYPE
+			SYNTAX INTEGER (1..64)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.3
+		onuIpHostAddressConfigMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				dhcp(1),
+				static(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.4
+		onuIpHostAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.5
+		onuIpHostSubnetMask OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.6
+		onuIpHostGateway OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.7
+		onuIpHostPrimaryDNS OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.8
+		onuIpHostSecondaryDNS OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.9
+		onuIpHostVlanTagPriority OBJECT-TYPE
+			SYNTAX INTEGER (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			DEFVAL { 1 }
+			::= { onuIpHostEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.10
+		onuIpHostVlanPvid OBJECT-TYPE
+			SYNTAX INTEGER (1..4094)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			DEFVAL { 1 }
+			::= { onuIpHostEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.11
+		onuIpHostMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.3.1.12
+		onuIpHostRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuIpHostEntry 12 }
+
+-- 1.3.6.1.4.1.17409.2.8.4.4
+	
+gponOnuPonPortOpticalTransmissionPropertyTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF GponOnuPonPortOpticalTransmissionPropertyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            This table is designed for both OLT and ONU 
+        Applied Obj  - Descriptions of Index
+      ------------------------------------------------------------------
+        OLT      - OnuNum of GponDeviceIndex TC shall be set to 0,
+                 onuPonPortOpticalTransmissionPropertyCardIndex, and 
+                 onuPonPortOpticalTransmissionPropertyPortIndex set to 
+                 65535 indicates meaningless
+        ONU      - Set GponDeviceIndex TC to corresponding ONU ID,
+                   onuPonPortOpticalTransmissionPropertyCardIndex, and 
+                   onuPonPortOpticalTransmissionPropertyPortIndex set to the 
+                   corresponding value
+      "
+        ::= { gponOnuObjects 4 }
+        
+    gponOnuPonPortOpticalTransmissionPropertyEntry  OBJECT-TYPE
+        SYNTAX      GponOnuPonPortOpticalTransmissionPropertyEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION  
+            "The gponOnuPonPortOpticalTransmissionPropertyEntry Information"
+        INDEX       { onuPonPortOpticalTransmissionPropertyDeviceIndex, onuPonPortOpticalTransmissionPropertyCardIndex,onuPonPortOpticalTransmissionPropertyPortIndex }   
+        ::={ gponOnuPonPortOpticalTransmissionPropertyTable 1 }   
+        
+    GponOnuPonPortOpticalTransmissionPropertyEntry ::= SEQUENCE {
+        onuPonPortOpticalTransmissionPropertyDeviceIndex     GponDeviceIndex,  
+        onuPonPortOpticalTransmissionPropertyCardIndex       INTEGER,
+        onuPonPortOpticalTransmissionPropertyPortIndex       INTEGER,        
+        onuReceivedOpticalPower                              INTEGER,
+        onuTramsmittedOpticalPower                           INTEGER,
+        onuBiasCurrent                                       INTEGER,
+        onuWorkingVoltage                                    INTEGER,
+        onuWorkingTemperature                                INTEGER     
+      } 
+
+    onuPonPortOpticalTransmissionPropertyDeviceIndex  OBJECT-TYPE
+        SYNTAX      GponDeviceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Device Index of the ONU."
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 1 }      
+ 
+     onuPonPortOpticalTransmissionPropertyCardIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Card Index in the ONU. Shall set to 0, if ONU is not a modulized 
+            device"
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 2 }  
+        
+    onuPonPortOpticalTransmissionPropertyPortIndex  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Port Index in the Pon card of ONU"
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 3 }          
+    onuReceivedOpticalPower  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "centi-dBm"
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "received Optical Power"
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 4 }    
+        
+    onuTramsmittedOpticalPower  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "centi-dBm"
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "tramsmitted Optical Power"
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 5 }               
+        
+    onuBiasCurrent  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "centi-mA"
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "biasCurrent"
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 6 }  
+
+    onuWorkingVoltage  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "centi-mV"
+        MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "onuworking Voltage"
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 7 }  
+        
+    onuWorkingTemperature  OBJECT-TYPE
+        SYNTAX      INTEGER
+        UNITS   "Centi-degree centigrade"
+       MAX-ACCESS  read-only 
+        STATUS      current
+        DESCRIPTION
+            "working Temperature"
+        ::= {gponOnuPonPortOpticalTransmissionPropertyEntry 8 } 
+
+
+
+		-- 1.3.6.1.4.1.17409.2.8.4.5
+		onuCapabilityTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuCapabilityEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A list of onuInfoTable entries. "
+			::= { gponOnuObjects 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1
+		onuCapabilityEntry OBJECT-TYPE
+			SYNTAX OnuCapabilityEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The onuCapabilityEntry Information"
+			INDEX { onuCapabilityDeviceIndex }
+			::= { onuCapabilityTable 1 }
+
+		
+		OnuCapabilityEntry ::=
+			SEQUENCE { 
+				onuCapabilityDeviceIndex
+					GponDeviceIndex,
+				onuOMCCVersion
+					INTEGER,
+				onuTotalEthNum
+					INTEGER,
+				onuTotalWlanNum
+					INTEGER,
+				onuTotalCatvNum
+					INTEGER,
+				onuTotalVeipNum
+					INTEGER,
+				onuIpHostNum
+					INTEGER,
+				onuTrafficMgmtOption
+					INTEGER,
+				onuTotalGEMPortNum
+					INTEGER,
+				onuTotalTContNum
+					INTEGER,
+				onuConnectCapbility
+					BITS,
+				onuQosFlexibility
+					BITS
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.1
+		onuCapabilityDeviceIndex OBJECT-TYPE
+			SYNTAX GponDeviceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"onu Device Index"
+			::= { onuCapabilityEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.2
+		onuOMCCVersion OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0x80 	ITU-T G.984.4 (06/04)
+						NOTE \u9225\ufffdFor historical reasons, this code point may also appear in
+						ONUs that support later versions of [ITU-T G.984.4].				
+				0x81 	ITU-T G.984.4 2004 Amd.1 (06/05)
+				0x82 	ITU-T G.984.4 2004 Amd.2 (03/06)
+				0x83 	ITU-T G.984.4 2004 Amd.3 (12/06)				
+				0x84 	ITU-T G.984.4 2008 (02/08)				
+				0x85 	ITU-T G.984.4 2008 Amd.1 (06/09)				
+				0x86 	ITU-T G.984.4 2008 Amd.2 (2009). 
+						Baseline message set only, without the extended message set option
+				0x96 	ITU-T G.984.4 2008 Amd.2 (2009). Extended message set option, in addition to the baseline message set.54 Rec. ITU-T G.988 (10/2012)
+				0xA0 	ITU-T G.988 (2010). Baseline message set only, without the extended message set option
+				0xA1    ITU-T G.988 Amd.1 (2011). Baseline message set only
+				0xA2    ITU-T G.988 Amd.2 (2012). Baseline message set only
+				0xA3 	ITU-T G.988 (2012). Baseline message set only				
+				0xB0 	ITU-T G.988 (2010). Baseline and extended message set				
+				0xB1 	ITU-T G.988 Amd.1 (2011). Baseline and extended message set				
+				0xB2 	ITU-T G.988 Amd.2 (2012). Baseline and extended message	set				
+				0xB3 	ITU-T G.988 (2012). Baseline and extended message set"
+			::= { onuCapabilityEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.3
+		onuTotalEthNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"gePort Bitmap				
+				In slot+port pair list manner. Suppose each slot support up to 64 ports.
+				One octet to indentify slot and 8 octets to identify portbitmap for
+				the slot. The bitmap definition is internet sequence. The most left bit 
+				is for port 1 of the slot, the most right bit is for port 64 of the slot.            
+				If the slot cannot support 64 ports, set the bits of not supported ports
+				to 0.            
+				If the port is GE port, set the corresponding bit to 1.                 
+				Since the slot num depends on each individual device, the object is variable
+				length. If the device is fixed box (not modulized), set the slot number to 
+				255. Then the network management system could ignore the slot info.            
+				It is not necessary to list the slot doesn't support GE port.                        
+				For example, if have 4 GE ports, of: 1/4, 1/6, 2/3, 4/17,
+				the object will be presented in:
+				01 14 00 00 00 00 00 00 00
+				02 20 00 00 00 00 00 00 00
+				04 00 00 80 00 00 00 00 00            
+				Another example, for fixed box, if have 4 ge ports of 4,6,10,17, the object
+				will be presented as:
+				FF 14 40 10 00 00 00 00	"
+			::= { onuCapabilityEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.4
+		onuTotalWlanNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"fePort Num"
+			::= { onuCapabilityEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.5
+		onuTotalCatvNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { onuCapabilityEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.6
+		onuTotalVeipNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { onuCapabilityEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.7
+		onuIpHostNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { onuCapabilityEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.8
+		onuTrafficMgmtOption OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"0:	Priority controlled and flexibly scheduled upstream traffic. 
+				
+				 1: Rate controlled upstream traffic. 
+				 
+                 2: Priority and rate controlled. "
+			::= { onuCapabilityEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.9
+		onuTotalGEMPortNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { onuCapabilityEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.10
+		onuTotalTContNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION			" "
+			::= { onuCapabilityEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.11
+		onuConnectCapbility OBJECT-TYPE
+			SYNTAX BITS
+				{
+				nto1(0),
+				ntom(3),
+				ntop(5),
+				ntomp(6)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"1 	(LSB) N:1 bridging, Figure 8.2.2-3
+				
+				 2  1:M mapping, Figure 8.2.2-4
+				 
+				 3	1:P filtering, Figure 8.2.2-5
+				 
+				 4  N:M bridge-mapping, Figure 8.2.2-6
+				 
+				 5  1:MP map-filtering, Figure 8.2.2-7
+				 
+				 6  N:P bridge-filtering, Figure 8.2.2-8
+				 
+				 7	N:MP bridge-map-filtering, Figure 8.2.2-9
+				 
+				 8-16 Reserved"
+			::= { onuCapabilityEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.5.1.12
+		onuQosFlexibility OBJECT-TYPE
+			SYNTAX BITS { priorityQueueME(1) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"1	(LSB) Priority queue ME: Port field of related port attribute is read-write and
+					can point to any T-CONT or UNI port in the same slot
+					
+				 2	Priority queue ME: The traffic scheduler pointer is permitted to refer to
+					any other traffic scheduler in the same slot
+
+				 3	Traffic scheduler ME: T-CONT pointer is read-write
+				
+				 4	Traffic scheduler ME: Policy attribute is read-write
+								
+				 5	T-CONT ME: Policy attribute is read-write
+								
+				 6	Priority queue ME: Priority field of related port attribute is read-write
+								
+				 7..16 Reserved"
+			::= { onuCapabilityEntry 12 }
+
+
+		-- 1.3.6.1.4.1.17409.2.8.4.6
+		onuAuthenticationManagement OBJECT-IDENTITY
+			STATUS current
+			DESCRIPTION 
+				" "
+			::= { gponOnuObjects 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1
+		onuAuthenticationConfigTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuAuthenticationConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A list of onuAuthenticationPreConfigTable entries. "
+			::= { onuAuthenticationManagement 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1
+		onuAuthenticationConfigEntry OBJECT-TYPE
+			SYNTAX OnuAuthenticationConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The onuAuthenticationPreConfigEntry Information"
+			INDEX { onuAuthenOnuId }
+			::= { onuAuthenticationConfigTable 1 }
+
+		
+		OnuAuthenticationConfigEntry ::=
+			SEQUENCE { 
+				onuAuthenOnuId
+					INTEGER,
+				onuAuthenSN
+					OCTET STRING,
+				onuAuthenPassword
+					DisplayString,
+				onuAuthenLoid
+					DisplayString,
+				onuAuthenLoidPassword
+					DisplayString,
+				onuAuthenLineProfileId
+					INTEGER,
+				onuAuthenSrvProfileId
+					INTEGER,
+				onuAuthenRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.1
+		onuAuthenOnuId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"onu logical ID"
+			::= { onuAuthenticationConfigEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.2
+		onuAuthenSN OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (8))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"onu Mac Address"
+			::= { onuAuthenticationConfigEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.3
+		onuAuthenPassword OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Authen Action
+				
+				This is optional in function"
+			::= { onuAuthenticationConfigEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.4
+		onuAuthenLoid OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAuthenticationConfigEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.5
+		onuAuthenLoidPassword OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAuthenticationConfigEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.6
+		onuAuthenLineProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAuthenticationConfigEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.7
+		onuAuthenSrvProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAuthenticationConfigEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.6.1.1.8
+		onuAuthenRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"authen Row Status"
+			::= { onuAuthenticationConfigEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7
+		onuAutoFindTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuAutoFindEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuObjects 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1
+		onuAutoFindEntry OBJECT-TYPE
+			SYNTAX OnuAutoFindEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { onuAutoFindOnuIndex }
+			::= { onuAutoFindTable 1 }
+
+		
+		OnuAutoFindEntry ::=
+			SEQUENCE { 
+				onuAutoFindOnuIndex
+					INTEGER,
+				onuAutoFindOnuType
+					DisplayString,
+				onuAutoFindSerialNumber
+					DisplayString,
+				onuAutoFindPassword
+					DisplayString,
+				onuAutoFindLoid
+					DisplayString,
+				onuAutoFindLoidPassword
+					DisplayString,
+				onuAutoFindTime
+					DateAndTime,
+				onuAutoFindSoftwareVersion
+					DisplayString,
+				onuAutoFindHardwareVersion
+					DisplayString
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.1
+		onuAutoFindOnuIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.2
+		onuAutoFindOnuType OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.3
+		onuAutoFindSerialNumber OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.4
+		onuAutoFindPassword OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.5
+		onuAutoFindLoid OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.6
+		onuAutoFindLoidPassword OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.7
+		onuAutoFindTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.8
+		onuAutoFindSoftwareVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.7.1.9
+		onuAutoFindHardwareVersion OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoFindEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8
+		onuAutoAuthenticationTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OnuAutoAuthenticationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponOnuObjects 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1
+		onuAutoAuthenticationEntry OBJECT-TYPE
+			SYNTAX OnuAutoAuthenticationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { onuAutoAuthenIndex }
+			::= { onuAutoAuthenticationTable 1 }
+
+		
+		OnuAutoAuthenticationEntry ::=
+			SEQUENCE { 
+				onuAutoAuthenIndex
+					INTEGER,
+				onuAutoAuthenPortlist
+					DisplayString,
+				onuAutoAuthenOnuType
+					DisplayString,
+				onuAutoAuthenEthNum
+					INTEGER,
+				onuAutoAuthenWlanNum
+					INTEGER,
+				onuAutoAuthenCatvNum
+					INTEGER,
+				onuAutoAuthenVeipNum
+					INTEGER,
+				onuAutoAuthenLineProfileId
+					INTEGER,
+				onuAutoAuthenSrvProfileId
+					INTEGER,
+				onuAutoAuthenRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.1
+		onuAutoAuthenIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.2
+		onuAutoAuthenPortlist OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 2 }
+			
+			
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.3
+		onuAutoAuthenOnuType OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.4
+		onuAutoAuthenEthNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.5
+		onuAutoAuthenWlanNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.6
+		onuAutoAuthenCatvNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.7
+		onuAutoAuthenVeipNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.8
+		onuAutoAuthenLineProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.9
+		onuAutoAuthenSrvProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 9}
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.4.8.1.10
+		onuAutoAuthenRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { onuAutoAuthenticationEntry 10 }
+
+
+
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5
+		gponUniObjects OBJECT IDENTIFIER ::= { gponTree 5 }
+
+		
+-- ------------------------------------------------------------------------------
+-- gponUniObjects(1.3.6.1.4.1.17409.2.8.5)
+-- ------------------------------------------------------------------------------     
+	
+
+		-- 1.3.6.1.4.1.17409.2.8.5.1
+		ethAttributeTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF EthAttributeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A list of uniAttributeTable entries."
+			::= { gponUniObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1
+		ethAttributeEntry OBJECT-TYPE
+			SYNTAX EthAttributeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The uniAttributeEntry Information"
+			INDEX { ethAttributeDeviceIndex, ethAttributeCardIndex, ethAttributePortIndex }
+			::= { ethAttributeTable 1 }
+
+		
+		EthAttributeEntry ::=
+			SEQUENCE { 
+				ethAttributeDeviceIndex
+					GponDeviceIndex,
+				ethAttributeCardIndex
+					GponCardIndex,
+				ethAttributePortIndex
+					GponPortIndex,
+				ethAdminStatus
+					INTEGER,
+				ethOperationStatus
+					INTEGER,
+				ethDuplexRate
+					INTEGER,
+				ethPerfStats15minuteEnable
+					TruthValue,
+				ethPerfStats24hourEnable
+					TruthValue
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1.1
+		ethAttributeDeviceIndex OBJECT-TYPE
+			SYNTAX GponDeviceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Device Index
+				
+				For OLT, set to corresponding ONU ID
+				For ONU, set to 0
+				"
+			::= { ethAttributeEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1.2
+		ethAttributeCardIndex OBJECT-TYPE
+			SYNTAX GponCardIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Card Index            
+				The value of this cardIndex depends on onuType.            
+				fixed(1)        - set to 0, to indicate slot num is meaningless.
+				chassisBased(2) - MUST NOT be zero            
+				"
+			::= { ethAttributeEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1.3
+		ethAttributePortIndex OBJECT-TYPE
+			SYNTAX GponPortIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Port Index"
+			::= { ethAttributeEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1.4
+		ethAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Admin Status"
+			::= { ethAttributeEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1.5
+		ethOperationStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Operation Status"
+			::= { ethAttributeEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1.6
+		ethDuplexRate OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION			" "
+			::= { ethAttributeEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.5.1.1.7
+		ethPerfStats15minuteEnable OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				""
+			::= { ethAttributeEntry 7 }
+
+
+			-- 1.3.6.1.4.1.17409.2.8.5.1.1.8
+		ethPerfStats24hourEnable OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION			" "
+			::= { ethAttributeEntry 8 }
+
+	
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.6
+		gponIgmpManagementObjects OBJECT IDENTIFIER ::= { gponTree 6 }
+
+--------------------------------------------------------------------------------
+--  gponIgmpManagementObjects[IGMP(1.3.6.1.4.1.17409.2.8.6)
+-------------------------------------------------------------------------------- 
+    
+    gponOnuIgmpProfile OBJECT-IDENTITY
+      STATUS current
+      DESCRIPTION 
+        "
+        ONU Profile"
+      ::= { gponIgmpManagementObjects 4 }
+    
+     gponOnuIgmpProfileTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF GponOnuIgmpProfileEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+       ""
+      ::= { gponOnuIgmpProfile 1 }
+    
+    gponOnuIgmpProfileEntry OBJECT-TYPE
+      SYNTAX GponOnuIgmpProfileEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { gponOnuIgmpProfileIndex }
+      ::= { gponOnuIgmpProfileTable 1 }
+    
+    GponOnuIgmpProfileEntry ::=
+      SEQUENCE { 
+        gponOnuIgmpProfileIndex
+          INTEGER,
+        gponOnuIgmpProfileName
+          DisplayString,
+        gponOnuIgmpVersion 
+          INTEGER,
+        gponOnuIgmpFunction
+          INTEGER,
+        gponOnuIgmpImmediateLeave
+          INTEGER,
+        gponOnuIgmpUpstreamProtoTCI  
+          INTEGER,
+        gponOnuIgmpUpstreamProtoTagControl
+          INTEGER,
+        gponOnuIgmpUpstreamProtoRate
+          INTEGER,
+        gponOnuIgmpDynamicACL
+          INTEGER,
+        gponOnuIgmpStaticACL
+          INTEGER,
+        gponOnuIgmpRobustness
+          INTEGER,
+        gponOnuIgmpQueryInterval
+          INTEGER,
+        gponOnuIgmpQueryMaxResponseTime
+          INTEGER,
+        gponOnuIgmpLastMemberQueryInterval
+          INTEGER,
+        gponOnuIgmpUnautherizedJoin
+          INTEGER,
+        gponOnuIgmpDownstreamTCI
+          INTEGER,
+        gponOnuIgmpDownstreamTagControl
+          INTEGER,
+        gponOnuIgmpMaxRequestChannelNum
+          INTEGER,
+        gponOnuIgmpGlobalBW
+          INTEGER,
+        gponOnuIgmpRowStatus
+          RowStatus
+       }
+
+    gponOnuIgmpProfileIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Profile"
+      ::= { gponOnuIgmpProfileEntry 1 }
+
+    gponOnuIgmpProfileName  OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Profile\u041e
+        "
+      ::= { gponOnuIgmpProfileEntry 2 }
+
+    gponOnuIgmpVersion OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        igmp-v1(1),
+        igmp-v2(2),
+        igmp-v3(3)
+        --for future use ,mld-v1(16), mld-v2(17)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: IGMP version.
+        This attribute specifies the version of IGMP to be supported. Support of a
+        given version implies compatible support of previous versions.
+        "
+      ::= { gponOnuIgmpProfileEntry 3 }
+    
+    gponOnuIgmpFunction OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        snooping(1),
+        spr(2),
+        proxy(3)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: IGMP function.
+        This attribute enables an IGMP function. The value 1(value 0 in G.988) specifies transparent
+        IGMP snooping only. The value 2(value 1 in G.988) specifies snooping with proxy reporting(SPR); 
+        the value 3(value 2 in G.988) specifies IGMP proxy. The function must be consistent
+        with the capabilities specified by the other IGMP configuration attributes.
+        "
+      ::= { gponOnuIgmpProfileEntry 4 }
+
+    gponOnuIgmpImmediateLeave OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        true(1),
+        false(2)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Immediate leave.
+        This Boolean attribute controls the immediate leave function. The value
+        false disables immediate leave; true enables immediate leave.
+        "
+      ::= { gponOnuIgmpProfileEntry 5 }
+    
+    gponOnuIgmpUpstreamProtoTCI OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Upstream IGMP TCI.
+        Under control of gponOnuIgmpUpstreamProtoTagControl(the upstream IGMP tag control attribute), 
+        the upstream IGMP TCI attribute defines a VLAN ID and P-bits to add to upstream IGMP messages.
+        "
+      ::= { gponOnuIgmpProfileEntry 6 }
+
+    gponOnuIgmpUpstreamProtoTagControl OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        pass-through(1),
+        add-vlan(2),
+        replace-tci(3),
+        replace-vlan(4)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Upstream IGMP tag control.
+        This attribute controls the upstream IGMP TCI attribute. If
+        this attribute is not pass-through, a possible extended VLAN tagging operation ME is
+        ignored for upstream frames containing IGMP/MLD packets.
+        Value       Meaning
+        1           G.988 Value 0.
+                    Pass upstream IGMP/MLD traffic transparently, neither
+                    adding, stripping nor modifying tags that may be present.
+        2           G.988 Value 1.
+                    Add a VLAN tag (including P bits) to upstream IGMP/MLD
+                    traffic. The tag is specified by the upstream IGMP TCI
+                    attribute.
+        3           G.988 Value 2.
+                    Replace the entire TCI (VLAN ID plus P bits) on upstream
+                    IGMP/MLD traffic. The new tag is specified by the upstream
+                    IGMP/MLD TCI attribute. If the received IGMP/MLD traffic
+                    is untagged, an add operation is performed.
+        4           G.988 Value 3.
+                    Replace only the VLAN ID on upstream IGMP/MLD traffic,
+                    retaining the original DEI and P bits. The new VLAN ID is
+                    specified by the VLAN ID field of the upstream IGMP TCI
+                    attribute. If the received IGMP/MLD traffic is untagged, an
+                    add operation is performed, with DEI and P bits also taken
+                    from the upstream IGMP TCI attribute.
+        "
+      DEFVAL { pass-through }
+      ::= { gponOnuIgmpProfileEntry 7 }
+
+    gponOnuIgmpUpstreamProtoRate OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "pps"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Upstream IGMP rate.
+        This attribute limits the maximum rate of upstream IGMP traffic.
+        Traffic in excess of this limit is silently discarded. The attribute value is
+        specified in messages/second. The recommended default value 0 imposes no
+        rate limit on this traffic.
+        "
+      DEFVAL { 0 }
+      ::= { gponOnuIgmpProfileEntry 8 }
+
+    gponOnuIgmpDynamicACL OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        multicastACLIndex of gponOnuMulticastACLTable, refers to the list of multiple rules.
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table.
+        This attribute is a list that specifies one or more
+        multicast group address ranges. Groups defined in this 
+        list are multicast on the associated UNI(s) which need 
+        IGMP join,  bandwidth measurement, and preview management.
+        
+        0 for no DynamicACL
+        "
+      ::= { gponOnuIgmpProfileEntry 9 }
+
+    gponOnuIgmpStaticACL OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        multicastACLIndex of gponOnuMulticastACLTable, refers to the list of multiple rules.
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Static access control list table.
+        This attribute is a list that specifies one or more multicast
+        group address ranges. Groups defined in this list are multicast on the
+        associated UNI(s) unconditionally, that is, without the need for an IGMP
+        join. The bandwidth of static multicast groups is not included in the current
+        multicast bandwidth measurement maintained by the multicast subscriber
+        monitor managed entity. If a join message is always expected, this table may
+        be empty. Table entries have the same format as those in the dynamic access
+        control list table. The preview fields are not meaningful. 
+        
+        0 for no StaticACL
+        "
+      DEFVAL { 0 }
+      ::= { gponOnuIgmpProfileEntry 10 }
+
+    gponOnuIgmpRobustness OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Robustness.
+        This attribute allows tuning for possible packet loss in the network. The
+        recommended default value 0 causes the ONU to follow the IETF
+        recommendation [IETF RFC 3376] to copy the robustness value from query
+        messages originating further upstream.
+        "
+      DEFVAL { 0 }
+      ::= { gponOnuIgmpProfileEntry 11 }
+
+    gponOnuIgmpQueryInterval OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Query interval.
+        This attribute specifies the interval between general queries in seconds. The
+        value 0 specifies that the ONU use its own default, which may or may not be
+        the same as the recommended default of 125 seconds. 
+        "
+      DEFVAL { 125 }
+      ::= { gponOnuIgmpProfileEntry 12 }
+
+    gponOnuIgmpQueryMaxResponseTime OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "0.1 seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Query max response time.
+        This attribute is the max response time added by the proxy into
+        general query messages directed to UNIs. It is expressed in tenths of seconds.
+        The value 0 specifies that the ONU use its own default, which may or may
+        not be the same as the recommended default of 100 (10 seconds). 
+        "
+      DEFVAL { 100 }
+      ::= { gponOnuIgmpProfileEntry 13 }
+
+    gponOnuIgmpLastMemberQueryInterval OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "0.1 seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Last member query interval.
+        This attribute specifies the max response time inserted into
+        group-specific queries sent to UNIs in response to group leave messages. It is
+        also the repetition rate of [robustness] transmissions of the query. It is
+        specified in tenths of seconds, with a default of 10 (1 second).
+        "
+      DEFVAL { 10 }
+      ::= { gponOnuIgmpProfileEntry 14 }
+
+    gponOnuIgmpUnautherizedJoin OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        true(1),
+        false(2)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Unauthorized join request behaviour.
+        This Boolean attribute specifies the ONU's
+        behaviour when it receives an IGMP join request for a group that is not
+        authorized in the dynamic address control list table, or an IGMPv3
+        membership report for groups, none of which are authorized in the dynamic
+        ACL. The default value false specifies that the ONU silently discard the
+        IGMP request; the value true specifies that the ONU forwards the request
+        upstream. The ONU does not attempt to honour the request for the
+        unauthorized group(s) in either case. 
+        "
+      DEFVAL { false }
+      ::= { gponOnuIgmpProfileEntry 15 }
+
+    gponOnuIgmpDownstreamTCI OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Downstream IGMP and multicast TCI(last two bytes).
+        Under control of gponOnuIgmpDownstreamTagControl(first byte of Downstream IGMP and multicast TCI attribute), 
+        the downstream IGMP TCI attribute defines a VLAN ID and P-bits to add to both the IGMP/MLD and multicast frames.
+        "
+      ::= { gponOnuIgmpProfileEntry 16 }
+      
+    gponOnuIgmpDownstreamTagControl OBJECT-TYPE
+      SYNTAX INTEGER
+      {
+        pass-through(1),
+        strip-vlan(2),
+        add-vlan(3),
+        replace-tci(4),
+        replace-vlan(5)
+      }
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Downstream IGMP and multicast TCI(first byte).
+        This attribute controls the downstream tagging of
+        both the IGMP/MLD and multicast frames. If this attribute is
+        not 1, a possible extended VLAN tagging operation ME is ignored for
+        downstream IGMP/MLD and multicast frames. 
+        Value               Meaning
+        1                   G.988 Value 0 
+                            Pass the downstream IGMP/MLD and multicast traffic
+                            transparently, neither stripping nor modifying tags that may be
+                            present.
+        2                   G.988 Value 1 
+                            Strip the outer VLAN tag (including P bits) from the
+                            downstream IGMP/MLD and multicast traffic.
+        3                   G.988 Value 2 
+                            Add a tag onto the downstream IGMP/MLD and multicast
+                            traffic. The new tag is specified by gponOnuIgmpDownstreamTagControl.
+        4                   G.988 Value 3 
+                            Replace the tag on the downstream IGMP/MLD and multicast
+                            traffic. The new tag is specified by gponOnuIgmpDownstreamTagControl.
+        5                   G.988 Value 4 
+                            Replace only the VLAN ID on the downstream IGMP/MLD
+                            and multicast traffic, retaining the original DEI and P bits. The
+                            new VLAN ID is specified by gponOnuIgmpDownstreamTagControl.
+        "
+      DEFVAL { pass-through }
+      ::= { gponOnuIgmpProfileEntry 17 }
+
+    gponOnuIgmpMaxRequestChannelNum OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.28 Multicast subscriber config info, Attribute: Max simultaneous groups.
+        This attribute specifies the maximum number of dynamic
+        multicast groups that may be replicated to the client port at any one time. The
+        recommended default value 0 specifies that no administrative limit is to be
+        imposed.
+        "
+      DEFVAL { 0 }
+      ::= { gponOnuIgmpProfileEntry 18 }
+
+    gponOnuIgmpGlobalBW OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "Bps"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.28 Multicast subscriber config info, Attribute: Max multicast bandwidth.
+        This attribute specifies the maximum imputed dynamic
+        bandwidth, in bytes per second, that may be delivered to the client port at any
+        one time. The recommended default value 0 specifies that no administrative
+        limit is to be imposed.
+        
+        G.988 'Bandwidth enforcement' attribute should be set to TRUE when the bandwidth value is not 0.
+        "
+      DEFVAL { 0 }
+      ::= { gponOnuIgmpProfileEntry 19 }
+
+    gponOnuIgmpRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        ""
+      ::= { gponOnuIgmpProfileEntry 20 }
+    
+    gponOnuMulticastACLTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF GponOnuMulticastACLEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        ONU \u7f01\u52ec\u6331\u93c9\u51ae\u6aba\u741b\ufffd"
+      ::= { gponOnuIgmpProfile 2 }
+    
+    gponOnuMulticastACLEntry OBJECT-TYPE
+      SYNTAX GponOnuMulticastACLEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        " "
+      INDEX { multicastACLIndex, multicastACLIndex }
+      ::= { gponOnuMulticastACLTable 1 }
+    
+    GponOnuMulticastACLEntry ::=
+      SEQUENCE { 
+        multicastACLIndex
+          INTEGER,
+        multicastACLRuleIndex
+          INTEGER,
+        multicastACLRuleName
+          DisplayString,
+        vlanID
+          INTEGER,
+        sourceIpAddress
+          IpAddress,
+        destinationIpAddressStart
+          IpAddress,
+        destinationIpAddressEnd
+          IpAddress,
+        previewLenAndAuthority
+          INTEGER,
+        previewRepeatTime
+          INTEGER,
+        previewResetTime
+          INTEGER,
+        previewCount
+          INTEGER,
+        imputedGroupBandwidth
+          INTEGER,
+        multicastACLRuleStatus
+          RowStatus
+       }
+
+    multicastACLIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        \u7f01\u52ec\u6331\u93c9\u51ae\u6aba\u95c6\u55d9\u50a8\u5bee\ufffd"
+      ::= { gponOnuMulticastACLEntry 1 }
+    
+    multicastACLRuleIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        \u7f01\u52ec\u6331\u93c9\u51ae\u6aba\u7459\u52eb\u57af\u7ef1\u3220\u7d29"
+      ::= { gponOnuMulticastACLEntry 2 }
+    
+    multicastACLRuleName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        \u7459\u52eb\u57af\u935a\u5d85\u74e7"
+      ::= { gponOnuMulticastACLEntry 3 }
+    
+    vlanID OBJECT-TYPE
+      SYNTAX INTEGER (0..4094)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table[ VLAN ID (ANI) ]
+        This field specifies the VLAN carrying the multicast group downstream. 
+        The value 0 designates an untagged downstream flow.
+        "
+      ::= { gponOnuMulticastACLEntry 4 }
+    
+    sourceIpAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table[ Source IP address ]
+        The value 0.0.0.0 specifies that the source IP address is to be ignored.
+        "
+      ::= { gponOnuMulticastACLEntry 5 }
+
+    destinationIpAddressStart OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table
+         [ Destination IP address of the start of the multicast range ]
+        "
+      ::= { gponOnuMulticastACLEntry 6 }
+
+    destinationIpAddressEnd OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table
+         [ Destination IP address of the end of the multicast range ]
+        "
+      ::= { gponOnuMulticastACLEntry 7 }
+
+    previewLenAndAuthority OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table[ Preview length ]
+        The maximum duration of each preview in seconds.
+        The value 0 designates a group that is fully authorized by subscription
+        and is not subject to preview restrictions. The remaining preview
+        attributes in this row part are ignored.
+        "
+      ::= { gponOnuMulticastACLEntry 8 }
+    
+    previewRepeatTime OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "seconds"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table[ Preview repeat time ]
+        The minimum time in seconds between two previews of a given multicast group. 
+        "
+      ::= { gponOnuMulticastACLEntry 9 }
+    
+    previewResetTime OBJECT-TYPE
+      SYNTAX INTEGER (1..24)
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table[ Preview reset time ]
+        The time at which the ONU resets the preview
+        repeat counter. The value assignments are as follows: 
+        1..24:  The integer clock time at which the ONU resets the preview
+                repeat counter. For example the value 2 resets the counter at
+                2:00 AM. If the ONU does not have a time of day clock, the
+                preview repeat counter is reset every 24 hours at an
+                indeterminate time selected by the ONU.
+        other values are reserved 
+        "
+      ::= { gponOnuMulticastACLEntry 10 }
+    
+    previewCount OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table[ Preview repeat count ]
+        The maximum number of times a given multicast group 
+        may be previewed. A value of zero allows an unlimited 
+        number of previews.
+        "
+      ::= { gponOnuMulticastACLEntry 11 }
+  
+    imputedGroupBandwidth OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "Bps"
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        G.988-201210:  9.3.27 Multicast operations profile, Attribute: Dynamic access control list table[ Imputed group bandwidth ]
+        Expressed in bytes per second, the
+        imputed group bandwidth is used to decide whether or not to honour a
+        join request in the presence of a max multicast bandwidth limit. The
+        recommended default value 0 effectively allows this table entry to
+        avoid max bandwidth limitations.
+        "
+      ::= { gponOnuMulticastACLEntry 12 }
+  
+    multicastACLRuleStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+        "
+        \u741b\u5c80\u59f8\u93ac\ufffd"
+      ::= { gponOnuMulticastACLEntry 13 }
+
+
+    gponIgmpOnuUniTable  OBJECT-TYPE
+      SYNTAX      SEQUENCE OF GponIgmpOnuUniEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "A list of gponIgmpOnuUniTable  entries. "
+      ::= { gponIgmpManagementObjects 5 }
+
+    gponIgmpOnuUniEntry OBJECT-TYPE
+      SYNTAX      GponIgmpOnuUniEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION  
+        "The gponIgmpOnuUniEntry Information"
+      INDEX   { gponUniDeviceIndex, gponUniCardIndex, gponUniPortIndex }   
+      ::={ gponIgmpOnuUniTable 1 }   
+
+    GponIgmpOnuUniEntry::= SEQUENCE {
+      gponUniDeviceIndex
+        GponDeviceIndex,
+      gponUniCardIndex
+        GponCardIndex,
+      gponUniPortIndex
+        GponPortIndex,
+      gponUniIgmpProfileIndex
+        INTEGER,
+      gponUniRowstatus      
+        RowStatus
+    }
+
+    gponUniDeviceIndex OBJECT-TYPE
+      SYNTAX      GponDeviceIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "\u7481\u60e7\ue638\u7ef1\u3220\u7d29 "
+      ::= { gponIgmpOnuUniEntry 1 }   
+
+    gponUniCardIndex OBJECT-TYPE
+      SYNTAX      GponCardIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "\u93c9\u57ae\u5d31\u7ef1\u3220\u7d29"
+      ::= { gponIgmpOnuUniEntry 2 }  
+
+    gponUniPortIndex OBJECT-TYPE
+      SYNTAX      GponPortIndex
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "\u7ed4\ue21a\u5f5b\u7ef1\u3220\u7d29"
+      ::= { gponIgmpOnuUniEntry 3 }  
+
+    gponUniIgmpProfileIndex OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "gponOnuIgmpProfileTable\u7ef1\u3220\u7d29"
+    ::= { gponIgmpOnuUniEntry 4 }
+
+    gponUniRowstatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "\u741b\u5c80\u59f8\u93ac\ufffd"
+      ::= { gponIgmpOnuUniEntry 5 }
+
+
+
+    igmpOnuMulticastInfoTable  OBJECT-TYPE
+      SYNTAX      SEQUENCE OF IgmpOnuMulticastInfoEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "
+          A list of igmpOnuMulticastInfoTable  entries. 
+          G.988-201210:  9.3.29 Multicast subscriber monitor, Attribute: IPv4 active group list table
+        "
+      ::= { gponIgmpManagementObjects 6 }
+
+    igmpOnuMulticastInfoEntry OBJECT-TYPE
+      SYNTAX      IgmpOnuMulticastInfoEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION  
+        "The igmpOnuUniEntry Information"
+      INDEX   { onuMcInfoDeviceIndex,onuMcInfoCardIndex,onuMcInfoPortIndex,onuMcInfoIndex }   
+      ::={ igmpOnuMulticastInfoTable 1 }   
+
+    IgmpOnuMulticastInfoEntry::= SEQUENCE {
+      onuMcInfoDeviceIndex
+        GponDeviceIndex,
+      onuMcInfoCardIndex
+        GponCardIndex,
+      onuMcInfoPortIndex
+        GponPortIndex,
+      onuMcInfoIndex
+        INTEGER,
+      onuMcInfoSrcIp
+        IpAddress,
+      onuMcInfoMcDstIp      
+        IpAddress,
+      onuMcInfoMvlanVid
+        INTEGER,
+      onuMcInfoClientIp
+        IpAddress
+    }
+
+    onuMcInfoDeviceIndex OBJECT-TYPE
+      SYNTAX      GponDeviceIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "\u7481\u60e7\ue638\u7ef1\u3220\u7d29 "
+      ::= { igmpOnuMulticastInfoEntry 1 }   
+
+    onuMcInfoCardIndex OBJECT-TYPE
+      SYNTAX      GponCardIndex
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "\u93c9\u57ae\u5d31\u7ef1\u3220\u7d29"
+      ::= { igmpOnuMulticastInfoEntry 2 }  
+
+    onuMcInfoPortIndex OBJECT-TYPE
+      SYNTAX      GponPortIndex
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "\u7ed4\ue21a\u5f5b\u7ef1\u3220\u7d29"
+      ::= { igmpOnuMulticastInfoEntry 3 }  
+
+    onuMcInfoIndex OBJECT-TYPE
+      SYNTAX      INTEGER
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "\u7f01\u52ec\u6331\u93c9\uff04\u6d30\u7ef1\u3220\u7d29"
+      ::= { igmpOnuMulticastInfoEntry 4 }  
+
+    onuMcInfoSrcIp OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "
+          G.988-201210:  9.3.29 Multicast subscriber monitor, Attribute: IPv4 active group list table
+          Source IP address, 0.0.0.0 if not used
+        "
+    ::= { igmpOnuMulticastInfoEntry 5 }
+
+    onuMcInfoMcDstIp OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "
+          G.988-201210:  9.3.29 Multicast subscriber monitor, Attribute: IPv4 active group list table
+          Multicast destination IP address
+        "
+    ::= { igmpOnuMulticastInfoEntry 6 }
+
+    onuMcInfoMvlanVid OBJECT-TYPE
+      SYNTAX INTEGER (0..4094)
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "
+          G.988-201210:  9.3.29 Multicast subscriber monitor, Attribute: IPv4 active group list table
+          VLAN ID, 0 if not used
+        "
+    ::= { igmpOnuMulticastInfoEntry 7 }
+
+    onuMcInfoClientIp OBJECT-TYPE
+      SYNTAX IpAddress
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+        "
+          G.988-201210:  9.3.29 Multicast subscriber monitor, Attribute: IPv4 active group list table
+          Client (set-top box) IP address, that is, the IP address of the device currently joined.
+        "
+    ::= { igmpOnuMulticastInfoEntry 8 }
+      
+    
+		
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10
+		gponPerformanceStatisticObjects OBJECT IDENTIFIER ::= { gponTree 10 }
+
+		
+-- ------------------------------------------------------------------------------
+-- gponPerformanceStatisticObjects(1.3.6.1.4.1.17409.2.8.10)
+-- ------------------------------------------------------------------------------ 
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5
+		gponPerfStatsThresholdTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponPerfStatsThresholdEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponPerformanceStatisticObjects 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1
+		gponPerfStatsThresholdEntry OBJECT-TYPE
+			SYNTAX GponPerfStatsThresholdEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			INDEX { gponPerfStatsThresholdDeviceIndex, gponPerfStatsThresholdCardIndex, gponPerfStatsThresholdPortIndex, gponPerfStatsThresholdTypeIndex }
+			::= { gponPerfStatsThresholdTable 1 }
+
+		
+		GponPerfStatsThresholdEntry ::=
+			SEQUENCE { 
+				gponPerfStatsThresholdDeviceIndex
+					GponDeviceIndex,
+				gponPerfStatsThresholdCardIndex
+					GponCardIndex,
+				gponPerfStatsThresholdPortIndex
+					GponPortIndex,
+				gponPerfStatsThresholdTypeIndex
+					GponStatsThresholdType,
+				gponPerfStatsThresholdUpper
+					Counter64,
+				gponPerfStatsThresholdLower
+					Counter64,
+				gponPerfStatsThresholdRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1.1
+		gponPerfStatsThresholdDeviceIndex OBJECT-TYPE
+			SYNTAX GponDeviceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponPerfStatsThresholdEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1.2
+		gponPerfStatsThresholdCardIndex OBJECT-TYPE
+			SYNTAX GponCardIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponPerfStatsThresholdEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1.3
+		gponPerfStatsThresholdPortIndex OBJECT-TYPE
+			SYNTAX GponPortIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponPerfStatsThresholdEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1.4
+		gponPerfStatsThresholdTypeIndex OBJECT-TYPE
+			SYNTAX GponStatsThresholdType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			
+"\u95c2\u3129\u6aba\u7eeb\u8bf2\u7037\u951b\ufffd
+1\u9286\u4e1fponStatsThresholdType\u6d93\u8861\ufffd50  Temperature\u9225\u6fc7\u4fef\u6434\ufe3d\u6902\u951b\u5c7d\u5d1f\u6d63\u5d86\u69f8\u93bd\u52ec\u76ac\u6434\ufe3c\u7d1d\u934b\u5fd5\u0429\u95b2\ufffd100\u951b\u5c7e\u762e\u6fe1\u509e\u68ec\u95c4\u612f\ue195\u7f03\ue1bb\u8d1f75\u93bd\u52ec\u76ac\u6434\ufe3c\u7d1d\u7039\u70ba\u6aaf\u93c4\ufffd25\u93bd\u52ec\u76ac\u6434\ufe3d\u6f75\u6769\u6d9c\ue511\u59e3\u65c7\u7ddd\u9352\u3085\u757e\u951b\ufffd
+2\u9286\u4e1fponStatsThresholdType\u6d93\u8861\ufffd51  Voltage\u9225\u6fc7\u4fef\u6434\ufe3d\u6902\u951b\u5c7d\u5d1f\u6d63\u5d86\u69f8\u9225\u6e03enti-mv\u9225\u6fd3\u7d31
+3\u9286\u4e1fponStatsThresholdType\u6d93\u8861\ufffd52  TXPower\u9225\u6fc6\u62f0\u9225\ufffd3  RXPower\u9225\u6fc7\u6902\u951b\u5c7d\u5d1f\u6d63\u5d86\u69f8centi-dBuV "
+			::= { gponPerfStatsThresholdEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1.5
+		gponPerfStatsThresholdUpper OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION			
+" 
+\u95c3\u581d\ufffd\u6d93\u5a47\u6aba
+"
+			::= { gponPerfStatsThresholdEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1.6
+		gponPerfStatsThresholdLower OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION			
+"
+\u95c3\u581d\ufffd\u6d93\u5b2e\u6aba "
+			::= { gponPerfStatsThresholdEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.5.1.7
+		gponPerfStatsThresholdRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION			" "
+			::= { gponPerfStatsThresholdEntry 7 }
+
+
+		
+		
+-- 1.3.6.1.4.1.17409.2.8.10.6
+		curStatsGemPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF CurStatsGemPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponPerformanceStatisticObjects 6 }
+
+
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1
+		curStatsGemPortEntry OBJECT-TYPE
+			SYNTAX CurStatsGemPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { curStatsGemPortDeviceIndex, curStatsGemPortIndex }
+			::= { curStatsGemPortTable 1 }
+
+		
+		CurStatsGemPortEntry ::=
+			SEQUENCE { 
+				curStatsGemPortDeviceIndex
+					GponDeviceIndex,
+				curStatsGemPortIndex
+					INTEGER,
+				curStatsGemPortOutGemFrames
+					Counter64,
+				curStatsGemPortInGemFrames
+					Counter64,
+				curStatsGemPortOutBytes
+					Counter64,
+				curStatsGemPortInBytes
+					Counter64,
+				curStatsGemPortStatusAndAction
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1.1
+		curStatsGemPortDeviceIndex OBJECT-TYPE
+			SYNTAX GponDeviceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { curStatsGemPortEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1.2
+		curStatsGemPortIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { curStatsGemPortEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1.3
+		curStatsGemPortOutGemFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { curStatsGemPortEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1.4
+		curStatsGemPortInGemFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { curStatsGemPortEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1.5
+		curStatsGemPortOutBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { curStatsGemPortEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1.6
+		curStatsGemPortInBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { curStatsGemPortEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.6.1.7
+		curStatsGemPortStatusAndAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(1),
+				cleandata(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { curStatsGemPortEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7
+		stats15GemPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Stats15GemPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponPerformanceStatisticObjects 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1
+		stats15GemPortEntry OBJECT-TYPE
+			SYNTAX Stats15GemPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { stats15GemPortDeviceIndex, stats15GemPortIndex, stats15GemPortStatIndex }
+			::= { stats15GemPortTable 1 }
+
+		
+		Stats15GemPortEntry ::=
+			SEQUENCE { 
+				stats15GemPortDeviceIndex
+					GponDeviceIndex,
+				stats15GemPortIndex
+					INTEGER,
+				stats15GemPortStatIndex
+					GponStats15MinRecordType,
+				stats15GemPortOutGemFrames
+					Counter64,
+				stats15GemPortInGemFrames
+					Counter64,
+				stats15GemPortOutBytes
+					Counter64,
+				stats15GemPortInBytes
+					Counter64,
+				stats15GemPortStatusAndAction
+					INTEGER,
+				stats15GemPortValidityTag
+					TruthValue,
+				stats15GemPortElapsedTime
+					Counter32,
+				stats15GemPortEndTime
+					DateAndTime
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.1
+		stats15GemPortDeviceIndex OBJECT-TYPE
+			SYNTAX GponDeviceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.2
+		stats15GemPortIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.3
+		stats15GemPortStatIndex OBJECT-TYPE
+			SYNTAX GponStats15MinRecordType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.4
+		stats15GemPortOutGemFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.5
+		stats15GemPortInGemFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.6
+		stats15GemPortOutBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.7
+		stats15GemPortInBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.8
+		stats15GemPortStatusAndAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(1),
+				cleandata(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.9
+		stats15GemPortValidityTag OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.10
+		stats15GemPortElapsedTime OBJECT-TYPE
+			SYNTAX Counter32
+			UNITS "seconds"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.7.1.11
+		stats15GemPortEndTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats15GemPortEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8
+		stats24GemPortTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Stats24GemPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponPerformanceStatisticObjects 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1
+		stats24GemPortEntry OBJECT-TYPE
+			SYNTAX Stats24GemPortEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { stats24GemPortDeviceIndex, stats24GemPortIndex, stats24GemPortStatIndex }
+			::= { stats24GemPortTable 1 }
+
+		
+		Stats24GemPortEntry ::=
+			SEQUENCE { 
+				stats24GemPortDeviceIndex
+					GponDeviceIndex,
+				stats24GemPortIndex
+					INTEGER,
+				stats24GemPortStatIndex
+					GponStats24HourRecordType,
+				stats24GemPortOutGemFrames
+					Counter64,
+				stats24GemPortInGemFrames
+					Counter64,
+				stats24GemPortOutBytes
+					Counter64,
+				stats24GemPortInBytes
+					Counter64,
+				stats24GemPortStatusAndAction
+					INTEGER,
+				stats24GemPortValidityTag
+					TruthValue,
+				stats24GemPortElapsedTime
+					Counter32,
+				stats24GemPortEndTime
+					DateAndTime
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.1
+		stats24GemPortDeviceIndex OBJECT-TYPE
+			SYNTAX GponDeviceIndex
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.2
+		stats24GemPortIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.3
+		stats24GemPortStatIndex OBJECT-TYPE
+			SYNTAX GponStats24HourRecordType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.4
+		stats24GemPortOutGemFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.5
+		stats24GemPortInGemFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.6
+		stats24GemPortOutBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.7
+		stats24GemPortInBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.8
+		stats24GemPortStatusAndAction OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(1),
+				cleandata(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.9
+		stats24GemPortValidityTag OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.10
+		stats24GemPortElapsedTime OBJECT-TYPE
+			SYNTAX Counter32
+			UNITS "seconds"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.10.8.1.11
+		stats24GemPortEndTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { stats24GemPortEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.6
+		gponProfileObjects OBJECT IDENTIFIER ::= { gponTree 11 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.1
+		gponDbaProfileObjects OBJECT IDENTIFIER ::= { gponProfileObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1
+		gponDbaProfileInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponDbaProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1
+		gponDbaProfileInfoEntry OBJECT-TYPE
+			SYNTAX GponDbaProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponDbaProfileId }
+			::= { gponDbaProfileInfoTable 1 }
+
+		
+		GponDbaProfileInfoEntry ::=
+			SEQUENCE { 
+				gponDbaProfileId
+					INTEGER,
+				gponDbaProfileName
+					DisplayString,
+				gponDbaProfileType
+					INTEGER,
+				gponDbaProfileFixRate
+					INTEGER,
+				gponDbaProfileAssureRate
+					INTEGER,
+				gponDbaProfileMaxRate
+					INTEGER,
+				gponDbaProfileBindNum
+					INTEGER,
+				gponDbaProfileRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.1
+		gponDbaProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.2
+		gponDbaProfileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.3
+		gponDbaProfileType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				fix(1),
+				assure(2),
+				assureAndMax(3),
+				max(4),
+				fixAndAssureAndMax(5)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.4
+		gponDbaProfileFixRate OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "kbit/s"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.5
+		gponDbaProfileAssureRate OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "kbit/s"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.6
+		gponDbaProfileMaxRate OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "kbit/s"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.7
+		gponDbaProfileBindNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.1.1.1.8
+		gponDbaProfileRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponDbaProfileInfoEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2
+		gponLineProfileObjects OBJECT IDENTIFIER ::= { gponProfileObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1
+		gponLineProfileInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponLineProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1
+		gponLineProfileInfoEntry OBJECT-TYPE
+			SYNTAX GponLineProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponLineProfileId }
+			::= { gponLineProfileInfoTable 1 }
+
+		
+		GponLineProfileInfoEntry ::=
+			SEQUENCE { 
+				gponLineProfileId
+					INTEGER,
+				gponLineProfileName
+					DisplayString,
+				gponLineProfileUpstreamFECMode
+					INTEGER,
+				gponLineProfileMappingMode
+					INTEGER,
+				gponLineProfileTcontNum
+					INTEGER,
+				gponLineProfileGemNum
+					INTEGER,
+				gponLineProfileBindNum
+					INTEGER,
+				gponLineProfileRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.1
+		gponLineProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.2
+		gponLineProfileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.3
+		gponLineProfileUpstreamFECMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				on(1),
+				off(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			DEFVAL { off }
+			::= { gponLineProfileInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.4
+		gponLineProfileMappingMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				vlan(1),
+				priority(2),
+				vlan-priority(3),
+				port(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.5
+		gponLineProfileTcontNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileInfoEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.6
+		gponLineProfileGemNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileInfoEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.7
+		gponLineProfileBindNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileInfoEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.1.1.8
+		gponLineProfileRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileInfoEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.2
+		gponLineProfileTcontTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponLineProfileTcontEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.2.1
+		gponLineProfileTcontEntry OBJECT-TYPE
+			SYNTAX GponLineProfileTcontEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponLineProfileTcontProfileIndex, gponLineProfileTcontIndex }
+			::= { gponLineProfileTcontTable 1 }
+
+		
+		GponLineProfileTcontEntry ::=
+			SEQUENCE { 
+				gponLineProfileTcontProfileIndex
+					INTEGER,
+				gponLineProfileTcontIndex
+					INTEGER,
+				gponLineProfileTcontDbaProfileId
+					INTEGER,
+				gponLineProfileTcontRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.2.2.1.1
+		gponLineProfileTcontProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileTcontEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.2.1.2
+		gponLineProfileTcontIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileTcontEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.2.1.3
+		gponLineProfileTcontDbaProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileTcontEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.2.1.4
+		gponLineProfileTcontRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileTcontEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3
+		gponLineProfileGemTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponLineProfileGemEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1
+		gponLineProfileGemEntry OBJECT-TYPE
+			SYNTAX GponLineProfileGemEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponLineProfileGemProfileIndex, gponLineProfileGemIndex }
+			::= { gponLineProfileGemTable 1 }
+
+		
+		GponLineProfileGemEntry ::=
+			SEQUENCE { 
+				gponLineProfileGemProfileIndex
+					INTEGER,
+				gponLineProfileGemIndex
+					INTEGER,
+				gponLineProfileGemEncrypt
+					INTEGER,
+				gponLineProfileGemTcontId
+					INTEGER,
+				gponLineProfileGemQueuePri
+					INTEGER,
+				gponLineProfileGemUpCar
+					INTEGER,
+				gponLineProfileGemDownCar
+					INTEGER,
+				gponLineProfileGemMapNum
+					INTEGER,
+				gponLineProfileGemRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.1
+		gponLineProfileGemProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.2
+		gponLineProfileGemIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.3
+		gponLineProfileGemEncrypt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unconcern(0),
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.4
+		gponLineProfileGemTcontId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.5
+		gponLineProfileGemQueuePri OBJECT-TYPE
+			SYNTAX INTEGER (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			DEFVAL { 0 }
+			::= { gponLineProfileGemEntry 5 }
+
+
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.6
+		gponLineProfileGemUpCar OBJECT-TYPE
+			SYNTAX INTEGER (0 | 1..1024)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0:unconcern"
+			::= { gponLineProfileGemEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.7
+		gponLineProfileGemDownCar OBJECT-TYPE
+			SYNTAX INTEGER (0 | 1..1024)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0:unconcern"
+			::= { gponLineProfileGemEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.8
+		gponLineProfileGemMapNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.3.1.9
+		gponLineProfileGemRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4
+		gponLineProfileGemMapTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponLineProfileGemMapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1
+		gponLineProfileGemMapEntry OBJECT-TYPE
+			SYNTAX GponLineProfileGemMapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponLineProfileGemMapProfileIndex, gponLineProfileGemMapGemIndex, gponLineProfileGemMapIndex }
+			::= { gponLineProfileGemMapTable 1 }
+
+		
+		GponLineProfileGemMapEntry ::=
+			SEQUENCE { 
+				gponLineProfileGemMapProfileIndex
+					INTEGER,
+				gponLineProfileGemMapGemIndex
+					INTEGER,
+				gponLineProfileGemMapIndex
+					INTEGER,
+				gponLineProfileGemMapVlan
+					INTEGER,
+				gponLineProfileGemMapPriority
+					INTEGER,
+				gponLineProfileGemMapPortType
+					INTEGER,
+				gponLineProfileGemMapPortId
+					INTEGER,
+				gponLineProfileGemMapRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.1
+		gponLineProfileGemMapProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.2
+		gponLineProfileGemMapGemIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.3
+		gponLineProfileGemMapIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.4
+		gponLineProfileGemMapVlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.5
+		gponLineProfileGemMapPriority OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.6
+		gponLineProfileGemMapPortType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				eth(1),
+				iphost(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.7
+		gponLineProfileGemMapPortId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.2.4.1.8
+		gponLineProfileGemMapRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponLineProfileGemMapEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3
+		gponSrvProfileObjects OBJECT IDENTIFIER ::= { gponProfileObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.1
+		gponSrvProfileInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.1.1
+		gponSrvProfileInfoEntry OBJECT-TYPE
+			SYNTAX GponSrvProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfileId }
+			::= { gponSrvProfileInfoTable 1 }
+
+		
+		GponSrvProfileInfoEntry ::=
+			SEQUENCE { 
+				gponSrvProfileId
+					INTEGER,
+				gponSrvProfileName
+					DisplayString,
+				gponSrvProfileBindNum
+					INTEGER,
+				gponSrvProfileRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.1.1.1
+		gponSrvProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.1.1.2
+		gponSrvProfileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.1.1.3
+		gponSrvProfileBindNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.1.1.4
+		gponSrvProfileRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.2
+		gponSrvProfileCfgTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfileCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.2.1
+		gponSrvProfileCfgEntry OBJECT-TYPE
+			SYNTAX GponSrvProfileCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfileIndex }
+			::= { gponSrvProfileCfgTable 1 }
+
+		
+		GponSrvProfileCfgEntry ::=
+			SEQUENCE { 
+				gponSrvProfileIndex
+					INTEGER,
+				gponSrvProfileMacLearning
+					INTEGER,
+				gponSrvProfileMacAgeSeconds
+					INTEGER,
+				gponSrvProfileLoopbackDetectCheck
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.2.1.1
+		gponSrvProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileCfgEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.2.1.2
+		gponSrvProfileMacLearning OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unconcern(0),
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileCfgEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.2.1.3
+		gponSrvProfileMacAgeSeconds OBJECT-TYPE
+			SYNTAX INTEGER (-1 | 0 | 10..1000000)
+			UNITS "second"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0:unconcern;
+				-1:unlimited;
+				10-1000000:\u7039\u70ba\u6aaf\u9470\u4f78\u5bf2\u93c3\u5815\u68ff "
+			::= { gponSrvProfileCfgEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.2.1.4
+		gponSrvProfileLoopbackDetectCheck OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unconcern(0),
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileCfgEntry 4 }
+
+		
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.3
+		gponSrvProfilePortNumTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfilePortNumEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.3.1
+		gponSrvProfilePortNumEntry OBJECT-TYPE
+			SYNTAX GponSrvProfilePortNumEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfilePortNumProfileIndex }
+			::= { gponSrvProfilePortNumTable 1 }
+
+		
+		GponSrvProfilePortNumEntry ::=
+			SEQUENCE { 
+				gponSrvProfilePortNumProfileIndex
+					INTEGER,
+				gponSrvProfileEthNum
+					INTEGER,
+				gponSrvProfileCatvNum
+					INTEGER,
+				gponSrvProfileWlanNum
+					INTEGER,
+				gponSrvProfileVeipNum
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.3.1.1
+		gponSrvProfilePortNumProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortNumEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.3.1.2
+		gponSrvProfileEthNum OBJECT-TYPE
+			SYNTAX INTEGER (-1 | 0..24)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" -1:adaptive , 
+				0-24:port num"
+			::= { gponSrvProfilePortNumEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.3.1.3
+		gponSrvProfileCatvNum OBJECT-TYPE
+			SYNTAX INTEGER (-1 | 0..2)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"-1:adaptive ,	0-2:port num"
+			::= { gponSrvProfilePortNumEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.3.1.4
+		gponSrvProfileWlanNum OBJECT-TYPE
+			SYNTAX INTEGER (-1 | 0..2)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"-1:adaptive, 0-2:port num"
+			::= { gponSrvProfilePortNumEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.3.1.5
+		gponSrvProfileVeipNum OBJECT-TYPE
+			SYNTAX INTEGER (-1 | 0..8)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				" -1:adaptive , 0-8:port num"
+			::= { gponSrvProfilePortNumEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4
+		gponSrvProfileEthPortConfigTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfileEthPortConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1
+		gponSrvProfileEthPortConfigEntry OBJECT-TYPE
+			SYNTAX GponSrvProfileEthPortConfigEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfileEthPortProfileIndex, gponSrvProfileEthPortIdIndex }
+			::= { gponSrvProfileEthPortConfigTable 1 }
+
+		
+		GponSrvProfileEthPortConfigEntry ::=
+			SEQUENCE { 
+				gponSrvProfileEthPortProfileIndex
+					INTEGER,
+				gponSrvProfileEthPortIdIndex
+					INTEGER,
+				gponSrvProfileEthPortMacLimited
+					INTEGER,
+				gponSrvProfileEthPortMtu
+					INTEGER,
+				gponSrvProfileEthPortFlowCtrl
+					INTEGER,
+				gponSrvProfileEthPortInTrafficProfileId
+					INTEGER,
+				gponSrvProfileEthPortOutTrafficProfileId
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1.1
+		gponSrvProfileEthPortProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileEthPortConfigEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1.2
+		gponSrvProfileEthPortIdIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileEthPortConfigEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1.3
+		gponSrvProfileEthPortMacLimited OBJECT-TYPE
+			SYNTAX INTEGER (-1 | 0..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"-1:unconcern,
+				 0:unlimited"
+			::= { gponSrvProfileEthPortConfigEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1.4
+		gponSrvProfileEthPortMtu OBJECT-TYPE
+			SYNTAX INTEGER (0 | 1518..2000)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0:unconcern"
+			::= { gponSrvProfileEthPortConfigEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1.5
+		gponSrvProfileEthPortFlowCtrl OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unconcern(0),
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfileEthPortConfigEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1.6
+		gponSrvProfileEthPortInTrafficProfileId OBJECT-TYPE
+			SYNTAX INTEGER (0..1024)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0:unconcern"
+			::= { gponSrvProfileEthPortConfigEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.4.1.7
+		gponSrvProfileEthPortOutTrafficProfileId OBJECT-TYPE
+			SYNTAX INTEGER (0..1024)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0:unconcern"
+			::= { gponSrvProfileEthPortConfigEntry 7 }
+		
+				
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5
+		gponSrvProfilePortVlanObjects OBJECT IDENTIFIER ::= { gponSrvProfileObjects 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1
+		gponSrvProfilePortVlanCfgTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfilePortVlanCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1.1
+		gponSrvProfilePortVlanCfgEntry OBJECT-TYPE
+			SYNTAX GponSrvProfilePortVlanCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfilePortVlanProfileIndex, gponSrvProfilePortVlanPortTypeIndex, gponSrvProfilePortVlanPortIdIndex }
+			::= { gponSrvProfilePortVlanCfgTable 1 }
+
+		
+		GponSrvProfilePortVlanCfgEntry ::=
+			SEQUENCE { 
+				gponSrvProfilePortVlanProfileIndex
+					INTEGER,
+				gponSrvProfilePortVlanPortTypeIndex
+					INTEGER,
+				gponSrvProfilePortVlanPortIdIndex
+					INTEGER,
+				gponSrvProfilePortVlanPvid
+					INTEGER,
+				gponSrvProfilePortVlanPvidPri
+					INTEGER,
+				gponSrvProfilePortVlanMode
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1.1.1
+		gponSrvProfilePortVlanProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanCfgEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1.1.2
+		gponSrvProfilePortVlanPortTypeIndex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				eth(0),
+				wlan(1),
+				catv(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanCfgEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1.1.3
+		gponSrvProfilePortVlanPortIdIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanCfgEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1.1.4
+		gponSrvProfilePortVlanPvid OBJECT-TYPE
+			SYNTAX INTEGER (0..4094)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"0:unconcern"
+			::= { gponSrvProfilePortVlanCfgEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1.1.5
+		gponSrvProfilePortVlanPvidPri OBJECT-TYPE
+			SYNTAX INTEGER (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanCfgEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.1.1.6
+		gponSrvProfilePortVlanMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				transparent(0),
+				tag(1),
+				translate(2),
+				aggregation(3),
+				trunk(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanCfgEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2
+		gponSrvProfilePortVlanTranslationTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfilePortVlanTranslationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2.1
+		gponSrvProfilePortVlanTranslationEntry OBJECT-TYPE
+			SYNTAX GponSrvProfilePortVlanTranslationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfilePortVlanTransProfileIndex, gponSrvProfilePortVlanTransPortTypeIndex, gponSrvProfilePortVlanTransPortIdIndex, gponSrvProfilePortVlanTransVlanIndex }
+			::= { gponSrvProfilePortVlanTranslationTable 1 }
+
+		
+		GponSrvProfilePortVlanTranslationEntry ::=
+			SEQUENCE { 
+				gponSrvProfilePortVlanTransProfileIndex
+					INTEGER,
+				gponSrvProfilePortVlanTransPortTypeIndex
+					INTEGER,
+				gponSrvProfilePortVlanTransPortIdIndex
+					INTEGER,
+				gponSrvProfilePortVlanTransVlanIndex
+					INTEGER,
+				gponSrvProfilePortVlanTransNewVlan
+					INTEGER,
+				gponSrvProfilePortVlanTransRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2.1.1
+		gponSrvProfilePortVlanTransProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTranslationEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2.1.2
+		gponSrvProfilePortVlanTransPortTypeIndex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				eth(0),
+				wlan(1),
+				catv(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTranslationEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2.1.3
+		gponSrvProfilePortVlanTransPortIdIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTranslationEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2.1.4
+		gponSrvProfilePortVlanTransVlanIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTranslationEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2.1.5
+		gponSrvProfilePortVlanTransNewVlan OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTranslationEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.2.1.6
+		gponSrvProfilePortVlanTransRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTranslationEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3
+		gponSrvProfilePortVlanAggregationTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfilePortVlanAggregationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3.1
+		gponSrvProfilePortVlanAggregationEntry OBJECT-TYPE
+			SYNTAX GponSrvProfilePortVlanAggregationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfilePortVlanAggrProfileIndex, gponSrvProfilePortVlanAggrPortTypeIndex, gponSrvProfilePortVlanAggrPortIdIndex, gponSrvProfilePortVlanAggrVlanIndex }
+			::= { gponSrvProfilePortVlanAggregationTable 1 }
+
+		
+		GponSrvProfilePortVlanAggregationEntry ::=
+			SEQUENCE { 
+				gponSrvProfilePortVlanAggrProfileIndex
+					INTEGER,
+				gponSrvProfilePortVlanAggrPortTypeIndex
+					INTEGER,
+				gponSrvProfilePortVlanAggrPortIdIndex
+					INTEGER,
+				gponSrvProfilePortVlanAggrVlanIndex
+					INTEGER,
+				gponSrvProfilePortVlanAggrVlanList
+					OCTET STRING,
+				gponSrvProfilePortVlanAggrRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3.1.1
+		gponSrvProfilePortVlanAggrProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanAggregationEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3.1.2
+		gponSrvProfilePortVlanAggrPortTypeIndex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				eth(0),
+				wlan(1),
+				catv(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanAggregationEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3.1.3
+		gponSrvProfilePortVlanAggrPortIdIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanAggregationEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3.1.4
+		gponSrvProfilePortVlanAggrVlanIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanAggregationEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3.1.5
+		gponSrvProfilePortVlanAggrVlanList OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (16))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"max num of vlan is 8, two bytes is one vlan."
+			::= { gponSrvProfilePortVlanAggregationEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.3.1.6
+		gponSrvProfilePortVlanAggrRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanAggregationEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.4
+		gponSrvProfilePortVlanTrunkTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponSrvProfilePortVlanTrunkEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.4.1
+		gponSrvProfilePortVlanTrunkEntry OBJECT-TYPE
+			SYNTAX GponSrvProfilePortVlanTrunkEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gponSrvProfilePortVlanTrunkProfileIndex, gponSrvProfilePortVlanTrunkPortTypeIndex, gponSrvProfilePortVlanTrunkPortIdIndex }
+			::= { gponSrvProfilePortVlanTrunkTable 1 }
+
+		
+		GponSrvProfilePortVlanTrunkEntry ::=
+			SEQUENCE { 
+				gponSrvProfilePortVlanTrunkProfileIndex
+					INTEGER,
+				gponSrvProfilePortVlanTrunkPortTypeIndex
+					INTEGER,
+				gponSrvProfilePortVlanTrunkPortIdIndex
+					INTEGER,
+				gponSrvProfilePortVlanTrunkVlanList
+					OCTET STRING,
+				gponSrvProfilePortVlanTrunkRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.4.1.1
+		gponSrvProfilePortVlanTrunkProfileIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTrunkEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.4.1.2
+		gponSrvProfilePortVlanTrunkPortTypeIndex OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				eth(0),
+				wlan(1),
+				catv(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTrunkEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.4.1.3
+		gponSrvProfilePortVlanTrunkPortIdIndex OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTrunkEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.4.1.4
+		gponSrvProfilePortVlanTrunkVlanList OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (16))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"max num of vlan is 8, two bytes is one vlan."
+			::= { gponSrvProfilePortVlanTrunkEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.3.5.4.1.5
+		gponSrvProfilePortVlanTrunkRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponSrvProfilePortVlanTrunkEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4
+		gponTrafficProfileObjects OBJECT IDENTIFIER ::= { gponProfileObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1
+		gponTrafficProfileInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GponTrafficProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1
+		gponTrafficProfileInfoEntry OBJECT-TYPE
+			SYNTAX GponTrafficProfileInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"cir/pir/cbs/pbs must config at the same time."
+			INDEX { gponTrafficProfileId }
+			::= { gponTrafficProfileInfoTable 1 }
+
+		
+		GponTrafficProfileInfoEntry ::=
+			SEQUENCE { 
+				gponTrafficProfileId
+					INTEGER,
+				gponTrafficProfileName
+					DisplayString,
+				gponTrafficProfileCfgCir
+					INTEGER,
+				gponTrafficProfileCfgPir
+					INTEGER,
+				gponTrafficProfileCfgCbs
+					INTEGER,
+				gponTrafficProfileCfgPbs
+					INTEGER,
+				gponTrafficProfileCfgPriority
+					INTEGER,
+				gponTrafficProfileBindNum
+					INTEGER,
+				gponTrafficProfileRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.1
+		gponTrafficProfileId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.2
+		gponTrafficProfileName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.3
+		gponTrafficProfileCfgCir OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "kbit/s"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.4
+		gponTrafficProfileCfgPir OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "kbit/s"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.5
+		gponTrafficProfileCfgCbs OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "byte"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.6
+		gponTrafficProfileCfgPbs OBJECT-TYPE
+			SYNTAX INTEGER
+			UNITS "byte"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.7
+		gponTrafficProfileCfgPriority OBJECT-TYPE
+			SYNTAX INTEGER (0..7)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.8
+		gponTrafficProfileBindNum OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.17409.2.8.11.4.1.1.9
+		gponTrafficProfileRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { gponTrafficProfileInfoEntry 9 }
+	END

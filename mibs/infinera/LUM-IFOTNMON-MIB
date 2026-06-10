@@ -1,0 +1,1860 @@
+LUM-IFOTNMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime
+        FROM SNMPv2-TC
+    lumModules, lumIfOtnMonMIB
+        FROM LUM-REG
+    SignalStatusWithNA, FaultStatusWithNA, DisplayStringWithNA, MgmtNameString,
+    Unsigned32WithNA, TruthValueWithNA, TcmMode, TcmNumber, OtnTIMDetModeWithNA,
+    EnabledDisabledWithNA, OtnAlarmMode, OtnTypeWithNA, OtnDirectionWithNA
+        FROM LUM-TC;
+
+lumIfOtnMonMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201706220000Z" -- June 22nd 2017
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The MIB module for management of OTN monitor objects (SM, TCM, PM
+    and trace objects).
+
+        This module describes the SM, TCM and PM in ITU-T Recommendation
+        G.709.
+
+    The references refers to the following:
+    G.709/Y.1331 (03/2003)
+    G.798 (06/2004)
+    G.806 (03/2006)
+
+        The tables contained in this MIB are:
+
+        (1) The General group contains some general attributes as time stamps
+            and tables sizes.
+
+        (2) The sm group contains information and configuration for the SM
+	    section objects.
+
+        (3) The tandem connection monitoring (tcm) group contains information
+            and configuration for the Tcm layer objects.
+
+        (4) The path monitoring (pm) group contains information and configu-
+            ration for the Pm layer objects.
+
+        (5) The trace group contains information and configuration for the
+            trace objects defined in G.709.
+
+"
+    REVISION
+        "201706220000Z" -- June 22nd 2017
+    DESCRIPTION
+         "Changes made for release r29.0:
+          - Enabled SNMP-write for operator specific transmitted mon-trace.
+          - Corrected SNMP Mon-trace values when N/A.
+          - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+        - Added tp100gotnii board."
+   REVISION
+        "201611040000Z" -- November 4th 2016
+    DESCRIPTION
+        "Changes made for patch release r27.0.3:
+        - Enabled Read-Write to Loopback and TTI attributes via SNMP."
+    REVISION
+        "201505290000Z" -- May 29th 2015
+    DESCRIPTION
+        "Changes made for release r25:
+        - "
+    REVISION
+        "201409300000Z" -- September 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+        - Added mxp100gotn board."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Added TcmSwitchCriteria object.
+        - Changed board name from tp10gotn to tphex10gotn."
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Added tp10gotn, tp100gotn board."
+    REVISION
+        "201305010000Z" -- May 1st 2013
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 55 }
+
+
+-- ----------------------------------------------------
+-- Compliance area, containing groups and compliance
+-- specifications.
+-- ----------------------------------------------------
+
+lumIfOtnMonConfs OBJECT IDENTIFIER ::= { lumIfOtnMonMIB 1 }
+lumIfOtnMonGroups OBJECT IDENTIFIER ::= { lumIfOtnMonConfs 1 }
+lumIfOtnMonCompl OBJECT IDENTIFIER ::= { lumIfOtnMonConfs 2 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the IFOTN MIB
+-- ----------------------------------------------------
+
+lumIfOtnMonMIBObjects OBJECT IDENTIFIER ::= { lumIfOtnMonMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+ifOtnMonGeneral OBJECT IDENTIFIER ::= { lumIfOtnMonMIBObjects 1 }
+ifOtnMonSmList OBJECT IDENTIFIER ::= { lumIfOtnMonMIBObjects 2 }
+ifOtnMonTcmList OBJECT IDENTIFIER ::= { lumIfOtnMonMIBObjects 3 }
+ifOtnMonPmList OBJECT IDENTIFIER ::= { lumIfOtnMonMIBObjects 4 }
+ifOtnMonTraceList OBJECT IDENTIFIER ::= { lumIfOtnMonMIBObjects 5 }
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+ifOtnMonGeneralConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB was
+        last changed.
+
+"
+    ::= { ifOtnMonGeneral 1 }
+
+ifOtnMonGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state of the MIB was last
+        changed.
+
+"
+    ::= { ifOtnMonGeneral 2 }
+
+ifOtnMonGeneralIfOtnMonSmTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of SM table.
+
+"
+    ::= { ifOtnMonGeneral 3 }
+
+ifOtnMonGeneralIfOtnMonSmConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnMonGeneral 4 }
+
+ifOtnMonGeneralIfOtnMonSmStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the
+       table was last changed.
+
+"
+   ::= { ifOtnMonGeneral 5 }
+
+ifOtnMonGeneralIfOtnMonTcmTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of otn tcm table
+
+"
+    ::= { ifOtnMonGeneral 6 }
+
+ifOtnMonGeneralIfOtnMonTcmConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnMonGeneral 7 }
+
+ifOtnMonGeneralIfOtnMonTcmStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the
+       table was last changed.
+
+"
+   ::= { ifOtnMonGeneral 8 }
+
+ifOtnMonGeneralIfOtnMonPmTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of otn pm table
+
+"
+    ::= { ifOtnMonGeneral 9 }
+
+ifOtnMonGeneralIfOtnMonPmConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnMonGeneral 10 }
+
+ifOtnMonGeneralIfOtnMonPmStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the
+       table was last changed.
+
+"
+   ::= { ifOtnMonGeneral 11 }
+
+ifOtnMonGeneralIfOtnMonTraceTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of otn trace table
+
+"
+    ::= { ifOtnMonGeneral 12 }
+
+ifOtnMonGeneralIfOtnMonTraceConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifOtnMonGeneral 13 }
+
+ifOtnMonGeneralIfOtnMonTraceStateLastChangeTime OBJECT-TYPE
+   SYNTAX      DateAndTime
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The time when the state and/or configuration of the table
+       was last changed.
+
+"
+   ::= { ifOtnMonGeneral 14 }
+
+-- ----------------------------------------------------
+-- SM group
+-- ----------------------------------------------------
+
+ifOtnMonSmTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnMonSmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The SM group contains information and configuration for
+	the SM section objects."
+
+    ::= { ifOtnMonSmList 1 }
+
+ifOtnMonSmEntry OBJECT-TYPE
+    SYNTAX      IfOtnMonSmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtnMon SM list.
+
+"
+    INDEX { ifOtnMonSmIndex }
+    ::= { ifOtnMonSmTable 1 }
+
+IfOtnMonSmEntry ::=
+    SEQUENCE {
+        ifOtnMonSmIndex                               Unsigned32,
+        ifOtnMonSmName                                MgmtNameString,
+        ifOtnMonSmConnIfBasicIfIndex                  Unsigned32WithNA,
+        ifOtnMonSmTxSignalStatus                      SignalStatusWithNA,
+        ifOtnMonSmRxSignalStatus                      SignalStatusWithNA,
+        ifOtnMonSmBackwardDefectIndication            FaultStatusWithNA,
+        ifOtnMonSmIncomingAlignmentError              FaultStatusWithNA,
+        ifOtnMonSmBackwardIncomingAlignmentError      FaultStatusWithNA }
+
+ifOtnMonSmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnMonSmEntry 1 }
+
+ifOtnMonSmName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the otn otu, for example 'otu:1:2:1-2',
+        where the first number indicates subrack, the second slot
+        number and the third/fourth are the physical port numbers.
+
+"
+    ::= { ifOtnMonSmEntry 2 }
+
+ifOtnMonSmConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifBasicIf table
+        this object is related.
+
+"
+    ::= { ifOtnMonSmEntry 3 }
+
+ifOtnMonSmTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonSmEntry 4 }
+
+ifOtnMonSmRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonSmEntry 5 }
+
+ifOtnMonSmBackwardDefectIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Backward defect indication (BDI).
+
+         Indicates if backward defect indication (BDI) alarm
+         exists or not.
+
+         Reference: 15.7.2.1.3 G.709, 6.2.6.6.1 G.798
+
+        alarm: Backward defect indication (in wrapper) active.
+
+        ok: Backward defect indication (in wrapper) inactive.
+
+"
+    ::= { ifOtnMonSmEntry 6 }
+
+ifOtnMonSmIncomingAlignmentError OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Incoming alignment error (IAE).
+
+        Indicates an incoming frame alignment error.
+
+        Reference: 15.7.2.1.5 G.709, 6.2.6.10.1 G.798
+
+        A: Incoming frame alignment error (IAE) is active.
+
+        D: IAE is inactive.
+
+"
+    ::= { ifOtnMonSmEntry 7 }
+
+ifOtnMonSmBackwardIncomingAlignmentError OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Backward incoming alignment error (BIAE).
+
+        Indicates a backward incoming alignment error.
+
+        Reference: 15.7.2.1.5 G.709, 6.2.6.10.1 G.798
+
+        A: Backward incoming alignment error (BIAE) is active.
+
+        D: BIAE is inactive.
+
+"
+    ::= { ifOtnMonSmEntry 8 }
+
+-- ----------------------------------------------------
+-- Otn tcm group
+-- ----------------------------------------------------
+
+ifOtnMonTcmTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnMonTcmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tandem connection monitoring (tcm) group contains information
+         and configuration for the Tcm layer objects."
+
+    ::= { ifOtnMonTcmList 1 }
+
+ifOtnMonTcmEntry OBJECT-TYPE
+    SYNTAX      IfOtnMonTcmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtnMon tcm list.
+
+"
+    INDEX { ifOtnMonTcmIndex }
+    ::= { ifOtnMonTcmTable 1 }
+
+IfOtnMonTcmEntry ::=
+    SEQUENCE {
+        ifOtnMonTcmIndex                          Unsigned32,
+        ifOtnMonTcmName                           MgmtNameString,
+        ifOtnMonTcmConnOduIndex                   Unsigned32WithNA,
+        ifOtnMonTcmAlarmMode                      OtnAlarmMode,
+        ifOtnMonTcmMode                           TcmMode,
+        ifOtnMonTcmTcmNumber                      TcmNumber,
+        ifOtnMonTcmTxSignalStatus                 SignalStatusWithNA,
+        ifOtnMonTcmRxSignalStatus                 SignalStatusWithNA,
+        ifOtnMonTcmBackwardDefectIndication       FaultStatusWithNA,
+        ifOtnMonTcmBackwardIncomingAlignmentError FaultStatusWithNA,
+        ifOtnMonTcmRxAlarmIndicationSignal        FaultStatusWithNA,
+        ifOtnMonTcmRxOpenConnectionIndication     FaultStatusWithNA,
+        ifOtnMonTcmRxLockedDefectIndication       FaultStatusWithNA,
+        ifOtnMonTcmLossOfTandemConnection         FaultStatusWithNA,
+        ifOtnMonTcmIncomingAlignmentError         FaultStatusWithNA,
+        ifOtnMonTcmSwitchCriteria                 EnabledDisabledWithNA}
+
+ifOtnMonTcmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnMonTcmEntry 1 }
+
+ifOtnMonTcmName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the otn tcm, for example 'tcm:1:2:1-2:1',
+        where the first number indicates subrack, the second slot
+        number and the third/fourth are the physical port numbers. The
+        last number tells which TCM in the ODU header it is.
+
+"
+    ::= { ifOtnMonTcmEntry 2 }
+
+ifOtnMonTcmConnOduIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifOtnMonOdu table
+        this object is related.
+
+"
+    ::= { ifOtnMonTcmEntry 3 }
+
+ifOtnMonTcmAlarmMode OBJECT-TYPE
+    SYNTAX      OtnAlarmMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tells how section specific alarms are handled.
+
+        ignore - Do not show fault status nor alarms for
+                 non-operational sections.
+
+        display - Show fault status, but do not generate
+                  alarms for non-operational sections.
+
+        alarm - Show fault status and generate alarms also
+                for non-operational sections.
+
+"
+    DEFVAL { ignore }
+    ::= { ifOtnMonTcmEntry 4 }
+
+ifOtnMonTcmMode OBJECT-TYPE
+    SYNTAX      TcmMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TCM mode sets the mode of the TCM according to 14.5 in
+         G.798 (06/2004).
+
+        operational - The TCM overhead is operational.
+
+        transparent - The TCM overhead is transparent.
+
+        monitor     - If TCM overhead is transparent but
+                      consequent actions will be executed
+                      in sink adaption.
+
+"
+    DEFVAL { transparent }
+    ::= { ifOtnMonTcmEntry 5 }
+
+ifOtnMonTcmTcmNumber OBJECT-TYPE
+    SYNTAX      TcmNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TCM number in ODU overhead. Can be tcm1 .. tcm6.
+
+"
+    DEFVAL { tcm1 }
+    ::= { ifOtnMonTcmEntry 6 }
+
+ifOtnMonTcmTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonTcmEntry 7 }
+
+ifOtnMonTcmRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonTcmEntry 8 }
+
+ifOtnMonTcmBackwardDefectIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Backward defect indication (BDI).
+
+         Indicates if backward defect indication (BDI) alarm
+         exists or not.
+
+         Reference: 15.8.2.2.3 G.709, 2.6.6.1 G.798
+
+        alarm: Backward defect indication (in wrapper) active.
+
+        ok: Backward defect indication (in wrapper) inactive.
+
+"
+    ::= { ifOtnMonTcmEntry 9 }
+
+ifOtnMonTcmBackwardIncomingAlignmentError OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Backward incoming alignment error (BIAE).
+
+        Indicates a backward incoming alignment error.
+
+        A: Backward incoming alignment error (BIAE) is active.
+
+        D: BIAE is inactive.
+
+"
+    ::= { ifOtnMonTcmEntry 10 }
+
+ifOtnMonTcmRxAlarmIndicationSignal OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Alarm indication signal (AIS).
+
+        Indicates if alarm indication signal (AIS) alarm
+        exists or not in receiving direction.
+
+        Reference: 16.5.1 G.709, 15.8.2.1.5 G.709, 6.2.6.3.2 G.798
+
+        alarm: An AIS in OTU signal is detected.
+
+        ok: AIS inactive.
+
+"
+    ::= { ifOtnMonTcmEntry 11 }
+
+ifOtnMonTcmRxOpenConnectionIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Open connection indication (OCI).
+
+        Indicates if an open connection indication (OCI) alarm
+        exists or not in receiving direction.
+
+        Reference: 15.8.2.2.5 G.709, 6.2.6.8.2 G.798
+
+        alarm: An 'open connection' in OTU signal is detected.
+
+        ok: OCI inactive.
+
+"
+    ::= { ifOtnMonTcmEntry 12 }
+
+ifOtnMonTcmRxLockedDefectIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Locked defect indication (LCK).
+
+        Indicates if locked defect indication alarm exists or not.
+
+        Reference: 15.8.2.2.5 G.709, 6.2.6.9.1 G.798
+
+        alarm: Locked defect indication active.
+
+        ok: Locked defect indication inactive.
+
+"
+    ::= { ifOtnMonTcmEntry 13 }
+
+ifOtnMonTcmLossOfTandemConnection OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loss of tandem connection (LTC).
+
+         No operational tandem connection
+         is found in other end.
+
+         Reference: 6.2.1.4 in G.798
+
+        alarm: No other operational TCM is found.
+
+        ok: An operation TCM is found.
+
+"
+    ::= { ifOtnMonTcmEntry 14 }
+
+ifOtnMonTcmIncomingAlignmentError OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Incoming alignment error (IAE).
+
+        Indicates an incoming frame alignment error when TCM is in use.
+
+        A: Incoming frame alignment error (IAE) is active.
+
+        D: IAE is inactive.
+
+        Reference: 14 in G.798
+
+"
+    ::= { ifOtnMonTcmEntry 15 }
+
+ifOtnMonTcmSwitchCriteria OBJECT-TYPE
+    SYNTAX      EnabledDisabledWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TCM switch criteria  set current TCM as protection switch criteria.
+
+        disable - The TCM is not set as switch criteria.
+
+        enable  - The TCM is set as switch criteria.
+
+"
+    DEFVAL { disabled }
+    ::= { ifOtnMonTcmEntry 16}
+
+-- ----------------------------------------------------
+-- Otn pm group
+-- ----------------------------------------------------
+
+ifOtnMonPmTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnMonPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The path monitoring (pm) group contains information and configu-
+         ration for the Pm layer objects."
+
+    ::= { ifOtnMonPmList 1 }
+
+ifOtnMonPmEntry OBJECT-TYPE
+    SYNTAX      IfOtnMonPmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtnMon pm list.
+
+"
+    INDEX { ifOtnMonPmIndex }
+    ::= { ifOtnMonPmTable 1 }
+
+IfOtnMonPmEntry ::=
+    SEQUENCE {
+        ifOtnMonPmIndex                        Unsigned32,
+        ifOtnMonPmName                         MgmtNameString,
+        ifOtnMonPmConnOduIndex                 Unsigned32WithNA,
+        ifOtnMonPmAlarmMode                    OtnAlarmMode,
+        ifOtnMonPmTxSignalStatus               SignalStatusWithNA,
+        ifOtnMonPmRxSignalStatus               SignalStatusWithNA,
+        ifOtnMonPmRxBackwardDefectIndication   FaultStatusWithNA,
+        ifOtnMonPmRxAlarmIndicationSignal      FaultStatusWithNA,
+        ifOtnMonPmRxOpenConnectionIndication   FaultStatusWithNA,
+        ifOtnMonPmRxLockedDefectIndication     FaultStatusWithNA,
+        ifOtnMonPmTxBackwardDefectIndication   FaultStatusWithNA,
+        ifOtnMonPmTxAlarmIndicationSignal      FaultStatusWithNA,
+        ifOtnMonPmTxOpenConnectionIndication   FaultStatusWithNA,
+        ifOtnMonPmTxLockedDefectIndication     FaultStatusWithNA,
+        ifOtnMonPmUpPortId                     Integer32 }
+
+ifOtnMonPmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnMonPmEntry 1 }
+
+ifOtnMonPmName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the otn pm, for example 'pm:1:2:1-2:1',
+        where the first number indicates subrack, the second slot
+        number and the third/fourth are the physical port numbers. The
+	last number tells in which of the ODU the PM is located.
+
+"
+    ::= { ifOtnMonPmEntry 2 }
+
+ifOtnMonPmConnOduIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifOtnMonOdu table
+        this object is related.
+
+"
+    ::= { ifOtnMonPmEntry 4 }
+
+ifOtnMonPmAlarmMode OBJECT-TYPE
+    SYNTAX      OtnAlarmMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tells how section specific alarms are handled.
+
+         ignore - Do not show fault status nor alarms for non-operational sections.
+
+         display - Show fault status, but do not generate alarms for non-operational sections.
+
+         alarm - Show fault status and generate alarms also for non-operational sections.
+
+"
+    DEFVAL { alarm }
+    ::= { ifOtnMonPmEntry 5 }
+
+ifOtnMonPmTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonPmEntry 6 }
+
+ifOtnMonPmRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonPmEntry 7 }
+
+ifOtnMonPmRxBackwardDefectIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Backward defect indication (BDI),
+
+         Monitored overhead: ODUk-PM-BDI
+
+         Direction: Received from the associated physical interface
+         and, unless the ODUk is terminated, the BDI is sent  towards
+         the board-internal G.805 Matrix.
+
+         Reference: 15.7.2.1.3 G.709, 6.2.6.6.1 G.798
+
+        Values:
+        alarm: The ODUk-PM-BDI overhead is declared as active according to
+               the G.798 processing rules
+
+        ok: The ODUk-PM-BDI overhead is declared as inactive according to
+            the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 8 }
+
+ifOtnMonPmRxAlarmIndicationSignal OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Alarm indication signal (AIS),
+
+         Monitored overhead: ODUk-PM-AIS
+
+         Direction: Received from the associated physical interface
+         and, unless the ODUk is terminated, the AIS is sent  towards
+         the board-internal G.805 Matrix.
+
+         Reference: 16.5.1 G.709, 15.8.2.2.5 G.709, 6.2.3.2 G.798
+
+        Values:
+        alarm: The ODUk-PM-AIS overhead is declared as active according to
+               the G.798 processing rules
+
+        ok: The ODUk-PM-AIS overhead is declared as inactive according to
+            the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 9 }
+
+ifOtnMonPmRxOpenConnectionIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Open connection indication (OCI).
+
+         Monitored overhead: ODUk-PM-OCI
+
+         Direction: Received from the associated physical interface
+         and, unless the ODUk is terminated, the OCI is sent  towards
+         the board-internal G.805 Matrix.
+
+         Reference: 15.8.2.2.5 G.709, 6.2.6.8.2 G.798
+
+        Values:
+        alarm: The ODUk-PM-OCI overhead is declared as active according to
+               the G.798 processing rules
+
+        ok: The ODUk-PM-OCI overhead is declared as inactive according to
+            the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 10 }
+
+ifOtnMonPmRxLockedDefectIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Locked defect indication (LCK).
+
+         Monitored overhead: ODUk-PM-LCK
+
+         Direction: Received from the associated physical interface
+         and, unless the ODUk is terminated, the LCK is sent  towards
+         the board-internal G.805 Matrix.
+
+         Reference: 15.8.2.2.5 G.709, 6.2.6.9.1 G.798
+
+        Values:
+        alarm: The ODUk-PM-LCK overhead is declared as active according to
+               the G.798 processing rules
+
+        ok: The ODUk-PM-LCK overhead is declared as inactive according to
+            the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 11 }
+
+ifOtnMonPmTxBackwardDefectIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Backward defect indication (BDI).
+
+         Monitored overhead: ODUk-PM-BDI
+
+         Direction: Received from the board-internal G.805 Matrix and,
+         if applicable, sent towards the physical interface.
+
+         Reference: 15.7.2.1.3 G.709, 6.2.6.6.1 G.798
+
+        Values:
+        alarm: The ODUk-PM-BDI overhead is declared as active according to
+               the G.798 processing rules
+
+        ok: The ODUk-PM-BDI overhead is declared as inactive according to
+            the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 12 }
+
+ifOtnMonPmTxAlarmIndicationSignal OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Alarm indication signal (AIS).
+
+         Monitored overhead: ODUk-PM-AIS
+
+         Direction: Received from the board-internal G.805 Matrix
+         and, if applicable, sent towards the physical interface.
+
+         Reference: 16.5.1 G.709, 15.8.2.2.5 G.709, 6.2.3.2 G.798
+
+        Values:
+        alarm: The ODUk-PM-AIS overhead is declared as active according
+               to the G.798 processing rules
+
+        ok: The ODUk-PM-AIS overhead is declared as inactive according
+            to the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 13 }
+
+ifOtnMonPmTxOpenConnectionIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Open connection indication (OCI).
+
+         Monitored overhead: ODUk-PM-AIS
+
+         Direction: Received from the board-internal G.805 Matrix
+         and, if applicable, sent towards the physical interface.
+
+         Reference: 15.8.2.2.5 G.709, 6.2.6.8.2 G.798
+
+        Values:
+        alarm: The ODUk-PM-OCI overhead is declared as active
+               according to the G.798 processing rules
+
+        ok: The ODUk-PM-OCI overhead is declared as inactive
+            according to the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 14 }
+
+ifOtnMonPmTxLockedDefectIndication OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tx Locked Defect Indication (LCK).
+
+         Monitored overhead: ODUk-PM-LCK
+
+         Direction: Received from the board-internal G.805 Matrix
+         and, if applicable, sent towards the physical interface.
+
+         Reference: 15.8.2.2.5 G.709, 6.2.6.9.1 G.798
+
+        Values:
+        alarm: The ODUk-PM-LCK overhead is declared as active
+               according to the G.798 processing rules
+
+        ok: The ODUk-PM-LCK overhead is declared as inactive
+            according to the G.798 processing rules
+
+"
+    ::= { ifOtnMonPmEntry 15 }
+
+ifOtnMonPmUpPortId OBJECT-TYPE
+        SYNTAX      Integer32   (-1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Internal port reference for traffic unit.
+"
+        DEFVAL { -1  }
+    ::= { ifOtnMonPmEntry 16 }
+
+-- ----------------------------------------------------
+-- Otn trace group
+-- ----------------------------------------------------
+
+ifOtnMonTraceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfOtnMonTraceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The trace group contains information and configuration for the
+         trace objects defined in G.709."
+
+    ::= { ifOtnMonTraceList 1 }
+
+ifOtnMonTraceEntry OBJECT-TYPE
+    SYNTAX      IfOtnMonTraceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifOtnMon trace list.
+
+"
+    INDEX { ifOtnMonTraceIndex }
+    ::= { ifOtnMonTraceTable 1 }
+
+IfOtnMonTraceEntry ::=
+    SEQUENCE {
+        ifOtnMonTraceIndex                         Unsigned32,
+        ifOtnMonTraceName                          MgmtNameString,
+        ifOtnMonTraceConnOtnType                   OtnTypeWithNA,
+        ifOtnMonTraceConnOtnIndex                  Unsigned32WithNA,
+        ifOtnMonTraceSapiTraceTransmitted          DisplayStringWithNA,
+        ifOtnMonTraceSapiTraceReceivedByte0        Unsigned32WithNA,
+        ifOtnMonTraceSapiTraceReceived             DisplayStringWithNA,
+        ifOtnMonTraceSapiTraceExpected             DisplayStringWithNA,
+        ifOtnMonTraceDapiTraceTransmitted          DisplayStringWithNA,
+        ifOtnMonTraceDapiTraceReceivedByte0        Unsigned32WithNA,
+        ifOtnMonTraceDapiTraceReceived             DisplayStringWithNA,
+        ifOtnMonTraceDapiTraceExpected             DisplayStringWithNA,
+        ifOtnMonTraceOpSpecificTraceTransmitted    DisplayStringWithNA,
+        ifOtnMonTraceOpSpecificTraceReceived       DisplayStringWithNA,
+        ifOtnMonTraceTraceIdMMDetectionMode        OtnTIMDetModeWithNA,
+        ifOtnMonTraceTraceAlarmMode                EnabledDisabledWithNA,
+        ifOtnMonTraceTIMConsequenceActionsDisabled TruthValueWithNA,
+        ifOtnMonTraceTxSignalStatus                SignalStatusWithNA,
+        ifOtnMonTraceRxSignalStatus                SignalStatusWithNA,
+        ifOtnMonTraceTraceMismatch                 FaultStatusWithNA,
+        ifOtnMonTraceConnOtnDirection              OtnDirectionWithNA,
+        ifOtnMonTraceUpPortId                      Integer32 }
+
+ifOtnMonTraceIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifOtnMonTraceEntry 1 }
+
+ifOtnMonTraceName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The management name of the OTN trace, for example 'clientSmTrace:1:2:1-2',
+        where the first number indicates subrack, the second slot
+        number and the third/fourth are the physical port numbers.
+
+"
+    ::= { ifOtnMonTraceEntry 2 }
+
+ifOtnMonTraceConnOtnType OBJECT-TYPE
+    SYNTAX      OtnTypeWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "What type of monitoring object the trace is related to.
+
+        sm  - Section monitoring (SM).
+
+        pm  - Path monitoring (PM).
+
+        tcm1 - Tandem connection monitoring (TCM)
+
+        tcm2 - Tandem connection monitoring (TCM)
+
+        tcm3 - Tandem connection monitoring (TCM)
+
+        tcm4 - Tandem connection monitoring (TCM)
+
+        tcm5 - Tandem connection monitoring (TCM)
+
+        tcm6 - Tandem connection monitoring (TCM)
+
+"
+    ::= { ifOtnMonTraceEntry 3 }
+
+ifOtnMonTraceConnOtnIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in SM, TCM or PM table
+        this object is related.
+
+"
+    ::= { ifOtnMonTraceEntry 4 }
+
+ifOtnMonTraceSapiTraceTransmitted   OBJECT-TYPE
+    SYNTAX     DisplayStringWithNA (SIZE(0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Source Access Point Identifier to be
+         transmitted from this interface.
+
+         Note, it is only possible to enter 15 characters since the first
+         character is added automatically according to standard.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    DEFVAL { "" }
+    ::= { ifOtnMonTraceEntry 5 }
+
+ifOtnMonTraceSapiTraceReceivedByte0 OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The received Source Access Point Identifier for this interface.
+
+         The value 255 is used by SNMP agent to show that the attribute is
+         not valid in current configuration.
+
+         The value 254 is used by SNMP agent to show that the attribute is
+         not possible to read at the moment.
+
+"
+    ::= { ifOtnMonTraceEntry 6 }
+
+ifOtnMonTraceSapiTraceReceived OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The received Source Access Point Identifier for this interface.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    ::= { ifOtnMonTraceEntry 7 }
+
+ifOtnMonTraceSapiTraceExpected OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA (SIZE(0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "SAPI used for matching against the received SAPI.
+
+         Note, it is only possible to enter 15 characters since first
+         character is added automatically according to standard.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    DEFVAL { "" }
+    ::= { ifOtnMonTraceEntry 8 }
+
+ifOtnMonTraceDapiTraceTransmitted   OBJECT-TYPE
+    SYNTAX     DisplayStringWithNA (SIZE(0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Destination Access Point Identifier to be
+         transmitted from this interface.
+
+         Note, it is only possible to enter 15 characters since first
+         character is added automatically according to standard.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    DEFVAL { "" }
+    ::= { ifOtnMonTraceEntry 9 }
+
+ifOtnMonTraceDapiTraceReceivedByte0 OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "The received Destination Access Point Identifier for this interface.
+
+        The value 255 is used by SNMP agent to show that the attribute is
+        not valid in current configuration.
+
+        The value 254 is used by SNMP agent to show that the attribute is
+        not possible to read at the moment.
+
+"
+    ::= { ifOtnMonTraceEntry 10 }
+
+ifOtnMonTraceDapiTraceReceived OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The received Destination Access Point Identifier for this interface.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    ::= { ifOtnMonTraceEntry 11 }
+
+ifOtnMonTraceDapiTraceExpected OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA (SIZE(0..15))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "DAPI used for matching against the received DAPI.
+
+         Note, it is only possible to enter 15 characters since the first
+         character is added automatically according to standard.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    DEFVAL { "" }
+    ::= { ifOtnMonTraceEntry 12 }
+
+ifOtnMonTraceOpSpecificTraceTransmitted   OBJECT-TYPE
+    SYNTAX       DisplayStringWithNA (SIZE(0..32))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The operator specific trace identifier to be transmitted
+         from this interface.
+
+         Set to empty string for default value.
+
+         &lt;IP address&gt;:&lt;subrack&gt;:&lt;slot&gt;:&lt;port&gt;
+
+         Note that only the last part of the address
+         is used.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    DEFVAL { "" }
+    ::= { ifOtnMonTraceEntry 13 }
+
+ifOtnMonTraceOpSpecificTraceReceived OBJECT-TYPE
+    SYNTAX      DisplayStringWithNA (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The received operator specific trace identifier for this
+         interface.
+
+         The trace _notApplicable_ is used to tell SNMP clients that
+         this attribute is not used in current configuration.
+
+         The trace _notAvailable_ is used to tell SNMP clients that
+         this attribute is not possible to read at the moment.
+
+"
+    ::= { ifOtnMonTraceEntry 14 }
+
+ifOtnMonTraceTraceIdMMDetectionMode OBJECT-TYPE
+    SYNTAX          OtnTIMDetModeWithNA
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The method to detect a trace identifier mismatch value.
+
+        off  - Mismatch will be ignored on all levels
+
+        sapi - Mismatch is based on mismatch in expected and received SAPI
+        trace
+
+        dapi - Mismatch is based on mismatch in expected and received DAPI
+        trace
+
+        both - Mismatch is based on both SAPI and DAPI traces.
+
+"
+    DEFVAL { off }
+    ::= { ifOtnMonTraceEntry 15 }
+
+ifOtnMonTraceTraceAlarmMode OBJECT-TYPE
+    SYNTAX      EnabledDisabledWithNA
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Controls if the trace identifier mismatch alarm
+        should be raised. If trace alarm mode is enabled and if object
+        is set in terminating or monitor mode, BDI is sent
+        in backward direction if received trace and expected trace
+        differs.
+
+        disabled - The alarm is disabled.
+
+        enabled - The alarm is raised if expected trace identifier
+        differs from the received trace identifier.
+
+"
+    DEFVAL { disabled }
+    ::= { ifOtnMonTraceEntry 16 }
+
+ifOtnMonTraceTIMConsequenceActionsDisabled OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+
+	"Controls if the trace identifier mismatch should give rise
+        to any consequent actions in the downstream direction.
+        Consequent actions for the upstream direction are always enabled
+        regardless of this value.
+
+        true - No consequent actions due to trace identifier mis-
+        match alarm.
+
+        false - Consequent actions enabled.
+
+        Reference: 9, 13 and 14 in G.798
+
+"
+    DEFVAL { true }
+    ::= { ifOtnMonTraceEntry 17 }
+
+ifOtnMonTraceTxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for outgoing (TX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonTraceEntry 18 }
+
+ifOtnMonTraceRxSignalStatus OBJECT-TYPE
+    SYNTAX      SignalStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state for incoming (RX) signal
+        of the interface.
+
+        down - A major fault has occurred.
+
+        degraded - The signal quality is impaired.
+
+        up - The signal is OK.
+
+"
+    ::= { ifOtnMonTraceEntry 19 }
+
+ifOtnMonTraceTraceMismatch OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Trace identifier mismatch (TIM).
+
+        Indicates if the expected SM/PM/TCM trace identifier
+        (SAPI and/or DAPI) differs from the received trace
+        identifier.
+
+        Reference: 15.8.2.2.1 G.709
+
+        alarm: The received trace identifier differs from
+        the expected trace identifier.
+
+        ok: The identifiers match.
+
+"
+    ::= { ifOtnMonTraceEntry 20 }
+
+ifOtnMonTraceConnOtnDirection OBJECT-TYPE
+    SYNTAX      OtnDirectionWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Direction of the trail trace identifier object
+        on the interface.
+
+        none - Direction is unambiguous.
+
+        rx - Received from the board-internal G.805 Matrix and,
+             if applicable, sent towards the physical interface.
+
+        tx - Received from the physical interface and, if applicable,
+             sent towards the board-internal G.805 Matrix.
+
+"
+    ::= { ifOtnMonTraceEntry 21 }
+ifOtnMonTraceUpPortId OBJECT-TYPE
+        SYNTAX      Integer32   (-1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+        "Internal port reference for traffic unit.
+"
+        DEFVAL { -1  }
+    ::= { ifOtnMonTraceEntry 22 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+ifOtnMonGeneralGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonGeneralConfigLastChangeTime,
+        ifOtnMonGeneralStateLastChangeTime,
+        ifOtnMonGeneralIfOtnMonSmTableSize,
+        ifOtnMonGeneralIfOtnMonSmConfigLastChangeTime,
+        ifOtnMonGeneralIfOtnMonSmStateLastChangeTime,
+        ifOtnMonGeneralIfOtnMonTcmTableSize,
+        ifOtnMonGeneralIfOtnMonTcmConfigLastChangeTime,
+        ifOtnMonGeneralIfOtnMonTcmStateLastChangeTime,
+        ifOtnMonGeneralIfOtnMonPmTableSize,
+        ifOtnMonGeneralIfOtnMonPmConfigLastChangeTime,
+        ifOtnMonGeneralIfOtnMonPmStateLastChangeTime,
+        ifOtnMonGeneralIfOtnMonTraceTableSize,
+        ifOtnMonGeneralIfOtnMonTraceConfigLastChangeTime,
+        ifOtnMonGeneralIfOtnMonTraceStateLastChangeTime }
+
+    STATUS      current
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfOtnMonGroups 1 }
+
+ifOtnMonSmGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonSmIndex,
+        ifOtnMonSmName,
+        ifOtnMonSmConnIfBasicIfIndex,
+        ifOtnMonSmTxSignalStatus,
+        ifOtnMonSmRxSignalStatus,
+        ifOtnMonSmBackwardDefectIndication,
+        ifOtnMonSmIncomingAlignmentError,
+        ifOtnMonSmBackwardIncomingAlignmentError }
+
+    STATUS      current
+    DESCRIPTION
+        "The ifOtnMon sm objects (R20.0)."
+    ::= { lumIfOtnMonGroups 2 }
+
+ifOtnMonTcmGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonTcmIndex,
+        ifOtnMonTcmName,
+        ifOtnMonTcmConnOduIndex,
+        ifOtnMonTcmAlarmMode,
+        ifOtnMonTcmMode,
+        ifOtnMonTcmTcmNumber,
+        ifOtnMonTcmTxSignalStatus,
+        ifOtnMonTcmRxSignalStatus,
+        ifOtnMonTcmBackwardDefectIndication,
+        ifOtnMonTcmBackwardIncomingAlignmentError,
+        ifOtnMonTcmRxAlarmIndicationSignal,
+        ifOtnMonTcmRxOpenConnectionIndication,
+        ifOtnMonTcmRxLockedDefectIndication,
+        ifOtnMonTcmLossOfTandemConnection,
+        ifOtnMonTcmIncomingAlignmentError }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtnMon tcm objects (R20.0)."
+    ::= { lumIfOtnMonGroups 3 }
+
+ifOtnMonPmGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonPmIndex,
+        ifOtnMonPmName,
+        ifOtnMonPmConnOduIndex,
+        ifOtnMonPmAlarmMode,
+        ifOtnMonPmTxSignalStatus,
+        ifOtnMonPmRxSignalStatus,
+        ifOtnMonPmRxBackwardDefectIndication,
+        ifOtnMonPmRxAlarmIndicationSignal,
+        ifOtnMonPmRxOpenConnectionIndication,
+        ifOtnMonPmRxLockedDefectIndication }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtnMon pm objects (R20.0)."
+    ::= { lumIfOtnMonGroups 4 }
+
+ifOtnMonTraceGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonTraceIndex,
+        ifOtnMonTraceName,
+        ifOtnMonTraceConnOtnIndex,
+        ifOtnMonTraceConnOtnType,
+        ifOtnMonTraceSapiTraceTransmitted,
+        ifOtnMonTraceSapiTraceReceivedByte0,
+        ifOtnMonTraceSapiTraceReceived,
+        ifOtnMonTraceSapiTraceExpected,
+        ifOtnMonTraceDapiTraceTransmitted,
+        ifOtnMonTraceDapiTraceReceivedByte0,
+        ifOtnMonTraceDapiTraceReceived,
+        ifOtnMonTraceDapiTraceExpected,
+        ifOtnMonTraceOpSpecificTraceTransmitted,
+        ifOtnMonTraceOpSpecificTraceReceived,
+        ifOtnMonTraceTraceIdMMDetectionMode,
+        ifOtnMonTraceTraceAlarmMode,
+        ifOtnMonTraceTIMConsequenceActionsDisabled,
+        ifOtnMonTraceTxSignalStatus,
+        ifOtnMonTraceRxSignalStatus,
+        ifOtnMonTraceTraceMismatch }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtnMon trace objects (R20.0)."
+    ::= { lumIfOtnMonGroups 5 }
+
+ifOtnMonPmGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonPmIndex,
+        ifOtnMonPmName,
+        ifOtnMonPmConnOduIndex,
+        ifOtnMonPmAlarmMode,
+        ifOtnMonPmTxSignalStatus,
+        ifOtnMonPmRxSignalStatus,
+        ifOtnMonPmRxBackwardDefectIndication,
+        ifOtnMonPmRxAlarmIndicationSignal,
+        ifOtnMonPmRxOpenConnectionIndication,
+        ifOtnMonPmTxBackwardDefectIndication,
+        ifOtnMonPmTxAlarmIndicationSignal,
+        ifOtnMonPmTxOpenConnectionIndication,
+        ifOtnMonPmTxLockedDefectIndication }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtnMon pm objects (R22.0)."
+    ::= { lumIfOtnMonGroups 6 }
+
+ifOtnMonTcmGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonTcmIndex,
+        ifOtnMonTcmName,
+        ifOtnMonTcmConnOduIndex,
+        ifOtnMonTcmAlarmMode,
+        ifOtnMonTcmMode,
+        ifOtnMonTcmTcmNumber,
+        ifOtnMonTcmTxSignalStatus,
+        ifOtnMonTcmRxSignalStatus,
+        ifOtnMonTcmBackwardDefectIndication,
+        ifOtnMonTcmBackwardIncomingAlignmentError,
+        ifOtnMonTcmRxAlarmIndicationSignal,
+        ifOtnMonTcmRxOpenConnectionIndication,
+        ifOtnMonTcmRxLockedDefectIndication,
+        ifOtnMonTcmLossOfTandemConnection,
+        ifOtnMonTcmIncomingAlignmentError,
+        ifOtnMonTcmSwitchCriteria }
+
+    STATUS      current
+    DESCRIPTION
+        "The ifOtnMon tcm objects (R23.0)."
+    ::= { lumIfOtnMonGroups 7 }
+
+ifOtnMonTraceGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonTraceIndex,
+        ifOtnMonTraceName,
+        ifOtnMonTraceConnOtnType,
+        ifOtnMonTraceConnOtnIndex,
+        ifOtnMonTraceSapiTraceTransmitted,
+        ifOtnMonTraceSapiTraceReceivedByte0,
+        ifOtnMonTraceSapiTraceReceived,
+        ifOtnMonTraceSapiTraceExpected,
+        ifOtnMonTraceDapiTraceTransmitted,
+        ifOtnMonTraceDapiTraceReceivedByte0,
+        ifOtnMonTraceDapiTraceReceived,
+        ifOtnMonTraceDapiTraceExpected,
+        ifOtnMonTraceOpSpecificTraceTransmitted,
+        ifOtnMonTraceOpSpecificTraceReceived,
+        ifOtnMonTraceTraceIdMMDetectionMode,
+        ifOtnMonTraceTraceAlarmMode,
+        ifOtnMonTraceTIMConsequenceActionsDisabled,
+        ifOtnMonTraceTxSignalStatus,
+        ifOtnMonTraceRxSignalStatus,
+        ifOtnMonTraceTraceMismatch }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtnMon trace objects (R23.0)."
+    ::= { lumIfOtnMonGroups 8 }
+
+ifOtnMonTraceGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonTraceIndex,
+        ifOtnMonTraceName,
+        ifOtnMonTraceConnOtnType,
+        ifOtnMonTraceConnOtnIndex,
+        ifOtnMonTraceSapiTraceTransmitted,
+        ifOtnMonTraceSapiTraceReceivedByte0,
+        ifOtnMonTraceSapiTraceReceived,
+        ifOtnMonTraceSapiTraceExpected,
+        ifOtnMonTraceDapiTraceTransmitted,
+        ifOtnMonTraceDapiTraceReceivedByte0,
+        ifOtnMonTraceDapiTraceReceived,
+        ifOtnMonTraceDapiTraceExpected,
+        ifOtnMonTraceOpSpecificTraceTransmitted,
+        ifOtnMonTraceOpSpecificTraceReceived,
+        ifOtnMonTraceTraceIdMMDetectionMode,
+        ifOtnMonTraceTraceAlarmMode,
+        ifOtnMonTraceTIMConsequenceActionsDisabled,
+        ifOtnMonTraceTxSignalStatus,
+        ifOtnMonTraceRxSignalStatus,
+        ifOtnMonTraceTraceMismatch,
+        ifOtnMonTraceConnOtnDirection }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifOtnMon trace objects (R25.0)."
+    ::= { lumIfOtnMonGroups 9 }
+
+ifOtnMonPmGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonPmIndex,
+        ifOtnMonPmName,
+        ifOtnMonPmConnOduIndex,
+        ifOtnMonPmAlarmMode,
+        ifOtnMonPmTxSignalStatus,
+        ifOtnMonPmRxSignalStatus,
+        ifOtnMonPmRxBackwardDefectIndication,
+        ifOtnMonPmRxAlarmIndicationSignal,
+        ifOtnMonPmRxOpenConnectionIndication,
+        ifOtnMonPmTxBackwardDefectIndication,
+        ifOtnMonPmTxAlarmIndicationSignal,
+        ifOtnMonPmTxOpenConnectionIndication,
+        ifOtnMonPmTxLockedDefectIndication,
+        ifOtnMonPmUpPortId}
+
+    STATUS      current
+    DESCRIPTION
+        "The ifOtnMon pm objects (R28.0)."
+    ::= { lumIfOtnMonGroups 10 }
+
+ifOtnMonTraceGroupV4 OBJECT-GROUP
+    OBJECTS {
+        ifOtnMonTraceIndex,
+        ifOtnMonTraceName,
+        ifOtnMonTraceConnOtnType,
+        ifOtnMonTraceConnOtnIndex,
+        ifOtnMonTraceSapiTraceTransmitted,
+        ifOtnMonTraceSapiTraceReceivedByte0,
+        ifOtnMonTraceSapiTraceReceived,
+        ifOtnMonTraceSapiTraceExpected,
+        ifOtnMonTraceDapiTraceTransmitted,
+        ifOtnMonTraceDapiTraceReceivedByte0,
+        ifOtnMonTraceDapiTraceReceived,
+        ifOtnMonTraceDapiTraceExpected,
+        ifOtnMonTraceOpSpecificTraceTransmitted,
+        ifOtnMonTraceOpSpecificTraceReceived,
+        ifOtnMonTraceTraceIdMMDetectionMode,
+        ifOtnMonTraceTraceAlarmMode,
+        ifOtnMonTraceTIMConsequenceActionsDisabled,
+        ifOtnMonTraceTxSignalStatus,
+        ifOtnMonTraceRxSignalStatus,
+        ifOtnMonTraceTraceMismatch,
+        ifOtnMonTraceConnOtnDirection,
+        ifOtnMonTraceUpPortId }
+
+    STATUS      current
+    DESCRIPTION
+        "The ifOtnMon trace objects (R28.0)."
+    ::= { lumIfOtnMonGroups 11 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumIfOtnMonComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtnMon MIB. (R20.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnMonGeneralGroupV1,
+            ifOtnMonSmGroupV1,
+            ifOtnMonTcmGroupV1,
+            ifOtnMonPmGroupV1,
+            ifOtnMonTraceGroupV1 }
+    ::= { lumIfOtnMonCompl 1 }
+
+lumIfOtnMonComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtnMon MIB. (R22.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnMonGeneralGroupV1,
+            ifOtnMonSmGroupV1,
+            ifOtnMonTcmGroupV1,
+            ifOtnMonPmGroupV2,
+            ifOtnMonTraceGroupV1 }
+    ::= { lumIfOtnMonCompl 2 }
+
+lumIfOtnMonComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtnMon MIB. (R23.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnMonGeneralGroupV1,
+            ifOtnMonSmGroupV1,
+            ifOtnMonTcmGroupV2,
+            ifOtnMonPmGroupV2,
+            ifOtnMonTraceGroupV2 }
+    ::= { lumIfOtnMonCompl 3 }
+
+lumIfOtnMonComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtnMon MIB. (R25.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnMonGeneralGroupV1,
+            ifOtnMonSmGroupV1,
+            ifOtnMonTcmGroupV2,
+            ifOtnMonPmGroupV2,
+            ifOtnMonTraceGroupV3 }
+    ::= { lumIfOtnMonCompl 4 }
+
+lumIfOtnMonComplV5 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the ifOtnMon MIB. (R28.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifOtnMonGeneralGroupV1,
+            ifOtnMonSmGroupV1,
+            ifOtnMonTcmGroupV2,
+            ifOtnMonPmGroupV3,
+            ifOtnMonTraceGroupV4 }
+    ::= { lumIfOtnMonCompl 5 }
+END
+

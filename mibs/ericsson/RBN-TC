@@ -1,0 +1,164 @@
+-- %DNP% $Id: RBN-TC.my,v 1.1.2.8.252.3 2011/02/22 17:26:18 thatcher Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/RBN-TC.my,v $
+-- *****************************************************************
+-- RBN-TC    Textual Convention MIB
+--
+-- Copyright (c) 2000, 2002-2009, 2011 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+RBN-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Integer32, Unsigned32
+            FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+
+    rbnModules
+            FROM RBN-SMI;
+
+
+rbnTC MODULE-IDENTITY
+    LAST-UPDATED    "201101191800Z" -- Jan 19, 2011
+    ORGANIZATION    "Ericsson AB."
+    CONTACT-INFO
+            "       Ericsson AB.
+
+            Postal: 100 Headquarters Dr
+                    San Jose, CA  95134
+                    USA
+
+             Phone: +1 408 750 5000
+               Fax: +1 408 750 5599
+            "
+    DESCRIPTION
+        "Defines common textual conventions used in RBN mib
+        modules."
+
+    REVISION        "201101191800Z" -- Jan 19, 2011
+    DESCRIPTION
+            "Update CONTACT-INFO & ORGANIZATION. "
+
+    REVISION      "200910201700Z" -- Oct 20, 2009
+    DESCRIPTION
+        "Added new textual convention: RbnUnsigned64 for read-write
+        capable 64 bit integer value."
+
+    REVISION      "200406191700Z" -- June 19, 2004
+    DESCRIPTION
+        "Added new textual convention: RbnPortMediumType. Correct 
+        warnings given by smilint."
+
+    REVISION      "200303171700Z" -- March 17, 2003
+    DESCRIPTION
+        "Added new textual convention: RbnVidOrUntagged."
+
+    REVISION      "200211110000Z" -- November 11, 2002
+    DESCRIPTION
+        "Moved definitions of RbnSlot and RbnPort from RBN-PVC-MIB.
+        Updated range on RbnSlot and RbnPort."
+
+    REVISION      "200206260000Z" -- June 26, 2002
+    DESCRIPTION
+        "Updated CONTACT-INFO. Added new textual conventions:
+        RbnKBytes and RbnPercentage."
+
+    REVISION      "200007140000Z" -- July 14, 2000
+    DESCRIPTION
+        "Initial version."
+    ::= { rbnModules 2 }
+
+
+RbnCircuitHandle ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d:1d:2x-2x-2x"
+    STATUS current
+    DESCRIPTION
+        "A unique identifier for individual circuits. The string is
+        composed of the following:
+        
+            Octet 1     slot
+                  2     port
+                  3-8   circuit identifier
+        
+        slots/ports are numbered 0..n. The SMS CLI also numbers slots/ports
+        0..n but SE CLI numbers slots/ports 1..n. For example: When the 
+        SE CLI refers to slot/port 1/2, this maps to to the RbnCircuitHandle
+        slot/port 0/1   
+        "
+    SYNTAX  OCTET STRING (SIZE (8))
+    
+RbnKBytes ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Storage size, expressed in units of 1024 bytes."
+    SYNTAX Integer32 (0..2147483647)
+
+RbnPercentage ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d%"
+    STATUS current
+    DESCRIPTION
+        "This Textual Convention describes an object that stores 
+        a whole integer percentage value."
+    SYNTAX Integer32 (0..100)    
+
+RbnSlot ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "The chassis slot number.  This is the physical slot
+        number as reported in the CLI command 'show hardware'
+        on SMS and the CLI command 'show port' on SE."
+    SYNTAX  Unsigned32 (0..255)
+
+RbnPort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+        "The chassis port number.  This is the physical port
+        number as reported in the CLI command 'show hardware'
+        on SMS and the CLI command 'show port' on SE."
+    SYNTAX  Unsigned32 (0..255)
+
+RbnVidOrUntagged ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION 
+        "The twelve-bit VLAN Identifer (VID) used to uniquely
+        identify the VLAN to which the frame belongs.  The VID is
+        encoded as an unsigned binary number.  An untagged frame
+        does not carry any identification of the VLAN to which it
+        belongs and is designated with a value of 4096."
+    SYNTAX	Integer32 (1..4096) 
+
+RbnPortMediumType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION 
+        "Medium type of NAS port."
+    SYNTAX	INTEGER {
+                    unknown(0),
+                    dsl(11),
+                    cable(12),
+                    wireless(13),
+                    satellite(14)
+                }
+
+RbnUnsigned64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "8d"
+    STATUS       current
+    DESCRIPTION 
+        "Unsigned 64 bit integer value is represented as an
+         OCTET STRING.  This allows an unsigned integer value in
+         the range 0..18446744073709551615.  
+
+         The octets are ordered with the first octet containing
+         the highest ordered bits of the integer and the 8th octet
+         containing the lowest ordered bits, corresponding to
+         network byte order."
+    SYNTAX OCTET STRING (SIZE(8))
+    
+END

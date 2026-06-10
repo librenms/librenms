@@ -1,0 +1,5450 @@
+-- =============================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide wireless intrusion prevention service
+--   feature.
+-- Reference:
+-- Version: V1.3
+-- History:
+--   V1.0 created by sunlongfei
+--     Initial version 2012-01-09
+--   V1.1 updated by sunlongfei 2012-12-7
+--     Modify the descriptions of hh3cWIPSDctAPAdd2CtmList,
+--     hh3cWIPSDctAPAdd2IgnoreList,hh3cWIPSDctAPAdd2WhiteList,
+--     hh3cWIPSDctAPAdd2BlackListc,hh3cWIPSDctStaAdd2BlackList,
+--     hh3cWIPSDctStaAdd2WhiteList,hh3cWIPSDctStaAdd2IgnoreList,
+--     hh3cWIPSDctStaAdd2CtmList,hh3cWIPSDevStatTxProbeRequest.
+--   V1.2 modified by sunlongfei 2013-6-7
+--     In hh3cWIPSGlobalConfigGroup,
+--     Modify the descriptions of hh3cWIPSEnable.
+--     Add hh3cWIPSDynamicTrustListAgingTime, hh3cWIPSDevUpdateTime,
+--     hh3cWIPSADOSEnable, hh3cWIPSAccessFlowScanEnable.
+--     Modify hh3cWIPSVsdTable, hh3cWIPSAtkDctPolicyCfgGroup,
+--     hh3cWIPSDctAPTable, hh3cWIPSDctStaTable.
+--     Add hh3cWIPSSigConfigGroup, hh3cWIPSCtmConfigGroup,
+--     hh3cWIPSMalPktDctConfigGroup, hh3cWIPSStaticTrustOUIListCfgTable
+--     hh3cWIPSStaticTrustVendorListCfgTable,
+--     hh3cWIPSCtmDeviceTable, hh3cWIPSMalPktStatTable
+--     modified by sunlongfei 2013-11-21
+--     Modify the size of hh3cWIPSSensorNameCfg, hh3cWIPSDctModeAPName,
+--     hh3cWIPSDctAPRptSensorName, hh3cWIPSDctStaRptSensorName
+--     from '1..32' to '1..64'.
+--   V1.3 modified by jianing 2014-05-12
+--     Add  hh3cWIPSDctUnassocStaTable, hh3cWIPSDctUnassocStaRptSensorTable.
+--     Modify the descriptions of hh3cWIPSAtkDctPolicyCfgTable,
+--     hh3cWIPSMalPktDctConfigGroup, hh3cWIPSMalPktStatTable,hh3cWIPSAPAuthType,
+--     hh3cWIPSDctAPAuthMethod, hh3cWIPSDctAPRadioType, hh3cWIPSDctStaRadioType,
+--     hh3cWIPSDctNetworkFirstRptTm.
+-- =============================================================================
+HH3C-WIPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    TimeTicks, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, Counter64
+        FROM SNMPv2-SMI
+    TruthValue, RowStatus, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+
+hh3cWIPS MODULE-IDENTITY
+    LAST-UPDATED "201112291450Z"        -- December 29, 2011 at 14:50 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB provides information about WIPS feature.
+
+        Wireless Intrusion Prevention System (WIPS)
+        WIPS is designed to be employed in an area that is serviced
+        by an existing wireless network.
+        It aids in the early detection of malicious outsider attacks
+        and intrusions via wireless networks, and takes corresponding
+        measures in order to guarantee the wireless environment security.
+        "
+    REVISION "201112291450Z"        -- December 29, 2011 at 14:50 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= {  hh3cCommon 118 }
+
+--
+-- Textual conventions
+--
+
+Hh3cWIPSRadioType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents AP 802.11 radio type of 802.11a/b/g/n as per
+        the standard.
+        dot11a  0x01
+        dot11b  0x02
+        dot11g  0x04
+        dot11n  0x08
+        dot11gn 0x10
+        dot11an 0x20
+        dot11ac 0x40"
+    SYNTAX Unsigned32
+
+Hh3cWIPSDevStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the status of devices detected by WIPS."
+    SYNTAX INTEGER
+        {
+        active(1),
+        inactive(2)
+        }
+
+Hh3cWIPSDevCategoryWay ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents by which way the device is categorized.
+        'manual': the device is categorized by user.
+        'autoByNMS': the device is automatically categorized by
+        NMS(Network Management System).
+        'autoByDev': the device is automatically categorized by WIPS."
+    SYNTAX INTEGER
+        {
+        manual(1),
+        autoByNMS(2),
+        autoByDev(3)
+        }
+
+Hh3cWIPSDeviceCategoryType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the categorized type of device detected by WIPS."
+    SYNTAX INTEGER
+        {
+        none(0),
+        authorizedAP(1),
+        authorizedClient(2),
+        misconfiguredAP(3),
+        rogueAP(4),
+        unauthorizedClient(5),
+        externalAP(6),
+        adhoc(7),
+        bridge(8),
+        misassociatedClient(9),
+        potentialAuthorizedAP(10),
+        potentialRogueAP(11),
+        potentialExternalAP(12),
+        uncategorizedAP(13),
+        uncategorizedClient(14)
+        }
+
+Hh3cWIPSAPCategoryType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the categorized type of AP detected by WIPS."
+    SYNTAX INTEGER
+        {
+        adhoc(1),
+        authorized(2),
+        rogue(3),
+        misconfigured(4),
+        external(5),
+        potentialAuthorized(6),
+        potentialRogue(7),
+        potentialExternal(8),
+        uncategorized(9)
+        }
+
+Hh3cWIPSClientCategoryType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the categorized type of Client detected by WIPS."
+    SYNTAX INTEGER
+        {
+        authorized(1),
+        unauthorized(2),
+        misassociated(3),
+        uncategorized(4),
+        unassociated(5)
+        }
+
+Hh3cWIPSChannel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents the channel number."
+    SYNTAX Integer32 (0..224)
+
+Hh3cWIPSEncryptMethod ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents the frame encryption cipher types for
+        frames on IEEE 802.11 radio interfaces.
+        The MIB defines TC by referring to the 802.11i protocol.
+        The following values are supported:
+        none(1)     - clear text or no cipher method is configure,
+        wep(2)      - WEP key,
+        tkip(4)     - WPA Temporal Key encryption,
+        ccmp(8)     - WPA AES CCMP encryption"
+    SYNTAX Unsigned32
+
+Hh3cWIPSAuthMethod ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the key management mode defined by 802.11i.
+        The following values are supported:
+        none         - No key management mode configured,
+        psk          - pre-shared key authentication,
+        dot1x        - 802.1x authentication.
+        other        - other authentication."
+    SYNTAX INTEGER
+        {
+        none(1),
+        psk(2),
+        dot1x(3),
+        other(4),
+        pskANDdot1x(5),
+        pskANDother(6),
+        dot1xANDother(7),
+        pskANDdot1xANDother(8)
+        }
+
+Hh3cWIPSAPClassifyType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Represents the classify type of AP.
+        'other' - represents undo operation."
+    SYNTAX INTEGER
+        {
+        other(1),
+        authorized(2),
+        external(3),
+        misconfigured(4),
+        rogue(5)
+        }
+
+Hh3cWIPSAPSecurityType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS current
+    DESCRIPTION
+        "Represents the AP security type.
+        clear  0x01
+        wpa2   0x02
+        wpa    0x04
+        wep    0x08"
+    SYNTAX Unsigned32
+
+--
+-- Node definitions
+--
+
+hh3cWIPSConfigGroup OBJECT IDENTIFIER ::= { hh3cWIPS 1 }
+
+hh3cWIPSGlobalConfigGroup OBJECT IDENTIFIER ::= { hh3cWIPSConfigGroup 1 }
+
+hh3cWIPSEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the WIPS feature is enabled or not.
+        'true': enable the WIPS feature.
+        'false': disable the WIPS feature."
+    ::= { hh3cWIPSGlobalConfigGroup 1 }
+
+hh3cWIPSSensorLicenseNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of sensor license."
+    ::= { hh3cWIPSGlobalConfigGroup 2 }
+
+hh3cWIPSBlocklistAction OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        block(1),
+        unblock(2)
+        }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the block list feature is enabled or not.
+        'block'  : Enable the block list feature to filter unwanted devices.
+        'unblock' : Disable the block list feature."
+    ::= { hh3cWIPSGlobalConfigGroup 3 }
+
+hh3cWIPSAPInactiveTime OBJECT-TYPE
+    SYNTAX Integer32 (60..600)
+    UNITS "second"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the time for AP getting inactive."
+    DEFVAL { 300 }
+    ::= { hh3cWIPSGlobalConfigGroup 4 }
+
+hh3cWIPSSTAInactiveTime OBJECT-TYPE
+    SYNTAX Integer32 (120..1200)
+    UNITS "second"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the time for STA getting inactive."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSGlobalConfigGroup 5 }
+
+hh3cWIPSDevAgingTime OBJECT-TYPE
+    SYNTAX Integer32 (60..2592000)
+    UNITS "second"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the time for device getting aged."
+    DEFVAL { 86400 }
+    ::= { hh3cWIPSGlobalConfigGroup 6 }
+
+hh3cWIPSStatisticPeriod OBJECT-TYPE
+    SYNTAX Integer32 (60..86400)
+    UNITS "second"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the period of WIPS reporting the statistic."
+    DEFVAL { 900 }
+    ::= { hh3cWIPSGlobalConfigGroup 7 }
+
+hh3cWIPSReclassificationPeriod OBJECT-TYPE
+    SYNTAX Integer32 (10..3600)
+    UNITS "second"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the period of WIPS reclassifying devices."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSGlobalConfigGroup 8 }
+
+hh3cWIPSResetAllTrustList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to remove all entries from the static trust list.
+        It will return false for get operation."
+    ::= { hh3cWIPSGlobalConfigGroup 9 }
+
+hh3cWIPSResetAllBlockList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to remove all entries from the static block list.
+        It will return false for get operation."
+    ::= { hh3cWIPSGlobalConfigGroup 10 }
+
+hh3cWIPSResetAllIgnoreList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to remove all entries from the ignore list.
+        It will return false for get operation.."
+    ::= { hh3cWIPSGlobalConfigGroup 11 }
+
+hh3cWIPSResetAllCtmList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This object is used to remove all entries from the static
+        countermeasure list.
+        It will return false for get operation."
+    ::= { hh3cWIPSGlobalConfigGroup 12 }
+
+hh3cWIPSPermitChlBitMap OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the permit channel number by bitmap."
+    ::= { hh3cWIPSGlobalConfigGroup 13 }
+
+hh3cWIPSDynamicTrustListAgingTime OBJECT-TYPE
+    SYNTAX Integer32 (60..86400)
+    UNITS "second"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the time for devices in the dynamic trust list getting aged."
+    DEFVAL {300}
+    ::= { hh3cWIPSGlobalConfigGroup 14 }
+
+hh3cWIPSDevUpdateTime OBJECT-TYPE
+    SYNTAX Integer32 (10..30)
+    UNITS "second"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the period of WIPS update the status of devices."
+    DEFVAL {20}
+    ::= { hh3cWIPSGlobalConfigGroup 15 }
+
+hh3cWIPSADOSEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether enable the ADOS feature.
+        'true': enable the ADOS feature.
+        'false': disable the ADOS feature."
+    DEFVAL { false }
+    ::= { hh3cWIPSGlobalConfigGroup 16 }
+
+hh3cWIPSAccessFlowScanEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the WIPS scanning feature during the access flow is enabled or not.
+        'true': enable the feature.
+        'false': disable the feature."
+    DEFVAL { false }
+    ::= { hh3cWIPSGlobalConfigGroup 17}
+
+hh3cWIPSVsdConfigGroup OBJECT IDENTIFIER ::= { hh3cWIPSConfigGroup 2 }
+
+hh3cWIPSVsdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSVsdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the list of virtual security domain."
+    ::= { hh3cWIPSVsdConfigGroup 1 }
+
+hh3cWIPSVsdEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSVsdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each VSD."
+    INDEX { hh3cWIPSVsdNameCfg }
+    ::= { hh3cWIPSVsdTable 1 }
+
+Hh3cWIPSVsdEntry ::=
+    SEQUENCE {
+        hh3cWIPSVsdNameCfg
+            OCTET STRING,
+        hh3cWIPSVsdRowStatus
+            RowStatus,
+        hh3cWIPSVsdAtkDctPolicyNameCfg
+            OCTET STRING,
+        hh3cWIPSVsdCtmPolicyNameCfg
+            OCTET STRING,
+        hh3cWIPSVsdSigPolicyNameCfg
+            OCTET STRING,
+        hh3cWIPSVsdMalPktPolicyNameCfg
+            OCTET STRING
+     }
+
+hh3cWIPSVsdNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of virtual security domain."
+    ::= { hh3cWIPSVsdEntry 1 }
+
+hh3cWIPSVsdRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSVsdEntry 2 }
+
+hh3cWIPSVsdAtkDctPolicyNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the name of attack detect policy attached to the VSD."
+    ::= { hh3cWIPSVsdEntry 3 }
+
+hh3cWIPSVsdCtmPolicyNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the name of countermeasure policy attached to the VSD."
+    ::= { hh3cWIPSVsdEntry 4 }
+
+hh3cWIPSVsdSigPolicyNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the name of signature policy attached to the VSD"
+    ::= { hh3cWIPSVsdEntry 5 }
+
+hh3cWIPSVsdMalPktPolicyNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the name of malformed packet detect policy attached to the VSD"
+    ::= { hh3cWIPSVsdEntry 6 }
+
+hh3cWIPSRule2VsdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSRule2VsdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the AP classification rules been attached to the VSD.
+        "
+    ::= { hh3cWIPSVsdConfigGroup 2 }
+
+hh3cWIPSRule2VsdEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSRule2VsdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each AP classification rule
+        in each VSD.
+        "
+    INDEX { hh3cWIPSVsdNameCfg, hh3cWIPSRule2VsdAPClaRuleNameCfg }
+    ::= { hh3cWIPSRule2VsdTable 1 }
+
+Hh3cWIPSRule2VsdEntry ::=
+    SEQUENCE {
+        hh3cWIPSRule2VsdAPClaRuleNameCfg
+            OCTET STRING,
+        hh3cWIPSRule2VsdRowStatus
+            RowStatus,
+        hh3cWIPSRule2VsdPrecedence
+            Integer32
+     }
+
+hh3cWIPSRule2VsdAPClaRuleNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of AP classification rule attached to the VSD."
+    ::= { hh3cWIPSRule2VsdEntry 1 }
+
+hh3cWIPSRule2VsdRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSRule2VsdEntry 2 }
+
+hh3cWIPSRule2VsdPrecedence OBJECT-TYPE
+    SYNTAX Integer32 (0..15)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of AP classification rule
+        attached to the VSD."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSRule2VsdEntry 3 }
+
+hh3cWIPSSensor2VsdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSSensor2VsdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the sensor been attached to the VSD.
+        "
+    ::= { hh3cWIPSVsdConfigGroup 3 }
+
+hh3cWIPSSensor2VsdEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSSensor2VsdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each sensor in each VSD."
+    INDEX { hh3cWIPSVsdNameCfg, hh3cWIPSSensorNameCfg }
+    ::= { hh3cWIPSSensor2VsdTable 1 }
+
+Hh3cWIPSSensor2VsdEntry ::=
+    SEQUENCE {
+        hh3cWIPSSensorNameCfg
+            OCTET STRING,
+        hh3cWIPSSensor2VsdRowStatus
+            RowStatus,
+        hh3cWIPSSensorState
+            INTEGER
+     }
+
+hh3cWIPSSensorNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of sensor attached to the VSD."
+    ::= { hh3cWIPSSensor2VsdEntry 1 }
+
+hh3cWIPSSensor2VsdRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSSensor2VsdEntry 2 }
+
+hh3cWIPSSensorState OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        running(1),
+        idle(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the running state of the sensor.
+        It will return false for set operation."
+    ::= { hh3cWIPSSensor2VsdEntry 3 }
+
+hh3cWIPSSensorRadioTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSSensorRadioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of sensor radio information."
+    ::= { hh3cWIPSVsdConfigGroup 4 }
+
+hh3cWIPSSensorRadioEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSSensorRadioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of a radio of a sensor."
+    INDEX { hh3cWIPSVsdNameCfg, hh3cWIPSSensorNameCfg, hh3cWIPSSensorRadioRadioId }
+    ::= { hh3cWIPSSensorRadioTable 1 }
+
+Hh3cWIPSSensorRadioEntry ::=
+    SEQUENCE {
+        hh3cWIPSSensorRadioRadioId
+            Integer32,
+        hh3cWIPSSensorRadioScanMode
+            INTEGER
+     }
+
+hh3cWIPSSensorRadioRadioId OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the radio identifier of the sensor."
+    ::= { hh3cWIPSSensorRadioEntry 1 }
+
+hh3cWIPSSensorRadioScanMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        accessFirst(1),
+        detectFirst(2),
+        middle(3),
+        detectOnly(4)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the scanning mode configured to the radio."
+    ::= { hh3cWIPSSensorRadioEntry 2 }
+
+hh3cWIPSAPClaRuleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSAPClaRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the parameters for WIPS AP classification rule.
+        One rule could be assigned to different VSDs.
+        "
+    ::= { hh3cWIPSConfigGroup 3 }
+
+hh3cWIPSAPClaRuleEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSAPClaRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each AP classification rule.
+        "
+    INDEX { hh3cWIPSAPClaRuleName }
+    ::= { hh3cWIPSAPClaRuleTable 1 }
+
+Hh3cWIPSAPClaRuleEntry ::=
+    SEQUENCE {
+        hh3cWIPSAPClaRuleName
+            OCTET STRING,
+        hh3cWIPSAPClaRowStatus
+            RowStatus,
+        hh3cWIPSAPClaSeverityLevel
+            Unsigned32,
+        hh3cWIPSAPClaRuleMatchAll
+            TruthValue,
+        hh3cWIPSAPClaType
+            Hh3cWIPSAPClassifyType,
+        hh3cWIPSAPClaSubRuleSSIDOperator
+            INTEGER,
+        hh3cWIPSAPClaSubRuleSSIDCase
+            TruthValue,
+        hh3cWIPSAPClaSubRuleSSID
+            OCTET STRING,
+        hh3cWIPSSecurityType
+            Hh3cWIPSAPSecurityType,
+        hh3cWIPSSecurityTypeMatch
+            INTEGER,
+        hh3cWIPSAPAuthType
+            INTEGER,
+        hh3cWIPSMaxRSSIValue
+            Unsigned32,
+        hh3cWIPSMinRSSIValue
+            Unsigned32,
+        hh3cWIPSMaxDuration
+            Unsigned32,
+        hh3cWIPSMinDuration
+            Unsigned32,
+        hh3cWIPSMaxAPNum
+            Unsigned32,
+        hh3cWIPSMinAPNum
+            Unsigned32,
+        hh3cWIPSMaxClientNum
+            Unsigned32,
+        hh3cWIPSMinClientNum
+            Unsigned32,
+        hh3cWIPSOUIInfo
+            OCTET STRING,
+        hh3cWIPSVendorInfo
+            OCTET STRING,
+        hh3cWIPSAPAuthTypeMatch
+            INTEGER
+     }
+
+hh3cWIPSAPClaRuleName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of AP classification rule."
+    ::= { hh3cWIPSAPClaRuleEntry 1 }
+
+hh3cWIPSAPClaRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSAPClaRuleEntry 2 }
+
+hh3cWIPSAPClaSeverityLevel OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the severity level of the AP classification rule.
+        Available value limits from 0 to 100."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 3 }
+
+hh3cWIPSAPClaRuleMatchAll OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents whether match all the AP classification sub-rules
+        which have been configured."
+    DEFVAL { false }
+    ::= { hh3cWIPSAPClaRuleEntry 4 }
+
+hh3cWIPSAPClaType OBJECT-TYPE
+    SYNTAX Hh3cWIPSAPClassifyType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the type of AP classification."
+    ::= { hh3cWIPSAPClaRuleEntry 5 }
+
+hh3cWIPSAPClaSubRuleSSIDOperator OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        include(1),
+        notinclude(2),
+        equal(3),
+        notequal(4)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the compare way of the SSID in the sub rule,
+        including include/not include/equal/not equal."
+    ::= { hh3cWIPSAPClaRuleEntry 6 }
+
+hh3cWIPSAPClaSubRuleSSIDCase OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the case sensitive or not for the SSID match.
+        'true': Case insensitive.
+        'false': Case sensitive."
+    DEFVAL { false }
+    ::= { hh3cWIPSAPClaRuleEntry 7 }
+
+hh3cWIPSAPClaSubRuleSSID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the SSID match template in the ap classification rule."
+    ::= { hh3cWIPSAPClaRuleEntry 8 }
+
+hh3cWIPSSecurityType OBJECT-TYPE
+    SYNTAX Hh3cWIPSAPSecurityType
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the security type of active AP.
+        "
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 9 }
+
+hh3cWIPSSecurityTypeMatch OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        equal(1),
+        include(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents match way of the security type of active AP.
+        "
+    DEFVAL { include }
+    ::= { hh3cWIPSAPClaRuleEntry 10 }
+
+hh3cWIPSAPAuthType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(1),
+        psk(2),
+        dot1x(3),
+        other(4),
+        undo(5),
+        pskANDdot1x(6),
+        pskANDother(7),
+        dot1xANDother(8),
+        pskANDdot1xANDother(9),
+        noneANDpsk(10),
+        noneANDdot1x(11),
+        noneANDother(12),
+        noneANDpskANDdot1x(13),
+        noneANDpskANDother(14),
+        noneANDdot1xANDother(15),
+        noneANDpskANDdot1xANDother(16)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the authentication type of the AP.
+        undo - represents undo operation"
+    DEFVAL { undo }
+    ::= { hh3cWIPSAPClaRuleEntry 11 }
+
+hh3cWIPSMaxRSSIValue OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the high-limit of the RSSI of AP.
+        Available value limits from 1 to 90."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 12 }
+
+hh3cWIPSMinRSSIValue OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the low-limit of the RSSI of AP.
+        Available value limits from 0 to 89."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 13 }
+
+hh3cWIPSMaxDuration OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "second"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the high-limit of the duration of AP.
+        Available value limits from 1 to 2592000."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 14 }
+
+hh3cWIPSMinDuration OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "second"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the low-limit of the duration of AP.
+        Available value limits from 0 to 2591999."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 15 }
+
+hh3cWIPSMaxAPNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the high-limit of the number of AP.
+        Available value limits from 1 to 128."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 16 }
+
+hh3cWIPSMinAPNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the low-limit of the number of AP.
+        Available value limits from 0 to 127."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 17 }
+
+hh3cWIPSMaxClientNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the high-limit of the number of client.
+        Available value limits from 1 to 128."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 18 }
+
+hh3cWIPSMinClientNum OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the low-limit of the number of client.
+        Available value limits from 0 to 127."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSAPClaRuleEntry 19 }
+
+hh3cWIPSOUIInfo OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..6))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the OUI hexadecimal string of the AP."
+    ::= { hh3cWIPSAPClaRuleEntry 20 }
+
+hh3cWIPSVendorInfo OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the vendor info of the AP."
+    ::= { hh3cWIPSAPClaRuleEntry 21 }
+
+hh3cWIPSAPAuthTypeMatch OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        equal(1),
+        include(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents match way of the authentication type of active AP.
+        "
+    DEFVAL { include }
+    ::= { hh3cWIPSAPClaRuleEntry 22 }
+
+hh3cWIPSAtkDctPolicyCfgGroup OBJECT IDENTIFIER ::= { hh3cWIPSConfigGroup 4 }
+
+hh3cWIPSAtkDctPolicyCfgSupportSet OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of supported attack detect policy.
+        The specific attack detect policy is supported if its corresponding
+        bit is set to 1; otherwise its corresponding bit is set to 0.
+        bit0: adhoc
+        bit1: ap-spoof
+        bit2: client-spoof
+        bit3: prohibited channel
+        bit4: ap-flood
+        bit5: eapol-start
+        bit6: authentication
+        bit7: association
+        bit8: reassociation
+        bit9: weak-IV
+        bit10: invalid-OUI
+        bit11: ps-attack
+        bit12: windows-bridge
+        bit13: hotspot-attack
+        bit14: ap-impersonation
+        bit15: soft-ap
+        bit16: unencrypted-authorized-ap
+        bit17: unencrypted-trust-client"
+    ::= { hh3cWIPSAtkDctPolicyCfgGroup 1 }
+
+hh3cWIPSAtkDctPolicyCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSAtkDctPolicyCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the parameters for WIPS attack detect policy."
+    ::= { hh3cWIPSAtkDctPolicyCfgGroup 2 }
+
+hh3cWIPSAtkDctPolicyCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSAtkDctPolicyCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each attack detect policy."
+    INDEX { hh3cWIPSAtkDctPolicyName }
+    ::= { hh3cWIPSAtkDctPolicyCfgTable 1 }
+
+Hh3cWIPSAtkDctPolicyCfgEntry ::=
+    SEQUENCE {
+        hh3cWIPSAtkDctPolicyName
+            OCTET STRING,
+        hh3cWIPSAtkDctPolicyCfgRowStatus
+            RowStatus,
+        hh3cWIPSAtkDctPolicyBitString
+            OCTET STRING,
+        hh3cWIPSAtkDctPolicyAPFloodQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyAPSpoofQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyCliSpoofQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyDosAssoQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyDosAuthQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyDosEAPOLStartQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyDosReAssoQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyWeakIVQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyInvalidOUIAction
+            INTEGER,
+        hh3cWIPSAtkDctPolicyUnencryptedAuthApQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyUnencryptedAuthClientQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyPSAttackQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyPSAttackMinOffPacket
+            Integer32,
+        hh3cWIPSAtkDctPolicyPSAttackOnOffPercent
+            Integer32,
+        hh3cWIPSAtkDctPolicyApImpersonationQT
+            Integer32,
+        hh3cWIPSAtkDctPolicyApImpersonationBeaconIncThreshold
+            Integer32,
+        hh3cWIPSAtkDctPolicyApImpersonationBeaconIncWaitTime
+            Integer32,
+        hh3cWIPSAtkDctPolicySoftApConvertTime
+            Integer32
+     }
+
+hh3cWIPSAtkDctPolicyName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of attack detect policy."
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 1 }
+
+hh3cWIPSAtkDctPolicyCfgRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 2 }
+
+hh3cWIPSAtkDctPolicyBitString OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of attack detect policy configuration.
+        The specific attack detect policy is enabled if its corresponding
+        bit is set to 1; disabled if its corresponding bit is set to 0.
+        bit0: adhoc
+        bit1: ap-spoof
+        bit2: client-spoof
+        bit3: prohibited channel
+        bit4: ap-flood
+        bit5: eapol-start
+        bit6: authentication
+        bit7: association
+        bit8: reassociation
+        bit9: weak-IV
+        bit10: invalid-OUI
+        bit11: ps-attack
+        bit12: windows-bridge
+        bit13: hotspot-attack
+        bit14: ap-impersonation
+        bit15: soft-ap
+        bit16: unencrypted-authorized-ap
+        bit17: unencrypted-trust-client"
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 3 }
+
+hh3cWIPSAtkDctPolicyAPFloodQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the AP flood attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 4 }
+
+hh3cWIPSAtkDctPolicyAPSpoofQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the AP spoofing attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 5 }
+
+hh3cWIPSAtkDctPolicyCliSpoofQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the client spoofing attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 6 }
+
+hh3cWIPSAtkDctPolicyDosAssoQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the dos of association attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 7 }
+
+hh3cWIPSAtkDctPolicyDosAuthQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the dos of authentication attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 8 }
+
+hh3cWIPSAtkDctPolicyDosEAPOLStartQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the dos of EAPOL-start attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 9 }
+
+hh3cWIPSAtkDctPolicyDosReAssoQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the dos of reassociation attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 10 }
+
+hh3cWIPSAtkDctPolicyWeakIVQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the weak-IV event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 11 }
+
+hh3cWIPSAtkDctPolicyInvalidOUIAction OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        rogue(1)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the action after detecting the invalid OUI,
+        which classify the device as rogue device."
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 12 }
+
+hh3cWIPSAtkDctPolicyUnencryptedAuthApQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the unencrypted-authorized-ap event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 13 }
+
+hh3cWIPSAtkDctPolicyUnencryptedAuthClientQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the unencrypted-trust-client event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 14 }
+
+hh3cWIPSAtkDctPolicyPSAttackQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the ps-attack event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 15 }
+
+hh3cWIPSAtkDctPolicyPSAttackMinOffPacket OBJECT-TYPE
+    SYNTAX Integer32 (10..150)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specify the minimum number of OFF packets
+        as threshold in detecting ps-attack."
+    DEFVAL { 50 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 16 }
+
+hh3cWIPSAtkDctPolicyPSAttackOnOffPercent OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specify the ratio of ON packets to OFF packets
+        in percentage as threshold in detecting ps-attack."
+    DEFVAL { 50 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 17 }
+
+hh3cWIPSAtkDctPolicyApImpersonationQT OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting
+        the ap-impersonation event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 18 }
+
+hh3cWIPSAtkDctPolicyApImpersonationBeaconIncThreshold OBJECT-TYPE
+    SYNTAX Integer32 (1..100)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specify the increased percentage threshold for beacon
+        frames that can trigger an AP impersonation alert"
+    DEFVAL { 30 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 19 }
+
+hh3cWIPSAtkDctPolicyApImpersonationBeaconIncWaitTime OBJECT-TYPE
+    SYNTAX Integer32 (0..360000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specify the waiting time before a suspected AP is
+         determined as an AP impersonator.  If the beacon frames
+         keep on increasing beyond the threshold during the waiting
+         time, then the suspected AP should be determined as an
+         AP impersonator."
+    DEFVAL { 10 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 20 }
+
+hh3cWIPSAtkDctPolicySoftApConvertTime OBJECT-TYPE
+    SYNTAX Integer32 (5..600)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specify the minimum client-AP switchover threshold
+         used to determine a soft AP"
+    DEFVAL { 10 }
+    ::= { hh3cWIPSAtkDctPolicyCfgEntry 21 }
+
+hh3cWIPSStaticCtmListCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSStaticCtmListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the MAC address list of devices
+        in the static countermeasure list."
+    ::= { hh3cWIPSConfigGroup 5 }
+
+hh3cWIPSStaticCtmListCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSStaticCtmListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each MAC address in the static
+        countermeasure list.
+        "
+    INDEX { hh3cWIPSStaticCtmListMAC }
+    ::= { hh3cWIPSStaticCtmListCfgTable 1 }
+
+Hh3cWIPSStaticCtmListCfgEntry ::=
+    SEQUENCE {
+        hh3cWIPSStaticCtmListMAC
+            MacAddress,
+        hh3cWIPSStaticCtmListRowStatus
+            RowStatus
+     }
+
+hh3cWIPSStaticCtmListMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address in static countermeasure list."
+    ::= { hh3cWIPSStaticCtmListCfgEntry 1 }
+
+hh3cWIPSStaticCtmListRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSStaticCtmListCfgEntry 2 }
+
+hh3cWIPSStaticBlockListCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSStaticBlockListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the MAC address list
+        of devices in the static block list.
+        WIPS will ignore the frames from the devices in the list,
+        and take the devices as rogue devices."
+    ::= { hh3cWIPSConfigGroup 6 }
+
+hh3cWIPSStaticBlockListCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSStaticBlockListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each MAC address
+        in the static block list.
+        "
+    INDEX { hh3cWIPSStaticBlockListMAC }
+    ::= { hh3cWIPSStaticBlockListCfgTable 1 }
+
+Hh3cWIPSStaticBlockListCfgEntry ::=
+    SEQUENCE {
+        hh3cWIPSStaticBlockListMAC
+            MacAddress,
+        hh3cWIPSStaticBlockListRowStatus
+            RowStatus
+     }
+
+hh3cWIPSStaticBlockListMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address in static block list."
+    ::= { hh3cWIPSStaticBlockListCfgEntry 1 }
+
+hh3cWIPSStaticBlockListRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSStaticBlockListCfgEntry 2 }
+
+hh3cWIPSStaticTrustListCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSStaticTrustListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the MAC address list
+        of devices in the static trust list.
+        WIPS will take the devices in the list as authorized devices."
+    ::= { hh3cWIPSConfigGroup 7 }
+
+hh3cWIPSStaticTrustListCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSStaticTrustListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each MAC address
+        in the static trust list.
+        "
+    INDEX { hh3cWIPSStaticTrustListMAC }
+    ::= { hh3cWIPSStaticTrustListCfgTable 1 }
+
+Hh3cWIPSStaticTrustListCfgEntry ::=
+    SEQUENCE {
+        hh3cWIPSStaticTrustListMAC
+            MacAddress,
+        hh3cWIPSStaticTrustListRowStatus
+            RowStatus
+     }
+
+hh3cWIPSStaticTrustListMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address in static trust list."
+    ::= { hh3cWIPSStaticTrustListCfgEntry 1 }
+
+hh3cWIPSStaticTrustListRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSStaticTrustListCfgEntry 2 }
+
+hh3cWIPSIgnoreListCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSIgnoreListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the MAC address list of devices in the ignore list.
+        WIPS will ignore the events caused by the device in the list."
+    ::= { hh3cWIPSConfigGroup 8 }
+
+hh3cWIPSIgnoreListCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSIgnoreListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each MAC address in the ignore list.
+        "
+    INDEX { hh3cWIPSIgnoreListMAC }
+    ::= { hh3cWIPSIgnoreListCfgTable 1 }
+
+Hh3cWIPSIgnoreListCfgEntry ::=
+    SEQUENCE {
+        hh3cWIPSIgnoreListMAC
+            MacAddress,
+        hh3cWIPSIgnoreListRowStatus
+            RowStatus
+     }
+
+hh3cWIPSIgnoreListMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address in ignore list."
+    ::= { hh3cWIPSIgnoreListCfgEntry 1 }
+
+hh3cWIPSIgnoreListRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSIgnoreListCfgEntry 2 }
+
+hh3cWIPSDctModeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of AP scanning mode configuration
+        on radio."
+    ::= { hh3cWIPSConfigGroup 9 }
+
+hh3cWIPSDctModeEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctModeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of WIPS scanning mode on radio."
+    INDEX { hh3cWIPSDctModeAPName, hh3cWIPSDctModeRadio }
+    ::= { hh3cWIPSDctModeTable 1 }
+
+Hh3cWIPSDctModeEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctModeAPName
+            OCTET STRING,
+        hh3cWIPSDctModeRadio
+            Integer32,
+        hh3cWIPSDctModeScanMode
+            INTEGER,
+        hh3cWIPSDctModeRowStatus
+            RowStatus
+     }
+
+hh3cWIPSDctModeAPName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of AP."
+    ::= { hh3cWIPSDctModeEntry 1 }
+
+hh3cWIPSDctModeRadio OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the radio of AP."
+    ::= { hh3cWIPSDctModeEntry 2 }
+
+hh3cWIPSDctModeScanMode OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        accessFirst(1),
+        detectFirst(2),
+        middle(3),
+        detectOnly(4)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the scanning mode.
+        The radio enable-disable status must be disabled before
+        WIPS scanning mode is configured on this radio.
+        The mesh feature must be disabled before any WIPS scanning mode
+        is set on radio.
+        This radio can not apply any service template before
+        the detectOnly scanning mode is set on the radio. "
+    ::= { hh3cWIPSDctModeEntry 3 }
+
+hh3cWIPSDctModeRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSDctModeEntry 4 }
+
+hh3cWIPSSigConfigGroup OBJECT IDENTIFIER ::= { hh3cWIPSConfigGroup 10 }
+
+hh3cWIPSSigPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSSigPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the parameters for WIPS signature policy.
+        One policy could be assigned to different VSDs.
+        "
+    ::= { hh3cWIPSSigConfigGroup 1 }
+
+hh3cWIPSSigPolicyEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSSigPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each signature policy."
+    INDEX { hh3cWIPSSigPolicyNameCfg }
+    ::= { hh3cWIPSSigPolicyTable 1 }
+
+Hh3cWIPSSigPolicyEntry ::=
+    SEQUENCE {
+        hh3cWIPSSigPolicyNameCfg
+            OCTET STRING,
+        hh3cWIPSSigPolicyRowStatus
+            RowStatus
+     }
+
+hh3cWIPSSigPolicyNameCfg OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of signature policy."
+    ::= { hh3cWIPSSigPolicyEntry 1 }
+
+hh3cWIPSSigPolicyRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSSigPolicyEntry 2 }
+
+hh3cWIPSSigRule2PolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSSigRule2PolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the signature rules been attached to the signature policy.
+        "
+    ::= { hh3cWIPSSigConfigGroup 2 }
+
+hh3cWIPSSigRule2PolicyEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSSigRule2PolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each signature rules
+        attached to signature policy."
+    INDEX { hh3cWIPSSigPolicyNameCfg, hh3cWIPSSigRule2PolicySigRuleIDCfg }
+    ::= { hh3cWIPSSigRule2PolicyTable 1 }
+
+Hh3cWIPSSigRule2PolicyEntry ::=
+    SEQUENCE {
+        hh3cWIPSSigRule2PolicySigRuleIDCfg
+            Unsigned32,
+        hh3cWIPSSigRule2PolicyRowStatus
+            RowStatus,
+        hh3cWIPSSigRule2PolicyPrecedence
+            Unsigned32
+     }
+
+hh3cWIPSSigRule2PolicySigRuleIDCfg OBJECT-TYPE
+    SYNTAX Unsigned32 (1..64)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the ID of signature rule attached to signature policy."
+    ::= { hh3cWIPSSigRule2PolicyEntry 1 }
+
+hh3cWIPSSigRule2PolicyRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSSigRule2PolicyEntry 2 }
+
+hh3cWIPSSigRule2PolicyPrecedence OBJECT-TYPE
+    SYNTAX Unsigned32 (1..64)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of signature rule attached to signature policy."
+    DEFVAL { 1 }
+    ::= { hh3cWIPSSigRule2PolicyEntry 3 }
+
+hh3cWIPSSigRuleTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSSigRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the signature rules.
+        "
+    ::= { hh3cWIPSSigConfigGroup 3 }
+
+hh3cWIPSSigRuleEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSSigRuleEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each signature rules."
+    INDEX { hh3cWIPSSigRuleName }
+    ::= { hh3cWIPSSigRuleTable 1 }
+
+Hh3cWIPSSigRuleEntry ::=
+    SEQUENCE {
+        hh3cWIPSSigRuleName
+            OCTET STRING,
+        hh3cWIPSSigRuleID
+            Integer32,
+        hh3cWIPSSigRuleRowStatus
+            RowStatus,
+        hh3cWIPSSigSubRuleMatchAll
+            TruthValue,
+        hh3cWIPSSigRuleDctPeriod
+            Unsigned32,
+        hh3cWIPSSigRuleTrackMethod
+            INTEGER,
+        hh3cWIPSSigRuleDctThresholdPerMAC
+            Unsigned32,
+        hh3cWIPSSigRuleDctThresholdPerSig
+            Unsigned32,
+        hh3cWIPSSigRuleActionEvtLevel
+            Unsigned32,
+        hh3cWIPSSigRuleQuietTime
+            Unsigned32,
+        hh3cWIPSSigSubRuleFrameType
+            INTEGER,
+        hh3cWIPSSigSubRuleFrameSubType
+            INTEGER,
+        hh3cWIPSSigSubRuleMac
+            OCTET STRING,
+        hh3cWIPSSigSubRuleMacType
+            INTEGER,
+        hh3cWIPSSigSubRuleSeqNumMin
+            Unsigned32,
+        hh3cWIPSSigSubRuleSeqNumMax
+            Unsigned32,
+        hh3cWIPSSigSubRuleSSIDLenMin
+            Unsigned32,
+        hh3cWIPSSigSubRuleSSIDLenMax
+            Unsigned32,
+        hh3cWIPSSigSubRuleSSID
+            OCTET STRING,
+        hh3cWIPSSigSubRuleSSIDOpe
+            INTEGER,
+        hh3cWIPSSigSubRuleSSIDCase
+            TruthValue
+     }
+
+hh3cWIPSSigRuleName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of signature rule."
+    ::= { hh3cWIPSSigRuleEntry 1 }
+
+hh3cWIPSSigRuleID OBJECT-TYPE
+    SYNTAX Integer32 (1..64)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the ID of signature rule.
+        The values from 1 to 32 are for built-in rules, which can not
+        be assigned to user-define rules.
+        When a user-define signature rule is being created, if ID is not specified,
+        the ID of the rule will be automatically assigned, which values from 33 to 64.
+        Once the rule is created, the ID is fixed and can not be changed again."
+    ::= { hh3cWIPSSigRuleEntry 2 }
+
+hh3cWIPSSigRuleRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSSigRuleEntry 3 }
+
+hh3cWIPSSigSubRuleMatchAll OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents whether match all the sub rules
+        which have been configured in the signature rule.
+        The default value for user-define rule is false,
+        and for built-in rule is true."
+    ::= { hh3cWIPSSigRuleEntry 4 }
+
+hh3cWIPSSigRuleDctPeriod OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "second"
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the detect period of signature rule.
+         Available value limits from 1 to 3600.
+         The default value depends on the certain rule.
+         For user-define rules it is 60.
+         The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 5 }
+
+hh3cWIPSSigRuleTrackMethod OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        perSig(1),
+        perMAC(2),
+        both(3)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the track-method for the signature rule.
+         The default value depends on the certain rule.
+         For user-define rules it is 'both(3)'."
+    ::= { hh3cWIPSSigRuleEntry 6 }
+
+hh3cWIPSSigRuleDctThresholdPerMAC OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the detect threshold for per-MAC track-method.
+         Available value limits from 1 to 32000.
+         The default value depends on the certain rule.
+         For user-define rules it is 1000.
+         The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 7 }
+
+hh3cWIPSSigRuleDctThresholdPerSig OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the detect threshold for per-Signature track-method.
+         Available value limits from 1 to 32000.
+         The default value depends on the certain rule.
+         For user-define rules it is 1000.
+         The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 8 }
+
+hh3cWIPSSigRuleActionEvtLevel OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the level of event sended for the action of reporting event alarm.
+         Available value limits from 0 to 7.
+         The default value depends on the certain rule.
+         For user-define rules it is 0xffffffff."
+    ::= { hh3cWIPSSigRuleEntry 9 }
+
+hh3cWIPSSigRuleQuietTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting event alarm.
+         Available value limits from 60 to 32000.
+         The default value depends on the certain rule.
+         For user-define rules it is 900.
+         The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 10 }
+
+hh3cWIPSSigSubRuleFrameType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        manage(0),
+        control(1),
+        data(2),
+        undo(3)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the type of frame to match.
+        0x0 management type
+        0x1 control type
+        0x2 data type
+        The default value depends on the certain rule.
+        For user-define rules it is 'undo(3)'."
+    ::= { hh3cWIPSSigRuleEntry 11 }
+
+hh3cWIPSSigSubRuleFrameSubType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        assocReq(1),
+        assocRes(2),
+        probeReq(3),
+        beacon(4),
+        disasso(5),
+        auth(6),
+        deauth(7)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the sub-type of frame to match.
+        1 association request
+        2 association response
+        3 probe request
+        4 beacon
+        5 disassoc
+        6 authentication
+        7 de-authentication
+        The default value depends on the certain rule.
+        For user-define rules it is 'none(0)'."
+    ::= { hh3cWIPSSigRuleEntry 12 }
+
+hh3cWIPSSigSubRuleMac OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..12))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address or BSSID to match."
+    ::= { hh3cWIPSSigRuleEntry 13 }
+
+hh3cWIPSSigSubRuleMacType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        source(0),
+        dest(1),
+        bssid(2)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the type of MAC address or BSSID to match.
+         0 Source MAC address in the 802.11 frame header
+         1 Destination MAC address in the 802.11 frame header
+         2 BSSID field in the 802.11 frame header"
+    ::= { hh3cWIPSSigRuleEntry 14 }
+
+hh3cWIPSSigSubRuleSeqNumMin OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the minimun value of sequence number of packet to match.
+         Available value limits from 0 to 4094.
+         The default value depends on the certain rule.
+         For user-define rules it is 0xffffffff.
+         The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 15 }
+
+hh3cWIPSSigSubRuleSeqNumMax OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the maximum value of sequence number of packet to match.
+        Available value limits from 1 to 4095.
+        The default value depends on the certain rule.
+        For user-define rules it is 0xffffffff.
+        The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 16 }
+
+hh3cWIPSSigSubRuleSSIDLenMin OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the minimun value of SSID of packet to match.
+        Available value limits from 0 to 31.
+        The default value depends on the certain rule.
+        For user-define rules it is 0xffffffff.
+        The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 17 }
+
+hh3cWIPSSigSubRuleSSIDLenMax OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the maximum value of SSID of packet to match.
+        Available value limits from 1 to 32.
+        The default value depends on the certain rule.
+        For user-define rules it is 0xffffffff.
+        The value 0xffffffff represents restoring default value operation."
+    ::= { hh3cWIPSSigRuleEntry 18 }
+
+hh3cWIPSSigSubRuleSSID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the string of SSID of packet to match."
+    ::= { hh3cWIPSSigRuleEntry 19 }
+
+hh3cWIPSSigSubRuleSSIDOpe OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        include(1),
+        notinclude(2),
+        equal(3),
+        notequal(4)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the compare way of the SSID in the sub rule,
+        including include/not include/equal/not equal."
+    ::= { hh3cWIPSSigRuleEntry 20 }
+
+hh3cWIPSSigSubRuleSSIDCase OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the case sensitive or not for the SSID match.
+        'true': Case insensitive.
+        'false': Case sensitive."
+    DEFVAL { false }
+    ::= { hh3cWIPSSigRuleEntry 21 }
+
+hh3cWIPSSigSubRulePatternTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSSigSubRulePatternEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the signature sub rules
+        which define the user-define match way through pattern of packet.
+        "
+    ::= { hh3cWIPSSigConfigGroup 4 }
+
+hh3cWIPSSigSubRulePatternEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSSigSubRulePatternEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each pattern signature sub rules."
+    INDEX { hh3cWIPSSigRuleName, hh3cWIPSSigSubRulePatternID }
+    ::= { hh3cWIPSSigSubRulePatternTable 1 }
+
+Hh3cWIPSSigSubRulePatternEntry ::=
+    SEQUENCE {
+        hh3cWIPSSigSubRulePatternID
+            Unsigned32,
+        hh3cWIPSSigSubRuleRowStatus
+            RowStatus,
+        hh3cWIPSSigSubRulePatternName
+            OCTET STRING,
+        hh3cWIPSSigSubRulePatternOffset
+            Integer32,
+        hh3cWIPSSigSubRulePatternMask
+            Integer32,
+        hh3cWIPSSigSubRulePatternValueMin
+            Unsigned32,
+        hh3cWIPSSigSubRulePatternValueMax
+            Unsigned32,
+        hh3cWIPSSigSubRulePatternFromPayload
+            TruthValue
+     }
+
+hh3cWIPSSigSubRulePatternID OBJECT-TYPE
+    SYNTAX Unsigned32 (1..27)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the ID of the pattern sub rule."
+    ::= { hh3cWIPSSigSubRulePatternEntry 1 }
+
+hh3cWIPSSigSubRuleRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSSigSubRulePatternEntry 2 }
+
+hh3cWIPSSigSubRulePatternName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the name of the pattern sub rule."
+    ::= { hh3cWIPSSigSubRulePatternEntry 3 }
+
+hh3cWIPSSigSubRulePatternOffset OBJECT-TYPE
+    SYNTAX Integer32 (0..2346)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the offset value of packet match."
+    ::= { hh3cWIPSSigSubRulePatternEntry 4 }
+
+hh3cWIPSSigSubRulePatternMask OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the mask value of packet match."
+    ::= { hh3cWIPSSigSubRulePatternEntry 5 }
+
+hh3cWIPSSigSubRulePatternValueMin OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the minimun value of match byte.
+         Available value limits from 0 to 65534."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSSigSubRulePatternEntry 6 }
+
+hh3cWIPSSigSubRulePatternValueMax OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the maximun value of match byte.
+         Available value limits from 1 to 65535."
+    DEFVAL { 'ffffffff'h }
+    ::= { hh3cWIPSSigSubRulePatternEntry 7 }
+
+hh3cWIPSSigSubRulePatternFromPayload OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether match start from the payload of the data frame."
+    DEFVAL { false }
+    ::= { hh3cWIPSSigSubRulePatternEntry 8 }
+
+hh3cWIPSCtmConfigGroup OBJECT IDENTIFIER ::= { hh3cWIPSConfigGroup 11 }
+
+hh3cWIPSCtmPolicyCfgSupportSet OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of supported countermeasure policy.
+        The specific countermeasure policy is supported if its corresponding
+        bit is set to 1; otherwise its corresponding bit is set to 0.
+        bit3:  misconfigured AP
+        bit4:  rogue AP
+        bit5:  unauthorized station
+        bit6:  external AP
+        bit9:  misassociation station
+        bit10: potential authorized AP
+        bit11: potential rogue AP
+        bit12: potential external AP
+        bit13: uncategorized AP
+        bit14: uncategorized station
+        "
+    ::= { hh3cWIPSCtmConfigGroup 1 }
+
+hh3cWIPSCtmPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSCtmPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the parameters for WIPS countermeasure policy.
+        One policy could be assigned to different VSDs.
+        "
+    ::= { hh3cWIPSCtmConfigGroup 2 }
+
+hh3cWIPSCtmPolicyEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSCtmPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each countermeasure policy."
+    INDEX { hh3cWIPSCtmPolicyName }
+    ::= { hh3cWIPSCtmPolicyTable 1 }
+
+Hh3cWIPSCtmPolicyEntry ::=
+    SEQUENCE {
+        hh3cWIPSCtmPolicyName
+            OCTET STRING,
+        hh3cWIPSCtmPolicyCfgRowStatus
+            RowStatus,
+        hh3cWIPSCtmPolicyBitString
+            OCTET STRING,
+        hh3cWIPSCtmPolicyFixedChl
+            TruthValue,
+        hh3cWIPSCtmPolicyRogueAPPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyPtRogueAPPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyMisconfAPPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyExternalAPPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyPtExternalAPPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyUncateAPPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyPtAuthAPPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyMisassoStaPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyUncateStaPre
+            Unsigned32,
+        hh3cWIPSCtmPolicyUnauthStaPre
+            Unsigned32
+     }
+
+hh3cWIPSCtmPolicyName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of countermeasure policy."
+    ::= { hh3cWIPSCtmPolicyEntry 1 }
+
+hh3cWIPSCtmPolicyCfgRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSCtmPolicyEntry 2 }
+
+hh3cWIPSCtmPolicyBitString OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (16))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of countermeasure policy configuration.
+        The specific countermeasure of device is enabled if its corresponding
+        bit is set to 1; disabled if its corresponding bit is set to 0.
+        bit3:  misconfigured AP
+        bit4:  rogue AP
+        bit5:  unauthorized station
+        bit6:  external AP
+        bit9:  misassociation station
+        bit10: potential authorized AP
+        bit11: potential rogue AP
+        bit12: potential external AP
+        bit13: uncategorized AP
+        bit14: uncategorized station"
+    ::= { hh3cWIPSCtmPolicyEntry 3 }
+
+hh3cWIPSCtmPolicyFixedChl OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents whether enable fixed channel scan function."
+    DEFVAL { false }
+    ::= { hh3cWIPSCtmPolicyEntry 4 }
+
+hh3cWIPSCtmPolicyRogueAPPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure for rogue AP.
+         Available value limits from 0 to 9.
+         Value 0xffffffff represents undo operation."
+    DEFVAL { 9 }
+    ::= { hh3cWIPSCtmPolicyEntry 5 }
+
+hh3cWIPSCtmPolicyPtRogueAPPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for potential rogue AP.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 7 }
+    ::= { hh3cWIPSCtmPolicyEntry 6 }
+
+hh3cWIPSCtmPolicyMisconfAPPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for misconfigured AP.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 3 }
+    ::= { hh3cWIPSCtmPolicyEntry 7 }
+
+hh3cWIPSCtmPolicyExternalAPPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for external AP.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 1 }
+    ::= { hh3cWIPSCtmPolicyEntry 8 }
+
+hh3cWIPSCtmPolicyPtExternalAPPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for potential external AP.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 2 }
+    ::= { hh3cWIPSCtmPolicyEntry 9 }
+
+hh3cWIPSCtmPolicyUncateAPPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for uncategorized AP.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 5 }
+    ::= { hh3cWIPSCtmPolicyEntry 10 }
+
+hh3cWIPSCtmPolicyPtAuthAPPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for potential authorized AP.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSCtmPolicyEntry 11 }
+
+hh3cWIPSCtmPolicyMisassoStaPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for misassociated station.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 6 }
+    ::= { hh3cWIPSCtmPolicyEntry 12 }
+
+hh3cWIPSCtmPolicyUncateStaPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for uncategorized station.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 4 }
+    ::= { hh3cWIPSCtmPolicyEntry 13 }
+
+hh3cWIPSCtmPolicyUnauthStaPre OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of countermeasure
+        for unauthorized station.
+        Available value limits from 0 to 9.
+        Value 0xffffffff represents undo operation."
+    DEFVAL { 8 }
+    ::= { hh3cWIPSCtmPolicyEntry 14 }
+
+hh3cWIPSCtmPolicyDevListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSCtmPolicyDevListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table defines the MAC address list of countermeasure device
+        in WIPS countermeasure policy. "
+    ::= { hh3cWIPSCtmConfigGroup 3 }
+
+hh3cWIPSCtmPolicyDevListEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSCtmPolicyDevListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each MAC address of device."
+    INDEX { hh3cWIPSCtmPolicyName,  hh3cWIPSCtmPolicyDevMAC }
+    ::= { hh3cWIPSCtmPolicyDevListTable 1 }
+
+Hh3cWIPSCtmPolicyDevListEntry ::=
+    SEQUENCE {
+        hh3cWIPSCtmPolicyDevMAC
+            MacAddress,
+        hh3cWIPSCtmPolicyDevRowStatus
+            RowStatus
+     }
+
+hh3cWIPSCtmPolicyDevMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of countermeasure device."
+    ::= { hh3cWIPSCtmPolicyDevListEntry 1 }
+
+hh3cWIPSCtmPolicyDevRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSCtmPolicyDevListEntry 2 }
+
+hh3cWIPSMalPktDctConfigGroup OBJECT IDENTIFIER ::= { hh3cWIPSConfigGroup 12 }
+
+hh3cWIPSMalPktDctCfgLogSupportSet OBJECT-TYPE
+    SYNTAX OCTET STRING  (SIZE (32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of supported malformed packet detect policy
+        controlling the log function.
+        The specific malformed packet detect policy is supported if its corresponding
+        bit is set to 1; otherwise its corresponding bit is set to 0.
+        bit0:  invalid IE length
+        bit1:  duplicated IE
+        bit2:  redundant IE
+        bit3:  invalid packet length
+        bit4:  illegal IBSS and ESS
+        bit5:  invalid source address
+        bit6:  overflow EAPOL key length
+        bit7:  malformed authetication
+        bit8:  malformed association request
+        bit9:  malformed HT-IE
+        bit10: large duration
+        bit11: null probe response
+        bit12: invalid deauthentication reason code
+        bit13: invalid disassociation reason code
+        bit14: overflow SSID length
+        bit15: fata-jack
+        bit17: invalid-channel"
+    ::= { hh3cWIPSMalPktDctConfigGroup 1 }
+
+hh3cWIPSMalPktDctCfgTrapSupportSet OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of supported malformed packet detect policy
+        controlling the trap function.
+        The specific malformed packet detect policy is supported if its corresponding
+        bit is set to 1; otherwise its corresponding bit is set to 0.
+        bit0:  invalid IE length
+        bit1:  duplicated IE
+        bit2:  redundant IE
+        bit3:  invalid packet length
+        bit4:  illegal IBSS and ESS
+        bit5:  invalid source address
+        bit6:  overflow EAPOL key length
+        bit7:  malformed authetication
+        bit8:  malformed association request
+        bit9:  malformed HT-IE
+        bit10: large duration
+        bit11: null probe response
+        bit12: invalid deauthentication reason code
+        bit13: invalid disassociation reason code
+        bit14: overflow SSID length
+        bit15: fata-jack
+        bit17: invalid-channel"
+    ::= { hh3cWIPSMalPktDctConfigGroup 2 }
+
+hh3cWIPSMalPktDctPolicyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSMalPktDctPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents."
+    ::= { hh3cWIPSMalPktDctConfigGroup 3 }
+
+hh3cWIPSMalPktDctPolicyEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSMalPktDctPolicyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents."
+    INDEX { hh3cWIPSMalPktDctPolicyName }
+    ::= { hh3cWIPSMalPktDctPolicyTable 1 }
+
+Hh3cWIPSMalPktDctPolicyEntry ::=
+    SEQUENCE {
+        hh3cWIPSMalPktDctPolicyName
+            OCTET STRING,
+        hh3cWIPSMalPktDctPolicyCfgRowStatus
+            RowStatus,
+        hh3cWIPSMalPktDctPolicyLogBitString
+            OCTET STRING,
+        hh3cWIPSMalPktDctPolicyTrapBitString
+            OCTET STRING,
+        hh3cWIPSMalPktDctPolicyDurationThreshold
+            Integer32,
+        hh3cWIPSMalPktDctPolicyQuietTime
+            Integer32
+     }
+
+hh3cWIPSMalPktDctPolicyName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of malformed packet detect policy."
+    ::= { hh3cWIPSMalPktDctPolicyEntry 1 }
+
+hh3cWIPSMalPktDctPolicyCfgRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSMalPktDctPolicyEntry 2 }
+
+hh3cWIPSMalPktDctPolicyLogBitString OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of malformed packet detect policy
+        controlling the log function configuration.
+        The specific malformed packet detect is enbled if its corresponding
+        bit is set to 1; disabled its corresponding bit is set to 0.
+        bit0:  invalid IE length
+        bit1:  duplicated IE
+        bit2:  redundant IE
+        bit3:  invalid packet length
+        bit4:  illegal IBSS and ESS
+        bit5:  invalid source address
+        bit6:  overflow EAPOL key length
+        bit7:  malformed authetication
+        bit8:  malformed association request
+        bit9:  malformed HT-IE
+        bit10: large duration
+        bit11: null probe response
+        bit12: invalid deauthentication reason code
+        bit13: invalid disassociation reason code
+        bit14: overflow SSID length
+        bit15: fata-jack
+        bit17: invalid-channel"
+    ::= { hh3cWIPSMalPktDctPolicyEntry 3 }
+
+hh3cWIPSMalPktDctPolicyTrapBitString OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (32))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the bit string of malformed packet detect policy
+        controlling the trap function configuration.
+        The specific malformed packet detect is enbled if its corresponding
+        bit is set to 1; disabled its corresponding bit is set to 0.
+        bit0:  invalid IE length
+        bit1:  duplicated IE
+        bit2:  redundant IE
+        bit3:  invalid packet length
+        bit4:  illegal IBSS and ESS
+        bit5:  invalid source address
+        bit6:  overflow EAPOL key length
+        bit7:  malformed authetication
+        bit8:  malformed association request
+        bit9:  malformed HT-IE
+        bit10: large duration
+        bit11: null probe response
+        bit12: invalid deauthentication reason code
+        bit13: invalid disassociation reason code
+        bit14: overflow SSID length
+        bit15: fata-jack
+        bit17: invalid-channel"
+    ::= { hh3cWIPSMalPktDctPolicyEntry 4 }
+
+hh3cWIPSMalPktDctPolicyDurationThreshold OBJECT-TYPE
+    SYNTAX Integer32 (1..32767)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the threshold of duration
+        for large duration malformed packet detection."
+    DEFVAL {5000}
+    ::= { hh3cWIPSMalPktDctPolicyEntry 5 }
+
+hh3cWIPSMalPktDctPolicyQuietTime OBJECT-TYPE
+    SYNTAX Integer32 (5..604800)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Represents the quiet time after reporting event alarm."
+    DEFVAL { 600 }
+    ::= { hh3cWIPSMalPktDctPolicyEntry 6 }
+
+hh3cWIPSStaticTrustOUIListCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSStaticTrustOUIListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the OUI list
+        of devices in the static trust list.
+        WIPS will take the devices in the list as authorized devices."
+    ::= { hh3cWIPSConfigGroup 13 }
+
+hh3cWIPSStaticTrustOUIListCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSStaticTrustOUIListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each OUI
+        in the static trust list.
+        "
+    INDEX { hh3cWIPSStaticTrustOUIListOUI }
+    ::= { hh3cWIPSStaticTrustOUIListCfgTable 1 }
+
+Hh3cWIPSStaticTrustOUIListCfgEntry ::=
+    SEQUENCE {
+        hh3cWIPSStaticTrustOUIListOUI
+            OCTET STRING,
+        hh3cWIPSStaticTrustOUIListRowStatus
+            RowStatus
+     }
+
+hh3cWIPSStaticTrustOUIListOUI OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (3))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the OUI in static trust list."
+    ::= { hh3cWIPSStaticTrustOUIListCfgEntry 1 }
+
+hh3cWIPSStaticTrustOUIListRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSStaticTrustOUIListCfgEntry 2 }
+
+hh3cWIPSStaticTrustVendorListCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSStaticTrustVendorListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the vendor list
+        of devices in the static trust list.
+        WIPS will take the devices in the list as authorized devices."
+    ::= { hh3cWIPSConfigGroup 14 }
+
+hh3cWIPSStaticTrustVendorListCfgEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSStaticTrustVendorListCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each vendor
+        in the static trust list.
+        "
+    INDEX { hh3cWIPSStaticTrustVendorListVendor }
+    ::= { hh3cWIPSStaticTrustVendorListCfgTable 1 }
+
+Hh3cWIPSStaticTrustVendorListCfgEntry ::=
+    SEQUENCE {
+        hh3cWIPSStaticTrustVendorListVendor
+            OCTET STRING,
+        hh3cWIPSStaticTrustVendorListRowStatus
+            RowStatus
+     }
+
+hh3cWIPSStaticTrustVendorListVendor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the vendor in static trust list."
+    ::= { hh3cWIPSStaticTrustVendorListCfgEntry 1 }
+
+hh3cWIPSStaticTrustVendorListRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { hh3cWIPSStaticTrustVendorListCfgEntry 2 }
+
+hh3cWIPSDetectGroup OBJECT IDENTIFIER ::= { hh3cWIPS 2 }
+
+hh3cWIPSDctAPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of possible BSS information for
+        APs detected by the WIPS."
+    ::= { hh3cWIPSDetectGroup 1 }
+
+hh3cWIPSDctAPEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible BSS information of each AP detected
+        by WIPS."
+    INDEX { hh3cWIPSDctAPVSD, hh3cWIPSDctAPBSSID }
+    ::= { hh3cWIPSDctAPTable 1 }
+
+Hh3cWIPSDctAPEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctAPVSD
+            OCTET STRING,
+        hh3cWIPSDctAPBSSID
+            MacAddress,
+        hh3cWIPSDctAPRunningTime
+            TimeTicks,
+        hh3cWIPSDctAPRunTmLastUpdateTm
+            TimeTicks,
+        hh3cWIPSDctAPIsCountered
+            TruthValue,
+        hh3cWIPSDctAPWorkChannel
+            Hh3cWIPSChannel,
+        hh3cWIPSDctAPRadioType
+            Hh3cWIPSRadioType,
+        hh3cWIPSDctAPAuthMethod
+            Hh3cWIPSAuthMethod,
+        hh3cWIPSDctAPEncryptMethod
+            Hh3cWIPSEncryptMethod,
+        hh3cWIPSDctAPSecurity
+            Hh3cWIPSAPSecurityType,
+        hh3cWIPSDctAPSeverityLevel
+            Unsigned32,
+        hh3cWIPSDctAPLastDctTm
+            TimeTicks,
+        hh3cWIPSDctAPFirstDctTm
+            TimeTicks,
+        hh3cWIPSDctAPAdd2BlackList
+            TruthValue,
+        hh3cWIPSDctAPAdd2WhiteList
+            TruthValue,
+        hh3cWIPSDctAPAdd2IgnoreList
+            TruthValue,
+        hh3cWIPSDctAPAdd2CtmList
+            TruthValue,
+        hh3cWIPSDctAPCategory
+            Hh3cWIPSAPCategoryType,
+        hh3cWIPSDctAPCategoryWay
+            Hh3cWIPSDevCategoryWay,
+        hh3cWIPSDctAPStatus
+            Hh3cWIPSDevStatus,
+        hh3cWIPSDctAPSSID
+            OCTET STRING,
+        hh3cWIPSDctAPAttachStaNum
+            Integer32,
+        hh3cWIPSDctAPRptSensorNum
+            Integer32,
+        hh3cWIPSDctAPVendor
+            OCTET STRING
+     }
+
+hh3cWIPSDctAPVSD OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the virtual security domain where the BSS was detected."
+    ::= { hh3cWIPSDctAPEntry 1 }
+
+hh3cWIPSDctAPBSSID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the Basic Service Set."
+    ::= { hh3cWIPSDctAPEntry 2 }
+
+hh3cWIPSDctAPRunningTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time since AP started to work, which is got from
+        beacon/probe response frame."
+    ::= { hh3cWIPSDctAPEntry 3 }
+
+hh3cWIPSDctAPRunTmLastUpdateTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time update hh3cWIPSDctAPRunningTime since
+        system is up."
+    ::= { hh3cWIPSDctAPEntry 4 }
+
+hh3cWIPSDctAPIsCountered OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents whether the detected AP is countered by WIPS."
+    ::= { hh3cWIPSDctAPEntry 5 }
+
+hh3cWIPSDctAPWorkChannel OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio channel which the detected AP work on."
+    ::= { hh3cWIPSDctAPEntry 6 }
+
+hh3cWIPSDctAPRadioType OBJECT-TYPE
+    SYNTAX Hh3cWIPSRadioType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio type used by the detected AP."
+    ::= { hh3cWIPSDctAPEntry 7 }
+
+hh3cWIPSDctAPAuthMethod OBJECT-TYPE
+    SYNTAX Hh3cWIPSAuthMethod
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the authentication method used by the detected AP.
+        none(1)            - No key management mode configured,
+        psk(2)             - pre-shared key authentication,
+        dot1x(3)           - 802.1x authentication,
+        other(4)           - other authentication,
+        psk/dot1x(5)       - psk and dot1x authentication,
+        psk/other(6)       - psk and other authentication,
+        dot1x/other(7)     - dot1x and other authentication,
+        psk/dot1x/other(8) - psk, dot1x and other authentication."
+
+    ::= { hh3cWIPSDctAPEntry 8 }
+
+hh3cWIPSDctAPEncryptMethod OBJECT-TYPE
+    SYNTAX Hh3cWIPSEncryptMethod
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the encrypt method used by the detected AP.
+        none(1)     - clear text or no cipher method is configure,
+        wep(2)      - WEP key,
+        tkip(4)     - WPA Temporal Key encryption,
+        ccmp(8)     - WPA AES CCMP encryption"
+    ::= { hh3cWIPSDctAPEntry 9 }
+
+hh3cWIPSDctAPSecurity OBJECT-TYPE
+    SYNTAX Hh3cWIPSAPSecurityType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the security suites of the detected AP.
+        clear  0x01
+        wpa2   0x02
+        wpa    0x04
+        wep    0x08"
+    ::= { hh3cWIPSDctAPEntry 10 }
+
+hh3cWIPSDctAPSeverityLevel OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the severity level of the detected AP."
+    ::= { hh3cWIPSDctAPEntry 11 }
+
+hh3cWIPSDctAPLastDctTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that AP was detected for the last time since system
+        is up."
+    ::= { hh3cWIPSDctAPEntry 12 }
+
+hh3cWIPSDctAPFirstDctTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that AP was detected for the first time
+        since system is up."
+    ::= { hh3cWIPSDctAPEntry 13 }
+
+hh3cWIPSDctAPAdd2BlackList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the AP will be taken as a rogue AP.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSBlockListTable and the category of the AP will be
+        taken as rogue.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSBlockListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctAPEntry 14 }
+
+hh3cWIPSDctAPAdd2WhiteList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the AP will be taken as an authorized AP.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSTrustListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSTrustListTable"
+    DEFVAL { false }
+    ::= { hh3cWIPSDctAPEntry 15 }
+
+hh3cWIPSDctAPAdd2IgnoreList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the AP will be taken as an ignored AP.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSIgnoreListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSIgnoreListTable"
+    DEFVAL { false }
+    ::= { hh3cWIPSDctAPEntry 16 }
+
+hh3cWIPSDctAPAdd2CtmList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the AP will be taken as a countered AP.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSCountermeasureListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSCountermeasureListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctAPEntry 17 }
+
+hh3cWIPSDctAPCategory OBJECT-TYPE
+    SYNTAX Hh3cWIPSAPCategoryType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents the categorized result of the AP.
+        For set operation, only the following values are valid:
+        authorized(2),rogue(3),misconfigured(4),external(5)"
+    ::= { hh3cWIPSDctAPEntry 18 }
+
+hh3cWIPSDctAPCategoryWay OBJECT-TYPE
+    SYNTAX Hh3cWIPSDevCategoryWay
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents by which way the AP is categorized.
+        manual(1)    -categorized by user
+        autoByNMS(2) -categorized by NMS(Network Management System)
+        autoByDev(3) -categorized by WIPS"
+    DEFVAL { autoByDev }
+    ::= { hh3cWIPSDctAPEntry 19 }
+
+hh3cWIPSDctAPStatus OBJECT-TYPE
+    SYNTAX Hh3cWIPSDevStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the status of the AP detected by WIPS."
+    ::= { hh3cWIPSDctAPEntry 20 }
+
+hh3cWIPSDctAPSSID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the SSID broadcasted by AP."
+    ::= { hh3cWIPSDctAPEntry 21 }
+
+hh3cWIPSDctAPAttachStaNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of clients associated with the detected AP."
+    ::= { hh3cWIPSDctAPEntry 22 }
+
+hh3cWIPSDctAPRptSensorNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of sensors detecting the AP."
+    ::= { hh3cWIPSDctAPEntry 23 }
+
+
+hh3cWIPSDctAPVendor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the vendor of this AP detected by WIPS."
+    ::= { hh3cWIPSDctAPEntry 24 }
+
+hh3cWIPSDctAPAttachStaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctAPAttachStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of station associated with APs
+        detected by the WIPS."
+    ::= { hh3cWIPSDetectGroup 2 }
+
+hh3cWIPSDctAPAttachStaEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctAPAttachStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible station information detected
+        by WIPS."
+    INDEX { hh3cWIPSDctAPVSD, hh3cWIPSDctAPBSSID, hh3cWIPSDctAPAttachStaMac }
+    ::= { hh3cWIPSDctAPAttachStaTable 1 }
+
+Hh3cWIPSDctAPAttachStaEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctAPAttachStaMac
+            MacAddress,
+        hh3cWIPSDctAPAttachStaRowStatus
+            RowStatus
+     }
+
+hh3cWIPSDctAPAttachStaMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of station associated with AP."
+    ::= { hh3cWIPSDctAPAttachStaEntry 1 }
+
+hh3cWIPSDctAPAttachStaRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry.  It is read-only and
+        will return 'Not writable' for set operation."
+    ::= { hh3cWIPSDctAPAttachStaEntry 2 }
+
+hh3cWIPSDctAPRptSensorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctAPRptSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of sensors."
+    ::= { hh3cWIPSDetectGroup 3 }
+
+hh3cWIPSDctAPRptSensorEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctAPRptSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible sensor information of WIPS."
+    INDEX { hh3cWIPSDctAPVSD, hh3cWIPSDctAPBSSID, hh3cWIPSDctAPRptSensorName }
+    ::= { hh3cWIPSDctAPRptSensorTable 1 }
+
+Hh3cWIPSDctAPRptSensorEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctAPRptSensorName
+            OCTET STRING,
+        hh3cWIPSDctAPRptSensorRadioId
+            Integer32,
+        hh3cWIPSDctAPRptRSSI
+            Integer32,
+        hh3cWIPSDctAPLastRptTm
+            TimeTicks
+     }
+
+hh3cWIPSDctAPRptSensorName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of sensor."
+    ::= { hh3cWIPSDctAPRptSensorEntry 1 }
+
+hh3cWIPSDctAPRptSensorRadioId OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents on which radio the sensor AP detected the AP."
+    ::= { hh3cWIPSDctAPRptSensorEntry 2 }
+
+hh3cWIPSDctAPRptRSSI OBJECT-TYPE
+    SYNTAX Integer32 (0..90)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the current value of signal strength that WIPS sensor
+        AP received from the AP."
+    ::= { hh3cWIPSDctAPRptSensorEntry 3 }
+
+hh3cWIPSDctAPLastRptTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that AP was detected by this sensor
+        for the last time since system is up."
+    ::= { hh3cWIPSDctAPRptSensorEntry 4 }
+
+hh3cWIPSDctStaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of possible information for
+        stations detected by the WIPS."
+    ::= { hh3cWIPSDetectGroup 4 }
+
+hh3cWIPSDctStaEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible station information of each station
+        detected by WIPS."
+    INDEX { hh3cWIPSDctStaVSD, hh3cWIPSDctStaMac }
+    ::= { hh3cWIPSDctStaTable 1 }
+
+Hh3cWIPSDctStaEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctStaVSD
+            OCTET STRING,
+        hh3cWIPSDctStaMac
+            MacAddress,
+        hh3cWIPSDctStaAssocBSSID
+            MacAddress,
+        hh3cWIPSDctStaStatus
+            Hh3cWIPSDevStatus,
+        hh3cWIPSDctStaCategory
+            Hh3cWIPSClientCategoryType,
+        hh3cWIPSDctStaRadioType
+            Hh3cWIPSRadioType,
+        hh3cWIPSDctStaWorkChannel
+            Hh3cWIPSChannel,
+        hh3cWIPSDctStaIsCountered
+            TruthValue,
+        hh3cWIPSDctStaAdd2BlackList
+            TruthValue,
+        hh3cWIPSDctStaAdd2WhiteList
+            TruthValue,
+        hh3cWIPSDctStaAdd2IgnoreList
+            TruthValue,
+        hh3cWIPSDctStaAdd2CtmList
+            TruthValue,
+        hh3cWIPSDctStaFirstDctTm
+            TimeTicks,
+        hh3cWIPSDctStaLastDctTm
+            TimeTicks,
+        hh3cWIPSDctStaRptSensorNum
+            Integer32,
+        hh3cWIPSDctStaState
+            INTEGER,
+        hh3cWIPSDctStaVendor
+            OCTET STRING
+     }
+
+hh3cWIPSDctStaVSD OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the virtual security domain in which the station was detected."
+    ::= { hh3cWIPSDctStaEntry 1 }
+
+hh3cWIPSDctStaMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of station."
+    ::= { hh3cWIPSDctStaEntry 2 }
+
+hh3cWIPSDctStaAssocBSSID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the BSSID which station associates with."
+    ::= { hh3cWIPSDctStaEntry 3 }
+
+hh3cWIPSDctStaStatus OBJECT-TYPE
+    SYNTAX Hh3cWIPSDevStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the status of this station detected by WIPS."
+    ::= { hh3cWIPSDctStaEntry 4 }
+
+hh3cWIPSDctStaCategory OBJECT-TYPE
+    SYNTAX Hh3cWIPSClientCategoryType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the categorized result of the station."
+    ::= { hh3cWIPSDctStaEntry 5 }
+
+hh3cWIPSDctStaRadioType OBJECT-TYPE
+    SYNTAX Hh3cWIPSRadioType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio type used by the detected station."
+    ::= { hh3cWIPSDctStaEntry 6 }
+
+hh3cWIPSDctStaWorkChannel OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents on which radio channel that WIPS sensor AP detected
+        the station."
+    ::= { hh3cWIPSDctStaEntry 7 }
+
+hh3cWIPSDctStaIsCountered OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents whether the detected station is countered by WIPS."
+    ::= { hh3cWIPSDctStaEntry 8 }
+
+hh3cWIPSDctStaAdd2BlackList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as a rogue station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSBlockListTable and the category of the station will be
+        taken as rogue.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSBlockListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctStaEntry 9 }
+
+hh3cWIPSDctStaAdd2WhiteList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as an authorized station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSTrustListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSTrustListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctStaEntry 10 }
+
+hh3cWIPSDctStaAdd2IgnoreList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as an ignored station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSIgnoreListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSIgnoreListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctStaEntry 11 }
+
+hh3cWIPSDctStaAdd2CtmList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as a countered station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSCountermeasureListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSCountermeasureListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctStaEntry 12 }
+
+hh3cWIPSDctStaFirstDctTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that station was detected for the first time
+        since system is up."
+    ::= { hh3cWIPSDctStaEntry 13 }
+
+hh3cWIPSDctStaLastDctTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that station was detected for the last time
+        since system is up."
+    ::= { hh3cWIPSDctStaEntry 14 }
+
+hh3cWIPSDctStaRptSensorNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of sensors detecting the station."
+    ::= { hh3cWIPSDctStaEntry 15 }
+
+hh3cWIPSDctStaState OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        authentication(1),
+        association(2),
+        eapSuccess(3),
+        eapLogoff(4),
+        disassociation(5),
+        deauthentication(6),
+        unassociation(7)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the authentication state of station with AP."
+    ::= { hh3cWIPSDctStaEntry 16 }
+
+hh3cWIPSDctStaVendor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the vendor of this station detected by WIPS."
+    ::= { hh3cWIPSDctStaEntry 17 }
+
+hh3cWIPSDctStaRptSensorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctStaRptSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of sensors detecting the station."
+    ::= { hh3cWIPSDetectGroup 5 }
+
+hh3cWIPSDctStaRptSensorEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctStaRptSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible sensor information of WIPS."
+    INDEX { hh3cWIPSDctStaVSD, hh3cWIPSDctStaMac, hh3cWIPSDctStaRtpSensorName }
+    ::= { hh3cWIPSDctStaRptSensorTable 1 }
+
+Hh3cWIPSDctStaRptSensorEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctStaRtpSensorName
+            OCTET STRING,
+        hh3cWIPSDctStaRptSensorRadioId
+            Integer32,
+        hh3cWIPSDctStaRptRSSI
+            Integer32,
+        hh3cWIPSDctStaLastRptTm
+            TimeTicks
+     }
+
+hh3cWIPSDctStaRtpSensorName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of sensor."
+    ::= { hh3cWIPSDctStaRptSensorEntry 1 }
+
+hh3cWIPSDctStaRptSensorRadioId OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents on which radio the sensor AP detected the station."
+    ::= { hh3cWIPSDctStaRptSensorEntry 2 }
+
+hh3cWIPSDctStaRptRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the current value of signal strength that WIPS sensor
+        AP received from the station."
+    ::= { hh3cWIPSDctStaRptSensorEntry 3 }
+
+hh3cWIPSDctStaLastRptTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that station was detected by this sensor
+        for the last time since system is up."
+    ::= { hh3cWIPSDctStaRptSensorEntry 4 }
+
+hh3cWIPSDctSSIDTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctSSIDEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of possible ESS information for
+        networks detected by WIPS."
+    ::= { hh3cWIPSDetectGroup 6 }
+
+hh3cWIPSDctSSIDEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctSSIDEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible ESS information of each ESS detected
+        by WIPS."
+    INDEX { hh3cWIPSDctNetworkVSD, hh3cWIPSDctNetworkSSID,
+            hh3cWIPSDctNetworkCfg }
+    ::= { hh3cWIPSDctSSIDTable 1 }
+
+Hh3cWIPSDctSSIDEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctNetworkVSD
+            OCTET STRING,
+        hh3cWIPSDctNetworkSSID
+            OCTET STRING,
+        hh3cWIPSDctNetworkCfg
+            Unsigned32,
+        hh3cWIPSDctNetworkFirstRptTm
+            TimeTicks,
+        hh3cWIPSDctNetworkLastRptTm
+            TimeTicks,
+        hh3cWIPSDctNetworkStatus
+            Hh3cWIPSDevStatus,
+        hh3cWIPSDctNetworkSSIDHide
+            TruthValue,
+        hh3cWIPSDctNetworkBSSNum
+            Integer32
+     }
+
+hh3cWIPSDctNetworkVSD OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the virtual security domain in which the ESS was detected."
+    ::= { hh3cWIPSDctSSIDEntry 1 }
+
+hh3cWIPSDctNetworkSSID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the service set identifier for the ESS.
+         Using the ASCII value '1' represents that the SSID is not advertised
+         in the beacon frames."
+    ::= { hh3cWIPSDctSSIDEntry 2 }
+
+hh3cWIPSDctNetworkCfg OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the encrypt method, security suite and authentication method
+        which are used by the detected ESS.
+        The lowest 8 bits mean encrypt method.  The higher 8 bits mean security suite.
+        The third 8 bits stand for authentication method.  The higerest 8 bits
+        are reserved.  The meaning is shown as follows:
+        31              23              15              7             0
+        + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+        |  reserved     |  auth method  | security suite|encryptmethod|
+        + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + + +
+        For encrypt method, the following values are supported:
+        1: none     - clear text or no cipher method is configure,
+        2: wep      - WEP key,
+        4: tkip     - WPA Temporal Key encryption,
+        8: ccmp     - WPA AES CCMP encryption
+        For security suite, the following values are supported:
+        0x01: clear
+        0x02: wpa2
+        0x04: wpa
+        0x08: wep
+        For authentication method, the following values are supported:
+        1:  none            - No key management mode configured,
+        2:  psk             - pre-shared key authentication,
+        3:  dot1x           - 802.1x authentication,
+        4:  other           - other authentication,
+        5:  psk/dot1x       - psk and dot1x authentication,
+        6:  psk/other       - psk and other authentication,
+        7:  dot1x/other     - dot1x and other authentication,
+        8:  psk/dot1x/other - psk, dot1x and other authentication."
+    ::= { hh3cWIPSDctSSIDEntry 3 }
+
+hh3cWIPSDctNetworkFirstRptTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that ESS was detected for the first time
+        since system is up."
+    ::= { hh3cWIPSDctSSIDEntry 4 }
+
+hh3cWIPSDctNetworkLastRptTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that ESS was detected for the last time
+        since system is up."
+    ::= { hh3cWIPSDctSSIDEntry 5 }
+
+hh3cWIPSDctNetworkStatus OBJECT-TYPE
+    SYNTAX Hh3cWIPSDevStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the status of this ESS detected by WIPS."
+    ::= { hh3cWIPSDctSSIDEntry 6 }
+
+hh3cWIPSDctNetworkSSIDHide OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents whether the ESS broadcasted its SSID."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctSSIDEntry 7 }
+
+hh3cWIPSDctNetworkBSSNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of APs using the same SSID in the ESS."
+    ::= { hh3cWIPSDctSSIDEntry 8 }
+
+hh3cWIPSDctSSIDBSSTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctSSIDBSSEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of APs using the same SSID in the ESS."
+    ::= { hh3cWIPSDetectGroup 7 }
+
+hh3cWIPSDctSSIDBSSEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctSSIDBSSEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible BSS information of each AP detected
+        by WIPS."
+    INDEX { hh3cWIPSDctNetworkVSD, hh3cWIPSDctNetworkSSID,
+            hh3cWIPSDctNetworkCfg, hh3cWIPSDctNetworkBSSID }
+    ::= { hh3cWIPSDctSSIDBSSTable 1 }
+
+Hh3cWIPSDctSSIDBSSEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctNetworkBSSID
+            MacAddress,
+        hh3cWIPSDctNetworkBSSWorkChl
+            Hh3cWIPSChannel,
+        hh3cWIPSDctNetworkBSSStaNum
+            Integer32
+     }
+
+hh3cWIPSDctNetworkBSSID OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the Basic Service Set."
+    ::= { hh3cWIPSDctSSIDBSSEntry 1 }
+
+hh3cWIPSDctNetworkBSSWorkChl OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents on which radio channel that WIPS sensor AP detected
+        the BSS."
+    ::= { hh3cWIPSDctSSIDBSSEntry 2 }
+
+hh3cWIPSDctNetworkBSSStaNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of clients associated with the detected BSS."
+    ::= { hh3cWIPSDctSSIDBSSEntry 3 }
+
+hh3cWIPSBlockListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSBlockListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of block device MAC address."
+    ::= { hh3cWIPSDetectGroup 8 }
+
+hh3cWIPSBlockListEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSBlockListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains block device MAC address information."
+    INDEX { hh3cWIPSBlockListMacAddress }
+    ::= { hh3cWIPSBlockListTable 1 }
+
+Hh3cWIPSBlockListEntry ::=
+    SEQUENCE {
+        hh3cWIPSBlockListMacAddress
+            MacAddress,
+        hh3cWIPSBlockListStatus
+            INTEGER
+    }
+
+hh3cWIPSBlockListMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of block device."
+    ::= { hh3cWIPSBlockListEntry 1 }
+
+hh3cWIPSBlockListStatus OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+    static(1),
+    dynamic(2),
+    staticAndDynamic(3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the status of block device."
+    ::= { hh3cWIPSBlockListEntry 2 }
+
+hh3cWIPSChannelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of channel information."
+    ::= { hh3cWIPSDetectGroup 9 }
+
+hh3cWIPSChannelEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains channel information."
+    INDEX { hh3cWIPSChannelNum }
+    ::= { hh3cWIPSChannelTable 1 }
+
+Hh3cWIPSChannelEntry ::=
+    SEQUENCE {
+        hh3cWIPSChannelNum
+            Hh3cWIPSChannel,
+        hh3cWIPSChannelRadioType
+            Hh3cWIPSRadioType,
+        hh3cWIPSChannelIsPermitted
+            TruthValue,
+        hh3cWIPSChannelLastRptTm
+            TimeTicks
+    }
+
+hh3cWIPSChannelNum OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannel
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the channel number."
+    ::= { hh3cWIPSChannelEntry 1 }
+
+hh3cWIPSChannelRadioType OBJECT-TYPE
+    SYNTAX Hh3cWIPSRadioType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio type used in the specific channel."
+    ::= { hh3cWIPSChannelEntry 2 }
+
+hh3cWIPSChannelIsPermitted OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents whether the channel is permitted."
+    ::= { hh3cWIPSChannelEntry 3 }
+
+hh3cWIPSChannelLastRptTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the latest time that detecting the channel is active."
+    ::= { hh3cWIPSChannelEntry 4 }
+
+hh3cWIPSCountermeasureListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSCountermeasureListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of global static countermeasure device information."
+    ::= { hh3cWIPSDetectGroup 10 }
+
+hh3cWIPSCountermeasureListEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSCountermeasureListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains countermeasure device information."
+    INDEX { hh3cWIPSCtmListMacAddress }
+    ::= { hh3cWIPSCountermeasureListTable 1 }
+
+Hh3cWIPSCountermeasureListEntry ::=
+    SEQUENCE {
+        hh3cWIPSCtmListMacAddress
+            MacAddress,
+        hh3cWIPSCtmListLastestWorkChl
+            Hh3cWIPSChannel,
+        hh3cWIPSCtmListFirstTm
+            TimeTicks,
+        hh3cWIPSCtmListLastTm
+            TimeTicks,
+        hh3cWIPSCtmListQurCnt
+            Integer32,
+        hh3cWIPSCtmListSensorNum
+            Integer32
+    }
+
+hh3cWIPSCtmListMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the countered device."
+    ::= { hh3cWIPSCountermeasureListEntry 1 }
+
+hh3cWIPSCtmListLastestWorkChl OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannel
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the channel on which the countermeasure device was working."
+    ::= { hh3cWIPSCountermeasureListEntry 2 }
+
+hh3cWIPSCtmListFirstTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the first time that the device was countered
+        since system is up."
+    ::= { hh3cWIPSCountermeasureListEntry 3 }
+
+hh3cWIPSCtmListLastTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the last time that the device was countered
+        since system is up."
+    ::= { hh3cWIPSCountermeasureListEntry 4 }
+
+hh3cWIPSCtmListQurCnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents how many times that the device was countered. "
+    ::= { hh3cWIPSCountermeasureListEntry 5 }
+
+hh3cWIPSCtmListSensorNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of sensors detecting the device."
+    ::= { hh3cWIPSCountermeasureListEntry 6 }
+
+hh3cWIPSIgnoreListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSIgnoreListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of ignored device information."
+    ::= { hh3cWIPSDetectGroup 11 }
+
+hh3cWIPSIgnoreListEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSIgnoreListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains ignored device information."
+    INDEX { hh3cWIPSIgnoreListMacAddress }
+    ::= { hh3cWIPSIgnoreListTable 1 }
+
+Hh3cWIPSIgnoreListEntry ::=
+    SEQUENCE {
+        hh3cWIPSIgnoreListMacAddress
+            MacAddress,
+        hh3cWIPSIgnoreListFirstIgnoreTm
+            TimeTicks,
+        hh3cWIPSIgnoreListLastIgnoreTm
+            TimeTicks,
+        hh3cWIPSIgnoreListIgnoreCnt
+            Integer32
+     }
+
+hh3cWIPSIgnoreListMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the ignored device."
+    ::= { hh3cWIPSIgnoreListEntry 1 }
+
+hh3cWIPSIgnoreListFirstIgnoreTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the first time when the event caused
+        by the device was ignored since system is up."
+    ::= { hh3cWIPSIgnoreListEntry 2 }
+
+hh3cWIPSIgnoreListLastIgnoreTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the last time when the event caused
+        by the device was ignored since system is up."
+    ::= { hh3cWIPSIgnoreListEntry 3 }
+
+hh3cWIPSIgnoreListIgnoreCnt OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of times of the event caused by device has been ignored."
+    ::= { hh3cWIPSIgnoreListEntry 4 }
+
+hh3cWIPSTrustListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSTrustListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of trust device information."
+    ::= { hh3cWIPSDetectGroup 12 }
+
+hh3cWIPSTrustListEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSTrustListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of a trust device."
+    INDEX { hh3cWIPSTrustListMacAddress }
+    ::= { hh3cWIPSTrustListTable 1 }
+
+Hh3cWIPSTrustListEntry ::=
+    SEQUENCE {
+        hh3cWIPSTrustListMacAddress
+            MacAddress,
+        hh3cWIPSTrustListStatus
+            INTEGER
+     }
+
+hh3cWIPSTrustListMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the trust device."
+    ::= { hh3cWIPSTrustListEntry 1 }
+
+hh3cWIPSTrustListStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        static(1),
+        dynamic(2),
+        staticAndDynamic(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the status of the trust device."
+    ::= { hh3cWIPSTrustListEntry 2 }
+
+hh3cWIPSChlStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSChlStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of channel statistics information."
+    ::= { hh3cWIPSDetectGroup 13 }
+
+hh3cWIPSChlStatEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSChlStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of channel statistics."
+    INDEX { hh3cWIPSChlStatSensorMacAddr, hh3cWIPSChlStatChannel }
+    ::= { hh3cWIPSChlStatTable 1 }
+
+Hh3cWIPSChlStatEntry ::=
+    SEQUENCE {
+        hh3cWIPSChlStatSensorMacAddr
+            MacAddress,
+        hh3cWIPSChlStatChannel
+            Hh3cWIPSChannel,
+        hh3cWIPSChlStatTotalPkt
+            Counter64,
+        hh3cWIPSChlStatTotalByte
+            Counter64,
+        hh3cWIPSChlStatBmcastPkt
+            Counter64,
+        hh3cWIPSChlStatBmcastByte
+            Counter64,
+        hh3cWIPSChlStatUnicastPkt
+            Counter64,
+        hh3cWIPSChlStatUnicastByte
+            Counter64,
+        hh3cWIPSChlStatManagement
+            Counter64,
+        hh3cWIPSChlStatControl
+            Counter64,
+        hh3cWIPSChlStatData
+            Counter64,
+        hh3cWIPSChlStatBeacon
+            Counter64,
+        hh3cWIPSChlStatRTS
+            Counter64,
+        hh3cWIPSChlStatCTS
+            Counter64,
+        hh3cWIPSChlStatProbeRequest
+            Counter64,
+        hh3cWIPSChlStatProbeResponse
+            Counter64,
+        hh3cWIPSChlStatFragment
+            Counter64,
+        hh3cWIPSChlStatRetry
+            Counter64,
+        hh3cWIPSChlStatEapSuccess
+            Counter64,
+        hh3cWIPSChlStatEapFailure
+            Counter64,
+        hh3cWIPSChlStatEapolStart
+            Counter64,
+        hh3cWIPSChlStatEapolLogoff
+            Counter64,
+        hh3cWIPSChlStatAssocRequest
+            Counter64,
+        hh3cWIPSChlStatAssocResponse
+            Counter64,
+        hh3cWIPSChlStatUnicastDisassoc
+            Counter64,
+        hh3cWIPSChlStatBroadcastDisassoc
+            Counter64,
+        hh3cWIPSChlStatAuthentication
+            Counter64,
+        hh3cWIPSChlStatUnicastDeauthen
+            Counter64,
+        hh3cWIPSChlStatBroadcastDeauthen
+            Counter64,
+        hh3cWIPSChlStatMalformed
+            Counter64
+     }
+
+hh3cWIPSChlStatSensorMacAddr OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of sensor."
+    ::= { hh3cWIPSChlStatEntry 1 }
+
+hh3cWIPSChlStatChannel OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannel
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the statistics channel."
+    ::= { hh3cWIPSChlStatEntry 2 }
+
+hh3cWIPSChlStatTotalPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of total frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 3 }
+
+hh3cWIPSChlStatTotalByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the length of total frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 4 }
+
+hh3cWIPSChlStatBmcastPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of broadcast and multicast frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 5 }
+
+hh3cWIPSChlStatBmcastByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the total length of broadcast and multicast frames
+        in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 6 }
+
+hh3cWIPSChlStatUnicastPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of unicast frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 7 }
+
+hh3cWIPSChlStatUnicastByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the total length of unicast frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 8 }
+
+hh3cWIPSChlStatManagement OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of management frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 9 }
+
+hh3cWIPSChlStatControl OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of control frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 10 }
+
+hh3cWIPSChlStatData OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of data frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 11 }
+
+hh3cWIPSChlStatBeacon OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of beacon frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 12 }
+
+hh3cWIPSChlStatRTS OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of RTS frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 13 }
+
+hh3cWIPSChlStatCTS OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of CTS frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 14 }
+
+hh3cWIPSChlStatProbeRequest OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of probe request frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 15 }
+
+hh3cWIPSChlStatProbeResponse OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of probe response frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 16 }
+
+hh3cWIPSChlStatFragment OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of fragment frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 17 }
+
+hh3cWIPSChlStatRetry OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of retry frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 18 }
+
+hh3cWIPSChlStatEapSuccess OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAP-Success frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 19 }
+
+hh3cWIPSChlStatEapFailure OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAP-Failure frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 20 }
+
+hh3cWIPSChlStatEapolStart OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAPOL-Start frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 21 }
+
+hh3cWIPSChlStatEapolLogoff OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAPOL-Logoff frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 22 }
+
+hh3cWIPSChlStatAssocRequest OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of association request frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 23 }
+
+hh3cWIPSChlStatAssocResponse OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of association response frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 24 }
+
+hh3cWIPSChlStatUnicastDisassoc OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of unicast disassociation frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 25 }
+
+hh3cWIPSChlStatBroadcastDisassoc OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of broadcast disassociation frames
+        in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 26 }
+
+hh3cWIPSChlStatAuthentication OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of authentication frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 27 }
+
+hh3cWIPSChlStatUnicastDeauthen OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of unicast deauthentication frames
+        in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 28 }
+
+hh3cWIPSChlStatBroadcastDeauthen OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of broadcast deauthentication frames
+        in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 29 }
+
+hh3cWIPSChlStatMalformed OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of malformed frames in the channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSChlStatEntry 30 }
+
+hh3cWIPSDevStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDevStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of device statistics information."
+    ::= { hh3cWIPSDetectGroup 14 }
+
+hh3cWIPSDevStatEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDevStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of device statistics."
+    INDEX { hh3cWIPSDevStatSensorMacAddr, hh3cWIPSDevStatDevMacAddress, hh3cWIPSDevStatChannel }
+    ::= { hh3cWIPSDevStatTable 1 }
+
+Hh3cWIPSDevStatEntry ::=
+    SEQUENCE {
+        hh3cWIPSDevStatSensorMacAddr
+            MacAddress,
+        hh3cWIPSDevStatDevMacAddress
+            MacAddress,
+        hh3cWIPSDevStatChannel
+            Hh3cWIPSChannel,
+        hh3cWIPSDevStatTxTotalPkt
+            Counter64,
+        hh3cWIPSDevStatTxTotalByte
+            Counter64,
+        hh3cWIPSDevStatTxBMcastPkt
+            Counter64,
+        hh3cWIPSDevStatTxBMcastByte
+            Counter64,
+        hh3cWIPSDevStatTxUnicastPkt
+            Counter64,
+        hh3cWIPSDevStatTxUnicastByte
+            Counter64,
+        hh3cWIPSDevStatTxMgmt
+            Counter64,
+        hh3cWIPSDevStatTxCtrl
+            Counter64,
+        hh3cWIPSDevStatTxData
+            Counter64,
+        hh3cWIPSDevStatTxBeacon
+            Counter64,
+        hh3cWIPSDevStatTxRTS
+            Counter64,
+        hh3cWIPSDevStatTxProbeRequest
+            Counter64,
+        hh3cWIPSDevStatTxProbeResponse
+            Counter64,
+        hh3cWIPSDevStatTxFragment
+            Counter64,
+        hh3cWIPSDevStatTxRetry
+            Counter64,
+        hh3cWIPSDevStatTxAssocRequest
+            Counter64,
+        hh3cWIPSDevStatTxAssocResponse
+            Counter64,
+        hh3cWIPSDevStatTxUnicastDisassoc
+            Counter64,
+        hh3cWIPSDevStatTxBcastDisassoc
+            Counter64,
+        hh3cWIPSDevStatTxAuth
+            Counter64,
+        hh3cWIPSDevStatTxUnicastDeauth
+            Counter64,
+        hh3cWIPSDevStatTxBcastDeauth
+            Counter64,
+        hh3cWIPSDevStatTxEAPSuccess
+            Counter64,
+        hh3cWIPSDevStatTxEAPFailure
+            Counter64,
+        hh3cWIPSDevStatTxEAPOLStart
+            Counter64,
+        hh3cWIPSDevStatTxEAPOLLogOff
+            Counter64,
+        hh3cWIPSDevStatTxMalformed
+            Counter64,
+        hh3cWIPSDevStatRxTotalPkt
+            Counter64,
+        hh3cWIPSDevStatRxTotalByte
+            Counter64,
+        hh3cWIPSDevStatRxUnicastPkt
+            Counter64,
+        hh3cWIPSDevStatRxUnicastByte
+            Counter64,
+        hh3cWIPSDevStatRxMgmt
+            Counter64,
+        hh3cWIPSDevStatRxCtrl
+            Counter64,
+        hh3cWIPSDevStatRxData
+            Counter64,
+        hh3cWIPSDevStatRxRTS
+            Counter64,
+        hh3cWIPSDevStatRxCTS
+            Counter64,
+        hh3cWIPSDevStatRxProbeRequest
+            Counter64,
+        hh3cWIPSDevStatRxProbeResponse
+            Counter64,
+        hh3cWIPSDevStatRxFragment
+            Counter64,
+        hh3cWIPSDevStatRxRetry
+            Counter64,
+        hh3cWIPSDevStatRxAssoRequest
+            Counter64,
+        hh3cWIPSDevStatRxAssoResponse
+            Counter64,
+        hh3cWIPSDevStatRxDisassoc
+            Counter64,
+        hh3cWIPSDevStatRxAuth
+            Counter64,
+        hh3cWIPSDevStatRxDeauth
+            Counter64,
+        hh3cWIPSDevStatRxEAPSuccess
+            Counter64,
+        hh3cWIPSDevStatRxEAPFailure
+            Counter64,
+        hh3cWIPSDevStatRxEAPOLStart
+            Counter64,
+        hh3cWIPSDevStatRxEAPOLLogoff
+            Counter64,
+        hh3cWIPSDevStatRxMalformed
+            Counter64
+     }
+
+hh3cWIPSDevStatSensorMacAddr OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of sensor."
+    ::= { hh3cWIPSDevStatEntry 1 }
+
+hh3cWIPSDevStatDevMacAddress OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of the device detected by the sensor."
+    ::= { hh3cWIPSDevStatEntry 2 }
+
+hh3cWIPSDevStatChannel OBJECT-TYPE
+    SYNTAX Hh3cWIPSChannel
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the device working channel."
+    ::= { hh3cWIPSDevStatEntry 3 }
+
+hh3cWIPSDevStatTxTotalPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of total frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 4 }
+
+hh3cWIPSDevStatTxTotalByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the length of total frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 5 }
+
+hh3cWIPSDevStatTxBMcastPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of broadcast and multicast frames transmitted by
+        the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 6 }
+
+hh3cWIPSDevStatTxBMcastByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the length of broadcast and multicast frames transmitted by
+        the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 7 }
+
+hh3cWIPSDevStatTxUnicastPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of unicast frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 8 }
+
+hh3cWIPSDevStatTxUnicastByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the length of unicast frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 9 }
+
+hh3cWIPSDevStatTxMgmt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of management frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 10 }
+
+hh3cWIPSDevStatTxCtrl OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of control frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 11 }
+
+hh3cWIPSDevStatTxData OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of data frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 12 }
+
+hh3cWIPSDevStatTxBeacon OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of beacon frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 13 }
+
+hh3cWIPSDevStatTxRTS OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of RTS frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 14 }
+
+hh3cWIPSDevStatTxProbeRequest OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of probe request frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 15 }
+
+hh3cWIPSDevStatTxProbeResponse OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of probe response frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 16 }
+
+hh3cWIPSDevStatTxFragment OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of fragment frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 17 }
+
+hh3cWIPSDevStatTxRetry OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of retry frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 18 }
+
+hh3cWIPSDevStatTxAssocRequest OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of association request frames transmitted
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 19 }
+
+hh3cWIPSDevStatTxAssocResponse OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of association response frames transmitted
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 20 }
+
+hh3cWIPSDevStatTxUnicastDisassoc OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of unicast disassociation frames transmitted
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 21 }
+
+hh3cWIPSDevStatTxBcastDisassoc OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of broadcast disassociation frames transmitted
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 22 }
+
+hh3cWIPSDevStatTxAuth OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of authentication frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 23 }
+
+hh3cWIPSDevStatTxUnicastDeauth OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of unicast deauthentication frames transmitted
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 24 }
+
+hh3cWIPSDevStatTxBcastDeauth OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of broadcast deauthentication frames transmitted
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 25 }
+
+hh3cWIPSDevStatTxEAPSuccess OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAP-Success frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 26 }
+
+hh3cWIPSDevStatTxEAPFailure OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAP-Failure frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 27 }
+
+hh3cWIPSDevStatTxEAPOLStart OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAPOL-Start frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 28 }
+
+hh3cWIPSDevStatTxEAPOLLogOff OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAPOL-Logoff frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 29 }
+
+hh3cWIPSDevStatTxMalformed OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of malformed frames transmitted by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 30 }
+
+hh3cWIPSDevStatRxTotalPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of total frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 31 }
+
+hh3cWIPSDevStatRxTotalByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the length of total frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 32 }
+
+hh3cWIPSDevStatRxUnicastPkt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of unicast frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 33 }
+
+hh3cWIPSDevStatRxUnicastByte OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the length of unicast frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 34 }
+
+hh3cWIPSDevStatRxMgmt OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of management frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 35 }
+
+hh3cWIPSDevStatRxCtrl OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of control frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 36 }
+
+hh3cWIPSDevStatRxData OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of data frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 37 }
+
+hh3cWIPSDevStatRxRTS OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of RTS frames recieved by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 38 }
+
+hh3cWIPSDevStatRxCTS OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of CTS frames recieved by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 39 }
+
+hh3cWIPSDevStatRxProbeRequest OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of probe request frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 40 }
+
+hh3cWIPSDevStatRxProbeResponse OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of probe response frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 41 }
+
+hh3cWIPSDevStatRxFragment OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of fragment frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 42 }
+
+hh3cWIPSDevStatRxRetry OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of retry frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 43 }
+
+hh3cWIPSDevStatRxAssoRequest OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of association request frames received
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 44 }
+
+hh3cWIPSDevStatRxAssoResponse OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of association response frames received
+        by the device in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 45 }
+
+hh3cWIPSDevStatRxDisassoc OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of disassociation frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 46 }
+
+hh3cWIPSDevStatRxAuth OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of authentication frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 47 }
+
+hh3cWIPSDevStatRxDeauth OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of deauthentication frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 48 }
+
+hh3cWIPSDevStatRxEAPSuccess OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAP-Success frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 49 }
+
+hh3cWIPSDevStatRxEAPFailure OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAP-Failure frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 50 }
+
+hh3cWIPSDevStatRxEAPOLStart OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAPOL-Start frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 51 }
+
+hh3cWIPSDevStatRxEAPOLLogoff OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of EAPOL-Logoff frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 52 }
+
+hh3cWIPSDevStatRxMalformed OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of malformed frames received by the device
+        in one channel."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSDevStatEntry 53 }
+
+hh3cWIPSCtmDeviceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSCtmDeviceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of device information
+        in static and dynamic countermeasure list."
+    ::= { hh3cWIPSDetectGroup 15 }
+
+hh3cWIPSCtmDeviceEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSCtmDeviceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of countermeasure device."
+    INDEX { hh3cWIPSCtmDeviceVSD, hh3cWIPSCtmDeviceMAC }
+    ::= { hh3cWIPSCtmDeviceTable 1 }
+
+Hh3cWIPSCtmDeviceEntry ::=
+    SEQUENCE {
+        hh3cWIPSCtmDeviceVSD
+            OCTET STRING,
+        hh3cWIPSCtmDeviceMAC
+            MacAddress,
+        hh3cWIPSCtmDeviceType
+            INTEGER,
+        hh3cWIPSCtmDeviceState
+            INTEGER,
+        hh3cWIPSCtmDeviceStartTime
+            TimeTicks,
+        hh3cWIPSCtmDeviceCategory
+            Hh3cWIPSDeviceCategoryType,
+        hh3cWIPSCtmDeviceChl
+            Unsigned32,
+        hh3cWIPSCtmDevicePrecedence
+            Integer32
+     }
+
+hh3cWIPSCtmDeviceVSD OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the VSD which the device belongs to."
+    ::= { hh3cWIPSCtmDeviceEntry 1 }
+
+hh3cWIPSCtmDeviceMAC OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of countermeasure device."
+    ::= { hh3cWIPSCtmDeviceEntry 2 }
+
+hh3cWIPSCtmDeviceType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        static(1),
+        dynamic(2),
+        staticAnddynamic(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the type of countermeasure device."
+    ::= { hh3cWIPSCtmDeviceEntry 3 }
+
+hh3cWIPSCtmDeviceState OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        idle(1),
+        pending(2),
+        action(3)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the state of countermeasure device."
+    ::= { hh3cWIPSCtmDeviceEntry 4 }
+
+hh3cWIPSCtmDeviceStartTime OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time when start to counter on the device."
+    ::= { hh3cWIPSCtmDeviceEntry 5 }
+
+hh3cWIPSCtmDeviceCategory OBJECT-TYPE
+    SYNTAX Hh3cWIPSDeviceCategoryType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the category of the device."
+    ::= { hh3cWIPSCtmDeviceEntry 6 }
+
+hh3cWIPSCtmDeviceChl OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the channel on which the device is countered."
+    ::= { hh3cWIPSCtmDeviceEntry 7 }
+
+hh3cWIPSCtmDevicePrecedence OBJECT-TYPE
+    SYNTAX Integer32 (0..10)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the precedence of the device."
+    ::= { hh3cWIPSCtmDeviceEntry 8 }
+
+hh3cWIPSMalPktStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSMalPktStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of malformed packet statistics information."
+    ::= { hh3cWIPSDetectGroup 16 }
+
+hh3cWIPSMalPktStatEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSMalPktStatEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of malformed pakcet."
+    INDEX { hh3cWIPSMalPktStatSensorName }
+    ::= { hh3cWIPSMalPktStatTable 1 }
+
+Hh3cWIPSMalPktStatEntry ::=
+    SEQUENCE {
+        hh3cWIPSMalPktStatSensorName
+            OCTET STRING,
+        hh3cWIPSMalPktStatInvalidIELength
+            Counter64,
+        hh3cWIPSMalPktStatDuplicatedIE
+            Counter64,
+        hh3cWIPSMalPktStatRedundantIE
+            Counter64,
+        hh3cWIPSMalPktStatInvalidPktLength
+            Counter64,
+        hh3cWIPSMalPktStatIllegalIBSSESS
+            Counter64,
+        hh3cWIPSMalPktStatInvalidSourceAddr
+            Counter64,
+        hh3cWIPSMalPktStatOverflowEAPOLKey
+            Counter64,
+        hh3cWIPSMalPktStatMalAuth
+            Counter64,
+        hh3cWIPSMalPktStatMalAssoReq
+            Counter64,
+        hh3cWIPSMalPktStatMalHTIE
+            Counter64,
+        hh3cWIPSMalPktStatLargeDuration
+            Counter64,
+        hh3cWIPSMalPktStatNULLProbeRes
+            Counter64,
+        hh3cWIPSMalPktStatInvalidDeAuthCode
+            Counter64,
+        hh3cWIPSMalPktStatInvalidDisAssoCode
+            Counter64,
+        hh3cWIPSMalPktStatOverflowSSID
+            Counter64,
+        hh3cWIPSMalPktStatFatajack
+            Counter64,
+        hh3cWIPSMalPktStatInvalidChannel
+            Counter64
+     }
+
+hh3cWIPSMalPktStatSensorName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of sensor."
+    ::= { hh3cWIPSMalPktStatEntry 1 }
+
+hh3cWIPSMalPktStatInvalidIELength OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the invalid IE length
+        malformed packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 2 }
+
+hh3cWIPSMalPktStatDuplicatedIE OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the duplicated IE
+        malformed packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 3 }
+
+hh3cWIPSMalPktStatRedundantIE OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the redundant IE
+        malformed packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 4 }
+
+hh3cWIPSMalPktStatInvalidPktLength OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the invalide packet length
+        malformed packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 5 }
+
+hh3cWIPSMalPktStatIllegalIBSSESS OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the illegal bits of
+        representing IBSS and ESS malformed packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 6 }
+
+hh3cWIPSMalPktStatInvalidSourceAddr OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of  invalid source address combination
+         malformed pakcets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 7 }
+
+hh3cWIPSMalPktStatOverflowEAPOLKey OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the overflow EAPOL key
+        malformed packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 8 }
+
+hh3cWIPSMalPktStatMalAuth OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed authentication packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 9 }
+
+hh3cWIPSMalPktStatMalAssoReq OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed association request packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 10 }
+
+hh3cWIPSMalPktStatMalHTIE OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed
+        High Throughput IE segment packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 11 }
+
+hh3cWIPSMalPktStatLargeDuration OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed
+        large duration packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 12 }
+
+hh3cWIPSMalPktStatNULLProbeRes OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed
+        null probe response packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 13 }
+
+hh3cWIPSMalPktStatInvalidDeAuthCode OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed
+        invalid deauthentication reason code packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 14 }
+
+hh3cWIPSMalPktStatInvalidDisAssoCode OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed
+        invalid disassociation reason code packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 15 }
+
+hh3cWIPSMalPktStatOverflowSSID OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of the malformed
+        SSID length overflow packets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 16}
+
+hh3cWIPSMalPktStatFatajack OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of FATA-Jack attack pakcets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 17 }
+
+hh3cWIPSMalPktStatInvalidChannel OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the count of Invalid-Channel attack pakcets."
+    DEFVAL { 0 }
+    ::= { hh3cWIPSMalPktStatEntry 18 }
+
+hh3cWIPSDctUnassocStaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctUnassocStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of possible information for
+        Unassociated stations detected by the WIPS."
+    ::= { hh3cWIPSDetectGroup 17 }
+
+hh3cWIPSDctUnassocStaEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctUnassocStaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible station information of each Unassociated
+        station detected by WIPS."
+    INDEX { hh3cWIPSDctUnassocStaVSD, hh3cWIPSDctUnassocStaMac }
+    ::= { hh3cWIPSDctUnassocStaTable 1 }
+
+Hh3cWIPSDctUnassocStaEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctUnassocStaVSD
+            OCTET STRING,
+        hh3cWIPSDctUnassocStaMac
+            MacAddress,
+        hh3cWIPSDctUnassocStaCategory
+            Hh3cWIPSClientCategoryType,
+        hh3cWIPSDctUnassocStaRadioType
+            Unsigned32,
+        hh3cWIPSDctUnassocStaIsCountered
+            TruthValue,
+        hh3cWIPSDctUnassocStaAdd2BlackList
+            TruthValue,
+        hh3cWIPSDctUnassocStaAdd2WhiteList
+            TruthValue,
+        hh3cWIPSDctUnassocStaAdd2IgnoreList
+            TruthValue,
+        hh3cWIPSDctUnassocStaAdd2CtmList
+            TruthValue,
+        hh3cWIPSDctUnassocStaFirstDctTm
+            TimeTicks,
+        hh3cWIPSDctUnassocStaLastDctTm
+            TimeTicks,
+        hh3cWIPSDctUnassocStaRptSensorNum
+            Integer32,
+        hh3cWIPSDctUnassocStaState
+            INTEGER,
+        hh3cWIPSDctUnassocStaVendor
+            OCTET STRING
+     }
+
+hh3cWIPSDctUnassocStaVSD OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..32))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the virtual security domain in which the Unassociated
+        station was detected."
+    ::= { hh3cWIPSDctUnassocStaEntry 1 }
+
+hh3cWIPSDctUnassocStaMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the MAC address of Unassociated station."
+    ::= { hh3cWIPSDctUnassocStaEntry 2 }
+
+hh3cWIPSDctUnassocStaCategory OBJECT-TYPE
+    SYNTAX Hh3cWIPSClientCategoryType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the categorized result of the Unassociated station."
+    ::= { hh3cWIPSDctUnassocStaEntry 3 }
+
+hh3cWIPSDctUnassocStaRadioType OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the radio type used by the Unassociated station.
+        dot11a  0x01
+        dot11b  0x02
+        dot11g  0x04
+        dot11n  0x08
+        dot11gn 0x10
+        dot11an 0x20
+        dot11ac 0x40"
+    ::= { hh3cWIPSDctUnassocStaEntry 4 }
+
+hh3cWIPSDctUnassocStaIsCountered OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents whether the Unassociated station is countered by WIPS."
+    ::= { hh3cWIPSDctUnassocStaEntry 5 }
+
+hh3cWIPSDctUnassocStaAdd2BlackList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as a rogue station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSBlockListTable and the category of the station will be
+        taken as rogue.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSBlockListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctUnassocStaEntry 6 }
+
+hh3cWIPSDctUnassocStaAdd2WhiteList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as an authorized station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSTrustListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSTrustListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctUnassocStaEntry 7 }
+
+hh3cWIPSDctUnassocStaAdd2IgnoreList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as an ignored station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSIgnoreListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSIgnoreListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctUnassocStaEntry 8 }
+
+hh3cWIPSDctUnassocStaAdd2CtmList OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Represents whether the station will be taken as a countered station.
+        If the value is true, the MAC address will be automatically added
+        into hh3cWIPSCountermeasureListTable.
+        If the value is false, the MAC address will be automatically deleted
+        from hh3cWIPSCountermeasureListTable."
+    DEFVAL { false }
+    ::= { hh3cWIPSDctUnassocStaEntry 9 }
+
+hh3cWIPSDctUnassocStaFirstDctTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that station was detected for the first time
+        since system is up."
+    ::= { hh3cWIPSDctUnassocStaEntry 10 }
+
+hh3cWIPSDctUnassocStaLastDctTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that station was detected for the last time
+        since system is up."
+    ::= { hh3cWIPSDctUnassocStaEntry 11 }
+
+hh3cWIPSDctUnassocStaRptSensorNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of sensors detecting the Unassociated station."
+    ::= { hh3cWIPSDctUnassocStaEntry 12 }
+
+hh3cWIPSDctUnassocStaState OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        authentication(1),
+        association(2),
+        eapSuccess(3),
+        eapLogoff(4),
+        disassociation(5),
+        deauthentication(6),
+        unassociation(7)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the authentication state of Unassociated station with AP."
+    ::= { hh3cWIPSDctUnassocStaEntry 13 }
+
+hh3cWIPSDctUnassocStaVendor OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the vendor of this Unassociated station detected by WIPS."
+    ::= { hh3cWIPSDctUnassocStaEntry 14 }
+
+hh3cWIPSDctUnassocStaRptSensorTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cWIPSDctUnassocStaRptSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of sensors detecting the Unassociated station."
+    ::= { hh3cWIPSDetectGroup 18 }
+
+hh3cWIPSDctUnassocStaRptSensorEntry OBJECT-TYPE
+    SYNTAX Hh3cWIPSDctUnassocStaRptSensorEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible sensor information of WIPS."
+    INDEX { hh3cWIPSDctUnassocStaVSD, hh3cWIPSDctUnassocStaMac, hh3cWIPSDctUnassocStaRtpSensorName }
+    ::= { hh3cWIPSDctUnassocStaRptSensorTable 1 }
+
+Hh3cWIPSDctUnassocStaRptSensorEntry ::=
+    SEQUENCE {
+        hh3cWIPSDctUnassocStaRtpSensorName
+            OCTET STRING,
+        hh3cWIPSDctUnassocStaRptSensorRadioId
+            Integer32,
+        hh3cWIPSDctUnassocStaRptRSSI
+            Integer32,
+        hh3cWIPSDctUnassocStaLastRptTm
+            TimeTicks
+     }
+
+hh3cWIPSDctUnassocStaRtpSensorName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..64))
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the name of sensor."
+    ::= { hh3cWIPSDctUnassocStaRptSensorEntry 1 }
+
+hh3cWIPSDctUnassocStaRptSensorRadioId OBJECT-TYPE
+    SYNTAX Integer32 (1..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents on which radio the sensor AP detected the Unassociated station."
+    ::= { hh3cWIPSDctUnassocStaRptSensorEntry 2 }
+
+hh3cWIPSDctUnassocStaRptRSSI OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the current value of signal strength that WIPS sensor
+        AP received from the Unassociated station."
+    ::= { hh3cWIPSDctUnassocStaRptSensorEntry 3 }
+
+hh3cWIPSDctUnassocStaLastRptTm OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the time that Unassociated station was detected by this sensor
+        for the last time since system is up."
+    ::= { hh3cWIPSDctUnassocStaRptSensorEntry 4 }
+
+hh3cWIPSNotifyGroup OBJECT IDENTIFIER ::= { hh3cWIPS 3 }
+
+END

@@ -1,0 +1,49 @@
+-- *****************************************************************
+-- DELLEMC-OS10-SMI-MIB
+--
+--
+-- Copyright (c) 2017 by Dell Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+        DELLEMC-OS10-SMI-MIB DEFINITIONS ::= BEGIN
+	--  This module provides authoritative
+	--  definitions for Dell EMC Networking OS10 SMI MIB.
+	--
+	
+	IMPORTS
+		MODULE-IDENTITY,enterprises,
+		OBJECT-IDENTITY
+			FROM SNMPv2-SMI;
+
+	dell  MODULE-IDENTITY
+
+	LAST-UPDATED "201807061200Z"
+	ORGANIZATION "Dell Emc"
+	CONTACT-INFO "http://www.dell.com/support"
+	DESCRIPTION "The Structure of Management Information for
+	    the Dell EMC Networking OS10."
+
+	-- Revision history.
+
+	REVISION     "201807061200Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+
+        ::= { enterprises 674 }
+        enterpriseSW   OBJECT IDENTIFIER ::= { dell 11000 }
+        networking    OBJECT IDENTIFIER ::= { enterpriseSW 5000 }
+
+        os10 OBJECT-IDENTITY
+		STATUS	current
+		DESCRIPTION
+			"Dell EMC Networking OS10 subtree's OID."
+		::= { networking 100 }
+
+	os10Experiment OBJECT-IDENTITY
+		STATUS  current
+		DESCRIPTION
+			"Dell EMC Networking OS10Experiment subtree's OID."
+		::= { networking 200 }
+
+	END

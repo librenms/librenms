@@ -1,0 +1,15 @@
+os: dell-sonic
+text: 'Dell Enterprise SONiC'
+type: network
+icon: dell
+group: dell
+mib_dir: dell
+ignore_mount_string: ['/proc', '/dev', '/run', '/sys', '/tmp', '/var/tmp']
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.4413.1.2.1.2.

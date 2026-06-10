@@ -1,0 +1,15 @@
+os: okilan
+group: printer
+text: 'OKI Printer'
+over:
+    - { graph: device_toner, text: Toner }
+type: printer
+icon: oki
+discovery:
+    -
+        sysDescr:
+            - 'OKI OkiLAN'
+discovery_modules:
+    printer-supplies:   true
+poller_modules:
+    printer-supplies:   true

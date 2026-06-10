@@ -1,0 +1,756 @@
+       HP-ICF-SECURITY DEFINITIONS ::= BEGIN
+
+       IMPORTS
+           Integer32, IpAddress, TimeTicks,
+           OBJECT-TYPE, MODULE-IDENTITY
+               FROM SNMPv2-SMI
+           DisplayString, RowStatus
+               FROM SNMPv2-TC
+           MODULE-COMPLIANCE, OBJECT-GROUP
+               FROM SNMPv2-CONF
+           hpicfObjectModules, icfSecurity
+               FROM HP-ICF-OID
+           InetAddress, InetAddressType, InetAddressPrefixLength
+               FROM INET-ADDRESS-MIB;
+
+       icfSecurityMib MODULE-IDENTITY
+            LAST-UPDATED "200710010903Z"  -- October 01, 2007
+            ORGANIZATION "Hewlett Packard Company,
+                          Network Infrastructure Solutions"
+            CONTACT-INFO "Hewlett Packard Company
+                          8000 Foothills Blvd.
+                          Roseville, CA 95747"
+            DESCRIPTION  "This MIB module describes objects for managing
+                         the SNMPv1 authorization configuration for
+                         devices in the HP Integrated Communication
+                         Facility product line."
+
+            REVISION     "200710010903Z"  -- October 01, 2007
+            DESCRIPTION  "Deprecated icfAuthIPMgrAddress and icfAuthIPMgrMask."
+
+            REVISION     "200301090112Z"  -- January 9, 2003
+            DESCRIPTION  "Deprecated icfCommunityTable and icfAuthMgrTable."
+
+            REVISION     "200011030756Z"  -- November 3, 2000
+            DESCRIPTION  "Added icfAuthIPMgrTable.  Updated division name."
+
+            REVISION     "9609100200Z"  -- September 10, 1996
+            DESCRIPTION  "Updated division name in ORGANIZATION clause."
+
+            REVISION     "9601250356Z"  -- October 25, 1996
+            DESCRIPTION  "Split this MIB module from the former monolithic
+                         hp-icf MIB.  Added the SNMP community group."
+
+            REVISION     "9307090000Z"  -- July 9, 1993
+            DESCRIPTION  "Initial version of this MIB module."
+            ::= { hpicfObjectModules 1 }
+
+
+       -- The HP ICF Security Group.  This group contains objects for
+       -- configuring SNMPv1 (non)security for this agent.
+
+
+       icfSecurPassword OBJECT-TYPE
+           SYNTAX     DisplayString (SIZE (0..63))
+           MAX-ACCESS read-write
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   This variable contains a string which is used
+                   both as the community name for the password
+                   community, and as the login password for the
+                   console port.  This community name is needed for
+                   most SET operations.  In addition, the variables
+                   in the ICF security group are only visible within
+                   the password community, and must use the value of
+                   this variable as the community name for GET
+                   operations.  If the value of this variable is
+                   equal to the null string, the community name
+                   'public' or the null string will be treated the
+                   same as the password community.
+
+                   This object has been deprecated.  Its functionality
+                   has been replaced by the icfCommunityTable."
+           ::= { icfSecurity 1 }
+
+       icfSecurAuthAnyMgr OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   When this variable is set to enabled, any manager
+                   with a valid community name may perform SET
+                   operations on this device.  In this configuration,
+                   entries in the icfSecurAuthMgrTable are used only
+                   for trap destinations.  If this variable is set to
+                   disabled, a manager must be in the
+                   icfSecurAuthMgrTable and have a valid community
+                   name in order to perform SET operations.
+
+                   This object has been deprecated.  Its functionality
+                   has been replaced by the icfAuthMgrTable."
+           ::= { icfSecurity 2 }
+
+       icfSecurAuthMgrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfSecurAuthMgrEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   This table contains a list of addresses of
+                   managers that are allowed to perform SET
+                   operations on this device, and controls the
+                   destination addresses for traps.  If
+                   icfSecurAuthAnyMgr is set to disabled, a manager
+                   must be in this table and use the correct
+                   community name for the password community in order
+                   to perform a GET operation on this table.
+
+                   This table has been deprecated.  It is replaced by
+                   the icfAuthMgrTable.  The trap destination
+                   functionality has been replaced by the
+                   hpicfTrapDestTable."
+           ::= { icfSecurity 3 }
+
+       icfSecurAuthMgrEntry OBJECT-TYPE
+           SYNTAX     IcfSecurAuthMgrEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   An entry in the icfSecurAuthMgrTable containing
+                   information about a single manager.
+
+                   This table has been deprecated.  It is replaced by
+                   the icfAuthMgrTable.  The trap destination
+                   functionality has been replaced by the
+                   hpicfTrapDestTable."
+           INDEX      { icfAuthMgrIndex }
+           ::= { icfSecurAuthMgrTable 1 }
+
+       IcfSecurAuthMgrEntry ::=
+           SEQUENCE {
+               icfAuthMgrIndex                 Integer32,
+               icfAuthMgrIpAddress             IpAddress,
+               icfAuthMgrIpxAddress            OCTET STRING,
+               icfAuthMgrRcvTraps              INTEGER
+           }
+
+       icfAuthMgrIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..10)
+           MAX-ACCESS read-only
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   This object contains the index which uniquely
+                   identifies this entry in the
+                   icfSecurAuthMgrTable.
+
+                   This table has been deprecated.  It is replaced by
+                   the icfAuthMgrTable.  The trap destination
+                   functionality has been replaced by the
+                   hpicfTrapDestTable."
+           ::= { icfSecurAuthMgrEntry 1 }
+
+       icfAuthMgrIpAddress OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-write
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The IP address of a manager that is allowed to
+                   manage this device.  Setting this variable to a
+                   nonzero value will clear the corresponding
+                   instance of the icfAuthMgrIpxAddress variable.
+
+                   This table has been deprecated.  It is replaced by
+                   the icfAuthMgrTable.  The trap destination
+                   functionality has been replaced by the
+                   hpicfTrapDestTable."
+           ::= { icfSecurAuthMgrEntry 2 }
+
+       icfAuthMgrIpxAddress OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (10))
+           MAX-ACCESS read-write
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   The IPX address of a manager that is allowed to
+                   manage this device.  Setting this variable to a
+                   valid IPX address will clear the corresponding
+                   instance of the icfAuthMgrIpAddress variable.
+
+                   This table has been deprecated.  It is replaced by
+                   the icfAuthMgrTable.  The trap destination
+                   functionality has been replaced by the
+                   hpicfTrapDestTable."
+           ::= { icfSecurAuthMgrEntry 3 }
+
+       icfAuthMgrRcvTraps OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          enabled(1),
+                          disabled(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS OBJECT IS DEPRECATED *********
+
+                   If this variable is set to enabled, any traps
+                   generated by this device will be sent to the
+                   manager indicated by the corresponding instance of
+                   either icfAuthMgrIpAddress or
+                   icfAuthMgrIpxAddress, whichever is valid.
+
+                   This table has been deprecated.  It is replaced by
+                   the icfAuthMgrTable.  The trap destination
+                   functionality has been replaced by the
+                   hpicfTrapDestTable."
+           ::= { icfSecurAuthMgrEntry 4 }
+
+       -- icfSecurIntruder objects.  When the agent detects an
+       -- authentication failure, it records the violation in the
+       -- following objects and in nonvolatile memory.  It uses the
+       -- icfSecurIntruderFlag as a throttle to prevent excessive
+       -- nvram writes.
+
+       icfSecurIntruder   OBJECT IDENTIFIER ::= { icfSecurity 4 }
+
+       icfSecurIntruderFlag OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          valid(1),
+                          invalid(2)
+                      }
+           MAX-ACCESS read-write
+           STATUS     current
+           DESCRIPTION
+                   "If this object is set to 'valid', the remainder
+                   of the intruder objects contain information about
+                   an authentication failure.  The Security LED on
+                   the device will blink if this flag is set to 
+                   'valid'.  The intruder objects will not be
+                   overwritten as long as this flag is set to 
+                   'valid'.  Setting this flag to 'invalid' will turn
+                   off the Security LED if there are no other
+                   current violations, and will allow the intruder
+                   objects to be overwritten by subsequent
+                   authentication failures."
+           ::= { icfSecurIntruder 1 }
+
+       icfSecurIntruderIpAddress OBJECT-TYPE
+           SYNTAX     IpAddress
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The IP address of the manager that caused the
+                   authentication failure.  Only one of
+                   icfSecurIntruderIpAddress and
+                   icfSecurIntruderIPXAddress will be valid."
+           ::= { icfSecurIntruder 2 }
+
+       icfSecurIntruderIpxAddress OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE (10))
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The IPX address of the manager that caused the
+                   authentication failure.  Only one of
+                   icfSecurIntruderIpAddress and
+                   icfSecurIntruderIPXAddress will be valid."
+           ::= { icfSecurIntruder 3 }
+
+       icfSecurIntruderTime OBJECT-TYPE
+           SYNTAX     TimeTicks
+           MAX-ACCESS read-only
+           STATUS     current
+           DESCRIPTION
+                   "The value of sysUpTime when the authentication
+                   failure occurred.  A value of 0 indicates that the
+                   agent has been reset since this authentication
+                   failure occurred."
+           ::= { icfSecurIntruder 4 }
+
+
+       -- The SNMP community group.  Used for configuring SNMPv1
+       -- (non)security.  Replaces the old icfSecurity group.
+
+       icfCommunityTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfCommunityEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                    This table contains information about community
+                   names known by this agent."
+           ::= { icfSecurity 5 }
+
+       icfCommunityEntry OBJECT-TYPE
+           SYNTAX     IcfCommunityEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   An entry in the table, containing information about
+                   a single community name."
+           INDEX      { icfCommunityIndex }
+           ::= { icfCommunityTable 1 }
+
+       IcfCommunityEntry ::=
+           SEQUENCE {
+               icfCommunityIndex               Integer32,
+               icfCommunityName                OCTET STRING,
+               icfCommunityReadView            INTEGER,
+               icfCommunityWriteView           INTEGER,
+               icfCommunityStatus              RowStatus
+           }
+
+       icfCommunityIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                    Uniquely identifies this community name entry."
+           ::= { icfCommunityEntry 1 }
+
+       icfCommunityName OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(1..32))
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   Community name this entry is about.  Not allowed
+                   to have two active rows with the same community
+                   name."
+           ::= { icfCommunityEntry 2 }
+
+       icfCommunityReadView OBJECT-TYPE
+           SYNTAX     INTEGER { 
+                          none(1),
+                          discovery(2),
+                          restricted(3),
+                          user(4),
+                          root(5)
+                      }
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   The MIB view used for read requests using this
+                   community name.  One of the following:
+                    'none' is the empty MIB view.
+                    'discovery' has access to discovery objects, which
+                        will be enough to do an address search, send
+                        announce packets, and do a link test.  This
+                        view also includes objects under the
+                        samplingProbe subtree.  This view is typically
+                        used as a writeView for a community used by
+                        autodiscovery and autotopology applications.
+                    'restricted' has access to a limited subset of the
+                        MIB, which includes monitoring objects and
+                        limited set of configuration objects.
+                    'user' has access to everything except objects
+                       under the icfSecurity subtree.
+                    'root' has access to everything, including the
+                       icfSecurity subtree."
+           ::= { icfCommunityEntry 3 }
+
+       icfCommunityWriteView OBJECT-TYPE
+           SYNTAX     INTEGER { 
+                          none(1),
+                          discovery(2),
+                          restricted(3),
+                          user(4),
+                          root(5)
+                      }
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   The MIB view used for write requests using this
+                   community name.  One of the following:
+                    'none' is the empty MIB view.
+                    'discovery' has access to discovery objects, which
+                        will be enough to do an address search, send
+                        announce packets, and do a link test.  This
+                        view also includes objects under the
+                        samplingProbe subtree.  This view is typically
+                        used as a writeView for a community used by
+                        autodiscovery and autotopology applications.
+                    'restricted' has access to a limited subset of the
+                        MIB, which includes monitoring objects and
+                        limited set of configuration objects.
+                    'user' has access to everything except objects
+                       under the icfSecurity subtree.
+                    'root' has access to everything, including the
+                       icfSecurity subtree."
+           ::= { icfCommunityEntry 4 }
+
+       icfCommunityStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                    Status of this entry."
+           ::= { icfCommunityEntry 5 }
+
+       icfAuthMgrTable OBJECT-TYPE
+           SYNTAX     SEQUENCE OF IcfAuthMgrEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   This table contains a list of manager addresses.
+                   Entries in this table are grouped by using a common
+                   value for icfCommunityIndex, that identifies the
+                   community name that the group of manager addresses
+                   has access to.  A community name entry which has
+                   a set of entries in this table can only be used by
+                   requests originating from one of the addresses in
+                   the set.  A community name entry which has no
+                   entries in this table can be used by requests
+                   originating from any address."
+           ::= { icfSecurity 6 }
+
+       icfAuthMgrEntry OBJECT-TYPE
+           SYNTAX     IcfAuthMgrEntry
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   An entry in the table, containing a single
+                   authorized manager address."
+           INDEX      { icfCommunityIndex, icfAuthMgrSubIndex }
+           ::= { icfAuthMgrTable 1 }
+
+       IcfAuthMgrEntry ::=
+           SEQUENCE {
+               icfAuthMgrSubIndex              Integer32,
+               icfAuthMgrAddrType              INTEGER,
+               icfAuthMgrAddress               OCTET STRING,
+               icfAuthMgrMask                  OCTET STRING,
+               icfAuthMgrStatus                RowStatus
+           }
+
+       icfAuthMgrSubIndex OBJECT-TYPE
+           SYNTAX     Integer32 (1..65535)
+           MAX-ACCESS not-accessible
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   An index which uniquely identifies an address within
+                   a group."
+           ::= { icfAuthMgrEntry 1 }
+
+       icfAuthMgrAddrType OBJECT-TYPE
+           SYNTAX     INTEGER {
+                          ip(1),
+                          ipx(2)
+                      }
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                    The network type for this entry."
+           ::= { icfAuthMgrEntry 2 }
+
+       icfAuthMgrAddress OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(4|10))
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   The manager address for this entry, formatted
+                   according to the value of icfAuthMgrAddrType.  When
+                   icfAuthMgrAddrType is 'ip', this value will consist
+                   of four octets, containing the IP address of the
+                   manager in network byte order.  When
+                   icfAuthMgrAddrType is 'ipx', this value will consist
+                   of ten octets.  The first four octets will contain
+                   the IPX network number in network byte order, and the
+                   remaining six octets will contain the IPX node number
+                   in network byte order."
+           ::= { icfAuthMgrEntry 3 }
+
+       icfAuthMgrMask OBJECT-TYPE
+           SYNTAX     OCTET STRING (SIZE(4|10))
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                   This object is used to qualify the value of the
+                   corresponding instance of icfAuthMgrAddress.  The
+                   semantics of this object depend on the corresponding
+                   value of icfAuthMgrAddrType.  When icfAuthMgrType
+                   is 'ip', this object can be used to allow access
+                   by all managers on a particular IP subnet.  When
+                   icfAuthMgrType is 'ipx', this object can be used to
+                   allow access by all managers with a particular IPX
+                   network number."
+           ::= { icfAuthMgrEntry 4 }
+
+       icfAuthMgrStatus OBJECT-TYPE
+           SYNTAX     RowStatus
+           MAX-ACCESS read-create
+           STATUS     deprecated
+           DESCRIPTION
+                   "******************DEPRECATED*******************
+                    Status of this entry."
+           ::= { icfAuthMgrEntry 5 }
+
+
+       icfAuthIPMgrTable OBJECT-TYPE
+           SYNTAX      SEQUENCE OF IcfAuthIPMgrEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "This table contains a list of IP manager
+                        addresses.  This list is used grant or deny
+                        access to HTTP, telnet, and TFTP."
+            ::= { icfSecurity 7 }
+
+       icfAuthIPMgrEntry OBJECT-TYPE
+           SYNTAX      IcfAuthIPMgrEntry
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "An entry in the table containing a single
+                        IP authorized manager address."
+           INDEX       { icfAuthIPMgrIndex }
+            ::= { icfAuthIPMgrTable 1 }
+       
+       IcfAuthIPMgrEntry ::=
+           SEQUENCE {
+                icfAuthIPMgrIndex            Integer32,
+                icfAuthIPMgrAddress          IpAddress,
+                icfAuthIPMgrMask             IpAddress,
+                icfAuthIPMgrAccess           INTEGER,
+                icfAuthIPMgrStatus           RowStatus,
+                icfAuthIPMgrInetAddrType     InetAddressType,
+                icfAuthIPMgrInetAddress      InetAddress,
+                icfAuthIPMgrInetAddrMaskType InetAddressType,
+                icfAuthIPMgrInetAddrMask     InetAddress
+           }
+
+       icfAuthIPMgrIndex OBJECT-TYPE
+           SYNTAX      Integer32 (1..65535)
+           MAX-ACCESS  not-accessible
+           STATUS      current
+           DESCRIPTION "An index which uniquely identifies an address
+                        within the group."
+           ::= { icfAuthIPMgrEntry 1 }
+
+       icfAuthIPMgrAddress OBJECT-TYPE
+           SYNTAX      IpAddress
+           MAX-ACCESS  read-create
+           STATUS      deprecated 
+           DESCRIPTION "**************deprecated*********************
+                        The IP address of the authorized manager for
+                        this entry.
+                        This object is deprecated new object icfAuthIPMgr
+                        InetAddress has been defined to hold version neutral
+                        address type."  
+           ::= { icfAuthIPMgrEntry 2 }
+
+       icfAuthIPMgrMask OBJECT-TYPE
+           SYNTAX      IpAddress
+           MAX-ACCESS  read-create
+           STATUS      deprecated 
+           DESCRIPTION "**************deprecated**********************
+                        This object qualifies the value of the
+                        corresponding instance of icfAuthIPMgrAddress.
+                        This object can be used to allow access by all
+                        managers on a particular IP subnet.
+                        This object is deprecated the new objects which are
+                        defined to hold this is value are
+                        icfAuthIPMgrInetAddrMaskType and icfAuthIPMgrInetAddrMask."
+           ::= { icfAuthIPMgrEntry 3 }
+
+       icfAuthIPMgrAccess OBJECT-TYPE
+           SYNTAX      INTEGER {
+                            operator(1),
+                            manager(2)
+                        }
+           MAX-ACCESS  read-create
+           STATUS      current 
+           DESCRIPTION "This object defines the access level for a
+                        given manager.  Operator allows for read only
+                        access, and Manager allows for read/write
+                        access."
+           ::= { icfAuthIPMgrEntry 4 }
+
+       icfAuthIPMgrStatus OBJECT-TYPE
+           SYNTAX      RowStatus
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION "Status of this entry."
+           ::= { icfAuthIPMgrEntry 5 }
+
+       icfAuthIPMgrInetAddrType OBJECT-TYPE
+           SYNTAX      InetAddressType
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION "Specifies the type of address stored in 
+                        icfAuthIPMgrInetAddress object."
+           ::= { icfAuthIPMgrEntry 6 }
+
+       icfAuthIPMgrInetAddress OBJECT-TYPE
+           SYNTAX      InetAddress
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION "The IP address of the authorized manager for
+                        this entry.This object can hold the version
+                        neutral IP address."
+           ::= { icfAuthIPMgrEntry 7 }
+
+       icfAuthIPMgrInetAddrMaskType OBJECT-TYPE
+           SYNTAX      InetAddressType
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION "Specifies the type of IP Mask stored in  
+                        icfAuthIPMgrInetAddrMask object."
+           ::= { icfAuthIPMgrEntry 8 }
+
+       icfAuthIPMgrInetAddrMask OBJECT-TYPE
+           SYNTAX      InetAddress
+           MAX-ACCESS  read-create
+           STATUS      current
+           DESCRIPTION "This object qualifies the value of the
+                        corresponding instance of icfAuthIPMgrInetAddress.
+                        This object can be used to allow access by all
+                        managers on a particular IP subnet.This object can
+                        hold the version neutral IP address Mask."
+           ::= { icfAuthIPMgrEntry 9 }
+
+       -- Conformance information
+
+       icfSecurityConformance
+           OBJECT IDENTIFIER ::= { icfSecurityMib 1 }
+
+       icfSecurityCompliances
+           OBJECT IDENTIFIER ::= { icfSecurityConformance 1 }
+       icfSecurityGroups
+           OBJECT IDENTIFIER ::= { icfSecurityConformance 2 }
+
+
+       -- compliance statements
+
+       icfSecurCompliance MODULE-COMPLIANCE
+           STATUS     obsolete --  change to deprecated when new SMI
+           DESCRIPTION
+                   "********* THIS COMPLIANCE IS DEPRECATED *********/
+
+                   A compliance statement for agents implementing
+                   the original version of this module."
+           MODULE
+               MANDATORY-GROUPS { icfSnmpSecurityGroup,
+                                  icfSecIntruderGroup }
+
+           ::= { icfSecurityCompliances 1 }
+
+
+       icfV1CommunityCompliance MODULE-COMPLIANCE
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+                   A compliance statement for HP ICF agents
+                   implementing SNMPv1 community name management."
+           MODULE
+               MANDATORY-GROUPS { icfV1CommunityGroup }
+
+               GROUP    icfSecIntruderGroup
+               DESCRIPTION
+                       "This group should be implemented by devices
+                       that are able to keep a non-volatile
+                       record of authentication failures."
+
+           ::= { icfSecurityCompliances 2 }
+
+
+       -- units of conformance
+
+       icfSnmpSecurityGroup OBJECT-GROUP
+           OBJECTS    { icfSecurPassword,
+                        icfSecurAuthAnyMgr,
+                        icfAuthMgrIndex,
+                        icfAuthMgrIpAddress,
+                        icfAuthMgrIpxAddress,
+                        icfAuthMgrRcvTraps
+                      }
+           STATUS     obsolete --  change to deprecated when new SMI
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+
+                   A collection of objects for managing the SNMPv1
+                   (non-)security configuration on HP networking
+                   devices."
+           ::= { icfSecurityGroups 1 }
+
+       icfSecIntruderGroup OBJECT-GROUP
+           OBJECTS    { icfSecurIntruderFlag,
+                        icfSecurIntruderIpAddress,
+                        icfSecurIntruderIpxAddress,
+                        icfSecurIntruderTime
+                      }
+           STATUS     current
+           DESCRIPTION
+                   "A collection of objects for tracking
+                   authentication failures."
+           ::= { icfSecurityGroups 2 }
+
+       icfV1CommunityGroup OBJECT-GROUP
+           OBJECTS    { icfCommunityName,
+                        icfCommunityReadView,
+                        icfCommunityWriteView,
+                        icfCommunityStatus,
+                        icfAuthMgrAddrType,
+                        icfAuthMgrAddress,
+                        icfAuthMgrMask,
+                        icfAuthMgrStatus
+                      }
+           STATUS     deprecated
+           DESCRIPTION
+                   "********* THIS GROUP IS DEPRECATED *********
+                   A collection of objects for managing SNMPv1
+                   community strings."
+           ::= { icfSecurityGroups 13 }
+
+       icfAuthIPMgrGroup OBJECT-GROUP
+           OBJECTS     { icfAuthIPMgrAddress,
+                         icfAuthIPMgrMask,
+                         icfAuthIPMgrAccess,
+                         icfAuthIPMgrStatus
+                       }
+           STATUS      deprecated 
+           DESCRIPTION "***************** deprecated ******************
+                       A collection of objects for granting or denying
+                       access to specific IP addresses for HTTP, telnet,
+                       and TFTP.
+                       This Group object has been deprecated and a new 
+                       group object has been defined with name 
+                       icfAuthIPMgrInetGroup."
+           ::= { icfSecurityGroups 14 }
+
+       icfAuthIPMgrInetGroup OBJECT-GROUP
+           OBJECTS     { icfAuthIPMgrInetAddrType, 
+                         icfAuthIPMgrInetAddress,
+                         icfAuthIPMgrInetAddrMaskType,
+                         icfAuthIPMgrInetAddrMask
+                       }
+           STATUS      current
+           DESCRIPTION "A collection of objects for granting or denying
+                       access to specific IP addresses for HTTP, telnet,
+                       and TFTP." 
+           ::= { icfSecurityGroups 15 }
+       END
+

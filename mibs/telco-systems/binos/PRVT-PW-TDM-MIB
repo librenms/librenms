@@ -1,0 +1,1514 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-PW-TDM-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-PW-TDM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Integer32,
+Counter32,
+Unsigned32,
+Gauge32,
+IpAddress
+FROM SNMPv2-SMI
+
+MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+OBJECT-GROUP
+FROM SNMPv2-CONF
+
+TEXTUAL-CONVENTION,
+TruthValue,
+RowStatus,
+StorageType,
+TimeStamp
+FROM SNMPv2-TC
+
+NOTIFICATION-TYPE, transmission
+          FROM SNMPv2-SMI                    -- [RFC2578]
+
+InterfaceIndexOrZero
+FROM IF-MIB
+
+PerfCurrentCount,
+PerfIntervalCount
+FROM PerfHist-TC-MIB
+ 
+PortList
+FROM Q-BRIDGE-MIB
+ 
+switch FROM PRVT-SWITCH-MIB; 
+ 
+ 
+
+-- The TDM MIB
+
+prvtPwVcTDMMIB MODULE-IDENTITY
+
+LAST-UPDATED "200907070000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email: 
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"This MIB contains managed object definitions for
+encapsulating TDM (T1,E1, T3, E3, NxDS0) as
+pseudo-wires over packet-switching networks (PSN)."
+
+-- revision history       
+REVISION "201902270000Z"
+DESCRIPTION
+"Update interval values for :
+ prvtPwVcTDMCfgPeerPort
+ prvtPwVcTDMCfgLocalPort
+ prvtPwVcTDMCfgOosPort
+ prvtPwVcTDMCfgPeerOosPort"
+ 
+REVISION "200907070000Z"
+DESCRIPTION
+"Change the range for prvtPwVcTDMCfgChannelGroup in order 
+to support all configurable channels group  for OC3 module" 
+
+REVISION "200907010000Z"
+DESCRIPTION
+"Added prvtPwVcTDMCfgRtpOosPayload and prvtPwVcTDMCfgRtpPayload objects." 
+
+  
+REVISION "200903060000Z"
+DESCRIPTION
+"Added MPLS objects." 
+
+
+REVISION "200903050000Z"
+DESCRIPTION
+"Added Destination Oos Port "  
+
+
+REVISION "200902180000Z"
+DESCRIPTION
+"Added prvtPwVcTDMCfgIpTos, prvtPwVcTDMCfgIpOosTos"  
+ 
+REVISION "200901150000Z"
+DESCRIPTION
+"Added prvtPwVcTDMCfgInterface, prvtTDMChannelGrpOC3TimeSlots"         
+
+REVISION "200806190000Z" 
+DESCRIPTION
+"Added prvtPwVcTDMClearCircuitStatistics, prvtPwVcTDMCfgRtp,
+prvtPwVcTDMCfgOosPort, prvtPwVcTDMCfgPayloadSuppression"
+
+REVISION "200607240000Z" 
+DESCRIPTION
+"Added Oos Ecid and Vlan priotity objects."
+
+::= { prvtPwVc 2 } 
+
+prvtPwVc OBJECT IDENTIFIER ::= { switch 200 }
+
+-- Local Textual conventions
+PrvtPwVcTDMCfgIndex ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"Index into any of the relevant prvtPwVcXXXCfgTable."
+SYNTAX Unsigned32 
+
+TimeSlotList ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"Each octet within this value specifies a time slot included
+in the give channel group. There should be 32 bits of 4 octets for each 
+port of the CES module. Note that if the line type is set to T1 only
+the first 24 bits of each 4 octests can be set. The most significant bit 
+of the list indicates timeslot 1 of port 1, the 33th bit - timeslot 1 of port 2, etc.
+If the bit is set, the port is included in the given channel group."
+SYNTAX OCTET STRING
+ 
+PrvtPwVcTDMCfgInterface ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"Interface of the given circuit used in TDM config for OC3 modules " 
+SYNTAX IpAddress
+
+
+InterfaceTimeSlot ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"The first 4 octets of this value represent the interface of 
+the given channel group P.K.L.M.The last 32 bits of the
+4 octets represent a bitmask of the time slots"
+SYNTAX OCTET STRING
+
+-- Tables, Scalars
+prvtPwVcTDMObjects OBJECT IDENTIFIER
+::= { prvtPwVcTDMMIB 1 }
+-- Notifications
+prvtPwVcTDMTraps OBJECT IDENTIFIER
+::= { prvtPwVcTDMMIB 2 }
+
+-- Conformance
+prvtPwVcTDMConformance OBJECT IDENTIFIER
+::= { prvtPwVcTDMMIB 3 }
+
+-- TDM PW table
+
+prvtPwVcTDMTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPwVcTDMEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains basic information including ifIndex,
+and pointers to entries in the relevant TDM config
+tables for this TDM PW."
+::= { prvtPwVcTDMObjects 1 }
+
+prvtPwVcTDMEntry OBJECT-TYPE
+SYNTAX PrvtPwVcTDMEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table is indexed by the same index that was
+created for the associated entry in the PW Table
+(in the PW-STD-MIB).
+An entry is created in this table by the agent for every
+entry in the prvtPwVcTable with a prvtPwVcType of 'TDM'."
+
+INDEX { prvtPwVcTDMModuleId, prvtPwVcTDMCircuitId }
+
+::= { prvtPwVcTDMTable 1 }
+
+PrvtPwVcTDMEntry ::= SEQUENCE {
+prvtPwVcTDMModuleId INTEGER, 
+prvtPwVcTDMCircuitId INTEGER, 
+prvtPwVcTDMType INTEGER,
+prvtPwVcRelTDMCfgIndex PrvtPwVcTDMCfgIndex,
+prvtPwVcTDMTimeElapsed Integer32,
+prvtPwVcTDMValidIntervals Integer32,
+prvtPwVcTDMCurrentIndications BITS,
+prvtPwVcTDMLatchedIndications BITS,
+prvtPwVcTDMLastEsTimeStamp TimeStamp,
+prvtPwVcTDMEmulationMode INTEGER,
+prvtPwVcTDMOperStatus INTEGER,
+prvtPwVcTDMClearCircuitStatistics INTEGER
+} 
+prvtPwVcTDMModuleId OBJECT-TYPE
+SYNTAX INTEGER (1..65535)
+MAX-ACCESS read-only
+STATUS current 
+DESCRIPTION 
+"The ID of the CES Module where the crcuit is configured. "
+::= { prvtPwVcTDMEntry 1 } 
+
+prvtPwVcTDMCircuitId OBJECT-TYPE
+SYNTAX INTEGER (1..65535)
+MAX-ACCESS read-only
+STATUS current 
+DESCRIPTION 
+"The ID of the CES Circuit that this PW represents. "
+::= { prvtPwVcTDMEntry 2 } 
+
+prvtPwVcTDMType OBJECT-TYPE
+SYNTAX INTEGER {
+
+other (1),
+ds1 (2),
+e1 (3),
+ds3 (4),
+e3 (5),
+octetAlignedT1 (6),
+nXds0 (7),
+nXds0WithCASe1 (8),
+nXds0WithCASds1Esf (9),
+nXds0WithCASds1Sf (10)
+
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Specifies the type of TDM PW. The connection assumed to be
+symmetrical having the same value at both ends. To identify
+structured vs. unstructured type for DS1 and E1, dsx1LineType
+and dsx1SignalMode [DS1MIB] should be referenced. DS3 and E3
+are always unstructured. "
+DEFVAL { e1 }
+::= { prvtPwVcTDMEntry 3 }
+
+prvtPwVcRelTDMCfgIndex OBJECT-TYPE
+SYNTAX PrvtPwVcTDMCfgIndex
+MAX-ACCESS read-only 
+STATUS current
+DESCRIPTION
+"Index to the relevant TDM configuration table entry
+that appears in one of the related MIB modules
+such as SAToP,TDMoIP or CESoPSN. It is likely that
+multiple TDM PWs of the same characteristic will share
+a single configuration entry of the relevant type."
+::= { prvtPwVcTDMEntry 4 }
+
+prvtPwVcTDMTimeElapsed OBJECT-TYPE
+SYNTAX Integer32 (1..900)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of seconds, including partial seconds,
+that have elapsed since the beginning of the current
+measurement period. If, for some reason, such as an
+adjustment in the system's time-of-day clock, the
+current interval exceeds the maximum value, the
+agent will return the maximum value."
+::= { prvtPwVcTDMEntry 5}
+
+prvtPwVcTDMValidIntervals OBJECT-TYPE
+SYNTAX Integer32 (0..96)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The number of previous 15-minute intervals for which data
+was collected.
+An agent with TDM capability must be capable of supporting
+at least n intervals. The minimum value of n is 4, The
+default of n is 32 and the maximum value of n is 96.
+The value will be <n> unless the measurement was (re-)
+started within the last (<n>*15) minutes, in which case
+the value will be the number of complete 15 minute
+intervals for which the agent has at least some data.
+In certain cases(e.g., in the case where the agent is
+a proxy) it is possible that some intervals are unavailable.
+In this case, this interval is the maximum interval number
+for which data is available. "
+::= { prvtPwVcTDMEntry 6}
+
+prvtPwVcTDMCurrentIndications OBJECT-TYPE
+SYNTAX BITS {
+other ( 0),
+strayPacket ( 1),
+malformedPacket ( 2),
+excessivePktLossRate( 3),
+bufferOverrun ( 4),
+bufferUnderrun ( 5),
+remotePktLoss ( 6),
+packetLoss ( 7),
+tdmFault ( 8),
+packetsLbitCounter ( 9),
+packetsRbitCounter (10)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The following defects should be detected and reported
+upon request:
+
+-Stray packets MAY be detected by the PSN and multiplexing
+layers. Stray packets MUST be discarded by the CE-bound IWF
+and their detection MUST NOT affect mechanisms for detection
+of packet loss.
+
+-Malformed packets are detected by mismatch between the
+expected packet size (taking the value of the L bit into
+account) and the actual packet size inferred from the PSN and
+multiplexing layers. Malformed in-order packets MUST be
+discarded by the CE-bound IWF and replacement data generated
+as for lost packets.
+
+-Excessive packet loss rate is detected by computing the
+average packet loss rate over the value of
+prvtPwVcTDMAvePktLossTimeWindow and comparing it with a
+preconfigured threshold [SATOP].
+
+-Buffer overrun is detected in the normal operation state
+when the CE bound IWF's jitter buffer cannot accommodate
+newly arrived packets.
+
+-Remote packet loss is indicated by reception of packets with
+their R bit set.
+
+-Packet misorder is detected by looking at the Sequence
+number provided by the control word.
+
+-TDM Fault, if L bit in the control word is set, it indicates
+that TDM data carried in the payload is invalid due an
+attachment circuit fault. When the L bit is set the payload
+MAY be omitted in order to conserve bandwidth.
+
+Note: the algorithm used to capture these indications
+is implementation specific."
+::= { prvtPwVcTDMEntry 7}
+
+prvtPwVcTDMLatchedIndications OBJECT-TYPE
+SYNTAX BITS {
+other ( 0),
+staryPacket ( 1),
+malformedPacket ( 2),
+excessivePktLossRate( 3),
+bufferOverrun ( 4),
+bufferUnderrun ( 5),
+remotePktLoss ( 6),
+packetLoss ( 7),
+tdmFault ( 8),
+packetsLbitCounter ( 9),
+packetsRbitCounter (10)
+}
+
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The state of TDM indicators when the TDM PW last declared
+an error second (either as ES, SES or a second with
+errors inside a UAS) condition. At this time, only LOPS
+can create a failure. Since indicators other than LOPS are
+useful, all are latched here. For bit definitions, see
+prvtPwVcTDMCurrentIndications above.
+
+Note: the algorithm used to latch these indications when
+entering an defect state is implementation specific."
+::= { prvtPwVcTDMEntry 8}
+
+prvtPwVcTDMLastEsTimeStamp OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of sysUpTime on the most recent occasion at
+which the TDM PW entered the ES or SES state."
+::= { prvtPwVcTDMEntry 9} 
+
+prvtPwVcTDMEmulationMode OBJECT-TYPE
+SYNTAX INTEGER
+{
+undefined ( 0),
+structured ( 1),
+unstuctured ( 2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The circuit emulation mode."
+
+::= {prvtPwVcTDMEntry 10 } 
+
+prvtPwVcTDMOperStatus OBJECT-TYPE
+SYNTAX INTEGER
+{
+up (1),
+down (2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The operational status of the circuit."
+
+::= {prvtPwVcTDMEntry 11 } 
+
+prvtPwVcTDMClearCircuitStatistics OBJECT-TYPE
+SYNTAX INTEGER {
+none ( 0 ),
+clear ( 1 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION "Clear circuit statistics."
+::= {prvtPwVcTDMEntry 12 }
+
+
+
+-- End of TDM PW table
+
+-- PW Generic TDM PW Configuration Table
+
+prvtPwVcTDMCfgTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPwVcTDMCfgEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains a set of parameters that may be
+referenced by one or more TDM PWs in prvtPwVcTDMTable."
+
+::= { prvtPwVcTDMObjects 3 }
+
+prvtPwVcTDMCfgEntry OBJECT-TYPE
+SYNTAX PrvtPwVcTDMCfgEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"These parameters define the characteristics of a
+TDM PW. They are grouped here to ease NMS burden.
+Once an entry is created here it may be re-used
+by many PWs."
+
+INDEX { prvtPwVcTDMModuleId,prvtPwVcTDMCircuitId }
+
+::= { prvtPwVcTDMCfgTable 1 }
+
+PrvtPwVcTDMCfgEntry ::= SEQUENCE { 
+prvtPwVcTDMCfgPayloadSize Unsigned32,
+prvtPwVcTDMCfgPktReorder TruthValue,
+prvtPwVcTDMCfgRtpHdrUsed TruthValue,
+prvtPwVcTDMCfgJtrBfrDepth Unsigned32,
+prvtPwVcTDMCfgChannelGroup INTEGER,
+prvtPwVcTDMCfgPorts OCTET STRING,
+prvtPwVcTDMCfgPeerIpType INTEGER,
+prvtPwVcTDMCfgPeerIpAddress IpAddress,
+prvtPwVcTDMCfgPeerPort INTEGER, 
+prvtPwVcTDMCfgPeerMAC OCTET STRING, 
+prvtPwVcTDMCfgPeerEcid INTEGER,
+prvtPwVcTDMCfgPeerOosEcid INTEGER,
+prvtPwVcTDMCfgVlanId INTEGER, 
+prvtPwVcTDMCfgVlanPrio INTEGER, 
+prvtPwVcTDMCfgLocalPort INTEGER, 
+prvtPwVcTDMCfgEcid INTEGER,
+prvtPwVcTDMCfgOosEcid INTEGER,
+prvtPwVcTDMCfgProtocol INTEGER, 
+prvtPwVcTDMCfgAdminStatus INTEGER,
+prvtPwVcTDMCfgRowStatus RowStatus,    
+prvtPwVcTDMCfgRtp INTEGER,
+prvtPwVcTDMCfgOosPort Unsigned32,
+prvtPwVcTDMCfgPayloadSuppression INTEGER,
+prvtPwVcTDMCfgInterface PrvtPwVcTDMCfgInterface,
+prvtPwVcTDMCfgIpTos INTEGER,
+prvtPwVcTDMCfgIpOosTos INTEGER,
+prvtPwVcTDMCfgPeerOosPort INTEGER,
+prvtPwVcTDMCfgMplsLocalLabel Unsigned32,
+prvtPwVcTDMCfgMplsPeerLabel Unsigned32,
+prvtPwVcTDMCfgMplsTTL INTEGER,  
+prvtPwVcTDMCfgMplsExp INTEGER,    
+prvtPwVcTDMCfgMplsOosLocalLabel Unsigned32,
+prvtPwVcTDMCfgMplsOosPeerLabel Unsigned32,      
+prvtPwVcTDMCfgMplsOosTTL INTEGER,
+prvtPwVcTDMCfgMplsOosExp INTEGER   ,
+prvtPwVcTDMCfgRtpOosPayload INTEGER,
+prvtPwVcTDMCfgRtpPayload INTEGER
+
+}
+
+prvtPwVcTDMCfgPayloadSize OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The value of this object indicates the PayLoad Size to
+be defined during the PW setUp. Upon TX, implementation
+must be capable of carrying that amount of data.
+Upon RX, When the LEN field is set to 0, the payload of
+packet MUST assume this size, and if the actual
+packet size is inconsistent with this length,
+the packet MUST be considered to be malformed. "
+::= { prvtPwVcTDMCfgEntry 1 }
+
+prvtPwVcTDMCfgPktReorder OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"If set True: as CE bound packets are queued in the
+jitter buffer, out of order packets are re-ordered. The
+maximum sequence number differential (i.e., the range in
+which re-sequencing can occur) is dependant on the depth
+of the jitter buffer. See prvtPwVcTDMCfgJtrBfrDepth.
+
+NOTE: Some implementations may not support this feature.
+The agent is then required to set this False."
+::= { prvtPwVcTDMCfgEntry 2 }
+
+prvtPwVcTDMCfgRtpHdrUsed OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"If set False: an RTP header is not pre-pended to the
+TDM packet."
+REFERENCE
+"See [SATOP]"
+DEFVAL { false }
+
+::= { prvtPwVcTDMCfgEntry 3 }
+
+prvtPwVcTDMCfgJtrBfrDepth OBJECT-TYPE
+SYNTAX Unsigned32 (1..200)
+UNITS "millisecond"
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The size of the Jitter buffer SHOULD be defined to
+a value that is capable to allow accommodation to the
+PSN-specific packet delay variation.
+
+If configured to a value not supported by the
+implementation, the agent MUST return an error code
+'jtrBfrDepth' in 'prvtPwVcTDMConfigError '
+
+NOTE: jitter buffers are a limited resource to
+be managed."
+DEFVAL { 3 }
+
+::= { prvtPwVcTDMCfgEntry 4 }
+
+
+
+prvtPwVcTDMCfgChannelGroup OBJECT-TYPE
+SYNTAX INTEGER  (1..128)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The circuit's channel group. This object is only valid if structured emulation mode is used.
+If a group is not set the value of the object is 0."
+
+::= { prvtPwVcTDMCfgEntry 5 } 
+
+prvtPwVcTDMCfgPorts OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"A bitmap of themodule's TDM ports belongng to the circuit. "
+::= { prvtPwVcTDMCfgEntry 6 } 
+
+prvtPwVcTDMCfgPeerIpType OBJECT-TYPE
+SYNTAX INTEGER 
+{
+ipv4(4),
+ipv6(6),
+dns(16)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The type of the peer's IP address. "
+::= { prvtPwVcTDMCfgEntry 7 }
+
+prvtPwVcTDMCfgPeerIpAddress OBJECT-TYPE
+SYNTAX IpAddress
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The peer's IP address. "
+::= { prvtPwVcTDMCfgEntry 8 } 
+
+prvtPwVcTDMCfgPeerPort OBJECT-TYPE
+SYNTAX INTEGER (0..65535)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The connection port. "
+::= { prvtPwVcTDMCfgEntry 9 } 
+
+prvtPwVcTDMCfgPeerMAC OBJECT-TYPE
+SYNTAX OCTET STRING 
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The Peer MAC address. This object is only valid for Metro-Ethernet and Mpls circuits.
+If an IP address is configured for the circuit, this object will display
+the resolved MAC address."
+::= { prvtPwVcTDMCfgEntry 10 } 
+
+prvtPwVcTDMCfgPeerEcid OBJECT-TYPE
+SYNTAX INTEGER 
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The peer circuit identifier. This object is only valid if the Circuit protocol is metro-ethernet. "
+::= { prvtPwVcTDMCfgEntry 11 } 
+
+prvtPwVcTDMCfgPeerOosEcid OBJECT-TYPE
+SYNTAX INTEGER 
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The peer circuit identifier for the out-of-band signaling. This value is valid only when the object
+prvtPwVcTDMCfgEcid is set and when the current protocol is metro-ethernet"
+::= { prvtPwVcTDMCfgEntry 12 } 
+
+prvtPwVcTDMCfgVlanId OBJECT-TYPE
+SYNTAX INTEGER (2..4094)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The circuit Vlan ID. "
+::= { prvtPwVcTDMCfgEntry 13 } 
+
+prvtPwVcTDMCfgVlanPrio OBJECT-TYPE
+SYNTAX INTEGER (0..7)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The prioirty for the VLAN set here, when the protocol for the circuit is metro-ethernet"
+::= { prvtPwVcTDMCfgEntry 14 } 
+
+prvtPwVcTDMCfgLocalPort OBJECT-TYPE
+SYNTAX INTEGER (0..65535)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Local UDP port. "
+::= { prvtPwVcTDMCfgEntry 15 } 
+
+
+prvtPwVcTDMCfgEcid OBJECT-TYPE
+SYNTAX INTEGER 
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The local circuit identifier. This object is only valid if the Circuit protocol is metro-ethernet. "
+::= { prvtPwVcTDMCfgEntry 16 } 
+
+prvtPwVcTDMCfgOosEcid OBJECT-TYPE
+SYNTAX INTEGER 
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The local circuit identifier for the out-of-band signaling. This value is valid only when the object
+prvtPwVcTDMCfgEcid is set and when the current protocol is metro-ethernet"
+::= { prvtPwVcTDMCfgEntry 17 } 
+
+prvtPwVcTDMCfgProtocol OBJECT-TYPE
+SYNTAX INTEGER 
+{
+undefined(0),
+satop(1),
+cesopsn(2),
+metro-ethernet(3),
+mpls (4)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The emulation protocol."
+::= { prvtPwVcTDMCfgEntry 18 } 
+
+prvtPwVcTDMCfgAdminStatus OBJECT-TYPE
+SYNTAX INTEGER
+{
+enable(1),
+disable(2)
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The administrative status of the circuit."
+::= { prvtPwVcTDMCfgEntry 19 }
+
+
+prvtPwVcTDMCfgRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This field is used to create and destroy TDM circuits."
+::= { prvtPwVcTDMCfgEntry 20 }   
+
+
+prvtPwVcTDMCfgRtp OBJECT-TYPE
+SYNTAX INTEGER {
+true ( 1 ),
+false ( 2 )
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"TRTP header."
+::= { prvtPwVcTDMCfgEntry 21 } 
+
+
+prvtPwVcTDMCfgOosPort OBJECT-TYPE
+SYNTAX Unsigned32 (0..65535)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Oos port."
+::= { prvtPwVcTDMCfgEntry 22 } 
+
+
+
+prvtPwVcTDMCfgPayloadSuppression OBJECT-TYPE
+SYNTAX INTEGER {
+enable ( 1 ),
+disable ( 2 )
+}
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Controls payload suppression. Object does not require module to be restarted."
+::= { prvtPwVcTDMCfgEntry 23 } 
+
+
+prvtPwVcTDMCfgInterface   OBJECT-TYPE 
+SYNTAX PrvtPwVcTDMCfgInterface 
+MAX-ACCESS  read-create
+STATUS current
+DESCRIPTION
+"Interface used for configuring OC3 TDM circuits 
+P - Port Number, K,L,M standard numbering of SONET/SDH."
+::= {prvtPwVcTDMCfgEntry 24}      
+
+
+prvtPwVcTDMCfgIpTos		OBJECT-TYPE 
+SYNTAX	INTEGER  (0..255)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Set/Show IP TOS information" 
+::= { prvtPwVcTDMCfgEntry 25 }    
+
+
+prvtPwVcTDMCfgIpOosTos	OBJECT-TYPE 
+SYNTAX	INTEGER  (0..255)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Set/Show IP Out Of Stream information" 
+::= { prvtPwVcTDMCfgEntry 26 }    
+ 
+ 
+prvtPwVcTDMCfgPeerOosPort OBJECT-TYPE
+SYNTAX INTEGER (0..65535)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This field is used to SET Destination Oos Port"
+::= { prvtPwVcTDMCfgEntry 27 } 
+
+
+prvtPwVcTDMCfgMplsLocalLabel OBJECT-TYPE
+SYNTAX Unsigned32 (0..1048575)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The local circuit identifier. This object is only valid if the Circuit protocol is MPLS "  
+DEFVAL { 15 }
+::= { prvtPwVcTDMCfgEntry 28 }
+
+prvtPwVcTDMCfgMplsPeerLabel OBJECT-TYPE
+SYNTAX Unsigned32 (0..1048575)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The peer circuit identifier. This object is only valid if the Circuit protocol is MPLS "
+DEFVAL { 15 }
+::= { prvtPwVcTDMCfgEntry 29 }        
+
+prvtPwVcTDMCfgMplsTTL OBJECT-TYPE
+SYNTAX INTEGER (2..255)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"MPLS TTL "   
+DEFVAL { 255 }
+::= { prvtPwVcTDMCfgEntry 30 }               
+
+prvtPwVcTDMCfgMplsExp OBJECT-TYPE
+SYNTAX INTEGER (0..7)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"MPLS EXP " 
+DEFVAL { 0 }
+::= { prvtPwVcTDMCfgEntry 31 }
+
+prvtPwVcTDMCfgMplsOosLocalLabel OBJECT-TYPE
+SYNTAX Unsigned32 (0..1048575)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The local circuit identifier  for the out-of-band signaling. This object is only valid if the Circuit protocol is MPLS "
+DEFVAL { 255 }
+::= { prvtPwVcTDMCfgEntry 32 } 
+
+prvtPwVcTDMCfgMplsOosPeerLabel OBJECT-TYPE
+SYNTAX Unsigned32 (0..1048575)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"The peer circuit identifier  for the out-of-band signaling. This object is only valid if the Circuit protocol is MPLS "
+DEFVAL { 255 }
+::= { prvtPwVcTDMCfgEntry 33 }
+
+prvtPwVcTDMCfgMplsOosTTL OBJECT-TYPE
+SYNTAX INTEGER (2..255)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"MPLS TTL for the out-of-band signaling."       
+DEFVAL { 255 }
+::= { prvtPwVcTDMCfgEntry 34 }     
+
+
+prvtPwVcTDMCfgMplsOosExp OBJECT-TYPE
+SYNTAX INTEGER (0..7)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"MPLS EXP for the out-of-band signaling."
+DEFVAL { 0 }
+::= { prvtPwVcTDMCfgEntry 35 }     
+
+
+prvtPwVcTDMCfgRtpOosPayload OBJECT-TYPE
+SYNTAX INTEGER (0..127)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This field is used to SET RTP Oos payload type."
+::= { prvtPwVcTDMCfgEntry 36 }
+
+prvtPwVcTDMCfgRtpPayload OBJECT-TYPE
+SYNTAX INTEGER (0..127)
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"This field is used to SET RTP payload type."
+::= { prvtPwVcTDMCfgEntry 37 }
+
+
+
+
+-- Channel group table --
+prvtTDMChannelGrpTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtTDMChannelGrpEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains the set of available channel groups."
+
+::= { prvtPwVcTDMObjects 4 } 
+
+prvtTDMChannelGrpEntry OBJECT-TYPE
+SYNTAX PrvtTDMChannelGrpEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"These parameters are used to configure a CES channel group."
+
+INDEX { prvtTDMChannelGrpModuleID, prvtTDMChannelGrpID }
+
+::= { prvtTDMChannelGrpTable 1 }
+
+
+PrvtTDMChannelGrpEntry ::= SEQUENCE { 
+prvtTDMChannelGrpModuleID Unsigned32,
+prvtTDMChannelGrpID Unsigned32,
+prvtTDMChannelGrpCfgError INTEGER, 
+prvtTDMChannelGrpTimeSlots TimeSlotList,
+prvtTDMChannelGrpOC3TimeSlots InterfaceTimeSlot 
+}
+
+prvtTDMChannelGrpModuleID OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The index of the module to which this channel group belongs. "
+::= { prvtTDMChannelGrpEntry 1 }
+
+prvtTDMChannelGrpID OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The channel group ID."
+::= { prvtTDMChannelGrpEntry 2 }
+
+prvtTDMChannelGrpCfgError OBJECT-TYPE
+SYNTAX INTEGER {
+noError(0),
+channelGroupAtached(1)
+}
+
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object displays the correctness of the configuration. If it has a value of 
+channelGroupAtached(1) this channel group has been attached to a circuit and the 
+new configuration cannot be applied."
+::= { prvtTDMChannelGrpEntry 3 }
+
+prvtTDMChannelGrpTimeSlots OBJECT-TYPE
+SYNTAX TimeSlotList 
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object is used to configure  which time slots are members of the given
+channel group."
+::= { prvtTDMChannelGrpEntry 4 }
+
+prvtTDMChannelGrpOC3TimeSlots OBJECT-TYPE
+SYNTAX InterfaceTimeSlot 
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"This object is used to configure  interface and time slots  for the given channel
+group in OC3 module."
+::= { prvtTDMChannelGrpEntry 5 }
+
+
+
+-- END of Table
+
+-- TDM PW Performance Current Table.
+
+prvtPwVcTDMPerfCurrentTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPwVcTDMPerfCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The current 15 minute interval counts are in
+this table.
+
+This table provides per TDM PW performance information."
+
+::= { prvtPwVcTDMObjects 5 }
+
+prvtPwVcTDMPerfCurrentEntry OBJECT-TYPE
+SYNTAX PrvtPwVcTDMPerfCurrentEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in this table is created by the agent for every
+prvtPwVcTDM entry. After 15 minutes, the contents of this table
+entry are copied to a new entry in the prvtPwVcTDMPerfInterval
+table and the counts in this entry are reset to zero."
+
+INDEX { prvtPwVcTDMModuleId,prvtPwVcTDMCircuitId }
+
+::= { prvtPwVcTDMPerfCurrentTable 1 }
+
+PrvtPwVcTDMPerfCurrentEntry ::= SEQUENCE {
+
+prvtPwVcTDMPerfCurrentPktsOoseq Counter32,
+prvtPwVcTDMPerfCurrentJtrBfrUnderruns Counter32,
+prvtPwVcTDMPerfCurrentJtrBfrOverruns Counter32,
+prvtPwVcTDMPerfCurrentMalformedPkt Counter32,
+prvtPwVcTDMPerfCurrentNearEndFC Counter32,
+prvtPwVcTDMPerfCurrentFarEndFC Counter32
+}
+
+prvtPwVcTDMPerfCurrentPktsOoseq OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected out of sequence (via TDM
+header sequence numbers), but successfully re-ordered.
+Note: some implementations may not support this
+Feature."
+::= { prvtPwVcTDMPerfCurrentEntry 1 }
+
+prvtPwVcTDMPerfCurrentJtrBfrUnderruns OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of times a packet needed to be played
+out and the jitter buffer was empty."
+::= { prvtPwVcTDMPerfCurrentEntry 2 }
+
+prvtPwVcTDMPerfCurrentJtrBfrOverruns OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected out of range (via TDM
+header sequence numbers), and could not be re-
+ordered, or could not fit in the jitter buffer."
+::= { prvtPwVcTDMPerfCurrentEntry 3 }
+
+prvtPwVcTDMPerfCurrentMalformedPkt OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected with unexpected size, or
+bad headers' stack"
+::= { prvtPwVcTDMPerfCurrentEntry 4 }
+
+prvtPwVcTDMPerfCurrentNearEndFC OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of local packet failures."
+::= { prvtPwVcTDMPerfCurrentEntry 5 }
+
+prvtPwVcTDMPerfCurrentFarEndFC OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of remote packet failures."
+::= { prvtPwVcTDMPerfCurrentEntry 6 }
+
+
+-- End TDM PW Performance Current Interval Table
+
+-- TDM PW Performance Interval Table.
+
+prvtPwVcTDMPerfIntervalTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPwVcTDMPerfIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table provides performance information per TDM PW
+similar to the prvtPwVcTDMPerfCurrentTable above. However,
+these counts represent historical 15 minute intervals.
+Typically, this table will have a maximum of 96 entries
+for a 24 hour period, but is not limited to this. "
+::= { prvtPwVcTDMObjects 6 }
+
+prvtPwVcTDMPerfIntervalEntry OBJECT-TYPE
+SYNTAX PrvtPwVcTDMPerfIntervalEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry in this table is created by the agent for
+every prvtPwVcTDMPerfCurrentEntry that is 15 minutes old.
+The contents of the Current entry are copied to the new
+entry here. The Current entry, then resets its counts
+to zero for the next current 15 minute interval. "
+
+INDEX { prvtPwVcTDMModuleId,prvtPwVcTDMCircuitId, prvtPwVcTDMPerfIntervalNumber }
+
+::= { prvtPwVcTDMPerfIntervalTable 1 }
+
+PrvtPwVcTDMPerfIntervalEntry ::= SEQUENCE {
+prvtPwVcTDMPerfIntervalNumber Unsigned32,
+prvtPwVcTDMPerfIntervalValidData TruthValue,
+prvtPwVcTDMPerfIntervalDuration Integer32,
+
+prvtPwVcTDMPerfIntervalPktsOoseq Counter32,
+prvtPwVcTDMPerfIntervalJtrBfrUnderruns Counter32,
+prvtPwVcTDMPerfIntervalJtrBfrOverruns Counter32,
+prvtPwVcTDMPerfIntervalMalformedPkt Counter32,
+prvtPwVcTDMPerfIntervalNearEndFC Counter32,
+prvtPwVcTDMPerfIntervalFarEndFC Counter32
+
+}
+
+prvtPwVcTDMPerfIntervalNumber OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A number (normally between 1 and 96 to cover a 24 hour
+period) which identifies the interval for which the set
+of statistics is available. The interval identified by 1
+is the most recently completed 15 minute interval, and
+the interval identified by N is the interval immediately
+preceding the one identified by N-1. The minimum range of
+N is 1 through 4. The default range is 1 through 32. The
+maximum value of N is 1 through 96."
+::= { prvtPwVcTDMPerfIntervalEntry 1 }
+
+prvtPwVcTDMPerfIntervalValidData OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This variable indicates if the data for this interval
+is valid."
+::= { prvtPwVcTDMPerfIntervalEntry 2 }
+
+prvtPwVcTDMPerfIntervalDuration OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+
+"The duration of a particular interval in seconds,
+Adjustments in the system's time-of-day clock, may
+cause the interval to be greater or less than, the
+normal value. Therefore this actual interval value
+is provided."
+::= { prvtPwVcTDMPerfIntervalEntry 3 }
+
+prvtPwVcTDMPerfIntervalPktsOoseq OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected out of sequence (via TDM
+header sequence numbers), but successfully re-ordered.
+Note: some implementations mat not support this
+feature."
+::= { prvtPwVcTDMPerfIntervalEntry 4 }
+
+prvtPwVcTDMPerfIntervalJtrBfrUnderruns OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of times a packet needed to be played
+out and the jitter buffer was empty."
+::= { prvtPwVcTDMPerfIntervalEntry 5 }
+
+prvtPwVcTDMPerfIntervalJtrBfrOverruns OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected out of range (via TDM
+header sequence numbers), and could not be re-
+ordered, or could not fit in the jitter buffer."
+::= { prvtPwVcTDMPerfIntervalEntry 6 }
+
+prvtPwVcTDMPerfIntervalMalformedPkt OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected with unexpected size, or
+bad headers' stack"
+::= { prvtPwVcTDMPerfIntervalEntry 7 }
+
+prvtPwVcTDMPerfIntervalNearEndFC OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of local packet failures."
+::= { prvtPwVcTDMPerfIntervalEntry 8 }
+
+prvtPwVcTDMPerfIntervalFarEndFC OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of remote packet failures."
+::= { prvtPwVcTDMPerfIntervalEntry 9 }
+
+
+-- End TDM PW Performance Interval Table
+
+-- TDM PW Performance Table
+
+prvtPwVcTDMPerfTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPwVcTDMPerfEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table provides performance information per TDM PW
+similar to the prvtPwVcTDMPerfIntervalTable above. However,
+these counters represent complete historical information. "
+::= { prvtPwVcTDMObjects 7 }
+
+prvtPwVcTDMPerfEntry OBJECT-TYPE
+SYNTAX PrvtPwVcTDMPerfEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry is created in this table by the agent for
+every entry in the prvtPwVcTDM table."
+
+INDEX { prvtPwVcTDMModuleId,prvtPwVcTDMCircuitId }
+
+::= { prvtPwVcTDMPerfTable 1 }
+
+PrvtPwVcTDMPerfEntry ::= SEQUENCE {
+prvtPwVcTDMPerfPktsOoseq Counter32,
+prvtPwVcTDMPerfJtrBfrUnderruns Counter32,
+prvtPwVcTDMPerfJtrBfrOverruns Counter32,
+prvtPwVcTDMPerfMalformedPkt Counter32,
+prvtPwVcTDMPerfNearEndFC Counter32,
+prvtPwVcTDMPerfFarEndFC Counter32,
+prvtPwVcTDMPerfDiscontinuityTime TimeStamp
+}
+
+prvtPwVcTDMPerfPktsOoseq OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected out of sequence (via TDM
+header sequence numbers), but successfully re-ordered.
+Note: some implementations may not support this
+feature."
+::= { prvtPwVcTDMPerfEntry 1 }
+
+prvtPwVcTDMPerfJtrBfrUnderruns OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of times a packet needed to be played
+out and the jitter buffer was empty."
+::= { prvtPwVcTDMPerfEntry 2 }
+
+prvtPwVcTDMPerfJtrBfrOverruns OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected out of range (via TDM
+header sequence numbers), and could not be re-
+ordered, or could not fit in the jitter buffer."
+::= { prvtPwVcTDMPerfEntry 3 }
+
+prvtPwVcTDMPerfMalformedPkt OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of packets detected with unexpected size, or
+bad headers' stack."
+::= { prvtPwVcTDMPerfEntry 4 }
+
+
+prvtPwVcTDMPerfDiscontinuityTime OBJECT-TYPE
+SYNTAX TimeStamp
+MAX-ACCESS read-only
+STATUS current
+
+DESCRIPTION
+"The value of sysUpTime on the most recent occasion at
+which any one or more of this segment's Counter32
+suffered a discontinuity. If no such
+discontinuities have occurred since the last re-
+initialization of the local management subsystem, then
+this object contains a zero value."
+::= { prvtPwVcTDMPerfEntry 5 }
+
+prvtPwVcTDMPerfNearEndFC OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of local packet failures."
+::= { prvtPwVcTDMPerfEntry 6 }
+
+prvtPwVcTDMPerfFarEndFC OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Number of remote packet failures."
+::= { prvtPwVcTDMPerfEntry 7 }
+
+-- End of PW TDM Performance table
+
+-- TDM PW Alarm Table
+
+prvtPwVcTDMAlarmTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtPwVcTDMAlarmEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains object for configuring and displaying CES Circuits TCA thresholds."
+::= { prvtPwVcTDMObjects 8 }
+
+prvtPwVcTDMAlarmEntry OBJECT-TYPE
+SYNTAX PrvtPwVcTDMAlarmEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+INDEX { prvtPwVcTDMModuleId, prvtPwVcTDMCircuitId, prvtPwVcTDMAlarmIndex }
+::= { prvtPwVcTDMAlarmTable 1 }
+
+PrvtPwVcTDMAlarmEntry ::= SEQUENCE {
+prvtPwVcTDMAlarmIndex Gauge32,
+prvtPwVcTDMAlarmVariable OBJECT IDENTIFIER,
+prvtPwVcTDMAlarmThreshold INTEGER,
+prvtPwVcTDMAlarmValue INTEGER
+}
+
+prvtPwVcTDMAlarmIndex OBJECT-TYPE
+SYNTAX Gauge32
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+" An integer uniquely identifying an alarm entry." 
+::= { prvtPwVcTDMAlarmEntry 1 } 
+
+prvtPwVcTDMAlarmVariable OBJECT-TYPE
+SYNTAX OBJECT IDENTIFIER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The OID of the variable whose value is being monitored. Depending on the time interval, 
+the error condition and the modue and circuit ID, this points to an object from an entry in 
+prvtPwVcTDMPerfCurrentTable or prvtPwVcTDMPerfTable." 
+::= { prvtPwVcTDMAlarmEntry 2 } 
+
+prvtPwVcTDMAlarmThreshold OBJECT-TYPE
+SYNTAX INTEGER 
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The alarm condition threshold for this alarm entry. The alarm is triggered if the value of the
+object pointed by prvtPwVcTDMAlarmVariable remains above this threshold for more than 3 seconds." 
+::= { prvtPwVcTDMAlarmEntry 3 } 
+
+prvtPwVcTDMAlarmValue OBJECT-TYPE
+SYNTAX INTEGER
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"The value of the object pointed to by prvtPwVcTDMAlarmVariable, present for notification purposes." 
+::= { prvtPwVcTDMAlarmEntry 4 } 
+
+prvtPwVcTDMAlarm NOTIFICATION-TYPE
+OBJECTS { prvtPwVcTDMAlarmVariable, prvtPwVcTDMAlarmThreshold, prvtPwVcTDMAlarmValue }
+STATUS current
+DESCRIPTION
+"This notification is sent when the value of a TDM port error condition statistic has exceeded the 
+configured threshold, or the value has dropped back below the threshold."
+::= {prvtPwVcTDMTraps 1}
+
+prvtPwVcTDMStatusChange NOTIFICATION-TYPE
+OBJECTS { prvtPwVcTDMOperStatus, prvtPwVcTDMCfgAdminStatus }
+STATUS current
+DESCRIPTION
+"This notification is sent when the operational or administrative status of circuit changes."
+::= {prvtPwVcTDMTraps 2}
+
+-- End of PW TDM Performance table
+
+-- Conformance Information
+
+prvtPwVcTDMGroups OBJECT IDENTIFIER ::= { prvtPwVcTDMConformance 1 }
+prvtPwVcTDMCompliances OBJECT IDENTIFIER ::= { prvtPwVcTDMConformance 2 }
+
+prvtPwTDMModuleCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement for agent that support PW
+over TDM PSN operation."
+
+MODULE -- this module
+MANDATORY-GROUPS { prvtPwVcTDMGroup,
+prvtPwVcTDMPerfCurrentGroup,
+prvtPwVcTDMPerfIntervalGroup,
+prvtPwVcTDMPerfGroup,
+prvtPwVcTDMNotificationsGroup
+}
+
+OBJECT prvtPwVcTDMCfgPktReorder
+MIN-ACCESS read-only
+DESCRIPTION
+"The ability to set the packet reordering
+is not required."
+
+OBJECT prvtPwVcTDMCfgRtpHdrUsed
+MIN-ACCESS read-only
+DESCRIPTION
+"The ability to set the whether to use the
+RTP header or not is not required."
+
+
+::= { prvtPwVcTDMCompliances 1 }
+
+-- Units of conformance.
+
+prvtPwVcTDMGroup OBJECT-GROUP
+OBJECTS {
+prvtPwVcTDMType,
+prvtPwVcRelTDMCfgIndex,
+prvtPwVcTDMTimeElapsed,
+prvtPwVcTDMValidIntervals,
+prvtPwVcTDMCurrentIndications,
+prvtPwVcTDMLatchedIndications,
+prvtPwVcTDMLastEsTimeStamp,
+prvtPwVcTDMCfgPayloadSize,
+prvtPwVcTDMCfgPktReorder,
+prvtPwVcTDMCfgRtpHdrUsed,
+prvtPwVcTDMCfgJtrBfrDepth
+}
+STATUS current
+DESCRIPTION
+"Collection of objects for basic TDM PW config and
+status."
+::= { prvtPwVcTDMGroups 1 }
+
+
+prvtPwVcTDMPerfCurrentGroup OBJECT-GROUP
+OBJECTS {
+prvtPwVcTDMPerfCurrentPktsOoseq,
+prvtPwVcTDMPerfCurrentJtrBfrUnderruns,
+prvtPwVcTDMPerfCurrentJtrBfrOverruns,
+prvtPwVcTDMPerfCurrentMalformedPkt,
+prvtPwVcTDMPerfNearEndFC,
+prvtPwVcTDMPerfFarEndFC
+}
+STATUS current
+DESCRIPTION
+"Collection of current statistics objects for TDM PWs."
+::= { prvtPwVcTDMGroups 2 }
+
+prvtPwVcTDMPerfIntervalGroup OBJECT-GROUP
+OBJECTS {
+prvtPwVcTDMPerfIntervalPktsOoseq,
+prvtPwVcTDMPerfIntervalJtrBfrUnderruns,
+prvtPwVcTDMPerfIntervalJtrBfrOverruns,
+prvtPwVcTDMPerfIntervalMalformedPkt,
+prvtPwVcTDMPerfNearEndFC,
+prvtPwVcTDMPerfFarEndFC,
+prvtPwVcTDMPerfIntervalValidData,
+prvtPwVcTDMPerfIntervalDuration
+
+}
+STATUS current
+DESCRIPTION
+"Collection of Interval statistics objects for TDM PWs."
+::= { prvtPwVcTDMGroups 3 }
+
+prvtPwVcTDMPerfGroup OBJECT-GROUP
+OBJECTS {
+prvtPwVcTDMPerfPktsOoseq,
+prvtPwVcTDMPerfJtrBfrUnderruns,
+prvtPwVcTDMPerfJtrBfrOverruns,
+prvtPwVcTDMPerfMalformedPkt,
+prvtPwVcTDMPerfNearEndFC,
+prvtPwVcTDMPerfFarEndFC,
+prvtPwVcTDMPerfDiscontinuityTime
+}
+STATUS current
+DESCRIPTION
+"Collection of running statistics objects for TDM PWs."
+::= { prvtPwVcTDMGroups 4 }
+
+prvtPwVcTDMNotificationsGroup NOTIFICATION-GROUP
+NOTIFICATIONS { prvtPwVcTDMAlarm, prvtPwVcTDMStatusChange } 
+STATUS current
+DESCRIPTION
+"The group of supported notifications."
+::= { prvtPwVcTDMGroups 5 }
+
+
+END

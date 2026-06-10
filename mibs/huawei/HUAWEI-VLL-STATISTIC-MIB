@@ -1,0 +1,711 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI VLL Management Statistic and PW Performance Statistic MIB
+-- Reference:
+-- Version:     V2.02
+-- Revision history:
+
+--     REVISION "201308301452Z"
+--     DESCRIPTION "V1.11, add hwVllStatisticInputPackets,hwVllStatisticInputBytes,hwVllStatisticInputPacketsRate,hwVllStatisticInputBytesRate for VLL PW NO Qos statistics."
+
+--     REVISION "201106010000Z"
+--     DESCRIPTION "V1.10,add hwPWATMPerfCurrentTable and hwPWTDMPerfCurrentTable for ATM TDM PW performance statistics." 
+--
+--     REVISION "200902130000Z"
+--     DESCRIPTION "V1.0, HouChengjie, 2009-02-13, publish"
+-- ==================================================================
+
+    HUAWEI-VLL-STATISTIC-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE           
+                FROM SNMPv2-CONF            
+            Counter64, OBJECT-TYPE, MODULE-IDENTITY, TimeTicks, Unsigned32
+                FROM SNMPv2-SMI
+            EnabledStatus            
+                FROM P-BRIDGE-MIB            
+            TEXTUAL-CONVENTION ,DateAndTime           
+                FROM SNMPv2-TC;
+    
+    
+        hwL2VpnVllStatistic MODULE-IDENTITY 
+            LAST-UPDATED "201708170145Z" --Aug 17,2017 at 14:52 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "The HUAWEI-VLL-STATISTIC-MIB contains objects to
+                manage VLL's statistic."
+
+           REVISION  "201708170145Z" --Aug 17,2017 at 14:52 GMT
+           DESCRIPTION "mod dispcription."  
+
+           REVISION  "201308301452Z" --Aug 30,2013 at 14:52 GMT
+           DESCRIPTION "add hwVllStatisticInputPackets,hwVllStatisticInputBytes,hwVllStatisticInputPacketsRate,hwVllStatisticInputBytesRate for VLL PW NO Qos statistics"  
+
+            ::= { hwL2Vpn 7 }
+
+--
+-- Node definitions
+--
+
+        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+
+        
+--           
+-- The VLL's QoS statistic Attribute Group
+-- 
+        hwVllMIBObjects OBJECT IDENTIFIER ::= { hwL2VpnVllStatistic 1 }
+
+        
+--
+-- The VLL's Statistic Table
+--
+        hwVllStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVllStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the VLL's traffic statistic, based on the interface."
+            ::= { hwVllMIBObjects 1 }
+
+
+        hwVllStatisticEntry OBJECT-TYPE
+            SYNTAX HWVllStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VLL's traffic statistic."
+            INDEX { hwVllStatisticIfIndex, hwVllStatisticPwType }
+            ::= { hwVllStatisticTable 1 }
+
+
+        HWVllStatisticEntry ::=
+            SEQUENCE { 
+                hwVllStatisticIfIndex
+                    InterfaceIndex,
+                hwVllStatisticPwType
+                    INTEGER,
+                hwVllStatisticEnable
+                    EnabledStatus,
+                hwVllStatisticResetTraffic
+                    INTEGER,
+                hwVllStatisticResetTime
+                    DateAndTime,
+                hwVllStatisticPackets
+                    Counter64,
+                hwVllStatisticBytes
+                    Counter64,
+                hwVllStatisticPacketsRate
+                    Counter64,  
+                hwVllStatisticBytesRate
+                    Counter64,                
+                hwVllStatisticInputPackets
+                    Counter64,
+                hwVllStatisticInputBytes
+                    Counter64,
+                hwVllStatisticInputPacketsRate
+                    Counter64,  
+                hwVllStatisticInputBytesRate
+                    Counter64                               
+            }
+
+
+        hwVllStatisticIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index."
+            ::= { hwVllStatisticEntry 1 }
+
+
+        hwVllStatisticPwType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                primary(1),
+                secondary(2),
+                bypass(3)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of PW."
+            ::= { hwVllStatisticEntry 2 }
+            
+            
+        hwVllStatisticEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of VLL's traffic statistics,
+                based on the interface."
+            ::= { hwVllStatisticEntry 3 }
+            
+        hwVllStatisticResetTraffic OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                reset(1),
+                unknownStatus(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "reset the traffic statistic."
+            ::= { hwVllStatisticEntry 4 }
+            
+            
+        hwVllStatisticResetTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Last time of clean out."
+            ::= { hwVllStatisticEntry 5 }
+            
+                        
+        hwVllStatisticPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The packets sent on the PW."
+            ::= { hwVllStatisticEntry 6 }
+            
+            
+        hwVllStatisticBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bytes sent on the PW."
+            ::= { hwVllStatisticEntry 7 }
+          
+            
+        hwVllStatisticPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The packet rate sent on the PW."
+            ::= { hwVllStatisticEntry 8 }
+
+            
+        hwVllStatisticBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The byte rate sent on the PW."
+            ::= { hwVllStatisticEntry 9 }
+                                                           
+                                                           
+        hwVllStatisticInputPackets OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of packets received over the PW."
+            ::= { hwVllStatisticEntry 10 }
+            
+            
+        hwVllStatisticInputBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of bytes received over the PW."
+            ::= { hwVllStatisticEntry 11 }
+          
+            
+        hwVllStatisticInputPacketsRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of receiving packets over the PW."
+            ::= { hwVllStatisticEntry 12 }
+
+            
+        hwVllStatisticInputBytesRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The rate of receiving bytes over the PW."
+            ::= { hwVllStatisticEntry 13 }
+
+            
+--
+-- The VLL's QoS Statistic Table
+--
+        hwVllQosStatisticTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWVllQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table displays VLL QoS traffic statistics."
+            ::= { hwVllMIBObjects 2 }
+
+
+        hwVllQosStatisticEntry OBJECT-TYPE
+            SYNTAX HWVllQosStatisticEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the VLL's traffic statistic."
+            INDEX { hwVllQosStatisticIfIndex, hwVllQosStatisticPwType, hwVllQosStatisticQueueId }
+            ::= { hwVllQosStatisticTable 1 }
+
+
+        HWVllQosStatisticEntry ::=
+            SEQUENCE { 
+                hwVllQosStatisticIfIndex
+                    InterfaceIndex,
+                hwVllQosStatisticPwType
+                    INTEGER,                 
+                hwVllQosStatisticQueueId
+                    INTEGER,
+                hwVllQosStatisticPassPacket
+                    Counter64,
+                hwVllQosStatisticPassByte
+                    Counter64,
+                hwVllQosStatisticDiscardPacket
+                    Counter64,
+                hwVllQosStatisticDiscardByte
+                    Counter64,
+                hwVllQosStatisticPassPacketRate
+                    Counter64,
+                hwVllQosStatisticPassByteRate
+                    Counter64,
+                hwVllQosStatisticDiscardPacketRate
+                    Counter64,
+                hwVllQosStatisticDiscardByteRate
+                    Counter64
+            }
+
+
+        hwVllQosStatisticIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index."
+            ::= { hwVllQosStatisticEntry 1 }
+            
+            
+        hwVllQosStatisticPwType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                primary(1),
+                secondary(2),
+                bypass(3)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of PW."
+            ::= { hwVllQosStatisticEntry 2 }            
+
+
+        hwVllQosStatisticQueueId OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                be(1),
+                af1(2),
+                af2(3),
+                af3(4),
+                af4(5),
+                ef(6),
+                cs6(7),
+                cs7(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the queue's ID. The value must be 
+                be,af1,af2,af3,af4,ef,cs6,cs7."
+            ::= { hwVllQosStatisticEntry 3 }
+            
+
+        hwVllQosStatisticPassPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of passed packets, based on the interface."
+            ::= { hwVllQosStatisticEntry 4 }
+
+
+        hwVllQosStatisticPassByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of passed bytes, based on the interface."
+            ::= { hwVllQosStatisticEntry 5 }
+
+
+        hwVllQosStatisticDiscardPacket OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of discarded packets, based on the interface."
+            ::= { hwVllQosStatisticEntry 6 }
+
+
+        hwVllQosStatisticDiscardByte OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of discarded bytes, based on the interface."
+            ::= { hwVllQosStatisticEntry 7 }
+
+
+        hwVllQosStatisticPassPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed packets for the past 300 seconds, based on the interface. Unit: pps"
+            ::= { hwVllQosStatisticEntry 8 }
+
+
+        hwVllQosStatisticPassByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of passed bytes for the past 300 seconds, based on the interface. Unit: bps"
+            ::= { hwVllQosStatisticEntry 9 }
+
+
+        hwVllQosStatisticDiscardPacketRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded packets for the past 300 seconds, based on the interface. Unit: pps"
+            ::= { hwVllQosStatisticEntry 10 }
+
+
+        hwVllQosStatisticDiscardByteRate OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Rate of discarded bytes for the past 300 seconds, based on the interface. Unit: bps"
+            ::= { hwVllQosStatisticEntry 11 }
+
+--
+-- The ATM PW Performance Information Table
+-- 
+        hwPWATMPerfCurrentTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWPWATMPerfCurrentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table provides per ATM PW performance information. The contents of this
+          table entry are reset to zero and gotten new information every 15 minutes."
+            ::= { hwVllMIBObjects 3 }
+        
+        hwPWATMPerfCurrentEntry OBJECT-TYPE
+            SYNTAX HWPWATMPerfCurrentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by the agent for every ATM PW entry."
+            INDEX { hwPwATMIfIndex }
+            ::= { hwPWATMPerfCurrentTable 1 }
+        
+        HWPWATMPerfCurrentEntry ::=
+            SEQUENCE {
+            hwPwATMIfIndex
+                    InterfaceIndex,
+            hwPWATMPerfCurrentEnable
+                    EnabledStatus,                                      
+            hwPWATMPerfCurrentMissingPkts 
+                    Unsigned32,                   
+            hwPWATMPerfCurrentPktsMisOrder
+                    Unsigned32,    
+            hwPWATMPerfCurrentCellsXmit
+                    Unsigned32,
+            hwPWATMPerfCurrentCellsReceived
+                    Unsigned32,                    
+            hwPWATMPerfCurrentUnknownCells
+                    Unsigned32
+          }
+
+        hwPwATMIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interface index."
+            ::= { hwPWATMPerfCurrentEntry 1 }
+
+        hwPWATMPerfCurrentEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of ATM PW's performance,
+                based on the interface."
+            ::= { hwPWATMPerfCurrentEntry 2 }
+
+        hwPWATMPerfCurrentMissingPkts OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The value of this object identifies the number of lost packets."
+            ::= { hwPWATMPerfCurrentEntry 3 }
+        
+        hwPWATMPerfCurrentPktsMisOrder OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets detected out of order (via control word
+       sequence numbers)."
+            ::= { hwPWATMPerfCurrentEntry 4 }    
+
+        hwPWATMPerfCurrentCellsXmit OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of transmitted cells."
+            ::= { hwPWATMPerfCurrentEntry 5 }
+            
+        hwPWATMPerfCurrentCellsReceived OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "Number of received cells."
+            ::= { hwPWATMPerfCurrentEntry 6 }
+
+        hwPWATMPerfCurrentUnknownCells OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "Number of cells received from the PSN with unknown VPI or
+      VCI values.  This object is relevant only in N:1 mode."
+            ::= { hwPWATMPerfCurrentEntry 7 }
+
+--          
+-- The TDM Performance Information Table
+-- 
+        hwPWTDMPerfCurrentTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWPWTDMPerfCurrentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table provides per TDM PW performance information. The contents of this
+          table entry are reset to zero and gotten new information every 15 minutes."
+            ::= { hwVllMIBObjects 4 }
+        
+        hwPWTDMPerfCurrentEntry OBJECT-TYPE
+            SYNTAX HWPWTDMPerfCurrentEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by the agent for every TDM PW entry."
+            INDEX { hwPWTDMIfIndex }
+            ::= { hwPWTDMPerfCurrentTable 1 }
+        
+        HWPWTDMPerfCurrentEntry ::=
+            SEQUENCE { 
+            hwPWTDMIfIndex
+                    InterfaceIndex,
+            hwPWTDMPerfCurrentEnable
+                    EnabledStatus,                                         
+            hwPWTDMPerfCurrentMissingPkts 
+                    Unsigned32,
+            hwPWTDMPerfCurrentJtrBfrOverruns
+                    Unsigned32,
+            hwPWTDMPerfCurrentJtrBfrUnderruns
+                    Unsigned32,
+            hwPWTDMPerfCurrentMisOrderDropped
+                    Unsigned32,
+            hwPWTDMPerfCurrentMalformedPkt
+                    Unsigned32,
+            hwPWTDMPerfCurrentESs
+                    Unsigned32,
+            hwPWTDMPerfCurrentSESs
+                    Unsigned32,
+            hwPWTDMPerfCurrentUASs
+                    Unsigned32,
+            hwPWTDMPerfCurrentStrayPkt
+                    Unsigned32                    
+          }
+        hwPWTDMIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Index of the interface (or the virtual interface) 
+                associated with the PW."
+            ::= { hwPWTDMPerfCurrentEntry 1 }
+                     
+        hwPWTDMPerfCurrentEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of TDM PW's performance,
+                based on the interface."
+            ::= { hwPWTDMPerfCurrentEntry 2 }
+            
+        hwPWTDMPerfCurrentMissingPkts OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of missing packets (as detected via control word
+                sequence number gaps)."
+            ::= { hwPWTDMPerfCurrentEntry 3 }
+
+        
+        hwPWTDMPerfCurrentJtrBfrOverruns OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of times the jitter buffer was overrun."
+            ::= { hwPWTDMPerfCurrentEntry 4 }
+
+        
+        hwPWTDMPerfCurrentJtrBfrUnderruns OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of times a packet needed to be played
+               out and the jitter buffer was empty."
+            ::= { hwPWTDMPerfCurrentEntry 5 }
+
+        
+        hwPWTDMPerfCurrentMisOrderDropped OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets detected out of order (via control word
+                sequence numbers) that could not be re-ordered or could
+                not fit in the jitter buffer."
+            ::= { hwPWTDMPerfCurrentEntry 6 }
+
+        hwPWTDMPerfCurrentMalformedPkt OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Number of packets detected with unexpected size or
+                bad headers' stack."
+            ::= { hwPWTDMPerfCurrentEntry 7 }
+
+        hwPWTDMPerfCurrentESs OBJECT-TYPE
+            SYNTAX       Unsigned32
+            MAX-ACCESS   read-only
+            STATUS       current
+            DESCRIPTION
+                "The value of this object identifies the accumulated number of seconds in which error bits exist. That is, the time during which the TDM-encapsulated PW drops packets or receives error packets, including disordered packets and malformed packets." 
+            ::= { hwPWTDMPerfCurrentEntry 8 }
+
+        hwPWTDMPerfCurrentSESs OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The value of this object identifies the accumulated number of seconds in which severe error bits exist."
+            ::= { hwPWTDMPerfCurrentEntry 9 }
+
+        hwPWTDMPerfCurrentUASs OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The value of this object identifies the number of seconds in which the TDM-encapsulated PW is unavailable. If the number of severe error bits exist in the TDM-encapsulated PW for more than 10 seconds, the TDM-encapsulated PW is considered unavailable. Counting of the number of unavailable seconds starts from the time when severe error bits occur."
+            ::= { hwPWTDMPerfCurrentEntry 10 }
+
+        hwPWTDMPerfCurrentStrayPkt OBJECT-TYPE
+            SYNTAX        Unsigned32
+            MAX-ACCESS    read-only
+            STATUS        current
+            DESCRIPTION
+                "The number of misconnected packets during the check period"
+            ::= { hwPWTDMPerfCurrentEntry 11 }   
+
+--           
+-- VLL's QoS statistic MIB Trap Definitions
+-- 
+        hwVllMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnVllStatistic 2 }
+
+
+--
+--    Conformance information
+--
+        hwVllMIBConformance OBJECT IDENTIFIER ::= { hwL2VpnVllStatistic 3 }
+
+        
+        hwVllMIBCompliances OBJECT IDENTIFIER ::= { hwVllMIBConformance 1 }
+
+        
+--  this module
+        hwVllMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-VLL-STATISTIC-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwVllStatisticGroup, hwVllQosStatisticGroup }
+            ::= { hwVllMIBCompliances 1 }
+
+        
+        hwVllMIBGroups OBJECT IDENTIFIER ::= { hwVllMIBConformance 2 }
+
+        
+        hwVllStatisticGroup OBJECT-GROUP
+            OBJECTS { hwVllStatisticEnable, hwVllStatisticResetTraffic, hwVllStatisticResetTime, hwVllStatisticPackets, hwVllStatisticBytes,
+                 hwVllStatisticPacketsRate, hwVllStatisticBytesRate,hwVllStatisticInputPackets, hwVllStatisticInputBytes, hwVllStatisticInputPacketsRate, 
+                 hwVllStatisticInputBytesRate
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VLL's statistic group."
+            ::= { hwVllMIBGroups 1 }
+            
+        hwVllQosStatisticGroup OBJECT-GROUP
+            OBJECTS { hwVllQosStatisticPassPacket, hwVllQosStatisticPassByte,
+                 hwVllQosStatisticDiscardPacket, hwVllQosStatisticDiscardByte, hwVllQosStatisticPassPacketRate,
+                 hwVllQosStatisticPassByteRate, hwVllQosStatisticDiscardPacketRate, hwVllQosStatisticDiscardByteRate
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The VLL's QoS statistic group."
+            ::= { hwVllMIBGroups 2 }
+
+        
+    END
+
+--
+-- HUAWEI-VLL-STATISTIC-MIB.mib
+--

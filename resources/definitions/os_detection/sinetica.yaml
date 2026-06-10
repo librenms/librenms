@@ -1,0 +1,12 @@
+os: sinetica
+text: 'Sinetica UPS'
+group: ups
+type: power
+icon: mitsubishi
+mib_dir: mitsubishi
+over:
+    - { graph: device_current, text: Current }
+discovery:
+    -
+        sysDescr_regex:
+            - '/^Sinetica UPSController./'

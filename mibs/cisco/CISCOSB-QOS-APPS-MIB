@@ -1,0 +1,210 @@
+CISCOSB-QOS-APPS-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB QOS Applications Configuration
+-- Version:    7.60.00.00
+-- Date:       15-December-2015
+IMPORTS
+    TruthValue, TEXTUAL-CONVENTION,
+    DisplayString, RowStatus                        FROM SNMPv2-TC
+    InetAddressType,InetAddress                     FROM INET-ADDRESS-MIB
+    switch001, rlQosApps                            FROM CISCOSB-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32        FROM SNMPv2-SMI;
+
+	
+rlQosApps MODULE-IDENTITY
+        LAST-UPDATED "201606020000Z"
+        ORGANIZATION "Cisco Systems, Inc."
+
+        CONTACT-INFO
+        "Postal: 170 West Tasman Drive
+        San Jose , CA 95134-1706
+        USA
+
+        
+        Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+        DESCRIPTION
+                "The private MIB module definition for QoS Applications Configuration in CISCOSB devices."
+        REVISION "201606020000Z"
+        DESCRIPTION
+                "Added this MODULE-IDENTITY clause."
+        ::= { switch001 232 }
+
+rlIscsiQos OBJECT IDENTIFIER ::= { rlQosApps 1 }
+
+-------------------------------------------------------------------------------
+-- rlIscsiQosEnable
+
+rlIscsiQosEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable iSCSI Quality Of Service in the switch."
+    ::= { rlIscsiQos 1 }
+
+-------------------------------------------------------------------------------
+-- rlIscsiQosDefaultFlowEnable
+
+-- rlIscsiQosDefaultFlowEnable OBJECT-TYPE
+--     SYNTAX      TruthValue
+--     MAX-ACCESS  read-write
+--     STATUS      current
+--     DESCRIPTION
+--         "Enable/Disable Two iSCSI IPv4 flows with well-known
+--          TCP ports 3260 and 860."
+--     DEFVAL { true }
+--     ::= { rlIscsiQos 2 }
+
+-------------------------------------------------------------------------------
+-- rlIscsiQosFlowTable
+
+rlIscsiQosFlowTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlIscsiQosFlowEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The table for configuration of iSCSI QOS."
+    ::= {  rlIscsiQos 2 }
+
+rlIscsiQosFlowEntry OBJECT-TYPE
+    SYNTAX      RlIscsiQosFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlIscsiQosFlowTable."
+    INDEX  { rlIscsiQosFlowDestTcpPort,
+             rlIscsiQosFlowType,
+             rlIscsiQosFlowDestAddressType,
+             rlIscsiQosFlowDestAddress}
+    ::= { rlIscsiQosFlowTable 1 }
+
+RlIscsiQosFlowEntry ::= SEQUENCE {
+   rlIscsiQosFlowDestTcpPort        INTEGER,
+   rlIscsiQosFlowType               INTEGER,
+   rlIscsiQosFlowDestAddressType    InetAddressType,
+   rlIscsiQosFlowDestAddress        InetAddress,
+   rlIscsiQosFlowStatus             RowStatus
+}
+
+rlIscsiQosFlowDestTcpPort OBJECT-TYPE
+    SYNTAX      INTEGER(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The TCP port on which iSCSI targets listen to requests."
+    ::= { rlIscsiQosFlowEntry 1 }
+
+rlIscsiQosFlowType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ipv4(1),
+                    ipv6(2),
+                    both(3)
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The type of flow entry:
+            ipv4 - ipv4 flows only.
+            ipv6 - ipv6 flows only.
+            both - ipv4 and ipv6 flows."
+    DEFVAL { ipv4 }
+    ::= { rlIscsiQosFlowEntry 2 }
+
+rlIscsiQosFlowDestAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The address type of rlIscsiQosDestAddress.
+         Only IPv4 is accepted in current implementation."
+    ::= { rlIscsiQosFlowEntry 3 }
+
+rlIscsiQosFlowDestAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The IP address on which iSCSI targets listen to requests."
+    ::= { rlIscsiQosFlowEntry 4 }
+
+rlIscsiQosFlowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry."
+    ::= { rlIscsiQosFlowEntry 5 }
+
+-------------------------------------------------------------------------------
+-- rlIscsiQosProfileTable
+
+rlIscsiQosProfileTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlIscsiQosProfileEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The table for configuration of iSCSI QOS Profile."
+    ::= {  rlIscsiQos 3 }
+
+rlIscsiQosProfileEntry OBJECT-TYPE
+    SYNTAX      RlIscsiQosProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlIscsiQosProfileTable."
+    INDEX  { rlIscsiQosProfileIndex }
+    ::= { rlIscsiQosProfileTable 1 }
+
+RlIscsiQosProfileEntry ::= SEQUENCE {
+   rlIscsiQosProfileIndex       INTEGER,
+   rlIscsiQosProfileVpt         INTEGER,
+   rlIscsiQosProfileDscp        INTEGER,
+   rlIscsiQosProfileQueue       INTEGER,
+   rlIscsiQosProfileStatus      RowStatus
+}
+
+rlIscsiQosProfileIndex OBJECT-TYPE
+    SYNTAX  INTEGER(1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The index of a table entry."
+    ::= { rlIscsiQosProfileEntry 1 }
+
+rlIscsiQosProfileVpt OBJECT-TYPE
+    SYNTAX      INTEGER(0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VLAN Priority Tag (VPT) that iSCSI tagged frames are
+         assigned with (Range: 0-7)."
+    ::= { rlIscsiQosProfileEntry 2 }
+
+rlIscsiQosProfileDscp OBJECT-TYPE
+    SYNTAX      INTEGER(0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Differentiated Services Code Point (DSCP) that iSCSI frames are
+         assigned with (Range: 0–63)."
+    ::= { rlIscsiQosProfileEntry 3 }
+
+
+rlIscsiQosProfileQueue OBJECT-TYPE
+    SYNTAX      INTEGER(1..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The outgoing queue that iSCSI frames are sent to (Range: 1–8)."
+    ::= { rlIscsiQosProfileEntry 4 }
+
+rlIscsiQosProfileStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The status of a table entry."
+    ::= { rlIscsiQosProfileEntry 5 }
+
+END

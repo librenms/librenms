@@ -1,0 +1,337 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: task mib
+-- Reference:   huawei enterprise mib
+-- Version:     V2.03
+-- History:
+--                initial version 2003-07-31
+-- =================================================================
+
+HUAWEI-TASK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm
+            FROM HUAWEI-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE            
+            FROM SNMPv2-CONF            
+        Gauge32, OBJECT-TYPE, MODULE-IDENTITY, Integer32
+            FROM SNMPv2-SMI            
+        DisplayString, TEXTUAL-CONVENTION            
+            FROM SNMPv2-TC;
+
+    hwTask MODULE-IDENTITY 
+        LAST-UPDATED "201708240000Z"        -- 08 24, 2017 at 00:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
+        DESCRIPTION 
+            "The MIB module describes active system tasks, including the status 
+            and the general information of a task."
+
+        REVISION "201708240000Z"        -- 08 24, 2017 at 00:00 GMT
+        DESCRIPTION
+            "V2.03, Modify english description of hwTaskTable,hwKeyTaskTable."
+	
+        REVISION "201708170000Z"        -- 08 17, 2017 at 00:00 GMT
+        DESCRIPTION
+            "V2.02, Modify hwKeyTaskIndex."
+    
+        REVISION "201409250000Z"        -- 09 25, 2014 at 00:00 GMT
+        DESCRIPTION
+            "V2.01, modify hwKeyTaskIndex, hwKeyTaskID and hwKeyTaskName."
+  
+        REVISION "200307310000Z"        -- 07 31, 2002 at 00:00 GMT
+        DESCRIPTION
+            "Initial version of this MIB module."
+        ::= { hwDatacomm 27 }
+
+    --
+    -- Textual conventions
+    --
+
+    HwTaskStatusType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "The status of the specified task. The parameter have seventeen different value.
+            Normally a task may be status of the following:
+            Normalready(0): task is ready,
+            Block(1): task is blocked,
+            Slept(2): task is slept,
+            Suspend(4): task is suspended blocked,
+            BlockAndSuspend(5): task is suspended blocked,
+            SleptAndSuspend(6): task is slept and suspended,
+            running(8): task is running,
+            Queueblock(17): task is blocked on receiving queue messages,
+            QueueblockAndSuspend(21): task is blocked on receiving queue messages and suspended,
+            Semaphoreblock(33): task is blocked on taking a semaphore,
+            SemaphoreblockAandSuspend(37): task is blocked on taking a semaphore and suspended,
+            Eventblock(65): task is blocked on receiving events,
+            EventblockAndSuspend(69): task is blocked on receiving events and suspended,
+            prioblock(128): task is priblock,
+            Preemptready(256): task is preempt ready,
+            Writequeueblock(513): task is blocked on sending queue messages,
+            WritequeueblockAndSuspend(517): task is blocked on sending queue messages and suspended."
+        SYNTAX INTEGER
+            {
+            normalready(0),
+            block(1),
+            sleep(2),
+            suspend(4),
+            blockAndSuspend(5),
+            sleptAndSuspend(6),
+            running(8),
+            queueblock(17),
+            queueblockAndSuspend(21),
+            semaphoreblock(33),
+            semaphoreblockAandSuspend(37),
+            eventblock(65),
+            eventblockAndSuspend(69),
+            prioblock(128),
+            preemptready(256),
+            writequeueblock(513),
+            writequeueblockAndSuspend(517)
+            }
+
+    --
+    -- Node definitions
+    --
+
+    -- 1.3.6.1.4.1.2011.5.109.1
+    hwTaskObjects OBJECT IDENTIFIER ::= { hwTask 1 }
+    
+    --  huawei task Common Table
+    -- 1.3.6.1.4.1.2011.5.109.1.1
+    hwTaskTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwTaskEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table describes information about tasks on a device,  including the task name, CPU usage, and task running time. 
+             This table supports the GET and GET-NEXT operations. In addition, SNMPv2 and SNMPv3 support the GET-BULK operation rather than the SET operation."
+        ::= { hwTaskObjects 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.1.1.1
+    hwTaskEntry OBJECT-TYPE
+        SYNTAX HwTaskEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Generic information about active tasks on this 
+            device. Entries in this table will change when tasks are 
+            created and destroyed on the device."
+        INDEX { hwTaskIndex, hwTaskID }
+        ::= { hwTaskTable 1 }
+    
+    HwTaskEntry ::=
+        SEQUENCE { 
+            hwTaskIndex
+                Gauge32,
+            hwTaskID
+                Gauge32,
+            hwTaskName
+                DisplayString,
+            hwTaskStatus
+                HwTaskStatusType,
+            hwTaskCpuUsage
+                Gauge32,
+            hwTaskuSecs
+                Gauge32
+         }
+
+    -- 1.3.6.1.4.1.2011.5.109.1.1.1.1
+    hwTaskIndex OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The object indicates some physical information, such as slot number of VIU 
+            or RSU board plugged in. "
+        ::= { hwTaskEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.1.1.1.2
+    hwTaskID OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object contains the task ID. "
+        ::= { hwTaskEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.1.1.1.3
+    hwTaskName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The name associated with this task. If the name is
+            longer than 255 characters, it will be truncated to the first
+            255 characters."
+        ::= { hwTaskEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.1.1.1.4
+    hwTaskStatus OBJECT-TYPE
+        SYNTAX HwTaskStatusType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the specified task. The parameter have seventeen different value.
+            Normally a task may be status of the following:
+            normalready(0): task is ready,  
+            block(1): task is blocked,
+            slept(2): task is slept,
+            suspend(4): task is suspended blocked,
+            blockAndSuspend(5): task is suspended blocked,
+            sleepAndSuspend(6): task is slept and suspended,
+            running(8): task is running,
+            queueblock(17): task is blocked on receiving queue messages,
+            queueblockAndSuspend(21): task is blocked on receiving queue messages and suspended,
+            semaphoreblock(33): task is blocked on taking a semaphore,
+            semaphoreblockAandSuspend(37): task is blocked on taking a semaphore and suspended,
+            eventblock(65): task is blocked on receiving events,
+            eventblockAndSuspend(69): task is blocked on receiving events and suspended,
+            prioblock(128): task is priblock,
+            preemptready(256): task is preempt ready,
+            writequeueblock(513): task is blocked on sending queue messages,
+            writequeueblockAndSuspend(517): task is blocked on sending queue messages and suspended."
+        ::= { hwTaskEntry 4 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.1.1.1.5
+    hwTaskCpuUsage OBJECT-TYPE
+        SYNTAX Gauge32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cpu usage information of this task(0%-100%).If a task's cpu usage is more than 90, 
+            it means that the task is very busy."
+        ::= { hwTaskEntry 5 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.1.1.1.6
+    hwTaskuSecs OBJECT-TYPE
+        SYNTAX Gauge32
+        UNITS "millseconds"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Average elapsed CPU time in millseconds when the task was active."
+        ::= { hwTaskEntry 6 }
+    
+        hwKeyTaskTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwKeyTaskEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes information about tasks on a device, including the task name and CPU usage."
+            ::= { hwTaskObjects 2 }
+        
+        hwKeyTaskEntry OBJECT-TYPE
+            SYNTAX HwKeyTaskEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Generic information about active tasks on this 
+                device. Entries in this table will change when tasks are 
+                created and destroyed on the device."
+            INDEX { hwKeyTaskIndex, hwKeyTaskID }
+            ::= { hwKeyTaskTable 1 }
+        
+        HwKeyTaskEntry ::=
+            SEQUENCE { 
+                hwKeyTaskIndex
+                    Integer32,
+                hwKeyTaskID
+                    Integer32,
+                hwKeyTaskName
+                    DisplayString,
+                hwKeyTaskCpuUsage
+                    Integer32
+             }
+
+        hwKeyTaskIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Specifies the slot ID of the task. Currently, the MIB provides information only about the main control board. The value of TaskIndex is 0 in centralized system mode; the value of TaskIndex is the slot ID of the main control board in distributed system mode. "
+            ::= { hwKeyTaskEntry 1 }
+        
+        hwKeyTaskID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object contains the task ID. "
+            ::= { hwKeyTaskEntry 2 }
+        
+        hwKeyTaskName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name associated with this task. If the name is
+                longer than 255 characters, it will be truncated to the first
+                255 characters."
+            ::= { hwKeyTaskEntry 3 }
+        
+        hwKeyTaskCpuUsage OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Cpu usage information of this task(0%-100%).If a task's cpu usage is more than 90, 
+                it means that the task is very busy."
+            ::= { hwKeyTaskEntry 4 }
+        
+    -- 1.3.6.1.4.1.2011.5.109.2
+    hwTaskNotifications OBJECT IDENTIFIER ::= { hwTask 2 }
+    
+    --  (no notifications are currently defined)
+    -- conformance information
+    -- 1.3.6.1.4.1.2011.5.109.3
+    hwTaskConformance OBJECT IDENTIFIER ::= { hwTask 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.3.1
+    hwTaskCompliances OBJECT IDENTIFIER ::= { hwTaskConformance 1 }
+    
+    --  this module
+    -- 1.3.6.1.4.1.2011.5.109.3.1.1
+    hwTaskCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which implement
+            the huawei Task MIB,Write access is not required."
+        MODULE -- this module
+            MANDATORY-GROUPS { hwTaskGroup }
+        ::= { hwTaskCompliances 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.109.3.2
+    hwTaskGroups OBJECT IDENTIFIER ::= { hwTaskConformance 2 }
+    
+    --  units of conformance
+    -- 1.3.6.1.4.1.2011.5.109.3.2.1
+    hwTaskGroup OBJECT-GROUP
+        OBJECTS { hwTaskName, hwTaskStatus, hwTaskCpuUsage, hwTaskuSecs }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing common task 
+            monitoring information. This group is mandatory for 
+            all huawei devices."
+        ::= { hwTaskGroups 1 }
+        hwKeyTaskGroup OBJECT-GROUP
+            OBJECTS { hwKeyTaskName, hwKeyTaskCpuUsage }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing common task 
+                monitoring information. This group is mandatory for 
+                all huawei devices."
+            ::= { hwTaskGroups 2 }
+    
+
+END

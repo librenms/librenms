@@ -1,0 +1,166 @@
+-- ===========================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: The MIB is designed to define the textual convention of storage.
+-- Reference:
+-- Version: V1.1
+-- History:
+--   V1.0 2007-09-19 created by yangqi
+--   V1.1 2010-01-20 modified by zhanglei
+--        Add Hh3cSoftwareInfoString
+-- =================================================================
+HH3C-STORAGE-REF-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        hh3c
+    FROM HH3C-OID-MIB
+        Counter32, Integer32, IpAddress,
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC;
+
+hh3cStorageRef MODULE-IDENTITY
+    LAST-UPDATED "200709141452Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB define the textual convention of storage."
+    ::= { hh3c 10 }
+
+
+Hh3cStorageCapableState  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An enumerated value which provides an indication of the capability
+        state of a particular object.
+        The value 'support' means the resource is enable to be managed, and
+        the value 'notsupport' means not"
+    SYNTAX      INTEGER
+        {
+            support(1),
+            notsupport(2)
+        }
+
+Hh3cStorageEnableState  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An enumerated value which provides an indication of the
+        ability state of a particular object."
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+
+Hh3cStorageActionType  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A control variable used to trigger an operator events,
+        when read, always returns a value of invalid."
+    SYNTAX      INTEGER
+        {
+            action(1),
+            invalid(2)
+        }
+
+
+Hh3cStorageLedStateType  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the state of storage device's led.
+        The value 'off' means the led is go out.
+        The value 'on' means the led is on.
+        The value 'blink' means the led is blinking."
+    SYNTAX      INTEGER
+        {
+            off(1),
+            on(2),
+            blink(3)
+        }
+
+Hh3cStorageOnlineState  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An enumerated value means an resource is online or offline."
+    SYNTAX      INTEGER
+        {
+            online(1),
+            offline(2)
+        }
+
+
+Hh3cLvIDType  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A variable used to identifies the GUID(global universal identification)
+        of the logic volume."
+    SYNTAX      OCTET STRING(SIZE(1..20))
+
+Hh3cSessionIDType  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A hex string used to identifies the session between targets and initiators."
+    SYNTAX      OCTET STRING(SIZE(1..16))
+
+Hh3cWwpnListType  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This object describes the format of WWPN(World Wide Port
+        Name) numbers. An WWPN is a 16-byte Hex value. Separate
+        the WWPN by comma if more than one WWPN is specified.
+        e.g. 13af35d2f4ea6fbc,13af35d2f4ea6fad."
+    SYNTAX      OCTET STRING
+
+Hh3cStorageOwnerType  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An enumerated value used in HA(High Availability) iSCSI target. The value
+        'spa' means the owner is the first storage processor, and 'spb' means another."
+    SYNTAX      INTEGER
+        {
+            spa(1),
+            spb(2),
+            none(3)
+        }
+
+Hh3cExtendSelectPolicy::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This object describes how to assign the storage space.
+        The value 'differentAdapter' means select drives from different adapter/channel,
+        system will look for space on another array only if it is on a separate adapter/channel.
+        The value 'differentDrive' means select different drive, system will look for space on another array.
+        The value 'anyDrive' means select any available drive, system will look for space on any array,
+        including the original.
+        The value 'none' means the way to assign the storage space is not specified,
+        in this case the system will allocate the storage with the default criteria in the following order:
+        1. the storage from different adapter
+        2. the storage from different drive
+        3. the storage from any drive"
+    SYNTAX      INTEGER
+        {
+            differentAdapter(1),
+            differentDrive(2),
+            anyDrive(3),
+            none(4)
+        }
+
+Hh3cRaidIDType  ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A string used to identifies the raid's UUID(unique universal identification).
+        e.g. c0a800a8-0000-07f5-0057-386e145eda44."
+    SYNTAX      OCTET STRING(SIZE(36..71))
+
+Hh3cSoftwareInfoString ::=    TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A string used to identifies the information which software provided.
+        e.g. [TARGET,LVM,DM] or [Both] or [3]."
+    SYNTAX      OCTET STRING(SIZE(2..64))
+
+END

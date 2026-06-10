@@ -1,0 +1,959 @@
+CISCOSB-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB SYSLOG Private MIB
+-- Version:    7.35
+-- Date:       15 Jan 2005
+--
+-- 15-Jun-2003  Added rlSyslogFileMessagesLogged and rlSyslogCacheTotalMessages
+
+IMPORTS
+    switch001                               FROM CISCOSB-MIB
+    OBJECT-TYPE, IpAddress, Unsigned32,Counter32,
+    MODULE-IDENTITY                         FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION,
+    TruthValue, RowStatus                   FROM SNMPv2-TC
+	InetAddressType, InetAddress
+                                            FROM INET-ADDRESS-MIB;
+
+ rlSyslog MODULE-IDENTITY
+          LAST-UPDATED "200602120001Z"
+          ORGANIZATION "Cisco Systems, Inc."
+
+          CONTACT-INFO
+          "Postal: 170 West Tasman Drive
+          San Jose , CA 95134-1706
+          USA
+
+          
+          Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+          DESCRIPTION
+                  "The private MIB module definition for SYSLOG services in CISCOSB devices."
+          REVISION "200602120000Z"
+          DESCRIPTION
+                  "Editorial changes to support new MIB compilers."
+          REVISION "200309220000Z"
+          DESCRIPTION
+                  "Initial version of this MIB."
+          ::= { switch001 82 }
+
+RlSyslogSeverity ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "This textual convention maps out to the minimal severity levels
+         of syslog messages, or indicate non Active. The syslog protocol
+         uses the values 0 (emergency), to 7 (debug) last value notActive
+         added to indicate inactivity."
+    SYNTAX  INTEGER {
+        emergency(0),
+        alert(1),
+        critical(2),
+        error(3),
+        warning(4),
+        notice(5),
+        info(6),
+        debug(7),
+        notActive(8)
+    }
+
+rlSyslogPrivate  OBJECT IDENTIFIER ::= { rlSyslog 2 }
+
+rlSyslogGlobalEnable OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Global enable for syslog flash, syslog cache and syslog UDP.
+         When set to false, only console logging is performed."
+    DEFVAL  { true }
+    ::= { rlSyslogPrivate 1 }
+
+rlSyslogMinLogToConsoleSeverity OBJECT-TYPE
+    SYNTAX  RlSyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The minimal severity to log to console. Lower severity
+         will not be written to console. Value notActive indicate this
+         activity is disabled."
+    DEFVAL  { info }
+    ::= { rlSyslogPrivate 2 }
+
+rlSyslogMinLogToFileSeverity OBJECT-TYPE
+    SYNTAX  RlSyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The minimal severity to log to LogFile. Lower severity
+         will not be written to the LogFile. Value notActive indicates
+         this activity is disabled."
+    DEFVAL  { error }
+    ::= { rlSyslogPrivate 3 }
+
+rlSyslogMinLogToCacheSeverity OBJECT-TYPE
+    SYNTAX  RlSyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The minimal severity to log to memory cache. Lower severity
+         will not be read from cache. Value notActive indicate this activity
+         is disabled. Note that all events are logged to cache unless its
+         severity is notActive."
+    DEFVAL  { info }
+    ::= { rlSyslogPrivate 4 }
+
+rlSyslogClearLogfile OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Setting to a value other than 0 results in deleting the log file."
+    ::= { rlSyslogPrivate 5 }
+
+rlSyslogClearCache OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Setting to a value other than 0 results in clearing the memory cache."
+    ::= { rlSyslogPrivate 6 }
+
+rlSyslogMibVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The Syslog MIB's version. It's 1."
+    ::= { rlSyslogPrivate 7 }
+
+--
+-- rlSyslogLog Table
+--
+rlSyslogLogTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlSyslogLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table containing events sent to the system log file."
+    ::= { rlSyslogPrivate 8 }
+
+rlSyslogLogEntry OBJECT-TYPE
+    SYNTAX  RlSyslogLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION  "A log entry "
+    INDEX  { rlSyslogLogCounter   }
+    ::= { rlSyslogLogTable 1 }
+
+RlSyslogLogEntry ::=
+    SEQUENCE {
+        rlSyslogLogCounter          Unsigned32,
+        rlSyslogLogDateTime         DisplayString,
+        rlSyslogLogAppMnemonic      DisplayString,
+        rlSyslogLogSeverity         RlSyslogSeverity,
+        rlSyslogLogMessageMnemonic  DisplayString,
+        rlSyslogLogText1            DisplayString,
+        rlSyslogLogText2            DisplayString,
+        rlSyslogLogText3            DisplayString,
+        rlSyslogLogText4            DisplayString
+    }
+rlSyslogLogCounter   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A counter that identifies this entry - used to differentiate logged
+         entries. And the order given is the order of logging. A entries may
+         not form sequence of this value. (Time is not a differentiating
+         element as logged entries may come in a sequence."
+    ::= { rlSyslogLogEntry 1 }
+
+rlSyslogLogDateTime   OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The time in string (formated DD-MMM-YYYY HH:MM:SS e.g
+         14-Apr-2002 10:33:31), when the error was logged.."
+    ::= { rlSyslogLogEntry 2 }
+
+rlSyslogLogAppMnemonic OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..8))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Application that created this error."
+    ::= { rlSyslogLogEntry 3 }
+
+rlSyslogLogSeverity OBJECT-TYPE
+    SYNTAX  RlSyslogSeverity
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Severity of the reported error."
+    ::= { rlSyslogLogEntry 4 }
+
+rlSyslogLogMessageMnemonic OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Short identifier of this message that created this error."
+    ::= { rlSyslogLogEntry 5 }
+
+rlSyslogLogText1 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 1."
+    ::= { rlSyslogLogEntry 6 }
+
+rlSyslogLogText2 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 2."
+    ::= { rlSyslogLogEntry 7 }
+
+rlSyslogLogText3 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 3."
+    ::= { rlSyslogLogEntry 8 }
+
+rlSyslogLogText4 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 4."
+    ::= { rlSyslogLogEntry 9 }
+
+--
+-- rlSyslogLogCache Table
+--
+rlSyslogLogCacheTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlSyslogLogCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table containing errors registered to system cache."
+    ::= { rlSyslogPrivate 9 }
+
+rlSyslogLogCacheEntry OBJECT-TYPE
+    SYNTAX  RlSyslogLogCacheEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION "A log history entry"
+    INDEX  { rlSyslogLogCacheCounter   }
+    ::= { rlSyslogLogCacheTable 1 }
+
+RlSyslogLogCacheEntry ::=
+    SEQUENCE {
+        rlSyslogLogCacheCounter             Unsigned32,
+        rlSyslogLogCacheDateTime            DisplayString,
+        rlSyslogLogCacheAppMnemonic         DisplayString,
+        rlSyslogLogCacheSeverity            RlSyslogSeverity,
+        rlSyslogLogCacheMessageMnemonic     DisplayString,
+        rlSyslogLogCacheText1               DisplayString,
+        rlSyslogLogCacheText2               DisplayString,
+        rlSyslogLogCacheText3               DisplayString,
+        rlSyslogLogCacheText4               DisplayString
+    }
+rlSyslogLogCacheCounter   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A counter that identifies this entry - used to differentiate logged
+         entries. And the order given is the order of logging. A entries may
+         not form sequence of this value. (Time is not a differentiating
+         element as logged entries may come in a sequence."
+    ::= { rlSyslogLogCacheEntry 1 }
+
+rlSyslogLogCacheDateTime   OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The time in string (formated DD-MMM-YYYY HH:MM:SS e.g
+         14-Apr-2002 10:33:31), when the eroor was logged.."
+    ::= { rlSyslogLogCacheEntry 2 }
+
+rlSyslogLogCacheAppMnemonic OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..8))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Application that created this error."
+    ::= { rlSyslogLogCacheEntry 3 }
+
+rlSyslogLogCacheSeverity OBJECT-TYPE
+    SYNTAX  RlSyslogSeverity
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Severity of the reported error."
+    ::= { rlSyslogLogCacheEntry 4 }
+
+rlSyslogLogCacheMessageMnemonic OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Short identifier of this message that created this error."
+    ::= { rlSyslogLogCacheEntry 5 }
+
+rlSyslogLogCacheText1 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 1."
+    ::= { rlSyslogLogCacheEntry 6 }
+
+rlSyslogLogCacheText2 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 2."
+    ::= { rlSyslogLogCacheEntry 7 }
+
+rlSyslogLogCacheText3 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 3."
+    ::= { rlSyslogLogCacheEntry 8 }
+
+rlSyslogLogCacheText4 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 4."
+    ::= { rlSyslogLogCacheEntry 9 }
+
+rlSyslogConsoleMessagesIgnored OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is a count of messages not sent to the console
+         because the severity level of the message was above
+         rlSyslogMinLogToConsoleSeverity, the higher the level,
+         the lower the severity."
+    ::= { rlSyslogPrivate 10 }
+
+rlSyslogFileMessagesIgnored OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is a count of messages not sent to the file
+         because the severity level of the message was above
+         rlSyslogMinLogToFileSeverity, the higher the level,
+         the lower the severity."
+::= { rlSyslogPrivate 11 }
+
+rlSyslogFileMessagesLogged OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is a count of all the messages currently held in the
+        Log file."
+::= { rlSyslogPrivate 12 }
+
+rlSyslogCacheTotalMessages OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This is a count of all the messages currently held in the
+        cache."
+::= { rlSyslogPrivate 13 }
+
+
+rlSyslogAggregationEnable  OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "enable/disable Syslog aggregation"
+    ::= { rlSyslogPrivate 14 }
+
+rlSyslogAggregationAgingTime OBJECT-TYPE
+    SYNTAX  Unsigned32  (15..3600)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "aging time for Syslog aggregated messages"
+    DEFVAL {300}
+    ::= { rlSyslogPrivate 15 }
+
+rlSyslogMinLogToWebSeverity OBJECT-TYPE
+    SYNTAX  RlSyslogSeverity
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The minimal severity to log to WEB client. Lower severity
+         will not be displayed in WEB client.
+         Value notActive indicate this activity
+         is disabled."
+    DEFVAL  { info }
+    ::= { rlSyslogPrivate 16 }
+
+rlSyslogAlarmFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The MIB is initiated by false and it is set to true every time
+        when a syslog message with severity >= min_severity_to_alarm_threshold (host parameter)
+        is generated."
+    DEFVAL  { false }
+    ::= { rlSyslogPrivate 17 }
+
+rlSyslogOriginId OBJECT-TYPE
+    SYNTAX INTEGER {
+        default(1),
+        hostname (2),
+        ip (3),
+        ipv6 (4),
+        string (5)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Defines the origin field of the SYSLOG message packets sent to the SYSLOG server"
+    DEFVAL { default }
+    ::= { rlSyslogPrivate 18 }
+
+rlSyslogOriginIdString OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..160))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Defines the string origin of the SYSLOG message packets sent to the SYSLOG server"
+    ::= { rlSyslogPrivate 19 }
+
+rlSyslogHeaderSendingEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Enabled sending/not sending of syslog header in syslog messages to syslog collectors."
+    DEFVAL  { true }
+    ::= { rlSyslogPrivate 20 }
+
+rlSyslogPhaseOneTests OBJECT IDENTIFIER ::= { rlSyslog 3}
+
+rlSyslogPhaseOneTestGenerator OBJECT-TYPE
+    SYNTAX  INTEGER {
+        successfulRegistration(11),
+        regTheSameComponentTwice (12),
+        regWithInvalidComponentID(13),
+        regWithInvalidApplicationID(14),
+        regWithInvalidMessageString(15),
+        regWithInvalidMessageList(16),
+        regWithInvalidApplicationList(17),
+        successfulLoggingWithNoParams(21),
+        logWithUnregisteredComponentID(22),
+        logWithInvalidComponentID(23),
+        logWithBadApplicationID(24),
+        logWithBadMessageID(25),
+        paramFormatting(31),
+        insufficientParams(32),
+        incorrectParams(33),
+        tooManyParams(34),
+        oversizedParams(35),
+        trapParams(36),
+        successfulFatalError(41),
+        fatalErrorThroughNonFatalInterface(42),
+        nonFatalErrorThroughFatalInterface(43),
+        nestedFatalErrors(47),
+        snmpAccessToLongMessage(62)
+
+    }
+-- todo: once we have all of the tests, change them into an enum.
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+      "Writing a value to this leaf results in a test being run on the host."
+    ::=  { rlSyslogPhaseOneTests 1 }
+
+--------------------------------------------------------------
+ -- rlSyslogCountersPerSeverityEntry
+ --------------------------------------------------------------
+rlSyslogCountersPerSeverityTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlSyslogCountersPerSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION  "The table displays counters per syslog severity"
+    ::= { rlSyslogPrivate 21 }
+
+rlSyslogCountersPerSeverityEntry OBJECT-TYPE
+    SYNTAX  RlSyslogCountersPerSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION   "Static row for this table."
+    INDEX { rlSyslogCountersPerSeverityIndex }
+    ::= { rlSyslogCountersPerSeverityTable 1 }
+
+RlSyslogCountersPerSeverityEntry ::= SEQUENCE {
+    rlSyslogCountersPerSeverityIndex               INTEGER,
+    rlSyslogCountersPerSeverityEmergencyCounter    Counter32,
+    rlSyslogCountersPerSeverityAlertCounter        Counter32,
+    rlSyslogCountersPerSeverityCriticalCounter     Counter32,
+    rlSyslogCountersPerSeverityErrorCounter        Counter32,
+    rlSyslogCountersPerSeverityWarningCounter      Counter32,
+    rlSyslogCountersPerSeverityNoticeCounter       Counter32,
+    rlSyslogCountersPerSeverityInfoCounter         Counter32,
+    rlSyslogCountersPerSeverityDebugCounter        Counter32
+}
+
+rlSyslogCountersPerSeverityIndex  OBJECT-TYPE
+   SYNTAX      INTEGER {
+        static(1)
+   }
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The table contains only one static entry."
+   ::= { rlSyslogCountersPerSeverityEntry 1 }
+
+rlSyslogCountersPerSeverityEmergencyCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Emergency syslog messages "
+    ::= { rlSyslogCountersPerSeverityEntry 2 }
+
+rlSyslogCountersPerSeverityAlertCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Alert syslog messages"
+    ::= { rlSyslogCountersPerSeverityEntry 3 }
+
+rlSyslogCountersPerSeverityCriticalCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Critical syslog messages"
+    ::= { rlSyslogCountersPerSeverityEntry 4 }
+
+rlSyslogCountersPerSeverityErrorCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Error syslog messages"
+    ::= { rlSyslogCountersPerSeverityEntry 5 }
+
+rlSyslogCountersPerSeverityWarningCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Warning syslog messages"
+    ::= { rlSyslogCountersPerSeverityEntry 6 }
+
+rlSyslogCountersPerSeverityNoticeCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Notice syslog messages"
+    ::= { rlSyslogCountersPerSeverityEntry 7 }
+
+rlSyslogCountersPerSeverityInfoCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Info syslog messages"
+    ::= { rlSyslogCountersPerSeverityEntry 8 }
+
+rlSyslogCountersPerSeverityDebugCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Counts Debug syslog messages"
+    ::= { rlSyslogCountersPerSeverityEntry 9 }
+
+-- -------------------------------------------------------------
+-- rlsnmpSyslogCollector Table
+-- -------------------------------------------------------------
+
+rlsnmpSyslogCollectorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RlsnmpSyslogCollectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing Syslog collector information. Internal MIB that configured by snmpSyslogCollectorTable"
+    ::= { rlSyslogPrivate 22 }
+
+rlsnmpSyslogCollectorEntry OBJECT-TYPE
+    SYNTAX      RlsnmpSyslogCollectorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines the information to generate syslog messages to
+         an aggregating agent or collector.
+
+         Entries within this table with an access level of read-
+         create MUST be considered non-volatile and MUST be
+         maintained across entity resets."
+    INDEX  { rlsnmpSyslogCollectorIndex }
+    ::= { rlsnmpSyslogCollectorTable 1 }
+
+RlsnmpSyslogCollectorEntry ::=
+    SEQUENCE {
+        rlsnmpSyslogCollectorIndex
+             Unsigned32,
+        rlsnmpSyslogCollectorAddressType
+             InetAddressType,
+        rlsnmpSyslogCollectorAddress
+             InetAddress,
+        rlsnmpSyslogCollectorRowStatus
+             RowStatus
+    }
+
+rlsnmpSyslogCollectorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique arbitrary identifier for this syslog collector."
+    ::= { rlsnmpSyslogCollectorEntry 1 }
+
+rlsnmpSyslogCollectorAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of Internet address by which the Syslog
+         collector is specified in snmpSyslogCollectorAddress.
+
+         Not all address types may be supported."
+    ::= { rlsnmpSyslogCollectorEntry 2 }
+
+rlsnmpSyslogCollectorAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The Internet address for the Syslog message collector.
+
+         The use of DNS domain names is discouraged, and agent
+         support for them is optional.  Deciding when, and how
+         often, to resolve them is an issue.  Not resolving them
+         often enough means you might lose synchronization with
+         the associated entry in the DNS server, and resolving
+         them too often might leave you without access to the
+         Syslog collector during critical network events."
+    ::= { rlsnmpSyslogCollectorEntry 3 }
+
+rlsnmpSyslogCollectorRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object allows for the dynamic creation and deletion
+         of entries within the snmpSyslogCollectorTable as well as
+         the activation and deactivation of these entries.
+
+         When this object's value is set to notInService(2) this
+         collector will not be sent any messages, nor will any of its
+         counters be incremented.
+
+         The agent SHOULD not delete a row, except in the case of
+         the loss of persistent storage.
+
+         Refer to the RowStatus convention for further details on
+         the behavior of this object."
+    REFERENCE
+        "RFC2579 (Textual Conventions for SMIv2)"
+    ::= { rlsnmpSyslogCollectorEntry 4 }
+
+--------------------------------------------------------------
+-- rlSyslogLastIndexPerSeverityEntry
+--------------------------------------------------------------
+rlSyslogLastIndexPerSeverityTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlSyslogLastIndexPerSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION  "The table displays Last Index per syslog severity"
+    ::= { rlSyslogPrivate 23 }
+
+rlSyslogLastIndexPerSeverityEntry OBJECT-TYPE
+    SYNTAX  RlSyslogLastIndexPerSeverityEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION   "Static row for this table."
+    INDEX { rlSyslogLastIndexPerSeverityIndex }
+    ::= { rlSyslogLastIndexPerSeverityTable 1 }
+
+RlSyslogLastIndexPerSeverityEntry ::= SEQUENCE {
+    rlSyslogLastIndexPerSeverityIndex               INTEGER,
+    rlSyslogLastIndexPerSeverityEmergencyIndex    Counter32,
+    rlSyslogLastIndexPerSeverityAlertIndex        Counter32,
+    rlSyslogLastIndexPerSeverityCriticalIndex     Counter32,
+    rlSyslogLastIndexPerSeverityErrorIndex        Counter32,
+    rlSyslogLastIndexPerSeverityWarningIndex      Counter32,
+    rlSyslogLastIndexPerSeverityNoticeIndex       Counter32,
+    rlSyslogLastIndexPerSeverityInfoIndex         Counter32,
+    rlSyslogLastIndexPerSeverityDebugIndex        Counter32
+}
+
+rlSyslogLastIndexPerSeverityIndex  OBJECT-TYPE
+   SYNTAX      INTEGER {
+        static(1)
+   }
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+     "The table contains only one static entry."
+   ::= { rlSyslogLastIndexPerSeverityEntry 1 }
+
+rlSyslogLastIndexPerSeverityEmergencyIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Emergency syslog message "
+    ::= { rlSyslogLastIndexPerSeverityEntry 2 }
+
+rlSyslogLastIndexPerSeverityAlertIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Alert syslog message"
+    ::= { rlSyslogLastIndexPerSeverityEntry 3 }
+
+rlSyslogLastIndexPerSeverityCriticalIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Critical syslog message"
+    ::= { rlSyslogLastIndexPerSeverityEntry 4 }
+
+rlSyslogLastIndexPerSeverityErrorIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Error syslog message"
+    ::= { rlSyslogLastIndexPerSeverityEntry 5 }
+
+rlSyslogLastIndexPerSeverityWarningIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Warning syslog message"
+    ::= { rlSyslogLastIndexPerSeverityEntry 6 }
+
+rlSyslogLastIndexPerSeverityNoticeIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Notice syslog message"
+    ::= { rlSyslogLastIndexPerSeverityEntry 7 }
+
+rlSyslogLastIndexPerSeverityInfoIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Info syslog message"
+    ::= { rlSyslogLastIndexPerSeverityEntry 8 }
+
+rlSyslogLastIndexPerSeverityDebugIndex OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Shows Index of last added Debug syslog message"
+    ::= { rlSyslogLastIndexPerSeverityEntry 9 }
+
+rlSyslogFindItLogLevel OBJECT-TYPE
+   SYNTAX  INTEGER {
+      info(0),
+      debug(1),
+      warning(2),
+      error(3)
+   }
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "The Log level of the FindIT Probe
+        info - info log level.
+        debug - debug log level.        
+        warnings - warnings log level.
+	errors - errors log level."
+   ::= { rlSyslogPrivate 24 }
+
+rlSyslogFindItLogModule OBJECT-TYPE
+   SYNTAX  Unsigned32
+   MAX-ACCESS   read-write
+   STATUS       current
+   DESCRIPTION
+       "The Log level of the FindIT Probe
+        options:
+        none - All modules log disabled
+        call-home - call-home modules log enabled.      
+        discovery - discovery modules log enabled.
+	northbound - northbound modules log enabled.
+	services - services modules log enabled.
+	southbound - southbound modules log enabled.
+	system - system modules log enabled.
+	All - all modules log enabled."
+   ::= { rlSyslogPrivate 25 }
+      
+
+rlSyslogUnexpectedRestartTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RlSyslogUnexpectedRestartEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "A table containing errors registered to non-volatile memory."
+    ::= { rlSyslogPrivate 26 }
+
+
+rlSyslogUnexpectedRestartEntry OBJECT-TYPE
+    SYNTAX  RlSyslogUnexpectedRestartEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION "An unexpected restart log entry"
+    INDEX  { rlSyslogUnexpectedRestartCounter   }
+    ::= { rlSyslogUnexpectedRestartTable 1 }
+
+RlSyslogUnexpectedRestartEntry ::=
+    SEQUENCE {
+        rlSyslogUnexpectedRestartCounter             Unsigned32,
+        rlSyslogUnexpectedRestartDateTime            DisplayString,
+        rlSyslogUnexpectedRestartAppMnemonic         DisplayString,
+        rlSyslogUnexpectedRestartSeverity            RlSyslogSeverity,
+        rlSyslogUnexpectedRestartMessageMnemonic     DisplayString,
+        rlSyslogUnexpectedRestartText1               DisplayString,
+        rlSyslogUnexpectedRestartText2               DisplayString,
+        rlSyslogUnexpectedRestartText3               DisplayString,
+        rlSyslogUnexpectedRestartText4               DisplayString
+    }
+	
+rlSyslogUnexpectedRestartCounter   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A counter that identifies this entry - used to differentiate logged
+         entries. And the order given is the order of logging. A entries may
+         not form sequence of this value. (Time is not a differentiating
+         element as logged entries may come in a sequence."
+    ::= { rlSyslogUnexpectedRestartEntry 1 }
+
+rlSyslogUnexpectedRestartDateTime   OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The time in string (formated DD-MMM-YYYY HH:MM:SS e.g
+         14-Apr-2002 10:33:31), when the eroor was logged.."
+    ::= { rlSyslogUnexpectedRestartEntry 2 }
+
+rlSyslogUnexpectedRestartAppMnemonic OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..8))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Application that created this error."
+    ::= { rlSyslogUnexpectedRestartEntry 3 }
+
+rlSyslogUnexpectedRestartSeverity OBJECT-TYPE
+    SYNTAX  RlSyslogSeverity
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Severity of the reported error."
+    ::= { rlSyslogUnexpectedRestartEntry 4 }
+
+rlSyslogUnexpectedRestartMessageMnemonic OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Short identifier of this message that created this error."
+    ::= { rlSyslogUnexpectedRestartEntry 5 }
+
+rlSyslogUnexpectedRestartText1 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 1."
+    ::= { rlSyslogUnexpectedRestartEntry 6 }
+
+rlSyslogUnexpectedRestartText2 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 2."
+    ::= { rlSyslogUnexpectedRestartEntry 7 }
+
+rlSyslogUnexpectedRestartText3 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 3."
+    ::= { rlSyslogUnexpectedRestartEntry 8 }
+
+rlSyslogUnexpectedRestartText4 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(1..160))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The text of the logged message without time and date - part 4."
+    ::= { rlSyslogUnexpectedRestartEntry 9 }
+
+
+
+
+rlSyslogUnexpectedRestartOccured  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A flag representing if an unexpected restart had occured
+        and has not yet been cleared"
+    DEFVAL { false }
+    ::= { rlSyslogPrivate 27 }
+
+rlSyslogUnexpectedRestartClear  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "An action MIB variable setting with that when 
+        set to true, will clear the unexpectedRestartOccured
+        and delete all entries in "
+    ::= { rlSyslogPrivate 28 }
+END
+

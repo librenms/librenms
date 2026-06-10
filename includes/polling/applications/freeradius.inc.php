@@ -1,0 +1,206 @@
+<?php
+
+use LibreNMS\RRD\RrdDefinition;
+
+$name = 'freeradius';
+
+if (! empty($agent_data['app'][$name])) {
+    $rawdata = $agent_data['app'][$name];
+} else {
+    $options = '-Oqv';
+    $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.102.114.101.101.114.97.100.105.117.115';
+    $rawdata = snmp_get($device, $oid, $options);
+}
+
+// Format Data
+$lines = explode("\n", (string) $rawdata);
+$freeradius = [];
+$metrics = [];
+foreach ($lines as $line) {
+    [$var,$value] = explode(' = ', $line);
+    $freeradius[$var] = $value;
+}
+
+// FreeRADIUS-Total-Access
+$rrd_def = RrdDefinition::make()
+    ->addDataset('requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('accepts', 'DERIVE', 0, 125000000000)
+    ->addDataset('rejects', 'DERIVE', 0, 125000000000)
+    ->addDataset('challenges', 'DERIVE', 0, 125000000000);
+$fields = [
+    'requests' => $freeradius['FreeRADIUS-Total-Access-Requests'] ?? null,
+    'accepts' => $freeradius['FreeRADIUS-Total-Access-Accepts'] ?? null,
+    'rejects' => $freeradius['FreeRADIUS-Total-Access-Rejects'] ?? null,
+    'challenges' => $freeradius['FreeRADIUS-Total-Access-Challenges'] ?? null,
+];
+$metrics['access'] = $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'access',
+    'rrd_name' => ['app', $name, 'access', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
+
+// FreeRADIUS-Total-Auth
+$rrd_def = RrdDefinition::make()
+    ->addDataset('responses', 'DERIVE', 0, 125000000000)
+    ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('malformed_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('invalid_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('dropped_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('unknown_types', 'DERIVE', 0, 125000000000);
+$fields = [
+    'responses' => $freeradius['FreeRADIUS-Total-Auth-Responses'] ?? null,
+    'duplicate_requests' => $freeradius['FreeRADIUS-Total-Auth-Duplicate-Requests'] ?? null,
+    'malformed_requests' => $freeradius['FreeRADIUS-Total-Auth-Malformed-Requests'] ?? null,
+    'invalid_requests' => $freeradius['FreeRADIUS-Total-Auth-Invalid-Requests'] ?? null,
+    'dropped_requests' => $freeradius['FreeRADIUS-Total-Auth-Dropped-Requests'] ?? null,
+    'unknown_types' => $freeradius['FreeRADIUS-Total-Auth-Unknown-Types'] ?? null,
+];
+$metrics['auth'] = $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'auth',
+    'rrd_name' => ['app', $name, 'auth', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
+
+// FreeRADIUS-Total-Acct
+$rrd_def = RrdDefinition::make()
+    ->addDataset('requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('responses', 'DERIVE', 0, 125000000000)
+    ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('malformed_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('invalid_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('dropped_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('unknown_types', 'DERIVE', 0, 125000000000);
+$fields = [
+    'requests' => $freeradius['FreeRADIUS-Total-Accounting-Requests'] ?? null,
+    'responses' => $freeradius['FreeRADIUS-Total-Accounting-Responses'] ?? null,
+    'duplicate_requests' => $freeradius['FreeRADIUS-Total-Acct-Duplicate-Requests'] ?? null,
+    'malformed_requests' => $freeradius['FreeRADIUS-Total-Acct-Malformed-Requests'] ?? null,
+    'invalid_requests' => $freeradius['FreeRADIUS-Total-Acct-Invalid-Requests'] ?? null,
+    'dropped_requests' => $freeradius['FreeRADIUS-Total-Acct-Dropped-Requests'] ?? null,
+    'unknown_types' => $freeradius['FreeRADIUS-Total-Acct-Unknown-Types'] ?? null,
+];
+$metrics['acct'] = $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'acct',
+    'rrd_name' => ['app', $name, 'acct', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
+
+// FreeRADIUS-Total-Proxy-Access
+$rrd_def = RrdDefinition::make()
+    ->addDataset('requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('accepts', 'DERIVE', 0, 125000000000)
+    ->addDataset('rejects', 'DERIVE', 0, 125000000000)
+    ->addDataset('challenges', 'DERIVE', 0, 125000000000);
+$fields = [
+    'requests' => $freeradius['FreeRADIUS-Total-Proxy-Access-Requests'] ?? null,
+    'accepts' => $freeradius['FreeRADIUS-Total-Proxy-Access-Accepts'] ?? null,
+    'rejects' => $freeradius['FreeRADIUS-Total-Proxy-Access-Rejects'] ?? null,
+    'challenges' => $freeradius['FreeRADIUS-Total-Proxy-Access-Challenges'] ?? null,
+];
+$metrics['proxy_access'] = $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'proxy_access',
+    'rrd_name' => ['app', $name, 'proxy_access', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
+
+// FreeRADIUS-Total-Proxy-Auth
+$rrd_def = RrdDefinition::make()
+    ->addDataset('responses', 'DERIVE', 0, 125000000000)
+    ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('malformed_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('invalid_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('dropped_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('unknown_types', 'DERIVE', 0, 125000000000);
+$fields = [
+    'responses' => $freeradius['FreeRADIUS-Total-Proxy-Auth-Responses'] ?? null,
+    'duplicate_requests' => $freeradius['FreeRADIUS-Total-Proxy-Auth-Duplicate-Requests'] ?? null,
+    'malformed_requests' => $freeradius['FreeRADIUS-Total-Proxy-Auth-Malformed-Requests'] ?? null,
+    'invalid_requests' => $freeradius['FreeRADIUS-Total-Proxy-Auth-Invalid-Requests'] ?? null,
+    'dropped_requests' => $freeradius['FreeRADIUS-Total-Proxy-Auth-Dropped-Requests'] ?? null,
+    'unknown_types' => $freeradius['FreeRADIUS-Total-Proxy-Auth-Unknown-Types'] ?? null,
+];
+$metrics['proxy_auth'] = $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'proxy_auth',
+    'rrd_name' => ['app', $name, 'proxy_auth', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
+
+// FreeRADIUS-Total-Proxy-Acct
+$rrd_def = RrdDefinition::make()
+    ->addDataset('requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('responses', 'DERIVE', 0, 125000000000)
+    ->addDataset('duplicate_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('malformed_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('invalid_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('dropped_requests', 'DERIVE', 0, 125000000000)
+    ->addDataset('unknown_types', 'DERIVE', 0, 125000000000);
+$fields = [
+    'requests' => $freeradius['FreeRADIUS-Total-Proxy-Accounting-Requests'] ?? null,
+    'responses' => $freeradius['FreeRADIUS-Total-Proxy-Accounting-Responses'] ?? null,
+    'duplicate_requests' => $freeradius['FreeRADIUS-Total-Proxy-Acct-Duplicate-Requests'] ?? null,
+    'malformed_requests' => $freeradius['FreeRADIUS-Total-Proxy-Acct-Malformed-Requests'] ?? null,
+    'invalid_requests' => $freeradius['FreeRADIUS-Total-Proxy-Acct-Invalid-Requests'] ?? null,
+    'dropped_requests' => $freeradius['FreeRADIUS-Total-Proxy-Acct-Dropped-Requests'] ?? null,
+    'unknown_types' => $freeradius['FreeRADIUS-Total-Proxy-Acct-Unknown-Types'] ?? null,
+];
+$metrics['proxy_acct'] = $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'proxy_acct',
+    'rrd_name' => ['app', $name, 'proxy_acct', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
+
+// FreeRADIUS-Queue
+$rrd_name = ['app', $name, 'queue', $app->app_id];
+$rrd_def = RrdDefinition::make()
+    ->addDataset('len_internal', 'DERIVE', 0, 125000000000)
+    ->addDataset('len_proxy', 'DERIVE', 0, 125000000000)
+    ->addDataset('len_auth', 'DERIVE', 0, 125000000000)
+    ->addDataset('len_acct', 'DERIVE', 0, 125000000000)
+    ->addDataset('len_detail', 'DERIVE', 0, 125000000000)
+    ->addDataset('pps_in', 'DERIVE', 0, 125000000000)
+    ->addDataset('pps_out', 'DERIVE', 0, 125000000000);
+$fields = [
+    'len_internal' => $freeradius['FreeRADIUS-Queue-Len-Internal'] ?? null,
+    'len_proxy' => $freeradius['FreeRADIUS-Queue-Len-Proxy'] ?? null,
+    'len_auth' => $freeradius['FreeRADIUS-Queue-Len-Auth'] ?? null,
+    'len_acct' => $freeradius['FreeRADIUS-Queue-Len-Acct'] ?? null,
+    'len_detail' => $freeradius['FreeRADIUS-Queue-Len-Detail'] ?? null,
+    'pps_in' => $freeradius['FreeRADIUS-Queue-PPS-In'] ?? null,
+    'pps_out' => $freeradius['FreeRADIUS-Queue-PPS-Out'] ?? null,
+];
+$metrics['queue'] = $fields;
+$tags = [
+    'name' => $name,
+    'app_id' => $app->app_id,
+    'type' => 'queue',
+    'rrd_name' => ['app', $name, 'queue', $app->app_id],
+    'rrd_def' => $rrd_def,
+];
+app('Datastore')->put($device, 'app', $tags, $fields);
+update_application($app, $rawdata, $metrics);
+
+unset($lines, $freeradius, $rrd_name, $rrd_def, $fields, $tags);

@@ -1,0 +1,2454 @@
+NBS-EUSM-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32,Counter64,Counter32,Integer32,
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    DisplayString, RowStatus, StorageType
+        FROM SNMPv2-TC
+
+    nbs
+        FROM NBS-MIB
+
+    nbsCmmcSlotEntry, nbsCmmcPortEntry
+        FROM NBS-CMMC-MIB
+
+    ;
+
+nbsEusmMib  MODULE-IDENTITY
+    LAST-UPDATED  "201103221412Z"
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "MIB for representing NBS Eusm information"
+
+    ::= { nbs 202 }
+
+nbsEusmSlotGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+      "Stage-II Slot context features for EUSM boards"
+    ::= { nbsEusmMib 1 }
+
+nbsEusmPortGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+      "Stage-II Port context featurea for EUSM boards"
+    ::= { nbsEusmMib 2 }
+
+nbsEusmTestGrp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+      "Testing category of features for EUSM boards. The example items
+       that may go here are the smart loopback traffic generation,
+       loss/gain analysis, performance monitoring, etc."
+    ::= { nbsEusmMib 3 }
+
+-- ********************************************************************
+--
+-- Objects for the Slot context features that are applicable to the
+-- whole module
+--
+-- ********************************************************************
+nbsEusmSlotTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmSlotEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of slot context features applicable
+           for the whole module. There is going to be one row for each
+           slot. All the scalar type objects applicable at the slot
+           context are dumped here."
+        ::= { nbsEusmSlotGrp 1 }
+
+nbsEusmSlotEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmSlotEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of slot context features applicable
+           for the whole module. There is going to be one row for each
+           slot. All the scalar type objects applicable at the slot
+           context are dumped here."
+
+        AUGMENTS { nbsCmmcSlotEntry }
+
+        ::= { nbsEusmSlotTable 1 }
+
+NbsEusmSlotEntry ::= SEQUENCE {
+-- Table Support
+      nbsEusmSlotSupportsEusm           INTEGER,
+
+-- Access Control stuff
+      nbsEusmSlotAccControlActionUntag  INTEGER,
+      nbsEusmSlotAccControlActionTag    INTEGER,
+      nbsEusmSlotAccControlVidList      DisplayString,
+
+-- Link Aggregation stuff
+      nbsEusmSlotLinkAggrAdmin          INTEGER,
+      nbsEusmSlotLinkAggrOper           INTEGER,
+
+-- Storm Control stuff
+      nbsEusmSlotStormControlBroadcast  INTEGER,
+      nbsEusmSlotStormControlMulticast  INTEGER,
+      nbsEusmSlotStormControlUnicast    INTEGER,
+      nbsEusmSlotStormBurstSize         INTEGER,
+
+-- CoS Traffic Classification stuff
+      nbsEusmSlotCoSMode                INTEGER,
+      nbsEusmSlotDscpRemark             INTEGER,
+      nbsEusmSlotDscpEgressMode         INTEGER,
+
+      nbsEusmSlotDscpIngressEf          INTEGER,
+      nbsEusmSlotDscpIngressAf          INTEGER,
+      nbsEusmSlotDscpIngressCs          INTEGER,
+      nbsEusmSlotDscpIngressZeroDscp    INTEGER,
+      nbsEusmSlotDscpIngressAllOther    INTEGER,
+
+-- IOMetrix stuff
+      nbsEusmSlotIometrix               INTEGER,
+
+      nbsEusmSlotManagementVid          INTEGER,
+      nbsEusmSlotUserPortIRAdmin        Unsigned32,
+      nbsEusmSlotUserPortIROper         Unsigned32,
+
+-- EUSM Maximum Table Sizes
+      nbsEusmSlotMaxFlowCfgSize         INTEGER,
+      nbsEusmSlotMaxVlanTranSize        INTEGER,
+      nbsEusmSlotMaxDscpMapSize         INTEGER,
+      nbsEusmSlotMaxCosPrioSize         INTEGER
+}
+
+-- ********************************************************************
+--
+-- Objects for Table Support
+--
+-- ********************************************************************
+
+nbsEusmSlotSupportsEusm OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported  (1),
+                supported     (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Is EUSM config and status supported for this slot?"
+
+        DEFVAL { notSupported }
+        ::= { nbsEusmSlotEntry 1 }
+
+-- ********************************************************************
+--
+-- Objects for the VLAN Access Control feature
+--
+-- ********************************************************************
+
+nbsEusmSlotAccControlActionUntag OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                permit       (2),
+                deny         (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "permit(2) or deny(3) works on all untagged frames"
+        DEFVAL { permit }
+        ::= { nbsEusmSlotEntry 2 }
+
+nbsEusmSlotAccControlActionTag OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                denyAll      (2),
+                denyVlan     (3),
+                permitVlan   (4),
+                permitAll    (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "denyAll(2) filters all tagged frames
+
+           denyVlan(3) and permitVlan(4) work on the specified list
+
+           permitAll(5) negates access control of tagged frames"
+        DEFVAL { permitAll }
+        ::= { nbsEusmSlotEntry 3 }
+
+nbsEusmSlotAccControlVidList OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "List of VLAN in a free format, for example 10-12 15 23-43
+           1000-1050 specifies 3 different ranges of vlan ids and one
+           isolated vlan id"
+        DEFVAL {""}
+        ::= { nbsEusmSlotEntry 4 }
+
+-- ********************************************************************
+--
+-- Objects for the Link Aggregation feature
+--
+-- ********************************************************************
+
+nbsEusmSlotLinkAggrAdmin OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            off             (2),
+            onRandom        (3),
+            onXorAll        (4),
+            deprecatedonSmac(5),
+            onDmac          (6),
+            onXorSd         (7),
+            onIp            (8)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Depending on the link status of the trunk ports the Link
+           Aggregation operational status may be different, this is why
+           it calls for both Admin and Oper objects"
+        DEFVAL { off }
+        ::= { nbsEusmSlotEntry 5 }
+
+nbsEusmSlotLinkAggrOper OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            off             (2),
+            onRandom        (3),
+            onXorAll        (4),
+            onSmac          (5),
+            onDmac          (6),
+            onXorSd         (7),
+            onIp            (8)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          " "
+        ::= { nbsEusmSlotEntry 6 }
+
+-- ********************************************************************
+--
+-- Objects for Storm Control feature
+--
+-- ********************************************************************
+
+nbsEusmSlotStormControlBroadcast  OBJECT-TYPE
+        SYNTAX      INTEGER (0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "User-specified maximum allowed Broadcast frames, in
+           units of 1000 frames/second.  The value zero (0)
+           indicates this feature is disabled, so no cap will
+           be enforced."
+        DEFVAL { 0 }
+        ::= { nbsEusmSlotEntry 7 }
+
+
+nbsEusmSlotStormControlMulticast  OBJECT-TYPE
+        SYNTAX      INTEGER (0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "User-specified maximum allowed Multicast frames, in
+           units of 1000 frames/second.  The value zero (0)
+           indicates this feature is disabled, so no cap will
+           be enforced."
+        DEFVAL { 0 }
+        ::= { nbsEusmSlotEntry 8 }
+
+nbsEusmSlotStormControlUnicast  OBJECT-TYPE
+        SYNTAX      INTEGER (0..255)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "User-specified maximum allowed Unicast frames, in
+           units of 1000 frames/second.  The value zero (0)
+           indicates this feature is disabled, so no cap will
+           be enforced."
+        DEFVAL { 0 }
+        ::= { nbsEusmSlotEntry 9 }
+
+nbsEusmSlotStormBurstSize OBJECT-TYPE
+        SYNTAX      INTEGER  (0..15)
+        MAX-ACCESS  read-write
+        STATUS      deprecated
+        DESCRIPTION
+          "**** DEPRECATED ****"
+         DEFVAL { 0 }
+        ::= { nbsEusmSlotEntry 10 }
+
+nbsEusmSlotCoSMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                dscpOnly     (2),
+                tagOnly      (3),
+                bothTagDscp  (4),
+                none         (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "If  the user selects bothTagDscp(4), and a packet arrives
+           with both DSCP and a Vlan tag, the DSCP priority system will
+           take precedence.
+
+           tagOnly(3) will use Layer 2 Vlan Priority bits to assign a
+           Service
+
+           Level Class (SLC) to a packet and tagMappingTable
+           information will be used.
+
+           dscpOnly(2) will use Layer 3 DSCP bits to assign an SL class
+           to a packet.
+
+           dscpMappingTable information will be used"
+        DEFVAL { none }
+        ::= { nbsEusmSlotEntry 11 }
+
+nbsEusmSlotDscpRemark OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                enable       (2),
+                disable      (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The EUSM can be set to mark egress packets with a new DSCP.
+           The user can set to remark egress DSCP in one of the
+           following modes: AF or CS Remarking only applies to IPv4 or
+           IPv6 packets. The user can define which type of incoming
+           (ingress )DSCP frames will be remarked.Selection includes
+           the combination of EF,AF,CS,Zero DSCP and all others."
+        DEFVAL { disable }
+        ::= { nbsEusmSlotEntry 12 }
+
+nbsEusmSlotDscpEgressMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                afMode       (2),
+                csMode       (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The user can set to egress remark DSCP in one of the
+           following modes:
+
+           a) Map CoS class to AF CPs (call it AF-mode)
+              0: AF12
+              1: AF22
+              2: AF32
+              3: AF42
+
+           b) Map CoS class to Class selectors CPs (call it CS-mode)
+              0: 000000
+              1: 001000
+              2: 010000
+              3: 110000"
+        DEFVAL { afMode }
+        ::= { nbsEusmSlotEntry 13 }
+
+nbsEusmSlotDscpIngressEf OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                enable       (2),
+                disable      (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "One of the five ingress options EF,AF,CS,ZERO and OTHER"
+        DEFVAL { disable }
+        ::= { nbsEusmSlotEntry 14 }
+
+nbsEusmSlotDscpIngressAf OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                enable       (2),
+                disable      (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "One of the five ingress options EF,AF,CS,ZERO and OTHER"
+        DEFVAL { disable }
+        ::= { nbsEusmSlotEntry 15 }
+
+nbsEusmSlotDscpIngressCs OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                enable       (2),
+                disable      (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "One of the five ingress options EF,AF,CS,ZERO and OTHER"
+        DEFVAL { disable }
+        ::= { nbsEusmSlotEntry 16 }
+
+nbsEusmSlotDscpIngressZeroDscp OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                enable       (2),
+                disable      (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "One of the five ingress options EF,AF,CS,ZERO and OTHER"
+        DEFVAL { disable }
+        ::= { nbsEusmSlotEntry 17 }
+
+nbsEusmSlotDscpIngressAllOther OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                enable       (2),
+                disable      (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "One of the five ingress options EF,AF,CS,ZERO and OTHER"
+        DEFVAL { disable }
+        ::= { nbsEusmSlotEntry 18 }
+
+-- ********************************************************************
+--
+-- Object for the Iometrix feature
+--
+-- ********************************************************************
+
+nbsEusmSlotIometrix OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            off             (2),
+            on              (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Controls whether or not the EUSM should enable Iometrix
+           Level 1 cNode agent behavior"
+        DEFVAL { notSupported }
+        ::= { nbsEusmSlotEntry 19 }
+
+nbsEusmSlotManagementVid OBJECT-TYPE
+        SYNTAX      INTEGER (1..4095)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "VLAN Id reserved for EUSM management activities."
+        DEFVAL { 4094 }
+        ::= { nbsEusmSlotEntry 20 }
+
+nbsEusmSlotUserPortIRAdmin OBJECT-TYPE
+        SYNTAX      Unsigned32(0..1000000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Unit is kilobits per second.
+
+           Max possible value is 4,294,967,295 which is large enough
+           even to represent 1 Terabit communication. This applies to
+           user ingress traffic that does not match any defined
+           flow. 0 is acceptable value, which means discard all non-flow traffic.
+           Any value above 1000000 for EUSM is considered as no limit."
+        DEFVAL { 1000000 }
+        ::= { nbsEusmSlotEntry 21 }
+
+nbsEusmSlotUserPortIROper OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Unit is kilobits per second.
+
+           Max possible value is 4,294,967,295 which is large enough
+           even to represent 1 Terabit communication. This is the actual
+           value applied to user ingress traffic that does not match any
+           defined flow. It is based on the configured IRAdmin object
+           modified to match the constraints of the device."
+        ::= { nbsEusmSlotEntry 22 }
+
+nbsEusmSlotMaxFlowCfgSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Maximum number of entries in the FlowCfg table.  This may
+           vary from slot to slot if different versions of EUSM software
+           support different table sizes."
+        DEFVAL { 32 }
+        ::= { nbsEusmSlotEntry 23 }
+
+nbsEusmSlotMaxVlanTranSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Maximum number of entries in the VLAN Translation table.
+
+           This may vary from slot to slot if different versions of
+           EUSM software support different table sizes."
+        DEFVAL { 4 }
+        ::= { nbsEusmSlotEntry 24 }
+
+nbsEusmSlotMaxDscpMapSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Maximum number of entries in the DSCP to SLC Priority Map table.
+
+           This may vary from slot to slot if different versions of
+           EUSM software support different table sizes."
+        DEFVAL { 7 }
+        ::= { nbsEusmSlotEntry 25 }
+
+nbsEusmSlotMaxCosPrioSize OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Maximum number of entries in the VLAN CoS to SLC Priority table.
+
+           This may vary from slot to slot if different versions of
+           EUSM software support different table sizes."
+        DEFVAL { 8 }
+        ::= { nbsEusmSlotEntry 26 }
+
+-- ********************************************************************
+--
+-- Objects for the VLAN Flow Rate Limiting feature
+--
+-- ********************************************************************
+nbsEusmFlowCfgTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmFlowCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A table that describes the Vlan Flow Rate Limits
+
+           At the moment there is a limit of 32 entries for this table"
+        ::= { nbsEusmSlotGrp 2 }
+
+nbsEusmFlowCfgEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmFlowCfgEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of a particular Vlan Flow Rate Limit
+           information"
+
+        INDEX { nbsEusmFlowCfgChassis,
+                nbsEusmFlowCfgSlot,
+                nbsEusmFlowCfgVid,
+                nbsEusmFlowCfgPriority}
+
+        ::= { nbsEusmFlowCfgTable 1 }
+
+NbsEusmFlowCfgEntry ::= SEQUENCE {
+        nbsEusmFlowCfgChassis        INTEGER,
+        nbsEusmFlowCfgSlot           INTEGER,
+        nbsEusmFlowCfgVid            INTEGER,
+        nbsEusmFlowCfgPriority       INTEGER,
+        nbsEusmFlowCfgRowStatus      RowStatus,
+        nbsEusmFlowCfgStorageType    StorageType,
+        nbsEusmFlowCfgIRAdmin        Unsigned32,
+        nbsEusmFlowCfgIROper         Unsigned32,
+        nbsEusmFlowCfgClearCounter   INTEGER
+}
+
+nbsEusmFlowCfgChassis OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Chassis"
+        ::= { nbsEusmFlowCfgEntry 1 }
+
+nbsEusmFlowCfgSlot OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Slot of this EUSM"
+        ::= { nbsEusmFlowCfgEntry 2 }
+
+nbsEusmFlowCfgVid OBJECT-TYPE
+        SYNTAX      INTEGER (1..4095)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The Vid part of the index."
+        ::= { nbsEusmFlowCfgEntry 3}
+
+nbsEusmFlowCfgPriority OBJECT-TYPE
+        SYNTAX      INTEGER (0..8)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Priority part of the VLAN as index.
+
+           0(Zero) is don't care and the real priority starts 1 based."
+        ::= { nbsEusmFlowCfgEntry 4}
+
+
+nbsEusmFlowCfgRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This table RowStatus object to create, modify and delete the rows"
+        ::= { nbsEusmFlowCfgEntry 5}
+
+nbsEusmFlowCfgStorageType OBJECT-TYPE
+        SYNTAX      StorageType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This table StorageType"
+        DEFVAL { nonVolatile }
+        ::= { nbsEusmFlowCfgEntry 6}
+
+nbsEusmFlowCfgIRAdmin OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..1000000)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Information Rate (IR) specified for the Vid and priority
+           combo.
+
+           Unit is kilobits per second. Max possible value is
+           4,294,967,295 which is large enough even to represent 1
+           Terabit communication."
+        DEFVAL { 1000 }
+        ::= { nbsEusmFlowCfgEntry 7}
+
+nbsEusmFlowCfgIROper OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Information Rate (IR) that is actually applied to the flow.
+
+           Unit is kilobits per second. Max possible value is
+           4,294,967,295 which is large enough even to represent 1
+           Terabit communication."
+        ::= { nbsEusmFlowCfgEntry 8}
+
+nbsEusmFlowCfgClearCounter OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                idle         (2), -- read-write
+                inProgress   (3), -- read-only
+                clear        (4)  -- write-only
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "To clear the counters for selected row"
+        DEFVAL { idle }
+        ::= { nbsEusmFlowCfgEntry 9}
+
+-- ********************************************************************
+nbsEusmFlowStatusTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmFlowStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A table that describes the Vlan Flow Rate Limits
+           At the moment there is a limit of 32 entries for this table."
+
+        ::= { nbsEusmSlotGrp 3 }
+
+nbsEusmFlowStatusEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmFlowStatusEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains status part of the FlowCfgTable"
+
+        AUGMENTS { nbsEusmFlowCfgEntry }
+
+        ::= { nbsEusmFlowStatusTable 1 }
+
+NbsEusmFlowStatusEntry ::= SEQUENCE {
+        nbsEusmFlowStatusRxFrames       Counter64,
+        nbsEusmFlowStatusRxOctets       Counter64
+}
+
+nbsEusmFlowStatusRxFrames OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Received Frames counted"
+        ::= { nbsEusmFlowStatusEntry 1}
+
+nbsEusmFlowStatusRxOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Received Octets counted"
+        ::= { nbsEusmFlowStatusEntry 2}
+
+-- ********************************************************************
+--
+-- Objects for the VLAN Translation feature
+--
+-- ********************************************************************
+nbsEusmVidMapTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmVidMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "A table that describes the Vlan Translation table
+
+           At the moment there is a limit of 3 or 7 entries for this
+           table"
+
+        ::= { nbsEusmSlotGrp 4 }
+
+nbsEusmVidMapEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmVidMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of a particular Vlan Translation
+           table feature"
+
+        INDEX { nbsEusmVidMapChassis,
+                nbsEusmVidMapSlot,
+                nbsEusmVidMapFromVid}
+
+        ::= { nbsEusmVidMapTable 1 }
+
+NbsEusmVidMapEntry ::= SEQUENCE {
+        nbsEusmVidMapChassis        INTEGER,
+        nbsEusmVidMapSlot           INTEGER,
+        nbsEusmVidMapFromVid        INTEGER,
+        nbsEusmVidMapToVid          INTEGER,
+        nbsEusmVidMapRowStatus      RowStatus,
+        nbsEusmVidMapStorageType    StorageType
+}
+
+nbsEusmVidMapChassis OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Chassis"
+        ::= { nbsEusmVidMapEntry 1 }
+
+nbsEusmVidMapSlot OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Slot of this EUSM"
+        ::= { nbsEusmVidMapEntry 2 }
+
+nbsEusmVidMapFromVid OBJECT-TYPE
+        SYNTAX      INTEGER (0..4095)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The vlanTranslation index."
+        ::= { nbsEusmVidMapEntry 3}
+
+nbsEusmVidMapToVid OBJECT-TYPE
+        SYNTAX      INTEGER (0..4095)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "The vlanTranslation index."
+        DEFVAL { 100 }
+        ::= { nbsEusmVidMapEntry 4}
+
+
+nbsEusmVidMapRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This table RowStatus object to create, modify and delete the
+           rows"
+        ::= { nbsEusmVidMapEntry 5}
+
+nbsEusmVidMapStorageType OBJECT-TYPE
+        SYNTAX      StorageType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This table StorageType"
+        DEFVAL { nonVolatile }
+        ::= { nbsEusmVidMapEntry 6}
+
+-- ********************************************************************
+--
+-- Objects for the CoS DSCP Mapping table
+--
+-- ********************************************************************
+nbsEusmCoSDscpMapTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmCoSDscpMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Only 7 possible rows in this table.It is possible to make
+           this table without the RowStatus object as there are not
+           going to be variable number of rows in this table. But we
+           could define less than 7 rows. So RowStatus is added on"
+
+        ::= { nbsEusmSlotGrp 5 }
+
+nbsEusmCoSDscpMapEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmCoSDscpMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Ingress Tag prio is mapped to egress SL class queue or
+           priority"
+
+        INDEX { nbsEusmCoSDscpMapChassis,
+                nbsEusmCoSDscpMapSlot,
+                nbsEusmCoSDscpMapDscp}
+
+        ::= { nbsEusmCoSDscpMapTable 1 }
+
+NbsEusmCoSDscpMapEntry ::= SEQUENCE {
+        nbsEusmCoSDscpMapChassis        INTEGER,
+        nbsEusmCoSDscpMapSlot           INTEGER,
+        nbsEusmCoSDscpMapDscp           INTEGER,
+        nbsEusmCoSDscpMapSlcPrio        INTEGER,
+        nbsEusmCoSDscpMapRowStatus      RowStatus,
+        nbsEusmCoSDscpMapStorageType    StorageType
+}
+
+nbsEusmCoSDscpMapChassis OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Chassis"
+        ::= { nbsEusmCoSDscpMapEntry 1 }
+
+nbsEusmCoSDscpMapSlot OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Slot of this EUSM"
+        ::= { nbsEusmCoSDscpMapEntry 2 }
+
+nbsEusmCoSDscpMapDscp OBJECT-TYPE
+        SYNTAX      INTEGER (0..63)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "DSCP range is 0..63 and since it is an index we make it
+           1..64 as the 1 based range"
+        ::= { nbsEusmCoSDscpMapEntry 3}
+
+nbsEusmCoSDscpMapSlcPrio OBJECT-TYPE
+        SYNTAX      INTEGER{
+            low     (1),
+            normal  (2),
+            medium  (3),
+            high    (4)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Service Level Class Priority has 4 queues. Each ingress
+           packet is assigned a Diffserv Service Level Class as part of
+           the ingress traffic process. A packet can be forwarded to
+           any one of 4 hardware egress packet queues of a port
+           according to the packet SL class."
+        DEFVAL { low }
+        ::= { nbsEusmCoSDscpMapEntry 4}
+
+
+nbsEusmCoSDscpMapRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This table RowStatus object to create, modify and delete the rows"
+        ::= { nbsEusmCoSDscpMapEntry 5}
+
+nbsEusmCoSDscpMapStorageType OBJECT-TYPE
+        SYNTAX      StorageType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "This table StorageType"
+        DEFVAL { nonVolatile }
+        ::= { nbsEusmCoSDscpMapEntry 6}
+
+
+-- ********************************************************************
+--
+-- Objects for the CoS Vlan Tag Priority Mapping table
+--
+-- ********************************************************************
+nbsEusmCoSTagPrioMapTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmCoSTagPrioMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Only 8 rows in this table.  It is a fixed size table because
+           rows for all values of the table index Priority object must
+           be defined in the configured device."
+
+        ::= { nbsEusmSlotGrp 6 }
+
+nbsEusmCoSTagPrioMapEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmCoSTagPrioMapEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Ingress Tag priority is mapped to egress Service Level class
+           queue or priority."
+
+        INDEX { nbsEusmCoSTagPrioMapChassis,
+                nbsEusmCoSTagPrioMapSlot,
+                nbsEusmCoSTagPrioMapPriority}
+
+        ::= { nbsEusmCoSTagPrioMapTable 1 }
+
+NbsEusmCoSTagPrioMapEntry ::= SEQUENCE {
+        nbsEusmCoSTagPrioMapChassis        INTEGER,
+        nbsEusmCoSTagPrioMapSlot           INTEGER,
+        nbsEusmCoSTagPrioMapPriority       INTEGER,
+        nbsEusmCoSTagPrioMapSlcPrio        INTEGER
+}
+
+nbsEusmCoSTagPrioMapChassis OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Chassis"
+        ::= { nbsEusmCoSTagPrioMapEntry 1 }
+
+nbsEusmCoSTagPrioMapSlot OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The index of the table to refer to Slot of this EUSM"
+        ::= { nbsEusmCoSTagPrioMapEntry 2 }
+
+nbsEusmCoSTagPrioMapPriority OBJECT-TYPE
+        SYNTAX      INTEGER (0..7)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Tag priority range is 0..7."
+        ::= { nbsEusmCoSTagPrioMapEntry 3}
+
+nbsEusmCoSTagPrioMapSlcPrio OBJECT-TYPE
+        SYNTAX      INTEGER{
+            low     (1),
+            normal  (2),
+            medium  (3),
+            high    (4)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+          "Service Level Class Priority has 4 queues. Each ingress
+           packet is assigned a Diffserv Service Level Class as part of
+           the ingress traffic process. A packet can be forwarded to
+           any one of 4 hardware egress packet queues of a port
+           according to the packet SL class."
+        ::= { nbsEusmCoSTagPrioMapEntry 4}
+
+-- ********************************************************************
+--
+-- Objects for the Port context features that are applicable
+--
+-- ********************************************************************
+
+nbsEusmPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of Port context features applicable
+           There is going to be one row for each port. All the scalar
+           type objects applicable at the port context are dumped
+           here."
+        ::= { nbsEusmPortGrp 1 }
+
+nbsEusmPortEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of slot context features applicable
+           for the whole module. There is going to be one row for each
+           slot. All the scalar type objects applicable at the slot
+           context are dumped here."
+
+        AUGMENTS { nbsCmmcPortEntry }
+
+        ::= { nbsEusmPortTable 1 }
+
+NbsEusmPortEntry ::= SEQUENCE {
+
+-- Table Support
+        nbsEusmPortSupportsEusm        INTEGER,
+
+-- Smart loopback stuff
+        nbsEusmPortSmartLoopbackAction INTEGER,
+        nbsEusmPortSmartLoopbackSwap   INTEGER,
+        nbsEusmPortSmartLoopbackMac    OCTET STRING,
+        nbsEusmPortSmartLoopbackVid    INTEGER,
+
+-- Stacking, stripping stuff
+        nbsEusmPortVlanTagAction   INTEGER,
+        nbsEusmPortVlanTagVid      INTEGER,
+        nbsEusmPortVlanTagPriority INTEGER
+}
+
+-- ********************************************************************
+--
+-- Objects for Table Support
+--
+-- ********************************************************************
+
+nbsEusmPortSupportsEusm OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported  (1),
+                supported     (2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "Is EUSM config and status supported for this slot?"
+
+        DEFVAL { notSupported }
+        ::= { nbsEusmPortEntry 1 }
+
+-- ********************************************************************
+--
+-- Objects for the SmartLoopback features
+--
+-- ********************************************************************
+
+nbsEusmPortSmartLoopbackAction OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            off             (2),
+            all             (3),
+            onDA            (4),
+            onVid           (5),
+            onBoth          (6),
+            mac             (7)  -- available only on User-Ports
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          " "
+        DEFVAL { off }
+        ::= { nbsEusmPortEntry 2 }
+
+nbsEusmPortSmartLoopbackSwap OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            off             (2),
+            on              (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          " "
+        DEFVAL { off }
+        ::= { nbsEusmPortEntry 3 }
+
+nbsEusmPortSmartLoopbackMac OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          " "
+        DEFVAL { '000000000000'h }
+        ::= { nbsEusmPortEntry 4 }
+
+nbsEusmPortSmartLoopbackVid  OBJECT-TYPE
+        SYNTAX      INTEGER (1..4095)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          " "
+        DEFVAL { 1 }
+        ::= { nbsEusmPortEntry 5 }
+
+-- ********************************************************************
+--
+-- Objects for the VLAN Q-in-Q feature - stacking, stripping etc
+--
+-- ********************************************************************
+
+nbsEusmPortVlanTagAction OBJECT-TYPE
+        SYNTAX      INTEGER {
+                notSupported (1),
+                add          (2),
+                strip        (3),
+                ignore       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "add(2) need two more arguments s-vlanId and s-vlan-priority
+           strip(3)and ignore(4) does not need any argument"
+        DEFVAL { ignore }
+        ::= { nbsEusmPortEntry 6 }
+
+nbsEusmPortVlanTagVid OBJECT-TYPE
+        SYNTAX      INTEGER  (0..4095)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "need to be specified when VlanTagAction is add(2)"
+        DEFVAL { 0 }
+        ::= { nbsEusmPortEntry 7 }
+
+nbsEusmPortVlanTagPriority OBJECT-TYPE
+        SYNTAX      INTEGER (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "need to be specified when VlanTagAction is add(2)"
+        DEFVAL { 0 }
+        ::= { nbsEusmPortEntry 8 }
+
+-- ********************************************************************
+-- TGA - Traffic Generation Agent
+-- Objects for the Traffic generation feature
+--
+-- ********************************************************************
+
+nbsEusmTgaTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmTgaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of Test context features applicable.
+
+           There is going to be one row for each port."
+        ::= { nbsEusmTestGrp 1 }
+
+nbsEusmTgaEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmTgaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of slot context features applicable
+           for the whole module.
+
+           There is going to be one row for each port."
+        AUGMENTS { nbsCmmcPortEntry }
+
+        ::= { nbsEusmTgaTable 1 }
+
+NbsEusmTgaEntry ::= SEQUENCE {
+
+-- Traffic generation stuff
+        nbsEusmTgaDa              OCTET STRING,
+        nbsEusmTgaDaType          INTEGER,
+        nbsEusmTgaSa              OCTET STRING,
+        nbsEusmTgaSaType          INTEGER,
+        nbsEusmTgaTag             OCTET STRING,
+        nbsEusmTgaTagType         INTEGER,
+        nbsEusmTgaPattern         OCTET STRING,
+        nbsEusmTgaPatternType     INTEGER,
+        nbsEusmTgaFrameSize       INTEGER,
+        nbsEusmTgaFrameSizeType   INTEGER,
+        nbsEusmTgaFrameCount      Unsigned32,
+        nbsEusmTgaFrameCountType  INTEGER,
+        nbsEusmTgaInterPacketGap  INTEGER,
+        nbsEusmTgaAction          INTEGER
+}
+
+-- ********************************************************************
+--
+-- Objects for the Tga features
+--
+-- ********************************************************************
+
+
+nbsEusmTgaDa OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Destination Address - MAC address"
+        DEFVAL { '000000000000'h }
+        ::= { nbsEusmTgaEntry 1 }
+
+nbsEusmTgaDaType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            random          (2),
+            fixed           (3),
+            increment       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Different options to specify the Destination Address"
+        DEFVAL { random }
+        ::= { nbsEusmTgaEntry 2 }
+
+nbsEusmTgaSa OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(6))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Source Address - MAC address"
+        DEFVAL { '000000000000'h }
+        ::= { nbsEusmTgaEntry 3 }
+
+nbsEusmTgaSaType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            random          (2),
+            fixed           (3),
+            increment       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Different options to specify the Source Address"
+        DEFVAL { random }
+        ::= { nbsEusmTgaEntry 4 }
+
+nbsEusmTgaTag  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(4))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "VLAN tag or e-type plus initial data If VLAN tagging is not
+           specified (i.e. Tag does not begin as '8100h', then the first
+           two bytes of Tag define the frame type, and the last two Tag
+           bytes are the first two data bytes"
+        DEFVAL { '00000000'h }
+        ::= { nbsEusmTgaEntry 5 }
+
+nbsEusmTgaTagType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            random          (2),
+            fixed           (3),
+            increment       (4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Different options to specify the Tag"
+        DEFVAL { random }
+        ::= { nbsEusmTgaEntry 6 }
+
+nbsEusmTgaPattern OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE(2))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "The two Pattern bytes are replicated as needed to fill-out
+           the frame to the specified size"
+        DEFVAL { '0000'h }
+        ::= { nbsEusmTgaEntry 7 }
+
+nbsEusmTgaPatternType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            random          (2),
+            fixed           (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Different options to specify the Source Address"
+        DEFVAL { random }
+        ::= { nbsEusmTgaEntry 8 }
+
+nbsEusmTgaFrameSize  OBJECT-TYPE
+        SYNTAX      INTEGER (64..9600)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Frame Size range from 64 to 9600"
+        DEFVAL { 64 }
+        ::= { nbsEusmTgaEntry 9 }
+
+nbsEusmTgaFrameSizeType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            random          (2),
+            fixed           (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Different options to specify the Frame Size"
+        DEFVAL { fixed }
+        ::= { nbsEusmTgaEntry 10 }
+
+nbsEusmTgaFrameCount  OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..4294967294)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          " "
+        DEFVAL { 1 }
+        ::= { nbsEusmTgaEntry 11 }
+
+nbsEusmTgaFrameCountType OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            continuous      (2),
+            fixed           (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Different options to specify the Frame Size"
+        DEFVAL { continuous }
+        ::= { nbsEusmTgaEntry 12 }
+
+nbsEusmTgaInterPacketGap  OBJECT-TYPE
+        SYNTAX      INTEGER (12..134217727)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Rate Control - only option is fixed. Default is 1249928.
+           This sets an approx rate of 100/10/1 fps at 1000/100/10
+           Mbps. Number of bytes between frames. Controls traffic rate"
+        DEFVAL { 1249928 }
+        ::= { nbsEusmTgaEntry 13 }
+
+nbsEusmTgaAction OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            start           (2),
+            stop            (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Different actions to activate the traffic generation. There
+           are three frame generation activities: specify, start, and
+           stop. Specifying and actually starting traffic may be done
+           together or separately. In fact, it is reasonable to specify
+           once, then start (and stop) many times."
+        DEFVAL { stop }
+        ::= { nbsEusmTgaEntry 14 }
+
+
+--********************************************************************
+-- TAA - Traffic Analysis Agent
+-- Objects for the Traffic Analysis feature
+--
+-- ********************************************************************
+
+nbsEusmCableTestTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmCableTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Cable testing feature"
+        ::= { nbsEusmTestGrp 2 }
+
+nbsEusmCableTestEntry      OBJECT-TYPE
+        SYNTAX      NbsEusmCableTestEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Cable testing feature"
+
+        AUGMENTS { nbsCmmcPortEntry }
+
+        ::= { nbsEusmCableTestTable 1 }
+
+NbsEusmCableTestEntry ::= SEQUENCE {
+
+-- Cable Test stuff
+        nbsEusmCableTestStatus        INTEGER,
+        nbsEusmCableTestResult        DisplayString
+}
+
+nbsEusmCableTestStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+            notSupported    (1),
+            testStart       (2),
+            testInProgress  (3),
+            testCompleted   (4),
+            testIdle        (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "To initiate and get the status of the cable test feature. It
+           is applicable only to copper ports. In the future we may
+           have multiple copper ports. A GET on this object will show
+           testIdle if a test has never been run, or testCompleted(4)
+           if it has.
+
+           When testStart(2) is SET, for a short time of
+           about 3 seconds you would expect to see testInProgress(3).
+           Time-stamp of the test start will be sent by the SNMP agent
+           to the line-card to keep track of the time instance of the
+           test."
+        DEFVAL { testIdle }
+        ::= { nbsEusmCableTestEntry 1 }
+
+nbsEusmCableTestResult OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This string will give out the result of the cable test done
+           with a time stamp that gives the indication as to when the
+           CableTest was initiated. This also gives the result for all
+           the 4 pairs of wire. Possible results status includes
+           invalid, good, mismatch short and open.
+
+           When the status is mismatch, short or open, there will be
+           length indicating more information about the location of the
+           fault. From the LNXNM point of view it is easy to deal with
+           scalars than tables - so this is made into DisplayString.
+           Since the MVs use it read-only and display anyway, it is
+           probably simpler to deal with scalar display string rather
+           than table. An example TestResult may look like the
+           following
+
+             <time-stamp>pair-1 good,pair-2 invalid,pair-3 open at 25
+             meters,pair-4 good."
+
+        ::= { nbsEusmCableTestEntry 2 }
+
+
+-- ********************************************************************
+-- Loss/Gain Analysis or Traffic Analysis features
+-- ********************************************************************
+
+nbsEusmLgaTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmLgaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of Traffic discrepancy counters."
+        ::= { nbsEusmTestGrp 3 }
+
+nbsEusmLgaEntry  OBJECT-TYPE
+        SYNTAX      NbsEusmLgaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Discrepancy entry"
+
+        AUGMENTS { nbsCmmcSlotEntry }
+
+        ::= { nbsEusmLgaTable 1 }
+
+NbsEusmLgaEntry ::= SEQUENCE {
+
+-- Discrepancies in the most recent interval
+     nbsEusmLgaRdAllFrames      Integer32,
+     nbsEusmLgaRducFrames       Integer32,
+     nbsEusmLgaRdmcFrames       Integer32,
+     nbsEusmLgaRdbcFrames       Integer32,
+     nbsEusmLgaRdSize64         Integer32,
+     nbsEusmLgaRdSizeMax127     Integer32,
+     nbsEusmLgaRdSizeMax255     Integer32,
+     nbsEusmLgaRdSizeMax511     Integer32,
+     nbsEusmLgaRdSizeMax1023    Integer32,
+     nbsEusmLgaRdSizeMax1518    Integer32,
+     nbsEusmLgaRdSizeMax2047    Integer32,
+     nbsEusmLgaRdSizeOvr2047    Integer32,
+     nbsEusmLgaRdFrameDivisor   Unsigned32,
+     nbsEusmLgaRdAllOctets      Integer32,
+     nbsEusmLgaRdOctetDivisor   Unsigned32,
+     nbsEusmLgaRdTimeSpan       Unsigned32,
+
+-- Discrepancies accumulated over all intervals
+     nbsEusmLgaAdAllFrames      Integer32,
+     nbsEusmLgaAducFrames       Integer32,
+     nbsEusmLgaAdmcFrames       Integer32,
+     nbsEusmLgaAdbcFrames       Integer32,
+     nbsEusmLgaAdSize64         Integer32,
+     nbsEusmLgaAdSizeMax127     Integer32,
+     nbsEusmLgaAdSizeMax255     Integer32,
+     nbsEusmLgaAdSizeMax511     Integer32,
+     nbsEusmLgaAdSizeMax1023    Integer32,
+     nbsEusmLgaAdSizeMax1518    Integer32,
+     nbsEusmLgaAdSizeMax2047    Integer32,
+     nbsEusmLgaAdSizeOvr2047    Integer32,
+     nbsEusmLgaAdFrameDivisor   Unsigned32,
+     nbsEusmLgaAdAllOctets      Integer32,
+     nbsEusmLgaAdOctetDivisor   Unsigned32,
+     nbsEusmLgaAdTimeSpan       Unsigned32,
+
+-- Time measurements
+     nbsEusmSlotLgaInterval        INTEGER,
+     nbsEusmSlotLgaAction          INTEGER
+}
+
+-- Objects for table support
+
+nbsEusmLgaRdAllFrames  OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all frames (good+bad) lost/gained (-/+) in the
+           most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 1}
+
+nbsEusmLgaRducFrames   OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of good unicast frames lost/gained (-/+) in the
+           most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 2}
+
+nbsEusmLgaRdmcFrames  OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of good multicast frames lost/gained (-/+) in the
+           most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 3}
+
+nbsEusmLgaRdbcFrames   OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of good broadcast frames lost/gained (-/+) in the
+           most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 4}
+
+nbsEusmLgaRdSize64     OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 64 byte frames lost/gained (-/+) in the
+           most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 5}
+
+nbsEusmLgaRdSizeMax127 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 65-127 byte frames lost/gained (-/+) in the
+           most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 6}
+
+nbsEusmLgaRdSizeMax255 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 128-255 byte frames lost/gained (-/+) in
+           the most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 7}
+
+nbsEusmLgaRdSizeMax511 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 256-511 byte frames lost/gained (-/+) in
+           the most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 8}
+
+nbsEusmLgaRdSizeMax1023 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 512-1023 byte frames lost/gained (-/+) in
+           the most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 9}
+
+nbsEusmLgaRdSizeMax1518 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 1024-1518 byte frames lost/gained (-/+) in
+           the most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 10}
+
+nbsEusmLgaRdSizeMax2047 OBJECT-TYPE
+        SYNTAX      Integer32(-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 1519-2047 byte frames lost/gained (-/+) in
+           the most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 11}
+
+nbsEusmLgaRdSizeOvr2047 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all 2048-plus byte frames lost/gained (-/+) in
+           the most recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 12}
+
+nbsEusmLgaRdFrameDivisor OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The divisor to calculate frame loss/gain ratios for the most
+           recent interval."
+        ::= {nbsEusmLgaEntry 13}
+
+nbsEusmLgaRdAllOctets OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all frame octets lost/gained (-/+) in the most
+           recent interval.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 14}
+
+nbsEusmLgaRdOctetDivisor OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The divisor to calculate octet loss/gain ratios for the most
+           recent interval."
+        ::= {nbsEusmLgaEntry 15}
+
+nbsEusmLgaRdTimeSpan OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The time span (tenths of a sec) for the most recent
+           interval."
+        ::= {nbsEusmLgaEntry 16 }
+
+nbsEusmLgaAdAllFrames  OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all frames (good+bad) lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 17}
+
+nbsEusmLgaAducFrames   OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of good unicast frames lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 18}
+
+nbsEusmLgaAdmcFrames  OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of good multicast frames lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 19}
+
+nbsEusmLgaAdbcFrames   OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of good broadcast frames lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 20}
+
+nbsEusmLgaAdSize64     OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 64 byte frames lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 21}
+
+nbsEusmLgaAdSizeMax127 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 65-127 byte frames lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 22}
+
+nbsEusmLgaAdSizeMax255 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 128-255 byte frames lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 23}
+
+nbsEusmLgaAdSizeMax511 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 256-511 byte frames lost/gained
+           (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 24}
+
+nbsEusmLgaAdSizeMax1023 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 512-1023 byte frames
+           lost/gained (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 25}
+
+nbsEusmLgaAdSizeMax1518 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 1024-1518 byte frames
+           lost/gained (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 26}
+
+nbsEusmLgaAdSizeMax2047 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 1519-2047 byte frames
+                 lost/gained (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 27}
+
+nbsEusmLgaAdSizeOvr2047 OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all 2048-plus byte frames
+           lost/gained (-/+) over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 28}
+
+nbsEusmLgaAdFrameDivisor OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The divisor to calculate frame loss/gain ratios over all intervals."
+        ::= {nbsEusmLgaEntry 29}
+
+nbsEusmLgaAdAllOctets OBJECT-TYPE
+        SYNTAX      Integer32 (-2147483648..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated count of all frame octets lost/gained (-/+)
+           over all intervals.
+
+           Not supported value: 0x80000000"
+
+        ::= {nbsEusmLgaEntry 30}
+
+nbsEusmLgaAdOctetDivisor OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The divisor to calculate octet loss/gain ratios over all intervals."
+        ::= {nbsEusmLgaEntry 31}
+
+nbsEusmLgaAdTimeSpan OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The accumulated time span (tenths of a sec) for all intervals."
+        ::= {nbsEusmLgaEntry 32 }
+
+nbsEusmSlotLgaInterval OBJECT-TYPE
+        SYNTAX      INTEGER (10..86400)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Traffic Analysis (loss/gain) sampling time interval (sec).
+           Practical range allowed is 10 seconds to 1 day."
+        DEFVAL { 60 }
+        ::= {nbsEusmLgaEntry 33 }
+
+nbsEusmSlotLgaAction   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSupported    (1),
+            inactive        (2),
+            start           (3),
+            stop            (4),
+            inProgress      (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Traffic Analysis (loss/gain) activity status."
+        DEFVAL { notSupported }
+        ::= {nbsEusmLgaEntry 34 }
+
+-- ********************************************************************
+-- Performance monitoring
+-- ********************************************************************
+
+nbsEusmPmTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsEusmPmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Contains a description of Traffic discrepancy counters."
+        ::= { nbsEusmTestGrp 4 }
+
+nbsEusmPmEntry  OBJECT-TYPE
+        SYNTAX      NbsEusmPmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+          "Performance Monitoring entry"
+
+        AUGMENTS { nbsCmmcSlotEntry }
+
+        ::= { nbsEusmPmTable 1 }
+
+NbsEusmPmEntry ::= SEQUENCE {
+
+-- Average
+  nbsEusmPmAvgAllSizes    Counter32,
+  nbsEusmPmAvg64          Counter32,
+  nbsEusmPmAvg127         Counter32,
+  nbsEusmPmAvg255         Counter32,
+  nbsEusmPmAvg511         Counter32,
+  nbsEusmPmAvg1023        Counter32,
+  nbsEusmPmAvg1518        Counter32,
+  nbsEusmPmAvg2047        Counter32,
+  nbsEusmPmAvgOvr2047     Counter32,
+
+-- Minimum
+  nbsEusmPmMinAllSizes    Counter32,
+  nbsEusmPmMin64          Counter32,
+  nbsEusmPmMin127         Counter32,
+  nbsEusmPmMin255         Counter32,
+  nbsEusmPmMin511         Counter32,
+  nbsEusmPmMin1023        Counter32,
+  nbsEusmPmMin1518        Counter32,
+  nbsEusmPmMin2047        Counter32,
+  nbsEusmPmMinOvr2047     Counter32,
+
+-- Maximum
+  nbsEusmPmMaxAllSizes    Counter32,
+  nbsEusmPmMax64          Counter32,
+  nbsEusmPmMax127         Counter32,
+  nbsEusmPmMax255         Counter32,
+  nbsEusmPmMax511         Counter32,
+  nbsEusmPmMax1023        Counter32,
+  nbsEusmPmMax1518        Counter32,
+  nbsEusmPmMax2047        Counter32,
+  nbsEusmPmMaxOvr2047     Counter32,
+
+-- Count of frames
+  nbsEusmPmFramesAllSizes    Counter64,
+  nbsEusmPmFrames64          Counter64,
+  nbsEusmPmFrames127         Counter64,
+  nbsEusmPmFrames255         Counter64,
+  nbsEusmPmFrames511         Counter64,
+  nbsEusmPmFrames1023        Counter64,
+  nbsEusmPmFrames1518        Counter64,
+  nbsEusmPmFrames2047        Counter64,
+  nbsEusmPmFramesOvr2047     Counter64,
+
+-- Count of octets
+  nbsEusmPmOctetsAllSizes    Counter64,
+  nbsEusmPmOctets64          Counter64,
+  nbsEusmPmOctets127         Counter64,
+  nbsEusmPmOctets255         Counter64,
+  nbsEusmPmOctets511         Counter64,
+  nbsEusmPmOctets1023        Counter64,
+  nbsEusmPmOctets1518        Counter64,
+  nbsEusmPmOctets2047        Counter64,
+  nbsEusmPmOctetsOvr2047     Counter64,
+
+  nbsEusmSlotPmInterval      INTEGER,
+  nbsEusmSlotPmSelector      INTEGER,
+  nbsEusmSlotPmAction        INTEGER,
+  nbsEusmSlotPmCapabilities  OCTET STRING
+}
+
+nbsEusmPmAvgAllSizes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored frames."
+        ::= {nbsEusmPmEntry 1 }
+
+nbsEusmPmAvg64 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 64 byte
+           frames."
+        ::= {nbsEusmPmEntry 2 }
+
+nbsEusmPmAvg127  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 65-127 byte
+           frames."
+        ::= {nbsEusmPmEntry 3 }
+
+nbsEusmPmAvg255 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 128-255
+           byte frames."
+        ::= {nbsEusmPmEntry 4 }
+
+nbsEusmPmAvg511  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 256-511
+           byte frames."
+        ::= {nbsEusmPmEntry 5 }
+
+nbsEusmPmAvg1023 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 512-1023
+           byte frames."
+        ::= {nbsEusmPmEntry 6 }
+
+nbsEusmPmAvg1518  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 1024-1518
+           byte frames."
+        ::= {nbsEusmPmEntry 7 }
+
+nbsEusmPmAvg2047 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 1519-2047
+           byte frames."
+        ::= {nbsEusmPmEntry 8 }
+
+nbsEusmPmAvgOvr2047  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The average transit time (nanosec) for monitored 2048-plus
+           byte frames."
+        ::= {nbsEusmPmEntry 9 }
+
+nbsEusmPmMinAllSizes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored frames."
+        ::= {nbsEusmPmEntry 10 }
+
+nbsEusmPmMin64 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 64
+           byte frames."
+        ::= {nbsEusmPmEntry 11 }
+
+nbsEusmPmMin127  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 65-127
+           byte frames."
+        ::= {nbsEusmPmEntry 12 }
+
+nbsEusmPmMin255 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 128-255
+           byte frames."
+        ::= {nbsEusmPmEntry 13 }
+
+nbsEusmPmMin511  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 256-511
+           byte frames."
+        ::= {nbsEusmPmEntry 14 }
+
+nbsEusmPmMin1023 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 512-1023
+           byte frames."
+        ::= {nbsEusmPmEntry 15}
+
+nbsEusmPmMin1518  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 1024-1518
+           byte frames."
+        ::= {nbsEusmPmEntry 16 }
+
+nbsEusmPmMin2047 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 1519-2047
+           byte frames."
+        ::= {nbsEusmPmEntry 17 }
+
+nbsEusmPmMinOvr2047  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The minimum transit time (nanosec) for monitored 2048-plus
+           byte frames."
+        ::= {nbsEusmPmEntry 18 }
+
+nbsEusmPmMaxAllSizes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored frames."
+        ::= {nbsEusmPmEntry 19 }
+
+nbsEusmPmMax64 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 64
+           byte frames."
+        ::= {nbsEusmPmEntry 20 }
+
+nbsEusmPmMax127  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 65-127
+           byte frames."
+        ::= {nbsEusmPmEntry 21 }
+
+nbsEusmPmMax255 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 128-255
+           byte frames."
+        ::= {nbsEusmPmEntry 22 }
+
+nbsEusmPmMax511  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 256-511
+           byte frames."
+        ::= {nbsEusmPmEntry 23 }
+
+nbsEusmPmMax1023 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 512-1023
+           byte frames."
+        ::= {nbsEusmPmEntry 24}
+
+nbsEusmPmMax1518  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 1024-1518
+           byte frames."
+        ::= {nbsEusmPmEntry 25 }
+
+nbsEusmPmMax2047 OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 1519-2047
+           byte frames."
+        ::= {nbsEusmPmEntry 26 }
+
+nbsEusmPmMaxOvr2047  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The maximum transit time (nanosec) for monitored 2048-plus
+           byte frames."
+        ::= {nbsEusmPmEntry 27 }
+
+nbsEusmPmFramesAllSizes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored frames."
+        ::= {nbsEusmPmEntry 28 }
+
+nbsEusmPmFrames64 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 64 byte frames."
+        ::= {nbsEusmPmEntry 29 }
+
+nbsEusmPmFrames127  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 65-127 byte frames."
+        ::= {nbsEusmPmEntry 30 }
+
+nbsEusmPmFrames255 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 128-255 byte frames."
+        ::= {nbsEusmPmEntry 31 }
+
+nbsEusmPmFrames511  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 256-511 byte frames."
+        ::= {nbsEusmPmEntry 32 }
+
+nbsEusmPmFrames1023 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 512-1023 byte frames."
+        ::= {nbsEusmPmEntry 33 }
+
+nbsEusmPmFrames1518  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 1024-1518 byte frames."
+        ::= {nbsEusmPmEntry 34 }
+
+nbsEusmPmFrames2047 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 1519-2047 byte frames."
+        ::= {nbsEusmPmEntry 35 }
+
+nbsEusmPmFramesOvr2047  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of all monitored 2048-plus byte frames."
+        ::= {nbsEusmPmEntry 36 }
+
+nbsEusmPmOctetsAllSizes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored frames."
+        ::= {nbsEusmPmEntry 37 }
+
+nbsEusmPmOctets64 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 64 byte frames."
+        ::= {nbsEusmPmEntry 38 }
+
+nbsEusmPmOctets127  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 65-127 byte frames."
+        ::= {nbsEusmPmEntry 39 }
+
+nbsEusmPmOctets255 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 128-255 byte frames."
+        ::= {nbsEusmPmEntry 40 }
+
+nbsEusmPmOctets511  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 256-511 byte frames."
+        ::= {nbsEusmPmEntry 41 }
+
+nbsEusmPmOctets1023 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 512-1023 byte frames."
+        ::= {nbsEusmPmEntry 42 }
+
+nbsEusmPmOctets1518  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 1024-1518 byte frames."
+        ::= {nbsEusmPmEntry 43 }
+
+nbsEusmPmOctets2047 OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 1519-2047 byte frames."
+        ::= {nbsEusmPmEntry 44 }
+
+nbsEusmPmOctetsOvr2047  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The count of octets in all monitored 2048-plus byte frames."
+        ::= {nbsEusmPmEntry 45 }
+
+nbsEusmSlotPmInterval OBJECT-TYPE
+        SYNTAX      INTEGER (60..604800)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Performance Monitoring time duration (sec). Practical range
+           allowed is 1 minute to 1 week."
+        DEFVAL { 60 }
+        ::= {nbsEusmPmEntry 46 }
+
+nbsEusmSlotPmSelector   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSupported    (1),
+            coToCpe         (2),
+            cpeToCo         (3),
+            cpeTx           (4),
+            cpeRx           (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Performance Monitoring traffic direction selector.
+
+           coToCpe(2) measures from CO's active trunk port to
+           CPE's active trunk port.
+
+           cpeToCo(3) measures from CPE's active trunk port to
+           CO's active trunk port.
+
+           To measure from one CPE to another, the user should
+           designate the source CPE as cpeTx(4) and the
+           destination CPE as cpeRx(5).
+
+           The reflector CPE must be activated before the
+           source CPE."
+        DEFVAL { notSupported }
+        ::= {nbsEusmPmEntry 47 }
+
+nbsEusmSlotPmAction   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            notSupported    (1),
+            inactive        (2),
+            start           (3),
+            stop            (4),
+            inProgress      (5),
+            complete        (6),
+            stopping        (7)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "Traffic Analysis (performance monitoring) activity status."
+        DEFVAL { notSupported }
+        ::= {nbsEusmPmEntry 48 }
+
+nbsEusmSlotPmCapabilities OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(1))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "This bitmask indicates which performance monitoring  selectors
+           this slot can support.  This object is mandatory for all slots
+           in systems where the nbsEusmSlotPmSelector object is supported.
+           Each capability is represented by one bit.  Set bit to 1 to
+           advertise capability, 0 to deny it.
+
+             Capability    Bit
+           --------------  ---
+                 reserved   0
+             notSupported   1
+                  coToCpe   2
+                  cpeToCo   3
+                    cpeTx   4
+                    cpeRx   5
+
+           OCTET STRING bitmasks count the leftmost bit (MSB) as 0.
+
+           A zero length OCTET STRING indicates that this object is not
+           supported."
+
+        ::= { nbsEusmPmEntry 49 }
+
+
+END

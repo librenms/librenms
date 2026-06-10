@@ -1,0 +1,190 @@
+PRVT-DRY-CONTACTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+TimeTicks,
+NOTIFICATION-TYPE,
+Integer32
+FROM SNMPv2-SMI
+
+switch
+FROM PRVT-SWITCH-MIB;
+
+prvtDryContactsMIB MODULE-IDENTITY
+LAST-UPDATED "200711270000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"Initial version. This MIB provides external-alarm management and notifications"
+
+-- revision history
+REVISION "200711270000Z"
+DESCRIPTION
+"Compilation fixes"
+
+::= { switch 112 }
+
+dryContactsNotifications OBJECT IDENTIFIER ::= { prvtDryContactsMIB 0 }
+dryContactsObjects OBJECT IDENTIFIER ::= { prvtDryContactsMIB 1 }
+
+cfgTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CfgEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A table containing inputs configuration and statuses"
+::= { dryContactsObjects 1 }
+
+cfgEntry OBJECT-TYPE
+SYNTAX CfgEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"cfgEntry"
+INDEX  { prvtAlarmID }
+::= { cfgTable 1 }
+
+CfgEntry ::= SEQUENCE {
+prvtAlarmID Integer32,
+prvtSensorType  INTEGER,
+prvtName OCTET STRING,
+prvtDescription OCTET STRING,
+prvtEnableStatus INTEGER,
+prvtAlarmStatus INTEGER,
+prvtAlarmSeverity INTEGER,
+prvtPolarity INTEGER,
+prvtLastChange TimeTicks
+}
+
+prvtAlarmID OBJECT-TYPE
+SYNTAX Integer32(1..6)
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"External and internal alarm index uniquely identifies this row.
+T-Metro 200 ES platform has four dry-contacts sensor inputs.
+T5C-XG platform has four dry-contact sensor inputs and two dry-contact sensor outputs. 
+An integer with supported range of values 1-6 for T5C-XG and 1-4 for T-Metro 200 ES. Index. Not-accessible"
+::= { cfgEntry 1}
+
+prvtSensorType OBJECT-TYPE
+SYNTAX INTEGER {
+input(1),
+output(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Sensor type. An enumeration with two values: input(1), output(2). 
+T-Metro 200 ES platform has four dry-contacts sensor inputs.
+T5C-XG platform has four dry-contact sensor inputs and two dry-contact sensor outputs.
+Read-only."
+::= { cfgEntry 2 }
+
+
+
+prvtName OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Name of alarm. An OCTET-STRING with max. 16 OCTETS.
+Default value null string. Read-write"
+::= { cfgEntry 3}
+
+prvtDescription OBJECT-TYPE
+SYNTAX OCTET STRING
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Alarm description. An OCTET-STRING with max. 64 OCTETS.
+Default value null string. Read-write"
+::= { cfgEntry 4}
+
+prvtEnableStatus OBJECT-TYPE
+SYNTAX INTEGER {
+enabled(1),
+disabled(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Senging alarms status. An enumeration with two values: enabled(1), disabled(2).
+Default value is disabled(2). Read-write"
+::= { cfgEntry 5}
+
+prvtAlarmStatus OBJECT-TYPE
+SYNTAX INTEGER {
+no-alarm(1),
+alarm(2)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Alarm status. An enumeration with two values: no-alarm(1), alarm(2).
+Default value is no-alarm(1). Read-only."
+::= { cfgEntry 6 }
+
+prvtAlarmSeverity OBJECT-TYPE
+SYNTAX INTEGER {
+info(1),
+minor(2),
+major(3),
+critical(4)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Configured alarm severity. An enumeration with 4 values:
+info(1), minor(2), major(3) and critical(4).
+Default value is info(1). Read-write"
+::= { cfgEntry 7}
+
+prvtPolarity OBJECT-TYPE
+SYNTAX INTEGER {
+normally-opened(1),
+normally-closed(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Configured polarity.
+An enumeration with 2 values: normally-opened(1), normally-closed(2).
+This object is only for T-Metro 200 ES platform. 
+Default value is normally-opened(1). Read-write"
+::= { cfgEntry 8}
+
+prvtLastChange OBJECT-TYPE
+SYNTAX TimeTicks
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The value of sysUpTime at the time of the last operational status change.
+TimeTicks. Read-only"
+::= { cfgEntry 9}
+
+-- Notifications.
+
+stateChanged NOTIFICATION-TYPE
+OBJECTS {
+prvtAlarmID ,
+prvtSensorType,
+prvtName,
+prvtDescription,
+prvtAlarmStatus,
+prvtAlarmSeverity
+}
+STATUS current
+DESCRIPTION
+"Send notification when operational status of the input changes"
+::= { dryContactsNotifications 1 }
+
+END

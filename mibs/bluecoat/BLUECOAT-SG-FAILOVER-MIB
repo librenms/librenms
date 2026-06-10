@@ -1,0 +1,69 @@
+BLUECOAT-SG-FAILOVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+bluecoatSGFailoverMIB MODULE-IDENTITY
+        LAST-UPDATED    "201112200300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The failover MIB is used to monitor
+                         changes in the failover state of the SG appliance."
+        REVISION        "201112200300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 13 }
+
+bluecoatSgFailoverMIBObjects
+        OBJECT IDENTIFIER ::= { bluecoatSGFailoverMIB 1 }
+
+bluecoatSgFailoverMIBNotifications
+        OBJECT IDENTIFIER ::= { bluecoatSGFailoverMIB 2 }
+
+bluecoatSgFailoverMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { bluecoatSgFailoverMIBNotifications 0 }
+
+--
+-- Textual conventions
+--
+
+FailoverMessageString ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT     "255a"
+        STATUS           current
+        DESCRIPTION      "The message describing a change in failover state
+                          of the SG system."
+        SYNTAX           OCTET STRING (SIZE (0..255))
+
+--
+-- MIB variables
+--
+
+bluecoatSgFailoverValues
+        OBJECT IDENTIFIER ::= { bluecoatSgFailoverMIBObjects 1 }
+
+bluecoatSgFailoverMessage OBJECT-TYPE
+        SYNTAX          FailoverMessageString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The custom message generated for this change in
+                         failover state."
+        ::= { bluecoatSgFailoverValues 1 }
+
+--
+-- notifications
+--
+
+bluecoatSgFailoverTrap NOTIFICATION-TYPE
+        OBJECTS { bluecoatSgFailoverMessage }
+        STATUS          current
+        DESCRIPTION     "A notification is generated when the failover state
+                         of the SG system changes."
+        ::= { bluecoatSgFailoverMIBNotificationsPrefix 1 }
+
+END
+

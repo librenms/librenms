@@ -1,0 +1,2841 @@
+-- MIB created 5/06/99 21:05:47, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+IBM-LAN-EMULATION-EXTENSION-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmlanex.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Gauge32, Integer32, Counter32, TimeTicks, IpAddress
+            FROM SNMPv2-SMI-v1
+    OBJECT-TYPE
+            FROM RFC-1212
+    RowStatus, DisplayString, MacAddress, TimeStamp
+            FROM SNMPv2-TC-v1
+    enterprises
+            FROM RFC1155-SMI
+    lesConfEntry
+            FROM LAN-EMULATION-LES-MIB
+    IfIndexOrZero
+            FROM LAN-EMULATION-ELAN-MIB
+    BridgeId, Timeout
+            FROM BRIDGE-MIB;
+
+lanEmulation OBJECT IDENTIFIER ::= { ibmArchitecture 8 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9804091200Z
+--  OrgName
+--    IBM Corporation
+--  ContactInfo
+--     Florian K Kandefer
+--       Postal:  IBM Corporation
+--                800 Park Offices Drive
+--                Research Triangle Park, NC 27709
+--                US
+--       Tel:     +1 919 254 0685
+--       Fax:     +1 919 254 0391
+--       E-mail:  kandefer@vnet.ibm.com     
+--  Descr
+--    
+--    This MIB module contains definitions for common IBM LAN
+--    Emulation Server and Client implementations.
+--  RevDate
+--    9804091200Z
+--  RevDescr
+--    
+--    Added enumerations to IbmVlanType for by port vlans and
+--    IP Multicast vlans.
+--  RevDate
+--    9711051200Z
+--  RevDescr
+--    
+--    The following changes have been made for this revision
+--    
+--    1) VLAN MIB has been added
+--    2) Super ELAN MIB has been added with the exception
+--       of the ibmSEPortStatisticsTable which existed in original MIB.
+--       However, ibmSEPortStatisticsTable has been updated.
+--    3) deprecated ibmBbcmConfigNextId, the ibmBbcmConfigIndex
+--       will take on the value of the superElanID.
+--  RevDate
+--    9705221200Z
+--  RevDescr
+--    
+--    Changed ibmLeServerXLesConfigEntry to be an augment of
+--    lesConfEntry and removed ibmLeServerXLesConfigIndex.
+--  RevDate
+--    9701211200Z
+--  RevDescr
+--    
+--    The  creation
+
+ibm             OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmArchitecture OBJECT IDENTIFIER ::= { ibm 5 }
+ibmLeServerX    OBJECT IDENTIFIER ::= { lanEmulation 3 }
+ibmLeClientX    OBJECT IDENTIFIER ::= { lanEmulation 4 }
+ibmLeMIBConformance OBJECT IDENTIFIER ::= { lanEmulation 5 }
+ibmLeServerXMonitoring OBJECT IDENTIFIER ::= { ibmLeServerX 1 }
+ibmLeServerXConfig OBJECT IDENTIFIER ::= { ibmLeServerX 2 }
+ibmLeServerXMon OBJECT IDENTIFIER ::= { ibmLeServerXMonitoring 1 }
+ibmSuperELAN    OBJECT IDENTIFIER ::= { ibmLeClientX 1 }
+ibmBbcmMIB      OBJECT IDENTIFIER ::= { ibmLeClientX 2 }
+ibmBbcmConfigGroup OBJECT IDENTIFIER ::= { ibmBbcmMIB 1 }
+ibmBbcmStatsGroup OBJECT IDENTIFIER ::= { ibmBbcmMIB 2 }
+ibmVlan         OBJECT IDENTIFIER ::= { ibmLeClientX 3 }
+ibmVlanGGroup   OBJECT IDENTIFIER ::= { ibmVlan 1 }
+ibmVlanGOGroup  OBJECT IDENTIFIER ::= { ibmVlanGGroup 1 }
+ibmVlanCGroup   OBJECT IDENTIFIER ::= { ibmVlan 2 }
+ibmVlanConfGroup OBJECT IDENTIFIER ::= { ibmVlanCGroup 1 }
+ibmVlanStatusGroup OBJECT IDENTIFIER ::= { ibmVlan 3 }
+ibmLeMIBGroups  OBJECT IDENTIFIER ::= { ibmLeMIBConformance 1 }
+ibmLeMIBCompliances OBJECT IDENTIFIER ::= { ibmLeMIBConformance 2 }
+
+IbmSEBridgeID ::= INTEGER(1..65535)
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    
+--    This is a unique identifier associated with the Super ELAN Bridge (SEB).
+--    For SEB's spanning multiple devices, the SEB ID must be
+--    consistent because it is propagated in the spanning tree BPDUs.
+--    The SEB name has only local significance and need not be the
+--    same for every device participating in the Super ELAN. The valid
+--    range for SEB IDs is from 1 to 65279 (0xFEFF). The range
+--    of ID's from 65280 to 65535 are reserved for non SEB's.
+--    An ID of 65535 is reserved for the base bridge, a single non SEB.
+
+IbmVlanPortMap ::= OCTET STRING(SIZE(1..65535))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    
+--    The VLAN Port Map provides the bridge port mapping for a
+--    specific VLAN definition. In the map each bit of each octet
+--    provides the definition for a given port.
+--    That is the first octet defines the first eight ports
+--    of the bridge, the second octet defines the second
+--    eight ports of the bridge and so on and so on and so on.
+--    
+--    Note that bit 0 of octet 1 should never be set because
+--    bridges have no concept of port 0.
+--    
+--    ibmVlanMaxPortMap defines the maximum number of octets supported
+--    in any of the PortMap objects, for this version of the agent.
+
+IbmVlanIndex ::= Integer32
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    
+--    A value which uniquely identifies a conceptual row in the various
+--    VLAN tables. The VlanIndex is used to correlate table information
+--    pertaining to that same VLAN instance in the various VLAN tables.
+--    
+--    This index is unique across all bridge instances.
+
+IbmVlanType ::= INTEGER {
+        ip(1),
+        ipx(2),
+        netbios(3),
+        userDefSldWindo(4),
+        mac(5),
+        byPort(6),
+        ipMulticast(7)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    
+--    A value which uniquely identifies the type of VLAN.
+--    
+
+ibmLeServerXMonLecsInstances OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LECS instances currently created on this agent."
+    ::= { ibmLeServerXMon 1 }
+
+ibmLeServerXMonLesInstances OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LES instances currently created on this agent."
+    ::= { ibmLeServerXMon 2 }
+
+ibmLeServerXMonBusInstances OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of BUS instances currently created on this agent."
+    ::= { ibmLeServerXMon 3 }
+
+ibmLeServerXLecsMonTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmLeServerXLecsMonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides monitoring of LECS instances."
+    ::= { ibmLeServerXMonitoring 2 }
+
+ibmLeServerXLecsMonEntry OBJECT-TYPE
+    SYNTAX IbmLeServerXLecsMonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Entries of ibmLeServerXLecsMonTable."
+    INDEX { ibmLeServerXLecsMonIndex }
+    ::= { ibmLeServerXLecsMonTable 1 }
+
+IbmLeServerXLecsMonEntry ::= SEQUENCE {
+    ibmLeServerXLecsMonIndex Integer32,
+    ibmLeServerXLecsUsedConnections Gauge32
+    }
+
+ibmLeServerXLecsMonIndex OBJECT-TYPE
+    SYNTAX Integer32(0..214748364)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The index used to identify this LECS instance on
+         this agent. This variable has the same value as
+         the lecsConfIndex used to identify this instance
+         in the LECS MIB."
+    REFERENCE
+        "LAN-EMULATION-ELAN-MIB for definition of lecsConfIndex"
+    ::= { ibmLeServerXLecsMonEntry 1 }
+
+ibmLeServerXLecsUsedConnections OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of virtual connections currently
+         in use by this LECS instance."
+    ::= { ibmLeServerXLecsMonEntry 2 }
+
+ibmLeServerXLesMonTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmLeServerXLesMonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides monitoring of LES instances."
+    ::= { ibmLeServerXMonitoring 3 }
+
+ibmLeServerXLesMonEntry OBJECT-TYPE
+    SYNTAX IbmLeServerXLesMonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Entries of ibmLeServerXLesMonTable."
+    INDEX { ibmLeServerXLesMonIndex }
+    ::= { ibmLeServerXLesMonTable 1 }
+
+IbmLeServerXLesMonEntry ::= SEQUENCE {
+    ibmLeServerXLesMonIndex Integer32,
+    ibmLeServerXLesMonUsedConnections Gauge32,
+    ibmLeServerXLesMonLesLecInstances Gauge32
+    }
+
+ibmLeServerXLesMonIndex OBJECT-TYPE
+    SYNTAX Integer32(0..214748364)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The index used to identify this LES instance on
+         this agent. This variable has the same value as
+         the lesConfIndex used to identify this instance
+         in the LES MIB."
+    REFERENCE
+        "LAN-EMULATION-LES-MIB for definition of lesConfIndex"
+    ::= { ibmLeServerXLesMonEntry 1 }
+
+ibmLeServerXLesMonUsedConnections OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of virtual connections currently
+         in use by this LES instance."
+    ::= { ibmLeServerXLesMonEntry 2 }
+
+ibmLeServerXLesMonLesLecInstances OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of clients currently served by this
+         LES instance. This is the number of entries in the
+         lesLecTable which have successfully joined this
+         LES instance."
+    REFERENCE
+        "LAN-EMULATION-LES-MIB for definition of lesLecTable"
+    ::= { ibmLeServerXLesMonEntry 3 }
+
+ibmLeServerXBusMonTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmLeServerXBusMonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides monitoring of BUS instances."
+    ::= { ibmLeServerXMonitoring 4 }
+
+ibmLeServerXBusMonEntry OBJECT-TYPE
+    SYNTAX IbmLeServerXBusMonEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Entries of ibmLeServerXBusMonTable."
+    INDEX { ibmLeServerXBusMonIndex }
+    ::= { ibmLeServerXBusMonTable 1 }
+
+IbmLeServerXBusMonEntry ::= SEQUENCE {
+    ibmLeServerXBusMonIndex Integer32,
+    ibmLeServerXBusMonUsedConnections Gauge32,
+    ibmLeServerXBusMonBusLecInstances Gauge32
+    }
+
+ibmLeServerXBusMonIndex OBJECT-TYPE
+    SYNTAX Integer32(0..214748364)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The index used to identify this BUS instance on
+         this agent. This variable has the same value as
+         the busConfIndex used to identify this instance
+         in the BUS MIB."
+    REFERENCE
+        "LAN-EMULATION-BUS-MIB for definition of busConfIndex"
+    ::= { ibmLeServerXBusMonEntry 1 }
+
+ibmLeServerXBusMonUsedConnections OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of virtual connections currently
+         in use by this BUS instance."
+    ::= { ibmLeServerXBusMonEntry 2 }
+
+ibmLeServerXBusMonBusLecInstances OBJECT-TYPE
+    SYNTAX Gauge32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of clients currently served by this
+         BUS instance. This is the number of entries in the
+         busLecTable."
+    REFERENCE
+        "LAN-EMULATION-BUS-MIB for definition of busLecTable"
+    ::= { ibmLeServerXBusMonEntry 3 }
+
+ibmLeServerXLesConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmLeServerXLesConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table provides extension for LES configuration."
+    ::= { ibmLeServerXConfig 1 }
+
+ibmLeServerXLesConfigEntry OBJECT-TYPE
+    SYNTAX IbmLeServerXLesConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Entries of ibmLeServerXLesConfigTable."
+    INDEX { lesConfIndex }
+-- Augments lesConfEntry FROM LAN-EMULATION-LES-MIB
+    ::= { ibmLeServerXLesConfigTable 1 }
+
+IbmLeServerXLesConfigEntry ::= SEQUENCE {
+    ibmLeServerXLesMinLecID Integer32,
+    ibmLeServerXLesMaxLecID Integer32
+    }
+
+ibmLeServerXLesMinLecID OBJECT-TYPE
+    SYNTAX Integer32(1..65279)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The minimum number on the LEC ID range in use by
+         by this LES instance. The default value is 1
+         the first possible LEC ID. "
+    DEFVAL { 1 }
+    ::= { ibmLeServerXLesConfigEntry 1 }
+
+ibmLeServerXLesMaxLecID OBJECT-TYPE
+    SYNTAX Integer32(1..65279)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum number on the LEC ID range in use by
+         by this LES instance. The default value is 65279
+         the last possible LEC ID. "
+    DEFVAL { 65279 }
+    ::= { ibmLeServerXLesConfigEntry 2 }
+
+ibmSEPortStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmSEPortStatisticsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains statistics about LAN Emulation
+         Control Frame Statistics for Super ELAN Bridge ports."
+    ::= { ibmSuperELAN 1 }
+
+ibmSEPortStatisticsEntry OBJECT-TYPE
+    SYNTAX IbmSEPortStatisticsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of LE Control Frame statistical information
+        for each SEB port"
+    INDEX { ibmSEBridgeId, ibmSEPortNum }
+    ::= { ibmSEPortStatisticsTable 1 }
+
+IbmSEPortStatisticsEntry ::= SEQUENCE {
+    ibmSEBridgeId IbmSEBridgeID,
+    ibmSEPortNum INTEGER,
+    ibmSEPortArpRequestsIn Counter32,
+    ibmSEPortArpRequestsOut Counter32,
+    ibmSEArpRequestsErrors Counter32,
+    ibmSEPortArpRequestsDroppedPortBlocked Counter32,
+    ibmSEPortArpRequestsFiltered Counter32,
+    ibmSEPortArpRepliesIn Counter32,
+    ibmSEPortArpRepliesOut Counter32,
+    ibmSEPortArpRepliesErrors Counter32,
+    ibmSEPortNarpRequestsIn Counter32,
+    ibmSEPortNarpRequestsOut Counter32,
+    ibmSEPortNarpRequestsDroppedPortBlocked Counter32,
+    ibmSEPortFlushRequestsIn Counter32,
+    ibmSEPortFlushRequestsOut Counter32,
+    ibmSEPortFlushRepliesIn Counter32,
+    ibmSEPortFlushRepliesOut Counter32,
+    ibmSEPortFlushRequestErrors Counter32,
+    ibmSEPortFlushRepliesErrors Counter32,
+    ibmSEPortLeCtrlFramesIn Counter32,
+    ibmSEPortLeCtrlFramesOut Counter32,
+    ibmSEPortLeCtrlFramesDiscSrcPortNotFwrd Counter32,
+    ibmSEPortLeCtrlFramesDiscDestPortNotFwrd Counter32
+    }
+
+ibmSEBridgeId OBJECT-TYPE
+    SYNTAX IbmSEBridgeID
+--    Rsyntax INTEGER(1..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The identifier of the Super ELAN Bridge which
+         this LAN Emulation Client has joined."
+    ::= { ibmSEPortStatisticsEntry 1 }
+
+ibmSEPortNum OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The bridge port number associated with this
+         Super ELAN Bridge LAN Emulation Client.
+         This variable directly corresponds, is equal to, the
+         dot1dBasePort variable in rfc1493."
+    ::= { ibmSEPortStatisticsEntry 2 }
+
+ibmSEPortArpRequestsIn OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LE ARP Requests received by the
+         SEB port."
+    ::= { ibmSEPortStatisticsEntry 3 }
+
+ibmSEPortArpRequestsOut OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of bridged LE ARP Requests transmitted
+         by the SEB port."
+    ::= { ibmSEPortStatisticsEntry 4 }
+
+ibmSEArpRequestsErrors OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of received LE ARP Requests that were not
+         bridged by the SEB port"
+    ::= { ibmSEPortStatisticsEntry 5 }
+
+ibmSEPortArpRequestsDroppedPortBlocked OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "The number of outgoing ARP Requests that were dropped
+         by the SEB port because the port was in
+         the blocking state."
+    REFERENCE
+        "rfc1493: dot1dStpPortState"
+    ::= { ibmSEPortStatisticsEntry 6 }
+
+ibmSEPortArpRequestsFiltered OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of received LE ARP Requests discarded by the
+         SEB port because the target MAC address in
+         the LE ARP Request was filtered by the bridge."
+    ::= { ibmSEPortStatisticsEntry 7 }
+
+ibmSEPortArpRepliesIn OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LE ARP Responses received by the
+         SEB port."
+    ::= { ibmSEPortStatisticsEntry 8 }
+
+ibmSEPortArpRepliesOut OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of bridged LE ARP Responses transmitted
+         by the SEB port."
+    ::= { ibmSEPortStatisticsEntry 9 }
+
+ibmSEPortArpRepliesErrors OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of received LE ARP Responses that were
+         dropped by the SEB port because the
+         SEB port originating the corresponding
+         LE ARP Request could not be determined."
+    ::= { ibmSEPortStatisticsEntry 10 }
+
+ibmSEPortNarpRequestsIn OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LE NARP Requests received by the
+         SEB port."
+    ::= { ibmSEPortStatisticsEntry 11 }
+
+ibmSEPortNarpRequestsOut OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of bridged LE NARP Requests transmitted
+         by the SEB port."
+    ::= { ibmSEPortStatisticsEntry 12 }
+
+ibmSEPortNarpRequestsDroppedPortBlocked OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "The number of bridged LE NARP Requests that were
+         dropped by the SEB port because the port
+         was in the blocking state."
+    REFERENCE
+        "rfc1493: dot1dStpPortState"
+    ::= { ibmSEPortStatisticsEntry 13 }
+
+ibmSEPortFlushRequestsIn OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LE Flush Requests received by
+         the SEB port."
+    ::= { ibmSEPortStatisticsEntry 14 }
+
+ibmSEPortFlushRequestsOut OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of bridged LE Flush Requests transmitted
+         by the SEB port."
+    ::= { ibmSEPortStatisticsEntry 15 }
+
+ibmSEPortFlushRepliesIn OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LE Flush Responses received by the
+         SEB port."
+    ::= { ibmSEPortStatisticsEntry 16 }
+
+ibmSEPortFlushRepliesOut OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of bridged LE Flush Responses transmitted
+         by the SEB port."
+    ::= { ibmSEPortStatisticsEntry 17 }
+
+ibmSEPortFlushRequestErrors OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of bridged LE Flush Request Errors for this
+        SEB port."
+    ::= { ibmSEPortStatisticsEntry 18 }
+
+ibmSEPortFlushRepliesErrors OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of bridged LE Flush Replies Errors for this
+        SEB port."
+    ::= { ibmSEPortStatisticsEntry 19 }
+
+ibmSEPortLeCtrlFramesIn OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of LE Control frames received by the
+         SEB port."
+    ::= { ibmSEPortStatisticsEntry 20 }
+
+ibmSEPortLeCtrlFramesOut OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of LE Control frames transmitted
+         by the SEB port."
+    ::= { ibmSEPortStatisticsEntry 21 }
+
+ibmSEPortLeCtrlFramesDiscSrcPortNotFwrd OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of LE Control frames discarded
+         because the SEB source port is not forwarding."
+    ::= { ibmSEPortStatisticsEntry 22 }
+
+ibmSEPortLeCtrlFramesDiscDestPortNotFwrd OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of LE Control frames discarded
+         because the SEB destination port is not forwarding."
+    ::= { ibmSEPortStatisticsEntry 23 }
+
+ibmSEBridgeConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmSEBridgeConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A table that contains the Super ELAN Bridge (SEB) Configuration."
+    ::= { ibmSuperELAN 2 }
+
+ibmSEBridgeConfigEntry OBJECT-TYPE
+    SYNTAX IbmSEBridgeConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The configuration information for each Super ELAN Bridge instance"
+    INDEX { ibmSEBridgeId }
+    ::= { ibmSEBridgeConfigTable 1 }
+
+IbmSEBridgeConfigEntry ::= SEQUENCE {
+    ibmSEAtmIfNumber IfIndexOrZero,
+    ibmSEEnabled INTEGER,
+    ibmSEName DisplayString,
+    ibmSEFrameSize INTEGER,
+    ibmSEMacCacheAge INTEGER,
+    ibmSERDCacheAge INTEGER,
+    ibmSEPriority INTEGER,
+    ibmSEMaxAge INTEGER,
+    ibmSEBridgeHelloTime INTEGER,
+    ibmSEBridgeForwardDelay INTEGER,
+    ibmSEBridgeAddress MacAddress,
+    ibmSEType INTEGER,
+    ibmSEConfigRowStatus RowStatus
+    }
+
+ibmSEAtmIfNumber OBJECT-TYPE
+    SYNTAX IfIndexOrZero
+--    Rsyntax INTEGER(0..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The ATM interface number the Super ELAN (SE) bridging function
+        is associated with. This number is used to determine the NETWORK ID.
+        A SE Bridge (SEB) may span ATM adapters but they have to
+        be on the same network, as specified by the Network ID.
+        The specific requirement is that the LECs in the Super ELAN
+        can establish a Data Direct VCC.
+        
+        The Network ID is an ATM configuration parameter that is required
+        to allow Data Direct VCC's to be established.
+        
+        The value of this object must match an existing value in the ifTable.
+        This object is set to zero when the ATM interface is not
+        specified and the agent must determine itself which ATM
+        interface it is to use. If the agent can not determine a
+        default ATM interface an error should be returned by the
+        agent."
+    DEFVAL { 0 }
+    ::= { ibmSEBridgeConfigEntry 1 }
+
+ibmSEEnabled OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        When enabled(1) the SE Bridge (SEB) will bridge frames to the
+        ports defined  in its bridging domain.  When disabled(2) the SEB
+        will not bridge frames."
+    DEFVAL { enabled }
+    ::= { ibmSEBridgeConfigEntry 2 }
+
+ibmSEName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+--    Rsyntax OCTET STRING(SIZE(1..32))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This is a user provided name to associate with the SEB.
+        The SEB name is independent of the ELANs names of the
+        constituent ELANs of the SEB.
+        
+        No default, name must be specified."
+    ::= { ibmSEBridgeConfigEntry 3 }
+
+ibmSEFrameSize OBJECT-TYPE
+    SYNTAX INTEGER {
+        en1516(1516),
+        tr4544(4544),
+        tr9234(9234),
+        tr18190(18190)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Indicates the maximum SuperElan frame size. All ELANs in a
+        single SEB must be set to the same maximum frame size.
+        
+        Valid Values 1516, 4544, 9234, 18190
+        
+        Default for Ethernet 1516, the Default for Token Ring is 4544
+        
+        Since ibmSEType defaults to Token Ring the MIB documents
+        the ibmSEFrameSize DEFVAL to be 4544. However, if on row creation
+        ibmSEType is set to Ethernet sebEN(1), and ibmSEFrameSize
+        is not specified, the default value used by the agent should be
+        1516."
+    DEFVAL { tr4544 }
+    ::= { ibmSEBridgeConfigEntry 4 }
+
+ibmSEMacCacheAge OBJECT-TYPE
+    SYNTAX INTEGER(10..1000000)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of seconds a learned MAC address remains in the
+        data frame forwarding cache without revalidation."
+    DEFVAL { 300 }
+    ::= { ibmSEBridgeConfigEntry 5 }
+
+ibmSERDCacheAge OBJECT-TYPE
+    SYNTAX INTEGER(10..1000000)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of seconds a learned route descriptor remains in the
+        data frame forwarding cache without revalidation."
+    DEFVAL { 1800 }
+    ::= { ibmSEBridgeConfigEntry 6 }
+
+ibmSEPriority OBJECT-TYPE
+    SYNTAX INTEGER(0..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The SuperElan Bridge spanning tree priority.
+        A lower value will increase the likelihood of a SuperElan
+        bridge becoming the root. This value is appended to the
+        SuperElan Spanning Tree MAC Address to form a SuperElan
+        Bridge ID."
+    DEFVAL { 32768 }
+    ::= { ibmSEBridgeConfigEntry 7 }
+
+ibmSEMaxAge OBJECT-TYPE
+    SYNTAX INTEGER(6..40)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The age at which the current Spanning Tree configuration is
+        deemed too old. A value to small may cause the spanning tree to
+        unnecessarily reconfigure. A value to large will increase the
+        time it takes for the spanning tree to form once an outage
+        is detected."
+    DEFVAL { 20 }
+    ::= { ibmSEBridgeConfigEntry 8 }
+
+ibmSEBridgeHelloTime OBJECT-TYPE
+    SYNTAX INTEGER(1..10)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The interval of time in seconds between the generation of
+        Spanning Tree configuration messages generate by the root.
+        Lower values increase the spanning tree robustness, but
+        increase network traffic overhead. Higher values decrease
+        network control traffic but decrease spanning tree robustness."
+    DEFVAL { 2 }
+    ::= { ibmSEBridgeConfigEntry 9 }
+
+ibmSEBridgeForwardDelay OBJECT-TYPE
+    SYNTAX INTEGER(4..30)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The delay in seconds that the SEB waits before
+        transitioning to the next port state. The forward delay should
+        be large enough to allow all Super ELAN bridges in the
+        SuperELAN to disable ports in the new topology while the new
+        spanning tree is being set up prior to forwarding data frames.
+        Values too low might cause temporary loops in the SuperELAN,
+        because not all bridges will complete the spanning tree updates.
+        While values too large, lengthen network partitions after the
+        spanning tree has converged, which causes data frame delays.
+        The default value indicated that the bridge will begin forwarding
+        frames 30 seconds after the spanning tree has converged: 15 seconds
+        in listening state and 15 seconds in learning state."
+    DEFVAL { 15 }
+    ::= { ibmSEBridgeConfigEntry 10 }
+
+ibmSEBridgeAddress OBJECT-TYPE
+    SYNTAX MacAddress
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The Bridge MAC Address identifies the SuperELAN for the purposes
+        of maintaining the SEB Spanning tree. If no value is configured,
+        the SEB interface with the lowest MAC address will be used. This
+        6 octet Spanning Tree MAC Address is added to the value of the
+        SuperELAN priority found in ibmSEPriority to create a SEB ID."
+    DEFVAL { '000000000000'h }
+    ::= { ibmSEBridgeConfigEntry 11 }
+
+ibmSEType OBJECT-TYPE
+    SYNTAX INTEGER {
+        sebEN(1),
+        sebTR(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object indicates the type of SEB.  sebEN(1)
+        specifies a type of Ethernet, sebTR(2) specific's a type of
+        Token Ring."
+    DEFVAL { sebTR }
+    ::= { ibmSEBridgeConfigEntry 12 }
+
+ibmSEConfigRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+--    Rsyntax INTEGER {
+--        active(1),
+--        notInService(2),
+--        notReady(3),
+--        createAndGo(4),
+--        createAndWait(5),
+--        destroy(6)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object is used to create or delete entries (rows)
+        in the SuperElan Bridge Configuration Table."
+    REFERENCE
+        "
+        RFC 1903, Textual Conventions for version 2 of the
+        Simple Network Management Protocol (SNMPv2)."
+    ::= { ibmSEBridgeConfigEntry 13 }
+
+ibmSEPortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmSEPortConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A table that contains SuperELAN Bridge Port Configuration."
+    ::= { ibmSuperELAN 3 }
+
+ibmSEPortConfigEntry OBJECT-TYPE
+    SYNTAX IbmSEPortConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "The configuration information for each SuperELAN Bridge Port"
+    INDEX { ibmSEBridgeId, ibmSEPortNum }
+    ::= { ibmSEPortConfigTable 1 }
+
+IbmSEPortConfigEntry ::= SEQUENCE {
+    ibmSEPortIfNumber INTEGER,
+    ibmSEPortElanName DisplayString,
+    ibmSEPortRemoteElan INTEGER,
+    ibmSEPortEnabled INTEGER,
+    ibmSEPortPriority INTEGER,
+    ibmSEPortRootCost INTEGER,
+    ibmSEPortRowStatus RowStatus
+    }
+
+ibmSEPortIfNumber OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The interface number associated with this port."
+    ::= { ibmSEPortConfigEntry 1 }
+
+ibmSEPortElanName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+--    Rsyntax OCTET STRING(SIZE(1..32))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The ELAN Name in which the SuperElan Bridge LEC participates.
+        If the ELAN Name matches that of a LES/BUS on the same node,
+        a SEB-LEC interface is automatically added to the configuration,
+        and the SEB-LEC parameters needed to join the ELAN are read
+        from the local ELAN configuration. If the ELAN name does not
+        match that of a LES/BUS on the same node, the SEB-LEC must be
+        configured to join the specified ELAN.
+        
+        No Default value a name must be specified."
+    ::= { ibmSEPortConfigEntry 2 }
+
+ibmSEPortRemoteElan OBJECT-TYPE
+    SYNTAX INTEGER {
+        true(1),
+        false(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object indicates whether or not the  Super ELAN LE
+        Services (LES/BUS) for the ELAN specified by ibmSEPortElanName
+        are local to the same node as the port or not.
+        
+        If false(2) the LE Services are local, if true(1) the LE Services
+        are remote (not resident at the same node as the SuperElan).
+        
+        Default is local ELAN."
+    DEFVAL { false }
+    ::= { ibmSEPortConfigEntry 3 }
+
+ibmSEPortEnabled OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        When enabled(1) the SuperELAN will bridge frames through this
+        SEB port. When disabled(2) the SuperELAN will not bridge frames
+        through this port."
+    DEFVAL { enabled }
+    ::= { ibmSEPortConfigEntry 4 }
+
+ibmSEPortPriority OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This value influences which port is used when two or more
+        ports are connected to the same network segment. This situation
+        may cause a routing loop and a the priority provides a port selection
+        method. A lower value represents a higher priority.
+        
+        ?Is Define ports and interfaces as bit 16 going to be a problem.?
+        Put in to agent capabilities and check in agent.
+        "
+    DEFVAL { 128 }
+    ::= { ibmSEPortConfigEntry 5 }
+
+ibmSEPortRootCost OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The cost added to the root path cost in the Spanning Tree
+        configuration message received on this port in order to
+        determine the path cost to get to the root bridge through
+        this port. Setting this value small increases the probability
+        that this port will be close to the root bridge, and thus
+        asked to carry more broadcast and unknown unicast traffic."
+    DEFVAL { 32768 }
+    ::= { ibmSEPortConfigEntry 6 }
+
+ibmSEPortRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+--    Rsyntax INTEGER {
+--        active(1),
+--        notInService(2),
+--        notReady(3),
+--        createAndGo(4),
+--        createAndWait(5),
+--        destroy(6)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object is used to create or delete entries (rows)
+        in the SuperElan Bridge Port Configuration Table."
+    REFERENCE
+        "
+        RFC 1903, Textual Conventions for version 2 of the
+        Simple Network Management Protocol (SNMPv2)."
+    ::= { ibmSEPortConfigEntry 7 }
+
+ibmSEBridgeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmSEBridgeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A table that contains bridge information for the SEB."
+    ::= { ibmSuperELAN 4 }
+
+ibmSEBridgeEntry OBJECT-TYPE
+    SYNTAX IbmSEBridgeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "Each entry (row) contains additional SEB pertaining to
+         a specific SEB instance."
+    INDEX { ibmSEBridgeId }
+-- Augments ibmSEBridgeConfigEntry
+    ::= { ibmSEBridgeTable 1 }
+
+IbmSEBridgeEntry ::= SEQUENCE {
+    ibmSENumPorts INTEGER,
+    ibmSEProtocolSpecification INTEGER,
+    ibmSETimeSinceTopologyChange TimeTicks,
+    ibmSETopChanges Counter32,
+    ibmSEDesignatedRoot BridgeId,
+    ibmSERootCost INTEGER,
+    ibmSERootPort INTEGER,
+    ibmSEBridgeMaxAge Timeout,
+    ibmSEHelloTime Timeout,
+    ibmSEHoldTime INTEGER,
+    ibmSEForwardDelay Timeout,
+    ibmSEMacLearnedEntryDiscards Counter32,
+    ibmSERDLearnedEntryDiscards Counter32
+    }
+
+ibmSENumPorts OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of ports defined for this SEB.
+        
+        This number can be used to determine the next available
+        port number for row creation in any of the SEB Port Tables.
+        Of course the next available index is determined by adding
+        one to the number of ports defined."
+    ::= { ibmSEBridgeEntry 1 }
+
+ibmSEProtocolSpecification OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(1),
+        tbSra(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The protocol type used for this SEB. Currently only
+        Transparent Bridging with Source Route Awareness (tbSra(2))
+        is the only defined protocol type for SEB's."
+    ::= { ibmSEBridgeEntry 2 }
+
+ibmSETimeSinceTopologyChange OBJECT-TYPE
+    SYNTAX TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The time (in hundredths of a second) since the
+        last time a topology change was detected by the
+        bridge entity."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.8.1.1.3"
+    ::= { ibmSEBridgeEntry 3 }
+
+ibmSETopChanges OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of topology changes detected by
+        this bridge since the management entity was last
+        reset or initialized."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.8.1.1.3"
+    ::= { ibmSEBridgeEntry 4 }
+
+ibmSEDesignatedRoot OBJECT-TYPE
+    SYNTAX BridgeId
+--    Rsyntax OCTET STRING(SIZE(8))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The bridge identifier of the root of the spanning
+        tree as determined by the Spanning Tree Protocol
+        as executed by this node.  This value is used as
+        the Root Identifier parameter in all Configuration
+        Bridge PDUs originated by this node."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.1"
+    ::= { ibmSEBridgeEntry 5 }
+
+ibmSERootCost OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The cost of the path to the root as seen from
+        this bridge."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.2"
+    ::= { ibmSEBridgeEntry 6 }
+
+ibmSERootPort OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The port number of the port which offers the
+        lowest cost path from this bridge to the root
+        bridge."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.3"
+    ::= { ibmSEBridgeEntry 7 }
+
+ibmSEBridgeMaxAge OBJECT-TYPE
+    SYNTAX Timeout(1..65535)
+--    Rsyntax INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum age of Spanning Tree Protocol
+        information learned from the network on any port
+        before it is discarded, in units of hundredths of
+        a second.  This is the actual value that this
+        bridge is currently using."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.4"
+    ::= { ibmSEBridgeEntry 8 }
+
+ibmSEHelloTime OBJECT-TYPE
+    SYNTAX Timeout(1..65535)
+--    Rsyntax INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The amount of time between the transmission of
+        Configuration bridge PDUs by this node on any port
+        when it is the root of the spanning tree or trying
+        to become so, in units of hundredths of a second.
+        This is the actual value that this bridge is
+        currently using."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.5"
+    ::= { ibmSEBridgeEntry 9 }
+
+ibmSEHoldTime OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This time value determines the interval length
+        during which no more than two Configuration bridge
+        PDUs shall be transmitted by this node, in units
+        of hundredths of a second."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.14"
+    ::= { ibmSEBridgeEntry 10 }
+
+ibmSEForwardDelay OBJECT-TYPE
+    SYNTAX Timeout(1..65535)
+--    Rsyntax INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This time value, measured in units of hundredths
+        of a second, controls how fast a port changes its
+        spanning state when moving towards the Forwarding
+        state.  The value determines how long the port
+        stays in each of the Listening and Learning
+        states, which precede the Forwarding state.  This
+        value is also used, when a topology change has
+        been detected and is underway, to age all dynamic
+        entries in the Forwarding Database.  [Note that
+        this value is the one that this bridge is
+        currently using, in contrast to
+        ibmSEBridgeForwardDelay which is the value that
+        this bridge and all others would start using
+        if/when this bridge were to become the root.]"
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.3.6"
+    ::= { ibmSEBridgeEntry 11 }
+
+ibmSEMacLearnedEntryDiscards OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of Mac Forwarding Database entries,
+        which have been or would have been learnt, but
+        have been discarded due to a lack of space to
+        store them in the Forwarding Database.  If this
+        counter is increasing, it indicates that the
+        Forwarding Database is regularly becoming full (a
+        condition which has unpleasant performance effects
+        on the subnetwork).  If this counter has a
+        significant value but is not presently increasing,
+        it indicates that the problem has been occurring
+        but is not persistent."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.7.1.1.3"
+    ::= { ibmSEBridgeEntry 12 }
+
+ibmSERDLearnedEntryDiscards OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The total number of Route Descriptor Forwarding Database
+        entries, which have been or would have been learnt, but
+        have been discarded due to a lack of space to
+        store them in the Forwarding Database.  If this
+        counter is increasing, it indicates that the
+        Forwarding Database is regularly becoming full (a
+        condition which has unpleasant performance effects
+        on the subnetwork).  If this counter has a
+        significant value but is not presently increasing,
+        it indicates that the problem has been occurring
+        but is not persistent."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.7.1.1.3"
+    ::= { ibmSEBridgeEntry 13 }
+
+ibmSEStpPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmSEStpPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A table that contains port-specific information and
+         Spanning Tree Protocol information for each SEB Port."
+    ::= { ibmSuperELAN 5 }
+
+ibmSEStpPortEntry OBJECT-TYPE
+    SYNTAX IbmSEStpPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of SEB information maintained for each SEB port."
+    INDEX { ibmSEBridgeId, ibmSEPortNum }
+-- Augments ibmSEPortConfigEntry
+    ::= { ibmSEStpPortTable 1 }
+
+IbmSEStpPortEntry ::= SEQUENCE {
+    ibmSEStpPortState INTEGER,
+    ibmSEStpPortDesignatedRoot BridgeId,
+    ibmSEStpPortDesignatedCost INTEGER,
+    ibmSEStpPortDesignatedBridge BridgeId,
+    ibmSEStpPortDesignatedPort INTEGER,
+    ibmSEStpPortForwardTransitions Counter32,
+    ibmSEPortMaxInfo INTEGER
+    }
+
+ibmSEStpPortState OBJECT-TYPE
+    SYNTAX INTEGER {
+        forwarding(1),
+        learning(2),
+        listening(3),
+        blocked(4),
+        configured(5),
+        netdown(6),
+        configuring(7),
+        unknown(8)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The port's current state as defined by
+        application of the Spanning Tree Protocol.  This
+        state controls what action a port takes on
+        reception of a frame.  If the bridge has detected
+        a port that is malfunctioning it will place that
+        port into the broken(6) state.  For ports which
+        are disabled (see ibmSEPortEnable), this object
+        will have a value of disabled(1).
+        
+        forwarding(1) - port is in forwarding state
+        learning(2) - port is in learning state
+        listening(3) - port is in listening state
+        blocked(4)  -  this port is blocked by spanning tree
+        configured(5) -  this port is waiting for spanning tree
+        netdown(6) - this ports network interface is down
+        configuring(7) - this port is loading LEC configuration
+        unknown(8) - this port is in some unknown state"
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.2"
+    ::= { ibmSEStpPortEntry 1 }
+
+ibmSEStpPortDesignatedRoot OBJECT-TYPE
+    SYNTAX BridgeId
+--    Rsyntax OCTET STRING(SIZE(8))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The unique Bridge Identifier of the Bridge
+        recorded as the Root in the Configuration BPDUs
+        transmitted by the Designated Bridge for the
+        segment to which the port is attached."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.4"
+    ::= { ibmSEStpPortEntry 2 }
+
+ibmSEStpPortDesignatedCost OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The path cost of the Designated Port of the
+        segment connected to this port.  This value is
+        compared to the Root Path Cost field in received
+        bridge PDUs."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.5"
+    ::= { ibmSEStpPortEntry 3 }
+
+ibmSEStpPortDesignatedBridge OBJECT-TYPE
+    SYNTAX BridgeId
+--    Rsyntax OCTET STRING(SIZE(8))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The Bridge Identifier of the bridge which this
+        port considers to be the Designated Bridge for
+        this port's segment."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.6"
+    ::= { ibmSEStpPortEntry 4 }
+
+ibmSEStpPortDesignatedPort OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The Port Identifier of the port on the Designated
+        Bridge for this port's segment."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 4.5.5.7"
+    ::= { ibmSEStpPortEntry 5 }
+
+ibmSEStpPortForwardTransitions OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of times this port has transitioned
+        from the Learning state to the Forwarding state."
+    ::= { ibmSEStpPortEntry 6 }
+
+ibmSEPortMaxInfo OBJECT-TYPE
+    SYNTAX INTEGER(1..65535)
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The maximum size of the INFO (non-MAC) field that
+        this port will receive or transmit."
+    ::= { ibmSEStpPortEntry 7 }
+
+ibmSEPortDataStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmSEPortDataStatisticsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "This table contains statistics about LAN Emulation
+         Data Frame Statistics for Super ELAN Bridge ports."
+    ::= { ibmSuperELAN 8 }
+
+ibmSEPortDataStatisticsEntry OBJECT-TYPE
+    SYNTAX IbmSEPortDataStatisticsEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "A list of LE Data Frame statistical information
+        for each SEB port"
+    INDEX { ibmSEBridgeId, ibmSEPortNum }
+-- Augments ibmSEPortConfigEntry
+    ::= { ibmSEPortDataStatisticsTable 1 }
+
+IbmSEPortDataStatisticsEntry ::= SEQUENCE {
+    ibmSEPortInFrames Counter32,
+    ibmSEPortOutFrames Counter32,
+    ibmSEPortRoutedInFrames Counter32,
+    ibmSEPortBpduFrames Counter32,
+    ibmSEPortInDiscards Counter32,
+    ibmSEPortDropSrcAddrFilters Counter32,
+    ibmSEPortDropDestAddrFilters Counter32,
+    ibmSEPortDropProtocolFilters Counter32,
+    ibmSEPortDropSrcNotFwds Counter32,
+    ibmSEPortDropDestNotFwds Counter32,
+    ibmSEPortDropInputOverflows Counter32,
+    ibmSEPortDropBpduOverflows Counter32,
+    ibmSEPortDropSrOverflows Counter32,
+    ibmSEPortRecNoBuffFailures Counter32,
+    ibmSEPortTransmitFailures Counter32,
+    ibmSEPortToBigFailures Counter32,
+    ibmSEPortLanIdFailures Counter32,
+    ibmSEPortStpLanIdFailures Counter32
+    }
+
+ibmSEPortInFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of frames that have been received by
+         this port from its segment. Note that a frame
+         received on the interface corresponding to this
+         port is only counted by this object if and only if
+         it is for a protocol being processed by the local
+         bridging function, including bridge management
+         frames."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.6.1.1.3"
+    ::= { ibmSEPortDataStatisticsEntry 1 }
+
+ibmSEPortOutFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of frames that have been transmitted
+         by this port to its segment.  Note that a frame
+         transmitted on the interface corresponding to this
+         port is only counted by this object if and only if
+         it is for a protocol being processed by the local
+         bridging function, including bridge management
+         frames."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.6.1.1.3"
+    ::= { ibmSEPortDataStatisticsEntry 2 }
+
+ibmSEPortRoutedInFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frames received on this port that were routed, rather than,
+        or in addition to, bridged."
+    ::= { ibmSEPortDataStatisticsEntry 3 }
+
+ibmSEPortBpduFrames OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Count of SE BPDU Frames"
+    ::= { ibmSEPortDataStatisticsEntry 4 }
+
+ibmSEPortInDiscards OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Count of valid frames received which were
+         discarded (i.e., filtered) by the Forwarding
+         Process."
+    REFERENCE
+        "IEEE 802.1D-1990: Section 6.6.1.1.3"
+    ::= { ibmSEPortDataStatisticsEntry 5 }
+
+ibmSEPortDropSrcAddrFilters OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frames dropped due to Source Address filtering"
+    ::= { ibmSEPortDataStatisticsEntry 6 }
+
+ibmSEPortDropDestAddrFilters OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frames dropped due to destination address filtering. These are
+        frames to destinations on the same LAN that they arrived on,
+        or otherwise filtered by the filtering database of the bridge."
+    ::= { ibmSEPortDataStatisticsEntry 7 }
+
+ibmSEPortDropProtocolFilters OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frames dropped due to user filtering of particular protocol
+        identifiers."
+    ::= { ibmSEPortDataStatisticsEntry 8 }
+
+ibmSEPortDropSrcNotFwds OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frames received on this port when it was not in forwarding
+        state (mostly in learning state)."
+    ::= { ibmSEPortDataStatisticsEntry 9 }
+
+ibmSEPortDropDestNotFwds OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frames not sent because output port not in forwarding state.
+        Don't know which port they tag on yet."
+    ::= { ibmSEPortDataStatisticsEntry 10 }
+
+ibmSEPortDropInputOverflows OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frames dropped due to input queue overflow."
+    ::= { ibmSEPortDataStatisticsEntry 11 }
+
+ibmSEPortDropBpduOverflows OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        BPDU's dropped due to BPDU input queue overflow."
+    ::= { ibmSEPortDataStatisticsEntry 12 }
+
+ibmSEPortDropSrOverflows OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Source Route Frames dropped due to SR input queue overflow."
+    ::= { ibmSEPortDataStatisticsEntry 13 }
+
+ibmSEPortRecNoBuffFailures OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Receive frames discarded due to no buffer available."
+    ::= { ibmSEPortDataStatisticsEntry 14 }
+
+ibmSEPortTransmitFailures OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Frame Count of transmit failures."
+    ::= { ibmSEPortDataStatisticsEntry 15 }
+
+ibmSEPortToBigFailures OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Count of frames to big to sent on this port."
+    ::= { ibmSEPortDataStatisticsEntry 16 }
+
+ibmSEPortLanIdFailures OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Count of frames discarded due to mismatch in the LAN ID."
+    ::= { ibmSEPortDataStatisticsEntry 17 }
+
+ibmSEPortStpLanIdFailures OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Count of frames discarded due to duplicate LAN ID or
+        spanning tree error."
+    ::= { ibmSEPortDataStatisticsEntry 18 }
+
+ibmBbcmConfigNextId OBJECT-TYPE
+    SYNTAX Integer32(0..214748364)
+    ACCESS read-only
+    STATUS obsolete
+    DESCRIPTION
+        "The next available index in the ibmBbcmConfigTable.
+        The value of this object can be used as the index by the
+        network manager to create an entry in the table.
+        
+        This object is no longer required since the ibmBbcmConfigIndex
+        is now specified as the superElanID."
+    ::= { ibmBbcmConfigGroup 1 }
+
+ibmBbcmConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmBbcmConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This table contains configuration values for the Bridging
+        Broadcast Manager (BBCM)."
+    ::= { ibmBbcmConfigGroup 2 }
+
+ibmBbcmConfigEntry OBJECT-TYPE
+    SYNTAX IbmBbcmConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the table represents a configured instance
+        of the BBCM."
+    INDEX { ibmBbcmConfigIndex }
+    ::= { ibmBbcmConfigTable 1 }
+
+IbmBbcmConfigEntry ::= SEQUENCE {
+    ibmBbcmConfigIndex IbmSEBridgeID,
+    ibmBbcmName DisplayString,
+    ibmBbcmConfigRowStatus RowStatus
+    }
+
+ibmBbcmConfigIndex OBJECT-TYPE
+    SYNTAX IbmSEBridgeID
+--    Rsyntax INTEGER(1..65535)
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        A value which uniquely identifies a conceptual row of the
+        BBCM Configuration Table.
+        
+        Since BBCM is a bridge based function, each row of this table
+        identifies a unique bridge instance."
+    ::= { ibmBbcmConfigEntry 1 }
+
+ibmBbcmName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+--    Rsyntax OCTET STRING(SIZE(0..32))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This is the name associated with the bridge instance. It is
+        either the Super Elan Bridge name or the name assigned
+        to the base bridge."
+    ::= { ibmBbcmConfigEntry 2 }
+
+ibmBbcmConfigRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+--    Rsyntax INTEGER {
+--        active(1),
+--        notInService(2),
+--        notReady(3),
+--        createAndGo(4),
+--        createAndWait(5),
+--        destroy(6)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object is used to create or
+        delete entries in the ibmBbcmConfigTable."
+    REFERENCE
+        "
+        RFC 1903, Textual Conventions for version 2 of the
+        Simple Network Management Protocol (SNMPv2)."
+    ::= { ibmBbcmConfigEntry 3 }
+
+ibmBbcmProtocolConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmBbcmProtocolConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the table represents a configured instance
+        of a specific protocol for a particular BBCM instance."
+    ::= { ibmBbcmConfigGroup 3 }
+
+ibmBbcmProtocolConfigEntry OBJECT-TYPE
+    SYNTAX IbmBbcmProtocolConfigEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the table represents a configuration information
+        for a specific protocol supported by a specific BBCM."
+    INDEX { ibmBbcmProtocolType, ibmBbcmConfigIndex }
+    ::= { ibmBbcmProtocolConfigTable 1 }
+
+IbmBbcmProtocolConfigEntry ::= SEQUENCE {
+    ibmBbcmProtocolType INTEGER,
+    ibmBbcmProtocolOperStatus INTEGER,
+    ibmBbcmProtocolAdminStatus INTEGER,
+    ibmBbcmProtocolCacheAge Integer32
+    }
+
+ibmBbcmProtocolType OBJECT-TYPE
+    SYNTAX INTEGER {
+        reserved(1),
+        ip(2)
+        }
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        BBCM Protocols Supported. For ease in implementation
+        the enumerated types for ibmBbcmProtocolType and
+        ibmBbcmStatProtocolType are equivalent.
+        
+        Note: 1 is reserved so ibmBbcmStatProtocolType of 1 can be all.
+              This allows enumeration values to match between ibmBbcmProtocolType
+              and ibmBbcmStatProtocolType."
+    ::= { ibmBbcmProtocolConfigEntry 1 }
+
+ibmBbcmProtocolOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        other(1),
+        up(2),
+        down(3)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The current BBCM Status
+        
+        Note for this implementation other is defined only to be consistent
+        with standard LE server MIBs, it has no meaning for the definition."
+    ::= { ibmBbcmProtocolConfigEntry 2 }
+
+ibmBbcmProtocolAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        up(2),
+        down(3)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+         The desired state of the BBCM as prescribed by the
+         operator. The actions of the agent will, if at all possible,
+         eventually result in the desired state being reflected in the
+         ibmBbcmProtocolOperStatus."
+    ::= { ibmBbcmProtocolConfigEntry 3 }
+
+ibmBbcmProtocolCacheAge OBJECT-TYPE
+    SYNTAX Integer32(1..214748364)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of minutes a protocol is cached by BBCM before
+        being added due to inactivity."
+    ::= { ibmBbcmProtocolConfigEntry 4 }
+
+ibmBbcmStatTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmBbcmStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This table contains activity statistics on a BBCM basis."
+    ::= { ibmBbcmStatsGroup 1 }
+
+ibmBbcmStatEntry OBJECT-TYPE
+    SYNTAX IbmBbcmStatEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the tables represents a BBCM protocol instance."
+    INDEX { ibmBbcmStatProtocolType, ibmBbcmConfigIndex }
+    ::= { ibmBbcmStatTable 1 }
+
+IbmBbcmStatEntry ::= SEQUENCE {
+    ibmBbcmStatProtocolType INTEGER,
+    ibmBbcmStatInReceives Counter32,
+    ibmBbcmStatInOctets Counter32,
+    ibmBbcmStatOutManaged Counter32,
+    ibmBbcmStatOutManagedOctets Counter32,
+    ibmBbcmStatOutNotManaged Counter32,
+    ibmBbcmStatOutNotManagedOctets Counter32,
+    ibmBbcmStatOutFiltered Counter32,
+    ibmBbcmStatOutFilteredOctets Counter32
+    }
+
+ibmBbcmStatProtocolType OBJECT-TYPE
+    SYNTAX INTEGER {
+        allprotocols(1),
+        ip(2)
+        }
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        BBCM Protocols Supported. For ease in implementation
+        the enumerated types for ibmBbcmProtocolType and
+        ibmBbcmStatProtocolType are equivalent.
+        
+        When the protocol type is 1 (allprotocols) the response
+        contains the total count for all protocols supported by
+        this BBCM."
+    ::= { ibmBbcmStatEntry 1 }
+
+ibmBbcmStatInReceives OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Number of packets processed by BBCM for this protocol"
+    ::= { ibmBbcmStatEntry 2 }
+
+ibmBbcmStatInOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Number of Octets processed by BBCM for this protocol.
+        
+        This count is of all octets seen, including control
+        information like headers."
+    ::= { ibmBbcmStatEntry 3 }
+
+ibmBbcmStatOutManaged OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Number of packets transformed by BBCM from broadcast to
+        unicast for this protocol."
+    ::= { ibmBbcmStatEntry 4 }
+
+ibmBbcmStatOutManagedOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Number of Octets transformed by BBCM from broadcast to
+        unicast for this protocol.
+        
+        This count is of all octets seen, including control
+        information like headers."
+    ::= { ibmBbcmStatEntry 5 }
+
+ibmBbcmStatOutNotManaged OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of packets seen by BBCM that were left as they
+        were originally broadcast."
+    ::= { ibmBbcmStatEntry 6 }
+
+ibmBbcmStatOutNotManagedOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of octets seen by BBCM that were left as they
+        were originally broadcast.
+        
+        This count is of all octets seen, including control
+        information like headers."
+    ::= { ibmBbcmStatEntry 7 }
+
+ibmBbcmStatOutFiltered OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Number of Packets Filtered by BBCM."
+    ::= { ibmBbcmStatEntry 8 }
+
+ibmBbcmStatOutFilteredOctets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Number of Octets Filtered by BBCM."
+    ::= { ibmBbcmStatEntry 9 }
+
+ibmVlanConfIndexNextID OBJECT-TYPE
+    SYNTAX IbmVlanIndex
+--    Rsyntax Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This is the next available Vlan Index for this agent. If should be
+        used when creating rows in the Vlan tables indexed by ibmVlanConfIndex."
+    ::= { ibmVlanGOGroup 1 }
+
+ibmVlanTopologyChange OBJECT-TYPE
+    SYNTAX TimeStamp
+--    Rsyntax TimeTicks
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This is the time stamp at which time the last VLAN Topology Change
+        occurred. This object can be used to monitor the change status of
+        the VLANs controlled by this agent.
+        
+        A change is defined whenever a VLAN has been added, deleted
+        or changes configuration.
+        
+        A change is also defined when a port is discovered or is aged out."
+    ::= { ibmVlanGOGroup 2 }
+
+ibmVlanMaxPortMap OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This is the maximum number of octets this agent supports
+        for representing ports in the the Port Map objects which use
+        the textual convention IbmVlanPortMap."
+    ::= { ibmVlanGOGroup 3 }
+
+ibmVlanMaxUDSWMaskFilter OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This is the maximum number of octets this agent supports for
+        ibmVlanUDSWMask or ibmVlanUDSWFilter. The Mask and Filter must
+        contain the same number of octets."
+    ::= { ibmVlanGOGroup 4 }
+
+ibmVlanConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmVlanConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The layout of the VLAN MIB tables relies on common information
+        and VLAN type specific information.
+        The ibmVlanConfTable is the base table. Columns are added to
+        this table depending on the VLAN type, for example
+        ibmVlanIPConfTable is for IP VLANs, ibmVlanIPXConfTable is
+        for IPX VlANS, ibmVlanUDSWConfTable is for User Defined Sliding
+        Window based VLANs, and ibmVlanMacConfTable is for MAC address
+        defined VLANs. Associated with the extended configuration
+        table is a base status table, ibmVlanStatusTable. This table
+        covers generic status and the USDW and MAC VLAN status
+        requirements are currently defined. Specific status table additions
+        are provided by the ibmVlanIpStatusTable for IP criteria."
+    ::= { ibmVlanConfGroup 1 }
+
+ibmVlanConfEntry OBJECT-TYPE
+    SYNTAX IbmVlanConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the ibmVlanConfTable provides configuration information
+        pertaining to a specific instance of a VLAN."
+    INDEX { ibmVlanConfIndex }
+    ::= { ibmVlanConfTable 1 }
+
+IbmVlanConfEntry ::= SEQUENCE {
+    ibmVlanConfIndex IbmVlanIndex,
+    ibmVlanConfBridgeId IbmSEBridgeID,
+    ibmVlanConfType IbmVlanType,
+    ibmVlanConfAgingTimer UInteger32,
+    ibmVlanConfForwardingPortMap IbmVlanPortMap,
+    ibmVlanConfIncludedPortMap IbmVlanPortMap,
+    ibmVlanConfExcludedPortMap IbmVlanPortMap,
+    ibmVlanConfName DisplayString,
+    ibmVlanConfRowStatus RowStatus
+    }
+
+ibmVlanConfIndex OBJECT-TYPE
+    SYNTAX IbmVlanIndex
+--    Rsyntax Integer32
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        An index assigned by the agent which uniquely identifies an instance
+        of a VLAN. This objects value is NOT guaranteed to be the same value
+        across agent restarts."
+    ::= { ibmVlanConfEntry 1 }
+
+ibmVlanConfBridgeId OBJECT-TYPE
+    SYNTAX IbmSEBridgeID
+--    Rsyntax INTEGER(1..65535)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The identifier of the Base Bridge or Super ELAN Bridge which
+         this VLAN is defined as an additional filter for."
+    ::= { ibmVlanConfEntry 2 }
+
+ibmVlanConfType OBJECT-TYPE
+    SYNTAX IbmVlanType
+--    Rsyntax INTEGER {
+--        ip(1),
+--        ipx(2),
+--        netbios(3),
+--        userDefSldWindo(4),
+--        mac(5),
+--        byPort(6),
+--        ipMulticast(7)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The type of VLAN."
+    ::= { ibmVlanConfEntry 3 }
+
+ibmVlanConfAgingTimer OBJECT-TYPE
+    SYNTAX UInteger32
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The amount of time (in minutes) an auto-detect port will remain in
+        the forwarding domain of the VLAN in the absence of traffic from that
+        VLAN. A value of zero means forever."
+    DEFVAL { 5000 }
+    ::= { ibmVlanConfEntry 4 }
+
+ibmVlanConfForwardingPortMap OBJECT-TYPE
+    SYNTAX IbmVlanPortMap
+--    Rsyntax OCTET STRING(SIZE(1..65535))
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Defines which ports are in forwarding state for this VLAN. The VLAN
+        port is in forwarding state if one of the following is true:
+        
+        The port has been statically included by setting the corresponding
+        port in ibmVlanIncludedPortMap.
+        
+        The port is not excluded, corresponding port in ibmVlanExcludedPortMap
+        is zero, and the port has seen VLAN traffic in the current age out period,
+        as defined by ibmVlanConfAgingTimer."
+    ::= { ibmVlanConfEntry 5 }
+
+ibmVlanConfIncludedPortMap OBJECT-TYPE
+    SYNTAX IbmVlanPortMap
+--    Rsyntax OCTET STRING(SIZE(1..65535))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each of the bits in the port map represents a bridge port and
+        defines which ports are automatically and permanently included
+        from the forwarding domain of the VLAN. A value of 1 for the
+        port means it is included. A value of 0 means the port has to
+        be discovered (port traffic seen) to be included in the VLAN."
+    DEFVAL { '0'h }
+    ::= { ibmVlanConfEntry 6 }
+
+ibmVlanConfExcludedPortMap OBJECT-TYPE
+    SYNTAX IbmVlanPortMap
+--    Rsyntax OCTET STRING(SIZE(1..65535))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each of the bits in the port map represents a bridge port and
+        defines which ports are automatically and permanently excluded
+        from the forwarding domain of the VLAN. A value of 1 for the
+        port means it is excluded from the VLAN even if traffic for this
+        VLAN type is seen on this port. A value of 0 means the port can
+        be discovered."
+    DEFVAL { '0'h }
+    ::= { ibmVlanConfEntry 7 }
+
+ibmVlanConfName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..32))
+--    Rsyntax OCTET STRING(SIZE(0..32))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        A node unique user defined name for the VLAN.
+        This name must be unique across all bridge instances at that node (agent)."
+    ::= { ibmVlanConfEntry 8 }
+
+ibmVlanConfRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+--    Rsyntax INTEGER {
+--        active(1),
+--        notInService(2),
+--        notReady(3),
+--        createAndGo(4),
+--        createAndWait(5),
+--        destroy(6)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object is used to create or delete entries (rows)
+        in the VLAN Configuration Table."
+    REFERENCE
+        "
+        RFC 1903, Textual Conventions for version 2 of the
+        Simple Network Management Protocol (SNMPv2)."
+    ::= { ibmVlanConfEntry 9 }
+
+ibmVlanIpConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmVlanIpConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The IBM VLAN Configuration Table provides the definitions required
+        to configure an IBM IP or IP Multicast Protocol Virtual LAN (PVLAN)
+        
+        This table defines the filters for the IP or IP Multicast PVLAN
+        
+        Entries in this table must be provided when the corresponding row
+        of the ibmVlanConfTable is being created."
+    ::= { ibmVlanConfGroup 2 }
+
+ibmVlanIpConfEntry OBJECT-TYPE
+    SYNTAX IbmVlanIpConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the ibmVlanIpConfTable provides configuration information
+        pertaining to a specific instance of an IP or IP Multicast PVLAN."
+    INDEX { ibmVlanConfIndex }
+    ::= { ibmVlanIpConfTable 1 }
+
+IbmVlanIpConfEntry ::= SEQUENCE {
+    ibmVlanIpNetworkAddr IpAddress,
+    ibmVlanIpNetworkMask IpAddress,
+    ibmVlanIpCutThruFromHere INTEGER,
+    ibmVlanIpCutThruToHere INTEGER
+    }
+
+ibmVlanIpNetworkAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The IP or IP Multicast address of the local forwarding component
+        used to route or bridge traffic for this VLAN.
+        
+        No default value. A default value must be specified when creating
+        an IP or IP Multicast VLAN."
+    ::= { ibmVlanIpConfEntry 1 }
+
+ibmVlanIpNetworkMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The IP address mask used to 'AND' against the IP address in a
+        received IP frame. The result of the 'AND' operation is compared to
+        the value given in the ibmVlanIPNetworkAddr in order to determine if
+        the frame belongs to the VLAN and should be forwarded.
+        
+        There is no default value. A mask must be specified when creating an IP PVLAN
+        entry in the ibmVlanConfTable.
+        
+        Note: if the ibmVlanConfType is IP Multicast ibmVlanIpNetworkMask
+              the ibmVlanIpNetworkMask is not used. A value 0.0.0.0 should be
+              returned by the agent."
+    ::= { ibmVlanIpConfEntry 2 }
+
+ibmVlanIpCutThruFromHere OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Specifies whether IP cut through communications originating from
+        this subnet are enabled."
+    DEFVAL { disabled }
+    ::= { ibmVlanIpConfEntry 3 }
+
+ibmVlanIpCutThruToHere OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Specifies whether IP cut through communications destined for
+        this subnet are enabled."
+    DEFVAL { disabled }
+    ::= { ibmVlanIpConfEntry 4 }
+
+ibmVlanIpxConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmVlanIpxConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The IBM IPX VLAN Configuration Table provides the definitions required
+        to configure an IBM IPX Protocol Virtual LAN (PVLAN).
+        
+        This table defines the filters for the IPX PVLAN.
+        
+        Entries in this table must be provided when the corresponding row
+        of the ibmVlanConfTable is being created."
+    ::= { ibmVlanConfGroup 3 }
+
+ibmVlanIpxConfEntry OBJECT-TYPE
+    SYNTAX IbmVlanIpxConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the ibmVlanIpxConfTable provides configuration information
+        pertaining to a specific instance of an IPX PVLAN."
+    INDEX { ibmVlanConfIndex }
+    ::= { ibmVlanIpxConfTable 1 }
+
+IbmVlanIpxConfEntry ::= SEQUENCE {
+    ibmVlanIpxNetworkAddr OCTET STRING(SIZE(4))
+    }
+
+ibmVlanIpxNetworkAddr OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(4))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This is the VLANs IPX Network Address.
+        
+        No Default Value, one must be specified when creating an IPX PVLAN
+        in the ibmVlanConfTable."
+    ::= { ibmVlanIpxConfEntry 1 }
+
+ibmVlanUDSWConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmVlanUDSWConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This table defines a 'sliding window' mechanism for the definition of
+        'policy' or 'user' defined VLANs. The mechanism is based on a set of
+        mask and filter fields that when compared to traffic data permit
+        forwarding decisions for the packet to be made for a VLAN.
+        The window may be moved or slide by defining the
+        appropriate offset type and offset values for the mask and filter
+        object fields.
+        Care must be taken to ensure the consistent configuration of VLAN
+        policies. Once a VLAN entry has been made in the table if a
+        change is made to any of the variables in that row for the VLAN
+        then all other entries in other nodes associated with the VLAN
+        must be updated in a corresponding manner!
+        
+        This table is an auxiliary extension to the base VLAN configuration
+        table defined in ibmVlanConfTable.
+        See that table for additional Vlan details.
+        "
+    ::= { ibmVlanConfGroup 4 }
+
+ibmVlanUDSWConfEntry OBJECT-TYPE
+    SYNTAX IbmVlanUDSWConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the ibmVlanUDSWConfTable provides configuration information
+        pertaining to a specific instance of an UDSW VLAN.
+        
+        Entries in this table must be provided when the corresponding row
+        of the ibmVlanConfTable is being created."
+    INDEX { ibmVlanConfIndex }
+    ::= { ibmVlanUDSWConfTable 1 }
+
+IbmVlanUDSWConfEntry ::= SEQUENCE {
+    ibmVlanUDSWOffsetType INTEGER,
+    ibmVlanUDSWOffset INTEGER,
+    ibmVlanUDSWMask OCTET STRING,
+    ibmVlanUDSWFilter OCTET STRING
+    }
+
+ibmVlanUDSWOffsetType OBJECT-TYPE
+    SYNTAX INTEGER {
+        udswMacOffset(1),
+        udswInfoOffset(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object specifies the base location in the traffic frame where
+        the ibmVlanUDSWOffset will be used to start the comparison with the
+        ibmVlanUDSWFilter value to determine if this frame is in a Sliding
+        Window Vlan.
+        
+        Two starting location modes are predefined for LAN Emulation VLANs.
+        udswMacOffset indicates that the starting location is the first byte
+        of the MAC destination address in the traffic frame. This mode may be
+        used for VLAN filtering on MAC addresses, for both Token Ring traffic and
+        Ethernet traffic. The ibmVlanMacConfTable however should be used to
+        define source MAC address based VLANs. This mode may also be used for
+        VLAN filtering on protocol and address information or for other user
+        specified information found in a portion of the LLC information field
+        when source routed Token Ring traffic is NOT the traffic source (due
+        to the presence of the variable size Routing Information Field).
+        
+        udswInfoOffset is a generic way of indicating that the starting
+        location is at the first byte of the LLC information field.
+        This mode may be used for VLAN filtering on protocol and address
+        information or for other user specified information found in a
+        portion of the LLC information field.  For source routed Token Ring,
+        this location is not static within the frame since the
+        Routing Information Field (RIF) is of variable length depending
+        on LAN segments in the route. Specifying this mode permits the
+        offset to begin relative to the end of the last byte of the RIF.
+        
+        There is no default value for this entry. The offset type
+        must be defined when creating a user defined sliding window VLAN
+        in the ibmVlanConfTable."
+    ::= { ibmVlanUDSWConfEntry 1 }
+
+ibmVlanUDSWOffset OBJECT-TYPE
+    SYNTAX INTEGER(0..255)
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object determines the starting location in the traffic frame
+        that will be used in the comparison with the ibmVlanUDSWFilter
+        value to determine if this frame is in a Sliding Window Vlan.
+        It is specified as a value offset indicating the number of octets
+        from the base location determined by the mode selected in the
+        ibmVlanUSDWOffsetType.
+        
+        udswMacOffset mode indicates that the starting location for the
+        compare is ibmVlanUDSWOffset octets after the the first byte
+        of the MAC destination address.
+        
+        udswInfoOffset mode indicates that the starting location is
+        ibmVlanUDSWOffset octets after the start of the frame's
+        information field.
+        
+        There is no default value and this offset selection mode must be
+        defined when creating a UDSW VLAN in the ibmVlanConfTable."
+    ::= { ibmVlanUDSWConfEntry 2 }
+
+ibmVlanUDSWMask OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..256))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object determines the size and bit pattern that is compared to
+        the traffic frame at the location specified by the offset type and
+        starting at the offset location in order to produce a result.
+        The size of the mask must be equivalent to the size of the filter
+        defined in ibmVlanUDSWFilter. The value of 1 in a mask bit location
+        has the effect of making a comparison of the mask  to the traffic
+        frame significant.  The value of a zero in a mask bit location has
+        the effect of making the comparison of the mask with the traffic
+        frame a 'don't care'.
+        
+        The octets in this object are transmitted in most significant byte
+        first order.
+        
+        There is no default value and this mask must be specified when
+        creating a UDSW VLAN in the ibmVlanConfTable."
+    ::= { ibmVlanUDSWConfEntry 3 }
+
+ibmVlanUDSWFilter OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(1..256))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object determines the size and bit pattern that is compared to
+        the result after the mask being applied to the traffic frame
+        at the location specified by the offset type and starting at
+        the offset location.
+        
+        The size of the filter must be equivalent to the size of the
+        mask defined in ibmVlanUDSWMask.
+        
+        If the result exactly matches the bit values defined in the filter
+        then the frame is forwarded to the VLAN identified by the index
+        for this table entry.
+        
+        The octets in this object are transmitted in most significant byte
+        first order.
+        
+        There is no default value and this filter must be specified when
+        creating a UDSW VLAN in the ibmVlanConfTable."
+    ::= { ibmVlanUDSWConfEntry 4 }
+
+ibmVlanMacConfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmVlanMacConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The IBM MAC VLAN Configuration Table provides the definitions required
+        to configure an IBM MAC Virtual LAN (VLAN).
+        
+        This table defines the filters for the IBM MAC VLAN.
+        
+        Entries in this table must be provided when the corresponding row
+        of the ibmVlanConfTable is being created."
+    ::= { ibmVlanConfGroup 5 }
+
+ibmVlanMacConfEntry OBJECT-TYPE
+    SYNTAX IbmVlanMacConfEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry of the ibmVlanMacConfTable provides configuration information
+        pertaining to a specific instance of a MAC VLAN."
+    INDEX { ibmVlanConfIndex, ibmVlanMacAddrIndex }
+    ::= { ibmVlanMacConfTable 1 }
+
+IbmVlanMacConfEntry ::= SEQUENCE {
+    ibmVlanMacAddrIndex Integer32,
+    ibmVlanMacAddresses OCTET STRING,
+    ibmVlanMacAddrConfRowStatus RowStatus
+    }
+
+ibmVlanMacAddrIndex OBJECT-TYPE
+    SYNTAX Integer32
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The MAC address index being used as a filter for this MAC address VLAN."
+    ::= { ibmVlanMacConfEntry 1 }
+
+ibmVlanMacAddresses OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..600))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        A string of Source MAC addresses being used as a filter for this
+        MAC address VLAN."
+    ::= { ibmVlanMacConfEntry 2 }
+
+ibmVlanMacAddrConfRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+--    Rsyntax INTEGER {
+--        active(1),
+--        notInService(2),
+--        notReady(3),
+--        createAndGo(4),
+--        createAndWait(5),
+--        destroy(6)
+--        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        This object is used to create or delete entries (rows)
+        in the MAC Address Configuration Table."
+    REFERENCE
+        "
+        RFC 1903, Textual Conventions for version 2 of the
+        Simple Network Management Protocol (SNMPv2)."
+    ::= { ibmVlanMacConfEntry 3 }
+
+ibmVlanStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmVlanStatusEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The IBM VLAN Status Table provides the administration and
+        statistics for an IBM Virtual LAN (VLAN)."
+    ::= { ibmVlanStatusGroup 1 }
+
+ibmVlanStatusEntry OBJECT-TYPE
+    SYNTAX IbmVlanStatusEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry in the ibmVlanStatusTable augments a specific
+        instance of an IP VLAN."
+    INDEX { ibmVlanConfIndex }
+-- Augments ibmVlanConfEntry
+    ::= { ibmVlanStatusTable 1 }
+
+IbmVlanStatusEntry ::= SEQUENCE {
+    ibmVlanOperStatus INTEGER,
+    ibmVlanAdminStatus INTEGER,
+    ibmVlanProcessedPackets Counter32,
+    ibmVlanDiscardedPackets Counter32,
+    ibmVlanDiscPktsMac MacAddress
+    }
+
+ibmVlanOperStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Current state of the VLAN"
+    ::= { ibmVlanStatusEntry 1 }
+
+ibmVlanAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+        }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Desired state of the VLAN. This change becomes immediate
+        on completion of the set operation and does not require system restart."
+    ::= { ibmVlanStatusEntry 2 }
+
+ibmVlanProcessedPackets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of Broadcast/Multicast packets received by this VLAN."
+    ::= { ibmVlanStatusEntry 3 }
+
+ibmVlanDiscardedPackets OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of Broadcast packets discarded by this VLAN
+        because the source VLAN was excluded on the port."
+    ::= { ibmVlanStatusEntry 4 }
+
+ibmVlanDiscPktsMac OBJECT-TYPE
+    SYNTAX MacAddress
+--    Rsyntax OCTET STRING(SIZE(6))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The object contains the Source MAC address from the last packet that
+        was discarded because the source VLAN was excluded on the port.
+        This will aid in finding the station that is being excluded.
+        
+        This object is defined as read-write so that a manager can clear
+        the current Source MAC address after identifying the station that
+        is trying to transmit on an excluded port. In order to clear the
+        object the manager can specify a MAC address of all zeros 0x000000000000."
+    ::= { ibmVlanStatusEntry 5 }
+
+ibmVlanIpStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IbmVlanIpStatusEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The IBM IP VLAN Status Table provides the administration and
+        statistics for an IBM IP Protocol Virtual LAN (PVLAN)."
+    ::= { ibmVlanStatusGroup 2 }
+
+ibmVlanIpStatusEntry OBJECT-TYPE
+    SYNTAX IbmVlanIpStatusEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        "
+        Each entry in the ibmVlanIpStatusTable augments a specific
+        instance of an IP PVLAN."
+    INDEX { ibmVlanConfIndex }
+-- Augments ibmVlanIpConfEntry
+    ::= { ibmVlanIpStatusTable 1 }
+
+IbmVlanIpStatusEntry ::= SEQUENCE {
+    ibmVlanIpCutThruFromPkts Counter32,
+    ibmVlanIpCutThruToPkts Counter32,
+    ibmVlanIpCutThruFromDiscPkts Counter32,
+    ibmVlanIpCutThruToDiscPkts Counter32
+    }
+
+ibmVlanIpCutThruFromPkts OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of Broadcast/Multicast packets cutThru from this VLAN."
+    ::= { ibmVlanIpStatusEntry 1 }
+
+ibmVlanIpCutThruToPkts OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of Broadcast/Multicast packets received to this VLAN."
+    ::= { ibmVlanIpStatusEntry 2 }
+
+ibmVlanIpCutThruFromDiscPkts OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of Broadcast/Multicast packets discarded because cutThru
+        from this VLAN was disabled."
+    ::= { ibmVlanIpStatusEntry 3 }
+
+ibmVlanIpCutThruToDiscPkts OBJECT-TYPE
+    SYNTAX Counter32
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "
+        The number of Broadcast/Multicast packets discarded before it is forwarded
+        because cutThru to this VLAN was disabled."
+    ::= { ibmVlanIpStatusEntry 4 }
+
+ibmLeCServerXMonLECSGroup OBJECT IDENTIFIER ::= { ibmLeMIBGroups 1 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    
+--    These are the objects are used to support LECS
+--  objects
+--    ibmLeServerXMonLecsInstances, ibmLeServerXLecsUsedConnections
+
+ibmLeCServerXMonLESGroup OBJECT IDENTIFIER ::= { ibmLeMIBGroups 2 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    
+--    These are the objects are used to support LES
+--  objects
+--    ibmLeServerXMonLesInstances, 
+--    ibmLeServerXLesMonUsedConnections, 
+--    ibmLeServerXLesMonLesLecInstances, ibmLeServerXLesMinLecID, 
+--    ibmLeServerXLesMaxLecID
+
+ibmLeCServerXMonBUSGroup OBJECT IDENTIFIER ::= { ibmLeMIBGroups 3 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    
+--    These are the objects are used to support BUS
+--  objects
+--    ibmLeServerXMonBusInstances, 
+--    ibmLeServerXBusMonUsedConnections, 
+--    ibmLeServerXBusMonBusLecInstances
+
+ibmCSuperELANGroup OBJECT IDENTIFIER ::= { ibmLeMIBGroups 4 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    
+--    These are the objects are used to support SuperELAN
+--  objects
+--    ibmSEPortArpRequestsIn, ibmSEPortArpRequestsOut, 
+--    ibmSEArpRequestsErrors, ibmSEPortArpRequestsFiltered, 
+--    ibmSEPortArpRepliesIn, ibmSEPortArpRepliesOut, 
+--    ibmSEPortArpRepliesErrors, ibmSEPortNarpRequestsIn, 
+--    ibmSEPortNarpRequestsOut, ibmSEPortFlushRequestsIn, 
+--    ibmSEPortFlushRequestsOut, ibmSEPortFlushRepliesIn, 
+--    ibmSEPortFlushRepliesOut, ibmSEPortFlushRequestErrors, 
+--    ibmSEPortFlushRepliesErrors, ibmSEPortLeCtrlFramesIn, 
+--    ibmSEPortLeCtrlFramesOut, 
+--    ibmSEPortLeCtrlFramesDiscSrcPortNotFwrd, 
+--    ibmSEPortLeCtrlFramesDiscDestPortNotFwrd, ibmSEAtmIfNumber, 
+--    ibmSEEnabled, ibmSEName, ibmSEFrameSize, ibmSEMacCacheAge, 
+--    ibmSERDCacheAge, ibmSEPriority, ibmSEMaxAge, 
+--    ibmSEBridgeHelloTime, ibmSEBridgeForwardDelay, 
+--    ibmSEBridgeAddress, ibmSEType, ibmSEConfigRowStatus, 
+--    ibmSEPortIfNumber, ibmSEPortElanName, ibmSEPortRemoteElan, 
+--    ibmSEPortEnabled, ibmSEPortPriority, ibmSEPortRootCost, 
+--    ibmSEPortRowStatus, ibmSENumPorts, ibmSEProtocolSpecification, 
+--    ibmSETimeSinceTopologyChange, ibmSETopChanges, 
+--    ibmSEDesignatedRoot, ibmSERootCost, ibmSERootPort, 
+--    ibmSEBridgeMaxAge, ibmSEHelloTime, ibmSEHoldTime, 
+--    ibmSEForwardDelay, ibmSEMacLearnedEntryDiscards, 
+--    ibmSERDLearnedEntryDiscards, ibmSEStpPortState, 
+--    ibmSEStpPortDesignatedRoot, ibmSEStpPortDesignatedCost, 
+--    ibmSEStpPortDesignatedBridge, ibmSEStpPortDesignatedPort, 
+--    ibmSEStpPortForwardTransitions, ibmSEPortMaxInfo, 
+--    ibmSEPortInFrames, ibmSEPortOutFrames, 
+--    ibmSEPortRoutedInFrames, ibmSEPortBpduFrames, 
+--    ibmSEPortInDiscards, ibmSEPortDropSrcAddrFilters, 
+--    ibmSEPortDropDestAddrFilters, ibmSEPortDropProtocolFilters, 
+--    ibmSEPortDropSrcNotFwds, ibmSEPortDropDestNotFwds, 
+--    ibmSEPortDropInputOverflows, ibmSEPortDropBpduOverflows, 
+--    ibmSEPortDropSrOverflows, ibmSEPortRecNoBuffFailures, 
+--    ibmSEPortTransmitFailures, ibmSEPortToBigFailures, 
+--    ibmSEPortLanIdFailures, ibmSEPortStpLanIdFailures
+
+ibmCBbcmMIBGroup OBJECT IDENTIFIER ::= { ibmLeMIBGroups 5 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    
+--    These are the objects are used to support BBCM
+--  objects
+--    ibmBbcmName, ibmBbcmConfigRowStatus, 
+--    ibmBbcmProtocolOperStatus, ibmBbcmProtocolAdminStatus, 
+--    ibmBbcmProtocolCacheAge, ibmBbcmStatInReceives, 
+--    ibmBbcmStatInOctets, ibmBbcmStatOutManaged, 
+--    ibmBbcmStatOutManagedOctets, ibmBbcmStatOutNotManaged, 
+--    ibmBbcmStatOutNotManagedOctets, ibmBbcmStatOutFiltered, 
+--    ibmBbcmStatOutFilteredOctets
+
+ibmCVlanMIBGroup OBJECT IDENTIFIER ::= { ibmLeMIBGroups 6 }
+-- OBJECT-GROUP
+--  Status
+--    mandatory
+--  Descr
+--    
+--    These are the objects are used to support VLAN
+--  objects
+--    ibmVlanConfIndexNextID, ibmVlanTopologyChange, 
+--    ibmVlanMaxPortMap, ibmVlanMaxUDSWMaskFilter, ibmVlanConfIndex, 
+--    ibmVlanConfBridgeId, ibmVlanConfType, ibmVlanConfAgingTimer, 
+--    ibmVlanConfForwardingPortMap, ibmVlanConfIncludedPortMap, 
+--    ibmVlanConfExcludedPortMap, ibmVlanConfName, 
+--    ibmVlanConfRowStatus, ibmVlanIpNetworkAddr, 
+--    ibmVlanIpNetworkMask, ibmVlanIpCutThruFromHere, 
+--    ibmVlanIpCutThruToHere, ibmVlanIpxNetworkAddr, 
+--    ibmVlanUDSWOffsetType, ibmVlanUDSWOffset, ibmVlanUDSWMask, 
+--    ibmVlanUDSWFilter, ibmVlanMacAddrIndex, ibmVlanMacAddresses, 
+--    ibmVlanMacAddrConfRowStatus, ibmVlanOperStatus, 
+--    ibmVlanAdminStatus, ibmVlanProcessedPackets, 
+--    ibmVlanDiscardedPackets, ibmVlanDiscPktsMac, 
+--    ibmVlanIpCutThruFromPkts, ibmVlanIpCutThruToPkts, 
+--    ibmVlanIpCutThruFromDiscPkts, ibmVlanIpCutThruToDiscPkts
+
+ibmLeMIBCompliance OBJECT IDENTIFIER ::= { ibmLeMIBCompliances 1 }
+-- MODULE-COMPLIANCE
+--  Status
+--    mandatory
+--  Descr
+--    The compliance statement for SNMP IBM extensions
+--    for ATM emulated LANs.
+--  Module
+--    >>current<<
+--   OptGroup
+--    ibmLeCServerXMonLECSGroup
+--   OptGroup
+--    ibmLeCServerXMonLESGroup
+--   OptGroup
+--    ibmLeCServerXMonBUSGroup
+--   OptGroup
+--    ibmCSuperELANGroup
+--   OptGroup
+--    ibmCBbcmMIBGroup
+--   OptGroup
+--    ibmCVlanMIBGroup
+
+
+END
+

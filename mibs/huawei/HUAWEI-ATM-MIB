@@ -1,0 +1,3073 @@
+-- ==================================================================
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: HUAWEI Private ATM Interface MIB
+-- Reference:
+-- Version: V2.17
+-- History:
+--      V1.0 initial
+--      V1.1 add hwAtmPvcGroupTable and hwAtmPvcGroupMemTable for
+--           pvc-group; add hwAtmPvcPppTable for PPPoA on demand; add a node
+--           hwAtmPvcBridgeBroadcast in hwAtmPvcBridgeTable for bridge.
+--      V1.2 add hwAtmPvcDynamicTable for auto PVC, add hwAtmPvcDynamicPppTable
+--           for PPP on auto PVC, add hwAtmPvcDynamicBridgeTable for auto PVC,
+--           add hwAtmDynamicEncapsulateTable for auto PVC.
+--      V2.11 add hwAtmPvcStatisticInputCellDrops,hwAtmPvcStatisticInputPktDrops,
+--           hwAtmPvcStatisticOutputCellDrops and hwAtmPvcStatisticOutputPktDrops
+--           for HwAtmPvcStatisticEntry.
+--      V2.12 modify the invalid value of hwAtmPvcServiceBuffer and hwAtmPvpServiceBuffer 
+--           from 4294967295 to -1. Modify the MAX-ACCESS of hwAtmVpcConnectivityTestRowStatus 
+--           and hwAtmVccConnectivityTestRowStatus from accessible-for-notify to read-create.
+
+
+-- ==================================================================
+-- ==================================================================
+--
+-- Variables and types be imported
+--
+-- ==================================================================
+
+    HUAWEI-ATM-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            AtmVpIdentifier, AtmVcIdentifier
+                FROM ATM-TC-MIB
+            atmMIBObjects
+                FROM ATM-MIB
+            hwDatacomm
+                FROM HUAWEI-MIB
+            ifName, InterfaceIndex, InterfaceIndexOrZero
+                FROM IF-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE
+            ,NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+            Counter64 
+                FROM SNMPv2-SMI
+            RowStatus, TruthValue, DisplayString
+                FROM SNMPv2-TC
+	    hwFrameIndex, hwSlotIndex, hwPortIndex
+	    	FROM HUAWEI-DEVICE-MIB;
+
+--  October 17, 2007 at 22:30 GMT
+-- October 17, 2007 at 22:30 GMT
+        hwAtmMIB MODULE-IDENTITY
+            LAST-UPDATED "201803160000Z"
+            ORGANIZATION
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO
+               "Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+             DESCRIPTION
+                "V1.3, add hwAtmPvcStatisticInputCellDrops,hwAtmPvcStatisticInputPktDrops,
+                          hwAtmPvcStatisticOutputCellDrops and hwAtmPvcStatisticOutputPktDrops
+                          for HwAtmPvcStatisticEntry."
+
+            REVISION     "201803160000Z"
+            DESCRIPTION
+                "V2.17, modify default value of hwAtmVccAal5EncapsType and hwAtmPvcDynamicAal5EncapsType."
+
+            REVISION     "201801130000Z"
+            DESCRIPTION
+                "V2.16, modify node description."
+				
+            REVISION     "201702170000Z"
+            DESCRIPTION
+                "V2.15, modify the description of hwAtmVpcConnectivityTestResultNotify and hwAtmVccConnectivityTestResultNotify."
+
+            REVISION     "201612270000Z"
+            DESCRIPTION
+                "V2.14, add trap node hwNoAtmResourceAlarmTrap of table hwAtmTraps."
+
+            REVISION     "201509300000Z"
+            DESCRIPTION
+                "V2.13, add hwAtmPvcQueueStatisticTable for pvc-queue."
+
+            REVISION     "201509300000Z"
+            DESCRIPTION
+                "Modify the MAX-ACCESS of hwAtmPvcTransmittalDirection from not-accessible to read-only."
+
+            REVISION     "201407280000Z"
+            DESCRIPTION
+                "Modify the invalid value of hwAtmPvcServiceBuffer and hwAtmPvpServiceBuffer  from 4294967295 to -1. 
+                 Modify the MAX-ACCESS of hwAtmVpcConnectivityTestRowStatus and hwAtmVccConnectivityTestRowStatus
+                 from accessible-for-notify to read-create"
+
+            REVISION     "201402180000Z"
+            DESCRIPTION
+                "This MIB is mainly used to configure the ATM OC-3/STM-1 and ATM OC-12/STM-4
+                 interface, IPoA, IPoEoA, PVC service type, OAM F5 loopback, parameters of
+                 the VP limit, and mapping between the peer VPI and the local VPI."
+
+            REVISION     "201103250000Z"
+            DESCRIPTION
+                "V1.2, add hwAtmPvcDynamicTable for auto PVC, add hwAtmDynamicPppTable
+                          for PPP on auto PVC, add hwAtmDynamicBridgeTable for auto PVC,
+                          add hwAtmDynamicEncapsulateTable for auto PVC."
+
+            REVISION     "201009250000Z"
+            DESCRIPTION
+                "V1.1, add hwAtmPvcGroupTable and hwAtmPvcGroupMemTable for
+                          pvc-group; add hwAtmPvcPppTable for PPPoA on demand; add a node
+                          hwAtmPvcBridgeBroadcast in hwAtmPvcBridgeTable for bridge."
+
+            REVISION     "200710172230Z"
+            DESCRIPTION
+                "V1.0, the initial revision for MIB about ATM protocl."
+            ::= { hwDatacomm 156 }
+
+
+--
+-- Node definitions
+--
+
+--  Node definitions
+--
+        hwAtmObjects OBJECT IDENTIFIER ::= { hwAtmMIB 1 }
+
+--     hwAtmTable Table
+--
+        hwAtmTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the parameters of the ATM interface."
+            ::= { hwAtmObjects 1 }
+
+        hwAtmEntry OBJECT-TYPE
+            SYNTAX HwAtmEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the parameters of the ATM interface."
+
+
+            INDEX { hwAtmIfIndex }
+            ::= { hwAtmTable 1 }
+
+        HwAtmEntry ::=
+            SEQUENCE {
+                hwAtmIfIndex
+                    InterfaceIndex,
+                hwAtmIfType
+                    INTEGER,
+                hwAtmClock
+                    INTEGER,
+                hwAtmFrameFormat
+                    INTEGER,
+                hwAtmScramble
+                    TruthValue,
+                hwAtmLoopback
+                    INTEGER,
+                hwAtmPitp
+                    INTEGER,
+                hwAtmFlagJ0Mode
+                    INTEGER,
+                hwAtmFlagJ0Value
+                    Integer32,
+                hwAtmFlagJ0Trace
+                    OCTET STRING,
+                hwAtmFlagJ1Mode
+                    INTEGER,
+                hwAtmFlagJ1Value
+                    Integer32,
+                hwAtmFlagJ1Trace
+                    OCTET STRING,
+                hwAtmFlagC2Value
+                    Integer32
+                     }
+
+        hwAtmIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface index."
+            ::= { hwAtmEntry 1 }
+
+        hwAtmIfType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                oc3OrStm1(1),
+                oc12OrStm4(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface type."
+            ::= { hwAtmEntry 11 }
+
+        hwAtmClock OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                master(1),
+                slave(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Master clock: uses the internal clock signal.
+                Slave clock: uses the line clock signal."
+
+            ::= { hwAtmEntry 12 }
+
+        hwAtmFrameFormat OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                sdh(1),
+                sonet(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "For the optical interface STM-1/STM-4, the frame format on the ATM interface
+                is SDH; for the OC-3/OC-12 interface, the frame format is SONET.
+                The default frame format is SDH."
+            DEFVAL { sdh }
+            ::= { hwAtmEntry 13 }
+
+        hwAtmScramble OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "By default, the scramble function is enabled. The scramble function
+                takes effect only on payload rather than cell header.
+                true: enables the scramble function. false: disables the scramble function."
+            DEFVAL { true }
+            ::= { hwAtmEntry 14 }
+
+        hwAtmLoopback OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                local(1),
+                remote(2),
+                payload(3),
+                none(255)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable the loopback function of the channel.
+                local: enables the local loopback on the interface.
+                remote: enables the remote loopback on the interface.
+                payload: enables the remote payload loopback on the interface.
+                By default, all loopback functions are disabled."
+            DEFVAL { none }
+            ::= { hwAtmEntry 15 }
+
+        hwAtmPitp OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            true(1),
+            false(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Enable or disable the function of PITP."
+        DEFVAL { false }
+        ::= { hwAtmEntry 16 }
+
+    hwAtmFlagJ0Mode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            j01ByteMode(1),
+            j016ByteMode(2),
+            j064ByteOrNullMode(3),
+            peer(4)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates the overhead byte of the SDH frame. j0: sets section trace byte.
+            The default value is j016ByteMode(2);hwAtmFlagJ0Trace:NetEngine."
+        ::= { hwAtmEntry 17 }
+
+
+    hwAtmFlagJ0Value OBJECT-TYPE
+        SYNTAX Integer32 (0..127)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates the value of j01ByteMode. When hwAtmFlagJ0Mode is set to j01ByteMode, hwAtmFlagJ0Value takes effect."
+        ::= { hwAtmEntry 18 }
+
+
+    hwAtmFlagJ0Trace OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Set section trace byte.
+            When hwAtmFlagJ0Mode is set to j016ByteMode or j064ByteOrNullMode, this variable takes effect.
+            When hwAtmFlagJ0Mode is set to j016ByteMode, the value of this variable is up to 15 characters trace byte.
+            When hwAtmFlagJ0Mode is set to j064ByteOrNullMode, the value of this variable is up to 64 characters trace byte."
+        ::= { hwAtmEntry 19 }
+
+
+    hwAtmFlagJ1Mode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            j11ByteMode(1),
+            j116ByteMode(2),
+            j164ByteOrNullMode(3),
+            peer(4)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates the overhead byte of the SDH frame. j1: sets path trace byte.
+            The default value is j116ByteMode(2);hwAtmFlagJ1Trace:NetEngine."
+        ::= { hwAtmEntry 20 }
+
+
+    hwAtmFlagJ1Value OBJECT-TYPE
+        SYNTAX Integer32 (0..127)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates the value of j11ByteMode. When hwAtmFlagJ1Mode is set to j11ByteMode, hwAtmFlagJ1Value takes effect."
+        ::= { hwAtmEntry 21 }
+
+
+    hwAtmFlagJ1Trace OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Set path trace byte.
+            When hwAtmFlagJ1Mode is set to j116ByteMode or j164ByteOrNullMode, this variable takes effect.
+            When hwAtmFlagJ1Mode is set to j116ByteMode, this variable is up to 15 characters trace byte.
+            When hwAtmFlagJ1Mode is set to j164ByteOrNullMode, this variable is up to 64 characters trace byte."
+        ::= { hwAtmEntry 22 }
+
+    hwAtmFlagC2Value OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates the overhead byte of the SDH frame.
+            c2: indicates the signal label byte. It is a hexdecimal value ranging from 00 to FF.
+            The default value is 0x02."
+        ::= { hwAtmEntry 23 }
+
+
+--      hwAtmMapPvpTable table
+--
+        hwAtmMapPvpTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmMapPvpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the mapping between the peer VPI and the local
+
+VPI."
+            ::= { hwAtmObjects 2 }
+
+        hwAtmMapPvpEntry OBJECT-TYPE
+            SYNTAX HwAtmMapPvpEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the mapping between the peer VPI and the local
+
+VPI."
+            INDEX { hwAtmMapPvpIfIndex, hwAtmMapPvpVplVpi }
+            ::= { hwAtmMapPvpTable 1 }
+
+        HwAtmMapPvpEntry ::=
+            SEQUENCE {
+                hwAtmMapPvpIfIndex
+                    InterfaceIndex,
+                hwAtmMapPvpVplVpi
+                    AtmVpIdentifier,
+                hwAtmMapPvpRemoteVplVpi
+                    AtmVpIdentifier,
+                hwAtmMapPvpBi
+                   INTEGER,
+                hwAtmMapPvpRowStatus
+                    RowStatus
+             }
+
+        hwAtmMapPvpIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface index."
+            ::= { hwAtmMapPvpEntry 1 }
+
+        hwAtmMapPvpVplVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the local VPI value. The value is an integer.
+                For UNI interface, VPI value ranging from 0 to 255;
+                For NNI interface, VPI value ranging from 0 to 4095."
+            ::= { hwAtmMapPvpEntry 2 }
+
+        hwAtmMapPvpRemoteVplVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the peer VPI value. The value is an integer.
+                 For UNI interface, VPI value ranging from 0 to 255;
+                 For NNI interface, VPI value ranging from 0 to 4095."
+            ::= { hwAtmMapPvpEntry 11 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.2.1.12
+    hwAtmMapPvpBi OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            downdirectional(0),
+            bidirectional(1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwAtmMapPvpEntry 12 }
+
+        hwAtmMapPvpRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "This variable is used to create or delete an object."
+            ::= { hwAtmMapPvpEntry 51 }
+
+--     hwAtmMapPvcTable table
+--
+        hwAtmMapPvcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmMapPvcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the mapping between the peer VPI/VCI
+                 and the local VPI/VCI."
+            ::= { hwAtmObjects 3 }
+
+        hwAtmMapPvcEntry OBJECT-TYPE
+            SYNTAX HwAtmMapPvcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the mapping between the peer VPI/VCI
+                 and the local VPI/VCI."
+            INDEX { hwAtmMapPvcIfIndex, hwAtmMapPvcVclVpi, hwAtmMapPvcVclVci }
+            ::= { hwAtmMapPvcTable 1 }
+
+        HwAtmMapPvcEntry ::=
+            SEQUENCE {
+                hwAtmMapPvcIfIndex
+                    InterfaceIndex,
+                hwAtmMapPvcVclVpi
+                    AtmVpIdentifier,
+                hwAtmMapPvcVclVci
+                    AtmVcIdentifier,
+                hwAtmMapPvcRemoteVclVci
+                    AtmVcIdentifier,
+                hwAtmMapPvcRemoteVclVpi
+                    AtmVpIdentifier,
+        hwAtmMapPvcBi
+            INTEGER,
+                hwAtmMapPvcRowStatus
+                    RowStatus
+             }
+
+        hwAtmMapPvcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface index."
+            ::= { hwAtmMapPvcEntry 1 }
+
+        hwAtmMapPvcVclVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the local VPI value. The value is an integer.
+                For UNI interface, VPI value ranging from 0 to 255;
+                For NNI interface, VPI value ranging from 0 to 4095."
+            ::= { hwAtmMapPvcEntry 2 }
+
+        hwAtmMapPvcVclVci OBJECT-TYPE
+            SYNTAX AtmVcIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the local VCI value. VCI is short for Virtual Channel Identifier.
+                The VCI value ranges from 0 to 65535. Generally, the values 3, 4 and 65535 are
+                reserved for specail use."
+            ::= { hwAtmMapPvcEntry 3 }
+
+        hwAtmMapPvcRemoteVclVci OBJECT-TYPE
+            SYNTAX AtmVcIdentifier
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the peer VCI value. VCI is short for Virtual Channel Identifier.
+                The VCI value ranges from 0 to 65535. Generally, the values 3, 4 and 65535 are
+                reserved for specail use."
+            ::= { hwAtmMapPvcEntry 11 }
+
+        hwAtmMapPvcRemoteVclVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the peer VPI value. The value is an integer.
+                For UNI interface, VPI value ranging from 0 to 255;
+                For NNI interface, VPI value ranging from 0 to 4095."
+            ::= { hwAtmMapPvcEntry 12 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.3.1.13
+    hwAtmMapPvcBi OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            downdirectional(0),
+            bidirectional(1)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwAtmMapPvcEntry 13 }
+
+        hwAtmMapPvcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "This variable is used to create or delete an object."
+            ::= { hwAtmMapPvcEntry 51 }
+
+        hwAtmServiceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the service type and related parameters
+                 for the PVC."
+            ::= { hwAtmObjects 4 }
+
+        hwAtmServiceEntry OBJECT-TYPE
+            SYNTAX HwAtmServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the service type for the PVC."
+            INDEX { hwAtmServiceName }
+            ::= { hwAtmServiceTable 1 }
+
+        HwAtmServiceEntry ::=
+            SEQUENCE {
+                hwAtmServiceName
+                    OCTET STRING,
+                hwAtmServiceType
+                    INTEGER,
+                hwAtmServiceOutputPcr
+                    Integer32,
+                hwAtmServiceOutputScr
+                    Integer32,
+                hwAtmServiceOutputMbs
+                    Integer32,
+                hwAtmServiceCbrCdvtValue
+                    Integer32,
+                hwAtmServiceOutputMcr
+                    Integer32,
+                hwAtmServiceRowStatus
+                    RowStatus
+             }
+
+        hwAtmServiceName    OBJECT-TYPE
+            SYNTAX      OCTET STRING (SIZE (1..31))
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "Indicates the name of the service type. The name is a string
+                of 1 to 31 characters."
+            ::= { hwAtmServiceEntry 1 }
+
+        hwAtmServiceType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                cbr(1),
+                vbrNrt(2),
+                vbrRt(3),
+                ubr(4),
+                ubrPlus(5)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Set the service type for the PVC as required."
+            DEFVAL { ubr }
+            ::= { hwAtmServiceEntry 11 }
+
+        hwAtmServiceOutputPcr OBJECT-TYPE
+            SYNTAX Integer32 (0 | 8..599040)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the peak output rate of the ATM cell.
+                When hwPvcServiceTableType is ubr, the peak output rate is 0."
+            DEFVAL { 149760 }
+            ::= { hwAtmServiceEntry 12 }
+
+        hwAtmServiceOutputScr OBJECT-TYPE
+            SYNTAX Integer32 (0 | 8..599040)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the peak output rate of the ATM cell.
+                When hwPvcServiceTableType is cbr or ubr, the peak output rate is 0."
+            DEFVAL { 149760 }
+            ::= { hwAtmServiceEntry 13 }
+
+        hwAtmServiceOutputMbs OBJECT-TYPE
+            SYNTAX Integer32 (0 | 1..512)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the peak output rate of the ATM cell.
+                When hwPvcServiceTableType is cbr or ubr, the peak output rate is 0."
+            ::= { hwAtmServiceEntry 14 }
+
+        hwAtmServiceCbrCdvtValue OBJECT-TYPE
+            SYNTAX Integer32 (0..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the limit of the ATM cell delay variation.
+                When hwPvcServiceTableType is cbr, the variable is valid.
+                For other service types, the variable is 0."
+            DEFVAL { 500 }
+            ::= { hwAtmServiceEntry 15 }
+
+         hwAtmServiceOutputMcr OBJECT-TYPE
+            SYNTAX Integer32 (0 | 8..599040)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the mini width guarantee bit rate of the ATM cell.
+                When hwPvcServiceTableType is ubr, the peak output rate is 0."
+            DEFVAL { 149760 }
+            ::= { hwAtmServiceEntry 16 }
+
+
+        hwAtmServiceRowStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "This variable is used to create or delete an object."
+            ::= { hwAtmServiceEntry 51 }
+
+        hwAtmPvcServiceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the service type for the PVC."
+            ::= { hwAtmObjects 5 }
+
+        hwAtmPvcServiceEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the service type for the PVC."
+            INDEX { hwAtmPvcServiceIfIndex, hwAtmPvcServiceVpi, hwAtmPvcServiceVci, hwAtmPvcTransmittalDirection }
+            ::= { hwAtmPvcServiceTable 1 }
+
+        HwAtmPvcServiceEntry ::=
+          SEQUENCE {
+              hwAtmPvcServiceIfIndex
+                 InterfaceIndex,
+              hwAtmPvcServiceVpi
+                 AtmVpIdentifier,
+              hwAtmPvcServiceVci
+                 AtmVcIdentifier,
+              hwAtmPvcServiceName
+                 OCTET STRING,
+              hwAtmPvcTransmittalDirection
+                 INTEGER,
+              hwAtmPvcPriority
+                 Integer32,
+              hwAtmPvcServiceBuffer
+                 Integer32,
+              hwAtmPvcServiceRowStatus
+                 RowStatus
+        }
+
+        hwAtmPvcServiceIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface index."
+            ::= { hwAtmPvcServiceEntry 1 }
+
+        hwAtmPvcServiceVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the local VPI value. The value is an integer.
+                For UNI interface, VPI value ranging from 0 to 255;
+                For NNI interface, VPI value ranging from 0 to 4095."
+            ::= { hwAtmPvcServiceEntry 2 }
+
+        hwAtmPvcServiceVci OBJECT-TYPE
+            SYNTAX AtmVcIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the local VCI value. VCI is short for Virtual Channel Identifier.
+                The VCI value ranges from 0 to 65535. Generally, the values 3, 4 and 65535
+                are reserved for specail use."
+            ::= { hwAtmPvcServiceEntry 3 }
+
+        hwAtmPvcServiceName    OBJECT-TYPE
+            SYNTAX      OCTET STRING (SIZE (1..31))
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+               "Indicates the name of the service type. The name is a string
+                of 1 to 31 characters."
+            ::= { hwAtmPvcServiceEntry 11 }
+
+        hwAtmPvcTransmittalDirection    OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                 input(1),
+                 output(2)
+            }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+               "Indicates the input or output tpye of the service type."
+            ::= { hwAtmPvcServiceEntry 21 }
+
+    hwAtmPvcPriority OBJECT-TYPE
+        SYNTAX Integer32 (1..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Indicates the priority  of the output service."
+                DEFVAL { 7 }
+        ::= { hwAtmPvcServiceEntry 22 }
+
+	hwAtmPvcServiceBuffer OBJECT-TYPE
+		SYNTAX Integer32  (128..8192|-1)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"The range of buffer,0xFFFFFFFF is invalid value for ima/serial interface which not support."
+		::= { hwAtmPvcServiceEntry 23 }
+
+        hwAtmPvcServiceRowStatus  OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "This variable is used to create or delete an object."
+            ::= { hwAtmPvcServiceEntry 51 }
+
+
+        hwAtmVpVlanMapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmVpVlanMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the VP vlan map."
+            ::= { hwAtmObjects 6 }
+
+        hwAtmVpVlanMapEntry OBJECT-TYPE
+            SYNTAX HwAtmVpVlanMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the VP vlan map."
+            INDEX { hwAtmVpVlanMapIfIndex, hwAtmVpVlanMapVpi, hwAtmVpVlanMapPeVid }
+            ::= { hwAtmVpVlanMapTable 1 }
+
+        HwAtmVpVlanMapEntry ::=
+            SEQUENCE {
+                hwAtmVpVlanMapIfIndex
+                    InterfaceIndex,
+                hwAtmVpVlanMapVpi
+                    AtmVpIdentifier,
+                hwAtmVpVlanMapPeVid
+                    Integer32,
+                hwAtmVpVlanMapRowStatus
+                    RowStatus
+             }
+
+        hwAtmVpVlanMapIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index."
+            ::= { hwAtmVpVlanMapEntry 1 }
+
+        hwAtmVpVlanMapVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VPI."
+            ::= { hwAtmVpVlanMapEntry 2 }
+
+        hwAtmVpVlanMapPeVid OBJECT-TYPE
+            SYNTAX Integer32  (1..4094)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "PE VLAN ID."
+            ::= { hwAtmVpVlanMapEntry 11 }
+
+        hwAtmVpVlanMapRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus. "
+            ::= { hwAtmVpVlanMapEntry 51 }
+
+        hwAtmVcVlanMapTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmVcVlanMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the VC vlan map."
+            ::= { hwAtmObjects 7 }
+
+        hwAtmVcVlanMapEntry OBJECT-TYPE
+            SYNTAX HwAtmVcVlanMapEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the VC vlan map."
+            INDEX { hwAtmVcVlanMapIfIndex, hwAtmVcVlanMapVpi, hwAtmVcVlanMapCeVid }
+            ::= { hwAtmVcVlanMapTable 1 }
+
+        HwAtmVcVlanMapEntry ::=
+            SEQUENCE {
+                hwAtmVcVlanMapIfIndex
+                    InterfaceIndex,
+                hwAtmVcVlanMapVpi
+                    AtmVpIdentifier,
+                hwAtmVcVlanMapBeginVci
+                    Integer32,
+                hwAtmVcVlanMapEndVci
+                    Integer32,
+                hwAtmVcVlanMapCeVid
+                    Integer32,
+                hwAtmVpVlanMapServiceName
+                    OCTET STRING,
+                hwAtmVcVlanMapPiority
+                    Integer32,
+        hwAtmVcVlanMapPBit
+                Integer32,
+                hwAtmVcVlanMapRowStatus
+                    RowStatus
+             }
+
+        hwAtmVcVlanMapIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index."
+            ::= { hwAtmVcVlanMapEntry 1 }
+
+        hwAtmVcVlanMapVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VPI."
+            ::= { hwAtmVcVlanMapEntry 2 }
+
+        hwAtmVcVlanMapBeginVci OBJECT-TYPE
+            SYNTAX Integer32 (0..2|5..65534)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Begin VCI Value, not config 3 or 4."
+            ::= { hwAtmVcVlanMapEntry 11 }
+
+        hwAtmVcVlanMapEndVci OBJECT-TYPE
+            SYNTAX Integer32 (0..2|5..65534)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "End VCI Value, not config 3 or 4."
+            ::= { hwAtmVcVlanMapEntry 12 }
+
+        hwAtmVcVlanMapCeVid OBJECT-TYPE
+            SYNTAX Integer32  (0..4089)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "CE VLAN ID."
+            ::= { hwAtmVcVlanMapEntry 13 }
+
+        hwAtmVpVlanMapServiceName OBJECT-TYPE
+            SYNTAX      OCTET STRING (SIZE (1..32))
+            MAX-ACCESS  read-create
+            STATUS      current
+            DESCRIPTION
+               "Indicates the name of the service type. The name is a string
+               of 1 to 31 characters."
+            ::= { hwAtmVcVlanMapEntry 14 }
+
+        hwAtmVcVlanMapPiority OBJECT-TYPE
+            SYNTAX Integer32 (1..7)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Piority."
+            DEFVAL { 1 }
+            ::= { hwAtmVcVlanMapEntry 15 }
+
+    hwAtmVcVlanMapPBit OBJECT-TYPE
+        SYNTAX Integer32 (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Indicates the p-bit value,the default value is 0."
+        DEFVAL { 0 }
+        ::= { hwAtmVcVlanMapEntry 18 }
+
+
+        hwAtmVcVlanMapRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus. "
+            ::= { hwAtmVcVlanMapEntry 51 }
+
+        hwAtmPvpServiceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvpServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the service type for the PVP."
+            ::= { hwAtmObjects 8 }
+
+        hwAtmPvpServiceEntry OBJECT-TYPE
+            SYNTAX HwAtmPvpServiceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the service type for the PVP."
+            INDEX { hwAtmPvpServiceIfIndex, hwAtmPvpServiceVpi }
+            ::= { hwAtmPvpServiceTable 1 }
+        HwAtmPvpServiceEntry ::=
+            SEQUENCE {
+                hwAtmPvpServiceIfIndex
+                    InterfaceIndex,
+                hwAtmPvpServiceVpi
+                    AtmVpIdentifier,
+                hwAtmPvpServiceName
+                    OCTET STRING,
+                hwAtmPvpTransmittalDirection
+                    INTEGER,
+                hwAtmPvpPriority
+                    Integer32,
+		hwAtmPvpServiceBuffer
+			Integer32,
+                hwAtmPvpServiceRowStatus
+                    RowStatus
+             }
+        hwAtmPvpServiceIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index."
+            ::= { hwAtmPvpServiceEntry 1 }
+        hwAtmPvpServiceVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the local VPI value. The value is an integer.
+                For UNI interface, VPI value ranging from 0 to 255;
+                        For NNI interface, VPI value ranging from 0 to 4095."
+            ::= { hwAtmPvpServiceEntry 2 }
+        hwAtmPvpServiceName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the name of the service type. The name is a string
+                of 1 to 31 characters."
+            ::= { hwAtmPvpServiceEntry 11 }
+        hwAtmPvpTransmittalDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                input(1),
+                output(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the input or output tpye of the service type."
+            ::= { hwAtmPvpServiceEntry 21 }
+        hwAtmPvpPriority OBJECT-TYPE
+            SYNTAX Integer32 (1..7)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the priority of the output service."
+            DEFVAL { 7 }
+            ::= { hwAtmPvpServiceEntry 22 }
+	hwAtmPvpServiceBuffer OBJECT-TYPE
+		SYNTAX Integer32 (128..8192|-1)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"The range of buffer,0xFFFFFFFF is invalid value for ima/serial interface which not support"
+		::= { hwAtmPvpServiceEntry 23 }
+
+        hwAtmPvpServiceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create or delete an object."
+            ::= { hwAtmPvpServiceEntry 51 }
+            
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9
+    hwAtmPvcStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtmPvcStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure pvc statistic including inputPackets,
+            inputBytes,inputPktErrors,outputPackets,outputBytes and outputPktErrors."
+        ::= { hwAtmObjects 9 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1
+    hwAtmPvcStatisticEntry OBJECT-TYPE
+        SYNTAX HwAtmPvcStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure pvc statistic including inputPackets,
+            inputBytes,inputPktErrors,outputPackets,outputBytes and outputPktErrors."
+        INDEX { hwAtmPvcStatisticIfIndex, hwAtmPvcStatisticVpi, hwAtmPvcStatisticVci }
+        ::= { hwAtmPvcStatisticTable 1 }
+
+        
+    HwAtmPvcStatisticEntry ::=
+        SEQUENCE { 
+            hwAtmPvcStatisticIfIndex
+                InterfaceIndex,
+            hwAtmPvcStatisticVpi
+                AtmVpIdentifier,
+            hwAtmPvcStatisticVci
+                AtmVcIdentifier,
+            hwAtmPvcStatisticInputPackets
+                Counter64,
+            hwAtmPvcStatisticInputBytes
+                Counter64,
+            hwAtmPvcStatisticInputPktErrors
+                Integer32,
+            hwAtmPvcStatisticInputCells
+                Counter64,
+            hwAtmPvcStatisticInputCellErrors
+                Integer32,
+            hwAtmPvcStatisticOutputPackets
+                Counter64,
+            hwAtmPvcStatisticOutputBytes
+                Counter64,
+            hwAtmPvcStatisticOutputPktErrors
+                Integer32,
+            hwAtmPvcStatisticOutputCells
+                Counter64,
+            hwAtmPvcStatisticOutputCellErrors
+                Integer32,
+            hwAtmPvcStatisticInputCellDrops
+                Counter64,
+            hwAtmPvcStatisticInputPktDrops
+                Counter64,
+            hwAtmPvcStatisticOutputCellDrops
+                Counter64,
+            hwAtmPvcStatisticOutputPktDrops
+                Counter64,
+            hwAtmPvcStatisticReset
+                INTEGER
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.1
+    hwAtmPvcStatisticIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interface index."
+        ::= { hwAtmPvcStatisticEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.2
+    hwAtmPvcStatisticVpi OBJECT-TYPE
+        SYNTAX AtmVpIdentifier
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the virtual path identifier (VPI) of ATM. The value is an integer. 
+            For a UNI, the value ranges from 0 to 255. 
+            For an NNI, the value ranges from 0 to 4095."
+        ::= { hwAtmPvcStatisticEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.3
+    hwAtmPvcStatisticVci OBJECT-TYPE
+        SYNTAX AtmVcIdentifier
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object indicates the virtual channel identifier (VCI) of ATM."
+        ::= { hwAtmPvcStatisticEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.11
+    hwAtmPvcStatisticInputPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of received packets."
+        ::= { hwAtmPvcStatisticEntry 11 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.12
+    hwAtmPvcStatisticInputBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of received bytes."
+        ::= { hwAtmPvcStatisticEntry 12 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.13
+    hwAtmPvcStatisticInputPktErrors OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of received error packets."
+        ::= { hwAtmPvcStatisticEntry 13 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.14
+    hwAtmPvcStatisticInputCells OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of received cells."
+        ::= { hwAtmPvcStatisticEntry 14 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.15
+    hwAtmPvcStatisticInputCellErrors OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of received error cells."
+        ::= { hwAtmPvcStatisticEntry 15 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.16
+    hwAtmPvcStatisticOutputPackets OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent packets."
+        ::= { hwAtmPvcStatisticEntry 16 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.17
+    hwAtmPvcStatisticOutputBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent bytes."
+        ::= { hwAtmPvcStatisticEntry 17 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.18
+    hwAtmPvcStatisticOutputPktErrors OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent error packets."
+        ::= { hwAtmPvcStatisticEntry 18 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.19
+    hwAtmPvcStatisticOutputCells OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent cells."
+        ::= { hwAtmPvcStatisticEntry 19 }
+
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.20
+    hwAtmPvcStatisticOutputCellErrors OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent error cells."
+        ::= { hwAtmPvcStatisticEntry 20 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.21
+    hwAtmPvcStatisticInputCellDrops OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of discarded received cells."
+        ::= { hwAtmPvcStatisticEntry 21 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.22
+    hwAtmPvcStatisticInputPktDrops OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of discarded received packets."
+        ::= { hwAtmPvcStatisticEntry 22 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.23
+    hwAtmPvcStatisticOutputCellDrops OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of discarded sent cells."
+        ::= { hwAtmPvcStatisticEntry 23 }
+        
+        
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.24
+    hwAtmPvcStatisticOutputPktDrops OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of discarded sent packets."
+        ::= { hwAtmPvcStatisticEntry 24 }
+        
+    
+    -- 1.3.6.1.4.1.2011.5.25.156.1.9.1.51
+    hwAtmPvcStatisticReset OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            reset(1),
+            ready(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates cleared statistics."
+        ::= { hwAtmPvcStatisticEntry 51 }
+
+        hwAtmIfConfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmIfConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the configuration of the ATM interface."
+            ::= { hwAtmObjects 11 }
+
+        hwAtmIfConfEntry OBJECT-TYPE
+            SYNTAX HwAtmIfConfEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the configuration of the ATM interface."
+            INDEX { hwAtmIfConfIfIndex }
+            ::= { hwAtmIfConfTable 1 }
+
+        HwAtmIfConfEntry ::=
+            SEQUENCE {
+                hwAtmIfConfIfIndex
+                    InterfaceIndex,
+                hwAtmIfConfMaxVccs
+                    Integer32,
+                hwAtmIfConfOperVccs
+                    Integer32,
+                hwAtmIfConfIntfType
+                    INTEGER,
+                hwAtmIfConfCellTransfer
+                    TruthValue
+             }
+
+        hwAtmIfConfIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface index."
+            ::= { hwAtmIfConfEntry 1 }
+
+        hwAtmIfConfMaxVccs OBJECT-TYPE
+            SYNTAX Integer32 (1..16384)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+               "Indicates the maximum number of the PVCs. Only main-interfaces encapsulated
+               with ATM protocol can be set."
+            ::= { hwAtmIfConfEntry 11 }
+
+        hwAtmIfConfOperVccs OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               "Indicates the number of the configured PVCs."
+            ::= { hwAtmIfConfEntry 12 }
+
+        hwAtmIfConfIntfType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                uni(1),
+                nni(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+               "This object indicates the type of the serial interface with the ATM protocol.
+               Only main-interfaces encapsulated with ATM protocol can be set."
+            ::= { hwAtmIfConfEntry 13 }
+
+        hwAtmIfConfCellTransfer OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the cell transfer function is enabled.
+                 By default, the cell transfer function is enabled on IMA sub-interfaces
+                 and serial sub-interfaces and disabled on other types of interfaces.
+                 This object can not be set on IMA sub-interfaces and serial sub-interface.
+                 true: enables the cell transfer function.
+                 false: disables the cell transfer function."
+            ::= { hwAtmIfConfEntry 14 }
+
+        hwAtmVplTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmVplEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the configuration of the ATM PVP."
+            ::= { hwAtmObjects 12 }
+
+        hwAtmVplEntry OBJECT-TYPE
+            SYNTAX HwAtmVplEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the configuration of the ATM PVP."
+            INDEX { hwAtmVplIfIndex, hwAtmVplVpi }
+            ::= { hwAtmVplTable 1 }
+
+        HwAtmVplEntry ::=
+            SEQUENCE {
+                hwAtmVplIfIndex
+                    InterfaceIndex,
+                hwAtmVplVpi
+                    AtmVpIdentifier,
+                hwAtmVplRowStatus
+                    RowStatus
+             }
+
+        hwAtmVplIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface index."
+            ::= { hwAtmVplEntry 1 }
+
+        hwAtmVplVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "VPI."
+            ::= { hwAtmVplEntry 2 }
+
+        hwAtmVplRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the status of the row."
+            ::= { hwAtmVplEntry 51 }
+
+        hwAtmVclTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmVclEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the configuration of the ATM PVC."
+            ::= { hwAtmObjects 13 }
+
+        hwAtmVclEntry OBJECT-TYPE
+            SYNTAX HwAtmVclEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the configuration of the ATM PVC."
+            INDEX { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci }
+            ::= { hwAtmVclTable 1 }
+
+        HwAtmVclEntry ::=
+            SEQUENCE {
+                hwAtmVclIfIndex
+                    InterfaceIndex,
+                hwAtmVclVpi
+                    AtmVpIdentifier,
+                hwAtmVclVci
+                    AtmVcIdentifier,
+                hwAtmVclName
+                    OCTET STRING,
+                hwAtmVccAal5EncapsType
+                    INTEGER,
+                hwAtmVclRowStatus
+                    RowStatus,
+                hwAtmVclDescr
+                    OCTET STRING
+             }
+
+        hwAtmVclIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+               "Indicates the interface index."
+            ::= { hwAtmVclEntry 1 }
+
+        hwAtmVclVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "VPI."
+            ::= { hwAtmVclEntry 2 }
+
+        hwAtmVclVci OBJECT-TYPE
+            SYNTAX AtmVcIdentifier
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "VCI."
+            ::= { hwAtmVclEntry 3 }
+
+        hwAtmVclName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the name of the PVC."
+            ::= { hwAtmVclEntry 11 }
+
+        hwAtmVccAal5EncapsType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                aal5Snap(1),
+                aal5Mux(2),
+                aal5MuxNonstandard(3),
+                aal5Nlpid(4),
+                aal5NlpidIetf(5),
+                aal5Auto(6)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the encapsulation mode of AAL5.
+                aal5snap: LLC/SNAP (Logical Link Control (LLC)/Subnet Access Protocol (SNAP)) encapsulation type.
+                aal5mux: MUX encapsulation type.
+                aal5muxnonstandard: nonstandard MUX encapsulation type, which used to interconnect other devices.
+                aal5nlpid: RFC1490 encapsulation type.
+                aal5nlpidietf: RFC1490 encapsulation type, which used to differentiate with aal5nlpid for ISIS.
+                aal5Auto: Auto encapsulation type.
+                "
+            DEFVAL { aal5Snap }
+            ::= { hwAtmVclEntry 12 }
+
+        hwAtmVclRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the status of the row."
+            ::= { hwAtmVclEntry 51 }
+
+	hwAtmVclDescr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the Description of the PVC."
+            ::= { hwAtmVclEntry 52 }
+        hwAtmPvcIpoaTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcIpoaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the IPoA mapping on the PVC."
+            ::= { hwAtmObjects 14 }
+
+        hwAtmPvcIpoaEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcIpoaEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the IPoA mapping on the PVC."
+            INDEX { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwAtmPvcIpoaType, hwAtmPvcIpoaIpAddress }
+            ::= { hwAtmPvcIpoaTable 1 }
+
+        HwAtmPvcIpoaEntry ::=
+            SEQUENCE {
+                hwAtmPvcIpoaType
+                    INTEGER,
+                hwAtmPvcIpoaIpAddress
+                    IpAddress,
+                hwAtmPvcIpoaIpMask
+                    IpAddress,
+                hwAtmPvcIpoaInarpInterval
+                    Integer32,
+                hwAtmPvcIpoaBroadcast
+                    TruthValue,
+                hwAtmPvcIpoaRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvcIpoaType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ip(1),
+                default(2),
+                inarp(3)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the type of the PVC IPoA mapping.
+                ip: sets the peer IP address and mask that are mapped to the PVC.
+                default: configures a mapping with default route attributes.
+                If no mapping of the next hop address of a packet can be found,
+                the packet is sent over the PVC if the PVC is configured with
+                default mapping.
+                inarp: configures InARP on the PVC."
+            ::= { hwAtmPvcIpoaEntry 3 }
+
+        hwAtmPvcIpoaIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the peer IP address mapped to the PVC."
+            ::= { hwAtmPvcIpoaEntry 4 }
+
+        hwAtmPvcIpoaIpMask OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the IP address mask. The IP address mask is an optional parameter."
+            ::= { hwAtmPvcIpoaEntry 11 }
+
+        hwAtmPvcIpoaInarpInterval OBJECT-TYPE
+            SYNTAX Integer32 (0 | 1..600)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the interval for sending InARP packets. The parameter is optional.
+                The value ranges from 1 to 600 in seconds. If the type of the PVC IPoA
+                mapping is IP or default, the value is 0. The default value is 1."
+            DEFVAL { 1 }
+            ::= { hwAtmPvcIpoaEntry 12 }
+
+        hwAtmPvcIpoaBroadcast OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "If a mapping with this attribute is configured on the PVC,
+                broadcast packets on the interface where the PVC resides
+                will be sent over the PVC."
+
+            DEFVAL { false }
+            ::= { hwAtmPvcIpoaEntry 13 }
+
+        hwAtmPvcIpoaRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus."
+            ::= { hwAtmPvcIpoaEntry 51 }
+
+        hwAtmPvcBridgeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcBridgeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the IPoEoA mapping and PPPoEoA mapping on the
+
+PVC."
+            ::= { hwAtmObjects 15 }
+
+        hwAtmPvcBridgeEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcBridgeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the IPoEoA mapping and PPPoEoA mapping on the
+
+PVC."
+            INDEX { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci }
+            ::= { hwAtmPvcBridgeTable 1 }
+
+        HwAtmPvcBridgeEntry ::=
+            SEQUENCE {
+                hwAtmPvcBridgeDstIfIndex
+                    InterfaceIndexOrZero,
+                hwAtmPvcBridgeBroadcast
+                    TruthValue,
+                hwAtmPvcBridgeRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvcBridgeDstIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the VE interface."
+            ::= { hwAtmPvcBridgeEntry 11 }
+
+        hwAtmPvcBridgeBroadcast OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the PVC can forward bridge packets."
+            DEFVAL { false }
+            ::= { hwAtmPvcBridgeEntry 12 }
+
+        hwAtmPvcBridgeRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus.
+                 Only 'createAndGo' and 'destroy' is supported."
+            ::= { hwAtmPvcBridgeEntry 51 }
+
+        hwAtmPvcOAMLoopbackTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcOAMLoopbackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure OAM F5 Loopback,
+                enable the sending of OAM F5 Loopback cells,
+                and configure the parameters of the retransmission check
+                or modify the parameters of the retransmission check."
+            ::= { hwAtmObjects 17 }
+
+        hwAtmPvcOAMLoopbackEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcOAMLoopbackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure OAM F5 Loopback."
+            INDEX { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci }
+            ::= { hwAtmPvcOAMLoopbackTable 1 }
+
+        HwAtmPvcOAMLoopbackEntry ::=
+            SEQUENCE {
+                hwAtmPvcOAMLoopbackFrequency
+                    Integer32,
+                hwAtmPvcOAMLoopbackUpCount
+                    Integer32,
+                hwAtmPvcOAMLoopbackDownCount
+                    Integer32,
+                hwAtmPvcOAMLoopbackRetryFrequency
+                    Integer32,
+                hwAtmPvcOAMLoopbackRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvcOAMLoopbackFrequency OBJECT-TYPE
+            SYNTAX Integer32 (1..600)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the interval for sending OAM F5 Loopback cells."
+            ::= { hwAtmPvcOAMLoopbackEntry 11 }
+
+        hwAtmPvcOAMLoopbackUpCount OBJECT-TYPE
+            SYNTAX Integer32 (1..600)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the number of continuous OAM F5 Loopback cells that must be received
+
+before the PVC turns Up."
+            DEFVAL { 3 }
+            ::= { hwAtmPvcOAMLoopbackEntry 12 }
+
+        hwAtmPvcOAMLoopbackDownCount OBJECT-TYPE
+            SYNTAX Integer32 (1..600)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the number of continuous OAM F5 Loopback cells that are not received
+
+before the PVC turns Down."
+            DEFVAL { 5 }
+            ::= { hwAtmPvcOAMLoopbackEntry 13 }
+
+        hwAtmPvcOAMLoopbackRetryFrequency OBJECT-TYPE
+            SYNTAX Integer32 (1..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the interval for sending cells during OAM F5 Loopback retransmission
+
+verification before the PVC status changes."
+            ::= { hwAtmPvcOAMLoopbackEntry 14 }
+
+        hwAtmPvcOAMLoopbackRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus"
+            ::= { hwAtmPvcOAMLoopbackEntry 51 }
+
+        hwAtmPvpLimitTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvpLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the VP limit. To monitor the VP, configure
+
+related VP parameters."
+            ::= { hwAtmObjects 18 }
+
+        hwAtmPvpLimitEntry OBJECT-TYPE
+            SYNTAX HwAtmPvpLimitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the VP limit."
+            INDEX { hwAtmPvpLimitIfIndex, hwAtmPvpLimitVpi }
+            ::= { hwAtmPvpLimitTable 1 }
+
+        HwAtmPvpLimitEntry ::=
+            SEQUENCE {
+                hwAtmPvpLimitIfIndex
+                    InterfaceIndex,
+                hwAtmPvpLimitVpi
+                    AtmVpIdentifier,
+                hwAtmPvpLimitPeakRate
+                    Integer32,
+                hwAtmPvpLimitRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvpLimitIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index."
+            ::= { hwAtmPvpLimitEntry 1 }
+
+        hwAtmPvpLimitVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "VPI."
+            ::= { hwAtmPvpLimitEntry 2 }
+
+        hwAtmPvpLimitPeakRate OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "VCI."
+            ::= { hwAtmPvpLimitEntry 11 }
+
+        hwAtmPvpLimitRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus. "
+            ::= { hwAtmPvpLimitEntry 51 }
+
+--
+-- hwAtmPvcPppTable
+--
+      hwAtmPvcPppTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcPppEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the PPPoA mapping on the PVC."
+            ::= { hwAtmObjects 16 }
+
+        hwAtmPvcPppEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcPppEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the PPPoA mapping on the PVC."
+            INDEX { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci }
+            ::= { hwAtmPvcPppTable 1 }
+
+        HwAtmPvcPppEntry::=
+            SEQUENCE {
+                hwAtmPvcPppDstIfIndex
+                    InterfaceIndex,
+                hwAtmPvcPppServer
+                    TruthValue,
+                hwAtmPvcPppRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvcPppDstIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the VT or dialer interface."
+            ::= { hwAtmPvcPppEntry 11 }
+
+        hwAtmPvcPppServer OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the node is server or not.
+                 By default, the node is not server.
+                 true: indicates the node is server.
+                 false: indicates the node is not server.
+                "
+            DEFVAL { false }
+            ::= { hwAtmPvcPppEntry 12 }
+
+        hwAtmPvcPppRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus.
+                 Only 'createAndGo' and 'destroy' is supported."
+            ::= { hwAtmPvcPppEntry 51 }
+
+--
+-- hwAtmPvcGroupTable
+--
+        hwAtmPvcGroupTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to create or delete the pvc-group, and get the TOS type or state of the pvc-group."
+            ::= { hwAtmObjects 19 }
+
+        hwAtmPvcGroupEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcGroupEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to create or delete the pvc-group, and get the TOS type or state of the pvc-group."
+            INDEX { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci }
+            ::= { hwAtmPvcGroupTable 1 }
+
+        HwAtmPvcGroupEntry::=
+            SEQUENCE {
+                hwAtmPvcGroupTosType
+                    INTEGER,
+                hwAtmPvcGroupState
+                    INTEGER,
+                hwAtmPvcGroupName
+                    OCTET STRING,
+                hwAtmPvcGroupRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvcGroupTosType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                precedence(2),
+                dscp(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               "Indicates the TOS type. The default value is 1."
+            ::= { hwAtmPvcGroupEntry 1 }
+
+        hwAtmPvcGroupState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               "Indicates the state of the pvc-group."
+            ::= { hwAtmPvcGroupEntry 2 }
+
+        hwAtmPvcGroupName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+               "Indicates the name of the pvc-group. Only support visible characters."
+            ::= { hwAtmPvcGroupEntry 3 }
+
+        hwAtmPvcGroupRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus.
+                 Only 'createAndGo' and 'destroy' is supported.
+                "
+            ::= { hwAtmPvcGroupEntry 51 }
+
+--
+-- hwAtmPvcGroupMemTable
+--
+        hwAtmPvcGroupMemTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcGroupMemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the member PVC and TOS type and TOS type value on the pvc-group."
+            ::= { hwAtmObjects 20 }
+
+        hwAtmPvcGroupMemEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcGroupMemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the member PVC and TOS type and TOS type value on the pvc-group."
+            INDEX { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwAtmPvcGroupMemVpi, hwAtmPvcGroupMemVci }
+            ::= { hwAtmPvcGroupMemTable 1 }
+
+        HwAtmPvcGroupMemEntry::=
+            SEQUENCE {
+                hwAtmPvcGroupMemVpi
+                    Integer32,
+                hwAtmPvcGroupMemVci
+                    Integer32,
+                hwAtmPvcGroupMemName
+                    OCTET STRING,
+                hwAtmPvcGroupMemMinGrade
+                    Integer32,
+                hwAtmPvcGroupMemMaxGrade
+                    Integer32,
+                hwAtmPvcGroupMemDefault
+                    TruthValue,
+                hwAtmPvcGroupMemTosType
+                    INTEGER,
+                hwAtmPvcGroupMemRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvcGroupMemVpi OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the VPI of the member PVC in pvc-group."
+            ::= { hwAtmPvcGroupMemEntry 1 }
+
+        hwAtmPvcGroupMemVci OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the VCI of the member PVC in pvc-group."
+            ::= { hwAtmPvcGroupMemEntry 2 }
+
+        hwAtmPvcGroupMemName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the name of the member PVC of the pvc-group.
+                Only support visible characters."
+            ::= { hwAtmPvcGroupMemEntry 3 }
+
+        hwAtmPvcGroupMemMinGrade OBJECT-TYPE
+            SYNTAX Integer32 (0..63 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the minimum value of the TOS with one member PVC.
+               If the TOS type is precedence, the maximum value cannot be larger than 7.
+               Return 255 when this value is not configed."
+            ::= { hwAtmPvcGroupMemEntry 4 }
+
+        hwAtmPvcGroupMemMaxGrade OBJECT-TYPE
+            SYNTAX Integer32 (0..63 | 255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the maximum value of the TOS with one member PVC.
+               If the TOS type is precedence, the maximum value cannot be larger than 7.
+               Return 255 when this value is not configed."
+            ::= { hwAtmPvcGroupMemEntry 5 }
+
+        hwAtmPvcGroupMemDefault OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the PVC is default PVC or not.
+                By default, the default TOS is disabled.
+                true: with default. false: without default."
+            DEFVAL { false }
+            ::= { hwAtmPvcGroupMemEntry 6 }
+
+        hwAtmPvcGroupMemTosType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                precedence(2),
+                dscp(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the TOS type. The default value is 1."
+            ::= { hwAtmPvcGroupMemEntry 7 }
+
+        hwAtmPvcGroupMemRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus.
+                 Only 'createAndGo' and 'destroy' is supported.
+                "
+            ::= { hwAtmPvcGroupMemEntry 51 }
+
+-- hwAtmPvcDynamicTable
+
+        hwAtmPvcDynamicTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcDynamicEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the auto PVC."
+            ::= { hwAtmObjects 21 }
+
+        hwAtmPvcDynamicEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcDynamicEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the auto PVC."
+            INDEX { hwAtmPvcDynamicIfIndex,
+                    hwAtmPvcDynamicStartVpi,
+                    hwAtmPvcDynamicStartVci,
+                    hwAtmPvcDynamicEndVpi,
+                    hwAtmPvcDynamicEndVci }
+            ::= { hwAtmPvcDynamicTable 1 }
+
+        HwAtmPvcDynamicEntry::=
+            SEQUENCE {
+                hwAtmPvcDynamicIfIndex
+                    InterfaceIndex,
+                hwAtmPvcDynamicStartVpi
+                    AtmVpIdentifier,
+                hwAtmPvcDynamicStartVci
+                    AtmVcIdentifier,
+                hwAtmPvcDynamicEndVpi
+                    AtmVpIdentifier,
+                hwAtmPvcDynamicEndVci
+                    AtmVcIdentifier,
+                hwAtmPvcDynamicAdminStatus
+                    INTEGER,
+                hwAtmPvcDynamicAal5EncapsType
+                    INTEGER,
+                hwAtmPvcDynamicRowStatus
+                    RowStatus
+             }
+
+        hwAtmPvcDynamicIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "Indicates the index of ATM interface which support auto PVC."
+            ::= { hwAtmPvcDynamicEntry 1 }
+
+        hwAtmPvcDynamicStartVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "The start VPI of auto PVC."
+            ::= { hwAtmPvcDynamicEntry 2 }
+
+        hwAtmPvcDynamicStartVci OBJECT-TYPE
+            SYNTAX AtmVcIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "The start VCI of auto PVC."
+            ::= { hwAtmPvcDynamicEntry 3 }
+
+        hwAtmPvcDynamicEndVpi OBJECT-TYPE
+            SYNTAX AtmVpIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "The end VPI of auto PVC."
+            ::= { hwAtmPvcDynamicEntry 4 }
+
+        hwAtmPvcDynamicEndVci OBJECT-TYPE
+            SYNTAX AtmVcIdentifier
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "The end VCI of auto PVC."
+            ::= { hwAtmPvcDynamicEntry 5 }
+
+        hwAtmPvcDynamicAdminStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the administrative status of auto PVC."
+            DEFVAL { up }
+            ::= { hwAtmPvcDynamicEntry 6 }
+
+        hwAtmPvcDynamicAal5EncapsType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                aal5Snap(1),
+                aal5Mux(2),
+                aal5MuxNonstandard(3),
+                aal5Nlpid(4),
+                aal5NlpidIetf(5),
+                aal5Auto(6)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+               "Indicates the encapsulation mode of AAL5.
+                aal5snap: LLC/SNAP (Logical Link Control (LLC)/Subnet Access Protocol (SNAP)) encapsulation type.
+                aal5mux: MUX encapsulation type.
+                aal5muxnonstandard: nonstandard MUX encapsulation type, which used to interconnect other devices.
+                aal5nlpid: RFC1490 encapsulation type.
+                aal5nlpidietf: RFC1490 encapsulation type, which used to differentiate with aal5nlpid for ISIS.
+                aal5Auto: Auto encapsulation type."
+            DEFVAL { aal5Snap }
+            ::= { hwAtmPvcDynamicEntry 7 }
+
+        hwAtmPvcDynamicRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus.
+                 Only 'createAndGo' and 'destroy' is supported.
+                "
+            ::= { hwAtmPvcDynamicEntry 8 }
+
+
+-- hwAtmPvcDynamicPppTable
+       hwAtmPvcDynamicPppTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcDynamicPppEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the map PPP on auto PVC."
+            ::= { hwAtmObjects 22 }
+
+       hwAtmPvcDynamicPppEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcDynamicPppEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the map PPP on auto PVC."
+            INDEX { hwAtmPvcDynamicIfIndex,
+                    hwAtmPvcDynamicStartVpi,
+                    hwAtmPvcDynamicStartVci,
+                    hwAtmPvcDynamicEndVpi,
+                    hwAtmPvcDynamicEndVci }
+            ::= { hwAtmPvcDynamicPppTable 1 }
+
+       HwAtmPvcDynamicPppEntry::=
+            SEQUENCE {
+                hwAtmPvcDynamicPppDstIfIndex
+                    InterfaceIndex,
+                hwAtmPvcDynamicPppRowStatus
+                    RowStatus
+             }
+
+       hwAtmPvcDynamicPppDstIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the VT interface."
+            ::= { hwAtmPvcDynamicPppEntry 1 }
+
+       hwAtmPvcDynamicPppRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus.
+                 Only 'createAndGo' and 'destroy' is supported.
+                "
+            ::= { hwAtmPvcDynamicPppEntry 2 }
+
+--hwAtmPvcDynamicBridgeTable
+           hwAtmPvcDynamicBridgeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmPvcDynamicBridgeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the map bridge on auto PVC."
+            ::= { hwAtmObjects 23 }
+
+           hwAtmPvcDynamicBridgeEntry OBJECT-TYPE
+            SYNTAX HwAtmPvcDynamicBridgeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the map bridge on auto PVC."
+            INDEX { hwAtmPvcDynamicIfIndex,
+                    hwAtmPvcDynamicStartVpi,
+                    hwAtmPvcDynamicStartVci,
+                    hwAtmPvcDynamicEndVpi,
+                    hwAtmPvcDynamicEndVci }
+            ::= { hwAtmPvcDynamicBridgeTable 1 }
+
+           HwAtmPvcDynamicBridgeEntry::=
+            SEQUENCE {
+                hwAtmPvcDynamicBridgeDstIfIndex
+                    InterfaceIndex,
+                hwAtmPvcDynamicBridgeRowStatus
+                    RowStatus
+             }
+
+           hwAtmPvcDynamicBridgeDstIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the index of the VE interface."
+            ::= { hwAtmPvcDynamicBridgeEntry 1 }
+
+           hwAtmPvcDynamicBridgeRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus.
+                 Only 'createAndGo' and 'destroy' is supported."
+            ::= { hwAtmPvcDynamicBridgeEntry 2 } 
+                      
+                      
+	hwAtmTrunkTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwAtmTrunkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the parameters of the atm trunk interface."
+            ::= { hwAtmObjects 24 }
+
+
+        hwAtmTrunkEntry OBJECT-TYPE
+            SYNTAX HwAtmTrunkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the parameters of the atm trunk interface."
+            INDEX { hwAtmTrunkIfIndex }
+            ::= { hwAtmTrunkTable 1 }
+
+
+        HwAtmTrunkEntry ::=
+            SEQUENCE {
+                hwAtmTrunkIfIndex
+                InterfaceIndex,
+                hwAtmTrunkWorkMode
+                INTEGER
+            }
+        hwAtmTrunkIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface index."
+            ::= { hwAtmTrunkEntry 1 }
+
+
+        hwAtmTrunkWorkMode OBJECT-TYPE
+            SYNTAX INTEGER
+                     {
+                     true(1),
+                     false(2)
+                     }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+            "Indicates the work mode of atm trunk."
+            DEFVAL { false }
+            ::= { hwAtmTrunkEntry 2 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25
+    hwAtmVpcConnectivityTestTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtmVpcConnectivityTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwAtmObjects 25 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25.1
+    hwAtmVpcConnectivityTestEntry OBJECT-TYPE
+        SYNTAX HwAtmVpcConnectivityTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description."
+        INDEX { hwAtmVpcConnectivityTestIfIndex, hwAtmVpcConnectivityTestVpi, hwAtmVpcConnectivityTestLLID }
+        ::= { hwAtmVpcConnectivityTestTable 1 }
+
+
+    HwAtmVpcConnectivityTestEntry ::=
+        SEQUENCE {
+            hwAtmVpcConnectivityTestIfIndex
+                InterfaceIndex,
+            hwAtmVpcConnectivityTestVpi
+                AtmVpIdentifier,
+            hwAtmVpcConnectivityTestLLID
+                DisplayString,
+            hwAtmVpcConnectivityTestResult
+                Integer32,
+            hwAtmVpcConnectivityTestIfName
+                DisplayString,
+            hwAtmVpcConnectivityTestRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25.1.1
+    hwAtmVpcConnectivityTestIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates the interface index."
+        ::= { hwAtmVpcConnectivityTestEntry 1 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25.1.2
+    hwAtmVpcConnectivityTestVpi OBJECT-TYPE
+        SYNTAX AtmVpIdentifier
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "VPI."
+        ::= { hwAtmVpcConnectivityTestEntry 2 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25.1.3
+    hwAtmVpcConnectivityTestLLID OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Loopback Local Identify."
+        ::= { hwAtmVpcConnectivityTestEntry 3 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25.1.4
+    hwAtmVpcConnectivityTestResult OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates the result of the test."
+        ::= { hwAtmVpcConnectivityTestEntry 4 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25.1.5
+    hwAtmVpcConnectivityTestIfName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates the interface name."
+        ::= { hwAtmVpcConnectivityTestEntry 5 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.25.1.51
+    hwAtmVpcConnectivityTestRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the status of the row."
+        ::= { hwAtmVpcConnectivityTestEntry 51 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26
+    hwAtmVccConnectivityTestTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtmVccConnectivityTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwAtmObjects 26 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1
+    hwAtmVccConnectivityTestEntry OBJECT-TYPE
+        SYNTAX HwAtmVccConnectivityTestEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Description."
+        INDEX { hwAtmVccConnectivityTestIfIndex, hwAtmVccConnectivityTestVpi, hwAtmVccConnectivityTestVci, hwAtmVccConnectivityTestLLID }
+        ::= { hwAtmVccConnectivityTestTable 1 }
+
+
+    HwAtmVccConnectivityTestEntry ::=
+        SEQUENCE {
+            hwAtmVccConnectivityTestIfIndex
+                InterfaceIndex,
+            hwAtmVccConnectivityTestVpi
+                AtmVpIdentifier,
+            hwAtmVccConnectivityTestVci
+                AtmVcIdentifier,
+            hwAtmVccConnectivityTestLLID
+                DisplayString,
+            hwAtmVccConnectivityTestResult
+                Integer32,
+            hwAtmVccConnectivityTestIfName
+                DisplayString,
+            hwAtmVccConnectivityTestRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1.1
+    hwAtmVccConnectivityTestIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates the interface index."
+        ::= { hwAtmVccConnectivityTestEntry 1 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1.2
+    hwAtmVccConnectivityTestVpi OBJECT-TYPE
+        SYNTAX AtmVpIdentifier
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "VPI."
+        ::= { hwAtmVccConnectivityTestEntry 2 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1.3
+    hwAtmVccConnectivityTestVci OBJECT-TYPE
+        SYNTAX AtmVcIdentifier
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "VCI."
+        ::= { hwAtmVccConnectivityTestEntry 3 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1.4
+    hwAtmVccConnectivityTestLLID OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Loopback Local Identify."
+        ::= { hwAtmVccConnectivityTestEntry 4 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1.5
+    hwAtmVccConnectivityTestResult OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates the result of the test."
+        ::= { hwAtmVccConnectivityTestEntry 5 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1.6
+    hwAtmVccConnectivityTestIfName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Indicates the interface name."
+        ::= { hwAtmVccConnectivityTestEntry 6 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.26.1.51
+    hwAtmVccConnectivityTestRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Indicates the status of the row."
+        ::= { hwAtmVccConnectivityTestEntry 51 }
+
+-- hwAtmPvcQueueStatisticTable
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27
+    hwAtmPvcQueueStatisticTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwAtmPvcQueueStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure pvc-queue statistic including outputPackets,
+            outputBytes and outputDropPackets."
+        ::= { hwAtmObjects 27 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1
+    hwAtmPvcQueueStatisticEntry OBJECT-TYPE
+        SYNTAX HwAtmPvcQueueStatisticEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table is used to configure pvc-queue statistic including outputPackets,
+            outputBytes and outputDropPackets."
+        INDEX { hwAtmPvcQueueStatisticIfIndex,
+                hwAtmPvcQueueStatisticVpi,
+                hwAtmPvcQueueStatisticVci,
+                hwAtmPvcQueueStatisticQueueIndex }
+        ::= { hwAtmPvcQueueStatisticTable 1 }
+
+    HwAtmPvcQueueStatisticEntry ::=
+        SEQUENCE { 
+            hwAtmPvcQueueStatisticIfIndex
+                InterfaceIndex,
+            hwAtmPvcQueueStatisticVpi
+                AtmVpIdentifier,
+            hwAtmPvcQueueStatisticVci
+                AtmVcIdentifier,
+            hwAtmPvcQueueStatisticQueueIndex
+                INTEGER,
+            hwAtmPvcQueueStatisticReset
+                INTEGER,
+            hwAtmPvcQueueStatisticTxPks
+                Counter64,
+            hwAtmPvcQueueStatisticTxBytes
+                Counter64,
+            hwAtmPvcQueueStatisticTxDropPks
+                Counter64
+         }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.1
+    hwAtmPvcQueueStatisticIfIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the interface index."
+        ::= { hwAtmPvcQueueStatisticEntry 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.2
+    hwAtmPvcQueueStatisticVpi OBJECT-TYPE
+        SYNTAX AtmVpIdentifier
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the virtual path identifier (VPI) of ATM. The value is an integer. 
+            For a UNI, the value ranges from 0 to 255. 
+            For an NNI, the value ranges from 0 to 4095."
+        ::= { hwAtmPvcQueueStatisticEntry 2 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.3
+    hwAtmPvcQueueStatisticVci OBJECT-TYPE
+        SYNTAX AtmVcIdentifier
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the virtual channel identifier (VCI) of ATM."
+        ::= { hwAtmPvcQueueStatisticEntry 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.4
+    hwAtmPvcQueueStatisticQueueIndex OBJECT-TYPE
+        SYNTAX INTEGER
+          {
+            be(1),
+            af1(2), 
+            af2(3),
+            af3(4),
+            af4(5),
+            ef(6),
+            cs6(7),
+            cs7(8)
+          }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        " This object indicates the queue priority."
+        ::= { hwAtmPvcQueueStatisticEntry 4 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.5
+    hwAtmPvcQueueStatisticReset OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            reset(1),
+            ready(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates cleared statistics."
+        ::= { hwAtmPvcQueueStatisticEntry 5 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.6
+    hwAtmPvcQueueStatisticTxPks OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent packets."
+        ::= { hwAtmPvcQueueStatisticEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.7
+    hwAtmPvcQueueStatisticTxBytes OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of sent bytes."
+        ::= { hwAtmPvcQueueStatisticEntry 7 }
+
+    -- 1.3.6.1.4.1.2011.5.25.156.1.27.1.8
+    hwAtmPvcQueueStatisticTxDropPks OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of discarded sent packets."
+        ::= { hwAtmPvcQueueStatisticEntry 8 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.2
+    hwAtmNotification OBJECT IDENTIFIER ::= { hwAtmMIB 2 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.2.1
+    hwVplTrap OBJECT IDENTIFIER ::= { hwAtmNotification 1 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.2.1.1
+    hwAtmVpcConnectivityTestResultNotify NOTIFICATION-TYPE
+        OBJECTS { hwAtmVpcConnectivityTestIfIndex, hwAtmVpcConnectivityTestVpi, hwAtmVpcConnectivityTestLLID, hwAtmVpcConnectivityTestResult, hwAtmVpcConnectivityTestIfName
+             }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the connectivity test on ATM VPC services is ended."
+        ::= { hwVplTrap 1 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.2.2
+    hwVclTrap OBJECT IDENTIFIER ::= { hwAtmNotification 2 }
+
+
+    -- 1.3.6.1.4.1.2011.5.25.156.2.2.1
+    hwAtmVccConnectivityTestResultNotify NOTIFICATION-TYPE
+        OBJECTS { hwAtmVccConnectivityTestIfIndex, hwAtmVccConnectivityTestVpi, hwAtmVccConnectivityTestVci, hwAtmVccConnectivityTestLLID, hwAtmVccConnectivityTestResult,
+            hwAtmVccConnectivityTestIfName }
+        STATUS current
+        DESCRIPTION
+            "This object indicates that the connectivity test on ATM VCC services is ended."
+        ::= { hwVclTrap 1 }
+
+
+    hwAtmConformance OBJECT IDENTIFIER ::= { hwAtmMIB 11 }
+
+
+    hwAtmCompliances OBJECT IDENTIFIER ::= { hwAtmConformance 1 }
+
+
+    hwAtmCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for systems supporting
+            the HUAWEI-ATM-MIB."
+        MODULE
+            MANDATORY-GROUPS { hwAtmObjectGroup, hwAtmMapPvpObjectGroup,
+                hwAtmMapPvcObjectGroup, hwAtmPvcIpoaObjectGroup, hwAtmPvcBridgeObjectGroup,
+                hwAtmPvcServiceObjectGroup, hwAtmPvcOAMLoopbackObjectGroup,
+                hwAtmPvpLimitObjectGroup, hwAtmPvcDynamicObjectGroup,
+                hwAtmPvcDynamicPppObjectGroup, hwAtmPvcDynamicBridgeObjectGroup }
+        ::= { hwAtmCompliances 1 }
+
+
+    hwAtmGroups OBJECT IDENTIFIER ::= { hwAtmConformance 2 }
+
+
+    hwAtmObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmIfType, hwAtmClock, hwAtmFrameFormat, hwAtmScramble, hwAtmLoopback,
+            hwAtmPitp, hwAtmFlagJ0Mode, hwAtmFlagJ0Value, hwAtmFlagJ0Trace, hwAtmFlagJ1Mode,
+            hwAtmFlagJ1Value, hwAtmFlagJ1Trace, hwAtmFlagC2Value }
+        STATUS current
+        DESCRIPTION
+            "The Atm attribute group."
+        ::= { hwAtmGroups 1 }
+
+
+    hwAtmIfConf OBJECT-GROUP
+        OBJECTS {
+              hwAtmIfConfMaxVccs,
+              hwAtmIfConfOperVccs,
+              hwAtmIfConfIntfType,
+              hwAtmIfConfCellTransfer
+                }
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwAtmGroups 2 }
+
+
+    hwAtmVplObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmPvcBridgeDstIfIndex, hwAtmPvcBridgeRowStatus, hwAtmPvcPppDstIfIndex, hwAtmPvcPppRowStatus }
+        STATUS current
+        DESCRIPTION
+            "The ATM PVC bridge attribute group."
+        ::= { hwAtmGroups 3 }
+
+
+    hwAtmVclObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmVclName, hwAtmVccAal5EncapsType, hwAtmVclRowStatus, hwAtmVclDescr }
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwAtmGroups 4 }
+
+
+    hwAtmMapPvpObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmMapPvpRemoteVplVpi, hwAtmMapPvpBi, hwAtmMapPvpRowStatus }
+        STATUS current
+        DESCRIPTION
+            "The ATM map PVP attribute group."
+        ::= { hwAtmGroups 5 }
+
+
+    hwAtmMapPvcObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmMapPvcRemoteVclVpi, hwAtmMapPvcRemoteVclVci, hwAtmMapPvcBi, hwAtmMapPvcRowStatus }
+        STATUS current
+        DESCRIPTION
+            "The ATM map PVC attribute group."
+        ::= { hwAtmGroups 6 }
+
+
+    hwAtmServiceObjectGroup OBJECT-GROUP
+        OBJECTS {
+            hwAtmServiceType,
+            hwAtmServiceOutputPcr,
+            hwAtmServiceOutputScr,
+            hwAtmServiceOutputMbs,
+            hwAtmServiceCbrCdvtValue,
+            hwAtmServiceOutputMcr,
+            hwAtmServiceRowStatus
+                }
+        STATUS current
+        DESCRIPTION
+            "The ATM service attribute group."
+        ::= { hwAtmGroups 7 }
+
+
+    hwAtmPvcServiceObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmPvcServiceName, hwAtmPvcTransmittalDirection, hwAtmPvcServiceRowStatus }
+        STATUS current
+        DESCRIPTION
+            "The ATM PVC service attribute group."
+        ::= { hwAtmGroups 8 }
+
+
+    hwAtmPvcIpoaObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmPvcIpoaIpMask, hwAtmPvcIpoaInarpInterval, hwAtmPvcIpoaBroadcast, hwAtmPvcIpoaRowStatus }
+        STATUS current
+        DESCRIPTION
+            "The ATM PVC IPOA attribute group."
+        ::= { hwAtmGroups 9 }
+
+
+    hwAtmPvcBridgeObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmVplRowStatus }
+        STATUS current
+        DESCRIPTION
+            "The ATM Pvl attribute group."
+        ::= { hwAtmGroups 10 }
+
+
+    hwAtmPvcOAMLoopbackObjectGroup OBJECT-GROUP
+        OBJECTS {
+            hwAtmPvcOAMLoopbackFrequency,
+            hwAtmPvcOAMLoopbackUpCount,
+            hwAtmPvcOAMLoopbackDownCount,
+            hwAtmPvcOAMLoopbackRetryFrequency,
+            hwAtmPvcOAMLoopbackRowStatus
+                }
+        STATUS current
+        DESCRIPTION
+            "The port attribute group."
+        ::= { hwAtmGroups 11 }
+
+
+    hwAtmPvpLimitObjectGroup OBJECT-GROUP
+        OBJECTS { hwAtmPvpLimitPeakRate, hwAtmPvpLimitRowStatus }
+        STATUS current
+        DESCRIPTION
+            "The port attribute group."
+        ::= { hwAtmGroups 12 }
+
+
+    hwAtmPvcDynamicObjectGroup OBJECT-GROUP
+        OBJECTS {
+            hwAtmPvcDynamicAdminStatus,
+            hwAtmPvcDynamicAal5EncapsType,
+            hwAtmPvcDynamicRowStatus
+                }
+        STATUS current
+        DESCRIPTION
+            "The ATM any other PVC attribute group."
+        ::= { hwAtmGroups 13 }
+
+
+    hwAtmPvcDynamicPppObjectGroup OBJECT-GROUP
+        OBJECTS {
+            hwAtmPvcDynamicPppDstIfIndex,
+            hwAtmPvcDynamicPppRowStatus
+                }
+        STATUS current
+        DESCRIPTION
+            "The ATM any other map PPP attribute group."
+        ::= { hwAtmGroups 14 }
+
+
+    hwAtmPvcDynamicBridgeObjectGroup OBJECT-GROUP
+        OBJECTS {
+            hwAtmPvcDynamicBridgeDstIfIndex,
+            hwAtmPvcDynamicBridgeRowStatus
+                }
+        STATUS current
+        DESCRIPTION
+            "The ATM any other map bridge attribute group."
+        ::= { hwAtmGroups 15 }  
+        
+    
+    hwAtmVpcVccConnectivityTestTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwAtmVpcConnectivityTestResultNotify, hwAtmVccConnectivityTestResultNotify }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwAtmGroups 16 }    
+        
+        
+    hwAtmVpVcTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwVpAis, hwVpAisResume,
+                        hwVpRdi, hwVpRdiResume,
+                        hwVcAis, hwVcAisResume,
+                        hwVcRdi, hwVcRdiResume,
+                        hwVpLoc, hwVpLocResume,
+                        hwVcLoc, hwVcLocResume,
+                        hwNoAtmResourceAlarmTrap                                   
+                      }
+        STATUS current
+        DESCRIPTION 
+            "Description."
+        ::= { hwAtmGroups 17 }   
+        
+    hwAtmAlarmObjectGroup OBJECT-GROUP
+        OBJECTS { hwOamAlmDirection
+                }
+        STATUS current
+        DESCRIPTION
+            "Description."
+        ::= { hwAtmGroups 18 }
+        
+    
+
+
+    hwAtmTraps OBJECT IDENTIFIER ::= { hwAtmMIB 12 }
+
+    hwVpAis NOTIFICATION-TYPE
+      OBJECTS { hwAtmVplIfIndex, hwAtmVplVpi, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The AIS alarm of the VP is found."
+      ::= { hwAtmTraps 1 }
+
+
+    hwVpAisResume NOTIFICATION-TYPE
+      OBJECTS { hwAtmVplIfIndex, hwAtmVplVpi, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The AIS alarm of the VP is cancelled."
+      ::= { hwAtmTraps 2 }
+
+    hwVpRdi NOTIFICATION-TYPE
+      OBJECTS { hwAtmVplIfIndex, hwAtmVplVpi, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The RDI alarm of the VP is found."
+      ::= { hwAtmTraps 3 }
+
+
+    hwVpRdiResume NOTIFICATION-TYPE
+      OBJECTS { hwAtmVplIfIndex, hwAtmVplVpi, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The RDI alarm of the VP is cancelled."
+      ::= { hwAtmTraps 4 }
+
+
+    hwVcAis NOTIFICATION-TYPE
+      OBJECTS { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The AIS alarm of the VC is found."
+      ::= { hwAtmTraps 5 }
+
+
+    hwVcAisResume NOTIFICATION-TYPE
+      OBJECTS { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The AIS alarm of the VC is cancelled."
+      ::= { hwAtmTraps 6 }
+
+
+    hwVcRdi NOTIFICATION-TYPE
+      OBJECTS { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The RDI alarm of the VC is found."
+      ::= { hwAtmTraps 7 }
+
+
+    hwVcRdiResume NOTIFICATION-TYPE
+      OBJECTS { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The RDI alarm of the VC is cancelled."
+      ::= { hwAtmTraps 8 }
+
+
+    hwVpLoc NOTIFICATION-TYPE
+      OBJECTS { hwAtmVplIfIndex, hwAtmVplVpi, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The CC-LOC alarm of the VP is found."
+      ::= { hwAtmTraps 9 }
+
+
+    hwVpLocResume NOTIFICATION-TYPE
+      OBJECTS { hwAtmVplIfIndex, hwAtmVplVpi, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The CC-LOC alarm of the VP is cancelled."
+      ::= { hwAtmTraps 10 }
+
+
+    hwVcLoc NOTIFICATION-TYPE
+      OBJECTS { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The CC-LOC alarm of the VC is found."
+      ::= { hwAtmTraps 11 }
+
+
+    hwVcLocResume NOTIFICATION-TYPE
+      OBJECTS { hwAtmVclIfIndex, hwAtmVclVpi, hwAtmVclVci, hwOamAlmDirection, ifName }
+      STATUS current
+      DESCRIPTION
+        "The CC-LOC alarm of the VC is cancelled."
+      ::= { hwAtmTraps 12 }
+
+     hwNoAtmResourceAlarmTrap NOTIFICATION-TYPE
+       OBJECTS    {
+                  hwFrameIndex,  
+                  hwSlotIndex,
+                  hwPortIndex
+                  }         
+       STATUS current
+       DESCRIPTION
+           "When ATM resources of the system are insufficient, this trap will be generated."
+       ::= { hwAtmTraps 13 }      
+
+    hwOamAlmDirection OBJECT-TYPE
+      SYNTAX Integer32
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION
+        "The direction of alarm such as ais, rdi, cc-loc, the value of directon is forward or backward."
+      ::= { hwAtmMIB 13 }
+
+    END
+
+--
+-- HUAWEI-ATM-MIB.mib
+--

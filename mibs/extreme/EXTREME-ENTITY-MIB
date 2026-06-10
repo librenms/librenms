@@ -1,0 +1,72 @@
+-- ################################################################################
+
+EXTREME-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY  FROM SNMPv2-SMI
+		OBJECT-TYPE      FROM SNMPv2-SMI
+                Unsigned32	 FROM SNMPv2-SMI
+                extremeAgent     FROM EXTREME-BASE-MIB
+		entPhysicalIndex FROM ENTITY-MIB;
+
+        extremeEntity MODULE-IDENTITY
+	        LAST-UPDATED "200502140000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme System objects: objects common to all platforms"
+        ::= { extremeAgent 31 }
+
+--
+--  FRU Table
+--
+	extremeEntityFRUTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeEntityFRUEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about each FRU in the 
+		chassis based on Entity MIB."
+			::= { extremeEntity 1 }
+
+	extremeEntityFRUEntry OBJECT-TYPE
+		SYNTAX  ExtremeEntityFRUEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"Entry in table for a FRU Entity."
+		INDEX	  { entPhysicalIndex }
+			::= { extremeEntityFRUTable 1 }
+
+	ExtremeEntityFRUEntry ::= SEQUENCE {
+		extremeEntityFRUStartTime	Unsigned32,
+		extremeEntityFRUOdometer	Unsigned32,
+		extremeEntityFRUOdometerUnit	INTEGER
+	}
+
+        extremeEntityFRUStartTime  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "First Recorded Start Time."
+		::= { extremeEntityFRUEntry 1 }
+
+	extremeEntityFRUOdometer   OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"Number of time units in service."
+		::= { extremeEntityFRUEntry 2 }
+
+	extremeEntityFRUOdometerUnit OBJECT-TYPE
+		SYNTAX INTEGER { days(1), seconds(2) }
+	        MAX-ACCESS read-only
+            	STATUS current
+            	DESCRIPTION
+            	"Time unit used to represent value reported by
+		extremeEntityFRUOdometer. Depending on the underlying 
+		hardware capability."
+		::= { extremeEntityFRUEntry 3 }
+
+END

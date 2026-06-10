@@ -1,0 +1,519 @@
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition 
+  
+-- This file describes the ZyXEL Communications Corporation Enterprise MIB.
+-- It contains ZyXEL products OIDs, and common managed objects.
+
+-- ZYXEL-HW-MONITOR-MIB.mib
+-- Revision 1.10  2016/02/24 
+
+ZYXEL-HW-MONITOR-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+	OBJECT-TYPE
+		FROM SNMPv2-SMI			-- RFC2578	
+		
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+		
+	DisplayString                                          
+	  FROM SNMPv2-TC
+
+	NOTIFICATION-TYPE
+		FROM SNMPv2-SMI
+
+	esMgmt			
+		FROM ZYXEL-ES-SMI;
+
+	zyxelHwMonitor MODULE-IDENTITY
+		LAST-UPDATED	"201207010000Z"    
+		ORGANIZATION "Enterprise Solution ZyXEL"     
+		CONTACT-INFO
+			""	   
+		DESCRIPTION
+			"The subtree for hardware monitor"
+		::= { esMgmt 26 }
+
+	zyxelHwMonitorStatus 			OBJECT IDENTIFIER ::= { zyxelHwMonitor 1 }		
+	zyxelHwMonitorNotifications 	OBJECT IDENTIFIER ::= { zyxelHwMonitor 2 }
+	zyxelHwMonitorTrapInfoObject	OBJECT IDENTIFIER ::= { zyxelHwMonitor 3 }	
+
+--  26.HwMonitor
+
+-- 		fanRpmTable
+	
+        zyxelHwMonitorFanRpmTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelHwMonitorFanRpmEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains HW monitor fan information."
+        ::= { zyxelHwMonitorStatus 1 }
+        
+		zyxelHwMonitorFanRpmEntry OBJECT-TYPE
+        SYNTAX	ZyxelHwMonitorFanRpmEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains HW monitor fan information."
+        INDEX          	{ zyHwMonitorFanRpmIndex }
+        ::= { zyxelHwMonitorFanRpmTable 1 }
+
+        ZyxelHwMonitorFanRpmEntry ::=
+           SEQUENCE {
+        	zyHwMonitorFanRpmIndex			INTEGER,
+        	zyHwMonitorFanRpmDescription	DisplayString,
+        	zyHwMonitorFanRpmCurrentValue	INTEGER,
+        	zyHwMonitorFanRpmMaxValue		INTEGER,
+        	zyHwMonitorFanRpmMinValue		INTEGER,
+        	zyHwMonitorFanRpmLowThreshold	INTEGER,
+        	zyHwMonitorFanRpmStatus			DisplayString
+           }
+
+        zyHwMonitorFanRpmIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Index of fan."
+        ::= { zyxelHwMonitorFanRpmEntry 1 }
+        
+        zyHwMonitorFanRpmDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"Fan Description"
+        ::= { zyxelHwMonitorFanRpmEntry 2 }
+
+        zyHwMonitorFanRpmCurrentValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Current speed in Revolutions Per Minute (RPM) on the fan."
+        ::= { zyxelHwMonitorFanRpmEntry 3 }
+
+        zyHwMonitorFanRpmMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Maximum speed measured in Revolutions Per Minute (RPM) on the fan."
+        ::= { zyxelHwMonitorFanRpmEntry 4 }
+        
+        zyHwMonitorFanRpmMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Minimum speed measured in Revolutions Per Minute (RPM) on the fan."
+        ::= { zyxelHwMonitorFanRpmEntry 5 }
+
+        zyHwMonitorFanRpmLowThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The minimum speed at which a normal fan should work."
+        ::= { zyxelHwMonitorFanRpmEntry 6 }
+
+        zyHwMonitorFanRpmStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"'Normal' indicates that this fan is functioning above the minimum speed. 
+		 'Error' indicates that this fan is functioning below the minimum speed."
+        ::= { zyxelHwMonitorFanRpmEntry 7 }
+
+-- 		tempTable
+
+        zyxelHwMonitorTemperatureTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelHwMonitorTemperatureEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains HW monitor temperature information."
+        ::= { zyxelHwMonitorStatus 2 }
+        
+		zyxelHwMonitorTemperatureEntry OBJECT-TYPE
+        SYNTAX	ZyxelHwMonitorTemperatureEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains HW temperature information."
+        INDEX          	{ zyHwMonitorTemperatureIndex }
+        ::= { zyxelHwMonitorTemperatureTable 1 }
+
+        ZyxelHwMonitorTemperatureEntry ::=
+           SEQUENCE {
+        	zyHwMonitorTemperatureIndex			INTEGER,
+        	zyHwMonitorTemperatureDescription	DisplayString,
+        	zyHwMonitorTemperatureCurrentValue	INTEGER,
+        	zyHwMonitorTemperatureMaxValue		INTEGER,
+        	zyHwMonitorTemperatureMinValue		INTEGER,
+        	zyHwMonitorTemperatureHighThreshold	INTEGER,
+        	zyHwMonitorTemperatureStatus		DisplayString
+           }
+
+        zyHwMonitorTemperatureIndex OBJECT-TYPE
+        SYNTAX  INTEGER 
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Index of temperature unit."
+        ::= { zyxelHwMonitorTemperatureEntry 1 }
+        
+        zyHwMonitorTemperatureDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Temperature Description"
+        ::= { zyxelHwMonitorTemperatureEntry 2 }
+        
+
+        zyHwMonitorTemperatureCurrentValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The current temperature measured at this sensor."
+        ::= { zyxelHwMonitorTemperatureEntry 3 }
+
+        zyHwMonitorTemperatureMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The maximum temperature measured at this sensor."
+        ::= { zyxelHwMonitorTemperatureEntry 4 }
+        
+        zyHwMonitorTemperatureMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The minimum temperature measured at this sensor."
+        ::= { zyxelHwMonitorTemperatureEntry 5 }
+
+        zyHwMonitorTemperatureHighThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The upper temperature limit at this sensor."
+        ::= { zyxelHwMonitorTemperatureEntry 6 }
+
+        zyHwMonitorTemperatureStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "'Normal' indicates temperatures below the threshold and 'Error' for those above."
+        ::= { zyxelHwMonitorTemperatureEntry 7 }
+
+-- 		voltageTable
+
+        zyxelHwMonitorVoltageTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelHwMonitorVoltageEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains HW monitor voltage information."
+        ::= { zyxelHwMonitorStatus 3 }
+        
+		zyxelHwMonitorVoltageEntry OBJECT-TYPE
+        SYNTAX	ZyxelHwMonitorVoltageEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains HW voltage information."
+        INDEX          	{ zyHwMonitorVoltageIndex }
+        ::= { zyxelHwMonitorVoltageTable 1 }
+
+        ZyxelHwMonitorVoltageEntry ::=
+           SEQUENCE {
+        	zyHwMonitorVoltageIndex			INTEGER,
+        	zyHwMonitorVoltageDescription	DisplayString,
+        	zyHwMonitorVoltageCurrentValue	INTEGER,
+        	zyHwMonitorVoltageMaxValue		INTEGER,
+        	zyHwMonitorVoltageMinValue		INTEGER,
+        	zyHwMonitorVoltageNominalValue	INTEGER,
+        	zyHwMonitorVoltageLowThreshold	INTEGER,
+        	zyHwMonitorVoltageStatus		DisplayString
+           }
+
+        zyHwMonitorVoltageIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Index of voltage."
+        ::= { zyxelHwMonitorVoltageEntry 1 }
+        
+        zyHwMonitorVoltageDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "Voltage Description"
+        ::= { zyxelHwMonitorVoltageEntry 2 } 
+
+        zyHwMonitorVoltageCurrentValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The current voltage reading."
+        ::= { zyxelHwMonitorVoltageEntry 3 }
+
+        zyHwMonitorVoltageMaxValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The maximum voltage measured at this point."
+        ::= { zyxelHwMonitorVoltageEntry 4 }
+        
+        zyHwMonitorVoltageMinValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The minimum voltage measured at this point."
+        ::= { zyxelHwMonitorVoltageEntry 5 }
+
+        zyHwMonitorVoltageNominalValue OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The normal voltage at which the switch work."
+        ::= { zyxelHwMonitorVoltageEntry 6 }
+
+        zyHwMonitorVoltageLowThreshold OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The minimum voltage at which the switch should work."
+        ::= { zyxelHwMonitorVoltageEntry 7 }
+
+        zyHwMonitorVoltageStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "'Normal' indicates that the voltage is within an acceptable operating 
+		 range at this point; otherwise 'Error' is displayed."
+        ::= { zyxelHwMonitorVoltageEntry 8 }    
+  
+  
+  -- PowerSourceStatus 
+ 	zyxelHwMonitorPowerSource OBJECT IDENTIFIER  ::= { zyxelHwMonitorStatus 4 } 
+        
+    zyHwMonitorPowerSourceMode OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The current power source reading (AC prefer, load-sharing)."
+        ::= { zyxelHwMonitorPowerSource 1 }
+
+	zyxelHwMonitorPowerSourceTable	OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ZyxelHwMonitorPowerSourceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The table contains HW monitor power source information."
+        ::= { zyxelHwMonitorPowerSource 2 }
+                
+      
+	zyxelHwMonitorPowerSourceEntry OBJECT-TYPE
+        SYNTAX	ZyxelHwMonitorPowerSourceEntry
+        MAX-ACCESS	not-accessible
+        STATUS	current
+        DESCRIPTION    	
+		"An entry contains HW power source information."
+        INDEX          	{ zyHwMonitorPowerSourceIndex }
+        ::= { zyxelHwMonitorPowerSourceTable 1 }
+
+        ZyxelHwMonitorPowerSourceEntry ::=
+           SEQUENCE {
+        	zyHwMonitorPowerSourceIndex			        INTEGER,
+        	zyHwMonitorPowerSourceType			        DisplayString, 
+        	zyHwMonitorPowerSourceStatus		        DisplayString,
+			zyHwMonitorPowerSourceDescription	        DisplayString,
+			zyHwMonitorPowerSourcePreviousStatus	    DisplayString
+         }
+
+        zyHwMonitorPowerSourceIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "Index of power source."
+        ::= { zyxelHwMonitorPowerSourceEntry 1 }
+
+        zyHwMonitorPowerSourceType OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The current power source type (AC/DC)."
+        ::= { zyxelHwMonitorPowerSourceEntry 2 } 
+         
+        zyHwMonitorPowerSourceStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The current power source status  (normal/error/absent/present)."
+        ::= { zyxelHwMonitorPowerSourceEntry 3 } 
+		
+		zyHwMonitorPowerSourceDescription OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"Power source Description."
+        ::= { zyxelHwMonitorPowerSourceEntry 4 }
+		
+		zyHwMonitorPowerSourcePreviousStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+		"Power source Previous Status  (normal/error/absent/present)."
+        ::= { zyxelHwMonitorPowerSourceEntry 5 }
+		
+	   zyHwMonitorFanSpeedOutOfRange NOTIFICATION-TYPE
+       OBJECTS {
+				zyHwMonitorFanRpmIndex,
+				zyHwMonitorFanRpmDescription
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Fan speed is out of the normal operation range."
+       ::= { zyxelHwMonitorNotifications 1 }
+	   
+	   zyHwMonitorTemperatureOutOfRange NOTIFICATION-TYPE
+       OBJECTS {
+				zyHwMonitorTemperatureIndex,
+				zyHwMonitorTemperatureDescription
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Temperature is out of the normal operation range."
+       ::= { zyxelHwMonitorNotifications 2 }
+	   
+	   zyHwMonitorPowerSupplyVoltageOutOfRange NOTIFICATION-TYPE
+       OBJECTS {
+				zyHwMonitorVoltageIndex,
+				zyHwMonitorVoltageDescription
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Power supply voltage is out of the normal operation range."
+       ::= { zyxelHwMonitorNotifications 3 }
+	   
+	   zyHwMonitorBackupPowerSupplyInUse NOTIFICATION-TYPE    
+	   STATUS  current
+       DESCRIPTION
+       "Backup power in use is fault."
+       ::= { zyxelHwMonitorNotifications 4 }
+	   
+	   zyHwMonitorDyingGasp NOTIFICATION-TYPE      
+	   STATUS  current
+       DESCRIPTION
+       "Unexpected power down or low power is detected."
+       ::= { zyxelHwMonitorNotifications 5 }
+
+	   zyHwMonitorFanAirFlowInconsistency NOTIFICATION-TYPE    
+	   STATUS  current
+       DESCRIPTION
+       "FAN airflows are inconsistent."
+       ::= { zyxelHwMonitorNotifications 6 }	
+       
+       zyHwMonitorFanSpeedOutOfRangeRecovered NOTIFICATION-TYPE
+       OBJECTS {
+				zyHwMonitorFanRpmIndex,
+				zyHwMonitorFanRpmDescription
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Fan speed is recovered from out of the normal operation range."
+       ::= { zyxelHwMonitorNotifications 7 }
+	   
+	   zyHwMonitorTemperatureOutOfRangeRecovered NOTIFICATION-TYPE
+       OBJECTS {
+				zyHwMonitorTemperatureIndex,
+				zyHwMonitorTemperatureDescription
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Temperature is recovered from out of the normal operation range."
+       ::= { zyxelHwMonitorNotifications 8 }
+	   
+	   zyHwMonitorPowerSupplyVoltageOutOfRangeRecovered NOTIFICATION-TYPE
+       OBJECTS {
+				zyHwMonitorVoltageIndex,
+				zyHwMonitorVoltageDescription
+         }       
+	   STATUS  current
+       DESCRIPTION
+       "Power supply voltage is recovered from out of the normal operation range."
+       ::= { zyxelHwMonitorNotifications 9 }
+	   
+	   zyHwMonitorPowerSourceAbnormal NOTIFICATION-TYPE
+		OBJECTS {
+				zyHwMonitorPowerSourceIndex,
+				zyHwMonitorPowerSourceStatus,
+				zyHwMonitorPowerSourceDescription,
+				zyHwMonitorTrapPowerSourceErrorType
+         }   	   
+	   STATUS  current
+       DESCRIPTION
+       "Power source status is change."
+       ::= { zyxelHwMonitorNotifications 10 }
+	   
+	   zyHwMonitorPowerSourceAbnormalRecovered NOTIFICATION-TYPE 
+		OBJECTS {
+				zyHwMonitorPowerSourceIndex,
+				zyHwMonitorPowerSourceStatus,
+				zyHwMonitorPowerSourceDescription		
+         }   	   
+	   STATUS  current
+       DESCRIPTION
+       "Power source status change to normal."
+       ::= { zyxelHwMonitorNotifications 11 }
+	   
+	  zyHwMonitorPowerSourceStatusChange NOTIFICATION-TYPE 
+		OBJECTS {
+				zyHwMonitorPowerSourceIndex,
+				zyHwMonitorPowerSourcePreviousStatus,
+				zyHwMonitorPowerSourceStatus,
+				zyHwMonitorPowerSourceDescription,
+				zyHwMonitorTrapPowerSourceErrorType
+				
+         }   	   
+	   STATUS  current
+       DESCRIPTION
+       "Check power source status change situation."
+       ::= { zyxelHwMonitorNotifications 12 } 	   
+	   
+-- *******************************************************************
+-- *
+-- * zyxelHwMonitorTrapInfoObject
+-- *
+-- *******************************************************************		
+		zyHwMonitorTrapPowerSourceErrorType OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+			"There are the error type of power source."  
+        ::= { zyxelHwMonitorTrapInfoObject 1 }  
+  END
+

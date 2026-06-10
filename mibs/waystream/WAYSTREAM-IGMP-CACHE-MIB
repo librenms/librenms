@@ -1,0 +1,131 @@
+WAYSTREAM-IGMP-CACHE-MIB DEFINITIONS ::= BEGIN
+--
+-- This is the Waystream Management Information Base definition for IGMP 
+-- cache viewing on Waystream iBOS based products.
+--
+-- Copyright (c) 2017 Waystream AB, All rights reserved
+--
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+	IpAddress, 
+	TimeTicks
+	FROM SNMPv2-SMI
+	
+	InterfaceIndex
+	FROM IF-MIB
+
+        wsMgmt
+        FROM WAYSTREAM-SMI;
+
+--
+-- Waystream IGMP snoop 
+--
+wsIgmp MODULE-IDENTITY
+    LAST-UPDATED "201702101100Z"	-- February 10, 2017
+    ORGANIZATION "Waystream AB"
+    CONTACT-INFO
+        "Waystream AB
+         Customer Service
+
+         Mail : Farogatan 33
+                SE-164 51 Kista
+                Sweden
+
+         Tel  : +46 8 5626 9450
+
+         E-mail: info@waystream.com
+         Web   : http://www.waystream.com"
+
+    DESCRIPTION
+        "Waystream MIB describing IGMP caching and snooping functions of
+         ASRs"
+
+    REVISION "201702101100Z"	-- February 10, 2017
+    DESCRIPTION
+        "Company name change:
+	 In October 2015 PacketFront Network Products was renamed Waystream.
+	 In this update all PacketFront were changed to Waystream and all
+	 pf* to ws*."
+    REVISION "201101111754Z"	-- January 11, 2011
+    DESCRIPTION
+        "Updated company name"
+    REVISION "200904291349Z"
+    DESCRIPTION
+        "Moved pfIgmp from pfExperimental.3 to pfMgmt.13"
+    REVISION "200903231125Z"
+    DESCRIPTION
+        "Updated telephone information in contact-info"
+    REVISION "200804301348Z"
+    DESCRIPTION
+        "Move from PACKETFRONT-MIB"
+    REVISION "200706131437Z"
+    DESCRIPTION
+        "Initial implementation of pfIgmp"
+
+    ::= { wsMgmt 13 }
+
+
+wsIgmpCacheTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF WsIgmpCacheEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The table listing all snooped members of IP multicast groups
+	that are connected through downstream0-mapped interfaces."
+    ::= { wsIgmp 2 }
+
+wsIgmpCacheEntry OBJECT-TYPE
+    SYNTAX	WsIgmpCacheEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"An entry in the wsIgmpCacheTable."
+    INDEX	{ wsIgmpCacheAddress, wsIgmpCacheIfIndex, wsIgmpCacheReporter }
+    ::= { wsIgmpCacheTable 1 }
+
+WsIgmpCacheEntry ::= SEQUENCE {
+    wsIgmpCacheAddress		IpAddress,
+    wsIgmpCacheIfIndex		InterfaceIndex,
+    wsIgmpCacheReporter		IpAddress,
+    wsIgmpCacheUpTime		TimeTicks
+}
+
+wsIgmpCacheAddress OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The IP multicast group for which this entry
+	contains information."
+    ::= { wsIgmpCacheEntry 1 }
+
+wsIgmpCacheIfIndex OBJECT-TYPE
+    SYNTAX	InterfaceIndex
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The interface for which this entry contains
+	information for	an IP multicast group."
+    ::= { wsIgmpCacheEntry 2 }
+
+wsIgmpCacheReporter OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION
+	"The reporter for which this entry contains
+	information for an IP multicast group."
+    ::= { wsIgmpCacheEntry 3 }
+
+wsIgmpCacheUpTime OBJECT-TYPE
+    SYNTAX	TimeTicks
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Time elapsed since this entry was created."
+    ::= { wsIgmpCacheEntry 4 }
+
+
+END

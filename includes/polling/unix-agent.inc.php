@@ -1,0 +1,241 @@
+<?php
+
+use App\Models\Process;
+use Illuminate\Support\Facades\Cache;
+use LibreNMS\RRD\RrdDefinition;
+
+if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
+    echo \App\Facades\LibrenmsConfig::get('project_name') . ' UNIX Agent: ';
+
+    $agent_port = get_dev_attrib($device, 'override_Unixagent_port');
+    if (empty($agent_port)) {
+        $agent_port = \App\Facades\LibrenmsConfig::get('unix-agent.port');
+    }
+
+    $agent_start = microtime(true);
+    $agent = null;
+    try {
+        $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(DeviceCache::getPrimary()->pollerTarget());
+        $agent = @fsockopen($poller_target, $agent_port, $errno, $errstr, \App\Facades\LibrenmsConfig::get('unix-agent.connection-timeout'));
+    } catch (ErrorException $e) {
+        echo $e->getMessage() . PHP_EOL; // usually connection timed out
+
+        return;
+    }
+
+    if (! $agent) {
+        echo 'Connection to UNIX agent failed on port ' . $agent_port . '.';
+    } else {
+        // Set stream timeout (for timeouts during agent  fetch
+        stream_set_timeout($agent, \App\Facades\LibrenmsConfig::get('unix-agent.read-timeout'));
+        $agentinfo = stream_get_meta_data($agent);
+        $agent_raw = '';
+
+        // fetch data while not eof and not timed-out
+        while ((! feof($agent)) && (! $agentinfo['timed_out'])) {
+            $agent_raw .= fgets($agent, 128);
+            $agentinfo = stream_get_meta_data($agent);
+        }
+
+        if ($agentinfo['timed_out']) {
+            echo 'Connection to UNIX agent timed out during fetch on port ' . $agent_port . '.';
+        }
+    }
+
+    $agent_end = microtime(true);
+    $agent_time = round(($agent_end - $agent_start) * 1000);
+
+    if (! empty($agent_raw)) {
+        echo 'execution time: ' . $agent_time . 'ms';
+
+        $tags = [
+            'rrd_def' => RrdDefinition::make()->addDataset('time', 'GAUGE', 0),
+        ];
+        $fields = [
+            'time' => $agent_time,
+        ];
+        app('Datastore')->put($device, 'agent', $tags, $fields);
+
+        $os->enableGraph('agent');
+
+        $agentapps = [
+            'apache',
+            'bind',
+            'ceph',
+            'mysql',
+            'nginx',
+            'os-updates',
+            'php-fpm',
+            'powerdns',
+            'powerdns-recursor',
+            'proxmox',
+            'redis',
+            'rrdcached',
+            'tinydns',
+            'gpsd',
+        ];
+
+        $agent_data = [];
+        foreach (explode('<<<', (string) $agent_raw) as $section) {
+            if (empty($section)) {
+                continue;
+            }
+
+            [$section, $data] = explode('>>>', $section);
+            if (in_array($section, $agentapps)) {
+                $agent_data['app'][$section] = trim($data);
+            }
+
+            if (str_contains($section, '-')) {
+                [$sa, $sb] = explode('-', $section, 2);
+                $agent_data[$sa][$sb] = trim($data);
+            } else {
+                $agent_data[$section] = trim($data);
+            }
+        }//end foreach
+
+        d_echo($agent_data);
+
+        include base_path('includes/polling/unix-agent/packages.inc.php');
+        include base_path('includes/polling/unix-agent/munin-plugins.inc.php');
+
+        foreach (array_keys($agent_data) as $key) {
+            $parser_file = base_path("includes/polling/unix-agent/$key.inc.php");
+            if (file_exists($parser_file)) {
+                d_echo("Including: unix-agent/$key.inc.php");
+
+                include $parser_file;
+            }
+        }
+
+        // Unix Processes
+        if (! empty($agent_data['ps'])) {
+            echo 'Processes: ';
+            \App\Models\Process::where('device_id', $device['device_id'])->delete();
+            $data = [];
+            foreach (explode("\n", $agent_data['ps']) as $process) {
+                if (preg_match('/\((.*),([0-9]*),([0-9]*),([-0-9:.]*),([0-9]*)\) (.+)/', $process, $process_matches)) {
+                    [, $user, $vsz, $rss, $cputime, $pid, $command] = $process_matches;
+                    $data[] = ['device_id' => $device['device_id'], 'pid' => $pid, 'user' => $user, 'vsz' => $vsz, 'rss' => $rss, 'cputime' => $cputime, 'command' => $command];
+                }
+            }
+            if (count($data) > 0) {
+                foreach (array_chunk($data, 1000) as $chunk) {
+                    Process::insert($chunk);
+                }
+            }
+            echo "\n";
+        }
+
+        // Windows Processes
+        if (! empty($agent_data['ps:sep(9)'])) {
+            echo 'Processes: ';
+            \App\Models\Process::where('device_id', $device['device_id'])->delete();
+            $data = [];
+            foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
+                $process = preg_replace('/\(([^,;]+),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)?,?([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11|\\12', $process);
+                [$user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name] = explode('|', (string) $process, 12);
+                if (! empty($process_name)) {
+                    $cputime = ($UserModeTime + $KernelModeTime) / 10000000;
+                    $days = floor($cputime / 86400);
+                    $hours = str_pad(floor(($cputime / 3600) % 24), 2, '0', STR_PAD_LEFT);
+                    $minutes = str_pad(floor(($cputime / 60) % 60), 2, '0', STR_PAD_LEFT);
+                    $seconds = str_pad($cputime % 60, 2, '0', STR_PAD_LEFT);
+                    $cputime = ($days > 0 ? "$days-" : '') . "$hours:$minutes:$seconds";
+                    $data[] = ['device_id' => $device['device_id'], 'pid' => $processId, 'user' => $user, 'vsz' => $PageFileUsage + $WorkingSetSize, 'rss' => $WorkingSetSize, 'cputime' => $cputime, 'command' => $process_name];
+                }
+            }
+            if (count($data) > 0) {
+                foreach (array_chunk($data, 1000) as $chunk) {
+                    Process::insert($chunk);
+                }
+            }
+            echo "\n";
+        }
+
+        foreach (array_keys($agent_data['app'] ?? []) as $key) {
+            if (file_exists(base_path("includes/polling/applications/$key.inc.php"))) {
+                d_echo("Enabling $key for " . $device['hostname'] . " if not yet enabled\n");
+
+                if (in_array($key, $agentapps)) {
+                    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ?', [$device['device_id'], $key]) == '0') {
+                        echo "Found new application '$key'\n";
+                        dbInsert(['device_id' => $device['device_id'], 'app_type' => $key, 'app_status' => '', 'app_instance' => ''], 'applications');
+                    }
+                }
+            }
+        }
+
+        // memcached
+        if (! empty($agent_data['app']['memcached'])) {
+            $agent_data['app']['memcached'] = json_decode($agent_data['app']['memcached'], true);
+            foreach ($agent_data['app']['memcached'] as $memcached_host => $memcached_data) {
+                if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device['device_id'], 'memcached', $memcached_host]) == '0') {
+                    echo "Found new application 'Memcached' $memcached_host\n";
+                    dbInsert(['device_id' => $device['device_id'], 'app_type' => 'memcached', 'app_status' => '', 'app_instance' => $memcached_host], 'applications');
+                }
+            }
+        }
+
+        // DRBD
+        if (! empty($agent_data['drbd'])) {
+            $agent_data['app']['drbd'] = [];
+            foreach (explode("\n", $agent_data['drbd']) as $drbd_entry) {
+                [$drbd_dev, $drbd_data] = explode(':', $drbd_entry);
+                if (preg_match('/^drbd/', $drbd_dev)) {
+                    $agent_data['app']['drbd'][$drbd_dev] = $drbd_data;
+                    if (dbFetchCell('SELECT COUNT(*) FROM `applications` WHERE `device_id` = ? AND `app_type` = ? AND `app_instance` = ?', [$device['device_id'], 'drbd', $drbd_dev]) == '0') {
+                        echo "Found new application 'DRBd' $drbd_dev\n";
+                        dbInsert(['device_id' => $device['device_id'], 'app_type' => 'drbd', 'app_status' => '', 'app_instance' => $drbd_dev], 'applications');
+                    }
+                }
+            }
+        }
+    }//end if
+
+    // Use agent DMI data if available
+    if (isset($agent_data['dmi'])) {
+        $getDmiValue = function ($system_key, $baseboard_key, $generic_value) use ($agent_data) {
+            $dmi = $agent_data['dmi'];
+
+            if (isset($dmi[$system_key]) && $dmi[$system_key] !== $generic_value) {
+                return $dmi[$system_key];
+            }
+
+            return $dmi[$baseboard_key] ?? '';
+        };
+
+        $manufacturer = $getDmiValue('system-manufacturer', 'baseboard-manufacturer', 'System Manufacturer');
+        $product = $getDmiValue('system-product-name', 'baseboard-product-name', 'System Product Name');
+        if ($product || $manufacturer) {
+            // Clean up Generic hardware descriptions
+            DeviceCache::getPrimary()->hardware = str_replace([
+                ' Computer Corporation',
+                ' Corporation',
+                ' Inc.',
+            ], '', implode(' ', array_filter([$manufacturer, $product])));
+        }
+
+        $serial = $getDmiValue('system-serial-number', 'baseboard-serial-number', 'System Serial Number');
+        if ($serial) {
+            DeviceCache::getPrimary()->serial = $serial;
+        }
+        DeviceCache::getPrimary()->save();
+        unset($dmi, $getDmiValue, $manufacturer, $product, $serial);
+    }
+
+    // store results in array cache
+    Cache::driver('array')->put('agent_data', $agent_data ?? null);
+
+    if (! empty($agent_sensors)) {
+        echo 'Sensors: ';
+        app('sensor-discovery')->sync(sensor_class: 'temperature', poller_type: 'agent');
+        d_echo($agent_sensors);
+        if (count($agent_sensors) > 0) {
+            record_sensor_data($device, $agent_sensors);
+        }
+        echo "\n";
+    }
+
+    echo "\n";
+}//end if

@@ -1,0 +1,551 @@
+
+VOLIUS-OS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY, 
+	enterprises, TimeTicks, Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, TruthValue, MacAddress, 
+	DateAndTime, DisplayString
+		FROM SNMPv2-TC
+	InetAddressIPv4
+		FROM INET-ADDRESS-MIB;
+
+vlsGlobalModule MODULE-IDENTITY
+	LAST-UPDATED "201105311534Z"
+	ORGANIZATION 
+		"Volius"
+	CONTACT-INFO 
+		""
+	DESCRIPTION 
+		"This MIB describes all SNMP-enabled hardware produced by Volius,
+		such as Fiber optical receivers, Erbium-doped fiber amplifiers,
+		Optical switches, CATV optical transmitters."
+
+	REVISION "201105311543Z"
+	DESCRIPTION 
+		"Initial version"
+::= { volius 1 }
+
+
+VlsDbuv ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d"
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing RF power readings in units of dBuV."
+	SYNTAX  Integer32
+
+
+VlsDeciCelsius ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-1"
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing temperature readings in units of 0.1
+		degrees Celsius. For example, a temperature of -12.3 degrees
+		Celsius will be represented as -123."
+	SYNTAX  Integer32
+
+
+VlsDeciDbm ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-1"
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing power readings in units of 0.1 dBm. For
+		example, a power of -2.5 dBm will be represented as -25."
+	SYNTAX  Integer32
+
+
+VlsEvent ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		vlsEventStartUp (1),
+		vlsEventPowerOff (2),
+		vlsEventSntpSync (3),
+		vlsEventFwUpload (4),
+		vlsEventIn1LoS (5),
+		vlsEventIn1LoQ (6),
+		vlsEventIn1Norm (7),
+		vlsEventIn2LoS (8),
+		vlsEventIn2LoQ (9),
+		vlsEventIn2Norm (10),
+		vlsEventSw1 (11),
+		vlsEventSw2 (12)
+	}
+
+
+VlsMillivolt ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT 	"d-3"
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing voltage values in units of mV."
+	SYNTAX  Integer32
+
+
+VlsSwitchMode ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		""
+	SYNTAX  INTEGER {
+		vlsForcePathA (1),
+		vlsForcePathB (2),
+		vlsPreferPathA (3),
+		vlsPreferPathB (4),
+		vlsAutoLatching (5),
+		vlsScript (6)
+	}
+
+
+VlsSwitchState ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"Data type representing the state of an A-B switch."
+	SYNTAX  INTEGER {
+		vlsPathA (1),
+		vlsPathB (2)
+	}
+
+volius               OBJECT IDENTIFIER ::= { enterprises 34652 }
+vlsSystem            OBJECT IDENTIFIER ::= { volius 2 }
+vlsSystemGeneral     OBJECT IDENTIFIER ::= { vlsSystem 10 }
+vlsNetworkServices   OBJECT IDENTIFIER ::= { vlsSystem 11 }
+vlsNetworkAddress    OBJECT IDENTIFIER ::= { vlsNetworkServices 5 }
+vlsHttp              OBJECT IDENTIFIER ::= { vlsNetworkServices 6 }
+vlsSnmp              OBJECT IDENTIFIER ::= { vlsNetworkServices 7 }
+vlsSntp              OBJECT IDENTIFIER ::= { vlsNetworkServices 8 }
+vlsEventLog          OBJECT IDENTIFIER ::= { vlsSystem 13 }
+vlsEdfa              OBJECT IDENTIFIER ::= { volius 3 }
+vlsOpticalSwitch     OBJECT IDENTIFIER ::= { volius 4 }
+
+vlsModelName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 1 }
+
+vlsSerialNumber  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 2 }
+
+vlsFirmwareVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 3 }
+
+vlsDateAndTime  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 4 }
+
+vlsTimeZone  OBJECT-TYPE
+	SYNTAX     Integer32 (-720..780)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 5 }
+
+vlsCaseTemperature  OBJECT-TYPE
+	SYNTAX     VlsDeciCelsius
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 6 }
+
+vlsSupplyVoltageTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsSupplyVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSystemGeneral 7 }
+
+vlsSupplyVoltageEntry  OBJECT-TYPE
+	SYNTAX 	VlsSupplyVoltageEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsSupplyVoltageIndex }
+	::= { vlsSupplyVoltageTable 1 }
+
+VlsSupplyVoltageEntry ::= SEQUENCE {
+	vlsSupplyVoltageIndex
+		Integer32,
+	vlsSupplyVoltageNominal
+		VlsMillivolt,
+	vlsSupplyVoltageActual
+		VlsMillivolt
+}
+
+vlsSupplyVoltageIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSupplyVoltageEntry 1 }
+
+vlsSupplyVoltageNominal  OBJECT-TYPE
+	SYNTAX     VlsMillivolt
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSupplyVoltageEntry 2 }
+
+vlsSupplyVoltageActual  OBJECT-TYPE
+	SYNTAX     VlsMillivolt
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSupplyVoltageEntry 3 }
+
+vlsMacAddress  OBJECT-TYPE
+	SYNTAX     MacAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 1 }
+
+vlsIpAddress  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 2 }
+
+vlsNetMask  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 3 }
+
+vlsDefaultGateway  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsNetworkAddress 4 }
+
+vlsHttpPassword  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     obsolete
+	DESCRIPTION 
+		""
+	::= { vlsHttp 1 }
+
+vlsHttpPasswordEnabled  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsHttp 2 }
+
+vlsHttpPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsHttp 3 }
+
+vlsHttpEnabled  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsHttp 4 }
+
+vlsSnmpPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSnmp 1 }
+
+vlsTrapDestTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsTrapDestEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSnmp 2 }
+
+vlsTrapDestEntry  OBJECT-TYPE
+	SYNTAX 	VlsTrapDestEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsTrapDestIndex }
+	::= { vlsTrapDestTable 1 }
+
+VlsTrapDestEntry ::= SEQUENCE {
+	vlsTrapDestIndex
+		Integer32,
+	vlsTrapDestAddr
+		InetAddressIPv4,
+	vlsTrapDestPort
+		Integer32,
+	vlsTrapDestEnable
+		TruthValue
+}
+
+vlsTrapDestIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 1 }
+
+vlsTrapDestAddr  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 2 }
+
+vlsTrapDestPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 3 }
+
+vlsTrapDestEnable  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsTrapDestEntry 4 }
+
+vlsSntpServerAddr  OBJECT-TYPE
+	SYNTAX     InetAddressIPv4
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSntp 1 }
+
+vlsSntpServerPort  OBJECT-TYPE
+	SYNTAX     Integer32 (1..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSntp 2 }
+
+vlsSntpEnabled  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSntp 3 }
+
+vlsLastEventCode  OBJECT-TYPE
+	SYNTAX     VlsEvent
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 1 }
+
+vlsLastEventIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 2 }
+
+vlsEventLogSize  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 3 }
+
+vlsEventLogTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsEventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 4 }
+
+vlsEventLogEntry  OBJECT-TYPE
+	SYNTAX 	VlsEventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsEventIndex }
+	::= { vlsEventLogTable 1 }
+
+VlsEventLogEntry ::= SEQUENCE {
+	vlsEventIndex
+		Integer32,
+	vlsEventCode
+		VlsEvent,
+	vlsEventTimeStamp
+		TimeTicks,
+	vlsEventDateTime
+		DateAndTime,
+	vlsEventMessage
+		DisplayString
+}
+
+vlsEventIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 1 }
+
+vlsEventCode  OBJECT-TYPE
+	SYNTAX     VlsEvent
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 2 }
+
+vlsEventTimeStamp  OBJECT-TYPE
+	SYNTAX     TimeTicks
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 3 }
+
+vlsEventDateTime  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 4 }
+
+vlsEventMessage  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLogEntry 5 }
+
+vlsEventTrap  NOTIFICATION-TYPE
+	OBJECTS { vlsLastEventCode }
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsEventLog 8 }
+
+vlsSwitchInputTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF VlsSwitchInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsOpticalSwitch 1 }
+
+vlsSwitchInputEntry  OBJECT-TYPE
+	SYNTAX 	VlsSwitchInputEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { vlsSwitchInputIndex }
+	::= { vlsSwitchInputTable 1 }
+
+VlsSwitchInputEntry ::= SEQUENCE {
+	vlsSwitchInputIndex
+		Integer32,
+	vlsSwitchInputPower
+		VlsDeciDbm,
+	vlsSwitchLosThreshold
+		VlsDeciDbm,
+	vlsSwitchLoqThreshold
+		VlsDeciDbm
+}
+
+vlsSwitchInputIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSwitchInputEntry 1 }
+
+vlsSwitchInputPower  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSwitchInputEntry 2 }
+
+vlsSwitchLosThreshold  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSwitchInputEntry 3 }
+
+vlsSwitchLoqThreshold  OBJECT-TYPE
+	SYNTAX     VlsDeciDbm
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsSwitchInputEntry 4 }
+
+vlsSwitchMode  OBJECT-TYPE
+	SYNTAX     VlsSwitchMode
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsOpticalSwitch 2 }
+
+vlsSwitchState  OBJECT-TYPE
+	SYNTAX     VlsSwitchState
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { vlsOpticalSwitch 3 }
+END

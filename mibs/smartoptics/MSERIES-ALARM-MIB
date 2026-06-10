@@ -1,0 +1,736 @@
+	-- SmartOptics Enterprise Specific Alarm MIB.
+--
+-- Copyright (c) 2011, SmartOptics
+-- All rights reserved
+--
+
+MSERIES-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32, Counter32, Integer32
+    FROM SNMPv2-SMI
+    DisplayString, DateAndTime
+    FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+    FROM SNMPv2-CONF
+    AlarmPerceivedSeverity, AlarmNotificationType, AlarmProbableCause, UnitType, PortType
+    FROM MSERIES-TC
+    mseries
+    FROM MSERIES-MIB;
+
+smartAlarm      MODULE-IDENTITY
+                LAST-UPDATED    "201402121415Z"
+                ORGANIZATION    "SmartOptics"
+                CONTACT-INFO    "http://www.smartoptics.com"
+                DESCRIPTION
+                                "This is the enterprise specific Alarm MIB for SmartOptics M-Series"
+                REVISION        "201402121415Z"
+                DESCRIPTION
+                                "Added alarmLogList and smartAlarmMIBConformance."
+
+                REVISION        "201310151341Z"
+                DESCRIPTION
+                                "Added alarmHostName, alarmPortName and alarmPortType to AlarmEntry.
+                                 Added alarmHostName, alarmPortName and alarmPortType to
+                                 alarmNotificationCleared, alarmNotificationWarning,
+                                 alarmNotificationMinor, alarmNotificationMajor,
+                                 and alarmNotificationCritical.
+
+                                 Also alarmPort reports different numbers against before
+                                 (changed from SmartOS v2.1). 1-10 means Line ports
+                                 and 11 and above means Client port.
+
+                                 Descriptions are also updated."
+                REVISION        "201112050000Z"
+                DESCRIPTION
+                                "Initial revision.
+
+                                 Added notifications."
+                ::=  { mseries 1 }
+
+        alarmGeneral   OBJECT IDENTIFIER
+                ::=  { smartAlarm  1}
+
+        alarmActiveList   OBJECT IDENTIFIER
+                ::=  { smartAlarm  2}
+
+        alarmLogList   OBJECT IDENTIFIER
+                ::=  { smartAlarm  3}
+
+        alarmNotifications   OBJECT IDENTIFIER
+                ::=  { smartAlarm  4}
+
+        smartAlarmMIBConformance   OBJECT IDENTIFIER
+                ::=  { smartAlarm  5}
+
+        smartAlarmGroups   OBJECT IDENTIFIER
+                ::=  { smartAlarmMIBConformance  1}
+
+        smartAlarmCompliances   OBJECT IDENTIFIER
+                ::=  { smartAlarmMIBConformance  2}
+
+--
+-- General alarm group
+--
+
+smartAlarmGeneralLastSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sequence number of the last sent notification."
+    ::= { alarmGeneral 1 }
+
+smartAlarmGeneralHighestSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current highest severity of the active alarms."
+    ::= { alarmGeneral 2 }
+
+smartAlarmGeneralNumberActiveList OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active alarms in the alarmActiveList."
+    ::= { alarmGeneral 3 }
+
+smartAlarmGeneralNumberLogList OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of alarms in the alarmLogList."
+    ::= { alarmGeneral 4 }
+
+--
+-- Alarm active list group
+--
+
+alarmActiveTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The active alarm list."
+    ::= { alarmActiveList 1 }
+
+alarmEntry OBJECT-TYPE
+    SYNTAX      AlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the active alarm list."
+    INDEX { alarmIndex }
+    ::= { alarmActiveTable 1 }
+
+AlarmEntry ::=
+    SEQUENCE {
+        alarmIndex                      Unsigned32,
+        alarmUnit                       UnitType,
+        alarmPort                       Integer32,
+        alarmText                       DisplayString,
+        alarmSeverity                   AlarmPerceivedSeverity,
+        alarmActivationTime             DateAndTime,
+        alarmCeaseTime                  DateAndTime,
+        alarmSeqNumber                  Counter32,
+        alarmHostName                   DisplayString,
+        alarmPortName                   DisplayString,
+        alarmPortType                   PortType,
+        alarmType                       AlarmNotificationType,
+        alarmCause                      AlarmProbableCause,
+        alarmPortAlias                  DisplayString
+}
+
+alarmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An unique index assigned to each alarm."
+    ::= { alarmEntry 1 }
+
+alarmUnit OBJECT-TYPE
+    SYNTAX      UnitType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarming unit associated with this alarm.
+        undefined(0), nmb(1), psu1(2), psu2(3), fan(4), system&#40;5&#41;,
+        slaveNmb(6), slavePsu1(7), slavePsu2(8), slaveFan(9)."
+    ::= { alarmEntry 2 }
+
+alarmPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarming port associated with this alarm.
+        1-10 is Line Ports. 11 and higher is Client ports. For non port alarms this value is 0."
+    ::= { alarmEntry 3 }
+
+alarmText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The additional text for the alarm."
+    ::= { alarmEntry 4 }
+
+alarmSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The severity of the alarm as defined in
+        ITU-T X.733."
+    ::= { alarmEntry 5 }
+
+alarmActivationTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was created."
+    ::= { alarmEntry 6 }
+
+alarmCeaseTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was ceased."
+    ::= { alarmEntry 7 }
+
+alarmSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last sequence number used when issuing
+        a notification for this alarm."
+    ::= { alarmEntry 8 }
+
+alarmHostName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hostname."
+    ::= { alarmEntry 9 }
+
+alarmPortName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Name."
+    ::= { alarmEntry 10 }
+
+alarmPortType OBJECT-TYPE
+    SYNTAX      PortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Type. undefined(0), rx(1), tx(2), biDi(3)."
+    ::= { alarmEntry 11 }
+
+alarmType OBJECT-TYPE
+    SYNTAX      AlarmNotificationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of alarm as defined in ITU-T X.733
+         undefined (0),
+         other (1),
+         communicationsAlarm (2),
+         qualityOfServiceAlarm (3),
+         processingErrorAlarm (4),
+         equipmentAlarm (5),
+         environmental (6),
+         integrityViolation (7),
+         operationalViolation (8),
+         physicalViolation(9),
+         securityServiceOrMechanismViloation (10),
+         timeDomainViolation (11)"
+    ::= { alarmEntry 12 }
+
+alarmCause OBJECT-TYPE
+    SYNTAX      AlarmProbableCause
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm probable cause as defined in ITU-T X.733.
+        undefined (0)
+        adapterError (1)                       -- Equipment
+        applicationSubsystemFailure (2)        -- Processing
+        bandwidthReduced (3)                   -- Quality of service
+        callEstablishmentError (4)             -- Communications
+        communicationsProtocolError (5)        -- Communications
+        communicationsSubsystemFailure (6)     -- Communications
+        configurationOrCustomizationError (7)  -- Processing
+        congestion (8)                         -- Quality of service
+        corruptData (9)                        -- Processing
+        cpuCyclesLimitExceeded (10)            -- Processing
+        dTEdCEInterfaceError (11)              -- Communications
+        datasetOrModemError (12)               -- Equipment
+        degradedSignal (13)                    -- Communications
+        enclosureDoorOpen (14)                 -- Environmental
+        equipmentMalfunction (15)              -- Equipment
+        excessiveVibration (16)                -- Environmental
+        fileError (17)                         -- Processing
+        fireDetected (18)                      -- Environmental
+        floodDetected (19)                     -- Environmental
+        framingError (20)                      -- Communications
+        heatingOrVentilationOrCoolingSystemProblem (21) -- Environmental
+        humidityUnacceptable (22)              -- Environmental
+        inputDeviceError (23)                  -- Equipment
+        inputOutputDeviceError (24)            -- Equipment
+        lANError (25)                          -- Communications
+        leakDetected (26)                      -- Environmental
+        localNodeTransmissionError (27)        -- Communications
+        lossOfFrame (28)                       -- Communications
+        lossOfSignal (29)                      -- Communications
+        materialSupplyExhausted (30)           -- Environmental
+        multiplexerProblem (31)                -- Equipment
+        outOfMemory (32)                       -- Processing
+        outputDeviceError (33)                 -- Equipment
+        performanceDegraded (34)               -- Quality of service
+        powerProblem (35)                      -- Equipment
+        pressureUnacceptable (36)              -- Environmental
+        processorProblem (37)                  -- Equipment
+        pumpFailure (38)                       -- Environmental
+        queueSizeExceeded (39)                 -- Quality of service
+        receiveFailure (40)                    -- Equipment
+        receiverFailure (41)                   -- Equipment
+        remoteNodeTransmissionError (42)       -- Communications
+        resourceAtOrNearingCapacity (43)       -- Quality of service
+        responseTimeExcessive (44)             -- Quality of service
+        retransmissionRateExcessive (45)       -- Quality of service
+        softwareProgramError (46)              -- Processing
+        softwareError (47)                     -- Processing
+        softwareProgramAbnormallyTerminated (48) -- Processing
+        storageCapacityProblem (49)            -- Processing
+        temperatureUnacceptable (50)           -- Environmental
+        thresholdCrossed (51)                  -- Quality of service
+        timingProblem (52)                     -- Equipment
+        toxicLeakDetected (53)                 -- Environmental
+        transmitFailure (54)                   -- Equipment
+        transmitterFailure (55)                -- Equipment
+        underlyingResourceUnavailable (56)     -- Processing
+        versionMismatch (57)                   -- Processing"
+    ::= { alarmEntry 13 }
+
+alarmPortAlias OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Alias."
+    ::= { alarmEntry 14 }
+
+--
+-- Alarm active list group
+--
+
+alarmLogTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AlarmLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The active alarm list."
+    ::= { alarmLogList 1 }
+
+alarmLogEntry OBJECT-TYPE
+    SYNTAX      AlarmLogEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the alarm log table."
+    INDEX { alarmLogIndex }
+    ::= { alarmLogTable 1 }
+
+AlarmLogEntry ::=
+    SEQUENCE {
+        alarmLogIndex                      Unsigned32,
+        alarmLogUnit                       UnitType,
+        alarmLogPort                       Integer32,
+        alarmLogText                       DisplayString,
+        alarmLogSeverity                   AlarmPerceivedSeverity,
+        alarmLogActivationTime             DateAndTime,
+        alarmLogCeaseTime                  DateAndTime,
+        alarmLogSeqNumber                  Counter32,
+        alarmLogHostName                   DisplayString,
+        alarmLogPortName                   DisplayString,
+        alarmLogPortType                   PortType,
+        alarmLogType                       AlarmNotificationType,
+        alarmLogCause                      AlarmProbableCause
+}
+
+alarmLogIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An unique index assigned to each alarm."
+    ::= { alarmLogEntry 1 }
+
+alarmLogUnit OBJECT-TYPE
+    SYNTAX      UnitType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarming unit associated with this alarm.
+        undefined(0), nmb(1), psu1(2), psu2(3), fan(4), system&#40;5&#41;,
+        slaveNmb(6), slavePsu1(7), slavePsu2(8), slaveFan(9)."
+    ::= { alarmLogEntry 2 }
+
+alarmLogPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarming port associated with this alarm.
+        1-10 is Line Ports. 11 and higher is Client ports. For non port alarms this value is 0."
+    ::= { alarmLogEntry 3 }
+
+alarmLogText OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The additional text for the alarm."
+    ::= { alarmLogEntry 4 }
+
+alarmLogSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The severity of the alarm as defined in
+        ITU-T X.733."
+    ::= { alarmLogEntry 5 }
+
+alarmLogActivationTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was created."
+    ::= { alarmLogEntry 6 }
+
+alarmLogCeaseTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the alarm was ceased."
+    ::= { alarmLogEntry 7 }
+
+alarmLogSeqNumber OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The last sequence number used when issuing
+        a notification for this alarm."
+    ::= { alarmLogEntry 8 }
+
+alarmLogHostName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hostname."
+    ::= { alarmLogEntry 9 }
+
+alarmLogPortName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Name."
+    ::= { alarmLogEntry 10 }
+
+alarmLogPortType OBJECT-TYPE
+    SYNTAX      PortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port Direction. rx(1), tx(2), biDi(3)."
+    ::= { alarmLogEntry 11 }
+
+alarmLogType OBJECT-TYPE
+    SYNTAX      AlarmNotificationType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of alarm as defined in ITU-T X.733
+         undefined (0),
+         other (1),
+         communicationsAlarm (2),
+         qualityOfServiceAlarm (3),
+         processingErrorAlarm (4),
+         equipmentAlarm (5),
+         environmental (6),
+         integrityViolation (7),
+         operationalViolation (8),
+         physicalViolation(9),
+         securityServiceOrMechanismViloation (10),
+         timeDomainViolation (11)"
+    ::= { alarmLogEntry 12 }
+
+alarmLogCause OBJECT-TYPE
+    SYNTAX      AlarmProbableCause
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarm probable cause as defined in ITU-T X.733.
+        undefined (0)
+        adapterError (1)                       -- Equipment
+        applicationSubsystemFailure (2)        -- Processing
+        bandwidthReduced (3)                   -- Quality of service
+        callEstablishmentError (4)             -- Communications
+        communicationsProtocolError (5)        -- Communications
+        communicationsSubsystemFailure (6)     -- Communications
+        configurationOrCustomizationError (7)  -- Processing
+        congestion (8)                         -- Quality of service
+        corruptData (9)                        -- Processing
+        cpuCyclesLimitExceeded (10)            -- Processing
+        dTEdCEInterfaceError (11)              -- Communications
+        datasetOrModemError (12)               -- Equipment
+        degradedSignal (13)                    -- Communications
+        enclosureDoorOpen (14)                 -- Environmental
+        equipmentMalfunction (15)              -- Equipment
+        excessiveVibration (16)                -- Environmental
+        fileError (17)                         -- Processing
+        fireDetected (18)                      -- Environmental
+        floodDetected (19)                     -- Environmental
+        framingError (20)                      -- Communications
+        heatingOrVentilationOrCoolingSystemProblem (21) -- Environmental
+        humidityUnacceptable (22)              -- Environmental
+        inputDeviceError (23)                  -- Equipment
+        inputOutputDeviceError (24)            -- Equipment
+        lANError (25)                          -- Communications
+        leakDetected (26)                      -- Environmental
+        localNodeTransmissionError (27)        -- Communications
+        lossOfFrame (28)                       -- Communications
+        lossOfSignal (29)                      -- Communications
+        materialSupplyExhausted (30)           -- Environmental
+        multiplexerProblem (31)                -- Equipment
+        outOfMemory (32)                       -- Processing
+        outputDeviceError (33)                 -- Equipment
+        performanceDegraded (34)               -- Quality of service
+        powerProblem (35)                      -- Equipment
+        pressureUnacceptable (36)              -- Environmental
+        processorProblem (37)                  -- Equipment
+        pumpFailure (38)                       -- Environmental
+        queueSizeExceeded (39)                 -- Quality of service
+        receiveFailure (40)                    -- Equipment
+        receiverFailure (41)                   -- Equipment
+        remoteNodeTransmissionError (42)       -- Communications
+        resourceAtOrNearingCapacity (43)       -- Quality of service
+        responseTimeExcessive (44)             -- Quality of service
+        retransmissionRateExcessive (45)       -- Quality of service
+        softwareProgramError (46)              -- Processing
+        softwareError (47)                     -- Processing
+        softwareProgramAbnormallyTerminated (48) -- Processing
+        storageCapacityProblem (49)            -- Processing
+        temperatureUnacceptable (50)           -- Environmental
+        thresholdCrossed (51)                  -- Quality of service
+        timingProblem (52)                     -- Equipment
+        toxicLeakDetected (53)                 -- Environmental
+        transmitFailure (54)                   -- Equipment
+        transmitterFailure (55)                -- Equipment
+        underlyingResourceUnavailable (56)     -- Processing
+        versionMismatch (57)                   -- Processing"
+    ::= { alarmLogEntry 13 }
+
+--
+-- Notifications
+--
+
+alarmNotifyPrefix OBJECT IDENTIFIER ::= { alarmNotifications 0 }
+
+alarmNotificationCleared NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmUnit,
+        alarmPort,
+        alarmText,
+        alarmSeverity,
+        alarmActivationTime,
+        alarmCeaseTime,
+        alarmSeqNumber,
+        alarmHostName,
+        alarmPortName,
+        alarmPortType,
+        alarmPortAlias }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm is cleared."
+    ::= { alarmNotifyPrefix 1 }
+
+alarmNotificationWarning NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmUnit,
+        alarmPort,
+        alarmText,
+        alarmSeverity,
+        alarmActivationTime,
+        alarmCeaseTime,
+        alarmSeqNumber,
+        alarmHostName,
+        alarmPortName,
+        alarmPortType,
+        alarmPortAlias }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with warning severity is activated."
+    ::= { alarmNotifyPrefix 2 }
+
+alarmNotificationMinor NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmUnit,
+        alarmPort,
+        alarmText,
+        alarmSeverity,
+        alarmActivationTime,
+        alarmCeaseTime,
+        alarmSeqNumber,
+        alarmHostName,
+        alarmPortName,
+        alarmPortType,
+        alarmPortAlias }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with minor severity is activated."
+    ::= { alarmNotifyPrefix 3 }
+
+alarmNotificationMajor NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmUnit,
+        alarmPort,
+        alarmText,
+        alarmSeverity,
+        alarmActivationTime,
+        alarmCeaseTime,
+        alarmSeqNumber,
+        alarmHostName,
+        alarmPortName,
+        alarmPortType,
+        alarmPortAlias }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with major severity is activated.."
+    ::= { alarmNotifyPrefix 4 }
+
+alarmNotificationCritical NOTIFICATION-TYPE
+    OBJECTS {
+        alarmIndex,
+        alarmUnit,
+        alarmPort,
+        alarmText,
+        alarmSeverity,
+        alarmActivationTime,
+        alarmCeaseTime,
+        alarmSeqNumber,
+        alarmHostName,
+        alarmPortName,
+        alarmPortType,
+        alarmPortAlias }
+    STATUS      current
+    DESCRIPTION
+        "Sent when an alarm with critical severity is activated."
+    ::= { alarmNotifyPrefix 5 }
+
+
+-- ----------------------------------------------------
+-- Conformance
+-- ----------------------------------------------------
+
+-- ----------------------------------------------------
+-- Groups
+-- ----------------------------------------------------
+
+smartAlarmGeneralGroupV1 OBJECT-GROUP
+    OBJECTS   { smartAlarmGeneralLastSeqNumber,
+                smartAlarmGeneralHighestSeverity,
+                smartAlarmGeneralNumberActiveList,
+                smartAlarmGeneralNumberLogList }
+    STATUS     current
+    DESCRIPTION
+           "The general alarm objects V1."
+    ::= { smartAlarmGroups 1 }
+
+smartAlarmNotificationGroupV1 NOTIFICATION-GROUP
+    NOTIFICATIONS   { alarmNotificationCleared,
+                alarmNotificationCritical,
+                alarmNotificationMajor,
+                alarmNotificationMinor,
+                alarmNotificationWarning }
+    STATUS     current
+    DESCRIPTION
+           "The alarm notifications V1."
+    ::= { smartAlarmGroups 2 }
+
+smartAlarmActiveTableGroupV1 OBJECT-GROUP
+    OBJECTS   { alarmIndex,
+                alarmUnit,
+                alarmPort,
+                alarmText,
+                alarmSeverity,
+                alarmActivationTime,
+                alarmCeaseTime,
+                alarmSeqNumber,
+                alarmHostName,
+                alarmPortName,
+                alarmPortType,
+                alarmType,
+                alarmCause }
+    STATUS     current
+    DESCRIPTION
+           "The active alarm table objects V1."
+    ::= { smartAlarmGroups 3 }
+
+smartAlarmLogTableGroupV1 OBJECT-GROUP
+    OBJECTS   { alarmLogIndex,
+                alarmLogUnit,
+                alarmLogPort,
+                alarmLogText,
+                alarmLogSeverity,
+                alarmLogActivationTime,
+                alarmLogCeaseTime,
+                alarmLogSeqNumber,
+                alarmLogHostName,
+                alarmLogPortName,
+                alarmLogPortType,
+                alarmLogType,
+                alarmLogCause }
+    STATUS     current
+    DESCRIPTION
+           "The alarm log table objects V1."
+    ::= { smartAlarmGroups 4 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+smartAlarmBasicComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the alarm MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            smartAlarmGeneralGroupV1,
+            smartAlarmNotificationGroupV1,
+            smartAlarmActiveTableGroupV1,
+            smartAlarmLogTableGroupV1 }
+    ::= { smartAlarmCompliances 1 }
+
+END

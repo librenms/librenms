@@ -1,0 +1,233 @@
+-- =================================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: CATV transceiver MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 created by xujun.
+--     Initial version of the MIB
+-- =================================================================
+HH3C-CATV-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY,
+        NOTIFICATION-TYPE
+    FROM SNMPv2-SMI;
+
+hh3cCATVTransceiver MODULE-IDENTITY
+    LAST-UPDATED "200807251008Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "SMB BG Team New H3C Technologies Co., Ltd.
+        Shang-Di Information Industry Base,
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:310053."
+    DESCRIPTION
+        "
+        The objects in this MIB module are used to manage and
+        display common configuration for CATV(Community Antenna
+        Television) transceiver module.
+        "
+    ::= { hh3cCommon 94 }
+
+--
+-- hh3cCATVTransceiverStatus
+--
+
+hh3cCATVTransStatus OBJECT IDENTIFIER ::= { hh3cCATVTransceiver 1 }
+
+hh3cCATVTransStatusScalarObjects OBJECT IDENTIFIER ::= { hh3cCATVTransStatus 1 }
+
+hh3cCATVTransState OBJECT-TYPE
+    SYNTAX     INTEGER
+    {
+        on         (1),
+        off        (2)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "
+         The state of CATV transceiver.
+         "
+    ::= { hh3cCATVTransStatusScalarObjects 1 }
+
+hh3cCATVTransInputPwr OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "dbm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "
+         The input power of CATV transceiver.
+         If transceiver is not on site,
+         the value should be zero.
+         "
+    ::= { hh3cCATVTransStatusScalarObjects 2 }
+
+hh3cCATVTransOutputLevel OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "dbuv"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "
+         The output level of CATV transceiver.
+         If transceiver is not on site,
+         the value should be zero.
+         "
+    ::= { hh3cCATVTransStatusScalarObjects 3 }
+
+hh3cCATVTransTemperature OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "centigrade"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "
+         The temperature of CATV transceiver.
+         If transceiver is not on site,
+         the value should be zero.
+         "
+    ::= { hh3cCATVTransStatusScalarObjects 4 }
+
+
+--
+-- hh3cCATVTransceiverMan
+--
+
+hh3cCATVTransceiverMan OBJECT IDENTIFIER ::= { hh3cCATVTransceiver 2 }
+
+hh3cCATVTransCtrlScalarObjects OBJECT IDENTIFIER ::= { hh3cCATVTransceiverMan 1 }
+
+hh3cCATVTransInputPwrLowerThr OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "dbm"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        A threshold for the CATV transceiver's input power.
+        When the input power of CATV transceiver is lower
+        than threshold, a trap should be generated.
+        "
+    ::= { hh3cCATVTransCtrlScalarObjects 1 }
+
+hh3cCATVTransOutputLvlLowerThr OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "dbuv"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        A threshold for the CATV transceiver's output level.
+        When the output level of CATV transceiver is lower
+        than threshold, a trap should be generated.
+        "
+    ::= { hh3cCATVTransCtrlScalarObjects 2 }
+
+hh3cCATVTransTempratureUpperThr OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "¡æ"
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "
+        A threshold for the CATV transceiver's temperature.
+        When the temperature of CATV transceiver is higher
+        than threshold, a trap should be generated.
+        "
+    ::= { hh3cCATVTransCtrlScalarObjects 3 }
+
+
+--
+-- hh3cCATVTransceiver NOTIFICATION
+--
+
+hh3cCATVTansTrap OBJECT IDENTIFIER ::= { hh3cCATVTransceiver 3 }
+
+hh3cCATVTransTrapPrefix OBJECT IDENTIFIER ::= {hh3cCATVTansTrap 0}
+
+hh3cCATVTransInputPwrTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCATVTransInputPwr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cCATVTransInputPwrTrap notification is sent when the
+        input power of CATV transceiver is lower than the threshold.
+        "
+    ::= { hh3cCATVTransTrapPrefix 1 }
+
+hh3cCATVTransInputPwrReTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCATVTransInputPwr
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cCATVTransInputPwrReTrap notification is sent when the
+        input power of CATV transceiver recovered from the last trap.
+        "
+    ::= { hh3cCATVTransTrapPrefix 2 }
+
+hh3cCATVTransOutputLvlTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCATVTransOutputLevel
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cCATVTransOutputLvlTrap notification is sent when the
+        output level of CATV transceiver is lower than the threshold.
+        "
+    ::= { hh3cCATVTransTrapPrefix 3 }
+
+hh3cCATVTransOutputLvlReTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCATVTransOutputLevel
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cCATVTransOutputLvlReTrap notification is sent when the
+        output level of CATV transceiver recovered from the last trap.
+        "
+    ::= { hh3cCATVTransTrapPrefix 4 }
+
+hh3cCATVTransTemperatureTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCATVTransTemperature
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cCATVTransTemperatureTrap notification is sent when the
+        temperature of CATV transceiver is higher than the threshold.
+        "
+    ::= { hh3cCATVTransTrapPrefix 5 }
+
+hh3cCATVTransTemperatureReTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cCATVTransTemperature
+        }
+    STATUS current
+    DESCRIPTION
+        "
+        A hh3cCATVTransTemperatureReTrap notification is sent when the
+        temperature of CATV transceiver recovered from the last trap.
+        "
+    ::= { hh3cCATVTransTrapPrefix 6 }
+END

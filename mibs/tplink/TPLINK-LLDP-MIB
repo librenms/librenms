@@ -1,0 +1,20 @@
+TPLINK-LLDP-MIB DEFINITIONS ::= BEGIN
+		IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+			  	         	FROM SNMPv2-SMI
+			tplinkMgmt
+							FROM TPLINK-MIB;
+          	  	          
+          	 
+		tplinkLldpMIB MODULE-IDENTITY
+		LAST-UPDATED    "201212131730Z"
+		ORGANIZATION    "TPLINK"
+		CONTACT-INFO		"www.tplink.com"
+		DESCRIPTION			"LLDP Private MIB."
+		REVISION        "201212131730Z"
+		DESCRIPTION			"Initial version of this MIB module."
+		::= { tplinkMgmt 35 }
+		
+		tplinkLldpMIBObjects		OBJECT IDENTIFIER ::= {tplinkLldpMIB 1}
+		tplinkLldpMIBNotifications	OBJECT IDENTIFIER ::= {tplinkLldpMIB 2}    
+END

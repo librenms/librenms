@@ -1,0 +1,269 @@
+BLUECOAT-SEGMENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString
+                FROM SNMPv2-TC
+        PortList
+                FROM Q-BRIDGE-MIB
+        blueCoatMgmt
+                FROM BLUECOAT-MIB;
+
+segmentMIB MODULE-IDENTITY
+        LAST-UPDATED    "201602240300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The segment status MIB is used to monitor
+                         the state of network segements"
+        REVISION        "201602240300Z"
+        DESCRIPTION     "Added segmentStatusComment to this MIB."
+        REVISION        "201501130300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { blueCoatMgmt 17 }
+
+segmentMIBObjects
+        OBJECT IDENTIFIER ::= { segmentMIB 1 }
+
+segmentMIBNotifications
+        OBJECT IDENTIFIER ::= { segmentMIB 2 }
+
+segmentMIBConformance
+        OBJECT IDENTIFIER ::= { segmentMIB 3 }
+
+segmentMIBNotificationsPrefix
+        OBJECT IDENTIFIER ::= { segmentMIBNotifications 0 }
+
+
+-- Conformance information *******************************************
+
+segmentMIBCompliances OBJECT IDENTIFIER
+    ::= {segmentMIBConformance 1}
+
+segmentMIBGroups OBJECT IDENTIFIER
+    ::= {segmentMIBConformance 2}
+
+segmentMIBNotifGroups OBJECT IDENTIFIER
+    ::= {segmentMIBConformance 3}
+
+
+-- Compliance statements *********************************************
+
+segmentMIBCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for health check module. "
+    MODULE -- this module
+        MANDATORY-GROUPS { segmentMIBGroup }
+
+        OBJECT        segmentStatusIdentifier
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        segmentStatusMode
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        segmentStatusIfList
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        segmentStatusDownIfList
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        segmentStatusCopyIfList
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        segmentStatusState
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+
+        OBJECT        segmentStatusComment
+        MIN-ACCESS    read-only
+        DESCRIPTION   "Write access is not required."
+        ::= { segmentMIBCompliances 1 }
+
+
+-- textual conventions
+
+SegmentMode ::= TEXTUAL-CONVENTION
+        STATUS           current
+        DESCRIPTION     "Segment mode supports both passive and active
+                         appliances as well as in-line and tap modes
+                         of operation with support for asymmetric
+                         routed traffic"
+        SYNTAX INTEGER {
+                invalid(0),
+                activeInlineFailToAppliance(1),
+                asymActiveInlineFailToAppliance(2),
+                activeInlineFailToNetwork(3),
+                asymActiveInlineFailToNetwork(4),
+                passiveInline(5),
+                asymPassiveInline(6),
+                passiveTap(7),
+                asymPassiveTap(8),
+                passiveTap2xAggrInputs(9),
+                passiveTap3xAggrInputs(10)
+        }
+
+SegmentState ::= TEXTUAL-CONVENTION
+        STATUS           current
+        DESCRIPTION     "Bitmap where each bit indicates a Segment failure state.
+                         A value of 1 in the bitmap indicates a failure.
+                         A value of 0 in the bitmap indicates no failure.
+                         
+                              bit 0: software failure
+                              bit 1: manual failure
+                              bit 2: link failure
+                              bit 3: activation failure
+
+                         The Segment is in a good state when no bits are set.
+                         "
+        SYNTAX BITS {
+                softwareFailure(0),
+                manualFailure(1),
+                linkFailure(2),
+                activationFailure(3)
+        }
+
+
+--
+-- MIB variables
+--
+
+segments
+        OBJECT IDENTIFIER ::= { segmentMIBObjects 1 }
+
+--
+-- segmentStatusTable
+--
+
+segmentStatusTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SegmentStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table of Segments."
+        ::= { segments 1 }
+
+segmentStatusEntry OBJECT-TYPE
+        SYNTAX          SegmentStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A segmentStatusTable entry describes the
+                         segment status for each segment of the appliance."
+        INDEX           { segmentStatusIndex }
+        ::= { segmentStatusTable 1 }
+
+SegmentStatusEntry ::= SEQUENCE {
+        segmentStatusIndex       INTEGER,
+        segmentStatusIdentifier  DisplayString,
+        segmentStatusMode        SegmentMode,
+        segmentStatusIfList      PortList,
+        segmentStatusDownIfList  PortList,
+        segmentStatusCopyIfList  PortList,
+        segmentStatusState       SegmentState,
+        segmentStatusComment     DisplayString
+        }
+
+segmentStatusIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..2147483647)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An arbitrary value which uniquely identifies the segment."
+        ::= { segmentStatusEntry 1 }
+
+segmentStatusIdentifier OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable uniquely identifies the segment
+                         on the appliance."
+        ::= { segmentStatusEntry 2 }
+
+segmentStatusMode OBJECT-TYPE
+        SYNTAX          SegmentMode
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the mode of the segment."
+        ::= { segmentStatusEntry 3 }
+
+segmentStatusIfList OBJECT-TYPE
+        SYNTAX          PortList (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the set of one or more
+                         ports assigned to the segment."
+        ::= { segmentStatusEntry 4 }
+
+segmentStatusDownIfList OBJECT-TYPE
+        SYNTAX          PortList (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the subset of ports assigned
+                         to the segment that are currently in a down state."
+        ::= { segmentStatusEntry 5 }
+
+segmentStatusCopyIfList OBJECT-TYPE
+        SYNTAX          PortList (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the subset of copy ports
+                         assigned to the segment to which traffic is being
+                         replicated."
+        ::= { segmentStatusEntry 6 }
+
+segmentStatusState OBJECT-TYPE
+        SYNTAX          SegmentState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable indicates the state of the segment."
+        ::= { segmentStatusEntry 7 }
+
+segmentStatusComment OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This variable displays the comment of the segment."
+        ::= { segmentStatusEntry 8 }
+
+--
+-- notifications
+--
+
+segmentStateTrap NOTIFICATION-TYPE
+        OBJECTS { segmentStatusIdentifier, segmentStatusMode, segmentStatusIfList, segmentStatusDownIfList, segmentStatusCopyIfList, segmentStatusState, segmentStatusComment }
+        STATUS          current
+        DESCRIPTION     "The segment state has changed."
+        ::= { segmentMIBNotificationsPrefix 1 }
+
+--
+-- groups
+--
+
+segmentMIBGroup OBJECT-GROUP
+        OBJECTS {
+                segmentStatusIdentifier,
+                segmentStatusMode,
+                segmentStatusIfList,
+                segmentStatusDownIfList,
+                segmentStatusCopyIfList,
+                segmentStatusState,
+                segmentStatusComment
+                }
+        STATUS       current
+        DESCRIPTION  "Group of Network Segment related objects."
+        ::= { segmentMIBGroups 1 }
+
+segmentMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS  { segmentStateTrap }
+        STATUS         current
+        DESCRIPTION    "Group of Network Segment notifications."
+        ::= { segmentMIBNotifGroups 1 }
+
+
+END
+

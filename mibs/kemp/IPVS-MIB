@@ -1,0 +1,338 @@
+
+IPVS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, Counter32, Counter64
+        FROM SNMPv2-SMI
+ 
+    one4net 
+	FROM ONE4NET-MIB;
+
+ipvs MODULE-IDENTITY
+	LAST-UPDATED "202106250906Z"
+	ORGANIZATION "Kemp Technologies"
+	CONTACT-INFO "email: supportteam@kemptechnologies.com"
+	DESCRIPTION "LoadMaster metrics."
+	REVISION "202106250906Z"
+	DESCRIPTION "Version 1.18"
+	::= { one4net 12 }
+
+
+ipvsVSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing IPVS Virtual Service specific information."
+	::= { ipvs 1 }
+
+ipvsRSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing IPVS Real Server specific information."
+	::= { ipvs 2 }
+
+ipvsRSTotalTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RsTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing Real Server statistics."
+	::= { ipvs 8 }
+
+RsTotalEntry ::= SEQUENCE {
+	totRSIdx	Integer32,
+	totRSDesc	OCTET STRING,
+	totRSConns	Counter32,
+	totRSInPkts	Counter32,
+	totRSOutPkts	Counter32,
+	totRSInBytes	Counter64,
+	totRSOutBytes	Counter64,
+	totRSActiveConns	Gauge32,
+	totRSInactiveConns	Counter32 }
+
+rsTotalEntry OBJECT-TYPE
+	SYNTAX		RsTotalEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Statistics for a Real Server"
+	INDEX { totRSIdx }
+	::= { ipvsRSTotalTable 1 }
+
+totRSIdx OBJECT-TYPE
+	SYNTAX		Integer32 (0..8192)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Real Server index "
+	::= { rsTotalEntry 1 }
+
+totRSDesc OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..8192))
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"The Real Server IP address"
+	::= { rsTotalEntry 2 }
+
+totRSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of connections for this Real Server"
+	::= { rsTotalEntry 3 }
+
+totRSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming packets to this Real Server"
+	::= { rsTotalEntry 4 }
+
+totRSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing packets from this Real Server"
+	::= { rsTotalEntry 5 }
+
+totRSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming bytes to this Real Server"
+	::= { rsTotalEntry 6 }
+
+totRSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing bytes from this Real Server"
+	::= { rsTotalEntry 7 }
+
+totRSActiveConns OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of active connections for this Real Server"
+	::= { rsTotalEntry 8 }
+
+totRSInactiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inactive connections for this Real Server"
+	::= { rsTotalEntry 9 }
+
+--
+
+vsEntry OBJECT-TYPE
+	SYNTAX		VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information about a Virtual Service"
+	INDEX   { 	vSIdx }
+	::= { ipvsVSTable 1 }
+
+VSEntry ::= SEQUENCE {
+	vSIdx		INTEGER,
+	vSDesc		OCTET STRING,
+	vSConns		Counter32,
+	vSInPkts	Counter32,
+	vSOutPkts	Counter32,
+	vSInBytes	Counter64,
+	vSOutBytes	Counter64,
+	vSActiveConns	Gauge32 }
+
+vSIdx OBJECT-TYPE
+	SYNTAX		INTEGER (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service index"
+	::= { vsEntry 1 }
+    
+
+vSDesc OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..1024))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service details (protocol, IP address, port, scheduling method)"
+	::= { vsEntry 11 }
+
+vSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of connections for this Virtual Service"
+	::= { vsEntry 12 }
+
+vSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incomming packets to this Virtual Service"
+	::= { vsEntry 13 }
+
+vSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing packets from this Virtual Service"
+	::= { vsEntry 14 }
+
+vSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incomming bytes to this Virtual Service"
+	::= { vsEntry 15 }
+
+vSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of outgoing bytes from this Virtual Service"
+	::= { vsEntry 16 }
+
+vSActiveConns OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of active connections for this Virtual Service"
+	::= { vsEntry 17 }
+
+--
+
+rsEntry OBJECT-TYPE
+	SYNTAX		RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information about a Real Server"
+	INDEX   { 	rSIdx }
+	::= { ipvsRSTable 1 }
+
+RSEntry ::= SEQUENCE {
+	rSIdx		INTEGER,        
+	rSVSidx		INTEGER,
+	rSDesc		OCTET STRING,
+	rSConns		Counter32,
+	rSInPkts	Counter32,
+	rSOutPkts	Counter32,
+	rSInBytes	Counter64,
+	rSOutBytes	Counter64,
+	rSActiveConns	Gauge32,
+	rSInactiveConns	Counter32,
+	rSWeight	Integer32 }
+
+rSIdx OBJECT-TYPE
+	SYNTAX		INTEGER (0..8192)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"The Real Server index"
+	::= { rsEntry 1 }
+
+rSVSidx OBJECT-TYPE
+	SYNTAX		INTEGER (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The id of the associated Virtual Service"
+	::= { rsEntry 2 }
+
+rSDesc OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..8192))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Real Server details (IP address, port, forwarding method, weight)"
+	::= { rsEntry 11 }
+
+rSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of connections for this Real Server"
+	::= { rsEntry 12 }
+
+rSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming packets to this Real Server"
+	::= { rsEntry 13 }
+
+rSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing packets from this Real Server"
+	::= { rsEntry 14 }
+
+rSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming bytes to this Real Server"
+	::= { rsEntry 15 }
+
+rSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing bytes from this Real Server"
+	::= { rsEntry 16 }
+
+rSActiveConns OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of active connections for this Real Server"
+	::= { rsEntry 17 }
+
+rSInactiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inactive connections for this Real Server"
+	::= { rsEntry 18 }
+
+rSWeight OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The current weight of this Real Server"
+	::= { rsEntry 19 }
+
+--
+
+conns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of connections handled for all Virtual Services"
+	::= { ipvs 3 } 
+
+inPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming packets for all Virtual Services"
+	::= { ipvs 4 } 
+
+outPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing packets for all Virtual Services"
+	::= { ipvs 5 } 
+
+inBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming bytes for all Virtual Services"
+	::= { ipvs 6 } 
+
+outBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing bytes for all Virtual Services"
+	::= { ipvs 7 } 
+
+END
+

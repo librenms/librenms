@@ -1,0 +1,1826 @@
+-- =========================================================================
+-- Copyright (C) 2001,2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:This file describes the MIB implementation of mpls lsr.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- 	    V1.0 6th Mar 2004
+--		Initial version
+-- =========================================================================
+HH3C-MPLS-LSR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+   Integer32, Counter32, Unsigned32,
+   Counter64, Gauge32
+      FROM SNMPv2-SMI
+      
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+      
+   TEXTUAL-CONVENTION, TruthValue, RowStatus, StorageType,
+   RowPointer, TimeStamp
+      FROM SNMPv2-TC
+      
+   InterfaceIndex, InterfaceIndexOrZero
+      FROM IF-MIB
+
+   hh3cMpls
+      FROM HH3C-OID-MIB
+
+   AddressFamilyNumbers
+      FROM IANA-ADDRESS-FAMILY-NUMBERS-MIB
+      
+   InetAddressIPv4, InetAddressIPv6, InetAddressType
+      FROM INET-ADDRESS-MIB;
+
+hh3cMplsLsr MODULE-IDENTITY
+   LAST-UPDATED "200007121200Z"  -- 12 July 2000 12:00:00 EST
+   ORGANIZATION
+       "New H3C Tech. Co., Ltd."
+   CONTACT-INFO
+       "Platform Team New H3C Tech. Co., Ltd.
+       Hai-Dian District Beijing P.R. China
+       http://www.h3c.com
+       Zip:100085
+       "
+   DESCRIPTION
+       "This MIB contains managed object definitions for the
+        Multiprotocol Label Switching (MPLS) Router as
+        defined in: Rosen, E., Viswanathan, A., and R.
+        Callon, Multiprotocol Label Switching Architecture,
+        Internet Draft <draft-ietf-mpls-arch-06.txt>,
+        August 1999."
+   
+   -- Revision history.
+   REVISION
+       "200007121200Z"  -- 12 July 2000 12:00:00 EST
+   DESCRIPTION
+       "Seventh draft version. Fix minor compilation errors."
+   REVISION
+       "200007071200Z"  -- 07 July 2000 12:00:00 EST
+   DESCRIPTION
+       "Sixth draft version. Made minor typographical corrections 
+        noted from WG mailing list during second working group last
+        call."
+   REVISION
+       "200004261200Z"  -- 26 April 2000 12:00:00 EST
+   DESCRIPTION
+       "Fifth draft version. Made minor typographical corrections 
+        noted from WG mailing list."
+   REVISION
+       "200004211200Z"  -- 21 April 2000 12:00:00 EST
+   DESCRIPTION
+       "Fourth draft version.  Made corrections from WG Last 
+        Call comments."
+   REVISION
+       "200003061200Z"  -- 6 March 2000 12:00:00 EST
+   DESCRIPTION
+       "Third draft version."
+   REVISION
+       "200002161200Z"  -- 16 February 2000 12:00:00 EST
+   DESCRIPTION
+       "Second draft version."
+   REVISION
+       "199906161200Z"  -- 16 June 1999 12:00:00 EST
+   DESCRIPTION
+      "Initial draft version."
+   ::= { hh3cMpls 1 }
+
+
+-- Textual Conventions.
+
+Hh3cMplsLSPID ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "An identifier that is assigned to each LSP and is
+        used to uniquely identify it.  This is assigned at
+        the head end of the LSP and can be used by all LSRs
+        to identify this LSP.  This value is piggybacked by
+        the signaling protocol when this LSP is signaled
+        within the network.  This identifier can then be
+        used at each LSR to identify which labels are being
+        swapped to other labels for this LSP.  For IPv4
+        addresses this results in a 6-octet long cookie."
+   SYNTAX        OCTET STRING (SIZE (0..31))
+
+-- An MPLS label.
+Hh3cMplsLabel ::= TEXTUAL-CONVENTION
+   STATUS        current
+   DESCRIPTION
+       "This value represents an MPLS label.  Note that the
+        contents of a label field are interpreted in an
+        interface-type specific fashion.  For example, the
+        20-bit wide label carried in the MPLS shim header is
+        contained in bits 0-19 and bits 20-31 must be zero.
+        The frame relay label can be either 10 or 23 bits
+        wide depending on the size of the DLCI field and
+        bits 10-31, or 23-31 must be zero, respectively.
+        For an ATM interface, bits 0-15 must be interpreted
+        as the VCI, bits 16-23 as the VPI and bits 24-31
+        must be zero.  Note that the permissible label
+        values are also a function of the interface type.
+        For example, the value 3 has special semantics in
+        the control plane for an MPLS shim header label and
+        is not a valid label value in the data path."
+   REFERENCE
+       "1. MPLS Label Stack Encoding, Rosen et al, draft-
+          ietf-mpls-label-encaps-07.txt, March 2000.
+        2. Use of Label Switching on Frame Relay Networks,
+          Conta et al, draft-ietf-mpls-fr-03.txt, Nov.
+          1998.
+        3. MPLS using LDP and ATM VC switching, Davie et al,
+          draft-ietf-mpls-atm-02.txt, April 1999."
+   SYNTAX  Unsigned32 (0..4294967295)
+
+Hh3cMplsBitRate ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "d"
+   STATUS      current
+   DESCRIPTION
+       "An estimate of bandwidth in units of 1,000 bits per
+        second.  If this object reports a value of 'n' then
+        the rate of the object is somewhere in the range of
+        'n-500' to 'n+499'. For objects which do not vary in
+        bitrate, or for those where no accurate estimation
+        can be made, this object should contain the nominal
+        bitrate."
+   SYNTAX  Integer32 (1..2147483647)
+
+Hh3cMplsBurstSize ::= TEXTUAL-CONVENTION
+   DISPLAY-HINT "d"
+   STATUS      current
+   DESCRIPTION
+       "The number of octets of MPLS data that the stream
+        may send back-to-back without concern for policing."
+   SYNTAX  Integer32 (1..2147483647)
+
+Hh3cMplsObjectOwner ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+           "The entity which owns the object in question."
+   SYNTAX   INTEGER {
+                other(1),
+                snmp(2),
+                ldp(3),
+                rsvp(4),
+                crldp(5),
+                policyAgent(6),
+                unknown (7)
+             }
+
+-- Top level components of this MIB.
+
+-- Tables, Scalars
+hh3cmplsLsrObjects       OBJECT IDENTIFIER ::= { hh3cMplsLsr 1 }
+-- traps
+hh3cmplsLsrNotifications OBJECT IDENTIFIER ::= { hh3cMplsLsr 2 }
+hh3cmplsLsrNotifyPrefix OBJECT IDENTIFIER ::= { hh3cmplsLsrNotifications 0 }
+-- conformance
+hh3cmplsLsrConformance   OBJECT IDENTIFIER ::= { hh3cMplsLsr 3 }
+
+
+-- MPLS Interface Configuration Table.
+
+hh3cmplsInterfaceConfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsInterfaceConfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies per-interface MPLS capability
+        and associated information."
+   ::= { hh3cmplsLsrObjects 1 }
+
+hh3cmplsInterfaceConfEntry OBJECT-TYPE
+   SYNTAX        Hh3cMplsInterfaceConfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by an LSR for
+        every interface capable of supporting MPLS. The
+        entry with index 0 represents the per-platform label
+        space and contains parameters that apply to all
+        interfaces that participate in the per-platform
+        label space. Other entries defined in this table
+        represent additional MPLS interfaces that may
+        participate in either the per-platform or per-
+        interface label spaces, or both. Additional
+        information about label space participation of an
+        interface is provided in the description clause of
+        hh3cmplsInterfaceLabelParticipationType."
+   INDEX       { hh3cmplsInterfaceConfIndex }
+      ::= { hh3cmplsInterfaceConfTable 1 }
+
+Hh3cMplsInterfaceConfEntry ::= SEQUENCE {
+  hh3cmplsInterfaceConfIndex              InterfaceIndexOrZero,
+  hh3cmplsInterfaceLabelMinIn             Hh3cMplsLabel,
+  hh3cmplsInterfaceLabelMaxIn             Hh3cMplsLabel,
+  hh3cmplsInterfaceLabelMinOut            Hh3cMplsLabel,
+  hh3cmplsInterfaceLabelMaxOut            Hh3cMplsLabel,
+  hh3cmplsInterfaceTotalBandwidth         Hh3cMplsBitRate,
+  hh3cmplsInterfaceAvailableBandwidth     Hh3cMplsBitRate,
+  hh3cmplsInterfaceLabelParticipationType BITS,
+  hh3cmplsInterfaceConfStorageType        StorageType
+}
+
+hh3cmplsInterfaceConfIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This is a unique index for an entry in the
+        hh3cmplsInterfaceConfTable.  A non-zero index for an
+        entry indicates the ifIndex for the corresponding
+        interface entry in of the MPLS-layer in the ifTable.
+        Note that the per-platform label space may apply to
+        several interfaces, and therefore the configuration
+        of the per-platform label space interface parameters
+        will apply to all of the interfaces that are
+        participating in the per-platform label space."
+   REFERENCE
+       "RFC 2233 - The Interfaces Group MIB using SMIv2,
+        McCloghrie, K., and F. Kastenholtz, Nov. 1997"
+   ::= { hh3cmplsInterfaceConfEntry 1 }
+
+hh3cmplsInterfaceLabelMinIn OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This is the minimum value of an MPLS label that this
+        LSR is willing to receive on this interface."
+   ::= { hh3cmplsInterfaceConfEntry 2 }
+
+hh3cmplsInterfaceLabelMaxIn OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This is the maximum value of an MPLS label that this
+        LSR is willing to receive on this interface."
+   ::= { hh3cmplsInterfaceConfEntry 3 }
+
+hh3cmplsInterfaceLabelMinOut OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This is the minimum value of an MPLS label that this
+        LSR is willing to send on this interface."
+   ::= { hh3cmplsInterfaceConfEntry 4 }
+
+hh3cmplsInterfaceLabelMaxOut OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabel
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This is the maximum value of an MPLS label that this
+        LSR is willing to send on this interface."
+   ::= { hh3cmplsInterfaceConfEntry 5 }
+
+hh3cmplsInterfaceTotalBandwidth        OBJECT-TYPE
+   SYNTAX        Hh3cMplsBitRate
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value indicates the total amount of usable
+        bandwidth on this interface and is specified in
+        kilobits per second (Kbps).  This variable is
+        not applicable when applied to the interface with
+        index 0."
+::= { hh3cmplsInterfaceConfEntry 6 }
+
+hh3cmplsInterfaceAvailableBandwidth       OBJECT-TYPE
+   SYNTAX        Hh3cMplsBitRate
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value indicates the total amount of available
+        bandwidth available on this interface and is
+        specified in kilobits per second (Kbps).  This
+        value is calculated as the difference between the
+        amount of bandwidth currently in use and that
+        specified in hh3cmplsInterfaceTotalBandwidth.  This
+        variable is not applicable when applied to the
+        interface with index 0."
+::= { hh3cmplsInterfaceConfEntry 7 }
+
+hh3cmplsInterfaceLabelParticipationType OBJECT-TYPE
+   SYNTAX  BITS {
+                perPlatform (0),
+                perInterface (1)
+              }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Either the perPlatform(0) or perInterface(1) bit
+        MUST be set. If the value of the
+        hh3cmplsInterfaceConfIndex for this entry is zero, then
+        only the perPlatform(0) bit MUST be set and the
+        perInterface(1) bit is meaningless. If the
+        perInterface(1) bit is set then the value of
+        hh3cmplsInterfaceLabelMinIn, hh3cmplsInterfaceLabelMaxIn,
+        hh3cmplsInterfaceLabelMinOut, and
+        hh3cmplsInterfaceLabelMaxOut for this entry reflect the
+        label ranges for this interface.  If only the
+        perPlatform(0) bit is set, then the value of
+        hh3cmplsInterfaceLabelMinIn, hh3cmplsInterfaceLabelMaxIn,
+        hh3cmplsInterfaceLabelMinOut, and
+        hh3cmplsInterfaceLabelMaxOut for this entry must be
+        identical to the instance of these objects with
+        index 0."
+   REFERENCE
+      "Multiprotocol Label Switching, Rosen et al, draft-ietf-mpls-
+       arch-06.txt, August 1999."
+::= { hh3cmplsInterfaceConfEntry 8 }
+
+hh3cmplsInterfaceConfStorageType  OBJECT-TYPE
+   SYNTAX      StorageType
+   MAX-ACCESS  read-create
+   STATUS      current
+   DESCRIPTION
+       "The storage type for this entry."
+   ::= { hh3cmplsInterfaceConfEntry 9 }
+
+-- End of hh3cmplsInterfaceConfTable
+
+
+-- MPLS Interface Performance Table.
+hh3cmplsInterfacePerfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsInterfacePerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table provides MPLS performance information on
+        a per-interface basis."
+   ::= { hh3cmplsLsrObjects 2 }
+
+hh3cmplsInterfacePerfEntry OBJECT-TYPE
+   SYNTAX        Hh3cMplsInterfacePerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table is created by the LSR for
+        every interface capable of supporting MPLS.  Its is
+        an extension to the hh3cmplsInterfaceConfEntry table."
+   AUGMENTS      { hh3cmplsInterfaceConfEntry }
+      ::= { hh3cmplsInterfacePerfTable 1 }
+
+Hh3cMplsInterfacePerfEntry ::= SEQUENCE {
+      -- incoming direction
+      hh3cmplsInterfaceInLabelsUsed          Gauge32,
+      hh3cmplsInterfaceFailedLabelLookup     Counter32,
+      
+      -- outgoing direction
+      hh3cmplsInterfaceOutLabelsUsed         Gauge32,
+      hh3cmplsInterfaceOutFragments          Counter32
+   }
+
+hh3cmplsInterfaceInLabelsUsed OBJECT-TYPE
+   SYNTAX        Gauge32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object counts the number of labels
+        that are in use at this point in time on this
+        interface in the incoming direction. If the interface
+        participates in the per-platform label space only,
+        then this instance of this object MUST be identical
+        with the instance with index 0. If the interface
+        participates in the per-interface label space, then this
+        this instance of this object MUST represent the number of
+        of per-interface labels that are in use at this point in
+        time on this interface."
+   ::= { hh3cmplsInterfacePerfEntry 1 }
+
+hh3cmplsInterfaceFailedLabelLookup OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object counts the number of labeled packets
+        that have been received on this interface and were
+        discarded because there was no matching cross-connect
+        entry. This object MUST count on a per-interface basis
+        regardless of which label space the interface participates
+        in."
+   ::= { hh3cmplsInterfacePerfEntry 2 }
+
+hh3cmplsInterfaceOutLabelsUsed OBJECT-TYPE
+   SYNTAX        Gauge32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object counts the number of top-most labels in the
+        outgoing label stacks that are in use at this point
+        in time on this interface. This object
+        MUST count on a per-interface basis regardless of
+        which label space the interface participates in."
+   ::= { hh3cmplsInterfacePerfEntry 3 }
+
+hh3cmplsInterfaceOutFragments OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object counts the number of outgoing MPLS
+        packets that required fragmentation before
+        transmission on this interface. This object
+        transmission on this interface. This object
+        MUST count on a per-interface basis regardless of 
+        which label space the interface participates in."
+::= { hh3cmplsInterfacePerfEntry 4 }
+
+-- In-segment table.
+
+hh3cmplsInSegmentTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsInSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains a collection of incoming
+        segments to an LSR."
+   ::= { hh3cmplsLsrObjects 3 }
+
+hh3cmplsInSegmentEntry  OBJECT-TYPE
+   SYNTAX        Hh3cMplsInSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents one incoming
+        segment.  An entry can be created by a network
+        administrator or an SNMP agent, or an MPLS signaling
+        protocol.  The creator of the entry is denoted by
+        hh3cmplsInSegmentOwner.  An entry in this table is
+        indexed by the ifIndex of the incoming interface and
+        the (top) label."
+   INDEX         { hh3cmplsInSegmentIfIndex, hh3cmplsInSegmentLabel }
+   ::= { hh3cmplsInSegmentTable 1 }
+
+Hh3cMplsInSegmentEntry ::= SEQUENCE {
+  hh3cmplsInSegmentIfIndex              InterfaceIndexOrZero,
+  hh3cmplsInSegmentLabel                Hh3cMplsLabel,
+  hh3cmplsInSegmentNPop                 Integer32,
+  hh3cmplsInSegmentAddrFamily           AddressFamilyNumbers,
+  hh3cmplsInSegmentXCIndex              Integer32,
+  hh3cmplsInSegmentOwner                Hh3cMplsObjectOwner,
+  hh3cmplsInSegmentTrafficParamPtr      RowPointer,
+  hh3cmplsInSegmentRowStatus            RowStatus,
+  hh3cmplsInSegmentStorageType          StorageType
+}
+
+hh3cmplsInSegmentIfIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndexOrZero
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "This is a unique index for an entry in the
+        hh3cmplsInSegmentTable.  This value represents the
+        interface index for the incoming MPLS interface.  A
+        value of zero represents an incoming label from the
+        per-platform label space.  In this case, the
+        hh3cmplsInSegmentLabel is interpreted to be an MPLS-type
+        label."
+   ::= { hh3cmplsInSegmentEntry 1 }
+
+hh3cmplsInSegmentLabel OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabel
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "The incoming label for this segment."
+   ::= { hh3cmplsInSegmentEntry 2 }
+
+hh3cmplsInSegmentNPop OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The number of labels to pop from the incoming
+        packet.  Normally only the top label is popped from
+        the packet and used for all switching decisions for
+        that packet.  Note that technologies which do not
+        support label popping should set this value to its
+        default value of 1."
+   DEFVAL        { 1 }
+   ::= { hh3cmplsInSegmentEntry 3 }
+
+hh3cmplsInSegmentAddrFamily OBJECT-TYPE
+   SYNTAX        AddressFamilyNumbers
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The IANA address family [IANAFamily] of the incoming
+        packet.  A value of other(0) indicates that the
+        family type is either unknown or undefined."
+   DEFVAL        { other }
+   ::= { hh3cmplsInSegmentEntry 4 }
+
+hh3cmplsInSegmentXCIndex OBJECT-TYPE
+SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Index into hh3cmplsXCTable which identifies which cross-
+        connect entry this segment is part of.  A value of
+        zero indicates that this entry is not referred to by
+        any cross-connect entry.  When a cross-connect entry
+        is created which this in-segment is a part of, this
+        object is automatically updated to reflect the value
+        of hh3cmplsXCIndex of that cross-connect entry."
+   DEFVAL        { 0 }
+   ::= { hh3cmplsInSegmentEntry 5 }
+   
+hh3cmplsInSegmentOwner OBJECT-TYPE
+   SYNTAX        Hh3cMplsObjectOwner
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes the entity that created and is responsible
+        for managing this segment."
+   DEFVAL { unknown }
+   ::= { hh3cmplsInSegmentEntry 6 }
+
+hh3cmplsInSegmentTrafficParamPtr OBJECT-TYPE
+   SYNTAX            RowPointer
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION
+     "This variable represents a pointer to the traffic
+     parameter specification for this in-segment.  This
+     value may point at an entry in the
+     hh3cmplsTrafficParamTable to indicate which
+     hh3cmplsTrafficParamEntry is to be assigned to this
+     segment.  This value may optionally point at an
+     externally defined traffic parameter specification
+     table.  A value of zero-dot-zero indicates best-effort
+     treatment.  By having the same value of this object,
+     two or more segments can indicate resource sharing."
+   ::= { hh3cmplsInSegmentEntry 7 }
+
+hh3cmplsInSegmentRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable is used to create, modify, and/or
+        delete a row in this table."
+   ::= { hh3cmplsInSegmentEntry 8 }
+   
+hh3cmplsInSegmentStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable indicates the storage type for this
+        object."
+   ::= { hh3cmplsInSegmentEntry 9 }
+
+-- End of hh3cmplsInSegmentTable
+
+-- In-segment performance table.
+
+hh3cmplsInSegmentPerfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsInSegmentPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains statistical information for
+        incoming MPLS segments to an LSR."
+   ::= { hh3cmplsLsrObjects 4 }
+
+hh3cmplsInSegmentPerfEntry  OBJECT-TYPE
+   SYNTAX        Hh3cMplsInSegmentPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table contains statistical
+        information about one incoming segment which was
+        configured in the hh3cmplsInSegmentTable. The counters
+        in this entry should behave in a manner similar to
+        that of the interface."
+   AUGMENTS      { hh3cmplsInSegmentEntry }
+   ::= { hh3cmplsInSegmentPerfTable 1 }
+
+Hh3cMplsInSegmentPerfEntry ::= SEQUENCE {
+    hh3cmplsInSegmentOctets                 Counter32,
+    hh3cmplsInSegmentPackets                Counter32,
+    hh3cmplsInSegmentErrors                 Counter32,
+    hh3cmplsInSegmentDiscards               Counter32,
+    
+    -- high capacity counter
+    hh3cmplsInSegmentHCOctets               Counter64,
+    
+    hh3cmplsInSegmentPerfDiscontinuityTime  TimeStamp
+   }
+hh3cmplsInSegmentOctets OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value represents the total number of octets
+        received by this segment."
+   ::= { hh3cmplsInSegmentPerfEntry 1 }
+
+hh3cmplsInSegmentPackets OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Total number of packets received by this segment."
+   ::= { hh3cmplsInSegmentPerfEntry 2 }
+
+hh3cmplsInSegmentErrors OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The number of errored packets received on this
+        segment."
+   ::= { hh3cmplsInSegmentPerfEntry 3 }
+
+hh3cmplsInSegmentDiscards OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The number of labeled packets received on this in-
+        segment, which were chosen to be discarded even
+        though no errors had been detected to prevent their
+        being transmitted.  One possible reason for
+        discarding such a labeled packet could be to free up
+        buffer space."
+   ::= { hh3cmplsInSegmentPerfEntry 4 }
+
+hh3cmplsInSegmentHCOctets OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The total number of octets received.  This is the 64
+        bit version of hh3cmplsInSegmentOctets."
+   ::= { hh3cmplsInSegmentPerfEntry 5 }
+   
+hh3cmplsInSegmentPerfDiscontinuityTime OBJECT-TYPE
+
+       SYNTAX      TimeStamp
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+         "The value of sysUpTime on the most recent occasion at
+          which any one or more of this segment's Counter32 or
+          Counter64 suffered a discontinuity. If no such
+          discontinuities have occurred since the last re-
+          initialization of the local management subsystem, then
+          this object contains a zero value."
+       ::= { hh3cmplsInSegmentPerfEntry 6 }
+   
+
+-- End of hh3cmplsInSegmentPerfTable.
+
+-- Out-segment table.
+
+hh3cmplsOutSegmentIndexNext OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains the next appropriate value to
+        be used for hh3cmplsOutSegmentIndex when creating
+        entries in the hh3cmplsOutSegmentTable.  If the number
+        of unassigned entries is exhausted, this object will
+        take on the value of 0.  To obtain the
+        hh3cmplsOutSegmentIndex value for a new entry, the
+        manager must first issue a management protocol
+        retrieval operation to obtain the current value of
+        this object.  The agent should modify the value to
+        reflect the next unassigned index after each
+        retrieval operation.  After a manager retrieves a
+        value the agent will determine through its local
+        policy when this index value will be made available
+        for reuse."
+   ::= { hh3cmplsLsrObjects 5 }
+
+
+hh3cmplsOutSegmentTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsOutSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains a representation of the outgoing
+        segments from an LSR."
+   ::= { hh3cmplsLsrObjects 6 }
+
+hh3cmplsOutSegmentEntry  OBJECT-TYPE
+   SYNTAX        Hh3cMplsOutSegmentEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents one outgoing
+        segment.  An entry can be created by a network
+        administrator or an SNMP agent, or an MPLS signaling
+        protocol.  The object hh3cmplsOutSegmentOwner indicates
+        the creator of this entry."
+   INDEX         { hh3cmplsOutSegmentIndex }
+   ::= { hh3cmplsOutSegmentTable 1 }
+
+Hh3cMplsOutSegmentEntry ::= SEQUENCE {
+  hh3cmplsOutSegmentIndex                Integer32,
+  hh3cmplsOutSegmentIfIndex              InterfaceIndex,
+  hh3cmplsOutSegmentPushTopLabel         TruthValue,
+  hh3cmplsOutSegmentTopLabel             Hh3cMplsLabel,
+  hh3cmplsOutSegmentNextHopIpAddrType    InetAddressType,
+  hh3cmplsOutSegmentNextHopIpv4Addr      InetAddressIPv4,
+  hh3cmplsOutSegmentNextHopIpv6Addr      InetAddressIPv6,
+  hh3cmplsOutSegmentXCIndex              Integer32,
+  hh3cmplsOutSegmentOwner                Hh3cMplsObjectOwner,
+  hh3cmplsOutSegmentTrafficParamPtr      RowPointer,
+  hh3cmplsOutSegmentRowStatus            RowStatus,
+  hh3cmplsOutSegmentStorageType          StorageType
+}
+
+hh3cmplsOutSegmentIndex OBJECT-TYPE
+   SYNTAX        Integer32(0..2147483647)
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "This value contains a unique index for this row.
+        While a value of 0 is not valid as an index for this
+        row it can be supplied as a valid value to index
+        hh3cmplsXCTable to access entries for which no out-
+        segment has been configured."
+   ::= { hh3cmplsOutSegmentEntry 1 }
+
+hh3cmplsOutSegmentIfIndex OBJECT-TYPE
+   SYNTAX        InterfaceIndex
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This value contains the interface index of the
+        outgoing interface."
+   ::= { hh3cmplsOutSegmentEntry 2 }
+
+hh3cmplsOutSegmentPushTopLabel OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This value indicates whether or not a top label
+        should be pushed onto the outgoing packet's label
+        stack.  The value of this variable must be set to
+        true if the outgoing interface does not support pop-
+        and-go (for example an ATM interface) or if it is a
+        tunnel origination.  Note that it is considered an
+        error in the case that hh3cmplsOutSegmentPushTopLabel is
+        set to false, but the cross-connect entry which
+        refers to this out-segment has a non-zero
+        hh3cmplsLabelStackIndex.  The LSR MUST ensure that this
+        situation does not happen "
+   ::= { hh3cmplsOutSegmentEntry 3 }
+
+hh3cmplsOutSegmentTopLabel OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "If hh3cmplsOutSegmentPushTopLabel is true then this
+        represents the label that should be pushed onto the
+        top of the outgoing packet's label stack."
+   ::= { hh3cmplsOutSegmentEntry 4 }
+
+hh3cmplsOutSegmentNextHopIpAddrType OBJECT-TYPE
+   SYNTAX        InetAddressType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Indicates whether the next hop address is IPv4 or
+        IPv6.  Note that a value of unknown (0) is valid
+        only when the outgoing interface is of type point-to-
+        point."
+   DEFVAL        { unknown }
+   ::= { hh3cmplsOutSegmentEntry 5 }
+
+hh3cmplsOutSegmentNextHopIpv4Addr OBJECT-TYPE
+   SYNTAX        InetAddressIPv4
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "IPv4 Address of the next hop.  Its value is
+        significant only when
+        hh3cmplsOutSegmentNextHopIpAddrType is ipV4 (1),
+        otherwise it should return a value of 0."
+   ::= { hh3cmplsOutSegmentEntry 6 }
+
+hh3cmplsOutSegmentNextHopIpv6Addr OBJECT-TYPE
+   SYNTAX        InetAddressIPv6
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "IPv6 address of the next hop.  Its value is
+        significant only when
+        hh3cmplsOutSegmentNextHopIpAddrType is ipV6 (2),
+        otherwise it should return a value of 0."
+   ::= { hh3cmplsOutSegmentEntry 7 }
+
+hh3cmplsOutSegmentXCIndex OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Index into hh3cmplsXCTable which identifies which cross-
+        connect entry this segment is part of.  A value of
+        zero indicates that this entry is not referred to by
+        any cross-connect entry.  When a cross-connect entry
+        is created which this out-segment is a part of, this
+        object is automatically updated to reflect the value
+        of hh3cmplsXCIndex of that cross-connect entry."
+   DEFVAL        { 0 }
+   ::= { hh3cmplsOutSegmentEntry 8 }
+
+hh3cmplsOutSegmentOwner OBJECT-TYPE
+   SYNTAX        Hh3cMplsObjectOwner
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes the entity which created and is responsible
+        for managing this segment."
+   DEFVAL { unknown }
+   ::= { hh3cmplsOutSegmentEntry 9 }
+
+hh3cmplsOutSegmentTrafficParamPtr OBJECT-TYPE
+   SYNTAX        RowPointer
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+     "This variable represents a pointer to the traffic
+      parameter specification for this out-segment.  This
+      value may point at an entry in the
+      hh3cmplsTrafficParamTable to indicate which
+      hh3cmplsTrafficParamEntry is to be assigned to this
+      segment.  This value may optionally point at an
+      externally defined traffic parameter specification
+      table.  A value of zero-dot-zero indicates best-
+      effort treatment.  By having the same value of this
+      object, two or more segments can indicate resource
+      sharing."
+   ::= { hh3cmplsOutSegmentEntry 10 }
+
+hh3cmplsOutSegmentRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row."
+   ::= { hh3cmplsOutSegmentEntry 11 }
+
+hh3cmplsOutSegmentStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This variable indicates the storage type for this
+        object."
+   ::= { hh3cmplsOutSegmentEntry 12 }
+
+-- End of hh3cmplsOutSegmentTable
+
+
+-- Out-segment performance table.
+
+hh3cmplsOutSegmentPerfTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsOutSegmentPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table contains statistical information about
+        outgoing segments from an LSR. The counters in this
+        entry should behave in a manner similar to that of
+        the interface."
+   ::= { hh3cmplsLsrObjects 7 }
+
+hh3cmplsOutSegmentPerfEntry  OBJECT-TYPE
+   SYNTAX        Hh3cMplsOutSegmentPerfEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table contains statistical
+        information about one outgoing segment configured in
+        hh3cmplsOutSegmentTable."
+   AUGMENTS      { hh3cmplsOutSegmentEntry }
+      ::= { hh3cmplsOutSegmentPerfTable 1 }
+
+Hh3cMplsOutSegmentPerfEntry ::= SEQUENCE {
+      hh3cmplsOutSegmentOctets                Counter32,
+      hh3cmplsOutSegmentPackets               Counter32,
+      hh3cmplsOutSegmentErrors                Counter32,
+      hh3cmplsOutSegmentDiscards              Counter32,
+      
+      -- HC counter
+      hh3cmplsOutSegmentHCOctets              Counter64,
+      
+      hh3cmplsOutSegmentPerfDiscontinuityTime  TimeStamp
+   }
+
+hh3cmplsOutSegmentOctets OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value contains the total number of octets sent
+        on this segment."
+   ::= { hh3cmplsOutSegmentPerfEntry 1 }
+
+hh3cmplsOutSegmentPackets OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This value contains the total number of packets sent
+        on this segment."
+   ::= { hh3cmplsOutSegmentPerfEntry 2 }
+
+hh3cmplsOutSegmentErrors OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Number of packets that could not be sent due to
+        errors on this segment."
+   ::= { hh3cmplsOutSegmentPerfEntry 3 }
+
+hh3cmplsOutSegmentDiscards OBJECT-TYPE
+   SYNTAX        Counter32
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The number of labeled packets received on this out-
+        segment, which were chosen to be discarded even
+        though no errors had been detected to prevent their
+        being transmitted.  One possible reason for
+        discarding such a labeled packet could be to free up
+        buffer space."
+   ::= { hh3cmplsOutSegmentPerfEntry 4 }
+
+hh3cmplsOutSegmentHCOctets OBJECT-TYPE
+   SYNTAX        Counter64
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "Total number of octets sent.  This is the 64 bit
+        version of hh3cmplsOutSegmentOctets."
+   ::= { hh3cmplsOutSegmentPerfEntry 5 }
+   
+hh3cmplsOutSegmentPerfDiscontinuityTime OBJECT-TYPE
+       SYNTAX      TimeStamp
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+         "The value of sysUpTime on the most recent occasion at
+          which any one or more of this segment's Counter32 or
+          Counter64 suffered a discontinuity. If no such
+          discontinuities have occurred since the last re-
+          initialization of the local management subsystem, then
+          this object contains a zero value."
+       ::= { hh3cmplsOutSegmentPerfEntry 6 }
+   
+
+-- End of hh3cmplsOutSegmentPerfTable.
+
+-- Cross-connect table.
+
+hh3cmplsXCIndexNext OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains an appropriate value to be used
+        for hh3cmplsXCIndex when creating entries in the
+        hh3cmplsXCTable.  The value 0 indicates that no
+        unassigned entries are available.  To obtain the
+        value of hh3cmplsXCIndex for a new entry in the
+        hh3cmplsXCTable, the manager issues a management
+        protocol retrieval operation to obtain the current
+        value of hh3cmplsXCIndex.  After each retrieval
+        operation, the agent should modify the value to
+        reflect the next unassigned index.  After a manager
+        retrieves a value the agent will determine through
+        its local policy when this index value will be made
+        available for reuse."
+   ::= { hh3cmplsLsrObjects 8 }
+
+hh3cmplsXCTable  OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsXCEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+
+       "This table specifies information for switching
+        between LSP segments.  It supports point-to-point,
+        point-to-multipoint and multipoint-to-point
+        connections.  hh3cmplsLabelStackTable specifies the
+        label stack information for a cross-connect LSR and
+        is referred to from hh3cmplsXCTable."
+   ::= { hh3cmplsLsrObjects 9 }
+
+hh3cmplsXCEntry  OBJECT-TYPE
+   SYNTAX        Hh3cMplsXCEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "A row in this table represents one cross-connect
+        entry.  The following objects index it:
+       
+        - cross-connect index hh3cmplsXCIndex that uniquely
+          identifies a group of cross-connect entries
+        - interface index of the in-segment,
+          hh3cmplsInSegmentIfIndex
+        - incoming label(s), hh3cmplsInSegmentLabel
+        - out-segment index, hh3cmplsOutSegmentIndex
+       
+       Originating LSPs:
+        These are represented by using the special
+        combination of values hh3cmplsInSegmentIfIndex=0 and
+        hh3cmplsInSegmentLabel=0 as indexes.  In this case the
+        hh3cmplsOutSegmentIndex MUST be non-zero.
+       
+       Terminating LSPs:
+       These are represented by using the special value
+        hh3cmplsOutSegmentIndex=0 as index.
+
+       Special labels:
+        Entries indexed by reserved MPLS label values 0
+        through 15 imply terminating LSPs and MUST have
+        hh3cmplsOutSegmentIfIndex = 0.  Note that situations
+        where LSPs are terminated with incoming label equal
+        to 0, should have hh3cmplsInSegmentIfIndex = 0 as well,
+        but can be distinguished from originating LSPs
+        because the hh3cmplsOutSegmentIfIndex = 0.  The
+        hh3cmplsOutSegmentIfIndex MUST only be set to 0 in
+        cases of terminating LSPs.
+       
+        An entry can be created by a network administrator
+        or by an SNMP agent as instructed by an MPLS
+        signaling protocol."
+   INDEX  { hh3cmplsXCIndex, hh3cmplsInSegmentIfIndex,
+            hh3cmplsInSegmentLabel,
+            hh3cmplsOutSegmentIndex }
+
+      ::= { hh3cmplsXCTable 1 }
+
+Hh3cMplsXCEntry ::= SEQUENCE {
+      hh3cmplsXCIndex                 Integer32,
+      hh3cmplsXCLspId                 Hh3cMplsLSPID,
+      hh3cmplsXCLabelStackIndex       Integer32,
+      hh3cmplsXCIsPersistent          TruthValue,
+      hh3cmplsXCOwner                 Hh3cMplsObjectOwner,
+      hh3cmplsXCRowStatus             RowStatus,
+      hh3cmplsXCStorageType           StorageType,
+      hh3cmplsXCAdminStatus           INTEGER,
+      hh3cmplsXCOperStatus            INTEGER
+   }
+
+hh3cmplsXCIndex OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    accessible-for-notify
+   STATUS        current
+   DESCRIPTION
+       "Primary index for the conceptual row identifying 
+        a group of cross-connect segments."
+   ::= { hh3cmplsXCEntry 1 }
+
+hh3cmplsXCLspId OBJECT-TYPE
+   SYNTAX        Hh3cMplsLSPID
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "This value identifies the label switched path that
+        this cross-connect entry belongs to."
+   ::= { hh3cmplsXCEntry 2 }
+
+hh3cmplsXCLabelStackIndex OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Primary index into hh3cmplsLabelStackTable identifying a
+        stack of labels to be pushed beneath the top label.
+        Note that the top label identified by the out-
+        segment ensures that all the components of a
+        multipoint-to-point connection have the same
+        outgoing label.  A value of 0 indicates that no
+        labels are to be stacked beneath the top label."
+   ::= { hh3cmplsXCEntry 3 }
+
+hh3cmplsXCIsPersistent OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes whether or not this cross-connect entry and
+        associated in- and out-segments should be restored
+        automatically after failures.  This value MUST be
+        set to false in cases where this cross-connect entry
+        was created by a signaling protocol."
+   DEFVAL        { false }
+   ::= { hh3cmplsXCEntry 4 }
+   
+hh3cmplsXCOwner OBJECT-TYPE
+   SYNTAX    Hh3cMplsObjectOwner
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Denotes the entity that created and is responsible
+        for managing this cross-connect."
+   ::= { hh3cmplsXCEntry 5 }
+
+hh3cmplsXCRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row."
+   ::= { hh3cmplsXCEntry 6 }
+   
+hh3cmplsXCStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Defines the storage type for this object."
+   ::= { hh3cmplsXCEntry 7 }
+
+hh3cmplsXCAdminStatus OBJECT-TYPE
+   SYNTAX   INTEGER {
+                up(1),     -- ready to pass packets
+                down(2),
+                testing(3) -- in some test mode
+                }
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The desired operational status of this segment."
+   ::= { hh3cmplsXCEntry 8 }
+
+hh3cmplsXCOperStatus OBJECT-TYPE
+   SYNTAX   INTEGER {
+         up(1),            -- ready to pass packets
+         down(2),
+         testing(3),       -- in some test mode
+         unknown(4),       -- status cannot be determined
+                           -- for some reason.
+         dormant(5),
+         notPresent(6),    -- some component is missing
+         lowerLayerDown(7) -- down due to the state of
+                           -- lower layer interfaces
+      }
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The actual operational status of this cross-
+        connect."
+   ::= { hh3cmplsXCEntry 9 }
+
+-- End of hh3cmplsXCTable
+
+
+-- Label stack table.
+hh3cmplsMaxLabelStackDepth  OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "The maximum stack depth supported by this LSR."
+::= { hh3cmplsLsrObjects 10 }
+
+hh3cmplsLabelStackIndexNext  OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains an appropriate value to be used
+        for hh3cmplsLabelStackIndex when creating entries in the
+        hh3cmplsLabelStackTable.  The value 0 indicates that no
+        unassigned entries are available.  To obtain an
+        hh3cmplsLabelStackIndex value for a new entry, the
+        manager issues a management protocol retrieval
+        operation to obtain the current value of this
+        object.  After each retrieval operation, the agent
+        should modify the value to reflect the next
+        unassigned index.  After a manager retrieves a value
+        the agent will determine through its local policy
+        when this index value will be made available for
+        reuse."
+::= { hh3cmplsLsrObjects 11 }
+
+hh3cmplsLabelStackTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsLabelStackEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies the label stack to be pushed
+        onto a packet, beneath the top label.  Entries into
+        this table are referred to from hh3cmplsXCTable."
+   ::= { hh3cmplsLsrObjects 12 }
+
+hh3cmplsLabelStackEntry OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabelStackEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents one label which is
+        to be pushed onto an outgoing packet, beneath the
+        top label.  An entry can be created by a network
+        administrator or by an SNMP agent as instructed by
+        an MPLS signaling protocol."
+   INDEX         { hh3cmplsLabelStackIndex, hh3cmplsLabelStackLabelIndex }
+      ::= { hh3cmplsLabelStackTable 1 }
+
+Hh3cMplsLabelStackEntry ::= SEQUENCE {
+      hh3cmplsLabelStackIndex             Integer32,
+      hh3cmplsLabelStackLabelIndex        Integer32,
+      hh3cmplsLabelStackLabel             Hh3cMplsLabel,
+      hh3cmplsLabelStackRowStatus         RowStatus,
+      hh3cmplsLabelStackStorageType       StorageType
+   }
+
+hh3cmplsLabelStackIndex OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Primary index for this row identifying a stack of
+        labels to be pushed on an outgoing packet, beneath
+        the top label."
+   ::= { hh3cmplsLabelStackEntry 1 }
+
+hh3cmplsLabelStackLabelIndex OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Secondary index for this row identifying one label
+        of the stack.  Note that an entry with a smaller
+        hh3cmplsLabelStackLabelIndex would refer to a label
+        higher up the label stack and would be popped at a
+        downstream LSR before a label represented by a
+        higher hh3cmplsLabelStackLabelIndex at a downstream
+        LSR."
+
+   ::= { hh3cmplsLabelStackEntry 2 }
+
+hh3cmplsLabelStackLabel OBJECT-TYPE
+   SYNTAX        Hh3cMplsLabel
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The label to pushed."
+   ::= { hh3cmplsLabelStackEntry 3 }
+
+hh3cmplsLabelStackRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row."
+   ::= { hh3cmplsLabelStackEntry 4 }
+   
+hh3cmplsLabelStackStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Defines the storage type for this object."
+   ::= { hh3cmplsLabelStackEntry 5 }
+
+-- End of hh3cmplsLabelStackTable
+
+-- Traffic Parameter table.
+
+hh3cmplsTrafficParamIndexNext OBJECT-TYPE
+   SYNTAX        Integer32 (0..2147483647)
+   MAX-ACCESS    read-only
+   STATUS        current
+   DESCRIPTION
+       "This object contains an appropriate value which will
+        be used for hh3cmplsTrafficParamIndex when creating
+        entries in the hh3cmplsTrafficParamTable.  The value 0
+        indicates that no unassigned entries are available.
+        To obtain the hh3cmplsTrafficParamIndex value for a new
+        entry, the manager issues a management protocol
+        retrieval operation to obtain the current value of
+        this object.  After each retrieval operation, the
+        agent should modify the value to reflect the next
+        unassigned index.  After a manager retrieves a value
+        the agent will determine through its local policy
+        when this index value will be made available for
+        reuse."
+   ::= { hh3cmplsLsrObjects 13 }
+
+
+hh3cmplsTrafficParamTable OBJECT-TYPE
+   SYNTAX        SEQUENCE OF Hh3cMplsTrafficParamEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "This table specifies the Traffic Parameter objects
+        for in and out-segments."
+   ::= { hh3cmplsLsrObjects 14 }
+
+hh3cmplsTrafficParamEntry OBJECT-TYPE
+   SYNTAX        Hh3cMplsTrafficParamEntry
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "An entry in this table represents the TrafficParam
+        objects for one or more in or out segments.  A
+        single entry can be pointed to by multiple segments
+        indicating resource sharing."
+   INDEX         { hh3cmplsTrafficParamIndex }
+      ::= { hh3cmplsTrafficParamTable 1 }
+
+Hh3cMplsTrafficParamEntry ::= SEQUENCE {
+      hh3cmplsTrafficParamIndex           Integer32,
+      hh3cmplsTrafficParamMaxRate         Hh3cMplsBitRate,
+      hh3cmplsTrafficParamMeanRate        Hh3cMplsBitRate,
+      hh3cmplsTrafficParamMaxBurstSize    Hh3cMplsBurstSize,
+      hh3cmplsTrafficParamRowStatus       RowStatus,
+      hh3cmplsTrafficParamStorageType     StorageType
+   }
+
+hh3cmplsTrafficParamIndex OBJECT-TYPE
+   SYNTAX        Integer32 (1..2147483647)
+   MAX-ACCESS    not-accessible
+   STATUS        current
+   DESCRIPTION
+       "Uniquely identifies this row of the table.  Note
+        that zero represents an invalid index."
+   ::= { hh3cmplsTrafficParamEntry 1 }
+
+hh3cmplsTrafficParamMaxRate OBJECT-TYPE
+   SYNTAX        Hh3cMplsBitRate
+   UNITS         "kilobits per second"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Maximum rate in kilobits/second."
+   ::= { hh3cmplsTrafficParamEntry 2 }
+
+hh3cmplsTrafficParamMeanRate OBJECT-TYPE
+   SYNTAX        Hh3cMplsBitRate
+   UNITS         "kilobits per second"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Mean rate in kilobits/second."
+   ::= { hh3cmplsTrafficParamEntry 3 }
+
+hh3cmplsTrafficParamMaxBurstSize OBJECT-TYPE
+   SYNTAX        Hh3cMplsBurstSize
+   UNITS         "bytes"
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "Maximum burst size in bytes."
+   ::= { hh3cmplsTrafficParamEntry 4 }
+
+hh3cmplsTrafficParamRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "For creating, modifying, and deleting this row."
+   ::= { hh3cmplsTrafficParamEntry 5 }
+   
+hh3cmplsTrafficParamStorageType OBJECT-TYPE
+   SYNTAX        StorageType
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION
+       "The storage type for this object."
+   ::= { hh3cmplsTrafficParamEntry 6 }
+
+-- End of hh3cmplsTrafficParamTable
+
+-- Notification Configuration
+
+hh3cmplsXCTrapEnable OBJECT-TYPE
+   SYNTAX        TruthValue
+   MAX-ACCESS    read-write
+   STATUS        current
+   DESCRIPTION
+       "If this object is true, then it enables the
+        generation of hh3cmplsXCUp and hh3cmplsXCDown traps,
+        otherwise these traps are not emitted."
+   DEFVAL { false }
+   ::= { hh3cmplsLsrObjects 15 }
+
+-- Cross-connect.
+
+hh3cmplsXCUp NOTIFICATION-TYPE
+   OBJECTS     { hh3cmplsXCIndex,
+                  hh3cmplsInSegmentIfIndex,
+                  hh3cmplsInSegmentLabel,
+                  hh3cmplsOutSegmentIndex,
+                  hh3cmplsXCAdminStatus,
+                  hh3cmplsXCOperStatus }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when a
+        hh3cmplsXCOperStatus object for one of the configured
+        cross-connect entries is about to leave the down
+        state and transition into some other state (but not
+        into the notPresent state).  This other state is
+        indicated by the included value of
+        hh3cmplsXCOperStatus."
+   ::= { hh3cmplsLsrNotifyPrefix 1 }
+
+hh3cmplsXCDown NOTIFICATION-TYPE
+   OBJECTS     { hh3cmplsXCIndex,
+                 hh3cmplsInSegmentIfIndex,
+                 hh3cmplsInSegmentLabel,
+                 hh3cmplsOutSegmentIndex,
+                 hh3cmplsXCAdminStatus,
+                 hh3cmplsXCOperStatus }
+   STATUS      current
+   DESCRIPTION
+       "This notification is generated when a
+        hh3cmplsXCOperStatus object for one of the configured
+        cross-connect entries is about to enter the down
+        state from some other state (but not from the
+        notPresent state).  This other state is indicated by
+        the included value of hh3cmplsXCOperStatus."
+   ::= { hh3cmplsLsrNotifyPrefix 2 }
+
+-- End of notifications.
+
+
+-- Module compliance.
+
+hh3cmplsLsrGroups
+   OBJECT IDENTIFIER ::= { hh3cmplsLsrConformance 1 }
+
+hh3cmplsLsrCompliances
+   OBJECT IDENTIFIER ::= { hh3cmplsLsrConformance 2 }
+
+hh3cmplsLsrModuleCompliance MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION
+       "Compliance statement for agents that support the
+        MPLS LSR MIB."
+   MODULE -- this module
+
+      -- The mandatory groups have to be implemented
+      -- by all LSRs.  However, they may all be supported
+      -- as read-only objects in the case where manual
+      -- configuration is unsupported.
+
+      MANDATORY-GROUPS    { hh3cmplsInSegmentGroup,
+                            hh3cmplsOutSegmentGroup,
+                            hh3cmplsXCGroup,
+                            hh3cmplsInterfaceGroup,
+                            hh3cmplsPerfGroup,
+                            hh3cmplsSegmentDiscontinuityGroup }
+
+      GROUP hh3cmplsHCInSegmentPerfGroup
+      DESCRIPTION
+          "This group is mandatory for those in-segment
+           entries for which the object
+           hh3cmplsInSegmentOutOctets wraps around too
+           quickly."
+
+      GROUP hh3cmplsHCOutSegmentPerfGroup
+      DESCRIPTION
+          "This group is mandatory for those out-segment
+           entries for which the object
+           hh3cmplsOutSegmentOctets wraps around too quickly."
+          
+      GROUP hh3cmplsTrafficParamGroup
+      DESCRIPTION
+          "This group is mandatory for those LSRs that
+           support QoS resource reservation."
+
+      -- Depending on whether the device implements
+      -- persistent cross-connects or not one of the
+      -- following two groups is mandatory.
+
+      GROUP hh3cmplsXCIsPersistentGroup
+      DESCRIPTION
+          "This group is mandatory for devices which
+           support persistent cross-connects.  The
+           following constraints apply: hh3cmplsXCIsPersistent
+           must at least be read-only returning true(2)."
+
+      GROUP hh3cmplsXCIsNotPersistentGroup
+      DESCRIPTION
+          "This group is mandatory for devices which
+           support non-persistent cross-connects.  The
+           following constraints apply: hh3cmplsXCIsPersistent
+           must at least be read-only returning false(1)."
+
+      -- hh3cmplsInterfaceConfTable
+
+      OBJECT      hh3cmplsInterfaceConfStorageType
+      SYNTAX      INTEGER { other(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Only other(1) needs to be supported."
+      
+      -- hh3cmplsInSegmentTable
+          
+      OBJECT     hh3cmplsInSegmentXCIndex
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      hh3cmplsInSegmentNPop
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access if not required.  This object
+           should be set to 1 if it is read-only."
+
+      OBJECT      hh3cmplsInSegmentAddrFamily
+      DESCRIPTION
+          "Write access is not required.  A <value of
+           other(0) should be supported because there may
+           be cases where the agent may not know about or
+           support any address types."
+
+      OBJECT      hh3cmplsInSegmentStorageType
+      SYNTAX      INTEGER { other(1) }
+      MIN-ACCESS  read-only
+
+      DESCRIPTION
+          "Only other(1) needs to be supported."
+
+      -- hh3cmplsOutSegmentTable
+
+      OBJECT      hh3cmplsOutSegmentIfIndex
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+      
+      OBJECT      hh3cmplsOutSegmentPushTopLabel
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      hh3cmplsOutSegmentTopLabel
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      hh3cmplsOutSegmentNextHopIpAddrType
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "ipV6(3) need not be supported."
+
+      OBJECT      hh3cmplsOutSegmentNextHopIpv4Addr
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      hh3cmplsOutSegmentNextHopIpv6Addr
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      hh3cmplsOutSegmentRowStatus
+      SYNTAX      INTEGER { active(1), notInService(2),
+                            createAndGo(4), destroy(6) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "The notReady(3) and createAndWait(5) states need
+           not be supported."
+      OBJECT      hh3cmplsOutSegmentStorageType
+      SYNTAX      INTEGER { other(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Only other(1) needs to be supported."
+
+      -- hh3cmplsXCTable
+
+      OBJECT      hh3cmplsXCLabelStackIndex
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      hh3cmplsXCIsPersistent
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Write access is not required."
+
+      OBJECT      hh3cmplsXCAdminStatus
+      SYNTAX      INTEGER { up(1), down(2) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "A value of testing(3) need not be supported."
+
+      OBJECT      hh3cmplsXCOperStatus
+      SYNTAX      INTEGER { up(1), down(2) }
+      DESCRIPTION
+          "Only up(1) and down(2) need to be supported."
+      
+      OBJECT      hh3cmplsXCRowStatus
+      SYNTAX      INTEGER { active(1),
+                             notInService(2),
+                             createAndGo(4),
+                             destroy(6) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "The notReady(3) and createAndWait(5) states need
+           not be supported."
+      
+      OBJECT      hh3cmplsXCStorageType
+      SYNTAX      INTEGER { other(1) }
+      MIN-ACCESS  read-only
+      DESCRIPTION
+          "Only other(1) needs to be supported."
+
+   ::= { hh3cmplsLsrCompliances 1 }
+
+-- Units of conformance.
+
+hh3cmplsInterfaceGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsInterfaceLabelMinIn,
+             hh3cmplsInterfaceLabelMaxIn,
+             hh3cmplsInterfaceLabelMinOut,
+             hh3cmplsInterfaceLabelMaxOut,
+             hh3cmplsInterfaceTotalBandwidth,
+             hh3cmplsInterfaceAvailableBandwidth,
+             hh3cmplsInterfaceLabelParticipationType,
+             hh3cmplsInterfaceConfStorageType
+          }
+             
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed for MPLS interface
+           configuration and performance information."
+   ::= { hh3cmplsLsrGroups 1 }
+
+hh3cmplsInSegmentGroup  OBJECT-GROUP
+             OBJECTS { hh3cmplsInSegmentNPop,
+             hh3cmplsInSegmentAddrFamily,
+             hh3cmplsInSegmentXCIndex,
+             hh3cmplsInSegmentOctets,
+             hh3cmplsInSegmentDiscards,
+             hh3cmplsInSegmentOwner,
+             hh3cmplsInSegmentRowStatus,
+             hh3cmplsInSegmentStorageType,
+             hh3cmplsInSegmentTrafficParamPtr
+          }
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed to implement an in-
+           segment."
+   ::= { hh3cmplsLsrGroups 2 }
+
+hh3cmplsOutSegmentGroup  OBJECT-GROUP
+   OBJECTS { hh3cmplsOutSegmentIndexNext,
+             hh3cmplsOutSegmentIfIndex,
+             hh3cmplsOutSegmentPushTopLabel,
+             hh3cmplsOutSegmentTopLabel,
+             hh3cmplsOutSegmentNextHopIpAddrType,
+             hh3cmplsOutSegmentNextHopIpv4Addr,
+             hh3cmplsOutSegmentNextHopIpv6Addr,
+             hh3cmplsOutSegmentXCIndex,
+             hh3cmplsOutSegmentOwner,
+             hh3cmplsOutSegmentOctets,
+             hh3cmplsOutSegmentDiscards,
+             hh3cmplsOutSegmentErrors,
+             hh3cmplsOutSegmentRowStatus,
+             hh3cmplsOutSegmentStorageType,
+             hh3cmplsOutSegmentTrafficParamPtr
+          }
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed to implement an out-
+           segment."
+   ::= { hh3cmplsLsrGroups 3 }
+
+hh3cmplsXCGroup  OBJECT-GROUP
+   OBJECTS { hh3cmplsXCIndexNext,
+             hh3cmplsXCLabelStackIndex,
+             hh3cmplsXCOwner,
+             hh3cmplsXCAdminStatus,
+             hh3cmplsXCOperStatus,
+             hh3cmplsXCRowStatus,
+             hh3cmplsXCTrapEnable,
+             hh3cmplsXCStorageType
+          }
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects needed to implement a
+           cross-connect entry."
+   ::= { hh3cmplsLsrGroups 4 }
+
+hh3cmplsXCOptionalGroup  OBJECT-GROUP
+   OBJECTS { hh3cmplsXCLspId }
+   STATUS  current
+   DESCRIPTION
+          "Collection of optional objects for implementing 
+           a cross-connect entry."
+   ::= { hh3cmplsLsrGroups 5 }
+
+hh3cmplsPerfGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsInSegmentOctets,
+             hh3cmplsInSegmentPackets,
+             hh3cmplsInSegmentErrors,
+             hh3cmplsInSegmentDiscards,
+             hh3cmplsOutSegmentOctets,
+             hh3cmplsOutSegmentPackets,
+             hh3cmplsOutSegmentDiscards,
+             hh3cmplsInterfaceInLabelsUsed,
+             hh3cmplsInterfaceFailedLabelLookup,
+             hh3cmplsInterfaceOutFragments,
+             hh3cmplsInterfaceOutLabelsUsed
+          }
+   
+   STATUS  current
+   DESCRIPTION
+          "Collection of objects providing performance
+           information
+        about an LSR."
+   ::= { hh3cmplsLsrGroups 6 }
+
+hh3cmplsHCInSegmentPerfGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsInSegmentHCOctets }
+   STATUS  current
+   DESCRIPTION
+          "Object(s) providing performance information
+           specific to out-segments for which the object
+           hh3cmplsInterfaceInOctets wraps around too quickly."
+   ::= { hh3cmplsLsrGroups 7 }
+
+hh3cmplsHCOutSegmentPerfGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsOutSegmentHCOctets }
+   STATUS  current
+   DESCRIPTION
+          "Object(s) providing performance information
+           specific to out-segments for which the object
+           hh3cmplsInterfaceOutOctets wraps around too
+           quickly."
+   ::= { hh3cmplsLsrGroups 8 }
+   
+hh3cmplsTrafficParamGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsTrafficParamIndexNext,
+             hh3cmplsTrafficParamMaxRate,
+             hh3cmplsTrafficParamMeanRate,
+             hh3cmplsTrafficParamMaxBurstSize,
+             hh3cmplsTrafficParamRowStatus,
+             hh3cmplsTrafficParamStorageType
+          }
+   STATUS  current
+   DESCRIPTION
+          "Object(s) required for supporting QoS resource
+           reservation."
+   ::= { hh3cmplsLsrGroups 9 }
+
+hh3cmplsXCIsPersistentGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsXCIsPersistent }
+   STATUS  current
+   DESCRIPTION
+          "Objects needed to support persistent cross-
+           connects."
+   ::= { hh3cmplsLsrGroups 10 }
+
+hh3cmplsXCIsNotPersistentGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsXCIsPersistent }
+   STATUS  current
+   DESCRIPTION
+          "Objects needed to support non-persistent cross-
+           connects."
+   ::= { hh3cmplsLsrGroups 11 }
+   
+hh3cmplsLabelStackGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsLabelStackLabel,
+             hh3cmplsLabelStackRowStatus,
+             hh3cmplsLabelStackStorageType,
+             hh3cmplsMaxLabelStackDepth,
+             hh3cmplsLabelStackIndexNext }
+   STATUS current
+   DESCRIPTION
+          "Objects needed to support label stacking."
+      ::= { hh3cmplsLsrGroups 12 }
+      
+hh3cmplsSegmentDiscontinuityGroup OBJECT-GROUP
+   OBJECTS { hh3cmplsInSegmentPerfDiscontinuityTime,
+             hh3cmplsOutSegmentPerfDiscontinuityTime
+          }
+   
+   STATUS  current
+   DESCRIPTION
+       " A collection of objects providing information
+        specific to segment discontinuities.."
+   ::= { hh3cmplsLsrGroups 13 }
+      
+
+hh3cmplsLsrNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS { hh3cmplsXCUp,
+                   hh3cmplsXCDown }
+   STATUS  current
+   DESCRIPTION
+          "Set of notifications implemented in this module.
+           None is mandatory."
+   ::= { hh3cmplsLsrGroups 14 }
+
+-- End of MPLS-LSR-MIB
+END

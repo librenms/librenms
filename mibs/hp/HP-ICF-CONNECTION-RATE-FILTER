@@ -1,0 +1,241 @@
+HP-ICF-CONNECTION-RATE-FILTER DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY,
+        NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TruthValue
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        hpSwitch
+            FROM HP-ICF-OID
+        InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB
+        ifIndex 
+            FROM IF-MIB;
+
+    hpicfConnectionRateFilter MODULE-IDENTITY
+        LAST-UPDATED "200905120108Z"  -- May 12, 2009
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO "Hewlett Packard Company
+                     8000 Foothills Blvd.
+                     Roseville, CA 95747"
+        DESCRIPTION  "This MIB module describes objects for 
+                     management of the Connection Rate Filter feature in
+                     the HP Switch product line."
+        REVISION     "200905120108Z"  -- May 12,2009
+        DESCRIPTION  "Added 'hpicfConnectionRateFilterSensitivity',
+                      'hpicfConnectionRateFilterIfModeValue'."  
+        REVISION     "200409070108Z"  -- September 07, 2004
+        DESCRIPTION  "Added Connection Rate Filter MIBs."
+   ::= { hpSwitch 24 }
+
+    hpicfConnectionRateFilterNotifications OBJECT IDENTIFIER       ::=
+        { hpicfConnectionRateFilter 0 }
+    hpicfConnectionRateFilterNotificationControl OBJECT IDENTIFIER ::=
+        { hpicfConnectionRateFilter 1 }
+    hpicfConnectionRateFilterObjects OBJECT IDENTIFIER             ::=
+        { hpicfConnectionRateFilter 2 }
+    hpicfConnectionRateFilterConformance OBJECT IDENTIFIER         ::=
+        { hpicfConnectionRateFilter 3 }
+    hpicfConnectionRateFilterIfModeConfig OBJECT IDENTIFIER        ::= 
+        { hpicfConnectionRateFilter 4 }     
+    
+    --
+    -- Connection Rate Filter Notifications
+    --
+
+    hpicfConnectionRateFilterNotification NOTIFICATION-TYPE
+        OBJECTS     { hpicifConnectionRateFilterVlanId,
+                      hpicifConnectionRateFilterInetAddress,
+                      hpicifConnectionRateFilterInetAddressType,
+                      hpicifConnectionRateFilterMode }
+        STATUS      current
+        DESCRIPTION "This Notification indicates that the host associated with
+                     the specified IP Address has been flagged by the connection
+                     rate filter and may have been throttled or blocked."
+        ::= { hpicfConnectionRateFilterNotifications 1 }
+
+    --
+    -- Connection Rate Filter Objects
+    --
+
+    hpicifConnectionRateFilterVlanId OBJECT-TYPE
+        SYNTAX      Integer32 (1..4094)
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "This variable uniquely identifies the vlan on which the
+                    host was flagged by the connection rate filter."
+        ::= { hpicfConnectionRateFilterObjects 1 }
+
+    hpicifConnectionRateFilterInetAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "This variable uniquely identifies the IP address of the
+                    host flagged by the connection rate filter."
+        ::= { hpicfConnectionRateFilterObjects 2 }
+
+    hpicifConnectionRateFilterInetAddressType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "This variable uniquely identifies the type of IP address
+                    of the host flagged by the connection rate filter."
+        ::= { hpicfConnectionRateFilterObjects 3 }
+
+    hpicifConnectionRateFilterMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        inform(0),
+                        throttle(1),
+                        block(2)
+                    }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "This variable identifies the mode applied to the host
+                    flagged by the connection rate filter."
+        ::= { hpicfConnectionRateFilterObjects 4 }
+
+-- 
+-- Objects for mode of connection rate filter
+-- 
+
+
+     hpicfConnectionRateFilterIfModeConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfConnectionRateFilterIfModeConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains objects for configuring  mode of 
+                     the host flagged by the connection rate filter."
+        ::= { hpicfConnectionRateFilterIfModeConfig 1 }
+
+    hpicfConnectionRateFilterIfModeConfigEntry OBJECT-TYPE
+        SYNTAX      HpicfConnectionRateFilterIfModeConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the 
+                     hpicfConnectionRateFilterIfModeConfigEntry contains
+                     objects for configuring  mode of the host flagged 
+                     by the connection rate filter."
+        INDEX    { ifIndex }
+        ::= { hpicfConnectionRateFilterIfModeConfigTable 1 }
+
+    HpicfConnectionRateFilterIfModeConfigEntry ::= 
+       SEQUENCE
+       {
+           hpicfConnectionRateFilterIfModeValue            INTEGER
+       }
+
+     
+      hpicfConnectionRateFilterIfModeValue OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        none(0), 
+                        inform(1),
+                        throttle(2),
+                        block(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This variable identifies the mode applied to the host
+                    flagged by the connection rate filter."
+        DEFVAL      { none }
+        ::= { hpicfConnectionRateFilterIfModeConfigEntry 1 }
+
+
+
+
+    --
+    -- Connection Rate Filter Notification Control
+    --
+
+    hpicfConnectionRateFilterNotificationControlEnable  OBJECT-TYPE
+          SYNTAX             TruthValue
+          MAX-ACCESS         read-write
+          STATUS             current
+          DESCRIPTION "This object controls, whether or not notifications from
+             the agent are enabled. The value true(1) means that notifications
+             are enabled; the value false(2) means that they are not.  The
+             default value is enabled."
+          ::= { hpicfConnectionRateFilterNotificationControl 1 }
+
+
+
+-- 
+-- Objects for sensitivity  of connection rate filter
+-- 
+      hpicfConnectionRateFilterSensitivity OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        none(0),
+                        low(1),
+                        medium(2),
+                        high(3),
+                        aggressive(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This variable is for setting the level of filtering
+                     required for connection-rate-filter."
+        DEFVAL      { none }
+    ::= { hpicfConnectionRateFilterNotificationControl  2 }
+
+
+          
+
+    --
+    -- Conformance Section
+    --
+    hpicfConnectionRateFilterCompliances OBJECT IDENTIFIER
+    ::= { hpicfConnectionRateFilterConformance 1 }
+    hpicfConnectionRateFilterGroups OBJECT IDENTIFIER
+    ::= { hpicfConnectionRateFilterConformance 2 }
+    
+    hpicfConnectionRateFilterCompliance MODULE-COMPLIANCE
+        STATUS       current
+        DESCRIPTION  "A compliance statement for HP Routing switches with
+                     Connection Rate Filtering capability"
+        MODULE
+        MANDATORY-GROUPS { hpicfConnectionRateFilterNotifyGroup,
+                           hpicfConnectionRateFilterObjectGroup }
+        GROUP        hpicfConnectionRateFilterNotifyGroup
+        DESCRIPTION  "The notification object for Connection Rate Filtering"
+        GROUP        hpicfConnectionRateFilterObjectGroup
+        DESCRIPTION  "A collection of objects that control notification"
+        ::= { hpicfConnectionRateFilterCompliances 1 }
+
+    hpicfConnectionRateFilterCompliance1 MODULE-COMPLIANCE
+        STATUS       current
+        DESCRIPTION  "A compliance statement for HP Routing switches with
+                     Connection Rate Filtering capability"
+        MODULE
+        MANDATORY-GROUPS { hpicfConnectionRateFilterObjectGroup1 }
+        ::= { hpicfConnectionRateFilterCompliances 2 }
+        
+    hpicfConnectionRateFilterNotifyGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hpicfConnectionRateFilterNotification }
+        STATUS        current
+        DESCRIPTION   "A collection of notifications used to indicate
+                      changes in Connection Rate Filter status"
+        ::= { hpicfConnectionRateFilterGroups 1 }
+
+    hpicfConnectionRateFilterObjectGroup OBJECT-GROUP
+        OBJECTS     { hpicfConnectionRateFilterNotificationControlEnable,
+                      hpicfConnectionRateFilterIfModeValue,
+                      hpicfConnectionRateFilterSensitivity
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects for configuring the Connection
+                    Rate Filter."
+        ::= { hpicfConnectionRateFilterGroups 2 }
+
+    hpicfConnectionRateFilterObjectGroup1 OBJECT-GROUP
+        OBJECTS     { hpicifConnectionRateFilterVlanId,
+                      hpicifConnectionRateFilterInetAddress,
+                      hpicifConnectionRateFilterInetAddressType,
+                      hpicifConnectionRateFilterMode }
+        STATUS      current
+        DESCRIPTION "A collection of objects for configuring the Connection
+                    Rate Filter."
+        ::= { hpicfConnectionRateFilterGroups 3 }
+
+END

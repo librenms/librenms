@@ -1,0 +1,57 @@
+--File Name : TERRA-SMI
+--Date      : Thu Aug 21 10:59:28 EEST 2008
+--Author    : Tadas Leskevicius
+
+TERRA-SMI DEFINITIONS ::= BEGIN
+    IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI;
+
+    terraRoot MODULE-IDENTITY
+        LAST-UPDATED        "199505160000Z"
+        ORGANIZATION        "TERRA Electronics"
+        CONTACT-INFO        "TERRA Electronics    
+                            Draugystes
+                            22
+                            Kaunas
+                            Lithuania
+                            LT-51256
+                            E-mail design@terraelectronics.com"
+        DESCRIPTION         "The Structure of Management Information for the
+                            TERRA enterprise."
+
+        REVISION            "200808191104Z"
+        DESCRIPTION         ""
+        ::= { enterprises 30631 }
+
+
+    terraProducts OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "terraProducts is the root OBJECT IDENTIFIER from
+                            which sysObjectID values are assigned. Actual
+                            values are defined in TERRA-PRODUCTS-MIB."
+        ::= { terraRoot 1 }
+
+    terraExperimental OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "terraExperimental provides a root object identifier
+                            from which experimental mibs may be temporarily
+                            based. mibs are typicially based here if they
+                            are TERRA work-in-process which has not been
+                            assigned a permanent object identifier by the
+                            TERRA assigned number authority, typicially because
+                            the mib is not ready for deployment. NOTE WELL:
+                            support for mibs in the terraExperimental subtree
+                            will be deleted when a permanent object identifier
+                            assignment is made."
+        ::= { terraRoot 2 }
+
+    terraDefIdent OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "The MIB module represents specific Textual Conventions"
+        ::= { terraRoot 3 }
+
+
+
+END
+

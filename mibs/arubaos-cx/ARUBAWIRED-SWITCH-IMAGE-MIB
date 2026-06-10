@@ -1,0 +1,226 @@
+--**MOD+************************************************************************
+--* Module:    ARUBAWIRED-SWITCH-IMAGE-MIB :SWITCH IMAGE MIB file
+--*
+--* (c) Copyright 2023 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-SWITCH-IMAGE-MIB
+--*
+--**MOD-************************************************************************
+
+ARUBAWIRED-SWITCH-IMAGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    wndFeatures
+        FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredSwitchImage MODULE-IDENTITY
+    LAST-UPDATED "202305250000Z" -- May 25, 2023
+    ORGANIZATION "HPE/Aruba Networking Division"
+    CONTACT-INFO "Hewlett Packard Company
+                  8000 Foothills Blvd.
+                  Roseville, CA 95747"
+    DESCRIPTION
+        "This MIB describes information about switch operating system
+        images loaded in non-volatile storage."
+
+    REVISION     "202305250000Z" -- May 25, 2023
+    DESCRIPTION  "Initial revision."
+    ::= { wndFeatures 26 }
+
+arubaWiredSwitchImageObject OBJECT IDENTIFIER
+    ::= {arubaWiredSwitchImage 1}
+arubaWiredSwitchImageConformance OBJECT IDENTIFIER
+    ::= {arubaWiredSwitchImage 2}
+
+----------------------------------------------------------------------
+-- Switch Flash Information
+------------------------------------------------------------------------
+
+arubaWiredSwitchImageGeneral OBJECT IDENTIFIER
+    ::= {arubaWiredSwitchImageObject 0}
+
+    arubaWiredDefaultBoot  OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes the default flash boot image.
+                      It may be either primary or secondary image."
+        ::= {arubaWiredSwitchImageGeneral 1}
+
+
+    arubaWiredDefaultBootEnum  OBJECT-TYPE
+        SYNTAX       INTEGER{
+                        primary(1),
+                        secondary(2)
+                        }
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes the default flash boot image.
+                      It may be either primary (1) or secondary (2) image."
+        ::= {arubaWiredSwitchImageGeneral 2}
+
+    arubaWiredBootProfileTimeout  OBJECT-TYPE
+        SYNTAX       Integer32 (2..10)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes the time in seconds that the
+                      system waits for a user to select the software image
+                      to boot with. The switch is booted with the default
+                      software image if the user does not select within this
+                      timeframe."
+        ::= {arubaWiredSwitchImageGeneral 3}
+
+---------------------------------------------------------------
+-- Switch Flash Images Table
+----------------------------------------------------------------
+
+arubaWiredSwitchImageDetails OBJECT IDENTIFIER
+    ::= {arubaWiredSwitchImageObject 1}
+
+    arubaWiredSwitchImageTable  OBJECT-TYPE
+        SYNTAX       SEQUENCE  OF  ArubaWiredSwitchImageEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Each entry of this table describes
+                      information like size of image, build date,
+                      image version and the SHA256 for the images
+                      that are present in the flash."
+        ::= {arubaWiredSwitchImageDetails 1}
+
+    arubaWiredSwitchImageEntry  OBJECT-TYPE
+        SYNTAX       ArubaWiredSwitchImageEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "Each entry of this table describes
+                      information like size of image, build date,
+                      image version and the SHA256 for the images
+                      that are present in the flash."
+        INDEX        {arubaWiredSwitchImageTypeEnum}
+        ::= {arubaWiredSwitchImageTable 1}
+
+
+    ArubaWiredSwitchImageEntry  ::= SEQUENCE{
+        arubaWiredSwitchImageTypeEnum  INTEGER,
+        arubaWiredSwitchImageType      DisplayString,
+        arubaWiredSwitchImageVersion   DisplayString,
+        arubaWiredSwitchImageSize      DisplayString,
+        arubaWiredSwitchImageBuildDate DisplayString,
+        arubaWiredSwitchImageSha       DisplayString
+    }
+
+    arubaWiredSwitchImageTypeEnum OBJECT-TYPE
+        SYNTAX       INTEGER{
+                      primary(1),
+                      secondary(2)
+                     }
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  "This object describes flash image type. It may be
+                      primary (1) or secondary (2) image."
+        ::= {arubaWiredSwitchImageEntry 1}
+
+    arubaWiredSwitchImageType OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes flash image type. It may be
+                      primary or secondary image."
+        ::= {arubaWiredSwitchImageEntry 2}
+
+    arubaWiredSwitchImageVersion OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes the version number."
+        ::= {arubaWiredSwitchImageEntry 3}
+
+    arubaWiredSwitchImageSize  OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes the image size."
+        ::= {arubaWiredSwitchImageEntry 4}
+
+    arubaWiredSwitchImageBuildDate OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes the date on which this
+                      image is built."
+        ::= {arubaWiredSwitchImageEntry 5}
+
+    arubaWiredSwitchImageSha OBJECT-TYPE
+        SYNTAX       DisplayString
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION  "This object describes the SHA256 calculated for
+                      this image."
+        ::= {arubaWiredSwitchImageEntry 6}
+
+
+--------------------------------------------------------------
+--
+-- Conformance Information
+----------------------------------------------------------------
+--
+    arubaWiredSwitchImageGroups
+         OBJECT IDENTIFIER ::= {arubaWiredSwitchImageConformance 1}
+    arubaWiredSwitchImageCompliances
+         OBJECT IDENTIFIER ::= {arubaWiredSwitchImageConformance 2}
+
+
+-- Compliance statements
+
+    arubaWiredSwitchImageCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "The compliance statement is for
+                        arubaWiredSwitchFlashImagesGroup,
+                        arubaWiredSwitchBootGroup."
+        MODULE          --this module
+        MANDATORY-GROUPS  { arubaWiredSwitchFlashImagesGroup,
+                            arubaWiredSwitchBootGroup}
+        ::= {arubaWiredSwitchImageCompliances 1}
+
+-- MIB Groupings
+
+    arubaWiredSwitchFlashImagesGroup  OBJECT-GROUP
+        OBJECTS {
+             arubaWiredSwitchImageType,
+             arubaWiredSwitchImageVersion,
+             arubaWiredSwitchImageSize,
+             arubaWiredSwitchImageBuildDate,
+             arubaWiredSwitchImageSha
+        }
+        STATUS         current
+        DESCRIPTION    "A mandatory group which is required to
+                        give the details including image size,
+                        image build date, image version, and image
+                        type for the images in the flash."
+        ::= {arubaWiredSwitchImageGroups 1}
+
+    arubaWiredSwitchBootGroup     OBJECT-GROUP
+        OBJECTS {
+             arubaWiredDefaultBoot,
+             arubaWiredDefaultBootEnum,
+             arubaWiredBootProfileTimeout
+        }
+        STATUS        current
+        DESCRIPTION   "A mandatory group which is required to
+                       give the details including the default
+                       image and the boot profile timeout length."
+       ::={arubaWiredSwitchImageGroups 2}
+
+END

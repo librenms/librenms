@@ -1,0 +1,80 @@
+<?php
+
+namespace App\Policies;
+
+use App\Models\Dashboard;
+use App\Models\User;
+
+class DashboardPolicy
+{
+    use ChecksGlobalPermissions;
+
+    /**
+     * Determine whether the user can view any dashboard.
+     *
+     * @param  User  $user
+     */
+    public function viewAny(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can view the dashboard.
+     *
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
+     */
+    public function view(User $user, Dashboard $dashboard): bool
+    {
+        return $dashboard->user_id == $user->user_id || $dashboard->access > 0;
+    }
+
+    /**
+     * Determine whether the user can create dashboards.
+     *
+     * @param  User  $user
+     */
+    public function create(User $user): bool
+    {
+        return true;
+    }
+
+    /**
+     * Determine whether the user can update the dashboard.
+     *
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
+     */
+    public function update(User $user, Dashboard $dashboard): bool
+    {
+        return $dashboard->user_id == $user->user_id
+            || $dashboard->access > 2
+            || ($dashboard->access > 1 && $this->hasGlobalPermission($user, 'update'));
+    }
+
+    /**
+     * Determine whether the user can delete the dashboard.
+     *
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
+     */
+    public function delete(User $user, Dashboard $dashboard): bool
+    {
+        return $dashboard->user_id == $user->user_id
+            || $this->hasGlobalPermission($user, 'delete');
+    }
+
+    /**
+     * Determine whether the user can copy the dashboard.
+     *
+     * @param  User  $user
+     * @param  Dashboard  $dashboard
+     * @param  int  $target_user_id
+     */
+    public function copy(User $user, ?Dashboard $dashboard = null, int $target_user_id = 0): bool
+    {
+        return $this->hasGlobalPermission($user, 'copy')
+            || ($dashboard && $target_user_id && $user->user_id == $target_user_id && $this->view($user, $dashboard));
+    }
+}

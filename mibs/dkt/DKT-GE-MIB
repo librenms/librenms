@@ -1,0 +1,1239 @@
+DKT-GE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    Counter32                   FROM SNMPv2-SMI
+    OBJECT-GROUP				FROM SNMPv2-CONF
+    dkt                         FROM DKT-MIB;
+
+geMIB MODULE-IDENTITY
+    LAST-UPDATED  "200901140000Z"
+    ORGANIZATION "DKT A/S"
+    CONTACT-INFO
+        "postal:  DKT A/S
+                  Fanoevej 6
+                  DK-4060 Kirke Saaby
+                  Denmark
+
+         email:   info@dktcomega.com"
+    DESCRIPTION   "DKT Gigabit MIB."
+    ::= { dkt 14 }
+
+geSwitchEngine OBJECT IDENTIFIER ::= { geMIB 1 }
+
+
+geATU OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..20480))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Dumps the Address Translation Unit (ATU) Switch table in semi colon format" 
+    ::= { geSwitchEngine 1 }
+
+geUnicastDelete
+ OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Removes a unicast MAC address from the Address Translation Unit (ATU) Switch table."
+    ::= { geSwitchEngine 2 }
+
+geMulticastDelete
+ OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Removes a multicast IP address from the Address Translation Unit (ATU) Switch table."
+    ::= { geSwitchEngine 3 }
+
+geIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Starts/stops IGMP snooping, input parameter 0 = stops IGMP snooping, 1 = starts IGMP snooping. Per Default IGMP snooping is enabled, but has to be configured per port"
+    ::= { geSwitchEngine 4 }
+
+geVTU OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..9600))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Dumps the VLAN Table Unit (VTU) Switch table in semi colon format"  
+    ::= { geSwitchEngine 5 }
+
+geVLANCreate OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Creates a VLAN, input parameters are: VID:WAN:LAN1:LAN2:LAN3:LAN4:CPU:NRL-ENABLE"
+    ::= { geSwitchEngine 6 }
+
+geVLANDelete OBJECT-TYPE
+    SYNTAX	INTEGER (0..4095)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Deletes a VLAN, input parameter is VLAN VID: 0 - 4095"
+    ::= { geSwitchEngine 7 }
+
+geClearVTU OBJECT-TYPE
+    SYNTAX	INTEGER (1)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Clears the VLAN Table Unit (VTU) Switch table, input parameter 1 = clear VTU table"
+    ::= { geSwitchEngine 8 }
+
+geDumpPIRLBuckets OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Dumps a list of the active buckets."
+    ::= { geSwitchEngine 9 }
+
+geVLANProviderMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enable/disable VLAN provider mode, input parameter 0 = disable VLAN provider mode, 1 = enable VLAN provider mode. Per Default VLAN provider mode is disabled.  NOTE: Provider VLAN ID should be setup in port default VID for the originating port."
+    ::= { geSwitchEngine 10 }
+
+gePorts OBJECT IDENTIFIER ::= { geMIB 2 }
+
+geCPUPort OBJECT IDENTIFIER ::= { gePorts 1 }
+
+geCPUPortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 1 }
+
+geCPUPortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Input parameters are: AUTO"
+    ::= { geCPUPort 2 }
+
+
+geCPUPortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { geCPUPort 3 }
+
+
+geCPUPortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 4 }
+
+
+geCPUPortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 5 }
+
+
+geCPUPortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 6 }
+
+geCPUPortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 7 }
+
+
+geCPUPortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 8 }
+
+
+geCPUPortDisablePIRL2Bucket OBJECT-TYPE
+    SYNTAX	INTEGER (0..4)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Disables per port an already defined Port Ingress Rate Limitation (PIRL) bucket, input parameter bucket 0 - 4."
+    ::= { geCPUPort 9 }
+
+
+geCPUPortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { geCPUPort 10 }
+
+
+geCPUPortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { geCPUPort 11 }
+
+
+geCPUPortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { geCPUPort 12 }
+
+
+geCPUPortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 13 }
+
+
+geCPUPortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { geCPUPort 14 }
+
+
+geCPUPortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { geCPUPort 15 }
+
+
+geCPUPortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { geCPUPort 16 }
+
+
+geCPUPortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { geCPUPort 17 }
+
+
+geCPUPortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { geCPUPort 18 }
+
+
+geCPUPortMtu OBJECT-TYPE
+    SYNTAX	INTEGER (0..2)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"The MTU size of the port."
+    ::= { geCPUPort 19 }
+
+
+
+
+geWANPort OBJECT IDENTIFIER ::= { gePorts 2 }
+
+geWANPortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 1 }
+
+geWANPortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { geWANPort 2 }
+
+
+geWANPortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { geWANPort 3 }
+
+
+geWANPortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 4 }
+
+
+geWANPortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 5 }
+
+
+geWANPortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 6 }
+
+geWANPortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 7 }
+
+
+geWANPortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 8 }
+
+
+geWANPortDisablePIRL2Bucket OBJECT-TYPE
+    SYNTAX	INTEGER (0..4)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Disables per port an already defined Port Ingress Rate Limitation (PIRL) bucket, input parameter bucket 0 - 4."
+    ::= { geWANPort 9 }
+
+
+geWANPortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { geWANPort 10 }
+
+
+geWANPortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { geWANPort 11 }
+
+
+geWANPortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { geWANPort 12 }
+
+
+geWANPortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 13 }
+
+
+geWANPortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { geWANPort 14 }
+
+
+geWANPortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { geWANPort 15 }
+
+
+geWANPortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { geWANPort 16 }
+
+
+geWANPortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { geWANPort 17 }
+
+
+geWANPortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { geWANPort 18 }
+
+
+geWANPortMtu OBJECT-TYPE
+    SYNTAX	INTEGER (0..2)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"The MTU size of the port."
+    ::= { geWANPort 19 }
+
+geWANPortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { geWANPort 20 }
+
+
+geLAN1Port OBJECT IDENTIFIER ::= { gePorts 3 }
+
+geLAN1PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 1 }
+
+geLAN1PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { geLAN1Port 2 }
+
+
+geLAN1PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { geLAN1Port 3 }
+
+
+geLAN1PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 4 }
+
+
+geLAN1PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 5 }
+
+
+geLAN1PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 6 }
+
+geLAN1PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 7 }
+
+
+geLAN1PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 8 }
+
+
+geLAN1PortDisablePIRL2Bucket OBJECT-TYPE
+    SYNTAX	INTEGER (0..4)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Disables per port an already defined Port Ingress Rate Limitation (PIRL) bucket, input parameter bucket 0 - 4."
+    ::= { geLAN1Port 9 }
+
+
+geLAN1PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { geLAN1Port 10 }
+
+
+geLAN1PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { geLAN1Port 11 }
+
+
+geLAN1PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { geLAN1Port 12 }
+
+
+geLAN1PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 13 }
+
+
+geLAN1PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { geLAN1Port 14 }
+
+
+geLAN1PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { geLAN1Port 15 }
+
+
+geLAN1PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { geLAN1Port 16 }
+
+
+geLAN1PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { geLAN1Port 17 }
+
+
+geLAN1PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { geLAN1Port 18 }
+
+
+geLAN1PortMtu OBJECT-TYPE
+    SYNTAX	INTEGER (0..2)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"The MTU size of the port."
+    ::= { geLAN1Port 19 }
+
+geLAN1PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { geLAN1Port 20 }
+
+
+
+geLAN2Port OBJECT IDENTIFIER ::= { gePorts 4 }
+
+geLAN2PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 1 }
+
+geLAN2PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { geLAN2Port 2 }
+
+
+geLAN2PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { geLAN2Port 3 }
+
+
+geLAN2PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 4 }
+
+
+geLAN2PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 5 }
+
+
+geLAN2PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 6 }
+
+geLAN2PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 7 }
+
+
+geLAN2PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 8 }
+
+
+geLAN2PortDisablePIRL2Bucket OBJECT-TYPE
+    SYNTAX	INTEGER (0..4)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Disables per port an already defined Port Ingress Rate Limitation (PIRL) bucket, input parameter bucket 0 - 4."
+    ::= { geLAN2Port 9 }
+
+
+geLAN2PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { geLAN2Port 10 }
+
+
+geLAN2PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { geLAN2Port 11 }
+
+
+geLAN2PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { geLAN2Port 12 }
+
+
+geLAN2PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 13 }
+
+
+geLAN2PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { geLAN2Port 14 }
+
+
+geLAN2PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { geLAN2Port 15 }
+
+
+geLAN2PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { geLAN2Port 16 }
+
+
+geLAN2PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { geLAN2Port 17 }
+
+
+geLAN2PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { geLAN2Port 18 }
+
+
+geLAN2PortMtu OBJECT-TYPE
+    SYNTAX	INTEGER (0..2)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"The MTU size of the port."
+    ::= { geLAN2Port 19 }
+
+geLAN2PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { geLAN2Port 20 }
+
+
+
+geLAN3Port OBJECT IDENTIFIER ::= { gePorts 5 }
+
+geLAN3PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 1 }
+
+geLAN3PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { geLAN3Port 2 }
+
+
+geLAN3PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { geLAN3Port 3 }
+
+
+geLAN3PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 4 }
+
+
+geLAN3PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 5 }
+
+
+geLAN3PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 6 }
+
+geLAN3PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 7 }
+
+
+geLAN3PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 8 }
+
+
+geLAN3PortDisablePIRL2Bucket OBJECT-TYPE
+    SYNTAX	INTEGER (0..4)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Disables per port an already defined Port Ingress Rate Limitation (PIRL) bucket, input parameter bucket 0 - 4."
+    ::= { geLAN3Port 9 }
+
+
+geLAN3PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { geLAN3Port 10 }
+
+
+geLAN3PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { geLAN3Port 11 }
+
+
+geLAN3PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { geLAN3Port 12 }
+
+
+geLAN3PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 13 }
+
+
+geLAN3PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { geLAN3Port 14 }
+
+
+geLAN3PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { geLAN3Port 15 }
+
+
+geLAN3PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { geLAN3Port 16 }
+
+
+geLAN3PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { geLAN3Port 17 }
+
+
+geLAN3PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { geLAN3Port 18 }
+
+
+geLAN3PortMtu OBJECT-TYPE
+    SYNTAX	INTEGER (0..2)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"The MTU size of the port."
+    ::= { geLAN3Port 19 }
+
+geLAN3PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { geLAN3Port 20 }
+
+
+
+geLAN4Port OBJECT IDENTIFIER ::= { gePorts 6 }
+
+geLAN4PortAutoNegotiation OBJECT-TYPE
+    SYNTAX	INTEGER (0..10)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Enables/disables auto negotiation on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 1 }
+
+geLAN4PortSpeedMode OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..10))
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION  
+	"Sets/gets the speed and duplex mode on the port. Valid values are (1000FD|1000HD|100FD|100HD|10FD|10HD|AUTO|FD|HD)"
+    ::= { geLAN4Port 2 }
+
+
+geLAN4PortLinkStatus OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Gets the Link status for the port"
+    ::= { geLAN4Port 3 }
+
+
+geLAN4PortFlowControl OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables flow control on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 4 }
+
+
+geLAN4PortIEEEQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on there IEEE priority tags. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 5 }
+
+
+geLAN4PortIPQoSPriority OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables prioritized frames based on their IP4/IP6 priority fields. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 6 }
+
+geLAN4PortQoSPortMapRule OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces queue priority for a port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 7 }
+
+
+geLAN4PortVIDNRLEnable OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables per port the Non rate limit for VLANs with the NRL bit enabled. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 8 }
+
+
+geLAN4PortDisablePIRL2Bucket OBJECT-TYPE
+    SYNTAX	INTEGER (0..4)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Disables per port an already defined Port Ingress Rate Limitation (PIRL) bucket, input parameter bucket 0 - 4."
+    ::= { geLAN4Port 9 }
+
+
+geLAN4PortEgressRateLimitation OBJECT-TYPE
+    SYNTAX	Integer32
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the egress limitation rate for the port. Input parameter is value in kbps"
+    ::= { geLAN4Port 10 }
+
+
+geLAN4PortIngressRateLimitation OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Sets a Port Input Rate Limit(PIRL) bucket. Input parameters are: bucket:rate:layer:(DROP|FC)"
+    ::= { geLAN4Port 11 }
+
+
+geLAN4PortDefaultVLAN OBJECT-TYPE
+    SYNTAX	INTEGER
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the default VLAN ID(VID) for the port. Input parameter is 0 - 4095"
+    ::= { geLAN4Port 12 }
+
+
+geLAN4PortForceDefaultVID OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Forces the tagging of VID on all frames on the port. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 13 }
+
+
+geLAN4PortVLANPortMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..3)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the 802.1Q mode for the ingress port.
+       Mode either 0=disable,
+                   1=fallback,
+                   2=check,
+                   3=secure"
+    ::= { geLAN4Port 14 }
+
+
+geLAN4PortBlockAllUnknown OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"This will make sure that all frames received on the port are blocked, unless they are tagged with the correct VID."
+    ::= { geLAN4Port 15 }
+
+
+geLAN4PortIGMPSnooping OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Enables/disables IGMP snooping. Set to 1 for enable and 0 for disable."
+    ::= { geLAN4Port 16 }
+
+
+geLAN4PortAddUnicast OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the unicast mac address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aa:bb:cc:dd:ee:ff"
+    ::= { geLAN4Port 17 }
+
+
+geLAN4PortAddMulticast OBJECT-TYPE
+    SYNTAX	IpAddress
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Adds the IP multicast address statically to the Address Translation Unit (ATU) Switch table. Input parameter is: aaa.bbb.ccc.ddd"
+    ::= { geLAN4Port 18 }
+
+
+geLAN4PortMtu OBJECT-TYPE
+    SYNTAX	INTEGER (0..2)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"The MTU size of the port."
+    ::= { geLAN4Port 19 }
+
+geLAN4PortArpMirroring OBJECT-TYPE
+    SYNTAX	INTEGER (0..1)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Mirror ARP packets seen on the port to the CPU port."
+    ::= { geLAN4Port 20 }
+
+
+
+
+geModuleGroup OBJECT-GROUP
+	OBJECTS {
+		geSwitchEngine,
+		geATU,
+		geUnicastDelete,
+		geMulticastDelete,
+		geIGMPSnooping,
+		geVTU,
+		geVLANCreate,
+		geVLANDelete,
+		geClearVTU,
+		geVLANProviderMode,
+		gePorts,
+		geDumpPIRLBuckets,
+		geCPUPort,
+		geCPUPortAutoNegotiation, geCPUPortSpeedMode, geCPUPortLinkStatus, geCPUPortFlowControl, geCPUPortIEEEQoSPriority, geCPUPortIPQoSPriority, geCPUPortQoSPortMapRule, geCPUPortVIDNRLEnable, geCPUPortDisablePIRL2Bucket, geCPUPortEgressRateLimitation, geCPUPortIngressRateLimitation, geCPUPortDefaultVLAN, geCPUPortForceDefaultVID, geCPUPortVLANPortMode, geCPUPortBlockAllUnknown, geCPUPortIGMPSnooping, geCPUPortAddUnicast, geCPUPortAddMulticast, geCPUPortMtu, 
+		geWANPort,
+		geWANPortAutoNegotiation, geWANPortSpeedMode, geWANPortLinkStatus, geWANPortFlowControl, geWANPortIEEEQoSPriority, geWANPortIPQoSPriority, geWANPortQoSPortMapRule, geWANPortVIDNRLEnable, geWANPortDisablePIRL2Bucket, geWANPortEgressRateLimitation, geWANPortIngressRateLimitation, geWANPortDefaultVLAN, geWANPortForceDefaultVID, geWANPortVLANPortMode, geWANPortBlockAllUnknown, geWANPortIGMPSnooping, geWANPortAddUnicast, geWANPortAddMulticast,  geWANPortMtu, geWANPortArpMirroring, 
+		geLAN1Port,
+		geLAN1PortAutoNegotiation, geLAN1PortSpeedMode, geLAN1PortLinkStatus, geLAN1PortFlowControl, geLAN1PortIEEEQoSPriority, geLAN1PortIPQoSPriority, geLAN1PortQoSPortMapRule, geLAN1PortVIDNRLEnable, geLAN1PortDisablePIRL2Bucket, geLAN1PortEgressRateLimitation, geLAN1PortIngressRateLimitation, geLAN1PortDefaultVLAN, geLAN1PortForceDefaultVID, geLAN1PortVLANPortMode, geLAN1PortBlockAllUnknown, geLAN1PortIGMPSnooping, geLAN1PortAddUnicast, geLAN1PortAddMulticast,  geLAN1PortMtu, geLAN1PortArpMirroring, 
+		geLAN2Port,
+		geLAN2PortAutoNegotiation, geLAN2PortSpeedMode, geLAN2PortLinkStatus, geLAN2PortFlowControl, geLAN2PortIEEEQoSPriority, geLAN2PortIPQoSPriority, geLAN2PortQoSPortMapRule, geLAN2PortVIDNRLEnable, geLAN2PortDisablePIRL2Bucket, geLAN2PortEgressRateLimitation, geLAN2PortIngressRateLimitation, geLAN2PortDefaultVLAN, geLAN2PortForceDefaultVID, geLAN2PortVLANPortMode, geLAN2PortBlockAllUnknown, geLAN2PortIGMPSnooping, geLAN2PortAddUnicast, geLAN2PortAddMulticast,  geLAN2PortMtu, geLAN2PortArpMirroring, 
+		geLAN3Port,
+		geLAN3PortAutoNegotiation, geLAN3PortSpeedMode, geLAN3PortLinkStatus, geLAN3PortFlowControl, geLAN3PortIEEEQoSPriority, geLAN3PortIPQoSPriority, geLAN3PortQoSPortMapRule, geLAN3PortVIDNRLEnable, geLAN3PortDisablePIRL2Bucket, geLAN3PortEgressRateLimitation, geLAN3PortIngressRateLimitation, geLAN3PortDefaultVLAN, geLAN3PortForceDefaultVID, geLAN3PortVLANPortMode, geLAN3PortBlockAllUnknown, geLAN3PortIGMPSnooping, geLAN3PortAddUnicast, geLAN3PortAddMulticast,  geLAN3PortMtu, geLAN3PortArpMirroring, 
+		geLAN4Port,
+		geLAN4PortAutoNegotiation, geLAN4PortSpeedMode, geLAN4PortLinkStatus, geLAN4PortFlowControl, geLAN4PortIEEEQoSPriority, geLAN4PortIPQoSPriority, geLAN4PortQoSPortMapRule, geLAN4PortVIDNRLEnable, geLAN4PortDisablePIRL2Bucket, geLAN4PortEgressRateLimitation, geLAN4PortIngressRateLimitation, geLAN4PortDefaultVLAN, geLAN4PortForceDefaultVID, geLAN4PortVLANPortMode, geLAN4PortBlockAllUnknown, geLAN4PortIGMPSnooping, geLAN4PortAddUnicast, geLAN4PortAddMulticast,  geLAN4PortMtu, geLAN4PortArpMirroring 
+	}
+    STATUS current
+    DESCRIPTION
+        "The objects are related to the DKTCOMEGA Gigabit module, MIB rev 02_00."
+    ::= { geMIB 4 }
+
+
+END

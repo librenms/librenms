@@ -1,0 +1,461 @@
+--
+--  LigoWave Wireless MIB
+--
+
+LIGO-WIRELESS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Counter32, Integer32, Gauge32
+        FROM SNMPv2-SMI
+    MacAddress, TruthValue
+        FROM SNMPv2-TC
+    sysLocation
+        FROM SNMPv2-MIB
+    ifIndex, ifPhysAddress
+        FROM IF-MIB
+    ligoMgmt
+        FROM LIGOWAVE-MIB;
+
+ligoWirelessMIB MODULE-IDENTITY
+    LAST-UPDATED    "201111111111Z"
+    ORGANIZATION    "LigoWave"
+    CONTACT-INFO    "
+        LigoWave Customer Support
+        E-mail: support@ligowave.com"
+    DESCRIPTION
+        "The LigoWave Wireless MIB."
+    REVISION    "201111111111Z"
+    DESCRIPTION
+        "First revision."
+    ::= { ligoMgmt 10 }
+
+ligoWirelessMIBObjects
+        OBJECT IDENTIFIER ::= { ligoWirelessMIB 1 }
+
+ligoWiNotifs
+        OBJECT IDENTIFIER ::= { ligoWirelessMIBObjects 0 }
+ligoWiInfo
+        OBJECT IDENTIFIER ::= { ligoWirelessMIBObjects 1 }
+ligoWiConf
+        OBJECT IDENTIFIER ::= { ligoWirelessMIBObjects 2 }
+ligoWiStats
+        OBJECT IDENTIFIER ::= { ligoWirelessMIBObjects 3 }
+
+ligoWiIfConfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LigoWiIfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface configuration table."
+    ::= { ligoWiConf 1 }
+
+ligoWiIfConfEntry OBJECT-TYPE
+    SYNTAX  LigoWiIfConfEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface configuration table entry."
+    INDEX { ifIndex }
+    ::= { ligoWiIfConfTable 1 }
+
+LigoWiIfConfEntry ::=
+    SEQUENCE {
+        ligoWiIfMacAddress           MacAddress,
+        ligoWiIfProtocol             OCTET STRING,
+        ligoWiIfMode                 INTEGER,
+        ligoWiIfESSID                OCTET STRING,
+        ligoWiIfCountryCode          OCTET STRING,
+        ligoWiIfFrequency            Integer32,
+        ligoWiIfChannel              Integer32,
+        ligoWiIfChannelBandwidth     Integer32,
+        ligoWiIfEncryption           INTEGER,
+        ligoWiIfTxPower              Gauge32,
+        ligoWiIfBitRate              Gauge32,
+        ligoWiIfLinkQuality          Gauge32,
+        ligoWiIfMaxLinkQuality       Gauge32,
+        ligoWiIfSignalLevel          Integer32,
+        ligoWiIfNoiseLevel           Integer32,
+        ligoWiIfAssocNodeCount       Gauge32
+    }
+
+ligoWiIfMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interface MAC address."
+    ::= { ligoWiIfConfEntry 1 }
+
+ligoWiIfProtocol OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Protocol string, for example 'IEEE 802.11g'."
+    ::= { ligoWiIfConfEntry 2 }
+
+ligoWiIfMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    auto(0),
+                    adhoc(1),
+                    managed(2),
+                    master(3),
+                    repeater(4),
+                    secondary(5),
+                    monitor(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wireless interface operation mode."
+    ::= { ligoWiIfConfEntry 3 }
+
+ligoWiIfESSID OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ESSID."
+    ::= { ligoWiIfConfEntry 4 }
+
+ligoWiIfCountryCode OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(2..3))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Country code."
+    ::= { ligoWiIfConfEntry 5 }
+
+ligoWiIfFrequency OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Current operating frequency."
+    ::= { ligoWiIfConfEntry 6 }
+
+ligoWiIfChannel OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel number."
+    ::= { ligoWiIfConfEntry 7 }
+
+ligoWiIfChannelBandwidth OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "MHz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel bandwidth."
+    ::= { ligoWiIfConfEntry 8 }
+
+ligoWiIfEncryption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    unknown(0),
+                    open(1),
+                    wep64bit(2),
+                    wep128bit(3),
+                    wep(4),
+                    enterpriseWpa(5),
+                    personalWpa(6),
+                    enterpriseWpa2(7),
+                    personalWpa2(8),
+                    enterpriseWpaOrWpa2(9),
+                    personalWpaOrWpa2(10)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encryption type."
+    ::= { ligoWiIfConfEntry 9 }
+
+ligoWiIfTxPower OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmit power in dBm."
+    ::= { ligoWiIfConfEntry 10 }
+
+ligoWiIfBitRate OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kbit/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmission bitrate."
+    ::= { ligoWiIfConfEntry 11 }
+
+ligoWiIfLinkQuality OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Link quality value."
+    ::= { ligoWiIfConfEntry 12 }
+
+ligoWiIfMaxLinkQuality OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum possible link quality value for current wireless card."
+    ::= { ligoWiIfConfEntry 13 }
+
+ligoWiIfSignalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal level."
+    ::= { ligoWiIfConfEntry 14 }
+
+ligoWiIfNoiseLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise level."
+    ::= { ligoWiIfConfEntry 15 }
+
+ligoWiIfAssocNodeCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of associated nodes when working in access point mode.
+         1 - if associated to remote access point in client mode."
+    ::= { ligoWiIfConfEntry 16 }
+
+ligoWiIfStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LigoWiIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface statistics table."
+    ::= { ligoWiStats 1 }
+
+ligoWiIfStatsEntry OBJECT-TYPE
+    SYNTAX  LigoWiIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless interface statistics table entry."
+    INDEX { ifIndex }
+    ::= { ligoWiIfStatsTable 1 }
+
+LigoWiIfStatsEntry ::=
+    SEQUENCE {
+        ligoWiIfRxTotal              Counter32,
+        ligoWiIfRxErrors             Counter32,
+        ligoWiIfTxTotal              Counter32,
+        ligoWiIfTxRetries            Counter32
+    }
+
+ligoWiIfRxTotal OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of total received packets."
+    ::= { ligoWiIfStatsEntry 1 }
+
+ligoWiIfRxErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of reception errors."
+    ::= { ligoWiIfStatsEntry 2 }
+
+ligoWiIfTxTotal OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of total transmitted packets."
+    ::= { ligoWiIfStatsEntry 3 }
+
+ligoWiIfTxRetries OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of transmission retries."
+    ::= { ligoWiIfStatsEntry 4 }
+
+ligoWiRemoteNodeStatsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LigoWiRemoteNodeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Remote node statistics table. This table shows statistics for associated or already disconnected clients
+        on wireless interfaces which are operating in access point mode. For interfaces operating in client mode and
+        associated to remote access point information about access point is shown."
+    ::= { ligoWiStats 2 }
+
+ligoWiRemoteNodeStatsEntry OBJECT-TYPE
+    SYNTAX  LigoWiRemoteNodeStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Wireless remote node statistics table entry."
+    INDEX { ifIndex, ligoWiRmtNodeMacAddress }
+    ::= { ligoWiRemoteNodeStatsTable 1 }
+
+LigoWiRemoteNodeStatsEntry ::=
+    SEQUENCE {
+        ligoWiRmtNodeMacAddress             MacAddress,
+        ligoWiRmtNodeAssociated             TruthValue,
+        ligoWiRmtNodeTxBytes                Counter32,
+        ligoWiRmtNodeRxBytes                Counter32,
+        ligoWiRmtNodeSignalLevel            Integer32,
+        ligoWiRmtNodeNoiseLevel             Integer32
+    }
+
+ligoWiRmtNodeMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote node MAC address."
+    ::= { ligoWiRemoteNodeStatsEntry 1 }
+
+ligoWiRmtNodeAssociated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote node is currently associated."
+    ::= { ligoWiRemoteNodeStatsEntry 2 }
+
+ligoWiRmtNodeTxBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bytes transmitted to remote node."
+    ::= { ligoWiRemoteNodeStatsEntry 3 }
+
+ligoWiRmtNodeRxBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bytes received from remote node."
+    ::= { ligoWiRemoteNodeStatsEntry 4 }
+
+ligoWiRmtNodeSignalLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal level reported by remote node."
+    ::= { ligoWiRemoteNodeStatsEntry 5 }
+
+ligoWiRmtNodeNoiseLevel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Noise level reported by remote node."
+    ::= { ligoWiRemoteNodeStatsEntry 6 }
+
+--
+-- Notifications
+--
+
+ligoWiFrequencyChange NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        ligoWiIfFrequency
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent on frequency change."
+    ::= { ligoWiNotifs 1 }
+
+ligoWiNoiseThresholdReached NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        ligoWiIfNoiseLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when noise becomes bigger than threshold."
+    ::= { ligoWiNotifs 2 }
+
+ligoWiRemoteNodeConnected NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifPhysAddress,
+        ifIndex,
+        ligoWiRmtNodeMacAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when remote node associates."
+    ::= { ligoWiNotifs 3 }
+
+ligoWiRemoteNodeDisconnected NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifPhysAddress,
+        ifIndex,
+        ligoWiRmtNodeMacAddress
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when remote node dissasociates."
+    ::= { ligoWiNotifs 4 }
+
+ligoWiLinkQualThresholdReached NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        ligoWiIfLinkQuality
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when link quality crosses the specified threshold."
+    ::= { ligoWiNotifs 5 }
+
+ligoWiRxErrorsThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        ligoWiIfMacAddress,
+        ligoWiIfRxErrors
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when percentage of erroneous frames in relation
+         to number of frames received over the same time period reaches the threshold."
+    ::= { ligoWiNotifs 6 }
+
+ligoWiTxRetriesThreshold NOTIFICATION-TYPE
+    OBJECTS {
+        sysLocation,
+        ifIndex,
+        ligoWiIfMacAddress,
+        ligoWiIfTxRetries
+    }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when percentage of transmission retries in relation
+         to number of frames transmitted over the same time period reaches the threshold."
+    ::= { ligoWiNotifs 7 }
+
+END

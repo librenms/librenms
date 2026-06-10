@@ -1,0 +1,761 @@
+ARRIS-C3-SM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, 
+    Unsigned32, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3SMMIB  MODULE-IDENTITY
+        LAST-UPDATED "200311250000Z" -- 25th Nov 2003
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the System Manager
+            software on the Arris CMTS C3"
+        ::= { cmtsC3 4 }
+
+    dcxSMObjects OBJECT IDENTIFIER ::= { cmtsC3SMMIB 1 }
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Boot
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxSMBootGroup OBJECT IDENTIFIER ::= { dcxSMObjects 1 }
+
+    dcxSMBootDevice OBJECT-TYPE
+        SYNTAX INTEGER {
+                nfs (1),
+                tftp (2),
+                ftp (3),
+                diskAlternative (4),
+                diskCurrent (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specify device CMTS will by default boot from"
+        ::= { dcxSMBootGroup 1 } 
+
+    dcxSMBootHostname OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Ip address of tftp, nfs, ftp server,
+            ignored when booting from flash disk"
+        ::= { dcxSMBootGroup 2 }      
+        
+    dcxSMBootUsername OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..20))
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION 
+                "User name for tftp, ftp, nfs server,
+                ignored when booting from flash disk"
+            ::= { dcxSMBootGroup 3 }      
+            
+    dcxSMBootPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "User password for tftp, ftp, nfs server,
+            ignored when booting from flash disk"
+        ::= { dcxSMBootGroup 4 }      
+        
+    dcxSMBootPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..80))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Boot path for image file on tftp,
+            ftp, nfs server, ignored when 
+            booting from flash disk"
+        ::= { dcxSMBootGroup 5 }      
+        
+    dcxSMEnetMgmtInterface OBJECT-TYPE
+        SYNTAX INTEGER{
+            outOfBand(0),
+            inBand(1)                  
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Specify Cmts management interface"
+        ::= { dcxSMBootGroup 6 }
+
+    dcxSMRebootAction OBJECT-TYPE 
+        SYNTAX INTEGER{
+            nil(1),
+            rebootNow(2) 
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Force a reboot of the CMTS"
+        ::= { dcxSMBootGroup 7 }
+    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Config File boot
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxSMConfigFileBootGroup OBJECT IDENTIFIER ::= { dcxSMObjects 2 }
+
+    dcxSMConfigFileBootDevice OBJECT-TYPE
+        SYNTAX INTEGER {
+            nfs (1),
+            tftp (2),
+            ftp (3),
+            diskAlternative (4),
+            diskCurrent (5)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specify device from which CMTS
+            will read it's configuration"
+        ::= { dcxSMConfigFileBootGroup 1 } 
+        
+    dcxSMConfigFileBootHostname OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Ip address of tftp, nfs, ftp server, 
+            ignored when using flash disk"
+        ::= { dcxSMConfigFileBootGroup 2 }      
+
+    dcxSMConfigFileBootUsername OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "User name for tftp, ftp server,
+            ignored when using flash disk"
+        ::= { dcxSMConfigFileBootGroup 3 }      
+
+    dcxSMConfigFileBootPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "User password for tftp, ftp server,
+            ignored when using flash disk"
+        ::= { dcxSMConfigFileBootGroup 4 }      
+
+    dcxSMConfigFileBootPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Boot path for image file on tftp,
+            ftp server, ignored when using flash disk"
+        ::= { dcxSMConfigFileBootGroup 5 }      
+        
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Download
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxSMDownloadGroup OBJECT IDENTIFIER ::= { dcxSMObjects 3 }
+            
+    dcxSMDownloadDevice OBJECT-TYPE
+        SYNTAX INTEGER {
+            nfs (1),
+            tftp (2),
+            ftp (3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specify device CMTS will by download from"
+        ::= { dcxSMDownloadGroup 1 } 
+
+    dcxSMDownloadHostname OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "download ip address"
+        ::= { dcxSMDownloadGroup 2 }      
+
+    dcxSMDownloadUsername OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "download user name"
+        ::= { dcxSMDownloadGroup 3 }      
+        
+    dcxSMDownloadPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "download user password"
+        ::= { dcxSMDownloadGroup 4 }      
+
+    dcxSMDownloadPath OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "Boot path for image file on tftp, ftp"
+        ::= { dcxSMDownloadGroup 5 }      
+        
+    dcxSMDownloadControl OBJECT-TYPE
+        SYNTAX          INTEGER { start(1), abort(2) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Begin downloading by setting to start(1)
+            abort a current download with abort(2)
+            downloaded image will not become active
+            until it made current in the softwareList
+            group"
+        ::= { dcxSMDownloadGroup 6 }      
+        
+    dcxSMDownloadStatus OBJECT-TYPE
+        SYNTAX          INTEGER { none(1), inprogress(2), finished(3)  }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "none(1) indicates no images has been downloaded
+            since the CMTS rebooted, inprogress indicates there
+            is an active download occuring, finished(3) indicates
+            the download is complete and may be activated in the
+            SoftwareList group"
+        ::= { dcxSMDownloadGroup 7 }      
+        
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Traps
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxSMTrapGroup OBJECT IDENTIFIER ::= { dcxSMObjects 4 }
+    
+    dcxSMDiskInserted NOTIFICATION-TYPE
+        OBJECTS { dcxSMSoftwareVersion }
+        STATUS          current
+        DESCRIPTION 
+            "disk inserted. Severity is WARNING"
+        ::= { dcxSMTrapGroup 1 }      
+        
+    dcxSMDiskRemoved NOTIFICATION-TYPE
+        OBJECTS { dcxSMSoftwareVersion }
+        STATUS          current
+        DESCRIPTION 
+            "disk removed. Severity is ERROR."
+        ::= { dcxSMTrapGroup 2 }      
+        
+    dcxSMDiskFailed NOTIFICATION-TYPE
+        OBJECTS { dcxSMSoftwareVersion }
+        STATUS          current
+        DESCRIPTION 
+            "disk failed. Severity is ERROR."
+        ::= { dcxSMTrapGroup 3 }      
+        
+    dcxSMConfigChecksumChanged NOTIFICATION-TYPE
+        OBJECTS { dcxSMConfigFileDesc }
+        STATUS          current
+        DESCRIPTION 
+            "Config file checksum is different compared to the 
+            config file used to initialize the cmts. Severity
+                is WARNING."
+        ::= { dcxSMTrapGroup 4 }      
+            
+    dcxSMImageChecksumChanged NOTIFICATION-TYPE
+        OBJECTS { dcxSMSoftwareVersion }
+        STATUS          current
+        DESCRIPTION 
+            "Config image checksum is different compared to the
+            image used to boot the cmts. Severity is WARNING."
+        ::= { dcxSMTrapGroup 5 }      
+        
+    dcxSMImageDownloadFailed NOTIFICATION-TYPE
+        OBJECTS { dcxSMSoftwareVersion }
+        STATUS          current
+        DESCRIPTION 
+            "An error occured while downloading the image file.
+            Severity is ERROR."
+        ::= { dcxSMTrapGroup 6 }      
+        
+    dcxSMImageBootFailed NOTIFICATION-TYPE
+        OBJECTS { dcxSMSoftwareVersion }
+        STATUS          current
+        DESCRIPTION 
+            "An error occured while booting.
+            Severity is ERROR."
+        ::= { dcxSMTrapGroup 7 }      
+            
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- DcxSMConfigFileTable
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxSMConfigFileGroup OBJECT IDENTIFIER ::= { dcxSMObjects 5 }
+
+    dcxSMConfigFileTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DcxSMConfigFileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Table of config files installed on CMTS flash disk"
+        ::= { dcxSMConfigFileGroup 1 }
+
+    dcxSMConfigFileEntry OBJECT-TYPE
+        SYNTAX DcxSMConfigFileEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "."
+        INDEX   { dcxSMConfigFileIndex }
+        ::= { dcxSMConfigFileTable 1 }
+
+    DcxSMConfigFileEntry ::= SEQUENCE {
+        dcxSMConfigFileIndex          Unsigned32,
+        dcxSMConfigFileDate           DateAndTime,
+        dcxSMConfigFileDesc           OCTET STRING,
+        dcxSMConfigFileChecksum       Integer32,
+        dcxSMConfigFileSize           Integer32,
+        dcxSMConfigFileStatus         INTEGER }
+
+    dcxSMConfigFileIndex   OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..6)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "index"
+        ::= { dcxSMConfigFileEntry 1 }     
+        
+    dcxSMConfigFileDate OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Date Config file last modified"
+        ::= { dcxSMConfigFileEntry 2 }     
+        
+    dcxSMConfigFileDesc   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Description of config file"
+        ::= { dcxSMConfigFileEntry 3 }     
+        
+    dcxSMConfigFileChecksum   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "checksum"
+        ::= { dcxSMConfigFileEntry 4 }     
+
+    dcxSMConfigFileSize   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "file size"
+        ::= { dcxSMConfigFileEntry 5 }     
+
+    dcxSMConfigFileStatus OBJECT-TYPE
+        SYNTAX          INTEGER { curconfig(1), alt(2), inactive(3), deleted(4) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Status of config file may be currrent, alt or inactive
+            current -> alt allowed config files swapped
+            alt -> current allowed config files swapped
+            inactive -> current allowed config files swapped
+            inactive -> alt allowed config files swapped
+            current -> inactive not allowed
+            alt -> inactive not allowed
+            deleted -> inactive only change allowed on deleted
+            deleted files remain available until the cmts is rebooted"
+        ::= { dcxSMConfigFileEntry 6 }
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- DcxSMSoftwareTable
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxSMSoftwareListGroup OBJECT IDENTIFIER ::= { dcxSMObjects 6 }
+
+    dcxSMSoftwareListTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DcxSMSoftwareListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Table of images installed on CMTS flash disk"
+        ::= { dcxSMSoftwareListGroup 1 }
+
+    dcxSMSoftwareListEntry OBJECT-TYPE
+        SYNTAX DcxSMSoftwareListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "."
+        INDEX   { dcxSMSoftwareIndex }
+        ::= { dcxSMSoftwareListTable 1 }
+
+    DcxSMSoftwareListEntry ::= SEQUENCE {
+        dcxSMSoftwareIndex Unsigned32,
+        dcxSMSoftwareVersion OCTET STRING,
+        dcxSMSoftwareDate DateAndTime,
+        dcxSMSoftwareDesc OCTET STRING,
+        dcxSMSoftwareChecksum Integer32,
+        dcxSMSoftwareSize Integer32,
+        dcxSMSoftwareStatus INTEGER }
+
+    dcxSMSoftwareIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..6)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "image index"
+        ::= { dcxSMSoftwareListEntry 1 }     
+        
+    dcxSMSoftwareVersion  OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "image version"
+        ::= { dcxSMSoftwareListEntry 2 }     
+        
+    dcxSMSoftwareDate   OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Date image created"
+        ::= { dcxSMSoftwareListEntry 3 }     
+        
+    dcxSMSoftwareDesc   OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..256))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Description of image"
+        ::= { dcxSMSoftwareListEntry 4 }
+        
+    dcxSMSoftwareChecksum   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "checksum"
+        ::= { dcxSMSoftwareListEntry 5 }     
+        
+    dcxSMSoftwareSize   OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "file size"
+        ::= { dcxSMSoftwareListEntry 6 }    
+        
+    dcxSMSoftwareStatus OBJECT-TYPE
+        SYNTAX          INTEGER { curimage(1), alt(2), inactive(3), deleted(4) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Status of software may be currrent, alt or inactive
+            current -> alt allowed software swapped
+            alt -> current allowed software swapped
+            inactive -> current allowed config files swapped
+            inactive -> alt allowed softwares swapped
+            current -> inactive not allowed
+            alt -> inactive not allowed
+            deleted -> inactive only change allowed on deleted
+            deleted files remain available until the cmts is rebooted"
+        ::= { dcxSMSoftwareListEntry 7 }     
+
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Misc user management
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+--  removed for security reasons 7 may 03(COMmv14520) dcxSMMiscUserManagementGroup OBJECT IDENTIFIER ::= { dcxSMObjects 7 }
+--  put back in for feature reasons 25 nov 03(PROD00034329)
+    dcxSMMiscUserManagementGroup OBJECT IDENTIFIER ::= { dcxSMObjects 7 }
+
+    dcxSMMiscUserTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DcxSMMiscUserListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Table of CLI accounts"
+        ::= { dcxSMMiscUserManagementGroup 1 }
+        
+    dcxSMMiscUserListEntry OBJECT-TYPE
+        SYNTAX DcxSMMiscUserListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "."
+        INDEX   { dcxSMMiscUserIndex }
+        ::= { dcxSMMiscUserTable 1 }
+        
+    DcxSMMiscUserListEntry ::= SEQUENCE {
+        dcxSMMiscUserIndex Unsigned32,
+        dcxSMMiscUserLoginName OCTET STRING,
+        dcxSMMiscUserLoginPwd  OCTET STRING,
+        dcxSMMiscUserEnablePwd OCTET STRING,
+        dcxSMMiscUserEnableSecretePwd OCTET STRING,
+        dcxSMMiscUserWorkMode  INTEGER }
+
+    dcxSMMiscUserIndex OBJECT-TYPE
+            SYNTAX          Unsigned32 (1..5)
+            MAX-ACCESS      not-accessible
+            STATUS          current
+            DESCRIPTION
+                "user index"
+            ::= { dcxSMMiscUserListEntry 1 }     
+            
+    dcxSMMiscUserLoginName  OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Login user name"
+        ::= { dcxSMMiscUserListEntry 2 }     
+        
+    dcxSMMiscUserLoginPwd  OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Login user password"
+        ::= { dcxSMMiscUserListEntry 3 }
+        
+    dcxSMMiscUserEnablePwd  OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Login user name password to enter priviledged mode"
+        ::= { dcxSMMiscUserListEntry 4 }
+        
+    dcxSMMiscUserEnableSecretePwd OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Login user enable secret password to enter priviledged mode"
+            ::= { dcxSMMiscUserListEntry 5 }
+            
+    dcxSMMiscUserWorkMode  OBJECT-TYPE
+        SYNTAX          INTEGER {
+            usermode(1),
+            priviledgedmode(2),
+            globalconfiguremode(3),
+            lineconfmode(4),
+            ethernetconfmode(5),
+            cableconfmode(6)            			
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Login user config mode"
+        ::= { dcxSMMiscUserListEntry 6 }
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- Ipdr
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxIpdrGroup OBJECT IDENTIFIER ::= { dcxSMObjects 8 }
+
+    dcxIpdrEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable or disable Ipdr"
+        ::= { dcxIpdrGroup 1 } 
+
+    dcxIpdrFileName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (8..63))
+            MAX-ACCESS      read-write
+            STATUS          current
+            DESCRIPTION 
+                "Ipdr file name on the ftp server. Can not be changed
+                while the collection system is retrieving or deleting
+                the exisiting file or if the CMTS is building the current
+                Ipdr file."
+            ::= { dcxIpdrGroup 2 }      
+            
+    dcxIpdrUserLoginName  OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(6..31))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Ftp server login name for accessing Ipdr file. If
+            set to 'anonymous', any non-zero length password
+            will be accepted."
+        ::= { dcxIpdrGroup 3 }     
+        
+    dcxIpdrUserLoginPwd  OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(6..31))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Ftp server login password for accessing Ipdr file.
+            If dcxIpdrUserLoginName is 'anonymous', any non-zero
+            length password will be accepted."
+        ::= { dcxIpdrGroup 4 }
+
+    dcxDxmObjects OBJECT IDENTIFIER ::= { cmtsC3SMMIB 2 }
+
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- DoxMonitor Status Group
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+    dcxDxmStatusGroup OBJECT IDENTIFIER ::= { dcxDxmObjects 1 }
+
+    dcxDxmStatusIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies the IP address of the DoxMonitor managing this DoxController"
+        ::= { dcxDxmStatusGroup 1 } 
+
+    dcxDxmStatusPort OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies the TCP/UDP Port us to connect to the appropriate DoxMonitor"
+        ::= { dcxDxmStatusGroup 2 } 
+
+    dcxDxmStatusEnable OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies whether the DoxController should register with the specified DoxMonitor"
+        ::= { dcxDxmStatusGroup 3 } 
+
+    dcxDxmStatusCmtsId OBJECT-TYPE
+        SYNTAX      INTEGER (0..9)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies whether the DoxController should register with the specified DoxMonitor"
+        ::= { dcxDxmStatusGroup 4 } 
+
+    dcxDxmStatusRole OBJECT-TYPE
+        SYNTAX      INTEGER{
+                    other(1),
+                    primary(2),
+                    standby(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "describes the DoxController's role in the DoxMonitor redundancy cluster, it is
+             a Primary or Standby CMTS"
+        ::= { dcxDxmStatusGroup 5 } 
+                   
+    dcxDxmStatusState OBJECT-TYPE
+        SYNTAX      INTEGER{
+                    standalone(1),
+                    active(2),
+                    inactive(3),
+                    passive(4),
+                    restored(5),
+                    failed(6),
+                    replacement(7),
+                    restoring(8)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies the current state of the DoxController"
+        ::= { dcxDxmStatusGroup 6 } 
+
+    dcxDxmStatusLastConfigRetrieval OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies when the startup-configuration was last retrieved from this DoxController"
+        ::= { dcxDxmStatusGroup 7 } 
+
+    dcxDxmStatusLastConfigChange OBJECT-TYPE
+        SYNTAX      DateAndTime
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Specifies when the startup-configuration was last changed on this DoxController"
+        ::= { dcxDxmStatusGroup 8 } 
+
+    dcxDxmStatusConfigRetrievalCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the DoxController has responded to a Config Retrieval Request"
+        ::= { dcxDxmStatusGroup 9 } 
+
+    dcxDxmStatusHeartbeatCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the DoxController has responded to a Heartbeat Request"
+        ::= { dcxDxmStatusGroup 10 } 
+
+    dcxDxmStatusNotifAddCmCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the DoxController has generated an AddCableModem Notification"
+        ::= { dcxDxmStatusGroup 11 } 
+
+    dcxDxmStatusNotifDelCmCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the DoxController has generated an DeleteCableModem Notification"
+        ::= { dcxDxmStatusGroup 12 } 
+
+    dcxDxmStatusNotifAddCpeCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the DoxController has generated an AddCpe Notification"
+        ::= { dcxDxmStatusGroup 13 } 
+
+    dcxDxmStatusNotifDelCpeCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The total number of times the DoxController has generated a DeleteCpe Notification"
+        ::= { dcxDxmStatusGroup 14 } 
+
+END

@@ -1,0 +1,40 @@
+
+MCAFEE-SMI DEFINITIONS ::= BEGIN
+
+-- $Header: /cvs/WebShield/wsrc/comp/lib/snmp/Attic/MCAFEE-SMI.txt,v 1.1.2.1 2006/09/21 07:46:36 cbotteri Exp $
+-- Copyright (C) 2006 McAfee Inc. All rights reserved.
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+mcafee MODULE-IDENTITY
+        LAST-UPDATED    "200607110000Z"
+        ORGANIZATION    "McAfee, Inc."
+        CONTACT-INFO
+                        "McAfee Customer Service Department
+
+                         Postal: 5000 Headquarters Drive
+                         Plano, TX  75024
+                         USA
+
+                         Tel: +1 800 338 8754
+
+                         E-mail: support@mcafee.com"
+	DESCRIPTION
+		" The Structure of Management Information for the
+		  McAfee enterprise."
+	REVISION      "200609190000Z"
+	DESCRIPTION
+		"Initial Definition"
+	::= { enterprises 1230 }
+
+mcafeeGATEWAY OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"McAfee Gateway Products"
+	::= { mcafee 2 }
+
+END

@@ -1,0 +1,1120 @@
+
+-- *****************************************************************************
+-- Juniper-PPP-PROFILE-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   PPP Profile MIB
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2007 Juniper Networks, Inc.
+-- Copyright (c) 2009 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-PPP-PROFILE-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs
+    JuniEnable, JuniSetMap, JuniName, JuniNibbleConfig
+        FROM Juniper-TC
+    JuniPppAuthentication
+        FROM Juniper-PPP-MIB;
+
+juniPppProfileMIB  MODULE-IDENTITY
+    LAST-UPDATED  "200909180724Z"  -- 18-Sep-09 03:24 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Point-to-Point Protocol (PPP) Profile MIB for the Juniper Netowrks
+        enterprise.  This MIB provides configuration parameters that extend the
+        tables found in the Juniper-PROFILE-MIB to support profiles for PPP
+        interfaces."
+    -- Revision History
+    REVISION    "200909180724Z"  -- 18-Sep-09 03:24 AM EDT  - JUNOSe 11.1
+    DESCRIPTION
+	"Added new multiclass multilink objects. Added new traffic class 
+	mapping for multiclasses."
+    REVISION    "200908101423Z"  -- 10-Aug-09 07:53 PM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added IPCP dns prompt and lockout option element in juniPppProfileTable."
+    REVISION    "200707121215Z"  -- 12-Jul-07 08:15 AM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "Added new ignore magic number mismatch element in juniPppProfileEntry MIB.
+         Added new authentication elements to use JuniNibbleConfig."
+    REVISION    "200510191626Z"  -- 19-Oct-05 12:26 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+	"Added new object for multilink." 
+    REVISION    "200311032110Z"  -- 03-Nov-03 04:10 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Added support for MLPPP fragmentation and reassembly."
+    REVISION    "200309291858Z"  -- 29-Sep-03 02:58 PM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Increased the maximum range of the PPP Profile LCP keep-alive time."
+    REVISION    "200303112159Z"  -- 11-Mar-03 04:59 PM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added juniPppProfileInitiateIp and juniPppProfileInitiateIpv6."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200209032238Z"  -- 03-Sep-02 06:38 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added juniPppProfileAaaProfile."
+    REVISION    "200201251400Z"  -- 25-Jan-02 09:00 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added juniPppProfileAuthenticatorVirtualRouter."
+    REVISION    "200201161758Z"  -- 16-Jan-02 12:58 PM EST  - JUNOSe 3.4
+    DESCRIPTION
+        "Added support for negotiation of the IPCP option netmask."
+    REVISION    "200201081943Z"  -- 08-Jan-02 02:43 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Added support for dynamic multilink PPP (MLPPP) interfaces."
+    REVISION    "200110021241Z"  -- 02-Oct-01 08:41 AM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 45 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPppProfileObjects     OBJECT IDENTIFIER ::= { juniPppProfileMIB 1 }
+juniPppProfile            OBJECT IDENTIFIER ::= { juniPppProfileObjects 1 }
+
+--
+-- This MIB defines configuration profile structure for PPP interfaces.
+-- The creation/deletion of profiles and mapping of profile names to profile
+-- indices is coordinated in the Juniper-PROFILE-MIB.
+--
+--
+-- The PPP Profile Table
+--
+juniPppProfileTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains profiles for configuring PPP interfaces.
+
+        Entries in this table are created/deleted as a side-effect of
+        corresponding operations to the juniProfileNameTable in the
+        Juniper-PROFILE-MIB."
+    ::= { juniPppProfile 1 }
+
+juniPppProfileEntry  OBJECT-TYPE
+    SYNTAX      JuniPppProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A profile describing configuration of a PPP interface."
+    INDEX     { juniPppProfileId }
+    ::= { juniPppProfileTable 1 }
+
+JuniPppProfileEntry ::= SEQUENCE {
+    juniPppProfileId                           Unsigned32,
+    juniPppProfileSetMap                       JuniSetMap,
+    juniPppProfileLcpMagicNumber               INTEGER,
+    juniPppProfileLcpKeepalive                 Integer32,
+    juniPppProfileLcpAuthentication            JuniPppAuthentication,
+    juniPppProfileIpPeerDnsPriority            JuniEnable,
+    juniPppProfileIpPeerWinsPriority           JuniEnable,
+    juniPppProfileLcpInitialMRU                Integer32,
+    juniPppProfilePacketLog                    JuniEnable,
+    juniPppProfileStateLog                     JuniEnable,
+    juniPppProfileChapMinChallengeLength       Integer32,
+    juniPppProfileChapMaxChallengeLength       Integer32,
+    juniPppProfilePassiveMode                  JuniEnable,
+    juniPppProfileMlppp                        JuniEnable,
+    juniPppProfileIpcpNetmask                  JuniEnable,
+    juniPppProfileAuthenticatorVirtualRouter   JuniName,
+    juniPppProfileAaaProfile                   JuniName,
+    juniPppProfileInitiateIp                   JuniEnable,
+    juniPppProfileInitiateIpv6                 JuniEnable,
+    juniPppProfileFragmentation                JuniEnable,
+    juniPppProfileReassembly                   JuniEnable,
+    juniPppProfileMaxReceiveReconstructedUnit  Integer32,
+    juniPppProfileFragmentSize                 Integer32,
+    juniPppProfileHashLinkSelection            JuniEnable,
+    juniPppProfileLcpAuthentication2           JuniNibbleConfig,
+    juniPppProfileIgnoreMagicNumberMismatch    JuniEnable,
+    juniPppProfileIpcpPromptDnsOption          JuniEnable,
+    juniPppProfileIpcpLockout                  JuniEnable,
+    juniPppProfileMultilinkMulticlass          JuniEnable,
+    juniPppProfileMultilinkMaxMultiClasses     INTEGER }
+
+juniPppProfileId  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The integer identifier associated with this profile.  A value for this
+        identifier is determined by locating or creating a profile name in the
+        Juniper-PROFILE-MIB.juniProfileNameTable."
+    ::= { juniPppProfileEntry 1 }
+
+juniPppProfileSetMap  OBJECT-TYPE
+    SYNTAX      JuniSetMap
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A bitmap representing which objects in this entry have been explicitly
+        configured.  See the definition of the JuniSetMap TEXTUAL-CONVENTION for
+        details of use.
+
+        The INDEX object(s) and this object are excluded from representation
+        (i.e. their bits are never set).
+
+        When a SET request does not explicitly configure JuniSetMap, bits in
+        JuniSetMap are set as a side-effect of configuring other profile
+        attributes in the same entry.
+
+        If, however, a SET request explicitly configures JuniSetMap, the
+        explicitly configured value overrides 1) any previous bit settings, and
+        2) any simultaneous 'side-effect' settings that would otherwise occur.
+
+        Once set, bits can only be cleared by explicitly configuring
+        JuniSetMap."
+    ::= { juniPppProfileEntry 2 }
+
+juniPppProfileLcpMagicNumber  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    false(1),
+                    true(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If true(2) then the local node will attempt to perform Magic Number
+        negotiation with the remote node.  If false(1) then this negotiation is
+        not performed.  In any event, the local node will comply with any magic
+        number negotiations attempted by the remote node, per the PPP
+        specification."
+    DEFVAL    { false }
+    ::= { juniPppProfileEntry 3 }
+
+juniPppProfileLcpKeepalive  OBJECT-TYPE
+    SYNTAX      Integer32 (0|30..64800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Keepalive interval in seconds.  A value of zero disables keepalive.
+        Keepalive is performed using LCP Echo."
+    DEFVAL    { 30 }
+    ::= { juniPppProfileEntry 4 }
+
+juniPppProfileLcpAuthentication  OBJECT-TYPE
+    SYNTAX      JuniPppAuthentication
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "Specifies the type(s) of authentication, if any, to be negotiated with
+        the peer:
+          none      No authentication is negotiated.
+          pap       PAP negotiation only.
+          chap      CHAP negotiation only.
+          papChap   PAP negotiation is attempted first; if fails, attempt CHAP.
+          chapPap   CHAP negotiation is attempted first; if fails, attempt PAP.
+
+        Setting this object to none will set the
+        juniPppProfileAuthenticatorVirtualRouter object to an empty string.
+
+        This object returns a none value on the get operation. New object
+        juniPppProfileLcpAuthentication2 will reflect the configured values.
+
+        Setting this object along with the juniPppProfileLcpAuthentication2 
+        object will return an inconsistentValue error."
+    DEFVAL    { none }
+    ::= { juniPppProfileEntry 5 }
+
+juniPppProfileIpPeerDnsPriority  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows peer's DNS address to prevail in the event of a
+        negotiation conflict; when disabled, the local PPP interface's DNS
+        address prevails."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 6 }
+
+juniPppProfileIpPeerWinsPriority  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows peer's WINS address to prevail in the event of a
+        negotiation conflict; when disabled, the local PPP interface's WINS
+        address prevails."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 7 }
+
+juniPppProfileLcpInitialMRU  OBJECT-TYPE
+    SYNTAX      Integer32 (1|64..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The initial Maximum Receive Unit (MRU) that the local PPP entity will
+        advertise to the remote entity.
+
+        If the value of this variable is 1 then the local PPP entity will
+        advertise an MRU value determined by its underlying media interface."
+    DEFVAL    { 1 }
+    ::= { juniPppProfileEntry 8 }
+
+juniPppProfilePacketLog  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows packet logging on dynamic PPP interfaces."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 9 }
+
+juniPppProfileStateLog  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows state machine logging on dynamic PPP interfaces."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 10 }
+
+juniPppProfileChapMinChallengeLength  OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Minimum value of the CHAP authenticator challenge length value.  This
+        value is never allowed to be set to a value greater than
+        juniPppProfileChapMaxChallengeLength."
+    DEFVAL    { 16 }
+    ::= { juniPppProfileEntry 11 }
+
+juniPppProfileChapMaxChallengeLength  OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Maximum value of the CHAP authenticator challenge length value. This
+        value is never allowed to be set to a value less than
+        juniPppLinkConfigChapMinChallengeLength."
+    DEFVAL    { 32 }
+    ::= { juniPppProfileEntry 12 }
+
+juniPppProfilePassiveMode  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When enabled, LCP state machine is forced into passive mode on lower
+        layer UP message.  It adds compatibility with slow and buggy clients."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 13 }
+
+juniPppProfileMlppp  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables the creation of dynamic multi-link PPP interfaces."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 14 }
+
+juniPppProfileIpcpNetmask  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables the negotiation of the IPCP option netmask (0x90) during IPCP
+        negotiation."
+    DEFVAL { disable }
+    ::= { juniPppProfileEntry 15 }
+
+juniPppProfileAuthenticatorVirtualRouter  OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the virtual router (Juniper-ROUTER-MIB.juniRouterName) to
+        be used for authentication on the PPP interface.  Setting this object
+        statically binds the authenticating virtual router with the PPP
+        interface.  If this object is not explicitly set or it is set to null
+        string, then this object is ignored and the virtual router used for
+        authentication is determined by other means.  On a Set operation, if the
+        value of this object is not null and does not correspond to an existing
+        virtual router, then an inconsistentValue error is returned.
+
+        Setting this object to non null string returns inconsistentValue value
+        error if juniPppProfileConfigAuthentication object is none or not
+        configured."
+    ::= { juniPppProfileEntry 16 }
+
+juniPppProfileAaaProfile  OBJECT-TYPE
+    SYNTAX      JuniName
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of the AAA profile to be used for authentication on the PPP
+        interface.  Setting this object statically binds the aaa profile with
+        the PPP interface.  If this object is not explicitly set or it is set to
+        null string, then this object is ignored.  On a Set operation, if the
+        value of this object is not null and does not correspond to an existing
+        AAA profile, then an inconsistentValue error is returned."
+    ::= { juniPppProfileEntry 17 }
+
+juniPppProfileInitiateIp  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, PPP interface will initiate negotiation of IPCP;
+        if disabled, PPP interface will rely on remote PPP client to
+        initiate negotiation of IPCP."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 18 }
+
+juniPppProfileInitiateIpv6  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If enabled, PPP interface will initiate negotiation of IPv6CP;
+        if disabled, PPP interface will rely on remote PPP client to
+        initiate negotiation of IPv6CP."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 19 }
+
+juniPppProfileFragmentation  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP fragmentation."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 20 }
+
+juniPppProfileReassembly  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP reassembly."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 21 }
+
+juniPppProfileMaxReceiveReconstructedUnit  OBJECT-TYPE
+    SYNTAX      Integer32 (1|64..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Received Reconstructed Unit (MRRU) that the local PPP
+        entity will advertise to the remote entity.  If the value of this
+        variable is 1, then the MRRU is set to the local MRU value."
+    DEFVAL    { 1 }
+    ::= { juniPppProfileEntry 22 }
+
+juniPppProfileFragmentSize  OBJECT-TYPE
+    SYNTAX      Integer32 (1|128..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The size of fragments transmitted by the local PPP entity.  If the
+        value of this variable is 1, then the fragment size is set to the link's
+        MTU value."
+    DEFVAL    { 1 }
+    ::= { juniPppProfileEntry 23 }
+
+juniPppProfileHashLinkSelection  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP hash-based link selection for non-best-effort data."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 24 }
+
+juniPppProfileLcpAuthentication2  OBJECT-TYPE
+    SYNTAX      JuniNibbleConfig
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A configuration variable comprised of nibbles i.e. 4 bits, such that 
+         a client can supply a list of 0 to 8 selections.  The least 
+         significant nibble is the first value of the list, and the most 
+         significant nibble is the last value.  The value in each field 
+         ranges from 0 to 15, however the first nibble with value 0 indicates
+         the end of the list.  Repetition of values is not allowed. 
+         Segregation of values is not allowed.
+
+         Valid Values are:
+         none - 0
+         pap  - 1
+         chap - 2
+         eap  - 3
+
+         Example valid encoding:
+         0x00000321
+         0x00000012
+
+         Not a valid encoding:
+         0x00000121
+         0x01002001
+
+         If authentication negotiation is not supported for this PPP interface,
+         then any attempt to explicitly set this object will result in a
+         notWritable error and it will be implicitly set to the DEFVAL on row
+         creation.
+
+         Setting this object to null will set
+         juniPppProfileAuthenticatorVirtualRouter object to an empty string.
+
+         Setting this object along with the juniPppProfileLcpAuthentication 
+         object will return an inconsistentValue error."
+    DEFVAL    { 0 }
+    ::= { juniPppProfileEntry 25 }
+
+juniPppProfileIgnoreMagicNumberMismatch  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The ignore magic number mismatch option of the PPP interface 
+        determines the action to be taken, when the peer has not negotiated
+        any value yet sent null or invalid magic number in the LCP echo 
+        packets. The two actions that can be configured are:
+            1)	Ignore the mismatch and retain connection
+            2)	Disallow the mismatch and terminate connection"
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 26 }
+
+juniPppProfileIpcpPromptDnsOption  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Control prompting of IPCP options to remote peer."
+    DEFVAL    { disable }
+    ::= { juniPppProfileEntry 27 }
+
+juniPppProfileIpcpLockout  OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The lockout option for IPCP determines whether IPCP can be negotiated
+         when the interface is already running IPV6CP. On enabling this option,
+         the negotiation will be blocked after the IPV6CP service is up and
+         waited for 10 seconds for peer IPCP initiation. The address is restored
+         to the pool after the 10 second timeout. Disabling this option will re
+         enable simultaneous NCP negotiations that are configured."
+    DEFVAL { disable }
+    ::= { juniPppProfileEntry 28 }
+
+juniPppProfileMultilinkMulticlass OBJECT-TYPE
+    SYNTAX      JuniEnable
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Enables Multiclass Multilink PPP (MCML). Changing this object has an 
+		effect when the link is next restarted."
+    DEFVAL    {disable}
+    ::= { juniPppProfileEntry 29 }
+
+juniPppProfileMultilinkMaxMultiClasses OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of MCML classes to be negotiated. Changing this object
+		 has an effect when the link is next restarted."
+    DEFVAL    {0}
+    ::= { juniPppProfileEntry 30 }
+
+
+--
+-- The Profile Multiclass Traffic class Configuration Table
+--
+JuniPppProfileMulticlassTcName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Name of the Traffic class. The bundle name is a characteristic of a MLPPP
+        Multiclass."
+    SYNTAX OCTET STRING (SIZE(0..64))
+    
+juniPppProfileMulticlassTraffiClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniPppProfileMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP Multiclass to traffic class
+         mapping of the profile present in the system."
+    ::= { juniPppProfile 2 }
+ 
+juniPppProfileMulticlassTrafficClassEntry OBJECT-TYPE
+    SYNTAX      JuniPppProfileMulticlassTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the MLPPP multiclass to traffic class mapping of
+         profiles.Other characteristics like fragmentation and reassembly
+         for a particular traffic class can be configured."
+    INDEX     { juniPppProfileId,
+                juniPppProfileMulticlassIndex }
+    ::= { juniPppProfileMulticlassTraffiClassTable  1 }
+
+JuniPppProfileMulticlassTrafficClassEntry ::= SEQUENCE {
+    juniPppProfileMulticlassId        	                Unsigned32,
+    juniPppProfileMulticlassIndex                         INTEGER,
+    juniPppProfileMulticlassTcName     			        JuniPppProfileMulticlassTcName,
+    juniPppProfileMulticlassFragmentation                 JuniEnable,
+    juniPppProfileMulticlassReassembly                    JuniEnable }
+    
+juniPppProfileMulticlassId OBJECT-TYPE
+    SYNTAX               Unsigned32
+    MAX-ACCESS           not-accessible
+    STATUS               current
+    DESCRIPTION
+        "The index of the profile.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniPppProfileId."
+    ::= { juniPppProfileMulticlassTrafficClassEntry 1 }
+    
+juniPppProfileMulticlassIndex OBJECT-TYPE
+	SYNTAX		INTEGER
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"The multiclass index of a particular traffic class type. This can be
+		 configured only when MCMP is enabled in the profile."
+	DEFVAL	{ 15 }
+	::= { juniPppProfileMulticlassTrafficClassEntry 2 }
+	
+juniPppProfileMulticlassTcName OBJECT-TYPE
+	SYNTAX		JuniPppProfileMulticlassTcName
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"The traffic class index mapped to the MCMP multiclass index. This can be
+		 configured only when MCMP is enabled in the profile."
+	::= { juniPppProfileMulticlassTrafficClassEntry 3 }
+	
+juniPppProfileMulticlassFragmentation  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable fragmentation for a particular multiclass. This can be
+		 configured only when MCMP is enaled in the profile."
+	DEFVAL  { disable }
+	::= { juniPppProfileMulticlassTrafficClassEntry 4 }
+
+juniPppProfileMulticlassReassembly  OBJECT-TYPE
+	SYNTAX		JuniEnable
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+		"Enable or disable rassembly for a particular multiclass. This can be
+		 configured only when MCMP is enaled in the profile."
+	DEFVAL  { disable }
+	::= { juniPppProfileMulticlassTrafficClassEntry 5 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniPppProfileConformance OBJECT IDENTIFIER ::= { juniPppProfileMIB 4 }
+juniPppProfileCompliances OBJECT IDENTIFIER ::= { juniPppProfileConformance 1 }
+juniPppProfileGroups      OBJECT IDENTIFIER ::= { juniPppProfileConformance 2 }
+
+--
+-- compliance statements
+--
+juniPppProfileCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP Profile MIB.  This statement became obsolete when support was added
+        for multi-link PPP interfaces."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup }
+    ::= { juniPppProfileCompliances 1 }                            -- JUNOSe 3.0
+
+juniPppProfileCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP Profile MIB.  This statement became obsolete when support was added
+        for negotiation of IPCP option netmask."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup2 }
+    ::= { juniPppProfileCompliances 2 }                            -- JUNOSe 3.3
+
+juniPppProfileCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP Profile MIB.  This statement became obsolete when the
+        juniPppProfileAuthenticatorVirtualRouter object was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup3 }
+    ::= { juniPppProfileCompliances 3 }                            -- JUNOSe 3.4
+
+juniPppProfileCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP Profile MIB.  This statement became obsolete when the
+        juniPppProfileAaaProfile object was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup4 }
+    ::= { juniPppProfileCompliances 4 }                            -- JUNOSe 4.0
+
+juniPppProfileCompliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP Profile MIB.  This statement became obsolete when the
+        juniPppProfileInitiateIp and juniPppProfileInitiateIpv6 objects were
+        added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup5 }
+    ::= { juniPppProfileCompliances 5 }                            -- JUNOSe 4.1
+
+juniPppProfileCompliance6  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        PPP Profile MIB.  This statement became obsolete when fragmentation and
+        reassembly support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup6 }
+    ::= { juniPppProfileCompliances 6 }                            -- JUNOSe 5.1
+
+juniPppProfileCompliance7  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        Profile MIB.  This statement became obsolete when object 
+        juniPppProfileHashLinkSelection was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup7 }
+    ::= { juniPppProfileCompliances 7 }                            -- JUNOSe 5.3
+
+juniPppProfileCompliance8  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        Profile MIB.  This statement became obsolete when object 
+        juniPppProfileLcpAuthentication2 was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup8 }
+    ::= { juniPppProfileCompliances 8 }                            -- JUNOSe 7.2
+
+juniPppProfileCompliance9  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP 
+        Profile MIB.  This statement became obsolete when object 
+        juniPppProfileIpcpDnsOption and juniPppProfileIpcpLockout was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup10 }
+    ::= { juniPppProfileCompliances 9 }                            -- JUNOSe 7.3
+
+juniPppProfileCompliance10  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper PPP
+        Profile MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniPppProfileGroup11 }
+    ::= { juniPppProfileCompliances 10 }                            -- JUNOSe 11.0
+
+--
+-- units of conformance
+--
+juniPppProfileGroup  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when support was added for MLPPP."
+    ::= { juniPppProfileGroups 1 }                                 -- JUNOSe 3.0
+
+juniPppProfileGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when support was added for negotiation of IPCP option
+        netmask."
+    ::= { juniPppProfileGroups 2 }                                 -- JUNOSe 3.3
+
+juniPppProfileGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when the juniPppProfileAuthenticatorVirtualRouter object
+        was added."
+    ::= { juniPppProfileGroups 3 }                                 -- JUNOSe 3.4
+
+juniPppProfileGroup4  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when the juniPppProfileAaaProfile object was added."
+    ::= { juniPppProfileGroups 4 }                                 -- JUNOSe 4.0
+
+juniPppProfileGroup5  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when the juniPppProfileInitiateIp and
+        juniPppProfileInitiateIpv6 objects were added."
+    ::= { juniPppProfileGroups 5 }                                 -- JUNOSe 4.1
+
+juniPppProfileGroup6  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6 }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when support was added for fragmentation and
+        reassembly."
+    ::= { juniPppProfileGroups 6 }                                 -- JUNOSe 5.1
+
+juniPppProfileGroup7  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize }
+    STATUS      obsolete
+    DESCRIPTION
+	"Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when support was added for mlppp hash-based link
+	selection."
+    ::= { juniPppProfileGroups 7 }                                 -- JUNOSe 5.3
+
+juniPppProfileGroup8  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize,
+        juniPppProfileHashLinkSelection }
+    STATUS      obsolete
+    DESCRIPTION
+	"Obsolete collection of objects providing management of profile
+        functionality for PPP interfaces in a Juniper product.  This group
+        became obsolete when juniPppProfileLcpAuthentication2 was added."
+    ::= { juniPppProfileGroups 8 }                                 -- JUNOSe 7.2
+
+juniPppProfileGroup9  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize,
+        juniPppProfileHashLinkSelection,
+        juniPppProfileLcpAuthentication2 }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile functionality
+        for PPP interfaces in a Juniper product. This group became obsolete when 
+        juniPppProfileIgnoreMagicNumberMismatch was added"
+    ::= { juniPppProfileGroups 9 }                                 -- JUNOSe 7.3
+
+juniPppProfileGroup10  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize,
+        juniPppProfileHashLinkSelection,
+        juniPppProfileLcpAuthentication2,
+        juniPppProfileIgnoreMagicNumberMismatch }
+    STATUS      obsolete
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality for
+        PPP interfaces in a Juniper product. This group became obsolete when
+        juniPppProfileIpcpDnsOption and juniPppProfileIpcpLockout was added"
+    ::= { juniPppProfileGroups 10 }                                 -- JUNOSe 7.3
+
+juniPppProfileGroup11  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize,
+        juniPppProfileHashLinkSelection,
+        juniPppProfileLcpAuthentication2,
+        juniPppProfileIgnoreMagicNumberMismatch,
+        juniPppProfileIpcpPromptDnsOption,
+        juniPppProfileIpcpLockout}
+    STATUS      current
+    DESCRIPTION
+        "Obsolete collection of objects providing management of profile functionality
+        for PPP interfaces in a Juniper product. This was obsoleted when the
+        support for multiclass MLPPP was added."
+    ::= { juniPppProfileGroups 11 }                                 -- JUNOSe 11.0
+
+juniPppProfileGroup12  OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileSetMap,
+        juniPppProfileLcpMagicNumber,
+        juniPppProfileLcpKeepalive,
+        juniPppProfileLcpAuthentication,
+        juniPppProfileIpPeerDnsPriority,
+        juniPppProfileIpPeerWinsPriority,
+        juniPppProfileLcpInitialMRU,
+        juniPppProfilePacketLog,
+        juniPppProfileStateLog,
+        juniPppProfileChapMinChallengeLength,
+        juniPppProfileChapMaxChallengeLength,
+        juniPppProfilePassiveMode,
+        juniPppProfileMlppp,
+        juniPppProfileIpcpNetmask,
+        juniPppProfileAuthenticatorVirtualRouter,
+        juniPppProfileAaaProfile,
+        juniPppProfileInitiateIp,
+        juniPppProfileInitiateIpv6,
+        juniPppProfileFragmentation,
+        juniPppProfileReassembly,
+        juniPppProfileMaxReceiveReconstructedUnit,
+        juniPppProfileFragmentSize,
+        juniPppProfileHashLinkSelection,
+        juniPppProfileLcpAuthentication2,
+        juniPppProfileIgnoreMagicNumberMismatch,
+        juniPppProfileMultilinkMulticlass,
+        juniPppProfileMultilinkMaxMultiClasses }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of profile functionality
+        for PPP interfaces in a Juniper product."
+    ::= { juniPppProfileGroups 12 }                                 -- JUNOSe 11.1
+
+juniPppProfileMulticlassTrafficClassGroup1    OBJECT-GROUP
+    OBJECTS {
+        juniPppProfileMulticlassTcName,
+    	juniPppProfileMulticlassFragmentation,
+    	juniPppProfileMulticlassReassembly  }
+    STATUS		current
+    DESCRIPTION
+    	" A collection of object providing management of multiclass MLPPP
+		multiclass to traffic class mapping functionality in the PPP profile 
+		in a Juniper product."
+	::= { juniPppProfileGroups 13 }	                          -- JUNOSe 11.1
+
+END

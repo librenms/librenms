@@ -1,0 +1,18 @@
+os: konica
+group: printer
+text: 'Konica-Minolta Printer'
+type: printer
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    -
+        sysDescr:
+            - 'KONICA MINOLTA'
+            - 'konica minolta'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.18334.1.
+discovery_modules:
+    printer-supplies:   true
+poller_modules:
+    printer-supplies:   true

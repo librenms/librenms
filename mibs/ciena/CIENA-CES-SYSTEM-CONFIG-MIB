@@ -1,0 +1,208 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-SYSTEM-CONFIG-MIB.my
+ --
+
+ CIENA-CES-SYSTEM-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+   NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+   DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+   cienaGlobalSeverity, cienaGlobalMacAddress
+        FROM CIENA-GLOBAL-MIB
+   cienaCesNotifications, cienaCesConfig
+        FROM CIENA-SMI;
+
+
+ cienaCesSystemConfigMIB MODULE-IDENTITY
+        LAST-UPDATED "201706070000Z"
+        ORGANIZATION "Ciena Corp."
+        CONTACT-INFO
+        "   Mib Meister
+            7035 Ridge Road
+            Hanover, Maryland 21076
+            USA
+            Phone:  +1 800 921 1144
+            Email:  support@ciena.com"
+        DESCRIPTION
+               "This module defines the system configuration related notifications."
+
+        REVISION "201706070000Z"
+        DESCRIPTION
+               "Updated contact info."
+
+        REVISION "201610280000Z"
+        DESCRIPTION
+               "Added cienaCesCommandFileCompletedNotification and
+                cienaCesCommandFileFailedNotification."
+
+        REVISION "201005100000Z"
+        DESCRIPTION
+               "Initial creation."
+        ::= { cienaCesConfig 14 }
+
+ FileName ::= TEXTUAL-CONVENTION
+     DISPLAY-HINT   "255a"
+     STATUS         current
+     DESCRIPTION
+             "Represents the textual convention which defines the
+              name string and display hint"
+     SYNTAX         OCTET STRING (SIZE (1..64))
+
+ --
+ -- Node definitions
+ --
+
+ cienaCesSystemConfigMIBObjects OBJECT IDENTIFIER ::= { cienaCesSystemConfigMIB 1 }
+
+ cienaCesSystemConfigNotifAttrs OBJECT IDENTIFIER ::= { cienaCesSystemConfigMIBObjects 1 }
+
+ -- Notifications
+
+ cienaCesSystemConfigMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 14 }
+ cienaCesSystemConfigMIBNotifications       OBJECT IDENTIFIER ::=
+                       { cienaCesSystemConfigMIBNotificationPrefix 0 }
+
+ -- Conformance information
+
+ cienaCesSystemConfigMIBConformance OBJECT IDENTIFIER ::= { cienaCesSystemConfigMIB 3 }
+ cienaCesSystemConfigCompliances OBJECT IDENTIFIER ::= { cienaCesSystemConfigMIBConformance 1 }
+ cienaCesSystemConfigMIBGroups      OBJECT IDENTIFIER ::= { cienaCesSystemConfigMIBConformance 2 }
+
+
+
+
+ --
+ -- String used for notification
+ --
+
+ cienaCesSystemConfigFileName     OBJECT-TYPE
+     SYNTAX         FileName
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "The name of the configuration file."
+     ::= { cienaCesSystemConfigNotifAttrs 1 }
+
+ cienaCesSystemConfigErrLineNum OBJECT-TYPE
+     SYNTAX         INTEGER (1..65535)
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "This object is sent in the cienaCesImproperCmdInConfigLineString
+              notification to identify the line number that failed when the configuration
+              was applied."
+     ::= { cienaCesSystemConfigNotifAttrs 2 }
+
+ cienaCesSystemConfigErrStr OBJECT-TYPE
+     SYNTAX         DisplayString
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "This object is sent in the cienaCesImproperCmdInConfigLineString
+              notification to identify the command line string that failed when the
+              configuration was applied."
+     ::= { cienaCesSystemConfigNotifAttrs 3 }
+
+ cienaCesSystemConfigErrLinesTotal OBJECT-TYPE
+     SYNTAX         INTEGER (0..64)
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "This object is sent in the cienaCesImproperCmdInConfigFile
+              notification to identify the total line numbers that failed when the
+              configuration was applied. "
+     ::= { cienaCesSystemConfigNotifAttrs 4 }
+
+ cienaCesCommandFileHost OBJECT-TYPE
+     SYNTAX         DisplayString
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "The host name or IP address of the file server from which an
+              attempt was made to download a command file. This object is
+              contained in cienaCesCommandFileCompletedNotification and
+              cienaCesCommandFileFailedNotification, which report the status
+              of the download and execution attempt of that command file."
+     ::= { cienaCesSystemConfigNotifAttrs 5 }
+
+ cienaCesCommandFileName OBJECT-TYPE
+     SYNTAX         FileName
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "The name of the command file whose status is reported by
+              cienaCesCommandFileCompletedNotification or
+              cienaCesCommandFileFailedNotification after an attempt was made
+              to download and execute the file."
+     ::= { cienaCesSystemConfigNotifAttrs 6 }
+
+ cienaCesCommandFileError OBJECT-TYPE
+     SYNTAX         DisplayString
+     MAX-ACCESS     accessible-for-notify
+     STATUS         current
+     DESCRIPTION
+             "A description of the reason for the failure to download or
+              execute a command file, contained in
+              cienaCesCommandFileFailedNotification."
+     ::= { cienaCesSystemConfigNotifAttrs 7 }
+
+ --
+ -- Traps
+ --
+
+ cienaCesImproperCmdInConfigFile  NOTIFICATION-TYPE
+     OBJECTS        {
+                         cienaGlobalSeverity,
+                         cienaGlobalMacAddress,
+                         cienaCesSystemConfigFileName,
+                         cienaCesSystemConfigErrLinesTotal
+                    }
+     STATUS         current
+     DESCRIPTION
+             "A cienaCesImproperCmdInConfigFile notification signifies that the SNMP entity, acting in
+              an agent role, has detected that improper commands were found in the
+              configuration file while processing the cienaCesSystemConfigFileName. The
+              cienaCesSystemConfigErrLinesTotal specifies the number of the lines in the
+              configuration file that failed. To enable the device to send this notification:
+              cienaCesSystemConfigImproperCmdTrapState must be set to enabled.
+              cienaCesSystemConfigImproperCmdTrapState is enabled by default. Variable bindings
+              include: cienaGlobalSeverity, cienaGlobalMacAddress, cienaCesSystemConfigFileName, and
+              cienaCesSystemConfigErrLinesTotal. "
+     ::= { cienaCesSystemConfigMIBNotifications 1 }
+
+ cienaCesCommandFileCompletedNotification NOTIFICATION-TYPE
+     OBJECTS        { 
+                         cienaGlobalSeverity,
+                         cienaGlobalMacAddress,
+                         cienaCesCommandFileHost,
+                         cienaCesCommandFileName
+                    }
+     STATUS         current
+     DESCRIPTION
+             "Indicates that a command file has been successfully downloaded
+              and executed."
+     ::= { cienaCesSystemConfigMIBNotifications 2 }
+
+ cienaCesCommandFileFailedNotification NOTIFICATION-TYPE
+     OBJECTS        { 
+                         cienaGlobalSeverity,
+                         cienaGlobalMacAddress,
+                         cienaCesCommandFileHost,
+                         cienaCesCommandFileName,
+                         cienaCesCommandFileError
+                    }
+     STATUS         current
+     DESCRIPTION
+             "Indicates that a failure occurred while downloading or executing
+              a command file."
+     ::= { cienaCesSystemConfigMIBNotifications 3 }
+
+
+ END
+
+ --
+ -- CIENA-CES-SYSTEM-CONFIG-MIB.my
+ --

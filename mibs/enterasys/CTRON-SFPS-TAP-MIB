@@ -1,0 +1,371 @@
+CTRON-SFPS-TAP-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-tap-mib.txt
+--  Revision: 0.0.04
+--              
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+ 
+IMPORTS
+      OBJECT-TYPE
+                FROM RFC-1212
+      DisplayString
+                FROM RFC1213-MIB
+--      enterprises,
+--      IpAddress, 
+--      Counter, Gauge, 
+--      TimeTicks
+--                FROM RFC1155-SMI
+
+--  These Objects are defined in the file sfps-inc.mib.txt.0.0.2
+        sfpsCallTap, sfpsTap, sfpsTapStats
+
+                FROM CTRON-SFPS-INCLUDE-MIB;
+
+--  Textual Conventions
+
+-- SfpsAddress ::= OCTET STRING (SIZE (6))
+--  this will map to a MAC address
+
+sfpsCallTapVerb OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        other(1),
+                        call-tap(2),
+                        call-untap(3),
+                        vlan-tap(4),
+                        vlan-untap(5)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Tap/Untap request"
+        ::= { sfpsCallTap 1 }
+
+sfpsCallTapHeaderType   OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        other(1),
+                        mac-da-sa(2),
+                        atm-vpi-vci(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Type of header, typically MAC DA/SA"
+        ::= { sfpsCallTap 2 }
+
+sfpsCallTapHeaderLength OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Length of header"
+        ::= { sfpsCallTap 3 }
+
+sfpsCallTapHeaderValue  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "DA/SA header value"
+        ::= { sfpsCallTap 4 }
+
+sfpsCallTapArgDirection OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        other(1),
+                        bi(2),
+                        uni(3)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Uni or Bi directional tap"
+        ::= { sfpsCallTap 5 }
+
+sfpsCallTapProbeSwitch  OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Base MAC of probe switch"
+        ::= { sfpsCallTap 6 }
+
+sfpsCallTapProbePort    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Port number of probe "
+        ::= { sfpsCallTap 7 }
+
+
+
+
+
+sfpsTapTable    OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SfpsTapEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                "Contains information on current taps."
+        ::= { sfpsTap 1 }
+
+sfpsTapEntry     OBJECT-TYPE
+        SYNTAX  SfpsTapEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+                ""
+        INDEX   { sfpsTapHeaderDASA }
+        ::= { sfpsTapTable 1 }
+
+SfpsTapEntry ::=
+        SEQUENCE {
+                sfpsTapHeaderDASA               DisplayString,
+                sfpsTapRQPort                   INTEGER,
+                sfpsTapRSPPort                  INTEGER,
+                sfpsTapRetries                  INTEGER,
+                sfpsTapSwitchState              INTEGER,
+                sfpsTapSwitchType               INTEGER,
+                sfpsTapSwitchStatus             INTEGER,
+                sfpsTapDirection                INTEGER,
+                sfpsTapDirectRouteMAC           DisplayString,
+                sfpsTapResponseStatus           INTEGER,
+                sfpsTapProbeSwitchMac           DisplayString,
+                sfpsTapProbePort                INTEGER
+                }
+
+sfpsTapHeaderDASA       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "DA/SA header value"
+        ::= { sfpsTapEntry 1 }
+
+sfpsTapRQPort   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Inport of tap request"
+        ::= { sfpsTapEntry 2 }
+
+sfpsTapRSPPort  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Inport of tap response"
+        ::= { sfpsTapEntry 3 }
+
+sfpsTapRetries  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Number of tap retries"
+        ::= { sfpsTapEntry 4 }
+
+sfpsTapSwitchState      OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        awaitingTapRsps(1),
+                        receivingTapRsps(2),
+                        retryingTapRequest(3),
+                        tapActive(4),
+                        awaitingUnTapRsps(5),
+                        receivingUnTapRsps(6),
+                        retryingUnTapRequest(7),
+                        unassigned(8)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Tap state of switch"
+        ::= { sfpsTapEntry 5 }
+
+sfpsTapSwitchType       OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        originatingTap(1),
+                        intermediate(2),
+                        terminal(3),
+                        originatingUntap(4)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Type of tap switch"
+        ::= { sfpsTapEntry 6 }
+
+sfpsTapSwitchStatus     OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        disableOutport(1),
+                        keepOutport(2),
+                        probeNotFound(3),
+                        decisionUnknown(4),
+                        unassigned(5),
+                        halfCnx(6),
+                        alterCnx(7),
+                        alterCnxDone(8),
+                        halfCnxDone(9),
+                        tapIgnore(10),
+                        tapDeleteCnx(11),
+                        tapMarkCnx(12),
+                        tapFilterCnx(13),
+                        tapSharedMedia(14)
+
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Contains information helpful for untapping"
+        ::= { sfpsTapEntry 7 }
+
+sfpsTapDirection        OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        other(1),
+                        bi-Directional(2),
+                        uni-Directional(3)
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Uni or Bi Directional tap"
+        ::= { sfpsTapEntry 8 }
+
+sfpsTapDirectRouteMAC   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "MAC of switch for direct Nbr connection"
+        ::= { sfpsTapEntry 9 }
+
+
+sfpsTapResponseStatus   OBJECT-TYPE
+        SYNTAX  INTEGER
+                {
+                        disableOutport(1),
+                        keepOutport(2),
+                        probeNotFound(3),
+                        decisionUnknown(4),
+                        unassigned(5),
+                        halfCnx(6),
+                        alterCnx(7),
+                        alterCnxDone(8),
+                        halfCnxDone(9),
+                        tapIgnore(10),
+                        tapDeleteCnx(11),
+                        tapMarkCnx(12),
+                        tapFilterCnx(13),
+                        tapSharedMedia(14)
+
+                }
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Status to reutrn for multi-tap"
+        ::= { sfpsTapEntry 10 }
+
+sfpsTapProbeSwitchMac   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Probe Switch mac address"
+        ::= { sfpsTapEntry 11 }
+
+sfpsTapProbePort        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Probe Switch port"
+        ::= { sfpsTapEntry 12 }
+
+
+-- 
+
+sfpsTapStatsTapReqCnt   OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Count for all tap requests"
+        ::= { sfpsTapStats 1 }
+
+sfpsTapStatsTapRespCnt  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Count for all tap responses"
+        ::= { sfpsTapStats 2 }
+
+sfpsTapStatsUntapReqCnt OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Count of all untap requests"
+        ::= { sfpsTapStats 3 }
+
+sfpsTapStatsUntapRespCnt        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Count of all untap responses"
+        ::= { sfpsTapStats 4 }
+
+sfpsTapStatsErrorCnt    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Count of all tap errors"
+        ::= { sfpsTapStats 5 }
+
+sfpsTapStatsStaleEntCnt OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     
+                "Count of all stale tap entries"
+        ::= { sfpsTapStats 6 }
+
+END

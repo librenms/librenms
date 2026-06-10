@@ -1,0 +1,5925 @@
+-- ***********************************************************************
+-- INFINERA-TC-MIB.txt:  This module defines all the textual conventions
+--                         that are used in various other MIBs.
+--
+-- Jul 2010, Sharfuddin Syed / Narendra Gupta
+--
+-- (c) Copyright 2012 Infinera Corporation. All rights reserved.
+-- ***********************************************************************
+
+
+INFINERA-TC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Integer32, Counter64
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    common
+        FROM INFINERA-REG-MIB;
+
+infnTextualConventions MODULE-IDENTITY
+    LAST-UPDATED "201210121700Z"
+    ORGANIZATION
+        "Infinera"
+    CONTACT-INFO
+               "Infinera
+                1322 Bordeaux Drive
+                Sunnyvale, CA - 94089
+
+
+                Contact : Technical Support
+                Email   : support@infinera.com
+                Phone   : 1-877-INF-5288"
+    DESCRIPTION
+        "Module representing textual conventions used
+        by Infinera Network Elements"
+
+    REVISION "201210121700Z"
+    DESCRIPTION
+        " "
+::= { common 1 }
+
+
+FloatArbitraryPrecision ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "An ascii representation of a possibly signed decimal floating point number of arbitrary precision.
+                This string can contain only digits and the characters '-' and '.'"
+    SYNTAX  OCTET STRING (SIZE(0..255))
+
+OctetDisplayStringX ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "An ascii representation of a possibly signed decimal floating point number of arbitrary precision.
+                This string can contain only digits and the characters '-' and '.'"
+    SYNTAX  OCTET STRING (SIZE (0..65535))
+
+
+FloatHundredths ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT   "d-2"
+	STATUS     current
+	DESCRIPTION
+		"An integer representation of a fractional number. The transmitted value is the actual value
+		                multiplied by 100 and rounded to the nearest Integer. The management station should divide
+		                the transmitted value by 100 to derive the actual value of this variable."
+	SYNTAX  Integer32
+
+
+FloatTenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT     "d-1"
+    STATUS     current
+    DESCRIPTION
+        "An integer representation of a fractional number. The transmitted value is the actual value
+                multiplied by 10 and rounded to the nearest Integer. The management station should divide
+                the transmitted value by 10 to derive the actual value of this variable."
+    SYNTAX  Integer32
+
+
+FloatThousandths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT     "d-3"
+    STATUS     current
+    DESCRIPTION
+        "An integer representation of a fractional number. The transmitted value is the actual value
+                multiplied by 1000 and rounded to the nearest Integer. The management station should divide
+                the transmitted value by 1000 to derive the actual value of this variable."
+    SYNTAX  Integer32
+
+Unsigned64 ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "An unsigned 64-bit quantity"
+    SYNTAX  Counter64
+
+InfnAdminState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents the AdminState of the manged objects."
+    SYNTAX  INTEGER {
+        locked (1),
+        maintenance (2),
+        unlocked (3)
+    }
+
+
+InfnArc ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents the alarm reporting control state of the manged objects."
+    SYNTAX  INTEGER {
+        allowed (1),
+        inhibited (2)
+}
+
+InfnAdminState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents the AdminState of the manged objects."
+    SYNTAX  INTEGER {
+        locked (1),
+        maintenance (2),
+        unlocked (3)
+    }
+
+InfnAvailabilityState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents the availability state of the managed objects."
+    SYNTAX  INTEGER {
+        available (1),
+        partiallyAvailable (2),
+        unavailable (3)
+    }
+
+
+InfnChassisType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents the chassis types."
+    SYNTAX  INTEGER {
+        cBand(1),
+        lBand(2),
+        hybrid (3),
+        dtc (4),
+        otc (5),
+        unknown (6),
+        dtcA (7),
+        dtcB (8),
+        mtcA (9),
+	    atcA (10),
+	    atcP (11),
+	    ofm-40-d-m-1859(12),
+	    atc3(13), --Leaving enum for use in ATN
+        atc4(14),
+        atc5(15),
+        atc6(16),
+        atc7(17),
+        atc8(18),
+        atc9(19),
+        atc10(20),
+        xtc10(21),
+        xtc(22),
+        xtc4(23),
+        itc16(24),
+        mtc9(25),
+        xtc2(26),
+        xtc2e(27),
+		mtc6 (28),
+        xt3600 (29),
+        xt3300 (30),
+        cx(52),
+        cx-40e-500s-1c2(53),
+        cx-40e-500s-3c2(54),
+        cx-40e-500s-5c2(55),
+        cx-40e-500s-7c2(56),
+        cx-40e-500sb-1c2(57),
+        cx-40e-500sb-3c2(58),
+        cx-40e-500sb-5c2(59),
+        cx-40e-500sb-7c2(60),
+        cx-10e-500s-1c2(61),
+        cx-10e-500s-3c2(62),
+        cx-10e-500s-5c2(63),
+        cx-10e-500s-7c2(64),
+        cx-10e-500sb-1c2(65),
+        cx-10e-500sb-3c2(66),
+        cx-10e-500sb-5c2(67),
+        cx-10e-500sb-7c2(68),
+        cx-10e-500s-1c3(69),
+        cx-10e-500s-3c3(70),
+        cx-10e-500s-5c3(71),
+        cx-10e-500s-7c3(72),
+        cx-10e-500sb-1c3(73),
+        cx-10e-500sb-3c3(74),
+        cx-10e-500sb-5c3(75),
+        cx-10e-500sb-7c3(76),
+        xt-500s-10-1c3(77),
+        xt-500s-10-3c3(78),
+        xt-500s-10-5c3(79),
+        xt-500s-10-7c3(80),
+        xt-500sb-10-1c3(81),
+        xt-500sb-10-3c3(82),
+        xt-500sb-10-5c3(83),
+        xt-500sb-10-7c3(84),
+        xt-500(85),
+        cx-100e-500s-1c2(86),
+        cx-100e-500s-3c2(87),
+        cx-100e-500s-5c2(88),
+        cx-100e-500s-7c2(89),
+        cx-100e-500sb-1c2(90),
+        cx-100e-500sb-3c2(91),
+        cx-100e-500sb-5c2(92),
+        cx-100e-500sb-7c2(93),
+        cx-100e-500s-1c3(94),
+        cx-100e-500s-3c3(95),
+        cx-100e-500s-5c3(96),
+        cx-100e-500s-7c3(97),
+        cx-100e-500sb-1c3(98),
+        cx-100e-500sb-3c3(99),
+        cx-100e-500sb-5c3(100),
+        cx-100e-500sb-7c3(101),
+        xt-500s-100-1c3(102),
+        xt-500s-100-3c3(103),
+        xt-500s-100-5c3(104),
+        xt-500s-100-7c3(105),
+        xt-500s-100-1c5(106),
+        xt-500s-100-3c5(107),
+        xt-500s-100-5c5(108),
+        xt-500s-100-7c5(109),
+        xt-500s-100-1c6(110),
+        xt-500s-100-3c6(111),
+        xt-500s-100-5c6(112),
+        xt-500s-100-7c6(113),
+        xt-500s-100-1c8(114),
+        xt-500s-100-3c8(115),
+        xt-500s-100-5c8(116),
+        xt-500s-100-7c8(117),
+        xt-500sb-100-1c3(118),
+        xt-500sb-100-3c3(119),
+        xt-500sb-100-5c3(120),
+        xt-500sb-100-7c3(121),
+        xt-500sb-100-1c5(122),
+        xt-500sb-100-3c5(123),
+        xt-500sb-100-5c5(124),
+        xt-500sb-100-7c5(125),
+        xt-500sb-100-1c6(126),
+        xt-500sb-100-3c6(127),
+        xt-500sb-100-5c6(128),
+        xt-500sb-100-7c6(129),
+        xt-500sb-100-1c8(130),
+        xt-500sb-100-3c8(131),
+        xt-500sb-100-5c8(132),
+        xt-500sb-100-7c8(133),
+        xt-500f-100-1c3(134),
+        xt-500f-100-5c3(135),
+        xt-500f-100-9c3(136),
+        xt-500f-100-13c3(137),
+        xt-500f-100-1c5(138),
+        xt-500f-100-5c5(139),
+        xt-500f-100-9c5(140),
+        xt-500f-100-13c5(141),
+        xt-500f-100-1c6(142),
+        xt-500f-100-5c6(143),
+        xt-500f-100-9c6(144),
+        xt-500f-100-13c6(145),
+        xt-500f-100-1c8(146),
+        xt-500f-100-5c8(147),
+        xt-500f-100-9c8(148),
+        xt-500f-100-13c8(149),
+        cx-100e-500s-1c1(150),
+        cx-100e-500s-3c1(151),
+        cx-100e-500s-5c1(152),
+        cx-100e-500s-7c1(153),
+        xt-500f-100-17c3(154),
+        xt-500f-100-17c5(155),
+        xt-500f-100-17c6(156),
+        xt-500f-100-17c8(157),
+        xt-500fb-100-1c3(158),
+        xt-500fb-100-1c5(159),
+        xt-500fb-100-1c6(160),
+        xt-500fb-100-1c8(161),
+        xt-500fb-100-5c3(162),
+        xt-500fb-100-5c5(163),
+        xt-500fb-100-5c6(164),
+        xt-500fb-100-5c8(165),
+        xt-500fb-100-9c3(166),
+        xt-500fb-100-9c5(167),
+        xt-500fb-100-9c6(168),
+        xt-500fb-100-9c8(169),
+        xt-500fb-100-13c3(170),
+        xt-500fb-100-13c5(171),
+        xt-500fb-100-13c6(172),
+        xt-500fb-100-13c8(173),
+        xt-500fb-100-17c3(174),
+        xt-500fb-100-17c5(175),
+        xt-500fb-100-17c6(176),
+        xt-500fb-100-17c8(177),
+
+	cx-100e-1200f-c0(178),
+	cx-100e-1200f-c1(179),
+	cx-100e-1200f-c2(180),
+	cx-100e-1200f-c3(181),
+	cx-100e-1200fb-c1(182),
+	cx-100e-1200fb-c2(183),
+	cx-100e-1200fb-c3(184),
+    cx-100e-1200fb-c0(185),
+    cx-100e-1200f-s-c2(186),
+    cx-100e-1200f-s-c3(187),
+
+	cx-100e-500f-1c1(191),
+	cx-100e-500f-5c1(192),
+	cx-100e-500f-9c1(193),
+	cx-100e-500f-13c1(194),
+	cx-100e-500f-17c(195),
+	cx-100e-500f-1c2(196),
+	cx-100e-500f-5c2(197),
+	cx-100e-500f-9c2(198),
+	cx-100e-500f-13c2(199),
+	cx-100e-500f-17c2(200),
+	cx-100e-500f-1c3(201),
+	cx-100e-500f-5c3(202),
+	cx-100e-500f-9c3(203),
+	cx-100e-500f-13c3(204),
+	cx-100e-500f-17c3(205),
+	cx-100e-500fb-1c1(206),
+	cx-100e-500fb-5c1(207),
+	cx-100e-500fb-9c1(208),
+	cx-100e-500fb-13c1(209),
+	cx-100e-500fb-17c1(210),
+	cx-100e-500fb-1c2(211),
+	cx-100e-500fb-5c2(212),
+	cx-100e-500fb-9c2(213),
+	cx-100e-500fb-13c2(214),
+	cx-100e-500fb-17c2(215),
+	cx-100e-500fb-1c3(216),
+	cx-100e-500fb-5c3(217),
+	cx-100e-500fb-9c3(218),
+	cx-100e-500fb-13c3(219),
+	cx-100e-500fb-17c3(220),
+
+	cx-lim-1(1001),
+
+        xt3612-yn-eqc5(1002),  -- XT3600 PONs
+	xt3612-yn-eqc6(1003),
+	xt3612-yn-eqc8(1004),
+	xt3618-yn-eec5(1005),
+	xt3618-yn-eec6(1006),
+	xt3618-yn-eec8(1007),
+	xt3624-yn-esc5(1008),
+	xt3624-yn-esc6(1009),
+	xt3624-yn-esc8(1010),
+	xt3624-yn-ezc5(1011),
+	xt3624-yn-ezc6(1012),
+	xt3624-yn-ezc8(1013),
+	xt3612-yb-eqc5(1014),
+	xt3612-yb-eqc6(1015),
+	xt3612-yb-eqc8(1016),
+	xt3618-yb-eec5(1017),
+	xt3618-yb-eec6(1018),
+	xt3618-yb-eec8(1019),
+	xt3624-yb-esc5(1020),
+	xt3624-yb-esc6(1021),
+	xt3624-yb-esc8(1022),
+	xt3624-yb-ezc5(1023),
+	xt3624-yb-ezc6(1024),
+	xt3624-yb-ezc8(1025),
+
+	xts3606-yn-ebc13(1026),  --IB PONs
+	xts3606-yn-ebc14(1027),
+	xts3609-yn-etc13(1028),
+	xts3609-yn-etc14(1029),
+	xts3612-yn-eqc13(1030),
+	xts3612-yn-eqc14(1031),
+	xts3618-yn-eec13(1032),
+	xts3618-yn-eec14(1033),
+	xts3624-yn-esc13(1034),
+	xts3624-yn-esc14(1035),
+	xts3624-yn-ezc13(1036),
+	xts3624-yn-ezc14(1037),
+	xts3606-yb-ebc13(1038),
+	xts3606-yb-ebc14(1039),
+	xts3609-yb-etc13(1040),
+	xts3609-yb-etc14(1041),
+	xts3612-yb-eqc13(1042),
+	xts3612-yb-eqc14(1043),
+	xts3618-yb-eec13(1044),
+	xts3618-yb-eec14(1045),
+	xts3624-yb-esc13(1046),
+
+	xts3624-yb-esc14(1047), --SLTE PONs
+	xts3624-yb-ezc13(1048),
+	xts3624-yb-ezc14(1049),
+    xt3612-yp-eqc5(1050),
+    xt3612-yp-eqc6(1051),
+
+    xt3612-yp-eqc8(1052),
+    xt3618-yp-eec5(1053),
+    xt3618-yp-eec6(1054),
+    xt3618-yp-eec8(1055),
+    xt3624-yp-esc5(1056),
+    xt3624-yp-esc6(1057),
+    xt3624-yp-esc8(1058),
+    xt3624-yp-ezc5(1059),
+    xt3624-yp-ezc6(1060),
+    xt3624-yp-ezc8(1061),
+    xts3606-yp-ebc13(1062),
+    xts3606-yp-ebc14(1063),
+    xts3609-yp-etc13(1064),
+    xts3609-yp-etc14(1065),
+    xts3612-yp-eqc13(1066),
+    xts3612-yp-eqc14(1067),
+    xts3618-yp-eec13(1068),
+    xts3618-yp-eec14(1069),
+    xts3624-yp-esc13(1070),
+    xts3624-yp-esc14(1071),
+    xts3624-yp-ezc13(1072),
+    xts3624-yp-ezc14(1073),
+
+	xts36xx-lim-1(1501),
+
+    xt3306-yn-eqc2(1502),
+    xt3306-yn-eqc3(1503),
+    xt3306-yn-eqc5(1504),
+    xt3306-yn-eqc6(1505),
+    xt3306-yn-eqc8(1506),
+    xt3309-yn-eec2(1507),
+    xt3309-yn-eec3(1508),
+    xt3309-yn-eec5(1509),
+    xt3309-yn-eec6(1510),
+    xt3309-yn-eec8(1511),
+    xt3312-yn-esc2(1512),
+    xt3312-yn-esc3(1513),
+    xt3312-yn-esc5(1514),
+    xt3312-yn-esc6(1515),
+    xt3312-yn-esc8(1516),
+    xt3312-yn-ezc2(1517),
+    xt3312-yn-ezc3(1518),
+    xt3312-yn-ezc5(1519),
+    xt3312-yn-ezc6(1520),
+    xt3312-yn-ezc8(1521),
+
+    xt3306-yb-eqc2(1522),
+    xt3306-yb-eqc3(1523),
+    xt3306-yb-eqc5(1524),
+    xt3306-yb-eqc6(1525),
+    xt3306-yb-eqc8(1526),
+    xt3309-yb-eec2(1527),
+    xt3309-yb-eec3(1528),
+    xt3309-yb-eec5(1529),
+    xt3309-yb-eec6(1530),
+    xt3309-yb-eec8(1531),
+    xt3312-yb-esc2(1532),
+    xt3312-yb-esc3(1533),
+    xt3312-yb-esc5(1534),
+    xt3312-yb-esc6(1535),
+    xt3312-yb-esc8(1536),
+    xt3312-yb-ezc2(1537),
+    xt3312-yb-ezc3(1538),
+    xt3312-yb-ezc5(1539),
+    xt3312-yb-ezc6(1540),
+    xt3312-yb-ezc8(1541),
+
+    xts3312-yb-ezc13(1542),
+    xts3303-yb-ebc13(1543),
+    xts3306-yb-eqc13(1544),
+    xts3309-yb-eec13(1545),
+    xts3312-yb-esc13(1546),
+    xts3312-yb-ezc14(1547),
+    xts3303-yb-ebc14(1548),
+    xts3306-yb-eqc14(1549),
+    xts3309-yb-eec14(1550),
+    xts3312-yb-esc14(1551),
+
+    xts3312-yn-ezc13(1552),
+    xts3303-yn-ebc13(1553),
+    xts3306-yn-eqc13(1554),
+    xts3309-yn-eec13(1555),
+    xts3312-yn-esc13(1556),
+    xts3312-yn-ezc14(1557),
+    xts3303-yn-ebc14(1558),
+    xts3306-yn-eqc14(1559),
+    xts3309-yn-eec14(1560),
+    xts3312-yn-esc14(1561),
+    xts3312-yp-ezc13(1562),
+    xts3303-yp-ebc13(1563),
+    xts3306-yp-eqc13(1564),
+    xts3309-yp-eec13(1565),
+    xts3312-yp-esc13(1566),
+    xts3312-yp-ezC14(1567),
+    xts3303-yp-ebc14(1568),
+    xts3306-yp-eqc14(1569),
+    xts3309-yp-eec14(1570),
+    xts3312-yp-esc14(1571),
+
+    xt3306-yp-eqc2 (1572),
+    xt3306-yp-eqc5 (1573),
+    xt3306-yp-eqc6 (1574),
+    xt3306-yp-eqc8 (1575),
+    xt3309-yp-eec2 (1576),
+    xt3309-yp-eec5 (1577),
+    xt3309-yp-eec6 (1578),
+    xt3309-yp-eec8 (1579),
+    xt3312-yp-esc2 (1580),
+    xt3312-yp-esc5 (1581),
+    xt3312-yp-esc6 (1582),
+    xt3312-yp-esc8 (1583),
+    xt3312-yp-ezc2 (1584),
+    xt3312-yp-ezc5 (1585),
+    xt3312-yp-ezc6 (1586),
+    xt3312-yp-ezc8 (1587),
+
+    xt3312-ybi-ezc2 (1588),
+    xt3312-ybi-ezc5 (1589),
+    xt3312-ybi-ezc6 (1590),
+    xt3312-ybi-ezc8 (1591),
+    xt3312-ypi-ezc2 (1592),
+    xt3312-ypi-ezc5 (1593),
+    xt3312-ypi-ezc6 (1594),
+    xt3312-ypi-ezc8 (1595),
+
+    xt3312-ybt-ezc2 (1600),
+    xt3312-ybt-ezc5 (1601),
+    xt3312-ybt-ezc6 (1602),
+    xt3312-ybt-ezc8 (1603),
+
+    xts3303-ybt-ebc13 (1604),
+    xts3303-ybt-ebc14 (1605),
+    xts3306-ybt-eqc13 (1606),
+    xts3306-ybt-eqc14 (1607),
+    xts3309-ybt-eec13 (1608),
+    xts3309-ybt-eec14 (1609),
+    xts3312-ybt-esc13 (1610),
+    xts3312-ybt-esc14 (1611),
+    xts3312-ybt-ezc13 (1612),
+    xts3312-ybt-ezc14 (1613),
+    xts3312-yn-ezc15 (1614),
+
+    xts33xx-lim-1 (1701),
+
+	xt-lim-1(2001),
+    cls-t (2002),
+    cls-t-ecxh1   (2003),
+    cls-t-ecxh2   (2004)
+	}
+
+
+InfnCircuitPackType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"This textual convention represents all the Circuit Pack Types used by
+		                Infinera Network Elements."
+    SYNTAX  INTEGER {
+        unknown (1),
+        dlm (2),
+        bmm (3),
+        oam (4),
+        mcm (5),
+        omm (6),
+        scm (7),
+        tam (8),
+        tom (9),
+        xfp (10),
+        pem (11),
+        fan (12),
+        dfb (13),
+        chassis (14),
+        me (15),
+        owm (16),
+        tem (17),
+        xlm (18),
+        ram (19),
+        gam (20),
+        orm (21),
+        dse (22),
+        cmm (23),
+        xcm (24),
+        otm (25),
+        otlm (26),
+        oxm (27),
+        tsm (28),
+        olm (29),
+
+        -- for ATN
+        amm (30),
+        sim (32),
+        pcm (33),
+        aam (34),
+        opsw (35),
+
+
+	-- ATN upto 100
+        tim (101),
+        olx(102),
+        pxm(103),
+        otxm(104),
+		muxp(105),
+		mxp(106),
+
+		xmm(121),
+        xtim(122),
+        xmm2 (123),
+        clmm(124),
+        imm(151),
+        iam(152),
+        irm(153),
+        fmm(154),
+        fsm(155),
+        frm(156),
+        ofx(157),
+        ofm(158),
+        ilc(159),
+        fse(160),
+        otdm(161),
+        fp(162),
+        iam1(163),
+		frm4d(164),
+		fmmf250(165),
+		opsm(166),
+		fmmc5(167),
+        immb(168),
+		iop (171),
+        lmm (181),
+		asesrc (191),
+		xcmh   (201),
+        rbp (202),
+        bpp (203),
+        mpc (204),
+        xtmm (205),
+        fmmc12 (206),
+        frm20x (207),
+        frm9x  (208),
+        fbm  (209),
+        asem (210),
+        cwm (211),
+        mfm (212),
+        xt (221),
+        oxm2 (222),
+        aofx1200 (223),
+        iam2c (225),
+        irp1c (226),
+        otm1200 (227),
+        lom (228),
+        passiveEqpt (229)
+
+}
+
+
+InfnCurrentDcnGatewayType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Current Dcn Gateway Type."
+    SYNTAX   INTEGER  {
+        none (1),
+	    primary (2),
+	    secondary (3)
+    }
+
+InfnDcmType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+
+    SYNTAX   INTEGER  {
+        none(1),
+        dcm1H100N(2),
+        dcm1H200N(3),
+        dcm1H300N(4),
+        dcm1H400N(5),
+        dcm1H500N(6),
+        dcm1H600N(7),
+        dcm1H700N(8),
+        dcm1H800N(9),
+        dcm1H900N(10),
+        dcm1H1000N(11),
+        dcm1H1100N(12),
+        dcm1H1200N(13),
+        dcm1H1300H(14),
+        dcm1F1400N(15),
+        dcm1F1500N(16),
+        dcm1F1600N(17),
+        dcm1F1700N(18),
+        dcm1F1800N(19),
+        dcm1F1900N(20),
+        dcm1H100P(21),
+        dcm1H200P(22),
+        dcm1F300P(23),
+        dcm1F400L(24),
+        unspecified(25),
+        dcm2H3000N(26),
+        dcm2H4000N(27),
+        dcm1F1700nLL(28),
+        dcm1F1900nLL(29),
+        dse (30),
+        pse1 (31),
+        pse1b (32),
+        dcm3F800S (33),
+        dcm3F1000S (34),
+        dcm3F1600S (35),
+        dcm3F1800S (36),
+        pse (37),
+        dcm300pPlus100P (38),
+        dcm300pPlus200P (39),
+        dcm300pPlus300P (40),
+        dcm3F150S2 (41),
+        dcm2H2000N2 (42),
+        dcm3F300S (43),
+        dcm3F600S2 (44),
+        dcm3F800S2 (45),
+        dcm3F1000S2 (46),
+        dcm3F2400S2 (47),
+        dcm4F3000N (48),
+        dcm4F4000N (49),
+        dcm4H200L (50),
+        dcm4H300L (51),
+        dcm4H500L (52),
+        dcm4H800L (53),
+        dcm4H1300L (54),
+        dcm4H1700L (55),
+        dcm4H2000L (56),
+        dcm4H300N (57),
+        dcm4H700N (58),
+        dcm4H1000N (59),
+        dcm4H1300N (60),
+        dcm4H1700N (61),
+        dcm4H2000N (62),
+        dcm3F2300S (63),
+        dcm4F360LS (64),
+        dcm4F870LS (65),
+        lmm1H2 (66),
+        dcm1F200P (67),
+        dcm1H1300N (68),
+        dcm1HBLANKA (69),
+        dcm2H700N2 (70),
+        dcm3H300N (71),
+        dcm3H700N (72),
+        dcm3H1000N (73),
+        dcm3H1300N (74),
+        dcm3H1700N (75),
+        dcm3H2000N (76),
+        dcm3F3000N (77),
+        dcm3F4000N (78),
+        dcm3H200L (79),
+        dcm3H300L (80),
+        dcm3H500L (81),
+        dcm3H800L (82),
+        dcm3H1300L (83),
+        dcm3H1700L (84),
+        dcm3H2000L (85),
+        lmm1F4(86),
+        dcm1max(87)
+
+    }
+
+
+InfnDcnSpeed ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Dcn Speed."
+    SYNTAX  INTEGER {
+        s10M ( 1 ) ,
+        s100M ( 2 )
+    }
+
+
+
+InfnEnableDisable ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		""
+	SYNTAX  INTEGER {
+		disabled (1),
+		enabled (2),
+        unknown (3)
+	}
+
+
+InfnEqptType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"This textual convention represents the INFINERA equipment types"
+        SYNTAX  INTEGER {
+            unknown (1),
+            bmm4C1 (3),
+            bmm4C2 (5),
+            bmm4C3 (7),
+            bmm4C2ms (9),
+            bmm4C3ms (11),
+            oamC1 (13),
+            oamC2 (15),
+            oamC3 (17),
+            oamC2ms (19),
+            oamC3ms (21),
+            dlm1C1 (22),
+            dlm3C1 (23),
+            dlm5C1 (24),
+            dlm7C1 (25),
+            dlm1C2 (26),
+            dlm3C2 (27),
+            dlm5C2 (28),
+            dlm7C2 (29),
+            dlm2C1 (30),
+            dlm4C1 (31),
+            dlm6C1 (32),
+            dlm8C1 (33),
+            dlm2C2 (34),
+            dlm4C2 (35),
+            dlm6C2 (36),
+            dlm8C2 (37),
+            tam2p10g (38),
+            tamOC192 (39),
+            tam10XG (40),
+            tam4p2d5g (41),
+            tam4p1g (42),
+            tomMrDwdmLR2 (44),
+            none (45),
+            dlm (46),
+            bmm (47),
+            oam (48),
+            mcm (49),
+            omm (50),
+            scm (51),
+            tamUNSUPPORTED (52),
+            tomMrCwdmLR2 (53),
+            ormCxh1MsLL (54),
+            pem (55),
+            fan (56),
+            chassis (58),
+            me (59),
+            owm (60),
+            tom (61),
+            tom10gSR1 (62),
+            tom2d5gSR1 (63),
+            tom2d5gIR1 (64),
+            tom622mSR1 (65),
+            tom1gLX (66),
+            tom1gSX (67),
+            bmm8C1A (68),
+            bmm8C2msA (69),
+            bmm8C3msA (70),
+            bmm8C1B (71),
+            bmm8C2msB (72),
+            bmm8C3msB (73),
+            bmm4C1B (74),
+            bmm4C2msB (75),
+            bmm4C3msB (76),
+            bmm4C1C (77),
+            bmm4C2msC (78),
+            bmm4C3msC (79),
+            bmm4CX1A (80),
+            bmm4CX2msA (81),
+            bmm4CX3msA (82),
+            bmm8CXH1 (83),
+            bmm8CXH2ms (84),
+            bmm8CXH3ms (85),
+            oamC1B (86),
+            oamC2msB (87),
+            oamC3msB (88),
+            oamC1C (89),
+            oamC2msC (90),
+            oamC3msC (91),
+            oamCX1A (92),
+            oamCX2msA (93),
+            oamCX3msA (94),
+            oamCXH1 (95),
+            oamCXH2ms (96),
+            oamCXH3ms (97),
+            mcmA (98),
+            mcmB (99),
+            tom10gIR2 (100),
+            tom10gLR2 (101),
+            tom10gSR2 (102),
+            tom2d5gIR2 (103),
+            tom2d5gLR2 (104),
+            tom10gSR0 (105),
+            tom2d5gmrIR1 (106),
+            tom40gVSR (107),
+            tom1gZX (108),
+            tem (109),
+            dPemA (110),
+            oPemA (111),
+            dFantrayB (112),
+            oFantrayB (113),
+            tam8p1g (114),
+            tam4p2d38g (115),
+            tam1p40g (116),
+            tam2p10gr (117),
+            tam2p10gt (118),
+            tamFut3 (119),
+            dIOPANEL (120),
+            oIOPANEL (121),
+            mFANTRAY (122),
+            xlm (123),
+            xlm1C2 (124),
+            xlm2C2 (125),
+            xlm3C2 (126),
+            xlm4C2 (127),
+            xlm5C2 (128),
+            xlm6C2 (129),
+            xlm7C2 (130),
+            xlm8C2 (131),
+            dlm1C1B (132),
+            dlm2C1B (133),
+            dlm3C1B (134),
+            dlm4C1B (135),
+            dlm5C1B (136),
+            dlm6C1B (137),
+            dlm7C1B (138),
+            dlm8C1B (139),
+            mIOPANEL (140),
+            tom2d5gMRC47LR2 (141),
+            tom2d5gMRC49LR2 (142),
+            tom2d5gMRC51LR2 (143),
+            tom2d5gMRC53LR2 (144),
+            tom2d5gMRC55LR2 (145),
+            tom2d5gMRC57LR2 (146),
+            tom2d5gMRC59LR2 (147),
+            tom2d5gMRC61LR2 (148),
+            tom40g (149),
+            tom10g (150),
+            tom2d5g (151),
+            tom2d5gMR (152),
+            tom1g (153),
+            tom622m (154),
+            tom622mMR (155),
+            tom155m (156),
+            tom10gDL48LR2 (157),
+            tom10gDQ48LR2 (158),
+            tom10gDL00LR2 (159),
+            tom10gDQ00LR2 (160),
+            tom10gDC01LR2 (161),
+            tom10gDH01LR2 (162),
+            tom10gDC61LR2 (163),
+            tom10gDH61LR2 (164),
+            tom10gWdm (165),
+            tom40GWdm (166),
+            bmm1H4CX2 (167),
+            ram1 (168),
+            ram2OR (169),
+            rem2 (170),
+            xlm1C3 (171),
+            xlm2C3 (172),
+            xlm3C3 (173),
+            xlm4C3 (174),
+            xlm5C3 (175),
+            xlm6C3 (176),
+            xlm7C3 (177),
+            xlm8C3 (178),
+            bmm2-8CXH2ms (179),
+            bmm2-8CH3ms (180),
+            oamCXH1ms (181),
+            gam (182),
+            gam1 (183),
+            dlm1C3 (184),
+            dlm2C3 (185),
+            dlm3C3 (186),
+            dlm4C3 (187),
+            dlm5C3 (188),
+            dlm6C3 (189),
+            dlm7C3 (190),
+            dlm8C3 (191),
+            tom10gDWDMLR2 (192),
+            bmm2h4r3ms (193),
+            bmm2h4b3 (194),
+            bmm2-8ceh3 (195),
+            axlmT4d1C4 (196),
+            axlmT4d3C4 (197),
+            axlmT4d5C4 (198),
+            axlmT4d7C4 (199),
+            adlmT4d1C4 (200),
+            adlmT4d3C4 (201),
+            adlmT4d5C4 (202),
+            adlmT4d7C4 (203),
+            orm (204),
+            ormChx1Ms (205),
+            dse (206),
+            dse1 (207),
+            axlmT4d1C2 (208),
+            axlmT4d3C2 (209),
+            axlmT4d5C2 (210),
+            axlmT4d7C2 (211),
+            axlmT4d1C5 (212),
+            axlmT4d3C5 (213),
+            axlmT4d5C5 (214),
+            axlmT4d7C5 (215),
+            adlmT4d1C2 (216),
+            adlmT4d3C2 (217),
+            adlmT4d5C2 (218),
+            adlmT4d7C2 (219),
+            adlmT4d1C5 (220),
+            adlmT4d3C5 (221),
+            adlmT4d5C5 (222),
+            adlmT4d7C5 (223),
+            slmT4d1C3 (224),
+            slmT4d3C3 (225),
+            slmT4d5C3 (226),
+            slmT4d7C3 (227),
+            slmT4d1C4 (228),
+            slmT4d3C4 (229),
+            slmT4d5C4 (230),
+            slmT4d7C4 (231),
+            slmT4d1C5 (232),
+            slmT4d3C5 (233),
+            slmT4d5C5 (234),
+            slmT4d7C5 (235),
+            tam2p10gm (236),
+            tam8p2d5gm (237),
+            tom2d5gSR0 (238),
+            tom4gLR1 (239),
+            tom4gIR11 (240),
+            tom4gSR0 (241),
+            tom8gLR1 (242),
+            tom8gIR1 (243),
+            tom8gSR0 (244),
+            tom2d5GMRCnn (245),
+            mcmC (246),
+            tom1d485gHdRx (247),
+            tom1d485gHdTx (248),
+            tom1d4835gHdRx (249),
+            tom1d4835gHdTx (250),
+            tom8gSmLcL (251),
+            tom25gmrSR1 (252),
+            tom10gDwaLR2 (253),
+            bmm2p8Ch1Ms (254),
+            bmm2p8Ceh1 (255),
+            gam2 (256),
+            ormCxh1 (257),
+            tom8g (258),
+            scm1 (259),
+            ormCxh1LL (260),
+            cmm (261),
+            cmma (263),
+            cmm1da20c1 (264),
+            cmm1da20c2 (265),
+            cmm1da20c5 (266),
+            cmm1da20c6 (267),
+            cmm1d20cr (268),
+            cmm1d20cb (269),
+            tam1p100ge (274),
+            tam1p100gr (275),
+            tom100gCR10 (276),
+            tom100gSR10 (277),
+            tom100gL10X (278),
+            tom40gKR4 (279),
+            tom40gCR4 (280),
+            tam1p40ge (281),
+            tam1p40gr (282),
+            tom40gSR4 (283),
+            tom40gLR4 (284),
+            tom40gER4 (285),
+            tom40gFR  (286),
+            adlm80 (287),
+            adlm80T1C5  (288),
+            axlm80 (289),
+            axlm80T1C5  (290),
+            slm80T1C5  (291),
+            tom100gLR4 (292),
+            tom100gS10X (293),
+	    tom100g (294),
+            tom100ger4 (295),
+            bmm2c16ch (296),
+            dicm-t-2-10gt(297),
+            dicm-t-2-10gm(298),
+            ommA(299),
+            ommB(300),
+            dtnr7-5(301),
+            scm2(302),
+
+            --XTN eqpt type
+
+            xcm (5002),
+            otm500 (5003),
+            olm400 (5004),
+            xm (5005),
+            oxm (5006),
+            oxmx10 (5007),
+            oxmx4 (5008),
+            xFanTrayA (5009),
+            xPemA (5010),
+            xIopanel (5011),
+            otmx500 (5012),
+            otxm600 (5013),
+            x-fantray-x2 (5014),
+            x-fantray-x2e-o (5015),
+            otsm-600 (5016),
+
+            tsm (5018),
+            tsmx10 (5019),
+            tsmx4 (5020),
+            mxp-400 (5021),
+
+            olm200(5023),
+            aolm200-T4-1-C6 (5024),
+            aolm200-T4-3-C6 (5025),
+            aolm200-T4-5-C6 (5026),
+            aolm200-T4-7-C6 (5027),
+            aolm200-T4-1-C5 (5028),
+            aolm200-T4-3-C5 (5029),
+            aolm200-T4-5-C5 (5030),
+            aolm200-T4-7-C5 (5031),
+            olm500 (5032),
+            aolm500-T4-1-C6 (5033),
+            aolm500-T4-3-C6 (5034),
+            aolm500-T4-5-C6 (5035),
+            aolm500-T4-7-C6 (5036),
+            aolm500-T4-1-C5 (5037),
+            aolm500-T4-3-C5 (5038),
+            aolm500-T4-5-C5 (5039),
+            aolm500-T4-7-C5 (5040),
+            aolm500-T1-1-C4 (5041),
+            aolm500-T1-2-C4 (5042),
+            aolm500-T1-3-C4 (5043),
+            aolm500-T1-4-C4 (5044),
+            aolm500-T1-5-C4 (5045),
+            aolm500-T1-6-C4 (5046),
+            aolm500-T1-7-C4 (5047),
+            aolm500-T1-8-C4 (5048),
+            aolm500-T1-9-C4 (5049),
+            aolm500-T1-10-C4 (5050),
+            aolm500-T1-11-C4 (5051),
+            aolm500-T1-12-C4 (5052),
+            aolm500-T1-13-C4 (5053),
+            aolm500-T1-14-C4 (5054),
+            aolm500-T1-15-C4 (5055),
+            aolm500-T1-16-C4 (5056),
+            aolm500-T1-1-C5 (5057),
+            aolm500-T1-2-C5 (5058),
+            aolm500-T1-3-C5 (5059),
+            aolm500-T1-4-C5 (5060),
+            aolm500-T1-5-C5 (5061),
+            aolm500-T1-6-C5 (5062),
+            aolm500-T1-7-C5 (5063),
+            aolm500-T1-8-C5 (5064),
+            aolm500-T1-9-C5 (5065),
+            aolm500-T1-10-C5 (5066),
+            aolm500-T1-11-C5 (5067),
+            aolm500-T1-12-C5 (5068),
+            aolm500-T1-13-C5 (5069),
+            aolm500-T1-14-C5 (5070),
+            aolm500-T1-15-C5 (5071),
+            aolm500-T1-16-C5 (5072),
+            solm500-T4-1-C11 (5073),
+            solm500-T4-3-C11 (5074),
+            solm500-T4-5-C11 (5075),
+            solm500-T4-7-C11 (5076),
+            solm500-T1-1-C11 (5077),
+            solm500-T1-2-C11 (5078),
+            solm500-T1-3-C11 (5079),
+            solm500-T1-4-C11 (5080),
+            solm500-T1-5-C11 (5081),
+            solm500-T1-6-C11 (5082),
+            solm500-T1-7-C11 (5083),
+            solm500-T1-8-C11 (5084),
+            solm500-T1-9-C11 (5085),
+            solm500-T1-10-C11 (5086),
+            solm500-T1-11-C11 (5087),
+            solm500-T1-12-C11 (5088),
+            solm500-T1-13-C11 (5089),
+            solm500-T1-14-C11 (5090),
+            solm500-T1-15-C11 (5091),
+            solm500-T1-16-C11 (5092),
+            olx500          (5093),
+            aolx500-T4-1-C5  (5094),
+            aolx500-T4-3-C5  (5095),
+            aolx500-T4-5-C5  (5096),
+            aolx500-T4-7-C5  (5097),
+            aolx500-T4-1-C6  (5098),
+            aolx500-T4-3-C6  (5099),
+            aolx500-T4-5-C6  (5100),
+            aolx500-T4-7-C6  (5101),
+            solx500-T4-1-C11 (5102),
+            solx500-T4-3-C11 (5103),
+	        solx500-T4-5-C11 (5104),
+            solx500-T4-7-C11 (5105),
+
+            olm500b          (5151),
+            aolm500b-T4-1-C5 (5152),
+            aolm500b-T4-3-C5 (5153),
+            aolm500b-T4-5-C5 (5154),
+            aolm500b-T4-7-C5 (5155),
+            aolm500b-T4-1-C6 (5156),
+            aolm500b-T4-3-C6 (5157),
+            aolm500b-T4-5-C6 (5158),
+            aolm500b-T4-7-C6 (5159),
+
+            olx200           (5201),
+            aolx200-T4-1-C5  (5202),
+            aolx200-T4-3-C5  (5203),
+            aolx200-T4-5-C5  (5204),
+            aolx200-T4-7-C5  (5205),
+            aolx200-T4-1-C6  (5206),
+            aolx200-T4-3-C6  (5207),
+            aolx200-T4-5-C6  (5208),
+            aolx200-T4-7-C6  (5209),
+
+            olx500b          (5251),
+            aolx500b-T4-1-C5 (5252),
+            aolx500b-T4-3-C5 (5253),
+            aolx500b-T4-5-C5 (5254),
+            aolx500b-T4-7-C5 (5255),
+            aolx500b-T4-1-C6 (5256),
+            aolx500b-T4-3-C6 (5257),
+            aolx500b-T4-5-C6 (5258),
+            aolx500b-T4-7-C6 (5259),
+
+			tom-10g-sfpp-ir2(5301),
+			tom-10g-sfpp-lr2(5302),
+			tom-10g-sfpp-sr1(5303),
+			tom-100g-er10(5304),
+            tom-10g-sfpp-sr0(5306),
+            tom-10g-sfpp-dt(5307),
+		    tom-40gmr-er4 (5308),
+            tom-100gmr-er4 (5309),
+            tom-10g-sfpp-lrl(5310),
+
+			tom2-100g-lr4  (5315),
+			tom-100g-cfp-dt (5316),
+
+			tim5-10g (5501),
+			tim5-10gm (5502),
+            tim5-10gx (5503),
+            tim1-100ge (5504),
+            tim1-40gx (5505),
+            tim1-40ge (5506),
+            tim1-40gt (5507),
+            tim1-40g (5508),
+            tim1-100g (5509),
+            tom40gmrlr4 (5510),
+            tom40gmrfr (5511),
+            tom100gmrlr4 (5512),
+            tom100gmrl10x (5513),
+            tim-5b-10gm (5514),
+            tim-5b-20gx (5515),
+            tim-1b-100ge (5516),
+            tim-1b-40ge (5517),
+            tim1-40gm (5518),
+            tim16-25gm (5519),
+            xicm-t-5-10gm(5520 ),
+            tim-1-100gx   (5521),
+            tim-1-100gm   (5522),
+			tim2-1-100ge  (5523),
+			lim-1-100ge (5524),
+			lim-1-100gm   (5525),
+			lim-1-100gx   (5526),
+			tim-1-100ge-q (5527),
+            tim2-20-10ge (5528),
+            tim2-18-10gm (5529),
+            tim2-18-10gx (5530),
+            tim2-2-100gm (5531),
+            tim2-2-100gx (5532),
+            tom-40g-q-lrl4 (5533),
+
+
+            olm2-500           (5701),
+            aolm2-500-T4-1-C5  (5702),
+            aolm2-500-T4-3-C5  (5703),
+            aolm2-500-T4-5-C5  (5704),
+            aolm2-500-T4-7-C5  (5705),
+            aolm2-500-T4-1-C6  (5706),
+            aolm2-500-T4-3-C6  (5707),
+            aolm2-500-T4-5-C6  (5708),
+            aolm2-500-T4-7-C6  (5709),
+            aolm2-500-T4-1-C8  (5710),
+            aolm2-500-T4-3-C8  (5711),
+            aolm2-500-T4-5-C8  (5712),
+            aolm2-500-T4-7-C8  (5713),
+            solm2-500-T4-1-C12 (5714),
+            solm2-500-T4-3-C12 (5715),
+            solm2-500-T4-5-C12 (5716),
+            solm2-500-T4-7-C12 (5717),
+            solm2-500-T4-1-C13 (5718),
+            solm2-500-T4-3-C13 (5719),
+            solm2-500-T4-5-C13 (5720),
+            solm2-500-T4-7-C13 (5721),
+
+            olx2-500           (5751),
+            aolx2-500-T4-1-C5  (5752),
+            aolx2-500-T4-3-C5  (5753),
+            aolx2-500-T4-5-C5  (5754),
+            aolx2-500-T4-7-C5  (5755),
+            aolx2-500-T4-1-C6  (5756),
+            aolx2-500-T4-3-C6  (5757),
+            aolx2-500-T4-5-C6  (5758),
+            aolx2-500-T4-7-C6  (5759),
+            aolx2-500-T4-1-C8  (5760),
+            aolx2-500-T4-3-C8  (5761),
+            aolx2-500-T4-5-C8  (5762),
+            aolx2-500-T4-7-C8  (5763),
+            solx2-500-T4-1-C12 (5764),
+            solx2-500-T4-3-C12 (5765),
+            solx2-500-T4-5-C12 (5766),
+            solx2-500-T4-7-C12 (5767),
+            solx2-500-T4-1-C13 (5768),
+            solx2-500-T4-3-C13 (5769),
+            solx2-500-T4-5-C13 (5770),
+            solx2-500-T4-7-C13 (5771),
+
+            olm2-500b          (5801),
+            aolm2-500b-T4-1-C5 (5802),
+            aolm2-500b-T4-3-C5 (5803),
+            aolm2-500b-T4-5-C5 (5804),
+            aolm2-500b-T4-7-C5 (5805),
+            aolm2-500b-T4-1-C6 (5806),
+            aolm2-500b-T4-3-C6 (5807),
+            aolm2-500b-T4-5-C6 (5808),
+            aolm2-500b-T4-7-C6 (5809),
+            aolm2-500b-T4-1-C8 (5810),
+            aolm2-500b-T4-3-C8 (5811),
+            aolm2-500b-T4-5-C8 (5812),
+            aolm2-500b-T4-7-C8 (5813),
+            solm2-500b-T4-1-C12 (5814),
+            solm2-500b-T4-3-C12 (5815),
+            solm2-500b-T4-5-C12 (5816),
+            solm2-500b-T4-7-C12 (5817),
+            solm2-500b-T4-1-C13 (5818),
+            solm2-500b-T4-3-C13 (5819),
+            solm2-500b-T4-7-C13 (5820),
+            solm2-500b-T4-9-C13 (5821),
+
+            olx2-500b           (5851),
+            aolx2-500b-T4-1-C5 (5852),
+            aolx2-500b-T4-3-C5 (5853),
+            aolx2-500b-T4-5-C5 (5854),
+            aolx2-500b-T4-7-C5 (5855),
+            aolx2-500b-T4-1-C6 (5856),
+            aolx2-500b-T4-3-C6 (5857),
+            aolx2-500b-T4-5-C6 (5858),
+            aolx2-500b-T4-7-C6 (5859),
+            aolx2-500b-T4-1-C8 (5860),
+            aolx2-500b-T4-3-C8 (5861),
+            aolx2-500b-T4-5-C8 (5862),
+            aolx2-500b-T4-7-C8 (5863),
+            solx2-500b-T4-1-C12 (5864),
+            solx2-500b-T4-3-C12 (5865),
+            solx2-500b-T4-5-C12 (5866),
+            solx2-500b-T4-7-C12 (5867),
+            solx2-500b-T4-1-C13 (5868),
+            solx2-500b-T4-3-C13 (5869),
+            solx2-500b-T4-7-C13 (5870),
+            solx2-500b-T4-9-C13 (5871),
+
+            ofx-500(5901),
+            aofx-500-t4-1-c5 (5912),
+            aofx-500-t4-5-c5 (5913),
+            aofx-500-t4-9-c5 (5914),
+            aofx-500-t4-13-c5 (5915),
+            aofx-500-t4-17-c5 (5916),
+            aofx-500-t4-1-c6 (5917),
+            aofx-500-t4-5-c6 (5918),
+            aofx-500-t4-9-c6 (5919),
+            aofx-500-t4-13-c6 (5920),
+            aofx-500-t4-17-c6 (5921),
+            aofx-500-t4-1-c7 (5922),
+            aofx-500-t4-5-c7 (5923),
+            aofx-500-t4-9-c7 (5924),
+            aofx-500-t4-13-c7 (5925),
+            aofx-500-t4-17-c7 (5926),
+            aofx-500-t4-1-c8 (5927),
+            aofx-500-t4-5-c8 (5928),
+            aofx-500-t4-9-c8 (5929),
+            aofx-500-t4-13-c8 (5930),
+            aofx-500-t4-17-c8 (5931),
+            aofx-500-t4-1-c9 (5942),
+            aofx-500-t4-5-c9 (5943),
+            aofx-500-t4-9-c9 (5944),
+            aofx-500-t4-13-c9 (5945),
+            aofx-500-t4-17-c9 (5946),
+
+            sofx-500-t4-1-c12 (5952),
+            sofx-500-t4-5-c12 (5953),
+            sofx-500-t4-9-c12 (5954),
+            sofx-500-t4-13-c12 (5955),
+            sofx-500-t4-17-c12 (5956),
+
+            sofx-500-t4-1-c13 (5962),
+            sofx-500-t4-5-c13 (5963),
+            sofx-500-t4-9-c13 (5964),
+            sofx-500-t4-13-c13 (5965),
+            sofx-500-t4-17-c13 (5966),
+
+            ofm-500 (6001),
+            aofm-500-t4-1-c5 (6012),
+            aofm-500-t4-5-c5 (6013),
+            aofm-500-t4-9-c5 (6014),
+            aofm-500-t4-13-c5 (6015),
+            aofm-500-t4-17-c5 (6016),
+            aofm-500-t4-1-c6 (6017),
+            aofm-500-t4-5-c6 (6018),
+            aofm-500-t4-9-c6 (6019),
+            aofm-500-t4-13-c6 (6020),
+            aofm-500-t4-17-c6 (6021),
+            aofm-500-t4-1-c7 (6022),
+            aofm-500-t4-5-c7 (6023),
+            aofm-500-t4-9-c7 (6024),
+            aofm-500-t4-13-c7 (6025),
+            aofm-500-t4-17-c7 (6026),
+            aofm-500-t4-1-c8 (6032),
+            ofm-500-t4-5-c8 (6033),
+            aofm-500-t4-9-c8 (6034),
+            aofm-500-t4-13-c8 (6035),
+            aofm-500-t4-17-c8 (6036),
+            aofm-500-t4-1-c9 (6042),
+            aofm-500-t4-5-c9 (6043),
+            aofm-500-t4-9-c9 (6044),
+            aofm-500-t4-13-c9 (6045),
+            aofm-500-t4-17-c9 (6046),
+
+            sofm-500-t4-1-c12 ( 6052 ),
+            sofm-500-t4-5-c12 ( 6053 ),
+            sofm-500-t4-9-c12 ( 6054 ),
+            sofm-500-t4-13-c12 ( 6055 ),
+            sofm-500-t4-17-c12 ( 6056 ),
+            sofm-500-t4-1-c13 ( 6067 ),
+            sofm-500-t4-5-c13 ( 6068 ),
+            sofm-500-t4-9-c13 ( 6069 ),
+            sofm-500-t4-13-c13 ( 6065 ),
+            sofm-500-t4-17-c13 ( 6066 ),
+            ofm-500b ( 6101 ),
+            aofm-500b-t4-1-c5 ( 6102 ),
+            aofm-500b-t4-5-c5 ( 6103 ),
+            aofm-500b-t4-9-c5 ( 6104 ),
+            aofm-500b-t4-13-c5 ( 6105 ),
+            aofm-500b-t4-17-c5 ( 6106 ),
+            aofm-500b-t4-1-c6 ( 6107 ),
+            aofm-500b-t4-5-c6 ( 6108 ),
+            aofm-500b-t4-9-c6 ( 6109 ),
+            aofm-500b-t4-13-c6 ( 6110 ),
+            aofm-500b-t4-17-c6 ( 6111 ),
+            aofm-500b-t4-1-c8 ( 6112 ),
+            aofm-500b-t4-5-c8 ( 6113 ),
+            aofm-500b-t4-9-c8 ( 6114 ),
+            aofm-500b-t4-13-c8 ( 6115 ),
+            aofm-500b-t4-17-c8 ( 6116 ),
+            sofm-500b-t4-1-c12 ( 6122 ),
+            sofm-500b-t4-5-c12 ( 6123 ),
+            sofm-500b-t4-9-c12 ( 6124 ),
+            sofm-500b-t4-13-c12 ( 6125 ),
+            sofm-500b-t4-17-c12 ( 6126 ),
+            sofm-500b-t4-1-c13 ( 6132 ),
+            sofm-500b-t4-5-c13 ( 6133 ),
+            sofm-500b-t4-9-c13 ( 6134 ),
+            sofm-500b-t4-13-c13 ( 6135 ),
+            sofm-500b-t4-17-c13 ( 6136 ),
+            ofx-500b ( 6151 ),
+            aofx-500b-t4-1-c5 ( 6152 ),
+            aofx-500b-t4-5-c5 ( 6153 ),
+            aofx-500b-t4-9-c5 ( 6154 ),
+            aofx-500b-t4-13-c5 ( 6155 ),
+            aofx-500b-t4-17-c5 ( 6156 ),
+            aofx-500b-t4-1-c6 ( 6157 ),
+            aofx-500b-t4-5-c6 ( 6158 ),
+            aofx-500b-t4-9-c6 ( 6159 ),
+            aofx-500b-t4-13-c6 ( 6160 ),
+            aofx-500b-t4-17-c6 ( 6161 ),
+            aofx-500b-t4-1-c8 ( 6162 ),
+            aofx-500b-t4-5-c8 ( 6163 ),
+            aofx-500b-t4-9-c8 ( 6164 ),
+            aofx-500b-t4-13-c8 ( 6165 ),
+            aofx-500b-t4-17-c8 ( 6166 ),
+            sofx-500b-t4-1-c12 ( 6172 ),
+            sofx-500b-t4-5-c12 ( 6173 ),
+            sofx-500b-t4-9-c12 ( 6174 ),
+            sofx-500b-t4-13-c12 ( 6175 ),
+            sofx-500b-t4-17-c12 ( 6176 ),
+            sofx-500b-t4-1-c13 ( 6182 ),
+            sofx-500b-t4-5-c13 ( 6183 ),
+            sofx-500b-t4-9-c13 ( 6184 ),
+            sofx-500b-t4-13-c13 ( 6185 ),
+            sofx-500b-t4-17-c13 ( 6186 ),
+
+            pxm-16-10ge ( 6301 ),
+            pxm-1-100ge ( 6302 ),
+
+            imm (7701),
+            iam  (7702),
+            iam-b-ecxh1 (7703),
+            iam-b-ecxh2 (7704),
+            irm  (7705),
+            irm-b-ecxh1 (7706),
+            fmm-9-ec  (7707),
+            fsm-cdc-8d-12-ec(7708),
+            fse-4d-ec  (7709),
+            frm-3d-b-4-ec  (7710),
+            frm-9d-r-8-ec  (7711),
+            frm4d-b-3-ec (7714),
+            imm-a (7715),
+            imm-b (7716),
+            -- 7716 eqTyp got from MO is also displayed same as IMM-B
+            immb (7717),
+            m-pem-a  (7801),
+            i-iopanel  (7802),
+            i-fantray-a  (7803),
+            otdm-4d  (7804),
+            fsp-e-9d-18mpo (7805),
+            fsp-s-4d-8mpo (7806),
+            fsp-c-1d-1mpo  (7807),
+            fmp-c-8-4-lc-mpo (7808),
+            lmm1h-2 (7809),
+            fmp-f250-19-2-lc-lc (7810),
+			frm-4d-b-3-ec (7811),
+			fmm-f250-19-ec (7812),
+            fmm-c-5-ectr (7813),
+            mpc-6 (7814),
+            rbp-49-ec (7815),
+            bpp-1-1600-ec (7816),
+            bpp-33-1600-ec (7817),
+            bpp-65-1600-ec (7818),
+            otp-10-90 (7819),
+            otp-20-80 (7820),
+            otp-50-50 (7821),
+            fmp-o25-4-1-LC-LC   (7822),
+            fmp-o50-16-1-LC-LC  (7823),
+            lmmm1f-4            (7824),
+            frm-9x              (7825),
+            frm-20x-r-ec       (7826),
+            fmm-c-12-ectr-old   (7827),
+            fsp-e-5d-5mpo       (7828),
+            fsp-ee-9d-13mpo     (7829),
+            fsp-ce-2mpo-1lc     (7830),
+            fsp-ce-2mpo-2lc     (7831),
+            irm-b-ech1          (7832),
+            iam-b-ech2          (7833),
+            irp-b-ech1          (7834),
+            irm-b-lh1           (7835),
+            iam-b-lh2           (7836),
+            otdm-4d-l           (7837),
+            fsp-ee-13d-21mpo    (7838),
+            irm-b-ech2          (7839),
+
+            opsm-1              (7901),
+			opsm-2              (7902),
+            fmm-c-12-ectr       (7903),
+			si-asem             (7904),
+            si-cwm-4            (7905),
+            si-mfm              (7906),
+			xcmh                (8001),
+            mtc-6-dc-pem        (8002),
+            mtc-6-ac-pem        (8003),
+            mtc-6-fantray       (8004),
+            xtmm                (8101),
+            fbm-slcdc-2-8       (8201),
+            fbm-slcdc-4-4       (8202),
+            fbm-slcdc-8-4       (8203),
+            fbm-slcdc-8-2-usb   (8301),
+            fbm-slcdc-8-4-usb   (8302),
+            fbm-slcdc-8-8-usb   (8303),
+            fbm-slcdc-8-12-usb  (8304),
+
+
+            aofx-100               (9001),
+            aofx-100-t32-1-c3      (9002),
+            aofx-100-t32-2-c3        (9003),
+            aofx-100-t32-3-c3        (9004),
+            aofx-100-t32-1-c5      (9005),
+            aofx-100-t32-2-c5      (9006),
+            aofx-100-t32-3-c5      (9007),
+            aofx-100-t32-1-c6      (9008),
+			aofx-100-t32-2-c6      (9009),
+            aofx-100-t32-3-c6      (9010),
+            aofx-100-t32-1-c8      (9011),
+            aofx-100-t32-2-c8      (9012),
+            aofx-100-t32-3-c8      (9013),
+
+            sofx-100-t32-1-c12     (9014),
+            sofx-100-t32-2-c12     (9015),
+            sofx-100-t32-3-c12     (9016),
+            sofx-100-t32-1-c13     (9017),
+            sofx-100-t32-2-c13     (9018),
+            sofx-100-t32-3-c13     (9019),
+
+            aofm-100               (9020),
+            aofm-100-t32-1-c6      (9021),
+            aofm-100-t32-2-c6      (9022),
+            aofm-100-t32-3-c6      (9023),
+            aofm-100-t32-1-c3      (9024),
+            aofm-100-t32-2-c3      (9025),
+            aofm-100-t32-3-c3      (9026),
+            aofm-100-t32-1-c5      (9027),
+            aofm-100-t32-2-c5      (9028),
+            aofm-100-t32-3-c5      (9029),
+            aofm-100-t32-1-c8      (9030),
+            aofm-100-t32-2-c8      (9031),
+            aofm-100-t32-3-c8      (9032),
+
+			xmm                     (10001),
+            xtim-12-qsfpp           (10002),
+            c-pem-a                 (10003),
+            c-fantray               (10004),
+            tom40g-q-lr4            (10005),
+            tom40g-q-sr4            (10006),
+            tom40g-q-sr4e           (10007),
+            tom40g-q-lrl            (10008),
+            xtim-48-sfpp            (10009),
+            tom-100g-q-lr4          (10010),
+            tom-100g-q-sr4          (10011),
+            tom-100g-q-lr4l         (10012),
+            xtim-cx100e-s           (10013),
+			tom-100g-q              (10014),
+			xtim-500f               (10015),
+			tom-100g-q-clr4         (10016),
+            tom-100g-q-cwdm4-old    (10017),
+            xtim-cx1200f            (10018),
+			tom-100g-q-cwdm4        (10019),
+            xp2-c-cbla-q-078        (10020),
+            tom-100-gmr-q-lr4       (10021),
+            tom-100-gmr-q-sr4       (10022),
+
+            mxp-m-400-ez-c5   (10076),
+            mxp-m-400-ez-c8   (10077),
+            mxp-m-400p-ez-c5  (10078),
+            mxp-m-400p-ez-c8  (10079),
+
+			x-ps-dc-x2    (10102),
+			x-ps-dc-x2-l  (10103),
+			x-ps-ac       (10104),
+            xp-pem   (10105),
+            xmm2   (10106),
+            xp2-pem-ac   (10107),
+            xp2-pem-dc   (10108),
+            xp2-pem   (10109),
+            xp2-fanmodule (10110),
+            xp-pem-ac     (10111),
+            xp-pem-dc     (10112),
+            x-ps2-dc      (10113),
+            x-fanTray2-x10 (10114),
+            x-fanTray2-x4   (10115),
+            xtim-xt3600 (11001),
+            xtim-cx1200 (11002),
+            xtim-mxp400 (11003),
+            lom         (11004),
+            tom-200g-a-cfp2 (11005),
+            xt-500f-100-1-c3 (40001),
+            xt-500f-100-5-c3 (40002),
+            xt-500f-100-9-c3 (40003),
+            xt-500f-100-13-c3 (40004),
+            xt-500f-100-17-c3 (40005),
+            xt-500f-100-1-c5 (40006),
+            xt-500f-100-5-c5 (40007),
+            xt-500f-100-9-c5 (40008),
+            xt-500f-100-13-c5 (40009),
+            xt-500f-100-17-c5 (40010),
+            xt-500f-100-1-c6 (40011),
+            xt-500f-100-5-c6 (40012),
+            xt-500f-100-9-c6 (40013),
+            xt-500f-100-13-c6 (40014),
+            xt-500f-100-17-c6 (40015),
+            xt-500f-100-1-c8 (40016),
+            xt-500f-100-5-c8 (40017),
+            xt-500f-100-9-c8 (40018),
+            xt-500f-100-13-c8 (40019),
+            xt-500f-100-17-c8 (40020),
+            xt-500fb-100-1-c3 (40021),
+            xt-500fb-100-5-c3 (40022),
+            xt-500fb-100-9-c3 (40023),
+            xt-500fb-100-13-c3 (40024),
+            xt-500fb-100-17-c3 (40025),
+            xt-500fb-100-1-c5 (40026),
+            xt-500fb-100-5-c5 (40027),
+            xt-500fb-100-9-c5 (40028),
+            xt-500fb-100-13-c5 (40029),
+            xt-500fb-100-17-c5 (40030),
+            xt-500fb-100-1-c6 (40031),
+            xt-500fb-100-5-c6 (40032),
+            xt-500fb-100-9-c6 (40033),
+            xt-500fb-100-13-c6 (40034),
+            xt-500fb-100-17-c6 (40035),
+            xt-500fb-100-1-c8 (40036),
+            xt-500fb-100-5-c8 (40037),
+            xt-500fb-100-9-c8 (40038),
+            xt-500fb-100-13-c8 (40039),
+            xt-500fb-100-17-c8 (40040),
+
+            xt3612-yn-eq-c5 (40502),
+            xt3612-yn-eq-c6 (40503),
+            xt3612-yn-eq-c8 (40504),
+            xt3618-yn-ee-c5 (40505),
+            xt3618-yn-ee-c6 (40506),
+            xt3618-yn-ee-c8 (40507),
+            xt3624-yn-es-c5 (40508),
+            xt3624-yn-es-c6 (40509),
+            xt3624-yn-es-c8 (40510),
+            xt3624-yn-ez-c5 (40511),
+            xt3624-yn-ez-c6 (40512),
+            xt3624-yn-ez-c8 (40513),
+
+            xt3612-yb-eq-c5 (40514),
+            xt3612-yb-eq-c6 (40515),
+            xt3612-yb-eq-c8 (40516),
+            xt3618-yb-ee-c5 (40517),
+            xt3618-yb-ee-c6 (40518),
+            xt3618-yb-ee-c8 (40519),
+            xt3624-yb-es-c5 (40520),
+            xt3624-yb-es-c6 (40521),
+            xt3624-yb-es-c8 (40522),
+            xt3624-yb-ez-c5 (40523),
+            xt3624-yb-ez-c6 (40524),
+            xt3624-yb-ez-c8 (40525),
+            -- IB PONs
+            xts3606-yn-eb-c13 (40526),
+            xts3606-yn-eb-c14 (40527),
+            xts3609-yn-et-c13 (40528),
+            xts3609-yn-et-c14 (40529),
+            xts3612-yn-eq-c13 (40530),
+            xts3612-yn-eq-c14 (40531),
+            xts3618-yn-ee-c13 (40532),
+            xts3618-yn-ee-c14 (40533),
+            xts3624-yn-es-c13 (40534),
+            xts3624-yn-es-c14 (40535),
+            xts3624-yn-ez-c13 (40536),
+            xts3624-yn-ez-c14 (40537),
+            xts3606-yb-eb-c13 (40538),
+            xts3606-yb-eb-c14 (40539),
+            xts3609-yb-et-c13 (40540),
+            xts3609-yb-et-c14 (40541),
+            xts3612-yb-eq-c13 (40542),
+            xts3612-yb-eq-c14 (40543),
+            xts3618-yb-ee-c13 (40544),
+            xts3618-yb-ee-c14 (40545),
+            xts3624-yb-es-c13 (40546),
+            -- SLTE PONs
+            xts3624-yb-es-c14 (40547),
+            xts3624-yb-ez-c13 (40548),
+            xts3624-yb-ez-c14 (40549),
+
+            xt3306-yn-eqc2 (40602),
+            xt3306-yn-eqc3 (40603),
+            xt3306-yn-eqc5 (40604),
+            xt3306-yn-eqc6 (40605),
+            xt3306-yn-eqc8 (40606),
+            xt3309-yn-eec2 (40607),
+            xt3309-yn-eec3 (40608),
+            xt3309-yn-eec5 (40609),
+            xt3309-yn-eec6 (40610),
+            xt3309-yn-eec8 (40611),
+            xt3312-yn-esc2 (40612),
+            xt3312-yn-esc3 (40613),
+            xt3312-yn-esc5 (40614),
+            xt3312-yn-esc6 (40615),
+            xt3312-yn-esc8 (40616),
+            xt3312-yn-ezc2 (40617),
+            xt3312-yn-ezc3 (40618),
+            xt3312-yn-ezc5 (40619),
+            xt3312-yn-ezc6 (40620),
+            xt3312-yn-ezc8 (40621),
+
+            xt3306-yb-eqc2 (40622),
+            xt3306-yb-eqc3 (40623),
+            xt3306-yb-eqc5 (40624),
+            xt3306-yb-eqc6 (40625),
+            xt3306-yb-eqc8 (40626),
+            xt3309-yb-eec2 (40627),
+            xt3309-yb-eec3 (40628),
+            xt3309-yb-eec5 (40629),
+            xt3309-yb-eec6 (40630),
+            xt3309-yb-eec8 (40631),
+            xt3312-yb-esc2 (40632),
+            xt3312-yb-esc3 (40633),
+            xt3312-yb-esc5 (40634),
+            xt3312-yb-esc6 (40635),
+            xt3312-yb-esc8 (40636),
+            xt3312-yb-ezc2 (40637),
+            xt3312-yb-ezc3 (40638),
+            xt3312-yb-ezc5 (40639),
+            xt3312-yb-ezc6 (40640),
+            xt3312-yb-ezc8 (40641),
+            -- IB for sltee pons
+            xts3312-yb-ezc13 (40642),
+            xts3303-yb-ebc13 (40643),
+            xts3306-yb-eqc13 (40644),
+            xts3309-yb-eec13 (40645),
+            xts3312-yb-esc13 (40646),
+            xts3312-yb-ezc14 (40647),
+            xts3303-yb-ebc14 (40648),
+            xts3306-yb-eqc14 (40649),
+            xts3309-yb-eec14 (40650),
+            xts3312-yb-esc14 (40651),
+            -- slte pons
+            xts3312-yn-ezc13 (40652),
+            xts3303-yn-ebc13 (40653),
+            xts3306-yn-eqc13 (40654),
+            xts3309-yn-eec13 (40655),
+            xts3312-yn-esc13 (40656),
+            xts3312-yn-ezc14 (40657),
+            xts3303-yn-ebc14 (40658),
+            xts3306-yn-eqc14 (40659),
+            xts3309-yn-eec14 (40660),
+            xts3312-yn-esc14 (40661),
+
+            -- warm IB pons for XTS 3300
+            xts3312-yp-ezc13 (40662),
+            xts3303-yp-ebc13 (40663),
+            xts3306-yp-eqc13 (40664),
+            xts3309-yp-eec13 (40665),
+            xts3312-yp-esc13 (40666),
+            xts3312-yp-ezc14 (40667),
+            xts3303-yp-ebc14 (40668),
+            xts3306-yp-eqc14 (40669),
+            xts3309-yp-eec14 (40670),
+            xts3312-yp-esc14 (40671),
+
+            -- warm ib pons for XT 3300
+            xt3306-yp-eqc2 (40672),
+            xt3306-yp-eqc5 (40673),
+            xt3306-yp-eqc6 (40674),
+            xt3306-yp-eqc8 (40675),
+            xt3309-yp-eec2 (40676),
+            xt3309-yp-eec5 (40677),
+            xt3309-yp-eec6 (40678),
+            xt3309-yp-eec8 (40679),
+            xt3312-yp-esc2 (40680),
+            xt3312-yp-esc5 (40681),
+            xt3312-yp-esc6 (40682),
+            xt3312-yp-esc8 (40683),
+            xt3312-yp-ezc2 (40684),
+            xt3312-yp-ezc5 (40685),
+            xt3312-yp-ezc6 (40686),
+            xt3312-yp-ezc8 (40687),
+
+            xt3312-ybi-ezc2  (40688),
+            xt3312-ybi-ezc5  (40689),
+            xt3312-ybi-ezc6  (40690),
+            xt3312-ybi-ezc8  (40691),
+            xt3312-ypi-ezc2  (40692),
+            xt3312-ypi-ezc5  (40693),
+            xt3312-ypi-ezc6  (40694),
+            xt3312-ypi-ezc8  (40695),
+
+            xt3312-ybt-ezc2  (40696),
+            xt3312-ybt-ezc5  (40697),
+            xt3312-ybt-ezc6  (40698),
+            xt3312-ybt-ezc8  (40699),
+
+            xts3303-ybt-ebc13 (40700),
+            xts3303-ybt-ebc14 (40701),
+            xts3306-ybt-eqc13 (40702),
+            xts3306-ybt-eqc14 (40703),
+            xts3309-ybt-eec13 (40704),
+            xts3309-ybt-eec14 (40705),
+            xts3312-ybt-esc13 (40706),
+            xts3312-ybt-esc14 (40707),
+            xts3312-ybt-ezc13 (40708),
+            xts3312-ybt-ezc14 (40709),
+            xts3312-yn-ezc15 (40710),
+
+            xt3312-yns-ezc8 (40751),
+
+            cx-100e-1200f-c1  (42002),
+            cx-100e-500f-1c1  (44002),
+
+            aofm-1200y-qc5 (45001),
+            aofm-1200y-qc6 (45002),
+            aofm-1200y-qc8 (45003),
+            aofm-1200y-ec5 (45004),
+            aofm-1200y-ec6 (45005),
+            aofm-1200y-ec8 (45006),
+            aofm-1200y-sc5 (45007),
+            aofm-1200y-sc6 (45008),
+            aofm-1200y-sc8 (45009),
+            aofm-1200y-zc5 (45010),
+            aofm-1200y-zc6 (45011),
+            aofm-1200y-zc8 (45012),
+            aofm-1200y-dc5 (45013),
+            aofm-1200y-dc6 (45014),
+            aofm-1200y-dc8 (45015),
+
+            aofm-1200yb-qc5 (45016),
+            aofm-1200yb-qc6 (45017),
+            aofm-1200yb-qc8 (45018),
+            aofm-1200yb-ec5 (45019),
+            aofm-1200yb-ec6 (45020),
+            aofm-1200yb-ec8 (45021),
+            aofm-1200yb-sc5 (45022),
+            aofm-1200yb-sc6 (45023),
+            aofm-1200yb-sc8 (45024),
+            aofm-1200yb-zc5 (45025),
+            aofm-1200yb-zc6 (45026),
+            aofm-1200yb-zc8 (45027),
+            aofm-1200yb-dc5 (45028),
+            aofm-1200yb-dc6 (45029),
+            aofm-1200yb-dc8 (45030),
+
+            aofm-1200yp-qc5  (45031),
+            aofm-1200yp-qc6  (45032),
+            aofm-1200yp-qc8  (45033),
+            aofm-1200yp-ec5  (45034),
+            aofm-1200yp-ec6  (45035),
+            aofm-1200yp-ec8  (45036),
+            aofm-1200yp-sc5  (45037),
+            aofm-1200yp-sc6  (45038),
+            aofm-1200yp-sc8  (45039),
+            aofm-1200yp-zc5  (45040),
+            aofm-1200yp-zc6  (45041),
+            aofm-1200yp-zc8  (45042),
+            aofm-1200yp-dc5  (45043),
+            aofm-1200yp-dc6  (45044),
+            aofm-1200yp-dc8  (45045),
+
+            aofx-1200y-qc5 (45046),
+            aofx-1200y-qc6 (45047),
+            aofx-1200y-qc8 (45048),
+            aofx-1200y-ec5 (45049),
+            aofx-1200y-ec6 (45050),
+            aofx-1200y-ec8 (45051),
+            aofx-1200y-sc5 (45052),
+            aofx-1200y-sc6 (45053),
+            aofx-1200y-sc8 (45054),
+            aofx-1200y-zc5 (45055),
+            aofx-1200y-zc6 (45056),
+            aofx-1200y-zc8 (45057),
+            aofx-1200y-dc5 (45058),
+            aofx-1200y-dc6 (45059),
+            aofx-1200y-dc8 (45060),
+
+            aofx-1200yb-qc5 (45061),
+            aofx-1200yb-qc6 (45062),
+            aofx-1200yb-qc8 (45063),
+            aofx-1200yb-ec5 (45064),
+            aofx-1200yb-ec6 (45065),
+            aofx-1200yb-ec8 (45066),
+            aofx-1200yb-sc5 (45067),
+            aofx-1200yb-sc6 (45068),
+            aofx-1200yb-sc8 (45069),
+            aofx-1200yb-zc5 (45070),
+            aofx-1200yb-zc6 (45071),
+            aofx-1200yb-zc8 (45072),
+            aofx-1200yb-dc5 (45073),
+            aofx-1200yb-dc6 (45074),
+            aofx-1200yb-dc8 (45075),
+
+            aofx-1200yp-qc5  (45076),
+            aofx-1200yp-qc6  (45077),
+            aofx-1200yp-qc8  (45078),
+            aofx-1200yp-ec5  (45079),
+            aofx-1200yp-ec6  (45080),
+            aofx-1200yp-ec8  (45081),
+            aofx-1200yp-sc5  (45082),
+            aofx-1200yp-sc6  (45083),
+            aofx-1200yp-sc8  (45084),
+            aofx-1200yp-zc5  (45085),
+            aofx-1200yp-zc6  (45086),
+            aofx-1200yp-zc8  (45087),
+            aofx-1200yp-dc5  (45088),
+            aofx-1200yp-dc6  (45089),
+            aofx-1200yp-dc8  (45090),
+
+			sofm-1200y-zc13 (45091),
+			sofm-1200y-bc13 (45092),
+			sofm-1200y-tc13 (45093),
+			sofm-1200y-qc13 (45094),
+			sofm-1200y-ec13 (45095),
+			sofm-1200y-sc13 (45096),
+			sofm-1200y-zc14 (45097),
+			sofm-1200y-bc14 (45098),
+			sofm-1200y-tc14 (45099),
+			sofm-1200y-qc14 (45100),
+			sofm-1200y-ec14 (45101),
+			sofm-1200y-sc14 (45102),
+
+			sofm-1200yb-zc13 (45103),
+			sofm-1200yb-bc13 (45104),
+			sofm-1200yb-tc13 (45105),
+			sofm-1200yb-qc13 (45106),
+			sofm-1200yb-ec13 (45107),
+			sofm-1200yb-sc13 (45108),
+			sofm-1200yb-zc14 (45109),
+			sofm-1200yb-bc14 (45110),
+			sofm-1200yb-tc14 (45111),
+			sofm-1200yb-qc14 (45112),
+			sofm-1200yb-ec14 (45113),
+			sofm-1200yb-sc14 (45114),
+
+			sofm-1200yp-zc13 (45115),
+			sofm-1200yp-bc13 (45116),
+			sofm-1200yp-tc13 (45117),
+			sofm-1200yp-qc13 (45118),
+			sofm-1200yp-ec13 (45119),
+			sofm-1200yp-sc13 (45120),
+			sofm-1200yp-zc14 (45121),
+			sofm-1200yp-bc14 (45122),
+			sofm-1200yp-tc14 (45123),
+			sofm-1200yp-qc14 (45124),
+			sofm-1200yp-ec14 (45125),
+			sofm-1200yp-sc14 (45126),
+
+			sofx-1200y-zc13  (45127),
+			sofx-1200y-bc13  (45128),
+			sofx-1200y-tc13  (45129),
+			sofx-1200y-qc13  (45130),
+			sofx-1200y-ec13  (45131),
+			sofx-1200y-sc13  (45132),
+			sofx-1200y-zc14  (45133),
+			sofx-1200y-bc14  (45134),
+			sofx-1200y-tc14  (45135),
+			sofx-1200y-qc14  (45136),
+			sofx-1200y-ec14  (45137),
+			sofx-1200y-sc14  (45138),
+
+			sofx-1200yb-zc13 (45139),
+			sofx-1200yb-bc13 (45140),
+			sofx-1200yb-tc13 (45141),
+			sofx-1200yb-qc13 (45142),
+			sofx-1200yb-ec13 (45143),
+			sofx-1200yb-sc13 (45144),
+			sofx-1200yb-zc14 (45145),
+			sofx-1200yb-bc14 (45146),
+			sofx-1200yb-tc14 (45147),
+			sofx-1200yb-qc14 (45148),
+			sofx-1200yb-ec14 (45149),
+			sofx-1200yb-sc14 (45150),
+
+			sofx-1200yp-zc13 (45151),
+			sofx-1200yp-bc13 (45152),
+			sofx-1200yp-tc13 (45153),
+			sofx-1200yp-qc13 (45154),
+			sofx-1200yp-ec13 (45155),
+			sofx-1200yp-sc13 (45156),
+			sofx-1200yp-zc14 (45157),
+			sofx-1200yp-bc14 (45158),
+			sofx-1200yp-tc14 (45159),
+			sofx-1200yp-qc14 (45160),
+			sofx-1200yp-ec14 (45161),
+			sofx-1200yp-sc14 (45162),
+
+            -- oxm2), otm1200 and aofx1200 frus
+            aofx-1200 (45402),
+            aofx-1200-x10 (45403),
+            aofx-1200-x4 (45404),
+            otm-1200 (45502),
+            oxm2 (46002),
+            oxm2-x10 (46003),
+            oxm2-x4 (46004),
+
+            -- licensable warm olm pon types(hdfec family.
+            olm-500p (46050),
+            aolm-500p-t4-1-c5 (46051),
+            aolm-500p-t4-3-c5 (46052),
+            aolm-500p-t4-5-c5 (46053),
+            aolm-500p-t4-7-c5 (46054),
+            aolm-500p-t4-1-c6 (46055),
+            aolm-500p-t4-3-c6 (46056),
+            aolm-500p-t4-5-c6 (46057),
+            aolm-500p-t4-7-c6 (46058),
+
+            olx-500p (46059),
+            aolx-500p-t4-1-c5 (46060),
+            aolx-500p-t4-3-c5 (46061),
+            aolx-500p-t4-5-c5 (46062),
+            aolx-500p-t4-7-c5 (46063),
+            aolx-500p-t4-1-c6 (46064),
+            aolx-500p-t4-3-c6 (46065),
+            aolx-500p-t4-5-c6 (46066),
+            aolx-500p-t4-7-c6 (46067),
+
+            -- licensable warm olm pon types(sdfec family.
+            olm2-500p (46100),
+            aolm2-500p-t4-1-c5 (46101),
+            aolm2-500p-t4-3-c5 (46102),
+            aolm2-500p-t4-5-c5 (46103),
+            aolm2-500p-t4-7-c5 (46104),
+            aolm2-500p-t4-1-c6 (46105),
+            aolm2-500p-t4-3-c6 (46106),
+            aolm2-500p-t4-5-c6 (46107),
+            aolm2-500p-t4-7-c6 (46108),
+            aolm2-500p-t4-1-c8 (46109),
+            aolm2-500p-t4-3-c8 (46110),
+            aolm2-500p-t4-5-c8 (46111),
+            aolm2-500p-t4-7-c8 (46112),
+
+            solm2-500p-t4-1-c12 (46113),
+            solm2-500p-t4-3-c12 (46114),
+            solm2-500p-t4-5-c12 (46115),
+            solm2-500p-t4-7-c12 (46116),
+            solm2-500p-t4-1-c13 (46117),
+            solm2-500p-t4-3-c13 (46118),
+            solm2-500p-t4-5-c13 (46119),
+            solm2-500p-t4-7-c13 (46120),
+
+            olx2-500p (46121),
+            aolx2-500p-t4-1-c5 (46122),
+            aolx2-500p-t4-3-c5 (46123),
+            aolx2-500p-t4-5-c5 (46124),
+            aolx2-500p-t4-7-c5 (46125),
+            aolx2-500p-t4-1-c6 (46126),
+            aolx2-500p-t4-3-c6 (46127),
+            aolx2-500p-t4-5-c6 (46128),
+            aolx2-500p-t4-7-c6 (46129),
+            aolx2-500p-t4-1-c8 (46130),
+            aolx2-500p-t4-3-c8 (46131),
+            aolx2-500p-t4-5-c8 (46132),
+            aolx2-500p-t4-7-c8 (46133),
+
+            solx2-500p-t4-1-c12 (46134),
+            solx2-500p-t4-3-c12 (46135),
+            solx2-500p-t4-5-c12 (46136),
+            solx2-500p-t4-7-c12 (46137),
+            solx2-500p-t4-1-c13 (46138),
+            solx2-500p-t4-3-c13 (46139),
+            solx2-500p-t4-5-c13 (46140),
+            solx2-500p-t4-7-c13 (46141),
+
+            -- licensable warm olm pon types(flex channel lm sdfec family).
+            ofm-500p (46200),
+            aofm-500p-t4-1-c5 (46201),
+            aofm-500p-t4-5-c5 (46202),
+            aofm-500p-t4-9-c5 (46203),
+            aofm-500p-t4-13-c5 (46204),
+            aofm-500p-t4-17-c5 (46205),
+            aofm-500p-t4-1-c6 (46206),
+            aofm-500p-t4-5-c6 (46207),
+            aofm-500p-t4-9-c6 (46208),
+            aofm-500p-t4-13-c6 (46209),
+            aofm-500p-t4-17-c6 (46210),
+            aofm-500p-t4-1-c8 (46211),
+            aofm-500p-t4-5-c8 (46212),
+            aofm-500p-t4-9-c8 (46213),
+            aofm-500p-t4-13-c8 (46214),
+            aofm-500p-t4-17-c8 (46215),
+
+            sofm-500p-t4-1-c12 (46216),
+            sofm-500p-t4-5-c12 (46217),
+            sofm-500p-t4-9-c12 (46218),
+            sofm-500p-t4-13-c12 (46219),
+            sofm-500p-t4-17-c12 (46220),
+            sofm-500p-t4-1-c13 (46221),
+            sofm-500p-t4-5-c13 (46222),
+            sofm-500p-t4-9-c13 (46223),
+            sofm-500p-t4-13-c13 (46224),
+            sofm-500p-t4-17-c13 (46225),
+
+            ofx-500p (46226),
+            aofx-500p-t4-1-c5 (46227),
+            aofx-500p-t4-5-c5 (46228),
+            aofx-500p-t4-9-c5 (46229),
+            aofx-500p-t4-13-c5 (46230),
+            aofx-500p-t4-17-c5 (46231),
+            aofx-500p-t4-1-c6 (46232),
+            aofx-500p-t4-5-c6 (46233),
+            aofx-500p-t4-9-c6 (46234),
+            aofx-500p-t4-13-c6 (46235),
+            aofx-500p-t4-17-c6 (46236),
+            aofx-500p-t4-1-c8 (46237),
+            aofx-500p-t4-5-c8 (46238),
+            aofx-500p-t4-9-c8 (46239),
+            aofx-500p-t4-13-c8 (46240),
+            aofx-500p-t4-17-c8 (46241),
+
+            sofx-500p-t4-1-c12 (46242),
+            sofx-500p-t4-5-c12 (46243),
+            sofx-500p-t4-9-c12 (46244),
+            sofx-500p-t4-13-c12 (46245),
+            sofx-500p-t4-17-c12 (46246),
+            sofx-500p-t4-1-c13 (46247),
+            sofx-500p-t4-5-c13 (46248),
+            sofx-500p-t4-9-c13 (46249),
+            sofx-500p-t4-13-c13 (46250),
+            sofx-500p-t4-17-c13 (46251),
+            cls-t-ecxh1   (46252),
+            cls-t-ecxh2   (46253),
+            cls-t-spare-1 (46254),
+            cls-t-spare-2 (46255),
+            cls-pem-ac (46256),
+            cls-pem-dc (46257),
+            cls-fanmodule (46258),
+            fmp-c-8-4-lc-mpo-m6 (46259),
+            fmp-f250-19-2-lc-lc-m6 (46260),
+            fsp-e-9d-18mpo-m6 (46261),
+            unsupported16 (46262),
+            unsupported17 (46263),
+            fsp-s-4d-8mpo-m6 (46264),
+            unsupported18 (46265),
+            unsupported19 (46266),
+            fsp-c-1d-1mpo-4lc-m6 (46267),
+            lmm1h-2-m6 (46268),
+            clmm (46269),
+            rbm-1-m6 (46270),
+	    mdu40-50g-even-l (46271),
+	    mdu40-50g-odd-l (46272),
+	    custom-passive (46273),
+        fmp-c-6-1-lc-lc (46274)
+}
+
+
+ InfnFanSpeed ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Fan speed."
+    SYNTAX  INTEGER {
+        low (1),
+        mid (2),
+        high (3),
+	unknown (4)
+    }
+
+
+InfnFiberType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+        unknown(1),
+        smf(2),
+        eLeaf(3),
+        trueWaveReducedSlope(4),
+        trueWaveClassic(5),
+        ls(6),
+        dsf(7),
+        pre1993SMF(8),
+        originalLEAF(9),
+        trueWavePlus(10),
+        metroCore(11),
+        allwave(12),
+        silicaCoreFiber(13),
+        terraLight(14),
+        fiberPatch(15),
+        smfull(16),
+        smfultra(17)
+    }
+
+InfnJ0MessageCompliance ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"J0 Message Compliance."
+	SYNTAX  INTEGER {
+		gr253r3 (1),
+		ansiItu (2)
+	}
+
+
+InfnJ0TraceMode ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"J0 Trace Mode."
+	SYNTAX  INTEGER {
+		transparent (1),
+		overwrite (2)
+	}
+
+
+InfnLoopbackType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents the loop back types."
+    SYNTAX  INTEGER {
+        none (1),
+        terminal (2),
+        facility (3)
+    }
+
+
+-- The following are the textual conventions used for the managed object type
+-- These managed object types are used in many management applications such as to report
+-- the alarms and PMs, to retrive details of a specifc managed object etc.
+
+InfnManagedObjectType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents all the MO types used by the Infinera Network Elements"
+        SYNTAX  INTEGER {
+            acci (1),
+            acco (2),
+            alarm (3),
+            alarmSap (4),
+            association (5),
+            bandCtp (6),
+            bandPtp (7),
+            bmm (8),
+            bmmOcgPtp (9),
+            channelCtp (10),
+            chassis (11),
+            configTimerAlarm (12),
+            ctrlLink (13),
+            dbControl (14),
+            dcfPtp (15),
+            dchCtp (16),
+            dlm (17),
+            dlmOcgPtp (18),
+            dtpCtp (19),
+            digitalSncp1Port (20),
+            fan (21),
+            fanShelf (22),
+            gam (23),
+            gamOcgPtp (24),
+            gigeClientCtp (25),
+            gre (26),
+            groupTp (27),
+            interopCpNeighbor (28),
+            interopCpTeInterface (29),
+            ioShelf (30),
+            internalLink (31),
+            lbandPtp (32),
+            localSnc (33),
+            localSubSnc (34),
+            mcm (35),
+            me (36),
+            nctGigE (37),
+            ntpd (38),
+            oam (39),
+            omm (40),
+            oscCtp (41),
+            osctCtp (42),
+            otsPtp (43),
+            owCtp (44),
+            owm (45),
+            pem (46),
+            radiusAuthServer (47),
+            ram (48),
+            remoteSnc (49),
+            remoteSubSnc (50),
+            resourceOwner (51),
+            sdhClientCtp (52),
+            securityProfile (53),
+            session (54),
+            slot (55),
+            sonetClientCtp (56),
+            staticRoute (57),
+            subClient (58),
+            swControl (59),
+            tam (60),
+            tom (61),
+            tribPtp (62),
+            tribPtpYcablePg (63),
+            teLink (64),
+            topoNode (65),
+            user (66),
+            vcCtp (67),
+            vcg (68),
+            xcon (69),
+            xfr (70),
+            xlm (71),
+            tem (72),
+            snmpCommunity (73),
+            snmpAccessList (74),
+            snmpConfig (75),
+            snmpTrapConfig (76),
+            dse (77),
+            dsePtp (78),
+            gmplsControlChannel (79),
+            orm (80),
+            osaPtp (81),
+            snmpCommunityTable (82),
+            snmpNotifyFP (83),
+            snmpNotifyFilter (84),
+            snmpNotify (85),
+            snmpProxy (86),
+            snmpTargetAddr (87),
+            snmpTargetParams (88),
+            snmpUsm (89),
+            snmpV3AdminUser (90),
+            snmpV3Config (91),
+            snmpVacmAccess (92),
+            snmpVacmContext (93),
+            snmpVacmSecToGroup (94),
+            snmpVacmVTFamily (95),
+            teEndPoint (96),
+            teInterface (97),
+            oduClientCtp (98),
+            oduktClientCtp (99),
+            fcClientCtp (100),
+            remoteNe (101),
+            scm (102),
+            cmm (103),
+            cmmOcgPtp (104),
+            cmmOchPtp (105),
+            lmOchPtp (106),
+            idlerPtp (107),
+            idlerChannelCtp (108),
+            olm  (109),
+            otm  (110),
+            tim  (111),
+            tsm  (112),
+            xcm   (113),
+            xm    (114),
+            odukiCtp(115),
+            otukiCtp(116),
+            gfpClientCtp (117),
+            ochCtp(118),
+            lmOcgPtp (119),
+            oduKtiCtp(120),
+            feedPtp(121),
+            olx(122),
+            ---------------------------
+            imm(124),
+            iam(125),
+            irm(126),
+            frm(127),
+            ofx(129),
+            igcc(130),
+            oel(131),
+            fsp(132),
+            carrierCtp(133),
+            fmmScgPtp(138),
+            frmScgPtp(139),
+            fsmScgPtp(140),
+            otdmOtdrPtp(141),
+            ampOtdrPtp(142),
+            fmm(144),
+            fsm(145),
+--            ofm(146),
+            fse(147),
+            schctp(148),
+            basescgptp(149),
+            expnscgptp(150),
+            ofxscgptp(151),
+            fmpscgptp(152),
+            lmm(153),
+            lmmPtp(154),
+            xcmh(155),
+            otxm(156),
+            cypg(157),
+            ------------------------------
+            -- additinal ATN table types
+            amm (200),
+            ofm (201),
+            sim (202),
+            pcm (203),
+            atnOcgPtp (204),
+            clitermcfg (205),
+            clrChClientCtp (206),
+            dcnPtp (207),
+            fiberPatch (208),
+            hostAccess (209),
+            ncPtp (210),
+            oscPtp (211),
+            otuClientCtp (212),
+            stpConfig (213),
+            aam (214),
+            opsw (215),
+            adaptLink (216),
+            osncPg (217),
+            nmSnc (218),
+            euni (219),
+            bandwidthProfile (220),
+            vlanPortMapping (221),
+            evc (222),
+            ntpAuthKey (223),
+            ipAccessList (224),
+
+            ---Cloud xp
+            xmm(225),
+            ocgPtp(226),
+			otdm-4d(227),
+			pxm (228),
+			gfPtp (229),
+            lldpRemoteSystem(230),
+            fmmC(231),
+            fmmCScgPtp    (232),
+			fmmf250     (233),
+			fmmfScgptp    (234),
+			ofix    (235),
+			ofim    (236),
+			opsm    (237),
+			opsmPtp    (238),
+			rbp    (239),
+			bpp    (240),
+			mpc    (241),
+			rbpPtp    (242),
+			bppPtp    (243),
+            pw (244),
+            ac (245),
+            ethintf (246),
+            nwintf (247),
+            md (248),
+            ma (249),
+            mep (250),
+            rmep (251),
+            osnc (252),
+	        flexCarrierCtp    (254),
+            xtim        (255),
+            xtmm        (256),
+            fbm         (257),
+            fbmScgPtp   (258),
+            xtScgPtp (259),
+            cxScgPtp (260),
+            ikePeer (261),
+            localCertificate (262),
+            peerCertificate (263),
+            secureEntity (264),
+            secureChannel (265),
+            secyCtrl (266),
+            oldpSch (267),
+            digitalWrapperCtp (268),
+            asem (269),
+            cwm (270),
+            mfm (271),
+            expnPtp (272),
+            asePtp (273),
+            passiveEqpt (274),
+            passivePtp (275),
+            ocm (276),
+            otdr (277),
+            edfa (278),
+            port (279),
+            clmm (280),
+            erbiumCoil (281),
+            voa (282),
+            pump (283),
+            ffp (284),
+            mxp         (285),
+            mxpScgPtp   (286),
+            syslog (287),
+            ntpServer (288),
+            lom (289),
+            otdrPort (290),
+            baseBoard (291),
+            acf (292),
+            schThresholdProfile (293),
+            ntpKey      (294),
+            krpTable    (295),
+            csts        (296),
+            keyRing     (297),
+            key         (298),
+            ncc         (300),
+            opmSchCtp   (301),
+            digitalSNCP-1-port (302),
+            xosncpg (303),
+            smpg (304),
+            opticalSchPG (305),
+            ssh-authorized-keys (306)
+}
+
+
+InfnMonitoringMode ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		""
+	SYNTAX  INTEGER {
+		unused (1),
+		nim (2),
+		lim (3),
+		im (4)
+	}
+
+
+InfnOcgChannelMap ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX BITS {
+	ch1(0),
+	ch2(1),
+	ch3(2),
+	ch4(3),
+	ch5(4),
+	ch6(5),
+	ch7(6),
+	ch8(7),
+	ch9(8),
+	ch10(9)
+	}
+
+InfnOduSMQ ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+            none(1),
+            smqOc192(2),
+            smqStm64(3),
+            smq10Gbe(4),
+            smqOc48 (5),
+            smqStm16(6),
+            smqGfpf (7),
+            smqGfpp (8),
+            smqGfpt (9),
+            smqOdu3 (10),
+            smqOdu2 (11),
+            smqOdu1 (12),
+            smqOdu0 (13),
+            smqMuxDemux (14)
+    }
+
+InfnOperationalState ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"SysConstOb::enumOprState"
+	SYNTAX  INTEGER {
+		disabled (1),
+		enabled (2),
+		unknown (3)
+	}
+
+InfnALSAdminPolicy ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+        doNotBlock (1),
+        block (2)
+    }
+
+InfnEqualizationCtrlLoop ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+
+InfnConvergenceStatus::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+       notConverged (1),
+       converged (2)
+    }
+
+
+--InfnOpsQualifierList ::= TEXTUAL-CONVENTION
+--    STATUS     current
+--    DESCRIPTION
+--        "This textual convention represents the operational qualifiers that currently apply."
+--    SYNTAX  BITS {
+--        ancestorUnavailable (0),
+--        ancestorLocked (1),
+--        ancestorFaulted (2),
+--        ancestorSilenced (3),
+--        ancestorMaintenance (4),
+--        ains (5),
+--        dbUpload (6),
+--        equipmentNotPresent (7),
+--        equipmentMismatch (8),
+--        faulted (9),
+--        inTest (10),
+--        loopback (11),
+--        prbsMon (12),
+--        prbsGen (13),
+--        partiallyFaulted (14),
+--        supportingUnavailbale (15),
+--       supportingFaulted (16),
+--        supportingLocked (17),
+--        supportingSilenced (18),
+--       supportingMaintenance (19),
+--        softwareDownload (20),
+--        turnedOff (21),
+--        testSigMon (22),
+--        testSigGen (23),
+--        powerReset(24)
+--    }
+
+InfnTimReptMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Otu Tim Rept Mode."
+    SYNTAX   INTEGER  {
+        off ( 1 ) ,
+        sapi ( 2 ) ,
+        dapi ( 3 ) ,
+        sapiDapi ( 4 )
+    }
+
+
+InfnPhyConnDcnGwType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Phy Conn Dcn Gw Type."
+    SYNTAX   INTEGER  {
+        none ( 1 ) ,
+        primaryGw ( 2 ) ,
+        secondaryGw ( 3 )
+    }
+
+
+InfnSampleDuration ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		""
+	SYNTAX  INTEGER {
+		fifteenMinutes (1),
+		day (2)
+	}
+
+InfnServiceProvUsage ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Service Prov Usage."
+    SYNTAX   INTEGER  {
+        inUse ( 1 ) ,
+        notInUse ( 2 ) ,
+        unknown ( 3 )
+    }
+
+
+InfnServiceType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "The infinera supported payloads."
+        SYNTAX  INTEGER {
+            notSet (1),
+            bw10g (2),
+            bw2d5g (3),
+            oc48 (4),
+            oc192 (5),
+            bwtdm155 (6),
+            bwtdm622 (7),
+            stm16 (8),
+            stm64 (9),
+            ficon (10),
+            escon (11),
+            bw10Gbe (12),
+            oc3 (13),
+            oc12 (14),
+            stm1 (15),
+            stm4 (16),
+            bw10Gcc (17),
+            bw1Gbe (18),
+            bw2d5Gcc (19),
+            bw2d38Gcc (20),
+            bw1G (21),
+            bw2x1GbeChan (22),
+            bw40g (23),
+            stm256 (24),
+            stm256L1 (25),
+            stm256L2 (26),
+            stm256L3 (27),
+            stm256L4 (28),
+            oc768 (29),
+            oc768L1 (30),
+            oc768L2 (31),
+            oc768L3 (32),
+            oc768L4 (33),
+            bw4xoc192 (34),
+            bw4xstm64 (35),
+            bw10Gdtf (36),
+            bw1Gfc (37),
+            bw2Gfc (38),
+            bw4Gfc (39),
+            bw4Gcc (40),
+            bw8Gfc (41),
+            bw10Gfc (42),
+            otu1 (43),
+            otu2 (44),
+            otu1e (45),
+            otu2e (46),
+            odu1 (47),
+            odu1e(48),
+            odu2 (49),
+            odu2e (50),
+            dv6000 (51),
+            escon200Mcc (52),
+            ib2d5Gcc (53),
+            ib10Gcc (54),
+            hd1d485Gcc (55),
+            hd1d483Gcc (56),
+            sd270Mcc (57),
+            dvb270Mcc (58),
+            hdSdi3GPal (59),
+            hdSdi3GNtsc (60),
+            bw4Gig (61),
+            bw8Gig (62),
+            bw1d25g (63),
+            otu2f (64),
+            odu2f (65),
+            bwVideo270 (66),
+            bw4GFc1 (67),
+            bw4GFc2 (68),
+            bw1d25Gcc (69),
+            bw40Gbe (70),
+            bw100Gbe (71),
+            bw10d3Gcc (72),
+            bw100g (73),
+            bw40gbellane(74),
+            bw100gbellane(75),
+            bwOdui0(76),
+            bwOdui1(77),
+            bwOdui2(78),
+            bwOdui3(79),
+            bwOdui4(80),
+            bwOdui3plus(81),
+            bwOtui0(82),
+            bwOtui1(83),
+            bwOtui2(84),
+            bwOtui3(85),
+            bwOtui4(86),
+            bwOtui3plus(87),
+            bwOtu4(88),
+            bwOtu3(89),
+            bwOdu4(90),
+            bwOdu3(91),
+            bwOtu3e1(92),
+            bwOtu3e2(93),
+            bwOdu3e1(94),
+            bwOdu3e2(95),
+            bwOdu0(96),
+            bwOduFlex(97),
+            bwOduFlexI(98),
+            bwGfp(99),
+            bw11G1Cc(100),
+            bwOtu2v(101),
+            bwCcFlex(102),
+            bw1G0625Cc(103),
+            bw2G125Cc(104),
+            bwOc768demux(105),
+            bwStm256demux(106),
+            bwTransparent(107),
+            bw40gedemux(108),
+            bw100gedemux(109),
+            bwOdu1dtn(110),
+            bWOdu2dtn(111),
+            bWOdu1edtn(112),
+            bWOdu2edtn(113),
+            bW10X10gdemux(114),
+            bwOdu2i4v(115),
+            bwOdu2i10v(116),
+			bw10gbe  (117),
+			bw100gbe (118),
+			bwOtuAdapti (119),
+			bwOduAdapti (120)
+
+    }
+
+InfnServiceTypeList ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention for list of infinera supported payloads."
+    SYNTAX  INTEGER {
+        notSet (1),
+        bw10g (2),
+        bw2d5g (3),
+        oc48 (4),
+        oc192 (5),
+        bwtdm155 (6),
+        bwtdm622 (7),
+        stm16 (8),
+        stm64 (9),
+        ficon (10),
+        escon (11),
+        bw10Gbe (12),
+        oc3 (13),
+        oc12 (14),
+        stm1 (15),
+        stm4 (16),
+        bw10Gcc (17),
+        bw1Gbe (18),
+        bw2d5Gcc (19),
+        bw2d38Gcc (20),
+        bw1G (21),
+        bw2x1GbeChan (22),
+        bw40g (23),
+        stm256 (24),
+        stm256L1 (25),
+        stm256L2 (26),
+        stm256L3 (27),
+        stm256L4 (28),
+        oc768 (29),
+        oc768L1 (30),
+        oc768L2 (31),
+        oc768L3 (32),
+        oc768L4 (33),
+        bw4xoc192 (34),
+        bw4xstm64 (35),
+        bw10Gdtf (36),
+        bw1Gfc (37),
+        bw2Gfc (38),
+        bw4Gfc (39),
+        bw4Gcc (40),
+        bw8Gfc (41),
+        bw10Gfc (42),
+        otu1 (43),
+        otu2 (44),
+        otu1e (45),
+        otu2e (46),
+        odu1 (47),
+        odu1e(48),
+        odu2 (49),
+        odu2e (50),
+        dv6000 (51),
+        escon200Mcc (52),
+        ib2d5Gcc (53),
+        ib10Gcc (54),
+        hd1d485Gcc (55),
+        hd1d483Gcc (56),
+        sd270Mcc (57),
+        dvb270Mcc (58),
+        hdSdi3GPal (59),
+        hdSdi3GNtsc (60),
+        bw4g (61),
+        bw8g (62),
+        bw1d25g (63),
+        otu2f (64),
+        odu2f (65),
+	bwVideo270 (66),
+        bw4GFc1 (67),
+        bw4GFc2 (68),
+        bw1d25Gcc (69),
+        bw40Gbe (70),
+        bw100Gbe (71),
+        bw10dG3cc (72),
+        bw100g (73) ,
+	bw40gbellane(74),
+	bw100gbellane(75),
+	bwOdui0(76),
+        bwOdui1(77),
+        bwOdui2(78),
+        bwOdui3(79),
+        bwOdui4(80),
+        bwOdui3plus(81),
+        bwOtui0(82),
+        bwOtui1(83),
+        bwOtui2(84),
+        bwOtui3(85),
+        bwOtui4(86),
+        bwOtui3plus(87),
+        bwOtu4(88),
+        bwOtu3(89),
+        bwOdu4(90),
+        bwOdu3(91),
+        bwOtu3e1(92),
+        bwOtu3e2(93),
+        bwOdu3e1(94),
+        bwOdu3e2(95),
+        bwOdu0(96),
+        bwOduFlex(97),
+        bwOduFlexI(98),
+        bwGfp(99),
+        bw11G1Cc(100),
+        bwOtu2v(101),
+        bwCcFlex(102),
+        bw1G0625Cc(103),
+        bw2G125Cc(104),
+        otu2-odu2-oc192(65537),
+        otu2-odu2-stm64(65538),
+        otu2e-odu2e-10gbelan(65539),
+        otu1-odu1-oc48(65540),
+        otu1-odu1-stm16(65541),
+        otu1e-odu1e-10gbelan(65542),
+        otu2-odu2(65543),
+        otu2e-odu2e(65544),
+        otu1e-odu1e(65545),
+        otu2-odu2-odu1(65546),
+        otu2-odu2-odu0(65547),
+        otu2-odu2-odu1-odu0(65548),
+        otu4i-odu4i-odu3(65549),
+        otu4i-odu4i-odu3i(65550),
+        otu4i-odu4i-odu2(65551),
+        otu4i-odu4i-odu2i(65552),
+        otu4i-odu4i-odu1(65553),
+        otu4i-odu4i-odu1i(65554),
+        otu4i-odu4i-odu0(65555),
+        otu4i-odu4i-odu0i(65556),
+        otu4i-odu4i(65557),
+        otu4i-odu4i-odu2e(65558),
+        otu4i-odu4i-odu1e(65559),
+        otu4i-odu4i-odu3e1(65560),
+        otu4i-odu4i-odu3e2(65561),
+        otu3i-odu3i-odu2(65562),
+        otu3i-odu3i-odu2i(65563),
+        otu3i-odu3i-odu1(65564),
+        otu3i-odu3i-odu1i(65565),
+        otu3i-odu3i-odu0(65566),
+        otu3i-odu3i-odu0i(65567),
+        otu3i-odu3i(65568),
+        otu3i-odu3i-odu2e(65569),
+        otu3i-odu3i-odu1e(65570),
+        otu3-odu3(65571),
+        otu3e1-odu3e1(65572),
+        otu3e2-odu3e2(65573),
+        otu4-odu4(65574),
+        otu1-odu1(65575),
+        max(65576)
+    }
+
+
+InfnSimPayloadWrapperType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Sim Payload Wrapper."
+    SYNTAX  INTEGER {
+        otu ( 1 ) ,
+        dtf ( 2 ) ,
+        none ( 3 ) ,
+        unknown ( 4 )
+    }
+
+
+InfnStpForwardingState ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Stp Forwrding Type."
+    SYNTAX  INTEGER {
+        disabled ( 1 ) ,
+        blocking ( 2 ) ,
+        listening( 3 ) ,
+        learning ( 4 ) ,
+        undiscovered ( 5 ),
+        holding ( 6 ),
+        discarding ( 7 ),
+        forward ( 8 )
+    }
+
+
+InfnGigeMaxPacketLen ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Gige Max Packet Len."
+    SYNTAX  INTEGER {
+         standard1518 ( 1 ) ,
+         jumbo9216 ( 2 ) ,
+         extremeJumbo18742 ( 3 ) ,
+	 standard1522 (4),
+	 extremeJumbo16376 (5)
+    }
+
+InfnOtuFecModeType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Otu Fec Mode Type."
+    SYNTAX   INTEGER  {
+        disabled ( 1 ) ,
+        g709 ( 2 ) ,
+        enhanced ( 3 )
+    }
+
+InfnOtu ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Otu Tim Rept Mode."
+    SYNTAX   INTEGER  {
+        off ( 1 ) ,
+        dapi ( 2 ) ,
+        sapi ( 3 ) ,
+        dapiSapi ( 4 )
+    }
+
+InfnTcmList ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  BITS {
+    tcm1Fac(0),
+    tcm1Term(1),
+    tcm2Fac(2),
+    tcm2Term(3),
+    tcm3Fac(4),
+    tcm3Term(5),
+    tcm4Fac(6),
+    tcm4Term(7),
+    tcm5Fac(8),
+    tcm5Term(9),
+    tcm6Fac(10),
+    tcm6Term(11)
+    }
+
+
+InfnTestPattern ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+        disabled (1),
+        crpat (2),
+	cjtpat (3),
+	jspat (4),
+	jtspat (5),
+	prts1 (6),
+	prts2 (7),
+	sqwave (8),
+	prbs31 (9),
+	enabled (10)
+	}
+
+
+InfnTribDisableAction ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Encap Trib Disable Action. SONET/SDH/GBE "
+    SYNTAX   INTEGER  {
+        unknown      ( 1 ),
+        turnOffLaser ( 2 ),
+        sendAISL     ( 3 ),
+        sendIDLE     ( 4 ),
+        none         ( 5 ),
+        disableTransmitter (6),
+        sendNOS      ( 7 ),
+        sendAllZero  ( 8 ),
+        sendLF       ( 9 ),
+        sendFaultCode( 10 ),
+        doNothing    ( 11 ),
+        sendOduAis   ( 12 )
+    }
+
+
+InfnInterFrameGap ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"Inter Frame Gap."
+	SYNTAX  INTEGER {
+		interframegap-10 (10),
+		interframegap-12 (12)
+	}
+
+InfnValidityBitmap ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+		"Indicates validity of PM parameters. Bit positions indicate validity scenario. More than one bit can be set, to indicate multiple parameter validity."
+	SYNTAX  BITS {
+		all (0),
+		fec (1),
+		rxOtu (2),
+		txOtu (3),
+		prbs (4)
+	}
+
+InfnDirectionality  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+            receive(1),
+            transmit(2),
+            bidirectional(3)
+        }
+
+InfnInterfaceType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+            optical(1),
+            electrical(2)
+        }
+
+InfnMaxChRatePlan  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+            unknown(1),
+            rate10g(2),
+            rate40gAligned (3),
+            rate40gInterleaved (4),
+            rate40gDualCarrier (5)
+        }
+
+InfnWaveInterfaceType  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+            infineraWave(1),
+            openWave(2),
+            aseidler (3),
+			manualmode2 (4),
+			manualmode1 (5),
+            slteManual  (6),
+            passive     (7)
+        }
+
+InfnModulationRate  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+            rate20G(1),
+            rate40g(2)
+        }
+
+InfnModulationCategory  ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        ""
+    SYNTAX  INTEGER {
+            notset(1),
+            baud11g(2),
+            baud11grz (3),
+            baud14g (4),
+            baud23g (5),
+            baud23grz (6),
+            baud30g (7),
+            baud43gOok50gFiltered (8),
+            gbaud43gDpsk50gFiltered (9),
+            gbaud43gOokUnFiltered (10),
+            gbaud43gDpskUnFiltered (11),
+            baud14gDc25g(12),
+            baud14gDc20g(13),
+            baud16g (14),
+            baud16gBaudDc25 (15),
+            baud17GDac (16),
+            baud17GDac12GOffset (17),
+            baud22GDac (18),
+            baud22GDac12GOffset (19),
+            baud33GDac (20),
+            baud33GDac12GOffset (21),
+            notApplicable (256)
+        }
+
+InfnL2CPProcessUniMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        ""
+    SYNTAX INTEGER {
+        discard (2),
+        passToEvc (3)
+    }
+
+InfnL2CPProcessEvcMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        ""
+    SYNTAX INTEGER {
+        discard (1),
+        tunnel (2)
+    }
+
+InfnEuniSpeed ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+       "Ethernet User Network Interface speed"
+    SYNTAX INTEGER{
+        speed1gbps (1)
+    }
+
+InfnEuniMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+      "Ethernet User Network Interface Mode"
+    SYNTAX INTEGER {
+       fullDuplex (1)
+    }
+
+InfnbandwidthProfileColorMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+      "Bandwidth profile color mode"
+    SYNTAX INTEGER {
+       color-aware (1),
+       color-blind (2)
+    }
+
+InfnEvcType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+      "Ethernet Virtual Connection Type"
+    SYNTAX INTEGER {
+       point-to-point (1),
+       point-to-multipoint (2)
+    }
+
+InfnEvcDeliveryMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+      "Ethernet Virtual Connection frame delivery mode"
+    SYNTAX INTEGER {
+       deliver-unconditionally (1),
+       deliver-conditionally (2)
+    }
+
+InfnUniPhysicalMedium ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+      "Ethernet Uni Physical Medium"
+    SYNTAX INTEGER {
+        none (1),
+	    base1000sx (2),
+		base1000lx (3),
+		base1000zx (4),
+		base1000t (5),
+		mr-25g-ir1 (6),
+		mr-25g-sr1 (7),
+		ir-25g (8),
+		lr2-25g (9)
+    }
+
+ InfnOxmCardRedundancyStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+        none (1),
+	    active (2),
+	    standby (3)
+    }
+
+
+ InfnOxmEccStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+     SYNTAX INTEGER {
+        eccNone (1),
+	    eccActive  (2)
+    }
+
+ InfnChassisSwitchingMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+		none (1),
+        switch (2),
+        transport (3),
+        bypass(4),
+        switchExtension(5)
+    }
+
+ InfnOtuBitRateK ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+		otu3i (1),
+        otu4i (2),
+        otu3iplus (3),
+        otuAdapti25g (4),
+		otuAdapti37g5 (5),
+		otuAdapti50g (6),
+		otuAdapti75g (7),
+		otuAdapti100g (8),
+		otuAdapti112g5 (9),
+		otuAdapti125g (10),
+		otuAdapti150g (11),
+		otuAdapti175g (12),
+		otuAdapti187g5 (13),
+		otuAdapti200g (14),
+		otuAdapti225g (15),
+		otuAdapti250g (16),
+		otuAdapti262g5 (17),
+		otuAdapti300g (18),
+		otuAdapti337g5 (19),
+		otuAdapti350g (20),
+		otuAdapti375g (21),
+		otuAdapti400g (22),
+		otuAdapti450g (23),
+		otuAdapti500g (24),
+        otuAdapti600g (25),
+        otuAdapti750g (26),
+        otuAdapti800g (27),
+        otuAdapti900g (28),
+        otuAdapti1000g (29),
+        otuAdapti1200g (30),
+        otuAdapti1500g (31),
+        otuAdapti1800g (32),
+        otuAdapti2000g (33),
+        otuAdapti2400g (34),
+        otuAdapti275g (35),
+        otuAdapti525g (36),
+        otuAdapti550g (37),
+        otuAdapti675g (38),
+        otuAdapti700g (39),
+        otuAdapti825g (40),
+        otuAdapti1050g (41),
+        otuAdapti1100g (42),
+        otuAdapti1350g (43),
+        otuAdapti1400g (44),
+        otuAdapti1600g (45),
+        otuAdapti1650g (46),
+        otuAdapti2200g (47),
+        na (48)
+
+	}
+
+ InfnNctType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+		copper(1),
+		fiber (2)
+    }
+
+InfnSlteOpMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+		nativeAutomated(1),
+		slteMode1 (2)
+    }
+
+ InfnChannelPlan ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+        unKnown (1),
+		odd (2),
+		even(3),
+		oneToOne(4),
+		all(5)
+	}
+
+InfnOcgType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER {
+        unKnown(1),
+		type1(2),
+		type2 (3)
+		}
+
+InfnAutoTunable ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	enabled(1),
+	disabled(2)
+	}
+
+InfnOduServiceMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	  none (1),
+	  adaptation (2),
+	  networkWrapper (3),
+	  muxed (4),
+	  transport (5),
+	  switching (6)
+	 }
+
+InfnGFPPayloadFCS ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	  enable (1),
+	  disable (2)
+	  }
+
+InfnGFPState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	    hunt (1),
+	    presync (2),
+	    sync (3)
+	  }
+
+InfnGfpExtHdrTyp ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	    null (1),
+	    linear(2)
+	}
+
+InfnServiceMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	    none (1),
+		adaptation (2),
+		networkWrapper (3),
+		muxed (4),
+		transport (5),
+		switching (6)
+	}
+
+InfnSMQ  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	    none (1),
+        smqWithoutFecErrFwd (2),
+        smqWithFecErrFwd (3),
+        smqMuxDemux (4),
+        smqOC192 (5),
+        smqSTM64 (6),
+        smq10GBE (7),
+        smqOC48 (8),
+        smqSTM16 (9),
+        smqGFP (10),
+        smqODU4i (11),
+        smqODU4 (12),
+        smqODU3iPlus (13),
+        smqODU3i (14),
+        smqODU3 (15),
+        smqODU2e (16),
+        smqODU2 (17),
+        smqODU1e (18),
+        smqODU1 (19),
+        smqODU0 (20),
+        smqODU3e2(21),
+        smqODU3e1(22),
+		smqWithFecOam (23),
+		smqOc768  (24),
+		smqStm256 (25),
+		smqOduAdapti (26)
+	}
+
+InfnRate  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+	    rateNotSet(1),
+        rate10GigAny(2),
+        rate25GigAny(3),
+        rate1GigAny(4),
+        rate40GigAny (5) ,
+        rate100GigAny(6),
+        rateccFlexAny(7)
+	}
+
+InfnOpticalRate ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        rate1000G(1),
+        rate500G(2),
+        rate375G(3),
+        rate250G(4),
+        rate1875G(5),
+        rate175G(6),
+        rate100G(7),
+        rate50g(8),
+        rate75g(9),
+        rate150g(10),
+        rate200g(11),
+        rate300g(12),
+        rate400g(13),
+        rate450g(14),
+        rate600g(15),
+        rate800g(16),
+        rate900g(17),
+        rate1200g(18),
+        rate1500g(19),
+        rate1800g(20),
+        rate2000g(21),
+        rate2400g(22),
+        rate25g(23),
+        rate125g(24),
+        rate225g(25),
+        rate275g(26),
+        rate350g(27),
+        rate525g(28),
+        rate550g(29),
+        rate675g(30),
+        rate700g(31),
+        rate750g(32),
+        rate825g(33),
+        rate1050g(34),
+        rate1100g(35),
+        rate1350g(36),
+        rate1400g(37),
+        rate1600g(38),
+        rate1650g(39),
+        rate2200g(40)
+    }
+InfnXconType   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+        none(1),
+        unidirectionFrom(2),
+        unidirectionTo (3),
+        unidirectionToAndFrom(4),
+        bidirection(5),
+        bidirectionUnidirectionFrom(6),
+        bidirectionUnidirectionTo(7),
+        bidirectionUnidirectionToAndFrom(8)
+	}
+
+InfnTsgType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+        tsg1G25(1),
+        tsg2G5(2)
+	}
+
+InfnCarrierType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+        none(1),
+        single(2),
+	    dual(3),
+        all(4),
+        custom(5)
+	}
+
+InfnEncoding  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER{
+         none(1),
+         bc(2),
+         bdlopt(3),
+         bdetopt(4)
+	}
+
+InfnSuperChannelNumber  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX INTEGER{
+        schNone(1),
+        sch1(2),
+        sch2(3),
+        sch3(4),
+        sch4(5),
+        sch5(6),
+        sch6(7),
+        sch7(8),
+        sch8(9),
+        sch9(10),
+        sch10(11),
+        sch11(12),
+        sch12(13),
+        sch13(14),
+        sch14(15),
+        sch15(16),
+        sch16(17),
+        sch17(18),
+        sch18(19),
+        sch19(20),
+        sch20(21),
+        sch21(22),
+        sch22(23),
+        sch23(24),
+        sch24(25),
+        sch1SS(26),
+        sch2SS(27),
+        sch5SS(28),
+        sch6SS(29),
+        sch9SS(30),
+        sch10SS(31),
+        sch13SS(32),
+        sch14SS(33),
+        sch17SS(34),
+        sch1SSA(35),
+        sch1SSB(36),
+        sch2SSA(37),
+        sch2SSB(38),
+        sch5SSA(39),
+        sch5SSB(40),
+        sch6SSA(41),
+        sch6SSB(42),
+        sch9SSA(43),
+        sch9SSB(44),
+        sch10SSA(45),
+        sch10SSB(46),
+        sch13SSA(47),
+        sch13SSB(48),
+        sch14SSA(49),
+        sch14SSB(50),
+        sch17SSA(51),
+        sch17SSB(52),
+        schMax(53)
+    }
+
+InfnFrequencySlotPlanType   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX INTEGER {
+        freqSlotPlanNone(1),
+        freqSlotPlanCustom(2),
+        freqSlotPlanOcg50GHz1(3),
+        freqSlotPlanOcg50GHz2(4),
+        freqSlotPlan250GHz1(5),
+        freqSlotPlan375GHz1(6),
+        freqSlotPlan262FiveGHz1(7),
+        freqSlotPlan200GHz1(8),
+        freqSlotPlanAseIdler(9),
+        freqSlotPlan2x250GHz1(10),
+        freqSlotPlan50GHz1(11),
+        freqSlotPlanOcg2(12),
+        freqSlotPlanCustomSlte(13),
+        freqSlotPlanFlex(14),
+	freqSlotPlanOcg25GHz1(15),
+	freqSlotPlanOcg50GHz3(16),
+	freqSlotPlan210GHz1(17),
+        freqSlotPlanMax(18),
+	freqSlotPlan208GHz1(19)
+    }
+
+InfnChannelPlanType    ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        chPlanNone(1),
+        custom(2),
+        flexChPlan1(3),
+        flexChPlan2(4),
+        flexChPlan3(5),
+        flexChPlan4(6),
+        ocgChPlan1(7),
+        ocgChPlan2(8),
+        defaultChPlanAOFX(9),
+        flexChPlan5(10),
+        flexChPlan7(11),
+        ocgChPlan3(12),
+        chplanMax(13)
+    }
+
+InfnSpectrumType    ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        cs(1),
+        ss(2),
+        ssA(3),
+        ssB(4),
+        na(256)
+    }
+
+InfnFlashStatus         ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        good(1),
+        bad(2)
+    }
+
+InfnCDCompType         ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        automatic(1),
+        manual(2),
+        disable(3),
+        none(4),
+        unknown(5)
+    }
+
+InfnCDRange            ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        range1(1),
+        range2(2)
+    }
+
+InfnFFCRMode          ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        automatic(1),
+        manual(2),
+        none(3),
+        unknown(4)
+    }
+
+InfnPicStatus        ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        unknown(1),
+        init(2),
+        failed(3),
+        readyfordisc(4),
+        inautodisc(5),
+        active(6),
+        shutdown(7),
+        adtimeout(8),
+        powerramp(9),
+        waitingforad(10),
+        pwrramptmo(11)
+    }
+
+InfnLatencyMode          ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        unknown   (1),
+        low       (2),
+        medium    (3),
+        high      (4)
+}
+
+InfnNwLatencyMeasurementMode   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        disabled(1),
+        transparent(2),
+        initiator(3),
+        responder(4)
+    }
+
+InfnFPGAOperatingMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        none(1),
+        unknown(2),
+        odu4odl(3),
+        odu4odu2odu2e(4),
+        oduk(5),
+        odu4100geodu4i(6),
+        odu44i100ge(7),
+        odukoduj(8)
+    }
+
+
+InfnOAOperatingMode     ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        nativeAutomated(1),
+        slteMode1(2),
+        thirdPartyAmp(3),
+        static(4),
+        slteTLA(5),
+        aseSource(6),
+        aseGain(7),
+        tla (8),
+		none (9),
+		manual (10)
+    }
+
+InfnPortMappingMode     ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION ""
+    SYNTAX  INTEGER {
+        none (1),
+        bmp-gmp (2),
+        bmp-amp (3)
+    }
+
+InfnOperatingMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+	gen1 (1),
+	gen2 (2),
+	flex (3),
+    unknown (4)
+    }
+
+InfnOlosSoakTime ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX      INTEGER {
+        fast(1),
+        medium(2),
+        long(3)
+    }
+
+InfnALSDetectionMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX      INTEGER {
+        pilotTone(1),
+        oscCBand(2),
+	pilotToneNoOSC(3)
+    }
+
+InfnCorrelatedRedunStatus  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX     INTEGER {
+        none (1),
+        single (2),
+        active (3),
+        standby (4),
+        makeStandbyInProgress (5),
+        oos (6),
+        lock (7)
+    }
+
+InfnNeType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "System NE Types."
+    SYNTAX   INTEGER  {
+        don (1),
+        adm (2),
+        da (3),
+        dt (4),
+        ha (5),
+        oa (6),
+        dr (7),
+        ad (8),
+        atn (9),
+        ola (10),
+        roadm (11),
+        cloud-xp (12),
+        xt (13),
+        clst (14),
+        unknown (100)
+    }
+
+InfnXcmTimingSrcRedunState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+	none (1),
+	active (2),
+    standby (3)
+    }
+
+InfnOlmDefFlexLicModformat ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+     ""
+    SYNTAX INTEGER  {
+	unknown (1),
+	qpsk (2),
+    bpsk (3)
+    }
+
+InfnUpgradePrepStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX    INTEGER {
+        idle(1),
+        started(2),
+        cleanup(3)
+     }
+
+InfnSysArcBehaviour ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        clearAlarms (1),
+        leaveAlarms (2)
+    }
+
+InfnSysEnableAuxTosByteAlteration ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        disabled (1),
+        enabled (2)
+    }
+
+InfnSysTermLoopBackBehaviour ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        bridgeSignal (1),
+        turnOffLaser (2)
+    }
+
+
+InfnAutoDiscoveryState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        inProgress (1),
+        completed  (2),
+        unknown    (3),
+        notValid   (4),
+        failed     (5),
+        waitToStart (6),
+        associated  (7)
+    }
+
+InfnPowerControlLoop ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        disabled (1),
+        enabled  (2)
+    }
+
+InfnLineSystemMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+       modeOcg      (1),
+       modeOpenWave (2),
+       modeScg(3),
+       modeScgPassiveMux-1(4),
+       modeOpenAutomated (5),
+       modeOcgPassiveMux-1(6),
+       unknown(7)
+    }
+
+InfnPmHistStatsControl ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        enabled  (1),
+        disabled (2),
+        unknown (3)
+    }
+
+InfnOcgPortConfig ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        unknown  (1),
+        addDrop  (2),
+        express  (3),
+        manual   (4)
+    }
+
+InfnSignalType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        normal  (1),
+        manual  (2),
+        openAutomatedAddDrop  (3),
+        openAutomatedExpress  (4)
+    }
+
+InfnShutterState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        open    (1),
+        closed  (2),
+        closedDemux  (3),
+        closedMux  (4)
+    }
+
+InfnClientAction ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        sendaisl   (1),
+        sendlf     (2),
+        noreplace  (3),
+        genericais  (4),
+        sendnos    (5)
+    }
+
+InfnReporting ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        disabled (1),
+        enabled  (2),
+        unknown  (3)
+    }
+
+InfnEnetPswLaserCtrlState   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        turnLaserOff   (1),
+        keepLaserOn    (2),
+        unknown        (3)
+    }
+
+InfnAutoCableEqualization ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        enabled  (1),
+        disabled (2)
+    }
+
+InfnProtectionMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        none    (1),
+        ycable  (2),
+        stDsncp (3),
+        fastSmp (4)
+    }
+
+InfnCfgProtState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        unknown    (1),
+        wrk        (2),
+        prot       (3),
+        relb       (4),
+        pu         (5),
+        et         (6)
+    }
+
+InfnCurrProtState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        unknown    (1),
+        act        (2),
+        stby       (3),
+        relb       (4)
+    }
+
+InfnPsDirn ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        uni    (1)
+    }
+
+
+InfnSwitchReason ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        mSwP    (1),
+        mSwW    (2),
+        wLck    (3),
+        pLck    (4),
+        auto    (5),
+        none    (6),
+        revert  (7),
+        admLck  (8),
+        unProv  (9),
+        eqFlt   (10),
+        liFlt   (11),
+        liSF    (12),
+        clRxFlt (13),
+        clTxFlt (14),
+        sysLof  (15),
+        unknown (16)
+    }
+
+InfnSwitchRequestState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        none                        (1),
+        auto                        (2),
+        lockout                     (3),
+        autoLockout                 (4),
+        admLocked                   (5),
+        autoAdmLocked               (6),
+        lockoutAdmLocked            (7),
+        autoLockoutAdmLocked        (8),
+        wtr                         (9),
+        wtrAuto                     (10),
+        wtrLockout                  (11),
+        wtrLockoutAuto             (12),
+        wtrAdmLocked                (13),
+        wtrAdmLockedAuto            (14),
+        wtrAdmLockedLockout         (15),
+        wtrAdmLockedLockoutAuto     (16),
+        manual                      (17),
+        manualAuto                  (18),
+        manualLockout               (19),
+        manualLockoutAuto          (20),
+        manualAdmLocked             (21),
+        manualAdmLockedAuto         (22),
+        manualAdmLockedLockout      (23),
+        manualAdmLockedLockoutAuto  (24),
+        unknown                     (25)
+}
+
+InfnTribAction ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "Trib Action."
+    SYNTAX   INTEGER  {
+        unknown      ( 1 ),
+        turnOffLaser ( 2 ),
+        sendAISL     ( 3 ),
+        sendIDLE     ( 4 ),
+        none         ( 5 ),
+        disableTransmitter (6),
+        sendNOS      ( 7 ),
+        sendAllZero  ( 8 ),
+        sendLF       ( 9 ),
+        sendFaultCode( 10 ),
+        doNothing    ( 11 ),
+        sendRF       ( 12 ),
+        sendAISGeneric ( 13 )
+    }
+
+InfnUsageState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        eligible    ( 1 ),
+        nonEligible ( 2 ),
+        nonOperational ( 3 )
+    }
+
+InfnTxDisableActionOnAdminLock  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        laserOn     ( 1 ),
+        laserOff    ( 2 ),
+        unknown     ( 3 )
+    }
+
+InfnXYAlignment ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+       none         ( 1 ),
+       aligned      ( 2 ),
+       interleaved  ( 3 )
+    }
+
+InfnMeterActionRed  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        drop    (1)
+    }
+
+InfnSchedulerType   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        classBased  (1),
+        enhancedClassBased  (2)
+    }
+
+InfnNetworkMappingMode  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        oduFlexi        (1)
+    }
+
+InfnNetworkMapping  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        na              (1),
+        odu2            (2),
+        odu2-amp        (3),
+        odu2-bmp        (4),
+        odu1e           (5),
+        odu2e           (6),
+        odu2i           (7),
+        odu2i-4v        (8),
+        odu3i           (9),
+        odu2-gfpp       (10),
+        odu2-gfpf       (11),
+        odu4i           (12),
+        odu2i-10v       (13),
+        oduFlexi        (14),
+        odu2-gfpo       (15),
+        odu2e-ttt       (16),
+        any             (17),
+        best            (18),
+        odu3-amp        (19),
+        odu3-bmp        (20),
+        odu0-ttt-gmp    (21),
+        odu1-amp        (22),
+        odu1-bmp        (23),
+        odu0-gmp        (24),
+        odu1-gmp        (25),
+        odu4            (26)
+    }
+
+
+InfnOtnOtuType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        otuKi(1),
+		otuCni(2),
+		none  (3)
+	}
+
+InfnEnforcementMode  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		unknown (1),
+		notEnforced (2),
+		enforced (3)
+	}
+
+InfnLicenseModulationType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		unknown (1),
+		qpsk (2),
+		bpsk (3),
+		pm3qam (4),
+		pm8qam (5),
+		pm16qam (6)
+}
+
+InfnSlotOperatingMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        unknown             (1),
+        standaloneWithOSC   (2),
+        pairedWithoutOSC    (3),
+        standaloneWithoutOSC(4)
+    }
+
+InfnAddDropCount ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        adc0    (1),
+        adc3    (4),
+        adc4    (5),
+        adc5    (6),
+        adc6    (7),
+        adc8    (9),
+        adc12   (13),
+        adc16   (17)
+    }
+
+InfnCBandOlosSoakTime ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        fast    (1),
+        medium  (2),
+        long    (3)
+    }
+
+InfnSpanLossRange ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        under25dB   (1),
+        over25dB    (2)
+    }
+
+InfnAdTpType    ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        unknown     (1),
+        lmOcgPtp    (2),
+        fmScgPtp    (3),
+        frmScgPtp   (4),
+        fsmScgPtp   (5),
+        fmpScgPtp   (6),
+        lmmPtp      (7),
+        otsPtp      (8),
+        gamOcgPtp   (9),
+        pxOcgPtp    (10),
+        fmmfScgPtp  (11),
+        opsmPtp     (12),
+	fmmcScgptp (13),
+	bmmOcgPtp (14),
+    bppPtp      (15),
+    rbpPtp      (16),
+    xtScgPtp    (17),
+        fbmScgPtp (18),
+        mfmAsePtp (19),
+        aseAsePtp (20),
+        mfmIdlerPtp (21),
+        cwmIdlerPtp (22),
+        expnPtp (23),
+        otdmOtdrPtp (24),
+        mfmOtsPtp (25),
+        proxyTp (26),
+        ampOtdrPtp (27),
+        bandPtp (28),
+	mxpScgPtp (29),
+	awgPassivePtp (30)
+    }
+
+InfnModulation ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+	""
+	SYNTAX  INTEGER {
+		pmQPSK(1),
+		pmBPSK(2),
+		pmEnhancedBPSK(3),
+		pm3QAM(4),
+		pm8QAM(5),
+		pm16QAM(6),
+                pmMEPSK(7),
+		pmNONE(101)
+}
+
+InfnPgSwitchingType  ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+	""
+	SYNTAX    INTEGER {
+		nonRevertive    (1),
+		revertive       (2)
+}
+
+InfnReachScope   ::= TEXTUAL-CONVENTION
+	STATUS      current
+	DESCRIPTION
+	""
+	SYNTAX    INTEGER {
+		local  (1),
+		reachable  (2),
+		unreachable  (3)
+}
+
+InfnOpsQualifierList ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "This textual convention represents the operational qualifiers that currently apply."
+    SYNTAX  INTEGER {
+        ancestorUnavailable (1),
+        ancestorLocked (2),
+        ancestorFaulted (3),
+        ancestorSilenced (4),
+        ancestorMaintenance (5),
+        ains (6),
+        dbUpload (7),
+        equipmentNotPresent (8),
+        equipmentMismatch (9),
+        faulted (10),
+        inTest (11),
+        loopback (12),
+        prbsMon (13),
+        prbsGen (14),
+        partiallyFaulted (15),
+        supportingUnavailbale (16),
+        supportingFaulted (17),
+        supportingLocked (18),
+        supportingSilenced (19),
+        supportingMaintenance (20),
+        softwareDownload (21),
+        turnedOff (22),
+        testSigMon (23),
+        testSigGen (24),
+        powerReset(25)
+    }
+
+InfnOTSGainType  ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+    "This textual convention represents the OTS gain type."
+	SYNTAX  INTEGER {
+		unknown  (1),
+		fixed  (2),
+		variable (3)
+	}
+
+InfnMidStageAccess  ::=TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION
+	"This textual convention represents the Mid stage access state."
+	SYNTAX  INTEGER {
+        unknown   (1),
+        enabled  (2),
+        disabled  (3)
+}
+
+InfnOASlotOperatingMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        singleSlotWithOSC  (1),
+        singleSlotWithoutOSC(2),
+		dualSlotWithOSC  (3),
+		dualSlotWithoutOSC  (4)
+    }
+
+InfnALSDisableMode  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		timerBased(1),
+		permament(2),
+		notApplicable(3)
+}
+
+InfnOtdrTestExecutionType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		 manual  (1),
+         scheduled  (2)
+}
+
+InfnOtdrTestAcquisitionMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		automatic (1),
+		manual (2)
+}
+
+InfnOtdrPtpConnState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		notVerified (1),
+		valid (2),
+		invalid (3)
+}
+
+InfnOtdrTestPulseWidth ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		ns-5  (1),
+		ns-10 (2),
+		ns-30 (3),
+		ns-100 (4),
+		ns-300 (5),
+		us-1 (6),
+		us-3 (7),
+		us-10 (8),
+		us-20  (9)
+}
+
+InfnOtdrFileUploadStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		notAttempted (1),
+		notScheduled (2),
+		scheduled (3),
+		inProgress (4),
+		uploaded (5),
+		failed (6)
+}
+
+InfnX509Version ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "enumInfnX509Version"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        v1              (2),
+        v2              (3),
+        v3              (4)
+}
+
+InfnFecEncodingMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		sd-fec1 (1),
+		sd-fec2 (2),
+		sd-fec3 (3),
+		hd-fec (4)
+}
+
+InfnMigrationStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		disabled (1),
+		disableInProgress (2),
+		enableInProgress (3),
+		enabled (4)
+}
+
+InfnMacFlapAction       ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        none                (1),
+        alarmNoAction       (2),
+        alarmDisableIntf    (3)
+}
+
+InfnFlushFdbType       ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        none                (1),
+        flushAllFdbByPort   (2),
+        flushAllFdbByVsi    (3),
+        flushAllFdb         (4)
+}
+
+InfnMepRole       ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        faultMonitoring         (1),
+        performanceMonitoring   (2)
+}
+
+InfnIsEnabled   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        false            (1),
+        true             (2)
+}
+
+InfnMepDirection   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        unknown          (1),
+        mepdown          (2),
+        mepup            (3)
+}
+
+InfnAISInterval   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        interval1sec    (1),
+        interval1min    (2)
+}
+
+InfnPortStatusTLV   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        noStatusTlv      (1),
+        blocked          (2),
+        up               (3)
+}
+
+InfnInterfaceStatusTLV   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        noStatusTlv      (1),
+        up               (2),
+        down             (3),
+        testing          (4),
+        unknown          (5),
+        dormant          (6),
+        notPresent       (7),
+        lowerLayerDown   (8)
+}
+
+InfnCFMAction   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        notifyDefect                    (1),
+        notifyDefectAndBlockDataFrames  (2)
+}
+
+InfnLowestPriDef   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        allDef           (1),
+        macRemErrXcon    (2),
+        remErrXcon       (3),
+        errXcon          (4),
+        xcon             (5),
+        noXcon           (6)
+}
+
+InfnPxmIntfProtocolType ::=TEXTUAL-CONVENTION
+	STATUS  current
+    DESCRIPTION
+    "PXM related enum entries"
+    SYNTAX      INTEGER {
+        mplsTp (1)
+}
+
+InfnIngressMatchCriteria ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM related enum entries"
+    SYNTAX      INTEGER {
+		none                 (1),
+		matchIntf            (2),
+		matchIntfOuterVlan   (3),
+		matchIntfOuterVlanOuterPriority (4),
+		matchIntfOuterPriority (5),
+		matchIntfOuterVlanInnerVlan (6),
+		matchIntfOuterVlanOuterProrityInnerVlan(7)
+}
+
+InfnActionOnVlan ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+	"PXM related enum entries"
+	SYNTAX    INTEGER {
+         none    (1),
+         push    (2),
+         pop     (3),
+         swap    (4)
+}
+
+InfnEgressActionPriority ::=TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+	"PXM related enum entries"
+	SYNTAX   INTEGER {
+	     none                (1),
+         setViaEgressCosMap  (2),
+         propagateFromInner  (3)
+}
+
+InfnLoopback   ::=TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+	"PXM related enum entries"
+	SYNTAX   INTEGER{
+	    none        (1),
+        facility    (2),
+        terminal    (3)
+}
+
+InfnLoopbackBehavior ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+        "PXM related enum entries"
+     SYNTAX   INTEGER {
+        noMacSwap   (1),
+        macSwap     (2)
+}
+
+InfnCreationType   ::=TEXTUAL-CONVENTION
+	STATUS  current
+    DESCRIPTION
+      "PXM related enum entries"
+    SYNTAX     INTEGER  {
+        manual (1),
+        nmSignaled (2)
+}
+
+InfnFlapActionClear  ::=TEXTUAL-CONVENTION
+    STATUS  current
+	DESCRIPTION
+      "PXM related enum entries"
+    SYNTAX     INTEGER {
+        none    (1),
+        enabled (2)
+}
+
+InfnPWSetupMode ::=TEXTUAL-CONVENTION
+    STATUS  current
+	DESCRIPTION
+      "PXM related enum entries"
+	SYNTAX     INTEGER {
+		static (1)
+}
+
+InfnPXMInterfaceType  ::=TEXTUAL-CONVENTION
+    STATUS  current
+	DESCRIPTION
+      "PXM related enum entries"
+    SYNTAX     INTEGER {
+        ieee8021ad  (1),
+        ieee8021q   (2)
+}
+
+InfnEnableDisableType ::=TEXTUAL-CONVENTION
+    STATUS  current
+	DESCRIPTION
+      "PXM related enum entries"
+    SYNTAX     INTEGER {
+        disabled    (1),
+        enabled     (2),
+        unknown     (3),
+        na          (256)
+    }
+
+InfnAcceptableFrameType ::=TEXTUAL-CONVENTION
+    STATUS  current
+	DESCRIPTION
+      "PXM related enum entries"
+     SYNTAX     INTEGER {
+         all                 (1),
+         taggedFramesOnly    (2),
+         untaggedAndPriorityTaggedFramesOnly (3)
+}
+
+InfnColorMode ::=TEXTUAL-CONVENTION
+    STATUS  current
+	DESCRIPTION
+      "PXM related enum entries"
+     SYNTAX     INTEGER {
+		colorBlind (1),
+		colorAware (2)
+}
+
+InfnMeterType ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		trTCM (1),
+		srTCM (2)
+}
+
+InfnSharedMeterInstance ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		shared (1),
+		notShared (2)
+}
+
+InfnMeterAction ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		none (1),
+		remarkDp (2),
+		remarkTcDp (3)
+}
+
+InfnCcmInterval ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		ccmPeriodDisabled  (1),
+		ccmPeriod3-3ms (2),
+		ccmPeriod10ms (3),
+		ccmPeriod100ms (4),
+		ccmPeriod1s (5),
+		ccmPeriod10s (6),
+		ccmPeriod1m (7),
+		ccmPeriod10m (8)
+
+}
+
+InfnMANameFormat ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		primaryVid (1),
+		charString (2),
+		unsignedInt (3),
+		rfc2856VpnId(4)
+}
+
+InfnSenderIDTLV ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		sendIdNone  (1),
+		sendIdChassis  (2),
+		sendIdManage  (3),
+		sendIdChassisAndManage(4)
+
+}
+
+InfnCosType ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		none (1),
+		pcp  (2),
+		pcpDei  (3),
+		tcDp  (4),
+		mplsExp (5),
+		lspExp (6)
+}
+
+InfnDP ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		na (1),
+		high (2),
+		low (3)
+}
+
+InfnBwRateUnit ::=TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+       "PXM related enum entries"
+      SYNTAX     INTEGER {
+		bwInKbps (1),
+		bwInPercentageOfIntfRate(2)
+}
+
+InfnVsiType    ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM Vsi Type"
+    SYNTAX      INTEGER {
+        vpws                (1),
+        vlanCrossConnect    (2),
+        vpls                (3)
+}
+
+InfnVsiCreationType    ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM Vsi Creation Type"
+    SYNTAX      INTEGER {
+        manual              (1),
+        nmSignalled         (2)
+}
+
+InfnVlanLearningMode   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM Vsi Creation Type"
+    SYNTAX      INTEGER {
+        shared              (1),
+        independant         (2)
+}
+
+InfnVsiMacLimitAction   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM Vsi MAC Limit Action"
+    SYNTAX      INTEGER {
+        doNotLearnDoNotFlood    (1),
+        doNotLearnDoFlood       (2),
+        doNotForward            (3)
+}
+
+InfnLSPType    ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "LSP Type"
+    SYNTAX      INTEGER {
+        none                (1),
+        endPoint            (2),
+        midpoint            (3)
+}
+
+InfnMplsQosModel   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM MPLS QOS Model"
+    SYNTAX      INTEGER {
+        uniform             (1),
+        pipe                (2)
+}
+
+InfnLSPLoopBackBehaviour  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM LSP LoopBack Behavior"
+    SYNTAX      INTEGER {
+        none                (1),
+        labelSwap           (2)
+}
+
+InfnL2CpAction  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "L2CP Action"
+    SYNTAX      INTEGER {
+        discard         (1),
+        peer            (2),
+        tunnel          (3)
+}
+
+InfnRMepType  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM RMEP Creation Type"
+    SYNTAX      INTEGER {
+        manuallyCreated     (1),
+        autoDiscovered      (2)
+}
+
+InfnRmepState  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "PXM RMEP State"
+    SYNTAX      INTEGER {
+        idle     (1),
+        start    (2),
+		failed   (3),
+		ok       (4)
+}
+
+InfnMDNameFormat  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "MD Name Format"
+    SYNTAX      INTEGER {
+        none                    (1),
+        dnsLikeName             (2),
+		macAddressAndUint       (3),
+		charString              (4)
+}
+
+InfnMHFCreationCriteria  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "MD Name Format"
+    SYNTAX      INTEGER {
+        none                    (1),
+        default                 (2),
+		explicit                (3)
+}
+
+InfnAlienTxEDFAGain ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        high    (1),
+        low     (2)
+}
+
+InfnModelingMode    ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        passive (1),
+        active  (2)
+}
+
+InfnDeploymentConfig ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+       notValid  (1),
+       standAlone  (2),
+       peeredSystemFacing (3),
+       peeredLineFacing (4),
+       paBaLoopback  (5),
+       paOnly (6),
+       custom (7)
+}
+
+InfnTrafficMode ::= TEXTUAL-CONVENTION
+	STATUS  current
+	DESCRIPTION
+	""
+	SYNTAX      INTEGER {
+		none (1),
+		addDrop (2),
+		express (3)
+}
+
+InfnPathLossCheckControlStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        inProgress (1),
+        idle (2)
+}
+
+InfnLastPathLossCheckAttemptStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        successful (1),
+		unsuccessful (2),
+		notAttempted (3)
+}
+
+InfnLastPathLossCheckFailedReason ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+		notAvailable (1),
+		timedOut (2),
+		interruptedByAD (3),
+		interruptedByReset (4),
+		portInService (5),
+		errorInReading (6)
+
+}
+
+InfnCSFInterval   ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        interval1sec    (1),
+        interval1min    (2)
+}
+
+InfnChassisIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumChassisIdSubtype"
+    SYNTAX      INTEGER {
+        chassisComponent    (2),
+        interfaceAlias      (3),
+        portComponent       (4),
+        macAddress          (5),
+        networkAddress      (6),
+        interfaceName       (7),
+        local               (8)
+}
+
+InfnPortIdSubtype ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumPortIdSubtype"
+    SYNTAX      INTEGER {
+        interfaceAlias      (2),
+        portComponent       (3),
+        macAddress          (4),
+        networkAddress      (5),
+        interfaceName       (6),
+        agentCircuitId      (7),
+        local               (8)
+}
+
+InfnManAddrSubtype ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumManAddrSubtype"
+    SYNTAX      INTEGER {
+        other               (1),
+        ipv4                (2),
+        ipv6                (3),
+        nSAP                (4),
+        hdlc                (5),
+        bbn1822             (6),
+        all802              (7),
+        e163                (8),
+        e164                (9),
+        f69                 (10),
+        x121                (11),
+        ipx                 (12),
+        appleTalk           (13),
+        decnetIV            (14),
+        banyanVines         (15),
+        e164withNSAP        (16),
+        dns                 (17),
+        distinguishedName   (18),
+        asNumber            (19),
+        xtpOverIPv4         (20),
+        xtpOverIPv6         (21),
+        xtpNativeModeXTP    (22),
+        fibreChannelWWPN    (23),
+        fiberChannelWWNN    (24),
+        gwid                (25),
+        afi                 (26),
+        reserved            (65535)
+}
+
+InfnManAddrIfSubtype ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumManAddrIfSubtype"
+    SYNTAX      INTEGER {
+        unknown             (2),
+        ifIndex             (3),
+        systemPortNumber    (4)
+}
+
+InfnX509SignLen ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnX509SignLen"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        bits1024        (2),
+        bits2048        (3)
+}
+
+InfnX509PubKeyLen ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnX509PubKeyLen"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        bits256         (2),
+        bits512         (3),
+        bits1024        (4),
+        bits2048        (5)
+}
+
+InfnX509Encoding ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnX509Encoding"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        base64Pem       (2),
+        der             (3),
+        pkcs7           (4),
+        pkcs12          (5)
+}
+
+InfnX509Status ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnX509Status"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        ok              (2),
+        used            (3),
+        revoked         (4),
+        expired         (5)
+}
+
+InfnAuthScheme ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnAuthScheme"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        x509            (2),
+        psk             (3)
+}
+
+InfnFailPolicy ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnFailPolicy"
+    SYNTAX      INTEGER {
+        invalid             (1),
+        killTraffic         (2),
+        continueOperation   (3)
+}
+
+InfnCipherSuite ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnCipherSuite"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        gcm-aes-xpn-256 (2),
+        ctr-aes-256     (3)
+}
+
+InfnICVLength ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumInfnICVLength"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        bytes8          (9),
+        bytes16         (17)
+}
+
+InfnPhyMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConst::enumPhyMode"
+    SYNTAX  INTEGER {
+        phy40g (1),
+        phy4x10g (2),
+        phy100g (3),
+        phyNone(4)
+}
+
+InfnProvBaudRate ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+	none     (1),
+        baud-17g (2),
+        baud-22g (3),
+        baud-33g (4)
+
+}
+
+InfnProvCarrSpacing ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        none         (1),
+        cs-18-75ghz  (2),
+        cs-25ghz     (3),
+        cs-37-5ghz   (4),
+        cs-50ghz     (5)
+
+}
+
+InfnLastRebootReason  ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConst::enumLastRebootTyp"
+    SYNTAX      INTEGER {
+        none            (1),
+        cold            (2),
+        warm            (3),
+        pwron           (4),
+        shutdown        (5),
+        bpost           (6),
+        power           (7),
+        hard            (8),
+        grace-shut      (9)
+}
+
+InfnExpnPtpMode::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        lband         (1),
+        otdr          (2)
+}
+
+InfnLineOperatingMode::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        unknown         (1),
+        passive         (2),
+        active          (3)
+}
+
+InfnFECOverHeadPercent ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConst::enumFECOverHeadPercent"
+    SYNTAX  INTEGER {
+        fecOHInvalid (1),
+        fecOH20 (21),
+        fecOH25 (26)
+}
+
+InfnCarrierSpacing ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConst::enumCarrierSpacing"
+    SYNTAX  INTEGER {
+        notApplicable (1),
+        cs-18-75GHZ (2),
+        cs-25GHZ (3),
+        cs-37-5GHZ (4),
+        cs-50HZ (5),
+        cs-33-375GHZ (6)
+    }
+
+InfnPCLOperatingMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConst::enumPCLOperatingMode"
+    SYNTAX  INTEGER {
+        none (1),
+        constantPower (2),
+        constantGain  (3)
+    }
+
+InfnTransportProtocol::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumTransportProtocol"
+    SYNTAX      INTEGER {
+        udp             (1)
+}
+
+InfnSyslogAdminState::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumAdminState"
+    SYNTAX      INTEGER {
+        down            (1),
+        up              (2)
+}
+
+InfnSyslogFeature::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumSyslogFeature"
+    SYNTAX      INTEGER {
+        disable          (1),
+        enable           (2)
+}
+
+InfnOPMSwitchPosition::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumOPMSwitchPosition"
+    SYNTAX      INTEGER {
+        lineOut          (1),
+        muxOut           (2),
+        lineIn           (3),
+        opmIn            (4)
+}
+
+InfnOPMScanGranularity::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumOPMScanGranularity"
+    SYNTAX      INTEGER {
+        gran-3-125       (1),
+        gran-6-25        (2),
+        gran-12-5        (3)
+}
+
+InfnASEIdlerMuxOprMode::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumASEIdlerMuxOprMode"
+    SYNTAX      INTEGER {
+        manual           (1),
+        automatic        (2)
+}
+
+InfnFFCRAveraging::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumASEIdlerMuxOprMode"
+    SYNTAX      INTEGER {
+        unknown          (1),
+        sc-1             (2),
+        sc-2             (3),
+        sc-4             (4)
+}
+
+InfnTuningStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumTuningStatus"
+    SYNTAX      INTEGER {
+        unknown             (1),
+        tuned               (2),
+        retune-in-progress  (3),
+        out-of-band         (4)
+}
+
+InfnOpticalSignal ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumOpticalSignal"
+    SYNTAX      INTEGER {
+        unknown           (1),
+        enabled           (2),
+        mute              (3),
+        shutdown          (4)
+}
+
+InfnOpticalSignalStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumOpticalSignalStatus"
+    SYNTAX      INTEGER {
+        unknown           (1),
+        shutdown          (2),
+        muted             (3),
+        initialized       (4),
+        active            (5)
+}
+
+InfnLaserStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumLaserStatus"
+    SYNTAX      INTEGER {
+        disabled         (1),
+        enabled          (2)
+}
+
+InfnPSKType::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumPSKType"
+    SYNTAX      INTEGER {
+        invalid        (1),
+        ascii          (2),
+        hex            (3)
+}
+
+InfnSBSMode::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumSBSMode"
+    SYNTAX      INTEGER {
+        sbsModeOff       (1),
+        sbsModeOn        (2)
+}
+
+InfnStaticRouteAction ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "MoStaticRouteOb::enumStaticRouteAction"
+    SYNTAX      INTEGER {
+        localAction       (1),
+        advertiseAction   (2)
+}
+
+InfnBlackHoleRouteStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "MoStaticRouteOb::enumBlackHoleRouteStatus"
+    SYNTAX      INTEGER {
+        disabled       (1),
+        enabled        (2)
+}
+
+InfnRxEDFAGainMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumRxEDFAGainMode"
+    SYNTAX      INTEGER {
+        unknown      (1),
+        lg           (2),
+        hg           (3)
+}
+
+InfnRouteType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumRouteType"
+    SYNTAX      INTEGER {
+        local          (1),
+        distributed    (2)
+}
+
+InfnProvNbrTpType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumProvNbrTpType"
+    SYNTAX      INTEGER {
+            unknown     (1),
+            fbmScgPtp   (2)
+}
+
+InfnGainSwitchMode::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumGainSwitchMode"
+    SYNTAX      INTEGER {
+        unknown         (1),
+        lowGain         (2),
+        highGain        (3)
+}
+
+InfnFalseTrue::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumFalseTrue"
+    SYNTAX      INTEGER {
+        false         (1),
+        true          (2)
+}
+
+InfnForceSwitchCmd::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumForceSwitchCmd"
+    SYNTAX      INTEGER {
+        none                  (1),
+        force-to-protection   (2),
+        force-to-work         (3)
+}
+
+InfnFFPSwitchStatus::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumFFPSwitchStatus"
+    SYNTAX      INTEGER {
+        unknown                   (1),
+        normal                    (2),
+        maintenance               (3),
+        forceCommandToWorking     (4),
+        forceCommandToProtecting  (5),
+        signalFailOnProtecting    (6),
+        signalFailOnWorking       (7),
+        doNotRevert               (8),
+        waitToRevert              (9)
+}
+
+InfnSwitchPosition::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumSwitchPosition"
+    SYNTAX      INTEGER {
+        unknown               (1),
+        working               (2),
+        protecting            (3)
+}
+
+InfnMuxponderMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumMuxponderMode"
+    SYNTAX      INTEGER {
+        none        (1),
+        standalone  (2),
+        paired      (3)
+}
+
+InfnTribGroupServiceMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumTribGroupServiceMode"
+    SYNTAX      INTEGER {
+        none             (1),
+        mapping          (2),
+        muxing           (3),
+        muxing-100g      (4),
+        mapping-100g     (5),
+        muxing-sub100g   (6),
+        mapping-sub100g  (7)
+}
+
+InfnChassisOxmSwitchingMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+    ""
+    SYNTAX          INTEGER{
+        none                (1),
+        singleBay2Tbps      (2),
+        singleBay5Tbps      (3),
+        singleBay4-8Tbps    (4),
+        singleBay12Tbps     (5),
+        interBay            (6)
+}
+
+InfnAcfInterface::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "AcfConstOb::enumInterface"
+    SYNTAX      INTEGER {
+        invalid        (1),
+        dcn            (2),
+        aux            (3),
+        igcc           (4),
+        osc            (5),
+        all            (6)
+}
+
+InfnAcfProtocol::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "AcfConstOb::enumProtocol"
+    SYNTAX      INTEGER {
+        all            (1),
+        tcp            (2),
+        udp            (3),
+        icmp           (4)
+}
+
+InfnAcfDirection::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "AcfConstOb::enumDirection"
+    SYNTAX      INTEGER {
+        invalid        (1),
+        input          (2),
+        output         (3)
+}
+
+InfnAcfAction::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "AcfConstOb::enumAction"
+    SYNTAX      INTEGER {
+        invalid        (1),
+        accept         (2),
+        drop           (3),
+        reject         (4),
+        log            (5)
+}
+
+InfnMuxPowerControlLoop::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumMuxPowerControlLoop"
+    SYNTAX      INTEGER {
+        manual        (1),
+        automatic     (2)
+}
+
+InfnMacsecProtocolType::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumMacsecProtocolType"
+    SYNTAX      INTEGER {
+        none          (1),
+        static        (2),
+        ike           (3)
+}
+
+InfnGrpcFeature::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumGrpcFeature"
+    SYNTAX      INTEGER {
+        disable       (1),
+        enable        (2)
+}
+
+InfnSchCreationProfileType::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SyslogConstOb::enumSchCreationProfileType"
+    SYNTAX      INTEGER {
+        none                  (1),
+        systemCreatedFixed    (2)
+}
+
+InfnConfigDbSaveMode::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumConfigDbSaveMode"
+    SYNTAX      INTEGER {
+        mode0         (1),
+        mode1         (2),
+        unknown       (3)
+}
+
+InfnScanStatus::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumScanStatus"
+    SYNTAX      INTEGER {
+        unknown      (1),
+        idle         (2),
+        scan-request-processing (3)
+}
+
+InfnSchThCreationType::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    ""
+    SYNTAX      INTEGER {
+        user          (1),
+        system        (2)
+}
+
+InfnNeighborDiscMode::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumNeighborDiscoveryMode"
+    SYNTAX      INTEGER {
+        manual          (1),
+        automatic       (2),
+        unknown         (3)
+}
+
+InfnOXCONRole ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "ProtectionOb::"
+    SYNTAX      INTEGER {
+        na            (1),
+        active        (2),
+        standBy       (3),
+        switchRequest (4)
+}
+
+InfnClientPowerMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumClientPowerMode"
+    SYNTAX      INTEGER {
+        none          (1),
+        fullPower     (2),
+        reducedPower  (3)
+}
+
+InfnCascadeMode ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumCascadeMode"
+    SYNTAX      INTEGER {
+        base          (1),
+        extender      (2)
+}
+
+InfnPrRole ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SysConstOb::enumPrRole"
+    SYNTAX      INTEGER {
+        disabledPort     (1),
+        alternatePort    (2),
+        backupPort       (3),
+        rootPort         (4),
+        designatedPort   (5),
+        nonStpPort       (6)
+}
+
+InfnAutomaticTunable ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConstOb::enumAutomaticTunable"
+    SYNTAX  INTEGER {
+        enabled(1),
+        disabled(2)
+}
+
+InfnNTPAuthType ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConstOb::enumNTPAuthType"
+    SYNTAX  INTEGER {
+        none (1),
+        md5  (2),
+        sha1 (3)
+}
+
+InfnLOTunableMode   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConstOb::enumLOTunableMode"
+    SYNTAX  INTEGER {
+        unknown (1),
+        master  (2),
+        slave   (3)
+}
+InfnPChangeAuthority   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SecurityConst::enumPChangeAuthority"
+    SYNTAX  INTEGER {
+        user (1),
+        secadmin (2)
+}
+InfnPAuthenticationPolicy   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "RadiusConst::enumPAuthenticationPolicy"
+    SYNTAX  INTEGER {
+        local (1),
+        radius  (2),
+        rfl   (3),
+        tacas-plus (4),
+        tfl (5)
+}
+InfnBannerDisplay   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SecurityConst::enumBannerDisplay"
+    SYNTAX  INTEGER {
+        disable (1),
+        enable  (2)
+}
+
+InfnNEPasswdDigestType   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SecurityConst::NEPasswdDigestType"
+    SYNTAX  INTEGER {
+        md5 (1),
+        sha-256  (2),
+        sha-384  (3),
+        sha-512  (4),
+        none     (5)
+}
+
+InfnInstallStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SigConst::enumInstallStatus"
+    SYNTAX      INTEGER {
+        invalid         (1),
+        notInstalled    (2),
+        installed       (3)
+}
+
+InfnSigVerifyStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "SigConst::enumSigVerifyStatus"
+    SYNTAX      INTEGER {
+        invalid             (1),
+        ok                  (2),
+        fail                (3),
+        notVerified         (4),
+        verifyInProgress    (5),
+        siNotSupported      (6)
+}
+
+
+InfnActionStatus ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+    "MoCstsControl::enumActionStatus"
+    SYNTAX      INTEGER {
+        notStarted          (1),
+        inProgress          (2),
+        success             (3),
+        failed              (4)
+}
+
+InfnAuthenticationStatus   ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+        "SysConst::enumAuthenticationStatus"
+    SYNTAX  INTEGER {
+        none     (1),
+        success  (2),
+        failure  (3)
+}
+
+END

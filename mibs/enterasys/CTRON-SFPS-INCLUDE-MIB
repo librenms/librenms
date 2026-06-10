@@ -1,0 +1,494 @@
+CTRON-SFPS-INCLUDE-MIB DEFINITIONS ::= BEGIN
+
+--  sfps-inc.mib.txt
+--  Revision: 0.0.15
+--  Date: "200211082156Z"  - Fri Nov  8 21:56 GMT 2002
+--
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific Fast Packet Switching Services MIB.
+--
+--  This module will be extended, as required.
+--
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+--
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+--  Copyright October 93 Cabletron Systems
+--
+
+
+IMPORTS
+        enterprises
+                FROM RFC1155-SMI;
+
+
+
+cabletron               OBJECT IDENTIFIER ::= { enterprises 52 }
+
+mibs                    OBJECT IDENTIFIER ::= { cabletron 4 }
+                
+ctronExp                OBJECT IDENTIFIER ::= { mibs 2 }
+
+ctronSwitch             OBJECT IDENTIFIER ::= { ctronExp 4 }
+ctVLANMib               OBJECT IDENTIFIER ::= { ctronExp 12 }
+
+switchCommon            OBJECT IDENTIFIER ::= { ctronSwitch 1 }
+
+switchSFPS              OBJECT IDENTIFIER ::= { ctronSwitch 2 }
+
+
+
+--  The VLAN  Switch Groups.
+
+vlanSwitch              OBJECT IDENTIFIER ::= { ctVLANMib 1 }
+vlanAMRTop                      OBJECT IDENTIFIER ::= { ctVLANMib 3 }
+   
+--  The SFPS Switch Groups.
+
+sfpsSwitchEngine    OBJECT IDENTIFIER ::= { switchSFPS 1 }
+sfpsSwitchAgent     OBJECT IDENTIFIER ::= { switchSFPS 2 }
+sfpsRSVRouter       OBJECT IDENTIFIER ::= { switchSFPS 3 }
+sfpsATM             OBJECT IDENTIFIER ::= { switchSFPS 4 }
+sfpsMulticast       OBJECT IDENTIFIER ::= { switchSFPS 5 }
+sfpsChassis         OBJECT IDENTIFIER ::= { switchSFPS 6 }
+   
+--  The SFPS Switch Engine Groups
+
+sfpsSwitchSystem        OBJECT IDENTIFIER ::= { sfpsSwitchEngine 1 }
+sfpsSwitchPorts         OBJECT IDENTIFIER ::= { sfpsSwitchEngine 2 }
+sfpsSwitchConnections   OBJECT IDENTIFIER ::= { sfpsSwitchEngine 3 }
+sfpsConnectionAPI       OBJECT IDENTIFIER ::= { sfpsSwitchEngine 4 }
+sfpsGAPI                OBJECT IDENTIFIER ::= { sfpsSwitchEngine 6 }
+sfpsSwitchSfpsPacket    OBJECT IDENTIFIER ::= { sfpsSwitchEngine 7 }
+sfpsPktDispatchStats    OBJECT IDENTIFIER ::= { sfpsSwitchSfpsPacket 5 }
+sfpsCSPPacket           OBJECT IDENTIFIER ::= { sfpsSwitchEngine 10 }
+sfpsCallTap             OBJECT IDENTIFIER ::= { sfpsSwitchEngine 11 }
+sfpsTap                 OBJECT IDENTIFIER ::= { sfpsSwitchEngine 12 }
+sfpsTapStats            OBJECT IDENTIFIER ::= { sfpsSwitchEngine 13 }
+sfpsSizeServices        OBJECT IDENTIFIER ::= { sfpsSwitchEngine 14 }
+sfpsCNXPacketStats      OBJECT IDENTIFIER ::= { sfpsSwitchEngine 15 }
+
+--  The SFPS Switch Agent Groups
+
+sfpsAgentACMS                   OBJECT IDENTIFIER ::= { sfpsSwitchAgent 1 }
+sfpsAgentRedirector             OBJECT IDENTIFIER ::= { sfpsSwitchAgent 2 }
+sfpsAgentTopology               OBJECT IDENTIFIER ::= { sfpsSwitchAgent 3 }
+sfpsAgentSignalling             OBJECT IDENTIFIER ::= { sfpsSwitchAgent 5 }
+sfpsAgentDiagnostics            OBJECT IDENTIFIER ::= { sfpsSwitchAgent 6 }
+sfpsAgentConfig                 OBJECT IDENTIFIER ::= { sfpsSwitchAgent 7 }
+sfpsAgentInterSwitchProtocals   OBJECT IDENTIFIER ::= { sfpsSwitchAgent 9 }
+sfpsAgentFacility               OBJECT IDENTIFIER ::= { sfpsSwitchAgent 11 }
+sfpsAgentScout                  OBJECT IDENTIFIER ::= { sfpsSwitchAgent 12 }
+sfpsSourceBlock                 OBJECT IDENTIFIER ::= { sfpsSwitchAgent 14 }
+sfpsDHCPServerVLAN              OBJECT IDENTIFIER ::= { sfpsSwitchAgent 15 }
+sfpsATalkAMRVLANControl         OBJECT IDENTIFIER ::= { sfpsSwitchAgent 16 }
+
+-- The SFPS ATM Group
+
+sfpsATMElan             OBJECT IDENTIFIER ::= { sfpsATM 1 }
+sfpsATMDiag             OBJECT IDENTIFIER ::= { sfpsATM 2 }
+sfpsATMResolver         OBJECT IDENTIFIER ::= { sfpsATM 3 }
+sfpsATMResolverCounters OBJECT IDENTIFIER ::= { sfpsATMResolver 2 }
+sfpsATMAnibIfoStats     OBJECT IDENTIFIER ::= { sfpsATM 4 }
+sfpsATMPorts            OBJECT IDENTIFIER ::= { sfpsATM 5 }
+sfpsATMPortsMgr         OBJECT IDENTIFIER ::= { sfpsATMPorts 2 }
+sfpsATMHistory          OBJECT IDENTIFIER ::= { sfpsATM 6 }
+sfpsATMLecForum         OBJECT IDENTIFIER ::= { sfpsATM 7 }
+sfpsATMSvcHistory       OBJECT IDENTIFIER ::= { sfpsATM 8 }
+sfpsATMSvcHistoryMgr    OBJECT IDENTIFIER ::= { sfpsATMSvcHistory 1 }
+sfpsATMSvcHistoryEvent  OBJECT IDENTIFIER ::= { sfpsATMSvcHistory 2 }
+
+-- The SFPS Multicast Group
+
+sfpsMcastConnection             OBJECT IDENTIFIER ::= { sfpsMulticast 1 }
+sfpsMcastIP                     OBJECT IDENTIFIER ::= { sfpsMulticast 2 }
+sfpsMcastConfig                 OBJECT IDENTIFIER ::= { sfpsMulticast 4 }
+
+-- The SFPS Chassis Group
+
+sfpsChassisRip          OBJECT IDENTIFIER ::= { sfpsChassis 1 }
+sfpsChassisRipTable     OBJECT IDENTIFIER ::= { sfpsChassisRip 1 }
+sfpsChassisRipAPI       OBJECT IDENTIFIER ::= { sfpsChassisRip 2 }
+
+-- The SFPS Multicast Connection Group
+
+sfpsMcastCnx                OBJECT IDENTIFIER ::= { sfpsMcastConnection 1}
+sfpsMcastCnxAPI             OBJECT IDENTIFIER ::= { sfpsMcastConnection 2}
+
+-- The SFPS Multicast IP Group
+
+sfpsMcastIPRouter               OBJECT IDENTIFIER ::= { sfpsMcastIP 1 }
+sfpsMcastIGMP                   OBJECT IDENTIFIER ::= { sfpsMcastIP 2 }
+sfpsMcastIPReceiverInfoBase     OBJECT IDENTIFIER ::= { sfpsMcastIP 3 }
+sfpsMcastIPSenderInfoBase       OBJECT IDENTIFIER ::= { sfpsMcastIP 4 }
+
+-- The SFPS Multicast Receiver Information Base Group
+
+sfpsMcastIPRIBApi           OBJECT IDENTIFIER ::= { sfpsMcastIPReceiverInfoBase 2 }
+
+-- The SFPS Multicast Receiver Information Base Group
+
+sfpsMcastIPSIBApi           OBJECT IDENTIFIER ::= { sfpsMcastIPSenderInfoBase 2 }
+
+-- The SFPS Multicast Configuration Group
+
+sfpsMcastConfigApi                      OBJECT IDENTIFIER ::= { sfpsMcastConfig 1 }
+ 
+--  The SFPS Switch System Group
+
+sfpsSystemConfig        OBJECT IDENTIFIER ::= { sfpsSwitchSystem 1 }
+sfpsSystemStats         OBJECT IDENTIFIER ::= { sfpsSwitchSystem 2 }
+sfpsSystemGenerics      OBJECT IDENTIFIER ::= { sfpsSwitchSystem 3 }
+sfpsSystemPool              OBJECT IDENTIFIER ::= { sfpsSwitchSystem 4 }
+sfpsAOProperties            OBJECT IDENTIFIER ::= { sfpsSwitchSystem 5 }
+sfpsSystemSwitchChange  OBJECT IDENTIFIER ::= { sfpsSwitchSystem 6 }
+
+--
+sfpsMemHeapStat         OBJECT IDENTIFIER ::= { sfpsSystemStats 2 }
+sfpsMemHeapStats        OBJECT IDENTIFIER ::= { sfpsMemHeapStat 1 }
+--
+sfpsAOPropertiesAPI     OBJECT IDENTIFIER ::= { sfpsAOProperties 2 }
+
+--  The SFPS Switch Ports Group
+
+sfpsPortConfig          OBJECT IDENTIFIER ::= { sfpsSwitchPorts 1 }
+sfpsPortStats           OBJECT IDENTIFIER ::= { sfpsSwitchPorts 2 }
+sfpsPortAttribute       OBJECT IDENTIFIER ::= { sfpsPortConfig 9 }
+sfpsPortAttributeTable  OBJECT IDENTIFIER ::= { sfpsPortAttribute 1 }
+sfpsPortAttributeAPI    OBJECT IDENTIFIER ::= { sfpsPortAttribute 2 }
+
+--  The SFPS Switch Connections Group
+
+sfpsConnectionLookupAPI    OBJECT IDENTIFIER ::= { sfpsSwitchConnections 2 }
+sfpsConnectionConfigAPI    OBJECT IDENTIFIER ::= { sfpsSwitchConnections 3 }
+sfpsConnectionStats        OBJECT IDENTIFIER ::= { sfpsSwitchConnections 4 }
+sfpsConnectionQueryAPI     OBJECT IDENTIFIER ::= { sfpsSwitchConnections 5 }
+sfpsConnectionTestAPI      OBJECT IDENTIFIER ::= { sfpsSwitchConnections 6 }
+
+--  The SFPS GAPI Group
+
+sfpsGAPIATM             OBJECT IDENTIFIER ::= { sfpsGAPI 6 }
+
+
+--  The SFPS Agent Redirector Group
+
+sfpsSap            OBJECT IDENTIFIER ::= { sfpsAgentRedirector 2 }
+sfpsSapAPI         OBJECT IDENTIFIER ::= { sfpsSap 2 }
+sfpsCPResources    OBJECT IDENTIFIER ::= { sfpsAgentRedirector 3 }
+sfpsServiceCenter  OBJECT IDENTIFIER ::= { sfpsAgentRedirector 4 }
+sfpsCSPControl     OBJECT IDENTIFIER ::= { sfpsAgentRedirector 5 }
+
+--  The SFPS Agent ServiceCenter Group
+
+sfpsISPResolve     OBJECT IDENTIFIER ::= { sfpsServiceCenter 1 }
+sfpsISPPolicy      OBJECT IDENTIFIER ::= { sfpsServiceCenter 2 }
+sfpsISPPath        OBJECT IDENTIFIER ::= { sfpsServiceCenter 5 }
+sfpsISPFlood       OBJECT IDENTIFIER ::= { sfpsServiceCenter 6 }
+sfpsISPSwitchPath  OBJECT IDENTIFIER ::= { sfpsServiceCenter 7 }
+
+
+--  The SFPS Topology Group
+
+sfpsTopologyAdjacencies   OBJECT IDENTIFIER ::= { sfpsAgentTopology 2 }
+sfpsTopologyNodes         OBJECT IDENTIFIER ::= { sfpsAgentTopology 5 }
+sfpsTopologyAliases       OBJECT IDENTIFIER ::= { sfpsAgentTopology 6 }
+sfpsTopologyVNSNeighbors  OBJECT IDENTIFIER ::= { sfpsAgentTopology 7 }
+sfpsTopologyVLANNeighbors OBJECT IDENTIFIER ::= { sfpsAgentTopology 8 }
+sfpsTopologyDAPITest      OBJECT IDENTIFIER ::= { sfpsAgentTopology 9 }
+sfpsTopologyDAPI          OBJECT IDENTIFIER ::= { sfpsAgentTopology 10 }
+sfpsTopologyDirStats      OBJECT IDENTIFIER ::= { sfpsAgentTopology 11 }
+sfpsTopology              OBJECT IDENTIFIER ::= { sfpsAgentTopology 12 }
+sfpsTopologyRemoteNodes   OBJECT IDENTIFIER ::= { sfpsAgentTopology 13 }
+sfpsTopologyRemoteAliases OBJECT IDENTIFIER ::= { sfpsAgentTopology 14 }
+sfpsTopologyDirLock       OBJECT IDENTIFIER ::= { sfpsAgentTopology 15 }
+sfpsDapiNvramStats        OBJECT IDENTIFIER ::= { sfpsAgentTopology 16 }
+sfpsTRTimeOut             OBJECT IDENTIFIER ::= { sfpsAgentTopology 18 }
+
+--  The SFPS Topology Dir Lock Group
+
+sfpsDirViolation          OBJECT IDENTIFIER ::= { sfpsTopologyDirLock 1 }
+sfpsDirViolationAPI       OBJECT IDENTIFIER ::= { sfpsDirViolation 2 }
+sfpsDirViolationDeltaAPI  OBJECT IDENTIFIER ::= { sfpsDirViolation 4 }
+sfpsDirRestriction        OBJECT IDENTIFIER ::= { sfpsTopologyDirLock 2 }
+sfpsDirLockConfig         OBJECT IDENTIFIER ::= { sfpsTopologyDirLock 3 }
+sfpsDirLockStats          OBJECT IDENTIFIER ::= { sfpsTopologyDirLock 4 }
+sfpsRestrictedMobility    OBJECT IDENTIFIER ::= { sfpsTopologyDirLock 5 }
+
+--
+sfpsRestrictedMobilityAPI    OBJECT IDENTIFIER ::= { sfpsRestrictedMobility 2 }
+
+
+sfpsDirFilterAPI          OBJECT IDENTIFIER ::= { sfpsTopologyRemoteNodes 1 }
+
+--  The SFPS Topology (sfpsTopology) Group
+
+sfpsTopologyPortManager           OBJECT IDENTIFIER  ::= { sfpsTopology 1 }
+sfpsTopologyAgentCommon           OBJECT IDENTIFIER  ::= { sfpsTopology 2 }
+sfpsTopologyAgents            OBJECT IDENTIFIER  ::= { sfpsTopology 3 }
+sfpsTopologyServers           OBJECT IDENTIFIER  ::= { sfpsTopology 4 }
+sfpsTopologyTestApplication   OBJECT IDENTIFIER  ::= { sfpsTopology 5 }
+sfpsTopologyStatistics            OBJECT IDENTIFIER  ::= { sfpsTopology 6 }
+sfpsTopologyFCL                       OBJECT IDENTIFIER  ::= { sfpsTopology 7 }
+
+-- SFPS Topology Branches
+
+sfpsTAPITestIn                 OBJECT IDENTIFIER ::= { sfpsTAPITest 1 }
+sfpsTAPITestOut                OBJECT IDENTIFIER ::= { sfpsTAPITest 2 }
+sfpsVLANTopologyAgent          OBJECT IDENTIFIER ::= { sfpsTopologyAgents 1 }
+sfpsRATopologyAgent            OBJECT IDENTIFIER ::= { sfpsTopologyAgents 2 }
+sfpsESPTopologyAgent
+               OBJECT IDENTIFIER ::= { sfpsTopologyAgents 3 }
+sfpsVLANTopAgentPortTableAPIIn OBJECT IDENTIFIER ::= { sfpsVLANTopologyAgent 3 }
+sfpsRATopAgentPortTableAPIIn   OBJECT IDENTIFIER ::= { sfpsRATopologyAgent 3 }
+sfpsRATopAgentPortTableAPIOut  OBJECT IDENTIFIER ::= { sfpsRATopologyAgent 4 }
+sfpsVMTopologyServer           OBJECT IDENTIFIER ::= { sfpsTopologyServers 1 }
+sfpsHistTopologyServer         OBJECT IDENTIFIER ::= { sfpsTopologyServers 2 }
+sfpsTAPITest                   OBJECT IDENTIFIER ::= { sfpsTopologyTestApplication 1 }
+sfpsTopologyServerTest         OBJECT IDENTIFIER ::= { sfpsTopologyTestApplication 2 }
+sfpsTopologyServerTestIn       OBJECT IDENTIFIER ::= { sfpsTopologyServerTest 1 }
+sfpsTopologyServerPortEventRelay       OBJECT IDENTIFIER ::= { sfpsTopologyServerTest 4 }
+sfpsNeighborEvents             OBJECT IDENTIFIER ::= { sfpsTopologyStatistics 1 }
+sfpsTPMPortTableAPIIn          OBJECT IDENTIFIER ::= { sfpsTopologyPortManager 2 }
+sfpsTPMPortTableAPIOut         OBJECT IDENTIFIER ::= { sfpsTopologyPortManager 3 }
+
+--  The SFPS Agent Call Processing Group
+
+sfpsCallManagement    OBJECT IDENTIFIER ::= { sfpsAgentSignalling 1 }
+sfpsEventsAndSignals  OBJECT IDENTIFIER ::= { sfpsAgentSignalling 2 }
+
+--  The SFPS Call Management Group
+
+sfpsCallByTuple       OBJECT IDENTIFIER ::= { sfpsCallManagement 5 }
+sfpsCallTableStats    OBJECT IDENTIFIER ::= { sfpsCallManagement 6 }
+
+--  The SFPS Events And Signals Group
+
+sfpsEventStatistics             OBJECT IDENTIFIER ::= { sfpsEventsAndSignals 1 }
+
+--  The SFPS Event Statistics Group
+
+sfpsEventSummaryStatistics      OBJECT IDENTIFIER ::= { sfpsEventStatistics 1 }
+
+--  The SFPS Event Summary Statistics Group
+
+sfpsSignallingSummaryStatistics OBJECT IDENTIFIER ::= { sfpsEventSummaryStatistics 1 }
+
+--  The SFPS Agent Diagnostics Group
+
+sfpsDiagEventLog        OBJECT IDENTIFIER ::= { sfpsAgentDiagnostics 1 }
+sfpsDiagStats           OBJECT IDENTIFIER ::= { sfpsAgentDiagnostics 2 }
+sfpsResetNVRAM          OBJECT IDENTIFIER ::= { sfpsAgentDiagnostics 3 }
+
+--  The SFPS Diagnostic Event Logger Group
+
+sfpsEventLogStats             OBJECT IDENTIFIER ::= { sfpsDiagEventLog 3 }
+sfpsEventLogGenConfig         OBJECT IDENTIFIER ::= { sfpsDiagEventLog 4 }
+sfpsEventLogClientConfig      OBJECT IDENTIFIER ::= { sfpsDiagEventLog 5 }
+sfpsEventLogClientConfigAPI   OBJECT IDENTIFIER ::= { sfpsEventLogClientConfig 2 }
+sfpsEventLogLevelConfig       OBJECT IDENTIFIER ::= { sfpsDiagEventLog 6 }
+sfpsTraps                     OBJECT IDENTIFIER ::= { sfpsDiagEventLog 7 }
+sfpsTrapAPI                   OBJECT IDENTIFIER ::= { sfpsTraps 1 }
+sfpsTrapTable                 OBJECT IDENTIFIER ::= { sfpsTraps 2 }
+sfpsFragStats                 OBJECT IDENTIFIER ::= { sfpsDiagEventLog 11 }
+
+-- The SFPS Diagnostic Statistics Group
+
+sfpsFloodCounters        OBJECT IDENTIFIER ::= { sfpsDiagStats 1 }
+sfpsFloodCountersReset   OBJECT IDENTIFIER ::= { sfpsDiagStats 2 }
+sfpsIsolatedSwitch       OBJECT IDENTIFIER ::= { sfpsDiagStats 5 }
+
+-- The SFPS Inter Switch Protocals Group
+
+sfpsISPTraffic     OBJECT IDENTIFIER ::= { sfpsAgentInterSwitchProtocals 1 }
+sfpsISPNewUser     OBJECT IDENTIFIER ::= { sfpsAgentInterSwitchProtocals 2 }
+sfpsISPTransport   OBJECT IDENTIFIER ::= { sfpsAgentInterSwitchProtocals 3 }
+
+-- The SFPS Facility Group
+
+sfpsCentersFacility  OBJECT IDENTIFIER ::= { sfpsAgentFacility 1 }
+sfpsVNSFacility      OBJECT IDENTIFIER ::= { sfpsAgentFacility 2 }
+sfpsVLANFacility     OBJECT IDENTIFIER ::= { sfpsAgentFacility 3 }
+sfpsDiagFacility     OBJECT IDENTIFIER ::= { sfpsAgentFacility 4 }
+sfpsFabricFacility   OBJECT IDENTIFIER ::= { sfpsAgentFacility 6 }
+sfpsLiteFacility     OBJECT IDENTIFIER ::= { sfpsAgentFacility 7 }
+sfpsFpcFacility      OBJECT IDENTIFIER ::= { sfpsAgentFacility 8 }
+sfpsATMFacility      OBJECT IDENTIFIER ::= { sfpsAgentFacility 12 }
+sfpsATMDiagFacility  OBJECT IDENTIFIER ::= { sfpsAgentFacility 13 }
+sfpsRAFacility       OBJECT IDENTIFIER ::= { sfpsAgentFacility 14 }
+sfpsMcastFacility    OBJECT IDENTIFIER ::= { sfpsAgentFacility 15 }
+sfpsUpLinkFacility   OBJECT IDENTIFIER ::= { sfpsAgentFacility 16 }
+sfpsVRAFacility      OBJECT IDENTIFIER ::= { sfpsAgentFacility 17 }
+sfpsToggleFacility   OBJECT IDENTIFIER ::= { sfpsAgentFacility 18 }
+sfpsMatrixFacility   OBJECT IDENTIFIER ::= { sfpsAgentFacility 19 }
+sfpsFepFacility      OBJECT IDENTIFIER ::= { sfpsAgentFacility 20 }
+sfpsBetaFacility     OBJECT IDENTIFIER ::= { sfpsAgentFacility 21 }
+sfpsL4Facility       OBJECT IDENTIFIER ::= { sfpsAgentFacility 22 }
+sfpsRemoteDeviceManagerFacility       OBJECT IDENTIFIER ::= { sfpsAgentFacility 23 }
+sfpsCallTapFacility  OBJECT IDENTIFIER ::= { sfpsAgentFacility 32 }
+
+-- The SFPS ISP Traffic Group
+
+sfpsLinkLoad         OBJECT IDENTIFIER ::= { sfpsISPTraffic 5 }
+
+-- The SFPS ISP NewUser Group
+
+sfpsMobilityStats     OBJECT IDENTIFIER ::= { sfpsISPNewUser 3 }
+
+-- The SFPS ISP Transport Group
+
+sfpsReliableDelivery     OBJECT IDENTIFIER ::= { sfpsISPTransport 1 }
+
+-- The SFPS ISP Path Group
+
+sfpsPathAPI              OBJECT IDENTIFIER ::= { sfpsISPPath 3 }
+sfpsStaticPath           OBJECT IDENTIFIER ::= { sfpsISPPath 4 }
+sfpsPathMaskObj          OBJECT IDENTIFIER ::= { sfpsISPPath 5 }
+sfpsDirPath              OBJECT IDENTIFIER ::= { sfpsISPPath 6 }
+sfpsDirPathAPI           OBJECT IDENTIFIER ::= { sfpsISPPath 7 }                        
+sfpsAdminPath            OBJECT IDENTIFIER ::= { sfpsISPPath 8 }
+sfpsAdminPathAPI         OBJECT IDENTIFIER ::= { sfpsISPPath 9 }
+sfpsUpLinkPath           OBJECT IDENTIFIER ::= { sfpsISPPath 10 }
+sfpsChassisRIPPath       OBJECT IDENTIFIER ::= { sfpsISPPath 12 }
+
+
+-- The SFPS ISP Resolve Group
+
+sfpsSwitchResolve       OBJECT IDENTIFIER ::= { sfpsISPResolve 2 }
+sfpsResolveStats        OBJECT IDENTIFIER ::= { sfpsISPResolve 3 }
+sfpsBlockResolve        OBJECT IDENTIFIER ::= { sfpsISPResolve 4 }
+sfpsUnresolve           OBJECT IDENTIFIER ::= { sfpsISPResolve 5 }
+sfpsTableResolve        OBJECT IDENTIFIER ::= { sfpsISPResolve 6 }
+sfpsSubnetResolve       OBJECT IDENTIFIER ::= { sfpsISPResolve 7 }
+sfpsRelayAgent          OBJECT IDENTIFIER ::= { sfpsISPResolve 10 }
+
+-- ISP Resolve 
+
+sfpsSubnetResolveStats  OBJECT IDENTIFIER ::= { sfpsSubnetResolve 1 }
+sfpsSubnetResolveAPI    OBJECT IDENTIFIER ::= { sfpsSubnetResolve 2 }
+sfpsSubnetResolveNvram  OBJECT IDENTIFIER ::= { sfpsSubnetResolve 4 }
+sfpsTableResolveAPI     OBJECT IDENTIFIER ::= { sfpsTableResolve 2 }
+sfpsBlockResolveStats   OBJECT IDENTIFIER ::= { sfpsBlockResolve 3 }
+sfpsBlockResolveAPI     OBJECT IDENTIFIER ::= { sfpsBlockResolve 2 }
+sfpsUnresolveTableAPI   OBJECT IDENTIFIER ::= { sfpsUnresolve 2 }
+sfpsUnresolveTableStats OBJECT IDENTIFIER ::= { sfpsUnresolve 3 }
+sfpsRelayAgentResolve   OBJECT IDENTIFIER ::= { sfpsRelayAgent 4 }
+sfpsRelayAgentResolveStats   OBJECT IDENTIFIER ::= { sfpsRelayAgent 5 }
+
+-- The SFPS ISP Flood Group
+
+sfpsResolveCounter          OBJECT IDENTIFIER ::= { sfpsISPFlood 8 }
+sfpsMobileUser              OBJECT IDENTIFIER ::= { sfpsISPFlood 9 }
+sfpsMobileUserTable             OBJECT IDENTIFIER ::= { sfpsMobileUser 1 }
+sfpsMobileUserReset             OBJECT IDENTIFIER ::= { sfpsMobileUser 2 }
+
+-- The SFPS ISP Switch Path Group
+
+sfpsSwitchPath       OBJECT IDENTIFIER ::= { sfpsISPSwitchPath 2 }
+sfpsSwitchPathStats  OBJECT IDENTIFIER ::= { sfpsSwitchPath 1 }
+sfpsSwitchPathAPI    OBJECT IDENTIFIER ::= { sfpsSwitchPath 2 }
+
+-- The SFPS ISP Policy Group
+
+sfpsVlanMatrix          OBJECT IDENTIFIER ::= { sfpsISPPolicy 2 }
+sfpsVlanMatrixApi           OBJECT IDENTIFIER ::= { sfpsISPPolicy 3 }
+sfpsVMMatrix                OBJECT IDENTIFIER ::= { sfpsISPPolicy 4 }
+
+-- The SFPS Source Block Group
+
+sfpsBlockSource         OBJECT IDENTIFIER ::= { sfpsSourceBlock 1 }
+sfpsBlockSourceOnly             OBJECT IDENTIFIER ::= { sfpsSourceBlock 2 }
+sfpsBlockSourcePort             OBJECT IDENTIFIER ::= { sfpsSourceBlock 3 }
+sfpsBlockSourceAPI              OBJECT IDENTIFIER ::= { sfpsSourceBlock 4 }
+sfpsBlockSourceExclude  OBJECT IDENTIFIER ::= { sfpsSourceBlock 5 }
+sfpsBlockSourceStats    OBJECT IDENTIFIER ::= { sfpsSourceBlock 6 }
+
+-- The SFPS Size Service Group
+
+sfpsSizeService        OBJECT IDENTIFIER ::= { sfpsSizeServices 1 }
+sfpsSizeServiceAPI     OBJECT IDENTIFIER ::= { sfpsSizeServices 2 }
+
+
+--  The SFPS Virtual Bus Group
+
+vlanAPI         OBJECT IDENTIFIER ::= { vlanSwitch 1 }
+vlanInternal    OBJECT IDENTIFIER ::= { vlanSwitch 2 }
+vlanPriority    OBJECT IDENTIFIER ::= { vlanSwitch 3 }
+vlanGARP        OBJECT IDENTIFIER ::= { vlanSwitch 4 }
+
+--
+vlanPriorityAPI    OBJECT IDENTIFIER ::= { vlanPriority 1 }
+vlanPriorityTable  OBJECT IDENTIFIER ::= { vlanPriority 2 }
+
+--
+
+vlanGARPAPI        OBJECT IDENTIFIER ::= { vlanGARP 1 }
+vlanGARPTable      OBJECT IDENTIFIER ::= { vlanGARP 2 }
+
+-- The VLAN AMR Group
+
+vlanAMRRules        OBJECT IDENTIFIER ::= { vlanAMRTop 6 }
+vlanAMRSubnets      OBJECT IDENTIFIER ::= { vlanAMRTop 7 }
+vlanAMRStats        OBJECT IDENTIFIER ::= { vlanAMRTop 8 }
+
+--  The SFPS Virtual Bus Internal Group
+
+vlanName            OBJECT IDENTIFIER ::= { vlanInternal 1 }
+vlanOutPort     OBJECT IDENTIFIER ::= { vlanInternal 2 }
+vlanSystem          OBJECT IDENTIFIER ::= { vlanInternal 5 }
+vlanPort            OBJECT IDENTIFIER ::= { vlanInternal 6 }
+vlanSflsp       OBJECT IDENTIFIER ::= { vlanInternal 7 }
+vlanSpanning    OBJECT IDENTIFIER ::= { vlanInternal 8 }
+vlanTestAPI     OBJECT IDENTIFIER ::= { vlanInternal 9 }
+vlanCount           OBJECT IDENTIFIER ::= { vlanInternal 10 }
+
+--
+vlanCountAPI    OBJECT IDENTIFIER ::= { vlanCount 1 }
+
+--  The SFPS SFLSP group
+
+vlanSflspGeneral        OBJECT IDENTIFIER ::= { vlanSflsp 1 }
+vlanSflspLsdb           OBJECT IDENTIFIER ::= { vlanSflsp 2 }
+vlanSflspInterfaces     OBJECT IDENTIFIER ::= { vlanSflsp 3 }
+vlanSflspIfMetric       OBJECT IDENTIFIER ::= { vlanSflsp 4 }
+vlanSflspNeighbors      OBJECT IDENTIFIER ::= { vlanSflsp 5 }
+vlanSflspArea           OBJECT IDENTIFIER ::= { vlanSflsp 6 }
+vlanSflsp1stHop         OBJECT IDENTIFIER ::= { vlanSflsp 7 }
+vlanSflspTracePath  OBJECT IDENTIFIER ::= { vlanSflsp 8 }
+vlanSflspLSDBFlood  OBJECT IDENTIFIER ::= { vlanSflsp 20 }
+vlanSflspLSPStats   OBJECT IDENTIFIER ::= { vlanSflsp 21 }
+
+--  The SFPS General Group
+
+vlanSflspGeneralVariables       OBJECT IDENTIFIER ::= { vlanSflspGeneral 1 }
+
+--  The SFPS TracePath group
+
+vlanSflspTracePathExternal OBJECT IDENTIFIER ::= { vlanSflspTracePath 1 }
+vlanSflspTracePathInternal OBJECT IDENTIFIER ::= { vlanSflspTracePath 2 }
+
+--  The SFPS TracePathExternal group
+
+vlanSflspTracePathAPI      OBJECT IDENTIFIER ::= { vlanSflspTracePathExternal 1 }
+
+vlanSpanningTreePort    OBJECT IDENTIFIER ::= { vlanSpanning 1 }
+vlanSpanningTreeSwitch  OBJECT IDENTIFIER ::= { vlanSpanning 2 } 
+
+END

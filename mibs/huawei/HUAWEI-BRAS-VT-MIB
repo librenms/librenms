@@ -1,0 +1,126 @@
+-- =================================================================
+-- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description:HUAWEI-BRAS-VT-MIB DEFINITIONS
+-- Reference:
+-- Version: V1.0
+-- History:
+--     
+-- =================================================================
+
+HUAWEI-BRAS-VT-MIB    DEFINITIONS ::= BEGIN
+    
+    IMPORTS
+    hwBRASMib            
+        FROM HUAWEI-MIB
+    RowStatus 
+        FROM SNMPv2-TC;    
+
+        hwIFVT MODULE-IDENTITY 
+            LAST-UPDATED "200508101200Z"
+            ORGANIZATION 
+                "HAUWEI MIB Standard community
+                "
+            CONTACT-INFO 
+        "Floor 5, Block 4, R&D Building,
+        Huawei Longgang Production Base,
+        Shenzhen,   P.R.C.
+        http://www.huawei.com
+        Zip:518057
+        "
+            DESCRIPTION 
+                "
+                V1.00
+                The VT mib is for all datacomm product.
+                "
+            ::= { hwBRASMib 10 }
+
+    
+    hwhwIFVTMibObjects OBJECT IDENTIFIER ::= { hwIFVT 1 }    
+
+
+        hwIFVTTable OBJECT-TYPE
+            SYNTAX     SEQUENCE OF HWIFVTEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                       "VT Configuration Table."
+            ::= { hwhwIFVTMibObjects 1 }
+            
+        hwIFVTEntry OBJECT-TYPE
+            SYNTAX     HWIFVTEntry
+            MAX-ACCESS not-accessible
+            STATUS     current
+            DESCRIPTION
+                       "An entry of Description."
+            INDEX { hwifVTNo }
+            ::= { hwIFVTTable 1 }
+            
+        HWIFVTEntry ::= SEQUENCE {
+            hwifVTNo                 Integer32,
+            hwifVTDescr              OCTET STRING,
+            hwifVTMtu                Integer32,
+            hwifVTRowStatus          RowStatus
+        }
+        
+        hwifVTNo OBJECT-TYPE
+            SYNTAX     Integer32 (0..1023)
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION
+                       "VT Index." 
+            ::= { hwIFVTEntry 1 }
+            
+        hwifVTDescr OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (0..80))
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION
+                       "VT Description."
+            ::= {hwIFVTEntry 2 }  
+            
+        hwifVTMtu OBJECT-TYPE
+            SYNTAX     Integer32 (128..1500)  
+            MAX-ACCESS read-write
+            STATUS     current 
+            DESCRIPTION         
+                       "VT Mtu."     
+            DEFVAL     { 1500 }
+            ::= {hwIFVTEntry 3 }
+            
+        hwifVTRowStatus OBJECT-TYPE
+            SYNTAX     RowStatus
+            MAX-ACCESS read-write
+            STATUS     current 
+            DESCRIPTION
+                       "VT RowStatus."
+            ::= {hwIFVTEntry 4 }  
+            
+            
+         --  ============== conformance information ==============
+        hwIfVtConformance OBJECT IDENTIFIER ::= { hwIFVT 2 }
+        
+        
+        hwIfVtCompliances OBJECT IDENTIFIER ::= { hwIfVtConformance 1 }
+        hwIfVtCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    { hwIfVtTableGroup }  
+                                               
+              ::= { hwIfVtCompliances 1 }
+              
+                --  ============== groups ==============  
+        hwIfVtObjectGroups OBJECT IDENTIFIER ::= { hwIfVtConformance 2 } 
+        
+        hwIfVtTableGroup OBJECT-GROUP
+            OBJECTS { hwifVTNo,hwifVTDescr,hwifVTMtu,hwifVTRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The VT configuration table."
+            ::= { hwIfVtObjectGroups 1 }
+
+END

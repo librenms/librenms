@@ -1,0 +1,280 @@
+ALCATEL-NGOAW-DEVICES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+FROM
+    SNMPv2-SMI
+
+    hardwareNGOAWDevices
+FROM
+    ALCATEL-NGOAW-BASE-MIB;
+
+
+alcatelNGOAWDevicesMIB MODULE-IDENTITY
+
+    LAST-UPDATED  "201905150000Z"
+    ORGANIZATION  "AL-Enterprise"
+    CONTACT-INFO
+        "Please consult with Customer Service to ensure the most appropriate
+         version of this document is used with the products in question:
+
+                    AL-Enterprise
+                   (Formerly Alcatel Internetworking, Incorporated)
+                           26801 West Agoura Road
+                        Agoura Hills, CA  91301-5122
+                          United States Of America
+
+        Telephone:               North America  +1 800 995 2696
+                                 Latin America  +1 877 919 9526
+								 Europe         +800 00200100 (Toll Free) or +1(650)385-2193
+								 Asia Pacific: +65 6240 8484
+
+                                 All Other      +1 818 878 4507
+
+        Electronic Mail:         ebg_global_supportcenter@al-enterprise.com
+        World Wide Web:          http://alcatel-lucent.com/wps/portal/enterprise
+        File Transfer Protocol:  ftp://ftp.ind.alcatel.com/pub/products/mibs"
+
+    DESCRIPTION
+        "This module describes an authoritative enterprise-specific Simple
+         Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             This module provides Object Indentifier definitions for
+             Chassis and AP of the AL-Enterprise
+             NGOAW Wireless Product Lines.
+
+         The right to make changes in specification and other information
+         contained in this document without prior notice is reserved.
+
+         No liability shall be assumed for any incidental, indirect, special, or
+         consequential damages whatsoever arising from or related to this
+         document or the information contained herein.
+
+         Vendors, end-users, and other interested parties are granted
+         non-exclusive license to use this specification in connection with
+         management of the products for which it is intended to be used.
+
+                     Copyright (C) 2016-2019 AL-Enterprise
+                         ALL RIGHTS RESERVED WORLDWIDE"
+
+    REVISION      "201609010000Z"
+    DESCRIPTION
+        "Initial version of this MIB Module."
+
+    REVISION      "201905150000Z"
+    DESCRIPTION
+        "Updated for new Modules like OAW-AP1201L."
+
+    ::= { hardwareNGOAWDevices 1 }
+
+
+familyNGOAWWirelessSwitch OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For NGOAW Wireless Switch Product Family.
+		sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.1 "
+    ::= { alcatelNGOAWDevicesMIB 1 }
+
+
+familyNGOAWWirelessAP OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Branch For NGOAW Wireless AP Product Family.
+		sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2 "
+    ::= { alcatelNGOAWDevicesMIB 2 }
+
+    
+deviceNGOAWAp1101 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess AP1101 NexGen wireless access point. Dual radio 2x2 IEEE 802.11a/b/g/n/ac wireless 
+        access point with support for 802.11'B/G/N' and 802.11'A/N/AC' operation, dual-band integral antenna, 
+        1 x 10/100/1000Base-T (RJ-45) Ethernet Interface (Supports 802.3af Power over Ethernet), 
+        1 x 12V DC power interface, Console port.
+        Model Name: OAW-AP1101
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.1 "
+    ::= { familyNGOAWWirelessAP 1 }
+
+    
+deviceNGOAWAp1221 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess AP1221 NexGen wireless access point. 802.11ac wave2 Tri radio 2.4GHz 2*2:2 + 5GHz 2*2:2 + 5Ghz 4*4:4 
+        wireless access point with support for 802.11'B/G/N' and 802.11'A/N/AC' operation, integral antenna, 
+        2 x 10/100/1000Base-T (RJ-45) Ethernet Interface (Supports 802.3at PoE), 1 x 48V DC power interface, Console port.
+        Model Name: OAW-AP1221
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.2 "
+    ::= { familyNGOAWWirelessAP 2 }
+
+    
+deviceNGOAWAp1222 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess AP1222 NexGen wireless access point. 802.11ac wave2 Tri radio 2.4GHz 2*2:2 + 5GHz 2*2:2 + 5Ghz 4*4:4 
+        wireless access point with support for 802.11'B/G/N' and 802.11'A/N/AC' operation, external antenna, 
+        2 x 10/100/1000Base-T (RJ-45) Ethernet Interface (Supports 802.3at PoE), 1 x 48V DC power interface, Console port. 
+        Model Name: OAW-AP1222
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.3 "
+    ::= { familyNGOAWWirelessAP 3 }
+
+
+        
+deviceNGOAWAp1231 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess AP1231 NexGen wireless access point. 802.11ac wave2 Tri radio 2.4GHz 2*2 + 5GHz 4*4:4 + 5Ghz 4*4:4 
+        wireless access point with integral antenna, 1 x 10/100/1000/2500Base-T (RJ45) and 1 x 10/100/1000Base-T (RJ-45) 
+        Ethernet Interface (Both supports 802.3at PoE), 1 x 48V DC power interface, Console port.  
+        Model Name: OAW-AP1231
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.4 "
+    ::= { familyNGOAWWirelessAP 4 }
+
+        
+deviceNGOAWAp1232 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess AP1231 NexGen wireless access point. 802.11ac wave2 Tri radio 2.4GHz 2*2 + 5GHz 4*4:4 + 5Ghz 4*4:4 
+        wireless access point with external antenna, 1 x 10/100/1000/2500Base-T (RJ45) and 1 x 10/100/1000Base-T (RJ-45) 
+        Ethernet Interface (Both supports 802.3at PoE), 1 x 48V DC power interface, Console port 
+        Model Name: OAW-AP1232
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.5 "
+    ::= { familyNGOAWWirelessAP 5 }
+
+        
+deviceNGOAWAp1251 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess AP1251 NexGen Outdoor wireless access point. Dual radio 2x2 IEEE 802.11a/b/g/n/ac wireless access point 
+        with support for 802.11'B/G/N' and 802.11'A/N/AC' operation, dual-band integral antenna, 1 x 10/100/1000Base-T (RJ-45) 
+        Ethernet Interface (Supports 802.3af PoE), 1 x 48V DC power interface, Console port 
+        Model Name: OAW-AP1251
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.6 "
+    ::= { familyNGOAWWirelessAP 6 }
+
+
+deviceNGOAWAp1251D OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess AP1251 NexGen Outdoor wireless access point. Dual radio 2x2 IEEE 802.11a/b/g/n/ac wireless access point 
+        with support for 802.11'B/G/N' and 802.11'A/N/AC' operation, dual-band integral directional antenna, 
+        1 x 10/100/1000Base-T (RJ-45) Ethernet Interface (Supports 802.3af PoE), 1 x48V DC power interface, Console port. 
+        Model Name: OAW-AP1251D
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.7 "
+    ::= { familyNGOAWWirelessAP 7 }
+
+             
+deviceNGOAWAp1201H OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1201H. Dual radio 2x2:2 802.11a/b/g/n/ac MU-MIMO AP, integrated antenna,
+        1x GbE uplink, 3x GbE downlink, 1x RJ45 passthrough, 1x USB (opt BLE) and 1x 48V DC power interface.
+         Model Name: OAW-AP1201H
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.8 "
+    ::= { familyNGOAWWirelessAP 8 }
+
+deviceNGOAWAp1201 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1201. Dual radio 2x2:2 802.11a/b/g/n/ac MU-MIMO AP, integrated antenna,
+         1x GbE, integrated BLE, 1x 48V DC power interface, 1x Console.
+         Model Name: OAW-AP1201
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.9 "
+    ::= { familyNGOAWWirelessAP 9 }
+
+
+deviceNGOAWAp1201L OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1201L. Dual radio 2x2:2 802.11a/b/g/n/ac MU-MIMO Indoor AP, with integrated 
+        antenna, 1x GbE, 1x 48V DC power interface, 1x Console.
+        Model Name: OAW-AP1201L
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.10 "
+    ::= { familyNGOAWWirelessAP 10 }
+
+deviceNGOAWAp1201HL OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1201HL. Dual radio 2x2:2 802.11a/b/g/n/ac MU-MIMO AP, integrated antenna, 
+        1x GbE uplink, 3x GbE downlink, 1x RJ45 passthrough and 1x 48V DC power interface.
+        Model Name: OAW-AP1201HL
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.11 "
+    ::= { familyNGOAWWirelessAP 11 }
+   
+
+deviceNGOAWAp1321 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1321. Dual radio 4x4:4 + 2x2:2 802.11ax Indoor AP, integrated Omni Directional 
+        Antenna. Integrated 1x1 full band scanning radio and BLE radio. Interfaces 2.5GbE, 1GbE, USB, 
+        48V DC Power, Console. AP mount kit to be ordered separately. 
+        Model Name: OAW-AP1321
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.12 "
+    ::= { familyNGOAWWirelessAP 12 }
+
+deviceNGOAWAp1322 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1322. Dual radio 4x4:4 + 2x2:2 802.11ax Indoor AP. Integrated 1x1 full band 
+        scanning radio and BLE radio. Interfaces 2.5GbE, 1GbE, USB, 48V DC Power, Console & 4x antenna 
+        connectors. AP mount kit and Antennas to be ordered separately. 
+        Model Name: OAW-AP1322
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.13 "
+    ::= { familyNGOAWWirelessAP 13 }
+
+deviceNGOAWAp1361 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1361. Dual radio 4x4:4 + 2x2:2 802.11ax Outdoor AP, integrated Omni Directional Antenna. 
+        Integrated 1x1 full band scanning radio and BLE radio. Interfaces 2.5GbE RJ-45, 1GbE RJ-45, 1GbE SFP, 
+        USB, 48V DC Power, Console. AP mount kit to be ordered separately. 
+        Model Name: OAW-AP1361
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.14 "
+    ::= { familyNGOAWWirelessAP 14 }
+
+deviceNGOAWAp1361D OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1361D. Dual radio 4x4:4 + 2x2:2 802.11ax Outdoor AP, integrated Directional Antenna. 
+        Integrated 1x1 full band scanning radio and BLE radio. Interfaces 2.5GbE RJ-45, 1GbE RJ-45, 1GbE SFP, USB, 
+        48V DC Power, Console. AP mount kit to be ordered separately. 
+        Model Name: OAW-AP1361D
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.15 "
+    ::= { familyNGOAWWirelessAP 15 }
+
+deviceNGOAWAp1362 OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar AP1362. Dual radio 4x4:4 + 2x2:2 802.11ax Outdoor AP. Integrated 1x1 full band scanning 
+        radio and BLE radio. Interfaces 2.5GbE RJ-45, 1GbE RJ-45, 1GbE SFP, USB, 48V DC Power, Console & 4x antenna 
+        connectors. AP mount kit and antennas to be ordered separately. 
+        Model Name: OAW-AP1362
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.16 "
+    ::= { familyNGOAWWirelessAP 16 }
+
+deviceNGOAWAp1201BG OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "OmniAccess Stellar BLE GATEWAY AP1201BG. Dual radio 2x2:2 802.11a/b/g/n/ac WiFi client, integrated 
+        BLE GW ,integrated antenna, 1x GbE, 1x 48V DC power interface, 1x Console. Cannot be used as Access Point. 
+        Model Name: OAW-AP1201BG
+        Assembly:
+        sysObjectID: 1.3.6.1.4.1.6486.802.1.1.2.1.2.17 "
+    ::= { familyNGOAWWirelessAP 17 }
+    
+END

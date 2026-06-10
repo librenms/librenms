@@ -1,0 +1,135 @@
+--
+-- ALPINE-GEN-CARD-TDCM-MIB.mib
+-- 
+
+	ALPINE-GEN-CARD-TDCM-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			alpineGeneric			
+				FROM ALPINE-ROOT			
+			Integer32, OBJECT-TYPE			
+				FROM SNMPv2-SMI;
+	
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.52326.1.2
+		alpineGenCardTdcm OBJECT IDENTIFIER ::= { alpineGeneric 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.2.1
+		alpineGenCardTdcmInfosTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF AlpineGenCardTdcmInfosEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { alpineGenCardTdcm 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.2.1.1
+		alpineGenCardTdcmInfosEntry OBJECT-TYPE
+			SYNTAX AlpineGenCardTdcmInfosEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { gctiSlotNum }
+			::= { alpineGenCardTdcmInfosTable 1 }
+
+		
+		AlpineGenCardTdcmInfosEntry ::=
+			SEQUENCE { 
+				gctiSlotNum
+					Integer32,
+				gctiWorkMode
+					Integer32,
+				gctiDefaultDispersion
+					Integer32,
+				gctiCurrentDispersion
+					Integer32,
+				gctiAutoModeSwitch
+					Integer32,
+				gctiSaveConfig
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.52326.1.2.1.1.1
+		gctiSlotNum OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot number."
+			::= { alpineGenCardTdcmInfosEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.2.1.1.2
+		gctiWorkMode OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Work mode of TDCM.
+				1. Manual Mode.
+				2. Auto Mode."
+			::= { alpineGenCardTdcmInfosEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.2.1.1.3
+		gctiDefaultDispersion OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "ps/nm*km"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The default dipersion value for line card startup."
+			::= { alpineGenCardTdcmInfosEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.2.1.1.4
+		gctiCurrentDispersion OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "ps/nm*km"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Current dispersion setting."
+			::= { alpineGenCardTdcmInfosEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.2.1.1.5
+		gctiAutoModeSwitch OBJECT-TYPE
+			SYNTAX Integer32 (1..2)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Turn on/off auto engine when current work mode is auto.
+				1. Turn on auto monitor and tunning for current monitor fiber.
+				2. Turn off auto monitor and tunning.
+				Note, this value is only available when current work mode 'gctiWorkMode' is auto."
+			::= { alpineGenCardTdcmInfosEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.52326.1.2.1.1.6
+		gctiSaveConfig OBJECT-TYPE
+			SYNTAX Integer32 (0..2)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Save current configuration into flash for non-valatile setting.
+				0: Idle/Save Done.
+				1: Issue save command.
+				2: Saving.
+				Only value 1 can be accepted in snmp set."
+			::= { alpineGenCardTdcmInfosEntry 6 }
+
+		
+	
+	END
+
+--
+-- ALPINE-GEN-CARD-TDCM-MIB.mib
+--

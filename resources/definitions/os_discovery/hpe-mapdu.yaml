@@ -1,0 +1,421 @@
+modules:
+    os:
+            serial:
+                - CPQPOWER-MIB::deviceSerialNumber.0
+            version:
+                - CPQPOWER-MIB::deviceFirmwareVersion.0
+            hardware:
+                - CPQPOWER-MIB::deviceModel.0
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - CPQPOWER-MIB::pdu2OutletName
+                        - CPQPOWER-MIB::pdu2OutletControlStatus
+                        - CPQPOWER-MIB::pdu2InputPhaseIndex
+                        - CPQPOWER-MIB::pdu3OutletName
+                        - CPQPOWER-MIB::pdu3OutletControlStatus
+                        - CPQPOWER-MIB::pdu3InputPhaseIndex
+        state:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2OutletControlStatus
+                    value: CPQPOWER-MIB::pdu2OutletControlStatus
+                    index: '{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.2.1.1.{{ $index }}'
+                    state_name: pdu2OutletControlStatus
+                    descr: '{{ CPQPOWER-MIB::pdu2OutletName }} State'
+                    group: 'Outlets'
+                    states:
+                        - { value: 1, generic: 3, descr: off,  }
+                        - { value: 2, generic: 0, descr: on,  }
+                        - { value: 3, generic: 1, descr: pendingOff,  }
+                        - { value: 4, generic: 2, descr: pendingOn,  }
+                -
+                    oid: CPQPOWER-MIB::pdu2InputType
+                    value: CPQPOWER-MIB::pdu2InputType
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.1.{{ $index }}'
+                    state_name: pdu2InputType
+                    descr: 'PDU Type'
+                    states:
+                        - { value: 1, generic: 0, descr: singlePhase,  }
+                        - { value: 2, generic: 1, descr: splitPhase,  }
+                        - { value: 3, generic: 2, descr: threePhaseDelta,  }
+                        - { value: 4, generic: 3, descr: threePhaseWye,  }
+                -
+                    oid: CPQPOWER-MIB::pdu3OutletControlStatus
+                    value: CPQPOWER-MIB::pdu3OutletControlStatus
+                    state_name: pdu3OutletControlStatus
+                    index: 'pdu3OutletControlStatus.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.2.1.1.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu3OutletName }} State'
+                    group: 'Outlets'
+                    states:
+                        - { value: 1, generic: 3, descr: off,  }
+                        - { value: 2, generic: 0, descr: on,  }
+                        - { value: 3, generic: 1, descr: pendingOff,  }
+                        - { value: 4, generic: 2, descr: pendingOn,  }
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletName'
+                        op: '=='
+                        value: '........'
+                -
+                    oid: CPQPOWER-MIB::pdu3InputType
+                    value: CPQPOWER-MIB::pdu3InputType
+                    state_name: pdu3InputType
+                    index: 'pdu3InputType.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.1.{{ $index }}'
+                    descr: 'PDU Type'
+                    states:
+                        - { value: 1, generic: 0, descr: singlePhase,  }
+                        - { value: 2, generic: 1, descr: splitPhase,  }
+                        - { value: 3, generic: 2, descr: threePhaseDelta,  }
+                        - { value: 4, generic: 3, descr: threePhaseWye,  }
+        frequency:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2InputFrequency
+                    value: CPQPOWER-MIB::pdu2InputFrequency
+                    index: 'pdu2InputFrequency.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.2.{{ $index }}'
+                    descr: 'Input Frequency'
+                    divisor: 10
+                -
+                    oid: CPQPOWER-MIB::pdu3InputFrequency
+                    value: CPQPOWER-MIB::pdu3InputFrequency
+                    index: 'pdu3InputFrequency.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.2.{{ $index }}'
+                    descr: 'Input Frequency'
+                    divisor: 10
+        voltage:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2InputPhaseVoltage
+                    value: CPQPOWER-MIB::pdu2InputPhaseVoltage
+                    index: 'pdu2InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.3.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu2InputPhaseIndex }} Voltage'
+                    divisor: 1000
+                    low_limit: CPQPOWER-MIB::pdu2InputPhaseVoltageThLowerCritical
+                    low_warn_limit: CPQPOWER-MIB::pdu2InputPhaseVoltageThLowerWarning
+                    warn_limit: CPQPOWER-MIB::pdu2InputPhaseVoltageThUpperWarning
+                    high_limit: CPQPOWER-MIB::pdu2InputPhaseVoltageThUpperCritical
+                -
+                    oid: CPQPOWER-MIB::pdu3InputPhaseVoltage
+                    value: CPQPOWER-MIB::pdu3InputPhaseVoltage
+                    index: 'pdu3InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.3.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu3InputPhaseIndex }} Voltage'
+                    divisor: 10
+                    low_limit: CPQPOWER-MIB::pdu3InputPhaseVoltageThLowerCritical
+                    low_warn_limit: CPQPOWER-MIB::pdu3InputPhaseVoltageThLowerWarning
+                    warn_limit: CPQPOWER-MIB::pdu3InputPhaseVoltageThUpperWarning
+                    high_limit: CPQPOWER-MIB::pdu3InputPhaseVoltageThUpperCritical
+                    skip_values: 0
+        current:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2InputPhaseCurrent
+                    value: CPQPOWER-MIB::pdu2InputPhaseCurrent
+                    index: 'pdu2InputPhaseCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.11.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu2InputPhaseIndex }} Current'
+                    skip_values: -1
+                    divisor: 1000
+                -
+                    oid: CPQPOWER-MIB::pdu2OutletCurrent
+                    value: CPQPOWER-MIB::pdu2OutletCurrent
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.5.{{ $index }}'
+                    index: 'pdu2OutletCurrent.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu2OutletName }} Current'
+                    divisor: 1000
+                    group: 'Outlets'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu3InputPhaseCurrent
+                    value: CPQPOWER-MIB::pdu3InputPhaseCurrent
+                    index: 'pdu3InputPhaseCurrent.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.11.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu3InputPhaseIndex }} Current'
+                    divisor: 100
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3InputPhaseIndex'
+                        op: '=='
+                        value: '0'
+                -
+                    oid: CPQPOWER-MIB::pdu3OutletCurrent
+                    value: CPQPOWER-MIB::pdu3OutletCurrent
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.5.{{ $index }}'
+                    index: 'pdu3OutletCurrent.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu3OutletName }} Current'
+                    divisor: 100
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletName'
+                        op: '=='
+                        value: '........'
+        power:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2InputPowerWatts
+                    value: CPQPOWER-MIB::pdu2InputPowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.5.{{ $index }}'
+                    index: 'Pdu2InputEntry.{{ $index }}'
+                    descr: 'Total Input Power'
+                    skip_values: -1
+                -
+                    oid: CPQPOWER-MIB::pdu2InputPhasePowerWatts
+                    value: CPQPOWER-MIB::pdu2InputPhasePowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.21.{{ $index }}'
+                    index: 'Pdu2InputEntry.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu2InputPhaseIndex }} Power'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2InputType:0'
+                        op: '!='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu2OutletWatts
+                    value: CPQPOWER-MIB::pdu2OutletWatts
+                    index: 'Pdu2OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.14.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu2OutletName }} Power'
+                    group: 'Outlets'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu3InputPowerWatts
+                    value: CPQPOWER-MIB::pdu3InputPowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.5.{{ $index }}'
+                    index: 'Pdu3InputEntry.{{ $index }}'
+                    descr: 'Total Input Power'
+                    skip_values: 0
+                -
+                    oid: CPQPOWER-MIB::pdu3InputPhasePowerWatts
+                    value: CPQPOWER-MIB::pdu3InputPhasePowerWatts
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.20.{{ $index }}'
+                    index: 'Pdu3InputEntry.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu3InputPhaseIndex }} Power'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3InputType:0'
+                        op: '!='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu3OutletWatts
+                    value: CPQPOWER-MIB::pdu3OutletWatts
+                    index: 'Pdu3OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.13.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu3OutletName }} Power'
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletName'
+                        op: '=='
+                        value: '........'
+        power_factor:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2InputPhasePowerFactor
+                    value: CPQPOWER-MIB::pdu2InputPhasePowerFactor
+                    index: 'Pdu2InputIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.8.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu2InputPhaseIndex }} Power Factor'
+                    divisor: 1000
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2InputType:0'
+                        op: '!='
+                        value: '1'
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2InputPhasePowerFactor'
+                        op: '=='
+                        value: '-1'
+                -
+                    oid: CPQPOWER-MIB::pdu2InputPowerFactor
+                    value: CPQPOWER-MIB::pdu2InputPowerFactor
+                    index: 'Pdu2InputIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.1.1.8.{{ $index }}'
+                    descr: 'Input Power Factor'
+                    skip_values: -1
+                    divisor: 1000
+                -
+                    oid: CPQPOWER-MIB::pdu2OutletPowerFactor
+                    value: CPQPOWER-MIB::pdu2OutletPowerFactor
+                    index: 'pdu2OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.17.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu2OutletName }} Power Factor'
+                    divisor: -1000
+                    group: 'Outlets'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu3InputPowerFactor
+                    value: CPQPOWER-MIB::pdu3InputPowerFactor
+                    index: 'Pdu3InputIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.1.1.9.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu3InputPhaseIndex }} Power Factor'
+                    skip_values: -1
+                    divisor: 100
+                -
+                    oid: CPQPOWER-MIB::pdu3OutletPowerFactor
+                    value: CPQPOWER-MIB::pdu3OutletPowerFactor
+                    index: 'pdu3OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.16.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu3OutletName }} Power Factor'
+                    divisor: 100
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletName'
+                        op: '=='
+                        value: '........'
+        load:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2OutletCurrentPercentLoad
+                    value: CPQPOWER-MIB::pdu2OutletCurrentPercentLoad
+                    index: 'pdu2OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.5.1.1.12.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu2OutletName }} Load'
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu2InputPhaseCurrentPercentLoad
+                    value: CPQPOWER-MIB::pdu2InputPhaseCurrentPercentLoad
+                    index: 'pdu2InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.2.2.1.18.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu2InputPhaseIndex }} Load'
+                    skip_value_lt: 0
+                -
+                    oid: CPQPOWER-MIB::pdu3OutletCurrentPercentLoad
+                    value: CPQPOWER-MIB::pdu3OutletCurrentPercentLoad
+                    index: 'pdu3OutletIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.5.1.1.11.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu3OutletName }} Load'
+                    divisor: 10
+                    group: 'Outlets'
+                    skip_value_lt: 0
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletControlStatus'
+                        op: '=='
+                        value: '1'
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3OutletName'
+                        op: '=='
+                        value: '........'
+                -
+                    oid: CPQPOWER-MIB::pdu3InputPhaseCurrentPercentLoad
+                    value: CPQPOWER-MIB::pdu3InputPhaseCurrentPercentLoad
+                    index: 'pdu3InputPhaseIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.2.2.1.17.{{ $index }}'
+                    descr: 'Input Phase {{ CPQPOWER-MIB::pdu3InputPhaseIndex }} Load'
+                    divisor: 10
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3InputPhaseIndex'
+                        op: '=='
+                        value: '0'
+        temperature:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2TemperatureTable
+                    value: CPQPOWER-MIB::pdu2TemperatureValue
+                    index: 'pdu2TemperatureIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.4.2.1.4.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu2TemperatureName }} Temperature sensor'
+                    low_limit: CPQPOWER-MIB::pdu2TemperatureThLowerCritical
+                    low_warn_limit: CPQPOWER-MIB::pdu2TemperatureThLowerWarning
+                    warn_limit: CPQPOWER-MIB::pdu2TemperatureThUpperWarning
+                    high_limit: CPQPOWER-MIB::pdu2TemperatureThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2TemperatureProbeStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu3TemperatureTable
+                    value: CPQPOWER-MIB::pdu3TemperatureValue
+                    index: 'pdu3TemperatureIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.4.2.1.4.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu3TemperatureName }} Temperature sensor'
+                    low_limit: CPQPOWER-MIB::pdu3TemperatureThLowerCritical
+                    low_warn_limit: CPQPOWER-MIB::pdu3TemperatureThLowerWarning
+                    warn_limit: CPQPOWER-MIB::pdu3TemperatureThUpperWarning
+                    high_limit: CPQPOWER-MIB::pdu3TemperatureThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3TemperatureProbeStatus'
+                        op: '=='
+                        value: '1'
+        humidity:
+            data:
+                -
+                    oid: CPQPOWER-MIB::pdu2HumidityTable
+                    value: CPQPOWER-MIB::pdu2HumidityValue
+                    index: 'pdu2HumidityIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.7.4.3.1.4.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu2HumidityName.0.1 }} Humidity sensor'
+                    low_limit: CPQPOWER-MIB::pdu2HumidityThLowerCritical
+                    low_warn_limit: CPQPOWER-MIB::pdu2HumidityThLowerWarning
+                    warn_limit: CPQPOWER-MIB::pdu2HumidityThUpperWarning
+                    high_limit: CPQPOWER-MIB::pdu2HumidityThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu2HumidityProbeStatus'
+                        op: '=='
+                        value: '1'
+                -
+                    oid: CPQPOWER-MIB::pdu3HumidityTable
+                    value: CPQPOWER-MIB::pdu3HumidityValue
+                    index: 'pdu3HumidityIndex.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.232.165.11.4.3.1.4.{{ $index }}'
+                    descr: '{{ CPQPOWER-MIB::pdu3HumidityName.0.1 }} Humidity sensor'
+                    low_limit: CPQPOWER-MIB::pdu3HumidityThLowerCritical
+                    low_warn_limit: CPQPOWER-MIB::pdu3HumidityThLowerWarning
+                    warn_limit: CPQPOWER-MIB::pdu3HumidityThUpperWarning
+                    high_limit: CPQPOWER-MIB::pdu3HumidityThUpperCritical
+                    group: 'Sensors'
+                    skip_values:
+                    -
+                        oid: 'CPQPOWER-MIB::pdu3HumidityProbeStatus'
+                        op: '=='
+                        value: '1'

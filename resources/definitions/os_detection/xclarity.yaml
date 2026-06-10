@@ -1,0 +1,21 @@
+os: xclarity
+text: 'Lenovo XCC IMPI'
+type: appliance
+icon: lenovo
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.19046.11.1
+ignore_mount_string:
+    - .whitelist
+    - .xcc-fw
+    - mlc
+    - mlc2
+    - mnt
+    - pstorage
+    - pybox
+    - run
+    - shm
+    - tdm-rw
+    - tmp
+mib_dir: lenovo

@@ -1,0 +1,414 @@
+-- Made by Jeon, DHL 
+-- at Thu Jan 27 16:50:00 2005
+
+     DASAN-ACCESS-SLOT-MGCP-MIB DEFINITIONS ::= BEGIN 
+   
+     IMPORTS 
+          BITS, mib-2, Counter32, Gauge32, -- inserted by jeon 20041206
+          MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, 
+          Integer32, IpAddress, Unsigned32 
+                  FROM SNMPv2-SMI 
+          TEXTUAL-CONVENTION, 
+          RowStatus, TestAndIncr, AutonomousType, TimeStamp, DisplayString 
+                  FROM SNMPv2-TC 
+          MODULE-COMPLIANCE, OBJECT-GROUP, 
+          NOTIFICATION-GROUP                          
+                  FROM SNMPv2-CONF 
+          SnmpAdminString                             
+                  FROM SNMP-FRAMEWORK-MIB
+--          Unsigned32
+--          		  FROM DASAN-TC
+          InterfaceIndex                              
+                  FROM IF-MIB
+          dasanMgmt
+          		  FROM DASAN-SMI;
+
+     dasanAccessMib MODULE-IDENTITY 
+   
+         LAST-UPDATED   "200506112100Z" 
+         ORGANIZATION   "DASAN Networks" 
+         CONTACT-INFO 
+          " 
+          Postal: 
+   
+          Phone: 
+   
+          Email: 
+
+          " 
+         DESCRIPTION 
+          "Access Gateway Management Information Base (MIB)" 
+       
+         -- Revision History  
+   
+         REVISION     "200502112100Z"              -- Feb, 2005
+         DESCRIPTION 
+          "Initial Version by Jeon." 
+   
+   
+         --::= { mib-2 64 }
+         ::= { dasanMgmt 100 }
+         -- private oid
+         -- _ should be .... final assignment by IANA at publication time  
+   
+   
+     -- *****************************************************************  
+     --  
+     -- OID For the MIB 
+     -- 
+     -- *****************************************************************  
+   
+     dasanAccGatewayMIBObjects    OBJECT IDENTIFIER::= { dasanAccessMib 2 }
+   
+      
+     -- *****************************************************************  
+     --  
+     -- Group Objects 
+     -- 
+     -- *****************************************************************  
+     
+     dsAccGwyMgcp       OBJECT IDENTIFIER ::= { dasanAccGatewayMIBObjects 2 }
+  
+     dsAccGwyMgcpConfiguration		OBJECT IDENTIFIER ::= { dsAccGwyMgcp 1 }
+     dsAccGwyMgcpMonitor			OBJECT IDENTIFIER ::= { dsAccGwyMgcp 2 }
+                                                           
+     -- ***************************************************************** 
+     -- *****************************************************************                                                           
+                                                                                                                                               
+     dsAccGwyConfigMgcpSlot			OBJECT IDENTIFIER ::= { dsAccGwyMgcpConfiguration 1 }
+  
+     dsAccGwyMonitorMgcpSlot		OBJECT IDENTIFIER ::= { dsAccGwyMgcpMonitor 1 }  
+
+     -- *****************************************************************   
+     -- ConfigMgcpSlot
+     -- *****************************************************************    
+	          
+	 dsAccGwyConfigMgcpSlotTable OBJECT-TYPE
+	 	SYNTAX		SEQUENCE OF DsAccGwyConfigMgcpSlotEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current
+	 	DESCRIPTION "A list of accGwyGatewatconfigEntry object."
+	 ::= { dsAccGwyConfigMgcpSlot 1 }
+	 
+	 dsAccGwyConfigMgcpSlotEntry OBJECT-TYPE
+	 	SYNTAX		DsAccGwyConfigMgcpSlotEntry
+	 	MAX-ACCESS 	not-accessible
+	 	STATUS		current  
+	 	DESCRIPTION "Config AccessGateway Functions for each slot."
+	 	INDEX		{ dsMgcpSlotIndex } 
+	 ::= { dsAccGwyConfigMgcpSlotTable 1}
+	 
+	 DsAccGwyConfigMgcpSlotEntry ::= SEQUENCE
+	 {        
+	 	dsMgcpSlotIndex			INTEGER,
+        dsMgcpSlotEncodePackageName     INTEGER,
+        dsMgcpSlotRetransmitStartTimeout INTEGER,
+        dsMgcpSlotRetransmitMaxTimeout   INTEGER,
+        dsMgcpSlotRetransmitLongTimer    INTEGER,
+        dsMgcpSlotRetransmitMaxLifetime  INTEGER,
+        dsMgcpSlotRetransmitMax1         INTEGER,
+        dsMgcpSlotRetransmitMax2         INTEGER,
+        dsMgcpSlotRestartMaxwait         INTEGER,
+        dsMgcpSlotDisconnectInit         INTEGER,
+        dsMgcpSlotDisconnectMin          INTEGER,
+        dsMgcpSlotDisconnectMax          INTEGER,
+        dsMgcpSlotCaAddr1               DisplayString,
+        dsMgcpSlotCaAddr2               DisplayString,
+        dsMgcpSlotCaAddr3               DisplayString,
+        dsMgcpSlotCaAddr4               DisplayString,
+        dsMgcpSlotCaAddr5               DisplayString,
+        dsMgcpSlotCaAddr6               DisplayString,
+        dsMgcpSlotCaAddr7               DisplayString,
+        dsMgcpSlotCaAddr8               DisplayString,
+        dsMgcpSlotCaPort1               INTEGER,
+        dsMgcpSlotCaPort2               INTEGER,
+        dsMgcpSlotCaPort3               INTEGER,
+        dsMgcpSlotCaPort4               INTEGER,
+        dsMgcpSlotCaPort5               INTEGER,
+        dsMgcpSlotCaPort6               INTEGER,
+        dsMgcpSlotCaPort7               INTEGER,
+        dsMgcpSlotCaPort8               INTEGER,
+        dsMgcpSlotMgAddr                DisplayString,
+        dsMgcpSlotMgPort                INTEGER
+     }
+                                            
+     dsMgcpSlotIndex			OBJECT-TYPE
+	 	SYNTAX		INTEGER
+	 	MAX-ACCESS	read-only
+		STATUS		current
+     	DESCRIPTION	"AGLU Slot Index of a System"
+     ::= {dsAccGwyConfigMgcpSlotEntry 1}
+
+   
+     dsMgcpSlotEncodePackageName	OBJECT-TYPE
+     	SYNTAX		INTEGER {
+                   on(1),
+                   off(0)
+               }
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"When notified the event, 
+     				it decides whether to use the package name or not "
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 2}
+     
+     dsMgcpSlotRetransmitStartTimeout		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Starting value of re-transmision timer."
+     	--DEFVAL		{"200"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 3}
+     
+     dsMgcpSlotRetransmitMaxTimeout		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Maximum value of re-transmission timer"
+     	--DEFVAL		{"4"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 4}
+     
+     dsMgcpSlotRetransmitLongTimer		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"The object represents the holding session time 
+     				after succeeded MGCP message to be received and transmitted"
+     	--DEFVAL		{"30"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 5}
+     
+     dsMgcpSlotRetransmitMaxLifetime		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Maximum life time of transaction"
+     	--DEFVAL		{"30"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 6}
+     
+     dsMgcpSlotRetransmitMax1		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"It is the counter value of retrying transmission, 
+     				with multipled timeout(initially start-timeout) by 2"
+     	--DEFVAL		{"3"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 7}
+     
+     dsMgcpSlotRetransmitMax2		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"It is the retry counter value without increasing time-out
+     				after RetransmitMax1"
+     	--DEFVAL		{"10"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 8}
+     
+     dsMgcpSlotRestartMaxwait		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Maximum waiting time before sending RSIP message
+     				after restarting MGCP or booting"
+     	--DEFVAL		{"600"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 9}
+     
+     dsMgcpSlotDisconnectInit		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Disconnected initial waiting delay value in sec (Default: 8 sec)"
+     	--DEFVAL		{"15"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 10}
+     
+     dsMgcpSlotDisconnectMin		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Disconnected minimum waiting delay value in sec (Default: 8 sec)"
+     	--DEFVAL		{"15"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 11}
+     
+     dsMgcpSlotDisconnectMax		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"Disconnected maximum waiting delay value in sec (Default: 600 sec)"
+     	--DEFVAL		{"600"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 12}
+     
+     dsMgcpSlotCaAddr1	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 1 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 13}
+     
+     dsMgcpSlotCaAddr2	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 2 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 14}
+     
+     dsMgcpSlotCaAddr3	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 3 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 15}
+     
+     dsMgcpSlotCaAddr4	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 4 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 16}
+     
+     dsMgcpSlotCaAddr5	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 5 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 17}
+     
+     dsMgcpSlotCaAddr6	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 6 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 18}
+     
+     dsMgcpSlotCaAddr7	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 7 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 19}
+     
+     dsMgcpSlotCaAddr8	OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 8 IP Address or name address"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 20}
+     
+     dsMgcpSlotCaPort1	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 1 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 21}
+     
+     dsMgcpSlotCaPort2	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 2 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 22}
+
+     dsMgcpSlotCaPort3	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 3 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 23}
+     
+     dsMgcpSlotCaPort4	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 4 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 24}
+     
+     dsMgcpSlotCaPort5	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 5 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 25}
+     
+     dsMgcpSlotCaPort6	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 6 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 26}
+     
+     dsMgcpSlotCaPort7	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 7 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 27}
+     
+     dsMgcpSlotCaPort8	OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Call Agent 8 Port Number"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 28}     
+
+     dsMgcpSlotMgAddr		OBJECT-TYPE
+     	SYNTAX		DisplayString
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Media Gateway IP Address Configuration"
+     	DEFVAL		{"1.1.1.1"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 29}
+     
+     dsMgcpSlotMgPort		OBJECT-TYPE
+     	SYNTAX		INTEGER
+     	MAX-ACCESS	read-write
+     	STATUS		current
+     	DESCRIPTION	"MGCP Media Gateway Port Configuration"
+     	--DEFVAL		{"0"}
+     ::= {dsAccGwyConfigMgcpSlotEntry 30}   
+                                          
+     -- *****************************************************************   
+     -- MonitorMgcpSlot
+     -- *****************************************************************    
+                 
+     dsAccGwyMonitorMgcpSlotTable	OBJECT-TYPE
+     	SYNTAX      SEQUENCE OF DsAccGwyMonitorMgcpSlotEntry
+        MAX-ACCESS  not-accessible 
+        STATUS      current 
+        DESCRIPTION "A list of AGLU ConfigEntry objects." 
+     ::= { dsAccGwyMonitorMgcpSlot 1}
+     
+     dsAccGwyMonitorMgcpSlotEntry OBJECT-TYPE
+         SYNTAX       DsAccGwyMonitorMgcpSlotEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION "Config AGLU Functions for each slot."
+         INDEX      { dsMgcpSlotIndex }
+     ::= { dsAccGwyMonitorMgcpSlotTable 1 }
+   
+     DsAccGwyMonitorMgcpSlotEntry ::= SEQUENCE 
+     {   
+		dsMgcpMonitorMgcpStatus    		   OCTET STRING
+			 }
+	      
+     dsMgcpMonitorMgcpStatus	OBJECT-TYPE
+	 	SYNTAX		DisplayString
+	 	MAX-ACCESS	read-only
+     	STATUS		current
+     	DESCRIPTION	"MGCP Status Information"
+     ::= {dsAccGwyMonitorMgcpSlotEntry 1}
+     
+     END

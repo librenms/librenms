@@ -1,0 +1,136 @@
+--********************************************************************
+-- AC-FAULT-TC:
+--   This MIB defines textual conventions for alarm attributes
+--   used in various Audiocodes MIBs
+--
+-- Creation Date: December 2003
+--
+-- Copyright (c) 2003 by Audiocodes
+-- All rights reserved.
+--********************************************************************
+
+--********************************************************************
+--
+-- Revision History
+--   4.4. Dec. 11, 2003.
+--     o  Initial revision
+--
+--********************************************************************
+
+AC-FAULT-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32
+    FROM SNMPv2-SMI
+  TEXTUAL-CONVENTION, TruthValue
+    FROM SNMPv2-TC;
+
+AcAlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "ISO/IEC 10164-4, ITU X.733 alarm severities"
+    SYNTAX      INTEGER
+                {
+                  cleared(0),
+                  indeterminate(1),
+                  warning(2),
+                  minor(3),
+                  major(4),
+                  critical(5)
+                }
+
+AcAlarmEventType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "ISO/IEC 10164-4, ITU X.733 event types"
+    SYNTAX      INTEGER
+                {
+                  other(0),
+                  communicationsAlarm(1),
+                  qualityOfServiceAlarm(2),
+                  processingErrorAlarm(3),
+                  equipmentAlarm(4),
+                  environmentalAlarm(5)
+                }
+
+AcAlarmProbableCause ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "ISO/IEC 10164-4, ITU X.733 probable causes"
+    SYNTAX      INTEGER
+                {
+                  other(0),
+                  adapterError(1),
+                  applicationSubsystemFailure(2),
+                  bandwidthReduced(3),
+                  callEstablishmentError(4),
+                  communicationsProtocolError(5),
+                  communicationsSubsystemFailure(6),
+                  configurationOrCustomizationError(7),
+                  congestion(8),
+                  corruptData(9),
+                  cpuCyclesLimitExceeded(10),
+                  dataSetOrModemError(11),
+                  degradedSignal(12),
+                  dteDceInterfaceError(13),
+                  enclosureDoorOpen(14),
+                  equipmentMalfunction(15),
+                  excessiveVibration(16),
+                  fileError(17),
+                  fireDetected(18),
+                  floodDetected(19),
+                  framingError(20),
+                  heatingVentCoolingSystemProblem(21),
+                  humidityUnacceptable(22),
+                  inputOutputDeviceError(23),
+                  inputDeviceError(24),
+                  lanError(25),
+                  leakDetected(26),
+                  localNodeTransmissionError(27),
+                  lossOfFrame(28),
+                  lossOfSignal(29),
+                  materialSupplyExhausted(30),
+                  multiplexerProblem(31),
+                  outOfMemory(32),
+                  ouputDeviceError(33),
+                  performanceDegraded(34),
+                  powerProblem(35),
+                  pressureUnacceptable(36),
+                  processorProblem(37),
+                  pumpFailure(38),
+                  queueSizeExceeded(39),
+                  receiveFailure(40),
+                  receiverFailure(41),
+                  remoteNodeTransmissionError(42),
+                  resourceAtOrNearingCapacity(43),
+                  responseTimeExecessive(44),
+                  retransmissionRateExcessive(45),
+                  softwareError(46),
+                  softwareProgramAbnormallyTerminated(47),
+                  softwareProgramError(48),
+                  storageCapacityProblem(49),
+                  temperatureUnacceptable(50),
+                  thresholdCrossed(51),
+                  timingProblem(52),
+                  toxicLeakDetected(53),
+                  transmitFailure(54),
+                  transmitterFailure(55),
+                  underlyingResourceUnavailable(56),
+                  versionMismatch(57),
+                  authenticationFailure(58),
+                  breachOfConfidentiality(59),
+                  cableTamper(60),
+                  delayedInformation(61),
+                  denialOfService(62),
+                  duplicateInformation(63),
+                  informationMissing(64),
+                  informationModificationDetected(65),
+                  informationOutOfSequence(66),
+                  intrusionDetection(67),
+                  keyExpired(68),
+                  nonRepudiationFailure(69),
+                  outOfHoursActivity(70),
+                  outOfService(71),
+                  proceduralError(72),
+                  unauthorizedAccessAttempt(73),
+                  unexpectedInformation(74)
+                }
+
+END

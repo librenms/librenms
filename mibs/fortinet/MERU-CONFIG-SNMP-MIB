@@ -1,0 +1,109 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-SNMP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    ;
+
+  mwConfigSnmp  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         SNMP Configuration infrastructure"
+    ::= { mwConfiguration 12 } 
+  
+    
+  
+  mwWncTrapCommunityTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwWncTrapCommunityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes SNMP Trap Management "
+    ::= { mwConfigSnmp 2 }
+
+  mwWncTrapCommunityEntry  OBJECT-TYPE
+    SYNTAX MwWncTrapCommunityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes SNMP Trap Management "
+    INDEX {  mwWncTrapCommunityTableIndex  }
+    ::= { mwWncTrapCommunityTable 1 }
+
+  MwWncTrapCommunityEntry  ::=  SEQUENCE { 
+       mwWncTrapCommunityTableIndex                                Integer32, 
+       mwWncTrapCommunitypCommunityStr                             DisplayString(SIZE (1..32)),
+       mwWncTrapCommunityClientIpAddress                           IpAddress,
+       mwWncTrapCommunityRowStatus                                 RowStatus 
+  }
+   
+   
+  mwWncTrapCommunityTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwWncTrapCommunityEntry 1 }
+
+  mwWncTrapCommunitypCommunityStr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Trap Community"
+    ::= { mwWncTrapCommunityEntry    2 }
+
+  mwWncTrapCommunityClientIpAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Trap Destination IP"
+    ::= { mwWncTrapCommunityEntry    3 }
+
+  mwWncTrapCommunityRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwWncTrapCommunityEntry 4 }
+
+  
+END
+   

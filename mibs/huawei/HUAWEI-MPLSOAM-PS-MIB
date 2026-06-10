@@ -1,0 +1,542 @@
+    HUAWEI-MPLSOAM-PS-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwMplsOam            
+                FROM HUAWEI-MPLSOAM-MIB            
+            InterfaceIndex            
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, Unsigned32, OBJECT-TYPE, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            RowStatus, TruthValue            
+                FROM SNMPv2-TC;
+    
+    
+    
+--
+-- Node definitions
+--
+    
+        hwMplsOamPs OBJECT IDENTIFIER ::= { hwMplsOam 1 }
+
+        
+        hwMplsPsObjects OBJECT IDENTIFIER ::= { hwMplsOamPs 3 }
+
+        
+        hwMplsPsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table specifies per-protection-group MPLS PS 
+                capability and associated information.
+                "
+            ::= { hwMplsPsObjects 1 }
+
+        
+        hwMplsPsEntry OBJECT-TYPE
+            SYNTAX HwMplsPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in this table is created by an LSR for every 
+                protection group capable of supporting mpls ps."
+            INDEX { hwMplsPsIndex }
+            ::= { hwMplsPsTable 1 }
+
+        
+        HwMplsPsEntry ::=
+            SEQUENCE { 
+                hwMplsPsIndex
+                    Unsigned32,
+                hwMplsPsType
+                    Integer32,
+                hwMplsPsWorkTunnName
+                    OCTET STRING,
+                hwMplsPsWorkTunnId
+                    Integer32,
+                hwMplsPsProtectTunnName
+                    OCTET STRING,
+                hwMplsPsProtectTunnId
+                    Integer32,
+                hwMplsPsRevertiveMode
+                    Integer32,
+                hwMplsPsWTR
+                    Integer32,
+                hwMplsPsHoldOff
+                    Integer32,
+                hwMplsPsSwitchCondition
+                    Integer32,
+                hwMplsPsWorkTunnelState
+                    Integer32,
+                hwMplsPsProtTunnelState
+                    Integer32,
+                hwMplsPsSwitchResult
+                    Integer32,
+                hwMplsPsCfgType
+                    Integer32,
+                hwMplsPsCfgProtectTunnId
+                    Integer32,
+                hwMplsPsCfgRevertiveMode
+                    Integer32,
+                hwMplsPsCfgWTR
+                    Integer32,
+                hwMplsPsCfgHoldOff
+                    Integer32,
+                hwMplsPsRowStatus
+                    RowStatus
+             }
+
+        hwMplsPsIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This is a unique index for an entry in the mplspsEntry.
+                
+                "
+            ::= { hwMplsPsEntry 1 }
+
+        
+        hwMplsPsType OBJECT-TYPE
+            SYNTAX Integer32 (1..4)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of protection switch,can be 1:1,1+1,shared mesh,
+                packet 1+1,the default choice is 1:1.
+                In the 1+1 architecture type, a protection LSP is dedicated to 
+                each working LSP with the working LSP bridged onto the 
+                protection LSP at the source of the protection domain. 
+                The traffic on working and protection LSPs is transmitted 
+                simultaneously to the sink of the protection domain, 
+                where a selection between the working and protection LSP is 
+                made, based on some predetermined criteria, such as defect 
+                indication.
+                In the 1:1 architecture type, a protection LSP is dedicated to 
+                each working LSP. The working traffic is transmitted either by 
+                working or protection LSP.
+                In the shared mesh architecture type, possible sharing of 
+                protection capacity between disjoint link, node in the network 
+                is achieved while guaranteeing recovery from a single failure.
+                In the packet 1+1 architecture type, the traffic is transmitted 
+                simultaneously onto two possibly disjoint routed LSPs to the 
+                sink of the protection domain. Each pair of duplicate 
+                transmitted packets is assigned the same identifier (sequence 
+                number) but distinct from the other pairs of duplicate packets. 
+                At the sink of the protection domain packet level selection 
+                mechanism is employed to select one of the two possibly 
+                received copies of each packet. 
+                1:  1:1 protection switching,;
+                2:  1+1 protection switching;
+                3:  shared mesh protection swiching;
+                4:  packet 1+1 protection switching.
+                "
+            ::= { hwMplsPsEntry 2 }
+
+        
+        hwMplsPsWorkTunnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The name of work-tunnel."
+            ::= { hwMplsPsEntry 3 }
+
+        
+        hwMplsPsWorkTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Work-tunnel id(session-tunnel-id)."
+            ::= { hwMplsPsEntry 4 }
+
+        
+        hwMplsPsProtectTunnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of protect-tunnel."
+            ::= { hwMplsPsEntry 5 }
+
+        
+        hwMplsPsProtectTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Protect-tunnel id(session-tunnel-id)."
+            ::= { hwMplsPsEntry 6 }
+
+        
+        hwMplsPsRevertiveMode OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Revertive mode is a protection switching mode where revertive 
+                action (switch back to the working LSP) is taken after the 
+                working LSP is repaired.And switching does not occur in a
+                non-revertive mode.
+                1: revertive;
+                2: non-revertive;
+                "
+            ::= { hwMplsPsEntry 7 }
+
+        
+        hwMplsPsWTR OBJECT-TYPE
+            SYNTAX Integer32 (0..60)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Wait to Restore timer is only applicable for the revertive mode 
+                and applies to a working LSP,It prevents reversion back to 
+                select the working LSP until the Wait to Restore timer has 
+                expired.The default value is 12 minutes.step is 30s."
+            ::= { hwMplsPsEntry 8 }
+
+        
+        hwMplsPsHoldOff OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time between declaration of signal degrade or signal fail, 
+                and the initialization of the protection switching algorithm.
+                step is 100ms.maximum is 10s."
+            ::= { hwMplsPsEntry 9 }
+
+        
+        hwMplsPsSwitchCondition OBJECT-TYPE
+            SYNTAX Integer32 (1..9)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The current switch condition of the protection group.
+                1: clear,This command clears all of the externally 
+                   initiated switch commands listed below;
+                2: lockout of protection,Fix the selector position on the 
+                   working LSP,Prevents the selector from switching to the 
+                   protection LSP when it is selecting the working LSP. 
+                   Switches the selector from the protection to the working LSP 
+                   when it is selecting the protection LSP;
+                3: forced protection,Switches the selector from the working LSP 
+                   to the protection LSP (unless a higher priority switch 
+                   request (i.e., LoP) is in effect);
+                4: signal fail,for 1:1,Signal Fail (SF) is declared when the 
+                   source of the protection domain enters the Defect State by 
+                   receiving a BDI packet (from the return LSP or out of band).
+                5: manual switch for working-lsp,Switches the selector from the 
+                   working LSP to the protection LSP (unless an equal or higher 
+                   priority switch request (i.e., LoP, FS, SF or MS) is in 
+                   effect);
+                6: manual switch for protection-lsp,Switches the selector from 
+                   the protection LSP to the working LSP (unless an equal or 
+                   higher priority switch request (i.e., LoP, FS, SF or MS) is 
+                   in effect).
+                7: WTR-timer;
+                8: HoldOff-timer;
+                9: Others;
+                The pripority of the commands are:
+                clear > lockout of protection > force switch > manual switch for working
+                lsp = manual switch for protection lsp"
+            ::= { hwMplsPsEntry 10 }
+
+        
+        hwMplsPsWorkTunnelState OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The state of working tunnel state in one protection group,
+                whether it is in detection,
+                1: it is outof defect
+                2: it enters defect
+                "
+            ::= { hwMplsPsEntry 11 }
+
+        
+        hwMplsPsProtTunnelState OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The state of protection tunnel state in one protection group,
+                whether it is in detection,
+                1: it is outof defect
+                2: it enters defect"
+            ::= { hwMplsPsEntry 12 }
+
+        
+        hwMplsPsSwitchResult OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Which tunnel is used to transfer the data stream.
+                1: working-tunnel
+                2: protection-tunnel"
+            ::= { hwMplsPsEntry 13 }
+
+        
+        hwMplsPsCfgType OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of protection switch which is configured.
+                1: 1:1
+                2: 1+1
+                3: shared mesh
+                4: packet 1:1"
+            ::= { hwMplsPsEntry 14 }
+
+        
+        hwMplsPsCfgProtectTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Protect-tunnel id(session-tunnel-id)."
+            ::= { hwMplsPsEntry 15 }
+
+        
+        hwMplsPsCfgRevertiveMode OBJECT-TYPE
+            SYNTAX Integer32 (1..2)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Revertive mode is a protection switching mode where revertive 
+                action (switch back to the working LSP) is taken after the 
+                working LSP is repaired.And switching does not occur in a
+                non-revertive mode.
+                1: revertive;
+                2: non-revertive;
+                
+                "
+            ::= { hwMplsPsEntry 16 }
+
+        
+        hwMplsPsCfgWTR OBJECT-TYPE
+            SYNTAX Integer32 (0..60)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Wait to Restore timer is only applicable for the revertive mode 
+                and applies to a working LSP,It prevents reversion back to 
+                select the working LSP until the Wait to Restore timer has 
+                expired.The default value is 12 minutes.step is 30s."
+            ::= { hwMplsPsEntry 17 }
+
+        
+        hwMplsPsCfgHoldOff OBJECT-TYPE
+            SYNTAX Integer32 (0..100)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The time between declaration of signal degrade or signal fail, 
+                and the initialization of the protection switching algorithm.
+                step is 100ms.maximum is 10s."
+            ::= { hwMplsPsEntry 18 }
+
+        
+        hwMplsPsRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This variable is used to create, modify, and
+                delete a row in this table.
+                1: active
+                2: not in service
+                3: not ready
+                4: create and go
+                5: create and wait
+                6: destroy"
+            ::= { hwMplsPsEntry 19 }
+
+        
+        hwTunnPsTrapOpen OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "1:enable;
+                2:disable;"
+            ::= { hwMplsPsObjects 2 }
+
+        
+        hwMplsVCPsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMplsVCPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Description."
+            ::= { hwMplsPsObjects 3 }
+
+        
+        hwMplsVCPsEntry OBJECT-TYPE
+            SYNTAX HwMplsVCPsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "this table for these commands
+                1.mpls te protection tunnel XXX
+                2. mpls te reverse-lsp { lsp-name XXXX | lsr-id X.X.X.X tunnel-id x }                                               
+                3. mpls te reserved-for-binding  "
+            INDEX { hwMplsVCPsIfIndex }
+            ::= { hwMplsVCPsTable 1 }
+
+        
+        HwMplsVCPsEntry ::=
+            SEQUENCE { 
+                hwMplsVCPsIfIndex
+                    InterfaceIndex,
+                hwMplsVCPsTNLBinding
+                    TruthValue,
+                hwMplsTeReverseLspName
+                    OCTET STRING,
+                hwMplsVcPsRowStatus
+                    RowStatus,
+                hwMplsTeReverseLspLsrId
+                    IpAddress,
+                hwMplsTeReverseLspTunnId
+                    Integer32
+             }
+
+        hwMplsVCPsIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Description.the  index of working tunnel interface of Protection group  "
+            ::= { hwMplsVCPsEntry 1 }
+
+        
+        hwMplsVCPsTNLBinding OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Description.it is used by command ' mpls te reserved-for-binding '"
+            ::= { hwMplsVCPsEntry 2 }
+
+        
+        hwMplsTeReverseLspName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Description.it is used for command ' mpls te reverse-lsp lspname'"
+            ::= { hwMplsVCPsEntry 3 }
+
+        
+        hwMplsVcPsRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Description.
+                1: active;
+                2: notInservice;
+                3: notReady;
+                4: CreateAndGo;
+                5: CreateAndWait;
+                6: destroy;"
+            ::= { hwMplsVCPsEntry 4 }
+
+        
+        hwMplsTeReverseLspLsrId OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Description.it is used for command ' mpls te reverse-lsp lsr-id X.X.X.X tunnel-id XX'"
+            ::= { hwMplsVCPsEntry 5 }
+
+        
+        hwMplsTeReverseLspTunnId OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Description.it is used for command ' mpls te reverse-lsp lsr-id X.X.X.X tunnel-id XX'"
+            ::= { hwMplsVCPsEntry 6 }
+
+        
+        hwMplsPsNotifications OBJECT IDENTIFIER ::= { hwMplsOamPs 4 }
+
+        
+        hwMplsPsSwitchPtoW NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsPsWorkTunnId, hwMplsPsProtectTunnName, hwMplsPsProtectTunnId, hwMplsPsSwitchResult
+                 }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when switching from
+                protection-lsp to working-lsp occured."
+            ::= { hwMplsPsNotifications 1 }
+
+        
+        hwMplsPsSwitchWtoP NOTIFICATION-TYPE
+            OBJECTS { hwMplsPsWorkTunnName, hwMplsPsWorkTunnId, hwMplsPsProtectTunnName, hwMplsPsProtectTunnId, hwMplsPsSwitchResult
+                 }
+            STATUS current
+            DESCRIPTION 
+                "This notification is generated when switching from woking-lsp
+                to protection-lsp occured.
+                "
+            ::= { hwMplsPsNotifications 2 }
+
+        
+        hwMplsOamPsConformance OBJECT IDENTIFIER ::= { hwMplsOamPs 100 }
+
+        
+        hwMplsOamPsCompliances OBJECT IDENTIFIER ::= { hwMplsOamPsConformance 1 }
+
+        
+        hwMplsOamPsGroupCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for mpls oam ps."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwMplsPsGroup, hwMplsVcPsGroup }
+            ::= { hwMplsOamPsCompliances 1 }
+
+        
+        hwMplsOamPsGroups OBJECT IDENTIFIER ::= { hwMplsOamPsConformance 2 }
+
+        
+        hwMplsPsGroup OBJECT-GROUP
+            OBJECTS { hwMplsPsType, hwMplsPsWorkTunnName, hwMplsPsWorkTunnId, hwMplsPsProtectTunnName, hwMplsPsProtectTunnId, 
+                hwMplsPsRevertiveMode, hwMplsPsWTR, hwMplsPsHoldOff, hwMplsPsSwitchCondition, hwMplsPsWorkTunnelState, 
+                hwMplsPsProtTunnelState, hwMplsPsSwitchResult, hwMplsPsCfgType, hwMplsPsCfgProtectTunnId, hwMplsPsCfgRevertiveMode, 
+                hwMplsPsCfgWTR, hwMplsPsCfgHoldOff, hwMplsPsRowStatus, hwTunnPsTrapOpen, hwMplsVCPsIfIndex, 
+                hwMplsPsIndex }
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for mpls oam ps management."
+            ::= { hwMplsOamPsGroups 1 }
+
+        
+        hwMplsVcPsGroup OBJECT-GROUP
+            OBJECTS { hwMplsVCPsTNLBinding, hwMplsTeReverseLspName, hwMplsVcPsRowStatus, hwMplsTeReverseLspLsrId, hwMplsTeReverseLspTunnId
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for mpls oam ps reverse lsp."
+            ::= { hwMplsOamPsGroups 2 }
+
+        
+        hwMplsPsNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMplsPsSwitchPtoW, hwMplsPsSwitchWtoP }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMplsOamPsGroups 3 }
+
+        
+    
+    END

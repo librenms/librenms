@@ -1,0 +1,185 @@
+--  ===========================================================================
+-- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: HUAWEI MSDP MIB
+-- Reference:   Module(HUAWEI-MSDP-MIB).
+-- Version:     V1.01
+-- History:     
+-- V1.00
+-- ===========================================================================
+
+    HUAWEI-MSDP-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            msdpPeerRemoteAddress, msdpPeerState, msdpPeerFsmEstablishedTransitions            
+                FROM MSDP-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32          
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;         -- [RFC2579]
+
+        hwMsdpMIB MODULE-IDENTITY 
+            LAST-UPDATED "201502050000Z"        -- February 05, 2015 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "The MIB module for management of PIM routers.
+                
+                Huawei Technologies co.,Ltd . Supplementary information may
+                be available at:
+                http://www.huawei.com"
+                
+            REVISION "201502050000Z"        -- February 05, 2015 at 00:00 GMT
+            DESCRIPTION 
+                "Delete hwPimTuningParametersGroup from hwMsdpMIBFullCompliance."
+                 
+            REVISION "200910310000Z"        -- October 31, 2009 at 00:00 GMT
+            DESCRIPTION 
+                "The initial revision of this Mib module."
+            ::= { hwDatacomm 218 }        
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1
+        hwMsdpMIBObjects OBJECT IDENTIFIER ::= { hwMsdpMIB 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1
+        hwMsdp OBJECT IDENTIFIER ::= { hwMsdpMIBObjects 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.1
+        hwMsdpObjects OBJECT IDENTIFIER ::= { hwMsdp 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.2
+        hwMsdpTrapsObjects OBJECT IDENTIFIER ::= { hwMsdp 2 }
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.2.1
+        hwMsdpInstanceID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The instance ID of the trap."
+            ::= { hwMsdpTrapsObjects 1 }
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.2.2
+        hwMsdpInstanceName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The instance name of the trap."
+            ::= { hwMsdpTrapsObjects 2 }
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.2.3
+        hwMsdpNotificationReason OBJECT-TYPE
+            SYNTAX INTEGER{
+                         holdTimerExpired(1),
+                         tcpNotEstablish(2),
+                         sockerError(3),
+                         receiveInvalidTLV(4),
+                         receiveNotificationTLV(5),
+                         userOperation(6),
+                         peerUpAgain(7),
+                         deletePeer(8),
+                         alarmTimeout(9),
+                         alarmClear(100)
+    }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The reason for trap sending.
+                  1.HoldTime expired
+                  2.TCP not establish
+                  3.Socket error
+                  4.Receive invalid TLV
+                  5.Receive notification TLV
+                  6.User operation
+                  7.Peer Up again
+                  8.Delete peer
+                  9.Alarm timeout
+                  100.Alarm Clear"
+            ::= { hwMsdpTrapsObjects 3 }
+
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.3
+        hwMsdpTraps OBJECT IDENTIFIER ::= { hwMsdp 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.3.1
+        hwMsdpNeighborUnavailable NOTIFICATION-TYPE
+            OBJECTS { hwMsdpInstanceID, 
+                      hwMsdpInstanceName, 
+                      msdpPeerState, 
+                      hwMsdpNotificationReason
+                    }
+            STATUS current
+            DESCRIPTION 
+                "A hwMsdpNeighborUnavailable notification signifies that the MSDP peer is unavailable."
+            ::= { hwMsdpTraps 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.3.2
+        hwMsdpNeighborUnvailableClear NOTIFICATION-TYPE
+            OBJECTS { hwMsdpInstanceID, 
+                      hwMsdpInstanceName, 
+                      msdpPeerState, 
+                      hwMsdpNotificationReason
+                    }
+            STATUS current
+            DESCRIPTION 
+                "A hwMsdpNeighborUnvailableClear notification signifies that the MSDP peer is available."
+            ::= { hwMsdpTraps 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.4
+        hwMsdpMIBConformance OBJECT IDENTIFIER ::= { hwMsdp 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.4.1
+        hwMsdpMIBCompliances OBJECT IDENTIFIER ::= { hwMsdpMIBConformance 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.4.1.1
+        hwMsdpMIBCompliance MODULE-COMPLIANCE
+            STATUS deprecated
+            DESCRIPTION 
+                "Description."
+            MODULE      -- this module
+            ::= { hwMsdpMIBCompliances 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.4.1.2
+        hwMsdpMIBFullCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for HUAWEI-MSDP MIB."
+        MODULE  
+        MANDATORY-GROUPS { hwMsdpMIBPeerGroup,
+                           hwMsdpMIBNotificationGroup }
+
+        GROUP   hwMsdpMIBPeerGroup
+        DESCRIPTION
+            "This group is optional."
+
+        ::= { hwMsdpMIBCompliances 2 }  
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.4.2
+        hwMsdpMIBGroups OBJECT IDENTIFIER ::= { hwMsdpMIBConformance 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.4.2.1
+        hwMsdpMIBPeerGroup OBJECT-GROUP
+            OBJECTS { hwMsdpNotificationReason, hwMsdpInstanceName, hwMsdpInstanceID }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMsdpMIBGroups 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.218.1.1.4.2.2
+        hwMsdpMIBNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwMsdpNeighborUnavailable, hwMsdpNeighborUnvailableClear }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwMsdpMIBGroups 2 }
+        
+    
+    END

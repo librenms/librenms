@@ -1,0 +1,7 @@
+os: openvms
+type: server
+text: 'HPE OpenVMS'
+icon: hpe
+bad_hrSystemUptime: true
+discovery:
+    - { sysObjectID: .1.3.6.1.4.1.36.2.15.22.1 }

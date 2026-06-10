@@ -1,0 +1,551 @@
+GUDEADS-ESB7213-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises,
+	MODULE-IDENTITY,
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Integer32,
+	Unsigned32
+		FROM SNMPv2-SMI
+	OBJECT-GROUP,
+	NOTIFICATION-GROUP
+		FROM SNMPv2-CONF;
+
+gudeads MODULE-IDENTITY
+	LAST-UPDATED "202211230916Z"	-- Nov 23, 2022, 9:16:00 AM
+	ORGANIZATION "GUDE Systems GmbH"
+	CONTACT-INFO
+		"Von-der-Wettern-Str. 23
+		51149 Cologne
+		Germany
+		https://www.gude.info"
+	DESCRIPTION
+		"Expert Power Control 7213 MIB"
+	-- 1.3.6.1.4.1.28507
+	::= { enterprises 28507 }
+
+
+esb7213ExtInputs OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.6.2
+	::= { esb7213ExtSensors 2 }
+
+esb7213ExtInputEntry OBJECT-TYPE
+	SYNTAX  Esb7213ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		esb7213ExtInputIndex }
+	-- 1.3.6.1.4.1.28507.66.1.6.2.2.1
+	::= { esb7213ExtInputTable 1 }
+
+
+Esb7213ExtInputEntry ::= SEQUENCE {
+
+	esb7213ExtInputIndex      Unsigned32,
+	esb7213ExtInput           INTEGER,
+	esb7213ExtInputName       OCTET STRING,
+	esb7213ExtInputPortNum    Integer32,
+	esb7213ExtInputBlockIndex Integer32 }
+
+
+esb7213ExtInput OBJECT-TYPE
+	SYNTAX  INTEGER {
+			lo(0),
+			hi(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Input state of device"
+	-- 1.3.6.1.4.1.28507.66.1.6.2.2.1.2
+	::= { esb7213ExtInputEntry 2 }
+
+
+esb7213ExtActiveInputs OBJECT-TYPE
+	SYNTAX  Unsigned32 (1..12)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of suppported Input Channels."
+	-- 1.3.6.1.4.1.28507.66.1.6.2.1
+	::= { esb7213ExtInputs 1 }
+
+
+esb7213ExtInputTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7213ExtInputEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.66.1.6.2.2
+	::= { esb7213ExtInputs 2 }
+
+
+esb7213ExtInputIndex OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.66.1.6.2.2.1.1
+	::= { esb7213ExtInputEntry 1 }
+
+
+esb7213ExtInputName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of
+		the Input"
+	-- 1.3.6.1.4.1.28507.66.1.6.2.2.1.32
+	::= { esb7213ExtInputEntry 32 }
+
+
+esb7213ExtInputPortNum OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Number of external Sensor Port when value greater zero, else device built-in Input."
+	-- 1.3.6.1.4.1.28507.66.1.6.2.2.1.33
+	::= { esb7213ExtInputEntry 33 }
+
+
+esb7213ExtInputBlockIndex OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Either index of device built-in Input, or index of Input in external sensor."
+	-- 1.3.6.1.4.1.28507.66.1.6.2.2.1.34
+	::= { esb7213ExtInputEntry 34 }
+
+
+esb7213NTPClient OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.5.15
+	::= { esb7213IntSensors 15 }
+
+esb7213NTPUnixTime OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show received NTP time as unixtime (secs since 1 January 1970)"
+	-- 1.3.6.1.4.1.28507.66.1.5.15.2
+	::= { esb7213NTPClient 2 }
+
+
+esb7213NTPLastValidTimestamp OBJECT-TYPE
+	SYNTAX  Unsigned32
+	UNITS	"s"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"show seconds since last valid NTP timestamp received"
+	-- 1.3.6.1.4.1.28507.66.1.5.15.3
+	::= { esb7213NTPClient 3 }
+
+
+esb7213NTPTimeValid OBJECT-TYPE
+	SYNTAX  INTEGER {
+			notime(0),
+			valid(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"Show if valid Time is received"
+	-- 1.3.6.1.4.1.28507.66.1.5.15.1
+	::= { esb7213NTPClient 1 }
+
+
+esb7213ExtSensorName OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"A textual string containing name of a
+		external Sensor"
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.32
+	::= { esb7213SensorEntry 32 }
+
+
+esb7213AirPressure OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"1 hPA (hectopascal) ~ 1 milibar"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual air pressure"
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.5
+	::= { esb7213SensorEntry 5 }
+
+
+esb7213DewPoint OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree Celsius"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"dew point for actual temperature and humidity"
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.6
+	::= { esb7213SensorEntry 6 }
+
+
+esb7213DewPointDiff OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree Celsius"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"difference between dew point and actual
+		temperature (Temp - DewPoint)"
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.7
+	::= { esb7213SensorEntry 7 }
+
+
+esb7213POE OBJECT-TYPE
+	SYNTAX  Integer32 (0..1)
+	UNITS	"0 = no POE, 1 = POE available"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"signals POE availability"
+	-- 1.3.6.1.4.1.28507.66.1.5.10
+	::= { esb7213IntSensors 10 }
+
+
+
+esb7213POEEvt NOTIFICATION-TYPE
+	OBJECTS {
+		esb7213POE}
+	STATUS  current
+	DESCRIPTION
+		"Power over Ethernet changed"
+	-- 1.3.6.1.4.1.28507.66.3.6
+	::= { events 6 }
+
+gadsESB7213 OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66
+	::= { gudeads 66 }
+
+-- Notification Types
+--
+
+events OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.3
+	::= { gadsESB7213 3 }
+
+-- Scalars and Tables
+--
+
+esb7213Objects OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1
+	::= { gadsESB7213 1 }
+
+esb7213CommonConfig OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.1
+	::= { esb7213Objects 1 }
+
+esb7213SNMPaccess OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.1.1
+	::= { esb7213CommonConfig 1 }
+
+esb7213TrapCtrl OBJECT-TYPE
+	SYNTAX  Integer32 (0..3)
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"0 = off
+		1 = Ver. 1
+		2 = Ver. 2c
+		3 = Ver. 3"
+	-- 1.3.6.1.4.1.28507.66.1.1.1.1
+	::= { esb7213SNMPaccess 1 }
+
+
+esb7213TrapIPTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7213TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"list of all Trap receiver"
+	-- 1.3.6.1.4.1.28507.66.1.1.1.2
+	::= { esb7213SNMPaccess 2 }
+
+
+esb7213TrapIPEntry OBJECT-TYPE
+	SYNTAX  Esb7213TrapIPEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION
+		"an entry containing management
+		informations regarding the list of trap
+		receivers"
+	INDEX {
+		esb7213TrapIPIndex }
+	-- 1.3.6.1.4.1.28507.66.1.1.1.2.1
+	::= { esb7213TrapIPTable 1 }
+
+
+Esb7213TrapIPEntry ::= SEQUENCE {
+
+	esb7213TrapIPIndex Integer32,
+	esb7213TrapAddr    OCTET STRING }
+
+
+esb7213TrapIPIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..8)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"A unique value, greater than zero, for each receiver slot."
+	-- 1.3.6.1.4.1.28507.66.1.1.1.2.1.1
+	::= { esb7213TrapIPEntry 1 }
+
+
+esb7213TrapAddr OBJECT-TYPE
+	SYNTAX  OCTET STRING (SIZE (0..99))
+	MAX-ACCESS read-write
+	STATUS  current
+	DESCRIPTION
+		"DNS name or IP address specifying one Trap receiver slot.
+		A port can optionally be specified: 'name:port' An empty
+		string disables this slot."
+	-- 1.3.6.1.4.1.28507.66.1.1.1.2.1.2
+	::= { esb7213TrapIPEntry 2 }
+
+
+esb7213DeviceConfig OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.2
+	::= { esb7213Objects 2 }
+
+esb7213IntActors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.3
+	::= { esb7213Objects 3 }
+
+esb7213ExtActors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.4
+	::= { esb7213Objects 4 }
+
+esb7213IntSensors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.5
+	::= { esb7213Objects 5 }
+
+esb7213ExtSensors OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.1.6
+	::= { esb7213Objects 6 }
+
+esb7213SensorTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF Esb7213SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.66.1.6.1
+	::= { esb7213ExtSensors 1 }
+
+
+esb7213SensorEntry OBJECT-TYPE
+	SYNTAX  Esb7213SensorEntry
+	MAX-ACCESS not-accessible
+	STATUS  current
+	DESCRIPTION ""
+	INDEX {
+		esb7213SensorIndex }
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1
+	::= { esb7213SensorTable 1 }
+
+
+Esb7213SensorEntry ::= SEQUENCE {
+
+	esb7213SensorIndex   Integer32,
+	esb7213TempSensor    Integer32,
+	esb7213HygroSensor   Integer32,
+	esb7213InputSensor   INTEGER,
+	esb7213AirPressure   Integer32,
+	esb7213DewPoint      Integer32,
+	esb7213DewPointDiff  Integer32,
+	esb7213ExtSensorName OCTET STRING }
+
+
+esb7213SensorIndex OBJECT-TYPE
+	SYNTAX  Integer32 (1..4)
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION ""
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.1
+	::= { esb7213SensorEntry 1 }
+
+
+esb7213TempSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 degree Celsius"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual temperature"
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.2
+	::= { esb7213SensorEntry 2 }
+
+
+esb7213HygroSensor OBJECT-TYPE
+	SYNTAX  Integer32
+	UNITS	"0.1 percent humidity"
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"actual humidity"
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.3
+	::= { esb7213SensorEntry 3 }
+
+
+esb7213InputSensor OBJECT-TYPE
+	SYNTAX  INTEGER {
+			off(0),
+			on(1) }
+	MAX-ACCESS read-only
+	STATUS  current
+	DESCRIPTION
+		"logical state of input sensor"
+	-- 1.3.6.1.4.1.28507.66.1.6.1.1.4
+	::= { esb7213SensorEntry 4 }
+
+
+-- Conformance
+--
+
+esb7213Conf OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.2
+	::= { gadsESB7213 2 }
+
+-- Groups
+--
+
+esb7213Groups OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.2.1
+	::= { esb7213Conf 1 }
+
+-- Compliance
+--
+
+esb7213Compls OBJECT IDENTIFIER
+	-- 1.3.6.1.4.1.28507.66.2.2
+	::= { esb7213Conf 2 }
+
+esb7213BasicGroup OBJECT-GROUP
+	OBJECTS {
+		esb7213TrapCtrl,
+		esb7213TrapIPIndex,
+		esb7213TrapAddr,
+		esb7213POE,
+		esb7213SensorIndex,
+		esb7213TempSensor,
+		esb7213HygroSensor,
+		esb7213InputSensor,
+		esb7213AirPressure,
+		esb7213DewPoint,
+		esb7213DewPointDiff,
+		esb7213ExtSensorName,
+		esb7213NTPTimeValid,
+		esb7213NTPUnixTime,
+		esb7213NTPLastValidTimestamp,
+		esb7213ExtActiveInputs,
+		esb7213ExtInputIndex,
+		esb7213ExtInput,
+		esb7213ExtInputName,
+		esb7213ExtInputPortNum,
+		esb7213ExtInputBlockIndex }
+	STATUS  current
+	DESCRIPTION
+		"Basic objects."
+	-- 1.3.6.1.4.1.28507.66.2.1.1
+	::= { esb7213Groups 1 }
+
+esb7213NotificationGroup NOTIFICATION-GROUP
+	NOTIFICATIONS {
+		esb7213TempEvtSen,
+		esb7213HygroEvtSen,
+		esb7213InputEvtSen,
+		esb7213AirPressureEvtSen,
+		esb7213DewPtDiffEvtSen,
+		esb7213POEEvt,
+		esb7213ExtInputEvt }
+	STATUS  current
+	DESCRIPTION
+		""
+	-- 1.3.6.1.4.1.28507.66.2.1.2
+	::= { esb7213Groups 2 }
+
+
+esb7213HygroEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7213SensorIndex,
+		esb7213HygroSensor}
+	STATUS  current
+	DESCRIPTION
+		"hygro limits exceeded"
+	-- 1.3.6.1.4.1.28507.66.3.2
+	::= { events 2 }
+
+
+esb7213InputEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7213SensorIndex,
+		esb7213InputSensor}
+	STATUS  current
+	DESCRIPTION
+		"change of logical input sensor state"
+	-- 1.3.6.1.4.1.28507.66.3.3
+	::= { events 3 }
+
+
+esb7213AirPressureEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7213SensorIndex,
+		esb7213AirPressure}
+	STATUS  current
+	DESCRIPTION
+		"Air Pressure limits exceeded
+
+		"
+	-- 1.3.6.1.4.1.28507.66.3.4
+	::= { events 4 }
+
+
+esb7213DewPtDiffEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7213SensorIndex,
+		esb7213DewPointDiff}
+	STATUS  current
+	DESCRIPTION
+		"Dew Point Difference limits exceeded"
+	-- 1.3.6.1.4.1.28507.66.3.5
+	::= { events 5 }
+
+
+esb7213TempEvtSen NOTIFICATION-TYPE
+	OBJECTS {
+		esb7213SensorIndex,
+		esb7213TempSensor}
+	STATUS  current
+	DESCRIPTION
+		"temperature limits exceeded"
+	-- 1.3.6.1.4.1.28507.66.3.1
+	::= { events 1 }
+
+
+esb7213ExtInputEvt NOTIFICATION-TYPE
+	OBJECTS {
+		esb7213ExtInputIndex,
+		esb7213ExtInput,
+		esb7213ExtInputName,
+		esb7213ExtInputPortNum,
+		esb7213ExtInputBlockIndex}
+	STATUS  current
+	DESCRIPTION
+		"Change of external sensor input."
+	-- 1.3.6.1.4.1.28507.66.3.7
+	-- 1.3.6.1.4.1.28507.66.3.25
+	::= { events 25 }
+
+END

@@ -1,0 +1,3043 @@
+MEF-UNI-EVC-MIB DEFINITIONS ::= BEGIN
+  IMPORTS
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, enterprises,
+    Counter32, Counter64
+             FROM SNMPv2-SMI            -- RFC 2578
+    RowStatus, MacAddress, DateAndTime, TEXTUAL-CONVENTION, DisplayString
+             FROM SNMPv2-TC             -- RFC 2579
+    OBJECT-GROUP, NOTIFICATION-GROUP, MODULE-COMPLIANCE
+             FROM SNMPv2-CONF           -- RFC 2580
+    ifIndex
+             FROM IF-MIB                -- [RFC2863]
+    EntityAdminState, EntityOperState
+             FROM ENTITY-STATE-TC-MIB   -- RFC 4268
+    VlanId
+             FROM Q-BRIDGE-MIB          -- [RFC4363]
+    IEEE8021PriorityValue
+             FROM IEEE8021-TC-MIB;      -- IEEE 802.1ap
+
+mefUniEvcMib MODULE-IDENTITY
+    LAST-UPDATED    "201301251200Z" -- January 25, 2013
+    ORGANIZATION    "Metro Ethernet Forum"
+    CONTACT-INFO
+       "Web URL: http://metroethernetforum.org/
+        E-mail:  mibs@metroethernetforum.org
+        Postal:  Metro Ethernet Forum
+                 6033 W. Century Boulevard, Suite 1107
+                 Los Angeles, CA 90045
+                 U.S.A.
+        Phone:   +1 310-642-2800
+        Fax:     +1 310-642-2808"
+    DESCRIPTION
+            "This MIB module contains the management objects for the
+            management of User Network Interfaces (UNIs) and Ethernet
+            Virtual Connections (EVCs)
+
+            Copyright 2013 Metro Ethernet Forum
+            All rights reserved.
+
+    ****************************************************************************
+    Reference Overview
+
+    A number of base documents have been used to create this MIB. The following
+    are the abbreviations for the baseline documents:
+
+    [MEF6.1] refers to MEF 6.1 'Ethernet Services Definitions - Phase 2',
+        April 2008
+    [MEF 6.1.1] refers to MEF 6.1.1 'Layer 2 Control Protocol Handling Amendment
+       to MEF 6.1', January 2012
+    [MEF 7.2] refers to MEF 7.2 'Carrier Ethernet Management Information Model',
+        January 2013
+    [MEF 10.2] refers to MEF 10.2 'Ethernet Services Attributes Phase 2',
+        October 2009
+    [MEF 26.1] refers to MEF 26.1 'External Network Network Interface (ENNI) -
+        Phase 2', January 2012
+    [Q.840.1] refers to 'ITU-T Requirements and analysis for NMS-EMS
+        management interface of Ethernet over Transport and Metro Ethernet
+        Network (EoT/MEN)', March 2007
+    ****************************************************************************
+           "
+    REVISION        "201301251200Z" -- January 25, 2013
+    DESCRIPTION
+            "Initial Version."
+    ::= { enterprises mef(15007) mefService(2) 2 }
+
+
+-- *****************************************************************************
+-- Object definitions in the Service MIB Module
+-- *****************************************************************************
+mefServiceNotifications      OBJECT IDENTIFIER ::= { mefUniEvcMib 0 }
+mefServiceObjects            OBJECT IDENTIFIER ::= { mefUniEvcMib 1 }
+mefServiceMibConformance     OBJECT IDENTIFIER ::= { mefUniEvcMib 2 }
+
+-- *****************************************************************************
+-- Groups in the Service MIB Module
+-- *****************************************************************************
+mefServiceInterfaceAttributes  OBJECT IDENTIFIER ::= { mefServiceObjects 1 }
+mefServiceUniAttributes        OBJECT IDENTIFIER ::= { mefServiceObjects 2 }
+mefServiceEvcAttributes        OBJECT IDENTIFIER ::= { mefServiceObjects 3 }
+
+mefServiceBwpAttributes        OBJECT IDENTIFIER ::= { mefServiceObjects 4 }
+mefServiceCosAttributes        OBJECT IDENTIFIER ::= { mefServiceObjects 5 }
+mefServiceL2cpAttributes       OBJECT IDENTIFIER ::= { mefServiceObjects 6 }
+mefServiceNotificationCfg      OBJECT IDENTIFIER ::= { mefServiceObjects 7 }
+mefServiceNotificationObj      OBJECT IDENTIFIER ::= { mefServiceObjects 8 }
+
+
+-- *****************************************************************************
+-- Ethernet Service Textual Conventions
+-- *****************************************************************************
+
+MefServicePreservationType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Configures the EVC preservation attributes.
+
+        preserve(1)           The type of service is preserved, either 
+                              CE-VLAN ID or CE-VLAN CoS as indicated by
+                              the specific object.
+        noPreserve(2)         The type of service is not preserved, either 
+                              CE-VLAN ID or CE-VLAN CoS as indicated by
+                              the specific object.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    SYNTAX      INTEGER {
+        preserve              (1),
+        noPreserve            (2)
+    }
+
+
+MefServiceDeliveryType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "A MEF service can have one of three different delivery types:
+
+        discard(1)            Service Frames are discarded
+        unconditional(2)      Service Frames are unconditionally
+                              delivered no matter the content of the 
+                              Service Frame. An example of this is
+                              a Point-to-Point EVC
+        conditional(3)        Service Frame are conditionally 
+                              delivered to the destination UNI. The
+                              condition is specified, for example via a
+                              bandwidth profile or unicast MAC address 
+                              learning.
+       " 
+    REFERENCE
+       "[MEF 6.1] 6.0"
+    SYNTAX      INTEGER {
+        discard               (1),
+        unconditional         (2),
+        conditional           (3)
+    }
+
+MefServiceInterfaceType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+       "A MEF Interface can be one of several types:
+
+         bUni1d1(0)    UNI Type 1.1
+         bUni1d2(1)    UNI Type 1.2
+         bUni2d1(2)    UNI Type 2.1
+         bUni2d2(3)    UNI Type 2.2
+         bEnni(4)      ENNI
+         bEnniVuni(5)  VUNI on an ENNI
+       " 
+    REFERENCE
+       "[MEF 6.1] 6.0"
+    SYNTAX      BITS {
+                     bUni1d1(0),
+                     bUni1d2(1),
+                     bUni2d1(2),
+                     bUni2d2(3),
+                     bEnni(4),
+                     bEnniVuni(5)
+                }
+
+MefServiceListType ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "255t"
+       STATUS       current
+       DESCRIPTION
+           "An octet string containing a list of item values.
+
+            An item value is an arbitrary string of octets from
+            ASCII character 0x21 - 0x7E, but may not contain 
+            a delimiter character. Delimiter characters are 
+            defined to be one of the following:
+
+                -  An ASCII comma character (0x2C)
+                -  An ASCII colon character (0x3A)
+
+            Delimiter characters are used to separate item values
+            in a item list.  Only a single delimiter character may
+            occur between two item values.  A item value may not
+            have a zero length.  These constraints imply certain
+            restrictions on the contents of this object:
+
+                - There cannot be a leading or trailing delimiter
+                  character.
+
+                - There cannot be multiple adjacent delimiter
+                  characters.
+
+            The 'comma' delimiter separates individual items or a
+            sequence of items. The 'colon' delimiter indicates a range
+            of items from the first item before the colon through the
+            last item after the colon. Individual ranges in the same
+            item list need to be separated by a 'comma'.
+
+            Some examples of valid item lists are:
+
+                - ''            -- an empty list
+                - '1234'        -- list of one item
+                - '10,11,12'    -- list of several items
+                - '10:20'       -- a list containing all the valid values from
+                                   10 through 20
+
+            Note that although an item value may not have a length of
+            zero, an empty string is still valid.  This indicates
+            an empty list (i.e. there are no tag values in the list).
+
+            The use of the item list is to select one or more items at
+            one time with a single object instead of having separate row
+            entries in a table for each individual item.
+           "
+       SYNTAX       OCTET STRING (SIZE (0..255))
+
+
+-- *****************************************************************************
+-- Ethernet Service Interface Configuration
+-- *****************************************************************************
+
+mefServiceInterfaceCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceInterfaceCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the local interface configuration table for an
+        MEF Ethernet compliant Network Element (NE). The primary purpose of 
+        this table is to provide configuration of the interface for a Metro 
+        Ethernet NE (ME-NE). Rows are automatically created by the SNMP
+        Agent in the table based upon the MEF compliant interfaces that a ME-NE
+        contains based upon the listed defaults. A SNMP Manager can modify
+        values of each of the objects in the row. 
+
+        This table may be sparsely populated based upon the number of ME-NE 
+        interfaces that the device supports.
+
+        Rows in this table are accessed by the IF-MIB interface object ifIndex.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot.
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 7.2], [MEF 10.2], [Q.840.1]"
+    ::= { mefServiceInterfaceAttributes 1 }
+
+mefServiceInterfaceCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceInterfaceCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServiceInterfaceCfgTable."
+    INDEX { ifIndex }
+    ::= { mefServiceInterfaceCfgTable 1 }
+
+MefServiceInterfaceCfgEntry ::= SEQUENCE {
+      mefServiceInterfaceCfgType                 MefServiceInterfaceType,
+      mefServiceInterfaceCfgIdentifier           DisplayString,
+      mefServiceInterfaceCfgFrameFormat          INTEGER,
+      mefServiceInterfaceCfgIngressBwpGrpIndex   Unsigned32,
+      mefServiceInterfaceCfgEgressBwpGrpIndex    Unsigned32,
+      mefServiceInterfaceCfgL2cpGrpIndex         Unsigned32
+    }
+
+mefServiceInterfaceCfgType OBJECT-TYPE
+    SYNTAX      MefServiceInterfaceType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the configured interface type. One
+        bit in the vector can be set at one time based upon the
+        possible values indicated by mefServiceInterfaceStatusType.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0; [MEF 7.2] 6.2.1.1, 6.2.1.2, 6.2.1.3"
+    DEFVAL { {bUni1d1} }
+ ::= { mefServiceInterfaceCfgEntry 1 }
+
+mefServiceInterfaceCfgIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the interface identifier and is an arbitrary 
+        text string that is used to identify an interface. Unique string
+        values are chosen to uniquely identify an interface.
+
+        This object is used to add an identifier to a physical port. The
+        mefServiceUniCfgIdentifier can be used to add a separate identifier
+        that is associated with the service interface name.
+
+        Octet values of 0x00 through 0x1f are illegal.
+
+        MEF 26.1 restricts the maximum size identifiers to 45 octets.
+       "
+    REFERENCE
+       "[MEF 7.2] 6.2.1.4"
+    DEFVAL { "" }
+    ::= { mefServiceInterfaceCfgEntry 2 }
+
+mefServiceInterfaceCfgFrameFormat OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noTag       (1),
+        ctag        (2),
+        stag        (3),
+        stagCtag    (4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the interface frame format type that the
+        interface can recognize.
+
+        noTag(1)        indicates that all data on the interface is
+                        as untagged data
+        ctag(2)         indicates that tagged data is associated with
+                        CE-VLAN ID or a C-TAG
+        stag(3)         indicates that tagged data is associated with
+                        a provider tag or S-TAG
+        stagCtag(4)     indicates that service traffic identified with
+                        both an S-TAG (outer tag) and a C-TAG (inner tag)
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0"
+    DEFVAL { noTag }
+    ::= { mefServiceInterfaceCfgEntry 3 }
+
+mefServiceInterfaceCfgIngressBwpGrpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the index number of the ingress bandwidth profile group
+        associated with the current interface. A value of 0 indicates that no
+        interface ingress bandwidth profile group is associated with the 
+        interface.
+
+        This index indicates the specific bandwidth profile group previously 
+        configured via mefServiceBwpGrpCfgTable and mefServiceBwpCfgTable 
+        using this value for mefServiceBwpGrpCfgIndex. There may be multiple 
+        entries in mefServiceBwpCfgTable using this index, each containing
+        bandwidth parameters for a different Class of Service Identifier.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceInterfaceCfgEntry 4 }
+
+mefServiceInterfaceCfgEgressBwpGrpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the index number of the egress bandwidth profile group
+        associated with the current interface. A value of 0 indicates that no
+        interface egress bandwidth profile group is associated with the 
+        interface.
+
+        This index indicates the specific bandwidth profile group previously 
+        configured via mefServiceBwpGrpCfgTable and mefServiceBwpCfgTable 
+        using this value for mefServiceBwpGrpCfgIndex. There may be multiple 
+        entries in mefServiceBwpCfgTable using this index, each containing
+        bandwidth parameters for a different Class of Service Identifier.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceInterfaceCfgEntry 5 }
+
+mefServiceInterfaceCfgL2cpGrpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the index of the L2CP profile group
+        (mefServiceL2cpGrpCfgIndex) associated with the current interface. A 
+        value of 0 indicates that no interface L2CP profile group is associated
+        with the interface.
+
+        This index indicates the L2CP profile group previously configured via
+        mefServiceL2cpGrpCfgTable and mefServiceL2cpCfgTable using the value 
+        of the mefServiceL2cpGrpCfgIndex. There may be multiple entries in 
+        mefServiceL2cpCfgTable using this index, each containing
+        parameters for a different L2CP protocol.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceInterfaceCfgEntry 9 }
+
+
+-- *****************************************************************************
+-- Ethernet Service Interface Status
+-- *****************************************************************************
+
+mefServiceInterfaceStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceInterfaceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the local interface status table for an
+        MEF Ethernet compliant NE. The primary purpose of this table is to
+        provide status information of the interface for a ME-NE. Rows are
+        automatically created in the table based upon the interfaces that a MEF
+        NE contains. This tables contains the same rows as the 
+        mefServiceInterfaceCfgTable. A SNMP Manager can access objects in each
+        of the rows in the table.
+
+        Rows in this table are accessed by the IF-MIB interface object ifIndex.
+
+        Rows in this table are persistent (non-volatile) upon reboot, but the
+        values of the objects in a row are not persistent.
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 7.2], [MEF 10.2], [Q.840.1]"
+    ::= { mefServiceInterfaceAttributes 2 }
+
+mefServiceInterfaceStatusEntry OBJECT-TYPE
+    SYNTAX      MefServiceInterfaceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServiceInterfaceStatusTable."
+    INDEX { ifIndex }
+    ::= { mefServiceInterfaceStatusTable 1 }
+
+MefServiceInterfaceStatusEntry ::= SEQUENCE {
+      mefServiceInterfaceStatusType               MefServiceInterfaceType,
+      mefServiceInterfaceStatusMaxVc              Unsigned32,
+      mefServiceInterfaceStatusMaxEndPointPerVc   Unsigned32
+    }
+
+mefServiceInterfaceStatusType OBJECT-TYPE
+    SYNTAX      MefServiceInterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is a vector of bits that indicates the possible
+        interface types that an interface can be configured to. An interface,
+        for instance, can be configured to be a UNI type 1 or 2, or an ENNI.
+
+        All the possible capabilities of an interface are indicated, one bit
+        per possible type. At least one bit must be set for MEF compliant NEs.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0"
+    ::= { mefServiceInterfaceStatusEntry 1 }
+
+mefServiceInterfaceStatusMaxVc OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the maximum number of virtual channels that the
+        interface can support. A virtual connection can be an Ethernet Virtual 
+        Connection (EVC) or an Operator Virtual Connection (OVC) depending upon
+        the type of interface that is selected.  
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0; [MEF 7.2] 6.2.1.2"
+    ::= { mefServiceInterfaceStatusEntry 2 }
+
+mefServiceInterfaceStatusMaxEndPointPerVc OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the interface maximum number of end points per
+        virtual channel. It can be used to indicate the maximum number of OVC
+        end points per OVC. It has no current applicability for EVCs. 
+       "
+    REFERENCE
+       "[MEF 26.1]"
+    ::= { mefServiceInterfaceStatusEntry 3 }
+
+
+-- *****************************************************************************
+-- Ethernet Service Interface Statistics
+-- *****************************************************************************
+
+mefServiceInterfaceStatisticsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the local interface statistics table for an
+        MEF Ethernet compliant NE. The primary purpose of this table is to
+        provide statistics information of the interface for a ME-NE. Rows are
+        automatically created in the table based upon the interfaces that a MEF
+        NE contains. This table contains the same rows as the 
+        mefServiceInterfaceCfgTable. A SNMP Manager can access objects in each
+        of the rows in the table.
+
+        Rows in this table are accessed by the IF-MIB interface object ifIndex.
+
+        Rows in this table are persistent (non-volatile) upon reboot, but the
+        values of the objects in a row are not persistent.
+       "
+    REFERENCE
+       "[MEF 15], [Q.840.1]"
+    ::= { mefServiceInterfaceAttributes 3 }
+
+mefServiceInterfaceStatisticsEntry OBJECT-TYPE
+    SYNTAX      MefServiceInterfaceStatisticsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServiceInterfaceStatisticsTable."
+    INDEX { ifIndex }
+    ::= { mefServiceInterfaceStatisticsTable 1 }
+
+MefServiceInterfaceStatisticsEntry ::= SEQUENCE {
+      mefServiceInterfaceStatisticsIngressUndersized   Counter32,
+      mefServiceInterfaceStatisticsIngressOversized    Counter32,
+      mefServiceInterfaceStatisticsIngressFragments    Counter32,
+      mefServiceInterfaceStatisticsIngressCrcAlignment Counter32,
+      mefServiceInterfaceStatisticsIngressInvalidVid   Counter32,
+      mefServiceInterfaceStatisticsIngressOctets       Counter64,
+      mefServiceInterfaceStatisticsIngressUnicast      Counter64,
+      mefServiceInterfaceStatisticsIngressMulticast    Counter64,
+      mefServiceInterfaceStatisticsIngressBroadcast    Counter64,
+      mefServiceInterfaceStatisticsEgressOctets        Counter64,
+      mefServiceInterfaceStatisticsEgressUnicast       Counter64,
+      mefServiceInterfaceStatisticsEgressMulticast     Counter64,
+      mefServiceInterfaceStatisticsEgressBroadcast     Counter64
+    }
+
+mefServiceInterfaceStatisticsIngressUndersized   OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each frame received
+        on a NE interface that was smaller than 64 octets.
+
+        This object defaults to '0'. 
+      "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 1 }
+
+mefServiceInterfaceStatisticsIngressOversized    OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each frame received
+        on a NE interface that was larger than the maximum MTU size.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 2 }
+
+mefServiceInterfaceStatisticsIngressFragments    OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each frame received
+        on a NE interface that was less than 64 octets in length
+        (excluding framing bits but including FCS octets) and had 
+        either a bad Frame Check Sequence (FCS) with an integral 
+        number of octets (FCS Error) or a bad FCS with a non-integral
+        number of octets (Alignment Error).
+
+        Note that it is entirely normal for this counter to
+        increment.  This is because it counts both runts (which are
+        normal occurrences due to collisions) and noise hits.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 3 }
+
+mefServiceInterfaceStatisticsIngressCrcAlignment OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each frame received
+        on a NE interface that was from 64 octets to the maximum MTU
+        size in length, but had either a bad Frame Check Sequence (FCS)
+        with an integral number of octets (FCS Error) or a bad FCS with
+        a non-integral number of octets (Alignment Error).
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 4 }
+
+mefServiceInterfaceStatisticsIngressInvalidVid   OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each frame received
+        on a NE interface with an invalid VLAN ID.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 5 }
+
+mefServiceInterfaceStatisticsIngressOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented by the number of octets in a
+        valid frame received on a NE interface.
+
+        This object defaults to '0'.
+      "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 6 }
+
+mefServiceInterfaceStatisticsIngressUnicast OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each valid unicast frame received
+        on a NE interface.
+
+        NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 7 }
+
+mefServiceInterfaceStatisticsIngressMulticast    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each valid multicast frame received
+        on a NE interface.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 8 }
+
+mefServiceInterfaceStatisticsIngressBroadcast OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each valid broadcast frame received
+        on a NE interface.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 9 }
+
+mefServiceInterfaceStatisticsEgressOctets  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented by the number of octets in a frame 
+        transmitted on a NE interface.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 10 }
+
+mefServiceInterfaceStatisticsEgressUnicast OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each unicast frame transmitted on a
+        NE interface.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 11 }
+
+mefServiceInterfaceStatisticsEgressMulticast    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each multicast frame transmitted on a
+        NE interface.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 12 }
+
+mefServiceInterfaceStatisticsEgressBroadcast OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object is incremented for each broadcast frame transmitted on a
+        NE interface.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'.
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServiceInterfaceStatisticsEntry 13 }
+
+    
+-- *****************************************************************************
+-- Ethernet UNI Interface Configuration
+-- *****************************************************************************
+
+mefServiceUniCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceUniCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the specific UNI attributes configuration table
+        for an MEF Ethernet compliant NE. The primary purpose of this table
+        is to provide configuration of the UNI for a ME-NE. Rows are
+        automatically created in the table when an interface is configured as
+        type UNI via the mefServiceInterfaceCfgType object based upon the
+        listed defaults by the SNMP Agent. Rows are deleted if the interface
+        is configured to a non-UNI by the SNMP Agent. A SNMP Manager can modify
+        values of each of the objects in the row. 
+
+        This table may be sparsely populated based upon the number of ME-NE 
+        interfaces that are configured as type UNI.
+
+        Rows in this table are accessed by the IF-MIB interface object ifIndex.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 7.2], [MEF 10.2], [Q.840.1]"
+    ::= { mefServiceUniAttributes 1 }
+
+mefServiceUniCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceUniCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServiceUniCfgTable."
+    INDEX { ifIndex }
+    ::= { mefServiceUniCfgTable 1 }
+
+MefServiceUniCfgEntry ::= SEQUENCE {
+      mefServiceUniCfgIdentifier          DisplayString,
+      mefServiceUniCfgBundlingMultiplex   INTEGER,
+      mefServiceUniCfgCeVidUntagged       VlanId,
+      mefServiceUniCfgCePriorityUntagged  IEEE8021PriorityValue
+    }
+
+mefServiceUniCfgIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the UNI identifier. This is distinct from 
+        the mefServiceInterfaceCfgIdentifier and allows the naming of the
+        UNI separately from the Interface name. The identifier is
+        an arbitrary text string that is used to identify an interface. 
+        Unique string values are chosen to uniquely identify the UNI.
+
+        This object is used to add an identifier to a service interface. The
+        mefServiceInterfaceCfgIdentifier can be used to add a separate 
+        identifier that is associated with the physical interface name.
+
+        Octet values of 0x00 through 0x1f are illegal.
+
+        MEF 26.1 restricts the maximum size identifiers to 45 octets.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, [MEF 7.2] 6.2.1.2"
+    DEFVAL { "" }
+    ::= { mefServiceUniCfgEntry 1 }
+
+mefServiceUniCfgBundlingMultiplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+        allToOne            (1),
+        bundling            (2),
+        multiplex           (3),
+        bundlingMultiplex   (4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures bundling and multiplexing options for the UNI. This object
+         is an enumerated list of possible multiplexing and bundling options
+         on a UNI that is unambiguous and provides only the legal possibilities.
+
+         allToOne(1)          All to One Bundling, used for Private services:
+                              EPL, EP-LAN, and EP-Tree
+
+         bundling(2)          Bundling, indicates one or more CE-VLANS per 
+                              service, used for virtual private CE-VLAN 
+                              preservation services: EVPL, EVP-LAN, EVP-Tree
+
+         multiplex(3)         Service Multiplexing, indicates one or more EVCs
+                              per UNI, used for virtual private CE-VLAN 
+                              preservation or non-preservation services:
+                              EVPL, EVP-LAN, EVP-Tree
+
+         bundlingMultiplex(4) Service Multiplexing plus Bundling, indicates one 
+                              or more EVCs per UNI that are composed of one or 
+                              more CE-VLANs, used for virtual CE-VLAN 
+                              preservation services: EVPL, EVP-LAN, EVP-Tree
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, [MEF 7.2] 6.2.1.2"
+    DEFVAL { allToOne }
+    ::= { mefServiceUniCfgEntry 2 }
+
+mefServiceUniCfgCeVidUntagged OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures the CE VLAN ID associated with untagged and priority
+         Service Frames. It allows the identification of untagged and 
+         priority tagged traffic with a specific CE-VLAN ID. This object
+         is ignored for all to one bundling at the UNI.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, [MEF 7.2] 6.2.1.2"
+    DEFVAL { 1 }
+    ::= { mefServiceUniCfgEntry 3 }
+
+mefServiceUniCfgCePriorityUntagged OBJECT-TYPE
+    SYNTAX      IEEE8021PriorityValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Configures the CE VLAN Priority associated with untagged Service
+         Frames. It allows the assignment of a specific VLAN priority to
+         untagged traffic. This object is ignored for all to one bundling
+         at the UNI.
+        "
+    REFERENCE
+       "[MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceUniCfgEntry 4 }
+
+
+-- *****************************************************************************
+-- Ethernet EVC Configuration
+-- *****************************************************************************
+
+mefServiceEvcNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains an unused value for an EVC on a
+        MEF compliant NE, or a zero to indicate that none exist. This value
+        needs to be read by the SNMP Manager in order to find an available
+        index for row-creation of an EVC and then used when a row is created. 
+        This value is automatically updated by the SNMP Agent after the row
+        is created.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a NE.  The index
+        is never to be reused for a new EVC on the same MEF compliant
+        NE until it wraps to zero.  The index value keeps
+        increasing up to that time. This is to facilitate access control based
+        on a fixed index for an EMS, since the index is not reused.
+       "
+    DEFVAL { 1 }
+    ::= { mefServiceEvcAttributes 1 }
+
+mefServiceEvcCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceEvcCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the specific EVC attributes configuration table
+        for an MEF Ethernet compliant NE. The primary purpose of this table
+        is to provide configuration of the EVC for a ME-NE.
+
+        Rows in this table are accessed by the SNMP Manager via the EVC 
+        number object mefServiceEvcCfgIndex. A new row is created in the 
+        table by the SNMP Manager by first reading the mefServiceEvcNextIndex
+        to find an available EVC number and using this value when the row
+        is created. If an object in the row is not defined during row 
+        creation time the object is set to the default value by the 
+        SNMP Agent. Rows are deleted by the SNMP Manager via the 
+        mefServiceEvcCfgRowStatus object.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 7.2], [MEF 10.2], [Q.840.1]"
+    ::= { mefServiceEvcAttributes 2 }
+
+mefServiceEvcCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceEvcCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServiceEvcCfgTable."
+    INDEX { mefServiceEvcCfgIndex }
+    ::= { mefServiceEvcCfgTable 1 }
+
+MefServiceEvcCfgEntry ::= SEQUENCE {
+      mefServiceEvcCfgIndex                 Unsigned32,
+      mefServiceEvcCfgIdentifier            DisplayString,
+      mefServiceEvcCfgServiceType           INTEGER,
+      mefServiceEvcCfgMtuSize               Unsigned32,
+      mefServiceEvcCfgCevlanIdPreservation  MefServicePreservationType,
+      mefServiceEvcCfgCevlanCosPreservation MefServicePreservationType,
+      mefServiceEvcCfgUnicastDelivery       MefServiceDeliveryType,
+      mefServiceEvcCfgMulticastDelivery     MefServiceDeliveryType,
+      mefServiceEvcCfgBroadcastDelivery     MefServiceDeliveryType,
+      mefServiceEvcCfgL2cpGrpIndex          Unsigned32,
+      mefServiceEvcCfgAdminState            EntityAdminState,
+      mefServiceEvcCfgRowStatus             RowStatus
+    }
+
+mefServiceEvcCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The specific instance of an EVC number."
+    ::= { mefServiceEvcCfgEntry 1 }
+
+mefServiceEvcCfgIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the EVC identifier. The identifier is
+        an arbitrary text string that is used to identify an EVC. 
+        Unique string values are chosen to uniquely identify the EVC.
+
+        Octet values of 0x00 through 0x1f are illegal.
+
+        MEF 26.1 restricts the maximum size identifiers to 45 octets.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { "" }
+    ::= { mefServiceEvcCfgEntry 2 }
+
+mefServiceEvcCfgServiceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pointToPoint            (1),
+        multipointToMultipoint  (2),
+        rootedMultipoint        (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the EVC service type for the ME-NE.
+
+         pointToPoint(1)             EVC Point-to-Point service,
+                                     used for EPL and EVPL services
+
+         multipointToMultipoint(2)   EVC Multipoint-to-Multipoint Service,
+                                     used for EP-LAN and EVP-LAN services
+ 
+         rootedMultipoint(3)         EVC Rooted-Multipoint Service,
+                                     used for EP-Tree and EVP-Tree services
+        "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { pointToPoint }
+    ::= { mefServiceEvcCfgEntry 3 }
+
+mefServiceEvcCfgMtuSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (1522..16384)
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the configured EVC maximum service frame format
+        size. It must be less than or equal to the
+        mefServiceEvcStatusMaxMtuSize.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { 1522 }
+    ::= { mefServiceEvcCfgEntry 4 }
+
+mefServiceEvcCfgCevlanIdPreservation OBJECT-TYPE
+    SYNTAX      MefServicePreservationType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the EVC CE-VLAN ID preservation.
+
+         preserve(1)          The CE-VLAN ID is preserved. The ingress CE-VLAN
+                              is the CE-VLAN ID at the egress UNI
+         noPreserve(2)        The CE-VLAN ID is not preserved. The ingress 
+                              CE-VLAN ID may not be the CE-VLAN ID at the egress 
+                              UNI
+        "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { preserve }
+    ::= { mefServiceEvcCfgEntry 5 }
+
+mefServiceEvcCfgCevlanCosPreservation OBJECT-TYPE
+    SYNTAX      MefServicePreservationType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures EVC CE-VLAN CoS preservation.
+
+         preserve(1)          The CE-VLAN CoS is preserved. The ingress CE-VLAN
+                              CoS is the CE-VLAN CoS at the egress UNI
+         noPreserve(2)        The CE-VLAN CoS is not preserved. The ingress 
+                              CE-VLAN CoS may not be the CE-VLAN CoS at the 
+                              egress UNI
+        "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { preserve }
+    ::= { mefServiceEvcCfgEntry 6 }
+
+mefServiceEvcCfgUnicastDelivery OBJECT-TYPE
+    SYNTAX      MefServiceDeliveryType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures EVC Unicast delivery condition.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { unconditional }
+    ::= { mefServiceEvcCfgEntry 7 }
+
+mefServiceEvcCfgMulticastDelivery OBJECT-TYPE
+    SYNTAX      MefServiceDeliveryType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures EVC Multicast delivery condition.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { unconditional }
+    ::= { mefServiceEvcCfgEntry 8 }
+
+mefServiceEvcCfgBroadcastDelivery OBJECT-TYPE
+    SYNTAX      MefServiceDeliveryType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures EVC Broadcast delivery condition.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { unconditional }
+    ::= { mefServiceEvcCfgEntry 9 }
+
+mefServiceEvcCfgL2cpGrpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the index of the L2CP profile group
+        (mefServiceL2cpGrpCfgIndex) associated with the current EVC on an 
+        interface. A value of 0 indicates that no EVC L2CP profile group is
+        associated with the EVC.
+
+        This index indicates the L2CP profile group previously configured via
+        the mefServiceL2cpGrpCfgTable and mefServiceL2cpCfgTable using the value 
+        of the mefServiceL2cpGrpCfgIndex. There may be multiple entries in 
+        mefServiceL2cpCfgTable using this index, each containing
+        parameters for a different L2CP protocol.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.3"
+    DEFVAL { 0 }
+    ::= { mefServiceEvcCfgEntry 10 }
+
+mefServiceEvcCfgAdminState OBJECT-TYPE
+    SYNTAX      EntityAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object specifies the administrative state of the EVC.
+
+        If mefServiceEvcCfgAdminState is set to 'locked', the EVC will be
+        administratively locked.
+
+        If mefServiceEvcCfgAdminState is set to 'unlocked', the EVC will be
+        administratively unlocked if previously locked.
+
+        Other values of mefServiceEvcCfgAdminState are undefined.
+       "
+    REFERENCE
+       "[MEF 7.2] 6.2.1.3"
+    DEFVAL { unlocked }
+    ::= { mefServiceEvcCfgEntry 11 }
+
+mefServiceEvcCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { mefServiceEvcCfgEntry 12 }
+
+
+-- *****************************************************************************
+-- Ethernet UNIs on a EVC Configuration
+-- *****************************************************************************
+
+mefServiceEvcUniCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceEvcUniCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the specific EVC attributes configuration table
+        for an MEF Ethernet compliant NE. The primary purpose of this table
+        is to provide configuration of the EVC for a ME-NE at each MEF
+        compliant interface.
+
+        Rows in the table can only be created after the EVC is created. 
+        Interfaces are added to the EVC and are selected as either a type 'root'
+        or 'leaf' by the creation of the row by the SNMP Manager as addressed 
+        by  mefServiceEvcCfgIndex and ifIndex. Rows are deleted by the SNMP
+        Manager via the mefServiceEvcUniCfgRowStatus object.
+
+        Rows in this table are accessed by the EVC number object 
+        mefServiceEvcCfgIndex and the IF-MIB interface object ifIndex by
+        the SNMP Manager.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 7.2], [MEF 10.2], [Q.840.1]"
+    ::= { mefServiceEvcAttributes 3 }
+
+mefServiceEvcUniCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceEvcUniCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServiceEvcUniCfgTable."
+    INDEX { mefServiceEvcCfgIndex, ifIndex }
+    ::= { mefServiceEvcUniCfgTable 1 }
+
+MefServiceEvcUniCfgEntry ::= SEQUENCE {
+      mefServiceEvcUniCfgType               INTEGER,
+      mefServiceEvcUniCfgRowStatus          RowStatus
+    }
+
+mefServiceEvcUniCfgType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        root                  (1),
+        leaf                  (2),
+        unknown               (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object configures UNI type on an EVC.
+
+        root(1)            Valid setting for all service types. A UNI set
+                           to this value may send frames to UNIs configured
+                           as 'root' or 'leaf'
+        leaf(2)            Valid setting for Root-Multipoint EVCs only. A
+                           UNI set to this value may send frames to UNIs
+                           'root'
+        unknown(3)         UNI port is not configured or illegally
+                           configured. This value cannot be written, but
+                           is only returned when the type is unknown.
+        "
+    REFERENCE
+       "[MEF 10.2]"
+    DEFVAL { root }
+    ::= { mefServiceEvcUniCfgEntry 1 }
+
+mefServiceEvcUniCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { mefServiceEvcUniCfgEntry 2 }
+
+
+-- *****************************************************************************
+-- Ethernet Service EVC Status
+-- *****************************************************************************
+
+mefServiceEvcStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceEvcStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the EVC status table for an
+        MEF Ethernet compliant NE. The primary purpose of this table is to
+        provide status information of the EVC for a ME-NE. Rows are
+        automatically created in the table by the SNMP Agent when a row is
+        created in the mefServiceEvcCfgTable. This table contains the same
+        rows as the mefServiceEvcCfgTable. Rows are automatically deleted
+        in this table by the SNMP Agent when the corresponding row is deleted 
+        in the mefServiceEvcCfgTable.
+
+        Rows in this table are accessed via the EVC number object 
+        mefServiceEvcCfgIndex by the SNMP Manager.
+
+        Rows in this table are persistent (non-volatile) upon reboot, but the
+        values of the objects in a row are not persistent.
+       "
+    REFERENCE
+       "[MEF 10.2]"
+    ::= { mefServiceEvcAttributes 4 }
+
+mefServiceEvcStatusEntry OBJECT-TYPE
+    SYNTAX      MefServiceEvcStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServiceEvcStatusTable."
+    INDEX { mefServiceEvcCfgIndex }
+    ::= { mefServiceEvcStatusTable 1 }
+
+MefServiceEvcStatusEntry ::= SEQUENCE {
+      mefServiceEvcStatusMaxMtuSize         Unsigned32,
+      mefServiceEvcStatusMaxNumUni          Unsigned32,
+      mefServiceEvcStatusOperationalState   INTEGER
+    }
+
+mefServiceEvcStatusMaxMtuSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (1522..16384)
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the EVC maximum configurable service
+        frame format size. The actual configured size is set via the
+        mefServiceEvcCfgMtuSize object.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    ::= { mefServiceEvcStatusEntry 1 }
+
+mefServiceEvcStatusMaxNumUni OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..16384)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the maximum number of UNIs in an EVC. For
+        a Point-to-Point EVC this value is '2'. For a Multipoint EVC the 
+        value can be '2' or greater.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    ::= { mefServiceEvcStatusEntry 2 }
+
+mefServiceEvcStatusOperationalState OBJECT-TYPE
+    SYNTAX      EntityOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the operational state (current
+        capability) of the EVC.
+
+        If the value is 'enabled', the EVC is able to ingress and
+        egress service frames and has been set to active.
+
+        If the value is 'disabled' the EVC is not able to ingress and
+        egress service frames, has detected an operational failure
+        condition, or has failed an internal test.
+
+        If the value is 'testing' the EVC has been placed into a test mode,
+        either a troubleshooting mode or a test mode.
+
+        If the value is 'unknown' the EVC is unable to report the operational
+        state.
+       "
+    REFERENCE
+       "[MEF 7.2] 6.2.1.3"
+    ::= { mefServiceEvcStatusEntry 3 }
+
+
+-- *****************************************************************************
+-- Ethernet EVC per UNI Attributes Configuration
+-- *****************************************************************************
+
+mefServiceEvcPerUniCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceEvcPerUniCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table represents the specific EVC per UNI attributes configuration
+        table for an MEF Ethernet compliant NE. The primary purpose of this table
+        is to provide configuration of the EVC per UNI attributes for a MEF
+        NE. Rows are automatically created in the table by the SNMP Agent with
+        the indicated default values when an interface is added to the EVC via
+        the mefServiceEvcUniCfgType object and are deleted when the corresponding
+        row is deleted in the mefServiceEvcCfgTable or an interface is
+        removed from the EVC. 
+
+        Rows are accessed via the IF-MIB interface object ifIndex and the EVC
+        number object mefServiceEvcCfgIndex by the SNMP Manager.
+
+        Rows in this table and the value of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    ::= { mefServiceUniAttributes 2 }
+
+mefServiceEvcPerUniCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceEvcPerUniCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The conceptual row of mefServicePerUniCfgTable.
+       "
+    INDEX { ifIndex, mefServiceEvcCfgIndex }
+    ::= { mefServiceEvcPerUniCfgTable 1 }
+
+MefServiceEvcPerUniCfgEntry ::= SEQUENCE {
+     mefServiceEvcPerUniCfgServiceType          INTEGER,
+     mefServiceEvcPerUniCfgIdentifier           DisplayString,
+     mefServiceEvcPerUniCfgCeVlanMap            MefServiceListType,
+     mefServiceEvcPerUniCfgIngressBwpGrpIndex   Unsigned32,
+     mefServiceEvcPerUniCfgEgressBwpGrpIndex    Unsigned32
+    }
+
+mefServiceEvcPerUniCfgServiceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        epl             (1),
+        evpl            (2),
+        eplan           (3),
+        evplan          (4),
+        eptree          (5),
+        evptree         (6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the specific Ethernet service type. The value is 
+         derived from the EVC object 'mefServiceEvcCfgType' and the UNI object
+         'mefServiceUniCfgBundlingMultiplex'. 
+
+         epl(1)      Ethernet Private Line Service (EPL)
+                     Point-to-Point EVC, all to one bundling
+
+         evpl(2)     Ethernet Virtual Private Line (EVPL)
+                     Point-to-Point EVC, bundling and/or multiplexing
+
+         eplan(3)    Ethernet Private LAN Service (EP-LAN)
+                     Multipoint-to-Multipoint EVC, all to one bundling
+
+         evplan(4)   Ethernet Virtual Private LAN Service (EVP-LAN)
+                     Multipoint-to-Multipoint EVC, bundling and/or multiplexing
+
+         eptree(5)   Ethernet Private Tree Service (EP-Tree)
+                     Rooted-Multipoint EVC, all to one bundling
+
+         evptree(6)  Ethernet Virtual Private Tree Service (EVP-Tree)
+                     Rooted-Multipoint EVC, bundling and/or multiplexing
+        "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { epl }
+    ::= { mefServiceEvcPerUniCfgEntry 1 }
+
+mefServiceEvcPerUniCfgIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..90))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the concatenated EVC-UNI identifier. It is
+        the concatenation of the mefServiceUniCfgIdentifier and the
+        mefServiceEvcCfgIdentifier.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+::= { mefServiceEvcPerUniCfgEntry 2 }
+
+mefServiceEvcPerUniCfgCeVlanMap OBJECT-TYPE
+    SYNTAX      MefServiceListType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the CE-VLANs associated with the specific
+        EVC on a UNI. CE-VLAN IDs have value of 0 to 4095. The CE-VLAN ID
+        list can be a single value or multiple values separated by a delimiter.
+
+        Some valid values are: '100', '1:10', '10,20,30', '1:4095'. In the
+        first example only CE-VLAN ID 100 is associated with the VLAN map.
+        In the second example the CE-VLAN map includes CE-VLAN IDs 1 through
+        10 (range of values). The third example indicates three separate values
+        that make up the CE-VLAN map. The last example indicates all CE-VLAN IDs
+        are included in the map (range of values). 
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { "1:4095" }    
+ ::= { mefServiceEvcPerUniCfgEntry 3 }
+
+mefServiceEvcPerUniCfgIngressBwpGrpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the index number of the ingress bandwidth profile group
+        associated with the current EVC on a UNI. A value of 0 indicates that
+        no ingress bandwidth profile group is associated with the EVC on a UNI.
+
+        This index indicates the specific bandwidth profile group previously 
+        configured via mefServiceBwpGrpCfgTable and mefServiceBwpCfgTable 
+        using this value for mefServiceBwpGrpCfgIndex. There may be multiple 
+        entries in mefServiceBwpCfgTable using this index, each containing
+        bandwidth parameters for a different Class of Service Identifier.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { 0 }  
+   ::= { mefServiceEvcPerUniCfgEntry 4 }
+
+mefServiceEvcPerUniCfgEgressBwpGrpIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the index number of the egress bandwidth profile group
+        associated with the current EVC on a UNI. A value of 0 indicates that
+        no egress bandwidth profile group is associated with the EVC on a UNI.
+
+        This index indicates the specific bandwidth profile group previously 
+        configured via mefServiceBwpGrpCfgTable and mefServiceBwpCfgTable 
+        using this value for mefServiceBwpGrpCfgIndex. There may be multiple 
+        entries in mefServiceBwpCfgTable using this index, each containing
+        bandwidth parameters for a different Class of Service Identifier.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { 0 }  
+    ::= { mefServiceEvcPerUniCfgEntry 5 }
+
+
+-- *****************************************************************************
+-- Ethernet Service Bandwidth Profile Group Table
+-- *****************************************************************************
+
+mefServiceBwpGrpNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains an unused value for a bandwidth profile group on a
+        MEF compliant NE, or a zero to indicate that none exist. This value
+        needs to be read by the SNMP Manager in order to find an available 
+        index for row creation of a bandwidth profile group and then used when
+        a row is created. This value is automatically updated by the SNMP Agent
+        after the row is created.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a NE.  The index
+        is never to be reused for a new bandwidth profile group on the same MEF 
+        compliant NE until it wraps to zero.  The index value keeps
+        increasing up to that time. This is to facilitate access control based
+        on a fixed index for an EMS, since the index is not reused.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { 1 }  
+    ::= { mefServiceBwpAttributes 1 }
+
+mefServiceBwpGrpCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceBwpGrpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports bandwidth profile group settings. Rows in this table 
+        are created by the SNMP Manager by first reading the 
+        mefServiceBwpGrpNextIndex object to find an available bandwidth 
+        profile group number and using this value when the row is created. If
+        an object in the row is not defined during row creation time the object
+        is set to the default value by the SNMP Agent. Rows are deleted by the 
+        SNMP Manager via the mefServiceBwpGrpCfgRowStatus object and the
+        corresponding rows in the mefServiceBwpCfgTable and 
+        mefServicePerformanceTable are deleted by the SNMP Agent.
+
+        Once a row in this table is created, an entry can be
+        created in the mefServiceBwpCfgTable using the index from this
+        table and the value of mefServiceBwpCfgNextIndex object. 
+
+        A row in the mefServiceBwpCfgTable indicates how a specific bandwidth
+        profile will be handled.
+
+        Rows in this table are accessed via the bandwidth profile group object 
+        mefServiceEvcCfgIndex by the SNMP Manager.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot.
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 6.1.1] 8.0, [MEF 7.2], [MEF 10.2]"
+    ::= { mefServiceBwpAttributes 2 }
+
+mefServiceBwpGrpCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceBwpGrpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Bandwidth profile group settings table entry."
+    INDEX { mefServiceBwpGrpCfgIndex }
+    ::= { mefServiceBwpGrpCfgTable 1 }
+
+MefServiceBwpGrpCfgEntry ::= SEQUENCE {
+      mefServiceBwpGrpCfgIndex      Unsigned32,
+      mefServiceBwpCfgNextIndex     Unsigned32,
+      mefServiceBwpGrpCfgRowStatus  RowStatus
+    }
+
+mefServiceBwpGrpCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Bandwidth profile group index number"
+    ::= { mefServiceBwpGrpCfgEntry 1 }
+
+mefServiceBwpCfgNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the value to be used as the index of the
+         bandwidth profile table entries. This value is automatically 
+         incremented when a row is created in the bandwidth profile table
+         by the SNMP Agent. When the SNMP Manager wants to create a new
+         row in the bandwidth profile table the value of this object is used
+         to create the specific row.
+        "
+    DEFVAL { 1 }
+    ::= { mefServiceBwpGrpCfgEntry 2 }
+
+mefServiceBwpGrpCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { mefServiceBwpGrpCfgEntry 3 }
+
+-- *****************************************************************************
+-- Ethernet Service Bandwidth Profile Table
+-- *****************************************************************************
+
+mefServiceBwpCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceBwpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports bandwidth profile settings and allows multiple
+        bandwidth profiles to configured on an interface or a Virtual Service,
+        based upon different Class of Service Identifiers.
+
+        Rows in this table are created by the SNMP Manager by first reading
+        the mefServiceBwpCfgNextIndex object to find an available bandwidth 
+        profile number and using this value when the row is created. If
+        an object in the row is not defined during row creation time the object
+        is set to the default value by the SNMP Agent. 
+
+        Rows are deleted by the SNMP Manager via the mefServiceBwpCfgRowStatus
+        object or by the SNMP Agent when the corresponding row in the 
+        mefServiceBwpGrpCfgTable is deleted. Corresponding rows in the
+        mefServicePerformanceTable are deleted by the SNMP Agent.
+
+        If resources in the ME-NE are not available to create a new bandwidth
+        profile or to enable a Performance Data Set an error is returned when
+        the row is created.
+
+        A bandwidth profile can be associated to a CoS Identifier via the
+        mefServiceBwpCfgCosIndex. The value set to the
+        mefServiceBwpCfgCosIndex object is the value of the associated 
+        CoS Identifier indicated by the mefServiceCosCfgIndex object.
+
+        Rows in this table are accessed by the SNMP Manager via the bandwidth
+        profile group object mefServiceBwpGrpCfgIndex and the individual
+        bandwidth profile in the group by the mefServiceBwpCfgIndex.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    ::= { mefServiceBwpAttributes 3 }
+
+mefServiceBwpCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceBwpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Bandwidth profile settings table entry."
+    INDEX { mefServiceBwpGrpCfgIndex, mefServiceBwpCfgIndex }
+    ::= { mefServiceBwpCfgTable 1 }
+
+MefServiceBwpCfgEntry ::= SEQUENCE {
+      mefServiceBwpCfgIndex             Unsigned32,
+      mefServiceBwpCfgIdentifier        DisplayString,
+      mefServiceBwpCfgCir               Unsigned32,
+      mefServiceBwpCfgCbs               Unsigned32,
+      mefServiceBwpCfgEir               Unsigned32,
+      mefServiceBwpCfgEbs               Unsigned32,
+      mefServiceBwpCfgCm                INTEGER,
+      mefServiceBwpCfgCf                INTEGER,
+      mefServiceBwpCfgCosIndex          Unsigned32,
+      mefServiceBwpCfgPerformanceEnable INTEGER,
+      mefServiceBwpCfgRowStatus         RowStatus
+    }
+
+mefServiceBwpCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the bandwidth profile index number. Multiple
+        bandwidth profiles can be set for the same bandwidth profile group,
+        allowing for unique bandwidth profiles for each CoS Identifier. 
+       "
+    ::= { mefServiceBwpCfgEntry 1 }
+
+mefServiceBwpCfgIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the bandwidth profile identifier for the
+        associated bandwidth profile index and is an arbitrary 
+        text string that is used to identify a bandwidth profile. Unique
+        string values are chosen to uniquely identify the bandwidth
+        profile.
+
+        Octet values of 0x00 through 0x1f are illegal.
+
+        MEF 26.1 restricts the maximum size identifiers to 45 octets.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { "" }
+   ::= { mefServiceBwpCfgEntry 2 }
+
+mefServiceBwpCfgCir OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000000)
+    UNITS       "kbits/s"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the Committed Information Rate (CIR) in kbits/s
+        and defines the average rate in kbits/sec up to which 
+        the network delivers Service Frames. Service Frames that meet
+        the CIR are said to be in profile or in conformance to performance
+        objectives. These frames are generally identified as 'Green' 
+        Service Frames.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { 1000000 }
+    ::= { mefServiceBwpCfgEntry 3 }
+
+mefServiceBwpCfgCbs OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000000)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the Committed Burst Size (CBS) in bytes. It limits
+        the maximum number of bytes available for a burst of Service Frames sent
+        at interface speed to remain CIR-conformant.
+       "
+    REFERENCE
+       "[MEF 10.2]"
+    DEFVAL { 12 }
+    ::= { mefServiceBwpCfgEntry 4 }
+
+mefServiceBwpCfgEir OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000000)
+    UNITS       "kbits/s"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the Excess Information Rate (EIR) in kbits/s
+        and defines the average rate in kbits/sec of Service Frames up to
+        which the network may deliver Service Frames but without performance
+        objectives. Service Frames that meet the EIR as set to be in out-of-
+        profile or not in conformance to performance objectives. These 
+        frames are not guaranteed to be delivered and are generally identified
+        as 'Yellow' service frames.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { 0 }
+    ::= { mefServiceBwpCfgEntry 5 }
+
+mefServiceBwpCfgEbs OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000000)
+    UNITS       "bytes"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the Excess Burst Size (EBS) in bytes. It limits
+        the maximum number of bytes available for a burst of Service Frames
+        sent at the interface speed to remain EIR-conformant.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { 0 }
+    ::= { mefServiceBwpCfgEntry 6 }
+
+mefServiceBwpCfgCm OBJECT-TYPE
+    SYNTAX      INTEGER {
+        colorBlind      (1),
+        colorAware      (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the bandwidth profile color mode.
+
+        colorBlind(1)    A bandwidth profile property where ingress 
+                         Service Frames are not pre-colored for either 
+                         green or yellow, and if present, is ignored when
+                         determining the level of compliance for each
+                         Service Frame
+        colorAware(2)    A bandwidth profile property were a pre-determined
+                         level of Bandwidth Profile compliance for each
+                         Service Frame is taken into account when determining
+                         the level of compliance for each Service Frame. 
+                         Each service frame can be colored red (discarded),
+                         yellow (conditional delivery), or green (unconditional
+                         delivery.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { colorBlind }
+    ::= { mefServiceBwpCfgEntry 7 }
+
+mefServiceBwpCfgCf OBJECT-TYPE
+    SYNTAX      INTEGER {
+        couplingYellowEirOnly     (0),
+        couplingYellowEirPlusCir  (1)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the bandwidth profile coupling flag and has
+         the effect of controlling the volume of the Service Frames that are
+         declared Yellow.
+
+        couplingYellowEirOnly(0)     The long term average bit rate of Service
+                                     Frames that are declared Yellow is bounded
+                                     by EIR.         
+        couplingYellowEirPlusCir(1)  The long term average bit rate of Service
+                                     Frames that are declared Yellow is bounded
+                                     by CIR + EIR depending on the volume of
+                                     the offered Service Frames that are 
+                                     declared Green.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { couplingYellowEirOnly }
+    ::= { mefServiceBwpCfgEntry 8 }
+
+mefServiceBwpCfgCosIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is the index number of the CoS ID profile
+        associated with the current bandwidth profile. A value of 0 indicates
+        that no CoS ID profile is associated with the bandwidth profile and the
+        bandwidth profile applies to all CoS IDs.
+
+        This index indicates a specific CoS ID profile previously configured via
+        mefServiceCosCfgTable as indicated by the mefServiceCosCfgIndex object.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { 0 }  
+    ::= { mefServiceBwpCfgEntry 9 }
+
+mefServiceBwpCfgPerformanceEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disablePerformanceDataSet (1),
+        enablePerformanceDataSet  (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates whether a performance data set is configured
+        for a specific bandwidth profile. This allows for only specific
+        bandwidth profiles to be monitored if there are limitations in the
+        ME-NE being accessed.
+
+        disablePerformanceDataSet(1) A performance data set is enabled for this
+                                     bandwidth profile
+        enablePerformanceDataSet(2)  A performance data set is not enabled for
+                                     this bandwidth profile.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.1; [MEF 7.2] 6.2.1.3"
+    DEFVAL { disablePerformanceDataSet }  
+    ::= { mefServiceBwpCfgEntry 10 }
+
+mefServiceBwpCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { mefServiceBwpCfgEntry 11 }
+
+
+-- *****************************************************************************
+-- Ethernet Service Class of Service Identifier Profile Table
+-- *****************************************************************************
+
+mefServiceCosNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains an unused value for a Class of Service Identifier
+        (CoS ID) profile on a MEF compliant NE, or a zero to indicate that none
+        exist. This value needs to be read by the SNMP Manager in order to find
+        an available index for row-creation of a CoS ID profile and then used
+        when a row is created. This value is automatically updated by the SNMP
+        Agent after the row is created.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a NE.  The index
+        is never to be reused for a new CoS ID profile on the same MEF compliant
+        NE until it wraps to zero.  The index value keeps
+        increasing up to that time. This is to facilitate access control based
+        on a fixed index for an EMS, since the index is not reused.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { 1 }  
+    ::= { mefServiceCosAttributes 1 }
+
+mefServiceCosCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceCosCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports Class of Service Identifier profile settings.
+
+        Rows in this table are created by the SNMP Manager by first reading
+        the mefServiceCosNextIndex object to find an available Cos  
+        profile number and using this value when the row is created. If
+        an object in the row is not defined during row creation time the object
+        is set to the default value by the SNMP Agent. 
+
+        Rows are deleted by the SNMP Manager via the mefServiceCosCfgRowStatus
+        object.
+
+        If resources in the ME-NE are not available to create a new CoS
+        profile an error is returned when the row is created.
+
+        Rows in this table are accessed by the SNMP Manager via the CoS
+        profile object mefServiceCosCfgIndex.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    ::= { mefServiceCosAttributes 2 }
+
+mefServiceCosCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceCosCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Class of Service Identifier settings table entry."
+    INDEX { mefServiceCosCfgIndex }
+    ::= { mefServiceCosCfgTable 1 }
+
+MefServiceCosCfgEntry ::= SEQUENCE {
+      mefServiceCosCfgIndex             Unsigned32,
+      mefServiceCosCfgIdentifier        DisplayString,
+      mefServiceCosCfgType              INTEGER,
+      mefServiceCosCfgIdentifierList    MefServiceListType,
+      mefServiceCosCfgMacAddress        MacAddress,
+      mefServiceCosCfgProtocol          Unsigned32,
+      mefServiceCosCfgSubType           Unsigned32,
+      mefServiceCosCfgRowStatus         RowStatus
+    }
+
+mefServiceCosCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Class of Service Identifier profile index number."
+    ::= { mefServiceCosCfgEntry 1 }
+
+mefServiceCosCfgIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the Class of Service Name for the
+        associated CoS profile index and is an arbitrary text string that is
+        used to identify a CoS ID profile. Unique string values are chosen to 
+        uniquely identify the profile.
+
+        Octet values of 0x00 through 0x1f are illegal.
+
+        MEF 26.1 restricts the maximum size identifiers to 45 octets.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { "" }
+    ::= { mefServiceCosCfgEntry 2 }
+
+mefServiceCosCfgType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        interface       (1),
+        evc             (2),
+        pcp             (3),
+        dscp            (4),
+        l2cp            (5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object configures the CoS ID type and indicates the interpretation
+        of the mefServiceCosIdentifierList object.
+
+        interface(1) This value indicates that the CoS ID profile is associated
+                     with the interface, i.e. UNI or ENNI
+        vc(2)        This value indicates that the CoS ID profile is associated
+                     with the virtual channel, i.e. EVC or OVC
+        pcp(3)       This value indicates that the CoS ID profile is associated
+                     with the outer tag's Priority Code Point (priority bits)
+        dscp(4)      This value indicates that the CoS ID profile is associated
+                     the IP's frames DSCP (priority) setting
+        l2cp(5)      This value indicates that the CoS ID profile is associated
+                     a Layer 2 Control Protocol
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { pcp }
+    ::= { mefServiceCosCfgEntry 3 }
+
+mefServiceCosCfgIdentifierList OBJECT-TYPE
+    SYNTAX      MefServiceListType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the list of CoS identifiers associated with
+        the specific CoS ID profile. Interpretation of the values in the list
+        are based upon the mefServiceCosCfgType object.
+
+        For each of the mefServiceCosCfgType types valid range is:
+
+        interface - the value of this object is ignored for the 'interface'
+                    type
+        vc        - the value of this object is ignored for the 'vc' type
+        pcp       - the value of this object has a range of '0:7'
+        dscp      - the value of this object has a range of '0:63' for IPv4
+                    and '0:16384' for IPv6
+        l2cp      - the value of this object indicates the matching criteria:
+                    '1' - destination MAC address only
+                    '2' - destination MAC address plus Ethernet protocol
+                    '3' - destination MAC address plus Ethernet protocol 
+                          plus subtype
+
+        CoS identifier list can be a single value or multiple values separated
+        by a delimiter.
+
+        Some valid values are: '1', '1:3', '1,3,5', '0:7'. In the first example
+        only one item, '1', is included in the CoS ID list. In the second example
+        values 1, 2, and 3 are included in the CoS ID list (range of values). In
+        the third example three individual values are included. In the fourth
+        example eight values are included: 0 through 7 (range of values).
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 6.1, 6.2, 6.3; [MEF 7.2] 6.2.1.2, 6.2.1.3"
+    DEFVAL { "0:7" }
+   ::= { mefServiceCosCfgEntry 4 }
+
+mefServiceCosCfgMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the L2CP Destination MAC address for CoS 
+         Identifier type of 'l2cp' and is ignored for other types.
+
+         Valid values are 01-80-C2-00-00-00 through 01-80-C2-00-00-0F and
+         01-80-C2-00-00-20 through 01-80-C2-00-00-2F
+        "
+    DEFVAL { '000000000000'H }
+    ::= { mefServiceCosCfgEntry 5 }
+
+mefServiceCosCfgProtocol OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the L2CP Ethernet protocol for CoS Identifier
+         type of 'l2cp' and is ignored for other types. It is also ignored if
+         mefServiceCosCfgIdentifierList has a value of '1'.
+
+         The protocol is defined in the Ethertype field of the Ethertype
+         frame. For instance the Ethertype for Link OAM is 0x8809, for 
+         E-LMI it is 0x88EE, for LLDP it is 0x88CC.
+
+         Valid protocol values are defined by MEF 6.1 and MEF 6.1.1.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, 8.0; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceCosCfgEntry 6 }
+
+mefServiceCosCfgSubType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the L2CP subtype protocol for CoS Identifier
+         type of 'l2cp' and is ignored for other types. It is also ignored if
+         mefServiceCosCfgIdentifierList has a value of '1' or '2'.
+
+         For instance, the subtype for LACP is '2' and Link OAM is '3'.
+
+         Valid subtype values are defined by MEF 6.1 and MEF 6.1.1.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, 8.0; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceCosCfgEntry 7 }
+
+mefServiceCosCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { mefServiceCosCfgEntry 8 }
+
+
+-- *****************************************************************************
+-- Ethernet Service L2CP Profile Group Table
+-- *****************************************************************************
+
+mefServiceL2cpGrpNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains an unused value for a L2CP profile group on a
+        MEF compliant NE, or a zero to indicate that none exist. This value
+        needs to be read by the SNMP Manager in order to find an available
+        index for row-creation of a L2CP profile group and then used when
+        a row is created. This value is automatically updated by the SNMP Agent
+        after the row is created.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a NE.  The index
+        is never to be reused for a new L2CP profile group on the same MEF 
+        compliant NE until it wraps to zero.  The index value keeps
+        increasing up to that time. This is to facilitate access control based
+        on a fixed index for an EMS, since the index is not reused.
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 6.1.1] 8.0, [MEF 7.2], [MEF 10.2]"
+    DEFVAL { 1 }  
+    ::= { mefServiceL2cpAttributes 1 }
+
+mefServiceL2cpGrpCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceL2cpGrpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports a group of L2CP settings for an interface via the
+        mefServiceInterfaceCfgL2cpGrpIndex object or for a service via the 
+        mefServiceEvcCfgL2cpGrpIndex object. 
+
+        Rows in this table are created by the SNMP Manager by first reading
+        the mefServiceL2cpGrpNextIndex object to find an available L2CP 
+        profile group number and using this value when the row is created. 
+        If an object in the row is not defined during row creation time the
+        object is set to the default value by the SNMP Agent. 
+
+        Rows are deleted by the SNMP Manager via the 
+        mefServiceL2cpGrpCfgRowStatus object and corresponding rows in the
+        mefServiceL2cpCfgTable are deleted by the SNMP Agent.
+
+        Once a row in this table is created, an entry can be created in the 
+         mefServiceL2cpCfgTable using the index from this table and the
+        value of mefServiceL2cpCfgNextIndex object. A row in the 
+        mefServiceL2cpCfgTable indicates how a specific L2CP will be
+        handled.
+
+        Rows in this table are accessed by the L2CP group number object
+        mefServiceL2cpGrpCfgIndex.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 6.1.1] 8.0, [MEF 7.2], [MEF 10.2]"
+    ::= { mefServiceL2cpAttributes 2 }
+
+mefServiceL2cpGrpCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceL2cpGrpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "L2CP profile group settings table entry on an interface."
+    INDEX { mefServiceL2cpGrpCfgIndex }
+    ::= { mefServiceL2cpGrpCfgTable 1 }
+
+MefServiceL2cpGrpCfgEntry ::= SEQUENCE {
+      mefServiceL2cpGrpCfgIndex         Unsigned32,
+      mefServiceL2cpCfgNextIndex Unsigned32,
+      mefServiceL2cpGrpCfgRowStatus     RowStatus
+    }
+
+mefServiceL2cpGrpCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "L2CP profile group index number, indicating the specific L2CP profile 
+         group
+        "
+    ::= { mefServiceL2cpGrpCfgEntry 1 }
+
+mefServiceL2cpCfgNextIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the value to be used as the index of the L2CP
+         table entries. This value is automatically incremented when a row
+         is created in the L2CP table by the SNMP Agent. When the SNMP
+         Manager wants to create a new row in the L2CP table the value
+         of this object is used to create the specific item row.
+         
+         A group of L2CP protocols is indicated by the use of the
+         mefServiceL2cpCfgTable, which allows more than one
+         Layer 2 Protcol to be associated within a L2CP profile group.
+        "
+    DEFVAL { 1 }
+    ::= { mefServiceL2cpGrpCfgEntry 2 }
+
+mefServiceL2cpGrpCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { mefServiceL2cpGrpCfgEntry 3 }
+
+
+-- *****************************************************************************
+-- Ethernet Service L2CP Profile Table
+-- *****************************************************************************
+
+mefServiceL2cpCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServiceL2cpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports L2CP profile settings. Each row in the table 
+        indicates a specific L2CP and its processing type. Once a row is
+        created in the mefServiceL2cpGrpCfgTable one or more rows can be
+        created in the mefServiceL2cpCfgTable table to indicate a group
+        of Layer 2 Control Protocols that are handled as one L2CP profile
+        group.
+
+        Rows in this table are created by the SNMP Manager by first reading
+        the mefServiceL2cpCfgNextIndex object to find an available L2CP 
+        profile number and using this value when the row is created. If
+        an object in the row is not defined during row creation time the object
+        is set to the default value by the SNMP Agent. 
+
+        Rows are deleted by the SNMP Manager via the 
+        mefServiceL2cpGrpCfgRowStatus object or by the SNMP Agent when
+        the corresponding row is deleted in the mefServiceL2cpGrpCfgTable.
+
+        Rows in this table are accessed by the L2CP group number object
+        mefServiceL2cpGrpCfgIndex and the individual L2CP profile in the
+        group via the mefServiceL2cpCfgIndex object.
+
+        Rows in this table and the values of the objects in the row are 
+        persistent (non-volatile) upon reboot. 
+       "
+    REFERENCE
+       "[MEF 6.1], [MEF 7.2], [MEF 10.2]"
+    ::= { mefServiceL2cpAttributes 3 }
+
+mefServiceL2cpCfgEntry OBJECT-TYPE
+    SYNTAX      MefServiceL2cpCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "L2CP settings table entry on an interface or a service."
+    INDEX { mefServiceL2cpGrpCfgIndex, mefServiceL2cpCfgIndex }
+    ::= { mefServiceL2cpCfgTable 1 }
+
+MefServiceL2cpCfgEntry ::= SEQUENCE {
+      mefServiceL2cpCfgIndex       Unsigned32,
+      mefServiceL2cpCfgType        INTEGER,
+      mefServiceL2cpCfgMatchScope  INTEGER,
+      mefServiceL2cpCfgMacAddress  MacAddress,
+      mefServiceL2cpCfgProtocol    Unsigned32,
+      mefServiceL2cpCfgSubType     Unsigned32,
+      mefServiceL2cpCfgRowStatus   RowStatus
+    }
+
+mefServiceL2cpCfgIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object configures the L2CP index number on an interface or a 
+         Service and is used to create/access a L2CP profile within a L2CP 
+         group.
+        "
+    ::= { mefServiceL2cpCfgEntry 1 }
+
+mefServiceL2cpCfgType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        discard   (1),
+        tunnel    (2),
+        peer      (3),
+        passToEvc (4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object configures the L2CP processing type setting.
+
+        discard(1)     the indicated L2CP is discarded
+        tunnel(2)      the indicated L2CP is tunneled (passed)
+        peer(3)        the indicated L2CP is peered with the NE
+        passToEvc(4)   the indicated L2CP is passed to the EVC for
+                       EVC processing of the L2CP. Final L2CP 
+                       disposition is based the L2CP profile for
+                       the EVC to be tunneled, discarded, or peered.
+                       This value is not valid for EVC based
+                       L2CP.
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 8.0; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { tunnel }
+    ::= { mefServiceL2cpCfgEntry 2 }
+
+mefServiceL2cpCfgMatchScope OBJECT-TYPE
+    SYNTAX      INTEGER {
+        destinationAddressOnly         (1),
+        daPlusProtocol                 (2),
+        daPlusProtocolPlusSubtype      (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "This object configures the L2CP selection matching scope.
+
+        destinationAddressOnly(1)     L2CP selection is determined by
+                                      MAC Destination Address only
+        daPlusProtocol(2)             L2CP selection is determined by
+                                      MAC Destination Address plus 
+                                      Ethernet protocol
+        daPlusProtocolPlusSubtype(3)  L2CP selection is determined by
+                                      MAC Destination Address plus 
+                                      Ethernet protocol plus subtype
+       "
+    REFERENCE
+       "[MEF 6.1] 6.0, 8.0; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { destinationAddressOnly }
+    ::= { mefServiceL2cpCfgEntry 3 }
+
+mefServiceL2cpCfgMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the L2CP Destination MAC address.
+
+         Valid values are 01-80-C2-00-00-00 through 01-80-C2-00-00-0F and
+         01-80-C2-00-00-20 through 01-80-C2-00-00-2F
+        "
+    DEFVAL { '0180C2000000'H }
+    ::= { mefServiceL2cpCfgEntry 4 }
+
+mefServiceL2cpCfgProtocol OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures the L2CP Ethernet protocol. The protocol is 
+         defined in the Ethertype field of the Ethertype frame. For instance the
+         Ethertype for Link OAM is 0x8809, for E-LMI it is 0x88EE, for
+         LLDP it is 0x88CC.
+
+         Valid protocol values are defined by MEF 6.1 and MEF 6.1.1.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, 8.0; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceL2cpCfgEntry 5 }
+
+mefServiceL2cpCfgSubType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object configures L2CP subtype for the protocol selected. For
+         instance, the subtype for LACP is '2' and Link OAM is '3'.
+
+         Valid subtype values are defined by MEF 6.1 and MEF 6.1.1.
+        "
+    REFERENCE
+       "[MEF 6.1] 6.0, 8.0; [MEF 6.1.1] 8.0; [MEF 7.2] 6.2.1.2"
+    DEFVAL { 0 }
+    ::= { mefServiceL2cpCfgEntry 6 }
+
+mefServiceL2cpCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The status of the row.
+
+        The writable columns in a row cannot be changed if the row
+        is active. All columns must have a valid value before a row
+        can be activated.
+       "
+   ::= { mefServiceL2cpCfgEntry 7 }
+
+
+-- *****************************************************************************
+-- Ethernet Service Traffic Performance Data Set Table
+-- *****************************************************************************
+
+mefServicePerformanceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MefServicePerformanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table supports Traffic Performance Data Set profile settings on 
+        a Bandwidth Profile.
+
+        A row in this table is automatically created when a row in the 
+        mefServiceBwpCfgTable is created. This table contains the same rows as
+        the mefServiceBwpCfgTable. 
+
+        A row in this table is deleted when a row in the mefServiceBwpCfgTable
+        is deleted. Counters in the table are only enabled when the associated
+        object, mefServiceBwpCfgPerformanceEnable, is enabled. 
+
+        Rows in this table are accessed via the bandwidth profile group 
+        object mefServiceBwpGrpCfgIndex and the individual bandwidth profile
+        in the group by the mefServiceBwpCfgIndex object. A SNMP Manager 
+        can access objects in each of the rows in the table.
+
+        Rows in this table are persistent (non-volatile) upon reboot, but the
+        values of the objects in a row are not persistent.
+       "
+    ::= { mefServiceBwpAttributes 4 }
+
+mefServicePerformanceEntry OBJECT-TYPE
+    SYNTAX      MefServicePerformanceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Traffic Performance Data Set profile settings table entry."
+    INDEX { mefServiceBwpGrpCfgIndex, mefServiceBwpCfgIndex }
+    ::= { mefServicePerformanceTable 1 }
+
+MefServicePerformanceEntry ::= SEQUENCE {
+      mefServicePerformanceIngressGreenFrameCount            Counter64,
+      mefServicePerformanceIngressYellowFrameCount           Counter64,
+      mefServicePerformanceIngressRedFrameCount              Counter64,
+      mefServicePerformanceIngressGreenOctets                Counter64,
+      mefServicePerformanceIngressYellowOctets               Counter64,
+      mefServicePerformanceIngressRedOctets                  Counter64,
+
+      mefServicePerformanceIngressGreenFrameDiscards         Counter64,
+      mefServicePerformanceIngressYellowFrameDiscards        Counter64,
+      mefServicePerformanceIngressGreenOctetsDiscards        Counter64,
+      mefServicePerformanceIngressYellowOctetsDiscards       Counter64,
+
+      mefServicePerformanceEgressGreenFrameCount             Counter64,
+      mefServicePerformanceEgressYellowFrameCount            Counter64,
+      mefServicePerformanceEgressGreenOctets                 Counter64,
+      mefServicePerformanceEgressYellowOctets                Counter64
+    }
+
+mefServicePerformanceIngressGreenFrameCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of green frames that were 
+        received on a ME-NE for the associated bandwidth profile.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 1 }
+
+mefServicePerformanceIngressYellowFrameCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of yellow frames that were 
+        received on the ME-NE for the associated bandwidth profile.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 2 }
+
+mefServicePerformanceIngressRedFrameCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of red frames that were 
+        received on the ME-NE for the associated bandwidth profile.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 3 }
+
+mefServicePerformanceIngressGreenOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of valid green octets 
+        that were received on the ME-NE for the associated bandwidth 
+        profile.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 4 }
+
+mefServicePerformanceIngressYellowOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of valid yellow octets 
+        that were received on the ME-NE for the associated bandwidth
+        profile.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 5 }
+
+mefServicePerformanceIngressRedOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of valid red octets 
+        that were received on the ME-NE for the associated bandwidth
+        profile.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 6 }
+
+mefServicePerformanceIngressGreenFrameDiscards OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of green frames that were 
+        discarded due to congestion within the ME-NE for the
+        associated bandwidth profile.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 7 }
+
+mefServicePerformanceIngressYellowFrameDiscards  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of yellow frames that were 
+        discarded due to congestion within the ME-NE for the 
+        associated bandwidth profile.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 8 }
+
+mefServicePerformanceIngressGreenOctetsDiscards  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of valid green octets 
+        that were discarded due to congestion within the ME-NE for the
+        associated bandwidth profile.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 9 }
+
+mefServicePerformanceIngressYellowOctetsDiscards  OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of valid yellow octets 
+        that were discarded due to congestion within the ME-NE for the
+        associated bandwidth profile.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 10 }
+
+mefServicePerformanceEgressGreenFrameCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of green frames that were 
+        transmitted on the ME-NE for the associated bandwidth profile.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 11 }
+
+mefServicePerformanceEgressYellowFrameCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Ethernet frames"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of yellow frames that were 
+        transmitted on the ME-NE for the associated bandwidth profile.
+
+        ME-NEs that do not support 64 bit counters can return the
+        upper half of the counter as all zeros.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 12 }
+
+mefServicePerformanceEgressGreenOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of valid green octets 
+        that were transmitted on the ME-NE for the associated bandwidth 
+        profile.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 13 }
+
+mefServicePerformanceEgressYellowOctets   OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object indicates the number of valid yellow octets 
+        that were transmitted on the ME-NE for the associated bandwidth 
+        profile.
+
+        This object defaults to '0'. 
+       "
+    REFERENCE
+       "[MEF 15] 8.2; [Q.840.1] 6.2.4"
+    ::= { mefServicePerformanceEntry 14 }
+
+
+-- *****************************************************************************
+-- Notification Configuration Objects
+-- *****************************************************************************
+
+mefServiceNotificationCfgAlarmEnable OBJECT-TYPE
+    SYNTAX      BITS {
+                     bServiceConfigurationAlarm(0)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "This object is a vector of bits that indicates whether a specific
+        notification is enabled. 
+
+        A bit set to '1' enables the specific notification generation. 
+
+        A bit set to '0' disables the specific notification.
+
+        If a particular alarm is not supported the BIT value of the enable/disable
+        is set to '0'.
+
+        bServiceConfigurationAlarm(0)  enables/disables mefServiceConfigurationAlarm
+
+        The value of this object is persistent (non-volatile) upon reboot.
+       "
+    DEFVAL { { } }
+    ::= { mefServiceNotificationCfg 1 }
+
+
+-- *****************************************************************************
+-- Notification Data Objects
+-- *****************************************************************************
+
+mefServiceNotificationObjDateAndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+       "This object contains the time and date at the time that
+        the notification event is detected, not the time of the notification
+        generation.
+
+        This object is used only for notifications. The mechanism to set and keep
+        current the date and time is not specified.
+       "
+    ::= { mefServiceNotificationObj 1 }
+
+mefServiceNotificationConfigurationChangeType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  entryAdded     (1),
+                  entryDeleted   (2),
+                  entryModified  (3)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+       "The Notification Configuration Change Type of the object that caused the
+        generation.
+
+        entryAdded(1)    indicates that the specific object/service was added
+        entryDelete(2)   indicates that the specific object/service was deleted
+        entryModified(3) indicates that the specific object/service was modified
+
+        This object is only used for the notification.
+       "
+    REFERENCE
+       "[MEF 7.2] 6.2.1.1, 6.2.1.2, 6.2.1.3"
+    ::= { mefServiceNotificationObj 2 }
+
+
+-- *****************************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- *****************************************************************************
+
+mefServiceConfigurationAlarm NOTIFICATION-TYPE
+    OBJECTS     {
+                mefServiceNotificationObjDateAndTime,
+                mefServiceNotificationConfigurationChangeType
+                }
+    STATUS      current
+    DESCRIPTION
+       "An mefServiceConfigurationAlarm notification is sent when the configuration
+        of an object or service is added, deleted, or modified.
+
+        The ME-NE that receives the notification can identify
+        the system from the network source address of the notification,
+        and can identify the configuration change by the indices in the
+        standard snmpTrapOID object.
+       "
+    REFERENCE
+       "[MEF 7.2] 6.2.1.1, 6.2.1.2, 6.2.1.3"
+    ::= { mefServiceNotifications 1 }
+
+
+-- *****************************************************************************
+-- SERVICE-UNI MIB Module - Conformance Information
+-- *****************************************************************************
+
+mefServiceUniEvcMibCompliances OBJECT IDENTIFIER ::= { mefServiceMibConformance 1 }
+mefServiceUniEvcMibGroups      OBJECT IDENTIFIER ::= { mefServiceMibConformance 2 }
+
+
+-- ******************************************************************
+-- SERVICE-UNI MIB Units of conformance
+-- ******************************************************************
+
+mefServiceInterfaceMandatoryGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceInterfaceCfgType,
+      mefServiceInterfaceCfgIdentifier,
+      mefServiceInterfaceCfgFrameFormat,
+      mefServiceInterfaceCfgIngressBwpGrpIndex,
+      mefServiceInterfaceCfgEgressBwpGrpIndex,
+      mefServiceInterfaceCfgL2cpGrpIndex,
+      mefServiceInterfaceStatusType,
+      mefServiceInterfaceStatusMaxVc,
+      mefServiceInterfaceStatusMaxEndPointPerVc,
+      mefServiceInterfaceStatisticsIngressUndersized,
+      mefServiceInterfaceStatisticsIngressOversized,
+      mefServiceInterfaceStatisticsIngressFragments,
+      mefServiceInterfaceStatisticsIngressCrcAlignment,
+      mefServiceInterfaceStatisticsIngressInvalidVid,
+      mefServiceInterfaceStatisticsIngressOctets,
+      mefServiceInterfaceStatisticsIngressUnicast,
+      mefServiceInterfaceStatisticsIngressMulticast,
+      mefServiceInterfaceStatisticsIngressBroadcast,
+      mefServiceInterfaceStatisticsEgressOctets,
+      mefServiceInterfaceStatisticsEgressUnicast,
+      mefServiceInterfaceStatisticsEgressMulticast,
+      mefServiceInterfaceStatisticsEgressBroadcast
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the Interface group."
+    ::= { mefServiceUniEvcMibGroups 1 }
+
+
+mefServiceUniMandatoryGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceUniCfgIdentifier,
+      mefServiceUniCfgBundlingMultiplex,
+      mefServiceUniCfgCeVidUntagged,
+      mefServiceUniCfgCePriorityUntagged,
+      mefServiceEvcPerUniCfgServiceType,
+      mefServiceEvcPerUniCfgIdentifier,
+      mefServiceEvcPerUniCfgCeVlanMap,
+      mefServiceEvcPerUniCfgIngressBwpGrpIndex,
+      mefServiceEvcPerUniCfgEgressBwpGrpIndex
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the UNI Attributes group."
+    ::= { mefServiceUniEvcMibGroups 2 }
+
+
+mefServiceEvcMandatoryGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceEvcNextIndex,
+      mefServiceEvcCfgIdentifier,
+      mefServiceEvcCfgServiceType,
+      mefServiceEvcCfgMtuSize,
+      mefServiceEvcCfgCevlanIdPreservation,
+      mefServiceEvcCfgCevlanCosPreservation,
+      mefServiceEvcCfgL2cpGrpIndex,
+      mefServiceEvcCfgAdminState,
+      mefServiceEvcCfgRowStatus,
+      mefServiceEvcUniCfgType,
+      mefServiceEvcUniCfgRowStatus,
+      mefServiceEvcStatusMaxMtuSize,
+      mefServiceEvcStatusMaxNumUni,
+      mefServiceEvcStatusOperationalState
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the EVC Attributes group."
+    ::= { mefServiceUniEvcMibGroups 3 }
+
+
+mefServiceEvcOptionalGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceEvcCfgUnicastDelivery,
+      mefServiceEvcCfgMulticastDelivery,
+      mefServiceEvcCfgBroadcastDelivery
+    }
+    STATUS      current
+    DESCRIPTION
+       "Optional objects for the EVC Attributes group."
+    ::= { mefServiceUniEvcMibGroups 4 }
+
+
+mefServiceBwpMandatoryGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceBwpGrpNextIndex,
+      mefServiceBwpCfgNextIndex,
+      mefServiceBwpGrpCfgRowStatus,
+      mefServiceBwpCfgIdentifier,
+      mefServiceBwpCfgCir,
+      mefServiceBwpCfgCbs,
+      mefServiceBwpCfgEir,
+      mefServiceBwpCfgEbs,
+      mefServiceBwpCfgCm,
+      mefServiceBwpCfgCf,
+      mefServiceBwpCfgCosIndex,
+      mefServiceBwpCfgPerformanceEnable,
+      mefServiceBwpCfgRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the Bandwidth Profile Attributes group."
+    ::= { mefServiceUniEvcMibGroups 5 }
+
+
+mefServiceCosMandatoryGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceCosNextIndex,
+      mefServiceCosCfgIdentifier,
+      mefServiceCosCfgType,
+      mefServiceCosCfgIdentifierList,
+      mefServiceCosCfgMacAddress,
+      mefServiceCosCfgProtocol,
+      mefServiceCosCfgSubType,
+      mefServiceCosCfgRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the Class of Service Attributes group."
+    ::= { mefServiceUniEvcMibGroups 6 }
+
+
+mefServiceL2cpMandatoryGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceL2cpGrpNextIndex,
+      mefServiceL2cpCfgNextIndex,
+      mefServiceL2cpGrpCfgRowStatus,
+      mefServiceL2cpCfgType,
+      mefServiceL2cpCfgMatchScope,
+      mefServiceL2cpCfgMacAddress,
+      mefServiceL2cpCfgProtocol,
+      mefServiceL2cpCfgSubType,
+      mefServiceL2cpCfgRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the L2CP Attributes group."
+    ::= { mefServiceUniEvcMibGroups 7 }
+
+
+mefServicePerformanceMandatoryGroup OBJECT-GROUP
+    OBJECTS {
+      mefServicePerformanceIngressGreenFrameCount,
+      mefServicePerformanceIngressGreenOctets,
+      mefServicePerformanceEgressGreenFrameCount,
+      mefServicePerformanceEgressGreenOctets
+    }
+    STATUS      current
+    DESCRIPTION
+       "Mandatory objects for the Bandwidth Profile Performance group."
+    ::= { mefServiceUniEvcMibGroups 8 }
+
+
+mefServicePerformanceOptionalGroup OBJECT-GROUP
+    OBJECTS {
+      mefServicePerformanceIngressYellowFrameCount,
+      mefServicePerformanceIngressRedFrameCount,
+      mefServicePerformanceIngressYellowOctets,
+      mefServicePerformanceIngressRedOctets,
+      mefServicePerformanceEgressYellowFrameCount,
+      mefServicePerformanceEgressYellowOctets,
+      mefServicePerformanceIngressGreenFrameDiscards,
+      mefServicePerformanceIngressYellowFrameDiscards,
+      mefServicePerformanceIngressGreenOctetsDiscards,
+      mefServicePerformanceIngressYellowOctetsDiscards
+    }
+    STATUS      current
+    DESCRIPTION
+       "Optional objects for the Bandwidth Profile Performance group."
+    ::= { mefServiceUniEvcMibGroups 9 }
+
+
+mefServiceNotificationObjOptionalGroup OBJECT-GROUP
+    OBJECTS {
+      mefServiceNotificationCfgAlarmEnable,      
+      mefServiceNotificationObjDateAndTime,
+      mefServiceNotificationConfigurationChangeType
+    }
+    STATUS      current
+    DESCRIPTION
+       "Optional objects for the Notification Object group."
+    ::= { mefServiceUniEvcMibGroups 10 }
+
+
+mefServiceNotificationsOptionalGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+      mefServiceConfigurationAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+       "Optional notifications for the Notifications group."
+    ::= { mefServiceUniEvcMibGroups 11 }
+
+
+-- ******************************************************************
+-- UNI-EVC MIB Module Compliance statements
+-- ******************************************************************
+
+mefServiceUniMibCompliance MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION "The compliance statement for the Ethernet Service 
+        UNI-EVC MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            mefServiceInterfaceMandatoryGroup,
+            mefServiceUniMandatoryGroup,
+            mefServiceEvcMandatoryGroup,
+            mefServiceBwpMandatoryGroup,
+            mefServiceCosMandatoryGroup,
+            mefServiceL2cpMandatoryGroup,
+            mefServicePerformanceMandatoryGroup
+        }
+
+    GROUP mefServiceEvcOptionalGroup
+    DESCRIPTION "The mefServiceEvcOptionalGroup is an optional 
+        requirement."
+
+    GROUP mefServicePerformanceOptionalGroup
+    DESCRIPTION "The mefServicePerformanceOptionalGroup is an optional 
+        requirement."
+
+    GROUP mefServiceNotificationObjOptionalGroup
+    DESCRIPTION "The mefServiceNotificationObjOptionalGroup is an optional 
+        requirement."
+
+    GROUP mefServiceNotificationsOptionalGroup
+    DESCRIPTION "The mefServiceNotificationsOptionalGroup is an optional 
+        requirement."
+
+    ::= { mefServiceUniEvcMibCompliances 1 }
+
+END

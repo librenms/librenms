@@ -1,0 +1,619 @@
+
+-- File Name : EquipmentCommon_MIB.mib
+-- Version   : 1.01.00
+-- Date      : May 1, 2015
+-- Author    : DragonWave Inc.
+
+EQUIPMENT-COMMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+	Counter64, IpAddress, Integer32, TimeTicks, Counter32, Unsigned32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, DateAndTime, 
+	TimeStamp
+		FROM SNMPv2-TC
+	equipmentCommon
+		FROM DWI-HARMONY-PRIVATE-MIB;
+
+-- Not supported : Opaque
+-- [RFC2578]
+-- [RFC2579]
+-- 
+-- Module Identity
+-- 
+
+equipmentCommonMib MODULE-IDENTITY
+	LAST-UPDATED "200901210000Z"
+	ORGANIZATION 
+		"DragonWave Inc."
+	CONTACT-INFO 
+		""
+	DESCRIPTION 
+		"This MIB Module defines a notification log mechanism and a current alarm list."
+
+	REVISION "200901210000Z"
+	DESCRIPTION 
+		"Initial Revision"
+
+	REVISION "201501051615Z"
+	DESCRIPTION 
+		"Corrected EquipmentAlarmActiveTable index order."
+::= { equipmentCommon 100 }
+
+
+-- 
+-- History of MIB Changes
+-- 
+-- 
+-- 
+-- Textual conventions
+-- 
+
+EnableType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"Enabled/Disabled"
+	SYNTAX  INTEGER {
+		disabled (0),
+		enabled (1)
+	}
+
+
+-- 
+-- Node definitions
+-- 
+
+equipmentCommonObjects  OBJECT IDENTIFIER ::= { equipmentCommon 1 }
+equipmentConfigLog   OBJECT IDENTIFIER ::= { equipmentCommonObjects 1 }
+equipmentLog         OBJECT IDENTIFIER ::= { equipmentCommonObjects 2 }
+equipmentAlarmList   OBJECT IDENTIFIER ::= { equipmentCommonObjects 3 }
+equipmentSnmpTrap    OBJECT IDENTIFIER ::= { equipmentCommonObjects 4 }
+equipmentPseudoEventsObjects  OBJECT IDENTIFIER ::= { equipmentCommon 2 }
+equipmentMirrorObjects  OBJECT IDENTIFIER ::= { equipmentCommon 3 }
+
+-- 
+-- Object definitions: configuration section 
+-- 
+
+equipmentEventLogEntryLimit  OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The maximum number of notification entries that may be held
+		     in EventLogTable."
+	DEFVAL  { 4096 }
+	::= { equipmentConfigLog 1 }
+
+-- 
+-- Object definitions: event log section 
+--                     
+
+equipmentEventLogLastEntry  OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value of equipmentEventLogIndex at the time of the last
+		       creation of an entry in the equipmentEventLogTable."
+	::= { equipmentLog 1 }
+
+-- 
+-- Event Notification Log Table (inspired by RFC 3014)
+-- 
+
+equipmentEventLogTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF EquipmentEventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of Notification log entries."
+	::= { equipmentLog 2 }
+
+equipmentEventLogEntry  OBJECT-TYPE
+	SYNTAX 	EquipmentEventLogEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A Notification log entry. Entries appear in this table 
+		                         when Notifications occur.  They are removed to make way 
+		                         for new entries due to lack of resources or the values of 
+		                         equipmentEventLogEntryLimit.If adding an entry would exceed 
+		                         equipmentEventLogEntryLimit the oldest entry in that log SHOULD 
+		                         be removed to make room for the new one."
+	INDEX { equipmentEventLogIndex }
+	::= { equipmentEventLogTable 1 }
+
+EquipmentEventLogEntry ::= SEQUENCE {
+	equipmentEventLogIndex
+		Unsigned32,
+	equipmentEventLogTime
+		TimeStamp,
+	equipmentEventLogDateAndTime
+		DateAndTime,
+	equipmentEventLogNotificationID
+		OBJECT IDENTIFIER,
+	equipmentEventLogVariables
+		Unsigned32
+}
+
+equipmentEventLogIndex  OBJECT-TYPE
+	SYNTAX     Unsigned32 (1..4294967295)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A monotonically increasing integer for the sole purpose of
+		     indexing entries within the log.  When it reaches the
+		     maximum value,the agent wraps the value back to 1.
+		This number should correspond to the number of notifications 
+		sent by the agent."
+	::= { equipmentEventLogEntry 1 }
+
+equipmentEventLogTime  OBJECT-TYPE
+	SYNTAX     TimeStamp
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value of sysUpTime when the entry was placed in the log."
+	::= { equipmentEventLogEntry 2 }
+
+equipmentEventLogDateAndTime  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The local date and time when the entry was logged, useful when browsing the MIB."
+	::= { equipmentEventLogEntry 3 }
+
+equipmentEventLogNotificationID  OBJECT-TYPE
+	SYNTAX     OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The NOTIFICATION-TYPE object identifier of the Notification that
+		                 occurred."
+	::= { equipmentEventLogEntry 4 }
+
+equipmentEventLogVariables  OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of variables in equipmentEventLogVariableTable for this
+		       logged notification."
+	::= { equipmentEventLogEntry 5 }
+
+-- 
+-- Event Log variable Table
+-- 
+
+equipmentEventLogVariableTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF EquipmentEventLogVariableEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of variables to go with Notification log entries."
+	::= { equipmentLog 3 }
+
+equipmentEventLogVariableEntry  OBJECT-TYPE
+	SYNTAX 	EquipmentEventLogVariableEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A Notification log entry variable.
+		
+		     Entries appear in this table when there are variables in
+		   the varbind list of a Notification in equipmentEventLogTable."
+	INDEX { equipmentEventLogIndex, 
+		equipmentEventLogVariableIndex }
+	::= { equipmentEventLogVariableTable 1 }
+
+EquipmentEventLogVariableEntry ::= SEQUENCE {
+	equipmentEventLogVariableIndex
+		Unsigned32,
+	equipmentEventLogVariableID
+		OBJECT IDENTIFIER,
+	equipmentEventLogVariableValueType
+		INTEGER,
+	equipmentEventLogVariableCounter32Val
+		Counter32,
+	equipmentEventLogVariableUnsigned32Val
+		Unsigned32,
+	equipmentEventLogVariableTimeTicksVal
+		TimeTicks,
+	equipmentEventLogVariableInteger32Val
+		Integer32,
+	equipmentEventLogVariableOctetStringVal
+		OCTET STRING,
+	equipmentEventLogVariableIpAddressVal
+		IpAddress,
+	equipmentEventLogVariableOidVal
+		OBJECT IDENTIFIER,
+	equipmentEventLogVariableCounter64Val
+		Counter64
+}
+
+equipmentEventLogVariableIndex  OBJECT-TYPE
+	SYNTAX     Unsigned32 (1..4294967295)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A monotonically increasing integer, starting at 1 for a given
+		 equipmentEventLogIndex, for indexing variables within the logged
+		     Event Notification."
+	::= { equipmentEventLogVariableEntry 1 }
+
+equipmentEventLogVariableID  OBJECT-TYPE
+	SYNTAX     OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The variable's object identifier."
+	::= { equipmentEventLogVariableEntry 2 }
+
+equipmentEventLogVariableValueType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		counter32 (1),
+		unsigned32 (2),
+		timeTicks (3),
+		integer32 (4),
+		ipAddress (5),
+		octetString (6),
+		objectId (7),
+		counter64 (8)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The type of the value.  One and only one of the value
+		                 objects that follow must be instantiated, based on this type."
+	::= { equipmentEventLogVariableEntry 3 }
+
+-- Not supported: opaque(9)
+
+equipmentEventLogVariableCounter32Val  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'counter32'."
+	::= { equipmentEventLogVariableEntry 4 }
+
+equipmentEventLogVariableUnsigned32Val  OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'unsigned32'."
+	::= { equipmentEventLogVariableEntry 5 }
+
+equipmentEventLogVariableTimeTicksVal  OBJECT-TYPE
+	SYNTAX     TimeTicks
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'timeTicks'."
+	::= { equipmentEventLogVariableEntry 6 }
+
+equipmentEventLogVariableInteger32Val  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'integer32'."
+	::= { equipmentEventLogVariableEntry 7 }
+
+equipmentEventLogVariableOctetStringVal  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'octetString'."
+	::= { equipmentEventLogVariableEntry 8 }
+
+equipmentEventLogVariableIpAddressVal  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'ipAddress'.
+		     Although this seems to be unfriendly for IPv6, we
+		     have to recognize that there are a number of older
+		     MIBs that do contain an IPv4 format address, known
+		     as IpAddress.
+		
+		  IPv6 addresses are represented using TAddress or
+		   InetAddress, and so the underlying datatype is
+		     OCTET STRING, and their value would be stored in
+		     the equipmentEventLogVariableOctetStringVal column."
+	::= { equipmentEventLogVariableEntry 9 }
+
+equipmentEventLogVariableOidVal  OBJECT-TYPE
+	SYNTAX     OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'objectId'."
+	::= { equipmentEventLogVariableEntry 10 }
+
+equipmentEventLogVariableCounter64Val  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value when equipmentEventLogVariableValueType is 'counter64'."
+	::= { equipmentEventLogVariableEntry 11 }
+
+-- 
+-- Opaque type not supported 
+-- 
+--	equipmentEventLogVariableOpaqueVal          OBJECT-TYPE
+-- 	   SYNTAX      Opaque
+-- 	   MAX-ACCESS  read-only
+-- 	   STATUS      current
+-- 	   DESCRIPTION
+-- 	    "The value when equipmentEventLogVariableValueType is 'opaque'."
+-- 	   ::= { equipmentEventLogVariableEntry 12 }
+-- 
+-- Object definitions: active alarm list section
+-- 
+-- 
+-- Active Alarm Table 
+-- 
+
+equipmentAlarmActiveLastChanged  OBJECT-TYPE
+	SYNTAX     TimeTicks
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value of sysUpTime at the time of the last
+		       creation or deletion of an entry in the equipmentAlarmActiveTable.
+		       Useful in case of polling (no traps mechanism used).
+		       If the number of entries has been unchanged since the
+		       last re-initialization, then this object contains a zero value."
+	::= { equipmentAlarmList 1 }
+
+equipmentAlarmActiveRowCounter  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of active alarms row in the table."
+	::= { equipmentAlarmList 2 }
+
+equipmentAlarmActiveTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF EquipmentAlarmActiveEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of Active Alarms entries."
+	::= { equipmentAlarmList 3 }
+
+equipmentAlarmActiveEntry  OBJECT-TYPE
+	SYNTAX 	EquipmentAlarmActiveEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Entries appear in this table when alarms are raised.  They
+		        are removed when the alarm is cleared."
+	INDEX { equipmentAlarmActiveIndex, 
+		equipmentAlarmActiveTime }
+	::= { equipmentAlarmActiveTable 1 }
+
+EquipmentAlarmActiveEntry ::= SEQUENCE {
+	equipmentAlarmActiveIndex
+		Unsigned32,
+	equipmentAlarmActiveTime
+		TimeStamp,
+	equipmentAlarmActiveDateAndTime
+		DateAndTime,
+	equipmentAlarmActiveName
+		DisplayString,
+	equipmentAlarmActiveID
+		Integer32,
+	equipmentAlarmActiveInstance
+		Unsigned32,
+	equipmentAlarmActiveTrapOID
+		OBJECT IDENTIFIER,
+	equipmentAlarmActiveSeverity
+		INTEGER,
+	equipmentAlarmActiveConditionId
+		DisplayString
+}
+
+equipmentAlarmActiveIndex  OBJECT-TYPE
+	SYNTAX     Unsigned32 (1..4294967295)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A strictly monotonically increasing integer which
+		       acts as the index of entries within the named alarm
+		       list.  It wraps back to 1 after it reaches its
+		       maximum value."
+	::= { equipmentAlarmActiveEntry 1 }
+
+equipmentAlarmActiveTime  OBJECT-TYPE
+	SYNTAX     TimeStamp
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The value of sysUpTime when the entry was placed in the list.
+		       This object facilitates retrieving all instances of
+		       alarms that have been raised or have changed state
+		       since a given point in time."
+	::= { equipmentAlarmActiveEntry 2 }
+
+equipmentAlarmActiveDateAndTime  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The local date and time when the error occurred.
+		
+		       This object facilitates retrieving all instances of
+		       alarms that have been raised or have changed state
+		       since a given point in time.
+		
+		       Implementations MUST include the offset from UTC,
+		       if available.  Implementation in environments in which
+		       the UTC offset is not available is NOT RECOMMENDED."
+	::= { equipmentAlarmActiveEntry 3 }
+
+equipmentAlarmActiveName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the active alarm name."
+	::= { equipmentAlarmActiveEntry 4 }
+
+equipmentAlarmActiveID  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the active alarm ID which is the index to the alarm configuration table defined in product specific MIB."
+	::= { equipmentAlarmActiveEntry 5 }
+
+equipmentAlarmActiveInstance  OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { equipmentAlarmActiveEntry 6 }
+
+equipmentAlarmActiveTrapOID  OBJECT-TYPE
+	SYNTAX     OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The MIB object identifier of the alarm (contained in an Alarm Notification
+		type object) that is occurring."
+	::= { equipmentAlarmActiveEntry 7 }
+
+equipmentAlarmActiveSeverity  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		warning (1),
+		minor (2),
+		major (3),
+		critical (4)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the active alarm severity."
+	::= { equipmentAlarmActiveEntry 8 }
+
+equipmentAlarmActiveConditionId  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		""
+	::= { equipmentAlarmActiveEntry 9 }
+
+-- 
+-- Opaque type not supported
+-- 
+--	equipmentAlarmActiveSourceOpaqueVal          OBJECT-TYPE
+-- 	   SYNTAX      Opaque
+-- 	   MAX-ACCESS  read-only
+-- 	   STATUS      current
+-- 	   DESCRIPTION
+-- 	    "The value when value type is 'opaque'.It is coded as follows:
+--		code: OCTET STRING(SIZE(1)), fixed to 1 (structure identifier);
+--		type: INTEGER, see equipmentEventLogVariableValueType values;
+--		value: ASN.1 basic encoding rule"
+-- 	   ::= { equipmentAlarmActiveEntry 5 }
+-- 
+-- Object definitions: trap counter and timestamp
+-- 
+
+equipmentOutTrapsCounter  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The counter of the output traps.
+		It increases by one every time a new trap is sent to all the managers configured
+		in the relevant table. In this way its value is the number of notification events
+		occurred since the last agent reset and every manager that reads this value can understand
+		whether some event has been lost or not.
+		(Note that in general this counter differs from the RFC1213 snmpOutTraps, that counts the
+		number of Trap PDUs sent). When the logging mechanism is enabled, it corresponds to the index in the eventlog table"
+	::= { equipmentSnmpTrap 1 }
+
+equipmentLastOutTrapTimeStamp  OBJECT-TYPE
+	SYNTAX     TimeStamp
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The value of sysUpTime when the last trap was sent."
+	::= { equipmentSnmpTrap 2 }
+
+equipmentTrapInfo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A string representing additional info that can be used as the varbind in trap. "
+	::= { equipmentSnmpTrap 3 }
+
+-- 
+-- Object definitions: pseudo-events support
+-- 
+
+equipmentConfChangeOid  OBJECT-TYPE
+	SYNTAX     OBJECT IDENTIFIER
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The OID of the last node changed. It is sent to the managers in order to
+		notify a configuration change."
+	::= { equipmentPseudoEventsObjects 1 }
+
+equipmentConfChangeMode  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enable/Disable of sending ConfChange Trap.
+		STORAGE: permanent."
+	DEFVAL  { enabled }
+	::= { equipmentPseudoEventsObjects 2 }
+
+equipmentConfChangeNotification  NOTIFICATION-TYPE
+	OBJECTS { equipmentConfChangeOid, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"Notification of configuration change."
+	::= { equipmentPseudoEventsObjects 3 }
+
+-- 
+-- Object definitions: mirror-traps support
+-- 
+
+equipmentMirrorFlag  OBJECT-TYPE
+	SYNTAX     Integer32 (0..65535)
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Fixed to 1=mirror trap"
+	::= { equipmentMirrorObjects 1 }
+
+equipmentMirrorColdStart  NOTIFICATION-TYPE
+	OBJECTS { equipmentMirrorFlag, 
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"A coldStart trap signifies that the SNMP entity,
+		               supporting a notification originator application, is
+		               reinitializing itself and that its configuration may
+		               have been altered."
+	::= { equipmentMirrorObjects 2 }
+END
+
+

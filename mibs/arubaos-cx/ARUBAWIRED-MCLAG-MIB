@@ -1,0 +1,491 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-MCLAG-MIB.mib
+--*
+--* (c) Copyright 2017-2018 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of ARUBAWIRED-MCLAG-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-MCLAG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks
+                FROM SNMPv2-SMI
+  DisplayString, TruthValue, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+  MODULE-COMPLIANCE, OBJECT-GROUP
+                FROM SNMPv2-CONF
+  InterfaceIndex
+                FROM IF-MIB
+  InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+  wndFeatures
+                FROM ARUBAWIRED-NETWORKING-OID;
+
+arubaWiredMclagMIB MODULE-IDENTITY
+        LAST-UPDATED "201805090000Z" -- May 09, 2018
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett Packard Company
+                       8000 Foothills Blvd.
+                       Roseville, CA 95747"
+        DESCRIPTION  "This is the MIB module related to HPE Aruba MCLAG feature"
+
+        REVISION     "201805090000Z" -- May 09, 2018
+        DESCRIPTION  "obsolete revision."
+
+        ::= { wndFeatures 2 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+   VidList ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "512x"
+      STATUS      obsolete
+      DESCRIPTION
+         "Each octet within this value specifies a set of eight
+         VlanIIndex (VID), with the first octet specifying VIDs 1
+         through 8, the second octet specifying VIDs 9 through 16,
+         etc.  Within each octet, the most significant bit represents
+         the lowest numbered VID, and the least significant bit
+         represents the highest numbered VID.  Thus, each VID
+         is represented by a single bit within the value of this
+         object.  If that bit has a value of 1 then that VID is
+         included in the set of VIDs; the VID is not included if its
+         bit has a value of 0.  This list represents the entire
+         range of VlanIndex values defined in the scope of IEEE
+         802.1Q."
+      SYNTAX      OCTET STRING (SIZE (512))
+
+-- -------------------------------------------------------------
+-- Start of MIB Objects
+-- -------------------------------------------------------------
+
+arubaWiredMclagConfig       OBJECT IDENTIFIER
+                                ::= { arubaWiredMclagMIB 1 }
+
+arubaWiredMclagStatus       OBJECT IDENTIFIER
+                                ::= { arubaWiredMclagMIB 2 }
+
+------------------------------------------------------------------------
+--  MCLAG global configuration - ISL
+------------------------------------------------------------------------
+arubaWiredMclagIslConfig 	         OBJECT IDENTIFIER
+                                ::= { arubaWiredMclagConfig 1 }
+
+arubaWiredMclagIslPort OBJECT-TYPE
+      SYNTAX      InterfaceIndex
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "IfIndex corresponding to the Mclag InterSwitchLink port.
+                   A value of 0 means there is no ISL port configuration."
+      DEFVAL      { 0 }
+      ::= { arubaWiredMclagIslConfig 1 }
+
+arubaWiredMclagIslHelloInterval OBJECT-TYPE
+      SYNTAX      Integer32 (1..5)
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "ISLP hello interval in seconds. The default value is 1."
+      DEFVAL      { 1 }
+      ::= { arubaWiredMclagIslConfig 2 }
+
+arubaWiredMclagIslHoldTime OBJECT-TYPE
+      SYNTAX      Integer32 (0..3)
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "ISL port-flap hold time in seconds. The default value is 0."
+      DEFVAL      { 0 }
+      ::= { arubaWiredMclagIslConfig 3 }
+
+arubaWiredMclagIslHelloTimeout OBJECT-TYPE
+      SYNTAX      Integer32 (3..20)
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "ISL hello timeout in seconds. The default value is 3."
+      DEFVAL      { 3 }
+      ::= { arubaWiredMclagIslConfig 4 }
+
+arubaWiredMclagIslDevicePriority OBJECT-TYPE
+      SYNTAX      Integer32 (1..16)
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "Mclags on device with lower value of priority will stay UP in
+                   the case of split. The default value is 8."
+      DEFVAL      { 8 }
+      ::= { arubaWiredMclagIslConfig 5 }
+
+arubaWiredMclagIslSystemID OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Device identifier. This is advertised over ISL."
+      ::= { arubaWiredMclagIslConfig 6 }
+
+arubaWiredMclagIslPlatformName OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Device type. This is advertised over ISL."
+      ::= { arubaWiredMclagIslConfig 7 }
+
+arubaWiredMclagIslSwVersion OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "S/W version running on the device type. This is advertised over ISL."
+      ::= { arubaWiredMclagIslConfig 8 }
+
+arubaWiredMclagIslVIDList OBJECT-TYPE
+      SYNTAX      VidList
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "VLAN IDs that the ISL port is a member of."
+      ::= { arubaWiredMclagIslConfig 9 }
+
+------------------------------------------------------------------------
+--  MCLAG global configuration - KeepAlive
+------------------------------------------------------------------------
+
+arubaWiredMclagKeepAliveConfig                  OBJECT IDENTIFIER
+                                ::= { arubaWiredMclagConfig 2 }
+
+arubaWiredMclagKeepAliveSrcIPAddrType OBJECT-TYPE
+      SYNTAX      InetAddressType
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "The KeepAlive source address type. It can be IPv4 or IPv6."
+      ::= { arubaWiredMclagKeepAliveConfig 1 }
+
+arubaWiredMclagKeepAliveSrcIPAddr OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "The KeepAlive source address. It can be IPv4 or IPv6."
+      ::= { arubaWiredMclagKeepAliveConfig 2 }
+
+arubaWiredMclagKeepAliveVrf OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "The KeepAlive VRF domain."
+      ::= { arubaWiredMclagKeepAliveConfig 3 }
+
+arubaWiredMclagKeepAliveUdpPort OBJECT-TYPE
+      SYNTAX      Integer32(1024..65535)
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "The KeepAlive UDP port. Same port is used as source and destination UDP ports."
+      ::= { arubaWiredMclagKeepAliveConfig 4 }
+
+arubaWiredMclagKeepAlivePeerIPAddrType OBJECT-TYPE
+      SYNTAX      InetAddressType
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "The KeepAlive peer address type. It can be IPv4 or IPv6."
+      ::= { arubaWiredMclagKeepAliveConfig 5 }
+
+arubaWiredMclagKeepAlivePeerIPAddr OBJECT-TYPE
+      SYNTAX      InetAddress
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "The KeepAlive peer address. It can be IPv4 or IPv6."
+      ::= { arubaWiredMclagKeepAliveConfig 6 }
+
+arubaWiredMclagKeepAliveHelloInterval OBJECT-TYPE
+      SYNTAX      Integer32 (1..5)
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "KeepAlive hello interval in seconds. The default value is 1."
+      DEFVAL      { 1 }
+      ::= { arubaWiredMclagKeepAliveConfig 7 }
+
+arubaWiredMclagKeepAliveHelloTimeout OBJECT-TYPE
+      SYNTAX      Integer32 (3..20)
+      MAX-ACCESS  read-write
+      STATUS      obsolete
+      DESCRIPTION "KeepAlive hello timeout in seconds. The default value is 3."
+      DEFVAL      { 3 }
+      ::= { arubaWiredMclagKeepAliveConfig 8 }
+
+arubaWiredMclagKeepAliveDevicePriority OBJECT-TYPE
+      SYNTAX      Integer32 (1..16)
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Device priority that will be advertised via KeepAlive protocol."
+      ::= { arubaWiredMclagKeepAliveConfig 9 }
+
+arubaWiredMclagKeepAliveSystemID OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Device  identifier that will be advertised via KeepAlive protocol."
+      ::= { arubaWiredMclagKeepAliveConfig 10 }
+
+arubaWiredMclagKeepAlivePlatformName OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Device type that will be advertised via KeepAlive protocol."
+      ::= { arubaWiredMclagKeepAliveConfig 11 }
+
+arubaWiredMclagKeepAliveSwVersion OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "S/W version that will be advertised via KeepAlive protocol."
+      ::= { arubaWiredMclagKeepAliveConfig 12 }
+
+------------------------------------------------------------------------
+--  MCLAG Aggregator configuration - Per LAG
+------------------------------------------------------------------------
+arubaWiredMclagAggregatorConfig    OBJECT IDENTIFIER
+                                ::= { arubaWiredMclagConfig 3 }
+
+arubaWiredMclagAggregatorTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF ArubaWiredMclagAggregatorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      obsolete
+      DESCRIPTION "This table supplements the table 'dot3adAggTable'
+                  in ieee802.3ad mib."
+      ::= { arubaWiredMclagAggregatorConfig 1 }
+
+arubaWiredMclagAggregatorEntry OBJECT-TYPE
+      SYNTAX      ArubaWiredMclagAggregatorEntry
+      MAX-ACCESS  not-accessible
+      STATUS      obsolete
+      DESCRIPTION "The fields in this entry will be used to supplement
+                  fields of dot3adAggEntry in ieee802.3ad mib."
+      INDEX   { arubaWiredMclagAggregatorIndex }
+      ::= { arubaWiredMclagAggregatorTable 1 }
+
+ArubaWiredMclagAggregatorEntry ::=
+    SEQUENCE {
+        arubaWiredMclagAggregatorIndex
+            InterfaceIndex,
+        arubaWiredMclagAggregatorType
+            INTEGER,
+        arubaWiredMclagVlanList
+            VidList,
+        arubaWiredMclagLoopProtectEnabled
+            TruthValue,
+        arubaWiredMclagLoadBalanceScheme
+            INTEGER,
+        arubaWiredMclagCosOverride
+            INTEGER,
+        arubaWiredMclagDscpOverride
+            INTEGER,
+        arubaWiredMclagQoSTrust
+            INTEGER
+     }
+
+arubaWiredMclagAggregatorIndex OBJECT-TYPE
+      SYNTAX      InterfaceIndex
+      MAX-ACCESS  not-accessible
+      STATUS      obsolete
+      DESCRIPTION "The unique identifier allocated to this Aggregator by
+                   the local System.  This attribute identifies an
+                   Aggregator instance among the subordinate managed
+                   objects of the containing object.
+                   This value is read-only."
+      ::= { arubaWiredMclagAggregatorEntry 1 }
+
+arubaWiredMclagAggregatorType OBJECT-TYPE
+      SYNTAX      INTEGER {
+                            point2Point (1),
+                            multiChassis (2)
+                          }
+      MAX-ACCESS  read-create
+      STATUS      obsolete
+      DESCRIPTION "This field specifies the aggregator/lag type."
+      ::= { arubaWiredMclagAggregatorEntry 2 }
+
+arubaWiredMclagVlanList OBJECT-TYPE
+      SYNTAX      VidList
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "VLANs that this aggregator is a member of. This is used for configuration consistency validation."
+::= { arubaWiredMclagAggregatorEntry 3 }
+
+arubaWiredMclagLoopProtectEnabled OBJECT-TYPE
+      SYNTAX      TruthValue
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Loop Protect protocol admin state for this MCLAG. This is used for configuration consistency validation."
+::= { arubaWiredMclagAggregatorEntry 4 }
+
+arubaWiredMclagLoadBalanceScheme OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   l2-Src-Dst (1),
+                   l3-Src-Dst (2),
+                   l4-Src-Dst (3)
+          }
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Load balance scheme configured for this MCLAG. This is used for configuration consistency validation."
+::= { arubaWiredMclagAggregatorEntry 5}
+
+arubaWiredMclagCosOverride OBJECT-TYPE
+      SYNTAX      INTEGER(0..7)
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "CoS override configuration for this MCLAG. This is used for configuration consistency validation."
+::= { arubaWiredMclagAggregatorEntry 6}
+
+arubaWiredMclagDscpOverride OBJECT-TYPE
+      SYNTAX      INTEGER(0..63)
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "DSCP override configuration for this MCLAG. This is used for configuration consistency validation."
+::= { arubaWiredMclagAggregatorEntry 7}
+
+arubaWiredMclagQoSTrust OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   cos  (1),
+                   dscp (2)
+          }
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Port QoS trust mode configured for this MCLAG. This is used for configuration consistency validation."
+::= { arubaWiredMclagAggregatorEntry 8}
+
+------------------------------------------------------------------------
+--  MCLAG global status & statistics - ISL
+------------------------------------------------------------------------
+
+arubaWiredMclagIslStatus       OBJECT IDENTIFIER
+                                ::= { arubaWiredMclagStatus 1 }
+
+arubaWiredMclagIslOperState  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   init   (1),
+                   outSync(2),
+                   inSync (3)
+          }
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "ISL operational state."
+      ::= { arubaWiredMclagIslStatus 1 }
+
+arubaWiredMclagIslPduTx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of ISL PDUs transmitted by this device."
+       ::= { arubaWiredMclagIslStatus 2 }
+
+arubaWiredMclagIslPduRx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of ISL PDUs received by this device."
+       ::= { arubaWiredMclagIslStatus 3 }
+
+arubaWiredMclagIslHelloTx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of ISL Hello packets transmitted by this device."
+       ::= { arubaWiredMclagIslStatus 4 }
+
+arubaWiredMclagIslHelloRx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of ISL Hello packets received by this device."
+       ::= { arubaWiredMclagIslStatus 5 }
+
+arubaWiredMclagDeviceOperRole  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   primary(1),
+                   secondary(2)
+          }
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Operational role of this device derived based on
+                       device priority of the 2 devices."
+      ::= { arubaWiredMclagIslStatus 6 }
+
+arubaWiredMclagDeviceOperSystemID OBJECT-TYPE
+      SYNTAX      DisplayString
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "System identifier used by this device - derived from
+                       system identifier values of the 2 devices."
+       ::= { arubaWiredMclagIslStatus 7 }
+
+------------------------------------------------------------------------
+--  KeepAlive global status & statistics - KeepAlive
+------------------------------------------------------------------------
+arubaWiredMclagKeepAliveStatus       OBJECT IDENTIFIER
+                                ::= { arubaWiredMclagStatus 2 }
+
+arubaWiredMclagKeepAliveOperState  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                   initialized(1),
+                   configured (2),
+                   established(3),
+                   failed     (4),
+                   stopped    (5)
+          }
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "KeepAlive protocol operational state."
+      ::= { arubaWiredMclagKeepAliveStatus 1 }
+
+arubaWiredMclagKeepAlivePacketsTx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of KeepAlive protocol packets transmitted by this device."
+       ::= { arubaWiredMclagKeepAliveStatus 2 }
+
+arubaWiredMclagKeepAlivePacketsRx OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of KeepAlive protocol packets received by this device."
+       ::= { arubaWiredMclagKeepAliveStatus 3 }
+
+arubaWiredMclagKeepAlivePacketsDrop OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of KeepAlive protocol packets dropped."
+       ::= { arubaWiredMclagKeepAliveStatus 4 }
+
+arubaWiredMclagKeepAliveTimeoutCount OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Number of times KeepAlive protocol went to failed state because of KeepAlive timer expiry."
+       ::= { arubaWiredMclagKeepAliveStatus 5 }
+
+arubaWiredMclagKeepAliveLastEstablishedTime  OBJECT-TYPE
+      SYNTAX      TimeTicks
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Stores the most recent time KeepAlive handshake was successful
+                   and a value of 0 indicates KeepAlive handshake was never established."
+      ::= { arubaWiredMclagKeepAliveStatus 6 }
+
+arubaWiredMclagKeepAliveLastFailedTime  OBJECT-TYPE
+      SYNTAX      TimeTicks
+      MAX-ACCESS  read-only
+      STATUS      obsolete
+      DESCRIPTION "Stores the most recent time KeepAlive handshake failed
+                   and a value of 0 indicates KeepAlive handshake never failed."
+      ::= { arubaWiredMclagKeepAliveStatus 7 }
+
+
+
+
+END

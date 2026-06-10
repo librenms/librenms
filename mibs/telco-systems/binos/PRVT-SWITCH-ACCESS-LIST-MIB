@@ -1,0 +1,2529 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-SWITCH-ACCESS-LIST-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+
+PRVT-SWITCH-ACCESS-LIST-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+
+    MODULE-IDENTITY, OBJECT-TYPE,IpAddress                                            
+        FROM SNMPv2-SMI
+    RowStatus, DisplayString, TEXTUAL-CONVENTION, MacAddress, TruthValue
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    dot1qVlanIndex, dot1qVlanStatus
+        FROM Q-BRIDGE-MIB
+       NOTIFICATION-TYPE
+          FROM SNMPv2-SMI       
+              
+      MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+OBJECT-GROUP
+FROM SNMPv2-CONF
+
+svcId,
+sapPortId, 
+sapEncapValue,  
+sdpId
+FROM  PRVT-SERV-MIB
+ 
+   ipSwitch   
+	                                     FROM PRVT-SWITCH-MIB;  
+
+
+    prvtSwitchAccessListMib MODULE-IDENTITY
+    LAST-UPDATED "201011160000Z"
+    ORGANIZATION "BATM Advanced Communication"
+    CONTACT-INFO
+         " BATM/Telco Systems Support team
+				Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+    DESCRIPTION
+        "The access-list MIB module that controls L3 switches access-list parameters"
+
+    -- revision history   
+    REVISION   "201102070000Z"
+    DESCRIPTION   
+    "Addeed accessListInterfaceRateStatistics object"
+
+    REVISION   "201011160000Z"
+    DESCRIPTION
+    	"Added accessListSapTable and accessListSapStatisticsTable"
+
+    REVISION   "201011030000Z"
+    DESCRIPTION
+    	"Added new OIDs standardAccessListDropLevel,  extendedAccessListDropLevel, macAccessListDropLevel,
+    	 standardAccessListDscp, extendedAccessListDscp"
+	REVISION	"200904170000Z"
+	DESCRIPTION
+		"Created AccessListRemarkString TC."
+
+	REVISION	"200811200000Z"
+	DESCRIPTION
+		"Added objects for Egress Access Lists"
+
+	REVISION	"200802140000Z"
+	DESCRIPTION
+		"Added Access List Interface Statistics"
+         REVISION     "200801010000Z"
+     	 DESCRIPTION
+		"Removed redefined OIDs in private vendor extension definitions." 
+    REVISION 	 "200712050000Z"
+    	DESCRIPTION
+    	" "
+    REVISION     "200603220000Z"
+     	 DESCRIPTION
+		"Added the tag filter object in the interface and VLAN access group tables and changed some
+		description with TMetro specific information."      
+		
+    REVISION     "200510030000Z"
+     	 DESCRIPTION
+		"Switched the values of greater-than and less-than in PortDef textual convention."                
+		
+    REVISION     "200509300000Z"
+     	 DESCRIPTION
+		"Changed the Rate textual convention to include the value of 0 (zero)."
+
+    REVISION     "200502280000Z"
+     	 DESCRIPTION
+		"Added the span track objects in the interface tables."
+		   
+    REVISION     "200502240000Z"
+     	 DESCRIPTION
+		"Added the source and destination range objects in the extended access list table."
+
+    
+      REVISION     "200502160000Z"
+     	 DESCRIPTION
+		"Fixed spelling errors and changed the contact info."
+		
+     REVISION     "200412150000Z"
+    DESCRIPTION
+       "1. accessListControlTable is now indexed only by accessListControlListGroup and the row
+       status creates whole groups.
+       2. Added standardAccessListIndex and extendedAccessListIndex as indices of standardAccessListTable 
+       and extendedAccessListTable to replace accessGroupControlListIndex.
+       3. Added standardAccessListRowStatus and extendedAccessListRowStatus to enable creation of rules.
+       Rules, however, cannot be deleted using these objects. 
+       4. Added support for enabling the loggin of ACLs (standardAccessListLog, extendedAccessListLog).
+       5. Added support for redirection traffic to a vlan and ip next hop
+           (accessListInterfaceRedirectVlanID,accessListVLANRedirectVlanID,accessListInterfaceRedirectNexthop,accessListVLANRedirectNexthop).
+       6. Added objects for configuring the Peak rate and peak burst when dual rate limit is used.
+       (accessListInterfacePeakRate, accessListInterfacePeakBurst, accessListVLANPeakRate,accessListVLANPeakBurst) 
+       7. Added objects for toggling the traffic metering color awareness and remarking policy. 
+       (accessListInterfaceColorAware, accessListVlanColorAware,accessListInterfacePolicy, accessListVlanPolicy)
+        "
+
+    REVISION     "200310150000Z" 
+          DESCRIPTION
+       "Global changes:
+        1. Added support for VLAN IP access-group.
+        2. Added support for redirecting traffic to an interface
+           (accessListInterfaceRedirectIfIndex,accessListVLANRedirectIfIndex).
+        3. Renamed accessListControlListGroupIndex to accessListInterfaceGroupIndex
+        4. Changes in AccessListAction, removed shaper.
+        5. Removed Burst TEXTUAL-CONVENTION.
+        
+        Changes for E-Series
+        1. Introduced changes in PortDef,ExceedAction,AccessListDiscard TEXTUAL-CONVENTION for E-Series.
+        2. The objects extendedAccessListIgmpType and accessListInterfaceShaper are
+           not supported for E-Series.
+        3. Added accessListInterfaceBurst,accessListVLANBurst for E-Series.
+        4. The range of accessListInterfaceDscp is now 0..63 for E-Series."
+
+    REVISION     "200305080000Z"
+    DESCRIPTION
+       "Moved to SMI-V2.
+        Removed extendedAccessListEstablished and
+        extendedAccessListMSS."
+
+    REVISION     "200211120000Z"
+    DESCRIPTION
+        "Changed mapping of AccessListAction enum."
+
+    REVISION     "200111050000Z"
+    DESCRIPTION
+        "Added shaper to access group."
+
+    REVISION     "200109300000Z"
+    DESCRIPTION
+        "Added ICMP type,ICMP code and IGMP to extended access list."
+
+    REVISION     "200108270000Z"
+    DESCRIPTION
+        "Added access group with rate limit."
+
+    REVISION     "200107310000Z"
+    DESCRIPTION
+        "Added routed ISP."
+
+    REVISION     "200105140000Z"
+    DESCRIPTION
+        "1. Added remark, MSS and Established to access list.
+         2. Added Priority and Discard to access group."
+
+    REVISION     "200102200000Z"
+    DESCRIPTION
+        "Added the ability to modify TOS in extended access list."
+
+    REVISION     "200102150000Z"
+    DESCRIPTION
+        "Added shaper mode for access list action."
+
+    REVISION     "200101280000Z"
+    DESCRIPTION
+        "Added support for access group in ISP."
+
+    REVISION     "200011130959Z"
+    DESCRIPTION
+        "Initial version."
+
+    ::= { ipSwitch 1 }
+        
+    AccessListAction ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The AccessListAction type represents action taken when this 
+         access-list condition are asserted.
+         "
+      SYNTAX INTEGER
+      {
+        permit(0),
+        deny(1),
+        shaper(2),
+        remark(3),
+        undefined(100)
+      }
+
+     IpProtocol ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The IpProtocol type represents the protocol number in the IP datagram header"
+      SYNTAX INTEGER (0..255)
+
+     PortDef ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The PortDef type operates together with the port number filed inside
+         the access-list & control how the port number is being processed.
+         The values greater-than(3) and less-than(4) are supported only on
+         E-Series family boards"
+      SYNTAX INTEGER
+      {
+        equal(1),
+        range(2),
+        greater-than(3),
+        less-than(4),
+        undefined(0)
+      }
+
+    Rate ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The Rate type represents in Kbps the maximum rate limit for the flow"
+      SYNTAX INTEGER (0|13..1000000)
+
+    ExceedAction ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "the ExceedAction type represents the action that the switch should take
+         when one of the limits exceeded: drop -> drop the packets, markDiscardable
+         this packet is discardable if a conjection ocure
+         Only the E-Series family boards support the values green, yellow and red. Other
+         values are not supported by the E-Series"
+      SYNTAX INTEGER
+      {
+        drop(0),
+        markDiscardable(1),
+        undefined(2),
+        green(3),
+        yellow(4),
+        red(5)
+      }
+
+    VlanTag ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The VlanTag type represents if the VLAN is tagged or untagged."
+      SYNTAX INTEGER
+      {
+        untagged (0),
+        tagged   (1),
+        undefined (2)
+      }
+
+    ISPType ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The ISPType type represents the ISP type - either connective or normal."
+      SYNTAX INTEGER
+      {
+        connectivity (0),
+        normal	     (1),
+        routed       (2)   
+        
+      }
+
+    Shaper ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The Shaper type represents the status of the shaper"
+      SYNTAX INTEGER
+      {
+        disable (0),
+        enable (1)
+      }
+
+    ConformAction ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The action to perform if the condition is matched."
+      SYNTAX INTEGER
+      {
+        transmit (0)
+      }
+      
+    AssigenValue ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "Enables/disables assignment of an ISP user to this interface."
+      SYNTAX INTEGER
+      {
+        enable  (1),
+        disable (2)
+      }
+
+    AccessListModifyTos ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "The AccessListModifyTos must be enabled if the user wants the ToS to be modified."
+      SYNTAX INTEGER
+      {
+        enable  (1),
+        disable (0)
+      }    
+
+    AccessListEstablished ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "Match established connection (ACK or RST flages)"
+      SYNTAX INTEGER
+      {
+        enable  (1),
+        disable (0)
+      }        
+      
+    AccessListDiscard ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "Mark discardable or normal for priority on access group
+         Only the E-Series family and the G-Series family boards support the values green, yellow and red. Other
+         values are not supported by the E-Series and G-series."
+      SYNTAX INTEGER
+      {
+        normal(0),
+        discardable(1),
+        green(2),
+        yellow(3),
+        red(4),
+        undefined(5)
+      }
+
+    AccessListRemarkString ::= TEXTUAL-CONVENTION
+      DISPLAY-HINT "40a"
+      STATUS       current
+      DESCRIPTION
+        "Access list entry comment string"
+      SYNTAX       OCTET STRING (SIZE (0..40))
+
+   TxqDropLevel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "TXQ drop level values"
+    SYNTAX  INTEGER { undefined(0), green(1), yellow(2) }
+ 
+MatchTraffic ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Match traffic values"
+    SYNTAX  INTEGER { 
+	undefined(0), 
+	untagged(1),
+	unknown-unicast(2),
+	multicast(3),
+	broadcast(4),
+	known-unicast(5) }
+
+    AccessListStatistics ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "Access list statistics values"
+      SYNTAX INTEGER
+      {
+        enable  (1),
+        disable (0)
+      }        
+
+    AccessListDirection ::= TEXTUAL-CONVENTION
+      STATUS current
+      DESCRIPTION
+        "Access list applied direction values"
+      SYNTAX INTEGER
+      {
+        ingress  (0),
+        egress (1)
+      }        
+
+    prvtSwitchAccessListNotifications  	OBJECT IDENTIFIER ::= { prvtSwitchAccessListMib 0 }  
+    accessLists 						OBJECT IDENTIFIER ::= { prvtSwitchAccessListMib 1 }
+    isp         						OBJECT IDENTIFIER ::= { prvtSwitchAccessListMib 2 }  
+    prvtSwitchAccessListConformance  	OBJECT IDENTIFIER ::= { prvtSwitchAccessListMib 3 }
+
+
+    accessListTemplate OBJECT-TYPE
+    SYNTAX INTEGER {
+        standard  (1),
+        vlan-priority (2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The access-list template in use. For non E-series devices, the device must be restarted 
+        for this setting to take effect."
+    ::= { accessLists 1 }
+
+    accessGroupsDefinitions OBJECT IDENTIFIER ::= { accessLists 2 }
+    accessListsInterfaces   OBJECT IDENTIFIER ::= { accessLists 3 }
+    accessListsVLAN         OBJECT IDENTIFIER ::= { accessLists 4 }     
+    accessListsServices     OBJECT IDENTIFIER ::= { accessLists 5 }
+    accessListsInterfaceStatistics OBJECT IDENTIFIER ::= { accessLists 6 }  
+    accessListsServicesStatistics OBJECT IDENTIFIER ::= {accessLists 7}
+
+    accessListControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AccessListControlEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table controls the creation or removal of a access-list
+         group from all access-list tables. The real programming of values is
+         done in the coresponding access-list table."
+	::= { accessGroupsDefinitions 1 }
+
+    accessListControlEntry OBJECT-TYPE
+	SYNTAX	AccessListControlEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "An entry in the accessListControlTable table."
+    INDEX { accessListControlListGroup }
+	::= { accessListControlTable 1 }
+
+    AccessListControlEntry ::= SEQUENCE {
+        accessListControlListGroup INTEGER,
+        accessListControlRowStatus RowStatus
+    }
+
+    accessListControlListGroup OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+        "This object identifies the index of the group of access-list rules         
+        Each range of group indexes is related to a different access-list type
+         1..99    for standard access-list
+         100..199 for extended access-list."
+	::= { accessListControlEntry 1 }
+    accessListControlRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status & enables creation & deletion of lines in
+	     this table. See SNMPv2-TC for more information."
+    ::= { accessListControlEntry 2 }
+
+ ----------------------------------------------
+
+    standardAccessListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF StandardAccessListEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table contains standard access-list parameters."
+	::= { accessGroupsDefinitions 2 }
+
+    standardAccessListEntry OBJECT-TYPE
+	SYNTAX StandardAccessListEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "An entry in the standardAccessListTable table."
+    INDEX { accessListControlListGroup, standardAccessListIndex }
+	::= { standardAccessListTable 1 }
+
+    StandardAccessListEntry ::= SEQUENCE { 
+        standardAccessListIndex		INTEGER,
+	standardAccessListAction    AccessListAction,
+        standardAccessListIpSrc     IpAddress,
+        standardAccessListIpMASKsrc IpAddress,
+        standardAccessListRemark    AccessListRemarkString,
+        standardAccessListLog       INTEGER,
+        standardAccessListVpt		INTEGER,
+        standardAccessListRowStatus RowStatus,
+	standardAccessListVlanId	INTEGER,
+	standardAccessListVlanMask	DisplayString,
+        standardAccessListProviderVlanId INTEGER,
+        standardAccessListProviderVlanMask DisplayString,
+	standardAccessListProviderVpt	INTEGER,
+	standardAccessListUntaggedMode	TruthValue,
+	standardAccessListDropLevel     INTEGER,
+	standardAccessListDscp  		INTEGER
+	
+    }
+
+    standardAccessListIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "Index of the particular rule of the group."
+    ::= { standardAccessListEntry 1 }
+
+    standardAccessListAction OBJECT-TYPE
+	SYNTAX AccessListAction
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	    "The action to preform if the condition of this access-list rule condition is true."
+    ::= { standardAccessListEntry 2 }
+
+    standardAccessListIpSrc OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP source address associated with this flow."
+        ::= { standardAccessListEntry 3 }
+
+    standardAccessListIpMASKsrc OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP mask that, together with standardAccessListIpSrc, defines the subnet."
+        ::= { standardAccessListEntry 4 }
+        
+    standardAccessListRemark OBJECT-TYPE 
+	SYNTAX	AccessListRemarkString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Access list entry comment"
+        ::= { standardAccessListEntry 5 }  
+        
+   	standardAccessListLog OBJECT-TYPE 
+   	SYNTAX	INTEGER 
+   	{
+        undefined (0),
+        log  (1),
+        log-input (2)
+    }
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Enable normal or extended logging of this access-list rule."
+        ::= { standardAccessListEntry 6 }  
+        
+    standardAccessListVpt OBJECT-TYPE 
+   	SYNTAX	INTEGER  
+	{
+	 vpt-value0(0),
+	 vpt-value1(1),
+	 vpt-value2(2),
+	 vpt-value3(3),
+	 vpt-value4(4),
+	 vpt-value5(5),
+	 vpt-value6(6),   
+	 vpt-value7(7),
+	 undefined(8),	
+	 fc-be(241),
+	 fc-l2(242),
+	 fc-af(243),
+	 fc-l1(244),
+	 fc-h2(245),
+	 fc-ef(246),
+	 fc-h1(247),
+	 fc-nc(248) 
+	}
+   	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object is meaningful :
+	    1.when vlan-priority template is used and will reprezent vlan priority tag. 
+	    2.Forwarding class reprezented in the second part of enumeration: fc-##.
+	    A value of 8 means that neither of above is defined."
+        ::= { standardAccessListEntry 7 }  
+
+   standardAccessListRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status & enables creation of rows in
+	     this table. In order to be consistent with ACL policy, this object 
+	     does not allow deletion of rules. The entire group must be deleted and all 
+	     rules removed at once."
+    ::= { standardAccessListEntry 8 }
+
+  	standardAccessListVlanId OBJECT-TYPE
+		SYNTAX INTEGER (0..4092)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the customer VLAN. The object is meaningful only 
+		 if standardAccessListVlanMask is set."
+	::= { standardAccessListEntry 9 }
+
+	standardAccessListVlanMask OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the customer VLAN mask. It is meaningful only 
+		 if standardAccessListVlanId is set.
+		 The value is in hexadecimal type DisplayString (0xXXX)."
+	::= { standardAccessListEntry 10 }
+
+	standardAccessListProviderVlanId OBJECT-TYPE
+		SYNTAX INTEGER (0..4092)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the provider VLAN. The object is meaningful only 
+		 if standardAccessListProviderVlanMask is set."
+	::= { standardAccessListEntry 11 }
+
+	standardAccessListProviderVlanMask OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the provider VLAN mask. It is meaningful only
+		 if standardAccessListProviderVlanId is set.
+		 The value is in hexadecimal type DisplayString (0xXXX)"
+	::= { standardAccessListEntry 12}
+
+	standardAccessListProviderVpt OBJECT-TYPE
+		SYNTAX INTEGER (0..8)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the provider VLAN priority tag.
+		 A value of 8 means undefined."
+	::= { standardAccessListEntry 13 }
+
+	standardAccessListUntaggedMode OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object enables the untagged mode"
+	::= { standardAccessListEntry 14 }    
+	
+	standardAccessListDropLevel OBJECT-TYPE
+	SYNTAX  INTEGER
+	{  
+	green(0),
+	yellow(1)	
+    }  
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+    "This object define drop-level."
+    ::= { standardAccessListEntry 15}      
+    
+    standardAccessListDscp OBJECT-TYPE
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+    "The object shows the DiffServ Point (DSCP) value from IP header."
+    ::= {standardAccessListEntry 16}
+    
+
+    extendedAccessListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF ExtendedAccessListEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table contains extended access-list parameters."
+	::= { accessGroupsDefinitions 3 }
+
+    extendedAccessListEntry 	OBJECT-TYPE
+	SYNTAX	ExtendedAccessListEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+        "An entry in the extendedAccessListTable table."
+    INDEX { accessListControlListGroup, extendedAccessListIndex	}
+	::= { extendedAccessListTable 1 }
+
+    ExtendedAccessListEntry ::= SEQUENCE {
+    		extendedAccessListIndex		INTEGER,
+            extendedAccessListAction     AccessListAction,
+            extendedAccessListIpProtocol IpProtocol,
+            extendedAccessListIpSrc      IpAddress,
+            extendedAccessListIpMASKsrc  IpAddress,
+            extendedAccessListPortDefSrc PortDef,
+            extendedAccessListPortNumSrc INTEGER,
+            extendedAccessListPortRangeSrc INTEGER,
+            extendedAccessListIpDest     IpAddress,
+            extendedAccessListIpMASKdst  IpAddress,
+            extendedAccessListPortDefDst PortDef,
+            extendedAccessListPortNumDst INTEGER, 
+            extendedAccessListPortRangeDst INTEGER,
+            extendedAccessListTos 	  INTEGER,
+            extendedAccessListPrec       INTEGER,
+            extendedAccessListModifyTos  AccessListModifyTos,
+            extendedAccessListRemark     AccessListRemarkString,
+            extendedAccessListIcmpType   INTEGER,
+	    	extendedAccessListIcmpCode   INTEGER,
+	    	extendedAccessListIgmpType   INTEGER,   
+	    	extendedAccessListEstablished   AccessListEstablished,
+	    	extendedAccessListLog       INTEGER,
+        	extendedAccessListVpt		INTEGER,
+        	extendedAccessListRowStatus RowStatus,
+		extendedAccessListVlanId INTEGER,
+        	extendedAccessListVlanMask DisplayString,
+        	extendedAccessListProviderVlanId INTEGER,
+        	extendedAccessListProviderVlanMask DisplayString,
+		extendedAccessListProviderVpt	INTEGER,
+		extendedAccessListUntaggedMode TruthValue,
+		extendedAccessListDropLevel INTEGER,
+		extendedAccessListDscp INTEGER
+    }
+
+    extendedAccessListIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "Index of the particular rule of the group."
+    ::= { extendedAccessListEntry 1 }
+
+    extendedAccessListAction OBJECT-TYPE
+	SYNTAX	AccessListAction
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The action to preform if this access-list rule condition is true."
+        ::= { extendedAccessListEntry 2 }
+
+	extendedAccessListIpProtocol OBJECT-TYPE
+	SYNTAX	IpProtocol
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP protocol number (see IpProtocol)."
+        ::= { extendedAccessListEntry 3 }
+
+    extendedAccessListIpSrc OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP source address associated with this flow."
+        ::= { extendedAccessListEntry 4 }
+
+    extendedAccessListIpMASKsrc OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP mask, together with extendendAccessListIpSrc, defines the subnet."
+        ::= { extendedAccessListEntry 5 }
+
+    extendedAccessListPortDefSrc OBJECT-TYPE
+	SYNTAX	PortDef
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The extendedAccessListPortDefSrc object operates together with the port number filed inside 
+	    the access-list & controls how the port number is being processed.
+	    The values less-than(3) and greater-than(4) are supported only on E-Series family boards."
+        ::= { extendedAccessListEntry 6 }
+
+    extendedAccessListPortNumSrc OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "UDP/TCP port number. A value of 0 represents undefined port number."
+        ::= { extendedAccessListEntry 7 } 
+        
+    extendedAccessListPortRangeSrc OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "UDP/TCP ned range port number. A value of 0 represents undefined port number. Valid
+	    only with extendedAccessListPortDefSrc value of range(2)."
+        ::= { extendedAccessListEntry 8 }    
+
+    extendedAccessListIpDest OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP destination address associated with this flow."
+        ::= { extendedAccessListEntry 9 }
+
+    extendedAccessListIpMASKdst OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP mask, together with extendedAccessListIpMASKdst, defines the subnet."
+        ::= { extendedAccessListEntry 10 }
+
+    extendedAccessListPortDefDst OBJECT-TYPE
+	SYNTAX	PortDef
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The extendedAccessListPortDefDst object operates together with the port number filed inside 
+	    the access-list & controls how the port number is being processed.
+	    The values less-than(3) and greater-than(4) are supported only on E-Series family boards."
+        ::= { extendedAccessListEntry 11 }
+
+    extendedAccessListPortNumDst OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "UDP/TCP port number. A value of 0 represents undefined port number."
+        ::= { extendedAccessListEntry 12 }  
+        
+     extendedAccessListPortRangeDst OBJECT-TYPE
+	SYNTAX	INTEGER (0..65535)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "UDP/TCP ned range port number. A value of 0 represents undefined port number. Valid for
+	    value range (2) of extendedAccessListPortDefDst."
+        ::= { extendedAccessListEntry 13 }  
+
+
+    extendedAccessListTos OBJECT-TYPE
+	SYNTAX	INTEGER (0..15)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the type of service value."
+        ::= { extendedAccessListEntry 14 }
+
+    extendedAccessListPrec OBJECT-TYPE
+	SYNTAX	INTEGER (0..7)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Precedence value."
+        ::= { extendedAccessListEntry 15 }
+        
+    extendedAccessListModifyTos OBJECT-TYPE
+	SYNTAX	AccessListModifyTos
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "extendedAccessListModifyTos must be enabled if the user wants the ToS to be modified."
+        ::= { extendedAccessListEntry 16 }    
+        
+    extendedAccessListRemark OBJECT-TYPE 
+	SYNTAX	AccessListRemarkString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Access list entry comment."
+        ::= { extendedAccessListEntry 17 }        
+        
+    extendedAccessListIcmpType OBJECT-TYPE 
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "ICMP message type."
+        ::= { extendedAccessListEntry 18 }        
+        
+    extendedAccessListIcmpCode OBJECT-TYPE 
+	SYNTAX	INTEGER (0..255)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "ICMP message code."
+        ::= { extendedAccessListEntry 19 }            
+    
+    extendedAccessListIgmpType OBJECT-TYPE
+	SYNTAX	INTEGER (0..15)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "IGMP message type. This object is not supported in E-Series"
+        ::= { extendedAccessListEntry 20 }   
+        
+     extendedAccessListEstablished OBJECT-TYPE 
+	SYNTAX	AccessListEstablished	
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "When TCP protocol type is chosen, setting this object indicates that established connections will be matched."
+        ::= { extendedAccessListEntry 21 }        
+    
+    extendedAccessListLog OBJECT-TYPE 
+   	SYNTAX	INTEGER 
+   	{
+        undefined (0),
+        log  (1),
+        log-input (2)
+    }
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	     "Enable normal or extended logging of this access-list rule."
+        ::= { extendedAccessListEntry 22 }  
+        
+    extendedAccessListVpt OBJECT-TYPE 
+   	SYNTAX	INTEGER 
+   	{
+	 vpt-value0(0),
+	 vpt-value1(1),
+	 vpt-value2(2),
+	 vpt-value3(3),
+	 vpt-value4(4),
+	 vpt-value5(5),
+	 vpt-value6(6),    
+	 vpt-value7(7),
+	 undefined(8),	
+	 fc-be(241),
+	 fc-l2(242),
+	 fc-af(243),
+	 fc-l1(244),
+	 fc-h2(245),
+	 fc-ef(246),
+	 fc-h1(247),
+	 fc-nc(248) 
+	}
+   	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object is meaningful :
+	    1.when vlan-priority template is used and will reprezent vlan priority tag. 
+	    2.Forwarding class reprezented in the second part of enumeration: fc-##.
+	    A value of 8 means that neither of above is defined."
+
+        ::= { extendedAccessListEntry 23 }  
+
+   extendedAccessListRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	     "This indicates the row status & enables creation of lines in
+	     this table. In order to be consistent with ACL policy, this object 
+	     does not allow deletion of rules. The entire group must be deleted and all 
+	     rules removed at once."
+    ::= { extendedAccessListEntry 24 }
+	extendedAccessListVlanId OBJECT-TYPE
+		SYNTAX INTEGER (0..4092)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the customer VLAN. The object is meaningful
+		 only if extendedAccessListVlanMask is set."
+	::= { extendedAccessListEntry 25 }
+
+	extendedAccessListVlanMask OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-create		
+		STATUS current                                                                        
+		DESCRIPTION
+		"This object shows the customer VLAN mask. It is meaningful only
+		 if extendedAccessListVlanId is set.
+		 The value is in hexadecimal type string(0x..)."
+	::= { extendedAccessListEntry 26 }
+
+	extendedAccessListProviderVlanId OBJECT-TYPE
+		SYNTAX INTEGER (0..4092)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the provider VLAN. The object is meaningful only
+		 if extendedAccessListProviderVlanMask is set."
+	::= { extendedAccessListEntry 27 }
+
+	extendedAccessListProviderVlanMask OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-create		
+		STATUS current                                                                        
+		DESCRIPTION
+		"This object shows the provider VLAN mask. It is meaningful only
+		 if extendedAccessListProviderVlanId is set.
+		 The value is in hexadecimal type string(0x..)."
+	::= { extendedAccessListEntry 28 }
+
+	extendedAccessListProviderVpt OBJECT-TYPE
+		SYNTAX INTEGER (0..8)
+		MAX-ACCESS read-create		
+		STATUS current                                                                        
+		DESCRIPTION
+		"This object shows the provider VLAN priority tag. 
+		 A value of 8 means undefined.
+		 This object is meaningful only if vlan-priority template is used."
+	::= { extendedAccessListEntry 29 }
+
+	extendedAccessListUntaggedMode OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-create		
+		STATUS current                                                                        
+		DESCRIPTION
+		"This object enables the untagged mode."
+	::= { extendedAccessListEntry 30 }        
+	
+	extendedAccessListDropLevel OBJECT-TYPE
+	SYNTAX  INTEGER
+	{  
+	green(0),
+	yellow(1)
+	}  
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+	"This object define drop-level."
+    ::= { extendedAccessListEntry 31}  
+    
+    extendedAccessListDscp OBJECT-TYPE      
+    SYNTAX INTEGER (0..63)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION 
+    "The object shows the DiffServ Point (DSCP) value from IP header."
+    ::= {extendedAccessListEntry 32}
+
+--MAC ACL----------------------------------------------------------------
+   macAccessListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MACAccessListEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table contains MAC access-list parameters."
+	::= { accessGroupsDefinitions 4 }
+
+    macAccessListEntry 	OBJECT-TYPE
+	SYNTAX	MACAccessListEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+        "An entry in the macAccessListTable table."
+    INDEX { accessListControlListGroup, macAccessListIndex }
+	::= { macAccessListTable 1 }
+
+    MACAccessListEntry ::= SEQUENCE {
+		macAccessListIndex		INTEGER,
+		macAccessListAction     	AccessListAction,
+		macAccessListMacSrc		MacAddress,
+		macAccessListMacSrcMask		MacAddress,
+		macAccessListMacDst		MacAddress,
+		macAccessListMacDstMask		MacAddress,
+		macAccessListRemark		AccessListRemarkString,
+		macAccessListLog		INTEGER,
+		macAccessListRowStatus		RowStatus,
+		macAccessListTos		INTEGER,
+		macAccessListPrecedence		INTEGER,
+		macAccessListVpt		INTEGER,
+		macAccessListVlanId		INTEGER,
+		macAccessListVlanMask 		DisplayString,
+		macAccessListInnerVlanId 	INTEGER,
+		macAccessListInnerVlanMask 	DisplayString,
+		macAccessListInnerVpt 	INTEGER,
+		macAccessListEtherType 		DisplayString,
+		macAccessListDscp 		INTEGER,
+		macAccessListMatchTraffic	MatchTraffic,
+		macAccessListMatchTrafficPort	DisplayString,
+		macAccessListUntaggedMode	TruthValue,
+		macAccessListDropLevel  INTEGER
+
+	}
+
+    macAccessListIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "Index of the particular rule of the group."
+    ::= { macAccessListEntry 1 }
+
+    macAccessListAction OBJECT-TYPE
+	SYNTAX	AccessListAction
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The action to preform if this access-list rule condition is true."
+        ::= { macAccessListEntry 2 }
+   
+	macAccessListMacSrc OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The object contains the MAC address of source.
+	     If this object is not set, the result is 'any' source mac address.
+	     If object macAccessListMacSrcMask is not set, this object means the host address."
+        ::= { macAccessListEntry 3 }
+       
+	macAccessListMacSrcMask		OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object contains the mask for MAC source address.
+	     The object affects macAccessListMacSrc, defines host or range."
+		::= { macAccessListEntry 4 } 
+	
+	macAccessListMacDst OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The object contains the MAC address of destination.
+	     If this object is not set, the result is 'any' destination mac address.
+	     If object macAccessListMacDstMask is not set, this object means the host address."
+        ::= { macAccessListEntry 5 }
+        
+	macAccessListMacDstMask OBJECT-TYPE
+	SYNTAX	MacAddress
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object contains the mask for MAC destination address.
+	     The object affects macAccessListMacDst, defines host or range."
+    	::= { macAccessListEntry 6 }
+
+	macAccessListRemark OBJECT-TYPE 
+	SYNTAX	AccessListRemarkString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Access list entry comment"
+        ::= { macAccessListEntry 7 }  
+        
+   	macAccessListLog OBJECT-TYPE 
+   	SYNTAX	INTEGER 
+   	{
+        undefined (0),
+        log  (1),
+        log-input (2)
+	}
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Enable normal or extended logging of this access-list rule."
+        ::= { macAccessListEntry 8 }  
+       
+	macAccessListRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status & enables creation of rows in
+	     this table. In order to be consistent with ACL policy, this object 
+	     does not allow deletion of rules. The entire group must be deleted and all 
+	     rules removed at once."
+    ::= { macAccessListEntry 9 }
+	
+	macAccessListTos OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the type of service value."
+        ::= { macAccessListEntry 10}
+	
+	macAccessListPrecedence OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the precedence value.
+	     The parameter is matched for IP traffic only.
+	     The value is in the range between <0-8>.
+	     When precendence is disable the object will take 8 value."
+        ::= { macAccessListEntry 11 }
+
+	macAccessListVpt OBJECT-TYPE
+	SYNTAX INTEGER 
+	{
+	 vpt-value0(0),
+	 vpt-value1(1),
+	 vpt-value2(2),
+	 vpt-value3(3),
+	 vpt-value4(4),
+	 vpt-value5(5),
+	 vpt-value6(6),      
+	 vpt-value7(7),
+	 undefined(8),	
+	 fc-be(241),
+	 fc-l2(242),
+	 fc-af(243),
+	 fc-l1(244),
+	 fc-h2(245),
+	 fc-ef(246),
+	 fc-h1(247),
+	 fc-nc(248) 
+	}
+
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	   "This object is meaningful :
+	    1.when vlan-priority template is used and will reprezent vlan priority tag. 
+	    2.Forwarding class reprezented in the second part of enumeration: fc-##.
+	    A value of 8 means that neither of above is defined."
+        ::= { macAccessListEntry 12 }
+
+	macAccessListVlanId OBJECT-TYPE
+	SYNTAX INTEGER (0..4092)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the customer VLAN. The object is meaningful only
+	     if macAccessListVlanMask is set."
+        ::= { macAccessListEntry 13 }
+
+	macAccessListVlanMask OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the customer VLAN mask. It is meaningful only 
+	     if macAccessListVlanId is set.
+	     The value is in hexadecimal type string(0x..)."
+        ::= { macAccessListEntry 14 }
+        
+	macAccessListInnerVlanId OBJECT-TYPE
+	SYNTAX INTEGER (0..4092)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the provider VLAN. The object is meaningful only
+	     if macAccessListProviderVlanMask is set."
+        ::= { macAccessListEntry 15 } 
+
+	macAccessListInnerVlanMask OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the provider VLAN mask. It is meaningful only
+	     if macAccessListProviderVlanId is set.
+	     The value is in hexadecimal type string(0x..). "
+        ::= { macAccessListEntry 16 } 
+	
+	macAccessListInnerVpt OBJECT-TYPE
+	SYNTAX INTEGER (0..8)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the provider VLAN priority tag.
+	     A value of 8 means undefined"
+        ::= { macAccessListEntry 17 }
+
+	macAccessListEtherType OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The object shows the EtherType field in the Ethernet header.
+	     The field is matched only for non-IP and non-ARP traffic only."
+        ::= { macAccessListEntry 18 }
+
+	macAccessListDscp OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The object shows the DiffServ Point (DSCP) value from IP header."
+        ::= { macAccessListEntry 19 }
+
+	macAccessListMatchTraffic OBJECT-TYPE
+	SYNTAX	MatchTraffic
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object shows the type of traffic to match."
+        ::= { macAccessListEntry 20 }
+
+	macAccessListMatchTrafficPort OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object is meaningful only if macAccessListMatchTraffic
+	     is set to 'known-unicast' value - else returns error.
+		 The values are of types PORTLIST (for example 1/1/1-1/1/4,1/1/6)"
+        ::= { macAccessListEntry 21 }
+
+	macAccessListUntaggedMode OBJECT-TYPE
+	SYNTAX	TruthValue
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "This object enables the untagged mode."
+        ::= { macAccessListEntry 22 }
+        
+    macAccessListDropLevel OBJECT-TYPE
+	SYNTAX  INTEGER
+	{  
+	green(0),
+	yellow(1)
+	}  
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION 
+	"This object define drop-level."
+	::= { macAccessListEntry 23}
+
+
+--Ethertype ACL---------------------------------
+    etherTypeAccessListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF EtherTypeAccessListEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table contains extended MAC access-list parameters."
+	::= { accessGroupsDefinitions 5 }
+
+    etherTypeAccessListEntry 	OBJECT-TYPE
+	SYNTAX	EtherTypeAccessListEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+        "An entry in the etherTypeAccessListTable table."
+    INDEX { accessListControlListGroup, etherTypeAccessListIndex }
+	::= { etherTypeAccessListTable 1 }
+
+    EtherTypeAccessListEntry ::= SEQUENCE {
+	etherTypeAccessListIndex		INTEGER,
+	etherTypeAccessListAction		AccessListAction,
+	etherTypeAccessListEtherType		DisplayString,
+	etherTypeAccessListEtherTypeCodeMask 	DisplayString,
+   	etherTypeAccessListRemark		AccessListRemarkString,
+        etherTypeAccessListLog			INTEGER,
+        etherTypeAccessListRowStatus		RowStatus,
+        etherTypeAccessListVlanId		INTEGER,
+       	etherTypeAccessListVlanMask		DisplayString,
+       	etherTypeAccessListProviderVlanId 	INTEGER,
+       	etherTypeAccessListProviderVlanMask 	DisplayString,
+       	etherTypeAccessListProviderVpt 		INTEGER
+     }
+
+    etherTypeAccessListIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "Index of the particular rule of the group."
+    ::= { etherTypeAccessListEntry 1 }
+
+    etherTypeAccessListAction OBJECT-TYPE
+	SYNTAX	AccessListAction
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The action to preform if this access-list rule condition is true."
+        ::= { etherTypeAccessListEntry 2 }
+
+	etherTypeAccessListEtherType OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP protocol number (see IpProtocol)."
+        ::= { etherTypeAccessListEntry 3 }
+
+    etherTypeAccessListEtherTypeCodeMask OBJECT-TYPE
+	SYNTAX	DisplayString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The IP source address associated with this flow."
+        ::= { etherTypeAccessListEntry 4 }
+
+	etherTypeAccessListRemark OBJECT-TYPE 
+	SYNTAX	AccessListRemarkString
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Access list entry comment"
+        ::= { etherTypeAccessListEntry 5 }  
+        
+   	etherTypeAccessListLog OBJECT-TYPE 
+   	SYNTAX	INTEGER 
+   	{
+        undefined (0),
+        log  (1),
+        log-input (2)
+	}
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Enable normal or extended logging of this access-list rule."
+        ::= { etherTypeAccessListEntry 6 }  
+       
+	etherTypeAccessListRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status & enables creation of rows in
+	     this table. In order to be consistent with ACL policy, this object 
+	     does not allow deletion of rules. The entire group must be deleted and all 
+	     rules removed at once."
+    ::= { etherTypeAccessListEntry 7 }
+
+  	etherTypeAccessListVlanId OBJECT-TYPE
+		SYNTAX INTEGER (0..4092)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the customer VLAN.The object is meaningful only
+		 if etherTypeAccessListVlanMask is set."
+	::= { etherTypeAccessListEntry 8 }
+
+	etherTypeAccessListVlanMask OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-create		
+		STATUS current                                                                        
+		DESCRIPTION
+		"This object shows the customer VLAN mask. It is meaningful only
+		 if etherTypeAccessListVlanId is set."
+	::= { etherTypeAccessListEntry 9 }
+
+  	etherTypeAccessListProviderVlanId OBJECT-TYPE
+		SYNTAX INTEGER (0..4092)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+		"This object shows the provider VLAN. The object is meaningful only
+		 if etherTypeAccessListProviderVlanMask is set."
+	::= { etherTypeAccessListEntry 10 }
+
+	etherTypeAccessListProviderVlanMask OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-create		
+		STATUS current                                                                        
+		DESCRIPTION
+		"This object shows the provider VLAN mask. It is meaningful only 
+		 if etherTypeAccessListProviderVlanId is set.
+		 The value is in hexadecimal type string (0x..). "
+	::= { etherTypeAccessListEntry 11 }
+      
+    etherTypeAccessListProviderVpt OBJECT-TYPE 
+   		SYNTAX	INTEGER  (0..8)
+   		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	    "The vlan priority tag. A value of 8 means undefined. This object is meaningful 
+	    only if vlan-priority template is used."
+        ::= { etherTypeAccessListEntry 12 }  
+    -----------------------------------------------
+
+    accessListInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AccessListInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table controls the assigment of access groups to an interface."
+	::= { accessListsInterfaces 1 }
+
+    accessListInterfaceEntry OBJECT-TYPE
+	SYNTAX	AccessListInterfaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "An entry in the AccessListInterfaceEntry table."
+    INDEX { ifIndex, accessListInterfaceTableIndex, accessListInterfaceGroupIndex }
+	::= { accessListInterfaceTable 1 }
+
+    AccessListInterfaceEntry ::= SEQUENCE {
+        accessListInterfaceTableIndex	   INTEGER,
+        accessListInterfaceGroupIndex      INTEGER,
+        accessListInterfaceDscp            INTEGER,
+        accessListInterfaceRowStatus       RowStatus,
+        accessListInterfacePriority        INTEGER,
+        accessListInterfaceDiscard         AccessListDiscard,
+        accessListInterfaceRateLimit       Rate,
+		accessListInterfaceExceedAction    ExceedAction,
+        accessListInterfaceShaper          Shaper,
+        accessListInterfaceBurst           Rate,
+        accessListInterfaceRedirectIfIndex INTEGER,
+        accessListInterfaceRedirectVlanID 	INTEGER,
+        accessListInterfaceRedirectNexthop  IpAddress,
+        accessListInterfacePeakRate			Rate,  
+        accessListInterfacePeakBurst		Rate,  
+        accessListInterfaceColorAware		INTEGER,
+        accessListInterfacePolicy			INTEGER,
+        accessListInterfaceTrafficClass		INTEGER,
+        accessListInterfaceSpanRootTrack    INTEGER,
+        accessListInterfaceUntagFilter	    INTEGER,
+	accessListInterfaceTxq			INTEGER,
+	accessListInterfaceTxqDropLevel		TxqDropLevel,
+	accessListInterfaceApplyMirror		TruthValue,
+	accessListInterfaceStatistics		AccessListStatistics,
+	accessListInterfaceDirection		AccessListDirection,
+	accessListInterfaceRateStatistics		AccessListStatistics
+
+    }
+
+    accessListInterfaceTableIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This object identifies the row number for this (ifIndex) interface."
+	::= { accessListInterfaceEntry 1 }
+
+    accessListInterfaceGroupIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This indicates the index of the access group for this interface. This value is
+         the same as the value of accessListControlListGroup for the assigned ACL."
+    ::= { accessListInterfaceEntry 2 }
+
+    accessListInterfaceDscp OBJECT-TYPE
+	SYNTAX	INTEGER 
+				{
+				disable(0),
+				enable(1)
+				}	
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Enable Diffserv codepoint."
+    ::= { accessListInterfaceEntry 3}
+
+    accessListInterfaceRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status & enables creation & deletion of lines in
+	     this (and related) tables. See SNMPv2-TC for more information."
+    ::= { accessListInterfaceEntry 4 }
+    
+    accessListInterfacePriority OBJECT-TYPE
+	SYNTAX INTEGER (0..8)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Priority level value. Valid values are 0 to 7, 8 means undefined."
+    ::= { accessListInterfaceEntry 5 }
+    
+    accessListInterfaceDiscard OBJECT-TYPE
+	SYNTAX AccessListDiscard
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Mark discardable or normal for priority on access group
+         Only the E-Series family and the G-Series family boards 
+         support the values green, yellow and red. Other
+         values are not supported by the E-Series and G-series."
+    ::= { accessListInterfaceEntry 6 }
+    
+    accessListInterfaceRateLimit OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The maximum rate in kBps(kilobytes per second)"
+        ::= { accessListInterfaceEntry 7 }
+
+    accessListInterfaceExceedAction OBJECT-TYPE
+	SYNTAX	ExceedAction
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The action to perform when the condition is true."
+        ::= { accessListInterfaceEntry 8 }
+
+    accessListInterfaceShaper OBJECT-TYPE
+	SYNTAX	Shaper
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Enable/disable shaper.
+         This object is supported only in B-series."
+        ::= { accessListInterfaceEntry 9 }
+
+    accessListInterfaceBurst OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The maximum Burst rate in kBps(kilobytes per second).
+	    This object is supported only by E-Series and G-series."
+        ::= { accessListInterfaceEntry 10 }
+
+    accessListInterfaceRedirectIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "This object controls redirection of traffic matching this ACG. If the
+             value is a valid ifIndex, the traffic will be redirected to it. If the value is 0 
+             redirection is disabled. Setting this object requires that accessListInterfaceRedirectVlanID is also set."
+        ::= { accessListInterfaceEntry 11 }  
+        
+    accessListInterfaceRedirectVlanID OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "This object controls redirection of traffic matching this ACG. If the
+             value is a valid VLAN ID, the traffic will be redirected to it. If the value is 0 
+             redirection is disabled. If the device is TMetro, this object sets the tag substitution
+             policy for this access group"
+        ::= { accessListInterfaceEntry 12 }  
+        
+   	accessListInterfaceRedirectNexthop OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "This object controls redirection of traffic matching this ACG. If the
+             value is a valid IP address then the traffic will be redirected to it. If the value is 0 
+             redirection is disabled."
+        ::= { accessListInterfaceEntry 13 }  
+        
+    accessListInterfacePeakRate OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Peak Information Rate in kBps(kilobytes per second)."
+        ::= { accessListInterfaceEntry 14 }
+
+    accessListInterfacePeakBurst OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Peak Burst Size in kBps(kilobytes per second)."
+        ::= { accessListInterfaceEntry 15 }
+
+    accessListInterfaceColorAware OBJECT-TYPE
+	SYNTAX	INTEGER {
+					disable (0),
+					enable (1)
+	}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Toggle Color aware traffic metering. Disabled by default."
+        ::= { accessListInterfaceEntry 16 } 
+        
+   accessListInterfacePolicy OBJECT-TYPE
+	SYNTAX	INTEGER {
+					undefined (0),
+					dcsp (1),
+					priority (2),
+					priority-dp (3)
+	}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Set remarking policy."
+        ::= { accessListInterfaceEntry 17 }
+
+    accessListInterfaceTrafficClass OBJECT-TYPE
+    	SYNTAX	INTEGER (0..256)   
+    		MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+	      "Diff Serv CP - Type of Service
+             In E-Series and G-series the range is 0..63. A value of 256 means Traffic Class is not set."
+        ::= { accessListInterfaceEntry 18 } 
+        
+     accessListInterfaceSpanRootTrack OBJECT-TYPE
+    	SYNTAX	INTEGER 
+				{
+				disable(0),
+				enable(1)
+				}	 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "The span root track option for VLAN redirects."
+        ::= { accessListInterfaceEntry 19 }
+                                                
+      accessListInterfaceUntagFilter OBJECT-TYPE
+    	SYNTAX	INTEGER 
+				{
+				disable(0),
+				enable(1)
+				}	 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "The filter for tagged or untagged backets to be applied."
+        ::= { accessListInterfaceEntry 20 }
+
+      accessListInterfaceTxq OBJECT-TYPE
+    	SYNTAX	INTEGER 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "This object performs QoS and remarking of traffic matching an ACG"
+        ::= { accessListInterfaceEntry 21 }
+
+      accessListInterfaceTxqDropLevel OBJECT-TYPE
+    	SYNTAX	TxqDropLevel
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+		"This object shows the drop-level (green/yellow)
+		 and is related to accessListInterfaceTxq."
+        ::= { accessListInterfaceEntry 22 }
+
+	accessListInterfaceApplyMirror OBJECT-TYPE
+    	SYNTAX	TruthValue 
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object shows that the traffic on the interface will be mirrored"
+        ::= { accessListInterfaceEntry 23 }
+
+	accessListInterfaceStatistics OBJECT-TYPE
+    	SYNTAX	AccessListStatistics 
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object enables statistics on the interface."
+        ::= { accessListInterfaceEntry 24 }
+
+	accessListInterfaceDirection OBJECT-TYPE
+    	SYNTAX	AccessListDirection
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object determines the ingress-egress type of applied ACL."
+        ::= { accessListInterfaceEntry 25 }
+
+	accessListInterfaceRateStatistics OBJECT-TYPE
+    	SYNTAX	AccessListStatistics 
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object enables rate statistics on the interface."
+        ::= { accessListInterfaceEntry 26 }
+
+    -----------------------------------------------
+    accessListVLANTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AccessListVLANEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table controls the assignment of access groups to a VLAN."
+	::= { accessListsVLAN 1 }
+
+    accessListVLANEntry OBJECT-TYPE
+	SYNTAX	AccessListVLANEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "An entry in the AccessListVLANEntry table."
+    INDEX { dot1qVlanIndex, accessListVLANTableIndex, accessListVLANGroupIndex}
+	::= { accessListVLANTable 1 }
+
+    AccessListVLANEntry ::= SEQUENCE {
+        accessListVLANTableIndex      INTEGER,
+        accessListVLANGroupIndex      INTEGER,
+        accessListVLANDscp            INTEGER,
+        accessListVLANRowStatus       RowStatus,
+        accessListVLANPriority        INTEGER,
+        accessListVLANDiscard         AccessListDiscard,
+        accessListVLANRateLimit       Rate,
+		accessListVLANExceedAction    ExceedAction,
+		accessListVLANBurst           Rate,
+		accessListVLANRedirectIfIndex INTEGER,
+		accessListVLANRedirectVlanID 	INTEGER,
+        accessListVLANRedirectNexthop  IpAddress,
+        accessListVLANPeakRate			Rate,  
+        accessListVLANPeakBurst			Rate,  
+        accessListVLANColorAware		INTEGER,
+        accessListVLANPolicy			INTEGER,
+        accessListVLANTrafficClass		INTEGER,
+        accessListVLANSpanRootTrack     INTEGER,
+        accessListVLANUntagFilter			INTEGER,
+	accessListVLANApplyMirror	TruthValue,
+	accessListVLANStatistics	AccessListStatistics,
+	accessListVLANDirection			AccessListDirection
+        }
+
+    accessListVLANTableIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This object identifies the order in which the access group was applied on this VLAN."
+	::= { accessListVLANEntry 1 }
+
+    accessListVLANGroupIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This indicates the index of the access group for this VLAN. This value is 
+         the same as the value of accessListControlListGroup for the assigned ACL."
+    ::= { accessListVLANEntry 2 }
+
+    accessListVLANDscp OBJECT-TYPE
+	SYNTAX	INTEGER 
+				{
+				disable(0),
+				enable(1)
+				}	
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Enable Diffserv codepoint."
+
+    ::= { accessListVLANEntry 3}
+
+    accessListVLANRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status & enables creation & delettion of rows in
+	     this and related tables. See SNMPv2-TC for more information."
+    ::= { accessListVLANEntry 4 }
+    
+    accessListVLANPriority OBJECT-TYPE
+	SYNTAX INTEGER (0..8)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Priority level value. Valid values are 0 to 7, 8 means undefined."
+    ::= { accessListVLANEntry 5 }
+    
+    accessListVLANDiscard OBJECT-TYPE
+	SYNTAX AccessListDiscard
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "Mark discardable or normal for priority on access group
+         Only the E-Series family and the G-Series family boards 
+         support the values green, yellow and red. Other
+         values are not supported by the E-Series and G-series."
+    ::= { accessListVLANEntry 6 }
+    
+    accessListVLANRateLimit OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The maximum rate in kBps(kilobytes per second)."
+        ::= { accessListVLANEntry 7 }
+
+    accessListVLANExceedAction OBJECT-TYPE
+	SYNTAX	ExceedAction
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The action to perform when the condition is true."
+        ::= { accessListVLANEntry 8 }
+
+    accessListVLANBurst OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The maximum Burst rate in kBps(kilobytes per second).
+	    This object is supported only by E-Series and G-series."
+        ::= { accessListVLANEntry 9 }
+
+    accessListVLANRedirectIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "This object controls redirection of traffic matching this ACG. If the
+             value is a valid ifIndex, the traffic will be redirected to it. If the value is 0 
+             redirection is disabled. Setting this object requires that accessListInterfaceRedirectVlanID is also set."
+        ::= { accessListVLANEntry 10 }  
+    
+     accessListVLANRedirectVlanID OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "his object controls redirection of traffic matching this ACG. If the
+             value is a valid VLAN ID, the traffic will be redirected to it. If the value is 0 
+             redirection is disabled. If the device is TMetro, this object sets the tag substitution
+             policy for this access group"
+        ::= { accessListVLANEntry 11 }  
+        
+   	accessListVLANRedirectNexthop OBJECT-TYPE
+	SYNTAX	IpAddress
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "This object controls redirection of traffic matching this ACG. If the
+             value is a valid IP address then the traffic will be redirected to it. If the value is 0 
+             redirection is disabled."
+        ::= { accessListVLANEntry 12 }  
+        
+    accessListVLANPeakRate OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Peak Information Rate in kBps(kilobytes per second)."
+        ::= { accessListVLANEntry 13 }
+
+    accessListVLANPeakBurst OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	     "Peak Burst Size in kBps(kilobytes per second)."
+        ::= { accessListVLANEntry 14 }
+
+    accessListVLANColorAware OBJECT-TYPE
+	SYNTAX	INTEGER {
+					disable (0),
+					enable (1)
+	}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	       "Toggle Color aware traffic metering.Disabled by default."
+        ::= { accessListVLANEntry 15 } 
+        
+   accessListVLANPolicy OBJECT-TYPE
+	SYNTAX	INTEGER {
+					undefined (0),
+					dcsp (1),
+					priority (2),
+					priority-dp (3)
+	}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Set remarking policy."
+        ::= { accessListVLANEntry 16 }
+                                        
+    accessListVLANTrafficClass OBJECT-TYPE
+    	SYNTAX	INTEGER (0..256)   
+    		MAX-ACCESS	read-write
+			STATUS	current
+			DESCRIPTION
+	      "Diff Serv CP - Type of Service
+             In E-Series and G-series the range is 0..63. A value of 256 means that Traffic Class is not set."
+        ::= { accessListVLANEntry 17 }
+                        
+     accessListVLANSpanRootTrack OBJECT-TYPE
+    	SYNTAX	INTEGER 
+				{
+				disable(0),
+				enable(1)
+				}	 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "The span root track option for VLAN redirects."
+        ::= { accessListVLANEntry 18 }      
+        
+     accessListVLANUntagFilter OBJECT-TYPE
+    	SYNTAX	INTEGER 
+				{
+				disable(0),
+				enable(1)
+				}	 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "The filter for tagged or untagged backets to be applied"
+        ::= { accessListVLANEntry 19 }
+
+     accessListVLANApplyMirror OBJECT-TYPE
+    	SYNTAX	TruthValue 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "This object shows that the traffic on the interface will be mirrored."
+        ::= { accessListVLANEntry 20 }
+
+     accessListVLANStatistics OBJECT-TYPE
+    	SYNTAX	AccessListStatistics 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "This object enables statistics on the interface."
+        ::= { accessListVLANEntry 21 }
+
+     accessListVLANDirection OBJECT-TYPE
+    	SYNTAX	AccessListDirection 
+		MAX-ACCESS	read-create
+		STATUS	current
+		DESCRIPTION
+	      "This object determines the ingress-egress type of applied ACL."
+        ::= { accessListVLANEntry 22 }
+
+    ----------------------------------------------------------------------------------
+	 accessListSapTable OBJECT-TYPE
+	    SYNTAX SEQUENCE OF AccessListSapEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+	        "This table controls the assigment of access groups to a SAP."
+		::= { accessListsServices 1 }
+	
+	    accessListSapEntry OBJECT-TYPE
+		SYNTAX	AccessListSapEntry
+		MAX-ACCESS	not-accessible
+		STATUS	current
+		DESCRIPTION
+		    "An entry in the AccessListSapEntry table."
+	    INDEX { svcId, sapPortId, sapEncapValue , accessListSapTableIndex, accessListSapGroupIndex }
+		::= { accessListSapTable 1 }
+	
+	    AccessListSapEntry ::= SEQUENCE {
+	        accessListSapTableIndex	   INTEGER,
+	        accessListSapGroupIndex      INTEGER,
+	        accessListSapRowStatus       RowStatus,
+	        accessListSapRateLimit       Rate,
+			accessListSapExceedAction    ExceedAction,
+	        accessListSapBurst           Rate,
+	        accessListSapPeakRate			Rate,  
+	        accessListSapPeakBurst		Rate,  
+	        accessListSapColorAware		INTEGER,
+	        accessListSapTxq			INTEGER,
+			accessListSapTxqDropLevel		TxqDropLevel,
+			accessListSapStatistics		AccessListStatistics,  
+			accessListSapRateStatistics    AccessListStatistics,
+			accessListSapDirection		AccessListDirection
+	    }
+
+    accessListSapTableIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This object identifies the row number for this (ifIndex) interface."
+	::= { accessListSapEntry 1 }
+
+    accessListSapGroupIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This indicates the index of the access group for this interface. This value is
+         the same as the value of accessListControlListGroup for the assigned ACL."
+    ::= { accessListSapEntry 2 }
+
+    
+    accessListSapRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status & enables creation & deletion of lines in
+	     this (and related) tables. See SNMPv2-TC for more information."
+    ::= { accessListSapEntry 3 }
+    
+    accessListSapRateLimit OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The maximum rate in kBps(kilobytes per second)"
+        ::= { accessListSapEntry 4 }
+
+    accessListSapExceedAction OBJECT-TYPE
+	SYNTAX	ExceedAction
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The action to perform when the condition is true."
+        ::= { accessListSapEntry 5 }
+
+
+    accessListSapBurst OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The maximum Burst rate in kBps(kilobytes per second).
+	    This object is supported only by E-Series and G-series."
+        ::= { accessListSapEntry 6 }
+
+         
+    accessListSapPeakRate OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Peak Information Rate in kBps(kilobytes per second)."
+        ::= { accessListSapEntry 7 }
+
+    accessListSapPeakBurst OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Peak Burst Size in kBps(kilobytes per second)."
+        ::= { accessListSapEntry 8 }
+
+    accessListSapColorAware OBJECT-TYPE
+	SYNTAX	INTEGER {
+					disable (0),
+					enable (1)
+	}
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Toggle Color aware traffic metering. Disabled by default."
+        ::= { accessListSapEntry 9 } 
+        
+   
+     accessListSapTxq OBJECT-TYPE
+     SYNTAX	INTEGER 
+	 MAX-ACCESS	read-create
+	 STATUS	current
+	 DESCRIPTION
+     "This object performs QoS and remarking of traffic matching an ACG"
+      ::= { accessListSapEntry 10 }
+
+    accessListSapTxqDropLevel OBJECT-TYPE
+   	SYNTAX	TxqDropLevel
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object shows the drop-level (green/yellow)
+	 and is related to accessListInterfaceTxq."
+     ::= { accessListSapEntry 11 }
+
+
+	accessListSapStatistics OBJECT-TYPE
+    	SYNTAX	AccessListStatistics 
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object enables statistics on the SAP."
+        ::= { accessListSapEntry 12 }    
+    
+   accessListSapRateStatistics OBJECT-TYPE
+    	SYNTAX	AccessListStatistics 
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object enables rate statistics on the SAP."
+        ::= { accessListSapEntry 13 }
+
+
+	accessListSapDirection OBJECT-TYPE
+   		SYNTAX	AccessListDirection
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	"This object determines the ingress-egress type of applied ACL."
+        ::= { accessListSapEntry 14 }
+
+    --------------------------------------------------------------            
+            
+    accessListInterfaceStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AccessListInterfaceStatisticsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table serves the interface statistics."
+	::= { accessListsInterfaceStatistics 1 }
+
+    accessListInterfaceStatisticsEntry OBJECT-TYPE
+	SYNTAX	AccessListInterfaceStatisticsEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "An entry in the accessListInterfaceStatisticsTable table."
+    INDEX { ifIndex, accessListInterfaceStatisticsGroupIndex }
+	::= { accessListInterfaceStatisticsTable 1 }
+
+     AccessListInterfaceStatisticsEntry ::= SEQUENCE {
+        accessListInterfaceStatisticsGroupIndex	INTEGER,
+        accessListInterfaceGreenBytes	INTEGER,
+        accessListInterfaceYellowBytes	INTEGER,
+        accessListInterfaceRedBytes	INTEGER,
+		accessListInterfaceClassifiedPackets	INTEGER
+     }
+
+    accessListInterfaceStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This indicates the index of the access group for this interface. This value is
+ 	the same as the value of accessListControlListGroup for the assigned ACL."
+	::= { accessListInterfaceStatisticsEntry 1 }
+
+    accessListInterfaceGreenBytes OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows green traffic in bytes for access group with enabled rate-limit statistics."
+    ::= { accessListInterfaceStatisticsEntry 2 }
+
+    accessListInterfaceYellowBytes OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows yellow traffic in bytes for access group with enabled rate-limit statistics."
+    ::= { accessListInterfaceStatisticsEntry 3 }
+
+    accessListInterfaceRedBytes OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows red traffic in bytes for access group with enabled rate-limit statistics."
+    ::= { accessListInterfaceStatisticsEntry 4 }
+	
+	accessListInterfaceClassifiedPackets OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows match classified packets in bytes for access group with enabled statistics."
+    ::= { accessListInterfaceStatisticsEntry 5 }
+-----------------------------------------------------------------------------------------------------------    
+    accessListSapStatisticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AccessListSapStatisticsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table serves the Sap statistics."
+	::= { accessListsServicesStatistics 1 }
+
+    accessListSapStatisticsEntry OBJECT-TYPE
+	SYNTAX	AccessListSapStatisticsEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "An entry in the accessListSapStatisticsTable table."
+    INDEX { svcId, sapPortId, sapEncapValue , accessListSapStatisticsGroupIndex }
+	::= { accessListSapStatisticsTable 1 }
+
+     AccessListSapStatisticsEntry ::= SEQUENCE {
+        accessListSapStatisticsGroupIndex	INTEGER,
+        accessListSapGreenBytes	INTEGER,
+        accessListSapYellowBytes	INTEGER,
+        accessListSapRedBytes	INTEGER,
+		accessListSapClassifiedPackets	INTEGER
+     }
+
+    accessListSapStatisticsGroupIndex OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This indicates the index of the access group for this Sap. This value is
+ 	the same as the value of accessListControlListGroup for the assigned ACL."
+	::= { accessListSapStatisticsEntry 1 }
+
+    accessListSapGreenBytes OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows green traffic in bytes for access group with enabled rate-limit statistics."
+    ::= { accessListSapStatisticsEntry 2 }
+
+    accessListSapYellowBytes OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows yellow traffic in bytes for access group with enabled rate-limit statistics."
+    ::= { accessListSapStatisticsEntry 3 }
+
+    accessListSapRedBytes OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows red traffic in bytes for access group with enabled rate-limit statistics."
+    ::= { accessListSapStatisticsEntry 4 }
+	
+	accessListSapClassifiedPackets OBJECT-TYPE
+	SYNTAX INTEGER
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+        "This object shows classified packets in bytes for access group with enabled match statistics."
+    ::= { accessListSapStatisticsEntry 5 }
+
+    -----------------------------------------------
+    
+    ispUpLinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IspUpLinkEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table controls the ISP up-links. This table is supported only by B-Series."
+	::= { isp 1 }
+
+    ispUpLinkEntry OBJECT-TYPE
+	SYNTAX	IspUpLinkEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "An entry in the ispUpLinkTable table."
+    INDEX { ispUpLinkIndex }
+	::= { ispUpLinkTable 1 }
+
+    IspUpLinkEntry ::= SEQUENCE {
+		ispUpLinkIndex       INTEGER,
+		ispUpLinkIfIndex     INTEGER,
+                ispUpLinkType        ISPType,
+                ispUpLinkAccessGroup INTEGER,
+		ispUpLinkVLANid      INTEGER,
+		ispUpLinkVLANtag     VlanTag,
+                ispUpLinkRowStatus   RowStatus
+   }
+
+	ispUpLinkIndex OBJECT-TYPE
+	SYNTAX	INTEGER (1..32)
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "The ISP index."
+    ::= { ispUpLinkEntry 1 }
+
+	ispUpLinkIfIndex OBJECT-TYPE
+	SYNTAX	INTEGER
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The ifIndex (from RFC1213) that this ISP belongs to."
+    ::= { ispUpLinkEntry 2 }
+
+    ispUpLinkType OBJECT-TYPE
+	SYNTAX	ISPType
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The ispUpLinkType object shows if the ISP is connective or normal."
+        ::= { ispUpLinkEntry 3 }
+        
+    ispUpLinkAccessGroup OBJECT-TYPE
+	SYNTAX	INTEGER (1..199)
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "A valid index (accessListControlListGroup) from accessListControlTable.
+	     For the ISP up-link the index groups are 100..199."
+        ::= { ispUpLinkEntry 4 }
+
+    ispUpLinkVLANid OBJECT-TYPE
+	SYNTAX	INTEGER (0..4000)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "The VID for this link. 0 means no VID."
+    ::= { ispUpLinkEntry 5 }
+
+	ispUpLinkVLANtag OBJECT-TYPE
+	SYNTAX	VlanTag
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "Type of the VLAN - tagged or untagged."
+        ::= { ispUpLinkEntry 6 }
+
+    ispUpLinkRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	    "This indicates the row status and enables creation & deletion of rows in
+	     this and related tables. See SNMPv2-TC for more information."
+        ::= { ispUpLinkEntry 7 }
+
+    -----------------------------------------------
+
+    ispUserInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IspUserInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table controls the assignment of ISP users to an interface.
+        This table is supported only by B-Series."
+	::= { isp 2 }
+
+    ispUserInterfaceEntry OBJECT-TYPE
+	SYNTAX	IspUserInterfaceEntry
+	MAX-ACCESS	not-accessible
+	STATUS	current
+	DESCRIPTION
+	    "An entry in the ispUserInterfaceTable table."
+    INDEX { ifIndex}
+	::= { ispUserInterfaceTable 1 }
+
+    IspUserInterfaceEntry ::= SEQUENCE {
+        ispUserInterfaceAssigen        AssigenValue,
+        ispUserInterfaceIspUplinkIndex INTEGER,
+        ispUserInterfaceRateLimit      Rate,
+	ispUserInterfaceConformAction  ConformAction,
+        ispUserInterfaceExceedAction   ExceedAction,
+        ispUserInterfaceShaper         Shaper
+   }
+
+	ispUserInterfaceAssigen OBJECT-TYPE
+	SYNTAX	AssigenValue
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "Indicates if an ISP user is assigned to this interface."
+        ::= { ispUserInterfaceEntry 1 }
+
+	ispUserInterfaceIspUplinkIndex OBJECT-TYPE
+	SYNTAX	INTEGER (1..32)
+	MAX-ACCESS	read-create
+	STATUS	current
+	DESCRIPTION
+	    "A valid index from ispUpLinkTable."
+        ::= { ispUserInterfaceEntry 2 }
+
+	ispUserInterfaceRateLimit OBJECT-TYPE
+	SYNTAX	Rate
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The maximum rate."
+        ::= { ispUserInterfaceEntry 3 }
+
+	ispUserInterfaceConformAction OBJECT-TYPE
+	SYNTAX	ConformAction
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The action to perform when the condition is true."
+        ::= { ispUserInterfaceEntry 4 }
+
+        ispUserInterfaceExceedAction OBJECT-TYPE
+	SYNTAX	ExceedAction
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "The action to perform when the condition is true."
+        ::= { ispUserInterfaceEntry 5 }
+
+        ispUserInterfaceShaper OBJECT-TYPE
+	SYNTAX	Shaper
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+	    "This object controls the status of the shaper."
+        ::= { ispUserInterfaceEntry 6 }     
+        
+  standardAccessListRuleMatched  NOTIFICATION-TYPE
+       OBJECTS { ifIndex, dot1qVlanStatus, standardAccessListAction}
+         STATUS current
+         DESCRIPTION
+         "This trap indicates that a packet matching a standard ACL rule has been received."
+         ::= { prvtSwitchAccessListNotifications 1} 
+          
+  extendedAccessListRuleMatched  NOTIFICATION-TYPE
+  		OBJECTS { ifIndex, dot1qVlanStatus, extendedAccessListAction}
+         STATUS current
+         DESCRIPTION
+         "This trap indicates that a packet matching an extended ACL rule has been received."
+         ::= { prvtSwitchAccessListNotifications 2}  
+
+   macAccessListRuleMatched  NOTIFICATION-TYPE
+       OBJECTS { ifIndex, dot1qVlanStatus, macAccessListAction}
+         STATUS current
+         DESCRIPTION
+         "This trap indicates that a packet matching a mac ACL rule has been received."
+         ::= { prvtSwitchAccessListNotifications 3} 
+
+   etherTypeAccessListRuleMatched  NOTIFICATION-TYPE
+       OBJECTS { ifIndex, dot1qVlanStatus, etherTypeAccessListAction}
+         STATUS current
+         DESCRIPTION
+         "This trap indicates that a packet matching a ether-type ACL rule has been received."
+         ::= { prvtSwitchAccessListNotifications 4} 
+
+-- *******************************************************************
+--  Conformance Information
+-- *******************************************************************
+
+    prvtSwitchAccessListMibGroups       OBJECT IDENTIFIER ::= { prvtSwitchAccessListConformance 1 }
+
+
+    prvtSwitchAccessListNotificationGroup NOTIFICATION-GROUP
+    	NOTIFICATIONS {
+    		standardAccessListRuleMatched,
+    		extendedAccessListRuleMatched,
+		macAccessListRuleMatched,
+		etherTypeAccessListRuleMatched
+    	}
+	STATUS current
+     	DESCRIPTION
+        	"Private Notification Group."
+     ::= { prvtSwitchAccessListMibGroups 1 }
+
+END
+
+
+

@@ -1,0 +1,293 @@
+
+-- *****************************************************************************
+-- Juniper-CLI-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   Command Line Interface (CLI) MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999 Unisphere Networks, Inc.
+-- Copyright (c) 2002 Juniper Networks, Inc.
+-- Copyright (c) 2007 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-CLI-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, DateAndTime, TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    juniMibs
+        FROM Juniper-MIBs
+    JuniLogSeverity
+        FROM Juniper-TC;
+
+juniCliMIB  MODULE-IDENTITY
+    LAST-UPDATED "200712101325Z"  -- 10-Dec-07 06:55 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Command Line Interface (CLI) MIB for the Juniper Networks
+        enterprise."
+    -- Revision History
+    REVISION    "200712101325Z"  -- 10-Dec-07 06:55 PM EST  - JUNOSe 9.1
+    DESCRIPTION
+        "Added the juniCliConfigurationTable. A script file transferred using
+        JUNIPER-FILE-XFER-MIB can be applied using this table."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200009261350Z"  -- 26-Sep-00 09:50 AM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Make it SMIv2 conformant."
+    REVISION      "9912010000Z"  -- 01-Dec-99
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 30 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- MIB Structure
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniCliTrap          OBJECT IDENTIFIER ::= { juniCliMIB 0 }
+juniCliObjects       OBJECT IDENTIFIER ::= { juniCliMIB 1 }
+juniCliConformance   OBJECT IDENTIFIER ::= { juniCliMIB 2 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+--
+-- Object Groups
+--
+juniCliGeneral       OBJECT IDENTIFIER ::= { juniCliObjects 1 }
+juniCliSecurity      OBJECT IDENTIFIER ::= { juniCliObjects 2 }
+
+juniCliSecurityTrapEnable  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "An indication of whether the juniCliSecurityAlert notifications are
+        enabled."
+    ::= { juniCliGeneral 1 }
+
+juniCliConfigurationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniCliConfigurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table which has entries for the configuration files which are
+        transferred using juniFileXferMIB."
+    ::= { juniCliObjects 3 }
+
+juniCliConfigurationEntry OBJECT-TYPE
+    SYNTAX      JuniCliConfigurationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in juniCliConfigurationTable represents a CLI configuration
+        file which can be applied using juniConfigurationApply object."
+    INDEX     { juniCliConfigurationIndex }
+    ::= { juniCliConfigurationTable 1 }
+
+JuniCliConfigurationEntry ::= SEQUENCE {
+    juniCliConfigurationIndex             INTEGER,
+    juniCliConfigurationFileName          DisplayString,
+    juniCliConfigurationApply             INTEGER, 
+    juniCliConfigurationOpStatus          INTEGER }
+
+juniCliConfigurationIndex OBJECT-TYPE
+    SYNTAX      INTEGER (1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A unique index used to identify this entry. The value of the index is
+        same as the index in juniFileXferTable from juniFileXferMIB. The 
+        entries in this table correspond only to those entries in the
+        juniFileXferTable which has the juniFileXferFileType specified as
+        juniFileXferScript."
+    ::= { juniCliConfigurationEntry 1 }
+
+juniCliConfigurationFileName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..128))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The full path name of the CLI configuration files on the router which
+        are copied using juniFileXferMIB. The configuration specified in these
+        file can be applied to the router."
+    ::= { juniCliConfigurationEntry 2 }
+
+juniCliConfigurationApply OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniCliConfigurationReadyToApply(0),
+                    juniCliConfigurationApplyNow(1)}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "As soon as a CLI configuration file is transferred using
+        juniFileXferMIB, this value is set to juniCliConfigurationReadyToApply.
+        If the user wants to apply the configuration specified in this file,
+        the value of this object needs to be set to 
+        juniCliConfigurationApplyNow. Once the operation is completed, the 
+        status of the operation is updated in juniCliConfigurationOpStatus 
+        object and the value of juniCliConfigurationApply is reset to
+        juniCliConfigurationReadyToApply."
+    DEFVAL { juniCliConfigurationReadyToApply }
+    ::= { juniCliConfigurationEntry 3 }
+
+juniCliConfigurationOpStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniCliConfigurationOpNoOp (0),
+                    juniCliConfigurationOpSuccessful(1),
+                    juniCliConfigurationOpInProgress(2),
+                    juniCliConfigurationFileNotFound(3),
+                    juniCliConfigurationFileIncompatible(4),
+                    juniCliConfigurationOperationFailed(5) } --Failed due to any
+                                                           --other reason  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of the operation. Once the CLI configuration file is 
+        copied, the value of this object is set to juniCliConfigurationOp. Once
+        the administrator sets the vlaue of juniCliConfigurationApply object to
+        be juniCliConfigurationApplyNow,the status is changed to
+        juniCliConfigurationOpInProgress until the operation is completed. After
+        completion of the operation, the status is set to one of the specified
+        values."
+    DEFVAL { juniCliConfigurationOpNoOp }    
+    ::= { juniCliConfigurationEntry 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Traps & Trap Control
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniCliSecurityAlertPriority  OBJECT-TYPE
+    SYNTAX      JuniLogSeverity
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The priority level of the cli security alert."
+    ::= { juniCliSecurity 1 }
+
+juniCliSecurityAlertMessage  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The cli security alert message."
+    ::= { juniCliSecurity 2 }
+
+juniCliSecurityAlertTime  OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The date and time of this cliSecurityAlert."
+    ::= { juniCliSecurity 3 }
+
+
+juniCliSecurityAlert  NOTIFICATION-TYPE
+    OBJECTS {
+        juniCliSecurityAlertPriority,
+        juniCliSecurityAlertMessage,
+        juniCliSecurityAlertTime }
+    STATUS      current
+    DESCRIPTION
+        "Reports a cli security alert.  Events such as the following generate
+        this notification when it is enabled:
+            - Logins/logouts from telnet or console access
+            - Logins/logout from SSH
+            - Access from unknown IP addreses
+            - Access list accept or failures
+            - Successful and unsuccessful authentications "
+    ::= { juniCliTrap 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniCliCompliances  OBJECT IDENTIFIER ::= { juniCliConformance 1 }
+juniCliGroups       OBJECT IDENTIFIER ::= { juniCliConformance 2 }
+
+--
+-- compliance statements
+--
+juniCliCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities that implement the Juniper 
+        CLI MIB. This statement became obsolete when new groups were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniCliGroup,
+            juniCliSecurityAlertGroup,
+            juniCliSecurityTrapGroup }
+    ::= { juniCliCompliances 1 }
+
+juniCliCompliance2  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities that implement the Juniper CLI
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniCliGroup,
+            juniCliSecurityAlertGroup,
+            juniCliSecurityTrapGroup,
+            juniCliConfigurationGroup }
+    ::= { juniCliCompliances 2 }
+
+--
+-- units of conformance
+--
+juniCliGroup  OBJECT-GROUP
+    OBJECTS {
+        juniCliSecurityTrapEnable }
+    STATUS      current
+    DESCRIPTION
+        "A management object pertaining to CLI security configuration."
+    ::= { juniCliGroups 1 }
+
+juniCliSecurityAlertGroup  OBJECT-GROUP
+    OBJECTS {
+        juniCliSecurityAlertPriority,
+        juniCliSecurityAlertMessage,
+        juniCliSecurityAlertTime }
+    STATUS      current
+    DESCRIPTION
+        "A collection of management objects pertaining to CLI security alert
+        notification."
+    ::= { juniCliGroups 2 }
+
+juniCliSecurityTrapGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniCliSecurityAlert }
+    STATUS      current
+    DESCRIPTION
+        "A management notification pertaining to CLI security operations."
+    ::= { juniCliGroups 3 }
+
+juniCliConfigurationGroup  OBJECT-GROUP
+    OBJECTS {
+        juniCliConfigurationFileName,
+        juniCliConfigurationApply,
+        juniCliConfigurationOpStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing information to implementers for
+        applying configuration on a Juniper router."
+    ::= { juniCliGroups 4 }
+
+END

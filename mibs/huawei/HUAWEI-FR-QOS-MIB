@@ -1,0 +1,621 @@
+-- =================================================================
+-- Copyright (C) 2004 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: This mib file is used for management of huawei Class Based 
+--              FR QoS information. 
+-- Reference:
+-- Version:     V1.0
+-- History:
+--  2004-07-12   V1.00   CAOLEI  publish 
+-- =================================================================
+
+HUAWEI-FR-QOS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hwDatacomm 
+            FROM HUAWEI-MIB
+        ifIndex            
+            FROM RFC1213-MIB
+        OBJECT-GROUP, MODULE-COMPLIANCE                 
+            FROM SNMPv2-CONF
+        IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY                   
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, RowStatus, DisplayString, MacAddress
+               FROM SNMPv2-TC;        
+                 
+    -- 
+    -- type definitions in the policy 
+    -- 
+                
+    -- Direction         
+    
+    DirectionType ::= TEXTUAL-CONVENTION
+        STATUS  current  
+        DESCRIPTION
+            "The Direction Policy apply on."                 
+        SYNTAX  INTEGER { 
+            inbound (1),
+            outbound (2)
+            }                  
+
+    -- 
+    -- end of type definitions in policy 
+    -- 
+
+    -- 1.3.6.1.4.1.2011.5.25.32
+    hwQoS OBJECT IDENTIFIER ::= { hwDatacomm 32 }                  
+                    
+    -- 1.3.6.1.4.1.2011.5.25.36
+    hwFrQoSMib MODULE-IDENTITY 
+        LAST-UPDATED "200407120000Z"    -- JULY 12, 2004 at 00:00 GMT
+        ORGANIZATION 
+            "Huawei Technologies co.,Ltd."
+        CONTACT-INFO 
+            " R&D BeiJing, Huawei Technologies co.,Ltd.
+            Huawei Bld.,NO.3 Xinxi Rd., 
+            Shang-Di Information Industry Base,
+            Hai-Dian District Beijing P.R. China
+            Zip:100085 
+            Http://www.huawei.com                                       
+            E-mail:support@huawei.com "
+        DESCRIPTION 
+            "The HUAWEI-FR-QOS-MIB contains objects to 
+            Manage configuration and Monitor running state 
+            for Class Based FR QoS feature.
+            
+                   *********************************
+                    MIB Tables
+                   **********************************
+            This MIB consists of the following tables:
+                 1 :  hwFrClassCfgInfoTable
+                 2 :  hwCirAllowCfgInfoTable
+                 3 :  hwCirCfgInfoTable
+                 4 :  hwIfApplyFrClassTable
+                 5 :  hwPvcApplyFrClassTable
+                 6 :  hwFrPvcBandwidthTable
+                 7 :  hwRTPFrClassApplyTable
+                 8 :  hwRTPFrPvcQueueRunInfoTable                        
+            "
+        ::= { hwQoS 3 } 
+                
+    -- 
+    -- Node definitions
+    -- 
+
+    -- 1.3.6.1.4.1.2011.5.25.36.1
+                hwFrQoSObjects OBJECT IDENTIFIER ::= { hwFrQoSMib 1 } 
+                                                                                                           
+    -- hwFrClassObjects 
+        
+    hwFrClassObjects OBJECT IDENTIFIER ::= { hwFrQoSObjects 1 } 
+        
+    -- Fr Class Next Index 
+    hwFrClassIndexNext OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object contains an appropriate value to be used for 
+            hwFrClassIndex when creating rows in the 
+            hwFrClassCfgInfoTable. Begin with 0.
+            "                                
+        ::= { hwFrClassObjects 1 }
+                                                                                                 
+    -- Fr Class               
+    hwFrClassCfgInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwFrClassCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Fr Class configuration information."
+        ::= { hwFrClassObjects 2 }
+
+    hwFrClassCfgInfoEntry OBJECT-TYPE
+        SYNTAX HwFrClassCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Fr Class Configuration Information Entry."
+        INDEX { hwFrClassIndex }
+        ::= { hwFrClassCfgInfoTable 1 }
+        
+    HwFrClassCfgInfoEntry ::=
+        SEQUENCE { 
+            hwFrClassIndex
+                Integer32,
+            hwFrClassName
+                OCTET STRING,
+            hwFrClassRowStatus
+                RowStatus
+        }     
+
+        
+    hwFrClassIndex OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of Fr Class. Begin with 0."
+        ::= { hwFrClassCfgInfoEntry 1 }
+                
+    hwFrClassName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Name of Fr Class."
+        ::= { hwFrClassCfgInfoEntry 2 }                                  
+        
+    hwFrClassRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus. Three actions are used: active,
+            createAndGo, destroy"
+        ::= { hwFrClassCfgInfoEntry 3 }
+
+    -- Cir Allow on the Fr Class               
+    hwCirAllowCfgInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCirAllowCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of DCE allowed rate Configuration information."
+        ::= { hwFrClassObjects 3 }
+        
+    hwCirAllowCfgInfoEntry OBJECT-TYPE
+        SYNTAX HwCirAllowCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DCE allowed ratee Configuration Information Entry."
+        INDEX { hwCirAllowFrClassIndex,
+                hwCirAllowDirection}
+        ::= { hwCirAllowCfgInfoTable 1 }
+        
+    HwCirAllowCfgInfoEntry ::=
+        SEQUENCE { 
+            hwCirAllowFrClassIndex
+                Integer32,  
+            hwCirAllowDirection 
+                Integer32,                                        
+            hwCirAllowValue
+                Integer32, 
+            hwCirAllowRowStatus
+                RowStatus
+        } 
+        
+    hwCirAllowFrClassIndex OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of Fr Class. Begin with 0.Equal to hwFrClassIndex"
+        ::= { hwCirAllowCfgInfoEntry 1 }
+                
+    hwCirAllowDirection OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Packet Direction. 
+            value 1,2,3 Used by hwCirAllowValue.            
+            inbound (1)
+            outbound (2)
+            inbound and outbound (3)  
+            "
+        ::= { hwCirAllowCfgInfoEntry 2 }                                  
+        
+    hwCirAllowValue OBJECT-TYPE
+        SYNTAX Integer32(1..45000000) 
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DCE allowed rate (value greater than CIR) 
+            Unit : Bits per second. 
+            Value : <1-45000000> ."
+        ::= { hwCirAllowCfgInfoEntry 3 } 
+        
+    hwCirAllowRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus. Three actions are used: active,
+            createAndGo, destroy"
+        ::= { hwCirAllowCfgInfoEntry 4 }
+                                            
+    -- Cir on the Fr Class               
+    hwCirCfgInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCirCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Committed Information Rate Configuration information."
+        ::= { hwFrClassObjects 4 }
+        
+    hwCirCfgInfoEntry OBJECT-TYPE
+        SYNTAX HwCirCfgInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Committed Information Rate Configuration Information Entry."
+        INDEX { hwCirFrClassIndex }
+        ::= { hwCirCfgInfoTable 1 }
+        
+    HwCirCfgInfoEntry ::=
+        SEQUENCE { 
+            hwCirFrClassIndex
+                Integer32,  
+            hwCirValue
+                Integer32,        
+            hwCirRowStatus
+                RowStatus
+        } 
+        
+    hwCirFrClassIndex OBJECT-TYPE
+        SYNTAX Integer32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of Fr Class. Begin with 0.Equal to hwFrClassIndex"
+        ::= { hwCirCfgInfoEntry 1 }
+                
+    hwCirValue OBJECT-TYPE
+        SYNTAX Integer32(1000..45000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            " CIR in packet output direction ,bps. 
+            Value : <1000-45000000>."
+        ::= { hwCirCfgInfoEntry 2 } 
+                                       
+    hwCirRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus. Three actions are used: active,
+            createAndGo, destroy"
+        ::= { hwCirCfgInfoEntry 3 }
+        
+                                          
+    -- Fr Class Instance on interface Table
+    hwIfApplyFrClassTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwIfApplyFrClassEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of QoS Fr Class instance."
+        ::= { hwFrClassObjects 5 }
+        
+    hwIfApplyFrClassEntry OBJECT-TYPE
+        SYNTAX HwIfApplyFrClassEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "FrClass applied on interface Configuration Information Entry."
+        INDEX { hwIfApplyFrClassIfIndex }
+        ::= { hwIfApplyFrClassTable 1 }
+        
+    HwIfApplyFrClassEntry ::=
+            SEQUENCE {        
+                hwIfApplyFrClassIfIndex
+            Integer32,                                                                                                                                              
+                hwIfApplyFrClassIndex
+            Integer32,    
+                hwIfApplyFrClassRowStatus
+            RowStatus                                                                            
+        }    
+                                             
+    hwIfApplyFrClassIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interface Index, equal to ifIndex."
+        ::= { hwIfApplyFrClassEntry 1 }    
+        
+    hwIfApplyFrClassIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Index of Fr Class, equal to hwFrClassIndex"
+        ::= { hwIfApplyFrClassEntry 2 }    
+        
+    hwIfApplyFrClassRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus. Three actions are used: active,
+            createAndGo, destroy"
+        ::= { hwIfApplyFrClassEntry 3 }
+                 
+    -- Fr Class Instance on fr pvc Table                        
+    hwPvcApplyFrClassTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwPvcApplyFrClassEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of QoS Fr Class instance."
+        ::= { hwFrClassObjects 6 }
+        
+    hwPvcApplyFrClassEntry OBJECT-TYPE
+        SYNTAX HwPvcApplyFrClassEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Fr Class applied on FR Pvc Configuration Information Entry."
+        INDEX { hwPvcApplyFrClassIfIndex, 
+            hwPvcApplyFrClassDlciNum 
+        }
+        ::= { hwPvcApplyFrClassTable 1 }
+        
+    HwPvcApplyFrClassEntry ::=
+        SEQUENCE {            
+            hwPvcApplyFrClassIfIndex
+                Integer32,
+            hwPvcApplyFrClassDlciNum
+                Integer32,                                                                                                                                        
+            hwPvcApplyFrClassIndex
+                Integer32,
+            hwPvcApplyFrClassRowStatus
+                RowStatus                                                                                                                 
+        }    
+                                             
+    hwPvcApplyFrClassIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Fr Interface Index, equal to ifIndex."
+        ::= { hwPvcApplyFrClassEntry 1 }
+        
+    hwPvcApplyFrClassDlciNum OBJECT-TYPE
+        SYNTAX Integer32 (16..1007)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Fr DLCI number."
+        ::= { hwPvcApplyFrClassEntry 2 }                            
+        
+    hwPvcApplyFrClassIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Index of Fr Class, equal to hwFrClassIndex"
+        ::= { hwPvcApplyFrClassEntry 3 }    
+        
+    hwPvcApplyFrClassRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus. Three actions are used: active,
+            createAndGo, destroy"
+        ::= { hwPvcApplyFrClassEntry 4 }
+
+
+    -- bandwidth parameter on interface                        
+                       
+    hwFrPvcBandwidthTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwFrPvcBandwidthEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Running statistics for bandwidth.
+            "
+        ::= { hwFrClassObjects 7 }
+        
+    hwFrPvcBandwidthEntry OBJECT-TYPE
+        SYNTAX HwFrPvcBandwidthEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Bandwidth Running statistics"
+        INDEX { hwPvcApplyFrClassIfIndex, 
+            hwPvcApplyFrClassDlciNum 
+        }
+
+        ::= { hwFrPvcBandwidthTable 1 }
+        
+    HwFrPvcBandwidthEntry ::=
+            SEQUENCE {                                                                                                                                                                          
+                hwFrPvcBandwidthMaxReservedBW
+                    Integer32,
+                hwFrPvcBandwidthAvailable
+                    Integer32    
+                                                                                                
+                }                                                                            
+                    
+    hwFrPvcBandwidthMaxReservedBW OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max reserved bandWidth. Unit : Kbps"
+        ::= { hwFrPvcBandwidthEntry 1 }    
+        
+    hwFrPvcBandwidthAvailable OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Available bandWidth. Unit : Kbps"
+        ::= { hwFrPvcBandwidthEntry 2 }              
+        
+                                                                                                       
+    -- hwRTPQoSObjects 
+        
+    hwRTPQoSObjects OBJECT IDENTIFIER ::= { hwFrQoSObjects 2 } 
+        
+    -- Rtpq applied on the Fr Class 
+        
+    hwRTPFrClassApplyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwRTPFrClassApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of QoS rtpq instance."
+        ::= { hwRTPQoSObjects 1 }
+        
+    hwRTPFrClassApplyEntry OBJECT-TYPE
+        SYNTAX HwRTPFrClassApplyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Rtpq Configuration Information Entry."
+        INDEX { hwRTPFrClassApplyFrClassIndex }
+        ::= { hwRTPFrClassApplyTable 1 }
+        
+    HwRTPFrClassApplyEntry ::=
+        SEQUENCE { 
+            hwRTPFrClassApplyFrClassIndex
+                Integer32,
+            hwRTPFrClassApplyStartPort
+                Integer32,
+            hwRTPFrClassApplyEndPort 
+                Integer32,
+            hwRTPFrClassApplyBandWidth 
+                Integer32,
+            hwRTPFrClassApplyCbs 
+                Integer32,                
+            hwRTPFrClassApplyRowStatus 
+                RowStatus                                        
+        }  
+        
+    hwRTPFrClassApplyFrClassIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Fr Class Index, equal to HwFrClassIndex."
+        ::= { hwRTPFrClassApplyEntry 1 }    
+        
+    hwRTPFrClassApplyStartPort OBJECT-TYPE
+        SYNTAX Integer32(2000..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                                                                                        
+            RTP-PORT(3): start-port: 2000~65535   
+            "                         
+        ::= { hwRTPFrClassApplyEntry 2 }
+        
+    hwRTPFrClassApplyEndPort OBJECT-TYPE
+        SYNTAX Integer32(2000..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "                         
+            RTP-PORT(3): end-port: 2000~65535
+            "                         
+        ::= { hwRTPFrClassApplyEntry 3 }
+        
+    hwRTPFrClassApplyBandWidth OBJECT-TYPE
+        SYNTAX Integer32 (8..1000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Max bandWidth Value:
+            Absolute value: 8~1000000. Unit: Kbps             
+            "                
+        ::= { hwRTPFrClassApplyEntry 4 }  
+        
+    hwRTPFrClassApplyCbs OBJECT-TYPE
+        SYNTAX Integer32 (1500..2000000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "
+            Committed Burst Size: 1500~2000000. Unit: byte             
+            "                
+        ::= { hwRTPFrClassApplyEntry 5 }          
+        
+    hwRTPFrClassApplyRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "RowStatus for RTPFrClassApply Table. 
+            Three actions are used: active, createAndGo, destroy"
+        ::= { hwRTPFrClassApplyEntry 6 } 
+
+    -- RTPQ statistics on the Fr Pvc 
+                         
+    hwRTPFrPvcQueueRunInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwRTPFrPvcQueueRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of Running statistics for RTPQ Queue
+            applied on the FR PVC"
+        ::= { hwRTPQoSObjects 2 }
+        
+    hwRTPFrPvcQueueRunInfoEntry OBJECT-TYPE
+        SYNTAX HwRTPFrPvcQueueRunInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Queue statistics entry."
+        INDEX { hwPvcApplyFrClassIfIndex,                                
+            hwPvcApplyFrClassDlciNum                              
+        }
+        ::= { hwRTPFrPvcQueueRunInfoTable 1 }
+        
+    HwRTPFrPvcQueueRunInfoEntry ::=
+        SEQUENCE {
+            hwRTPFrPvcQueueSize
+                Integer32,
+            hwRTPFrPvcQueueMaxSize
+                Integer32, 
+            hwRTPFrPvcQueueOutputs
+                Counter32,
+            hwRTPFrPvcQueueDiscards
+                Counter32                                                                                                                                                                                                                                    
+        }  
+            
+    hwRTPFrPvcQueueSize OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Size of Rtpq Queue."
+        ::= { hwRTPFrPvcQueueRunInfoEntry 1 }    
+                             
+    hwRTPFrPvcQueueMaxSize OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Max size of Rtpq Queue."
+        ::= { hwRTPFrPvcQueueRunInfoEntry 2 }
+        
+    hwRTPFrPvcQueueOutputs OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Outputs of Rtpq Queue."
+        ::= { hwRTPFrPvcQueueRunInfoEntry 3 } 
+                 
+    hwRTPFrPvcQueueDiscards OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Discards of Rtpq Queue."
+        ::= { hwRTPFrPvcQueueRunInfoEntry 4 }
+                                                    
+END
+
+    -- 
+    -- HUAWEI-FR-QOS-MIB.mib
+    -- 
+                        
+                             
+                                                                                                       

@@ -1,0 +1,2472 @@
+CTRON-DECIV-ROUTER-MIB  DEFINITIONS ::= BEGIN
+
+--  ctron-deciv-router-mib.txt
+--  Revision: 1.01.03
+--  Part Number: 2170985
+--  Date: August 11, 1995
+
+--  Cabletron Systems, Inc.
+--  35 Industrial Way, P.O. Box 5005
+--  Rochester, NH 03867-0505
+--  (603) 332-9400
+--  support@ctron.com
+
+--  This module provides authoritative definitions for Cabletron's
+--  enterprise specific DECnet Routing Services MIB.
+--
+--  This module will be extended as required.
+
+--  Cabletron Systems reserves the right to make changes in
+--  specification and other information contained in this document
+--  without prior notice.  The reader should consult Cabletron Systems
+--  to determine whether any such changes have been made.
+--
+--  In no event shall Cabletron Systems be liable for any incidental,
+--  indirect, special, or consequential damages whatsoever (including
+--  but not limited to lost profits) arising out of or related to this
+--  document or the information contained in it, even if Cabletron
+--  Systems has been advised of, known, or should have known, the
+--  possibility of such damages.
+
+--  Cabletron grants vendors, end-users, and other interested parties
+--  a non-exclusive license to use this Specification in connection
+--  with the management of Cabletron products.
+
+--  Copyright August 95 Cabletron Systems
+
+
+
+IMPORTS
+      OBJECT-TYPE
+        FROM RFC-1212
+      DisplayString
+        FROM RFC1213-MIB
+        nwRtrProtoSuites
+                FROM ROUTER-OIDS
+      Counter, TimeTicks, Gauge
+        FROM RFC1155-SMI;
+
+
+--  The DECnet Phase IV Router Group.
+
+nwDecIVRouter             OBJECT IDENTIFIER ::= { nwRtrProtoSuites 3 }
+
+nwDecIVMibs               OBJECT IDENTIFIER ::= { nwDecIVRouter 1 }
+nwDecIVComponents         OBJECT IDENTIFIER ::= { nwDecIVRouter 2 }
+
+
+--  DECnet Phase IV Router Component Groups
+
+nwDecIVSystem             OBJECT IDENTIFIER ::= { nwDecIVComponents 1 }
+nwDecIVForwarding         OBJECT IDENTIFIER ::= { nwDecIVComponents 2 }
+nwDecIVTopology           OBJECT IDENTIFIER ::= { nwDecIVComponents 4 }
+nwDecIVFib                OBJECT IDENTIFIER ::= { nwDecIVComponents 5 }
+nwDecIVEndSystems         OBJECT IDENTIFIER ::= { nwDecIVComponents 6 }
+nwDecIVAccessControl      OBJECT IDENTIFIER ::= { nwDecIVComponents 7 }
+nwDecIVFilters            OBJECT IDENTIFIER ::= { nwDecIVComponents 8 }
+nwDecIVRedirector         OBJECT IDENTIFIER ::= { nwDecIVComponents 9 }
+nwDecIVEvent              OBJECT IDENTIFIER ::= { nwDecIVComponents 10 }
+nwDecIVWorkGroup          OBJECT IDENTIFIER ::= { nwDecIVComponents 11 }
+
+
+--  DECnet Phase IV Router System Groups
+
+nwDecIVSysConfig          OBJECT IDENTIFIER ::= { nwDecIVSystem 1 }
+nwDecIVSysAdministration  OBJECT IDENTIFIER ::= { nwDecIVSystem 2 }
+
+
+--  DECnet Phase IV Router Forwarding Groups
+
+nwDecIVFwdSystem          OBJECT IDENTIFIER ::= { nwDecIVForwarding 1 }
+nwDecIVFwdInterfaces      OBJECT IDENTIFIER ::= { nwDecIVForwarding 2 }
+
+nwDecIVFwdCounters        OBJECT IDENTIFIER ::= { nwDecIVFwdSystem 1 }
+nwDecIVFwdIfConfig        OBJECT IDENTIFIER ::= { nwDecIVFwdInterfaces 1 }
+nwDecIVFwdIfCounters      OBJECT IDENTIFIER ::= { nwDecIVFwdInterfaces 2 }
+
+
+--  DECnet Phase IV Router Routing Groups
+
+nwDecIVDistanceVector     OBJECT IDENTIFIER ::= { nwDecIVTopology 1 }
+nwDecIVLinkState          OBJECT IDENTIFIER ::= { nwDecIVTopology 2 }
+
+nwDecIVProto              OBJECT IDENTIFIER ::= { nwDecIVDistanceVector 1 }
+nwDecIVProtoSystem        OBJECT IDENTIFIER ::= { nwDecIVProto 1 }
+nwDecIVProtoInterface     OBJECT IDENTIFIER ::= { nwDecIVProto 2 }
+
+nwDecIVProtoConfig        OBJECT IDENTIFIER ::= { nwDecIVProtoSystem 1 }
+nwDecIVProtoCounters      OBJECT IDENTIFIER ::= { nwDecIVProtoSystem 2 }
+nwDecIVProtoIfConfig      OBJECT IDENTIFIER ::= { nwDecIVProtoInterface 1 }
+nwDecIVProtoIfCounters    OBJECT IDENTIFIER ::= { nwDecIVProtoInterface 2 }
+
+--  DECnet Phase IV Router Host End Systems Groups
+
+nwDecIVHostsSystem        OBJECT IDENTIFIER ::= { nwDecIVEndSystems 1 }
+nwDecIVHostsInterfaces    OBJECT IDENTIFIER ::= { nwDecIVEndSystems 2 }
+nwDecIVHostsToMedia          OBJECT IDENTIFIER ::= { nwDecIVEndSystems 3 }
+
+
+--  DECnet Phase IV Router Access Control Group
+
+
+--  DECnet Phase IV Router Event Log Group
+
+nwDecIVEventLogConfig           OBJECT IDENTIFIER ::= { nwDecIVEvent 1 }
+nwDecIVEventLogFilterTable      OBJECT IDENTIFIER ::= { nwDecIVEvent 2 }
+nwDecIVEventLogTable            OBJECT IDENTIFIER ::= { nwDecIVEvent 3 }
+
+--  DECnet Phase IV Router Work-Group Group
+
+
+DecIVAddress ::= OCTET STRING
+--  MacAddress ::= OCTET STRING (SIZE (6))
+
+
+--  DECnet Phase IV MIB Group
+--  This group contains information about the revision level of this
+--  MIB within the device.  It allows verification of the released
+--  version without having to read other objects.
+
+nwDecIVMibRevText      OBJECT-TYPE
+    SYNTAX         DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the current revision level of the DECnet Phase
+        IV MIB in textual format."     
+    ::= { nwDecIVMibs 1 }
+
+   
+--  DECnet Phase IV Router System Group
+--  This group contains the objects related to the DECnet Phase IV Router at a
+--  global device-wide level.
+
+--  DECnet Phase IV System Configuration Group
+--  This group contains the objects that pertain to the setup and
+--  configuration of the DECnet Phase IV routing services at a global,
+--  device-wide level.
+
+nwDecIVSysRouterId     OBJECT-TYPE
+    SYNTAX      DecIVAddress
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "The DECnet Address used to uniquely identify the host (device)
+        running DECnet Phase IV Routing Services. Since DECnet Phase IV
+        uses a single address to identify the host and all of its router
+        ports, rather than using an address per router port,
+        nwDecIVSysRouterID is the DECnet node address for all the router
+        ports on the device."
+    ::= { nwDecIVSysConfig 1 }
+
+nwDecIVNodeType        OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),        -- not configured
+                routing-iv(2),    -- level 1 router
+                area(3)            -- level 2 router
+            }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the node type. Setting this value to 2, (routing-iv),
+        establishes the Routing Services-enabled device as a DECnet
+        Level 1, intra-area router. Setting this value to 2, establishes
+        the Routing Services-enabled device as a DECnet Phase IV Level 2,
+        or inter-area router."
+   DEFVAL { routing-iv }
+   ::= { nwDecIVSysConfig 2 }
+
+nwDecIVMaxNodes        OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum number of DECnet nodes allowed within an
+        area."
+    DEFVAL { 1023 }
+    ::= { nwDecIVSysConfig 3 }
+
+nwDecIVMaxBRA          OBJECT-TYPE
+    SYNTAX            INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum number of router adjacencies supported by
+        this node."
+    DEFVAL { 16 }
+    ::= { nwDecIVSysConfig 4 }
+
+nwDecIVMaxBEA          OBJECT-TYPE
+    SYNTAX             INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum number of endnode adjacencies supported
+        by this node."
+    DEFVAL { 64 }
+    ::= { nwDecIVSysConfig 5 }
+
+nwDecIVMaxHops         OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum number of hops allowed for a valid route
+        within the area. Any intra-area route consisting of a greater
+        number of hops than specified by nwDecIVMaxHops is considered
+        unreachable."
+    DEFVAL { 30 }
+    ::= { nwDecIVSysConfig 6 }
+
+nwDecIVMaxCost         OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum cost allowed for a valid route within the
+        area. Any intra-area route with a cost greater than nwDecIVMaxCost
+        is considered unreachable."
+    DEFVAL { 1022 }
+    ::= { nwDecIVSysConfig 7 }
+
+nwDecIVMaxVisits       OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum number of intra-area hops a packet can be
+        forwarded. A packet is dropped once it has been forwarded
+        nwDecIVMaxVisits."
+    DEFVAL { 63 }
+    ::= { nwDecIVSysConfig 8 }
+
+nwDecIVNonBroadcastTimer        OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the periodic interval (in seconds) at which DECnet
+        Routing Services advertises its route table, on any non-broadcast
+        networks attached to any router port configured and enabled for
+        DECnet Phase IV Routing Services."
+    DEFVAL { 1000 }
+    ::= { nwDecIVSysConfig 9 }
+
+nwDecIVBroadcastTimer  OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the periodic interval (in seconds) at which DECnet
+        Routing Services advertises its route table on any multi-access
+        broadcast networks attached to any router port configured and 
+        enabled for DECnet Phase IV Routing Services."
+    DEFVAL { 1000 }
+    ::= { nwDecIVSysConfig 10 }
+
+nwDecIVAreas           OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum number of areas allowed within a Level 2
+        (inter-area)routing domain."
+    DEFVAL { 63 }
+    ::= { nwDecIVSysConfig 11 }
+
+nwDecIVMaxAreaHops     OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum number of areas that can be hopped by
+        a valid inter-area route. Any inter-area route requiring a 
+        greater number of areas to be hopped than specified by 
+        nwDecIVMaxAreaHops is considered invalid."
+    DEFVAL { 30 }
+    ::= { nwDecIVSysConfig 12 }
+
+nwDecIVMaxAreaCost     OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the maximum cost allowed for a valid Level 2
+        (inter-area) route. Any inter-area route with a cost greater than
+        nwDecIVMaxAreaCost is considered unreachable."
+    DEFVAL { 1022 }
+    ::= { nwDecIVSysConfig 13 }
+
+--  DECnet Phase IV System Administration Group
+nwDecIVSysAdminStatus  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        other(1),         --  none of the following
+                        disabled(2),      --  shutdown DECnet routing services
+                        enabled(3)        --  startup DECnet routing services
+            }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Sets the administrative state of DECnet Phase IV Routing Services,
+        system-wide. Enabled (3) causes DECnet Phase IV system-wide Routing
+        Services to become active on all router ports configured and enabled
+        for DECnet Phase IV Routing Services. Disabled (2) causes DECnet
+        Phase IV Routing Services to become inactive system-wide."
+    DEFVAL { enabled }
+    ::= { nwDecIVSysAdministration 1 }
+
+nwDecIVSysOperStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),     --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of DECnet Phase IV
+        Routing Services system-wide. The value of nwDecIVSysOperStatus
+        indicates any problem with your DECnet Phase IV Routing Services
+        configuration. A value of 6 indicates that regardless of the value
+        of nwDecIVSysAdminStatus, DECnet Phase IV Routing Services is not
+        operating because of an invalid configuration."
+    DEFVAL { enabled }
+    ::= { nwDecIVSysAdministration 2 }
+                
+nwDecIVSysAdminReset   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Resets DECnet Phase IV Routing Services, system-wide. Reset (2)
+        forces a restart of DECnet Phase IV Routing Services without a
+        graceful shutdown on any active router ports and without affecting
+        any other routing services."
+    DEFVAL { other }
+    ::= { nwDecIVSysAdministration 3 }
+                
+nwDecIVSysOperationalTime  OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwDecIVSysOperStatus has been in it's current state."
+    ::= { nwDecIVSysAdministration 4 }
+
+nwDecIVSysVersion  OBJECT-TYPE
+    SYNTAX      DisplayString 
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the current revision level of the DECnet Phase IV Routing
+        Services firmware, in textual format."
+    ::= { nwDecIVSysAdministration 5 }
+
+
+--  DECnet Phase IV Forwarding Group
+--  This group contains the managed objects used to setup and configure
+--  the DECnet Phase IV router network router ports for packet forwarding as well as
+--  the aggregate and per-interface DECnet Phase IV packet forwarding counters.
+
+--  DECnet Phase IV System-wide Packet Forwarding Counters
+
+nwDecIVFwdCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),        -- none of the following
+                            disabled(2),    -- counters off
+                            enabled(3)        -- counters on
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregate (system-wide)
+        DECnet packet and byte counters. Enabled (3) causes these counters
+        to become active. Disabled (2) causes these counters to become
+        inactive."
+    DEFVAL { enabled }
+    ::= { nwDecIVFwdCounters 1 }
+
+nwDecIVFwdCtrReset     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),        -- none of the following
+                            reset(2)        -- force a reset
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the aggregate (system-wide) DECnet packet and byte counters.
+        Reset (2) resets the DECnet aggregate counters to 0.
+        nwDecIVFwdCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwDecIVFwdCounters 2 }
+
+nwDecIVFwdCtrOperationalTime       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        DecIVFwdCtrOperStatus has been in the current state."
+    ::= { nwDecIVFwdCounters 3 }
+
+nwDecIVFwdCtrInPkts    OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        received, system-wide, during nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 4 }
+
+nwDecIVFwdCtrOutPkts   OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        transmitted, system-wide, during nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 5 }
+
+nwDecIVFwdCtrFwdPkts   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the total number of DECnet packets that have been
+           forwarded, system-wide, during nwDecIVFwdCtrOperationalTime."
+        ::= { nwDecIVFwdCounters 6 }
+
+nwDecIVFwdCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        administratively filtered, system-wide, during
+        nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 7 }
+
+nwDecIVFwdCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded, system-wide, during nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 8 }
+
+nwDecIVFwdCtrAddrErrPkts        OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been 
+        discarded, system-wide, during nwDecIVFwdCtrOperationalTime,
+        because of addressing errors in the DECnet header."
+    ::= { nwDecIVFwdCounters 9 }
+
+nwDecIVFwdCtrLenErrPkts        OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded, system-wide, during nwDecIVFwdCtrOperationalTime,
+        because an invalid packet length is contained in the DECnet header."
+    ::= { nwDecIVFwdCounters 10 }
+
+nwDecIVFwdCtrHdrErrPkts        OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded, system-wide, during nwDecIVFwdCtrOperationalTime,
+        because of an invalid DECnet header."
+    ::= { nwDecIVFwdCounters 11 }
+
+nwDecIVFwdCtrInBytes   OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been received, system-wide, during nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 12 }
+
+nwDecIVFwdCtrOutBytes  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been transmitted, system-wide, during 
+        nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 13 }
+
+nwDecIVFwdCtrFwdBytes  OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets
+        that have been forwarded, system-wide, during
+        nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 14 }
+
+nwDecIVFwdCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been administratively filtered, system-wide, during
+        nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 15 }
+
+nwDecIVFwdCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been discarded, system wide, during nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 16 }
+
+nwDecIVFwdCtrHostInPkts   OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        successfully delivered to the local host, during
+        nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 17 }
+
+nwDecIVFwdCtrHostOutPkts OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        transmitted by the local host, during nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 18 }
+
+nwDecIVFwdCtrHostDiscardPkts OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded by the local host, during nwDecIVFwdCtrOperationalTime, 
+        due to a lack of host resources."
+    ::= { nwDecIVFwdCounters 19 }
+
+nwDecIVFwdCtrHostInBytes  OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been received by the local host, during
+        nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 20 }
+
+nwDecIVFwdCtrHostOutBytes OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been transmitted by the local host, during
+        nwDecIVFwdCtrOperationalTime."
+    ::= { nwDecIVFwdCounters 21 }
+
+nwDecIVFwdCtrHostDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that have
+        been discarded by the local host, during
+        nwDecIVFwdCtrOperationalTime, due to a lack of host resources."
+    ::= { nwDecIVFwdCounters 22 }
+
+
+--  DECnet Phase IV Forwarding Interface Table
+nwDecIVFwdIfTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NwDecIVFwdIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. This table is
+        indexed by nwDecIVFwdIfIndex, which indicates the value of MIB 2
+        ifIndex, which identifies the router port for which each entry exists."
+    ::= { nwDecIVFwdIfConfig 1 }
+
+nwDecIVFwdIfEntry    OBJECT-TYPE
+    SYNTAX      NwDecIVFwdIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "Each entry specifies the DECnet Phase IV Routing Services
+        configuration for the router port for which the entry exists."
+    INDEX   { nwDecIVFwdIfIndex }
+    ::= { nwDecIVFwdIfTable 1 }
+
+NwDecIVFwdIfEntry ::=
+        SEQUENCE {
+                nwDecIVFwdIfIndex                INTEGER,
+                nwDecIVFwdIfAdminStatus          INTEGER,
+                nwDecIVFwdIfOperStatus             INTEGER,
+                nwDecIVFwdIfOperationalTime      TimeTicks,
+                nwDecIVFwdIfControl              INTEGER,
+                nwDecIVFwdIfMtu                  INTEGER,
+                nwDecIVFwdIfForwarding           INTEGER,
+                nwDecIVFwdIfFrameType            INTEGER,
+                nwDecIVFwdIfAclIdentifier        INTEGER,
+                nwDecIVFwdIfAclStatus            INTEGER,
+                nwDecIVFwdIfCacheControl         INTEGER,
+                nwDecIVFwdIfCacheEntries        Counter,
+                nwDecIVFwdIfCacheHits            Counter,
+                nwDecIVFwdIfCacheMisses          Counter
+        }
+
+nwDecIVFwdIfIndex      OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwDecIVFwdIfEntry 1 }
+
+nwDecIVFwdIfAdminStatus      OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                    }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of DECnet Phase IV Routing Services
+        on the router port for which the entry exists. Enabled (3) causes
+        DECnet Phase IV Routing Services to become active. Disabled (2)
+        causes it to become inactive."
+    DEFVAL { enabled }
+    ::= { nwDecIVFwdIfEntry 2 }
+
+nwDecIVFwdIfOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                        invalid-config(6)     --  not running,invalid config
+        }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of DECnet Phase IV
+        Routing Services on the router port for which the entry exists.
+        The value of nwDecIVFwdIfOperStatus indicates any problem with the
+        configuration of DECnet Phase IV Routing Services on the router port.
+        value of 6 indicates that regardless of the value of
+        nwDecIVFwdIfAdminStatus, DECnet Phase IV Routing Services is not
+        operating because of an invalid port-level configuration."
+    ::= { nwDecIVFwdIfEntry 3 }
+
+nwDecIVFwdIfOperationalTime   OBJECT-TYPE
+    SYNTAX      TimeTicks
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwDecIVFwdIfOperStatus has been in its current state."
+    ::= { nwDecIVFwdIfEntry 4 }
+
+nwDecIVFwdIfControl  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),        -- none of the following
+                        add(2),            -- add this entry
+                        delete(3)        -- delete this entry
+                }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object,
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs. Setting this object has no effect."
+    DEFVAL { add }
+    ::= { nwDecIVFwdIfEntry 5 }
+
+nwDecIVFwdIfMtu        OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Specifies the Maximum Transmission Unit (MTU) for DECnet packets on
+        the router port for which the entry exists. This includes the DECnet
+        header and data, but does not include framing."
+    DEFVAL { 1500 }
+    ::= { nwDecIVFwdIfEntry 6 }
+
+nwDecIVFwdIfForwarding       OBJECT-TYPE
+    SYNTAX  INTEGER {
+                            other(1),        -- none of the following
+                            disabled(2),    -- not forwarding
+                            enabled(3)        -- forwarding
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the forwarding of DECnet packets on the router port for
+        which the entry exists. Enabled (3) causes DECnet packets to be
+        forwarded. Disabled (2) prevents DECnet packets from being forwarded."
+    DEFVAL { disabled }
+    ::= { nwDecIVFwdIfEntry 7 }
+
+nwDecIVFwdIfFrameType        OBJECT-TYPE
+    SYNTAX     INTEGER    {                 --  valid media types
+                    other(1),               --  experimental
+                    ethernet(2),            --  ethernet
+                    snap(3),                --  ethernet, fddi, and token ring
+                    nativewan(8),           --  wan media types
+                    encapenet(9),           --  wan media types
+                    encapenetsnap(11),      --  wan media types
+                    encaptrsnap(14),        --  wan media types
+                    encapfddisnap(16),      --  wan media types
+                    canonical(17)           --  special media, tbd
+                    }
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the framing type for DECnet packets forwarded on the router
+        port for which the entry exists.  Some frame types are only valid for
+        specific media types.  The comments reflect those valid media types."
+    DEFVAL { ethernet }
+    ::= { nwDecIVFwdIfEntry 8 }
+
+nwDecIVFwdIfAclIdentifier    OBJECT-TYPE
+    SYNTAX         INTEGER    
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the Access Control ID of the access control list in
+        effect for DECnet packets being routed on the router port for which
+        the entry exists. A value of 0 indicates that no access control list
+        is in effect."
+    DEFVAL { 0 }
+    ::= { nwDecIVFwdIfEntry 9 }
+
+nwDecIVFwdIfAclStatus        OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),        -- none of the following
+                            disabled(2),    -- do not apply nwDecIVFwdIfAclIdentifier
+                            enabled(3)        -- apply nwDecIVFwdIfAclIdentifier
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Controls the operation of any access control list configured
+        for DECnet traffic on the router port for which the entry exists.
+        Enabled (3) applies the access control list indicated by the value
+        of nwDecIVFwdIfAclIdentifier to all DECnet traffic being routed on
+        the port. Disabled (2) prevents the access control list from being
+        applied."
+    DEFVAL { disabled }
+    ::= { nwDecIVFwdIfEntry 10 }
+
+nwDecIVFwdIfCacheControl     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                other(1),        -- none of the followin
+                                disable(2),        -- caching disabled
+                                enable(3)        -- caching enabled
+                        }
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs. Setting this object has no effect."
+    DEFVAL { enable }
+    ::= { nwDecIVFwdIfEntry 11 }
+
+nwDecIVFwdIfCacheEntries      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "This object does not apply to this protocol. It is a common
+            object inherited from the MIB framework used to provide a
+            common management interface to all the Cabletron Routing
+            Services protocol-specific MIBs. Setting this object has no
+            effect."
+        ::= { nwDecIVFwdIfEntry 12 }
+
+nwDecIVFwdIfCacheHits        OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+        Setting this object has no effect."
+    ::= { nwDecIVFwdIfEntry 13 }
+       
+nwDecIVFwdIfCacheMisses      OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs. Setting this object has no effect."
+    ::= { nwDecIVFwdIfEntry 14 }
+
+
+--  DECnet Phase IV Forwarding Interfaces Counter Table
+nwDecIVFwdIfCtrTable         OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwDecIVFwdIfCtrEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port configured and
+        enabled for DECnet Phase IV Routing Services."
+    ::= { nwDecIVFwdIfCounters 1 }
+
+nwDecIVFwdIfCtrEntry         OBJECT-TYPE
+    SYNTAX          NwDecIVFwdIfCtrEntry
+    ACCESS         not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry indicates the current packet and byte count of DECnet
+        packets on each router port for which the entry exists."
+    INDEX           { nwDecIVFwdIfCtrIfIndex }
+    ::= { nwDecIVFwdIfCtrTable 1 }
+
+NwDecIVFwdIfCtrEntry ::=
+        SEQUENCE {
+                nwDecIVFwdIfCtrIfIndex               INTEGER,
+                nwDecIVFwdIfCtrAdminStatus           INTEGER,
+                nwDecIVFwdIfCtrReset                 INTEGER,
+                nwDecIVFwdIfCtrOperationalTime       TimeTicks,
+                nwDecIVFwdIfCtrInPkts                Counter,
+                nwDecIVFwdIfCtrOutPkts               Counter,
+                nwDecIVFwdIfCtrFwdPkts                 Counter,
+                nwDecIVFwdIfCtrFilteredPkts          Counter,
+                nwDecIVFwdIfCtrDiscardPkts           Counter,
+                nwDecIVFwdIfCtrAddrErrPkts           Counter,
+                nwDecIVFwdIfCtrLenErrPkts            Counter,
+                nwDecIVFwdIfCtrHdrErrPkts            Counter,
+                nwDecIVFwdIfCtrInBytes               Counter,
+                nwDecIVFwdIfCtrOutBytes              Counter,
+                nwDecIVFwdIfCtrFwdBytes                 Counter,
+                nwDecIVFwdIfCtrFilteredBytes         Counter,
+                nwDecIVFwdIfCtrDiscardBytes          Counter,
+                nwDecIVFwdIfCtrHostInPkts            Counter,
+                nwDecIVFwdIfCtrHostOutPkts           Counter,
+                nwDecIVFwdIfCtrHostDiscardPkts       Counter,
+                nwDecIVFwdIfCtrHostInBytes           Counter,
+                nwDecIVFwdIfCtrHostOutBytes          Counter,
+                nwDecIVFwdIfCtrHostDiscardBytes      Counter
+        }
+
+nwDecIVFwdIfCtrIfIndex       OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 1 }
+
+nwDecIVFwdIfCtrAdminStatus   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Sets the administrative state of the per-port DECnet packet and
+        byte counters on the router port for which the entry exists. Enabled
+        (3) causes these counters to become active. Disabled (2) causes
+        these counters to become inactive."
+    DEFVAL { enabled }
+    ::= { nwDecIVFwdIfCtrEntry 2 }
+
+nwDecIVFwdIfCtrReset         OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            reset(2)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Resets the per-port DECnet packet and byte counters on the router
+        port for which the entry exists. Reset (2) resets the counters to 0.
+        nwDecIVFwdIfCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwDecIVFwdIfCtrEntry 3 }
+
+nwDecIVFwdIfCtrOperationalTime        OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that the
+        per-port DECnet packet and byte counters have been active on the
+        router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 4 }
+
+nwDecIVFwdIfCtrInPkts        OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        received, during nwDecIVFwdIfCtrOperationaltime, on the router port
+        for which the entry exists."
+   ::= { nwDecIVFwdIfCtrEntry 5 }
+
+nwDecIVFwdIfCtrOutPkts       OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        transmitted, during nwDecIVFwdIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 6 }
+
+nwDecIVFwdIfCtrFwdPkts       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Indicates the total number of DECnet packets that have been
+              forwarded on the router port for which the entry exists, during
+             nwDecIVFwdCtrOperationalTime."
+        ::= { nwDecIVFwdIfCtrEntry 7 }
+
+nwDecIVFwdIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        administratively filtered, during nwDecIVFwdIfCtrOperationalTime,
+        on the router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 8 }
+
+nwDecIVFwdIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded (dropped), during nwDecIVFwdIfCtrOperationalTime,
+        on the router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 9 }
+
+nwDecIVFwdIfCtrAddrErrPkts        OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded because of addressing errors in the DECnet header,
+        during nwDecIVFwdIfCtrOperationalTime, on the router port for
+        which the entry exists."
+        ::= { nwDecIVFwdIfCtrEntry 10 }
+
+nwDecIVFwdIfCtrLenErrPkts        OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded because an invalid packet length was contained in the
+        DECnet header, during nwDecIVFwdIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 11 }
+
+nwDecIVFwdIfCtrHdrErrPkts        OBJECT-TYPE
+    SYNTAX      Counter
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded because of an invalid DECnet header, during
+        nwDecIVFwdIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 12 }
+
+nwDecIVFwdIfCtrInBytes      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been received, during nwDecIVFwdIfCtrOperationalTime, on the
+        router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 13 }
+
+nwDecIVFwdIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that have
+         been transmitted, during nwDecIVFwdIfCtrOperationalTime, on the router
+         port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 14 }
+
+nwDecIVFwdIfCtrFwdBytes     OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been forwarded, during nwDecIVFwdIfCtrOperationalTime, on the
+        router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 15 }
+
+nwDecIVFwdIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS      read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been administratively filtered, during
+        nwDecIVFwdIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 16 }
+
+nwDecIVFwdIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been discarded, during nwDecIVFwdIfCtrOperationalTime, on the
+        router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 17 }
+
+nwDecIVFwdIfCtrHostInPkts   OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        delivered to the local host, during nwDecIVFwdIfCtrOperationalTime,
+        that were received on the router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 18 }
+
+nwDecIVFwdIfCtrHostOutPkts  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        transmitted by the local host, during nwDecIVFwdIfCtrOperationalTime,
+        on the router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 19 }
+
+nwDecIVFwdIfCtrHostDiscardPkts      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet packets that have been
+        discarded by the local host, during nwDecIVFwdIfCtrOperationalTime,
+        that were received on the router port for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 20 }
+
+nwDecIVFwdIfCtrHostInBytes  OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been delivered to the local host, during
+        nwDecIVFwdIfCtrOperationalTime, that were received on the router port
+        for which the entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 21 }
+
+nwDecIVFwdIfCtrHostOutBytes OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been transmitted by the local host, during
+        nwDecIVFwdIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwDecIVFwdIfCtrEntry 22 }
+
+nwDecIVFwdIfCtrHostDiscardBytes     OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that
+        have been discarded by the local host, due to a lack of host
+        resources, that were received on the router port for which the entry
+        exists, during nwDecIVFwdIfCtrOperationalTime."
+    ::= { nwDecIVFwdIfCtrEntry 23 }
+
+
+--  DistanceVector-based Protocols
+--  This group contains the managed objects for DEC IV Routing Protocol, DEC IV
+--  DistanceVector based routing.
+
+--  DEC IV Proto System Configuration Parameters
+--  This group contains the objects that pertain to the setup and
+--  configuration of the DEC IV Proto DistanceVector based routing protocol.
+
+
+nwDecIVProtoAdminStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  shutdown the router
+                        enabled(3)            --  startup the router
+                }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Sets the administrative state of the DECnet Phase IV
+        distance-vector-based routing protocol system-wide. Enabled (3) 
+        causes the routing protocol to become active on all router ports
+        configured and enabled for DECnet Routing Services. Disabled (2)
+        causes the routing protocol to become inactive."
+    DEFVAL { enabled }
+    ::= { nwDecIVProtoConfig 1 }
+
+nwDecIVProtoOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5),    --  start-up in progress
+                invalid-config(6)     --   not running-invalid config
+                        }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the current operating condition of the DECnet Phase
+        IV distance-vector-based routing protocol system-wide. The value
+        of nwDecIVProtoOperStatus indicates any problem with the DECnet
+        Phase IV distance-vector-based routing protocol configuration. 
+        A value of 6 indicates that regardless of the value of
+        nwDecIVProtoAdminStatus, the DECnet Phase IV distance-vector-based
+        routing protocol is not operating because of an invalid configuration."
+    ::= { nwDecIVProtoConfig 2 }
+
+nwDecIVProtoAdminReset      OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        reset(2)              --  force a reset
+                    }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Resets the DECnet Phase IV distance-vector-based routing
+        protocol. Reset (2) forces a system-wide restart of the protocol
+        without a graceful shut-down on any active router ports."     
+    DEFVAL { other }
+    ::= { nwDecIVProtoConfig 3 }
+
+nwDecIVProtoOperationalTime  OBJECT-TYPE
+    SYNTAX      TimeTicks
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwDecIVProtoOperStatus has been in current state."
+    ::= { nwDecIVProtoConfig 4 }
+
+nwDecIVProtoVersion  OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the current revision level of the DECnet Phase IV
+        distance-vector-based routing protocol firmware, in textual format."
+    ::= { nwDecIVProtoConfig 5 }
+
+nwDecIVProtoStackSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Specifies the stack size of the DECnet Phase IV distance-vector-
+        based routing protocol thread. In order for a change of this value
+        to take effect, the protocol (nwDecIVProtoAdminReset), DECnet
+        Phase IV Routing Services (nwDecIVSysAdminReset), or the device
+        running Routing Services must be reset."
+    DEFVAL { 4096 }
+    ::= { nwDecIVProtoConfig 6 }
+
+nwDecIVProtoThreadPriority OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Specifies the run-time execution priority of the DECnet Phase IV
+        distance-vector-based routing protocol thread. In order for a change
+        of this value to take effect, the protocol (nwDecIVProtoAdminReset),
+        DECnet Phase IV Routing Services (nwDecIVSysAdminReset), or the 
+        device running Routing Services must be reset."
+    DEFVAL { 127 }
+    ::= { nwDecIVProtoConfig 7 }
+
+nwDecIVProtoDatabaseThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs. Setting this object has no effect."
+    DEFVAL { 2000 }
+    ::= { nwDecIVProtoConfig 8 }
+
+nwDecIVProtoAgeOut  OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs. Setting this object has no effect."
+    DEFVAL { 180 }
+    ::= { nwDecIVProtoConfig 9 }
+
+nwDecIVProtoHoldDown        OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific
+        MIBs. Setting this object has no effect. "
+    DEFVAL { 120 }
+    ::= { nwDecIVProtoConfig 10 }
+
+
+--  DEC IV Routing Protocol System (aggregate) Counters
+--  This group contains the aggregate (device-wide) DEC IV Routing Protocol
+--  packet and byte counters.
+nwDecIVProtoCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1),        -- none of the following
+                                disabled(2),    -- counters off
+                                enabled(3)        -- counters on
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the administrative state of the aggregate (system-wide) DECnet
+        Phase IV distance-vector-based routing protocol packet and byte
+        counters. Enabled (3) causes these counters to become active.
+        Disabled (2) causes these counters to become inactive."
+    DEFVAL { enabled }
+    ::= { nwDecIVProtoCounters 1 }
+
+nwDecIVProtoCtrReset     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),        -- none of the following
+                            reset(2)        -- force a reset
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Resets the aggregate (system-wide) DECnet Phase IV
+        distance-vector-based routing protocol packet and byte counters.
+        Reset (2) resets the DECnet aggregate counters to 0.
+        nwDecIVProtoCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwDecIVProtoCounters 2 }
+
+nwDecIVProtoCtrOperationalTime       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that
+        nwDecIVProtoCtrAdminStatus has been in it's current state."
+    ::= { nwDecIVProtoCounters 3 }
+
+nwDecIVProtoCtrInPkts       OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet Phase IV distance-vector-based
+        routing protocol packets that have been received, system-wide, 
+        during nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 4 }
+
+nwDecIVProtoCtrOutPkts      OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet Phase IV distance-vector-based
+        routing protocol packets that have been transmitted, system-wide,
+        during nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 5 }
+
+nwDecIVProtoCtrFilteredPkts OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet Phase IV distance-vector-based
+        routing protocol packets that have been administratively filtered,
+        system-wide, during nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 6 }
+
+nwDecIVProtoCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of the DECnet Phase IV distance-vector
+        -based routing protocol packets that have been discarded, 
+        system-wide, during nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 7 }
+
+nwDecIVProtoCtrInBytes      OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet Phase IV
+        distance-vector based routing protocol packets that have been
+        received, system-wide, during nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 8 }
+
+nwDecIVProtoCtrOutBytes     OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet Phase IV
+        distance-vectorbased routing protocol packets that have been
+        transmitted, system-wide, during nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 9 }
+
+nwDecIVProtoCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet Phase IV
+        distance-vectorbased routing protocol packets that have been
+        administratively filtered, system-wide, during
+        nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 10 }
+
+nwDecIVProtoCtrDiscardBytes OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet Phase IV
+        distance-vectorbased routing protocol packets that have been
+        discarded system-wide, during nwDecIVProtoCtrOperationalTime."
+    ::= { nwDecIVProtoCounters 11 }
+
+
+-- DecIV Protocol Interface Table
+nwDecIVProtoIfTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NwDecIVProtoIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. Each entry can
+        contain different values, allowing the routing protocol configuration
+        to vary from router port to router port. This table is indexed by
+        nwDecIVProtoIfIndex, which indicates the value of MIB 2 ifIndex,
+        which identifies the router port for which each entry exists."
+    ::= { nwDecIVProtoIfConfig     1 }
+
+nwDecIVProtoIfEntry            OBJECT-TYPE
+    SYNTAX      NwDecIVProtoIfEntry
+    ACCESS      not-accessible
+    STATUS      mandatory
+    DESCRIPTION
+        "Each entry contains the DECnet Phase IV distance-vector-based
+         routing protocol configuration for the router port for which the
+         entry exists."
+    INDEX   { nwDecIVProtoIfIndex }
+    ::= { nwDecIVProtoIfTable 1 }
+
+NwDecIVProtoIfEntry ::=
+        SEQUENCE {
+                nwDecIVProtoIfIndex                  INTEGER,
+                nwDecIVProtoIfAdminStatus            INTEGER,
+                nwDecIVProtoIfOperStatus             INTEGER,
+                nwDecIVProtoIfOperationalTime        TimeTicks,
+                nwDecIVProtoIfVersion                INTEGER,
+                nwDecIVProtoIfAdvertisement          INTEGER,
+                nwDecIVProtoIfFloodDelay             INTEGER,
+                nwDecIVProtoIfRequestDelay           INTEGER,
+                nwDecIVProtoIfPriority               INTEGER,
+                nwDecIVProtoIfHelloTimer             INTEGER,
+                nwDecIVProtoIfSplitHorizon           INTEGER,
+                nwDecIVProtoIfPoisonReverse          INTEGER,
+                nwDecIVProtoIfSnooping               INTEGER,
+                nwDecIVProtoIfType                   INTEGER,
+                nwDecIVProtoIfXmitCost               INTEGER,
+                nwDecIVProtoIfAclIdentifier          INTEGER,
+                nwDecIVProtoIfAclStatus              INTEGER
+        }
+
+nwDecIVProtoIfIndex         OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwDecIVProtoIfEntry 1 }
+
+nwDecIVProtoIfAdminStatus   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+     ACCESS          read-write
+     STATUS          mandatory
+     DESCRIPTION
+         "Sets the administrative state of the DECnet Phase IV
+         distance-vector-based routing protocol on the router port for which
+         the entry exists. Enabled (3) causes the routing protocol to become
+         active on the router port. Disabled (2) causes it to become inactive."
+     DEFVAL { enabled }
+     ::= { nwDecIVProtoIfEntry 2 }
+
+nwDecIVProtoIfOperStatus     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                        other(1),             --  none of the following
+                        disabled(2),          --  not running
+                        enabled(3),           --  running
+                        pending-disable(4),   --  shut-down in progress
+                        pending-enable(5)     --  start-up in progress
+                    }
+     ACCESS      read-only
+     STATUS      mandatory
+     DESCRIPTION
+         "Indicates the current operating condition of the DECnet Phase IV
+         distance-vector-based routing protocol on the router port for which
+         the entry exists. The value of nwDecIVProtoIfOperStatus indicates
+         any problem with your routing protocol configuration on the router
+         port. A value of 6 indicates that regardless of the value of
+         nwDecIVProtoIfAdminStatus, the routing protocol is not operating
+         because of an invalid configuration."
+     ::= { nwDecIVProtoIfEntry 3 }
+
+nwDecIVProtoIfOperationalTime        OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that 
+        nwDecIVProtoIfOperStatus has been in it`s current state."
+    ::= { nwDecIVProtoIfEntry 4 }
+
+nwDecIVProtoIfVersion       OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the revision level of the DECnet Phase IV
+        distance-vector-based routing protocol firmware on the router port 
+        for which the entry exists, in textual format."
+    DEFVAL { 3 }
+    ::= { nwDecIVProtoIfEntry 5 }
+
+nwDecIVProtoIfAdvertisement OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the interval, in seconds, at which the DECnet Phase IV
+        distance-vectorbased routing protocol advertises its route table on
+        the router port for which the entry exists. Change this value to
+        cause the DECnet Phase IV distance-vector-based routing protocol to
+        advertise its route table more or less frequently on the router port."
+    DEFVAL  { 40 }
+    ::= { nwDecIVProtoIfEntry 6 }
+
+nwDecIVProtoIfFloodDelay    OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+        Setting this object has no effect."
+    DEFVAL  { 2 }
+    ::= { nwDecIVProtoIfEntry 7 }
+
+nwDecIVProtoIfRequestDelay  OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+        Setting this object has no effect."
+    DEFVAL  { 0 }
+    ::= { nwDecIVProtoIfEntry 8 }
+
+nwDecIVProtoIfPriority       OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the priority of the DECnet Phase IV distance-vector-based
+        routing protocol on the router port for which the entry exists.
+        Within an area, the router with the highest value for
+        nwDecIVProtoIfPriority becomes the priority or designated router.
+        The highest possible value for nwDecIVProtocolIfPriority is 127. Set
+        this value high to cause your DECnet Phase IV Routing Services-enabled
+        device to become the designated router. Set this value low to guarantee
+        that it does not become the designated router."
+    DEFVAL  { 64 }
+    ::= { nwDecIVProtoIfEntry 9 }
+
+nwDecIVProtoIfHelloTimer    OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the interval, in seconds, at which DECnet Phase IV
+        distance-vector-based routing protocol sends Hello packets on the
+        router port for which the entry exists."
+    DEFVAL  { 15 }
+    ::= { nwDecIVProtoIfEntry 10 }
+
+nwDecIVProtoIfSplitHorizon  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),        -- none of the following
+                            disabled(2),    -- Split Horizon off
+                            enabled(3)        -- Split Horizon on
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+     Setting this object has no effect."
+    DEFVAL { enabled }
+    ::= { nwDecIVProtoIfEntry 11 }
+
+nwDecIVProtoIfPoisonReverse OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            disabled(2),
+                            enabled(3)
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "This object does not apply to this protocol. It is a common object
+        inherited from the MIB framework used to provide a common management
+        interface to all the Cabletron Routing Services protocol-specific MIBs.
+        Setting this object has no effect."
+    DEFVAL { disabled }
+    ::= { nwDecIVProtoIfEntry 12 }
+
+nwDecIVProtoIfSnooping      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),        --  none of the following
+                            disabled(2),    --  Snooping off
+                            enabled(3)        --  Snooping on
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Controls the operation of DECnet Phase IV distance-vector-based
+        routing protocol snooping on the router port. When snooping is 
+        enabled the DECnet Phase IV distance-vector-based routing protocol
+        operates in passive mode, so that it receives route information,
+        builds and maintains a route table, but does not advertise the route
+        table or send updates on the router port for which the entry exists."
+    DEFVAL { disabled }
+    ::= { nwDecIVProtoIfEntry 13 }
+
+nwDecIVProtoIfType             OBJECT-TYPE
+    SYNTAX      INTEGER {
+                               other(1),        --  none of the following
+                            bma(2),            --  broadcast media access
+                            nbma(3)            --  non-broadcast media access
+                     }
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates whether the directly connected network segment does or 
+        does not support broadcast media access."
+    DEFVAL { bma }
+    ::= { nwDecIVProtoIfEntry 14 }
+
+nwDecIVProtoIfXmitCost      OBJECT-TYPE
+    SYNTAX      INTEGER
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Sets the cost of transmitting a packet on the network segment
+        connected to the router port for which the entry exists. The DECnet
+        Phase IV distance-vector-based routing protocol picks the route with
+        the least total nwDecIVProtoIfXmitCost as the best route. If
+        nwDecIVProtocolIfXmitCost, also known as path cost, is the same for
+        all possible routes , the best route chosen is the route with the
+        least number of hops is chosen as the best route."
+    DEFVAL { 1 }
+    ::= { nwDecIVProtoIfEntry 15 }
+
+nwDecIVProtoIfAclIdentifier OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Specifies the Access Control ID of the access control list in
+        effect for DECnet Phase IV distance-vector-based routing protocol
+        packets on the router port for which the entry exists. A value of 0
+        indicates that there is no access control list in effect for DECnet
+        Phase IV distance-vector-based routing protocol packets on the router
+        port."
+    DEFVAL { 0 }
+    ::= { nwDecIVProtoIfEntry 16 }
+
+nwDecIVProtoIfAclStatus     OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1),      --  none of the following
+                                disabled(2),  --  do not apply nwDecIVProtoIfAcl
+                                enabled(3)    --  apply nwDecIVProtoIfAcl
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Controls the operation of the access control list identified by
+        nwDecIVProtoIfAclIdentifier. Enabled (3) applies the access control
+        list to all DECnet Phase IV distance-vector-based routing protocol
+        packet traffic on the router port for which the entry exists. Disabled
+        (2) prevents the access control list from being applied."
+    DEFVAL { disabled }
+    ::= { nwDecIVProtoIfEntry 17 }
+
+
+--  Dec IV Protocol Interface Counters Table
+--  This table contains the managed objects for DEC IV protocols packet and
+--  byte counter on a per router port basis.
+nwDecIVProtoIfCtrTable      OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwDecIVProtoIfCtrEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "This table contains an entry for each router port. This table is
+        indexed by nwDecIVProtoIfCtrIfIndex which indicates the value of
+        MIB2 ifindex, which identifies the router port for which the entry
+        exists."
+    ::= { nwDecIVProtoIfCounters 1 }
+
+nwDecIVProtoIfCtrEntry      OBJECT-TYPE
+    SYNTAX          NwDecIVProtoIfCtrEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "Each entry indicates the current packet and byte count of DECnet
+        Phase IV distance-vector-based routing protocol packets on the router
+        port for which the entry exists."
+    INDEX           { nwDecIVProtoIfCtrIfIndex }
+    ::= { nwDecIVProtoIfCtrTable 1 }
+
+NwDecIVProtoIfCtrEntry ::=
+    SEQUENCE {
+                nwDecIVProtoIfCtrIfIndex            INTEGER,
+                nwDecIVProtoIfCtrAdminStatus        INTEGER,
+                nwDecIVProtoIfCtrReset              INTEGER,
+                nwDecIVProtoIfCtrOperationalTime    TimeTicks,
+                nwDecIVProtoIfCtrInPkts             Counter,
+                nwDecIVProtoIfCtrOutPkts            Counter,
+                nwDecIVProtoIfCtrFilteredPkts       Counter,
+                nwDecIVProtoIfCtrDiscardPkts        Counter,
+                nwDecIVProtoIfCtrInBytes            Counter,
+                nwDecIVProtoIfCtrOutBytes           Counter,
+                nwDecIVProtoIfCtrFilteredBytes      Counter,
+                nwDecIVProtoIfCtrDiscardBytes       Counter
+        }
+nwDecIVProtoIfCtrIfIndex    OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port for which the entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 1 }
+
+nwDecIVProtoIfCtrAdminStatus  OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                                enabled(3)
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the administrative state of the per-port DECnet Phase IV
+        distance-vectorbased routing protocol packet and byte counters on
+        the router port for which the entry exists. Enabled (3) causes these
+        counters to become active. Disabled (2) causes these counters to 
+        become inactive."
+    DEFVAL { enabled }
+    ::= { nwDecIVProtoIfCtrEntry 2 }
+
+nwDecIVProtoIfCtrReset      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),        -- none of the following
+                            reset(2)          -- force a reset 
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Resets the per-port DECnet Phase IV distance-vector-based routing
+        protocol packet and byte counters on the router port for which the
+        entry exists. Reset (2) resets the counters to 0.
+        nwDecIVProtoIfCtrOperationalTime is also reset to 0."
+    DEFVAL { other }
+    ::= { nwDecIVProtoIfCtrEntry 3 }
+
+nwDecIVProtoIfCtrOperationalTime     OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the elapsed time, in hundredths of a second, that 
+        nwDecIVProtoIfCtrAdminStatus has been in the current state."
+    ::= { nwDecIVProtoIfCtrEntry 4 }
+
+nwDecIVProtoIfCtrInPkts       OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet Phase IV distance-vector-based
+        routing protocol packets that have been received, during
+        nwDecIVProtoIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 5 }
+
+nwDecIVProtoIfCtrOutPkts      OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet Phase IV distance-vector-based
+        routing protocol packets that have been transmitted, during
+        nwDecIVProtoIfCtrOperationalTime, on the router port for which the
+        entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 6 }
+
+nwDecIVProtoIfCtrFilteredPkts OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet Phase IV distance-vector-based
+        routing protocol packets that have been administratively filtered,
+        during nwDecIVProtoIfCtrOperationalTime, on the router port for which
+        the entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 7 }
+
+nwDecIVProtoIfCtrDiscardPkts  OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of DECnet Phase IV distance-vector-based
+        routing protocol packets that have been discarded, during
+        nwDecIVProtoIfCtrOperationalTime, that were received on the router
+        port for which the entry exist."
+    ::= { nwDecIVProtoIfCtrEntry 8 }
+nwDecIVProtoIfCtrInBytes      OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet Phase IV
+        distance-vector-based routing protocol packets that have been 
+        received, during nwDecIVProtoIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 9 }
+
+nwDecIVProtoIfCtrOutBytes     OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet Phase IV
+        distance-vector-based routing protocol packets that have been
+        transmitted, during nwDecIVProtoIfCtrOperationalTime, on the router
+        port for which the entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 10 }
+nwDecIVProtoIfCtrFilteredBytes        OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet Phase IV
+        distance-vector-based routing protocol packets that have been
+        administratively filtered, during nwDecIVProtoIfCtrOperationalTime,
+        that were received on the router port for which the entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 11 }
+
+nwDecIVProtoIfCtrDiscardBytes OBJECT-TYPE
+    SYNTAX          Counter
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the total number of bytes in the DECnet packets that have
+        been discarded, during nwDecIVProtoIfCtrOperationalTime, that were
+        received on the router port for which the entry exists."
+    ::= { nwDecIVProtoIfCtrEntry 12 }
+
+
+--  DECnet Phase IV Forward Information Base (FIB) Table
+--  This table contains the managed objects for the forwarding table of the
+--  DECnet Phase IV router.  This table is built from entries in the DECnet
+--  Phase IV routing table(s) and reflects the routes that are considered
+--  the best routes to forward on.
+nwDecIVFibTable        OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwDecIVFibEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains an entry for each route being used to forward
+        DECnet data packets.."
+    ::= { nwDecIVFib 1 }
+
+nwDecIVFibEntry        OBJECT-TYPE
+    SYNTAX          NwDecIVFibEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry in the table describes a route to a particular DECnet
+        destination network and node."
+    INDEX   { nwDecIVFibNodeId }
+    ::= { nwDecIVFibTable 1 }
+
+NwDecIVFibEntry ::=
+        SEQUENCE {
+                nwDecIVFibNodeId          DecIVAddress,
+                nwDecIVFibNextHopNodeId   DecIVAddress,
+                nwDecIVFibNextHopIf       INTEGER,
+                nwDecIVFibRouteType       INTEGER
+        }
+
+nwDecIVFibNodeId       OBJECT-TYPE
+    SYNTAX         DecIVAddress
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Contains the DECnet Address of the destination node of the route 
+        for which the entry exists."
+    ::= { nwDecIVFibEntry 1 }
+
+nwDecIVFibNextHopNodeId      OBJECT-TYPE
+    SYNTAX          DecIVAddress
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Contains the DECnet Address of the next hop router for the route
+        for which the entry exists."
+    ::= { nwDecIVFibEntry 2 }
+
+nwDecIVFibNextHopIf    OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the value of MIB 2 ifindex, which identifies the router
+        port through which the route exists."
+    DEFVAL { 0 }
+    ::= { nwDecIVFibEntry 3 }
+
+nwDecIVFibRouteType    OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                other(1),        -- none of the following
+                                invalid(2),    --  not a valid route
+                                direct(3),     --  destination is on a direct conn. seg.
+                                remote(4)      --  destination is avail. through the next hop router.
+}
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the status of the route. A value of 3 indicates that the
+        destination is on the network segment that is directly connected to
+        the router port identified by nwDecIVFibNextHopIf. A value of 4
+        indicates that the destination is on an indirectly connected network 
+        segment, which is reachable through the next hop router indicated by
+        the value of nwDecIVFibNextHopNodeId. A value of 2 indicates that the
+        route is invalid."
+    DEFVAL { direct }
+    ::= { nwDecIVFibEntry 4 }
+
+
+--  DECnet Phase IV Access Control List Table
+--  This table contains the managed objects for the Access Control Lists
+--  within the DECnet Phase IV Router.  Access Control Lists allow configuration of
+--  restricted access to networks and protocols reachable thru the DecIV
+--  Router device.  Access Control Lists can be defined with these
+nwDecIVAclValidEntries OBJECT-TYPE
+    SYNTAX      Gauge
+    ACCESS      read-only
+    STATUS      mandatory
+    DESCRIPTION
+        "Indicates the number of valid entries that exist in the access 
+        control list table, nwDecIVAclTable."
+    ::= { nwDecIVAccessControl 1 }
+
+nwDecIVAclTable        OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwDecIVAclEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "This table contains the access control list information for DECnet
+         traffic. This table contains entries each of which specifies whether
+         packet forwarding between a particular source destination pair is
+         permitted or denied. Each entry is part of a particular access 
+         control list. Each list is identified by a unique Access Control ID.
+         Each list may contain multiple entries ordered by sequence number.
+         When an Access Control List is searched, it is searched in sequence
+         number order and the first match found ends the search. If no match
+         is found, access defaults to permitted."
+    ::= { nwDecIVAccessControl 2 }
+
+nwDecIVAclEntry        OBJECT-TYPE
+    SYNTAX          NwDecIVAclEntry
+    ACCESS          not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+        "Each entry contains DECnet source/destination access information."
+    INDEX           { nwDecIVAclIdentifier, nwDecIVAclSequence }
+    ::= { nwDecIVAclTable 1 }
+
+NwDecIVAclEntry ::=
+        SEQUENCE {
+                nwDecIVAclIdentifier           INTEGER,
+                nwDecIVAclSequence             INTEGER,
+                nwDecIVAclPermission           INTEGER,
+                nwDecIVAclMatches              Counter,
+                nwDecIVAclDestAddress          DecIVAddress,
+                nwDecIVAclSrcAddress           DecIVAddress
+
+        }
+
+nwDecIVAclIdentifier   OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the primary (major) index into the DECnet access control
+        list table. This value identifies each access control list by a 
+        unique identifier, a number arbitrarily assigned by the user. All
+        entries that have the same value for nwDecIVAclIdentifier belong to
+        the same access control list."
+    ::= { nwDecIVAclEntry 1 }
+
+nwDecIVAclSequence     OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "This is the secondary (minor) index into the DECnet access control
+        list table. This number corresponds to a sequence number used to 
+        order multiple entries within the same access control list."
+    ::= { nwDecIVAclEntry 2 }
+
+nwDecIVAclPermission   OBJECT-TYPE
+    SYNTAX          INTEGER {
+                            other(1),
+                            invalid(2),
+                            permit(3),
+                            deny(4),
+                            permit-bidirectional(5),
+                            deny-bidirectional(6)
+                        }
+    ACCESS        read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies whether access is allowed or denied between the source
+        and destination address pair. Note that source and destination are
+        interchangeable when bi-directional control is selected. To remove 
+        an existing entry set nwDecIVAclPermission to invalid (2). Invalid
+        entries disappear after reboot."
+    DEFVAL { permit }
+    ::= { nwDecIVAclEntry 3 }
+
+nwDecIVAclMatches      OBJECT-TYPE
+    SYNTAX         Counter
+    ACCESS        read-only
+    STATUS        mandatory
+    DESCRIPTION
+        "Indicates the number of matches on this entry that have resulted
+        in the permit/deny access restriction being applied as part of the
+        forwarding process."
+    ::= { nwDecIVAclEntry 4 }
+
+nwDecIVAclDestAddress  OBJECT-TYPE
+    SYNTAX          DecIVAddress
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the destination DECnet Address used to compare for
+        matches on the access control list. Either the Area ID or Node ID 
+        of this address may be set to 0, a wildcard value which matches all
+        areas or all nodes."
+    ::= { nwDecIVAclEntry 5 }
+
+nwDecIVAclSrcAddress   OBJECT-TYPE
+    SYNTAX          DecIVAddress
+    ACCESS          read-write
+    STATUS        mandatory
+    DESCRIPTION
+        "Specifies the source DECnet Address used to compare for matches on
+        the access control list. Either the Area ID or Node ID of this
+        address may be set to a wildcard value which matches all areas or 
+        all nodes."
+    ::= { nwDecIVAclEntry 6 }
+
+--
+--  DecIV Hosts-to-Media Table 
+
+--  This table provides a mapping between DecIV Network Protocol
+--  addresses and their corresponding circuit identifiers (if
+--  applicable), port numbers, and framing.
+
+
+nwDecIVHostMapTable       OBJECT-TYPE
+    SYNTAX           SEQUENCE OF NwDecIVHostMapEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+                "The DecIV Address translation table used for mapping 
+         a DecIV address to a circuit identifier (if applicable), 
+         corresponding port number, and framing type."
+        ::= { nwDecIVHostsToMedia 1 }
+
+nwDecIVHostMapEntry     OBJECT-TYPE
+     SYNTAX         NwDecIVHostMapEntry
+    ACCESS        not-accessible
+    STATUS        mandatory
+    DESCRIPTION
+                "Each entry contains one DecIVAddress to circuit
+        equivalence. Also provided is the framing required to
+        converse with this host, and the corresponding logical 
+        port number."
+        INDEX   { nwDecIVHostMapIfIndex, nwDecIVHostMapDecIVAddr }
+        ::= { nwDecIVHostMapTable 1 }
+
+ NwDecIVHostMapEntry ::=
+        SEQUENCE {
+                nwDecIVHostMapIfIndex         INTEGER,
+                nwDecIVHostMapDecIVAddr       DecIVAddress,
+                nwDecIVHostMapType            INTEGER,   
+                nwDecIVHostMapCircuitID       INTEGER,
+                nwDecIVHostMapFraming         INTEGER,   
+                nwDecIVHostMapPortNumber      INTEGER
+                }
+
+nwDecIVHostMapIfIndex    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "This is the primary (major) index into the DecIV HostMap 
+        table. This number corresponds to the index into the MIB-2 
+        Interfaces Group which describes the DecIV router port for which
+        the entry exists."
+        ::= { nwDecIVHostMapEntry 1 }
+ 
+nwDecIVHostMapDecIVAddr    OBJECT-TYPE
+        SYNTAX  DecIVAddress
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The DecIVAddress of the host on the corresponding interface
+        and circuit (if applicable)."
+        ::= { nwDecIVHostMapEntry 2 }
+
+nwDecIVHostMapType        OBJECT-TYPE
+        SYNTAX  INTEGER {
+            other(1),
+            invalid(2),
+            dynamic(3),
+            static(4),
+            inactive(5)
+        }    
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+        "Setting this object to the value invalid(2) has
+        the effect of invalidating the corresponding entry in the
+        nwDecIVHostMapTable.  That is, it effectively dissasociates 
+        the circuitand/or interface identified with said entry from the  
+        mapping identified with said entry.  It is an implementation-
+        specific matter as to whether the agent removes an invalidated 
+        entry from the table.  Accordingly, management stations must be 
+        prepared to receive tabular information from agents that 
+        corresponds to entries not currently in use.  Proper inter-
+        pretation of such entries requires examination of the relevant
+        wDecIVHostMapType object."
+
+        ::= { nwDecIVHostMapEntry 3 }
+
+nwDecIVHostMapCircuitID    OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "The identifier for the virtual circuit present on the 
+        interface. On an interface configured for Frame Relay,
+        this number is the DLCI for the DecIV Address at the end of
+        the circuit. For non-WAN interfaces, the value of this
+        object is zero."
+        ::= { nwDecIVHostMapEntry 4 }
+
+nwDecIVHostMapFraming    OBJECT-TYPE
+    SYNTAX     INTEGER    {                 --  valid media types
+                    other(1),               --  experimental
+                    ethernet(2),            --  ethernet
+                    snap(3),                --  ethernet, fddi, and token ring
+                    nativewan(8),           --  wan media types
+                    encapenet(9),           --  wan media types
+                    encapenetsnap(11),      --  wan media types
+                    encaptrsnap(14),        --  wan media types
+                    encapfddisnap(16),      --  wan media types
+                    canonical(17)           --  special media, tbd
+                    }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+                "Specifies the framing type required to converse with the
+         host for which this entry exists."
+        ::= { nwDecIVHostMapEntry 5 }
+
+nwDecIVHostMapPortNumber    OBJECT-TYPE
+        SYNTAX  INTEGER 
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+                "The unique value for the logical port number. It's value
+        ranges between 1 and a maximum value which is dependent on both
+        the number of configured interfaces in the system and the number
+        of circuits present on those interfaces which are of WAN type."
+        ::= { nwDecIVHostMapEntry 6 }
+
+
+--  DECnet Event Group
+
+nwDecIVEventAdminStatus    OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1) ,
+                                disabled(2),
+                                enabled(3)
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the administrative state of DECnet event logging. Enabled (3)
+        causes the event log to become active. Disabled (2) causes the event
+        log to become inactive."
+    DEFVAL { disabled }
+    ::= { nwDecIVEventLogConfig 1 }
+
+nwDecIVEventMaxEntries     OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Sets the maximum number of entries allowed in the event log table.
+        When the number of entries reaches the value of nwDecIVEventMaxEntries,
+        the first (oldest) entry is deleted to allow a new entry to be added."
+    DEFVAL { 100 }
+    ::= { nwDecIVEventLogConfig 2 }
+
+nwDecIVEventTraceAll OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1),
+                                disabled(2),
+                                enabled(3)
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Enabled (3) allows logging of all event types on all router ports
+        for all protocols and components. Disabled (2) causes the filter 
+        table to specify which events to log."
+    DEFVAL { enabled }
+    ::= { nwDecIVEventLogConfig 3 }
+
+
+--  Event Log Filter Table
+--  The Event Log Filter Table contains the managed objects used to set-up
+--  and configure log entries.
+
+nwDecIVEventFilterTable            OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwDecIVEventFilterEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "This table contains and entry for each event filter configured for
+        DECnet Phase IV Routing Services events."
+    ::= { nwDecIVEventLogFilterTable 1 }
+
+nwDecIVEventFilterEntry            OBJECT-TYPE
+    SYNTAX          NwDecIVEventFilterEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "Each entry describes an event filter which defines a particular type
+        of event to be logged to the event log. The value of
+        nwDecIVEventFltrProtocol indicates the value used either in the
+        nwRtgProtocolTable or the nwComponentTable in the Cabletron Routing
+        Services MIB, which identifies the protocol or component to which the
+        entry applies."
+    INDEX   { nwDecIVEventFltrProtocol, nwDecIVEventFltrIfNum }
+    ::= { nwDecIVEventFilterTable 1 }
+
+NwDecIVEventFilterEntry ::=
+        SEQUENCE {
+                nwDecIVEventFltrProtocol   INTEGER,
+                nwDecIVEventFltrIfNum      INTEGER,
+                nwDecIVEventFltrControl    INTEGER,
+                nwDecIVEventFltrType       INTEGER,
+                nwDecIVEventFltrSeverity   INTEGER,
+                nwDecIVEventFltrAction     INTEGER
+        }
+
+nwDecIVEventFltrProtocol   OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the value of the Cabletron Routing Services MIB
+        nwRtgProtocolInstance or nwComponentRtgInstance which identifies the
+        protocol involved in the event for which the event filter exists."
+    ::= { nwDecIVEventFilterEntry 1 }
+
+nwDecIVEventFltrIfNum      OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Specifies the router port involved in the event for which the event
+        filter exists."
+    ::= { nwDecIVEventFilterEntry 2 }
+
+nwDecIVEventFltrControl    OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                other(1),
+                                delete(2),
+                                add(3)
+                        }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION
+        "Set this value to 3 to add the entry to the event filter table. Set
+        this value to 2 to remove the entry from the event filter table."
+    DEFVAL { add }
+    ::= { nwDecIVEventFilterEntry 3 }
+
+nwDecIVEventFltrType        OBJECT-TYPE
+    SYNTAX      INTEGER {
+                            misc(1),
+                            timer(2),
+                            rcv(4),
+                            xmit(8),
+                            event(16),
+                            diags(32),
+                            error(64)
+            }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "This 6 bit mask specifies the types of events to be logged. By 
+        default all 6 bits are set to 1, indicating that all types of events
+        are to be logged. Setting any bit to 0 removes an event type from
+        this field and prevents that type of event from being logged. Setting
+        any bit to 1 adds an event type to this field and enables that type
+        of event to be logged."
+    ::= { nwDecIVEventFilterEntry 4 }
+
+nwDecIVEventFltrSeverity   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                             highest(1),
+                             highmed(2),
+                             highlow(3)
+            }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Specifies the level of severity an event must meet in order to be
+        logged. Controls the amount of event logging by ignoring events of a
+        lower priority than specified by this filter value. `Highmed' ignores
+        only events of the lowest severity. `Highlow' logs all events highest
+        priority through lowest. `Highest' severity causes all events except
+        those of the highest severity to be ignored. `Highmed' severity is the
+        default setting which causes only events of the lowest severity to be
+        ignored. `Highlow' severity logs all events, regardless of severity."
+    DEFVAL { highest }
+    ::= { nwDecIVEventFilterEntry 5 }
+
+nwDecIVEventFltrAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        log(1),
+                        trap(2),
+                                log-trap(3)
+            }
+    ACCESS      read-write
+    STATUS      mandatory
+    DESCRIPTION
+        "Specifies how the events are to be logged. Logging to the `log' 
+        stores the events in the event log table (nwDecIVEventLogTable).
+        Logging to'trap' sends events out through the trap mechanism."
+    DEFVAL { log }
+    ::= { nwDecIVEventFilterEntry 6 }
+
+--  Event Log Table
+--  The Event Log Table contains the logged events.
+
+nwDecIVEventTable          OBJECT-TYPE
+    SYNTAX          SEQUENCE OF NwDecIVEventEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+            "This table contains an entry for each event that has been
+            logged."
+    ::= { nwDecIVEventLogTable 1 }
+
+nwDecIVEventEntry          OBJECT-TYPE
+    SYNTAX          NwDecIVEventEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION
+        "Each entry contains the information about an event that has 
+        been logged to the event table."
+    INDEX           { nwDecIVEventNumber }
+    ::= { nwDecIVEventTable 1 }
+
+NwDecIVEventEntry ::=
+        SEQUENCE {
+                nwDecIVEventNumber         INTEGER,
+                nwDecIVEventTime           TimeTicks,
+                nwDecIVEventType           INTEGER,
+                nwDecIVEventSeverity       INTEGER,
+                nwDecIVEventProtocol       INTEGER,
+                nwDecIVEventIfNum          INTEGER,
+                nwDecIVEventTextString     OCTET STRING
+        }
+
+nwDecIVEventNumber         OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "An ordinal value assigned to the event for which the log entry
+        exists. nwDecIVEventNumber is assigned so that each event in the
+        event log can be uniquely identified by the value of
+        nwDecIVEventNumber."
+    ::= { nwDecIVEventEntry 1 }
+
+nwDecIVEventTime           OBJECT-TYPE
+    SYNTAX          TimeTicks
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the time at which the event was logged to the event
+            log."
+    ::= { nwDecIVEventEntry 2 }
+
+nwDecIVEventType           OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                misc(1),
+                                timer(2),
+                                rcv(4),
+                                xmit(8),
+                                event(16),
+                                error(32)
+                        }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the type of event that was logged."
+    ::= { nwDecIVEventEntry 3 }
+
+nwDecIVEventSeverity               OBJECT-TYPE
+    SYNTAX          INTEGER {
+                                highest(1),
+                                highmed(2),
+                                highlow(3)
+                        }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the severity that was assigned to the event."
+    ::= { nwDecIVEventEntry 4 }
+
+nwDecIVEventProtocol               OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the value of the Cabletron Routing Services MIB
+        nwRtgProtocolInstance or nwComponentInstance which identifies the
+        protocol or component that was involved in the event."
+    ::= { nwDecIVEventEntry 5 }
+
+nwDecIVEventIfNum          OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Indicates the router port that was involved in the event."
+    ::= { nwDecIVEventEntry 6 }
+
+nwDecIVEventTextString     OBJECT-TYPE
+    SYNTAX          OCTET STRING
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION
+        "Contains the actual text string that was logged."
+    ::= { nwDecIVEventEntry 7 }
+
+END

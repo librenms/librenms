@@ -1,0 +1,203 @@
+-- *****************************************************************
+-- UBQS-NTP-MIB:  Ubiquoss NTP MIB file
+--
+-- Jan 2011, Hyung Eun Park
+--
+-- Copyright (c) 2011 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-NTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	IpAddress
+		FROM RFC1155-SMI  
+	OBJECT-TYPE
+		FROM RFC-1212
+	RowStatus,DisplayString,
+		FROM SNMPv2-TC      
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,      
+    	FROM INET-ADDRESS-MIB   
+	ubiMgmtv2
+		FROM UBQS-SMI;
+          
+ubiNtpMIB MODULE-IDENTITY
+    LAST-UPDATED    "201101290000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-NTP-MIB is used to get 
+        the ntp information."      
+      
+    ::= { ubiMgmtv2 17 }
+                          
+
+-- ***********************************************************
+-- Textual Conventions
+-- *********************************************************** 
+
+-- ***************************************************************
+-- ubiSystemMIB
+-- ***************************************************************
+ubiNtpMIBNotificationPrefix 	OBJECT IDENTIFIER 	::= { ubiNtpMIB 0 }
+ubiNtpMIBObjects  				OBJECT IDENTIFIER	::= { ubiNtpMIB 1 }    
+ubiNtpMIBConformance    		OBJECT IDENTIFIER 	::= { ubiNtpMIB 2 }
+                    
+                        
+ 
+ubiNtpSystem           			OBJECT IDENTIFIER 	::= { ubiNtpMIBObjects 1 }
+ubiNtpMaster           			OBJECT IDENTIFIER 	::= { ubiNtpSystem 4 }
+
+
+-- ***********************************************************
+-- ubiNtpSystem
+-- ***********************************************************
+
+	ubiNtpCurrentStratum OBJECT-TYPE
+		SYNTAX        Integer32(1..15)
+		MAX-ACCESS    read-only
+		STATUS        current
+		DESCRIPTION   "current NTP stratum"
+		::= { ubiNtpSystem 1 }
+						
+	ubiNtpInterval	OBJECT-TYPE	
+		SYNTAX		Integer32   
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION		
+				"NTP client mode polling interval (default 64seconds)"
+		::=  {  ubiNtpSystem  2  }
+		
+
+-- ***********************************************************
+-- ubiNtpMaster
+-- ***********************************************************
+ 
+	ubiNtpMasterEnable	OBJECT-TYPE	
+		SYNTAX		INTEGER 
+		{                     
+			enable(1),
+			disable(2)
+		}   
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION		
+				"Flag that enable NTP master mode"
+		::=  {  ubiNtpMaster  1  }
+
+	ubiNtpMasterStratum	OBJECT-TYPE	
+		SYNTAX		Integer32(1..15)   
+		ACCESS		read-write
+		STATUS		current
+		DESCRIPTION		
+				"To configure NTP stratum"
+		::=  {  ubiNtpMaster  2  }
+
+		
+-- ***********************************************************
+-- ubiNtpServerTable
+-- ***********************************************************    
+
+	ubiNtpServerTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF UbiNtpServerEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Time Server Table"
+    	::= { ubiNtpMIBObjects 2 }
+
+  	ubiNtpServerEntry OBJECT-TYPE
+    	SYNTAX          UbiNtpServerEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Time server entry"
+    	INDEX           { ubiNtpServerAddrType, ubiNtpServerAddr } 
+    	::= { ubiNtpServerTable 1 }
+            
+  	UbiNtpServerEntry ::= SEQUENCE {       
+  			ubiNtpServerAddrType			InetAddressType,
+        	ubiNtpServerAddr              	InetAddress, 
+        	ubiNtpServerRowStatus			RowStatus      
+    }            
+ 
+     
+	ubiNtpServerAddrType	OBJECT-TYPE	
+		SYNTAX		InetAddressType 
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION		
+				"IP address type of the time server"
+		::=  {  ubiNtpServerEntry  1  }
+
+    
+	ubiNtpServerAddr	OBJECT-TYPE	
+		SYNTAX		InetAddress 
+		ACCESS		read-only
+		STATUS		current
+		DESCRIPTION		
+				"IP address of time server"
+		::=  {  ubiNtpServerEntry  2 }
+
+	ubiNtpServerRowStatus	OBJECT-TYPE	
+		SYNTAX		RowStatus   
+		ACCESS		read-create
+		STATUS		current
+		DESCRIPTION		
+				"NTP time server rowstatus"
+		::=  {  ubiNtpServerEntry  3  }
+                                        
+	                                           
+-- *****************************************************************   
+-- ubiNtpMIBConformance
+-- *****************************************************************
+	
+-- 
+-- conformance information         
+--
+ubiNtpMIBCompliances 	OBJECT IDENTIFIER ::= { ubiNtpMIBConformance 1 }
+ubiNtpMIBGroups      	OBJECT IDENTIFIER ::= { ubiNtpMIBConformance 2 }      
+
+
+
+-- compliance statements
+
+	ubiNtpMIBCompliance MODULE-COMPLIANCE
+        STATUS  current     
+        DESCRIPTION
+                 "The compliance statement for entities which implement
+                the ubiquoss NTP MIB."
+        MODULE  
+                MANDATORY-GROUPS {  ubiNtpMIBGroup    }
+
+       GROUP    ubiNtpMIBGroup
+       DESCRIPTION  
+       	        "This group is applicable for implementations which
+                 need information for NTP."   
+        ::= { ubiNtpMIBCompliances 1 }
+
+
+ 
+-- units of conformance
+	ubiNtpMIBGroup OBJECT-GROUP
+        OBJECTS {        
+        		        		}
+    	STATUS          current
+    	DESCRIPTION
+        	 "ubiquoss NTP."
+    	::= { ubiNtpMIBGroups 1 }     
+    
+
+END

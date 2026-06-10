@@ -1,0 +1,614 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-PORTS-AGGREGATION-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-PORTS-AGGREGATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex
+        FROM IF-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    Counter64, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MacAddress, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtPortsAggregationMIB MODULE-IDENTITY
+    LAST-UPDATED "201402050000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The Ports Aggregation MIB module for
+         managing switch or ipSwitch static and
+         dynamic port aggregation."
+    REVISION    "201001070000Z"
+    DESCRIPTION 
+        "Initial"
+    ::= { switch 106 }
+
+
+PrvtPortsAggregationMacSecType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The state of a port with regards to MAC count."
+    SYNTAX      INTEGER { noViolation(1), watermarkReached(2), 
+                    maxMacCountReached(3), errorState(4) }
+
+prvtPortsAggregationNotifications OBJECT IDENTIFIER
+    ::= { prvtPortsAggregationMIB 0 }
+
+prvtPortsAggregationObjects OBJECT IDENTIFIER
+    ::= { prvtPortsAggregationMIB 1 }
+
+prvtPortsAggregationDistributionType OBJECT-TYPE
+    SYNTAX      INTEGER { l2(1), l3(2), l4(3), mpls(4) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The LACP distribution type.
+         l2 - MAC address based distribution
+         l3 - IP address based distribution
+         l4 - TCP/UDP IP address based distribution
+         mpls -MPLS label based distribution"
+    ::= { prvtPortsAggregationObjects 1 }
+
+portsAggregationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortsAggregationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the status of all the
+         trunks in the system. It can contain two
+         major types: static and dynamic trunks."
+    ::= { prvtPortsAggregationObjects 2 }
+
+portsAggregationEntry OBJECT-TYPE
+    SYNTAX      PortsAggregationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Ports aggregation entry."
+    INDEX       { portsAggregationName }
+    ::= { portsAggregationTable 1 }
+
+PortsAggregationEntry ::= SEQUENCE {
+    portsAggregationName                    OCTET STRING,
+    portsAggregationRowStatus               RowStatus,
+    portsAggregationDescription             OCTET STRING,
+    portsAggregationMode                    INTEGER,
+    portsAggregationLacpEnable              TruthValue,
+    portsAggregationLacpMode                INTEGER,
+    portsAggregationLacpAdminKey            Unsigned32,
+    portsAggregationLacpId                  MacAddress,
+    portsAggregationLacpMarker              TruthValue,
+    portsAggregationLacpSystemPriority      Unsigned32,
+    portsAggregationOperStatus              INTEGER,
+    portsAggregationPortCount               Unsigned32,
+    portsAggregationUplinkCount             Unsigned32,
+    portsAggregationIfInOctets              Counter64,
+    portsAggregationIfInUcastPkts           Counter64,
+    portsAggregationIfInNUcastPkts          Counter64,
+    portsAggregationIfInErrors              Counter64,
+    portsAggregationIfInUnknownProtos       Counter64,
+    portsAggregationIfOutOctets             Counter64,
+    portsAggregationIfOutUcastPkts          Counter64,
+    portsAggregationIfOutNUcastPkts         Counter64,
+    portsAggregationIfOutErrors             Counter64,
+    portsAggregationIfInMulticastPkts       Counter64,
+    portsAggregationIfInBroadcastPkts       Counter64,
+    portsAggregationIfInDiscardsPkts        Counter64,
+    portsAggregationIfOutMulticastPkts      Counter64,
+    portsAggregationIfOutBroadcastPkts      Counter64,
+    portsAggregationLacpFastRate            TruthValue,
+    portsAggregationLacpSelectionCriteria   INTEGER,
+    portsAggregationLacpTxOnStandby         TruthValue,
+    portsAggregationLacpForceActive         Unsigned32,
+    portsAggregationFailoverTime            OCTET STRING,
+    portsAggregationMacSecIfProfile         OCTET STRING,
+    portsAggregationMacSecIfCurrMacCount    Unsigned32,
+    portsAggregationMacSecIfState           PrvtPortsAggregationMacSecType,
+    portsAggregationEvPropProfile           OCTET STRING
+}
+
+portsAggregationName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..5))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation Name:
+         pattern ag(([1-9])|([1-9][0-9])|(1[0-9][0-9])|(2[0-5][0-6]))"
+    ::= { portsAggregationEntry 1 }
+
+portsAggregationRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation row status."
+    ::= { portsAggregationEntry 2 }
+
+portsAggregationDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation description."
+    ::= { portsAggregationEntry 3 }
+
+portsAggregationMode OBJECT-TYPE
+    SYNTAX      INTEGER { access(1), network(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation mode."
+    ::= { portsAggregationEntry 4 }
+
+portsAggregationLacpEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Link Aggregation Control Protocol (LACP) Configuration"
+    ::= { portsAggregationEntry 5 }
+
+portsAggregationLacpMode OBJECT-TYPE
+    SYNTAX      INTEGER { passive(1), active(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation lacp mode."
+    ::= { portsAggregationEntry 6 }
+
+portsAggregationLacpAdminKey OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation administrative key."
+    ::= { portsAggregationEntry 7 }
+
+portsAggregationLacpId OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify LACP ID (MAC address format)."
+    ::= { portsAggregationEntry 8 }
+
+portsAggregationLacpMarker OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation lacp marker."
+    ::= { portsAggregationEntry 9 }
+
+portsAggregationLacpSystemPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation lacp priority."
+    ::= { portsAggregationEntry 10 }
+
+portsAggregationOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER { up(1), down(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation operational status."
+    ::= { portsAggregationEntry 11 }
+
+portsAggregationPortCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation ports count."
+    ::= { portsAggregationEntry 12 }
+
+portsAggregationUplinkCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation uplink ports count."
+    ::= { portsAggregationEntry 13 }
+
+portsAggregationIfInOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of octets received on the interface,
+         including framing characters."
+    ::= { portsAggregationEntry 14 }
+
+portsAggregationIfInUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of packets, delivered by this sub-layer to a
+         higher (sub-)layer, which were not addressed to a multicast
+         or broadcast address at this sub-layer."
+    ::= { portsAggregationEntry 15 }
+
+portsAggregationIfInNUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of packets, delivered by this sub-layer to a
+         higher (sub-)layer, which were addressed to a multicast or
+         broadcast address at this sub-layer."
+    ::= { portsAggregationEntry 16 }
+
+portsAggregationIfInErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "For packet-oriented interfaces, the number of inbound
+         packets that contained errors preventing them from being
+         deliverable to a higher-layer protocol. For character-
+         oriented or fixed-length interfaces, the number of inbound
+         transmission units that contained errors preventing them
+         from being deliverable to a higher-layer protocol."
+    ::= { portsAggregationEntry 17 }
+
+portsAggregationIfInUnknownProtos OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "For packet-oriented interfaces, the number of packets
+         received via the interface which were discarded because of
+         an unknown or unsupported protocol. For character-oriented
+         or fixed-length interfaces that support protocol
+         multiplexing the number of transmission units received via
+         the interface which were discarded because of an unknown or
+         unsupported protocol. For any interface that does not
+         support protocol multiplexing, this counter will always be
+         0."
+    ::= { portsAggregationEntry 18 }
+
+portsAggregationIfOutOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of octets transmitted out of the
+         interface, including framing characters."
+    ::= { portsAggregationEntry 19 }
+
+portsAggregationIfOutUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets that higher-level protocols
+         requested be transmitted, and which were not addressed to a
+         multicast or broadcast address at this sub-layer, including
+         those that were discarded or not sent."
+    ::= { portsAggregationEntry 20 }
+
+portsAggregationIfOutNUcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets that higher-level protocols
+         requested be transmitted, and which were addressed to a
+         multicast or broadcast address at this sub-layer, including
+         those that were discarded or not sent."
+    ::= { portsAggregationEntry 21 }
+
+portsAggregationIfOutErrors OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "For packet-oriented interfaces, the number of outbound
+         packets that could not be transmitted because of errors.
+         For character-oriented or fixed-length interfaces, the
+         number of outbound transmission units that could not be
+         transmitted because of errors."
+    ::= { portsAggregationEntry 22 }
+
+portsAggregationIfInMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of packets, delivered by this sub-layer to a
+         higher (sub-)layer, which were addressed to a multicast
+         address at this sub-layer. For a MAC layer protocol, this
+         includes both Group and Functional addresses."
+    ::= { portsAggregationEntry 23 }
+
+portsAggregationIfInBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of packets, delivered by this sub-layer to a
+         higher (sub-)layer, which were addressed to a broadcast
+         address at this sub-layer."
+    ::= { portsAggregationEntry 24 }
+
+portsAggregationIfInDiscardsPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of inbound packets which were chosen to be
+         discarded even though no errors had been detected to prevent
+         
+         their being deliverable to a higher-layer protocol. One
+         possible reason for discarding such a packet could be to
+         free up buffer space."
+    ::= { portsAggregationEntry 25 }
+
+portsAggregationIfOutMulticastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets that higher-level protocols
+         requested be transmitted, and which were addressed to a
+         multicast address at this sub-layer, including those that
+         were discarded or not sent. For a MAC layer protocol, this
+         includes both Group and Functional addresses.
+         
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other
+         times as indicated by the value of
+         ifCounterDiscontinuityTime."
+    ::= { portsAggregationEntry 26 }
+
+portsAggregationIfOutBroadcastPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The total number of packets that higher-level protocols
+         requested be transmitted, and which were addressed to a
+         broadcast address at this sub-layer, including those that
+         were discarded or not sent."
+    ::= { portsAggregationEntry 27 }
+
+portsAggregationLacpFastRate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify LACP transmission interval."
+    ::= { portsAggregationEntry 28 }
+
+portsAggregationLacpSelectionCriteria OBJECT-TYPE
+    SYNTAX      INTEGER { highest-count(1), highest-weight(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify LACP active Sub-LAG selection criteria."
+    ::= { portsAggregationEntry 29 }
+
+portsAggregationLacpTxOnStandby OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Enable transmission of LACP PDUs on links selected as standby."
+    ::= { portsAggregationEntry 30 }
+
+portsAggregationLacpForceActive OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Force the active Sub-LAG."
+    ::= { portsAggregationEntry 31 }
+
+portsAggregationFailoverTime OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Time since last Sub-LAG failover."
+    ::= { portsAggregationEntry 32 }
+
+portsAggregationMacSecIfProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..30))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The name of a learning profile from prvtMacSecLrnProfTable."
+    ::= { portsAggregationEntry 33 }
+
+portsAggregationMacSecIfCurrMacCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current MAC count for this entry."
+    ::= { portsAggregationEntry 34 }
+
+portsAggregationMacSecIfState OBJECT-TYPE
+    SYNTAX      PrvtPortsAggregationMacSecType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current state of this entry."
+    ::= { portsAggregationEntry 35 }
+
+portsAggregationEvPropProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Event propagation profile name, aplied to this aggregation."
+    ::= { portsAggregationEntry 36 }
+
+portsAggregationPortsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PortsAggregationPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains ports in trunk."
+    ::= { prvtPortsAggregationObjects 3 }
+
+portsAggregationPortsEntry OBJECT-TYPE
+    SYNTAX      PortsAggregationPortsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Ports aggregation entry."
+    INDEX       { portsAggregationName, portsAggregationPortsIfIndex }
+    ::= { portsAggregationPortsTable 1 }
+
+PortsAggregationPortsEntry ::= SEQUENCE {
+    portsAggregationPortsIfIndex    InterfaceIndex,
+    portsAggregationPortsRowStatus  RowStatus,
+    portsAggregationPortsPriority   Unsigned32,
+    portsAggregationPortsSubLag     Unsigned32
+}
+
+portsAggregationPortsIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation port index."
+    ::= { portsAggregationPortsEntry 1 }
+
+portsAggregationPortsRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation ports row status."
+    ::= { portsAggregationPortsEntry 2 }
+
+portsAggregationPortsPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation port priority."
+    ::= { portsAggregationPortsEntry 3 }
+
+portsAggregationPortsSubLag OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Aggregation port Sub-LAG."
+    ::= { portsAggregationPortsEntry 4 }
+
+lagMemberLinkUp NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationUplinkCount }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated
+         when a port in lag link becomes up."
+    ::= { prvtPortsAggregationNotifications 1 }
+
+lagMemberLinkDown NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationUplinkCount }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated
+         when a port in lag link becomes down."
+    ::= { prvtPortsAggregationNotifications 2 }
+
+lagMemberAdd NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationPortCount }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated when a new port is added to 
+         a lag link."
+    ::= { prvtPortsAggregationNotifications 3 }
+
+lagMemberRemove NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationPortCount }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated when a port is removed from 
+         a lag."
+    ::= { prvtPortsAggregationNotifications 4 }
+
+lagLinkUp NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationOperStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated when lag link becomes
+         up."
+    ::= { prvtPortsAggregationNotifications 5 }
+
+lagLinkDown NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationOperStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated when lag link becomes
+         down."
+    ::= { prvtPortsAggregationNotifications 6 }
+
+portsAggregationWmarkViolation NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationName }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtPortsAggregationNotifications 7 }
+
+portsAggregationViolation NOTIFICATION-TYPE
+    OBJECTS     { portsAggregationName }
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtPortsAggregationNotifications 8 }
+
+END -- end of module PRVT-PORTS-AGGREGATION-MIB.

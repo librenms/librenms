@@ -1,0 +1,2265 @@
+-- MIB module odule defining SNMPv2 traps for the 3584 family of IBM tape libraries.
+IBM-TS4500-MIBv2 DEFINITIONS ::= BEGIN
+
+
+-- Imports from other sources that are used in this MIB module.
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, enterprises, Integer32
+                FROM SNMPv2-SMI         -- RFC1902
+
+        DisplayString
+                FROM SNMPv2-TC          -- RFC1903
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF;       -- RFC1904
+
+
+-- Module identification.
+ibm3584 MODULE-IDENTITY
+        LAST-UPDATED    "201404150000Z"   -- April 15, 2012
+        ORGANIZATION    "IBM RMSS - 3584 Development"
+        CONTACT-INFO    "IBM Help"
+                        
+        DESCRIPTION     "Initial revision of this module."
+
+        ::= { ibmProd 182 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Tree structure ID setup
+
+ibm OBJECT IDENTIFIER
+        ::= { enterprises 2 }
+
+ibmProd OBJECT IDENTIFIER
+        ::= { ibm 6 }
+
+--ibm3584 OBJECT IDENTIFIER
+--        ::= { ibmProd 182 }
+
+ibm3584MIB OBJECT IDENTIFIER
+        ::= { ibm3584 1 }
+
+ibm3584MIBTraps OBJECT IDENTIFIER
+        ::= { ibm3584MIB 0 }
+
+ibm3584MIBAdmin OBJECT IDENTIFIER
+        ::= { ibm3584MIB 1 }
+
+ibm3584MIBObjects OBJECT IDENTIFIER
+        ::= { ibm3584MIB 2 }
+
+ibm3584MIBConformance OBJECT IDENTIFIER
+        ::= { ibm3584MIB 3 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Specific trap object setup
+
+-- Machine type, model number, library serial number ID
+ibm3584MIBGroupMTMNLSN OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 11 }
+
+-- Sense key, additional sense code, additional sense code qualifier ID
+ibm3584MIBGroupSKASCASCQ OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 21 }
+
+-- Hardware error code, hardware error code qualifier ID
+ibm3584MIBGroupErrorCode OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 31 }
+
+-- URC ID
+ibm3584MIBGroupURC OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 41 }
+
+-- Text description ID
+ibm3584MIBGroupTD OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 51 }
+
+-- Cartridge Volume Serial Number
+ibm3584MIBGroupVOLSER OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 61 }
+
+-- Logical Library Number
+ibm3584MIBGroupLL OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 71 }
+
+-- World Wide Node Name
+ibm3584MIBGroupWWNN OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 81 }
+
+-- Drive Serial Number
+ibm3584MIBGroupDrvSN OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 91 }
+
+-- Severity Code
+ibm3584MIBSeverity OBJECT IDENTIFIER
+        ::= { ibm3584MIBObjects 101 }
+
+-- UserID
+ibm3584MIBUserID OBJECT IDENTIFIER    
+        ::= { ibm3584MIBObjects 111 }
+        
+-- Location
+ibm3584MIBLocation OBJECT IDENTIFIER    
+        ::= { ibm3584MIBObjects 121 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Trap object definitions
+
+-- Machine type, model number, library serial number definition
+-- Size is 14 plus one space b/n MT and MN and one space b/n MN and LSN
+ibm3584MIBObjectsMTMNLSN OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the machine type associated with the trap."
+        ::= { ibm3584MIBGroupMTMNLSN 1 }
+
+-- Sense key, additional sense code, additional sense code qualifier definition
+-- Size is 6 plus one space b/n SK and ASC and one space b/n ASC and ASCQ
+ibm3584MIBObjectsSKASCASCQ OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..8))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the sense key associated with the trap."
+        ::= { ibm3584MIBGroupSKASCASCQ 1 }
+
+-- Hardware error code, hardware error code qualifier definition
+-- Size is 4 plus one space b/n ErrorCode
+ibm3584MIBObjectsErrorCode OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..5))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the hardware error code associated with the trap."
+        ::= { ibm3584MIBGroupErrorCode 1 }
+
+-- URC definition
+ibm3584MIBObjectsURC OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..4))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the URC associated with the trap."
+        ::= { ibm3584MIBGroupURC 1 }
+
+-- Text description definition
+ibm3584MIBObjectsTD OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the text description of the trap."
+        ::= { ibm3584MIBGroupTD 1 }
+
+-- Text description definition
+ibm3584MIBObjectsVOLSER OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..8))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the Volume Serial number on the cartridge."
+        ::= { ibm3584MIBGroupVOLSER 1 }
+
+
+-- Logical Library Definition
+ibm3584MIBObjectsLL OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..16))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the Logical Library that is having a problem within the physical library."
+        ::= { ibm3584MIBGroupLL 1 }
+
+-- World Wide Node Name Definition
+ibm3584MIBObjectsWWNN OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..8))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The World Wide Node Name of the Drive that is having problems."
+        ::= { ibm3584MIBGroupWWNN 1 }
+
+-- Element Address Definition
+ibm3584MIBObjectsDrvSN OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..12))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "The Serial Number of the Drive that is having problems."
+        ::= { ibm3584MIBGroupDrvSN 1 }
+
+
+-- Severity Code
+ibm3584MIBObjectsSeverity OBJECT-TYPE
+            SYNTAX          INTEGER { 
+                              error (0),
+                              warning  (1),
+                              information (4)
+                              }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     
+         "Indicates the percieved severity of the problem"
+::= { ibm3584MIBSeverity 1 }
+
+-- User ID of request from external UI
+ibm3584MIBObjectsUserID OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..20))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the User ID associated with a request via external UI."
+::= { ibm3584MIBUserID 1 }
+
+-- Trap device location
+ibm3584MIBObjectsLocation OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..50))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "This is the location of the device that generated the trap."
+::= { ibm3584MIBLocation 1 }
+
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Trap definitions - Specific TapeAlert traps for the 3584 library
+-- Range is 001 to 199
+
+-- Trap for library TapeAlert 1
+ibm3584Trap001 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 001.
+                 Flag: Library hardware A
+                 Type: C
+                 Cause: The library has trouble communicating with the drive.
+                 Required host message:
+                 The library has trouble communicating with the drive.
+                 1. Restart the operation.
+                 2. If the problem persists, call your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 1 }
+
+-- Trap for library TapeAlert 002
+ibm3584Trap002 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 002.
+                 Flag: Library hardware B.
+                 Type: W
+                 Cause: The library has a hardware failure.
+                 Required host message:
+                 The library has a hardware failure.
+                 1. Restart the operation.
+                 2. If the problem persists, call your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 2 }
+
+-- Trap for library TapeAlert 004
+ibm3584Trap004 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 004.
+                 Flag: Library hardware D.
+                 Type: C
+                 Cause: The library has a hardware fault that is not mechanically.
+                 Required host message:
+                 The library has a hardware fault that is not mechanically related.
+                 1. Restart the operation.
+                 2. If the problem persists, call your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 4 }
+
+-- Trap for library TapeAlert 007
+ibm3584Trap007 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 007.
+                 Flag: Predictive failure.
+                 Type: W
+                 Cause: The library detected that a hardware component is degraded but stil operational.
+                 Required host message:
+                 A hardware The library detected that a hardware component is degraded but stil operational.
+                 Call your IBM service representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 7 }
+
+-- Trap for library TapeAlert 016
+ibm3584Trap016 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,      
+                          ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 016.
+                 Flag: Library door.
+                 Type: C
+                 Cause: A library door is open and prevents the library from functioning.
+                 Required host message:
+                 A library door is open and prevents the library from functioning.
+                 1. Close the library door.
+                 2. If the problem persists, call your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 16 }
+
+-- Trap for library TapeAlert 017
+ibm3584Trap017 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 017.
+                 Flag: Library I/O station.
+                 Type: C
+                 Cause: A problem with an I/O station exists.
+                 Required host message:
+                 A problem with an I/O station exists.
+                 1. Ensure that there is no obstruction in the I/O station.
+                 2. Restart the operation.
+                 3. If the problem persists, call your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 17 }
+
+-- Trap for library TapeAlert 020
+ibm3584Trap020 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,      
+                          ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 020.
+                 Flag: Library security mode.
+                 Type: I
+                 Cause: Library security mode has changed.
+                 Required host message:
+                 The security mode of the library has been changed. Either the library
+                 has been put into secure mode or the library has exited secure mode.
+                 This is for informational purposes only. No action is required."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 20 }
+
+-- Trap for library TapeAlert 021
+ibm3584Trap021 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,      
+                          ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 021.
+                 Flag: Library offline.
+                 Type: I
+                 Cause: Library manually turned offline.
+                 Required host message:
+                 The library has been manually turned offline and is unavailable for use."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 21 }
+
+-- Trap for library TapeAlert 022
+ibm3584Trap022 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,      
+                          ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 022.
+                 Flag: Library drive offline.
+                 Type: I
+                 Cause: Library turned internal drive offline.
+                 Required host message:
+                 A drive inside the library has been taken offline. This is for
+                 informational purposes only. No action is required."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 22 }
+
+-- Trap for library TapeAlert 024
+ibm3584Trap024 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,      
+                          ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 024.
+                 Flag: Library inventory.
+                 Type: C
+                 Cause: An inventory of the media was inconsistent.
+                 Required host message:
+                 An inventory of the media was inconsistent.
+                 1. Run a library inventory to correct the inconsistency.
+                 2. Restart operation.
+                 3. If the problem persists, call your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 24 }
+
+-- Trap for library TapeAlert 028
+ibm3584Trap028 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 028.
+                 Flag: Power supply.
+                 Type: W
+                 Cause: A redundant power supply failure exists inside the library subsystem.
+                 Required host message:
+                 A redundant power supply failure exists inside the library subsystem.
+                 Call your IBM service representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 28 }
+
+-- Trap for library TapeAlert 030
+ibm3584Trap030 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 030.
+                 Flag: Shuttle mechanism failure.
+                 Type: C
+                 Cause: A failure has occurred in the shuttle mechanism while attempting to transfer a cartridge between two library strings.
+                 Required host message:
+                 A failure has occurred in the shuttle mechanism while attempting to transfer a cartridge between two library strings.
+                 1. Restart the operation.
+                 2. If the problem persists, call your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 30 }
+
+-- Trap for library TapeAlert 031
+ibm3584Trap031 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 031.
+                 Flag: Cartridge in pass-through mechanism.
+                 Type: C
+                 Cause: Cartridge left in the pass-through mechanism between two library
+                        modules.
+                 Required host message:
+                 A cartridge has been left in the library pass-through mechanism from a
+                 previous hardware fault. Check the library users guide for instructions
+                 on clearing this fault."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 31 }
+
+-- Trap for library TapeAlert 032
+ibm3584Trap032 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsSKASCASCQ, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for library TapeAlert 032.
+                 Flag: Unreadable bar code labels.
+                 Type: I
+                 Cause: During an inventory or scan, the library was unable to read a bar code label on a cartridge.
+                 Required host message:
+                 During an inventory or scan, the library was unable to read a bar code label on a cartridge.
+                 1. Check for damaged, misaligned, or peeling barcode labels on the cartridge.
+                 2. If you find a damaged, misaligned or peeling bar code label, replace it with a new barcode label.  To request a new barcode
+                 label, call you IBM Service Representative.
+                 2. If no problem is found, call your IBM Service Representative."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 32 }
+
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Trap definitions - Specific TapeAlert traps for the LTO tape drive
+-- Range is 201 to 399
+
+-- Trap for drive TapeAlert 001
+ibm3584Trap201 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsVOLSER, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 001.
+                 Flag: Read warning.
+                 Type: W
+                 Cause: The drive is having problems reading data.
+                 Required host message:
+                 The tape drive is having problems reading data. No data has been
+                 lost, but there has been a reduction in the performance of the
+                 tape.
+                 Isolate the fault between the drive and the tape by doing the following:
+                 1) Use a known good cartidge in the suspect drive.  If the drive fails, contact your IBM Service Representative.
+                 2) Use the suspect tape cartrige in a known good drive.  If the test fails, discard the cartridge."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 201 }
+
+-- Trap for drive TapeAlert 002
+ibm3584Trap202 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 002.
+                 Flag: Write warning.
+                 Type: W
+                 Cause: The drive is having problems writing data.
+                 Required host message:
+                 The tape drive is having problems writing data. No data has been lost,
+                 but there has been a reduction in the performance of the tape.
+                 Isolate the fault between the drive and the tape by doing the following:
+                 1) Use a known good cartidge in the suspect drive.  If the drive fails, contact your IBM Service Representative.
+                 2) Use the suspect tape cartrige in a known good drive.  If the test fails, discard the cartridge."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 202 }
+
+-- Trap for drive TapeAlert 003
+ibm3584Trap203 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 003.
+                 Flag: Hard error.
+                 Type: W
+                 Cause: The drive had an unrecoverable read, write, or positioning error.
+                 Required host message:
+                 The drive had an unrecoverable read, write, or positioning error.
+                 Determine if flags 4, 5, or 6, exist; follow the actions there."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 203 }
+
+-- Trap for drive TapeAlert 004
+ibm3584Trap204 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 004.
+                 Flag: Media.
+                 Type: C
+                 Cause: The drive had an unrecoverable read, write, or positioning error that is due to faulty media.
+                 Required host message:
+                 The drive had an unrecoverable read, write, or positioning error that is due to faulty media. 
+                 Replace the tape cartridge."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 204 }
+
+-- Trap for drive TapeAlert 005
+ibm3584Trap205 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,   ibm3584MIBObjectsVOLSER, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 005.
+                 Flag: Read failure.
+                 Type: C
+                 Cause: The drive can not determine if an unrecoverable read failure is due to faulty media or drive hardware.
+                 Required host message:
+                 The drive can not determine if an unrecoverable read failure is due to faulty media or drive hardware.
+                 1) Discard the tape cartridge.
+                 2) If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 205 }
+
+-- Trap for drive TapeAlert 006
+ibm3584Trap206 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER, 
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 006.
+                 Flag: Write failure.
+                 Type: C
+                 Cause: The drive can not determine if an unrecoverable write failure is due to faulty media or drive hardware.
+                 Required host message:
+                 The drive can not determine if an unrecoverable write failure is due to faulty media or drive hardware.
+                 1) Discard the tape cartridge.
+                 2) If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 206 }
+
+-- Trap for drive TapeAlert 007
+ibm3584Trap207 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 007.
+                 Flag: Media life.
+                 Type: W
+                 Cause: The media has reached its end of life.
+                 Required host message:
+                 The media has reached its end of life.
+                 1. Copy the data to another tape cartridge.
+                 2. Discard the old tape cartridge."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 207 }
+
+-- Trap for drive TapeAlert 008
+ibm3584Trap208 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 008.
+                 Flag: Not data grade.
+                 Type: W
+                 Cause: The cartridge is not data-grade.  Any data that you write to the tape is at risk.
+                 Required host message:
+                 The cartridge is not data-grade.  Any data that you write to the tape is at risk.
+                 Replace the tape with a data-grade tape.
+                 1) Discard the tape cartridge.
+                 2) If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 208 }
+
+-- Trap for drive TapeAlert 009
+ibm3584Trap209 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 009.
+                 Flag: Write protect.
+                 Type: C
+                 Cause: The drive has detected a write command for a write protected tape cartridge.
+                 Required host message:
+                 The drive has detected a write command for a write protected tape cartridge.
+                 1) Set the write protect switch on the cartridge to OFF.
+                 2) Enusre that the tape cartridge is not logically protected.
+                 3) If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 209 }
+
+-- Trap for drive TapeAlert 010
+ibm3584Trap210 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 010.
+                 Flag: No removal.
+                 Type: I
+                 Cause: The tape drive received an UNLOAD command after the server prevented
+                 the tape cartridge from being removed.
+                 Required host message:
+                 The tape drive received an UNLOAD command after the server prevented
+                 the tape cartridge from being removed.
+                 1) If the error is an operator error, no action is required.
+                 2) If the error is a customer software error, see the documentation for
+                 your server's operating system."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 210 }
+
+-- Trap for drive TapeAlert 011
+ibm3584Trap211 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 011.
+                 Flag: Cleaning media.
+                 Type: I
+                 Cause: Cleaning tape loaded into drive.
+                 Required host message:
+                 A cleaning tape has been loaded into drive.  No action is required."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 211 }
+
+-- Trap for drive TapeAlert 012
+ibm3584Trap212 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 012.
+                 Flag: Unsupported format.
+                 Type: I
+                 Cause: The drive has detected a tape cartridge with an unsupported tape format.
+                 Required host message:
+                 The drive has detected a tape cartridge with an unsupported tape format.
+                 1) Remove the invalid tape cartridge.
+                 2) If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 212 }
+
+-- Trap for drive TapeAlert 013
+ibm3584Trap213 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 013.
+                 Flag: Recoverable snapped tape.
+                 Type: C
+                 Cause: Tape snapped/cut in the drive where media can be ejected.
+                 Required host message:
+                 The tape has split apart. Do not attempt to extract the old tape cartridge.
+                 Call your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 213 }
+
+-- Trap for drive TapeAlert 014
+ibm3584Trap214 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 014.
+                 Flag: Unrecoverable snapped tape.
+                 Type: C
+                 Cause: Tape snapped/cut in the drive where media cannot be ejected.
+                 Required host message:
+                 The operation has failed because the tape in the drive has snapped:
+                 1. Do not attempt to extract the tape cartridge.
+                 2. Call the tape drive supplier helpline."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 214 }
+
+-- Trap for drive TapeAlert 015
+ibm3584Trap215 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 015.
+                 Flag: Memory chip in cartridge failure.
+                 Type: W
+                 Cause: Memory chip failed in cartridge.
+                 Required host message:
+                 The memory in the tape cartridge has failed, which reduces performance. 
+                 1) Replace the tape cartridge.
+                 2) If this error occurs on multiple cartridges, see Error Code 6 located in the list of drive error
+                 codes in the 3584 Maintenance Information Guide."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 215 }
+
+-- Trap for drive TapeAlert 016
+ibm3584Trap216 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 016.
+                 Flag: Forced eject.
+                 Type: C
+                 Cause: Manual or forced eject while drive actively writing or reading.
+                 Required host message:
+                 The operation has failed because the tape cartridge was manually ejected
+                 while the tape drive was actively writing or reading.  No action required."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 216 }
+
+-- Trap for drive TapeAlert 017
+ibm3584Trap217 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 017.
+                 Flag: Read only format.
+                 Type: W
+                 Cause: Media loaded that is read-only format.
+                 Required host message:
+                 You have loaded a cartridge of a type that is read-only in this drive.
+                 The cartridge will appear as write-protected.  No action required."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 217 }
+
+-- Trap for drive TapeAlert 018
+ibm3584Trap218 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 018.
+                 Flag: Tape directory corrupted on load.
+                 Type: W
+                 Cause: Tape drive powered down with tape loaded, or permanent error
+                        prevented the tape directory being updated.
+                 Required host message:
+                 The drive detected that the tape directory in the cartridge memory has been
+                 corrupted.  Re-read all data from the tape to rebuild the tape directory."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 218 }
+
+-- Trap for drive TapeAlert 020
+ibm3584Trap220 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 020.
+                 Flag: Clean now.
+                 Type: C
+                 Cause: The drive thinks it has a head clog, or needs cleaning.
+                 Required host message:
+                 The tape drive needs cleaning:
+                 1. If the operation has stopped, eject the tape and clean the drive.
+                 2. If the operation has not stopped, wait for it to finish and then clean
+                    the drive."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 220 }
+
+-- Trap for drive TapeAlert 021
+ibm3584Trap221 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 021.
+                 Flag: Clean periodic.
+                 Type: W
+                 Cause: The drive is ready for a periodic clean
+                 Required host message:
+                 The tape drive is due for routine cleaning:
+                 1. Wait for the current operation to finish.
+                 2. Clean the drive as soon as possible."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 221 }
+
+-- Trap for drive TapeAlert 022
+ibm3584Trap222 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 022.
+                 Flag: Expired cleaning media.
+                 Type: C
+                 Cause: The cleaning tape has expired.
+                 Required host message:
+                 The last cleaning cartridge used in the tape drive has worn out:
+                 1. Discard the worn out cleaning cartridge."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 222 }
+
+-- Trap for drive TapeAlert 023
+ibm3584Trap223 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 023.
+                 Flag: Invalid cleaning tape.
+                 Type: C
+                 Cause: Invalid cleaning tape type used.
+                 Required host message:
+                 The last cleaning cartridge used in the tape drive was an invalid type:
+                 1. Do not use this cleaning cartridge in this drive.
+                 2. Wait for the current operation to finish.
+                 3. Then use a valid cleaning cartridge."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 223 }
+
+-- Trap for drive TapeAlert 025
+ibm3584Trap225 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 025.
+                 Flag: Dual-port interface error.
+                 Type: W
+                 Cause: Failure of one interface port in a dual-port configuration, eg
+                        Fibrechannel.
+                 Required host message:
+                 A redundant interface port on the tape drive has failed.
+                 Contact your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 225 }
+
+
+
+-- Trap for drive TapeAlert 026
+ibm3584Trap226 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 026.
+                 Flag: Cooling fan failure.
+                 Type: W
+                 Cause: Fan failure inside tape drive mechanism or tape drive enclosure.
+                 Required host message:
+                 A tape drive cooling fan has failed.
+                 Contact your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 226 }
+
+-- Trap for drive TapeAlert 027
+ibm3584Trap227 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 027.
+                 Flag: Power supply.
+                 Type: W
+                 Cause: Redundant PSU failure inside the tape drive enclosure or rack
+                        subsystem.
+                 Required host message:
+                 A redundant power supply has failed inside the tape drive enclosure.
+                 Contact your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 227 }
+
+-- Trap for drive TapeAlert 030
+ibm3584Trap230 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 030.
+                 Flag: Hardware A.
+                 Type: C
+                 Cause: The drive has a hardware fault that requires reset to recover.
+                 Required host message:
+                 A hardware failure has occurred that requires a tape drive reset to recover.
+                 1) Reset the drive.
+                 2) If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 230 }
+
+-- Trap for drive TapeAlert 031
+ibm3584Trap231 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 031.
+                 Flag: Hardware B.
+                 Type: C
+                 Cause: The drive has a hardware fault which is not read/write related
+                        or requires a power cycle to recover.
+                 Required host message:
+                 The tape drive failed it's internal Power-On Self Test.  
+                 Contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 231 }
+
+-- Trap for drive TapeAlert 032
+ibm3584Trap232 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 032.
+                 Flag: Interface.
+                 Type: W
+                 Cause: The drive has identified an interfacing fault.
+                 Required host message:
+                 The tape drive has detected a problem with the Fibre Channel Interface.
+                 Contact your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 232 }
+
+-- Trap for drive TapeAlert 033
+ibm3584Trap233 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 033.
+                 Flag: Eject media.
+                 Type: C
+                 Cause: A failure has occurred that requires you to unload the cartridge from the drive.
+                 Required host message:
+                 A failure has occurred that requires you to unload
+                 the cartridge from the drive. 
+                 1) Unload the tape cartridge and try different media.
+                 2) If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 233 }
+
+-- Trap for drive TapeAlert 034
+ibm3584Trap234 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 034.
+                 Flag: Download failed.
+                 Type: W
+                 Cause: Firmware download failed.
+                 Required host message:
+                 The firmware download has failed.
+                 Contact you IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 234 }
+
+-- Trap for drive TapeAlert 035
+ibm3584Trap235 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 035.
+                 Flag: Drive humidity.
+                 Type: W
+                 Cause: Drive humidity limits exceeded.
+                 Required host message:
+                 Environmental conditions inside the tape drive are outside the specified
+                 humidity range."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 235 }
+
+-- Trap for drive TapeAlert 036
+ibm3584Trap236 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 036.
+                 Flag: Drive temperature.
+                 Type: W
+                 Cause: Drive temperature limits exceeded.
+                 Required host message:
+                 The drive detected the temperature is exceeding the recommended temperature
+                 of the library. 
+                 Contact your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 236 }
+
+-- Trap for drive TapeAlert 037
+ibm3584Trap237 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsURC,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 037.
+                 Flag: Drive voltage.
+                 Type: W
+                 Cause: Drive voltage limits exceeded.
+                 Required host message:
+                 The drive detected externally supplied voltages are approaching or outside
+                 the specified voltage limits.  
+                 Contact your IBM Service Representative."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 237 }
+
+-- Trap for drive TapeAlert 049
+ibm3584Trap249 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 049.
+                 Flag: Media.
+                 Type: C
+                 Cause: The beginning of partition 0 for cartridge was written to unexpectedly.
+                 Required host message:
+                 The beginning of partition 0 for cartridge was written to unexpectedly."
+                 --#SEVERITY Critical
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 249 }
+
+-- Trap for drive TapeAlert 052
+ibm3584Trap252 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 052.
+                 Flag: Tape system area write failure.
+                 Type: C
+                 Cause: Write errors while writing the system log on unload.
+                 Required host message:
+                 The tape cartridge that was previously unloaded could not write it's system area
+                 successfully.  
+                 Copy the data to another tape cartridge, then discard the old cartridge."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 252 }
+
+-- Trap for drive TapeAlert 053
+ibm3584Trap253 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 053.
+                 Flag: Tape system area read failure.
+                 Type: C
+                 Cause: Read errors while reading the system area on load.
+                 Required host message:
+                 The tape system area could not be read successfully at load time. 
+                 Copy the data to another tape cartridge, then discard the old cartridge."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 253 }
+
+
+-- Trap for drive TapeAlert 054
+ibm3584Trap254 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for LTO drive TapeAlert 054.
+                 Flag: No start of data.
+                 Type: C
+                 Cause: Tape damaged, bulk erased, or incorrect format.
+                 Required host message:
+                 The start of data could not be found on the tape:
+                 1. Check you are using the correct format tape.
+                 2. If correct, discard the tape cartridge and try another one.
+                 3. If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 254 }
+        
+
+-- Trap for drive TapeAlert 055
+ibm3584Trap255 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 055.
+                 Flag: Load Failure.
+                 Type: C
+                 Cause: Loading failure
+                 Required host message:
+                 The operation has failed because the media cannot be loaded and threaded.
+                 1. Discard the tape cartridge and try another one.
+                 2. If the problem persists, contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 255 }
+
+
+-- Trap for drive TapeAlert 056
+ibm3584Trap256 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER,  
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 056.
+                 Flag: Unrecoverable unload failure.
+                 Type: C
+                 The operation has failed because the medium cannot be unloaded:
+                 1. Do not attempt to extract the tape cartridge.
+                 2. Contact your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 256 }
+
+-- Trap for drive TapeAlert 057
+ibm3584Trap257 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,     
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 057.
+                 Flag: Automation interface failure.
+                 Type: C
+                 The tape drive has a problem with the automation
+                 interface:
+                 1. Check the power to the automation system.
+                 2. Check the cables and cable connections.
+                 3. If the problem persists, contract your IBM Service Representative."
+                 --#SEVERITY CRITICAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 257 }
+
+-- Trap for drive TapeAlert 059
+ibm3584Trap259 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER, 
+                           ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 059.
+                 Flag: WORM Medium - Integrity Check Failed
+                 Type: W
+                 The tape drive has detected an inconsistency during
+                 the WORM medium integrity checks. 
+                 1) Copy the data to another WORM tape cartridge.
+                 2) Discard the faulty WORM tape cartridge."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 259 }
+        
+-- Trap for drive TapeAlert 060
+ibm3584Trap260 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode,   ibm3584MIBObjectsVOLSER, 
+                           ibm3584MIBObjectsTD, ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for drive TapeAlert 060.
+                 Flag: WORM Medium - Overwrite Attempted
+                 Type: W
+                 An attempt had been made to overwrite user data on a WORM medium:
+                 1. If a WORM medium was used inadvertently, replace
+                 it with a normal data medium.
+                 2. If a WORM medium was used intentionally:
+                 a) check that the software application is compatible
+                 with the WORM medium format you are using.
+                 b) check that the medium is bar-coded correctly for
+                 WORM."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 260 }
+        
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Trap definitions - Non TapeAlert traps
+-- Range is 401 to 599
+
+-- Trap for non TapeAlert 001
+ibm3584Trap401 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 001.
+                 Cause: I/O station full.
+                 Required host message:
+                 The Import/Export station is full."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 401 }
+
+-- Trap for non TapeAlert 002
+ibm3584Trap402 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsLL, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 002.
+                 Cause: All cartridge slots in the associated logical library are occupied.
+                 Required host message:
+                 The logical library is full."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 402 }
+
+-- Trap for non TapeAlert 003
+ibm3584Trap403 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 003.
+                 Cause: Library out of LTO cleaning cartridges.
+                 Required host message:
+                 The library is out of LTO cleaning cartridges."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 403 }
+
+ibm3584Trap405 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 005.
+                 Cause: I/O station door has been open for five minutes.
+                 Required host message:
+                 The Import/Export station has been open for five minutes."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 405 }
+
+-- Trap for non TapeAlert 006
+ibm3584Trap406 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsVOLSER, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 006.
+                 Cause: LTO cleaning cartridge expired.
+                 Required host message:
+                 An LTO cleaning cartridge has expired."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 406 }
+
+-- Trap for non TapeAlert 007
+ibm3584Trap407 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 007.
+                 Cause: A shuffle operation failed because there were no open slots in the library.
+                 Required host message:
+                 A shuffle operation failed because there were no open slots in the library."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 407 }
+-- Trap for non TapeAlert 008
+ibm3584Trap408 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 008.
+                 Cause: Test initiated from operator panel.
+                 Required host message:
+                 This is a test SNMP trap."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 408 }
+
+-- Trap for non TapeAlert 009
+ibm3584Trap409 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 009.
+                 Cause: Library out of 3592 Enterprise Tape cleaning cartridges.
+                 Required host message:
+                 The library is out of Enterprise Tape cleaning cartridges."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 409 }
+
+-- Trap for non TapeAlert 010
+ibm3584Trap410 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsVOLSER, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 010.
+                 Cause: 3592 Enterprise Tape cleaning cartridge expired.
+                 Required host message:
+                 A Enterprise Tape cleaning cartridge has expired."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 410 }
+
+-- Trap for non TapeAlert 015
+ibm3584Trap415 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                "Trap for non TapeAlert 015.
+                 Cause: The library attempted to call home, but was unsuccessful.
+                 Required host message:
+                 The library attempted to call home, but was unsuccessful."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::= { ibm3584MIBTraps 415 }
+        
+-- Trap for non TapeAlert 016
+ibm3584Trap416 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsLL,
+                          ibm3584MIBObjectsTD,      ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 016.
+                 Cause: The associated logical library is nearing full capacity.
+                 Required host message:
+                 The logical library is almost full."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 416 }
+        
+-- Trap for non TapeAlert 019
+ibm3584Trap419 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 019.
+                 Cause: Unable to reach associated EKM.
+                 Required host message:
+                 Library is unable to communicate with the associated EKM address."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 419 }
+        
+-- Trap for non TapeAlert 020
+ibm3584Trap420 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsLL,
+                          ibm3584MIBObjectsVOLSER, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 020.
+                 Cause: A cartridge that can not be encrypted has is loaded in a drives that is used to encrypt all cartridges.
+                 Required host message:
+                 A cartridge that can not be encrypted has been loaded into a drive that is setup for encryption."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 420 }
+        
+ibm3584Trap421 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsVOLSER,
+                          ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 021.
+                 Cause: A new unassigned cartridge is in the library.
+                 Required host message:
+                 A new cartridge is in the library and is currently unassigned."
+                 --#SEVERITY WARNING
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 421 }
+        
+ibm3584Trap422 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 022.
+                 Cause: All library doors are closed.  The library will inventory and resume operations.
+                 Required host message:
+                 All library doors have been closed.  The library will now inventory and resume operations."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 422 }  
+
+ibm3584Trap424 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 024.
+                                Cause: The library was almost out of licensed LTO storage slots.
+                                Required host message:
+                                The library was almost out of licensed LTO storage slots."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 424 }
+                
+ibm3584Trap425 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 025.
+                                Cause: The library was almost out of licensed 3592 storage slots.
+                                Required host message:
+                                The library was almost out of licensed 3592 storage slots."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 425 }
+                
+ibm3584Trap426 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 026.
+                                Cause: The library ran out of licensed 3592 storage slots.
+                                Required host message:
+                                The library ran out of licensed 3592 storage slots."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 426 }
+                
+ibm3584Trap427 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 027.
+                                Cause: The library ran out of licensed LTO storage slots:
+                                The library ran out of licensed LTO storage slots."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 427 }
+                
+ibm3584Trap428 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 028.
+                                Cause: A fixed home slot was not available.
+                                Required host message:
+                                A fixed home slot was not available."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 428 }
+                
+ibm3584Trap429 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 029.
+                                Cause: An inventory of the library was started.
+                                Required host message:
+                                An inventory of the library was started."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 429 }
+                
+ibm3584Trap430 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 030.
+                                Cause: An inventory of the library ended.
+                                Required host message:
+                                An inventory of the library ended."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 430 }
+                
+ibm3584Trap431 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 031.
+                                Cause: Call home request initiated from the host.
+                                Required host message:
+                                Call home request initiated from the host."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 431 }
+                
+ibm3584Trap432 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 032.
+                                Cause: Test call home sent.
+                                Required host message:
+                                Test call home sent."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 432 }
+                
+ibm3584Trap433 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsVOLSER,
+                                        ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 033.
+                                Cause: No LTO diagnostic cartridge found in the library.
+                                Required host message:
+                                No LTO diagnostic cartridge found in the library."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 433 }
+                
+ibm3584Trap434 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsVOLSER,
+                                        ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 034.
+                                Cause: No 3592 diagnostic cartridge found in the library.
+                                Required host message:
+                                No 3592 diagnostic cartridge found in the library."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 434 }
+                
+ibm3584Trap435 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 035.
+                                Cause: The humidity was higher than what is recommended.
+                                Required host message:
+                                The humidity was higher than what is recommended."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 435 }
+                
+ibm3584Trap436 NOTIFICATION-TYPE
+                
+                OBJECTS { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                                }
+                STATUS          current
+                DESCRIPTION
+                                "Trap for non TapeAlert 036.
+                                Cause: The temperature was higher than what is recommended.
+                                Required host message:
+                                The temperature was higher than what is recommended."
+                                --#SEVERITY WARNING
+                                --#SOURCE_ID "T"
+                                --#CATEGORY "Error Events" 
+                ::=  { ibm3584MIBTraps 436 }
+
+ibm3584Trap440 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current                  
+        DESCRIPTION
+                 "Trap for non TapeAlert 040.
+                 Cause: A user has successfully logged in to the web or operator panel.
+                 Required host message:
+                 A user has successfully logged into the Web Specialist or Operator Panel."
+                 --#SEVERITY AUTHENTICATION
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 440 }
+        
+-- Trap for non TapeAlert 041
+ibm3584Trap441 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                          }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 041.
+                 Cause: A user has attempted to log in to the web or operator panel and was unsuccessful.
+                 Required host message:
+                 A user has attempted to log in to the Web Specialist or Operator Panel and was unsuccessful."
+                 --#SEVERITY AUTHENTICATION
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 441 }
+        
+-- Trap for non TapeAlert 042
+ibm3584Trap442 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                          }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 042.
+                 Cause: A user has logged out of the web or operator panel.
+                 Required host message:
+                 A user has logged out of the Web Specialist or Operator Panel."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 442 }
+        
+-- Trap for non TapeAlert 043
+ibm3584Trap443 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD,
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                          }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 043.
+                 Cause: A library configuration setting has been changed.
+                 Required host message:
+                 A library configuration setting has been changed via the Op Panel or Web Specialist."
+                 --#SEVERITY CONFIGURATION CHANGE
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 443 }
+        
+-- Trap for non TapeAlert 044
+ibm3584Trap444 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, 
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsLL, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 044.
+                 Cause: A logical library configuration setting has been changed.
+                 Required host message:
+                 A logical library configuration setting has been changed."
+                 --#SEVERITY CONFIGURATION CHANGE
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 444 }
+        
+-- Trap for non TapeAlert 045
+ibm3584Trap445 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, 
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsLL,
+                          ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity 
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 045.
+                 Cause: A tape drive configuration setting has been changed.
+                 Required host message:
+                 A tape drive configuration setting has been changed."
+                 --#SEVERITY CONFIGURATION CHANGE
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 445 }
+        
+-- Trap for non TapeAlert 046
+ibm3584Trap446 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, 
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsLL,
+                          ibm3584MIBObjectsVOLSER, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 046.
+                 Cause: A cartridge has been modified from an external UI.
+                 Required host message:
+                 A cartridge has been modified from the Web Specialist or Op Panel."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 446 }
+        
+-- Trap for non TapeAlert 047
+ibm3584Trap447 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 047.
+                 Cause: A library, drive, or shuttle code load has been initiated from an external UI.
+                 Required host message:
+                 A library, drive, or shuttle code load has been initiated from the Web Specialist, Op Panel, or CE Tool."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 447 }
+        
+-- Trap for non TapeAlert 048
+ibm3584Trap448 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 048.
+                 Cause: An Accessor FRU been prepared/finished.
+                 Required host message:
+                 An Accessor has been placed in the prepared or finished Accessor service state."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 448 }
+        
+-- Trap for non TapeAlert 049
+ibm3584Trap449 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, 
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsLL,
+                          ibm3584MIBObjectsWWNN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation 
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 049.
+                 Cause: A drive FRU been prepared/finished.
+                 Required host message:
+                 A drive has been placed in the prepared or finished Drive service state."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 449 }
+        
+-- Trap for non TapeAlert 050
+ibm3584Trap450 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, 
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsLL, 
+                          ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 050.
+                 Cause: A drive Serial number has changed.
+                 Required host message:
+                 A drive Serial number has changed."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 450 }
+        
+-- Trap for non TapeAlert 051
+ibm3584Trap451 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, 
+                          ibm3584MIBObjectsUserID, ibm3584MIBObjectsLL, 
+                          ibm3584MIBObjectsWWNN, ibm3584MIBObjectsDrvSN, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 051.
+                 Cause: A drive has been power cycled from the web UI.
+                 Required host message:
+                 A drive has been power cycled via the Web Specialist."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 451 }
+        
+-- Trap for non TapeAlert 052
+ibm3584Trap452 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 052.
+                 Cause: A node card has been reset from the web UI.
+                 Required host message:
+                 A node card has been reset via the Web Specialist."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 452 }
+        
+-- Trap for non TapeAlert 053
+ibm3584Trap453 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 053.
+                 Cause: The admin password has been changed from the web UI or Op Panel.
+                 Required host message:
+                 The admin password has been changed from the web UI or Op Panel."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 453 }
+        
+-- Trap for non TapeAlert 054
+ibm3584Trap454 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsLL, 
+                          ibm3584MIBObjectsVOLSER, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 054.
+                 Cause: A cartridge has been left in a gripper.
+                 Required host message:
+                 A cartridge has been left in a gripper."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 454 }
+        
+-- Trap for non TapeAlert 055
+ibm3584Trap455 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 055.
+                 Cause: A library firmware update failed.
+                 Required host message:
+                 A library firmware update failed."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 455 }
+        
+-- Trap for non TapeAlert 056
+ibm3584Trap456 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 056.
+                 Cause: A corrupted library firwmware image was downloaded.
+                 Required host message:
+                 A corrupted library firwmware image was downloaded."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 456 }
+        
+-- Trap for non TapeAlert 057
+ibm3584Trap457 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity, ibm3584MIBObjectsLocation
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 057.
+                 Cause: A drive firmware update failed.
+                 Required host message:
+                 A drive firmware update failed."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 457 }
+        
+-- Trap for non TapeAlert 058
+ibm3584Trap458 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 058.
+                 Cause: A library firmware update finished.
+                 Required host message:
+                 A A library firmware update finished."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 458 }
+        
+-- Trap for non TapeAlert 059
+ibm3584Trap459 NOTIFICATION-TYPE
+        OBJECTS         { ibm3584MIBObjectsMTMNLSN, ibm3584MIBObjectsErrorCode, ibm3584MIBObjectsTD, ibm3584MIBObjectsUserID, ibm3584MIBObjectsSeverity
+                        }
+        STATUS          current
+        DESCRIPTION
+                 "Trap for non TapeAlert 059.
+                 Cause: A A library firmware update finished.
+                 Required host message:
+                 A A library firmware update finished."
+                 --#SEVERITY INFORMATIONAL
+                 --#SOURCE_ID "T"
+                 --#CATEGORY "Error Events"
+        ::=  { ibm3584MIBTraps 459 }
+
+
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Conformance information (mandatory)
+
+
+ibm3584MIBCompliances OBJECT IDENTIFIER ::= { ibm3584MIBConformance 1 }
+ibm3584MIBGroups      OBJECT IDENTIFIER ::= { ibm3584MIBConformance 2 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- Compliance statements
+
+ibm3584MIBCompliance MODULE-COMPLIANCE
+      STATUS current
+      DESCRIPTION
+          "The compliance statement for the SNMP entities that
+          implement this MIB."
+
+      MODULE -- this module
+
+--    Unconditionally mandatory groups
+      MANDATORY-GROUPS  { ibm3584MIBNotificationsGroup1,
+                          ibm3584MIBObjectsGroup
+                        }
+      ::= { ibm3584MIBCompliances 1 }
+
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+-- MIB groupings
+-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+-- Traps used in the MIB
+ibm3584MIBNotificationsGroup1 NOTIFICATION-GROUP
+      NOTIFICATIONS
+         { ibm3584Trap001,
+           ibm3584Trap002,
+           ibm3584Trap004,
+           ibm3584Trap007,
+           ibm3584Trap016,
+           ibm3584Trap017,
+           ibm3584Trap020,
+           ibm3584Trap021,
+           ibm3584Trap022,
+           ibm3584Trap024,
+           ibm3584Trap028,
+           ibm3584Trap030,
+           ibm3584Trap031,
+           ibm3584Trap032,
+           ibm3584Trap201,
+           ibm3584Trap202,
+           ibm3584Trap203,
+           ibm3584Trap204,
+           ibm3584Trap205,
+           ibm3584Trap206,
+           ibm3584Trap207,
+           ibm3584Trap208,
+           ibm3584Trap209,
+           ibm3584Trap210,
+           ibm3584Trap211,
+           ibm3584Trap212,
+           ibm3584Trap213,
+           ibm3584Trap214,
+           ibm3584Trap215,
+           ibm3584Trap216,
+           ibm3584Trap217,
+           ibm3584Trap218,
+           ibm3584Trap220,
+           ibm3584Trap221,
+           ibm3584Trap222,
+           ibm3584Trap223,
+           ibm3584Trap225,
+           ibm3584Trap226,
+           ibm3584Trap227,
+           ibm3584Trap230,
+           ibm3584Trap231,
+           ibm3584Trap232,
+           ibm3584Trap233,
+           ibm3584Trap234,
+           ibm3584Trap235,
+           ibm3584Trap236,
+           ibm3584Trap237,
+           ibm3584Trap249,
+           ibm3584Trap252,
+           ibm3584Trap253,
+           ibm3584Trap254,
+           ibm3584Trap255,
+           ibm3584Trap256,
+           ibm3584Trap257,
+           ibm3584Trap259,
+           ibm3584Trap260,
+           ibm3584Trap401,
+           ibm3584Trap402,
+           ibm3584Trap403,
+           ibm3584Trap405,
+           ibm3584Trap406,
+           ibm3584Trap407,
+           ibm3584Trap408,
+           ibm3584Trap409,
+           ibm3584Trap410,
+           ibm3584Trap415,
+           ibm3584Trap416,
+           ibm3584Trap419,
+           ibm3584Trap420,
+           ibm3584Trap421,
+           ibm3584Trap422,
+           ibm3584Trap424,
+           ibm3584Trap425,
+           ibm3584Trap426,
+           ibm3584Trap427,
+           ibm3584Trap428,
+           ibm3584Trap429,
+           ibm3584Trap430,
+           ibm3584Trap431,
+           ibm3584Trap432,
+           ibm3584Trap433,
+           ibm3584Trap434,
+           ibm3584Trap435,
+           ibm3584Trap436,
+           ibm3584Trap440,
+           ibm3584Trap441,
+           ibm3584Trap442,
+           ibm3584Trap443,
+           ibm3584Trap444,
+           ibm3584Trap445,
+           ibm3584Trap446,
+           ibm3584Trap447,
+           ibm3584Trap448,
+           ibm3584Trap449,
+           ibm3584Trap450,
+           ibm3584Trap451,
+           ibm3584Trap452,
+           ibm3584Trap453,
+           ibm3584Trap454,
+           ibm3584Trap455,
+           ibm3584Trap456,
+           ibm3584Trap457,
+           ibm3584Trap458,
+           ibm3584Trap459       
+         }
+      STATUS current
+      DESCRIPTION
+          "Mandatory notification for entities implemented in this MIB."
+      ::= { ibm3584MIBGroups 1 }
+
+-- Objects used in the traps
+ibm3584MIBObjectsGroup OBJECT-GROUP
+      OBJECTS
+         { ibm3584MIBObjectsMTMNLSN,
+           ibm3584MIBObjectsSKASCASCQ,
+           ibm3584MIBObjectsErrorCode,
+           ibm3584MIBObjectsURC,
+           ibm3584MIBObjectsTD,
+           ibm3584MIBObjectsVOLSER,
+           ibm3584MIBObjectsLL,
+           ibm3584MIBObjectsWWNN,
+           ibm3584MIBObjectsDrvSN,
+           ibm3584MIBObjectsSeverity,
+           ibm3584MIBObjectsUserID,
+           ibm3584MIBObjectsLocation
+         }
+      STATUS current
+      DESCRIPTION
+          "Mandatory objects for entities implemented in this MIB."
+      ::= { ibm3584MIBGroups 3 }
+
+
+
+END

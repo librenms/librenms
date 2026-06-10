@@ -1,0 +1,21 @@
+.tagmanagerTag {
+  background: none repeat scroll 0 0 #cde69c;
+  border: 1px solid #a5d24a;
+  border-radius: 3px;
+  color: #638421;
+  display: block;
+  float: left;
+  font-size: 13px;
+  margin-bottom: 5px;
+  margin-right: 5px;
+  padding: 6px 5px 5px 5px;
+  text-decoration: none;
+  vertical-align: middle;
+  line-height: 18px;
+  height: 30px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;
+}
+.tagmanagerRemoveTag {
+  color: #c0c0c0;
+  padding-left: 8px;
+}

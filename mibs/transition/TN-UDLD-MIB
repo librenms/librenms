@@ -1,0 +1,227 @@
+-- *****************************************************************
+-- TN-UDLD-MIB.mib : TN UDLD private MIB
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+
+TN-UDLD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TNDisplayString FROM TN-TC
+    TNInterfaceIndex FROM TN-TC
+    ;
+
+tnUdldMib MODULE-IDENTITY
+    LAST-UPDATED "201507080000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "This is a private MIB for udld"
+    REVISION    "201507080000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { tnProducts 124 }
+
+
+TNUdldDetectionState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the link detection state."
+    SYNTAX      INTEGER { inDeterminant(0), uniDirectional(1), biDirectional(2), neighborMismatch(3), loopback(4), multipleNeighbor(5) }
+
+TNUdldMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "This enumeration defines the available udld mode."
+    SYNTAX      INTEGER { disable(0), normal(1), aggressive(2) }
+
+tnUdldConfigInterfaceParamTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNUdldConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of udld interface conf parameters"
+    ::= { tnUdldMib 1 }
+
+tnUdldConfigInterfaceParamEntry OBJECT-TYPE
+    SYNTAX      TNUdldConfigInterfaceParamEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each physical interface has a set of configurable parameters"
+    INDEX       { tnUdldConfigInterfaceParamIfIndex }
+    ::= { tnUdldConfigInterfaceParamTable 1 }
+
+TNUdldConfigInterfaceParamEntry ::= SEQUENCE {
+    tnUdldConfigInterfaceParamIfIndex     TNInterfaceIndex,
+    tnUdldConfigInterfaceParamUdldMode    TNUdldMode,
+    tnUdldConfigInterfaceParamProbeMsgInterval    Unsigned32
+}
+
+tnUdldConfigInterfaceParamIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { tnUdldConfigInterfaceParamEntry 1 }
+
+tnUdldConfigInterfaceParamUdldMode OBJECT-TYPE
+    SYNTAX      TNUdldMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Port udld mode disable/normal/aggresive. 
+          disable(0), normal(1), aggressive(2)"
+    ::= { tnUdldConfigInterfaceParamEntry 2 }
+
+tnUdldConfigInterfaceParamProbeMsgInterval OBJECT-TYPE
+    SYNTAX      Unsigned32 (7..90)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Port probe message interval(seconds). Valid range: 7 to 90 seconds."
+    ::= { tnUdldConfigInterfaceParamEntry 3 }
+
+tnUdldStatusInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNUdldStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of udld interface local device information"
+   ::= { tnUdldMib 2 }
+
+tnUdldStatusInterfaceEntry OBJECT-TYPE
+    SYNTAX      TNUdldStatusInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each udld enabled interface has a local device information"
+    INDEX       { tnUdldStatusInterfaceIfIndex }
+    ::= { tnUdldStatusInterfaceTable 1 }
+
+TNUdldStatusInterfaceEntry ::= SEQUENCE {
+    tnUdldStatusInterfaceIfIndex      TNInterfaceIndex,
+    tnUdldStatusInterfaceDeviceID     TNDisplayString,
+    tnUdldStatusInterfaceDeviceName   TNDisplayString,
+    tnUdldStatusInterfaceLinkState    TNUdldDetectionState
+}
+
+tnUdldStatusInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { tnUdldStatusInterfaceEntry 1 }
+
+tnUdldStatusInterfaceDeviceID OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local device id."
+    ::= { tnUdldStatusInterfaceEntry 2 }
+
+tnUdldStatusInterfaceDeviceName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local device name."
+    ::= { tnUdldStatusInterfaceEntry 3 }
+
+tnUdldStatusInterfaceLinkState OBJECT-TYPE
+    SYNTAX      TNUdldDetectionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Local device link detected state."
+    ::= { tnUdldStatusInterfaceEntry 4 }
+
+tnUdldStatusInterfaceNeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNUdldStatusInterfaceNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of udld interface neighbor cache information"
+    ::= { tnUdldMib 3 }
+
+tnUdldStatusInterfaceNeighborEntry OBJECT-TYPE
+    SYNTAX      TNUdldStatusInterfaceNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each udld enabled interface has a neighbor cache information"
+    INDEX       { tnUdldStatusInterfaceNeighborIfIndex }
+    ::= { tnUdldStatusInterfaceNeighborTable 1 }
+
+TNUdldStatusInterfaceNeighborEntry ::= SEQUENCE {
+    tnUdldStatusInterfaceNeighborIfIndex      TNInterfaceIndex,
+    tnUdldStatusInterfaceNeighborNeighborDeviceID     TNDisplayString,
+    tnUdldStatusInterfaceNeighborNeighborPortID   TNDisplayString,
+    tnUdldStatusInterfaceNeighborNeighborDeviceName   TNDisplayString,
+    tnUdldStatusInterfaceNeighborLinkDetectionState   TNUdldDetectionState
+}
+
+tnUdldStatusInterfaceNeighborIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface number."
+    ::= { tnUdldStatusInterfaceNeighborEntry 1 }
+
+tnUdldStatusInterfaceNeighborNeighborDeviceID OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor device id."
+    ::= { tnUdldStatusInterfaceNeighborEntry 2 }
+
+tnUdldStatusInterfaceNeighborNeighborPortID OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor port id."
+    ::= { tnUdldStatusInterfaceNeighborEntry 3 }
+
+tnUdldStatusInterfaceNeighborNeighborDeviceName OBJECT-TYPE
+    SYNTAX      TNDisplayString (SIZE(0..254))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor device name."
+    ::= { tnUdldStatusInterfaceNeighborEntry 4 }
+
+tnUdldStatusInterfaceNeighborLinkDetectionState OBJECT-TYPE
+    SYNTAX      TNUdldDetectionState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Neighbor device link detected state."
+    ::= { tnUdldStatusInterfaceNeighborEntry 5 }
+
+
+END

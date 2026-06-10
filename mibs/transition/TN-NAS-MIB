@@ -1,0 +1,867 @@
+-- *****************************************************************
+-- TN-NAS-MIB.mib : TN Network Access Service MIB
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-NAS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32,
+    Gauge32,
+    TimeTicks
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    RowStatus,TruthValue,
+    MacAddress,
+    DisplayString
+        FROM SNMPv2-TC     -- [RFC2579]  
+    VlanId
+        FROM Q-BRIDGE-MIB
+    tnProducts
+        FROM TRANSITION-SMI; 
+        
+TnNASAdminStateType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Indicates the type of network access server admin state type.
+       "
+    SYNTAX      INTEGER {
+                  forceAuthorized (1),
+                  portBased802dot1x (2),
+                  forceUnauthorized (3),
+                  macBasedAuth (4),
+                  single802dot1x (5),
+                  multi802dot1x (6)
+                } 
+
+--
+-- main body
+--
+tnNASMIB MODULE-IDENTITY
+    LAST-UPDATED    "201204051930Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+             Technical Support
+             10900 Red Circle Drive
+             Minnetonka, MN 55343 USA
+             Tel: +1-800-526-9267
+             E-mail: techsupport@transition.com
+            "
+    DESCRIPTION
+        "TBD"
+    REVISION        "201204200000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 125 }
+
+tnNASMIBNotifications  OBJECT IDENTIFIER ::= { tnNASMIB 0 }
+
+tnNASMIBObjects  OBJECT IDENTIFIER ::= { tnNASMIB 1 }
+
+tnNASMIBConformance  OBJECT IDENTIFIER ::= { tnNASMIB 2 }
+
+--
+-- sub Objects list
+--
+tnNASSysMgmt                                   OBJECT IDENTIFIER ::= { tnNASMIBObjects 1 }
+tnNASPortMgmt                                  OBJECT IDENTIFIER ::= { tnNASMIBObjects 2 }
+tnNASAuthCountMgmt                             OBJECT IDENTIFIER ::= { tnNASMIBObjects 3 }
+tnNASPortStatus                                OBJECT IDENTIFIER ::= { tnNASMIBObjects 4 }
+tnNASClientStatus                              OBJECT IDENTIFIER ::= { tnNASMIBObjects 5 }
+tnNASSelectedBackendServerCounter              OBJECT IDENTIFIER ::= { tnNASMIBObjects 6 }
+tnNASSelectedEapolCounter                      OBJECT IDENTIFIER ::= { tnNASMIBObjects 7 }
+tnNASAttachedClientStatus                      OBJECT IDENTIFIER ::= { tnNASMIBObjects 8 }
+tnNASClearCounter                              OBJECT IDENTIFIER ::= { tnNASMIBObjects 9 }
+
+-- ******************************************************************
+-- system configuration
+-- ******************************************************************
+tnNASSysReAuthEnabled OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "If checked, successfully authenticated supplicants/clients are reauthenticated after the interval specified by 
+         the Reauthentication Period.Reauthentication for 802.1X-enabled ports can be used to detect if a new device is plugged into 
+         a switch port or if a supplicant is no longer attached.
+         For MAC-based ports, reauthentication is only useful if the RADIUS server configuration has changed. 
+         It does not involve communication between the switch and the client, and therefore doesn't imply that a client is still present on a port.
+         "
+    ::= { tnNASSysMgmt 1 }
+
+tnNASSysReAuthPeriod OBJECT-TYPE
+    SYNTAX          INTEGER(1..3600)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Determines the period, in seconds, after which a connected client must be reauthenticated. 
+         This is only active if the Reauthentication Enabled checkbox is checked. Valid values are in the range 1 to 3600 seconds.
+         "
+    ::= { tnNASSysMgmt 2 }
+  
+tnNASSysEAPOLTimeout OBJECT-TYPE
+    SYNTAX          INTEGER(1..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Determines the time for retransmission of Request Identity EAPOL frames.
+         Valid values are in the range 1 to 65535 seconds. This has no effect for MAC-based ports..
+         "
+    ::= { tnNASSysMgmt 3 }
+
+tnNASSysAgingPeriod OBJECT-TYPE
+    SYNTAX          Unsigned32(10..1000000)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This setting applies to the following modes, i.e. modes using the Port Security functionality to secure MAC addresses:
+         Single 802.1X, Multi 802.1X, MAC-Based Auth.
+         When the NAS module uses the Port Security module to secure MAC addresses, the Port Security module needs to 
+         check for activity on the MAC address in question at regular intervals and free resources if no activity is seen within 
+         a given period of time. This parameter controls exactly this period and can be set to a number between 10 and 1000000 seconds. 
+         If reauthentication is enabled and the port is in an 802.1X-based mode, this is not so critical, since supplicants that are 
+         no longer attached to the port will get removed upon the next reauthentication, which will fail. But if reauthentication is not enabled, 
+         the only way to free resources is by aging the entries. 
+         For ports in MAC-based Auth. mode, reauthentication doesn't cause direct communication between the switch and the client, 
+         so this will not detect whether the client is still attached or not, and the only way to free any resources is to age the entry..
+         "
+    ::= { tnNASSysMgmt 4 }
+    
+tnNASSysHoldTime OBJECT-TYPE
+    SYNTAX          Unsigned32(10..1000000)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This setting applies to the following modes, i.e. modes using the Port Security functionality to secure MAC addresses:
+         Single 802.1X, Multi 802.1X, MAC-Based Auth.
+         If a client is denied access - either because the RADIUS server denies the client access or because the RADIUS server request times out,
+         the client is put on hold in the Unauthorized state. The hold timer does not count during an on-going authentication.
+         In MAC-based Auth. mode, the switch will ignore new frames coming from the client during the hold time.
+         The Hold Time can be set to a number between 10 and 1000000 seconds..
+         "
+    ::= { tnNASSysMgmt 5 }
+    
+tnNASSysRadiusAssignedQosEnable OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "RADIUS-assigned QoS provides a means to centrally control the traffic class to which traffic coming from 
+        a successfully authenticated supplicant is assigned on the switch. The RADIUS server must be configured to 
+        transmit special RADIUS attributes to take advantage of this feature.
+
+        When checked, the individual ports' ditto setting determine whether RADIUS-assigned QoS Class is enabled on that port. 
+        When unchecked, RADIUS-server assigned QoS Class is disabled on all ports..
+         "
+    ::= { tnNASSysMgmt 6 }
+    
+tnNASSysRadiusAssignedVlanEnable OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "RADIUS-assigned VLAN provides a means to centrally control the VLAN on which a successfully authenticated supplicant 
+        is placed on the switch. Incoming traffic will be classified to and switched on the RADIUS-assigned VLAN. 
+        The RADIUS server must be configured to transmit special RADIUS attributes to take advantage of this feature.
+
+        When checked, the individual ports' ditto setting determine whether RADIUS-assigned VLAN is enabled on that port. 
+        When unchecked, RADIUS-server assigned VLAN is disabled on all ports..
+         "
+    ::= { tnNASSysMgmt 7 }
+
+tnNASSysGuestVlanEnable OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "A Guest VLAN is a special VLAN - typically with limited network access - on which 802.1X-unaware clients are placed after 
+         a network administrator-defined timeout. The switch follows a set of rules for entering and leaving the Guest VLAN as listed below.
+
+         When checked, the individual ports' ditto setting determines whether the port can be moved into Guest VLAN. 
+         When unchecked, the ability to move to the Guest VLAN is disabled on all ports..
+         "
+    ::= { tnNASSysMgmt 8 }
+    
+tnNASSysGuestVlanId OBJECT-TYPE
+    SYNTAX          VlanId
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This is the value that a port's Port VLAN ID is set to if a port is moved into the Guest VLAN. 
+         It is only changeable if the Guest VLAN option is globally enabled.
+         Valid values are in the range [1; 4094].
+         "
+    ::= { tnNASSysMgmt 9 }
+    
+tnNASSysMaxReAuthCount OBJECT-TYPE
+    SYNTAX          INTEGER(1..255)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The number of times the switch transmits an EAPOL Request Identity frame without response before considering entering 
+         the Guest VLAN is adjusted with this setting. The value can only be changed if the Guest VLAN option is globally enabled.
+         Valid values are in the range [1; 255]..
+         "
+    ::= { tnNASSysMgmt 10 }
+    
+tnNASSysAllowGuestVlanIFEAPOLSeen OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The switch remembers if an EAPOL frame has been received on the port for the life-time of the port. 
+         Once the switch considers whether to enter the Guest VLAN, it will first check if this option is enabled or disabled. 
+         If disabled (unchecked; default), the switch will only enter the Guest VLAN if an EAPOL frame has not been received 
+         on the port for the life-time of the port. 
+         If enabled (checked), the switch will consider entering the Guest VLAN even if an EAPOL frame has been received 
+         on the port for the life-time of the port.
+         The value can only be changed if the Guest VLAN option is globally enabled..
+         "
+    ::= { tnNASSysMgmt 11 }
+ 
+-- ******************************************************************
+-- NAS port configuration table
+-- ******************************************************************
+tnNASPortCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASPortCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table displays and sets port configuratio.
+        "
+    ::= { tnNASPortMgmt 1 }
+
+tnNASPortCfgEntry OBJECT-TYPE
+    SYNTAX          TnNASPortCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents a port configuration."
+    INDEX           { tnNASPortNum }
+    ::= { tnNASPortCfgTable 1 }
+
+TnNASPortCfgEntry ::= SEQUENCE {
+        tnNASPortNum                                Unsigned32,
+        tnNASAdminState                             INTEGER,
+        tnNASRadiusAssignedQosEnabled               INTEGER,
+        tnNASRadiusAssignedVlanEnabled              INTEGER,
+        tnNASGuestVlanEnabled                       INTEGER,
+        tnNASPortCfgState                           INTEGER
+}
+
+tnNASPortNum OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+        "The port number for which the configuration below applies.
+        "
+    ::= { tnNASPortCfgEntry 1 }
+
+tnNASAdminState OBJECT-TYPE
+    SYNTAX          TnNASAdminStateType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "If NAS is globally enabled, this selection controls the port's authentication mode. 
+        "
+    ::= { tnNASPortCfgEntry 2 }
+
+tnNASRadiusAssignedQosEnabled  OBJECT-TYPE
+    SYNTAX         INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When RADIUS-Assigned QoS is both globally enabled and enabled (checked) on a given port, the switch reacts to QoS Class information 
+        carried in the RADIUS Access-Accept packet transmitted by the RADIUS server when a supplicant is successfully authenticated. 
+        If present and valid, traffic received on the supplicant's port will be classified to the given QoS Class. If (re-)authentication fails 
+        or the RADIUS Access-Accept packet no longer carries a QoS Class or it's invalid, or the supplicant is otherwise no longer present on 
+        the port, the port's QoS Class is immediately reverted to the original QoS Class (which may be changed by the administrator 
+        in the meanwhile without affecting the RADIUS-assigned).
+        This option is only available for single-client modes, i.e Port-based 802.1X, Single 802.1X
+        "
+    ::= { tnNASPortCfgEntry 3 }
+
+tnNASRadiusAssignedVlanEnabled OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "When RADIUS-Assigned VLAN is both globally enabled and enabled (checked) for a given port, the switch reacts to VLAN ID information 
+         carried in the RADIUS Access-Accept packet transmitted by the RADIUS server when a supplicant is successfully authenticated. 
+         If present and valid, the port's Port VLAN ID will be changed to this VLAN ID, the port will be set to be a member of that VLAN ID, 
+         and the port will be forced into VLAN unaware mode. Once assigned, all traffic arriving on the port will be classified and switched 
+         on the RADIUS-assigned VLAN ID.
+         If (re-)authentication fails or the RADIUS Access-Accept packet no longer carries a VLAN ID or it's invalid, or the supplicant 
+         is otherwise no longer present on the port, the port's VLAN ID is immediately reverted to the original VLAN ID 
+         (which may be changed by the administrator in the meanwhile without affecting the RADIUS-assigned).
+         This option is only available for single-client modes, i.e. Port-based 802.1X, Single 802.1X.
+         "
+    ::= { tnNASPortCfgEntry 4 }
+
+tnNASGuestVlanEnabled OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       enable (1),
+                       disable (2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "TWhen Guest VLAN is both globally enabled and enabled (checked) for a given port, the switch considers moving the port into 
+        the Guest VLAN according to the rules outlined below.
+        This option is only available for EAPOL-based modes, i.e.: Port-based 802.1X, Single 802.1X, Multi 802.1X  
+         "
+    ::= { tnNASPortCfgEntry 5 }
+          
+tnNASPortCfgState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                       linkDown (0),
+                       authorized(1),
+                       unauthorized (2),
+                       globallyDisabled (3),
+                       authOrUnauth(4) 
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The current state of the port.
+         "
+    ::= { tnNASPortCfgEntry 6 }       
+                                              
+-- ******************************************************************
+-- NAS authorized count table
+-- ******************************************************************
+tnNASAuthCountTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASAuthCountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of auth counter."
+    ::= { tnNASAuthCountMgmt 1 }
+
+tnNASAuthCountEntry OBJECT-TYPE
+    SYNTAX        TnNASAuthCountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an auth counter.
+        "
+    INDEX           { tnNASPortNum }
+    ::= { tnNASAuthCountTable 1 }
+
+TnNASAuthCountEntry ::= SEQUENCE {
+        tnNASAuthCount        INTEGER,
+        tnNASUnauthCount      INTEGER
+}
+        
+tnNASAuthCount OBJECT-TYPE
+    SYNTAX    INTEGER
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "NAS auththenticate count"
+    ::= { tnNASAuthCountEntry 1 }
+        
+tnNASUnauthCount OBJECT-TYPE
+    SYNTAX    INTEGER
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "NAS unauththenticate count"
+    ::= { tnNASAuthCountEntry 2 }
+ 
+-- ******************************************************************
+-- NAS port status table
+-- ******************************************************************  
+tnNASPortStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASPortStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of port status."
+    ::= { tnNASPortStatus 1 }
+
+tnNASPortStatusEntry OBJECT-TYPE
+    SYNTAX        TnNASPortStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents a port status.
+        "
+    INDEX           { tnNASPortNum }
+    ::= { tnNASPortStatusTable 1 }
+
+TnNASPortStatusEntry ::= SEQUENCE {
+        tnNASPortAdminState       INTEGER,
+        tnNASPortState            INTEGER,
+        tnNASQosClass             OCTET STRING,
+        tnNASPortVlanId           VlanId
+}
+
+tnNASPortAdminState OBJECT-TYPE
+    SYNTAX    TnNASAdminStateType
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The port's current administrative state.
+        "
+    ::= { tnNASPortStatusEntry 1 }
+
+tnNASPortState OBJECT-TYPE
+    SYNTAX    INTEGER{
+                       linkDown (0),
+                       authorized(1),
+                       unauthorized (2),
+                       globallyDisabled (3),
+                       authOrUnauth(4) 
+                    }
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The current state of the port.
+        "
+    ::= { tnNASPortStatusEntry 2 }
+   
+tnNASQosClass OBJECT-TYPE
+    SYNTAX    OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The QoS class assigned by the RADIUS server. The field is blank if no QoS class is assigned.
+        "
+    ::= { tnNASPortStatusEntry 3 }
+    
+tnNASPortVlanId OBJECT-TYPE
+    SYNTAX    VlanId
+    MAX-ACCESS  read-only
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID that NAS has put the port in. The field is blank, if the Port VLAN ID is not overridden by NAS. 
+        "
+    ::= { tnNASPortStatusEntry 4 }
+  
+-- ******************************************************************
+-- NAS client and supplication status table
+-- ****************************************************************** 
+tnNASClientStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASClientStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of client status."
+    ::= { tnNASClientStatus 1 }
+
+tnNASClientStatusEntry OBJECT-TYPE
+    SYNTAX          TnNASClientStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents a client status.
+        "
+    INDEX           { tnNASPortNum, tnNASClientNum }
+    ::= { tnNASClientStatusTable 1 }
+
+TnNASClientStatusEntry ::= SEQUENCE { 
+        tnNASClientNum                Unsigned32,
+        tnNASMacAddr                  MacAddress,
+        tnNASVlanId                   VlanId,
+        tnNASVersion                  INTEGER,
+        tnNASIdentify                 OCTET STRING
+}      
+
+tnNASClientNum OBJECT-TYPE
+         SYNTAX     Unsigned32(1..2)
+         MAX-ACCESS not-accessible
+         STATUS     current
+         DESCRIPTION
+            "1 for last client/supplication; 2 for selected client/supplication."
+        ::= { tnNASClientStatusEntry 1 }
+
+tnNASMacAddr OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The MAC address of the last supplicant/client.
+                    "
+        ::= { tnNASClientStatusEntry 2 }
+
+tnNASVlanId OBJECT-TYPE
+        SYNTAX      VlanId
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The VLAN ID on which the last frame from the last supplicant/client was received.
+                    "
+        ::= { tnNASClientStatusEntry 3 } 
+        
+tnNASIdentify OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "802.1X-based: The user name (supplicant identity) carried in the most recently received Response Identity EAPOL frame. 
+                     MAC-based: Not applicable.
+                    "
+        ::= { tnNASClientStatusEntry 4 }        
+   
+-- ******************************************************************
+-- NAS selected client backend server counter table
+-- ****************************************************************** 
+tnNASSelectedBackendServerCounterTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASSelectedBackendServerCounterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of Selected backend server counter."
+    ::= { tnNASSelectedBackendServerCounter 1 }
+
+tnNASSelectedBackendServerCounterEntry OBJECT-TYPE
+    SYNTAX          TnNASSelectedBackendServerCounterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an Selected backend server counter.
+        "
+    INDEX           { tnNASPortNum }
+    ::= { tnNASSelectedBackendServerCounterTable 1 }
+
+TnNASSelectedBackendServerCounterEntry ::= SEQUENCE {
+        tnNASRxAccessChallenges        Gauge32,
+        tnNASRxOtherRequests           Gauge32,
+        tnNASRxAuthSuccesses           Gauge32,
+        tnNASRxAuthFailures            Gauge32,
+        tnNASTxResponses               Gauge32
+}
+
+tnNASRxAccessChallenges OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "802.1X-based: Counts the number of times that the switch receives the first request from the backend server 
+                     following the first response from the supplicant. Indicates that the backend server has communication with the switch. 
+                     MAC-based: Counts all Access Challenges received from the backend server for this port (left-most table) or client (right-most table).
+                    "
+        ::= { tnNASSelectedBackendServerCounterEntry 1 }
+
+tnNASRxOtherRequests OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "802.1X-based: Counts the number of times that the switch sends an EAP Request packet following the first to the supplicant. 
+                     Indicates that the backend server chose an EAP-method. 
+                     MAC-based: Not applicable.
+                    "
+        ::= { tnNASSelectedBackendServerCounterEntry 2 }
+        
+tnNASRxAuthSuccesses OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "802.1X- and MAC-based: Counts the number of times that the switch receives a success indication. 
+                     Indicates that the supplicant/client has successfully authenticated to the backend server.
+                    "
+        ::= { tnNASSelectedBackendServerCounterEntry 3 }
+        
+tnNASRxAuthFailures OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "802.1X- and MAC-based: Counts the number of times that the switch receives a failure message. 
+                     This indicates that the supplicant/client has not authenticated to the backend server.
+                    "
+        ::= { tnNASSelectedBackendServerCounterEntry 4 }
+        
+tnNASTxResponses OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "    802.1X-based: Counts the number of times that the switch attempts to send a supplicant's first response packet to 
+                        the backend server. Indicates the switch attempted communication with the backend server. Possible retransmissions are 
+                        not counted. 
+                        MAC-based: Counts all the backend server packets sent from the switch towards the backend server for a given port
+                        or client (right-most table). Possible retransmissions are not counted.
+                    "
+        ::= { tnNASSelectedBackendServerCounterEntry 5 }
+
+-- ******************************************************************
+-- NAS selected client EAPOL counter table
+-- ****************************************************************** 
+tnNASSelectedEapolCounterTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASSelectedEapolCounterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of selected EAPOL counter."
+    ::= { tnNASSelectedEapolCounter 1 }
+
+tnNASSelectedEapolCounterEntry OBJECT-TYPE
+    SYNTAX          TnNASSelectedEapolCounterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents a selected EAPOL counter.
+        "
+    INDEX           { tnNASPortNum }
+    ::= { tnNASSelectedEapolCounterTable 1 }
+
+TnNASSelectedEapolCounterEntry ::= SEQUENCE {
+        tnNASRxTotal                       Gauge32,
+        tnNASRxResponseId                  Gauge32,
+        tnNASRxResponses                   Gauge32,
+        tnNASRxStart                       Gauge32,
+        tnNASRxLogoff                      Gauge32,
+        tnNASRxInvalidType                 Gauge32,
+        tnNASRxInvalidLength               Gauge32,
+        tnNASTxTotal                       Gauge32,
+        tnNASTxRequestId                   Gauge32,
+        tnNASTxRequests                    Gauge32
+}
+
+tnNASRxTotal OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of valid EAPOL frames of any type that have been received by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 1 }
+
+tnNASRxResponseId OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of valid EAPOL Response Identity frames that have been received by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 2 }
+        
+tnNASRxResponses OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of valid EAPOL response frames (other than Response Identity frames) that have been received by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 3 }
+        
+tnNASRxStart OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of EAPOL Start frames that have been received by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 4 }
+        
+tnNASRxLogoff OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of valid EAPOL Logoff frames that have been received by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 5 }
+        
+tnNASRxInvalidType OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of EAPOL frames that have been received by the switch in which the frame type is not recognized.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 6 }
+        
+tnNASRxInvalidLength OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of EAPOL frames that have been received by the switch in which the Packet Body Length field is invalid.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 7 }
+        
+tnNASTxTotal OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of EAPOL frames of any type that have been transmitted by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 8 }
+        
+tnNASTxRequestId OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of EAPOL Request Identity frames that have been transmitted by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 9 }
+        
+tnNASTxRequests OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of valid EAPOL Request frames (other than Request Identity frames) that have been transmitted by the switch.
+                    "
+        ::= { tnNASSelectedEapolCounterEntry 10 }        
+        
+-- ******************************************************************
+-- NAS attached client/supplication status table
+-- ******************************************************************  
+tnNASAttachedClientStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASAttachedClientStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of attached client status."
+    ::= { tnNASAttachedClientStatus 1 }
+
+tnNASAttachedClientStatusEntry OBJECT-TYPE
+    SYNTAX          TnNASAttachedClientStatusEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents an attached client status.
+        "
+    INDEX           { tnNASPortNum, tnNASAttachedNum }
+    ::= { tnNASAttachedClientStatusTable 1 }
+
+TnNASAttachedClientStatusEntry ::= SEQUENCE {
+        tnNASAttachedNum                   Unsigned32,
+        tnNASAttachedIdentify              OCTET STRING,
+        tnNASMacAddress                    MacAddress,
+        tnNASAttachedVlanId                VlanId,
+        tnNASState                         INTEGER,
+        tnNASLastAuthentication            OCTET STRING,
+        tnNASSelected                      INTEGER
+}
+
+tnNASAttachedNum OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS      current
+        DESCRIPTION "The number of attached clients/supplications.
+                    "
+        ::= { tnNASAttachedClientStatusEntry 1 } 
+        
+tnNASAttachedIdentify OBJECT-TYPE
+        SYNTAX     OCTET STRING
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION "Shows the identity of the supplicant, as received in the Response Identity EAPOL frame.
+                     If no supplicants are attached, it shows No supplicants attached. 
+                     This is not available for MAC-based Auth..
+                    "
+        ::= { tnNASAttachedClientStatusEntry 2 }
+        
+tnNASMacAddress OBJECT-TYPE
+        SYNTAX     MacAddress
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION "For Multi 802.1X, this column holds the MAC address of the attached supplicant.
+                     For MAC-based Auth., this column holds the MAC address of the attached client.
+                     If no clients are attached, it shows No clients attached.
+                    "
+        ::= { tnNASAttachedClientStatusEntry 3 }
+        
+tnNASAttachedVlanId OBJECT-TYPE
+        SYNTAX     VlanId
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION "This column holds the VLAN ID that the corresponding client is currently secured through the Port Security module.
+                    "
+        ::= { tnNASAttachedClientStatusEntry 4 }
+        
+tnNASState OBJECT-TYPE
+        SYNTAX     INTEGER {
+                       linkDown (0),
+                       authorized(1),
+                       unauthorized (2),
+                       globallyDisabled (3) 
+                    }
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION "The client can either be authenticated or unauthenticated. In the authenticated state, it is allowed to forward frames 
+                     on the port, and in the unauthenticated state, it is blocked. As long as the backend server hasn't successfully 
+                     authenticated the client, it is unauthenticated. If an authentication fails for one or the other reason, 
+                     the client will remain in the unauthenticated state for Hold Time seconds.
+                    "
+        ::= { tnNASAttachedClientStatusEntry 5 }
+        
+tnNASLastAuthentication OBJECT-TYPE
+        SYNTAX     OCTET STRING
+        MAX-ACCESS read-only
+        STATUS      current
+        DESCRIPTION "Shows the date and time of the last authentication of the client (successful as well as unsuccessful).
+                    "
+        ::= { tnNASAttachedClientStatusEntry 6 }
+        
+tnNASSelected OBJECT-TYPE
+        SYNTAX     INTEGER {
+                       unselected(0),
+                       selected(1) 
+                    }
+        MAX-ACCESS read-write
+        STATUS      current
+        DESCRIPTION "select specific attached client.
+                    "
+        ::= { tnNASAttachedClientStatusEntry 7 } 
+        
+-- ******************************************************************
+-- NAS clear counter table
+-- ******************************************************************        
+ tnNASClearCounterTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnNASClearCounterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the configuration of clearing counter."
+    ::= { tnNASClearCounter 1 }
+
+tnNASClearCounterEntry OBJECT-TYPE
+    SYNTAX          TnNASClearCounterEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents a clear counter.
+        "
+    INDEX           { tnNASPortNum }
+    ::= { tnNASClearCounterTable 1 }
+
+TnNASClearCounterEntry ::= SEQUENCE {
+        tnNASClear                      INTEGER
+}
+
+tnNASClear OBJECT-TYPE
+        SYNTAX     INTEGER {
+                       unclear(0),
+                       clear(1) 
+                    }
+        MAX-ACCESS read-write
+        STATUS      current
+        DESCRIPTION "The action of clearing counter.
+                    "
+        ::= { tnNASClearCounterEntry 1 }
+END

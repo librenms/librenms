@@ -1,0 +1,1552 @@
+-- Namespace: http://viptela.com/oper-bgp
+
+VIPTELA-OPER-BGP DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, Counter32, Counter64,
+    Gauge32, IpAddress
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, RowStatus, DateAndTime,
+    TruthValue
+        FROM SNMPv2-TC
+    viptela
+        FROM VIPTELA-GLOBAL
+;
+
+viptela-oper-bgp MODULE-IDENTITY
+    LAST-UPDATED "202007010000Z"
+    ORGANIZATION "Viptela, Inc."
+    CONTACT-INFO "Viptela, Inc.  Email:support@viptela.com"
+    DESCRIPTION "This module defines the data model for BGP operational data"
+    REVISION "202007010000Z"
+    DESCRIPTION "Viptela Revision 20.3"
+    REVISION "202002240000Z"
+    DESCRIPTION "Viptela Revision 20.1"
+    REVISION "201911150000Z"
+    DESCRIPTION "Viptela Revision 19.3"
+    REVISION "201908150000Z"
+    DESCRIPTION "Viptela Revision 19.2"
+    REVISION "201811010000Z"
+    DESCRIPTION "Viptela Revision 18.4"
+    REVISION "201808200000Z"
+    DESCRIPTION "Viptela Revision 18.3.1"
+    REVISION "201806250000Z"
+    DESCRIPTION "Viptela Revision 18.3"
+    REVISION "201804250000Z"
+    DESCRIPTION "Viptela Revision 18.2"
+    REVISION "201803150000Z"
+    DESCRIPTION "Viptela Revision 18.1.1"
+    REVISION "201801160000Z"
+    DESCRIPTION "Viptela Revision 17.2.3"
+    REVISION "201711010000Z"
+    DESCRIPTION "Viptela Revision 17.2.1"
+    REVISION "201708010000Z"
+    DESCRIPTION "Viptela Revision 17.2"
+    REVISION "201705250000Z"
+    DESCRIPTION "Viptela Revision 17.1.1"
+    REVISION "201704060000Z"
+    DESCRIPTION "Viptela Revision 17.1"
+    REVISION "201702150000Z"
+    DESCRIPTION "Viptela Revision 16.3.2"
+    REVISION "201702060000Z"
+    DESCRIPTION "Viptela Revision 16.3.1"
+    REVISION "201611160000Z"
+    DESCRIPTION "Viptela Revision 16.3"
+    REVISION "201610250000Z"
+    DESCRIPTION "Viptela Revision 16.2.10"
+    REVISION "201610240000Z"
+    DESCRIPTION "Viptela Revision 16.2.4"
+    REVISION "201608100000Z"
+    DESCRIPTION "Viptela Revision 16.2.2"
+    REVISION "201608010000Z"
+    DESCRIPTION "Viptela Revision 16.2.1"
+    REVISION "201606090000Z"
+    DESCRIPTION "Viptela Revision 16.2"
+    REVISION "201604220000Z"
+    DESCRIPTION "Viptela Revision 16.1.1"
+    REVISION "201603150000Z"
+    DESCRIPTION "Viptela Revision 16.1"
+    REVISION "201601300000Z"
+    DESCRIPTION "Viptela Revision 15.4.3"
+    REVISION "201512280000Z"
+    DESCRIPTION "Viptela Revision 15.4.1"
+    REVISION "201512010000Z"
+    DESCRIPTION "Viptela Revision 15.4.0"
+    REVISION "201510310000Z"
+    DESCRIPTION "Viptela Revision 15.3.5"
+    REVISION "201509270000Z"
+    DESCRIPTION "Viptela Revision 15.3.3"
+    REVISION "201509010000Z"
+    DESCRIPTION "Viptela Revision 15.3.1"
+    REVISION "201507010000Z"
+    DESCRIPTION "Viptela Revision 15.3"
+    ::= { viptela 14 }
+
+UnsignedShort ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION "xs:unsignedShort"
+    SYNTAX      Unsigned32 (0 .. 65535)
+
+ConfdString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs: and confd: types mapped to strings"
+    SYNTAX      OCTET STRING
+
+Ipv4Prefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d.1d.1d.1d/1d"
+    STATUS      current
+    DESCRIPTION "confd:ipv4Prefix"
+    SYNTAX      OCTET STRING (SIZE (5))
+
+String ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1t"
+    STATUS      current
+    DESCRIPTION "xs:string"
+    SYNTAX      OCTET STRING
+
+BgpRibStatusType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION ""
+    SYNTAX      BITS {valid(0),best(1),internal(2),external(3),removed(4),stale(5),history(6),damped(7),inaccessible(8),multipath(9)}
+
+-- Display BGP information
+-- tagpath /bgp
+bgp OBJECT IDENTIFIER ::= { viptela-oper-bgp 1 }
+
+-- tagpath /bgp/bgp-summary
+bgpBgpSummaryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BgpBgpSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "BGP summary"
+    ::= { viptela-oper-bgp 2 }
+
+-- tagpath /bgp/bgp-summary
+bgpBgpSummaryEntry OBJECT-TYPE
+    SYNTAX      BgpBgpSummaryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bgpBgpSummaryVpnId }
+        ::= { bgpBgpSummaryTable 1 }
+
+BgpBgpSummaryEntry ::=
+    SEQUENCE {
+        bgpBgpSummaryVpnId Unsigned32,
+        bgpBgpSummaryBgpRouterIdentifier IpAddress,
+        bgpBgpSummaryLocalAs Unsigned32,
+        bgpBgpSummaryRibEntries Unsigned32,
+        bgpBgpSummaryRibMemory Unsigned32,
+        bgpBgpSummaryTotalPeers Unsigned32,
+        bgpBgpSummaryPeerMemory Unsigned32,
+        bgpBgpSummaryLocalSiteOfOrigin String,
+        bgpBgpSummaryIgnoreSiteOfOrigin TruthValue
+    }
+
+-- tagpath /bgp/bgp-summary/vpn-id
+bgpBgpSummaryVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { bgpBgpSummaryEntry 1 }
+
+-- tagpath /bgp/bgp-summary/bgp-router-identifier
+bgpBgpSummaryBgpRouterIdentifier OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router ID"
+    ::= { bgpBgpSummaryEntry 2 }
+
+-- tagpath /bgp/bgp-summary/local-as
+bgpBgpSummaryLocalAs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local AS number"
+    ::= { bgpBgpSummaryEntry 3 }
+
+-- tagpath /bgp/bgp-summary/rib-entries
+bgpBgpSummaryRibEntries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB count"
+    ::= { bgpBgpSummaryEntry 4 }
+
+-- tagpath /bgp/bgp-summary/rib-memory
+bgpBgpSummaryRibMemory OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "RIB memory usage, in bytes"
+    ::= { bgpBgpSummaryEntry 5 }
+
+-- tagpath /bgp/bgp-summary/total-peers
+bgpBgpSummaryTotalPeers OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total number of BGP neighbors"
+    ::= { bgpBgpSummaryEntry 6 }
+
+-- tagpath /bgp/bgp-summary/peer-memory
+bgpBgpSummaryPeerMemory OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor memory usage, in bytes"
+    ::= { bgpBgpSummaryEntry 7 }
+
+-- tagpath /bgp/bgp-summary/local-site-of-origin
+bgpBgpSummaryLocalSiteOfOrigin OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local site-of-origin extended community added to OMP routes in BGP"
+    ::= { bgpBgpSummaryEntry 8 }
+
+-- tagpath /bgp/bgp-summary/ignore-site-of-origin
+bgpBgpSummaryIgnoreSiteOfOrigin OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ignore site-of-origin value in BGP"
+    ::= { bgpBgpSummaryEntry 9 }
+
+-- tagpath /bgp/bgp-summary/neighbor
+bgpBgpSummaryNeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BgpBgpSummaryNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of neighbors"
+    ::= { viptela-oper-bgp 3 }
+
+-- tagpath /bgp/bgp-summary/neighbor
+bgpBgpSummaryNeighborEntry OBJECT-TYPE
+    SYNTAX      BgpBgpSummaryNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bgpBgpSummaryVpnId, bgpBgpSummaryNeighborPeerAddr }
+        ::= { bgpBgpSummaryNeighborTable 1 }
+
+BgpBgpSummaryNeighborEntry ::=
+    SEQUENCE {
+        bgpBgpSummaryNeighborPeerAddr IpAddress,
+        bgpBgpSummaryNeighborAs Unsigned32,
+        bgpBgpSummaryNeighborMsgRcvd Unsigned32,
+        bgpBgpSummaryNeighborMsgSent Unsigned32,
+        bgpBgpSummaryNeighborOutQ Unsigned32,
+        bgpBgpSummaryNeighborPrefixRcvd Unsigned32,
+        bgpBgpSummaryNeighborPrefixValid Unsigned32,
+        bgpBgpSummaryNeighborPrefixInstalled Unsigned32,
+        bgpBgpSummaryNeighborUpTime String,
+        bgpBgpSummaryNeighborState INTEGER,
+        bgpBgpSummaryNeighborLastUpTime String
+    }
+
+-- tagpath /bgp/bgp-summary/neighbor/peer-addr
+bgpBgpSummaryNeighborPeerAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Neighbor address"
+    ::= { bgpBgpSummaryNeighborEntry 1 }
+
+-- tagpath /bgp/bgp-summary/neighbor/as
+bgpBgpSummaryNeighborAs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor AS number"
+    ::= { bgpBgpSummaryNeighborEntry 2 }
+
+-- tagpath /bgp/bgp-summary/neighbor/msg-rcvd
+bgpBgpSummaryNeighborMsgRcvd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of messages received"
+    ::= { bgpBgpSummaryNeighborEntry 3 }
+
+-- tagpath /bgp/bgp-summary/neighbor/msg-sent
+bgpBgpSummaryNeighborMsgSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of messages sent"
+    ::= { bgpBgpSummaryNeighborEntry 4 }
+
+-- tagpath /bgp/bgp-summary/neighbor/outQ
+bgpBgpSummaryNeighborOutQ OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound queue"
+    ::= { bgpBgpSummaryNeighborEntry 5 }
+
+-- tagpath /bgp/bgp-summary/neighbor/prefix-rcvd
+bgpBgpSummaryNeighborPrefixRcvd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of routes received"
+    ::= { bgpBgpSummaryNeighborEntry 6 }
+
+-- tagpath /bgp/bgp-summary/neighbor/prefix-valid
+bgpBgpSummaryNeighborPrefixValid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of valid routes"
+    ::= { bgpBgpSummaryNeighborEntry 7 }
+
+-- tagpath /bgp/bgp-summary/neighbor/prefix-installed
+bgpBgpSummaryNeighborPrefixInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of installed routes"
+    ::= { bgpBgpSummaryNeighborEntry 8 }
+
+-- tagpath /bgp/bgp-summary/neighbor/up-time
+bgpBgpSummaryNeighborUpTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uptime (Days:Hours:Minutes:Seconds)"
+    ::= { bgpBgpSummaryNeighborEntry 9 }
+
+-- tagpath /bgp/bgp-summary/neighbor/state
+bgpBgpSummaryNeighborState OBJECT-TYPE
+    SYNTAX      INTEGER {idle(0),connect(1),active(2),opensent(3),openconfirm(4),established(5),clearing(6),deleted(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State"
+    ::= { bgpBgpSummaryNeighborEntry 10 }
+
+-- tagpath /bgp/bgp-summary/neighbor/last-up-time
+bgpBgpSummaryNeighborLastUpTime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last uptime (Days:Hours:Minutes:Seconds)"
+    ::= { bgpBgpSummaryNeighborEntry 11 }
+
+-- tagpath /bgp/routes-table
+bgpRoutesTableTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BgpRoutesTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of routes"
+    ::= { viptela-oper-bgp 4 }
+
+-- tagpath /bgp/routes-table
+bgpRoutesTableEntry OBJECT-TYPE
+    SYNTAX      BgpRoutesTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bgpRoutesTableVpnId, bgpRoutesTablePrefix }
+        ::= { bgpRoutesTableTable 1 }
+
+BgpRoutesTableEntry ::=
+    SEQUENCE {
+        bgpRoutesTableVpnId Unsigned32,
+        bgpRoutesTablePrefix Ipv4Prefix,
+        bgpRoutesTableBestPath Unsigned32,
+        bgpRoutesTableSuppressed TruthValue,
+        bgpRoutesTableNoAdvertise TruthValue,
+        bgpRoutesTableNoExport TruthValue,
+        bgpRoutesTableNoLocalAs TruthValue
+    }
+
+-- tagpath /bgp/routes-table/vpn-id
+bgpRoutesTableVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { bgpRoutesTableEntry 1 }
+
+-- tagpath /bgp/routes-table/prefix
+bgpRoutesTablePrefix OBJECT-TYPE
+    SYNTAX      Ipv4Prefix
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Route prefix"
+    ::= { bgpRoutesTableEntry 2 }
+
+-- tagpath /bgp/routes-table/best-path
+bgpRoutesTableBestPath OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Best path"
+    ::= { bgpRoutesTableEntry 3 }
+
+-- tagpath /bgp/routes-table/suppressed
+bgpRoutesTableSuppressed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Advertisements suppressed"
+    ::= { bgpRoutesTableEntry 4 }
+
+-- tagpath /bgp/routes-table/no-advertise
+bgpRoutesTableNoAdvertise OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Not advertised to any peer"
+    ::= { bgpRoutesTableEntry 5 }
+
+-- tagpath /bgp/routes-table/no-export
+bgpRoutesTableNoExport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Not advertised to EBGP peer"
+    ::= { bgpRoutesTableEntry 6 }
+
+-- tagpath /bgp/routes-table/no-local-as
+bgpRoutesTableNoLocalAs OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Not advertised outside local AS"
+    ::= { bgpRoutesTableEntry 7 }
+
+-- tagpath /bgp/routes-table/advertised-peers
+bgpRoutesTableAdvertisedPeersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BgpRoutesTableAdvertisedPeersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of peers"
+    ::= { viptela-oper-bgp 5 }
+
+-- tagpath /bgp/routes-table/advertised-peers
+bgpRoutesTableAdvertisedPeersEntry OBJECT-TYPE
+    SYNTAX      BgpRoutesTableAdvertisedPeersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bgpRoutesTableVpnId, bgpRoutesTablePrefix, bgpRoutesTableAdvertisedPeersPeerIndex }
+        ::= { bgpRoutesTableAdvertisedPeersTable 1 }
+
+BgpRoutesTableAdvertisedPeersEntry ::=
+    SEQUENCE {
+        bgpRoutesTableAdvertisedPeersPeerIndex Unsigned32,
+        bgpRoutesTableAdvertisedPeersPeerAddr IpAddress
+    }
+
+-- tagpath /bgp/routes-table/advertised-peers/peer-index
+bgpRoutesTableAdvertisedPeersPeerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Peer address"
+    ::= { bgpRoutesTableAdvertisedPeersEntry 1 }
+
+-- tagpath /bgp/routes-table/advertised-peers/peer-addr
+bgpRoutesTableAdvertisedPeersPeerAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer address"
+    ::= { bgpRoutesTableAdvertisedPeersEntry 2 }
+
+-- tagpath /bgp/routes-table/info
+bgpRoutesTableInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BgpRoutesTableInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Route information"
+    ::= { viptela-oper-bgp 6 }
+
+-- tagpath /bgp/routes-table/info
+bgpRoutesTableInfoEntry OBJECT-TYPE
+    SYNTAX      BgpRoutesTableInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bgpRoutesTableVpnId, bgpRoutesTablePrefix, bgpRoutesTableInfoInfoId }
+        ::= { bgpRoutesTableInfoTable 1 }
+
+BgpRoutesTableInfoEntry ::=
+    SEQUENCE {
+        bgpRoutesTableInfoInfoId Unsigned32,
+        bgpRoutesTableInfoNexthop IpAddress,
+        bgpRoutesTableInfoMetric Unsigned32,
+        bgpRoutesTableInfoLocalPref Unsigned32,
+        bgpRoutesTableInfoWeight Unsigned32,
+        bgpRoutesTableInfoOrigin INTEGER,
+        bgpRoutesTableInfoAsPath String,
+        bgpRoutesTableInfoRrClient TruthValue,
+        bgpRoutesTableInfoHistory TruthValue,
+        bgpRoutesTableInfoAggregator TruthValue,
+        bgpRoutesTableInfoAggregatorAs Unsigned32,
+        bgpRoutesTableInfoAggregatorIp IpAddress,
+        bgpRoutesTableInfoRiPeer IpAddress,
+        bgpRoutesTableInfoRiRouterid IpAddress,
+        bgpRoutesTableInfoIgpMetric Unsigned32,
+        bgpRoutesTableInfoConfedExternal TruthValue,
+        bgpRoutesTableInfoAggregated TruthValue,
+        bgpRoutesTableInfoLocal TruthValue,
+        bgpRoutesTableInfoSourced TruthValue,
+        bgpRoutesTableInfoMultipath TruthValue,
+        bgpRoutesTableInfoCommunity String,
+        bgpRoutesTableInfoExtCommunity String,
+        bgpRoutesTableInfoOriginator IpAddress,
+        bgpRoutesTableInfoLastUpdate String,
+        bgpRoutesTableInfoClusterList String,
+        bgpRoutesTableInfoPathStatus BgpRibStatusType,
+        bgpRoutesTableInfoTag Unsigned32,
+        bgpRoutesTableInfoOspfTag Unsigned32
+    }
+
+-- tagpath /bgp/routes-table/info/info-id
+bgpRoutesTableInfoInfoId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Route information index"
+    ::= { bgpRoutesTableInfoEntry 1 }
+
+-- tagpath /bgp/routes-table/info/nexthop
+bgpRoutesTableInfoNexthop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next-hop IP address"
+    ::= { bgpRoutesTableInfoEntry 2 }
+
+-- tagpath /bgp/routes-table/info/metric
+bgpRoutesTableInfoMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Metric"
+    ::= { bgpRoutesTableInfoEntry 3 }
+
+-- tagpath /bgp/routes-table/info/local-pref
+bgpRoutesTableInfoLocalPref OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local preference"
+    ::= { bgpRoutesTableInfoEntry 4 }
+
+-- tagpath /bgp/routes-table/info/weight
+bgpRoutesTableInfoWeight OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Weight"
+    ::= { bgpRoutesTableInfoEntry 5 }
+
+-- tagpath /bgp/routes-table/info/origin
+bgpRoutesTableInfoOrigin OBJECT-TYPE
+    SYNTAX      INTEGER {igp(0),egp(1),incomplete(2)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Origin"
+    ::= { bgpRoutesTableInfoEntry 6 }
+
+-- tagpath /bgp/routes-table/info/as-path
+bgpRoutesTableInfoAsPath OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "AS path"
+    ::= { bgpRoutesTableInfoEntry 7 }
+
+-- tagpath /bgp/routes-table/info/rr-client
+bgpRoutesTableInfoRrClient OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received from a route reflector client"
+    ::= { bgpRoutesTableInfoEntry 8 }
+
+-- tagpath /bgp/routes-table/info/history
+bgpRoutesTableInfoHistory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "History entry"
+    ::= { bgpRoutesTableInfoEntry 9 }
+
+-- tagpath /bgp/routes-table/info/aggregator
+bgpRoutesTableInfoAggregator OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Aggregated"
+    ::= { bgpRoutesTableInfoEntry 10 }
+
+-- tagpath /bgp/routes-table/info/aggregator-as
+bgpRoutesTableInfoAggregatorAs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Aggregator AS number"
+    ::= { bgpRoutesTableInfoEntry 11 }
+
+-- tagpath /bgp/routes-table/info/aggregator-ip
+bgpRoutesTableInfoAggregatorIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Aggregator IP address"
+    ::= { bgpRoutesTableInfoEntry 12 }
+
+-- tagpath /bgp/routes-table/info/ri-peer
+bgpRoutesTableInfoRiPeer OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer address"
+    ::= { bgpRoutesTableInfoEntry 13 }
+
+-- tagpath /bgp/routes-table/info/ri-routerid
+bgpRoutesTableInfoRiRouterid OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router ID"
+    ::= { bgpRoutesTableInfoEntry 14 }
+
+-- tagpath /bgp/routes-table/info/igp-metric
+bgpRoutesTableInfoIgpMetric OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IGP metric"
+    ::= { bgpRoutesTableInfoEntry 15 }
+
+-- tagpath /bgp/routes-table/info/confed-external
+bgpRoutesTableInfoConfedExternal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EBGP confederation"
+    ::= { bgpRoutesTableInfoEntry 16 }
+
+-- tagpath /bgp/routes-table/info/aggregated
+bgpRoutesTableInfoAggregated OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Aggregated"
+    ::= { bgpRoutesTableInfoEntry 17 }
+
+-- tagpath /bgp/routes-table/info/local
+bgpRoutesTableInfoLocal OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local"
+    ::= { bgpRoutesTableInfoEntry 18 }
+
+-- tagpath /bgp/routes-table/info/sourced
+bgpRoutesTableInfoSourced OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sourced"
+    ::= { bgpRoutesTableInfoEntry 19 }
+
+-- tagpath /bgp/routes-table/info/multipath
+bgpRoutesTableInfoMultipath OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION "Multipath"
+    ::= { bgpRoutesTableInfoEntry 20 }
+
+-- tagpath /bgp/routes-table/info/community
+bgpRoutesTableInfoCommunity OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Community"
+    ::= { bgpRoutesTableInfoEntry 21 }
+
+-- tagpath /bgp/routes-table/info/ext-community
+bgpRoutesTableInfoExtCommunity OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Extended community"
+    ::= { bgpRoutesTableInfoEntry 22 }
+
+-- tagpath /bgp/routes-table/info/originator
+bgpRoutesTableInfoOriginator OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Attribute originator ID"
+    ::= { bgpRoutesTableInfoEntry 23 }
+
+-- tagpath /bgp/routes-table/info/last-update
+bgpRoutesTableInfoLastUpdate OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time"
+    ::= { bgpRoutesTableInfoEntry 24 }
+
+-- tagpath /bgp/routes-table/info/cluster-list
+bgpRoutesTableInfoClusterList OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Cluster list"
+    ::= { bgpRoutesTableInfoEntry 25 }
+
+-- tagpath /bgp/routes-table/info/path-status
+bgpRoutesTableInfoPathStatus OBJECT-TYPE
+    SYNTAX      BgpRibStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "BGP path status"
+    ::= { bgpRoutesTableInfoEntry 26 }
+
+-- tagpath /bgp/routes-table/info/tag
+bgpRoutesTableInfoTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "BGP Tag"
+    ::= { bgpRoutesTableInfoEntry 27 }
+
+-- tagpath /bgp/routes-table/info/ospf-tag
+bgpRoutesTableInfoOspfTag OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "OSPF Tag"
+    ::= { bgpRoutesTableInfoEntry 28 }
+
+-- tagpath /bgp/bgp-neighbor
+bgpBgpNeighborTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BgpBgpNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "List of neighbors"
+    ::= { viptela-oper-bgp 9 }
+
+-- tagpath /bgp/bgp-neighbor
+bgpBgpNeighborEntry OBJECT-TYPE
+    SYNTAX      BgpBgpNeighborEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bgpBgpNeighborVpnId, bgpBgpNeighborPeerAddr }
+        ::= { bgpBgpNeighborTable 1 }
+
+BgpBgpNeighborEntry ::=
+    SEQUENCE {
+        bgpBgpNeighborVpnId Unsigned32,
+        bgpBgpNeighborPeerAddr IpAddress,
+        bgpBgpNeighborAs Unsigned32,
+        bgpBgpNeighborLocalAsNum Unsigned32,
+        bgpBgpNeighborChangeLocalAsNum TruthValue,
+        bgpBgpNeighborFlags Unsigned32,
+        bgpBgpNeighborDesc String,
+        bgpBgpNeighborRemoteRouterId IpAddress,
+        bgpBgpNeighborCommonAdmin TruthValue,
+        bgpBgpNeighborLastRead Unsigned32,
+        bgpBgpNeighborKeepalive Unsigned32,
+        bgpBgpNeighborHoldtime Unsigned32,
+        bgpBgpNeighborCfgKeepalive Unsigned32,
+        bgpBgpNeighborCfgHoldtime Unsigned32,
+        bgpBgpNeighborAdv4byteAsCap TruthValue,
+        bgpBgpNeighborRec4byteAsCap TruthValue,
+        bgpBgpNeighborAdvDynamicCap TruthValue,
+        bgpBgpNeighborRecDynamicCap TruthValue,
+        bgpBgpNeighborAdvRefreshCap TruthValue,
+        bgpBgpNeighborRecRefreshCap TruthValue,
+        bgpBgpNeighborAdvNewRefreshCap TruthValue,
+        bgpBgpNeighborRecNewRefreshCap TruthValue,
+        bgpBgpNeighborAdvIpv4UnicastAddrFamily TruthValue,
+        bgpBgpNeighborRecIpv4UnicastAddrFamily TruthValue,
+        bgpBgpNeighborRestartTimeLeft Unsigned32,
+        bgpBgpNeighborStalepathTimeLeft Unsigned32,
+        bgpBgpNeighborMsgRcvd Unsigned32,
+        bgpBgpNeighborMsgSent Unsigned32,
+        bgpBgpNeighborPrefixRcvd Unsigned32,
+        bgpBgpNeighborPrefixValid Unsigned32,
+        bgpBgpNeighborPrefixInstalled Unsigned32,
+        bgpBgpNeighborOutQ Unsigned32,
+        bgpBgpNeighborUptime String,
+        bgpBgpNeighborState INTEGER,
+        bgpBgpNeighborOpenInCount Unsigned32,
+        bgpBgpNeighborOpenOutCount Unsigned32,
+        bgpBgpNeighborNotifyInCount Unsigned32,
+        bgpBgpNeighborNotifyOutCount Unsigned32,
+        bgpBgpNeighborUpdateInCount Unsigned32,
+        bgpBgpNeighborUpdateOutCount Unsigned32,
+        bgpBgpNeighborKeepaliveInCount Unsigned32,
+        bgpBgpNeighborKeepaliveOutCount Unsigned32,
+        bgpBgpNeighborRefreshInCount Unsigned32,
+        bgpBgpNeighborRefreshOutCount Unsigned32,
+        bgpBgpNeighborDynamicInCount Unsigned32,
+        bgpBgpNeighborDynamicOutCount Unsigned32,
+        bgpBgpNeighborAdvInterval Unsigned32,
+        bgpBgpNeighborUpdateSource IpAddress,
+        bgpBgpNeighborUpdateIf String,
+        bgpBgpNeighborWeight Unsigned32,
+        bgpBgpNeighborConnEstablished Unsigned32,
+        bgpBgpNeighborConnDropped Unsigned32,
+        bgpBgpNeighborLastResetTime Unsigned32,
+        bgpBgpNeighborLastResetReason String,
+        bgpBgpNeighborMaxPrefixRestartTime Unsigned32,
+        bgpBgpNeighborExtPeerHops Unsigned32,
+        bgpBgpNeighborLocalHost IpAddress,
+        bgpBgpNeighborLocalPort UnsignedShort,
+        bgpBgpNeighborRemoteHost IpAddress,
+        bgpBgpNeighborRemotePort UnsignedShort,
+        bgpBgpNeighborNextHop IpAddress,
+        bgpBgpNeighborNextStartTimer Unsigned32,
+        bgpBgpNeighborNextConnectTimer Unsigned32,
+        bgpBgpNeighborReadThreadOn TruthValue,
+        bgpBgpNeighborWriteThreadOn TruthValue,
+        bgpBgpNeighborPassword String,
+        bgpBgpNeighborLastUptime String
+    }
+
+-- tagpath /bgp/bgp-neighbor/vpn-id
+bgpBgpNeighborVpnId OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 .. 65530)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VPN ID"
+    ::= { bgpBgpNeighborEntry 1 }
+
+-- tagpath /bgp/bgp-neighbor/peer-addr
+bgpBgpNeighborPeerAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Neighbor address"
+    ::= { bgpBgpNeighborEntry 2 }
+
+-- tagpath /bgp/bgp-neighbor/as
+bgpBgpNeighborAs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Neighbor AS number"
+    ::= { bgpBgpNeighborEntry 3 }
+
+-- tagpath /bgp/bgp-neighbor/local-as-num
+bgpBgpNeighborLocalAsNum OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local AS number"
+    ::= { bgpBgpNeighborEntry 4 }
+
+-- tagpath /bgp/bgp-neighbor/change-local-as-num
+bgpBgpNeighborChangeLocalAsNum OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Change local AS number"
+    ::= { bgpBgpNeighborEntry 5 }
+
+-- tagpath /bgp/bgp-neighbor/flags
+bgpBgpNeighborFlags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Flags"
+    ::= { bgpBgpNeighborEntry 6 }
+
+-- tagpath /bgp/bgp-neighbor/desc
+bgpBgpNeighborDesc OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Description"
+    ::= { bgpBgpNeighborEntry 7 }
+
+-- tagpath /bgp/bgp-neighbor/remote-router-id
+bgpBgpNeighborRemoteRouterId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Remote router ID"
+    ::= { bgpBgpNeighborEntry 8 }
+
+-- tagpath /bgp/bgp-neighbor/common-admin
+bgpBgpNeighborCommonAdmin OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Common administrator"
+    ::= { bgpBgpNeighborEntry 9 }
+
+-- tagpath /bgp/bgp-neighbor/last-read
+bgpBgpNeighborLastRead OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last read time, in seconds"
+    ::= { bgpBgpNeighborEntry 10 }
+
+-- tagpath /bgp/bgp-neighbor/keepalive
+bgpBgpNeighborKeepalive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Keepalive time"
+    ::= { bgpBgpNeighborEntry 11 }
+
+-- tagpath /bgp/bgp-neighbor/holdtime
+bgpBgpNeighborHoldtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Hold time"
+    ::= { bgpBgpNeighborEntry 12 }
+
+-- tagpath /bgp/bgp-neighbor/cfg-keepalive
+bgpBgpNeighborCfgKeepalive OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configured keepalive time"
+    ::= { bgpBgpNeighborEntry 13 }
+
+-- tagpath /bgp/bgp-neighbor/cfg-holdtime
+bgpBgpNeighborCfgHoldtime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Configured holdtime"
+    ::= { bgpBgpNeighborEntry 14 }
+
+-- tagpath /bgp/bgp-neighbor/adv-4byte-as-cap
+bgpBgpNeighborAdv4byteAsCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Advertised 4-byte AS capability"
+    ::= { bgpBgpNeighborEntry 15 }
+
+-- tagpath /bgp/bgp-neighbor/rec-4byte-as-cap
+bgpBgpNeighborRec4byteAsCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received 4-byte AS capability"
+    ::= { bgpBgpNeighborEntry 16 }
+
+-- tagpath /bgp/bgp-neighbor/adv-dynamic-cap
+bgpBgpNeighborAdvDynamicCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Advertised dynamic capability"
+    ::= { bgpBgpNeighborEntry 17 }
+
+-- tagpath /bgp/bgp-neighbor/rec-dynamic-cap
+bgpBgpNeighborRecDynamicCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received dynamic capability"
+    ::= { bgpBgpNeighborEntry 18 }
+
+-- tagpath /bgp/bgp-neighbor/adv-refresh-cap
+bgpBgpNeighborAdvRefreshCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Advertised route refresh capability"
+    ::= { bgpBgpNeighborEntry 19 }
+
+-- tagpath /bgp/bgp-neighbor/rec-refresh-cap
+bgpBgpNeighborRecRefreshCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received route refresh capability"
+    ::= { bgpBgpNeighborEntry 20 }
+
+-- tagpath /bgp/bgp-neighbor/adv-new-refresh-cap
+bgpBgpNeighborAdvNewRefreshCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Advertised new route refresh capability"
+    ::= { bgpBgpNeighborEntry 21 }
+
+-- tagpath /bgp/bgp-neighbor/rec-new-refresh-cap
+bgpBgpNeighborRecNewRefreshCap OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received new route refresh capability"
+    ::= { bgpBgpNeighborEntry 22 }
+
+-- tagpath /bgp/bgp-neighbor/adv-ipv4-unicast-addr-family
+bgpBgpNeighborAdvIpv4UnicastAddrFamily OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Advertised IPv4 unicast address family"
+    ::= { bgpBgpNeighborEntry 23 }
+
+-- tagpath /bgp/bgp-neighbor/rec-ipv4-unicast-addr-family
+bgpBgpNeighborRecIpv4UnicastAddrFamily OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Received IPv4 unicast address family"
+    ::= { bgpBgpNeighborEntry 24 }
+
+-- tagpath /bgp/bgp-neighbor/restart-time-left
+bgpBgpNeighborRestartTimeLeft OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Restart time remaining, in seconds"
+    ::= { bgpBgpNeighborEntry 25 }
+
+-- tagpath /bgp/bgp-neighbor/stalepath-time-left
+bgpBgpNeighborStalepathTimeLeft OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Stale path time remaining, in seconds"
+    ::= { bgpBgpNeighborEntry 26 }
+
+-- tagpath /bgp/bgp-neighbor/msg-rcvd
+bgpBgpNeighborMsgRcvd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total messages input count"
+    ::= { bgpBgpNeighborEntry 27 }
+
+-- tagpath /bgp/bgp-neighbor/msg-sent
+bgpBgpNeighborMsgSent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total messages output count"
+    ::= { bgpBgpNeighborEntry 28 }
+
+-- tagpath /bgp/bgp-neighbor/prefix-rcvd
+bgpBgpNeighborPrefixRcvd OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of routes received"
+    ::= { bgpBgpNeighborEntry 29 }
+
+-- tagpath /bgp/bgp-neighbor/prefix-valid
+bgpBgpNeighborPrefixValid OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of valid routes"
+    ::= { bgpBgpNeighborEntry 30 }
+
+-- tagpath /bgp/bgp-neighbor/prefix-installed
+bgpBgpNeighborPrefixInstalled OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of installed routes"
+    ::= { bgpBgpNeighborEntry 31 }
+
+-- tagpath /bgp/bgp-neighbor/outQ
+bgpBgpNeighborOutQ OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Output queue depth"
+    ::= { bgpBgpNeighborEntry 32 }
+
+-- tagpath /bgp/bgp-neighbor/uptime
+bgpBgpNeighborUptime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Uptime (Days:Hours:Minutes:Seconds)"
+    ::= { bgpBgpNeighborEntry 33 }
+
+-- tagpath /bgp/bgp-neighbor/state
+bgpBgpNeighborState OBJECT-TYPE
+    SYNTAX      INTEGER {idle(0),connect(1),active(2),opensent(3),openconfirm(4),established(5),clearing(6),deleted(7)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "State"
+    ::= { bgpBgpNeighborEntry 34 }
+
+-- tagpath /bgp/bgp-neighbor/open-in-count
+bgpBgpNeighborOpenInCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Open message input count"
+    ::= { bgpBgpNeighborEntry 35 }
+
+-- tagpath /bgp/bgp-neighbor/open-out-count
+bgpBgpNeighborOpenOutCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Open message output count"
+    ::= { bgpBgpNeighborEntry 36 }
+
+-- tagpath /bgp/bgp-neighbor/notify-in-count
+bgpBgpNeighborNotifyInCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Notify input count"
+    ::= { bgpBgpNeighborEntry 37 }
+
+-- tagpath /bgp/bgp-neighbor/notify-out-count
+bgpBgpNeighborNotifyOutCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Notify output count"
+    ::= { bgpBgpNeighborEntry 38 }
+
+-- tagpath /bgp/bgp-neighbor/update-in-count
+bgpBgpNeighborUpdateInCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update message input count"
+    ::= { bgpBgpNeighborEntry 39 }
+
+-- tagpath /bgp/bgp-neighbor/update-out-count
+bgpBgpNeighborUpdateOutCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update message output count"
+    ::= { bgpBgpNeighborEntry 40 }
+
+-- tagpath /bgp/bgp-neighbor/keepalive-in-count
+bgpBgpNeighborKeepaliveInCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Keepalive message input count"
+    ::= { bgpBgpNeighborEntry 41 }
+
+-- tagpath /bgp/bgp-neighbor/keepalive-out-count
+bgpBgpNeighborKeepaliveOutCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Keepalive message output count"
+    ::= { bgpBgpNeighborEntry 42 }
+
+-- tagpath /bgp/bgp-neighbor/refresh-in-count
+bgpBgpNeighborRefreshInCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Route refresh message input count"
+    ::= { bgpBgpNeighborEntry 43 }
+
+-- tagpath /bgp/bgp-neighbor/refresh-out-count
+bgpBgpNeighborRefreshOutCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Route refresh message output count"
+    ::= { bgpBgpNeighborEntry 44 }
+
+-- tagpath /bgp/bgp-neighbor/dynamic-in-count
+bgpBgpNeighborDynamicInCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Dynamic capability message input count"
+    ::= { bgpBgpNeighborEntry 45 }
+
+-- tagpath /bgp/bgp-neighbor/dynamic-out-count
+bgpBgpNeighborDynamicOutCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Dynamic capability message output count"
+    ::= { bgpBgpNeighborEntry 46 }
+
+-- tagpath /bgp/bgp-neighbor/adv-interval
+bgpBgpNeighborAdvInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time between advertisements, in seconds"
+    ::= { bgpBgpNeighborEntry 47 }
+
+-- tagpath /bgp/bgp-neighbor/update-source
+bgpBgpNeighborUpdateSource OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update source"
+    ::= { bgpBgpNeighborEntry 48 }
+
+-- tagpath /bgp/bgp-neighbor/update-if
+bgpBgpNeighborUpdateIf OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Update interface"
+    ::= { bgpBgpNeighborEntry 49 }
+
+-- tagpath /bgp/bgp-neighbor/weight
+bgpBgpNeighborWeight OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Weight"
+    ::= { bgpBgpNeighborEntry 50 }
+
+-- tagpath /bgp/bgp-neighbor/conn-established
+bgpBgpNeighborConnEstablished OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Connections established"
+    ::= { bgpBgpNeighborEntry 51 }
+
+-- tagpath /bgp/bgp-neighbor/conn-dropped
+bgpBgpNeighborConnDropped OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Connections dropped"
+    ::= { bgpBgpNeighborEntry 52 }
+
+-- tagpath /bgp/bgp-neighbor/last-reset-time
+bgpBgpNeighborLastResetTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last reset time"
+    ::= { bgpBgpNeighborEntry 53 }
+
+-- tagpath /bgp/bgp-neighbor/last-reset-reason
+bgpBgpNeighborLastResetReason OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last reset reason"
+    ::= { bgpBgpNeighborEntry 54 }
+
+-- tagpath /bgp/bgp-neighbor/max-prefix-restart-time
+bgpBgpNeighborMaxPrefixRestartTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Restart time after maximum prefix reached"
+    ::= { bgpBgpNeighborEntry 55 }
+
+-- tagpath /bgp/bgp-neighbor/ext-peer-hops
+bgpBgpNeighborExtPeerHops OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "EBGP neighbor hops"
+    ::= { bgpBgpNeighborEntry 56 }
+
+-- tagpath /bgp/bgp-neighbor/local-host
+bgpBgpNeighborLocalHost OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local host"
+    ::= { bgpBgpNeighborEntry 57 }
+
+-- tagpath /bgp/bgp-neighbor/local-port
+bgpBgpNeighborLocalPort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Local port"
+    ::= { bgpBgpNeighborEntry 58 }
+
+-- tagpath /bgp/bgp-neighbor/remote-host
+bgpBgpNeighborRemoteHost OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Remote host"
+    ::= { bgpBgpNeighborEntry 59 }
+
+-- tagpath /bgp/bgp-neighbor/remote-port
+bgpBgpNeighborRemotePort OBJECT-TYPE
+    SYNTAX      UnsignedShort
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Remote port"
+    ::= { bgpBgpNeighborEntry 60 }
+
+-- tagpath /bgp/bgp-neighbor/next-hop
+bgpBgpNeighborNextHop OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next hop"
+    ::= { bgpBgpNeighborEntry 61 }
+
+-- tagpath /bgp/bgp-neighbor/next-start-timer
+bgpBgpNeighborNextStartTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next start timer"
+    ::= { bgpBgpNeighborEntry 62 }
+
+-- tagpath /bgp/bgp-neighbor/next-connect-timer
+bgpBgpNeighborNextConnectTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next connect timer"
+    ::= { bgpBgpNeighborEntry 63 }
+
+-- tagpath /bgp/bgp-neighbor/read-thread-on
+bgpBgpNeighborReadThreadOn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Read thread on"
+    ::= { bgpBgpNeighborEntry 64 }
+
+-- tagpath /bgp/bgp-neighbor/write-thread-on
+bgpBgpNeighborWriteThreadOn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Write thread on"
+    ::= { bgpBgpNeighborEntry 65 }
+
+-- tagpath /bgp/bgp-neighbor/password
+bgpBgpNeighborPassword OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MD5 key (hashed)"
+    ::= { bgpBgpNeighborEntry 66 }
+
+-- tagpath /bgp/bgp-neighbor/last-uptime
+bgpBgpNeighborLastUptime OBJECT-TYPE
+    SYNTAX      String
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Last uptime (Days:Hours:Minutes:Seconds)"
+    ::= { bgpBgpNeighborEntry 67 }
+
+-- tagpath /bgp/bgp-neighbor/address-family
+bgpBgpNeighborAddressFamilyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BgpBgpNeighborAddressFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Address family information"
+    ::= { viptela-oper-bgp 10 }
+
+-- tagpath /bgp/bgp-neighbor/address-family
+bgpBgpNeighborAddressFamilyEntry OBJECT-TYPE
+    SYNTAX      BgpBgpNeighborAddressFamilyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX { bgpBgpNeighborVpnId, bgpBgpNeighborPeerAddr, bgpBgpNeighborAddressFamilyAfiId }
+        ::= { bgpBgpNeighborAddressFamilyTable 1 }
+
+BgpBgpNeighborAddressFamilyEntry ::=
+    SEQUENCE {
+        bgpBgpNeighborAddressFamilyAfiId Unsigned32,
+        bgpBgpNeighborAddressFamilyAfi INTEGER,
+        bgpBgpNeighborAddressFamilyRouteReflectorClient TruthValue,
+        bgpBgpNeighborAddressFamilyInboundSoftReconfig TruthValue,
+        bgpBgpNeighborAddressFamilyPrivateAs TruthValue,
+        bgpBgpNeighborAddressFamilyNexthopSelf TruthValue,
+        bgpBgpNeighborAddressFamilyAsPathUnchanged TruthValue,
+        bgpBgpNeighborAddressFamilyNexthopUnchanged TruthValue,
+        bgpBgpNeighborAddressFamilyMedUnchanged TruthValue,
+        bgpBgpNeighborAddressFamilySentCommunity TruthValue,
+        bgpBgpNeighborAddressFamilyDefOriginateRoutemap String,
+        bgpBgpNeighborAddressFamilySentDefOriginate TruthValue,
+        bgpBgpNeighborAddressFamilyPolicyIn TruthValue,
+        bgpBgpNeighborAddressFamilyPolicyOut TruthValue,
+        bgpBgpNeighborAddressFamilyAcceptedPrefixCount Unsigned32,
+        bgpBgpNeighborAddressFamilyMaximumPrefixCount Unsigned32,
+        bgpBgpNeighborAddressFamilyMaxPrefixWarningOnly TruthValue,
+        bgpBgpNeighborAddressFamilyMaxPrefixThresholdWarning Unsigned32,
+        bgpBgpNeighborAddressFamilyMaxPrefixRestartInterval Unsigned32
+    }
+
+-- tagpath /bgp/bgp-neighbor/address-family/afi-id
+bgpBgpNeighborAddressFamilyAfiId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Address family Index"
+    ::= { bgpBgpNeighborAddressFamilyEntry 1 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/afi
+bgpBgpNeighborAddressFamilyAfi OBJECT-TYPE
+    SYNTAX      INTEGER {ipv4-unicast(0)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Address family"
+    ::= { bgpBgpNeighborAddressFamilyEntry 2 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/route-reflector-client
+bgpBgpNeighborAddressFamilyRouteReflectorClient OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Route reflector client"
+    ::= { bgpBgpNeighborAddressFamilyEntry 3 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/inbound-soft-reconfig
+bgpBgpNeighborAddressFamilyInboundSoftReconfig OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound soft reconfiguration allowed"
+    ::= { bgpBgpNeighborAddressFamilyEntry 4 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/private-as
+bgpBgpNeighborAddressFamilyPrivateAs OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Private AS number removed"
+    ::= { bgpBgpNeighborAddressFamilyEntry 5 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/nexthop-self
+bgpBgpNeighborAddressFamilyNexthopSelf OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next hop is this router"
+    ::= { bgpBgpNeighborAddressFamilyEntry 6 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/as-path-unchanged
+bgpBgpNeighborAddressFamilyAsPathUnchanged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "AS path propogated unchanged"
+    ::= { bgpBgpNeighborAddressFamilyEntry 7 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/nexthop-unchanged
+bgpBgpNeighborAddressFamilyNexthopUnchanged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Next hop unchanged"
+    ::= { bgpBgpNeighborAddressFamilyEntry 8 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/med-unchanged
+bgpBgpNeighborAddressFamilyMedUnchanged OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MED propogated unchanged"
+    ::= { bgpBgpNeighborAddressFamilyEntry 9 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/sent-community
+bgpBgpNeighborAddressFamilySentCommunity OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Sent community attribute"
+    ::= { bgpBgpNeighborAddressFamilyEntry 10 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/def-originate-routemap
+bgpBgpNeighborAddressFamilyDefOriginateRoutemap OBJECT-TYPE
+    SYNTAX      String (SIZE (1 .. 32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Default originate route map"
+    ::= { bgpBgpNeighborAddressFamilyEntry 11 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/sent-def-originate
+bgpBgpNeighborAddressFamilySentDefOriginate OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Default originate sent"
+    ::= { bgpBgpNeighborAddressFamilyEntry 12 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/policy-in
+bgpBgpNeighborAddressFamilyPolicyIn OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inbound path policy configured"
+    ::= { bgpBgpNeighborAddressFamilyEntry 13 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/policy-out
+bgpBgpNeighborAddressFamilyPolicyOut OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Outbound path policy configured"
+    ::= { bgpBgpNeighborAddressFamilyEntry 14 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/accepted-prefix-count
+bgpBgpNeighborAddressFamilyAcceptedPrefixCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Accepted prefix count"
+    ::= { bgpBgpNeighborAddressFamilyEntry 15 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/maximum-prefix-count
+bgpBgpNeighborAddressFamilyMaximumPrefixCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum prefix count"
+    ::= { bgpBgpNeighborAddressFamilyEntry 16 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/max-prefix-warning-only
+bgpBgpNeighborAddressFamilyMaxPrefixWarningOnly OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Warning only"
+    ::= { bgpBgpNeighborAddressFamilyEntry 17 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/max-prefix-threshold-warning
+bgpBgpNeighborAddressFamilyMaxPrefixThresholdWarning OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Threshold for warning"
+    ::= { bgpBgpNeighborAddressFamilyEntry 18 }
+
+-- tagpath /bgp/bgp-neighbor/address-family/max-prefix-restart-interval
+bgpBgpNeighborAddressFamilyMaxPrefixRestartInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Threshold for restart interval"
+    ::= { bgpBgpNeighborAddressFamilyEntry 19 }
+
+END

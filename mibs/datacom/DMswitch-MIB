@@ -1,0 +1,4863 @@
+--
+-- DATACOM Telematica
+-- Copyright 2015 by DATACOM (Teracom Telematica Ltda). All Rights Reserved.
+-- This DATACOM SNMP MIB Specification is DATACOM proprietary intellectual property.
+--
+-- This module will be extend, as required. The specification and other information
+-- contained in this document can be modified without prior notice. The user should
+-- consult DATACOM to determine whether any such changes have been done.
+--
+
+
+DMswitch-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32, Counter32,IpAddress,
+        NOTIFICATION-TYPE, enterprises
+                FROM SNMPv2-SMI
+        DisplayString, RowStatus, TruthValue, MacAddress
+                FROM SNMPv2-TC
+        PortList
+                FROM Q-BRIDGE-MIB
+        InterfaceIndex
+               FROM IF-MIB
+        EnabledStatus
+               FROM P-BRIDGE-MIB
+        datacomAccessDevicesMIBs
+               FROM DATACOM-SMI;
+
+
+dmSwitchMIB MODULE-IDENTITY
+        LAST-UPDATED "201512100000Z"
+        ORGANIZATION "DATACOM"
+        CONTACT-INFO
+                "DATACOM
+--
+--              Postal: DATACOM
+--                      Rua América, 1000
+--                      Eldorado do Sul - RS
+--                      Brasil
+--                      CEP: 92990-000
+--
+--                      Tel: +55 51 3933 3000
+--                      Fax: +55 51 3933 3003
+
+--
+                 e-mail: datacom@datacom.ind.br"
+        DESCRIPTION
+                "The MIB module for DMswitch."
+--        DESCRIPTION
+--             "Conformance issues"
+        ::= { datacomAccessDevicesMIBs 201 }
+
+
+dmSwitchMIBObjects       OBJECT IDENTIFIER ::= { dmSwitchMIB 1 }
+dmSwitchNotifications    OBJECT IDENTIFIER ::= { dmSwitchMIB 2 }
+dmSwitchConformance      OBJECT IDENTIFIER ::= { dmSwitchMIB 3 }
+
+--supported groups
+switchMgt           OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 1 }
+portMgt             OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 2 }
+trunkMgt            OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 3 }
+lacpMgt             OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 4 }
+staMgt              OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 5 }
+tftpMgt             OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 6 }
+restartMgt          OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 7 }
+mirrorMgt           OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 8 }
+igmpSnoopMgt        OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 9 }
+ipMgt               OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 10 }
+bcastStormMgt       OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 11 }
+vlanMgt             OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 12 }
+priorityMgt         OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 13 }
+trapDestMgt         OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 14 }
+rateLimitMgt        OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 16 }
+securityMgt         OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 17 }
+sysLogMgt           OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 19 }
+sysTimeMgt          OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 20 }
+fileMgt             OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 21 }
+countMgt            OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 22 }
+filterCounterMgt    OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 23 }
+eapsMgt             OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 24 }
+cfmProbeMgmt        OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 25 }
+cpumonMgmt          OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 26 }
+queuePortMgmt       OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 27 }
+ddTransceiversMgmt  OBJECT IDENTIFIER ::= { dmSwitchMIBObjects 28 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+ValidStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object to create and destroy
+         a table entry. This is a simplified variant of RowStatus as it
+         supports only two values. Setting it to valid(1) creates an entry.
+         Setting it to invalid(2) destroys an entry."
+    SYNTAX      INTEGER { valid(1), invalid(2) }
+
+--sshv2 only start
+KeySegment ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The total length of the key is 1024 characters,
+         it is divided into 8 parts and stored in 8 separated mib
+         variables as below:
+
+             Key1: part 1 of the key (1-128)
+             Key2: part 2 of the key (129-256)
+             Key3: part 3 of the key (257-384)
+             Key4: part 4 of the key (385-512)
+             Key5: part 5 of the key (513-640)
+             Key6: part 6 of the key (641-768)
+             Key7: part 7 of the key (769-896)
+             Key8: part 8 of the key (897-1024)
+
+         Please note that if the key string is less then 1024 characters,
+         the remaining part of the string will be filled by a zero-length string.
+         For example, if the length of the key is 129,
+         we will get a string of length 128 in Key1, and
+         a string of length 1 in Key2,
+         moreover, Key3 to Key8 will all be zero-length strings."
+    SYNTAX      DisplayString(SIZE(0..128))
+--sshv2 only end
+
+StaPathCostMode ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION
+         "The path cost mode of a spanning tree algorithm, short(1) indicates
+          that we retrieve/configure the spanning tree path cost as a 16 bit
+          value and long(2) indicates that we retrieve/configure the spanning
+          tree path cost as a 32 bit value."
+     SYNTAX      INTEGER { short(1), long(2) }
+
+--
+-- switchMgt
+--
+
+switchNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of switches present on this system."
+        ::= { switchMgt 1 }
+
+switchInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SwitchInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     switches in this system."
+        ::= { switchMgt 2 }
+
+switchInfoEntry OBJECT-TYPE
+        SYNTAX      SwitchInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about a single switch in this system."
+        INDEX       { swUnitIndex }
+        ::= { switchInfoTable 1 }
+
+SwitchInfoEntry ::= SEQUENCE
+{
+    swUnitIndex             Integer32,
+    swHardwareVer           INTEGER,
+    swBootLoaderVer         DisplayString,
+    swFirmwareVer           DisplayString,
+    swPortNumber            Integer32,
+    swPowerStatus           INTEGER,
+    swRoleInSystem          INTEGER,
+    swSerialNumber          DisplayString,
+    swProdName              DisplayString,
+    swProdModelId           INTEGER,
+    swFirmwareReleaseDate   DisplayString,
+    swTemperature           INTEGER,
+    swG704IntfNumber        Integer32,
+    swE1cIntfNumber         Integer32,
+    swBundleIntfNumber      Integer32,
+    swPtpIntfNumber         Integer32,
+    swSdhIntfNumber         Integer32,
+    swVC4Number             Integer32,
+    swVC12Number            Integer32
+}
+
+swUnitIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object identifies the switch within the system
+                     for which this entry contains information. This
+                     value can never be greater than switchNumber."
+        ::= { switchInfoEntry 1 }
+
+swHardwareVer OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Hardware version of the main board."
+        ::= { switchInfoEntry 2 }
+
+swBootLoaderVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Loader version of the main board."
+        ::= { switchInfoEntry 3 }
+
+swFirmwareVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Operation code version of the main board."
+        ::= { switchInfoEntry 4 }
+
+swPortNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total port number of this switch
+                     (including expansion slot)."
+        ::= { switchInfoEntry 5 }
+
+swPowerStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        internalPower(1),
+                        redundantPower(2),
+                        internalAndRedundantPower(3),
+                        externalPower(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the switch using internalPower(1),
+                     redundantPower(2), internalAndRedundantPower(3) or externalPower(4)"
+        ::= { switchInfoEntry 6 }
+
+swRoleInSystem OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        master(1),
+                        backupMaster(2),
+                        slave(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the switch is master(1), backupMaster(2)
+                     or slave(3) in this system."
+        ::= { switchInfoEntry 7 }
+
+swSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Serial number of the switch."
+        ::= { switchInfoEntry 8 }
+
+swProdName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..127))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchInfoEntry 9 }
+
+swProdModelId OBJECT-TYPE
+        SYNTAX      INTEGER
+                 {
+           dmSwitch2204G1(1),
+           dmSwitch2304G1(2),
+           dmSwitch3224F1(3),
+           dmSwitch3324F1(4),
+           dmSwitch3224F2(5),
+           dmSwitch3324F2(6),
+           dmSwitch3224F3(7),
+           dmSwitch3324F3(8),
+           mpu192(9),
+           mpu384(10),
+           eth12gx(11),
+           eth24gx(12),
+           eth1x10gx(13),
+           eth2x10gx(14),
+           eth12gxEth1x10gx(15),
+           eth24gt(16),
+           eth48gt(17),
+           eth24gxEth2x10gx(20),
+           eth48gx(21),
+           eth4x10gxhseries(22),
+           eth24gxEth2x10gxhseries(23),
+           eth48gxhseries(24),
+           eth24gxhseries(25),
+           eth2x10gxhseries(26),
+           eth10gx32xe1(27),
+           eth10gx4xstm1(28),
+           eth10gx2xstm4(29),
+           mpu512(30),
+           eth24gxlseries(31),
+           eth24gx4gx(32),
+           eth24gx2xx(33),
+           eth24gxs(34),
+           eth24gx2xxs(35),
+           eth24gx4xx(36),
+           eth20gt4gc(37),
+           eth20gt4gc2xx(38),
+           eth20gt4gcs(39),
+           eth20gt4gc2xxs(40),
+           eth20gt4gc4xx(41),
+           eth44gt4gc(42),
+           eth44gt4gc2xx(43),
+           eth44gt4gcs(44),
+           eth44gt4gc2xxs(45),
+           eth44gt4gc4xx(46),
+           eth44gt4gc2xs(47),
+           eth44gt4gc2xss(48),
+           eth44gt4gc4xs(49),
+           eth24gthseries(50),
+           eth48gthseries(51),
+           eth20gt4gc2xss(52),
+           eth20gx32xe1hseries(53),
+           eth20gx2x10gx32xe1hseries(54),
+           eth16gx2x10gx4xstm1hseries(55),
+           eth16gx4xstm1hseries(56),
+           eth24gx2x10gxeseries(57),
+           eth24gxeseries(58),
+           eth4x10gxeseries(59),
+           eth48gteseries(60),
+           mpu960(61),
+           eth44gt4gcsmplsdc(62),
+           eth44gt4gc2xxsmplsdc(63),
+           eth44gt4gc4xxmplsdc(64),
+           eth24gx2x10gxhseriesII(65),
+           eth20gt4gc4xs(66),
+           eth24gxhseriesII(67),
+           eth2x10gxhseriesII(68),
+           eth48gxhseriesII(69),
+           eth4x10gxhseriesII(70),
+           eth24gx4xs(71)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Product model identifier."
+        ::= { switchInfoEntry 10 }
+
+swFirmwareReleaseDate OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Release date of the firmware."
+        ::= { switchInfoEntry 11 }
+
+swTemperature OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Temperature of the switch."
+        ::= { switchInfoEntry 12 }
+
+swG704IntfNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of G704 interfaces of this switch."
+        ::= { switchInfoEntry 13 }
+
+swE1cIntfNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of E1c interfaces of this switch."
+        ::= { switchInfoEntry 14 }
+
+swBundleIntfNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of Bundle interfaces of this switch."
+        ::= { switchInfoEntry 15 }
+
+swPtpIntfNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of PTP interfaces of this switch."
+        ::= { switchInfoEntry 16 }
+
+swSdhIntfNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of SDH interfaces of this switch."
+        ::= { switchInfoEntry 17 }
+
+swVC4Number OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of VC4 interfaces of this switch."
+        ::= { switchInfoEntry 18 }
+
+swVC12Number OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of VC12 interfaces of this switch."
+        ::= { switchInfoEntry 19 }
+
+switchProductId     OBJECT IDENTIFIER ::= { switchMgt 3 }
+
+
+swProdManufacturer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..127))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchProductId 2 }
+
+swProdDescription OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..127))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchProductId 3 }
+
+swProdUrl OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..127))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchProductId 5 }
+
+swIdentifier OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "A unique identifier of which switch in the chassis is currently
+                     being looked at."
+        ::= { switchProductId 6 }
+
+swVendorId OBJECT-TYPE
+  SYNTAX    INTEGER {
+      datacom                    (1),
+      ieru                       (2),
+      asga                       (3),
+      parks                      (4),
+      digitel                    (5),
+      none                         (6),
+      elebra                     (7),
+      osp                        (9),
+      objectNonexistentInModel   (2000000254),
+      infNotAvailable            (2000000255)
+      }
+  ACCESS      read-only
+  STATUS      mandatory
+  DESCRIPTION     " Vendor information. The value 0
+        indicates a vendor not defined.  "
+        ::= { switchProductId 7 }
+
+switchIndivPowerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SwitchIndivPowerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of individual powers."
+        ::= { switchMgt 4 }
+
+switchIndivPowerEntry OBJECT-TYPE
+        SYNTAX      SwitchIndivPowerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of individual powers."
+        INDEX       { swIndivPowerUnitIndex, swIndivPowerIndex }
+        ::= { switchIndivPowerTable 1 }
+
+SwitchIndivPowerEntry ::= SEQUENCE
+{
+    swIndivPowerUnitIndex   Integer32,
+    swIndivPowerIndex       INTEGER,
+    swIndivPowerStatus      INTEGER
+}
+
+swIndivPowerUnitIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as swUnitIndex."
+        ::= { switchIndivPowerEntry 1 }
+
+swIndivPowerIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..2)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "1 means internal power. 2 means external power."
+        ::= { switchIndivPowerEntry 2 }
+
+swIndivPowerStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        red(1),
+                        green(2),
+                        notPresent(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "notPresent(3) means not present. green(2) means
+                     up. red(1) means down."
+        ::= { switchIndivPowerEntry 3 }
+
+switchIndivFanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SwitchIndivFanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of individual fans."
+        ::= { switchMgt 5 }
+
+switchIndivFanEntry OBJECT-TYPE
+        SYNTAX      SwitchIndivFanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of individual fans."
+        INDEX       { swIndivFanUnitIndex, swIndivFanIndex }
+        ::= { switchIndivFanTable 1 }
+
+SwitchIndivFanEntry ::= SEQUENCE
+{
+    swIndivFanUnitIndex   Integer32,
+    swIndivFanIndex       INTEGER,
+    swIndivFanStatus      INTEGER
+}
+
+swIndivFanUnitIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as swUnitIndex."
+        ::= { switchIndivFanEntry 1 }
+
+swIndivFanIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..2)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchIndivFanEntry 2 }
+
+swIndivFanStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        red(1),
+      green(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "red(1) means down. green(2) means
+                     up. "
+        ::= { switchIndivFanEntry 3 }
+
+switchIndivAlarmTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SwitchIndivAlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of individual alarms."
+        ::= { switchMgt 6 }
+
+switchIndivAlarmEntry OBJECT-TYPE
+        SYNTAX      SwitchIndivAlarmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of individual alarms."
+        INDEX       { swIndivAlarmUnitIndex, swIndivAlarmIndex }
+        ::= { switchIndivAlarmTable 1 }
+
+SwitchIndivAlarmEntry ::= SEQUENCE
+{
+    swIndivAlarmUnitIndex   Integer32,
+    swIndivAlarmIndex       INTEGER,
+    swIndivAlarmStatus      INTEGER
+}
+
+swIndivAlarmUnitIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as swUnitIndex."
+        ::= { switchIndivAlarmEntry 1 }
+
+swIndivAlarmIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..3)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchIndivAlarmEntry 2 }
+
+swIndivAlarmStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        deactivated(1),
+                        activated(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchIndivAlarmEntry 3 }
+
+switchResObj OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchMgt 7 }
+
+swHashConfig OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchMgt 8 }
+
+swHashStatus OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchMgt 9 }
+
+swCpuUsage OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The CPU usage (in hundredths of a percent) at the last minute."
+        ::= { switchMgt 10 }
+
+swMemUsage OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The memory usage (percentage)."
+        ::= { switchMgt 11 }
+
+switchMacAddrUsageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SwitchMacAddrUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about the total of used MAC addresses entries."
+        ::= { switchMgt 12 }
+
+switchMacAddrUsageEntry OBJECT-TYPE
+        SYNTAX      SwitchMacAddrUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about the total of used MAC addresses entries."
+        INDEX       { swMacAddrUnitIndex }
+        ::= { switchMacAddrUsageTable 1 }
+
+SwitchMacAddrUsageEntry ::= SEQUENCE
+{
+    swMacAddrUnitIndex      Integer32,
+    swMacAddrUsageValue     Integer32
+}
+
+swMacAddrUnitIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as swUnitIndex."
+        ::= { switchMacAddrUsageEntry 1 }
+
+swMacAddrUsageValue OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total of used MAC addresses entries."
+        ::= { switchMacAddrUsageEntry 2 }
+
+swSlotNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The total number of interface board slots present on the device."
+        ::= { switchMgt 13 }
+
+switchMpuTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SwitchMpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     MPUs in this system."
+        ::= { switchMgt 14 }
+
+switchMpuEntry OBJECT-TYPE
+        SYNTAX      SwitchMpuEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about a single MPU in this system."
+        INDEX       { swMpuIndex }
+        ::= { switchMpuTable 1 }
+
+SwitchMpuEntry ::= SEQUENCE
+{
+    swMpuIndex             Integer32,
+    swMpuBootLoaderVer     DisplayString,
+    swMpuRoleInSystem      INTEGER,
+    swMpuSerialNumber      DisplayString,
+  swMpuModelId           INTEGER
+}
+
+swMpuIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This object identifies the MPU within the system
+                     for which this entry contains information."
+        ::= { switchMpuEntry 1 }
+
+swMpuBootLoaderVer OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Loader version of the main board."
+        ::= { switchMpuEntry 2 }
+
+swMpuRoleInSystem OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        active(1),
+                        standby(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the MPU is active(1) or standby(2) in this system."
+        ::= { switchMpuEntry 3 }
+
+swMpuSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Serial number of the MPU."
+        ::= { switchMpuEntry 4 }
+
+swMpuModelId OBJECT-TYPE
+        SYNTAX      INTEGER
+                 {
+           mpu192(9),
+           mpu384(10)
+                 }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "MPU model identifier."
+        ::= { switchMpuEntry 5 }
+
+swHashHardware OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(16))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { switchMgt 15 }
+
+switchIndivAlarmOutTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SwitchIndivAlarmOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of output alarms."
+        ::= { switchMgt 16 }
+
+swChassisModel OBJECT-TYPE
+       SYNTAX       INTEGER {
+                        dmSwitch3000(1),
+                        dmSwitch4001(2),
+                        dmSwitch4001L(3),
+                        dmSwitch4001S(4),
+                        dmSwitch4004(5),
+                        dmSwitch4008(6),
+                        dmSwitch4008HighSpeed(7),
+                        dmSwitch4001NewFan(8),
+                        dmSwitch4100(9),
+                        objectNonexistentInModel   (2000000254),
+                        infNotAvailable            (2000000255)
+                }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Chassis model for equipment"
+        ::= { switchMgt 17 }
+
+switchSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SwitchIndivAlarmOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about CLI sessions informations."
+        ::= { switchMgt 18 }
+
+switchSessionEntry OBJECT-TYPE
+        SYNTAX      SwitchSessionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about a single switch in this system."
+        INDEX       { swSessionUnitIndex }
+        ::= { switchSessionTable 1 }
+
+SwitchSessionEntry ::= SEQUENCE
+{
+    swSessionUnitIndex             INTEGER,
+    swSessionName                  DisplayString,
+    swSessionUptime                DisplayString,
+    swSessionPid                   INTEGER,
+    swSessionSrcIP                 DisplayString
+}
+
+swSessionUnitIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as swUnitIndex."
+        ::= { switchSessionEntry 1 }
+
+swSessionName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Session username."
+        ::= { switchSessionEntry 2 }
+
+swSessionUptime OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Login time and date (uptime)."
+        ::= { switchSessionEntry 3 }
+
+swSessionPid OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "CLI Session Process ID."
+        ::= { switchSessionEntry 4 }
+
+swSessionSrcIP OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "IP from process that called CLI - telnet, ssh or inetd."
+        ::= { switchSessionEntry 5 }
+
+switchIndivAlarmOutEntry OBJECT-TYPE
+        SYNTAX      SwitchIndivAlarmOutEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table about status of output alarms."
+        INDEX       { swIndivAlarmOutUnitIndex }
+        ::= { switchIndivAlarmOutTable 1 }
+
+SwitchIndivAlarmOutEntry ::= SEQUENCE
+{
+    swIndivAlarmOutUnitIndex   Integer32,
+    swIndivAlarmOutStatus      INTEGER
+}
+
+swIndivAlarmOutUnitIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This is defined as swUnitIndex."
+        ::= { switchIndivAlarmOutEntry 1 }
+
+swIndivAlarmOutStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        deactivated(1),
+                        activated(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates current alarm output status, as configured in external-alarm-output."
+        ::= { switchIndivAlarmOutEntry 2 }
+
+
+--
+-- portMgt
+--
+
+portTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each switch port (including expansion slot)
+                     in this system. This table also contains information
+                     about each trunk (similar to Cisco's EtherChannel)."
+        ::= { portMgt 1 }
+
+portEntry OBJECT-TYPE
+        SYNTAX      PortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one switch port of the switch."
+        INDEX       { portIndex }
+        ::= { portTable 1 }
+
+PortEntry ::= SEQUENCE
+{
+    portIndex                Integer32,
+    portName                 DisplayString,
+    portType                 INTEGER,
+    portSpeedDpxCfg          INTEGER,
+    portFlowCtrlCfg          INTEGER,
+    portCapabilities         BITS,
+    portAutonegotiation      INTEGER,
+    portSpeedDpxStatus       INTEGER,
+    portFlowCtrlStatus       INTEGER,
+    portTrunkIndex           Integer32,
+    portMdiStatus            INTEGER
+}
+
+portIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { portEntry 1 }
+
+portName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..64))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Indicates the port name. This is same as
+                     ifAlias in the IF-MIB (RFC2863 or later)."
+        ::= { portEntry 2 }
+
+portType OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+            other(1),
+            hundredBaseTX(2),
+            hundredBaseFX(3),
+            thousandBaseSX(4),
+            thousandBaseLX(5),
+            thousandBaseT(6),
+            thousandBaseGBIC(7),
+            thousandBaseSfp(8),
+            hundredBaseFxScSingleMode(9),
+            hundredBaseFxScMultiMode(10),
+            tenG(11),
+            tenGSfp(12)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Indicates the port type."
+        ::= { portEntry 3 }
+
+portSpeedDpxCfg OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+            reserved(1),
+            halfDuplex10(2),
+            fullDuplex10(3),
+            halfDuplex100(4),
+            fullDuplex100(5),
+            halfDuplex1000(6),
+            fullDuplex1000(7),
+            fullDuplex10000(8)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Set the port speed and duplex mode as follows:
+            halfDuplex10(2)    - 10Mbps and half duplex mode
+            fullDuplex10(3)    - 10Mbps and full duplex mode
+            halfDuplex100(4)   - 100Mbps and half duplex mode
+            fullDuplex100(5)   - 100Mbps and full duplex mode
+            halfDuplex1000(6)  - 1000Mbps and half duplex mode
+            fullDuplex1000(7)  - 1000Mbps and full duplex mode
+       fullDuplex10000(8) - 10000Mbps and full duplex mode
+             hundredBaseTX port can be set as
+                 halfDuplex10(2)
+                 fullDuplex10(3)
+                 halfDuplex100(4)
+                 fullDuplex100(5)
+             hundredBaseFX port can be set as
+                 halfDuplex100(4)
+                 fullDuplex100(5)
+             thousandBaseSX port can be set as
+                 halfDuplex1000(6)
+                 fullDuplex1000(7)
+             The actual operating speed and duplex of the port
+             is given by portSpeedDpxStatus."
+        DEFVAL      { halfDuplex10 }
+        ::= { portEntry 4 }
+
+portFlowCtrlCfg OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2),
+                        backPressure(3),
+                        dot3xFlowControlRxTx(4),
+      dot3xFlowControlRx(5),
+      dot3xFlowControlTx(6)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "(1) Flow control mechanism is enabled.
+                         If the port type is hundredBaseTX or thousandBaseSX:
+                         When the port is operating in halfDuplex mode, the
+                         port uses backPressure flow control mechanism. When
+                         the port is operating in fullDuplex mode, the port
+                         uses IEEE 802.3x flow control mechanism.
+                         If the port type is hundredBaseFX:
+                         When the port is operating in halfDuplex mode, the
+                         port uses backPressure flow control mechanism. When
+                         the port is operating in fullDuplex mode, Flow
+                         control mechanism will not function.
+                     (2) Flow control mechanism is disabled.
+                     (3) Flow control mechanism is backPressure.
+                         when the port is in fullDuplex mode.This flow control
+                         mechanism will not function.
+                     (4) Flow control mechanism is IEEE 802.3x flow control.
+                         when the port is in halfDuplex mode.This flow control
+                         mechanism will not function.
+                     hundredBaseTX and thousandBaseSX port can be set as:
+                         enabled(1),
+                         disabled(2),
+                         backPressure(3),
+                         dot3xFlowControl(4).
+                     hundredBaseFX port can be set as:
+                         enabled(1),
+                         disabled(2),
+                         backPressure(3).
+                     The actual flow control mechanism is used given by
+                     portFlowCtrlStatus."
+        DEFVAL      { enabled }
+        ::= { portEntry 5 }
+
+portCapabilities OBJECT-TYPE
+        SYNTAX      BITS
+                    {
+                        portCap10half(0),
+                        portCap10full(1),
+                        portCap100half(2),
+                        portCap100full(3),
+                        portCap1000half(4),
+                        portCap1000full(5),
+                        portCap10000full(6),
+                        dot3xFlowControlRxTx(7),
+      dot3xFlowControlRx(8),
+      dot3xFlowControlTx(9)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Port capabilities."
+        ::= { portEntry 6 }
+
+portAutonegotiation OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether autonegotiation is enabled."
+        ::= { portEntry 7 }
+
+portSpeedDpxStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        error(1),
+                        halfDuplex10(2),
+                        fullDuplex10(3),
+                        halfDuplex100(4),
+                        fullDuplex100(5),
+                        halfDuplex1000(6),
+                        fullDuplex1000(7),
+      fullDuplex10000(8),
+      down(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The operating speed and duplex mode of the
+                     switched port. If this index is a trunk,
+                     the speed is the speed of its individual members.
+                     If this index is a trunk and the result
+                     is inconsistent among its member ports, this value is
+                     error(1)."
+        ::= { portEntry 8 }
+
+portFlowCtrlStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        error(1),
+                        backPressure(2),
+                        dot3xFlowControlRxTx(3),
+      dot3xFlowControlRx(4),
+      dot3xFlowControlTx(5),
+                        disable(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "(2) BackPressure flow control machanism is used.
+                     (3) IEEE 802.3 flow control machanism is used.
+                     (4) Flow control mechanism is disabled.
+                     If this index is a trunk and the result
+                     is inconsistent among its member ports, this value is
+                     error(1)."
+        ::= { portEntry 9 }
+
+portMdiStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        auto(1),
+                        normal(2),
+                        xover(3)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION ""
+        ::= { portEntry 10 }
+
+portTrunkIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The trunk to which this port belongs. A value of 0
+                    means that this port does not belong to any trunk.
+                    A value greater than zero means that this port
+                    belongs to trunk at trunkIndex, defined by the
+                    corresponding trunkPorts."
+        ::= { portEntry 11 }
+
+--
+-- trunkMgt
+--
+
+trunkMaxId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number for a trunk identifier."
+    ::= { trunkMgt 1 }
+
+trunkValidNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid trunks."
+    ::= { trunkMgt 2 }
+
+trunkTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TrunkEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     configuration of each trunk,
+                     similar to Cisco EtherChannel."
+        ::= { trunkMgt 3 }
+
+trunkEntry OBJECT-TYPE
+        SYNTAX      TrunkEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one trunk of the switch."
+        INDEX       { trunkIndex }
+        ::= { trunkTable 1 }
+
+TrunkEntry ::= SEQUENCE
+{
+    trunkIndex                Integer32,
+    trunkPorts                PortList,
+    trunkCreation             INTEGER,
+    trunkStatus               INTEGER
+}
+
+trunkIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object identifies the trunk within the switch
+                     for which this entry contains information."
+        ::= { trunkEntry 1 }
+
+trunkPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The complete set of ports currently associated with
+        this trunk."
+    ::= { trunkEntry 2 }
+
+trunkCreation OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    static(1),
+                    lacp(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A value of static(1) means a statically configured trunk.
+         A value of lacp(2) means an LACP-configured trunk."
+    ::= { trunkEntry 3 }
+
+trunkStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    valid(1),
+                    invalid(2)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Writing this to valid(1) creates an entry.
+         Writing this to invalid(2) destroys an entry."
+    ::= { trunkEntry 4 }
+
+---
+--- lacpMgt
+---
+
+lacpPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF LacpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for LACP port configuration."
+        ::= { lacpMgt 1 }
+
+lacpPortEntry OBJECT-TYPE
+        SYNTAX      LacpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for LACP port configuration."
+        INDEX       { lacpPortIndex }
+        ::= { lacpPortTable 1 }
+
+LacpPortEntry ::= SEQUENCE
+{
+    lacpPortIndex            Integer32,
+    lacpPortStatus           INTEGER
+}
+
+lacpPortIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { lacpPortEntry 1 }
+
+lacpPortStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether 802.3ad LACP is enabled."
+        ::= { lacpPortEntry 2 }
+
+--
+-- staMgt
+--
+
+-- Management for Spanning Tree Algorithm (STA).
+-- This has variables not already defined in the implemented
+-- standard MIB(s).
+
+-- for 1d(STP) start
+staSystemStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Global spanning tree status.
+                     (1) Spanning tree protocol is enabled.
+                     (2) Spanning tree protocol is disabled."
+        DEFVAL      { enabled }
+        ::= { staMgt 1 }
+-- for 1d(STP) end
+
+staPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF StaPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The table manages port settings for Spanning Tree
+                     Protocol 802.1d, 802.1w or 802.1s depending on the
+                     value specified by staProtocolType."
+        REFERENCE "IEEE 802.1d, IEEE 802.1w, IEEE 802.1s."
+        ::= { staMgt 2 }
+
+staPortEntry OBJECT-TYPE
+        SYNTAX      StaPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The conceptual entry of staPortTable."
+        INDEX       { staPortIndex }
+        ::= { staPortTable 1 }
+
+StaPortEntry ::= SEQUENCE
+{
+    staPortIndex                  Integer32,
+-- for 1w(RSTP) start
+    staPortAdminEdgePort      TruthValue,
+    staPortOperEdgePort       TruthValue,
+    staPortAdminPointToPoint  INTEGER,
+    staPortOperPointToPoint   TruthValue,
+    staPortLongPathCost       Integer32,
+    staPortSystemStatus       EnabledStatus
+-- for 1w(RSTP) end
+}
+
+staPortIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port and the trunk (excluding trunk member ports)
+                     interface of the staPortTable. The interface identified
+                     by a particular value of this index is the same interface
+                     as identified by the same value of dot1dStpPort in the
+                     BRIDGE-MIB."
+        ::= { staPortEntry 1 }
+
+-- for 1w(RSTP) start
+staPortAdminEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative value of the edge port parameter.  A
+         value of true(1) indicates that this port should be
+         assumed as an edge-port and a value of false(2) indicates
+         that this port should be assumed as a non-edge-port."
+    REFERENCE
+        "IEEE 802.1t clause 14.8.2, 18.3.3"
+    ::= { staPortEntry 2 }
+
+staPortOperEdgePort OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational value of the edge port parameter. The object is
+         initialized to the value of staPortAdminEdgePort and is set false
+         when a BPDU is received."
+    REFERENCE
+        "IEEE 802.1t clause 14.8.2, 18.3.4"
+    ::= { staPortEntry 3 }
+
+staPortAdminPointToPoint OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    forceTrue(0),
+                    forceFalse(1),
+                    auto(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+     DESCRIPTION
+        "The administrative point-to-point status of the LAN segment
+         attached to this port. A value of forceTrue(0) indicates that
+         this port should always be treated as if it is connected to
+         a point-to-point link. A value of forceFalse(1) indicates
+         that this port should be treated as having a shared media
+         connection. A value of auto(2) indicates that this port is
+         considered to have a point-to-point link if it is an Aggregator
+         and all of its members are aggregatable, or if the MAC entity
+         is configured for full duplex operation, either through
+         auto-negotiation or by management means."
+   REFERENCE
+       "IEEE 802.1w clause 6.4.3, 6.5, 14.8.2"
+   ::= { staPortEntry 4 }
+
+staPortOperPointToPoint OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational point-to-point status of the LAN segment
+         attached to this port. This indicates whether a port is
+         considered to have a point-to-point connection or not.
+         The value is determined by management or by auto-detection,
+         as described in the staPortAdminPointToPoint object."
+    REFERENCE
+        "IEEE 802.1w clause 6.4.3, 6.5, 14.8.2"
+    ::= { staPortEntry 5 }
+
+staPortLongPathCost OBJECT-TYPE
+    SYNTAX      Integer32(1..200000000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "The contribution of this port to the path cost (in 32
+          bits value) of paths towards the spanning tree root which
+          include this port.
+
+          This object is used to configure the spanning tree port
+          path cost in the 32-bit value range when the
+          staPathCostMethod is long(2).
+
+          If the staPathCostMethod is short(1), this mib object is not
+          instantiated."
+    ::= { staPortEntry 6 }
+
+staPortSystemStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Per-port spanning tree status.
+                     (1) Spanning tree protocol is enabled.
+                     (2) Spanning tree protocol is disabled."
+        DEFVAL      { enabled }
+        ::= { staPortEntry 7 }
+
+staProtocolType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    stp(1),
+                    rstp(2),
+                    mstp(3)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The version of Spanning Tree Protocol the bridge is currently
+                 running. The value 'stp(1)' indicates the Spanning Tree
+                 Protocol is as specified in IEEE 802.1D,'rstp(2)' indicates that
+                 the Rapid Spanning Tree Protocol is as specified in IEEE
+                 802.1w, and the value 'mstp(3)' indicates that the Multiple Spanning
+                 Tree Protocol is as specified in IEEE 802.1s. New values may
+                 be defined in the future as new or updated versions of the
+                 protocol become available."
+    REFERENCE
+        "IEEE 802.1w clause 14.8.1, 17.12, 17.16.1"
+    ::= { staMgt 3 }
+-- for 1w(RSTP) end
+
+--
+-- tftpMgt
+--
+
+tftpFile  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The file name for TFTP transfer when a
+        transfer is next requested via this MIB.  This value is set to
+        the zero length string when no file name has been specified."
+    ::= { tftpMgt 1 }
+
+tftpFlashConfig  OBJECT-TYPE
+    SYNTAX     INTEGER (1..4)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Number of flash config partition for to be used when the chosen action
+   is the downloadToFlashConfig or the uploadFromFlashConfig. This values is
+   set to the zero when no flash config has been specified."
+    ::= { tftpMgt 2 }
+
+tftpServer  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IP address of the TFTP server for transfer
+        when a download or upload is next requested via this MIB.
+        This value is set to `0.0.0.0' when no IP address has been
+        specified."
+    ::= { tftpMgt 3 }
+
+tftpAction  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  downloadToFlashConfig(1),
+                  downloadToRunningConfig(2),
+      downloadToStartupConfig(3),
+                  downloadToFirmware(4),
+                  uploadFromFlashConfig(5),
+      uploadFromRunningConfig(6),
+      uploadFromStartupConfig(7),
+      notDownloading(8)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "When this object is set to downloadToFlashConfig(1),
+  the device will begin download of the file specified
+        by tftpFile from the server specified by tftpServer to
+  flash-config(specified by tftpFlashConfig) in the device
+  using the TFTP protocol.
+  When this object is set to downloadToRunningConfig(2),
+  the device will begin download of the file specified
+        by tftpFile from the server specified by tftpServer to
+  running-config in the device using the TFTP protocol.
+  When this object is set to downloadToStartupConfig(3),
+  the device will begin download of the file specified
+        by tftpFile from the server specified by tftpServer to
+  Startup-config in the device  using the TFTP protocol.
+  When this object is set to downloadToFirmware(4),
+  the device will begin download of the file specified
+        by tftpFile from the server specified by tftpServer to
+  firmware in the device using the TFTP protocol.
+        When this object is set to uploadFromFlashConfig(5),
+  the device will begin upload of the
+  flash-config(specified by tftpFlashConfig) in the device
+        to tftpFile in the server specified by tftpServer.
+  When this object is set to uploadFromRunningConfig(6),
+  the device will begin upload of the running-config in
+  the device to tftpFile in the server specified by tftpServer.
+  When this object is set to uploadFromStartupConfig(7),
+  the device will begin upload of the startup-config in
+  the device to tftpFile in the server specified by
+        tftpServer.
+  When the device is not downloading, this object will have
+  a value of notDownloading(8)."
+    ::= { tftpMgt 4 }
+
+
+--
+-- restartMgt
+--
+
+restartFirmware OBJECT-TYPE
+        SYNTAX      INTEGER (1..2)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Number of firmware flash index for start-up."
+        ::= { restartMgt 1 }
+
+restartConfig OBJECT-TYPE
+        SYNTAX      INTEGER (1..4)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Number of configuration flash index for start-up."
+        ::= { restartMgt 2 }
+
+restartControl  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    running(1),
+                    warmBoot(2),
+                    coldBoot(3)
+              }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Setting this object to warmBoot(2) causes the device to
+        restart the application software with current configuration
+        parameters saved in non-volatile memory.  Setting this
+        object to coldBoot(3) causes the device to reinitialize
+        configuration parameters in non-volatile memory to default
+        values and restart the application software.  When the device
+        is running normally, this variable has a value of
+        running(1)."
+    ::= { restartMgt 3 }
+
+--
+-- mirrorMgt
+--
+
+mirrorDestinationPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Destination port for mirrored packets. This is defined
+                    as ifIndex in the IF-MIB."
+        ::= { mirrorMgt 1 }
+
+mirrorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MirrorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+                     switches in this system."
+        ::= { mirrorMgt 2 }
+
+mirrorEntry OBJECT-TYPE
+        SYNTAX      MirrorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about a single switch in this system. "
+        INDEX       { mirrorSourcePort }
+        ::= { mirrorTable 1 }
+
+MirrorEntry ::= SEQUENCE
+{
+    mirrorSourcePort       Integer32,
+    mirrorType             INTEGER
+}
+
+mirrorSourcePort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Source port for mirrored packets. This is defined as
+                    ifIndex in the IF-MIB."
+        ::= { mirrorEntry 1 }
+
+mirrorType OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        rx(1),
+                        tx(2),
+      all(3),
+      disable(4)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "If this value is rx(1), receive packets will
+                    be mirrored. If this value is tx(2), transmit
+                    packets will be mirrored. If this value is all(3),
+        all packts will be mirrored"
+        ::= { mirrorEntry 2 }
+
+
+--
+-- igmpSnoopMgt
+--
+
+igmpSnoopStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Parameter to enable or disable IGMP snooping on the device.
+                     When enabled, the device will examine IGMP packets and set
+                     up filters for IGMP ports. "
+        DEFVAL      { enabled }
+        ::= { igmpSnoopMgt 1 }
+
+igmpSnoopQuerier OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether to act as querier."
+        DEFVAL      { enabled }
+        ::= { igmpSnoopMgt 2 }
+
+igmpSnoopQueryCount OBJECT-TYPE
+        SYNTAX      INTEGER (2..10)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Maximum number of queries that have not been heard on the
+                     system before the system starts taking action to solicit
+                     reports."
+        DEFVAL      { 2 }
+        ::= { igmpSnoopMgt 3 }
+
+
+igmpSnoopQueryInterval OBJECT-TYPE
+        SYNTAX      INTEGER (60..125)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Query interval."
+        DEFVAL      { 125 }
+        ::= { igmpSnoopMgt 4 }
+
+igmpSnoopQueryMaxResponseTime OBJECT-TYPE
+        SYNTAX      INTEGER (5..25)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Timeout value (seconds) between IGMP reports received on a port
+                     for an IP Multicast Address that can pass before the system
+                     sends an IGMP Query out the port and removes it from the
+                     list."
+        DEFVAL      { 10 }
+        ::= { igmpSnoopMgt 5 }
+
+igmpSnoopQueryTimeout OBJECT-TYPE
+        SYNTAX      INTEGER (300..500)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Query time-out."
+        DEFVAL      { 300 }
+        ::= { igmpSnoopMgt 6 }
+
+igmpSnoopVersion OBJECT-TYPE
+        SYNTAX      INTEGER (1..2)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Version."
+        DEFVAL      { 2 }
+        ::= { igmpSnoopMgt 7 }
+
+igmpSnoopRouterCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpSnoopRouterCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for current router ports."
+    ::= { igmpSnoopMgt 8 }
+
+igmpSnoopRouterCurrentEntry OBJECT-TYPE
+    SYNTAX      IgmpSnoopRouterCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry for current router ports."
+    INDEX   { igmpSnoopRouterCurrentVlanIndex }
+    ::= {
+igmpSnoopRouterCurrentTable 1 }
+
+IgmpSnoopRouterCurrentEntry ::=
+    SEQUENCE {
+        igmpSnoopRouterCurrentVlanIndex
+            Unsigned32,
+        igmpSnoopRouterCurrentPorts
+            PortList
+    }
+
+igmpSnoopRouterCurrentVlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is defined as dot1qVlanIndex in the Q-BRIDGE-MIB."
+    ::= { igmpSnoopRouterCurrentEntry 1 }
+
+igmpSnoopRouterCurrentPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are current router ports.
+         Within this list, some router ports are static router ports.
+         Please refer to igmpSnoopRouterStaticTable."
+    ::= { igmpSnoopRouterCurrentEntry 2 }
+
+igmpSnoopRouterStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpSnoopRouterStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for static router ports."
+    ::= { igmpSnoopMgt 9 }
+
+igmpSnoopRouterStaticEntry OBJECT-TYPE
+    SYNTAX      IgmpSnoopRouterStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry for static router ports."
+    INDEX   { igmpSnoopRouterStaticVlanIndex }
+    ::= {
+igmpSnoopRouterStaticTable 1 }
+
+IgmpSnoopRouterStaticEntry ::=
+    SEQUENCE {
+        igmpSnoopRouterStaticVlanIndex
+            Unsigned32,
+        igmpSnoopRouterStaticPorts
+            PortList
+    }
+
+igmpSnoopRouterStaticVlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is defined as dot1qVlanIndex in the Q-BRIDGE-MIB."
+    ::= { igmpSnoopRouterStaticEntry 1 }
+
+igmpSnoopRouterStaticPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are static router ports."
+    ::= { igmpSnoopRouterStaticEntry 2 }
+
+igmpSnoopMulticastCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpSnoopMulticastCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for current multicast addresses."
+    ::= { igmpSnoopMgt 10 }
+
+igmpSnoopMulticastCurrentEntry OBJECT-TYPE
+    SYNTAX      IgmpSnoopMulticastCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry for current multicast addresses."
+    INDEX   { igmpSnoopMulticastCurrentVlanIndex,
+              igmpSnoopMulticastCurrentIpAddress }
+    ::= {
+igmpSnoopMulticastCurrentTable 1 }
+
+IgmpSnoopMulticastCurrentEntry ::=
+    SEQUENCE {
+        igmpSnoopMulticastCurrentVlanIndex
+            Unsigned32,
+        igmpSnoopMulticastCurrentIpAddress
+            IpAddress,
+        igmpSnoopMulticastCurrentPorts
+            PortList
+    }
+
+igmpSnoopMulticastCurrentVlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is defined as dot1qVlanIndex in the Q-BRIDGE-MIB."
+    ::= { igmpSnoopMulticastCurrentEntry 1 }
+
+igmpSnoopMulticastCurrentIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP address of multicast group."
+    ::= { igmpSnoopMulticastCurrentEntry 2 }
+
+igmpSnoopMulticastCurrentPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are members."
+    ::= { igmpSnoopMulticastCurrentEntry 3 }
+
+igmpSnoopMulticastStaticTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IgmpSnoopMulticastStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table for static multicast addresses."
+    ::= { igmpSnoopMgt 11 }
+
+igmpSnoopMulticastStaticEntry OBJECT-TYPE
+    SYNTAX      IgmpSnoopMulticastStaticEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry for static multicast addresses."
+    INDEX   { igmpSnoopMulticastStaticVlanIndex,
+              igmpSnoopMulticastStaticIpAddress }
+    ::= {
+igmpSnoopMulticastStaticTable 1 }
+
+IgmpSnoopMulticastStaticEntry ::=
+    SEQUENCE {
+        igmpSnoopMulticastStaticVlanIndex
+            Unsigned32,
+        igmpSnoopMulticastStaticIpAddress
+            IpAddress,
+        igmpSnoopMulticastStaticPorts
+            PortList
+    }
+
+igmpSnoopMulticastStaticVlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is defined as dot1qVlanIndex in the Q-BRIDGE-MIB."
+    ::= { igmpSnoopMulticastStaticEntry 1 }
+
+igmpSnoopMulticastStaticIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP address of multicast group."
+    ::= { igmpSnoopMulticastStaticEntry 2 }
+
+igmpSnoopMulticastStaticPorts OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The set of ports which are static members."
+    ::= { igmpSnoopMulticastStaticEntry 3 }
+
+
+--
+-- The Probe Configuration Group
+--
+-- This group controls the configuration of various operating
+-- parameters of the probe.
+
+ ipAddressMode OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   static(1),
+                   dhcp(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION ""
+    ::= { ipMgt 1 }
+
+ipDefaultGateway  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IP Address of the default gateway.  If this value is
+        undefined or unknown, it shall have the value 0.0.0.0."
+    ::= { ipMgt 2 }
+
+ipPrimaryDnsServer  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IP Address of the primary DNS server.  If this value is
+        undefined or unknown, it shall have the value 0.0.0.0."
+    ::= { ipMgt 3 }
+
+ipSecondaryDnsServer  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The IP Address of the secondary DNS server.  If this value is
+        undefined or unknown, it shall have the value 0.0.0.0."
+    ::= { ipMgt 4 }
+
+ipHttpState OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   enabled(1),
+                   disabled(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Whether HTTP is enabled."
+    ::= { ipMgt 5 }
+
+ipHttpPort OBJECT-TYPE
+   SYNTAX     INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The port number for HTTP."
+    ::= { ipMgt 6 }
+
+ipHttpsState OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   enabled(1),
+                   disabled(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Whether HTTPS is enabled."
+    ::= { ipMgt 7 }
+
+ipHttpsPort OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The port number for HTTPS."
+    ::= { ipMgt 8 }
+
+ipTelnetState OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   enabled(1),
+                   disabled(2)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Whether telnet is enabled."
+    ::= { ipMgt 9 }
+
+--
+-- bcastStormMgt
+--
+
+bcastStormTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF BcastStormEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of descriptive and status information about
+              configuration of each switch ports(including expansion slot)
+                     in this system."
+        ::= { bcastStormMgt 1 }
+
+bcastStormEntry OBJECT-TYPE
+        SYNTAX      BcastStormEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one switch port of the switch."
+        INDEX       { bcastStormIfIndex }
+        ::= { bcastStormTable 1 }
+
+BcastStormEntry ::= SEQUENCE
+{
+    bcastStormIfIndex      Integer32,
+    bcastStormStatus       INTEGER,
+    bcastStormPacketRate   INTEGER
+}
+
+bcastStormIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { bcastStormEntry 1 }
+
+bcastStormStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether broadcast storm protection is enabled."
+        ::= { bcastStormEntry 2 }
+
+bcastStormPacketRate OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Broadcast storm threshold as packets per second."
+        ::= { bcastStormEntry 3 }
+
+--
+-- vlanMgt
+--
+
+vlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF VlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for VLAN configuration."
+        ::= { vlanMgt 1 }
+
+vlanEntry OBJECT-TYPE
+        SYNTAX      VlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for VLAN configuration."
+        INDEX       { vlanIndex }
+        ::= { vlanTable 1 }
+
+VlanEntry ::= SEQUENCE
+{
+    vlanIndex               Unsigned32,
+    vlanAddressMethod       INTEGER
+}
+
+vlanIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Same is dot1qVlanIndex in the Q-BRIDGE-MIB.
+            This table has only one entry - the entry for
+            the VLAN of the management interface."
+        ::= { vlanEntry 1 }
+
+vlanAddressMethod OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        user(1),
+                        dhcp(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Method to get the IP address."
+        ::= { vlanEntry 2 }
+
+--
+-- priorityMgt
+--
+
+prioWrrTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PrioWrrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for weighted round robin (WRR)."
+        ::= { priorityMgt 1 }
+
+prioWrrEntry OBJECT-TYPE
+        SYNTAX      PrioWrrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for weighted round robin (WRR)."
+        INDEX       { prioWrrTrafficClass }
+        ::= { prioWrrTable 1 }
+
+PrioWrrEntry ::= SEQUENCE
+{
+    prioWrrTrafficClass    INTEGER,
+    prioWrrWeight          INTEGER
+}
+
+prioWrrTrafficClass OBJECT-TYPE
+        SYNTAX      INTEGER (0..7)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Traffic class for this entry, as defined in
+                    dot1dTrafficClass in the Q-BRIDGE-MIB. The actual
+                    maximum depends on the hardware, and is
+                    equal to dot1dPortNumTrafficClasses-1."
+        ::= { prioWrrEntry 1 }
+
+prioWrrWeight OBJECT-TYPE
+        SYNTAX      INTEGER (1..31)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Weight for this entry."
+        ::= { prioWrrEntry 2 }
+
+prioQueueMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    wrr(1),
+                    strict(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The global status for the prioQueue.
+                    wrr(1),strict(2)"
+        ::= { priorityMgt 2 }
+
+--
+-- trapDestMgt
+--
+
+trapDestTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TrapDestEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of trap destination entries."
+    ::= { trapDestMgt 1 }
+
+trapDestEntry  OBJECT-TYPE
+    SYNTAX     TrapDestEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This entry includes a destination IP address to which to send
+        traps for this community."
+    INDEX { trapDestAddress }
+    ::= { trapDestTable 1 }
+
+TrapDestEntry ::= SEQUENCE {
+    trapDestAddress             IpAddress,
+    trapDestCommunity           OCTET STRING,
+    trapDestStatus              INTEGER,
+    trapDestVersion             INTEGER
+}
+
+trapDestAddress  OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The address to send traps."
+    ::= { trapDestEntry 1 }
+
+trapDestCommunity  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(0..31))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "A community to which this destination address belongs."
+    ::= { trapDestEntry 2 }
+
+trapDestStatus  OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   valid(1),
+                   invalid(2)
+               }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Writing this to valid(1) creates an entry.
+         Writing this to invalid(2) destroys an entry."
+    ::= { trapDestEntry 3 }
+
+trapDestVersion OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   version1(1),
+                   version2(2)
+               }
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This variables represent the version of the Trap we wish to send to trap Receiver,
+         if the value is 1, mean we wish to send Version 1 trap, if the value is 2,
+         mean we wish to send version 2 trap."
+    ::= { trapDestEntry 4}
+
+-- trapVar is for binding variables for traps, there is no value when
+-- no trap is sent.
+trapVar OBJECT IDENTIFIER ::= { trapDestMgt 2 }
+
+trapForbiddenAccessMode OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     web(1),
+                     snmp(2),
+                     telnet(3),
+         ssh(4)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicated the ipfilter reject mode.
+                  web(1),
+                  snmp(2),
+                  telnet(3),
+      ssh(4)."
+     ::= { trapVar 1 }
+
+trapForbiddenAccessIp OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the IP address that rejected by the ipfilter."
+     ::= { trapVar 2 }
+
+trapLoginUserName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the name used by user to logging."
+     ::= { trapVar 3 }
+
+trapConfigSavePartition OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the partition witch the config was saved."
+     ::= { trapVar 4 }
+
+trapSfpPresenceStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+         {
+      absentee(1),
+      present(2)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the presence status of a sfp connector."
+     ::= { trapVar 5 }
+
+trapInfAlarmVal OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     deactivated(1),
+                     activated(2),
+                     unstable(3)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the alarm value.
+                  deactivated(1),
+                  actived(2),
+                  unstable(3)."
+     ::= { trapVar 6 }
+
+trapDuplicatedIpVlan OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the vlan witch the duplicated ip was detected."
+     ::= { trapVar 7 }
+
+trapDuplicatedIpAddress OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the duplicated ip address."
+     ::= { trapVar 8 }
+
+trapDuplicatedIpMacAddress OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the mac address of the device that has the duplicated ip."
+     ::= { trapVar 9 }
+
+trapEapsDomainName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the eaps domain name."
+     ::= { trapVar 10 }
+
+trapEapsDomainId OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the eaps domain identifier."
+     ::= { trapVar 11 }
+
+trapEapsStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     idle(0),
+                     complete(1),
+                     failed(2),
+         links-up(3),
+         links-down(4),
+         pre-forwarding(5)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+          indicating the eaps status.
+      idle(0),
+                  complete(1),
+                  failed(2),
+      links-up(3),
+      links-down(4),
+      pre-forwarding(5)."
+     ::= { trapVar 12 }
+
+trapTemperature OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+          indicating the temperature in degrees Celsius."
+     ::= { trapVar 13 }
+
+trapFuseId OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+          indicating the fuse indentifier."
+     ::= { trapVar 14 }
+
+trapFuseStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     normal(1),
+                     failed(2)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the fuse status.
+                  normal(1),
+                  failed(2)."
+     ::= { trapVar 15 }
+
+trapFansBoardPresenceStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+         {
+      absentee(1),
+      present(2)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the presence status of the fans board."
+     ::= { trapVar 16 }
+
+trapStandbyMpuPresenceStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+         {
+      absentee(1),
+      present(2)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the presence status of the standby MPU."
+     ::= { trapVar 17 }
+
+trapMacAddressMove OBJECT-TYPE
+     SYNTAX      MacAddress
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the MAC address of the device that has moved."
+     ::= { trapVar 18 }
+
+trapMemFree OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the total memory free(in Kbytes)."
+     ::= { trapVar 19 }
+
+trapBootloaderNew OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the installed bootloader version."
+     ::= { trapVar 20 }
+
+trapDevNo OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the Dev no of equipment."
+     ::= { trapVar 21 }
+
+trapDevLocalId OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the Serial number of remote equipment."
+     ::= { trapVar 22 }
+
+trapCesopTdmStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      los(1),
+      ais(2),
+      lof(3)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of TDM interface."
+     ::= { trapVar 23 }
+
+trapCesopTdmRemoteStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      ralm(5)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of remote TDM interface."
+     ::= { trapVar 24 }
+
+trapCesopTdmCasStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      lom(4)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of CAS TDM interface."
+     ::= { trapVar 25 }
+
+trapCesopTdmCrcStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      crc(6)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of CRC TDM interface."
+     ::= { trapVar 26 }
+
+trapCesopBundleLocalTdmStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      fail(1),
+      rdi(2)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of Local TDM in bundle interface."
+     ::= { trapVar 27 }
+
+trapCesopBundleRemoteTdmStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      fail(1),
+      rdi(2)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of Remote TDM in bundle interface."
+     ::= { trapVar 28 }
+
+trapCesopBundleLocalStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      fail(1)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of Local bundle interface."
+     ::= { trapVar 29 }
+
+trapCesopBundleRemoteStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      fail(1)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of Remote bundle interface."
+     ::= { trapVar 30 }
+
+trapCesopBundlePktMismatchStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      mismatch(3)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of packet mismatch in bundle interface."
+     ::= { trapVar 31 }
+
+trapCesopBundleNextHopStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      up(0),
+      down(4)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of Next Hop in bundle interface."
+     ::= { trapVar 32 }
+
+trapCesopClockAdapLinkQuality OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+          indicating the Adaptative link quality of clock interface."
+     ::= { trapVar 33 }
+
+trapCesopClockSourceStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+      ok(0),
+      out-of-limits(1)
+    }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of Clock Source interface."
+     ::= { trapVar 34 }
+
+trapBroadcastStormControlStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+                 ok(1),
+                 out-of-limits(2)
+       }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of broadcsat storm control at this
+interface."
+     ::= { trapVar 35 }
+
+
+trapBroadcastStormControlPPS OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding, indicating the current average count of
+                   broadcast packets per second at this interface."
+     ::= { trapVar 36 }
+
+trapMulticastStormControlStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+       {
+                 ok(1),
+                 out-of-limits(2)
+       }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of multicsat storm control at this
+interface."
+     ::= { trapVar 37 }
+
+trapMulticastStormControlPPS OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+       indicating the current average count of multicast packets per second at this interface."
+     ::= { trapVar 38 }
+
+trapStatusLDP OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     up(1),
+                     down(2),
+                     delete(3)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+
+                  indicating the status of condition the protocol LDP."
+     ::= { trapVar 39 }
+
+trapIdLDP OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+
+       indicating the entity identification the protocol LDP."
+     ::= { trapVar 40 }
+
+trapStatusTunnelRSVP OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     up(1),
+                     down(2),
+                     deleted(3),
+                     rerouted(4)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the status of condition tunnel on protocol RSVP."
+     ::= { trapVar 41 }
+
+trapIdTunnelRSVP OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the entity identification the tunnel on protocol RSVP."
+     ::= { trapVar 42 }
+
+trapPanelStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     closed(1),
+                     open(2)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the panel status.
+                  closed(1),
+                  open(2)"
+     ::= { trapVar 43 }
+
+
+trapLSTGroup OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the Link-state Tracking Group."
+     ::= { trapVar 44 }
+
+trapMemL3Free OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the total L3 memory free(in Kbytes)."
+     ::= { trapVar 45 }
+
+trapActiveMpuNsfId OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the active mpu nsf-id."
+     ::= { trapVar 46 }
+
+trapStandByMpuNsfId OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the standby mpu nsf-id."
+     ::= { trapVar 47 }
+
+trapErpsDomainName OBJECT-TYPE
+     SYNTAX      DisplayString
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the erps domain name."
+     ::= { trapVar 48 }
+
+trapErpsDomainId OBJECT-TYPE
+     SYNTAX      INTEGER
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the erps domain identifier."
+     ::= { trapVar 49 }
+
+trapErpsStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     init(1),
+                     idle(2),
+                     protection(3)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                                 indicating the erps status.
+                init(1),
+                idle(2),
+                protection(3)."
+     ::= { trapVar 50 }
+
+trapCfmMdName OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(1..42))
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the Maintenance Domain (MD) name that originated
+                 the trap."
+     ::= { trapVar 51 }
+
+trapCfmMaName OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(1..44))
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the Maintenance Association (MA) name that originated
+                 the trap."
+     ::= { trapVar 52 }
+
+trapCfmMepId OBJECT-TYPE
+     SYNTAX      INTEGER (1..8192)
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the Maintenance End Point ID (MEPID) that
+                  originated the trap."
+     ::= { trapVar 53 }
+
+trapCfmVlan OBJECT-TYPE
+     SYNTAX      INTEGER (1..4094)
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the VLAN that originated the trap."
+     ::= { trapVar 54 }
+
+trapCfmDefect OBJECT-TYPE
+     SYNTAX      INTEGER
+                 {
+                     defNone(0),
+                     defRDICCM(1),
+                     defMACstatus(2),
+                     defRemoteCCM(3),
+                     defErrorCCM(4),
+                     defXconCCM(5)
+                 }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the defect condition being notified .
+                     defNone(0),
+                     defRDICCM(1),
+                     defMACstatus(2),
+                     defRemoteCCM(3),
+                     defErrorCCM(4),
+                     defXconCCM(5)."
+     ::= { trapVar 55 }
+
+trapEvcName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "This variable is for trap var binding,
+                indicating the EVC name."
+    ::= { trapVar 56 }
+
+trapEvcStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    notActive(0),
+                    newAndNotActive(1),
+                    active(2),
+                    newAndActive(3),
+                    partiallyActive(4),
+                    newAndPartiallyActive(5)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of EVC being notified,
+                    notActive(0),
+                    newAndNotActive(1),
+                    active(2),
+                    newAndActive(3),
+                    partiallyActive(4),
+                    newAndPartiallyActive(5)."
+    ::= { trapVar 57 }
+
+trapSyncSystemClockStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+                {
+                    freerun(1),
+                    holdover(2),
+                    acquiring(3),
+                    locked(4)
+                }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                  indicating the status of system clock"
+     ::= { trapVar 58 }
+
+trapCesopG704ClockSourceStatus OBJECT-TYPE
+     SYNTAX      INTEGER
+                {
+                    dontcare(7),
+                    locked(9),
+                    fail(10)
+                }
+
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the status of g704 clock source."
+     ::= { trapVar 59 }
+
+trapSystemWarningsUnits OBJECT-TYPE
+     SYNTAX      INTEGER
+                {
+                    sysWarUnitsHsEnNoError(1),
+                    sysWarUnitsHsEnWES(2),
+                    sysWarUnitsHsEnWHSDis(3),
+                    sysWarUnitsHsEnWDifMod(4),
+                    sysWarUnitsCommFail(5),
+                    sysWarUnitsMPLS(6),
+                    sysWarUnitsL3(7)
+                }
+     MAX-ACCESS  accessible-for-notify
+     STATUS      current
+     DESCRIPTION "This variable is for trap var binding,
+                 indicating the system warnings units."
+     ::= { trapVar 60 }
+
+trapSensorGroup OBJECT-TYPE
+        SYNTAX INTEGER {
+            boardSensors(1),
+            chipsetSensors(2)
+        }
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION "This variable indicates the sensor's type informed in notification."
+    ::= { trapVar 61 }
+
+--
+-- rateLimitMgt
+--
+
+rateLimitPortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RateLimitPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for rate limit of each port."
+        ::= { rateLimitMgt 1 }
+
+rateLimitPortEntry OBJECT-TYPE
+        SYNTAX      RateLimitPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for rate limit of each port."
+        INDEX       { rlPortIndex }
+        ::= { rateLimitPortTable 1 }
+
+
+RateLimitPortEntry ::= SEQUENCE
+{
+    rlPortIndex              Integer32,
+    rlPortInputStatus        EnabledStatus,
+    rlPortOutputStatus       EnabledStatus,
+    rlPortInputRate          Integer32,
+    rlPortInputBurst         Integer32,
+    rlPortOutputRate         Integer32,
+    rlPortOutputBurst        Integer32
+}
+
+rlPortIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The port and the trunk (including trunk member) interface of
+                     the portTable. The interface identified by a particular value
+                     of this index is the same interface as identified by the same
+                     value of ifIndex in the IF-MIB."
+        ::= { rateLimitPortEntry 1 }
+
+rlPortInputStatus OBJECT-TYPE
+       SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether input rate limit is enabled for this port."
+        ::= { rateLimitPortEntry 2 }
+
+rlPortOutputStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether output rate limit is enabled for this port."
+        ::= { rateLimitPortEntry 3 }
+
+--same as rlPortInputLimit, special for LEO_X 's chip
+rlPortInputRate OBJECT-TYPE
+        SYNTAX      Integer32(64..1000000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Rate-limit in kilobits per second. Must be multiple of 64."
+        ::= { rateLimitPortEntry 4 }
+
+rlPortInputBurst OBJECT-TYPE
+        SYNTAX      Integer32(32..4096)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Maximum burst size in kilobits. Must be power of 2."
+        ::= { rateLimitPortEntry 5 }
+
+--same as rlPortOutputLimit, special for LEO_X 's chip
+rlPortOutputRate OBJECT-TYPE
+        SYNTAX      Integer32(64..1000000)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Rate-limit in kilobits per second. Must be multiple of 64."
+        ::= { rateLimitPortEntry 6 }
+
+rlPortOutputBurst OBJECT-TYPE
+        SYNTAX      Integer32(32..4096)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Maximum burst size in kilobits. Must be power of 2."
+        ::= { rateLimitPortEntry 7 }
+
+
+--
+-- securityMgt
+--
+
+radiusMgt           OBJECT IDENTIFIER ::= { securityMgt 1 }
+sshMgt              OBJECT IDENTIFIER ::= { securityMgt 2 }
+ipFilterMgt         OBJECT IDENTIFIER ::= { securityMgt 3 }
+
+
+-- radiusMgt
+radiusServerPortNumber OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "IP port number of RADIUS server."
+        ::= { radiusMgt 2 }
+radiusServerKey OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Key for RADIUS. This variable can only be written.
+                     When this variable is read, it always returns a
+                     zero-length string. when this variable is written,
+                     it's max length is 48 characters."
+        ::= { radiusMgt 3 }
+
+radiusServerRetransmit OBJECT-TYPE
+        SYNTAX      INTEGER (1..30)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Maximum number of retransmissions for RADIUS."
+        ::= { radiusMgt 4 }
+
+radiusServerTimeout OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Timeout for RADIUS."
+        ::= { radiusMgt 5 }
+
+radiusMultipleServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RadiusMultipleServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The table for multiple RADIUS server."
+        ::= { radiusMgt 7 }
+
+radiusMultipleServerEntry OBJECT-TYPE
+        SYNTAX      RadiusMultipleServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The conceptual row for radiusMultipleServerTable."
+        INDEX       { radiusMultipleServerIndex }
+        ::= { radiusMultipleServerTable 1 }
+
+RadiusMultipleServerEntry ::= SEQUENCE
+{
+   radiusMultipleServerIndex      Integer32,
+   radiusMultipleServerAddress    IpAddress,
+   radiusMultipleServerPortNumber Integer32,
+   radiusMultipleServerKey        DisplayString,
+   radiusMultipleServerRetransmit INTEGER,
+   radiusMultipleServerTimeout    INTEGER,
+   radiusMultipleServerStatus     ValidStatus
+}
+
+radiusMultipleServerIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The RADIUS multiple server index."
+        ::= { radiusMultipleServerEntry 1 }
+
+radiusMultipleServerAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "IP address of a multiple RADIUS server.
+        IP address will be set to system default value(e.g. 10.1.0.1)
+        after creates an entry first by setting radiusMultipleServerStatus to valid.
+        "
+        ::= { radiusMultipleServerEntry 2 }
+
+radiusMultipleServerPortNumber OBJECT-TYPE
+        SYNTAX      Integer32 (1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "IP port number of a multiple RADIUS server."
+        ::= { radiusMultipleServerEntry 3 }
+
+radiusMultipleServerKey OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Key for RADIUS.  This variable can only be written.
+                     When this variable is read, it always returns a
+                     zero-length string. when this variable is written,
+                     it's max length is 48 characters."
+        ::= { radiusMultipleServerEntry 4 }
+
+radiusMultipleServerRetransmit OBJECT-TYPE
+        SYNTAX      INTEGER (1..30)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Maximum number of retransmissions for RADIUS."
+        ::= { radiusMultipleServerEntry 5 }
+
+radiusMultipleServerTimeout OBJECT-TYPE
+        SYNTAX      INTEGER (1..65535)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Timeout for RADIUS."
+        ::= { radiusMultipleServerEntry 6}
+
+radiusMultipleServerStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { radiusMultipleServerEntry 8 }
+--
+-- sshMgt
+--
+
+-- Management for Secure Shell Configuration
+
+sshServerStatus OBJECT-TYPE
+        SYNTAX      EnabledStatus
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The status of Secure Shell Server. Set this value to
+                     enabled(1) to enable SSH server, set this value to
+                     disabled(2) to disable the SSH server."
+        ::= { sshMgt 1 }
+
+sshServerMajorVersion  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The major version of the SSH Server."
+        ::= { sshMgt 2 }
+
+sshServerMinorVersion  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The minor version of the SSH Server."
+        ::= { sshMgt 3 }
+
+sshTimeout OBJECT-TYPE
+        SYNTAX      INTEGER(1..120)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The time interval that the router waits for the SSH
+                     client to respond. The range is 1-120."
+        ::= { sshMgt 4 }
+
+sshKeySize OBJECT-TYPE
+        SYNTAX      INTEGER(512..896)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The SSH server key size."
+        ::= { sshMgt 5 }
+
+sshRsaHostKey OBJECT-TYPE
+        SYNTAX      KeySegment
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The RSA host key."
+        ::= { sshMgt 6 }
+
+sshDsaHostKey OBJECT-TYPE
+        SYNTAX      KeySegment
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The DSA host key."
+        ::= { sshMgt 7 }
+
+sshHostKeyGenAction OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        noGen(1),
+                        genRsaKey(2),
+                        genDsaKey(3),
+                        genBothKeys(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "This variable is for host key generating.
+
+                    For the set behavior:
+                    Set it to genRsaKey(2) to generate the RSA host key,
+                    and to genDsaKey(3) to generate the DSA host key,
+                    if genBothKeys(4) is set, both RSA and DSA host key are
+                    generated.
+
+                    For the get behavior:
+                    You will get genRsaKey(2), genDsaKey(3) or
+                    genBothKeys(4) when the key gen action is in progress.
+                    otherwise, you will get noGen(1)."
+        ::= { sshMgt 8 }
+
+sshHostKeyDelAction  OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        noDel(1),
+                        delRsaKey(2),
+                        delDsaKey(3),
+                        delBothKeys(4)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "To delete the host key.
+
+                     For the set behavior:
+                     Set it to delRsaKey(2) to delete the RSA host key,
+                     to delDsaKey(3) to delete the DSA host key,
+                     or to delBothKeys(4) to delete both RSA and DSA host key.
+
+                     For the get behavior:
+                     You will get delRsaKey(2), delDsaKey(3) or  delBothKeys(4)
+                     when the delete operation is in progress.
+                     Otherwise, you will get noDel(1)."
+        ::= { sshMgt 9 }
+
+
+--
+-- ipFilterMgt
+--
+
+--ipFilterSnmpTable
+ipFilterSnmpTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IpFilterSnmpEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of IP address entries."
+    ::= { ipFilterMgt 1 }
+
+ipFilterSnmpEntry  OBJECT-TYPE
+    SYNTAX     IpFilterSnmpEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This entry includes an IP address range which the system
+         will allow to connect to this device through SNMP."
+    INDEX { ipFilterSnmpAddress, ipFilterSnmpMask }
+    ::= { ipFilterSnmpTable 1 }
+
+IpFilterSnmpEntry ::= SEQUENCE {
+    ipFilterSnmpAddress        IpAddress,
+    ipFilterSnmpMask           IpAddress,
+    ipFilterSnmpStatus         ValidStatus
+    }
+
+ipFilterSnmpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The start IP address."
+        ::= { ipFilterSnmpEntry 1 }
+
+ipFilterSnmpMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP mask."
+        ::= { ipFilterSnmpEntry 2 }
+
+ipFilterSnmpStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { ipFilterSnmpEntry 3 }
+
+--ipFilterHTTPTable
+ipFilterHTTPTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IpFilterHTTPEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of IP address entries."
+    ::= { ipFilterMgt 2 }
+
+ipFilterHTTPEntry  OBJECT-TYPE
+    SYNTAX     IpFilterHTTPEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This entry includes an IP address range which the system
+         will allow to connect to this device through SNMP."
+    INDEX { ipFilterHTTPAddress,ipFilterHTTPMask }
+    ::= { ipFilterHTTPTable 1 }
+
+IpFilterHTTPEntry ::= SEQUENCE {
+    ipFilterHTTPAddress        IpAddress,
+    ipFilterHTTPMask    IpAddress,
+    ipFilterHTTPStatus         ValidStatus
+}
+
+ipFilterHTTPAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The start IP address."
+        ::= { ipFilterHTTPEntry 1 }
+
+ipFilterHTTPMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP mask."
+        ::= { ipFilterHTTPEntry 2 }
+
+ipFilterHTTPStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { ipFilterHTTPEntry 3 }
+
+--ipFilterTelnetTable
+ipFilterTelnetTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IpFilterTelnetEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of IP address entries."
+    ::= { ipFilterMgt 3 }
+
+ipFilterTelnetEntry  OBJECT-TYPE
+    SYNTAX     IpFilterTelnetEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This entry includes an IP address range which the system
+         will allow them to connect to this device through SNMP."
+    INDEX { ipFilterTelnetAddress,ipFilterTelnetMask }
+    ::= { ipFilterTelnetTable 1 }
+
+IpFilterTelnetEntry ::= SEQUENCE {
+    ipFilterTelnetAddress        IpAddress,
+    ipFilterTelnetMask    IpAddress,
+    ipFilterTelnetStatus         ValidStatus
+}
+
+ipFilterTelnetAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The start IP address."
+        ::= { ipFilterTelnetEntry 1 }
+
+ipFilterTelnetMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP mask."
+        ::= { ipFilterTelnetEntry 2 }
+
+ipFilterTelnetStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { ipFilterTelnetEntry 3 }
+
+--ipFilterSSHTable
+ipFilterSSHTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IpFilterSSHEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of IP address entries."
+    ::= { ipFilterMgt 4 }
+
+ipFilterSSHEntry  OBJECT-TYPE
+    SYNTAX     IpFilterSSHEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This entry includes an IP address range which the system
+         will allow them to connect to this device through SNMP."
+    INDEX { ipFilterSSHAddress,ipFilterSSHMask }
+    ::= { ipFilterSSHTable 1 }
+
+IpFilterSSHEntry ::= SEQUENCE {
+    ipFilterSSHAddress        IpAddress,
+    ipFilterSSHMask    IpAddress,
+    ipFilterSSHStatus         ValidStatus
+}
+
+ipFilterSSHAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The start IP address."
+        ::= { ipFilterSSHEntry 1 }
+
+ipFilterSSHMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP mask."
+        ::= { ipFilterSSHEntry 2 }
+
+ipFilterSSHStatus OBJECT-TYPE
+        SYNTAX      ValidStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Setting this to valid(1) creates an entry.
+                     Setting this to invalid(2) destroys an entry."
+        ::= { ipFilterSSHEntry 3 }
+
+--
+-- sysLogMgt
+--
+
+sysLogStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Whether system log is enabled."
+        ::= { sysLogMgt 1 }
+
+sysLogHistoryFlashLevel OBJECT-TYPE
+        SYNTAX      INTEGER (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Severity level for logging to flash."
+        ::= { sysLogMgt 2 }
+
+sysLogHistoryRamLevel OBJECT-TYPE
+        SYNTAX      INTEGER (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Severity level for logging to RAM."
+        ::= { sysLogMgt 3 }
+
+remoteLogMgt OBJECT IDENTIFIER ::= { sysLogMgt 6 }
+
+remoteLogStatus OBJECT-TYPE
+       SYNTAX      EnabledStatus
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "Whether the remote log system is enabled."
+       ::= { remoteLogMgt 1 }
+
+remoteLogLevel OBJECT-TYPE
+        SYNTAX      Integer32 (0..7)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Severity level for remote log."
+        ::= { remoteLogMgt 2 }
+
+remoteLogFacilityType OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                      localUse0(16),
+                      localUse1(17),
+                      localUse2(18),
+                      localUse3(19),
+                      localUse4(20),
+                      localUse5(21),
+                      localUse6(22),
+                      localUse7(23)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION " The FacilityType for remote log."
+        ::= { remoteLogMgt 3 }
+
+remoteLogServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF RemoteLogServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A Table for storing the remote log Server list."
+        ::= { remoteLogMgt 4 }
+
+remoteLogServerEntry OBJECT-TYPE
+        SYNTAX      RemoteLogServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "A conceptually row for remoteLogServerTable."
+        INDEX { remoteLogServerIp }
+        ::= { remoteLogServerTable 1 }
+
+RemoteLogServerEntry ::= SEQUENCE
+{
+    remoteLogServerIp     IpAddress,
+    remoteLogServerStatus ValidStatus
+}
+
+remoteLogServerIp OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION "The IP address of the remote log Server."
+         ::= { remoteLogServerEntry 1 }
+
+remoteLogServerStatus OBJECT-TYPE
+         SYNTAX      ValidStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION  "Setting this to valid(1) creates an entry.
+                       Setting this to invalid(2) destroys an entry."
+         ::= { remoteLogServerEntry 2 }
+
+
+--
+-- sysTimeMgt
+--
+
+sntpMgt OBJECT IDENTIFIER ::= { sysTimeMgt 1 }
+
+sntpStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                    {
+                        enabled(1),
+                        disabled(2)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Set enabled(1) to enable the SNTP, set disabled(2) to disable
+                 the SNTP."
+    ::= { sntpMgt 1 }
+
+sntpPollInterval OBJECT-TYPE
+    SYNTAX      Integer32(16..16384)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Polling interval."
+    ::= { sntpMgt 2 }
+
+sntpServerTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF SntpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for SNTP servers"
+        ::= { sntpMgt 3 }
+
+sntpServerEntry OBJECT-TYPE
+        SYNTAX      SntpServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Entry for SNTP servers."
+        INDEX       { sntpServerIp }
+        ::= { sntpServerTable 1 }
+
+SntpServerEntry ::= SEQUENCE
+{
+    sntpServerIp     IpAddress,
+    sntpServerStatus     ValidStatus
+
+}
+
+sntpServerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "The IP address of a server."
+    ::= { sntpServerEntry 1 }
+
+sntpServerStatus OBJECT-TYPE
+    SYNTAX      ValidStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION  "Setting this to valid(1) creates an entry.
+                 Setting this to invalid(2) destroys an entry."
+    ::= { sntpServerEntry 2 }
+
+
+sysCurrentTime OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(20))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION "It is a text string in the following form, based on Unix:
+                  'Mmm _d hh:mm:ss yyyy'. 'Mmm' is the first three letters
+                  of the English name of the month. '_d' is the day of month.
+                  A single-digit day is preceded by the space. 'hh:mm:ss' is
+                  a 24-hour representations of hours, minutes, and seconds.
+                  A single-digit hour is preceded by a zero. 'yyyy' is the
+                  four-digit year. An example is: 'Jan  1 02:03:04 2002'."
+     ::= { sysTimeMgt 2 }
+
+sysTimeZone OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(6))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION "It is a text string in the following form: '[s]hh:mm'.
+                  '[s]' is a plus-or-minus sign. For UTC, this is omitted.
+                  For a positive offset, this is '+'. For a negative offset,
+                  this is '-'. 'hh:mm' in the hour and minute offset from UTC.
+                  A single-digit hour is preceded by a zero."
+     ::= { sysTimeMgt 3 }
+
+sysTimeZoneName OBJECT-TYPE
+     SYNTAX      DisplayString(SIZE(0..30))
+     MAX-ACCESS  read-write
+     STATUS      current
+     DESCRIPTION "The name of the time zone."
+     ::= { sysTimeMgt 4 }
+
+--
+-- fileMgt
+--
+
+-- This mangement performs the display and delete operation.
+
+
+fileInfoTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF FileInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "This table contain the information of the file system;
+                 we can also perform the delete, set startup file operation."
+
+    ::= { fileMgt 1 }
+
+fileInfoEntry OBJECT-TYPE
+    SYNTAX       FileInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "A conceptually row for fileInfoTable."
+    INDEX       {fileInfoUnitID, fileInfoFileIndex}
+    ::= { fileInfoTable 1 }
+
+FileInfoEntry ::= SEQUENCE
+    {
+        fileInfoUnitID                  Integer32,
+        fileInfoFileIndex        Integer32,
+  fileInfoFlashId            Integer32,
+  fileInfoFileName                DisplayString,
+        fileInfoFileType                INTEGER,
+        fileInfoIsStartUp               TruthValue,
+        fileInfoFileSize                Integer32,
+        fileInfoCreationTime            DisplayString,
+        fileInfoDelete                  INTEGER
+    }
+
+fileInfoUnitID OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "The switch unit in a stacking system, in a
+                 non-stacking system, this value is always 1."
+    ::= { fileInfoEntry 1 }
+
+fileInfoFileIndex OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION ""
+    ::= { fileInfoEntry 2 }
+
+fileInfoFlashId OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION ""
+    ::= { fileInfoEntry 3 }
+
+fileInfoFileName OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (1..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "The file Name of the file System in the device."
+    ::= { fileInfoEntry 4 }
+
+fileInfoFileType OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                    firmware(1),
+                    config(2)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "The file type of the file System in the device."
+    ::= { fileInfoEntry 5 }
+
+fileInfoIsStartUp OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "This flag indicate whether this file is a startup file. Set this
+                 object to true(1) to indicate that this is a startup file. Setting this
+                 object to false(2) is a invalid operation."
+    ::= { fileInfoEntry 6 }
+
+fileInfoFileSize OBJECT-TYPE
+    SYNTAX       Integer32
+    UNITS        "bytes"
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "The sizes (in bytes) of the file."
+    ::= { fileInfoEntry 7 }
+
+fileInfoCreationTime OBJECT-TYPE
+    SYNTAX       DisplayString(SIZE(20))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "The creation time of the file, This is a text string in the
+                 following form, based on Unix: 'Mmm _d hh:mm:ss yyyy'. 'Mmm'
+                 are the first three letters of the English name of the month.
+                 '_d' is the day of month. A single-digit day is preceded by
+                 a space. 'hh:mm:ss' is a 24-hour representations of hours,
+                 minutes, and seconds. A single-digit hour is preceded by a
+                 zero. 'yyyy' is the four-digit year. An example is:
+                 'Jan  1 02:03:04 2002'."
+    ::= { fileInfoEntry 8 }
+
+fileInfoDelete OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                  noDelete(1),
+                  delete(2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION "Write this object to delete(2) to delete a file, when
+                 read, this always return noDelete(1)."
+    ::= { fileInfoEntry 9 }
+
+--
+-- trap definitions
+--
+
+    dmSwitchTraps  OBJECT IDENTIFIER ::= { dmSwitchNotifications 1 }
+    dmSwitchTrapsPrefix OBJECT IDENTIFIER ::= { dmSwitchTraps 0 }
+
+     swLoginFailTrap NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId, trapLoginUserName }
+          STATUS   current
+          DESCRIPTION "This trap is sent when an user try logging with a
+    incorrect username or password."
+          ::= { dmSwitchTrapsPrefix 40001 }
+
+      swLoginSucessTrap NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId, trapLoginUserName }
+          STATUS   current
+          DESCRIPTION "This trap is sent when an user get logging."
+          ::= { dmSwitchTrapsPrefix 40002 }
+
+  swStackAttachTrap NOTIFICATION-TYPE
+          OBJECTS     { swUnitIndex, swSerialNumber }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a device is attached in stack."
+          ::= { dmSwitchTrapsPrefix 40003 }
+
+   swStackDetachTrap NOTIFICATION-TYPE
+          OBJECTS     { swUnitIndex, swSerialNumber }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a device is detached from stack."
+          ::= { dmSwitchTrapsPrefix 40004 }
+
+   swForbiddenAccessTrap NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId, trapForbiddenAccessMode, trapForbiddenAccessIp }
+          STATUS   current
+          DESCRIPTION "This trap is sent when an incorrect IP address is rejected by
+                        the ipfilter."
+          ::= { dmSwitchTrapsPrefix 40005 }
+
+    swSfpPresenceTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapSfpPresenceStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a sfp conector is taken off or placed."
+          ::= { dmSwitchTrapsPrefix 40006 }
+
+    swConfigChangeTrap NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the device's config change."
+          ::= { dmSwitchTrapsPrefix 40007 }
+
+    swConfigSaveTrap NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId, trapConfigSavePartition }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the device's config is saved."
+          ::= { dmSwitchTrapsPrefix 40008 }
+
+    swFanStatusChangeTrap NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId, swIndivFanUnitIndex, swIndivFanIndex, swIndivFanStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the status of one fan changes."
+          ::= { dmSwitchTrapsPrefix 40009 }
+
+    swTrapsLostTrap NOTIFICATION-TYPE
+          STATUS   current
+          DESCRIPTION "This trap is sent when one or more traps are discarded."
+          ::= { dmSwitchTrapsPrefix 40010 }
+
+    swPowerStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS     { trapDevNo, trapDevLocalId, swIndivPowerUnitIndex, swIndivPowerIndex, swIndivPowerStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the status of one PSU changes."
+          ::= { dmSwitchTrapsPrefix 40011 }
+
+    swAlarmTrap NOTIFICATION-TYPE
+    OBJECTS     { trapDevNo, trapDevLocalId, swIndivAlarmUnitIndex, swIndivAlarmIndex, swIndivAlarmStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the status of one alarm changes."
+          ::= { dmSwitchTrapsPrefix 40012 }
+
+    swDuplicatedIp NOTIFICATION-TYPE
+    OBJECTS     { trapDevNo, trapDevLocalId, trapDuplicatedIpVlan,trapDuplicatedIpAddress,trapDuplicatedIpMacAddress }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a duplicate ip is detected."
+          ::= { dmSwitchTrapsPrefix 40013 }
+
+    swLoopbackOnPortDetected NOTIFICATION-TYPE
+    OBJECTS     { trapDevNo, trapDevLocalId, portIndex }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a loopback on port is detected."
+          ::= { dmSwitchTrapsPrefix 40014 }
+
+      swLoopbackOnPortNoMoreDetected NOTIFICATION-TYPE
+    OBJECTS     { trapDevNo, trapDevLocalId, portIndex }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a loopback on port is no more detected."
+          ::= { dmSwitchTrapsPrefix 40015 }
+
+      swUnidirLinkDetected NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId, portIndex }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a unidirectional link on port is detected."
+          ::= { dmSwitchTrapsPrefix 40016 }
+
+      swUnidirLinkRecovered NOTIFICATION-TYPE
+       OBJECTS     { trapDevNo, trapDevLocalId, portIndex }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a unidirectional link on port is recovered."
+          ::= { dmSwitchTrapsPrefix 40017 }
+
+      swCriticalEventDetected NOTIFICATION-TYPE
+    OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a critical event on port is detected."
+          ::= { dmSwitchTrapsPrefix 40018 }
+
+      swCriticalEventRecovered NOTIFICATION-TYPE
+    OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a critical event on port is recovered."
+          ::= { dmSwitchTrapsPrefix 40019 }
+
+      swLinkFlapDetected NOTIFICATION-TYPE
+    OBJECTS     { portIndex }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a link-flap on port is detected."
+          ::= { dmSwitchTrapsPrefix 40020 }
+
+      swLinkFlapNoMoreDetected NOTIFICATION-TYPE
+    OBJECTS     { portIndex }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a link-flap on port is no more detected."
+          ::= { dmSwitchTrapsPrefix 40021 }
+
+    swEapsStatusChange NOTIFICATION-TYPE
+    OBJECTS     { trapDevNo, trapDevLocalId, trapEapsDomainId, trapEapsDomainName, trapEapsStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the eaps status change."
+          ::= { dmSwitchTrapsPrefix 40022 }
+
+    swPortSecurityViolation NOTIFICATION-TYPE
+    OBJECTS     { portIndex }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a port-security violation happens."
+          ::= { dmSwitchTrapsPrefix 40023 }
+
+    swHighTemperatureDetected NOTIFICATION-TYPE
+    OBJECTS     { swUnitIndex, trapDevNo, trapDevLocalId, trapTemperature }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a high temperature is detected."
+          ::= { dmSwitchTrapsPrefix 40024 }
+
+    swHighTemperatureNoMoreDetected NOTIFICATION-TYPE
+     OBJECTS     { swUnitIndex, trapDevNo, trapDevLocalId, trapTemperature }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a high temperature is no more detected."
+          ::= { dmSwitchTrapsPrefix 40025 }
+
+    swFuseStatusChange NOTIFICATION-TYPE
+     OBJECTS     { swUnitIndex, trapFuseId, trapFuseStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the status of on fuse changes."
+          ::= { dmSwitchTrapsPrefix 40026 }
+
+    swFansBoardPresenceTrap NOTIFICATION-TYPE
+       OBJECTS     { trapFansBoardPresenceStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the fans board is taken off or placed."
+          ::= { dmSwitchTrapsPrefix 40027 }
+
+    swStandbyMpuTrap NOTIFICATION-TYPE
+       OBJECTS     { swMpuIndex, swMpuSerialNumber, swMpuModelId, trapStandbyMpuPresenceStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the standby MPU is taken off or placed."
+          ::= { dmSwitchTrapsPrefix 40028 }
+
+    swNonHomologSfpTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a non-homologated SFP is placed."
+          ::= { dmSwitchTrapsPrefix 40029 }
+
+   swHighCpuUsageDetected NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the CPU utilization is greater than 90%."
+          ::= { dmSwitchTrapsPrefix 40030 }
+
+    swHighCpuUsageNoMoreDetected NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the CPU utilization is lower than 90%."
+          ::= { dmSwitchTrapsPrefix 40031 }
+
+    swDuplicatedMac NOTIFICATION-TYPE
+    OBJECTS     { trapMacAddressMove }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a MAC address move is detected."
+          ::= { dmSwitchTrapsPrefix 40032 }
+
+    swHighMemoryUsageDetected NOTIFICATION-TYPE
+     OBJECTS     { trapDevNo, trapDevLocalId, trapMemFree }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the memory utilization is critical."
+          ::= { dmSwitchTrapsPrefix 40033 }
+
+    swHighMemoryUsageNoMoreDetected NOTIFICATION-TYPE
+     OBJECTS     {  trapDevNo, trapDevLocalId, trapMemFree }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the memory utilization is normal."
+          ::= { dmSwitchTrapsPrefix 40034 }
+
+    swNewBootloaderVersion NOTIFICATION-TYPE
+     OBJECTS     { swUnitIndex, trapBootloaderNew }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a new bootloader version is saved."
+          ::= { dmSwitchTrapsPrefix 40035 }
+
+    swCesopTdmStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopTdmStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when TDM status change."
+          ::= { dmSwitchTrapsPrefix 40036 }
+
+    swCesopTdmRemoteStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopTdmRemoteStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when TDM Remote status change (RALM)."
+          ::= { dmSwitchTrapsPrefix 40037 }
+
+    swCesopTdmCasStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopTdmCasStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when TDM Cas status change (LOM)."
+          ::= { dmSwitchTrapsPrefix 40038 }
+
+    swCesopTdmCrcStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopTdmCrcStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when TDM CRC status change (CRC)."
+          ::= { dmSwitchTrapsPrefix 40039 }
+
+    swCesopBundleLocalTdmStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopBundleLocalTdmStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Bundle Local TDM status change."
+          ::= { dmSwitchTrapsPrefix 40040 }
+
+    swCesopBundleRemoteTdmStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopBundleRemoteTdmStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Bundle Remote TDM status change."
+          ::= { dmSwitchTrapsPrefix 40041 }
+
+    swCesopBundleLocalStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopBundleLocalStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Bundle Local status change."
+          ::= { dmSwitchTrapsPrefix 40042 }
+
+    swCesopBundleRemoteStatusTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopBundleRemoteStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Bundle Remote status change."
+          ::= { dmSwitchTrapsPrefix 40043 }
+
+    swCesopBundlePktMismatchTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopBundlePktMismatchStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Packet mismatch status chanege in Bundle Interface."
+          ::= { dmSwitchTrapsPrefix 40044 }
+
+    swCesopBundleNextHopTrap NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId, trapCesopBundleNextHopStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Packet mismatch status chanege in Bundle Interface."
+          ::= { dmSwitchTrapsPrefix 40045 }
+
+    swCesopClockAdapLinkQualityTrap NOTIFICATION-TYPE
+     OBJECTS     { swUnitIndex,  trapDevNo, trapDevLocalId, trapCesopClockAdapLinkQuality }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Adaptative link quality change in clock source interface."
+          ::= { dmSwitchTrapsPrefix 40046 }
+
+    swCesopClockSourceTrap NOTIFICATION-TYPE
+     OBJECTS     { swUnitIndex, trapDevNo, trapDevLocalId, trapCesopClockSourceStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when Source clock status change."
+          ::= { dmSwitchTrapsPrefix 40047 }
+
+    swRemoteDeviceReady NOTIFICATION-TYPE
+     OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a remote device becomes ready to be managed."
+          ::= { dmSwitchTrapsPrefix 40048 }
+
+    swRemoteDeviceLost NOTIFICATION-TYPE
+     OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a remote device is no longer manageable."
+          ::= { dmSwitchTrapsPrefix 40049 }
+
+    swRemoteDeviceConfigFail NOTIFICATION-TYPE
+     OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the configuration sent to a remote device is rejected."
+          ::= { dmSwitchTrapsPrefix 40050 }
+
+    swRemoteDeviceConfigForced NOTIFICATION-TYPE
+     OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a remote device configuration is forced."
+          ::= { dmSwitchTrapsPrefix 40051 }
+
+    swFanFuseStatusChange NOTIFICATION-TYPE
+     OBJECTS     { swUnitIndex, trapFuseId, trapFuseStatus }
+          STATUS   current
+          DESCRIPTION "This trap is sent when the fan board fuse change its status."
+          ::= { dmSwitchTrapsPrefix 40052 }
+
+    swDyingGaspPackReceived NOTIFICATION-TYPE
+     OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent every time an OAM:Dying Gasp package is received on port"
+          ::= { dmSwitchTrapsPrefix 40053 }
+
+    swBroadcastStormCheckChange NOTIFICATION-TYPE
+          OBJECTS     {
+             trapDevNo,
+             trapDevLocalId,
+             portIndex,
+             trapBroadcastStormControlStatus,
+             trapBroadcastStormControlPPS
+
+    }
+          STATUS   current
+          DESCRIPTION "This trap is sent when a broadcast storm threshold is hit or recovers."
+          ::= { dmSwitchTrapsPrefix 40054 }
+
+    swMulticastStormCheckChange NOTIFICATION-TYPE
+         OBJECTS     {
+            trapDevNo,
+            trapDevLocalId,
+            portIndex,
+            trapMulticastStormControlStatus,
+            trapMulticastStormControlPPS
+      }
+         STATUS   current
+         DESCRIPTION "This trap is sent when a multicast storm threshold is hit or recovers."
+         ::= { dmSwitchTrapsPrefix 40055 }
+
+    swBpduProtectLimit NOTIFICATION-TYPE
+         OBJECTS     {
+            portIndex,
+            trapDevNo,
+            trapDevLocalId
+      }
+         STATUS   current
+         DESCRIPTION "This trap is sent when a BPDU limit has reached."
+         ::= { dmSwitchTrapsPrefix 40056 }
+
+
+    swChangeStatusLDP NOTIFICATION-TYPE
+         OBJECTS     {
+            trapDevNo,
+            trapDevLocalId,
+            trapStatusLDP,
+            trapIdLDP
+      }
+         STATUS   current
+         DESCRIPTION "This trap is sent when occurs one change on status the
+                      protocol LDP."
+         ::= { dmSwitchTrapsPrefix 40057 }
+
+    swChangeStatusTunnelRSVP NOTIFICATION-TYPE
+         OBJECTS     {
+            trapDevNo,
+            trapDevLocalId,
+            trapStatusTunnelRSVP,
+            trapIdTunnelRSVP
+      }
+         STATUS   current
+         DESCRIPTION "This trap is sent when occurs one change on status the
+                      tunnels of protocol RSVP."
+         ::= { dmSwitchTrapsPrefix 40058 }
+
+
+    swBpduProtect NOTIFICATION-TYPE
+         OBJECTS     {
+            portIndex,
+            trapDevNo,
+            trapDevLocalId
+      }
+         STATUS   current
+         DESCRIPTION "This trap is sent when a BPDU protect block time expired."
+         ::= { dmSwitchTrapsPrefix 40059 }
+
+    swRouteTableFull NOTIFICATION-TYPE
+         OBJECTS     {
+            trapDevNo,
+            trapDevLocalId
+      }
+         STATUS   current
+         DESCRIPTION "This trap is sent when L3 Routing Table reaches its limits."
+         ::= { dmSwitchTrapsPrefix 40060 }
+
+     swPanelStatusTrap NOTIFICATION-TYPE
+           OBJECTS        { trapDevNo, trapDevLocalId, trapPanelStatus }
+             STATUS   current
+             DESCRIPTION "This trap is sent when the Panel status change."
+             ::= { dmSwitchTrapsPrefix 40061 }
+
+
+     swLSTGroupLinkStatusDown NOTIFICATION-TYPE
+           OBJECTS     { trapDevNo, trapDevLocalId, trapLSTGroup }
+             STATUS   current
+             DESCRIPTION "This trap is sent when a link-state tracking group is down"
+             ::= { dmSwitchTrapsPrefix 40062 }
+
+     swLSTGroupLinkStatusUp  NOTIFICATION-TYPE
+           OBJECTS     { trapDevNo, trapDevLocalId, trapLSTGroup }
+             STATUS   current
+             DESCRIPTION "This trap is sent when a link-state tracking group is up"
+             ::= { dmSwitchTrapsPrefix 40063 }
+
+     swHighCpuL3UsageDetected NOTIFICATION-TYPE
+            OBJECTS     { trapDevNo, trapDevLocalId }
+              STATUS   current
+              DESCRIPTION "This trap is sent when the CPU L3 utilization is greater
+              than 90%."
+              ::= { dmSwitchTrapsPrefix 40064 }
+
+     swHighCpuL3UsageNoMoreDetected NOTIFICATION-TYPE
+            OBJECTS     { trapDevNo, trapDevLocalId }
+              STATUS   current
+              DESCRIPTION "This trap is sent when the CPU L3 utilization is lower
+              than 90%."
+              ::= { dmSwitchTrapsPrefix 40065 }
+
+     swHighMemoryL3UsageDetected NOTIFICATION-TYPE
+            OBJECTS     { trapDevNo, trapDevLocalId, trapMemL3Free }
+              STATUS   current
+              DESCRIPTION "This trap is sent when the L3 memory utilization is critical."
+              ::= { dmSwitchTrapsPrefix 40066 }
+
+     swHighMemoryL3UsageNoMoreDetected NOTIFICATION-TYPE
+            OBJECTS     {  trapDevNo, trapDevLocalId, trapMemL3Free }
+              STATUS   current
+              DESCRIPTION "This trap is sent when the L3 memory utilization is normal."
+              ::= { dmSwitchTrapsPrefix 40067 }
+
+     swMpuNsfIdDiffers NOTIFICATION-TYPE
+           OBJECTS     { trapDevNo, trapDevLocalId, trapActiveMpuNsfId, trapStandByMpuNsfId }
+              STATUS   current
+              DESCRIPTION "This trap is sent when the active and standby mpu nsf-id  differs."
+              ::= { dmSwitchTrapsPrefix 40068 }
+
+    swErpsStatusChange NOTIFICATION-TYPE
+           OBJECTS    { trapDevNo, trapDevLocalId, trapErpsDomainId, trapErpsDomainName, trapErpsStatus }
+             STATUS   current
+             DESCRIPTION "This trap is sent when the erps status change."
+            ::= { dmSwitchTrapsPrefix 40069 }
+
+    swCfmDefect NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId, trapCfmMdName, trapCfmMaName, trapCfmMepId, trapCfmVlan, trapCfmDefect }
+          STATUS   current
+          DESCRIPTION "This trap is sent when some CFM MEP enters or leave an error state."
+          ::= { dmSwitchTrapsPrefix 40070 }
+
+    swLldpRemoteChange NOTIFICATION-TYPE
+          OBJECTS     { portIndex, trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when LLDP remote table changes."
+          ::= { dmSwitchTrapsPrefix 40071 }
+
+    swPoeOverCurrent NOTIFICATION-TYPE
+          OBJECTS    { trapDevNo, trapDevLocalId, portIndex }
+          STATUS current
+          DESCRIPTION "This trap is sent when a Power over Ethernet enabled port was shut down due an overcurrent."
+          ::= { dmSwitchTrapsPrefix 40072 }
+
+    swPoePowerRestriction NOTIFICATION-TYPE
+          OBJECTS    { trapDevNo, trapDevLocalId, portIndex }
+          STATUS current
+          DESCRIPTION "This trap is sent when an Power over Ethernet enabled port was shut down because the connected device announced an power consumption over the configured for the port."
+          ::= { dmSwitchTrapsPrefix 40073 }
+
+    swCoreDump NOTIFICATION-TYPE
+          OBJECTS     { trapDevNo, trapDevLocalId }
+          STATUS   current
+          DESCRIPTION "This trap is sent when an application terminate abnormally and generates a core dump."
+          ::= { dmSwitchTrapsPrefix 40074 }
+
+    swElmiEvcStatus NOTIFICATION-TYPE
+          OBJECTS    { trapDevNo, trapDevLocalId, portIndex, trapEvcName, trapEvcStatus }
+          STATUS current
+          DESCRIPTION "This trap is sent when an EVC changes its state."
+          ::= { dmSwitchTrapsPrefix 40075 }
+
+    swSyncSystemClockSwitchHier NOTIFICATION-TYPE
+          OBJECTS    { swUnitIndex, trapDevNo, trapDevLocalId }
+          STATUS current
+          DESCRIPTION "This trap is sent when system changes active clock synchronize hierarchy "
+          ::= { dmSwitchTrapsPrefix 40076 }
+
+    swSyncSystemClockStatus NOTIFICATION-TYPE
+          OBJECTS    { swUnitIndex, trapDevNo, trapDevLocalId, trapSyncSystemClockStatus }
+          STATUS current
+          DESCRIPTION "This trap is sent when system clock changes its status "
+          ::= { dmSwitchTrapsPrefix 40077 }
+
+    swHostTableFull NOTIFICATION-TYPE
+         OBJECTS     { trapDevNo, trapDevLocalId }
+         STATUS current
+         DESCRIPTION "This trap is sent when L3 Host Table reaches its limits."
+         ::= { dmSwitchTrapsPrefix 40078 }
+
+    swSyncG704ClockStatus NOTIFICATION-TYPE
+         OBJECTS     {trapDevNo, trapDevLocalId, portIndex, trapCesopG704ClockSourceStatus }
+         STATUS current
+         DESCRIPTION "This trap is sent when g704 clock source changes its status."
+         ::= { dmSwitchTrapsPrefix 40079 }
+
+    swSystemWarningsUnits NOTIFICATION-TYPE
+         OBJECTS     { trapDevNo, trapDevLocalId, trapSystemWarningsUnits }
+         STATUS current
+         DESCRIPTION "This trap is sent when warnings in the system units are found."
+         ::= { dmSwitchTrapsPrefix 40080 }
+
+    swRebootDueToOvertemp  NOTIFICATION-TYPE
+         OBJECTS     { trapDevNo, trapDevLocalId, swUnitIndex, portIndex, trapSensorGroup, trapTemperature}
+         STATUS current
+         DESCRIPTION "This trap is sent when the device reboots due to overheat."
+         ::= { dmSwitchTrapsPrefix 40081 }
+
+--
+-- countMgt
+--
+
+-- countHoldTable
+countHoldPktsTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CountHoldPktsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of dropped packets counters by interface for QoS statistics."
+        ::= { countMgt 1 }
+
+
+countHoldPktsEntry OBJECT-TYPE
+        SYNTAX      CountHoldPktsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing the number of dropped packets in a single interface. "
+        INDEX       { interfaceNumber }
+        ::= { countHoldPktsTable 1 }
+
+CountHoldPktsEntry ::= SEQUENCE
+{
+    interfaceNumber       Integer32,
+    countHoldPkts         Counter64
+}
+
+interfaceNumber OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Interface Number from dropped packets."
+        ::= { countHoldPktsEntry 1 }
+
+countHoldPkts OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter Hold shows the number of dropped packets in a single interface."
+        ::= { countHoldPktsEntry 2 }
+
+--
+-- filterCounterMgt
+--
+
+--- info
+
+filterCounterInfoTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF FilterCounterInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "This table contain the description about counters,
+                 so they can be used to measure performance from user-based
+    filters."
+
+    ::= { filterCounterMgt 1 }
+
+filterCounterInfoEntry OBJECT-TYPE
+    SYNTAX       FilterCounterInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "A conceptually row for filterCounterInfoTable."
+    INDEX       { filterCounterInfoIndex }
+    ::= { filterCounterInfoTable 1 }
+
+FilterCounterInfoEntry ::= SEQUENCE
+    {
+        filterCounterInfoIndex          Integer32,
+        filterCounterInfoRemark         DisplayString
+    }
+
+filterCounterInfoIndex  OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "Index for counter, matches current CLI information"
+    ::= { filterCounterInfoEntry 1 }
+
+filterCounterInfoRemark OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "Remark is a textual description, as configured by user."
+    ::= { filterCounterInfoEntry 2 }
+
+
+--- values
+
+filterCounterValueTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF FilterCounterValueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "This table contains current values for filter counters."
+    ::= { filterCounterMgt 2 }
+
+filterCounterValueEntry OBJECT-TYPE
+    SYNTAX       FilterCounterValueEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION "A conceptually row for filterCounterValueTable."
+    INDEX       { filterCounterInfoIndex, filterCounterValueIndex }
+    ::= { filterCounterValueTable 1 }
+
+FilterCounterValueEntry ::= SEQUENCE
+    {
+        filterCounterValueIndex             Integer32,
+        filterCounterValue                  Counter64
+    }
+
+filterCounterValueIndex     OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION "Subcounters index identifies each internal counter that a
+  user-editable counter can have. Internal counters may differ from
+  equipament model to other."
+    ::= { filterCounterValueEntry 1 }
+
+filterCounterValue OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of data which matches internal subcounter.
+            It can be bytes or packets, according to equipment configuration.
+
+            Discontinuities in the value of this counter can occur at
+            re-initialization of the management system, and at other
+            times."
+    ::= { filterCounterValueEntry 2 }
+
+
+--
+-- eapsMgt
+--
+
+eapsInfoTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF EapsInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains EAPS information about all EAPS
+                            domains on this device."
+
+        ::= { eapsMgt 1 }
+
+eapsInfoEntry OBJECT-TYPE
+        SYNTAX      EapsInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An individual entry of this table contains EAPS
+                            information related to that EAPS domain."
+        INDEX { eapsInfoId }
+        ::= { eapsInfoTable 1 }
+
+EapsInfoEntry ::= SEQUENCE {
+                eapsInfoId    INTEGER,
+                eapsInfoName  DisplayString,
+                eapsInfoMode  INTEGER,
+                eapsInfoState INTEGER
+        }
+
+eapsInfoId OBJECT-TYPE
+    SYNTAX          INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the mode of the EAPS Id."
+        ::= { eapsInfoEntry 1 }
+
+eapsInfoName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The EAPS domain name."
+        ::= { eapsInfoEntry 2 }
+
+eapsInfoMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            invalid(0),
+            master(1),
+            transit(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the mode of the EAPS domain."
+        ::= { eapsInfoEntry 3 }
+
+eapsInfoState OBJECT-TYPE
+        SYNTAX INTEGER {
+            idle(0),
+            complete(1),
+            failed(2),
+            linksup(3),
+            linkdown(4),
+            preforwarding(5),
+            init(6)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "This indicates the current EAPS state of this EAPS
+                                domain."
+    ::= { eapsInfoEntry 4 }
+
+--
+-- cfmProbeMgmt
+--
+
+cfmProbeDmTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CfmProbeDmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains CFM delay measurements informationS."
+
+        ::= { cfmProbeMgmt 1 }
+
+cfmProbeDmEntry OBJECT-TYPE
+        SYNTAX      CfmProbeDmEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An individual entry of this table contains CFM
+                            delay measurements information related to that probe."
+        INDEX { cfmProbeDmIndex }
+        ::= { cfmProbeDmTable 1 }
+
+CfmProbeDmEntry ::= SEQUENCE {
+                cfmProbeDmIndex       INTEGER,
+                cfmProbeDmAvgDelay  Integer32,
+                cfmProbeDmAvgJitter Integer32,
+                cfmProbeDmLoss       INTEGER
+        }
+
+cfmProbeDmIndex OBJECT-TYPE
+    SYNTAX          INTEGER(1..32)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The index value used to identify the probe."
+        ::= { cfmProbeDmEntry 1 }
+
+cfmProbeDmAvgDelay OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The average delay in microseconds of CFM delay measurement."
+        ::= { cfmProbeDmEntry 2 }
+
+cfmProbeDmAvgJitter OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The average jitter in microseconds of CFM delay measurement."
+        ::= { cfmProbeDmEntry 3 }
+
+cfmProbeDmLoss OBJECT-TYPE
+    SYNTAX          INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The percentage of CFM frames lost on the indicate probe."
+        ::= { cfmProbeDmEntry 4 }
+
+--
+-- cpumonMgmt
+--
+
+cpuActiveUsageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CpuActiveUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of cpu usage."
+
+        ::= { cpumonMgmt 1 }
+
+cpuActiveUsageEntry OBJECT-TYPE
+        SYNTAX      CpuActiveUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of cpu usage."
+        INDEX { cpuActiveUsageIndex }
+        ::= { cpuActiveUsageTable 1 }
+
+CpuActiveUsageEntry ::= SEQUENCE {
+                cpuActiveUsageIndex     Integer32,
+                cpuActiveUsageValue     Integer32
+        }
+
+cpuActiveUsageIndex OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object identifies the switch within the system
+                     for which this entry contains information. This
+                     value can never be greater than switchNumber."
+        ::= { cpuActiveUsageEntry 1 }
+
+cpuActiveUsageValue OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The CPU usage (in hundredths of a percent)."
+        ::= { cpuActiveUsageEntry 2 }
+
+
+memActiveUsageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MemActiveUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of memory usage."
+
+        ::= { cpumonMgmt 2 }
+
+memActiveUsageEntry OBJECT-TYPE
+        SYNTAX      MemActiveUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of memory usage."
+        INDEX { memActiveUsageIndex }
+        ::= { memActiveUsageTable 1 }
+
+MemActiveUsageEntry ::= SEQUENCE {
+                memActiveUsageIndex     Integer32,
+                memActiveUsageValue     Integer32
+        }
+
+memActiveUsageIndex OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object identifies the switch within the system
+                     for which this entry contains information. This
+                     value can never be greater than switchNumber."
+        ::= { memActiveUsageEntry 1 }
+
+memActiveUsageValue OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The memory usage (percentage)."
+        ::= { memActiveUsageEntry 2 }
+
+
+cpuStandbyUsageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF CpuStandbyUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of cpu usage."
+
+        ::= { cpumonMgmt 3 }
+
+cpuStandbyUsageEntry OBJECT-TYPE
+        SYNTAX      CpuStandbyUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of cpu usage."
+        INDEX { cpuStandbyUsageIndex }
+        ::= { cpuStandbyUsageTable 1 }
+
+CpuStandbyUsageEntry ::= SEQUENCE {
+                cpuStandbyUsageIndex        Integer32,
+                cpuStandbyUsageValue        Integer32
+        }
+
+cpuStandbyUsageIndex OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object identifies the switch within the system
+                     for which this entry contains information. This
+                     value can never be greater than switchNumber."
+        ::= { cpuStandbyUsageEntry 1 }
+
+cpuStandbyUsageValue OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The CPU usage (in hundredths of a percent)."
+        ::= { cpuStandbyUsageEntry 2 }
+
+
+memStandbyUsageTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MemStandbyUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of memory usage."
+
+        ::= { cpumonMgmt 4 }
+
+memStandbyUsageEntry OBJECT-TYPE
+        SYNTAX      MemStandbyUsageEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table of memory usage."
+        INDEX { memStandbyUsageIndex }
+        ::= { memStandbyUsageTable 1 }
+
+MemStandbyUsageEntry ::= SEQUENCE {
+                memStandbyUsageIndex        Integer32,
+                memStandbyUsageValue        Integer32
+        }
+
+memStandbyUsageIndex OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This object identifies the switch within the system
+                     for which this entry contains information. This
+                     value can never be greater than switchNumber."
+        ::= { memStandbyUsageEntry 1 }
+
+memStandbyUsageValue OBJECT-TYPE
+    SYNTAX          Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The memory usage (percentage)."
+        ::= { memStandbyUsageEntry 2 }
+
+
+
+--
+-- queuePortMgmt
+--
+
+queuePortTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF QueuePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Table for statistics of interface queues."
+        ::= { queuePortMgmt 1 }
+
+queuePortEntry OBJECT-TYPE
+        SYNTAX      QueuePortEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about configuration in one switch port of the switch."
+        INDEX       { queuePortIfIndex, queuePortQueueIndex }
+        ::= { queuePortTable 1 }
+
+QueuePortEntry ::= SEQUENCE
+{
+    queuePortIfIndex         Integer32,
+    queuePortQueueIndex      Integer32,
+    queuePortSentPackets     Counter64,
+    queuePortSentBytes       Counter64,
+    queuePortDroppedPackets  Counter64,
+    queuePortDroppedBytes    Counter64
+}
+
+queuePortIfIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { queuePortEntry 1 }
+
+queuePortQueueIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The COS queue from the interface."
+        ::= { queuePortEntry 2 }
+
+queuePortSentPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of sent packets."
+        ::= { queuePortEntry 3 }
+
+queuePortSentBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of sent bytes."
+        ::= { queuePortEntry 4 }
+
+queuePortDroppedPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of dropped packets."
+        ::= { queuePortEntry 5 }
+
+queuePortDroppedBytes OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Counter of dropped bytes."
+        ::= { queuePortEntry 6 }
+
+
+
+--
+-- ddTransceiversMgmt
+--
+
+ddTransceiversTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DdTransceiversEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "Transceivers digital diagnostic table."
+        ::= { ddTransceiversMgmt 1 }
+
+ddTransceiversEntry OBJECT-TYPE
+        SYNTAX      DdTransceiversEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the table, containing information
+                     about digital diagnostic."
+        INDEX       { ddTransceiversIfIndex}
+        ::= { ddTransceiversTable 1 }
+
+DdTransceiversEntry ::= SEQUENCE
+{
+    ddTransceiversIfIndex      Integer32,
+    ddTransceiversTemperature  DisplayString,
+    ddTransceiversVcc3v3       DisplayString,
+    ddTransceiversRxPower      DisplayString,
+    ddTransceiversTxPower      DisplayString,
+    ddTransceiversTxBias       DisplayString
+}
+
+ddTransceiversIfIndex OBJECT-TYPE
+      SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This is defined as ifIndex in the IF-MIB."
+        ::= { ddTransceiversEntry 1 }
+
+ddTransceiversTemperature OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver temperature information in Celsius"
+        ::= { ddTransceiversEntry 2 }
+
+ddTransceiversVcc3v3 OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver Vcc 3v3 information in Volts"
+        ::= { ddTransceiversEntry 3 }
+
+ddTransceiversRxPower OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver rx power information in Decibels"
+        ::= { ddTransceiversEntry 4 }
+
+ddTransceiversTxPower OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx power information in Decibels"
+        ::= { ddTransceiversEntry 5 }
+
+ddTransceiversTxBias OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE(0..20))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx bias information in Amperes"
+        ::= { ddTransceiversEntry 6 }
+
+ddTransceiversTemperatureValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Celsius (degrees C)"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver temperature infomation"
+        ::= { ddTransceiversEntry 7 }
+
+ddTransceiversVcc3v3Value OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 V"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver Vcc 3v3 infomation"
+        ::= { ddTransceiversEntry 8 }
+
+ddTransceiversRxPowerValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 dBm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver rx power infomation"
+        ::= { ddTransceiversEntry 9 }
+
+ddTransceiversTxPowerValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 dBm"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx power infomation"
+        ::= { ddTransceiversEntry 10 }
+
+ddTransceiversTxBiasValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 mA"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Transceiver tx bias infomation"
+        ::= { ddTransceiversEntry 11 }
+
+END

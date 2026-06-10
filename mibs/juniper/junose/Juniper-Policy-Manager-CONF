@@ -1,0 +1,636 @@
+
+-- *****************************************************************************
+-- Juniper-Policy-Manager-CONF
+--
+-- SNMP Agent Capabilities definitions for the Policy Manager MIB.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003, 2005 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-Policy-Manager-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniPolicyManagerAgent  MODULE-IDENTITY
+    LAST-UPDATED "200508081821Z"  -- 08-Aug-05 02:21 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Policy Manager component of
+        the SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200508081821Z"  -- 08-Aug-05 02:21 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+        "Add support for ATM Cell Mode configuration."
+    REVISION    "200502011558Z"  -- 01-Feb-05 10:58 AM EST  - JUNOSe x.y
+    DESCRIPTION
+        "Add attachment statistics preserve attribute."
+    REVISION    "200310211920Z"  -- 21-Oct-03 03:20 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Juniper-POLICY-MIB:
+         Policy precedence enhancements.
+         Route class policy feature support."
+    REVISION    "200308261251Z"  -- 26-Aug-03 08:51 AM EDT  - JUNOSe 5.2
+    DESCRIPTION
+        "Juniper-POLICY-MIB:
+         Added new forward rules data objects."
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-POLICY-MIB:
+         Replaced Unisphere names with Juniper names."
+    REVISION    "200208021207Z"  -- 02-Aug-02 08:07 AM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Juniper-POLICY-MIB:
+         Added a capabilities statement for traffic class rules management.
+         Extended rate limit profile objects.
+         Obsoleted policy traffic shaped capabilities."
+    REVISION    "200109071527Z"  -- 07-Sep-01 11:27 AM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 31 }
+
+
+-- *****************************************************************************
+-- The basic Policy Manager SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniPolicyManagerBaseAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The basic Policy Manager component of the Policy Manager application.
+        MIB support for each specific policy rule type can run as a subcomponent
+        in addition to this base component."
+    ::= { juniPolicyManagerAgent 1 }
+
+juniPolicyManagerBaseAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the Policy Manager base component of the JUNOSe SNMP
+        agent.  This version of the Policy Manager base component was supported
+        in JUNOSe 3.2 thru 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the base component of
+        the Policy Manager application in JUNOSe. These capabilities became
+        obsolete when support was added to separate precedence from policy
+        rule and apply it to classifier groups within a policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniPolicyBaseGroup,
+            juniClassifierControlListGroup2,
+            juniPolicyIfAttachGroup,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup }
+    ::= { juniPolicyManagerBaseAgent 1 }
+
+juniPolicyManagerBaseAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the Policy Manager base component of the JUNOSe SNMP
+        agent.  This version of the Policy Manager base component is supported
+        in JUNOSe 5.3 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the base component of
+        the Policy Manager application in JUNOSe. These capabilities became
+        obsolete when support was added for client based policy sharing."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniPolicyBaseGroup2,
+            juniPolicyClaclGrpGroup,
+            juniClassifierControlListGroup3,
+            juniPolicyIfAttachGroup,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup2 }
+    ::= { juniPolicyManagerBaseAgent 2 }
+
+juniPolicyManagerBaseAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the Policy Manager base component of the JUNOSe SNMP
+        agent.  This version of the Policy Manager base component is supported
+        in JUNOSe 6.2 and subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the base component of
+        the Policy Manager application in JUNOSe. These capabilities became
+        obsolete when support was added to allow consideration for ATM cell 
+        tax when calculating statistics and rate limiting."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniPolicyBaseGroup2,
+            juniPolicyClaclGrpGroup,
+            juniClassifierControlListGroup3,
+            juniPolicyIfAttachGroup2,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup2 }
+    ::= { juniPolicyManagerBaseAgent 2 }
+
+juniPolicyManagerBaseAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the Policy Manager base component of the JUNOSe SNMP
+        agent.  This version of the Policy Manager base component is supported
+        in JUNOSe 7.2 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the base component of
+        the Policy Manager application in JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniPolicyBaseGroup3,
+            juniPolicyClaclGrpGroup,
+            juniClassifierControlListGroup3,
+            juniPolicyIfAttachGroup2,
+            juniPolicyAttachProfileGroup,
+            juniPolicyAttachStatisticsGroup2 }
+    ::= { juniPolicyManagerBaseAgent 2 }
+
+
+-- *****************************************************************************
+-- The rate limit Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerRateLimitAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The rate limit policy management component of the Policy Manager
+        application.  MIB support for this specific policy rule type
+        subcomponent can run independently of the other subcomponents but
+        requires the base component."
+    ::= { juniPolicyManagerAgent 2 }
+
+juniPolicyManagerRateLimitAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the rate limit management subcomponent of the Policy
+        Manager component of the JUNOSe SNMP agent.  This version of the rate
+        limit policy management subcomponent was supported in JUNOSe 3.2 and
+        subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the rate limit policy
+        management subcomponent of the Policy Manager application in JUNOSe.
+        These capabilities became obsolete when support was added for new rate
+        limit objects."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniRateLimitGroup }
+    ::= { juniPolicyManagerRateLimitAgent 1 }
+
+juniPolicyManagerRateLimitAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the rate limit management subcomponent of the Policy
+        Manager component of the JUNOSe SNMP agent.  This version of the rate
+        limit policy management subcomponent was supported in JUNOSe 4.0 thru
+        5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the rate limit policy
+        management subcomponent of the Policy Manager application in JUNOSe.
+        These capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniRateLimitGroup2 }
+    ::= { juniPolicyManagerRateLimitAgent 2 }
+
+juniPolicyManagerRateLimitAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the rate limit management subcomponent of the Policy
+        Manager component of JUNOSe SNMP agent.  This version of the rate limit
+        policy management subcomponent is supported in the Juniper RX 5.3 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the rate limit policy
+        management subcomponent of the Policy Manager application in JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniRateLimitGroup2, -- deprecated
+            juniRateLimitGroup3 }
+    ::= { juniPolicyManagerRateLimitAgent 3 }
+
+
+-- *****************************************************************************
+-- The traffic shape Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerTrafficShapeAgent  OBJECT-IDENTITY
+    STATUS      obsolete
+    DESCRIPTION
+        "The traffic shape policy management component of the Policy Manager
+        application.  MIB support for this specific policy rule type
+        subcomponent can run independently of the other subcomponents but
+        requires the base component."
+    ::= { juniPolicyManagerAgent 3 }
+
+juniPolicyManagerTrafficShapeAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the traffic shape management subcomponent of the Policy
+        Manager component of the JUNOSe SNMP agent.  This version of the traffic
+        shape policy management subcomponent was supported in JUNOSe 3.2 and
+        subsequent 3.x system releases. "
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the traffic shape policy
+        management subcomponent of the Policy Manager application in JUNOSe.
+        These capabilities became obsolete when the policy shaper capability was
+        moved into the quality of service component."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniTrafficShapeGroup }
+    ::= { juniPolicyManagerTrafficShapeAgent 1 }
+
+
+-- *****************************************************************************
+-- The log rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerLogRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The log policy rules component of the Policy Manager application.  MIB
+        support for this specific policy rule type subcomponent requires the
+        base component but can run independently of the other subcomponents."
+    ::= { juniPolicyManagerAgent 4 }
+
+juniPolicyManagerLogRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the log rules subcomponent of the Policy Manager component
+        of the JUNOSe SNMP agent.  This version of the log policy rules
+        subcomponent was supported in JUNOSe 3.2 thru 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the log policy rules
+        subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniLogRuleGroup }
+    ::= { juniPolicyManagerLogRulesAgent 1 }
+
+juniPolicyManagerLogRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the log rules subcomponent of the Policy Manager component
+        of the JUNOSe SNMP agent.  This version of the log policy rules
+        subcomponent is supported in JUNOSe 5.3 and subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the log policy rules
+        subcomponent of the Policy Manager application in JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniLogRuleGroup, -- deprecated
+            juniLogRuleGroup2 }
+    ::= { juniPolicyManagerLogRulesAgent 2 }
+
+
+-- *****************************************************************************
+-- The next-hop rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerNextHopRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The next-hop policy rules component of the Policy Manager application.
+        MIB support for this specific policy rule type subcomponent can run
+        independently of the other subcomponents but requires the base
+        component."
+    ::= { juniPolicyManagerAgent 5 }
+
+juniPolicyManagerNextHopRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the next-hop rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the next-hop policy
+        rules subcomponent was supported in JUNOSe 3.2 thru 5.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the next-hop policy rules
+        subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniNextHopRulesGroup }
+    ::= { juniPolicyManagerNextHopRulesAgent 1 }
+
+juniPolicyManagerNextHopRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the next-hop rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the next-hop policy
+        rules subcomponent is supported in JUNOSe 5.3 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the next-hop policy rules
+        subcomponent of the Policy Manager application in the JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniNextHopRulesGroup, -- deprecated
+            juniNextHopRulesGroup2 }
+    ::= { juniPolicyManagerNextHopRulesAgent 2 }
+
+
+-- *****************************************************************************
+-- The filter rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerFilterRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The filter policy rules component of the Policy Manager application.
+        MIB support for this specific policy rule type subcomponent requires the
+        base component but can run independently of the other subcomponents."
+    ::= { juniPolicyManagerAgent 6 }
+
+juniPolicyManagerFilterRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the filter rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the filter policy
+        rules subcomponent is supported in JUNOSe 3.2 thru 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the filter policy rules
+        subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniFilterRulesGroup }
+    ::= { juniPolicyManagerFilterRulesAgent 1 }
+
+juniPolicyManagerFilterRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the filter rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the filter policy
+        rules subcomponent is supported in JUNOSe 5.3 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the filter policy rules
+        subcomponent of the Policy Manager application in the JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniFilterRulesGroup, -- deprecated
+            juniFilterRulesGroup2 }
+    ::= { juniPolicyManagerFilterRulesAgent 2 }
+
+
+-- *****************************************************************************
+-- The next-interface rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerNextInterfaceRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The next-interface policy rules component of the Policy Manager
+        application.  MIB support for this specific policy rule type
+        subcomponent requires the base component but can run independently of
+        the other subcomponents."
+    ::= { juniPolicyManagerAgent 7 }
+
+juniPolicyManagerNextInterfaceRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the next-interface rules subcomponent of the Policy
+        Manager component of the JUNOSe SNMP agent.  This version of the
+        next-interface policy rules subcomponent was supported in JUNOSe 3.2
+        thru 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the next-interface policy
+        rules subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniNextInterfaceRulesGroup }
+    ::= { juniPolicyManagerNextInterfaceRulesAgent 1 }
+
+juniPolicyManagerNextInterfaceRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the next-interface rules subcomponent of the Policy
+        Manager component of the JUNOSe SNMP agent.  This version of the
+        next-interface policy rules subcomponent is supported in JUNOSe 5.3 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the next-interface policy
+        rules subcomponent of the Policy Manager application in JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniNextInterfaceRulesGroup, -- deprecated
+            juniNextInterfaceRulesGroup2 }
+    ::= { juniPolicyManagerNextInterfaceRulesAgent 2 }
+
+
+-- *****************************************************************************
+-- The marking rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerMarkingRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The marking policy rules component of the Policy Manager application.
+        MIB support for this specific policy rule type subcomponent requires the
+        base component but can run independently of the other subcomponents."
+    ::= { juniPolicyManagerAgent 8 }
+
+juniPolicyManagerMarkingRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the marking rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the marking policy
+        rules subcomponent was supported in JUNOSe 3.2 thru 5.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the marking policy rules
+        subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniMarkingRulesGroup }
+    ::= { juniPolicyManagerMarkingRulesAgent 1 }
+
+juniPolicyManagerMarkingRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the marking rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the marking policy
+        rules subcomponent is supported in JUNOSe 5.3 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the marking policy rules
+        subcomponent of the Policy Manager application in JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniMarkingRulesGroup, -- deprecated
+            juniMarkingRulesGroup2 }
+    ::= { juniPolicyManagerMarkingRulesAgent 2 }
+
+
+-- *****************************************************************************
+-- The forward rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerForwardRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The forward policy rules component of the Policy Manager application.
+        MIB support for this specific policy rule type subcomponent requires the
+        base component but can run independently of the other subcomponents."
+    ::= { juniPolicyManagerAgent 9 }
+
+juniPolicyManagerForwardRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the forward rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the forward policy
+        rules subcomponent was supported in JUNOSe 3.2 thru 5.1 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the forward policy rules
+        subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added for new forward
+        rules objects."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniForwardRulesGroup }
+    ::= { juniPolicyManagerForwardRulesAgent 1 }
+
+juniPolicyManagerForwardRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the forward rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the forward policy
+        rules subcomponent was supported in JUNOSe 5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the forward policy rules
+        subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniForwardRulesGroup }
+    ::= { juniPolicyManagerForwardRulesAgent 2 }
+
+juniPolicyManagerForwardRulesAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the forward rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the forward policy
+        rules subcomponent is supported in JUNOSe 5.3 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the forward policy rules
+        subcomponent of the Policy Manager application in JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniForwardRulesGroup2, -- deprecated
+            juniForwardRulesGroup3 }
+    ::= { juniPolicyManagerForwardRulesAgent 3 }
+
+
+-- *****************************************************************************
+-- The color rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerColorRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The color policy rules component of the Policy Manager application.
+        MIB support for this specific policy rule type subcomponent requires the
+        base component but can run independently of the other subcomponents."
+    ::= { juniPolicyManagerAgent 10 }
+
+juniPolicyManagerColorRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the color rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the color policy
+        rules subcomponent was supported in JUNOSe 3.2 thru 5.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the color policy rules
+        subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniColorRulesGroup }
+    ::= { juniPolicyManagerColorRulesAgent 1 }
+
+juniPolicyManagerColorRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the color rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the color policy
+        rules subcomponent is supported in JUNOSe 5.3 and subsequent system
+        releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the color policy rules
+        subcomponent of the Policy Manager application in JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniColorRulesGroup, -- deprecated
+            juniColorRulesGroup2 }
+    ::= { juniPolicyManagerColorRulesAgent 2 }
+
+
+-- *****************************************************************************
+-- The traffic class rules Policy Manager agent capabilities.
+-- *****************************************************************************
+juniPolicyManagerTrafficClassRulesAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The traffic class policy rules component of the Policy Manager
+        application.  MIB support for this specific policy rule type
+        subcomponent requires the base component but can run independently of
+        the other subcomponents."
+    ::= { juniPolicyManagerAgent 11 }
+
+juniPolicyManagerTrafficClassRulesAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the traffic class rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the traffic class
+        policy rules subcomponent was supported in JUNOSe 4.0 thru 5.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the traffic class policy
+        rules subcomponent of the Policy Manager application in JUNOSe.  These
+        capabilities became obsolete when support was added to separate
+        precedence from policy rule and apply it to classifier groups within a
+        policy list."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniTrafficClassRulesGroup }
+    ::= { juniPolicyManagerTrafficClassRulesAgent 1 }
+
+juniPolicyManagerTrafficClassRulesAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the traffic class rules subcomponent of the Policy Manager
+        component of the JUNOSe SNMP agent.  This version of the traffic class
+        policy rules subcomponent is supported in JUNOSe 5.3 and subsequent
+        system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB group supported by the SNMP agent for the traffic class policy
+        rules subcomponent of the Policy Manager application in the JUNOSe."
+    SUPPORTS    Juniper-POLICY-MIB
+        INCLUDES {
+            juniTrafficClassRulesGroup, -- deprecated
+            juniTrafficClassRulesGroup2 }
+    ::= { juniPolicyManagerTrafficClassRulesAgent 2 }
+
+END

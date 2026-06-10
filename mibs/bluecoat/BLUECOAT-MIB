@@ -1,0 +1,115 @@
+BLUECOAT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, enterprises
+                FROM SNMPv2-SMI;
+
+-- Blue Coat Systems Inc. private MIBs
+
+blueCoat MODULE-IDENTITY
+        LAST-UPDATED    "201512150300Z"
+        ORGANIZATION    "Blue Coat Systems, Inc."
+        CONTACT-INFO    "support.services@bluecoat.com
+                         http://www.bluecoat.com"
+        DESCRIPTION     "The root MIB module for Blue Coat.
+                         Note that the enterprise number is 
+                         that of CacheFlow, Blue Coat's 
+                         former corporate name."
+        REVISION        "201512150300Z"
+        DESCRIPTION     "Added device id for sgxen."
+        REVISION        "201504240300Z"
+        DESCRIPTION     "Added device id for sghyperv. 
+                         Added product asg. Added asg id for asgs400, asgs500, asgs200"
+        REVISION        "201403040300Z"
+        DESCRIPTION     "Added device id for sgs200."
+        REVISION        "201312120300Z"
+        DESCRIPTION     "Added cas product and cas id for cass400."
+        REVISION        "201311120300Z"
+        DESCRIPTION     "Added device id for sgvmwareesx."
+        REVISION        "201309240300Z"
+        DESCRIPTION     "Added device id for sgs400."
+        REVISION        "201306270300Z"
+        DESCRIPTION     "Added device id for sgs500."
+        REVISION        "201104150300Z"
+        DESCRIPTION     "Device id for sg900 is changed to match the new code."
+        REVISION        "201104010300Z"
+        DESCRIPTION     "Added device id for sg300, sg900, sg9000 and av products."
+        REVISION        "200711050300Z"
+        DESCRIPTION     "Minor corrections and reformatting."
+        REVISION        "200208280300Z"
+        DESCRIPTION     "Initial revision of this MIB."
+        ::= { enterprises 3417 }
+
+products        OBJECT IDENTIFIER ::= { blueCoat 1 }
+blueCoatMgmt    OBJECT IDENTIFIER ::= { blueCoat 2 }
+
+-- 'device' refers to the sg product (ProxySG)
+device          OBJECT IDENTIFIER ::= { products 1 }
+director        OBJECT IDENTIFIER ::= { products 2 }
+av              OBJECT IDENTIFIER ::= { products 3 }
+cas             OBJECT IDENTIFIER ::= { products 4 }
+sslv            OBJECT IDENTIFIER ::= { products 5 }
+asg             OBJECT IDENTIFIER ::= { products 6 }
+
+sg1000          OBJECT IDENTIFIER ::= { device 1 }
+sg100           OBJECT IDENTIFIER ::= { device 2 }
+sg500           OBJECT IDENTIFIER ::= { device 3 }
+sg2000          OBJECT IDENTIFIER ::= { device 4 }
+sg5000          OBJECT IDENTIFIER ::= { device 5 }
+sg500A          OBJECT IDENTIFIER ::= { device 6 }
+sg3000          OBJECT IDENTIFIER ::= { device 7 }
+sg5x5           OBJECT IDENTIFIER ::= { device 8 }
+sg110           OBJECT IDENTIFIER ::= { device 9 }
+sg6000          OBJECT IDENTIFIER ::= { device 11 }
+sg610           OBJECT IDENTIFIER ::= { device 12 }
+sg6x5           OBJECT IDENTIFIER ::= { device 13 }
+sg3000s         OBJECT IDENTIFIER ::= { device 14 }
+sg5000s         OBJECT IDENTIFIER ::= { device 15 }
+sg7x5           OBJECT IDENTIFIER ::= { device 16 }
+sg710           OBJECT IDENTIFIER ::= { device 17 }
+sg7000          OBJECT IDENTIFIER ::= { device 18 }
+sg611           OBJECT IDENTIFIER ::= { device 19 }
+sg800           OBJECT IDENTIFIER ::= { device 20 }
+sg400           OBJECT IDENTIFIER ::= { device 22 }
+sg8000          OBJECT IDENTIFIER ::= { device 23 }
+sg200           OBJECT IDENTIFIER ::= { device 24 }
+sg810           OBJECT IDENTIFIER ::= { device 25 }
+sg210           OBJECT IDENTIFIER ::= { device 26 }
+sg510           OBJECT IDENTIFIER ::= { device 27 }
+sg8100          OBJECT IDENTIFIER ::= { device 28 }
+sg9000          OBJECT IDENTIFIER ::= { device 29 }
+sgvmwareesx     OBJECT IDENTIFIER ::= { device 30 }
+sg600           OBJECT IDENTIFIER ::= { device 31 }
+sg300           OBJECT IDENTIFIER ::= { device 32 }
+sg900           OBJECT IDENTIFIER ::= { device 34 }
+sgs500          OBJECT IDENTIFIER ::= { device 36 }
+sgs400          OBJECT IDENTIFIER ::= { device 37 }
+sgs200          OBJECT IDENTIFIER ::= { device 38 }
+sghyperv        OBJECT IDENTIFIER ::= { device 42 }
+sgxen           OBJECT IDENTIFIER ::= { device 43 }
+sgkvm			OBJECT IDENTIFIER ::= { device 44 }
+
+sgme710         OBJECT IDENTIFIER ::= { director 1 }
+sgme800         OBJECT IDENTIFIER ::= { director 2 }
+
+av2000          OBJECT IDENTIFIER ::= { av 1 }
+av400           OBJECT IDENTIFIER ::= { av 2 }
+av810           OBJECT IDENTIFIER ::= { av 3 }
+av510           OBJECT IDENTIFIER ::= { av 4 }
+av1400          OBJECT IDENTIFIER ::= { av 5 }
+av2400          OBJECT IDENTIFIER ::= { av 6 }
+av1200          OBJECT IDENTIFIER ::= { av 7 }
+
+cass400         OBJECT IDENTIFIER ::= { cas 1 }
+
+sslv800         OBJECT IDENTIFIER ::= { sslv 1 }
+sslv1800        OBJECT IDENTIFIER ::= { sslv 2 }
+sslv2800        OBJECT IDENTIFIER ::= { sslv 3 }
+sslv3800        OBJECT IDENTIFIER ::= { sslv 4 }
+
+asgs500         OBJECT IDENTIFIER ::= { asg 1 }
+asgs400         OBJECT IDENTIFIER ::= { asg 2 }
+asgs200         OBJECT IDENTIFIER ::= { asg 3 }
+
+END
+

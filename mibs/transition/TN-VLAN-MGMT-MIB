@@ -1,0 +1,1723 @@
+-- ***********************************************************************************************
+-- TN-VLAN-MGMT-MIB.mib:  Transition Networks, Inc. Enterprise MIB for VLAN management
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+
+TN-VLAN-MGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress,
+    enterprises FROM SNMPv2-SMI
+    RowStatus, MacAddress,
+    TEXTUAL-CONVENTION, DisplayString, TimeStamp, TruthValue FROM SNMPv2-TC
+    entPhysicalIndex FROM ENTITY-MIB
+    InterfaceIndexOrZero, InterfaceIndex, ifIndex FROM IF-MIB
+    VlanIndex, PortList FROM Q-BRIDGE-MIB
+    EightOTwoOui FROM DOT3-OAM-MIB
+    SnmpAdminString FROM SNMP-FRAMEWORK-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnVlanQoSMgmtMIB MODULE-IDENTITY
+    LAST-UPDATED "201405010000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "    Transition Networks
+            Technical Support
+
+            10900 Red Circle Drive
+            Minnetonka, MN 55343 USA
+            Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for managing VLAN and QoS in TN platform products."
+
+    REVISION      "200901080000Z"
+        DESCRIPTION
+        "Initial Revision of this module"
+    REVISION      "201102250000Z"
+        DESCRIPTION
+        "Add tnVLANDbFlush and tnFIDDbFlush"
+    REVISION      "201205180000Z"
+        DESCRIPTION
+        "Add tnSysVlanExtMgmtPortType, tnSysVLANExtCustomSTag, tnIfVLANTagMgmt2PortType,
+         tnIfVLANTagMgmt2TxTagType and tnIfVLANTagMgmt2ConfigConflicts"
+    REVISION      "201212210000Z"
+        DESCRIPTION
+        "Add Vlan Control List tnVclMgmt subtree"
+    REVISION      "201405010000Z"
+        DESCRIPTION
+        "Added Port VLAN Configuration Mode, Allowed VLANs, Forbidden VLANs" 
+        
+    REVISION      "201506170000Z"
+        DESCRIPTION
+        "Added Allowed Access VLANs 
+            tnVlanConfigGlobalsMainAccessVlans0To1K    
+            tnVlanConfigGlobalsMainAccessVlans1KTo2K   
+            tnVlanConfigGlobalsMainAccessVlans2KTo3K   
+            tnVlanConfigGlobalsMainAccessVlans3KTo4K"                     
+        
+    ::= { tnProducts 4 }
+
+--
+-- Textual Conventions
+--
+TnVlanServiceTranslationType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "T"
+    SYNTAX  INTEGER {
+        noTranslation(1),
+        untaggedUntagged(2),
+        untaggedSingleTagged(3),
+        singleTaggedSingleTagged(4),
+        singleTaggedTranslation(5),
+        singleTaggedDoubleTagged(6),
+        doubleTaggedDoubleTagged(7),
+        doubleTaggedTranslation(8),
+        addProviderTag(9)
+    }
+
+TNVlanListQuarter ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "128x"
+    STATUS       current
+    DESCRIPTION
+        "A list representing 1024 VLAN IDs.
+
+         The type should be interpreted as a sequence of bits, each bit
+         representing one VLAN ID. If a bit is set (1) the represented VLAN is
+         included in the VLAN list. If a bit is not set (0) the represented VLAN
+         is not included in the VLAN list.
+
+         The least significant bit of each byte represents a smaller VLAN ID
+         than a more significant bit of a byte.
+
+         If for example the VLAN list represents VLAN IDs from 0 to 1023,
+         bit 0 of the first byte represents VLAN ID 0, bit 1 of the first byte
+         represents VLAN ID 1, and so on. The most significant bit of the 128th
+         byte therefore represents VLAN ID 1023.
+
+         An implementation that needs to represent all 4K VLANs will divide
+         the VLAN list into four equally sized objects. VLAN ID 0 is included
+         in the first object even though it is not used."
+    SYNTAX       OCTET STRING (SIZE (128))
+
+--
+-- Section 1 :
+--
+tnVlanQoSMgmtNotifications   OBJECT IDENTIFIER ::= { tnVlanQoSMgmtMIB 0 }
+tnVlanQoSMgmtObjects         OBJECT IDENTIFIER ::= { tnVlanQoSMgmtMIB 1 }
+tnVlanMQoSgmtConformance     OBJECT IDENTIFIER ::= { tnVlanQoSMgmtMIB 2 }
+
+--
+-- TN Vlan management information
+--
+tnSysVlanMgmt             OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 1 }
+tnDevSysPriorityMgmt      OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 2 }
+tnInterfaceQoSMgmt        OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 3 }
+tnInterfaceVlanMgmt       OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 4 }
+tnVlanServiceMgmt         OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 5 }
+tnVlanDbMgmt              OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 6 }
+tnFIDDbMgmt               OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 7 }
+tnVclMgmt                 OBJECT IDENTIFIER ::= { tnVlanQoSMgmtObjects 8 }
+--
+-- Management VLAN
+--
+tnSysManagmentVLANTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSysManagmentVLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Management VLAN configuration table."
+    ::= { tnSysVlanMgmt 1 }
+
+tnSysManagmentVLANEntry OBJECT-TYPE
+    SYNTAX TnSysManagmentVLANEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Each entry represents the management VLAN entry on a device."
+    INDEX { entPhysicalIndex }
+    ::= { tnSysManagmentVLANTable 1 }
+
+TnSysManagmentVLANEntry ::=
+        SEQUENCE
+        {
+            tnSysMgmtVLANStatus       INTEGER,
+            tnSysMgmtVLANId           INTEGER,
+            tnSysMgmtMemberPorts      BITS
+        }
+
+tnSysMgmtVLANStatus OBJECT-TYPE
+    SYNTAX        INTEGER { enabled(1), disabled(2) }
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The device if management VLAN capable, can enable the secure channel
+    for all its management traffic by setting this variable to enabled(1)."
+     ::= { tnSysManagmentVLANEntry 1 }
+
+tnSysMgmtVLANId OBJECT-TYPE
+    SYNTAX        INTEGER (1..4094)
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The VLAN id, that this device will use for its management traffic.
+    All Management frames to this device when 'tnSysManagmentVLANStatus'
+    is set to 'enabled(1)' must be tagged with this VLAN id and all
+    management frames from this device will be tagged with this VLAN id."
+     ::= { tnSysManagmentVLANEntry 2 }
+
+tnSysMgmtMemberPorts OBJECT-TYPE
+    SYNTAX        BITS { none(0) } -- value added by Jing
+    MAX-ACCESS    read-write
+    STATUS current
+    DESCRIPTION
+    "The ports on this device which are members of this Management VLAN.
+    This is for security, some ports can be made not a member, which blocks all
+    management access from this port.
+    Each bit in this variable represents the logical port number local to the device."
+     ::= { tnSysManagmentVLANEntry 3 }
+
+--
+-- TN Switch management information
+--
+
+tnSysVLANExtTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSysVLANExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "System VLAN external configuration table."
+    ::= { tnSysVlanMgmt 2 }
+
+tnSysVLANExtEntry OBJECT-TYPE
+    SYNTAX TnSysVLANExtEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Each entry represents the VLAN config on a device."
+    INDEX { entPhysicalIndex }
+    ::= { tnSysVLANExtTable 1 }
+
+TnSysVLANExtEntry ::=
+        SEQUENCE
+        {
+            tnSysVlanExtMgmtPortType      INTEGER,
+            tnSysVLANExtCustomSTag          OCTET STRING,
+            tnVlanConfigGlobalsMainAccessVlans0To1K   TNVlanListQuarter, 
+            tnVlanConfigGlobalsMainAccessVlans1KTo2K  TNVlanListQuarter, 
+            tnVlanConfigGlobalsMainAccessVlans2KTo3K  TNVlanListQuarter, 
+            tnVlanConfigGlobalsMainAccessVlans3KTo4K  TNVlanListQuarter                   
+       }
+
+tnSysVlanExtMgmtPortType  OBJECT-TYPE
+    SYNTAX  INTEGER{
+                unaware(1),
+                cPort(2),
+                sPort(3),
+                sCustomPort(4)
+            }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "This mib variable is applicable for products that have a out of band management port.
+     This determines the Port type for all management traffic.It can be one of the following types:
+     Unaware, C-port, S-port, or S-custom-port where:
+      - Unaware: The management traffic is untagged or not management vlan.
+      - C-port: The management vlan is a C-Vlan and TPID 0x8100 is used for out of band management traffic.
+      - S-port: The management vlan is a S-Vlan and TPID 0x88a8 is used for out of band management traffic.
+      - S-custom-port: The management vlan is a S-Vlan, which use a custom TPID defined in tnSysVLANExtCustomSTag.
+     "
+    ::= { tnSysVLANExtEntry 1 }
+
+tnSysVLANExtCustomSTag  OBJECT-TYPE
+    SYNTAX        OCTET STRING(SIZE(2))
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+    "This field specifies the Ether type used for Custom S-ports.
+     This is a global setting and is applicable for all Custom S-ports.
+     This field is used when TPID other than 0x8100 and 0x88a8 is needed for S-Tags."
+    ::= { tnSysVLANExtEntry 2 }
+
+ tnVlanConfigGlobalsMainAccessVlans0To1K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "First quarter of bit-array indicating the enabled access VLANs."
+    ::= { tnSysVLANExtEntry 3 }
+
+tnVlanConfigGlobalsMainAccessVlans1KTo2K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Second quarter of bit-array indicating the enabled access VLANs."
+    ::= { tnSysVLANExtEntry 4 }
+
+tnVlanConfigGlobalsMainAccessVlans2KTo3K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Third quarter of bit-array indicating the enabled access VLANs."
+    ::= { tnSysVLANExtEntry 5 }
+
+tnVlanConfigGlobalsMainAccessVlans3KTo4K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Last quarter of bit-array indicating the enabled access VLANs."
+    ::= { tnSysVLANExtEntry 6 }
+
+-- IP Priority mapping Table
+tnSwIPPrioTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSwIPPrioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "IP Traffic class table."
+    ::= { tnDevSysPriorityMgmt 1 }
+
+tnSwIPPrioEntry OBJECT-TYPE
+    SYNTAX TnSwIPPrioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Each entry represents the remapped value for each traffic class."
+    INDEX { tnSwIPPrioIndex }
+    ::= { tnSwIPPrioTable 1 }
+
+TnSwIPPrioEntry ::=
+        SEQUENCE
+        {
+            tnSwIPPrioIndex        INTEGER,
+            tnSwIPPrioTC           INTEGER,
+            tnSwIPPrioRemap        INTEGER
+        }
+
+tnSwIPPrioIndex OBJECT-TYPE
+    SYNTAX INTEGER  (1..11111)  -- range added by Jing
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The IP traffic class remap table index. The indexing is for a bridge entity"
+    ::= { tnSwIPPrioEntry 1 }
+
+tnSwIPPrioTC OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The IP traffic class value."
+    ::= { tnSwIPPrioEntry 2 }
+
+tnSwIPPrioRemap OBJECT-TYPE
+    SYNTAX INTEGER  { pri0(1), pri1(2), pri2(3), pri3(4) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The frames with IP traffic class set, will be remapped to the listed priority queues."
+    ::= { tnSwIPPrioEntry 3 }
+
+-- IEEE Priority mapping Table
+tnSwIEEEPrioTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnSwIEEEPrioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "IEEE priority remapping table."
+    ::= { tnDevSysPriorityMgmt 2 }
+
+tnSwIEEEPrioEntry OBJECT-TYPE
+    SYNTAX TnSwIEEEPrioEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Each entry represents the remapped value for each priority class."
+    INDEX { tnSwIEEEPriority }
+    ::= { tnSwIEEEPrioTable 1 }
+
+TnSwIEEEPrioEntry ::=
+        SEQUENCE
+        {
+            tnSwIEEEPriority           INTEGER,
+            tnSwIEEEPriorityRemap      INTEGER
+        }
+
+tnSwIEEEPriority OBJECT-TYPE
+    SYNTAX INTEGER (0..7)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The IEEE tag priority bits in the frame."
+    ::= { tnSwIEEEPrioEntry 1 }
+
+tnSwIEEEPriorityRemap OBJECT-TYPE
+    SYNTAX INTEGER  { pri0(1), pri1(2), pri2(3), pri3(4) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The frames with IEEE priority bits set, will be mapped to the listed priority queues."
+    ::= { tnSwIEEEPrioEntry 2 }
+
+--
+-- ION Interface Priority Management
+--
+tnIfPriorityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries for interfaces which are capable of Priority management."
+    ::= { tnInterfaceQoSMgmt 1 }
+
+tnIfPriorityEntry OBJECT-TYPE
+    SYNTAX      TnIfPriorityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents Priority configuration."
+    INDEX  { ifIndex }
+    ::= { tnIfPriorityTable 1 }
+
+TnIfPriorityEntry ::=
+    SEQUENCE
+    {
+        tnIfDefaultPriority        INTEGER,
+        tnIfUseIEEEPriority        TruthValue,
+        tnIfUseIPPriority          TruthValue,
+        tnIfUseIPOrIEEEPriority    INTEGER,
+        tnIfSrcMACPriorityRemap    TruthValue,
+        tnIfDstMACPriorityRemap    TruthValue,
+        tnIfVIDPriorityRemap       TruthValue
+    }
+
+tnIfDefaultPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..7)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The default priority for frames ingressing this port, if it doesnt have any
+        IEEE 802.3ac tag or any IP TOS/Diffserv traffic class fields."
+    ::= { tnIfPriorityEntry 1 }
+
+tnIfUseIEEEPriority OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If the frame is IEEE tagged, and this mib variable is set to 'true',
+        the 802.1p bits are used as the frames priority."
+    ::= { tnIfPriorityEntry 2 }
+
+tnIfUseIPPriority OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If the frame has IP TOS/Diffserv traffic class fields, and this mib variable is
+        set to 'true'. The traffic class fields will be used as the frame's priority."
+    ::= { tnIfPriorityEntry 3 }
+
+tnIfUseIPOrIEEEPriority OBJECT-TYPE
+    SYNTAX     INTEGER { useIEEE(1), useIP(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If the frame has IP TOS/Diffserv traffic class fields, and IEEE 802.3ac tagged, then
+        this mib variable decides which one is to be considered as the frame's priority."
+    ::= { tnIfPriorityEntry 4 }
+
+tnIfSrcMACPriorityRemap OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "When set to true(1), a frame's Source MAC address decides the priority of the frame.
+        The new priority value is assigned based on the priority assigned to that MAC address
+        in the MAC forwarding database."
+    ::= { tnIfPriorityEntry 5 }
+
+tnIfDstMACPriorityRemap OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "When set to true(1), a frame's Destination MAC address decides the priority of the frame.
+        The new priority value is assigned based on the priority assigned to that MAC address
+        in the MAC forwarding database."
+    ::= { tnIfPriorityEntry 6 }
+
+tnIfVIDPriorityRemap OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "When set to true(1), a frame's VLAN id decides the priority of the frame.
+        The new priority value is assigned based on the priority assigend to that VLAN id
+        in the VLAN database."
+    ::= { tnIfPriorityEntry 7 }
+
+--
+-- ION Interface Priority remapping
+--
+tnIfPriorityRemapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfPriorityRemapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries for each interface's IEEE priority remapping."
+    ::= { tnInterfaceQoSMgmt 2 }
+
+tnIfPriorityRemapEntry OBJECT-TYPE
+    SYNTAX      TnIfPriorityRemapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents Priority remapping for an interface."
+    INDEX  { ifIndex, tnIfUserPriority }
+    ::= { tnIfPriorityRemapTable 1 }
+
+TnIfPriorityRemapEntry ::=
+    SEQUENCE
+    {
+        tnIfUserPriority        INTEGER,
+        tnIfRemappedPriority    INTEGER
+    }
+
+tnIfUserPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..7)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The priority found in the frames ingressing this interface.
+        Frames which are untagged take up the interface's priority."
+    ::= { tnIfPriorityRemapEntry 1 }
+
+tnIfRemappedPriority OBJECT-TYPE
+    SYNTAX     INTEGER (0..7)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The frame's priority is remapped to this new priority value.
+        Frames that egress tagged will have the remapped priority."
+    ::= { tnIfPriorityRemapEntry 2 }
+
+--
+-- ION Interface VLAN Management
+--
+tnIfVLANTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfVLANEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries for interfaces which are VLAN capable."
+    ::= { tnInterfaceVlanMgmt 1 }
+
+tnIfVLANEntry OBJECT-TYPE
+    SYNTAX      TnIfVLANEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents VLAN configuration on an interface."
+    INDEX  { ifIndex }
+    ::= { tnIfVLANTable 1 }
+
+TnIfVLANEntry ::=
+    SEQUENCE
+    {
+        tnIfDot1qState             INTEGER,
+        tnIfDiscardTagged          TruthValue,
+        tnIfDiscardUntagged        TruthValue,
+        tnIfDefaultVlanId          INTEGER,
+        tnIfForceDefaultVlanId     TruthValue
+    }
+
+tnIfDot1qState OBJECT-TYPE
+    SYNTAX     INTEGER { vlanEnabled(1), vlanDisabled(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+--    SYNTAX     INTEGER { vlanDisabled(1), fallback(2), check(3), secure(4) }
+--    MAX-ACCESS read-write
+--    STATUS     current
+--    DESCRIPTION
+--      "The IEEE 802.1Q status of this inteface.
+--      vlanDisabled - 802.1Q is disabled.
+--         fallback   - The frame is not discarded if the Vlan Id is not in the VLAN Database. It is forwarded normally.
+--         check      - The Vlan Id must be in the VLAN Database, the ingress port may or may not be a member.
+--                      If the Vlan Id is not in the VLAN Database, it is discarded.
+--         secure     - The Vlan Id must be in the VLAN Database and the ingresss port should be a member
+--                      of the VLAN, else it is discarded.
+--         In all the three cases when 802.1Q is enabled, the frame is allowed to egress only port is a member of the VLAN."
+    DESCRIPTION
+        "The IEEE802.1Q status of this interface."
+    ::= { tnIfVLANEntry 1 }
+
+tnIfDiscardTagged OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This filters all tagged non-management frames ingressing this port.
+         All untagged and priority tagged frames are processed as normal frames."
+    ::= { tnIfVLANEntry 2 }
+
+tnIfDiscardUntagged OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This filters all untagged and priority tagged non-management frames
+        ingressing this port. All frames .1Q tagged frames are processed as normal frames."
+    ::= { tnIfVLANEntry 3 }
+
+tnIfDefaultVlanId OBJECT-TYPE
+    SYNTAX     INTEGER (0..4094)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The interface's default Vlan id. This VLAN id is given to untagged frames on ingress into
+        the device."
+    ::= { tnIfVLANEntry 4 }
+
+tnIfForceDefaultVlanId OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This forces all untagged and (802.1Q)tagged frames to take up the interface's ionIfDefaultVlanId."
+    ::= { tnIfVLANEntry 5 }
+
+--
+-- Tagging options at Port Level
+--
+tnIfVLANTagMgmtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfVLANTagMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries for interfaces which are VLAN capable."
+    ::= { tnInterfaceVlanMgmt 2 }
+
+tnIfVLANTagMgmtEntry OBJECT-TYPE
+    SYNTAX      TnIfVLANTagMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents VLAN configuration on an interface."
+    INDEX  { ifIndex }
+    ::= { tnIfVLANTagMgmtTable 1 }
+
+TnIfVLANTagMgmtEntry ::=
+    SEQUENCE
+    {
+        tnIfFrameTagMode           INTEGER,
+        tnIfProviderEtherType      INTEGER,
+        tnIfNetworkModeTagging     INTEGER
+    }
+
+tnIfFrameTagMode OBJECT-TYPE
+    SYNTAX     INTEGER { network(1), provider(2), customer(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The interface's taggin mode. The interface can be set as :
+             network(1) - This is the normal network mode. It can take untagged
+                          and 802.3ac tagged frames. In this mode, 802.1q can be
+                          enabled on the interface. Frames with an ethertype of
+                          0x8100 is considered as tagged.
+
+             provider(2) - In provider mode, frames are considered
+                            provider tagged if it matches the 'ionIfProviderEtherType'.
+                           Frames which are ingress with a provider tag, are stripped
+                            of their provider tag on egressing this interface.
+                           If the frame's ethertype doesnt match the 'ionIfProviderEtherType'
+                           it is as untagged.
+
+             customer(3) - The customer mode is a normal access port which is not 802.1Q aware.
+        "
+    ::= { tnIfVLANTagMgmtEntry 1 }
+
+tnIfProviderEtherType OBJECT-TYPE
+    SYNTAX     INTEGER { x8100(1), x9100(2), x88a8(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This ether type is used when an interface is set to 'provider' mode.
+         Frames are considered tagged only if the ether type matches this value."
+    ::= { tnIfVLANTagMgmtEntry 2 }
+
+tnIfNetworkModeTagging OBJECT-TYPE
+    SYNTAX     INTEGER { unmodified(1), removeTag(2), addTag(3) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is available only when 'ionIfFrameTagMode' is set to 'network(1)' mode.
+        In unmodified(1) - Frames are unmodified, the egress the same as they ingress this interface
+           removeTag(2)  - Tagged frames are stripped of their tag, and are transmitted untagged
+           addTag(3)     - Untagged frames get tagged when they egress this interface."
+    ::= { tnIfVLANTagMgmtEntry 3 }
+
+tnIfVLANTagMgmt2Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnIfVLANTagMgmt2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table has entries for interfaces which are VLAN capable."
+    ::= { tnInterfaceVlanMgmt 3 }
+
+tnIfVLANTagMgmt2Entry OBJECT-TYPE
+    SYNTAX      TnIfVLANTagMgmt2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents VLAN configuration on an interface."
+    INDEX  { ifIndex }
+    ::= { tnIfVLANTagMgmt2Table 1 }
+
+TnIfVLANTagMgmt2Entry ::=
+    SEQUENCE
+    {
+        tnIfVLANTagMgmt2PortType           INTEGER,
+        tnIfVLANTagMgmt2TxTagType          INTEGER,
+        tnIfVLANTagMgmt2ConfigConflicts    INTEGER,
+        tnVlanConfigInterfaceMode          INTEGER,
+        tnVlanConfigInterfaceAllowVlans0KTo1K         TNVlanListQuarter,
+        tnVlanConfigInterfaceAllowVlans1KTo2K         TNVlanListQuarter,
+        tnVlanConfigInterfaceAllowVlans2KTo3K         TNVlanListQuarter,
+        tnVlanConfigInterfaceAllowVlans3KTo4K         TNVlanListQuarter,
+        tnVlanConfigInterfaceForbiddenVlans0KTo1K     TNVlanListQuarter,
+        tnVlanConfigInterfaceForbiddenVlans1KTo2K     TNVlanListQuarter,
+        tnVlanConfigInterfaceForbiddenVlans2KTo3K     TNVlanListQuarter,
+        tnVlanConfigInterfaceForbiddenVlans3KTo4K     TNVlanListQuarter
+    }
+
+tnIfVLANTagMgmt2PortType    OBJECT-TYPE
+    SYNTAX  INTEGER{
+                unaware(1),
+                cPort(2),
+                sPort(3),
+                sCustomPort(4)
+            }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "A Port can be one of the following types: Unaware, C-port, S-port, or S-custom-port where:
+          - Unaware: all frames are classified to the Port VLAN ID and tags are not removed (default).
+          - C-port: Customer port; with Customer tags (C-Tags), which use TPID 0x8100.
+          - S-port: Service port; with Service tags (S-Tags), which use TPID 0x88A8 (IEEE 802.1ad).
+          - S-custom-port: Custom Service port; with Service tags (S-Tags), which use a custom TPID assigned
+            in tnSysVLANExtCustomSTag.
+         For Customer tags and Service tags, both VLAN tags (tags with non-zero VID) and Priority tags (tags with
+         VID = 0) are processed.
+         The tag header is either retrieved from a tag in the incoming frame or from a default port-based tag header.
+         The port-based tag header is configured in ieee8021QBridgePvid.
+         For double-tagged frames, there is an option to use the inner tag instead of the outer tag.
+         In addition to the tag header, the ingress port decides the number of VLAN tags to pop at egress. If the
+         configured number of tags to pop is greater than the actual number of tags in the frame, the number is
+         reduced to the actual number of tags in the frame. "
+    ::= { tnIfVLANTagMgmt2Entry 1 }
+
+tnIfVLANTagMgmt2TxTagType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                untagPvid(1),
+                tagAll(2),
+                untagAll(3)
+            }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Determines egress tagging on a port:
+         - Untag_pvid - All frames with classified VLAN as the PVID egress as untagged frames.
+         - Tag_all - All frames which do not have a tag with classified vlan are tagged on egress.
+                     An extra tag with ingress port PVID is added if the frames are already tagged.
+         - Untag_all - All frames tagged with the classified vlan id are untagged on egress."
+    ::= { tnIfVLANTagMgmt2Entry 2 }
+
+tnIfVLANTagMgmt2ConfigConflicts OBJECT-TYPE
+    SYNTAX  INTEGER {
+            no(1),
+        yes(2)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Shows the status of Conflicts whether one exists or not. When a Volatile VLAN User requests to set VLAN
+        membership or VLAN port configuration, the following conflicts can occur:
+
+        - Functional Conflicts between features.
+        - Conflicts due to hardware limitation.
+        - Direct conflict between user modules. "
+    ::= { tnIfVLANTagMgmt2Entry 3 }
+
+tnVlanConfigInterfaceMode OBJECT-TYPE
+    SYNTAX      INTEGER { access(1), trunk(2), hybrid(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines the underlying port mode.
+
+         Access ports are only members of one VLAN, the AccessVlan.
+
+         Trunk ports are by default members of all VLANs, which can be limited
+         with TrunkVlans.
+
+         Hybrid ports allow for changing all port VLAN parameters. As trunk
+         ports, hybrid ports are by default members of all VLANs, which can be
+         limited with HybridVlans."
+    ::= { tnIfVLANTagMgmt2Entry 4 }
+
+tnVlanConfigInterfaceAllowVlans0KTo1K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { tnIfVLANTagMgmt2Entry 5 }
+
+tnVlanConfigInterfaceAllowVlans1KTo2K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { tnIfVLANTagMgmt2Entry 6 }
+
+tnVlanConfigInterfaceAllowVlans2KTo3K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { tnIfVLANTagMgmt2Entry 7 }
+
+tnVlanConfigInterfaceAllowVlans3KTo4K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Last quarter of bit-array indicating whether the port is member of a
+         VLAN ('1') or not ('0'). Used when Mode is hybrid."
+    ::= { tnIfVLANTagMgmt2Entry 8 }
+
+tnVlanConfigInterfaceForbiddenVlans0KTo1K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "First quarter of bit-array indicating whether the port can ever become
+         a member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { tnIfVLANTagMgmt2Entry 9 }
+
+tnVlanConfigInterfaceForbiddenVlans1KTo2K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Second quarter of bit-array indicating whether the port can ever become
+         a member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { tnIfVLANTagMgmt2Entry 10 }
+
+tnVlanConfigInterfaceForbiddenVlans2KTo3K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Third quarter of bit-array indicating whether the port can ever become
+         a member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { tnIfVLANTagMgmt2Entry 11 }
+
+tnVlanConfigInterfaceForbiddenVlans3KTo4K OBJECT-TYPE
+    SYNTAX      TNVlanListQuarter
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Last quarter of bit-array indicating whether the port can ever become a
+         member of a VLAN ('0') or not ('1'). Used in all modes."
+    ::= { tnIfVLANTagMgmt2Entry 12 }
+
+--
+-- VLAN service configuration for a 2-port ION device
+--
+tnVlanServiceConnType    OBJECT-TYPE
+    SYNTAX     INTEGER { customerProvider(1), providerCustomer(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This defines the VLAN service type. The connection specified Port 1 and Port 2 configuration.
+        customerProvider(1) : This sets the Port 1 to be customer facing port and Port 2 to be provider facing port.
+        providerCustomer(2) : This sets the Port 1 to be provider facing port and Port 2 to be customer facing port.
+        "
+    ::= { tnVlanServiceMgmt 1 }
+
+tnVlanServiceVIDForTag    OBJECT-TYPE
+    SYNTAX     INTEGER  (1..4094)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This Vlan id will be used when the service translation requires an extra tag to be added."
+    ::= { tnVlanServiceMgmt 2 }
+
+tnVlanServiceEtherTypeForTag    OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This Ethertype will be used when the service translation requires an extra tag to be added.
+        Typical values are 0x8100 for IEEE 802.1Q tags, 0x88a8 for IEEE 802.1ad S-tags or other 2 byte private ethertype."
+    ::= { tnVlanServiceMgmt 3 }
+
+tnVlanServiceTranslation OBJECT-TYPE
+    SYNTAX     TnVlanServiceTranslationType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This determines the service or flow type between the two terminations.
+        The translation type as the flow passes the termination points from Customer edge to provider edge
+        are detailed below :
+
+
+         <----- Provider Side ----->                                <----- Customer Side ----->
+                                                Device
+                                    +------------------------------+
+                        ---->       |  P |                    |  P |     ---->
+                        ---->       |  o |                    |  o |     ---->
+                        <----       |  r |                    |  r |     <----
+                        <----       |  t |                    |  t |     <----
+                                    |(PE)|                    |(CE)|
+                                    +------------------------------+
+
+
+         noTranslation(1) :-
+         The ingress flow might contain any kind of frames, untagged or single or double tagged.
+         The egress flow will be exactly the same, no translation is done.
+
+        untaggedUntagged(2) :-
+        The traffic should be untagged, all tagged frames will be discarded.
+        The traffic that egress the device contain the untagged flow without any modification.
+
+        untaggedSingleTagged(3) :-
+        At the CE the traffic should be untagged.
+        At the PE the traffic will contain a single tag with the VID specified in tnVlanServiceVIDForTag.
+
+        singleTaggedSingleTagged(4) :-
+        The traffic should be single tagged on ingress and on egress with no translation.
+
+        singleTaggedTranslation(5) :-
+        The traffic should be single tagged on ingress and on egress.
+        The only changes from the singleTaggedSingleTagged(4), there is a translation.
+        The Vlan Id that came on ingress is translated to a different Vlan Id on egress.
+
+        singleTaggedDoubleTagged(6) :-
+        At the CE the traffic should be single tagged.
+        At the PE the traffic will contain an extra tag with the VID specified in tnVlanServiceVIDForTag.
+
+        doubleTaggedDoubleTagged(7) :-
+        The traffic should be double tagged on ingress and on egress with no translation.
+
+        doubleTaggedTranslation(8) :-
+        The traffic should be double tagged on ingress and on egress.
+        The only changes from the doubleTaggedDoubleTagged(7), there is a translation.
+        The Vlan Id in outer tag that came on CE is translated to a different Vlan Id on PE.
+        The inner tag remains intact.
+
+        addProviderTag(9) :-
+        This option adds an extra tag on the PE interface, no matter what kind of traffic at CE.
+        This strips the outer tag for traffic from PE interface egressing the CE interface.
+        "
+    ::= { tnVlanServiceMgmt 4 }
+
+--
+-- VLAN database
+--
+tnVLANDbTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnVLANDbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table contains all VLAN entries for this bridge."
+    ::= { tnVlanDbMgmt 1 }
+
+tnVLANDbEntry OBJECT-TYPE
+    SYNTAX      TnVLANDbEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table represents a VLAN and the interfaces that are members of that VLAN."
+    INDEX  { tnVlanDbVID }
+    ::= { tnVLANDbTable 1 }
+
+TnVLANDbEntry ::=
+    SEQUENCE
+    {
+        tnVlanDbVID            VlanIndex,
+         tnVlanDbFID           INTEGER,
+        tnVlanDbVIDPriOverride INTEGER,
+        tnVlanDbVIDPriority    INTEGER,
+        tnVlanDbMemTagPort1    INTEGER,
+        tnVlanDbMemTagPort2    INTEGER,
+        tnVlanDbMemTagPort3    INTEGER,
+        tnVlanDbMemTagPort4    INTEGER,
+        tnVlanDbMemTagPort5    INTEGER,
+        tnVlanDbMemTagPort6    INTEGER,
+        tnVlanDbMemTagPort7    INTEGER,
+        tnVlanDbMemTagPort8    INTEGER,
+        tnVlanDbMemTagPort9    INTEGER,
+        tnVlanDbMemTagPort10   INTEGER,
+        tnVlanDbRowStatus      RowStatus
+    }
+
+tnVlanDbVID     OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The VLAN ID of the entry."
+    ::= { tnVLANDbEntry 1 }
+
+tnVlanDbFID     OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Forwarding Database number for this VLAN."
+    ::= { tnVLANDbEntry 2 }
+
+tnVlanDbVIDPriOverride     OBJECT-TYPE
+    SYNTAX INTEGER { enable(1), disable(2) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Override Priority on frames assosicated with this VID."
+    ::= { tnVLANDbEntry 3 }
+
+tnVlanDbVIDPriority     OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Priority for frames assosicated with this VID."
+    ::= { tnVLANDbEntry 4 }
+
+tnVlanDbMemTagPort1     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 1.
+                    memEgressNoMode(1)- Port 1 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 1 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 1 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 1 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 5 }
+
+tnVlanDbMemTagPort2     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 2.
+                    memEgressNoMode(1)- Port 2 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 2 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 2 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 2 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 6 }
+
+tnVlanDbMemTagPort3     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 3.
+                    memEgressNoMode(1)- Port 3 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 3 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 3 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 3 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 7 }
+
+tnVlanDbMemTagPort4     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 4.
+                    memEgressNoMode(1)- Port 4 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 4 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 4 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 4 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 8 }
+
+tnVlanDbMemTagPort5     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 5.
+                    memEgressNoMode(1)- Port 5 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 5 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 5 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 5 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 9 }
+
+tnVlanDbMemTagPort6     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 6.
+                    memEgressNoMode(1)- Port 6 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 6 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 6 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 6 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 10 }
+
+tnVlanDbMemTagPort7     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 7.
+                    memEgressNoMode(1)- Port 7 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 7 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 7 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 7 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 11 }
+
+tnVlanDbMemTagPort8     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 8.
+                    memEgressNoMode(1)- Port 8 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 8 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 8 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 8 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 12 }
+
+tnVlanDbMemTagPort9     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 9.
+                    memEgressNoMode(1)- Port 9 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 9 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 9 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 9 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 13 }
+
+tnVlanDbMemTagPort10     OBJECT-TYPE
+    SYNTAX INTEGER { memEgressNoMod(1), memEgressNoTag(2), memEgressTag(3), notMember(4), notApplicable(5) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "Membership and Egress Tagging on Logical Port 10.
+                    memEgressNoMode(1)- Port 10 is a member of this VLAN and frames
+                                         that egress are unmodified.
+                    memEgressNoTag(2) - Port 10 is a member of this VLAN and frames
+                                         that egress are untagged.
+                    memEgressTag(3)   - Port 10 is a member of this VLAN and frames
+                                         that egress are tagged.
+                    notMember(4)      - Port 10 is not a member of this VLAN and frames
+                                         that ingress with this VID are discarded.
+                    notApplicable(5) is returned if there is no valid port."
+
+    ::= { tnVLANDbEntry 14 }
+
+tnVlanDbRowStatus     OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "The status of this VLAN entry in the VLAN database."
+
+    ::= { tnVLANDbEntry 15 }
+
+tnVLANDbFlush          OBJECT IDENTIFIER ::= { tnVlanDbMgmt 2 }
+
+tnVLANDbFlushOperation OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    doNothing(1),
+                    flushAll(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Set this viarable to:
+                 flushAll(2): flush all VLAN entries except default VLAN 1.
+                 This variable can't be set if the 'tnVLANDbFlushOperationStatus'
+                 is 'inProgress(4)'.
+                 Do getting to this variable:
+                 If an operation is being processed, the operation being processed is returned.
+                 If no operation is being processed, 'doNothing(1)' is returned."
+    ::= { tnVLANDbFlush 1 }
+
+tnVLANDbFlushOperationStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    success(2),
+                    failure(3),
+                    inProgress(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The VLAN database flush operation status.
+                 unknown(1): no flush operation has been performed.
+                 success(2)/failure(3): the last flush operation is finished, success(2)
+                     indicates the last flush operation is successful. failure(3)
+                     indicates the last flush operation fails.
+                 inProgress(4): flush operation is in progress."
+    ::= { tnVLANDbFlush 2 }
+
+tnVLANDbFlushOperationFailureReason  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..63))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "Specifies the description of the cause of 'failure(3)' state of the
+                  object 'tnVLANDbFlushOperationStatus'. This object would be a null
+                  string if value of 'tnVLANDbFlushOperationStatus' is anything other
+                  than 'failure(3)'."
+    ::= { tnVLANDbFlush 3 }
+
+--
+-- Forwarding database
+--
+tnFIDDbTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnFIDDbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The forwarding/filtering address database for this device."
+    ::= { tnFIDDbMgmt 1 }
+
+tnFIDDbEntry OBJECT-TYPE
+    SYNTAX TnFIDDbEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Information about a particular MAC address."
+    INDEX { tnFIDDbID, tnFIDDbMacAddress }
+    ::= { tnFIDDbTable 1 }
+
+TnFIDDbEntry ::=
+    SEQUENCE {
+        tnFIDDbID                      INTEGER,
+        tnFIDDbMacAddress              MacAddress,
+        tnFIDDbConnPort                INTEGER,
+        tnFIDDbPriority                INTEGER,
+        tnFIDDbEntryType               INTEGER,
+        tnFIDDbEntryStatus             RowStatus
+    }
+
+tnFIDDbID     OBJECT-TYPE
+    SYNTAX INTEGER (0..255)
+        MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The Forwarding Database Number. This identifies the database."
+    ::= { tnFIDDbEntry 2 }
+
+tnFIDDbMacAddress     OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The unicast or multicast MAC address that the device has forwarding information."
+    ::= { tnFIDDbEntry 3 }
+
+tnFIDDbConnPort OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "The index of the logical Port from which the device received the 'tnFIDDbMacAddress'."
+    ::= { tnFIDDbEntry 4 }
+
+tnFIDDbPriority OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "The priority of this MAC entry."
+    ::= { tnFIDDbEntry 5 }
+
+tnFIDDbEntryType OBJECT-TYPE
+    SYNTAX INTEGER  { static(1), staticNRL(2), staticPA(3), dynamic(4) }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "The Entry state of this unicast or multicast entry.
+                The types represent :
+                    static(1)    - A Valid entry that doesnot age.
+                    staticNRL(2) - A static entry that has no ingress rate limiting.
+                    staticPA(3)  - A static entry that has priority override enabled.
+                    dynamic(4)   - A valid entry with no special attributes which
+                                   ages and finally removed from the database.
+
+                A unicast entry can be static(1) or staticPA(3) but not
+                staticNRL(2). For MAC address which are learned, the read-only value
+                of dynamic(4) is returned."
+    ::= { tnFIDDbEntry 6 }
+
+tnFIDDbEntryStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION "The status of this entry."
+    ::= { tnFIDDbEntry 7 }
+
+tnFIDDbFlush          OBJECT IDENTIFIER ::= { tnFIDDbMgmt 2 }
+
+tnFIDDbFlushFID OBJECT-TYPE
+    SYNTAX      INTEGER(0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "When 'tnFIDDbFlushOperation' is 'flushAllFID(3)' or 'flushAllDynamicFID(4)',
+                 the value(1..4094) of this viarable is used to specify the FID to be flushed.
+                 The value 0 of this virable means no FID is specified."
+    ::= { tnFIDDbFlush 1 }
+
+tnFIDDbFlushOperation OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    doNothing(1),
+                    flushAll(2),
+                    flushAllDynamic(3),
+                    flushAllFID(4),
+                    flushAllDynamicFID(5)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Set this viarable to:
+                 flushAll(2): flush all FID entries for all FIDs.
+                 flushAllDynamic(3): flush all FID dynamic entries for all FIDs.
+                 flushAllFID(4): flush all FID entries for one FID which is specified
+                              by ionFIDDbFlushFID.
+                 flushAllDynamicFID(5): flush all FID dynamic entries for one FID which
+                              is specified by ionFIDDbFlushFID.
+                 This variable can't be set if the 'ionFIDDbFlushOperationStatus'
+                 is 'inProgress(4)'.
+                 Do getting to this variable:
+                 If an operation is being processed, the operation being processed is returned.
+                 If no operation is being processed, 'doNothing(1)' is returned."
+    ::= { tnFIDDbFlush 2 }
+
+tnFIDDbFlushOperationStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    success(2),
+                    failure(3),
+                    inProgress(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The FID database flush operation status.
+                 unknown(1): no flush operation has been performed.
+                 success(2)/failure(3): the last flush operation is finished, success(2)
+                     indicates the last flush operation is successful. failure(3)
+                     indicates the last flush operation fails.
+                 inProgress(4): flush operation is in progress."
+    ::= { tnFIDDbFlush 3 }
+
+tnFIDDbFlushOperationFailureReason  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..63))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "Specifies the description of the cause of 'failure(3)' state of the
+                  object 'ionFIDDbFlushOperationStatus'. This object would be a null
+                  string if value of 'ionFIDDbFlushOperationStatus' is anything other
+                  than 'failure(3)'."
+    ::= { tnFIDDbFlush 4 }
+
+--
+-- VLAN Control List
+--
+tnVclMacBasedMgmt              OBJECT IDENTIFIER ::= { tnVclMgmt 1 }
+tnVclProtoBasedMgmt            OBJECT IDENTIFIER ::= { tnVclMgmt 2 }
+tnVclIpSubnetBasedMgmt         OBJECT IDENTIFIER ::= { tnVclMgmt 3 }
+
+--
+-- Mac based Vlan
+--
+tnVclMacBasedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnVclMacBasedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table is used to control MAC based Vlan functions."
+    ::= { tnVclMacBasedMgmt 1 }
+
+tnVclMacBasedEntry OBJECT-TYPE
+    SYNTAX      TnVclMacBasedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in the table is used to control MAC based Vlan functions."
+    INDEX  { tnVclMacBasedMacAddr }
+    ::= { tnVclMacBasedTable 1 }
+
+TnVclMacBasedEntry ::=
+    SEQUENCE
+    {
+        tnVclMacBasedMacAddr        MacAddress,
+        tnVclMacBasedVlanId         VlanIndex,
+        tnVclMacBasedPortMember     PortList,
+        tnVclMacBasedUser           INTEGER,
+        tnVclMacBasedRowStatus      RowStatus
+    }
+
+tnVclMacBasedMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The MAC address is used for the MAC based VLAN function classification key."
+    ::= { tnVclMacBasedEntry 1 }
+
+tnVclMacBasedVlanId OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The Vlan Id will be assigned to the incoming frame(if needed) which matches this specific MAC address and port member list."
+    ::= { tnVclMacBasedEntry 2 }
+
+tnVclMacBasedPortMember OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The member port list of this specific MAC based Vlan match process takes place."
+    ::= { tnVclMacBasedEntry 3 }
+
+tnVclMacBasedUser OBJECT-TYPE
+    SYNTAX      INTEGER{
+                  static(1),
+                  nas(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The creater of this entry. The MAC based VLAN entry is either created by user configuration(static), or by NAS dynamic creation(nas)."
+    ::= { tnVclMacBasedEntry 4 }
+
+tnVclMacBasedRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The status of this entry."
+    ::= { tnVclMacBasedEntry 5 }
+
+--
+--  Protocol Based Vlan
+--
+tnVclProtoBasedGroupMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnVclProtoBasedGroupMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table is used to build a specific protocol group for VCL match process."
+    ::= { tnVclProtoBasedMgmt 1 }
+
+tnVclProtoBasedGroupMapEntry OBJECT-TYPE
+    SYNTAX      TnVclProtoBasedGroupMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in this table is used to build a specific protocol group for VCL match process."
+--    INDEX  { IMPLIED tnVclProtoBasedGroupMapName }
+    INDEX  { tnVclProtoBasedGroupMapName }
+    ::= { tnVclProtoBasedGroupMapTable 1 }
+
+TnVclProtoBasedGroupMapEntry ::=
+    SEQUENCE
+    {
+        tnVclProtoBasedGroupMapName           SnmpAdminString,
+        tnVclProtoBasedGroupMapProtocol       INTEGER,
+        tnVclProtoBasedGroupMapEtherTypeVal   INTEGER,
+        tnVclProtoBasedGroupMapSnapOui        EightOTwoOui,
+        tnVclProtoBasedGroupMapSnapPid        INTEGER,
+        tnVclProtoBasedGroupMapLlcDsap        INTEGER,
+        tnVclProtoBasedGroupMapLlcSsap        INTEGER,
+        tnVclProtoBasedGroupMapRowStatus      RowStatus
+    }
+
+tnVclProtoBasedGroupMapName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The locally arbitrary, but unique identifier associated with this TnVclProtoBasedGroupMapEntry."
+    ::= { tnVclProtoBasedGroupMapEntry 1 }
+
+tnVclProtoBasedGroupMapProtocol OBJECT-TYPE
+    SYNTAX      INTEGER{
+                 ethernet(1),
+                 snap(2),
+                 llc(3)
+                }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Frame Type can have one of the following values:
+     1. Ethernet
+     2. SNAP
+     3. LLC"
+    ::= { tnVclProtoBasedGroupMapEntry 2 }
+
+tnVclProtoBasedGroupMapEtherTypeVal OBJECT-TYPE
+    SYNTAX      INTEGER(1536..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Ethernet Type is valid only if the tnVclProtoBasedGroupMapProtocol is ethernet(1). Valid values for etype ranges is from 0x0600-0xffff.
+     If tnVclProtoBasedGroupMapProtocol is not ethernet(1), this value will be 0xffff instead."
+    ::= { tnVclProtoBasedGroupMapEntry 3 }
+
+tnVclProtoBasedGroupMapSnapOui OBJECT-TYPE
+    SYNTAX      EightOTwoOui
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "SNAP OUI is valid only if the tnVclProtoBasedGroupMapProtocol is snap(2). OUI (Organizationally Unique Identifier) is value in
+     format of xx-xx-xx where each pair (xx) in string is a hexadecimal value ranges from 0x00-0xff.
+     If tnVclProtoBasedGroupMapProtocol is not snap(2), this value will be FF-FF-FF instead."
+    ::= { tnVclProtoBasedGroupMapEntry 4 }
+
+tnVclProtoBasedGroupMapSnapPid OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "SNAP PID is valid only if the tnVclProtoBasedGroupMapProtocol is snap(2).
+     If the OUI is hexadecimal 000000, the protocol ID is the Ethernet type (EtherType) field value for the protocol running on top of SNAP;
+     if the OUI is an OUI for a particular organization, the protocol ID is a value assigned by that organization to the protocol
+     running on top of SNAP.
+     In other words, if value of OUI field is 00-00-00 then value of PID will be etype (0x0600-0xffff) and
+     if value of OUI is other than 00-00-00 then valid value of PID will be any value from 0x0000 to 0xffff.
+     If tnVclProtoBasedGroupMapProtocol is not snap(2), this value will be 0xffff instead."
+    ::= { tnVclProtoBasedGroupMapEntry 5 }
+
+tnVclProtoBasedGroupMapLlcDsap OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "LLC DSAP is valid only if the tnVclProtoBasedGroupMapProtocol is llc(3).
+     DSAP: 1-byte long string (0x00-0xff).
+     If tnVclProtoBasedGroupMapProtocol is not llc(3), this value will be 0xff instead."
+    ::= { tnVclProtoBasedGroupMapEntry 6 }
+
+tnVclProtoBasedGroupMapLlcSsap OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "LLC SSAP is valid only if the tnVclProtoBasedGroupMapProtocol is llc(3).
+     SSAP: 1-byte long string (0x00-0xff).
+     If tnVclProtoBasedGroupMapProtocol is not llc(3), this value will be 0xff instead."
+    ::= { tnVclProtoBasedGroupMapEntry 7 }
+
+tnVclProtoBasedGroupMapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The status of this entry."
+    ::= { tnVclProtoBasedGroupMapEntry 8 }
+
+--
+--
+tnVclProtoBasedVlanMapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnVclProtoBasedVlanMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The table is used to associate the protocol based VLAN groups with VLAN paramaters."
+    ::= { tnVclProtoBasedMgmt 2 }
+
+tnVclProtoBasedVlanMapEntry OBJECT-TYPE
+    SYNTAX      TnVclProtoBasedVlanMapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in this table is used to associate the protocol based VLAN groups with VLAN paramaters."
+    INDEX  { IMPLIED tnVclProtoBasedGroupMapName, tnVclProtoBasedVlanMapVlanId }
+    ::= { tnVclProtoBasedVlanMapTable 1 }
+
+TnVclProtoBasedVlanMapEntry ::=
+    SEQUENCE
+    {
+        tnVclProtoBasedVlanMapVlanId         VlanIndex,
+        tnVclProtoBasedVlanMapPortMember     PortList,
+        tnVclProtoBasedVlanMapRowStatus      RowStatus
+    }
+
+tnVclProtoBasedVlanMapVlanId OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The Vlan Id will be assigned to the incoming frame(if needed) which matches this specific Protocol Group and port member list."
+    ::= { tnVclProtoBasedVlanMapEntry 1 }
+
+tnVclProtoBasedVlanMapPortMember OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The member port list of this specific Protocol based Vlan match process takes place."
+    ::= { tnVclProtoBasedVlanMapEntry 2 }
+
+tnVclProtoBasedVlanMapRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The status of this entry."
+    ::= { tnVclProtoBasedVlanMapEntry 3 }
+
+--
+-- IP subnet based Vlan
+--
+tnVclIpSubnetBasedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnVclIpSubnetBasedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This Table is used to control IP subnet based VLAN functions."
+    ::= { tnVclIpSubnetBasedMgmt 1 }
+
+tnVclIpSubnetBasedEntry OBJECT-TYPE
+    SYNTAX      TnVclIpSubnetBasedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A entry in this table is used to control IP subnet based VLAN functions."
+    INDEX  { tnVclIpSubnetBasedVceId }
+    ::= { tnVclIpSubnetBasedTable 1 }
+
+TnVclIpSubnetBasedEntry ::=
+    SEQUENCE
+    {
+        tnVclIpSubnetBasedVceId          INTEGER,
+        tnVclIpSubnetBasedIpAddr         IpAddress,
+        tnVclIpSubnetBasedMaskLen        INTEGER,
+        tnVclIpSubnetBasedVlanId         VlanIndex,
+        tnVclIpSubnetBasedPortMember     PortList,
+        tnVclIpSubnetBasedRowStatus      RowStatus
+    }
+
+tnVclIpSubnetBasedVceId OBJECT-TYPE
+    SYNTAX      INTEGER  (1..11111)  -- range added by Jing
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Indicates the index of the entry. The valid range is implement specific.
+     If VCE ID is 0, application will auto-generate the VCE ID for that entry."
+    ::= { tnVclIpSubnetBasedEntry 1 }
+
+tnVclIpSubnetBasedIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Indicates the IP address for match process."
+    ::= { tnVclIpSubnetBasedEntry 2 }
+
+tnVclIpSubnetBasedMaskLen OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "Indicates the network mask length."
+    ::= { tnVclIpSubnetBasedEntry 3 }
+
+tnVclIpSubnetBasedVlanId OBJECT-TYPE
+    SYNTAX      VlanIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The Vlan Id will be assigned to the incoming frame(if needed) which matches this specific IP subnet and port member list."
+    ::= { tnVclIpSubnetBasedEntry 4 }
+
+tnVclIpSubnetBasedPortMember OBJECT-TYPE
+    SYNTAX      PortList
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The member port list of this specific IP subnet based Vlan match process takes place."
+    ::= { tnVclIpSubnetBasedEntry 5 }
+
+tnVclIpSubnetBasedRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    "The status of this entry."
+    ::= { tnVclIpSubnetBasedEntry 6 }
+
+--
+-- NOTIFICATIONS FOR THIS MIB
+--
+
+tnIfSourceAddrChangeEvt  NOTIFICATION-TYPE
+    OBJECTS {
+                tnFIDDbMacAddress, tnFIDDbConnPort
+            }
+    STATUS  current
+    DESCRIPTION
+    "A tnIfSourceAddrChangeEvt event is sent when the tnIfSourceAddrLock is set to 'true',
+     the ionIfSourceAddrLockAction is set to 'discardAndNotify' or 'all' and there is an
+     intrusion/SA change on this port."
+    ::= { tnVlanQoSMgmtNotifications 1 }
+
+END

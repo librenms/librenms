@@ -1,0 +1,95 @@
+/**
+ * First we will load all of this project's JavaScript dependencies which
+ * includes Vue and other libraries. It is a great starting point when
+ * building robust, powerful web applications using Vue and Laravel.
+ */
+
+import "../css/app.css";
+import "./bootstrap";
+
+// Gridstack (bundled by Vite)
+import 'gridstack/dist/gridstack.min.css';
+import {GridStack} from 'gridstack';
+import Vue from "vue";
+import {i18n} from "./plugins/i18n.js"; // translation
+import ToggleButton from "vue-js-toggle-button";
+import VTooltip from "v-tooltip";
+import vSelect from "vue-select";
+import Multiselect from "vue-multiselect";
+import VueTabs from "vue-nav-tabs";
+import VModal from "vue-js-modal";
+// // Alpine Components
+import Alpine from "alpinejs";
+import intersect from "@alpinejs/intersect";
+// import popup from './components/alpine/popup.js'
+import popup from "./components/alpine/oldpopup.js";
+import deviceLink from "./components/alpine/deviceLink.js";
+import portLink from "./components/alpine/portLink.js";
+import filterBarComponent from "./components/alpine/filterBarComponent.js";
+import remoteDropdown from "./components/alpine/remoteDropdown.js";
+import LibreNMSDate from "./datetime.js";
+import LibreNMSUrl from './url.js';
+
+window.GridStack = GridStack;
+
+window.LibreNMS = window.LibreNMS || {};
+window.LibreNMS.Date = LibreNMSDate;
+window.LibreNMS.Url = LibreNMSUrl;
+
+/**
+ * The following block of code may be used to automatically register your
+ * Vue components. It will recursively scan this directory for the Vue
+ * components and automatically register them with their "basename".
+ *
+ * Eg. ./components/ExampleComponent.vue -> <example-component></example-component>
+ */
+const components = import.meta.glob('./components/*.vue', { eager: true });
+Object.entries(components).forEach(([path, component]) => {
+    const name = path.split('/').pop().replace(/\.\w+$/, '');
+    Vue.component(name, component.default);
+});
+
+Vue.use(ToggleButton);
+
+Vue.use(VTooltip);
+
+Vue.component('v-select', vSelect);
+
+Vue.component('multiselect', Multiselect)
+
+Vue.use(VueTabs)
+
+Vue.use(VModal)
+
+// Vue.mixin({
+//     methods: {
+//         route: route
+//     }
+// });
+
+Vue.filter('ucfirst', function (value) {
+    if (!value) return '';
+    value = value.toString();
+    return value.charAt(0).toUpperCase() + value.slice(1)
+});
+
+/**
+ * Next, we will create a fresh Vue application instance and attach it to
+ * the page. Then, you may begin adding components to this application
+ * or customize the JavaScript scaffolding to fit your unique needs.
+ */
+
+const app = new Vue({
+    el: '#app',
+    i18n,
+});
+
+Alpine.plugin(intersect);
+Alpine.data('popup', popup);
+Alpine.data('deviceLink', deviceLink);
+Alpine.data('portLink', portLink);
+Alpine.data("filterBarComponent", filterBarComponent);
+Alpine.data("remoteDropdown", remoteDropdown);
+
+window.Alpine = Alpine;
+Alpine.start();

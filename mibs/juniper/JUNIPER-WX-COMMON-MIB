@@ -1,0 +1,378 @@
+
+-- End - JUNIPER-WX-GLOBAL-TC Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-COMMON-MIB Module
+
+-- MIB for the common MIB objects implemented by all
+-- WX devices.
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+JUNIPER-WX-COMMON-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		DisplayString, TruthValue
+			FROM SNMPv2-TC
+		TcChassisType
+			FROM JUNIPER-WX-GLOBAL-TC
+		jnxWxModules, jnxWxCommonMib
+			FROM JUNIPER-WX-GLOBAL-REG;
+
+	jnxWxCommonMibModule MODULE-IDENTITY
+		LAST-UPDATED			"200206030000Z"
+		ORGANIZATION			"Juniper Networks, Inc"
+		CONTACT-INFO			"
+					Customer Support
+					Juniper Networks, Inc.
+					1194 North Mathilda Avenue
+					Sunnyvale, CA  94089
+
+					+1 888-314-JTAC
+					support@juniper.net"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			implemented by all Juniper Networks' products."
+
+		REVISION				"200309300845Z"
+		DESCRIPTION				"
+			Fix minor error in description of jnxWxSysDaylightSaving."
+
+		REVISION				"200304010000Z"
+		DESCRIPTION				"
+			Add interface duplex mismatch notification."
+
+		REVISION				"200303100000Z"
+		DESCRIPTION				"
+			Add interface speed mismatch notifications."
+
+		REVISION				"200206030000Z"
+		DESCRIPTION				"
+			Add Fan notifications."
+
+		REVISION				"200203270000Z"
+		DESCRIPTION				"
+			Add FaultTolerantPassthrough notification."
+
+		REVISION				"200202220000Z"
+		DESCRIPTION				"
+			Add LoginFailure notification."
+
+		REVISION				"200201230000Z"
+		DESCRIPTION				"
+			Add LicenseWillExpire notification."
+
+		REVISION				"200201170000Z"
+		DESCRIPTION				"
+			Add ThruputLimitExceeded notification."
+
+		REVISION				"200108070000Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module JUNIPER-WX-COMMON-MIB."
+
+		::= { jnxWxModules 3 }
+
+	jnxWxCommonConfMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration MIB conformance statements."
+		::= { jnxWxCommonMib 1 }
+
+	jnxWxCommonObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB objects."
+		::= { jnxWxCommonMib 2 }
+
+	jnxWxCommonEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB events."
+		::= { jnxWxCommonMib 3 }
+
+	-- Top level groups
+
+	jnxWxSys OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common system objects."
+		::= { jnxWxCommonObjs 1 }
+
+	jnxWxChassis OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common chassis information."
+		::= { jnxWxCommonObjs 2 }
+
+	----------------------------------------------------------------------
+	-- System objects
+
+	jnxWxSysSwVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Full software version. The first two components of the full
+			version are the major and minor versions. The third component
+			indicates the maintenance release number and the fourth,
+			the build number."
+		::= { jnxWxSys 1 }
+
+	jnxWxSysHwVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Hardware version of the unit."
+		::= { jnxWxSys 2 }
+
+	jnxWxSysSerialNumber OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..128))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The serial number of the unit. If not available,
+			an empty string is returned."
+		::= { jnxWxSys 3 }
+
+	jnxWxSysTimeZoneOffset OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The offset in seconds from UTC of the system's time zone.
+			Values are negative for locations west of UTC and positive
+			for locations east of UTC."
+		::= { jnxWxSys 4 }
+
+	jnxWxSysDaylightSaving OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Whether daylight savings are currently in effect for the
+			system's time zone."
+		::= { jnxWxSys 5 }
+
+	----------------------------------------------------------------------
+	-- Chassis
+
+	jnxWxChassisType OBJECT-TYPE
+		SYNTAX      TcChassisType
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Chassis type for this WX device."
+		::= { jnxWxChassis 1 }
+
+	----------------------------------------------------------------------
+	-- Events
+
+	jnxWxCommonEventObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for objects meant only to be sent in event varbinds."
+		::= { jnxWxCommonEvents 1 }
+
+	jnxWxCommonEventEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for the events themselves."
+		::= { jnxWxCommonEvents 2 }
+
+	jnxWxCommonEventEventsV2 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for SNMPv2 events. The OIDs for SNMPv2 events should
+			have a zero as the next-to-last sub-identifier (as specified
+			in RFC1902)."
+		::= { jnxWxCommonEventEvents 0 }
+
+	-- Objects sent only in events
+
+	jnxWxCommonEventDescr OBJECT-TYPE
+		SYNTAX					DisplayString
+		MAX-ACCESS				accessible-for-notify
+		STATUS					current
+		DESCRIPTION
+			"String that provides a textual description of the event."
+		::= { jnxWxCommonEventObjs 1 }
+
+	-- Event descriptions
+
+	jnxWxCommonEventInFailSafeMode NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"This trap is sent when the device boots up in fail-safe mode.
+			This can happen for one of the following reasons:
+			o Fail-safe reboot was explicitly initiated by the user.
+			o The device rebooted automatically too many times because of
+			  the failure of internal consistency checks or the failure of
+			  tests that verify proper operation of the device."
+		::= { jnxWxCommonEventEventsV2 1 }
+
+	jnxWxCommonEventPowerSupplyFailure NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"One or more sources of power to the system has failed.
+			A redundant power-supply has presumably taken over.
+
+			NOTE: This trap is for future use.
+			      WX devices currently do not generate this trap."
+		::= { jnxWxCommonEventEventsV2 2 }
+
+	jnxWxCommonEventPowerSupplyOk NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"One or more previously failed sources of power is now
+			working normally. The transition to normal condition happened
+			without the system having to be restarted.
+
+			NOTE: This trap is for future use.
+			      WX devices currently do not generate this trap."
+		::= { jnxWxCommonEventEventsV2 3 }
+
+	jnxWxCommonEventLicenseExpired NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The license for the system expired.
+			As a result, the system will switch over to
+			and stay in pass-through mode."
+		::= { jnxWxCommonEventEventsV2 4 }
+
+	jnxWxCommonEventThruputLimitExceeded NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The throughput of traffic through the device
+			has exceeded the limit for which it has
+			been licensed."
+		::= { jnxWxCommonEventEventsV2 5 }
+
+	jnxWxCommonEventLicenseWillExpire NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The license for the system is about to
+			expire shortly. When it eventually does
+			expire, the system will switch over to
+			and stay in pass-through mode."
+		::= { jnxWxCommonEventEventsV2 6 }
+
+	jnxWxCommonEventLoginFailure NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A user's login attempt via the console/ssh/web server
+			failed due to incorrect username or password."
+		::= { jnxWxCommonEventEventsV2 7 }
+
+	jnxWxCommonEventFaultTolerantPassThrough NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"An anomalous health condition was detected.
+			It would have subsequently triggered hardware
+			pass through mode followed by a reboot."
+		::= { jnxWxCommonEventEventsV2 8 }
+
+	jnxWxCommonEventFanFailure NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A cooling fan inside the device has failed.
+			The 'jnxWxCommonEventDescr' object has the name of
+			the fan that failed.
+			
+            This trap is currently unused"
+		::= { jnxWxCommonEventEventsV2 9 }
+
+	jnxWxCommonEventFanSpeedVariation NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The speed of a cooling fan inside the device is either
+			too low or too high. The 'jnxWxCommonEventDescr' object
+			has the name of the fan that has the problem.
+			
+			This trap is currently unused."
+		::= { jnxWxCommonEventEventsV2 10 }
+
+	jnxWxCommonEventFanOk NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A cooling fan inside the device that had previously
+			failed or whose speed variation was high is now
+			working properly. The 'jnxWxCommonEventDescr' object
+			has the name of the fan that has recovered.
+			
+			This trap is currently unused."
+		::= { jnxWxCommonEventEventsV2 11 }
+
+	jnxWxCommonEventInterfaceSpeedMismatch NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A mismatch is detected between the local and remote
+			interface settings. This can happen due to a mismatch
+			in the local and remote interface speed or mode. "
+		::= { jnxWxCommonEventEventsV2 12 }
+
+	jnxWxCommonEventInterfaceSpeedOk NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A mismatch previously detected between the local and remote
+			interface settings is now resolved. The local and remote interface
+			speed and mode are matched. "
+		::= { jnxWxCommonEventEventsV2 13 }
+
+	jnxWxCommonEventInterfaceDuplexMismatch NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A possible mismatch was detected between the duplex setting
+			of either the local or remote interface and that of the
+			device attached to that interface. The interface (local
+			or remote) is identified by the 'jnxWxCommonEventDescr' object.
+
+			Note that this notification is quite different from
+			jnxWxCommonEventInterfaceSpeedMismatch, which compares the
+			local and remote interfaces on the same WX device."
+		::= { jnxWxCommonEventEventsV2 14 }
+
+    jnxWxCommonEventIpsecSecurityAssociationAdded NOTIFICATION-TYPE
+        OBJECTS { jnxWxCommonEventDescr }
+        STATUS  current
+        DESCRIPTION
+            "An IPSec security association has been negotiated and added
+            to security association database."
+        ::= { jnxWxCommonEventEventsV2 15 }
+
+    jnxWxCommonEventIpsecSecurityAssociationExpired NOTIFICATION-TYPE
+        OBJECTS { jnxWxCommonEventDescr }
+        STATUS  current
+        DESCRIPTION
+            "An IPSec security association has been deleted from the
+            security association database."
+        ::= { jnxWxCommonEventEventsV2 16 }
+
+    jnxWxCommonEventIpsecSecurityAssociationDeleted NOTIFICATION-TYPE
+        OBJECTS { jnxWxCommonEventDescr }
+        STATUS  current
+        DESCRIPTION
+            "An IPSec security association has been deleted from the
+            security association database."
+        ::= { jnxWxCommonEventEventsV2 17 }
+END

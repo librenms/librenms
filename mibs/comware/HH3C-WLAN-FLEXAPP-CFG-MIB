@@ -1,0 +1,1409 @@
+-- =============================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--   The file defines a MIB that provides WLAN application configuration information.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2015-05-26 Initial version, created by lifei (Richard)
+-- =============================================================================
+HH3C-WLAN-FLEXAPP-CFG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TruthValue,
+        MacAddress
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-TYPE,
+        Integer32,
+        IpAddress
+    FROM SNMPv2-SMI
+        hh3cDot11
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cWlanFlexAppCFG MODULE-IDENTITY
+    LAST-UPDATED "201505261800Z"        -- May 26, 2015 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB provides information about WLAN application configuration."
+    REVISION "201505261800Z"        -- May 26, 2015 at 18:00 GMT
+    DESCRIPTION
+        "Added new nodes."
+    ::= { hh3cDot11 19 }
+--
+-- Node definitions
+--
+
+hh3cWlanModuleConfigGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 1 }
+--  Module Group has the following children:
+--  hh3cWlanModuleConfigTable          ::= { hh3cWlanModuleConfigGroup 1 }
+--  hh3cWlanModuleInfoTable            ::= { hh3cWlanModuleConfigGroup 2 }
+
+hh3cWlanIOTConfigGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 2 }
+--  IOT Configure Group has the following children:
+--  hh3cWlanIOTConfigTable             ::= { hh3cWlanIOTConfigGroup 1 }
+
+hh3cWlanModuleNotifyGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 3 }
+--  Module Notify Group has the following children:
+--  hh3cWlanModuleTraps ::= { hh3cWlanModuleNotifyGroup 0 }
+--  hh3cWlanModuleTrapVarObjects ::= { hh3cWlanModuleNotifyGroup 1 }
+
+hh3cWlanBLEConfigGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 4 }
+--  BLE Configure Group has the following children:
+--  hh3cWlanBLEConfigTable             ::= { hh3cWlanBLEConfigGroup 1 }
+--  hh3cWlanBLEModuleConfigTable       ::= { hh3cWlanBLEConfigGroup 2 }
+
+hh3cWlanAEConfigGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 5 }
+--  AE Configure Group has the following children:
+--  hh3cWlanAEConfigTable               ::= { hh3cWlanAEConfigGroup 1 }
+--  hh3cWlanAERadioConfigTable          ::= { hh3cWlanAEConfigGroup 2 }
+
+hh3cWlanCommonConfigGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 6 }
+--  common Configure Group has the following children:
+--  hh3cWlanCommonConfigTable             ::= { hh3cWlanCommonConfigGroup 1 }
+
+hh3cWlanCUPIDConfigGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 7 }
+--  CUPID Configure Group has the following children:
+--  hh3cWlanCUPIDConfigTable             ::= { hh3cWlanCUPIDConfigGroup 1 }
+
+hh3cWlanFPConfigGroup OBJECT IDENTIFIER ::= { hh3cWlanFlexAppCFG 8 }
+--  fingerprint Configure Group has the following children:
+--  hh3cWlanFPConfigTable             ::= { hh3cWlanFPConfigGroup 1 }
+
+-- *****************************************************************************
+-- *  hh3cWlanModuleConfigTable Definition
+-- *****************************************************************************
+hh3cWlanModuleConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanModuleConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure module parameters for a module to operate."
+    ::= { hh3cWlanModuleConfigGroup 1 }
+
+hh3cWlanModuleConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanModuleConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains module configuration information."
+    INDEX
+        {
+            hh3cWlanAPSerialID,
+            hh3cWlanModuleID
+        }
+    ::= { hh3cWlanModuleConfigTable 1 }
+
+Hh3cWlanModuleConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanAPSerialID               OCTET STRING,
+        hh3cWlanModuleID                 Integer32,
+        hh3cWlanModuleType               INTEGER,
+        hh3cWlanModuleStatus             TruthValue,
+        hh3cWlanModuleReset              INTEGER,
+        hh3cWlanModuleRstFac             INTEGER,
+        hh3cWlanModuleUpWareStatus       TruthValue,
+        hh3cWlanModuleTxPower            Integer32,
+        hh3cWlanModuleManualUpdate          OCTET STRING
+    }
+
+hh3cWlanAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanModuleConfigEntry 1 }
+
+hh3cWlanModuleID OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the module ID of a module."
+    ::= { hh3cWlanModuleConfigEntry 2 }
+
+hh3cWlanModuleType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          none(0),
+          ble(1),
+          iot(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the type of a module."
+    ::= { hh3cWlanModuleConfigEntry 3 }
+
+hh3cWlanModuleStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of a module."
+    ::= { hh3cWlanModuleConfigEntry 4 }
+
+hh3cWlanModuleReset OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+      none(0),
+      reboot(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When read the value from the node
+         none: Represents the module has been rebooted and the status of the module is normal.
+         When write the value to the node
+         reboot: Represents module rebooting.  Other values are not supported."
+    ::= { hh3cWlanModuleConfigEntry 5 }
+
+hh3cWlanModuleRstFac OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+      none(0),
+      restore(1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When read the value from the node
+         none: Represents the module has been restored and the status of the module is normal.
+         When write the value to the node
+         restore: Represents module restoring.  Other values are not supported."
+    ::= { hh3cWlanModuleConfigEntry 6 }
+
+hh3cWlanModuleUpWareStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of module auto update."
+    ::= { hh3cWlanModuleConfigEntry 7 }
+
+hh3cWlanModuleTxPower OBJECT-TYPE
+    SYNTAX      Integer32(1..4)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the packet transmit power."
+    ::= { hh3cWlanModuleConfigEntry 8 }
+
+hh3cWlanModuleManualUpdate OBJECT-TYPE
+    SYNTAX       OCTET STRING
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object represents the file path for module firmware updating."
+    ::= { hh3cWlanModuleConfigEntry 9 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanModuleConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanModuleInfoTable Definition
+-- *****************************************************************************
+hh3cWlanModuleInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanModuleInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table contains information about each module of an AP."
+    ::= { hh3cWlanModuleConfigGroup 2 }
+
+hh3cWlanModuleInfoEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanModuleInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains IOT module information."
+    INDEX
+        {
+            hh3cDot11IOTAPSerialID,
+            hh3cDot11IOTModuleID
+        }
+    ::= { hh3cWlanModuleInfoTable 1 }
+
+Hh3cWlanModuleInfoEntry ::= SEQUENCE
+    {
+        hh3cDot11IOTAPSerialID          OCTET STRING,
+        hh3cDot11IOTModuleID            Integer32,
+        hh3cDot11IOTModuleType          INTEGER,
+        hh3cDot11IOTModuleModel         OCTET STRING,
+        hh3cDot11IOTModuleHwVersion     OCTET STRING,
+        hh3cDot11IOTModuleSwVersion     OCTET STRING,
+        hh3cDot11IOTModuleSerialId      OCTET STRING
+    }
+
+hh3cDot11IOTAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanModuleInfoEntry 1 }
+
+hh3cDot11IOTModuleID OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents a module."
+    ::= { hh3cWlanModuleInfoEntry 2 }
+
+hh3cDot11IOTModuleType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          none(0),
+          h3c(1),
+          iot(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the type of a module."
+    ::= { hh3cWlanModuleInfoEntry 3 }
+
+hh3cDot11IOTModuleModel OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the model of a module."
+    ::= { hh3cWlanModuleInfoEntry 4 }
+
+hh3cDot11IOTModuleHwVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the hardware version of a module."
+    ::= { hh3cWlanModuleInfoEntry 5 }
+
+hh3cDot11IOTModuleSwVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the software version of a module."
+    ::= { hh3cWlanModuleInfoEntry 6 }
+
+hh3cDot11IOTModuleSerialId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the sequence ID of a module."
+    ::= { hh3cWlanModuleInfoEntry 7 }
+
+-- *****************************************************************************
+-- * End of hh3cDot11APModuleInfoTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanIOTConfigTable Definition
+-- *****************************************************************************
+hh3cWlanIOTConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanIOTConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure IOT parameters."
+    ::= { hh3cWlanIOTConfigGroup 1 }
+
+hh3cWlanIOTConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanIOTConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains module configuration information."
+    INDEX
+        {
+            hh3cWlanIOTAPSerialID
+        }
+    ::= { hh3cWlanIOTConfigTable 1 }
+
+Hh3cWlanIOTConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanIOTAPSerialID            OCTET STRING,
+        hh3cWlanIOTEngineAdd             IpAddress,
+        hh3cWlanIOTEnginePort            Integer32
+    }
+
+hh3cWlanIOTAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanIOTConfigEntry 1 }
+
+hh3cWlanIOTEngineAdd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the IPv4 address of the location server."
+    ::= { hh3cWlanIOTConfigEntry 2 }
+
+hh3cWlanIOTEnginePort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port to listen for IOT messages from the server."
+    ::= { hh3cWlanIOTConfigEntry 3 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanIOTConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanModuleTraps Definition
+-- *****************************************************************************
+-- AP Management Notification
+
+hh3cWlanModuleTraps OBJECT IDENTIFIER
+    ::= { hh3cWlanModuleNotifyGroup 0 }
+
+hh3cWlanModuleInsertTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWlanTrapAPMacAddress,
+            hh3cWlanTrapModuleID,
+            hh3cWlanTrapModulePhyType,
+            hh3cWlanTrapModuleModel,
+            hh3cWlanTrapModuleHwVersion,
+            hh3cWlanTrapModuleSwVersion,
+            hh3cWlanTrapModuleSequenceId
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification will be generated when an IOT module is inserted."
+    ::= { hh3cWlanModuleTraps 1 }
+
+hh3cWlanModuleRomveTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWlanTrapAPMacAddress,
+            hh3cWlanTrapModuleID,
+            hh3cWlanTrapModulePhyType,
+            hh3cWlanTrapModuleModel,
+            hh3cWlanTrapModuleHwVersion,
+            hh3cWlanTrapModuleSwVersion,
+            hh3cWlanTrapModuleSequenceId
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification will be generated when an IOT module is removed."
+    ::= { hh3cWlanModuleTraps 2 }
+
+hh3cWlanModuleMissMatch NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cWlanTrapAPMacAddress,
+            hh3cWlanTrapModuleID,
+            hh3cWlanTrapModuleCfgType,
+            hh3cWlanTrapModulePhyType,
+            hh3cWlanTrapModuleModel
+        }
+    STATUS current
+    DESCRIPTION
+        "This notification will be generated when the configured
+         type doesn't match the module type."
+    ::= { hh3cWlanModuleTraps 3 }
+
+-- AP Management Notification variable object
+
+hh3cWlanModuleTrapVarObjects OBJECT IDENTIFIER
+    ::= { hh3cWlanModuleNotifyGroup 1 }
+
+hh3cWlanTrapAPMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the MAC address of an AP."
+    ::= {hh3cWlanModuleTrapVarObjects 1 }
+
+hh3cWlanTrapModuleID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the ID of a module."
+    ::= { hh3cWlanModuleTrapVarObjects 2 }
+
+hh3cWlanTrapModuleCfgType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          none(0),
+          h3c(1),
+          iot(2)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the configuration type of a module."
+    ::= { hh3cWlanModuleTrapVarObjects 3 }
+
+hh3cWlanTrapModulePhyType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          none(0),
+          h3c(1),
+          iot(2)
+        }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the physical type of a module."
+    ::= { hh3cWlanModuleTrapVarObjects 4 }
+
+hh3cWlanTrapModuleModel OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the model of a module."
+    ::= { hh3cWlanModuleTrapVarObjects 5 }
+
+hh3cWlanTrapModuleHwVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the hardware version of a module."
+    ::= { hh3cWlanModuleTrapVarObjects 6 }
+
+hh3cWlanTrapModuleSwVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the software version of a module."
+    ::= { hh3cWlanModuleTrapVarObjects 7 }
+
+hh3cWlanTrapModuleSequenceId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object represents the sequence ID of a module."
+    ::= { hh3cWlanModuleTrapVarObjects 8 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanModuleTraps Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanBLEConfigTable Definition
+-- *****************************************************************************
+hh3cWlanBLEConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanBLEConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure Bluetooth Low Energy (BLE) parameters."
+    ::= { hh3cWlanBLEConfigGroup 1 }
+
+hh3cWlanBLEConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanBLEConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains BLE location configuration information."
+    INDEX
+        {
+            hh3cWlanBLEAPSerialID
+        }
+    ::= { hh3cWlanBLEConfigTable 1 }
+
+Hh3cWlanBLEConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanBLEAPSerialID            OCTET STRING,
+        hh3cWlanBLEStatus                TruthValue,
+        hh3cWlanBLEEngineAdd             IpAddress,
+        hh3cWlanBLEEnginePort            Integer32,
+        hh3cWlanBLEVendorPort            Integer32,
+        hh3cWlanBLERssiStatus            TruthValue,
+        hh3cWlanBLERssiThreshold         Integer32,
+        hh3cWlanBLEConnectPassword       OCTET STRING,
+        hh3cWlanBLECommandPassword       OCTET STRING,
+        hh3cWlanBLEReportStatus          TruthValue,
+        hh3cWlanBLEReportInterval        Integer32,
+        hh3cWlanBLEAgingTime             Integer32,
+        hh3cWlanBLERealTimeReportStatus  TruthValue,
+        hh3cWlanBLERealTimePrefix        OCTET STRING
+    }
+
+hh3cWlanBLEAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanBLEConfigEntry 1 }
+
+hh3cWlanBLEStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of BLE location."
+    ::= { hh3cWlanBLEConfigEntry 2 }
+
+hh3cWlanBLEEngineAdd OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the server's IPv4 address to which BLE messages are sent."
+    ::= { hh3cWlanBLEConfigEntry 3 }
+
+hh3cWlanBLEEnginePort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port of the location server."
+    ::= { hh3cWlanBLEConfigEntry 4 }
+
+hh3cWlanBLEVendorPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port to listen for BLE messages from the server."
+    ::= { hh3cWlanBLEConfigEntry 5 }
+
+hh3cWlanBLERssiStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of BLE RSSI-based packet filtering."
+    ::= { hh3cWlanBLEConfigEntry 6 }
+
+hh3cWlanBLERssiThreshold OBJECT-TYPE
+    SYNTAX      Integer32(5..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the max RSSI value of clients' packets."
+    ::= { hh3cWlanBLEConfigEntry 7 }
+
+hh3cWlanBLEConnectPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0|4))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the BLE module connection password."
+    ::= { hh3cWlanBLEConfigEntry 8 }
+
+hh3cWlanBLECommandPassword OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0|12))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the BLE module command password."
+    ::= { hh3cWlanBLEConfigEntry 9 }
+
+hh3cWlanBLEReportStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of BLE location reporting."
+    ::= { hh3cWlanBLEConfigEntry 10 }
+
+hh3cWlanBLEReportInterval OBJECT-TYPE
+    SYNTAX      Integer32(1..86400)
+    UNITS       "Second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the interval at which an AP sends BLE messages to the server."
+    ::= { hh3cWlanBLEConfigEntry 11 }
+
+hh3cWlanBLEAgingTime OBJECT-TYPE
+    SYNTAX      Integer32(60..3600)
+    UNITS       "Second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the aging time for iBeacon devices."
+    ::= { hh3cWlanBLEConfigEntry 12 }
+
+hh3cWlanBLERealTimeReportStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of BLE realtime reporting."
+    ::= { hh3cWlanBLEConfigEntry 13 }
+
+hh3cWlanBLERealTimePrefix OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0|8..18))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the manufacturer prefix of BLE devices to
+         be located.  The prefix must be an even number."
+    ::= { hh3cWlanBLEConfigEntry 14 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanBLEConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanBLEModuleConfigTable Definition
+-- *****************************************************************************
+hh3cWlanBLEModuleConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanBLEModuleConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure BLE module parameters."
+    ::= { hh3cWlanBLEConfigGroup 2 }
+
+hh3cWlanBLEModuleConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanBLEModuleConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains BLE module configuration information."
+    INDEX
+        {
+            hh3cWlanBLEModuleAPSerialID,
+            hh3cWlanBLEModuleID
+        }
+    ::= { hh3cWlanBLEModuleConfigTable 1 }
+
+Hh3cWlanBLEModuleConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanBLEModuleAPSerialID   OCTET STRING,
+        hh3cWlanBLEModuleID           Integer32,
+        hh3cWlanBLEAdvReportStatus    TruthValue,
+        hh3cWlanBLEAdvReportInterval  Integer32,
+        hh3cWlanBLEAdvUUID            OCTET STRING,
+        hh3cWlanBLEAdvMajorID         Integer32,
+        hh3cWlanBLEAdvMinorID         Integer32
+    }
+
+hh3cWlanBLEModuleAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanBLEModuleConfigEntry 1 }
+
+hh3cWlanBLEModuleID OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the ID of a module."
+    ::= { hh3cWlanBLEModuleConfigEntry 2 }
+
+hh3cWlanBLEAdvReportStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of BLE advertisement reporting."
+    ::= { hh3cWlanBLEModuleConfigEntry 3 }
+
+hh3cWlanBLEAdvReportInterval OBJECT-TYPE
+    SYNTAX      Integer32(50..1000)
+    UNITS       "Second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the interval at which a BLE module sends advertisement packets."
+    ::= { hh3cWlanBLEModuleConfigEntry 4 }
+
+hh3cWlanBLEAdvUUID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0|32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UUID of BLE advertisement packets."
+    ::= { hh3cWlanBLEModuleConfigEntry 5 }
+
+hh3cWlanBLEAdvMajorID OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the major ID of BLE advertisement packets."
+    ::= { hh3cWlanBLEModuleConfigEntry 6 }
+
+hh3cWlanBLEAdvMinorID OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the minor ID of BLE advertisement packets."
+    ::= { hh3cWlanBLEModuleConfigEntry 7 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanBLEModuleConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanAEConfigTable Definition
+-- *****************************************************************************
+hh3cWlanAEConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanAEConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure AeroScout (AE) parameters."
+    ::= { hh3cWlanAEConfigGroup 1 }
+
+hh3cWlanAEConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanAEConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains AE location configuration information."
+    INDEX
+        {
+            hh3cWlanAEAPSerialID
+        }
+    ::= { hh3cWlanAEConfigTable 1 }
+
+Hh3cWlanAEConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanAEAPSerialID          OCTET STRING,
+        hh3cWlanAEStatus              TruthValue,
+        hh3cWlanAEEngineAddr          IpAddress,
+        hh3cWlanAEEnginePort          Integer32,
+        hh3cWlanAEVendorPort          Integer32,
+        hh3cWlanAETimeStamp           INTEGER,
+        hh3cWlanAEVersion             INTEGER,
+        hh3cWlanAETagMultiAddr        MacAddress,
+        hh3cWlanAEEngineDetection     INTEGER,
+        hh3cWlanAEReportMode          INTEGER
+    }
+
+hh3cWlanAEAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanAEConfigEntry 1 }
+
+hh3cWlanAEStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of AE location."
+    ::= { hh3cWlanAEConfigEntry 2 }
+
+hh3cWlanAEEngineAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the server's IPv4 address to which AE messages are sent."
+    ::= { hh3cWlanAEConfigEntry 3 }
+
+hh3cWlanAEEnginePort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port of the location server."
+    ::= { hh3cWlanAEConfigEntry 4 }
+
+hh3cWlanAEVendorPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port to listen for AE messages from the server."
+    ::= { hh3cWlanAEConfigEntry 5 }
+
+hh3cWlanAETimeStamp OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          absolute(1),
+          relative(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of timestamp."
+    ::= { hh3cWlanAEConfigEntry 6 }
+
+hh3cWlanAEVersion OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          v2(2),
+          v3(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the version of the AE protocol."
+    ::= { hh3cWlanAEConfigEntry 7 }
+
+hh3cWlanAETagMultiAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents Tag's multicast MAC address."
+    ::= { hh3cWlanAEConfigEntry 8 }
+hh3cWlanAEEngineDetection OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          static(1),
+          dynamic(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the location mode."
+    ::= { hh3cWlanAEConfigEntry 9 }
+hh3cWlanAEReportMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          local(1),
+          central(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the report mode."
+    ::= { hh3cWlanAEConfigEntry 10 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanAEConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanAERadioConfigTable Definition
+-- *****************************************************************************
+hh3cWlanAERadioConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanAERadioConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure AE parameters."
+    ::= { hh3cWlanAEConfigGroup 2 }
+
+hh3cWlanAERadioConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanAERadioConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains AE location configuration information."
+    INDEX
+        {
+            hh3cWlanAERadioAPSerialID,
+            hh3cWlanAEAPRadioID
+        }
+    ::= { hh3cWlanAERadioConfigTable 1 }
+
+Hh3cWlanAERadioConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanAERadioAPSerialID     OCTET STRING,
+        hh3cWlanAEAPRadioID           Integer32,
+        hh3cWlanAERadioStatus         TruthValue,
+        hh3cWlanAEMUStatus            TruthValue,
+        hh3cWlanAETagStatus           TruthValue
+    }
+
+hh3cWlanAERadioAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanAERadioConfigEntry 1 }
+
+hh3cWlanAEAPRadioID OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the ID of a radio."
+    ::= { hh3cWlanAERadioConfigEntry 2 }
+
+hh3cWlanAERadioStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of radio-based location."
+    ::= { hh3cWlanAERadioConfigEntry 3 }
+
+hh3cWlanAEMUStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of MU message reporting."
+    ::= { hh3cWlanAERadioConfigEntry 4 }
+
+hh3cWlanAETagStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of Tag message reporting."
+    ::= { hh3cWlanAERadioConfigEntry 5 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanAERadioConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanCommonConfigTable Definition
+-- *****************************************************************************
+hh3cWlanCommonConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanCommonConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure common parameters."
+    ::= { hh3cWlanCommonConfigGroup 1 }
+
+hh3cWlanCommonConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanCommonConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains common configuration information."
+    INDEX
+        {
+            hh3cWlanCommonAPSerialID
+        }
+    ::= { hh3cWlanCommonConfigTable 1 }
+
+Hh3cWlanCommonConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanCommonAPSerialID                 OCTET STRING,
+        hh3cWlanDilutionStatus                   TruthValue,
+        hh3cWlanDilutionFactor                   Integer32,
+        hh3cWlanDilutionTimeout                  Integer32,
+        hh3cWlanIgnoreBeacon                     TruthValue,
+        hh3cWlanRateLimitStatus                  TruthValue,
+        hh3cWlanRateLimitCir                     Integer32,
+        hh3cWlanRateLimitCbs                     Integer32,
+        hh3cWlanClientRateLimitStatus            TruthValue,
+        hh3cWlanClientRateLimitCir               Integer32,
+        hh3cWlanClientRateLimitCbs               Integer32,
+        hh3cWlanRssiStatus                       TruthValue,
+        hh3cWlanRssiThreshold                    Integer32,
+        hh3cWlanIgnoreApFrame                    TruthValue
+    }
+
+hh3cWlanCommonAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanCommonConfigEntry 1 }
+
+hh3cWlanDilutionStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of packet dilution."
+    ::= { hh3cWlanCommonConfigEntry 2 }
+
+hh3cWlanDilutionFactor OBJECT-TYPE
+    SYNTAX      Integer32(0..10000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the packet dilution factor."
+    ::= { hh3cWlanCommonConfigEntry 3 }
+
+hh3cWlanDilutionTimeout OBJECT-TYPE
+    SYNTAX      Integer32(0..60)
+    UNITS       "Second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the packet dilution timeout."
+    ::= { hh3cWlanCommonConfigEntry 4 }
+
+hh3cWlanIgnoreBeacon OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of beacon ignoring."
+    ::= { hh3cWlanCommonConfigEntry 5 }
+
+hh3cWlanRateLimitStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of location packet rate limiting."
+    ::= { hh3cWlanCommonConfigEntry 6 }
+
+hh3cWlanRateLimitCir OBJECT-TYPE
+    SYNTAX      Integer32(0|8..1300000)
+    UNITS       "Kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the CIR for sending location packets."
+    ::= { hh3cWlanCommonConfigEntry 7 }
+
+hh3cWlanRateLimitCbs OBJECT-TYPE
+    SYNTAX      Integer32(0|500..130000000)
+    UNITS       "Bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the CBS for sending location packets."
+    ::= { hh3cWlanCommonConfigEntry 8 }
+
+hh3cWlanClientRateLimitStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of client packet rate limiting."
+    ::= { hh3cWlanCommonConfigEntry 9 }
+
+hh3cWlanClientRateLimitCir OBJECT-TYPE
+    SYNTAX      Integer32(0..1300000)
+    UNITS       "Kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the CIR for receiving client packets."
+    ::= { hh3cWlanCommonConfigEntry 10 }
+
+hh3cWlanClientRateLimitCbs OBJECT-TYPE
+    SYNTAX      Integer32(0|80..130000000)
+    UNITS       "Bytes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the CBS for receiving client packets."
+    ::= { hh3cWlanCommonConfigEntry 11 }
+
+hh3cWlanRssiStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of RSSI-based packet filtering."
+    ::= { hh3cWlanCommonConfigEntry 12 }
+
+hh3cWlanRssiThreshold OBJECT-TYPE
+    SYNTAX      Integer32(5..100)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the max RSSI value of clients' packets."
+    ::= { hh3cWlanCommonConfigEntry 13 }
+
+hh3cWlanIgnoreApFrame OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of AP packet ignoring."
+    ::= { hh3cWlanCommonConfigEntry 14 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanCommonConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanCUPIDConfigTable Definition
+-- *****************************************************************************
+hh3cWlanCUPIDConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanCUPIDConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure CUPID parameters."
+    ::= { hh3cWlanCUPIDConfigGroup 1 }
+
+hh3cWlanCUPIDConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanCUPIDConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains CUPID location configuration information."
+    INDEX
+        {
+            hh3cWlanCupidAPSerialID
+        }
+    ::= { hh3cWlanCUPIDConfigTable 1 }
+
+Hh3cWlanCUPIDConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanCupidAPSerialID             OCTET STRING,
+        hh3cWlanCupidStatus                 TruthValue,
+        hh3cWlanCupidEngineAddr             IpAddress,
+        hh3cWlanCupidEnginePort             Integer32,
+        hh3cWlanCupidVendorPort             Integer32,
+        hh3cWlanCupidReportStatus           TruthValue,
+        hh3cWlanCupidReportInterval         Integer32,
+        hh3cWlanCupidUnassSta               TruthValue,
+        hh3cWlanCupidUnassMeasureSta        TruthValue,
+        hh3cWlanCupidReportMode             INTEGER,
+        hh3cWlanCUPIDReportFormat           INTEGER
+    }
+
+hh3cWlanCupidAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanCUPIDConfigEntry 1 }
+
+hh3cWlanCupidStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of CUPID location."
+    ::= { hh3cWlanCUPIDConfigEntry 2 }
+
+hh3cWlanCupidEngineAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the IPv4 address of the CUPID location server."
+    ::= { hh3cWlanCUPIDConfigEntry 3 }
+
+hh3cWlanCupidEnginePort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port of the CUPID location server."
+    ::= { hh3cWlanCUPIDConfigEntry 4 }
+
+hh3cWlanCupidVendorPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port to listen for CUPID messages from the server."
+    ::= { hh3cWlanCUPIDConfigEntry 5 }
+
+hh3cWlanCupidReportStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of CUPID location reporting."
+    ::= { hh3cWlanCUPIDConfigEntry 6 }
+
+hh3cWlanCupidReportInterval OBJECT-TYPE
+    SYNTAX      Integer32(1..10)
+    UNITS       "Second"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the interval for sending CUPID location packets."
+    ::= { hh3cWlanCUPIDConfigEntry 7 }
+
+hh3cWlanCupidUnassSta OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of unassociated client information
+         reporting for CUPID location."
+    ::= { hh3cWlanCUPIDConfigEntry 8 }
+
+hh3cWlanCupidUnassMeasureSta OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of CUPID location for unassociated clients."
+    ::= { hh3cWlanCUPIDConfigEntry 9 }
+
+hh3cWlanCupidReportMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          local(1),
+          central(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the report mode."
+    ::= { hh3cWlanCUPIDConfigEntry 10 }
+
+hh3cWlanCUPIDReportFormat OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          general(1),
+          lightweight(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the report format."
+    ::= { hh3cWlanCUPIDConfigEntry 11 }
+
+-- *****************************************************************************
+-- * End of hh3cWlanCUPIDConfigTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cWlanFPConfigTable Definition
+-- *****************************************************************************
+hh3cWlanFPConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cWlanFPConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Administrators must configure RF fingerprinting parameters."
+    ::= { hh3cWlanFPConfigGroup 1 }
+
+hh3cWlanFPConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cWlanFPConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains RF fingerprinting configuration information."
+    INDEX
+        {
+            hh3cWlanFPAPSerialID
+        }
+    ::= { hh3cWlanFPConfigTable 1 }
+
+Hh3cWlanFPConfigEntry ::= SEQUENCE
+    {
+        hh3cWlanFPAPSerialID         OCTET STRING,
+        hh3cWlanFPStatus             TruthValue,
+        hh3cWlanFPEngineAddr         IpAddress,
+        hh3cWlanFPEnginePort         Integer32,
+        hh3cWlanFPVendorPort         Integer32,
+        hh3cWlanFPRawFrameReport     TruthValue,
+        hh3cWlanFPMUReport           TruthValue,
+        hh3cWlanFPReportMode         INTEGER,
+        hh3cWlanFPReportFormat       INTEGER,
+        hh3cWlanFPTagMultiAddr       MacAddress
+    }
+
+hh3cWlanFPAPSerialID OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object represents the serial ID of an AP."
+    ::= { hh3cWlanFPConfigEntry 1 }
+
+hh3cWlanFPStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the enabled or disabled status of RF fingerprinting."
+    ::= { hh3cWlanFPConfigEntry 2 }
+
+hh3cWlanFPEngineAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the IPv4 address of the RF fingerprinting server."
+    ::= { hh3cWlanFPConfigEntry 3 }
+
+hh3cWlanFPEnginePort OBJECT-TYPE
+    SYNTAX      Integer32(0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port of the RF fingerprinting server."
+    ::= { hh3cWlanFPConfigEntry 4 }
+
+hh3cWlanFPVendorPort OBJECT-TYPE
+    SYNTAX      Integer32(1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the UDP port to listen for RF fingerprinting
+         packets from the server."
+    ::= { hh3cWlanFPConfigEntry 5 }
+
+hh3cWlanFPRawFrameReport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of raw frame reporting for RF fingerprinting."
+    ::= { hh3cWlanFPConfigEntry 6 }
+
+hh3cWlanFPMUReport OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the status of MU information reporting for RF fingerprinting."
+    ::= { hh3cWlanFPConfigEntry 7 }
+
+hh3cWlanFPReportMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          local(1),
+          central(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the report mode."
+    ::= { hh3cWlanFPConfigEntry 8 }
+
+hh3cWlanFPReportFormat OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+          general(1),
+          lightweight(2),
+          cupidhybrid(3)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents the report format."
+    ::= { hh3cWlanFPConfigEntry 9 }
+
+hh3cWlanFPTagMultiAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object represents Tag's multicast MAC address."
+    ::= { hh3cWlanFPConfigEntry 10 }
+-- *****************************************************************************
+-- * End of hh3cWlanFPConfigTable Definition
+-- *****************************************************************************
+
+END

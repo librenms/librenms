@@ -1,0 +1,231 @@
+-- *****************************************************************
+-- TN-HTTPS-MIB
+--
+-- Copyright (c) 2013, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+TN-HTTPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue,DisplayString
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    tnDevMgmt
+        FROM TN-MGMT-MIB;
+
+tnHttpsMib         OBJECT IDENTIFIER ::= { tnDevMgmt 41 }
+
+--
+-- sub HTTPS
+--
+
+tnHttpsConfig              OBJECT IDENTIFIER ::= { tnHttpsMib 1 }
+tnHttpsCertGene            OBJECT IDENTIFIER ::= { tnHttpsMib 2 }
+
+-- HTTPS Configuration
+
+tnHttpsConfigMode           OBJECT-TYPE
+    SYNTAX                  TruthValue
+    MAX-ACCESS              read-write
+    STATUS                  current
+    DESCRIPTION
+        "Indicates the HTTPS mode operation. When the
+         current connection is HTTPS, to apply HTTPS
+         disabled mode operation will automatically
+         redirect web browser to an HTTP connection.
+         Possible modes are:
+         Enabled: Enable HTTPS mode operation.
+         Disabled: Disable HTTPS mode operation."
+    ::= { tnHttpsConfig 1 }
+
+tnHttpsConfigAutoRedirect   OBJECT-TYPE
+    SYNTAX                  TruthValue
+    MAX-ACCESS              read-write
+    STATUS                  current
+    DESCRIPTION
+        "Indicates the HTTPS redirect mode operation.
+         It only significant if HTTPS mode 'Enabled' is
+         selected. Automatically redirects web browser
+         to an HTTPS connection when both HTTPS mode
+         and Automatic Redirect are enabled. Possible
+         modes are:
+         Enabled: Enable HTTPS redirect mode operation.
+         Disabled: Disable HTTPS redirect mode operation."
+    ::= { tnHttpsConfig 2 }
+
+-- HTTPS Certificate Generate
+
+tnHttpsCertGenerate         OBJECT-TYPE
+    SYNTAX                  INTEGER {
+                                rsa(1),
+                                dsa(2)
+                            }
+    MAX-ACCESS              read-write
+    STATUS                  current
+    DESCRIPTION
+        "The Generate dropdown lets you select RSA or DSA
+         as the public key algorithm. RSA: Generate an RSA
+         key. Uses the RSA internet encryption and
+         authentication system. DSA: Generate a DSA key.
+         Uses the digital signature algorithm (DSA). When
+         done, click the Generate button to generate the
+         certificate as defined at the Generate dropdown.
+         Depending on the encryption method selected (RSA or
+         DSA) here, the HTTPS Certificate > View section
+         displays one of two signature algorithms in effect,
+         either:
+         Signature Algorithm: dsaWithSHA1,
+         or
+         Signature Algorithm: sha1WithRSAEncryption."
+    ::= { tnHttpsCertGene 1 }
+
+-- HTTPS Certificate Load
+
+tnHttpsCertLoadTable        OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF TnHttpsCertLoadEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Lets you select a new HTTPS certificate and load
+         it.
+         The information of this table should be sent in
+         a network entry through snmpset command."
+    ::= { tnHttpsMib 3 }
+
+tnHttpsCertLoadEntry        OBJECT-TYPE
+    SYNTAX                  TnHttpsCertLoadEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Each entry represents an excution of HTTPS
+         certificate loading."
+    INDEX { tnHttpsCertLoadId }
+    ::= { tnHttpsCertLoadTable 1 }
+
+TnHttpsCertLoadEntry     ::= SEQUENCE {
+    tnHttpsCertLoadId       Unsigned32,
+    tnHttpsCertLoadAddrType InetAddressType,
+    tnHttpsCertLoadAddr     InetAddress,
+    tnHttpsCertLoadFileName DisplayString,
+    tnHttpsCertLoadStatus   TruthValue,
+    tnHttpsCertLastLoad     INTEGER
+}
+
+tnHttpsCertLoadId           OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "The index of HTTPS certificate load."
+    ::= { tnHttpsCertLoadEntry 1 }
+
+tnHttpsCertLoadAddrType     OBJECT-TYPE
+    SYNTAX                  InetAddressType
+    MAX-ACCESS              read-create
+    STATUS                  current
+    DESCRIPTION
+        "Address type of host. For a detailed description
+         of this type, please refer to INET-ADDRESS-MIB.
+         Because we cannot access the hostname of the load
+         file dirctly, so we assume the return value is
+         unknown(0)."
+    ::= { tnHttpsCertLoadEntry 2 }
+
+tnHttpsCertLoadAddr         OBJECT-TYPE
+    SYNTAX                  InetAddress
+    MAX-ACCESS              read-create
+    STATUS                  current
+    DESCRIPTION
+        "Address of host. For a detailed description of this
+         type, please refer to INET-ADDRESS-MIB.
+         Because we cannot access the hostname of the load
+         file dirctly, so we return nothing."
+    ::= { tnHttpsCertLoadEntry 3 }
+
+tnHttpsCertLoadFileName     OBJECT-TYPE
+    SYNTAX                  DisplayString (SIZE (1..64))
+    MAX-ACCESS              read-create
+    STATUS                  current
+    DESCRIPTION
+        "Absolute filename on the local file system for loading
+         HTTPS certificate.
+         Because we cannot access to the load file dirctly, so
+         we return nothing."
+    ::= { tnHttpsCertLoadEntry 4 }
+
+tnHttpsCertLoadStatus       OBJECT-TYPE
+    SYNTAX                  TruthValue
+    MAX-ACCESS              read-create
+    STATUS                  current
+    DESCRIPTION
+        "When uploading files of HTTPS certificate, the loading
+         status of HTTPS certificate must keep enabled temporarily.
+         Otherwise, the status will be disabled.
+         "
+    ::= { tnHttpsCertLoadEntry 5 }
+
+tnHttpsCertLastLoad         OBJECT-TYPE
+    SYNTAX                  INTEGER {
+                                true(1),
+                                false(2)
+                            }
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "The result of uploaded HTTPS certificate last time. If
+         HTTPS certificate uploaded success last time, the result
+         is true. Otherwise, the result must be false."
+    ::= { tnHttpsCertLoadEntry 6 }
+
+-- HTTPS Certificate View
+
+tnHttpsCertViewTable        OBJECT-TYPE
+    SYNTAX                  SEQUENCE OF TnHttpsCertViewEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Displays the current HTTPS certificate (see above).
+         Each certificate contains Data and a Signature
+         Algorithm."
+    ::= { tnHttpsMib 4 }
+
+tnHttpsCertViewEntry        OBJECT-TYPE
+    SYNTAX                  TnHttpsCertViewEntry
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "Each entry represents a part of HTTPS certificate
+         message."
+    INDEX { tnHttpsCertId }
+    ::= { tnHttpsCertViewTable 1 }
+
+TnHttpsCertViewEntry    ::= SEQUENCE {
+    tnHttpsCertId           Unsigned32,
+    tnHttpsCertMessage      DisplayString
+}
+
+tnHttpsCertId               OBJECT-TYPE
+    SYNTAX                  Unsigned32
+    MAX-ACCESS              not-accessible
+    STATUS                  current
+    DESCRIPTION
+        "The index of HTTPS certificate.
+         Each index represets the corresponding line number
+         of HTTPS certificate, so the maximum index is the max
+         line number of HTTPS certificate."
+    ::= { tnHttpsCertViewEntry 1 }
+
+tnHttpsCertMessage          OBJECT-TYPE
+    SYNTAX                  DisplayString (SIZE (1..255))
+    MAX-ACCESS              read-only
+    STATUS                  current
+    DESCRIPTION
+        "A part of HTTPS certificate mseeage.
+         Each part message represets a line of certificate
+         mseeage in the corresponding line number and ended by
+         'NL'. The ASCII value of 'NL' is equal to 10."
+    ::= { tnHttpsCertViewEntry 2 }
+END

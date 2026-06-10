@@ -1,0 +1,1530 @@
+--  File          : oasfp.mib
+--  Description   : Private MIB for SFP Modules
+--                
+--  By            : Ilan Weber
+--  Version       : Revision:   0.7 
+--  Original Date : May 26, 2005
+--  Last Change   : Date:   January 15, 2006
+--  ==========================================================================
+--
+--
+-- Copyright (c) 2005 MRV.  All Rights Reserved.
+--
+-- Reproduction of this document is authorized on condition that this
+-- copyright notice is included.  This MRV SNMP MIB Specification
+-- embodies MRV proprietary intellectual property.  MRV
+-- retains all title and ownership in the specification, including any
+-- revisions.
+--
+-- It is MRV's intent to encourage the widespread use of this
+-- specification in connection with the management of MRV's
+-- products. MRV grants vendor, end-users, and other interested
+-- parties a non-exclusive license to use this specification in
+-- connection with the management of MRV's products.
+--
+-- This specification is supplied "AS IS," and MRV makes no
+-- warranty, either express or implied, as to the use, operation,
+-- condition, or performance of the specification.
+--
+-- MRV retains the right to change this MIB without notification.
+--
+OA-SFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+                OBJECT-TYPE             FROM SNMPv2-SMI
+                Integer32, Unsigned32   FROM SNMPv2-SMI
+--                TRAP-TYPE               FROM RFC-1215
+                TEXTUAL-CONVENTION,
+                DisplayString           FROM SNMPv2-TC
+                MODULE-IDENTITY         FROM SNMPv2-SMI
+                oaccess                 FROM OS-COMMON-TC-MIB
+                MODULE-COMPLIANCE,
+--                NOTIFICATION-GROUP      FROM SNMPv2-CONF
+                OBJECT-GROUP            FROM SNMPv2-CONF;
+
+------------------------------------------------------------------------------
+-- Object Identifier Definition
+------------------------------------------------------------------------------
+
+oaSfpMib   MODULE-IDENTITY
+        LAST-UPDATED "200505260000Z" -- 26 May, 2005
+        ORGANIZATION "MRV Communications"
+        CONTACT-INFO "For technical support, please contact your service
+                      channel"
+        DESCRIPTION 
+              "This MIB defines objects of pluggable modules
+              (such as SFP modules). The MIB objects defined in this MIB are
+              based on the Small Form Factor Pluggable (SFP) Transceiver
+              MultiSource Agreement(MSA)."
+        REVISION "200505260000Z" -- 26 May, 2005
+            DESCRIPTION "Initial MIB Creation"
+   
+         ::= { oaManagement 18 }
+
+--
+-- Textual Conventions
+--
+ 
+SlotIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS  current
+    DESCRIPTION
+            "A unique value, greater than zero, for each Slot
+            in the managed device."
+    SYNTAX  Integer32  (1..1024)
+
+PortInSlotIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS  current
+    DESCRIPTION
+            "A unique value, greater than zero, for each Port inside a Slot
+            in the managed device."
+    SYNTAX  Integer32  (1..1024)
+
+-- oaccess                OBJECT IDENTIFIER ::= { enterprises 6926 }
+oaManagement           OBJECT IDENTIFIER ::= { oaccess 1 }
+
+oaSfp                  OBJECT IDENTIFIER ::= { oaSfpMib 1 }
+oaSfpMIBObjects        OBJECT IDENTIFIER ::= { oaSfp 1 }
+oaXfpMIBObjects        OBJECT IDENTIFIER ::= { oaSfp 2 }
+oaDsfpMIBObjects       OBJECT IDENTIFIER ::= { oaSfp 3 }
+oaMsa300PinMIBObjects  OBJECT IDENTIFIER ::= { oaSfp 4 }
+
+------------------------------------------------------------------------------
+-- SFP MIB Definitions 
+------------------------------------------------------------------------------
+oaSfpCompatibleInterfaceCount OBJECT-TYPE
+     SYNTAX	Integer32
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The number of ports in the system which are sfp compatible"
+     ::= { oaSfpMIBObjects 1 }
+
+------------------------------------------------------------------------------
+-- SFP Info Table 
+------------------------------------------------------------------------------
+
+oaSfpInfoTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaSfpInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The sfp information table."
+       ::= { oaSfpMIBObjects 2 }
+
+oaSfpInfoEntry OBJECT-TYPE
+     SYNTAX	OaSfpInfoEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the SFP Information Table"
+     INDEX { oaSfpInfoSlotIndex, oaSfpInfoPortIndex }
+     ::= { oaSfpInfoTable 1 }
+
+OaSfpInfoEntry ::= SEQUENCE {
+       oaSfpInfoSlotIndex                SlotIndex,
+       oaSfpInfoPortIndex                PortInSlotIndex,
+       oaSfpInfoIdentifier               INTEGER,
+       oaSfpInfoVendorSpecificIdentifier DisplayString,
+       oaSfpInfoConnector                INTEGER,
+       oaSfpInfoVendorSpecificConnector  DisplayString,
+       oaSfpInfoVendorName               DisplayString,
+       oaSfpInfoVendorOUI                DisplayString,
+       oaSfpInfoVendorPN                 DisplayString,
+       oaSfpInfoVendorRev                DisplayString,
+       oaSfpInfoLaserWavelength          Integer32,
+       oaSfpTunability                   INTEGER,
+       oaSfpInfoVendorSN                 DisplayString,
+       oaSfpInfoVendorDate               DisplayString,
+       oaSfpInfoVendorSpecificLotCode    DisplayString,
+       oaSfpInfoVendorSpecificData       OCTET STRING,
+       oaSfpInfoDiagnosticPowerType      INTEGER,
+       oaSfpInfoDigitalDiagnostic        INTEGER,
+       oaSfpInfoDiagnosticCalibration    INTEGER,
+       oaSfpInfoInstalledStatus          INTEGER,
+       oaSfpInfofaultStatus              INTEGER,
+       oaSfpInfoEnableStatus             INTEGER,
+       oaSfpInfoUnitName                 DisplayString,
+       oaSfpInfoFiberType                DisplayString,
+       oaSfpInfoReach                    DisplayString,
+       oaSfpInfoConnectorType            DisplayString,
+       oaSfpInfoItemNum                  DisplayString,
+       oaSfpInfoHWRev                    DisplayString,
+       oaSfpInfoCleiCode                 DisplayString,
+       oaSfpInfoPageA2hSN                DisplayString,
+       oaSfpInfoManufactureDate          DisplayString,
+       oaSfpInfoManufactureID            DisplayString
+     }
+
+oaSfpInfoSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The SFP slot number"
+     ::= { oaSfpInfoEntry 1 }
+
+oaSfpInfoPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The SFP port number"
+     ::= { oaSfpInfoEntry 2 }
+
+oaSfpInfoIdentifier OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              other(2),
+              gbic(3),
+              fixed(4),
+              sfp(5),
+              xbi300pin(6),
+              xenpak(7),
+              xfp(8),
+              xff(9),
+              xfpE(10),
+              xpak(11),
+              x2(12),
+              dsfp(13)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The type of serial transceiver
+                 unknown - Unknown or unspecified
+                 other - Vendor specific
+                 gbic - GBIC
+                 fixed - Module/connector soldered to motherboard
+                 sfp - SFP transceiver
+                 xbi300pin - 300 pin XBI
+                 xenpak - XENPAK transceiver
+                 xfp - XFP transceiver
+                 xff - XFF transceiver
+                 xfp-e - XFP-E transceiver
+                 xpak - XPAK transceiver
+                 x2 - X2 transceiver
+                 dsfp - DWDM SFP transceiver"
+     ::= { oaSfpInfoEntry 3 }
+
+oaSfpInfoVendorSpecificIdentifier OBJECT-TYPE
+     SYNTAX	 DisplayString (SIZE(0..30))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The vendor specific identifier. This Object will be set to
+        value other than null only if oaSfpInfoIdentifier returns a value
+        of other"
+     ::= { oaSfpInfoEntry 4 }
+
+oaSfpInfoConnector OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              other(2),
+              sc(3),
+              fcs1cc(4),
+              fcs2cc(5),
+              bnctnc(6),
+              fcch(7),
+              fiberJack(8),
+              lc(9),
+              mtrj(10),
+              mu(11),
+              sg(12),
+              opticalPigtail(13),
+              hssdcii(34),
+              copperPigtail(35)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The type of external connector provided
+                 unknown - Unknown or unspecified
+                 other - Vendor specific
+                 sc - SC
+                 fcs1cc - Fibre Channel Style 1 copper connector
+                 fcs2cc - Fibre Channel Style 2 copper connector
+                 bnctnc - BNC/TNC
+                 fcch - Fibre Channel coaxial headers
+                 fiberJack - Fiber Jack
+                 lc --LC
+                 mtrj - MT-RJ
+                 mu - MU
+                 sg - SG
+                 opticalPigtail - Optical Pigtail
+                 hssdcii - HSSDC II
+                 copperPigtail - Copper Pigtail"
+     ::= { oaSfpInfoEntry 8 }
+
+oaSfpInfoVendorSpecificConnector OBJECT-TYPE
+     SYNTAX	 DisplayString (SIZE(0..30))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The type of vendor specific Connector. This Object will be set to
+        value other than null only if oaSfpInfoConnector returns a value of
+        other"
+     ::= { oaSfpInfoEntry 9 }
+
+oaSfpInfoVendorName OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..16))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp vendor name which is the full name of the corporation, a
+        commonly accepted abbreviation of the name of the corporation, the SCSI
+        company code for the corporation, or the stock exchange code for the
+        corporation."
+     ::= { oaSfpInfoEntry 24 }
+
+oaSfpInfoVendorOUI OBJECT-TYPE
+     SYNTAX	 DisplayString (SIZE(3))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp vendor organizationally unique identifier field (vendor OUI)
+        that contains the IEEE company identifier for the vendor. A value of
+        all zero in the 3 octet field indicates that the vendor OUI is
+        unspecified"
+     ::= { oaSfpInfoEntry 25 }
+
+oaSfpInfoVendorPN OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..16))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp vendor part number (Vendor PN) or product name if the
+        Vendor PN is unspecified, the null string will be returned"
+     ::= { oaSfpInfoEntry 26 }
+
+oaSfpInfoVendorRev OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..4))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The transceiver vendor's product revision number (Vendor Rev) if the
+        Vendor Rev is unspecified, the null string will be returned"
+     ::= { oaSfpInfoEntry 27 }
+
+oaSfpInfoLaserWavelength OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.01 Nano Meter(nm)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Nominal Transmitter output wavelength at room temperature.
+        Units: 0.01 Nano Meter(nm)"
+     ::= { oaSfpInfoEntry 28 }
+
+oaSfpTunability OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              tunable(2),
+              nonTunable(3)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The tunability of SFP/XFP transceiver.
+                 unknown    - Unknown about tunability feature;
+                 tunable    - Wavelength tunability feature is implemented;
+                 nonTunable - Wavelength tunability feature is not implemented."
+     ::= { oaSfpInfoEntry 29 }
+
+-- Extended ID Fields --
+oaSfpInfoVendorSN OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..16))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The Sfp vendor serial number (Vendor SN) if the Vendor SN is
+        unspecified, the null string will be returned"
+     ::= { oaSfpInfoEntry 32 }
+
+oaSfpInfoVendorDate OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(8))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The Vendor's date. Formated: YY MM DD "
+     ::= { oaSfpInfoEntry 33 }
+
+oaSfpInfoVendorSpecificLotCode OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(2))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The Vendor Specific Lot code. A null value indicates that
+        the lot code is unspecified."
+     ::= { oaSfpInfoEntry 34 }
+
+oaSfpInfoVendorSpecificData OBJECT-TYPE
+     SYNTAX	OCTET STRING (SIZE(0..32))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Vendor Specific Information which can be read from the SFP transceiver
+        (Reference: SFF-8472, revision 9.3 -  Registers 96-127 )"
+     ::= { oaSfpInfoEntry 35 }
+
+oaSfpInfoDiagnosticPowerType OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              average(2),
+              oma(3)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The diagnostic monitoring receive power type in the SFP transceiver.
+                 unknown - Unknown
+                 avarage - Received power measurement type is avarage
+                 oma - Received power measurement type is OMA"
+     ::= { oaSfpInfoEntry 36 }
+       
+oaSfpInfoDigitalDiagnostic OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              digitalDiagnostic(2),
+              noDigitalDiagnostic(3)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The diagnostic monitoring implemented in the SFP transceiver.
+                 unknown - Unknown
+                 digitalDiagMonitoring - Digital diagnostic monitoring
+                                         implemented.
+                 noDigitalDiagMonitoring - Digital diagnostic monitoring
+                                           not implemented."
+     ::= { oaSfpInfoEntry 37 }
+       
+oaSfpInfoDiagnosticCalibration OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              externalCalibration(2),
+              internalCalibration(3)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The diagnostic calibration in the SFP transceiver.
+                 unknown - Unknown
+                 ExternalCalibration - External Calibration
+                 InternalCalibration - Internal Calibration"
+     ::= { oaSfpInfoEntry 38 }
+       
+oaSfpInfoInstalledStatus OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              notInstalled(2),
+              installed(3)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The current installed state of the sfp transceiver
+                 unknown - Unknown
+                 notInstalled - the SFP transceiver is not installed
+                 installed - the sfp transceiver is installed"
+     ::= { oaSfpInfoEntry 40 }
+
+oaSfpInfofaultStatus OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              faulty(2),
+              operational(3)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The current fault state of the sfp transceiver
+                 unknown - Unknown
+                 fault - the sfp transceiver is faulty
+                 operational - the sfp transceiver is working properly"
+     ::= { oaSfpInfoEntry 41 }
+
+oaSfpInfoEnableStatus OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              enabled(2),
+              disabled(3)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The current enable state of the sfp transceiver
+                 unknown - Unknown
+                 enabled - the sfp transceiver has been enabled
+                 disabled - the sfp transceiver has been diabled"
+     ::= { oaSfpInfoEntry 42 }
+     
+     
+oaSfpInfoUnitName OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..29))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp unit name"
+     ::= { oaSfpInfoEntry 43 }
+     
+oaSfpInfoFiberType OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..9))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp fiber type multi/single mode."
+     ::= { oaSfpInfoEntry 44 }
+     
+oaSfpInfoReach OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..20))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp info reach."
+     ::= { oaSfpInfoEntry 45 }
+     
+     
+oaSfpInfoConnectorType OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..4))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp connector type"
+     ::= { oaSfpInfoEntry 46 }
+     
+     
+oaSfpInfoItemNum OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..16))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp item number."
+     ::= { oaSfpInfoEntry 47 }
+     
+     
+oaSfpInfoHWRev OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..8))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp hardware revision."
+     ::= { oaSfpInfoEntry 48 }
+     
+     
+oaSfpInfoCleiCode OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..12))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp clei code"
+     ::= { oaSfpInfoEntry 49 }
+     
+     
+oaSfpInfoPageA2hSN OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..26))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp serial number taken from A2h eeprom page"
+     ::= { oaSfpInfoEntry 50 }
+     
+oaSfpInfoManufactureDate OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..12))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp manufacture date."
+     ::= { oaSfpInfoEntry 51 }
+     
+oaSfpInfoManufactureID OBJECT-TYPE
+     SYNTAX	DisplayString (SIZE(0..119))
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The sfp manufacture ID"
+     ::= { oaSfpInfoEntry 52 }
+
+------------------------------------------------------------------------------
+-- SFP Diagnostics Table 
+------------------------------------------------------------------------------
+
+oaSfpDiagnosticTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaSfpDiagnosticEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The sfp real time diagnostic table."
+       ::= { oaSfpMIBObjects 3 }
+
+oaSfpDiagnosticEntry OBJECT-TYPE
+     SYNTAX	OaSfpDiagnosticEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the SFP Real Time Diagnostic Table"
+     INDEX { oaSfpDiagnosticSlotIndex, oaSfpDiagnosticPortIndex }
+     ::= { oaSfpDiagnosticTable 1 }
+
+OaSfpDiagnosticEntry ::= SEQUENCE {
+       oaSfpDiagnosticSlotIndex   SlotIndex,
+       oaSfpDiagnosticPortIndex   PortInSlotIndex,
+-- Real Time Readouts
+       oaSfpDiagnosticTemperature Integer32,
+       oaSfpDiagnosticVcc         Integer32,
+       oaSfpDiagnosticTxBias      Integer32,
+       oaSfpDiagnosticTxPower     Integer32,
+       oaSfpDiagnosticRxPower     Integer32
+     }
+
+oaSfpDiagnosticSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The SFP slot number"
+     ::= { oaSfpDiagnosticEntry 1 }
+
+oaSfpDiagnosticPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The SFP port number"
+     ::= { oaSfpDiagnosticEntry 2 }
+
+oaSfpDiagnosticTemperature OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "1/10 degrees Celsius (C)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Internaly measured module temperature.
+        Units: 1/10 degrees Celsius (C)"
+     ::= { oaSfpDiagnosticEntry 3 }
+
+oaSfpDiagnosticVcc OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "100 micro Volts (V)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Internaly measured supply voltage in transceiver.
+        Units: 100 micro Volts (V)"
+     ::= { oaSfpDiagnosticEntry 4 }
+
+oaSfpDiagnosticTxBias OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "1 micro Amperes (A)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Internaly measured Tx Bias current.
+        Units: 1 micro Amperes (A)"
+     ::= { oaSfpDiagnosticEntry 5 }
+
+oaSfpDiagnosticTxPower OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.01 decibel (dBm)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Internaly measured Tx output power.
+        Units: 0.01 decibel (dBm)"
+     ::= { oaSfpDiagnosticEntry 6 }
+
+oaSfpDiagnosticRxPower OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.01 decibel (dBm)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Internaly measured Rx input power.
+        Units: 0.01 decibel (dBm)"
+     ::= { oaSfpDiagnosticEntry 7 }
+
+------------------------------------------------------------------------------
+-- SFP Rates Supported Table 
+------------------------------------------------------------------------------
+
+oaSfpRatesSupportedTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaSfpRatesSupportedEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The sfp supported rates."
+       ::= { oaSfpMIBObjects 4 }
+
+oaSfpRatesSupportedEntry OBJECT-TYPE
+     SYNTAX OaSfpRatesSupportedEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the SFP Supported rates list"
+     INDEX { oaSfpInfoSlotIndex, oaSfpInfoPortIndex, oaSfpRatesSupportedIndex }
+     ::= { oaSfpRatesSupportedTable 1 }
+
+OaSfpRatesSupportedEntry ::= SEQUENCE {
+       oaSfpRatesSupportedIndex       Unsigned32,
+       oaSfpRatesSupportedValue       Unsigned32
+     }
+
+oaSfpRatesSupportedIndex    OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+       "Index of rates database the SFP support."
+     ::= { oaSfpRatesSupportedEntry 3 }
+
+oaSfpRatesSupportedValue OBJECT-TYPE
+     SYNTAX     Unsigned32
+     UNITS      "Mbps"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+       "Rate value the SFP support - unit are in 100m."
+     ::= { oaSfpRatesSupportedEntry 4 }
+------------------------------------------------------------------------------
+-- XFP MIB Definitions 
+------------------------------------------------------------------------------
+
+oaXfpCompatibleInterfaceCount OBJECT-TYPE
+     SYNTAX	Integer32
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The number of ports in the system which are xfp compatible"
+     ::= { oaXfpMIBObjects 1 }
+
+------------------------------------------------------------------------------
+-- XFP Info Table 
+------------------------------------------------------------------------------
+
+oaXfpInfoTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaXfpInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The XFP information table."
+       ::= { oaXfpMIBObjects 2 }
+
+oaXfpInfoEntry OBJECT-TYPE
+     SYNTAX	OaXfpInfoEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the XFP Information Table"
+     INDEX { oaXfpInfoSlotIndex, oaXfpInfoPortIndex }
+     ::= { oaXfpInfoTable 1 }
+
+OaXfpInfoEntry ::= SEQUENCE {
+       oaXfpInfoSlotIndex                SlotIndex,
+       oaXfpInfoPortIndex                PortInSlotIndex,
+       oaXfpInfoLaserWavelengthTolerance Integer32
+     }
+
+oaXfpInfoSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The XFP slot number"
+     ::= { oaXfpInfoEntry 1 }
+
+oaXfpInfoPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The XFP port number"
+     ::= { oaXfpInfoEntry 2 }
+
+oaXfpInfoLaserWavelengthTolerance OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.001 Nano Meter(nm)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Guaranteed +/- range of transmitter output wavelength under all normal
+        operating conditions.
+        Units: 0.001 Nano Meter(nm)"
+     ::= { oaXfpInfoEntry 28 }
+
+------------------------------------------------------------------------------
+-- XFP Tunability Table 
+------------------------------------------------------------------------------
+
+oaXfpTunTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaXfpTunEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The XFP Tunability Parameters table."
+       ::= { oaXfpMIBObjects 3 }
+
+oaXfpTunEntry OBJECT-TYPE
+     SYNTAX	OaXfpTunEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the XFP Tunability Parameters Table"
+     INDEX { oaXfpTunSlotIndex, oaXfpTunPortIndex }
+     ::= { oaXfpTunTable 1 }
+
+OaXfpTunEntry ::= SEQUENCE {
+       oaXfpTunSlotIndex Integer32,
+       oaXfpTunPortIndex Integer32,
+       oaXfpTunLaserFirstFrequency Integer32,
+       oaXfpTunLaserLastFrequency Integer32,
+       oaXfpTunGridSpacing INTEGER,
+       oaXfpTunLaserItuBand INTEGER,
+       oaXfpTunLaserItuCh Integer32
+     }
+
+oaXfpTunSlotIndex OBJECT-TYPE
+     SYNTAX	Integer32 (1..16)
+     MAX-ACCESS not-accessible
+     STATUS	current
+     DESCRIPTION
+       "The Tunable XFP slot number"
+     ::= { oaXfpTunEntry 1 }
+
+oaXfpTunPortIndex OBJECT-TYPE
+     SYNTAX	Integer32 (1..16)
+     MAX-ACCESS not-accessible
+     STATUS	current
+     DESCRIPTION
+       "The Tunable XFP port number"
+     ::= { oaXfpTunEntry 2 }
+
+oaXfpTunLaserFirstFrequency OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.001 Terahertz(THz)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "First Frequency setting supported by the Tunable XFP port 
+        as defined in the factory prior shipment.
+        Units: 0.001 Terahertz(THz)"
+     ::= { oaXfpTunEntry 3 }
+
+oaXfpTunLaserLastFrequency OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.001 Terahertz(THz)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Last Frequency setting supported by the Tunable XFP port
+        as defined in the factory prior shipment.
+        Units: 0.001 Terahertz(THz)"
+     ::= { oaXfpTunEntry 4 }
+
+oaXfpTunGridSpacing OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              g200(2),
+              g100(3),
+              g50(4),
+              g25(5)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The Tunable XFP port spacing. The port is compatible with.
+                 unknown - Unknown
+                 g200 - 200 GHz
+                 g100 - 100 GHz
+                 g50 -  50 GHz
+                 g25 -  25 GHz"
+     ::= { oaXfpTunEntry 5 }
+
+oaXfpTunLaserItuBand OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              cBand(2),
+              lBand(3),
+              sBand(4)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "ITU Band setting supported by the Tunable XFP port.
+                 unknown - Unknown
+                 cBand - C Band
+                 lBand - L Band
+                 sBand - S Band"
+     ::= { oaXfpTunEntry 6 }
+
+oaXfpTunLaserItuCh OBJECT-TYPE
+     SYNTAX	Integer32
+     MAX-ACCESS read-write
+     STATUS	current
+     DESCRIPTION
+       "ITU Channel number of the Tunable XFP port * 1000."
+     ::= { oaXfpTunEntry 7 }
+
+------------------------------------------------------------------------------
+-- DWDM SFP MIB Definitions 
+------------------------------------------------------------------------------
+
+oaDsfpCompatibleInterfaceCount OBJECT-TYPE
+     SYNTAX	Integer32
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The number of ports in the system which are DWDM sfp compatible"
+     ::= { oaDsfpMIBObjects 1 }
+
+------------------------------------------------------------------------------
+-- DWDM SFP Info Table 
+------------------------------------------------------------------------------
+
+oaDsfpInfoTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaDsfpInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The DWDM SFP information table."
+       ::= { oaDsfpMIBObjects 2 }
+
+oaDsfpInfoEntry OBJECT-TYPE
+     SYNTAX	OaDsfpInfoEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the XFP Information Table"
+     INDEX { oaDsfpInfoSlotIndex, oaDsfpInfoPortIndex }
+     ::= { oaDsfpInfoTable 1 }
+
+OaDsfpInfoEntry ::= SEQUENCE {
+       oaDsfpInfoSlotIndex      SlotIndex,
+       oaDsfpInfoPortIndex      PortInSlotIndex,
+       oaDsfpInfoChannelSpacing INTEGER,
+       oaDsfpInfoChannelTuning  Integer32
+     }
+
+oaDsfpInfoSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The DWDM SFP slot number"
+     ::= { oaDsfpInfoEntry 1 }
+
+oaDsfpInfoPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The DWDM SFP port number"
+     ::= { oaDsfpInfoEntry 2 }
+
+oaDsfpInfoChannelSpacing OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              g200(2),
+              g100(3),
+              g50(4)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The densest channel spacing the modle is compatible with.
+                 unknown - Unknown
+                 g200 - 200 GHz
+                 g100 - 100 GHz
+                 g50 - 50 GHz"
+     ::= { oaDsfpInfoEntry 4 }
+
+oaDsfpInfoChannelTuning OBJECT-TYPE
+     SYNTAX	Integer32 
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The number of channel over which the module may be tuned by
+        user command (1 - 63)."
+     ::= { oaDsfpInfoEntry 5 }
+
+------------------------------------------------------------------------------
+-- MSA 300 Pin MIB Definitions 
+------------------------------------------------------------------------------
+oaMsa300PinCompatibleIfCount OBJECT-TYPE
+     SYNTAX	Integer32
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The number of ports in the system which are MSA 300 Pin compatible"
+     ::= { oaMsa300PinMIBObjects 1 }
+
+------------------------------------------------------------------------------
+-- MSA 300 Pin Identifier Table 
+------------------------------------------------------------------------------
+oaMsa300PinIdTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaMsa300PinIdEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The Msa300Pin Identifier table."
+       ::= { oaMsa300PinMIBObjects 2 }
+
+oaMsa300PinIdEntry OBJECT-TYPE
+     SYNTAX	OaMsa300PinIdEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the Msa300Pin Identifier Table"
+     INDEX { oaMsa300PinIdSlotIndex, oaMsa300PinIdPortIndex }
+     ::= { oaMsa300PinIdTable 1 }
+
+OaMsa300PinIdEntry ::= SEQUENCE {
+       oaMsa300PinIdSlotIndex         SlotIndex,
+       oaMsa300PinIdPortIndex         PortInSlotIndex,
+       oaMsa300PinIdModuleTypeCode    INTEGER,
+       oaMsa300PinIdFirstLaserItuBand INTEGER,
+       oaMsa300PinIdFirstLaserItuCh   Integer32,
+       oaMsa300PinIdLastLaserItuBand  INTEGER,
+       oaMsa300PinIdLastLaserItuCh    Integer32,
+       oaMsa300PinIdLaserItuChSpacing INTEGER
+     }
+
+oaMsa300PinIdSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin slot number"
+     ::= { oaMsa300PinIdEntry 1 }
+
+oaMsa300PinIdPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin port number"
+     ::= { oaMsa300PinIdEntry 2 }
+
+oaMsa300PinIdModuleTypeCode OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              msa10Gb(6),
+              msa10GbWdm(8)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Port Type code.
+                 unknown    - Unknown
+                 msa10Gb    - 10Gb MSA
+                 msa10GbWdm - 10Gb MSA WDM"
+     ::= { oaMsa300PinIdEntry 4 }
+
+oaMsa300PinIdFirstLaserItuBand OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              cBand(2),
+              lBand(3),
+              sBand(4)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "First ITU Band setting supported by the port.
+                 unknown - Unknown
+                 cBand - C Band
+                 lBand - L Band
+                 sBand - S Band"
+     ::= { oaMsa300PinIdEntry 6 }
+
+oaMsa300PinIdFirstLaserItuCh OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.01 Nano Meter(nm)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "First ITU Channel setting supported by the port
+        (i.e. maximum wavelength) as defined in the factory prior shipment.
+        Units: 0.01 Nano Meter(nm)"
+     ::= { oaMsa300PinIdEntry 7 }
+
+oaMsa300PinIdLastLaserItuBand OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              cBand(2),
+              lBand(3),
+              sBand(4)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Last ITU Band setting supported by the port.
+                 unknown - Unknown
+                 cBand - C Band
+                 lBand - L Band
+                 sBand - S Band"
+     ::= { oaMsa300PinIdEntry 8 }
+
+oaMsa300PinIdLastLaserItuCh OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.01 Nano Meter(nm)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Last ITU Channel setting supported by the port
+        (i.e. maximum wavelength) as defined in the factory prior shipment.
+        Units: 0.01 Nano Meter(nm)"
+     ::= { oaMsa300PinIdEntry 9 }
+
+oaMsa300PinIdLaserItuChSpacing OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              g200(2),
+              g100(3),
+              g50(4),
+              g25(5)
+            }
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The MSA 300 Pin port spacing the port is compatible with.
+                 unknown - Unknown
+                 g200 - 200 GHz
+                 g100 - 100 GHz
+                 g50 -  50 GHz
+                 g25 -  25 GHz"
+     ::= { oaMsa300PinIdEntry 10 }
+
+------------------------------------------------------------------------------
+-- MSA 300 Pin Measurement Table 
+------------------------------------------------------------------------------
+
+oaMsa300PinMeasTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaMsa300PinMeasEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The MSA 300 Pin Measurement table."
+       ::= { oaMsa300PinMIBObjects 3 }
+
+oaMsa300PinMeasEntry OBJECT-TYPE
+     SYNTAX	OaMsa300PinMeasEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the MSA 300 Pin Measurement Table"
+     INDEX { oaMsa300PinMeasSlotIndex, oaMsa300PinMeasPortIndex }
+     ::= { oaMsa300PinMeasTable 1 }
+
+OaMsa300PinMeasEntry ::= SEQUENCE {
+       oaMsa300PinMeasSlotIndex         SlotIndex,
+       oaMsa300PinMeasPortIndex         PortInSlotIndex,
+       oaMsa300PinMeasLaserOutputPwrMon Integer32,
+       oaMsa300PinMeasLaserTempMon      Integer32,
+       oaMsa300PinMeasRecSigAvrOptPower Integer32,
+       oaMsa300PinMeasLaserWlengthMon   Integer32,
+       oaMsa300PinMeasTransTempMon      Integer32
+     }
+
+oaMsa300PinMeasSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin slot number"
+     ::= { oaMsa300PinMeasEntry 1 }
+
+oaMsa300PinMeasPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin port number"
+     ::= { oaMsa300PinMeasEntry 2 }
+
+
+oaMsa300PinMeasLaserOutputPwrMon OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "Micro Watt(uW)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Laser output power.
+        Units: 1 Micro Watt(uW)"
+     ::= { oaMsa300PinMeasEntry 4 }
+
+oaMsa300PinMeasLaserTempMon OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.001 degrees Celsius (C)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Laser temperature.
+        Units: 0.001 degrees Celsius (C)"
+     ::= { oaMsa300PinMeasEntry 5 }
+
+oaMsa300PinMeasRecSigAvrOptPower OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "Nano Watt (nW)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Average received optical power.
+        Units: Nano Watt (nW)"
+     ::= { oaMsa300PinMeasEntry 7 }
+
+oaMsa300PinMeasLaserWlengthMon OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "Mega Hertz (MHz)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "The offset of the exact ITU channel wavelength.
+        Units: Mega Hertz (MHz)"
+     ::= { oaMsa300PinMeasEntry 8 }
+
+oaMsa300PinMeasTransTempMon OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.001 degrees Celsius (C)"
+     MAX-ACCESS read-only
+     STATUS	current
+     DESCRIPTION
+       "Photodiode Temperature.
+        Units: 0.001 degrees Celsius (C)"
+     ::= { oaMsa300PinMeasEntry 9 }
+
+------------------------------------------------------------------------------
+-- MSA 300 Pin Alarm Table 
+------------------------------------------------------------------------------
+
+oaMsa300PinAlarmTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaMsa300PinAlarmEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The MSA 300 Pin Alarm table."
+       ::= { oaMsa300PinMIBObjects 4 }
+
+oaMsa300PinAlarmEntry OBJECT-TYPE
+     SYNTAX	OaMsa300PinAlarmEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the MSA 300 Pin Alarm Table"
+     INDEX { oaMsa300PinAlarmSlotIndex, oaMsa300PinAlarmPortIndex }
+     ::= { oaMsa300PinAlarmTable 1 }
+
+OaMsa300PinAlarmEntry ::= SEQUENCE {
+       oaMsa300PinAlarmSlotIndex SlotIndex,
+       oaMsa300PinAlarmPortIndex PortInSlotIndex,
+       oaMsa300PinAlarmTxAlarm   OCTET STRING,
+       oaMsa300PinAlarmRxAlarm   OCTET STRING,
+       oaMsa300PinAlarmPsAlarm   OCTET STRING
+     }
+
+oaMsa300PinAlarmSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin slot number"
+     ::= { oaMsa300PinAlarmEntry 1 }
+
+oaMsa300PinAlarmPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin port number"
+     ::= { oaMsa300PinAlarmEntry 2 }
+
+oaMsa300PinAlarmTxAlarm OBJECT-TYPE
+        SYNTAX  OCTET STRING  (SIZE(3))
+        MAX-ACCESS read-only
+        STATUS	current
+        DESCRIPTION
+        "Transmit Alarms.
+         Alarm bits in this object remain in the alarmed state until a read 
+         of this register occurs.
+         This object is organised as a bit map. Each bit represents an alarm.
+         If the object is zero - no alarm is active.
+         0x000000 ('0000 0000 0000 0000 0000 0000'B) - Normal (No alarm)
+         0x000001 ('0000 0000 0000 0000 0000 0001'B) - TxALM INT
+                                                     - Tx Summary alarm
+         0x000004 ('0000 0000 0000 0000 0000 0100'B) - LsTEMPALM
+                                                     - Laser temperature alarm
+         0x000008 ('0000 0000 0000 0000 0000 1000'B) - TxLOCKERR
+                                                     - Loss of TxPLL lock indicator
+         0x000020 ('0000 0000 0000 0000 0010 0000'B) - LsPOWALM
+                                                     - Laser power alarm
+         0x000200 ('0000 0000 0000 0010 0000 0000'B) - ModTEMPALM
+                                                     - Modulator temperature alarm
+         0x002000 ('0000 0000 0010 0000 0000 0000'B) - LsWAVALM
+                                                     - Laser Wavelength alarm
+         Any combination of the bits represent the combination of the alarms"
+     ::= { oaMsa300PinAlarmEntry 3 }
+
+
+oaMsa300PinAlarmRxAlarm OBJECT-TYPE
+        SYNTAX  OCTET STRING  (SIZE(2))
+        MAX-ACCESS read-only
+        STATUS	current
+        DESCRIPTION
+        "Receive Alarms.
+         Alarm bits in this object remain in the alarmed state until a read 
+         of this register occurs.
+         This object is organised as a bit map. Each bit represents an alarm.
+         If the object is zero - no alarm is active.
+         0x0000 ('0000 0000 0000 0000'B) - Normal (No alarm)
+         0x0001 ('0000 0000 0000 0001'B) - RxALM INT - Rx Summary alarm
+         0x0002 ('0000 0000 0000 0010'B) - RxPOWALM 
+                                         - Loss average optical power alarm
+         Any combination of the bits represent the combination of the alarms"
+     ::= { oaMsa300PinAlarmEntry 4}
+
+oaMsa300PinAlarmPsAlarm OBJECT-TYPE
+        SYNTAX  OCTET STRING  (SIZE(1))
+        MAX-ACCESS read-only
+        STATUS	current
+        DESCRIPTION
+        "Receive Alarms.
+         Alarm bits in this object remain in the alarmed state until a read 
+         of this register occurs.
+         This object is organised as a bit map. Each bit represents an alarm.
+         If the object is zero - no alarm is active.
+         0x00 ('0000 0000'B) - Normal       (No alarm)
+         0x01 ('0000 0001'B) - PSUMMARY     (poerw summary)
+         0x02 ('0000 0010'B) - P5VANALOG    (+5V analog)
+         0x04 ('0000 0100'B) - N5P2VANALOG  (-5.2V analog)
+         0x08 ('0000 1000'B) - P3P3VANALOG  (_3.3V analog)
+         0x10 ('0001 0000'B) - P3P3VDIGITAL (+3.3V digital)
+         0x20 ('0010 0000'B) - LVDIGITAL    (+1.8V digital)
+         0x40 ('0100 0000'B) - N5P2VDIGITAL (-5.2V digital)
+         Any combination of the bits represent the combination of the alarms"
+     ::= { oaMsa300PinAlarmEntry 5}
+
+------------------------------------------------------------------------------
+-- MSA 300 Pin Command Table 
+------------------------------------------------------------------------------
+
+oaMsa300PinComTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF OaMsa300PinComEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+         "The MSA 300 Pin Command table."
+       ::= { oaMsa300PinMIBObjects 5 }
+
+oaMsa300PinComEntry OBJECT-TYPE
+     SYNTAX	OaMsa300PinComEntry
+     MAX-ACCESS not-accessible
+     STATUS current
+     DESCRIPTION
+       "An entry in the MSA 300 Pin Command Table"
+     INDEX { oaMsa300PinComSlotIndex, oaMsa300PinComPortIndex }
+     ::= { oaMsa300PinComTable 1 }
+
+OaMsa300PinComEntry ::= SEQUENCE {
+       oaMsa300PinComSlotIndex    SlotIndex,
+       oaMsa300PinComPortIndex    PortInSlotIndex,
+       oaMsa300PinComLaserItuBand INTEGER,
+       oaMsa300PinComLaserItuCh   Integer32
+     }
+
+oaMsa300PinComSlotIndex OBJECT-TYPE
+     SYNTAX	    SlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin slot number"
+     ::= { oaMsa300PinComEntry 1 }
+
+oaMsa300PinComPortIndex OBJECT-TYPE
+     SYNTAX	    PortInSlotIndex
+     MAX-ACCESS not-accessible
+     STATUS	    current
+     DESCRIPTION
+       "The MSA 300 Pin port number"
+     ::= { oaMsa300PinComEntry 2 }
+
+oaMsa300PinComLaserItuBand OBJECT-TYPE
+     SYNTAX	INTEGER {
+              unknown(1),
+              cBand(2),
+              lBand(3),
+              sBand(4)
+            }
+     MAX-ACCESS read-write
+     STATUS	current
+     DESCRIPTION
+       "ITU Band of the port.
+                 unknown - Unknown
+                 cBand - C Band
+                 lBand - L Band
+                 sBand - S Band"
+     ::= { oaMsa300PinComEntry 7 }
+
+oaMsa300PinComLaserItuCh OBJECT-TYPE
+     SYNTAX	Integer32
+     UNITS  "0.01 Nano Meter(nm)"
+     MAX-ACCESS read-write
+     STATUS	current
+     DESCRIPTION
+       "ITU Channel wavelength of the port
+        Units: 0.01 Nano Meter(nm)"
+     ::= { oaMsa300PinComEntry 8 }
+
+------------------------------------------------------------------------------
+-- conformance information
+------------------------------------------------------------------------------
+
+oaSfpConformance OBJECT IDENTIFIER ::= { oaSfpMib 2 }
+
+oaSfpGroups      OBJECT IDENTIFIER ::= { oaSfpConformance 1 }
+oaSfpCompliances OBJECT IDENTIFIER ::= { oaSfpConformance 2 }
+
+------------------------------------------------------------------------------
+-- compliance statements
+------------------------------------------------------------------------------
+
+oaSfpCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities which have
+             SFP/DSFP/XFP/MSA300Pin module interfaces."
+
+    MODULE  -- this module
+        MANDATORY-GROUPS { oaSfpCompatibleIfCountGroup }
+
+        GROUP       oaSfpGroup
+        DESCRIPTION
+            "This group is mandatory for those port interfaces which
+            are SFP ports."
+
+        GROUP       oaXfpGroup
+        DESCRIPTION
+            "This group is mandatory for those port interfaces which
+            are XFP ports."
+
+        GROUP       oaDsfpGroup
+        DESCRIPTION
+            "This group is mandatory for those port interfaces which
+            are DSFP ports."
+
+        GROUP       oaMsa300PinGroup
+        DESCRIPTION
+            "This group is mandatory for those port interfaces which
+            are MSA 300 Pin ports."
+
+        GROUP       oaXfpTunGroup
+        DESCRIPTION
+            "This group is mandatory for those port interfaces which
+            are Tunable XFP ports."
+
+    ::= { oaSfpCompliances 1 }
+
+------------------------------------------------------------------------------
+-- units of conformance
+------------------------------------------------------------------------------
+
+oaSfpCompatibleIfCountGroup    OBJECT-GROUP
+    OBJECTS { oaSfpCompatibleInterfaceCount,
+              oaXfpCompatibleInterfaceCount,
+              oaDsfpCompatibleInterfaceCount,
+              oaMsa300PinCompatibleIfCount }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information on number
+            of specific compatible ports."
+    ::= { oaSfpGroups 1 }
+
+oaSfpGroup    OBJECT-GROUP
+    OBJECTS { oaSfpInfoIdentifier,
+              oaSfpInfoVendorSpecificIdentifier,
+              oaSfpInfoConnector,
+              oaSfpInfoVendorSpecificConnector,
+              oaSfpInfoVendorName,
+              oaSfpInfoVendorOUI,
+              oaSfpInfoVendorPN,
+              oaSfpInfoVendorRev,
+              oaSfpInfoLaserWavelength,
+              oaSfpTunability,
+              oaSfpInfoVendorSN,
+              oaSfpInfoVendorDate,
+              oaSfpInfoVendorSpecificLotCode,
+              oaSfpInfoVendorSpecificData,
+              oaSfpInfoDiagnosticPowerType,
+              oaSfpInfoDigitalDiagnostic,
+              oaSfpInfoDiagnosticCalibration,
+              oaSfpInfoInstalledStatus,
+              oaSfpInfofaultStatus,
+              oaSfpInfoEnableStatus,
+              oaSfpDiagnosticTemperature,
+              oaSfpDiagnosticVcc,
+              oaSfpDiagnosticTxBias,
+              oaSfpDiagnosticTxPower,
+              oaSfpDiagnosticRxPower,
+              oaSfpRatesSupportedValue
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information on 
+            SFP compatible ports."
+    ::= { oaSfpGroups 2 }
+
+
+oaXfpGroup    OBJECT-GROUP
+    OBJECTS { oaXfpInfoLaserWavelengthTolerance }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information on 
+            XFP compatible ports."
+    ::= { oaSfpGroups 3 }
+
+oaDsfpGroup    OBJECT-GROUP
+    OBJECTS { oaDsfpInfoChannelSpacing,
+              oaDsfpInfoChannelTuning }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information on 
+            DSFP compatible ports."
+    ::= { oaSfpGroups 4 }
+
+oaMsa300PinGroup    OBJECT-GROUP
+    OBJECTS { oaMsa300PinIdModuleTypeCode,
+              oaMsa300PinIdFirstLaserItuBand,
+              oaMsa300PinIdFirstLaserItuCh,
+              oaMsa300PinIdLastLaserItuBand,
+              oaMsa300PinIdLastLaserItuCh,
+              oaMsa300PinIdLaserItuChSpacing,
+              oaMsa300PinMeasLaserOutputPwrMon,
+              oaMsa300PinMeasLaserTempMon,
+              oaMsa300PinMeasRecSigAvrOptPower,
+              oaMsa300PinMeasLaserWlengthMon,
+              oaMsa300PinMeasTransTempMon,
+              oaMsa300PinAlarmTxAlarm,
+              oaMsa300PinAlarmRxAlarm,
+              oaMsa300PinAlarmPsAlarm,
+
+              oaMsa300PinComLaserItuBand,
+              oaMsa300PinComLaserItuCh }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information on 
+            MSA 300 Pin compatible ports."
+    ::= { oaSfpGroups 5 }
+
+oaXfpTunGroup    OBJECT-GROUP
+    OBJECTS { oaXfpTunLaserFirstFrequency,
+              oaXfpTunLaserLastFrequency,
+              oaXfpTunGridSpacing,
+              oaXfpTunLaserItuBand,
+              oaXfpTunLaserItuCh }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information on 
+            Tunable XFP compatible ports."
+    ::= { oaSfpGroups 6 }
+
+
+END

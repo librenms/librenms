@@ -1,0 +1,464 @@
+CISCOSB-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      CISCOSB ROS
+-- Version:    7.46
+-- Date:       23-Jan-2007
+--
+
+
+-- Title:                CISCOSB ROS
+--                       Private CISCOSB MIB
+-- Version:              7.46
+-- Date:                 2 JAN 2007
+
+IMPORTS
+
+    enterprises
+                FROM SNMPv2-SMI;
+
+    Percents ::= INTEGER (0..100)
+    NetNumber ::=  OCTET STRING (SIZE(4))
+    VlanPriority ::= INTEGER (0..7)
+
+switch001 MODULE-IDENTITY
+                LAST-UPDATED "202105170000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines CISCOSB private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { enterprises 9 6 1 101 }
+
+
+-- Some MIB compilers require that the following 7 lines which define the path
+-- to switch001 MIB are commented out:
+
+-- mib            OBJECT IDENTIFIER ::= { mgmt 1  }
+-- directory      OBJECT IDENTIFIER ::= { internet 1  }
+-- experimental   OBJECT IDENTIFIER ::= { internet 3  }
+-- private        OBJECT IDENTIFIER ::= { internet 4  }
+-- enterprises    OBJECT IDENTIFIER ::= { private 1  }
+
+    
+-- At the end of the MIB there is a definition of all RND-specific traps.
+
+rndNotifications OBJECT-IDENTITY
+           STATUS      current
+           DESCRIPTION " All the switch001 notifications will reside under this branch
+                         as specified in
+                         RFC2578 'Structure of Management Information Version 2 (SMIv2)' 8.5"
+           ::= { switch001 0 }
+
+
+-- rndMng group contains Management Variables for switch001 devices
+
+rndMng   OBJECT IDENTIFIER ::= { switch001 1  }
+-- see CISCOSBMng.mib
+
+rndDeviceParams       OBJECT IDENTIFIER ::= { switch001 2  }
+-- see CISCOSB-DEVICEPARAMS-MIB.MIB
+
+-- Obsolete
+-- rndInterface OBJECT IDENTIFIER ::= { switch001 4  }
+
+-- Obsolete
+-- rndBackup    OBJECT IDENTIFIER ::= { switch001 9 }
+
+-- Obsolete
+-- rndIPX   OBJECT IDENTIFIER ::= { switch001 12 }
+
+-- Obsolete
+-- rndFACS    OBJECT IDENTIFIER ::=  { switch001 16 }
+
+-- Obsolete
+-- rndCOD    OBJECT IDENTIFIER ::=  { switch001 20 }
+
+-- Obsolete
+-- rndBrgHub     OBJECT IDENTIFIER ::=  { switch001 22 }
+
+-- Obsolete
+-- rndAdapter    OBJECT IDENTIFIER ::=  { switch001 23 }
+
+rndBootP       OBJECT IDENTIFIER ::= { switch001 24  }
+-- see CISCOSB-BOOTP-MIB.MIB
+
+-- ip Specific group  Addition parameters to ip group in MIB-2
+
+ipSpec      OBJECT IDENTIFIER ::= { switch001 26 }
+-- see rlIp.mib
+
+-- Obsolete
+-- virtualLan  OBJECT IDENTIFIER ::= { switch001 27 }
+
+-- Obsolete
+-- rsConf  OBJECT IDENTIFIER ::= { switch001 28 }
+
+rsTunning  OBJECT IDENTIFIER ::= { switch001 29 }
+-- see rlTuning.mib
+
+-- Obsolete
+-- rndISDN      OBJECT IDENTIFIER ::= { switch001 30}
+
+-- Obsolete
+-- rndPPP   OBJECT IDENTIFIER ::= { switch001 31 }
+
+-- Obsolete
+-- frameRelay    OBJECT IDENTIFIER ::= { switch001 34 }
+
+rndApplications  OBJECT IDENTIFIER ::= { switch001 35 }
+-- see rlApplication.mib
+
+-- Obsolete
+-- rndOGCompression  OBJECT IDENTIFIER ::= { switch001 36 }
+
+-- Obsolete
+-- rndEthernet  OBJECT IDENTIFIER ::= { switch001 37 }
+
+--rsDHCP  OBJECT IDENTIFIER ::= { switch001 38 }
+--see rlDhcl.mib
+
+-- Obsolete
+-- radWiz  OBJECT IDENTIFIER ::= { switch001 39 }
+
+-- Obsolete
+-- rsCfgUpgrade  OBJECT IDENTIFIER ::= { switch001 40 }
+
+-- Obsolete
+--rsRMON  OBJECT IDENTIFIER ::= { switch001 41 }
+
+-- rsCopyPort was deleted
+-- { rsRMON 1 } reserved
+
+-- rsMonitPort was deleted
+-- { rsRMON 2 } reserved
+
+rsUDP    OBJECT IDENTIFIER ::=  { switch001 42}
+-- see rlUdp.mib
+
+swInterfaces  OBJECT IDENTIFIER ::= { switch001 43 }
+-- see rlInterfaces.mib
+
+-- Obsolete
+-- securityZone  OBJECT IDENTIFIER ::= { switch001 44 }
+
+-- Obsolete
+-- rll3SwtchETMdl OBJECT IDENTIFIER ::= { switch001 45 }
+
+rlIPmulticast OBJECT IDENTIFIER ::= { switch001 46 }
+
+rlFFT OBJECT IDENTIFIER ::= { switch001 47 }
+
+vlan  OBJECT IDENTIFIER ::= { switch001 48 }
+
+rlRmonControl   OBJECT IDENTIFIER ::=  { switch001 49}
+-- see rlRmon.mib
+
+rlBrgMacSwitch       OBJECT IDENTIFIER ::= { switch001 50  }
+-- see CISCOSB-BRGMACSWITCH-MIB.MIB
+
+rlExperience OBJECT IDENTIFIER ::= { switch001 51 }
+
+rlCli OBJECT IDENTIFIER ::= { switch001 52 }
+--see CISCOSB-CLI-MIB.MIB
+
+-- Used for Drafts not received yet OBJECT IDENTIFIER
+
+rlPhysicalDescription OBJECT IDENTIFIER ::= { switch001 53 }
+
+rlIfInterfaces OBJECT IDENTIFIER ::= { switch001 54 }
+-- see rlInterfaces.mib
+
+rlMacMulticast OBJECT IDENTIFIER ::= { switch001 55 }
+--see rlbrgmulticast.mib
+
+rlGalileo OBJECT IDENTIFIER ::= { switch001 56 }
+
+rlpBridgeMIBObjects OBJECT IDENTIFIER ::= { switch001 57 }
+--see CISCOSB-BRIDGEMIBOBJECTS-MIB.MIB
+
+rlTelnet OBJECT IDENTIFIER ::= { switch001 58 }
+--see CISCOSB-TELNET-MIB.MIB
+
+rlPolicy  OBJECT IDENTIFIER ::= { switch001 59 }
+
+rlArpSpoofing OBJECT IDENTIFIER ::= { switch001 60 }
+--see CISCOSB-ARPSPOOFING-MIB.MIB
+
+rlMir  OBJECT IDENTIFIER ::= { switch001 61 }
+--see CISCOSB-MIR-MIB.MIB
+
+rlIpMRouteStdMIB OBJECT IDENTIFIER ::= { switch001 62 }
+
+rl3sw2swTables OBJECT IDENTIFIER ::= { switch001 63 }
+--see CISCOSB-3SW2SWTABLES-MIB.MIB
+
+rlGvrp  OBJECT IDENTIFIER ::= { switch001 64 }
+--see CISCOSB-GVRP-MIB.MIB
+
+rlDot3adAgg  OBJECT IDENTIFIER ::= { switch001 65 }
+
+rlEmbWeb  OBJECT IDENTIFIER ::= { switch001 66 }
+
+rlSwPackageVersion OBJECT IDENTIFIER ::= { switch001 67 }
+--see CISCOSB-SWPACKAGEVERSION-MIB.MIB
+
+rlMultiSessionTerminal  OBJECT IDENTIFIER ::= { switch001 69 }
+--see CISCOSB-MULTISESSIONTERMINAL-MIB.MIB
+
+rlRCli  OBJECT IDENTIFIER ::= { switch001 70 }
+--see CISCOSB-RCLI-MIB.MIB
+
+rlBgp OBJECT IDENTIFIER ::= { switch001 71 }
+
+rlAgentsCapabilitiesGroups  OBJECT IDENTIFIER ::= { switch001 72 }
+
+rlAggregateVlan OBJECT IDENTIFIER ::= {switch001 73}
+--see CISCOSB-AGGREGATEVLAN-MIB.MIB
+
+-- rlLCli  OBJECT IDENTIFIER ::= { switch001 74 }
+
+rlGmrp  OBJECT IDENTIFIER ::= { switch001 75 }
+--see CISCOSB-GMRP-MIB.MIB
+
+rlDhcpCl OBJECT IDENTIFIER ::= { switch001 76 }
+--see CISCOSB-DHCPCL-MIB.MIB
+
+------------------------------
+
+rlStormCtrl OBJECT IDENTIFIER ::= { switch001 77 }
+--see CISCOSB-STORMCTRL-MIB.MIB
+
+rlSsh OBJECT IDENTIFIER ::= { switch001 78 }
+
+rlAAA OBJECT IDENTIFIER ::= { switch001 79 }
+
+rlRadius  OBJECT IDENTIFIER ::= { switch001 80 }
+
+-- see rlAAA.mib
+
+rlTraceRoute  OBJECT IDENTIFIER ::= { switch001 81 }
+--see CISCOSB-TRACEROUTE-MIB.MIB
+
+rlSyslog  OBJECT IDENTIFIER ::= { switch001 82 }
+
+rlEnv  OBJECT IDENTIFIER ::= { switch001 83 }
+-- rlPhysicalDescription OBJECT IDENTIFIER ::= { rlEnv 1 }
+-- entitySensorMIB OBJECT IDENTIFIER ::= { rlEnv 2 }
+
+rlSmon  OBJECT IDENTIFIER ::= { switch001 84 }
+-- see CISCOSB-SMON-MIB.MIB
+
+rlSocket OBJECT IDENTIFIER ::= { switch001 85 }
+-- see CISCOSB-SOCKET-MIB.MIB
+
+rlDigitalKeyManage OBJECT IDENTIFIER ::= { switch001 86 }
+-- see CISCOSB-DIGITALKEYMANAGE-MIB.MIB
+
+rlCopy  OBJECT IDENTIFIER ::= { switch001 87 }
+
+rlQosCliMib OBJECT IDENTIFIER ::= { switch001 88 }
+
+rlMngInf OBJECT IDENTIFIER ::= { switch001 89 }
+
+rlPhy OBJECT IDENTIFIER ::= { switch001 90 }
+
+rlJumboFrames OBJECT IDENTIFIER ::= { switch001 91 }
+-- see CISCOSB-JUMBOFRAMES-MIB.MIB
+
+rlTimeSynchronization OBJECT IDENTIFIER ::= { switch001 92 }
+
+rlDnsCl OBJECT IDENTIFIER ::= { switch001 93 }
+
+rlCDB  OBJECT IDENTIFIER ::= { switch001 94 }
+-- see CISCOSB-CDB-MIB.MIB
+
+rldot1x  OBJECT IDENTIFIER ::= { switch001 95 }
+-- see CISCOSB-DOT1X-MIB.MIB
+
+rlFile  OBJECT IDENTIFIER ::= { switch001 96 }
+
+rlAAAEap OBJECT IDENTIFIER ::= { switch001 97 }
+
+rlSNMP OBJECT IDENTIFIER ::= { switch001 98 }
+
+--rlQosServ OBJECT IDENTIFIER ::= { switch001 99 }
+
+rlSsl OBJECT IDENTIFIER ::= { switch001 100 }
+
+--rlWlanAccessPoint OBJECT IDENTIFIER ::= { rnd 102 }
+
+rlLocalization  OBJECT IDENTIFIER ::= { switch001 103 }
+
+rlRs232 OBJECT IDENTIFIER ::= { switch001 104 }
+
+rlNicRedundancy OBJECT IDENTIFIER ::= { switch001 105 }
+
+rlAmap OBJECT IDENTIFIER ::= { switch001 106 }
+
+rlStack OBJECT IDENTIFIER ::= { switch001 107 }
+
+rlPoe OBJECT IDENTIFIER ::= { switch001 108 }
+
+rlUPnP  OBJECT IDENTIFIER ::= { switch001 109 }
+
+rlLldp OBJECT IDENTIFIER ::= { switch001 110 }
+
+rlOib OBJECT IDENTIFIER ::= { switch001 111 }
+
+rlBridgeSecurity OBJECT IDENTIFIER ::= { switch001 112 }
+
+rlDhcpSpoofing  OBJECT IDENTIFIER ::= { switch001 113 }
+
+rlBonjour OBJECT IDENTIFIER ::= { switch001 114 }
+
+rlCiscoSmartMIB  OBJECT IDENTIFIER ::= { switch001 115 }
+
+rlBrgMulticast  OBJECT IDENTIFIER ::= { switch001 116 }
+
+rlBrgMcMngr  OBJECT IDENTIFIER ::= { switch001 117 }
+
+rlGlobalIpAddrTable OBJECT IDENTIFIER ::= { switch001 118 }
+
+dlPrivate OBJECT IDENTIFIER ::= { switch001 119 }
+
+rlSecuritySuiteMib OBJECT IDENTIFIER ::= { switch001 120 }
+
+rlIntel OBJECT IDENTIFIER ::= { switch001 121 }
+
+rlTunnel OBJECT IDENTIFIER ::= { switch001 122 }
+
+rlAutoUpdate OBJECT IDENTIFIER ::= { switch001 123 }
+
+rlCpuCounters OBJECT IDENTIFIER ::= { switch001 124 }
+
+--xxxx  OBJECT IDENTIFIER ::= { switch001 125 }
+
+--rlGreenEthernet OBJECT IDENTIFIER ::= { switch001 126 }
+
+rlLbd  OBJECT IDENTIFIER ::= { switch001 127 }
+
+rlErrdisableRecovery  OBJECT IDENTIFIER ::= { switch001 128 }
+
+rlIPv6 OBJECT IDENTIFIER ::= { switch001 129 }
+
+rlActionAcl  OBJECT IDENTIFIER ::= { switch001 130 }
+
+rlSafeGuard OBJECT IDENTIFIER ::= { switch001 131 }
+
+rlProtectedPorts OBJECT IDENTIFIER ::= { switch001 132}
+
+rlBanner OBJECT IDENTIFIER ::= { switch001 133}
+
+rlGreenEth OBJECT IDENTIFIER ::= { switch001 134}
+
+rlDlf OBJECT IDENTIFIER ::= { switch001 135}
+
+rlVlanTrunking OBJECT IDENTIFIER ::= { switch001 136 }
+
+rlCdp OBJECT IDENTIFIER ::= { switch001 137 }
+
+rlTrafficSeg OBJECT IDENTIFIER ::= { switch001 138 }
+
+rlImpbFeatures OBJECT IDENTIFIER ::= { switch001 139 }
+
+rlSmartPorts OBJECT IDENTIFIER ::= { switch001 140 }
+
+rlStatistics OBJECT IDENTIFIER ::= { switch001 141 }
+
+rlDeleteImg  OBJECT IDENTIFIER ::= { switch001 142 }
+
+rlCustom1BonjourService OBJECT IDENTIFIER ::= { switch001 143 }
+
+rlSpecialBpdu OBJECT IDENTIFIER ::= { switch001 144 }
+
+rlTBIMib OBJECT IDENTIFIER ::= { switch001 145}
+
+rlWeightedRandomTailDrop OBJECT IDENTIFIER ::= { switch001 146}
+
+rlsFlowMib OBJECT IDENTIFIER ::= { switch001 147 }
+
+rlPfcMib OBJECT IDENTIFIER ::= { switch001 148}
+
+rlEee OBJECT IDENTIFIER ::= { switch001 149}
+
+rlEventsMib OBJECT IDENTIFIER ::= { switch001 150}
+
+rlWlanMIB OBJECT IDENTIFIER ::= { switch001 200 }
+
+rlEtsMib OBJECT IDENTIFIER ::= { switch001 201 }
+
+rlQcnMib OBJECT IDENTIFIER ::= { switch001 202 }
+
+rlSctMib OBJECT IDENTIFIER ::= { switch001 203 }
+
+rlSysmngMib OBJECT IDENTIFIER ::= { switch001 204 }
+
+rlFip OBJECT IDENTIFIER ::= { switch001 205 }
+
+rlDebugCapabilities OBJECT IDENTIFIER ::= { switch001 206 }
+
+rlIpStdAcl  OBJECT IDENTIFIER ::= { switch001 207 }
+
+rlSecSd  OBJECT IDENTIFIER ::= { switch001 209 }
+
+rlOspf  OBJECT IDENTIFIER ::= { switch001 210 }
+
+rlRtRedist OBJECT IDENTIFIER ::= { switch001 211 }
+
+rlIpPrefList  OBJECT IDENTIFIER ::= { switch001 212 }
+
+rlVoipSnoop  OBJECT IDENTIFIER ::= { switch001 213 }
+
+rlDhcpv6  OBJECT IDENTIFIER ::= { switch001 214}
+
+rlIpv6Fhs  OBJECT IDENTIFIER ::= { switch001 215} 
+
+rlInventoryEnt  OBJECT IDENTIFIER ::= { switch001 217}
+
+rlUdld OBJECT IDENTIFIER ::= { switch001 218 }
+
+rlSpan OBJECT IDENTIFIER ::= { switch001 219 }
+
+rlPortStat OBJECT IDENTIFIER ::= { switch001 223 }
+
+rlLan1 OBJECT IDENTIFIER ::= { switch001 224 }    
+
+rlIgmp OBJECT IDENTIFIER ::= { switch001 225 }
+
+rlRadiusServ OBJECT IDENTIFIER ::= { switch001 226 }
+
+rlRouteMap OBJECT IDENTIFIER ::= { switch001 227 }
+
+rlPolicyBasedRouting OBJECT IDENTIFIER ::= { switch001 228 }
+
+rlSna  OBJECT IDENTIFIER ::= { switch001 229 }
+
+rlWBA  OBJECT IDENTIFIER ::= { switch001 230 }
+
+rlSLA  OBJECT IDENTIFIER ::= { switch001 231 }
+
+rlQosApps OBJECT IDENTIFIER ::= { switch001 232 }
+
+rlQueueStatistics OBJECT IDENTIFIER ::= { switch001 233 }
+
+rlPNP OBJECT IDENTIFIER ::= { switch001 234 }
+
+rlFindit OBJECT IDENTIFIER ::= { switch001 235 }
+
+rndEndOfMibGroup   OBJECT IDENTIFIER ::= { switch001 1000  }
+
+-- see CISCOSB-ENDOFMIB-MIB.MIB
+
+END
+
+

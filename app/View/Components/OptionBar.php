@@ -1,0 +1,50 @@
+<?php
+
+namespace App\View\Components;
+
+use Illuminate\View\Component;
+
+class OptionBar extends Component
+{
+    /**
+     * Name of the option bar
+     *
+     * @var string
+     */
+    public $name;
+    /**
+     * Entries to show on the option bar
+     * [
+     *   'name' => ['text' => 'Display Text', 'link' => 'https://...'],
+     * ]
+     *
+     * @var array
+     */
+    public $options;
+
+    /**
+     * Create a new component instance.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @param  mixed  $selected
+     */
+    public function __construct(string $name = '', array $options = [], /**
+     * Selected option
+     */
+    public $selected = null)
+    {
+        $this->name = $name;
+        $this->options = $options;
+    }
+
+    /**
+     * Get the view / contents that represent the component.
+     *
+     * @return \Illuminate\Contracts\View\View|\Closure|string
+     */
+    public function render()
+    {
+        return view('components.option-bar');
+    }
+}

@@ -1,0 +1,3681 @@
+-- For an overview of this MIB, see the DESCRIPTION of the module.
+--
+-- References
+--
+-- G.964    ITU-T Recommendation G.964, V Interfaces at the digital local
+--          exchange (LE) - V5.1-interface (based on 2048 kbit/s) for the
+--          support of access network (AN), June 1994
+--
+-- G.965    ITU-T Recommendation G.965, V-interfaces at the digital local
+--          exchange (LE) - V5.2 interface (based on 2048 kbit/s) for the
+--          support of access network (AN), March 1995
+--
+-- X.721    ITU-T Recommendation X.721, Information Technology - Open Systems
+--          Interconnection - Structure of Management Information: Definition of
+--          Management Information, 1992
+--          The identical text is also published as ISO/IEC International
+--          Standard 10165-2.
+--
+-- X.731    ITU-T Recommendation X.731, Information Technology - Open Systems
+--          Interconnection - Systems Management: State Management Function,
+--          January 1992
+--          The identical text is also published as ISO/IEC International
+--          Standard 10164-2.
+--
+-- SDSL     Symmetrical single pair high bitrate Digital Subscriber Line (SDSL),
+--          ETSI TS 101 524, V1.1.1 (2001-04).
+--
+-- RFC 1597 Address Allocation for Private Internets
+--
+-- 802.3    Carrier Sense multiple access with collision detection (CSMA/CD)
+--          access method and physical layer specifications.
+--          IEEE Std 802.3, 1998 Edition
+--
+-- This MIB has been tested with the following SNMP tools:
+--
+-- AdventNet SnmpUtilities 4.0.0 Standard Editition (Evaluation)
+--
+-- Castle Rock Computing SNMPc 6.0.9 Workgroup Edition
+--
+-- net-snmp 5.0.6
+--
+-- MG-Soft MIB Browser 8.0.0.3893 Professional Edition (Evaluation)
+--
+
+PEGASUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+  enterprises,
+  Integer32,
+  Counter32,
+  IpAddress,
+  OBJECT-TYPE,
+  MODULE-IDENTITY
+    FROM SNMPv2-SMI
+
+  DisplayString,
+  TruthValue,
+  RowStatus,
+  TEXTUAL-CONVENTION
+    FROM SNMPv2-TC;
+
+pegasusMibModule  MODULE-IDENTITY
+  LAST-UPDATED "200412170000Z"  -- 17 December, 2004
+  ORGANIZATION "Schmid Telecom, Zurich"
+  CONTACT-INFO
+    "Schmid Telecom AG
+     Binzstrasse 35, CH-8048 Zurich
+     Switzerland
+
+     Email: xdslsupport@schmid-telecom.ch"
+  DESCRIPTION
+    "This MIB applies to the PEGASUS SDSL product manufactured by Schmid
+    Telecom Zurich. The MIB is modelled after the PEM management model, so
+    object hierarchy and individual variables agree with the PEM client.
+
+    The overall structure is five groups, one for each of DSL, V5 and Data
+    cards, one with global parameters for the whole rack, and finally one group
+    for performance history measurement.
+
+    The DSL group contains four tables:
+
+    - dslCardTable       one entry for each DSL card (line card) configured.
+    - dslLinkTable       one entry for each DSL link.
+    - dslInterfaceTable  one entry per DSL interface, i.e. two per DSL link.
+    - iadTable           one entry per DSL link.
+    - dslLinkCosTable    one entry per DSL link.
+
+    The V5 group contains five tables:
+
+    - v5CardTable        one entry for each V5 card configured.
+    - v5LinkTable        one entry for each V5 link.
+    - v5InterfaceTable   one entry for each V5 interface.
+    - v5IsdnPortTable    one entry per ISDN User Port (S0 interface on IAD).
+    - v5LccTable         one entry per Logical Communication Channel.
+
+    The data switch group contains two tables:
+
+    - dataCardTable      one entry per data card (normally one)
+    - dataPortTable      one entry per trunk interface.
+
+    The Pegasus System group contains individual variables related to the
+    rack as a whole.
+
+    The perf group for performance histories contains two tables and one extra
+    variable:
+
+    - perfSweeperCyclePeriod  how soon are unused perfDataTable entries cleared
+    - perfControlTable        configuration of performance history monitoring
+    - perfDataTable           performance history registers
+
+    Note
+
+    - Notification definitions are singled out to their own MIB, to allow for
+      alternative sets of notification styles.
+    - Tables in this MIB are indexed hierarchically with physical attributes.
+      E.g. all cards are indexed by the slot number. DSL links are indexed by
+      two variables: first the slot number of the DSL card which carries the
+      link, then the number of the link within that card.
+    - Unlike the PEM client, this MIB does not model V5 Physical Communication
+      Channels explicitely. They have no interesting variables of their own.
+      Rather, the user allots a range of these objects through the V5 link
+      configuration, and then maps the Logical Communication Channels to them
+      (using indexes within the alloted range, of course). These objects are
+      then created, deleted and managed under the hood.
+    - V5 interfaces are logical entities, unlike DSL interfaces.
+    - ISDN user ports are physically part of the IAD, and are indexed by DSL
+      attributes. Their configuration, though, belongs to V5, so the user port
+      tables are in the V5 group, not in the DSL group."
+
+  REVISION "200412170000Z"  -- 17 December, 2004
+  DESCRIPTION
+    "A new table dslLinkCosTable has been added to the dsl branch to allow 
+    the configuration of the Class of Service (COS) attributes. Each row 
+    within this table corresponds to a DSL link.
+    Besides, some missing type and variable descriptions have been added."
+  REVISION "200406140000Z"  -- 14 June, 2004
+  DESCRIPTION
+    "Line identifiers are have been added for ISDN user ports and V5 links."
+  REVISION "200404080000Z"  -- 8 April, 2004
+  DESCRIPTION
+    "Maximum size of dslLinkAddress and trapDestination have been increased."
+  REVISION "200312110000Z"  -- 11 December, 2003
+  DESCRIPTION
+    "Improved the description of DslLinkLoopEnum. The variables 
+    v5IsdnPortActiveLoop and authRespEnabled are now obsolete. The agent never 
+    sends an error message if the request contains a wrong community string."
+  REVISION "200310300000Z"  -- 30 October, 2003
+  DESCRIPTION
+    "Corrected the value range of perfSweepCyclePeriod. The new maximum value 
+    is 604800 seconds (1 week)."
+  REVISION "200310240000Z"  -- 24 October, 2003
+  DESCRIPTION
+    "Declared perfControlEffectiveUpdatePeriod as obsolete. The definition 
+    would be now redundant to perfControlUpdatePeriod.
+    The behaviour of v5LccPccV5LinkNumber/v5LccPccTimeslot has been modified.
+    The assignment of a PCC becomes active after both attributes have been set.
+    To erase the PCC, only one of these attributes has to be set to 0. Write 
+    access is allowed for RowStatus active now. The comments of attributes and 
+    table habe been aapted."
+  REVISION "200310020000Z"  -- 2 October, 2003
+  DESCRIPTION
+    "Declared hwAdaptionPolicy as obsolete. The definition of DataPortSpeedEnum
+    and DataPortFlowConrtolEnum has been moved within the MIB file to make 
+    possible the compilation without errors using the MG-Soft MIB Compiles.
+    This revision of the MIB is compatible with the preceeding revision."
+  REVISION "200303140000Z"  -- 14 March, 2003
+  DESCRIPTION
+    "Deleted all IP base address objects: dslCardIPBaseAddress,
+    dataCardIPBaseAddress, and v5CardIPBaseAddress.  The base address of a
+    card can no longer be set through Pegasus Management, but only through
+    the CLI on the card itself.
+    The remaining objects were renumbered to keep the numbering compact, so
+    this revision of the MIB is again NOT COMPATIBLE with preceeding revisions!
+    Changed the type of perfControlIndex and perfDataIndex from INTEGER to
+    Integer32, with range (1..2147483647), which is the set of positive values
+    possible for an Integer32.  This change is rather formal (Integer32 is
+    indistinguishable from INTEGER, as SNMPv2-SMI puts it, that is, its
+    serialisation is identical to INTEGER), but it makes certain parsers happy.
+    In fact, the value is always chosen by the client, and the agent gladly
+    takes what it gets - including 0 and negative values."
+  REVISION "200303110000Z"  -- 11 March, 2003
+  DESCRIPTION
+    "Deleted all config version objects: dslCardConfigVersion,
+    v5CardConfigVersion, and dataCardConfigVersion.  These objects were never
+    really useful for customers, and so have been removed.  Objects following
+    them were renumbered, so this revision of the MIB is NOT COMPATIBLE with
+    preceeding revisions!
+    Added new literals at end of DataPortSpeedEnum and DataPortFlowControlEnum
+    to convey that the value of a (read-only) status variable is currently
+    unknown (for example because a sub-device like the Iad cannot be queried
+    because is not connected).
+    Added four new objects to the Iad table, to describe configuration and
+    corresponding status of the Ethernet port on the Iad.  This was mandated
+    by the Iad Rev. B, which can control its Ethernet port and also report its
+    status.  For the older Iad Rev. B, control and status of the Ethernet port
+    are not available, and the new objects will read with fixed values. The
+    objects are: iadEthPortSpeed, iadEthCurrentPortSpeed, iadEthFlowControl,
+    iadEthCurrentFlowControl."
+  REVISION "200210090000Z"  -- 9 October, 2002
+  DESCRIPTION
+    "SignalQuality and Attenuation were prefixed with dslLink in
+    dslInterfaceEntry sequence, changed to dslInterface.
+    Type DslLinkNumber was defined as 1..8, but V5 configurations already hold
+    user port parameters for future DSL cards with 16 DSL links. This caused
+    problems with some clients, so the definition was changed to 1..16.
+    Revamped description of writeCommunity."
+  REVISION "200209190000Z"  -- 19 September, 2002
+  DESCRIPTION
+    "The following objects were added or changed:
+
+    dataPortSpeed         New literal autoCrossoverAndPortSpeed(1) was added to
+                          type DataPortSpeedEnum. Warning: existing literals
+                          have changed their ordinal numbers.
+                          Revamped description, added reference.
+
+    v5CardFlags           Four new objects added to table v5CardTable, and
+    v5CardETSIRelease     the new type V5CardFlagSet.
+    v5CardE1LineCode
+    v5CardFrameFormat
+
+    v5LinkAlarmStatus     New literal v5LinkAlarmIdFailure(6) was added to type
+                          V5LinkAlarmStatusElem (at the end, without changing
+                          the ordinal numbers of existing literals).
+
+    iadAlarmStatus        New literal dcContinuity(2) was added to type
+                          IadAlarmStatusElem (at the end, without changing the
+                          ordinal numbers of existing literals).
+
+    dslInterfaceSignalQuality  Three new objects added to dslInterfaceTable.
+    dslInterfaceAttenuation
+    v5InterfaceAlarmStatus"
+  REVISION "200208230000Z"  -- 23 August, 2002
+  DESCRIPTION
+    "Fixed a number of typos and formatting problems. Renamed l2 group to data
+    group. (Input from BBe)."
+  REVISION "200207160000Z"  -- 16 July, 2002
+  DESCRIPTION
+    "Changed all type assignments with BITS to textual conventions (BITS is part
+    of the OBJECT-TYPE and TEXTUAL-CONVENTION macros (for SMI v2 only), but not
+    a ASN.1 builtin or DefinedType, and so cannot be used in a type assignment
+    or sequence definition). The types are:
+    AvailabilityStatusElem, DslLinkAlarmElem, DslCardAlarmStatus,
+    IadAlarmStatusElem, DslPerformanceStatusElem, V5LinkAlarmStatusElem,
+    V5IsdnPortAlarmStatusElem, RackAlarmStatusElem, PerfControlStatus.
+    Added import clause for TEXTUAL-CONVENTION.
+    Changed dataCardAvailabilityStatus in DataCardEntry from BITS to
+    AvailabilityStatusElem.
+    Changed spelling bit-names of AvailabilityStatusElem to agree with ASN.1
+    definitions in X.721.
+    Added description for the AvailabilityStatusElem textual convention (taken
+    from attributes, with updates).
+    In v5CardTable and v5LccTable, changed all read-write access clauses to
+    read-create.
+    Improved list of references in initial comment.
+    Added list of tools tested with this MIB to initial comment.
+    Constrained type Priority to (0..7).
+    Constrained dslLinkNumberOfZBits to (0..1)."
+  REVISION "200207030000Z"  -- 3 July, 2002
+  DESCRIPTION
+    "dslLinkAssignedTrunk was TrunkNumber in its Object-Type definition, fixed
+    to TrunkNumberOrZero. For dslCardIPBaseAddress, v5CardIPBaseAddress and
+    dataCardIPBaseAddress: corrected descriptions and examples to have plausible
+    slot-numbers. ipBaseAddress adapted, with general examples."
+  REVISION "200206240000Z"  -- 24 June, 2002
+  DESCRIPTION
+    "User manual realignment with syntax errors fixed, raw version."
+  REVISION "200206200000Z"  -- 20 June, 2002
+  DESCRIPTION
+    "Changed all ...IPAddressPrefix variable names to ...IPBaseAddress (dslCard,
+    v5Card, dataCard, pegasusSystem. Changed the variable in pegasusSystem from
+    DisplayString to IpAddress, to agree with other variables.
+    Renamed dataCardAlarmStatus to rackAlarmStatus (also renamed the associated
+    BITS type to RackAlarmStatusElem). Moved to pegasusSystem.
+    Renamed dslLinkAssociatedTrunk to dslLinkAssignedTrunk, to realign with
+    PEMClient.
+    Eliminated type DataPortNumber, used TrunkNumber in its place. Also created
+    type TrunkNumberOrZero, to allow reference to 'no trunk'.
+    Renamed ...ProgramVersion to ...FirmwareVersion: dslCard, dslCardM16, iad,
+    v5Card, dataCard.
+    Removed dataPortVLAN (and its type VLanId): is automatically computed as
+    part of the enhanced switching configuration. For future general VLAN
+    switching, it will be configured through standard MIBs.
+    Removed FilterBroadcast and FilterUnknown for both dslLink and dataPort:
+    present in the devices, but not in the PEMClient. It was not clear if these
+    are useful, and according to PSt it was decided to 'hide' them.
+    Removed special(4) from DslLinkLoopEnum - no longer supported."
+  REVISION "200206070000Z"  -- 7 June, 2002
+  DESCRIPTION
+    "Removed ProceduralStatus and its enumeration type from all three cards and
+    IAD. Fixed spelling of 'v5LccIsProteced' to 'v5LccIsProtected'. Improved
+    various descriptions."
+  REVISION "200205220000Z"  -- 22 May, 2002
+  DESCRIPTION
+    "Changed Gauge32 in perfData to Integer32, removed import for Gauge32.
+    Added description for v5CardRowStatus."
+  REVISION "200205100000Z"  -- 10 May, 2002
+  DESCRIPTION
+    "Improved descriptions for dslLink{DataRate,LinkRate,NumberOfBRA} and
+    dslLinkDynamicSlotAllocation.
+    Added 6 remaining objects for SNMP configuration to group pegasusSystem
+    (read/write/trapCommunity, agentPort, authRespEnabled, trapDestination).
+    Improved description of objects in perf group.
+    DslCard, dataCard: removed AdminState, renumbered attributes contiguously.
+    v5Lcc: renumbered objects contiguously, starting at 1.
+    v5Interface: added RowStatus, changed all read-write objects to read-create,
+    renumbered objects contigously, starting at 1.
+    v5Link: added RowStatus, changed all read-write objects to read-create.
+    iad: removed AdminState, renumbered attributes contiguously."
+  REVISION "200204250000Z"  -- 25 Apr, 2002
+  DESCRIPTION
+    "Added group for performance history of V5 links and DSL interfaces.
+    Added description for dslLinkNumberOfBRA, dslLinkDataRate, and
+    dslLinkLineRate."
+  REVISION "200204160000Z"  -- 16 Apr, 2002
+  DESCRIPTION
+    "Changed numbering scheme. { schmidtelecom 1 } is now reserved for a
+    centralized registry, and the pegasusMibModule is { schmidtelecom 2 }.
+    All groups and objects in this and other Pegasus MIBs are below
+    pegasusMibModule."
+  REVISION "200204030000Z"  -- 3 Apr, 2002
+  DESCRIPTION
+    "v5CardTable and V5LccTable (LogCommChan) now have a RowStatus. For 
+    v5CardTable, this controls provisioning mode, but it does not yet
+    support creation. For v5LccTable, it controls verification of the
+    v5LccPccV5LinkNumber and and v5LccPccTimeslot columns, which define
+    the Pcc (PhysCommChan) (i.e. the RowStatus supports transactions on
+    these values). Again, creation is not yet supported for v5LccTable.
+    The new object mibRevision holds the revision number of the MIB with
+    which the agent was compiled."
+  REVISION "200203190000Z"  -- 19 Mar, 2002
+  DESCRIPTION
+    "Added missing import of DisplayString. Changed definitions of dslInterface
+    counter values to Counter32 consistently. Added one missing variable to
+    V5IsdnPortEntry sequence."
+  REVISION "200203140000Z"  -- 14 Mar, 2002
+  DESCRIPTION
+    "Initial comments updated and moved to the module description, where they
+    are more useful for typical browsers."
+  REVISION "200203010000Z"  -- 1 Mar, 2002
+  DESCRIPTION
+    "Added PegasusSystem."
+  REVISION "200202280000Z"  -- 28 Feb, 2002
+  DESCRIPTION
+    "Removed dslInterfaceIsRestartEnabled. Renumbered dslInterfaceEntry and
+    dslLinkEntry columns to start with one and form a compact sequence."
+  REVISION "200202180000Z"  -- 18 Feb, 2002
+  DESCRIPTION
+    "Added initial comment with overview and additional hints.
+    Corrected spelling of CommStateEnum literals to comply with SNMPv2 (dashes
+    were replaced by mixed-case spelling).
+    Added VLAN support (DSL link and data card port). Presently only for
+    enhanced mode, transparent and VLAN modes to come.
+    Removed some VLAN related definitions which are not yet used."
+  REVISION "200202140000Z"  -- 14 Feb, 2002
+  DESCRIPTION
+    "Added definitions for data switch and data switch port."
+  REVISION "200201250000Z"  -- 25 Jan, 2002
+  DESCRIPTION
+    "Added object-type definition of v5IsdnPortAlarmStatus. Renumbered
+     remaining objects."
+  REVISION "200201230000Z"  -- 23 Jan, 2002
+  DESCRIPTION
+    "Changed all occurrences of NetworkAddress to IpAddress (imported
+    from SNMPv2-SMI). NetworkAddress was in SNMPv1, but was replaced
+    by IpAddress for SNMPv2.
+
+    Corrected dataCardVLANMode to SYNTAX TruthValue - it erronously
+    used NetworkAddress.
+
+    Correct the year on the previous revision clause."
+  REVISION "200012210000Z"  -- 21 Dec, 2001
+  DESCRIPTION
+    "Initial revision."
+  ::= { schmidtelecom 2 }
+
+schmidtelecom      OBJECT IDENTIFIER ::= { enterprises 6368 }
+--pegasus            OBJECT IDENTIFIER ::= { schmidtelecom 2 }
+
+-- groups
+
+dsl            OBJECT IDENTIFIER ::= { pegasusMibModule 1 }
+v5             OBJECT IDENTIFIER ::= { pegasusMibModule 2 }
+data           OBJECT IDENTIFIER ::= { pegasusMibModule 3 }
+pegasusSystem  OBJECT IDENTIFIER ::= { pegasusMibModule 4 }
+-- reserve { pegasusMibModule 5 } for leanTrapModule
+-- reserve { pegasusMibModule 6 } for oldTrapModule
+perf           OBJECT IDENTIFIER ::= { pegasusMibModule 7 }
+
+-- General Pegasus Enumerations and Subranges
+
+AdminStateEnum ::= INTEGER {
+    locked(1),
+    unlocked(2),
+    shutdown(3)
+  }
+
+OperStateEnum ::= INTEGER {
+    enabled(1),
+    disabled(2)
+  }
+
+AvailabilityStatusElem ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          inTest        The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          powerOff      The device requires power to be applied and is not 
+                        powered on.
+          offLine       The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          offDuty       The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          notInstalled  The device is not present, or incomplete.
+          logFull       The log is full."
+  REFERENCE
+          "X.731, section 8.1.2.3 (explanation)
+           X.721, section 14.2 (formal definition of values)"
+  SYNTAX      BITS {
+                inTest(0),
+                failed(1),
+                powerOff(2),
+                offLine(3),
+                offDuty(4),
+                dependency(5),
+                degraded(6),
+                notInstalled(7),
+                logFull(8)
+              }
+
+CommStateEnum ::=        -- literals: must lc initial, no _
+  INTEGER {
+    disconnected(1),     -- agent-device connection not established
+    init(2),             -- slot-card side only: wait for agent to connect
+    identification(3),   -- identification of detected device
+    checkHw(4),          -- substate of identification: compare HW version
+    hwAdaption(5),       -- agent side only: MBean is adapted to match HW
+    checkHwVers(6),      -- substate of identification: compare program version
+    wrongProgram(7),     -- program update is initiated
+    checkConfig(8),      -- substate of identification: compare config version
+    downloadConfig(9),   -- configuration is downloaded from remote object
+    uploadConfig(10),    -- configuration is uploaded to remote object
+    statusSynch(11),     -- dynamic attributes are being synchronised
+    resetting(12),       -- the device is going to be reset
+    inactive(13),        -- object is in inactive state
+    active(14)           -- connection was successfully established
+  }
+
+DataPortSpeedEnum ::= INTEGER {
+    autoCrossoverAndPortSpeed(1),
+    autoNegotiationPortSpeed(2),
+    base100TFullDuplex(3),
+    base100THalfDuplex(4),
+    base10TFullDuplex(5),
+    base10THalfDuplex(6),
+    unknown(7)
+  }
+
+DataPortFlowControlEnum ::= INTEGER {
+    autoNegotiationFlowControl(1),
+    onFlowControl(2),
+    offFlowControl(3),
+    unknown(4)
+  }
+
+SlotNumber         ::= INTEGER(1..12)
+DataCardSlotNumber ::= INTEGER(1..2)
+V5SlotNumber       ::= INTEGER(3..4)
+DslSlotNumber      ::= INTEGER(5..12)
+DslLinkNumber      ::= INTEGER(1..16)
+TrunkNumber        ::= INTEGER(1..5)
+TrunkNumberOrZero  ::= INTEGER(0..5)
+Priority           ::= INTEGER(0..7) -- for VLANs
+
+-- *******************************************************************
+-- dsl card group
+--
+-- This group contains four tables:
+-- - dslCardTable
+-- - dslLinkTable
+-- - iadTable
+-- - dslInterfaceTable
+-- *******************************************************************
+-- Dsl Card Enumerations and Subranges
+
+DslLinkLoopEnum ::= INTEGER {
+    none(1),
+    loop1(2),   -- Loopback at the output of the LTU DSL circuits
+    loop2(3)    -- Loopback at the input of the IAD DSL circuits
+  }
+
+DslLinkAlarmElem ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "Bitset to represent alarms on a DSL link."
+  SYNTAX      BITS {
+                config(0),
+                service(1)
+              }
+
+DslLinkPSDMaskEnum ::= INTEGER {
+    symmetric(1),
+    asymmetric(2)
+  }
+
+
+-- DSL Card: DSL Card Table
+
+DslCardAlarmStatus ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "Bitset to represent alarms on a DSL card."
+  SYNTAX      BITS {
+                intercom(0)
+              }
+
+dslCardTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF DslCardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing line card specific information."
+  ::= { dsl 1 }
+
+dslCardEntry OBJECT-TYPE
+  SYNTAX      DslCardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for line card table."
+  INDEX   { dslCardSlotNumber }
+  ::= { dslCardTable 1 }
+
+DslCardEntry ::= SEQUENCE {
+    dslCardSlotNumber          DslSlotNumber,
+
+--Device Part, without AdminState
+    dslCardAvailabilityStatus  AvailabilityStatusElem,
+    dslCardHardwareVersion     DisplayString,
+    dslCardManufacturer        DisplayString,
+    dslCardName                DisplayString,
+    dslCardOperState           OperStateEnum,
+    dslCardFirmwareVersion     DisplayString,
+    dslCardSerialNumber        DisplayString,
+  --action installNewSoftware
+--SlotCard Part
+    dslCardCommState           CommStateEnum,
+--DslCard Specific Part
+    dslCardAlarmStatus         DslCardAlarmStatus,
+    dslCardM16FirmwareVersion  DisplayString
+  }
+
+dslCardSlotNumber OBJECT-TYPE
+  SYNTAX      DslSlotNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Slot number for line card."
+  ::= { dslCardEntry 1 }
+
+dslCardAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { dslCardEntry 2 }
+
+dslCardHardwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Hardware version of the Line card. This is also called CHM-number (it
+          always starts with the letters 'CHM'). Example: CHM40510WA0A2. The
+          number '405' after the 'CHM' identifies the card as a line card."
+  ::= { dslCardEntry 3 }
+
+dslCardManufacturer OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Name of company which manufactured this line card/ltu."
+  ::= { dslCardEntry 4 }
+
+dslCardName OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "User defined ame of line card."
+  ::= { dslCardEntry 5 }
+
+dslCardOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { dslCardEntry 6 }
+
+dslCardFirmwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Version number and build date of the firmware running on the line
+          card. This applies to the PPC part, the M16 firmware part has its own
+          version attribute, dslCardM16FirmwareVersion.
+          Example:
+            '1.3 20020607 16:34'
+          The format is 'major.minor YYYYMMDD hh:mm', where the fields are:
+          major     Major and minor version numbers, separated by a dot. Take at
+          minor     most 5 characters together, including the space. Both major
+                    and minor consist of digits only.
+          YYYYMMDD  Date (year YYYY, month MM 1-12 and day DD 1-31) of firmware
+                    build. Preceded and followed by exactly one space to
+                    separate it from the version numbers and time.
+          hh:mm     Time (hour hh 0-23 and minute mm 0-59) of firmware build."
+  ::= { dslCardEntry 7 }
+
+dslCardSerialNumber OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Serial number of the line card. Also called HM-number, as it always
+          starts with 'HM'. Example: HMVSS014810294."
+  ::= { dslCardEntry 8 }
+
+dslCardCommState OBJECT-TYPE
+  SYNTAX      CommStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The Management Comm State indicates the state of the management
+          connection between the PEM Server and the line card.
+          disconnected            No connection has been established.
+          init                    A connection has freshly been established on
+                                  the underlying protocol, but no management
+                                  information has been transmitted so far.
+          identification          The connected device is being identified.
+          check hardware          The connected hardware is compared to the one
+                                  stored in the configuration.
+          hardware adaptation     If the configured and the existing device do
+                                  not match, an adoption is made. The behaviour
+                                  in this case can be configured with the 'HW
+                                  Adaptation Policy' option.
+          check program version   The program version of the connected hardware
+                                  is compared to the one stored in the
+                                  configuration.
+          check config version    The configuration version of the connected
+                                  hardware is compared to the one stored in the
+                                  configuration.
+          download config         If a configuration version mismatch has been
+                                  detected and the 'Config Priority' of 'PEGASUS
+                                  system' is set to 'Device', the configuration
+                                  is downloaded from the device to the PEM
+                                  Server.
+          upload config           If a configuration version mismatch has been
+                                  detected and the 'Config Priority' of 'PEGASUS
+                                  system' is set to 'Server', the configuration
+                                  is uploaded from the PEM Server to the device.
+          status synch            The values of the status properties are being
+                                  synchronised.
+          resetting               The device is resetting.
+          inactive                The device is connected, but it is inactive,
+                                  that is not operational. This may be due to a
+                                  hardware mismatch.
+          active                  The management connection between the device
+                                  and the PEM Server is fully established and
+                                  the device is active."
+  ::= { dslCardEntry 9 }
+
+dslCardAlarmStatus OBJECT-TYPE
+  SYNTAX      DslCardAlarmStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Alarm status of the line card. Bits assigned as follows:
+           bit 0    intercom    The intercom line between the PPC and M16
+                                has failed."
+  ::= { dslCardEntry 10 }
+
+dslCardM16FirmwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current  -- optional? (future versions have no M16?)
+  DESCRIPTION
+          "Version number and build date of the firmware running on the line
+          card. This applies to the M16 part, the PPC firmware part has its own
+          version attribute, dslCardFirmwareVersion.
+          Example:
+            '1.3 20020607 16:34'
+          The format is 'major.minor YYYYMMDD hh:mm', where the fields are:
+          major     Major and minor version numbers, separated by a dot. Take at
+          minor     most 5 characters together, including the space. Both major
+                    and minor consist of digits only.
+          YYYYMMDD  Date (year YYYY, month MM 1-12 and day DD 1-31) of firmware
+                    build. Preceded and followed by exactly one space to
+                    separate it from the version numbers and time.
+          hh:mm     Time (hour hh 0-23 and minute mm 0-59) of firmware build."
+  ::= { dslCardEntry 11 }
+
+
+-- DSL Card: DSL Link Table
+
+dslLinkTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF DslLinkEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing dsl link specific information."
+  ::= { dsl 2 }
+
+dslLinkEntry OBJECT-TYPE
+  SYNTAX      DslLinkEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Information about a particular dsl link."
+  INDEX   { dslCardSlotNumber, dslLinkNumber }
+  ::= { dslLinkTable 1 }
+
+-- DSL Link Table Entry
+
+DslLinkEntry ::=  SEQUENCE {
+    dslLinkNumber                DslLinkNumber,
+-- DSL Link
+    dslLinkActiveLoop            DslLinkLoopEnum,
+    dslLinkAddress               DisplayString,
+    dslLinkAdminState            AdminStateEnum,
+    dslLinkAlarmStatus           DslLinkAlarmElem,
+    dslLinkAvailabilityStatus    AvailabilityStatusElem,
+    dslLinkContact               DisplayString,
+    dslLinkCustomerId            DisplayString,
+    dslLinkDynamicSlotAllocation TruthValue,
+    dslLinkIsRemotePower         TruthValue,
+    dslLinkLineRate              INTEGER,
+    dslLinkDataRate              INTEGER,
+    dslLinkName                  DisplayString,
+    dslLinkNotes                 DisplayString,
+    dslLinkNumberOfBRA           INTEGER,
+    dslLinkOperState             OperStateEnum,
+    dslLinkNumberOfZBits         INTEGER,
+    dslLinkPSDMask               DslLinkPSDMaskEnum,
+    dslLinkAssignedTrunk         TrunkNumberOrZero,
+    dslLinkPriority              Priority
+  }
+
+dslLinkNumber OBJECT-TYPE
+  SYNTAX      DslLinkNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Number 1-8 of link on line card."
+  ::= { dslLinkEntry 1 }
+
+dslLinkActiveLoop OBJECT-TYPE
+  SYNTAX      DslLinkLoopEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Loop back (test) setup currently active. Disconnect the DSL link 
+          before activating the maintenance loop on the LTU (loop1)."
+  ::= { dslLinkEntry 2 }
+
+dslLinkAddress OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..80))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Customer address stored in configuration file of agent."
+  ::= { dslLinkEntry 3 }
+
+dslLinkAdminState OBJECT-TYPE
+  SYNTAX      AdminStateEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+         "This configuration attribute allows the administrator to enable or
+         disable the operability of a device.
+         unlocked   The device is administratively permitted to perform services
+                    for its users.
+         locked     The device is administratively prohibited from performing
+                    services for users."
+  ::= { dslLinkEntry 4 }
+
+dslLinkAlarmStatus OBJECT-TYPE
+  SYNTAX      DslLinkAlarmElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Alarms on the link. Bit assignments as follows:
+           Bit 0    Configuration Alarm present on link. Some configuration
+                    attribute is invalid.
+           Bit 1    User Service Alarm present on link. This could be for
+                    example the IAD being locked (admin-state), or a mis-
+                    configuration which keeps the LTU-NTU from operating."
+  ::= { dslLinkEntry 5 }
+
+dslLinkAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { dslLinkEntry 6 }
+
+dslLinkContact OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "A contact person, address or phone number."
+  ::= { dslLinkEntry 7 }
+
+dslLinkCustomerId OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "An identification number which has been assigned to this customer."
+  ::= { dslLinkEntry 8 }
+
+dslLinkDynamicSlotAllocation OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "If set to true(1), the link allows timeslots reserved for voice but
+          currently unused for usage by data. This can improve utilization
+          of the link by increasing the effective data rate. If set to false(2),
+          reserved and unused voice timeslots are not released for data usage."
+  ::= { dslLinkEntry 9 }
+
+dslLinkIsRemotePower OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "LTU puts dc supply voltage onto link. IAD uses this if local power
+          fails."
+  ::= { dslLinkEntry 10 }
+
+dslLinkLineRate OBJECT-TYPE
+  SYNTAX      INTEGER(3..36)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Number of 64Kbit timeslots per second. The signal on the DSL link is
+          structured as 166 2/3 frames with 48 blocks each, for a total of 8000
+          blocks per second. Each block contains 3 to 36 bytes (also called
+          timeslots), as configured by this object. The bit rate of the DSL link
+          is derived from this value.
+          Individual timeslots can be used for data, for voice, or for voice
+          related signalling data (D-channels). The number of data and voice
+          timeslots is configured with dslLinkDataRate and dslLinkNumberOfBRA.
+          The value of this variable cannot be set outside the range of 3..36,
+          inclusive. It should be chosen such that the following conditions
+          hold:
+              if dslLinkNumberOfBRA is zero
+                  dslLinkLineRate >= dslLinkDataRate
+              if dslLinkNumberOfBRA is not zero
+                  dslLinkLineRate >= dslLinkDataRate + 2*dslLinkNumberOfBRA + 1
+          If the value violates this condition, the DSL link raises a
+          'configuration' alarm."
+  ::= { dslLinkEntry 11 }
+
+dslLinkDataRate OBJECT-TYPE
+  SYNTAX      INTEGER(0..36)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Number of timeslots per block reserved for data. The value of this
+          object cannot be set outside of the range 0..36, inclusive. It should
+          be chosen such that the following conditions hold:
+              if dslLinkNumberOfBRA is zero
+                  dslLinkDataRate <= dslLinkLineRate
+              if dslLinkNumberOfBRA is not zero
+                  dslLinkDataRate <= dslLinkLineRate - 2*dslLinkNumberOfBRA - 1
+          If the value violates this condition, the DSL link raises a
+          'configuration' alarm.
+          The value of this object gives the guaranteed capacity available for
+          data. If dslLinkDynamicSlotAllocation is true(1), the effective data
+          rate may be higher."
+  ::= { dslLinkEntry 12 }
+
+dslLinkName OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "User defined name of the DSL link."
+  ::= { dslLinkEntry 13 }
+
+dslLinkNotes OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Notes stored in the configuration file of the agent."
+  ::= { dslLinkEntry 14 }
+
+dslLinkNumberOfBRA OBJECT-TYPE
+  SYNTAX      INTEGER(0..4)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Number of basic rate interfaces on the IAD for which capacity is
+          reserved on the DSL link. The capacity is reserved in units of
+          timeslots, and the table below shows the number of timeslots reserved
+          as a function of dslLinkNumberOfBRA.
+
+                                 voice       dslLinkDynamicSlotAllocation
+          dslLinkNumberOfBRA   reservation       true(1)     false(2)
+          ---------------------------------------------------------------
+                  0                0               0           0
+                  1                3              1-3          3
+                  2                5              1-5          5
+                  3                7              1-7          7
+                  4                9              1-9          9
+
+          If dslLinkNumberOfBRA is 0, no timeslots are reserved in the DSL link.
+          If dslLinkNumberOfBRA is non-zero, one timeslot is always reserved
+          and used for D-channel signalling. For each BRA allowed, exactly
+          two timeslots are reserved (one each for the two B-channels of the
+          basic rate interface). When dynamic (time)slot allocation is off,
+          reserved timeslots are unavailable for data. If dynamic slot
+          allocation is in effect, reserved voice timeslots are used only on
+          demand, that is when a phone call is being made. Reserved but unused
+          voice timeslots are then used for data, increasing the data rate.
+          The timeslot for the D-channel is not dynamically allocated. If a
+          D-channel is reserved, it is unavailable for data.
+          The value of this object cannot be set outside of the range 0..4. It
+          should be chosen such that the following conditions hold:
+              dslLinkNumberOrBRA <= (dslLinkLineRate - dslLinkDataRate - 1) / 2
+              dslLinkNumberOrBRA <= number of basic rate interfaces on the IAD
+          where the division should round towards zero. If the value violates
+          either of these conditions, the DSL link raises a 'configuration'
+          alarm.
+
+          Note that if the IAD is not connected, the link may raise the alarm
+          only when the IAD connects. It is allowed to set a value less than the
+          actual number of basic rate interfaces present on the IAD."
+  ::= { dslLinkEntry 15 }
+
+dslLinkOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { dslLinkEntry 16 }
+
+dslLinkNumberOfZBits OBJECT-TYPE
+  SYNTAX      INTEGER(0..1)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Number of Z bits on the DSL link."
+  ::= { dslLinkEntry 17 }
+
+dslLinkPSDMask OBJECT-TYPE
+  SYNTAX      DslLinkPSDMaskEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "PSD (Power Spectral Density) Mask of DSL link. Asymmetric PSD offers 
+          a 5 - 10% longer DSL range. PSD symmetric is default setting. PSD 
+          asymmetric is only possible with line rates n = 32 or 36."
+  ::= { dslLinkEntry 18 }
+
+dslLinkAssignedTrunk OBJECT-TYPE
+  SYNTAX      TrunkNumberOrZero
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Determines the data trunk (aggregate side) on which the all data 
+          traffic of this DSL Link is mapped."
+  ::= { dslLinkEntry 19 }
+
+dslLinkPriority OBJECT-TYPE
+  SYNTAX      Priority
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Determines the priority according to IEEE 802.3x for data traffic 
+          coming from this DSL Link. Value range is 0 .. 7. 0 lowest priority, 
+          7 highest priority."
+  ::= { dslLinkEntry 20 }
+
+
+-- DSL Card: IAD Table
+
+IadAlarmStatusElem ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "Bitset to represent alarms on a IAD."
+  SYNTAX      BITS {
+                powerdown(0),
+                lifeline(1),
+                dcContinuity(2)
+              } 
+
+IadISDNPoweringEnum ::= INTEGER {
+    off(1),
+    normal(2),
+    lifeline(3),
+    always(4)
+  }
+
+IadPOTSPoweringEnum ::= INTEGER {
+    off(1),
+    always(2)
+  }
+
+iadTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF IadEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "IAD table. IAD is for Integrated Access Device. The IAD contains the
+          DSL NTU, and depending on the model, ISDN Adapters, POTS Terminal
+          Adapters (TA) and Ethernet interfaces. The IAD is also called just
+          modem or NTU.
+          The table contains one entry per DSL link. The entry exists even if
+          the IAD is offline (that is disconnected)."
+  ::= { dsl 3 }
+
+iadEntry OBJECT-TYPE
+  SYNTAX      IadEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Carry index for iad table."
+  AUGMENTS    { dslLinkEntry }
+  ::= { iadTable 1 }
+
+IadEntry ::= SEQUENCE {
+-- Device part, without AdminState
+    iadAvailabilityStatus  AvailabilityStatusElem,
+    iadHardwareVersion     DisplayString,
+    iadManufacturer        DisplayString,
+    iadName                DisplayString,
+    iadOperState           OperStateEnum,
+    iadFirmwareVersion     DisplayString,
+    iadSerialNumber        DisplayString,
+  --action install new software
+  --action: reset
+-- Iad part
+    iadAlarmStatus         IadAlarmStatusElem,
+  --iadBridgeFilterEnabled  obsolete?
+  --iadDslInterface         really? oid?
+  --iadFullDuplexEnabled    obsolete?
+  --iadHDLCModeOn           obsolete?
+    iadISDNPowering        IadISDNPoweringEnum,
+    iadPOTSPowering        IadPOTSPoweringEnum,
+    iadEthPortSpeed        DataPortSpeedEnum,
+    iadEthCurrentPortSpeed DataPortSpeedEnum,
+    iadEthFlowControl      DataPortFlowControlEnum,
+    iadEthCurrentFlowControl DataPortFlowControlEnum
+  }
+
+iadAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { iadEntry 1 }
+
+iadHardwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Hardware version of the IAD. This is also called CHM-number (it
+          always starts with the letters 'CHM'). Example: CHM415080WAAA2. The
+          number '415' after the 'CHM' identifies the device as an IAD."
+  ::= { iadEntry 2 }
+
+iadManufacturer OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Name of company which manufactured this IAD."
+  ::= { iadEntry 3 }
+
+iadName OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "User defined name of IAD."
+  ::= { iadEntry 4 }
+
+iadOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { iadEntry 5 }
+
+iadFirmwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Version number and build date of the firmware running on the IAD.
+          Example:
+            '1.3 20020607 16:34'
+          The format is 'major.minor YYYYMMDD hh:mm', where the fields are:
+          major     Major and minor version numbers, separated by a dot. Take at
+          minor     most 5 characters together, including the space. Both major
+                    and minor consist of digits only.
+          YYYYMMDD  Date (year YYYY, month MM 1-12 and day DD 1-31) of firmware
+                    build. Preceded and followed by exactly one space to
+                    separate it from the version numbers and time.
+          hh:mm     Time (hour hh 0-23 and minute mm 0-59) of firmware build."
+  ::= { iadEntry 6 }
+
+iadSerialNumber OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Serial number of the IAD. Also called HM-number, as it always
+          starts with 'HM'. Example: HMHMZ014432064."
+  ::= { iadEntry 7 }
+
+iadAlarmStatus OBJECT-TYPE
+  SYNTAX      IadAlarmStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Alarm Status of IAD. Individual alarms show that specific
+           (usually adverse) conditions are present. Bits are assigned
+           as follows:
+           bit 0      powerdown    The IAD has no local power.
+           bit 1      lifeline     The IAD is operating on lifeline, i.e.
+                                   is taking power from the DSL line, not
+                                   from the local power supply."
+  ::= { iadEntry 8 }
+
+iadISDNPowering OBJECT-TYPE
+  SYNTAX      IadISDNPoweringEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "State of the powering of the ISDN S-Bus port 0.
+          no power        No powering of ISDN S0 Bus at all.
+          normal power    Powering of ISDN S0 Bus, normal mode.
+          lifeline power  Lifeline mode
+          always power    Supporting  normal operation and lifeline operation."
+  ::= { iadEntry 9 }
+
+iadPOTSPowering OBJECT-TYPE
+  SYNTAX      IadPOTSPoweringEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Defines how the IAD powers the POTS line, i.e. the analog telephone
+          line on the integrated TA. This feature is not reliable on older IAD
+          models."
+  ::= { iadEntry 10 }
+
+iadEthPortSpeed OBJECT-TYPE
+  SYNTAX      DataPortSpeedEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Configuration of the desired speed for the IAD's Ethernet port."
+  ::= { iadEntry 11 }
+
+iadEthCurrentPortSpeed OBJECT-TYPE
+  SYNTAX      DataPortSpeedEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Displays the currently active speed of a IAD's Ethernet port."
+  ::= { iadEntry 12 }
+
+iadEthFlowControl OBJECT-TYPE
+  SYNTAX      DataPortFlowControlEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Configuration of the desired flow control."
+  ::= { iadEntry 13 }
+
+iadEthCurrentFlowControl OBJECT-TYPE
+  SYNTAX      DataPortFlowControlEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Displays the currently used flow control."
+  ::= { iadEntry 14 }
+
+
+-- DSL Card: DSL Interface Table
+
+DslInterfaceTypeEnum ::= INTEGER {
+    ltu(1),
+    ntu(2)
+  }
+
+DslPerformanceStatusElem ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "Possible status values or alarms for a DSL interface."
+  SYNTAX      BITS {
+                att(0),  --loop attenuation
+                losw(1)  --LOSW failure (frame synch lost)
+              }
+
+dslInterfaceTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF DslInterfaceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "DSL Interface table."
+  ::= { dsl 4 }
+
+dslInterfaceEntry OBJECT-TYPE
+  SYNTAX      DslInterfaceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row/index definition for dslInterfaceTable."
+  INDEX   { dslCardSlotNumber, dslLinkNumber, dslInterfaceType }
+  ::= { dslInterfaceTable 1 }
+
+DslInterfaceEntry ::= SEQUENCE {
+    dslInterfaceType                        DslInterfaceTypeEnum,
+
+    dslInterfaceAvailabilityStatus          AvailabilityStatusElem,
+    dslInterfaceOperState                   OperStateEnum,
+    dslInterfacePerformanceStatus           DslPerformanceStatusElem,
+    dslInterfacePerfControlIndexOrZero      INTEGER,
+    dslInterfaceSignalQuality               Integer32,
+    dslInterfaceAttenuation                 Integer32
+  }
+
+dslInterfaceType OBJECT-TYPE
+  SYNTAX      DslInterfaceTypeEnum
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "The type of device on which the interface sits: LTU (linecard) or
+           Ntu (IAD, modem)."
+  ::= { dslInterfaceEntry 1 }
+
+dslInterfaceAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+         "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { dslInterfaceEntry 2 }
+
+dslInterfaceOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { dslInterfaceEntry 3 }
+
+dslInterfacePerformanceStatus OBJECT-TYPE
+  SYNTAX      DslPerformanceStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Displays the current status of the DSL interface"
+  ::= { dslInterfaceEntry 4 }
+
+dslInterfacePerfControlIndexOrZero OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "If the value of this variable is set to a non-zero value, there must
+          be a row in perfControlTable with this value in perfControlIndex. The
+          perfControlEntry thus identified controls the performance history
+          entries in perfDataTable for the DSL interface referencing the
+          perfControlEntry.
+          If the value is set to zero, performance history for this interface
+          is removed from the perfDataTable."
+  DEFVAL    { 0 }
+  ::= { dslInterfaceEntry 5 }
+
+dslInterfaceSignalQuality OBJECT-TYPE
+  SYNTAX      Integer32 (-128 .. 127)
+  UNITS       "dB"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "This object gives the signal quality, expressed as the
+          signal-to-noise ratio (SNR) in decibels (dB).
+          The value 127 shows that the real value is currently unavailable."
+  REFERENCE
+          "ETSI TS 101 524 [SDSL], clauses 10.5.5.7.15-16."
+  ::= { dslInterfaceEntry 6 }
+
+dslInterfaceAttenuation OBJECT-TYPE
+  SYNTAX      Integer32 (-128 .. 127)
+  UNITS       "dB"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "This object shows how much the signal has been weakened (attenuated)
+          on the DSL line. It is expressed in decibels (dB) relative to the
+          transmit power.
+          The value -128 shows that the real value is currently not available.
+          The value normally increases with the line length."
+  REFERENCE
+          "ETSI TS 101 524 [SDSL], clauses 10.5.5.7.5 and 10.5.5.7.15-16."
+  ::= { dslInterfaceEntry 7 }
+
+
+-- DSL Card: Class of Service (COS) table for DSL links 
+
+CosClassifierEnum ::= INTEGER {
+    vlanPriority(1),
+    dscpPriority(2)
+  }
+
+CosClassmap ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Meaning and length of the octet string depends on the value of 
+        dslLinkCOSClassifier. If vlanPriority(1) is used, only the first 
+        octet is valid. Each bit represents the number of a vlan that is 
+        used for the particular queue (EF, AF2 or AF1). In case of 
+        dscpPriority(2), 8 octets represent the 64 priorities.
+        Within each octet, the most significant bit represents the lowest 
+        numbered vlan/priority, and the least significant bit represents 
+        the highest numbered vlan/priority. 
+        
+        octet-to-vlan/prio mappings (1st number = value for MSB):
+                 octet1 octet2 octet3 octet4 octet5 octet6 octet7 octet8
+        vlan(1):  0..7    -      -      -      -      -      -      -
+        dscp(2):  0..7  8..15  16..23 24..31 32..39 40..47 48..55 56..64"
+    SYNTAX      OCTET STRING (SIZE (0..8))
+
+
+dslLinkCosTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF DslLinkCosEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Class of Service (COS) table for a DSL link. The table allows 
+          to assign vlans or priorities to the queues EF (Expedited 
+          Forwarding) and AF1/AF2 (Assured Forwarding). The last queue, 
+          BE (Best Effort) gets the bandwidth that is left.
+
+            queue: priority:  bandwidth:
+             EF     highest    configurable
+             AF2    higher     configurable
+             AF1    lower      configurable
+             BE     lowesr     left-over"
+  ::= { dsl 5 }
+
+dslLinkCosEntry OBJECT-TYPE
+  SYNTAX      DslLinkCosEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row/index definition for dslLinkCosTable."
+  AUGMENTS    { dslLinkEntry }
+  ::= { dslLinkCosTable 1 }
+
+DslLinkCosEntry ::= SEQUENCE {
+    dslLinkCosAvailable     TruthValue,
+    dslLinkCosEnabled       TruthValue,
+    dslLinkCosClassifier    CosClassifierEnum,
+    dslLinkCosClassmapEF    CosClassmap,
+    dslLinkCosClassmapAF2   CosClassmap,
+    dslLinkCosClassmapAF1   CosClassmap,
+    dslLinkCosRateLimitEF   INTEGER,
+    dslLinkCosRateLimitAF2  INTEGER,
+    dslLinkCosRateLimitAF1  INTEGER
+  }
+
+dslLinkCosAvailable OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          " If true(1), COS is supported by the LineCard."
+  ::= { dslLinkCosEntry 1 }
+
+dslLinkCosEnabled OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Enabling and disabling of COS for the specified link."
+  ::= { dslLinkCosEntry 2 }
+
+dslLinkCosClassifier OBJECT-TYPE
+  SYNTAX      CosClassifierEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Configuration of the desired classifier. Possible values are 
+          VLAN priority and DSCP (Differentiated Services Code Point) 
+          priority."
+  ::= { dslLinkCosEntry 3 }
+
+dslLinkCosClassmapEF OBJECT-TYPE
+  SYNTAX      CosClassmap
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Classmap for the EF (Expedited Forwarding) queue. See 
+          description of CosClassmap for further information."
+  ::= { dslLinkCosEntry 4 }
+
+dslLinkCosClassmapAF2 OBJECT-TYPE
+  SYNTAX      CosClassmap
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Classmap for the AF2 (Assured Forwarding) queue. See 
+          description of CosClassmap for further information."
+  ::= { dslLinkCosEntry 5 }
+
+dslLinkCosClassmapAF1 OBJECT-TYPE
+  SYNTAX      CosClassmap
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Classmap for the AF1 (Assured Forwarding) queue. See 
+          description of CosClassmap for further information."
+  ::= { dslLinkCosEntry 6 }
+
+dslLinkCosRateLimitEF OBJECT-TYPE
+  SYNTAX      INTEGER (0..2312)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Maximum rate in kB that the EF queue is allowed to use.
+          Note: The sum of the maxima of EF, AF1 and AF2 queue cannot 
+          exceed the configured maximum data rate od the DSL link."
+  ::= { dslLinkCosEntry 7 }
+
+dslLinkCosRateLimitAF2 OBJECT-TYPE
+  SYNTAX      INTEGER (0..2312)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Maximum rate in kB that the AF2 queue is allowed to use.
+          Note: The sum of the maxima of EF, AF1 and AF2 queue cannot 
+          exceed the configured maximum data rate od the DSL link."
+  ::= { dslLinkCosEntry 8 }
+
+dslLinkCosRateLimitAF1 OBJECT-TYPE
+  SYNTAX      INTEGER (0..2312)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Maximum rate in kB that the AF1 queue is allowed to use.
+          Note: The sum of the maxima of EF, AF1 and AF2 queue cannot 
+          exceed the configured maximum data rate od the DSL link."
+  ::= { dslLinkCosEntry 9 }
+
+
+-- *******************************************************************
+-- v5 card group
+--
+-- This group consist of 5 tables:
+--  - v5CardTable
+--  - v5LinkTable
+--  - v5InterfaceTable
+--  - v5LccTable
+--  - v5IsdnPortTable
+-- *******************************************************************
+
+-- V5 Card: Enumeration and Set types used in the v5 group
+
+V5ClockModeEnum ::= INTEGER {
+    v5ClockMaster(1),
+    v5ClockSlave(2)
+  }
+
+V5ClockSourceEnum ::= INTEGER {
+    v5ClockExternal(1),
+    v5ClockLink1(2),
+    v5ClockLink2(3),
+    v5ClockLink3(4),
+    v5ClockLink4(5),
+    v5ClockLink5(6),
+    v5ClockLink6(7),
+    v5ClockLink7(8),
+    v5ClockLink8(9)
+  }
+
+V5ProtocolVersionEnum ::= INTEGER {
+    v51(1),
+    v52(2)
+  }
+
+V5CardFlagSet ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+    "Possible configuration flags that can be applied to the V5 card."
+  SYNTAX      BITS {
+                noFastAlign(0),          --suppress accelerated alignment
+                noLinkId(1),             --suppress link identification
+                autoPortUnblock(2),      --automatic port unblock
+                retryAutoPortUnblock(3), --retry automatic port unblock
+                rejectLinkId(4),         --reject link identification
+                forcePSTNDL(5),          --force PSTN-DL establish at startup
+                slowStart(6),            --slow start with 96 sec. delay
+                deallocBlockedPort(7)    --automatic de-alloc when port blocked
+              }
+
+-- V5 Card: V5 Card Table
+
+v5CardTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF V5CardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing V5 card specific information"
+  ::= { v5 1 }
+
+v5CardEntry OBJECT-TYPE
+  SYNTAX      V5CardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for V5 card table."
+  INDEX   { v5CardSlotNumber }
+  ::= { v5CardTable 1 }
+
+V5CardEntry ::= SEQUENCE {
+    v5CardSlotNumber          V5SlotNumber,
+
+--Device part
+    v5CardAdminState          AdminStateEnum,
+    v5CardAvailabilityStatus  AvailabilityStatusElem,
+    v5CardHardwareVersion     DisplayString,
+    v5CardManufacturer        DisplayString,
+    v5CardName                DisplayString,
+    v5CardOperState           OperStateEnum,
+    v5CardFirmwareVersion     DisplayString,
+    v5CardSerialNumber        DisplayString,
+  --action installNewSoftware
+--Slotcard part
+    v5CardCommState           CommStateEnum,
+--V5 specific (=non-shared) part of V5 card
+    v5CardIsProvisioning      TruthValue,
+    v5CardClockMode           V5ClockModeEnum,
+    v5CardClockSource1        V5ClockSourceEnum,
+    v5CardClockSource2        V5ClockSourceEnum,
+    v5CardProtocolVersion     V5ProtocolVersionEnum,
+    v5CardRowStatus           RowStatus,
+    v5CardFlags               V5CardFlagSet,
+    v5CardETSIRelease         INTEGER,
+    v5CardE1LineCode          INTEGER,
+    v5CardE1FrameFormat       INTEGER
+  }
+
+v5CardSlotNumber OBJECT-TYPE
+  SYNTAX      V5SlotNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Slot number for v5 card."
+  ::= { v5CardEntry 1 }
+
+v5CardAdminState OBJECT-TYPE
+  SYNTAX      AdminStateEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+         "This configuration attribute allows the administrator to enable or
+         disable the operability of a device.
+         unlocked   The device is administratively permitted to perform services
+                    for its users.
+         locked     The device is administratively prohibited from performing 
+                    services for users."
+  ::= { v5CardEntry 2 }
+
+v5CardAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { v5CardEntry 3 }
+
+v5CardHardwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Hardware version of the V5 card. This is also called CHM-number (it
+          always starts with the letters 'CHM'). Example: CHM40210WA0A2. The
+          number '402' after the 'CHM' identifies the card as a V5 card."
+  ::= { v5CardEntry 4 }
+
+v5CardManufacturer OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Name of company which manufactured this V5 card."
+  ::= { v5CardEntry 5 }
+
+v5CardName OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "User defined name of the V5 card."
+  ::= { v5CardEntry 6 }
+
+v5CardOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { v5CardEntry 7 }
+
+v5CardFirmwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Version number and build date of the firmware running on the V5 card.
+          Example:
+            '1.3 20020607 16:34'
+          The format is 'major.minor YYYYMMDD hh:mm', where the fields are:
+          major     Major and minor version numbers, separated by a dot. Take at
+          minor     most 5 characters together, including the space. Both major
+                    and minor consist of digits only.
+          YYYYMMDD  Date (year YYYY, month MM 1-12 and day DD 1-31) of firmware
+                    build. Preceded and followed by exactly one space to
+                    separate it from the version numbers and time.
+          hh:mm     Time (hour hh 0-23 and minute mm 0-59) of firmware build."
+  ::= { v5CardEntry 8 }
+
+v5CardSerialNumber OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Serial number of the V5 card. Also called HM-number, as it always
+          starts with 'HM'. Example: HMHMZ014532139."
+  ::= { v5CardEntry 9 }
+
+v5CardCommState OBJECT-TYPE
+  SYNTAX      CommStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The Management Comm State indicates the state of the management 
+          connection between the PEM Server and the Data Card.
+          disconnected            No connection has been established.
+          init                    A connection has freshly been established on 
+                                  the underlying protocol, but no management 
+                                  information has been transmitted so far.
+          identification          The connected device is being identified.
+          check hardware          The connected hardware is compared to the one 
+                                  stored in the configuration.
+          hardware adaptation     If the configured and the existing device do 
+                                  not match, an adoption is made. The behaviour 
+                                  in this case can be configured with the 'HW 
+                                  Adaptation Policy' option.
+
+          check program version   The program version of the connected hardware 
+                                  is compared to the one stored in the configura-
+                                  tion.
+          check config version    The configuration version of the connected 
+                                  hardware is compared to the one stored in the 
+                                  configuration.
+          download config         If a configuration version mismatch has bee 
+                                  detected and the 'Config Priority' of 'PEGASUS 
+                                  system' is set to 'Device', the configuration 
+                                  is downloaded from the device to the PEM Server.
+          upload config           If a configuration version mismatch has been 
+                                  detected and the 'Config Priority' of 'PEGASUS 
+                                  system' is set to 'Server', the configuration 
+                                  is uploaded from the PEM Server to the device.
+          status synch            The values of the status properties are being 
+                                  synchronised.
+          resetting               The device is resetting.
+          inactive                The device is connected, but it is inactive,
+                                  i.e. not operational. This may be due to a
+                                  hardware mismatch.
+          active                  The management connection between the device 
+                                  and the PEM Server is fully established and the 
+                                  device is active."
+  ::= { v5CardEntry 10 }
+
+v5CardIsProvisioning OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The V5 Card is in provisioning mode. Only if this flag is true,
+          re-configuration of the V5 Card is possible."
+  ::= { v5CardEntry 11 }
+
+v5CardClockMode OBJECT-TYPE
+  SYNTAX      V5ClockModeEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Clock mode of the V5 Card
+          Master  This card is the clock master.
+          Slave   This card is a clock slave."
+  ::= { v5CardEntry 12 }
+
+v5CardClockSource1 OBJECT-TYPE
+  SYNTAX      V5ClockSourceEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "If the card is configured to be the clock master (v5CardClockMode),
+          this property determines the source of the clock. Values range is 
+          1 .. 8 or external clock (from plug on front panel)."
+  ::= { v5CardEntry 13 }
+
+v5CardClockSource2 OBJECT-TYPE
+  SYNTAX      V5ClockSourceEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "If the card is configured to be the clock master (v5CardClockMode),
+          this property determines the source of the clock in case clock source
+          1 is not available. Value range is 1 .. 8 or external clock (from plug
+          on front panel)."
+  ::= { v5CardEntry 14 }
+
+v5CardProtocolVersion OBJECT-TYPE
+  SYNTAX      V5ProtocolVersionEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "The version of the V5 protocol. Can be either V5.1 or V5.2"
+  REFERENCE
+          "G.964 for the V5.1 protocol
+           G.965 for the V5.2 protocol"
+  ::= { v5CardEntry 15 }
+
+v5CardRowStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "This object allows creation and deletion of V5 card table entries.
+          The card can only be deleted when it is disconnected. V5 cards are
+          always created with 512 user ports. All other objects (V5 interfaces,
+          V5 links, and log comm channels) must be created separately.
+          If the card is deleted, all objects related to it are also deleted.
+          To configure the card, or any object associated with it, the card
+          must be disconnected or v5CardRowStatus must not be 'active'.
+          Setting v5CardRowStatus to 'notInService' while the card is connected
+          puts the card into provisioning mode. Setting v5CardRowStatus to
+          'active' while the card is connected commits provisioning, that is
+          ends provisioning mode (or fails if the card finds the configuration
+          incorrect or incomplete)."
+  ::= { v5CardEntry 16 }
+
+v5CardFlags OBJECT-TYPE
+  SYNTAX      V5CardFlagSet
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "This object holds various flags which can be set to modify the
+          behaviour of the V5 protocol stack."
+  ::= { v5CardEntry 17 }
+
+v5CardETSIRelease OBJECT-TYPE
+  SYNTAX      INTEGER {
+                v1(1),
+                v2(2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "The ETSI release (version) of the V5 standard used for the V5
+          protocol on all V5 interface of the V5 card. This must not be
+          confused with the choice of the V5 protocol (V5.1 or V5.2)."
+  ::= { v5CardEntry 18 }
+
+v5CardE1LineCode OBJECT-TYPE
+  SYNTAX      INTEGER {
+                hdb3(1),
+                ami(2)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "The E1 line code used on all V5 links of the V5 card."
+  ::= { v5CardEntry 19 }
+
+v5CardE1FrameFormat OBJECT-TYPE
+  SYNTAX      INTEGER {
+                crc4(1),
+                crc4e(2),
+                dff(3)
+              }
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "The frame format of E1 frames used on all V5 links of the V5 card."
+  ::= { v5CardEntry 20 }
+
+
+-- V5 Card: V5 Link Table
+
+V5LinkNumber ::= INTEGER(1..8)
+
+V5LinkNumberOrZero ::= INTEGER(0..8)
+
+V5InterfaceNumber ::= V5LinkNumber
+
+V5InterfaceNumberOrZero ::= V5LinkNumberOrZero
+
+V5PccCount ::= INTEGER(0..3)
+
+V5LinkAlarmStatusElem ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "Bitset that represents all possible alarms for a V5 link."
+  SYNTAX      BITS {
+                v5LinkAlarmLOS(0),
+                v5LinkAlarmLFA(1),
+                v5LinkAlarmAIS(2),
+                v5LinkAlarmBERH(3),
+                v5LinkAlarmEXTLOC(4),
+                v5LinkAlarmRAI(5),
+                v5LinkAlarmIdFailure(6)
+              }
+
+V5LinkTypeEnum ::= INTEGER {
+    primary(1),
+    secondary(2),
+    normal(3)
+  }
+
+v5LinkTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF V5LinkEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing V5 link specific information"
+  ::= { v5 2 }
+
+v5LinkEntry OBJECT-TYPE
+  SYNTAX      V5LinkEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for V5 link table."
+  INDEX   { v5CardSlotNumber, v5LinkNumber }
+  ::= { v5LinkTable 1 }
+
+V5LinkEntry ::= SEQUENCE {
+    v5LinkNumber                  V5LinkNumber,
+
+    v5LinkAdminState              AdminStateEnum,
+    v5LinkAvailabilityStatus      AvailabilityStatusElem,
+    v5LinkId                      INTEGER,
+    v5LinkOperState               OperStateEnum,
+    v5LinkInterface               V5InterfaceNumberOrZero,
+    v5LinkAlarmStatus             V5LinkAlarmStatusElem,
+    v5LinkType                    V5LinkTypeEnum,
+    v5LinkNumberOfPcc             V5PccCount,
+    v5LinkPerfControlIndexOrZero  INTEGER,
+    v5LinkRowStatus               RowStatus,
+    v5LinkLineIdentifier          DisplayString
+  }
+
+v5LinkNumber OBJECT-TYPE  
+  SYNTAX      V5LinkNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Number of the link on the V5 card (used for table indexing)."
+  ::= { v5LinkEntry 1 }
+
+v5LinkAdminState OBJECT-TYPE
+  SYNTAX      AdminStateEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "This configuration attribute allows the administrator to enable or
+          disable the operability of a device.
+          unlocked   The device is administratively permitted to perform
+                     services for its users.
+          locked     The device is administratively prohibited from performing 
+                     services for users."
+  ::= { v5LinkEntry 2 }
+
+v5LinkAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { v5LinkEntry 3 }
+
+v5LinkId OBJECT-TYPE
+  SYNTAX      INTEGER(0..255)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "V5 Link Identifier. Value range is 0 .. 255"
+  ::= { v5LinkEntry 4 }
+
+v5LinkOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { v5LinkEntry 5 }
+
+v5LinkInterface OBJECT-TYPE
+  SYNTAX      V5InterfaceNumberOrZero
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Identifies to which V5 interface this V5 link is related."
+  ::= { v5LinkEntry 6 }
+
+v5LinkAlarmStatus OBJECT-TYPE
+  SYNTAX      V5LinkAlarmStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Alarm status of the V5 link. Bits assigned as follows:
+           bit 0    LOS         Loss of signal
+           bit 1    LFA         Loss of frame alignment
+           bit 2    AIS         Alarm indication signal
+           bit 3    BERH        Bit error rate to high
+           bit 4    EXTLOC      Loss of external clock
+           bit 5    RAI         Remote alarm indication"
+  ::= { v5LinkEntry 7 }
+
+v5LinkType OBJECT-TYPE
+  SYNTAX      V5LinkTypeEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Specifies the type of V5 Link
+          Primary     The primary link carries all the important V5 Protocols.
+                      Therefore it needs to have at least one Physical Communi-
+                      cation Channel on timeslot 16. There must be exactly one 
+                      primary link per V5 interface.
+          Secondary   The secondary link acts as 'standby' link for the primary 
+                      link; i.e. if the primary link fails, the secondary link 
+                      will transport the V5 Protocols instead. Therefore it needs 
+                      to have an unused PhysComm Channel on timeslot 16. If more 
+                      than one links are available, there must be exactly one 
+                      secondary link per V5 interface.
+          Normal      All other links are 'normal' links and do not take any 
+                      predefined responsibility concerning protection mechanisms."
+  ::= { v5LinkEntry 8 }
+
+v5LinkNumberOfPcc OBJECT-TYPE
+  SYNTAX      V5PccCount
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "The number of Physical Communication Channel (Physcommchan or
+          PCC) configured on this V5 link. V5 links are structured as 8000
+          frames per second of 32 timeslots each. A timeslot can carry voice
+          data, or alternatively signalling, e.g. synchronization data, CRC's,
+          or D-channel data. Timeslot 0 is always used for signalling by lower
+          level layers of E1. For higher level signalling like D-channels,
+          additional timeslots must be explicitly allocated - these are called
+          physcommchans. Timeslots 16, 15 and 31 are available for this purpose.
+          So, a V5 link can have from zero to three physcommchans. Timeslots
+          are always allocated in the order mentioned above, that is the
+          following configurations are possible:
+
+                                 Timeslots allocated to
+          v5LinkNumberOfPcc      higher level signalling
+                  0              -
+                  1              16
+                  2              16,15
+                  3              16,15,31
+
+          Timeslots that are not used for signalling are available for voice
+          data. So, a link can have from 28 to 31 voice data channels."
+  ::= { v5LinkEntry 9 }
+
+v5LinkPerfControlIndexOrZero OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "The value of this variable represents the index of a row within 
+          the perfControlTable. If the value is not 0, performance data 
+          (statistics) concerning this link are captured."
+  ::= { v5LinkEntry 10 }
+
+v5LinkRowStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "RowStatis variable that allows creation and deletion of V5 links."
+  ::= { v5LinkEntry 11 }
+
+v5LinkLineIdentifier OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "An idenifier assigned to the subscriber (customer)."
+  ::= { v5LinkEntry 12 }
+
+
+-- V5 Card: V5 Interface Table
+
+V5InterfaceAlarmSet ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+          "Bitset that contains the possible alarms for a V5 interface"
+  SYNTAX      BITS {
+                idFailure(0),
+                provisioningMismatch(1)
+              }
+
+v5InterfaceTable  OBJECT-TYPE
+  SYNTAX      SEQUENCE OF V5InterfaceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing V5 interface specific information. Only AN
+           side interfaces are present."
+  ::= { v5 3 }
+
+v5InterfaceEntry OBJECT-TYPE
+  SYNTAX      V5InterfaceEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for V5 interface table."
+  INDEX   { v5CardSlotNumber, v5InterfaceNumber }
+  ::= { v5InterfaceTable 1 }
+
+V5InterfaceEntry ::= SEQUENCE {
+    v5InterfaceNumber              V5InterfaceNumber,
+
+    v5InterfaceAdminState          AdminStateEnum,
+    v5InterfaceAvailabilityStatus  AvailabilityStatusElem,
+    v5InterfaceId                  INTEGER,
+    v5InterfaceOperState           OperStateEnum,
+    v5InterfaceVariantId           INTEGER,
+    v5InterfaceRowStatus           RowStatus,
+    v5InterfaceAlarmStatus         V5InterfaceAlarmSet
+  }
+
+v5InterfaceNumber OBJECT-TYPE
+  SYNTAX      V5InterfaceNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "interface number, used for table indexing"
+  ::= { v5InterfaceEntry 1 }
+
+v5InterfaceAdminState OBJECT-TYPE
+  SYNTAX      AdminStateEnum
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "This configuration attribute allows the administrator to enable or
+          disable the operability of a device.
+          unlocked   The device is administratively permitted to perform
+                     services for its users.
+          locked     The device is administratively prohibited from performing 
+                     services for users."
+  ::= { v5InterfaceEntry 2 }
+
+v5InterfaceAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { v5InterfaceEntry 3 }
+
+v5InterfaceId  OBJECT-TYPE
+  SYNTAX      INTEGER(0..16777215)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "V5 Interface Identifier. Value range is 0 .. 16777215."
+  REFERENCE
+          "G.964, section 14.4.2.5.7"
+  ::= { v5InterfaceEntry 4 }
+
+v5InterfaceOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { v5InterfaceEntry 5 }
+
+v5InterfaceVariantId OBJECT-TYPE
+  SYNTAX      INTEGER(0..127)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Indicates the V5 provisioning variant, which is currently valid. 
+          This is used to decide if the configuration is compliant with the LE. 
+          Value range is 0 .. 127."
+  REFERENCE
+          "G.964, section 14.4.2.5.6"
+  ::= { v5InterfaceEntry 6 }
+
+
+v5InterfaceRowStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Variable to create and delete V5 interfaces."
+  ::= { v5InterfaceEntry 7 }
+
+v5InterfaceAlarmStatus OBJECT-TYPE
+  SYNTAX      V5InterfaceAlarmSet
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Displays the currently active alarms of the V5 interface."
+  ::= { v5InterfaceEntry 8 }
+
+
+-- V5 Card: V5 LCC Table (Logical Communication Channel)
+
+-- Lccs belong to exactly one V5 interface. So the V5 interface can naturally
+-- be used as part of the index. This yields two index columns, slot-number of
+-- the V5 card and V5 interface number within the V5 card. In other words, the
+-- index for lccTable includes the index columns of the V5 interface table.
+-- Because a V5 interface generally has more than one LCC, more index material
+-- is needed. The LCC has no really good attribute for this, so we use the
+-- component index. This is immutable and guaranteed to be unique within the
+-- V5 interface (although the fact is not helpful, it is usually unique with
+-- the V5 card). This makes the lccTable an extension of the V5 interface table.
+
+V5LccNumber ::= INTEGER (1..21)
+V5LccNumberOrZero ::= INTEGER (0..21)
+V5PccNumberOrZero ::= INTEGER (0..3)
+
+v5LccTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF V5LccEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "table containing all LCC (Logical Communication Channels) 
+          for a V5 interface"
+  ::= { v5 4 }
+
+v5LccEntry OBJECT-TYPE
+  SYNTAX      V5LccEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "row defintion for the v5LccTable"
+  INDEX   { v5CardSlotNumber, v5InterfaceNumber, v5LccNumber }
+  ::= { v5LccTable 1 }
+
+V5LccEntry ::= SEQUENCE {
+    v5LccNumber              V5LccNumber,
+
+    v5LccIsProtected         TruthValue,
+    v5LccId                  INTEGER,
+    v5LccOperState           OperStateEnum,
+
+  --Identify the related PCC. The PCC is uniquely described through slot number
+  --of the V5 card, V5 link on the card, and timeslot within the link. The slot
+  --number is redundant (it must be equal to the slot number used to index the
+  --lcc table). So two attributes are used to identify the PCC: the V5 link and
+  --the timeslot. We must verify them together, as a combination, and therefore 
+  --both attributes have to be set before the modification of the PCC becomes 
+  --active. The PCC can be cleared by setting one attribute to 0.
+
+    v5LccPccV5LinkNumber     V5LinkNumberOrZero,
+    v5LccPccTimeslot         V5PccNumberOrZero,
+    v5LccRowStatus           RowStatus
+  }
+
+v5LccNumber OBJECT-TYPE
+  SYNTAX      V5LccNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "index of the LCC; number in the range of 1..21"
+  ::= { v5LccEntry 1 }
+
+v5LccIsProtected OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "If true, all information transported over this LCC is protected by 
+          the V5 Protection protocol (V5.2 only)."
+  ::= { v5LccEntry 2 }
+
+v5LccId OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Unique L3 address per Logical Communication Channel. Value range is 
+          0 .. 65535."
+  ::= { v5LccEntry 3 }
+
+v5LccOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { v5LccEntry 4 }
+
+v5LccPccV5LinkNumber OBJECT-TYPE
+  SYNTAX      V5LinkNumberOrZero
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Identify (together with v5LccPccTimeslot) the Physical Communication
+          Channel used for the signalling data of this Logical Communication
+          Channel."
+  ::= { v5LccEntry 5 }
+
+v5LccPccTimeslot OBJECT-TYPE
+  SYNTAX      V5PccNumberOrZero
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "Identify (together with v5LccPccV5LinkNumber) the Physical
+          Communication Channel used for the signalling data of this Logical
+          Communication Channel.
+          The value of this variable is a code with the following value:
+          v5LccPccTimeslot   Timeslot
+            0                  none
+            1                  16
+            2                  15
+            3                  31
+          A value of 0 cannot be set explicitly, and can only appear while the
+          LCC object is being initialized. Once a non-zero value has been set
+          (either through SNMP or by other means of management, a value of
+          0 can never again appear."
+  ::= { v5LccEntry 6 }
+
+v5LccRowStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+          "The value of this object can be active(1) in order for the value
+          of v5LccPccV5LinkNumber or v5LccPccTimeslot to be modified. To set 
+          the PCC both attributes v5LccPccV5LinkNumber and v5LccPccTimeslot 
+          must be set before the values become active. 
+          The values become only active if v5LccPccV5LinkNumber and 
+          v5LccPccTimeslot specify an existing Physical Communication Channel 
+          on the V5 card identified by the instance of v5CardSlotNumber used 
+          to index this v5LccEntry."
+  ::= { v5LccEntry 7 }
+
+
+-- V5 Card: V5 ISDN Port Table
+
+V5IsdnPortLoopEnum ::= INTEGER {
+    none(1),
+    loop1(2),
+    loop2(3)
+  }
+
+V5IsdnPortBlockingStatusEnum ::= INTEGER {
+    none(1),
+    local(2),
+    remote(3),
+    both(4)
+  }
+
+V5IsdnPortAlarmStatusElem ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "Bitset representing the possible alarms for a ISDN port."
+  SYNTAX      BITS {
+                l1ActivationFault(0),
+                losTref(1),
+                losDsig(2)
+              }
+
+V5TimeslotNumber ::= INTEGER (1 .. 15 | 17 .. 31)
+V5EnvelopeFuncAddress ::= INTEGER (0 .. 8175)
+
+v5IsdnPortTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF V5IsdnPortEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "A table containing information specific to V5 ISDN user ports,
+           i.e. S0 interfaces on IADs."
+  ::= { v5 5 }
+
+v5IsdnPortEntry OBJECT-TYPE
+  SYNTAX      V5IsdnPortEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "Row and index definition for V5 ISDN user port table. Sometimes,
+           user ports are numbered 0..511 (8 cards @ 16 ltus @ 4 bras/ntu),
+           with an implicit assignment of
+           linecard  = port/(8*16).
+           dsl link  = port%(8*16)/4
+           bra       = port%(8*16*4)."
+  INDEX { dslCardSlotNumber, dslLinkNumber, v5IsdnPortBRANumber }
+  ::= { v5IsdnPortTable 1 }
+
+--The related Dsl link attribute of the user port is already defined through
+--the index attributes ov V5IsdnPortEntry, so it is not reduplicated.
+
+V5IsdnPortEntry ::= SEQUENCE {
+    v5IsdnPortBRANumber            INTEGER,
+
+--user port part
+    v5IsdnPortAdminState           AdminStateEnum,
+    v5IsdnPortOperState            OperStateEnum,
+    v5IsdnPortBlockingStatus       V5IsdnPortBlockingStatusEnum,
+    v5IsdnPortV5CardSlotNumber     V5SlotNumber,
+    v5IsdnPortV5InterfaceNumber    V5InterfaceNumberOrZero,
+--v5 user port part
+    v5IsdnPortBearer1Timeslot      V5TimeslotNumber,
+    v5IsdnPortBearer2Timeslot      V5TimeslotNumber,
+    v5IsdnPortEnvelopeFuncAddress  V5EnvelopeFuncAddress,
+    v5IsdnPortDSignallingCommChan  V5LccNumberOrZero,
+    v5IsdnPortFrameCommChan        V5LccNumberOrZero,
+    v5IsdnPortPacketCommChan       V5LccNumberOrZero,
+    v5IsdnPortIsActivated          TruthValue,
+    v5IsdnPortAlarmStatus          V5IsdnPortAlarmStatusElem,
+    v5IsdnPortActiveLoop           V5IsdnPortLoopEnum,   -- obsolete
+    v5IsdnPortLineIdentifier       DisplayString
+  }
+
+v5IsdnPortBRANumber OBJECT-TYPE
+  SYNTAX      INTEGER(1..4)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+          "index number for this port"
+  ::= { v5IsdnPortEntry 3 }
+
+v5IsdnPortAdminState OBJECT-TYPE
+  SYNTAX      AdminStateEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "This configuration attribute allows the administrator to enable or
+          disable the operability of a device.
+          unlocked   The device is administratively permitted to perform
+                     services for its users.
+          locked     The device is administratively prohibited from performing 
+                     services for users."
+  ::= { v5IsdnPortEntry 4 }
+
+v5IsdnPortOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { v5IsdnPortEntry 5 }
+
+v5IsdnPortBlockingStatus OBJECT-TYPE
+  SYNTAX      V5IsdnPortBlockingStatusEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "In the case of an unlocked/disabled status, this attribute 
+          indicates, if the disabled-state is due to local or remote reasons 
+          (ETS 300 376-1, A.2), (Definition in ETS 300 377-1)
+          None    The User Port is unblocked.
+          Local   The User Port is blocked on the Access Network side only
+          Remote  The User Port is blocked on the Local Exchange side only
+          Both    The User Port is blocked both on the AN and on the LE side."
+  ::= { v5IsdnPortEntry 6 }
+
+v5IsdnPortBearer1Timeslot OBJECT-TYPE
+  SYNTAX      V5TimeslotNumber
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Assigned bearer time slot number to port B1 channel. No assignment 
+          for V5.2 interfaces because the BCC protocol is used for dynamic 
+          assignment. In V5.1 the association between V5Interface and V5Link 
+          is one to one. The link associated to this user port is fully 
+          determined by the UserPort-V5Interface association. Value range is 
+          1 .. 15 or 17 .. 31."
+  ::= { v5IsdnPortEntry 7 }
+
+v5IsdnPortBearer2Timeslot OBJECT-TYPE
+  SYNTAX      V5TimeslotNumber
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Assigned bearer time slot number to port B2 channel. No assignment 
+          for V5.2 interfaces because the BCC protocol is used for dynamic 
+          assignment. In V5.1 the association between V5Interface and V5Link 
+          is one to one. The link associated to this user port is fully 
+          determined by the UserPort-V5Interface association. Value range is 
+          1 .. 15 or 17 .. 31."
+  ::= { v5IsdnPortEntry 8 }
+
+v5IsdnPortEnvelopeFuncAddress OBJECT-TYPE
+  SYNTAX      V5EnvelopeFuncAddress
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "Layer 3 Address of this User Port. Value range is 0 .. 8175."
+  ::= { v5IsdnPortEntry 9 }
+
+v5IsdnPortIsActivated  OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Layer 1 activation status"
+  ::= { v5IsdnPortEntry 10 }
+
+v5IsdnPortAlarmStatus OBJECT-TYPE
+  SYNTAX      V5IsdnPortAlarmStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "displays the currently active alarms for the ISDN port"
+  ::= { v5IsdnPortEntry 11 }
+
+v5IsdnPortActiveLoop OBJECT-TYPE
+  SYNTAX      V5IsdnPortLoopEnum
+  MAX-ACCESS  read-write
+  STATUS      obsolete
+  DESCRIPTION
+          ""
+  ::= { v5IsdnPortEntry 12 }
+
+v5IsdnPortV5CardSlotNumber OBJECT-TYPE
+  SYNTAX      V5SlotNumber
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+          "Slot number of V5 card which owns this user port configuration.
+          Physically, user ports are on IAD devices. Logically, their
+          configuration is part of the V5 configuration, so it is the V5
+          card which owns the configuration, not the DSL card.
+          For this reason, user ports are created in the context of a V5
+          card, which is why the V5 card cannot be changed."
+  ::= { v5IsdnPortEntry 13 }
+
+v5IsdnPortV5InterfaceNumber OBJECT-TYPE
+  SYNTAX      V5InterfaceNumberOrZero
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The V5 interface whose V5 links provide signalling and B channel
+          capacity for this user port. The value zero appears only after
+          creation. Once a non-zero value has been set here, it is no more
+          possible to reset the value to zero."
+  ::= { v5IsdnPortEntry 14 }
+
+v5IsdnPortDSignallingCommChan OBJECT-TYPE
+  SYNTAX      V5LccNumberOrZero
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The ISDN Communication Path over which the D-Signalling control 
+          information of this User Port is transported."
+  ::= { v5IsdnPortEntry 15 }
+
+v5IsdnPortFrameCommChan OBJECT-TYPE
+  SYNTAX      V5LccNumberOrZero
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The ISDN Communication Path over which the Frame control information 
+          of this User Port is transported."
+  ::= { v5IsdnPortEntry 16 }
+
+v5IsdnPortPacketCommChan OBJECT-TYPE
+  SYNTAX      V5LccNumberOrZero
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "The ISDN Communication Path over which the Packet control information
+          of this User Port is transported."
+  ::= { v5IsdnPortEntry  17 }
+
+v5IsdnPortLineIdentifier OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+          "An idenifier assigned to the subscriber (customer)."
+  ::= { v5IsdnPortEntry 18 }
+
+
+-- *******************************************************************
+-- data card group
+--
+--  This group contains two tables:
+--  - dataCardTable
+--  - dataPortTable
+-- *******************************************************************
+
+
+-- Data Card: Data Card Table
+
+dataCardTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF DataCardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "attributes concerning the data switch (slot 1)"
+  ::= { data 1 }
+
+dataCardEntry OBJECT-TYPE
+  SYNTAX      DataCardEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "entry/row within the dataCardTable"
+  INDEX       { dataCardSlotNumber }
+  ::= { dataCardTable 1 }
+
+DataCardEntry ::= SEQUENCE {
+--Device part, without AdminState
+    dataCardSlotNumber          DataCardSlotNumber,
+    dataCardAvailabilityStatus  AvailabilityStatusElem,
+    dataCardHardwareVersion     DisplayString,
+    dataCardManufacturer        DisplayString,
+    dataCardName                DisplayString,
+    dataCardOperState           OperStateEnum,
+    dataCardFirmwareVersion     DisplayString,
+    dataCardSerialNumber        DisplayString,
+  --action installNewSoftware
+--Slotcard Part
+    dataCardCommState           CommStateEnum,
+--Data Switch Part
+--Most data switch specific options are in MIB-2
+    dataCardVLANMode            TruthValue
+  }
+
+dataCardSlotNumber OBJECT-TYPE
+  SYNTAX      DataCardSlotNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "Position of the slot card in the rack."
+  ::= { dataCardEntry 1 }
+
+dataCardAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { dataCardEntry 2 }
+
+dataCardHardwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Hardware Version Number of the data card. This is also called CHM-number
+      (it always starts with the letters 'CHM'). Example: CHM40310WA0A2. The
+      number '403' after the 'CHM' identifies the card as a data card."
+  ::= { dataCardEntry 3 }
+
+dataCardManufacturer OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Manufacturer of the data card."
+  ::= { dataCardEntry 4 }
+
+dataCardName OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current           
+  DESCRIPTION
+      "User defined name of the data card."
+  ::= { dataCardEntry 5 }
+
+dataCardOperState OBJECT-TYPE    
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The operational state is a status property indicating whether or not a
+      device is physically installed and working.
+      enabled   The device is partially or fully operable and available for use.
+      disabled  The device is totally inoperable and unavailable to provide 
+                service."
+  ::= { dataCardEntry 6 }
+
+dataCardFirmwareVersion OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current           
+  DESCRIPTION
+      "Version number and build date of the firmware running on the data card.
+      Example:
+        '1.3 20020607 16:34'
+      The format is 'major.minor YYYYMMDD hh:mm', where the fields are:
+      major     Major and minor version numbers, separated by a dot. Take at
+      minor     most 5 characters together, including the space. Both major
+                and minor consist of digits only.
+      YYYYMMDD  Date (year YYYY, month MM 1-12 and day DD 1-31) of firmware
+                build. Preceded and followed by exactly one space to
+                separate it from the version numbers and time.
+      hh:mm     Time (hour hh 0-23 and minute mm 0-59) of firmware build."
+  ::= { dataCardEntry 7 }
+
+dataCardSerialNumber OBJECT-TYPE    
+  SYNTAX      DisplayString (SIZE (0..20))
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Serial number of the data card. Also called HM-number, as it always
+      starts with 'HM'. Example: HMHMZ014332080."
+  ::= { dataCardEntry 8 }
+
+dataCardCommState OBJECT-TYPE
+  SYNTAX      CommStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The Management Comm State indicates the state of the management 
+          connection between the PEM Server and the Data Card.
+          disconnected            No connection has been established.
+          init                    A connection has freshly been established on 
+                                  the underlying protocol, but no management 
+                                  information has been transmitted so far.
+          identification          The connected device is being identified.
+          check hardware          The connected hardware is compared to the one 
+                                  stored in the configuration.
+          hardware adaptation     If the configured and the existing device do 
+                                  not match, an adoption is made. The behaviour 
+                                  in this case can be configured with the 'HW 
+                                  Adaptation Policy' option.
+
+          check program version   The program version of the connected hardware 
+                                  is compared to the one stored in the configura-
+                                  tion.
+          check config version    The configuration version of the connected 
+                                  hardware is compared to the one stored in the 
+                                  configuration.
+          download config         If a configuration version mismatch has bee 
+                                  detected and the 'Config Priority' of 'PEGASUS 
+                                  system' is set to 'Device', the configuration 
+                                  is downloaded from the device to the PEM Server.
+          upload config           If a configuration version mismatch has been 
+                                  detected and the 'Config Priority' of 'PEGASUS 
+                                  system' is set to 'Server', the configuration 
+                                  is uploaded from the PEM Server to the device.
+          status synch            The values of the status properties are being 
+                                  synchronised.
+          resetting               The device is resetting.
+          inactive                The device is connected, but it is inactive,
+                                  i.e. not operational. This may be due to a
+                                  hardware mismatch.
+          active                  The management connection between the device 
+                                  and the PEM Server is fully established and the 
+                                  device is active."
+  ::= { dataCardEntry 9 }
+
+dataCardVLANMode OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "If true(1), enhanced switching (trunk assignment according to setting in 
+      DSL link configuration) is enabled. Otherwise transparent switching (any 
+      DSL link to any trunk) is used."
+  ::= { dataCardEntry 10 }
+
+
+-- Data Card: Data Port Table
+
+dataPortTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF DataPortEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "The table contains an entry for each Ethernet trunk on the 
+      data switch (card)."
+  ::= { data 2 }
+
+dataPortEntry OBJECT-TYPE
+  SYNTAX      DataPortEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "entry within the dataPortTable"
+  INDEX       { dataCardSlotNumber, dataPortNumber }
+  ::= { dataPortTable 1 }
+
+DataPortEntry ::= SEQUENCE {
+    dataPortNumber                  TrunkNumber,
+    dataPortAdminState              AdminStateEnum,
+    dataPortOperState               OperStateEnum,
+    dataPortAvailabilityStatus      AvailabilityStatusElem,
+    dataPortSpeed                   DataPortSpeedEnum,
+    dataPortFlowControl             DataPortFlowControlEnum
+  }
+
+dataPortNumber OBJECT-TYPE
+  SYNTAX      TrunkNumber
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "index of the (ethernet) trunk on the data switch"
+  ::= { dataPortEntry 1 }
+
+dataPortAdminState OBJECT-TYPE
+  SYNTAX      AdminStateEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "This configuration attribute allows the administrator to enable or
+      disable the operability of a device.
+      unlocked   The device is administratively permitted to perform services 
+                 for its users.
+      locked     The device is administratively prohibited from performing 
+                 services for users."
+  ::= { dataPortEntry 2 }
+
+dataPortOperState OBJECT-TYPE
+  SYNTAX      OperStateEnum
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The operational state is a status property indicating whether or 
+          not a device is physically installed and working.
+          enabled   The device is partially or fully operable and available 
+                    for use.
+          disabled  The device is totally inoperable and unavailable to provide 
+                    service."
+  ::= { dataPortEntry 3 }
+
+dataPortAvailabilityStatus OBJECT-TYPE
+  SYNTAX      AvailabilityStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The availability status gives more detailed information about
+          failures within a device. An empty status set means that no error
+          exists. Possible status are:
+          in test       The device is under test.
+          failed        The device has an internal fault that prevents it from 
+                        operating.
+          power off     The device requires power to be applied and is not 
+                        powered on.
+          off line      The device requires a routine operation to be performed
+                        to place it online and make it available for use.
+          off duty      The device has been made inactive by an internal control
+                        process in accordance with a predetermined time
+                        schedule.
+          dependency    The device can not operate because some other resource 
+                        on which it depends is unavailable.
+          degraded      The device is partially defective but still operable.
+          not installed The device is not present, or incomplete.
+          log full      The log is full."
+  ::= { dataPortEntry 4 }
+
+dataPortSpeed OBJECT-TYPE
+  SYNTAX      DataPortSpeedEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "This object allows specification of options for three areas:
+
+      crossover    Normally, DTE and hub sockets are wired such that they can
+                   connect with a straight-through cable, that is the hub has
+                   RX and TX circuits swapped (it has internal crossover). If
+                   a DTE must be connected directly to another DTE (or hub port
+                   to a port on another hub), a crossover cable must be used.
+                   The data card trunk interfaces have an automatic crossover
+                   function, which turns on or off crossover. Any sort of cable
+                   can then be used to connect to any sort of device (DTE
+                   or hub).
+
+      duplex mode  If duplex mode is full duplex, transmission is allowed while
+                   data are received. With half duplex, transmission must wait
+                   until the receiver is idle.
+
+      speed        The port can operate in 10 or 100 MBits per second.
+
+
+      The values possible for this variable are:
+
+      autoCrossoverAndPortSpeed(1)   Allows the port to negotiate speed,
+                                     duplex mode, and to enable or disable
+                                     the internal crossover function.
+
+      autoNegotiationPortSpeed(2)    Allows the port to negotiate speed and
+                                     and duplex mode. Internal crossover is on
+                                     - a straight-through cable is needed to
+                                     connect to a DTE (PC), a crossover cable
+                                     is needed to connect to a repeater or hub.
+
+      base100TFullDuplex(3)          Speed is set to 100 MBits per second, with
+                                     full duplex. Internal crossover is on.
+
+      base100THalfDuplex(4)          Speed is set to 100 MBits per second, with
+                                     half duplex. Internal crossover is on.
+
+      base10TFullDuplex(5)           Speed is set to 10 MBits per second, with
+                                     full duplex. Internal crossover is on.
+
+      base10THalfDuplex(6)           Speed is set to 10 MBits per second, with
+                                     half duplex. Internal crossover is on."
+  REFERENCE
+      "IEEE 802.3, section 14.5.2: The Crossover Function."
+  ::= { dataPortEntry 5}
+
+dataPortFlowControl OBJECT-TYPE
+  SYNTAX      DataPortFlowControlEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "Setting of Flow Control according to IEEE 802.3x.
+      Auto  Enables auto negotiation of IEEE 802.3x flow control when in
+            full-duplex mode.
+      On    Force flow control operation
+      Off   No flow control."
+  ::= { dataPortEntry 6 }
+
+
+-- *******************************************************************
+-- pegasus system group
+--
+-- Note: Description, Location, Name are already in system!
+-- *******************************************************************
+
+ConfigPriorityEnum ::= INTEGER {
+    server(1),
+    device(2)
+  }
+
+HWAdaptionPolicyEnum ::= INTEGER {
+    device(1),
+    server(2)
+  }
+
+RackAlarmStatusElem ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "possible alarms concerning the Pegasus rack"
+  SYNTAX      BITS {
+                psu1Failure(0),
+                psu2Failure(1),
+                fanFailure(2),
+                urgentExt(3),
+                nonUrgentExt(4)
+              }
+
+autoPersistDelay OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "If Auto Persist Config is enabled, this is the delay (in seconds) after 
+      which the configuration is persisted on the PEM Server. The default value 
+      is: 10s."
+   ::= { pegasusSystem 1 }
+
+autoPersistEnabled OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "Determines, whether configuration changes are made persistent 
+      automatically (a certain interval after the last change of a configuration
+      attribute) or explicitly by a corresponding message from the PEM Client."
+   ::= { pegasusSystem 2 }
+
+configPriority OBJECT-TYPE
+  SYNTAX      ConfigPriorityEnum
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "Determines, which configuration is used in case of a configuration 
+      mismatch. Possible values: Server or device. Device: The device config is 
+      used (replaces server config). Server: The server config is used (replaces
+      device config)"
+   ::= { pegasusSystem 3 }
+
+hwAdaptionPolicy OBJECT-TYPE
+  SYNTAX      HWAdaptionPolicyEnum
+  MAX-ACCESS  read-write
+  STATUS      obsolete
+  DESCRIPTION
+      "In case of a hardware mismatch (the configured device does not match with
+      the one detected in the rack): shall the PEM Server be reconfigured with
+      the new device or shall the device be taken out of operation? Possible
+      Values: Server or Device. Device: The device config is used (replaces
+      server config). Server: The server config is used (replaces device
+      config)"
+   ::= { pegasusSystem 4 }
+
+ipBaseAddress OBJECT-TYPE
+  SYNTAX      IpAddress
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "Base address for the computation of the IP addresses for the management
+      interfaces of the cards. When the PEMServer wants to connect to a card
+      in the rack, it computes the card IP address from ipBaseAddress, the slot
+      number of the card, and the systemNumber of the rack (also in
+      pegasusSystem), as follows: the slot number is added to the last byte
+      of ipBaseAddress, modulo 256, and the systemNumber is added to the next
+      to last byte of ipBaseAddress, again modulo 256.
+
+      Example                      1               2               3
+      iPBaseAddress        |192.168.  0.  0|192.168.244.231|192.168.  0.  0
+      systemNumber         |         +4    |         +4    |         +4
+      slot number          |             +1|             +3|             +5
+      sum                  |          4   1|          4 234|          4   5
+      sum modulo 256       |          4   1|          4 234|          4   5
+      Resulting mgmt IP-#  |192.168.  4.  1|192.168.248.234|192.168.  4.  5
+
+      The slot cards compute their own management interface IP addresses in
+      a similar way, using their own ip base addresses.  These base addresses
+      are not visible through the PEM Client or SNMP. To read or change them
+      on a card, the CLI must be used.
+
+      All slot cards within a PEGASUS system must have the management IP
+      addresses in the same network in order to communicate with each other.
+      They must then have the same base address (with the exception
+      of biasing, as explained below).
+      The base addresses of all cards are usually chosen such that the
+      management IP addresses end up in a non-routable (private) networks.
+
+      Biasing: cards read slot and rack numbers through dedicated pins on
+      their backplane plugs.  If such a pin is damaged, cards read bad
+      numbers and compute bad (possibly conflicting) IP addresses.
+      In this case, the CLI can be used to set the base address such that the
+      resulting address is still correct."
+  REFERENCE
+          "RFC 1597, Section 3, Private Address Space"
+   ::= { pegasusSystem 5 }
+
+javaRuntimeVersion OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Version of the installed Java Runtime."
+   ::= { pegasusSystem 6 }
+
+javaVMName OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Name of the installed Java virtual machine."
+   ::= { pegasusSystem 7 }
+
+javaVMVersion OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Version of the installed Java virtual machine on the work-station."
+   ::= { pegasusSystem 8 }
+
+mgmtIPAddress OBJECT-TYPE
+  SYNTAX      IpAddress
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The IP Address of the PEGASUS system through which the PEM Server is 
+      accessible."
+   ::= { pegasusSystem 9 }
+
+--mgmtNetmask OBJECT-TYPE
+--  SYNTAX      IpAddress
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      ""
+--   ::= { pegasusSystem 10 }
+
+osArchitecture OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Displays information about the operating system where the PEM server
+      is running."
+   ::= { pegasusSystem 11 }
+
+osNameAndVersion OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Name and version of the operating system that is running on the
+      workstation where the PEM server is running."
+   ::= { pegasusSystem 12 }
+
+pemVersion OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The version of the PEM Software that is installed on the PEGASUS system."
+   ::= { pegasusSystem 13 }
+
+startedBy OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The username of the person that started the PEM server."
+   ::= { pegasusSystem 14 }
+
+systemNumber OBJECT-TYPE
+  SYNTAX      INTEGER
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "A number between 0 and 31 which uniquely identifies a PEGASUS system 
+      within a subnet. The system number is identified by the HW."
+   ::= { pegasusSystem 15 }
+
+mibRevision OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "The version number assigned by the version control system. You can query
+      this from the agent, to find out with which version of the MIB was built
+      into the agent. The value is also present in copies of the MIB to feed
+      into SNMP managers. Comparing the version numbers from both sources can
+      help to detect mismatches. The revision string for this version is:
+      $Workfile: PEGASUS.mib $ $Revision: 48 $ $Date: 12/17/04 1:16p $"
+  DEFVAL    { "$Workfile: PEGASUS.mib $ $Revision: 48 $ $Date: 12/17/04 1:16p $" }
+   ::= { pegasusSystem 16 }
+
+-- In the PEM client, the Pegasus System has an SNMP tab with the following
+-- properties:
+--
+-- ReadCommunity    string 40
+-- WriteCommunity   string 40
+-- TrapCommunity    string 40
+-- TrapDestination  string 40
+-- AgentPort        int
+-- AuthRespEnabled  boolean
+-- AuthTrapEnabled  boolean        this is in SNMPv2-MIB
+-- SysContact       string 80      this is in SNMPv2-MIB
+-- SetSerialNo      INTEGER        this is in SNMPv2-MIB
+--
+-- Here we implement the first six objects. The last three are already
+-- accessible through SNMPv2-MIB, and we do not repeat them here.
+
+readCommunity OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "SNMP operations with this community name are given read access to all
+      variables in the MIB."
+  ::= { pegasusSystem 17 }
+
+writeCommunity OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "SNMP operations with this community name are given read access to all
+      variables in the MIB, and write access to all writable variables in the
+      MIB. Note that you can write this value provided you know the old value.
+      For requests with a protocol offering no privacy, this variable always
+      reads as three stars (***).
+      Setting this to the empty string effectively turns off all SNMP write
+      access."
+  ::= { pegasusSystem 18 }
+
+trapCommunity OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "This community name is used for SNMPv1 or SNMPv2c traps sent by the
+      Pegasus system."
+  ::= { pegasusSystem 19 }
+
+trapDestination OBJECT-TYPE
+  SYNTAX      DisplayString (SIZE (0..40))
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "IP number of the system to receive traps from the Pegasus system. If this
+      variable is set to the empty string, the Pegasus system sends no traps."
+  ::= { pegasusSystem 20 }
+
+agentPort OBJECT-TYPE
+  SYNTAX      INTEGER (0..65535)
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "UDP port number of the SNMP agent on the Pegasus system. The initial
+      value is the standard SNMP port number for SNMP, 161. If this variable
+      is set to a non-zero value different from the old value, the agent is
+      immediately restarted with the new port number. If the value is set to
+      zero, the agent is turned off."
+  ::= { pegasusSystem 21 }
+
+authRespEnabled OBJECT-TYPE
+  SYNTAX      TruthValue
+  MAX-ACCESS  read-write
+  STATUS      obsolete
+  DESCRIPTION
+      "If authentication/authorization fails for an SNMP request, the agent
+      normally replies with an SNMP standard error message. If this variable is
+      set to false(2), the agent sends no error message. The initial value is
+      true(1)."
+  ::= { pegasusSystem 22 }
+
+rackAlarmStatus OBJECT-TYPE
+  SYNTAX      RackAlarmStatusElem
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Shows the alarms currently set for the Pegasus rack."
+  ::= { pegasusSystem 23 }
+
+
+-- *******************************************************************
+-- perf group (performance history)
+--
+-- This group contains one object and two tables:
+-- - perfSweepCiclePeriod
+-- - perfControlTable
+-- - perfDataTable
+-- *******************************************************************
+
+PerfControlStatus ::= TEXTUAL-CONVENTION
+  STATUS      current
+  DESCRIPTION
+      "status of a performance control entry"
+  SYNTAX      BITS {
+                busy(0),
+                offline(1),
+                data(2),
+                marked(3)
+              }
+
+perfSweepCyclePeriod OBJECT-TYPE
+  SYNTAX      INTEGER (0..604800)
+  UNITS       "Seconds"
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+      "Time in seconds between attempts to clear unused performance history
+      data. Performance history can take a lot of memory. If the manager fails
+      to delete entries in the perfControlTable, the memory will never be
+      recovered. To avoid this, the agent periodically removes entries which
+      have not been used recently. This is done through a mark-and-sweep
+      method, as follows:
+      - each perfControEntry has a mark
+      - reading perfDataEntries sets the mark on associated perfControlEntry
+      - the sweeper sweeps all perfControlEntries periodically. If an entry is
+        not marked, it is deleted. If an entry is marked, it is unmarked, and
+        will be deleted in the next sweep, if not used (marked) before.
+      This value is volatile"
+  DEFVAL    { 300 }
+  ::= { perf 1 }
+
+
+-- Perf: Performance Control Table
+
+perfControlTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF PerfControlEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "The table is used to control the gathering of G.826 statistics. This 
+      is currently possible for DSL interfaces and V5 links. If it's desired 
+      to get statstic samples, a row within this table must be created. Then 
+      link between subject and this entry must be established using the 
+      variables dslInterface- and v5LinkPerfControlIndexOrZero. Afterwards 
+      the perfDataTable is filled and can be read."
+  ::= { perf 2 }
+
+perfControlEntry OBJECT-TYPE
+  SYNTAX      PerfControlEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "Definition of a row within the perfControlTable. Such a row contains 
+      information about the monitored subject (currently DSL interfaces and 
+      V5 links) and the status of the monitoring."
+  INDEX       { perfControlIndex }
+  ::= { perfControlTable 1 }
+
+PerfControlEntry ::= SEQUENCE {
+    perfControlIndex                  Integer32,
+    perfControlStatus                 PerfControlStatus,
+    perfControlLinkDescr              DisplayString,
+    perfControlUpdatePeriod           INTEGER,
+    perfControlEffectiveUpdatePeriod  INTEGER,  -- obsolete
+    perfControlRowStatus              RowStatus
+  }
+
+perfControlIndex OBJECT-TYPE
+  SYNTAX      Integer32 (1..2147483647)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "index of perfControlEntries"
+  ::= { perfControlEntry 1 }
+
+perfControlStatus OBJECT-TYPE
+  SYNTAX      PerfControlStatus
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "This is a set of bits giving information on the status of this entry of
+      the perfControlTable. The meaning of the individual bits is as follows:
+
+      bit   name          Description
+
+       0    busy          This bit is one if there is a DSL interface or
+                          V5 link referencing this perfControlEntry through
+                          a dslInterfacePerfControlIndexOrZero or a
+                          v5LinkPerfControlIndexOrZero value.
+                          This indicates that this perfControlEntry is busy, and
+                          its perfControlIndex value cannot be used in another
+                          DSL interface or V5 link.
+                          If the ...PerfControlIndexOrZero of the referencing
+                          interface or link is set to zero, this bit is also
+                          set to zero to show that this perfControlEntry is no
+                          longer busy - it can be used in another interface
+                          or link.
+
+       1    offline       Device is offline, data may be absent or out of date.
+                          This bit is 0 if the last attempt to get performance
+                          history data from the device succeeded. In this case,
+                          the data bit (see below) is also 1. This bit (offline)
+                          is 1 if the last attempt to get performance history
+                          data failed. In this case, if no data have been 
+                          received from the device, the data bit is 0, and no
+                          perfDataEntries are associated with this
+                          perfControlEntry. If some data was received from the
+                          device before the device went offline, the data bit
+                          may be 1, but the data may be out of date.
+
+       2    data          Data is present. If this perfControlEntry is active,
+                          busy, and the device is not offline, this bit is to 1,
+                          which indicates that the perfDataEntries associated
+                          with this perfControlEntry are present and can be read
+                          from the perfDataTable.
+
+       3    marked        This perfControlEntry has been used recently. The
+                          sweeper periodically sweeps all perfControlEntries,
+                          deleting entries with 0 in this bit. For entries with
+                          1 in this bit, the bit is set to 0. Reading
+                          perfDataEntries sets the marked bit of the associated
+                          perfControlEntries to 1."
+  ::= { perfControlEntry 2 }
+
+perfControlLinkDescr OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Description of the interface or link using this perfControlEntry.
+      If the perfControlEntry is busy, the value is a textual description of
+      the object referencing this entry through its ...PerfControlIndexOrZero
+      instance. Example:
+       dslInterface 8.1.ltu   (DSL interface on card in slot 8, link 1, on ltu)
+       v5Link 3.8             (V5 link 8 on V5 card in slot 3)
+      If the perfControlEntry is not busy, the value is the empty string (length
+      zero).
+      This object helps to find the interface or link using this entry."
+  ::= { perfControlEntry 3 }
+
+perfControlUpdatePeriod OBJECT-TYPE
+  SYNTAX      INTEGER(0..180)
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+      "Time interval in seconds to wait between querying the performance history
+       data from the device. Minimum value is 1 second. Shorter values yield
+       more accurate/up-to-date figures, at higher communication cost. A value
+       of 0 turns off online reporting."
+  ::= { perfControlEntry 4 }
+
+perfControlEffectiveUpdatePeriod OBJECT-TYPE
+  SYNTAX      INTEGER(0..180)
+  MAX-ACCESS  read-only
+  STATUS      obsolete
+  DESCRIPTION
+      "If several clients monitor the same V5 link or DSL interface, each sets
+      its own update period. The server then computes the greatest common
+      divisor of all values. For example, if a PEM client wants to have an
+      update every 15 seconds, and the SNMP agent wants an update every 21
+      seconds, the server will produce updates every 3 seconds (15=3*5,
+      21=3*7). The subsequence of every fifth update than has a period of 15
+      seconds, and the subsequence of every seventh has a period of 21 seconds."
+  ::= { perfControlEntry 5 }
+
+perfControlRowStatus OBJECT-TYPE
+  SYNTAX      RowStatus
+  MAX-ACCESS  read-create
+  STATUS      current
+  DESCRIPTION
+      "Attribute to create and delete rows dynamically."
+  ::= { perfControlEntry 6 }
+
+
+-- Perf: Performance Data Table
+
+PerfHistoryType ::= INTEGER {
+    history15m(1),
+    history24h(2)
+  }
+
+
+perfDataTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF PerfDataEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "G.826 statistics table for DSL interfaces and V5 links. Each entry is 
+      associated to exactly one perfControlEntry that represents the link 
+      between the DSL interface or V5 link and the data entry."
+  ::= { perf 3 }
+
+perfDataEntry OBJECT-TYPE
+  SYNTAX      PerfDataEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "Each perfDataEntry is associated with exactly one perfControlEntry
+      row through the perfControlIndex instance which is part of the index."
+  INDEX       { perfControlIndex, perfDataKind, perfDataIndex }
+  ::= { perfDataTable 1 }
+
+PerfDataEntry ::= SEQUENCE {
+    perfDataKind                PerfHistoryType,
+    perfDataIndex               Integer32,
+    perfDataES                  Integer32,
+    perfDataSES                 Integer32,
+    perfDataUAS                 Integer32,
+    perfDataCV                  Integer32, --anomaly
+    perfDataLOSWS               Integer32  --defect
+  }
+
+perfDataKind OBJECT-TYPE
+  SYNTAX      PerfHistoryType
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "The second position in the index, shows the type of history - either
+      'history15m' (15 minute history) or 'history24h' (24 hour history)."
+  ::= { perfDataEntry 1 }
+
+perfDataIndex OBJECT-TYPE
+  SYNTAX      Integer32 (1..2147483647)
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+      "Register number. Each register has 5 values (ES/SES/UAS/CV/LOSWS). The
+      15 minute history has 32 history registers, indexed from 1 to 32. Each
+      accumulates its measures over 15 minutes. The register with index 1 is the
+      oldest register (numerical equals chronological order). The 15 minute
+      history has an additional entry (index 33) for the current register (which
+      is only updated when perfControlUpdatePeriod of the associated
+      perfControlEntry is not zero).
+      The 24 hour history has 7 true history registers, indexed 1 to 7. These
+      accumulate there measures over 24 hours. Again, the register with index 1
+      is the oldest, and again, there is a current register with index 8. This
+      current register is updated every 15 minutes, no matter what the value of
+      perfControlUpdatePeriod of the associated perfControlEntry is."
+  ::= { perfDataEntry 2 }
+
+-- For the data fields, Counter and Gauge cannot be used (both are unsigned,
+-- but we need negative values). Also, Counter semantics are incompatible with
+-- out register 'shifting'.
+
+perfDataES OBJECT-TYPE
+  SYNTAX      Integer32
+  UNITS       "Seconds"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Number of errored seconds. An errored second is one with at least one
+      CRC anomaly (see perfDataCV below) and/or at least one LOSW defect (see
+      perfDataLOSWS below). In the 15 minute history, this register ranges from
+      0 to 900. In the 24 hour history, it ranges from 0 to 86400 (=24*3600)
+      seconds).
+      This register is inhibited, that is not counted while UAS is counting.
+      Due to variations in the communication delay, sampling periods can
+      slightly deviate from their ideal length of 15 minutes or 24 hours. This
+      can cause the register to show values somewhat above 900 (86400 resp.)
+      seconds."
+  REFERENCE
+      "ETSI TS 101 524 'Symmetrical single pair high bitrate Digital Subscriber
+      Line (SDSL)'. Clause 10.3, 'SDSL Line Related Performance Parameters'."
+  ::= { perfDataEntry 3 }
+
+perfDataSES OBJECT-TYPE
+  SYNTAX      Integer32
+  UNITS       "Seconds"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Number of severely errored seconds. A severely errored second is one with
+      50 or more CRC anomalies (see perfDataCV below) or at least one LOSW
+      defect (see perfDataLOSWS below). In the 15 minute history, this register
+      ranges from -9 to about 450. In the 24 hour history, it ranges from -9 to
+      about 43200. (These limits may seem strange, but are a result of the UAS
+      derivation and SES inhibition rules of the ETSI standard.
+      This register is inhibited, that is not counted while UAS is counting.
+      Deviations in the sampling period length can cause this register to
+      deviate from its true value (see perfDataES)."
+  REFERENCE
+      "ETSI TS 101 524 'Symmetrical single pair high bitrate Digital Subscriber
+      Line (SDSL)'. Clause 10.3, 'SDSL Line Related Performance Parameters'."
+  ::= { perfDataEntry 4 }
+
+perfDataUAS OBJECT-TYPE
+  SYNTAX      Integer32
+  UNITS       "Seconds"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Number of unavailable seconds. Seconds from the beginning of 10 or more
+      SES (perfDataSES) to the beginning of 10 or more non-SES are considered
+      as unavailable. In the 15 minute history, this register ranges from -9 to
+      900. In the 24 hour history, it ranges from -9 to 86400 (24*3600).
+      Deviations in the sampling period length can cause this register to
+      deviate from the true value (see perfDataES)."
+  REFERENCE
+      "ETSI TS 101 524 'Symmetrical single pair high bitrate Digital Subscriber
+      Line (SDSL)'. Clause 10.3, 'SDSL Line Related Performance Parameters'."
+  ::= { perfDataEntry 5 }
+
+perfDataCV OBJECT-TYPE
+  SYNTAX      Integer32
+  UNITS       "Frames with CRC faults"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Number of error checking code faults (the usual error checking code is
+      CRC). DSL links are structured as 166 2/3 frames per second, each with a
+      CRC value.
+      This register is subject to inhibition, that is it counts at most 50 CRC
+      faults per second."
+  REFERENCE
+      "ETSI TS 101 524 'Symmetrical single pair high bitrate Digital Subscriber
+      Line (SDSL)'. Clause 10.3, 'SDSL Line Related Performance Parameters'."
+  ::= { perfDataEntry 6 }
+
+perfDataLOSWS OBJECT-TYPE
+  SYNTAX      Integer32
+  UNITS       "Seconds"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+      "Number of seconds with one or more LOSW defects (loss of frame
+      synchronization word)."
+  REFERENCE
+      "ETSI TS 101 524 'Symmetrical single pair high bitrate Digital Subscriber
+      Line (SDSL)'. Clause 10.3, 'SDSL Line Related Performance Parameters'."
+  ::= { perfDataEntry 7 }
+
+END

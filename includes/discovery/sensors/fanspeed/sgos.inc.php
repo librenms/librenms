@@ -1,0 +1,18 @@
+<?php
+
+echo 'ProxySG ';
+$fan_index = 0;
+for ($index = 21; $index < 39; $index++) { //Proxy SG Fan OID end in 21-38
+    $fanstatus_oid = ".1.3.6.1.4.1.3417.2.1.1.1.1.1.6.$index";
+    $fanstatus = SnmpQuery::get($fanstatus_oid)->value();
+    if ($fanstatus != 'notInstalled') {
+        $fan_oid = ".1.3.6.1.4.1.3417.2.1.1.1.1.1.5.$index";
+        $descr_oid = ".1.3.6.1.4.1.3417.2.1.1.1.1.1.9.$index";
+        $limit_oid = ".1.3.6.1.4.1.10876.2.1.1.1.1.6.$index";
+        $descr = SnmpQuery::get($descr_oid)->value();
+        $current = SnmpQuery::get($fan_oid)->value();
+        $divisor = '1';
+        discover_sensor(null, 'fanspeed', $device, $fan_oid, $fan_index, 'sgos', $descr, 1, '1', null, null, null, null, $current);
+    }
+    $fan_index++;
+}//end for

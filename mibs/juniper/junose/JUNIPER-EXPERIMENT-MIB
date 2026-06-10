@@ -1,0 +1,60 @@
+--
+-- Juniper Networks: SNMP Experimental MIB Registry
+-- 
+-- Copyright (c) 2003, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JUNIPER-EXPERIMENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI               -- RFC 2578
+    juniperMIB
+        FROM JUNIPER-SMI;
+
+jnxExperiment MODULE-IDENTITY
+    LAST-UPDATED "200304170100Z" -- 17-Apr-03
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "Juniper Technical Assistance Center
+             Juniper Networks, Inc.
+             1194 N. Mathilda Avenue
+             Sunnyvale, CA 94089
+             E-mail: support@juniper.net"
+    DESCRIPTION
+        "The object identifiers for experimental MIBs for the Juniper Networks,
+        Inc. products.  This is the top-level object identifier registry for 
+        SNMP modules containing experimental MIB definitions.  Experimental 
+        MIBs are defined as:
+
+        1) IETF work-in-process MIBs which have not been assigned a permanent
+           object identifier by the IANA.
+
+        2) Juniper work-in-process MIBs that have not achieved final
+           production quality or field experience.
+
+        NOTE: Support for MIBs under the this OID subtree is temporary and
+              changes to objects may occur without notice."
+    REVISION     "200304170100Z" -- 17-Apr-03
+    DESCRIPTION
+            "Initial revision"
+    ::= { juniperMIB 5 }
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Experimental MIB OID assignments.
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+jnxBgpM2Experiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The object identifier used to anchor the experimental IETF draft
+        for the BGPv2 MIB."
+    REFERENCE
+        "IETF Inter-Domain Routing Working Group documents:
+            draft-ietf-idr-bgp4-mibv2-03.txt"
+    ::= { jnxExperiment 1 }
+
+END

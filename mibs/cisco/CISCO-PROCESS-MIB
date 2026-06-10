@@ -1,0 +1,2976 @@
+-- $Id$
+-- $Source$
+-- *****************************************************************
+-- CISCO-PROCESS-MIB.my: MIB for CPU and process statistics
+--   
+-- August 1998, Ramanathan R. Kavasseri
+--   
+-- Copyright (c) 1998, 2001, 2003, 2006-2011, 2020 by cisco Systems Inc.
+-- All rights reserved.
+-- *****************************************************************
+-- $Log$
+-- *****************************************************************
+-- $Endlog$
+--   
+-- This mib was extracted from RFC xxx
+
+CISCO-PROCESS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Gauge32,
+    Unsigned32,
+    NOTIFICATION-TYPE,
+    Counter64
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TimeStamp,
+    DisplayString,
+    RowStatus,
+    TruthValue,
+    RowPointer,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    CounterBasedGauge64
+        FROM HCNUM-TC
+    EntPhysicalIndexOrZero,
+    Unsigned64
+        FROM CISCO-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoProcessMIB MODULE-IDENTITY
+    LAST-UPDATED    "202004210000Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-snmp@cisco.com"
+    DESCRIPTION
+        "The MIB module to describe active system processes.
+        Virtual Machine refers to those OS which can run the 
+        code or process of a different executional model OS.
+        Virtual Process assume the executional model 
+        of a OS which is different from Native OS. Virtual
+        Processes are also referred as Tasks.
+        Thread is a sequence of instructions to be executed
+        within a program. Thread which adhere to POSIX standard
+        is referred as a POSIX thread."
+    REVISION        "202004210000Z"
+    DESCRIPTION
+        "Added new attribute in cpmProcessTable.
+        Added new notification for a process in cpmProcessTable
+        upon PM state change."
+    REVISION        "201106230000Z"
+    DESCRIPTION
+        "Added new table cpmCoreTable as well as a new optoinal
+        compliance group cpmCoreGroup."
+    REVISION        "201005060000Z"
+    DESCRIPTION
+        "Added the following new objects to the cpmCPUTotalTable.
+        cpmCPUMemoryCommitted, cpmCPUMemoryCommittedOvrFlow and
+        cpmCPUMemoryHCCommitted.
+
+        Added new compliance group cpmCPUTotalMemoryCommitGroup which
+        includes Committed memory objects.
+
+        Added new compliance cProcessMIBComplianceRev5 which 
+        deprecates cProcessMIBComplianceRev4."
+    REVISION        "200910120000Z"
+    DESCRIPTION
+        "Added TEXTUAL-CONVENTION called CPULoadAverage.
+        Added the following new objects to cpmCPUTotalTable.
+        cpmCPULoadAvg1min, cpmCPULoadAvg5min, cpmCPULoadAvg15min.
+
+        Added new compliance group cpmCPULoadAvgGroup which includes
+        load average objects.
+
+        Added new compliance cProcessMIBComplianceRev4 which 
+        deprecates cProcessMIBComplianceRev3."
+    REVISION        "200901230000Z"
+    DESCRIPTION
+        "Added the following new objects to cpmCPUTotalTable.
+        cpmCPUMemoryUsedOvrflw, cpmCPUMemoryHCUsed,
+        cpmCPUMemoryFreeOvrflw, cpmCPUMemoryHCFree,
+        cpmCPUMemoryKernelReservedOvrflw, cpmCPUMemoryHCKernelReserved,
+        cpmCPUMemoryLowestOvrflw, cpmCPUMemoryHCLowest
+
+        Added the following new objects to cpmProcessExtRevTable.
+        cpmProcExtMemAllocatedRevOvrflw, cpmProcExtHCMemAllocatedRev,
+        cpmProcExtMemFreedRevOvrflw, cpmProcExtHCMemFreedRev,
+        cpmProcessTextSegmentSizeOvrflw, cpmProcessHCTextSegmentSize,
+        cpmProcessDataSegmentSizeOvrflw, cpmProcessHCDataSegmentSize,
+        cpmProcessStackSizeOvrflw, cpmProcessHCStackSize,
+        cpmProcessDynamicMemorySizeOvrflw, cpmProcessHCDynamicMemorySize
+
+        Added the following new objects to cpmThreadTable.
+        cpmThreadStackSizeOvrflw, cpmThreadHCStackSize
+
+        Added the following new objects to cpmVirtualProcessTable.
+        cpmVirtualProcessMemAllocatedOvrflw,
+        cpmVirtualProcessHCMemAllocated,
+        cpmVirtualProcessMemFreedOvrflw, cpmVirtualProcessHCMemFreed
+
+        Added following new compliance groups.
+        cpmCPUTotalOverflowGroup, cpmCPUTotalOverflowGroup,
+        cpmProcessExtRevOverflowGroup, cpmProcessExtRevHCGroup,
+        cpmThreadOverflowGroup, cpmThreadHCGroup,
+        cpmVirtualProcessOverflowGroup, cpmVirtualProcessHCGroup
+
+        Added new compliance cProcessMIBComplianceRev3 which deprecates
+        cProcessMIBComplianceRev2."
+    REVISION        "200703230000Z"
+    DESCRIPTION
+        "Added new objects to support POSIX compliant OS. Added
+        cpmThread, cpmThreadTable, cpmVirtualProcess, 
+        cpmVirtualProcessTable and updated cpmCPUTotalTable, 
+        cpmProcessExtRevTable. Added cProcessMIBComplianceRev2
+        by deprecating cProcessMIBComplianceRev1. Added 
+        cpmCPUPosixMemoryGroup, cpmPosixProcessGroup, 
+        cpmThreadGroup, cpmVirtualProcessGroup."
+    REVISION        "200301220000Z"
+    DESCRIPTION
+        "cpmCPUThresholdTable, cpmCPUHistoryTable,
+        cpmCPUProcessHistoryTable are added for CPU thresholding 
+        feature."
+    REVISION        "200105180000Z"
+    DESCRIPTION
+        "The objects cpmProcExtUtil5Sec, cpmProcExtUtil1Min,
+        cpmProcExtUtil5Min,cpmCPUTotal5sec, cpmCPUTotal1min 
+        and cpmCPUTotal5min are deprecated to increase the
+        value range as 0..100. The table cpmProcessExtTable
+        is deprecated. The new objects added are 
+        cpmProcessExtRevTable, cpmProcExtMemAllocatedRev,
+        cpmProcExtMemFreedRev, cpmProcExtInvokedRev, 
+        cpmProcExtRuntimeRev, cpmProcExtUtil5SecRev,
+        cpmProcExtUtil1MinRev, cpmCPUTotal5MinRev, 
+        cpmCPUTotal5secRev, cpmCPUTotal1minRev and 
+        cpmCPUTotal5minRev."
+    REVISION        "9804150000Z"
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { ciscoMgmt 109 }
+
+
+
+CPULoadAverage ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "d"
+    STATUS          current
+    DESCRIPTION
+        "The average number of processes in the queue waiting for CPU
+        time over the last N minutes, where the N is defined by the 
+        object using this TC. This is similar to UNIX/Linux system load
+        average. The calculation may vary by different OS kernels, so
+        refer  to  the specific system document of your interest.
+        The object value, which uses this TC, reflects the average
+        number of runnable processes with units of hundredths of
+        processes, i.e. a value of 183 indicates the average number of
+        runnable processes over the N minutes is 1.83."
+    SYNTAX          Unsigned32
+-- This MIB displays memory and CPU utilization on cisco devices. CPU
+-- utilization will give a general idea of how busy the processor is.
+-- The numbers are a ratio of the current idle time over the longest
+-- idle time. Please note that this information should be used as an
+-- estimate only.
+
+ciscoProcessMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIB 1 }
+
+cpmCPU  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIBObjects 1 }
+
+cpmProcess  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIBObjects 2 }
+
+cpmThread  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIBObjects 3 }
+
+cpmVirtualProcess  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIBObjects 4 }
+
+cpmCPUHistory  OBJECT IDENTIFIER
+    ::= { cpmProcess 5 }
+
+-- Cisco CPU Total Table
+
+cpmCPUTotalTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmCPUTotalEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of overall CPU statistics."
+    ::= { cpmCPU 1 }
+
+cpmCPUTotalEntry OBJECT-TYPE
+    SYNTAX          CpmCPUTotalEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Overall information about the CPU load. Entries in this
+        table come and go as CPUs are added and removed from the
+        system."
+    INDEX           { cpmCPUTotalIndex } 
+    ::= { cpmCPUTotalTable 1 }
+
+CpmCPUTotalEntry ::= SEQUENCE {
+        cpmCPUTotalIndex                 Unsigned32,
+        cpmCPUTotalPhysicalIndex         EntPhysicalIndexOrZero,
+        cpmCPUTotal5sec                  Gauge32,
+        cpmCPUTotal1min                  Gauge32,
+        cpmCPUTotal5min                  Gauge32,
+        cpmCPUTotal5secRev               Gauge32,
+        cpmCPUTotal1minRev               Gauge32,
+        cpmCPUTotal5minRev               Gauge32,
+        cpmCPUMonInterval                Unsigned32,
+        cpmCPUTotalMonIntervalValue      Gauge32,
+        cpmCPUInterruptMonIntervalValue  Gauge32,
+        cpmCPUMemoryUsed                 Gauge32,
+        cpmCPUMemoryFree                 Gauge32,
+        cpmCPUMemoryKernelReserved       Gauge32,
+        cpmCPUMemoryLowest               Gauge32,
+        cpmCPUMemoryUsedOvrflw           Gauge32,
+        cpmCPUMemoryHCUsed               CounterBasedGauge64,
+        cpmCPUMemoryFreeOvrflw           Gauge32,
+        cpmCPUMemoryHCFree               Counter64,
+        cpmCPUMemoryKernelReservedOvrflw Gauge32,
+        cpmCPUMemoryHCKernelReserved     CounterBasedGauge64,
+        cpmCPUMemoryLowestOvrflw         Gauge32,
+        cpmCPUMemoryHCLowest             CounterBasedGauge64,
+        cpmCPULoadAvg1min                CPULoadAverage,
+        cpmCPULoadAvg5min                CPULoadAverage,
+        cpmCPULoadAvg15min               CPULoadAverage,
+        cpmCPUMemoryCommitted            Gauge32,
+        cpmCPUMemoryCommittedOvrflw      Gauge32,
+        cpmCPUMemoryHCCommitted          CounterBasedGauge64
+}
+
+cpmCPUTotalIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An index that uniquely represents a CPU (or group of CPUs)
+        whose CPU load information is reported by a row in this table.
+        This index is assigned arbitrarily by the engine
+        and is not saved over reboots." 
+    ::= { cpmCPUTotalEntry 1 }
+
+cpmCPUTotalPhysicalIndex OBJECT-TYPE
+    SYNTAX          EntPhysicalIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The entPhysicalIndex of the physical entity for which
+        the CPU statistics in this entry are maintained.
+        The physical entity can be a CPU chip, a group of CPUs,
+        a CPU card etc. The exact type of this entity is described by
+        its entPhysicalVendorType value. If the CPU statistics
+        in this entry correspond to more than one physical entity
+        (or to no physical entity), or if the entPhysicalTable is
+        not supported on the SNMP agent, the value of this object
+        must be zero." 
+    ::= { cpmCPUTotalEntry 2 }
+
+cpmCPUTotal5sec OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The overall CPU busy percentage in the last 5 second
+        period. This object obsoletes the busyPer object from 
+        the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+        by cpmCPUTotal5secRev which has the changed range of
+        value (0..100)." 
+    ::= { cpmCPUTotalEntry 3 }
+
+cpmCPUTotal1min OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The overall CPU busy percentage in the last 1 minute
+        period. This object obsoletes the avgBusy1 object from 
+        the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+        by cpmCPUTotal1minRev which has the changed range
+        of value (0..100)." 
+    ::= { cpmCPUTotalEntry 4 }
+
+cpmCPUTotal5min OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The overall CPU busy percentage in the last 5 minute
+        period. This object deprecates the avgBusy5 object from 
+        the OLD-CISCO-SYSTEM-MIB. This object is deprecated
+        by cpmCPUTotal5minRev which has the changed range 
+        of value (0..100)." 
+    ::= { cpmCPUTotalEntry 5 }
+
+cpmCPUTotal5secRev OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The overall CPU busy percentage in the last 5 second
+        period. This object deprecates the object cpmCPUTotal5sec 
+        and increases the value range to (0..100). This object
+        is deprecated by cpmCPUTotalMonIntervalValue" 
+    ::= { cpmCPUTotalEntry 6 }
+
+cpmCPUTotal1minRev OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU busy percentage in the last 1 minute
+        period. This object deprecates the object cpmCPUTotal1min 
+        and increases the value range to (0..100)." 
+    ::= { cpmCPUTotalEntry 7 }
+
+cpmCPUTotal5minRev OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU busy percentage in the last 5 minute
+        period. This object deprecates the object cpmCPUTotal5min 
+        and increases the value range to (0..100)." 
+    ::= { cpmCPUTotalEntry 8 }
+
+cpmCPUMonInterval OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "CPU usage monitoring interval. The value of this
+        object in seconds indicates the how often the 
+        CPU utilization is calculated and monitored." 
+    ::= { cpmCPUTotalEntry 9 }
+
+cpmCPUTotalMonIntervalValue OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU busy percentage in the last
+        cpmCPUMonInterval period. 
+        This object deprecates the object cpmCPUTotal5secRev." 
+    ::= { cpmCPUTotalEntry 10 }
+
+cpmCPUInterruptMonIntervalValue OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU busy percentage in the
+        interrupt context in the last cpmCPUMonInterval
+        period." 
+    ::= { cpmCPUTotalEntry 11 }
+
+cpmCPUMemoryUsed OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is currently
+        under use." 
+    ::= { cpmCPUTotalEntry 12 }
+
+cpmCPUMemoryFree OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is currently
+        free." 
+    ::= { cpmCPUTotalEntry 13 }
+
+cpmCPUMemoryKernelReserved OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is reserved
+        for kernel usage." 
+    ::= { cpmCPUTotalEntry 14 }
+
+cpmCPUMemoryLowest OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The lowest free memory that has been recorded since
+        device has booted." 
+    ::= { cpmCPUTotalEntry 15 }
+
+cpmCPUMemoryUsedOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of cpmCPUMemoryUsed.
+        This object needs to be supported only when the value of
+        cpmCPUMemoryUsed exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { cpmCPUTotalEntry 16 }
+
+cpmCPUMemoryHCUsed OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is currently under
+        use. This object is a 64-bit version of cpmCPUMemoryUsed." 
+    ::= { cpmCPUTotalEntry 17 }
+
+cpmCPUMemoryFreeOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of cpmCPUMemoryFree.
+        This object needs to be supported only when the value of
+        cpmCPUMemoryFree exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { cpmCPUTotalEntry 18 }
+
+cpmCPUMemoryHCFree OBJECT-TYPE
+    SYNTAX          Counter64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is currently free.
+        This object is a 64-bit version of cpmCPUMemoryFree." 
+    ::= { cpmCPUTotalEntry 19 }
+
+cpmCPUMemoryKernelReservedOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmCPUMemoryKernelReserved. This object needs 
+        to be supported only when the value of 
+        cpmCPUMemoryKernelReserved exceeds 32-bit, otherwise
+        this object value would be set to 0." 
+    ::= { cpmCPUTotalEntry 20 }
+
+cpmCPUMemoryHCKernelReserved OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is reserved
+        for kernel usage. This object is a 64-bit version of
+        cpmCPUMemoryKernelReserved." 
+    ::= { cpmCPUTotalEntry 21 }
+
+cpmCPUMemoryLowestOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of cpmCPUMemoryLowest.
+        This object needs to be supported only when the value of
+        cpmCPUMemoryLowest exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { cpmCPUTotalEntry 22 }
+
+cpmCPUMemoryHCLowest OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The lowest free memory that has been recorded since device has
+        booted. This object is a 64-bit version of cpmCPUMemoryLowest." 
+    ::= { cpmCPUTotalEntry 23 }
+
+cpmCPULoadAvg1min OBJECT-TYPE
+    SYNTAX          CPULoadAverage
+    UNITS           "hundredths of processes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU load Average in the last 1 minute period" 
+    ::= { cpmCPUTotalEntry 24 }
+
+cpmCPULoadAvg5min OBJECT-TYPE
+    SYNTAX          CPULoadAverage
+    UNITS           "hundredths of processes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU load Average in the last 5 minutes period" 
+    ::= { cpmCPUTotalEntry 25 }
+
+cpmCPULoadAvg15min OBJECT-TYPE
+    SYNTAX          CPULoadAverage
+    UNITS           "hundredths of processes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU load Average in the last 15 minutes period" 
+    ::= { cpmCPUTotalEntry 26 }
+
+cpmCPUMemoryCommitted OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is currently
+        Committed." 
+    ::= { cpmCPUTotalEntry 27 }
+
+cpmCPUMemoryCommittedOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmCPUMemoryCommitted.
+        This object needs to be supported only when the value of
+        cpmCPUMemoryCommitted exceeds 32-bit, otherwise this object
+        value would be set to 0." 
+    ::= { cpmCPUTotalEntry 28 }
+
+cpmCPUMemoryHCCommitted OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall CPU wide system memory which is currently
+        committed. This object is a 64-bit version of
+        cpmCPUMemoryCommitted" 
+    ::= { cpmCPUTotalEntry 29 }
+ 
+
+-- Cisco Core Table
+
+cpmCoreTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmCoreEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of per-Core statistics."
+    ::= { cpmCPU 2 }
+
+cpmCoreEntry OBJECT-TYPE
+    SYNTAX          CpmCoreEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Overall information about the Core load. Entries in this
+        table could come and go as Cores go online or offline."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmCoreIndex
+                    } 
+    ::= { cpmCoreTable 1 }
+
+CpmCoreEntry ::= SEQUENCE {
+        cpmCoreIndex         Unsigned32,
+        cpmCorePhysicalIndex EntPhysicalIndexOrZero,
+        cpmCore5sec          Gauge32,
+        cpmCore1min          Gauge32,
+        cpmCore5min          Gauge32,
+        cpmCoreLoadAvg1min   CPULoadAverage,
+        cpmCoreLoadAvg5min   CPULoadAverage,
+        cpmCoreLoadAvg15min  CPULoadAverage
+}
+
+cpmCoreIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An index that uniquely represents a Core (or group of Cores)
+        whose Core load information is reported by a row in this table.
+        This index is assigned arbitrarily by the engine
+        and is not saved over reboots." 
+    ::= { cpmCoreEntry 1 }
+
+cpmCorePhysicalIndex OBJECT-TYPE
+    SYNTAX          EntPhysicalIndexOrZero
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The entCorePhysicalIndex of the physical entity for which
+        the Core statistics in this entry are maintained.
+        The physical entity can be a CPU chip, a group of CPUs,
+        a CPU card etc. The exact type of this entity is described by
+        its entPhysicalVendorType value. If the Core statistics
+        in this entry correspond to more than one physical entity
+        (or to no physical entity), or if the entPhysicalTable is
+        not supported on the SNMP agent, the value of this object
+        must be zero." 
+    ::= { cpmCoreEntry 2 }
+
+cpmCore5sec OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall Core busy percentage in the last 5 second
+        period." 
+    ::= { cpmCoreEntry 3 }
+
+cpmCore1min OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall Core busy percentage in the last 1 minute
+        period." 
+    ::= { cpmCoreEntry 4 }
+
+cpmCore5min OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall Core busy percentage in the last 5 minute
+        period." 
+    ::= { cpmCoreEntry 5 }
+
+cpmCoreLoadAvg1min OBJECT-TYPE
+    SYNTAX          CPULoadAverage
+    UNITS           "hundredths of processes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall Core load Average in the last 1 minute period" 
+    ::= { cpmCoreEntry 6 }
+
+cpmCoreLoadAvg5min OBJECT-TYPE
+    SYNTAX          CPULoadAverage
+    UNITS           "hundredths of processes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall Core load Average in the last 5 minutes period" 
+    ::= { cpmCoreEntry 7 }
+
+cpmCoreLoadAvg15min OBJECT-TYPE
+    SYNTAX          CPULoadAverage
+    UNITS           "hundredths of processes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The overall Core load Average in the last 15 minutes period" 
+    ::= { cpmCoreEntry 8 }
+ 
+
+-- Cisco Processes Common Table
+
+cpmProcessTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmProcessEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of generic information on all active
+        processes on this device."
+    ::= { cpmProcess 1 }
+
+cpmProcessEntry OBJECT-TYPE
+    SYNTAX          CpmProcessEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Generic information about an active process on this
+        device. Entries in this table come and go as processes are 
+        created and destroyed by the device."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmProcessPID
+                    } 
+    ::= { cpmProcessTable 1 }
+
+CpmProcessEntry ::= SEQUENCE {
+        cpmProcessPID          Unsigned32,
+        cpmProcessName         DisplayString,
+        cpmProcessState        INTEGER,
+        cpmProcessuSecs        Unsigned32,
+        cpmProcessTimeCreated  TimeStamp,
+        cpmProcessAverageUSecs Unsigned32
+}
+
+cpmProcessPID OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object contains the process ID. cpmTimeCreated
+        should be checked against the last time it was polled,
+        and if it has changed the PID has been reused and the
+        entire entry should be polled again." 
+    ::= { cpmProcessEntry 1 }
+
+cpmProcessName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE  (1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The name associated with this process. If the name is
+        longer than 32 characters, it will be truncated to the first
+        31 characters, and a `*' will be appended as the last
+        character to imply this is a truncated process name." 
+    ::= { cpmProcessEntry 2 }
+
+cpmProcessState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        down(0),
+                        running(1),
+                        started(2),
+                        waiting(3),
+                        disabled(4),
+                        userdisabled(5),
+                        locked(6),
+                        other(7)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the current state of a process.
+        Running state means that the process is actively 
+        consuming CPU. All the other states are just waiting 
+        states. The valid states are:
+        other         - Any other state apart from the  
+                        ones listed.
+        down                  - The process is not operational.
+        running       - Actively running on a core.
+        started                  - The process is just forked.
+        waiting                  - The ProcessMgr config for this process specifies a delay before the
+                        process moves to running.
+        disabled           - The process is not enabled in the ProcessMgr configuration.      
+        userdisabled  - The process is put to disabled state by admin.
+        locked                  - Implies that if the process exits, it will not be restarted until 
+                        the lock is released." 
+    ::= { cpmProcessEntry 3 }
+
+cpmProcessuSecs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "Average elapsed CPU time in microseconds when the
+        process was active. This object is deprecated
+        by cpmProcessAverageUSecs." 
+    ::= { cpmProcessEntry 4 }
+
+cpmProcessTimeCreated OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The time when the process was created. The process ID
+        and the time when the process was created, uniquely 
+        identifies a process." 
+    ::= { cpmProcessEntry 5 }
+
+cpmProcessAverageUSecs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Average elapsed CPU time in microseconds when the
+        process was active. This object deprecates the
+        object cpmProcessuSecs." 
+    ::= { cpmProcessEntry 6 }
+ 
+
+-- Cisco processes detail Table.  This table is mandatory on systems
+-- that have the internal capability to keep the information.
+
+cpmProcessExtTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmProcessExtEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          deprecated
+    DESCRIPTION
+        "This table contains information that may or may
+        not be available on all cisco devices. It contains
+        additional objects for the more general
+        cpmProcessTable. This object is deprecated by
+        cpmProcessExtRevTable."
+    ::= { cpmProcess 2 }
+
+cpmProcessExtEntry OBJECT-TYPE
+    SYNTAX          CpmProcessExtEntry
+    MAX-ACCESS      not-accessible
+    STATUS          deprecated
+    DESCRIPTION
+        "An entry containing additional information for
+        a particular process. This object is deprecated by
+        cpmProcessExtRevEntry."
+    AUGMENTS           { cpmProcessEntry  } 
+    ::= { cpmProcessExtTable 1 }
+
+CpmProcessExtEntry ::= SEQUENCE {
+        cpmProcExtMemAllocated Gauge32,
+        cpmProcExtMemFreed     Gauge32,
+        cpmProcExtInvoked      Counter32,
+        cpmProcExtRuntime      Counter32,
+        cpmProcExtUtil5Sec     Gauge32,
+        cpmProcExtUtil1Min     Gauge32,
+        cpmProcExtUtil5Min     Gauge32,
+        cpmProcExtPriority     INTEGER
+}
+
+cpmProcExtMemAllocated OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The sum of all the dynamically allocated memory that
+        this process has received from the system. This includes
+        memory that may have been returned. The sum of freed
+        memory is provided by cpmProcExtMemFreed. This object
+        is deprecated by cpmProcExtMemAllocatedRev." 
+    ::= { cpmProcessExtEntry 1 }
+
+cpmProcExtMemFreed OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The sum of all memory that this process has returned
+        to the system. This object is deprecated by 
+        cpmProcExtMemFreedRev." 
+    ::= { cpmProcessExtEntry 2 }
+
+cpmProcExtInvoked OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The number of times since cpmTimeCreated that
+        the process has been invoked. This object is
+        deprecated by cpmProcExtInvokedRev." 
+    ::= { cpmProcessExtEntry 3 }
+
+cpmProcExtRuntime OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The amount of CPU time the process has used, in
+        microseconds. This object is deprecated by
+        cpmProcExtRuntimeRev." 
+    ::= { cpmProcessExtEntry 4 }
+
+cpmProcExtUtil5Sec OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object provides a general idea of how busy
+        a process caused the processor to be over a 5 
+        second period. It is determined as a weighted 
+        decaying average of the current idle time over 
+        the longest idle time. Note that this information 
+        should be used as an estimate only. This object is 
+        deprecated by cpmProcExtUtil5SecRev which has the 
+        changed range of value (0..100)." 
+    ::= { cpmProcessExtEntry 5 }
+
+cpmProcExtUtil1Min OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object provides a general idea of how busy
+        a process caused the processor to be over a 1 
+        minute period. It is determined as a weighted 
+        decaying average of the current idle time over the 
+        longest idle time. Note that this information 
+        should be used as an estimate only. This object is 
+        deprecated by cpmProcExtUtil1MinRev which has
+        the changed range of value (0..100)." 
+    ::= { cpmProcessExtEntry 6 }
+
+cpmProcExtUtil5Min OBJECT-TYPE
+    SYNTAX          Gauge32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "This object provides a general idea of how busy
+        a process caused the processor to be over a 5 
+        minute period. It is determined as a weighted 
+        decaying average of the current idle time over 
+        the longest idle time. Note that this information 
+        should be used as an estimate only. This object
+        is deprecated by cpmProcExtUtil5MinRev which
+        has the changed range of value (0..100)." 
+    ::= { cpmProcessExtEntry 7 }
+
+cpmProcExtPriority OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        critical(1),
+                        high(2),
+                        normal(3),
+                        low(4),
+                        notAssigned(5)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          deprecated
+    DESCRIPTION
+        "The priority level at which the process is
+        running. This object is deprecated by
+        cpmProcExtPriorityRev." 
+    ::= { cpmProcessExtEntry 8 }
+ 
+
+
+cpmProcessExtRevTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmProcessExtRevEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains information that may or may
+        not be available on all cisco devices. It contains
+        additional objects for the more general
+        cpmProcessTable. This object deprecates 
+        cpmProcessExtTable."
+    ::= { cpmProcess 3 }
+
+cpmProcessExtRevEntry OBJECT-TYPE
+    SYNTAX          CpmProcessExtRevEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing additional information for
+        a particular process. This object deprecates 
+        cpmProcessExtEntry."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmProcessPID
+                    } 
+    ::= { cpmProcessExtRevTable 1 }
+
+CpmProcessExtRevEntry ::= SEQUENCE {
+        cpmProcExtMemAllocatedRev         Gauge32,
+        cpmProcExtMemFreedRev             Gauge32,
+        cpmProcExtInvokedRev              Counter32,
+        cpmProcExtRuntimeRev              Counter32,
+        cpmProcExtUtil5SecRev             Gauge32,
+        cpmProcExtUtil1MinRev             Gauge32,
+        cpmProcExtUtil5MinRev             Gauge32,
+        cpmProcExtPriorityRev             INTEGER,
+        cpmProcessType                    INTEGER,
+        cpmProcessRespawn                 TruthValue,
+        cpmProcessRespawnCount            Counter32,
+        cpmProcessRespawnAfterLastPatch   Counter32,
+        cpmProcessMemoryCore              INTEGER,
+        cpmProcessLastRestartUser         SnmpAdminString,
+        cpmProcessTextSegmentSize         Unsigned32,
+        cpmProcessDataSegmentSize         Gauge32,
+        cpmProcessStackSize               Gauge32,
+        cpmProcessDynamicMemorySize       Gauge32,
+        cpmProcExtMemAllocatedRevOvrflw   Gauge32,
+        cpmProcExtHCMemAllocatedRev       CounterBasedGauge64,
+        cpmProcExtMemFreedRevOvrflw       Gauge32,
+        cpmProcExtHCMemFreedRev           CounterBasedGauge64,
+        cpmProcessTextSegmentSizeOvrflw   Unsigned32,
+        cpmProcessHCTextSegmentSize       Unsigned64,
+        cpmProcessDataSegmentSizeOvrflw   Gauge32,
+        cpmProcessHCDataSegmentSize       CounterBasedGauge64,
+        cpmProcessStackSizeOvrflw         Gauge32,
+        cpmProcessHCStackSize             CounterBasedGauge64,
+        cpmProcessDynamicMemorySizeOvrflw Gauge32,
+        cpmProcessHCDynamicMemorySize     CounterBasedGauge64
+}
+
+cpmProcExtMemAllocatedRev OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The sum of all the dynamically allocated memory that
+        this process has received from the system. This includes
+        memory that may have been returned. The sum of freed
+        memory is provided by cpmProcExtMemFreedRev. This object
+        deprecates cpmProcExtMemAllocated." 
+    ::= { cpmProcessExtRevEntry 1 }
+
+cpmProcExtMemFreedRev OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The sum of all memory that this process has returned
+        to the system. This object  deprecates 
+        cpmProcExtMemFreed." 
+    ::= { cpmProcessExtRevEntry 2 }
+
+cpmProcExtInvokedRev OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times since cpmTimeCreated that
+        the process has been invoked. This object 
+        deprecates cpmProcExtInvoked." 
+    ::= { cpmProcessExtRevEntry 3 }
+
+cpmProcExtRuntimeRev OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The amount of CPU time the process has used, in
+        microseconds. This object deprecates
+        cpmProcExtRuntime." 
+    ::= { cpmProcessExtRevEntry 4 }
+
+cpmProcExtUtil5SecRev OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object provides a general idea of how busy
+        a process caused the processor to be over a 5 
+        second period. It is determined as a weighted 
+        decaying average of the current idle time over 
+        the longest idle time. Note that this information 
+        should be used as an estimate only. This object
+        deprecates cpmProcExtUtil5Sec and increases the 
+        value range to (0..100)." 
+    ::= { cpmProcessExtRevEntry 5 }
+
+cpmProcExtUtil1MinRev OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object provides a general idea of how busy
+        a process caused the processor to be over a 1 
+        minute period. It is determined as a weighted 
+        decaying average of the current idle time over the 
+        longest idle time. Note that this information 
+        should be used as an estimate only. This object 
+        deprecates cpmProcExtUtil1Min and increases the value
+        range to (0..100)." 
+    ::= { cpmProcessExtRevEntry 6 }
+
+cpmProcExtUtil5MinRev OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object provides a general idea of how busy
+        a process caused the processor to be over a 5 
+        minute period. It is determined as a weighted 
+        decaying average of the current idle time over 
+        the longest idle time. Note that this information 
+        should be used as an estimate only. This object
+        deprecates cpmProcExtUtil5Min and increases the
+        value range to (0..100)." 
+    ::= { cpmProcessExtRevEntry 7 }
+
+cpmProcExtPriorityRev OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        critical(1),
+                        high(2),
+                        normal(3),
+                        low(4),
+                        notAssigned(5)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The priority level at  which the process is
+        running. This object deprecates 
+        cpmProcExtPriority." 
+    ::= { cpmProcessExtRevEntry 8 }
+
+cpmProcessType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        other(1),
+                        posix(2),
+                        ios(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the kind of process in context." 
+    ::= { cpmProcessExtRevEntry 9 }
+
+cpmProcessRespawn OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates whether respawn of a process is enabled
+        or not. If enabled the process in context repawns after
+        it has crashed/stopped." 
+    ::= { cpmProcessExtRevEntry 10 }
+
+cpmProcessRespawnCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the number of times the process has
+        respawned/restarted." 
+    ::= { cpmProcessExtRevEntry 11 }
+
+cpmProcessRespawnAfterLastPatch OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the number of times a process has
+        restarted after the last patch is applied. This is to 
+        determine the stability of the last patch." 
+    ::= { cpmProcessExtRevEntry 12 }
+
+cpmProcessMemoryCore OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        other(1),
+                        mainmem(2),
+                        mainmemSharedmem(3),
+                        mainmemText(4),
+                        mainmemTextSharedmem(5),
+                        sharedmem(6),
+                        sparse(7),
+                        off(8)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the part of process memory to be
+        dumped when a process crashes. The process 
+        memory is used for debugging purposes to trace the 
+        root cause of the crash.
+        sparse        - Some operating systems support minimal
+                        dump of process core like register
+                        info, partial stack, partial memory
+                        pages especially for critical process
+                        to facilitate faster process restart." 
+    ::= { cpmProcessExtRevEntry 13 }
+
+cpmProcessLastRestartUser OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicate the user that has last restarted the
+        process or has taken running coredump of the process." 
+    ::= { cpmProcessExtRevEntry 14 }
+
+cpmProcessTextSegmentSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the text memory of a process and all
+        its shared objects." 
+    ::= { cpmProcessExtRevEntry 15 }
+
+cpmProcessDataSegmentSize OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the data segment of a process and
+        all its shared objects." 
+    ::= { cpmProcessExtRevEntry 16 }
+
+cpmProcessStackSize OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the amount of stack memory used by the
+        process." 
+    ::= { cpmProcessExtRevEntry 17 }
+
+cpmProcessDynamicMemorySize OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the amount of dynamic memory being used
+        by the process." 
+    ::= { cpmProcessExtRevEntry 18 }
+
+cpmProcExtMemAllocatedRevOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmProcExtMemAllocatedRev. This object needs
+        to be supported only when the value of 
+        cpmProcExtMemAllocatedRev exceeds 32-bit, 
+        otherwise this object value would be set to 0." 
+    ::= { cpmProcessExtRevEntry 19 }
+
+cpmProcExtHCMemAllocatedRev OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The sum of all the dynamically allocated memory that this
+        process has received from the system. This includes memory
+        that may have been returned. This object is a 64-bit version
+        of cpmProcExtMemAllocatedRev." 
+    ::= { cpmProcessExtRevEntry 20 }
+
+cpmProcExtMemFreedRevOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmProcExtMemFreedRev. This object needs to 
+        be supported only when the value of
+        cpmProcExtMemFreedRev exceeds 32-bit,otherwise
+        this object value would be set to 0." 
+    ::= { cpmProcessExtRevEntry 21 }
+
+cpmProcExtHCMemFreedRev OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The sum of all memory that this process has returned to the
+        system. This object is a 64-bit version of
+        cpmProcExtMemFreedRev." 
+    ::= { cpmProcessExtRevEntry 22 }
+
+cpmProcessTextSegmentSizeOvrflw OBJECT-TYPE
+    SYNTAX          Unsigned32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmProcessTextSegmentSize. This object needs
+        to be supported only when the value of 
+        cpmProcessTextSegmentSize exceeds 32-bit, 
+        otherwise this object value would be set to 0." 
+    ::= { cpmProcessExtRevEntry 23 }
+
+cpmProcessHCTextSegmentSize OBJECT-TYPE
+    SYNTAX          Unsigned64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the text memory of a process and all
+        its shared objects. This object is a 64-bit version
+        of cpmProcessTextSegmentSize." 
+    ::= { cpmProcessExtRevEntry 24 }
+
+cpmProcessDataSegmentSizeOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmProcessDataSegmentSize. This object needs
+        to be supported only when the value of 
+        cpmProcessDataSegmentSize exceeds 32-bit, 
+        otherwise this object value would be set to 0." 
+    ::= { cpmProcessExtRevEntry 25 }
+
+cpmProcessHCDataSegmentSize OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the data segment of a process and
+        all its shared objects.. This object is a 64-bit
+        version of cpmProcessDataSegmentSize." 
+    ::= { cpmProcessExtRevEntry 26 }
+
+cpmProcessStackSizeOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of cpmProcessStackSize.
+        This object needs to be supported only when the value of
+        cpmProcessStackSize exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { cpmProcessExtRevEntry 27 }
+
+cpmProcessHCStackSize OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the amount of stack memory used by the process.
+        This object is a 64-bit version of cpmProcessStackSize." 
+    ::= { cpmProcessExtRevEntry 28 }
+
+cpmProcessDynamicMemorySizeOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmProcessDynamicMemorySize. This object needs
+        to be supported only when the value of 
+        cpmProcessDynamicMemorySize exceeds 32-bit, 
+        otherwise this object value would be set to 0." 
+    ::= { cpmProcessExtRevEntry 29 }
+
+cpmProcessHCDynamicMemorySize OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "kilo-bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates the amount of dynamic memory being used
+        by the process. This object is a 64-bit version of
+        cpmProcessDynamicMemorySize." 
+    ::= { cpmProcessExtRevEntry 30 }
+ 
+
+-- Threshold Table allows the CPU threshold configurations.
+-- When the configured threshold is reached a NMS will be notified
+-- with this event.
+
+cpmCPUThresholdTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmCPUThresholdEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the information about the
+        thresholding values for CPU , configured by the user."
+    ::= { cpmProcess 4 }
+
+cpmCPUThresholdEntry OBJECT-TYPE
+    SYNTAX          CpmCPUThresholdEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing information about
+        CPU thresholding parameters. cpmCPUTotalIndex
+        identifies the CPU (or group of CPUs) for which this
+        configuration applies."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmCPUThresholdClass
+                    } 
+    ::= { cpmCPUThresholdTable 1 }
+
+CpmCPUThresholdEntry ::= SEQUENCE {
+        cpmCPUThresholdClass         INTEGER,
+        cpmCPURisingThresholdValue   Unsigned32,
+        cpmCPURisingThresholdPeriod  Unsigned32,
+        cpmCPUFallingThresholdValue  Unsigned32,
+        cpmCPUFallingThresholdPeriod Unsigned32,
+        cpmCPUThresholdEntryStatus   RowStatus
+}
+
+cpmCPUThresholdClass OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        total(1),
+                        interrupt(2),
+                        process(3)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Value of this object indicates the type of
+        utilization, which is monitored. The total(1) indicates
+        the total CPU utilization, interrupt(2) indicates the
+        the CPU utilization in interrupt context and process(3)
+        indicates the CPU utilization in the process level
+        execution context." 
+    ::= { cpmCPUThresholdEntry 1 }
+
+cpmCPURisingThresholdValue OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..100)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The percentage rising threshold value configured by
+        the user. The value indicates, 
+        if the percentage CPU utilization is equal to or above
+        this value for cpmCPURisingThresholdPeriod duration 
+        then send a cpmCPURisingThreshold notification to
+        the NMS." 
+    ::= { cpmCPUThresholdEntry 2 }
+
+cpmCPURisingThresholdPeriod OBJECT-TYPE
+    SYNTAX          Unsigned32 (5..4294967295)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is an observation interval.
+        The value of this object indicates that 
+        the CPU utilization should be above
+        cpmCPURisingThresholdValue for this duration to send a 
+        cpmCPURisingThreshold notification to the NMS."
+    DEFVAL          { 5 } 
+    ::= { cpmCPUThresholdEntry 3 }
+
+cpmCPUFallingThresholdValue OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..100)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The percentage falling threshold value configured by
+        the user. The value indicates, if the percentage 
+        CPU utilization is equal to or below this value for 
+        cpmCPUFallingThresholdPeriod duration
+        then send a cpmCPUFallingThreshold notification 
+        to the NMS." 
+    ::= { cpmCPUThresholdEntry 4 }
+
+cpmCPUFallingThresholdPeriod OBJECT-TYPE
+    SYNTAX          Unsigned32 (5..4294967295)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is an observation interval. The value of this
+        object indicates that CPU utilization should be below
+        cpmCPUFallingThresholdValue for this duration to send a 
+        cpmCPURisingThreshold notification to the NMS."
+    DEFVAL          { 5 } 
+    ::= { cpmCPUThresholdEntry 5 }
+
+cpmCPUThresholdEntryStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this table entry." 
+    ::= { cpmCPUThresholdEntry 6 }
+ 
+
+
+cpmCPUHistoryThreshold OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..100)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The user  configured value of this object gives
+        the minimum percent CPU utilization of a process
+        in the last cpmCPUMonInterval duration required to be a 
+        member of history table. When this object is changed
+        the new value will have effect in the next interval." 
+    ::= { cpmCPUHistory 1 }
+
+cpmCPUHistorySize OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "A value configured by the user which specifies the
+        number of reports in the history table. 
+        A report contains set of processes which crossed
+        the cpmCPUHistoryThreshold 
+        in the last cpmCPUMonInterval along with 
+        the time at which this report is
+        created, total and interrupt CPU utilizations. 
+        When this object is changed
+        the new value will have effect in the next interval." 
+    ::= { cpmCPUHistory 2 }
+
+cpmCPUHistoryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmCPUHistoryEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of CPU utilization history entries."
+    ::= { cpmCPUHistory 3 }
+
+cpmCPUHistoryEntry OBJECT-TYPE
+    SYNTAX          CpmCPUHistoryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A historical sample of CPU utilization statistics.
+        cpmCPUTotalIndex identifies the CPU (or group of CPUs)
+        for which this history is collected. 
+        When the cpmCPUHistorySize is
+        reached the least recent entry is lost."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmCPUHistoryReportId
+                    } 
+    ::= { cpmCPUHistoryTable 1 }
+
+CpmCPUHistoryEntry ::= SEQUENCE {
+        cpmCPUHistoryReportId      Unsigned32,
+        cpmCPUHistoryReportSize    Unsigned32,
+        cpmCPUHistoryTotalUtil     Gauge32,
+        cpmCPUHistoryInterruptUtil Gauge32,
+        cpmCPUHistoryCreatedTime   TimeStamp
+}
+
+cpmCPUHistoryReportId OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "All the entries which are created at the same time
+        will have same value for this object. When the
+        configured threshold for being a part of History table
+        is reached then the qualified processes become the
+        part of history table. The entries which became the 
+        part of history table at one instant will have
+        the same value for this object. When this object
+        reaches the max index value then it will wrap around." 
+    ::= { cpmCPUHistoryEntry 1 }
+
+cpmCPUHistoryReportSize OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..4294967295)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of process entries in a report.
+        This object gives information about how many processes 
+        became a part of history table at one instant." 
+    ::= { cpmCPUHistoryEntry 2 }
+
+cpmCPUHistoryTotalUtil OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Total percentage of CPU utilization
+        at cpmCPUHistoryCreated." 
+    ::= { cpmCPUHistoryEntry 3 }
+
+cpmCPUHistoryInterruptUtil OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Percentage of CPU utilization in the interrupt context
+        at cpmCPUHistoryCreated." 
+    ::= { cpmCPUHistoryEntry 4 }
+
+cpmCPUHistoryCreatedTime OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Time stamp with respect to sysUpTime indicating
+        the time at which this report is created." 
+    ::= { cpmCPUHistoryEntry 5 }
+ 
+
+
+cpmThreadTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmThreadEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains generic information about
+        POSIX threads in the device."
+    ::= { cpmThread 1 }
+
+cpmThreadEntry OBJECT-TYPE
+    SYNTAX          CpmThreadEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing the general statistics
+        of a POSIX thread."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmProcessPID,
+                        cpmThreadID
+                    } 
+    ::= { cpmThreadTable 1 }
+
+CpmThreadEntry ::= SEQUENCE {
+        cpmThreadID              Unsigned32,
+        cpmThreadName            SnmpAdminString,
+        cpmThreadPriority        Unsigned32,
+        cpmThreadState           INTEGER,
+        cpmThreadBlockingProcess RowPointer,
+        cpmThreadCpuUtilization  Gauge32,
+        cpmThreadStackSize       Gauge32,
+        cpmThreadStackSizeOvrflw Gauge32,
+        cpmThreadHCStackSize     CounterBasedGauge64
+}
+
+cpmThreadID OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object contains the thread ID. ThreadID is
+        Unique per process." 
+    ::= { cpmThreadEntry 1 }
+
+cpmThreadName OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the name of the thread.
+        Thread names need not be unique. Hence statistics 
+        should be analyzed against thread ID." 
+    ::= { cpmThreadEntry 2 }
+
+cpmThreadPriority OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..63)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the priority of a POSIX thread.
+        The higher the number, the higher the priority of the 
+        thread over other threads." 
+    ::= { cpmThreadEntry 3 }
+
+cpmThreadState OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        other(1),
+                        dead(2),
+                        running(3),
+                        ready(4),
+                        stopped(5),
+                        send(6),
+                        receive(7),
+                        reply(8),
+                        stack(9),
+                        waitpage(10),
+                        sigsuspend(11),
+                        sigwaitinfo(12),
+                        nanosleep(13),
+                        mutex(14),
+                        condvar(15),
+                        join(16),
+                        intr(17),
+                        sem(18)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the current state of a thread.
+        Running state means that the thread is actively 
+        consumig CPU. All the other states are just waiting 
+        states. The valid states are:
+        other         - Any other state apart from the listed 
+                        ones.
+        dead          - Kernel is waiting to release the 
+                        thread's resources.
+        running       - Actively running on a CPU.
+        ready         - Not running on a CPU, but is ready to 
+                        run (one or more higher or equal 
+                        priority threads are running).
+        stopped       - Suspended (SIGSTOP signal).
+        send          - Waiting for a server to receive 
+                        a message.
+        receive       - Waiting for a client to send a message.
+        reply         - Waiting for a server to reply to a 
+                        message.
+        stack         - Waiting for more stack to be allocated.
+        waitpage      - Waiting for process manager to 
+                        resolve a fault on a page.
+        sigsuspend    - Suspended for a signal.
+        sigwaitinfo   - Waiting for a signal.
+        nanosleep     - Sleeping for a period of time.
+        mutex         - Waiting to acquire a mutex
+        condvar       - Waiting for a condition variable to be 
+                        signalled.
+        join          - Waiting for the completion of another 
+                        thread.
+        intr          - Waiting for an interrupt.
+        sem           - Waiting to acquire a semaphore." 
+    ::= { cpmThreadEntry 4 }
+
+cpmThreadBlockingProcess OBJECT-TYPE
+    SYNTAX          RowPointer
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object identifies the process on which the
+        current thread is blocked on. This points to the 
+        cpmProcessTable of the process on which the thread 
+        in context is blocked. This is valid only to threads
+        which are either in send/reply states. For the 
+        rest of the threads it is returned as 0.0" 
+    ::= { cpmThreadEntry 5 }
+
+cpmThreadCpuUtilization OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "milliseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object provides a general idea on how busy
+        the thread in context caused the processor to be." 
+    ::= { cpmThreadEntry 6 }
+
+cpmThreadStackSize OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the stack size allocated to
+        the thread in context." 
+    ::= { cpmThreadEntry 7 }
+
+cpmThreadStackSizeOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of cpmThreadStackSize.
+        This object needs to be supported only when the value of
+        cpmThreadStackSize exceeds 32-bit, otherwise this object value
+        would be set to 0." 
+    ::= { cpmThreadEntry 8 }
+
+cpmThreadHCStackSize OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the stack size allocated to the
+        thread in context. This object is a 64-bit version of
+        cpmThreadStackSize." 
+    ::= { cpmThreadEntry 9 }
+ 
+
+
+cpmVirtualProcessTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmVirtualProcessEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains information about virtual
+        processes in a virtual machine."
+    ::= { cpmVirtualProcess 1 }
+
+cpmVirtualProcessEntry OBJECT-TYPE
+    SYNTAX          CpmVirtualProcessEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry containing the general statistics of a
+        virtual process in a virtual machine."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmProcessPID,
+                        cpmVirtualProcessID
+                    } 
+    ::= { cpmVirtualProcessTable 1 }
+
+CpmVirtualProcessEntry ::= SEQUENCE {
+        cpmVirtualProcessID                 Unsigned32,
+        cpmVirtualProcessName               SnmpAdminString,
+        cpmVirtualProcessUtil5Sec           Gauge32,
+        cpmVirtualProcessUtil1Min           Gauge32,
+        cpmVirtualProcessUtil5Min           Gauge32,
+        cpmVirtualProcessMemAllocated       Gauge32,
+        cpmVirtualProcessMemFreed           Gauge32,
+        cpmVirtualProcessInvokeCount        Counter32,
+        cpmVirtualProcessRuntime            Counter32,
+        cpmVirtualProcessMemAllocatedOvrflw Gauge32,
+        cpmVirtualProcessHCMemAllocated     CounterBasedGauge64,
+        cpmVirtualProcessMemFreedOvrflw     Gauge32,
+        cpmVirtualProcessHCMemFreed         CounterBasedGauge64
+}
+
+cpmVirtualProcessID OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the process ID of a virtual
+        process. PID is unique only inside one address space.
+        Virtual process PID should be considered along with 
+        Parent process cpmProcessPID." 
+    ::= { cpmVirtualProcessEntry 1 }
+
+cpmVirtualProcessName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the name of a virtual process.
+        If the name is longer than 32 characters, it will be
+        truncated to the first 31 characters, and a `*' will be
+        appended as the last character to imply this is a
+        truncated process name." 
+    ::= { cpmVirtualProcessEntry 2 }
+
+cpmVirtualProcessUtil5Sec OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates an estimated CPU utilization by
+        a virtual process over the last 5 seconds." 
+    ::= { cpmVirtualProcessEntry 3 }
+
+cpmVirtualProcessUtil1Min OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates an estimated CPU utilization by
+        a virtual process over the last one minute." 
+    ::= { cpmVirtualProcessEntry 4 }
+
+cpmVirtualProcessUtil5Min OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This indicates an estimated CPU utilization by
+        a virtual process over the last 5 minutes." 
+    ::= { cpmVirtualProcessEntry 5 }
+
+cpmVirtualProcessMemAllocated OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the memory allocated by the
+        virtual process inside the address space of a 
+        process running on Native OS." 
+    ::= { cpmVirtualProcessEntry 6 }
+
+cpmVirtualProcessMemFreed OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the memory freed by the virtual
+        process inside the address space of a process running 
+        on Native OS." 
+    ::= { cpmVirtualProcessEntry 7 }
+
+cpmVirtualProcessInvokeCount OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times a virtual process is invoked." 
+    ::= { cpmVirtualProcessEntry 8 }
+
+cpmVirtualProcessRuntime OBJECT-TYPE
+    SYNTAX          Counter32
+    UNITS           "microseconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The amount of CPU time a virtual process has used in
+        microseconds." 
+    ::= { cpmVirtualProcessEntry 9 }
+
+cpmVirtualProcessMemAllocatedOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmVirtualProcessMemAllocated. This object 
+        needs to be supported only when the value of
+        cpmVirtualProcessMemAllocated exceeds 32-bit,
+        otherwise this object value would be set to 0." 
+    ::= { cpmVirtualProcessEntry 10 }
+
+cpmVirtualProcessHCMemAllocated OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the memory allocated by the
+        virtual process inside the address space of a process
+        running on Native OS. This object is a 64-bit version
+        of cpmVirtualProcessMemAllocated." 
+    ::= { cpmVirtualProcessEntry 11 }
+
+cpmVirtualProcessMemFreedOvrflw OBJECT-TYPE
+    SYNTAX          Gauge32
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the upper 32-bit of
+        cpmVirtualProcessMemFreed. This object needs
+        to be supported only when the value of 
+        cpmVirtualProcessMemFreed exceeds 32-bit, 
+        otherwise this object value would be set to 0." 
+    ::= { cpmVirtualProcessEntry 12 }
+
+cpmVirtualProcessHCMemFreed OBJECT-TYPE
+    SYNTAX          CounterBasedGauge64
+    UNITS           "bytes"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the memory freed by the virtual process
+        inside the address space of a process running on Native OS.This
+        object is a 64-bit version of cpmVirtualProcessMemAllocated." 
+    ::= { cpmVirtualProcessEntry 13 }
+ 
+
+-- History table contains the statistics for the processes
+-- qualified to be a part of history table.
+-- The statistics are the CPU utilization of processes
+-- for past 5 second period.
+
+cpmCPUProcessHistoryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CpmCPUProcessHistoryEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A list of process history entries. This table contains
+        CPU utilization of processes which crossed the 
+        cpmCPUHistoryThreshold."
+    ::= { cpmCPUHistory 4 }
+
+cpmCPUProcessHistoryEntry OBJECT-TYPE
+    SYNTAX          CpmCPUProcessHistoryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A historical sample of process utilization
+        statistics. The entries in this table will have
+        corresponding entires in the cpmCPUHistoryTable.
+        The entries in this table get deleted when the entry
+        associated with this entry in the cpmCPUHistoryTable 
+        gets deleted."
+    INDEX           {
+                        cpmCPUTotalIndex,
+                        cpmCPUHistoryReportId,
+                        cpmCPUProcessHistoryIndex
+                    } 
+    ::= { cpmCPUProcessHistoryTable 1 }
+
+CpmCPUProcessHistoryEntry ::= SEQUENCE {
+        cpmCPUProcessHistoryIndex Unsigned32,
+        cpmCPUHistoryProcId       Unsigned32,
+        cpmCPUHistoryProcName     DisplayString,
+        cpmCPUHistoryProcCreated  TimeStamp,
+        cpmCPUHistoryProcUtil     Gauge32
+}
+
+cpmCPUProcessHistoryIndex OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..4294967295)
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in
+        the cmpCPUProcessHistory table among those in the 
+        same report. This index is between 1 to N, 
+        where N is the cpmCPUHistoryReportSize." 
+    ::= { cpmCPUProcessHistoryEntry 1 }
+
+cpmCPUHistoryProcId OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..2147483647)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The process Id associated with this entry." 
+    ::= { cpmCPUProcessHistoryEntry 2 }
+
+cpmCPUHistoryProcName OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The process name associated with this entry." 
+    ::= { cpmCPUProcessHistoryEntry 3 }
+
+cpmCPUHistoryProcCreated OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The time when the process was created. The process ID
+        and the time when the process was created, uniquely 
+        identifies a process." 
+    ::= { cpmCPUProcessHistoryEntry 4 }
+
+cpmCPUHistoryProcUtil OBJECT-TYPE
+    SYNTAX          Gauge32 (0..100)
+    UNITS           "percent"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The percentage CPU utilization of a process at
+        cpmCPUHistoryCreatedTime." 
+    ::= { cpmCPUProcessHistoryEntry 5 }
+ 
+
+-- notifications
+
+ciscoProcessMIBNotifPrefix  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIB 2 }
+
+ciscoProcessMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIBNotifPrefix 0 }
+
+
+cpmCPURisingThreshold NOTIFICATION-TYPE
+    OBJECTS         {
+                        cpmCPURisingThresholdValue,
+                        cpmCPUTotalMonIntervalValue,
+                        cpmCPUInterruptMonIntervalValue,
+                        cpmProcExtUtil5SecRev,
+                        cpmProcessTimeCreated
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A cpmCPURisingThreshold notification is sent
+        when configured rising CPU utilization threshold
+        (cpmCPURisingThresholdValue) is reached and
+        CPU utilization remained above the threshold 
+        for configured interval(cpmCPURisingThresholdPeriod)
+        and such a notification is requested. 
+        The cpmProcExtUtil5SecRev and cpmProcessTimeCreated 
+        objects can be repeated multiple times
+        in a notification indicating the top users of CPU."
+   ::= { ciscoProcessMIBNotifs 1 }
+
+cpmCPUFallingThreshold NOTIFICATION-TYPE
+    OBJECTS         {
+                        cpmCPUFallingThresholdValue,
+                        cpmCPUTotalMonIntervalValue,
+                        cpmCPUInterruptMonIntervalValue
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A cpmCPUFallingThresholdTrap is sent when the
+        configured falling threshold
+        (cpmCPURisingThresholdValue) 
+        is reached and CPU utilization remained under 
+        threshold for configured 
+        interval (cpmCPUFallingThresholdPeriod) 
+        and such a notification is requested."
+   ::= { ciscoProcessMIBNotifs 2 }
+
+cpmProcessStateTrap NOTIFICATION-TYPE
+    OBJECTS         {
+                        cpmProcessPID,
+                        cpmProcessName,
+                        cpmProcessState
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A cpmProcessStateTrap is sent when a critical
+        process of interest has seen a state change for whatever reason 
+        and such a notification is requested.
+        This trap is not applicable to all processes running on the system,
+        but for the critical ones pre-determined by the system software. 
+        A PID=0 in this trap implies that a PID wasn't available when
+        this notification was generated."
+   ::= { ciscoProcessMIBNotifs 3 }
+-- conformance information
+
+ciscoProcessMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIB 3 }
+
+cpmCompliances  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIBConformance 1 }
+
+cpmGroups  OBJECT IDENTIFIER
+    ::= { ciscoProcessMIBConformance 2 }
+
+
+cProcessMIBCompliance MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Process MIB. This is deprecated and new 
+        compliance cProcessMIBComplianceRev is added."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cpmCPUTotalGroup,
+                        cpmProcessGroup
+                    }
+
+    GROUP           cpmProcessExtGroup
+    DESCRIPTION
+        "The cpmProcessExtGroup is optional for all entities."
+
+    OBJECT          cpmProcExtPriority
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required."
+    ::= { cpmCompliances 1 }
+
+cProcessMIBComplianceRev MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Process MIB. This compliance module
+        deprecates cProcessMIBCompliance."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cpmCPUTotalGroupRev,
+                        cpmProcessGroupRev
+                    }
+
+    GROUP           cpmProcessExtGroupRev
+    DESCRIPTION
+        "The cpmProcessExtGroupRev is optional for all
+        entities. This object is defined after deprecating
+        cpmProcessExtGroup."
+    ::= { cpmCompliances 2 }
+
+cProcessMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Process MIB. This compliance module
+        deprecates cProcessMIBComplianceRev."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cpmCPUThresholdGroup,
+                        cpmCPUTotalGroupRev1
+                    }
+
+    GROUP           cpmCPUHistoryGroup
+    DESCRIPTION
+        "The cpmCPUHistoryGroup is optional and gives
+        the information about process CPU utilization history."
+
+    GROUP           cpmCPUThresholdNotificationGroup
+    DESCRIPTION
+        "The cpmCPUThresholdNotificationGroup is optional and
+        these traps indicates that 
+        configured threshold is reached."
+    ::= { cpmCompliances 3 }
+
+cProcessMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Process MIB. This compliance module
+        deprecates cProcessMIBComplianceRev1."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpmCPUTotalGroupRev1 }
+
+    GROUP           cpmCPUHistoryGroup
+    DESCRIPTION
+        "The cpmCPUHistoryGroup is optional and gives
+        the information about process CPU utilization history."
+
+    GROUP           cpmCPUThresholdNotificationGroup
+    DESCRIPTION
+        "The cpmCPUThresholdNotificationGroup is optional and
+        these traps indicates that configured threshold 
+        is reached."
+
+    GROUP           cpmProcessExtGroupRev
+    DESCRIPTION
+        "The cpmProcessExtGroupRev is optional and gives
+        detailed process monitoring information."
+
+    GROUP           cpmCPUThresholdGroup
+    DESCRIPTION
+        "The cpmCPUThresholdGroup is optional and provides
+        information on configuring threshold values."
+
+    GROUP           cpmProcessGroupRev
+    DESCRIPTION
+        "The cpmProcessGroupRev is optional and provides common
+        process monitoring information."
+
+    GROUP           cpmCPUPosixMemoryGroup
+    DESCRIPTION
+        "The cpmCPUPosixMemoryGroup gives information about
+        CPU wide system memory of POSIX OS.
+        cpmCPUPosixMemoryGroup is mandatory if the Operating
+        System of the managed system supports Posix standard
+        kernel."
+
+    GROUP           cpmPosixProcessGroup
+    DESCRIPTION
+        "The cpmPosixProcessGroup gives information about
+        POSIX process. cpmPosixProcessGroup is mandatory if
+        the Operating System of the managed system
+        supports Posix standard kernel."
+
+    GROUP           cpmThreadGroup
+    DESCRIPTION
+        "The cpmThreadGroup gives information about POSIX
+        threads. cpmThreadGroup is mandatory if the Operating
+        System of the managed system supports Posix standard
+        kernel."
+
+    GROUP           cpmVirtualProcessGroup
+    DESCRIPTION
+        "The cpmVirtualProcessGroup gives information about
+        virtual process. cpmVirtualProcessGroup is mandatory
+        Operating System of the managed system supports
+        Posix standard kernel."
+    ::= { cpmCompliances 4 }
+
+cProcessMIBComplianceRev3 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Process MIB. This compliance module
+        deprecates cProcessMIBComplianceRev2."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpmCPUTotalGroupRev1 }
+
+    GROUP           cpmCPUHistoryGroup
+    DESCRIPTION
+        "The cpmCPUHistoryGroup is optional and gives
+        the information about process CPU utilization history."
+
+    GROUP           cpmCPUThresholdNotificationGroup
+    DESCRIPTION
+        "The cpmCPUThresholdNotificationGroup is optional and
+        these traps indicates that configured threshold 
+        is reached."
+
+    GROUP           cpmProcessExtGroupRev
+    DESCRIPTION
+        "The cpmProcessExtGroupRev is optional and gives
+        detailed process monitoring information."
+
+    GROUP           cpmCPUThresholdGroup
+    DESCRIPTION
+        "The cpmCPUThresholdGroup is optional and provides
+        information on configuring threshold values."
+
+    GROUP           cpmProcessGroupRev
+    DESCRIPTION
+        "The cpmProcessGroupRev is optional and provides common
+        process monitoring information."
+
+    GROUP           cpmCPUPosixMemoryGroup
+    DESCRIPTION
+        "The cpmCPUPosixMemoryGroup gives information about
+        CPU wide system memory of POSIX OS.
+        cpmCPUPosixMemoryGroup is mandatory if the Operating
+        System of the managed system supports Posix standard
+        kernel."
+
+    GROUP           cpmPosixProcessGroup
+    DESCRIPTION
+        "The cpmPosixProcessGroup gives information about
+        POSIX process. cpmPosixProcessGroup is mandatory if
+        the Operating System of the managed system
+        supports Posix standard kernel."
+
+    GROUP           cpmThreadGroup
+    DESCRIPTION
+        "The cpmThreadGroup gives information about POSIX
+        threads. cpmThreadGroup is mandatory if the Operating
+        System of the managed system supports Posix standard
+        kernel."
+
+    GROUP           cpmVirtualProcessGroup
+    DESCRIPTION
+        "The cpmVirtualProcessGroup gives information about
+        virtual process. cpmVirtualProcessGroup is mandatory
+        Operating System of the managed system supports
+        Posix standard kernel."
+
+    GROUP           cpmCPUTotalOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+
+    GROUP           cpmCPUTotalHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+
+    GROUP           cpmProcessExtRevOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+
+    GROUP           cpmProcessExtRevHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+
+    GROUP           cpmThreadOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+
+    GROUP           cpmThreadHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+
+    GROUP           cpmVirtualProcessOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+
+    GROUP           cpmVirtualProcessHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which
+        run on 32-bit operating system."
+    ::= { cpmCompliances 5 }
+
+cProcessMIBComplianceRev4 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Process MIB. This compliance module
+        deprecates cProcessMIBComplianceRev3."
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpmCPUTotalGroupRev1 }
+
+    GROUP           cpmCPUHistoryGroup
+    DESCRIPTION
+        "The cpmCPUHistoryGroup is optional and gives the information
+        about process CPU utilization history."
+
+    GROUP           cpmCPUThresholdNotificationGroup
+    DESCRIPTION
+        "The cpmCPUThresholdNotificationGroup is optional and these traps
+        indicates that configured threshold is reached."
+
+    GROUP           cpmProcessExtGroupRev
+    DESCRIPTION
+        "The cpmProcessExtGroupRev is optional and gives detailed process
+        monitoring information."
+
+    GROUP           cpmCPUThresholdGroup
+    DESCRIPTION
+        "The cpmCPUThresholdGroup is optional and provides information on
+        configuring threshold values."
+
+    GROUP           cpmProcessGroupRev
+    DESCRIPTION
+        "The cpmProcessGroupRev is optional and provides common process
+        monitoring information."
+
+    GROUP           cpmCPUPosixMemoryGroup
+    DESCRIPTION
+        "The cpmCPUPosixMemoryGroup gives information about CPU wide
+        system memory of POSIX OS.
+        cpmCPUPosixMemoryGroup is mandatory if the Operating System of
+        the managed system supports Posix standard kernel."
+
+    GROUP           cpmPosixProcessGroup
+    DESCRIPTION
+        "The cpmPosixProcessGroup gives information about POSIX process.
+        cpmPosixProcessGroup is mandatory if the Operating System of the
+        managed system supports Posix standard kernel."
+
+    GROUP           cpmThreadGroup
+    DESCRIPTION
+        "The cpmThreadGroup gives information about POSIX threads.
+        cpmThreadGroup is mandatory if the Operating System of the
+        managed system supports Posix standard kernel."
+
+    GROUP           cpmVirtualProcessGroup
+    DESCRIPTION
+        "The cpmVirtualProcessGroup gives information about virtual
+        process.cpmVirtualProcessGroup is mandatory Operating System of
+        the managed system supports Posix standard kernel."
+
+    GROUP           cpmCPUTotalOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmCPUTotalHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmProcessExtRevOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmProcessExtRevHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmThreadOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmThreadHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmVirtualProcessOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmVirtualProcessHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmCPULoadAvgGroup
+    DESCRIPTION
+        "The cpmCPULoadAvgGroup is optional and provides CPU load
+        average information.This Group is valid only for the device
+        which supports it."
+    ::= { cpmCompliances 6 }
+
+cProcessMIBComplianceRev5 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the Cisco Process MIB. This compliance module
+        deprecates cProcessMIBComplianceRev4"
+    MODULE          -- this module
+    MANDATORY-GROUPS { cpmCPUTotalGroupRev1 }
+
+    GROUP           cpmCoreGroup
+    DESCRIPTION
+        "The cpmCoreGroup is optoinal and gives per-core CPU utilization."
+
+    GROUP           cpmCPUHistoryGroup
+    DESCRIPTION
+        "The cpmCPUHistoryGroup is optional and gives the information
+        about process CPU utilization history."
+
+    GROUP           cpmCPUThresholdNotificationGroup
+    DESCRIPTION
+        "The cpmCPUThresholdNotificationGroup is optional and these
+        traps indicates that configured threshold is reached."
+
+    GROUP           cpmProcessExtGroupRev
+    DESCRIPTION
+        "The cpmProcessExtGroupRev is optional and gives detailed process
+        monitoring information."
+
+    GROUP           cpmCPUThresholdGroup
+    DESCRIPTION
+        "The cpmCPUThresholdGroup is optional and provides information
+        on configuring threshold values."
+
+    GROUP           cpmProcessGroupRev
+    DESCRIPTION
+        "The cpmProcessGroupRev is optional and provides common process
+        monitoring information."
+
+    GROUP           cpmCPUPosixMemoryGroup
+    DESCRIPTION
+        "The cpmCPUPosixMemoryGroup gives information about CPU wide
+        system memory of POSIX OS.
+        cpmCPUPosixMemoryGroup is mandatory if the Operating System of
+        the managed system supports Posix standard kernel."
+
+    GROUP           cpmPosixProcessGroup
+    DESCRIPTION
+        "The cpmPosixProcessGroup gives information about POSIX process.
+        cpmPosixProcessGroup is mandatory if the Operating System
+        of the managed system supports Posix standard kernel."
+
+    GROUP           cpmThreadGroup
+    DESCRIPTION
+        "The cpmThreadGroup gives information about POSIX threads.
+        cpmThreadGroup is mandatory if the Operating System of the
+        managed system supports Posix standard kernel."
+
+    GROUP           cpmVirtualProcessGroup
+    DESCRIPTION
+        "The cpmVirtualProcessGroup gives information about virtual
+        process.cpmVirtualProcessGroup is mandatory Operating System of 
+        the managed system supports Posix standard kernel."
+
+    GROUP           cpmCPUTotalOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system."
+
+    GROUP           cpmCPUTotalHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmProcessExtRevOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmProcessExtRevHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmThreadOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmThreadHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmVirtualProcessOverflowGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system."
+
+    GROUP           cpmVirtualProcessHCGroup
+    DESCRIPTION
+        "This group is an optional group for the devices which run on
+        32-bit operating system"
+
+    GROUP           cpmCPULoadAvgGroup
+    DESCRIPTION
+        "The cpmCPULoadAvgGroup is optional and provides CPU load
+        average information.This Group is valid only for the device
+        which supports it"
+
+    GROUP           cpmCPUTotalMemoryCommitGroup
+    DESCRIPTION
+        "The cpmCPUTotalMemoryCommitGroup is optional and provides system
+        Committed memory information.This Group is valid only for the
+        device which supports it."
+    ::= { cpmCompliances 7 }
+
+-- units of conformance
+
+cpmCPUTotalGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUTotalPhysicalIndex,
+                        cpmCPUTotal5sec,
+                        cpmCPUTotal1min,
+                        cpmCPUTotal5min
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "A collection of objects providing CPU load monitoring
+        information. This group is mandatory for all cisco devices.
+        This group is deprecated since the objects cpmCPUTotal5sec,
+        cpmCPUTotal1min and cpmCPUTotal5min are
+        deprecated. A new object cpmCPUTotalGroupRev is
+        added in place of it."
+    ::= { cpmGroups 1 }
+
+cpmProcessGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmProcessPID,
+                        cpmProcessName,
+                        cpmProcessuSecs,
+                        cpmProcessTimeCreated
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "A collection of objects providing common process
+        monitoring information. This group is mandatory for 
+        all cisco devices. This object is deprecated
+        by cpmProcessGroupRev."
+    ::= { cpmGroups 2 }
+
+cpmProcessExtGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmProcExtMemAllocated,
+                        cpmProcExtMemFreed,
+                        cpmProcExtInvoked,
+                        cpmProcExtRuntime,
+                        cpmProcExtUtil5Sec,
+                        cpmProcExtUtil1Min,
+                        cpmProcExtUtil5Min,
+                        cpmProcExtPriority
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "A collection of objects providing additional and
+        more detailed process monitoring information. This 
+        group is mandatory for all cisco devices that have 
+        the internal capability to keep this information. 
+        This group is deprecated and new group
+        cpmProcessExtGroupRev is added."
+    ::= { cpmGroups 3 }
+
+cpmCPUTotalGroupRev OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUTotalPhysicalIndex,
+                        cpmCPUTotal5secRev,
+                        cpmCPUTotal1minRev,
+                        cpmCPUTotal5minRev
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "A collection of objects providing CPU load monitoring
+        information. This group is mandatory for all cisco
+        devices. This group deprecates cpmCPUTotalGroup.
+        This group is deprecated since the object
+        cpmCPUTotal5secRev is deprecated.
+        A new object cpmCPUTotalGroupRev1 is
+        added in place of it."
+    ::= { cpmGroups 4 }
+
+cpmProcessExtGroupRev OBJECT-GROUP
+    OBJECTS         {
+                        cpmProcExtMemAllocatedRev,
+                        cpmProcExtMemFreedRev,
+                        cpmProcExtInvokedRev,
+                        cpmProcExtRuntimeRev,
+                        cpmProcExtUtil5SecRev,
+                        cpmProcExtUtil1MinRev,
+                        cpmProcExtUtil5MinRev,
+                        cpmProcExtPriorityRev
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing additional and
+        more detailed process monitoring information. This 
+        group is mandatory for all cisco devices that have 
+        the internal capability to keep this information.
+        This group is formed after deprecating cpmProcessExtGroup.
+        cpmProcExtMemAllocatedRev, cpmProcExtMemFreedRev,
+        cpmProcExtInvokedRev, cpmProcExtRuntimeRev,
+        cpmProcExtUtil5SecRev, cpmProcExtUtil1MinRev and 
+        cpmProcExtUtil5MinRev are the new objects added."
+    ::= { cpmGroups 5 }
+
+cpmProcessGroupRev OBJECT-GROUP
+    OBJECTS         {
+                        cpmProcessPID,
+                        cpmProcessName,
+                        cpmProcessAverageUSecs,
+                        cpmProcessTimeCreated
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing common process
+        monitoring information. This group is mandatory for 
+        all cisco devices. This object deprecates
+        cpmProcessGroup."
+    ::= { cpmGroups 6 }
+
+cpmCPUTotalGroupRev1 OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUTotalPhysicalIndex,
+                        cpmCPUTotal1minRev,
+                        cpmCPUTotal5minRev,
+                        cpmCPUMonInterval,
+                        cpmCPUTotalMonIntervalValue,
+                        cpmCPUInterruptMonIntervalValue
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing CPU load monitoring
+        information. This group is mandatory for all cisco
+        devices. This group deprecates cpmCPUTotalGroupRev."
+    ::= { cpmGroups 7 }
+
+cpmCPUThresholdGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPURisingThresholdValue,
+                        cpmCPURisingThresholdPeriod,
+                        cpmCPUFallingThresholdValue,
+                        cpmCPUFallingThresholdPeriod,
+                        cpmCPUThresholdEntryStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects used for configuration
+        of thresholding."
+    ::= { cpmGroups 8 }
+
+cpmCPUHistoryGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUHistorySize,
+                        cpmCPUHistoryThreshold,
+                        cpmCPUHistoryTotalUtil,
+                        cpmCPUHistoryInterruptUtil,
+                        cpmCPUHistoryCreatedTime,
+                        cpmCPUHistoryReportSize,
+                        cpmCPUHistoryProcId,
+                        cpmCPUHistoryProcName,
+                        cpmCPUHistoryProcCreated,
+                        cpmCPUHistoryProcUtil
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing information
+        about CPU utilization history."
+    ::= { cpmGroups 9 }
+
+cpmCPUThresholdNotificationGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    {
+                        cpmCPURisingThreshold,
+                        cpmCPUFallingThreshold
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A group of notifications."
+    ::= { cpmGroups 10 }
+
+cpmCPUPosixMemoryGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUMemoryUsed,
+                        cpmCPUMemoryFree,
+                        cpmCPUMemoryKernelReserved,
+                        cpmCPUMemoryLowest
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of common objects providing
+        CPU wide System memory information running
+        POSIX compliant OS."
+    ::= { cpmGroups 11 }
+
+cpmPosixProcessGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmProcessType,
+                        cpmProcessRespawn,
+                        cpmProcessRespawnCount,
+                        cpmProcessRespawnAfterLastPatch,
+                        cpmProcessMemoryCore,
+                        cpmProcessLastRestartUser,
+                        cpmProcessTextSegmentSize,
+                        cpmProcessDataSegmentSize,
+                        cpmProcessStackSize,
+                        cpmProcessDynamicMemorySize
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of common objects providing Process
+        information on devices running POSIX compliant OS."
+    ::= { cpmGroups 12 }
+
+cpmThreadGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmThreadName,
+                        cpmThreadPriority,
+                        cpmThreadState,
+                        cpmThreadBlockingProcess,
+                        cpmThreadCpuUtilization,
+                        cpmThreadStackSize
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing thread information
+        information on devices running POSIX compliant OS."
+    ::= { cpmGroups 13 }
+
+cpmVirtualProcessGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmVirtualProcessName,
+                        cpmVirtualProcessUtil5Sec,
+                        cpmVirtualProcessUtil1Min,
+                        cpmVirtualProcessUtil5Min,
+                        cpmVirtualProcessMemAllocated,
+                        cpmVirtualProcessMemFreed,
+                        cpmVirtualProcessInvokeCount,
+                        cpmVirtualProcessRuntime
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing virtual process
+        information on devices that can run virtual machines."
+    ::= { cpmGroups 14 }
+
+cpmCPUTotalOverflowGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUMemoryUsedOvrflw,
+                        cpmCPUMemoryFreeOvrflw,
+                        cpmCPUMemoryKernelReservedOvrflw,
+                        cpmCPUMemoryLowestOvrflw
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of Overflow (Ovrflw) objects providing CPU load
+        monitoring information."
+    ::= { cpmGroups 15 }
+
+cpmCPUTotalHCGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUMemoryHCUsed,
+                        cpmCPUMemoryHCFree,
+                        cpmCPUMemoryHCKernelReserved,
+                        cpmCPUMemoryHCLowest
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of High Capacity (HC) objects providing CPU
+        load monitoring information."
+    ::= { cpmGroups 16 }
+
+cpmProcessExtRevOverflowGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmProcExtMemAllocatedRevOvrflw,
+                        cpmProcExtMemFreedRevOvrflw,
+                        cpmProcessTextSegmentSizeOvrflw,
+                        cpmProcessDataSegmentSizeOvrflw,
+                        cpmProcessStackSizeOvrflw,
+                        cpmProcessDynamicMemorySizeOvrflw
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of Overflow objects providing additional
+        and more detailed process monitoring information."
+    ::= { cpmGroups 17 }
+
+cpmProcessExtRevHCGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmProcExtHCMemAllocatedRev,
+                        cpmProcExtHCMemFreedRev,
+                        cpmProcessHCTextSegmentSize,
+                        cpmProcessHCDataSegmentSize,
+                        cpmProcessHCStackSize,
+                        cpmProcessHCDynamicMemorySize
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of High Capacity objects providing
+        additional and more detailed process monitoring 
+        information."
+    ::= { cpmGroups 18 }
+
+cpmThreadOverflowGroup OBJECT-GROUP
+    OBJECTS         { cpmThreadStackSizeOvrflw }
+    STATUS          current
+    DESCRIPTION
+        "A collection of Overflow objects providing thread
+        information on devices running POSIX compliant OS."
+    ::= { cpmGroups 19 }
+
+cpmThreadHCGroup OBJECT-GROUP
+    OBJECTS         { cpmThreadHCStackSize }
+    STATUS          current
+    DESCRIPTION
+        "A collection of High Capacity objects providing thread
+        information on devices running POSIX compliant OS."
+    ::= { cpmGroups 20 }
+
+cpmVirtualProcessOverflowGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmVirtualProcessMemAllocatedOvrflw,
+                        cpmVirtualProcessMemFreedOvrflw
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of Overflow objects providing virtual process
+        information on devices that can run virtual machines."
+    ::= { cpmGroups 21 }
+
+cpmVirtualProcessHCGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmVirtualProcessHCMemAllocated,
+                        cpmVirtualProcessHCMemFreed
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of High Capacity objects providing virtual process
+        information on devices that can run virtual machines."
+    ::= { cpmGroups 22 }
+
+cpmCPULoadAvgGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPULoadAvg1min,
+                        cpmCPULoadAvg5min,
+                        cpmCPULoadAvg15min
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing CPU load average
+        information"
+    ::= { cpmGroups 23 }
+
+cpmCPUTotalMemoryCommitGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCPUMemoryCommitted,
+                        cpmCPUMemoryCommittedOvrflw,
+                        cpmCPUMemoryHCCommitted
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing CPU system Committed memory
+        information."
+    ::= { cpmGroups 24 }
+
+cpmCoreGroup OBJECT-GROUP
+    OBJECTS         {
+                        cpmCorePhysicalIndex,
+                        cpmCore5sec,
+                        cpmCore1min,
+                        cpmCore5min,
+                        cpmCoreLoadAvg1min,
+                        cpmCoreLoadAvg5min,
+                        cpmCoreLoadAvg15min
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing per-Core CPU utilization."
+    ::= { cpmGroups 25 }
+
+END
+
+

@@ -1,0 +1,481 @@
+-- *****************************************************************
+-- RUIJIE-MEMORY-MIB.mib:  Ruijie Memory MIB file
+--
+-- October 2003, Wuzg
+--
+-- Copyright (c) 2003 by Ruijie Networks Co.,Ltd.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+RUIJIE-MEMORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Gauge32
+                FROM SNMPv2-SMI
+        DisplayString,
+        MacAddress,
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+                FROM SNMPv2-CONF
+        ruijieMgmt
+                FROM RUIJIE-SMI;
+
+ruijieMemoryMIB MODULE-IDENTITY
+        LAST-UPDATED "200310140000Z"
+        ORGANIZATION "Ruijie Networks Co.,Ltd."
+        CONTACT-INFO
+                " 
+                Tel: 4008-111-000 
+
+                E-mail: service@ruijie.com.cn"
+        DESCRIPTION
+                "This module defines ruijie system mibs."
+        REVISION      "200310140000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { ruijieMgmt 35}
+
+-- Percentage for statistic, etc.
+--
+Percent ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "An integer that is in the range of a percent value."
+    SYNTAX INTEGER (0..100)
+    
+ruijieMemoryPoolMIBObjects OBJECT IDENTIFIER ::= { ruijieMemoryMIB 1 }
+
+    
+ruijieMemoryPoolUtilizationTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF RuijieMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time."
+  ::= { ruijieMemoryPoolMIBObjects 1 }
+
+ruijieMemoryPoolUtilizationEntry OBJECT-TYPE
+  SYNTAX      RuijieMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the memory pool utilization table."
+  INDEX { ruijieMemoryPoolIndex }
+  ::= { ruijieMemoryPoolUtilizationTable 1 }
+
+RuijieMemoryPoolUtilizationEntry ::=
+  SEQUENCE {
+    ruijieMemoryPoolIndex  Integer32,
+    ruijieMemoryPoolName   DisplayString,
+    ruijieMemoryPoolCurrentUtilization  Percent,
+    ruijieMemoryPoolLowestUtilization  Percent,
+    ruijieMemoryPoolLargestUtilization Percent,
+    ruijieMemoryPoolSize   Integer32,
+    ruijieMemoryPoolUsed   Integer32,
+    ruijieMemoryPoolFree   Integer32,
+    ruijieMemoryPoolWarning  Percent,
+    ruijieMemoryPoolCritical Percent,
+    ruijieMemoryPoolAverageUtilization Percent,
+    ruijieMemoryPoolTotalSize   Gauge32,
+    ruijieMemoryPoolUsedSize    Gauge32,
+    ruijieMemoryPoolFreeSize    Gauge32
+
+  }
+    
+ruijieMemoryPoolIndex OBJECT-TYPE
+    SYNTAX        Integer32(0..255)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a Memory Pool."
+    ::= { ruijieMemoryPoolUtilizationEntry 1 }
+
+ruijieMemoryPoolName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to the memory pool.  This
+        object is suitable for output to a human operator"
+    ::= { ruijieMemoryPoolUtilizationEntry 2 }
+    
+ruijieMemoryPoolCurrentUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization currently."
+    ::= { ruijieMemoryPoolUtilizationEntry 3 }
+
+ruijieMemoryPoolLowestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization when memory used least."
+    ::= { ruijieMemoryPoolUtilizationEntry 4 }
+
+ruijieMemoryPoolLargestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization when memory used most."
+    ::= { ruijieMemoryPoolUtilizationEntry 5 }
+        
+ruijieMemoryPoolSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the size of physical memory ."
+    ::= { ruijieMemoryPoolUtilizationEntry 6 }
+
+ruijieMemoryPoolUsed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory size that has been used."
+    ::= { ruijieMemoryPoolUtilizationEntry 7 }
+
+ruijieMemoryPoolFree OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory size that is free."
+    ::= { ruijieMemoryPoolUtilizationEntry 8 }
+
+ruijieMemoryPoolWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first warning of memory pool."
+    ::= { ruijieMemoryPoolUtilizationEntry 9 }
+
+ruijieMemoryPoolCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second warning of memory pool."
+    ::= { ruijieMemoryPoolUtilizationEntry 10 }
+
+ruijieMemoryPoolAverageUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the average memory pool utilization currently."
+    ::= { ruijieMemoryPoolUtilizationEntry 11 }
+
+ruijieMemoryPoolTotalSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total size of physical memory, the unit is Mbytes ."
+    ::= { ruijieMemoryPoolUtilizationEntry 12 }
+
+ruijieMemoryPoolUsedSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Have used physical memory size, the unit is Mbytes ."
+    ::= { ruijieMemoryPoolUtilizationEntry 13 }
+
+ruijieMemoryPoolFreeSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remaining physical memory size, the unit is Mbytes ."
+    ::= { ruijieMemoryPoolUtilizationEntry 14 }
+
+ruijieNodeMemoryPoolTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF RuijieNodeMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of node's memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time."
+  ::= { ruijieMemoryPoolMIBObjects 2 }
+
+ruijieNodeMemoryPoolEntry OBJECT-TYPE
+  SYNTAX      RuijieNodeMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the node's memory pool utilization table."
+  INDEX { ruijieNodeMemoryPoolIndex }
+  ::= { ruijieNodeMemoryPoolTable 1 }
+
+RuijieNodeMemoryPoolEntry ::=
+  SEQUENCE {
+    ruijieNodeMemoryPoolIndex  Integer32,
+    ruijieNodeMemoryPoolName   DisplayString,
+    ruijieNodeMemoryPoolCurrentUtilization  Percent,
+    ruijieNodeMemoryPoolLowestUtilization  Percent,
+    ruijieNodeMemoryPoolLargestUtilization Percent,
+    ruijieNodeMemoryPoolSize   Integer32,
+    ruijieNodeMemoryPoolUsed   Integer32,
+    ruijieNodeMemoryPoolFree   Integer32,
+    ruijieNodeMemoryPoolWarning  Percent,
+    ruijieNodeMemoryPoolCritical Percent,
+    ruijieNodeMemoryPoolTotalSize  Gauge32,
+    ruijieNodeMemoryPoolUsedSize  Gauge32,
+    ruijieNodeMemoryPoolFreeSize  Gauge32
+  }
+    
+ruijieNodeMemoryPoolIndex OBJECT-TYPE
+    SYNTAX        Integer32(0..255)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents a node's Memory Pool."
+    ::= { ruijieNodeMemoryPoolEntry 1 }
+
+ruijieNodeMemoryPoolName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to the node's memory pool.  This
+        object is suitable for output to a human operator"
+    ::= { ruijieNodeMemoryPoolEntry 2 }
+    
+ruijieNodeMemoryPoolCurrentUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory pool utilization currently."
+    ::= { ruijieNodeMemoryPoolEntry 3 }
+
+ruijieNodeMemoryPoolLowestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory pool utilization when memory used least."
+    ::= { ruijieNodeMemoryPoolEntry 4 }
+
+ruijieNodeMemoryPoolLargestUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory pool utilization when memory used most."
+    ::= { ruijieNodeMemoryPoolEntry 5 }
+        
+ruijieNodeMemoryPoolSize OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the size of the node's physical memory ."
+    ::= { ruijieNodeMemoryPoolEntry 6 }
+
+ruijieNodeMemoryPoolUsed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory size that has been used."
+    ::= { ruijieNodeMemoryPoolEntry 7 }
+
+ruijieNodeMemoryPoolFree OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the node's memory size that is free."
+    ::= { ruijieNodeMemoryPoolEntry 8 }
+    
+ruijieNodeMemoryPoolWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the first warning of the node's memory."
+    ::= { ruijieNodeMemoryPoolEntry 9 }
+    
+ruijieNodeMemoryPoolCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This is the second warning of the node's memory."
+    ::= { ruijieNodeMemoryPoolEntry 10 }  
+
+ruijieNodeMemoryPoolTotalSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The total size of node's physical memory, the unit is Mbytes ."
+    ::= { ruijieNodeMemoryPoolEntry 11 }
+
+ruijieNodeMemoryPoolUsedSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Have used node's physical memory size, the unit is Mbytes ."
+    ::= { ruijieNodeMemoryPoolEntry 12 }
+
+ruijieNodeMemoryPoolFreeSize OBJECT-TYPE
+    SYNTAX        Gauge32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The remaining node's physical memory size, the unit is Mbytes ."
+    ::= { ruijieNodeMemoryPoolEntry 13 }
+
+
+--lank ap 2010-7   
+ruijieLankApMemoryPoolTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF RuijieLankApMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of lank ap memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time."
+  ::= { ruijieMemoryPoolMIBObjects 3 }
+
+ruijieLankApMemoryPoolEntry OBJECT-TYPE
+  SYNTAX      RuijieLankApMemoryPoolEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the lank ap memory pool utilization table."
+  INDEX { ruijieLankApMemoryPoolMacAddr }
+  ::= { ruijieLankApMemoryPoolTable 1 }
+
+RuijieLankApMemoryPoolEntry ::=
+  SEQUENCE {
+    ruijieLankApMemoryPoolMacAddr             MacAddress,
+    ruijieLankApMemoryPoolWarning             Percent,  
+    ruijieLankApMemoryPoolCritical            Percent,
+    ruijieLankApMemoryPoolCurrentUtilization  Percent,
+    ruijieLankApMemoryPoolAverageUtilization  Percent
+  }
+ 
+ruijieLankApMemoryPoolMacAddr OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "An index that uniquely represents lank ap Memory Pool."
+    ::= { ruijieLankApMemoryPoolEntry 1 }   
+    
+ruijieLankApMemoryPoolWarning OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The first warning of lank ap memory pool."
+    ::= { ruijieLankApMemoryPoolEntry 2 }
+
+ruijieLankApMemoryPoolCritical OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "The second warning of lank ap memory pool."
+    ::= { ruijieLankApMemoryPoolEntry 3 }
+
+ruijieLankApMemoryPoolCurrentUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the lank ap memory pool utilization currently."
+    ::= { ruijieLankApMemoryPoolEntry 4 }
+  
+ruijieLankApMemoryPoolAverageUtilization OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the lank ap average memory pool utilization currently."
+    ::= { ruijieLankApMemoryPoolEntry 5 }
+
+
+ruijieMemoryMIBConformance OBJECT IDENTIFIER ::= { ruijieMemoryMIB 2 }
+ruijieMemoryMIBCompliances OBJECT IDENTIFIER ::= { ruijieMemoryMIBConformance 1 }
+ruijieMemoryMIBGroups      OBJECT IDENTIFIER ::= { ruijieMemoryMIBConformance 2 }
+
+
+-- compliance statements
+
+ruijieMemoryMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the Ruijie Memory MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { ruijieMemoryPoolUtilizationMIBGroup
+                 }
+        ::= { ruijieMemoryMIBCompliances 1 }
+                
+-- units of conformance
+
+ruijieMemoryPoolUtilizationMIBGroup OBJECT-GROUP
+        OBJECTS {
+          ruijieMemoryPoolIndex,
+          ruijieMemoryPoolName,
+          ruijieMemoryPoolCurrentUtilization,
+          ruijieMemoryPoolLowestUtilization,
+          ruijieMemoryPoolLargestUtilization,
+	  ruijieMemoryPoolSize,
+	  ruijieMemoryPoolUsed,
+	  ruijieMemoryPoolFree,
+	  ruijieMemoryPoolWarning,
+	  ruijieMemoryPoolCritical,
+          ruijieMemoryPoolAverageUtilization,
+          ruijieMemoryPoolTotalSize,
+          ruijieMemoryPoolUsedSize,
+          ruijieMemoryPoolFreeSize
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing memory pool utilization to a Ruijie agent."
+        ::= { ruijieMemoryMIBGroups 1 } 
+  
+ruijieNodeMemoryPoolMIBGroup OBJECT-GROUP
+        OBJECTS {
+          ruijieNodeMemoryPoolIndex,
+          ruijieNodeMemoryPoolName,
+          ruijieNodeMemoryPoolCurrentUtilization,
+          ruijieNodeMemoryPoolLowestUtilization,
+          ruijieNodeMemoryPoolLargestUtilization,
+	  ruijieNodeMemoryPoolSize,
+	  ruijieNodeMemoryPoolUsed,
+	  ruijieNodeMemoryPoolFree,
+	  ruijieNodeMemoryPoolWarning,
+	  ruijieNodeMemoryPoolCritical,
+          ruijieNodeMemoryPoolTotalSize,
+          ruijieNodeMemoryPoolUsedSize,
+          ruijieNodeMemoryPoolFreeSize
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing node's memory pool utilization to a Ruijie agent."
+        ::= { ruijieMemoryMIBGroups 2 } 
+  
+END

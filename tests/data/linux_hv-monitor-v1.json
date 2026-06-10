@@ -1,0 +1,2224 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "hv-monitor",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "hv-monitor",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"hv\":\"libvirt\",\"VMs\":[\"cuckoo70\",\"cuckoo71\",\"cuckoo72\",\"win10\",\"win10-base\"],\"VMdisks\":{\"cuckoo70\":[\"sda\",\"sdb\"],\"cuckoo71\":[\"sda\",\"sdb\"],\"cuckoo72\":[\"sda\",\"sdb\"],\"win10\":[\"sda\",\"sdb\"],\"win10-base\":[\"sda\",\"sdb\"]},\"VMdifs\":[],\"VMdstatus\":[],\"VMifs\":{\"cuckoo70\":[],\"cuckoo71\":[],\"cuckoo72\":[],\"win10\":[],\"win10-base\":[]}}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "totals_blocked",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_cow",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_cpus",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_crashed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_disk_alloc",
+                    "value": 2684354560000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_disk_in_use",
+                    "value": 112917528576,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_disk_on_disk",
+                    "value": 623888236544,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_etimes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_ibytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_idrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_ierrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_inblk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_ipkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_majflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_mem_alloc",
+                    "value": 21474836480,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_minflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_nivcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_nostate",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_nswap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_nvcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_obytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_odrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_oerrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_off",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_off_hard",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_off_soft",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_on",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_opkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_oublk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_paused",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_pcpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_pmem",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_pmsuspended",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_snaps",
+                    "value": 16,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_snaps_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_systime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_usertime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_vsz",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "totals_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_cow",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_cpus",
+                    "value": "2",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disk_alloc",
+                    "value": 536870912000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disk_in_use",
+                    "value": 21556596736,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disk_on_disk",
+                    "value": 22602317824,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_alloc",
+                    "value": "536870912000",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_in_use",
+                    "value": "21556596736",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_on_disk",
+                    "value": "22602317824",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sda_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_alloc",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_in_use",
+                    "value": "4380393472",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_on_disk",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_disks_sdb_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_etimes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_ibytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_idrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_ierrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_inblk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_ip",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_ipkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_majflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_mem_alloc",
+                    "value": 4294967296,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_minflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_nice",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_nivcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_nswap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_nvcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_obytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_odrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_oerrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_opkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_os_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_oublk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_pcpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_pmem",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_pri",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_snaps",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_snaps_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_status_int",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_systime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_usertime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_vsz",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo70_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_cow",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_cpus",
+                    "value": "2",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disk_alloc",
+                    "value": 536870912000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disk_in_use",
+                    "value": 21621743616,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disk_on_disk",
+                    "value": 22828810240,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_alloc",
+                    "value": "536870912000",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_in_use",
+                    "value": "21621743616",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_on_disk",
+                    "value": "22828810240",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sda_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_alloc",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_in_use",
+                    "value": "4380393472",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_on_disk",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_disks_sdb_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_etimes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_ibytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_idrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_ierrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_inblk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_ip",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_ipkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_majflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_mem_alloc",
+                    "value": 4294967296,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_minflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_nice",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_nivcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_nswap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_nvcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_obytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_odrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_oerrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_opkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_os_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_oublk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_pcpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_pmem",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_pri",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_snaps",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_snaps_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_status_int",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_systime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_usertime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_vsz",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo71_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_cow",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_cpus",
+                    "value": "2",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disk_alloc",
+                    "value": 536870912000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disk_in_use",
+                    "value": 21531758592,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disk_on_disk",
+                    "value": 22568960000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_alloc",
+                    "value": "536870912000",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_in_use",
+                    "value": "21531758592",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_on_disk",
+                    "value": "22568960000",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sda_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_alloc",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_in_use",
+                    "value": "4380393472",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_on_disk",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_disks_sdb_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_etimes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_ibytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_idrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_ierrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_inblk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_ip",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_ipkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_majflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_mem_alloc",
+                    "value": 4294967296,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_minflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_nice",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_nivcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_nswap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_nvcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_obytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_odrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_oerrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_opkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_os_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_oublk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_pcpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_pmem",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_pri",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_snaps",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_snaps_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_status_int",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_systime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_usertime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_vsz",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_cuckoo72_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_cow",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_cpus",
+                    "value": "2",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disk_alloc",
+                    "value": 536870912000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disk_in_use",
+                    "value": 29271355392,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disk_on_disk",
+                    "value": 536953094144,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_alloc",
+                    "value": "536870912000",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_in_use",
+                    "value": 29271355392,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_on_disk",
+                    "value": 536953094144,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sda_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_alloc",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_in_use",
+                    "value": "4380393472",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_on_disk",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_disks_sdb_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_etimes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_ibytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_idrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_ierrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_inblk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_ip",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_ipkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_majflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_mem_alloc",
+                    "value": 4294967296,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_minflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_nice",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_nivcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_nswap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_nvcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_obytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_odrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_oerrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_opkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_os_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_oublk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_pcpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_pmem",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_pri",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_snaps",
+                    "value": 5,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_snaps_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_status_int",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_systime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_usertime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_vsz",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_coll",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_console",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_console_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_cow",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_cpus",
+                    "value": "2",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disk_alloc",
+                    "value": 536870912000,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disk_in_use",
+                    "value": 18936074240,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disk_on_disk",
+                    "value": 18935054336,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_alloc",
+                    "value": "536870912000",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_in_use",
+                    "value": 18936074240,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_on_disk",
+                    "value": 18935054336,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sda_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_alloc",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_in_use",
+                    "value": "4380393472",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_on_disk",
+                    "value": "4380387328",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_rreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_rtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_wreqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_disks_sdb_wtime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_etimes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_freqs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ftime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ibytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_idrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ierrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_inblk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ip",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_ipkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_majflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_mem_alloc",
+                    "value": 4294967296,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_minflt",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nice",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nivcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nswap",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_nvcsw",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_obytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_odrop",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_oerrs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_opkts",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_os_type",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_oublk",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_pcpu",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_pmem",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_pri",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_rbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_rss",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_snaps",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_snaps_size",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_status_int",
+                    "value": "5",
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_systime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_usertime",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_vsz",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                },
+                {
+                    "metric": "VMs_win10-base_wbytes",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "hv-monitor"
+                }
+            ]
+        }
+    }
+}

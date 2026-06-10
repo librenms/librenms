@@ -1,0 +1,170 @@
+modules:
+    os:
+        hardware: FS-ENTITY-MIB::fsDeviceInfoDescr.1
+        serial: FS-ENTITY-MIB::fsDeviceSerialNumber.1
+        version: FS-ENTITY-MIB::fsDeviceSWVersion.1
+    mempools:
+        data:
+            -
+                oid: FS-MEMORY-MIB::fsNodeMemoryPoolTable
+                total: FS-MEMORY-MIB::fsNodeMemoryPoolSize
+                used: FS-MEMORY-MIB::fsNodeMemoryPoolUsed
+                warn_percent: FS-MEMORY-MIB::fsNodeMemoryPoolWarning
+                precision: 1024
+                descr: "{{ FS-MEMORY-MIB::fsNodeMemoryPoolName }}"
+    processors:
+        data:
+            -
+                oid: FS-PROCESS-MIB::fsNodeCPUTotalTable
+                value: FS-PROCESS-MIB::fsNodeCPUTotal5min
+                num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.36.1.2.1.5.{{ $index }}'
+                descr: '{{ FS-PROCESS-MIB::fsNodeCPUTotalName }}'
+                warn_percent: FS-PROCESS-MIB::fsNodeCPUTotalCritical
+    sensors:
+        additional_oids:
+            data:
+                -
+                    oid:
+                        - IF-MIB::ifAdminStatus
+        dbm:
+            data:
+                -
+                    oid: FS-FIBER-MIB::fsFiberTable
+                    value: FS-FIBER-MIB::fsFiberRXpower
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.76.{{ $index }}'
+                    descr: "{{ FS-FIBER-MIB::fsFiberPortDescr }} RX"
+                    divisor: 100
+                    low_warn_limit: FS-FIBER-MIB::fsFiberRXpowerLowWarnThreshold
+                    warn_limit: FS-FIBER-MIB::fsFiberRXpowerHighWarnThreshold
+                    low_limit: FS-FIBER-MIB::fsFiberRXpowerLowAlarmThreshold
+                    high_limit: FS-FIBER-MIB::fsFiberRXpowerHighAlarmThreshold
+                    index: 'rx-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: FS-FIBER-MIB::fsFiberDDMSupportStatus
+                            op: '='
+                            value: 2
+                        -
+                            oid: FS-FIBER-MIB::fsFiberRXpower
+                            op: '='
+                            value: -10000
+                        -
+                            oid: IF-MIB::ifAdminStatus
+                            op: '='
+                            value: 2
+                -
+                    oid: FS-FIBER-MIB::fsFiberTable
+                    value: FS-FIBER-MIB::fsFiberTXpower
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.81.{{ $index }}'
+                    descr: "{{ FS-FIBER-MIB::fsFiberPortDescr }} TX"
+                    divisor: 100
+                    low_warn_limit: FS-FIBER-MIB::fsFiberTXpowerLowWarnThreshold
+                    warn_limit: FS-FIBER-MIB::fsFiberTXpowerHighWarnThreshold
+                    low_limit: FS-FIBER-MIB::fsFiberTXpowerLowAlarmThreshold
+                    high_limit: FS-FIBER-MIB::fsFiberTXpowerHighAlarmThreshold
+                    index: 'tx-{{ $index }}'
+                    skip_values:
+                        -
+                            oid: FS-FIBER-MIB::fsFiberDDMSupportStatus
+                            op: '='
+                            value: 2
+                        -
+                            oid: FS-FIBER-MIB::fsFiberTXpower
+                            op: '='
+                            value: -10000
+                        -
+                            oid: IF-MIB::ifAdminStatus
+                            op: '='
+                            value: 2
+        fanspeed:
+            data:
+                -
+                    oid: FS-SYSTEM-MIB::fsSystemFanStatusTable
+                    value: FS-SYSTEM-MIB::fsSystemFanStatusSpeed
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.43.1.6.{{ $index }}'
+                    descr: 'Fan {{ $subindex0 }}/{{ $subindex1 }}'
+        temperature:
+            data:
+                -
+                    oid: FS-SYSTEM-MIB::fsSystemMultipleTemperatureTable
+                    value: FS-SYSTEM-MIB::fsSystemMultipleTemperatureCurrent
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.44.1.5.{{ $index }}'
+                    warn_limit: FS-SYSTEM-MIB::fsSystemMultipleTemperatureWarning
+                    high_limit: FS-SYSTEM-MIB::fsSystemMultipleTemperatureCritical
+                    descr: "{{ FS-SYSTEM-MIB::fsSystemMultipleTemperatureName }} {{ $subindex0 }}/{{ $subindex1 }}"
+                -
+                    oid: FS-FIBER-MIB::fsFiberTable
+                    value: FS-FIBER-MIB::fsFiberTemp
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.17.{{ $index }}'
+                    descr: "{{ FS-FIBER-MIB::fsFiberPortDescr }}"
+                    index: 'temp-{{ $index }}'
+                    group: Transceivers
+                    skip_values:
+                        -
+                            oid: FS-FIBER-MIB::fsFiberDDMSupportStatus
+                            op: '='
+                            value: 2
+                        -
+                            oid: FS-FIBER-MIB::fsFiberTemp
+                            op: '='
+                            value: 0
+        voltage:
+            data:
+                -
+                    oid: FS-SYSTEM-MIB::fsSystemElectricalInformationTable
+                    value: FS-SYSTEM-MIB::fsSystemElectricalInformationInVoltage
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.41.1.11.{{ $index }}'
+                    descr: 'Power supply {{ $subindex0 }}/{{ $subindex1 }}'
+        power:
+            data:
+                -
+                    oid: FS-SYSTEM-MIB::fsSystemElectricalInformationTable
+                    value: FS-SYSTEM-MIB::fsSystemElectricalInformationOutPower
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.41.1.15.{{ $index }}'
+                    descr: 'Power supply {{ $subindex0 }}/{{ $subindex1 }}'
+        state:
+            data:
+                -
+                    oid: FS-SYSTEM-MIB::fsSystemFanStatusTable
+                    value: FS-SYSTEM-MIB::fsSystemFanStatus
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.43.1.4.{{ $index }}'
+                    descr: 'Fan {{ $subindex0 }}/{{ $subindex1 }}'
+                    state_name: fsSystemFanStatus
+                    index: 'fan-{{ $index }}'
+                    group: Fans
+                    states:
+                        - { value: 1, generic: 3, descr: 'noexist' }
+                        - { value: 2, generic: 2, descr: 'existnopower' }
+                        - { value: 3, generic: 1, descr: 'existreadypower' }
+                        - { value: 4, generic: 0, descr: 'normal' }
+                        - { value: 5, generic: 2, descr: 'powerbutabnormal' }
+                        - { value: 6, generic: 3, descr: 'unknown' }
+                -
+                    oid: FS-FIBER-MIB::fsFiberTable
+                    value: FS-FIBER-MIB::fsFiberTempStatus
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.105.1.1.1.18.{{ $index }}'
+                    descr: '{{ FS-FIBER-MIB::fsFiberPortDescr }} Temperature'
+                    state_name: fsFiberTempStatus
+                    index: 'tempstat-{{ $index }}'
+                    group: Transceivers
+                    skip_values:
+                        - 1
+                    states:
+                        - { value: 2, generic: 0, descr: 'ok' }
+                        - { value: 3, generic: 1, descr: 'warning' }
+                        - { value: 4, generic: 2, descr: 'alarm' }
+                -
+                    oid: FS-SYSTEM-MIB::fsSystemElectricalInformationTable
+                    value: FS-SYSTEM-MIB::fsSystemElectricalInformationStatus
+                    num_oid: '.1.3.6.1.4.1.52642.1.1.10.2.1.1.41.1.3.{{ $index }}'
+                    descr: 'Power supply {{ $subindex0 }}/{{ $subindex1 }}'
+                    state_name: fsSystemElectricalInformationStatus
+                    index: 'psu-{{ $index }}'
+                    group: 'Power Supplies'
+                    states:
+                        - { value: 1, generic: 3, descr: 'noexist' }
+                        - { value: 2, generic: 2, descr: 'existnopower' }
+                        - { value: 3, generic: 1, descr: 'existreadypower' }
+                        - { value: 4, generic: 0, descr: 'normal' }
+                        - { value: 5, generic: 2, descr: 'powerbutabnormal' }
+                        - { value: 6, generic: 3, descr: 'unknown' }

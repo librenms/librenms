@@ -1,0 +1,156 @@
+-- **********************************************************
+-- Copyright 2018-2022 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMW-TUNNEL-SERVER-AGENTCAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    vmwareAgentCapabilities
+        FROM VMWARE-ROOT-MIB
+    AGENT-CAPABILITIES
+        FROM  SNMPv2-CONF;
+
+
+vmwTunnelServerAgentCapMIB MODULE-IDENTITY
+    LAST-UPDATED "202210280000Z"
+    ORGANIZATION "VMware, Inc."
+    CONTACT-INFO
+        "VMware, Inc.
+        3401 Hillview Ave
+        Palo Alto, CA 94304
+        Tel: 1-877-486-9273 or 650-427-5000
+        Fax: 650-427-5001
+        Web: https://kb.vmware.com/s/article/1013445
+        "
+    DESCRIPTION
+        "This module defines agent capabilities for deployed
+         VMware Workspace ONE Tunnel Server by release."
+
+    REVISION     "202210280000Z"
+    DESCRIPTION
+        "Capabilities for VMware Tunnel Server 22.12.00 release."
+    REVISION     "202007210000Z"
+    DESCRIPTION
+        "Capabilities for VMware Tunnel Server 20.09.00 release."
+    REVISION     "201910300000Z"
+    DESCRIPTION
+        "Capabilities for VMware Tunnel Server 4.2.0 release."
+    REVISION     "201809040000Z"
+    DESCRIPTION
+        "Capabilities for VMware Tunnel Server 4.0.0 release."
+        ::= { vmwareAgentCapabilities 28 }
+
+vmwTunnelServerCapability OBJECT IDENTIFIER ::=
+    { vmwTunnelServerAgentCapMIB 1 }
+
+
+--
+-- Applies to 22.12.00 Release
+--
+
+
+vmwTunnelServer2022-221200 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "22.12.00"
+    STATUS  current
+    DESCRIPTION
+        "Release 22.12.00 for VMware Workspace ONE Tunnel Server
+         supporting tunnel statistic and information queries.
+        "
+    REFERENCE
+        "https://www.vmware.com/products/workspace-one.html"
+    SUPPORTS VMWARE-TUNNEL-SERVER-MIB    -- REVISION 202210280000Z
+
+    INCLUDES {
+        vmwTunnelServerInfoGroup,
+        vmwTunnelServerInfoGroup2,
+        vmwTunnelServerInfoGroup3,
+        vmwTunnelServerStatGroup,
+        vmwTunnelServerStatGroup2,
+        vmwTunnelServerStatGroup3,
+        vmwTunnelServerStatGroup4
+    }
+    ::= { vmwTunnelServerCapability 4 }
+
+
+--
+-- Applies to 20.09.00 Release
+--
+
+
+vmwTunnelServer2020-200900 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "20.09.00"
+    STATUS  current
+    DESCRIPTION
+        "Release 20.09.00 for VMware Tunnel Server supporting tunnel
+         statistic and information queries.
+        "
+    REFERENCE
+        "https://www.vmware.com/products/workspace-one.html"
+    SUPPORTS VMWARE-TUNNEL-SERVER-MIB    -- REVISION 202007210000Z
+
+    INCLUDES {
+        vmwTunnelServerInfoGroup,
+        vmwTunnelServerInfoGroup2,
+        vmwTunnelServerStatGroup,
+        vmwTunnelServerStatGroup2,
+        vmwTunnelServerStatGroup3
+    }
+    ::= { vmwTunnelServerCapability 3 }
+
+
+--
+-- Applies to 4.2.0 Release
+--
+
+
+vmwTunnelServer2019-420 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "4.2.0"
+    STATUS  current
+    DESCRIPTION
+        "Release 4.2.0 for VMware Tunnel Server supporting tunnel
+         statistic and information queries.
+        "
+    REFERENCE
+        "https://www.vmware.com/products/workspace-one.html"
+    SUPPORTS VMWARE-TUNNEL-SERVER-MIB    -- REVISION 201910300000Z
+
+    INCLUDES {
+        vmwTunnelServerStatGroup,
+        vmwTunnelServerInfoGroup,
+        vmwTunnelServerStatGroup2
+    }
+    ::= { vmwTunnelServerCapability 2 }
+
+
+--
+-- Applies to 4.0.0 Release
+--
+
+
+vmwTunnelServer2018-400 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "4.0.0"
+    STATUS  current
+    DESCRIPTION
+        "Release 4.0.0 for VMware Tunnel Server supporting tunnel
+         statistic and information queries.
+        "
+    REFERENCE
+        "https://www.vmware.com/products/workspace-one.html"
+    SUPPORTS VMWARE-TUNNEL-SERVER-MIB    -- REVISION 201808300000Z
+
+    INCLUDES {
+        vmwTunnelServerStatGroup,
+        vmwTunnelServerInfoGroup
+    }
+    ::= { vmwTunnelServerCapability 1 }
+
+
+END
+
+

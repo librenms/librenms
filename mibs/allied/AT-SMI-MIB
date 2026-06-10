@@ -1,0 +1,169 @@
+-- ============================================================================
+-- AT-SMI.MIB, Allied Telesis enterprise MIB: Structure of Management Information
+--
+-- Copyright (c) 2014 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-SMI-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+
+        alliedTelesis MODULE-IDENTITY
+            LAST-UPDATED "201409300000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "  http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The Structure of Management Information for Allied Telesis enterprise."
+            REVISION "201409300000Z"
+            DESCRIPTION
+                "Merged object IDs from ATKK-WLAN-SMI-MIB for Wireless Products."
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200802280000Z"
+            DESCRIPTION
+                "Standardized the file head."
+            REVISION "200606140000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
+            ::= { enterprises 207 }
+
+
+
+--
+-- Textual conventions
+--
+
+        DisplayStringUnsized ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT
+                "255a"
+            STATUS current
+            DESCRIPTION
+                "Represents textual information taken from the NVT ASCII
+                character set. It is a variation of DisplayString which
+                is defined in RFC 2579."
+            REFERENCE
+                "DisplayString"
+            SYNTAX OCTET STRING
+
+
+--
+-- Node definitions
+--
+
+        products OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "products is the root OBJECT IDENTIFIER. Beneath it there are subtree
+                bridgeRouter and routerSwitch, which are is defined in AT-PRODUCTS-MIB."
+            ::= { alliedTelesis 1 }
+
+
+        wirelesslan OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which wireless lan product MIB object ids are assigned."
+            ::= { products 13 }
+
+
+        mibObject OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "mibObject is the root OBJECT IDENTIFIER from which brouterMib and
+                wirelessLanmMIB are built."
+            ::= { alliedTelesis 8 }
+
+
+        brouterMib OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which atRouter object ids are assigned."
+            ::= { mibObject 4 }
+
+
+        wirelessLanmMIB OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which object ids for wlanAccess and uwc are assigned."
+            ::= { mibObject 42 }
+
+
+        atUWC OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which wlanSwitch object ids are assigned."
+            ::= { wirelessLanmMIB 8 }
+
+
+        atRouter OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which various groups of object id are assigned."
+            ::= { brouterMib 4 }
+
+
+        objects OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which object ids for boards and chips are assigned."
+            ::= { atRouter 1 }
+
+
+        traps OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which un-sorted trap ids are assigned."
+            ::= { atRouter 2 }
+
+
+        sysinfo OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which system inforamtion ids are assigned."
+            ::= { atRouter 3 }
+
+
+        modules OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which software module ids are assigned."
+            ::= { atRouter 4 }
+
+
+        arInterfaces OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which interface ids are assigned."
+            ::= { atRouter 5 }
+
+
+        protocols OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which protocol ids are assigned."
+            ::= { atRouter 6 }
+
+
+        atAgents OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "subtree beneath which variation from standards defined."
+            ::= { atRouter 7 }
+
+
+
+    END
+
+--
+-- at-smi.mib
+--
+

@@ -1,0 +1,571 @@
+
+-- *****************************************************************************
+-- Juniper-PPP-CONF
+--
+-- SNMP Agent Capabilities definitions for the PPP MIBs.
+--
+-- Copyright (c) 2001-2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2007 Juniper Networks, Inc.
+-- Copyright (c) 2007-2009 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-PPP-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniPppAgent  MODULE-IDENTITY
+    LAST-UPDATED "200909180724Z"  -- 18-Sep-09 03:24 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the point-to-point protocol
+        (PPP) component of the SNMP agent in the Juniper E-series family of
+        products."
+    -- Revision History
+    REVISION    "200909180724Z"  -- 18-Sep-09 03:24 AM EDT  - JUNOSe 11.1
+    DESCRIPTION
+        "Added new multiclass multilink objects. Added new traffic class
+	mapping for multiclasses.juniPppMultiLinkAgentV10 was added."
+    REVISION    "200908101423Z"  -- 10-Aug-09 07:53 PM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added juniPppGeneralAgentV8"
+    REVISION    "200808271318Z"  -- 08-Sep-08 06:48 PM EST  - JUNOSe 10.1
+    DESCRIPTION
+        "Added juniPppGeneralAgentV7"
+    REVISION    "200707121215Z"  -- 12-Jul-07 08:15 AM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "Updated juniPppLcpGroup and juniPppMlPppGroup to add ignore magic number.
+         Updated juniPppLcpGroup and juniPppMlpppGroup."
+    REVISION    "200510191626Z"  -- 19-Oct-05 12:26 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+	"Juniper-PPP-MIB:
+	 Added new object to the multi-link group." 
+    REVISION    "200410012141Z"  -- 01-Oct-04 05:41 PM EDT  - JUNOSe 6.0
+    DESCRIPTION
+        "Updated the juniPppSummary table"
+    REVISION    "200311031832Z"  -- 03-Nov-03 01:32 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Juniper-PPP-MIB:
+         Added new objects to the multi-link group."    
+    REVISION    "200309242011Z"  -- 24-Sep-03 04:11 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Juniper-PPP-MIB:
+         Added IPv6 support."
+    REVISION    "200301281547Z"  -- 28-Jan-03 10:47 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Juniper-PPP-MIB:
+         Replaced Unisphere names with Juniper names.
+         Added new objects to the multi-link group."
+    REVISION    "200208302036Z"  -- 30-Aug-02 04:36 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Juniper-PPP-MIB:
+         Added new objects to the LCP and multi-link groups."
+    REVISION    "200205092103Z"  -- 09-May-02 05:03 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Juniper-PPP-MIB:
+         Added new objects to the LCP, IP and multi-link groups."
+    REVISION    "200205082025Z"  -- 08-May-02 04:25 PM EDT  - JUNOSe 3.3
+    DESCRIPTION
+        "Created separate capabilities for multi-link PPP."
+    REVISION    "200104101823Z"  -- 10-Apr-01 02:23 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 32 }
+
+
+-- *****************************************************************************
+-- The inclusive PPP SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniPppAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the PPP component of the JUNOSe SNMP agent.  This version
+        of the PPP component was supported in JUNOSe 2.4 thru 3.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the PPP application in JUNOSe.
+        These capabilities became obsolete when the multilink capabilities were
+        separated out."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup3,
+            juniPppIpGroup2,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppMlPppGroup,
+            juniPppSummaryGroup }
+    ::= { juniPppAgent 1 }
+
+
+-- *****************************************************************************
+-- The general PPP interface agent capabilities.
+-- *****************************************************************************
+juniPppGeneralAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for the general
+        functionality of the PPP application which provides management support
+        for basic (non-multi-link) PPP interfaces via SNMP."
+    ::= { juniPppAgent 2 }
+
+juniPppGeneralAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component was supported in JUNOSe 3.3 and subsequent
+        3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe.  These capabilities became obsolete when new LCP and IP objects
+        were added to the Juniper-PPP-MIB."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup3,
+            juniPppIpGroup2,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppSummaryBasicGroup }
+    ::= { juniPppGeneralAgent 1 }
+
+juniPppGeneralAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component was supported in JUNOSe 4.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe.  These capabilities became obsolete when new LCP objects were
+        added to the Juniper-PPP-MIB."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup4,
+            juniPppIpGroup3,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppSummaryBasicGroup }
+    ::= { juniPppGeneralAgent 2 }
+
+juniPppGeneralAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component was supported in JUNOSe 4.1 through 5.0
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe.  These capabilities became obsolete when IPv6 support was
+        added."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES  {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES  {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES  {
+            juniPppLcpGroup5,
+            juniPppIpGroup3,
+            juniPppOsiGroup2,
+            juniPppSessionGroup,
+            juniPppSummaryBasicGroup }
+    ::= { juniPppGeneralAgent 3 }
+
+juniPppGeneralAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component was supported in JUNOSe 5.1 and subsequent
+        5.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe.  These capabilities became obsolete when new objects were
+        added."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup5,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup2,
+            juniPppIpv6Group }
+    ::= { juniPppGeneralAgent 4 }
+
+juniPppGeneralAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component is supported in JUNOSe 6.0 throught 7.2
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe.  These capabilities became obsolete when new objects were
+        added."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup5,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group }
+    ::= { juniPppGeneralAgent 5 }
+
+juniPppGeneralAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component is supported in JUNOSe 7.3 and subsequent
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe. These capabilities became obsolete when new objects were
+        added."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup7,
+            juniPppIpGroup4,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group }
+    ::= { juniPppGeneralAgent 6 }
+
+juniPppGeneralAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component is supported in JUNOSe 10.1 and subsequent
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup8,
+            juniPppIpGroup5,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+    ::= { juniPppGeneralAgent 7 }
+    
+juniPppGeneralAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the general PPP component of the JUNOSe SNMP agent.  This
+        version of the PPP component is supported in JUNOSe 11.0 and subsequent
+        system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe.These capabilities became obsolete when new objects were
+        added."
+    SUPPORTS    PPP-LCP-MIB
+    --  The PPP-LCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppLinkStatusEntry,
+            pppLinkConfigEntry }
+    SUPPORTS    PPP-IP-NCP-MIB
+    --  The PPP-IP-NCP-MIB is based on SMIv1 and has no conformance groups.
+    --  Therefore, capabilities are identified by OID subtree "groups".
+        INCLUDES {
+            pppIpEntry,
+            pppIpConfigEntry }
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppLcpGroup8,
+            juniPppIpGroup6,
+            juniPppOsiGroup2,
+            juniPppSessionGroup2,
+            juniPppSummaryBasicGroup3,
+            juniPppIpv6Group2 }
+    ::= { juniPppGeneralAgent 8 }
+
+
+-- *****************************************************************************
+-- The multi-link PPP interface agent capabilities.
+-- *****************************************************************************
+juniPppMultiLinkAgent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The registration group of agent capabilities for the multi-link
+        functionality of the PPP application which provides management support
+        for multi-link PPP interfaces via SNMP."
+    ::= { juniPppAgent 3 }
+
+juniPppMultiLinkAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 3.3 and
+        subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe.  These capabilities became obsolete when new multi-link objects
+        were added to the Juniper-PPP-MIB."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppMlPppGroup,
+            juniPppSummaryLinkGroup,
+            juniPppSummaryNetworkGroup }
+    ::= { juniPppMultiLinkAgent 1 }
+
+juniPppMultiLinkAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 4.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIBs supported by the SNMP agent for the basic PPP application in
+        JUNOSe.  These capabilities became obsolete when new multi-link objects
+        were added to the Juniper-PPP-MIB"
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES  {
+            juniPppMlPppGroup2,
+            juniPppSummaryLinkGroup,
+            juniPppSummaryNetworkGroup }
+    ::= { juniPppMultiLinkAgent 2 }
+
+juniPppMultiLinkAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 4.1 and
+        subsequent 4.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe.  These capabilities became obsolete when new multi-link objects
+        were added to the Juniper-PPP-MIB"
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppMlPppGroup3,
+            juniPppSummaryLinkGroup,
+            juniPppSummaryNetworkGroup }
+    ::= { juniPppMultiLinkAgent 3 }
+
+juniPppMultiLinkAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 5.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe.  These capabilities became obsolete when IPv6 support was
+        added."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppMlPppGroup4,
+            juniPppSummaryLinkGroup,
+            juniPppSummaryNetworkGroup }
+    ::= { juniPppMultiLinkAgent 4 }
+
+juniPppMultiLinkAgentV5  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 5.1 and 5.2
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe.  These capabilities became obsolete when new multi-link objects
+        were added to the Juniper-PPP-MIB."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES {
+            juniPppMlPppGroup4,
+            juniPppSummaryLinkGroup,
+            juniPppSummaryNetworkGroup2 }
+    ::= { juniPppMultiLinkAgent 5 }
+
+juniPppMultiLinkAgentV6  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 5.1 and 
+        subsequent 5.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe.  These capabilities became obsolete when new multi-link objects
+        were added to the Juniper-PPP-MIB."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES  {
+            juniPppMlPppGroup5,
+            juniPppSummaryLinkGroup,
+            juniPppSummaryNetworkGroup2 }
+    ::= { juniPppMultiLinkAgent 6 }
+
+juniPppMultiLinkAgentV7  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component is supported in JUNOSe 6.0 through
+        7.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe.  These capabilities became obsolete when new multi-link objects
+        were added to the Juniper-PPP-MIB."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES  {
+            juniPppMlPppGroup5,
+            juniPppSummaryLinkGroup2,
+            juniPppSummaryNetworkGroup3 }
+    ::= { juniPppMultiLinkAgent 7 }
+
+juniPppMultiLinkAgentV8  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component is supported in JUNOSe 7.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe.  These capabilities became obsolete when new multi-link objects
+        were added to the Juniper-PPP-MIB."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES  {
+            juniPppMlPppGroup6,
+            juniPppSummaryLinkGroup2,
+            juniPppSummaryNetworkGroup3 }
+    ::= { juniPppMultiLinkAgent 8 }
+
+juniPppMultiLinkAgentV9  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 7.3 and 
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe. These capabilities became obsolete when new multi-link objects
+		were added to the Juniper-PPP-MIB."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES  {
+            juniPppMlPppGroup8,
+            juniPppSummaryLinkGroup2,
+            juniPppSummaryNetworkGroup3 }
+    ::= { juniPppMultiLinkAgent 9 }
+
+juniPppMultiLinkAgentV10  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 10 of the multi-link PPP component of the JUNOSe SNMP agent.
+        This version of the PPP component was supported in JUNOSe 11.1 and 
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB groups supported by the SNMP agent for the PPP application in
+        JUNOSe."
+    SUPPORTS    Juniper-PPP-MIB
+        INCLUDES  {
+            juniPppMlPppGroup9,
+            juniPppSummaryLinkGroup2,
+            juniPppSummaryNetworkGroup3,
+            juniPppMlPppMulticlassTcGroup1 }
+    ::= { juniPppMultiLinkAgent 10 }
+
+END
+

@@ -1,0 +1,304 @@
+CTRON-FNBTR-MIB DEFINITIONS ::= BEGIN
+
+        --  ctfnbtr-mib.txt
+        --  Revision: 1.06.00
+        --  Part Number:  2170557-01
+        --  Date: August 14, 1994
+
+        --  Cabletron Systems, Inc.
+        --  35 Industrial Way, P.O. Box 5005
+        --  Rochester, NH 03867-0505
+        --  (603) 332-9400
+        --  support@ctron.com
+
+        --  This module provides authoritative definitions for Cabletron's
+        --  enterprise-specific FNB Token Ring MIB.
+        --
+        --  This module will be extended, as required.
+        --
+
+        --  Cabletron Systems reserves the right to make changes in 
+        --  specification and other information contained in this document 
+        --  without prior notice.  The reader should consult Cabletron Systems
+        --  to determine whether any such changes have been made.
+        --
+        --  In no event shall Cabletron Systems be liable for any incidental, 
+        --  indirect, special, or consequential damages whatsoever (including 
+        --  but not limited to lost profits) arising out of or related to this
+        --  document or the information contained in it, even if Cabletron
+        --  Systems has been advised of, known, or should have known, the 
+        --  possibility of such damages.
+        --
+        --  Cabletron grants vendors, end-users, and other interested parties
+        --  a non-exclusive license to use this Specification in connection
+        --  with the management of Cabletron products.
+
+        --  Copyright (c)October, 1995 Cabletron Systems, Inc.
+
+        IMPORTS
+                ctTokenRingFnb                  FROM CTRON-MIB-NAMES
+                OBJECT-TYPE                     FROM RFC-1212;
+
+        ctronFnbTR      OBJECT IDENTIFIER ::= { ctTokenRingFnb 1 }
+        ctronMultiFnbTR OBJECT IDENTIFIER ::= { ctTokenRingFnb 2 }
+
+        -- ==========================================================
+        --
+        --  The fnbTR group
+        --
+        --  This group of objects is used to control and report status
+        --  of Token Ring devices supporting only 1 FNB ring.
+        --
+        --  Implementation of this group is mandatory for Token Ring
+        --  subsystems on devices that incorporate the FNB.
+        --
+        -- ==========================================================
+
+        ctronFnbTRTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CtronFnbTREntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of entries that provide connection status of
+                    Token Ring subsystems, for the FNB."
+            ::= { ctronFnbTR 1 }
+
+        ctronFnbTREntry  OBJECT-TYPE
+            SYNTAX  CtronFnbTREntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "An entry in the ctronFnbTRTable containing objects that
+                    provide FNB connection status for a Token Ring sub-
+                    system."
+            INDEX  { ctronFnbTRIndex }
+            ::= { ctronFnbTRTable 1 }
+
+
+        CtronFnbTREntry ::=
+            SEQUENCE {
+                ctronFnbTRIndex
+                    INTEGER,
+                ctronFnbConnectLeft
+                    INTEGER,
+                ctronFnbConnectRight
+                    INTEGER,
+                ctronFnbBypass
+                    INTEGER,
+                ctronFnbRPBypass
+                    INTEGER
+            }
+
+        ctronFnbTRIndex  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                    "An unique value for each Token Ring subsystem.  Its
+                     value ranges between 1 and 'chNumSlots' defined in 
+                     chassis-mib.txt."
+            ::= { ctronFnbTREntry 1 }
+
+        ctronFnbConnectLeft  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        other(1),       --  none of the following
+                        detached(2),
+                        attached(3),
+                        faulted(4)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the connection status of the Token Ring
+                     board to the left of the current one.  An attempt to
+                     set a value of 1 or 4 will result in an error code
+                     of badValue."
+            ::= { ctronFnbTREntry 2 }
+
+        ctronFnbConnectRight  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        other(1),       --  none of the following
+                        detached(2),
+                        attached(3),
+                        faulted(4)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the connection status of the Token Ring
+                    board to the right of the current one.  An attempt
+                    to set a value of 1 or 4 will result in an error
+                    code of badValue."
+            ::= { ctronFnbTREntry 3 }
+
+        ctronFnbBypass  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                        other(1),       --  none of the following
+                        disabled(2),
+                        enabled(3)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                    "Denotes the bypass status of the current Token Ring
+                    board."
+            ::= { ctronFnbTREntry 4 }
+        
+        ctronFnbRPBypass  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                other(1),
+                enable(2),
+                disabled(3)
+        }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "Denotes the Ring Port bypass status of the current Token Ring
+            board.  If this capability is not available on this board, the
+            value 'other' is returned when read, and BADSETINFO when written."
+        ::= { ctronFnbTREntry 5 }
+
+        -- ==========================================================
+        --
+        --  The multiFnbTR group
+        --
+        --  This group of objects is used to control and report status
+        --  of Token Ring devices supporting multiple FNB rings.
+        --
+        --  Implementation of this group is mandatory for Token Ring
+        --  subsystems on devices that manage devices supporting multiple
+        --  FNB rings.
+        --
+        -- ==========================================================
+
+        ctronMultiFnbTRTable  OBJECT-TYPE
+            SYNTAX  SEQUENCE OF CtronMultiFnbTREntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                    "A list of entries that provide connection status of
+                    Token Ring subsystems, for the FNB."
+            ::= { ctronMultiFnbTR 1 }
+
+        ctronMultiFnbTREntry  OBJECT-TYPE
+            SYNTAX  CtronMultiFnbTREntry
+            ACCESS  not-accessible
+            STATUS  mandatory
+            DESCRIPTION
+                "An entry in the ctronMultiFnbTRTable containing objects that
+                provide FNB connection status for a Token Ring sub-
+                system."
+            INDEX  { ctronMultiFnbTRIndex, ctronMultiFnbRingIndex }
+            ::= { ctronMultiFnbTRTable 1 }
+
+
+        CtronMultiFnbTREntry ::=
+            SEQUENCE {
+                ctronMultiFnbTRIndex
+                    INTEGER,
+                ctronMultiFnbRingIndex
+                    INTEGER,
+                ctronMultiFnbConnectLeft
+                    INTEGER,
+                ctronMultiFnbConnectRight
+                    INTEGER,
+                ctronMultiFnbBypass
+                    INTEGER,
+                ctronMultiFnbRPBypass
+                    INTEGER
+            }
+
+        ctronMultiFnbTRIndex  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "An unique value for each Token Ring subsystem.  Its
+                value ranges between 1 and 'chNumSlots' defined in 
+                chassis-mib.txt."
+            ::= { ctronMultiFnbTREntry 1 }
+
+        ctronMultiFnbRingIndex  OBJECT-TYPE
+            SYNTAX  INTEGER
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "An unique value representing an instance of an FNB ring path 
+                attachment.  Its value ranges between 1 and n, where n equals 
+                the maximum number of FNB ring paths available in a given 
+                chassis.  For an MMAC chassis with an FNB, this number is 4."
+            ::= { ctronMultiFnbTREntry 2 }
+
+        ctronMultiFnbConnectLeft  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    other(1),       --  none of the following
+                    detached(2),
+                    attached(3),
+                    faulted(4)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Denotes the connection status of the left attach circuitry for
+                a particular FNB ring path attachment on this Token Ring 
+                oard."
+            ::= { ctronMultiFnbTREntry 3 }
+
+        ctronMultiFnbConnectRight  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    other(1),       --  none of the following
+                    detached(2),
+                    attached(3),
+                    faulted(4)
+                    }
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                "Denotes the connection status of the right attach circuitry for
+                a particular FNB ring path attachment on this Token Ring board."
+            ::= { ctronMultiFnbTREntry 4 }
+
+        ctronMultiFnbBypass  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    other(1),       --  none of the following
+                    disabled(2),
+                    enabled(3)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "Denotes the connection status of the bypass circuitry for a 
+                particular backplane ring path attachment on this Token Ring 
+                board."
+            ::= { ctronMultiFnbTREntry 5 }
+
+        ctronMultiFnbRPBypass  OBJECT-TYPE
+            SYNTAX  INTEGER {
+                    other(1),
+                    enable(2),
+                    disabled(3)
+                    }
+            ACCESS  read-write
+            STATUS  mandatory
+            DESCRIPTION
+                "Denotes the connection status of the ring port bypass 
+                circuitry for a particular backplane ring path attachment on
+                his Token Ring board.  If this capability is not available on
+                this board, the value 'other' is returned when read, and
+                BADSETINFO when written."
+            ::= { ctronMultiFnbTREntry 6 }
+
+--
+-- Revision History:
+--
+-- Revision: 1.04.01
+-- Date:     March 17, 1994
+--
+-- a) Added ctronMultiFnbTR branch at { ctTokenRingFnb 2 } in support of port switched
+--    Token Ring MIMs.
+-- b) Made the access policy for the objects ctronMultiFnbConnectLeft and 
+--    ctronMultiFnbConnectRight read-only.
+-- c) Modified the copyright date.
+--
+
+END

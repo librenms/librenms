@@ -1,0 +1,347 @@
+--
+-- Copyright (c) 2010 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusCommonDeviceModule
+        FROM RUCKUS-ROOT-MIB
+    TruthValue,
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    IpAddress
+        FROM SNMPv2-SMI
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    ifIndex
+        FROM IF-MIB
+    RuckusCountryCode
+        FROM RUCKUS-TC-MIB;
+
+ruckusDeviceMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless Inc.
+
+        Postal:
+        880 W Maude Ave
+        Sunnyvale, CA 94085
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200."
+    DESCRIPTION
+        "Ruckus device management mib."
+    ::= { ruckusCommonDeviceModule 1 }
+
+
+-- Groups
+--
+
+ruckusDeviceObjects OBJECT IDENTIFIER   ::= { ruckusDeviceMIB 1 }
+
+ruckusDeviceInfo OBJECT IDENTIFIER  ::= { ruckusDeviceObjects 1 }
+
+ruckusDeviceTrapInfo OBJECT IDENTIFIER  ::= { ruckusDeviceObjects 2 }
+
+ruckusDeviceIPInfo OBJECT IDENTIFIER    ::= { ruckusDeviceObjects 3 }
+
+ruckusDeviceWanInfo OBJECT IDENTIFIER   ::= { ruckusDeviceObjects 4 }
+
+ruckusDeviceEvents OBJECT IDENTIFIER    ::= { ruckusDeviceMIB 2 }
+
+-- Device Generals
+--
+
+ruckusDeviceName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies name of the device.
+        Show the same value as model name."
+    ::= { ruckusDeviceInfo 1 }
+
+
+ruckusDeviceReboot OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Setting this object to true(1) would cause to reboot the device.
+        Always returns false(2) on read."
+    DEFVAL { false }
+    ::= { ruckusDeviceInfo 2 }
+
+
+ruckusDeviceRebootWithDefaults OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This allows the product to revert to factory defaults."
+    DEFVAL { false }
+    ::= { ruckusDeviceInfo 3 }
+
+
+ruckusDeviceCountryCode OBJECT-TYPE
+    SYNTAX  RuckusCountryCode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the country code.
+        Example ISO country codes: CA,US,HK,IL,CN,JP,TW."
+    ::= { ruckusDeviceInfo 4 }
+
+ruckusDeviceGPS OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..32))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies GPS coordinates of the device.
+        (e.g.  37.3881,-122.0258)"
+    ::= { ruckusDeviceInfo 5 }
+
+ruckusDeviceNEId OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "NE Id."
+    ::= { ruckusDeviceInfo 6 }
+
+ruckusDeviceLocation OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (1..64))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Location of the device.
+        Show the intstallation position."
+    ::= { ruckusDeviceInfo 10 }
+
+-- SNMP Trap Receiver
+--
+
+ruckusDeviceTrapDestination OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies primary trap destination IPv6 or IPv4 address."
+    ::= { ruckusDeviceTrapInfo 1 }
+
+ruckusDeviceTrapDestination2 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies secondary trap destination IPv6 or IPv4 address."
+    ::= { ruckusDeviceTrapInfo 2 }
+
+-- Device Misc IP Configuration
+--
+ruckusDevicePrimaryDNS OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies primary DNS IP address."
+    ::= { ruckusDeviceIPInfo 1 }
+
+
+ruckusDeviceSecondaryDNS OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies secondary DNS IP address."
+    ::= { ruckusDeviceIPInfo 2 }
+
+
+ruckusDevicePrimaryDNSIPV6 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies primary DNS IPV6 address."
+    ::= { ruckusDeviceIPInfo 3 }
+
+
+ruckusDeviceSecondaryDNSIPV6 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies secondary DNS IPV6 address."
+    ::= { ruckusDeviceIPInfo 4 }
+
+
+-- Device's WAN Configuration
+--
+
+ruckusDeviceWanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusDeviceWanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each wan table."
+    ::= { ruckusDeviceWanInfo 1 }
+
+
+ruckusDeviceWanEntry OBJECT-TYPE
+    SYNTAX  RuckusDeviceWanEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each wan entry."
+    INDEX {
+        ifIndex }
+    ::= { ruckusDeviceWanTable 1 }
+
+
+RuckusDeviceWanEntry ::= SEQUENCE {
+
+    ruckusDeviceWanIPAddrMode      INTEGER,
+    ruckusDeviceWanIPAddr          IpAddress,
+    ruckusDeviceWanName            DisplayString,
+    ruckusDeviceWanNetmask         IpAddress,
+    ruckusDeviceWanGateway         IpAddress,
+
+    ruckusDeviceWanIPVersion       INTEGER,
+    ruckusDeviceWanIPV6AddrMode    INTEGER,
+    ruckusDeviceWanIPV6Addr        OCTET STRING,
+    ruckusDeviceWanIPV6PrefixLen   INTEGER,
+    ruckusDeviceWanIPV6Gateway     OCTET STRING }
+
+
+ruckusDeviceWanIPAddrMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+            none(1),
+            static(2),
+            dhcp(3),
+            pppoe(4) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies how the wan gets its IP address.
+
+        none   - bridging
+        static -  Statically assigned IP address
+        dhcp   -  Using DHCP protocol
+        pppoe  - Using PPPoE protocol
+
+        when ipaddr mode from dhcp to static,the relative nodes should be set together ,
+        including:ruckusDeviceWanIPAddr,ruckusDeviceWanNetmask,ruckusDeviceWanGateway
+        "
+    ::= { ruckusDeviceWanEntry 1 }
+
+
+ruckusDeviceWanIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This is writable only if the ruckusDeviceWanIPAddrMode
+        is set to static(2)."
+    ::= { ruckusDeviceWanEntry 2 }
+
+
+ruckusDeviceWanName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Specifies the name of the wan interface."
+    ::= { ruckusDeviceWanEntry 3 }
+
+ruckusDeviceWanNetmask OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the ip address mask if the ruckusDeviceWanIPAddrMode
+        is set to static(2)."
+    ::= { ruckusDeviceWanEntry 4 }
+
+ruckusDeviceWanGateway OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the gateway ipaddr if the ruckusDeviceWanIPAddrMode
+        is set to static(2)."
+    ::= { ruckusDeviceWanEntry 5 }
+
+
+ruckusDeviceWanIPVersion OBJECT-TYPE
+    SYNTAX  INTEGER { ipv4(1), ipv6(2),dualstack(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the system ip version,ipv4 or ipv6 or dualstack.
+
+        ipv4       - only support IPV4
+        ipv6       - only support IPV6
+        dualstack  - support IPV4 and IPV6"
+
+    DEFVAL {ipv6}
+    ::= { ruckusDeviceWanEntry 8 }
+
+
+ruckusDeviceWanIPV6AddrMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	    auto-configuration(1),
+            static(2)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies how the wan gets its IPV6 address.
+
+        auto-configuration     - auto get ipv6 address by RFC about IPV6
+        static                 -  Statically assigned IPV6 address
+
+        when ipv6addr mode from auto-configuration to static,the relative nodes should be set together ,
+        including:ruckusDeviceWanIPV6Addr,ruckusDeviceWanIPV6PrefixLen,ruckusDeviceWanIPV6Gateway "
+
+    DEFVAL {auto-configuration}
+    ::= { ruckusDeviceWanEntry 10 }
+
+
+ruckusDeviceWanIPV6Addr OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This is writable only if the ruckusDeviceWanIPAddrMode
+        is set to static(2)."
+    ::= { ruckusDeviceWanEntry 11 }
+
+ruckusDeviceWanIPV6PrefixLen OBJECT-TYPE
+    SYNTAX  INTEGER (3..128)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the ip v6 address prefix length if the ruckusDeviceWanIPV6AddrMode
+        is set to static(2)."
+    ::= { ruckusDeviceWanEntry 12 }
+
+ruckusDeviceWanIPV6Gateway OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Specifies the gateway ipv6 address if the ruckusDeviceWanIPV6AddrMode
+        is set to static(2)."
+    ::= { ruckusDeviceWanEntry 13 }
+
+
+-- Conformance & Compliance
+--
+
+END

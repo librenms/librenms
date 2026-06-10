@@ -1,0 +1,144 @@
+SYNOLOGY-RAID-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-GROUP, MODULE-COMPLIANCE
+				FROM SNMPv2-CONF
+	enterprises, MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64
+				FROM SNMPv2-SMI;
+
+synoRaid MODULE-IDENTITY
+    LAST-UPDATED "201309110000Z"
+    ORGANIZATION "www.synology.com"
+    CONTACT-INFO
+         "Synology Inc.
+          Email: snmp@synology.com"
+    DESCRIPTION
+        "Characteristics of the raid information"
+    REVISION     "201309110000Z"
+    DESCRIPTION
+        "Second draft."
+    ::= { synology 3 }
+    
+synology	 OBJECT IDENTIFIER 
+	::= { enterprises 6574 }
+
+raidTable OBJECT-TYPE
+    SYNTAX	   SEQUENCE OF RaidEntry
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "Synology raid table"
+    ::= { synoRaid 1 }
+
+raidEntry	  OBJECT-TYPE
+    SYNTAX	   RaidEntry
+    MAX-ACCESS	  not-accessible
+    STATUS	   current
+    DESCRIPTION
+    "For all raid entry"
+    INDEX   { raidIndex }
+    ::= { raidTable 1 }
+
+RaidEntry ::= SEQUENCE {
+    raidIndex		Integer32,
+    raidName		OCTET STRING,
+	raidStatus		Integer32,
+	raidFreeSize	Counter64,
+	raidTotalSize	Counter64,
+	raidHotspareCnt Integer32
+}
+
+raidIndex OBJECT-TYPE
+    SYNTAX	   Integer32(0..2147483647)
+    MAX-ACCESS	  read-only
+    STATUS	   current
+    DESCRIPTION
+    "The index of raid table"
+    ::= { raidEntry 1 }
+
+raidName OBJECT-TYPE
+    SYNTAX	  OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology raid name
+	 The name of each raid will be showed here.
+	"
+    ::= { raidEntry 2 }
+
+raidStatus OBJECT-TYPE
+    SYNTAX	  Integer32(1..12)
+    MAX-ACCESS  read-only
+    STATUS	  current
+    DESCRIPTION
+    "Synology Raid status
+	 Each meanings of status represented describe below.
+	 Normal(1): The raid functions normally.
+ 	 Degrade(11): Degrade happens when a tolerable failure of disk(s) occurs.
+ 	 Crashed(12): Raid has crashed and just uses for read-only operation.
+
+	 Note:
+	 Other status will be showed when creating or deleting raids, including below status, Repairing(2), Migrating(3), Expanding(4), Deleting(5), Creating(6), RaidSyncing(7), RaidParityChecking(8), RaidAssembling(9) and Canceling(10).
+	"
+    ::= { raidEntry 3 }
+
+raidFreeSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid freesize
+	 Free space in bytes.
+	"
+    ::= { raidEntry 4 }
+
+raidTotalSize OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid totalsize
+	 Total space in bytes.
+	"
+    ::= { raidEntry 5 }
+
+raidHotspareCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Synology raid hotspare
+	 Total hotspare disks count.
+	 Each meaning of values described as below.
+	 Normal(>=0): Total number of hotspare disks in this pool.
+	"
+    ::= { raidEntry 6 }
+
+raidConformance OBJECT IDENTIFIER ::= { synoRaid 2 }
+raidCompliances OBJECT IDENTIFIER ::= { raidConformance 1 }
+raidGroups 			OBJECT IDENTIFIER ::= { raidConformance 2 }
+
+raidCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for synoRaid entities which
+            implement the SYNOLOGY RAID MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS { raidGroup }
+
+    ::= { raidCompliances 1 }
+
+raidGroup OBJECT-GROUP
+    OBJECTS { raidIndex,
+              raidName,
+              raidStatus,
+              raidFreeSize,
+              raidTotalSize,
+              raidHotspareCnt}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing basic instrumentation and
+            control of an synology raid entity."
+    ::= { raidGroups 1 }
+
+END

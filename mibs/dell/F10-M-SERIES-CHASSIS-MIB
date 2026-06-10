@@ -1,0 +1,1595 @@
+    F10-M-SERIES-CHASSIS-MIB DEFINITIONS ::= BEGIN
+    
+    --  This module provides authoritative definitions for M-series modules
+    --  Dell Networking OS Chassis MIB.
+    --
+    --  This module will be extended, as needed.
+    --  
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        Gauge32, Counter32, Integer32, Unsigned32, 
+        TimeTicks, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        DateAndTime, DisplayString, 
+        MacAddress, RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        f10Mgmt
+            FROM FORCE10-SMI
+        chAlarmVarInteger, chAlarmVarString, 
+        chAlarmVarSlot, chAlarmVarPort
+            FROM F10-CHASSIS-MIB
+        F10SwDate, F10ChassisType, F10ProcessorModuleType,
+        F10MfgDate, F10HundredthdB, F10MSeriesPortType
+            FROM FORCE10-TC;        
+        
+    f10MSerChassisMib MODULE-IDENTITY
+    LAST-UPDATED "201203271200Z"  -- Dec 03, 2012 12:00:00 GMT
+    
+    ORGANIZATION "Dell Inc."
+
+    CONTACT-INFO "http://www.force10networks.com/support"
+
+    DESCRIPTION
+       "Dell Networking OS M-Series Chassis MIB. "
+
+    REVISION     "201211021200Z"
+    DESCRIPTION
+          "Added the new trap for notifying stack role changes."
+
+    REVISION     "201212031200Z"
+    DESCRIPTION
+          "Adding new objects - chSysSwInPartitionAImgVers
+          and chSysSwInPartitionBImgVers"
+
+    REVISION     "201203271200Z"
+    DESCRIPTION
+          "Adding new objects - Dell PPID, Revision, Service Tag,
+          Express Service Code."
+    REVISION     "200710031200Z"
+    DESCRIPTION
+          "Initial version of this mib."
+           ::= { f10Mgmt 19 }   
+
+    -- ### Groups ###
+
+    f10MSerChassisObject OBJECT IDENTIFIER ::={ f10MSerChassisMib 1 }
+    chObjects            OBJECT IDENTIFIER ::={ f10MSerChassisObject 1 }
+    chSysObjects         OBJECT IDENTIFIER ::={ f10MSerChassisObject 2 }
+    chAlarmObjects       OBJECT IDENTIFIER ::={ f10MSerChassisObject 4 }
+  
+    -- ### Textual Convention
+                 
+    CodeType ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "x"
+        STATUS      current
+        DESCRIPTION
+            "The code type value for a given unit, 
+            displayed in hexadecimal."
+        SYNTAX  Unsigned32  
+
+    UnitType ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "x"
+        STATUS      current
+        DESCRIPTION
+            "The unit type value for a given unit, 
+            displayed in hexadecimal."
+        SYNTAX  Unsigned32  
+        
+    -- ### Chassis Information
+
+       chNumStackUnits     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of stack units configured
+            on the chassis."
+        ::= { chObjects 1 }
+        
+       chNumMaxStackableUnits OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Indicates the maximum allowed Unit Number 
+            configurable on the chassis."
+        ::= { chObjects 2 }
+
+       chStackUnitIndexNext OBJECT-TYPE
+        SYNTAX        Integer32 (0|1..6)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This object contains the next appropriate value to
+            be used for chStackUnitIndex when creating
+            entries in the chStackUnitTable. The value 0
+            indicates that no unassigned entries are available.
+            To obtain the chStackUnitIndexNext value for a new entry,
+            the manager must first issue a management protocol
+            retrieval operation to obtain the current value of
+            this object.  The agent should modify the value to
+            reflect the next unassigned number after each 
+            retrieval operation. After a manager retrieves a value
+            the agent will determine when this index value will be
+            made available for reuse.
+            
+            Note that this object is not the unit number assigned by
+            the management unit. 
+            The max number of stackable units allowed on this chassis
+            is found from the object chNumMaxStackableUnits."
+        ::= { chObjects 3 }
+
+    -- ### Chassis System  ###
+
+                
+    -- ## StackUnit Table
+
+    -- The M-series chassis is a single virtual system to 
+    -- have the stackable units as virtual slots.
+    -- In the chassis, there can be multiple physical units
+    -- stacked together.  
+
+    -- The StackUnit table contains the management information 
+    -- of each stacked unit in the chassis.
+
+      chStackUnitTable     OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChStackUnitEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+                      "A list of stack units configured in the chassis.
+                      The StackUnit table contains the management 
+                      information of each stacked unit in the chassis. 
+                      "
+        ::= { chSysObjects 1 }
+
+      chStackUnitEntry  OBJECT-TYPE 
+        SYNTAX        ChStackUnitEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of units entries containing information 
+             for each stacked unit."
+        INDEX    { chStackUnitIndex }
+        ::= { chStackUnitTable 1 }
+
+      ChStackUnitEntry    ::=
+        SEQUENCE {
+           chStackUnitIndex               Integer32,
+           chStackUnitNumber              Integer32,
+           chStackUnitSID                 Integer32,
+           chStackUnitMgmtStatus          INTEGER,
+           chStackUnitHwMgmtPreference    INTEGER, 
+           chStackUnitAdmMgmtPreference   Integer32,
+           chStackUnitModelID             DisplayString,
+           chStackUnitStatus              INTEGER,
+           chStackUnitDescription         DisplayString,
+           chStackUnitCodeVersion         DisplayString,
+           chStackUnitCodeVersionInFlash  DisplayString,
+           chStackUnitSerialNumber        DisplayString, 
+           chStackUnitUpTime              TimeTicks,
+           chStackUnitTemp                Gauge32,
+           chStackUnitType                UnitType,
+           chStackUnitSysType             F10ChassisType,
+           chStackUnitVendorId            DisplayString,
+           chStackUnitMfgDate             F10MfgDate,
+           chStackUnitMacAddress          MacAddress,
+           chStackUnitPartNum             DisplayString,
+           chStackUnitProductRev          DisplayString,
+           chStackUnitProductOrder        DisplayString,
+           chStackUnitCountryCode         OCTET STRING,
+           chStackUnitNum10GigEtherPorts  Integer32,
+           chStackUnitNumGigEtherPorts    Integer32,
+           chStackUnitNumFastEtherPorts   Integer32,
+           chStackUnitNumFanTrays         Integer32,
+           chStackUnitNumPowerSupplies    Integer32,
+           chStackUnitNumPluggableModules Integer32,
+           chStackUnitNum40GigEtherPorts  Integer32,
+           chStackUnitRowStatus           RowStatus,
+           chStackUnitPiecePartID         DisplayString,
+           chStackUnitPPIDRevision        DisplayString,
+           chStackUnitServiceTag          DisplayString,
+           chStackUnitExpressServiceCode  DisplayString
+        }
+       
+       chStackUnitIndex		OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+             "The unique index for this entry. 
+             Refer to the object chStackUnitIndexNext." 
+        ::= { chStackUnitEntry 1 }
+        
+       chStackUnitNumber	OBJECT-TYPE
+        SYNTAX        Integer32 (0|1..6)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+             "The unit number associated with this unit.
+             The unit number can be manually assigned to stack members. 
+             
+             Note that the unit number assignment is based on 
+             the following factors:
+             
+             - if the unit number is requested here, but another unit 
+             already uses that number, the unit changes its configured 
+             unit number to the lowest unassigned unit number.
+             - if the unit number is 0, i.e. unassigned, then the unit sets 
+             its configured unit number to the lowest unassigned unit number.
+             - if the unit number is configured and no other device uses 
+             the unit number, then the unit starts using the configured 
+             unit number.
+             - if a unit detects that the maximum number of units already 
+             exist, the unit sets its unit number to 0, i.e. unassigned, 
+             and stays in the Initialization state.
+             - The max number of stackable units allowed on this chassis 
+               is found from the object chNumMaxStackableUnits." 
+        ::= { chStackUnitEntry 2 }
+
+       chStackUnitSID		OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-create
+        STATUS        deprecated
+        DESCRIPTION
+            "The unique switch type index (SID)."
+        ::= { chStackUnitEntry 3 }
+
+       chStackUnitMgmtStatus	OBJECT-TYPE
+        SYNTAX        INTEGER {
+                      mgmtUnit(1),
+                      standbyUnit(2),
+                      stackUnit(3),
+                      unassigned(4)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Indicates whether the unit is a Management Unit, 
+            a Stack Unit, or unassigned.
+            
+            Setting this object to mgmtUnit(1) initiates transfer of the 
+            management functionality to the specified stack unit. 
+            Object values stackUnit(2) and unassigned(3) cannot be set."
+        ::= { chStackUnitEntry 4 }
+
+       chStackUnitHwMgmtPreference  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                      disabled(0),
+                      unsassigned(1),
+                      assigned(2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "indicates whether the unit is capable of becoming a
+            management unit. if it is unsigned, this unit can be a management
+            unit."
+        ::= { chStackUnitEntry 5 }
+
+       chStackUnitAdmMgmtPreference  OBJECT-TYPE
+        SYNTAX        Integer32 (0|1..15)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "indicates how likely this unit is to be chosen as 
+            the management unit.  A value of 0 indicates a disabled
+            or unassigned preference."
+        ::= { chStackUnitEntry 6 }
+ 
+       chStackUnitModelID  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The plugged-in model ID for this unit."
+        ::= { chStackUnitEntry 7 }
+
+       chStackUnitStatus  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                      ok(1),
+                      unsupported(2),
+                      codeMismatch(3),		-- version mismatch
+                      configMismatch(4),	-- type mismatch
+                      unitDown(5),	 		-- hardware problem
+                      notPresent(6)        
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The status of this unit."
+        ::= { chStackUnitEntry 8 }
+     
+       chStackUnitDescription  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The description of this unit."
+        ::= { chStackUnitEntry 9 }
+     
+       chStackUnitCodeVersion  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Current code version of this unit."
+        ::= { chStackUnitEntry 10 }
+                                       
+       chStackUnitCodeVersionInFlash  OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Code version of this unit's flash."
+        ::= { chStackUnitEntry 11 }
+
+       chStackUnitSerialNumber OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's serial number."
+        ::= { chStackUnitEntry 12 }
+                
+       chStackUnitUpTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The system up time of the unit."
+        ::= { chStackUnitEntry 13 }
+        
+       chStackUnitTemp  OBJECT-TYPE
+        SYNTAX        Gauge32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The temperature of the unit." 
+        ::= { chStackUnitEntry 14 }
+        
+       chStackUnitType  OBJECT-TYPE
+        SYNTAX        UnitType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Unit Type identifier for this unit." 
+        ::= { chStackUnitEntry 15 }        
+        
+       chStackUnitSysType  OBJECT-TYPE
+        SYNTAX        F10ChassisType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Dell Networking OS system type for this unit." 
+        ::= { chStackUnitEntry 16 }   
+        
+       chStackUnitVendorId    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The vendor id that manufactured this unit." 
+        ::= { chStackUnitEntry 17 }  
+
+       chStackUnitMfgDate    OBJECT-TYPE
+        SYNTAX        F10MfgDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The date the unit is manufactured."
+        ::= { chStackUnitEntry 18 }
+
+       chStackUnitMacAddress   OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "A 6-octet MAC Address assigned
+             to this unit."
+        ::= { chStackUnitEntry 19 }
+
+       chStackUnitPartNum    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit part number"
+        ::= { chStackUnitEntry 20 }
+                                         
+       chStackUnitProductRev    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit manufacturer's product
+            revision"
+        ::= { chStackUnitEntry 21 }
+
+       chStackUnitProductOrder OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The product order number for this unit."
+        ::= { chStackUnitEntry 22 }
+
+       chStackUnitCountryCode    OBJECT-TYPE
+        SYNTAX        OCTET STRING (SIZE (2))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit manufacturer's country
+            code"
+        ::= { chStackUnitEntry 23 }
+
+       chStackUnitNum10GigEtherPorts     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 10G Ethernet/802.3 interfaces
+            in this unit."
+        ::= { chStackUnitEntry 24 }
+
+       chStackUnitNumGigEtherPorts     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 1G Ethernet/802.3 interfaces
+            in this unit."
+        ::= { chStackUnitEntry 25 }
+
+       chStackUnitNumFastEtherPorts     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 10/100 Ethernet/802.3 interfaces
+            in this unit."
+        ::= { chStackUnitEntry 26 }
+
+       chStackUnitNumFanTrays  OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of fan trays
+            on the unit."
+        ::= { chStackUnitEntry 27 }
+
+       chStackUnitNumPowerSupplies     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of power supplies available
+            to the unit."
+        ::= { chStackUnitEntry 28 }
+       
+       chStackUnitNumPluggableModules OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of pluggable modules 
+            in the stack."
+        ::= { chStackUnitEntry 29 }
+
+       chStackUnitNum40GigEtherPorts     OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of 40G Ethernet/802.3 interfaces
+            in this unit."
+        ::= { chStackUnitEntry 30 }
+
+       chStackUnitRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Creation of new instances requires the object
+            chStackUnitIndexNext to be retreived to create
+            an entry.
+            
+            active(1)      - This instance is active.
+            createAndGo(4) - Creates a new instance.
+            destroy(6)     - Removes this instance."
+        ::= { chStackUnitEntry 31 }
+
+       chStackUnitPiecePartID OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..24))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's piece part id."
+        ::= { chStackUnitEntry 32 }
+                
+       chStackUnitPPIDRevision OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..3))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's PPID revision."
+        ::= { chStackUnitEntry 33 }
+                
+       chStackUnitServiceTag OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..7))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's service tag."
+        ::= { chStackUnitEntry 34 }
+
+       chStackUnitExpressServiceCode OBJECT-TYPE
+        SYNTAX        DisplayString (SIZE (0..14))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's express service code."
+        ::= { chStackUnitEntry 35 }
+
+
+    -- ### Power Supply Table
+
+   chSysPowerSupplyTable    OBJECT-TYPE
+     SYNTAX        SEQUENCE OF ChSysPowerSupplyEntry
+     MAX-ACCESS    not-accessible
+     STATUS        current
+     DESCRIPTION
+         "A list of power supply resident
+         in the M-series chassis."
+     ::= { chSysObjects 2 }
+
+     chSysPowerSupplyEntry    OBJECT-TYPE
+       SYNTAX        ChSysPowerSupplyEntry
+       MAX-ACCESS    not-accessible
+       STATUS        current
+       DESCRIPTION
+           "A power supply entry containing objects for a
+           particular power supply."
+       INDEX    { chStackUnitNumber,
+                  chSysPowerSupplyIndex }
+       ::= { chSysPowerSupplyTable 1 }
+
+     ChSysPowerSupplyEntry    ::=
+       SEQUENCE {
+          chSysPowerSupplyIndex        Integer32,
+          chSysPowerSupplyOperStatus   INTEGER,
+          chSysPowerSupplyType         INTEGER
+       }
+
+       chSysPowerSupplyIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unique index of the power supply."
+        ::= { chSysPowerSupplyEntry 1 }
+
+       chSysPowerSupplyOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        normal(1),
+                        warning(2),
+                        critical(3),
+                        shutdown(4),
+                        notPresent(5),
+                        notFunctioning(6)
+                    }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The status of the power supply."
+        ::= { chSysPowerSupplyEntry 2 }
+
+       chSysPowerSupplyType    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        unknown(1),
+                        ac(2),
+                        dc(3),
+                        externalPowerSupply(4),
+                        internalRedundant(5)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of the power supply."
+        ::= { chSysPowerSupplyEntry 3 }
+
+
+    -- ## Fan Tray Table
+
+       chSysFanTrayTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysFanTrayEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of fan tray resident in the M-series chassis."
+        ::= { chSysObjects 3 }
+
+      chSysFanTrayEntry    OBJECT-TYPE
+        SYNTAX        ChSysFanTrayEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A fan entry containing objects for a
+            particular fan tray."
+        INDEX    { chStackUnitNumber,
+                   chSysFanTrayIndex }
+        ::= { chSysFanTrayTable 1 }
+
+      ChSysFanTrayEntry    ::=
+        SEQUENCE {
+           chSysFanTrayIndex        Integer32,
+           chSysFanTrayOperStatus   INTEGER
+        }
+
+       chSysFanTrayIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unique index of the fan tray."
+        ::= { chSysFanTrayEntry 1 }
+
+       chSysFanTrayOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The status of the fan tray."
+        ::= { chSysFanTrayEntry 2 }
+
+
+    -- ## Port Table 
+
+       chSysPortTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of ports in the M-series chassis."
+        ::= { chSysObjects 4 }
+
+      chSysPortEntry  OBJECT-TYPE 
+        SYNTAX        ChSysPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A port entry containing objects for a
+            particular port."
+        INDEX    { chStackUnitNumber,
+                   chSysPortIndex }
+        ::= { chSysPortTable 1 }
+
+      ChSysPortEntry    ::=
+        SEQUENCE {
+           chSysPortIndex        Integer32,
+           chSysPortType         F10MSeriesPortType,
+           chSysPortAdminStatus  INTEGER,
+           chSysPortOperStatus   INTEGER,
+           chSysPortIfIndex      Integer32,           
+           chSysPortXfpRecvPower F10HundredthdB,
+           chSysPortXfpRecvTemp  Integer32,
+           chSysPortXfpTxPower   F10HundredthdB
+        }
+
+       chSysPortIndex OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A unique index for each slot within the unit.
+            "
+        ::= { chSysPortEntry 1 }
+
+       chSysPortType  OBJECT-TYPE
+        SYNTAX        F10MSeriesPortType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of port in the unit."
+        ::= { chSysPortEntry 2 }
+
+       chSysPortAdminStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The admin status of the card.
+            The port admin status is Up if 
+            the user has configured it to be up 
+            otherwise, the admin status is Down."
+        ::= { chSysPortEntry 3 }
+
+       chSysPortOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                      ready(1),
+                      portDown(2),
+                      portProblem(3),
+                      cardProblem(4),
+                      cardDown(5),
+                      notPresent(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The operational status provides further
+            condition of the card.
+            If the chSysPortAdminStatus is 'up', the 
+            valid state is
+            'ready' - the card is present and 
+                    ready and the chSysPortAdminStatus
+                    status is 'up'.
+            'portDown'    - the port is down or not enabled.
+            'portProblem' - port hardware problems.
+                        'cardProblem' - not used.  Same as cardDown.
+            'cardDown'    - the card is downed.
+            'notPresent' - the card is not present."
+        ::= { chSysPortEntry 4 }
+
+       chSysPortIfIndex    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The index of ifIndex in the Interface Mib.
+            This index can link to the ifEntry to get
+            this interface/port information"
+        ::= { chSysPortEntry 5 }
+
+       chSysPortXfpRecvPower    OBJECT-TYPE
+        SYNTAX        F10HundredthdB
+        UNITS         "dB"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "
+            The power signal strength (dB) received for
+            1G/10G/40G Ethernet/802.3 interface.
+            "
+        ::= { chSysPortEntry 6 }
+
+       chSysPortXfpRecvTemp    OBJECT-TYPE
+       SYNTAX        Integer32
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+           "The temperature value received for the optics."
+       ::= { chSysPortEntry 7 }
+
+        chSysPortXfpTxPower    OBJECT-TYPE
+        SYNTAX        F10HundredthdB
+        UNITS         "dB"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "
+            The power signal strength (dB) Transmitted for
+            1G/10G/40G Ethernet/802.3 interface.
+            "
+
+        ::= { chSysPortEntry 8 }
+
+
+    -- ## Stack Port Table 
+
+       chSysStackPortTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysStackPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of stack ports in the M-series chassis."
+        ::= { chSysObjects 5 }
+
+      chSysStackPortEntry  OBJECT-TYPE 
+        SYNTAX        ChSysStackPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A stack port entry containing objects for a
+            particular stack port."
+        INDEX    { chStackUnitNumber,
+                   chSysStackPortIndex }
+        ::= { chSysStackPortTable 1 }
+
+      ChSysStackPortEntry    ::=
+        SEQUENCE {
+           chSysStackPortIndex          Integer32,
+           chSysStackPortConfiguredMode INTEGER,
+           chSysStackPortRunningMode    INTEGER,          
+           chSysStackPortLinkStatus     INTEGER,
+           chSysStackPortLinkSpeed      Gauge32,
+           chSysStackPortRxDataRate     Counter32,
+           chSysStackPortRxErrorRate    Counter32,
+           chSysStackPortRxTotalErrors  Counter32,
+           chSysStackPortTxDataRate     Counter32,
+           chSysStackPortTxErrorRate    Counter32,
+           chSysStackPortTxTotalErrors  Counter32           
+        }
+
+       chSysStackPortIndex OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The index for each stack port within the unit.
+             1 - stack port A,
+             2 - stack port B
+            "
+        ::= { chSysStackPortEntry 1 }
+
+       chSysStackPortConfiguredMode  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                      stack(1),
+                      ethernet(2),
+                      unknown(3)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Configured mode of the Stack Port. Changes to this
+            value happen only after a reset of the unit."
+        ::= { chSysStackPortEntry 2 }
+
+       chSysStackPortRunningMode  OBJECT-TYPE
+        SYNTAX        INTEGER {
+                      stack(1),
+                      ethernet(2),
+                      unknown(3)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Operational mode of the Stack Port."
+        ::= { chSysStackPortEntry 3 }
+            
+       chSysStackPortLinkStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     up(1),
+                     down(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Link status of the Stack Port. Ports in ethernet
+            mode will return a status of down(2)."
+        ::= { chSysStackPortEntry 4 }
+    
+       chSysStackPortLinkSpeed OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Speed of the Stack Port measured in Gb/s. Ports
+            in ethernet mode will return a speed of 0."
+        ::= { chSysStackPortEntry 5 }
+    
+       chSysStackPortRxDataRate OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Received Data rate on the stacking port. 
+            Measured in Mb/s.
+            Ports in ethernet mode will return 0."
+        ::= { chSysStackPortEntry 6 }
+    
+       chSysStackPortRxErrorRate OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Received error rate on the stack port. 
+            Measured in Errors per Second.  
+            Ports in ethernet mode will return 0."
+        ::= { chSysStackPortEntry 7 }
+    
+       chSysStackPortRxTotalErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Received number of errors since boot. 
+            The counter may wrap. Ports in ethernet mode 
+            will return 0."
+        ::= { chSysStackPortEntry 8 }
+    
+       chSysStackPortTxDataRate OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transmitted Data rate on the stacking port. 
+            Measured in Mb/s.
+            Ports in ethernet mode will return 0."
+        ::= { chSysStackPortEntry 9 }
+    
+       chSysStackPortTxErrorRate OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transmitted error rate on the stack port. 
+            Measured in Errors per Second.  
+            Ports in ethernet mode will return 0."
+        ::= { chSysStackPortEntry 10 }
+    
+       chSysStackPortTxTotalErrors OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Transmitted number of errors since boot. 
+            The counter may wrap. Ports in ethernet mode 
+            will return 0."
+        ::= { chSysStackPortEntry 11 }
+                
+
+    -- ## Processor Table 
+
+    -- Each stack unit has a single processor.
+    -- The Processor table contains information on the  
+    -- processor and the memory.
+
+       chSysProcessorTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysProcessorEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of Processors resident in the M-series chassis."
+        ::= { chSysObjects 6 }
+
+      chSysProcessorEntry    OBJECT-TYPE 
+        SYNTAX        ChSysProcessorEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of Processor entries."
+        INDEX    { chStackUnitNumber }
+        ::= { chSysProcessorTable 1 }
+
+      ChSysProcessorEntry    ::=
+        SEQUENCE {
+           chSysProcessorModule       F10ProcessorModuleType,
+           chSysProcessorUpTime       TimeTicks,
+           chSysProcessorNvramSize    Integer32,
+           chSysProcessorMemSize      Integer32
+        }
+
+       chSysProcessorModule    OBJECT-TYPE
+        SYNTAX        F10ProcessorModuleType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of module running on the Processor."
+        ::= { chSysProcessorEntry 1 }
+
+       chSysProcessorUpTime    OBJECT-TYPE
+        SYNTAX        TimeTicks
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The SysUpTime for this Processor."
+        ::= { chSysProcessorEntry 2 }
+
+       chSysProcessorNvramSize    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Total Non-volatile RAM in Kbytes."
+        ::= { chSysProcessorEntry 3 }
+
+       chSysProcessorMemSize    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The size of the RAM in Mb."
+        ::= { chSysProcessorEntry 4 }
+
+
+    -- ## Software Module Table 
+
+       chSysSwModuleTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysSwModuleEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of software version information in 
+            a processor."
+        ::= { chSysObjects 7 }
+
+      chSysSwModuleEntry    OBJECT-TYPE 
+        SYNTAX        ChSysSwModuleEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A software module entry containing version 
+            number information for a particular processor."
+        INDEX    { chStackUnitNumber }
+        ::= { chSysSwModuleTable 1 }
+
+      ChSysSwModuleEntry    ::=
+        SEQUENCE {
+           chSysSwRuntimeImgVersion     DisplayString,
+           chSysSwRuntimeImgDate        F10SwDate,
+           chSysSwCurrentBootImgVersion DisplayString,
+           chSysSwCurrentBootImgDate    DateAndTime,
+           chSysSwCurrentBootImgStatus  INTEGER,
+           chSysSwBackupBootImgVersion  DisplayString,
+           chSysSwBackupBootImgDate     DateAndTime,
+           chSysSwBackupBootImgStatus   INTEGER,
+           chSysSwNextRebootImage       INTEGER,
+           chSysSwCurrentBootImage      INTEGER,
+           chSysSwInPartitionAImgVers   DisplayString,
+           chSysSwInPartitionBImgVers   DisplayString
+        }
+
+       chSysSwRuntimeImgVersion    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This variable indicates the software 
+            module version that is currently
+            running on the processor.  
+            The software release version is in 
+            the format as follow:
+            <major version>.<minor version>.<minor 
+            version>......
+            '1.2' indicate major version of 1 and
+            minor release of 2."    
+        ::= { chSysSwModuleEntry 1 }
+
+       chSysSwRuntimeImgDate    OBJECT-TYPE
+        SYNTAX        F10SwDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The release date of this software
+            module."
+        ::= { chSysSwModuleEntry 2 }
+
+       chSysSwCurrentBootImgVersion    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This provides the uboot image version 
+            that is currently running and it is in 
+            the format as follow:
+            <major version>.<minor version>.<minor 
+            version>......
+            '1.2' indicate major version of 1 and
+            minor release of 2."    
+        ::= { chSysSwModuleEntry 3 }
+
+       chSysSwCurrentBootImgDate    OBJECT-TYPE
+        SYNTAX        DateAndTime
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The release date of this software module
+            If the CPU is reset, the software module
+            running date (chSysSwModuleRunningDate) 
+            will change to this current date."
+        ::= { chSysSwModuleEntry 4 }
+
+       chSysSwCurrentBootImgStatus    OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        ok(1),
+                        failed(2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The status of current boot image."
+        ::= { chSysSwModuleEntry 5 }
+
+       chSysSwBackupBootImgVersion OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This provides the uboot image version
+                that would be the backup image and it is in
+                the format as follow:
+                <major version>.<minor version>.<minor
+                version>......
+                '1.2' indicate major version of 1 and
+                minor release of 2."
+        ::= { chSysSwModuleEntry 6 }
+
+       chSysSwBackupBootImgDate    OBJECT-TYPE
+       SYNTAX          DateAndTime
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+               "The backup boot image released date."
+       ::= { chSysSwModuleEntry 7 }
+
+       chSysSwBackupBootImgStatus  OBJECT-TYPE
+       SYNTAX          INTEGER {
+                           ok(1),
+                           failed(2)
+                       }
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+            "The status of the backup boot image."
+       ::= { chSysSwModuleEntry 8 }
+
+       chSysSwNextRebootImage  OBJECT-TYPE
+       SYNTAX          INTEGER {
+                           bootImage-A(1),
+                           bootImage-B(2)
+                       }
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+        "The boot flash image selection. When the
+         chassis is rebooted, this is the boot 
+         image to use."
+       ::= { chSysSwModuleEntry 9 }
+
+       chSysSwCurrentBootImage  OBJECT-TYPE
+       SYNTAX          INTEGER {
+                           bootImage-A(1),
+                           bootImage-B(2)
+                       }
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+        "The current boot image. This is the boot image described by the 
+        chSysSwCurrentBootImgVersion, chSysSwCurrentBootImgDate, and
+        chSysSwCurrentBootImgStatus objects.   
+        "
+       ::= { chSysSwModuleEntry 10 }
+
+       chSysSwInPartitionAImgVers    OBJECT-TYPE
+       SYNTAX        DisplayString
+       MAX-ACCESS    read-only
+       STATUS        current
+       DESCRIPTION
+            "This provides the Dell Networking OS system image version
+            that is stored in partition A: and The version
+            string has Major and Minor release numbers. It
+            also denotes if the release is Maintenance,
+            Technical, Patch, Beta, or Generally Available"
+       ::= { chSysSwModuleEntry 11 }
+
+
+       chSysSwInPartitionBImgVers OBJECT-TYPE
+       SYNTAX          DisplayString
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+            "This provides the Dell Networking OS system image version
+            that is stored in partition B: and  The version
+            string has Major and Minor release numbers. It
+            also denotes if the release is Maintenance,
+            Technical, Patch, Beta, or Generally Available"
+      ::= { chSysSwModuleEntry 12 }
+
+
+    -- ## Stack Unit CPU and Memory Utilization
+
+       chStackUnitUtilTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChStackUnitUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table listing the cpu and memory utilization
+             in the stack unit."
+        ::= { chSysObjects 8  }
+
+      chStackUnitUtilEntry  OBJECT-TYPE 
+        SYNTAX        ChStackUnitUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row in each processor cpu and mmory utilization"
+        INDEX    { chStackUnitNumber }
+        ::= { chStackUnitUtilTable 1 }
+
+      ChStackUnitUtilEntry    ::=
+        SEQUENCE {
+           chStackUnitCpuType         F10ProcessorModuleType,
+           chStackUnitCpuUtil5Sec     Gauge32,
+           chStackUnitCpuUtil1Min     Gauge32,
+           chStackUnitCpuUtil5Min     Gauge32,
+           chStackUnitMemUsageUtil    Gauge32,
+           chStackUnitFlashUsageUtil  Gauge32
+        }
+
+       chStackUnitCpuType   OBJECT-TYPE
+        SYNTAX        F10ProcessorModuleType
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The type of module running on the Processor."
+        ::= { chStackUnitUtilEntry 1 }
+
+       chStackUnitCpuUtil5Sec OBJECT-TYPE
+        SYNTAX          Gauge32(0..100)
+        UNITS           "percent"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "CPU utilization in percentage for last 5 seconds."
+        ::= { chStackUnitUtilEntry 2 }
+
+       chStackUnitCpuUtil1Min     OBJECT-TYPE
+        SYNTAX              Gauge32(0..100)
+        UNITS               "percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "CPU utilization in percentage for last 1 minute."
+        ::= { chStackUnitUtilEntry 3 }
+
+       chStackUnitCpuUtil5Min     OBJECT-TYPE
+        SYNTAX              Gauge32(0..100)
+        UNITS               "percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "CPU utilization in percentage for last 5 minutes."
+        ::= { chStackUnitUtilEntry 4 }
+
+       chStackUnitMemUsageUtil    OBJECT-TYPE
+        SYNTAX              Gauge32(0..100)
+        UNITS               "percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Total memory usage in percentage."
+        ::= { chStackUnitUtilEntry 5 }
+
+       chStackUnitFlashUsageUtil  OBJECT-TYPE
+        SYNTAX              Gauge32(0..100)
+        UNITS               "percent"
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION
+            "Total flash usage in percentage."
+        ::= { chStackUnitUtilEntry 6 }
+
+
+    -- ## Software Cores Table
+
+       chSysSwCoresTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF ChSysCoresEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table containing information about the software
+             cores that have been generated as a result of
+             system failures."
+        ::= { chSysObjects 9  }
+
+      chSysCoresEntry  OBJECT-TYPE
+        SYNTAX        ChSysCoresEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row in the software core table representing
+             information about a core that has been generated."
+        INDEX    { chStackUnitNumber,
+                   chSysCoresInstance  }
+        ::= { chSysSwCoresTable 1 }
+
+      ChSysCoresEntry    ::=
+        SEQUENCE {
+           chSysCoresInstance         INTEGER,
+           chSysCoresFileName         DisplayString,
+           chSysCoresTimeCreated      F10SwDate,
+           chSysCoresStackUnitNumber  Integer32,
+           chSysCoresProcess          DisplayString
+        }
+
+       chSysCoresInstance    OBJECT-TYPE
+        SYNTAX        INTEGER
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A unique index assigned to the cores stored on
+             this stack unit."
+        ::= { chSysCoresEntry 1 }
+
+       chSysCoresFileName    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the core file including the path."
+        ::= { chSysCoresEntry 2 }
+
+       chSysCoresTimeCreated    OBJECT-TYPE
+        SYNTAX        F10SwDate
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The time at which the core file was created."
+        ::= { chSysCoresEntry 3 }
+
+       chSysCoresStackUnitNumber  OBJECT-TYPE
+        SYNTAX        Integer32 (1..12)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The stack unit member which generated the core."
+        ::= { chSysCoresEntry 4 }
+
+       chSysCoresProcess    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the process which generated the core."
+        ::= { chSysCoresEntry 5 }
+
+    --
+    -- ## Notifications 
+    --
+    
+    chAlarmMibNotifications     OBJECT IDENTIFIER ::= { chAlarmObjects 0 }    
+
+    --
+    -- TRAPS
+    --
+    
+    chAlarmStackUnitDown    NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort                            
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a 
+             stack unit operational status is down."
+        ::= { chAlarmMibNotifications 1 }
+
+    chAlarmStackUnitUp      NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort                            
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a 
+             stack unit operational status is up."
+        ::= { chAlarmMibNotifications 2 }
+
+
+    chAlarmStackUnitReset   NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort                            
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a 
+             stack unit is reset."
+        ::= { chAlarmMibNotifications 3 }
+
+    chAlarmStackUnitOffline NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort                            
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a 
+             stack unit is set to offline."
+        ::= { chAlarmMibNotifications 4 }
+
+    chAlarmStackUnitCodeMismatch NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort                            
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a 
+             stack unit is not the same code as a management
+             stack."
+        ::= { chAlarmMibNotifications 5 }
+
+    chAlarmStackPortLinkUp  NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort                            
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a 
+             stack port is connected to annother stack member."
+        ::= { chAlarmMibNotifications 6 }
+
+    chAlarmStackPortLinkDown  NOTIFICATION-TYPE
+        OBJECTS         {   chAlarmVarInteger,
+                            chAlarmVarString,
+                            chAlarmVarSlot,
+                            chAlarmVarPort                            
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a 
+             stack port is disconnected from annother stack member."
+        ::= { chAlarmMibNotifications 7 }
+
+    chAlarmStackUnitRoleChanged  NOTIFICATION-TYPE
+        OBJECTS         { chStackUnitMgmtStatus, 
+                          chAlarmVarString
+                        }
+        STATUS          current
+        DESCRIPTION
+            "The driver/agent generate this trap when a stack unit role is changed."
+        ::= { chAlarmMibNotifications 8 }
+
+    -- ### conformance information ###
+    f10mSeriesMibConformance    OBJECT IDENTIFIER    ::=    { f10MSerChassisMib 2 }
+    f10mSeriesMibCompliances    OBJECT IDENTIFIER    ::=    { f10mSeriesMibConformance 1 }
+    f10mSeriesMibGroups         OBJECT IDENTIFIER    ::=    { f10mSeriesMibConformance 2 }
+
+    -- ## compliance statements
+    f10mSeriesMibCompliance    MODULE-COMPLIANCE
+        STATUS                  current
+        DESCRIPTION
+            "The compliance statement for Dell 
+            product which implement the Dell Networking OS
+            M-Series Chassis MIB."
+        MODULE    -- this module
+        MANDATORY-GROUPS {
+            f10mSeriesComponentGroup,
+            f10mSeriesSystemGroup,
+            f10mSeriesNotificationGroup
+        }
+        ::= { f10mSeriesMibCompliances 1 }
+
+    -- ## units of conformance
+
+    f10mSeriesComponentGroup    OBJECT-GROUP
+        OBJECTS {
+        chNumStackUnits,
+        chNumMaxStackableUnits,
+        chStackUnitIndexNext
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            overall M-series chassis information."
+        ::= { f10mSeriesMibGroups 1 }
+
+    f10mSeriesSystemGroup    OBJECT-GROUP
+        OBJECTS {
+        chStackUnitNumber,
+        chStackUnitSID,
+        chStackUnitMgmtStatus,
+        chStackUnitHwMgmtPreference, 
+        chStackUnitAdmMgmtPreference,
+        chStackUnitModelID,
+        chStackUnitStatus,
+        chStackUnitDescription,
+        chStackUnitCodeVersion,
+        chStackUnitCodeVersionInFlash,
+        chStackUnitSerialNumber, 
+        chStackUnitUpTime,
+        chStackUnitTemp,
+        chStackUnitType,
+        chStackUnitSysType,
+        chStackUnitVendorId,
+        chStackUnitMfgDate,
+        chStackUnitMacAddress,
+        chStackUnitPartNum,
+        chStackUnitProductRev,
+        chStackUnitProductOrder,
+        chStackUnitCountryCode,
+        chStackUnitNum10GigEtherPorts,
+        chStackUnitNumGigEtherPorts,
+        chStackUnitNumFastEtherPorts,
+        chStackUnitNumFanTrays, 
+        chStackUnitNumPowerSupplies,
+        chStackUnitNumPluggableModules,
+        chStackUnitRowStatus,
+        chStackUnitPiecePartID,
+        chStackUnitPPIDRevision,
+        chStackUnitServiceTag,
+        chStackUnitExpressServiceCode,
+        chSysPowerSupplyIndex,
+        chSysPowerSupplyOperStatus,
+        chSysPowerSupplyType,
+        chSysFanTrayIndex,
+        chSysFanTrayOperStatus,
+        chSysPortIndex,
+        chSysPortType,
+        chSysPortAdminStatus ,
+        chSysPortOperStatus,
+        chSysPortIfIndex,           
+        chSysPortXfpRecvPower,                
+        chSysPortXfpRecvTemp,
+        chSysPortXfpTxPower,
+        chSysStackPortIndex,
+        chSysStackPortConfiguredMode,
+        chSysStackPortRunningMode,          
+        chSysStackPortLinkStatus,
+        chSysStackPortLinkSpeed,
+        chSysStackPortRxDataRate,
+        chSysStackPortRxErrorRate,
+        chSysStackPortRxTotalErrors,
+        chSysStackPortTxDataRate,
+        chSysStackPortTxErrorRate,
+        chSysStackPortTxTotalErrors,
+        chSysProcessorModule,
+        chSysProcessorUpTime,
+        chSysProcessorNvramSize,
+        chSysProcessorMemSize,                   
+        chSysSwRuntimeImgVersion,
+        chSysSwRuntimeImgDate,
+        chSysSwCurrentBootImgVersion,
+        chSysSwCurrentBootImgDate,
+        chSysSwCurrentBootImgStatus,
+        chSysSwBackupBootImgVersion,
+        chSysSwBackupBootImgDate,
+        chSysSwBackupBootImgStatus,
+        chSysSwNextRebootImage,
+        chSysSwCurrentBootImage,
+        chSysSwInPartitionAImgVers,
+        chSysSwInPartitionBImgVers,
+        chStackUnitCpuType,
+        chStackUnitCpuUtil5Sec,
+        chStackUnitCpuUtil1Min,
+        chStackUnitCpuUtil5Min,
+        chStackUnitMemUsageUtil,
+        chStackUnitFlashUsageUtil,
+        chSysCoresInstance,
+        chSysCoresFileName,
+        chSysCoresTimeCreated,
+        chSysCoresStackUnitNumber,
+        chSysCoresProcess
+        }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects providing the
+            chassis system hardware information."
+        ::= { f10mSeriesMibGroups 2 }
+
+    f10mSeriesNotificationGroup    NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        chAlarmStackUnitDown,
+        chAlarmStackUnitUp,
+        chAlarmStackUnitReset,
+        chAlarmStackUnitOffline,
+        chAlarmStackUnitCodeMismatch,
+        chAlarmStackPortLinkUp,
+        chAlarmStackPortLinkDown,
+        chAlarmStackUnitRoleChanged
+        }
+        STATUS    current
+        DESCRIPTION
+            "Notifications for Dell Networking OS M-Series Chassis mib"
+        ::= { f10mSeriesMibGroups 3 }
+
+    END
+    

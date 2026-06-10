@@ -1,0 +1,90 @@
+-- *****************************************************************
+-- Copyright (c) 2017 SonicWall Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+
+SONICWALL-SMI
+ 
+--FORCE-INCLUDE <mib.h>
+--FORCE-INCLUDE <snmpdefs.h>
+--FORCE-INCLUDE "swPrivMibhand.h"
+
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+sonicwall MODULE-IDENTITY
+	LAST-UPDATED "201804090001Z"
+	ORGANIZATION "SonicWall"
+	CONTACT-INFO
+		"	SonicWall Inc.
+
+		   Tel: +1 408 745 9600
+		   Fax: +1 408 745 9300
+
+		E-mail: support@sonicwall.com"
+	DESCRIPTION
+		"The MIB Module for SonicWall enterprise."
+	REVISION      "201701060000Z"
+	DESCRIPTION   "Updated company copyright and organization."    
+
+	REVISION      "200701060000Z"
+	DESCRIPTION   "Initial version."
+	::= { enterprises 8741 }
+	
+
+sonicwallFw OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"sonicwallFw is the subtree for the SonicWall firewall products."
+	::= { sonicwall 1 }
+
+sonicwallCommon OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree for MIBs common for all SonicWall products"
+	::= { sonicwall 2 }
+
+sonicwallGMS OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"sonicwallGMS is the subtree for the SonicWall Global Management System products."
+	::= { sonicwall 3 }
+
+sonicwallEmailSec OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"sonicwallEmailSec is the subtree for SonicWall email security products."
+	::= { sonicwall 4 }
+
+sonicwallDataCenter OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"sonicwallDataCenter is the subtree for SonicWall datacenter operations."
+	::= { sonicwall 5 }
+
+sonicwallSSLVPN OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"sonicwallSSLVPN is the subtree for SonicWall SSL VPN products."
+	::= { sonicwall 6 }
+
+sonicwallCDP OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"sonicwallCDP is the subtree for SonicWall CDP products."
+	::= { sonicwall 7 }
+
+sonicwallSMA OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"sonicwallSMA is the subtree for SonicWall SMA 1000 series products."
+	::= { sonicwall 8 }
+
+END

@@ -1,0 +1,2551 @@
+F3-CONNECTGUARD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, IpAddress
+             FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+    DateAndTime, DisplayString, TruthValue, RowStatus, StorageType, 
+    MacAddress, VariablePointer, TEXTUAL-CONVENTION, TimeStamp
+             FROM SNMPv2-TC
+    Ipv6Address
+             FROM IPV6-TC
+    InterfaceIndex, ifIndex
+             FROM IF-MIB
+    SecySCI
+             FROM IEEE8021-SECY-MIB
+    PhysicalIndex
+             FROM ENTITY-MIB
+    neIndex, shelfIndex, slotIndex, f3UsbHostIndex, networkElementEntry
+             FROM CM-ENTITY-MIB
+    cmFlowEntry
+             FROM CM-FACILITY-MIB
+    f3AccFlowPointEntry
+             FROM F3-FPM-MIB
+    f3NetFlowPointEntry
+             FROM F3-FPM-MIB
+
+    fsp150cm
+             FROM  ADVA-MIB 
+    AdminState, OperationalState, SecondaryState, EthernetMediaType, 
+    EthernetPortSpeed, TrafficDirection, SfpConnectorValue, SfpMediaType,
+    VlanId, VlanPriority, VlanTagType, PriorityMapMode, PerfCounter64,
+    AfpTagControl, VlanEthertype,CmPmIntervalType, CmPmBinAction,
+    F3DisplayString
+             FROM CM-COMMON-MIB;
+
+f3ConnectGuardMIB MODULE-IDENTITY
+    LAST-UPDATED    "201607110000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jack Chen
+                     ADVA Optical Networking, Inc.
+                Tel: +86755 86217400-8205
+             E-mail: jchen@advaoptical.com
+             Postal: 
+             "
+    DESCRIPTION
+            "This module defines the Connect Guard MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201607110000Z"
+    DESCRIPTION
+        "Notes from release 201607110000Z
+          a) added  FlowSecureState back to the mib since the mib has been released
+         Notes from release 201607080000Z
+          a) deprecated f3FlowExtConnectGuardTable moved the attributes to cmFlowTable
+          b) removed f3AccFlowpointExtConnectGuardTable and f3NetFlowpointExtConnectGuardTable
+             and moved the attributes to acc/net flowpoint tables
+         Notes from release 201606200000Z
+          a) added f3ConnectGuardFlowKeyInjectFlowPoint to f3ConnectGuardFlowTable
+         Notes from release 201606170000Z
+          a) added f3MPFlowExtConnectGuardTable
+         Notes from release 201606060000Z
+          a) added f3ConnectGuardFlowKeyExchangeFrameOuterVlanEtherType, f3ConnectGuardFlowKeyExchangeFrameInner1VlanEtherType,
+             and f3ConnectGuardFlowKeyExchangeFrameInner2VlanEtherType to f3ConnectGuardFlowTable
+         Notes from release 201605100000Z
+          a) added f3AccFlowpointExtConnectGuardTable and f3NetFlowpointExtConnectGuardTable
+             to support secure flow on flow point
+         Notes from release 201604120000Z
+          a) added system level scalar f3ConnectGuardCryptoPasswordControl
+         Notes from release 201601260000Z
+          a) add f3ConnectGuardFlowAlias to f3ConnectGuardFlowTable
+         Notes from release 201409120000Z
+          
+         Notes from release 201601040000Z
+           a) add f3ConnectGuardFlowAssociatedMep to f3ConnectGuardFlowTable
+        " 
+    ::= {fsp150cm 36}    
+
+-- 
+-- OID definitions
+-- 
+f3ConnectGuardConfigObjects       OBJECT IDENTIFIER ::= {f3ConnectGuardMIB 1}
+f3ConnectGuardPerformanceObjects  OBJECT IDENTIFIER ::= {f3ConnectGuardMIB 2}
+f3ConnectGuardNotifications       OBJECT IDENTIFIER ::= {f3ConnectGuardMIB 3}
+f3ConnectGuardConformance         OBJECT IDENTIFIER ::= {f3ConnectGuardMIB 4}
+
+
+FlowSecureState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Flow secure state."
+    SYNTAX       INTEGER {
+                   secureNormal (1),
+                   secureBlocked (2),
+                   unsecureNormal (3),
+                   unsecureBlocked (4)
+                 }
+
+CipherSuiteType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes the cipher suite type."
+    SYNTAX INTEGER {
+                gcmAes256(1),
+                gcmAes128(2)
+               }
+
+KeyExchangeFrameTagControl ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes the key exchange frame tag mode."
+    SYNTAX INTEGER {
+                autoSelect(1),
+                manual(2)
+               }
+ScSaState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes the SC State."
+    SYNTAX INTEGER {
+                inUse(1),
+                notInUse(2)
+               }
+
+ConnectGuardKeyExMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes the Connect Guard Key exchange mode."
+    SYNTAX INTEGER {
+                authPasswordBasedDiffieHellman(1),
+                caBasedDiffieHellman(2),
+                ieee8021x(3)
+               }
+
+DiffieHellmanKeyPairLength ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "This object describes supported length used in DiffieHellman algorithm."
+    SYNTAX INTEGER {
+                length2048(1),
+                length4096(2)
+               }
+
+
+ConnectGuardFlowActionType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The action on mac sec flow."
+    SYNTAX       INTEGER {
+                   noAction (1),
+                   restartKeyXchg (2)
+                 }
+
+--
+--  Connect Guard Flow Table
+--
+f3ConnectGuardFlowTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the Connect Guard flow."
+    ::= { f3ConnectGuardConfigObjects 1 }
+
+f3ConnectGuardFlowEntry  OBJECT-TYPE
+    SYNTAX      F3ConnectGuardFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardFlowTable."
+    INDEX { neIndex, f3ConnectGuardFlowIndex }
+    ::= { f3ConnectGuardFlowTable 1 }
+
+F3ConnectGuardFlowEntry ::= SEQUENCE {
+    f3ConnectGuardFlowIndex                                   Integer32,
+    f3ConnectGuardFlowCipherSuite                             CipherSuiteType,
+    f3ConnectGuardFlowAdminState                              AdminState,
+    f3ConnectGuardFlowSecondaryState                          SecondaryState,
+    f3ConnectGuardFlowOperationalState                        OperationalState,
+    f3ConnectGuardFlowEgressInterface                         VariablePointer,
+    f3ConnectGuardFlowKeyExchangeProfile                      VariablePointer,
+    f3ConnectGuardFlowKeyExchangeFrameTagControl              KeyExchangeFrameTagControl,
+    f3ConnectGuardFlowKeyExchangeFrameOuterVlanEnabled        TruthValue,
+    f3ConnectGuardFlowKeyExchangeFrameOuterVlanId             VlanId,
+    f3ConnectGuardFlowKeyExchangeFrameOuterVlanPriority       VlanPriority,
+    f3ConnectGuardFlowKeyExchangeFrameInner1VlanEnabled       TruthValue,
+    f3ConnectGuardFlowKeyExchangeFrameInner1VlanId            VlanId,
+    f3ConnectGuardFlowKeyExchangeFrameInner1VlanPriority      VlanPriority,
+    f3ConnectGuardFlowKeyExchangeFrameInner2VlanEnabled       TruthValue,
+    f3ConnectGuardFlowKeyExchangeFrameInner2VlanId            VlanId,
+    f3ConnectGuardFlowKeyExchangeFrameInner2VlanPriority      VlanPriority,
+    f3ConnectGuardFlowKeyExchangeInterval                     Integer32,
+    f3ConnectGuardFlowTagsClear                               Integer32,    
+    f3ConnectGuardFlowStorageType                             StorageType,
+    f3ConnectGuardFlowRowStatus                               RowStatus,
+    f3ConnectGuardFlowKeyXchgFailsCounts                      Unsigned32,
+    f3ConnectGuardFlowAction                                  ConnectGuardFlowActionType,
+    f3ConnectGuardFlowReplayProtectionEnabled                 TruthValue,
+    f3ConnectGuardFlowReplayProtectionWindow                  Unsigned32,
+    f3ConnectGuardFlowRemoteMacAddrEnabled                    TruthValue,
+    f3ConnectGuardFlowRemoteMacAddr                           MacAddress,
+    f3ConnectGuardFlowAssociatedMep                           VariablePointer,
+    f3ConnectGuardFlowAlias                                   DisplayString,
+    f3ConnectGuardFlowKeyExchangeFrameOuterVlanEtherType      Unsigned32,
+    f3ConnectGuardFlowKeyExchangeFrameInner1VlanEtherType     Unsigned32,
+    f3ConnectGuardFlowKeyExchangeFrameInner2VlanEtherType     Unsigned32,
+    f3ConnectGuardFlowKeyInjectFlowPoint                      VariablePointer
+}
+
+f3ConnectGuardFlowIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index of the Connect Guard flow entry."
+    ::= { f3ConnectGuardFlowEntry 1 }
+
+f3ConnectGuardFlowCipherSuite OBJECT-TYPE
+    SYNTAX      CipherSuiteType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the cipher suite type for this flow."
+    ::= { f3ConnectGuardFlowEntry 2 }
+
+f3ConnectGuardFlowAdminState OBJECT-TYPE
+    SYNTAX      AdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object represents the Administrative State of the Flow."
+    ::= { f3ConnectGuardFlowEntry 3 }
+
+f3ConnectGuardFlowSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object represents the Secondary State of the Flow."
+    ::= { f3ConnectGuardFlowEntry 4 }
+
+f3ConnectGuardFlowOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object represents the Operational State of the Flow."
+    ::= { f3ConnectGuardFlowEntry 5 }
+
+f3ConnectGuardFlowEgressInterface OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the Connect Guard Flow egress interface."
+    ::= { f3ConnectGuardFlowEntry 6 }
+
+f3ConnectGuardFlowKeyExchangeProfile OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange profile to be used for the secure flow."
+    ::= { f3ConnectGuardFlowEntry 7 }
+
+f3ConnectGuardFlowKeyExchangeFrameTagControl OBJECT-TYPE
+    SYNTAX      KeyExchangeFrameTagControl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange frame tag mode."
+    ::= { f3ConnectGuardFlowEntry 8 }
+
+f3ConnectGuardFlowKeyExchangeFrameOuterVlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object controls the key exchange frame Outer Vlan."
+    ::= { f3ConnectGuardFlowEntry 9 }
+
+f3ConnectGuardFlowKeyExchangeFrameOuterVlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange frame outer Vlan ID"
+    ::= { f3ConnectGuardFlowEntry 10 }
+
+f3ConnectGuardFlowKeyExchangeFrameOuterVlanPriority OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange frame outer Vlan Priority."
+    ::= { f3ConnectGuardFlowEntry 11 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner1VlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object controls the key exchange frame Inner Vlan."
+    ::= { f3ConnectGuardFlowEntry 12 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner1VlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange frame Inner Vlan ID"
+    ::= { f3ConnectGuardFlowEntry 13 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner1VlanPriority OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange frame Inner Vlan Priority."
+    ::= { f3ConnectGuardFlowEntry 14 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner2VlanEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object controls the key exchange frame Inner most Vlan."
+    ::= { f3ConnectGuardFlowEntry 15 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner2VlanId OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange frame Inner most Vlan ID"
+    ::= { f3ConnectGuardFlowEntry 16 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner2VlanPriority OBJECT-TYPE
+    SYNTAX      VlanPriority
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines the key exchange frame Inner most Vlan Priority."
+    ::= { f3ConnectGuardFlowEntry 17 }
+
+
+f3ConnectGuardFlowKeyExchangeInterval OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object defines the key exchange interval value, in one minute increment"
+    ::= { f3ConnectGuardFlowEntry 18 }
+
+f3ConnectGuardFlowTagsClear OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object defines the number of tags to by pass in encryption"
+    ::= { f3ConnectGuardFlowEntry 19 }
+
+f3ConnectGuardFlowStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3ConnectGuardFlowEntry 20 }
+
+f3ConnectGuardFlowRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3ConnectGuardFlowRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3ConnectGuardFlowRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The f3ConnectGuardFlowRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3ConnectGuardFlowEntry 21 }
+
+f3ConnectGuardFlowKeyXchgFailsCounts OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object counts number of times key exchange protocol failed."
+    ::= { f3ConnectGuardFlowEntry 22 }
+
+f3ConnectGuardFlowAction OBJECT-TYPE
+    SYNTAX     ConnectGuardFlowActionType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object describe operation on the Connect Guard flow."
+    ::= { f3ConnectGuardFlowEntry 23 }
+
+f3ConnectGuardFlowReplayProtectionEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object can be used to enable/disable replay proctection."
+    ::= { f3ConnectGuardFlowEntry 24 }
+
+f3ConnectGuardFlowReplayProtectionWindow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines replay proctection window value."
+    ::= { f3ConnectGuardFlowEntry 25 }
+
+f3ConnectGuardFlowRemoteMacAddrEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object can be used to enable/disable remote MAC Address that used as the destination MAC address in the 
+            key exchange protocol packets."
+    ::= { f3ConnectGuardFlowEntry 26 }
+
+f3ConnectGuardFlowRemoteMacAddr OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object defines remote MAC Address value."
+    ::= { f3ConnectGuardFlowEntry 27 }
+
+
+f3ConnectGuardFlowAssociatedMep OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object speicify the mep object to use as trigger for key exchange failure"
+    ::= { f3ConnectGuardFlowEntry 28 }
+
+
+f3ConnectGuardFlowAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object speicify the connect guard flow's alias."
+    ::= { f3ConnectGuardFlowEntry 29 }
+
+f3ConnectGuardFlowKeyExchangeFrameOuterVlanEtherType  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Outer vlan ether type used in key exchange."
+    ::= { f3ConnectGuardFlowEntry 30 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner1VlanEtherType  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Inner1 vlan ether type used in key exchange."
+    ::= { f3ConnectGuardFlowEntry 31 }
+
+f3ConnectGuardFlowKeyExchangeFrameInner2VlanEtherType  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Inner2 vlan ether type used in key exchange."
+    ::= { f3ConnectGuardFlowEntry 32 }
+
+f3ConnectGuardFlowKeyInjectFlowPoint  OBJECT-TYPE
+     SYNTAX      VariablePointer
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+           "Pointer to a flowpoint used to up inject key exchange frames in case of ERP."
+    ::= { f3ConnectGuardFlowEntry 33 }
+
+--
+--  Key Exchange Profile Table
+--
+f3ConnectGuardKeyExchangeProfileTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardKeyExchangeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the key exchange profile."
+    ::= { f3ConnectGuardConfigObjects 2 }
+
+f3ConnectGuardKeyExchangeProfileEntry  OBJECT-TYPE
+    SYNTAX      F3ConnectGuardKeyExchangeProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardKeyExchangeProfileTable."
+    INDEX { f3ConnectGuardKeyExchangeProfileIndex }
+    ::= { f3ConnectGuardKeyExchangeProfileTable 1 }
+
+F3ConnectGuardKeyExchangeProfileEntry ::= SEQUENCE {
+    f3ConnectGuardKeyExchangeProfileIndex                     Integer32,
+    f3ConnectGuardKeyExchangeProfileName                      DisplayString,
+    f3ConnectGuardKeyExchangeProfileUserId                    DisplayString,
+    f3ConnectGuardKeyExchangeProfileMode                      ConnectGuardKeyExMode,
+    f3ConnectGuardKeyExchangeProfileAuthPassword              DisplayString,
+    f3ConnectGuardKeyExchangeProfileDiffieHellmanKeyPairLen   DiffieHellmanKeyPairLength,
+    f3ConnectGuardKeyExchangeProfileStorageType               StorageType,
+    f3ConnectGuardKeyExchangeProfileRowStatus                 RowStatus  
+}
+
+f3ConnectGuardKeyExchangeProfileIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index of the key exchange profile."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 1 }
+
+f3ConnectGuardKeyExchangeProfileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The name of this profile."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 2 }
+
+f3ConnectGuardKeyExchangeProfileUserId OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The user name who created this profile. It is automatically set by the system."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 3 }
+
+f3ConnectGuardKeyExchangeProfileMode OBJECT-TYPE
+    SYNTAX      ConnectGuardKeyExMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The key exchange mode."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 4 }
+
+f3ConnectGuardKeyExchangeProfileAuthPassword OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The authentication password for this profile."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 5 }
+
+f3ConnectGuardKeyExchangeProfileDiffieHellmanKeyPairLen OBJECT-TYPE
+    SYNTAX      DiffieHellmanKeyPairLength
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "The Diffie-Hellman key pair length for this profile."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 6 }
+
+f3ConnectGuardKeyExchangeProfileStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 7 }
+
+f3ConnectGuardKeyExchangeProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3ConnectGuardKeyExchangeProfileRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3ConnectGuardKeyExchangeProfileRowStatus value as createAndGo(4).
+            Upon successful row creation, this variable has a
+            value of active(1).
+
+            The f3ConnectGuardKeyExchangeProfileRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3ConnectGuardKeyExchangeProfileEntry 8 }
+
+--
+--  TX SC Table
+--
+f3ConnectGuardTxSCTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardTxSCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the Connect Guard TX SC."
+    ::= { f3ConnectGuardConfigObjects 3 }
+
+f3ConnectGuardTxSCEntry  OBJECT-TYPE
+    SYNTAX      F3ConnectGuardTxSCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardTxSCTable."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardTxSCIndex }
+    ::= { f3ConnectGuardTxSCTable 1 }
+
+F3ConnectGuardTxSCEntry ::= SEQUENCE {
+    f3ConnectGuardTxSCIndex                               Integer32,
+    f3ConnectGuardTxSCI                                   SecySCI,
+    f3ConnectGuardTxScState                               ScSaState,
+    f3ConnectGuardCurrentTxSa                             Integer32,
+    f3ConnectGuardPreviousTxSa                            Integer32,
+    f3ConnectGuardTxScCreateTime                          DateAndTime,
+    f3ConnectGuardTxScStartTime                           DateAndTime,
+    f3ConnectGuardTxScStopTime                            DateAndTime
+}
+
+f3ConnectGuardTxSCIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The index of the Connect Guard TX SC entry."
+    ::= { f3ConnectGuardTxSCEntry 1 }
+
+f3ConnectGuardTxSCI OBJECT-TYPE
+    SYNTAX      SecySCI
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The index of the Connect Guard TX SCI."
+    ::= { f3ConnectGuardTxSCEntry 2 }
+
+f3ConnectGuardTxScState OBJECT-TYPE
+    SYNTAX     ScSaState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object defines the Tx Sc State."
+    ::= { f3ConnectGuardTxSCEntry 3 }
+
+f3ConnectGuardCurrentTxSa OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object defines the AN number of current Tx SA.
+            -1 means no current Tx SA."
+    ::= { f3ConnectGuardTxSCEntry 4 }
+
+f3ConnectGuardPreviousTxSa OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object defines the AN number of previous Tx SA.
+            -1 means no previous Tx SA."
+    ::= { f3ConnectGuardTxSCEntry 5 }
+
+f3ConnectGuardTxScCreateTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object defines the system time when the SC was created."
+    ::= { f3ConnectGuardTxSCEntry 6 }
+
+f3ConnectGuardTxScStartTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The system time when this transmitting SC last started
+ 	           transmitting Connect Guard frames."
+    ::= { f3ConnectGuardTxSCEntry 7 }
+
+f3ConnectGuardTxScStopTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The system time when this transmitting SC last stopped
+ 	           transmitting Connect Guard frames."
+    ::= { f3ConnectGuardTxSCEntry 8}
+
+--
+--  RX SC Table
+--
+f3ConnectGuardRxSCTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardRxSCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the Connect Guard RX SC."
+    ::= { f3ConnectGuardConfigObjects 4 }
+
+f3ConnectGuardRxSCEntry  OBJECT-TYPE
+    SYNTAX      F3ConnectGuardRxSCEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardRxSCTable."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardRxSCIndex }
+    ::= { f3ConnectGuardRxSCTable 1 }
+
+F3ConnectGuardRxSCEntry ::= SEQUENCE {
+    f3ConnectGuardRxSCIndex             Integer32,
+    f3ConnectGuardRxSCI                 SecySCI,
+    f3ConnectGuardRxScState             ScSaState,
+    f3ConnectGuardCurrentRxSa           Integer32,
+    f3ConnectGuardRxScCreateTime        DateAndTime,
+    f3ConnectGuardRxScStartTime         DateAndTime,
+    f3ConnectGuardRxScStopTime          DateAndTime
+}
+
+f3ConnectGuardRxSCIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "The RX SC number."
+    ::= { f3ConnectGuardRxSCEntry 1 }
+
+f3ConnectGuardRxSCI OBJECT-TYPE
+    SYNTAX      SecySCI
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "The SCI value, includes 8 bytes."
+    ::= { f3ConnectGuardRxSCEntry 2 }
+
+f3ConnectGuardRxScState OBJECT-TYPE
+    SYNTAX     ScSaState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The state of the receiving SC in the SecY.
+            inUse(1) : means any of SAs for this SC is in use.
+            notInUse(2) : means no SAs for this SC is in use."
+    ::= { f3ConnectGuardRxSCEntry 3}
+
+f3ConnectGuardCurrentRxSa OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The AN number of current Rx SA, -1 means no current Rx SA."
+    ::= { f3ConnectGuardRxSCEntry 4}
+
+f3ConnectGuardRxScCreateTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The system time when this receiving SC was created."
+    ::= { f3ConnectGuardRxSCEntry 5 }
+
+f3ConnectGuardRxScStartTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The system time when this receiving SC last started
+             receiving ConnectGuard frames."
+    ::= { f3ConnectGuardRxSCEntry 6 }
+
+f3ConnectGuardRxScStopTime OBJECT-TYPE
+    SYNTAX     DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The system time when this receiving SC last stopped
+             receiving ConnectGuard frames."
+    ::= { f3ConnectGuardRxSCEntry 7}
+
+--
+-- Tx SA Management Table
+--
+
+f3ConnectGuardTxSATable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardTxSAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for providing information about the status of each
+         transmitting SA supported by the MAC security entity."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardConfigObjects 5 }
+
+f3ConnectGuardTxSAEntry    OBJECT-TYPE
+    SYNTAX      F3ConnectGuardTxSAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing transmitting SA management information
+         applicable to a particular SA."
+    INDEX   { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardTxSCIndex, f3ConnectGuardTxSAIndex } 
+    ::= { f3ConnectGuardTxSATable 1 }
+
+F3ConnectGuardTxSAEntry ::= SEQUENCE {
+    f3ConnectGuardTxSAIndex              Unsigned32,
+    f3ConnectGuardTxSAState              INTEGER,
+    f3ConnectGuardTxSANextPN             Unsigned32,
+    f3ConnectGuardTxSASAKUnchanged       TruthValue,
+    f3ConnectGuardTxSACreatedTime        DateAndTime,
+    f3ConnectGuardTxSAStartedTime        DateAndTime,
+    f3ConnectGuardTxSAStoppedTime        DateAndTime
+}
+
+f3ConnectGuardTxSAIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The association number (AN) for identifying a transmitting
+         SA."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardTxSAEntry 1 }
+
+f3ConnectGuardTxSAState    OBJECT-TYPE
+    SYNTAX      ScSaState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the transmitting SA.
+         inUse(1) : means this SA is in use.
+         notInUse(2) : means this SA is not in use."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardTxSAEntry 2 }
+
+f3ConnectGuardTxSANextPN    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next packet number (PN) that will be used in transmitting
+         ConnectGuard frames in the SA."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardTxSAEntry 3 }
+
+f3ConnectGuardTxSASAKUnchanged    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference to an SAK that is unchanged for the life
+         of the transmitting SA."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardTxSAEntry 4 }
+
+f3ConnectGuardTxSACreatedTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system time when this transmitting SA was created."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardTxSAEntry 5 }
+
+f3ConnectGuardTxSAStartedTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system time when this transmitting SA last started
+         transmitting ConnectGuard frames."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardTxSAEntry 6 }
+
+f3ConnectGuardTxSAStoppedTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system time when this transmitting SA last stopped
+         transmitting ConnectGuard frames."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardTxSAEntry 7 }
+
+--
+-- Rx SA Management Table
+--
+
+f3ConnectGuardRxSATable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardRxSAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for providing information about the status of each
+         transmitting SA supported by the MAC security entity."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardConfigObjects 6 }
+
+f3ConnectGuardRxSAEntry    OBJECT-TYPE
+    SYNTAX      F3ConnectGuardRxSAEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing transmitting SA management information
+         applicable to a particular SA."
+    INDEX   { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardRxSCIndex, f3ConnectGuardRxSAIndex } 
+    ::= { f3ConnectGuardRxSATable 1 }
+
+F3ConnectGuardRxSAEntry ::= SEQUENCE {
+    f3ConnectGuardRxSAIndex              Unsigned32,
+    f3ConnectGuardRxSAState              INTEGER,
+    f3ConnectGuardRxSANextPN             Unsigned32,
+    f3ConnectGuardRxSASAKUnchanged       TruthValue,
+    f3ConnectGuardRxSACreatedTime        DateAndTime,
+    f3ConnectGuardRxSAStartedTime        DateAndTime,
+    f3ConnectGuardRxSAStoppedTime        DateAndTime
+}
+
+f3ConnectGuardRxSAIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The association number (AN) for identifying a transmitting
+         SA."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardRxSAEntry 1 }
+
+f3ConnectGuardRxSAState    OBJECT-TYPE
+    SYNTAX      ScSaState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current status of the transmitting SA.
+         inUse(1) : means this SA is in use.
+         notInUse(2) : means this SA is not in use."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardRxSAEntry 2 }
+
+f3ConnectGuardRxSANextPN    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The next packet number (PN) that will be used in transmitting
+         ConnectGuard frames in the SA."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardRxSAEntry 3 }
+
+f3ConnectGuardRxSASAKUnchanged    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference to an SAK that is unchanged for the life
+         of the transmitting SA."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.21"
+    ::= { f3ConnectGuardRxSAEntry 4 }
+
+f3ConnectGuardRxSACreatedTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system time when this transmitting SA was created."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardRxSAEntry 5 }
+
+f3ConnectGuardRxSAStartedTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system time when this transmitting SA last started
+         transmitting ConnectGuard frames."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardRxSAEntry 6 }
+
+f3ConnectGuardRxSAStoppedTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system time when this transmitting SA last stopped
+         transmitting ConnectGuard frames."
+    REFERENCE
+        "IEEE 802.1AE Clause 10.7.22"
+    ::= { f3ConnectGuardRxSAEntry 7 }
+
+--
+-- flow extension Table
+--
+f3FlowExtConnectGuardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3FlowExtConnectGuardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "A list of entries corresponding to Flow for configuration purposes.
+             This table has been deprecated. Attributes have been moved to 
+             cmFlowTable."
+    ::= { f3ConnectGuardConfigObjects 7 }
+
+f3FlowExtConnectGuardEntry OBJECT-TYPE
+    SYNTAX      F3FlowExtConnectGuardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+            "A conceptual row in the f3FlowExtConnectGuardTable."
+    AUGMENTS { cmFlowEntry }
+    ::= { f3FlowExtConnectGuardTable 1 }
+
+F3FlowExtConnectGuardEntry ::= SEQUENCE {
+    f3FlowRefConnectGuardFlowObject       VariablePointer,
+    f3FlowSecureBlockingEnabled           TruthValue,
+    f3FlowSecureState                     FlowSecureState
+}
+
+f3FlowRefConnectGuardFlowObject OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "This object specifies Mac Sec flow object OID."
+     ::= { f3FlowExtConnectGuardEntry 1 }
+
+f3FlowSecureBlockingEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+          "This object can be used to enable/disable secure block."
+     ::= { f3FlowExtConnectGuardEntry 2 }
+
+f3FlowSecureState OBJECT-TYPE
+    SYNTAX     FlowSecureState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+          "This object specifies the secure state of this flow."
+     ::= { f3FlowExtConnectGuardEntry 3 }
+
+f3ConnectGuardConfigScalars    OBJECT IDENTIFIER ::= {f3ConnectGuardConfigObjects 8}
+f3ConnectGuardPasswordScalars  OBJECT IDENTIFIER ::= {f3ConnectGuardConfigObjects 9}
+
+f3ConnectGuardCryptoPassword OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This is the second level password for the crypto user. 
+        This password is required to modify ConnectGuard objects. 
+        Every set request that involves a ConnectGuard object should 
+        include this variable with correct password value to succeed."
+    ::= { f3ConnectGuardPasswordScalars 1 }
+
+f3ConnectGuardRestoreFactoryApproved OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Crypto user can use this object to enable/disable restore factory defaults on the NID."
+    ::= { f3ConnectGuardConfigScalars 1 }
+
+f3ConnectGuardSoftwareVersionApproved OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object describes the software version that crypto user approved for upgrade."
+    ::= { f3ConnectGuardConfigScalars 2 }
+
+f3ConnectGuardSoftwareInstallApproved OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Crypto user can use this object to enable/disable sofware install on the NID."
+    ::= { f3ConnectGuardConfigScalars 3 }
+
+f3ConnectGuardRestoreDatabaseApproved OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Crypto user can use this object to enable/disable restore database on the NID."
+    ::= { f3ConnectGuardConfigScalars 4 }
+
+f3ConnectGuardConfigFileLoadApproved OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Crypto user can use this object to enable/disable config file operation on the NID."
+    ::= { f3ConnectGuardConfigScalars 5 }
+
+f3ConnectGuardCryptoPasswordControl OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "A system level attribute to disable/enable crypto password request when changing ConnectGuard attributes."
+    ::= { f3ConnectGuardConfigScalars 6 }
+
+--
+-- PERFORMANCE 
+--
+
+--
+-- Mac Sec Flow Current Statistics Table
+--
+f3ConnectGuardFlowStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardFlowStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Mac Sec Flow statistics.  
+             These reflect the current data."
+    ::= { f3ConnectGuardPerformanceObjects 1 }
+
+f3ConnectGuardFlowStatsEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardFlowStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardFlowStatsTable.
+             Entries exist in this table for each Connect Guard Flow."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardFlowStatsIndex }
+    ::= { f3ConnectGuardFlowStatsTable 1 }
+
+F3ConnectGuardFlowStatsEntry ::= SEQUENCE {
+    f3ConnectGuardFlowStatsIndex                     Integer32,
+    f3ConnectGuardFlowStatsIntervalType              CmPmIntervalType,
+    f3ConnectGuardFlowStatsValid                     TruthValue,
+    f3ConnectGuardFlowStatsAction                    CmPmBinAction,
+    f3ConnectGuardFlowStatsTxUntaggedPkts            PerfCounter64,
+    f3ConnectGuardFlowStatsTxTooLongPkts             PerfCounter64,
+    f3ConnectGuardFlowStatsRxUntaggedPkts            PerfCounter64,
+    f3ConnectGuardFlowStatsRxNotagPkts               PerfCounter64,
+    f3ConnectGuardFlowStatsRxBadtagPkts              PerfCounter64,
+    f3ConnectGuardFlowStatsRxUnknownSCIPkts          PerfCounter64,
+    f3ConnectGuardFlowStatsRxNoSCIPkts               PerfCounter64,
+    f3ConnectGuardFlowStatsRxOverrunPkts             PerfCounter64
+}
+
+f3ConnectGuardFlowStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this Connect Guard Flow statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3ConnectGuardFlowStatsEntry 1 }
+
+f3ConnectGuardFlowStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the type of collection, i.e. whether it is
+             15 Min, 1 Day or rollover."
+    ::= { f3ConnectGuardFlowStatsEntry 2 }
+
+f3ConnectGuardFlowStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3ConnectGuardFlowStatsEntry 3 }
+
+f3ConnectGuardFlowStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the operator to clear the bin."
+    ::= { f3ConnectGuardFlowStatsEntry 4 }
+
+f3ConnectGuardFlowStatsTxUntaggedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of transmitted packets without the MAC	security tag (SecTAG)."
+     ::= { f3ConnectGuardFlowStatsEntry 5 }
+
+f3ConnectGuardFlowStatsTxTooLongPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of transmitted packets discarded because the packet
+ 	        length is greater than the ifMtu of the Common Port interface."
+     ::= { f3ConnectGuardFlowStatsEntry 6 }
+
+f3ConnectGuardFlowStatsRxUntaggedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets without the MAC security tag(SecTAG)."
+     ::= { f3ConnectGuardFlowStatsEntry 7 }
+
+f3ConnectGuardFlowStatsRxNotagPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets discarded without the MAC security tag (SecTAG)."
+     ::= { f3ConnectGuardFlowStatsEntry 8 }
+
+f3ConnectGuardFlowStatsRxBadtagPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets discarded with an invalid
+ 	        SecTAG or a zero value PN or an invalid ICV."
+     ::= { f3ConnectGuardFlowStatsEntry 9 }
+
+f3ConnectGuardFlowStatsRxUnknownSCIPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets with unknown SCI."
+     ::= { f3ConnectGuardFlowStatsEntry 10 }
+
+f3ConnectGuardFlowStatsRxNoSCIPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets discarded with unknown SCI information."
+     ::= { f3ConnectGuardFlowStatsEntry 11 }
+
+f3ConnectGuardFlowStatsRxOverrunPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets discarded because the number of
+         received packets exceeded the cryptographic performance
+         capabilities."
+     ::= { f3ConnectGuardFlowStatsEntry 12 }
+
+--
+-- Mac Sec Flow History Statistics Table
+--
+f3ConnectGuardFlowHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardFlowHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Connect Guard Flow history statistics.  
+             These reflect the history data."
+    ::= { f3ConnectGuardPerformanceObjects 2 }
+
+f3ConnectGuardFlowHistoryEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardFlowHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardFlowHistoryTable.
+             Entries exist in this table for each Connect Guard Flow."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardFlowStatsIndex, f3ConnectGuardFlowHistoryIndex }
+    ::= { f3ConnectGuardFlowHistoryTable 1 }
+
+F3ConnectGuardFlowHistoryEntry ::= SEQUENCE {
+    f3ConnectGuardFlowHistoryIndex                     Integer32,
+    f3ConnectGuardFlowHistoryTime                      DateAndTime,
+    f3ConnectGuardFlowHistoryValid                     TruthValue,
+    f3ConnectGuardFlowHistoryAction                    CmPmBinAction,
+    f3ConnectGuardFlowHistoryTxUntaggedPkts            PerfCounter64,
+    f3ConnectGuardFlowHistoryTxTooLongPkts             PerfCounter64,
+    f3ConnectGuardFlowHistoryRxUntaggedPkts            PerfCounter64,
+    f3ConnectGuardFlowHistoryRxNotagPkts               PerfCounter64,
+    f3ConnectGuardFlowHistoryRxBadtagPkts              PerfCounter64,
+    f3ConnectGuardFlowHistoryRxUnknownSCIPkts          PerfCounter64,
+    f3ConnectGuardFlowHistoryRxNoSCIPkts               PerfCounter64,
+    f3ConnectGuardFlowHistoryRxOverrunPkts             PerfCounter64
+}
+
+f3ConnectGuardFlowHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this Connect Guard Flow statistics entry."
+    ::= { f3ConnectGuardFlowHistoryEntry 1 }
+
+f3ConnectGuardFlowHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation."
+    ::= { f3ConnectGuardFlowHistoryEntry 2 }
+
+f3ConnectGuardFlowHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3ConnectGuardFlowHistoryEntry 3 }
+
+f3ConnectGuardFlowHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the operator to clear the bin."
+    ::= { f3ConnectGuardFlowHistoryEntry 4 }
+
+f3ConnectGuardFlowHistoryTxUntaggedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of transmitted packets without the MAC	security tag (SecTAG)."
+     ::= { f3ConnectGuardFlowHistoryEntry 5 }
+
+f3ConnectGuardFlowHistoryTxTooLongPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of transmitted packets discarded because the packet
+ 	        length is greater than the ifMtu of the Common Port interface."
+     ::= { f3ConnectGuardFlowHistoryEntry 6 }
+
+f3ConnectGuardFlowHistoryRxUntaggedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets without the MAC security tag(SecTAG)."
+     ::= { f3ConnectGuardFlowHistoryEntry 7 }
+
+f3ConnectGuardFlowHistoryRxNotagPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets discarded without the MAC security tag (SecTAG)."
+     ::= { f3ConnectGuardFlowHistoryEntry 8 }
+
+f3ConnectGuardFlowHistoryRxBadtagPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets discarded with an invalid
+ 	        SecTAG or a zero value PN or an invalid ICV."
+     ::= { f3ConnectGuardFlowHistoryEntry 9 }
+
+f3ConnectGuardFlowHistoryRxUnknownSCIPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets with unknown SCI."
+     ::= { f3ConnectGuardFlowHistoryEntry 10 }
+
+f3ConnectGuardFlowHistoryRxNoSCIPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of received packets discarded with unknown SCI information."
+     ::= { f3ConnectGuardFlowHistoryEntry 11 }
+
+f3ConnectGuardFlowHistoryRxOverrunPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets discarded because the number of
+         received packets exceeded the cryptographic performance
+         capabilities."
+     ::= { f3ConnectGuardFlowHistoryEntry 12 }
+
+--
+-- Connect Guard Flow Threshold Table
+--
+f3ConnectGuardFlowThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardFlowThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of Connect Guard Flow
+             Thresholds."
+    ::= { f3ConnectGuardPerformanceObjects 3 }
+
+f3ConnectGuardFlowThresholdEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardFlowThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PtpAccPortFlowPointThresholdTable."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardFlowStatsIndex, 
+            f3ConnectGuardFlowThresholdIndex }
+    ::= { f3ConnectGuardFlowThresholdTable 1 }
+
+F3ConnectGuardFlowThresholdEntry ::= SEQUENCE {
+    f3ConnectGuardFlowThresholdIndex       Integer32,
+    f3ConnectGuardFlowThresholdInterval    CmPmIntervalType,
+    f3ConnectGuardFlowThresholdVariable    VariablePointer,
+    f3ConnectGuardFlowThresholdValueLo     Unsigned32,
+    f3ConnectGuardFlowThresholdValueHi     Unsigned32,
+    f3ConnectGuardFlowThresholdMonValue    PerfCounter64
+}
+
+f3ConnectGuardFlowThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3ConnectGuardFlowThresholdTable."
+    ::= { f3ConnectGuardFlowThresholdEntry 1 }
+
+f3ConnectGuardFlowThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3ConnectGuardFlowThresholdEntry 2 }
+
+f3ConnectGuardFlowThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3ConnectGuardFlowThresholdEntry 3 }
+
+f3ConnectGuardFlowThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3ConnectGuardFlowThresholdEntry 4 }
+
+f3ConnectGuardFlowThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3ConnectGuardFlowThresholdEntry 5 }
+
+f3ConnectGuardFlowThresholdMonValue OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3ConnectGuardFlowThresholdVariable."
+    ::= { f3ConnectGuardFlowThresholdEntry 6 }
+
+
+--
+-- Connect Guard TX SC Current Statistics Table
+--
+f3ConnectGuardTxSCStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardTxSCStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Connect Guard TxSC statistics.  
+             These reflect the current data."
+    ::= { f3ConnectGuardPerformanceObjects 4 }
+
+f3ConnectGuardTxSCStatsEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardTxSCStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardTxSCStatsTable.
+             Entries exist in this table for each Connect Guard TxSC."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardTxSCIndex, f3ConnectGuardTxSCStatsIndex }
+    ::= { f3ConnectGuardTxSCStatsTable 1 }
+
+F3ConnectGuardTxSCStatsEntry ::= SEQUENCE {
+    f3ConnectGuardTxSCStatsIndex                     Integer32,
+    f3ConnectGuardTxSCStatsIntervalType              CmPmIntervalType,
+    f3ConnectGuardTxSCStatsValid                     TruthValue,
+    f3ConnectGuardTxSCStatsAction                    CmPmBinAction,
+    f3ConnectGuardTxSCStatsTxProtectedPkts           PerfCounter64,
+    f3ConnectGuardTxSCStatsTxEncryptedPkts           PerfCounter64,
+    f3ConnectGuardTxSCStatsTxOctetsProtected         PerfCounter64,
+    f3ConnectGuardTxSCStatsTxOctetsEncrypted         PerfCounter64
+}
+
+
+f3ConnectGuardTxSCStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this Connect Guard TX SC statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3ConnectGuardTxSCStatsEntry 1 }
+
+f3ConnectGuardTxSCStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the type of collection, i.e. whether it is
+             15 Min, 1 Day or rollover."
+    ::= { f3ConnectGuardTxSCStatsEntry 2 }
+
+f3ConnectGuardTxSCStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3ConnectGuardTxSCStatsEntry 3 }
+
+f3ConnectGuardTxSCStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the operator to clear the bin."
+    ::= { f3ConnectGuardTxSCStatsEntry 4 }
+
+f3ConnectGuardTxSCStatsTxProtectedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of integrity protected but not encrypted packets."
+     ::= { f3ConnectGuardTxSCStatsEntry 5 }
+
+f3ConnectGuardTxSCStatsTxEncryptedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of integrity protected and encrypted packets."
+     ::= { f3ConnectGuardTxSCStatsEntry 6 }
+
+f3ConnectGuardTxSCStatsTxOctetsProtected OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of plain text octets that are integrity protected
+        	but not encrypted."
+     ::= { f3ConnectGuardTxSCStatsEntry 7 }
+
+f3ConnectGuardTxSCStatsTxOctetsEncrypted OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of plain text octets that are integrity protected
+ 	        and encrypted."
+     ::= { f3ConnectGuardTxSCStatsEntry 8 }
+
+--
+-- Connect Guard TX SC History Statistics Table
+--
+f3ConnectGuardTxSCHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardTxSCHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Connect Guard TxSC history statistics.  
+             These reflect the history data."
+    ::= { f3ConnectGuardPerformanceObjects 5 }
+
+f3ConnectGuardTxSCHistoryEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardTxSCHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardTxSCHistoryTable.
+             Entries exist in this table for each Connect Guard TX SC."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardTxSCIndex, f3ConnectGuardTxSCStatsIndex, f3ConnectGuardTxSCHistoryIndex }
+    ::= { f3ConnectGuardTxSCHistoryTable 1 }
+
+F3ConnectGuardTxSCHistoryEntry ::= SEQUENCE {
+    f3ConnectGuardTxSCHistoryIndex                     Integer32,
+    f3ConnectGuardTxSCHistoryTime                      DateAndTime,
+    f3ConnectGuardTxSCHistoryValid                     TruthValue,
+    f3ConnectGuardTxSCHistoryAction                    CmPmBinAction,
+    f3ConnectGuardTxSCHistoryTxProtectedPkts           PerfCounter64,
+    f3ConnectGuardTxSCHistoryTxEncryptedPkts           PerfCounter64,
+    f3ConnectGuardTxSCHistoryTxOctetsProtected         PerfCounter64,
+    f3ConnectGuardTxSCHistoryTxOctetsEncrypted         PerfCounter64
+}
+
+f3ConnectGuardTxSCHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this Connect Guard TxSC statistics entry."
+    ::= { f3ConnectGuardTxSCHistoryEntry 1 }
+
+f3ConnectGuardTxSCHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation."
+    ::= { f3ConnectGuardTxSCHistoryEntry 2 }
+
+f3ConnectGuardTxSCHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3ConnectGuardTxSCHistoryEntry 3 }
+
+f3ConnectGuardTxSCHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the operator to clear the bin."
+    ::= { f3ConnectGuardTxSCHistoryEntry 4 }
+
+f3ConnectGuardTxSCHistoryTxProtectedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of integrity protected but not encrypted packets."
+     ::= { f3ConnectGuardTxSCHistoryEntry 5 }
+
+f3ConnectGuardTxSCHistoryTxEncryptedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of integrity protected and encrypted packets."
+     ::= { f3ConnectGuardTxSCHistoryEntry 6 }
+
+f3ConnectGuardTxSCHistoryTxOctetsProtected OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of plain text octets that are integrity protected
+        	but not encrypted."
+     ::= { f3ConnectGuardTxSCHistoryEntry 7 }
+
+f3ConnectGuardTxSCHistoryTxOctetsEncrypted OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of plain text octets that are integrity protected
+ 	        and encrypted."
+     ::= { f3ConnectGuardTxSCHistoryEntry 8 }
+
+--
+-- Connect Guard TX SC Threshold Table
+--
+f3ConnectGuardTxSCThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardTxSCThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of Connect Guard TxSC
+             Thresholds."
+    ::= { f3ConnectGuardPerformanceObjects 6 }
+
+f3ConnectGuardTxSCThresholdEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardTxSCThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardTxSCThresholdEntry."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardTxSCIndex, f3ConnectGuardTxSCStatsIndex, 
+            f3ConnectGuardTxSCThresholdIndex }
+    ::= { f3ConnectGuardTxSCThresholdTable 1 }
+
+F3ConnectGuardTxSCThresholdEntry ::= SEQUENCE {
+    f3ConnectGuardTxSCThresholdIndex       Integer32,
+    f3ConnectGuardTxSCThresholdInterval    CmPmIntervalType,
+    f3ConnectGuardTxSCThresholdVariable    VariablePointer,
+    f3ConnectGuardTxSCThresholdValueLo     Unsigned32,
+    f3ConnectGuardTxSCThresholdValueHi     Unsigned32,
+    f3ConnectGuardTxSCThresholdMonValue    PerfCounter64
+}
+
+f3ConnectGuardTxSCThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3ConnectGuardTxSCThresholdTable."
+    ::= { f3ConnectGuardTxSCThresholdEntry 1 }
+
+f3ConnectGuardTxSCThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3ConnectGuardTxSCThresholdEntry 2 }
+
+f3ConnectGuardTxSCThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3ConnectGuardTxSCThresholdEntry 3 }
+
+f3ConnectGuardTxSCThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3ConnectGuardTxSCThresholdEntry 4 }
+
+f3ConnectGuardTxSCThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3ConnectGuardTxSCThresholdEntry 5 }
+
+f3ConnectGuardTxSCThresholdMonValue OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3ConnectGuardTxSCThresholdVariable."
+    ::= { f3ConnectGuardTxSCThresholdEntry 6 }
+
+--
+-- Connect Guard RX SC Current Statistics Table
+--
+f3ConnectGuardRxSCStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardRxSCStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Connect Guard RxSC statistics.  
+             These reflect the current data."
+    ::= { f3ConnectGuardPerformanceObjects 7 }
+
+f3ConnectGuardRxSCStatsEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardRxSCStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardRxSCStatsTable.
+             Entries exist in this table for each Connect Guard RxSC."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardRxSCIndex, f3ConnectGuardRxSCStatsIndex }
+    ::= { f3ConnectGuardRxSCStatsTable 1 }
+
+F3ConnectGuardRxSCStatsEntry ::= SEQUENCE {
+    f3ConnectGuardRxSCStatsIndex                     Integer32,
+    f3ConnectGuardRxSCStatsIntervalType              CmPmIntervalType,
+    f3ConnectGuardRxSCStatsValid                     TruthValue,
+    f3ConnectGuardRxSCStatsAction                    CmPmBinAction,
+    f3ConnectGuardRxSCStatsRxUnusedSAPkts            PerfCounter64,
+    f3ConnectGuardRxSCStatsRxNoUsingSAPkts           PerfCounter64,
+    f3ConnectGuardRxSCStatsRxLatePkts                PerfCounter64,
+    f3ConnectGuardRxSCStatsRxNotValidPkts            PerfCounter64,
+    f3ConnectGuardRxSCStatsRxInvalidPkts             PerfCounter64,
+    f3ConnectGuardRxSCStatsRxDelayedPkts             PerfCounter64,
+    f3ConnectGuardRxSCStatsRxUncheckedPkts           PerfCounter64,
+    f3ConnectGuardRxSCStatsRxOKPkts                  PerfCounter64,
+    f3ConnectGuardRxSCStatsRxOctetsValidated         PerfCounter64,
+    f3ConnectGuardRxSCStatsRxOctetsDecrypted         PerfCounter64
+}
+
+
+f3ConnectGuardRxSCStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this Connect Guard Rx SC statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3ConnectGuardRxSCStatsEntry 1 }
+
+f3ConnectGuardRxSCStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the type of collection, i.e. whether it is
+             15 Min, 1 Day or rollover."
+    ::= { f3ConnectGuardRxSCStatsEntry 2 }
+
+f3ConnectGuardRxSCStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3ConnectGuardRxSCStatsEntry 3 }
+
+f3ConnectGuardRxSCStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the operator to clear the bin."
+    ::= { f3ConnectGuardRxSCStatsEntry 4 }
+
+f3ConnectGuardRxSCStatsRxUnusedSAPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsUnusedSAPkts
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCStatsEntry 5 }
+
+f3ConnectGuardRxSCStatsRxNoUsingSAPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsNoUsingSAPkts 
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCStatsEntry 6 }
+
+f3ConnectGuardRxSCStatsRxLatePkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "the number of received packets that have
+ 	        been discarded with the condition : secyReplayProtect is equal
+ 	        to true and the PN of the packet is lower than the lower bound
+ 	        replay check PN."
+     ::= { f3ConnectGuardRxSCStatsEntry 7 }
+
+f3ConnectGuardRxSCStatsRxNotValidPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsNotValidPkts
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCStatsEntry 8 }
+
+f3ConnectGuardRxSCStatsRxInvalidPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsInvalidPkts
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCStatsEntry 9 }
+
+f3ConnectGuardRxSCStatsRxDelayedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets with the condition
+ 	        that the PN of the packets is lower than the lower bound
+ 	        replay protection PN."
+     ::= { f3ConnectGuardRxSCStatsEntry 10 }
+
+f3ConnectGuardRxSCStatsRxUncheckedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets with the following condition:
+ 	        -secyValidateFrames is disabled or
+ 	        -secyValidateFrames is not disabled and the packet is not
+ 	           encrypted and the integrity check has failed or
+ 	        -secyValidateFrames is not disable and the packet is
+ 	           encrypted and integrity check has failed."
+     ::= { f3ConnectGuardRxSCStatsEntry 11 }
+
+f3ConnectGuardRxSCStatsRxOKPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsOKPkts
+         information for all the SAs."
+     ::= { f3ConnectGuardRxSCStatsEntry 12 }
+
+f3ConnectGuardRxSCStatsRxOctetsValidated OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of octets of plaintext recovered from received
+         	packets that were integrity protected but not encrypted."
+     ::= { f3ConnectGuardRxSCStatsEntry 13 }
+
+f3ConnectGuardRxSCStatsRxOctetsDecrypted OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of octets of plaintext recovered from received
+ 	        packets that were integrity protected and encrypted."
+     ::= { f3ConnectGuardRxSCStatsEntry 14 }
+
+
+--
+-- Connect Guard RX SC History Statistics Table
+--
+f3ConnectGuardRxSCHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardRxSCHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Connect Guard RxSC history statistics.  
+             These reflect the history data."
+    ::= { f3ConnectGuardPerformanceObjects 8 }
+
+f3ConnectGuardRxSCHistoryEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardRxSCHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardRxSCHistoryTable.
+             Entries exist in this table for each Connect Guard Flow RX SC."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardRxSCIndex, f3ConnectGuardRxSCStatsIndex, f3ConnectGuardRxSCHistoryIndex }
+    ::= { f3ConnectGuardRxSCHistoryTable 1 }
+
+F3ConnectGuardRxSCHistoryEntry ::= SEQUENCE {
+    f3ConnectGuardRxSCHistoryIndex                     Integer32,
+    f3ConnectGuardRxSCHistoryTime                      DateAndTime,
+    f3ConnectGuardRxSCHistoryValid                     TruthValue,
+    f3ConnectGuardRxSCHistoryAction                    CmPmBinAction,
+    f3ConnectGuardRxSCHistoryRxUnusedSAPkts            PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxNoUsingSAPkts           PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxLatePkts                PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxNotValidPkts            PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxInvalidPkts             PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxDelayedPkts             PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxUncheckedPkts           PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxOKPkts                  PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxOctetsValidated         PerfCounter64,
+    f3ConnectGuardRxSCHistoryRxOctetsDecrypted         PerfCounter64
+}
+
+f3ConnectGuardRxSCHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible 
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this Connect Guard RxSC statistics entry."
+    ::= { f3ConnectGuardRxSCHistoryEntry 1 }
+
+f3ConnectGuardRxSCHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation."
+    ::= { f3ConnectGuardRxSCHistoryEntry 2 }
+
+f3ConnectGuardRxSCHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3ConnectGuardRxSCHistoryEntry 3 }
+
+f3ConnectGuardRxSCHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the operator to clear the bin."
+    ::= { f3ConnectGuardRxSCHistoryEntry 4 }
+
+f3ConnectGuardRxSCHistoryRxUnusedSAPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsUnusedSAPkts
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCHistoryEntry 5 }
+
+f3ConnectGuardRxSCHistoryRxNoUsingSAPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsNoUsingSAPkts 
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCHistoryEntry 6 }
+
+f3ConnectGuardRxSCHistoryRxLatePkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "the number of received packets that have
+ 	        been discarded with the condition : secyReplayProtect is equal
+ 	        to true and the PN of the packet is lower than the lower bound
+ 	        replay check PN."
+     ::= { f3ConnectGuardRxSCHistoryEntry 7 }
+
+f3ConnectGuardRxSCHistoryRxNotValidPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsNotValidPkts
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCHistoryEntry 8 }
+
+f3ConnectGuardRxSCHistoryRxInvalidPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsInvalidPkts
+ 	        information for all the SAs."
+     ::= { f3ConnectGuardRxSCHistoryEntry 9 }
+
+f3ConnectGuardRxSCHistoryRxDelayedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets with the condition
+ 	        that the PN of the packets is lower than the lower bound
+ 	        replay protection PN."
+     ::= { f3ConnectGuardRxSCHistoryEntry 10 }
+
+f3ConnectGuardRxSCHistoryRxUncheckedPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of packets with the following condition:
+ 	        -secyValidateFrames is disabled or
+ 	        -secyValidateFrames is not disabled and the packet is not
+ 	           encrypted and the integrity check has failed or
+ 	        -secyValidateFrames is not disable and the packet is
+ 	           encrypted and integrity check has failed."
+     ::= { f3ConnectGuardRxSCHistoryEntry 11 }
+
+f3ConnectGuardRxSCHistoryRxOKPkts OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The summation of counter secyRxSAStatsOKPkts
+         information for all the SAs."
+     ::= { f3ConnectGuardRxSCHistoryEntry 12 }
+
+f3ConnectGuardRxSCHistoryRxOctetsValidated OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of octets of plaintext recovered from received
+         	packets that were integrity protected but not encrypted."
+     ::= { f3ConnectGuardRxSCHistoryEntry 13 }
+
+f3ConnectGuardRxSCHistoryRxOctetsDecrypted OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of octets of plaintext recovered from received
+ 	        packets that were integrity protected and encrypted."
+     ::= { f3ConnectGuardRxSCHistoryEntry 14 }
+
+--
+-- Connect Guard RX SC Threshold Table
+--
+f3ConnectGuardRxSCThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardRxSCThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of Connect Guard RxSC
+             Thresholds."
+    ::= { f3ConnectGuardPerformanceObjects 9 }
+
+f3ConnectGuardRxSCThresholdEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardRxSCThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardRxSCThresholdEntry."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardRxSCIndex, f3ConnectGuardRxSCStatsIndex, 
+            f3ConnectGuardRxSCThresholdIndex }
+    ::= { f3ConnectGuardRxSCThresholdTable 1 }
+
+F3ConnectGuardRxSCThresholdEntry ::= SEQUENCE {
+    f3ConnectGuardRxSCThresholdIndex       Integer32,
+    f3ConnectGuardRxSCThresholdInterval    CmPmIntervalType,
+    f3ConnectGuardRxSCThresholdVariable    VariablePointer,
+    f3ConnectGuardRxSCThresholdValueLo     Unsigned32,
+    f3ConnectGuardRxSCThresholdValueHi     Unsigned32,
+    f3ConnectGuardRxSCThresholdMonValue    PerfCounter64
+}
+
+f3ConnectGuardRxSCThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+         f3ConnectGuardRxSCThresholdTable."
+    ::= { f3ConnectGuardRxSCThresholdEntry 1 }
+
+f3ConnectGuardRxSCThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+         sampled and compared with the specified threshold."
+    ::= { f3ConnectGuardRxSCThresholdEntry 2 }
+
+f3ConnectGuardRxSCThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+         sampled."
+    ::= { f3ConnectGuardRxSCThresholdEntry 3 }
+
+f3ConnectGuardRxSCThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3ConnectGuardRxSCThresholdEntry 4 }
+
+f3ConnectGuardRxSCThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3ConnectGuardRxSCThresholdEntry 5 }
+
+f3ConnectGuardRxSCThresholdMonValue OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3ConnectGuardRxSCThresholdVariable."
+    ::= { f3ConnectGuardRxSCThresholdEntry 6 }
+
+--
+-- Connect Guard Tx SA Statistics Table
+--
+f3ConnectGuardTxSAStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardTxSAStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Connect Guard Tx SA statistics.  
+             These reflect the current data."
+    ::= { f3ConnectGuardPerformanceObjects 10 }
+
+f3ConnectGuardTxSAStatsEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardTxSAStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardTxSAStatsTable.
+             Entries exist in this table for each Connect Guard TxSA."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardTxSCIndex,f3ConnectGuardTxSAIndex }
+    ::= { f3ConnectGuardTxSAStatsTable 1 }
+
+F3ConnectGuardTxSAStatsEntry ::= SEQUENCE {
+    f3ConnectGuardTxSAStatsProtectedPkts         PerfCounter64,
+    f3ConnectGuardTxSAStatsEncryptedPkts         PerfCounter64
+}
+
+f3ConnectGuardTxSAStatsProtectedPkts OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of integrity protected but not encrypted packets
+ 	           for this transmitting SA."
+    ::= { f3ConnectGuardTxSAStatsEntry 1 }
+
+f3ConnectGuardTxSAStatsEncryptedPkts OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of integrity protected and encrypted packets for
+ 	           this transmitting SA."
+    ::= { f3ConnectGuardTxSAStatsEntry 2 }
+
+--
+-- Connect Guard Rx SA Statistics Table
+--
+f3ConnectGuardRxSAStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ConnectGuardRxSAStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of Connect Guard Rx SA statistics.  
+             These reflect the current data."
+    ::= { f3ConnectGuardPerformanceObjects 11 }
+
+f3ConnectGuardRxSAStatsEntry OBJECT-TYPE
+    SYNTAX      F3ConnectGuardRxSAStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ConnectGuardRxSAStatsTable.
+             Entries exist in this table for each Connect Guard RxSA."
+    INDEX { neIndex, f3ConnectGuardFlowIndex, f3ConnectGuardRxSCIndex ,f3ConnectGuardRxSAIndex }
+    ::= { f3ConnectGuardRxSAStatsTable 1 }
+
+F3ConnectGuardRxSAStatsEntry ::= SEQUENCE {
+    f3ConnectGuardRxSAStatsUnusedSAPkts          PerfCounter64,
+    f3ConnectGuardRxSAStatsNoUsingSAPkts         PerfCounter64,
+    f3ConnectGuardRxSAStatsNotValidPkts          PerfCounter64,
+    f3ConnectGuardRxSAStatsInvalidPkts           PerfCounter64,
+    f3ConnectGuardRxSAStatsOKPkts                PerfCounter64
+}
+
+f3ConnectGuardRxSAStatsUnusedSAPkts OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For this SA which is not currently in use, the number of
+            received, unencrypted, packets with secyValidateFrames
+            not in the strict mode."
+    ::= { f3ConnectGuardRxSAStatsEntry 1 }
+
+f3ConnectGuardRxSAStatsNoUsingSAPkts OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For this SA which is not currently in use, the number of
+            received packets that have been discarded, and have
+            either the packets encrypted or the secyValidateFrames set to
+            strict mode."
+    ::= { f3ConnectGuardRxSAStatsEntry 2 }
+
+f3ConnectGuardRxSAStatsNotValidPkts OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For this SA, the number discarded packets with the
+            condition that the packets are not valid and one of the
+            following conditions are true: either secyValidateFrames in
+            strict mode or the packets encrypted."
+    ::= { f3ConnectGuardRxSAStatsEntry 3 }
+
+f3ConnectGuardRxSAStatsInvalidPkts OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For this SA, the number of packets with the condition
+            that the packets are not valid and secyValidateFrames is in
+            check mode."
+    ::= { f3ConnectGuardRxSAStatsEntry 4 }
+
+f3ConnectGuardRxSAStatsOKPkts OBJECT-TYPE
+    SYNTAX      PerfCounter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For this SA, the number of validated packets."
+    ::= { f3ConnectGuardRxSAStatsEntry 5 }
+
+---
+---Notifications
+---
+f3ConnectGuardFlowThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3ConnectGuardFlowThresholdIndex,       
+                f3ConnectGuardFlowThresholdInterval,
+                f3ConnectGuardFlowThresholdVariable,
+                f3ConnectGuardFlowThresholdValueLo,
+                f3ConnectGuardFlowThresholdValueHi,
+                f3ConnectGuardFlowThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an Connect Guard flow is crossed."
+  ::= { f3ConnectGuardNotifications 1 }
+
+f3ConnectGuardTxSCThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3ConnectGuardTxSCThresholdIndex,       
+                f3ConnectGuardTxSCThresholdInterval,
+                f3ConnectGuardTxSCThresholdVariable,
+                f3ConnectGuardTxSCThresholdValueLo,
+                f3ConnectGuardTxSCThresholdValueHi,
+                f3ConnectGuardTxSCThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an Connect Guard Tx SC is crossed."
+  ::= { f3ConnectGuardNotifications 2 }
+
+f3ConnectGuardRxSCThresholdCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+                f3ConnectGuardRxSCThresholdIndex,       
+                f3ConnectGuardRxSCThresholdInterval,
+                f3ConnectGuardRxSCThresholdVariable,
+                f3ConnectGuardRxSCThresholdValueLo,
+                f3ConnectGuardRxSCThresholdValueHi,
+                f3ConnectGuardRxSCThresholdMonValue
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an Connect Guard Rx SC is crossed."
+  ::= { f3ConnectGuardNotifications 3 }
+
+f3ConnectGuardStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS {
+                f3FlowSecureState
+            }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time secure state value changed."
+  ::= { f3ConnectGuardNotifications 4 }
+
+--
+-- Conformance
+--
+f3ConnectGuardCompliances OBJECT IDENTIFIER ::= {f3ConnectGuardConformance 1}
+f3ConnectGuardGroups      OBJECT IDENTIFIER ::= {f3ConnectGuardConformance 2}
+
+f3ConnectGuardCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the Connect Guard."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3ConnectGuardObjectsGroup, f3ConnectGuardPerfGroup
+        }
+    ::= { f3ConnectGuardCompliances 1 }
+
+f3ConnectGuardObjectsGroup OBJECT-GROUP
+    OBJECTS {
+        f3ConnectGuardFlowIndex,f3ConnectGuardFlowEgressInterface,
+        f3ConnectGuardFlowAdminState,f3ConnectGuardFlowSecondaryState,
+        f3ConnectGuardFlowOperationalState,f3ConnectGuardFlowCipherSuite,
+        f3ConnectGuardFlowKeyExchangeProfile,f3ConnectGuardFlowKeyExchangeFrameTagControl,
+        f3ConnectGuardFlowKeyExchangeFrameOuterVlanEnabled,
+        f3ConnectGuardFlowKeyExchangeFrameOuterVlanId,
+        f3ConnectGuardFlowKeyExchangeFrameOuterVlanPriority,
+        f3ConnectGuardFlowKeyExchangeFrameInner1VlanEnabled,
+        f3ConnectGuardFlowKeyExchangeFrameInner1VlanId,
+        f3ConnectGuardFlowKeyExchangeFrameInner1VlanPriority,
+        f3ConnectGuardFlowKeyExchangeFrameInner2VlanEnabled,
+        f3ConnectGuardFlowKeyExchangeFrameInner2VlanId,
+        f3ConnectGuardFlowKeyExchangeFrameInner2VlanPriority,
+        f3ConnectGuardFlowKeyExchangeInterval,f3ConnectGuardFlowTagsClear,
+        f3ConnectGuardFlowStorageType,f3ConnectGuardFlowRowStatus,
+        f3ConnectGuardFlowKeyXchgFailsCounts,f3ConnectGuardFlowAction,
+        f3ConnectGuardFlowReplayProtectionEnabled,
+        f3ConnectGuardFlowReplayProtectionWindow,f3ConnectGuardFlowRemoteMacAddrEnabled,
+        f3ConnectGuardFlowRemoteMacAddr, f3ConnectGuardFlowAssociatedMep,
+        f3ConnectGuardFlowAlias,
+        f3ConnectGuardFlowKeyExchangeFrameOuterVlanEtherType,
+        f3ConnectGuardFlowKeyExchangeFrameInner1VlanEtherType,
+        f3ConnectGuardFlowKeyExchangeFrameInner2VlanEtherType,
+        f3ConnectGuardFlowKeyInjectFlowPoint,
+
+        f3ConnectGuardKeyExchangeProfileIndex,
+        f3ConnectGuardKeyExchangeProfileName,
+        f3ConnectGuardKeyExchangeProfileUserId,
+        f3ConnectGuardKeyExchangeProfileMode,
+        f3ConnectGuardKeyExchangeProfileAuthPassword,
+        f3ConnectGuardKeyExchangeProfileDiffieHellmanKeyPairLen,
+        f3ConnectGuardKeyExchangeProfileStorageType,
+        f3ConnectGuardKeyExchangeProfileRowStatus,
+
+        f3ConnectGuardTxSCIndex,
+        f3ConnectGuardTxSCI,
+        f3ConnectGuardTxScState,
+        f3ConnectGuardCurrentTxSa,
+        f3ConnectGuardPreviousTxSa,
+        f3ConnectGuardTxScCreateTime,
+        f3ConnectGuardTxScStartTime,
+        f3ConnectGuardTxScStopTime,
+
+        f3ConnectGuardRxSCIndex,
+        f3ConnectGuardRxSCI,
+        f3ConnectGuardRxScState,
+        f3ConnectGuardCurrentRxSa,
+        f3ConnectGuardRxScCreateTime,
+        f3ConnectGuardRxScStartTime,
+        f3ConnectGuardRxScStopTime,
+
+        f3ConnectGuardTxSAIndex,
+        f3ConnectGuardTxSAState,
+        f3ConnectGuardTxSANextPN,
+        f3ConnectGuardTxSASAKUnchanged,
+        f3ConnectGuardTxSACreatedTime,
+        f3ConnectGuardTxSAStartedTime,
+        f3ConnectGuardTxSAStoppedTime,
+
+        f3ConnectGuardRxSAIndex,
+        f3ConnectGuardRxSAState,
+        f3ConnectGuardRxSANextPN,
+        f3ConnectGuardRxSASAKUnchanged,
+        f3ConnectGuardRxSACreatedTime,
+        f3ConnectGuardRxSAStartedTime,
+        f3ConnectGuardRxSAStoppedTime,        
+        f3ConnectGuardCryptoPassword, f3ConnectGuardRestoreFactoryApproved,f3ConnectGuardSoftwareVersionApproved,
+        f3ConnectGuardSoftwareInstallApproved,f3ConnectGuardRestoreDatabaseApproved,f3ConnectGuardConfigFileLoadApproved        
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Connect Guard functionality."
+    ::= { f3ConnectGuardGroups 1 }
+
+
+
+f3ConnectGuardPerfGroup OBJECT-GROUP
+    OBJECTS {
+        f3ConnectGuardFlowStatsIndex,f3ConnectGuardFlowStatsIntervalType,
+        f3ConnectGuardFlowStatsValid,f3ConnectGuardFlowStatsAction,
+        f3ConnectGuardFlowStatsTxUntaggedPkts,f3ConnectGuardFlowStatsTxTooLongPkts,
+        f3ConnectGuardFlowStatsRxUntaggedPkts,f3ConnectGuardFlowStatsRxNotagPkts,
+        f3ConnectGuardFlowStatsRxBadtagPkts,f3ConnectGuardFlowStatsRxUnknownSCIPkts,
+        f3ConnectGuardFlowStatsRxNoSCIPkts,f3ConnectGuardFlowStatsRxOverrunPkts,
+
+        
+        f3ConnectGuardFlowHistoryIndex,f3ConnectGuardFlowHistoryTime,
+        f3ConnectGuardFlowHistoryValid,f3ConnectGuardFlowHistoryAction,
+        f3ConnectGuardFlowHistoryTxUntaggedPkts,f3ConnectGuardFlowHistoryTxTooLongPkts,
+        f3ConnectGuardFlowHistoryRxUntaggedPkts,f3ConnectGuardFlowHistoryRxNotagPkts,
+        f3ConnectGuardFlowHistoryRxBadtagPkts,f3ConnectGuardFlowHistoryRxUnknownSCIPkts,
+        f3ConnectGuardFlowHistoryRxNoSCIPkts,f3ConnectGuardFlowHistoryRxOverrunPkts,
+
+        f3ConnectGuardFlowThresholdIndex,f3ConnectGuardFlowThresholdInterval,
+        f3ConnectGuardFlowThresholdVariable,f3ConnectGuardFlowThresholdValueLo,
+        f3ConnectGuardFlowThresholdValueHi,f3ConnectGuardFlowThresholdMonValue,
+
+        f3ConnectGuardTxSCStatsIndex,f3ConnectGuardTxSCStatsIntervalType,
+        f3ConnectGuardTxSCStatsValid,f3ConnectGuardTxSCStatsAction,
+        f3ConnectGuardTxSCStatsTxProtectedPkts,f3ConnectGuardTxSCStatsTxEncryptedPkts,
+        f3ConnectGuardTxSCStatsTxOctetsProtected,f3ConnectGuardTxSCStatsTxOctetsEncrypted,
+
+        f3ConnectGuardTxSCHistoryIndex,f3ConnectGuardTxSCHistoryTime,
+        f3ConnectGuardTxSCHistoryValid,f3ConnectGuardTxSCHistoryAction,
+        f3ConnectGuardTxSCHistoryTxProtectedPkts,f3ConnectGuardTxSCHistoryTxEncryptedPkts,
+        f3ConnectGuardTxSCHistoryTxOctetsProtected,f3ConnectGuardTxSCHistoryTxOctetsEncrypted,
+
+        f3ConnectGuardTxSCThresholdIndex,f3ConnectGuardTxSCThresholdInterval,
+        f3ConnectGuardTxSCThresholdVariable,f3ConnectGuardTxSCThresholdValueLo,
+        f3ConnectGuardTxSCThresholdValueHi,f3ConnectGuardTxSCThresholdMonValue,
+
+        f3ConnectGuardRxSCStatsIndex,f3ConnectGuardRxSCStatsIntervalType,
+        f3ConnectGuardRxSCStatsValid,f3ConnectGuardRxSCStatsAction,
+        f3ConnectGuardRxSCStatsRxUnusedSAPkts,f3ConnectGuardRxSCStatsRxNoUsingSAPkts,
+        f3ConnectGuardRxSCStatsRxLatePkts,f3ConnectGuardRxSCStatsRxNotValidPkts,
+        f3ConnectGuardRxSCStatsRxInvalidPkts,f3ConnectGuardRxSCStatsRxDelayedPkts,
+        f3ConnectGuardRxSCStatsRxUncheckedPkts,f3ConnectGuardRxSCStatsRxOKPkts,
+        f3ConnectGuardRxSCStatsRxOctetsValidated,f3ConnectGuardRxSCStatsRxOctetsDecrypted,
+
+        f3ConnectGuardRxSCHistoryIndex,f3ConnectGuardRxSCHistoryTime,
+        f3ConnectGuardRxSCHistoryValid,f3ConnectGuardRxSCHistoryAction,
+        f3ConnectGuardRxSCHistoryRxUnusedSAPkts,f3ConnectGuardRxSCHistoryRxNoUsingSAPkts,
+        f3ConnectGuardRxSCHistoryRxLatePkts,f3ConnectGuardRxSCHistoryRxNotValidPkts,
+        f3ConnectGuardRxSCHistoryRxInvalidPkts,f3ConnectGuardRxSCHistoryRxDelayedPkts,
+        f3ConnectGuardRxSCHistoryRxUncheckedPkts,f3ConnectGuardRxSCHistoryRxOKPkts,
+        f3ConnectGuardRxSCHistoryRxOctetsValidated,f3ConnectGuardRxSCHistoryRxOctetsDecrypted,
+
+        f3ConnectGuardRxSCThresholdIndex,f3ConnectGuardRxSCThresholdInterval,
+        f3ConnectGuardRxSCThresholdVariable,f3ConnectGuardRxSCThresholdValueLo,
+        f3ConnectGuardRxSCThresholdValueHi,f3ConnectGuardRxSCThresholdMonValue,
+
+        f3ConnectGuardTxSAStatsProtectedPkts,f3ConnectGuardTxSAStatsEncryptedPkts,
+        
+        f3ConnectGuardRxSAStatsUnusedSAPkts,f3ConnectGuardRxSAStatsNoUsingSAPkts,
+        f3ConnectGuardRxSAStatsNotValidPkts,f3ConnectGuardRxSAStatsInvalidPkts,
+        f3ConnectGuardRxSAStatsOKPkts
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects performance used to manage the Connect Guard functionality."
+    ::= { f3ConnectGuardGroups 2 }
+END

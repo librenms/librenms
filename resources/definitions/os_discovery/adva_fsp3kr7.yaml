@@ -1,0 +1,8 @@
+modules:
+    os:
+        hardware:
+            - ADVA-MIB::inventoryUnitName.33619968
+            - ADVA-MIB::inventoryHardwareRev.33619968
+        hardware_template: '{{ ADVA-MIB::inventoryUnitName.33619968 }} V{{ ADVA-MIB::inventoryHardwareRev.33619968 }}'
+        serial: ADVA-MIB::inventorySerialNum.33619968
+        version: ADVA-MIB::swVersionActiveApplSw.100737280

@@ -1,0 +1,328 @@
+-- ****************************************************************************
+-- aviatSwManagement.mib: Aviat Networks Software Management MIB
+--
+-- Copyright © 2014 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-SWMANAGEMENT-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        DisplayString, DateAndTime
+            FROM SNMPv2-TC
+        Integer32, MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatSwManagementModule MODULE-IDENTITY
+        LAST-UPDATED    "201401210157Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This MIB defines the interface for software loading, soft
+                 reset and software details retrieval."
+        REVISION        "201401210157Z"
+        DESCRIPTION
+                "Initial Version."
+            ::= { aviatModules 11 }
+
+
+-- ****************************************************************************
+-- Conformance area, containing groups and compliance specifications
+-- ****************************************************************************
+    aviatSwManagementConf       OBJECT IDENTIFIER ::= { aviatSwManagementModule 1 }
+
+    aviatSwManagementGroups     OBJECT IDENTIFIER ::= { aviatSwManagementConf 1 }
+
+    aviatSwManagementCompliance OBJECT IDENTIFIER ::= { aviatSwManagementConf 2 }
+
+
+-- ****************************************************************************
+-- Sub-tree for Software Management MIB objects
+-- ****************************************************************************
+    aviatSwManagementMIBObjects OBJECT IDENTIFIER ::= { aviatSwManagementModule 2 }
+
+    aviatSwResetObjects         OBJECT IDENTIFIER ::= { aviatSwManagementMIBObjects 1 }
+
+    aviatSwLoadObjects          OBJECT IDENTIFIER ::= { aviatSwManagementMIBObjects 2 }
+
+    aviatSwDetailsObjects       OBJECT IDENTIFIER ::= { aviatSwManagementMIBObjects 3 }
+
+
+-- ****************************************************************************
+-- Software Reset MIB objects
+-- ****************************************************************************
+    aviatSmSoftReset            OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    resetNone (0),
+                                    resetSoft (1),
+                                    resetHard (2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This is the control to perform a software reset on the
+                         product.
+
+                         When set to resetSoft(1) a soft reset will be
+                         performed. When set to resetHard(2) a full system
+                         reset will be performed, with all reinitialisation
+                         carried out. Setting to resetNone(0) has no effect."
+            ::= { aviatSwResetObjects 1 }
+
+
+-- ****************************************************************************
+-- Software Loading MIB objects
+-- ****************************************************************************
+    aviatSmLoadControl          OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    abort (0),
+                                    load (1),
+                                    activate (2),
+                                    loadAndActivate (3),
+                                    rollback (4),
+                                    forceLoad (5)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The software loading process may be controlled using
+                         this object.
+
+                         Setting the value load(1) will begin transfer of the
+                         specified file from the external URI to the unit. If
+                         the file is a manifest, this will initiate transfer of
+                         all referenced files. When this procedure has
+                         completed, aviatSmLoadStatus will indicate loadOk(6)
+                         for success, or loadError(10) for failure.
+
+                         An unresolvable incompatibility error is indicated by
+                         compatibilityError(13) and should be followed by an
+                         abort(0).
+
+                         A successful software (loadOk) load may be activated
+                         by setting the value to activate(2). If the
+                         delayed/timed activation objects are disabled this
+                         will have an immediate effect, otherwise the
+                         activation will take place as scheduled. A successful
+                         activation will result in an aviatSmLoadStatus value
+                         of activateOk(7). An error will be indicated by the
+                         value activateError(11).
+
+                         If the value is idle(7) and no software load process
+                         has been initiated since the last successful
+                         activation, the inactive software can be re-activated
+                         by setting the value to rollback(4). Success is
+                         indicated in aviatSmLoadStatus by rollbackOk(8) and
+                         failure by rollbackError(12).
+
+                         Setting the value to loadAndActivate(3) will begin
+                         software transfer. A successful transfer will be
+                         followed by software activation which is controlled by
+                         the delayed/timed activation objects. Success will be
+                         indicated in aviatSmLoadStatus by activateOk(7). A
+                         pending scheduled activation is indicated by
+                         waitingToActivate(13)."
+            ::= { aviatSwLoadObjects 1 }
+
+    aviatSmLoadStatus           OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    abort (0),
+                                    load (1),
+                                    commit (2),
+                                    activate (3),
+                                    rollback (4),
+                                    idle (5),
+                                    loadOk (6),
+                                    activateOk (7),
+                                    rollbackOk (8),
+                                    compatibilityError (9),
+                                    loadError (10),
+                                    activateError (11),
+                                    rollbackError (12),
+                                    waitingToActivate (13),
+                                    sameVersion (14)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The software loading process may be monitored using
+                         this object. See the aviatSmLoadControl object
+                         description for more details."
+            ::= { aviatSwLoadObjects 2 }
+
+    aviatSmLoadRollbackDuration OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the duration, in seconds, from which
+                         the 'sw load rollback timer' will count down when it
+                         is started."
+            ::= { aviatSwLoadObjects 3 }
+
+    aviatSmLoadRollbackTimer    OBJECT-TYPE
+        SYNTAX          Integer32 ( -1..2147483647 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This is the control and counter of the 'sw load
+                         rollback timer'. When set to -1, the timer is stopped
+                         and disabled. When set to 0, the timer assumes an
+                         'instant timeout'. Otherwise, this object will
+                         indicate the time left on the timer.
+
+                         The timer is automatically started whenever the
+                         software starts up following a software load
+                         activation.
+
+                         When this timer reaches zero, the 'sw load manager' of
+                         the system will roll back the software to its previous
+                         version."
+            ::= { aviatSwLoadObjects 4 }
+
+    aviatSmLoadActivateWaitDuration OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the duration, in seconds, from which
+                         the 'sw load activate wait timer' will count down when
+                         it is started."
+            ::= { aviatSwLoadObjects 5 }
+
+    aviatSmLoadActivateWaitTimer    OBJECT-TYPE
+        SYNTAX          Integer32 ( -1..2147483647 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This is the control and counter of the 'sw load
+                         activate wait timer'. When set to -1, the timer is
+                         stopped and disabled. When set to 0, the timer assumes
+                         an 'instant timeout'. Otherwise, this object will
+                         indicate the time left on the timer.
+
+                         This timer is loaded with the lesser of
+                         aviatSmLoadActivateWaitDuration (if non-zero), or the
+                         time in seconds until aviatSmLoadActivateTime occurs
+                         (if set) when the activate(2) state is entered.
+
+                         When this timer reaches zero, the 'sw load manager' of
+                         the system will activate the loaded software."
+            ::= { aviatSwLoadObjects 6 }
+
+    aviatSmLoadActivateTime     OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This determines the date and time at which to activate
+                         the loaded software.
+
+                         The 'sw load manager' of the system shall activate the
+                         loaded software when the current system time reaches
+                         or is past this setting."
+            ::= { aviatSwLoadObjects 7 }
+
+    aviatSmLoadUri              OBJECT-TYPE
+        SYNTAX          DisplayString ( SIZE ( 0..1024 ) )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The URI of the manifest for software loading."
+            ::= { aviatSwLoadObjects 8 }
+
+    aviatSmLoadProgress         OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..100 )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The percentage progress of the current sofware load.
+                         It is only meaningful during load and commit, and will
+                         return zero otherwise."
+            ::= { aviatSwLoadObjects 9 }
+
+
+-- ****************************************************************************
+-- Software Details MIB objects
+-- ****************************************************************************
+    aviatSmDetailsVersion       OBJECT-TYPE
+        SYNTAX          DisplayString ( SIZE ( 0..32 ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The software version of currently running software."
+            ::= { aviatSwDetailsObjects 1 }
+
+    aviatSmDetailsInactiveVersion   OBJECT-TYPE
+        SYNTAX          DisplayString ( SIZE ( 0..32 ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The software version of the inactive software."
+            ::= { aviatSwDetailsObjects 2 }
+
+
+-- ****************************************************************************
+-- The Object and Event Groups
+-- ****************************************************************************
+    aviatSwResetGroup           OBJECT-GROUP
+        OBJECTS {
+            aviatSmSoftReset
+        }
+        STATUS          current
+        DESCRIPTION     "These are the software reset objects."
+            ::= { aviatSwManagementGroups 1 }
+
+    aviatSwLoadGroup            OBJECT-GROUP
+        OBJECTS {
+            aviatSmLoadControl,
+            aviatSmLoadStatus,
+            aviatSmLoadRollbackDuration,
+            aviatSmLoadRollbackTimer,
+            aviatSmLoadActivateWaitDuration,
+            aviatSmLoadActivateWaitTimer,
+            aviatSmLoadActivateTime,
+            aviatSmLoadUri,
+            aviatSmLoadProgress
+        }
+        STATUS          current
+        DESCRIPTION     "These are the objects for software loading."
+            ::= { aviatSwManagementGroups 2 }
+
+    aviatSwDetailsGroup         OBJECT-GROUP
+        OBJECTS {
+            aviatSmDetailsVersion,
+            aviatSmDetailsInactiveVersion
+        }
+        STATUS          current
+        DESCRIPTION     "These are the software details objects."
+            ::= { aviatSwManagementGroups 3 }
+
+
+-- ****************************************************************************
+-- The Compliance Specifications
+-- ****************************************************************************
+    aviatSwManagementComplV1    MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION     "The implementation requirements for this MIB."
+        MODULE          -- This module
+            MANDATORY-GROUPS    {
+                                    aviatSwResetGroup,
+                                    aviatSwLoadGroup,
+                                    aviatSwDetailsGroup
+                                }
+            ::= { aviatSwManagementCompliance 1 }
+
+END

@@ -1,0 +1,199 @@
+
+
+                -- Teldat, S.A.
+
+                -- Parque Tecnológico de Madrid
+
+                -- 28760, Tres Cantos (Madrid)
+
+                -- Tlf: +34-918076565
+
+                -- Fax: +34-918076521
+
+                -- e-mail: id@teldat.com
+
+
+            -- Teldat private MIB
+
+            -- Private tree structure definition
+
+
+    -- History:
+    -- 02-02-17     I. Garcia       Missing comment for DR593 added.
+    -- 26-04-16     Benjamin G.     DR 416 Regesta Compact PLC. SNMP PRIME monitoring.
+    -- 07-02-14     M.A. Pastor     Initial coding
+--------------------------------------------------------------------------------
+
+TELDAT-SW-STRUCTURE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        telproducts
+            FROM TELDAT-MIB;
+
+
+    -- Groups from TELDAT-MIB
+
+    -- teladmin                         OBJECT IDENTIFIER ::= { teldat 1 }
+    -- telxface                         OBJECT IDENTIFIER ::= { teldat 2 }
+    -- telproto                         OBJECT IDENTIFIER ::= { teldat 3 }
+    -- telproducts                      OBJECT IDENTIFIER ::= { teldat 4 }
+    -- telDot3ChipSets                  OBJECT IDENTIFIER ::= { teldat 5 }
+
+
+    -- telproducts group
+
+    telProductsNucleox                  OBJECT IDENTIFIER ::= { telproducts 1 }
+
+
+    -- telProductsNucleox group
+
+    telProductsNpConfig                 OBJECT IDENTIFIER ::= { telProductsNucleox 1 }
+    telProductsNpMonit                  OBJECT IDENTIFIER ::= { telProductsNucleox 2 }
+
+
+    --
+    -- telProductsNpConfig group
+    --
+
+    -- telProdNpConfigControl           OBJECT IDENTIFIER ::= { telProductsNpConfig 1 }
+    -- telProdNpConfDataGlobal          OBJECT IDENTIFIER ::= { telProductsNpConfig 2 }
+    -- telProdNpConfNode                OBJECT IDENTIFIER ::= { telProductsNpConfig 3 }
+    telProdNpConfInterface              OBJECT IDENTIFIER ::= { telProductsNpConfig 4 }
+    telProdNpConfProtocol               OBJECT IDENTIFIER ::= { telProductsNpConfig 5 }
+    -- telProdNpConfInterfaceAsignation OBJECT IDENTIFIER ::= { telProductsNpConfig 6 }
+    -- telProdNpConfRepeater            OBJECT IDENTIFIER ::= { telProductsNpConfig 10 }
+
+
+    -- telProdNpConfInterface group
+
+    -- telProdNpConfInterfEthernet      OBJECT IDENTIFIER ::= { telProdNpConfInterface 1 }
+    -- telProdNpConfInterfTokenRing     OBJECT IDENTIFIER ::= { telProdNpConfInterface 2 }
+    -- telProdNpConfInterfLLC           OBJECT IDENTIFIER ::= { telProdNpConfInterface 3 }
+    -- telProdNpConfInterfx25           OBJECT IDENTIFIER ::= { telProdNpConfInterface 10 }
+    -- telProdNpConfInterfFR            OBJECT IDENTIFIER ::= { telProdNpConfInterface 11 }
+    -- telProdNpConfInterfPPP           OBJECT IDENTIFIER ::= { telProdNpConfInterface 12 }
+    -- telProdNpConfInterfSDLC          OBJECT IDENTIFIER ::= { telProdNpConfInterface 13 }
+    -- telProdNpConfInterfx28           OBJECT IDENTIFIER ::= { telProdNpConfInterface 14 }
+    -- telProdNpConfInterfBRS           OBJECT IDENTIFIER ::= { telProdNpConfInterface 15 }
+    -- telProdNpConfInterfIec101GW      OBJECT IDENTIFIER ::= { telProdNpConfInterface 16 }
+    -- telNpConfRdsiBX25                OBJECT IDENTIFIER ::= { telProdNpConfInterface 31 }
+    -- telNpConfRdsiDX25                OBJECT IDENTIFIER ::= { telProdNpConfInterface 32 }
+    -- telNpConfRdsiDial                OBJECT IDENTIFIER ::= { telProdNpConfInterface 33 }
+    -- telProdNpConfInterfXST           OBJECT IDENTIFIER ::= { telProdNpConfInterface 40 }
+
+
+    -- telProdNpConfProtocol group
+
+    -- telProdNpConfProtIP              OBJECT IDENTIFIER ::= { telProdNpConfProtocol 1 }
+    -- telProdNpConfProtOSPF            OBJECT IDENTIFIER ::= { telProdNpConfProtocol 2 }
+    -- telNpConfArp                     OBJECT IDENTIFIER ::= { telProdNpConfProtocol 3 }
+    -- telProdNpConfProtSNMP            OBJECT IDENTIFIER ::= { telProdNpConfProtocol 4 }
+    -- telNpConfDlsw                    OBJECT IDENTIFIER ::= { telProdNpConfProtocol 5 }
+    -- telNpConfRIP                     OBJECT IDENTIFIER ::= { telProdNpConfProtocol 7 }
+    -- telProdNpConfProtBridge          OBJECT IDENTIFIER ::= { telProdNpConfProtocol 8 }
+    -- telProdNpConfProtPatch           OBJECT IDENTIFIER ::= { telProdNpConfProtocol 9 }
+    -- telProdNpConfProtBan             OBJECT IDENTIFIER ::= { telProdNpConfProtocol 10 }
+    -- telProdNpCnfPr270                OBJECT IDENTIFIER ::= { telProdNpConfProtocol 11 }
+    -- telProdNpConfProtFtp             OBJECT IDENTIFIER ::= { telProdNpConfProtocol 12 }
+    -- telProdNpConfProtNtp             OBJECT IDENTIFIER ::= { telProdNpConfProtocol 13 }
+    -- telProdNpConfProtGW104           OBJECT IDENTIFIER ::= { telProdNpConfProtocol 14 }
+    -- telProdNpCnfPrHandlers           OBJECT IDENTIFIER ::= { telProdNpConfProtocol 30 }
+
+
+    --
+    -- telProductsNpMonit group
+    --
+
+    telProdNpMonitSistema               OBJECT IDENTIFIER ::= { telProductsNpMonit 1 }
+    telProdNpMonInterface               OBJECT IDENTIFIER ::= { telProductsNpMonit 2 }
+    telProdNpMonProtocols               OBJECT IDENTIFIER ::= { telProductsNpMonit 3 }
+    telProdNpMonFeatures                OBJECT IDENTIFIER ::= { telProductsNpMonit 4 }
+    -- telProdNpMonTlphy                OBJECT IDENTIFIER ::= { telProductsNpMonit 5 }
+
+
+    -- telProdNpMonitSistema group
+
+    -- telProdNpMonSistemMemory         OBJECT IDENTIFIER ::= { telProdNpMonitSistema 1 }
+    -- teldatCPUMonMIB                  OBJECT IDENTIFIER ::= { telProdNpMonitSistema 2 }
+    -- telProdNpMonSistemFan            OBJECT IDENTIFIER ::= { telProdNpMonitSistema 3 }
+    -- telProdNpMonPoeCardsTable        OBJECT IDENTIFIER ::= { telProdNpMonitSistema 4 }
+
+
+    -- telProdNpMonInterface group
+
+    -- telProdNpMonInterfCommandsTable  OBJECT IDENTIFIER ::= { telProdNpMonInterface 1 }
+    telProdNpMonInterfRouter            OBJECT IDENTIFIER ::= { telProdNpMonInterface 2 }
+    telProdNpMonInterfNodo              OBJECT IDENTIFIER ::= { telProdNpMonInterface 3 }
+
+
+    -- telProdNpMonInterfRouter group
+
+    -- telProdNpMonInterfBufferTable    OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 1 }
+    -- telProdNpMonInterfGeneralTable   OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 2 }
+    -- telProdNpMonInterfErrorsTable    OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 3 }
+    -- telProdNpMonInterfQueueTable     OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 4 }
+    -- telProdNpMonInterfStatsTable     OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 5 }
+    -- telProdNpMonInterfEthernet       OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 6 }
+    -- telProdNpMonInterfTokenRing      OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 7 }
+    -- telProdNpMonInterfLLC            OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 8 }
+    -- telProdNpMonInterfFR             OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 9 }
+    -- telProdNpMonInterfPPP            OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 10 }
+    -- telProdNpMonInterfMPPP           OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 11 }
+    -- telProdNpMonInterfASTM           OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 12 }
+    -- telProdNpMonInterfSDLC           OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 13 }
+    -- telProdNpMonInterfX28            OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 14 }
+    -- telProdNpMonInterfSSL            OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 15 }
+    -- telProdNpMonInterfASL            OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 16 }
+    -- telProdNpMonInterfVOIP           OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 17 }
+    -- telProdNpMonInterfCellular       OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 18 }
+    -- telProdNpMonInterfPCMCIAMobile   OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 19 }
+    -- telProdNpMonInterfRcellular      OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 20 }
+    -- telProdNpMonInterfSwitch         OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 21 }
+    -- telProdNpMonInterfGprs           OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 22 }
+    -- telProdNpMonInterfIec104gw       OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 23 }
+    -- telProdNpMonInterfWlan           OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 24 }
+    -- telProdNpMonInterfPrime          OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 25 }
+
+    -- telProdNpMonInterfNodo group
+
+    -- telProdNpMonInterfIsdn           OBJECT IDENTIFIER ::= { telProdNpMonInterfNodo 1 }
+    -- telProdNpMonInterfX25            OBJECT IDENTIFIER ::= { telProdNpMonInterfNodo 2 }
+    -- telProdNpMonInterfXot            OBJECT IDENTIFIER ::= { telProdNpMonInterfNodo 3 }
+    -- telProdNpMonInterf270            OBJECT IDENTIFIER ::= { telProdNpMonInterfNodo 4 }
+
+
+    -- telProdNpMonProtocols group
+
+    telProdNpMonProtIP                  OBJECT IDENTIFIER ::= { telProdNpMonProtocols 1 }
+    -- telProdNpMonProtArp              OBJECT IDENTIFIER ::= { telProdNpMonProtocols 2 }
+    -- telProdNpMonProtDhcp             OBJECT IDENTIFIER ::= { telProdNpMonProtocols 3 }
+    -- telProdNpMonProtSnmp             OBJECT IDENTIFIER ::= { telProdNpMonProtocols 4 }
+    -- telProdNpMonProtRip              OBJECT IDENTIFIER ::= { telProdNpMonProtocols 5 }
+    -- telProdNpMonProtOspf             OBJECT IDENTIFIER ::= { telProdNpMonProtocols 6 }
+    -- telProdNpMonProtDLSw             OBJECT IDENTIFIER ::= { telProdNpMonProtocols 7 }
+    -- telProdNpMonProtBridge           OBJECT IDENTIFIER ::= { telProdNpMonProtocols 8 }
+    -- telProdNpMonProtRt1              OBJECT IDENTIFIER ::= { telProdNpMonProtocols 9 }
+    -- telProdNpMonProtRt2              OBJECT IDENTIFIER ::= { telProdNpMonProtocols 10 }
+    -- telProdNpMonProtRt3              OBJECT IDENTIFIER ::= { telProdNpMonProtocols 11 }
+    -- telProdNpMonProtRt4              OBJECT IDENTIFIER ::= { telProdNpMonProtocols 12 }
+    -- telProdNpMonProtSip              OBJECT IDENTIFIER ::= { telProdNpMonProtocols 13 }
+    -- telProdNpMonProtGw104            OBJECT IDENTIFIER ::= { telProdNpMonProtocols 14 }
+    -- telProdNpMonProtIpsec            OBJECT IDENTIFIER ::= { telProdNpMonProtocols 15 }
+    -- telProdNpMonProtTvrp             OBJECT IDENTIFIER ::= { telProdNpMonProtocols 16 }
+
+
+    -- telProdNpMonFeatures group
+
+    -- telProdNpMonFeatBrs              OBJECT IDENTIFIER ::= { telProdNpMonFeatures 1 }
+    -- telProdNpMonFeatMacfilter        OBJECT IDENTIFIER ::= { telProdNpMonFeatures 2 }
+    -- telProdNpMonFeatWRR              OBJECT IDENTIFIER ::= { telProdNpMonFeatures 3 }
+    -- telProdNpMonFeatWRS              OBJECT IDENTIFIER ::= { telProdNpMonFeatures 4 }
+    -- telProdNpMonFeatTidpMaster       OBJECT IDENTIFIER ::= { telProdNpMonFeatures 5 }
+    -- teldatNsmMonMIB                  OBJECT IDENTIFIER ::= { telProdNpMonFeatures 6 }
+    -- telProdNpMonFeatNsla             OBJECT IDENTIFIER ::= { telProdNpMonFeatures 7 }
+    -- telProdNpMonFeatDNS              OBJECT IDENTIFIER ::= { telProdNpMonFeatures 8 }
+    -- telProdNpMonFeatQos              OBJECT IDENTIFIER ::= { telProdNpMonFeatures 9 }
+    -- telProdNpMonFeatVrf              OBJECT IDENTIFIER ::= { telProdNpMonFeatures 10 }
+    -- telProdNpMonFeatWnms             OBJECT IDENTIFIER ::= { telProdNpMonFeatures 11 }
+
+END

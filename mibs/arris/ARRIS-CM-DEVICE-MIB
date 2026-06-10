@@ -1,0 +1,159 @@
+ARRIS-CM-DEVICE-MIB DEFINITIONS ::= BEGIN
+ 
+IMPORTS
+   MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress
+      FROM SNMPv2-SMI
+   arrisProdIdCM
+      FROM ARRIS-MIB
+   TruthValue, DisplayString, TEXTUAL-CONVENTION
+      FROM SNMPv2-TC;
+
+
+  arrisCmDevMib MODULE-IDENTITY
+     LAST-UPDATED    "0212100000Z" -- December 10, 2002
+     ORGANIZATION    "ARRIS Broadband"
+     CONTACT-INFO    "Robert Coley
+                      Postal: ARRIS Broadband
+                      3871 Lakefield Drive
+                      Suite 300
+                      Suwanee, GA 30024-1242
+                      U.S.A.
+                      Phone:  +1 770-622-8400
+                      E-mail: robert.coley@arrisi.com"
+     DESCRIPTION
+       "This MIB module supplies the basic proprietary (ARRIS-specific)
+        management objects for ARRIS Cable Modem (CM) devices."
+    
+       
+-- Revision history
+    REVISION    "0211080000Z" -- November 08, 2002
+    DESCRIPTION
+        "Added object 'arrisCmDevEnableDocsis20'."
+
+    REVISION    "0210290000Z" -- October 29, 2002
+    DESCRIPTION
+        "Added object 'arrisCmDevProvMethodIndicator'."
+        
+    REVISION    "0210230000Z" -- October 23, 2002
+    DESCRIPTION
+        "Added objects 'arrisCmDevSwImageName' and 'arrisCmDevSwImageBuildTime'."
+        
+    REVISION    "0207100000Z" --  July 10, 2002
+    DESCRIPTION
+        "Initial version"
+    ::= { arrisProdIdCM 1 }
+
+
+-- Textual Conventions
+ArrsCmDevProvMethod ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "These are the various provisioning methods that are 
+                 supported by the device."
+    SYNTAX INTEGER {
+        docsisOnly(0),
+        fullPacketCable(1),
+        packetCableMinusKDC(2),
+        cps(3),
+        gupi(4),
+        singleMAC(5)
+    } 
+
+
+arrisCmDevMibObjects OBJECT IDENTIFIER ::= { arrisCmDevMib 1 }
+arrisCmDevBase       OBJECT IDENTIFIER ::= {arrisCmDevMibObjects 1 }
+
+-- This MIB module contains the following groups.
+arrisCmDevCmSetup              OBJECT IDENTIFIER ::= { arrisCmDevMibObjects 2}
+arrisCmDevCmTest               OBJECT IDENTIFIER ::= { arrisCmDevMibObjects 3}
+
+-- Production groups
+arrisCmDevPermanentSetup       OBJECT IDENTIFIER ::= { arrisCmDevCmSetup 2}
+arrisCmDevOperationalSetup     OBJECT IDENTIFIER ::= { arrisCmDevCmSetup 3}
+arrisCmDevSalesSetup           OBJECT IDENTIFIER ::= { arrisCmDevCmSetup 4}
+
+arrisCmDevManufacturingTest    OBJECT IDENTIFIER ::= { arrisCmDevCmTest 2}
+arrisCmDevOperationalTest      OBJECT IDENTIFIER ::= { arrisCmDevCmTest 3}
+
+
+arrisCmDevWanIsolationState OBJECT-TYPE
+     SYNTAX INTEGER { 
+         off-InActiveMode(1), 
+         on-ActiveMode(2) 
+     }
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "The object controls the state of WAN Isolation.  The meaning of 
+          the state is as follows:
+          
+          off-InActiveMode(1) - Data traffic passes freely between 
+             the home user’s network and the outside network (i.e. the Internet).  
+             In this mode, the WAN Isolation state is considered 'InActive'.
+
+          on-ActiveMode(2) - The home user’s network is isolated from the Internet.  
+             Data traffic will not pass between the home user's network and the Internet.  
+             In this mode, the WAN Isolation state is considered 'Active'."                           
+     ::= { arrisCmDevBase 1 } 
+
+arrisCmDevSwImageName OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only 
+     STATUS     current
+     DESCRIPTION
+         "The name of the software image currently operating on this device."
+     ::= { arrisCmDevBase 2 }    
+        
+arrisCmDevSwImageBuildTime OBJECT-TYPE
+     SYNTAX     DisplayString
+     MAX-ACCESS read-only 
+     STATUS     current
+     DESCRIPTION
+         "The build date and time of the software image currently operating on 
+          this device."
+     ::= { arrisCmDevBase 3 }
+
+
+-- arrisCmDevOperationalSetup Group objects --
+
+-- [ARRIS NOTE: For the published (publicly available) MIB, the MAX-ACCESS clause should 
+--              have a value of 'read-only' for the 'arrisCmDevProvMethodIndicator' object.]
+arrisCmDevProvMethodIndicator OBJECT-TYPE
+     SYNTAX ArrsCmDevProvMethod
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION 
+         "Indicates the method used to provision the device.  This object should only be 
+          changed by the configuration file.  The following provisioning methods are supported:
+          
+             docsisOnly(0)          - DOCSIS-only provisioning
+                                    
+             fullPacketCable(1)     - fully PacketCable compliant provisioning
+             
+             packetCableMinusKDC(2) - same as 'fullPacketCable', except with IPSEC and 
+                                      SNMPv3 disabled                                
+                                      
+             cps(3)                 - compatible with CPS2000 (SNMPv2; IPSEC disabled)
+             
+             gupi(4)                - SNMPv2, with no SNMP Informs and IPSEC disabled
+             
+             singleMAC(5)           - single config file (SNMPv2, single IP address, 
+                                      single MAC address, no SNMP Informs, IPSEC disabled)"
+     ::= { arrisCmDevOperationalSetup 2 }
+
+arrisCmDevEnableDocsis20 OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+          "This object is used to enable/disable DOCSIS 2.0 operation mode.  
+           This object is stored into NVRAM and will be operational after 
+           the next reboot of the device.
+           Set to true(1) to enable DOCSIS 2.0 operation mode.
+           Set to false(2) to disable DOCSIS 2.0 operation mode.  
+           Setting this object to the same value that is already stored in NVRAM 
+           will do nothing.  After the successful setting of this object, the device 
+           will automatically reboot."
+        ::= { arrisCmDevOperationalSetup 3 }
+
+                                            
+END

@@ -1,0 +1,714 @@
+
+-- ============================================================================
+
+--
+-- Extreme Policy-Based QoS
+--
+
+EXTREME-PBQOS-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter64
+                                FROM SNMPv2-SMI
+                TruthValue, RowStatus
+                                FROM SNMPv2-TC
+                ifEntry         FROM IF-MIB
+      		OwnerString     FROM RMON-MIB
+		DisplayString	FROM RFC1213-MIB 
+                extremeAgent, PortList, L4Port
+                                FROM EXTREME-BASE-MIB;
+
+        extremeQosPolicy MODULE-IDENTITY
+                LAST-UPDATED "9903030000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION 
+                        "Extreme QoS Policy configuration objects"
+        ::= { extremeAgent 7 }
+
+--
+-- ============================================================================
+--        Rules
+-- ============================================================================
+-- 
+-- Policy rules are used to define the forwarding behaviour of either data
+-- traffic or of signaling messages e.g. RSVP. At the ExtremeWare device <->
+-- EEM interface, rules are of the following format:
+-- 
+-- <rule> ::= <rule_id>, <scope>, <direction>, <filter>, <treatment>
+-- 
+-- <rule_id> ::= INTEGER
+-- <scope> ::= signaled | inband
+-- <direction> ::= forward | backward | any
+--
+-- <filter> ::= <inport> | 
+--               <outports>, <filterspec> |
+--               <outports>, <iptosspec>
+-- 
+-- <inport> ::= <physport> | any
+-- <outports> ::= <physport>* | any
+-- <physport> ::= INTEGER | SLOT:INTEGER
+-- 
+-- The following fields may be used for classification of traffic into a QoS treatment:
+-- - IP destination/range
+-- - IP source/range
+-- - Incoming IP Type-of-Service/mask/match
+-- - transport-layer ProtocolNumber (TCP,UDP,other,any)
+-- - TCP/UDP destination port number
+-- - TCP/UDP source port number
+--
+-- These may be used in limited combinations to form compound patterns e.g.
+-- IntServ filterspecs based on {IP src/dest, IP protocol number, TCP/UDP
+-- src/dest} 5-tuples.
+-- 
+-- <filterspec> ::= <ipsrcrange> <ipdestrange> <ipproto> <srcport> <dstport>
+-- <ipsrcrange> ::= IPADDRESS IPADDRESS
+-- <ipdestrange> ::= IPADDRESS IPADDRESS
+-- <ipproto> ::= tcp | udp | other | any
+-- <srcport> ::= INTEGER(0..65535) | any
+-- <dstport> ::= INTEGER(0..65535) | any
+-- 
+-- <iptosspec> ::= <iptosmatch> <iptosmask>  - match if IPTOS & iptosmask == iptosmatch
+-- <iptosmatch> ::= INTEGER 0..255
+-- <iptosmask> ::= INTEGER 0..255
+-- 
+-- N.B. IPTOS support is not available on first generation (1-G) silicon
+-- IPTOS values are therefore ignored in EW 5.0.
+--
+-- Each rule is assigned an identifier, unique within each device. The rule is 
+-- tagged as applying to either signaled data flows (i.e. RSVP) or to be
+-- applied directly to the data itself. The direction of flow is also specified
+-- : these apply to the direction of the *data* flow and indicate whether the
+-- rule should be applied to one or both directions of a matching data or
+-- signal flow.
+--
+-- This table specifies which physical input and output ports and what traffic
+-- patterns are included in a rule.
+-- 
+-- Note: these filter fields are in addition to the existing extremeQosByVlanMappingTable 
+-- table. ExtremeWare currently has a fixed precedence of filter rules: VLAN has the lowest 
+-- precedence, followed by source physicalport, 802.1p, MAC and then IP/TCP/UDP as highest 
+-- precedence. This implies that any entry in this extremeQosFilterTable takes precedence over 
+-- any VLAN match that might indicate a QoS profile in extremeQosByVlanMappingTable. In addition, 
+-- any entry that indicates a <filterspec> that is not "any" takes precedence over a filter 
+-- indicating an individual <inport>. Any attempt to write a rule that indicates an individual
+-- extremeQosRuleInPort as well as non-DEFVAL value for any of {<ipsrcrange> <ipdestrange> 
+-- <ipproto> <srcport> <dstport>} will be rejected by the agent.
+-- 
+-- In other words, in the language of policy management, there is an implied rule precedence 
+-- which is used to resolve conflicts in the case where an incoming data packet could potentially
+-- be classified as matching 2 or more rules. Some conflicts can be indicated at the time a 
+-- policy rule is applied to the device but others can only be detected and resolved at the
+-- time a rule is invoked by an incoming message.
+--
+
+	extremeNextAvailableQosRuleIndex OBJECT-TYPE
+		SYNTAX	        INTEGER
+		MAX-ACCESS	read-only
+		STATUS	        current
+		DESCRIPTION
+		"The value of the next available QoS Rule index. This
+		 object is used by an NMS to select an index value 
+		 for row-creation in the extremeQosRuleTable. The 
+		 current value of this object is changed to a new
+		 value when the current value is written to an agent's
+		 table. Row creation using the current value of this object
+                 allocates a extremeQosRuleIndex.  Note the following:
+		
+		 1. A newly created row does not have to be active(1)
+		    for the agent to allocate the extremeQosRuleIndex.
+
+		 2. Race conditions between multiple NMS's end when
+		    a row is created.  Rows are deemed created when
+		    a setRequest is successfully committed (i.e.
+		    the errorStats is noError(0)).
+
+		3.  An agent that exhausts its supply of extremeQosRuleIndex
+		    values returns zero as the value of this
+		    object.  This can be used by an NMS as an indication
+		    to deleted unused rows and reboot the device."
+	::= { extremeQosPolicy 1 }		 
+
+	extremeQosClearIPFdb OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                      "Setting this to true will clear the hardware IP
+                       flow table."
+	::= { extremeQosPolicy 4 }
+
+	extremeQosClearFdb OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+                      "Setting this to true will clear the hardware MAC
+                       flow table."
+	::= { extremeQosPolicy 5 }
+
+
+        extremeQosRuleTable OBJECT-TYPE
+ 		SYNTAX  SEQUENCE OF ExtremeQosRuleEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+                DESCRIPTION
+                "Table of QoS policy rules. Entries that duplicate the exact
+                same set of policy conditions are not allowed."
+	::= { extremeQosPolicy 2 }
+
+        extremeQosRuleEntry OBJECT-TYPE
+		SYNTAX  ExtremeQosRuleEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+                "Entry in table of QoS policy rules"
+               INDEX { extremeQosRuleIndex } 
+	::= { extremeQosRuleTable 1 }
+
+        ExtremeQosRuleEntry ::= SEQUENCE
+        {
+                extremeQosRuleIndex             INTEGER,
+                extremeQosRuleScope             INTEGER,
+                extremeQosRuleDirection         INTEGER,
+                extremeQosRuleInPort            INTEGER,
+                extremeQosRuleInPortMask        PortList,
+                extremeQosRuleDestAddrStart     IpAddress,
+                extremeQosRuleDestAddrEnd       IpAddress,
+                extremeQosRuleSrcAddrStart      IpAddress,
+                extremeQosRuleSrcAddrEnd        IpAddress,
+                extremeQosRuleProtocol          INTEGER,
+                extremeQosRuleDestL4PortStart   L4Port,
+                extremeQosRuleSourceL4PortStart L4Port,
+                extremeQosRuleTosMask           OCTET STRING,
+                extremeQosRuleTosMatch          OCTET STRING,
+                extremeQosRuleQosProfileIndex   INTEGER,
+                extremeQosRuleOwner             OwnerString,
+                extremeQosRuleRowStatus         RowStatus,
+                extremeQosRuleDestL4PortEnd     L4Port,
+                extremeQosRuleSourceL4PortEnd   L4Port,
+		extremeQosRulePrecedence	INTEGER,
+		extremeQosRuleCounter           Counter64,
+		extremeQosRuleName		DisplayString
+        }
+
+        extremeQosRuleIndex  OBJECT-TYPE
+		SYNTAX          INTEGER
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"An index into the table of QoS policy pattern
+                rules. The index for a manager to use for creating
+                new rows is determined by reading the value of 
+                extremeNextAvailableQosRuleIndex."
+	::= { extremeQosRuleEntry 1 }
+
+        extremeQosRuleScope  OBJECT-TYPE
+		SYNTAX  INTEGER { any (1), signaled(2), inband(3) }
+		MAX-ACCESS 	read-create
+		STATUS  current
+		DESCRIPTION
+		"The scope of conditions in which this rule applies.
+                The value 'signaled' means that the policy rule is
+                applied only to QoS signaling messages e.g. RSVP. The
+                value 'inband' means that the policy rule is applied
+                only to data traffic passing through this node. the
+                value 'any' means that the policy is applied to any
+                of the above conditions. 
+
+                Only the value 'any' is supported in ExtremeWare 6.0."
+                DEFVAL { any }
+	::= { extremeQosRuleEntry 2 }
+
+        extremeQosRuleDirection  OBJECT-TYPE
+		SYNTAX          INTEGER { any(1), forward(2), backward(3) }
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The direction in which this rule applies. The value
+                'forward' means that the rule is applied to data streams
+                in the direction specified by the classification pattern.
+                The value 'backward' means that the rule is applied in
+                the reverse direction. The value 'any' means that the
+                rule is applied for traffic in either direction of data
+                flow. Note that the direction is applied to where the data 
+                flow itself will go, not to the direction of any signaling 
+                messages e.g. RSVP.
+
+                Only the value 'forward' is supported in ExtremeWare 6.0."
+                DEFVAL { forward }
+	::= { extremeQosRuleEntry 3 }
+
+        extremeQosRuleInPort  OBJECT-TYPE
+		SYNTAX          INTEGER
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The ifIndex value of the physical switch input port for which 
+                this rule applies. Rules that indicate an individual value
+                for this object have a lower precedence in ExtremeWare than
+                rules that specify IP patterns. Conversely, rules that use IP
+                patterns must apply to all physical ports and specify a value
+                of 0 for this object.
+
+                Any attempt to write a rule that indicates an individual
+                value for this object together with non-default values for any 
+                of { extremeQosRuleDestAddrStart, extremeQosRuleDestAddrEnd,
+                extremeQosRuleSrcAddrStart, extremeQosRuleSrcAddrEnd,
+                extremeQosRuleProtocol, extremeQosRuleDestL4PortStart,
+                extremeQosRuleDestL4PortEnd, extremeQosRuleSourceL4PortStart,
+                extremeQosRuleSourceL4PortEnd and extremeQosRuleInPortMask }
+                will be rejected by the agent."
+                DEFVAL { 0 }
+	::= { extremeQosRuleEntry 4 }
+
+        extremeQosRuleInPortMask  OBJECT-TYPE
+		SYNTAX          PortList
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The list of physical switch input ports which further
+	        qualifies an IP flow. This object is an octet string
+        	with the MSB of octet 0 indicating port 0 and LSB indicating
+		port 7. Similarly, the MSB of octet 1 indicates port 8 and it's 
+		LSB indicates port 15 and so on. The port numbers are 0-based.
+		This object has no meaning for rules defined on physical ports
+		that are not associated with an IP flow. Port based rules can be 
+		defined by assigning a non zero value to extremeQosRuleInPort. Any
+		attempt to set this value without specifying the source/destination 
+		address range and/or source/destination l4 port range will be rejected
+                by the agent. For IP flows that apply to all physical ports
+                in the switch, this will be a zero length octet string."
+	::= { extremeQosRuleEntry 5 }
+
+        extremeQosRuleDestAddrStart  OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The start of the destination IP address range for which this
+                 rule applies.If this object has any value other than the
+                 default then this rule takes precedence over any rule that
+                 specifies an individual physical input port, a VLAN or any
+                 incoming implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent."
+                DEFVAL { '00000000'h }      -- 0.0.0.0
+	::= { extremeQosRuleEntry 6 }
+
+        extremeQosRuleDestAddrEnd  OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The end of the destination IP address range for which this
+                 rule applies. If this object has any value other than the
+                 default then this rule takes precedence over any rule that
+                 specifies an individual physical input port, a VLAN or any
+                 incoming implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent."
+                DEFVAL { 'ffffffff'h }      -- 255.255.255.255
+	::= { extremeQosRuleEntry 7 }
+
+        extremeQosRuleSrcAddrStart  OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The start of the source IP address range for which this rule 
+                applies. If this object has any value other than the default
+                then this rule takes precedence over any rule that specifies
+                an individual physical input port, a VLAN or any incoming
+                implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent."
+                DEFVAL { '00000000'h }      -- 0.0.0.0
+	::= { extremeQosRuleEntry 8 }
+
+        extremeQosRuleSrcAddrEnd  OBJECT-TYPE
+		SYNTAX          IpAddress
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The end of the source IP address range for which this rule 
+                applies. If this object has any value other than the default
+                then this rule takes precedence over any rule that specifies
+                an individual physical input port, a VLAN or any incoming
+                implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent."
+                DEFVAL { 'ffffffff'h }      -- 255.255.255.255
+	::= { extremeQosRuleEntry 9 }
+
+        extremeQosRuleProtocol  OBJECT-TYPE
+		SYNTAX          INTEGER { any(1), udp(2), tcp(3), other(4), 
+					  tcpPermitEstablished(5), icmp(6) }
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The IP protocol number for which this rule applies. If this 
+                object has any value other than 'any' then this rule
+                takes precedence over any rule that specifies an individual
+                physical input port, a VLAN or any incoming implicit 802.1p
+                traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent."
+                DEFVAL { any }
+	::= { extremeQosRuleEntry 10 }
+
+        extremeQosRuleDestL4PortStart  OBJECT-TYPE
+		SYNTAX          L4Port
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The destination starting layer 4 port number that would
+                be used to match an IP flow. The value of 0 means that all
+                layer 4 information would be ignored when matching an IP
+                flow. If this object has any value other than 0 then this
+                rule takes precedence over any rule that specifies an
+                individual physical input port, a VLAN or any incoming
+                implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent.
+
+		Any attempt to write an ICMP rule specifying an IP pattern
+		with a non-default value for this object will be rejected by the
+		agent."
+                DEFVAL { 0 }
+	::= { extremeQosRuleEntry 11 }
+
+        extremeQosRuleSourceL4PortStart  OBJECT-TYPE
+		SYNTAX          L4Port
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The source starting layer 4 port number that would be
+                used to match an IP flow. The value of 0 means that all
+                layer 4 information would be ignored when matching an IP
+                flow. If this object has any value other than 0 then this
+                rule takes precedence over any rule that specifies an
+                individual physical input port, a VLAN or any incoming
+                implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent.
+
+		NOTE: For an ICMP rule that specifies an IP pattern, this 
+		object has a different meaning in that it specifies the ICMP Type
+		and Code values, in the following manner: The value of the Type must
+		be shifted to the left by 8 bits and logical ORed with the value of the 
+		Code. The result will be stored in this object. In this case, this 
+		object can only contain values between 0 and 65535 inclusive since the 
+		ICMP Type and Code values are limited between 0 and 255 each."
+
+                DEFVAL { 0 }
+	::= { extremeQosRuleEntry 12 }
+
+        extremeQosRuleTosMask  OBJECT-TYPE
+		SYNTAX          OCTET STRING (SIZE (1))
+		MAX-ACCESS 	read-create
+		STATUS          deprecated
+		DESCRIPTION
+		"A mask for the incoming IP Type-of-Service field to be applied
+                when matching. The value of 0 means that any incoming IP ToS
+                field is ignored.
+
+                Only the default value is supported in ExtremeWare 6.0."
+                DEFVAL { '00'h }
+	::= { extremeQosRuleEntry 13 }
+
+        extremeQosRuleTosMatch  OBJECT-TYPE
+		SYNTAX          OCTET STRING (SIZE (1))
+		MAX-ACCESS 	read-create
+		STATUS          deprecated
+		DESCRIPTION
+		"If the value of the incoming IP Type-of-Service field, after 
+                applying a mask of extremeQosRuleTosMask, is this value then
+                this rule is applied. 
+
+                Only the default value is supported in ExtremeWare 6.0."
+                DEFVAL { '00'h }
+	::= { extremeQosRuleEntry 14 }
+
+        extremeQosRuleQosProfileIndex  OBJECT-TYPE
+		SYNTAX          INTEGER 
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"A pointer into the extremeQosProfileTable indicating the 
+                QoS treatment and actions to be applied to traffic matching
+                this rule. A value of 0 means that this traffic will be
+                dropped/discarded. The default value is that this traffic
+                gets the default QoS treatment and actions."
+                DEFVAL { 1 }
+	::= { extremeQosRuleEntry 15 }
+
+        extremeQosRuleOwner  OBJECT-TYPE
+		SYNTAX          OwnerString(SIZE (0..32))
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+                	"Indicates the identity of the manager that 
+			configured this entry."
+	::= { extremeQosRuleEntry 16 }
+
+        extremeQosRuleRowStatus  OBJECT-TYPE
+		SYNTAX          RowStatus
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		  "The row status for this QoS rule. 
+
+		  This OBJECT can be set to:
+
+				active(1)
+				createAndGo(4)
+				createAndWait(5)
+				destroy(6)
+
+		  The following values may be read:
+				active(1)
+				notReady(3). "
+ 	::= { extremeQosRuleEntry 17 }
+
+        extremeQosRuleDestL4PortEnd  OBJECT-TYPE
+		SYNTAX          L4Port
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The destination last layer 4 port number that would
+                determine the l4 port range to match an IP flow. The value
+                of 0 means that all layer 4 information would be ignored
+                when matching an IP flow. If this object has any value other
+                than 0 then this rule takes precedence over any rule that
+                specifies an individual physical input port, a VLAN or any
+                incoming implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent.
+
+		Any attempt to write an ICMP rule specifying an IP pattern
+		with a non-default value for this object will be rejected by the
+		agent." 
+                DEFVAL { 0 }
+	::= { extremeQosRuleEntry 18 }
+
+        extremeQosRuleSourceL4PortEnd  OBJECT-TYPE
+		SYNTAX          L4Port
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The source last layer 4 port number that would determine
+                the l4 port range to match an IP flow. The value of 0 means
+                that all layer 4 information would be ignored when matching
+                an IP flow. If this object has any value other than 0 then
+                this rule takes precedence over any rule that specifies an
+                individual physical input port, a VLAN or any incoming
+                implicit 802.1p traffic class rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent.
+
+		Any attempt to write an ICMP rule specifying an IP pattern with
+		a non-default value for this object will be rejected by the agent."
+                DEFVAL { 0 }
+	::= { extremeQosRuleEntry 19 }
+
+        extremeQosRulePrecedence  OBJECT-TYPE
+		SYNTAX          INTEGER
+		MAX-ACCESS 	read-create
+		STATUS          current
+		DESCRIPTION
+		"The precedence used to select one rule over potentially 
+                multiple rules that might match an L3/L4 flow. The rule
+		with highest precedence  takes precedence over any rule
+		that specifies a matching flow, individual physical input
+		port, a VLAN or any incoming implicit 802.1p traffic class
+		rule.
+
+                Any attempt to write a rule that indicates a non-default value
+                for this object together with an individual port value for
+                extremeQosRuleInPort will be rejected by the agent."
+                DEFVAL { 0 }
+	::= { extremeQosRuleEntry 20 }
+
+        extremeQosRuleCounter  OBJECT-TYPE
+		SYNTAX          Counter64
+		MAX-ACCESS 	read-only
+		STATUS          current
+		DESCRIPTION
+		" " 
+                DEFVAL { 0 }
+	::= { extremeQosRuleEntry 21 }
+
+	extremeQosRuleName OBJECT-TYPE
+		SYNTAX 		DisplayString (SIZE (0..32))
+                MAX-ACCESS 	read-create
+                STATUS		current
+                DESCRIPTION
+                "A unique Qos rule name. If this is not specified then the system 
+		generates one automatically."
+        ::= { extremeQosRuleEntry 22 }
+
+-- ================================================================================
+-- Treatment/Action/QoSProfile
+-- ================================================================================
+-- 
+-- Several parameters are accessible, to a greater or lesser extent, for 
+-- specifying the treatment received by traffic that is classified as matching
+-- a static rule.
+-- 
+-- The following can be thought of as represented by a "per-hop behaviour" in 
+-- IETF DiffServ terminology or by a "QoS Profile" in Extreme terminology:
+--      - relative priority
+--      - minimum guaranteed bandwidth
+--      - maximum limit on bandwidth
+--      - limit on peak bandwidth
+--      - reserved buffer allocation
+--      - maximum limit on buffer allocation
+--      - filter/drop
+-- 
+-- In addition, the following actions can also be thought of as a part of the
+-- treatment:
+--      - trap to policy server
+--      - outgoing IP TOS/mark/mask
+--      - outgoing 802.1p mark
+-- 
+-- A set of parameters specify the scheduling characteristics of per-class 
+-- queues and the marking of traffic that exits those queues. The term
+-- "flowspec" is used loosely here although it has many of the characteristics
+-- of an IntServ flowspec.
+-- 
+-- <treatment> ::= drop | <qos_profile>
+--
+-- <qos_profile> ::= <flowspec>, <action>
+-- 
+-- <flowspec> ::= <tokenBucket> | <absoluteBw> | <percentBw>, <buffers>, <priority>
+-- <tokenBucket> ::= peakBW, sustBW, bucketSize
+-- <absoluteBW> ::= minBW, maxPeakBW, maxSustBW
+-- <percentBW> ::= minBWpercent, maxSustBWpercent, maxPeakBWpercent
+-- <buffers> ::= maxQueueLength, minBufferAlloc
+-- <priority> ::= relativePriority
+-- 
+-- <action> ::= <trap_to_server>, <mark_iptos>, <mark_8021p>
+-- <trap_to_server> ::= TRUE | FALSE
+-- <mark_iptos> ::= new_set_pattern, new_clear_pattern
+-- <mark_8021p> ::= INTEGER 0..7 | unchanged
+-- 
+-- On any device using first-generation silicon, additional 
+-- parameters are hard coded:
+-- 
+-- mark_iptos = 0,0   (i.e. IPTOS unchanged)
+-- 
+-- Note: for the ExtremeWare 4.0 release, some of the parameters are not 
+-- exposed for modification through this interface: these are represented as
+-- read-only - 6.0 behaviour is currently undefined. 
+--
+-- In particular, hard-coded values for the following are used in 4.0:
+--    maxPeakBWpercent ::= line rate or 100%
+--    maxQueueLength ::= infinite or something approaching total buffers in
+--                       the device
+--    minBufferAlloc ::= fixed at compile time <insert EW4.0 defaults>
+--    mark_8021p ::= for packets entering untagged: 0, 2, 4 or 6 depending on
+--                   queue number for packets entering tagged: unchanged.
+--
+-- 
+-- Existing table:
+--
+-- extremeQosProfileTable INDEX { extremeQosProfileIndex} SEQUENCE OF
+-- {
+--      extremeQosProfileIndex	        INTEGER ,
+--      extremeQosProfileName	        DisplayString,
+--	extremeQosProfileMinBw	        INTEGER (0..100),
+--	extremeQosProfileMaxBw		INTEGER (0..100),
+--	extremeQosProfilePriority	INTEGER {low, normal, medium, high}
+--	extremeQosProfileRowStatus	RowStatus
+-- }
+--
+-- Added the following "flowspec" columns to extremeQosProfileTable:
+--
+--        extremeQosProfileMinBwBps             INTEGER,
+--        extremeQosProfileMaxSustBwBps         INTEGER,
+--        extremeQosProfileMaxPeakBwBps         INTEGER,
+--        extremeQosProfileBucketSizeOctets     INTEGER,
+--        extremeQosProfileMaxPeakBwPercent     INTEGER (0..100),
+--        extremeQosProfileMaxQueueLengthOctets INTEGER,
+--        extremeQosProfileMinBufferAllocOctets INTEGER
+--
+-- Added the following "action" columns to extremeQosProfileTable:
+-- 
+--        extremeTrapToServer     TruthValue,     - send trap to policy server
+--        extremeMarkIpTosSet     OCTET STRING (SIZE (1)),
+--        extremeMarkIpTosClear   OCTET STRING (SIZE (1)),
+--        extremeMark8021p        INTEGER (0..7) or unchanged(8)  - see above
+
+
+
+-- ===========================================================================
+--        Capabilities
+-- ===========================================================================
+
+        extremeQosCapabilitiesTable OBJECT-TYPE
+ 		SYNTAX  SEQUENCE OF ExtremeQosCapabilitiesEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+                DESCRIPTION
+                "Table of per-port QoS policy capabilities. An entry only
+                 exists in this table for ifTable entries representing
+                 physical ports. On a modular system with mixed capability
+                 silicon it is necessary to indicate the QoS capabilities to
+                 a manager."
+	::= { extremeQosPolicy 3 }
+
+        extremeQosCapabilitiesEntry OBJECT-TYPE
+		SYNTAX  ExtremeQosCapabilitiesEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+                "Entry in table of QoS policy capabilities for a given switch
+                 port."
+                AUGMENTS { ifEntry }
+	::= { extremeQosCapabilitiesTable 1 }
+
+        ExtremeQosCapabilitiesEntry ::= SEQUENCE
+        {
+                extremeQosCapMarkIpTosCapable         TruthValue,
+                extremeQosCapMatchIpTosCapable        TruthValue
+        }
+
+        extremeQosCapMarkIpTosCapable  OBJECT-TYPE
+		SYNTAX          TruthValue
+		MAX-ACCESS 	read-only
+		STATUS          current
+		DESCRIPTION
+		"This port is capable of supporting policies that involve
+                the changing of IP TOS octet values."
+	::= { extremeQosCapabilitiesEntry 1 }
+
+        extremeQosCapMatchIpTosCapable  OBJECT-TYPE
+		SYNTAX          TruthValue
+		MAX-ACCESS 	read-only
+		STATUS          current
+		DESCRIPTION
+		"This port is capable of supporting policies that involve
+                packet classification based on matching of IP TOS octet 
+                values."
+	::= { extremeQosCapabilitiesEntry 2 }
+
+END

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 15.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 32 32" enable-background="new 0 0 32 32" xml:space="preserve">
+<circle fill="#FFFFFF" cx="16" cy="16" r="16"/>
+<g>
+	<g>
+		<path fill="#1867CD" stroke="#1867CD" stroke-width="0.44" stroke-linecap="round" stroke-linejoin="bevel" d="M8.586,26.799
+			L8.362,26.57v-0.844l0.224-0.225H9.91l0.542-0.541l0.002-9.758l-0.005-0.062c-0.086-0.774-0.132-1.627-0.132-2.535
+			c0-7.217,5.012-8.271,5.794-8.427L16.31,4.38l-0.028,6.512l0.339,0.503c0.367,0.154,0.557,0.403,0.557,0.744
+			c0,0.43-0.328,0.683-0.604,0.82l-0.301,0.483l-0.025,6.753l-0.176,0.209c-0.237,0-1.844-0.827-2.464-1.564l-0.856,0.438v5.684
+			l0.542,0.541h1.189l0.226,0.225v0.844l-0.226,0.229H8.586z M16.439,21.46l0.317-0.183l0.446-0.533l0.128-0.35l0.027-6.639
+			c0.578-0.39,0.904-0.965,0.904-1.617c0-0.655-0.328-1.222-0.893-1.573l0.025-6.408l-0.162-0.384l-0.541-0.546l-0.383-0.161
+			c-0.201,0-7.082,0.109-7.082,9.538c0,0.937,0.046,1.821,0.138,2.628L9.36,24.414h-1l-0.386,0.159l-0.542,0.543l-0.16,0.386v1.296
+			l0.16,0.384l0.542,0.543l0.386,0.159h1.004h4.469h0.871l0.383-0.159l0.543-0.543l0.159-0.384v-1.296l-0.159-0.386l-0.543-0.543
+			l-0.383-0.159h-0.871V20.18C14.692,21.297,16.392,21.469,16.439,21.46"/>
+		<path fill="none" stroke="#1867CD" stroke-width="1.65" stroke-linecap="round" d="M13.528,8.716c0,0-1.481,3.955,0,7.223"/>
+		<path fill="none" stroke="#1867CD" stroke-width="1.65" stroke-linecap="round" d="M19.65,16.816c0,0,3.145-4.033,0.014-8.981"/>
+		<path fill="none" stroke="#1867CD" stroke-width="1.65" stroke-linecap="round" d="M24.533,17.641c0,0,3.148-4.774,0.018-10.625"
+			/>
+	</g>
+	<path fill="#FFFFFF" d="M25.949,22.482H5.05v4.168c2.796,2.854,6.688,4.632,11,4.632c3.772,0,7.224-1.359,9.899-3.611V22.482z"/>
+	<text transform="matrix(1 0 0 1 8.7729 28.5137)" fill="#1867CD" font-family="'Roboto-Bold'" font-size="7.577">M</text>
+	<text transform="matrix(1 0 0 1 15.3662 28.5137)" fill="#1867CD" font-family="'Roboto-Bold'" font-size="7.577">X</text>
+</g>
+</svg>

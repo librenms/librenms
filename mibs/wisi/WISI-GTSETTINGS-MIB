@@ -1,0 +1,2133 @@
+
+WISI-GTSETTINGS-MIB DEFINITIONS ::= BEGIN
+--============================================================================--
+
+IMPORTS
+	IpAddress, Integer32, Unsigned32, MODULE-IDENTITY, NOTIFICATION-TYPE,
+	OBJECT-TYPE
+		FROM SNMPv2-SMI
+
+	DisplayString, PhysAddress, RowStatus
+		FROM SNMPv2-TC
+
+	gtModule
+		FROM WISI-GTMODULES-MIB
+
+	gtUnit
+		FROM WISI-TANGRAM-MIB
+
+	InterfaceIndex
+		FROM IF-MIB;
+
+--------------------------------------------------------------------------------
+
+gtSettingsMIB MODULE-IDENTITY
+	LAST-UPDATED "201609080000Z"
+	ORGANIZATION "WISI Communications GmbH & Co. KG"
+	CONTACT-INFO
+		"https://wisiconnect.tv/"
+	DESCRIPTION
+		"This MIB module represents the modules within a system (rack
+		unit) of a WISI next-generation headend. It provides general
+		module information and settings."
+
+	REVISION "201609080000Z"
+	DESCRIPTION
+		"Fixed parse errors and warnings and incorrect string sizes.
+		Added object to control if an interface should use its VLAN
+		settings. Added the ability to modify several objects regarding
+		interfaces, HMS, time, NTP, SNMP and module redundancy
+		settings. Added object to enable/disable user authentication
+		for modules and to create and upload/download individual
+		settings backups for modules. Added value to update a module's
+		entitlements. Updated contact information."
+	REVISION "201507020000Z"
+	DESCRIPTION
+		"Initial version."
+::= { gtUnit 5 }
+
+--------------------------------------------------------------------------------
+
+gtSettingsNotifications OBJECT IDENTIFIER ::= { gtSettingsMIB 0 }
+gtSettingsObjects OBJECT IDENTIFIER ::= { gtSettingsMIB 1 }
+gtSettingsConformance OBJECT IDENTIFIER ::= { gtSettingsMIB 2 }
+
+gtGeneral OBJECT IDENTIFIER ::= { gtSettingsObjects 1 }
+gtSwitch OBJECT IDENTIFIER ::= { gtSettingsObjects 2 }
+gtNetworking OBJECT IDENTIFIER ::= { gtSettingsObjects 3 }
+gtHeadendSystemManagement OBJECT IDENTIFIER ::= { gtSettingsObjects 4 }
+gtDateAndTime OBJECT IDENTIFIER ::= { gtSettingsObjects 5 }
+gtSNMP OBJECT IDENTIFIER ::= { gtSettingsObjects 6 }
+gtUser OBJECT IDENTIFIER ::= { gtSettingsObjects 7 }
+gtServices OBJECT IDENTIFIER ::= { gtSettingsObjects 8 }
+gtModuleBackup OBJECT IDENTIFIER ::= { gtSettingsObjects 9 }
+gtModuleUpdate OBJECT IDENTIFIER ::= { gtSettingsObjects 10 }
+
+gtSettingsCompliances OBJECT IDENTIFIER ::= { gtSettingsConformance 1 }
+gtSettingsGroups OBJECT IDENTIFIER ::= { gtSettingsConformance 2 }
+
+--============================================================================--
+
+gtSettingsNotifyWebChanged NOTIFICATION-TYPE
+	OBJECTS { gtWebEnable, gtWebAuth, gtWebProtocol }
+	STATUS current
+	DESCRIPTION
+		"The gtSettingsNotifyWebChanged indicates that the web
+		server status has changed"
+::= { gtSettingsNotifications 1 }
+
+gtSettingsNotifyInterfaceChanged NOTIFICATION-TYPE
+	OBJECTS { gtInterfaceName, gtInterfaceVLAN, gtInterfaceIPv4, 
+        gtInterfaceIPv4Mask, gtInterfaceIPv4Gateway, gtInterfaceVLAN,
+        gtInterfaceIGMP, gtInterfaceDHCPState, gtInterfaceWebMgt, 
+        gtInterfaceSNMP, gtInterfaceSimulcrypt, gtInterfaceStreaming, 
+	gtInterfaceCLI, gtInterfaceUseVLAN, gtInterfaceIfIndex,
+	gtInterfaceRowStatus }
+	STATUS current
+	DESCRIPTION
+		"The gtSettingsNotifyInterfaceChanged indicates that an
+		interface's global settings has changed"
+::= { gtSettingsNotifications 2 }
+
+--============================================================================--
+
+gtSWOptionsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtSWOptionsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSWOptionsTable table contains a list of all
+		software options of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtGeneral 1 }
+
+gtSWOptionsEntry OBJECT-TYPE
+	SYNTAX GtSWOptionsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSWOptionsEntry table entry represents a software 
+		option of a SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule,
+			gtSWOptionsIdx
+	}
+::= { gtSWOptionsTable 1 }
+
+GtSWOptionsEntry ::= SEQUENCE {
+	gtSWOptionsIdx Unsigned32,
+	gtSWOption DisplayString
+}
+
+gtSWOptionsIdx OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSWOptionsIdx entity represents the numeric index
+		of a software option of a SFM/MFM module within the 
+		GT01/GN50 rack unit."
+::= { gtSWOptionsEntry 1 }
+
+gtSWOption OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (20))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtSWOption entity represents the software option
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSWOptionsEntry 2 }
+
+--------------------------------------------------------------------------------
+
+gtSLATable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtSLAEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSLATable table contains a list of all Service License Agreements 
+		within the GT01/GN50 rack unit."
+::= { gtGeneral 2 }
+
+gtSLAEntry OBJECT-TYPE
+	SYNTAX GtSLAEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSLAEntry table entry represents a SFM/MFM module 
+		within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule
+	}
+::= { gtSLATable 1 }
+
+GtSLAEntry ::= SEQUENCE {
+	gtSLARegistered INTEGER,
+	gtSLAExpires DisplayString
+}
+
+gtSLARegistered OBJECT-TYPE
+	SYNTAX INTEGER { no(0), yes(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtSLARegistered entity represents the Service License 
+		Agreement Registration of a SFM/MFM module within the 
+		GT01/GN50 rack unit."
+::= { gtSLAEntry 1 }
+
+gtSLAExpires OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (20))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtSLAExpires entity represents the Service License 
+		Agreement expire date of a SFM/MFM module within the 
+		GT01/GN50 rack unit."
+::= { gtSLAEntry 2 }
+
+--------------------------------------------------------------------------------
+
+gtSyslogTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtSyslogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSyslogTable table contains a list of all syslog servers
+		within the GT01/GN50 rack unit."
+::= { gtGeneral 3 }
+
+gtSyslogEntry OBJECT-TYPE
+	SYNTAX GtSyslogEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtPortsEntry table entry represents a syslog server
+		within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule
+	}
+::= { gtSyslogTable 1 }
+
+GtSyslogEntry ::= SEQUENCE {
+	gtSyslogState INTEGER,
+	gtSyslogIP IpAddress
+}
+
+gtSyslogState OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtSyslogState represents the syslog state 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSyslogEntry 1 }
+
+gtSyslogIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtSyslogIP represents the syslog IP address 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSyslogEntry 2 }
+
+--============================================================================--
+--============================================================================--
+
+gtNetworkTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtNetworkEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkTable table contains a list of all
+		networks within the GT01/GN50 rack unit."
+::= { gtSwitch 1 }
+
+gtNetworkEntry OBJECT-TYPE
+	SYNTAX GtNetworkEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkEntry table entry represents a network 
+		within the GT01/GN50 rack unit."
+	INDEX {
+		gtNetworkVLAN
+	}
+::= { gtNetworkTable 1 }
+
+GtNetworkEntry ::= SEQUENCE {
+	gtNetworkVLAN Unsigned32,
+	gtNetworkName DisplayString,
+	gtNetworkIGMPQuerierState INTEGER,
+	gtNetworkIGMPQuerierIP IpAddress,
+	gtNetworkIGMPSnoopingState INTEGER
+}
+
+gtNetworkVLAN OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4095)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkVLAN represents the network VLAN ID 
+		within the GT01/GN50 rack unit."
+::= { gtNetworkEntry 1 }
+
+gtNetworkName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..100))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkName entity represents the network  
+		name within the GT01/GN50 rack unit."
+::= { gtNetworkEntry 2 }
+
+gtNetworkIGMPQuerierState OBJECT-TYPE
+	SYNTAX INTEGER { off(0), forced(1), auto(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkIGMPQuerierState represents the network IGMP 
+		querier state within the GT01/GN50 rack unit."
+::= { gtNetworkEntry 3 }
+
+gtNetworkIGMPQuerierIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkIGMPQuerierIP represents the network IGMP querier 
+		IP address within the GT01/GN50 rack unit."
+::= { gtNetworkEntry 4 }
+
+gtNetworkIGMPSnoopingState OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1), blockMulticast(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkIGMPSnoopingState represents the network IGMP snooping 
+		state within the GT01/GN50 rack unit."
+::= { gtNetworkEntry 5 }
+
+--------------------------------------------------------------------------------
+
+gtNetworkPortsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtNetworkPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkTable table contains a list of all
+		network ports within the GT01/GN50 rack unit. "
+::= { gtSwitch 2 }
+
+gtNetworkPortsEntry OBJECT-TYPE
+	SYNTAX GtNetworkPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkPortsEntry table entry represents a network 
+		within the GT01/GN50 rack unit. "
+	INDEX {
+		gtNetworkPortVLAN,
+		gtNetworkPortNumber
+	}
+::= { gtNetworkPortsTable 1 }
+
+GtNetworkPortsEntry ::= SEQUENCE {
+	gtNetworkPortVLAN Unsigned32,
+	gtNetworkPortNumber Unsigned32,
+	gtNetworkPortName	DisplayString,
+	gtNetworkPortState INTEGER
+}
+
+gtNetworkPortVLAN OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4095)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkPortVLAN represents the network VLAN ID within
+		the GT01/GN50 rack unit."
+::= { gtNetworkPortsEntry 1 }
+
+gtNetworkPortNumber OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkPortNumber entity represents the numeric index
+		of a network port within the GT01/GN50 rack unit."
+::= { gtNetworkPortsEntry 2 }
+
+gtNetworkPortName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkPortName entity represents the name
+		of a network port within the GT01/GN50 rack unit."
+::= { gtNetworkPortsEntry 3 }
+
+gtNetworkPortState OBJECT-TYPE
+	SYNTAX INTEGER { notMember(0), untagged(1), tagged(2) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNetworkPortState represents the state of a network port 
+		within the GT01/GN50 rack unit."
+::= { gtNetworkPortsEntry 4 }
+
+--------------------------------------------------------------------------------
+
+gtPortsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtPortsTable table contains a list of all network ports 
+		within the GT01/GN50 rack unit."
+::= { gtSwitch 3 }
+
+gtPortsEntry OBJECT-TYPE
+	SYNTAX GtPortsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtPortsEntry table entry represents a network port
+		within the GT01/GN50 rack unit."
+	INDEX {
+		gtPortsNumber
+	}
+::= { gtPortsTable 1 }
+
+GtPortsEntry ::= SEQUENCE {
+	gtPortsNumber Unsigned32,
+	gtPortsName DisplayString,
+	gtPortsFloodMulticast INTEGER,
+	gtPortsBitrateReceive Integer32,
+	gtPortsBitrateTransmit Integer32,
+	gtPortsLinkup INTEGER
+}
+
+gtPortsNumber OBJECT-TYPE
+	SYNTAX Unsigned32 (1..16)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtPortsNumber entity represents the numeric index of a 
+		network port within the GT01/GN50 rack unit."
+::= { gtPortsEntry 1 }
+
+gtPortsName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPortsName entity represents the network port name
+		within the GT01/GN50 rack unit."
+::= { gtPortsEntry 2 }
+
+gtPortsFloodMulticast OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPortsFloodMulticast represents the flood multicast setting		
+		of the specific network port within the GT01/GN50 rack unit."
+::= { gtPortsEntry 3 }
+
+gtPortsBitrateReceive OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPortsBitrateReceive entity represents the receiving bitrate 
+		of the specific network port within the GT01/GN50 rack unit.
+		The gtPortsBitrateReceive value is displayed in bits/sec."
+::= { gtPortsEntry 4 }
+
+gtPortsBitrateTransmit OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPortsBitrateTransmit entity represents the transmitting bitrate 
+		of the specific network port within the GT01/GN50 rack unit.
+		The gtPortsBitrateTransmit value is displayed in bits/sec."
+::= { gtPortsEntry 5 }
+
+gtPortsLinkup OBJECT-TYPE
+	SYNTAX INTEGER { disconnected(0), connected(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtPortsLinkup entity represents the link state 
+		of the specific network port within the GT01/GN50 rack unit."
+::= { gtPortsEntry 6 }
+
+--------------------------------------------------------------------------------
+
+gtIGMPQuerierVersion OBJECT-TYPE
+	SYNTAX INTEGER { igmpv1(1), igmpv2(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPQuerierVersion represents the IGMP querier version 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSwitch 4 }
+
+gtIGMPQuerierRobustness OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPQuerierRobustness represents the IGMP querier robustness 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSwitch 5 }
+
+gtIGMPQueryInterval OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPQueryInterval represents the IGMP query interval 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSwitch 6 }
+
+gtIGMPQueryStartupInterval OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPQueryStartupInterval represents the IGMP startup 
+		query interval of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSwitch 7 }
+
+gtIGMPQueryStartupCount OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPQueryStartupCount represents the IGMP startup query count 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSwitch 8 }
+
+gtIGMPLastMemberQueryInterval OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPLastMemberQueryInterval represents the last member 
+		query interval of a SFM/MFM module within the GT01/GN50 rack unit.
+		The gtIGMPLastMemberQueryInterval value is displayed in ms."
+::= { gtSwitch 9 }
+
+gtIGMPLastMemberQueryCount OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPLastMemberQueryCount represents the last member query 
+		count of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSwitch 10 }
+
+gtIGMPQuerierResponseTime OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtIGMPQuerierResponseTime represents the IGMP querier response 
+		time of a SFM/MFM module within the GT01/GN50 rack unit.
+		The gtIGMPQuerierResponseTime value is displayed in ms."
+::= { gtSwitch 11 }
+
+--------------------------------------------------------------------------------
+
+gtNumSFP OBJECT-TYPE
+	SYNTAX Unsigned32 (4)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtNumSFP entity represents the number of SFP ports 
+		within the GT01/GN50 rack unit.
+		The related entries are provided by gtSFPTable."
+::= { gtSwitch 12 }
+
+--------------------------------------------------------------------------------
+
+gtSFPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtSFPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSFPTable table contains a list of all SFP ports 
+		within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumSFP."
+::= { gtSwitch 13 }
+
+gtSFPEntry OBJECT-TYPE
+	SYNTAX GtSFPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSFPEntry table entry represents a SFP port
+		within the GT01/GN50 rack unit.
+		The number of entries is provided by gtNumSFP."
+	INDEX {
+		gtSFPNumber
+	}
+::= { gtSFPTable 1 }
+
+GtSFPEntry ::= SEQUENCE {
+	gtSFPNumber Unsigned32,
+	gtSFPPlugged INTEGER,
+	gtSFPLink INTEGER,
+	gtSFPType INTEGER,
+	gtSFPSpeed Unsigned32 
+}
+
+gtSFPNumber OBJECT-TYPE
+	SYNTAX Unsigned32 (4)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSFPNumber entity represents the numeric index of a 
+		SFP port within the GT01/GN50 rack unit."
+::= { gtSFPEntry 1 }
+
+gtSFPPlugged OBJECT-TYPE
+	SYNTAX INTEGER { notAttached(0), attached(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtSFPPlugged entity represents the SFP  
+		plugged state within the GT01/GN50 rack unit."
+::= { gtSFPEntry 2 }
+
+gtSFPLink OBJECT-TYPE
+	SYNTAX INTEGER { down(0), up(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtSFPPlugged entity represents the SFP  
+		link state within the GT01/GN50 rack unit."
+::= { gtSFPEntry 3 }
+
+gtSFPType OBJECT-TYPE
+	SYNTAX INTEGER { copper(0), fiber(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtSFPType entity represents the SFP  
+		type within the GT01/GN50 rack unit."
+::= { gtSFPEntry 4 }
+
+gtSFPSpeed OBJECT-TYPE
+	SYNTAX Unsigned32 (1..65535)
+	UNITS "Mbit/s"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtSFPSpeed entity represents the SFP  
+		speed within the GT01/GN50 rack unit."
+::= { gtSFPEntry 5 }
+
+--============================================================================--
+--============================================================================--
+
+gtDNSTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtDNSEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtDNSTable table contains a list of all DNS settings
+		within the GT01/GN50 rack unit."
+::= { gtNetworking 1 }
+
+gtDNSEntry OBJECT-TYPE
+	SYNTAX GtDNSEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		" The gtDNSEntry table entry represents a
+		SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule,
+		gtDNSNumber
+	}
+::= { gtDNSTable 1 }
+
+GtDNSEntry ::= SEQUENCE {
+	gtDNSNumber Unsigned32,
+	gtDNSServerIP IpAddress
+}
+
+gtDNSNumber OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	UNITS "slot"
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtDNSNumber entity represents the numeric index
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtDNSEntry 1 }
+
+gtDNSServerIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtDNSServerIP represents the primary DNS IP address 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtDNSEntry 2 }
+
+--------------------------------------------------------------------------------
+
+gtInterfaceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceTable table contains a list of all
+		network interfaces of a SFM/MFM module."
+::= { gtNetworking 2 }
+
+gtInterfaceEntry OBJECT-TYPE
+	SYNTAX GtInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceEntry table entry represents a network interface 
+		of a SFM/MFM module."
+	INDEX {
+		gtModule,
+			gtInterfaceNumber
+	}
+::= { gtInterfaceTable 1 }
+
+GtInterfaceEntry ::= SEQUENCE {
+	gtInterfaceNumber Unsigned32,
+	gtInterfaceName DisplayString,
+	gtInterfaceMAC PhysAddress,
+	gtInterfaceState INTEGER,
+	gtInterfaceIPv4 IpAddress,
+	gtInterfaceIPv4Mask IpAddress,
+	gtInterfaceIPv4Gateway IpAddress,
+	gtInterfaceVLAN Unsigned32,
+	gtInterfaceIGMP INTEGER,
+	gtInterfaceDHCPState INTEGER,
+	gtInterfaceWebMgt INTEGER,
+	gtInterfaceSNMP INTEGER,
+	gtInterfaceSimulcrypt INTEGER,
+	gtInterfaceStreaming INTEGER,
+	gtInterfaceCLI INTEGER,
+	gtInterfaceUseVLAN INTEGER,
+	gtInterfaceIfIndex InterfaceIndex,
+	gtInterfaceRowStatus RowStatus
+}
+
+gtInterfaceNumber OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceNumber entity represents the numeric index
+		of a network interface of a SFM/MFM module."
+::= { gtInterfaceEntry 1 }
+
+gtInterfaceName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..32))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceName entity represents the network interface 
+		name of a SFM/MFM module."
+::= { gtInterfaceEntry 2 }
+
+gtInterfaceMAC OBJECT-TYPE
+	SYNTAX PhysAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceMAC entity represents the MAC address 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtInterfaceEntry 3 }
+
+gtInterfaceState OBJECT-TYPE
+	SYNTAX INTEGER { disconnected(0), connected(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceState entity represents the network state 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtInterfaceEntry 4 }
+
+gtInterfaceIPv4 OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceIPv4 represents the network interface IP address 
+		of a SFM/MFM module."
+::= { gtInterfaceEntry 5 }
+
+gtInterfaceIPv4Mask OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceIPv4Mask represents the network interface netmask
+		of a SFM/MFM module."
+::= { gtInterfaceEntry 6 }
+
+gtInterfaceIPv4Gateway OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceIPv4Gateway represents the network interface gateway
+		of a SFM/MFM module."
+::= { gtInterfaceEntry 7 }
+
+gtInterfaceVLAN OBJECT-TYPE
+	SYNTAX Unsigned32 (1..4095)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceVLAN represents the network interface VLAN ID 
+		of a SFM/MFM module."
+::= { gtInterfaceEntry 8 }
+
+gtInterfaceIGMP OBJECT-TYPE
+	SYNTAX INTEGER { igmpv2(2), igmpv3(3) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceIGMP represents the network interface IGMP version 
+		of a SFM/MFM module."
+::= { gtInterfaceEntry 9 }
+
+gtInterfaceDHCPState OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceDHCPState represents the network interface 
+		DHCP state of a SFM/MFM module."
+::= { gtInterfaceEntry 10 }
+
+gtInterfaceWebMgt OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceWebMgt represents the network interface web 
+		management capability of a SFM/MFM module."
+::= { gtInterfaceEntry 11 }
+
+gtInterfaceSNMP OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceSNMP represents the network interface SNMP capability
+		of a SFM/MFM module."
+::= { gtInterfaceEntry 12 }
+
+gtInterfaceSimulcrypt OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceSimulcrypt represents the network interface 
+		simulcrypt capability of a SFM/MFM module."
+::= { gtInterfaceEntry 13 }
+
+gtInterfaceStreaming OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceStreaming represents the network interface streaming 
+		capability of a SFM/MFM module."
+::= { gtInterfaceEntry 14 }
+
+gtInterfaceCLI OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceCLI represents the network interface CLI capability
+		of a SFM/MFM module."
+::= { gtInterfaceEntry 15 }
+
+gtInterfaceUseVLAN OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtInterfaceUseVLAN entity represents whether or not
+		network packages on an SFM/MFM module should be tagged with the
+		VLAN ID set in the gtInterfaceVLAN entity."
+::= { gtInterfaceEntry 16 }
+
+gtInterfaceIfIndex OBJECT-TYPE
+	SYNTAX InterfaceIndex
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The ifIndex of the physical interface on which this virtual
+		interface exists, as stored in the IF-MIB::ifTable."
+::= { gtInterfaceEntry 17 }
+
+gtInterfaceRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The status of this virtual network interface table conceptual
+		row.
+
+		Only the following actions and values are supported:
+		 * active(1)
+		 * createAndGo(4)
+		 * destroy(6)
+
+		If a row exists, it will always be in the active(1) state, even
+		if the interface is not set up in a way that allows it to
+		communicate over the network. In order for the new interface to
+		work, the gtInterfaceIfIndex must be set to an existing,
+		physical interface - not the ifIndex of a VLAN.
+		
+		In order to create a new row, at least one other columnar value
+		than the row status must be set in the same PDU."
+::= { gtInterfaceEntry 18 }
+
+--============================================================================--
+--============================================================================--
+
+gtHMSTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtHMSEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtHMSTable table contains a list of all headend 
+		system management settings within the GT01/GN50 rack unit."
+::= { gtHeadendSystemManagement 4 }
+
+gtHMSEntry OBJECT-TYPE
+	SYNTAX GtHMSEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtHMSEntry table entry represents a
+		SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule
+	}
+::= { gtHMSTable 1 }
+
+GtHMSEntry ::= SEQUENCE {
+	gtHMSGroupName DisplayString,
+	gtHMSComMethod DisplayString,
+	gtHMSNumMembers Integer32,
+	gtHMSNumAvailModules Integer32
+}
+
+gtHMSGroupName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..100))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtHMSGroupName entity represents the group name of a SFM/MFM module."
+::= { gtHMSEntry 1 }
+
+gtHMSComMethod OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (20))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtHMSComMethod entity represents the communication method within 
+		the group of a SFM/MFM module."
+::= { gtHMSEntry 2 }
+
+gtHMSNumMembers OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtHMSNumMembers represents the number of members within the group 
+		of a SFM/MFM module."
+::= { gtHMSEntry 3 }
+
+gtHMSNumAvailModules OBJECT-TYPE
+	SYNTAX Integer32 
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtHMSNumAvailModules represents the number of available modules 
+		for a SFM/MFM module."
+::= { gtHMSEntry 4 }
+
+--============================================================================--
+--============================================================================--
+
+gtDateAndTimeTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtDateAndTimeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtDateAndTimeTable table contains a list of all 
+		date and time settings within the GT01/GN50 rack unit."
+::= { gtDateAndTime 1 }
+
+gtDateAndTimeEntry OBJECT-TYPE
+	SYNTAX GtDateAndTimeEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtDateAndTimeEntry table entry represents a
+		SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule
+	}
+::= { gtDateAndTimeTable 1 }
+
+GtDateAndTimeEntry ::= SEQUENCE {
+	gtCurrentTimeSource DisplayString,
+	gtTimeUTC DisplayString,
+	gtTimeLocal DisplayString,
+	gtTimeZone DisplayString,
+	gtDaylightAdjustment INTEGER
+}
+
+gtCurrentTimeSource OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtCurrentTimeSource entity represents the current time 
+		source of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtDateAndTimeEntry 1 }
+
+gtTimeUTC OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtTimeUTC entity represents the UTC time of a SFM/MFM 
+		module within the GT01/GN50 rack unit."
+::= { gtDateAndTimeEntry 2 }
+
+gtTimeLocal OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtTimeLocal entity represents the local time of a SFM/MFM 
+		module within the GT01/GN50 rack unit."
+::= { gtDateAndTimeEntry 3 }
+
+gtTimeZone OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..50))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtTimeZone entity represents the time zone of a SFM/MFM
+		module within the GT01/GN50 rack unit in POSIX time zone
+		format, which also allows you to specify the daylight savings
+		time to use."
+::= { gtDateAndTimeEntry 4 }
+
+gtDaylightAdjustment OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtDaylightAdjustment entity controls whether or not an
+		SFM/MFM module within the GT01/GN50 rack unit will switch to
+		daylight savings time automatically. The daylight savings time
+		settings to use is specified in the gtTimeZone entity."
+::= { gtDateAndTimeEntry 5 }
+
+--------------------------------------------------------------------------------
+
+gtNTPServerTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtNTPServerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNTPServerTable table contains a list of all
+		NTP servers of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtDateAndTime 2 }
+
+gtNTPServerEntry OBJECT-TYPE
+	SYNTAX GtNTPServerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNTPServerEntry table entry represents a NTP server 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule,
+			gtNTPServerNumber
+	}
+::= { gtNTPServerTable 1 }
+
+GtNTPServerEntry ::= SEQUENCE {
+	gtNTPServerNumber Unsigned32,
+	gtNTPServerAddress DisplayString,
+	gtNTPServerRowStatus RowStatus
+}
+
+gtNTPServerNumber OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtNTPServerNumber entity represents the numeric index
+		of a NTP server of a SFM/MFM module within the 
+		GT01/GN50 rack unit."
+::= { gtNTPServerEntry 1 }
+
+gtNTPServerAddress OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtNTPServerAddress entity represents an NTP server address
+		used by an SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtNTPServerEntry 2 }
+
+gtNTPServerRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The status of this NTP server table conceptual row.
+
+		Only the following actions and values are supported:
+		 * active(1)
+		 * createAndGo(4)
+		 * destroy(6)
+
+		If a row exists, it will always be in the active(1) state. In
+		order to create a new row, at least one other columnar value
+		than the row status must be set in the same PDU."
+::= { gtNTPServerEntry 3 }
+
+--============================================================================--
+--============================================================================--
+
+gtSNMPTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtSNMPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSNMPTable table contains a list of all SNMP  
+		configurations of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMP 1 }
+
+gtSNMPEntry OBJECT-TYPE
+	SYNTAX GtSNMPEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtSNMPEntry table entry represents a SNMP configuration
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule 
+	}
+::= { gtSNMPTable 1 }
+
+GtSNMPEntry ::= SEQUENCE {
+	gtAgentState INTEGER,
+	gtAgentPort Unsigned32,
+	gtAgentSecurityLevel INTEGER,
+	gtAgentComReadString DisplayString,
+	gtAgentComWriteString DisplayString,
+	gtTrapState INTEGER,
+	gtTrapSNMPVersion INTEGER,
+	gtTrapUser DisplayString,
+	gtTrapSecurityLevel INTEGER,
+	gtTrapComString DisplayString,
+	gtTrapPDU INTEGER
+}
+
+gtAgentState OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtAgentState entity represents the SNMP agent state of 
+		a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 1 }
+
+gtAgentPort OBJECT-TYPE
+	SYNTAX Unsigned32 (1..65535)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtAgentPort represents the SNMP agent port	of a 
+		SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 2 }
+
+gtAgentSecurityLevel OBJECT-TYPE
+	SYNTAX INTEGER { noAuthenticationOrEncryption(1), authenticationNoEncryption(2), authenticationAndEncryption(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtAgentSecurityLevel entity represents the SNMP agent 
+		security level of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 3 }
+
+gtAgentComReadString OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..40))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtAgentComReadString entity represents the SNMP agent community 
+		read string of an SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 4 }
+
+gtAgentComWriteString OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..40))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtAgentComWriteString entity represents the SNMP agent community 
+		write string of an SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 5 }
+
+gtTrapState OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtTrapState tells you if SNMP traps are enabled on an
+		SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 6 }
+
+gtTrapSNMPVersion OBJECT-TYPE
+	SYNTAX INTEGER { version1(0), version2c(1), version3(3) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtTrapSNMPVersion represents the SNMP protocol version
+		that will be used to send SNMP traps from an SFM/MFM module
+		within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 7 }
+
+gtTrapUser OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (40))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtTrapUser entity represents the SNMP trap user for SNMPv3 
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 8 }
+
+gtTrapSecurityLevel OBJECT-TYPE
+	SYNTAX INTEGER { noAuthenticationOrEncryption(1), authenticationNoEncryption(2), authenticationAndEncryption(3) }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtTrapSecurityLevel entity represents the SNMP trap security 
+		level of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 9 }
+
+gtTrapComString OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..40))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtTrapComString entity represents the SNMP trap community 
+		string of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 10 }
+
+gtTrapPDU OBJECT-TYPE
+	SYNTAX INTEGER { v1Trap(164), inform(166), v2Trap(167)}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtTrapPDU entity represents the SNMP trap PDU of a SFM/MFM 
+		module within the GT01/GN50 rack unit."
+::= { gtSNMPEntry 11 }
+
+--------------------------------------------------------------------------------
+
+gtTrapDestTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtTrapDestEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtTrapDestTable table contains a list of all SNMP trap
+		destinations of an SFM/MFM module within the GT01/GN50 rack
+		unit."
+::= { gtSNMP 2 }
+
+gtTrapDestEntry OBJECT-TYPE
+	SYNTAX GtTrapDestEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtTrapDestEntry table entry represents an SNMP trap
+		destination of an SFM/MFM module within the GT01/GN50 rack
+		unit."
+	INDEX {
+		gtModule, 
+		gtTrapDestNumber
+	}
+::= { gtTrapDestTable 1 }
+
+GtTrapDestEntry ::= SEQUENCE {
+	gtTrapDestNumber Unsigned32,
+	gtTrapDestIP IpAddress,
+	gtTrapDestPort Unsigned32,
+	gtTrapDestRowStatus RowStatus
+}
+
+gtTrapDestNumber OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtTrapDestNumber entity represents the numeric index of an
+		SNMP trap destination of an SFM/MFM module within the GT01/GN50
+		rack unit."
+::= { gtTrapDestEntry 1 }
+
+gtTrapDestIP OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtTrapDestIP represents an IP address to which an SFM/MFM
+		module within the GT01/GN50 rack unit should send SNMP traps."
+::= { gtTrapDestEntry 2 }
+
+gtTrapDestPort OBJECT-TYPE
+	SYNTAX Unsigned32 (1..65535)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtTrapDestPort represents the UDP port to which an SFM/MFM
+		module within the GT01/GN50 rack unit should send SNMP traps
+		destined for this target IP."
+::= { gtTrapDestEntry 3 }
+
+gtTrapDestRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The status of this trap destination table conceptual row.
+
+		Only the following actions and values are supported:
+		 * active(1)
+		 * createAndGo(4)
+		 * destroy(6)
+
+		If a row exists, it will always be in the active(1) state. In
+		order to create a new row, at least one other columnar value
+		than the row status must be set in the same PDU."
+::= { gtTrapDestEntry 4 }
+
+--============================================================================--
+--============================================================================--
+
+gtUserTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtUserEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUserTable table contains a list of all users within the 
+		GT01/GN50 rack unit."
+::= { gtUser 1 }
+
+gtUserEntry OBJECT-TYPE
+	SYNTAX GtUserEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUserEntry table entry represents a user within the 
+		GT01/GN50 rack unit."
+	INDEX {
+		gtModule,
+			gtUserIdx,
+			gtUserParamIdx
+	}
+::= { gtUserTable 1 }
+
+GtUserEntry ::= SEQUENCE {
+	gtUserIdx Unsigned32,
+	gtUserParamIdx Unsigned32,
+	gtUserName DisplayString,
+	gtUserPassword DisplayString,
+	gtUserGroup Integer32,
+	gtUserAccesslist Integer32,
+	gtUserRowStatus RowStatus
+}
+
+gtUserIdx OBJECT-TYPE
+	SYNTAX Unsigned32 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUserIdx entity represents the numeric index of a 
+		user within the GT01/GN50 rack unit."
+::= { gtUserEntry 1 }
+
+gtUserParamIdx OBJECT-TYPE
+	SYNTAX Unsigned32 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUserIdx entity represents the numeric index of a 
+		user parameter within the GT01/GN50 rack unit."
+::= { gtUserEntry 2 }
+
+gtUserName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..255))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtUserName entity represents the user  
+		name within the GT01/GN50 rack unit."
+::= { gtUserEntry 3 }
+
+gtUserPassword OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..255))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtUserPassword entity can be used to set
+		the user password within the GT01/GN50 rack unit."
+::= { gtUserEntry 4 }
+
+gtUserGroup OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtUserGroup entity represents the user  
+		group within the GT01/GN50 rack unit."
+::= { gtUserEntry 5 }
+
+gtUserAccesslist OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The gtUserAccesslist entity represents the user  
+		accesslist within the GT01/GN50 rack unit."
+::= { gtUserEntry 6 }
+
+gtUserRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+		"The status of this user table conceptual row.
+
+		Only the following actions and values are supported:
+		 * active(1)
+		 * createAndGo(4)
+		 * destroy(6)
+
+		If a row exists, it will always be in the active(1) state. In
+		order to create a new row, at least one other columnar value
+		than the row status must be set in the same PDU."
+::= { gtUserEntry 7 }
+
+--------------------------------------------------------------------------------
+
+gtGroupTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtGroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtGroupTable table contains a list of all groups within the 
+		GT01/GN50 rack unit."
+::= { gtUser 2 }
+
+gtGroupEntry OBJECT-TYPE
+	SYNTAX GtGroupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtGroupEntry table entry represents a group within the 
+		GT01/GN50 rack unit."
+	INDEX {
+		gtModule,
+			gtGroupIdx,
+			gtGroupParamIdx
+	}
+::= { gtGroupTable 1 }
+
+GtGroupEntry ::= SEQUENCE {
+	gtGroupIdx Unsigned32,
+	gtGroupParamIdx Unsigned32,
+	gtGroupName DisplayString,
+	gtGroupRights Integer32,
+	gtGroupAccesslist Integer32
+}
+
+gtGroupIdx OBJECT-TYPE
+	SYNTAX Unsigned32 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtGroupIdx entity represents the numeric index of a 
+		group within the GT01/GN50 rack unit."
+::= { gtGroupEntry 1 }
+
+gtGroupParamIdx OBJECT-TYPE
+	SYNTAX Unsigned32 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtGroupParamIdx entity represents the numeric index of a 
+		group parameter within the GT01/GN50 rack unit."
+::= { gtGroupEntry 2 }
+
+gtGroupName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..255))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtGroupName entity represents the group  
+		name within the GT01/GN50 rack unit."
+::= { gtGroupEntry 3 }
+
+gtGroupRights OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtGroupRights entity represents the group rights  
+		within the GT01/GN50 rack unit.
+                
+                Is a sum of the following values where every part of 
+                the sum is a right for the group.
+                
+                1 - read
+                2 - write
+                4 - execute"
+::= { gtGroupEntry 4 }
+
+gtGroupAccesslist OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtGroupAccesslist entity represents the group  
+		accesslist within the GT01/GN50 rack unit."
+::= { gtGroupEntry 5 }
+
+--------------------------------------------------------------------------------
+
+gtAccesslistTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtAccesslistEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtAccesslistTable table contains a list of all accesslists within the 
+		GT01/GN50 rack unit."
+::= { gtUser 3 }
+
+gtAccesslistEntry OBJECT-TYPE
+	SYNTAX GtAccesslistEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtAccesslistEntry table entry represents a accesslist within the 
+		GT01/GN50 rack unit."
+	INDEX {
+		gtModule,
+			gtAccesslistIdx,
+			gtAccesslistParamIdx
+	}
+::= { gtAccesslistTable 1 }
+
+GtAccesslistEntry ::= SEQUENCE {
+	gtAccesslistIdx Unsigned32,
+	gtAccesslistParamIdx Unsigned32,
+	gtAccesslistName DisplayString,
+	gtAccesslistIPRange DisplayString
+}
+
+gtAccesslistIdx OBJECT-TYPE
+	SYNTAX Unsigned32 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtAccesslistIdx entity represents the numeric index of a 
+		accesslist within the GT01/GN50 rack unit."
+::= { gtAccesslistEntry 1 }
+
+gtAccesslistParamIdx OBJECT-TYPE
+	SYNTAX Unsigned32 
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtAccesslistParamIdx entity represents the numeric index of a 
+		accesslist parameter within the GT01/GN50 rack unit."
+::= { gtAccesslistEntry 2 }
+
+gtAccesslistName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..255))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtAccesslistName entity represents the accesslist  
+		name within the GT01/GN50 rack unit."
+::= { gtAccesslistEntry 3 }
+
+gtAccesslistIPRange OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..255))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtAccesslistIPRange entity represents the accesslist IP range
+		within the GT01/GN50 rack unit."
+::= { gtAccesslistEntry 4 }
+
+--------------------------------------------------------------------------------
+
+gtCurrentUserName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..255))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtUserName entity represents the current user  
+		name within the GT01/GN50 rack unit."
+::= { gtUser 4 }
+
+--------------------------------------------------------------------------------
+
+gtCurrentUserPassword OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (1..255))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtUserPassword entity can be used to set
+		the password for the current user within the GT01/GN50 rack unit."
+::= { gtUser 5 }
+
+--------------------------------------------------------------------------------
+
+gtUserAuthTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtUserAuthEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUserAuthTable controls whether or not user authentication
+		will be used on the modules within the GT01/GN50 rack unit."
+::= { gtUser 6 }
+
+gtUserAuthEntry OBJECT-TYPE
+	SYNTAX GtUserAuthEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUserAuthEntry table entry controls whether or not user
+		authentication will be used on a module within the GT01/GN50
+		rack unit."
+	INDEX {
+		gtModule
+	}
+::= { gtUserAuthTable 1 }
+
+GtUserAuthEntry ::= SEQUENCE {
+	gtUserAuthEnabled INTEGER
+}
+
+gtUserAuthEnabled OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtUserAuthEnabled entity allows you to control whether or
+		not authentication will be used on a module within the
+		GT01/GN50 rack unit. If it is disabled a user does not have to
+		give a username/password in order to access data."
+::= { gtUserAuthEntry 1 }
+
+--============================================================================--
+--============================================================================--
+
+
+gtServicesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtServicesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtServicesTable table contains a list of 
+		services settings within the GT01/GN50 rack unit."
+::= { gtServices 1 }
+
+gtServicesEntry OBJECT-TYPE
+	SYNTAX GtServicesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtServicesEntry table entry represents a
+		SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule
+	}
+::= { gtServicesTable 1 }
+
+GtServicesEntry ::= SEQUENCE {
+	gtWebEnable INTEGER,
+	gtWebAuth INTEGER,
+	gtWebProtocol INTEGER
+}
+
+gtWebEnable OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtWebAuth represents the user interface state
+		within the GT01/GN50 rack unit."
+::= { gtServicesEntry 1 }
+
+gtWebAuth OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtWebAuth represents the user interface authentication 
+		within the GT01/GN50 rack unit."
+::= { gtServicesEntry 2 }
+
+gtWebProtocol OBJECT-TYPE
+	SYNTAX INTEGER { http(0), https(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtWebProtocol represents the user interface protocol 
+		within the GT01/GN50 rack unit."
+::= { gtServicesEntry 3 }
+
+--============================================================================--
+--============================================================================--
+
+gtChassisRedundancy OBJECT-TYPE
+	SYNTAX INTEGER { off(0), on(1) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtChassisRedundancy represents the chassis redundancy  
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModuleBackup 1 }
+
+--------------------------------------------------------------------------------
+
+gtModuleBackupTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtModuleBackupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtModuleBackupTable table contains a list of 
+		backup and redundancy settings within the GT01/GN50 rack unit."
+::= { gtModuleBackup 2 }
+
+gtModuleBackupEntry OBJECT-TYPE
+	SYNTAX GtModuleBackupEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtModuleBackupEntry table entry represents a
+		SFM/MFM module within the GT01/GN50 rack unit."
+	INDEX {
+		gtModule
+	}
+::= { gtModuleBackupTable 1 }
+
+GtModuleBackupEntry ::= SEQUENCE {
+	gtModuleBackupDate DisplayString,
+	gtModuleRedundancyGroup Integer32,
+	gtModuleRedundancyMode INTEGER,
+	gtModuleBackupControl INTEGER,
+	gtModuleBackupStatus INTEGER
+}
+
+gtModuleBackupDate OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (30))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModuleBackupDate entity represents the date of the last backup
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModuleBackupEntry 1 }
+
+gtModuleRedundancyGroup OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtModuleRedundancyGroup entity represents the redundancy group
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModuleBackupEntry 2 }
+
+gtModuleRedundancyMode OBJECT-TYPE
+	SYNTAX INTEGER { none(0), operational(1), backup(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtModuleRedundancyMode entity represents the redundancy mode
+		of a SFM/MFM module within the GT01/GN50 rack unit."
+::= { gtModuleBackupEntry 3 }
+
+gtModuleBackupControl OBJECT-TYPE
+	SYNTAX INTEGER { none(0), backup(1), restore(2), factoryReset(3), downloadBackup(4), uploadBackup(5) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtModuleBackupControl entity allows you to backup, restore
+		or reset the settings of an SFM/MFM module within the GT01/GN50
+		rack unit to factory defaults, or to download or upload its
+		current settings backup file from/to a server using SFTP. This
+		entity is used as a command, reading its value will return the
+		last command run for the given module since the GT01/GN50
+		booted or none(0) if no command has been run since it booted
+		up. The commands are:
+
+		  backup(1) - Create a backup of the module's settings and save
+		  it to the GT01/GN50.
+
+		  restore(2) - Restore a module's settings from the backup that
+		  is stored on the GT01/GN50.
+
+		  factoryReset(3) - Reset all settings on the module to the
+		  factory defaults.
+
+		  downloadBackup(4) - Download a settings backup file from an
+		  SFTP server to the GT01/GN50. The settings from this backup
+		  can then be applied to the module using the restore(2)
+		  command.
+
+		  uploadBackup(5) - Upload a settings backup from the GT01/GN50
+		  to an SFTP server.
+		
+		The downloadBackup(4) and uploadBackup(5) commands use the
+		gtBackupSFTP* settings to down-/upload the module's backup file
+		from/to an SFTP server."
+::= { gtModuleBackupEntry 4 }
+
+gtModuleBackupStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		none(0),
+		commandRunning(1),
+		commandSucceeded(2),
+		commandFailed(3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtModuleBackupStatus entity shows the status of the last
+		operation initiated by gtModuleBackupControl for an SFM/MFM
+		module within the GT01/GN50 rack unit. If no module backup
+		command has been run since the GT01/GN50 booted up, the state
+		will be none(0)."
+::= { gtModuleBackupEntry 5 }
+
+--------------------------------------------------------------------------------
+
+gtBackupControl OBJECT-TYPE
+	SYNTAX INTEGER {
+		downloadPrivateKey(1), 
+		createBackup(2),
+		deletePrivateKey(3)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupControl controls the module backup process.
+		The gtBackupControl can be set to downloadPrivateKey(1) to  
+		download the private key given by gtFilename from the 
+		SFTP server. There can be only one private key file stored
+		at the same time. 
+		The gtBackupControl can be set to createBackup(2) to create a 
+		backup from all modules available in the chassis and upload it to
+		the SFTP server given. The Upload will overwrite the existing 
+		backup file.
+		The gtBackupControl can be set to deletePrivateKey(3) to delete 
+		the stored private key."
+::= { gtModuleBackup 3 }
+
+gtBackupStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		downloading(1), 
+		downloadSuccessful(2), 
+		downloadFailed(3), 
+		createBackups(4), 
+		uploading(5), 
+		uploadSuccessful(6),
+		uploadFailed(7),
+		deletePrivateKeySuccessful(8),
+		deletePrivateKeyFailed(9)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtBackupStatus reports the different stages of the 
+		module backup process."
+::= { gtModuleBackup 4 }
+
+gtBackupPrivateKeyFilename OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupPrivateKeyFilename defines the private key filename 
+		to download from the SFTP server. The download is started 
+		by gtBackupControl."
+::= { gtModuleBackup 5 }
+
+gtBackupSFTPServer OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupSFTPServer defines the SFTP server address,
+		including the URL scheme. So to upload a file to my.server.com,
+		set gtBackupSFTPServer to sftp://my.server.com"
+::= { gtModuleBackup 6 }
+
+gtBackupSFTPPort OBJECT-TYPE
+	SYNTAX Unsigned32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupSFTPPort defines the SFTP server port."
+::= { gtModuleBackup 7 }
+
+gtBackupSFTPUsername OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupSFTPUsername defines the SFTP server username."
+::= { gtModuleBackup 8 }
+
+gtBackupSFTPPassword OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupSFTPPassword defines the SFTP server password. 
+		A SNMP get retrieves always an empty string."
+::= { gtModuleBackup 9 }
+
+gtBackupSFTPHostPublicKeyMD5 OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0|32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupSFTPHostPublicKeyMD5 defines the public key MD5 of the 
+		SFTP server to validate the correctness of the server. 
+		If left empty all servers are valid."
+::= { gtModuleBackup 10 }
+
+gtBackupSFTPFilename OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtBackupSFTPFilename object specifies the name of the
+		remote backup file on the server. This is the name of the file
+		that will be created on the SFTP server by setting
+		gtBackupControl to createBackup(2) - for creating a backup of
+		all the GT01/GN50 rack unit's modules' settings - or by setting
+		gtModuleBackupControl to uploadBackup(5) - to upload the
+		existing backup of a single module's settings from the
+		GT01/GN50. This is also used as the name of the remote file
+		that will be downloaded from the SFTP server by setting
+		gtModuleBackupControl to downloadBackup(4) - to download the
+		backup of a single module's settings to the GT01/GN50.
+
+		The filename should contain the full path of the remote file.
+		If it starts with a slash ('/') it will be interpreted as an
+		absolute path. If it starts with any other character, it will
+		be interpreted as a relative path from the user's home
+		directory on the server."
+::= { gtModuleBackup 11 }
+
+--============================================================================--
+--============================================================================--
+
+gtUpdateControl OBJECT-TYPE
+	SYNTAX INTEGER {
+		downloadFirmware(1), 
+		updateModules(2),
+		updateSwitch(3),
+		deleteAllFirmwareFiles(4),
+		deletePrivateKey(5),
+		updateEntitlements(6)
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtUpdateControl controls the module update process.
+		The gtUpdateControl can be set to the following values:
+		
+		  downloadFirmware(1) - download the firmware, entitlement or
+		  private key file given by gtFirmwareFilename from the SFTP
+		  server. There can be only one firmware per module type stored
+		  at a time, only one entitlement file per module and only one
+		  single private key. If you download a new firmware file for a
+		  type that already exists on the rack unit, the old firmware is
+		  deleted.
+		  Firmware file names must start with the module type, e.g.,
+		  'GT11_firmware_vXX.bin' or 'gt22-firmware.bin'. Entitlement
+		  files must have a file name of 'xxxxxxxxxxxxxxxx.ent', where
+		  xxxxxxxxxxxxxxxx is the serial number of the target module, as
+		  a 16 digit hexadecimal number.  Private key file names must
+		  end in '.ppk'.
+
+		  updateModules(2) - update all modules in the chassis with the
+		  firmware previously downloaded, corresponding to their module
+		  types.
+
+		  updateSwitch(3) - update the GT11 with the firmware downloaded
+		  previously.
+
+		  deleteAllFirmwareFiles(4) - delete all previously stored
+		  firmware and entitlement files.
+
+		  deletePrivateKey(5) - delete the stored private key.
+
+		  updateEntitlements(6) - update all modules and the GT11 using
+		  the entitlement files with their respective IDs that were
+		  previously downloaded."
+::= { gtModuleUpdate 1 }
+
+gtUpdateStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+		downloading(1), 
+		downloadSuccessful(2), 
+		downloadFailed(3), 
+		updating(4), 
+		updateSuccessful(5), 
+		updateFailed(6),
+		deleteAllFirmwareFilesSuccessful(7),
+		deleteAllFirmwareFilesFailed(8),
+		deletePrivateKeySuccessful(9),
+		deletePrivateKeyFailed(10)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtUpdateStatus reports the different stages of the 
+		firmware update."
+::= { gtModuleUpdate 2 }
+
+gtFilename OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtFilename defines the module firmware or private key filename 
+		to download from the SFTP server. The download is started 
+		by gtUpdateControl."
+::= { gtModuleUpdate 3 }
+
+gtSFTPServer OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtSFTPServer defines the SFTP server address."
+::= { gtModuleUpdate 4 }
+
+gtSFTPPort OBJECT-TYPE
+	SYNTAX Unsigned32 (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtSFTPPort defines the SFTP server port."
+::= { gtModuleUpdate 5 }
+
+gtSFTPUsername OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtSFTPUsername defines the SFTP server username."
+::= { gtModuleUpdate 6 }
+
+gtSFTPPassword OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtSFTPPassword defines the SFTP server password. 
+		A SNMP get retrieves always an empty string."
+::= { gtModuleUpdate 7 }
+
+gtSFTPHostPublicKeyMD5 OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0|32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtSFTPHostPublicKeyMD5 defines the public key MD5 of the 
+		SFTP server to validate the correctness of the server. 
+		If left empty all servers are valid."
+::= { gtModuleUpdate 8 }
+
+--------------------------------------------------------------------------------
+
+gtUpdateFilesTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF GtUpdateFilesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUpdateFilesTable table contains a list of all
+		files available for update."
+::= { gtModuleUpdate 9 }
+
+gtUpdateFilesEntry OBJECT-TYPE
+	SYNTAX GtUpdateFilesEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUpdateFilesEntry table entry represents a
+		file available for update."
+	INDEX {
+		gtUpdateFilesTableIdx
+	}
+::= { gtUpdateFilesTable 1 }
+
+GtUpdateFilesEntry ::= SEQUENCE {
+	gtUpdateFilesTableIdx Unsigned32,
+	gtUpdateFile DisplayString
+}
+
+gtUpdateFilesTableIdx OBJECT-TYPE
+	SYNTAX Unsigned32 (1..255)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The gtUpdateFilesTableIdx entity represents the numeric index
+		of the update files."
+::= { gtUpdateFilesEntry 1 }
+
+gtUpdateFile OBJECT-TYPE
+	SYNTAX DisplayString (SIZE (0..32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The gtUpdateFile reports an update file available for update."
+::= { gtUpdateFilesEntry 2 }
+
+
+--============================================================================--
+--============================================================================--
+
+
+
+--============================================================================--
+END
+

@@ -1,0 +1,379 @@
+-- ============================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Resource Monitor MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2017-04-01 created by yanfang.
+-- ============================================================================
+HH3C-RES-MON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM  HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+hh3cResMon MODULE-IDENTITY
+    LAST-UPDATED "201704010000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "Resource monitor information base for managing devices."
+    REVISION
+         "201704010000Z"
+    DESCRIPTION
+        "The first version of this module."
+    ::= { hh3cCommon 169 }
+
+--
+-- Nodes defined
+--
+hh3cResMonScalarObjects OBJECT IDENTIFIER ::= { hh3cResMon 1 }
+
+hh3cResMonMinorResendEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The switch for enabling or disabling retransmission of
+        minor resource depletion alarms."
+    ::= { hh3cResMonScalarObjects 1 }
+
+hh3cResMonOutputEnable OBJECT-TYPE
+    SYNTAX BITS
+    {
+        syslog(0),
+        snmpNotification(1),
+        netconfEvent(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Destinations for resource depletion alarms,
+        including syslog, SNMP notification, and NETCONF event."
+    ::= { hh3cResMonScalarObjects 2 }
+
+hh3cResMonTables OBJECT IDENTIFIER ::= { hh3cResMon 2 }
+
+--
+-- Node of hh3cResMonConfigTable
+--
+hh3cResMonConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cResMonConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for resource monitoring configuration."
+    ::= { hh3cResMonTables 1 }
+
+hh3cResMonConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cResMonConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry of hh3cResMonConfigTable."
+    INDEX
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName
+    }
+    ::= { hh3cResMonConfigTable 1 }
+
+Hh3cResMonConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cResMonChassisIndex                 Unsigned32,
+        hh3cResMonSlotIndex                    Unsigned32,
+        hh3cResMonCpuIndex                     Unsigned32,
+        hh3cResMonResourceName                 OCTET STRING,
+        hh3cResMonThresholdUnit                INTEGER,
+        hh3cResMonMinorThreshold               Unsigned32,
+        hh3cResMonSevereThreshold              Unsigned32
+    }
+
+hh3cResMonChassisIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Member ID of the member device where the entity resides."
+    ::= { hh3cResMonConfigEntry 1 }
+
+hh3cResMonSlotIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Slot number of the device node."
+    ::= { hh3cResMonConfigEntry 2 }
+
+hh3cResMonCpuIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU ID."
+    ::= { hh3cResMonConfigEntry 3 }
+
+hh3cResMonResourceName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(1..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Resource name."
+    ::= { hh3cResMonConfigEntry 4 }
+
+hh3cResMonThresholdUnit OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        absolute(1),
+        percentage(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Unit for resource depletion thresholds."
+    ::= { hh3cResMonConfigEntry 5 }
+
+hh3cResMonMinorThreshold OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Minor resource depletion threshold."
+    ::= { hh3cResMonConfigEntry 6 }
+
+hh3cResMonSevereThreshold OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Severe resource depletion threshold."
+    ::= { hh3cResMonConfigEntry 7 }
+
+--
+-- Node of hh3cResMonInfoTable
+--
+hh3cResMonInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cResMonInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for resource monitoring information."
+    ::= { hh3cResMonTables 2 }
+
+hh3cResMonInfoEntry OBJECT-TYPE
+    SYNTAX Hh3cResMonInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry of hh3cResMonInfoEntry."
+    INDEX
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName
+    }
+    ::= { hh3cResMonInfoTable 1 }
+
+    Hh3cResMonInfoEntry ::=
+    SEQUENCE
+    {
+        hh3cResMonUnit              INTEGER,
+        hh3cResMonCurrent           Unsigned32,
+        hh3cResMonFree              Unsigned32,
+        hh3cResMonTotal             Unsigned32
+    }
+
+hh3cResMonUnit OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        absolute(1),
+        percentage(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unit for resource information."
+    ::= { hh3cResMonInfoEntry 1 }
+
+hh3cResMonCurrent OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amount of the used resource."
+    ::= { hh3cResMonInfoEntry 2 }
+
+hh3cResMonFree OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Amount of the free resource."
+    ::= { hh3cResMonInfoEntry 3 }
+
+hh3cResMonTotal OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total size of resource."
+    ::= { hh3cResMonInfoEntry 4 }
+
+--
+-- Nodes of hh3cResMonNotification
+--
+hh3cResMonNotification OBJECT IDENTIFIER ::= { hh3cResMon 3 }
+
+hh3cResMonTrapPrefix OBJECT IDENTIFIER ::= { hh3cResMonNotification 0 }
+
+hh3cResMonMinorNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName,
+        hh3cResMonThresholdUnit,
+        hh3cResMonMinorThreshold,
+        hh3cResMonSevereThreshold,
+        hh3cResMonCurrent,
+        hh3cResMonFree,
+        hh3cResMonTotal,
+        hh3cResMonAdditionalInfo
+    }
+    STATUS current
+    DESCRIPTION
+        "The notification indicates that the amount of the free resource
+        decreased to or below the hhcResMonMinorThreshold"
+    ::= { hh3cResMonTrapPrefix 1 }
+
+hh3cResMonMinorRecoverNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName,
+        hh3cResMonThresholdUnit,
+        hh3cResMonMinorThreshold,
+        hh3cResMonSevereThreshold,
+        hh3cResMonCurrent,
+        hh3cResMonFree,
+        hh3cResMonTotal,
+        hh3cResMonAdditionalInfo
+    }
+    STATUS current
+    DESCRIPTION
+        "The notification indicates that the amount of the free resource
+        increased to or above the hhcResMonMinorThreshold."
+    ::= { hh3cResMonTrapPrefix 2 }
+
+hh3cResMonSevereNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName,
+        hh3cResMonThresholdUnit,
+        hh3cResMonMinorThreshold,
+        hh3cResMonSevereThreshold,
+        hh3cResMonCurrent,
+        hh3cResMonFree,
+        hh3cResMonTotal,
+        hh3cResMonAdditionalInfo
+    }
+    STATUS current
+    DESCRIPTION
+        "The notification indicates that the amount of the free resource
+        decreased to or below the hhcResMonSevereThreshold."
+    ::= { hh3cResMonTrapPrefix 3 }
+
+hh3cResMonSevereRecoverNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName,
+        hh3cResMonThresholdUnit,
+        hh3cResMonMinorThreshold,
+        hh3cResMonSevereThreshold,
+        hh3cResMonCurrent,
+        hh3cResMonFree,
+        hh3cResMonTotal,
+        hh3cResMonAdditionalInfo
+    }
+    STATUS current
+    DESCRIPTION
+        "The notification indicates that the amount of the free resource
+        increased to or above hhcResMonSevereThreshold."
+    ::= { hh3cResMonTrapPrefix 4 }
+
+hh3cResMonUsedUpNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName,
+        hh3cResMonThresholdUnit,
+        hh3cResMonMinorThreshold,
+        hh3cResMonSevereThreshold,
+        hh3cResMonCurrent,
+        hh3cResMonFree,
+        hh3cResMonTotal,
+        hh3cResMonAdditionalInfo
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification indicates that the resource is used up."
+    ::= { hh3cResMonTrapPrefix 5 }
+
+hh3cResMonUsedUpRecoverNotification NOTIFICATION-TYPE
+    OBJECTS
+    {
+        hh3cResMonChassisIndex,
+        hh3cResMonSlotIndex,
+        hh3cResMonCpuIndex,
+        hh3cResMonResourceName,
+        hh3cResMonThresholdUnit,
+        hh3cResMonMinorThreshold,
+        hh3cResMonSevereThreshold,
+        hh3cResMonCurrent,
+        hh3cResMonFree,
+        hh3cResMonTotal,
+        hh3cResMonAdditionalInfo
+    }
+    STATUS current
+    DESCRIPTION
+        "This notification indicates that the free resource increases from zero up."
+    ::= { hh3cResMonTrapPrefix 6 }
+
+hh3cResMonTrapInfor OBJECT IDENTIFIER ::= { hh3cResMonNotification 1 }
+
+hh3cResMonAdditionalInfo OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Additional information for a notification."
+    ::= { hh3cResMonTrapInfor 1 }
+
+END

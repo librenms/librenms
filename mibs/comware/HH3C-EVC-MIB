@@ -1,0 +1,585 @@
+-- =============================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Ethernet Virtual Connection MIB
+-- Reference:
+-- Version: V1.4
+-- History:
+--   V1.0 2009-08-08 Initial version Created by Jianyong Song
+--   V1.1 2011-12-23 Updated by Xuanli Mou
+--      Added hh3cEvcSrvInstEnableInStat in hh3cEvcSrvInstTable.
+--      Added hh3cEvcSrvInstEnableOutStat in hh3cEvcSrvInstTable.
+--      Added hh3cEvcSrvInstCarTable.
+--      Added hh3cEvcSrvInstStatInfoTable.
+--   V1.2 2012-11-21 Updated by Neng Yan
+--      portbased is replaced by default.
+--   V1.3 2014-01-03 Updated by Neng Yan
+--      Added hh3cEvcSrvInstCvlanIdListLow, hh3cEvcSrvInstCvlanIdListHigh
+--          in hh3cEvcSrvInstTable.
+--      Added encapSvlanIdCvlanId(6),
+--          encapSvlanIdCvlanIdList(7),
+--          encapCvlanId(8),
+--          encapCvlanIdList(9) for hh3cEvcSrvInstEncapCapabilities.
+--      Added svlanIdCvlanId(6),
+--          svlanIdCvlanIdList(7),
+--          svlanIdCvlanIdAll(8),
+--          cvlanIdList(9) for hh3cEvcSrvInstEncap.
+--   V1.4 2019-06-03 Updated by Dimin Zhang
+--      Added hh3cEvcSrvInstInRewriteType, hh3cEvcSrvInstInRewriteSvlanId,
+--          hh3cEvcSrvInstInRewriteCvlanId, hh3cEvcSrvInstInRewriteSymm,
+--          hh3cEvcSrvInstOutRewriteType, hh3cEvcSrvInstOutRewriteSvlanId,
+--          hh3cEvcSrvInstOutRewriteCvlanId in hh3cEvcSrvInstTable.
+-- =============================================================================
+HH3C-EVC-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        RowStatus,
+        TruthValue,
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Counter64
+    FROM SNMPv2-SMI
+        ifIndex
+    FROM IF-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cEvc MODULE-IDENTITY
+    LAST-UPDATED
+        "200908081000Z"        -- Aug 08, 2009 at 10:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "Ethernet Virtual Connection MIB"
+    REVISION
+        "200908081000Z"   -- Aug 08, 2009 at 10:00 GMT
+    DESCRIPTION
+        "The initial version of this MIB."
+    ::= { hh3cCommon 106 }
+
+-- =============================================================================
+-- Textual Conventions
+-- =============================================================================
+Hh3cEvcSrvInstRewriteType ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION
+       "A value that represents a type of VLAN tag processing rule for traffic.
+
+        none            Invalid value.
+
+        nestSvlan       Adds an outer VLAN tag.
+
+        nestCvlan       Adds an inner VLAN tag.
+
+        nestSvlanCvlan  Adds an outer VLAN tag and an inner VLAN tag.
+
+        stripSvlan      Removes an outer VLAN tag.
+
+        stripCvlan      Removes an inner VLAN tag.
+
+        stripSvlanCvlan Removes an outer VLAN tag and an inner VLAN tag.
+
+        remark1To1      Replaces one VLAN tag of packets with the specified VLAN tag
+                        (1-to-1 mapping).
+
+        remark1To2      Replaces the VLAN tag of single tagged packets with the
+                        specified outer and inner VLAN tags (1-to-2 mapping).
+
+        remark2To1      Replaces the outer and inner VLAN tags of double tagged
+                        packets with the specified VLAN tag (2-to-1 mapping).
+
+        remark2To2      Replaces the outer and inner VLAN tags of double tagged
+                        packets with the specified outer and inner VLAN tags
+                        (2-to-2 mapping)."
+   SYNTAX   INTEGER {
+                none(0),
+                nestSvlan(1),
+                nestCvlan(2),
+                nestSvlanCvlan(3),
+                stripSvlan(4),
+                stripCvlan(5),
+                stripSvlanCvlan(6),
+                remark1To1(7),
+                remark1To2(8),
+                remark2To1(9),
+                remark2To2(10)
+             }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+
+hh3cEvcObjects      OBJECT IDENTIFIER ::= { hh3cEvc 1 }
+
+hh3cEvcScalarGroup OBJECT IDENTIFIER ::= { hh3cEvcObjects 1 }
+
+hh3cEvcSrvInstEncapCapabilities    OBJECT-TYPE
+    SYNTAX      BITS
+    {
+        encapDefault(0),
+        encapUntagged(1),
+        encapTagged(2),
+        encapSvlanId(3),
+        encapSvlanIdList(4),
+        encapSvlanIdOnlyTagged(5),
+        encapSvlanIdCvlanId(6),
+        encapSvlanIdCvlanIdList(7),
+        encapCvlanId(8),
+        encapCvlanIdList(9)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object displays the encapsulation capabilities of service
+         instance with respect to certain fields.  The following values may be
+         supported:
+         encapDefault:       Support for matching packets by the default
+                             criteria which matches packets that do not match
+                             any other service instance.
+         encapUntagged:      Support for matching untagged packets.
+         encapTagged:        Support for matching all tagged packets.
+         encapSvlanId:       Support for matching packets by an SVLAN ID, and
+                             the packets may be untagged if PVID of the port is
+                             the SVLAN ID when the encapSvlanIdOnlyTagged field
+                             is not set.
+         encapSvlanIdList:   Support for matching packets by SVLAN ID list, and
+                             the packets may be untagged if PVID of the port is
+                             in SVLAN ID list when the encapSvlanIdOnlyTagged
+                             field is not set.
+         encapSvlanIdOnlyTagged:   Support for matching only tagged packets
+                                   by an SVLAN ID or a SVLAN ID list.
+         encapSvlanIdCvlanId:      Support for matching packets by an SVLAN ID
+                                   and a CVLAN ID.
+         encapSvlanIdCvlanIdList:  Support for matching packets by an SVLAN ID
+                                   and a CVLAN ID list.
+         encapCvlanId:       Support for matching packets by a CVLAN ID.
+         encapCvlanIdList:   Support for matching packets by a CVLAN ID list."
+    ::= { hh3cEvcScalarGroup 1 }
+
+hh3cEvcPortMaxSrvInstNum    OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The max service instance number of a port."
+    ::= { hh3cEvcScalarGroup 2 }
+
+-- =============================================================================
+-- hh3cEvcSrvInstTable Definition
+-- =============================================================================
+hh3cEvcSrvInstTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEvcSrvInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring service instance parameter of the port."
+    ::= { hh3cEvcObjects 2 }
+
+hh3cEvcSrvInstEntry  OBJECT-TYPE
+    SYNTAX      Hh3cEvcSrvInstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring service instance parameter of the port."
+    INDEX
+    {
+        ifIndex,
+        hh3cEvcSrvInstId
+    }
+    ::= { hh3cEvcSrvInstTable 1 }
+
+Hh3cEvcSrvInstEntry ::=
+    SEQUENCE
+    {
+        hh3cEvcSrvInstId                 Integer32,
+        hh3cEvcSrvInstEncap              INTEGER,
+        hh3cEvcSrvInstSvlanIdListLow     OCTET STRING,
+        hh3cEvcSrvInstSvlanIdListHigh    OCTET STRING,
+        hh3cEvcSrvInstRowStatus          RowStatus,
+        hh3cEvcSrvInstEnableInStat       TruthValue,
+        hh3cEvcSrvInstEnableOutStat      TruthValue,
+        hh3cEvcSrvInstCvlanIdListLow     OCTET STRING,
+        hh3cEvcSrvInstCvlanIdListHigh    OCTET STRING,
+        hh3cEvcSrvInstInRewriteType      Hh3cEvcSrvInstRewriteType,
+        hh3cEvcSrvInstInRewriteSvlanId   Integer32,
+        hh3cEvcSrvInstInRewriteCvlanId   Integer32,
+        hh3cEvcSrvInstInRewriteSymm      TruthValue,
+        hh3cEvcSrvInstOutRewriteType     Hh3cEvcSrvInstRewriteType,
+        hh3cEvcSrvInstOutRewriteSvlanId  Integer32,
+        hh3cEvcSrvInstOutRewriteCvlanId  Integer32
+    }
+
+hh3cEvcSrvInstId    OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Service instance ID.  Its value ranges from 1 to the value of
+        hh3cEvcPortMaxSrvInstNum."
+    ::= { hh3cEvcSrvInstEntry 1 }
+
+hh3cEvcSrvInstEncap    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        none(0),
+        default(1),
+        untagged(2),
+        tagged(3),
+        svlanIdList(4),
+        svlanIdListOnlyTagged(5),
+        svlanIdCvlanId(6),
+        svlanIdCvlanIdList(7),
+        svlanIdCvlanIdAll(8),
+        cvlanIdList(9)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Encapsulation mode of a service instance.
+        none : Invalid value.
+        default :    Match packets by the default criteria which matches
+                     packets that do not match any other service instance.
+                     It is supported when the encapDefault field of
+                     hh3cEvcCapabilities is set.
+        untagged :   Match untagged packets.  It is supported when the
+                     encapUntagged field of hh3cEvcCapabilities is set.
+        tagged :     Match all tagged packets.  It is supported when the
+                     encapTagged field of hh3cEvcCapabilities is set.
+        svlanIdList: Match packets by SVLAN ID list and untagged packets if
+                     PVID of the port is in SVLAN ID list, the SVLAN ID list is
+                     denoted by hh3cEvcSrvInstSvlanIdListLow and
+                     hh3cEvcSrvInstSvlanIdListHigh.  It is supported when the
+                     encapSvlanId or encapSvlanIdList field of
+                     hh3cEvcCapabilities is set.  Only a VLAN ID is supported
+                     when the encapSvlanId field of hh3cEvcCapabilities is set.
+        svlanIdListOnlyTagged: Match only tagged packets by an SVLAN ID list,
+                               the SVLAN ID is denoted by
+                               hh3cEvcSrvInstSvlanIdListLow and
+                               hh3cEvcSrvInstSvlanIdListLow.  It is
+                               supported when the encapSvlanId (or
+                               encapSvlanIdList) and encapSvlanIdOnlyTagged
+                               fields of hh3cEvcCapabilities are set.  Only a
+                               VLAN ID is supported when the encapSvlanId and
+                               encapSvlanIdOnlyTagged field of
+                               hh3cEvcCapabilities are set.
+        svlanIdCvlanId: Match packets by an SVLAN ID and a CVLAN ID.
+                        The SVLAN ID is denoted by hh3cEvcSrvInstSvlanIdListLow
+                        or hh3cEvcSrvInstSvlanIdListHigh.  The CVLAN ID is
+                        denoted by hh3cEvcSrvInstCvlanIdListLow or
+                        hh3cEvcSrvInstCvlanIdListHigh.  It is supported when
+                        the encapSvlanIdCvlanId field of
+                        hh3cEvcCapabilities is set.
+        svlanIdCvlanIdList: Match packets by an SVLAN ID and a CVLAN ID list.
+                            The SVLAN ID is denoted by
+                            hh3cEvcSrvInstSvlanIdListLow or
+                            hh3cEvcSrvInstSvlanIdListHigh.  The CVLAN ID list is
+                            denoted by hh3cEvcSrvInstCvlanIdListLow and
+                            hh3cEvcSrvInstCvlanIdListHigh.  It is supported when
+                            the encapSvlanIdCvlanIdList field of
+                            hh3cEvcCapabilities is set.
+        svlanIdCvlanIdAll:  Match packets by an SVLAN ID and all CVLAN IDs.
+                         The SVLAN ID is denoted by hh3cEvcSrvInstSvlanIdListLow
+                         or hh3cEvcSrvInstSvlanIdListHigh.  The CVLAN ID
+                         includes all VLAN IDs.  It is supported when the
+                         encapSvlanIdCvlanIdList field of hh3cEvcCapabilities
+                         is set.
+        cvlanIdList:  Match packets by CVLAN ID list.  The CVLAN ID list is
+                      denoted by hh3cEvcSrvInstCvlanIdListLow and
+                      hh3cEvcSrvInstCvlanIdListLow.  It is supported when the
+                      encapCvlanId or encapCvlanIdList field of
+                      hh3cEvcCapabilities is set."
+    ::= { hh3cEvcSrvInstEntry 2 }
+
+hh3cEvcSrvInstSvlanIdListLow OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the first 2048 bits of the 4096-bit vector,
+        indicating which SVLAN IDs are assigned to this service instance.  The
+        lowest order bit of the first octet corresponds to SVLAN 1, while the
+        highest order bit of the last octet corresponds to SVLAN 2048.  A bit
+        that is on (equal to 1) indicates that the corresponding SVLAN ID is
+        assigned to this service instance."
+    ::= { hh3cEvcSrvInstEntry 3 }
+
+hh3cEvcSrvInstSvlanIdListHigh OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the second 2048 bits of the 4096-bit vector,
+        indicating which SVLAN IDs are assigned to this service instance.  The
+        lowest order bit of the first octet corresponds to SVLAN 2049, while
+        the third highest order bit of the last octet corresponds to SVLAN
+        4094.  A bit that is on (equal to 1) indicates that the corresponding
+        SVLAN ID is assigned to this service instance."
+    ::= { hh3cEvcSrvInstEntry 4 }
+
+hh3cEvcSrvInstRowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  When a row in this
+         table is in active state, no objects in that row
+         can be modified by the agent."
+    ::= { hh3cEvcSrvInstEntry 5 }
+
+hh3cEvcSrvInstEnableInStat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object is used to configure inbound statistics function
+        to this service instance."
+    DEFVAL { false }
+    ::= { hh3cEvcSrvInstEntry 6 }
+
+hh3cEvcSrvInstEnableOutStat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object is used to configure outbound statistics function
+        to this service instance."
+    DEFVAL { false }
+    ::= { hh3cEvcSrvInstEntry 7 }
+
+hh3cEvcSrvInstCvlanIdListLow OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the first 2048 bits of the 4096-bit vector,
+        indicating which CVLAN IDs are assigned to this service instance.  The
+        lowest order bit of the first octet corresponds to CVLAN 1, while the
+        highest order bit of the last octet corresponds to CVLAN 2048.  A bit
+        that is on (equal to 1) indicates that the corresponding CVLAN ID is
+        assigned to this service instance."
+    DEFVAL { ''h }
+    ::= { hh3cEvcSrvInstEntry 8 }
+
+hh3cEvcSrvInstCvlanIdListHigh OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..256))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object contains the second 2048 bits of the 4096-bit vector,
+        indicating which CVLAN IDs are assigned to this service instance.  The
+        lowest order bit of the first octet corresponds to CVLAN 2049, while
+        the third highest order bit of the last octet corresponds to CVLAN
+        4094.  A bit that is on (equal to 1) indicates that the corresponding
+        CVLAN ID is assigned to this service instance."
+    DEFVAL { ''h }
+    ::= { hh3cEvcSrvInstEntry 9 }
+
+hh3cEvcSrvInstInRewriteType    OBJECT-TYPE
+    SYNTAX      Hh3cEvcSrvInstRewriteType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag processing rule for incoming traffic."
+    ::= { hh3cEvcSrvInstEntry 10 }
+
+hh3cEvcSrvInstInRewriteSvlanId    OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Outer VLAN tag processing rule for incoming traffic.Its value ranges
+         from 1 to 4094."
+    ::= { hh3cEvcSrvInstEntry 11 }
+
+hh3cEvcSrvInstInRewriteCvlanId    OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Inner VLAN tag processing rule for incoming traffic.Its value ranges
+         from 1 to 4094."
+    ::= { hh3cEvcSrvInstEntry 12 }
+
+hh3cEvcSrvInstInRewriteSymm OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Applies the reverse VLAN tag processing rule to outgoing traffic."
+    DEFVAL { false }
+    ::= { hh3cEvcSrvInstEntry 13 }
+
+hh3cEvcSrvInstOutRewriteType    OBJECT-TYPE
+    SYNTAX      Hh3cEvcSrvInstRewriteType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The VLAN tag processing rule for outgoing traffic."
+    ::= { hh3cEvcSrvInstEntry 14 }
+
+hh3cEvcSrvInstOutRewriteSvlanId    OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Outer VLAN tag processing rule for outgoing traffic.Its value ranges
+         from 1 to 4094."
+    ::= { hh3cEvcSrvInstEntry 15 }
+
+hh3cEvcSrvInstOutRewriteCvlanId    OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Inner VLAN tag processing rule for outgoing traffic.Its value ranges
+         from 1 to 4094."
+    ::= { hh3cEvcSrvInstEntry 16 }
+-- =============================================================================
+-- End of hh3cEvcSrvInstTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cEvcSrvInstCarTable Definition
+-- =============================================================================
+hh3cEvcSrvInstCarTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEvcSrvInstCarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of configuring CAR for the service instance."
+    ::= { hh3cEvcObjects 3 }
+
+hh3cEvcSrvInstCarEntry  OBJECT-TYPE
+    SYNTAX      Hh3cEvcSrvInstCarEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the table containing CAR configuration on
+         the service instance.  If the following entries are not supported
+         by the service instance, or not configured to the service instance,
+         they are zero."
+    INDEX
+    {
+        ifIndex,
+        hh3cEvcSrvInstId
+    }
+    ::= { hh3cEvcSrvInstCarTable 1 }
+
+Hh3cEvcSrvInstCarEntry ::=
+    SEQUENCE
+    {
+        hh3cEvcSrvInstInCarIndex          Integer32,
+        hh3cEvcSrvInstOutCarIndex         Integer32
+    }
+
+hh3cEvcSrvInstInCarIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The object is used to configure inbound CAR function
+        to this service instance.
+        The CAR index is defined in hh3cIfQoSAggregativeCarIndex
+        at HH3C-IFQOS2-MIB.  The default value is 0."
+    ::= { hh3cEvcSrvInstCarEntry 1 }
+
+hh3cEvcSrvInstOutCarIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The object is used to configure outbound CAR function
+        to this service instance.
+        The CAR index is defined in hh3cIfQoSAggregativeCarIndex
+        at HH3C-IFQOS2-MIB.  The default value is 0."
+    ::= { hh3cEvcSrvInstCarEntry 2 }
+-- =============================================================================
+-- End of hh3cEvcSrvInstTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cEvcSrvInstStatInfoTable Definition
+-- =============================================================================
+hh3cEvcSrvInstStatInfoTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cEvcSrvInstStatInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for displaying statistics information of service instance."
+    ::= { hh3cEvcObjects 4 }
+
+hh3cEvcSrvInstStatInfoEntry  OBJECT-TYPE
+    SYNTAX      Hh3cEvcSrvInstStatInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table entry of the service instance.
+         If the statistics function is not supported
+         by the service instance, or not configured to the service instance,
+         following entries will be zero."
+    INDEX
+    {
+        ifIndex,
+        hh3cEvcSrvInstId
+    }
+    ::= { hh3cEvcSrvInstStatInfoTable 1 }
+
+Hh3cEvcSrvInstStatInfoEntry ::=
+    SEQUENCE
+    {
+        hh3cEvcSrvInstInPackets       Counter64,
+        hh3cEvcSrvInstInBytes         Counter64,
+        hh3cEvcSrvInstOutPackets      Counter64,
+        hh3cEvcSrvInstOutBytes        Counter64
+    }
+
+hh3cEvcSrvInstInPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of inbound packets received on this service instance."
+    ::= { hh3cEvcSrvInstStatInfoEntry 1 }
+
+hh3cEvcSrvInstInBytes    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Byte counts of inbound packets received on this service instance."
+    ::= { hh3cEvcSrvInstStatInfoEntry 2 }
+
+hh3cEvcSrvInstOutPackets    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of outbound packets transmitted on this service instance."
+    ::= { hh3cEvcSrvInstStatInfoEntry 3 }
+
+hh3cEvcSrvInstOutBytes    OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Byte counts of outbound packets transmitted on this service instance."
+    ::= { hh3cEvcSrvInstStatInfoEntry 4 }
+-- =============================================================================
+-- End of hh3cEvcSrvInstStatInfoTable Definition
+-- =============================================================================
+
+END

@@ -1,0 +1,74 @@
+-- ===========================================================================
+-- AT-UDLD.MIB, Allied Telesis enterprise MIB: UniDirectional Link Detection (UDLD) protocol
+--
+-- Copyright (c) 2011 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ===========================================================================
+
+    AT-UDLD-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            modules
+                FROM AT-SMI-MIB
+            InterfaceIndex
+                FROM IF-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI;
+
+
+        atUdld MODULE-IDENTITY
+            LAST-UPDATED "201111220000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc."
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB file contains definitions of managed objects for the
+                UDLD module."
+            REVISION "201111220000Z"
+            DESCRIPTION
+                "The definition of OBJECT IDENTIFIER was modified."
+            REVISION "201105150000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
+            ::= { modules 550 }
+
+--
+-- Node definitions
+--
+
+        atUdldTrap OBJECT IDENTIFIER ::= { atUdld 0 }
+
+
+        atUdldPortDisabledTrap NOTIFICATION-TYPE
+            OBJECTS { atUdldIfIndex }
+            STATUS current
+            DESCRIPTION
+                "Generated when UDLD feature disabled an interface when
+                 detecting uni-directional link."
+            ::= { atUdldTrap 1 }
+
+
+        atUdldPortRecoveredTrap NOTIFICATION-TYPE
+            OBJECTS { atUdldIfIndex }
+            STATUS current
+            DESCRIPTION
+                "Generated when an interface recovers from error disable
+                 status when detecting uni-directional link."
+            ::= { atUdldTrap 2 }
+
+        atUdldIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index value of an interface of which the link status
+                 is changed."
+            ::= { atUdld 1 }
+
+    END
+
+--
+-- at-udld.mib
+--

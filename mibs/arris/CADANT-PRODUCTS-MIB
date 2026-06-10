@@ -1,0 +1,81 @@
+CADANT-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, enterprises FROM SNMPv2-SMI;
+
+cadant MODULE-IDENTITY
+    LAST-UPDATED "201406250000Z"    -- June 25, 2014
+    ORGANIZATION "Arris International"
+    CONTACT-INFO "support@arrisi.com"
+
+    DESCRIPTION
+        "The object identifiers of Cadant products."
+
+    REVISION     "201406250000Z"    -- June 25, 2014
+    DESCRIPTION
+       "Added cadLicense."
+    REVISION     "201004060000Z"    -- Apr 6, 2010
+    DESCRIPTION
+       "Added cadCmtsIpVideo."
+    REVISION     "200706040000Z"
+    DESCRIPTION
+       "Added cadTopology."
+    REVISION     "200306300000Z"
+    DESCRIPTION
+       "Added G2 IMS."
+    REVISION     "200212100000Z"
+    DESCRIPTION
+       "Added IKE."
+    REVISION     "200206260000Z"
+    DESCRIPTION
+       "Added AAA support."
+    REVISION     "200205070000Z"
+    DESCRIPTION
+       "Added cadPolicy."
+    REVISION     "200202010000Z"
+    DESCRIPTION
+       "Added c4ccmts."
+    REVISION     "200011180000Z"
+    DESCRIPTION
+       "Initial version. Added c4cmts."
+
+    ::= { enterprises 4998 }
+
+cadObjects  OBJECT IDENTIFIER ::= { cadant 1 }
+cadProducts OBJECT IDENTIFIER ::= { cadant 2 }
+
+--
+-- Feature Trees
+--
+cadCable             OBJECT IDENTIFIER ::= { cadObjects 1 }
+cadSystem            OBJECT IDENTIFIER ::= { cadCable   5 }
+cadNotification      OBJECT IDENTIFIER ::= { cadCable   6 }
+cadEquipment         OBJECT IDENTIFIER ::= { cadCable  10 }
+cadSpectrum          OBJECT IDENTIFIER ::= { cadCable  15 }
+cadLayer2            OBJECT IDENTIFIER ::= { cadCable  20 }
+cadLayer3            OBJECT IDENTIFIER ::= { cadCable  25 }
+cadSubscriber        OBJECT IDENTIFIER ::= { cadCable  30 }
+cadPolicy            OBJECT IDENTIFIER ::= { cadCable  35 }
+cadAuthentication    OBJECT IDENTIFIER ::= { cadCable  40 }
+cadIke               OBJECT IDENTIFIER ::= { cadCable  45 }
+cadSchema            OBJECT IDENTIFIER ::= { cadCable  50 }
+cadCmRemoteQuery     OBJECT IDENTIFIER ::= { cadCable  55 }
+cadExperimental      OBJECT IDENTIFIER ::= { cadCable 100 }
+cadTopology	         OBJECT IDENTIFIER ::= { cadCable 105 }
+cadCmtsIf3           OBJECT IDENTIFIER ::= { cadCable 110 }
+-- 115 has been allocated by CADANT-CMTS-PACKETCABLE-MIB
+cadL2vpn             OBJECT IDENTIFIER ::= { cadCable 120 }
+
+cadCmtsIpVideo       OBJECT IDENTIFIER ::= { cadCable 125 }
+cadMpls              OBJECT IDENTIFIER ::= { cadCable 130 }
+cadLicense           OBJECT IDENTIFIER ::= { cadCable 135 }
+cadNms               OBJECT IDENTIFIER ::= { cadObjects 2 }
+
+--
+-- Cadant Product Object Identifiers
+--
+c4cmts  OBJECT IDENTIFIER ::= { cadProducts 1 } -- Cadant's C4 CMTS
+c4ccmts OBJECT IDENTIFIER ::= { cadProducts 2 } -- Cadant's C4c CMTS
+g2ims   OBJECT IDENTIFIER ::= { cadProducts 3 } -- Cadant's G2 IMS
+
+END

@@ -1,0 +1,27 @@
+-- ****************************************************************************
+-- *
+-- *
+-- * File Status: ADOPTED  JULY 11, 2010
+-- *  
+-- * This MIB provides the root object identifier for the
+-- * Pacific Broadband Networks (PBN) as an enterprise,
+-- * as assigned by the Internet Assigned Numbers Authority (IANA).
+-- *
+-- *
+-- ****************************************************************************
+
+PBN-ROOT DEFINITIONS ::= BEGIN
+
+IMPORTS
+     enterprises
+          FROM RFC1155-SMI
+;
+
+pbn  OBJECT IDENTIFIER ::= { enterprises 11606 }
+
+-- DESCRIPTION
+--     "pbn defines the main root of the PBN Enterprises MIB tree. "
+
+
+END
+

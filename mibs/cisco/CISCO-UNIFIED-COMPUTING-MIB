@@ -1,0 +1,2313 @@
+-- ********************************************************************
+-- CISCO-UNIFIED-COMPUTING-MIB.my
+-- 
+-- Cisco Unified Computing System MIB Module
+-- 
+-- Copyright (c) 2005-2010 Cisco Systems, Inc. All rights reserved.
+-- ********************************************************************
+
+CISCO-UNIFIED-COMPUTING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        Unsigned32,
+        Counter32,
+        OBJECT-TYPE,
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        SnmpAdminString
+                FROM SNMP-FRAMEWORK-MIB
+        RowPointer,                
+        DateAndTime,
+        TEXTUAL-CONVENTION
+                FROM SNMPv2-TC
+        ciscoMgmt
+                FROM CISCO-SMI;
+
+ciscoUnifiedComputingMIB MODULE-IDENTITY
+        LAST-UPDATED  "201005200000Z" 
+        ORGANIZATION  "Cisco"
+        CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 West Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: ucs-snmp@cisco.com"
+      DESCRIPTION
+         "This MIB module defines the managed objects for
+         Unified Computing System (UCS) Manager.
+                
+         Cisco UCS Manager provides centralized management
+         capabilities, creates a unified management domain, and
+         serves as the central nervous system of the Cisco Unified
+         Computing System.
+         
+         UCS configuration is comprised of operational and
+         administrative settings. The data is organized hierarchically
+         in a tree structure, starts from the top (root) and contains
+         children and parent nodes. Each node in the tree is a managed
+         object and each object in the UCS has a unique Distinguished
+         Name (DN) that describes the object and its place in the tree.
+         Every managed object is also identified through a
+         CucsManagedObjectId of type integer.
+         
+         Managed objects are abstractions of real world resources,
+         they represent the physical and logical components of the UCS,
+         for example, switch, chassis, blades, and so on. Properties on
+         the Managed Objects (MO) are characterized as configurations
+         and operations.
+         Configuration Policies are the majority of the policies in the
+         system and are used to describe configurations of different
+         components of the UCS. Policies determine how the system
+         behaves under specific circumstances. Certain MOs are not
+         created by users, but are automatically created by the UCS,
+         power supply objects and fan objects are examples of
+         automatically created MOs.
+         "
+      REVISION "201005200000Z" 
+      DESCRIPTION
+         "Initial version of this MIB module."
+  ::= { ciscoMgmt 719 }
+
+-- *********************************************************************
+-- Textual Conventions
+-- *********************************************************************
+
+CucsManagedObjectId ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "d"
+        STATUS current
+        DESCRIPTION
+            "A unique identifier for this managed object.
+            Objects in UCS Manager are stored in a Management
+            Information Tree (MIT). The MIT is a repository of all
+            Managed Object (MO) instances, indexed by their
+            Distinguished Name (DN).
+            The MIT somewhat resembles a file structure - going from
+            main folder to the next lowest folder, and so on, until
+            the full path to a MO is established.
+            
+            Every object in UCS Manager has two unique identifiers:
+            1) A distinguished name (DN). A DN provides a
+            fully-qualified path from the top of the object tree.
+            It is built as an ordered sequence of relative names
+            separated by the '/' character.
+            The DN is used to identify objects in the XML API.
+            
+            2) A CucsManagedObjectId, which is an integer uniquely
+            identifying an object. 
+            The CucsManagedObjectId is used to identify objects and
+            traverse tables when using the SNMP protocol. 
+            
+            For example, an object representing a network adaptor
+            on a blade might be identified with its DN set
+            to 'sys/chassis-5/blade-2/adaptor-1' and its
+            CucsManagedObjectId set to '13203'."
+        SYNTAX         Unsigned32
+
+CucsManagedObjectDn ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "An immutable property of all Managed Objects (MO) that
+            provides a fully qualified and unambiguous name for the MO.
+            A DN provides a fully-qualified path from the top of the
+            object tree.
+            It is built as an ordered sequence of relative names
+            separated by the '/' character.
+            
+            For example, an object representing a network adaptor
+            on a blade might be identified with its DN set
+            to 'sys/chassis-5/blade-2/adaptor-1'.
+            "
+        SYNTAX         OCTET STRING
+
+-- Faults per Managed Object:
+-- The information below is organized as follows:
+-- MO Name
+    -- List of DNs under which the MO can be instantiated in the MIT
+        -- List of faults that can be instantiated for this MO
+
+-- capability:Catalogue
+    -- capabilities
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncBladeAGLocal
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncBladeAGRemote
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncHostagentAGLocal
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncHostagentAGRemote
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncNicAGLocal
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncNicAGRemote
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncPortAGLocal
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:SyncPortAGRemote
+        -- fsmStFailCapabilityCatalogueDeployCatalogue:finalize
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncBladeAGLocal
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncBladeAGRemote
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncHostagentAGLocal
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncHostagentAGRemote
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncNicAGLocal
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncNicAGRemote
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncPortAGLocal
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:SyncPortAGRemote
+        -- fsmRmtErrCapabilityCatalogueDeployCatalogue:finalize
+        -- fsmFailCapabilityCatalogueDeployCatalogue
+
+-- macpool:Pool
+    -- org-[name]/mac-pool-[name]
+        -- fltMacpoolPoolEmpty
+
+-- ippool:Pool
+    -- org-[name]/ip-pool-[name]
+        -- fltIppoolPoolEmpty
+
+-- sw:FcSanBorder
+    -- sys/switch-[id]/border-fc
+        -- fsmStFailSwFcSanBorderDeploy:UpdateConnectivity
+        -- fsmRmtErrSwFcSanBorderDeploy:UpdateConnectivity
+        -- fsmFailSwFcSanBorderDeploy
+
+-- sysdebug:LogControlEp
+    -- sys/sysdebug/logcontrol
+        -- fsmStFailSysdebugLogControlEpLogControlPersist:Local
+        -- fsmStFailSysdebugLogControlEpLogControlPersist:Peer
+        -- fsmRmtErrSysdebugLogControlEpLogControlPersist:Local
+        -- fsmRmtErrSysdebugLogControlEpLogControlPersist:Peer
+        -- fsmFailSysdebugLogControlEpLogControlPersist
+
+-- storage:RaidBattery
+    -- sys/chassis-[id]/blade-[slotId]/board/storage-[type]-[id]/raid-battery
+        -- fltStorageRaidBatteryInoperable
+
+-- ls:Server
+    -- org-[name]/tier-[name]/ls-[name]
+    -- org-[name]/ls-[name]
+        -- fltLsServerFailed
+        -- fltLsServerDiscoveryFailed
+        -- fltLsServerConfigFailure
+        -- fltLsServerMaintenanceFailed
+        -- fltLsServerRemoved
+        -- fltLsServerInaccessible
+        -- fltLsServerAssociationFailed
+        -- fltLsServerUnassociated
+        -- fltLsServerServer-unfulfilled
+
+-- firmware:Downloader
+    -- sys/fw-catalogue/dnld-[fileName]
+        -- fsmStFailFirmwareDownloaderDownload:CopyRemote
+        -- fsmStFailFirmwareDownloaderDownload:DeleteLocal
+        -- fsmStFailFirmwareDownloaderDownload:Local
+        -- fsmStFailFirmwareDownloaderDownload:UnpackLocal
+        -- fsmRmtErrFirmwareDownloaderDownload:CopyRemote
+        -- fsmRmtErrFirmwareDownloaderDownload:DeleteLocal
+        -- fsmRmtErrFirmwareDownloaderDownload:Local
+        -- fsmRmtErrFirmwareDownloaderDownload:UnpackLocal
+        -- fsmFailFirmwareDownloaderDownload
+
+-- pki:Ep
+    -- sys/pki-ext
+        -- fsmStFailPkiEpUpdateEp:SetKeyRingLocal
+        -- fsmStFailPkiEpUpdateEp:SetKeyRingPeer
+        -- fsmRmtErrPkiEpUpdateEp:SetKeyRingLocal
+        -- fsmRmtErrPkiEpUpdateEp:SetKeyRingPeer
+        -- fsmFailPkiEpUpdateEp
+
+-- firmware:Updatable
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/mgmt/fw-updatable
+    -- sys/chassis-[id]/blade-[slotId]/mgmt/fw-updatable
+    -- sys/chassis-[id]/blade-[slotId]/boardController/mgmt/fw-updatable
+    -- sys/chassis-[id]/slot-[id]/mgmt/fw-updatable
+    -- sys/switch-[id]/mgmt/fw-updatable
+    -- sys/mgmt/fw-updatable
+        -- fltFirmwareUpdatableImageUnusable
+
+-- adaptor:ExtIf
+        -- fltAdaptorExtIfLink-down
+
+-- synthetic:FsObj
+    -- sys/file-[name]
+        -- fsmStFailSyntheticFsObjCreate:createLocal
+        -- fsmStFailSyntheticFsObjCreate:createRemote
+        -- fsmRmtErrSyntheticFsObjCreate:createLocal
+        -- fsmRmtErrSyntheticFsObjCreate:createRemote
+        -- fsmFailSyntheticFsObjCreate
+
+-- fcpool:Initiators
+    -- org-[name]/wwn-pool-[name]
+        -- fltFcpoolInitiatorsEmpty
+
+-- adaptor:HostIf
+        -- fltAdaptorHostIfLink-down
+
+-- fabric:LanCloud
+    -- fabric/lan
+        -- fsmStFailFabricLanCloudSwitchMode:SwConfigLocal
+        -- fsmStFailFabricLanCloudSwitchMode:SwConfigPeer
+        -- fsmRmtErrFabricLanCloudSwitchMode:SwConfigLocal
+        -- fsmRmtErrFabricLanCloudSwitchMode:SwConfigPeer
+        -- fsmFailFabricLanCloudSwitchMode
+
+-- storage:Item
+    -- sys/switch-[id]/stor-part-[name]
+        -- fltStorageItemCapacityExceeded
+        -- fltStorageItemCapacityWarning
+
+-- port:PIo
+    -- sys/chassis-[id]/slot-[id]/[type]/port-[portId]
+    -- sys/switch-[id]/slot-[id]/[type]/port-[portId]
+        -- fltPortPIoLink-down
+        -- fltPortPIoFailed
+        -- fltPortPIoHardware-failure
+        -- fltPortPIoSfp-not-present
+
+-- firmware:Image
+    -- sys/fw-catalogue/image-[name]
+        -- fsmStFailFirmwareImageDelete:Local
+        -- fsmStFailFirmwareImageDelete:Remote
+        -- fsmRmtErrFirmwareImageDelete:Local
+        -- fsmRmtErrFirmwareImageDelete:Remote
+        -- fsmFailFirmwareImageDelete
+
+-- processor:Unit
+    -- sys/chassis-[id]/blade-[slotId]/board/cpu-[id]
+        -- fltProcessorUnitInoperable
+        -- fltProcessorUnitThermalNonCritical
+        -- fltProcessorUnitThermalThresholdCritical
+        -- fltProcessorUnitThermalThresholdNonRecoverable
+        -- fltProcessorUnitVoltageThresholdNonCritical
+        -- fltProcessorUnitVoltageThresholdCritical
+        -- fltProcessorUnitVoltageThresholdNonRecoverable
+
+-- adaptor:HostFcIf
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-fc-[id]
+        -- fsmStFailAdaptorHostFcIfResetFcPersBinding:Execute
+        -- fsmStFailAdaptorHostFcIfCircuitReset:DisableA
+        -- fsmStFailAdaptorHostFcIfCircuitReset:DisableB
+        -- fsmStFailAdaptorHostFcIfCircuitReset:EnableA
+        -- fsmStFailAdaptorHostFcIfCircuitReset:EnableB
+        -- fsmRmtErrAdaptorHostFcIfResetFcPersBinding:Execute
+        -- fsmRmtErrAdaptorHostFcIfCircuitReset:DisableA
+        -- fsmRmtErrAdaptorHostFcIfCircuitReset:DisableB
+        -- fsmRmtErrAdaptorHostFcIfCircuitReset:EnableA
+        -- fsmRmtErrAdaptorHostFcIfCircuitReset:EnableB
+        -- fsmFailAdaptorHostFcIfResetFcPersBinding
+        -- fsmFailAdaptorHostFcIfCircuitReset
+
+-- compute:Blade
+    -- sys/chassis-[id]/blade-[slotId]
+        -- fltComputeBladeInsufficientlyEquipped
+        -- fltComputeBladeIdentityUnestablishable
+        -- fltComputeBladePowerProblem
+        -- fltComputeBladeThermalProblem
+        -- fltComputeBladeBiosPostTimeout
+        -- fltComputeBladeDiscoveryFailed
+        -- fltComputeBladeAssociationFailed
+        -- fltComputeBladeInoperable
+        -- fltComputeBladeUnassignedMissing
+        -- fltComputeBladeAssignedMissing
+        -- fltComputeBladeUnidentified
+        -- fltComputeBladeUnassignedInaccessible
+        -- fltComputeBladeAssignedInaccessible
+        -- fltComputeBladePost-failure
+        -- fsmStFailComputeBladeDiscover:BiosPostCompletion
+        -- fsmStFailComputeBladeDiscover:BladeBootPnuos
+        -- fsmStFailComputeBladeDiscover:BladeBootWait
+        -- fsmStFailComputeBladeDiscover:BladePowerOn
+        -- fsmStFailComputeBladeDiscover:BladeReadBiosSettings
+        -- fsmStFailComputeBladeDiscover:BladeReadSmbios
+        -- fsmStFailComputeBladeDiscover:BmcInventory
+        -- fsmStFailComputeBladeDiscover:BmcPresence
+        -- fsmStFailComputeBladeDiscover:BmcShutdownDiscovered
+        -- fsmStFailComputeBladeDiscover:ConfigFeLocal
+        -- fsmStFailComputeBladeDiscover:ConfigFePeer
+        -- fsmStFailComputeBladeDiscover:ConfigUserAccess
+        -- fsmStFailComputeBladeDiscover:HandlePooling
+        -- fsmStFailComputeBladeDiscover:NicConfigPnuOS
+        -- fsmStFailComputeBladeDiscover:NicInventory
+        -- fsmStFailComputeBladeDiscover:NicPresence
+        -- fsmStFailComputeBladeDiscover:NicUnconfigPnuOS
+        -- fsmStFailComputeBladeDiscover:PnuOSIdent
+        -- fsmStFailComputeBladeDiscover:PnuOSInventory
+        -- fsmStFailComputeBladeDiscover:PnuOSPolicy
+        -- fsmStFailComputeBladeDiscover:PnuOSScrub
+        -- fsmStFailComputeBladeDiscover:PnuOSSelfTest
+        -- fsmStFailComputeBladeDiscover:PreSanitize
+        -- fsmStFailComputeBladeDiscover:Sanitize
+        -- fsmStFailComputeBladeDiscover:SetupVmediaLocal
+        -- fsmStFailComputeBladeDiscover:SetupVmediaPeer
+        -- fsmStFailComputeBladeDiscover:SwConfigPnuOSLocal
+        -- fsmStFailComputeBladeDiscover:SwConfigPnuOSPeer
+        -- fsmStFailComputeBladeDiscover:SwUnconfigPnuOSLocal
+        -- fsmStFailComputeBladeDiscover:SwUnconfigPnuOSPeer
+        -- fsmStFailComputeBladeDiscover:TeardownVmediaLocal
+        -- fsmStFailComputeBladeDiscover:TeardownVmediaPeer
+        -- fsmStFailComputeBladeDiscover:hagConnect
+        -- fsmStFailComputeBladeDiscover:hagDisconnect
+        -- fsmStFailComputeBladeAssociate:BiosImgUpdate
+        -- fsmStFailComputeBladeAssociate:BiosPostCompletion
+        -- fsmStFailComputeBladeAssociate:BladeBootHost
+        -- fsmStFailComputeBladeAssociate:BladeBootPnuos
+        -- fsmStFailComputeBladeAssociate:BladeBootWait
+        -- fsmStFailComputeBladeAssociate:BladePowerOff
+        -- fsmStFailComputeBladeAssociate:BladePowerOn
+        -- fsmStFailComputeBladeAssociate:ConfigSoL
+        -- fsmStFailComputeBladeAssociate:ConfigUserAccess
+        -- fsmStFailComputeBladeAssociate:ConfigUuid
+        -- fsmStFailComputeBladeAssociate:HbaImgUpdate
+        -- fsmStFailComputeBladeAssociate:HostOSConfig
+        -- fsmStFailComputeBladeAssociate:HostOSIdent
+        -- fsmStFailComputeBladeAssociate:HostOSPolicy
+        -- fsmStFailComputeBladeAssociate:HostOSValidate
+        -- fsmStFailComputeBladeAssociate:NicConfigHostOS
+        -- fsmStFailComputeBladeAssociate:NicConfigPnuOS
+        -- fsmStFailComputeBladeAssociate:NicImgUpdate
+        -- fsmStFailComputeBladeAssociate:NicUnconfigPnuOS
+        -- fsmStFailComputeBladeAssociate:PnuOSConfig
+        -- fsmStFailComputeBladeAssociate:PnuOSIdent
+        -- fsmStFailComputeBladeAssociate:PnuOSInventory
+        -- fsmStFailComputeBladeAssociate:PnuOSLocalDiskConfig
+        -- fsmStFailComputeBladeAssociate:PnuOSPolicy
+        -- fsmStFailComputeBladeAssociate:PnuOSSelfTest
+        -- fsmStFailComputeBladeAssociate:PnuOSUnloadDrivers
+        -- fsmStFailComputeBladeAssociate:PnuOSValidate
+        -- fsmStFailComputeBladeAssociate:PollBoardCtrlUpdateStatus
+        -- fsmStFailComputeBladeAssociate:PreSanitize
+        -- fsmStFailComputeBladeAssociate:PrepareForBoot
+        -- fsmStFailComputeBladeAssociate:Sanitize
+        -- fsmStFailComputeBladeAssociate:StorageCtlrImgUpdate
+        -- fsmStFailComputeBladeAssociate:SwConfigHostOSLocal
+        -- fsmStFailComputeBladeAssociate:SwConfigHostOSPeer
+        -- fsmStFailComputeBladeAssociate:SwConfigPnuOSLocal
+        -- fsmStFailComputeBladeAssociate:SwConfigPnuOSPeer
+        -- fsmStFailComputeBladeAssociate:SwUnconfigPnuOSLocal
+        -- fsmStFailComputeBladeAssociate:SwUnconfigPnuOSPeer
+        -- fsmStFailComputeBladeAssociate:UpdateBoardCtrlRequest
+        -- fsmStFailComputeBladeAssociate:activateAdaptorNwFw
+        -- fsmStFailComputeBladeAssociate:activateIBMCFw
+        -- fsmStFailComputeBladeAssociate:hagHostOSConnect
+        -- fsmStFailComputeBladeAssociate:hagPnuOSConnect
+        -- fsmStFailComputeBladeAssociate:hagPnuOSDisconnect
+        -- fsmStFailComputeBladeAssociate:resetIBMC
+        -- fsmStFailComputeBladeAssociate:updateAdaptorNwFw
+        -- fsmStFailComputeBladeAssociate:updateIBMCFw
+        -- fsmStFailComputeBladeAssociate:waitForAdaptorNwFwUpdate
+        -- fsmStFailComputeBladeAssociate:waitForIBMCFwUpdate
+        -- fsmStFailComputeBladeDisassociate:BiosPostCompletion
+        -- fsmStFailComputeBladeDisassociate:BladeBootPnuos
+        -- fsmStFailComputeBladeDisassociate:BladeBootWait
+        -- fsmStFailComputeBladeDisassociate:BladePowerOn
+        -- fsmStFailComputeBladeDisassociate:BladeShutdown
+        -- fsmStFailComputeBladeDisassociate:ConfigBios
+        -- fsmStFailComputeBladeDisassociate:ConfigUserAccess
+        -- fsmStFailComputeBladeDisassociate:HandlePooling
+        -- fsmStFailComputeBladeDisassociate:NicConfigPnuOS
+        -- fsmStFailComputeBladeDisassociate:NicUnconfigHostOS
+        -- fsmStFailComputeBladeDisassociate:NicUnconfigPnuOS
+        -- fsmStFailComputeBladeDisassociate:PnuOSIdent
+        -- fsmStFailComputeBladeDisassociate:PnuOSPolicy
+        -- fsmStFailComputeBladeDisassociate:PnuOSScrub
+        -- fsmStFailComputeBladeDisassociate:PnuOSSelfTest
+        -- fsmStFailComputeBladeDisassociate:PnuOSUnconfig
+        -- fsmStFailComputeBladeDisassociate:PnuOSValidate
+        -- fsmStFailComputeBladeDisassociate:PreSanitize
+        -- fsmStFailComputeBladeDisassociate:Sanitize
+        -- fsmStFailComputeBladeDisassociate:SwConfigPnuOSLocal
+        -- fsmStFailComputeBladeDisassociate:SwConfigPnuOSPeer
+        -- fsmStFailComputeBladeDisassociate:SwUnconfigHostOSLocal
+        -- fsmStFailComputeBladeDisassociate:SwUnconfigHostOSPeer
+        -- fsmStFailComputeBladeDisassociate:SwUnconfigPnuOSLocal
+        -- fsmStFailComputeBladeDisassociate:SwUnconfigPnuOSPeer
+        -- fsmStFailComputeBladeDisassociate:UnconfigBios
+        -- fsmStFailComputeBladeDisassociate:UnconfigSoL
+        -- fsmStFailComputeBladeDisassociate:UnconfigUuid
+        -- fsmStFailComputeBladeDisassociate:hagPnuOSConnect
+        -- fsmStFailComputeBladeDisassociate:hagPnuOSDisconnect
+        -- fsmStFailComputeBladeDecommission:Execute
+        -- fsmStFailComputeBladeSoftShutdown:Execute
+        -- fsmStFailComputeBladeHardShutdown:Execute
+        -- fsmStFailComputeBladeTurnup:Execute
+        -- fsmStFailComputeBladeHardreset:Execute
+        -- fsmStFailComputeBladeHardreset:PreSanitize
+        -- fsmStFailComputeBladeHardreset:Sanitize
+        -- fsmStFailComputeBladeSoftreset:Execute
+        -- fsmStFailComputeBladeSoftreset:PreSanitize
+        -- fsmStFailComputeBladeSoftreset:Sanitize
+        -- fsmStFailComputeBladeSwConnUpd:A
+        -- fsmStFailComputeBladeSwConnUpd:B
+        -- fsmStFailComputeBladeBiosRecovery:Cleanup
+        -- fsmStFailComputeBladeBiosRecovery:PreSanitize
+        -- fsmStFailComputeBladeBiosRecovery:Reset
+        -- fsmStFailComputeBladeBiosRecovery:Sanitize
+        -- fsmStFailComputeBladeBiosRecovery:SetupVmediaLocal
+        -- fsmStFailComputeBladeBiosRecovery:SetupVmediaPeer
+        -- fsmStFailComputeBladeBiosRecovery:Shutdown
+        -- fsmStFailComputeBladeBiosRecovery:Start
+        -- fsmStFailComputeBladeBiosRecovery:TeardownVmediaLocal
+        -- fsmStFailComputeBladeBiosRecovery:TeardownVmediaPeer
+        -- fsmStFailComputeBladeBiosRecovery:Wait
+        -- fsmStFailComputeBladeCmosReset:BladePowerOn
+        -- fsmStFailComputeBladeCmosReset:Execute
+        -- fsmStFailComputeBladeCmosReset:PreSanitize
+        -- fsmStFailComputeBladeCmosReset:ReconfigBios
+        -- fsmStFailComputeBladeCmosReset:ReconfigUuid
+        -- fsmStFailComputeBladeCmosReset:Sanitize
+        -- fsmStFailComputeBladeDiag:BiosPostCompletion
+        -- fsmStFailComputeBladeDiag:BladeBoot
+        -- fsmStFailComputeBladeDiag:BladeBootWait
+        -- fsmStFailComputeBladeDiag:BladePowerOn
+        -- fsmStFailComputeBladeDiag:BladeReadBiosSettings
+        -- fsmStFailComputeBladeDiag:BladeReadSmbios
+        -- fsmStFailComputeBladeDiag:BmcInventory
+        -- fsmStFailComputeBladeDiag:BmcPresence
+        -- fsmStFailComputeBladeDiag:BmcShutdownDiagCompleted
+        -- fsmStFailComputeBladeDiag:ConfigFeLocal
+        -- fsmStFailComputeBladeDiag:ConfigFePeer
+        -- fsmStFailComputeBladeDiag:ConfigSol
+        -- fsmStFailComputeBladeDiag:ConfigUserAccess
+        -- fsmStFailComputeBladeDiag:DebugWait
+        -- fsmStFailComputeBladeDiag:DeriveConfig
+        -- fsmStFailComputeBladeDiag:DisableServerConnSwA
+        -- fsmStFailComputeBladeDiag:DisableServerConnSwB
+        -- fsmStFailComputeBladeDiag:EnableServerConnSwA
+        -- fsmStFailComputeBladeDiag:EnableServerConnSwB
+        -- fsmStFailComputeBladeDiag:EvaluateStatus
+        -- fsmStFailComputeBladeDiag:FabricATrafficTestStatus
+        -- fsmStFailComputeBladeDiag:FabricBTrafficTestStatus
+        -- fsmStFailComputeBladeDiag:GenerateLogWait
+        -- fsmStFailComputeBladeDiag:GenerateReport
+        -- fsmStFailComputeBladeDiag:HostConnect
+        -- fsmStFailComputeBladeDiag:HostDisconnect
+        -- fsmStFailComputeBladeDiag:HostIdent
+        -- fsmStFailComputeBladeDiag:HostInventory
+        -- fsmStFailComputeBladeDiag:HostPolicy
+        -- fsmStFailComputeBladeDiag:HostServerDiag
+        -- fsmStFailComputeBladeDiag:HostServerDiagStatus
+        -- fsmStFailComputeBladeDiag:NicConfig
+        -- fsmStFailComputeBladeDiag:NicInventory
+        -- fsmStFailComputeBladeDiag:NicPresence
+        -- fsmStFailComputeBladeDiag:NicUnconfig
+        -- fsmStFailComputeBladeDiag:PollMemoryTestStatus
+        -- fsmStFailComputeBladeDiag:RemoveConfig
+        -- fsmStFailComputeBladeDiag:RemoveVMediaLocal
+        -- fsmStFailComputeBladeDiag:RemoveVMediaPeer
+        -- fsmStFailComputeBladeDiag:RestoreConfigFeLocal
+        -- fsmStFailComputeBladeDiag:RestoreConfigFePeer
+        -- fsmStFailComputeBladeDiag:SetDiagUser
+        -- fsmStFailComputeBladeDiag:SetupVMediaLocal
+        -- fsmStFailComputeBladeDiag:SetupVMediaPeer
+        -- fsmStFailComputeBladeDiag:StartFabricATrafficTest
+        -- fsmStFailComputeBladeDiag:StartFabricBTrafficTest
+        -- fsmStFailComputeBladeDiag:StartMemoryTestStatus
+        -- fsmStFailComputeBladeDiag:StopVMediaLocal
+        -- fsmStFailComputeBladeDiag:StopVMediaPeer
+        -- fsmStFailComputeBladeDiag:SwConfigLocal
+        -- fsmStFailComputeBladeDiag:SwConfigPeer
+        -- fsmStFailComputeBladeDiag:SwUnconfigLocal
+        -- fsmStFailComputeBladeDiag:SwUnconfigPeer
+        -- fsmStFailComputeBladeDiag:UnconfigSol
+        -- fsmStFailComputeBladeDiag:UnconfigUserAccess
+        -- fsmStFailComputeBladeUpdateExtUsers:Deploy
+        -- fsmStFailComputeBladeUpdateAdaptor:BladePowerOff
+        -- fsmStFailComputeBladeUpdateAdaptor:BladePowerOn
+        -- fsmStFailComputeBladeUpdateAdaptor:PollUpdateStatus
+        -- fsmStFailComputeBladeUpdateAdaptor:UpdateRequest
+        -- fsmStFailComputeBladeActivateAdaptor:Activate
+        -- fsmStFailComputeBladeActivateAdaptor:BladePowerOn
+        -- fsmStFailComputeBladeActivateAdaptor:Reset
+        -- fsmStFailComputeBladeConfigSoL:Execute
+        -- fsmStFailComputeBladeUnconfigSoL:Execute
+        -- fsmStFailComputeBladeResetBmc:Execute
+        -- fsmStFailComputeBladePowercycle:Execute
+        -- fsmStFailComputeBladePowercycle:PreSanitize
+        -- fsmStFailComputeBladePowercycle:Sanitize
+        -- fsmStFailComputeBladePowerCap:Config
+        -- fsmStFailComputeBladeBiosProfile:Configure
+        -- fsmStFailComputeBladeUpdateBoardController:BladePowerOff
+        -- fsmStFailComputeBladeUpdateBoardController:BladePowerOn
+        -- fsmStFailComputeBladeUpdateBoardController:PollUpdateStatus
+        -- fsmStFailComputeBladeUpdateBoardController:PrepareForUpdate
+        -- fsmStFailComputeBladeUpdateBoardController:UpdateRequest
+        -- fsmRmtErrComputeBladeDiscover:BiosPostCompletion
+        -- fsmRmtErrComputeBladeDiscover:BladeBootPnuos
+        -- fsmRmtErrComputeBladeDiscover:BladeBootWait
+        -- fsmRmtErrComputeBladeDiscover:BladePowerOn
+        -- fsmRmtErrComputeBladeDiscover:BladeReadBiosSettings
+        -- fsmRmtErrComputeBladeDiscover:BladeReadSmbios
+        -- fsmRmtErrComputeBladeDiscover:BmcInventory
+        -- fsmRmtErrComputeBladeDiscover:BmcPresence
+        -- fsmRmtErrComputeBladeDiscover:BmcShutdownDiscovered
+        -- fsmRmtErrComputeBladeDiscover:ConfigFeLocal
+        -- fsmRmtErrComputeBladeDiscover:ConfigFePeer
+        -- fsmRmtErrComputeBladeDiscover:ConfigUserAccess
+        -- fsmRmtErrComputeBladeDiscover:HandlePooling
+        -- fsmRmtErrComputeBladeDiscover:NicConfigPnuOS
+        -- fsmRmtErrComputeBladeDiscover:NicInventory
+        -- fsmRmtErrComputeBladeDiscover:NicPresence
+        -- fsmRmtErrComputeBladeDiscover:NicUnconfigPnuOS
+        -- fsmRmtErrComputeBladeDiscover:PnuOSIdent
+        -- fsmRmtErrComputeBladeDiscover:PnuOSInventory
+        -- fsmRmtErrComputeBladeDiscover:PnuOSPolicy
+        -- fsmRmtErrComputeBladeDiscover:PnuOSScrub
+        -- fsmRmtErrComputeBladeDiscover:PnuOSSelfTest
+        -- fsmRmtErrComputeBladeDiscover:PreSanitize
+        -- fsmRmtErrComputeBladeDiscover:Sanitize
+        -- fsmRmtErrComputeBladeDiscover:SetupVmediaLocal
+        -- fsmRmtErrComputeBladeDiscover:SetupVmediaPeer
+        -- fsmRmtErrComputeBladeDiscover:SwConfigPnuOSLocal
+        -- fsmRmtErrComputeBladeDiscover:SwConfigPnuOSPeer
+        -- fsmRmtErrComputeBladeDiscover:SwUnconfigPnuOSLocal
+        -- fsmRmtErrComputeBladeDiscover:SwUnconfigPnuOSPeer
+        -- fsmRmtErrComputeBladeDiscover:TeardownVmediaLocal
+        -- fsmRmtErrComputeBladeDiscover:TeardownVmediaPeer
+        -- fsmRmtErrComputeBladeDiscover:hagConnect
+        -- fsmRmtErrComputeBladeDiscover:hagDisconnect
+        -- fsmRmtErrComputeBladeAssociate:BiosImgUpdate
+        -- fsmRmtErrComputeBladeAssociate:BiosPostCompletion
+        -- fsmRmtErrComputeBladeAssociate:BladeBootHost
+        -- fsmRmtErrComputeBladeAssociate:BladeBootPnuos
+        -- fsmRmtErrComputeBladeAssociate:BladeBootWait
+        -- fsmRmtErrComputeBladeAssociate:BladePowerOff
+        -- fsmRmtErrComputeBladeAssociate:BladePowerOn
+        -- fsmRmtErrComputeBladeAssociate:ConfigSoL
+        -- fsmRmtErrComputeBladeAssociate:ConfigUserAccess
+        -- fsmRmtErrComputeBladeAssociate:ConfigUuid
+        -- fsmRmtErrComputeBladeAssociate:HbaImgUpdate
+        -- fsmRmtErrComputeBladeAssociate:HostOSConfig
+        -- fsmRmtErrComputeBladeAssociate:HostOSIdent
+        -- fsmRmtErrComputeBladeAssociate:HostOSPolicy
+        -- fsmRmtErrComputeBladeAssociate:HostOSValidate
+        -- fsmRmtErrComputeBladeAssociate:NicConfigHostOS
+        -- fsmRmtErrComputeBladeAssociate:NicConfigPnuOS
+        -- fsmRmtErrComputeBladeAssociate:NicImgUpdate
+        -- fsmRmtErrComputeBladeAssociate:NicUnconfigPnuOS
+        -- fsmRmtErrComputeBladeAssociate:PnuOSConfig
+        -- fsmRmtErrComputeBladeAssociate:PnuOSIdent
+        -- fsmRmtErrComputeBladeAssociate:PnuOSInventory
+        -- fsmRmtErrComputeBladeAssociate:PnuOSLocalDiskConfig
+        -- fsmRmtErrComputeBladeAssociate:PnuOSPolicy
+        -- fsmRmtErrComputeBladeAssociate:PnuOSSelfTest
+        -- fsmRmtErrComputeBladeAssociate:PnuOSUnloadDrivers
+        -- fsmRmtErrComputeBladeAssociate:PnuOSValidate
+        -- fsmRmtErrComputeBladeAssociate:PollBoardCtrlUpdateStatus
+        -- fsmRmtErrComputeBladeAssociate:PreSanitize
+        -- fsmRmtErrComputeBladeAssociate:PrepareForBoot
+        -- fsmRmtErrComputeBladeAssociate:Sanitize
+        -- fsmRmtErrComputeBladeAssociate:StorageCtlrImgUpdate
+        -- fsmRmtErrComputeBladeAssociate:SwConfigHostOSLocal
+        -- fsmRmtErrComputeBladeAssociate:SwConfigHostOSPeer
+        -- fsmRmtErrComputeBladeAssociate:SwConfigPnuOSLocal
+        -- fsmRmtErrComputeBladeAssociate:SwConfigPnuOSPeer
+        -- fsmRmtErrComputeBladeAssociate:SwUnconfigPnuOSLocal
+        -- fsmRmtErrComputeBladeAssociate:SwUnconfigPnuOSPeer
+        -- fsmRmtErrComputeBladeAssociate:UpdateBoardCtrlRequest
+        -- fsmRmtErrComputeBladeAssociate:activateAdaptorNwFw
+        -- fsmRmtErrComputeBladeAssociate:activateIBMCFw
+        -- fsmRmtErrComputeBladeAssociate:hagHostOSConnect
+        -- fsmRmtErrComputeBladeAssociate:hagPnuOSConnect
+        -- fsmRmtErrComputeBladeAssociate:hagPnuOSDisconnect
+        -- fsmRmtErrComputeBladeAssociate:resetIBMC
+        -- fsmRmtErrComputeBladeAssociate:updateAdaptorNwFw
+        -- fsmRmtErrComputeBladeAssociate:updateIBMCFw
+        -- fsmRmtErrComputeBladeAssociate:waitForAdaptorNwFwUpdate
+        -- fsmRmtErrComputeBladeAssociate:waitForIBMCFwUpdate
+        -- fsmRmtErrComputeBladeDisassociate:BiosPostCompletion
+        -- fsmRmtErrComputeBladeDisassociate:BladeBootPnuos
+        -- fsmRmtErrComputeBladeDisassociate:BladeBootWait
+        -- fsmRmtErrComputeBladeDisassociate:BladePowerOn
+        -- fsmRmtErrComputeBladeDisassociate:BladeShutdown
+        -- fsmRmtErrComputeBladeDisassociate:ConfigBios
+        -- fsmRmtErrComputeBladeDisassociate:ConfigUserAccess
+        -- fsmRmtErrComputeBladeDisassociate:HandlePooling
+        -- fsmRmtErrComputeBladeDisassociate:NicConfigPnuOS
+        -- fsmRmtErrComputeBladeDisassociate:NicUnconfigHostOS
+        -- fsmRmtErrComputeBladeDisassociate:NicUnconfigPnuOS
+        -- fsmRmtErrComputeBladeDisassociate:PnuOSIdent
+        -- fsmRmtErrComputeBladeDisassociate:PnuOSPolicy
+        -- fsmRmtErrComputeBladeDisassociate:PnuOSScrub
+        -- fsmRmtErrComputeBladeDisassociate:PnuOSSelfTest
+        -- fsmRmtErrComputeBladeDisassociate:PnuOSUnconfig
+        -- fsmRmtErrComputeBladeDisassociate:PnuOSValidate
+        -- fsmRmtErrComputeBladeDisassociate:PreSanitize
+        -- fsmRmtErrComputeBladeDisassociate:Sanitize
+        -- fsmRmtErrComputeBladeDisassociate:SwConfigPnuOSLocal
+        -- fsmRmtErrComputeBladeDisassociate:SwConfigPnuOSPeer
+        -- fsmRmtErrComputeBladeDisassociate:SwUnconfigHostOSLocal
+        -- fsmRmtErrComputeBladeDisassociate:SwUnconfigHostOSPeer
+        -- fsmRmtErrComputeBladeDisassociate:SwUnconfigPnuOSLocal
+        -- fsmRmtErrComputeBladeDisassociate:SwUnconfigPnuOSPeer
+        -- fsmRmtErrComputeBladeDisassociate:UnconfigBios
+        -- fsmRmtErrComputeBladeDisassociate:UnconfigSoL
+        -- fsmRmtErrComputeBladeDisassociate:UnconfigUuid
+        -- fsmRmtErrComputeBladeDisassociate:hagPnuOSConnect
+        -- fsmRmtErrComputeBladeDisassociate:hagPnuOSDisconnect
+        -- fsmRmtErrComputeBladeDecommission:Execute
+        -- fsmRmtErrComputeBladeSoftShutdown:Execute
+        -- fsmRmtErrComputeBladeHardShutdown:Execute
+        -- fsmRmtErrComputeBladeTurnup:Execute
+        -- fsmRmtErrComputeBladeHardreset:Execute
+        -- fsmRmtErrComputeBladeHardreset:PreSanitize
+        -- fsmRmtErrComputeBladeHardreset:Sanitize
+        -- fsmRmtErrComputeBladeSoftreset:Execute
+        -- fsmRmtErrComputeBladeSoftreset:PreSanitize
+        -- fsmRmtErrComputeBladeSoftreset:Sanitize
+        -- fsmRmtErrComputeBladeSwConnUpd:A
+        -- fsmRmtErrComputeBladeSwConnUpd:B
+        -- fsmRmtErrComputeBladeBiosRecovery:Cleanup
+        -- fsmRmtErrComputeBladeBiosRecovery:PreSanitize
+        -- fsmRmtErrComputeBladeBiosRecovery:Reset
+        -- fsmRmtErrComputeBladeBiosRecovery:Sanitize
+        -- fsmRmtErrComputeBladeBiosRecovery:SetupVmediaLocal
+        -- fsmRmtErrComputeBladeBiosRecovery:SetupVmediaPeer
+        -- fsmRmtErrComputeBladeBiosRecovery:Shutdown
+        -- fsmRmtErrComputeBladeBiosRecovery:Start
+        -- fsmRmtErrComputeBladeBiosRecovery:TeardownVmediaLocal
+        -- fsmRmtErrComputeBladeBiosRecovery:TeardownVmediaPeer
+        -- fsmRmtErrComputeBladeBiosRecovery:Wait
+        -- fsmRmtErrComputeBladeCmosReset:BladePowerOn
+        -- fsmRmtErrComputeBladeCmosReset:Execute
+        -- fsmRmtErrComputeBladeCmosReset:PreSanitize
+        -- fsmRmtErrComputeBladeCmosReset:ReconfigBios
+        -- fsmRmtErrComputeBladeCmosReset:ReconfigUuid
+        -- fsmRmtErrComputeBladeCmosReset:Sanitize
+        -- fsmRmtErrComputeBladeDiag:BiosPostCompletion
+        -- fsmRmtErrComputeBladeDiag:BladeBoot
+        -- fsmRmtErrComputeBladeDiag:BladeBootWait
+        -- fsmRmtErrComputeBladeDiag:BladePowerOn
+        -- fsmRmtErrComputeBladeDiag:BladeReadBiosSettings
+        -- fsmRmtErrComputeBladeDiag:BladeReadSmbios
+        -- fsmRmtErrComputeBladeDiag:BmcInventory
+        -- fsmRmtErrComputeBladeDiag:BmcPresence
+        -- fsmRmtErrComputeBladeDiag:BmcShutdownDiagCompleted
+        -- fsmRmtErrComputeBladeDiag:ConfigFeLocal
+        -- fsmRmtErrComputeBladeDiag:ConfigFePeer
+        -- fsmRmtErrComputeBladeDiag:ConfigSol
+        -- fsmRmtErrComputeBladeDiag:ConfigUserAccess
+        -- fsmRmtErrComputeBladeDiag:DebugWait
+        -- fsmRmtErrComputeBladeDiag:DeriveConfig
+        -- fsmRmtErrComputeBladeDiag:DisableServerConnSwA
+        -- fsmRmtErrComputeBladeDiag:DisableServerConnSwB
+        -- fsmRmtErrComputeBladeDiag:EnableServerConnSwA
+        -- fsmRmtErrComputeBladeDiag:EnableServerConnSwB
+        -- fsmRmtErrComputeBladeDiag:EvaluateStatus
+        -- fsmRmtErrComputeBladeDiag:FabricATrafficTestStatus
+        -- fsmRmtErrComputeBladeDiag:FabricBTrafficTestStatus
+        -- fsmRmtErrComputeBladeDiag:GenerateLogWait
+        -- fsmRmtErrComputeBladeDiag:GenerateReport
+        -- fsmRmtErrComputeBladeDiag:HostConnect
+        -- fsmRmtErrComputeBladeDiag:HostDisconnect
+        -- fsmRmtErrComputeBladeDiag:HostIdent
+        -- fsmRmtErrComputeBladeDiag:HostInventory
+        -- fsmRmtErrComputeBladeDiag:HostPolicy
+        -- fsmRmtErrComputeBladeDiag:HostServerDiag
+        -- fsmRmtErrComputeBladeDiag:HostServerDiagStatus
+        -- fsmRmtErrComputeBladeDiag:NicConfig
+        -- fsmRmtErrComputeBladeDiag:NicInventory
+        -- fsmRmtErrComputeBladeDiag:NicPresence
+        -- fsmRmtErrComputeBladeDiag:NicUnconfig
+        -- fsmRmtErrComputeBladeDiag:PollMemoryTestStatus
+        -- fsmRmtErrComputeBladeDiag:RemoveConfig
+        -- fsmRmtErrComputeBladeDiag:RemoveVMediaLocal
+        -- fsmRmtErrComputeBladeDiag:RemoveVMediaPeer
+        -- fsmRmtErrComputeBladeDiag:RestoreConfigFeLocal
+        -- fsmRmtErrComputeBladeDiag:RestoreConfigFePeer
+        -- fsmRmtErrComputeBladeDiag:SetDiagUser
+        -- fsmRmtErrComputeBladeDiag:SetupVMediaLocal
+        -- fsmRmtErrComputeBladeDiag:SetupVMediaPeer
+        -- fsmRmtErrComputeBladeDiag:StartFabricATrafficTest
+        -- fsmRmtErrComputeBladeDiag:StartFabricBTrafficTest
+        -- fsmRmtErrComputeBladeDiag:StartMemoryTestStatus
+        -- fsmRmtErrComputeBladeDiag:StopVMediaLocal
+        -- fsmRmtErrComputeBladeDiag:StopVMediaPeer
+        -- fsmRmtErrComputeBladeDiag:SwConfigLocal
+        -- fsmRmtErrComputeBladeDiag:SwConfigPeer
+        -- fsmRmtErrComputeBladeDiag:SwUnconfigLocal
+        -- fsmRmtErrComputeBladeDiag:SwUnconfigPeer
+        -- fsmRmtErrComputeBladeDiag:UnconfigSol
+        -- fsmRmtErrComputeBladeDiag:UnconfigUserAccess
+        -- fsmRmtErrComputeBladeUpdateExtUsers:Deploy
+        -- fsmRmtErrComputeBladeUpdateAdaptor:BladePowerOff
+        -- fsmRmtErrComputeBladeUpdateAdaptor:BladePowerOn
+        -- fsmRmtErrComputeBladeUpdateAdaptor:PollUpdateStatus
+        -- fsmRmtErrComputeBladeUpdateAdaptor:UpdateRequest
+        -- fsmRmtErrComputeBladeActivateAdaptor:Activate
+        -- fsmRmtErrComputeBladeActivateAdaptor:BladePowerOn
+        -- fsmRmtErrComputeBladeActivateAdaptor:Reset
+        -- fsmRmtErrComputeBladeConfigSoL:Execute
+        -- fsmRmtErrComputeBladeUnconfigSoL:Execute
+        -- fsmRmtErrComputeBladeResetBmc:Execute
+        -- fsmRmtErrComputeBladePowercycle:Execute
+        -- fsmRmtErrComputeBladePowercycle:PreSanitize
+        -- fsmRmtErrComputeBladePowercycle:Sanitize
+        -- fsmRmtErrComputeBladePowerCap:Config
+        -- fsmRmtErrComputeBladeBiosProfile:Configure
+        -- fsmRmtErrComputeBladeUpdateBoardController:BladePowerOff
+        -- fsmRmtErrComputeBladeUpdateBoardController:BladePowerOn
+        -- fsmRmtErrComputeBladeUpdateBoardController:PollUpdateStatus
+        -- fsmRmtErrComputeBladeUpdateBoardController:PrepareForUpdate
+        -- fsmRmtErrComputeBladeUpdateBoardController:UpdateRequest
+        -- fsmFailComputeBladeDiscover
+        -- fsmFailComputeBladeAssociate
+        -- fsmFailComputeBladeDisassociate
+        -- fsmFailComputeBladeDecommission
+        -- fsmFailComputeBladeSoftShutdown
+        -- fsmFailComputeBladeHardShutdown
+        -- fsmFailComputeBladeTurnup
+        -- fsmFailComputeBladeHardreset
+        -- fsmFailComputeBladeSoftreset
+        -- fsmFailComputeBladeSwConnUpd
+        -- fsmFailComputeBladeBiosRecovery
+        -- fsmFailComputeBladeCmosReset
+        -- fsmFailComputeBladeDiag
+        -- fsmFailComputeBladeUpdateExtUsers
+        -- fsmFailComputeBladeUpdateAdaptor
+        -- fsmFailComputeBladeActivateAdaptor
+        -- fsmFailComputeBladeConfigSoL
+        -- fsmFailComputeBladeUnconfigSoL
+        -- fsmFailComputeBladeResetBmc
+        -- fsmFailComputeBladePowercycle
+        -- fsmFailComputeBladePowerCap
+        -- fsmFailComputeBladeBiosProfile
+        -- fsmFailComputeBladeUpdateBoardController
+
+-- extvmm:SwitchDelTask
+    -- sys/extvm-mgmt/vsw-deltask-[swIntId]
+        -- fsmStFailExtvmmSwitchDelTaskRemoveProvider:RemoveLocal
+        -- fsmRmtErrExtvmmSwitchDelTaskRemoveProvider:RemoveLocal
+        -- fsmFailExtvmmSwitchDelTaskRemoveProvider
+
+-- sw:UtilityDomain
+    -- sys/switch-[id]/utility-eth
+        -- fsmStFailSwUtilityDomainDeploy:UpdateConnectivity
+        -- fsmRmtErrSwUtilityDomainDeploy:UpdateConnectivity
+        -- fsmFailSwUtilityDomainDeploy
+
+-- extvmm:MasterExtKey
+    -- sys/extvm-mgmt/ext-key
+        -- fsmStFailExtvmmMasterExtKeyConfig:SetLocal
+        -- fsmStFailExtvmmMasterExtKeyConfig:SetPeer
+        -- fsmRmtErrExtvmmMasterExtKeyConfig:SetLocal
+        -- fsmRmtErrExtvmmMasterExtKeyConfig:SetPeer
+        -- fsmFailExtvmmMasterExtKeyConfig
+
+-- dcx:VIf
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-eth-[id]/fcoe/vif-[id]
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-fc-[id]/fcoe/vif-[id]
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-eth-[id]/vif-[id]
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-fc-[id]/vif-[id]
+        -- fltDcxVIfLinkState
+
+-- adaptor:Unit
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]
+        -- fltAdaptorUnitUnidentifiable-fru
+        -- fltAdaptorUnitMissing
+        -- fltAdaptorUnitAdaptorReachability
+
+-- adaptor:HostEthIf
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-eth-[id]
+        -- fsmStFailAdaptorHostEthIfCircuitReset:DisableA
+        -- fsmStFailAdaptorHostEthIfCircuitReset:DisableB
+        -- fsmStFailAdaptorHostEthIfCircuitReset:EnableA
+        -- fsmStFailAdaptorHostEthIfCircuitReset:EnableB
+        -- fsmRmtErrAdaptorHostEthIfCircuitReset:DisableA
+        -- fsmRmtErrAdaptorHostEthIfCircuitReset:DisableB
+        -- fsmRmtErrAdaptorHostEthIfCircuitReset:EnableA
+        -- fsmRmtErrAdaptorHostEthIfCircuitReset:EnableB
+        -- fsmFailAdaptorHostEthIfCircuitReset
+
+-- sysdebug:MEpLog
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/mgmt/log-[type]-[id]
+    -- sys/chassis-[id]/blade-[slotId]/mgmt/log-[type]-[id]
+    -- sys/chassis-[id]/blade-[slotId]/boardController/mgmt/log-[type]-[id]
+    -- sys/chassis-[id]/slot-[id]/mgmt/log-[type]-[id]
+    -- sys/switch-[id]/mgmt/log-[type]-[id]
+    -- sys/mgmt/log-[type]-[id]
+        -- fltSysdebugMEpLogMEpLogLog
+        -- fltSysdebugMEpLogMEpLogVeryLow
+        -- fltSysdebugMEpLogMEpLogFull
+        -- fltSysdebugMEpLogTransferError
+
+-- equipment:LocatorLed
+    -- sys/chassis-[id]/blade-[slotId]/locator-led
+    -- sys/chassis-[id]/locator-led
+    -- sys/chassis-[id]/fan-module-[tray]-[id]/locator-led
+    -- sys/chassis-[id]/slot-[id]/locator-led
+    -- sys/chassis-[id]/psu-[id]/locator-led
+    -- sys/switch-[id]/psu-[id]/locator-led
+        -- fsmStFailEquipmentLocatorLedSetLocatorLed:Execute
+        -- fsmRmtErrEquipmentLocatorLedSetLocatorLed:Execute
+        -- fsmFailEquipmentLocatorLedSetLocatorLed
+
+-- aaa:Realm
+    -- sys/
+        -- fsmStFailAaaRealmUpdateRealm:SetRealmLocal
+        -- fsmStFailAaaRealmUpdateRealm:SetRealmPeer
+        -- fsmRmtErrAaaRealmUpdateRealm:SetRealmLocal
+        -- fsmRmtErrAaaRealmUpdateRealm:SetRealmPeer
+        -- fsmFailAaaRealmUpdateRealm
+
+-- stats:CollectionPolicy
+    -- stats/coll-policy-[name]
+        -- fsmStFailStatsCollectionPolicyUpdateEp:SetEpA
+        -- fsmStFailStatsCollectionPolicyUpdateEp:SetEpB
+        -- fsmRmtErrStatsCollectionPolicyUpdateEp:SetEpA
+        -- fsmRmtErrStatsCollectionPolicyUpdateEp:SetEpB
+        -- fsmFailStatsCollectionPolicyUpdateEp
+
+-- memory:Array
+    -- sys/chassis-[id]/blade-[slotId]/board/memarray-[id]
+        -- fltMemoryArrayVoltageThresholdNonCritical
+        -- fltMemoryArrayVoltageThresholdCritical
+        -- fltMemoryArrayVoltageThresholdNonRecoverable
+
+-- qosclass:Definition
+    -- fabric/lan/classes
+        -- fsmStFailQosclassDefinitionConfigGlobalQoS:SetLocal
+        -- fsmStFailQosclassDefinitionConfigGlobalQoS:SetPeer
+        -- fsmRmtErrQosclassDefinitionConfigGlobalQoS:SetLocal
+        -- fsmRmtErrQosclassDefinitionConfigGlobalQoS:SetPeer
+        -- fsmFailQosclassDefinitionConfigGlobalQoS
+
+-- compute:IOHub
+    -- sys/chassis-[id]/blade-[slotId]/board/iohub
+        -- fltComputeIOHubThermalNonCritical
+        -- fltComputeIOHubThermalThresholdCritical
+        -- fltComputeIOHubThermalThresholdNonRecoverable
+
+-- compute:RtcBattery
+    -- sys/chassis-[id]/blade-[slotId]/board/rtc-battery
+        -- fltComputeRtcBatteryInoperable
+
+-- mgmt:Controller
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/mgmt
+    -- sys/chassis-[id]/blade-[slotId]/mgmt
+    -- sys/chassis-[id]/blade-[slotId]/boardController/mgmt
+    -- sys/chassis-[id]/slot-[id]/mgmt
+    -- sys/switch-[id]/mgmt
+    -- sys/mgmt
+        -- fsmStFailMgmtControllerExtMgmtIfConfig:Primary
+        -- fsmStFailMgmtControllerExtMgmtIfConfig:Secondary
+        -- fsmStFailMgmtControllerUpdateSwitch:resetLocal
+        -- fsmStFailMgmtControllerUpdateSwitch:resetRemote
+        -- fsmStFailMgmtControllerUpdateSwitch:updateLocal
+        -- fsmStFailMgmtControllerUpdateSwitch:updateRemote
+        -- fsmStFailMgmtControllerUpdateSwitch:verifyLocal
+        -- fsmStFailMgmtControllerUpdateSwitch:verifyRemote
+        -- fsmStFailMgmtControllerUpdateIOM:PollUpdateStatus
+        -- fsmStFailMgmtControllerUpdateIOM:UpdateRequest
+        -- fsmStFailMgmtControllerActivateIOM:Activate
+        -- fsmStFailMgmtControllerActivateIOM:Reset
+        -- fsmStFailMgmtControllerUpdateBMC:PollUpdateStatus
+        -- fsmStFailMgmtControllerUpdateBMC:UpdateRequest
+        -- fsmStFailMgmtControllerActivateBMC:Activate
+        -- fsmStFailMgmtControllerActivateBMC:Reset
+        -- fsmStFailMgmtControllerUpdateUCSManager:execute
+        -- fsmStFailMgmtControllerUpdateUCSManager:start
+        -- fsmStFailMgmtControllerSysConfig:Primary
+        -- fsmStFailMgmtControllerSysConfig:Secondary
+        -- fsmRmtErrMgmtControllerExtMgmtIfConfig:Primary
+        -- fsmRmtErrMgmtControllerExtMgmtIfConfig:Secondary
+        -- fsmRmtErrMgmtControllerUpdateSwitch:resetLocal
+        -- fsmRmtErrMgmtControllerUpdateSwitch:resetRemote
+        -- fsmRmtErrMgmtControllerUpdateSwitch:updateLocal
+        -- fsmRmtErrMgmtControllerUpdateSwitch:updateRemote
+        -- fsmRmtErrMgmtControllerUpdateSwitch:verifyLocal
+        -- fsmRmtErrMgmtControllerUpdateSwitch:verifyRemote
+        -- fsmRmtErrMgmtControllerUpdateIOM:PollUpdateStatus
+        -- fsmRmtErrMgmtControllerUpdateIOM:UpdateRequest
+        -- fsmRmtErrMgmtControllerActivateIOM:Activate
+        -- fsmRmtErrMgmtControllerActivateIOM:Reset
+        -- fsmRmtErrMgmtControllerUpdateBMC:PollUpdateStatus
+        -- fsmRmtErrMgmtControllerUpdateBMC:UpdateRequest
+        -- fsmRmtErrMgmtControllerActivateBMC:Activate
+        -- fsmRmtErrMgmtControllerActivateBMC:Reset
+        -- fsmRmtErrMgmtControllerUpdateUCSManager:execute
+        -- fsmRmtErrMgmtControllerUpdateUCSManager:start
+        -- fsmRmtErrMgmtControllerSysConfig:Primary
+        -- fsmRmtErrMgmtControllerSysConfig:Secondary
+        -- fsmFailMgmtControllerExtMgmtIfConfig
+        -- fsmFailMgmtControllerUpdateSwitch
+        -- fsmFailMgmtControllerUpdateIOM
+        -- fsmFailMgmtControllerActivateIOM
+        -- fsmFailMgmtControllerUpdateBMC
+        -- fsmFailMgmtControllerActivateBMC
+        -- fsmFailMgmtControllerUpdateUCSManager
+        -- fsmFailMgmtControllerSysConfig
+
+-- sysdebug:AutoCoreFileExportTarget
+    -- sys/sysdebug/file-export
+        -- fsmStFailSysdebugAutoCoreFileExportTargetConfigure:Local
+        -- fsmStFailSysdebugAutoCoreFileExportTargetConfigure:Peer
+        -- fsmRmtErrSysdebugAutoCoreFileExportTargetConfigure:Local
+        -- fsmRmtErrSysdebugAutoCoreFileExportTargetConfigure:Peer
+        -- fsmFailSysdebugAutoCoreFileExportTargetConfigure
+
+-- extvmm:KeyStore
+    -- sys/extvm-mgmt/key-store
+        -- fsmStFailExtvmmKeyStoreCertInstall:SetLocal
+        -- fsmStFailExtvmmKeyStoreCertInstall:SetPeer
+        -- fsmRmtErrExtvmmKeyStoreCertInstall:SetLocal
+        -- fsmRmtErrExtvmmKeyStoreCertInstall:SetPeer
+        -- fsmFailExtvmmKeyStoreCertInstall
+
+-- sw:AccessDomain
+    -- sys/switch-[id]/access-eth
+        -- fsmStFailSwAccessDomainDeploy:UpdateConnectivity
+        -- fsmRmtErrSwAccessDomainDeploy:UpdateConnectivity
+        -- fsmFailSwAccessDomainDeploy
+
+-- firmware:PackItem
+    -- org-[name]/pack-image-[hwVendor]|[hwModel]|[type]
+    -- org-[name]/pack-image-[hwVendor]|[hwModel]|[type]
+    -- org-[name]/fw-host-pack-[name]/pack-image-[hwVendor]|[hwModel]|[type]
+    -- org-[name]/fw-mgmt-pack-[name]/pack-image-[hwVendor]|[hwModel]|[type]
+        -- fltFirmwarePackItemImageMissing
+
+-- equipment:Chassis
+    -- sys/chassis-[id]
+        -- fltEquipmentChassisUnsupportedConnectivity
+        -- fltEquipmentChassisUnacknowledged
+        -- fltEquipmentChassisIdentity
+        -- fltEquipmentChassisPowerProblem
+        -- fltEquipmentChassisThermalThresholdCritical
+        -- fltEquipmentChassisThermalThresholdNonCritical
+        -- fltEquipmentChassisThermalThresholdNonRecoverable
+        -- fltEquipmentChassisInoperable
+        -- fltEquipmentChassisIdentity-unestablishable
+        -- fsmStFailEquipmentChassisRemoveChassis:DisableEndPoint
+        -- fsmStFailEquipmentChassisRemoveChassis:UnIdentifyLocal
+        -- fsmStFailEquipmentChassisRemoveChassis:UnIdentifyPeer
+        -- fsmStFailEquipmentChassisRemoveChassis:Wait
+        -- fsmStFailEquipmentChassisRemoveChassis:decomission
+        -- fsmStFailEquipmentChassisPsuPolicyConfig:Execute
+        -- fsmRmtErrEquipmentChassisRemoveChassis:DisableEndPoint
+        -- fsmRmtErrEquipmentChassisRemoveChassis:UnIdentifyLocal
+        -- fsmRmtErrEquipmentChassisRemoveChassis:UnIdentifyPeer
+        -- fsmRmtErrEquipmentChassisRemoveChassis:Wait
+        -- fsmRmtErrEquipmentChassisRemoveChassis:decomission
+        -- fsmRmtErrEquipmentChassisPsuPolicyConfig:Execute
+        -- fsmFailEquipmentChassisRemoveChassis
+        -- fsmFailEquipmentChassisPsuPolicyConfig
+
+-- equipment:FanModule
+    -- sys/chassis-[id]/fan-module-[tray]-[id]
+        -- fltEquipmentFanModuleMissing
+        -- fltEquipmentFanModuleThermalThresholdNonCritical
+        -- fltEquipmentFanModuleThermalThresholdCritical
+        -- fltEquipmentFanModuleThermalThresholdNonRecoverable
+        -- fltEquipmentFanModuleIdentity
+        -- fltEquipmentFanModuleDegraded
+
+-- adaptor:ExtEthIf
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/ext-eth-[id]
+        -- fsmStFailAdaptorExtEthIfPathReset:Disable
+        -- fsmStFailAdaptorExtEthIfPathReset:Enable
+        -- fsmRmtErrAdaptorExtEthIfPathReset:Disable
+        -- fsmRmtErrAdaptorExtEthIfPathReset:Enable
+        -- fsmFailAdaptorExtEthIfPathReset
+
+-- compute:Pool
+    -- org-[name]/compute-pool-[name]
+        -- fltComputePoolEmpty
+
+-- vnic:ProfileSet
+    -- fabric/lan/profiles
+        -- fsmStFailVnicProfileSetDeploy:Local
+        -- fsmStFailVnicProfileSetDeploy:Peer
+        -- fsmRmtErrVnicProfileSetDeploy:Local
+        -- fsmRmtErrVnicProfileSetDeploy:Peer
+        -- fsmFailVnicProfileSetDeploy
+
+-- equipment:Fan
+    -- sys/chassis-[id]/fan-module-[tray]-[id]/fan-[id]
+    -- sys/switch-[id]/fan-[id]
+        -- fltEquipmentFanDegraded
+        -- fltEquipmentFanInoperable
+        -- fltEquipmentFanPerfThresholdNonCritical
+        -- fltEquipmentFanPerfThresholdCritical
+        -- fltEquipmentFanPerfThresholdNonRecoverable
+        -- fltEquipmentFanMissing
+        -- fltEquipmentFanPerfThresholdLowerNonRecoverable
+
+-- dcx:Vc
+    -- sys/chassis-[id]/blade-[slotId]/fabric-[switchId]/vc-[id]
+    -- sys/chassis-[id]/fabric-[switchId]/vc-[id]
+    -- sys/chassis-[id]/blade-[slotId]/fabric-[switchId]/path-[id]/vc-[id]
+    -- sys/chassis-[id]/fabric-[switchId]/path-[id]/vc-[id]
+        -- fltDcxVcDown
+        -- fltDcxVcMgmt-vif-down
+
+-- ether:ServerIntFIo
+    -- sys/chassis-[id]/blade-[slotId]/diag/port-[portId]
+    -- sys/chassis-[id]/slot-[id]/[type]/port-[portId]
+    -- sys/switch-[id]/slot-[id]/[type]/port-[portId]
+        -- fltEtherServerIntFIoHardware-failure
+
+-- aaa:UserEp
+    -- sys/user-ext
+        -- fsmStFailAaaUserEpUpdateUserEp:SetUserLocal
+        -- fsmStFailAaaUserEpUpdateUserEp:SetUserPeer
+        -- fsmRmtErrAaaUserEpUpdateUserEp:SetUserLocal
+        -- fsmRmtErrAaaUserEpUpdateUserEp:SetUserPeer
+        -- fsmFailAaaUserEpUpdateUserEp
+
+-- sysfile:Mutation
+    -- sys/corefiles/file-[name]|[switchId]/mutation
+    -- sys/corefiles/mutation
+        -- fsmStFailSysfileMutationSingle:Execute
+        -- fsmStFailSysfileMutationGlobal:Local
+        -- fsmStFailSysfileMutationGlobal:Peer
+        -- fsmRmtErrSysfileMutationSingle:Execute
+        -- fsmRmtErrSysfileMutationGlobal:Local
+        -- fsmRmtErrSysfileMutationGlobal:Peer
+        -- fsmFailSysfileMutationSingle
+        -- fsmFailSysfileMutationGlobal
+
+-- network:Element
+    -- sys/switch-[id]
+        -- fltNetworkElementInoperable
+
+-- epqos:Definition
+    -- org-[name]/ep-qos-[name]
+        -- fsmStFailEpqosDefinitionDeploy:Local
+        -- fsmStFailEpqosDefinitionDeploy:Peer
+        -- fsmRmtErrEpqosDefinitionDeploy:Local
+        -- fsmRmtErrEpqosDefinitionDeploy:Peer
+        -- fsmFailEpqosDefinitionDeploy
+
+-- aaa:Ep
+    -- sys/
+        -- fsmStFailAaaEpUpdateEp:SetEpLocal
+        -- fsmStFailAaaEpUpdateEp:SetEpPeer
+        -- fsmRmtErrAaaEpUpdateEp:SetEpLocal
+        -- fsmRmtErrAaaEpUpdateEp:SetEpPeer
+        -- fsmFailAaaEpUpdateEp
+
+-- ether:SwitchIntFIo
+    -- sys/chassis-[id]/slot-[id]/[type]/port-[portId]
+    -- sys/switch-[id]/slot-[id]/[type]/port-[portId]
+        -- fltEtherSwitchIntFIoSatellite-connection-absent
+        -- fltEtherSwitchIntFIoSatellite-wiring-problem
+        -- fltEtherSwitchIntFIoSatellite-wiring-numbers-unexpected
+
+-- equipment:IOCard
+    -- sys/chassis-[id]/slot-[id]
+        -- fltEquipmentIOCardRemoved
+        -- fltEquipmentIOCardThermalProblem
+        -- fltEquipmentIOCardFirmwareUpgrade
+        -- fltEquipmentIOCardUnsupportedConnectivity
+        -- fltEquipmentIOCardUnacknowledged
+        -- fltEquipmentIOCardPeerDisconnected
+        -- fltEquipmentIOCardIdentity
+        -- fltEquipmentIOCardAutoUpgradingFirmware
+        -- fltEquipmentIOCardInaccessible
+        -- fltEquipmentIOCardPost-failure
+        -- fsmStFailEquipmentIOCardFePresence:CheckLicense
+        -- fsmStFailEquipmentIOCardFePresence:Identify
+        -- fsmStFailEquipmentIOCardFeConn:ConfigureEndPoint
+        -- fsmStFailEquipmentIOCardFeConn:ConfigureSwMgmtEndPoint
+        -- fsmStFailEquipmentIOCardFeConn:ConfigureVifNs
+        -- fsmStFailEquipmentIOCardFeConn:DiscoverChassis
+        -- fsmStFailEquipmentIOCardFeConn:EnableChassis
+        -- fsmStFailEquipmentIOCardResetCmc:Execute
+        -- fsmRmtErrEquipmentIOCardFePresence:CheckLicense
+        -- fsmRmtErrEquipmentIOCardFePresence:Identify
+        -- fsmRmtErrEquipmentIOCardFeConn:ConfigureEndPoint
+        -- fsmRmtErrEquipmentIOCardFeConn:ConfigureSwMgmtEndPoint
+        -- fsmRmtErrEquipmentIOCardFeConn:ConfigureVifNs
+        -- fsmRmtErrEquipmentIOCardFeConn:DiscoverChassis
+        -- fsmRmtErrEquipmentIOCardFeConn:EnableChassis
+        -- fsmRmtErrEquipmentIOCardResetCmc:Execute
+        -- fsmFailEquipmentIOCardFePresence
+        -- fsmFailEquipmentIOCardFeConn
+        -- fsmFailEquipmentIOCardResetCmc
+
+-- uuidpool:Pool
+    -- org-[name]/uuid-pool-[name]
+        -- fltUuidpoolPoolEmpty
+
+-- sw:EthLanBorder
+    -- sys/switch-[id]/border-eth
+        -- fsmStFailSwEthLanBorderDeploy:UpdateConnectivity
+        -- fsmRmtErrSwEthLanBorderDeploy:UpdateConnectivity
+        -- fsmFailSwEthLanBorderDeploy
+
+-- extvmm:Provider
+    -- sys/extvm-mgmt/vm-[name]
+        -- fsmStFailExtvmmProviderConfig:GetVersion
+        -- fsmStFailExtvmmProviderConfig:SetLocal
+        -- fsmStFailExtvmmProviderConfig:SetPeer
+        -- fsmRmtErrExtvmmProviderConfig:GetVersion
+        -- fsmRmtErrExtvmmProviderConfig:SetLocal
+        -- fsmRmtErrExtvmmProviderConfig:SetPeer
+        -- fsmFailExtvmmProviderConfig
+
+-- fabric:ExternalPc
+        -- fltFabricExternalPcDown
+
+-- fabric:ComputeSlotEp
+    -- fabric/server/chassis-[chassisId]/slot-[slotId]
+        -- fltFabricComputeSlotEpMisplacedInChassisSlot
+        -- fltFabricComputeSlotEpServerIdentificationProblem
+        -- fsmStFailFabricComputeSlotEpIdentify:ExecuteLocal
+        -- fsmStFailFabricComputeSlotEpIdentify:ExecutePeer
+        -- fsmRmtErrFabricComputeSlotEpIdentify:ExecuteLocal
+        -- fsmRmtErrFabricComputeSlotEpIdentify:ExecutePeer
+        -- fsmFailFabricComputeSlotEpIdentify
+
+-- sw:VlanPortNs
+    -- sys/switch-[id]/vlan-port-ns
+        -- fltSwVlanPortNsResourceStatus
+
+-- mgmt:Backup
+    -- sys/backup-[hostname]
+        -- fsmStFailMgmtBackupBackup:backupLocal
+        -- fsmStFailMgmtBackupBackup:upload
+        -- fsmRmtErrMgmtBackupBackup:backupLocal
+        -- fsmRmtErrMgmtBackupBackup:upload
+        -- fsmFailMgmtBackupBackup
+
+-- capability:Updater
+    -- capabilities/ep/updater-[fileName]
+        -- fsmStFailCapabilityUpdaterUpdater:Apply
+        -- fsmStFailCapabilityUpdaterUpdater:CopyRemote
+        -- fsmStFailCapabilityUpdaterUpdater:DeleteLocal
+        -- fsmStFailCapabilityUpdaterUpdater:Local
+        -- fsmStFailCapabilityUpdaterUpdater:RescanImages
+        -- fsmStFailCapabilityUpdaterUpdater:UnpackLocal
+        -- fsmRmtErrCapabilityUpdaterUpdater:Apply
+        -- fsmRmtErrCapabilityUpdaterUpdater:CopyRemote
+        -- fsmRmtErrCapabilityUpdaterUpdater:DeleteLocal
+        -- fsmRmtErrCapabilityUpdaterUpdater:Local
+        -- fsmRmtErrCapabilityUpdaterUpdater:RescanImages
+        -- fsmRmtErrCapabilityUpdaterUpdater:UnpackLocal
+        -- fsmFailCapabilityUpdaterUpdater
+
+-- dcx:Ns
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/dcxns-[switchId]
+        -- fltDcxNsFailed
+
+-- vnic:Ether
+    -- org-[name]/tier-[name]/ls-[name]/ether-[name]
+    -- org-[name]/ls-[name]/ether-[name]
+        -- fltVnicEtherConfig-failed
+
+-- epqos:DefinitionDelTask
+    -- org-[name]/ep-qos-deletion-[defIntId]
+        -- fsmStFailEpqosDefinitionDelTaskRemove:Local
+        -- fsmStFailEpqosDefinitionDelTaskRemove:Peer
+        -- fsmRmtErrEpqosDefinitionDelTaskRemove:Local
+        -- fsmRmtErrEpqosDefinitionDelTaskRemove:Peer
+        -- fsmFailEpqosDefinitionDelTaskRemove
+
+-- mgmt:If
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/mgmt/if-[id]
+    -- sys/chassis-[id]/blade-[slotId]/mgmt/if-[id]
+    -- sys/chassis-[id]/blade-[slotId]/boardController/mgmt/if-[id]
+    -- sys/chassis-[id]/slot-[id]/mgmt/if-[id]
+    -- sys/switch-[id]/mgmt/if-[id]
+    -- sys/mgmt/if-[id]
+        -- fsmStFailMgmtIfSwMgmtOobIfConfig:Switch
+        -- fsmStFailMgmtIfSwMgmtInbandIfConfig:Switch
+        -- fsmStFailMgmtIfVirtualIfConfig:Local
+        -- fsmStFailMgmtIfVirtualIfConfig:Remote
+        -- fsmStFailMgmtIfEnableVip:Local
+        -- fsmStFailMgmtIfDisableVip:Peer
+        -- fsmStFailMgmtIfEnableHA:Local
+        -- fsmRmtErrMgmtIfSwMgmtOobIfConfig:Switch
+        -- fsmRmtErrMgmtIfSwMgmtInbandIfConfig:Switch
+        -- fsmRmtErrMgmtIfVirtualIfConfig:Local
+        -- fsmRmtErrMgmtIfVirtualIfConfig:Remote
+        -- fsmRmtErrMgmtIfEnableVip:Local
+        -- fsmRmtErrMgmtIfDisableVip:Peer
+        -- fsmRmtErrMgmtIfEnableHA:Local
+        -- fsmFailMgmtIfSwMgmtOobIfConfig
+        -- fsmFailMgmtIfSwMgmtInbandIfConfig
+        -- fsmFailMgmtIfVirtualIfConfig
+        -- fsmFailMgmtIfEnableVip
+        -- fsmFailMgmtIfDisableVip
+        -- fsmFailMgmtIfEnableHA
+
+-- firmware:Distributable
+    -- sys/fw-catalogue/distrib-[name]
+        -- fsmStFailFirmwareDistributableDelete:Local
+        -- fsmStFailFirmwareDistributableDelete:Remote
+        -- fsmRmtErrFirmwareDistributableDelete:Local
+        -- fsmRmtErrFirmwareDistributableDelete:Remote
+        -- fsmFailFirmwareDistributableDelete
+
+-- firmware:BootUnit
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-eth-[id]/fw-boot-def/bootunit-[type]
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/host-fc-[id]/fw-boot-def/bootunit-[type]
+    -- sys/chassis-[id]/blade-[slotId]/bios/fw-boot-def/bootunit-[type]
+    -- sys/chassis-[id]/blade-[slotId]/adaptor-[id]/mgmt/fw-boot-def/bootunit-[type]
+    -- sys/chassis-[id]/blade-[slotId]/mgmt/fw-boot-def/bootunit-[type]
+    -- sys/chassis-[id]/blade-[slotId]/boardController/mgmt/fw-boot-def/bootunit-[type]
+    -- sys/chassis-[id]/slot-[id]/mgmt/fw-boot-def/bootunit-[type]
+    -- sys/switch-[id]/mgmt/fw-boot-def/bootunit-[type]
+    -- sys/mgmt/fw-boot-def/bootunit-[type]
+    -- sys/chassis-[id]/blade-[slotId]/board/storage-[type]-[id]/fw-boot-def/bootunit-[type]
+        -- fltFirmwareBootUnitCantBoot
+
+-- comm:SvcEp
+    -- sys/svc-ext
+        -- fsmStFailCommSvcEpUpdateSvcEp:PropogateEpSettings
+        -- fsmStFailCommSvcEpUpdateSvcEp:PropogateEpTimeZoneSettingsLocal
+        -- fsmStFailCommSvcEpUpdateSvcEp:PropogateEpTimeZoneSettingsPeer
+        -- fsmStFailCommSvcEpUpdateSvcEp:SetEpLocal
+        -- fsmStFailCommSvcEpUpdateSvcEp:SetEpPeer
+        -- fsmStFailCommSvcEpRestartWebSvc:restart
+        -- fsmRmtErrCommSvcEpUpdateSvcEp:PropogateEpSettings
+        -- fsmRmtErrCommSvcEpUpdateSvcEp:PropogateEpTimeZoneSettingsLocal
+        -- fsmRmtErrCommSvcEpUpdateSvcEp:PropogateEpTimeZoneSettingsPeer
+        -- fsmRmtErrCommSvcEpUpdateSvcEp:SetEpLocal
+        -- fsmRmtErrCommSvcEpUpdateSvcEp:SetEpPeer
+        -- fsmRmtErrCommSvcEpRestartWebSvc:restart
+        -- fsmFailCommSvcEpUpdateSvcEp
+        -- fsmFailCommSvcEpRestartWebSvc
+
+-- vnic:Fc
+    -- org-[name]/tier-[name]/ls-[name]/fc-[name]
+    -- org-[name]/ls-[name]/fc-[name]
+        -- fltVnicFcConfig-failed
+
+-- sysdebug:ManualCoreFileExportTarget
+    -- sys/corefiles/file-[name]|[switchId]/export-to-[hostname]
+        -- fsmStFailSysdebugManualCoreFileExportTargetExport:Execute
+        -- fsmRmtErrSysdebugManualCoreFileExportTargetExport:Execute
+        -- fsmFailSysdebugManualCoreFileExportTargetExport
+
+-- mgmt:Importer
+    -- sys/import-config-[hostname]
+        -- fsmStFailMgmtImporterImport:config
+        -- fsmStFailMgmtImporterImport:downloadLocal
+        -- fsmStFailMgmtImporterImport:reportResults
+        -- fsmRmtErrMgmtImporterImport:config
+        -- fsmRmtErrMgmtImporterImport:downloadLocal
+        -- fsmRmtErrMgmtImporterImport:reportResults
+        -- fsmFailMgmtImporterImport
+
+-- equipment:Psu
+    -- sys/chassis-[id]/psu-[id]
+    -- sys/switch-[id]/psu-[id]
+        -- fltEquipmentPsuPowerSupplyProblem
+        -- fltEquipmentPsuInoperable
+        -- fltEquipmentPsuMissing
+        -- fltEquipmentPsuThermalThresholdNonCritical
+        -- fltEquipmentPsuThermalThresholdCritical
+        -- fltEquipmentPsuThermalThresholdNonRecoverable
+        -- fltEquipmentPsuVoltageThresholdNonCritical
+        -- fltEquipmentPsuVoltageThresholdCritical
+        -- fltEquipmentPsuVoltageThresholdNonRecoverable
+        -- fltEquipmentPsuPerfThresholdNonCritical
+        -- fltEquipmentPsuPerfThresholdCritical
+        -- fltEquipmentPsuPerfThresholdNonRecoverable
+        -- fltEquipmentPsuIdentity
+        -- fltEquipmentPsuOffline
+
+-- callhome:Ep
+    -- call-home
+        -- fsmStFailCallhomeEpConfigCallhome:SetLocal
+        -- fsmStFailCallhomeEpConfigCallhome:SetPeer
+        -- fsmRmtErrCallhomeEpConfigCallhome:SetLocal
+        -- fsmRmtErrCallhomeEpConfigCallhome:SetPeer
+        -- fsmFailCallhomeEpConfigCallhome
+
+-- mgmt:Entity
+    -- sys/mgmt-entity-[id]
+        -- fltMgmtEntityDegraded
+        -- fltMgmtEntityDown
+        -- fltMgmtEntityElection-failure
+        -- fltMgmtEntityHa-not-ready
+        -- fltMgmtEntityVersion-incompatible
+        -- fltMgmtEntityManagement-services-failure
+        -- fltMgmtEntityManagement-services-unresponsive
+        -- fltMgmtEntityChassis-1-SEEPROM-error
+        -- fltMgmtEntityChassis-2-SEEPROM error
+        -- fltMgmtEntityChassis-3-SEEPROM error
+
+-- memory:Unit
+    -- sys/chassis-[id]/blade-[slotId]/board/memarray-[id]/mem-[id]
+        -- fltMemoryUnitDegraded
+        -- fltMemoryUnitInoperable
+        -- fltMemoryUnitThermalThresholdNonCritical
+        -- fltMemoryUnitThermalThresholdCritical
+        -- fltMemoryUnitThermalThresholdNonRecoverable
+        -- fltMemoryUnitIdentity-unestablishable
+
+-- compute:Board
+    -- sys/chassis-[id]/blade-[slotId]/board
+        -- fltComputeBoardPowerError
+        -- fltComputeBoardCmosVoltageThresholdCritical
+        -- fltComputeBoardCmosVoltageThresholdNonRecoverable
+
+-- memory:BufferUnit
+    -- sys/chassis-[id]/blade-[slotId]/board/sensor-unit-[id]
+        -- fltMemoryBufferUnitThermalThresholdNonCritical
+        -- fltMemoryBufferUnitThermalThresholdCritical
+        -- fltMemoryBufferUnitThermalThresholdNonRecoverable
+
+CucsFaultCode ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+       "A code identifying a class of fault."
+        SYNTAX INTEGER {
+    fltFabricComputeSlotEpMisplacedInChassisSlot(156),
+    fltFabricComputeSlotEpServerIdentificationProblem(157),
+    fltVnicEtherConfigFailed(169),
+    fltVnicFcConfigFailed(170),
+    fltProcessorUnitInoperable(174),
+    fltProcessorUnitThermalNonCritical(175),
+    fltProcessorUnitThermalThresholdCritical(176),
+    fltProcessorUnitThermalThresholdNonRecoverable(177),
+    fltProcessorUnitVoltageThresholdNonCritical(178),
+    fltProcessorUnitVoltageThresholdCritical(179),
+    fltProcessorUnitVoltageThresholdNonRecoverable(180),
+    fltStorageItemCapacityExceeded(182),
+    fltStorageItemCapacityWarning(183),
+    fltMemoryUnitDegraded(184),
+    fltMemoryUnitInoperable(185),
+    fltMemoryUnitThermalThresholdNonCritical(186),
+    fltMemoryUnitThermalThresholdCritical(187),
+    fltMemoryUnitThermalThresholdNonRecoverable(188),
+    fltMemoryArrayVoltageThresholdNonCritical(189),
+    fltMemoryArrayVoltageThresholdCritical(190),
+    fltMemoryArrayVoltageThresholdNonRecoverable(191),
+    fltAdaptorUnitUnidentifiableFru(200),
+    fltAdaptorUnitMissing(203),
+    fltAdaptorUnitAdaptorReachability(206),
+    fltAdaptorHostIfLinkDown(207),
+    fltAdaptorExtIfLinkDown(209),
+    fltPortPIoLinkDown(276),
+    fltPortPIoFailed(277),
+    fltPortPIoHardwareFailure(278),
+    fltPortPIoSfpNotPresent(279),
+    fltFabricExternalPcDown(282),
+    fltDcxVcDown(283),
+    fltNetworkElementInoperable(291),
+    fltMgmtEntityDegraded(293),
+    fltMgmtEntityDown(294),
+    fltDcxNsFailed(304),
+    fltComputeBladeInsufficientlyEquipped(305),
+    fltComputeBladeIdentityUnestablishable(306),
+    fltComputeBoardPowerError(310),
+    fltComputeBladePowerProblem(311),
+    fltComputeBladeThermalProblem(312),
+    fltComputeBladeBiosPostTimeout(313),
+    fltComputeBladeDiscoveryFailed(314),
+    fltComputeBladeAssociationFailed(315),
+    fltComputeBladeInoperable(317),
+    fltComputeBladeUnassignedMissing(318),
+    fltComputeBladeAssignedMissing(319),
+    fltComputeBladeUnidentified(320),
+    fltComputeBladeUnassignedInaccessible(321),
+    fltComputeBladeAssignedInaccessible(322),
+    fltLsServerFailed(324),
+    fltLsServerDiscoveryFailed(326),
+    fltLsServerConfigFailure(327),
+    fltLsServerMaintenanceFailed(329),
+    fltLsServerRemoved(330),
+    fltLsServerInaccessible(331),
+    fltLsServerAssociationFailed(332),
+    fltLsServerUnassociated(334),
+    fltLsServerServerUnfulfilled(337),
+    fltEtherSwitchIntFIoSatelliteConnectionAbsent(367),
+    fltEtherSwitchIntFIoSatelliteWiringProblem(368),
+    fltEquipmentPsuPowerSupplyProblem(369),
+    fltEquipmentFanDegraded(371),
+    fltEquipmentFanInoperable(373),
+    fltEquipmentPsuInoperable(374),
+    fltEquipmentIOCardRemoved(376),
+    fltEquipmentFanModuleMissing(377),
+    fltEquipmentPsuMissing(378),
+    fltEquipmentIOCardThermalProblem(379),
+    fltEquipmentFanModuleThermalThresholdNonCritical(380),
+    fltEquipmentPsuThermalThresholdNonCritical(381),
+    fltEquipmentFanModuleThermalThresholdCritical(382),
+    fltEquipmentPsuThermalThresholdCritical(383),
+    fltEquipmentFanModuleThermalThresholdNonRecoverable(384),
+    fltEquipmentPsuThermalThresholdNonRecoverable(385),
+    fltEquipmentPsuVoltageThresholdNonCritical(387),
+    fltEquipmentPsuVoltageThresholdCritical(389),
+    fltEquipmentPsuVoltageThresholdNonRecoverable(391),
+    fltEquipmentPsuPerfThresholdNonCritical(392),
+    fltEquipmentPsuPerfThresholdCritical(393),
+    fltEquipmentPsuPerfThresholdNonRecoverable(394),
+    fltEquipmentFanPerfThresholdNonCritical(395),
+    fltEquipmentFanPerfThresholdCritical(396),
+    fltEquipmentFanPerfThresholdNonRecoverable(397),
+    fltEquipmentIOCardFirmwareUpgrade(398),
+    fltEquipmentChassisUnsupportedConnectivity(399),
+    fltEquipmentChassisUnacknowledged(400),
+    fltEquipmentIOCardUnsupportedConnectivity(401),
+    fltEquipmentIOCardUnacknowledged(402),
+    fltEquipmentIOCardPeerDisconnected(403),
+    fltEquipmentChassisIdentity(404),
+    fltEquipmentIOCardIdentity(405),
+    fltEquipmentFanModuleIdentity(406),
+    fltEquipmentPsuIdentity(407),
+    fltEquipmentChassisPowerProblem(408),
+    fltEquipmentChassisThermalThresholdCritical(409),
+    fltEquipmentChassisThermalThresholdNonCritical(410),
+    fltEquipmentChassisThermalThresholdNonRecoverable(411),
+    fltComputeBoardCmosVoltageThresholdCritical(424),
+    fltComputeBoardCmosVoltageThresholdNonRecoverable(425),
+    fltMgmtEntityElectionFailure(428),
+    fltMgmtEntityHaNotReady(429),
+    fltMgmtEntityVersionIncompatible(430),
+    fltEquipmentFanMissing(434),
+    fltEquipmentIOCardAutoUpgradingFirmware(435),
+    fltFirmwarePackItemImageMissing(436),
+    fltEtherSwitchIntFIoSatelliteWiringNumbersUnexpected(440),
+    fltMgmtEntityManagementServicesFailure(451),
+    fltMgmtEntityManagementServicesUnresponsive(452),
+    fltMgmtEntityChassis1SEEPROMError(453),
+    fltMgmtEntityChassis2SEEPROMError(454),
+    fltMgmtEntityChassis3SEEPROMError(455),
+    fltEquipmentChassisInoperable(456),
+    fltEtherServerIntFIoHardwareFailure(458),
+    fltDcxVcMgmtVifDown(459),
+    fltSysdebugMEpLogMEpLogLog(460),
+    fltSysdebugMEpLogMEpLogVeryLow(461),
+    fltSysdebugMEpLogMEpLogFull(462),
+    fltComputePoolEmpty(463),
+    fltUuidpoolPoolEmpty(464),
+    fltIppoolPoolEmpty(465),
+    fltMacpoolPoolEmpty(466),
+    fltFirmwareUpdatableImageUnusable(470),
+    fltFirmwareBootUnitCantBoot(471),
+    fltFcpoolInitiatorsEmpty(476),
+    fltEquipmentIOCardInaccessible(478),
+    fltDcxVIfLinkState(479),
+    fltEquipmentFanModuleDegraded(480),
+    fltEquipmentIOCardPostFailure(481),
+    fltEquipmentFanPerfThresholdLowerNonRecoverable(484),
+    fltMemoryUnitIdentityUnestablishable(502),
+    fltComputeBladePostFailure(517),
+    fltEquipmentPsuOffline(528),
+    fltStorageRaidBatteryInoperable(531),
+    fltSysdebugMEpLogTransferError(532),
+    fltComputeRtcBatteryInoperable(533),
+    fltMemoryBufferUnitThermalThresholdNonCritical(535),
+    fltMemoryBufferUnitThermalThresholdCritical(536),
+    fltMemoryBufferUnitThermalThresholdNonRecoverable(537),
+    fltComputeIOHubThermalNonCritical(538),
+    fltComputeIOHubThermalThresholdCritical(539),
+    fltComputeIOHubThermalThresholdNonRecoverable(540),
+    fltEquipmentChassisIdentityUnestablishable(543),
+    fltSwVlanPortNsResourceStatus(549),
+    fsmStFailEquipmentIOCardFePresenceIdentify(16405),
+    fsmStFailEquipmentIOCardFeConnEnableChassis(16406),
+    fsmStFailEquipmentChassisRemoveChassisDecomission(16407),
+    fsmStFailEquipmentLocatorLedSetLocatorLedExecute(16408),
+    fsmStFailMgmtControllerExtMgmtIfConfigSecondary(16518),
+    fsmStFailFabricComputeSlotEpIdentifyExecutePeer(16519),
+    fsmStFailComputeBladeDiscoverHagDisconnect(16520),
+    fsmStFailComputeBladeAssociateWaitForIBMCFwUpdate(16521),
+    fsmStFailComputeBladeDisassociateHagPnuOSDisconnect(16522),
+    fsmStFailComputeBladeDecommissionExecute(16523),
+    fsmStFailComputeBladeSoftShutdownExecute(16524),
+    fsmStFailComputeBladeHardShutdownExecute(16525),
+    fsmStFailComputeBladeTurnupExecute(16526),
+    fsmStFailComputeBladeHardresetSanitize(16528),
+    fsmStFailComputeBladeSoftresetSanitize(16529),
+    fsmStFailComputeBladeSwConnUpdB(16530),
+    fsmStFailComputeBladeBiosRecoveryWait(16531),
+    fsmStFailComputeBladeCmosResetSanitize(16532),
+    fsmStFailEquipmentChassisPsuPolicyConfigExecute(16533),
+    fsmStFailAdaptorHostFcIfResetFcPersBindingExecute(16534),
+    fsmStFailComputeBladeDiagUnconfigUserAccess(16535),
+    fsmStFailFabricLanCloudSwitchModeSwConfigPeer(16539),
+    fsmStFailVnicProfileSetDeployPeer(16550),
+    fsmStFailCommSvcEpUpdateSvcEpSetEpPeer(16576),
+    fsmStFailCommSvcEpRestartWebSvcRestart(16577),
+    fsmStFailComputeBladeUpdateExtUsersDeploy(16578),
+    fsmStFailStatsCollectionPolicyUpdateEpSetEpB(16579),
+    fsmStFailAaaRealmUpdateRealmSetRealmPeer(16580),
+    fsmStFailAaaUserEpUpdateUserEpSetUserPeer(16581),
+    fsmStFailSysfileMutationSingleExecute(16600),
+    fsmStFailSysfileMutationGlobalPeer(16601),
+    fsmStFailSysdebugManualCoreFileExportTargetExportExecute(16604),
+    fsmStFailSysdebugAutoCoreFileExportTargetConfigurePeer(16605),
+    fsmStFailSysdebugLogControlEpLogControlPersistPeer(16606),
+    fsmStFailSyntheticFsObjCreateCreateRemote(16641),
+    fsmStFailFirmwareDownloaderDownloadUnpackLocal(16650),
+    fsmStFailFirmwareImageDeleteRemote(16651),
+    fsmStFailMgmtControllerUpdateSwitchVerifyRemote(16653),
+    fsmStFailMgmtControllerUpdateIOMUpdateRequest(16654),
+    fsmStFailMgmtControllerActivateIOMReset(16655),
+    fsmStFailMgmtControllerUpdateBMCUpdateRequest(16656),
+    fsmStFailMgmtControllerActivateBMCReset(16657),
+    fsmStFailComputeBladeUpdateAdaptorUpdateRequest(16658),
+    fsmStFailComputeBladeActivateAdaptorReset(16659),
+    fsmStFailCallhomeEpConfigCallhomeSetPeer(16670),
+    fsmStFailMgmtIfSwMgmtOobIfConfigSwitch(16673),
+    fsmStFailMgmtIfSwMgmtInbandIfConfigSwitch(16674),
+    fsmStFailMgmtIfVirtualIfConfigRemote(16679),
+    fsmStFailMgmtIfEnableVipLocal(16680),
+    fsmStFailMgmtIfDisableVipPeer(16681),
+    fsmStFailMgmtIfEnableHALocal(16682),
+    fsmStFailMgmtBackupBackupUpload(16683),
+    fsmStFailMgmtImporterImportReportResults(16684),
+    fsmStFailComputeBladeConfigSoLExecute(16739),
+    fsmStFailComputeBladeUnconfigSoLExecute(16740),
+    fsmStFailQosclassDefinitionConfigGlobalQoSSetPeer(16745),
+    fsmStFailEpqosDefinitionDelTaskRemovePeer(16750),
+    fsmStFailComputeBladeResetBmcExecute(16802),
+    fsmStFailEquipmentIOCardResetCmcExecute(16803),
+    fsmStFailMgmtControllerUpdateUCSManagerStart(16815),
+    fsmStFailMgmtControllerSysConfigSecondary(16823),
+    fsmStFailComputeBladePowercycleSanitize(16834),
+    fsmStFailAdaptorExtEthIfPathResetEnable(16852),
+    fsmStFailAdaptorHostFcIfCircuitResetEnableB(16857),
+    fsmStFailExtvmmProviderConfigSetPeer(16879),
+    fsmStFailExtvmmKeyStoreCertInstallSetPeer(16880),
+    fsmStFailExtvmmSwitchDelTaskRemoveProviderRemoveLocal(16881),
+    fsmStFailComputeBladePowerCapConfig(16890),
+    fsmStFailComputeBladeBiosProfileConfigure(16891),
+    fsmStFailCapabilityUpdaterUpdaterUnpackLocal(16904),
+    fsmStFailComputeBladeUpdateBoardControllerUpdateRequest(16930),
+    fsmStFailCapabilityCatalogueDeployCatalogueFinalize(16931),
+    fsmRmtErrEquipmentIOCardFePresenceIdentify(77845),
+    fsmRmtErrEquipmentIOCardFeConnEnableChassis(77846),
+    fsmRmtErrEquipmentChassisRemoveChassisDecomission(77847),
+    fsmRmtErrEquipmentLocatorLedSetLocatorLedExecute(77848),
+    fsmRmtErrMgmtControllerExtMgmtIfConfigSecondary(77958),
+    fsmRmtErrFabricComputeSlotEpIdentifyExecutePeer(77959),
+    fsmRmtErrComputeBladeDiscoverHagDisconnect(77960),
+    fsmRmtErrComputeBladeAssociateWaitForIBMCFwUpdate(77961),
+    fsmRmtErrComputeBladeDisassociateHagPnuOSDisconnect(77962),
+    fsmRmtErrComputeBladeDecommissionExecute(77963),
+    fsmRmtErrComputeBladeSoftShutdownExecute(77964),
+    fsmRmtErrComputeBladeHardShutdownExecute(77965),
+    fsmRmtErrComputeBladeTurnupExecute(77966),
+    fsmRmtErrComputeBladeHardresetSanitize(77968),
+    fsmRmtErrComputeBladeSoftresetSanitize(77969),
+    fsmRmtErrComputeBladeSwConnUpdB(77970),
+    fsmRmtErrComputeBladeBiosRecoveryWait(77971),
+    fsmRmtErrComputeBladeCmosResetSanitize(77972),
+    fsmRmtErrEquipmentChassisPsuPolicyConfigExecute(77973),
+    fsmRmtErrAdaptorHostFcIfResetFcPersBindingExecute(77974),
+    fsmRmtErrComputeBladeDiagUnconfigUserAccess(77975),
+    fsmRmtErrFabricLanCloudSwitchModeSwConfigPeer(77979),
+    fsmRmtErrVnicProfileSetDeployPeer(77990),
+    fsmRmtErrCommSvcEpUpdateSvcEpSetEpPeer(78016),
+    fsmRmtErrCommSvcEpRestartWebSvcRestart(78017),
+    fsmRmtErrComputeBladeUpdateExtUsersDeploy(78018),
+    fsmRmtErrStatsCollectionPolicyUpdateEpSetEpB(78019),
+    fsmRmtErrAaaRealmUpdateRealmSetRealmPeer(78020),
+    fsmRmtErrAaaUserEpUpdateUserEpSetUserPeer(78021),
+    fsmRmtErrSysfileMutationSingleExecute(78040),
+    fsmRmtErrSysfileMutationGlobalPeer(78041),
+    fsmRmtErrSysdebugManualCoreFileExportTargetExportExecute(78044),
+    fsmRmtErrSysdebugAutoCoreFileExportTargetConfigurePeer(78045),
+    fsmRmtErrSysdebugLogControlEpLogControlPersistPeer(78046),
+    fsmRmtErrSyntheticFsObjCreateCreateRemote(78081),
+    fsmRmtErrFirmwareDownloaderDownloadUnpackLocal(78090),
+    fsmRmtErrFirmwareImageDeleteRemote(78091),
+    fsmRmtErrMgmtControllerUpdateSwitchVerifyRemote(78093),
+    fsmRmtErrMgmtControllerUpdateIOMUpdateRequest(78094),
+    fsmRmtErrMgmtControllerActivateIOMReset(78095),
+    fsmRmtErrMgmtControllerUpdateBMCUpdateRequest(78096),
+    fsmRmtErrMgmtControllerActivateBMCReset(78097),
+    fsmRmtErrComputeBladeUpdateAdaptorUpdateRequest(78098),
+    fsmRmtErrComputeBladeActivateAdaptorReset(78099),
+    fsmRmtErrCallhomeEpConfigCallhomeSetPeer(78110),
+    fsmRmtErrMgmtIfSwMgmtOobIfConfigSwitch(78113),
+    fsmRmtErrMgmtIfSwMgmtInbandIfConfigSwitch(78114),
+    fsmRmtErrMgmtIfVirtualIfConfigRemote(78119),
+    fsmRmtErrMgmtIfEnableVipLocal(78120),
+    fsmRmtErrMgmtIfDisableVipPeer(78121),
+    fsmRmtErrMgmtIfEnableHALocal(78122),
+    fsmRmtErrMgmtBackupBackupUpload(78123),
+    fsmRmtErrMgmtImporterImportReportResults(78124),
+    fsmRmtErrComputeBladeConfigSoLExecute(78179),
+    fsmRmtErrComputeBladeUnconfigSoLExecute(78180),
+    fsmRmtErrQosclassDefinitionConfigGlobalQoSSetPeer(78185),
+    fsmRmtErrEpqosDefinitionDelTaskRemovePeer(78190),
+    fsmRmtErrComputeBladeResetBmcExecute(78242),
+    fsmRmtErrEquipmentIOCardResetCmcExecute(78243),
+    fsmRmtErrMgmtControllerUpdateUCSManagerStart(78255),
+    fsmRmtErrMgmtControllerSysConfigSecondary(78263),
+    fsmRmtErrComputeBladePowercycleSanitize(78274),
+    fsmRmtErrAdaptorExtEthIfPathResetEnable(78292),
+    fsmRmtErrAdaptorHostFcIfCircuitResetEnableB(78297),
+    fsmRmtErrExtvmmProviderConfigSetPeer(78319),
+    fsmRmtErrExtvmmKeyStoreCertInstallSetPeer(78320),
+    fsmRmtErrExtvmmSwitchDelTaskRemoveProviderRemoveLocal(78321),
+    fsmRmtErrComputeBladePowerCapConfig(78330),
+    fsmRmtErrComputeBladeBiosProfileConfigure(78331),
+    fsmRmtErrCapabilityUpdaterUpdaterUnpackLocal(78344),
+    fsmRmtErrComputeBladeUpdateBoardControllerUpdateRequest(78370),
+    fsmRmtErrCapabilityCatalogueDeployCatalogueFinalize(78371),
+    fsmFailEquipmentIOCardFePresence(999445),
+    fsmFailEquipmentIOCardFeConn(999446),
+    fsmFailEquipmentChassisRemoveChassis(999447),
+    fsmFailEquipmentLocatorLedSetLocatorLed(999448),
+    fsmFailMgmtControllerExtMgmtIfConfig(999558),
+    fsmFailFabricComputeSlotEpIdentify(999559),
+    fsmFailComputeBladeDiscover(999560),
+    fsmFailComputeBladeAssociate(999561),
+    fsmFailComputeBladeDisassociate(999562),
+    fsmFailComputeBladeDecommission(999563),
+    fsmFailComputeBladeSoftShutdown(999564),
+    fsmFailComputeBladeHardShutdown(999565),
+    fsmFailComputeBladeTurnup(999566),
+    fsmFailComputeBladeHardreset(999568),
+    fsmFailComputeBladeSoftreset(999569),
+    fsmFailComputeBladeSwConnUpd(999570),
+    fsmFailComputeBladeBiosRecovery(999571),
+    fsmFailComputeBladeCmosReset(999572),
+    fsmFailEquipmentChassisPsuPolicyConfig(999573),
+    fsmFailAdaptorHostFcIfResetFcPersBinding(999574),
+    fsmFailComputeBladeDiag(999575),
+    fsmFailFabricLanCloudSwitchMode(999579),
+    fsmFailVnicProfileSetDeploy(999590),
+    fsmFailCommSvcEpUpdateSvcEp(999616),
+    fsmFailCommSvcEpRestartWebSvc(999617),
+    fsmFailComputeBladeUpdateExtUsers(999618),
+    fsmFailStatsCollectionPolicyUpdateEp(999619),
+    fsmFailAaaRealmUpdateRealm(999620),
+    fsmFailAaaUserEpUpdateUserEp(999621),
+    fsmFailSysfileMutationSingle(999640),
+    fsmFailSysfileMutationGlobal(999641),
+    fsmFailSysdebugManualCoreFileExportTargetExport(999644),
+    fsmFailSysdebugAutoCoreFileExportTargetConfigure(999645),
+    fsmFailSysdebugLogControlEpLogControlPersist(999646),
+    fsmFailSyntheticFsObjCreate(999681),
+    fsmFailFirmwareDownloaderDownload(999690),
+    fsmFailFirmwareImageDelete(999691),
+    fsmFailMgmtControllerUpdateSwitch(999693),
+    fsmFailMgmtControllerUpdateIOM(999694),
+    fsmFailMgmtControllerActivateIOM(999695),
+    fsmFailMgmtControllerUpdateBMC(999696),
+    fsmFailMgmtControllerActivateBMC(999697),
+    fsmFailComputeBladeUpdateAdaptor(999698),
+    fsmFailComputeBladeActivateAdaptor(999699),
+    fsmFailCallhomeEpConfigCallhome(999710),
+    fsmFailMgmtIfSwMgmtOobIfConfig(999713),
+    fsmFailMgmtIfSwMgmtInbandIfConfig(999714),
+    fsmFailMgmtIfVirtualIfConfig(999719),
+    fsmFailMgmtIfEnableVip(999720),
+    fsmFailMgmtIfDisableVip(999721),
+    fsmFailMgmtIfEnableHA(999722),
+    fsmFailMgmtBackupBackup(999723),
+    fsmFailMgmtImporterImport(999724),
+    fsmFailComputeBladeConfigSoL(999779),
+    fsmFailComputeBladeUnconfigSoL(999780),
+    fsmFailQosclassDefinitionConfigGlobalQoS(999785),
+    fsmFailEpqosDefinitionDelTaskRemove(999790),
+    fsmFailComputeBladeResetBmc(999842),
+    fsmFailEquipmentIOCardResetCmc(999843),
+    fsmFailMgmtControllerUpdateUCSManager(999855),
+    fsmFailMgmtControllerSysConfig(999863),
+    fsmFailComputeBladePowercycle(999874),
+    fsmFailAdaptorExtEthIfPathReset(999892),
+    fsmFailAdaptorHostFcIfCircuitReset(999897),
+    fsmFailExtvmmProviderConfig(999919),
+    fsmFailExtvmmKeyStoreCertInstall(999920),
+    fsmFailExtvmmSwitchDelTaskRemoveProvider(999921),
+    fsmFailComputeBladePowerCap(999930),
+    fsmFailComputeBladeBiosProfile(999931),
+    fsmFailCapabilityUpdaterUpdater(999944),
+    fsmFailComputeBladeUpdateBoardController(999970),
+    fsmFailCapabilityCatalogueDeployCatalogue(999971)
+  }
+
+CucsFaultType  ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+       "A code used to categorize UCS faults"
+        SYNTAX INTEGER {
+    fsm(1),
+    equipment(2),
+    server(3),
+    configuration(4),
+    environmental(5),
+    management(6),
+    connectivity(7),
+    network(8),
+    operational(9)
+  }
+
+CucsFaultProbableCause  ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+       "A code used to identify the probable cause of a fault"
+        SYNTAX INTEGER {
+    fsmFailed(3),
+    checkLicenseFailed(4),
+    identifyFailed(5),
+    configureSwMgmtEndPointFailed(6),
+    configureVifNsFailed(7),
+    configureEndPointFailed(8),
+    discoverChassisFailed(9),
+    enableChassisFailed(10),
+    decomissionFailed(11),
+    disableEndPointFailed(12),
+    unIdentifyLocalFailed(13),
+    unIdentifyPeerFailed(14),
+    waitFailed(15),
+    executeFailed(16),
+    bmcPresenceFailed(17),
+    bmcInventoryFailed(18),
+    configFeLocalFailed(19),
+    configFePeerFailed(20),
+    bladePowerOnFailed(21),
+    nicPresenceFailed(22),
+    nicInventoryFailed(23),
+    deriveConfigFailed(24),
+    configUserAccessFailed(25),
+    configSolFailed(26),
+    swConfigLocalFailed(27),
+    swConfigPeerFailed(28),
+    nicConfigFailed(29),
+    stopvmediaLocalFailed(30),
+    stopvmediaPeerFailed(31),
+    setupvmediaLocalFailed(32),
+    setupvmediaPeerFailed(33),
+    bladeBootFailed(34),
+    bladeBootWaitFailed(35),
+    biosPostCompletionFailed(36),
+    bladeReadSmbiosFailed(37),
+    bladeReadBiosSettingsFailed(38),
+    hostConnectFailed(39),
+    startMemoryTestStatusFailed(40),
+    pollMemoryTestStatusFailed(41),
+    hostIdentFailed(42),
+    hostPolicyFailed(43),
+    setDiagUserFailed(44),
+    hostInventoryFailed(45),
+    hostServerDiagFailed(46),
+    hostServerDiagStatusFailed(47),
+    disableServerConnSwBfailed(48),
+    startFabricatrafficTestFailed(49),
+    fabricatrafficTestStatusFailed(50),
+    enableServerConnSwBfailed(51),
+    disableServerConnSwAfailed(52),
+    startFabricbtrafficTestFailed(53),
+    fabricbtrafficTestStatusFailed(54),
+    enableServerConnSwAfailed(55),
+    generateReportFailed(56),
+    generateLogWaitFailed(57),
+    debugWaitFailed(58),
+    removevmediaLocalFailed(59),
+    removevmediaPeerFailed(60),
+    nicUnconfigFailed(61),
+    swUnconfigLocalFailed(62),
+    swUnconfigPeerFailed(63),
+    removeConfigFailed(64),
+    restoreConfigFeLocalFailed(65),
+    restoreConfigFePeerFailed(66),
+    unconfigUserAccessFailed(67),
+    unconfigSolFailed(68),
+    hostDisconnectFailed(69),
+    bmcShutdownDiagCompletedFailed(70),
+    evaluateStatusFailed(71),
+    primaryFailed(74),
+    secondaryFailed(75),
+    executeLocalFailed(76),
+    executePeerFailed(77),
+    preSanitizeFailed(78),
+    sanitizeFailed(79),
+    nicConfigPnuosFailed(80),
+    swConfigPnuoslocalFailed(81),
+    swConfigPnuospeerFailed(82),
+    setupVmediaLocalFailed(83),
+    setupVmediaPeerFailed(84),
+    bladeBootPnuosFailed(85),
+    hagConnectFailed(86),
+    pnuosidentFailed(87),
+    pnuospolicyFailed(88),
+    pnuosinventoryFailed(89),
+    pnuosselfTestFailed(90),
+    pnuosscrubFailed(91),
+    nicUnconfigPnuosFailed(92),
+    swUnconfigPnuoslocalFailed(93),
+    swUnconfigPnuospeerFailed(94),
+    teardownVmediaLocalFailed(95),
+    teardownVmediaPeerFailed(96),
+    hagDisconnectFailed(97),
+    bmcShutdownDiscoveredFailed(98),
+    handlePoolingFailed(99),
+    updateibmcfwFailed(100),
+    waitForibmcfwUpdateFailed(101),
+    activateibmcfwFailed(102),
+    resetibmcFailed(103),
+    bladePowerOffFailed(104),
+    updateBoardCtrlRequestFailed(105),
+    pollBoardCtrlUpdateStatusFailed(106),
+    updateAdaptorNwFwFailed(107),
+    waitForAdaptorNwFwUpdateFailed(108),
+    activateAdaptorNwFwFailed(109),
+    hagPnuosconnectFailed(110),
+    pnuosvalidateFailed(111),
+    biosImgUpdateFailed(112),
+    storageCtlrImgUpdateFailed(113),
+    hbaImgUpdateFailed(114),
+    nicImgUpdateFailed(115),
+    pnuosconfigFailed(116),
+    pnuoslocalDiskConfigFailed(117),
+    pnuosunloadDriversFailed(118),
+    swConfigHostoslocalFailed(119),
+    swConfigHostospeerFailed(120),
+    nicConfigHostosFailed(121),
+    hagPnuosdisconnectFailed(122),
+    configSoLfailed(123),
+    prepareForBootFailed(124),
+    configUuidFailed(125),
+    bladeBootHostFailed(126),
+    hagHostosconnectFailed(127),
+    hostosidentFailed(128),
+    hostospolicyFailed(129),
+    hostosvalidateFailed(130),
+    hostosconfigFailed(131),
+    nicUnconfigHostosFailed(132),
+    swUnconfigHostoslocalFailed(133),
+    swUnconfigHostospeerFailed(134),
+    configBiosFailed(135),
+    pnuosunconfigFailed(136),
+    unconfigUuidFailed(137),
+    bladeShutdownFailed(138),
+    unconfigBiosFailed(139),
+    unconfigSoLfailed(140),
+    configFailed(141),
+    aFailed(142),
+    bFailed(143),
+    shutdownFailed(144),
+    startFailed(145),
+    cleanupFailed(146),
+    resetFailed(147),
+    configureFailed(148),
+    reconfigBiosFailed(149),
+    reconfigUuidFailed(150),
+    serverMoved(151),
+    serverIdentificationProblem(152),
+    localFailed(153),
+    peerFailed(154),
+    configurationFailed(155),
+    equipmentInoperable(156),
+    thermalProblem(157),
+    voltageProblem(158),
+    capacityExceeded(159),
+    equipmentDegraded(160),
+    identityUnestablishable(161),
+    setEpLocalFailed(162),
+    setEpPeerFailed(163),
+    propogateEpSettingsFailed(164),
+    propogateEpTimeZoneSettingsLocalFailed(165),
+    propogateEpTimeZoneSettingsPeerFailed(166),
+    restartFailed(167),
+    deployFailed(168),
+    setRealmLocalFailed(169),
+    setRealmPeerFailed(170),
+    setUserLocalFailed(171),
+    setUserPeerFailed(172),
+    setKeyRingLocalFailed(173),
+    setKeyRingPeerFailed(174),
+    vifDown(175),
+    unidentifiableFru(176),
+    equipmentMissing(177),
+    connectivityProblem(178),
+    linkDown(179),
+    disableFailed(180),
+    enableFailed(181),
+    disableAfailed(182),
+    enableAfailed(183),
+    disableBfailed(184),
+    enableBfailed(185),
+    updateConnectivityFailed(186),
+    createLocalFailed(187),
+    createRemoteFailed(188),
+    unpackLocalFailed(189),
+    deleteLocalFailed(190),
+    copyRemoteFailed(191),
+    remoteFailed(192),
+    updateLocalFailed(193),
+    verifyLocalFailed(194),
+    resetLocalFailed(195),
+    updateRemoteFailed(196),
+    verifyRemoteFailed(197),
+    resetRemoteFailed(198),
+    updateRequestFailed(199),
+    pollUpdateStatusFailed(200),
+    activateFailed(201),
+    prepareForUpdateFailed(202),
+    imageDeleted(203),
+    imageUnusable(204),
+    imageCannotBoot(205),
+    applyFailed(206),
+    rescanImagesFailed(207),
+    syncBladeaglocalFailed(208),
+    syncBladeagremoteFailed(209),
+    syncNicaglocalFailed(210),
+    syncNicagremoteFailed(211),
+    syncPortaglocalFailed(212),
+    syncPortagremoteFailed(213),
+    syncHostagentaglocalFailed(214),
+    syncHostagentagremoteFailed(215),
+    finalizeFailed(216),
+    portFailed(217),
+    interfaceFailed(218),
+    operationalStateDown(219),
+    cmcVifDown(220),
+    setLocalFailed(221),
+    setPeerFailed(222),
+    switchFailed(223),
+    limitReached(224),
+    emptyPool(225),
+    backupLocalFailed(228),
+    uploadFailed(229),
+    downloadLocalFailed(230),
+    reportResultsFailed(231),
+    electionFailure(232),
+    managementServicesFailure(233),
+    managementServicesUnresponsive(234),
+    haNotReady(235),
+    versionIncompatible(236),
+    chassisSeepromError(237),
+    logCapacity(238),
+    fileTransferFailed(239),
+    insufficientResources(241),
+    insufficientlyEquipped(242),
+    powerProblem(243),
+    discoveryFailed(244),
+    associationFailed(245),
+    equipmentInaccessible(246),
+    equipmentProblem(247),
+    serverFailed(263),
+    configurationFailure(264),
+    maintenanceFailed(265),
+    equipmentRemoved(266),
+    serverInaccessible(267),
+    unassociated(268),
+    getVersionFailed(269),
+    removeLocalFailed(270),
+    setEpAfailed(271),
+    setEpBfailed(272),
+    satelliteConnectionAbsent(273),
+    satelliteMisConnected(275),
+    unexpectedNumberOfLinks(276),
+    equipmentOffline(277),
+    performanceProblem(278),
+    firmwareUpgradeProblem(279),
+    unsupportedConnectivityConfiguration(280),
+    equipmentUnacknowledged(281),
+    autoFirmwareUpgrade(282),
+    equipmentDisconnected(283),
+    fruProblem(284)
+  }
+
+CucsFaultSeverity  ::= TEXTUAL-CONVENTION
+        STATUS       current
+        DESCRIPTION
+       "A code used to identify the severity of a fault"
+        SYNTAX INTEGER {
+    cleared(0),
+    info(1),
+    warning(3),
+    minor(4),
+    major(5),
+    critical(6)
+  }
+
+-- *********************************************************************
+-- Basic UCS MIB Objects
+-- *********************************************************************
+
+ciscoUnifiedComputingMIBNotifs OBJECT IDENTIFIER
+    ::= { ciscoUnifiedComputingMIB 0 }
+
+ciscoUnifiedComputingMIBObjects OBJECT IDENTIFIER
+    ::= { ciscoUnifiedComputingMIB 1 }
+
+ciscoUnifiedComputingMIBConform OBJECT IDENTIFIER
+    ::= { ciscoUnifiedComputingMIB 2 }
+
+-- *********************************************************************
+-- Fault Managed Objects
+-- *********************************************************************
+
+cucsFaultObjects  OBJECT IDENTIFIER
+    ::= { ciscoUnifiedComputingMIBObjects 1 }
+
+cucsFaultMIBConform OBJECT IDENTIFIER
+    ::= { ciscoUnifiedComputingMIBConform 1 }
+
+-- *********************************************************************
+-- UCS Fault Table
+-- *********************************************************************
+
+cucsFaultTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CucsFaultEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "A table of UCS faults. This table may contain both active
+       and cleared faults.
+       The following UCS Managed Objects may have faults:
+       * MOs representing physical equipment, such as chassis,
+       blades, fans, IO modules, interface cards...
+       * Service Profiles and their sub-components.
+       * vNIC and vHBA templates.
+       * Pools, such as server pools or WWN pools.
+       * Port channels.
+       "
+    ::= { cucsFaultObjects 1 }
+        
+cucsFaultEntry       OBJECT-TYPE
+    SYNTAX          CucsFaultEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+       "An entry in the UCS fault table. Entries appear in this table
+       when faults are active. A system-wide fault policy specifies
+       what to do when faults are cleared:
+       * clearAction: what should happen to cleared faults
+         (retain or delete) 
+       * retentionInterval: duration (seconds) to retain a
+         cleared fault 
+       * flapInterval: duration (seconds) to detect possible flapping
+         condition 
+       * clearInterval: for non-auto-cleared faults,
+         duration (seconds) for a fault to be cleared
+           
+       Cleared faults may or may not remain in this table depending
+       on the fault policy. Refer to the UCS documentation for more
+       details about the fault policy."
+    INDEX { cucsFaultIndex }
+    ::= { cucsFaultTable 1 }
+        
+CucsFaultEntry ::= SEQUENCE {
+    cucsFaultIndex                 CucsManagedObjectId,
+    cucsFaultDescription           SnmpAdminString,
+    cucsFaultAffectedObjectId      RowPointer,
+    cucsFaultAffectedObjectDn      CucsManagedObjectDn,
+    cucsFaultCreationTime          DateAndTime,
+    cucsFaultLastModificationTime  DateAndTime,
+    cucsFaultCode                  CucsFaultCode,
+    cucsFaultType                  CucsFaultType,
+    cucsFaultProbableCause         CucsFaultProbableCause,
+    cucsFaultSeverity              CucsFaultSeverity,
+    cucsFaultOccur                 Counter32
+    }
+
+cucsFaultIndex OBJECT-TYPE
+    SYNTAX          CucsManagedObjectId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+           "This object uniquely identifies a specific instance of
+           a UCS fault.
+           For example, if two separate chassis have a Fan Failure, then
+           each chassis will have a fault instance with a unique index."
+    ::= { cucsFaultEntry 1 }
+
+cucsFaultDescription OBJECT-TYPE
+    SYNTAX          SnmpAdminString  (SIZE(0..255))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A human-readable message providing details about the fault." 
+    ::= { cucsFaultEntry 11 }
+
+cucsFaultAffectedObjectId OBJECT-TYPE
+    SYNTAX          RowPointer
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object uniquely identifies the managed object on which
+        this fault is occurring.
+        
+        For example, suppose a chassis has 2 power supply units PSU1
+        and PSU2. PSU1 is operational and PSU2 is in a failed state,
+        hence the MO representing PSU2 has a fault. Suppose the MO Id
+        of PSU2 is '1234' and its DN is 'sys/chassis-5/psu-1'.
+        The cucsFaultTable table would have an entry for the PSU fault.
+        The value of cucsFaultAffectedObjectId would be set to
+        'psuTable.psuEntry.1.1234'
+        and the value of cucsFaultAffectedObjectDn would be set to
+        'sys/chassis-5/psu-1'."
+    ::= { cucsFaultEntry 4 }
+        
+cucsFaultAffectedObjectDn OBJECT-TYPE
+    SYNTAX          CucsManagedObjectDn
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The distinguished name (DN) of the managed object that
+        has a fault.
+        The DN value provides a friendly unique identifier for the
+        object and can be used to query Managed Objects through the
+        XML API." 
+    ::= { cucsFaultEntry 5 }
+                
+cucsFaultCreationTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The date and time when the fault was created." 
+    ::= { cucsFaultEntry 10 }
+
+cucsFaultLastModificationTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The date and time when the fault was last modified. The
+        modification time is changed whenever a fault attribute
+        is changed." 
+    ::= { cucsFaultEntry 14 }
+
+cucsFaultCode OBJECT-TYPE
+    SYNTAX          CucsFaultCode
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A code uniquely identifying the fault class.
+        A managed object can have multiple faults, but it cannot have
+        multiple faults with the same code." 
+    ::= { cucsFaultEntry 9 }
+
+cucsFaultType OBJECT-TYPE
+    SYNTAX          CucsFaultType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object is used to categorize faults." 
+    ::= { cucsFaultEntry 22 }
+
+cucsFaultProbableCause OBJECT-TYPE
+    SYNTAX          CucsFaultProbableCause
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A code identifying the probable cause of the fault." 
+    ::= { cucsFaultEntry 7 }
+
+cucsFaultSeverity OBJECT-TYPE
+    SYNTAX          CucsFaultSeverity
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "A code identifying the perceived severity of the fault." 
+    ::= { cucsFaultEntry 20 }
+
+cucsFaultOccur OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times this fault has occurred since the
+        fault became active.
+        This counter can only increase when the fault is active.
+        It does not increase when the fault is cleared.
+        When a fault is cleared, the value of this counter remains
+        at the value it was before the fault was cleared." 
+    ::= { cucsFaultEntry 16 }
+    
+-- *********************************************************************
+-- Fault Notifications
+-- *********************************************************************
+
+cucsFaultActiveNotif NOTIFICATION-TYPE
+      OBJECTS  {
+                cucsFaultDescription,
+                cucsFaultAffectedObjectId,
+                cucsFaultAffectedObjectDn,
+                cucsFaultCreationTime,
+                cucsFaultLastModificationTime,
+                cucsFaultCode,
+                cucsFaultType,
+                cucsFaultProbableCause,
+                cucsFaultSeverity,
+                cucsFaultOccur
+               }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated by a UCS node whenever a fault
+          is active and the fault state changes."
+      ::= { ciscoUnifiedComputingMIBNotifs 1 }
+
+cucsFaultClearNotif NOTIFICATION-TYPE
+      OBJECTS  {
+                cucsFaultDescription,
+                cucsFaultAffectedObjectId,
+                cucsFaultAffectedObjectDn,
+                cucsFaultCreationTime,
+                cucsFaultLastModificationTime,
+                cucsFaultCode,
+                cucsFaultType,
+                cucsFaultProbableCause,
+                cucsFaultSeverity,
+                cucsFaultOccur
+               }
+      STATUS current
+      DESCRIPTION
+          "This notification is generated by a UCS node whenever a fault
+          is cleared."
+      ::= { ciscoUnifiedComputingMIBNotifs 2 }
+
+-- *********************************************************************
+-- Fault Conformance information
+-- *********************************************************************
+
+cucsFaultMIBCompliances OBJECT IDENTIFIER
+    ::= { cucsFaultMIBConform 1 }
+
+cucsFaultMIBGroups OBJECT IDENTIFIER
+    ::= { cucsFaultMIBConform 2 }
+
+cucsFaultMIBCompliance MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities that support
+        the Cisco UCS Fault Managed Objects."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cucsFaultsNotifGroup
+                    }
+
+    GROUP           cucsFaultsGroup
+    DESCRIPTION
+        "The UCS Fault optional group contains
+        objects for features that may not be implemented
+        on all systems."
+
+    ::= { cucsFaultMIBCompliances 1 }
+
+-- Compliance Groups
+
+cucsFaultsGroup OBJECT-GROUP
+        OBJECTS         {
+                        cucsFaultDescription,
+                        cucsFaultAffectedObjectId,
+                        cucsFaultAffectedObjectDn,
+                        cucsFaultCreationTime,
+                        cucsFaultLastModificationTime,
+                        cucsFaultCode,
+                        cucsFaultType,
+                        cucsFaultProbableCause,
+                        cucsFaultSeverity,
+                        cucsFaultOccur
+                        }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing UCS fault information."
+    ::= { cucsFaultMIBGroups 1 }
+                        
+cucsFaultsNotifGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        cucsFaultActiveNotif,
+                        cucsFaultClearNotif
+                    }
+    STATUS          current
+    DESCRIPTION
+        "The set of UCS notifications defined by this MIB."
+    ::= { cucsFaultMIBGroups 2 }
+
+END

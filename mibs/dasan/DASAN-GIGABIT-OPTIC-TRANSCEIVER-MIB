@@ -1,0 +1,1047 @@
+DASAN-GIGABIT-OPTIC-TRANSCEIVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, Integer32, TimeTicks, mib-2, NOTIFICATION-TYPE FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, PhysAddress, TruthValue, RowStatus, TimeStamp, AutonomousType, TestAndIncr FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP        FROM SNMPv2-CONF 
+	--NetworkAddress, IpAddress  FROM RFC1155-SMI 
+	ifIndex 		FROM IF-MIB
+	dasanMgmt       FROM DASAN-SMI 
+	dsSwitchModules,dsPortModuleIndex FROM DASAN-SWITCH-MIB;
+
+
+-- Definition Grammer
+
+dsGigabitOpticTransceiverMIB MODULE-IDENTITY
+    	LAST-UPDATED	"200606020000Z"
+    	ORGANIZATION	"DASAN Co., Ltd."
+    	CONTACT-INFO	"DASAN Co., Ltd."
+    	DESCRIPTION     "."
+    ::= { dsSwitchModules 13 }     
+    
+    
+--
+--  Textual Conventions
+--                     
+
+DsGOTransceiverIdentifierType ::= INTEGER
+{
+   unknown(0),
+   gbic(1),
+   soldered-to-motherboard(2),
+   sfp(3)
+}
+
+DsGOTransceiverExtIdentifierType ::= INTEGER
+{
+   not-compliant(0),
+   mod-def1(1),
+   mod-def2(2),
+   mod-def3(3),
+   serialonly(4),
+   mod-def4(5),
+   mod-def5(6),
+   mod-def6(7)
+}
+ 
+DsGOTransceiverConnectorType ::= INTEGER
+{
+   unknown(0),
+   sc(1),
+   style1-cooper(2),
+   style2-cooper(3),
+   bnc-tnc(4),
+   coaxial-headers(5),
+   fiverjack(6),
+   lc(7),
+   mt-rj(8),
+   mu(9),
+   sg(10),
+   optical-pigtail(11),
+   hssdcII(32),
+   copper-pigtail(33)
+}
+
+DsGOTransceiverEncodingType ::= INTEGER
+{
+   unspecified(0),
+   encode-8b10b(1),
+   encode-4b5b(2),
+   encode-nrz(3),
+   encode-manchester(4)                          
+}           
+
+
+
+DsGoTransceiverTransceiverType ::= INTEGER 
+{
+   unknown(0),
+   fiber-1000-sx(1),
+   fiber-1000-lx(2),
+   fiber-1000-cx(3),
+   fiber-1000-t(4),
+   fiber-oc-3-mm-sr(5),
+   fiber-oc-3-sm-ir(6),
+   fiber-oc-3-sm-lr(7)
+}
+--
+-- Info Tables
+--
+ 
+dsGOTransceiverInfo OBJECT IDENTIFIER ::= { dsGigabitOpticTransceiverMIB 1 }
+
+--
+-- Base ID
+--
+dsGOTransceiverBaseTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsGOTransceiverBaseEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		::= { dsGOTransceiverInfo 1 }
+
+dsGOTransceiverBaseEntry	OBJECT-TYPE
+		SYNTAX		DsGOTransceiverBaseEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		INDEX		{dsPortModuleIndex, ifIndex}
+		::= { dsGOTransceiverBaseTable 1 }        
+		
+		
+		-- OCTET STRING (SIZE (6))
+		
+
+DsGOTransceiverBaseEntry ::= SEQUENCE {
+		dsGOTransceiverIdentifier     DsGOTransceiverIdentifierType,
+		dsGOTransceiverExtIdentifier  DsGOTransceiverExtIdentifierType,
+	    dsGOTransceiverConnector      DsGOTransceiverConnectorType,
+	    dsGOTransceiverTransceiver    DsGoTransceiverTransceiverType,
+	    dsGOTransceiverEncoding       DsGOTransceiverEncodingType,
+	    dsGOTransceiverBRNominal      INTEGER,
+	    dsGOTransceiverLength9u-k	  INTEGER,
+	    dsGOTransceiverLength9u-100m  INTEGER,
+	    dsGOTransceiverLength50u      INTEGER,
+	    dsGOTransceiverLength62dot5u  INTEGER,
+	    dsGOTransceiverLengthCooper   INTEGER,
+	    dsGOTransceiverVendorName     OCTET STRING,
+	    dsGOTransceiverVendorOUI	  OCTET STRING,
+	    dsGOTransceiverVendorPN		  OCTET STRING,
+	    dsGOTransceiverVendorRev	  OCTET STRING,
+	    dsGOTransceiverCCBase		  INTEGER	     	
+	}
+
+dsGOTransceiverIdentifier OBJECT-TYPE
+       SYNTAX	   DsGOTransceiverIdentifierType
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Type of serial transceiver."
+       ::= { dsGOTransceiverBaseEntry 1 }
+
+dsGOTransceiverExtIdentifier OBJECT-TYPE
+       SYNTAX	   DsGOTransceiverExtIdentifierType
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Extended identifier of type of serial transceiver."
+       ::= { dsGOTransceiverBaseEntry 2 }
+
+dsGOTransceiverConnector OBJECT-TYPE
+       SYNTAX	   DsGOTransceiverConnectorType
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Code for connector type."
+       ::= { dsGOTransceiverBaseEntry 3 }
+
+dsGOTransceiverTransceiver OBJECT-TYPE
+       SYNTAX	   DsGoTransceiverTransceiverType
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Code for electronic compatibility or optical compatibility."
+       ::= { dsGOTransceiverBaseEntry 4 }
+ 
+dsGOTransceiverEncoding OBJECT-TYPE
+       SYNTAX      DsGOTransceiverEncodingType
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Code for serial encoding algorithm."
+       ::= { dsGOTransceiverBaseEntry 5 }
+
+dsGOTransceiverBRNominal OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Nominal bit rate, units of 100 MBits/sec.."
+       ::= { dsGOTransceiverBaseEntry 6 }	   
+       
+dsGOTransceiverLength9u-k OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Link length supported for 9/125 mm fiber, units of k."
+       ::= { dsGOTransceiverBaseEntry 7 }
+	    
+dsGOTransceiverLength9u-100m OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Link length supported for 9/125 mm fiber, units of 100 m."
+       ::= { dsGOTransceiverBaseEntry 8 }
+	    
+dsGOTransceiverLength50u OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Link length supported for 50/125 mm fiber, units of 10 m."
+       ::= { dsGOTransceiverBaseEntry 9 }
+      
+dsGOTransceiverLength62dot5u OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Link length supported for 62.5/125 mm fiber, units of 10 m."
+       ::= { dsGOTransceiverBaseEntry 10 }
+       
+
+dsGOTransceiverLengthCooper OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               " Link length supported for copper, units of meters."
+       ::= { dsGOTransceiverBaseEntry 11 }       
+      
+dsGOTransceiverVendorName OBJECT-TYPE
+	   SYNTAX      OCTET STRING (SIZE (16))
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "GBIC vendor name (ASCII)."
+       ::= { dsGOTransceiverBaseEntry 12 }
+
+dsGOTransceiverVendorOUI OBJECT-TYPE
+	   SYNTAX      OCTET STRING (SIZE (3))
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "GBIC vendor IEEE company ID."
+       ::= { dsGOTransceiverBaseEntry 13 }
+       
+dsGOTransceiverVendorPN OBJECT-TYPE
+	   SYNTAX      OCTET STRING (SIZE (16))
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Part number provided by GBIC vendor (ASCII)."
+       ::= { dsGOTransceiverBaseEntry 14 } 
+       
+dsGOTransceiverVendorRev OBJECT-TYPE
+	   SYNTAX      OCTET STRING (SIZE (4))
+	   MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Revision level for part number provided by vendor (ASCII)."
+       ::= { dsGOTransceiverBaseEntry 15 }
+	
+dsGOTransceiverCCBase OBJECT-TYPE
+	   SYNTAX      INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Check code for Base ID Fields."
+       ::= { dsGOTransceiverBaseEntry 16 }
+
+
+--
+-- Ext ID
+--
+dsGOTransceiverExtTable  OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsGOTransceiverExtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		::= { dsGOTransceiverInfo 2 }
+
+dsGOTransceiverExtEntry	OBJECT-TYPE
+		SYNTAX		DsGOTransceiverExtEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		INDEX		{dsPortModuleIndex, ifIndex}
+		::= { dsGOTransceiverExtTable 1 }
+
+
+DsGOTransceiverExtEntry ::= SEQUENCE {
+		dsGOTransceiverExtOptions   INTEGER,
+		dsGOTransceiverExtBrMax     INTEGER,
+		dsGOTransceiverExtBrMin     INTEGER,
+		dsGOTransceiverExtVendorSN  OCTET STRING,
+		dsGOTransceiverExtDateCode  OCTET STRING,
+		dsGOTransceiverExtDiagMonitoringType INTEGER,
+		dsGOTransceiverExtEnhancedOptions INTEGER,
+		dsGOTransceiverExtSff8472Compliance INTEGER,
+		dsGOTransceiverExtCCExt    INTEGER
+	}
+
+dsGOTransceiverExtOptions OBJECT-TYPE
+       SYNTAX	   INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Indicates which optional GBIC signals are implemented."
+       ::= { dsGOTransceiverExtEntry 1 }
+
+dsGOTransceiverExtBrMax OBJECT-TYPE
+       SYNTAX	   INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Upper bit rate margin, units of %."
+       ::= { dsGOTransceiverExtEntry 2 }
+		
+dsGOTransceiverExtBrMin OBJECT-TYPE
+       SYNTAX	   INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Lower bit rate margin, units of %."
+       ::= { dsGOTransceiverExtEntry 3 }
+       
+dsGOTransceiverExtVendorSN OBJECT-TYPE
+       SYNTAX	   OCTET STRING  (SIZE (16))
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Serial number provided by vendor (ASCII)."
+       ::= { dsGOTransceiverExtEntry 4 }
+       
+dsGOTransceiverExtDateCode OBJECT-TYPE
+       SYNTAX	   OCTET STRING  (SIZE (10))
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Vendor¡¯s manufacturing date code."
+       ::= { dsGOTransceiverExtEntry 5 }
+		
+dsGOTransceiverExtDiagMonitoringType OBJECT-TYPE
+       SYNTAX	   INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsGOTransceiverExtEntry 6 }
+
+dsGOTransceiverExtEnhancedOptions OBJECT-TYPE
+       SYNTAX	   INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsGOTransceiverExtEntry 7 }
+
+dsGOTransceiverExtSff8472Compliance OBJECT-TYPE
+       SYNTAX	   INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "."
+       ::= { dsGOTransceiverExtEntry 8 }
+		
+dsGOTransceiverExtCCExt OBJECT-TYPE
+       SYNTAX	   INTEGER
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Check code for the Extended ID Fields."
+       ::= { dsGOTransceiverExtEntry 9 }
+
+
+--
+-- Diagnostics
+--
+dsGOTransceiverDiagInfo OBJECT IDENTIFIER ::= { dsGOTransceiverInfo 3 }
+
+dsGOTransceiverDiagTable  OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsGOTransceiverDiagEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		::= { dsGOTransceiverDiagInfo 1 }
+
+dsGOTransceiverDiagEntry OBJECT-TYPE
+		SYNTAX		DsGOTransceiverDiagEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		INDEX		{dsPortModuleIndex, ifIndex}
+		::= { dsGOTransceiverDiagTable 1 }
+
+DsGOTransceiverDiagEntry ::= SEQUENCE {
+		dsGOTransceiverDiagTemper   OCTET STRING,
+		dsGOTransceiverDiagVoltage  OCTET STRING,
+		dsGOTransceiverDiagTxBias   OCTET STRING,
+		dsGOTransceiverDiagTxPower  OCTET STRING,
+		dsGOTransceiverDiagRxPower  OCTET STRING
+	}
+
+dsGOTransceiverDiagTemper OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Internally measured module temperature."
+       ::= { dsGOTransceiverDiagEntry 1 }
+
+dsGOTransceiverDiagVoltage OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Internally measured supply voltage in transceiver."
+       ::= { dsGOTransceiverDiagEntry 2 }
+
+dsGOTransceiverDiagTxBias OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Internally measured TX Bias Current."
+       ::= { dsGOTransceiverDiagEntry 3 }
+
+dsGOTransceiverDiagTxPower OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Measured TX output power."
+       ::= { dsGOTransceiverDiagEntry 4 }
+
+dsGOTransceiverDiagRxPower OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-only  
+       STATUS      current
+       DESCRIPTION
+               "Measured RX input power."
+       ::= { dsGOTransceiverDiagEntry 5 }
+
+ 
+dsGOTransceiverDiagThresholdTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF DsGOTransceiverDiagThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		::= { dsGOTransceiverDiagInfo 2 }
+
+dsGOTransceiverDiagThresholdEntry OBJECT-TYPE
+		SYNTAX		DsGOTransceiverDiagThresholdEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"."
+		INDEX		{dsPortModuleIndex, ifIndex}
+		::= { dsGOTransceiverDiagThresholdTable 1 }
+
+DsGOTransceiverDiagThresholdEntry ::= SEQUENCE {
+		dsGOTransceiverDiagThresholdAlarmTempHigh 		OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmTempLow  		OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnTempHigh 		OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnTempLow  		OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmVolHigh 		OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmVolLow 		OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnVolHigh 		OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnVolLow  		OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmTxBiasHigh 	OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmTxBiasLow 		OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnTxBiasHigh 		OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnTxBiasLow  		OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmTxPowerHigh 	OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmTxPowerLow 	OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnTxPowerHigh 	OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnTxPowerLow  	OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmRxPowerHigh 	OCTET STRING,
+		dsGOTransceiverDiagThresholdAlarmRxPowerLow 	OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnRxPowerHigh 	OCTET STRING,
+		dsGOTransceiverDiagThresholdWarnRxPowerLow  	OCTET STRING
+	}
+
+dsGOTransceiverDiagThresholdAlarmTempHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write 
+       STATUS      current
+       DESCRIPTION
+               "The alarm-high-threshold of temperature."
+       ::= { dsGOTransceiverDiagThresholdEntry 1 }
+     
+dsGOTransceiverDiagThresholdAlarmTempLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The alarm-low-threshold of temperature."
+       ::= { dsGOTransceiverDiagThresholdEntry 2 }
+
+dsGOTransceiverDiagThresholdWarnTempHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-high-threshold of temperature."
+       ::= { dsGOTransceiverDiagThresholdEntry 3 }
+ 
+dsGOTransceiverDiagThresholdWarnTempLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write 
+       STATUS      current
+       DESCRIPTION
+               "The warning-low-threshold of temperature."
+       ::= { dsGOTransceiverDiagThresholdEntry 4 }
+  
+dsGOTransceiverDiagThresholdAlarmVolHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The alarm-high-threshold of voltage."
+       ::= { dsGOTransceiverDiagThresholdEntry 5 }
+ 
+dsGOTransceiverDiagThresholdAlarmVolLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The alarm-low-threshold of voltage."
+       ::= { dsGOTransceiverDiagThresholdEntry 6 }
+ 
+dsGOTransceiverDiagThresholdWarnVolHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-high-threshold of voltage."
+       ::= { dsGOTransceiverDiagThresholdEntry 7 }
+ 	
+dsGOTransceiverDiagThresholdWarnVolLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-low-threshold of voltage."
+       ::= { dsGOTransceiverDiagThresholdEntry 8 }
+  	
+dsGOTransceiverDiagThresholdAlarmTxBiasHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The Alarm-high-threshold of tx bias."
+       ::= { dsGOTransceiverDiagThresholdEntry 9 }
+ 	
+dsGOTransceiverDiagThresholdAlarmTxBiasLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The Alarm-low-threshold of tx bias."
+       ::= { dsGOTransceiverDiagThresholdEntry 10 }
+ 	
+dsGOTransceiverDiagThresholdWarnTxBiasHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-high-threshold of tx bias."
+       ::= { dsGOTransceiverDiagThresholdEntry 11 }
+ 	
+dsGOTransceiverDiagThresholdWarnTxBiasLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-low-threshold of tx bias."
+       ::= { dsGOTransceiverDiagThresholdEntry 12 }
+  	
+dsGOTransceiverDiagThresholdAlarmTxPowerHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The alarm-high-threshold of tx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 13 }
+ 
+dsGOTransceiverDiagThresholdAlarmTxPowerLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The alarm-low-threshold of tx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 14 }
+ 
+dsGOTransceiverDiagThresholdWarnTxPowerHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-high-threshold of tx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 15 }
+ 
+dsGOTransceiverDiagThresholdWarnTxPowerLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-low-threshold of tx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 16 }
+  
+dsGOTransceiverDiagThresholdAlarmRxPowerHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The alarm-high-threshold of rx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 17 }
+ 
+dsGOTransceiverDiagThresholdAlarmRxPowerLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The alarm-low-threshold of rx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 18 }
+ 
+dsGOTransceiverDiagThresholdWarnRxPowerHigh OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write 
+       STATUS      current
+       DESCRIPTION
+               "The warning-high-threshold of rx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 19 }
+ 
+dsGOTransceiverDiagThresholdWarnRxPowerLow OBJECT-TYPE
+       SYNTAX	   OCTET STRING
+       MAX-ACCESS  read-write  
+       STATUS      current
+       DESCRIPTION
+               "The warning-low-threshold of rx power."
+       ::= { dsGOTransceiverDiagThresholdEntry 20 }
+
+
+-- dsGOTransceiverDiagnosticsNotification 
+dsGOTransceiverDiagNotification OBJECT IDENTIFIER ::= { dsGOTransceiverDiagInfo 3 }     
+
+dsGOTransceiverDiagTempHighOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTempHigh,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature is over alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 1 }
+
+dsGOTransceiverDiagTempHighFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTempHigh,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature fall under alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 2 }
+
+dsGOTransceiverDiagTempLowOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTempLow,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature is over alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 3 }
+
+
+dsGOTransceiverDiagTempLowFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTempLow,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature fall under alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 4 }
+
+dsGOTransceiverDiagTempHighOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTempHigh,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature is over warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 5} 
+    
+dsGOTransceiverDiagTempHighFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTempHigh,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature fall under warning-high-threshold."  
+    ::= { dsGOTransceiverDiagNotification 6} 
+
+
+dsGOTransceiverDiagTempLowOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTempLow,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature is over warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 7 }
+
+dsGOTransceiverDiagTempLowFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTempLow,
+       dsGOTransceiverDiagTemper
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of temperature fall under warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 8 }
+
+	
+dsGOTransceiverDiagVolHighOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmVolHigh,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage is over alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 9 }
+
+dsGOTransceiverDiagVolHighFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmVolHigh,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage fall under alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 10 }
+
+dsGOTransceiverDiagVolLowOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmVolLow,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage is over alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 11 }
+
+dsGOTransceiverDiagVolLowFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmVolLow,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage fall under alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 12 }
+
+dsGOTransceiverDiagVolHighOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnVolHigh,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage is over warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 13}
+
+dsGOTransceiverDiagVolHighFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnVolHigh,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage fall under warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 14}
+
+
+dsGOTransceiverDiagVolLowOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnVolLow,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage is over warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 15 }
+	
+dsGOTransceiverDiagVolLowFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnVolLow,
+       dsGOTransceiverDiagVoltage
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of voltage fall under warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 16 }
+	
+dsGOTransceiverDiagTxBiasHighOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxBiasHigh,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias is over alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 17 }                                                               
+
+dsGOTransceiverDiagTxBiasHighFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxBiasHigh,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias fall under alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 18 }
+
+dsGOTransceiverDiagTxBiasLowOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxBiasLow,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias is over alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 19 }
+
+dsGOTransceiverDiagTxBiasLowFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxBiasLow,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias fall under alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 20 }
+
+dsGOTransceiverDiagTxBiasHighOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxBiasHigh,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias is over warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 21 }
+
+dsGOTransceiverDiagTxBiasHighFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxBiasHigh,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias fall under warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 22 }
+    
+dsGOTransceiverDiagTxBiasLowOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxBiasLow,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias is over warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 23 }
+	
+dsGOTransceiverDiagTxBiasLowFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxBiasLow,
+       dsGOTransceiverDiagTxBias
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX bias fall under warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 24 }
+
+dsGOTransceiverDiagTxPowerHighOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxPowerHigh,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power is over alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 25 }
+
+dsGOTransceiverDiagTxPowerHighFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxPowerHigh,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power fall under alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 26 }
+    
+dsGOTransceiverDiagTxPowerLowOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxPowerLow,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power is over alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 27 }
+
+dsGOTransceiverDiagTxPowerLowFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmTxPowerLow,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power fall under alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 28 }
+
+dsGOTransceiverDiagTxPowerHighOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxPowerHigh,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power is over warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 29 }
+
+dsGOTransceiverDiagTxPowerHighFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxPowerHigh,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power fall under warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 30 }
+
+dsGOTransceiverDiagTxPowerLowOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxPowerLow,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power is over warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 31 }
+    
+dsGOTransceiverDiagTxPowerLowFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnTxPowerLow,
+       dsGOTransceiverDiagTxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of TX power fall under warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 32 }
+
+dsGOTransceiverDiagRxPowerHighOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmRxPowerHigh,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power is over alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 33 }
+
+dsGOTransceiverDiagRxPowerHighFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmRxPowerHigh,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power fall under alarm-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 34 }
+
+dsGOTransceiverDiagRxPowerLowOverAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmRxPowerLow,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power is over alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 35 }
+
+
+dsGOTransceiverDiagRxPowerLowFallAlarm NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdAlarmRxPowerLow,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power fall under alarm-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 36 }
+
+
+dsGOTransceiverDiagRxPowerHighOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnRxPowerHigh,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power is over warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 37 }
+
+
+dsGOTransceiverDiagRxPowerHighFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnRxPowerHigh,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power fall under warning-high-threshold."
+    ::= { dsGOTransceiverDiagNotification 38 }
+
+dsGOTransceiverDiagRxPowerLowOverWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnRxPowerLow,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power is over warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 39 }
+
+dsGOTransceiverDiagRxPowerLowFallWarning NOTIFICATION-TYPE
+    OBJECTS {
+       dsGOTransceiverDiagThresholdWarnRxPowerLow,
+       dsGOTransceiverDiagRxPower
+    }
+    STATUS current   
+    DESCRIPTION
+             "This notification is generated in case of RX power fall under warning-low-threshold."
+    ::= { dsGOTransceiverDiagNotification 40 }
+                          
+
+END

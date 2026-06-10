@@ -1,0 +1,415 @@
+--  *****************************************************************
+--  DLINKSW-STORM-CTRL-MIB.mib : Storm Control MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-STORM-CTRL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+           MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+           Integer32
+               FROM SNMPv2-SMI           
+           MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+               FROM SNMPv2-CONF        
+           ifIndex, InterfaceIndex
+               FROM IF-MIB
+           Unsigned32
+                FROM SNMPv2-SMI
+           dlinkIndustrialCommon        
+                FROM DLINK-ID-REC-MIB;
+   
+   dlinkSwStormCtrlMIB    MODULE-IDENTITY
+           LAST-UPDATED "201306130000Z"
+           ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for Storm Control"
+            
+        REVISION "201306130000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'Storm Control'
+            functionality."
+        ::= { dlinkIndustrialCommon 25 } 
+
+    
+    
+    DStormCtlTrafficType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "The type of storm control traffic type.
+                broadcast(1) - broadcast storm.
+            multicast(2) - including unknown L2 multicast, known L2 
+                           multicast, unknown IP multicast and known 
+                           IP multicast.
+            unicast(3) - when the action is configured as 'shutdown mode', 
+                         unicast refers to both known and unknown 
+                         unicast packet; Otherwise, unicast refers to 
+                         unknown unicast packet. "
+        SYNTAX  INTEGER  {
+            broadcast(1),
+            multicast(2),
+            unicast(3)
+        }   
+        
+    DStormCtlThrType ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "The type of storm control threshold is configured on an interface.
+            pps(1) - the threshold is configured as packet count per second. 
+            kbps(2) - the threshold is configured as a rate of bits per second. 
+            percentage(3) - the threshold is configured as a percentage of total 
+                      bandwidth per port. 
+            "
+        SYNTAX  INTEGER  {
+            pps(1),
+            kbps(2),
+            percentage(3)
+        }      
+     
+    DStormCtlThrTypeValue ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+        "Denotes a generic threshold value.
+
+         A DStormCtlThrTypeValue value is always interpreted within the context
+         of a DStormCtlThrType value.  Every usage of the DStormCtlThrTypeValue
+         textual convention is required to specify the DStormCtlThrType
+         object that provides the context.  
+         The unit and valid range are as follows:
+         Threshold Type     Unit                      Valid Range
+         =============      =====================     =================
+         pps                packet per second         1 ~ 2147483647
+         kbps               bits per second           1 ~ 2147483647
+         percentage         percentage                1 ~ 100    
+         
+         The special value of -1 indicates this object is undefined.
+         "
+         SYNTAX       Integer32
+        
+    
+      
+    dStormCtrlMIBNotifications     OBJECT IDENTIFIER ::= { dlinkSwStormCtrlMIB 0 }
+    dStormCtrlMIBObjects         OBJECT IDENTIFIER ::= { dlinkSwStormCtrlMIB 1 }
+    dStormCtrlMIBConformance    OBJECT IDENTIFIER ::= { dlinkSwStormCtrlMIB 2 }
+    
+-- --------------------------------------------------------------------------    
+    dStormCtrlGentrl    OBJECT IDENTIFIER ::= { dStormCtrlMIBObjects 1 }
+    
+    dStormCtrlNotifyEnable OBJECT-TYPE
+        SYNTAX  INTEGER {
+            none          (1),
+            stormOccurred (2),
+            stormCleared  (3),
+            both          (4)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object controls when a storm control notification will be generated.
+
+            If the object is set to
+            none(1): No notifications will be generated.
+            stormOccurred(2): A notification will be generated when a storm event is
+                      detected.
+            stormCleared(3): A notification will be generated when a storm event is
+                      cleared.
+            both (4): A notification will be generated both when a storm event is 
+                   detected and  cleared.
+            NOTE:The default value of this object is none(1)."
+        ::= { dStormCtrlGentrl 1}
+        
+    dStormCtrlPollingInterval OBJECT-TYPE
+        SYNTAX  Unsigned32 (5..600)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The interval, in seconds, the switch detects the storm."
+        DEFVAL { 5 }   
+        ::= { dStormCtrlGentrl 2}    
+
+    dStormCtrlPollingRetries OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0 | 1.. 360)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specify the retry count. If the action is configured 
+            as 'shutdown' mode and storm keep as long as 
+            interval * retries, the port will enters error-disabled state.
+            
+            The effective range is from 1 to 360.
+            
+            0 means that a 'shutdown' mode port will directly enter 
+            error-disabled state when storm is detected.
+            
+            -1 means that a 'shutdown' mode port will never enter 
+            error-disabled state even if storm is detected."   
+  DEFVAL { 3 } 
+        ::= { dStormCtrlGentrl 3}            
+
+-- --------------------------------------------------------------------------        
+    dStormCtrlThresholdTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DStormCtrlThresholdEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of interface-specific threshold
+            configuration for storm control."
+        ::= { dStormCtrlMIBObjects 2 }
+
+    dStormCtrlThresholdEntry OBJECT-TYPE
+        SYNTAX          DStormCtrlThresholdEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry presents threshold configuration on an interface."
+        INDEX    { 
+            ifIndex,
+            dStormCtrlTrafficType
+        }
+        ::= { dStormCtrlThresholdTable 1 }
+
+    DStormCtrlThresholdEntry ::= SEQUENCE {            
+        dStormCtrlTrafficType           DStormCtlTrafficType,
+        dStormCtrlThresholdType         DStormCtlThrType,            
+        dStormCtrlRiseThresholdValue    DStormCtlThrTypeValue,
+        dStormCtrlLowThresholdValue     DStormCtlThrTypeValue                                                               
+    }
+                 
+    dStormCtrlTrafficType OBJECT-TYPE
+        SYNTAX          DStormCtlTrafficType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the traffic type of the entry."
+        ::= { dStormCtrlThresholdEntry 1 }
+         
+    dStormCtrlThresholdType OBJECT-TYPE
+        SYNTAX          DStormCtlThrType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the threshold type of the entry."
+        ::= { dStormCtrlThresholdEntry 2 }
+    
+    dStormCtrlRiseThresholdValue OBJECT-TYPE
+        SYNTAX          DStormCtlThrTypeValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the rise threshold value of the entry.
+            A special value of -1 indicates the storm control of the
+            corresponding traffic type is not enabled on that interface.
+            "
+        ::= { dStormCtrlThresholdEntry 3 }
+        
+       dStormCtrlLowThresholdValue OBJECT-TYPE
+        SYNTAX          DStormCtlThrTypeValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the low level threshold.
+            A special value of -1 indicates low level is not specified.
+            The default value will be 80% of the value of the corresponding  
+            dStormCtrlRiseThresholdValue if applicable."                 
+        ::= { dStormCtrlThresholdEntry 4 }
+     
+-- --------------------------------------------------------------------------
+    dStormCtrlIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DStormCtrlIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of interface-specific configuration for 
+            storm control."
+        ::= { dStormCtrlMIBObjects 3 }
+
+    dStormCtrlIfEntry OBJECT-TYPE
+        SYNTAX          DStormCtrlIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry presents storm control configuration on an interface.            
+            "
+        INDEX    { ifIndex }
+        ::= { dStormCtrlIfTable 1 }
+
+    DStormCtrlIfEntry ::= SEQUENCE {                                    
+        dStormCtrlIfActionType         INTEGER               
+    }
+    
+    dStormCtrlIfActionType OBJECT-TYPE
+       SYNTAX          INTEGER {
+            none(1),
+            shutdown(2),
+            drop(3)                        
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specify the action will be taken when storm occurs: 
+              none(1) - Not filter the storm packets. 
+              shutdown(2) - The storm-control shutdown the port when the rise threshold is reached.
+              drop(3) - The storm-control always discards packets that exceed the rise threshold."
+        ::= { dStormCtrlIfEntry 1 }
+                             
+-- --------------------------------------------------------------------------
+    dStormCtrlTrafficInfoTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DStormCtrlTrafficInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of status information for traffic types
+            on interfaces. Only the interface/traffic-type on which the storm
+            control is enabled will present on this table.
+            "
+        ::= { dStormCtrlMIBObjects 4 }
+
+    dStormCtrlTrafficInfoEntry OBJECT-TYPE
+        SYNTAX          DStormCtrlTrafficInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry presents the status of a traffic type on an interface."
+        INDEX    { 
+            ifIndex,
+            dStormCtrlTrafficType
+        }
+        ::= { dStormCtrlTrafficInfoTable 1 }
+
+    DStormCtrlTrafficInfoEntry ::= SEQUENCE {                                                 
+        dStormCtrlTrafficInfoStatus         INTEGER,
+        dStormCtrlCurTrafficUnitType        DStormCtlThrType,
+        dStormCtrlCurTrafficValue           DStormCtlThrTypeValue
+    }
+                       
+    dStormCtrlCurTrafficUnitType OBJECT-TYPE
+        SYNTAX          DStormCtlThrType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current traffic unit of the entry."
+        ::= { dStormCtrlTrafficInfoEntry 1 }
+    
+    dStormCtrlCurTrafficValue OBJECT-TYPE
+        SYNTAX          DStormCtlThrTypeValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicating the current traffic value on the interface.
+            "
+        ::= { dStormCtrlTrafficInfoEntry 2 }
+        
+       dStormCtrlTrafficInfoStatus OBJECT-TYPE
+        SYNTAX       INTEGER {  
+            forwarding(1),
+            dropped(2),
+            errorDisabled(3),
+            linkDown(4),
+            inactive(5)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current status of storm control on a
+            given interface for a given traffic type. 
+            forwarding(1): no storm event has been detected.
+            dropped(2): a storm event has occurred and the storm traffic
+                        exceeding the threshold is dropped. 
+            errorDisabled(3): the port is disabled due to a storm. 
+            linkDown(4): the port is physically linked down.
+            inactive(5): Indicates that storm control is not 
+                         enabled for the given traffic type.
+            "
+        ::= { dStormCtrlTrafficInfoEntry 3 } 
+        
+-- --------------------------------------------------------------------------
+    dStormCtrlNotifyInfo  OBJECT IDENTIFIER ::= {  dStormCtrlMIBObjects 5 }
+       
+ 
+     dStormCtrlNotifyTrafficType OBJECT-TYPE
+        SYNTAX             DStormCtlTrafficType
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+              "This object is used by dStormCtrlOccurred and dStormCtrlStormCleared
+              to indicate the traffic type of the occurred storm."
+              ::= { dStormCtrlNotifyInfo 1 }
+        
+ -- --------------------------------------------------------------------------  
+    dStormCtrlOccurred NOTIFICATION-TYPE
+        OBJECTS     { 
+            ifIndex,
+            dStormCtrlNotifyTrafficType
+        }
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent when dStormCtrlNotifyEnable is 'stormOccurred'
+            or 'both' and a storm is detected."
+        ::= { dStormCtrlMIBNotifications 1 }
+
+    dStormCtrlStormCleared NOTIFICATION-TYPE
+        OBJECTS   { 
+            ifIndex,
+            dStormCtrlNotifyTrafficType
+        }                       
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent when dStormCtrlNotifyEnable is 'stormCleared'
+            or 'both' and a storm is cleared."
+        ::= { dStormCtrlMIBNotifications 2 }
+          
+--  ***************************************************************************    
+--  Conformance
+--  ***************************************************************************                       
+    dStormCtrlCompliances OBJECT IDENTIFIER ::= { dStormCtrlMIBConformance 1 }
+        
+    dStormCtrlCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities which implement the 
+            DLINKSW-STORM-CTRL-MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { dStormCtrlBaiscGroup }
+        ::= { dStormCtrlCompliances 1 }
+        
+    dStormCtrlGroup OBJECT IDENTIFIER ::= { dStormCtrlMIBConformance 2 }
+        
+    dStormCtrlBaiscGroup OBJECT-GROUP
+        OBJECTS { 
+            dStormCtrlNotifyEnable,
+            dStormCtrlPollingInterval,
+            dStormCtrlPollingRetries,
+            dStormCtrlThresholdType,
+            dStormCtrlRiseThresholdValue,
+            dStormCtrlLowThresholdValue, 
+            dStormCtrlIfActionType,
+            dStormCtrlCurTrafficUnitType,
+            dStormCtrlCurTrafficValue,
+            dStormCtrlTrafficInfoStatus,              
+            dStormCtrlNotifyTrafficType
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects providing the information for storm control"
+        ::= { dStormCtrlGroup 1 }
+    
+    dStormCtrlNotifyGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            dStormCtrlOccurred,
+            dStormCtrlStormCleared
+        }
+        STATUS current
+        DESCRIPTION 
+            "The collection of notifications used for storm control."
+        ::= { dStormCtrlGroup 2 }          
+                            
+END
+

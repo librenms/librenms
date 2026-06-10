@@ -1,0 +1,1369 @@
+
+-- Copyright 2001-2002 by Allied Telesyn International, Inc.
+--
+-- Name: AtiSwitch-MIB
+--
+-- Version: 2.1
+--
+-- Products using this MIB:
+--      at8024
+--      at8024GB
+--      at8024M
+--      at8016F
+--      at8026FC
+-- 
+-- History:
+-- Fawzi Aljumaan (ATI)       10/15/01        Created the MIB
+-- Praveen Donthi (ATI)       12/21/01        Updated MIB for S39 1.1
+-- Praveen Donthi (ATI)       03/20/02        Updated MIB for S39 1.4
+-- Praveen Donthi (ATI)       06/07/02        Changed the datatype of 'Timeout' from INTEGER to Integer32.
+--                                            Removed atiswitchBeVlanSendToCPU as it is no longer used.
+--                                            Changed value range for atiswitchBeVlanMirrorPort from 1..26 
+--                                            to 0..65535
+
+
+AtiSwitch-MIB DEFINITIONS ::= BEGIN
+        
+        IMPORTS 
+                OBJECT-TYPE, Integer32, Counter32, IpAddress, TimeTicks
+                        FROM SNMPv2-SMI
+                DisplayString, RowStatus, TruthValue
+                        FROM SNMPv2-TC
+                enterprises
+                        FROM RFC1155-SMI;
+
+
+-- OID tree for Allied Telesyn MIBs
+        
+        alliedTelesyn   OBJECT IDENTIFIER ::= { enterprises 207 }        
+        mibObject       OBJECT IDENTIFIER ::= { alliedTelesyn 8 }
+
+
+-- MODULE IDENTITY for the private mib
+                        
+        atiSwitchMib MODULE-IDENTITY
+                LAST-UPDATED "0205010000Z"                                            
+                ORGANIZATION "Allied Telesyn International"
+                CONTACT-INFO "Allied Telesyn International"
+                DESCRIPTION
+                    "Private MIB for ATI next generation layer 2 
+                    switches. This MIB can be used in Windows and 
+                    UNIX environment"
+            ::= { mibObject 15 }
+                
+
+-- General Definitions
+
+        MACAddress      ::= OCTET STRING (SIZE (6))  -- a 6 octet
+        BridgeId        ::= OCTET STRING (SIZE (8))  -- the Bridge Id as used in the STP
+        Timeout         ::= Integer32  -- a STP timer in units of 1 / 100 seconds
+
+
+-- OID tree for Allied Telesyn layer 2 switches
+
+        atiProduct      OBJECT IDENTIFIER ::= { alliedTelesyn 1 }
+        
+        swhub           OBJECT IDENTIFIER ::= { atiProduct 4 }
+        
+        at-8024         OBJECT IDENTIFIER ::= { swhub 66 }
+        at-8024GB       OBJECT IDENTIFIER ::= { swhub 67 }
+        at-8024M        OBJECT IDENTIFIER ::= { swhub 78 }
+        at-8016F        OBJECT IDENTIFIER ::= { swhub 79 }
+        at-8026FC       OBJECT IDENTIFIER ::= { swhub 80 }
+        
+
+-- Groups supported in this version of the MIB
+
+        atiswitchSysGroup               OBJECT IDENTIFIER ::= { atiSwitchMib 1 }
+        
+        atiswitchConfigGroup            OBJECT IDENTIFIER ::= { atiSwitchMib 2 }
+        
+        atiswitchPortGroup              OBJECT IDENTIFIER ::= { atiSwitchMib 3 }
+        
+        atiswitchVlanConfigGroup        OBJECT IDENTIFIER ::= { atiSwitchMib 4 }
+        
+        atiswitchEthernetStatsGroup     OBJECT IDENTIFIER ::= { atiSwitchMib 5 }
+        
+        atiswitchEthPortStatsGroup      OBJECT IDENTIFIER ::= { atiSwitchMib 6 }
+
+        atiswitchFwdVlanGroup           OBJECT IDENTIFIER ::= { atiSwitchMib 7 }
+        
+        atiswitchStaticMACGroup         OBJECT IDENTIFIER ::= { atiSwitchMib 8 }
+        
+        atiswitchTraps                  OBJECT IDENTIFIER ::= { atiSwitchMib 9 }
+                
+                 
+--
+-- atiswitchSysGroup (System group)
+--
+
+atiswitchProductType    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                at8024 (1),
+                                at8024GB (2),
+                                at8024M (3),
+                                at8016F (4),
+                                at8026FC (5),
+                                other (20)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object identifies the Product Type."
+        ::= { atiswitchSysGroup 1 }
+
+
+atiswitchBasePortCount  OBJECT-TYPE
+        SYNTAX          Integer32       
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object determines the number of base 
+                Ethernet ports in the switch."
+        ::= {atiswitchSysGroup 2 }
+        
+
+atiswitchUplinkPortCount        OBJECT-TYPE
+        SYNTAX          Integer32       
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object determines the total number of uplink 
+                ports available in the switch."
+        ::= {atiswitchSysGroup 3 }
+
+
+atiswitchReset          OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                switchnoreset (1),
+                                switchreset (2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "Setting this object to switchreset will cause the 
+                switch to perform a soft reboot. Setting this object 
+                to switch_no_reset will have no effect."
+        ::= { atiswitchSysGroup 4 }
+
+
+atiswitchUplink1Type       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                copper (1),
+                                fiber (2),
+                                none (3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object returns the MDA (Media Dependant Adapter) 
+                type of Uplink port 1. If there is no uplink installed 
+                it will return a value of none."
+        ::= { atiswitchSysGroup 5 }
+        
+
+atiswitchUplink2Type       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                copper (1),
+                                fiber (2),
+                                none (3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object returns the MDA (Media Dependant Adapter) 
+                type of Uplink port 2. If there is no uplink installed 
+                it will return a value of none."
+        ::= { atiswitchSysGroup 6 }
+        
+
+atiswitchSwGroup        OBJECT IDENTIFIER ::= { atiswitchSysGroup 7 }
+atiswitchIpGroup        OBJECT IDENTIFIER ::= { atiswitchSysGroup 8 }
+atiswitchNMGroup        OBJECT IDENTIFIER ::= { atiswitchSysGroup 9 }
+
+
+--
+-- atiswitchSwGroup (Information about the software version running in 
+-- the switch)
+--
+
+atiswitchSw             OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Identifies the name of the software running in the 
+                switch."
+        ::= { atiswitchSwGroup 1 }
+
+
+atiswitchSwVersion      OBJECT-TYPE
+        SYNTAX          DisplayString   (SIZE(0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Identifies the version number of the software running 
+                in the switch."
+        ::= { atiswitchSwGroup 2 }
+
+--
+-- atiswitchIpGroup (The Ip Group)
+-- 
+
+atiswitchConfigIpAddress        OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "IP address of the switch."
+        ::= { atiswitchIpGroup 1 }
+                
+
+atiswitchConfigSubMask          OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "Subnet mask of the switch."
+        ::= { atiswitchIpGroup 2 }
+                
+
+atiswitchConfigRouting  OBJECT-TYPE 
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "Gateway address for the switch." 
+        ::= { atiswitchIpGroup 3 }
+        
+
+atiswitchIPAddressStatus        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                fromDhcp (1),
+                                fromBootp (2),
+                                fromStatic (3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The IP Address can be obtained/configured through 
+                different ways - through DHCP, through Bootp or 
+                through a static configuration. This object specifies 
+                how the IP address, subnet mask and the gateway address
+                currently used by the switch was configured/obtained."
+        ::= {atiswitchIpGroup 4 }
+
+
+atiswitchDNServer       OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This attribute specifies the DNS server address for the
+                switch."
+        ::= { atiswitchIpGroup 5 }
+
+
+atiswitchDefaultDomainName      OBJECT-TYPE
+        SYNTAX                  DisplayString
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This attribute specifies the default Domain Name for 
+                the switch."
+        ::= { atiswitchIpGroup 6 }
+
+
+--
+-- atiswitchNMGroup (SNMP Group Network Management related MIB objects)
+--
+
+atiswitchNwMgrTable     OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AtiswitchNwMgrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table contains the list of IP Addresses 
+                (management stations) to which SNMP Traps are sent.
+                The maximum number of entries in the table is 4."
+        ::= { atiswitchNMGroup 1 }
+
+
+atiswitchNwMgrEntry     OBJECT-TYPE
+        SYNTAX          AtiswitchNwMgrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An entry of atiswitchNwMgrTable specifying each 
+                management station to which a SNMP trap is sent."
+        INDEX { atiswitchNwMgrIndex }
+        ::= { atiswitchNwMgrTable 1 }
+
+
+AtiswitchNwMgrEntry ::=
+        SEQUENCE{
+                atiswitchNwMgrIndex     INTEGER,
+                atiswitchNwMgrIpAddr    IpAddress
+                }
+                
+
+atiswitchNwMgrIndex     OBJECT-TYPE
+        SYNTAX          INTEGER (1..4)
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "The index for the management station entry."
+        ::= { atiswitchNwMgrEntry 1 }
+
+        
+atiswitchNwMgrIpAddr    OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "The IP address of the management station."
+        ::= { atiswitchNwMgrEntry 2 }   
+
+
+--
+-- atiswitchConfigGroup
+--
+
+atiswitchMirrorState    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                receive(1),
+                                transmit(2),
+                                both(3),
+                                disabled(4)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "If the attribute is set to one of the first three 
+                values, then port mirroring is enabled. If disabled, 
+                port operation works nomally. No traffic gets mirrored."
+        ::= { atiswitchConfigGroup 1 }
+        
+
+atiswitchMirroringSourcePorts   OBJECT-TYPE
+        SYNTAX                  DisplayString       
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This attribute identifies the source ports which are
+                mirrored. All packets received, transmitted or both on 
+                these ports gets mirrored on to the destination port. 
+                It's value can be a single port number or a contiguous 
+                range of ports (eg. 1-5). This attribute will have an 
+                empty string when port mirroring is disabled."
+        ::= { atiswitchConfigGroup 2 }
+
+
+atiswitchMirroringDestinationPort       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This attribute identifies the destination port number 
+                which mirrors the source port. All packets received, 
+                transmitted or both on the source port gets mirrored on 
+                to this port. This attribute will have the value 0 when 
+                port mirroring is disabled."
+        ::= { atiswitchConfigGroup 3 }
+
+
+atiswitchSecurityConfig OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                disabled (1),
+                                enabledLearningLocked (2),
+                                enabledLimited (3),
+                                enabledSecured (4)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This attribute is a port security configuration object.
+                Setting the value to 'disabled' will allow the switch to 
+                learn new MAC addresses as they come in. In
+                enabledLearningLocked mode, the device will stop 
+                learning new addresses and the old addresses that the 
+                device has learned will be locked. In enabledLimited 
+                mode, only a limited number of addresses will be 
+                learned. In enabledSecured mode, the administrator 
+                is responsible for entering the MAC addresses manually.
+                By doing this, the administrator knows exactly who is 
+                connecting to the switch."
+        ::= { atiswitchConfigGroup 4 }
+
+
+atiswitchSecurityAction OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                sendTrapOnly(1),
+                                disablePortOnly(2),
+                                disablePortAndSendTrap(3),
+                                doNothing(4)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This attribute identifies the security action taken in 
+                case of an intruder detected."
+        ::= { atiswitchConfigGroup 5 }
+        
+
+--
+-- atiswitchPortGroup (This subgroup contains basic port configuration 
+-- parameters)
+--
+
+atiswitchPortTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AtiswitchPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table contains all the type of devices supported 
+                by this MIB."
+        ::= { atiswitchPortGroup 1 }
+
+
+atiswitchPortEntry      OBJECT-TYPE
+        SYNTAX          AtiswitchPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "The device type in the DeviceTable."
+        INDEX   { atiswitchPortNumber }
+        ::= { atiswitchPortTable 1 }
+
+
+AtiswitchPortEntry ::= 
+        SEQUENCE {
+                atiswitchPortNumber
+                        Integer32,
+                atiswitchPortName
+                        DisplayString,
+                atiswitchPortAutosenseOrHalfDuplex
+                        INTEGER,
+                atiswitchPortLinkState
+                        INTEGER,
+                atiswitchPortDuplexStatus
+                        INTEGER,
+                atiswitchPortSpeed
+                        INTEGER,
+                atiswitchPortState
+                        INTEGER,
+                atiswitchPortFlowControlConfig
+                        INTEGER,
+                atiswitchPortBackPressureConfig
+                        INTEGER,
+                atiswitchPortVlanTagPriorityConfig
+                        INTEGER,
+                atiswitchPortCOSPriorityConfig
+                        INTEGER,
+                atiswitchPortBroadcastConfig
+                        INTEGER,
+                atiswitchPortReset
+                        INTEGER
+                }
+
+
+atiswitchPortNumber     OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535) 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                " The object identifies the port of the switch."
+        ::= { atiswitchPortEntry 1 }
+
+
+atiswitchPortName       OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..20))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This attribute associates a user defined string name 
+                with the port."
+        ::= { atiswitchPortEntry 2 }
+
+
+atiswitchPortAutosenseOrHalfDuplex      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                portAutoSense(1),
+                                forceHalfDuplex-10M(2),
+                                forceHalfDuplex-100M(3),
+                                forceFullDuplex-10M(4),
+                                forceFullDuplex-100M(5),
+                                forceHalfDuplex-1G(6),
+                                forceFullDuplex-1G(7)                           
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This object allows an admin request to configure 
+                whether this port is set to autosense or one of the 
+                different speed/duplex combinations."
+        ::= { atiswitchPortEntry 3 }
+
+
+atiswitchPortLinkState  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                online (1),
+                                offline (2)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This attribute allows an admin request to read the 
+                status of link state on this port."
+        ::= { atiswitchPortEntry 4 }
+
+
+atiswitchPortDuplexStatus       OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                fullDuplex(1),
+                                halfDuplex(2),
+                                autosense(3)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object allows an admin request to read the status 
+                of Duplex on this port."
+        ::= { atiswitchPortEntry 5 }
+
+
+atiswitchPortSpeed      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                tenMBits (1),
+                                hundredMBits (2),
+                                gigaBits (3),
+                                unknown (4)
+                                }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This attribute allows an admin request to read the 
+                speed of this port."
+        ::= { atiswitchPortEntry 6 }
+
+
+atiswitchPortState      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                enabled (1),
+                                disabled (2),
+                                blocking (3),
+                                listening (4),
+                                learning (5),
+                                unknown(6)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     
+                "This attribute allows an admin request to disable or 
+                enable communications on this port. It also responds 
+                with the status of the port. Except enabled(1) and 
+                disabled(2), all values are read-only status."
+        ::= { atiswitchPortEntry 7 }
+
+
+atiswitchPortFlowControlConfig  OBJECT-TYPE 
+        SYNTAX          INTEGER {
+                                disable(1),
+                                transmit-only(2),
+                                receive-only(3),
+                                transmit-and-receive(4),
+                                unknown(5)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This per port attribute determines whether the port 
+                has flow control enabled or not. By default, flow 
+                control is disabled."
+        ::= { atiswitchPortEntry 8 }
+        
+        
+atiswitchPortBackPressureConfig OBJECT-TYPE
+       SYNTAX           INTEGER {
+                                disable(1),
+                                enable(2),
+                                unknown(3)
+                                }
+       MAX-ACCESS       read-write
+       STATUS           current
+       DESCRIPTION 
+                 "This per-port attribute describes whether the port 
+                 identified has Back Pressure Enabled or not.By 
+                 default, Back Pressure is Disabled."
+           ::= { atiswitchPortEntry 9 }
+
+        
+atiswitchPortVlanTagPriorityConfig  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                use-vlan-priority(1),
+                                override-vlan-priority(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+                "This per-port attribute allows the configuration of the
+                Tag Priority to be Override or use the Tag Priority. By 
+                Default, all ports use Vlan Tag priority."
+        ::= { atiswitchPortEntry 10 }
+           
+
+atiswitchPortCOSPriorityConfig  OBJECT-TYPE
+        SYNTAX          INTEGER(0..7)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+                "This per-port attribute allows the configuration of the
+                priority of the port. There are 8 priorities as per the
+                IEEE standard with 0 being the lowest priority and 7 the
+                highest. In a switch environment, ports with higher 
+                priority has it's to and from traffic given higher 
+                priority when compared with those with lower priority."
+        ::= { atiswitchPortEntry 11 }
+        
+
+atiswitchPortBroadcastConfig  OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                discard-broadcasts(1),
+                                do-not-discard-broadcasts(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+                "This per-port attribute determines if broadcast 
+                packets received should be discarded or 
+                processed. By default, they will be processed."
+        ::= { atiswitchPortEntry 12 }
+
+
+atiswitchPortReset      OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                reset(1),
+                                no-reset(2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+                "This per-port attribute resets the port to the 
+                original default configuration.This can prove 
+                useful in situations where a port is experiencing 
+                a problem making a valid connection to the end node.
+                Setting the value to 'no-reset' has no effect."
+        ::= { atiswitchPortEntry 13 }
+
+
+--
+-- atiswitchVlanConfigGroup (Vlan configuration group)
+--
+
+-- Virtual LAN table
+
+atiswitchBasicVlanTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AtiswitchBasicVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Table of Virtual LANs configured in the switch."
+        ::= { atiswitchVlanConfigGroup 1 }
+
+
+atiswitchBasicVlanEntry OBJECT-TYPE
+        SYNTAX          AtiswitchBasicVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "An entry describing the configured Virtual LAN."
+        INDEX           { atiswitchBeVlanIndex }
+        ::= { atiswitchBasicVlanTable 1 }
+
+
+AtiswitchBasicVlanEntry ::= SEQUENCE {
+                atiswitchBeVlanIndex
+                        INTEGER,
+                atiswitchBeVlanName
+                        DisplayString,
+                atiswitchBeVlanTagId
+                        INTEGER,
+                atiswitchBeVlanTaggedPortMask
+                        DisplayString,
+                atiswitchBeVlanUntaggedPortMask
+                        DisplayString,
+                atiswitchBeVlanMirrorPort
+                        INTEGER,
+                atiswitchBeVlanRowStatus
+                        RowStatus
+                }
+
+
+atiswitchBeVlanIndex    OBJECT-TYPE
+        SYNTAX          INTEGER (1..64)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Index of the Virtual LAN entry. Maximum number of 
+                Virtual LANs in 8024/8024GB is 32."
+        ::= { atiswitchBasicVlanEntry 1 }
+
+
+atiswitchBeVlanName     OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..20) )
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "Name of the Virtual LAN."
+        ::= { atiswitchBasicVlanEntry 2 }
+        
+
+atiswitchBeVlanTagId    OBJECT-TYPE
+        SYNTAX          INTEGER (1..4095)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+                "VId of the Virtual LAN as stored in the tag information
+                header in accordance with 802.1q specification."
+        ::= { atiswitchBasicVlanEntry 3 }
+        
+
+atiswitchBeVlanTaggedPortMask   OBJECT-TYPE
+        SYNTAX                  DisplayString
+        MAX-ACCESS              read-create
+        STATUS                  current
+        DESCRIPTION
+                "List of tagged ports in the Virtual LAN."
+        ::= { atiswitchBasicVlanEntry 4 }
+        
+
+atiswitchBeVlanUntaggedPortMask OBJECT-TYPE
+        SYNTAX                  DisplayString
+        MAX-ACCESS              read-create
+        STATUS                  current
+        DESCRIPTION
+                "List of untagged ports in the Virtual LAN."
+        ::= { atiswitchBasicVlanEntry 5 }
+        
+
+atiswitchBeVlanMirrorPort       OBJECT-TYPE
+        SYNTAX                  INTEGER (0..65535)
+        MAX-ACCESS              read-create
+        STATUS                  current
+        DESCRIPTION
+                "Port number on which all Virtual LAN traffic is 
+                mirrored on. By default the value is 0 indicating no 
+                port mirroring."
+        ::= { atiswitchBasicVlanEntry 6 }
+    
+
+atiswitchBeVlanRowStatus        OBJECT-TYPE
+        SYNTAX                  RowStatus
+        MAX-ACCESS              read-create
+        STATUS                  current
+        DESCRIPTION
+                "Indicates the status of this entry. This object is 
+                used to create, modify or delete Virtual LAN entries 
+                as per the RowStatus specification of SMIv2. There 
+                are two ways to create a Virtual LAN entry - 
+                CreateAndGo (Used when all objects of the entry are 
+                set at one go) and CreateAndWait (Used when individual 
+                objects are set independently).
+                
+                CreateAndGo method:
+                Assign values to all objects of the Virtual LAN entry.
+                Set this object to CreateAndGo(4).
+                
+                CreateAndWait method:
+                Set this object to CreateAndWait(5).
+                Set individual object entries.
+                When all other entries are set, set this object to 
+                Active(1).
+                
+                To delete a Virtual LAN entry, set this object to 
+                destroy(6)."
+        ::= { atiswitchBasicVlanEntry 7 }
+
+
+-- Port to Vlan Table
+
+atiswitchPort2VlanTable         OBJECT-TYPE
+        SYNTAX                  SEQUENCE OF AtiswitchPort2VlanEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+                "Table of per port Virtual LAN configuration."
+        ::= { atiswitchVlanConfigGroup 2 }
+        
+
+atiswitchPort2VlanEntry         OBJECT-TYPE
+        SYNTAX                  AtiswitchPort2VlanEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION
+                "An entry in the table, containing per port Virtual LAN 
+                information."
+        INDEX           { atiswitchPvPortNumber }
+        ::= { atiswitchPort2VlanTable 1 }
+
+
+AtiswitchPort2VlanEntry ::= SEQUENCE {
+                atiswitchPvPortNumber
+                        Integer32,
+                atiswitchPvVlanName
+                        DisplayString
+                }
+
+
+atiswitchPvPortNumber   OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object identifies the port on the switch."
+        ::= { atiswitchPort2VlanEntry 1 }
+
+
+atiswitchPvVlanName     OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "This object identifies the Virtual LAN name to which 
+                the port belongs to."
+        ::= { atiswitchPort2VlanEntry 2 }
+
+
+--
+-- atiswitchEthernetStatsGroup (This monitor group contains statistics 
+-- measured for the switch as a whole)
+--
+                
+
+atiswitchEthMonStats    OBJECT IDENTIFIER ::= { atiswitchEthernetStatsGroup 1 }
+atiswitchEthErrorStats  OBJECT IDENTIFIER ::= { atiswitchEthernetStatsGroup 2 }
+
+
+atiswitchEthMonRxGoodFrames     OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of good frames received on the switch."
+        ::= { atiswitchEthMonStats 1 }
+
+
+atiswitchEthMonTxGoodFrames     OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+                "The total number of good frames that has been 
+                transimitted by the switch."
+        ::= { atiswitchEthMonStats 2 }
+        
+
+atiswitchEthMonTxTotalBytes     OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+                "The total number of bytes transimitted from the switch."
+        ::= { atiswitchEthMonStats 3 }
+
+
+atiswitchEthMonTxDeferred       OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of times a transmission attempt failed 
+                because of the medium being busy."
+        ::= { atiswitchEthMonStats 4 }
+
+
+atiswitchEthMonTxCollisions     OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of collisions detected while 
+                transmitting from the switch."
+        ::= { atiswitchEthMonStats 5 }
+        
+
+atiswitchEthMonTxBroadcastFrames        OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+                "The total number of Transmit Broadcast Frames while 
+                switching."
+        ::= { atiswitchEthMonStats 6 }
+        
+
+atiswitchEthMonTxMulticastFrames        OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+                "The total number of Transmit Multicast frames while 
+                switching."
+        ::= { atiswitchEthMonStats 7 }
+
+
+atiswitchEthMonRxOverruns        OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+                "The total number of Received Overrun Frames while 
+                switching."
+        ::= { atiswitchEthMonStats 8 }
+
+
+--
+-- atiswitchEthErrorStats (Ethernet Error Statistics for the switch as 
+-- a whole)
+--
+
+atiswitchEthErrorCRC    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of CRC errors on received packets."
+        ::= { atiswitchEthErrorStats 1 }
+
+
+atiswitchEthErrorAlignment      OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of packets received that has 
+                alignment errors."       
+        ::= { atiswitchEthErrorStats 2 }
+
+
+atiswitchEthErrorRxBadFrames    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of bad frames received."
+        ::= { atiswitchEthErrorStats 3 }
+
+
+atiswitchEthErrorLateCollision  OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The number of times collision was detected in the 
+                switch."
+        ::= { atiswitchEthErrorStats 4 }
+
+
+atiswitchEthErrorTxTotal        OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+                "Total number of errors resulting from transmit 
+                operations."
+        ::= { atiswitchEthErrorStats 5 }
+
+        
+--
+-- atiswitchEthPortStatsGroup (This monitor group contains statistics 
+-- measured per port)
+--
+
+atiswitchEthPortMonStats   OBJECT IDENTIFIER ::= { atiswitchEthPortStatsGroup 1 }
+atiswitchEthPortError      OBJECT IDENTIFIER ::= { atiswitchEthPortStatsGroup 2 }
+
+
+atiswitchEthPortMonTable        OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AtiswitchEthPortMonEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     
+                "A list of statistics entry for each port."
+        ::= { atiswitchEthPortMonStats 1 }
+
+
+atiswitchEthPortMonEntry        OBJECT-TYPE
+        SYNTAX          AtiswitchEthPortMonEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "A colletion of statistics kept for a particular port."
+        INDEX   { atiswitchEthPortMonId }
+        ::= { atiswitchEthPortMonTable 1 }
+
+
+AtiswitchEthPortMonEntry ::=
+        SEQUENCE        {
+                        atiswitchEthPortMonId
+                                Integer32,
+                        atiswitchEthPortMonRxGoodFrames
+                                Counter32,
+                        atiswitchEthPortMonTxGoodFrames
+                                Counter32,
+                        atiswitchEthPortMonTxTotalBytes
+                                Counter32,
+                        atiswitchEthPortMonTxDeferred
+                                Counter32,
+                        atiswitchEthPortMonTxCollisions
+                                Counter32, 
+                        atiswitchEthPortMonTxBroadcastFrames
+                                Counter32,
+                        atiswitchEthPortMonTxMulticastFrames
+                                Counter32,
+                        atiswitchEthPortMonRxOverruns
+                                Counter32
+                        }
+
+
+atiswitchEthPortMonId   OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Port number."
+        ::= { atiswitchEthPortMonEntry 1 }
+
+
+atiswitchEthPortMonRxGoodFrames         OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of good frames received on this port."
+        ::= { atiswitchEthPortMonEntry 2 }
+
+
+atiswitchEthPortMonTxGoodFrames OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of good frames transmitted from this 
+                port."
+        ::= { atiswitchEthPortMonEntry 3 }
+
+
+atiswitchEthPortMonTxTotalBytes OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of bytes transmitted from this port."
+        ::= { atiswitchEthPortMonEntry 4 }
+        
+
+atiswitchEthPortMonTxDeferred OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+                "This is the count of first time Transmission attempt 
+                which failed on an interface due to medium being busy."
+        ::= { atiswitchEthPortMonEntry 5 }
+        
+
+atiswitchEthPortMonTxCollisions OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION 
+                "The total number of collisions while switching on an 
+                interface."
+        ::= { atiswitchEthPortMonEntry 6 }
+
+
+atiswitchEthPortMonTxBroadcastFrames    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of broadcast frames transmitted from 
+                this port."
+        ::= { atiswitchEthPortMonEntry 7 }
+
+
+atiswitchEthPortMonTxMulticastFrames    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of multicast frames transmitted from 
+                this port."
+        ::= { atiswitchEthPortMonEntry 8 }
+
+
+atiswitchEthPortMonRxOverruns   OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The total number of over sized frames received on this 
+                port."
+        ::= { atiswitchEthPortMonEntry 9 }
+
+
+--
+--atiswitchEthPortError (Error statistics per port)
+--
+
+atiswitchEthPortErrorTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AtiswitchEthPortErrorEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "A list of statistics entries."
+        ::= { atiswitchEthPortError 1 }
+
+
+atiswitchEthPortErrorEntry      OBJECT-TYPE
+        SYNTAX          AtiswitchEthPortErrorEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "A collection of statistics kept for a particular port."
+        INDEX   { atiswitchEthPortErrorId }
+        ::= { atiswitchEthPortErrorTable 1 }
+
+
+AtiswitchEthPortErrorEntry ::=
+                SEQUENCE {
+                         atiswitchEthPortErrorId
+                         Integer32,
+                         atiswitchEthPortErrorRxBadFrames
+                         Counter32,
+                         atiswitchEthPortErrorTxTotal
+                         Counter32
+                         }
+                         
+atiswitchEthPortErrorId         OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Port number."
+        ::= { atiswitchEthPortErrorEntry 1 }
+
+
+atiswitchEthPortErrorRxBadFrames        OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Total number of bad Frames received on this port."
+        ::= { atiswitchEthPortErrorEntry 2 }
+        
+
+atiswitchEthPortErrorTxTotal    OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     
+                "Total number of errors resulting from transmit 
+                operations."
+        ::= { atiswitchEthPortErrorEntry 3 }
+
+
+--
+-- atiswichFwdVlanGroup (VLAN to MAC address association)
+--
+        
+atiswitchFwdVlanTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AtiswitchFwdVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "This table associates MAC addresses (as stored in the 
+                forwarding table of the switch) to the Virtual LAN to 
+                which it belongs."
+        ::= { atiswitchFwdVlanGroup 1 }
+
+
+atiswitchFwdVlanEntry   OBJECT-TYPE
+        SYNTAX          AtiswitchFwdVlanEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+                "Entry in the atiswitchFwdVlanTable."
+        INDEX   { atiswitchFwdVlanMACAddr }
+        ::= { atiswitchFwdVlanTable 1 }
+        
+
+AtiswitchFwdVlanEntry   ::=   SEQUENCE  {
+                atiswitchFwdVlanMACAddr
+                        MACAddress,
+                atiswitchFwdVlanVlanId
+                        Integer32,
+                atiswitchFwdVlanAge
+                        Integer32,
+                atiswitchFwdVlanStatus
+                        INTEGER,
+                atiswitchFwdVlanPort
+                        Integer32
+                }
+                
+
+atiswitchFwdVlanMACAddr OBJECT-TYPE
+        SYNTAX          MACAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "A MAC address from the forwarding table of the switch."
+        ::= { atiswitchFwdVlanEntry 1 }
+
+
+atiswitchFwdVlanVlanId  OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "The Virtual LAN to which atiswitchFwdVlanMACAddr 
+                belongs to."
+        ::= { atiswitchFwdVlanEntry 2 }
+
+
+atiswitchFwdVlanAge     OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Current age of the MAC Address in the forwarding table 
+                - 0 indicates it is still active, 1 indicates that the 
+                address has aged out."
+        ::= { atiswitchFwdVlanEntry 3 }
+        
+
+atiswitchFwdVlanStatus  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                        inactive(1),
+                        active(2),
+                        other(3)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Status of the MAC address - inactive (1): It is no 
+                longer valid e.g, it was learned and has since aged 
+                out, but has not yet been flushed from the table, 
+                active (2): Learned or statically assigned and 
+                currently in use and other (3): Neither of the other 
+                two."
+        ::= { atiswitchFwdVlanEntry 4 }
+
+
+atiswitchFwdVlanPort    OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+                "Either the value 0, or the port number of the port on 
+                which a frame having a source address equal to the 
+                atiswitchFwdVlanMACAddr has been seen. A value of 0 
+                indicates that the port number has not been learned but 
+                that the bridge does have some forwarding/filtering 
+                information about this address."
+        ::= { atiswitchFwdVlanEntry 5 }
+        
+--
+-- Static MAC Table
+--
+
+atiswitchStaticMACTable OBJECT-TYPE
+        SYNTAX  SEQUENCE        OF      AtiswitchStaticMACEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+                "This tables lists MAC addresses lexicographically from 
+                the static table which binds MAC address to ports on 
+                the switch."
+        ::= { atiswitchStaticMACGroup 1 }
+
+
+atiswitchStaticMACEntry OBJECT-TYPE
+        SYNTAX  AtiswitchStaticMACEntry
+        MAX-ACCESS      not-accessible
+        STATUS  current
+        DESCRIPTION
+                "Entry in the atiswitchStaticMACTable."
+        INDEX   { atiswitchStaticMACAddress }
+        ::= { atiswitchStaticMACTable 1 }
+
+
+AtiswitchStaticMACEntry ::=
+        SEQUENCE {
+                atiswitchStaticMACAddress
+                        MACAddress,
+                atiswitchStaticMACPortNumber
+                        INTEGER,
+                atiswitchStaticMACEntryStatus
+                        INTEGER
+        }
+
+
+atiswitchStaticMACAddress       OBJECT-TYPE
+        SYNTAX          MACAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This object identifies the MAC address associated with 
+                Static MAC table."
+        ::= { atiswitchStaticMACEntry 1 }
+
+
+atiswitchStaticMACPortNumber    OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                "This object identifies the port for which the MAC 
+                address is associated statically in the MAC Table."
+        ::= { atiswitchStaticMACEntry 2 }
+
+
+atiswitchStaticMACEntryStatus   OBJECT-TYPE
+        SYNTAX  INTEGER {
+                           valid(1),
+                           invalid(2)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+              "The status of this entry.  The meanings of the values 
+              are:
+              valid(1)   : This entry is valid.
+              invalid(2) : This entry is no longer valid, but has not 
+                           yet been flushed from the table."
+        ::= { atiswitchStaticMACEntry 3 }
+
+
+--
+-- Enterprise traps
+--
+
+atiswitchFanStopTrap    NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                "Trap sent when an error in the fan operation is 
+                detected."
+        ::= { atiswitchTraps 1 }
+
+
+atiswitchTemperatureAbnormalTrap        NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                "Trap sent when the temperature of the switch is 
+                abnormal."
+        ::= { atiswitchTraps 2 }
+        
+END
+

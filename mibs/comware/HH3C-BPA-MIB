@@ -1,0 +1,208 @@
+-- =================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: BGP policy accounting MIB File
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2013-08-14 created by wangzhenjun
+-- V1.1 2013-11-13 modified by wangzhenjun
+--      Changed MAX-ACCESS of hh3cBpaDirection, and added this node to the
+--      index of hh3cBpaCfgEntry
+--      Deleted value 'none(0), both(3)' from data type 'hh3cBpaSrcOrDest'
+--      Deleted DEVAL of hh3cBpaSrcOrDest
+--      Deleted value 'none(0)' from data type 'hh3cBpaSrcOrDest'
+--      Modified descriptions of hh3cBpaDirection, hh3cBpaSrcOrDest and
+--      hh3cBpaTrafficIndex
+-- V1.2 2014-11-20 modified by gongqing
+--      Modified the value range of hh3cBpaTrafficIndex from
+--      (1..64) to (1..128)
+-- =================================================================
+HH3C-BPA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, Counter64
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    InetAddressType
+        FROM INET-ADDRESS-MIB;
+
+hh3cBpa MODULE-IDENTITY
+    LAST-UPDATED
+        "201411200927Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB contains objects that manage the configuration and information
+         of BGP policy accounting.  It accounts IP packets by user defined
+         BGP policy.
+        "
+    REVISION
+        "201411200927Z"
+    DESCRIPTION
+        "Modified the value range of hh3cBpaTrafficIndex."
+    REVISION
+        "201311131128Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 144 }
+
+hh3cBpaObjects OBJECT IDENTIFIER ::= { hh3cBpa 1 }
+
+-- BGP policy accounting configuration table
+hh3cBpaCfgTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBpaCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table for BGP policy accounting configuration."
+    ::= { hh3cBpaObjects 1 }
+
+hh3cBpaCfgEntry    OBJECT-TYPE
+    SYNTAX      Hh3cBpaCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry for BGP policy accounting configuration."
+    INDEX {
+            ifIndex,
+            hh3cBpaDirection
+          }
+    ::= { hh3cBpaCfgTable 1 }
+
+Hh3cBpaCfgEntry ::=
+    SEQUENCE
+    {
+            hh3cBpaDirection              INTEGER,
+            hh3cBpaSrcOrDest              INTEGER,
+            hh3cBpaRowStatus              RowStatus
+    }
+
+hh3cBpaDirection    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+         input(1),
+         output(2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Identify the direction of IP packets on which BGP
+                 policy accounting takes effect.
+                 input  :input direction
+                 output :output direction"
+    ::= { hh3cBpaCfgEntry 1 }
+
+hh3cBpaSrcOrDest    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+         source(1),
+         destination(2),
+         both(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION "Identify IP packet's Destination or Source IP address that
+                 BGP policy accounting relies on.
+                 source      :source IP address of the IP packet
+                 destination :destination IP address of the IP packet
+                 both        :both source and destination IP addresses"
+    DEFVAL      { destination }
+    ::= { hh3cBpaCfgEntry 2 }
+
+hh3cBpaRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+            "This object manages the creation, deletion, and modification
+             of rows in the hh3cBpaCfgTable, which supports the
+             active status, createAndGo operation, and destroy operation."
+    ::= { hh3cBpaCfgEntry 3 }
+
+-- BGP policy accounting statistics table
+hh3cBpaStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cBpaStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table for BGP policy accounting statistics."
+    ::= { hh3cBpaObjects 2 }
+
+hh3cBpaStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cBpaStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry for BGP policy accounting statistics."
+    INDEX
+    {
+            ifIndex,
+            hh3cBpaTrafficType,
+            hh3cBpaTrafficIndex
+    }
+    ::= { hh3cBpaStatTable 1 }
+
+Hh3cBpaStatEntry ::=
+    SEQUENCE
+    {
+            hh3cBpaTrafficType        InetAddressType,
+            hh3cBpaTrafficIndex       Integer32,
+            hh3cBpaInPacketCount      Counter64,
+            hh3cBpaInOctetCount       Counter64,
+            hh3cBpaOutPacketCount     Counter64,
+            hh3cBpaOutOctetCount      Counter64
+    }
+
+hh3cBpaTrafficType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Type of IP packets, IPv4 or IPv6."
+    ::= { hh3cBpaStatEntry 1 }
+
+hh3cBpaTrafficIndex    OBJECT-TYPE
+    SYNTAX      Integer32  (1..128)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Traffic index generated by a BGP policy."
+    ::= { hh3cBpaStatEntry 2 }
+
+hh3cBpaInPacketCount   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The total number of received packets with the specified
+                 traffic type and traffic index."
+    ::= { hh3cBpaStatEntry 3 }
+
+hh3cBpaInOctetCount    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The total number of received bytes with the specified
+                 traffic type and traffic index."
+    ::= { hh3cBpaStatEntry 4 }
+
+hh3cBpaOutPacketCount   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The total number of output packets with the specified
+                 traffic type and traffic index."
+    ::= { hh3cBpaStatEntry 5 }
+
+hh3cBpaOutOctetCount   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The total number of output bytes with the specified
+                 traffic type and traffic index."
+    ::= { hh3cBpaStatEntry 6 }
+
+END

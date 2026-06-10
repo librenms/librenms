@@ -1,0 +1,236 @@
+-- ===================================================================
+-- Copyright (C) 2015 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: This MIB contains private managed object and notification 
+--              trap definitions for Openflow.
+-- Reference:
+-- Version: V1.00
+-- ===================================================================
+
+
+    HUAWEI-OPENFLOW-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm                     
+                FROM HUAWEI-MIB            
+            ifIndex, ifName, InterfaceIndex           
+                FROM IF-MIB 
+            SnmpAdminString            
+                FROM SNMP-FRAMEWORK-MIB       
+            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, Counter32, IpAddress, BITS, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI
+            InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+            DisplayString, TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+    
+    
+        hwOpenflowMib MODULE-IDENTITY 
+            LAST-UPDATED "201506171600Z"        -- June 17, 2015 at 16:00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                 Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China 
+                 Website: http://www.huawei.com
+                 Email: support@huawei.com"
+            DESCRIPTION 
+                "This MIB contains private managed object and notification trap 
+                definitions for Openflow."
+            REVISION    "201506171600Z"   
+            DESCRIPTION "V1.00, initial version."
+    
+            ::= { hwDatacomm 344 }
+
+    
+--
+-- Node definitions
+--
+        HWOpenflowDataPathId ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT "1d:1d:1d:1d:1d:1d:2d"
+            STATUS        current
+            DESCRIPTION
+                "Datapath unique ID type. The lower 48-bits are for
+                a MAC address, while the upper 16-bits are
+                implementer-defined."
+            SYNTAX  OCTET STRING (SIZE (8))
+    
+        hwOpenflowObject OBJECT IDENTIFIER ::= { hwOpenflowMib 1 }
+       
+    	hwOpenflowGlobalInfo OBJECT IDENTIFIER ::= { hwOpenflowObject 1 }
+        hwOpenflowObjects OBJECT IDENTIFIER ::= { hwOpenflowObject 2 }       
+
+        hwOpenflowConnectionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwOpenflowConnectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Basic information about openflow Connection."
+            ::= { hwOpenflowObjects 1 }
+		
+		hwOpenflowConnectionEntry OBJECT-TYPE
+            SYNTAX HwOpenflowConnectionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Basic information about openflow Connection."
+            REFERENCE
+                ""
+            INDEX {hwOpenflowIpType, hwOpenflowRemoteIp, hwOpenflowLocalIp, hwOpenflowVpnInstanceName, hwOpenflowDatapathId, hwOpenflowAuxiliaryId }
+            ::= { hwOpenflowConnectionTable 1 }
+        
+		HwOpenflowConnectionEntry ::=
+            SEQUENCE { 
+                hwOpenflowIpType 
+                    InetAddressType,
+                hwOpenflowRemoteIp 
+                    InetAddress,
+                hwOpenflowLocalIp
+                    InetAddress,
+                hwOpenflowVpnInstanceName
+                    DisplayString,
+                hwOpenflowDatapathId
+                    HWOpenflowDataPathId,
+                hwOpenflowAuxiliaryId
+                    Unsigned32,
+                hwOpenflowConnectionDownSubReason
+                    Unsigned32,
+                hwOpenflowConnectionDownReason
+                    INTEGER
+             }
+
+	    hwOpenflowIpType  OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the administrative IP type of openflow  node."
+            ::= { hwOpenflowConnectionEntry 1 }
+			
+		hwOpenflowRemoteIp  OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the administrative IP address of openflow remote node."
+            ::= { hwOpenflowConnectionEntry 2 }
+	    
+		hwOpenflowLocalIp  OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the administrative IP address of openflow local node."
+            ::= { hwOpenflowConnectionEntry 3 }
+
+		hwOpenflowVpnInstanceName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the vpn instance's name."
+            ::= { hwOpenflowConnectionEntry 4 }
+
+		hwOpenflowDatapathId  OBJECT-TYPE
+            SYNTAX HWOpenflowDataPathId
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the datapath unique ID. The lower 48-bits are for
+                a MAC address, while the upper 16-bits are implementer-defined."
+            ::= { hwOpenflowConnectionEntry 5 }
+
+		hwOpenflowAuxiliaryId  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the auxiliary connection ID."
+            ::= { hwOpenflowConnectionEntry 6 }
+			
+		hwOpenflowConnectionDownSubReason OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the detail reason of openflow connection down. If no detail reason, the value of the node will be zero."
+            ::= { hwOpenflowConnectionEntry 7 }
+			
+		hwOpenflowConnectionDownReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                tcpDown(1),
+                heartbeatTimeout(2),
+                pduError(3),
+                connectionUp(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the cause that the openflow connection becomes down.
+                 Options:
+                 1. tcpDown(1)            --indicates tcp down.
+                 2. heartbeatTimeout(2)   --indicates openflow heartbeat timeout.
+                 3. pduError(3)           --indicates openflow message data is wrong.
+                 4. connectionUp(4)       --indicates connection is up."
+            ::= { hwOpenflowConnectionEntry 8 }	
+
+						
+        hwOpenflowTraps OBJECT IDENTIFIER ::= { hwOpenflowMib 2 }
+		
+	    hwOpenflowConnectionDown NOTIFICATION-TYPE
+			OBJECTS { hwOpenflowIpType, hwOpenflowRemoteIp, hwOpenflowLocalIp, hwOpenflowVpnInstanceName, hwOpenflowDatapathId, hwOpenflowAuxiliaryId,
+                     hwOpenflowConnectionDownSubReason, hwOpenflowConnectionDownReason }
+			STATUS current
+			DESCRIPTION 
+               "This notification indicates that openflow session changes to down."
+			::= { hwOpenflowTraps 1 }
+			
+	    hwOpenflowConnectionDownClear NOTIFICATION-TYPE
+			OBJECTS { hwOpenflowIpType, hwOpenflowRemoteIp, hwOpenflowLocalIp, hwOpenflowVpnInstanceName, hwOpenflowDatapathId, hwOpenflowAuxiliaryId,
+                     hwOpenflowConnectionDownSubReason, hwOpenflowConnectionDownReason }
+			STATUS current
+			DESCRIPTION 
+               "This notification indicates that openflow session changes to up."
+			::= { hwOpenflowTraps 2 }	
+				    
+        hwOpenflowConformance OBJECT IDENTIFIER ::= { hwOpenflowMib 3 }
+
+        hwOpenflowCompliances OBJECT IDENTIFIER ::= { hwOpenflowConformance 1 }
+	   		
+	    hwOpenflowCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Compliance Channelment for agents that provide full support for hwBaseTrapMIB."
+			MODULE 
+				MANDATORY-GROUPS { hwOpenflowConnectionGroup }
+			::= { hwOpenflowCompliances 1 }
+		
+		hwOpenflowGroups OBJECT IDENTIFIER ::= { hwOpenflowConformance 2 }
+	    
+		hwOpenflowTrapGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwOpenflowConnectionDown, hwOpenflowConnectionDownClear}
+			STATUS current
+			DESCRIPTION 
+				"Group for all base traps."
+			::= { hwOpenflowGroups 1 }
+			
+		hwOpenflowConnectionGroup OBJECT-GROUP
+			OBJECTS { hwOpenflowIpType, hwOpenflowRemoteIp, hwOpenflowLocalIp, hwOpenflowVpnInstanceName, hwOpenflowDatapathId, hwOpenflowAuxiliaryId,
+                      hwOpenflowConnectionDownSubReason, hwOpenflowConnectionDownReason }
+			STATUS current
+			DESCRIPTION 
+				"Group for base trap objects."
+			::= { hwOpenflowGroups 2 }
+		
+
+			
+    END
+
+--
+-- HUAWEI-OPENFLOW-MIB.mib
+--

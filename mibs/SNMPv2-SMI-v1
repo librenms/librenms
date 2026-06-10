@@ -1,0 +1,24 @@
+SNMPv2-SMI-v1 DEFINITIONS ::= BEGIN
+
+Counter32 ::= Counter
+Gauge32 ::= Gauge
+Integer32 ::= INTEGER (-2147483648..2147483647)
+
+org             OBJECT IDENTIFIER ::= { iso 3 }
+dod             OBJECT IDENTIFIER ::= { org 6 }
+internet        OBJECT IDENTIFIER ::= { dod 1 }
+directory       OBJECT IDENTIFIER ::= { internet 1 }
+mgmt            OBJECT IDENTIFIER ::= { internet 2 }
+mib-2           OBJECT IDENTIFIER ::= { mgmt 1 }
+transmission    OBJECT IDENTIFIER ::= { mib-2 10 }
+experimental    OBJECT IDENTIFIER ::= { internet 3 }
+private         OBJECT IDENTIFIER ::= { internet 4 }
+enterprises     OBJECT IDENTIFIER ::= { private 1 }
+security        OBJECT IDENTIFIER ::= { internet 5 }
+snmpV2          OBJECT IDENTIFIER ::= { internet 6 }
+snmpDomains     OBJECT IDENTIFIER ::= { snmpV2 1 }
+snmpProxys      OBJECT IDENTIFIER ::= { snmpV2 2 }
+snmpModules     OBJECT IDENTIFIER ::= { snmpV2 3 }
+
+
+END

@@ -1,0 +1,323 @@
+--                                                                                                                           
+-- Title: Fibre Channel Switch MIB.                                                                                          
+--                                                                                                                           
+
+FA-EXT-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      DisplayString, TEXTUAL-CONVENTION, TruthValue
+      FROM SNMPv2-TC
+      Integer32, OBJECT-TYPE, OBJECT-IDENTITY,
+      MODULE-IDENTITY
+	  FROM SNMPv2-SMI
+      sw 
+      FROM SW-MIB
+      connUnitPortEntry
+      FROM FCMGMT-MIB;
+
+  faExt MODULE-IDENTITY
+    LAST-UPDATED "201310291354Z" -- Oct 29, 2013 01:54pm
+    ORGANIZATION "Brocade Communications Systems, Inc.,"
+    CONTACT-INFO "Customer Support Group
+		  Brocade Communications Systems,
+		  1745 Technology Drive,
+		  San Jose, CA 95110 U.S.A
+		  Tel: +1-408-392-6061
+		  Fax: +1-408-392-6656
+		  Email: support@Brocade.COM
+		  WEB: www.brocade.com"
+		
+
+    DESCRIPTION	"The MIB module	is Extension for FA-MIB.
+                 Copyright (c) 1996-2003 Brocade Communications Systems, Inc.
+		 All rights reserved."
+	REVISION    "201011221030Z" -- Nov 22, 2010 10:30am
+    DESCRIPTION	"Initial version of this module."
+	REVISION    "201309121030Z" -- Sep 12, 2013 10:00am
+    DESCRIPTION	"Added swConnUnitPortFECMode"
+	REVISION	"201309241355Z" -- Sep 24, 2013 01:55pm
+	DESCRIPTION	"Added swConnUnitPortFECState"
+	REVISION	"201310291354Z" -- Oct 29, 2013 01:54pm
+	DESCRIPTION	"Added notsupported value for swConnUnitPortFECState"
+	::= { sw 28 }
+
+  swSfpStatTable  OBJECT-TYPE
+	SYNTAX     SEQUENCE OF SwSfpStatEntry
+	MAX-ACCESS  not-accessible
+	STATUS    current
+	DESCRIPTION    "This represents the diagnostic stats of SFPs."
+  ::= { faExt 1 } 
+
+  swFapwwnFeature  OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for Fapwwn feature. Using this feature
+                    user can configure virtual port WWN for a port."
+  ::= { faExt 2 }
+
+  swPortConfigTable  OBJECT-TYPE
+     SYNTAX     SEQUENCE OF SwPortConfigEntry
+     MAX-ACCESS  not-accessible
+     STATUS    current
+     DESCRIPTION    "This represents the configuration of
+                     encryption / compression feature on a port"
+  ::= { faExt 3 }
+
+  swConnUnitPortTable  OBJECT-TYPE
+	SYNTAX     SEQUENCE OF SwConnUnitPortEntry
+	MAX-ACCESS  not-accessible
+	STATUS    current
+	DESCRIPTION    "This represents the Conn unit Port entry"
+  ::= { faExt 4 }
+
+  swSfpStatEntry OBJECT-TYPE
+	SYNTAX SwSfpStatEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "This represents the diagnostic stats of SFPs"
+	AUGMENTS {connUnitPortEntry}
+  ::= { swSfpStatTable 1 }
+                                                                                                                             
+  SwSfpStatEntry ::= SEQUENCE {
+	swSfpTemperature  OCTET STRING,
+	swSfpVoltage OCTET STRING,
+	swSfpCurrent OCTET STRING,
+	swSfpRxPower OCTET STRING,
+	swSfpTxPower OCTET STRING,
+	swSfpPoweronHrs Integer32,
+	swSfpUnitId   Integer32
+  }
+                                                                                                                             
+  swSfpTemperature OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(8))
+	UNITS  "centigrade"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "This object identifies the temperature of SFP"
+  ::= { swSfpStatEntry 1 }
+
+  swSfpVoltage OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(8))
+	UNITS  "milli voltage"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "This object identifies the voltage of SFP."
+  ::= { swSfpStatEntry 2 }                                                                                     
+                                                                                                                             
+  swSfpCurrent OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(8))
+	UNITS  "milli amphere"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This object identifies the current of SFP."
+  ::= { swSfpStatEntry 3 }
+                                                                                                                             
+  swSfpRxPower  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(8))
+	UNITS           "dBm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This object identifies the Rx power consumption of SFP."
+  ::= { swSfpStatEntry 4 }
+
+  swSfpTxPower  OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(8))
+	UNITS           "dBm"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This object identifies the Tx power consumption of SFP."
+  ::= { swSfpStatEntry 5 }                                                                                    
+                                                                                                                             
+  swSfpPoweronHrs OBJECT-TYPE
+	SYNTAX Integer32
+	UNITS           "hours"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This object identifies the power on hours of SFP.
+				This is applicable only to 16G SFPs."
+  ::= { swSfpStatEntry 6 }                                                                                     
+                                                                                                                             
+  swSfpUnitId OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "This object identifies unit ID of SFP.
+				This is applicable only to QSFP."
+  ::= { swSfpStatEntry 7 } 
+
+  swPortFapwwnConfigTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SwPortFapwwnConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS    current
+    DESCRIPTION    "This represents the configuration of ports."
+    ::= { swFapwwnFeature 1 }
+
+  swPortFapwwnConfigEntry OBJECT-TYPE
+    SYNTAX SwPortFapwwnConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION   "This represents the configuration of ports."
+    AUGMENTS {connUnitPortEntry}
+    ::= { swPortFapwwnConfigTable 1 }
+
+  FapwwnType ::= INTEGER {
+                unknown(1),
+                auto(2),
+                userConfigured(3)
+    }
+
+  SwPortFapwwnConfigEntry ::= SEQUENCE {
+        swPortFapwwnConfigEnable       TruthValue,
+        swPortFapwwnConfigFapwwn        DisplayString,
+        swPortFapwwnConfigType         FapwwnType
+    }
+
+  swPortFapwwnConfigEnable OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Represents the Fapwwn status. This is for per port."
+    ::= { swPortFapwwnConfigEntry 1 }
+
+  swPortFapwwnConfigFapwwn OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(256))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Represents the Fapwwn. For AG it is range of WWNs.
+                 If Fapwwn feature is not enabled in a port this
+                 object value is NA(Not Applicable."
+    ::= { swPortFapwwnConfigEntry 2 }
+
+  swPortFapwwnConfigType OBJECT-TYPE
+    SYNTAX FapwwnType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "Represents the Fapwwn type. "
+    ::= { swPortFapwwnConfigEntry 3 }
+
+   swPortConfigEntry OBJECT-TYPE
+    SYNTAX SwPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "This represents the configuration of
+                 encryption / compression feature on a port"
+    AUGMENTS {connUnitPortEntry}
+    ::= { swPortConfigTable 1 }
+
+
+  CiperMode     ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Represents cipher mode."
+     SYNTAX  INTEGER {
+               none             (1),
+               allFrames        (2),
+               fcpAndNonFCP     (3),--FCP data frames and non
+                                    --FCP frames except ELS (R_CTL=0x2)
+                                    --and BLS frames (R_CTL=0x8)
+               onlyFCP          (4)
+            }
+
+  EncryptCompressStatus ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Represents status of feature encryption or compression."
+     SYNTAX  INTEGER {
+               enabled              (1),
+               disabled             (2),
+               unknown              (3)
+            }
+
+    SwPortConfigEntry ::= SEQUENCE {
+        swPortEncrypt   EncryptCompressStatus,
+        swPortCompression  EncryptCompressStatus,
+        swPortCipherKeySize Integer32,
+        swPortCipherMode CiperMode
+    }
+  swPortEncrypt OBJECT-TYPE
+    SYNTAX EncryptCompressStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Represents the encryption status on a port."
+            ::= { swPortConfigEntry 1 }
+
+
+  swPortCompression OBJECT-TYPE
+    SYNTAX EncryptCompressStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Represents the compression status on port."
+            ::= { swPortConfigEntry 2 }
+
+
+  swPortCipherKeySize OBJECT-TYPE
+    SYNTAX Integer32 (0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Represents the Cipher key size.
+                 FOS supports 256 bytes key"
+            ::= { swPortConfigEntry 3 }
+
+
+  swPortCipherMode OBJECT-TYPE
+    SYNTAX CiperMode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Represents the Cipher mode. "
+            ::= { swPortConfigEntry 4 }
+
+  swConnUnitPortEntry OBJECT-TYPE
+	SYNTAX SwConnUnitPortEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION "This represents the Conn unit Port Entry"
+	AUGMENTS {connUnitPortEntry}
+  ::= { swConnUnitPortTable 1 }
+
+   SwConnUnitPortEntry ::= SEQUENCE {
+	swConnUnitPortCapableSpeeds OCTET STRING,
+	swConnUnitPortSpeedMode INTEGER,
+	swConnUnitPortFECMode INTEGER,
+	swConnUnitPortFECState INTEGER
+  }
+
+  swConnUnitPortCapableSpeeds OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "This represents the available speeds, that a port is capable of configuring"
+  ::= { swConnUnitPortEntry 1 }
+
+  swConnUnitPortSpeedMode OBJECT-TYPE
+	SYNTAX INTEGER {
+	auto-neg     (1),
+	static    (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION "This represents the type of speed modes that can be configured for the particular port.
+ 				 The modes that can be configured are auto-negotiable and static speeds."
+  ::= { swConnUnitPortEntry 2 }
+
+  swConnUnitPortFECMode OBJECT-TYPE
+    SYNTAX INTEGER {
+    unknown     (1),
+    disabled   (2),
+    enabled  (3),
+	notsupported (4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "This represents the port Forward Error Correction Mode. FEC feature is only applicable to 10G/16G platforms."
+  ::= { swConnUnitPortEntry 3 }
+
+  swConnUnitPortFECState OBJECT-TYPE
+    SYNTAX INTEGER {
+    unknown     (0),
+    active   (1),
+	inactive (2),
+	notsupported (3)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION "This represents FEC state of a port.If in link both sfp connected are of brocade vendor type
+				then state is active, else it will be inactive."
+  ::= { swConnUnitPortEntry 4 }
+END

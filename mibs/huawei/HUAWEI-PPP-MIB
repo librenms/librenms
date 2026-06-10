@@ -1,0 +1,472 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Private PPP Protocol MIB
+-- Reference:
+-- Version: V2.04
+-- History:
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+-- 
+-- ==================================================================
+
+    HUAWEI-PPP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS          
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InterfaceIndex, InterfaceIndexOrZero, ifName,ifIndex         
+                FROM IF-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
+                FROM SNMPv2-CONF            
+            IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY ,NOTIFICATION-TYPE           
+                FROM SNMPv2-SMI            
+            RowStatus, TruthValue, DisplayString            
+                FROM SNMPv2-TC;
+    
+    
+--  October 17, 2007 at 22:30 GMT
+-- October 17, 2007 at 22:30 GMT
+        hwPppMIB MODULE-IDENTITY 
+            LAST-UPDATED "201708171705Z"        -- June 29, 2015 at 17:05 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China 
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                "
+            DESCRIPTION 
+                "Modify the description at 2017-08-17."
+            REVISION "201708171705Z"   
+            DESCRIPTION 
+                "Modify the value of hwPppOsicp and hwPppMplscp  at 2016-02-01."
+            REVISION "201602011705Z"     
+            DESCRIPTION 
+                "This MIB is mainly used to configure  PPP , PPP MRU negotiation, MP binding with Mp-Group, and PAP/Chap authentication ."
+            REVISION "201506291705Z"     
+            DESCRIPTION 
+                "Modify length of hwPppAuthenticateChapPw and hwPppAuthenticatePapPw  at 2015-06-29." 
+            REVISION "201301291734Z"     
+            DESCRIPTION 
+                "V1.0-V1.1."  
+            ::= { hwDatacomm 169 }
+        
+    
+    
+--
+-- Node definitions
+--
+    
+--  Node definitions
+-- 
+        hwPppObjects OBJECT IDENTIFIER ::= { hwPppMIB 1 }
+        
+   
+                
+--      hwPppConfigTable table
+-- 
+        hwPppConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure PPP , PPP MRU negotiation, and MP binding with MP-Group."
+            ::= { hwPppObjects 1 }
+        
+        hwPppConfigEntry OBJECT-TYPE
+            SYNTAX HwPppConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure PPP , PPP MRU negotiation, and MP binding with MP-Group."
+            INDEX { hwPppIfIndex }
+            ::= { hwPppConfigTable 1 }
+        
+        HwPppConfigEntry ::=
+            SEQUENCE { 
+                hwPppIfIndex
+                    InterfaceIndex,
+                hwPppMruNegType
+                    INTEGER,
+                hwPppMpIfIndex
+                    InterfaceIndexOrZero
+             }
+
+        hwPppIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This object indicates the interface index."
+            ::= { hwPppConfigEntry 1 }
+        
+        hwPppMruNegType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                ipv4(1),
+                ipv6(2)
+
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+               "This object indicates the mode of MRU negotiation."
+            ::= { hwPppConfigEntry 11 }
+        
+        hwPppMpIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the MP-Group  index."
+            ::= { hwPppConfigEntry 12 }
+        
+
+
+
+--      hwPppAuthenticateTable table
+-- 
+        hwPppAuthenticateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppAuthenticateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure PAP/CHAP authentication ."
+            ::= { hwPppObjects 2 }
+        
+        hwPppAuthenticateEntry OBJECT-TYPE
+            SYNTAX HwPppAuthenticateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure PAP/CHAP authentication ."
+            INDEX { hwPppIfIndex }
+            ::= { hwPppAuthenticateTable 1 }
+        
+        HwPppAuthenticateEntry ::=
+            SEQUENCE { 
+                
+                hwPppAuthenticateMode
+                    INTEGER,
+                hwPppAuthenticateChapUserName
+                    DisplayString (SIZE(0..253)),
+                hwPppAuthenticateChapPwType
+                    INTEGER,
+                hwPppAuthenticateChapPw 
+                    DisplayString (SIZE(0..32|44|48|56|68)),
+                hwPppAuthenticatePapUserName
+                    DisplayString (SIZE(0..253)),
+                hwPppAuthenticatePapPwType
+                    INTEGER,
+                hwPppAuthenticatePapPw 
+                    DisplayString (SIZE(0..32|44|48|56|68))
+             }
+
+        
+        
+        hwPppAuthenticateMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                 default(1),
+                 chap(2),
+                 pap(3),
+                 chappap(4)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+               "This object indicates the mode of the authentication."
+            ::= { hwPppAuthenticateEntry 11 }
+        
+        hwPppAuthenticateChapUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..253))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the username of CHAP authentication."
+            ::= { hwPppAuthenticateEntry 12 }
+            
+            
+        hwPppAuthenticateChapPwType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                 cipher(1),
+                 simple(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the encryption type of CHAP."
+            ::= { hwPppAuthenticateEntry 13 }
+
+        hwPppAuthenticateChapPw OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..32|44|48|56|68))
+            
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the password of CHAP authentication."
+            ::= { hwPppAuthenticateEntry 14 }
+
+        hwPppAuthenticatePapUserName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..253))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the username of PAP authentication.."
+            ::= { hwPppAuthenticateEntry 15 }
+           
+           
+        hwPppAuthenticatePapPwType OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                 cipher(1),
+                 simple(2)
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the encryption type of PAP."
+            ::= { hwPppAuthenticateEntry 16 }
+
+         hwPppAuthenticatePapPw OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..32|44|48|56|68))
+           
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the password of PAP authentication."
+            ::= { hwPppAuthenticateEntry 17 }
+  
+         -- 1.3.6.1.4.1.2011.5.25.169.1.3
+         hwPppTrapObjects OBJECT IDENTIFIER ::= { hwPppObjects 3 }
+         
+         -- 1.3.6.1.4.1.2011.5.25.169.1.3.1
+         hwPppNegotiationFailReason OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE (1..47))
+             MAX-ACCESS accessible-for-notify
+             STATUS current
+             DESCRIPTION
+            "
+                  physicalLinkDown,
+                  receivedConfReqPacket,
+                  receivedConfAckPacket,
+                  receivedNakPacket,
+                  receivedTermReqPacket,
+                  receivedTermAckPacket,
+                  receivedCodeRejPacket,
+                  receivedProtoRejPacket,
+                  chapAuthenticationFailed,
+                  papAuthenticationFailed,
+                  keepaliveOutOfTime,
+                  adminDown,
+                  adminUp,
+                  peerNoReply,
+                  resultCannotBeAccepted,
+                  peerIpAddrInvalid
+             "
+             ::= { hwPppTrapObjects 1 }
+             
+         hwPppNcpName OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE (1..15))
+             MAX-ACCESS accessible-for-notify
+             STATUS current
+             DESCRIPTION
+            "
+                  ipcp,
+                  mplscp,
+                  osicp,
+                  ip6cp,
+                  ccp,
+                  ipxcp
+             "
+             ::= { hwPppTrapObjects 2 }               
+                           
+                           
+         --1.3.6.1.4.1.2011.5.25.169.1.4
+         --      hwPppNcpConfigtable      
+     --       HwPppNcpConfigEntry
+            hwPppNcpConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPppNcpConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+               "This table is used to configure the PPP Ncp type ."
+            ::= { hwPppObjects 4 }
+        
+            hwPppNcpConfigEntry OBJECT-TYPE
+            SYNTAX HwPppNcpConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to configure the PPP Ncp type."
+            INDEX { hwPppIfIndex }
+            ::= { hwPppNcpConfigTable 1 }
+        
+        HwPppNcpConfigEntry ::=
+            SEQUENCE { 
+                    hwPppOsicp
+                    INTEGER,
+                hwPppMplscp
+                    INTEGER
+             }
+        
+        hwPppOsicp OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                default(1),
+        disable(2)
+
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+               "Indicates the type of ppp network protocol of osicp."
+            ::= { hwPppNcpConfigEntry 11 }
+        
+        hwPppMplscp OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                default(1),
+        disable(2)
+
+            }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates the type of ppp network protocol of mplscp."
+            ::= { hwPppNcpConfigEntry 12 } 
+                           
+        -- 1.3.6.1.4.1.2011.5.25.169.2
+        hwPppTraps OBJECT IDENTIFIER ::= { hwPppMIB 2 }       
+
+        -- 1.3.6.1.4.1.2011.5.25.169.2.1
+        hwPppLoopbackDetect NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "The interface Loopback is detected."
+            ::= { hwPppTraps 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.169.2.2        
+        hwPppLoopbackDetResume NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "The interface is recovered from Loopback."
+            ::= { hwPppTraps 2 }
+                 
+        -- 1.3.6.1.4.1.2011.5.25.169.2.3
+        hwLcpNegotiateFailed NOTIFICATION-TYPE
+            OBJECTS { ifName, hwPppNegotiationFailReason }
+            STATUS current
+            DESCRIPTION 
+                "The PPP LCP negotiation failed. Send this trap when LCP protocol negotiation failed.           
+                1.ifName: interface name.
+                2.hwPppNegotiationFailReason: the reason of LCP protocol negotiation failure."
+            ::= { hwPppTraps 3 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.169.2.4        
+        hwLcpNegotiateResumed NOTIFICATION-TYPE
+            OBJECTS { ifName }
+            STATUS current
+            DESCRIPTION 
+                "The PPP LCP negotiation resumed.
+                1.ifName: interface name."
+            ::= { hwPppTraps 4 }        
+        
+        -- 1.3.6.1.4.1.2011.5.25.169.2.5
+        hwNcpNegotiateFailed NOTIFICATION-TYPE
+            OBJECTS { ifName, hwPppNcpName, hwPppNegotiationFailReason }
+            STATUS current
+            DESCRIPTION 
+                "The PPP NCP negotiation failed. Send this trap when NCP protocol negotiation failed.
+                1.ifName: interface name.
+                2.hwPppNcpName: NCP name.
+                3.hwPppNegotiationFailReason: the reason of NCP protocol negotiation failure."
+            ::= { hwPppTraps 5 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.169.2.6        
+        hwNcpNegotiateResumed NOTIFICATION-TYPE
+            OBJECTS { ifName, hwPppNcpName }
+            STATUS current
+            DESCRIPTION 
+                "The PPP NCP negotiation resumed.
+                1.ifName: interface name.
+                2.hwPppNcpName: NCP name."
+            ::= { hwPppTraps 6 }
+
+        -- 1.3.6.1.4.1.2011.5.25.169.2.7
+        hwMpDown NOTIFICATION-TYPE
+            OBJECTS { ifIndex,ifName }
+            STATUS current
+            DESCRIPTION 
+                "The MP-group negotiation fails because the number of bundled links is smaller than its lower threshold."
+            ::= { hwPppTraps 7 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.169.2.8        
+        hwMpUp NOTIFICATION-TYPE
+            OBJECTS { ifIndex,ifName }
+            STATUS current
+            DESCRIPTION 
+                "The MP-group negotiation is restored because the number of bundled links is greater than its lower threshold."
+            ::= { hwPppTraps 8 }  
+           
+        hwPppConformance OBJECT IDENTIFIER ::= { hwPppMIB 11 }
+        
+        hwPppCompliances OBJECT IDENTIFIER ::= { hwPppConformance 1 }
+        
+
+        hwPppCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-PPP-MIB."
+            MODULE 
+                MANDATORY-GROUPS { hwPppConfigObjectGroup, hwPppAuthenticateObjectGroup, hwPppTrapNotificationGroup, hwPppTrapObjectsGroup}
+            ::= { hwPppCompliances 1 }
+        
+        hwPppGroups OBJECT IDENTIFIER ::= { hwPppConformance 2 }
+        
+        hwPppConfigObjectGroup OBJECT-GROUP
+            OBJECTS {  hwPppMruNegType, hwPppMpIfIndex }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the PPP attribute group."
+            ::= { hwPppGroups 1 }
+        
+        hwPppAuthenticateObjectGroup OBJECT-GROUP
+            OBJECTS {  hwPppAuthenticateMode, hwPppAuthenticateChapUserName, hwPppAuthenticateChapPwType, hwPppAuthenticateChapPw, hwPppAuthenticatePapUserName, hwPppAuthenticatePapPwType, hwPppAuthenticatePapPw }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the PPP authentication group."
+            ::= { hwPppGroups 2 }
+            
+        hwPppTrapNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwPppLoopbackDetect, hwPppLoopbackDetResume, hwLcpNegotiateFailed, hwLcpNegotiateResumed, hwNcpNegotiateFailed, hwNcpNegotiateResumed, hwMpDown, hwMpUp }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the PPP Trap group."
+            ::= { hwPppGroups 3 }
+            
+        hwPppTrapObjectsGroup OBJECT-GROUP
+            OBJECTS {  hwPppNegotiationFailReason, hwPppNcpName }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the PPP Trap object group."
+            ::= { hwPppGroups 4 }
+        
+        
+        
+    
+    END
+
+--
+-- HUAWEI-PPP-MIB.mib
+--

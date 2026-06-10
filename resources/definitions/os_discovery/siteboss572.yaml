@@ -1,0 +1,170 @@
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>SiteBoss \S+) (?<version>.*)/'
+        serial: '.1.3.6.1.4.1.3052.20.2.16.15.3.0'
+        location: '.1.3.6.1.4.1.3052.20.3.1.0'
+
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: SITEBOSS-572-STD-MIB::esPointTable
+                    value: SITEBOSS-572-STD-MIB::esPointValueStr
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.1.1.1.7.{{ $index }}'
+                    descr: 'Sensor: {{ $index }} | {{ SITEBOSS-572-STD-MIB::esPointName }}'
+                    skip_values:
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esIndexPC
+                            op: '!='
+                            value: 1
+        state:
+            data:
+                -
+                    oid: SITEBOSS-572-STD-MIB::esPointTable
+                    value: SITEBOSS-572-STD-MIB::esPointInEventState
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.1.1.1.5.{{ $index }}'
+                    descr: 'Contact: {{ $index }} | {{ SITEBOSS-572-STD-MIB::esPointName }}'
+                    group: 'Contact Closures'
+                    state_name: contactClosure
+                    states:
+                        - { value: 1, generic: 2, descr: Open }
+                        - { value: 2, generic: 0, descr: Closed }
+                    skip_values:
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esIndexPC
+                            op: '!='
+                            value: 2
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esPointName
+                            op: '='
+                            value: ''
+                -
+                    oid: SITEBOSS-572-STD-MIB::esPointTable
+                    value: SITEBOSS-572-STD-MIB::esPointValueInt
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.1.1.1.6.{{ $index }}'
+                    descr: 'Relay: {{ $index }} | {{ SITEBOSS-572-STD-MIB::esPointName }}'
+                    group: 'Relay Outputs'
+                    state_name: relayOutput
+                    states:
+                        - { value: 0, generic: 0, descr: de-energized }
+                        - { value: 1, generic: 2, descr: energized }
+                    skip_values:
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esIndexPC
+                            op: '!='
+                            value: 6
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esPointValueStr
+                            op: 'not_in_array'
+                            value: ['Active/Energized', 'Inactive/Energized', 'Active/De-energized', 'Inactive/De-energized']
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esPointName
+                            op: '='
+                            value: unnamed
+                -
+                    oid: SITEBOSS-572-STD-MIB::esPointTable
+                    value: SITEBOSS-572-STD-MIB::esPointValueInt
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.1.1.1.6.{{ $index }}'
+                    descr: 'Port: {{ $index }} | {{ SITEBOSS-572-STD-MIB::esPointName }}'
+                    group: 'Power Outputs'
+                    state_name: powerOutput
+                    states:
+                        - { value: 0, generic: 1, descr: de-energized }
+                        - { value: 1, generic: 0, descr: energized }
+                    skip_values:
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esIndexPC
+                            op: '!='
+                            value: 6
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esPointValueStr
+                            op: 'not_in_array'
+                            value: ['On/Energized', 'Off/De-energized']
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esPointName
+                            op: '='
+                            value: unnamed
+
+        current:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: SITEBOSS-572-STD-MIB::pdnTable
+                    value: SITEBOSS-572-STD-MIB::pdnOutputCurrentValue
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.5.4.1.1.23.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    index: 'pdnOutputCurrentValue.{{ $index }}'
+                    descr: 'Port: {{ $index }}'
+                    group: 'Current (Per Port)'
+                    low_limit: SITEBOSS-572-STD-MIB::pdnOutputCurrentVLowCurrent
+                    low_warn_limit: SITEBOSS-572-STD-MIB::pdnOutputCurrentLowCurrent
+                    warn_limit: SITEBOSS-572-STD-MIB::pdnOutputCurrentHighCurrent
+                    high_limit: SITEBOSS-572-STD-MIB::pdnOutputCurrentVHighCurrent
+                -
+                    oid: SITEBOSS-572-STD-MIB::pdnTable
+                    value: SITEBOSS-572-STD-MIB::pdnMainCurrentValue
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.5.4.1.1.5.{{ $index }}'
+                    entPhysicalIndex: '{{ $subindex0 }}'
+                    index: 'pdnMainCurrentValue.{{ $index }}'
+                    descr: 'Module: {{ $index }}'
+                    group: 'Current (Per Module)'
+                    low_limit: SITEBOSS-572-STD-MIB::pdnMainCurrentVLowCurrent
+                    low_warn_limit: SITEBOSS-572-STD-MIB::pdnMainCurrentLowCurrent
+                    warn_limit: SITEBOSS-572-STD-MIB::pdnMainCurrentHighCurrent
+                    high_limit: SITEBOSS-572-STD-MIB::pdnMainCurrentVHighCurrent
+
+        voltage:
+            options:
+                divisor: 1000
+            data:
+                -
+                    oid: SITEBOSS-572-STD-MIB::pdnTable
+                    value: SITEBOSS-572-STD-MIB::pdnMainVoltageValue
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.5.4.1.1.13.{{ $index }}'
+                    descr: 'Module: {{ $index }}'
+                    group: 'Voltage (Per Module)'
+                    low_limit: SITEBOSS-572-STD-MIB::pdnMainVoltageVLowCurrent
+                    low_warn_limit: SITEBOSS-572-STD-MIB::pdnMainVoltageLowCurrent
+                    warn_limit: SITEBOSS-572-STD-MIB::pdnMainVoltageHighCurrent
+                    high_limit: SITEBOSS-572-STD-MIB::pdnMainVoltageVHighCurrent
+
+        power:
+            options:
+                divisor: 1
+            data:
+                -
+                    oid: SITEBOSS-572-STD-MIB::pdnTable
+                    value: SITEBOSS-572-STD-MIB::pdnMainPowerValue
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.5.4.1.1.20.{{ $index }}'
+                    descr: 'Module: {{ $index }}'
+                    group: 'Power (Per Module)'
+
+        humidity:
+            data:
+                -
+                    oid: SITEBOSS-572-STD-MIB::esPointTable
+                    value: SITEBOSS-572-STD-MIB::esPointValueInt
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.1.1.1.6.{{ $index }}'
+                    descr: 'Sensor: {{ $index }} | {{ SITEBOSS-572-STD-MIB::esPointName }}'
+                    skip_values:
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esIndexPC
+                            op: '!='
+                            value: 3
+        count:
+            data:
+                -
+                    oid: SITEBOSS-572-STD-MIB::esPointTable
+                    value: SITEBOSS-572-STD-MIB::esPointValueStr
+                    num_oid: '.1.3.6.1.4.1.3052.20.1.1.1.1.7.{{ $index }}'
+                    descr: 'Analog: {{ $index }} | {{ SITEBOSS-572-STD-MIB::esPointName }}'
+                    skip_values:
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esIndexPC
+                            op: '!='
+                            value: 5
+                        -
+                            oid: SITEBOSS-572-STD-MIB::esPointName
+                            op: '='
+                            value: unnamed

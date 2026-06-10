@@ -1,0 +1,897 @@
+
+-- ==================================================================
+-- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI LI Management MIB  HWAWEI-LI-MIB
+-- Reference:
+-- Version:     V1.0
+-- History:
+--              V1.0 s49159, 2007-06-10, publish
+-- ==================================================================
+
+    HUAWEI-LI-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            InetAddress, InetPortNumber, InetAddressType, InetAddressPrefixLength            
+                FROM INET-ADDRESS-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, BITS, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DateAndTime, MacAddress, RowStatus, TEXTUAL-CONVENTION                        
+                FROM SNMPv2-TC;
+    
+        hwLiMib MODULE-IDENTITY 
+            LAST-UPDATED "200706270000Z"        
+            ORGANIZATION 
+                "hw Technologies co.,Ltd."
+            CONTACT-INFO 
+                " R&D Meaning, huawei Technologies co.,Ltd.
+                Http://www.huawei.com                                       
+                E-mail:support@huawei.com "
+            DESCRIPTION 
+                "This module manages huawei's Lawful interception feature."
+            REVISION "200706270000Z"        
+            DESCRIPTION 
+                "Initial version of this MIB module."
+            ::= { hwDatacomm 131 }
+
+        
+    
+--
+-- Textual conventions
+--
+    
+        HWLiDscp ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "An integer that is in the range of the DiffServ codepoint
+                values."
+            SYNTAX Integer32 (0..63)
+
+    
+--
+-- Node definitions
+--
+    
+    
+        hwLiMibNotifs OBJECT IDENTIFIER ::= { hwLiMib 1 }
+
+        
+    
+        hwLiMibActive NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "This notification is sent when an intercepting router or switch is first 
+                capable of intercepting a packet corresponding to a configured data stream. "
+            ::= { hwLiMibNotifs 1 }
+
+    
+        hwLiX3HeartBeatAlarm NOTIFICATION-TYPE
+            OBJECTS { hwLiGatewayX3Address }
+            STATUS current
+            DESCRIPTION 
+                "This notification is sent when an LIG is lost connection to the device 
+                which  intercepting packet corresponding to a configured data stream. "
+            ::= { hwLiMibNotifs 2 } 
+        
+    
+        hwLiX3HeartBeatRecover NOTIFICATION-TYPE   
+            OBJECTS { hwLiGatewayX3Address }
+            STATUS current
+            DESCRIPTION 
+                "This notification is sent when an LIG is recover connection to the device 
+                which intercepting packet corresponding to a configured data stream. "
+            ::= { hwLiMibNotifs 3 }
+
+    
+        hwLiMibObjects OBJECT IDENTIFIER ::= { hwLiMib 2 }
+
+        
+
+        hwLiAgentObjects OBJECT IDENTIFIER ::= { hwLiMibObjects 1 }
+
+        
+
+        hwLiAgentTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time of the LI agent.Read-only."
+            ::= { hwLiAgentObjects 1 }
+
+        
+
+        hwLiAgentEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of the  LI agent.Read-only."
+            ::= { hwLiAgentObjects 2 }
+
+        
+
+        hwLiAgentX2IpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of the X2 interface in LI agent.Just can be read by server 
+                and can be set in command line."
+            ::= { hwLiAgentObjects 3 }
+
+
+        hwLiAgentX2Port OBJECT-TYPE
+            SYNTAX InetPortNumber
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Port of the X2 interface in LI agent.Just can be read by server 
+                and can be set in command line."
+            ::= { hwLiAgentObjects 4 }
+
+
+        hwLiAgentX3IpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The IP address of the X3 interface in LI agent.Just can be read by server 
+                and can be set in command line."
+            ::= { hwLiAgentObjects 5 }
+
+
+        hwLiAgentX3Port OBJECT-TYPE
+            SYNTAX InetPortNumber
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The Port of the X3 interface in LI agent.Just can be read by server 
+                and can be set in command line."
+            ::= { hwLiAgentObjects 6 }
+
+        
+
+        hwLiGatewayGroup OBJECT IDENTIFIER ::= { hwLiMibObjects 3 }
+
+        
+    
+        hwLiGatewayNewIndex OBJECT-TYPE
+            SYNTAX Integer32 (0 | 1..10)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object contains a value which may be used as an index
+                value for a new HwLiGatewayEntry. This is to reduce 
+                the probability of errors during creation of new hwLiGatewayTable 
+                entries.0 means no free resource."
+            ::= { hwLiGatewayGroup 1 }
+
+
+        hwLiGatewayTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLiGatewayEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table lists the LI Gateway Devices with which the
+                intercepting device communicates.
+                
+                This table is written by the LI Gateway Device, and is always
+                volatile. This is because intercepts may disappear during a
+                restart of the intercepting equipment.
+                
+                Entries are added to this table via hwLiGatewayStatus in
+                accordance with the RowStatus convention."
+            ::= { hwLiGatewayGroup 2 }
+
+
+        hwLiGatewayEntry OBJECT-TYPE
+            SYNTAX HwLiGatewayEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry describes a single session maintained with an
+                application on a LI Gateway Device."
+            INDEX { hwLiGatewayIndex }
+            ::= { hwLiGatewayTable 1 }
+
+        
+        HwLiGatewayEntry ::=
+            SEQUENCE { 
+                hwLiGatewayIndex
+                    Integer32,
+                hwLiGatewayAddressType
+                    InetAddressType,
+                hwLiGatewayX2Protocol
+                    INTEGER,
+                hwLiGatewayX2Address
+                    InetAddress,
+                hwLiGatewayX2Port
+                    InetPortNumber,
+                hwLiGatewayX3Protocol
+                    INTEGER,
+                hwLiGatewayX3Address
+                    InetAddress,
+                hwLiGatewayX3Port
+                    InetPortNumber,
+                hwLiGatewayX3HeartBeatTimer
+                    Integer32,
+                hwLiGatewayX3NoResponseNum
+                    Integer32,
+                hwLiGatewayX3OperateStatus
+                    INTEGER,
+                hwLiGatewayX3Dscp
+                    HWLiDscp,
+                hwLiGatewayRowStatus
+                    RowStatus,
+                hwLiGatewayX3AddressType
+                    InetAddressType,                
+                hwLiGatewayX2AddressType
+                    InetAddressType                
+             }
+
+
+        hwLiGatewayIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..10)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the LIG itself."
+            ::= { hwLiGatewayEntry 1 }
+
+
+        hwLiGatewayAddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of address in LIG"
+            DEFVAL { ipv4 }
+            ::= { hwLiGatewayEntry 2 }
+
+
+        hwLiGatewayX2Protocol OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                udp(1),
+                tcp(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The protocol used in transferring intercepted data to the
+                Gateway Device. "
+            DEFVAL { tcp }
+            ::= { hwLiGatewayEntry 3 }
+
+        
+
+        hwLiGatewayX2Address OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The IP Address of the Gateway Device's network interface
+                to which to direct IRI."
+            ::= { hwLiGatewayEntry 4 }
+
+        
+
+        hwLiGatewayX2Port OBJECT-TYPE
+            SYNTAX InetPortNumber
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The port number on the Gateway Device's network interface
+                to which to direct IRI."
+            ::= { hwLiGatewayEntry 5 }
+
+        
+
+        hwLiGatewayX3Protocol OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                udp(1),
+                tcp(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The protocol used in transferring intercepted data to the
+                Gateway Device. "
+            DEFVAL { udp }
+            ::= { hwLiGatewayEntry 6 }
+
+
+        hwLiGatewayX3Address OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The IP Address of the Gateway Device's network interface
+                to which to direct CC."
+            ::= { hwLiGatewayEntry 7 }
+
+        
+
+        hwLiGatewayX3Port OBJECT-TYPE
+            SYNTAX InetPortNumber
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The port number on the Gateway Device's network interface
+                to which to direct intercepted traffic."
+            ::= { hwLiGatewayEntry 8 }
+
+        
+
+        hwLiGatewayX3HeartBeatTimer OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The timer for sending HeartBeat to LIG,In seconds"
+            DEFVAL { 5 }
+            ::= { hwLiGatewayEntry 9 }
+
+        
+
+        hwLiGatewayX3NoResponseNum OBJECT-TYPE
+            SYNTAX Integer32 (2..16)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The times of heartbeats that allowed to missed from LIG"
+            DEFVAL { 3 }
+            ::= { hwLiGatewayEntry 10 }
+
+        
+
+        hwLiGatewayX3OperateStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                normal(1),
+                noHeartBeat(2),
+                linkdown(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The operate status of X3 interface"
+            ::= { hwLiGatewayEntry 11 }
+
+        
+
+        hwLiGatewayX3Dscp OBJECT-TYPE
+            SYNTAX HWLiDscp
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The Differentiated Services Code Point the intercepting
+                device applies to the IP packets encapsulating the
+                intercepted traffic."
+            DEFVAL { 0 }
+            ::= { hwLiGatewayEntry 12 }
+
+        
+
+        hwLiGatewayRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this conceptual row. This object is used to
+                manage creation, modification and deletion of rows in this
+                table.
+                "
+            ::= { hwLiGatewayEntry 14 }
+
+
+        hwLiGatewayX3AddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of address in LIG"
+            DEFVAL { ipv4 }
+            ::= { hwLiGatewayEntry 15 }
+
+    
+        hwLiGatewayX2AddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of address in LIG"
+            DEFVAL { ipv4 }
+            ::= { hwLiGatewayEntry 16 }
+    
+    
+
+        hwLiGatewayCapabilities OBJECT-TYPE
+            SYNTAX BITS
+                {
+                ipv4SrcInterface(0),
+                ipv6SrcInterface(1),
+                udp(2),
+                tcp(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object displays the device capabilities with respect to
+                certain fields in Gateway Device table. This may be dependent
+                on hardware capabilities, software capabilities.
+                The following values may be supported:
+                    ipv4SrcInterface:  SNMP ifIndex Value may be used to select
+                                       the interface (denoted by
+                                       hwLiGatewaySrcInterface) on the
+                                       intercepting device from which to
+                                       transmit intercepted data to an IPv4
+                                       address Gateway Device.
+                
+                
+                    ipv6SrcInterface:  SNMP ifIndex Value may be used to select
+                                       the interface (denoted by
+                                       hwLiGatewaySrcInterface) on the
+                                       intercepting device from which to
+                                       transmit intercepted data to an IPv6
+                                       address Gateway Device.
+                
+                
+                    udp:               UDP may be used as transport protocol
+                                       (denoted by hwLiGatewayTransport) in
+                                       transferring intercepted data to the
+                                       Gateway Device.
+                
+                
+                    tcp:               TCP may be used as transport protocol
+                                       (denoted by hwLiGatewayTransport) in
+                                       transferring intercepted data to the
+                                       Gateway Device."
+            ::= { hwLiGatewayGroup 3 }
+
+        
+
+        hwLiStreamGroup OBJECT IDENTIFIER ::= { hwLiMibObjects 4 }
+
+        
+    
+        hwLiStreamTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLiStreamEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Intercept Stream Table lists the IPv4 and IPv6 streams
+                to be intercepted.  The same data stream must be used by
+                one LIG.
+                
+                The first index indicates which LIG the
+                intercepted traffic will be diverted to. The second index
+                permits multiple classifiers to be used together, such as
+                having an IP address as source or destination."
+            ::= { hwLiStreamGroup 2 }
+
+
+        hwLiStreamEntry OBJECT-TYPE
+            SYNTAX HwLiStreamEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A stream entry indicates a single data stream to be
+                intercepted to a Mediation Device. Many selected data
+                streams may go to the same application interface, and many
+                application interfaces are supported."
+            INDEX { hwLiGatewayIndex, hwLiStreamIndex }
+            ::= { hwLiStreamTable 1 }
+
+        
+        HwLiStreamEntry ::=
+            SEQUENCE { 
+                hwLiStreamIndex
+                    Integer32,
+                hwLiStreamLiId
+                    Unsigned32,
+                hwLiStreamActivationType
+                    INTEGER,
+                hwLiStreamSessionId
+                    Integer32,
+                hwLiStreamTargetIdType
+                    INTEGER,
+                hwLiStreamSrcMacAddress
+                    MacAddress,
+                hwLiStreamDstMacAddress
+                    MacAddress,
+                hwLiStreamSrcIpAddress
+                    InetAddress,
+                hwLiStreamSrcIpLength
+                    InetAddressPrefixLength,
+                hwLiStreamDstIpAddress
+                    InetAddress,
+                hwLiStreamDstIpLength
+                    InetAddressPrefixLength,
+                hwLiStreamProtocol
+                    Integer32,                
+                hwLiStreamSrcPort
+                    InetPortNumber,                                
+                hwLiStreamDstPort
+                    InetPortNumber,                
+                hwLiStreamIfIndex
+                    Integer32,
+                hwLiStreamUserName
+                    OCTET STRING, 
+                hwLiStreamRowStatus
+                    RowStatus,
+                hwLiStreamSrcIpAddressType
+                    InetAddressType,
+                hwLiStreamDstIpAddressType
+                    InetAddressType,
+                hwLiStreamSrcVpnName
+                    OCTET STRING,
+                  hwLiStreamDstVpnName 
+                      OCTET STRING,
+                hwLiStreamL2tpIfIndex
+                    Integer32,
+                hwLiStreamL2tpVlanId
+                    Integer32,
+                hwLiStreamAcctSessionId
+                    OCTET STRING    
+             }
+
+
+        hwLiStreamIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..8192)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the stream itself."
+            ::= { hwLiStreamEntry 1 }
+
+        
+
+        hwLiStreamLiId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The ID indicate a independency stream in a LIG ."
+            ::= { hwLiStreamEntry 2 }
+
+        
+
+        hwLiStreamActivationType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                iri(1),
+                cc(2),
+                both(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Intercepted IRI or CC or BOTH."
+            DEFVAL { cc }
+            ::= { hwLiStreamEntry 3 }
+
+        
+    
+        hwLiStreamSessionId OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The index of the stream itself.0 means no session ID will be specified"
+            DEFVAL { 0 }
+            ::= { hwLiStreamEntry 4 }
+
+        
+
+        hwLiStreamTargetIdType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                oneDirection(1),
+                biDirection(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Target ID type specifies the type of packets. 
+                1 means one direction traffic is intercept, 
+                2 means bidirectional traffic is intercept. 
+                
+                for bidirectional interception,  if the source IP or destination IP 
+                in a packet is equal with the configured hwLiStreamSrcIpAddress£¬
+                If other condition is satisfied then the packet is intercepted.
+                
+                for one-directional interception,  if the sourceIP and DestinationIP 
+                in a packet is equal with the configured hwLiStreamSrcIpAddress and 
+                hwLiStreamDstIPAddress£¬If other condition is satisfied then the 
+                packet is intercepted"
+            DEFVAL { biDirection }
+            ::= { hwLiStreamEntry 5 }
+
+        
+
+        hwLiStreamSrcMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Source Mac address of the packets which will be intercepted.0000-0000-0000 means no MAC address will be specified"
+            ::= { hwLiStreamEntry 7 }
+
+        
+
+        hwLiStreamDstMacAddress OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Destination Mac address of the packets which will be intercepted."
+            ::= { hwLiStreamEntry 8 }
+
+        
+
+        hwLiStreamSrcIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The Source Address used in packet selection. This address will
+                be of the type specified in hwLiStreamIpAddrType.0.0.0.0 means no IP address will be specified"
+            DEFVAL { '00000000'H }
+            ::= { hwLiStreamEntry 9 }
+
+        
+
+        hwLiStreamSrcIpLength OBJECT-TYPE
+            SYNTAX InetAddressPrefixLength
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The length of the Source Prefix. A value of 32 causes all
+                addresses to match. This prefix length will be consistent with
+                the type specified in hwLiStreamIpAddrType."
+            DEFVAL { 32 }
+            ::= { hwLiStreamEntry 10 }
+
+        
+    
+        hwLiStreamDstIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The Destination address or prefix used in packet selection.
+                This address will be of the type specified in
+                hwLiStreamIpAddrType.0.0.0.0 means no IP address will be specified"
+            DEFVAL { '00000000'H }                
+            ::= { hwLiStreamEntry 11 }
+
+        
+        hwLiStreamDstIpLength OBJECT-TYPE
+            SYNTAX InetAddressPrefixLength
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The length of the Destination Prefix. A value of 32 causes
+                all addresses to match.  This prefix length will be consistent
+                with the type specified in hwLiStreamIpAddrType."
+            DEFVAL { 32 }
+            ::= { hwLiStreamEntry 12 }
+
+        
+    
+        hwLiStreamProtocol OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Protocol type of the packets which will be intercepted.0 means no Protocol type will be specified"
+            DEFVAL { 0 }                
+            ::= { hwLiStreamEntry 13 }
+        
+    
+        hwLiStreamSrcPort OBJECT-TYPE
+            SYNTAX InetPortNumber
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The fourth layer source port.0 means no Port will be specified"
+            DEFVAL { 0 }                
+            ::= { hwLiStreamEntry 14 }            
+            
+    
+        hwLiStreamDstPort OBJECT-TYPE
+            SYNTAX InetPortNumber
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The fourth layer Destination port.0 means no Port will be specified"
+            DEFVAL { 0 }                
+            ::= { hwLiStreamEntry 15 }
+
+        
+    
+        hwLiStreamIfIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The interface switch carrying the intercepted taffic.0 means no interface will be specified"
+            DEFVAL { 0 }                
+            ::= { hwLiStreamEntry 16 }
+
+        
+    
+        hwLiStreamUserName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The username whose traffic will be intercepted.zero-length means no user will be specified"
+            ::= { hwLiStreamEntry 17 }
+        
+  
+        hwLiStreamRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The status of this conceptual row. This object is used to
+                manage creation, modification and deletion of rows in this
+                table."
+            ::= { hwLiStreamEntry 18 }
+        
+
+        hwLiStreamSrcIpAddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The source IP address of the interception stream" 
+            DEFVAL { ipv4 }            
+            ::= { hwLiStreamEntry 19 } 
+        
+  
+        hwLiStreamDstIpAddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The destination IP address of the interception stream"  
+            DEFVAL { ipv4 }            
+            ::= { hwLiStreamEntry 20 }  
+
+
+        hwLiStreamSrcVpnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The source VPN instance name whose traffic will be intercepted.zero-length means no VPN will be specified"
+            ::= { hwLiStreamEntry 21 }
+
+         
+
+        hwLiStreamDstVpnName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The destination VPN instance name whose traffic will be intercepted. zero-length means no VPN will be specified"
+            ::= { hwLiStreamEntry 22 }
+        
+
+        hwLiStreamL2tpIfIndex OBJECT-TYPE
+            SYNTAX  Integer32 (0..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The L2TP ifindex of intercepting stream.0 means no l2tpIfindex will be specified"        
+            DEFVAL { 0 }    
+            ::= { hwLiStreamEntry 23 }
+ 
+        hwLiStreamL2tpVlanId OBJECT-TYPE
+            SYNTAX  Integer32 (0..2147483647)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The L2TP VLAN ID of intercepting stream.0 means no Vlan will be specified"     
+            DEFVAL { 0 }
+            ::= { hwLiStreamEntry 24 }
+    
+        hwLiStreamAcctSessionId OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The accounting session ID of intercepting stream.zero-length means no accouting session ID will be specified"
+            ::= { hwLiStreamEntry 25 }
+            
+        hwLiMibConform OBJECT IDENTIFIER ::= { hwLiMib 3 }
+
+        
+    
+        hwLiMibCompliances OBJECT IDENTIFIER ::= { hwLiMibConform 2 }
+
+
+        hwLiMibCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwLiGatewayComplianceGroup, hwLiStreamComplianceGroup, hwLiNotificationGroup, hwLiGatewayCpbComplianceGroup }
+            ::= { hwLiMibCompliances 1 }
+
+        
+    
+        hwLiMibGroups OBJECT IDENTIFIER ::= { hwLiMibConform 3 }
+
+        
+    
+        hwLiAgentComplianceGroup OBJECT-GROUP
+            OBJECTS { hwLiAgentTime, hwLiAgentEnable, hwLiAgentX2IpAddress, hwLiAgentX2Port, hwLiAgentX3IpAddress, 
+                hwLiAgentX3Port }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwLiMibGroups 1 }
+
+        
+    
+        hwLiGatewayComplianceGroup OBJECT-GROUP
+            OBJECTS { hwLiGatewayNewIndex, hwLiGatewayAddressType, hwLiGatewayX2Protocol, hwLiGatewayX2Address, hwLiGatewayX2Port, 
+                hwLiGatewayX3Protocol, hwLiGatewayX3Address, hwLiGatewayX3Port, hwLiGatewayX3HeartBeatTimer, hwLiGatewayX3NoResponseNum, 
+                hwLiGatewayX3OperateStatus, hwLiGatewayX3Dscp, hwLiGatewayRowStatus,hwLiGatewayX3AddressType,hwLiGatewayX2AddressType }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwLiMibGroups 2 }
+
+        
+    
+        hwLiStreamComplianceGroup OBJECT-GROUP
+            OBJECTS { hwLiStreamLiId, hwLiStreamActivationType, hwLiStreamSessionId, hwLiStreamTargetIdType,  
+                hwLiStreamProtocol, hwLiStreamSrcPort,hwLiStreamDstPort,hwLiStreamSrcMacAddress, hwLiStreamDstMacAddress, hwLiStreamSrcIpAddress, hwLiStreamSrcIpLength, 
+                hwLiStreamDstIpAddress, hwLiStreamDstIpLength, hwLiStreamIfIndex, hwLiStreamUserName, hwLiStreamRowStatus, 
+                hwLiStreamSrcIpAddressType,hwLiStreamDstIpAddressType,hwLiStreamSrcVpnName,hwLiStreamDstVpnName,
+                hwLiStreamL2tpIfIndex,hwLiStreamL2tpVlanId,hwLiStreamAcctSessionId }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwLiMibGroups 3 }
+
+        
+    
+        hwLiNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwLiMibActive, hwLiX3HeartBeatAlarm, hwLiX3HeartBeatRecover}
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwLiMibGroups 4 }
+
+        
+    
+        hwLiGatewayCpbComplianceGroup OBJECT-GROUP
+            OBJECTS { hwLiGatewayCapabilities }
+            STATUS current
+            DESCRIPTION 
+                "Description."
+            ::= { hwLiMibGroups 5 }
+
+        
+    
+    END
+
+
+

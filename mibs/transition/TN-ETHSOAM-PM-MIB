@@ -1,0 +1,1484 @@
+-- *****************************************************************
+-- TN-ETHSOAM-PM-MIB.my : TN Ethernet OAM MIB
+--
+-- Author : Angela Xing & Tony Lei
+--
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-ETHSOAM-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32, Counter64, Unsigned32
+        FROM SNMPv2-SMI
+    DateAndTime, TimeInterval, RowStatus
+        FROM SNMPv2-TC
+    tnEthSoaminstance
+        FROM TN-ETHSOAM-MIB
+    tnEvcIndex, tnEvcEceId
+        FROM TN-EVC-MIB
+    ifIndex
+        FROM IF-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+
+--
+-- main body
+--
+tnEthSoamPmMIB MODULE-IDENTITY
+    LAST-UPDATED    "201403281200Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+             Technical Support
+             10900 Red Circle Drive
+             Minnetonka, MN 55343 USA
+             Tel: +1-800-526-9267
+             E-mail: techsupport@transition.com
+            "
+    DESCRIPTION
+           "This MIB module contains the Performance Monitoring objects for
+            the management of Ethernet Services Operations, Administration
+            and Maintenance in TN platform products."
+    REVISION        "201403281200Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 143 }
+
+
+-- 1.3.6.1.4.1.868.2.5.143.0
+tnEthSoamPmNotifications           OBJECT IDENTIFIER ::= { tnEthSoamPmMIB 0 }
+-- 1.3.6.1.4.1.868.2.5.143.1
+tnEthSoamPmCfgMIBObjects           OBJECT IDENTIFIER ::= { tnEthSoamPmMIB 1 }
+-- 1.3.6.1.4.1.868.2.5.143.2
+tnEthSoamPmStatsMIBObjects         OBJECT IDENTIFIER ::= { tnEthSoamPmMIB 2 }
+-- 1.3.6.1.4.1.868.2.5.143.3
+tnEthSoamPmNotificationMIBObjects  OBJECT IDENTIFIER ::= { tnEthSoamPmMIB 3 }
+
+--
+-- sub Objects list
+--
+tnEthSoamPmSessionCfgObjects       OBJECT IDENTIFIER ::= { tnEthSoamPmCfgMIBObjects 1 }
+tnEthSoamPmTransferCfgObjects      OBJECT IDENTIFIER ::= { tnEthSoamPmCfgMIBObjects 2 }
+-- tnEthSoamPmThresholdCfgObjects     OBJECT IDENTIFIER ::= { tnEthSoamPmCfgMIBObjects 3 }
+
+tnEthSoamPmLmStatsObjects          OBJECT IDENTIFIER ::= { tnEthSoamPmStatsMIBObjects 1 }
+tnEthSoamPmDmStatsObjects          OBJECT IDENTIFIER ::= { tnEthSoamPmStatsMIBObjects 2 }
+tnEthSoamPmEvcStatsObjects         OBJECT IDENTIFIER ::= { tnEthSoamPmStatsMIBObjects 3 }
+tnEthSoamPmEceStatsObjects         OBJECT IDENTIFIER ::= { tnEthSoamPmStatsMIBObjects 4 }
+-- tnEthSoamPmPortStatsObjects        OBJECT IDENTIFIER ::= { tnEthSoamPmStatsMIBObjects 5 }
+-- tnEthSoamPmThresholdStatsObjects   OBJECT IDENTIFIER ::= { tnEthSoamPmStatsMIBObjects 6 }
+
+-- 1.3.6.1.4.1.868.2.5.143.3.1
+-- tnEthSoamPmThresholdCrossingNotifObj OBJECT IDENTIFIER ::= { tnEthSoamPmNotificationMIBObjects 1 }
+
+
+-- ******************************************************************
+-- TN Ethernet Performance Measurement Session Configuration Table
+-- ******************************************************************
+tnEthSoamPmSessionCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnEthSoamPmSessionCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table configure the Performance monitor session and storage settings.
+        "
+    ::= { tnEthSoamPmSessionCfgObjects 1 }
+
+tnEthSoamPmSessionCfgEntry OBJECT-TYPE
+    SYNTAX TnEthSoamPmSessionCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entries in this table configure the Performance monitor session and storage settings.
+        "
+    INDEX { tnEthSoamPmSessionCfgId }
+    ::= { tnEthSoamPmSessionCfgTable 1 }
+
+TnEthSoamPmSessionCfgEntry ::=
+    SEQUENCE {
+        tnEthSoamPmSessionCfgId            Integer32,
+        tnEthSoamPmSessionCfgType          INTEGER,
+        tnEthSoamPmSessionCfgSessionMode   INTEGER,
+        tnEthSoamPmSessionCfgStorageMode   INTEGER,
+        tnEthSoamPmSessionCfgInterval      Unsigned32
+     }
+
+tnEthSoamPmSessionCfgId OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An index to the Performce Monitor Configuration table which indicates
+        the specific session to be configured.
+        "
+    ::= { tnEthSoamPmSessionCfgEntry 1 }
+
+tnEthSoamPmSessionCfgType OBJECT-TYPE
+    SYNTAX INTEGER {
+        lossMeasurement(1),
+        delayMeasurement(2),
+        evc(3),
+        ece(4),
+        dmBinning(5)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Perfmonce Monitor session type:
+          - lossMeasurement   SOAM PM loss measurement collect and storage.
+          - delayMeasurement  SOAM PM delay measurement collect and storage.
+          - evc               EVC Port based counters collect and storage.
+          - ece               ECE Port based counters collect and storage.
+          - port              Port based counters collect and storage.
+        "
+    ::= { tnEthSoamPmSessionCfgEntry 2 }
+
+tnEthSoamPmSessionCfgSessionMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or disable this performance monitor session.
+        "
+    ::= { tnEthSoamPmSessionCfgEntry 3 }
+
+tnEthSoamPmSessionCfgStorageMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or disable the performance monitor local storage.
+        "
+    ::= { tnEthSoamPmSessionCfgEntry 4 }
+
+tnEthSoamPmSessionCfgInterval OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The measurement interval for the performance monitor.
+         The interval unit is minute, the valid range is system defined.
+         A typical range would be 1 - 60(mins)
+        "
+    ::= { tnEthSoamPmSessionCfgEntry 5 }
+
+
+-- ******************************************************************
+-- TN Ethernet Performance Measurement Transfer Configuration Table
+-- ******************************************************************
+tnEthSoamPmTransferCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnEthSoamPmTransferCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table configure the Performance Monitor data transfer related settings.
+        "
+    ::= { tnEthSoamPmTransferCfgObjects 1 }
+
+
+tnEthSoamPmTransferCfgEntry OBJECT-TYPE
+    SYNTAX TnEthSoamPmTransferCfgEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry in this table configure the Performance Monitor data transfer related settings.
+        "
+    INDEX { tnEthSoamPmTransferCfgId }
+    ::= { tnEthSoamPmTransferCfgTable 1 }
+
+TnEthSoamPmTransferCfgEntry ::=
+    SEQUENCE {
+        tnEthSoamPmTransferCfgId                     Integer32,
+        tnEthSoamPmTransferCfgMode                   INTEGER,
+        tnEthSoamPmTransferCfgSchedHrs               BITS,
+        tnEthSoamPmTransferCfgSchedMins              BITS,
+        tnEthSoamPmTransferCfgSchedOffset            Integer32,
+        tnEthSoamPmTransferCfgRandomOffset           Integer32,
+        tnEthSoamPmTransferCfgServerAddr             OCTET STRING,
+        tnEthSoamPmTransferCfgIntervalMode           INTEGER,
+        tnEthSoamPmTransferCfgIntervalNum            Integer32,
+        tnEthSoamPmTransferCfgIncludeIncomplete      INTEGER
+     }
+
+tnEthSoamPmTransferCfgId OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Indicate the performance monitor data transfer table index.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 1 }
+
+tnEthSoamPmTransferCfgMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Configure the performance monitor transfer mode per system. Possible modes are:
+         - Enabled:  Transfer data is enabled.
+         - Disabled: Transfer data is disabled.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 2 }
+
+tnEthSoamPmTransferCfgSchedHrs OBJECT-TYPE
+    SYNTAX BITS {
+                hrs00(0),
+                hrs01(1),
+                hrs02(2),
+                hrs03(3),
+                hrs04(4),
+                hrs05(5),
+                hrs06(6),
+                hrs07(7),
+                hrs08(8),
+                hrs09(9),
+                hrs10(10),
+                hrs11(11),
+                hrs12(12),
+                hrs13(13),
+                hrs14(14),
+                hrs15(15),
+                hrs16(16),
+                hrs17(17),
+                hrs18(18),
+                hrs19(19),
+                hrs20(20),
+                hrs21(21),
+                hrs22(22),
+                hrs23(23)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "It must be possible to select one or more of the 24 hours in a day, when PM data transfer will happen.
+                00:00
+                01:00
+                02:00
+                03:00
+                04:00
+                05:00
+                06:00
+                07:00
+                08:00
+                09:00
+                10:00
+                11:00
+                12:00
+                13:00
+                14:00
+                15:00
+                16:00
+                17:00
+                18:00
+                19:00
+                20:00
+                21:00
+                22:00
+                23:00
+         Default is none selected.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 3 }
+
+tnEthSoamPmTransferCfgSchedMins OBJECT-TYPE
+    SYNTAX BITS {
+        mins00(0),
+        mins15(1),
+        mins30(2),
+        mins45(3)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "It must be possible to select one or more of the four 15 min. in an hour, when PM data transfer will happen.
+                00:00
+                00:15
+                00:30
+                00:45
+         Default is none selected.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 4 }
+
+tnEthSoamPmTransferCfgSchedOffset OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "It must be possible to configure a fixed offset that is added to the scheduled transfer time.
+         The rage is 0-15 minutes. Default is 0 min.
+         The sum of Scheduled Fixed Offset and Scheduled Random Offset must not exceed 15 min.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 5 }
+
+tnEthSoamPmTransferCfgRandomOffset OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "It must be possible to configure a random offset that is added to the scheduled transfer time.
+         The offset added to the scheduled transfer time must be a random value in the range 0-Scheduled Offset.
+         The range is 0-900 seconds. Default is 0 sec.
+         The sum of Scheduled Offset and Random Offset must not exceed 15 min.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 6 }
+
+tnEthSoamPmTransferCfgServerAddr OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "It must be possible to configure the full URL of the server and the
+         corresponding directory (if any) for uploading.
+         The supported protocols are HTTP and TFTP.
+         To enable HTTP by entering http:// followed by the domain name or IP address.
+         To enable TFTP by entering tftp:// followed by the domain name or IP address.
+         The format is:
+             protocol://host_address:port_num/folder_name
+         while port_num and folder_name are optional.
+         For example, 'tftp://192.251.1.1:55/' will upload the counter files to
+         the tftp root directory in 192.251.1.1 at port 55 via tftp.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 7 }
+
+tnEthSoamPmTransferCfgIntervalMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        allAvailableIntervals(1),
+        newIntervalsSinceLastTransfer(2),
+        fixedNumberOfIntervals(3)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "There are three supported interval modes.
+         All available intervals: To enable transfer of all completed Measurement Intervals.
+         New intervals since last transfer: To enable transfer of only completed Measurement Intervals since last transfer.
+         Fixed number of intervals: To enable transfer of all completed Measurement Intervals up to the configured number. 
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 8 }
+
+tnEthSoamPmTransferCfgIntervalNum OBJECT-TYPE
+    SYNTAX Integer32 (1..96)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " When Fixed number of interval selected, this value is used to determine the number of intervals to send.
+          The range is 1 to 96 Intervals.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 9 }
+
+tnEthSoamPmTransferCfgIncludeIncomplete OBJECT-TYPE
+    SYNTAX INTEGER {
+        enabled(1),
+        disabled(2)
+    }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "When this option is checked, PM data transfer will include the suspended (incomplete) transmission.
+         - Enabled:  PM data transfer will include the suspended (incomplete) transmission.
+         - Disabled: PM data transfer will not include the suspended (incomplete) transmission.
+        "
+    ::= { tnEthSoamPmTransferCfgEntry 10 }
+
+-- ******************************************************************
+-- TN Ethernet Loss Measurement History Statistic Table
+-- ******************************************************************
+tnEthSoamPmLmHistoryStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamPmLmHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains the results for availability history Measurement
+        Intervals in a SOAM Loss Measurement session.
+
+        Rows of this table object are created automatically
+        by the SNMP Agent when the Loss Measurement session is running and a
+        Measurement Interval is completed.
+
+        Each row in the table represents the history statistics for a Loss
+        Measurement session availability Measurement Interval for the defined
+        MEP.
+
+        32 completed Measurement Intervals are to be supported. If
+        there are at least 32 rows in the table and a new Measurement Interval
+        completes and a new row is to be added to the table, the oldest completed
+        Measurement Interval is deleted (row deletion).
+
+        The rows and objects in this table are to be persistent upon reboot
+        or restart of a device if tnEthSoamPmSessionCfgStorageMode is enabled
+        for tnEthSoamPmSessionCfgType of 'lossMeasurement'.
+       "
+    ::= { tnEthSoamPmLmStatsObjects 1 }
+
+tnEthSoamPmLmHistoryStatsEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamPmLmHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The conceptual row of tnEthSoamPmLmHistoryStatsTable"
+    INDEX      { tnEthSoamPmLmHistoryStatsIndex, tnEthSoaminstance }
+    ::= { tnEthSoamPmLmHistoryStatsTable 1 }
+
+TnEthSoamPmLmHistoryStatsEntry ::= SEQUENCE {
+    tnEthSoamPmLmHistoryStatsIndex                     Unsigned32,
+    tnEthSoamPmLmHistoryStatsEndTime                   DateAndTime,
+    tnEthSoamPmLmHistoryStatsElapsedTime               TimeInterval,
+    tnEthSoamPmLmHistoryStatsTxCount                   Counter64,
+    tnEthSoamPmLmHistoryStatsRxCount                   Counter64,
+    tnEthSoamPmLmHistoryStatsNELossCount               Counter64,
+    tnEthSoamPmLmHistoryStatsFELossCount               Counter64,
+    tnEthSoamPmLmHistoryStatsNEAvgFlr                  Unsigned32,
+    tnEthSoamPmLmHistoryStatsFEAvgFlr                  Unsigned32
+}
+
+tnEthSoamPmLmHistoryStatsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The index for the Measurement Interval within this PM session.
+
+        Measurement Interval indexes are assigned sequentially by
+        the device.  The first Measurement Interval that occurs after
+        the session is started is assigned index 1.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a device.  The index
+        is never reused while this session is active until it wraps to zero.
+        The index value keeps increasing up to that time.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 1 }
+
+tnEthSoamPmLmHistoryStatsEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval ended.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 2 }
+
+tnEthSoamPmLmHistoryStatsElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval has been running, in 0.01
+        seconds.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 3 }
+
+tnEthSoamPmLmHistoryStatsTxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound frames
+        in this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 4 }
+
+tnEthSoamPmLmHistoryStatsRxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames
+        in this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 5 }
+
+tnEthSoamPmLmHistoryStatsNELossCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of frames lossed in the
+        near end of this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 6 }
+
+tnEthSoamPmLmHistoryStatsFELossCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of frames lossed in the
+        far end of this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 7 }
+
+tnEthSoamPmLmHistoryStatsNEAvgFlr       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000)
+    UNITS       "milli-percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average frame loss ratio in the
+        near end of this MEP calculated for this Measurement Interval.
+        The value is a ratio that is expressed as a
+        percent with a value of 0 (ratio 0.00) through 100000 (ratio 1.00).
+
+        Units are in milli-percent, where 1 indicates 0.001 percent.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 8 }
+
+tnEthSoamPmLmHistoryStatsFEAvgFlr       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100000)
+    UNITS       "milli-percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average frame loss ratio in the
+        far end of this MEP calculated for this Measurement Interval.
+        The value is a ratio that is expressed as a
+        percent with a value of 0 (ratio 0.00) through 100000 (ratio 1.00).
+
+        Units are in milli-percent, where 1 indicates 0.001 percent.
+       "
+    ::= { tnEthSoamPmLmHistoryStatsEntry 9 }
+
+
+-- ******************************************************************
+-- TN Ethernet Delay Measurement History Statistic Table
+-- ******************************************************************
+tnEthSoamPmDmHistoryStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamPmDmHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains the results for history Measurement
+        Intervals in a SOAM Delay Measurement session.
+
+        Rows of this table are created automatically
+        by the SNMP Agent when the Delay Measurement session is running and a
+        Measurement Interval is completed.
+
+        Each row in the table represents the Measurement Interval history
+        statistics for a Delay Measurement session for the defined MEP.
+
+
+        Each row in the table represents the history statistics for a delay 
+        Measurement session availability Measurement Interval for the defined
+        MEP.
+
+        32 completed Measurement Intervals are to be supported. If
+        there are at least 32 rows in the table and a new Measurement Interval
+        completes and a new row is to be added to the table, the oldest completed
+        Measurement Interval is deleted (row deletion).
+
+        The rows and objects in this table are to be persistent upon reboot
+        or restart of a device if tnEthSoamPmSessionCfgStorageMode is enabled
+        for tnEthSoamPmSessionCfgType of 'delayMeasurement'.
+       "
+    ::= { tnEthSoamPmDmStatsObjects 1 }
+
+tnEthSoamPmDmHistoryStatsEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamPmDmHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The conceptual row of tnEthSoamPmDmHistoryStatsTable"
+    INDEX      { tnEthSoamPmDmHistoryStatsIndex, tnEthSoaminstance }
+    ::= { tnEthSoamPmDmHistoryStatsTable 1 }
+
+TnEthSoamPmDmHistoryStatsEntry ::= SEQUENCE {
+    tnEthSoamPmDmHistoryStatsIndex                 Unsigned32,
+    tnEthSoamPmDmHistoryStatsEndTime               DateAndTime,
+    tnEthSoamPmDmHistoryStatsElapsedTime           TimeInterval,
+    tnEthSoamPmDmHistoryStatsTxCount               Counter64,
+    tnEthSoamPmDmHistoryStatsRxCount               Counter64,
+    tnEthSoamPmDmHistoryStatsFNAvgFrameDelay       Unsigned32,
+    tnEthSoamPmDmHistoryStatsFNAvgFrameDV          Unsigned32,
+    tnEthSoamPmDmHistoryStatsFNMinFrameDelay       Unsigned32,
+    tnEthSoamPmDmHistoryStatsFNMaxFrameDelay       Unsigned32,
+    tnEthSoamPmDmHistoryStatsNFAvgFrameDelay       Unsigned32,
+    tnEthSoamPmDmHistoryStatsNFAvgFrameDV          Unsigned32,
+    tnEthSoamPmDmHistoryStatsNFMinFrameDelay       Unsigned32,
+    tnEthSoamPmDmHistoryStatsNFMaxFrameDelay       Unsigned32,
+    tnEthSoamPmDmHistoryStatsTwoWayAvgFrameDelay   Unsigned32,
+    tnEthSoamPmDmHistoryStatsTwoWayAvgFrameDV      Unsigned32,
+    tnEthSoamPmDmHistoryStatsTwoWayMinFrameDelay   Unsigned32,
+    tnEthSoamPmDmHistoryStatsTwoWayMaxFrameDelay   Unsigned32
+}
+
+tnEthSoamPmDmHistoryStatsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The index for the Measurement Interval within this PM session.
+
+        Measurement Interval indexes are assigned sequentially by
+        the device.  The first Measurement Interval that occurs after
+        the session is started is assigned index 1.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a device.  The index
+        is never reused while this session is active until it wraps to zero.
+        The index value keeps increasing up to that time.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 1 }
+
+tnEthSoamPmDmHistoryStatsEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval ended.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 2 }
+
+tnEthSoamPmDmHistoryStatsElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval has been running, in 0.01
+        seconds.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 3 }
+
+tnEthSoamPmDmHistoryStatsTxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of frames transmitted
+        in this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 4 }
+
+tnEthSoamPmDmHistoryStatsRxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of frames received 
+        in this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 5 }
+
+tnEthSoamPmDmHistoryStatsFNAvgFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average one-way frame delay
+        in the far end to near end direction calculated by this MEP
+        for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 6 }
+
+tnEthSoamPmDmHistoryStatsFNAvgFrameDV OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average one-way inter-frame delay
+        interval in the far end to near end direction calculated by
+        this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 7 }
+
+tnEthSoamPmDmHistoryStatsFNMinFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the minimum one-way inter-frame delay
+        interval in the far end to near end direction calculated by
+        this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 8 }
+
+tnEthSoamPmDmHistoryStatsFNMaxFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the maximum one-way inter-frame delay
+        interval in the far end to near end direction calculated by
+        this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 9 }
+
+tnEthSoamPmDmHistoryStatsNFAvgFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average one-way frame delay
+        in the near end to far end direction calculated by this MEP
+        for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 10 }
+
+tnEthSoamPmDmHistoryStatsNFAvgFrameDV OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average one-way inter-frame delay
+        interval in the near end to far end direction calculated by
+        this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 11 }
+
+tnEthSoamPmDmHistoryStatsNFMinFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the minimum one-way inter-frame delay
+        interval in the near end to far end direction calculated by
+        this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 12 }
+
+tnEthSoamPmDmHistoryStatsNFMaxFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the maximum one-way inter-frame delay
+        interval in the near end to far end direction calculated by
+        this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 13 }
+
+tnEthSoamPmDmHistoryStatsTwoWayAvgFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average two-way inter-frame delay
+        interval direction calculated by this MEP for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 14 }
+
+tnEthSoamPmDmHistoryStatsTwoWayAvgFrameDV OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the average two-way inter-frame delay
+        interval calculated by this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 15 }
+
+tnEthSoamPmDmHistoryStatsTwoWayMinFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the minimum two-way inter-frame delay
+        interval calculated by this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 16 }
+
+tnEthSoamPmDmHistoryStatsTwoWayMaxFrameDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the maximum two-way inter-frame delay
+        interval calculated by this MEP for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmDmHistoryStatsEntry 17 }
+
+
+-- ******************************************************************
+-- TN Ethernet EVC History Statistic Table
+-- ******************************************************************
+tnEthSoamPmEvcHistoryStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamPmEvcHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains the results for history Measurement
+        Intervals in a SOAM EVC Measurement session.
+
+        Rows of this table object are created automatically
+        by the SNMP Agent when the EVC Measurement session is running and a
+        Measurement Interval is completed.
+
+        Each row in the table represents the history statistics for a EVC 
+        Measurement session availability Measurement Interval for the defined
+        EVC.
+
+        32 completed Measurement Intervals are to be supported. If
+        there are at least 32 rows in the table and a new Measurement Interval
+        completes and a new row is to be added to the table, the oldest completed
+        Measurement Interval is deleted (row deletion).
+
+        The rows and objects in this table are to be persistent upon reboot
+        or restart of a device if tnEthSoamPmSessionCfgStorageMode is enabled
+        for tnEthSoamPmSessionCfgType of 'evc'.
+       "
+    ::= { tnEthSoamPmEvcStatsObjects 1 }
+
+tnEthSoamPmEvcHistoryStatsEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamPmEvcHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The conceptual row of tnEthSoamPmEvcHistoryStatsTable"
+    INDEX      { tnEthSoamPmEvcHistoryStatsIndex, tnEvcIndex, ifIndex }
+    ::= { tnEthSoamPmEvcHistoryStatsTable 1 }
+
+TnEthSoamPmEvcHistoryStatsEntry ::= SEQUENCE {
+    tnEthSoamPmEvcHistoryStatsIndex                  Unsigned32,
+    tnEthSoamPmEvcHistoryStatsEndTime                DateAndTime,
+    tnEthSoamPmEvcHistoryStatsElapsedTime            TimeInterval,
+    tnEthSoamPmEvcHistoryStatsGreenFramesTx          Counter64,
+    tnEthSoamPmEvcHistoryStatsGreenFramesRx          Counter64,
+    tnEthSoamPmEvcHistoryStatsGreenBytesTx           Counter64,
+    tnEthSoamPmEvcHistoryStatsGreenBytesRx           Counter64,
+    tnEthSoamPmEvcHistoryStatsYellowFramesTx         Counter64,
+    tnEthSoamPmEvcHistoryStatsYellowFramesRx         Counter64,
+    tnEthSoamPmEvcHistoryStatsYellowBytesTx          Counter64,
+    tnEthSoamPmEvcHistoryStatsYellowBytesRx          Counter64,
+    tnEthSoamPmEvcHistoryStatsRedFramesRx            Counter64,
+    tnEthSoamPmEvcHistoryStatsRedBytesRx             Counter64,
+    tnEthSoamPmEvcHistoryStatsDiscardFramesTx        Counter64,
+    tnEthSoamPmEvcHistoryStatsDiscardFramesRx        Counter64,
+    tnEthSoamPmEvcHistoryStatsDiscardBytesTx         Counter64,
+    tnEthSoamPmEvcHistoryStatsDiscardBytesRx         Counter64
+}
+
+tnEthSoamPmEvcHistoryStatsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The index for the Measurement Interval within this PM session.
+
+        Measurement Interval indexes are assigned sequentially by
+        the device.  The first Measurement Interval that occurs after
+        the session is started is assigned index 1.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a device.  The index
+        is never reused while this session is active until it wraps to zero.
+        The index value keeps increasing up to that time.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 1 }
+
+tnEthSoamPmEvcHistoryStatsEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval ended.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 2 }
+
+tnEthSoamPmEvcHistoryStatsElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval has been running, in 0.01
+        seconds.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 3 }
+
+tnEthSoamPmEvcHistoryStatsGreenFramesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound frames within 
+        the CIR / CBS compliance level in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 4 }
+
+tnEthSoamPmEvcHistoryStatsGreenFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames within 
+        the CIR / CBS compliance level in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 5 }
+
+tnEthSoamPmEvcHistoryStatsGreenBytesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound bytes, where
+        frames are within the CIR / CBS compliance level in this
+        EVC for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 6 }
+
+tnEthSoamPmEvcHistoryStatsGreenBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes, where
+        frames are within the CIR / CBS compliance level in this
+        EVC for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 7 }
+
+tnEthSoamPmEvcHistoryStatsYellowFramesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound frames exceeding
+        the CIR/CBS but within the EIR/EBS in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 8 }
+
+tnEthSoamPmEvcHistoryStatsYellowFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames exceeding
+        the CIR/CBS but within the EIR/EBS in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 9 }
+
+tnEthSoamPmEvcHistoryStatsYellowBytesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound bytes, where
+        frames exceed the CIR/CBS but are within the EIR/EBS
+        in this EVC for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 10 }
+
+tnEthSoamPmEvcHistoryStatsYellowBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes, where
+        frames exceed the CIR/CBS but are within the EIR/EBS
+        in this EVC for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 11 }
+
+tnEthSoamPmEvcHistoryStatsRedFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames
+        not conforming to either the CIR/CBS or the EIR/EBS
+        in this EVC for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 12 }
+
+tnEthSoamPmEvcHistoryStatsRedBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes, where
+        frames do not conform to either the CIR/CBS or the EIR/EBS
+        in this EVC for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 13 }
+
+tnEthSoamPmEvcHistoryStatsDiscardFramesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound frames which
+        were chosen to be discarded in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 14 }
+
+tnEthSoamPmEvcHistoryStatsDiscardFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames which
+        were chosen to be discarded in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 15 }
+
+tnEthSoamPmEvcHistoryStatsDiscardBytesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound bytes which
+        were chosen to be discarded in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 16 }
+
+tnEthSoamPmEvcHistoryStatsDiscardBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes which
+        were chosen to be discarded in this EVC for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEvcHistoryStatsEntry 17 }
+
+
+-- ******************************************************************
+-- TN Ethernet ECE History Statistic Table
+-- ******************************************************************
+tnEthSoamPmEceHistoryStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnEthSoamPmEceHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This table contains the results for history Measurement
+        Intervals in a SOAM EVC Extention (ECE) Measurement session.
+        It provides port statistics for the UNI ports of EVC.
+
+        Rows of this table object are created automatically
+        by the SNMP Agent when the ECE Measurement session is running and a
+        Measurement Interval is completed.
+
+        Each row in the table represents the history statistics for a ECE
+        Measurement session availability Measurement Interval for the defined
+        ECE.
+
+        32 completed Measurement Intervals are to be supported. If
+        there are at least 32 rows in the table and a new Measurement Interval
+        completes and a new row is to be added to the table, the oldest completed
+        Measurement Interval is deleted (row deletion).
+
+        The rows and objects in this table are to be persistent upon reboot
+        or restart of a device if tnEthSoamPmSessionCfgStorageMode is enabled
+        for tnEthSoamPmSessionCfgType of 'ece'
+       "
+    ::= { tnEthSoamPmEceStatsObjects 1 }
+
+tnEthSoamPmEceHistoryStatsEntry OBJECT-TYPE
+    SYNTAX      TnEthSoamPmEceHistoryStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The conceptual row of tnEthSoamPmEceHistoryStatsTable"
+    INDEX      { tnEthSoamPmEceHistoryStatsIndex, tnEvcEceId, ifIndex }
+    ::= { tnEthSoamPmEceHistoryStatsTable 1 }
+
+TnEthSoamPmEceHistoryStatsEntry ::= SEQUENCE {
+    tnEthSoamPmEceHistoryStatsIndex                  Unsigned32,
+    tnEthSoamPmEceHistoryStatsEndTime                DateAndTime,
+    tnEthSoamPmEceHistoryStatsElapsedTime            TimeInterval,
+    tnEthSoamPmEceHistoryStatsGreenFramesTx          Counter64,
+    tnEthSoamPmEceHistoryStatsGreenFramesRx          Counter64,
+    tnEthSoamPmEceHistoryStatsGreenBytesTx           Counter64,
+    tnEthSoamPmEceHistoryStatsGreenBytesRx           Counter64,
+    tnEthSoamPmEceHistoryStatsYellowFramesTx         Counter64,
+    tnEthSoamPmEceHistoryStatsYellowFramesRx         Counter64,
+    tnEthSoamPmEceHistoryStatsYellowBytesTx          Counter64,
+    tnEthSoamPmEceHistoryStatsYellowBytesRx          Counter64,
+    tnEthSoamPmEceHistoryStatsRedFramesRx            Counter64,
+    tnEthSoamPmEceHistoryStatsRedBytesRx             Counter64,
+    tnEthSoamPmEceHistoryStatsDiscardFramesTx        Counter64,
+    tnEthSoamPmEceHistoryStatsDiscardFramesRx        Counter64,
+    tnEthSoamPmEceHistoryStatsDiscardBytesTx         Counter64,
+    tnEthSoamPmEceHistoryStatsDiscardBytesRx         Counter64
+}
+
+tnEthSoamPmEceHistoryStatsIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The index for the Measurement Interval within this PM session.
+
+        Measurement Interval indexes are assigned sequentially by
+        the device.  The first Measurement Interval that occurs after
+        the session is started is assigned index 1.
+
+        Referential integrity is necessary, i.e., the index needs to be
+        persistent upon a reboot or restart of a device.  The index
+        is never reused while this session is active until it wraps to zero.
+        The index value keeps increasing up to that time.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 1 }
+
+tnEthSoamPmEceHistoryStatsEndTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval ended.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 2 }
+
+tnEthSoamPmEceHistoryStatsElapsedTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The time that this Measurement Interval has been running, in 0.01
+        seconds.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 3 }
+
+tnEthSoamPmEceHistoryStatsGreenFramesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound frames within 
+        the CIR / CBS compliance level in this ECE for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 4 }
+
+tnEthSoamPmEceHistoryStatsGreenFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames
+        within the CIR / CBS compliance level in this
+        ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 5 }
+
+tnEthSoamPmEceHistoryStatsGreenBytesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound bytes, where
+        frames are within the CIR / CBS compliance level in this
+        ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 6 }
+
+tnEthSoamPmEceHistoryStatsGreenBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes, where
+        frames are within the CIR / CBS compliance level in this
+        ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 7 }
+
+tnEthSoamPmEceHistoryStatsYellowFramesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound frames
+        exceeding the CIR/CBS but within the EIR/EBS
+        in this ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 8 }
+
+tnEthSoamPmEceHistoryStatsYellowFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames
+        exceeding the CIR/CBS but within the EIR/EBS
+        in this ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 9 }
+
+tnEthSoamPmEceHistoryStatsYellowBytesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound bytes, where
+        frames exceed the CIR/CBS but are within the EIR/EBS
+        in this ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 10 }
+
+tnEthSoamPmEceHistoryStatsYellowBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes, where
+        frames exceed the CIR/CBS but are within the EIR/EBS
+        in this ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 11 }
+
+tnEthSoamPmEceHistoryStatsRedFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames
+        not conforming to either the CIR/CBS or the EIR/EBS
+        in this ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 12 }
+
+tnEthSoamPmEceHistoryStatsRedBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes, where
+        frames do not conform to either the CIR/CBS or the EIR/EBS
+        in this ECE for this Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 13 }
+
+tnEthSoamPmEceHistoryStatsDiscardFramesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound frames which
+        were chosen to be discarded in this ECE for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 14 }
+
+tnEthSoamPmEceHistoryStatsDiscardFramesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound frames which
+        were chosen to be discarded in this ECE for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 15 }
+
+tnEthSoamPmEceHistoryStatsDiscardBytesTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of outbound bytes which
+        were chosen to be discarded in this ECE for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 16 }
+
+tnEthSoamPmEceHistoryStatsDiscardBytesRx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "This object contains the number of inbound bytes which
+        were chosen to be discarded in this ECE for this
+        Measurement Interval.
+       "
+    ::= { tnEthSoamPmEceHistoryStatsEntry 17 }
+
+
+-- ******************************************************************
+-- TN Ethernet Port History Statistic Table
+-- ******************************************************************
+-- tnEthSoamPmPortHistoryStatsTable OBJECT-TYPE
+--     SYNTAX      SEQUENCE OF TnEthSoamPmPortHistoryStatsEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--        "This table contains the results for history Measurement
+--         Intervals in a SOAM Port Measurement session.
+-- 
+--         Rows of this table object are created automatically by the
+--         SNMP Agent when the Port Measurement session is running and a
+--         Measurement Interval is completed.
+-- 
+--         Each row in the table represents the history statistics for a Port
+--         Measurement session availability Measurement Interval for the defined
+--         port.
+-- 
+--         32 completed Measurement Intervals are to be supported. If
+--         there are at least 32 rows in the table and a new Measurement Interval
+--         completes and a new row is to be added to the table, the oldest completed
+--         Measurement Interval is deleted (row deletion).
+-- 
+--         The rows and objects in this table are to be persistent upon reboot
+--         or restart of a device if tnEthSoamPmSessionCfgStorageMode is enabled
+--         for tnEthSoamPmSessionCfgType of 'port'.
+--        "
+--     ::= { tnEthSoamPmPortStatsObjects 1 }
+-- 
+-- tnEthSoamPmPortHistoryStatsEntry OBJECT-TYPE
+--     SYNTAX      TnEthSoamPmPortHistoryStatsEntry
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--             "The conceptual row of tnEthSoamPmPortHistoryStatsTable"
+--     INDEX      { tnEthSoamPmPortHistoryStatsIndex, ifIndex }
+--     ::= { tnEthSoamPmPortHistoryStatsTable 1 }
+-- 
+-- TnEthSoamPmPortHistoryStatsEntry ::= SEQUENCE {
+--     tnEthSoamPmPortHistoryStatsIndex                  Unsigned32,
+--     tnEthSoamPmPortHistoryStatsEndTime                DateAndTime,
+--     tnEthSoamPmPortHistoryStatsElapsedTime            TimeInterval,
+--     tnEthSoamPmPortHistoryStatsTxOctets               Counter64,
+--     tnEthSoamPmPortHistoryStatsRxOctets               Counter64,
+--     tnEthSoamPmPortHistoryStatsTxPkts                 Counter64,
+--     tnEthSoamPmPortHistoryStatsRxPkts                 Counter64,
+--     tnEthSoamPmPortHistoryStatsTxBroadcastPkts        Counter64,
+--     tnEthSoamPmPortHistoryStatsRxBroadcastPkts        Counter64,
+--     tnEthSoamPmPortHistoryStatsTxMulticastPkts        Counter64,
+--     tnEthSoamPmPortHistoryStatsRxMulticastPkts        Counter64
+-- }
+-- 
+-- tnEthSoamPmPortHistoryStatsIndex OBJECT-TYPE
+--     SYNTAX      Unsigned32 (1..4294967295)
+--     MAX-ACCESS  not-accessible
+--     STATUS      current
+--     DESCRIPTION
+--        "The index for the Measurement Interval within this PM session.
+-- 
+--         Measurement Interval indexes are assigned sequentially by
+--         the device.  The first Measurement Interval that occurs after
+--         the session is started is assigned index 1.
+-- 
+--         Referential integrity is necessary, i.e., the index needs to be
+--         persistent upon a reboot or restart of a device.  The index
+--         is never reused while this session is active until it wraps to zero.
+--         The index value keeps increasing up to that time.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 1 }
+-- 
+-- tnEthSoamPmPortHistoryStatsEndTime OBJECT-TYPE
+--     SYNTAX      DateAndTime
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The time that this Measurement Interval ended.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 2 }
+-- 
+-- tnEthSoamPmPortHistoryStatsElapsedTime OBJECT-TYPE
+--     SYNTAX      TimeInterval
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The time that this Measurement Interval has been running, in 0.01
+--         seconds.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 3 }
+-- 
+-- tnEthSoamPmPortHistoryStatsTxOctets OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The total number of octets transmitted out of the interface
+--         for this Measurement Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 4 }
+-- 
+-- tnEthSoamPmPortHistoryStatsRxOctets OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The total number of octets received on the interface
+--         for this Measurement Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 5 }
+-- 
+-- tnEthSoamPmPortHistoryStatsTxPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The total number of packets transmitted out of the interface
+--         for this Measurement Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 6 }
+-- 
+-- tnEthSoamPmPortHistoryStatsRxPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The total number of packets received on the interface
+--         for this Measurement Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 7 }
+-- 
+-- tnEthSoamPmPortHistoryStatsTxBroadcastPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The total number of packets that higher-level protocols
+--         requested be transmitted, and which were addressed to a
+--         broadcast address at this sub-layer for this Measurement
+--         Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 8 }
+-- 
+-- tnEthSoamPmPortHistoryStatsRxBroadcastPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The number of packets, delivered by this sub-layer to a
+--         higher (sub-)layer, which were addressed to a broadcast
+--         address at this sub-layer for this Measurement Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 9 }
+-- 
+-- tnEthSoamPmPortHistoryStatsTxMulticastPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The total number of packets that higher-level protocols
+--         requested be transmitted, and which were addressed to a
+--         multicast address at this sub-layer for this Measurement
+--         Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 10 }
+-- 
+-- tnEthSoamPmPortHistoryStatsRxMulticastPkts OBJECT-TYPE
+--     SYNTAX      Counter64
+--     MAX-ACCESS  read-only
+--     STATUS      current
+--     DESCRIPTION
+--        "The number of packets, delivered by this sub-layer to a
+--         higher (sub-)layer, which were addressed to a multicast
+--         address at this sub-layer for this Measurement Interval.
+--        "
+--     ::= { tnEthSoamPmPortHistoryStatsEntry 11 }
+
+END

@@ -1,0 +1,1110 @@
+
+-- *****************************************************************************
+-- Juniper-UNI-SONET-MIB
+--
+-- Juniper Networks Enterprise MIB
+--   SONET MIB
+--
+-- Copyright (c) 1998 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-UNI-SONET-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, InterfaceIndex, InterfaceIndexOrZero, ifAlias
+        FROM IF-MIB
+    JuniNextIfIndex
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs;
+
+juniSonetMIB  MODULE-IDENTITY
+    LAST-UPDATED "200307161952Z"  -- 16-Jul-03 03:52 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The SONET MIB for the Juniper Networks enterprise.  This MIB contains
+        managed objects for SONET interfaces.  It contains management objects
+        for configuration of interface attributes that either are absent from,
+        or read-only in the standard SONET-MIB."
+    -- Revision History
+    REVISION    "200307161952Z"  -- 16-Jul-03 03:52 PM EDT  - JUNOSe 5.1
+    DESCRIPTION
+        "Added path event status and notification support.
+         Updated path creation description.
+         Added missing default values."
+    REVISION    "200211221637Z"  -- 22-Nov-02 11:37 AM EST  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names.
+         Expanded MIB to include following objects:
+                juniSonetMediumTriggerAlarms
+                juniSonetMediumTriggerDelay
+                juniSonetPathTriggerAlarms
+                juniSonetPathTriggerDelay
+                juniSonetPathC2ByteOverrideFlag
+                juniSonetPathC2ByteOverride "
+    REVISION    "200110102042Z"  -- 10-Oct-01 04:42 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "Deprecated juniSonetMediumType, juniSonetMediumCircuitIdentifier and
+        juniSonetVTType."
+    REVISION    "200101021800Z"  -- 02-Jan-01 01:00 PM EST  - JUNOSe 3.0
+    DESCRIPTION
+        "Expanded MIB to include following tables and objects:
+                juniSonetPathCapabilityTable
+                juniSonetPathNextIfIndex
+                juniSonetPathTable
+                juniSonetVTNextIfIndex
+                juniSonetVTTable "
+    REVISION    "9811130000Z"    -- 13-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 7 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JuniSonetLineSpeed ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The set of SONET Line Speeds."
+    SYNTAX       INTEGER {
+                     sonetUnknownSpeed(0),
+                     sonetOc1Stm0(1),
+                     sonetOc3Stm1(2),
+                     sonetOc12Stm3(3),
+                     sonetOc48Stm16(4) }
+
+JuniSonetLogicalPathChannel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A SONET Path channel description that uniquely identifies the SONET
+        Path and is administratively assigned."
+    SYNTAX      Integer32 (0..2147483647)
+
+JuniSonetPathHierarchy ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS       current
+    DESCRIPTION
+        "Represents textual information taken from the NVT ASCII character set.
+
+        The SONET path hierarchy is based upon the SONET line capacity.
+        Configuration examples follow the diagram below, which depicts the SONET
+        Path hierarchy.
+
+                             OC-192/STM-64
+                                   ^
+                                   |
+                             OC-48/STM-16 (1-4)
+                                   ^
+                                   |
+                             OC-12/STM-4  (1-4)
+                                   ^
+                                   |
+                             OC-3/STM-1   (1-4)
+                                   ^
+                                   |
+                             OC-1/STM-0   (1-3)
+                                   ^
+                                   |
+                  ^----------------^----------------^
+                  |                |                |
+                DS3 (1)   VT1.5/TU11 DS1 (1-28)  VT2/TU12 (1-21)
+
+         For Line Speed = OC-48/STM-16:
+                 When the entire capacity contains only one path, no specifier
+                 is used.
+
+             OC-12/STM-4 Path
+                 To specify an OC-12 path over OC-48 provide a single digit of
+                 the form a where:
+
+                     a - OC-12/STM-4 path number (1-4)
+
+             OC-3/STM-1 Path
+                 To specify an OC-3 Path over OC-48 provide two digits of the
+                 form a/b where:
+
+                     a - OC-12/STM-4 path number (1-4)
+                     b - OC-3/STM-1 path within the OC-12 (1-4)
+
+             OC-1/STM-0 Path
+                 To specify an OC1 Path over OC-48 provide three digits of the
+                 form a/b/c where:
+
+                     a - OC-12/STM-4 path number (1-4)
+                     b - OC-3/STM-1 path number within OC-12 (1-4)
+                     c - OC-1/STM-0 path number within OC-3 (1-3)
+
+         For Line Speed = OC-12/STM-4:
+
+             OC-12/STM-4 Path:
+                 When entire line capacity contains only one path, no
+                 channel-specifier is used.
+
+             OC-3/STM-1 Path:
+                 To specify an OC-3 path over OC-12 provide a single digit of
+                 the form a where:
+
+                     a - OC-3/STM-1 path within the OC-12 (1-4)
+
+             OC-1 Path:
+                 To specify an OC-1 path over OC-12 provide two digits of the
+                 form a/b where:
+
+                     a - OC-3/STM-1 path within the OC-12 (1-4)
+                     b - OC-1/STM-0 path within the OC-3 (1-3)
+
+         For Line Speed = OC-3/STM-1:
+
+             OC-3/STM-1 Path:
+                 When entire line capacity contains only one path, no
+                 channel-specifier is used.
+
+             OC-1 Path:
+                 To specify an OC-1 path over OC-3 provide one digit of the
+                 form a where:
+
+                     a - OC-1/STM-1 path within the OC-3 (1-3) "
+    REFERENCE
+        "RFC 854: NVT ASCII character set.  See SNMPv2-TC.DisplayString
+        DESCRIPTION for a summary."
+    SYNTAX      OCTET STRING (SIZE(0..32))
+
+JuniSonetPathC2ByteOverride ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "SONET Path c2 overhead byte.
+
+         This value should only be set in cases where the value set by
+         the upper interface type needs to be overridden.  Standard values
+         are:
+                0   Unequipped
+                1   Nonspecific
+                2   Floating VT
+                4   Asyncronous mapping of DS3
+                19  ATM
+                22  HDLC over Sonet - scrambling enabled
+                207 HDLC over Sonet - no scrambling"
+    SYNTAX      Integer32 (0..255)
+
+JuniSonetVTType ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+        "The SONET Virtual Tributary Type.  This TC has been deprecated because
+        RFC2558 provides this information in SONET-MIB.sonetVTCurrentWidth."
+    SYNTAX      INTEGER  {
+                    tribVT15TU11(0),
+                    tribVT20TU12(1),
+                    tribVT3(3),
+                    tribVT6(4),
+                    tribVT6c(5) }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSonetObjects     OBJECT IDENTIFIER ::= { juniSonetMIB 1 }
+juniSonetPathObjects OBJECT IDENTIFIER ::= { juniSonetMIB 2 }
+juniSonetVTObjects   OBJECT IDENTIFIER ::= { juniSonetMIB 3 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- SONET Interfaces
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The SONET Interface Table
+--
+juniSonetMediumTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSonetMediumEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for SONET interfaces present in the
+        system."
+    ::= { juniSonetObjects 1 }
+
+juniSonetMediumEntry OBJECT-TYPE
+    SYNTAX      JuniSonetMediumEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an SONET interface."
+    INDEX     { ifIndex }
+    ::= { juniSonetMediumTable 1 }
+
+JuniSonetMediumEntry ::= SEQUENCE {
+    juniSonetMediumType                 INTEGER,
+    juniSonetMediumLoopbackConfig       INTEGER,
+    juniSonetMediumTimingSource         INTEGER,
+    juniSonetMediumCircuitIdentifier    DisplayString,
+    juniSonetMediumTriggerAlarms        BITS,
+    juniSonetMediumTriggerDelay         Integer32 }
+
+juniSonetMediumType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    sonet(1),
+                    sdh(2) }
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "This variable identifies whether a SONET or a SDH signal is used across
+        this interface.  This object was deprecated because the same information
+        is provided by the SONET-MIB.sonetMediumType object (RFC 2558)."
+    ::= { juniSonetMediumEntry 1 }
+
+juniSonetMediumLoopbackConfig OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    sonetNoLoop(0),
+                    sonetFacilityLoop(1),
+                    sonetTerminalLoop(2),
+                    sonetOtherLoop(3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current loopback state of the SONET/SDH interface.
+        The values mean:
+            sonetNoLoop        Not in the loopback state.  A device that is not
+                               capable of performing a loopback on this
+                               interface shall always return this value.
+            sonetFacilityLoop  The received signal at this interface is looped
+                               back out through the corresponding transmitter in
+                               the return direction.
+            sonetTerminalLoop  The signal that is about to be transmitted is
+                               connected to the associated incoming receiver.
+            sonetOtherLoop     Loopbacks that are not defined here."
+    ::= { juniSonetMediumEntry 2 }
+
+juniSonetMediumTimingSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    loop(0),
+                    internalModule(1),
+                    internalChassis(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Selects the source from which transmit timing is derived.
+            loop            timing is recovered from the receiver
+            internalModule  timing is from the module associated with this
+                            interface
+            internalChassis timing is taken from the internal system timing
+                            reference "
+    ::= { juniSonetMediumEntry 3 }
+
+juniSonetMediumCircuitIdentifier OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "This variable contains the transmission vendor's circuit identifier,
+        for the purpose of facilitating troubleshooting.  This object was
+        deprecated because the same information is provided by the
+        SONET-MIB.sonetMediumCircuitIdentifier object (RFC 2558)."
+    ::= { juniSonetMediumEntry 4 }
+
+juniSonetMediumTriggerAlarms OBJECT-TYPE
+    SYNTAX      BITS {
+                    sectionLOS(0),
+                    sectionLOF(1),
+                    lineAIS(2),
+                    lineRDI(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The alarms that are used in the operational status calculation for this
+        SONET interface.
+            sectionLOS  When this bit is set, section LOS is used for
+                        operational status calculation.
+            sectionLOF  When this bit is set, section LOF is used for
+                        operational status calculation.
+            lineAIS     When this bit is set, line AIS is used for operational
+                        status calculation.
+            lineRDI     When this bit is set, line RDI is used for operational
+                        status calculation.
+
+        The value of this object defaults to all the bits set, indicating all of
+        the alarms are used for the operational status calculation."
+    DEFVAL    { { sectionLOS, sectionLOS, lineAIS, lineRDI } }
+    ::= { juniSonetMediumEntry 5 }
+
+juniSonetMediumTriggerDelay OBJECT-TYPE
+    SYNTAX      Integer32 (0..2500)
+    UNITS       "ms"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time delay (in milliseconds) before a defect is accepted as an
+        alarm for this SONET interface."
+    DEFVAL    { 2500 }
+    ::= { juniSonetMediumEntry 6 }
+
+
+--
+-- The SONET Path Capabilities Table
+--
+juniSonetPathCapabilityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSonetPathCapabilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for SONET Paths present in the system."
+    ::= { juniSonetPathObjects 1 }
+
+juniSonetPathCapabilityEntry OBJECT-TYPE
+    SYNTAX      JuniSonetPathCapabilityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the SONET path capability of a SONET interface.
+        This table is index by the ifIndex of the SONET interface."
+    INDEX     { ifIndex }
+    ::= { juniSonetPathCapabilityTable 1 }
+
+JuniSonetPathCapabilityEntry ::= SEQUENCE {
+    juniSonetPathRemoveFlag         TruthValue,
+    juniSonetPathChannelized        TruthValue,
+    juniSonetPathMaximumChannels    Unsigned32,
+    juniSonetPathMinimumPathSpeed   JuniSonetLineSpeed,
+    juniSonetPathMaximumPathSpeed   JuniSonetLineSpeed }
+
+juniSonetPathRemoveFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable identifies whether a SONET/SDH supports the deletion of
+        SONET Paths.  A value of true(1) indicates the SONET path is removable;
+        a value of false(2) indicates the SONET path cannot be removed."
+    ::= { juniSonetPathCapabilityEntry 1 }
+
+juniSonetPathChannelized OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies whether or not this SONET interface supports channelization.
+        A value of true(1) indicates the SONET path is channelized; a value of
+        false(2) indicates the SONET path is not channelized."
+    ::= { juniSonetPathCapabilityEntry 2 }
+
+juniSonetPathMaximumChannels OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the maximum number of SONET paths/channels for this
+        interface."
+    ::= { juniSonetPathCapabilityEntry 3 }
+
+juniSonetPathMinimumPathSpeed OBJECT-TYPE
+    SYNTAX      JuniSonetLineSpeed
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the minimum SONET path speed for this interface."
+    ::= { juniSonetPathCapabilityEntry 4 }
+
+juniSonetPathMaximumPathSpeed OBJECT-TYPE
+    SYNTAX      JuniSonetLineSpeed
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identifies the maximum SONET path speed for this interface."
+    ::= { juniSonetPathCapabilityEntry 5 }
+
+
+--
+-- The SONET Path Interface Objects
+--
+juniSonetPathNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniSonetPathTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniSonetPathObjects 2 }
+
+
+--
+-- The SONET Path Interface Table
+--
+juniSonetPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSonetPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for SONET Path interfaces present in the
+        system."
+    ::= { juniSonetPathObjects 3 }
+
+juniSonetPathEntry OBJECT-TYPE
+    SYNTAX      JuniSonetPathEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an SONET Path interface."
+    INDEX     { juniSonetPathIfIndex }
+    ::= { juniSonetPathTable 1 }
+
+JuniSonetPathEntry ::= SEQUENCE {
+    juniSonetPathIfIndex                InterfaceIndex,
+    juniSonetPathLogicalChannel         JuniSonetLogicalPathChannel,
+    juniSonetPathSpeed                  JuniSonetLineSpeed,
+    juniSonetPathHierarchy              JuniSonetPathHierarchy,
+    juniSonetPathLowerIfIndex           InterfaceIndexOrZero,
+    juniSonetPathRowStatus              RowStatus,
+    juniSonetPathTriggerAlarms          BITS,
+    juniSonetPathC2ByteOverrideFlag     TruthValue,
+    juniSonetPathC2ByteOverride         JuniSonetPathC2ByteOverride,
+    juniSonetPathTriggerDelay           Integer32,
+    juniSonetPathEventStatus            Unsigned32 }
+
+juniSonetPathIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the SONET Path interface.  When creating entries in this
+        table, suitable values for this object are determined by reading
+        juniSonetPathNextIfIndex."
+    ::= { juniSonetPathEntry 1 }
+
+juniSonetPathLogicalChannel OBJECT-TYPE
+    SYNTAX      JuniSonetLogicalPathChannel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The logical channel number assigned to this SONET Path.  If the
+        underlying SONET interface does not support channelization, the value of
+        this object is zero."
+    ::= { juniSonetPathEntry 2 }
+
+juniSonetPathSpeed OBJECT-TYPE
+    SYNTAX      JuniSonetLineSpeed
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The line speed associated with this SONET PATH."
+    ::= { juniSonetPathEntry 3 }
+
+juniSonetPathHierarchy OBJECT-TYPE
+    SYNTAX      JuniSonetPathHierarchy
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SONET Path hierarchy associated with this path."
+    ::= { juniSonetPathEntry 4 }
+
+juniSonetPathLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface over which this SONET Path interface is to
+        be layered - typically a SONET/SDH interface.  A value of zero indicates
+        no layering.  An implementation may choose to require that a nonzero
+        value be configured at entry creation."
+    ::= { juniSonetPathEntry 5 }
+
+juniSonetPathRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniSonetPathRowStatus
+            juniSonetPathSpeed
+            juniSonetPathHierarchy
+            juniSonetPathLowerIfIndex
+
+        The logical channel may optionally be specified.  If it is not specified
+        an unused logical channel value will be assigned by the system.
+            juniSonetPathLogicalChannel
+
+        In addition, when creating an entry the following conditions must hold:
+            A value for juniSonetPathIfIndex must have been determined
+            previously, by reading juniSonetPathNextIfIndex.
+
+            The interface identified by the juniSonetPathLowerIfIndex must
+            exist.
+
+            The juniSonetPathSpeed must be consistent with the speed for the
+            channel specified by the juniSonetPathHierarchy, based on the speed
+            of the interface identified by the juniSonetPathLowerIfIndex.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniSonetPathEntry 6 }
+
+juniSonetPathTriggerAlarms OBJECT-TYPE
+    SYNTAX      BITS {
+                    pathLOP(0),
+                    pathAIS(1),
+                    pathRDI(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The path alarms that are used in the operational status calculation for
+        this SONET Path.
+            pathLOP     When this bit is set, path LOP is used for operational
+                        status calculation.  This bit may not be modified.
+            pathAIS     When this bit is set, path AIS is used for operational
+                        status calculation.  This bit may not be modified.
+            pathRDI     When this bit is set, path RDI is used for operational
+                        status calculation.
+
+        The value of this object defaults to bits 0 and 1 set, indication LOP
+        and AIS will be used for operational status calculation this SONET
+        Path."
+    DEFVAL    { { pathLOP, pathAIS } }
+    ::= { juniSonetPathEntry 7 }
+
+juniSonetPathC2ByteOverrideFlag OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The path overhead c2 transmit override enable.  If set to true(1),
+        juniSonetPathC2Byte override value must be specified.  If set to
+        false(2), c2 byte will be automatically set by the system based on the
+        upper interface type."
+    DEFVAL    { false }
+    ::= { juniSonetPathEntry 8 }
+
+juniSonetPathC2ByteOverride OBJECT-TYPE
+    SYNTAX      JuniSonetPathC2ByteOverride
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The path overhead c2 transmit and expected value for this SONET Path."
+    DEFVAL    { 0 }
+    ::= { juniSonetPathEntry 9 }
+
+juniSonetPathTriggerDelay OBJECT-TYPE
+    SYNTAX      Integer32 (0..2500)
+    UNITS       "ms"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The time delay (in milliseconds) before a defect is accepted as an
+        alarm for this SONET Path."
+    DEFVAL    { 2500 }
+    ::= { juniSonetPathEntry 10 }
+
+juniSonetPathEventStatus OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32767)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This variable specifies which events have occurred in the current 15
+        minute interval.  The value represents a vector of bits, each specifying
+        a unique event:
+         - Bit 0   Rising threshold alarm, sonetPathCurrentESs.
+         - Bit 1   Rising threshold alarm, sonetPathCurrentSESs.
+         - Bit 2   Reserved.
+         - Bit 3   Rising threshold alarm, sonetPathCurrentCVs.
+         - Bit 4   Rising threshold alarm, sonetPathCurrentUASs.
+         - Bit 5   LOP failure indication.
+         - Bit 6   LOP failure cleared.
+         - Bit 7   AIS failure indication.
+         - Bit 8   AIS failure cleared.
+         - Bit 9   RFI indication.
+         - Bit 10  RFI cleared.
+         - Bit 11  UNEQ failure indication.
+         - Bit 12  UNEQ failure cleared.
+         - Bit 13  PLM failure indication.
+         - Bit 14  PLM failure cleared. "
+    ::= { juniSonetPathEntry 11 }
+
+
+--
+-- The SONET Virtual Tributary Interface Objects
+--
+juniSonetVTNextIfIndex OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniSonetVTTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniSonetVTObjects 1 }
+
+
+--
+-- The SONET Virtual Tributary Interface Table
+--
+juniSonetVTTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniSonetVTEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for SONET Virtual Tributary interfaces
+        present in the system.  This table augments the standard
+        SONET-MIB.sonetVTCurrentTable."
+    ::= { juniSonetVTObjects 2 }
+
+juniSonetVTEntry OBJECT-TYPE
+    SYNTAX      JuniSonetVTEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an SONET Virtual Tributary
+        interface."
+    INDEX     { juniSonetVTIfIndex }
+    ::= { juniSonetVTTable 1 }
+
+JuniSonetVTEntry ::= SEQUENCE {
+    juniSonetVTIfIndex              InterfaceIndex,
+    juniSonetVTPathLogicalChannel   JuniSonetLogicalPathChannel,
+    juniSonetVTType                 JuniSonetVTType,
+    juniSonetVTPathPayload          Unsigned32,
+    juniSonetVTTributaryGroup       Unsigned32,
+    juniSonetVTTributarySubChannel  Unsigned32,
+    juniSonetVTLowerIfIndex         InterfaceIndexOrZero,
+    juniSonetVTRowStatus            RowStatus }
+
+juniSonetVTIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the SONET Virtual Tributary interface.  When creating
+        entries in this table, suitable values for this object are determined by
+        reading juniSonetVTNextIfIndex."
+    ::= { juniSonetVTEntry 1 }
+
+juniSonetVTPathLogicalChannel OBJECT-TYPE
+    SYNTAX      JuniSonetLogicalPathChannel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SONET Path logical channel number associated with this virtual
+        tributary."
+    ::= { juniSonetVTEntry 2 }
+
+juniSonetVTType OBJECT-TYPE
+    SYNTAX      JuniSonetVTType
+    MAX-ACCESS  read-create
+    STATUS      deprecated
+    DESCRIPTION
+        "The SONET virtual tributary type.  This object was deprecated because
+        the same information is provided in the SONET-MIB.sonetVTCurrentWidth
+        object."
+    ::= { juniSonetVTEntry 3 }
+
+juniSonetVTPathPayload OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SONET Path payload number associated with this virtual tributary.
+        For SDH mode, this is a value with a range from 1-3.  For SONET mode,
+        the value of this object is always 1."
+    ::= { juniSonetVTEntry 4 }
+
+juniSonetVTTributaryGroup OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The SONET Path group number for this virtual tributary.  In SONET and
+        SDH mode, the value of this object is 1-7."
+    ::= { juniSonetVTEntry 5 }
+
+juniSonetVTTributarySubChannel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the virtual tributary number within the tributary group
+        defined by juniSonetVTTributaryGroup object.  The value of this object
+        ranges from 1-4 if the tributary type is tribVT15/TU11(0); and the
+        values 1-3 if the tributary type is tribVT20/TU12(1)."
+    ::= { juniSonetVTEntry 6 }
+
+juniSonetVTLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface over which this SONET Virtual Tributary
+        interface is to be layered - typically a SONET PATH interface.
+
+        A value of zero indicates no layering.  An implementation may choose to
+        require that a nonzero value be configured at entry creation."
+    ::= { juniSonetVTEntry 7 }
+
+juniSonetVTRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support the following
+        values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniSonetVTRowStatus
+            juniSonetVTPathLogicalChannel
+            juniSonetVTType
+            juniSonetVTPathPayload
+            juniSonetVTTributaryGroup
+            juniSonetVTTributarySubChannel
+            juniSonetVTLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for juniSonetVTIfIndex must have been determined previously,
+            by reading juniSonetVTNextIfIndex.
+
+            The interface identified by juniSonetVTLowerIfIndex must exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniSonetVTEntry 8 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notification control objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSonetTrapControl      OBJECT IDENTIFIER ::= { juniSonetMIB 5 }
+
+juniSonetPathEventIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the SONET Path interface.  This is the same value as
+        juniSonetPathIfIndex for the interface that is reporting an event."
+    ::= { juniSonetTrapControl 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- The following two OBJECT IDENTIFIERS are used to define SNMPv2 notifications
+-- that are easily translated into SNMPv1 Traps.
+juniSonetTraps            OBJECT IDENTIFIER ::= { juniSonetMIB 6 }
+juniSonetTrapPrefix       OBJECT IDENTIFIER ::= { juniSonetTraps 0 }
+
+juniSonetPathEvents  NOTIFICATION-TYPE
+    OBJECTS {
+        juniSonetPathEventIfIndex,
+        juniSonetPathEventStatus,
+        ifAlias }
+    STATUS      current
+    DESCRIPTION
+        "This trap reports SONET path events for the failures and normal
+        conditions of the SONET path entity."
+    ::= { juniSonetTrapPrefix 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniSonetConformance OBJECT IDENTIFIER ::= { juniSonetMIB 4 }
+juniSonetCompliances OBJECT IDENTIFIER ::= { juniSonetConformance 1 }
+juniSonetGroups      OBJECT IDENTIFIER ::= { juniSonetConformance 2 }
+
+--
+-- compliance statements
+--
+juniSonetCompliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        SONET MIB.  This statement became obsolete when the SONET Path and SONET
+        VT groups of objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSonetGroup }
+    ::= { juniSonetCompliances 1 }                                 -- JUNOSe 1.0
+
+juniSonetCompliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        SONET MIB.  This statement became obsolete when the juniSonetMediumType,
+        juniSonetMediumCircuitIdentifier and juniSonetVTType objects were
+        deprecated."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSonetGroup,
+            juniSonetPathGroup }
+        GROUP       juniSonetVirtualTributaryGroup
+            DESCRIPTION
+                "This group is mandatory only for those entities that support
+                SONET virtual tributaries."
+    ::= { juniSonetCompliances 2 }                                 -- JUNOSe 3.0
+
+juniSonetCompliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        SONET MIB.  This statement became obsolete when support was added for
+        alarm triggers and path c2 byte override."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSonetGroup2,
+            juniSonetPathGroup }
+        GROUP       juniSonetVirtualTributaryGroup2
+            DESCRIPTION
+                "This group is mandatory only for those entities that support
+                SONET virtual tributaries."
+    ::= { juniSonetCompliances 3 }                                 -- JUNOSe 3.2
+
+juniSonetCompliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        SONET MIB.  This statement became obsolete when the SONET Path event
+        status and notification support was added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSonetGroup3,
+            juniSonetPathGroup2 }
+        GROUP       juniSonetVirtualTributaryGroup2
+            DESCRIPTION
+                "This group is mandatory only for those entities that support
+                SONET virtual tributaries."
+    ::= { juniSonetCompliances 4 }                                 -- JUNOSe 5.0
+
+juniSonetCompliance5  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper SONET
+        MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniSonetGroup3,
+            juniSonetPathGroup3,
+            juniSonetPathNotificationGroup }
+        GROUP       juniSonetVirtualTributaryGroup2
+            DESCRIPTION
+                "This group is mandatory only for those entities that support
+                SONET virtual tributaries."
+    ::= { juniSonetCompliances 5 }                                 -- JUNOSe 5.1
+
+
+--
+-- units of conformance
+--
+juniSonetGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSonetMediumType,
+        juniSonetMediumLoopbackConfig,
+        juniSonetMediumTimingSource,
+        juniSonetMediumCircuitIdentifier }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SONET/SDH
+        interfaces in a Juniper product.  This group became obsolete when the
+        juniSonetMediumType and juniSonetMediumCircuitIdentifier objects were
+        deprecated."
+    ::= { juniSonetGroups 1 }                                      -- JUNOSe 1.0
+
+juniSonetPathGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSonetPathRemoveFlag,
+        juniSonetPathChannelized,
+        juniSonetPathMaximumChannels,
+        juniSonetPathMinimumPathSpeed,
+        juniSonetPathMaximumPathSpeed,
+        juniSonetPathNextIfIndex,
+        juniSonetPathLogicalChannel,
+        juniSonetPathSpeed,
+        juniSonetPathHierarchy,
+        juniSonetPathLowerIfIndex,
+        juniSonetPathRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SONET/SDH Path
+        interfaces in a Juniper product.  This group became obsolete when new
+        SONET path objects were added."
+    ::= { juniSonetGroups 2 }                                      -- JUNOSe 3.0
+
+juniSonetVirtualTributaryGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSonetVTNextIfIndex,
+        juniSonetVTPathLogicalChannel,
+        juniSonetVTType,
+        juniSonetVTPathPayload,
+        juniSonetVTTributaryGroup,
+        juniSonetVTTributarySubChannel,
+        juniSonetVTLowerIfIndex,
+        juniSonetVTRowStatus }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SONET virtual
+        tributaries in a Juniper product.  This group became obsolete when
+        juniSonetVTType was deprecated."
+    ::= { juniSonetGroups 3 }                                      -- JUNOSe 3.0
+
+juniSonetGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniSonetMediumLoopbackConfig,
+        juniSonetMediumTimingSource }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of SONET/SDH
+        interfaces in a Juniper product.  This group became obsolete when
+        juniSonetMediumTriggerAlarms was added."
+    ::= { juniSonetGroups 4 }                                      -- JUNOSe 3.2
+
+juniSonetVirtualTributaryGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniSonetVTNextIfIndex,
+        juniSonetVTPathLogicalChannel,
+        juniSonetVTPathPayload,
+        juniSonetVTTributaryGroup,
+        juniSonetVTTributarySubChannel,
+        juniSonetVTLowerIfIndex,
+        juniSonetVTRowStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of SONET virtual
+        tributaries in a Juniper product."
+    ::= { juniSonetGroups 5 }                                      -- JUNOSe 3.2
+
+juniSonetDeprecatedMediumGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSonetMediumType,
+        juniSonetMediumCircuitIdentifier }
+    STATUS      deprecated
+    DESCRIPTION
+        "A collection of deprecated objects providing management of SONET/SDH
+        interfaces in a Juniper product.  This group is deprecated because the
+        same information is provided by SONET-MIB objects (RFC 2558).  Support
+        for the objects in this group will be phased out over time."
+    ::= { juniSonetGroups 6 }                                      -- JUNOSe 3.2
+
+juniSonetDeprecatedVTGroup  OBJECT-GROUP
+    OBJECTS {
+        juniSonetVTType }
+    STATUS      deprecated
+    DESCRIPTION
+        "A deprecated object providing management of SONET/SDH VT interfaces in
+        a Juniper product.  This group is deprecated because the same
+        information is provided by SONET-MIB objects (RFC 2558).  Support for
+        the VT type object will be phased out over time."
+    ::= { juniSonetGroups 7 }                                      -- JUNOSe 3.2
+
+juniSonetGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniSonetMediumLoopbackConfig,
+        juniSonetMediumTimingSource,
+        juniSonetMediumTriggerAlarms,
+        juniSonetMediumTriggerDelay }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of SONET/SDH interfaces in
+        a Juniper product."
+    ::= { juniSonetGroups 8 }                                      -- JUNOSe 5.0
+
+juniSonetPathGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniSonetPathRemoveFlag,
+        juniSonetPathChannelized,
+        juniSonetPathMaximumChannels,
+        juniSonetPathMinimumPathSpeed,
+        juniSonetPathMaximumPathSpeed,
+        juniSonetPathNextIfIndex,
+        juniSonetPathLogicalChannel,
+        juniSonetPathSpeed,
+        juniSonetPathHierarchy,
+        juniSonetPathLowerIfIndex,
+        juniSonetPathRowStatus,
+        juniSonetPathTriggerAlarms,
+        juniSonetPathC2ByteOverrideFlag,
+        juniSonetPathC2ByteOverride,
+        juniSonetPathTriggerDelay }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of management objects providing management of
+        SONET/SDH Path interfaces in a Juniper product.  This group became
+        obsolete when path event notification support was added."
+    ::= { juniSonetGroups 9 }                                      -- JUNOSe 5.0
+
+juniSonetPathGroup3  OBJECT-GROUP
+    OBJECTS {
+        juniSonetPathRemoveFlag,
+        juniSonetPathChannelized,
+        juniSonetPathMaximumChannels,
+        juniSonetPathMinimumPathSpeed,
+        juniSonetPathMaximumPathSpeed,
+        juniSonetPathNextIfIndex,
+        juniSonetPathLogicalChannel,
+        juniSonetPathSpeed,
+        juniSonetPathHierarchy,
+        juniSonetPathLowerIfIndex,
+        juniSonetPathRowStatus,
+        juniSonetPathTriggerAlarms,
+        juniSonetPathC2ByteOverrideFlag,
+        juniSonetPathC2ByteOverride,
+        juniSonetPathTriggerDelay,
+        juniSonetPathEventIfIndex,
+        juniSonetPathEventStatus }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of SONET/SDH Path
+        interfaces in a Juniper product."
+    ::= { juniSonetGroups 10 }                                     -- JUNOSe 5.1
+
+juniSonetPathNotificationGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        juniSonetPathEvents }
+    STATUS      current
+    DESCRIPTION
+        "A management notification for signaling SONET Path interface status
+        changes in a Juniper product."
+    ::= { juniSonetGroups 11 }                                     -- JUNOSe 5.1
+
+END

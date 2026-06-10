@@ -1,0 +1,3194 @@
+BROCADE-NP-TM-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, Counter32
+      FROM SNMPv2-SMI                  -- [RFC2578]
+    InterfaceIndex
+      FROM IF-MIB                      -- [RFC2863]
+    InetAddress, InetAddressType, InetAddressPrefixLength
+      FROM INET-ADDRESS-MIB            -- [RFC4001]
+    DisplayString
+      FROM SNMPv2-TC                   -- [RFC2579]
+    platform
+      FROM FOUNDRY-SN-ROOT-MIB
+    PortPriorityTC
+      FROM FOUNDRY-SN-SWITCH-GROUP-MIB;
+
+brocadeNPTMStatsMIB MODULE-IDENTITY
+    LAST-UPDATED "201304250000Z"  -- 25 April 2013
+    ORGANIZATION "Brocade Communications Systems, Inc."
+    CONTACT-INFO
+             "Technical Support Center
+              130 Holger Way,
+              San Jose, CA  95134
+              Email:  ipsupport@brocade.com
+              Phone: 1-800-752-8061
+              URL:  www.brocade.com"
+    DESCRIPTION
+             "The MIB module to describe Network Processor (NP) and
+              Traffic Manager(TM) related statistics information.
+
+              Supported Platforms:
+                   - supported on NI XMR/MLX platforms.
+
+              Copyright 1996-2010 Brocade Communications Systems, Inc.
+              All rights reserved.
+              This Brocade Communications Systems SNMP Management Information
+              Base Specification embodies Brocade Communications Systems'
+              confidential and proprietary intellectual property.
+              Brocade Communications Systems retains all title and ownership
+              in the Specification, including any revisions.
+
+              This Specification is supplied AS IS, and Brocade Communications
+              Systems makes no warranty, either express or implied, as to the
+              use, operation, condition, or performance of the specification,
+              and any unintended consequence it may on the user environment."
+
+    REVISION        "201304250000Z"  -- 25 April 2013
+    DESCRIPTION
+        "Added table brcdNPCSRAMErrorTable, brcdNPLPMRAMErrorTable,
+             notification brcdNPCSRAMErrorThresholdExceeded, and
+             notification brcdNPLPMRAMErrorThresholdExceeded
+             for CER/CES Data Integrity Protection Phase-2"
+
+
+    REVISION     "201302220000Z"          -- Feb 22, 2013
+    DESCRIPTION  "Added  the following new NP error traps:
+                                   brcdNPMemoryParityErrorTrap
+                                   brcdNPMemoryMiscErrorTrap
+                                   brcdNPBuffOverFlowErrorTrap
+                                   brcdNPBuffUnderFlowErrorTrap
+                                   brcdNPECCSingleErrorTrap
+                                   brcdNPECCMultipleErrorTrap"
+
+    REVISION     "201302110000Z"          -- Feb 11, 2013
+    DESCRIPTION  "Added a new table brcdNPDebugStatTable "
+
+    REVISION     "201207040000Z"          -- July 4, 2012
+    DESCRIPTION  "Changes in this revision:
+                  - Added a new table brcdTMCpuAggrQStatsTable "
+
+    REVISION        "201205180000Z"  -- 18 May 2012
+    DESCRIPTION
+        "Added brcdNPIndex and brcdNPLockupRecoveryCount."
+
+    REVISION        "201204250000Z"  -- 25 April 2012
+    DESCRIPTION
+        "Added table brcdNPBufferErrorTable,
+             notification snTrapNPIngressBufferErrorThresholdExceeded, and
+             notification snTrapNPEgressBufferErrorThresholdExceeded
+             for CER/CES Data Integrity Protection."
+
+    REVISION     "201111180000Z"          -- November 18, 2011
+    DESCRIPTION  "Changes in this revision:
+                  - Updated below mib table descriptions with LAG interface
+                    support:
+                    brcdNPQosStatTable
+                    brcdTMDestUcastQStatTable "
+
+    REVISION     "201109280000Z"          -- September 28, 2011
+    DESCRIPTION  "Changes in this revision:
+                  - Added below new tables
+                    brcdNPQosStatTable
+                    brcdTMDestUcastQStatTable "
+
+    REVISION      "201009020000Z"  -- September 02, 2010
+    DESCRIPTION
+            "Initial revision"
+
+    ::= { platform 2 }
+
+--
+-- high level object identifiers
+--
+brcdNPTMMIBNotification  OBJECT IDENTIFIER ::= { brocadeNPTMStatsMIB 0 }
+brcdNPTMMIBObjects    OBJECT IDENTIFIER ::= { brocadeNPTMStatsMIB 1 }
+brcdNPStatisticsInfo  OBJECT IDENTIFIER ::= { brcdNPTMMIBObjects  1 }
+brcdTMStatisticsInfo  OBJECT IDENTIFIER ::= { brcdNPTMMIBObjects 2 }
+brcdNPGlobal          OBJECT IDENTIFIER ::= { brcdNPTMMIBObjects 3 }
+
+-- the brcdNPStatsTable table
+
+-- The brcdNPStatsTable table contains information of NP related
+-- statistics on NI XMR/MLX platform.
+
+brcdNPStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdNPStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of brcdNPStats entries. This table contains information
+            of various Network Processor(NP) counters supported by this system."
+    ::= { brcdNPStatisticsInfo 1 }
+
+brcdNPStatsEntry OBJECT-TYPE
+    SYNTAX      BrcdNPStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing NP counter information applicable for a
+             particular interface if the module is physically present."
+    INDEX   { brcdNPStatsIfIndex }
+    ::= { brcdNPStatsTable 1 }
+
+BrcdNPStatsEntry ::=  SEQUENCE {
+        brcdNPStatsIfIndex                              InterfaceIndex,
+        brcdNPStatsRxRawGoodPkts                Counter64,
+        brcdNPStatsRxForwardPkts                   Counter64,
+        brcdNPStatsRxDiscardPkts                    Counter64,
+        brcdNPStatsRxMiscPkts                         Counter64,
+        brcdNPStatsRxUnicastPkts                    Counter64,
+        brcdNPStatsRxBroadcastPkts                Counter64,
+        brcdNPStatsRxMulticastPkts                  Counter64,
+        brcdNPStatsRxSendToTMPkts              Counter64,
+        brcdNPStatsRxBadPkts                          Counter64,
+        brcdNPStatsRxLookupUnavailable         Counter64,
+        brcdNPStatsRxACLDrop                         Counter64,
+        brcdNPStatsRxPriority0And1Drop           Counter64,
+        brcdNPStatsRxPriority2And3Drop           Counter64,
+        brcdNPStatsRxPriority4And5Drop           Counter64,
+        brcdNPStatsRxPriority6And7Drop           Counter64,
+        brcdNPStatsRxSuppressRPFDrop          Counter64,
+        brcdNPStatsRxRPFDrop                        Counter64,
+        brcdNPStatsRxIPv4Pkts                         Counter64,
+        brcdNPStatsRxIPv6Pkts                         Counter64,
+        brcdNPStatsRxRouteOnlyDrop               Counter64,
+        brcdNPStatsRxIPv6SuppressRPFDrop       Counter64,
+        brcdNPStatsRxIPv6RPFDropCount        Counter64,
+        brcdNPStatsRxIPv4Bytes                       Counter64,
+        brcdNPStatsRxIPv6Bytes                       Counter64,
+        brcdNPStatsRxPOSCtrlProtocolPkts       Counter64,
+        brcdNPStatsRxPOSLinkDrop                  Counter64,
+        brcdNPStatsRxRoutedPktsDrop             Counter64,
+        brcdNPStatsTxSentToMACPkts             Counter64,
+        brcdNPStatsTxRawGoodPkts                 Counter64,
+        brcdNPStatsTxSrcPortSupressDrop        Counter64,
+        brcdNPStatsTxBadPktsCnt                     Counter64,
+        brcdNPStatsTxUnicastPkts                     Counter64,
+        brcdNPStatsTxBroadcastPkts                 Counter64,
+        brcdNPStatsTxMulticastPkts                   Counter64,
+        brcdNPStatsTxReceiveFromTM              Counter64,
+        brcdNPStatsTxACLDrop                          Counter64,
+        brcdNPStatsTxPFCMulticastDrop            Counter64,
+        brcdNPStatsTxPFCMTUExceedDrop      Counter64,
+        brcdNPStatsTxPFCQMAPErrorDrop        Counter64,
+        brcdNPStatsTxIPv4Pkts                          Counter64,
+        brcdNPStatsTxIPv6Pkts                          Counter64,
+        brcdNPStatsTxIPv4Bytes                        Counter64,
+        brcdNPStatsTxIPv6Bytes                        Counter64,
+        brcdNPStatsTxPOSCtrlProtocolPkts        Counter64,
+        brcdNPStatsTxPOSLinkDrop                  Counter64
+    }
+
+brcdNPStatsIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Interface index as equivalent to ifIndex in MIB II. This is
+             applicable only for the interfaces that are physically present and
+             operationally up.  "
+    ::= { brcdNPStatsEntry 1 }
+
+brcdNPStatsRxRawGoodPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for good packets received from MAC. In equation,
+             Rx Raw Good Packets = Rx Unicast Packets + Rx Multicast Packets +
+                                     Rx Broadcast Packets
+                                 = Rx IPv4 Packets + Rx IPv6 Packets +
+                                     Rx Other Packets
+                                 = Rx Forward Packets + Rx Discard Packets"
+    ::= { brcdNPStatsEntry 2 }
+
+brcdNPStatsRxForwardPkts OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            " Counter for forwarded packets by packet evaluation engine in the
+              Ingress. In equation,
+              Rx Forward Packets = Rx Sent to TM Packets + Rx RL drop packets ."
+    ::= { brcdNPStatsEntry 3 }
+
+brcdNPStatsRxDiscardPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for packets flagged for discard by packet evaluation
+             engine. In equation,
+             Rx Discard Packets = ACL drop + TTL drop + route-only drop +
+                                  RPF drop + tag mismatch drop
+                                  + VLAN blocking drop + segment filtering drop
+                                  + drop by packet evaluation decisions +
+                                  miscellaneous."
+    ::= { brcdNPStatsEntry 4 }
+
+brcdNPStatsRxMiscPkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for Miscellaneous Packets Received."
+    ::= { brcdNPStatsEntry 5 }
+
+brcdNPStatsRxUnicastPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for unicast packets received."
+    ::= { brcdNPStatsEntry 6 }
+
+brcdNPStatsRxBroadcastPkts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for broadcast packets received"
+    ::= { brcdNPStatsEntry 7 }
+
+brcdNPStatsRxMulticastPkts     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for multicast packets received."
+    ::= { brcdNPStatsEntry 8 }
+
+brcdNPStatsRxSendToTMPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for packets sent to TM. This value should be equal to
+             difference of Rx forward packets and RL drops."
+    ::= { brcdNPStatsEntry 9 }
+
+brcdNPStatsRxBadPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for bad packets in the receiver side. They represent the
+             packets that have MAC to NP interface errors."
+    ::= { brcdNPStatsEntry 10 }
+
+brcdNPStatsRxLookupUnavailable  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of packets that have been dropped due to unavailability of
+             the CAM interface for packet lookups."
+    ::= { brcdNPStatsEntry 11 }
+
+brcdNPStatsRxACLDrop   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Drop counter for ACL drop on the ingress path."
+    ::= { brcdNPStatsEntry 12 }
+
+brcdNPStatsRxPriority0And1Drop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for packets dropped based on Priority 0,1 in the Ingress."
+    ::= { brcdNPStatsEntry 13 }
+
+brcdNPStatsRxPriority2And3Drop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for packets dropped based on Priority 2,3 in the Ingress."
+    ::= { brcdNPStatsEntry 14 }
+
+brcdNPStatsRxPriority4And5Drop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for packets dropped based on Priority 4,5 in the Ingress."
+    ::= { brcdNPStatsEntry 15 }
+
+brcdNPStatsRxPriority6And7Drop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for packets dropped based on Priority 6,7 in the Ingress."
+    ::= { brcdNPStatsEntry 16 }
+
+brcdNPStatsRxSuppressRPFDrop   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for suppressed RPF drops on the ingress path due to ACL
+             override."
+    ::= { brcdNPStatsEntry 17 }
+
+brcdNPStatsRxRPFDrop      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for RPF drop in the ingress."
+    ::= { brcdNPStatsEntry 18 }
+
+brcdNPStatsRxIPv4Pkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Raw packet count that have IPv4 Etype (0x0800) and IP version of
+             0x4."
+    ::= { brcdNPStatsEntry 19 }
+
+brcdNPStatsRxIPv6Pkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Raw packet count that have IPv6 Etype (0x86DD) and IP version of
+             0x6."
+    ::= { brcdNPStatsEntry 20 }
+
+brcdNPStatsRxRouteOnlyDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counts packets that have been dropped due to Route-Only
+             configuration during MAC-DA processing. "
+    ::= { brcdNPStatsEntry 21 }
+
+brcdNPStatsRxIPv6SuppressRPFDrop    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for IPv6 suppressed RFP drops on the ingress path due to
+             ACL override."
+    ::= { brcdNPStatsEntry 22 }
+
+brcdNPStatsRxIPv6RPFDropCount   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for IPv6 drop on the ingress."
+    ::= { brcdNPStatsEntry 23 }
+
+brcdNPStatsRxIPv4Bytes   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Raw packet Bytes (+FCS) that have IPv4 Etype (0x0800) and IP
+             version equals 0x4. "
+    ::= { brcdNPStatsEntry 24 }
+
+brcdNPStatsRxIPv6Bytes    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Raw packet Bytes (+FCS) that have IPv6 Etype (0x86DD) and IP
+             version equals 0x6. "
+    ::= { brcdNPStatsEntry 25 }
+
+brcdNPStatsRxPOSCtrlProtocolPkts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of control protocol packets received in POS mode. The object
+             is supported only on POS interfaces. 0 is returned for others."
+    ::= { brcdNPStatsEntry 26 }
+
+brcdNPStatsRxPOSLinkDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of packets dropped due to link state in POS mode. The
+             object is supported only on POS interfaces. 0 is returned for
+             others. "
+    ::= { brcdNPStatsEntry 27 }
+
+brcdNPStatsRxRoutedPktsDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of received IPv4 or IPv6 routed packets that are dropped
+             because the TTL is 0, or because routing is not enabled on the
+             given virtual interface.  "
+    ::= { brcdNPStatsEntry 28 }
+
+brcdNPStatsTxSentToMACPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of packets sent to MAC for transmit.In equation,
+             Tx Sent to MAC = Tx IPv4 Packets + Tx IPv6 Packets + Tx Others
+                            = Tx Raw Good Packets - Tx Source Port Suppression
+                              Drop - Tx ACL drop - Tx RL Drop - Tx Multicast
+                              TTL drop."
+    ::= { brcdNPStatsEntry 29 }
+
+brcdNPStatsTxRawGoodPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of packets sent to egress processing logic that pass
+             the initial length checks (min, max, offsets, bad packet etc.)In
+             equation,
+             Tx Raw Good Packets = Tx Receive From TM Packets - Tx Bad Packets
+                                 = Tx Unicast Packets + Tx Broadcast Packets +
+                                   Tx Multicast Packets + Tx Source Port
+                                   Suppression Drop. "
+    ::= { brcdNPStatsEntry 30 }
+
+brcdNPStatsTxSrcPortSupressDrop  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of packets dropped because of transmit source port
+             suppression."
+    ::= { brcdNPStatsEntry 31 }
+
+brcdNPStatsTxBadPktsCnt  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of packets dropped in egress logic that fail
+             the initial length checks (min, max, bad packet etc.)."
+    ::= { brcdNPStatsEntry 32 }
+
+brcdNPStatsTxUnicastPkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for unicast packets transmitted."
+    ::= { brcdNPStatsEntry 33 }
+
+brcdNPStatsTxBroadcastPkts   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for broadcast packets transmitted."
+    ::= { brcdNPStatsEntry 34 }
+
+brcdNPStatsTxMulticastPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for multicast packets transmitted."
+    ::= { brcdNPStatsEntry 35 }
+
+brcdNPStatsTxReceiveFromTM     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for packets received from TM."
+    ::= { brcdNPStatsEntry 36 }
+
+brcdNPStatsTxACLDrop     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of packets that have been dropped by the outbound ACL
+             logic."
+    ::= { brcdNPStatsEntry 37 }
+
+brcdNPStatsTxPFCMulticastDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+              "Number of multicast FID packets that have been dropped by egress
+               logic that map to the egress queue which is in paused state.
+               Supported only on 'NI-MLX-10Gx8-D 8-port 10GbE Module',
+               'NI-MLX-10Gx8-M 8-port 10GbE (M) Module', 'NI-MLX-10Gx8-X 8-port
+               10GbE (X) Module', 'BR-MLX-40Gx4-M 4-port 40GbE Module',
+               'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-100Gx2-CFP2
+                 2-port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port
+                 10GbE Module'.
+               0 is returned for the rest of the cards."
+    ::= { brcdNPStatsEntry 38 }
+
+brcdNPStatsTxPFCMTUExceedDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+              "Number of packets that have been dropped by egress logic that
+               exceeds the MTU of the egress queue (they map to). Supported 
+               only on 'NI-MLX-10Gx8-D 8-port 10GbE Module',
+               'NI-MLX-10Gx8-M 8-port 10GbE (M) Module', 'NI-MLX-10Gx8-X 8-port
+               10GbE (X) Module', 'BR-MLX-40Gx4-M 4-port 40GbE Module',
+               'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-100Gx2-CFP2
+                 2-port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port
+                 10GbE Module'.
+               0 is returned for the rest of the cards."
+    ::= { brcdNPStatsEntry 39 }
+
+brcdNPStatsTxPFCQMAPErrorDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+              "Number of packets that have been dropped by egress logic that
+               does not map to any valid egress queue. This object is Supported
+               only on 'NI-MLX-10Gx8-D 8-port 10GbE Module',
+               'NI-MLX-10Gx8-M 8-port 10GbE (M) Module', 'NI-MLX-10Gx8-X 8-port
+               10GbE (X) Module', 'BR-MLX-40Gx4-M 4-port 40GbE Module',
+               'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-100Gx2-CFP2
+                 2-port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port
+                 10GbE Module'.
+               0 is returned for the rest of the cards."
+    ::= { brcdNPStatsEntry 40 }
+
+brcdNPStatsTxIPv4Pkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IPv4 packets transmitted out the port that have Etype
+             0x0800 and IPver version equals 0x4)"
+    ::= { brcdNPStatsEntry 41 }
+
+brcdNPStatsTxIPv6Pkts    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of IPv6 packets transmitted out the port that have Etype
+             0x86DD and IPver version equals 0x6."
+    ::= { brcdNPStatsEntry 42}
+
+brcdNPStatsTxIPv4Bytes  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counts packet Bytes (+FCS) that have IPv4 Etype (0x0800) and IP
+             version equals 0x4"
+    ::= { brcdNPStatsEntry 43}
+
+brcdNPStatsTxIPv6Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counts packet Bytes (+FCS) that have IPv6 Etype (0x86DD) and IP
+             version equals 0x6"
+    ::= { brcdNPStatsEntry 44}
+
+brcdNPStatsTxPOSCtrlProtocolPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of control protocol packets sent in POS mode. The object is
+             supported only for POS interfaces. For others it returns 0."
+    ::= { brcdNPStatsEntry 45 }
+
+brcdNPStatsTxPOSLinkDrop    OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Number of packets dropped due to link state in POS mode. The
+             object is supported only for POS interfaces. For others it returns
+             0."
+    ::= { brcdNPStatsEntry 46 }
+
+-- the brcdNPBufferErrorTable table
+
+-- The brcdNPBufferErrorTable table contains information of NP Buffer memory related
+-- error events on CES/CER platform.
+brcdNPBufferErrorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdNPBufferErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of brcdNPBufferError entries. This table contains information
+            of various Network Processor(NP) error event counters
+            supported by this system.
+            The objects in this table are refreshed every second, based on request.
+            This table is only supported on CES/CER."
+    ::= { brcdNPStatisticsInfo 3 }
+
+brcdNPBufferErrorEntry OBJECT-TYPE
+    SYNTAX      BrcdNPBufferErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing buffer error event counter information applicable for a
+             set of interfaces managed by a NP."
+    INDEX   { brcdNPBufferErrorSlotId,
+                   brcdNPBufferErrorDeviceId}
+    ::= { brcdNPBufferErrorTable 1 }
+
+BrcdNPBufferErrorEntry ::=  SEQUENCE {
+        brcdNPBufferErrorSlotId               Unsigned32,
+        brcdNPBufferErrorDeviceId              Unsigned32,
+        brcdNPBufferErrorDescription              DisplayString,
+        brcdNPBufferErrorIngressCurrentEvents         Counter32,
+        brcdNPBufferErrorIngressCumulativeEvents         Counter32,
+        brcdNPBufferErrorEgressCurrentEvents         Counter32,
+        brcdNPBufferErrorEgressCumulativeEvents            Counter32
+    }
+
+brcdNPBufferErrorSlotId OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the module, which uniquely identifies it.
+             The module must be physically present and operationally up.
+             This is 1-based index."
+    ::= { brcdNPBufferErrorEntry 1 }
+
+brcdNPBufferErrorDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The NP device ID, a number which uniquely identifies the network
+             processor within a module in the system.
+             This is 1-based index."
+    ::= { brcdNPBufferErrorEntry 2 }
+
+brcdNPBufferErrorDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the
+             NP identified by brcdNPBufferErrorSlotId and brcdNPBufferDeviceId."
+    ::= { brcdNPBufferErrorEntry 3 }
+
+brcdNPBufferErrorIngressCurrentEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for NP Ingress buffer error events recorded within a
+            window."
+    ::= { brcdNPBufferErrorEntry 4 }
+
+brcdNPBufferErrorIngressCumulativeEvents OBJECT-TYPE
+    SYNTAX  Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Counter for NP Ingress total buffer error events recorded."
+    ::= { brcdNPBufferErrorEntry 5 }
+
+brcdNPBufferErrorEgressCurrentEvents  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for NP Egress buffer error events recorded within a
+            window."
+    ::= { brcdNPBufferErrorEntry 6 }
+
+brcdNPBufferErrorEgressCumulativeEvents    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for NP Egress total buffer error events recorded"
+    ::= { brcdNPBufferErrorEntry 7 }
+
+-- brcdNPCSRAMErrorTable
+-- To query for NP CSRAM errors.
+brcdNPCSRAMErrorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdNPCSRAMErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of brcdNPCSRAMError entries. This table contains
+             information of various Network Processor(NP) CSRAM error
+             event counters supported by this system. The objects in this
+             table are refreshed every second, based on request.
+             This table is only supported on CES and CER."
+    ::= { brcdNPStatisticsInfo 4 }
+
+brcdNPCSRAMErrorEntry OBJECT-TYPE
+    SYNTAX      BrcdNPCSRAMErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing CSRAM error event counter information
+             applicable for a set of interfaces managed by a NP."
+    INDEX   { brcdNPCSRAMErrorSlotId, brcdNPCSRAMErrorDeviceId }
+    ::= { brcdNPCSRAMErrorTable 1 }
+
+BrcdNPCSRAMErrorEntry ::=  SEQUENCE {
+        brcdNPCSRAMErrorSlotId                  Unsigned32,
+        brcdNPCSRAMErrorDeviceId                Unsigned32,
+        brcdNPCSRAMErrorDescription             DisplayString,
+        brcdNPCSRAMErrorCurrentEvents           Counter32,
+        brcdNPCSRAMErrorCumulativeEvents        Counter32
+}
+
+brcdNPCSRAMErrorSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot-id of the module which uniquely identifies it in the system.
+             The module should be physically present and should be UP.
+             This is a 1-based index."
+    ::= { brcdNPCSRAMErrorEntry 1 }
+
+brcdNPCSRAMErrorDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The NP device-id, a number which uniquely identifies the network 
+             processor within a module in the system. This is a 1-based index."
+    ::= { brcdNPCSRAMErrorEntry 2 }
+
+brcdNPCSRAMErrorDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the NP identified
+             by brcdNPCSRAMErrorSlotId and brcdNPCSRAMErrorDeviceId."
+    ::= { brcdNPCSRAMErrorEntry 3 }
+
+brcdNPCSRAMErrorCurrentEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for NP CSRAM errors recorded within a configured window."
+    ::= { brcdNPCSRAMErrorEntry 4 }
+
+brcdNPCSRAMErrorCumulativeEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for total NP CSRAM errors recorded."
+    ::= { brcdNPCSRAMErrorEntry 5 }
+
+-- brcdNPLPMRAMErrorTable
+-- To query for NP LPM-RAM errors.
+
+brcdNPLPMRAMErrorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdNPLPMRAMErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of brcdNPLPMRAMError entries. This table contains
+             information of various LPM RAM error event counters supported
+             by the Network processor in this system. The objects in this
+             table are refreshed every second, based on request.
+             This table is only supported on CES and CER."
+    ::= { brcdNPStatisticsInfo 5 }
+
+brcdNPLPMRAMErrorEntry OBJECT-TYPE
+    SYNTAX      BrcdNPLPMRAMErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing LPMRAM error event counter information
+             applicable for a set of interfaces managed by a NP."
+    INDEX   { brcdNPLPMRAMErrorIndex, brcdNPLPMRAMErrorSlotId, brcdNPLPMRAMErrorDeviceId }
+    ::= { brcdNPLPMRAMErrorTable 1 }
+
+BrcdNPLPMRAMErrorEntry ::=  SEQUENCE {
+        brcdNPLPMRAMErrorIndex                   Unsigned32, 
+        brcdNPLPMRAMErrorSlotId                  Unsigned32,
+        brcdNPLPMRAMErrorDeviceId                Unsigned32,
+        brcdNPLPMRAMErrorName                    DisplayString,
+        brcdNPLPMRAMErrorDescription             DisplayString,
+        brcdNPLPMRAMErrorCurrentEvents           Counter32,
+        brcdNPLPMRAMErrorCumulativeEvents        Counter32
+}
+
+brcdNPLPMRAMErrorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This object uniquely identifies a LPM within a network processor.
+             CER devices use LPM-0, LPM-1 and LPM-2 memories, whereas CES
+             devices use LPM-3 memory only. This is a 1-based index. Therefore,
+             index value of 1 maps to LPM0, 2 maps to LPM1 and so on."
+    ::= { brcdNPLPMRAMErrorEntry 1 }
+
+brcdNPLPMRAMErrorSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot-id of the module which uniquely identifies it in the system.
+             The module should be physically present and should be UP.
+             This is a 1-based index."
+    ::= { brcdNPLPMRAMErrorEntry 2 }
+
+brcdNPLPMRAMErrorDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The NP device-id, a number which uniquely identifies the network
+             processor within a module in the system. This is a 1-based index."
+    ::= { brcdNPLPMRAMErrorEntry 3 }
+
+brcdNPLPMRAMErrorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives a string representing the LPM identified
+             by brcdNPLPMRAMErrorIndex."
+    ::= { brcdNPLPMRAMErrorEntry 4 }
+
+brcdNPLPMRAMErrorDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the NP identified
+             by brcdNPLPMRAMErrorSlotId and brcdNPLPMRAMErrorDeviceId."
+    ::= { brcdNPLPMRAMErrorEntry 5 }
+
+brcdNPLPMRAMErrorCurrentEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for the error events recorded within a configured window
+             in the LPM identified by brcdNPLPMRAMErrorIndex,
+             brcdNPLPMRAMErrorSlotId and brcdNPLPMRAMErrorDeviceId."
+    ::= { brcdNPLPMRAMErrorEntry 6 }
+
+brcdNPLPMRAMErrorCumulativeEvents OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Counter for the error events recorded within a configured window
+             in the LPM identified by brcdNPLPMRAMErrorIndex,
+             brcdNPLPMRAMErrorSlotId and brcdNPLPMRAMErrorDeviceId."
+    ::= { brcdNPLPMRAMErrorEntry 7 }
+
+-- The brcdNPQosStatTable table contains information of NP Qos related
+-- statistics on NI XMR/MLX platform.
+
+brcdNPQosStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdNPQosStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains information of Qos counters for the specific
+             interface per Qos priority. Please refer to the MIB reference
+             guide for pre-requisites of this table."
+    ::= { brcdNPStatisticsInfo 2 }
+
+brcdNPQosStatEntry OBJECT-TYPE
+    SYNTAX      BrcdNPQosStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing Qos statistics information applicable for a
+             particular interface. "
+    INDEX   { brcdNPQosStatIfIndex, brcdNPQosStatQosPriority }
+    ::= { brcdNPQosStatTable 1 }
+
+BrcdNPQosStatEntry ::=  SEQUENCE {
+        brcdNPQosStatIfIndex           InterfaceIndex,
+        brcdNPQosStatQosPriority       PortPriorityTC,
+        brcdNPQosStatIngressPkts       Counter64,
+        brcdNPQosStatIngressBytes      Counter64,
+        brcdNPQosStatEgressPkts        Counter64,
+        brcdNPQosStatEgressBytes       Counter64
+}
+
+brcdNPQosStatIfIndex OBJECT-TYPE
+    SYNTAX  InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "ifIndex of the interface. All the interfaces of the LP modules
+             that are physically present and operationally up will be included
+             in this table. Starting from NetIron 5.3 release, all deployed
+             LAG interfaces will also be included in this table."
+    ::= { brcdNPQosStatEntry 1 }
+
+
+brcdNPQosStatQosPriority OBJECT-TYPE
+    SYNTAX      PortPriorityTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Qos priority associated with this entry. This is 1-based index.
+             The priority0 maps to 1, priority1 maps to 2 etc. Priority value
+             equal to nonPriority(128) is not applicable to this table."
+    ::= { brcdNPQosStatEntry 2 }
+
+brcdNPQosStatIngressPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets that have arrived on the specified
+             interface with a DSCP, EXP or PCP value equal to the value
+             of the brcdNPQosStatQosPriority object."
+    ::= { brcdNPQosStatEntry 3 }
+
+brcdNPQosStatIngressBytes   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of bytes that have arrived on the specified
+             interface with a DSCP, EXP or PCP value in the packet
+             equal to the value of the brcdNPQosStatQosPriority object."
+    ::= { brcdNPQosStatEntry 4 }
+
+brcdNPQosStatEgressPkts  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of packets leaving the device on the specified
+             interface with an internal priority value equal to the value
+             of the brcdNPQosStatQosPriority object. The internal
+             priority is configuration dependent but generally is a function
+             of DSCP, EXP or PCP."
+    ::= { brcdNPQosStatEntry 5 }
+
+brcdNPQosStatEgressBytes   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of bytes leaving the device on the specified interface
+             with an internal priority value equal to the value of the
+             brcdNPQosStatQosPriority object. The internal priority is
+             configuration dependent but generally is a function of DSCP, EXP or
+             PCP."
+    ::= { brcdNPQosStatEntry 6 }
+
+
+-- The brcdNPDebugStatTable --
+-- show np debug-stat in CLI --
+
+brcdNPDebugStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdNPDebugStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains the debug statistics of Network Processors in the line cards."
+    ::= { brcdNPStatisticsInfo 6 }
+
+
+brcdNPDebugStatEntry OBJECT-TYPE
+    SYNTAX      BrcdNPDebugStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing debug statistics of a Network Processor "
+    INDEX   {  brcdNPDebugStatSlotId,
+                brcdNPDebugStatNPDeviceId }
+    ::= { brcdNPDebugStatTable 1 }
+
+BrcdNPDebugStatEntry ::=
+    SEQUENCE {
+        brcdNPDebugStatSlotId                           Unsigned32,
+        brcdNPDebugStatNPDeviceId                       Unsigned32,
+        brcdNPDebugStatDescription                      DisplayString,
+        brcdNPDebugStatL2SourceAddrLearnDrop            Counter64,
+        brcdNPDebugStatRateLimitVPLSLocalLearnDrop      Counter64,
+        brcdNPDebugStatUnkownMPLSDrop                   Counter64,
+        brcdNPDebugStatDestAddrVCMiss                   Counter64,
+        brcdNPDebugStatRateLimitVPLSRemoteLearnDrop     Counter64,
+        brcdNPDebugStatIPv4DestAddrVCMiss               Counter64,
+        brcdNPDebugStatIPv6DestAddrVCMiss               Counter64,
+        brcdNPDebugStatVPLSTx                           Counter64,
+        brcdNPDebugStatVLLTx                            Counter64,
+        brcdNPDebugStatUnknowL3VPNIngressDrop           Counter64,
+        brcdNPDebugStatIPv6VPNTx                        Counter64,
+        brcdNPDebugStatIPv4VPNTx                        Counter64,
+        brcdNPDebugStatGREIPv4RxCount                   Counter64,
+        brcdNPDebugStatGREInvalidDrop                   Counter64,
+        brcdNPDebugStat6to4RxCount                      Counter64,
+        brcdNPDebugStatGREEnfSourceIngressChkMiss       Counter64,
+        brcdNPDebugStat6to4EnfSourceIngressChkMiss      Counter64,
+        brcdNPDebugStatGREMPLSRxCount                   Counter64,
+        brcdNPDebugStatGREIPv6RxCount                   Counter64,
+        brcdNPDebugStatPBBRxDropCount                   Counter64,
+        brcdNPDebugStatPBBTxCount                       Counter64,
+        brcdNPDebugStatIPv4DestAddrVCDrop               Counter64,
+        brcdNPDebugStatIPv6DestAddrVCDrop               Counter64,
+        brcdNPDebugStatSourceAddrPortVLANMiss           Counter64,
+        brcdNPDebugStatVPLSSourceAddrPortVLANMiss       Counter64,
+        brcdNPDebugStatSourceAddrVCMiss                 Counter64,
+        brcdNPDebugStatIPv4HWFwdCount                   Counter64,
+        brcdNPDebugStatIPv6HWFwdCount                   Counter64,
+        brcdNPDebugStatMulticastRPFDropCount            Counter64,
+        brcdNPDebugStatMPLSLsrTxCount                   Counter64,
+        brcdNPDebugStatGREIPv4TxCount                   Counter64,
+        brcdNPDebugStat6to4TxCount                      Counter64,
+        brcdNPDebugStatMPLSRSVPTxCount                  Counter64,
+        brcdNPDebugStatGREMPLSTxCount                   Counter64,
+        brcdNPDebugStatGREIPv6TxCount                   Counter64
+    }
+
+brcdNPDebugStatSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the LP module, which uniquely identifies a linecard.
+             The LP module must be physically present and operationally up."
+    ::= { brcdNPDebugStatEntry 1 }
+
+brcdNPDebugStatNPDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The NP device ID, a number which uniquely identifies the network
+             processor within a linecard in the system."
+    ::= { brcdNPDebugStatEntry 2 }
+
+brcdNPDebugStatDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the
+             brcdNPDebugStatNPDeviceId."
+    ::= { brcdNPDebugStatEntry 3 }
+
+brcdNPDebugStatL2SourceAddrLearnDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all L2 source address learning drop packets."
+    ::= { brcdNPDebugStatEntry 4 }
+
+brcdNPDebugStatRateLimitVPLSLocalLearnDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all rate limit VPLS local learning drop packets."
+    ::= { brcdNPDebugStatEntry 5 }
+
+brcdNPDebugStatUnkownMPLSDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all unknow MPLS drop packets. It includes packets with
+             Unknow Label to CPU (or) MPLS Label TTL <=1 (or) L2VPN Packet
+             but PRAM type not equal to VLL or VPLS (or) MPLS transit label
+             TTL <=1."
+    ::= { brcdNPDebugStatEntry 6 }
+
+brcdNPDebugStatDestAddrVCMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all destination address VC lookup miss packets."
+    ::= { brcdNPDebugStatEntry 7 }
+
+brcdNPDebugStatRateLimitVPLSRemoteLearnDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all rate limit VPLS remote learn drop packets."
+    ::= { brcdNPDebugStatEntry 8 }
+
+brcdNPDebugStatIPv4DestAddrVCMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all IPv4 destination address VC lookup miss packets."
+    ::= { brcdNPDebugStatEntry 9 }
+
+brcdNPDebugStatIPv6DestAddrVCMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all IPv6 destination address VC lookup miss packets."
+    ::= { brcdNPDebugStatEntry 10 }
+
+brcdNPDebugStatVPLSTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all VPLS destination address hit Tx processing packets."
+    ::= { brcdNPDebugStatEntry 11 }
+
+brcdNPDebugStatVLLTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all VLL destination address hit Tx processing packets."
+    ::= { brcdNPDebugStatEntry 12 }
+
+brcdNPDebugStatUnknowL3VPNIngressDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all unknown L3 VPN ingress drop packets. It includes
+             outer IP checksum fail (or) TTL=0 (or) routing not enabled
+             packets."
+    ::= { brcdNPDebugStatEntry 13 }
+
+brcdNPDebugStatIPv6VPNTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all IPv6 VPN transmit processing packets."
+    ::= { brcdNPDebugStatEntry 14 }
+
+brcdNPDebugStatIPv4VPNTx OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all IPv4 VPN transmit processing packets."
+    ::= { brcdNPDebugStatEntry 15 }
+
+brcdNPDebugStatGREIPv4RxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all GRE encapsulated IPv4 payload packets
+              proceeded for IP DPA processing."
+    ::= { brcdNPDebugStatEntry 16 }
+
+brcdNPDebugStatGREInvalidDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets with invalid protocol type in GRE header."
+    ::= { brcdNPDebugStatEntry 17 }
+
+brcdNPDebugStat6to4RxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all valid outer IPv4 header and source ingress check 
+            hit packets."
+    ::= { brcdNPDebugStatEntry 18 }
+
+brcdNPDebugStatGREEnfSourceIngressChkMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all GRE outer IPv4 source ingress check miss packets."
+    ::= { brcdNPDebugStatEntry 19 }
+
+brcdNPDebugStat6to4EnfSourceIngressChkMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all outer IPv4 source ingress check miss packets."
+    ::= { brcdNPDebugStatEntry 20 }
+
+brcdNPDebugStatGREMPLSRxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all GRE encapsulated MPLS payload packets proceeded
+             for MPLS receive processing."
+    ::= { brcdNPDebugStatEntry 21 }
+
+brcdNPDebugStatGREIPv6RxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all GRE encapsulated IPv6 payload packets proceeded
+             for IP DPA processing."
+    ::= { brcdNPDebugStatEntry 22 }
+
+brcdNPDebugStatPBBRxDropCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all PBB Rx drop packets.This counter is valid only
+             for 2*100G, 8*10G, 4*40G, 'BR-MLX-10Gx20 20-port 1/10GbE Module',
+            'BR-MLX-100Gx2-CFP2 2-port 100GbE Module' and
+            'BR-MLX-10Gx4-M-IPSEC 4-port 10GbE Module' cards."
+    ::= { brcdNPDebugStatEntry 23 }
+
+brcdNPDebugStatPBBTxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all PBB Tx packets.This counter is valid only for
+             2*100G, 8*10G, 4*40G, 'BR-MLX-10Gx20 20-port 1/10GbE Module',
+            'BR-MLX-100Gx2-CFP2 2-port 100GbE Module' and
+            'BR-MLX-10Gx4-M-IPSEC 4-port 10GbE Module' cards."
+    ::= { brcdNPDebugStatEntry 24 }
+
+brcdNPDebugStatIPv4DestAddrVCDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all IPv4 destination address VC drop packets.
+             This counter is valid only for 2*100G, 8*10G, 4*40G,
+            'BR-MLX-10Gx20 20-port 1/10GbE Module',
+            'BR-MLX-100Gx2-CFP2 2-port 100GbE Module' and
+            'BR-MLX-10Gx4-M-IPSEC 4-port 10GbE Module' cards."
+    ::= { brcdNPDebugStatEntry 25 }
+
+brcdNPDebugStatIPv6DestAddrVCDrop OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all IPv6 destination address VC drop packets.
+              This counter is valid only for 2*100G, 8*10G, 4*40G,
+            'BR-MLX-10Gx20 20-port 1/10GbE Module',
+            'BR-MLX-100Gx2-CFP2 2-port 100GbE Module' and
+            'BR-MLX-10Gx4-M-IPSEC 4-port 10GbE Module' cards."
+    ::= { brcdNPDebugStatEntry 26 }
+
+brcdNPDebugStatSourceAddrPortVLANMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all source address port VLAN miss packets."
+    ::= { brcdNPDebugStatEntry 27 }
+
+brcdNPDebugStatVPLSSourceAddrPortVLANMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all VPLS source address port VLAN miss packets."
+    ::= { brcdNPDebugStatEntry 28 }
+
+brcdNPDebugStatSourceAddrVCMiss OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all source address VC miss packets."
+    ::= { brcdNPDebugStatEntry 29 }
+
+brcdNPDebugStatIPv4HWFwdCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all valid IPv4 hardware forwarded packets."
+    ::= { brcdNPDebugStatEntry 30 }
+
+brcdNPDebugStatIPv6HWFwdCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all valid IPv6 hardware forwarded packets."
+    ::= { brcdNPDebugStatEntry 31 }
+
+brcdNPDebugStatMulticastRPFDropCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all multicast RPF failed packets."
+    ::= { brcdNPDebugStatEntry 32 }
+
+brcdNPDebugStatMPLSLsrTxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of valid transit LSR cross-connect packets."
+    ::= { brcdNPDebugStatEntry 33 }
+
+brcdNPDebugStatGREIPv4TxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of valid IPv4 payload with GRE encapsulation."
+    ::= { brcdNPDebugStatEntry 34 }
+
+brcdNPDebugStat6to4TxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all valid 6to4 transmit packets."
+    ::= { brcdNPDebugStatEntry 35 }
+
+brcdNPDebugStatMPLSRSVPTxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all valid MPLS RSVP transmit packets."
+    ::= { brcdNPDebugStatEntry 36 }
+
+brcdNPDebugStatGREMPLSTxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all valid GRE encapsulated MPLS transmit packets."
+    ::= { brcdNPDebugStatEntry 37 }
+
+brcdNPDebugStatGREIPv6TxCount OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of valid IPv6 payload with IPv4 GRE encapsulation."
+    ::= { brcdNPDebugStatEntry 38 }
+
+
+-- the brcdTMStatsInfoGroup
+
+brcdTMStatisticsInfoGroup  OBJECT IDENTIFIER ::= { brcdTMStatisticsInfo 1 }
+
+brcdTMPortMappingMaxPorts OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The maximum ports that can be supported by the TM on this system"
+    ::= { brcdTMStatisticsInfoGroup 1 }
+
+brcdTMPortMappingUsedPorts OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The currently used ports on this system"
+    ::= { brcdTMStatisticsInfoGroup 2 }
+
+brcdTMPortMappingAvailablePorts OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The available ports on this system"
+    ::= { brcdTMStatisticsInfoGroup 3 }
+
+-- The brcdTMStatsTable table contains information of Traffic Manager(TM)
+-- related statistics on NI XMR/MLX platform.
+
+brcdTMStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of brcdTMStats entries. This table contains information of
+             various  Traffic Manager(TM) counters supported by this system."
+    ::= { brcdTMStatisticsInfo 2 }
+
+brcdTMStatsEntry OBJECT-TYPE
+    SYNTAX      BrcdTMStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing TM counter information."
+    INDEX   {   brcdTMStatsSlotId,
+                brcdTMStatsTMDeviceId  }
+    ::= { brcdTMStatsTable 1 }
+
+BrcdTMStatsEntry ::=
+    SEQUENCE {
+        brcdTMStatsSlotId                           Unsigned32,
+        brcdTMStatsTMDeviceId                       Unsigned32,
+        brcdTMStatsDescription                      DisplayString,
+        brcdTMStatsTotalIngressPktsCnt               Counter64,
+        brcdTMStatsIngressEnqueuePkts               Counter64,
+        brcdTMStatsEgressEnqueuePkts                Counter64,
+        brcdTMStatsIngressEnqueueBytes              Counter64,
+        brcdTMStatsEgressEnqueueBytes               Counter64,
+        brcdTMStatsIngressDequeuePkts               Counter64,
+        brcdTMStatsIngressDequeueBytes              Counter64,
+        brcdTMStatsIngressTotalQDiscardPkts         Counter64,
+        brcdTMStatsIngressTotalQDiscardBytes        Counter64,
+        brcdTMStatsIngressOldestDiscardPkts         Counter64,
+        brcdTMStatsIngressOldestDiscardBytes        Counter64,
+        brcdTMStatsEgressDiscardPkts                Counter64,
+        brcdTMStatsEgressDiscardBytes               Counter64
+    }
+
+brcdTMStatsSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the LP module, which uniquely identifies a linecard.
+             The LP module must be physically present and operationally up."
+    ::= { brcdTMStatsEntry 1 }
+
+brcdTMStatsTMDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The TM device ID, a number which uniquely identifies the network
+             processor TM  within a linecard in the system."
+    ::= { brcdTMStatsEntry 2 }
+
+brcdTMStatsDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the
+             brcdTMStatsTMDeviceId."
+    ::= { brcdTMStatsEntry 3 }
+
+brcdTMStatsTotalIngressPktsCnt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering into this traffic manager."
+    ::= { brcdTMStatsEntry 4 }
+
+brcdTMStatsIngressEnqueuePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager."
+    ::= { brcdTMStatsEntry 5 }
+
+brcdTMStatsEgressEnqueuePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering egress queues and forwarded out
+             on this traffic manager."
+    ::= { brcdTMStatsEntry 6 }
+
+brcdTMStatsIngressEnqueueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager. This counter is not supported on 'NI-MLX-10Gx8-D 8-port
+             10GbE (D) Module', 'NI-MLX-10Gx8-M 8-port 10GbE (M) Module',
+             'NI-MLX-10Gx8-X 8-port 10GbE (X) Module', 'BR-MLX-10Gx24-DM 24
+             -port-10GbE Module', 'BR-MLX-40Gx4-M 4-port 40GbE Module',
+             'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-100Gx2-CFP2 2-
+             port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port 10GbE Module'
+	     cards. 0 is returned for these cards."
+    ::= { brcdTMStatsEntry 7 }
+
+brcdTMStatsEgressEnqueueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering egress queues and forwarded out on
+             this traffic manager.  This counter is not supported on
+             'NI-MLX-10Gx8-D 8-port 10GbE (D) Module', 'NI-MLX-10Gx8-M 8-port
+             10GbE (M) Module', 'NI-MLX-10Gx8-X 8-port 10GbE (X) Module',
+             'BR-MLX-10Gx24-DM 24-port-10GbE Module', 'BR-MLX-40Gx4-M 4-port
+              40GbE Module', 'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-
+             100Gx2-CFP2 2-port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port
+              10GbE Module' cards.
+             0 is returned for these cards."
+    ::= { brcdTMStatsEntry 8 }
+
+brcdTMStatsIngressDequeuePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets dequeued from ingress queues and forwarded
+             on this traffic manager."
+    ::= { brcdTMStatsEntry 9 }
+
+brcdTMStatsIngressDequeueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes dequeued from ingress queues and forwarded
+             on this traffic manager. This counter is not supported on
+             'NI-MLX-10Gx8-D 8-port 10GbE (D) Module', 'NI-MLX-10Gx8-M 8-port
+             10GbE (M) Module', 'NI-MLX-10Gx8-X 8-port 10GbE (X) Module'
+             'BR-MLX-10Gx24-DM 24-port-10GbE Module', 'BR-MLX-40Gx4-M 4-port
+              40GbE Module', 'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-
+             100Gx2-CFP2 2-port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port
+              10GbE Module' cards."
+    ::= { brcdTMStatsEntry 10 }
+
+brcdTMStatsIngressTotalQDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             (1) the queue reaching its maximum depth, WRED, or other reasons.
+             (2) the network processor deciding to drop packets for reasons
+                 including: an unknown Layer-3 route, RPF, or segment
+                 filtering."
+    ::= { brcdTMStatsEntry 11 }
+
+brcdTMStatsIngressTotalQDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             (1) the queue reaching its maximum depth, WRED, or other reasons.
+             (2) the network processor deciding to drop packets for reasons
+             including: an unknown Layer-3 route, RPF, or segment filtering.
+             This counter is not supported on 'NI-MLX-10Gx8-D 8-port 10GbE (X)
+             Module'NI-MLX-10Gx8-D 8-port 10GbE(D) Module', 'NI-MLX-10Gx8-M
+             8-port 10GbE (M) Module','BR-MLX-10Gx24-DM 24-port-10GbE Module',
+             'BR-MLX-10Gx24-DM 24-port-10GbE Module', 'BR-MLX-40Gx4-M 4-port
+              40GbE Module', 'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-
+             100Gx2-CFP2 2-port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port
+              10GbE Module' cards.
+	     0 is returned for these cards."
+    ::= { brcdTMStatsEntry 12 }
+
+brcdTMStatsIngressOldestDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager, but deleted later due to buffer being full."
+    ::= { brcdTMStatsEntry 13 }
+
+brcdTMStatsIngressOldestDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager, but deleted later due to buffer being full. This counter
+             is not supported on 'NI-MLX-10Gx8-D 8-port 10GbE (D) Module',
+             'NI-MLX-10Gx8-M 8-port 10GbE (M) Module', 'NI-MLX-10Gx8-X 8-port
+             10GbE (X) Module', 'BR-MLX-10Gx24-DM 24-port-10GbE Module',
+             'BR-MLX-40Gx4-M 4-port 40GbE Module', 'BR-MLX-10Gx20 20-port
+              1/10GbE Module', 'BR-MLX-100Gx2-CFP2 2-port 100GbE Module' and
+             'BR-MLX-10Gx4-M-IPSEC 4-port 10GbE Module' cards.
+             0 is returned for these cards."
+    ::= { brcdTMStatsEntry 14 }
+
+brcdTMStatsEgressDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            " A count of all packets failing to enter egress queues on this
+              traffic manager."
+        ::= { brcdTMStatsEntry 15 }
+
+brcdTMStatsEgressDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            " A count of all bytes failing to enter egress queues on this
+              traffic manager. This counter is not supported on 'NI-MLX-10Gx8-D
+              8-port 10GbE (D) Module', 'NI-MLX-10Gx8-M 8-port 10GbE
+              (M) Module', 'NI-MLX-10Gx8-X 8-port 10GbE (X) Module',
+             'BR-MLX-10Gx24-DM 24-port-10GbE Module', 'BR-MLX-40Gx4-M 4-port
+              40GbE Module', 'BR-MLX-10Gx20 20-port 1/10GbE Module', 'BR-MLX-
+             100Gx2-CFP2 2-port 100GbE Module' and 'BR-MLX-10Gx4-M-IPSEC 4-port
+              10GbE Module' cards.
+              0 is returned for these cards. "
+        ::= { brcdTMStatsEntry 16 }
+
+-- The brcdTMUnicastQStatsTable table contains information of Traffic Manager
+-- (TM) Unicast queue related statistics on NI XMR/MLX platform.
+
+brcdTMUcastQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMUcastQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of TM unicast queue stats entries. This table contains
+             information of Traffic Manager(TM) unicast queue counters supported
+             by this system."
+    ::= { brcdTMStatisticsInfo 3 }
+
+brcdTMUcastQStatsEntry OBJECT-TYPE
+    SYNTAX      BrcdTMUcastQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing TM counter information."
+    INDEX   { brcdTMUcastQStatsSlotId,
+              brcdTMUcastQStatsTMDeviceId,
+              brcdTMUcastQStatsDstIfIndex,
+              brcdTMUcastQStatsPriority  }
+    ::= { brcdTMUcastQStatsTable 1 }
+
+BrcdTMUcastQStatsEntry ::=
+    SEQUENCE {
+        brcdTMUcastQStatsSlotId                         Unsigned32,
+        brcdTMUcastQStatsTMDeviceId                     Unsigned32,
+        brcdTMUcastQStatsDstIfIndex                     InterfaceIndex,
+        brcdTMUcastQStatsPriority                       PortPriorityTC,
+        brcdTMUcastQStatsDescription                    DisplayString,
+        brcdTMUcastQStatsEnquePkts                      Counter64,
+        brcdTMUcastQStatsEnqueBytes                     Counter64,
+        brcdTMUcastQStatsDequePkts                      Counter64,
+        brcdTMUcastQStatsDequeBytes                     Counter64,
+        brcdTMUcastQStatsTotalQDiscardPkts                    Counter64,
+        brcdTMUcastQStatsTotalQDiscardBytes             Counter64,
+        brcdTMUcastQStatsOldestDiscardPkts        Counter64,
+        brcdTMUcastQStatsOldestDiscardBytes             Counter64,
+        brcdTMUcastQStatsWREDDroppedPkts                Counter64,
+        brcdTMUcastQStatsWREDDroppedBytes               Counter64,
+        brcdTMUcastQStatsMaxQDepthSinceLastRead         Counter64,
+        brcdTMUcastQStatsQSize                          Unsigned32,
+        brcdTMUcastQStatsCreditCount                    Unsigned32
+    }
+
+brcdTMUcastQStatsSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the LP module, which uniquely identifies a linecard.
+             The LP module must be physically present and operationally up."
+    ::= { brcdTMUcastQStatsEntry 1 }
+
+brcdTMUcastQStatsTMDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The TM device ID, a number which uniquely identifies the network
+             processor TM  within a linecard in the system."
+    ::= { brcdTMUcastQStatsEntry 2 }
+
+brcdTMUcastQStatsDstIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The destination interface index. This is applicable only for the
+             interface on the LP module that is physically present and
+             operationally up"
+    ::= { brcdTMUcastQStatsEntry 3 }
+
+brcdTMUcastQStatsPriority OBJECT-TYPE
+    SYNTAX      PortPriorityTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The priority of the packets that will be stored in this queue. This
+             is 1-based index.
+             When the tm-max-queues is set to 4, two consecutive priorities
+             are stored in one unicast queue. In this case, the valid values for
+             this index are 1, 3, 5 and 7."
+    ::= { brcdTMUcastQStatsEntry 4 }
+
+brcdTMUcastQStatsDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the
+             brcdTMUcastQStatsTMDeviceId and priorities serviced by this
+             queue."
+    ::= { brcdTMUcastQStatsEntry 5 }
+
+brcdTMUcastQStatsEnquePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMUcastQStatsEntry 6 }
+
+brcdTMUcastQStatsEnqueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMUcastQStatsEntry 7 }
+
+brcdTMUcastQStatsDequePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets dequeued from ingress queues and forwarded
+             on this traffic Manager"
+    ::= { brcdTMUcastQStatsEntry 8 }
+
+brcdTMUcastQStatsDequeBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes dequeued from ingress queues and forwarded on
+             this traffic manager"
+    ::= { brcdTMUcastQStatsEntry 9 }
+
+brcdTMUcastQStatsTotalQDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering."
+    ::= { brcdTMUcastQStatsEntry 10 }
+
+brcdTMUcastQStatsTotalQDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering"
+    ::= { brcdTMUcastQStatsEntry 11 }
+
+brcdTMUcastQStatsOldestDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full."
+    ::= { brcdTMUcastQStatsEntry 12 }
+
+brcdTMUcastQStatsOldestDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full"
+    ::= { brcdTMUcastQStatsEntry 13 }
+
+brcdTMUcastQStatsWREDDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMUcastQStatsEntry 14 }
+
+brcdTMUcastQStatsWREDDroppedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMUcastQStatsEntry 15 }
+
+brcdTMUcastQStatsMaxQDepthSinceLastRead OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum queue depth since last access to read."
+    ::= { brcdTMUcastQStatsEntry 16 }
+
+brcdTMUcastQStatsQSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current size"
+    ::= { brcdTMUcastQStatsEntry 17 }
+
+brcdTMUcastQStatsCreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current credit count"
+    ::= { brcdTMUcastQStatsEntry 18 }
+
+-- The brcdTMMcastQStatsTable table contains information of Traffic Manager
+-- (TM) Multicast queue related statistics on NI XMR/MLX platform.
+
+brcdTMMcastQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMMcastQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of TM Multicast queue stats entries. This table contains
+             information of Traffic Manager(TM) Multicast queue counters
+             supported by this system."
+    ::= { brcdTMStatisticsInfo 4 }
+
+brcdTMMcastQStatsEntry OBJECT-TYPE
+    SYNTAX      BrcdTMMcastQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing TM counter information."
+    INDEX   { brcdTMMcastQStatsSlotId,
+              brcdTMMcastQStatsTMDeviceId,
+              brcdTMMcastQStatsPriority  }
+    ::= { brcdTMMcastQStatsTable 1 }
+
+BrcdTMMcastQStatsEntry ::=
+    SEQUENCE {
+        brcdTMMcastQStatsSlotId                         Unsigned32,
+        brcdTMMcastQStatsTMDeviceId                     Unsigned32,
+        brcdTMMcastQStatsPriority                       INTEGER,
+        brcdTMMcastQStatsDescription                    DisplayString,
+        brcdTMMcastQStatsEnquePkts                      Counter64,
+        brcdTMMcastQStatsEnqueBytes                     Counter64,
+        brcdTMMcastQStatsDequePkts                      Counter64,
+        brcdTMMcastQStatsDequeBytes                     Counter64,
+        brcdTMMcastQStatsTotalQDiscardPkts                    Counter64,
+        brcdTMMcastQStatsTotalQDiscardBytes             Counter64,
+        brcdTMMcastQStatsOldestDiscardPkts        Counter64,
+        brcdTMMcastQStatsOldestDiscardBytes             Counter64,
+        brcdTMMcastQStatsWREDDroppedPkts                Counter64,
+        brcdTMMcastQStatsWREDDroppedBytes               Counter64,
+        brcdTMMcastQStatsMaxQDepthSinceLastRead         Counter64,
+        brcdTMMcastQStatsQSize                          Unsigned32,
+        brcdTMMcastQStatsCreditCount                    Unsigned32
+    }
+
+brcdTMMcastQStatsSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the LP module, which uniquely identifies a linecard.
+             The LP module must be physically present and operationally up."
+    ::= { brcdTMMcastQStatsEntry 1 }
+
+brcdTMMcastQStatsTMDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The TM device ID, a number which uniquely identifies the network
+             processor TM  within a linecard in this system."
+    ::= { brcdTMMcastQStatsEntry 2 }
+
+brcdTMMcastQStatsPriority OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 priority1And2 (1), -- Priority 1 and 2
+                 priority3And4 (3), -- Priority 3 and 4
+                 priority5And6 (5), -- Priority 5 and 6
+                 priority7And8 (7)  -- Priority 7 and 8
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The priority of the packets that will be stored in this queue.
+             Two consecutive priorities are stored in one multicast queue.
+             There are 4 multicast queues per TM for 8 priorities."
+    ::= { brcdTMMcastQStatsEntry 3 }
+
+brcdTMMcastQStatsDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the
+             brcdTMMcastQStatsTMDeviceId and priorities serviced by this
+             queue."
+    ::= { brcdTMMcastQStatsEntry 4 }
+
+brcdTMMcastQStatsEnquePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMMcastQStatsEntry 5 }
+
+brcdTMMcastQStatsEnqueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMMcastQStatsEntry 6 }
+
+brcdTMMcastQStatsDequePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets dequeued from ingress queues and forwarded
+            on this traffic Manager"
+    ::= { brcdTMMcastQStatsEntry 7 }
+
+brcdTMMcastQStatsDequeBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes dequeued from ingress queues and forwarded on
+             this traffic manager"
+    ::= { brcdTMMcastQStatsEntry 8 }
+
+brcdTMMcastQStatsTotalQDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering."
+    ::= { brcdTMMcastQStatsEntry 9 }
+
+brcdTMMcastQStatsTotalQDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering"
+    ::= { brcdTMMcastQStatsEntry 10 }
+
+brcdTMMcastQStatsOldestDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full."
+    ::= { brcdTMMcastQStatsEntry 11 }
+
+brcdTMMcastQStatsOldestDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full"
+    ::= { brcdTMMcastQStatsEntry 12 }
+
+brcdTMMcastQStatsWREDDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMMcastQStatsEntry 13 }
+
+brcdTMMcastQStatsWREDDroppedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMMcastQStatsEntry 14 }
+
+brcdTMMcastQStatsMaxQDepthSinceLastRead OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum queue depth since last access to read."
+    ::= { brcdTMMcastQStatsEntry 15 }
+
+brcdTMMcastQStatsQSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current size"
+    ::= { brcdTMMcastQStatsEntry 16 }
+
+brcdTMMcastQStatsCreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current credit count"
+    ::= { brcdTMMcastQStatsEntry 17 }
+
+-- The brcdTMCpuQStatsTable table contains information of Traffic Manager(TM)
+-- CPU queue related statistics on NI XMR/MLX platform.
+
+brcdTMCpuQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMCpuQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of TM CPU queue stats entries. This table contains
+             information of Traffic Manager(TM) CPU queue counters supported
+             by this system."
+    ::= { brcdTMStatisticsInfo 5 }
+
+brcdTMCpuQStatsEntry OBJECT-TYPE
+    SYNTAX      BrcdTMCpuQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing TM counter information."
+    INDEX   { brcdTMCpuQStatsSlotId,
+              brcdTMCpuQStatsTMDeviceId,
+              brcdTMCpuQStatsType,
+              brcdTMCpuQStatsPriority  }
+    ::= { brcdTMCpuQStatsTable 1 }
+
+BrcdTMCpuQStatsEntry ::=
+    SEQUENCE {
+        brcdTMCpuQStatsSlotId                         Unsigned32,
+        brcdTMCpuQStatsTMDeviceId                     Unsigned32,
+        brcdTMCpuQStatsType                           INTEGER,
+        brcdTMCpuQStatsPriority                       PortPriorityTC,
+        brcdTMCpuQStatsDescription                    DisplayString,
+        brcdTMCpuQStatsEnquePkts                      Counter64,
+        brcdTMCpuQStatsEnqueBytes                     Counter64,
+        brcdTMCpuQStatsDequePkts                      Counter64,
+        brcdTMCpuQStatsDequeBytes                     Counter64,
+        brcdTMCpuQStatsTotalQDiscardPkts                    Counter64,
+        brcdTMCpuQStatsTotalQDiscardBytes             Counter64,
+        brcdTMCpuQStatsOldestDiscardPkts        Counter64,
+        brcdTMCpuQStatsOldestDiscardBytes             Counter64,
+        brcdTMCpuQStatsWREDDroppedPkts                Counter64,
+        brcdTMCpuQStatsWREDDroppedBytes               Counter64,
+        brcdTMCpuQStatsMaxQDepthSinceLastRead         Counter64,
+        brcdTMCpuQStatsQSize                          Unsigned32,
+        brcdTMCpuQStatsCreditCount                    Unsigned32
+    }
+
+brcdTMCpuQStatsSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the LP module, which uniquely identifies a linecard.
+             The LP module must be physically present and operationally up."
+    ::= { brcdTMCpuQStatsEntry 1 }
+
+brcdTMCpuQStatsTMDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The TM device ID, a number which uniquely identifies the network
+             processor TM  within a linecard in the system."
+    ::= { brcdTMCpuQStatsEntry 2 }
+
+brcdTMCpuQStatsType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                 cpuQ (1),           -- CPU Queue
+                 cpuCopyQ(2),        -- CPU Copy Queue
+                 cpuManagementQ (3), -- CPU Management Queue
+                 cpuProtocolQ (4)    -- CPU Protocol Queue
+                }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The type of the CPU queue"
+    ::= { brcdTMCpuQStatsEntry 3 }
+
+brcdTMCpuQStatsPriority OBJECT-TYPE
+    SYNTAX      PortPriorityTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The priority of the packets that will be stored in this queue.
+             This is 1-based index. The priority 0 maps to 1, priority 1 maps to
+             2 etc."
+    ::= { brcdTMCpuQStatsEntry 4 }
+
+brcdTMCpuQStatsDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the
+             brcdTMCpuQStatsTMDeviceId."
+    ::= { brcdTMCpuQStatsEntry 5 }
+
+brcdTMCpuQStatsEnquePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMCpuQStatsEntry 6 }
+
+brcdTMCpuQStatsEnqueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMCpuQStatsEntry 7 }
+
+brcdTMCpuQStatsDequePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets dequeued from ingress queues and forwarded
+             on this traffic Manager"
+    ::= { brcdTMCpuQStatsEntry 8 }
+
+brcdTMCpuQStatsDequeBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes dequeued from ingress queues and forwarded on
+             this traffic manager"
+    ::= { brcdTMCpuQStatsEntry 9 }
+
+brcdTMCpuQStatsTotalQDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering."
+    ::= { brcdTMCpuQStatsEntry 10 }
+
+brcdTMCpuQStatsTotalQDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering"
+    ::= { brcdTMCpuQStatsEntry 11 }
+
+brcdTMCpuQStatsOldestDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full."
+    ::= { brcdTMCpuQStatsEntry 12 }
+
+brcdTMCpuQStatsOldestDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full"
+    ::= { brcdTMCpuQStatsEntry 13 }
+
+brcdTMCpuQStatsWREDDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMCpuQStatsEntry 14 }
+
+brcdTMCpuQStatsWREDDroppedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMCpuQStatsEntry 15 }
+
+brcdTMCpuQStatsMaxQDepthSinceLastRead OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum queue depth since last access to read."
+    ::= { brcdTMCpuQStatsEntry 16 }
+
+brcdTMCpuQStatsQSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current size"
+    ::= { brcdTMCpuQStatsEntry 17 }
+
+brcdTMCpuQStatsCreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current credit count"
+    ::= { brcdTMCpuQStatsEntry 18 }
+
+-- The brcdTMMcastStreamQStatsTable table contains information of Traffic Manager
+-- (TM) Multicast stream queue related statistics on NI XMR/MLX platform.
+
+brcdTMMcastStreamQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMMcastStreamQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of TM Multicast stream queue stats entries. This table
+             contains information of Traffic Manager(TM) Multicast
+             stream queue counters supported by this system."
+    ::= { brcdTMStatisticsInfo 6 }
+
+brcdTMMcastStreamQStatsEntry OBJECT-TYPE
+    SYNTAX      BrcdTMMcastStreamQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing TM Multicast stream queue counter information."
+    INDEX   { brcdTMMcastStreamQStatsAddressType,
+              brcdTMMcastStreamQStatsSource,
+              brcdTMMcastStreamQStatsGroup,
+              brcdTMMcastStreamQStatsGroupPrefixLength }
+    ::= { brcdTMMcastStreamQStatsTable 1 }
+
+BrcdTMMcastStreamQStatsEntry ::=
+    SEQUENCE {
+        brcdTMMcastStreamQStatsAddressType              InetAddressType,
+        brcdTMMcastStreamQStatsSource                   InetAddress,
+        brcdTMMcastStreamQStatsGroup                    InetAddress,
+        brcdTMMcastStreamQStatsGroupPrefixLength        InetAddressPrefixLength,
+        brcdTMMcastStreamQStatsPriority                 INTEGER,
+        brcdTMMcastStreamQStatsEnquePkts                Counter64,
+        brcdTMMcastStreamQStatsEnqueBytes               Counter64,
+        brcdTMMcastStreamQStatsDequePkts                Counter64,
+        brcdTMMcastStreamQStatsDequeBytes               Counter64,
+        brcdTMMcastStreamQStatsTotalQDiscardPkts              Counter64,
+        brcdTMMcastStreamQStatsTotalQDiscardBytes       Counter64,
+        brcdTMMcastStreamQStatsOldestDiscardPkts  Counter64,
+        brcdTMMcastStreamQStatsOldestDiscardBytes       Counter64,
+        brcdTMMcastStreamQStatsWREDDroppedPkts          Counter64,
+        brcdTMMcastStreamQStatsWREDDroppedBytes         Counter64,
+        brcdTMMcastStreamQStatsMaxQDepthSinceLastRead   Counter64,
+        brcdTMMcastStreamQStatsQSize                    Unsigned32,
+        brcdTMMcastStreamQStatsCreditCount              Unsigned32
+    }
+
+brcdTMMcastStreamQStatsAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A value indicating the address family of the address contained in
+             brcdTMMcastStreamQStatsSource and brcdTMMcastStreamQStatsGroup. Legal
+             values correspond to the subset of address families for which multicast
+             forwarding is supported."
+    ::= { brcdTMMcastStreamQStatsEntry 1 }
+
+brcdTMMcastStreamQStatsSource OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The Source IP address of the multicast stream."
+    ::= { brcdTMMcastStreamQStatsEntry 2 }
+
+brcdTMMcastStreamQStatsGroup OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The Group IP address of the multicast stream."
+    ::= { brcdTMMcastStreamQStatsEntry 3 }
+
+brcdTMMcastStreamQStatsGroupPrefixLength OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The length in bits of the mask which, when combined with the
+             corresponding value of brcdTMMcastStreamQStatsGroup, identifies the
+             groups for which this entry contains queue statistics.
+
+             The InetAddressType is given by brcdTMMcastStreamQStatsAddressType.
+             For values 'ipv4' and 'ipv4z', this object must be in the
+             range 4..32. For values 'ipv6' and 'ipv6z', this object must be in
+             the range 8..128."
+    ::= { brcdTMMcastStreamQStatsEntry 4 }
+
+brcdTMMcastStreamQStatsPriority OBJECT-TYPE
+    SYNTAX      INTEGER {
+                          priority1And2 (1), -- Priority 1 and 2
+                          priority3And4 (3), -- Priority 3 and 4
+                          priority5And6 (5), -- Priority 5 and 6
+                          priority7And8 (7)  -- Priority 7 and 8
+                        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The priority of the packets that will be stored in this queue. Two
+             consecutive priorities are stored in one multicast stream queue."
+    ::= { brcdTMMcastStreamQStatsEntry 5 }
+
+brcdTMMcastStreamQStatsEnquePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMMcastStreamQStatsEntry 6 }
+
+brcdTMMcastStreamQStatsEnqueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMMcastStreamQStatsEntry 7 }
+
+brcdTMMcastStreamQStatsDequePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets dequeued from ingress queues and forwarded
+             on this traffic Manager"
+    ::= { brcdTMMcastStreamQStatsEntry 8 }
+
+brcdTMMcastStreamQStatsDequeBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes dequeued from ingress queues and forwarded on
+             this traffic manager"
+    ::= { brcdTMMcastStreamQStatsEntry 9 }
+
+brcdTMMcastStreamQStatsTotalQDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering."
+    ::= { brcdTMMcastStreamQStatsEntry 10 }
+
+brcdTMMcastStreamQStatsTotalQDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering"
+    ::= { brcdTMMcastStreamQStatsEntry 11 }
+
+brcdTMMcastStreamQStatsOldestDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full."
+    ::= { brcdTMMcastStreamQStatsEntry 12 }
+
+brcdTMMcastStreamQStatsOldestDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full"
+    ::= { brcdTMMcastStreamQStatsEntry 13 }
+
+brcdTMMcastStreamQStatsWREDDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all packets entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMMcastStreamQStatsEntry 14 }
+
+brcdTMMcastStreamQStatsWREDDroppedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A count of all bytes entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMMcastStreamQStatsEntry 15 }
+
+brcdTMMcastStreamQStatsMaxQDepthSinceLastRead OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The maximum queue depth since last access to read."
+    ::= { brcdTMMcastStreamQStatsEntry 16 }
+
+brcdTMMcastStreamQStatsQSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current size"
+    ::= { brcdTMMcastStreamQStatsEntry 17 }
+
+brcdTMMcastStreamQStatsCreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This queue's current credit count"
+    ::= { brcdTMMcastStreamQStatsEntry 18 }
+
+-- The brcdTMCpuQInfoTable table contains information of Traffic Manager(TM)
+-- CPU Queues information on NI XMR/MLX platform.
+
+brcdTMCpuQInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMCpuQInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of TM CPU queue information entries. This table contains
+             information of Traffic Manager(TM) CPU Queue information supported
+             by this system."
+    ::= { brcdTMStatisticsInfo 7 }
+
+brcdTMCpuQInfoEntry OBJECT-TYPE
+    SYNTAX      BrcdTMCpuQInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing TM counter information."
+    INDEX   { brcdTMCpuQInfoSlotId,
+              brcdTMCpuQInfoTMDeviceId }
+    ::= { brcdTMCpuQInfoTable 1 }
+
+BrcdTMCpuQInfoEntry ::=
+    SEQUENCE {
+        brcdTMCpuQInfoSlotId                   Unsigned32,
+        brcdTMCpuQInfoTMDeviceId               Unsigned32,
+        brcdTMCpuQInfoPriority0QSize           Unsigned32,
+        brcdTMCpuQInfoPriority0CreditCount     Unsigned32,
+        brcdTMCpuQInfoPriority1QSize           Unsigned32,
+        brcdTMCpuQInfoPriority1CreditCount     Unsigned32,
+        brcdTMCpuQInfoPriority2QSize           Unsigned32,
+        brcdTMCpuQInfoPriority2CreditCount     Unsigned32,
+        brcdTMCpuQInfoPriority3QSize           Unsigned32,
+        brcdTMCpuQInfoPriority3CreditCount     Unsigned32,
+        brcdTMCpuQInfoPriority4QSize           Unsigned32,
+        brcdTMCpuQInfoPriority4CreditCount     Unsigned32,
+        brcdTMCpuQInfoPriority5QSize           Unsigned32,
+        brcdTMCpuQInfoPriority5CreditCount     Unsigned32,
+        brcdTMCpuQInfoPriority6QSize           Unsigned32,
+        brcdTMCpuQInfoPriority6CreditCount     Unsigned32,
+        brcdTMCpuQInfoPriority7QSize           Unsigned32,
+        brcdTMCpuQInfoPriority7CreditCount     Unsigned32
+    }
+
+brcdTMCpuQInfoSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the LP module, which uniquely identifies a linecard.
+             The LP module must be physically present and operationally up."
+    ::= { brcdTMCpuQInfoEntry 1 }
+
+brcdTMCpuQInfoTMDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The TM device ID, a number which uniquely identifies the network
+             processor TM  within a linecard in this system."
+    ::= { brcdTMCpuQInfoEntry 2 }
+
+brcdTMCpuQInfoPriority0QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 0"
+    ::= { brcdTMCpuQInfoEntry 3 }
+
+brcdTMCpuQInfoPriority0CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 0"
+    ::= { brcdTMCpuQInfoEntry 4 }
+
+brcdTMCpuQInfoPriority1QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 1"
+    ::= { brcdTMCpuQInfoEntry 5 }
+
+brcdTMCpuQInfoPriority1CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 1"
+    ::= { brcdTMCpuQInfoEntry 6 }
+
+brcdTMCpuQInfoPriority2QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 2"
+    ::= { brcdTMCpuQInfoEntry 7 }
+
+brcdTMCpuQInfoPriority2CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 2"
+    ::= { brcdTMCpuQInfoEntry 8 }
+
+brcdTMCpuQInfoPriority3QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 3"
+    ::= { brcdTMCpuQInfoEntry 9 }
+
+brcdTMCpuQInfoPriority3CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 3"
+    ::= { brcdTMCpuQInfoEntry 10 }
+
+brcdTMCpuQInfoPriority4QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 4"
+    ::= { brcdTMCpuQInfoEntry 11 }
+
+brcdTMCpuQInfoPriority4CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 4"
+    ::= { brcdTMCpuQInfoEntry 12 }
+
+brcdTMCpuQInfoPriority5QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 5"
+    ::= { brcdTMCpuQInfoEntry 13 }
+
+brcdTMCpuQInfoPriority5CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 5"
+    ::= { brcdTMCpuQInfoEntry 14 }
+
+brcdTMCpuQInfoPriority6QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 6"
+    ::= { brcdTMCpuQInfoEntry 15 }
+
+brcdTMCpuQInfoPriority6CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 6"
+    ::= { brcdTMCpuQInfoEntry 16 }
+
+brcdTMCpuQInfoPriority7QSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size of the CPU Queue for the priority 7"
+    ::= { brcdTMCpuQInfoEntry 17 }
+
+brcdTMCpuQInfoPriority7CreditCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The credit count of the CPU Queue for the priority 7"
+    ::= { brcdTMCpuQInfoEntry 18 }
+
+-- Notifications
+-- NP Buffer Error
+brcdNPBufferErrorIngressThresholdExceeded    NOTIFICATION-TYPE
+   OBJECTS {brcdNPBufferErrorDescription, brcdNPBufferErrorIngressCurrentEvents}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when the NP ingress buffer error event count
+                  within a window exceeds the configured threshold."
+                 --#TYPE "Brocade Trap:  NP Ingress Buffer Error Threshold Exceeded "
+                 --#SUMMARY "NP ingress buffer has %d error events, exceeding configured threshold for interfaces %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+   ::= { brcdNPTMMIBNotification 1 }
+
+brcdNPBufferErrorEgressThresholdExceeded    NOTIFICATION-TYPE
+   OBJECTS {brcdNPBufferErrorDescription, brcdNPBufferErrorEgressCurrentEvents}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when the NP egress buffer error event count
+                  within a window exceeds the configured threshold."
+                 --#TYPE "Brocade Trap:  NP Egress Buffer Error Threshold Exceeded "
+                 --#SUMMARY "NP egress buffer has %d error events, exceeding configured threshold for interfaces %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+   ::= { brcdNPTMMIBNotification 2 }
+
+brcdNPCSRAMErrorThresholdExceeded    NOTIFICATION-TYPE
+   OBJECTS {brcdNPCSRAMErrorDescription, brcdNPCSRAMErrorCurrentEvents}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when the NP CSRAM error event count
+                   within a window exceeds the configured threshold."
+                 --#TYPE "Brocade Trap: NP CSRAM error threshold exceeded"
+                 --#SUMMARY "NP CSRAM has %d error events, exceeding configured threshold for interfaces %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+   ::= { brcdNPTMMIBNotification 3 }
+
+brcdNPLPMRAMErrorThresholdExceeded    NOTIFICATION-TYPE
+   OBJECTS {brcdNPLPMRAMErrorName, brcdNPLPMRAMErrorDescription, brcdNPLPMRAMErrorCurrentEvents}
+   STATUS current
+   DESCRIPTION
+                  "The SNMP trap that is generated when the NP LPM RAM error event count
+                   within a window exceeds the configured threshold."
+                 --#TYPE "Brocade Trap: NP LPMRAM error threshold exceeded"
+                 --#SUMMARY "NP %s memory has %d error events, exceeding configured threshold for interfaces %s"
+                 --#ARGUMENTS { 0, 2, 1 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+   ::= { brcdNPTMMIBNotification 4 }
+
+-- The brcdNPNotificationSupport Table.
+-- This table objects are used only by notifications as varbinds. 
+--No other SNMP operations are supported on this table. 
+brcdNPNotificationSupportTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdNPNotificationSupportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of brcdNPNotificationSupport entries. The objects in this
+             table are used by notifications defined in the
+             brcdNPTMMIBNotification group."
+    ::= { brcdNPTMMIBNotification 5 }
+
+brcdNPNotificationSupportEntry OBJECT-TYPE
+    SYNTAX      BrcdNPNotificationSupportEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry consisting of objects used by notifications."
+    INDEX   {   brcdNPNotificationSupportSlotId,
+                brcdNPNotificationSupportDeviceId  }
+    ::= { brcdNPNotificationSupportTable 1 }
+
+BrcdNPNotificationSupportEntry ::=
+    SEQUENCE {
+        brcdNPNotificationSupportSlotId                              Unsigned32,
+        brcdNPNotificationSupportDeviceId                           Unsigned32,
+        brcdNPNotificationSupportDescription                        DisplayString,
+        brcdNPNotificationSupportErrorType                          DisplayString
+    }
+
+brcdNPNotificationSupportSlotId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Slot ID of the LP module, which uniquely identifies a linecard.
+             The LP module must be physically present and operationally up."
+    ::= { brcdNPNotificationSupportEntry 1 }
+
+brcdNPNotificationSupportDeviceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The NP device ID, a number which uniquely identifies the
+             network processor within a linecard in the system."
+    ::= { brcdNPNotificationSupportEntry 2 }
+
+brcdNPNotificationSupportDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "This object can be used by the notifications to represent the
+             range of ports serviced by the NP device."
+    ::= { brcdNPNotificationSupportEntry 3 }
+
+brcdNPNotificationSupportErrorType OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "This object can be used by the traps to represent type or
+             location of the error in the NP device."
+    ::= { brcdNPNotificationSupportEntry 4 }
+
+brcdNPMemoryParityErrorTrap NOTIFICATION-TYPE
+   OBJECTS {brcdNPNotificationSupportDescription, brcdNPNotificationSupportErrorType }
+   STATUS current
+   DESCRIPTION
+                 "The SNMP trap that is generated when a memory
+                  parity error occurs in a NP device."
+                 --#TYPE "Brocade Trap: Memory parity error on NP device"
+                 --#SUMMARY "%s on NP device serving %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+    ::= {brcdNPTMMIBNotification 6  }
+
+brcdNPMemoryMiscErrorTrap NOTIFICATION-TYPE
+   OBJECTS {brcdNPNotificationSupportDescription, brcdNPNotificationSupportErrorType }
+   STATUS current
+   DESCRIPTION
+                 "The SNMP trap that is generated when a miscellaneous memory error occurs in a NP device."
+                 --#TYPE "Brocade Trap: Miscellaneous memory error on NP device"
+                 --#SUMMARY "%s on NP device serving %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+    ::= { brcdNPTMMIBNotification 7 }
+
+brcdNPBuffOverFlowErrorTrap NOTIFICATION-TYPE
+   OBJECTS {brcdNPNotificationSupportDescription, brcdNPNotificationSupportErrorType }
+   STATUS current
+   DESCRIPTION
+                 "The SNMP trap that is generated when a buffer overflow error occurs in a NP device."
+                 --#TYPE "Brocade Trap: Buffer overflow error on NP device"
+                 --#SUMMARY "%s on NP device serving %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+    ::= { brcdNPTMMIBNotification 8 }
+
+brcdNPBuffUnderFlowErrorTrap NOTIFICATION-TYPE
+   OBJECTS {brcdNPNotificationSupportDescription, brcdNPNotificationSupportErrorType }
+   STATUS current
+   DESCRIPTION
+                 "The SNMP trap that is generated when a buffer underflow occurs in a NP device."
+                 --#TYPE "Brocade Trap: Buffer underflow error on NP device"
+                 --#SUMMARY "%s on NP device serving %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+    ::= { brcdNPTMMIBNotification 9 }
+
+brcdNPECCSingleErrorTrap NOTIFICATION-TYPE
+   OBJECTS {brcdNPNotificationSupportDescription, brcdNPNotificationSupportErrorType }
+   STATUS current
+   DESCRIPTION
+                 "The SNMP trap that is generated when a single ECC error occurs in a NP device."
+                 --#TYPE "Brocade Trap: Single ECC error on NP device"
+                 --#SUMMARY "%s on NP device serving %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY WARNING
+                 --#STATE OPERATIONAL 
+    ::= { brcdNPTMMIBNotification 10 }
+
+brcdNPECCMultipleErrorTrap NOTIFICATION-TYPE
+    OBJECTS {brcdNPNotificationSupportDescription, brcdNPNotificationSupportErrorType }
+    STATUS current
+    DESCRIPTION
+                 "The SNMP trap that is generated when multiple ECC error occurs in a NP device."
+                 --#TYPE "Brocade Trap: Multiple ECC error on NP device"
+                 --#SUMMARY "%s on NP device serving %s"
+                 --#ARGUMENTS { 1, 0 }
+                 --#SEVERITY ALERTS
+                 --#STATE OPERATIONAL
+    ::= { brcdNPTMMIBNotification 11  }
+
+-- The brcdTMDestUcastQStatTable table contains information of Traffic Manager(TM)
+-- unicast queue counters aggregated across all TMs per destination interface
+-- information on NI XMR/MLX platform.
+
+brcdTMDestUcastQStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMDestUcastQStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains information of Traffic Manager(TM) unicast
+             queue counters aggregated across all TMs per destination interface
+             per priority. Entry with priority value equals to 128 includes
+             per interface statistics aggregated across all priorities.
+             Please refer to the MIB reference guide for pre-requisites of
+             this table."
+    ::= { brcdTMStatisticsInfo 8 }
+
+brcdTMDestUcastQStatEntry OBJECT-TYPE
+    SYNTAX      BrcdTMDestUcastQStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing TM unicast queue counters aggregated
+             across all TMs per a given destination interface per priority."
+    INDEX   { brcdTMDestUcastQStatDestIfIndex, brcdTMDestUcastQStatPriority }
+    ::= { brcdTMDestUcastQStatTable 1 }
+
+BrcdTMDestUcastQStatEntry ::=
+    SEQUENCE {
+        brcdTMDestUcastQStatDestIfIndex                    InterfaceIndex,
+        brcdTMDestUcastQStatPriority                       PortPriorityTC,
+        brcdTMDestUcastQStatEnquePkts                      Counter64,
+        brcdTMDestUcastQStatEnqueBytes                     Counter64,
+        brcdTMDestUcastQStatDequePkts                      Counter64,
+        brcdTMDestUcastQStatDequeBytes                     Counter64,
+        brcdTMDestUcastQStatTotalQDiscardPkts              Counter64,
+        brcdTMDestUcastQStatTotalQDiscardBytes             Counter64
+    }
+
+brcdTMDestUcastQStatDestIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "ifIndex of the destination interface. All the interfaces of the
+             LP modules that are physically present and operationally up will
+             be included in this table. Starting from NetIron 5.3 release, all
+             deployed LAG interfaces will also be included in this table."
+    ::= { brcdTMDestUcastQStatEntry 1 }
+
+brcdTMDestUcastQStatPriority OBJECT-TYPE
+    SYNTAX      PortPriorityTC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The priority of the packets that will be stored in this queue.
+             This is 1-based value. The priority0 maps to 1, priority1 maps
+             to 2 etc. Priority value equal to nonPriority(128) indicates the
+             aggregated counters for the given destination port. When the
+             tm-max-queues is set to 4, two consecutive priorities are
+             stored in one unicast queue. In this case, the valid values
+             for this index are 1, 3, 5, 7 and 128."
+    ::= { brcdTMDestUcastQStatEntry 2 }
+
+brcdTMDestUcastQStatEnquePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total aggregated count of all packets entering ingress queue
+             across all traffic managers."
+    ::= { brcdTMDestUcastQStatEntry 3 }
+
+brcdTMDestUcastQStatEnqueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total aggregated count of all bytes entering ingress queue
+             across all traffic managers."
+    ::= { brcdTMDestUcastQStatEntry 4 }
+
+brcdTMDestUcastQStatDequePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total aggregated count of all packets dequeued/transmitted from
+             ingress queue across all traffic managers."
+    ::= { brcdTMDestUcastQStatEntry 5 }
+
+brcdTMDestUcastQStatDequeBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total aggregated count of all bytes dequeued/transmitted from
+             ingress queue across all traffic managers."
+    ::= { brcdTMDestUcastQStatEntry 6 }
+
+brcdTMDestUcastQStatTotalQDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For a virtual output queue, total aggregated count across all TMs
+             of packets that were discarded, either before enqueueing due to
+             WRED or maximum queue depth reached, or after enqueueing but
+             before dequeueing due to aging."
+    ::= { brcdTMDestUcastQStatEntry 7 }
+
+brcdTMDestUcastQStatTotalQDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "For a virtual output queue, total aggregated count across all TMs
+             of bytes that were discarded, either before enqueueing due to
+             WRED or maximum queue depth reached, or after enqueueing but
+             before dequeueing due to aging."
+    ::= { brcdTMDestUcastQStatEntry 8 }
+
+brcdNPIndex OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+            "Identifies the network processor within a module
+             in the system."
+      ::= { brcdNPGlobal 1 }
+
+brcdNPLockupRecoveryCount OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  accessible-for-notify
+            STATUS      current
+            DESCRIPTION
+            "Number of times the network processor undergone
+             lockup and recovery."
+      ::= { brcdNPGlobal 2 }
+
+
+-- The brcdTMCpuAggrQStatsTable table contains information of Traffic Manager(TM)
+-- CPU queue related statistics on NI XMR/MLX platform.
+
+brcdTMCpuAggrQStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF BrcdTMCpuAggrQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of TM Aggregate CPU queue stats entries. This table contains
+             information of Aggregation of Traffic Manager(TM) CPU queue counters
+             supported by this system."
+    ::= { brcdTMStatisticsInfo 9 }
+
+brcdTMCpuAggrQStatsEntry OBJECT-TYPE
+    SYNTAX      BrcdTMCpuAggrQStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing Aggregation of TM CPU Queues counter information."
+    INDEX   { brcdTMCpuQStatsSlotId,
+              brcdTMCpuQStatsTMDeviceId,
+              brcdTMCpuQStatsPriority  }
+    ::= { brcdTMCpuAggrQStatsTable 1 }
+
+BrcdTMCpuAggrQStatsEntry ::=
+    SEQUENCE {
+        brcdTMCpuAggrQStatsDescription                    DisplayString,
+        brcdTMCpuAggrQStatsEnquePkts                      Counter64,
+        brcdTMCpuAggrQStatsEnqueBytes                     Counter64,
+        brcdTMCpuAggrQStatsDequePkts                      Counter64,
+        brcdTMCpuAggrQStatsDequeBytes                     Counter64,
+        brcdTMCpuAggrQStatsTotalQDiscardPkts              Counter64,
+        brcdTMCpuAggrQStatsTotalQDiscardBytes             Counter64,
+        brcdTMCpuAggrQStatsOldestDiscardPkts              Counter64,
+        brcdTMCpuAggrQStatsOldestDiscardBytes             Counter64,
+        brcdTMCpuAggrQStatsWREDDroppedPkts                Counter64,
+        brcdTMCpuAggrQStatsWREDDroppedBytes               Counter64        
+    }
+
+brcdTMCpuAggrQStatsDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object gives the range of ports serviced by the
+             brcdTMCpuQStatsTMDeviceId."
+    ::= { brcdTMCpuAggrQStatsEntry 1 }
+
+brcdTMCpuAggrQStatsEnquePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An aggregate count of all packets entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMCpuAggrQStatsEntry 2 }
+
+brcdTMCpuAggrQStatsEnqueBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An aggregate count of all bytes entering ingress queues on this traffic
+             manager"
+    ::= { brcdTMCpuAggrQStatsEntry 3 }
+
+brcdTMCpuAggrQStatsDequePkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A aggregate count of all packets dequeued from ingress queues and forwarded
+             on this traffic Manager"
+    ::= { brcdTMCpuAggrQStatsEntry 4 }
+
+brcdTMCpuAggrQStatsDequeBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A aggregate count of all bytes dequeued from ingress queues and forwarded on
+             this traffic manager"
+    ::= { brcdTMCpuAggrQStatsEntry 5 }
+
+brcdTMCpuAggrQStatsTotalQDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A aggregate count of all packets failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering."
+    ::= { brcdTMCpuAggrQStatsEntry 6 }
+
+brcdTMCpuAggrQStatsTotalQDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An aggregate count of all bytes failing to enter ingress queues on this
+             traffic manager. This may be due to:
+             * The queue reaching its maximum depth, WRED, or other reasons.
+             * The network processor deciding to drop packets for reasons
+               including: an unknown Layer-3 route, RPF, or segment filtering"
+    ::= { brcdTMCpuAggrQStatsEntry 7 }
+
+brcdTMCpuAggrQStatsOldestDiscardPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An aggregate count of all packets entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full."
+    ::= { brcdTMCpuAggrQStatsEntry 8 }
+
+brcdTMCpuAggrQStatsOldestDiscardBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An aggregate count of all bytes entering ingress queues on this traffic
+             manager, but deleted afterwards due to buffer full"
+    ::= { brcdTMCpuAggrQStatsEntry 9 }
+
+brcdTMCpuAggrQStatsWREDDroppedPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An aggregate count of all packets entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMCpuAggrQStatsEntry 10 }
+
+brcdTMCpuAggrQStatsWREDDroppedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An agggregate count of all bytes entering ingress queues on this traffic
+             manager but dropped due to WRED."
+    ::= { brcdTMCpuAggrQStatsEntry 11 }
+
+END

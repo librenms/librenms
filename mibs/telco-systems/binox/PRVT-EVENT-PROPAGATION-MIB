@@ -1,0 +1,377 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-EVENT-PROPAGATION-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-EVENT-PROPAGATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+prvtEventPropagationMIB MODULE-IDENTITY
+    LAST-UPDATED "201411100000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This MIB provides control over the Event Propagation feature"
+    REVISION    "201411100000Z"
+    DESCRIPTION 
+        "Initial version"
+    ::= { switch 166 }
+
+
+prvtEventPropagationObjects OBJECT IDENTIFIER
+    ::= { prvtEventPropagationMIB 1 }
+
+prvtEventPropagationProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtEventPropagationProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Profile table holds the settings for the
+         Event Propagation"
+    ::= { prvtEventPropagationObjects 1 }
+
+prvtEventPropagationProfileEntry OBJECT-TYPE
+    SYNTAX      PrvtEventPropagationProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "NONE"
+    INDEX       { prvtEventPropagationProfileName }
+    ::= { prvtEventPropagationProfileTable 1 }
+
+PrvtEventPropagationProfileEntry ::= SEQUENCE {
+    prvtEventPropagationProfileName         OCTET STRING,
+    prvtEventPropagationProfileRowStatus    RowStatus,
+    prvtEventPropagationSourceRemMep        Unsigned32,
+    prvtEventPropagationSourceLocalMep      Unsigned32,
+    prvtEventPropagationSourceVrrpGroup     Unsigned32,
+    prvtEventPropagationEvent               INTEGER,
+    prvtEventPropagationAction              INTEGER,
+    prvtEventPropagationReverse             INTEGER,
+    prvtEventPropagationThreshold           Unsigned32,
+    prvtEventPropagationTimerWaitToRestore  Unsigned32,
+    prvtEventPropagationTimerHoldOff        Unsigned32,
+    prvtEventPropagationPerformMacFlush     TruthValue
+}
+
+prvtEventPropagationProfileName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a unique identifier of the
+         Event Propagation profile tabel."
+    ::= { prvtEventPropagationProfileEntry 1 }
+
+prvtEventPropagationProfileRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Creation/delete/edit of the Event Propagation profile. "
+    ::= { prvtEventPropagationProfileEntry 2 }
+
+prvtEventPropagationSourceRemMep OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Event received from remote MEP"
+    ::= { prvtEventPropagationProfileEntry 3 }
+
+prvtEventPropagationSourceLocalMep OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..8191)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Event received from local MEP"
+    ::= { prvtEventPropagationProfileEntry 4 }
+
+prvtEventPropagationSourceVrrpGroup OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Event received from VRRP"
+    ::= { prvtEventPropagationProfileEntry 5 }
+
+prvtEventPropagationEvent OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), statusDown(1), conLost(2), aisLck(4), 
+                    rcvdTcBpdu(5), vrrpStatusBackup(6) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This leaf defines the type of event that will be monitored."
+    ::= { prvtEventPropagationProfileEntry 6 }
+
+prvtEventPropagationAction OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), linkDrop(1), macWithdraw(2), 
+                    lacpStandby(3), restrictForwarding(4), 
+                    noRestrictForwarding(5) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Defines the action to be take in case of an event. "
+    ::= { prvtEventPropagationProfileEntry 7 }
+
+prvtEventPropagationReverse OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), linkRestore(1), lacpActive(2), 
+                    restrictForwarding(3), noRestrictForwarding(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify reverse action, performed when configured event stops"
+    ::= { prvtEventPropagationProfileEntry 8 }
+
+prvtEventPropagationThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify threshold for specified source port"
+    ::= { prvtEventPropagationProfileEntry 9 }
+
+prvtEventPropagationTimerWaitToRestore OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify time to wait before configured action is reversed (<0-600000> milliseconds)"
+    ::= { prvtEventPropagationProfileEntry 10 }
+
+prvtEventPropagationTimerHoldOff OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..600000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify time to wait before configured action occurs (<0-600000> milliseconds)"
+    ::= { prvtEventPropagationProfileEntry 11 }
+
+prvtEventPropagationPerformMacFlush OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify whether to perform MAC flush upon receiving of defined event."
+    ::= { prvtEventPropagationProfileEntry 12 }
+
+prvtEventPropagationSourcePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtEventPropagationSourcePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Sourceport table holds the settings for the
+         Event Propagation"
+    ::= { prvtEventPropagationObjects 2 }
+
+prvtEventPropagationSourcePortEntry OBJECT-TYPE
+    SYNTAX      PrvtEventPropagationSourcePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "NONE"
+    INDEX       { prvtEventPropagationProfileName, 
+                  prvtEventPropagationSourcePortName }
+    ::= { prvtEventPropagationSourcePortTable 1 }
+
+PrvtEventPropagationSourcePortEntry ::= SEQUENCE {
+    prvtEventPropagationSourcePortName          OCTET STRING,
+    prvtEventPropagationSourcePortRowStatus     RowStatus
+}
+
+prvtEventPropagationSourcePortName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Specify port number (in format UU/SS/PP or AG)"
+    ::= { prvtEventPropagationSourcePortEntry 1 }
+
+prvtEventPropagationSourcePortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Creation/delete/edit of the Event Propagation source port. "
+    ::= { prvtEventPropagationSourcePortEntry 2 }
+
+prvtEventPropagationSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtEventPropagationSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtEventPropagationObjects 3 }
+
+prvtEventPropagationSessionEntry OBJECT-TYPE
+    SYNTAX      PrvtEventPropagationSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "NONE"
+    INDEX       { prvtEventPropagationProfileName, 
+                  prvtEventPropagationSessionIndex }
+    ::= { prvtEventPropagationSessionTable 1 }
+
+PrvtEventPropagationSessionEntry ::= SEQUENCE {
+    prvtEventPropagationSessionIndex        Unsigned32,
+    prvtEventPropagationSessionProfileName  OCTET STRING,
+    prvtEventPropagationSessionTarget       INTEGER,
+    prvtEventPropagationSessionId           OCTET STRING,
+    prvtEventPropagationSessionState        INTEGER,
+    prvtEventPropagationSessionActions      Unsigned32,
+    prvtEventPropagationSessionRevertives   Unsigned32
+}
+
+prvtEventPropagationSessionIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Event-propagation session index"
+    ::= { prvtEventPropagationSessionEntry 1 }
+
+prvtEventPropagationSessionProfileName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtEventPropagationSessionEntry 2 }
+
+prvtEventPropagationSessionTarget OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), sap(1), port(2), lag(3), sdp(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtEventPropagationSessionEntry 3 }
+
+prvtEventPropagationSessionId OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtEventPropagationSessionEntry 4 }
+
+prvtEventPropagationSessionState OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), linkDropped(1), linkRestored(2), 
+                    linkActionPend(3), linkRevertivePend(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtEventPropagationSessionEntry 5 }
+
+prvtEventPropagationSessionActions OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtEventPropagationSessionEntry 6 }
+
+prvtEventPropagationSessionRevertives OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { prvtEventPropagationSessionEntry 7 }
+
+epappPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EpappPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table that contains event propagation profiles enabled on each port."
+    ::= { prvtEventPropagationObjects 4 }
+
+epappPortEntry OBJECT-TYPE
+    SYNTAX      EpappPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Event propagation profile on port."
+    INDEX       { epappPortName }
+    ::= { epappPortTable 1 }
+
+EpappPortEntry ::= SEQUENCE {
+    epappPortName       OCTET STRING,
+    epappPortRowStatus  RowStatus,
+    epappPortProfile    OCTET STRING
+}
+
+epappPortName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Port name."
+    ::= { epappPortEntry 1 }
+
+epappPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Creation/delete/edit of the Event Propagation port. "
+    ::= { epappPortEntry 2 }
+
+epappPortProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..32))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify the name of event propagation profile, applied to this port. "
+    ::= { epappPortEntry 3 }
+
+END -- end of module PRVT-EVENT-PROPAGATION-MIB.

@@ -1,0 +1,921 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+EQLACCESS-MIB DEFINITIONS  ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Integer32, enterprises, TimeTicks, Unsigned32, Counter32, Counter64, Gauge32
+            FROM SNMPv2-SMI
+    DisplayString, RowStatus, RowPointer, TruthValue
+            FROM SNMPv2-TC
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    UTFString, eqlGroupId, eqlStorageGroupAdminAccountIndex
+            FROM EQLGROUP-MIB
+    eqliscsiLocalMemberId, eqliscsiVolumeIndex
+            FROM EQLVOLUME-MIB
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB       -- RFC2851
+    ACLAppliesTo
+            FROM EQLVOLUME-MIB;
+
+eqlAccessModule MODULE-IDENTITY
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "Dell Inc."
+    CONTACT-INFO
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION
+        "Dell Inc. Access Group information.
+
+        Copyright (c) 2012 by Dell, Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell, Inc.  This software embodies proprietary information 
+        and trade secrets of Dell, Inc. 
+        "
+
+    -- Revision history, in reverse chronological order
+    REVISION    "201205010000Z"         -- 01-May-2012
+    DESCRIPTION "Initial revision"
+    ::= { enterprises equalLogic(12740) 24 }
+
+eqlAccessObjects OBJECT IDENTIFIER ::=  { eqlAccessModule 1 }
+eqlAccessNotifications OBJECT IDENTIFIER ::= { eqlAccessModule 2 }
+eqlAccessConformance OBJECT IDENTIFIER ::=  { eqlAccessModule 3 }
+
+----------------------------------------------------------------------
+-- Access Group Table
+--
+
+eqlAccessGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table stores information for both access records and access 
+      groups. This MIB table uses the same object to describe both. 
+      Whether the object is an Access Group or Access Record is described 
+      by its eqlAccessGroupType field.
+      TimeoutDelete:90"
+    ::= { eqlAccessObjects 1 }
+
+eqlAccessGroupEntry OBJECT-TYPE
+    SYNTAX        EqlAccessGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Access Group table."
+    INDEX         { eqlAccessGroupIndex }
+    ::= { eqlAccessGroupTable 1 }
+
+EqlAccessGroupEntry ::= SEQUENCE {
+   eqlAccessGroupIndex        Unsigned32,
+   eqlAccessGroupRowStatus    RowStatus,
+   eqlAccessGroupUUID         UTFString,
+   eqlAccessGroupName         UTFString,
+   eqlAccessGroupKeyName      UTFString,
+   eqlAccessGroupDescription  UTFString,
+   eqlAccessGroupAdminKey     Unsigned32,
+   eqlAccessGroupType         INTEGER,
+   eqlAccessGroupPrivacyFlag  INTEGER
+}
+
+
+eqlAccessGroupIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible  
+    STATUS          current
+    DESCRIPTION     "The index of the access group."
+    ::=  { eqlAccessGroupEntry 1 }
+
+eqlAccessGroupRowStatus           OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "Row status used to manage this row."
+   ::= { eqlAccessGroupEntry  2 }
+
+eqlAccessGroupUUID OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     the UUID of the VMWare host used to create the Access Group.  
+                     The description can be up to 63 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlAccessGroupEntry 3 } 
+
+eqlAccessGroupName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..32))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     the name of the access group.  The description can be up 
+                     to 31 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlAccessGroupEntry 4 } 
+
+eqlAccessGroupKeyName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..32))    
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies the iSCSI profile sysprep version
+                     of eqlAccessGroupName. It is populated by the backend on a row-create."
+    DEFVAL          { "" }
+    ::=  { eqlAccessGroupEntry 5 } 
+
+
+eqlAccessGroupDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     details of the access group.  The description can be up 
+                     to 127 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlAccessGroupEntry 6 } 
+
+eqlAccessGroupAdminKey OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the unique key for identifying the administrator who owns this access group."
+    DEFVAL          { 0 }
+    ::=   { eqlAccessGroupEntry 7 }
+
+eqlAccessGroupType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    access-group(1),
+                    access-record(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field describes whether the ACL is an access 
+                     group or access record."
+    DEFVAL          { access-record }
+    ::=  { eqlAccessGroupEntry 8 } 
+
+eqlAccessGroupPrivacyFlag OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    public(1),
+                    private(2)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to mark if an access group is public
+                      (able to be used by any user) or private (only able to
+                      be used by the person who created it or group admin)."
+    DEFVAL          { private }
+    ::=  { eqlAccessGroupEntry 9 } 
+
+----------------------------------------------------------------------
+-- Access Group by Type Table
+--
+
+eqlAccessGroupByTypeTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessGroupByTypeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "Equallogic-Dynamic
+      This table displays information for access records and access groups,
+      like eqlAccessGroupTable, but partitioned by type (access-record, access-group),
+      which is part of the index (eqlAccessGroupType)."
+    ::= { eqlAccessObjects 2 }
+
+eqlAccessGroupByTypeEntry OBJECT-TYPE
+    SYNTAX        EqlAccessGroupByTypeEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Access Group By Type table."
+    INDEX         { eqlAccessGroupType, eqlAccessGroupIndex }
+    ::= { eqlAccessGroupByTypeTable 1 }
+
+EqlAccessGroupByTypeEntry ::= SEQUENCE {
+   eqlAccessGroupByTypeUUID         UTFString,
+   eqlAccessGroupByTypeName         UTFString,
+   eqlAccessGroupByTypeDescription  UTFString,
+   eqlAccessGroupByTypeAdminKey     Unsigned32
+}
+
+eqlAccessGroupByTypeUUID OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     the UUID of the VMWare host used to create the Access Group.  
+                     The description can be up to 63 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlAccessGroupByTypeEntry 1 } 
+
+eqlAccessGroupByTypeName OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..32))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     the name of the access group.  The description can be up 
+                     to 31 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlAccessGroupByTypeEntry 2 } 
+
+eqlAccessGroupByTypeDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     details of the access group.  The description can be up 
+                     to 127 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlAccessGroupByTypeEntry 3 } 
+
+eqlAccessGroupByTypeAdminKey OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the unique key for identifying an access group."
+    DEFVAL          { 0 }
+    ::=   { eqlAccessGroupByTypeEntry 4 }
+
+----------------------------------------------------------------------
+-- Access Group Member Table
+--
+
+eqlAccessGroupMemberTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessGroupMemberEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table represents a hierarchy of access groups via their corresonding
+      eqlAccessGroupIndex in the eqlAccessGroupTable."
+      
+    ::= { eqlAccessObjects 3 }
+
+eqlAccessGroupMemberEntry OBJECT-TYPE
+    SYNTAX        EqlAccessGroupMemberEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Access Group Member table."
+    INDEX         { eqlAccessGroupIndex, eqlAccessGroupChildIndex }
+    ::= { eqlAccessGroupMemberTable 1 }
+
+EqlAccessGroupMemberEntry ::= SEQUENCE {
+   eqlAccessGroupChildIndex      Unsigned32,
+   eqlAccessGroupMemberRowStatus RowStatus
+}
+
+
+
+eqlAccessGroupChildIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     The eqlAccessGroupIndex in the eqlAccessGroupTable of the 
+                     host access group which is associated with a cluster 
+                     access group, which is defined by the index represented in 
+                     eqlAccessGroupIndex of the full table index."
+    ::=  { eqlAccessGroupMemberEntry 1 }
+
+eqlAccessGroupMemberRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "Row status used to manage this row."
+   ::= { eqlAccessGroupMemberEntry  2 }
+
+----------------------------------------------------------------------
+-- Access Point Table
+--
+
+eqlAccessPointTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessPointEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table stores stores information on all the configured access points.
+      One row for each access point that the PS-Admin creates."
+    ::= { eqlAccessObjects 4 }
+
+eqlAccessPointEntry OBJECT-TYPE
+    SYNTAX        EqlAccessPointEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Access Point Table."
+    INDEX           { eqlAccessGroupIndex, eqlAccessPointIndex }
+    ::= { eqlAccessPointTable 1 }
+
+EqlAccessPointEntry ::= SEQUENCE { 
+   eqlAccessPointIndex      Unsigned32,
+   eqlAccessPointRowStatus  RowStatus,
+   eqlAccessPointInitiatorName         UTFString,
+   eqlAccessPointInitiatorCHAPUserName UTFString,
+   eqlAccessPointDescription           UTFString
+}
+
+eqlAccessPointIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible  
+    STATUS          current
+    DESCRIPTION     "The index of the access point."
+    ::=  { eqlAccessPointEntry 1 }
+
+eqlAccessPointRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "Row status used to manage this row."
+   ::= { eqlAccessPointEntry  2 }
+
+eqlAccessPointInitiatorName    OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..223))
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The name of the iscsi initiator permitted to discover or login."
+    ::=  { eqlAccessPointEntry 3 } 
+
+eqlAccessPointInitiatorCHAPUserName OBJECT-TYPE
+    SYNTAX          UTFString (SIZE (0..255))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The 256 byte character name user name to be used for initiator 
+                     authentication."
+    ::=   { eqlAccessPointEntry 4 }
+
+eqlAccessPointDescription OBJECT-TYPE      
+    SYNTAX          UTFString (SIZE (0..128))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a descriptive string that provides 
+                     details of the access group.  The description can be up 
+                     to 127 characters plus NULL."  
+    DEFVAL          { "" }
+    ::=  { eqlAccessPointEntry 5 } 
+
+
+----------------------------------------------------------------------
+-- Access Point IP Address Table
+--
+
+eqlAccessPointAddrTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessPointAddrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table stores stores information on all the configured access points.
+      One row for each access point that the PS-Admin creates."
+    ::= { eqlAccessObjects 5 }
+
+eqlAccessPointAddrEntry OBJECT-TYPE
+    SYNTAX        EqlAccessPointAddrEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Access Point IP Address Table."
+    INDEX           { eqlAccessGroupIndex, eqlAccessPointIndex, eqlAccessPointAddrIndex }
+    ::= { eqlAccessPointAddrTable 1 }
+
+EqlAccessPointAddrEntry ::= SEQUENCE {
+   eqlAccessPointAddrIndex     Unsigned32,
+   eqlAccessPointAddrRowStatus RowStatus,
+   eqlAccessPointAddrInitiatorAddrType       InetAddressType,
+   eqlAccessPointAddrInitiatorAddr           InetAddress,
+   eqlAccessPointAddrInitiatorAddrWildcardType       InetAddressType,
+   eqlAccessPointAddrInitiatorAddrWildcard   InetAddress
+}
+
+eqlAccessPointAddrIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible  
+    STATUS          current
+    DESCRIPTION     "The index of the access point IP Address table."
+    ::=  { eqlAccessPointAddrEntry 1 }
+
+eqlAccessPointAddrRowStatus OBJECT-TYPE
+   SYNTAX        RowStatus
+   MAX-ACCESS    read-create
+   STATUS        current
+   DESCRIPTION   "Row status used to manage this row."
+   ::= { eqlAccessPointAddrEntry  2 }
+
+eqlAccessPointAddrInitiatorAddrType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The IP version of the address of the initiator and corresponding wildcard
+                     allowed to access the target."
+    DEFVAL          { ipv4 } 
+    ::=  { eqlAccessPointAddrEntry 3 } 
+
+eqlAccessPointAddrInitiatorAddr OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The IP address of the initiator allowed to access the target."
+    ::=  { eqlAccessPointAddrEntry 4 } 
+
+eqlAccessPointAddrInitiatorAddrWildcardType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The IP version of the address of the initiator and corresponding wildcard
+                     allowed to access the target."
+    DEFVAL          { ipv4 } 
+    ::=  { eqlAccessPointAddrEntry 5 } 
+
+eqlAccessPointAddrInitiatorAddrWildcard OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The wildcard mask defines which portion of the eqlInitiatorAddress that
+                     does not have to match for the initiator to be permitted access to the volume.
+                     Type IPv4 mask is expressed in the form x.x.x.x, where x is 255 or 0.
+                     When x is 255, then that portion of the initiator's ip address must match.
+                     When x is 0, then that portion of the initiator's ip address does not have to match. "
+    ::=  { eqlAccessPointAddrEntry 6 } 
+
+----------------------------------------------------------------------
+-- Access Group Object Association Table
+--
+
+eqlAccessGroupObjectAssocTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessGroupObjectAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Persistent
+      This table stores stores information on all configured
+      Access Group to Object associations.
+      There is a row for each access group to volume association."
+    ::= { eqlAccessObjects 6 }
+
+eqlAccessGroupObjectAssocEntry OBJECT-TYPE
+    SYNTAX        EqlAccessGroupObjectAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Access Group Object Association table."
+    INDEX         { eqlAccessGroupIndex, eqlAccessGroupObjectAssocIndex }
+    ::= { eqlAccessGroupObjectAssocTable 1 }
+
+EqlAccessGroupObjectAssocEntry ::= SEQUENCE {
+   eqlAccessGroupObjectAssocIndex          Unsigned32,
+   eqlAccessGroupObjectAssocRowStatus      RowStatus,
+   eqlAccessGroupObjectAssocOID		   RowPointer,
+   eqlAccessGroupObjectAssocFlag           ACLAppliesTo,
+   eqlAccessGroupObjectAssocCreator        INTEGER 
+}
+
+eqlAccessGroupObjectAssocIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible  
+    STATUS          current
+    DESCRIPTION     "The index of the access group association table."
+    ::= { eqlAccessGroupObjectAssocEntry 1 }
+
+eqlAccessGroupObjectAssocRowStatus  OBJECT-TYPE
+    SYNTAX           RowStatus
+    MAX-ACCESS       read-create
+    STATUS           current
+    DESCRIPTION   "Row status used to manage this row."
+    ::= { eqlAccessGroupObjectAssocEntry 2 }
+
+eqlAccessGroupObjectAssocOID	    OBJECT-TYPE      
+    SYNTAX          RowPointer 
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "OID of the volume, folder, container, etc that this ACL is
+                     associated with."
+    REFERENCE
+            "EQLVOLUME MIB"
+    ::= { eqlAccessGroupObjectAssocEntry 3 } 
+
+eqlAccessGroupObjectAssocFlag OBJECT-TYPE      
+    SYNTAX          ACLAppliesTo
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "Flag that indicates type of object that the access group modifies."
+    ::=  { eqlAccessGroupObjectAssocEntry 4 } 
+
+eqlAccessGroupObjectAssocCreator OBJECT-TYPE
+    SYNTAX          INTEGER {
+                             vCenter(1),
+                             gui(2),
+                             cli(3),
+                             other(4)
+                            }
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field identifies the creator of the Association."
+    DEFVAL          { other } 
+    ::=  { eqlAccessGroupObjectAssocEntry 5 } 
+
+----------------------------------------------------------------------
+-- Access Group Volume Association Table
+--
+
+eqlAccessGroupVolumeAssocTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessGroupVolumeAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table stores stores information on all configured
+      Volume to Access Group associations.
+      There is a row for each access group to volume association."
+      ::= { eqlAccessObjects 7 }
+
+eqlAccessGroupVolumeAssocEntry OBJECT-TYPE
+    SYNTAX        EqlAccessGroupVolumeAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Volume Access Group Association Table."
+    INDEX           { eqlAccessGroupIndex, eqliscsiLocalMemberId, eqliscsiVolumeIndex }
+    ::= { eqlAccessGroupVolumeAssocTable 1 }
+
+EqlAccessGroupVolumeAssocEntry ::= SEQUENCE {
+   eqlAccessGroupVolumeAssocFlag        ACLAppliesTo,
+   eqlAccessGroupVolumeAssocObjectIndex Unsigned32
+}
+
+eqlAccessGroupVolumeAssocFlag OBJECT-TYPE      
+    SYNTAX          ACLAppliesTo
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Flag that indicates type of object that the access group modifies."
+    ::=  { eqlAccessGroupVolumeAssocEntry 1 } 
+
+eqlAccessGroupVolumeAssocObjectIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The index of the Access Group Object Association object in the 
+	             eqlAccessGroupObjectAssocTable."
+    ::=  { eqlAccessGroupVolumeAssocEntry 2 } 
+
+
+----------------------------------------------------------------------
+-- Volume Access Group Lookup Table
+--
+
+eqlVolumeAccessGroupAssocTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlVolumeAccessGroupAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table shows information on access groups associated with a specific volume.
+      Each row reflects one association"
+    ::= { eqlAccessObjects 8 }
+
+eqlVolumeAccessGroupAssocEntry OBJECT-TYPE
+    SYNTAX        EqlVolumeAccessGroupAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Volume Access Group Association Table."
+    INDEX           { eqliscsiLocalMemberId, eqliscsiVolumeIndex, eqlAccessGroupIndex }
+    ::= { eqlVolumeAccessGroupAssocTable 1 }
+
+EqlVolumeAccessGroupAssocEntry ::= SEQUENCE {
+   eqlVolumeAccessGroupAssocFlag        ACLAppliesTo,
+   eqlVolumeAccessGroupAssocObjectIndex Unsigned32
+}
+
+eqlVolumeAccessGroupAssocFlag OBJECT-TYPE      
+    SYNTAX          ACLAppliesTo
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Flag that indicates type of object that the access group modifies."
+    ::=  { eqlVolumeAccessGroupAssocEntry 1 } 
+
+eqlVolumeAccessGroupAssocObjectIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The index of the Access Group Object Association object in the 
+	             eqlAccessGroupObjectAssocTable."
+    ::=  { eqlVolumeAccessGroupAssocEntry 2 } 
+
+----------------------------------------------------------------------
+-- Access Group Shared Volume Association Table
+--
+
+eqlAccessGroupSharedVolumeAssocTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAccessGroupSharedVolumeAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table stores stores information on all configured
+      Shared Volume to Access Group associations.
+      There is a row for each access group to shared volume association."
+      ::= { eqlAccessObjects 9 }
+
+eqlAccessGroupSharedVolumeAssocEntry OBJECT-TYPE
+    SYNTAX        EqlAccessGroupSharedVolumeAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Volume Access Group Association Table."
+    INDEX           { eqlAccessGroupIndex, eqliscsiLocalMemberId, eqliscsiVolumeIndex }
+    ::= { eqlAccessGroupSharedVolumeAssocTable 1 }
+
+EqlAccessGroupSharedVolumeAssocEntry ::= SEQUENCE {
+   eqlAccessGroupSharedVolumeAssocFlag        ACLAppliesTo,
+   eqlAccessGroupSharedVolumeAssocObjectIndex Unsigned32
+}
+
+eqlAccessGroupSharedVolumeAssocFlag OBJECT-TYPE      
+    SYNTAX          ACLAppliesTo
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Flag that indicates type of object that the access group modifies."
+    ::=  { eqlAccessGroupSharedVolumeAssocEntry 1 } 
+
+eqlAccessGroupSharedVolumeAssocObjectIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The index of the Access Group Object Association object in the 
+	             eqlAccessGroupObjectAssocTable."
+    ::=  { eqlAccessGroupSharedVolumeAssocEntry 2 } 
+
+
+----------------------------------------------------------------------
+-- Shared Volume Access Group Lookup Table
+--
+
+eqlSharedVolumeAccessGroupAssocTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlSharedVolumeAccessGroupAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table shows information on access groups associated with a specific shared volume.
+      Each row reflects one association"
+    ::= { eqlAccessObjects 10 }
+
+eqlSharedVolumeAccessGroupAssocEntry OBJECT-TYPE
+    SYNTAX        EqlSharedVolumeAccessGroupAssocEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Volume Access Group Association Table."
+    INDEX           { eqliscsiLocalMemberId, eqliscsiVolumeIndex, eqlAccessGroupIndex }
+    ::= { eqlSharedVolumeAccessGroupAssocTable 1 }
+
+EqlSharedVolumeAccessGroupAssocEntry ::= SEQUENCE {
+   eqlSharedVolumeAccessGroupAssocFlag        ACLAppliesTo,
+   eqlSharedVolumeAccessGroupAssocObjectIndex Unsigned32
+}
+
+eqlSharedVolumeAccessGroupAssocFlag OBJECT-TYPE      
+    SYNTAX          ACLAppliesTo
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Flag that indicates type of object that the access group modifies."
+    ::=  { eqlSharedVolumeAccessGroupAssocEntry 1 } 
+
+eqlSharedVolumeAccessGroupAssocObjectIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The index of the Access Group Object Association object in the 
+	             eqlAccessGroupObjectAssocTable."
+    ::=  { eqlSharedVolumeAccessGroupAssocEntry 2 } 
+
+
+----------------------------------------------------------------------
+-- Admin Account Access Group Table
+--
+
+eqlAdminAccountAccessGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlAdminAccountAccessGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table shows information on admin account ownership for particular Access Groups.
+      Each row reflects one access group ownership."
+    ::= { eqlAccessObjects 11 }
+
+eqlAdminAccountAccessGroupEntry OBJECT-TYPE
+    SYNTAX        EqlAdminAccountAccessGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the Admin Account Access Group Table."
+    INDEX           { eqlGroupId, eqlStorageGroupAdminAccountIndex, eqlAccessGroupIndex }
+    ::= { eqlAdminAccountAccessGroupTable 1 }
+
+EqlAdminAccountAccessGroupEntry ::= SEQUENCE {
+   eqlAdminAccountAccessGroupRowStatus RowStatus,
+   eqlAdminAccountAccessGroupAccess    INTEGER
+}
+
+eqlAdminAccountAccessGroupRowStatus OBJECT-TYPE
+    SYNTAX           RowStatus
+    MAX-ACCESS       read-only
+    STATUS           current
+    DESCRIPTION   "Row status used to manage this row."
+    ::= { eqlAdminAccountAccessGroupEntry 1 }
+
+eqlAdminAccountAccessGroupAccess OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                             read-only(1),
+                             read-write(2)
+                            }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Administrative permission to the Access Group."
+    DEFVAL          { read-only } 
+    ::= { eqlAdminAccountAccessGroupEntry 2 }
+
+----------------------------------------------------------------------
+-- ACL Count Table
+--
+
+eqlACLCountTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlACLCountEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table provides a count of the number of ACLs currently in the
+      system.  It is used by the front end to help with limit checking"
+    ::= { eqlAccessObjects 12 }
+
+eqlACLCountEntry  OBJECT-TYPE
+    SYNTAX        EqlACLCountEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the ACL Count table."
+    INDEX           { eqlGroupId }
+    ::= { eqlACLCountTable 1 }
+
+EqlACLCountEntry ::= SEQUENCE {
+   eqlACLCountUserDefined       Unsigned32,
+   eqlACLCountMPIO              Unsigned32,
+   eqlACLCountTotal             Unsigned32,
+   eqlMaxAccessGroupCount       Unsigned32,
+   eqlMaxAccessRecordCount      Unsigned32,
+   eqlMaxAccessPointCount       Unsigned32,
+   eqlMaxAccessPointIPAddrCount Unsigned32,
+   eqlMaxAssociationCount       Unsigned32,
+   eqlAccessGroupCount          Unsigned32,
+   eqlAccessRecordCount         Unsigned32,
+   eqlAccessPointCount          Unsigned32,
+   eqlAccessPointIPAddrCount    Unsigned32,
+   eqlAssociationCount          Unsigned32
+}
+
+eqlACLCountUserDefined OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Total number of User defined ACL's in the group."
+    ::= { eqlACLCountEntry 1 }
+
+eqlACLCountMPIO OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Total number of MPIO ACL's in the group."
+    ::= { eqlACLCountEntry 2 }
+
+eqlACLCountTotal OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Total number of ACL's in the group."
+    ::= { eqlACLCountEntry 3 }
+
+eqlMaxAccessGroupCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Maximum number of Access Groups allowed in the group."
+    ::= { eqlACLCountEntry 4 }
+
+eqlMaxAccessRecordCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Maximum number of Access Records allowed in the group."
+    ::= { eqlACLCountEntry 5 }
+
+eqlMaxAccessPointCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Maximum number of Access Points allowed in the group."
+    ::= { eqlACLCountEntry 6 }
+
+eqlMaxAccessPointIPAddrCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Maximum number of Access Point IP Addresses allowed in the group."
+    ::= { eqlACLCountEntry 7 }
+
+eqlMaxAssociationCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Maximum number of Access Object to Volume associations allowed in the group."
+    ::= { eqlACLCountEntry 8 }
+
+eqlAccessGroupCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Current number of Access Groups in the group."
+    ::= { eqlACLCountEntry 9 }
+
+eqlAccessRecordCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Current number of Access Records in the group."
+    ::= { eqlACLCountEntry 10 }
+
+eqlAccessPointCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Current number of Access Points in the group."
+    ::= { eqlACLCountEntry 11 }
+
+eqlAccessPointIPAddrCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Current number of Access Point IP Addresses in the group."
+    ::= { eqlACLCountEntry 12 }
+
+eqlAssociationCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Current number of Access Object to Volume associations in the group."
+    ::= { eqlACLCountEntry 13 }
+
+----------------------------------------------------------------------
+-- ACL Volume Association Count Table
+--
+
+eqlVolumeAccessGroupAssocCountTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF EqlVolumeAccessGroupAssocCountEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+     "EqualLogic-Dynamic
+      This table provides a count for the total number of access groups
+      and access records associated to a single volume.  Data is indexed by
+      volume."
+    ::= { eqlAccessObjects 13 }
+
+eqlVolumeAccessGroupAssocCountEntry  OBJECT-TYPE
+    SYNTAX        EqlVolumeAccessGroupAssocCountEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+      "An entry in the ACL Association Count table."
+    INDEX           { eqliscsiLocalMemberId, eqliscsiVolumeIndex }
+    ::= { eqlVolumeAccessGroupAssocCountTable 1 }
+
+EqlVolumeAccessGroupAssocCountEntry ::= SEQUENCE {
+   eqlVolumeAccessGroupAssocCount     Unsigned32,
+   eqlVolumeAccessRecordAssocCount    Unsigned32
+}
+
+eqlVolumeAccessGroupAssocCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Total count of access group associations for the volume."
+    ::= { eqlVolumeAccessGroupAssocCountEntry 1 }
+
+eqlVolumeAccessRecordAssocCount OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "Total count of access record associations for the volume."
+    ::= { eqlVolumeAccessGroupAssocCountEntry 2 }
+
+END

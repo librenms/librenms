@@ -1,0 +1,663 @@
+-- ====================================================================
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: Huawei LOOPDETECT MIB
+-- Reference:   Huawei Enterprise MIB
+-- Version:     V2.08
+-- History:
+--              2010-11  modified by xuxuguang for atn loopback-detect
+-- 
+-- =====================================================================
+
+    HUAWEI-LOOPDETECT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm2            
+                FROM HUAWEI-MIB 
+                     
+            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF 
+                                     
+            OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY, Integer32            
+                FROM SNMPv2-SMI
+            
+            TruthValue,TEXTUAL-CONVENTION,
+            RowStatus,MacAddress,DisplayString
+                FROM SNMPv2-TC;
+ 
+
+--
+-- Node definitions
+--
+    
+--  Node definitions
+-- 
+-- 1.3.6.1.4.1.2011.25
+        -- 1.3.6.1.4.1.2011.25
+        -- hwDatacomm OBJECT IDENTIFIER ::= { huawei 25 }
+        
+        -- 1.3.6.1.4.1.2011.25.180    
+        hwLoopDetectMIB MODULE-IDENTITY
+        LAST-UPDATED "201804231716Z"        -- April 23, 2018 at 00:00 GMT
+        ORGANIZATION 
+         "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO 
+"Huawei Industrial Base  Bantian, Longgang   Shenzhen 518129   People's Republic of China   Website: http://www.huawei.com   Email: support@huawei.com "
+        DESCRIPTION
+            "The LoopDetect MIB module is defined to indicate loop-detect function of Huawei Technologies co., Ltd."
+        
+        REVISION "201804231716Z" 
+        DESCRIPTION "Change the parameter of trap node hwLoopDetectWithoutBlock and hwLoopDetectWithoutBlockResume"
+		
+		REVISION "201801311716Z" 
+        DESCRIPTION "Add the trap node hwLoopDetectWithoutBlock and hwLoopDetectWithoutBlockResume"
+
+        REVISION "201801191632Z" 
+     DESCRIPTION "Change the description of nodes"
+
+         REVISION "201706161148Z" 
+     DESCRIPTION "Add LoopDetectIncrease"
+
+         REVISION "201607111148Z" 
+     DESCRIPTION "Modify description"
+   
+         REVISION "201504081148Z" 
+     DESCRIPTION "Add LoopDetectResource"
+     
+         REVISION "201502051148Z" 
+     DESCRIPTION "Add AutoLoopDetect"
+            
+         REVISION "201406091548Z" 
+     DESCRIPTION "modify OID name hwDatacomm to hwDatacomm2"
+         ::= { hwDatacomm2 180 }
+
+        -- hwLoopDetectMIB OBJECT IDENTIFIER ::= { hwDatacomm2 180 }
+        
+        
+        -- Textual Convention
+        HWEnabledStatus ::= TEXTUAL-CONVENTION
+            STATUS      current
+            DESCRIPTION
+                "A simple status value for the object."
+            SYNTAX      INTEGER 
+            { 
+              enabled(1),
+              disabled(2)
+            }
+        
+        -- 1.3.6.1.4.1.2011.25.180.1
+        hwLoopDetectCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLoopDetectCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the table that shows the loop detect configuration and blocking state."
+            ::= {hwLoopDetectMIB 1}    
+        
+        hwLoopDetectCfgEntry OBJECT-TYPE
+            SYNTAX     HwLoopDetectCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the entries about the loop detect configuration and blocking state."
+            INDEX {hwLoopDetectCfgPortIndex}
+            ::= {hwLoopDetectCfgTable 1}
+         
+          HwLoopDetectCfgEntry ::=  
+              SEQUENCE { 
+              hwLoopDetectCfgPortIndex Integer32,
+              hwLoopDetectCfgPortName OCTET STRING,
+              hwLoopDetectCfg    Integer32,
+              hwLoopDetectCfgBlock Integer32,        
+              hwLoopDetectCfgBlockTime Integer32,
+              hwLoopDetectCfgPriority Integer32,
+              hwLoopDetectCfgTrigger Integer32,
+              hwLoopDetectCfgSta    Integer32,
+              hwPwVcLoopDetectAlarmReason DisplayString,
+              hwPwVcLoopDetectTime Integer32
+          }   
+          
+          hwLoopDetectCfgPortIndex OBJECT-TYPE
+              SYNTAX  Integer32 (0..2147483647)
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "Indicates the interface index."
+              ::= {hwLoopDetectCfgEntry 1}  
+              
+          hwLoopDetectCfgPortName OBJECT-TYPE
+               SYNTAX  OCTET STRING(SIZE (0..80)) 
+                   MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "Indicates the interface name."
+              ::= {hwLoopDetectCfgEntry 2}
+              
+          hwLoopDetectCfg OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "Indicates whether the loop detect function is enabled." 
+              ::= {hwLoopDetectCfgEntry 3}
+              
+          hwLoopDetectCfgBlock OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION 
+                  "Indicates whether the interface can enter the blocking state after a loop is detected."
+              ::= {hwLoopDetectCfgEntry 4}
+              
+          hwLoopDetectCfgBlockTime OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "Indicates the interval that is used to judge whether the loop disappears and the blocking state ends."
+              ::= {hwLoopDetectCfgEntry 5}        
+
+          hwLoopDetectCfgPriority OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "Indicates the priority in loop detect."
+              ::= {hwLoopDetectCfgEntry 6}
+              
+          hwLoopDetectCfgTrigger OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "Indicates whether the function of immediate interface Down/Up is triggered after a loop is detected."
+              ::= {hwLoopDetectCfgEntry 7}
+              
+          hwLoopDetectCfgSta OBJECT-TYPE
+              SYNTAX Integer32
+              MAX-ACCESS read-only
+              STATUS current
+              DESCRIPTION
+                  "Identify the interface that is blocked after a loop is detected."
+              ::= {hwLoopDetectCfgEntry 8}     
+
+        -- 1.3.6.1.4.1.2011.25.180.1.1.9
+        hwPwVcLoopDetectAlarmReason OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..63))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the reason of PW loop detect alarm."
+            ::= { hwLoopDetectCfgEntry 9 }
+
+
+        -- 1.3.6.1.4.1.2011.25.180.1.1.10
+        hwPwVcLoopDetectTime OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the reason of PW loop detect time."
+            ::= { hwLoopDetectCfgEntry 10 }
+                   
+        -- 1.3.6.1.4.1.2011.25.180.2
+        hwLoopDetectTraps OBJECT IDENTIFIER ::= { hwLoopDetectMIB 2 }
+        
+        -- 1.3.6.1.4.1.2011.25.180.2.1
+        hwLoopDetectEnabled NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName }
+            STATUS current
+            DESCRIPTION 
+                "The loop detect function is enabled."
+            ::= { hwLoopDetectTraps 1 }
+        
+        -- 1.3.6.1.4.1.2011.25.180.2.2
+        hwLoopDetectDisabled NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName }
+            STATUS current
+            DESCRIPTION 
+                "The loop detect function is disabled."
+            ::= { hwLoopDetectTraps 2 }
+        
+        -- 1.3.6.1.4.1.2011.25.180.2.3
+        hwLoopDetectBlocked NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates that an interface is blocked."
+            ::= { hwLoopDetectTraps 3 }
+        
+        -- 1.3.6.1.4.1.2011.25.180.2.4
+        hwLoopDetectUnBlocked NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates that a blocked interface is unblocked."
+            ::= { hwLoopDetectTraps 4 }   
+            
+        -- 1.3.6.1.4.1.2011.25.180.2.5
+        hwLoopDetectAlarm NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName }
+            STATUS current
+            DESCRIPTION 
+                "The interface is in loopback state."
+            ::= { hwLoopDetectTraps 5 }  
+            
+        -- 1.3.6.1.4.1.2011.25.180.2.6
+        hwLoopDetectRecover NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName }
+            STATUS current
+            DESCRIPTION 
+                "The loopback state of the interface is recovered."
+            ::= { hwLoopDetectTraps 6 }  
+
+        -- 1.3.6.1.4.1.2011.25.180.2.7
+        hwPWLoopDetectEnabledAlarm NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName, hwPwVcLoopDetectTime, hwPwVcLoopDetectAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "An alarm of enabling the PW loop detect function."
+            ::= { hwLoopDetectTraps 7 }
+
+
+        -- 1.3.6.1.4.1.2011.25.180.2.8
+        hwPWLoopDetectDisabledAlarm NOTIFICATION-TYPE
+            OBJECTS { hwLoopDetectCfgPortName, hwPwVcLoopDetectAlarmReason }
+            STATUS current
+            DESCRIPTION 
+                "An alarm of disabling the PW loop detect function."
+            ::= { hwLoopDetectTraps 8 }
+
+		-- 1.3.6.1.4.1.2011.25.180.2.9
+		hwAutoLoopDetectTriggerDown NOTIFICATION-TYPE
+			OBJECTS { hwAutoLoopDetectTrapPortName, hwAutoLoopDetectTrapVlan, hwAutoLoopDetectTrapVsiName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that an interface is blocked."
+			::= { hwLoopDetectTraps 9 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.2.10
+		hwAutoLoopDetectUnTriggerDown NOTIFICATION-TYPE
+			OBJECTS { hwAutoLoopDetectTrapPortName }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a blocked interface is unblocked."
+			::= { hwLoopDetectTraps 10 }
+			
+		-- 1.3.6.1.4.1.2011.25.180.2.11
+		hwLoopDetectNoResource NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				" The loop detect function does not take effect on some interfaces."
+			::= { hwLoopDetectTraps 11 }
+			
+		-- 1.3.6.1.4.1.2011.25.180.2.12
+		hwLoopDetectReGetResource NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"The loop detect function has taken effect on all interfaces configured with this function."
+			::= { hwLoopDetectTraps 12 }
+         -- 1.3.6.1.4.1.2011.25.180.2.13
+        hwLoopDetectWithoutBlock NOTIFICATION-TYPE
+                       OBJECTS {hwLoopDetectCfgPortName}
+                       STATUS current
+                       DESCRIPTION 
+                        "This object indicates that the interface is detected in loop state but not blocked."
+                       ::= { hwLoopDetectTraps 13 }
+        
+        -- 1.3.6.1.4.1.2011.25.180.2.14
+        hwLoopDetectWithoutBlockResume NOTIFICATION-TYPE
+                      OBJECTS {hwLoopDetectCfgPortName}
+                      STATUS current
+                      DESCRIPTION 
+                     "This object indicates that the loop state of this interface is recovered."
+                      ::= { hwLoopDetectTraps 14 } 		
+		
+        -- for compile builder     
+        -- 1.3.6.1.4.1.2011.25.180.3    
+        hwLoopDetectConformance  OBJECT IDENTIFIER ::= { hwLoopDetectMIB 3 }
+        hwLoopDetectCompliances OBJECT IDENTIFIER ::= { hwLoopDetectConformance 1 }
+        hwLoopDetectCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwLoopDetectCfgEntryGroup, 
+                                    hwLoopDetectTrapsGroup
+                                    }  
+                                               
+              ::= { hwLoopDetectCompliances 1 }          
+              
+        --  ============== groups ==============  
+    
+        hwLoopDetectGroups OBJECT IDENTIFIER ::= { hwLoopDetectCompliances 2 } 
+
+        hwLoopDetectCfgEntryGroup OBJECT-GROUP
+            OBJECTS{ 
+            hwLoopDetectCfgPortName,
+            hwLoopDetectCfg,
+            hwLoopDetectCfgBlock,        
+            hwLoopDetectCfgBlockTime,
+            hwLoopDetectCfgPriority,
+            hwLoopDetectCfgTrigger,
+            hwLoopDetectCfgSta,
+            hwPwVcLoopDetectAlarmReason,
+            hwPwVcLoopDetectTime
+            }
+           STATUS      current
+           DESCRIPTION
+               "Entries about the loop detect configuration and blocking state group."
+           ::= { hwLoopDetectGroups 1 }    
+           
+        hwLoopDetectTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS 
+                    {
+                        hwLoopDetectEnabled,  
+                        hwLoopDetectDisabled,
+                        hwLoopDetectBlocked,
+                        hwLoopDetectUnBlocked,
+                        hwLoopDetectAlarm,
+                        hwLoopDetectRecover,
+                        hwPWLoopDetectEnabledAlarm,
+                        hwPWLoopDetectDisabledAlarm,
+                        hwLoopDetectWithoutBlock, 
+                        hwLoopDetectWithoutBlockResume 
+                     }
+            STATUS current
+            DESCRIPTION 
+                "Loop-detect traps group."
+            ::= { hwLoopDetectGroups 2 } 
+       
+        
+        -- 1.3.6.1.4.1.2011.25.180.1.4
+        hwLoopbackDetectCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLoopbackDetectCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Indicates the table that shows the loop detect configuration and blocking state."
+            ::= {hwLoopDetectMIB 4}    
+            
+        hwLoopbackDetectCfgEntry OBJECT-TYPE
+            SYNTAX     HwLoopbackDetectCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The configuration of loopback detect table."
+            INDEX {hwLoopbackDetectCfgPortIndex}
+            ::= {hwLoopbackDetectCfgTable 1}
+         
+          HwLoopbackDetectCfgEntry ::=  
+              SEQUENCE { 
+              hwLoopbackDetectCfgPortIndex Integer32,
+              hwLoopbackDetectCfgPortName OCTET STRING,
+              hwLoopbackDetectCfg    HWEnabledStatus,
+              hwLoopbackDetectRowStatus     RowStatus 
+          }   
+          
+          hwLoopbackDetectCfgPortIndex OBJECT-TYPE
+              SYNTAX  Integer32 (0..2147483647)
+              MAX-ACCESS not-accessible
+              STATUS current
+              DESCRIPTION
+                  "Indicates the interface index."
+              ::= {hwLoopbackDetectCfgEntry 1}  
+              
+          hwLoopbackDetectCfgPortName OBJECT-TYPE 
+               SYNTAX  OCTET STRING(SIZE (0..80)) 
+                   MAX-ACCESS read-create
+              STATUS current
+              DESCRIPTION
+                  "Indicates the interface name."
+              ::= {hwLoopbackDetectCfgEntry 12}
+              
+          hwLoopbackDetectCfg OBJECT-TYPE
+              SYNTAX HWEnabledStatus
+              MAX-ACCESS read-create
+              STATUS current
+              DESCRIPTION
+                  "Indicates whether the loop detect function is enabled." 
+              ::= {hwLoopbackDetectCfgEntry 13}
+              
+         hwLoopbackDetectRowStatus  OBJECT-TYPE
+              SYNTAX          RowStatus
+              MAX-ACCESS      read-create
+              STATUS          current
+              DESCRIPTION
+                  "This object is used to create or delete a row
+              and represent the current status of this row.
+              Now support state:CreateAndGo,Destroy."
+              ::= { hwLoopbackDetectCfgEntry 100}   
+                
+                
+                
+                
+                
+        -- for compile builder     
+        -- 1.3.6.1.4.1.2011.25.180.10  
+        hwLoopDetectLastConformance  OBJECT IDENTIFIER ::= { hwLoopDetectMIB 10 }
+        hwLoopDetectLastCompliances OBJECT IDENTIFIER ::= { hwLoopDetectLastConformance 1 }
+        hwLoopDetectLastCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                the this module."
+
+               MODULE      -- this module
+               MANDATORY-GROUPS    {hwLoopbackDetectCfgEntryGroup
+                                                   }  
+                                               
+              ::= { hwLoopDetectLastCompliances 1 }          
+              
+        --  ============== groups ==============  
+    
+        hwLoopDetectLastGroups OBJECT IDENTIFIER ::= { hwLoopDetectLastCompliances 2 } 
+        
+        hwLoopbackDetectCfgEntryGroup OBJECT-GROUP
+            OBJECTS{ 
+                       hwLoopbackDetectCfgPortName,
+                       hwLoopbackDetectCfg,
+                       hwLoopbackDetectRowStatus
+            }
+           STATUS      current
+           DESCRIPTION
+               "Entries about the loop detect configuration and blocking state group."
+           ::= { hwLoopDetectLastGroups 1 }    
+            
+		-- 1.3.6.1.4.1.2011.25.180.11
+		hwAutoLoopDetectCfgTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwAutoLoopDetectCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwLoopDetectMIB 11 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.11.1
+		hwAutoLoopDetectCfgEntry OBJECT-TYPE
+			SYNTAX HwAutoLoopDetectCfgEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwAutoLoopDetectCfgPortIndex }
+			::= { hwAutoLoopDetectCfgTable 1 }
+		
+		HwAutoLoopDetectCfgEntry ::=
+			SEQUENCE { 
+				hwAutoLoopDetectCfgPortIndex
+					Integer32,
+				hwAutoLoopDetectCfgPortName
+					OCTET STRING,
+				hwAutoLoopDetectCfg
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.2011.25.180.11.1.1
+		hwAutoLoopDetectCfgPortIndex OBJECT-TYPE
+			SYNTAX Integer32 (0..2147483647)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwAutoLoopDetectCfgEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.11.1.2
+		hwAutoLoopDetectCfgPortName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwAutoLoopDetectCfgEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.11.1.3
+		hwAutoLoopDetectCfg OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(0),
+				disable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwAutoLoopDetectCfgEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.13
+		hwAutoLoopDetectTrapTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwAutoLoopDetectTrapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about a blocked interface."
+			::= { hwLoopDetectMIB 13 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.13.1
+		hwAutoLoopDetectTrapEntry OBJECT-TYPE
+			SYNTAX HwAutoLoopDetectTrapEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the entries about the auto loop detect configuration."
+			INDEX { hwAutoLoopDetectTrapPortName }
+			::= { hwAutoLoopDetectTrapTable 1 }
+		
+		HwAutoLoopDetectTrapEntry ::=
+			SEQUENCE { 
+				hwAutoLoopDetectTrapPortName
+					OCTET STRING,
+				hwAutoLoopDetectTrapVlan
+					Integer32,
+				hwAutoLoopDetectTrapVsiName
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.25.180.13.1.1
+		hwAutoLoopDetectTrapPortName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..64))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of a blocked interface."
+			::= { hwAutoLoopDetectTrapEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.13.1.2
+		hwAutoLoopDetectTrapVlan OBJECT-TYPE
+			SYNTAX Integer32 (0..4096)
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VLAN domain to which a blocked interface belongs."
+			::= { hwAutoLoopDetectTrapEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.13.1.3
+		hwAutoLoopDetectTrapVsiName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..32))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VSI domain to which a blocked interface belongs."
+			::= { hwAutoLoopDetectTrapEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.14
+		hwAutoLoopDetectGlobalCfgEntry OBJECT IDENTIFIER ::= { hwLoopDetectMIB 14 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.14.1
+		hwAutoLoopDetectGlobalCfg OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(0),
+				disable(1)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwAutoLoopDetectGlobalCfgEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.15
+		hwAutoLoopDetectConformance OBJECT IDENTIFIER ::= { hwLoopDetectMIB 15 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.15.1
+		hwAutoLoopDetectConformances OBJECT IDENTIFIER ::= { hwAutoLoopDetectConformance 1 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.15.1.1
+		hwAutoLoopDetectConpliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwAutoLoopDetectEntryGroups }
+			::= { hwAutoLoopDetectConformances 1 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.15.1.2
+		hwAutoLoopDetectGroups OBJECT IDENTIFIER ::= { hwAutoLoopDetectConformances 2 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.15.1.2.1
+		hwAutoLoopDetectEntryGroups OBJECT-GROUP
+			OBJECTS { hwAutoLoopDetectTrapPortName, hwAutoLoopDetectTrapVsiName, hwAutoLoopDetectTrapVlan, hwAutoLoopDetectGlobalCfg, hwAutoLoopDetectCfgPortName, 
+				hwAutoLoopDetectCfg }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwAutoLoopDetectGroups 1 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.15.1.2.2
+		hwAutoLoopDetectTrapGroups NOTIFICATION-GROUP
+			NOTIFICATIONS { hwAutoLoopDetectTriggerDown, hwAutoLoopDetectUnTriggerDown }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwAutoLoopDetectGroups 2 }
+			 
+		-- 1.3.6.1.4.1.2011.25.180.15.1.2.3
+		hwAutoLoopDetectResourceTrapGroups NOTIFICATION-GROUP
+			NOTIFICATIONS { hwLoopDetectNoResource,  hwLoopDetectReGetResource}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwAutoLoopDetectGroups 3 } 
+			
+		-- 1.3.6.1.4.1.2011.25.180.16
+		hwLoopDetectEnlargeCfgEntry OBJECT IDENTIFIER ::= { hwLoopDetectMIB 16 }
+		
+		-- 1.3.6.1.4.1.2011.25.180.16.1
+		hwLoopDetectEnlargeCfg OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(0)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwLoopDetectEnlargeCfgEntry 1 }	
+    END
+
+--
+-- HUAWEI-LOOPDETECT-MIB.mib
+--

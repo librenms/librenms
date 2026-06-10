@@ -1,0 +1,230 @@
+	XF-TOP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			enterprises, Integer32, Gauge32, MODULE-IDENTITY			
+				FROM SNMPv2-SMI			
+			TEXTUAL-CONVENTION			
+				FROM SNMPv2-TC;
+	
+	
+		-- 1.3.6.1.4.1.193.81
+		miniLinkXF MODULE-IDENTITY 
+			LAST-UPDATED "201210101600Z"		-- October 10, 2012 at 16:00 GMT
+			ORGANIZATION 
+				"Ericsson"
+			CONTACT-INFO 
+				" "
+			DESCRIPTION 
+				"This MIB specifies the highest level OIDs for 
+				the MINI-LINK Traffic Node product.
+				"
+
+			REVISION "201210101600Z"		-- October 10, 2012 at 16:00 GMT
+			DESCRIPTION 
+				"T : Fixed minor syntax warnings"
+			REVISION "201208311600Z"		-- August 31, 2012 at 16:00 GMT
+			DESCRIPTION 
+				"S : Changed to legal revision"
+			REVISION "201206131600Z"		-- June 13, 2012 at 16:00 GMT
+			DESCRIPTION 
+				"P : Added xfRps subtree."
+			REVISION "201109101200Z"		-- September 10, 2011 at 12:00 GMT
+			DESCRIPTION 
+				"O : Added xfCesService subtree."
+			REVISION "201009221100Z"		-- September 22, 2010 at 11:00 GMT
+			DESCRIPTION 
+				"N : Added xfPT6010 subtree for PT6010"
+			REVISION "201004201000Z"		-- April 20, 2010 at 10:00 GMT
+			DESCRIPTION 
+				"M : Added xfCN500 subtree for compact node 500."
+			REVISION "201001261000Z"		-- January 26, 2010 at 10:00 GMT
+			DESCRIPTION 
+				"L : Added xfCN210 subtree for compact node 210."
+			REVISION "200903161200Z"		-- March 16, 2009 at 12:00 GMT
+			DESCRIPTION 
+				"K : corrected Xf24HrsSeconds to 86400.
+				"
+			REVISION "200901221100Z"		-- January 22, 2009 at 11:00 GMT
+			DESCRIPTION 
+				"J : Length of xfProductRevison increased
+				    from 10 to 40."
+			REVISION "200802251444Z"		-- February 25, 2008 at 14:44 GMT
+			DESCRIPTION 
+				"H : Added xfSdhAdm"
+			REVISION "200601261224Z"		-- January 26, 2006 at 12:24 GMT
+			DESCRIPTION 
+				"G added xfAtmAggregationUnit"
+			REVISION "200502251600Z"		-- February 25, 2005 at 16:00 GMT
+			DESCRIPTION 
+				"F changed xfServiceApplications to
+				  added xfIpSau"
+			REVISION "200401231111Z"		-- January 23, 2004 at 11:11 GMT
+			DESCRIPTION 
+				"E Added xfRadioLink"
+			REVISION "200306190924Z"		-- June 19, 2003 at 09:24 GMT
+			DESCRIPTION 
+				"D 
+				Changed the Xf15MinSeconds and
+				Xf24Seconds to start with 1"
+			REVISION "200203071329Z"		-- March 07, 2002 at 13:29 GMT
+			DESCRIPTION 
+				"C 
+				Added TC for Product
+				number and revision
+				Added TCs for seconds counter 15min
+				and 24hrs
+				Changed contact info
+				"
+			REVISION "200110081501Z"		-- October 08, 2001 at 15:01 GMT
+			DESCRIPTION 
+				"B etoall: xfMCR instead xfRadio"
+			REVISION "200104020000Z"		-- April 02, 2001 at 00:00 GMT
+			DESCRIPTION 
+				"Rev. A   etoall
+				Initial version"
+			::= { ericsson 81 }
+
+		
+	
+--
+-- Textual conventions
+--
+	
+		XfProductnumber ::= TEXTUAL-CONVENTION
+			DISPLAY-HINT "30t"
+			STATUS current			
+			DESCRIPTION 
+				"A string indicating the product number
+				like 'RORJ605 001/1'. The string must be compliant to 
+				standard Ericsson format for product numbers."
+			SYNTAX OCTET STRING (SIZE (0..30))
+
+		XfProductRevision ::= TEXTUAL-CONVENTION
+			DISPLAY-HINT "40t"
+			STATUS current
+			DESCRIPTION 
+				"String indicating a product revision like 'R1A00'. 
+				The string must comply to standard Ericsson product 
+				revision numbers.
+				"
+			SYNTAX OCTET STRING (SIZE (0..40))
+
+		Xf24HrsSeconds ::= TEXTUAL-CONVENTION
+		    DISPLAY-HINT "d"
+			STATUS current
+			DESCRIPTION 
+				"General definition for perfomance threshold for 24 hours."
+			SYNTAX Integer32 (1..86400)
+
+		Xf15MinSeconds ::= TEXTUAL-CONVENTION
+		    DISPLAY-HINT "d"
+			STATUS current
+			DESCRIPTION 
+				"General definition for perfomance threshold for 15 minutes."
+			SYNTAX Integer32 (1..900)
+
+		Xf24HrsSecondsGauge ::= TEXTUAL-CONVENTION
+			DISPLAY-HINT "d"
+			STATUS current
+			DESCRIPTION 
+				"General definition for counting the number of seconds 
+				in 24 hours."
+			SYNTAX Gauge32 (0..86400)
+
+		Xf15MinSecondsGauge ::= TEXTUAL-CONVENTION
+			DISPLAY-HINT "d"
+			STATUS current
+			DESCRIPTION
+				"General definition for counting the number of seconds 
+				in 15 minutes."
+			SYNTAX Gauge32 (0..900)
+
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.193
+		ericsson OBJECT IDENTIFIER ::= { enterprises 193 }
+
+		
+		-- 1.3.6.1.4.1.193.81.1
+		xfSysId OBJECT IDENTIFIER ::= { miniLinkXF 1 }
+
+		
+		-- 1.3.6.1.4.1.193.81.2
+		xfPlatform OBJECT IDENTIFIER ::= { miniLinkXF 2 }
+
+		
+-- XfMediaSpecific branch is meant for the Link Applications.
+		-- 1.3.6.1.4.1.193.81.3
+		xfMediaSpecific OBJECT IDENTIFIER ::= { miniLinkXF 3 }
+
+		
+		-- 1.3.6.1.4.1.193.81.3.1
+		xfPDH OBJECT IDENTIFIER ::= { xfMediaSpecific 1 }
+
+		
+		-- 1.3.6.1.4.1.193.81.3.2
+		xfSDH OBJECT IDENTIFIER ::= { xfMediaSpecific 2 }
+
+		
+		-- 1.3.6.1.4.1.193.81.3.3
+		xfMCR OBJECT IDENTIFIER ::= { xfMediaSpecific 3 }
+
+		
+-- XfRadioLink is used for the MMU3 generation, both
+-- medium as well as high capacity.
+		-- 1.3.6.1.4.1.193.81.3.4
+		xfRadioLink OBJECT IDENTIFIER ::= { xfMediaSpecific 4 }
+
+		
+		-- 1.3.6.1.4.1.193.81.4
+		xfServiceApplications OBJECT IDENTIFIER ::= { miniLinkXF 4 }
+
+		
+		-- 1.3.6.1.4.1.193.81.4.1
+		xfEthernetBridge OBJECT IDENTIFIER ::= { xfServiceApplications 1 }
+
+		
+		-- 1.3.6.1.4.1.193.81.4.2
+		xfAtmAggregationUnit OBJECT IDENTIFIER ::= { xfServiceApplications 2 }
+
+		
+		-- 1.3.6.1.4.1.193.81.4.3
+		xfSdhAdm OBJECT IDENTIFIER ::= { xfServiceApplications 3 }
+
+		
+		-- 1.3.6.1.4.1.193.81.4.4
+		xfCesService OBJECT IDENTIFIER ::= { xfServiceApplications 4 }
+
+		
+		-- 1.3.6.1.4.1.193.81.4.5
+		xfRps OBJECT IDENTIFIER ::= { xfServiceApplications 5 }
+
+		
+		-- 1.3.6.1.4.1.193.81.5
+		xfIpSau OBJECT IDENTIFIER ::= { miniLinkXF 5 }
+
+		
+-- Used by Compact Node 210.
+		-- 1.3.6.1.4.1.193.81.6
+		xfCN210 OBJECT IDENTIFIER ::= { miniLinkXF 6 }
+
+		
+-- Used by Compact Node 500.
+		-- 1.3.6.1.4.1.193.81.7
+		xfCN500 OBJECT IDENTIFIER ::= { miniLinkXF 7 }
+
+		
+-- Used by PT6010.
+		-- 1.3.6.1.4.1.193.81.8
+		xfPT6010 OBJECT IDENTIFIER ::= { miniLinkXF 8 }
+
+		
+	
+	END
+
+--
+-- 3_19603-crxr10201_1_top.mi2
+--

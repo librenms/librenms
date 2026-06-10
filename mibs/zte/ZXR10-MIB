@@ -1,0 +1,3402 @@
+ZXR10-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Counter32, Gauge32,
+       Integer32, TimeTicks, Counter64,
+       NOTIFICATION-TYPE,
+       enterprises                      FROM SNMPv2-SMI
+       MacAddress
+                FROM SNMPv2-TC
+                  mgmt, NetworkAddress, IpAddress, Counter, Gauge
+                         FROM RFC1155-SMI
+      --         Counter, TimeTicks     FROM RFC1155-SMI
+      -- IpAddress,DisplayString, mib-2   FROM RFC1213-MIB
+      --            OBJECT-TYPE            FROM RFC-1212
+                  TRAP-TYPE              FROM RFC-1215;
+
+   zte OBJECT IDENTIFIER ::= { enterprises 3902 }
+   zxr10 OBJECT IDENTIFIER ::= { zte 3}
+
+       -- LAST-UPDATED "0108230840Z"
+       -- ORGANIZATION "ZTE"
+       -- CONTACT-INFO
+
+       -- Nanjing Institute of Telecom,ZTE Corporation
+       -- Postal: 9F. No.54 Building, 301# East ZhongShan Rd.
+       -- Nan Jing, China
+       -- Tel:    86-25-4826606-3821
+       -- E-Mail: li.xinshuang@mail.zte.com.cn
+       -- DESCRIPTION
+       -- The MIB module which descript the zxr10rack mib
+       -- object which defined in enterprise's ZTE(3902)
+
+
+    --  textual conventions
+
+      DisplayString ::= OCTET STRING
+          --  This data type is used to model textual information taken
+          --  from the NVT ASCII character set.  By convention, objects
+          --  with this syntax are declared as having
+          --
+          --       SIZE (0..255)
+
+      AvailStatus ::= INTEGER
+                      {
+                        out(0),
+                        in(1)
+                      }
+      -- in(1) indicate "board in slot"  and out(2) indicate "board not in slot" for board
+      -- in(1) indicate "physical level initialize ok"  and out(2) indicate "not ok " for port
+
+      OperStatus ::= INTEGER
+                      {
+                        down(0),
+                        up(1)
+                      }
+                
+      PortProperty ::= INTEGER
+                      {
+                        photo(0),
+                        electricity(1),
+                        phoelecmix(3),
+                        console(4)
+                      }
+      -- up(1) indicate "mpu and rpu both run normally"  and down(2) indicate "erro " for upc board
+      -- up(1) indicate "link level run normally"  and down(2) indicate "erro " for port
+      -- up(1) indicate "upc communicate with them(sfc,upc) normally"  and down(2) indicate "erro " for sfc npc board
+      -- up(1) indicate "fan run normally"  and down(2) indicate "erro " for fan
+      -- up(1) indicate "power on"  and down(2) indicate "off " for power
+
+      MasterStatus ::= INTEGER
+                       {
+                         master(1),
+                         slave(2),
+                         member(3)
+                       }
+      -- as for board upc and board sfc ,master indicates masterStatus,slave indicates slaveStatus
+      -- for npc, power ,fan only one status : master status
+
+    UnitRunStatus ::=INTEGER
+                  {
+                     down(0),
+                     up(1)
+                  }
+    -- up indicates the unit is running
+    -- down indicates the unit is shutdown
+
+    PidUsedStatus ::=INTEGER
+                  {
+                    reserved(0),
+                    used(1)
+                  }
+    -- used means the pid is in using
+    -- reserved means the pid is not exist
+
+    BoolStatus ::=INTEGER
+               {
+                 true(1),
+                 false(0)
+               }
+    --true false
+
+     ProductID ::=INTEGER
+              {
+                zxr10RouterT128(1),
+                zxr10RouterT64(2),
+                zxr10RouterT32(3),
+                zxr10Routergar-2608(4),
+                zxr10Routerger8(5),
+                zxr10Routergar-2604(6),
+                zxr10SwitchT160G(7),
+                zxr10Routergar-3608(8),
+                zxr10Routergar-7208(9),
+                zxr10SwitchT64G(10),
+                zxr10Switch3206(11),
+                zxr10Switch3906(12),
+                zxr10Switch3228(13),
+                zxr10Switch3928(14),
+                zxr10Switch3252(15),
+                zxr10Switch3952(16),                
+                zxr10Switch5224(17),
+                zxr10Switch5228(18),
+                zxr10Switch5228F(19),
+                zxr10Switch5928(20),
+                zxr10Switch5928F(21),
+                zxr10Switch5252(22),
+                zxr10Switch5952(23),
+                zxr10Switch3226(24),               
+                zxr10SwitchT40G(25),
+                zxr10RouterT1200(26),
+                zxr10RouterT600(27),
+                zxr10Routerger2(28),
+                zxr10Routerger4(29),
+                zxr10Switch3226FI(30),
+                zxr10Switch3928A(31),
+                zxr10Switch3928AFI(32),
+                zxr10Switch3952A(33),
+                zxr10Switch3228A-EI(34),
+                zxr10Switch3228A(35),
+                zxr10Switch3228A-FI(36),
+                zxr10Switch3252A(37),
+                zxr10Switch5228A(38),
+                zxr10Switch5252A(39),
+                zxr10Switch3928E(40),
+                zxr10Switch3928E-FI(41),
+                zxr10Switch3952E(42),
+                zxr10Switch5952E(43),
+                zxr10RouterR10-1822-AC(100),      
+                zxr10RouterR10-1822-DC(101),      
+                zxr10RouterR10-1821-AC(102),      
+                zxr10RouterR10-1821-DC(103),      
+                zxr10RouterR10-1812-AC(104),      
+                zxr10RouterR10-1812-DC(105),      
+                zxr10RouterR10-1811-AC(106),      
+                zxr10RouterR10-1811-DC(107),      
+                zxr10RouterR10-1822E-AC(108),     
+                zxr10RouterR10-1822E-DC(109),     
+                zxr10RouterR10-1821E-AC(110),     
+                zxr10RouterR10-1821E-DC(111),     
+                zxr10RouterR10-1812E-AC(112),     
+                zxr10RouterR10-1812E-DC(113),     
+                zxr10RouterR10-1811E-AC(114),     
+                zxr10RouterR10-1811E-DC(115),     
+                zxr10RouterR10-3881-AC(132),      
+                zxr10RouterR10-3882-AC(133),      
+                zxr10RouterR10-3883-AC(134),      
+                zxr10RouterR10-3884-AC(135),      
+                zxr10RouterR10-3881-DC(136),      
+                zxr10RouterR10-3882-DC(137),      
+                zxr10RouterR10-3883-DC(138),      
+                zxr10RouterR10-3884-DC(139),      
+                zxr10RouterR10-3841-AC(140),      
+                zxr10RouterR10-3842-AC(141),      
+                zxr10RouterR10-3843-AC(142),      
+                zxr10RouterR10-3844-AC(143),      
+                zxr10RouterR10-3841-DC(144),      
+                zxr10RouterR10-3842-DC(145),      
+                zxr10RouterR10-3843-DC(146),      
+                zxr10RouterR10-3844-DC(147),      
+                zxr10RouterR10-3821-AC(148),      
+                zxr10RouterR10-3822-AC(149),      
+                zxr10RouterR10-3823-AC(150),      
+                zxr10RouterR10-3824-AC(151),      
+                zxr10RouterR10-3821-DC(152),      
+                zxr10RouterR10-3822-DC(153),      
+                zxr10RouterR10-3823-DC(154),      
+                zxr10RouterR10-3824-DC(155),      
+                zxr10RouterR10-2841-AC(172),      
+                zxr10RouterR10-2842-AC(173),      
+                zxr10RouterR10-2843-AC(174),      
+                zxr10RouterR10-2844-AC(175),      
+                zxr10RouterR10-2841-DC(176),      
+                zxr10RouterR10-2842-DC(177),      
+                zxr10RouterR10-2843-DC(178),      
+                zxr10RouterR10-2844-DC(179),      
+                zxr10RouterR10-2881-AC(180),      
+                zxr10RouterR10-2882-AC(181),      
+                zxr10RouterR10-2883-AC(182),      
+                zxr10RouterR10-2884-AC(183),      
+                zxr10RouterR10-2881-DC(184),      
+                zxr10RouterR10-2882-DC(185),      
+                zxr10RouterR10-2883-DC(186),      
+                zxr10RouterR10-2884-DC(187),      
+                zxr10RouterR10-2821-AC(188),      
+                zxr10RouterR10-2822-AC(189),      
+                zxr10RouterR10-2823-AC(190),      
+                zxr10RouterR10-2824-AC(191),      
+                zxr10RouterR10-2821-DC(192),      
+                zxr10RouterR10-2822-DC(193),      
+                zxr10RouterR10-2823-DC(194),      
+                zxr10RouterR10-2824-DC(195),      
+                zxr10RouterR10-1841-AC(196),      
+                zxr10RouterR10-1842-AC(197),      
+                zxr10RouterR10-1843-AC(198),      
+                zxr10RouterR10-1844-AC(199),      
+                zxr10RouterR10-1841-DC(200),      
+                zxr10RouterR10-1842-DC(201),      
+                zxr10RouterR10-1843-DC(202),      
+                zxr10RouterR10-1844-DC(203),
+                zxr10Switch-6907(400),
+                zxr10Switch-T240G(401),
+                zxr10Switch-6902(402),
+                zxr10Switch-6905(403),
+                zxr10Switch-6908(404),
+                zxr10Switch-8902(405),
+                zxr10Switch-8905(406),
+                zxr10Switch-8908(407),
+                zxr10Switch-8912(408),
+                zxctn-6100(409),
+                zxr10Switch5928-PS(417),
+                zxr10Switch3928A-PS(418), 
+                zxr10Switch3928E(419),
+                zxr10Switch3928E-FI(420),
+                zxr10UAS10600(5000)
+              }
+
+    BoardType ::= INTEGER
+                    {
+                         upc-board(1),
+                         sfc-board(2),
+                         npc-board(3),
+                         mec-board(4),
+                         smp-board(5),
+                         mcp-board(6)
+                    }
+
+    NpcType ::= INTEGER
+                {
+                      card-fei-8(512),
+                      card-fei-f(513),
+                      card-fei-b(514),
+                      card-fei-o(515),
+                      card-fei-e(516),
+                      card-fei-1(517),
+                      card-fei-b2(518),
+                      card-fei-b-es(519),
+                      card-fei-48(520),
+                      card-fei-o8(521),
+                      card-fei-44-4-e(522),
+                      card-fei-44-4-e-ez(523),
+                      card-fei-24(524),
+                      card-fei-16(525),
+                      card-fei-2(526),
+                      card-fei-4(527),
+                      card-fei-o-16(528),
+                      card-fei-44-4-fi(529),
+                      card-fei-44-4-fi-ez(530), 
+                      card-mfe-2(531),
+                      card-fei-24e(532),
+                      card-fei-24eo(533),
+                      card-mefes(534),
+                      card-mfef(535),
+                      card-msgfs(536),
+                      card-megfs(537),
+                      card-msfes(538),
+                      card-mfef-2(539),
+                      card-fei-24-2-fi(542),
+                      card-fei-o24-2-fi(543),
+                      card-fei-48-4-fi(544),
+                      card-gei-8(1025),
+                      card-gei-l(1026),
+                      card-gei-g-1(1027),
+                      card-gei-g-2(1028),
+                      card-gei-2(1029),
+                      card-gei-o(1030),
+                      card-gei-o-g(1031),
+                      card-gei-e(1032),
+                      card-gei-g-2-es(1033),
+                      card-gei-12(1034),
+                      card-gei-x(1035),
+                      card-gei-h4(1036),
+                      card-gei-h2(1037),
+                      card-gei-24(1038),
+                      card-gei-12-4e(1039),
+                      card-gei-24-4e(1040),                   
+                      card-gei-x-2(1041),
+                      card-gei-x-1-ez(1042),
+                      card-gei-x-ez(1043),
+                      card-gei-12-4e-ez(1044),
+                      card-gei-t2(1045),
+                      card-gei-4-12e(1046),
+                      card-gei-4-24e(1047),
+                      card-gei-4-12e-ez(1048), 
+                      card-10gei-1(1049),
+                      card-gei-1(1050),
+                      card-gei-4o-24e-l(1051),
+                      card-gei-24o-4e(1052),
+                      card-gei-x-1o-w(1053),
+                      card-gei-x-1o-la(1054),
+                      card-gei-x-1e(1055),
+                      card-gei-x-1e-d(1056),
+                      card-gei-x-4o-48e(1057),
+                      card-gei-f-2(1058),
+                      card-gei-10(1059),
+                      card-gei-4(1060),
+                      card-gei-2e(1061),
+                      card-gei-2o(1062),
+                      card-gei-1o-1e(1063),
+                      card-gei-8-p4(1064),
+                      card-gei-8-p4-ez(1065),
+                      card-gei-4b(1066),
+                      card-gei-10-b(1067),
+                      card-gei-4-b(1068),
+                      card-gei-x-2ef(1069),
+                      card-gei-x-4ef(1070),
+                      card-gei-24ec(1071),
+                      card-gei-24ef(1072),
+                      card-gei-48ec(1073),
+                      card-gei-48ef(1074),
+                      ccard-gei-x2-n-ez(1075),
+                      card-gei-24-n-ez(1076), 
+                      card-gei-x-2ef-lit(1077),
+                      card-gei-x-4ef-lit(1078),
+                      card-gei-24ec-lit(1079),
+                      card-gei-24ef-lit(1080),
+                      card-gei-48ec-lit(1081),
+                      card-gei-48ef-lit(1082),
+                      card-gei-x-2ef-den(1083),
+                      card-gei-x-4ef-den(1084),
+                      card-gei-24ec-den(1085),
+                      card-gei-24ef-den(1086),
+                      card-gei-48ec-den(1087),
+                      card-gei-48ef-den(1088),  
+                      card-gei-24f-fg(1089),
+                      card-gei-24f-fg-lit(1090),
+                      card-gei-24f-fg-den(1091),
+                      card-gei-24hec(1092),
+                      card-gei-24hec-lit(1093),
+                      card-gei-24hec-den(1094),
+                      card-gei-24hef(1095),
+                      card-gei-24hef-lit(1096),
+                      card-gei-24hef-den(1097),
+                      card-gei-24hf-fg(1098),
+                      card-gei-24hf-fg-lit(1099),
+                      card-gei-24hf-fg-den(1100),
+                      card-gei-48f-fg(1101),
+                      card-gei-48f-fg-lit(1102),
+                      card-gei-48f-fg-den(1103), 
+                      card-gei-24ef-x11(1104),
+                      card-gei-24ec-x11(1105),
+                      card-gei-24hef-x11(1106),
+                      card-gei-48ef-x11(1107),
+                      card-gei-24hec-x11(1108),
+                      card-gei-48ec-x11(1109),
+                      card-gei-x-2ef-x11(1110),
+                      card-gei-x-4ef-x11(1111),
+                      card-wan-x(1112),
+                      card-gei-4-d(1113),
+                      card-gei-x-8ef(1114),
+                      card-ugse-gei-48ec(1115),
+                      card-ugse-gei-48ec-lit(1116),
+                      card-ugse-gei-48ec-den(1117),
+                      card-ugsf-gei-48ef(1118),
+                      card-ugsf-gei-48ef-lit(1119),
+                      card-ugsf-gei-48ef-den(1120),
+                      card-umtf-gei-24ef(1121),
+                      card-umtf-gei-24ef-lit(1122),
+                      card-umtf-gei-24ef-den(1123),
+                      card-umtf-gei-24ef-2x(1124),
+                      card-umtf-gei-24ef-2x-lit(1125),
+                      card-umtf-gei-24ef-2x-den(1126),
+                      card-umtf-gei-24ef-ez(1127),
+                      card-umtf-gei-24ef-lit-ez(1128),
+                      card-umtf-gei-24ef-den-ez(1129),
+                      card-umte-gei-24ef(1130), 
+                      card-umte-gei-24ef-lit(1131),
+                      card-umte-gei-24ef-den(1132),
+                      card-umte-gei-24ef-2x(1133),
+                      card-umte-gei-24ef-2x-lit(1134),
+                      card-umte-gei-24ef-2x-den(1135),
+                      card-umte-gei-24ef-ez(1136),
+                      card-umte-gei-24ef-lit-ez(1137),
+                      card-umte-gei-24ef-den-ez(1138),
+                      card-gei-e-sfp(1139),
+                      card-gei-8f(1140),
+                      card-uwsa8541-g-24(1141),
+                      card-stack(1142),
+                      card-gei-8e(1143),
+                      card-umhf-gei-x-4ef(1144),
+                      card-umhf-gei-x-4ef-1ez(1145),
+                      card-umhf-gei-x-4ef-2ez(1146),
+                      card-umhf-gei-x-4ef-1ez-left(1147),
+                      card-umtf1-gei-l2ef(1149),
+                      card-umtf1-gei-l2ef-lit(1150),
+                      card-umtf1-gei-l2ef-den(1151),
+                      card-umtf1-gei-l2ef-2x(1152),
+                      card-umtf1-gei-l2ef-2x-lit(1153),
+                      card-umtf1-gei-l2ef-2x-den(1154),
+                      card-umtf1-gei-l2ef-ez(1155),
+                      card-umtf1-gei-l2ef-lit-ez(1156),
+                      card-umtf1-gei-l2ef-den-ez(1157),
+                      card-umte1-gei-l2ef(1158),
+                      card-umte1-gei-l2ef-lit(1159),
+                      card-umte1-gei-l2ef-den(1160),
+                      card-umte1-gei-l2ef-2x(1161),
+                      card-umte1-gei-l2ef-2x-lit(1162),
+                      card-umte1-gei-l2ef-2x-den(1163),
+                      card-umte1-gei-l2ef-ez(1164),
+                      card-umte1-gei-l2ef-lit-ez(1165),
+                      card-umte1-gei-l2ef-den-ez(1166),
+                      card-sygf-gei-12ef-2x(1168),
+                      card-sygf-gei-12ef-2x-den(1169),
+                      card-sygf-gei-12ef-2x-ez(1170),
+                      card-sygf-gei-12ef-2x-den-ez(1171),
+                      card-sygf-gei-12ef-2x-clock(1172),
+                      card-sygf-gei-12ef-2x-den-clock(1173),
+                      card-sygf-gei-12ef-2x-ez-clock(1174),
+                      card-sygf-gei-12ef-2x-den-ez-clock(1175),
+                      card-umhf-gei-x-2ef(1184),
+                      card-umhf-gei-x-2ef-1ez(1185),
+                      card-umhf-gei-x-2ef-2ez(1186),
+                      card-umhf-gei-x-2ef-1ez-left(1187),
+                      card-gei-4oi-48e(1188),
+                      card-gei-4oi-24e(1189),
+                      card-umop-12gefi-12epon(1190),
+                      card-umop-12gefi-12epon-den(1191),
+                      card-umop-12gefi-12epon-ez(1192),
+                      card-umop-12gefi-12epon-den-ez(1193),
+                      card-umop-12gefi-8epon(1194),
+                      card-umop-12gefi-8epon-den(1195),
+                      card-umop-12gefi-8epon-ez(1196),
+                      card-umop-12gefi-8epon-den-ez(1197),
+                      card-umop-12gefi-4epon(1198),
+                      card-umop-12gefi-4epon-den(1199),
+                      card-umop-12gefi-4epon-ez(1200),
+                      card-umop-12gefi-4epon-den-ez(1201),
+                      card-uxhf-2c-2xefi(1202),
+                      card-uxhf-2c-2xefi-lit(1203),
+                      card-uxhf-2c-2xefi-den(1204),
+                      card-ge48a(1205),
+                      card-ge24a(1206),
+                      card-utqf-gei-12ef-1588-clock-no(1207),
+                      card-utqf-gei-12ef-1588-clock-left(1208),
+                      card-utqf-gei-12ef-1588-clock-right(1209),
+                      card-utqf-gei-12ef-1588-clock(1210),
+                      card-utqf-gei-12ef-1588-clock-no-den(1211),
+                      card-utqf-gei-12ef-1588-clock-left-den(1212),
+                      card-utqf-gei-12ef-1588-clock-right-den(1213),
+                      card-utqf-gei-12ef-1588-clock-den(1214),
+                      card-utqf-gei-12ef-1588-clock-no-ez(1215),
+                      card-utqf-gei-12ef-1588-clock-left-ez(1216),
+                      card-utqf-gei-12ef-1588-clock-right-ez(1217),
+                      card-utqf-gei-12ef-1588-clock-ez(1218),
+                      card-utqf-gei-12ef-1588-clock-no-den-ez(1219),
+                      card-utqf-gei-12ef-1588-clock-left-den-ez(1220),
+                      card-utqf-gei-12ef-1588-clock-right-den-ez(1221),
+                      card-utqf-gei-12ef-1588-clock-den-ez(1222),
+                      card-gei-48ef-den-replace-ufsf(1223),
+                      card-gei-48ef-replace-ufsf(1224),
+                      card-umtf1-gei-12ef-ez-replace-xgm(1225),
+                      card-umtf1-gei-12ef-den-ez-replace-xgm(1226),
+                      card-ge24d(1227),  
+                      card-UVSF-H3(1228), 
+                      card-UVFF-H3(1229),
+                      card-UWSF-H3(1230),
+                      card-UVTF-H3(1235),  
+                      card-USFF-H3(1236),
+                      card-SF-24GE-H3(1237),
+                      card-oc3(1538),
+                      card-oc3-4(1539),
+                      card-oc12(1540),
+                      card-oc48(1541),
+                      card-oc48-2(1542),
+                      card-oc3-c(1543),
+                      card-oc48-c(1544),
+                      card-oc48-dl(1545),
+                      card-oc48-sg(1546),
+                      card-oc48-2-dl(1547),
+                      card-oc3-8(1548), 
+                      card-oc192-1-ez(1549),
+                      card-oc3-8-pm5351(1550),
+                      card-oc3-c-2(1551),
+                      card-oc192b-1-ez(1552),
+                      card-oc48f(1553),
+                      card-oc48-4(1554),
+                      card-atm155(2051),
+                      card-atm622(2052),
+                      card-atm155-8(2053),
+                      card-atm155-rev(2054),
+                      card-atm155-4(2055),                      
+                      card-e1-16(2564),
+                      card-e1-32(2565),
+                      card-e1-c-32(2566),
+                      card-e1-c(2567),
+                      card-e1-c-4(2568),
+                      card-e1-c-8(2569),
+                      card-e1-c-8-ixbus(2570),
+                      card-e1-c-1(2571),
+                      card-e1-c-2(2572),
+                      card-e1vi(2573),
+                      card-e1-c-8-pm7366(2574), 
+                      card-t1-c-4(3077), 
+                      card-t1-4(3078),
+                      card-t1-c-1(3079),
+                      card-t1-c-2(3080),
+                      card-t1-c-8-pm7366(3081), 
+                      card-t3-c(4103),      
+                      card-t3(4104),
+                      card-smb(4609),
+                      card-e1te(4610),
+                      card-manage-qx-lct(4611),  
+                      card-e3-c(4616),      
+                      card-e3(4617),
+                      card-sygf-clkc-mmpi(4865),
+                      card-utqf-tphy-mmpi(4866),
+                      card-bpts(4867),                                              
+                      card-lhs(5129),
+                      card-aux(5130),
+                      card-lfxs(5131),
+                      card-lhsu(5132),
+                      card-lfxo(5133),
+                      card-lffxs-4(5134),
+                      card-lffxs-2(5135),
+                      card-ndec(5136),
+                      card-mhs8(5137),
+                      card-mhs16(5138),
+                      card-mndec(5139),
+                      card-mpc-tmcs-non-hg(5642),
+                      card-mpc-tmcs-8-hg(5643),
+                      card-mpc-umcs-12-hg(5644),
+                      card-mpc-umcs-16-hg(5645),
+                      card-mpc-umct-24-hg(5646),
+                      card-mpc-umcu-12-hg(5647),
+                      card-manage(128),
+                      card-manage-spec(129),
+                      card-manage-qx(130),
+                      card-manage-lct(131),
+                      card-loopback(161),
+                      card-gre(163),
+                      card-tunnel(164),
+                      card-mppp(165),
+                      card-vlan(166),
+                      card-null(167),
+                      card-port-channel(168),
+                      card-supervlan(169),
+                      card-dialer(170),
+                      card-vbui(171),
+                      card-virtual-template(173),
+                      card-virtual-access(174),
+                      card-superpvc(175),
+                      card-l2tpdialer(176),
+                      card-qinq(177),
+                      card-superqinq(178),
+                      card-uni(179),
+                      card-ces(180),
+                      card-cip(181),
+                      card-vip(182),
+                      upc-board(5001),
+                      sfc-board(5101),
+                      sfc2-board(5102),
+                      sfc3-board(5103),
+                      smp-board(5201),
+                      mcp-board(5301),
+                      mec-board(5401)
+                }
+
+    PortType ::= INTEGER
+                    {
+                      port-fei(512),
+                      port-gei(1025),
+                      port-gei-x(1026),
+                      port-wan-x(1027),
+                      port-stack(1028),
+                      port-gei-2e(1061),
+                      port-gei-2o(1062),
+                      port-gei-1o-1e(1063),
+                      port-gei-epon(1190), 
+                      port-oc3(1538),
+                      port-oc12(1539),
+                      port-oc48(1540),
+                      port-oc3-c(1541),
+                      port-oc48-c(1542),
+                      port-oc192(1543),
+                      port-atm155(2051),
+                      port-atm622(2052),
+                      port-e1(2564), 
+                      port-e1-c(2565),
+                      port-e1-c-ixbus(2566),
+                      port-e1vi(2567),
+                      port-e1vi-serial(2568), 
+                      port-t1(3077), 
+                      port-t1-c(3078), 
+                      port-tdm-e1(3590),
+                      port-tdm-ether(3591),
+                      port-tdm-inte-ether(3592),
+                      port-tdm-t1(3593), 
+                      port-t3(4103),
+                      port-t3-c(4104), 
+                      port-e3(4616),
+                      port-e3-c(4617),
+                      port-lhs(5129),
+                      port-aux(5130),
+                      port-lfxs(5131),
+                      port-lhsu(5132),
+                      port-lfxo(5133),
+                      port-async(5134),
+                      port-lffxs-2(5135),
+                      port-ndec(5136),
+                      port-mndec(5137),
+                      port-timer1588(5138),
+                      port-timer-ext(5139),
+                      port-manage-qx(5140),
+                      port-manage-lct(5141),
+                      port-timer-abs(5142),
+                      port-gps(5143),   
+                      port-manage(128),
+                      port-manage-spec(129),
+                      port-loopback(161),
+                      port-gre(163),
+                      port-tunnel(164),
+                      port-mppp(165),
+                      port-vlan(166),
+                      port-null(167),
+                      port-port-channel(168),
+                      port-supervlan(169),
+                      port-dialer(170),
+                      port-vbui(171),
+                      port-virtual-template(173),
+                      port-virtual-access(174),
+                      port-superpvc(175),
+                      port-l2tpdialer(176),
+                      port-qinq(177),
+                      port-superqinq(178),
+                      port-uni(179),
+                      port-ces(180),
+                      port-cip(181),
+                      port-vip(182)                      
+                    }
+
+AlarmType ::= INTEGER
+                  {
+                    hardware-environment(1),
+                    hardware-board(2),
+                    hardware-port(3),
+                    softprotocol-ros(65),
+                    softprotocol-database(66),
+                    softprotocol-oam(67),
+                    softprotocol-security(68),
+                    softprotocol-ospf(69),
+                    softprotocol-rip(70),
+                    softprotocol-bgp(71),
+                    softprotocol-drp(72),
+                    softprotocol-tcp-udp(73),
+                    softprotocol-ip(74),
+                    softprotocol-igmp(75),
+                    softprotocol-telnet(76),
+                    softprotocol-udp(77),
+                    softprotocol-arp(78),
+                    softprotocol-isis(79),
+                    softprotocol-icmp(80),
+                    softprotocol-snmp(81),
+                    softprotocol-rmon(82),
+                    softprotocol-nat(83),
+                    softprotocol-urpf(84),
+                    softprotocol-vswitch(85),
+                    softprotocol-acl(86),
+                    softprotocol-vrrp(87),
+                    softprotocol-ppp(88),
+                    softprotocol-scan(89),
+                    softprotocol-mac(90),
+                    softprotocol-alg(91),
+                    softprotocol-loopdetect(92),         
+                    softprotocol-session(93),
+                    softprotocol-dhcp(94),
+                    softprotocol-mld(95),
+                    softprotocol-stp(96),
+                    softprotocol-vlan(97),                    
+                    softprotocol-local-accounting(98),
+                    softprotocol-radius(99),                    
+                    softprotocol-ldp(100),
+                    softprotocol-amat(101),
+                    softprotocol-l2vpn(102),
+                    softprotocol-rsvp(103),
+                    softprotocol-zesr(104),
+                    softprotocol-igmp-snooping(105),
+                    softprotocol-fr(106),
+                    softprotocol-ethoam(107),
+                    softprotocol-ssh(108),
+                    softprotocol-tdm(109),
+                    softprotocol-qos(110),
+                    softprotocol-tacacs(111),
+                    softprotocol-aaa(112),
+                    softprotocol-ipv6(113),
+                    softprotocol-pim(114),
+                    softprotocol-fw(115), 
+                    softprotocol-mux(116),
+                    softprotocol-udld(117),                    
+                    softprotocol-mix(118),
+                    softprotocol-bfd(119),
+                    softprotocol-cfm(120),
+                    softprotocol-zess(128),
+                    statistics-aps(129),
+                    statistics-pdh-2m(130),
+                    statistics-epon(131)
+                  }
+     -- added by Tao Wen-qiang 2003-8-13 11:03
+     -- NOTES!!need update when new type alarm added
+     
+   PortWorkingType ::= INTEGER
+              {
+                auto-config(0),
+                full-duplex(1),
+                half-duplex(2)
+              }
+    -- full-duplex(1) indicate the port working type is full duplex
+    -- half-duplex(2) indicate the port working type is half duplex
+    
+    
+    
+    ShelfAttrib ::=INTEGER
+              { workshelf(1),
+                fanshelf(2),
+                powershelf(3),
+                environshelf(4)
+              }
+              
+    HostAttr   ::=INTEGER
+              {  global(0),
+                 mng(1),
+                 vrf(2)
+              }
+                 
+    SystemDeviceType ::=INTEGER
+              {  single(0),
+                 stack(1)
+              }
+              
+             
+      -- workshelf : the shelf of zxr10
+      -- fanshelf : the shelf of fan
+      -- powershelf : the shelf of power
+      -- environshelf : the shelf of environment
+    --  mib object in zxr10 group()
+    --  zxr10systemconfig,
+    --  zxr10rack
+
+    zxr10systemconfig OBJECT IDENTIFIER ::= { zxr10 1 }
+    zxr10rack OBJECT IDENTIFIER ::= { zxr10 2 }
+
+    --  mib object in zxr10systemconfig group
+       zxr10SystemID OBJECT-TYPE
+              SYNTAX  ProductID
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "An integer description of the zxr10SystemID."
+              ::= { zxr10systemconfig 1 }
+
+        zxr10SystemserialNo OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the serial no of the current system."
+              ::= { zxr10systemconfig 2 }
+
+        zxr10SystemDescrip OBJECT-TYPE
+              SYNTAX  DisplayString(SIZE(0..64))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "A texal description for the zxr10 System
+                       config information,The character must be
+                       printable ."
+              ::= { zxr10systemconfig 3 }
+
+        zxr10SystemTrapHost OBJECT-TYPE
+              SYNTAX  IpAddress
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                      "the ip address of trap host."
+              ::= { zxr10systemconfig 4 }
+
+
+        zxr10SystemTrapCommunity OBJECT-TYPE
+              SYNTAX  DisplayString(SIZE(0..32))
+              MAX-ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                      "the community of trap. "
+              ::= { zxr10systemconfig 5 }
+
+
+        zxr10SystemVersion OBJECT-TYPE
+              SYNTAX  DisplayString(SIZE(0..32))
+              MAX-ACCESS  read-only
+              STATUS current
+              DESCRIPTION
+                     "The version of current system."
+              ::= { zxr10systemconfig 6 }
+
+       zxr10SystemVpnName  OBJECT-TYPE                            
+                 SYNTAX  DisplayString (SIZE(0..16))            
+                 MAX-ACCESS  read-write       
+                 STATUS  current                                
+                 DESCRIPTION                                    
+                         "The Vrf VPN name of SNMP trap host."
+                 ::= { zxr10systemconfig 7 }  
+                                 
+      zxr10SystemHostAttr OBJECT-TYPE
+                 SYNTAX  HostAttr            
+                 MAX-ACCESS  read-write       
+                 STATUS  current                                
+                 DESCRIPTION                                    
+                         "The Vrf VPN name of SNMP trap host."
+                 ::= { zxr10systemconfig 8 }  
+
+      zxr10SystemEnableSecret OBJECT-TYPE
+                 SYNTAX  DisplayString (SIZE(3..16))           
+                 MAX-ACCESS  read-write       
+                 STATUS  current                                
+                 DESCRIPTION                                    
+                         "Specifies an ENCRYPTED secret."
+                 ::= { zxr10systemconfig 9 }  
+
+      zxr10SystemDeviceType OBJECT-TYPE
+                 SYNTAX        SystemDeviceType
+                 MAX-ACCESS    read-only
+                 STATUS        current
+                 DESCRIPTION   "The device is stack device or single device.
+                               1: stack device
+                               0: single device"
+                 ::= { zxr10systemconfig  12}
+                        
+    -- mib object in zxr10rack group
+
+    zxr10rackTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10RackEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 rackinfomation
+                       it is a list of rack entries."
+               ::= { zxr10rack 1 }
+
+    zxr10rackEntry  OBJECT-TYPE
+              SYNTAX  Zxr10RackEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A rack entry containing objects that
+                       descript the rack infomation,such as:
+                       rack no.,rack status,rack attribute."
+              INDEX  { zxr10RackNo }
+              ::= { zxr10rackTable 1 }
+
+    Zxr10RackEntry ::=
+              SEQUENCE {
+                zxr10RackNo
+                    INTEGER,
+                zxr10RackAttrib
+                    MasterStatus,
+                zxr10RackAvailStatus
+                    AvailStatus
+              }
+   zxr10RackNo  OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the no. of the special rack."
+              ::= { zxr10rackEntry 1 }
+   zxr10RackAttrib  OBJECT-TYPE
+              SYNTAX  MasterStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the attribute. of the special rack.
+                       eg ,the current rack is a master rack,
+                       we use 1,else if the rack is slave
+                       we use 2 ."
+              ::= { zxr10rackEntry 2 }
+   zxr10RackAvailStatus  OBJECT-TYPE
+              SYNTAX  AvailStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the status. of the special rack.
+                       eg ,the current rack is running,
+                       we use 1,else if the rack is down,
+                       we use 0 ."
+              ::= { zxr10rackEntry 3 }
+
+    -- shelf mib object
+    zxr10shelfTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10ShelfEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 shelf infomation
+                       it is a list of shelf entries."
+               ::= { zxr10rack 2 }
+
+    zxr10shelfEntry  OBJECT-TYPE
+              SYNTAX  Zxr10ShelfEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A shelf entry containing objects that
+                       descript the shelf infomation,such as:
+                       zxr10ShelfRackNo,zxr10ShelfNo ,
+                       zxr10ShelfAttrib,zxr10ShelfAvailStatus."
+              INDEX  { zxr10RackNo,
+                       zxr10ShelfNo }
+              ::= { zxr10shelfTable 1 }
+
+    Zxr10ShelfEntry ::=
+              SEQUENCE {
+                zxr10ShelfNo
+                    INTEGER,
+                zxr10ShelfAttrib
+                    INTEGER,
+                zxr10ShelfAvailStatus
+                    AvailStatus
+              }
+
+   zxr10ShelfNo  OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the no. of the special shelf."
+              ::= { zxr10shelfEntry 1 }
+
+   zxr10ShelfAttrib  OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the attribute. of the special rack.
+                       eg ,the current shelf is a working shelf,
+                       we use 1,else if the shelf  is a fan shelf
+                       we use 2 ,etc."
+              ::= { zxr10shelfEntry 2 }
+
+   zxr10ShelfAvailStatus  OBJECT-TYPE
+              SYNTAX  AvailStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the status. of the special shelf.
+                       eg ,the current shelf is in use,
+                       we use 1,else if the shelfis unuse,
+                       we use 0 ."
+              ::= { zxr10shelfEntry 3 }
+
+    -- mib object in zxr10slot group
+
+    zxr10slotTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10SlotEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of zxr10 card infomation
+                      it is a list of card entries."
+               ::= { zxr10rack 3 }
+
+    zxr10slotEntry  OBJECT-TYPE
+              SYNTAX  Zxr10SlotEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A card entry containing objects that
+                       descript the card infomation,such as:
+                       zxr10PaneNo,
+                       zxr10SlotBoardType,zxr10SlotPortsNumber,
+                       zxr10SlotAvailStatus,zxr10SlotOperStatus,
+                       zxr10SlotMasterStatus."
+              INDEX  { zxr10RackNo,
+                       zxr10ShelfNo,
+                       zxr10PosInRack }
+              ::= { zxr10slotTable 1 }
+
+    Zxr10SlotEntry ::=
+              SEQUENCE {
+                zxr10PaneNo
+                    INTEGER,
+                zxr10PosInRack
+                    INTEGER,
+                zxr10SlotBoardType
+                    BoardType,
+                zxr10SlotNPCType
+                    NpcType,
+                zxr10SlotPortsNumber
+                    INTEGER,
+                zxr10SlotAvailStatus
+                    AvailStatus,
+                zxr10SlotOperStatus
+                    OperStatus,
+                zxr10SlotMasterStatus
+                    MasterStatus,
+                zxr10ReceiveTick
+                    TimeTicks,
+                zxr10SlotTemperature
+                    Integer32, 
+                zxr10SubcardMax
+                    Integer32,
+                zxr10BootVersion
+                    DisplayString (SIZE(1..64)),
+                zxr10PCBVersion
+                    DisplayString (SIZE(1..128)), 
+                zxr10FPGAVer  
+                    DisplayString (SIZE(1..128)),
+                zxr10McodeVer 
+                    DisplayString (SIZE(1..32)),
+                zxr10MasterQDRSRAMSize
+                    Integer32,
+                zxr10SlaveQDRSRAMSize
+                    Integer32,
+                zxr10camSize
+                    Integer32,
+                zxr10BoardSilkLabel
+                    DisplayString (SIZE(1..8))
+              }
+   zxr10PaneNo  OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the no of the slot where the special card is inserted ."
+              ::= { zxr10slotEntry 1 }
+
+   zxr10PosInRack  OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the position where the special card is stored in the rack."
+              ::= { zxr10slotEntry 2 }
+
+   zxr10SlotBoardType  OBJECT-TYPE
+              SYNTAX  BoardType
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the type of the card( or board)."
+              ::= { zxr10slotEntry 3 }
+
+   zxr10SlotNPCType  OBJECT-TYPE
+              SYNTAX NpcType
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the NPC type of the board."
+              ::= { zxr10slotEntry 4 }
+
+   zxr10SlotPortsNumber OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "it descripts how many ports are in  the  card  ."
+              ::= { zxr10slotEntry 5 }
+
+   zxr10SlotAvailStatus  OBJECT-TYPE
+              SYNTAX  AvailStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the status. of the special card.
+                       eg ,the current rack is running,
+                       we use 1,else if the card is down,
+                       we use 0 .
+                       1 indicate board in slot,
+                       0 indicate board not in slot."
+              ::= { zxr10slotEntry 6 }
+
+   zxr10SlotOperStatus  OBJECT-TYPE
+              SYNTAX  OperStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the operstatus. of the special card.
+                       eg ,the current card  can work, we use 1,
+                       else if the card can't,we use 0 .
+                       1 indicate 'mpu and rpu both run normally',
+                       0 indicate 'error'  for upc board,
+                       1 indicate 'upc communicate with them(sfc,upc) normally',
+                       0 indicate 'error'  for sfc npc board."
+
+              ::= { zxr10slotEntry 7 }
+
+   zxr10SlotMasterStatus  OBJECT-TYPE
+              SYNTAX  MasterStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "as for board upc and board sfc ,
+                       master indicates masterStatus,
+                       slave indicates slaveStatus,
+                       for npc,only one status : master status"
+              ::= { zxr10slotEntry 8 }
+
+   zxr10ReceiveTick  OBJECT-TYPE
+              SYNTAX  TimeTicks
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION   "The last ticks of receving the board information ."
+              ::= { zxr10slotEntry 9 }
+
+   zxr10SlotTemperature  OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION   "The temperature of the board ."
+              ::= { zxr10slotEntry 10 }  
+              
+    zxr10SubcardMax OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts how many sub slots which can load the sub card in  the  board."
+              ::= { zxr10slotEntry 11 }   
+   
+   zxr10BootVersion OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(1..64))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the bootrom version in  the  board."
+              ::= { zxr10slotEntry 12 }
+   
+   zxr10PCBVersion OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(1..128))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the PCB version in  the  board."
+              ::= { zxr10slotEntry 13 }
+    
+    zxr10FPGAVer OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(1..128))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the FPGA version in  the  board."
+              ::= { zxr10slotEntry 14 }
+    
+    zxr10McodeVer OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(1..32))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the Mcode version in  the  board."
+              ::= { zxr10slotEntry 15 } 
+                    
+    zxr10MasterQDRSRAMSize OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the size of QDRSRAM."
+              ::= { zxr10slotEntry 16 }
+    
+    zxr10SlaveQDRSRAMSize OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the size of QDRSRAM."
+              ::= { zxr10slotEntry 17 }
+                              
+    zxr10camSize OBJECT-TYPE
+              SYNTAX  Integer32
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the size of cam."
+              ::= { zxr10slotEntry 18 }  
+    
+    zxr10BoardSilkLabel OBJECT-TYPE
+              SYNTAX  DisplayString (SIZE(1..8))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "It descripts the silk label of the  board."
+              ::= { zxr10slotEntry 19 }
+
+    -- mib object in ZXR10 CARD-PORT  group
+
+    zxr10portTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF Zxr10PortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "the description of port infomation
+                       in the zxr10 card .
+                       it is a list of port entries."
+               ::= { zxr10rack 4 }
+
+    zxr10portEntry  OBJECT-TYPE
+              SYNTAX  Zxr10PortEntry
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "A port entry containing objects that
+                       descript the port infomation,such as:
+                       zxr10PortNo
+                       zxr10PortType
+                       zxr10PortWorkingType
+                       zxr10PortMTU
+                       zxr10PortSpeed
+                       zxr10PortAvailStatus
+                       zxr10PortOperStatus."
+              INDEX  { zxr10RackNo,
+                       zxr10ShelfNo,
+                       zxr10PosInRack,
+                       zxr10PortNo }
+              ::= { zxr10portTable 1 }
+
+    Zxr10PortEntry ::=
+              SEQUENCE {
+                zxr10PortIfIndex
+                    INTEGER,
+                zxr10PortNo
+                    INTEGER,
+                zxr10PortType
+                    PortType,
+                zxr10PortWorkingType
+                    PortWorkingType,
+                zxr10PortMTU
+                    INTEGER,
+                zxr10PortSpeed
+                    DisplayString,
+                zxr10PortAvailStatus
+                    AvailStatus,
+                zxr10PortOperStatus
+                    OperStatus,
+                zxr10PortProtocolStatus
+                    OperStatus,
+                zxr10PortProperty
+                    PortProperty,
+                zxr10PortDesc
+                    DisplayString    
+                    }
+
+    zxr10PortIfIndex  OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the IfIndex of the port on the card."
+              ::= { zxr10portEntry 1 }
+  
+  
+   zxr10PortNo  OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the no. of the port on the card,
+                       which contains several ports ."
+              ::= { zxr10portEntry 2 }
+
+   zxr10PortType  OBJECT-TYPE
+              SYNTAX  PortType
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the type of the port."
+              ::= { zxr10portEntry 3 }
+
+
+   zxr10PortWorkingType  OBJECT-TYPE
+              SYNTAX  PortWorkingType
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "auto-mode(0)   indicate the port working type is auto mode,
+                       full-duplex(1) indicate the port working type is full duplex,
+                       half-duplex(2) indicate the port working type is half duplex."
+                       
+              ::= { zxr10portEntry 4 }
+
+   zxr10PortMTU OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the mtu of this port ."
+              ::= { zxr10portEntry 5 }
+
+   zxr10PortSpeed OBJECT-TYPE
+              SYNTAX  DisplayString(SIZE(0..16))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the transmit speed of this port, unit is Mbps."
+              ::= { zxr10portEntry 6 }
+
+   zxr10PortAvailStatus  OBJECT-TYPE
+              SYNTAX  AvailStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the status. of the special port.
+                       eg ,the current port is running,
+                       we use 1,else if the card is down,
+                       we use 0 .
+                       1 indicate physical level initialize ok
+                       0 indicate physical level initialize not ok "
+              ::= { zxr10portEntry 7 }
+
+   zxr10PortOperStatus  OBJECT-TYPE
+              SYNTAX  OperStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the operstatus. of the special card.
+                       eg ,the current card  can work, we use 1,
+                       else if the card can't,we use 0 .
+                       for upc board:
+                       1 indicate mpu and rpu both run normally,
+                       0 indicate error,
+                       for sfc npc board:
+                       1 indicate upc communicate with them(sfc,upc) normally,
+                       0 indicate error."
+
+              ::= { zxr10portEntry 8}
+
+   zxr10PortProtocolStatus  OBJECT-TYPE
+              SYNTAX  OperStatus
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "0: down
+                       1: up"
+
+              ::= { zxr10portEntry 9}     
+
+   zxr10PortProperty  OBJECT-TYPE
+              SYNTAX  PortProperty
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "0: photo
+                       1: electricity
+                       3: phoelecmix
+                       4: console"
+              ::= { zxr10portEntry 10}                        
+
+   --added by zhongyan for port info
+   zxr10PortDesc OBJECT-TYPE
+              SYNTAX  DisplayString(SIZE(0..128))
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "the description of this port."
+              ::= { zxr10portEntry 11 }  
+   
+                                                
+     -- added by chenwei 2001.8.24
+zxr10-alarm               OBJECT IDENTIFIER ::= { zxr10 4 }
+
+--define the following three table for sending trap use
+--define the hardware alarm table for sending  trap  use
+
+zxr10HardwareAlarmTrapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10HardwareAlarmTrapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A  hardware alarm list for sending trap information."
+    ::= { zxr10-alarm 6}
+
+zxr10HardwareAlarmTrapEntry OBJECT-TYPE
+    SYNTAX      Zxr10HardwareAlarmTrapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the hardware alarm trap table."
+    INDEX   { zxr10HardwareAlarmSlotNo,
+              zxr10HardwareAlarmCode }
+    ::= { zxr10HardwareAlarmTrapTable 1}
+
+Zxr10HardwareAlarmTrapEntry ::=
+    SEQUENCE {
+        zxr10HardwareAlarmRackNo                  INTEGER,
+        zxr10HardwareAlarmShelfNo                 INTEGER,
+        zxr10HardwareAlarmSlotNo                  INTEGER,
+        zxr10HardwareAlarmPortNo                  INTEGER,
+        zxr10HardwareAlarmCode                    INTEGER,
+        zxr10HardwareAlarmLevel                   INTEGER,
+        zxr10HardwareAlarmTime                    TimeTicks,
+        zxr10HardwareAlarmStatus                  BoolStatus,
+        zxr10HardwareAlarmType                    AlarmType,
+        zxr10HardwareAlarmVariableValue           INTEGER,
+        zxr10HardwareAlarmValueRisingThreshold    INTEGER,
+        zxr10HardwareAlarmValueFallingThreshold   INTEGER,
+        zxr10HardwareAlarmDescrip                 DisplayString
+        }
+
+ zxr10HardwareAlarmRackNo     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the rack no. "
+    ::= { zxr10HardwareAlarmTrapEntry 1}
+
+ zxr10HardwareAlarmShelfNo  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the shelf no. "
+    ::= { zxr10HardwareAlarmTrapEntry 2}
+
+ zxr10HardwareAlarmSlotNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the slot no. "
+    ::= { zxr10HardwareAlarmTrapEntry 3}
+
+ zxr10HardwareAlarmPortNo     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the port no. "
+    ::= { zxr10HardwareAlarmTrapEntry 4}
+
+ zxr10HardwareAlarmCode      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the hardware alarm code . "
+    ::= { zxr10HardwareAlarmTrapEntry 5}
+
+ zxr10HardwareAlarmLevel     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the hardware alarm level. "
+    ::= { zxr10HardwareAlarmTrapEntry 6}
+
+ zxr10HardwareAlarmTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Total running-time since the Router System up when the hardware alarm occurred. "
+    ::= { zxr10HardwareAlarmTrapEntry 7}
+
+ zxr10HardwareAlarmStatus    OBJECT-TYPE
+    SYNTAX      BoolStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the hardware alarm status. (true or 1 ) RAISED , (false or 0) CLEARED"
+    ::= { zxr10HardwareAlarmTrapEntry 8}
+
+ zxr10HardwareAlarmType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the hardware alarm type. "
+    ::= { zxr10HardwareAlarmTrapEntry 9}
+
+ zxr10HardwareAlarmVariableValue     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the hardware alarm variable value. "
+    ::= { zxr10HardwareAlarmTrapEntry 10}
+
+ zxr10HardwareAlarmValueRisingThreshold  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the hardware alarm variable rising value. "
+    ::= { zxr10HardwareAlarmTrapEntry 11}
+
+ zxr10HardwareAlarmValueFallingThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the hardware alarm variable falling value. "
+    ::= { zxr10HardwareAlarmTrapEntry 12}
+
+ zxr10HardwareAlarmDescrip               OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the hardware alarm description. "
+    ::= { zxr10HardwareAlarmTrapEntry 13}
+
+--define the softprotocol alarm table for binding trap  use
+
+zxr10SoftProtocolAlarmTrapTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10SoftProtocolAlarmTrapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A  softprotocol alarm list for sending trap information."
+    ::= { zxr10-alarm 7}
+
+zxr10SoftProtocolAlarmTrapEntry OBJECT-TYPE
+    SYNTAX      Zxr10SoftProtocolAlarmTrapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the softprotocol alarm trap table."
+    INDEX   { zxr10SoftProtocolAlarmSlotNo,
+              zxr10SoftProtocolAlarmCode }
+    ::= { zxr10SoftProtocolAlarmTrapTable 1}
+
+Zxr10SoftProtocolAlarmTrapEntry ::=
+    SEQUENCE {
+        zxr10SoftProtocolAlarmRackNo           INTEGER,
+        zxr10SoftProtocolAlarmShelfNo          INTEGER,
+        zxr10SoftProtocolAlarmSlotNo           INTEGER,
+        zxr10SoftProtocolAlarmCode             INTEGER,
+        zxr10SoftProtocolAlarmLevel            INTEGER,
+        zxr10SoftProtocolAlarmTime             TimeTicks,
+        zxr10SoftProtocolAlarmStatus           BoolStatus,
+        zxr10SoftProtocolAlarmType             AlarmType,
+        zxr10SoftProtocolAlarmDescrip          DisplayString
+        }
+
+ zxr10SoftProtocolAlarmRackNo     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the rack no . "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 1}
+
+ zxr10SoftProtocolAlarmShelfNo  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the shelf no . "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 2}
+
+ zxr10SoftProtocolAlarmSlotNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the slot no . "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 3}
+
+ zxr10SoftProtocolAlarmCode      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the softprotocol alarm code . "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 4}
+
+ zxr10SoftProtocolAlarmLevel     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the softprotocol alarm level. "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 5}
+
+ zxr10SoftProtocolAlarmTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the total running-time after the Router System up when the softprotocol alarm occurred. "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 6}
+
+ zxr10SoftProtocolAlarmStatus    OBJECT-TYPE
+    SYNTAX      BoolStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the softprotocol alarm status: (true or 1) RAISED , (false or 0) CLEARED . "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 7}
+
+ zxr10SoftProtocolAlarmType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the softprotocol alarm type. "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 8}
+
+ zxr10SoftProtocolAlarmDescrip               OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the softprotocol alarm description. "
+    ::= { zxr10SoftProtocolAlarmTrapEntry 9}
+
+--define the statistics alarm table for binding trap  use
+
+zxr10StatisticsAlarmTrapTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10StatisticsAlarmTrapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A  statistics alarm list for sending trap information."
+    ::= { zxr10-alarm 8}
+
+zxr10StatisticsAlarmTrapEntry   OBJECT-TYPE
+    SYNTAX      Zxr10StatisticsAlarmTrapEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the statistics alarm trap table."
+    INDEX   { zxr10StatisticsAlarmSlotNo,
+              zxr10StatisticsAlarmCode }
+    ::= { zxr10StatisticsAlarmTrapTable 1}
+
+Zxr10StatisticsAlarmTrapEntry ::=
+    SEQUENCE {
+        zxr10StatisticsAlarmRackNo                  INTEGER,
+        zxr10StatisticsAlarmShelfNo                 INTEGER,
+        zxr10StatisticsAlarmSlotNo                  INTEGER,
+        zxr10StatisticsAlarmPortNo                  INTEGER,
+        zxr10StatisticsAlarmCode                    INTEGER,
+        zxr10StatisticsAlarmLevel                   INTEGER,
+        zxr10StatisticsAlarmTime                    TimeTicks,
+        zxr10StatisticsAlarmStatus                  BoolStatus,
+        zxr10StatisticsAlarmType                    AlarmType,
+        zxr10StatisticsAlarmVariableValue           INTEGER,
+        zxr10StatisticsAlarmValueRisingThreshold    INTEGER,
+        zxr10StatisticsAlarmValueFallingThreshold   INTEGER,
+        zxr10StatisticsAlarmDescrip                 DisplayString
+        }
+
+ zxr10StatisticsAlarmRackNo   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the rack no . "
+    ::= { zxr10StatisticsAlarmTrapEntry 1}
+
+ zxr10StatisticsAlarmShelfNo  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the shelf no . "
+    ::= { zxr10StatisticsAlarmTrapEntry 2}
+
+ zxr10StatisticsAlarmSlotNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the slot no . "
+    ::= { zxr10StatisticsAlarmTrapEntry 3}
+
+ zxr10StatisticsAlarmPortNo     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the port no. "
+    ::= { zxr10StatisticsAlarmTrapEntry 4}
+
+ zxr10StatisticsAlarmCode      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the statistics alarm code . "
+    ::= { zxr10StatisticsAlarmTrapEntry 5}
+
+ zxr10StatisticsAlarmLevel     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the statistics alarm level. "
+    ::= { zxr10StatisticsAlarmTrapEntry 6}
+
+ zxr10StatisticsAlarmTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the total running-time after the Router System up when the statistics alarm occurred. "
+    ::= { zxr10StatisticsAlarmTrapEntry 7}
+
+ zxr10StatisticsAlarmStatus    OBJECT-TYPE
+    SYNTAX      BoolStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the statistics alarm status: (true or 1) RAISED , (false or 0) CLEARED . "
+    ::= { zxr10StatisticsAlarmTrapEntry 8}
+
+ zxr10StatisticsAlarmType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the statistics alarm sub type. "
+    ::= { zxr10StatisticsAlarmTrapEntry 9}
+
+ zxr10StatisticsAlarmVariableValue     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the statistics alarm variable value. "
+    ::= { zxr10StatisticsAlarmTrapEntry 10}
+
+ zxr10StatisticsAlarmValueRisingThreshold  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the statistics alarm variable rising value. "
+    ::= { zxr10StatisticsAlarmTrapEntry 11}
+
+ zxr10StatisticsAlarmValueFallingThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the statistics alarm variable falling value. "
+    ::= { zxr10StatisticsAlarmTrapEntry 12}
+
+ zxr10StatisticsAlarmDescrip               OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the statistics alarm description. "
+    ::= { zxr10StatisticsAlarmTrapEntry 13}
+
+--Alarm trap information
+
+zxr10AlarmTrap OBJECT IDENTIFIER ::= { zxr10-alarm 20 }
+
+
+zxr10HardwareAlarmTrap NOTIFICATION-TYPE
+        OBJECTS {
+              zxr10HardwareAlarmRackNo,
+              zxr10HardwareAlarmShelfNo,
+              zxr10HardwareAlarmSlotNo,
+              zxr10HardwareAlarmPortNo,
+              zxr10HardwareAlarmCode,
+              zxr10HardwareAlarmLevel,
+              zxr10HardwareAlarmTime,
+              zxr10HardwareAlarmStatus,
+              zxr10HardwareAlarmType,
+              zxr10HardwareAlarmVariableValue,
+              zxr10HardwareAlarmValueRisingThreshold,
+              zxr10HardwareAlarmValueFallingThreshold,
+              zxr10HardwareAlarmDescrip
+                  }
+        STATUS             current
+        DESCRIPTION
+           "when a hardware alarm occurred, send the trap PDU to uniform network manager."
+   ::= { zxr10AlarmTrap 1 }
+
+    zxr10SoftProtocolAlarmTrap NOTIFICATION-TYPE
+        OBJECTS {
+              zxr10SoftProtocolAlarmRackNo,
+              zxr10SoftProtocolAlarmShelfNo,
+              zxr10SoftProtocolAlarmSlotNo,
+              zxr10SoftProtocolAlarmCode,
+              zxr10SoftProtocolAlarmLevel,
+              zxr10SoftProtocolAlarmTime,
+              zxr10SoftProtocolAlarmStatus,
+              zxr10SoftProtocolAlarmType,
+              zxr10SoftProtocolAlarmDescrip
+                  }
+        STATUS             current
+        DESCRIPTION
+           "when a softprotocol alarm occurred, send the trap PDU to unm. "
+   ::= { zxr10AlarmTrap 2 }
+
+ zxr10StatisticsAlarmTrap NOTIFICATION-TYPE
+        OBJECTS {
+              zxr10StatisticsAlarmRackNo,
+              zxr10StatisticsAlarmShelfNo,
+              zxr10StatisticsAlarmSlotNo,
+              zxr10StatisticsAlarmPortNo,
+              zxr10StatisticsAlarmCode,
+              zxr10StatisticsAlarmLevel,
+              zxr10StatisticsAlarmTime,
+              zxr10StatisticsAlarmStatus,
+              zxr10StatisticsAlarmType,
+              zxr10StatisticsAlarmVariableValue,
+              zxr10StatisticsAlarmValueRisingThreshold,
+              zxr10StatisticsAlarmValueFallingThreshold,
+              zxr10StatisticsAlarmDescrip
+                  }
+        STATUS             current
+        DESCRIPTION
+           "when a statistics alarm occurred, send the trap PDU to uniform network manager. "
+   ::= { zxr10AlarmTrap 3 }
+
+zxr10-statistics    OBJECT IDENTIFIER    ::= { zxr10 3 }
+-- Defintion of system unit info table.
+
+zxr10SystemUnitTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10SystemUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the system statistics information."
+    ::= { zxr10-statistics 1}
+
+zxr10SystemUnitEntry    OBJECT-TYPE
+    SYNTAX      Zxr10SystemUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the sysem statistics information table."
+    INDEX   {   -- zxr10SystemCardIndex,
+                zxr10SystemUnitIndex }
+    ::= { zxr10SystemUnitTable 1}
+
+Zxr10SystemUnitEntry ::=
+    SEQUENCE {
+        zxr10SystemUnitIndex                   INTEGER,
+        zxr10SystemUnitRunStatus               UnitRunStatus,
+        zxr10SystemMemSize                     INTEGER,
+        zxr10SystemMemUsed                     INTEGER,
+        zxr10SystemCpuUtility2m                  INTEGER,
+        zxr10SystemCpuUtility5s                INTEGER,
+        zxr10SystemCpuUtility30s               INTEGER,
+        zxr10SystemPeakCpuUtility               INTEGER,
+        zxr10SystemUnitUpTime                  TimeTicks,
+        zxr10SystemUnitPidNum                  INTEGER,
+        zxr10SystemCpuUtility1m                INTEGER,
+        zxr10SystemCpuUtility5m                INTEGER     
+        }
+
+ zxr10SystemUnitIndex       OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the index of system Unit "
+    ::= { zxr10SystemUnitEntry 1}
+
+ zxr10SystemUnitRunStatus       OBJECT-TYPE
+    SYNTAX      UnitRunStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the run status of system Unit
+         1 is running,
+         0 is shutdown. "
+    ::= { zxr10SystemUnitEntry 2}
+
+ zxr10SystemMemSize     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the physical memory size of  the unit owned, the unit is byte."
+    ::= { zxr10SystemUnitEntry 3}
+
+ zxr10SystemMemUsed     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the used momery described by Octets"
+    ::= { zxr10SystemUnitEntry 4}
+
+ zxr10SystemCpuUtility2m      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the cpu utility described by percent(2 minutes)"
+    ::= { zxr10SystemUnitEntry 5}
+    
+ zxr10SystemCpuUtility5s    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the cpu utility described by percent( 5 seconds)."
+    ::= { zxr10SystemUnitEntry 6}
+ 
+ zxr10SystemCpuUtility30s   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the cpu utility described by percent( 30 seconds)."
+    ::= { zxr10SystemUnitEntry 7}
+    
+ zxr10SystemPeakCpuUtility   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the cpu peak utility described by percent.(measured in 30 seconds)"
+    ::= { zxr10SystemUnitEntry 8}
+    
+ zxr10SystemUnitUpTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the total time of system running."
+    ::= { zxr10SystemUnitEntry 9}
+    
+ zxr10SystemUnitPidNum      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the total process running on the unit."
+    ::= { zxr10SystemUnitEntry 10}
+   
+zxr10SystemCpuUtility1m   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the cpu utility described by percent( 1 minute)."
+    ::= { zxr10SystemUnitEntry 11}
+
+    zxr10SystemCpuUtility5m   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the cpu utility described by percent( 5 minute)."
+    ::= { zxr10SystemUnitEntry 12}
+
+-- Defintion of the process info table.
+
+zxr10UnitPidTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10UnitPidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the pid information."
+    ::= { zxr10-statistics 3}
+
+zxr10UnitPidEntry   OBJECT-TYPE
+    SYNTAX      Zxr10UnitPidEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the pid information table."
+    INDEX   { zxr10SystemUnitIndex,
+              zxr10UnitPidNo }
+    ::= { zxr10UnitPidTable 1}
+
+Zxr10UnitPidEntry ::=
+    SEQUENCE {
+--      zxr10UnitPidsystemUnitIndex      INTEGER,
+        zxr10UnitPidNo                   INTEGER,
+        zxr10UnitPidUsedStatus           DisplayString,
+        zxr10UnitPidName                 DisplayString,
+        zxr10UnitPidPrio                 INTEGER,
+        zxr10UnitPidStackSize            INTEGER,
+        zxr10UnitPidCalledTimes          INTEGER,
+        zxr10UnitPidCpuOccupanTime       TimeTicks,
+        zxr10UnitPidInterruptTimes       INTEGER,
+--      zxr10UnitPidAsyQuenId            INTEGER,
+        zxr10UnitPidAsyQuenMsgMax        INTEGER,
+        zxr10UnitPidAsyQuenUsed          INTEGER,
+        zxr10UnitPidAsyQuenBlocked       INTEGER,
+        zxr10UnitPidAsyQuenSendTimeouts  INTEGER,
+        zxr10UnitPidAsyQuenRecTimeouts   INTEGER,
+--      zxr10UnitPidSynQuenId            INTEGER,
+        zxr10UnitPidSynQuenMsgMax        INTEGER,
+        zxr10UnitPidSynQuenUsed          INTEGER,
+        zxr10UnitPidSynQuenBlocked       INTEGER,
+        zxr10UnitPidSynQuenSendTimeouts  INTEGER,
+        zxr10UnitPidSynQuenRecTimeouts   INTEGER,
+        zxr10UnitPidTimerNamedUsed       INTEGER,
+        zxr10UnitPidTimerUnnamedUsed     INTEGER
+        }
+
+-- zxr10UnitPidsystemUnitIndex  OBJECT-TYPE
+--  SYNTAX      INTEGER
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      "the unit no . "
+--  ::= { zxr10UnitPidEntry 1}
+
+zxr10UnitPidNo  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the pid no . "
+    ::= { zxr10UnitPidEntry 1}
+
+zxr10UnitPidUsedStatus  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the pid used status . "
+    ::= { zxr10UnitPidEntry 2}
+
+zxr10UnitPidName    OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the pid name. "
+    ::= { zxr10UnitPidEntry 3}
+
+zxr10UnitPidPrio    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the priority of the process described by number,
+         the number is bigger the priority is lower. "
+    ::= { zxr10UnitPidEntry 4}
+
+zxr10UnitPidStackSize   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the stack size of the process is owned, its unit is byte. "
+    ::= { zxr10UnitPidEntry 5}
+
+zxr10UnitPidCalledTimes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the times that the process was called by system. "
+    ::= { zxr10UnitPidEntry 6}
+
+zxr10UnitPidCpuOccupanTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the total time that the process occupying cpu. "
+    ::= { zxr10UnitPidEntry 7 }
+
+zxr10UnitPidInterruptTimes OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         " the times that the process was interrupted by other process. "
+    ::= { zxr10UnitPidEntry 8 }
+
+-- zxr10UnitPidAsyQuenId    OBJECT-TYPE
+--  SYNTAX      INTEGER
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      "the asynchronism quen id in the process. "
+--  ::= { zxr10UnitPidEntry 8}
+
+zxr10UnitPidAsyQuenMsgMax   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the max message number of the asynchronism quen. "
+    ::= { zxr10UnitPidEntry 9}
+
+zxr10UnitPidAsyQuenUsed OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the message number that waiting to be deal with in the asynchronism quen. "
+    ::= { zxr10UnitPidEntry 10}
+
+zxr10UnitPidAsyQuenBlocked  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the message number that blocked in the asynchronism quen. "
+    ::= { zxr10UnitPidEntry 11}
+
+zxr10UnitPidAsyQuenSendTimeouts OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the discarded messages sending to the process for timeout . "
+    ::= { zxr10UnitPidEntry 12}
+
+zxr10UnitPidAsyQuenRecTimeouts  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the discarded messages sent by the process for timeout . "
+    ::= { zxr10UnitPidEntry 13}
+
+-- zxr10UnitPidSynQuenId    OBJECT-TYPE
+--  SYNTAX      INTEGER
+--  MAX-ACCESS  read-only
+--  STATUS      current
+--  DESCRIPTION
+--      "the synchronism quen id in the process. "
+--  ::= { zxr10UnitPidEntry 14}
+
+zxr10UnitPidSynQuenMsgMax   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the max message number of the synchronism quen. "
+    ::= { zxr10UnitPidEntry 14}
+
+zxr10UnitPidSynQuenUsed OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the message number that waiting to be deal with in the synchronism quen. "
+    ::= { zxr10UnitPidEntry 15}
+
+zxr10UnitPidSynQuenBlocked  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the message number that blocked in the synchronism quen. "
+    ::= { zxr10UnitPidEntry 16}
+
+zxr10UnitPidSynQuenSendTimeouts OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the discarded messages sending to the process for timeout ."
+    ::= { zxr10UnitPidEntry 17}
+
+zxr10UnitPidSynQuenRecTimeouts  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the discard messages sent by the process for timeout ."
+    ::= { zxr10UnitPidEntry 18}
+
+zxr10UnitPidTimerNamedUsed  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the total number of named timer used in this process. "
+    ::= { zxr10UnitPidEntry 19}
+
+zxr10UnitPidTimerUnnamedUsed    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the total number of unnamed timer used in this process. "
+    ::= { zxr10UnitPidEntry 20}
+
+
+-- Defintion of the unit communicating info table.
+
+zxr10UnitCommStatTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10UnitCommStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the unit communication information."
+    ::= { zxr10-statistics 4}
+
+zxr10UnitCommStatEntry  OBJECT-TYPE
+    SYNTAX      Zxr10UnitCommStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the unit communication info table."
+    INDEX   { zxr10SystemUnitIndex,
+              zxr10UnitNo }
+    ::= { zxr10UnitCommStatTable 1}
+
+Zxr10UnitCommStatEntry ::=
+    SEQUENCE {
+        zxr10UnitNo               INTEGER,
+        zxr10UnitsndMsgs          INTEGER,
+        zxr10UnitsndBytes         INTEGER,
+        zxr10UnitsndByteGigas     INTEGER,
+        zxr10UnitrcvMsgs          INTEGER,
+        zxr10UnitrcvBytes         INTEGER,
+        zxr10UnitrcvByteGigas     INTEGER
+        }
+
+ zxr10UnitNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the unit no . "
+    ::= { zxr10UnitCommStatEntry 1}
+
+ zxr10UnitsndMsgs  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " the send message packets of the unit. "
+    ::= { zxr10UnitCommStatEntry 2}
+
+ zxr10UnitsndBytes  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " the message bytes of the unit send. "
+    ::= { zxr10UnitCommStatEntry 3}
+
+ zxr10UnitsndByteGigas OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " the message Giga bytes of the unit send. "
+    ::= { zxr10UnitCommStatEntry 4}
+
+ zxr10UnitrcvMsgs  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " the received message packets of the unit. "
+    ::= { zxr10UnitCommStatEntry 5}
+
+ zxr10UnitrcvBytes  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " the message bytes of the unit received. "
+    ::= { zxr10UnitCommStatEntry 6}
+
+ zxr10UnitrcvByteGigas  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " the message giga bytes of the unit received. "
+    ::= { zxr10UnitCommStatEntry 7}
+    
+-- Defintion of unit port info table.
+
+
+    
+-- Defintion of hardware environ alarm info table.
+
+zxr10HardwareEnvironAlarmTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10HardwareEnvironAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the environment alarm information."
+    ::= { zxr10-alarm 1}
+
+zxr10HardwareEnvironAlarmEntry  OBJECT-TYPE
+    SYNTAX      Zxr10HardwareEnvironAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the environ alarm information table."
+    INDEX   { zxr10HardwareEnvironAlarmSlotNo,
+              zxr10HardwareEnvironAlarmCode }
+    ::= { zxr10HardwareEnvironAlarmTable 1}
+
+Zxr10HardwareEnvironAlarmEntry ::=
+    SEQUENCE {
+        zxr10HardwareEnvironAlarmRackNo      INTEGER,
+        zxr10HardwareEnvironAlarmShelfNo     INTEGER,
+        zxr10HardwareEnvironAlarmSlotNo      INTEGER,
+        zxr10HardwareEnvironAlarmCode        INTEGER,
+        zxr10HardwareEnvironAlarmLevel       INTEGER,
+        zxr10HardwareEnvironAlarmTime        TimeTicks,
+        zxr10HardwareEnvironAlarmStatus      BoolStatus,
+        zxr10HardwareEnvironAlarmType        AlarmType,
+        zxr10HardwareEnvironAlarmDescrip     DisplayString
+        }
+
+ zxr10HardwareEnvironAlarmRackNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the Rack no . "
+    ::= { zxr10HardwareEnvironAlarmEntry 1}
+
+ zxr10HardwareEnvironAlarmShelfNo   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the shelf no. "
+    ::= { zxr10HardwareEnvironAlarmEntry 2}
+
+ zxr10HardwareEnvironAlarmSlotNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the slot no. "
+    ::= { zxr10HardwareEnvironAlarmEntry 3}
+
+ zxr10HardwareEnvironAlarmCode      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the environment alarm code . "
+    ::= { zxr10HardwareEnvironAlarmEntry 4}
+
+ zxr10HardwareEnvironAlarmLevel     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm level. "
+    ::= { zxr10HardwareEnvironAlarmEntry 5}
+
+ zxr10HardwareEnvironAlarmTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the total running-time after the Router System up when the environment alarm occurred. "
+    ::= { zxr10HardwareEnvironAlarmEntry 6}
+
+ zxr10HardwareEnvironAlarmStatus    OBJECT-TYPE
+    SYNTAX      BoolStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the environ alarm status: (true or 1) RAISED or (false or 0) CLEARED . "
+    ::= { zxr10HardwareEnvironAlarmEntry 7}
+
+ zxr10HardwareEnvironAlarmType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm type, here is environ."
+    ::= { zxr10HardwareEnvironAlarmEntry 8}
+
+ zxr10HardwareEnvironAlarmDescrip   OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the description string. "
+    ::= { zxr10HardwareEnvironAlarmEntry 9}
+
+-- Defintion of hardware board alarm info table.
+
+zxr10HardwareBoardAlarmTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10HardwareBoardAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the board alarm information."
+    ::= { zxr10-alarm 2}
+
+zxr10HardwareBoardAlarmEntry    OBJECT-TYPE
+    SYNTAX      Zxr10HardwareBoardAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the board alarm information table."
+    INDEX   { zxr10HardwareBoardAlarmSlotNo,
+              zxr10HardwareBoardAlarmCode }
+    ::= { zxr10HardwareBoardAlarmTable 1}
+
+Zxr10HardwareBoardAlarmEntry ::=
+    SEQUENCE {
+        zxr10HardwareBoardAlarmRackNo      INTEGER,
+        zxr10HardwareBoardAlarmShelfNo     INTEGER,
+        zxr10HardwareBoardAlarmSlotNo      INTEGER,
+        zxr10HardwareBoardAlarmCode        INTEGER,
+        zxr10HardwareBoardAlarmLevel       INTEGER,
+        zxr10HardwareBoardAlarmTime        TimeTicks,
+        zxr10HardwareBoardAlarmStatus      BoolStatus,
+        zxr10HardwareBoardAlarmType        AlarmType,
+        zxr10HardwareBoardAlarmDescrip     DisplayString
+        }
+
+ zxr10HardwareBoardAlarmRackNo  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the Rack no . "
+    ::= { zxr10HardwareBoardAlarmEntry 1}
+
+ zxr10HardwareBoardAlarmShelfNo   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the shelf no. "
+    ::= { zxr10HardwareBoardAlarmEntry 2}
+
+ zxr10HardwareBoardAlarmSlotNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the slot no. "
+    ::= { zxr10HardwareBoardAlarmEntry 3}
+
+ zxr10HardwareBoardAlarmCode      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the board alarm code . "
+    ::= { zxr10HardwareBoardAlarmEntry 4}
+
+ zxr10HardwareBoardAlarmLevel     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm level. "
+    ::= { zxr10HardwareBoardAlarmEntry 5}
+
+ zxr10HardwareBoardAlarmTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the total running-time after the Router System up when the board alarm occurred. "
+    ::= { zxr10HardwareBoardAlarmEntry 6}
+
+ zxr10HardwareBoardAlarmStatus    OBJECT-TYPE
+    SYNTAX      BoolStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the board alarm status: (true or 1) RAISED , (false or 0) CLEARED . "
+    ::= { zxr10HardwareBoardAlarmEntry 7}
+
+ zxr10HardwareBoardAlarmType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm type, here is board."
+    ::= { zxr10HardwareBoardAlarmEntry 8}
+
+ zxr10HardwareBoardAlarmDescrip   OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the description string. "
+    ::= { zxr10HardwareBoardAlarmEntry 9}
+
+-- Defintion of hardware port alarm info table.
+
+zxr10HardwarePortAlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10HardwarePortAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the port alarm information."
+    ::= { zxr10-alarm 3}
+
+zxr10HardwarePortAlarmEntry OBJECT-TYPE
+    SYNTAX      Zxr10HardwarePortAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the port alarm information table."
+    INDEX   { zxr10HardwarePortAlarmSlotNo,
+              zxr10HardwarePortAlarmPortNo,
+              zxr10HardwarePortAlarmCode }
+    ::= { zxr10HardwarePortAlarmTable 1}
+
+Zxr10HardwarePortAlarmEntry ::=
+    SEQUENCE {
+        zxr10HardwarePortAlarmRackNo      INTEGER,
+        zxr10HardwarePortAlarmShelfNo     INTEGER,
+        zxr10HardwarePortAlarmSlotNo      INTEGER,
+        zxr10HardwarePortAlarmPortNo      INTEGER,
+        zxr10HardwarePortAlarmCode        INTEGER,
+        zxr10HardwarePortAlarmLevel       INTEGER,
+        zxr10HardwarePortAlarmTime        TimeTicks,
+        zxr10HardwarePortAlarmStatus      BoolStatus,
+        zxr10HardwarePortAlarmType        AlarmType,
+        zxr10HardwarePortAlarmDescrip     DisplayString
+        }
+
+ zxr10HardwarePortAlarmRackNo   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the Rack no . "
+    ::= { zxr10HardwarePortAlarmEntry 1}
+
+ zxr10HardwarePortAlarmShelfNo   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the shelf no. "
+    ::= { zxr10HardwarePortAlarmEntry 2}
+
+ zxr10HardwarePortAlarmSlotNo    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the slot no. "
+    ::= { zxr10HardwarePortAlarmEntry 3}
+
+ zxr10HardwarePortAlarmPortNo     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the port no. "
+    ::= { zxr10HardwarePortAlarmEntry 4}
+
+ zxr10HardwarePortAlarmCode      OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the port alarm code . "
+    ::= { zxr10HardwarePortAlarmEntry 5}
+
+ zxr10HardwarePortAlarmLevel     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm level. "
+    ::= { zxr10HardwarePortAlarmEntry 6}
+
+ zxr10HardwarePortAlarmTime      OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the total running-time after the Router System up when the port alarm occurred. "
+    ::= { zxr10HardwarePortAlarmEntry 7}
+
+ zxr10HardwarePortAlarmStatus    OBJECT-TYPE
+    SYNTAX      BoolStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "the port alarm status: (true or 1) RAISED , (false or 0) CLEARED . "
+    ::= { zxr10HardwarePortAlarmEntry 8}
+
+ zxr10HardwarePortAlarmType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm type, here is port."
+    ::= { zxr10HardwarePortAlarmEntry 9}
+
+ zxr10HardwarePortAlarmDescrip   OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the description string. "
+    ::= { zxr10HardwarePortAlarmEntry 10}
+
+-- Defintion of softprotocol alarm info table.
+
+zxr10SoftProtocolAlarmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10SoftProtocolAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the softprotocol alarm information."
+    ::= { zxr10-alarm 4}
+
+zxr10SoftProtocolAlarmEntry OBJECT-TYPE
+    SYNTAX      Zxr10SoftProtocolAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the softprotocol alarm information table."
+    INDEX   { zxr10SoftProtocolAlarmSaveCode }
+    ::= { zxr10SoftProtocolAlarmTable 1}
+
+Zxr10SoftProtocolAlarmEntry ::=
+    SEQUENCE {
+        zxr10SoftProtocolAlarmSaveCode          INTEGER,
+        zxr10SoftProtocolAlarmSaveLevel         INTEGER,
+        zxr10SoftProtocolAlarmSaveLasttime      TimeTicks,
+        zxr10SoftProtocolAlarmSaveTotaltimes    INTEGER,
+        zxr10SoftProtocolAlarmSaveType          AlarmType
+        }
+
+ zxr10SoftProtocolAlarmSaveCode   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the softprotocol alarm code . "
+    ::= { zxr10SoftProtocolAlarmEntry 1}
+
+ zxr10SoftProtocolAlarmSaveLevel  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm level . "
+    ::= { zxr10SoftProtocolAlarmEntry 2}
+
+ zxr10SoftProtocolAlarmSaveLasttime    OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the total running-time after the Router System up when the latest softprotocol alarm occurred. "
+    ::= { zxr10SoftProtocolAlarmEntry 3}
+
+ zxr10SoftProtocolAlarmSaveTotaltimes     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "total times of the softprotocol alarm occurred . "
+    ::= { zxr10SoftProtocolAlarmEntry 4}
+
+ zxr10SoftProtocolAlarmSaveType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the softprotocol alarm sub-type . "
+    ::= { zxr10SoftProtocolAlarmEntry 5}
+
+-- Defintion of statistics alarm info table.
+
+zxr10StatisticsAlarmTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Zxr10StatisticsAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of the Statistics alarm information."
+    ::= { zxr10-alarm 5}
+
+zxr10StatisticsAlarmEntry   OBJECT-TYPE
+    SYNTAX      Zxr10StatisticsAlarmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry to the Statistics alarm information table."
+    INDEX   { zxr10StatisticsAlarmSaveCode }
+    ::= { zxr10StatisticsAlarmTable 1}
+
+Zxr10StatisticsAlarmEntry ::=
+    SEQUENCE {
+        zxr10StatisticsAlarmSaveCode          INTEGER,
+        zxr10StatisticsAlarmSaveLevel         INTEGER,
+        zxr10StatisticsAlarmSaveLasttime      TimeTicks,
+        zxr10StatisticsAlarmSaveTotaltimes    INTEGER,
+        zxr10StatisticsAlarmSaveType          AlarmType
+        }
+
+ zxr10StatisticsAlarmSaveCode     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the Statistics alarm code . "
+    ::= { zxr10StatisticsAlarmEntry 1}
+
+ zxr10StatisticsAlarmSaveLevel  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the alarm level . "
+    ::= { zxr10StatisticsAlarmEntry 2}
+
+ zxr10StatisticsAlarmSaveLasttime    OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the total running-time after the Router System up when the latest Statistics alarm occurred. "
+    ::= { zxr10StatisticsAlarmEntry 3}
+
+ zxr10StatisticsAlarmSaveTotaltimes     OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "total times of the Statistics alarm occurred . "
+    ::= { zxr10StatisticsAlarmEntry 4}
+
+ zxr10StatisticsAlarmSaveType      OBJECT-TYPE
+    SYNTAX      AlarmType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "the Statistics alarm sub-type . "
+    ::= { zxr10StatisticsAlarmEntry 5}
+
+
+zxr10-objectID               OBJECT IDENTIFIER  ::= { zxr10 100 }
+
+  -- should hide these define information, for the name of router and switch often change
+zxr10RouterT128SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T128 router"
+    ::= { zxr10-objectID 1 }
+
+zxr10RouterT64SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T64 router"
+    ::= { zxr10-objectID 2 }
+
+zxr10SwitchT32SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T32 switch"
+    ::= { zxr10-objectID 3 }
+
+zxr10RouterGER8SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 ger-8 router"
+    ::= { zxr10-objectID 5 }
+
+zxr10RouterGAR-2608SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 2608 router"
+    ::= { zxr10-objectID 4 }
+    
+zxr10RouterGAR-2604SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 2604 router"
+    ::= { zxr10-objectID 6 }
+
+zxr10SwitchT160GSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T160G switch"
+    ::= { zxr10-objectID 7 }
+
+zxr10RouterGAR-3608SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 3608 router"
+    ::= { zxr10-objectID 8 }
+    
+zxr10RouterGAR-7208SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 7208 router"
+    ::= { zxr10-objectID 9 }
+
+zxr10SwitchT64GSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T64G switch"
+    ::= { zxr10-objectID 10 }
+
+zxr10Switch3206SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3206 switch"
+    ::= { zxr10-objectID 11 }
+
+zxr10Switch3906SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3906 switch"
+    ::= { zxr10-objectID 12 }
+
+zxr10Switch3228SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3228 switch"
+    ::= { zxr10-objectID 13 }
+
+zxr10Switch3928SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3928 switch"
+    ::= { zxr10-objectID 14 }
+
+zxr10Switch3252SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3252 switch"
+    ::= { zxr10-objectID 15 }
+
+zxr10Switch3952SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3952 switch"
+    ::= { zxr10-objectID 16 }
+
+zxr10Switch5224SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5224 switch"
+    ::= { zxr10-objectID 17 }
+    
+zxr10Switch5228SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5228 switch"
+    ::= { zxr10-objectID 18 }    
+
+zxr10Switch5228FSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5228F switch"
+    ::= { zxr10-objectID 19 }    
+
+zxr10Switch5928SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5928 switch"
+    ::= { zxr10-objectID 20 }   
+
+zxr10Switch5928FSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5928F switch"
+    ::= { zxr10-objectID 21 } 
+
+zxr10Switch5252SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5252 switch"
+    ::= { zxr10-objectID 22 }
+
+zxr10Switch5952SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5952 switch"
+    ::= { zxr10-objectID 23 }
+    
+zxr10Switch3226SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3226 switch"
+    ::= { zxr10-objectID 24 }
+
+zxr10SwitchT40GSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T40G switch"
+    ::= { zxr10-objectID 25 }
+        
+zxr10RouterT1200SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T1200 router"
+    ::= { zxr10-objectID 26 }       
+
+zxr10RouterT600SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T600 router"
+    ::= { zxr10-objectID 27 }   
+        
+zxr10RouterGER2SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 ger-2 router"
+    ::= { zxr10-objectID 28 }
+    
+zxr10RouterGER4SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 ger-4 router"
+    ::= { zxr10-objectID 29 }
+        
+zxr10Switch3226FISysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3226FI switch"
+    ::= { zxr10-objectID 30 }
+
+zxr10Switch3928ASysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3900A switch"
+    ::= { zxr10-objectID 31 }
+
+zxr10Switch3928AFISysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3928A switch"
+    ::= { zxr10-objectID 32 }
+
+zxr10Switch3952ASysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3952A switch"
+    ::= { zxr10-objectID 33 }
+
+zxr10Switch3228A-EISysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3228A-EI switch"
+    ::= { zxr10-objectID 34 }
+
+zxr10Switch3228ASysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3228A switch"
+    ::= { zxr10-objectID 35 }
+
+zxr10Switch3228A-FISysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3228A-FI switch"
+    ::= { zxr10-objectID 36 }
+
+zxr10Switch3252ASysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3252A switch"
+    ::= { zxr10-objectID 37 }
+
+zxr10Switch5228ASysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5228A switch"
+    ::= { zxr10-objectID 38 }
+
+zxr10Switch5252ASysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5252A switch"
+    ::= { zxr10-objectID 39 }
+
+zxr10Switch5928ESysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5928E switch"
+    ::= { zxr10-objectID 40 }
+
+zxr10Switch5928E-FISysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5928E-FI switch"
+    ::= { zxr10-objectID 41 }
+
+zxr10Switch3952ESysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3952E switch"
+    ::= { zxr10-objectID 42 }
+
+zxr10Switch5952ESysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5952E switch"
+    ::= { zxr10-objectID 43 }
+       
+zxr10RouterR10-1822-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1822-AC router"
+    ::= { zxr10-objectID 100 } 
+
+zxr10RouterR10-1822-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1822-DC router"
+    ::= { zxr10-objectID 101 } 
+
+zxr10RouterR10-1821-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1821-AC router"
+    ::= { zxr10-objectID 102 } 
+    
+zxr10RouterR10-1821-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1821-DC router"
+    ::= { zxr10-objectID 103 } 
+    
+zxr10RouterR10-1812-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1821-AC router"
+    ::= { zxr10-objectID 104 }  
+    
+zxr10RouterR10-1812-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1812-DC router"
+    ::= { zxr10-objectID 105 } 
+    
+zxr10RouterR10-1811-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1811-AC router"
+    ::= { zxr10-objectID 106 }  
+    
+zxr10RouterR10-1811-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1811-DC router"
+    ::= { zxr10-objectID 107 } 
+        
+zxr10RouterR10-1822E-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1822E-AC router"
+    ::= { zxr10-objectID 108 } 
+
+zxr10RouterR10-1822E-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1822E-DC router"
+    ::= { zxr10-objectID 109 } 
+
+zxr10RouterR10-1821E-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1821E-AC router"
+    ::= { zxr10-objectID 110 } 
+    
+zxr10RouterR10-1821E-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1821E-DC router"
+    ::= { zxr10-objectID 111 } 
+    
+zxr10RouterR10-1812E-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1812E-AC router"
+    ::= { zxr10-objectID 112 }  
+    
+zxr10RouterR10-1812E-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1812E-DC router"
+    ::= { zxr10-objectID 113 } 
+    
+zxr10RouterR10-1811E-ACSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1811E-AC router"
+    ::= { zxr10-objectID 114 }  
+    
+zxr10RouterR10-1811E-DCSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 GAR 1811E-DC router"
+    ::= { zxr10-objectID 115 } 
+    
+ zxr10RouterR10-3881-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3881-AC router"    
+    ::= { zxr10-objectID 132 }    
+
+zxr10RouterR10-3882-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3882-AC router"    
+    ::= { zxr10-objectID 133 } 
+    
+zxr10RouterR10-3883-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3883-AC router"    
+    ::= { zxr10-objectID 134 } 
+
+zxr10RouterR10-3884-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3884-AC router"    
+    ::= { zxr10-objectID 135 }                                
+
+zxr10RouterR10-3881-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3881-DC router"    
+    ::= { zxr10-objectID 136 }                  
+
+zxr10RouterR10-3882-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3882-DC router"    
+    ::= { zxr10-objectID 137 }          
+    
+zxr10RouterR10-3883-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3883-DC router"    
+    ::= { zxr10-objectID 138 }          
+                
+zxr10RouterR10-3884-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3884-DC router"    
+    ::= { zxr10-objectID 139 }     
+                                                              
+zxr10RouterR10-3841-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3841-AC router"    
+    ::= { zxr10-objectID 140 }                  
+
+zxr10RouterR10-3842-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3842-AC router"    
+    ::= { zxr10-objectID 141 } 
+    
+zxr10RouterR10-3843-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3843-AC router"    
+    ::= { zxr10-objectID 142 }  
+   
+zxr10RouterR10-3844-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3844-AC router"    
+    ::= { zxr10-objectID 143 }                             
+
+zxr10RouterR10-3841-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3841-DC router"    
+    ::= { zxr10-objectID 144 }                  
+            
+zxr10RouterR10-3842-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3842-DC router"    
+    ::= { zxr10-objectID 145 }                         
+
+zxr10RouterR10-3843-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3843-DC router"    
+    ::= { zxr10-objectID 146 }          
+
+zxr10RouterR10-3844-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3844-DC router"    
+    ::= { zxr10-objectID 147 }  
+       
+zxr10RouterR10-3821-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3821-AC router"    
+    ::= { zxr10-objectID 148}                  
+
+zxr10RouterR10-3822-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3822-AC router"    
+    ::= { zxr10-objectID 149 }              
+   
+zxr10RouterR10-3823-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3823-AC router"    
+    ::= { zxr10-objectID 150 }
+   
+zxr10RouterR10-3824-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3824-AC router"    
+    ::= { zxr10-objectID 151 }   
+
+zxr10RouterR10-3821-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3821-DC router"    
+    ::= { zxr10-objectID 152 }                  
+
+zxr10RouterR10-3822-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3822-DC router"    
+    ::= { zxr10-objectID 153 }          
+                
+zxr10RouterR10-3823-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3823-DC router"    
+    ::= { zxr10-objectID 154 }                           
+
+zxr10RouterR10-3824-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 3824-DC router"    
+    ::= { zxr10-objectID 155 }    
+                     
+zxr10RouterR10-2841-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2841-AC router"    
+    ::= { zxr10-objectID 172 }                  
+
+zxr10RouterR10-2842-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2842-AC router"    
+    ::= { zxr10-objectID 173 }       
+
+zxr10RouterR10-2843-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2843-AC router"    
+    ::= { zxr10-objectID 174 }       
+
+zxr10RouterR10-2844-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2844-AC router"    
+    ::= { zxr10-objectID 175 }       
+
+zxr10RouterR10-2841-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2841-DC router"    
+    ::= { zxr10-objectID 176 }                  
+
+zxr10RouterR10-2842-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2842-DC router"    
+    ::= { zxr10-objectID 177 }       
+
+zxr10RouterR10-2843-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2843-DC router"    
+    ::= { zxr10-objectID 178 }       
+
+zxr10RouterR10-2844-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2844-DC router"    
+    ::= { zxr10-objectID 179 }  
+    
+zxr10RouterR10-2881-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2881-AC router"    
+    ::= { zxr10-objectID 180 }                  
+
+zxr10RouterR10-2882-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2882-AC router"    
+    ::= { zxr10-objectID 181 }       
+
+zxr10RouterR10-2883-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2883-AC router"    
+    ::= { zxr10-objectID 182 }       
+
+zxr10RouterR10-2884-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2884-AC router"    
+    ::= { zxr10-objectID 183 }                                                                       
+
+zxr10RouterR10-2881-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2881-DC router"    
+    ::= { zxr10-objectID 184 }                  
+
+zxr10RouterR10-2882-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2882-DC router"    
+    ::= { zxr10-objectID 185 }       
+
+zxr10RouterR10-2883-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2883-DC router"    
+    ::= { zxr10-objectID 186 }       
+
+zxr10RouterR10-2884-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2884-DC router"    
+    ::= { zxr10-objectID 187 }  
+
+zxr10RouterR10-2821-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2821-AC router"    
+    ::= { zxr10-objectID 188 }                  
+
+zxr10RouterR10-2822-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2822-AC router"    
+    ::= { zxr10-objectID 189 }       
+
+zxr10RouterR10-2823-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2823-AC router"    
+    ::= { zxr10-objectID 190 }       
+
+zxr10RouterR10-2824-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2824-AC router"    
+    ::= { zxr10-objectID 191 }                                                                       
+
+zxr10RouterR10-2821-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2821-DC router"    
+    ::= { zxr10-objectID 192 }                  
+
+zxr10RouterR10-2822-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2822-DC router"    
+    ::= { zxr10-objectID 193 }       
+
+zxr10RouterR10-2823-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2823-DC router"    
+    ::= { zxr10-objectID 194 }       
+
+zxr10RouterR10-2824-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 2824-DC router"    
+    ::= { zxr10-objectID 195 } 
+    
+zxr10RouterR10-1841-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1841-AC router"    
+    ::= { zxr10-objectID 196 }                  
+
+zxr10RouterR10-1842-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1842-AC router"    
+    ::= { zxr10-objectID 197 }       
+
+zxr10RouterR10-1843-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1843-AC router"    
+    ::= { zxr10-objectID 198 }       
+
+zxr10RouterR10-1844-ACSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1844-AC router"    
+    ::= { zxr10-objectID 199 }       
+
+zxr10RouterR10-1841-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1841-DC router"    
+    ::= { zxr10-objectID 200 }                  
+
+zxr10RouterR10-1842-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1842-DC router"    
+    ::= { zxr10-objectID 201 }       
+
+zxr10RouterR10-1843-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1843-DC router"    
+    ::= { zxr10-objectID 202 }       
+
+zxr10RouterR10-1844-DCSysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 GAR 1844-DC router"    
+    ::= { zxr10-objectID 203 }     
+
+zxr10Switch-6907SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 6907 switch"
+    ::= { zxr10-objectID 400 }
+
+zxr10Switch-T240GSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 T240G switch"
+    ::= { zxr10-objectID 401 } 
+    
+zxr10Switch-6902SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 6902 switch"
+    ::= { zxr10-objectID 402 }
+    
+zxr10Switch-6905SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 6905 switch"
+    ::= { zxr10-objectID 403 }  
+    
+zxr10Switch-6908SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 6908 switch"
+    ::= { zxr10-objectID 404 }
+
+zxr10Switch-8902SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 8902 switch"
+    ::= { zxr10-objectID 405 }
+
+zxr10Switch-8905SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 8905 switch"
+    ::= { zxr10-objectID 406 }
+
+zxr10Switch-8908SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 8908 switch"
+    ::= { zxr10-objectID 407 }
+
+zxr10Switch-8912SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 8912 switch"
+    ::= { zxr10-objectID 408 }
+
+zxctn-6100SysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxctn 6100"
+    ::= { zxr10-objectID 409 }
+    
+zxr10Switch5928-PSSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 5928-PS switch"
+    ::= { zxr10-objectID 417 }
+
+zxr10Switch3928A-PSSysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxctn 3928A-PS switch"
+    ::= { zxr10-objectID 418 }  
+
+zxr10Switch3928ESysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3928E switch"
+    ::= { zxr10-objectID 419 }
+
+zxr10Switch3928E-FISysID OBJECT-IDENTITY
+    STATUS        current
+    DESCRIPTION  "zxr10 3928E-FI switch"
+    ::= { zxr10-objectID 420 }
+       
+zxr10UAS10600SysID OBJECT-IDENTITY    
+    STATUS        current                       
+    DESCRIPTION  "zxr10 uas10600"    
+    ::= { zxr10-objectID 5000 }
+          
+END

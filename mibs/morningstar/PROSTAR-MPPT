@@ -1,0 +1,1027 @@
+PROSTAR-MPPT DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32 FROM SNMPv2-SMI
+	morningstar		FROM MORNINGSTAR
+	DisplayString		FROM RFC1213-MIB
+	TEXTUAL-CONVENTION	FROM SNMPv2-TC
+	OBJECT-GROUP		FROM SNMPv2-CONF;
+
+prostarMppt MODULE-IDENTITY
+	LAST-UPDATED "201912200000Z"
+	ORGANIZATION "morningstar"
+	CONTACT-INFO "Morningstar Corporation
+			Postal: Morningstar Corporation
+			8 Pheasant Run
+			Newtown, PA 18940
+			United States of America
+			Tel: +1 215 321 4457
+			E-Mail: info@morningstarcorp.com"
+
+	DESCRIPTION "Morningstar Product: Prostar MPPT
+			Device Type: 10
+			Device Model: 0
+			Meterbus Type: 10
+			--
+			Copyright (C) Morningstar Corporation (2019).
+			All Rights Reserved"
+	
+	REVISION "201912200000Z"
+	DESCRIPTION "Original version"
+	::= { morningstar 5 }
+
+
+ChargeStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Control State"
+	SYNTAX INTEGER {
+			start (0),
+			nightCheck (1),
+			disconnect (2),
+			night (3),
+			fault (4),
+			bulkMppt (5),
+			absorption (6),
+			float (7),
+			equalize (8),
+			slave (9),
+			fixed (10)
+		}
+LoadStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load State"
+	SYNTAX INTEGER {
+			start (0),
+			normal (1),
+			lvdWarning (2),
+			lvd (3),
+			fault (4),
+			disconnect (5),
+			normalOff (6),
+			override (7),
+			notUsed (8)
+		}
+SettingsSwitchesEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Settings Switches"
+	SYNTAX INTEGER {
+			off-off-off-off-off-off-off-off (0),
+			on-off-off-off-off-off-off-off (1),
+			off-on-off-off-off-off-off-off (2),
+			on-on-off-off-off-off-off-off (3),
+			off-off-on-off-off-off-off-off (4),
+			on-off-on-off-off-off-off-off (5),
+			off-on-on-off-off-off-off-off (6),
+			on-on-on-off-off-off-off-off (7),
+			off-off-off-on-off-off-off-off (8),
+			on-off-off-on-off-off-off-off (9),
+			off-on-off-on-off-off-off-off (10),
+			on-on-off-on-off-off-off-off (11),
+			off-off-on-on-off-off-off-off (12),
+			on-off-on-on-off-off-off-off (13),
+			off-on-on-on-off-off-off-off (14),
+			on-on-on-on-off-off-off-off (15),
+			off-off-off-off-on-off-off-off (16),
+			on-off-off-off-on-off-off-off (17),
+			off-on-off-off-on-off-off-off (18),
+			on-on-off-off-on-off-off-off (19),
+			off-off-on-off-on-off-off-off (20),
+			on-off-on-off-on-off-off-off (21),
+			off-on-on-off-on-off-off-off (22),
+			on-on-on-off-on-off-off-off (23),
+			off-off-off-on-on-off-off-off (24),
+			on-off-off-on-on-off-off-off (25),
+			off-on-off-on-on-off-off-off (26),
+			on-on-off-on-on-off-off-off (27),
+			off-off-on-on-on-off-off-off (28),
+			on-off-on-on-on-off-off-off (29),
+			off-on-on-on-on-off-off-off (30),
+			on-on-on-on-on-off-off-off (31),
+			off-off-off-off-off-on-off-off (32),
+			on-off-off-off-off-on-off-off (33),
+			off-on-off-off-off-on-off-off (34),
+			on-on-off-off-off-on-off-off (35),
+			off-off-on-off-off-on-off-off (36),
+			on-off-on-off-off-on-off-off (37),
+			off-on-on-off-off-on-off-off (38),
+			on-on-on-off-off-on-off-off (39),
+			off-off-off-on-off-on-off-off (40),
+			on-off-off-on-off-on-off-off (41),
+			off-on-off-on-off-on-off-off (42),
+			on-on-off-on-off-on-off-off (43),
+			off-off-on-on-off-on-off-off (44),
+			on-off-on-on-off-on-off-off (45),
+			off-on-on-on-off-on-off-off (46),
+			on-on-on-on-off-on-off-off (47),
+			off-off-off-off-on-on-off-off (48),
+			on-off-off-off-on-on-off-off (49),
+			off-on-off-off-on-on-off-off (50),
+			on-on-off-off-on-on-off-off (51),
+			off-off-on-off-on-on-off-off (52),
+			on-off-on-off-on-on-off-off (53),
+			off-on-on-off-on-on-off-off (54),
+			on-on-on-off-on-on-off-off (55),
+			off-off-off-on-on-on-off-off (56),
+			on-off-off-on-on-on-off-off (57),
+			off-on-off-on-on-on-off-off (58),
+			on-on-off-on-on-on-off-off (59),
+			off-off-on-on-on-on-off-off (60),
+			on-off-on-on-on-on-off-off (61),
+			off-on-on-on-on-on-off-off (62),
+			on-on-on-on-on-on-off-off (63),
+			off-off-off-off-off-off-on-off (64),
+			on-off-off-off-off-off-on-off (65),
+			off-on-off-off-off-off-on-off (66),
+			on-on-off-off-off-off-on-off (67),
+			off-off-on-off-off-off-on-off (68),
+			on-off-on-off-off-off-on-off (69),
+			off-on-on-off-off-off-on-off (70),
+			on-on-on-off-off-off-on-off (71),
+			off-off-off-on-off-off-on-off (72),
+			on-off-off-on-off-off-on-off (73),
+			off-on-off-on-off-off-on-off (74),
+			on-on-off-on-off-off-on-off (75),
+			off-off-on-on-off-off-on-off (76),
+			on-off-on-on-off-off-on-off (77),
+			off-on-on-on-off-off-on-off (78),
+			on-on-on-on-off-off-on-off (79),
+			off-off-off-off-on-off-on-off (80),
+			on-off-off-off-on-off-on-off (81),
+			off-on-off-off-on-off-on-off (82),
+			on-on-off-off-on-off-on-off (83),
+			off-off-on-off-on-off-on-off (84),
+			on-off-on-off-on-off-on-off (85),
+			off-on-on-off-on-off-on-off (86),
+			on-on-on-off-on-off-on-off (87),
+			off-off-off-on-on-off-on-off (88),
+			on-off-off-on-on-off-on-off (89),
+			off-on-off-on-on-off-on-off (90),
+			on-on-off-on-on-off-on-off (91),
+			off-off-on-on-on-off-on-off (92),
+			on-off-on-on-on-off-on-off (93),
+			off-on-on-on-on-off-on-off (94),
+			on-on-on-on-on-off-on-off (95),
+			off-off-off-off-off-on-on-off (96),
+			on-off-off-off-off-on-on-off (97),
+			off-on-off-off-off-on-on-off (98),
+			on-on-off-off-off-on-on-off (99),
+			off-off-on-off-off-on-on-off (100),
+			on-off-on-off-off-on-on-off (101),
+			off-on-on-off-off-on-on-off (102),
+			on-on-on-off-off-on-on-off (103),
+			off-off-off-on-off-on-on-off (104),
+			on-off-off-on-off-on-on-off (105),
+			off-on-off-on-off-on-on-off (106),
+			on-on-off-on-off-on-on-off (107),
+			off-off-on-on-off-on-on-off (108),
+			on-off-on-on-off-on-on-off (109),
+			off-on-on-on-off-on-on-off (110),
+			on-on-on-on-off-on-on-off (111),
+			off-off-off-off-on-on-on-off (112),
+			on-off-off-off-on-on-on-off (113),
+			off-on-off-off-on-on-on-off (114),
+			on-on-off-off-on-on-on-off (115),
+			off-off-on-off-on-on-on-off (116),
+			on-off-on-off-on-on-on-off (117),
+			off-on-on-off-on-on-on-off (118),
+			on-on-on-off-on-on-on-off (119),
+			off-off-off-on-on-on-on-off (120),
+			on-off-off-on-on-on-on-off (121),
+			off-on-off-on-on-on-on-off (122),
+			on-on-off-on-on-on-on-off (123),
+			off-off-on-on-on-on-on-off (124),
+			on-off-on-on-on-on-on-off (125),
+			off-on-on-on-on-on-on-off (126),
+			on-on-on-on-on-on-on-off (127),
+			off-off-off-off-off-off-off-on (128),
+			on-off-off-off-off-off-off-on (129),
+			off-on-off-off-off-off-off-on (130),
+			on-on-off-off-off-off-off-on (131),
+			off-off-on-off-off-off-off-on (132),
+			on-off-on-off-off-off-off-on (133),
+			off-on-on-off-off-off-off-on (134),
+			on-on-on-off-off-off-off-on (135),
+			off-off-off-on-off-off-off-on (136),
+			on-off-off-on-off-off-off-on (137),
+			off-on-off-on-off-off-off-on (138),
+			on-on-off-on-off-off-off-on (139),
+			off-off-on-on-off-off-off-on (140),
+			on-off-on-on-off-off-off-on (141),
+			off-on-on-on-off-off-off-on (142),
+			on-on-on-on-off-off-off-on (143),
+			off-off-off-off-on-off-off-on (144),
+			on-off-off-off-on-off-off-on (145),
+			off-on-off-off-on-off-off-on (146),
+			on-on-off-off-on-off-off-on (147),
+			off-off-on-off-on-off-off-on (148),
+			on-off-on-off-on-off-off-on (149),
+			off-on-on-off-on-off-off-on (150),
+			on-on-on-off-on-off-off-on (151),
+			off-off-off-on-on-off-off-on (152),
+			on-off-off-on-on-off-off-on (153),
+			off-on-off-on-on-off-off-on (154),
+			on-on-off-on-on-off-off-on (155),
+			off-off-on-on-on-off-off-on (156),
+			on-off-on-on-on-off-off-on (157),
+			off-on-on-on-on-off-off-on (158),
+			on-on-on-on-on-off-off-on (159),
+			off-off-off-off-off-on-off-on (160),
+			on-off-off-off-off-on-off-on (161),
+			off-on-off-off-off-on-off-on (162),
+			on-on-off-off-off-on-off-on (163),
+			off-off-on-off-off-on-off-on (164),
+			on-off-on-off-off-on-off-on (165),
+			off-on-on-off-off-on-off-on (166),
+			on-on-on-off-off-on-off-on (167),
+			off-off-off-on-off-on-off-on (168),
+			on-off-off-on-off-on-off-on (169),
+			off-on-off-on-off-on-off-on (170),
+			on-on-off-on-off-on-off-on (171),
+			off-off-on-on-off-on-off-on (172),
+			on-off-on-on-off-on-off-on (173),
+			off-on-on-on-off-on-off-on (174),
+			on-on-on-on-off-on-off-on (175),
+			off-off-off-off-on-on-off-on (176),
+			on-off-off-off-on-on-off-on (177),
+			off-on-off-off-on-on-off-on (178),
+			on-on-off-off-on-on-off-on (179),
+			off-off-on-off-on-on-off-on (180),
+			on-off-on-off-on-on-off-on (181),
+			off-on-on-off-on-on-off-on (182),
+			on-on-on-off-on-on-off-on (183),
+			off-off-off-on-on-on-off-on (184),
+			on-off-off-on-on-on-off-on (185),
+			off-on-off-on-on-on-off-on (186),
+			on-on-off-on-on-on-off-on (187),
+			off-off-on-on-on-on-off-on (188),
+			on-off-on-on-on-on-off-on (189),
+			off-on-on-on-on-on-off-on (190),
+			on-on-on-on-on-on-off-on (191),
+			off-off-off-off-off-off-on-on (192),
+			on-off-off-off-off-off-on-on (193),
+			off-on-off-off-off-off-on-on (194),
+			on-on-off-off-off-off-on-on (195),
+			off-off-on-off-off-off-on-on (196),
+			on-off-on-off-off-off-on-on (197),
+			off-on-on-off-off-off-on-on (198),
+			on-on-on-off-off-off-on-on (199),
+			off-off-off-on-off-off-on-on (200),
+			on-off-off-on-off-off-on-on (201),
+			off-on-off-on-off-off-on-on (202),
+			on-on-off-on-off-off-on-on (203),
+			off-off-on-on-off-off-on-on (204),
+			on-off-on-on-off-off-on-on (205),
+			off-on-on-on-off-off-on-on (206),
+			on-on-on-on-off-off-on-on (207),
+			off-off-off-off-on-off-on-on (208),
+			on-off-off-off-on-off-on-on (209),
+			off-on-off-off-on-off-on-on (210),
+			on-on-off-off-on-off-on-on (211),
+			off-off-on-off-on-off-on-on (212),
+			on-off-on-off-on-off-on-on (213),
+			off-on-on-off-on-off-on-on (214),
+			on-on-on-off-on-off-on-on (215),
+			off-off-off-on-on-off-on-on (216),
+			on-off-off-on-on-off-on-on (217),
+			off-on-off-on-on-off-on-on (218),
+			on-on-off-on-on-off-on-on (219),
+			off-off-on-on-on-off-on-on (220),
+			on-off-on-on-on-off-on-on (221),
+			off-on-on-on-on-off-on-on (222),
+			on-on-on-on-on-off-on-on (223),
+			off-off-off-off-off-on-on-on (224),
+			on-off-off-off-off-on-on-on (225),
+			off-on-off-off-off-on-on-on (226),
+			on-on-off-off-off-on-on-on (227),
+			off-off-on-off-off-on-on-on (228),
+			on-off-on-off-off-on-on-on (229),
+			off-on-on-off-off-on-on-on (230),
+			on-on-on-off-off-on-on-on (231),
+			off-off-off-on-off-on-on-on (232),
+			on-off-off-on-off-on-on-on (233),
+			off-on-off-on-off-on-on-on (234),
+			on-on-off-on-off-on-on-on (235),
+			off-off-on-on-off-on-on-on (236),
+			on-off-on-on-off-on-on-on (237),
+			off-on-on-on-off-on-on-on (238),
+			on-on-on-on-off-on-on-on (239),
+			off-off-off-off-on-on-on-on (240),
+			on-off-off-off-on-on-on-on (241),
+			off-on-off-off-on-on-on-on (242),
+			on-on-off-off-on-on-on-on (243),
+			off-off-on-off-on-on-on-on (244),
+			on-off-on-off-on-on-on-on (245),
+			off-on-on-off-on-on-on-on (246),
+			on-on-on-off-on-on-on-on (247),
+			off-off-off-on-on-on-on-on (248),
+			on-off-off-on-on-on-on-on (249),
+			off-on-off-on-on-on-on-on (250),
+			on-on-off-on-on-on-on-on (251),
+			off-off-on-on-on-on-on-on (252),
+			on-off-on-on-on-on-on-on (253),
+			off-on-on-on-on-on-on-on (254),
+			on-on-on-on-on-on-on-on (255)
+		}
+LedStateEnum ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "LED State"
+	SYNTAX INTEGER {
+			ledStart (0),
+			ledStart2 (1),
+			ledBranch (2),
+			equalizeFastGreen (3),
+			floatSlowGreen (4),
+			absorptionFlashingGreen (5),
+			green (6),
+			green-yellow (7),
+			yellow (8),
+			yellow-red (9),
+			flashingRed (10),
+			red (11),
+			r-y-gError (12),
+			ry-gError (13),
+			rg-yError (14),
+			r-yError (15),
+			r-gError (16),
+			ry-gyError (17),
+			gyrFlashingError (18),
+			gyrX2 (19),
+			ledOff (20)
+		}
+ArrayFaultsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Array Faults"
+	SYNTAX BITS {
+			overcurrent (0),
+			mosfetSShorted (1),
+			software (2),
+			batteryHvd (3),
+			arrayHvd (4),
+			customSettingsEdit (5),
+			rtsShorted (6),
+			rtsNoLongerValid (7),
+			localTempSensorDamaged (8),
+			batteryLowVoltageDisconnect (9),
+			slaveTimeout (10),
+			dipSwitchChanged (11),
+			fault13Undefined (12),
+			fault14Undefined (13),
+			fault15Undefined (14),
+			fault16Undefined (15)
+		}
+LoadFaultsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load Faults"
+	SYNTAX BITS {
+			externalShortCircuit (0),
+			overcurrent (1),
+			mosfetShorted (2),
+			software (3),
+			loadHvd (4),
+			highTempDisconnect (5),
+			dipSwitchChanged (6),
+			customSettingsEdit (7)
+		}
+AlarmsBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Alarms"
+	SYNTAX BITS {
+			rtsOpen (0),
+			rtsShorted (1),
+			rtsDisconnected (2),
+			heatsinkTempSensorOpen (3),
+			heatsinkTempSensorShorted (4),
+			heatsinkTempLimit (5),
+			inductorTempSensorOpen (6),
+			inductorTempSensorShorted (7),
+			inductorTempLimit (8),
+			currentLimit (9),
+			currentMeasurementError (10),
+			batterySenseOutOfRange (11),
+			batterySenseDisconnected (12),
+			uncalibrated (13),
+			tb5v (14),
+			fp10SupplyOutOfRange (15),
+			unused (16),
+			mosfetOpen (17),
+			arrayCurrentOffset (18),
+			loadCurrentOffset (19),
+			p33SupplyOutOfRange (20),
+			p12SupplyOutOfRange (21),
+			hightInputVoltageLimit (22),
+			controllerReset (23),
+			loadLvd (24),
+			logTimeout (25),
+			eepromAccessFailure (26)
+		}
+ArrayFaultsDailyBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Array Faults (daily)"
+	SYNTAX BITS {
+			overcurrent (0),
+			mosfetSShorted (1),
+			software (2),
+			batteryHvd (3),
+			arrayHvd (4),
+			customSettingsEdit (5),
+			rtsShorted (6),
+			rtsNoLongerValid (7),
+			localTempSensorDamaged (8),
+			batteryLowVoltageDisconnect (9),
+			slaveTimeout (10),
+			dipSwitchChanged (11),
+			fault13Undefined (12),
+			fault14Undefined (13),
+			fault15Undefined (14),
+			fault16Undefined (15)
+		}
+LoadFaultsDailyBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Load Faults (daily)"
+	SYNTAX BITS {
+			externalShortCircuit (0),
+			overcurrent (1),
+			mosfetShorted (2),
+			software (3),
+			loadHvd (4),
+			highTempDisconnect (5),
+			dipSwitchChanged (6),
+			customSettingsEdit (7)
+		}
+AlarmsDailyBitfield ::= TEXTUAL-CONVENTION
+	STATUS current
+	DESCRIPTION "Alarms (daily)"
+	SYNTAX BITS {
+			rtsOpen (0),
+			rtsShorted (1),
+			rtsDisconnected (2),
+			heatsinkTempSensorOpen (3),
+			heatsinkTempSensorShorted (4),
+			heatsinkTempLimit (5),
+			inductorTempSensorOpen (6),
+			inductorTempSensorShorted (7),
+			inductorTempLimit (8),
+			currentLimit (9),
+			currentMeasurementError (10),
+			batterySenseOutOfRange (11),
+			batterySenseDisconnected (12),
+			uncalibrated (13),
+			tb5v (14),
+			fp10SupplyOutOfRange (15),
+			unused (16),
+			mosfetOpen (17),
+			arrayCurrentOffset (18),
+			loadCurrentOffset (19),
+			p33SupplyOutOfRange (20),
+			p12SupplyOutOfRange (21),
+			hightInputVoltageLimit (22),
+			controllerReset (23),
+			loadLvd (24),
+			logTimeout (25),
+			eepromAccessFailure (26)
+		}
+subModel OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The device's exact model"
+	::= { prostarMppt 1 }
+serialNumber OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..15))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Device Serial Number"
+	::= { prostarMppt 2 }
+deviceVersion OBJECT-TYPE
+	SYNTAX       DisplayString (SIZE (0..32))
+	MAX-ACCESS   read-only
+	STATUS       current
+	DESCRIPTION
+		"Hardware and firmware versions: vHW1.HW2.FW"
+	::= { prostarMppt 3 }
+batteryTerminalVoltage OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Terminal Voltage
+		- Description: Battery  Terminal Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x0012"
+	::={ prostarMppt 30 }
+arrayVoltage OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Voltage
+		- Description: Array Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0, 80]
+		- Modbus address: 0x0013"
+	::={ prostarMppt 31 }
+loadVoltage OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Voltage
+		- Description: Load Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0, 80]
+		- Modbus address: 0x0014"
+	::={ prostarMppt 32 }
+chargeCurrent OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Charge Current
+		- Description: Charge Current
+		- Scaling Factor: 1.0
+		- Units: A
+		- Range: [0, 40]
+		- Modbus address: 0x0010"
+	::={ prostarMppt 33 }
+loadCurrent OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Current
+		- Description: Load Current
+		- Scaling Factor: 1.0
+		- Units: A
+		- Range: [0, 60]
+		- Modbus address: 0x0016"
+	::={ prostarMppt 34 }
+batteryCurrentNet OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Current (net)
+		- Description: Net Battery Current
+		- Scaling Factor: 1.0
+		- Units: A
+		- Range: [0.0, 65535]
+		- Modbus address: 0x0015"
+	::={ prostarMppt 35 }
+batterySenseVoltage OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Sense Voltage
+		- Description: Battery Sense Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0, 80]
+		- Modbus address: 0x0017"
+	::={ prostarMppt 36 }
+meterbusVoltage OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"MeterBus Voltage
+		- Description: MeterBus Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0, 80]
+		- Modbus address: 0x0008"
+	::={ prostarMppt 37 }
+heatsinkTemperature OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Heatsink Temperature
+		- Description: Heatsink Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x001A"
+	::={ prostarMppt 38 }
+batteryTemperature OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Temperature
+		- Description: Battery Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x001B"
+	::={ prostarMppt 39 }
+ambientTemperature OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ambient Temperature
+		- Description: Ambient Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x001C"
+	::={ prostarMppt 40 }
+rtsTemperature OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"RTS Temperature
+		- Description: RTS Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x001D"
+	::={ prostarMppt 41 }
+uInductorTemperature OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"U Inductor Temperature
+		- Description: U Inductor Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x001E"
+	::={ prostarMppt 42 }
+vInductorTemperature OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"V Inductor Temperature
+		- Description: V Inductor Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x001F"
+	::={ prostarMppt 43 }
+wInductorTemperature OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"W Inductor Temperature
+		- Description: W Inductor Temperature
+		- Scaling Factor: 1.0
+		- Units: deg C
+		- Range: [-128, 127]
+		- Modbus address: 0x0020"
+	::={ prostarMppt 44 }
+chargeState OBJECT-TYPE
+	SYNTAX     ChargeStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Charge State
+		- Description: Control State
+		- Modbus address: 0x0021"
+	::={ prostarMppt 45 }
+arrayFaults OBJECT-TYPE
+	SYNTAX     ArrayFaultsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Faults
+		- Description: Array Faults
+		- Modbus address: 0x0022"
+	::={ prostarMppt 46 }
+batteryVoltageSlow OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Battery Voltage (slow)
+		- Description: Battery Voltage (slow)
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x0023"
+	::={ prostarMppt 47 }
+targetVoltage OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Target Voltage
+		- Description: Target Regulation Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x0024"
+	::={ prostarMppt 48 }
+ahChargeResettable OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Charge (Resettable)
+		- Description: Ah Charge (Resettable)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x0026 L=0x0027"
+	::={ prostarMppt 49 }
+ahChargeTotal OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Charge (Total)
+		- Description: Ah Charge (Total)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x0028 L=0x0029"
+	::={ prostarMppt 50 }
+kwhChargeResettable OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"kWh Charge (Resettable)
+		- Description: Kilowatt Hours Charge (Resettable)
+		- Scaling Factor: 1.0
+		- Units: kWh
+		- Range: [0.0, 65535]
+		- Modbus address: 0x002A"
+	::={ prostarMppt 51 }
+kwhChargeTotal OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"kWh Charge (Total)
+		- Description: Kilowatt Hours Charge (Total)
+		- Scaling Factor: 1.0
+		- Units: kWh
+		- Range: [0.0, 65535]
+		- Modbus address: 0x002B"
+	::={ prostarMppt 52 }
+loadState OBJECT-TYPE
+	SYNTAX     LoadStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load State
+		- Description: Load State
+		- Modbus address: 0x002E"
+	::={ prostarMppt 53 }
+loadFaults OBJECT-TYPE
+	SYNTAX     LoadFaultsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Faults
+		- Description: Load Faults
+		- Modbus address: 0x002F"
+	::={ prostarMppt 54 }
+lvdSetpoint OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LVD Setpoint
+		- Description: LVD Setpoint (current compensated)
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x0030"
+	::={ prostarMppt 55 }
+ahLoadResettable OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Load (Resettable)
+		- Description: Ah Load (Resettable)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x0032 L=0x0033"
+	::={ prostarMppt 56 }
+ahLoadTotal OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Load (Total)
+		- Description: Ah Load (Total)
+		- Scaling Factor: 0.1
+		- Units: Ah
+		- Range: [0.0, 4294967294]
+		- Modbus addresses: H=0x0034 L=0x0035"
+	::={ prostarMppt 57 }
+hourmeter OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Hourmeter
+		- Description: Hourmeter
+		- Scaling Factor: 1.0
+		- Units: hrs
+		- Range: [0.0, 1677215]
+		- Modbus addresses: H=0x0036 L=0x0037"
+	::={ prostarMppt 58 }
+alarms OBJECT-TYPE
+	SYNTAX     AlarmsBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Alarms
+		- Description: Alarms
+		- Modbus addresses: H=0x0038 L=0x0039"
+	::={ prostarMppt 59 }
+settingsSwitches OBJECT-TYPE
+	SYNTAX     SettingsSwitchesEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Settings Switches
+		- Description: Settings Switches
+		- Modbus address: 0x003A"
+	::={ prostarMppt 60 }
+ledState OBJECT-TYPE
+	SYNTAX     LedStateEnum
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"LED State
+		- Description: LED State
+		- Modbus address: 0x003B"
+	::={ prostarMppt 61 }
+arrayPower OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Power
+		- Description: Array Power
+		- Scaling Factor: 1.0
+		- Units: W
+		- Range: [0.0, 500]
+		- Modbus address: 0x003C"
+	::={ prostarMppt 62 }
+arrayVmp OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Vmp
+		- Description: Array Max. Power Point Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 5000.0]
+		- Modbus address: 0x003D"
+	::={ prostarMppt 63 }
+arrayMaxPowerSweep OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Max. Power (sweep)
+		- Description: Array Max. Power (last sweep)
+		- Scaling Factor: 1.0
+		- Units: W
+		- Range: [0.0, 500]
+		- Modbus address: 0x003E"
+	::={ prostarMppt 64 }
+arrayVoc OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Voc
+		- Description: Array Open Circuit Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 80.0]
+		- Modbus address: 0x003F"
+	::={ prostarMppt 65 }
+vbMinDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Vb Min Daily
+		- Description: Min. Daily Battery Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 80]
+		- Modbus address: 0x0041"
+	::={ prostarMppt 66 }
+vbMaxDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Vb Max Daily
+		- Description: Max. Daily Battery Voltage
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 80]
+		- Modbus address: 0x0042"
+	::={ prostarMppt 67 }
+ahChargeDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Charge (daily)
+		- Description: Charge Amp-hours (daily)
+		- Scaling Factor: 1.0
+		- Units: Ah
+		- Range: [0.0, 65535]
+		- Modbus address: 0x0043"
+	::={ prostarMppt 68 }
+ahLoadDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Ah Load (daily)
+		- Description: Load Amp-hours (daily)
+		- Scaling Factor: 1.0
+		- Units: Ah
+		- Range: [0.0, 65535]
+		- Modbus address: 0x0044"
+	::={ prostarMppt 69 }
+arrayFaultsDaily OBJECT-TYPE
+	SYNTAX     ArrayFaultsDailyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Faults (daily)
+		- Description: Array Faults (daily)
+		- Modbus address: 0x0045"
+	::={ prostarMppt 70 }
+loadFaultsDaily OBJECT-TYPE
+	SYNTAX     LoadFaultsDailyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Load Faults (daily)
+		- Description: Load Faults (daily)
+		- Modbus address: 0x0046"
+	::={ prostarMppt 71 }
+alarmsDaily OBJECT-TYPE
+	SYNTAX     AlarmsDailyBitfield
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Alarms (daily)
+		- Description: Alarms (daily)
+		- Modbus addresses: H=0x0047 L=0x0048"
+	::={ prostarMppt 72 }
+arrayVoltageMaxDaily OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Voltage Max (daily)
+		- Description: Array Voltage Max (daily)
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 65535]
+		- Modbus address: 0x004C"
+	::={ prostarMppt 73 }
+arrayVoltageFixed OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Voltage Fixed
+		- Description: Fixed Array Voltage Operating Point
+		- Scaling Factor: 1.0
+		- Units: V
+		- Range: [0.0, 65535]
+		- Modbus address: 0x004F"
+	::={ prostarMppt 74 }
+arrayVocFixed OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE (0..16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Array Voc % Fixed
+		- Description: Fixed Voc % Operating Point
+		- Scaling Factor: 1.0
+		- Units: %
+		- Range: [0.0, 65535]
+		- Modbus address: 0x0050"
+	::={ prostarMppt 75 }
+
+END

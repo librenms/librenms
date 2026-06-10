@@ -1,0 +1,14 @@
+os: serveriron
+text: 'Brocade ServerIron'
+type: loadbalancer
+group: brocade
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+icon: brocade
+discovery:
+    -
+        sysDescr:
+            - ServerIron

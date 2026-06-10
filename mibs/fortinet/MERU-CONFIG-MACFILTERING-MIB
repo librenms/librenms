@@ -1,0 +1,175 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-MACFILTERING-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    ;
+
+  mwConfigMacFiltering  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         MAC Filtering Configuration infrastructure"
+    ::= { mwConfiguration 6 } 
+  
+    mwAcl                                    OBJECT IDENTIFIER ::= { mwConfigMacFiltering 1 }
+    
+  
+  mwAclCachingTimeout  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Auto Authentication Expiry Period(Seconds)"
+    ::= { mwAcl    4 }
+
+  mwAclAccessAllowTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwAclAccessAllowEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ACL Allow Access Configuration "
+    ::= { mwConfigMacFiltering 2 }
+
+  mwAclAccessAllowEntry  OBJECT-TYPE
+    SYNTAX MwAclAccessAllowEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ACL Allow Access Configuration "
+    INDEX {  mwAclAccessAllowTableIndex  }
+    ::= { mwAclAccessAllowTable 1 }
+
+  MwAclAccessAllowEntry  ::=  SEQUENCE { 
+       mwAclAccessAllowTableIndex                                  Integer32, 
+       mwAclAccessAllowMac                                         MacAddress,
+       mwAclAccessAllowDescr                                       DisplayString(SIZE (0..40)),
+       mwAclAccessAllowRowStatus                                   RowStatus 
+  }
+   
+   
+  mwAclAccessAllowTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwAclAccessAllowEntry 1 }
+
+  mwAclAccessAllowMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address. The value must not be 00:00:00:00:00:00"
+    ::= { mwAclAccessAllowEntry    2 }
+
+  mwAclAccessAllowDescr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..40))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Description"
+    ::= { mwAclAccessAllowEntry    3 }
+
+  mwAclAccessAllowRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwAclAccessAllowEntry 5 }
+
+  mwAclAccessDenyTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwAclAccessDenyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ACL Deny Access Configuration "
+    ::= { mwConfigMacFiltering 3 }
+
+  mwAclAccessDenyEntry  OBJECT-TYPE
+    SYNTAX MwAclAccessDenyEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ACL Deny Access Configuration "
+    INDEX {  mwAclAccessDenyTableIndex  }
+    ::= { mwAclAccessDenyTable 1 }
+
+  MwAclAccessDenyEntry  ::=  SEQUENCE { 
+       mwAclAccessDenyTableIndex                                   Integer32, 
+       mwAclAccessDenyMac                                          MacAddress,
+       mwAclAccessDenyDescr                                        DisplayString(SIZE (0..40)),
+       mwAclAccessDenyRowStatus                                    RowStatus 
+  }
+   
+   
+  mwAclAccessDenyTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwAclAccessDenyEntry 1 }
+
+  mwAclAccessDenyMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address. The value must not be 00:00:00:00:00:00"
+    ::= { mwAclAccessDenyEntry    2 }
+
+  mwAclAccessDenyDescr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..40))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Description"
+    ::= { mwAclAccessDenyEntry    3 }
+
+  mwAclAccessDenyRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwAclAccessDenyEntry 5 }
+
+  
+END
+   

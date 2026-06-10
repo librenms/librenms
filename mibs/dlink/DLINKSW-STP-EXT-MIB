@@ -1,0 +1,314 @@
+--  *****************************************************************
+--  DLINKSW-STP-EXT-MIB.mib : STP Extension MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+	DLINKSW-STP-EXT-MIB DEFINITIONS ::= BEGIN
+		
+	IMPORTS	          
+	    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        	FROM SNMPv2-SMI
+	    TruthValue
+	        FROM SNMPv2-TC
+	    MODULE-COMPLIANCE, OBJECT-GROUP
+	        FROM SNMPv2-CONF	    			    	    	      	                  
+	    IEEE8021BridgePortNumber, IEEE8021MstIdentifier
+        FROM IEEE8021-TC-MIB    
+        dlinkIndustrialCommon			
+			FROM DLINK-ID-REC-MIB;	
+		
+	dlinkSwStpExtMIB MODULE-IDENTITY
+	    LAST-UPDATED "201303270000Z"
+	    ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+                "        D-Link Corporation
+
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+	    DESCRIPTION
+		    "The MIB module for managing D-Link STP extensions which are not covered
+            by standard MIBs."
+		REVISION "201303270000Z"
+        DESCRIPTION
+            "Initial version of this MIB."    
+        ::= { dlinkIndustrialCommon 15 }
+                
+
+    dStpExtMIBNotifications      OBJECT IDENTIFIER ::= { dlinkSwStpExtMIB 0 }
+    dStpExtMIBObjects            OBJECT IDENTIFIER ::= { dlinkSwStpExtMIB 1 }
+    dStpExtMIBConformance        OBJECT IDENTIFIER ::= { dlinkSwStpExtMIB 2 }
+        	
+-- -----------------------------------------------------------------------------
+    dStpExtGblMgmt		OBJECT IDENTIFIER ::= { dStpExtMIBObjects 1 }
+    	
+	dStpExtStpGblStateEnabled OBJECT-TYPE
+        SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables global spanning-tree function."
+        ::= { dStpExtGblMgmt 1 }	
+	
+	dStpExtNotificationEnable OBJECT-TYPE
+        SYNTAX          BITS {
+            newRoot(0),
+            topologyChange(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object indicates whether a specified notification is enabled or not.
+            If a bit corresponding to a notification is set to 1, then 
+            the specified notification can be generated.
+
+            newRoot(0)    - the newRoot notification as defined in BRIDGE-MIB.
+
+            topologyChange(1) -- the topologyChange notification as defined in
+                         BRIDGE-MIB.                
+         "
+    ::= { dStpExtGblMgmt 2 }
+	
+    dStpExtStpNniBpduAddress OBJECT-TYPE
+       	SYNTAX  INTEGER {
+            dot1d(1),
+            dot1ad(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Specifies the BPDU MAC address of the NNI port in Q-in-Q status.
+            dot1d - Use Customer Bridge Group Address (01-80-C2-00-00-00) as 
+                    destination address of STP BPDU.
+            dot1ad - Use Provider Bridge Group Address (01-80-C2-00-00-08) as 
+                    destination address of STP BPDU.
+            "
+        ::= { dStpExtGblMgmt 3 }
+	
+        
+--  ***************************************************************************	
+--  STP Port Table
+--  ***************************************************************************  	 
+    dStpExtPortMgmt		OBJECT IDENTIFIER ::= { dStpExtMIBObjects 2 }
+             
+    dStpExtPortTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DStpExtPortEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "A table that contains port-specific information
+		      for the STP extensions."
+		::= { dStpExtPortMgmt 1 }
+
+	dStpExtPortEntry OBJECT-TYPE
+		SYNTAX          DStpExtPortEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "An entry in dStpExtPortTable. This object indicates per port
+		      STP information which is not covered by standard MIB(s)."
+		INDEX   { dStpExtPortNumber }
+		::= { dStpExtPortTable 1 }
+
+	DStpExtPortEntry ::=	SEQUENCE {
+		dStpExtPortNumber		            IEEE8021BridgePortNumber,							
+		dStpExtPortForwardBpduEnabled       TruthValue,
+		dStpExtPortAdminHelloTime           Unsigned32,
+		dStpExtPortState                    INTEGER
+	}
+     
+	dStpExtPortNumber OBJECT-TYPE
+		SYNTAX          IEEE8021BridgePortNumber
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+		      "The port number of the port for this entry."
+		::= { dStpExtPortEntry 1 }		
+	 			
+	dStpExtPortForwardBpduEnabled OBJECT-TYPE
+	    SYNTAX          TruthValue 
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether forward the received STP BPDUs to all
+            VLAN member ports in untagged form. 
+            dStpExtPortForwardBpduEnabled cannot be set to 'true' when 
+            spanning-tree protocol is enabled on the interface. "
+        ::= { dStpExtPortEntry 2 }
+
+	dStpExtPortAdminHelloTime OBJECT-TYPE
+	    SYNTAX          Unsigned32 (1..2)
+	    UNITS          "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the time interval to send one BPDU at the
+            designated port.
+            dStpExtPortAdminHelloTime only takes effect in MSTP mode."
+        ::= { dStpExtPortEntry 3 }
+                   	 
+	dStpExtPortState OBJECT-TYPE
+        SYNTAX  INTEGER {            
+            errDisabled(1),
+            blocking(2),
+            listening(3),
+            learning(4),
+            forwarding(5),
+            broken(6),
+            nonStpForwarding(7),          
+            nonStpOther(8)            
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of STP port.  
+            errDisabled(1): the port is at error disabled state.                                             
+            blocking(2) - broken(6): When STP is enabled on the port and the
+                          port is not at error disabled state, dStpExtPortState
+                          has the same value as dot1dStpPortState, as defined
+                          by application of STP.          
+            noStpForwarding(7) - STP is disabled at the port and this port is
+                          functioning.            
+            nonStpOther(8) - STP is disabled at the port and this port is link-down
+                          or other malfunctioning situations.
+            "                      
+        ::= { dStpExtPortEntry 4 }
+         
+--  ***************************************************************************	
+--  MSTP Instance Extension Table
+--  ***************************************************************************  
+    dStpExtMstpMgmt		OBJECT IDENTIFIER ::= { dStpExtMIBObjects 3 }
+    
+    dStpExtMstpPortTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DStpExtMstpPortEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		    "A table that contains MSTI-specific information
+		    which are not covered by ieee8021MstpPortTable.
+		    Note that entries will exist in this table only for bridge
+            components for which the corresponding instance of
+            ieee8021SpanningTreeVersion (from the IEEE8021-SPANNING-TREE-MIB)
+            has a value of mstp(2) and the corresponding port is not disabled.
+		    "
+		::= { dStpExtMstpMgmt 1 }
+
+	dStpExtMstpPortEntry OBJECT-TYPE
+		SYNTAX          DStpExtMstpPortEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+		      "An entry in dStpExtMstPortTable, which consists of information 
+		      is not covered by ieee8021MstpPortTable."
+		INDEX   { 
+		    dStpExtMstpPortMstId,
+		    dStpExtMstpPortNum 
+		}
+		::= { dStpExtMstpPortTable 1 }
+		
+    DStpExtMstpPortEntry ::=	SEQUENCE {
+        dStpExtMstpPortMstId        IEEE8021MstIdentifier,
+        dStpExtMstpPortNum          IEEE8021BridgePortNumber,		
+		dStpExtMstpPortRole		    INTEGER
+		}        
+	
+	dStpExtMstpPortMstId  OBJECT-TYPE
+        SYNTAX          IEEE8021MstIdentifier
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "In an MSTP Bridge, this parameter is the MSTID, i.e. the
+            identifier of a Spanning Tree (or MST) Instance."
+        ::= { dStpExtMstpPortEntry 1 }
+
+    dStpExtMstpPortNum OBJECT-TYPE
+        SYNTAX          IEEE8021BridgePortNumber
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "In an MSTP Bridge, the Port's Port Number parameter value for
+            the MSTI, i.e. the number of the Bridge Port for the MSTI."
+        ::= { dStpExtMstpPortEntry 2 }
+	
+	dStpExtMstpPortRole OBJECT-TYPE
+        SYNTAX  INTEGER {
+            root(1),
+            alternate(2),
+            designated(3),
+            backup(4),
+            master(5)              
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The MSTI's current port role as defined by application of MSTP."           
+        ::= { dStpExtMstpPortEntry 3 }  
+         	
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************
+    dStpExtMIBCompliances OBJECT IDENTIFIER ::= { dStpExtMIBConformance 1 }
+		
+	dStpExtCompliance MODULE-COMPLIANCE
+		STATUS          current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-STP-EXT-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dStpExtBasicGroup
+		}					
+		
+		GROUP   dStpExtMstpGroup
+        DESCRIPTION
+            "This group is required only if the MSTP is implemented by the agent."
+        
+        GROUP   dStpExtServiceProviderCfgGroup
+        DESCRIPTION
+            "This group is required only if the VLAN tunnel is implemented by the agent."        		     
+
+               
+	    ::= { dStpExtMIBCompliances 1 }
+		
+	dStpExtGroups OBJECT IDENTIFIER ::= { dStpExtMIBCompliances 2 }
+	
+	
+	dStpExtBasicGroup OBJECT-GROUP
+		OBJECTS { 
+		    dStpExtStpGblStateEnabled,
+		    dStpExtPortForwardBpduEnabled,		    
+		    dStpExtPortState,
+		    dStpExtNotificationEnable
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to  
+		    STP/RSTP configuration/status which cannot be covered by 
+		    standard MIBs."
+		::= { dStpExtGroups 1 }
+   
+    dStpExtMstpGroup OBJECT-GROUP
+		OBJECTS { 
+		    dStpExtPortAdminHelloTime,
+		    dStpExtMstpPortRole		   
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to  
+		    MSTP configuration/status which cannot be covered by 
+		    standard MIBs."
+		::= { dStpExtGroups 2 }		        		
+
+    dStpExtServiceProviderCfgGroup OBJECT-GROUP
+		OBJECTS 		    {   
+            dStpExtStpNniBpduAddress
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects configures STP in service provider site."
+		::= { dStpExtGroups 3 } 
+END

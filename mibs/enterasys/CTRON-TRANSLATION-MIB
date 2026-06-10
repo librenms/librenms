@@ -1,0 +1,1757 @@
+CTRON-TRANSLATION-MIB DEFINITIONS ::= BEGIN
+ 
+ --  ctron-translation-mib.txt
+ --  Revision: 1.02.00
+ --  Part Number:
+ --  Date: April 26, 1999
+ 
+ 
+ --  Cabletron Systems, Inc.
+ --  35 Industrial Way, P.O. Box 5005
+ --  Rochester, NH 03867-0505
+ --  (603) 332-9400
+ --  support@ctron.com
+ 
+ --
+ --  This module will be extended, as required.
+ --
+ 
+ --  Cabletron Systems reserves the right to make changes in
+ --  specification and other information contained in this document
+ --  without prior notice.  The reader should consult Cabletron Systems
+ --  to determine whether any such changes have been made.
+ --
+ --  In no event shall Cabletron Systems be liable for any incidental,
+ --  indirect, special, or consequential damages whatsoever (including
+ --  but not limited to lost profits) arising out of or related to this
+ --  document or the information contained in it, even if Cabletron
+ --  Systems has been advised of, known, or should have known, the
+ --  possibility of such damages.
+ --
+ --  Cabletron grants vendors, end-users, and other interested parties
+ --  a non-exclusive license to use this Specification in connection
+ --  with the management of Cabletron products.
+ --  Copyright August 94 Cabletron Systems
+ --
+ 
+  
+ IMPORTS
+       OBJECT-TYPE     FROM RFC-1212
+       DisplayString   FROM RFC1213-MIB
+       MacAddress      FROM BRIDGE-MIB
+       ctTranslation   FROM CTRON-MIB-NAMES;
+ 
+ --  DisplayString ::= OCTET STRING
+ --  This data type is used to model textual information taken from
+ --  the NVT ASCII character set.  By convention, objects with this
+ --  syntax, unless explicitly stated, are declared as having:
+ --
+ --  SIZE (0..255)
+ 
+ -- MacAddress ::= OCTET STRING (SIZE (6))       a 6 octet
+                                              -- address in the
+                                              -- "canonical" order
+ 
+
+ 
+ ctTransFddiAtm         OBJECT IDENTIFIER ::= { ctTranslation  1 }
+ ctTransFddiEthernet    OBJECT IDENTIFIER ::= { ctTranslation  2 }
+ ctTransEthernetFddi    OBJECT IDENTIFIER ::= { ctTranslation  3 }
+ ctTransRifDb           OBJECT IDENTIFIER ::= { ctTranslation  4 }
+ ctTransBcastX          OBJECT IDENTIFIER ::= { ctTranslation  5 }
+ ctTransIbmLlc          OBJECT IDENTIFIER ::= { ctTranslation  6 }
+ ctTransSr              OBJECT IDENTIFIER ::= { ctTranslation  7 }
+ ctTransNovellCfg       OBJECT IDENTIFIER ::= { ctTranslation  8 }
+ ctTransIPCfg           OBJECT IDENTIFIER ::= { ctTranslation  9 }
+ ctTransA2Cfg           OBJECT IDENTIFIER ::= { ctTranslation 10 }
+ ctTransOtherCfg        OBJECT IDENTIFIER ::= { ctTranslation 11 }
+ ctTranslfpsCfg         OBJECT IDENTIFIER ::= { ctTranslation 12 }
+ 
+
+ -- ============================================================================
+ -- FDDI/ATM Group 
+ --
+ -- controls IP fragmentation between FDDI and ATM.
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+         
+ ctTransFddiAtmMtu  OBJECT-TYPE
+ SYNTAX INTEGER {
+     greater1518MTU(1), -- MTU greater than 1518 (1) (default)
+        less1518MTU(2)          -- MTU less than 1518 (2)
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "When written with a (1), allows SNAP frames up to 4500 bytes in
+        length to be received from the FNB and processed by the ATM SAR
+        component. When this object is written with a (1), a value 
+        of (1) for the ctTransFddiAtmIPFrag object must be ignored.
+ 
+        When written with a (2), discards any frames received on the FNB
+        which are greater than 1518 bytes in length. A 
+        value of (2) must be ignored if the frame is IP and the
+        ctTransFddiAtmIPFrag object is written with a (1)."
+ DEFVAL { greater1518MTU }
+ ::= { ctTransFddiAtm 1 }
+ 
+ ctTransFddiAtmIPFrag    OBJECT-TYPE
+ SYNTAX INTEGER {
+        enable(1),      -- Enable IP Fragmentation
+        disable(2)      -- Disable IP Fragmentation
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "When written with a (1), will fragment IP frames from FDDI to
+        Ethernet before the frame is processed by the ATM SAR 
+        component. This object must be ignored when written with a (1) if the 
+        ctTransFddiAtmMtu object is written with a (1).
+ 
+        When written with a (2), discards any frames received on the FNB
+        which are greater than 1518 bytes in length. A value of 
+        (2) for this object must be ignored if the ctTransFddiAtmMtu
+        object is written with a (1)."
+ DEFVAL { disable }
+ ::= { ctTransFddiAtm 2 }
+ 
+ -- ============================================================================
+ -- FDDI/Ethernet Group 
+ -- 
+ -- controls frame Translation  between FDDI and Ethernet.
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+ 
+ ctTransFddiEthernetIPFrag      OBJECT-TYPE
+ SYNTAX INTEGER {
+        enabled(1),      
+        disabled(2)              
+       }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "Enables or disables IP fragmentation from FDDI to any/all
+        Ethernet interfaces."
+   ::= { ctTransFddiEthernet 1  }
+
+ ctTransFddiSnapEthernetType    OBJECT-TYPE
+ SYNTAX INTEGER {
+        ethernetII(1),
+        ethernetSnap(2)
+        }        
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "The desired frame type to be translated from FDDI to Ethernet.
+        If set to ethernetII(1) all non-IPX frames will be translated
+        to ethernetII.  If set to ethernetSnap(2), all non-IPX frames will
+        be translated to ethernet_snap."
+ DEFVAL { ethernetII }
+ ::= { ctTransFddiEthernet 2  }
+ 
+ ctTransFddiEthernetAuto        OBJECT-TYPE
+ SYNTAX INTEGER {
+        enabled(1),
+        disabled(2),             
+   notSupported(3)
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "Enables or disables the 'Auto-Learn' Translation feature of
+        FDDI to Ethernet frames for the objects below. If enabled, 
+        the device will automatically learn the frame type by source 
+        address from the Ethernet interfaces. If enabled, IPX FDDI frames 
+        destined to a learned source address will be translated to the 
+        appropriate frame type. If the Ethernet destination address has 
+        not been heard from,  therefore the frame type used is unknown, 
+        the device default frame translation for that frame type will be used."
+   ::= { ctTransFddiEthernet 3  }
+ 
+ ctTransFddiEthernetSnapIPX     OBJECT-TYPE
+ SYNTAX INTEGER {
+        ethernetII(1),
+        ethernetSnap(2),
+        ethernet802dot3(3),
+        ethernet802dot3Raw(4)            
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "The desired translation of IPX FDDI SNAP frames to Ethernet."
+ ::= { ctTransFddiEthernet 4  }
+ 
+ ctTransFddiEthernet802dot2IPX  OBJECT-TYPE
+ SYNTAX INTEGER {
+        ethernetII(1),
+        ethernetSnap(2),
+        ethernet802dot3(3),
+        ethernet802dot3Raw(4)
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "The desired translation of IPX FDDI 802.2 frames to Ethernet."
+ ::= { ctTransFddiEthernet 5  }
+ 
+ ctTransFddiEthernetMACIPX      OBJECT-TYPE
+ SYNTAX INTEGER {
+        ethernetII(1),
+        ethernetSnap(2),
+        ethernet802dot3(3),
+        ethernet802dot3Raw(4)
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "The desired translation of IPX FDDI MAC frames to Ethernet."
+ ::= { ctTransFddiEthernet 6 }
+  
+ -- ============================================================================
+ -- Ethernet/FDDI Group 
+ --
+ -- controls frame Translation  between Ethernet and FDDI.
+ -- Implementation of this group is optional.
+ --
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+
+ ctTransEthernetFddiRAW         OBJECT-TYPE
+ SYNTAX INTEGER {
+        fDDI802dot2(1),
+        fDDISnap(2),
+        fDDIMAC(3)
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "The desired translation of Ethernet802.3 'RAW' frames to FDDI.
+        This is a device level object meaning Ethernet 'RAW' frames 
+        to any/all FDDI interfaces."
+   ::= { ctTransEthernetFddi 1 }
+
+ ctTransEthernetFddiPadVerify OBJECT-TYPE
+ SYNTAX INTEGER {
+        enabled(1),
+        disabled(2),
+        not-supported(3)
+        }
+ ACCESS read-write
+ STATUS mandatory
+ DESCRIPTION
+        "Selects 802.3 length verfication for Ethernet FDDI frame  
+        translation. 
+
+        If set to Enabled(1), the device consults the 802.3 length
+        field to determine the amount of pad to removed regardless
+        of frame size. This setting will cause the device to strip
+        unnecessary pad in frames greater than 64 bytes.
+
+        If set to Disabled(2), the default value, the 802.3
+        length field is only interpreted if the frame size is
+        64 bytes. For frames greater than 64 bytes, it is assumed
+        that there is no 802.3 pad in the frame. 
+
+        If set to Not-Supported(3), the device does not support this 
+        feature and will only strip pad from ethernet frames that are
+        64 bytes in length."
+ ::= { ctTransEthernetFddi 2 }
+
+ -- ============================================================================
+ -- RIF database group.
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the entire
+ -- group must be implemented
+ --
+ -- ============================================================================
+
+ ctTransRifDbTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransRifDbEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing entries of RIF Database."
+         ::= { ctTransRifDb 1 }
+ 
+ ctTransRifDbEntry OBJECT-TYPE
+         SYNTAX  CtTransRifDbEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "This entry for ctTransRifDbTable."
+         INDEX    { ctTransRifDbMacAddr }
+         ::= { ctTransRifDbTable 1 }
+ 
+ CtTransRifDbEntry ::=
+         SEQUENCE {
+             ctTransRifDbMacAddr
+                  MacAddress,
+             ctTransRifDbSrcPort
+                  INTEGER,
+             ctTransRifDbLength
+                  INTEGER,
+             ctTransRifDbRIF
+                  DisplayString
+         }
+
+ ctTransRifDbMacAddr OBJECT-TYPE
+         SYNTAX  MacAddress
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The Mac address of a source station in Cabletron cannonical
+       format."
+         ::= { ctTransRifDbEntry 1 }
+ 
+ ctTransRifDbSrcPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The index of the MIB-II interface that hardware address is learned
+              from."
+         ::= { ctTransRifDbEntry 2 }
+ 
+ ctTransRifDbLength OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "This object returns the number of bytes of routing information
+              associated with this entry."
+         ::= { ctTransRifDbEntry 3 }
+ 
+ ctTransRifDbRIF OBJECT-TYPE
+         SYNTAX  DisplayString (SIZE (0..16))
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "This returns the routing information associated with an entry."
+         ::= { ctTransRifDbEntry 4 }
+ 
+ ctTransRifDbCtrlTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransRifDbCtrlEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table containing entries of objects to control RIF database."
+         ::= { ctTransRifDb 2 }
+ 
+ ctTransRifDbCtrlEntry OBJECT-TYPE
+         SYNTAX  CtTransRifDbCtrlEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "This entry for ctTransRifDbCtrlTable."
+         INDEX    { ctTransRifDbCtrlPort }
+         ::= { ctTransRifDbCtrlTable 1 }
+ 
+ CtTransRifDbCtrlEntry ::=
+         SEQUENCE {
+             ctTransRifDbCtrlPort
+                  INTEGER,
+             ctTransRifDbWeightState
+                  INTEGER,
+             ctTransRifDbCtrlType
+                  INTEGER,
+             ctTransRifDbAgingTimer
+                  INTEGER
+         }
+
+ ctTransRifDbCtrlPort  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry
+              is administering control over the RIF cache."
+         ::= { ctTransRifDbCtrlEntry 1 }
+
+ ctTransRifDbWeightState OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 notsupported(1),
+                 shortestpath(2),
+                 quickestpath(3),
+                 largestmtu(4),
+                 lastseen(5)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Indicates the type of RIF to be retained in the RIF database.
+              shortestPath (2) is the RIF with the least number of hops. The 
+                               existing RIF will be replaced if the new RIF 
+                               is shorter.
+              quickestPath (3) is the 'first seen' RIF.
+              largestMTU   (4) is the path that supports the largest frame as
+                               indicated by the LF (largest frame bits) in the
+                               routing control field (RCF).
+              lastSeen     (5) is the 'most recently seen' RIF. 
+ 
+              The default value for this object is device specific."
+         ::= { ctTransRifDbCtrlEntry 2 }
+
+ ctTransRifDbCtrlType  OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 explorer(1),
+                 all(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Type of RIF to cache. When the explorer option (1) is selected
+              the existing RIF may be replaced only if the received frame is 
+              an explorer.  When the 'all' option (2) is selected the existing 
+              RIF may be replaced for any SR frame received with a valid RIF. 
+
+              Some devices will use this in conjunction with the 
+              ctTransRifDbWeightState option to determine which RIFs may be 
+              cached.
+
+              The default for this object is product specific."
+         ::= { ctTransRifDbCtrlEntry 3 }
+
+
+ctTransRifDbAgingTimer  OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "The timeout period in seconds for aging out dynamically 
+              learned RI Fs.
+
+              The default for this object is product specific."
+         ::= { ctTransRifDbCtrlEntry 4 }
+
+
+ -- ============================================================================
+ -- Broadcast Conversion group.
+ --
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+
+ ctTransBcastXTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransBcastXEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list describing the state of the broadcast conversion for each
+              interface on this device. The user will specify two broadcast
+              addresses (per interface), one for the media specific interface 
+              one for the cannonical format, that the translation state machine
+              will provide conversion between. This conversion only acts upon the
+              DA of the MAC header when the specified address matches the DA."
+         ::= { ctTransBcastX 1 } 
+
+ ctTransBcastXEntry OBJECT-TYPE
+         SYNTAX  CtTransBcastXEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects pertaining to the state of broadcast
+              conversion for each interface."
+         INDEX    { ctTransBcastXPort }
+         ::= { ctTransBcastXTable 1 }
+
+ CtTransBcastXEntry ::=
+         SEQUENCE {
+             ctTransBcastXPort
+                  INTEGER,
+             ctTransBcastXMode
+                  INTEGER,
+             ctTransBcastXMedia
+                  MacAddress,
+             ctTransBcastXCanonical
+                  MacAddress
+         }
+
+ ctTransBcastXPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry
+              is administering broadcast conversion translation."
+         ::= { ctTransBcastXEntry 1}
+
+ ctTransBcastXMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether the ctTransBcastXMedia and 
+              ctTransBcastXCanonical objects pair are valid for this 
+              interface."
+         ::= { ctTransBcastXEntry 2}
+
+ ctTransBcastXMedia OBJECT-TYPE
+         SYNTAX  MacAddress
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object is the media specific broadcast address that this 
+              interface will allow translation to/from. This conversion only
+              acts upon the DA of the MAC header when the specified address 
+              matches the DA." 
+         ::= { ctTransBcastXEntry 3}
+
+ ctTransBcastXCanonical OBJECT-TYPE
+         SYNTAX  MacAddress
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object is the cannonical broadcast address that this 
+              interface will allow translation to/from. This conversion only 
+              acts upon the DA of the MAC header when the specified address 
+              matches the DA." 
+         ::= { ctTransBcastXEntry 4}
+ 
+ -- =========================================================================== 
+ -- IBM LLC configuration group.
+ --
+ -- Normally this group will only be implemented on devices with the
+ -- ability to 'remember' the type of network the packet originated 
+ -- on.
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- =========================================================================== 
+
+ ctTransIbmLlcTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransIbmLlcEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list describing the state of the
+              IBM LLC translation for each interface on this device."
+         ::= { ctTransIbmLlc 1 } 
+
+ ctTransIbmLlcEntry OBJECT-TYPE
+         SYNTAX  CtTransIbmLlcEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects pertaining to the state of IBM LLC 
+              translation for each interface."
+         INDEX    { ctTransIbmLlcPort }
+         ::= { ctTransIbmLlcTable 1 }
+
+ CtTransIbmLlcEntry ::=
+         SEQUENCE {
+             ctTransIbmLlcPort
+                  INTEGER,
+             ctTransIbmLlcNullMode
+                  INTEGER,
+             ctTransIbmLlcSnaPathMode
+                  INTEGER,
+             ctTransIbmLlcSnaMode
+                  INTEGER,
+             ctTransIbmLlcNbMode
+                  INTEGER,
+             ctTransIbmLlcLnmMode
+                  INTEGER,
+             ctTransIbmLlcDscMode
+                  INTEGER,
+             ctTransIbmLlcOtherMode
+                  INTEGER,
+             ctTransIbmLlcOtherValue
+                  INTEGER
+         }
+
+ ctTransIbmLlcPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry
+              is administering IBM LLC translation."
+         ::= { ctTransIbmLlcEntry 1}
+
+ ctTransIbmLlcNullMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "IBM networks systems have a special translation called 'IBM
+              LLC Encapsulation' which is used for translating IBM LLC
+              based protocols between Token Ring and Ethernet Version 2.0 (DIXE) 
+              format. This translation does not apply when going between Token 
+              Ring and 802.3, since LLC SAPs are maintained. This translation 
+              allows connectivity between Token stations separated by an 
+              Ethernet segment in an internetwork environment. An Ethernet 
+              protocol type of 80 D5 is used to indicate IBM LLC protocol 
+              encapsulation.
+
+              When enabled(1) all frames outbound on this token ring port and 
+              with an LSAP value of 00 (Null) and where the packet originated 
+              on an ethernet network will have the IBM LLC protocol field of 
+              five bytes stripped from the packet.
+
+              When disabled(2) the IBM LLC protocol field is untouched on these
+              packets.
+              
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransIbmLlcEntry 2}
+
+ ctTransIbmLlcSnaPathMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "IBM networks systems have a special translation called 'IBM
+              LLC Encapsulation' which is used for translating IBM LLC based 
+              protocols between Token Ring and Ethernet Version 2.0 (DIXE) 
+              format. This translation does not apply when going between Token 
+              Ring and 802.3, since LLC SAPs are maintained. This translation 
+              allows connectivity between Token stations separated by an 
+              Ethernet segment in an internetwork environment. An Ethernet 
+              protocol type of 80 D5 is used to indicate IBM LLC protocol 
+              encapsulation.
+
+
+              When enabled(1) all frames outbound on this token ring port and 
+              with an LSAP value of 04 (SNA path control) and where the packet 
+              originated on an ethernet network will have the IBM LLC protocol 
+              field of five bytes stripped from the packet.
+
+              When disabled(2) the IBM LLC protocol field is untouched on these
+              packets.
+              
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransIbmLlcEntry 3}
+
+ ctTransIbmLlcSnaMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "IBM networks systems have a special translation called 'IBM
+              LLC Encapsulation' which is used for translating IBM LLC based 
+              protocols between Token Ring and Ethernet Version 2.0 (DIXE) 
+              format. This translation does not apply when going between Token 
+              Ring and 802.3, since LLC SAPs are maintained. This translation 
+              allows connectivity between Token stations separated by an 
+              Ethernet segment in an internetwork environment. An Ethernet 
+              protocol type of 80 D5 is used to indicate IBM LLC protocol 
+              encapsulation.
+
+              When enabled(1) all frames outbound on this token ring port and 
+              with an LSAP value of 08 (SNA) and where the packet originated 
+              on an ethernet network will have the IBM LLC protocol field of 
+              five bytes stripped from the packet.
+
+              When disabled(2) the IBM LLC protocol field is untouched on these
+              packets.
+              
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransIbmLlcEntry 4}
+
+ ctTransIbmLlcNbMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "IBM networks systems have a special translation called 'IBM
+              LLC Encapsulation' which is used for translating IBM LLC based 
+              protocols between Token Ring and Ethernet Version 2.0 (DIXE) 
+              format. This translation does not apply when going between Token 
+              Ring and 802.3, since LLC SAPs are maintained. This translation 
+              allows connectivity between Token stations separated by an 
+              Ethernet segment in an internetwork environment. An Ethernet 
+              protocol type of 80 D5 is used to indicate IBM LLC protocol 
+              encapsulation.
+
+
+              When enabled(1) all frames outbound on this token ring port and 
+              with an LSAP value of F0 (NetBIOS) and where the packet originated 
+              on an ethernet network will have the IBM LLC protocol field of 
+              five bytes stripped from the packet.
+
+              When disabled(2) the IBM LLC protocol field is untouched on these
+              packets.
+              
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransIbmLlcEntry 5}
+
+ ctTransIbmLlcLnmMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "IBM networks systems have a special translation called 'IBM
+              LLC Encapsulation' which is used for translating IBM LLC based 
+              protocols between Token Ring and Ethernet Version 2.0 (DIXE) 
+              format. This translation does not apply when going between Token 
+              Ring and 802.3, since LLC SAPs are maintained. This translation 
+              allows connectivity between Token stations separated by an 
+              Ethernet segment in an internetwork environment. An Ethernet 
+              protocol type of 80 D5 is used to indicate IBM LLC protocol 
+              encapsulation.
+
+
+              When enabled(1) all frames outbound on this token ring port and 
+              with an LSAP value of F4 (LAN Network Manager) and where the packet 
+              originated on an ethernet network will have the IBM LLC protocol 
+              field of five bytes stripped from the packet.
+
+              When disabled(2) the IBM LLC protocol field is untouched on these
+              packets.
+              
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransIbmLlcEntry 6}
+
+ ctTransIbmLlcDscMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "IBM networks systems have a special translation called 'IBM
+              LLC Encapsulation' which is used for translating IBM LLC based 
+              protocols between Token Ring and Ethernet Version 2.0 (DIXE) 
+              format. This translation does not apply when going between Token 
+              Ring and 802.3, since LLC SAPs are maintained. This translation 
+              allows connectivity between Token stations separated by an 
+              Ethernet segment in an internetwork environment. An Ethernet 
+              protocol type of 80 D5 is used to indicate IBM LLC protocol 
+              encapsulation.
+
+              When enabled(1) all frames outbound on this token ring port and 
+              with an LSAP value of FC (Discovery) will and where the packet 
+              originated on an ethernet network will have the IBM LLC protocol 
+              field of five bytes stripped from the packet.
+
+              When disabled(2) the IBM LLC protocol field is untouched on these
+              packets.
+              
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransIbmLlcEntry 7}
+
+ ctTransIbmLlcOtherMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "IBM networks systems have a special translation called 'IBM
+              LLC Encapsulation' which is used for translating IBM LLC based 
+              protocols between Token Ring and Ethernet Version 2.0 (DIXE) 
+              format. This translation does not apply when going between Token 
+              Ring and 802.3, since LLC SAPs are maintained. This translation 
+              allows connectivity between Token stations separated by an 
+              Ethernet segment in an internetwork environment. An Ethernet 
+              protocol type of 80 D5 is used to indicate IBM LLC protocol 
+              encapsulation.
+
+              When enabled(1) all frames meeting the following criteria:
+                      - outbound on this token ring port 
+                      - with an LSAP value matching that found in 
+                        ctTransIbmLlcOtherValue
+                      - where the packet originated on an ethernet network 
+              will have the IBM LLC protocol field of five bytes stripped from 
+              the packet.
+
+              When disabled(2) the IBM LLC protocol field is untouched on these
+              packets.
+              
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransIbmLlcEntry 8}
+
+ ctTransIbmLlcOtherValue OBJECT-TYPE
+         SYNTAX  INTEGER (0..255)
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object allows the user to select an IBM LLC LSAP value not 
+              specified above. 
+
+              When ctTransIbmLlcOtherMode is enabled all frames outbound on this 
+              token ring port and providing a match between this value and the 
+              outbound packet's LSAP value and where the packet originated on an 
+              ethernet network will have the IBM LLC protocol field of five bytes 
+              stripped from the packet."
+         ::= { ctTransIbmLlcEntry 9}
+
+ -- ============================================================================
+ -- Source Route group.
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented,
+ -- the entire group must be implemented
+ --
+ -- ============================================================================
+ 
+ ctTransSrTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransSrEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A table of entries describing the source route
+              configuration managed objects."
+         ::= { ctTransSr 1 }
+ 
+ ctTransSrEntry OBJECT-TYPE
+         SYNTAX  CtTransSrEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects to allow the configuration of source
+              route translation information."
+         INDEX    { ctTransSrPort }
+         ::= { ctTransSrTable 1 }
+ 
+ CtTransSrEntry ::=
+         SEQUENCE {
+             ctTransSrPort
+                  INTEGER,
+             ctTransSrIfMode
+                  INTEGER,
+             ctTransSrExpMode
+                  INTEGER,
+             ctTransSrIP
+                  INTEGER,
+             ctTransSrIPX
+                  INTEGER,
+             ctTransSrNetBIOS
+                  INTEGER,
+             ctTransSrSNA
+                  INTEGER,
+             ctTransSrOther 
+                  INTEGER,
+             ctTransSRLocalSegment 
+                  INTEGER,
+             ctTransSrSRLF
+                  INTEGER,
+             ctTransSRAutoRingNumberDetect
+                  INTEGER
+         }
+
+ ctTransSrPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number for which this entry
+              is administering source route configuration management."
+         ::= { ctTransSrEntry 1 }
+ 
+ ctTransSrIfMode   OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 tp(1),
+                 sr(2),
+                 srt(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+        DESCRIPTION
+             "This object indicates the types of frames (sr,tp or both)
+              supported by endstations attached to this interface.
+              This information is used by the device to determine
+              if sr/tp translation is required. Default is product specific.
+
+              If tp (1) is selected the RIF cacheing mechanism for this port
+              will be disabled. That is, the RIF cache database will be 
+              emptied and no RIFs will be learned into the database or attached 
+              to outbound packets for this port.
+
+              If sr (2) or srt (3) is selected for this object then the RIFs 
+              will be learned into the database according to the rules defined 
+              in the object ctTransRifDbWeightState and attached as necessary 
+              to outbound packets." 
+         ::= { ctTransSrEntry 2 }
+ 
+ ctTransSrExpMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 notsupported(1),
+                 are(2),
+                 ste(3),
+                 inboundtype(4)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object selects the type of explorer frame the  SR or SRT
+              interface will use, if and when an explorer frame is required. 
+              This object is only applicable when ctTransSrIfMode is set to
+              sr (2) or srt (3). The requirements will depend on the device
+              being managed.
+              
+              The inboundtype option (4) is supported only on those devices with
+              the ability to 'remember' the original state of the arriving 
+              explorer packet. When set for this option the device will configure 
+              all outbound explorer frames for whichever type of explorer 
+              (ARE or STE) it arrived as.
+
+              The default value for this object is product specific. A write of
+              notsupported (1) will have no affect."
+         ::= { ctTransSrEntry 3 }
+
+ ctTransSrIP   OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 tp(1),
+                 sr(2),
+                 auto(3),
+                 notsupported(4)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object determines how the sr/tp translation of IP frames 
+              of type 'broadcast', 'destination unknown', or 'destination 
+              known but IP not previously seen for this end station' should 
+              be translated.  This object is only applicable for SRT interfaces.
+ 
+              If tp (1) is selected, the frame is forwarded out the
+              SRT interface as a transparent frame.
+ 
+              If sr (2) is selected, the frame is forwarded out
+              the srt interface as a source route frame. If this end station
+              has never been heard from before an explorer will be launched.
+              Which explorer frame (are or ste) is dependent on the object
+              ctTransSrExplorerMode defined above.
+ 
+              If auto (3) is selected, the frame is forwarded out the srt
+              interface as both a transparent frame and as a source route frame.
+
+              If not supported (4) is selected then the sr/tp translation of these
+              types of IP frames will be based on the configuration of the ctTransSrOther
+              managed object.
+ 
+              The default value is product specific." 
+         ::= { ctTransSrEntry 4 }
+ 
+ ctTransSrIPX   OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 tp(1),
+                 sr(2),
+                 auto(3),
+                 notsupported(4)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object determines how the sr/tp translation of IPX frames 
+              of type `broadcast`, `destination unknown`, or `destination 
+              known but IPX not previously seen for this end station` should 
+              be translated.  This object is only applicable for SRT interfaces.
+ 
+              If tp (1) is selected, the frame is forwarded out the
+              SRT interface as a transparent frame.
+ 
+              If sr (2) is selected, the frame is forwarded out
+              the SRT interface as a source route frame. If this end station
+              has never been heard from before an explorer will be launched.
+              Which explorer frame (are or ste) is dependent on the object
+              ctTransSrExplorerMode defined above.
+ 
+              If auto (3) is selected, the frame is forwarded out the SRT
+              interface as both a transparent frame and as a source route frame.
+
+              If not supported (4) is selected then the sr/tp translation of these
+              types of IPX frames will be based on the configuration of the ctTransSrOther
+              managed object.
+ 
+              The default value is product specific."
+         ::= { ctTransSrEntry 5 }
+ 
+ ctTransSrNetBIOS    OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 tp(1),
+                 sr(2),
+                 auto(3),
+                 notsupported(4)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object determines how the sr/tp translation of NetBIOS frames 
+              of type `broadcast`, `destination unknown`, or `destination 
+              known but NetBIOS not previously seen for this end station` should 
+              be translated.  This object is only applicable for SRT interfaces.
+ 
+              If tp (1) is selected, the frame is forwarded out the
+              SRT interface as a transparent frame.
+ 
+              If sr (2) is selected, the frame is forwarded out
+              the SRT interface as a source route frame. If this end station
+              has never been heard from before an explorer will be launched.
+              Which explorer frame (ARE or STE) is dependent on the object
+              ctTransSrExplorerMode defined above.
+ 
+              If auto (3) is selected, the frame is forwarded out the SRT
+              interface as both a transparent frame and as a source route frame.
+
+              If not supported (4) is selected then the sr/tp translation of these
+              types of NetBIOS frames will be based on the configuration of the ctTransSrOther
+              managed object.
+ 
+              The default value is product specific."
+         ::= { ctTransSrEntry 6 }
+ 
+ ctTransSrSNA    OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 tp(1),
+                 sr(2),
+                 auto(3),
+                 notsupported(4)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object determines how the sr/tp translation of SNA frames 
+              of type 'broadcast', 'destination unknown', or 'destination 
+              known but SNA not previously seen for this end station' should 
+              be translated.  This object is only applicable for SRT interfaces.
+ 
+              If tp (1) is selected, the frame is forwarded out the
+              SRT interface as a transparent frame.
+ 
+              If sr (2) is selected, the frame is forwarded out
+              the SRT interface as a source route frame. If this end station
+              has never been heard from before an explorer will be launched.
+              Which explorer frame (ARE or STE) is dependent on the object
+              ctTransSrExplorerMode defined above.
+ 
+              If auto (3) is selected, the frame is forwarded out the SRT
+              interface as both a transparent frame and as a source route frame.
+
+              If not supported (4) is selected then the sr/tp translation of these
+              types of SNA frames will be based on the configuration of the ctTransSrOther
+              managed object.
+ 
+              The default value is product specific."
+         ::= { ctTransSrEntry 7 }
+
+ ctTransSrOther    OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 tp(1),
+                 sr(2),
+                 auto(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object determines how the sr/tp translation of all 'other  
+              protocols' is handled. 'other protocols' includes any protocol not 
+              mentioned above (i.e. IP,IPX,NetBIOS, or SNA) or any of those 
+              mentioned above with the 'not supported' option selected.
+
+              This object applies to any 'other protocol' frame of type 
+              'broadcast', 'destination unknown', or 'destination known but 
+              'other protocol' not previously seen for this end station'.
+              This object is only applicable for SRT interfaces.
+ 
+              If tp (1) is selected, the frame is forwarded out the
+              SRT interface as a transparent frame.
+ 
+              If sr (2) is selected, the frame is forwarded out
+              the SRT interface as a source route frame. If this end station
+              has never been heard from before an explorer will be launched.
+              Which explorer frame (ARE or STE) is dependent on the object
+              ctTransSrExplorerMode defined above.
+ 
+              If auto (3) is selected, the frame is forwarded out the SRT
+              interface as both a transparent frame and as a source route frame.
+ 
+              The default value is product specific."
+         ::= { ctTransSrEntry 8 }
+ 
+ ctTransSRLocalSegment OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+            "The segment (ring) number that uniquely identifies the
+             segment to which this interface is connected. Current
+             source routing protocols limit this value to the
+             range: 0 through 4095. (The value 0 is used by
+             some management applications for special test
+             cases.)
+ 
+             A value of 65535 signifies that no segment number is
+             assigned for this interface. The default value is device
+             dependent."
+          ::= { ctTransSrEntry 9 }
+
+ ctTransSrSRLF OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+            "The maximum size of the INFO field (LLC and
+             above) that this interface can send/receive.  It does
+             not include any MAC level (framing) octets.  The
+             value of this object is used by this device to
+             determine whether a modification of the
+             LargestFrame (LF) field of the Routing
+             Control field of the Routing Information Field is
+             necessary.
+ 
+             64 valid values are defined by the IEEE 802.5M SRT
+             Addendum: 516, 635, 754, 873, 993, 1112, 1231,
+             1350, 1470, 1542, 1615, 1688, 1761, 1833, 1906,
+             1979, 2052, 2345, 2638, 2932, 3225, 3518, 3812,
+             4105, 4399, 4865, 5331, 5798, 6264, 6730, 7197,
+             7663, 8130, 8539, 8949, 9358, 9768, 10178, 10587,
+             10997, 11407, 12199, 12992, 13785, 14578, 15370,
+             16163, 16956, 17749, 20730, 23711, 26693, 29674,
+             32655, 35637, 38618, 41600, 44591, 47583, 50575,
+             53567, 56559, 59551, and 65535."
+          ::= { ctTransSrEntry 10 }
+
+ ctTransSRAutoRingNumberDetect OBJECT-TYPE
+          SYNTAX INTEGER {
+             notsupported(1),
+             enable(2),
+             disable(3)
+             }
+          ACCESS read-write
+          STATUS mandatory
+          DESCRIPTION
+             "This object enables an interface to automatically detect 
+              the source route ring number of the attached ring segment.
+              When enabled, the interface wil automatically each time at
+              open, configure its ring number with the supplied ring 
+              number from the RPS, if present on the ring. Otherwise,
+              a default value is used when the interface opens."
+         ::= { ctTransSrEntry 11 }
+
+ -- ============================================================================
+ -- Novell Configuration group.
+ --
+ -- Novell translation is typically used on devices with at least
+ -- one token ring interface.
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+
+ ctTransNovellCfgTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransNovellCfgEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list describing the enabled/disabled state of the
+              Novell translation for each interface on this device."
+         ::= { ctTransNovellCfg 1 }
+
+ ctTransNovellCfgEntry OBJECT-TYPE
+         SYNTAX  CtTransNovellCfgEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects pertaining to the state of Novell
+              translation for each interface."
+         INDEX    { ctTransNovellCfgPort }
+         ::= { ctTransNovellCfgTable 1 }
+
+ CtTransNovellCfgEntry ::=
+         SEQUENCE {
+             ctTransNovellCfgPort
+                  INTEGER,
+             ctTransNovellCfgMode
+                  INTEGER,
+             ctTransNovellGroupMode
+                  INTEGER
+         }
+
+ ctTransNovellCfgPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry is
+              administering Novell configuration management."
+         ::= { ctTransNovellCfgEntry 1}
+
+ ctTransNovellCfgMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 enabledType2(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "Enable this object indicates whether the device will reverse the
+              bit ordering of addresses in the Novell header on Novell packets.
+              Enable Type 2 indicates the device will reverse the bit ordering
+              of addresses for token ring to fddi and no translation for token
+              ring to inb in the MAC layer. Disable will not bit reverse any 
+              address.  
+
+              The default of this object is enabled."
+         ::= { ctTransNovellCfgEntry 2}
+ 
+ ctTransNovellGroupMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2),
+                 notsupported(3)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object allows the conversion of group and multicast 
+              addresses in the MAC DA of the IPX protocol format. Conversion
+              is as follows:
+              TR(C0 00 00 80 00 00) and Canonical (FF FF FF FF FF FF).
+              TR(C0 00 40 00 00 00) and Canonical (09 00 07 FF FF FF).
+              This object is only applicable if the state of ctTransNovellCfgMode 
+              is enabled. 
+
+              The default value for this object is product specific. A 
+              write of notsupported (3) will have no affect."
+         ::= { ctTransNovellCfgEntry 3}
+
+ -- ============================================================================
+ -- IP configuration group.
+ --
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+
+ ctTransIPCfgTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransIPCfgEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list describing the enabled/disabled state of the
+              IP translation for each interface on this device."
+         ::= { ctTransIPCfg 1 }
+
+ ctTransIPCfgEntry OBJECT-TYPE
+         SYNTAX  CtTransIPCfgEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects pertaining to the state of IP
+              translation for each interface."
+         INDEX    { ctTransIPCfgPort }
+         ::= { ctTransIPCfgTable 1 }
+
+ CtTransIPCfgEntry ::=
+         SEQUENCE {
+             ctTransIPCfgPort
+                  INTEGER,
+             ctTransIPDataCfgMode
+                  INTEGER,
+             ctTransIPArpCfgMode
+                  INTEGER,
+             ctTransIPRarpCfgMode
+                  INTEGER
+         }
+
+ ctTransIPCfgPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry
+              is administering IP configuration management."
+         ::= { ctTransIPCfgEntry 1}
+
+ ctTransIPDataCfgMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether the device will reverse the bit
+              ordering of addresses in the information field of IP data packets
+              received and then transmitted on this interface.  
+ 
+              The default of this object is enabled."
+         ::= { ctTransIPCfgEntry 2}
+ 
+ ctTransIPArpCfgMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether the device will reverse the bit
+              ordering of addresses in the information field of ARP packets
+              received and then transmitted on this interface. 
+
+              The default of this object is enabled."
+         ::= { ctTransIPCfgEntry 3}
+
+ ctTransIPRarpCfgMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether the device will reverse the
+              bit ordering of addresses in the information field of RARP
+              packets received and then transmitted on this interface. 
+
+              The default of this object is enabled."
+         ::= { ctTransIPCfgEntry 4}
+ 
+ -- ============================================================================
+ -- Appletalk2 configuration group.
+ --
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+
+ ctTransA2CfgTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransA2CfgEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list describing the enabled/disabled state of the
+              Appletalk2 translation for each interface on this device."
+         ::= { ctTransA2Cfg 1 }
+
+ ctTransA2CfgEntry OBJECT-TYPE
+         SYNTAX  CtTransA2CfgEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects pertaining to the state of Appletalk2 
+              translation for each interface."
+         INDEX    { ctTransA2CfgPort }
+         ::= { ctTransA2CfgTable 1 }
+
+ CtTransA2CfgEntry ::=
+         SEQUENCE {
+             ctTransA2CfgPort
+                  INTEGER,
+             ctTransA2DataCfgMode
+                  INTEGER,
+             ctTransA2ArpCfgMode
+                  INTEGER,
+             ctTransA2McastCfgMode
+                  INTEGER
+             }
+
+ ctTransA2CfgPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry is
+              administering Appletalk2 configuration management."
+         ::= { ctTransA2CfgEntry 1}
+
+ ctTransA2DataCfgMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether the device will reverse the
+              bit ordering of addresses in the information field of Appletalk2 
+              data packets received and then transmitted on this interface.  
+
+              The default of this object is enabled."
+         ::= { ctTransA2CfgEntry 2}
+ 
+ ctTransA2ArpCfgMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether the device will reverse the
+              bit ordering of addresses in the information field of ARP
+              packets received and then transmitted on this interface.  
+  
+              The default of this object is enabled."
+         ::= { ctTransA2CfgEntry 3}
+
+ ctTransA2McastCfgMode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether the device will reverse the
+              bit ordering of addresses in the information field of 
+              broadcast/multicast packets received and then transmitted on this 
+              interface.  
+  
+              The default of this object is enabled."
+         ::= { ctTransA2CfgEntry 4}
+
+ -- ============================================================================
+ -- Other Configuration group
+ --
+ -- Implementation of this group is optional.
+ -- However, if any one element of the group is implemented, the
+ -- entire group must be implemented
+ -- ============================================================================
+
+ ctTransOtherTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransOtherEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list describing processing control for subgroups of LLC frames 
+              by SAP or SNAP type. This table allows the user to single out 
+              selected frame type groups for special handling by the processor 
+              (purely intended as a future upgrade path to add protocols that 
+              are currently not supported). This list only affects inbound frames 
+              and is indexed on a per port basis."
+         ::= { ctTransOtherCfg 1 }
+
+ ctTransOtherEntry OBJECT-TYPE
+         SYNTAX  CtTransOtherEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "A list of objects pertaining to the processing of subgroups
+              of LLC frames by SAP or SNAP type."
+         INDEX    { ctTransOtherPort }
+         ::= { ctTransOtherTable 1 }
+
+ CtTransOtherEntry ::=
+         SEQUENCE {
+             ctTransOtherPort
+                  INTEGER,
+             ctTransOtherUnknownSap
+                  INTEGER,
+             ctTransOtherUnknownSnap
+                  INTEGER,
+             ctTransOtherSapDsap1Mode
+                  INTEGER,
+             ctTransOtherSapDsap1Val 
+                  INTEGER,
+             ctTransOtherSapDsap2Mode
+                  INTEGER,
+             ctTransOtherSapDsap2Val
+                  INTEGER,
+             ctTransOtherSapDsap3Mode
+                  INTEGER,
+             ctTransOtherSapDsap3Val
+                  INTEGER,
+             ctTransOtherSnap1Mode
+                  INTEGER,
+             ctTransOtherSnap1Val 
+                  INTEGER,
+             ctTransOtherSnap2Mode
+                  INTEGER,
+             ctTransOtherSnap2Val
+                  INTEGER
+         }
+
+ ctTransOtherPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry is
+              administering  control for subgroups of LLC frames by SAP or 
+              SNAP type."
+         ::= { ctTransOtherEntry 1}
+
+ ctTransOtherUnknownSap OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether any frames with an unrecognized SAP
+              will require special translation handling by the processor. A 
+              recognized SAP will be specified by the user in one of the 
+              previous configuration groups. 
+
+              The default of this object is product specific."
+         ::= { ctTransOtherEntry 2}
+ 
+ ctTransOtherUnknownSnap OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object indicates whether frames with an unrecognized SNAP
+              will require special translation handling by the processor. A 
+              recognized SNAP will be specified by the user in one of the 
+              previous configuration groups. 
+
+              The default of this object is product specific."
+         ::= { ctTransOtherEntry 3}
+
+ ctTransOtherSapDsap1Mode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object enables(1) or disables (2) the special translation 
+              handling of a SAP frame with a DSAP equal to  
+              ctTransOtherSapDsap1Val.
+
+              The default of this object is product specific."
+         ::= { ctTransOtherEntry 4}
+ 
+ ctTransOtherSapDsap1Val OBJECT-TYPE
+         SYNTAX  INTEGER (0..255)
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object allows the user to specify a DSAP value that 
+              when matched will require additional translation on frames."
+         ::= { ctTransOtherEntry 5}
+
+ ctTransOtherSapDsap2Mode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object enables(1) or disables (2) the special translation 
+              handling of a SAP frame with a DSAP equal to  
+              ctTransOtherSapDsap2Val.
+
+              The default of this object is product specific."
+         ::= { ctTransOtherEntry 6}
+ 
+ ctTransOtherSapDsap2Val OBJECT-TYPE
+         SYNTAX  INTEGER (0..255)
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object allows the user to specify a DSAP value that 
+              when matched will require additional translation on frames."
+         ::= { ctTransOtherEntry 7}
+
+ ctTransOtherSapDsap3Mode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object enables(1) or disables (2) the special translation 
+              handling of a SAP frame with a DSAP equal to  
+              ctTransOtherSapDsap3Val.
+
+              The default of this object is product specific."
+         ::= { ctTransOtherEntry 8}
+ 
+ ctTransOtherSapDsap3Val OBJECT-TYPE
+         SYNTAX  INTEGER (0..255)
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object allows the user to specify a DSAP value that 
+              when matched will require additional translation on frames."
+         ::= { ctTransOtherEntry 9}
+
+ ctTransOtherSnap1Mode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "When enabled (1) this object the value in ctTransOtherSnap1Val 
+              will be compared against the protocol values of all SNAP frames 
+              received on this interface. A match indicates that the current 
+              frame requires special translation handling.
+
+              The default of this object is product specific."
+         ::= { ctTransOtherEntry 10}
+ 
+ ctTransOtherSnap1Val OBJECT-TYPE
+         SYNTAX  INTEGER (0..65535)
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object allows the user to specify a SNAP value to match 
+              against inbound SNAP frames for translation handling." 
+         ::= { ctTransOtherEntry 11}
+
+ ctTransOtherSnap2Mode OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 enabled(1),
+                 disabled(2)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "When enabled (1) this object the value in ctTransOtherSnap2Val 
+              will be compared against the protocol values of all SNAP frames 
+              received on this interface. A match indicates that the current 
+              frame requires special translation handling.
+
+              The default of this object is product specific."
+         ::= { ctTransOtherEntry 12}
+
+ ctTransOtherSnap2Val OBJECT-TYPE
+         SYNTAX  INTEGER (0..65535)
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "This object allows the user to specify a SNAP value to match 
+              against inbound SNAP frames for translation handling." 
+         ::= { ctTransOtherEntry 13}
+
+ ctTransLfpsTable OBJECT-TYPE
+         SYNTAX  SEQUENCE OF CtTransLfpsEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             "This table is for the user to configure the large frame ports
+              ability to support large frames. The Large frame port support
+              is done on a per port basis. The operation affects outbound 
+              frames only."
+         ::= { ctTranslfpsCfg 1 }
+
+ ctTransLfpsEntry OBJECT-TYPE
+         SYNTAX  CtTransLfpsEntry
+         ACCESS  not-accessible
+         STATUS  mandatory
+         DESCRIPTION
+             " A list of objects that pertain to the large frame port
+               support table."
+         INDEX    { ctTransLfpsPort }
+         ::= { ctTransLfpsTable 1 }
+            
+ CtTransLfpsEntry ::=
+         SEQUENCE {
+             ctTransLfpsPort
+                  INTEGER,
+             ctTransLfpsAdminStatus
+                  INTEGER,
+             ctTransLfpsOperationalStatus
+                  INTEGER
+          }
+
+ ctTransLfpsPort OBJECT-TYPE
+         SYNTAX  INTEGER
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "The MIB-II interface number of the port for which this entry is
+              administering  control for subgroups of LLC frames by SAP or
+              SNAP type."
+         ::= { ctTransLfpsEntry 1}
+
+
+ ctTransLfpsAdminStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 large(1),
+                 fragment-if-possible(2),
+                 small(3),
+                 auto(4)
+                 }
+         ACCESS  read-write
+         STATUS  mandatory
+         DESCRIPTION
+             "When large(1) is the setting all large frames are permissable 
+              out that port. fragment_if_possible(2) is used when the outport 
+              wants ip frames fragmented before transmission. All other non 
+              fragmentable large frames will be transmitted large. small(3)
+              requires that no large frames be transmitted out this interface.
+              If a frame can be fragmented then it can be transmitted out the 
+              interface. auto(4) is a special setting that will allow a device
+              to negotiate which of the other three settings to use as the 
+              operational mode. 
+
+              The default of this object is product specific."
+         ::= { ctTransLfpsEntry 2}
+
+ ctTransLfpsOperationalStatus OBJECT-TYPE
+         SYNTAX  INTEGER {
+                 large(1),
+                 fragment-if-possible(2),
+                 small(3)
+                 }
+         ACCESS  read-only
+         STATUS  mandatory
+         DESCRIPTION
+             "This value represents the current operational mode of the
+              interface. The operational mode should reflect what is set in
+              the ctTransLfpsAdminStatus object. The only exception is when
+              the user sellects a platform mode that is unsupported and if 
+              the ctTransLfpsAdminStatus object is set to auto. If the 
+              ctTransLfpsAdminStatus object is set to auto then the negotiated
+              value will be reflected, which should be one of the above valid
+              possibilities.
+
+              The default of this object is product specific."
+         ::= { ctTransLfpsEntry 3 }
+
+END

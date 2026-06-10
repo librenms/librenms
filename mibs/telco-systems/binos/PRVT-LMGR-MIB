@@ -1,0 +1,632 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename:   PRVT-LMGR-MIB.mib
+-- ** Project:    T-Metro Switches.
+-- ** Purpose:    Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2006, BATM Advanced Communications.  All rights reserved.
+--                             WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information.  This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM.  Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-LMGR-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Unsigned32      FROM SNMPv2-SMI
+
+      OBJECT-GROUP, MODULE-COMPLIANCE                          FROM SNMPv2-CONF
+
+      TEXTUAL-CONVENTION, RowStatus, TruthValue                FROM SNMPv2-TC
+
+      InetAddressType, InetAddress, InetAddressIPv4            FROM INET-ADDRESS-MIB
+      mpls				 		FROM PRVT-CR-LDP-MIB;
+
+
+  prvtLmgr  MODULE-IDENTITY
+      LAST-UPDATED "200606110000Z" 
+      ORGANIZATION "BATM Advanced Communication"
+      CONTACT-INFO
+                   " BATM/Telco Systems Support team
+					Email: 
+				For North America: techsupport@telco.com
+				For North Europe: support@batm.de, info@batm.de
+				For the rest of the world: techsupport@telco.com"
+      DESCRIPTION  "The MIB module for management of the PRVT-LMGR
+                    product."
+
+-- revision history
+	REVISION       "200606110000Z"
+	DESCRIPTION
+	"Initial"
+  ::= { mpls 4 }
+
+  prvtLmgrObjects OBJECT IDENTIFIER ::= { prvtLmgr 1 } -- tables
+
+--  Textual Conventions.
+
+  PrvtLmgrAdminStatus ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The desired administrative state of a Label
+                   Manager entity."
+      SYNTAX      INTEGER {
+                      up(1),
+                      down(2)
+                  }
+
+  PrvtLmgrOperStatus ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The current operational state of a Label Manager
+                   entity. If the operational state is goingDown then
+                   a request to activate the Label Manager entity
+                   is rejected."
+      SYNTAX      INTEGER {
+                      up(1),          -- active
+                      down(2),        -- inactive
+                      goingUp(3),     -- activating
+                      goingDown(4),   -- deactivating
+                      actFailed(5)    -- activation failed
+                  }
+
+  PrvtLmgrPartnerStatus ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The state of a Label Manager partner entity."
+      SYNTAX      INTEGER {
+                      initial(0),     -- partner not active
+                      activating(1),  -- partner activating
+                      active(2),      -- partner active
+                      deactivating(3),-- partner deactivating
+                      failedOver(4),  -- partner failed, but recovering
+                      failed(5),      -- partner failed, but recovering
+                      unavailable(6)  -- partner unavailable
+                  }
+
+  PrvtLmgrIndex ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The index value identifying a Label Manager
+                   entity."
+      SYNTAX      Unsigned32
+
+  PrvtLmgrControlModes ::= TEXTUAL-CONVENTION
+      STATUS      current
+      DESCRIPTION "The Control Mode of Label Manager."
+      SYNTAX      INTEGER {
+                      ordered(1),     -- control is ordered
+                      independent(2)  -- control is independent
+                  }
+
+-- End of textual conventions
+
+   prvtLsrId  OBJECT-TYPE
+        SYNTAX      InetAddressIPv4
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+         "This object allows LSR Id value to be set. It is needed for unique 
+          identification of LSR instance, from which the packets are sent
+          through created LDP session.
+          
+          Although every 32 bit value is valid, it is recommended
+          the device's loopback ip address to be used.
+
+          A value of zero indicates that no LSR ID has been
+          configured.  In this case, the signaling protocol stack
+          should construct a unique LSR ID from the other
+          information that is available to it (such as IP
+          addresses).  For example, PRVT-CR-LDP and PRVT-RSVP derive
+          the LSR ID by taking the 32 low bits of the following
+          _transport_address_ field, left padding with zeros if
+          necessary."
+       ::= { prvtLmgrObjects 1 }
+
+-- Label Manager entity table.
+-- This table is used to create and manage Label Manager entities.
+
+    prvtLmgrLsrEntityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PrvtLmgrLsrEntityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry represents an instance of the Label Manager.
+             Each instance is identified by LSR index."
+       ::= { prvtLmgrObjects 2 }
+
+    prvtLmgrLsrEntityEntry OBJECT-TYPE
+        SYNTAX      PrvtLmgrLsrEntityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry represents a Label Manager entity."
+        INDEX       {  prvtlmgrLsrEntityLsrIndex  }
+       ::= { prvtLmgrLsrEntityTable 1 }
+
+
+    PrvtLmgrLsrEntityEntry ::= SEQUENCE {
+            prvtlmgrLsrEntityLsrIndex           PrvtLmgrIndex,
+            prvtLmgrLsrEntityAdminStatus        PrvtLmgrAdminStatus,
+            prvtLmgrLsrEntityOperStatus         PrvtLmgrOperStatus,
+            prvtLmgrLsrEntityRowStatus          RowStatus,
+            prvtLmgrLsrEntityMinLsiBuffers      Unsigned32,
+            prvtLmgrLsrEntityMaxLsiBuffers      Unsigned32,
+            prvtLmgrLscStatus                   PrvtLmgrPartnerStatus,
+            prvtLmgrLdbCount                    Unsigned32,
+            prvtLmgrLsrEntityLsrId              Unsigned32,
+            prvtLmgrLsrEntityTranAddrType       InetAddressType,
+            prvtLmgrLsrEntityTranAddrLen        Unsigned32,
+            prvtLmgrLsrEntityTranAddr           InetAddress,
+            prvtLmgrLsrEntityControlMode        PrvtLmgrControlModes,
+            prvtLmgrLsrEntityMergeLsps          TruthValue,
+            prvtLmgrLsrEntityLoopDetection      TruthValue,
+            prvtLmgrLsrEntityPerformGrouping    TruthValue,
+            prvtLmgrLsrAutoStaticLsps           TruthValue,
+            prvtLmgrLsrDisplayPhpXCs            TruthValue,
+            prvtLmgrLsrEntityIpv6TranAddr       InetAddress
+       }
+
+    prvtlmgrLsrEntityLsrIndex OBJECT-TYPE
+        SYNTAX      PrvtLmgrIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "LSR index for this prvtLmgrLsrEntityEntry. This is the
+             entity index passed in the Label Manager create
+             parameters."
+       ::= { prvtLmgrLsrEntityEntry 1 }
+
+    prvtLmgrLsrEntityAdminStatus   OBJECT-TYPE
+        SYNTAX      PrvtLmgrAdminStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Administrative status for Label Manager. When
+          prvtLmgrLsrEntityRowStatus is 'active' and
+          prvtLmgrLsrEntityAdminStatus is 'up' Label Manager is
+          active and only these two fields and
+          prvtLmgrLsrEntityMinLsiBuffers can be modified."
+        DEFVAL { up }
+       ::= { prvtLmgrLsrEntityEntry 2 }
+
+    prvtLmgrLsrEntityOperStatus OBJECT-TYPE
+        SYNTAX      PrvtLmgrOperStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "The current operational status of the Label Manager
+          entity."
+       ::= { prvtLmgrLsrEntityEntry 3 }
+
+    prvtLmgrLsrEntityRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Row status for the Label Manager table entry, used to
+          create and destroy table entries. When
+          prvtLmgrLsrEntityRowStatus is 'active' and
+          prvtLmgrLsrEntityAdminStatus is 'up' Label Manager is
+          active and only these two fields and
+          prvtLmgrLsrEntityMinLsiBuffers can be modified."
+       ::= { prvtLmgrLsrEntityEntry 4 }
+
+    prvtLmgrLsrEntityMinLsiBuffers OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Minimum number of buffers to allocate for Label Switch
+          Interface requests.  This number includes any buffers sent
+          to the Label Switch Controller and awaiting a response."
+       ::= { prvtLmgrLsrEntityEntry 5 }
+
+    prvtLmgrLsrEntityMaxLsiBuffers OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Maximum number of buffers to allocate for Label Switch
+          Interface requests.  A value of 0 means no maximum,
+          otherwise this value must equal or exceed the minimum
+          buffer count."
+       ::= { prvtLmgrLsrEntityEntry 6 }
+
+    prvtLmgrLscStatus OBJECT-TYPE
+        SYNTAX      PrvtLmgrPartnerStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "Diagnostic field providing information about the status
+	  of the Label Switch Controller as seen by Label Manager."
+       ::= { prvtLmgrLsrEntityEntry 7 }
+
+    prvtLmgrLdbCount  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "Diagnostic field providing information about the number
+         of active interfaces between Label Manager and the its
+         Label Database Interface users (PRVT-TEMIB and PRVT-RSVP)."
+       ::= { prvtLmgrLsrEntityEntry 8 }
+
+    prvtLmgrLsrEntityLsrId  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+         "An ID that uniquely identifies this LSR within the
+          network.
+
+          The LSR ID is typically derived from one of the LSR's IP
+          addresses.  It may be used for path vector based loop
+          detection if the signaling protocol in use implements
+          that.
+
+          A value of zero indicates that no LSR ID has been
+          configured.  In this case, the signaling protocol stack
+          should construct a unique LSR ID from the other
+          information that is available to it (such as IP
+          addresses).  For example, PRVT-CR-LDP and PRVT-RSVP derive
+          the LSR ID by taking the 32 low bits of the following
+          _transport_address_ field, left padding with zeros if
+          necessary.
+
+          The LSR ID is only used to identify this LSR on IPv4
+          networks.  See dcLmgrLsrEntityIpv6TranAddr for equivalent
+          function for use in IPv6 networks."
+       ::= { prvtLmgrLsrEntityEntry 9 }
+
+     prvtLmgrLsrEntityTranAddrType  OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "The type of the internetwork layer address used as the
+          transport address.  Currently this must be IPv4.  See
+          dcLmgrLsrEntityIpv6TranAddr, below, for the equivalent
+          field for use in IPv6 networks.
+
+          The transport address is used by LDP as the source
+          transport address for LDP Hello messages for the global
+          (per-platform) label space.
+
+          The transport address is used by RSVP as the source
+          address for messages originating on unnumbered interfaces.
+
+          This object indicates how the value of
+          mplsLdpEntityTransAddr is to be interpreted."
+       ::= { prvtLmgrLsrEntityEntry 10 }
+
+     prvtLmgrLsrEntityTranAddrLen  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "The length of the internetwork layer address used as the
+          transport address for LDP Hello messages in the global
+          label space and for messages originating on unnumbered
+          interfaces in RSVP.  Currently this must be an IPv4
+          address.
+
+          This object indicates how many elements of the
+          mplsLdpEntityTransAddr array are valid.  This value must
+          not exceed _LMGR_LSR_ADDR_LEN_."
+       ::= { prvtLmgrLsrEntityEntry 11 }
+
+     prvtLmgrLsrEntityTranAddr  OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "The value of the internetwork layer address used as the
+          transport address for LDP Hello messages in the global
+          label space and for messages originating on unnumbered
+          interfaces in RSVP.
+
+          This must be an IPv4 address.  See
+          dcLmgrLsrEntityIpv6TranAddr, below, for the equivalent
+          field for use in IPv6 networks.
+
+          If the transport address is not set, then _lsr_id_ must be
+          set to zero.  In this case, the transport address and LSR
+          ID are taken from an address on the Interface Information
+          Interface."
+       ::= { prvtLmgrLsrEntityEntry 12 }
+
+     prvtLmgrLsrEntityControlMode  OBJECT-TYPE
+        SYNTAX      PrvtLmgrControlModes
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "The LSP control mode that this LSR should adopt.
+          This field is only used by Label Manager in systems where
+          it supports LDP and/or CR-LDP."
+       ::= { prvtLmgrLsrEntityEntry 13 }
+
+     prvtLmgrLsrEntityMergeLsps  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Whether this LSR should aim to merge LSPs, where permitted
+          by the underlying hardware.
+          This field is only used by Label Manager in systems where
+          it supports LDP and/or CR-LDP."
+        DEFVAL { false }
+       ::= { prvtLmgrLsrEntityEntry 14 }
+
+     prvtLmgrLsrEntityLoopDetection  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Whether this LSR should perform loop detection.
+          This field is only used by Label Manager in systems where
+          it supports LDP and/or CR-LDP."
+        DEFVAL { false }
+       ::= { prvtLmgrLsrEntityEntry 15 }
+
+     prvtLmgrLsrEntityPerformGrouping  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Whether Label Manager should perform LSP grouping on
+          behalf of the LDBI user.  This field is currently only
+          used for systems supporting RSVP."
+        DEFVAL { false }
+       ::= { prvtLmgrLsrEntityEntry 16 }
+
+     prvtLmgrLsrAutoStaticLsps  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Whether Label Manager should automatically activate or
+          deactivate static LSPs when the interfaces on which they
+          depend become active or inactive."
+        DEFVAL { false }
+       ::= { prvtLmgrLsrEntityEntry 17 }
+
+     prvtLmgrLsrDisplayPhpXCs  OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "Whether Label Manager should display the virtual cross
+          connects its sets up at the Egress node of Implicit Null
+          and Explicit Null LSPs in the mplsXcTable.  These cross
+          connects do not represent real switch programming, but do
+          show the prescence of such LSPs, and correspond to the
+          entries in the mplsTunnelTable for theses types of LSP."
+        DEFVAL { false }
+       ::= { prvtLmgrLsrEntityEntry 18 }
+
+     prvtLmgrLsrEntityIpv6TranAddr  OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+         "The value of the internetwork address used for messages
+          originating on unnumbered interfaces in RSVP in an IPv6
+          network.
+
+          This value also uniquely identifies this LSR within an
+          IPv6 network.
+
+          If this address is not set, the IPv6 transport address is
+          taken from an address on the Interface Information
+          Interface.
+
+          A length value of zero indicates that no IPv6 transport
+          address has been configured.  In this case, if IPv6
+          support is configured, the signaling protocol stack should
+          use an IPv6 address configured to the signaling stack over
+          the Interface Information Interface that is flagged as
+          suitable for use as a stable address."
+        ::= { prvtLmgrLsrEntityEntry 19 }
+
+-- End of Label Manager entity table.
+-- Label Manager LSP XC Table
+-- This table is used to create and manage LSP XCs
+
+    prvtLmgrLsrLspXcTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF PrvtLmgrLsrLspXcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry represents an instance of an LSP
+             cross-conect between a single in-segment and a
+             single out-segment."
+       ::= { prvtLmgrObjects 3 }
+
+    prvtLmgrLsrLspXcEntry OBJECT-TYPE
+        SYNTAX      PrvtLmgrLsrLspXcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Each entry represents an LSP cross connect."
+        INDEX       {  prvtlmgrLsrEntityLsrIndex,
+                       prvtLmgrLsrLspXcIndex,
+                       prvtLmgrLsrLspInSegLabel,
+                       prvtLmgrLsrLspOutSegIndex }
+
+       ::= { prvtLmgrLsrLspXcTable 1 }
+
+    PrvtLmgrLsrLspXcEntry ::= SEQUENCE {
+            prvtLmgrLsrLspXcIndex               Unsigned32,
+            prvtLmgrLsrLspInSegIndex            Unsigned32,
+            prvtLmgrLsrLspInSegIfIndex          Unsigned32,
+            prvtLmgrLsrLspInSegLabel            Unsigned32,
+            prvtLmgrLsrLspOutSegIndex           Unsigned32,
+            prvtLmgrLsrLspOutSegIfIndex         Unsigned32,
+            prvtLmgrLsrLspOutSegLabel           Unsigned32,
+            prvtLmgrLsrLspOutSegNextHopAddr     InetAddressIPv4
+         }
+
+    prvtLmgrLsrLspXcIndex  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "XC index for this prvtLmgrLsrLspXc.  This is the XC index
+             assigned by Label Manager for the LSP."
+       ::= { prvtLmgrLsrLspXcEntry 2 }
+
+    prvtLmgrLsrLspInSegIndex  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the in segment.  This is the index assigned
+             by Label Manager for the in segment."
+       ::= { prvtLmgrLsrLspXcEntry 3 }
+
+    prvtLmgrLsrLspInSegIfIndex  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "If index for the in segment.  This is the If index
+             specified on setting up the in segment."
+       ::= { prvtLmgrLsrLspXcEntry 4 }
+
+    prvtLmgrLsrLspInSegLabel  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Top label for the in segment.  This is the Label assigned
+             by Label Manager Label Library for the in segment."
+       ::= { prvtLmgrLsrLspXcEntry 5 }
+
+
+    prvtLmgrLsrLspOutSegIndex  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Index for the out segment.  This is the index assigned
+             by Label Manager for the out segment."
+       ::= { prvtLmgrLsrLspXcEntry 6 }
+
+     prvtLmgrLsrLspOutSegIfIndex  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Interface Index for the out segment.  This is the
+             interface index specified when setting up the out segment."
+       ::= { prvtLmgrLsrLspXcEntry 7 }
+
+     prvtLmgrLsrLspOutSegLabel  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Top label for the out segment.  This is the label
+             specified by the remote LSR for the out segment."
+       ::= { prvtLmgrLsrLspXcEntry 8 }
+
+     prvtLmgrLsrLspOutSegNextHopAddr  OBJECT-TYPE
+        SYNTAX      InetAddressIPv4
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Next hop address for the out segment.  This is the address
+             specified by the remote LSR for the out segment."
+       ::= { prvtLmgrLsrLspXcEntry 9 }
+
+-- Module compliance.
+
+-- Conformance Information.
+
+  prvtLmgrConformance   OBJECT IDENTIFIER ::= { prvtLmgr 2 }
+
+  prvtLmgrCompliances  OBJECT IDENTIFIER ::= { prvtLmgrConformance 1 }
+  prvtLmgrGroups       OBJECT IDENTIFIER ::= { prvtLmgrConformance 2 }
+
+  prvtLmgrCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for the PRVT-LMGR product."
+    MODULE
+
+    GROUP prvtLmgrEntityGroup
+    DESCRIPTION
+        "Objects for prvtLmgrEntTable."
+
+    GROUP prvtLmgrMiscGroup
+    DESCRIPTION
+        "Miscellaneous objects."
+
+    ::= { prvtLmgrCompliances 1 }
+
+-- Units of Conformance (Groups)
+
+prvtLmgrEntityGroup OBJECT-GROUP
+   OBJECTS {
+      prvtLmgrLsrEntityAdminStatus,
+      prvtLmgrLsrEntityOperStatus,
+      prvtLmgrLsrEntityRowStatus,
+      prvtLmgrLsrEntityMinLsiBuffers,
+      prvtLmgrLsrEntityMaxLsiBuffers,
+      prvtLmgrLsrEntityLsrId,
+      prvtLmgrLsrEntityTranAddrType,
+      prvtLmgrLsrEntityTranAddrLen,
+      prvtLmgrLsrEntityTranAddr,
+      prvtLmgrLsrEntityControlMode,
+      prvtLmgrLsrEntityMergeLsps,
+      prvtLmgrLsrEntityLoopDetection,
+      prvtLmgrLsrEntityPerformGrouping
+   }
+    STATUS  current
+    DESCRIPTION
+           "Label Manager Entity Objects."
+    ::= { prvtLmgrGroups 2 }
+
+prvtLmgrMiscGroup OBJECT-GROUP
+   OBJECTS {
+      prvtLmgrLscStatus,
+      prvtLmgrLdbCount,
+      prvtLmgrLsrAutoStaticLsps,
+      prvtLmgrLsrDisplayPhpXCs,
+      prvtLmgrLsrLspInSegIfIndex,
+      prvtLmgrLsrLspInSegLabel,
+      prvtLmgrLsrLspOutSegIfIndex,
+      prvtLmgrLsrLspOutSegLabel,
+      prvtLmgrLsrLspOutSegNextHopAddr,
+      prvtLmgrLsrEntityIpv6TranAddr
+   }
+    STATUS  current
+    DESCRIPTION
+           "Miscellaneous Non-Mandatory Objects."
+    ::= { prvtLmgrGroups 3 }
+
+END

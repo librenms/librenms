@@ -1,0 +1,146 @@
+--
+-- SO-TC-MIB.mib
+-- Smartoptics Enterprise Specific TC MIB
+--
+-- Copyright (c) 2022, Smartoptics
+-- All rights reserved
+--
+
+SO-TC-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    smartoptics
+        FROM SO-MIB;
+
+soTcMIB MODULE-IDENTITY
+    LAST-UPDATED "202209051410Z"
+    ORGANIZATION "Smartoptics"
+    CONTACT-INFO "http://www.smartoptics.com"
+    DESCRIPTION "This is the enterprise specific TC MIB for 
+	Smartoptics containing common textual conventions."
+
+    REVISION "202209051410Z"
+    DESCRIPTION "Added xc4Wss1-5 to InterfacePortMode."
+
+    REVISION "202203181349Z"
+    DESCRIPTION "Added InterfacePortMode."
+
+    REVISION "202104121049Z"
+    DESCRIPTION "Added DcpTenth, DcpHundreds, OchPortMode textual convention.
+                 Updated description for InterfaceStatus."
+
+    REVISION "201810081444Z"
+    DESCRIPTION "The initial revision"
+::= { smartoptics 3 }
+
+
+--  Textual conventions
+--
+-- definitions of the textual convetions
+--
+OpticalPower1Decimal ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+    "d-1"
+    STATUS current
+    DESCRIPTION
+    "Power level at an interface in units of 0.1 dBm."
+    SYNTAX Integer32
+
+DcpTenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+    "d-1"
+    STATUS current
+    DESCRIPTION
+    "An integer to be displayed with 1 decimal place. 100 is displayes as 10.0"
+    SYNTAX Integer32
+
+DcpHundreds ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT
+    "d-2"
+    STATUS current
+    DESCRIPTION
+    "An integer to be displayed with 2 decimal place. 100 is displayes as 1.0"
+    SYNTAX Integer32
+
+InterfaceStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The operational state for a port, interface or optical channel.
+
+        idle - The port, interface or optical channel is not activated.
+
+        down - The port, interface or optical channel traffic is lost.
+
+        up - There is traffic on the port, interface or optical channel."
+    SYNTAX INTEGER
+    {
+    idle (1),
+    down (2),
+    up (3)
+    }
+
+ItuPerceivedSeverity ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "ITU perceived severity values"
+    SYNTAX INTEGER
+    {
+    cleared (1),
+    indeterminate (2),
+    critical (3),
+    major (4),
+    minor (5),
+    warning (6)
+    }
+
+OchPortMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The operational state for a port, interface or optical channel.
+        on - The channel is enabled.
+        off - The channel is disabled.
+        edfa - The channel is enabled and connected to the edfa port.
+        express - The channel is enabled and connected to the express port."
+    SYNTAX INTEGER
+    {
+    on (1),
+    off (2),
+    edfa (3),
+    express (4)
+    }
+
+InterfacePortMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The interface port mode for a service.
+        na - Not applicable.
+        localAD - The service is added to the chosen channel on the local Add/drop ports.
+        xc1 - The service is added to the cross connect port XC1.
+        xc2 - The service is added to the cross connect port XC2.
+        xc3 - The service is added to the cross connect port XC3.
+        xc4Wss1 - The service is added to the cross connect port XC4:Wss1.
+        xc4Wss2 - The service is added to the cross connect port XC4:Wss2.
+        xc4Wss3 - The service is added to the cross connect port XC4:Wss2.
+        xc4Wss4 - The service is added to the cross connect port XC4:Wss4.
+        xc4Wss5 - The service is added to the cross connect port XC4:Wss5."
+    SYNTAX INTEGER
+    {
+    na (1),
+    localAD (2),
+    xc1 (3),
+    xc2 (4),
+    xc3 (5),
+    xc4Wss1 (6),
+    xc4Wss2 (7),
+    xc4Wss3 (8),
+    xc4Wss4 (9),
+    xc4Wss5 (10)
+    }
+END
+
+--
+-- SO-TC-MIB.mib
+--

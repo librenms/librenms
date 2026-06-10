@@ -1,0 +1,562 @@
+-- Last Mile Gear CTM Master MIB
+-- This mib was custom edited to add Slave information
+-- Mar 27, 2018 - Paul Heinrichs <pdheinrichs@gmail.com>
+
+
+CTMMIBCUSTOM DEFINITIONS ::= BEGIN
+    IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215;
+
+
+    lastmilegear OBJECT IDENTIFIER ::= { enterprises 25868 }
+
+    mibObjects OBJECT IDENTIFIER ::= { lastmilegear 1 }
+
+    version OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Version of Web GUI - Version of Web GUI Interface
+                            currently running on CTM"
+        ::= { mibObjects 1 }
+
+    site OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Site Name - Site name as stored on CTM"
+        ::= { mibObjects 2 }
+
+    lastIP OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Last IP Address Login - Last IP address captured
+                            at Login Attempt"
+        ::= { mibObjects 3 }
+
+    lastTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Last Time Login - Last time of Login attempt"
+        ::= { mibObjects 4 }
+
+    nSats OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Number Satellites in View - Number of Satellites
+                            in view of GPS Receiver Antenna being used for
+                            timing calculations"
+        ::= { mibObjects 5 }
+
+    pwrP OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Primary Power - Master ?1? = Power OK,
+                            ?0? = Power Off or Low"
+        ::= { mibObjects 6 }
+
+    pwrS OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Secondary Power - Master ?1? = Power OK,
+                            ?0? = Power Off or Low"
+        ::= { mibObjects 7 }
+
+    cbTrip OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Circuit Breaker Trip Bit Code - Master
+                            Breaker Tripped Code: 1=Port 1, 2=Port2, 4=Port
+                            3, 8=Port4, 16=Port5, 32=Port6, 64=Port7, 128=Port8
+                            Example: Code 5 means Port 3 and Port 1 Tripped"
+        ::= { mibObjects 8 }
+
+    tempC OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Temperature"
+        ::= { mibObjects 9 }
+
+    voltsM1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Primary Power In Voltage - In Tenths of
+                            a Volt"
+        ::= { mibObjects 10 }
+
+    voltsM2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Secondary Power In Voltage - In Tenths
+                            of a Volt"
+        ::= { mibObjects 11 }
+
+    portOnM OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ports ON Enabled Status - Master ?1? =Sync
+                            Enabled, ?0? = Sync Off listed in order ?Port1?,
+                            ?Port2?, ?Port3?, ?Port4?, ?Port5?, ?Port6?,
+                            ?Port7?, ?Port8?"
+        ::= { mibObjects 12 }
+
+    portSyncM OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ports Sync Enabled Status - Master ?1?
+                            =Sync Enabled, ?0? = Sync Off listed in order
+                            ?Port1?, ?Port2?, ?Port3?, ?Port4?, ?Port5?,
+                            ?Port6?, ?Port7?, ?Port8?"
+        ::= { mibObjects 13 }
+
+    portPwrM1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 1 - (in tenths of a Watt) delivered
+                            on Port 1"
+        ::= { mibObjects 14 }
+
+    portPwrM2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 2 - (in tenths of a Watt) delivered
+                            on Port 2"
+        ::= { mibObjects 15 }
+
+    portPwrM3 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 3 - (in tenths of a Watt) delivered
+                            on Port 3"
+        ::= { mibObjects 16 }
+
+    portPwrM4 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 4 - (in tenths of a Watt) delivered
+                            on Port 4"
+        ::= { mibObjects 17 }
+
+    portPwrM5 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 5 - (in tenths of a Watt) delivered
+                            on Port 5"
+        ::= { mibObjects 18 }
+
+    portPwrM6 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 6 - (in tenths of a Watt) delivered
+                            on Port 6"
+        ::= { mibObjects 19 }
+
+    portPwrM7 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 7 - (in tenths of a Watt) delivered
+                            on Port 7"
+        ::= { mibObjects 20 }
+
+    portPwrM8 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Power Port 8 - (in tenths of a Watt) delivered
+                            on Port 8"
+        ::= { mibObjects 21 }
+
+    pwrSP OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Primary Power - Master ?1? = Power OK,
+                            ?0? = Power Off or Low"
+        ::= { mibObjects 23 }
+
+    pwrSS OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Secondary Power - Master ?1? = Power OK,
+                            ?0? = Power Off or Low"
+        ::= { mibObjects 24 }
+
+    voltsS1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Primary Power In Voltage - In Tenths of
+                            a Volt"
+        ::= { mibObjects 27 }
+
+    voltsS2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Secondary Power In Voltage - In Tenths
+                            of a Volt"
+        ::= { mibObjects 28 }
+
+    portOnS OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Ports ON Enabled Status - Slave ?1? =Sync
+                            Enabled, ?0? = Sync Off listed in order ?Port1?,
+                            ?Port2?, ?Port3?, ?Port4?, ?Port5?, ?Port6?,
+                            ?Port7?, ?Port8?"
+        ::= { mibObjects 29 }
+
+    portSyncS OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Ports Sync Enabled Status - Slave ?1?
+                            =Sync Enabled, ?0? = Sync Off listed in order
+                            ?Port1?, ?Port2?, ?Port3?, ?Port4?, ?Port5?,
+                            ?Port6?, ?Port7?, ?Port8?"
+        ::= { mibObjects 30 }
+
+    portPwrS1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 1 - (in tenths of a Watt) delivered
+                            on Port 1"
+        ::= { mibObjects 31 }
+
+    portPwrS2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 2 - (in tenths of a Watt) delivered
+                            on Port 2"
+        ::= { mibObjects 32 }
+
+    portPwrS3 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 3 - (in tenths of a Watt) delivered
+                            on Port 3"
+        ::= { mibObjects 33 }
+
+    portPwrS4 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 4 - (in tenths of a Watt) delivered
+                            on Port 4"
+        ::= { mibObjects 34 }
+
+    portPwrS5 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 5 - (in tenths of a Watt) delivered
+                            on Port 5"
+        ::= { mibObjects 35 }
+
+    portPwrS6 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 6 - (in tenths of a Watt) delivered
+                            on Port 6"
+        ::= { mibObjects 36 }
+    
+    portPwrS7 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 7 - (in tenths of a Watt) delivered
+                            on Port 7"
+        ::= { mibObjects 37 }
+    
+    portPwrS8 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Slave Power Port 8 - (in tenths of a Watt) delivered
+                            on Port 8"
+        ::= { mibObjects 38 }
+
+    modeReqM OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master CTM2 Port Type Setting - Master ?00?=Type
+                            A (Canopy) ?10?=Type B (OFDM), ?01? = Type C
+                            (POE 802.3at), ?11? (POE 802.3at 4 Pair), ?100?=(POE
+                            24V mode, CTM2 C Only) listed in order ?Port1?,
+                            ?Port2?, ?Port3?, ?Port4?, ?Port5?, ?Port6?,
+                            ?Port7?, ?Port8?"
+        ::= { mibObjects 39 }
+
+    trpCntGM1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 1 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 1"
+        ::= { mibObjects 45 }
+
+    trpCntGM2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 2 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 2"
+        ::= { mibObjects 46 }
+
+    trpCntGM3 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 3 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 3"
+        ::= { mibObjects 47 }
+
+    trpCntGM4 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 4 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 4"
+        ::= { mibObjects 48 }
+
+    trpCntGM5 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 5 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 5"
+        ::= { mibObjects 49 }
+
+    trpCntGM6 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 6 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 6"
+        ::= { mibObjects 50 }
+
+    trpCntGM7 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 7 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 7"
+        ::= { mibObjects 51 }
+
+    trpCntGM8 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Auto Restart Count Port 8 - Number of Times
+                            Auto Reset Feature has executed a Circuit Breaker
+                            Restart on Port 8"
+        ::= { mibObjects 52 }
+
+    trpCntBM1 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            1 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 1"
+        ::= { mibObjects 53 }
+
+    trpCntBM2 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            2 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 2"
+        ::= { mibObjects 54 }
+
+    trpCntBM3 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            3 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 3"
+        ::= { mibObjects 55 }
+
+    trpCntBM4 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            4 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 4"
+        ::= { mibObjects 56 }
+
+    trpCntBM5 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            5 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 5"
+        ::= { mibObjects 57 }
+
+    trpCntBM6 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            6 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 6"
+        ::= { mibObjects 58 }
+
+    trpCntBM7 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            7 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 7"
+        ::= { mibObjects 59 }
+
+    trpCntBM8 OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Master Ckt Breaker Auto Restart Fail Count Port
+                            8 - Number of Times Auto Reset Feature has failed
+                            to restart (after 7 tries) a Circuit Breaker
+                            on Port 8"
+        ::= { mibObjects 60 }
+
+
+    lostEthernetConnection TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Lost Ethernet Connection"
+        ::= 0
+
+    masterPrimayPowerLost TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Master Primary Power Lost"
+        ::= 1
+
+    masterSecondaryPowerLost TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Master Secondary Power Lost"
+        ::= 2
+
+    gpsSignalLost TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "GPS Signal Lost"
+        ::= 3
+
+    masterTempatureError TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Master Temperature Error"
+        ::= 4
+
+    masterCircuitBreakerTripCode TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Master Circuit Breaker Trip Code - Master Breaker Tripped
+                             Code: 1=Port 1, 2=Port2, 4=Port 3, 8=Port4, 16=Port5,
+                             32=Port6, 64=Port7, 128=Port8        Example: Code
+                             5 means Port 3 and Port 1 Tripped"
+        ::= 5
+
+    loginFailedAttempt TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Login Failed Attempt"
+        ::= 6
+
+    settingsChanged TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "CTM Settings Changed"
+        ::= 7
+
+    masterPrimaryPowerOK TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Master Primary Power OK"
+        ::= 10
+
+    masterSecondaryPowerOK TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Master Secondary Power OK"
+        ::= 20
+
+    gpsSignalOK TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "GPS Signal OK"
+        ::= 30
+
+    tempatureOK TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Temperature OK"
+        ::= 40
+
+    circuitBreakersOK TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Circuit Breakers OK"
+        ::= 50
+
+    masterAutoRestartCBCompletedOK TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Master Auto Restart CB Completed OK"
+        ::= 52
+
+    loginOK TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Login OK"
+        ::= 60
+
+    resetComplete TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Reset Complete"
+        ::= 80
+
+    ethernetConnectionRestored TRAP-TYPE
+        ENTERPRISE          mibObjects
+        DESCRIPTION         "Ethernet Connection Restored"
+        ::= 99
+
+
+END

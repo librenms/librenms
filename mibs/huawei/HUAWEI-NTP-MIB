@@ -1,0 +1,3469 @@
+
+--   ============================================================================
+-- Copyright (C) 2022 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: This MIB module defines mib objects that provide NTP service
+--              management.
+--              The Network Time Protocol (NTP) is used in networks of all types
+--              and sizes for time synchronization of servers, workstations and
+--              other networked equipment.
+-- Reference:
+-- Version: V2.17
+-- ============================================================================
+
+	HUAWEI-NTP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,NOTIFICATION-TYPE,
+        IpAddress, Unsigned32, Integer32, Counter64                 FROM SNMPv2-SMI
+        RowStatus, TruthValue, DateAndTime,
+        DisplayString                                               FROM SNMPv2-TC
+        huaweiUtility                                               FROM HUAWEI-MIB
+        InetAddressType, InetAddress                                FROM INET-ADDRESS-MIB
+        Ipv6Address                                                 FROM IPV6-TC
+        InterfaceIndex                                              FROM IF-MIB
+        OBJECT-GROUP, MODULE-COMPLIANCE                             FROM SNMPv2-CONF;
+
+        hwNtp MODULE-IDENTITY
+            LAST-UPDATED "202203170000Z"
+            ORGANIZATION
+               "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+
+            DESCRIPTION
+                  "This MIB module defines mib objects that provide NTP service
+                  management. The Network Time Protocol (NTP) is used in networks of all types
+                  and sizes for time synchronization of servers, workstations and
+                  other networked equipment."
+
+            --  Revision history
+            REVISION    "202203170000Z"
+            DESCRIPTION "V2.17, modified description of hwNtpUniPeerMinpoll, hwNtpManycastClientIfName, hwNtpManycastServerIfName, hwNtpMulticastServerGenIfName, hwNtpMulticastClientGenIfName, hwNtpBroadcastClientGenIfName, hwNtpBroadcastServerGenIfName"
+
+            REVISION    "202202240000Z"
+            DESCRIPTION "V2.16, modified revision history description spelling of the v2.14 and v2.15"
+
+            REVISION    "202202230000Z"
+            DESCRIPTION "V2.15, modified description spelling of the nodes hwNtpAuthKeyidType"
+
+            REVISION    "202111080000Z"
+            DESCRIPTION "V2.14, modified description of the nodes hwNtpAuthKeyidType"
+			
+            REVISION    "202103260000Z"
+            DESCRIPTION "V2.13, modified description of the nodes hwNtpServiceSourceInterfaceVpnTable and hwNtpServiceSourceInterfaceVpnEntry"
+
+            REVISION    "202007160000Z"
+            DESCRIPTION "V2.12, modified description of the nodes hwNtpSessionClockSourceIp, hwNtpSessionVpnFlag, hwNtpUniServerAddressType, hwNtpUniPeerAddressType, hwNtpServiceSourceInterfaceVpnAddressType, hwNtpManycastClientIpType, hwNtpManycastServerIpType, hwNtpMulticastServerGenAddressType, hwNtpMulticastClientGenAddressType and hwNtpServerSourceAllInterfaceAddressType"
+
+            REVISION    "202003300000Z"
+            DESCRIPTION "V2.11, modified description of the nodes hwNtpServerSourceAllInterfaceRowStatus, hwNtpServerSourceInterfaceRowStatus, hwNtpServerSourceIpv6Addr and hwNtpServerSourceIpv6RowStatus"
+
+            REVISION    "202003230000Z"
+            DESCRIPTION "V2.10, added below tables
+            hwNtpServerSourceAllInterfaceTable
+            hwNtpServerSourceInterfaceTable
+            hwNtpServerSourceIpv6Table"
+
+            REVISION    "201809200000Z"
+            DESCRIPTION "V2.09, modified description of the nodes hwNtpAuthKeyidType and hwNtpInInterfaceType"
+
+            REVISION    "201708170000Z"
+            DESCRIPTION "V2.08, deleted index"
+
+            REVISION    "201609260000Z"
+            DESCRIPTION "V2.07, modified hwNtpInInterfaceGenEntry, hwNtpBroadcastClientGenTable, hwNtpBroadcastClientGenEntry, hwNtpBroadcastServerGenTable, hwNtpBroadcastServerGenEntry description and modified alignment of hwNtpMulticastServerGenVersion, hwNtpIPv6ServerSwitch, hwNtpIPv4ServerSwitch"
+			
+            REVISION    "201409040000Z"
+            DESCRIPTION "V2.06, modified the revision history."
+			
+			REVISION    "201409010000Z"
+            DESCRIPTION "V2.05, modified the date of copyright."
+			
+            REVISION    "201407230000Z"
+            DESCRIPTION "V2.04, change in auth keyid table"
+                 
+            REVISION    "201407030000Z"
+            DESCRIPTION "V2.03, added hwNtpIPv4ServerSwitch and hwNtpIPv6ServerSwitch for NTP Server Disable"
+
+            REVISION     "201405280000Z"
+            DESCRIPTION  "V2.02, added new tables and scalar objects for IAS product"     
+
+            REVISION     "201405060000Z"
+            DESCRIPTION  "V2.01, added below nodes in HwNtpAuthenKeyEntry
+	            	hwNtpAuthKeyidType
+                                            hwNtpAuthKeyidPassword"     
+
+            REVISION     "201205220000Z"
+            DESCRIPTION  "V1.08, added below tables
+	            	hwNtpAuthenAccessTable
+			    hwNtpAuthenAccessAcl6    
+			hwNtpInInterfaceTable
+			    hwNtpInInterfaceAdminStatus6    
+			hwNtpQueryNtpServerSessionTable    
+			hwNtpSessionVpn    
+			hwNtpUniServerTable
+			    hwNtpUniServerMaxpoll
+			    hwNtpUniServerMinpoll
+			    hwNtpUniServerburst
+			    hwNtpUniServerIburst
+			    hwNtpUniServerPreempt    
+			hwNtpUniPeerTable
+			    hwNtpUniPeerMaxpoll
+			    hwNtpUniPeerMinpoll
+			    hwNtpUniPeerPreempt
+		    	hwNtpServiceSourceInterfaceVpnTable
+			hwNtpManycastClientTable
+			hwNtpManycastServerTable
+			hwNtpMulticastServerGenTable
+			hwNtpMulticastClientGenTable
+			Added below scalar nodes
+				hwNtpKODStatus
+				hwNtpDiscardMinInterval
+				hwNtpDiscardAvgInterval"		    	    
+			
+		  
+            REVISION     "201108100000Z"
+            DESCRIPTION  "V1.07, NTP support VPN
+                                        1) Added two tables hwNtpUniServerTable hwNtpUniPeerTable.
+                			2) Added two nodes hwNtpSessionVpnInstance hwNtpStatusReferenceClockVpn.
+					3) Modified the range of 5 nodes."	
+
+		     
+            REVISION     "201002080000Z"
+            DESCRIPTION  "V1.01, release version"	
+            
+            REVISION     "201001300000Z"
+            DESCRIPTION  "V1.00, initial draft"										
+					            
+			::= { huaweiUtility 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.1
+		ntp OBJECT IDENTIFIER ::= { hwNtp 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.1.4
+		ntpSynInterval OBJECT-TYPE
+			SYNTAX Integer32 (0 | 180..600)
+			UNITS "Seconds"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Sets the synchronization interval. Unit: Second.
+				0 indicates not configured."
+			::= { ntp 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.1.8
+		hwNtpKODStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Used for enabling or disabling the NTP service KOD feature.
+				Options:
+				1. enable(1)  -indicates the NTP service KOD feature is enabled
+				2. disable(2) -indicates the NTP service KOD feature is disabled
+				"
+			::= { ntp 8 }
+		-- 1.3.6.1.4.1.2011.6.4.2
+    hwNtpObject OBJECT IDENTIFIER ::= { hwNtp 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.2
+		hwNtpDynamicSession OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the maximum number of dynamic NTP sessions allowed on the host.
+				Range: 0-100
+				Default: 100
+				"
+			::= { hwNtpObject 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.3
+		hwNtpRefclockMasterTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpRefclockMasterEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting an NTP master clock. By using this table,
+				you can set an NTP master clock on the host, which functions as
+				the clock source for synchronizing the devices in a system.
+				After an NTP master clock is set successfully, all devices required
+				to follow the same clock in the system must synchronize to the master clock.
+				"
+			::= { hwNtpObject 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.3.1
+		hwNtpRefclockMasterEntry OBJECT-TYPE
+			SYNTAX HwNtpRefclockMasterEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting an NTP master clock. By using this table,
+				you can set an NTP master clock on the host, which functions as
+				the clock source for synchronizing the devices in a system.
+				After an NTP master clock is set successfully, all devices required
+				to follow the same clock in the system must synchronize to the master clock.
+				The index of this entry is hwNtpRefclockMasterIpaddr.
+				"
+			INDEX { hwNtpRefclockMasterIpaddr }
+			::= { hwNtpRefclockMasterTable 1 }
+
+		HwNtpRefclockMasterEntry ::=
+			SEQUENCE {
+				hwNtpRefclockMasterIpaddr
+					IpAddress,
+				hwNtpRefclockMasterStratum
+					Integer32,
+				hwNtpRefclockMasterRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.3.1.1
+		hwNtpRefclockMasterIpaddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the clock source. The format of the
+				value is 127.127.1.u, where u ranges from 0 to 3. The default
+				value of this leaf is 127.127.1.0."
+			::= { hwNtpRefclockMasterEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.3.1.2
+		hwNtpRefclockMasterStratum OBJECT-TYPE
+			SYNTAX Integer32 (1..15)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the stratum where the local clock is specified to locate.
+				The stratum represents the precision of a clock. The clock at stratum
+				1 has the highest precision. The precision descends from stratum 1 to
+				stratum 15. The default value of this leaf is 8."
+			::= { hwNtpRefclockMasterEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.3.1.6
+		hwNtpRefclockMasterRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpRefclockMasterEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.4
+		hwNtpServiceSourceInterfaceObject OBJECT IDENTIFIER ::= { hwNtpObject 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.4.1
+		hwNtpServiceSourceInterfaceIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				tunnel(1),
+				null(2),
+				meth(3),
+				vlanif(4),
+				loopback(5),
+				notConfigured(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type.
+				Options:
+				1. tunnel(1)      -indicates the tunnel interface
+				2. null(2)        -indicates the NULL interface
+				3. meth(3)        -indicates the MEth interface
+				4. vlanif(4)      -indicates the VLAN interface
+				5. loopback(5)    -indicates the loopback interface
+				6. notConfigured(6) -indicates that no source interface is configured
+
+				When this leaf is set to notConfigured(6), it indicates that no source
+				interface is configured.
+				"
+			::= { hwNtpServiceSourceInterfaceObject 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.4.2
+		hwNtpServiceSourceInterfaceIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID.
+				Range: 0-4093
+				Range for the tunnel interface: 1-64
+				Range for the NULL interface: 0
+				Range for the MEth interface: 0
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpServiceSourceInterfaceIfType) together identify an interface.
+				"
+			::= { hwNtpServiceSourceInterfaceObject 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5
+		hwNtpAuth OBJECT IDENTIFIER ::= { hwNtpObject 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.1
+		hwNtpAuthenSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Used for enabling or disabling the NTP service authentication function.
+				Options:
+				1. enable(1)  -indicates the NTP service authentication function is enabled
+				2. disable(2) -indicates the NTP service authentication function is disabled
+
+				After the NTP service authentication function is enabled, this function
+				is available; otherwise, this function is not available.
+				"
+			::= { hwNtpAuth 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.2
+		hwNtpAuthenAccessTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpAuthenAccessEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"To protect the NTP service of the local device, use this table to set the
+				authority for accessing the NTP service of the local device. After the
+				authority is set successfully, the local device determines whether to process
+				the received NTP synchronization packet and whether to allow the local device
+				to synchronize to the device sending the packet, according to the configured
+				authority and the packet content.
+				"
+			::= { hwNtpAuth 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.2.1
+		hwNtpAuthenAccessEntry OBJECT-TYPE
+			SYNTAX HwNtpAuthenAccessEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"To protect the NTP service of the local device, use this table to set the
+				authority for accessing the NTP service of the local device. After the
+				authority is set successfully, the local device determines whether to process
+				the received NTP synchronization packet and whether to allow the local device
+				to synchronize to the device sending the packet, according to the configured
+				authority and the packet content.
+				The index of this entry is hwNtpAuthenAccessType.
+				"
+			INDEX { hwNtpAuthenAccessType }
+			::= { hwNtpAuthenAccessTable 1 }
+
+		HwNtpAuthenAccessEntry ::=
+			SEQUENCE {
+				hwNtpAuthenAccessType
+					INTEGER,
+				hwNtpAuthenAccessAcl
+					Integer32,
+				hwNtpAuthenAccessRowStatus
+					RowStatus,
+				hwNtpAuthenAccessAcl6
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.2.1.1
+		hwNtpAuthenAccessType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				peer(1),
+				query(2),
+				server(3),
+				synchronization(4),
+				limited(5)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the access authority type. This leaf is the index of the table.
+				Five options are supported.
+				Options:
+				1. peer(1)        	  -The time request and control query to the local NTP service are allowed
+				                       and the local clock can be synchronized to the remote server.
+				2. query(2)           -Only the control query to the local NTP service is allowed.
+				3. server(3)          -The time request and control query to the local NTP service are allowed
+				                       but the local clock is not synchronized to the remote server.
+				4. synchronization(4) -Only the time request to the local NTP service is allowed.
+				5. limited(5)         -Controls the incoming packet rate and kiss code sent when kod is enabled.
+				"
+			::= { hwNtpAuthenAccessEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.2.1.2
+		hwNtpAuthenAccessAcl OBJECT-TYPE
+			SYNTAX Integer32 (0 | 2000..2999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the IPv4 ACL number.
+				Range: 2000-2999
+				The default value is 0, indicating no configuration.
+				The IP address ACL is used by the local device to match the source IP address of
+				a received packet, and then the device can determine whether to process or discard the packet.
+				"
+			::= { hwNtpAuthenAccessEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.2.1.6
+		hwNtpAuthenAccessRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpAuthenAccessEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.2.1.7
+		hwNtpAuthenAccessAcl6 OBJECT-TYPE
+			SYNTAX Integer32 (0 | 2000..2999)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the IPv6 ACL number.
+				Range: 2000-2999
+				The default value is 0, indicating no configuration.
+				The IPv6 address ACL is used by the local device to match the source IPv6 address of
+				a received packet and then the device can determine whether to process or discard the packet.
+				"
+			::= { hwNtpAuthenAccessEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3
+		hwNtpAuthenKeyTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpAuthenKeyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP service authentication key.
+				During the creation of the NTP service authentication key,
+				you can also set and issue hwNtpAuthReliableSwitch,
+				declaring the created key as reliable.
+				"
+			::= { hwNtpAuth 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3.1
+		hwNtpAuthenKeyEntry OBJECT-TYPE
+			SYNTAX HwNtpAuthenKeyEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP service authentication key.
+				During the creation of the NTP service authentication key,
+				you can also set and issue hwNtpAuthReliableSwitch,
+				declaring the created key as reliable.
+				The index of this entry is hwNtpAuthKeyidNumber.
+				"
+			INDEX { hwNtpAuthKeyidNumber }
+			::= { hwNtpAuthenKeyTable 1 }
+
+		HwNtpAuthenKeyEntry ::=
+			SEQUENCE {
+				hwNtpAuthKeyidNumber
+					Unsigned32,
+				hwNtpAuthKeyidMD5
+					OCTET STRING,
+				hwNtpAuthReliableSwitch
+					INTEGER,
+				hwNtpAuthKeyidRowStatus
+					RowStatus,
+				hwNtpAuthKeyidType
+					INTEGER,
+				hwNtpAuthKeyidPassword
+					OCTET STRING					
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3.1.1
+		hwNtpAuthKeyidNumber OBJECT-TYPE
+			SYNTAX Unsigned32 (1..4294967295)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the key number.
+				Range: 1-4294967295
+				"
+			::= { hwNtpAuthenKeyEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3.1.2
+		hwNtpAuthKeyidMD5 OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..392))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the MD5 key.
+				The MD5 key must not contain the space character and '?' character.
+				Reading this object always results in an OCTET STRING of length zero.
+				Authentication may not be bypassed by reading the MIB object.
+				"
+
+			::= { hwNtpAuthenKeyEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3.1.3
+		hwNtpAuthReliableSwitch OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Used for specifying the authentication key as reliable and to undo the current setting.
+				Options:
+				1. enable(1)  -indicating that the key is reliable.
+				2. disable(2) -indicating that the key is not reliable.
+				Default: disable(2).
+				"
+			::= { hwNtpAuthenKeyEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3.1.6
+		hwNtpAuthKeyidRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpAuthenKeyEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3.1.7
+		hwNtpAuthKeyidType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				md5(1),
+				sha256(2),
+				aes128cmac(3),
+				aes256cmac(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates hashing algorithm MD5 or SHA-256 which is used for NTP authentication.
+				Options:
+				1. md5(1)  -indicates the NTP MD5 algorithm is used as hashing algorithm
+				2. sha256(2) -indicates the NTP SHA-256 algorithm is used as hashing algorithm
+				3. aes128cmac(3) -indicates the NTP AES-128-CMAC algorithm is used as hashing algorithm
+				4. aes256cmac(4) -indicates the NTP AES-256-CMAC algorithm is used as hashing algorithm"
+			::= { hwNtpAuthenKeyEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.5.3.1.8
+		hwNtpAuthKeyidPassword OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..392))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates MD5 or SHA256 or AESCMAC password key.
+				The key must not contain the space character and '?' character.
+				Reading this object always results in an OCTET STRING of length zero.
+				Authentication may not be bypassed by reading the MIB object.
+				hwNtpAuthKeyidType and hwNtpAuthKeyidPassword should be configured together for set operation."
+
+			::= { hwNtpAuthenKeyEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6
+		hwNtpUnicastServerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpUnicastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast server mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the time server
+				of the local device.
+				"
+			::= { hwNtpObject 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1
+		hwNtpUnicastServerEntry OBJECT-TYPE
+			SYNTAX HwNtpUnicastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast server mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the time server
+				of the local device.
+				The index of this entry is hwNtpUnicastServerIp.
+				"
+			INDEX { hwNtpUnicastServerIp }
+			::= { hwNtpUnicastServerTable 1 }
+
+		HwNtpUnicastServerEntry ::=
+			SEQUENCE {
+				hwNtpUnicastServerIp
+					IpAddress,
+				hwNtpUnicastServerVersion
+					Integer32,
+				hwNtpUnicastServerAuthKeyid
+					Unsigned32,
+				hwNtpUnicastServerSourceIfType
+					INTEGER,
+				hwNtpUnicastServerSourceIfNumber
+					Integer32,
+				hwNtpUnicastServerPreference
+					INTEGER,
+				hwNtpUnicastServerRowStatus
+					RowStatus,
+				hwNtpUnicastServerSourceIfName
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.1
+		hwNtpUnicastServerIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the remote server. The IP address is the address of the
+				host and cannot be a broadcast IP address, multicast IP address, IP address of the
+				clock source or IP address of an interface on the local device."
+			::= { hwNtpUnicastServerEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.2
+		hwNtpUnicastServerVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4
+				Default: 3
+				The protocol of a later version is compatible with an earlier version,
+				but an earlier version is not compatible with a later version.
+				"
+			::= { hwNtpUnicastServerEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.3
+		hwNtpUnicastServerAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID used for sending packets to the remote server.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 indicates not configured.
+				The key ID identifies a key.
+				When the packets sent by the remote server need to be authenticated, you need
+				to set and issue this leaf.
+				"
+			::= { hwNtpUnicastServerEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.4
+		hwNtpUnicastServerSourceIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				tunnel(1),
+				null(2),
+				meth(3),
+				vlanif(4),
+				loopback(5),
+				notConfigured(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type.
+				Options:
+				1. tunnel(1)      -indicates the tunnel interface
+				2. null(2)        -indicates the NULL interface
+				3. meth(3)        -indicates the MEth interface
+				4. vlanif(4)      -indicates the VLAN interface
+				5. loopback(5)    -indicates the loopback interface
+				6. notConfigured(6) -indicates that no source interface is configured
+
+				When this leaf is set to notConfigured(6), it indicates that no source interface is
+				configured in the case of the create operation and that the source interface
+				is deleted in the case of the modify operation.
+				"
+			::= { hwNtpUnicastServerEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.5
+		hwNtpUnicastServerSourceIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID.
+				Range: 0-4093
+				Range for the tunnel interface: 1-64
+				Range for the NULL interface: 0
+				Range for the MEth interface: 0
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+
+				The interface ID and interface type (hwNtpUnicastServerSourceIfType) together
+				identify the source interface for sending NTP unicast packets.
+				"
+			::= { hwNtpUnicastServerEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.6
+		hwNtpUnicastServerPreference OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the server is the preferred server.
+				Options:
+				1. enable(1)  -indicates that the server is preferred
+				2. disable(2) -indicates that the server is not preferred
+
+				When multiple servers exist at the same stratum, the specified server is preferred
+				for synchronization.
+				"
+			::= { hwNtpUnicastServerEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.9
+		hwNtpUnicastServerRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpUnicastServerEntry 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.6.1.10
+		hwNtpUnicastServerSourceIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..63))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name used for sending out the packets if
+				hwNtpUnicastServerSourceIfType and hwNtpUnicastServerSourceIfNumber
+				are configured. If not configured, it will be wildcard.
+				"
+			::= { hwNtpUnicastServerEntry 10 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7
+		hwNtpUnicastPeerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpUnicastPeerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast peer mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the peer of
+				the local device.
+				"
+			::= { hwNtpObject 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1
+		hwNtpUnicastPeerEntry OBJECT-TYPE
+			SYNTAX HwNtpUnicastPeerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast peer mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the peer of
+				the local device.
+				The index of this entry is hwNtpUnicastPeerIP.
+				"
+			INDEX { hwNtpUnicastPeerIP }
+			::= { hwNtpUnicastPeerTable 1 }
+
+		HwNtpUnicastPeerEntry ::=
+			SEQUENCE {
+				hwNtpUnicastPeerIP
+					IpAddress,
+				hwNtpUnicastPeerVersion
+					Integer32,
+				hwNtpUnicastPeerAuthKeyid
+					Unsigned32,
+				hwNtpUnicastPeerSourceIfType
+					INTEGER,
+				hwNtpUnicastPeerSourceIfNumber
+					Integer32,
+				hwNtpUnicastPeerPreference
+					INTEGER,
+				hwNtpUnicastPeerRowStatus
+					RowStatus,
+				hwNtpUnicastPeerSourceIfName
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.1
+		hwNtpUnicastPeerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the remote peer. The IP address is the address
+				of the host and cannot be a broadcast IP address, multicast IP address, IP address
+				of the clock source or IP address of an interface on the local device."
+			::= { hwNtpUnicastPeerEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.2
+		hwNtpUnicastPeerVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4
+				Default: 3
+				The protocol of a later version is compatible with an earlier version,
+				but an earlier version is not compatible with a later version.
+				"
+			::= { hwNtpUnicastPeerEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.3
+		hwNtpUnicastPeerAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID for sending packets to the unicast peer.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 indicates not configured.
+				The key ID identifies a key.
+				When the packets sent by the peer need to be authenticated, you need to set and issue this leaf.
+				"
+			::= { hwNtpUnicastPeerEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.4
+		hwNtpUnicastPeerSourceIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				tunnel(1),
+				null(2),
+				meth(3),
+				vlanif(4),
+				loopback(5),
+				notConfigured(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type.
+				Options:
+				1. tunnel(1)      -indicates the tunnel interface
+				2. null(2)        -indicates the NULL interface
+				3. meth(3)        -indicates the MEth interface
+				4. vlanif(4)      -indicates the VLAN interface
+				5. loopback(5)    -indicates the loopback interface
+				6. notConfigured(6) -indicates that no source interface is configured
+				When this leaf is set to notConfigured(6), it indicates that no source interface is configured in
+				the case of the create operation and that the source interface is deleted in the case of the
+				modify operation.
+				"
+			::= { hwNtpUnicastPeerEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.5
+		hwNtpUnicastPeerSourceIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID.
+				Range: 0-4093
+				Range for the tunnel interface: 1-64
+				Range for the NULL interface: 0
+				Range for the MEth interface: 0
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpUnicastPeerSourceIfType) together identify an interface.
+				"
+			::= { hwNtpUnicastPeerEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.6
+		hwNtpUnicastPeerPreference OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the peer is the preferred peer.
+				Options:
+				1. enable(1)  -indicates that the peer is preferred.
+				2. disable(2) -indicates that the peer is not preferred.
+				When multiple peers exist at the same stratum, the specified peer is preferred
+				for synchronization.
+				"
+			::= { hwNtpUnicastPeerEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.9
+		hwNtpUnicastPeerRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpUnicastPeerEntry 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.7.1.10
+		hwNtpUnicastPeerSourceIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..63))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name used for sending out the packets if
+				hwNtpUnicastPeerSourceIfType and hwNtpUnicastPeerSourceIfNumber
+				are configured. If not configured, it will be wildcard.
+				"
+			::= { hwNtpUnicastPeerEntry 10 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.8
+		hwNtpMulticastClientTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpMulticastClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the local device to function as a multicast client.
+				When functioning as a multicast client, the local device listens for the NTP multicast
+				packets sent by the server and synchronizes the local clock with the clock source.
+				"
+			::= { hwNtpObject 8 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.8.1
+		hwNtpMulticastClientEntry OBJECT-TYPE
+			SYNTAX HwNtpMulticastClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the local device to function as a multicast client.
+				When functioning as a multicast client, the local device listens for the NTP multicast
+				packets sent by the server and synchronizes the local clock with the clock source.
+				The indexes of this entry are hwNtpMulticastClientIfType, hwNtpMulticastClientIfNumber and hwNtpMulticastClientIp.
+				"
+			INDEX { hwNtpMulticastClientIfType, hwNtpMulticastClientIfNumber, hwNtpMulticastClientIp }
+			::= { hwNtpMulticastClientTable 1 }
+
+		HwNtpMulticastClientEntry ::=
+			SEQUENCE {
+				hwNtpMulticastClientIfType
+					INTEGER,
+				hwNtpMulticastClientIfNumber
+					Integer32,
+				hwNtpMulticastClientIp
+					IpAddress,
+				hwNtpMulticastClientRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.8.1.1
+		hwNtpMulticastClientIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				loopback(1),
+				vlanif(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type to configure NTP multicast client.
+				Options:
+				1. loopback(1) -indicates the loopback interface
+				2. vlanif(2)   -indicates the VLAN interface
+				"
+			::= { hwNtpMulticastClientEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.8.1.2
+		hwNtpMulticastClientIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID to configure NTP multicast client.
+				Range: 0-4093
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpMulticastClientIfType) together identify
+				the interface for receiving NTP multicast packets.
+				"
+			::= { hwNtpMulticastClientEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.8.1.3
+		hwNtpMulticastClientIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the NTP multicast client. The IP address can only be a class-D address.
+				"
+			::= { hwNtpMulticastClientEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.8.1.6
+		hwNtpMulticastClientRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpMulticastClientEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9
+		hwNtpMulticastServerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpMulticastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP multicast server mode. When functioning in the multicast
+				server mode, the local device serves as the multicast server and periodically sends multicast
+				packets to multicast clients.
+				"
+			::= { hwNtpObject 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1
+		hwNtpMulticastServerEntry OBJECT-TYPE
+			SYNTAX HwNtpMulticastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP multicast server mode. When functioning in the multicast
+				server mode, the local device serves as the multicast server and periodically sends multicast
+				packets to multicast clients.
+				The indexes of this entry are hwNtpMulticastServerIfType, hwNtpMulticastServerIfNumber and hwNtpMulticastServerIP.
+				"
+			INDEX { hwNtpMulticastServerIfType, hwNtpMulticastServerIfNumber, hwNtpMulticastServerIP }
+			::= { hwNtpMulticastServerTable 1 }
+
+		HwNtpMulticastServerEntry ::=
+			SEQUENCE {
+				hwNtpMulticastServerIfType
+					INTEGER,
+				hwNtpMulticastServerIfNumber
+					Integer32,
+				hwNtpMulticastServerIP
+					IpAddress,
+				hwNtpMulticastServerVersion
+					Integer32,
+				hwNtpMulticastServerAuthKeyid
+					Unsigned32,
+				hwNtpMulticastServerTTL
+					Integer32,
+				hwNtpMulticastServerRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1.1
+		hwNtpMulticastServerIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				loopback(1),
+				vlanif(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type to configure NTP multicast server.
+				Options:
+				1. loopback(1) -indicates the loopback interface
+				2. vlanif(2)   -indicates the VLAN interface
+				"
+			::= { hwNtpMulticastServerEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1.2
+		hwNtpMulticastServerIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID to configure NTP multicast server.
+				Range: 0-4093
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpMulticastServerIfType) together identify
+				the interface for sending NTP multicast packets.
+				"
+			::= { hwNtpMulticastServerEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1.3
+		hwNtpMulticastServerIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the multicast server for sending multicast packets.
+				The IP address can only be a class-D address. This IP address identifies a multicast server."
+			::= { hwNtpMulticastServerEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1.4
+		hwNtpMulticastServerVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4
+				Default: 3
+				The protocol of a later version is compatible with that of an earlier version,
+				but an earlier version is not compatible with a later version.
+				"
+			::= { hwNtpMulticastServerEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1.5
+		hwNtpMulticastServerAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID for sending messages to a multicast client.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 indicates not configured.
+				The key ID identifies a key.
+				The server and the client use the same authentication key.
+				"
+			::= { hwNtpMulticastServerEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1.6
+		hwNtpMulticastServerTTL OBJECT-TYPE
+			SYNTAX Integer32 (1..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the TTL value of the multicast packet sent. Each time a multicast packet is forwarded,
+				TTL value is increased starting from 1 till the configured or default value is reached.
+				When the TTL value reaches configured or default value, the device does not forward the multicast packet.
+				Range: 1-255
+				Default: 16
+				"
+			::= { hwNtpMulticastServerEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.9.1.9
+		hwNtpMulticastServerRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpMulticastServerEntry 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.10
+		hwNtpBroadcastClientTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpBroadcastClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast client mode. When set to the broadcast
+				client mode, the local device listens for NTP broadcast packets and synchronizes
+				the local clock according to the received broadcast packets.
+				"
+			::= { hwNtpObject 10 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.10.1
+		hwNtpBroadcastClientEntry OBJECT-TYPE
+			SYNTAX HwNtpBroadcastClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast client mode. When set to the broadcast
+				client mode, the local device listens for NTP broadcast packets and synchronizes
+				the local clock according to the received broadcast packets.
+				The indexes of this entry are hwNtpBroadcastClientIfType and hwNtpBroadcastClientIfNumber.
+				"
+			INDEX { hwNtpBroadcastClientIfType, hwNtpBroadcastClientIfNumber }
+			::= { hwNtpBroadcastClientTable 1 }
+
+		HwNtpBroadcastClientEntry ::=
+			SEQUENCE {
+				hwNtpBroadcastClientIfType
+					INTEGER,
+				hwNtpBroadcastClientIfNumber
+					Integer32,
+				hwNtpBroadcastClientRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.10.1.1
+		hwNtpBroadcastClientIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				loopback(1),
+				vlanif(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type to configure NTP broadcast client.
+				Options:
+				1. loopback(1) -indicates the loopback interface
+				2. vlanif(2)   -indicates the VLAN interface
+				"
+			::= { hwNtpBroadcastClientEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.10.1.2
+		hwNtpBroadcastClientIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID to configure NTP broadcast client.
+				Range: 0-4093
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpBroadcastClientIfType) together
+				identify the interface for receiving broadcast packets.
+				"
+			::= { hwNtpBroadcastClientEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.10.1.6
+		hwNtpBroadcastClientRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpBroadcastClientEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.11
+		hwNtpBroadcastServerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpBroadcastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast server mode. When serving as an NTP broadcast
+				server, the local router periodically sends clock synchronization packets to broadcast
+				address 255.255.255.255 from a specified interface.
+				"
+			::= { hwNtpObject 11 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.11.1
+		hwNtpBroadcastServerEntry OBJECT-TYPE
+			SYNTAX HwNtpBroadcastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast server mode. When serving as an NTP broadcast
+				server, the local router periodically sends clock synchronization packets to broadcast
+				address 255.255.255.255 from a specified interface.
+				The indexes of this entry are hwNtpBroadcastServerIfType and hwNtpBroadcastServerIfNumber.
+				"
+			INDEX { hwNtpBroadcastServerIfType, hwNtpBroadcastServerIfNumber }
+			::= { hwNtpBroadcastServerTable 1 }
+
+		HwNtpBroadcastServerEntry ::=
+			SEQUENCE {
+				hwNtpBroadcastServerIfType
+					INTEGER,
+				hwNtpBroadcastServerIfNumber
+					Integer32,
+				hwNtpBroadcastServerVersion
+					Integer32,
+				hwNtpBroadcastServerAuthKeyid
+					Unsigned32,
+				hwNtpBroadcastServerRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.11.1.1
+		hwNtpBroadcastServerIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				loopback(1),
+				vlanif(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type to configure NTP broadcast server.
+				Options:
+				1. loopback(1) -indicates the loopback interface
+				2. vlanif(2)   -indicates the VLAN interface
+				"
+			::= { hwNtpBroadcastServerEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.11.1.2
+		hwNtpBroadcastServerIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID to configure NTP broadcast server.
+				Range: 0-4093
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpBroadcastServerIfType) together identify
+				the interface for sending broadcast packets.
+				"
+			::= { hwNtpBroadcastServerEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.11.1.3
+		hwNtpBroadcastServerVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4
+				Default: 3
+				The protocol of a later version is compatible with an earlier version,
+				but an earlier version is not compatible with a later version.
+				"
+			::= { hwNtpBroadcastServerEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.11.1.4
+		hwNtpBroadcastServerAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID for sending packets to a broadcast client.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 means not configured.
+				The key ID identifies a key.
+				The server and the client use the same authentication key.
+				"
+			::= { hwNtpBroadcastServerEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.11.1.8
+		hwNtpBroadcastServerRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpBroadcastServerEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.12
+		hwNtpInInterfaceTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpInInterfaceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for enabling or disabling the NTP packet reception capability of a VLAN
+				interface or loopback interface.
+				"
+			::= { hwNtpObject 12 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.12.1
+		hwNtpInInterfaceEntry OBJECT-TYPE
+			SYNTAX HwNtpInInterfaceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for enabling or disabling the NTP packet reception capability of a VLAN
+				interface or loopback interface.
+				The indexes of this entry are hwNtpInInterfaceType and hwNtpInInterfaceIfNumber.
+				"
+			INDEX { hwNtpInInterfaceType, hwNtpInInterfaceIfNumber }
+			::= { hwNtpInInterfaceTable 1 }
+
+		HwNtpInInterfaceEntry ::=
+			SEQUENCE {
+				hwNtpInInterfaceType
+					INTEGER,
+				hwNtpInInterfaceIfNumber
+					Integer32,
+				hwNtpInInterfaceAdminStatus
+					INTEGER,
+				hwNtpInInterfaceAdminIPv6Status
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.12.1.1
+		hwNtpInInterfaceType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				invalid(0),				
+				loopback(1),
+				vlanif(2)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type of the ingress interface.
+				Options:
+				1. invalid(0) -indicates the Invalid interface
+				2. loopback(1) -indicates the loopback interface
+				3. vlanif(2)   -indicates the VLAN interface
+				"
+			::= { hwNtpInInterfaceEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.12.1.2
+		hwNtpInInterfaceIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface number of the ingress interface.
+				Range: 0-4093
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpInInterfaceType) together identify the
+				interface for enabling or disabling NTP packets reception.
+				"
+			::= { hwNtpInInterfaceEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.12.1.6
+		hwNtpInInterfaceAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enables or disables an ingress interface.
+				Options:
+				1. enabled(1)  -indicates that the NTP IPv4 packet reception capability is enabled
+				2. disabled(2) -indicates that the NTP IPv4 packet reception capability is disabled
+				Default: enabled(1)
+				In the walk operation, only the disabled interfaces are displayed.
+				"
+			::= { hwNtpInInterfaceEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.12.1.7
+		hwNtpInInterfaceAdminIPv6Status OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enables or disables an ingress interface.
+				Options:
+				1. enabled(1)  -indicates that the NTP IPv6 packet reception capability is enabled
+				2. disabled(2) -indicates that the NTP IPv6 packet reception capability is disabled
+				Default: enabled(1)
+				In the walk operation, only the disabled interfaces are displayed.
+				"
+			::= { hwNtpInInterfaceEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13
+		hwNtpQueryNtpServerSessionTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpQueryNtpServerSessionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for querying the information about all the sessions maintained by the
+				NTP service of the local device.
+				"
+			::= { hwNtpObject 13 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1
+		hwNtpQueryNtpServerSessionEntry OBJECT-TYPE
+			SYNTAX HwNtpQueryNtpServerSessionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for querying the information about all the sessions maintained by the
+				NTP service of the local device.
+				The index of this entry is hwNtpSessionAssociationID.
+				"
+			INDEX { hwNtpSessionAssociationID }
+			::= { hwNtpQueryNtpServerSessionTable 1 }
+
+		HwNtpQueryNtpServerSessionEntry ::=
+			SEQUENCE {
+				hwNtpSessionAssociationID
+					Unsigned32,
+				hwNtpSessionClockSourceIp
+					InetAddress,
+				hwNtpSessionClockStratum
+					Integer32,
+				hwNtpSessionReferClockID
+					IpAddress,
+				hwNtpSessionSourceMaster
+					TruthValue,
+				hwNtpSessionSourcePeer
+					TruthValue,
+				hwNtpSessionSelected
+					TruthValue,
+				hwNtpSessionCandidate
+					TruthValue,
+				hwNtpSessionConfigured
+					TruthValue,
+				hwNtpSessionPoll
+					Integer32,
+				hwNtpSessionTimeSpending
+					OCTET STRING,
+				hwNtpSessionOffset
+					OCTET STRING,
+				hwNtpSessionDelay
+					OCTET STRING,
+				hwNtpSessionDisper
+					OCTET STRING,
+				hwNtpSessionReach
+					Integer32,
+				hwNtpSessionVpnFlag
+					TruthValue,
+				hwNtpSessionVpn
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.1
+		hwNtpSessionAssociationID OBJECT-TYPE
+			SYNTAX Unsigned32 (1..65535)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP session ID.
+				Range: 1-65535
+				The NTP session ID is automatically allocated inside the system and is not user-configurable.
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.2
+		hwNtpSessionClockSourceIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the remote host, that is, IPv4 or IPv6. the host connected to the local device."
+			::= { hwNtpQueryNtpServerSessionEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.3
+		hwNtpSessionClockStratum OBJECT-TYPE
+			SYNTAX Integer32 (0..16)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the clock stratum of the remote host.
+				Range: 0-16
+				The value 16 indicates that no clock stratum is configured.
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.4
+		hwNtpSessionReferClockID OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Specifies the IP address of the remote server or the identifier of the reference clock that the local system clock has been synchronized with.
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.5
+		hwNtpSessionSourceMaster OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the flag of the current system clock source.
+				Options:
+				1. true(1)  -indicates that the clock is the current system clock source
+				2. false(2) -indicates that the clock is not the current system clock source
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.6
+		hwNtpSessionSourcePeer OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the flag of the candidate clock source.
+				Options:
+				1. true(1)  -indicates that the clock is the candidate clock source
+				2. false(2) -indicates that the clock is not the candidate clock source
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.7
+		hwNtpSessionSelected OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the flag of the clock source participating in the clock selection.
+				Options:
+				1. true(1)  -indicates that the clock source participates in the clock selection
+				2. false(2) -indicates that the clock source does not participate in the clock selection
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.8
+		hwNtpSessionCandidate OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the flag of the clock as a member of the candidate synchronous clock source list.
+				Options:
+				1. true(1)  -indicates that the clock is a member of the candidate synchronous clock source list
+				2. false(2) -indicates that the clock is not a member of the candidate synchronous clock source list
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.9
+		hwNtpSessionConfigured OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the configured flag. Indicates whether the session is configured by the user on the local host.
+				Options:
+				1. true(1)  -indicates that the session is configured by the user on the local host
+				2. false(2) -indicates that the session is not configured by the user on the local host
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.10
+		hwNtpSessionPoll OBJECT-TYPE
+			SYNTAX Integer32
+			UNITS "second"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the poll interval for sending packets.
+				Default: 64
+				Unit: Second
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 10 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.11
+		hwNtpSessionTimeSpending OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the time since the NTP packet is received from the peer last time.
+				Unit: Second.
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 11 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.12
+		hwNtpSessionOffset OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the offset. It is the offset between the local clock and its peer clock."
+			::= { hwNtpQueryNtpServerSessionEntry 12 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.13
+		hwNtpSessionDelay OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the round-trip delay for transmitting the NTP packet between the server and client."
+			::= { hwNtpQueryNtpServerSessionEntry 13 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.14
+		hwNtpSessionDisper OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the dispersion. It means the maximum tolerance between the local clock and its peer clock."
+			::= { hwNtpQueryNtpServerSessionEntry 14 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.15
+		hwNtpSessionReach OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the reachability. It means whether the NTP packet sent by the remote host can reach the local device.
+				The value 0 indicates unreachable, and the non-zero value indicates reachable.
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 15 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.16
+		hwNtpSessionVpnFlag OBJECT-TYPE
+			SYNTAX TruthValue
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the flag of the VPN instance.
+				Options:
+				1. true(1)  -indicates that the clock is in a VPN instance
+				2. false(2) -indicates that the clock is not in a VPN instance, that is, IPv4 or IPv6. in the public VPN
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 16 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.13.1.17
+		hwNtpSessionVpn OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the VPN name to which the clock source belongs, in case of public VPN, value will be NULL.
+				"
+			::= { hwNtpQueryNtpServerSessionEntry 17 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14
+		hwNtpQueryNtpServerStatus OBJECT IDENTIFIER ::= { hwNtpObject 14 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.1
+		hwNtpStatusClockStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unsynchronized(1),
+				synchronized(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the clock Status of the local device.
+				Options:
+				1. unsynchronized(1) -indicates the local clock is not synchronized to the remote server
+				2. synchronized(2)   -indicates the local clock is synchronized to the remote server
+				"
+			::= { hwNtpQueryNtpServerStatus 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.2
+		hwNtpStatusClockStratum OBJECT-TYPE
+			SYNTAX Integer32 (1..16)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the clock stratum of the local device.
+				Range: 1-16
+				The value 16 indicates that no clock stratum is configured.
+				"
+			::= { hwNtpQueryNtpServerStatus 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.3
+		hwNtpStatusReferenceClockID OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the reference clock ID of the clock source. The value 0.0.0.0 indicates that clock is not synchronized.
+				"
+			::= { hwNtpQueryNtpServerStatus 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.4
+		hwNtpStatusNominalFrequency OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the nominal frequency of the local device. It is the pulse frequency
+				of the clock source and affects the precision of the clock source.
+				Unit: Hz
+				"
+			::= { hwNtpQueryNtpServerStatus 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.5
+		hwNtpStatusActualFrequency OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the actual frequency of the local device. It is the pulse frequency
+				of the clock source in actual running.
+				Unit: Hz
+				"
+			::= { hwNtpQueryNtpServerStatus 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.6
+		hwNtpStatusClockPrecision OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..16))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the precision of the local clock of the local device. The precision of the local
+				clock is indicated by the offset range of the local clock source. 2^N indicates 2 to the power of -N.
+				For example, 2^7 = 0.0078125.
+				"
+			::= { hwNtpQueryNtpServerStatus 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.7
+		hwNtpStatusClockOffset OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the clock offset. Indicates the adjustment value of the local clock when it synchronizes
+				to the clock source. The clock offset is the difference between the two clocks before the local
+				clock synchronizes to the clock source.
+				Unit: Millisecond
+				"
+			::= { hwNtpQueryNtpServerStatus 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.8
+		hwNtpStatusRootDelay OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the root delay. It indicates the delay between a server and its upper-layer server.
+				Unit: Millisecond
+				"
+			::= { hwNtpQueryNtpServerStatus 8 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.9
+		hwNtpStatusRootDispersion OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the root dispersion. It indicates the dispersion between a server and its upper-layer server.
+				Unit: Millisecond
+				"
+			::= { hwNtpQueryNtpServerStatus 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.10
+		hwNtpStatusPeerDispersion OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..24))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the peer dispersion. It indicates the maximum tolerance between the local clock and its peer clock.
+				Unit: Millisecond
+				"
+			::= { hwNtpQueryNtpServerStatus 10 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.11
+		hwNtpStatusReferenceTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the reference time. It is the adjusted local time.
+				The data type is DateAndTime and the time format is UTC.
+				"
+			::= { hwNtpQueryNtpServerStatus 11 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.14.12
+		hwNtpStatusReferenceClockVpn OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the VPN in which the reference clock is.
+				"
+			::= { hwNtpQueryNtpServerStatus 12 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15
+		hwNtpUniServerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpUniServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast server mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the time server
+				of the local device.
+				"
+			::= { hwNtpObject 15 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1
+		hwNtpUniServerEntry OBJECT-TYPE
+			SYNTAX HwNtpUniServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast server mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the time server
+				of the local device.
+				The indexes of this entry are hwNtpUniServerVpnName, hwNtpUniServerAddressType and hwNtpUniServerAddress.
+				"
+			INDEX { hwNtpUniServerVpnName, hwNtpUniServerAddressType, hwNtpUniServerAddress }
+			::= { hwNtpUniServerTable 1 }
+
+		HwNtpUniServerEntry ::=
+			SEQUENCE {
+				hwNtpUniServerVpnName
+					OCTET STRING,
+				hwNtpUniServerAddressType
+					InetAddressType,
+				hwNtpUniServerAddress
+					InetAddress,
+				hwNtpUniServerVersion
+					Integer32,
+				hwNtpUniServerAuthKeyid
+					Unsigned32,
+				hwNtpUniServerSourceIfType
+					INTEGER,
+				hwNtpUniServerSourceIfNumber
+					Integer32,
+				hwNtpUniServerPreference
+					INTEGER,
+				hwNtpUniServerRowStatus
+					RowStatus,
+				hwNtpUniServerMaxpoll
+					Integer32,
+				hwNtpUniServerMinpoll
+					Integer32,
+				hwNtpUniServerBurst
+					INTEGER,
+				hwNtpUniServerIburst
+					INTEGER,
+				hwNtpUniServerPreempt
+					INTEGER,
+				hwNtpUniServerSourceIfName
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.1
+		hwNtpUniServerVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the VPN instance of the remote server."
+			::= { hwNtpUniServerEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.2
+		hwNtpUniServerAddressType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of the remote server's IP address, that is, IPv4 or IPv6.
+				For IPv4 value is 1 and for IPv6 value is 2."
+			::= { hwNtpUniServerEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.3
+		hwNtpUniServerAddress OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the remote server. The IP address is the address of the
+				host and cannot be a broadcast IP address, multicast IP address, IP address of the
+				clock source or IP address of an interface on the local device. (Supports both IPv4 and IPv6).
+				"
+			::= { hwNtpUniServerEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.4
+		hwNtpUniServerVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4 for IPv4 server
+				       4 for IPv6 server (IPv6 supports only version 4)
+				Default: 3 for IPv4 server
+				         4 for IPv6 server
+				The protocol of a later version is compatible with an earlier version,
+				but an earlier version is not compatible with a later version.
+				"
+			::= { hwNtpUniServerEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.5
+		hwNtpUniServerAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID used for sending packets to the remote server.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 indicates not configured.
+				The key ID identifies a key.
+				When the packets sent by the remote server need to be authenticated, you need
+				to set and issue this leaf.
+				"
+			::= { hwNtpUniServerEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.6
+		hwNtpUniServerSourceIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				tunnel(1),
+				null(2),
+				meth(3),
+				vlanif(4),
+				loopback(5),
+				notConfigured(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type.
+				Options:
+				1. tunnel(1)      -indicates the tunnel interface
+				2. null(2)        -indicates the NULL interface
+				3. meth(3)        -indicates the MEth interface
+				4. vlanif(4)      -indicates the VLAN interface
+				5. loopback(5)    -indicates the loopback interface
+				6. notConfigured(6) -indicates that no source interface is configured
+				When this leaf is set to notConfigured(6), it indicates that no source interface is
+				configured in the case of the create operation, and that the source interface
+				is deleted in the case of the modify operation.
+				"
+			::= { hwNtpUniServerEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.7
+		hwNtpUniServerSourceIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID.
+				Range: 0-4093
+				Range for the tunnel interface: 1-64
+				Range for the NULL interface: 0
+				Range for the MEth interface: 0
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpUniServerSourceIfType) together
+				identify the source interface for sending NTP unicast packets.
+				"
+			::= { hwNtpUniServerEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.8
+		hwNtpUniServerPreference OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the server is the preferred server.
+				Options:
+				1. enable(1)  -indicates that the server is preferred.
+				2. disable(2) -indicates that the server is not preferred.
+				Default: disable(2)
+				When multiple servers exist at the same stratum, the specified server is preferred
+				for synchronization.
+				"
+			::= { hwNtpUniServerEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.9
+		hwNtpUniServerRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpUniServerEntry 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.10
+		hwNtpUniServerMaxpoll OBJECT-TYPE
+			SYNTAX Integer32 (10..17)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates NTP maximum poll interval.
+				Range: 10-17
+				Default: 10"
+			::= { hwNtpUniServerEntry 10 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.11
+		hwNtpUniServerMinpoll OBJECT-TYPE
+			SYNTAX Integer32 (3..13)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates NTP minimum poll interval.
+				Range: 3-13
+				Default: 6"
+			::= { hwNtpUniServerEntry 11 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.12
+		hwNtpUniServerBurst OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates packets sent will be in burst mode
+				Options:
+				1. enable(1)  -indicates packets are sent in burst mode
+				2. disable(2) -indicates packets are sent in normal mode"
+			::= { hwNtpUniServerEntry 12 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.13
+		hwNtpUniServerIburst OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates packets sent will be in iburst mode
+				Options:
+				1. enable(1)  -indicates packets are sent in iburst mode
+				2. disable(2) -indicates packets are sent in normal mode"
+			::= { hwNtpUniServerEntry 13 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.14
+		hwNtpUniServerPreempt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the server can be preempted.
+				Options:
+				1. enable(1)  -indicates that the server can be preempted
+				2. disable(2) -indicates that the server cannot be preempted
+				Default: disable(2)"
+			::= { hwNtpUniServerEntry 14 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.15.1.15
+		hwNtpUniServerSourceIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..63))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name used for sending out the packets.
+				 If not configured, it will be wildcard.
+				 "
+			::= { hwNtpUniServerEntry 15 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16
+		hwNtpUniPeerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpUniPeerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast peer mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the peer of
+				the local device.
+				"
+			::= { hwNtpObject 16 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1
+		hwNtpUniPeerEntry OBJECT-TYPE
+			SYNTAX HwNtpUniPeerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP unicast peer mode. This table provides a leaf for
+				setting an IP address, which specifies a remote server to serve as the peer of
+				the local device.
+				The indexes of this entry are  hwNtpUniPeerVpnName, hwNtpUniPeerAddressType and hwNtpUniPeerAddress.
+				"
+			INDEX { hwNtpUniPeerVpnName, hwNtpUniPeerAddressType, hwNtpUniPeerAddress }
+			::= { hwNtpUniPeerTable 1 }
+
+		HwNtpUniPeerEntry ::=
+			SEQUENCE {
+				hwNtpUniPeerVpnName
+					OCTET STRING,
+				hwNtpUniPeerAddressType
+					InetAddressType,
+				hwNtpUniPeerAddress
+					InetAddress,
+				hwNtpUniPeerVersion
+					Integer32,
+				hwNtpUniPeerAuthKeyid
+					Unsigned32,
+				hwNtpUniPeerSourceIfType
+					INTEGER,
+				hwNtpUniPeerSourceIfNumber
+					Integer32,
+				hwNtpUniPeerPreference
+					INTEGER,
+				hwNtpUniPeerRowStatus
+					RowStatus,
+				hwNtpUniPeerMaxpoll
+					Integer32,
+				hwNtpUniPeerMinpoll
+					Integer32,
+				hwNtpUniPeerPreempt
+					INTEGER,
+				hwNtpUniPeerSourceIfName
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.1
+		hwNtpUniPeerVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the VPN instance of the remote peer."
+			::= { hwNtpUniPeerEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.2
+		hwNtpUniPeerAddressType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of the remote peer's IP address, that is, IPv4 or IPv6.
+				For IPv4 value is 1 and for IPv6 value is 2."
+			::= { hwNtpUniPeerEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.3
+		hwNtpUniPeerAddress OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the remote peer. The IP address is the address
+				of the host and cannot be a broadcast IP address, multicast IP address, IP address
+				of the clock source or IP address of an interface on the local device. (Supports both IPv4 and IPv6).
+				"
+			::= { hwNtpUniPeerEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.4
+		hwNtpUniPeerVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4 for IPv4 peer
+				       4 for IPv6 peer (IPv6 supports only version 4)
+				Default: 3 for IPv4 peer
+				         4 for IPv6 peer
+				The protocol of a later version is compatible with an earlier version,
+				but an earlier version is not compatible with a later version.
+				"
+			::= { hwNtpUniPeerEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.5
+		hwNtpUniPeerAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID for sending packets to the unicast peer.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 indicates not configured.
+				The key ID identifies a key.
+				When the packets sent by the peer need to be authenticated, you need to set and issue this leaf.
+				"
+			::= { hwNtpUniPeerEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.6
+		hwNtpUniPeerSourceIfType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				tunnel(1),
+				null(2),
+				meth(3),
+				vlanif(4),
+				loopback(5),
+				notConfigured(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface type.
+				Options:
+				1. tunnel(1)      -indicates the tunnel interface
+				2. null(2)        -indicates the NULL interface
+				3. meth(3)        -indicates the MEth interface
+				4. vlanif(4)      -indicates the VLAN interface
+				5. loopback(5)    -indicates the loopback interface
+				6. notConfigured(6) -indicates that no source interface is configured
+
+				When this leaf is set to notConfigured(6), it indicates that no source interface is
+				configured in the case of the create operation and that the source interface
+				is deleted in the case of the modify operation.
+				"
+			::= { hwNtpUniPeerEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.7
+		hwNtpUniPeerSourceIfNumber OBJECT-TYPE
+			SYNTAX Integer32 (0..4093)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the interface ID.
+				Range: 0-4093
+				Range for the tunnel interface: 1-64
+				Range for the NULL interface: 0
+				Range for the MEth interface: 0
+				Range for the VLAN interface: 1-4093
+				Range for the loopback interface: 0-31
+				The interface ID and interface type (hwNtpUniPeerSourceIfType) together identify an interface.
+				"
+			::= { hwNtpUniPeerEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.8
+		hwNtpUniPeerPreference OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the peer is the preferred peer.
+				Options:
+				1. enable(1)  -indicates that the peer is preferred
+				2. disable(2) -indicates that the peer is not preferred
+				Default: disable(2)
+				When multiple peers exist at the same stratum, the specified peer is preferred
+				for synchronization.
+				"
+			::= { hwNtpUniPeerEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.9
+		hwNtpUniPeerRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete and query operations.
+				In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpUniPeerEntry 9 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.10
+		hwNtpUniPeerMaxpoll OBJECT-TYPE
+			SYNTAX Integer32 (10..17)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates NTP maximum poll interval.
+				Range: 10-17
+				Default: 10"
+			::= { hwNtpUniPeerEntry 10 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.11
+		hwNtpUniPeerMinpoll OBJECT-TYPE
+			SYNTAX Integer32 (3..13)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates NTP minimum poll interval.
+				Default: 6"
+			::= { hwNtpUniPeerEntry 11 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.12
+		hwNtpUniPeerPreempt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the peer can be preempted.
+				Options:
+				1. enable(1)  -indicates that the peer can be preempted
+				2. disable(2) -indicates that the peer cannot be preempted
+				Default: disable(2)"
+			::= { hwNtpUniPeerEntry 12 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.16.1.13
+		hwNtpUniPeerSourceIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..63))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name used for sending out the packets.
+				 If not configured, it will be wildcard.
+				 "
+			::= { hwNtpUniPeerEntry 13 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.17
+		hwNtpDiscard OBJECT IDENTIFIER ::= { hwNtpObject 17 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.17.1
+		hwNtpDiscardMinInterval OBJECT-TYPE
+			SYNTAX Integer32 (1..8)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the minimum inter-packet spacing interval  Range: 1-8 Default: 1"
+			::= { hwNtpDiscard 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.17.2
+		hwNtpDiscardAvgInterval OBJECT-TYPE
+			SYNTAX Integer32 (1..8)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the average inter-packet spacing interval  Range: 1-8 Default: 5"
+			::= { hwNtpDiscard 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.18
+		hwNtpServiceSourceInterfaceVpnTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpServiceSourceInterfaceVpnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The hwNtpServiceSourceInterfaceVpn table is used to specify the IPv4/IPv6 interface
+				to send NTP messages with specified VPN. In case of no configuration for VPN, default VPN 0 will be considered.
+				In the unicast mode, if you want only one interface to receive the NTP response packets,
+				specify NTP packets sent from all local interfaces to use the same source IP address.
+				In the broadcast and multicast modes, this command is invalid.
+				It is because the NTP service is enabled on the specified interface that actually is the source interface.
+				"
+			::= { hwNtpObject 18 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.18.1
+		hwNtpServiceSourceInterfaceVpnEntry OBJECT-TYPE
+			SYNTAX HwNtpServiceSourceInterfaceVpnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The hwNtpServiceSourceInterfaceVpn table is used to specify the IPv4/IPv6 interface
+				to send NTP messages with specified VPN. In case of no configuration for VPN, default VPN 0 will be considered.
+				In the unicast mode, if you want only one interface to receive the NTP response packets,
+				specify NTP packets sent from all local interfaces to use the same source IP address.
+				In the broadcast and multicast modes, this command is invalid.
+				It is because the NTP service is enabled on the specified interface that actually is the source interface.
+				The indexes of this entry are hwNtpServiceSourceInterfaceVpnName and hwNtpServiceSourceInterfaceVpnAddressType.
+				"
+			INDEX { hwNtpServiceSourceInterfaceVpnName, hwNtpServiceSourceInterfaceVpnAddressType }
+			::= { hwNtpServiceSourceInterfaceVpnTable 1 }
+
+		HwNtpServiceSourceInterfaceVpnEntry ::=
+			SEQUENCE {
+				hwNtpServiceSourceInterfaceVpnName
+					OCTET STRING,
+				hwNtpServiceSourceInterfaceVpnAddressType
+					InetAddressType,
+				hwNtpServiceSourceInterfaceVpnIfName
+					OCTET STRING,
+				hwNtpServiceSourceInterfaceVpnRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.18.1.1
+		hwNtpServiceSourceInterfaceVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the VPN instance of the source interface."
+			::= { hwNtpServiceSourceInterfaceVpnEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.18.1.2
+		hwNtpServiceSourceInterfaceVpnAddressType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of the source interface's IP address, that is, IPv4 or IPv6.
+				For IPv4 value is 1 and for IPv6 value is 2.
+				"
+			::= { hwNtpServiceSourceInterfaceVpnEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.18.1.3
+		hwNtpServiceSourceInterfaceVpnIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name used for sending out the packets.
+				 If not configured, it will be wildcard.
+				"
+			::= { hwNtpServiceSourceInterfaceVpnEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.18.1.4
+		hwNtpServiceSourceInterfaceVpnRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpServiceSourceInterfaceVpnEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19
+		hwNtpManycastClientTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpManycastClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"hwNtpManycastClient table specifies NTP manycast client configurations.
+				An interface on the local device to send NTP manycast messages when timeout occurs.
+				The local device runs in manycast client mode and periodically sends manycast messages to the manycast server.
+				Based on the message received from manycast server, the dynamic client-server association is established.
+				While configuring manycast client, multicast IPv4 or IPv6 address must be used.
+				"
+			::= { hwNtpObject 19 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19.1
+		hwNtpManycastClientEntry OBJECT-TYPE
+			SYNTAX HwNtpManycastClientEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"hwNtpManycastClient table specifies NTP manycast client configurations.
+				An interface on the local device to send NTP manycast messages when timeout occurs.
+				The local device runs in manycast client mode and periodically sends manycast messages to the manycast server.
+				Based on the message received from manycast server, the dynamic client-server association is established.
+				While configuring manycast client, multicast IPv4 or IPv6 address must be used.
+				The indexes of this entry are hwNtpManycastClientIfName, hwNtpManycastClientIpType and hwNtpManycastClientIp."
+			INDEX { hwNtpManycastClientIfName, hwNtpManycastClientIpType, hwNtpManycastClientIp }
+			::= { hwNtpManycastClientTable 1 }
+
+		HwNtpManycastClientEntry ::=
+			SEQUENCE {
+				hwNtpManycastClientIfName
+					OCTET STRING,
+				hwNtpManycastClientIpType
+					InetAddressType,
+				hwNtpManycastClientIp
+					InetAddress,
+				hwNtpManycastClientAuthKeyId
+					Unsigned32,
+				hwNtpManycastClientTTL
+					Integer32,
+				hwNtpManycastClientRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19.1.1
+		hwNtpManycastClientIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name to configure generic manycast client.
+ 				"
+			::= { hwNtpManycastClientEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19.1.2
+		hwNtpManycastClientIpType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of the manycast IP address, that is, IPv4 or IPv6.
+				For IPv4 value is 1 and for IPv6 value is 2.
+				"
+			::= { hwNtpManycastClientEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19.1.3
+		hwNtpManycastClientIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the manycast client for sending manycast packets.
+				The IP address can only be a class-D address. This IP address identifies a manycast client. (Supports both IPv4 and IPv6).
+				"
+			::= { hwNtpManycastClientEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19.1.4
+		hwNtpManycastClientAuthKeyId OBJECT-TYPE
+			SYNTAX Unsigned32 (0..65535)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the authentication key ID number used while sending messages to the manycast servers.
+				0 indicates not configured."
+			::= { hwNtpManycastClientEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19.1.5
+		hwNtpManycastClientTTL OBJECT-TYPE
+			SYNTAX Integer32 (1..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the TTL of a manycast packet. Each time a manycast packet is forwarded,
+				TTL value is increased starting from 1 till the configured or default value is reached. When the TTL value reaches configured or default value, the device does not forward the manycast packet.
+				Range: 1-255
+				Default: 255"
+			::= { hwNtpManycastClientEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.19.1.6
+		hwNtpManycastClientRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpManycastClientEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.20
+		hwNtpManycastServerTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpManycastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"hwNtpManycastServer table specifies ntp service manycast server configuration, we can specify an interface on
+				the local device to receive NTP manycast packets. The local device is run in the manycast server mode.
+				The manycast server responds to manycast client packets.
+				Based on the response, manycast client creates ephemeral association and works in client server mode.
+				If we configure manycast server on the current interface, it is ready to receive NTP manycast messages
+				and the local device runs in the server mode. When we remove manycast server configuration and multicast
+				IP address is not specified then local device searches for default IP addresses.
+				The manycast server with default IP address is 224.0.1.1 in IPv4 network and FFOE::101 in IPv6 address.
+				If the local device finds the default IP address, this command cancels the manycast server configuration,
+				else it does not perform any action.
+				"
+			::= { hwNtpObject 20 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.20.1
+		hwNtpManycastServerEntry OBJECT-TYPE
+			SYNTAX HwNtpManycastServerEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"hwNtpManycastServer table specifies ntp service manycast server configuration, we can specify an interface on
+				the local device to receive NTP manycast packets. The local device is run in the manycast server mode.
+				The manycast server responds to manycast client packets.
+				Based on the response, manycast client creates ephemeral association and works in client server mode.
+				If we configure manycast server on the current interface, it is ready to receive NTP manycast messages
+				and the local device runs in the server mode. When we remove manycast server configuration and multicast
+				IP address is not specified then local device searches for default IP addresses.
+				The manycast server with default IP address is 224.0.1.1 in IPv4 network and FFOE::101 in IPv6 address.
+				If the local device finds the default IP address, this command cancels the manycast server configuration,
+				else it does not perform any action.
+				The indexes of this entry are hwNtpManycastServerIfName, hwNtpManycastServerIpType and hwNtpManycastServerIp."
+			INDEX { hwNtpManycastServerIfName, hwNtpManycastServerIpType, hwNtpManycastServerIp }
+			::= { hwNtpManycastServerTable 1 }
+
+		HwNtpManycastServerEntry ::=
+			SEQUENCE {
+				hwNtpManycastServerIfName
+					OCTET STRING,
+				hwNtpManycastServerIpType
+					InetAddressType,
+				hwNtpManycastServerIp
+					InetAddress,
+				hwNtpManycastServerRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.20.1.1
+		hwNtpManycastServerIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name to configure generic manycast server.
+ 				"
+			::= { hwNtpManycastServerEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.20.1.2
+		hwNtpManycastServerIpType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of the manycast IP address, that is, IPv4 or IPv6.
+				For IPv4 value is 1 and for IPv6 value is 2."
+			::= { hwNtpManycastServerEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.20.1.3
+		hwNtpManycastServerIp OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the manycast server for receiving manycast packets.
+				The IP address can only be a class-D address. This IP address identifies a manycast server. (Supports both IPv4 and IPv6).
+				"
+			::= { hwNtpManycastServerEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.20.1.4
+		hwNtpManycastServerRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpManycastServerEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21
+		hwNtpMulticastServerGenTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpMulticastServerGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP multicast server mode. When functioning in the multicast server mode,
+				the local device serves as the multicast server and periodically sends multicast packets to multicast clients.
+				"
+			::= { hwNtpObject 21 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1
+		hwNtpMulticastServerGenEntry OBJECT-TYPE
+			SYNTAX HwNtpMulticastServerGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP multicast server mode. When functioning in the multicast server mode,
+				the local device serves as the multicast server and periodically sends multicast packets to multicast clients.
+				The indexes of this entry are hwNtpMulticastServerGenIfName, hwNtpMulticastServerGenAddressType and hwNtpMulticastServerGenAddr.
+				"
+			INDEX { hwNtpMulticastServerGenIfName, hwNtpMulticastServerGenAddressType, hwNtpMulticastServerGenAddr }
+			::= { hwNtpMulticastServerGenTable 1 }
+
+		HwNtpMulticastServerGenEntry ::=
+			SEQUENCE {
+				hwNtpMulticastServerGenIfName
+					OCTET STRING,
+				hwNtpMulticastServerGenAddressType
+					InetAddressType,
+				hwNtpMulticastServerGenAddr
+					InetAddress,
+				hwNtpMulticastServerGenVersion
+					Integer32,
+				hwNtpMulticastServerGenAuthKeyid
+					Unsigned32,
+				hwNtpMulticastServerGenTTL
+					Integer32,
+				hwNtpMulticastServerGenRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1.1
+		hwNtpMulticastServerGenIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name to configure generic multicast server.
+ 				"
+			::= { hwNtpMulticastServerGenEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1.2
+		hwNtpMulticastServerGenAddressType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of the multicast IP address, that is, IPv4 or IPv6.
+				For IPv4 value is 1 and for IPv6 value is 2."
+			::= { hwNtpMulticastServerGenEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1.3
+		hwNtpMulticastServerGenAddr OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the multicast server for sending multicast packets.
+				This IP address identifies a multicast server. (Supports both IPv4 and IPv6).
+				"
+			::= { hwNtpMulticastServerGenEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1.4
+		hwNtpMulticastServerGenVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4 for IPv4 server
+				       4 for IPv6 server (IPv6 supports only version 4)
+				Default: 3 for IPv4 server
+				         4 for IPv6 server
+				The protocol of a later version is compatible with an earlier version,
+				but an earlier version is not compatible with a later version.
+				       "
+			::= { hwNtpMulticastServerGenEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1.5
+		hwNtpMulticastServerGenAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID for sending messages to a multicast client.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 indicates not configured.
+				The value 0 indicates that no key is configured. The key ID identifies a key.
+				The server and the client use the same authentication key.
+				"
+			::= { hwNtpMulticastServerGenEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1.6
+		hwNtpMulticastServerGenTTL OBJECT-TYPE
+			SYNTAX Integer32 (1..255)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the TTL value of the multicast packet sent. Each time a multicast packet is forwarded,
+				TTL value is increased starting from 1 till the configured or default value is reached.
+				When the TTL value reaches configured or default value, the device does not forward the multicast packet.
+				Range: 1-255
+				Default: 16
+				"
+			::= { hwNtpMulticastServerGenEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.21.1.7
+		hwNtpMulticastServerGenRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpMulticastServerGenEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.22
+		hwNtpMulticastClientGenTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpMulticastClientGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the local device to function as a multicast client.
+				When functioning as a multicast client, the local device listens for the NTP multicast
+				packets sent by the server and synchronizes the local clock with the clock source.
+				"
+			::= { hwNtpObject 22 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.22.1
+		hwNtpMulticastClientGenEntry OBJECT-TYPE
+			SYNTAX HwNtpMulticastClientGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the local device to function as a multicast client.
+				When functioning as a multicast client, the local device listens for the NTP multicast
+				packets sent by the server and synchronizes the local clock with the clock source.
+				The indexes of this entry are hwNtpMulticastClientGenIfName, hwNtpMulticastClientGenAddressType and hwNtpMulticastClientGenAddr."
+			INDEX { hwNtpMulticastClientGenIfName, hwNtpMulticastClientGenAddressType, hwNtpMulticastClientGenAddr }
+			::= { hwNtpMulticastClientGenTable 1 }
+
+		HwNtpMulticastClientGenEntry ::=
+			SEQUENCE {
+				hwNtpMulticastClientGenIfName
+					OCTET STRING,
+				hwNtpMulticastClientGenAddressType
+					InetAddressType,
+				hwNtpMulticastClientGenAddr
+					InetAddress,
+				hwNtpMulticastClientGenRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.22.1.1
+		hwNtpMulticastClientGenIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name to configure generic multicast client.
+ 				"
+			::= { hwNtpMulticastClientGenEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.22.1.2
+		hwNtpMulticastClientGenAddressType OBJECT-TYPE
+			SYNTAX InetAddressType
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of the multicast IP address, that is, IPv4 or IPv6.
+				For IPv4 value is 1 and for IPv6 value is 2.
+				"
+			::= { hwNtpMulticastClientGenEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.22.1.3
+		hwNtpMulticastClientGenAddr OBJECT-TYPE
+			SYNTAX InetAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicates the IP address of the multicast client to receive multicast packets.
+				This IP address identifies a multicast client. (Supports both IPv4 and IPv6).
+				"
+			::= { hwNtpMulticastClientGenEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.22.1.4
+		hwNtpMulticastClientGenRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpMulticastClientGenEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.23
+		hwNtpBroadcastClientGenTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpBroadcastClientGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast client mode. When set to the broadcast
+				client mode, the local device listens for NTP broadcast packets and synchronizes
+				the local clock according to the received broadcast packets.
+				"
+			::= { hwNtpObject 23 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.23.1
+		hwNtpBroadcastClientGenEntry OBJECT-TYPE
+			SYNTAX HwNtpBroadcastClientGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast client mode. When set to the broadcast
+				client mode, the local device listens for NTP broadcast packets and synchronizes
+				the local clock according to the received broadcast packets.
+				The index of this entry is hwNtpBroadcastClientGenIfName.
+				"
+			INDEX { hwNtpBroadcastClientGenIfName }
+			::= { hwNtpBroadcastClientGenTable 1 }
+
+		HwNtpBroadcastClientGenEntry ::=
+			SEQUENCE {
+				hwNtpBroadcastClientGenIfName
+					OCTET STRING,
+				hwNtpBroadcastClientGenRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.23.1.1
+		hwNtpBroadcastClientGenIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name to configure generic broadcast client.
+				"
+			::= { hwNtpBroadcastClientGenEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.23.1.2
+		hwNtpBroadcastClientGenRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpBroadcastClientGenEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.24
+		hwNtpBroadcastServerGenTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpBroadcastServerGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast server mode. When serving as an NTP broadcast
+				server, the local router periodically sends clock synchronization packets to broadcast
+				address 255.255.255.255 from a specified interface.
+				"
+			::= { hwNtpObject 24 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.24.1
+		hwNtpBroadcastServerGenEntry OBJECT-TYPE
+			SYNTAX HwNtpBroadcastServerGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for setting the NTP broadcast server mode. When serving as an NTP broadcast
+				server, the local router periodically sends clock synchronization packets to broadcast
+				address 255.255.255.255 from a specified interface.
+				The index of this entry is hwNtpBroadcastServerGenIfName.
+				"
+			INDEX { hwNtpBroadcastServerGenIfName }
+			::= { hwNtpBroadcastServerGenTable 1 }
+
+		HwNtpBroadcastServerGenEntry ::=
+			SEQUENCE {
+				hwNtpBroadcastServerGenIfName
+					OCTET STRING,
+				hwNtpBroadcastServerGenVersion
+					Integer32,
+				hwNtpBroadcastServerGenAuthKeyid
+					Unsigned32,
+				hwNtpBroadcastServerGenRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.24.1.1
+		hwNtpBroadcastServerGenIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the interface name to configure generic broadcast server.
+ 				"
+			::= { hwNtpBroadcastServerGenEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.24.1.2
+		hwNtpBroadcastServerGenVersion OBJECT-TYPE
+			SYNTAX Integer32 (1..4)
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the NTP protocol version.
+				Range: 1-4 for IPv4 server
+				       4 for IPv6 server (IPv6 supports only version 4)
+				Default: 3 for IPv4 server
+				         4 for IPv6 server
+				The protocol of a later version is compatible with an earlier version,
+				but an earlier version is not compatible with a later version.
+				       "
+			::= { hwNtpBroadcastServerGenEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.24.1.3
+		hwNtpBroadcastServerGenAuthKeyid OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the key ID for sending messages to a broadcast client.
+				Range: 0-4294967295 for versions 1,2 and 3
+				Range: 0-65535 for version 4
+				0 indicates not configured.
+				The value 0 indicates that no key is configured. The key ID identifies a key.
+				The server and the client use the same authentication key.
+				"
+			::= { hwNtpBroadcastServerGenEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.24.1.4
+		hwNtpBroadcastServerGenRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. It is used for the create, delete
+				and query operations. In the modify operation, this leaf is not set or issued.
+				Options:
+				1. createAndGo(4) -specified in the create operation
+				2. destroy(6)     -specified in the delete operation
+				3. active(1)      -always returned in the query operation
+				"
+			::= { hwNtpBroadcastServerGenEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.25
+		hwNtpInInterfaceGenTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwNtpInInterfaceGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for enabling or disabling the NTP packet reception capability of a VLAN
+				interface or loopback interface.
+				"
+			::= { hwNtpObject 25 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.25.1
+		hwNtpInInterfaceGenEntry OBJECT-TYPE
+			SYNTAX HwNtpInInterfaceGenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"It is used for enabling or disabling the NTP packet reception capability of a VLAN
+				interface or loopback interface.
+				The index of this entry is hwNtpInInterfaceGenIfName.
+				"
+			INDEX { hwNtpInInterfaceGenIfName }
+			::= { hwNtpInInterfaceGenTable 1 }
+
+		HwNtpInInterfaceGenEntry ::=
+			SEQUENCE {
+				hwNtpInInterfaceGenIfName
+					OCTET STRING,
+				hwNtpInInterfaceGenAdminStatus
+					INTEGER,
+				hwNtpInInterfaceGenAdminIPv6Status
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.25.1.1
+		hwNtpInInterfaceGenIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..63))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Interface name is used for enabling or disabling the NTP packet reception capability on specified interface.
+				 "
+			::= { hwNtpInInterfaceGenEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.25.1.2
+		hwNtpInInterfaceGenAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enables or disables an ingress interface.
+				Options:
+				1. enabled(1)  -indicates that the NTP IPv4 packet reception capability is enabled
+				2. disabled(2) -indicates that the NTP IPv4 packet reception capability is disabled
+				Default: enabled(1)
+				In the walk operation, only the disabled interfaces are displayed.
+				"
+			::= { hwNtpInInterfaceGenEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.4.2.25.1.3
+		hwNtpInInterfaceGenAdminIPv6Status OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				enabled(1),
+				disabled(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Enables or disables an ingress interface.
+				Options:
+				1. enabled(1)  -indicates that the NTP IPv6 packet reception capability is enabled
+				2. disabled(2) -indicates that the NTP IPv6 packet reception capability is disabled
+				Default: enabled(1)
+				In the walk operation, only the disabled interfaces are displayed.
+				"
+			::= { hwNtpInInterfaceGenEntry 3 }
+			
+        	-- 1.3.6.1.4.1.2011.6.4.2.26
+                hwNtpServerSwitch OBJECT IDENTIFIER ::= { hwNtpObject 26 }
+
+                -- 1.3.6.1.4.1.2011.6.4.2.26.1
+                hwNtpIPv4ServerSwitch  OBJECT-TYPE
+                       SYNTAX INTEGER
+                	       {
+                	       enable(1),
+                	       disable(2)
+                	       }
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                	"Used for enabling or disabling NTP IPv4 server functionality.
+                	Options:
+                	1. enable(1)  -indicates the NTP IPv4 server functionality is enabled
+                	2. disable(2) -indicates the NTP IPv4 server functionality is disabled
+                 Default: enable(1)                                  
+                        "            	    
+                ::= { hwNtpServerSwitch 1 }
+        
+                -- 1.3.6.1.4.1.2011.6.4.2.26.2
+                hwNtpIPv6ServerSwitch  OBJECT-TYPE
+                        SYNTAX INTEGER
+                        {
+                	enable(1),
+                	disable(2)
+                	}
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                	        "Used for enabling or disabling NTP IPv6 server functionality.
+                	        Options:
+                	        1. enable(1)  -indicates the NTP IPv6 server functionality is enabled
+                	        2. disable(2) -indicates the NTP IPv6 server functionality is disabled
+                         Default: enable(1)                                        
+                                "                     
+                ::= { hwNtpServerSwitch 2 }		
+
+                
+        -- 1.3.6.1.4.1.2011.6.4.2.27
+        hwNtpServerSource OBJECT IDENTIFIER ::= { hwNtpObject 27 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.1
+        hwNtpServerSourceAllInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNtpServerSourceAllInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwNtpServerSourceAllInterface table is used to enable the ntp server to listen to all interfaces.
+                 Currently supports all interfaces of the specified IPv4 or IPv6 address family type.
+                "
+            ::= { hwNtpServerSource 1 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.1.1
+        hwNtpServerSourceAllInterfaceEntry OBJECT-TYPE
+            SYNTAX HwNtpServerSourceAllInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwNtpServerSourceAllInterface table is used to enable the ntp server to listen to all interfaces.
+                 Currently supports all interfaces of the specified IPv4 or IPv6 address family type.
+                "
+            INDEX { hwNtpServerSourceAllInterfaceAddressType }
+            ::= { hwNtpServerSourceAllInterfaceTable 1 }
+
+            HwNtpServerSourceAllInterfaceEntry ::=
+            SEQUENCE {
+                hwNtpServerSourceAllInterfaceAddressType
+                    InetAddressType,
+                hwNtpServerSourceAllInterfaceRowStatus
+                    RowStatus
+            }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.1.1.1
+        hwNtpServerSourceAllInterfaceAddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the type of the source interface's IP address, that is, IPv4 or IPv6.
+                 For IPv4 value is 1 and for IPv6 value is 2.
+                "
+            ::= { hwNtpServerSourceAllInterfaceEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.1.1.2
+        hwNtpServerSourceAllInterfaceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the row status. It is used for the create, delete and query operations.
+                Options:
+                1. createAndGo(4) -specified in the create operation
+                2. destroy(6)     -specified in the delete operation
+                3. active(1)      -always returned in the query operation
+                "
+            ::= { hwNtpServerSourceAllInterfaceEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.2
+        hwNtpServerSourceInterfaceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwNtpServerSourceInterfaceEntry
+        MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwNtpServerSourceInterface table is used to specify the source interface for ntp server listening.
+                "
+            ::= { hwNtpServerSource 2 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.2.1
+        hwNtpServerSourceInterfaceEntry OBJECT-TYPE
+            SYNTAX HwNtpServerSourceInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwNtpServerSourceInterface table is used to specify the source interface for ntp server listening.
+                "
+            INDEX { hwNtpServerSourceInterfaceIfname }
+            ::= { hwNtpServerSourceInterfaceTable 1 }
+
+            HwNtpServerSourceInterfaceEntry ::=
+            SEQUENCE {
+                hwNtpServerSourceInterfaceIfname
+                    OCTET STRING,
+                hwNtpServerSourceInterfaceRowStatus
+                    RowStatus
+            }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.2.1.1
+        hwNtpServerSourceInterfaceIfname OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..63))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Specifies the source interface name for ntp server listening.
+                "
+            ::= { hwNtpServerSourceInterfaceEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.2.1.2
+        hwNtpServerSourceInterfaceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the row status. It is used for the create, delete and query operations.
+                Options:
+                1. createAndGo(4) -specified in the create operation
+                2. destroy(6)     -specified in the delete operation
+                3. active(1)      -always returned in the query operation
+                "
+            ::= { hwNtpServerSourceInterfaceEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.3
+        hwNtpServerSourceIpv6Table OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwNtpServerSourceIpv6Entry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwNtpServerSourceIpv6Table table is used to specify the source ipv6 address for ntp server listening.
+                "
+            ::= { hwNtpServerSource 3 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.3.1
+        hwNtpServerSourceIpv6Entry OBJECT-TYPE
+            SYNTAX HwNtpServerSourceIpv6Entry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The hwNtpServerSourceIpv6Table table is used to specify the source ipv6 address for ntp server listening.
+                "
+            INDEX { hwNtpServerSourceIpv6Addr, hwNtpServerSourceIpv6VpnName}
+            ::= { hwNtpServerSourceIpv6Table 1 }
+
+        HwNtpServerSourceIpv6Entry ::=
+            SEQUENCE {
+                hwNtpServerSourceIpv6Addr
+                    Ipv6Address,
+                hwNtpServerSourceIpv6VpnName
+                    OCTET STRING,
+                hwNtpServerSourceIpv6RowStatus
+                    RowStatus
+            }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.3.1.1
+        hwNtpServerSourceIpv6Addr OBJECT-TYPE
+            SYNTAX Ipv6Address
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Specifies the source ipv6 address for ntp server listening.
+                 The IP address cannot be a multicast, loopback, link-local, site-local, or unspecified address.
+                "
+            ::= { hwNtpServerSourceIpv6Entry 1 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.3.1.2
+        hwNtpServerSourceIpv6VpnName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "It is used for setting the VPN instance of the source ipv6 address.
+                "
+            ::= { hwNtpServerSourceIpv6Entry 2 }
+
+        -- 1.3.6.1.4.1.2011.6.4.2.27.3.1.3
+        hwNtpServerSourceIpv6RowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Indicates the row status. It is used for the create, delete and query operations.
+                Options:
+                1. createAndGo(4) -specified in the create operation
+                2. destroy(6)     -specified in the delete operation
+                3. active(1)      -always returned in the query operation
+                "
+            ::= { hwNtpServerSourceIpv6Entry 3 }
+
+     hwNtpConformance OBJECT IDENTIFIER ::= { hwNtp 3 }
+     hwNtpCompliances OBJECT IDENTIFIER ::= { hwNtpConformance 1 }
+
+
+     hwNtpCompliance MODULE-COMPLIANCE
+         STATUS current
+         DESCRIPTION
+             "The compliance statement for systems supporting
+             the Ntp-MIB."
+         MODULE -- this module
+             MANDATORY-GROUPS { hwNtpObjGroup }
+         ::= { hwNtpCompliances 1 }
+                   
+      -- 1.3.6.1.4.1.2011.6.4.2.23
+		hwNtpObjGroup OBJECT-GROUP
+			OBJECTS { ntpSynInterval, hwNtpDynamicSession, hwNtpRefclockMasterStratum, hwNtpRefclockMasterRowStatus, hwNtpServiceSourceInterfaceIfType,
+				hwNtpServiceSourceInterfaceIfNumber, hwNtpAuthenSwitch, hwNtpAuthenAccessAcl, hwNtpAuthenAccessRowStatus, hwNtpAuthenAccessAcl6,
+		hwNtpAuthKeyidMD5, hwNtpAuthReliableSwitch, hwNtpAuthKeyidRowStatus, hwNtpAuthKeyidType, hwNtpAuthKeyidPassword, hwNtpUnicastServerVersion, hwNtpUnicastServerAuthKeyid, 
+				hwNtpUnicastServerSourceIfType, hwNtpUnicastServerSourceIfNumber, hwNtpUnicastServerPreference, hwNtpUnicastServerRowStatus, hwNtpUnicastServerSourceIfName,
+				hwNtpUnicastPeerVersion, hwNtpUnicastPeerAuthKeyid, hwNtpUnicastPeerSourceIfType, hwNtpUnicastPeerSourceIfNumber, hwNtpUnicastPeerPreference,
+				hwNtpUnicastPeerRowStatus, hwNtpUnicastPeerSourceIfName, hwNtpMulticastClientRowStatus, hwNtpMulticastServerVersion, hwNtpMulticastServerAuthKeyid,
+				hwNtpMulticastServerTTL, hwNtpMulticastServerRowStatus, hwNtpBroadcastClientRowStatus, hwNtpBroadcastServerVersion, hwNtpBroadcastServerAuthKeyid,
+				hwNtpBroadcastServerRowStatus, hwNtpInInterfaceAdminStatus, hwNtpInInterfaceAdminIPv6Status, hwNtpSessionClockSourceIp, hwNtpSessionClockStratum,
+				hwNtpSessionReferClockID, hwNtpSessionSourceMaster, hwNtpSessionSourcePeer, hwNtpSessionSelected, hwNtpSessionCandidate,
+				hwNtpSessionConfigured, hwNtpSessionPoll, hwNtpSessionTimeSpending, hwNtpSessionOffset, hwNtpSessionDelay,
+				hwNtpSessionDisper, hwNtpSessionReach, hwNtpSessionVpnFlag, hwNtpSessionVpn, hwNtpStatusClockStatus,
+				hwNtpStatusClockStratum, hwNtpStatusReferenceClockID, hwNtpStatusNominalFrequency, hwNtpStatusActualFrequency, hwNtpStatusClockPrecision,
+				hwNtpStatusClockOffset, hwNtpStatusRootDelay, hwNtpStatusRootDispersion, hwNtpStatusPeerDispersion, hwNtpStatusReferenceTime,
+				hwNtpStatusReferenceClockVpn, hwNtpUniServerVersion, hwNtpUniServerAuthKeyid, hwNtpUniServerSourceIfType, hwNtpUniServerSourceIfNumber,
+				hwNtpUniServerPreference, hwNtpUniServerRowStatus, hwNtpUniServerMaxpoll, hwNtpUniServerMinpoll, hwNtpUniServerBurst,
+				hwNtpUniServerIburst, hwNtpUniServerPreempt, hwNtpUniServerSourceIfName, hwNtpUniPeerVersion, hwNtpUniPeerAuthKeyid,
+				hwNtpUniPeerSourceIfType, hwNtpUniPeerSourceIfNumber, hwNtpUniPeerPreference, hwNtpUniPeerRowStatus, hwNtpUniPeerMaxpoll,
+				hwNtpUniPeerMinpoll, hwNtpUniPeerPreempt, hwNtpUniPeerSourceIfName, hwNtpDiscardMinInterval, hwNtpDiscardAvgInterval,
+				hwNtpServiceSourceInterfaceVpnIfName, hwNtpServiceSourceInterfaceVpnRowStatus, hwNtpManycastClientAuthKeyId, hwNtpManycastClientTTL, hwNtpManycastClientRowStatus,
+				hwNtpManycastServerRowStatus, hwNtpMulticastServerGenVersion, hwNtpMulticastServerGenAuthKeyid, hwNtpMulticastServerGenTTL, hwNtpMulticastServerGenRowStatus,
+				hwNtpInInterfaceGenAdminIPv6Status, hwNtpInInterfaceGenAdminStatus, hwNtpAuthKeyidPassword, hwNtpBroadcastServerGenRowStatus, hwNtpAuthKeyidType,
+				hwNtpBroadcastServerGenAuthKeyid, hwNtpMulticastClientGenRowStatus, hwNtpBroadcastServerGenVersion, hwNtpKODStatus, 
+				hwNtpBroadcastClientGenRowStatus, hwNtpIPv4ServerSwitch, hwNtpIPv6ServerSwitch , hwNtpServerSourceAllInterfaceRowStatus,
+				hwNtpServerSourceInterfaceRowStatus, hwNtpServerSourceIpv6RowStatus }
+			STATUS current
+			DESCRIPTION
+				"This objects are used to provide NTP functionality through MIB browser."
+	                ::= { hwNtpCompliances 2 }
+
+
+	END
+
+--
+-- HUAWEI-NTP-MIB.mib
+--

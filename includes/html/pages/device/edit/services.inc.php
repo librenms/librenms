@@ -1,0 +1,34 @@
+<?php
+
+use App\Models\Service;
+use Illuminate\Support\Facades\Gate;
+
+if (Gate::allows('create', Service::class)) {
+    if ($vars['addsrv']) {
+        $updated = '1';
+
+        $service_id = \LibreNMS\Services::addService($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'] ?? 0, $vars['disabled'] ?? 0, 0, strip_tags((string) $vars['name']));
+        if ($service_id) {
+            $message .= $message_break . 'Service added (' . $service_id . ')!';
+            $message_break .= '<br />';
+        }
+    }
+
+    // Build the types list.
+    foreach (scandir(\App\Facades\LibrenmsConfig::get('nagios_plugins')) as $file) {
+        if (str_starts_with($file, 'check_')) {
+            $check_name = substr($file, 6);
+            $servicesform .= "<option value='$check_name'>$check_name</option>";
+        }
+    }
+
+    if ($updated) {
+        print_message('Device Settings Saved');
+    }
+
+    echo '<div class="col-sm-6 col-sm-offset-3">';
+
+    include_once 'includes/html/print-service-add.inc.php';
+} else {
+    include 'includes/html/error-no-perm.inc.php';
+}

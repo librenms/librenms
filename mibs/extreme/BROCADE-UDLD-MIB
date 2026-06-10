@@ -1,0 +1,123 @@
+-- MIB File: BROCADE-UDLD-MIB.mib
+-- *********************************************************************
+-- BROCADE-UDLD-MIB.mib: Extreme UniDirectional Link Detection (UDLD) MIB
+--
+-- Septermber 2016
+-- 
+-- Copyright (c) 2018 Extreme Networks, Inc.
+-- All rights reserved.
+--
+-- *********************************************************************
+BROCADE-UDLD-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP        
+        FROM SNMPv2-CONF        
+	TEXTUAL-CONVENTION
+		FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+        FROM IF-MIB
+    bcsiModules 
+        FROM Brocade-REG-MIB
+	;
+
+brocadeUdldMIB  MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+    DESCRIPTION
+        "This MIB module supports UDLD related notifications."
+    REVISION        "201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	
+        "Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION        "201609280000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { bcsiModules 9 }
+    
+bcsiUdldNotifications  	 OBJECT IDENTIFIER ::=  { brocadeUdldMIB 0 }
+bcsiUdldObjects 		 OBJECT IDENTIFIER ::=  { brocadeUdldMIB 1 }
+bcsiUdldConformance 	 OBJECT IDENTIFIER ::=  { brocadeUdldMIB 2 }
+
+-- Objects
+bcsiUdldNotifObjects 	 OBJECT IDENTIFIER ::=  { bcsiUdldObjects 1 }
+
+bcsiUdldNotifMessage  OBJECT-TYPE
+	  SYNTAX		SnmpAdminString (SIZE(0..255))
+	  MAX-ACCESS    accessible-for-notify
+	  STATUS    	current
+	  DESCRIPTION
+		   "Generic Notification message string for UDLD notifications."
+	::= { bcsiUdldNotifObjects 1 }
+
+-- Notifications
+bcsiUdldNotifLinkDown NOTIFICATION-TYPE
+   OBJECTS { ifIndex, bcsiUdldNotifMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when UDLD port link status
+	   has changed to down."
+	--#TYPE "Extreme Notification: UDLD Port Link Down"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 1 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { bcsiUdldNotifications 1 }
+
+bcsiUdldNotifLinkUp NOTIFICATION-TYPE
+   OBJECTS { ifIndex, bcsiUdldNotifMessage }
+   STATUS current
+   DESCRIPTION
+	   "The SNMP trap that is generated when UDLD port link status
+	   has changed to up."
+	--#TYPE "Extreme Notification: UDLD Port Link Up"
+	--#SUMMARY "%s."
+	--#ARGUMENTS { 1 }
+	--#SEVERITY NOTIFICATIONS
+	--#STATE OPERATIONAL
+   ::= { bcsiUdldNotifications 2 }
+    
+--
+-- Conformance
+--
+
+bcsiUdldCompliances OBJECT IDENTIFIER 
+                             ::= { bcsiUdldConformance 1 }
+bcsiUdldGroups       OBJECT IDENTIFIER 
+                             ::= { bcsiUdldConformance 2 }
+
+bcsiUdldCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which
+        implement BROCADE-UDLD-MIB."
+    MODULE MANDATORY-GROUPS { bcsiUdldNotifGroup }
+    ::= { bcsiUdldCompliances 1 }
+
+--
+-- Units of Conformance
+--
+   
+bcsiUdldNotifGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+		bcsiUdldNotifLinkDown,
+		bcsiUdldNotifLinkUp
+    }
+    STATUS         current  
+    DESCRIPTION
+        "A collection of notifications for UDLD MIB."
+    ::= { bcsiUdldGroups 1 }        
+
+END
+
+
+

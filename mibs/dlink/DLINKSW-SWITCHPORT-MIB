@@ -1,0 +1,191 @@
+--  *****************************************************************
+--  DLINKSW-SWITCHPORT-MIB.mib : Switch Port MIB
+--
+--  Copyright (c) 2012 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-SWITCHPORT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32
+                FROM SNMPv2-SMI
+        TruthValue
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP 
+                FROM SNMPv2-CONF
+        ifIndex
+                FROM IF-MIB
+        dlinkIndustrialCommon
+                FROM DLINK-ID-REC-MIB;
+                
+    dlinkSwSwitchPortMIB MODULE-IDENTITY    
+        LAST-UPDATED "201303040000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for per-port configuration which 
+            are not covered by standard MIB(s)."
+	
+        REVISION "201303040000Z"
+        DESCRIPTION
+            " This is the first version of the MIB file
+            "
+        ::= { dlinkIndustrialCommon 11 }
+
+-- -----------------------------------------------------------------------------
+    dSwPortNotifications    OBJECT IDENTIFIER ::= { dlinkSwSwitchPortMIB 0 }
+    dSwPortObjects          OBJECT IDENTIFIER ::= { dlinkSwSwitchPortMIB 1 }
+    dSwPortConformance      OBJECT IDENTIFIER ::= { dlinkSwSwitchPortMIB 2 }
+
+
+-- -----------------------------------------------------------------------------
+-- Objects
+-- -----------------------------------------------------------------------------         
+     dSwPortIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSwPortIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of physical port interface entries."
+        ::= { dSwPortObjects 1 }
+        
+    dSwPortIfEntry OBJECT-TYPE
+	    SYNTAX          DSwPortIfEntry
+	    MAX-ACCESS      not-accessible
+	    STATUS          current
+	    DESCRIPTION 
+	        "An entry in dSwPortIfTable contains port-specific configuration
+		    which cannot be covered by standard MIBs (EtherLike or MAU-MIB)."
+	    INDEX       { ifIndex }
+	    ::= { dSwPortIfTable 1 } 
+	    
+    DSwPortIfEntry ::= SEQUENCE {            
+        dSwPortIfB1000baseTCtrl     INTEGER,        
+        dSwPortIfB10GbaseTCtrl      INTEGER,         
+        dSwPortIfMdix               INTEGER,
+        dSwPortIfJumboFrameSize     Unsigned32,
+        dSwPortIfSpeedAutoDowngrade TruthValue
+    }
+   
+    dSwPortIfB1000baseTCtrl OBJECT-TYPE
+        SYNTAX          INTEGER { 
+            other(1),           
+            b1000baseTMaster(2),
+            b1000baseTSlave(3)                          
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION      
+            "This object can be modified when port speed is configured to 1000BASE-T. 
+            other(1) - the port is not 1000BASE-T or master/slave timing mode
+                       is not specified.
+            b1000baseTMaster(2) - configure the port operate as master timing.
+            b1000baseTSlave(3) - configure the port operate as slave timing.                    
+            "     
+        DEFVAL      { b1000baseTMaster }      
+        ::= { dSwPortIfEntry 1 }
+
+    dSwPortIfB10GbaseTCtrl OBJECT-TYPE
+        SYNTAX          INTEGER { 
+            other(1),           
+            b10GbaseTMaster(2),
+            b10GbaseTSlave(3)                          
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION      
+            "This object can be modified when port speed is configured to 10GBASE-T. 
+            other(1) - the port is not 10GBASE-T or master/slave timing mode
+                       is not specified.
+            b10GbaseTMaster(2) - configure the port operate as master timing.
+            b10GbaseTSlave(3) - configure the port operate as slave timing.                    
+            "     
+        DEFVAL      { b10GbaseTMaster }      
+        ::= { dSwPortIfEntry 2 }
+                
+    dSwPortIfMdix OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            auto(1), 
+            normal(2), 
+            cross(3) 
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION   
+            "Uses the object to configure the state of Media-Dependent Interface
+            Crossover (MDIX) of the port."
+        DEFVAL      { auto }
+        ::= { dSwPortIfEntry 3 }
+	
+    dSwPortIfJumboFrameSize OBJECT-TYPE
+	    SYNTAX		    Unsigned32
+	    MAX-ACCESS	    read-write
+	    STATUS		    current
+	    DESCRIPTION
+			"The size of the largest packet which can be received on the
+			interface, specified in octets."
+		DEFVAL      { 1536 }	
+	    ::= { dSwPortIfEntry 4 }
+
+    dSwPortIfSpeedAutoDowngrade OBJECT-TYPE
+	    SYNTAX		TruthValue
+	    MAX-ACCESS	    	read-write
+	    STATUS		current
+	    DESCRIPTION
+			"This object indicates whether automatically downgrade the advertised
+            speed in case a link cannot be established at the available speed. 
+			"
+		DEFVAL      { false }	
+	    ::= { dSwPortIfEntry 5 }	    
+   
+-- -----------------------------------------------------------------------------
+-- Conformance
+-- -----------------------------------------------------------------------------
+    dSwPortCompliances OBJECT IDENTIFIER ::= { dSwPortConformance 1 }
+		
+	dSwPortCompliance MODULE-COMPLIANCE
+		STATUS          current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-SWITCHPORT-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dSwPortBasicGroup
+		}		
+	                        
+        OBJECT          dSwPortIfSpeedAutoDowngrade        
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is compliant to implement this object as
+            read-only. The write-access is only required
+            when auto-downgrade feature is supported."
+	    ::= { dSwPortCompliances 1 }
+		
+	dSwPortGroups OBJECT IDENTIFIER ::= { dSwPortConformance 2 }
+		
+    dSwPortBasicGroup OBJECT-GROUP
+		OBJECTS { 
+		    dSwPortIfB1000baseTCtrl,
+		    dSwPortIfB10GbaseTCtrl,
+		    dSwPortIfMdix,
+		    dSwPortIfJumboFrameSize,
+		    dSwPortIfSpeedAutoDowngrade
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of fundamental port configuration
+			objects which are not covered by standard MIBs."						
+		::= { dSwPortGroups 1 }
+	
+
+	
+END

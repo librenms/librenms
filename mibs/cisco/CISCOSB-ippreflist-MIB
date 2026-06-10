@@ -1,0 +1,297 @@
+
+CISCOSB-ippreflist-MIB DEFINITIONS ::= BEGIN
+
+-- Title:      IP Prefix List
+-- Version:    7.50.00.00
+-- Date:       22-May-2011
+--
+
+IMPORTS
+    TruthValue, TEXTUAL-CONVENTION, TimeStamp,
+    DisplayString, DateAndTime, RowStatus                FROM SNMPv2-TC
+    TimeTicks, IpAddress, NOTIFICATION-TYPE,
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32             FROM SNMPv2-SMI
+    InetAddress, InetAddressType,
+    InetAddressPrefixLength,
+    InetVersion, InetZoneIndex                           FROM INET-ADDRESS-MIB
+    switch001                                            FROM CISCOSB-MIB;
+
+
+
+rlIpPrefList  OBJECT IDENTIFIER ::= { switch001 212 }
+
+
+RlIpPrefListEntryType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Prefix List entry type defines data type in the entry. Rule (1) means
+         the entry inludes classification and action. Description (2) means
+         the entry icludes comments only."
+    SYNTAX  INTEGER {
+        rule(1),
+        description(2)
+}
+
+RlIpPrefListActionType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Prefix List action type. Drop action prevents packet forwarding.
+         Permit action allows packet forwarding."
+    SYNTAX  INTEGER {
+        drop(1),
+        permit(2)
+}
+
+RlIpPrefListType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+         "Classification type is used to create prefix list rule.
+         IPv4 type means match IPv4 packets. IPv6 type means match IPv6 packets."
+    SYNTAX  INTEGER {
+        ipv4(1),
+        ipv6(2)
+}
+
+
+rlIpPrefListTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlIpPrefListEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The IP Prefix List table."
+    ::= {  rlIpPrefList 1 }
+
+
+rlIpPrefListEntry OBJECT-TYPE
+    SYNTAX      RlIpPrefListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlIpPrefListTable."
+    INDEX  { rlIpPrefListType, rlIpPrefListName, rlIpPrefListEntryIndex }
+    ::= { rlIpPrefListTable 1 }
+
+RlIpPrefListEntry::= SEQUENCE {
+
+   rlIpPrefListType                                RlIpPrefListType,
+   rlIpPrefListName                                DisplayString,
+   rlIpPrefListEntryIndex                          Unsigned32,
+   rlIpPrefListEntryType                           RlIpPrefListEntryType,
+   rlIpPrefListInetAddrType                        InetAddressType,
+   rlIpPrefListInetAddr                            InetAddress,
+   rlIpPrefListPrefixLength                        INTEGER,
+   rlIpPrefListAction                              RlIpPrefListActionType,
+   rlIpPrefListGeLength                            INTEGER,
+   rlIpPrefListLeLength                            INTEGER,
+   rlIpPrefListDescription                         DisplayString,
+   rlIpPrefListHitCount                            INTEGER,
+   rlIpPrefListRowStatus                           RowStatus
+
+}
+
+
+
+
+rlIpPrefListType OBJECT-TYPE
+    SYNTAX      RlIpPrefListType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Prefix List Type."
+    ::= { rlIpPrefListEntry 1 }
+
+
+rlIpPrefListName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Prefix List Name."
+    ::= { rlIpPrefListEntry 2 }
+
+rlIpPrefListEntryIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967294)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Entry Index for specific prefix list."
+    ::= { rlIpPrefListEntry 3 }
+
+
+rlIpPrefListEntryType OBJECT-TYPE
+    SYNTAX     RlIpPrefListEntryType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Prefix list entry type."
+    ::= { rlIpPrefListEntry 4 }
+
+
+rlIpPrefListInetAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The address type of rlIpPrefListIpAddr."
+    ::= { rlIpPrefListEntry 5 }
+
+
+rlIpPrefListInetAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "IP address."
+    ::= { rlIpPrefListEntry 6 }
+
+
+rlIpPrefListPrefixLength OBJECT-TYPE
+    SYNTAX     INTEGER(0..128)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+           "The prefix list can be a number from 0 to 32 for IPv4 address
+           and from 0 to 128 for IPv6 address."
+    ::= { rlIpPrefListEntry 7 }
+
+
+rlIpPrefListAction OBJECT-TYPE
+    SYNTAX      RlIpPrefListActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Drop or permit action for a matching condition."
+    ::= { rlIpPrefListEntry 8 }
+
+
+rlIpPrefListGeLength OBJECT-TYPE
+    SYNTAX      INTEGER(0..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the lesser value of a range by applying the ge-length argument
+        to the specified range. ge-length repesents the minimum prefix length to be matched."
+    DEFVAL{ 0 }
+    ::= { rlIpPrefListEntry 9 }
+
+rlIpPrefListLeLength OBJECT-TYPE
+    SYNTAX      INTEGER(0..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the greater value of a range by applying the ge-length argument
+        to the specified range. le-length repesents the maximum prefix length to be matched."
+    DEFVAL{ 0 }
+    ::= { rlIpPrefListEntry 10 }
+
+
+rlIpPrefListDescription OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(0..80))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Prefix List Name."
+    ::= { rlIpPrefListEntry 11 }
+
+
+rlIpPrefListHitCount OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Match counter."
+    ::= { rlIpPrefListEntry 12 }
+
+
+
+rlIpPrefListRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Row status."
+    ::= { rlIpPrefListEntry 13 }
+
+
+
+
+------------------------------------------------------------------
+
+
+
+rlIpPrefListInfoTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF RlIpPrefListInfoEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The IP Prefix List Info table."
+    ::= {  rlIpPrefList 2 }
+
+
+rlIpPrefListInfoEntry OBJECT-TYPE
+    SYNTAX      RlIpPrefListInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the rlIpPrefListInfoTable."
+    INDEX  { rlIpPrefListInfoType, rlIpPrefListInfoName }
+    ::= { rlIpPrefListInfoTable 1 }
+
+
+
+RlIpPrefListInfoEntry::= SEQUENCE {
+   rlIpPrefListInfoType                                RlIpPrefListType,
+   rlIpPrefListInfoName                                DisplayString,
+   rlIpPrefListInfoEntriesNumber                       INTEGER,
+   rlIpPrefListInfoRangeEntries                        INTEGER,
+   rlIpPrefListInfoNextFreeIndex                       INTEGER
+
+}
+
+
+rlIpPrefListInfoType OBJECT-TYPE
+    SYNTAX      RlIpPrefListType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Prefix List Type."
+    ::= { rlIpPrefListInfoEntry 1 }
+
+
+rlIpPrefListInfoName OBJECT-TYPE
+    SYNTAX DisplayString(SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Prefix List Name."
+    ::= { rlIpPrefListInfoEntry 2 }
+
+rlIpPrefListInfoEntriesNumber OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of entries for specific prefix list."
+    ::= { rlIpPrefListInfoEntry 3 }
+
+
+rlIpPrefListInfoRangeEntries OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of entries with range for specific prefix list."
+    ::= { rlIpPrefListInfoEntry 4 }
+
+
+rlIpPrefListInfoNextFreeIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Next free index for specific prefix list."
+    ::= { rlIpPrefListInfoEntry 5 }
+
+
+END
+

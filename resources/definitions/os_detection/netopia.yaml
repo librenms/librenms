@@ -1,0 +1,7 @@
+os: netopia
+text: 'Motorola Netopia'
+type: network
+discovery:
+    -
+        sysDescr_regex:
+            - '/^Netopia/'

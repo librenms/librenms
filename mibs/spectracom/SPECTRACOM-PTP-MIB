@@ -1,0 +1,403 @@
+--******************************************************************************
+--  Module  : SPECTRACOM-PTP-REG.mib
+--  Date    : 18 January 2011
+--  Authors : Najah HAJEJE
+--  Purpose : This MIB defines the PTP MIB for the private Spectracom MIB.
+--
+--  Copyright(C) 2011 Spectracom Corporation.
+--  All Rights Reserved.
+--..............................................................................
+
+SPECTRACOM-PTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    DisplayString
+        FROM SNMPv2-TC
+    specModules, specProducts
+        FROM SPECTRACOM-GLOBAL-REG-MIB;
+
+spectracomPtpMibModule MODULE-IDENTITY
+--               "YYYYMMDDHHMMZ"
+    LAST-UPDATED "202201070000Z"
+    ORGANIZATION "Spectracom"
+    CONTACT-INFO
+        "Postal: Orolia USA, Inc. dba Spectracom
+                 45 Becker Road, Suite A
+                 West Henrietta, NY 14586 USA
+         Tel:    +1 (585) 321-5800
+         Fax:    +1 (585) 321-5218
+         Email:  timingsupport@orolia.com"
+    DESCRIPTION
+        "Spectracom Corporation's PTP MIB."
+
+    REVISION     "202201070000Z"
+    DESCRIPTION
+        "Rev 1.4 - Updated address and email."
+
+    REVISION    "201306171453Z"
+    DESCRIPTION
+        "Rev 1.3 - Updated address."
+    REVISION     "201103210000Z"
+    DESCRIPTION
+        "Rev 1.2 - Added new column as index for PTP reference table.
+                 - Changed enumerations to remove (0) values.
+                 - Changed size of reference identifier string from 20 to 5."
+
+    REVISION     "201101250000Z"
+    DESCRIPTION
+        "Rev 1.1 - Fix duplicate names for INTEGER types, and text and variable
+                   names with single quotes and/or capital starting letters.
+                 - PTP MIB is placed in the MIB structure as 'specProducts 4'.
+                 - Add Conformance Section.
+                 - Tabs removed and Text lined up.
+                 - Rename defined values for ptpStatusClockClass and
+                   ptpStatusProtocolGmClockClass items."
+
+    REVISION     "201101240000Z"
+    DESCRIPTION
+        "Rev 1.0 - Initial Revision."
+    ::= { specModules 6 }
+
+--******************************************************************************
+-- Tree definition
+--..............................................................................
+
+--ptpSnmpObjs subtree
+ptpSnmpObjs             OBJECT IDENTIFIER ::= { specProducts 4 }
+
+--ptpStatusObjs subtree
+ptpStatusObjs           OBJECT IDENTIFIER ::= { ptpSnmpObjs 1 }
+
+--******************************************************************************
+-- ptpStatusObjs Objects [enterprises.18837.3.4.1.1.1.x]
+--..............................................................................
+
+ptpStatusTable                                  OBJECT-TYPE
+    SYNTAX                                      SEQUENCE OF PtpStatusTableEntry
+    MAX-ACCESS                                  not-accessible
+    STATUS                                      current
+    DESCRIPTION
+        "This table contains status for all PTP Module that are present
+         in system."
+    ::= { ptpStatusObjs 1 }
+
+ptpStatusTableEntry                             OBJECT-TYPE
+    SYNTAX                                      PtpStatusTableEntry
+    MAX-ACCESS                                  not-accessible
+    STATUS                                      current
+    DESCRIPTION
+        "A table entry (row) in the PTP Module table."
+    INDEX                                       { ptpStatusRow }
+    ::= { ptpStatusTable 1 }
+
+PtpStatusTableEntry ::= SEQUENCE {
+        ptpStatusRow                                 Unsigned32,
+        ptpStatusInstance                            Unsigned32,
+        ptpStatusReference                           DisplayString,
+        ptpStatusNetworkIp                           DisplayString,
+        ptpStatusNetworkNetmask                      DisplayString,
+        ptpStatusNetworkGateway                      DisplayString,
+        ptpStatusNetworkTransportProtocol            DisplayString,
+        ptpStatusNetworkTtl                          INTEGER,
+        ptpStatusNetworkDomainNumber                 INTEGER,
+        ptpStatusPortNumber                          INTEGER,
+        ptpStatusPortState                           DisplayString,
+        ptpStatusClockIdentity                       DisplayString,
+        ptpStatusClockMode                           DisplayString,
+        ptpStatusClockClass                          INTEGER,
+        ptpStatusClockAccuracy                       DisplayString,
+        ptpStatusProtocolGmClockClass                INTEGER,
+        ptpStatusProtocolGmClockAccuracy             DisplayString,
+        ptpStatusProtocolOneStep                     INTEGER,
+        ptpStatusProtocolAnnounceReceptionTimeOut    INTEGER,
+        ptpStatusProtocolLogAnnounceInterval         INTEGER,
+        ptpStatusProtocolLogSyncInterval             INTEGER,
+        ptpStatusProtocolLogDelayRequestInterval     INTEGER,
+        ptpStatusProtocolLogPeerDelayRequestInterval INTEGER,
+        ptpStatusProtocolDelayMechanism              DisplayString }
+
+ptpStatusRow                                    OBJECT-TYPE
+    SYNTAX                                      Unsigned32(1..8)
+    MAX-ACCESS                                  not-accessible
+    STATUS                                      current
+    DESCRIPTION
+        "This is the unique row index for each PTP reference."
+    ::= { ptpStatusTableEntry 1 }
+
+ptpStatusInstance                               OBJECT-TYPE
+    SYNTAX                                      Unsigned32(0..7)
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is the unique instance for the PTP."
+    ::= { ptpStatusTableEntry 2 }
+
+ptpStatusReference                              OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(5))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is the unique identifier for this PTP clock reference."
+    ::= { ptpStatusTableEntry 3 }
+
+ptpStatusNetworkIp                              OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the current IP address of the Ethernet interface."
+    ::= { ptpStatusTableEntry 4 }
+
+ptpStatusNetworkNetmask                         OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the current netmask of the Ethernet interface."
+    ::= { ptpStatusTableEntry 5 }
+
+ptpStatusNetworkGateway                         OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the current gateway of the Ethernet interface."
+    ::= { ptpStatusTableEntry 6 }
+
+ptpStatusNetworkTransportProtocol               OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the Transport protocol for PTP packets
+         (Either PTP over IPv4 or PTP over 802.3/Ethernet)."
+    ::= { ptpStatusTableEntry 7 }
+
+ptpStatusNetworkTtl                             OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the Time To Live (TTL) for PTP packets."
+    ::= { ptpStatusTableEntry 8 }
+
+ptpStatusNetworkDomainNumber                    OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the domain number."
+    ::= { ptpStatusTableEntry 9 }
+
+ptpStatusPortNumber                             OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the port number."
+    ::= { ptpStatusTableEntry 10 }
+
+ptpStatusPortState                              OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is a string representation of the state of the port,
+         based on the names defined in section 9.2.4 of
+         the PTP protocol specification."
+    ::= { ptpStatusTableEntry 11 }
+
+ptpStatusClockIdentity                          OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(24))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the PTP clock identity."
+    ::= { ptpStatusTableEntry 12 }
+
+ptpStatusClockMode                              OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the PTP clock mode
+         (Either slave-only, master-only or master-slave)."
+    ::= { ptpStatusTableEntry 13 }
+
+ptpStatusClockClass                             OBJECT-TYPE
+    SYNTAX                                      INTEGER { sync(6),
+                                                          holdoverInSpec(7),
+                                                          holdoverOutSpec1(52),
+                                                          holdoverOutSpec2(187),
+                                                          nosync(248),
+                                                          unknown(255) }
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the PTP clock class according to the PTP V2 standard
+         depending on the timescale of the reference clock generated by the Host
+         board.
+         6:   Time and 1pps references are synchronized with the host
+              references.
+         7:   Time and 1pps references are in holdover state, within
+              specifications.
+         52:  Time and 1pps references are in holdover state, not within
+              specifications.
+         187: Time and 1pps references are in holdover state, not within
+              specifications.
+         255: Slave Only class.
+         248: Unknown class."
+    ::= { ptpStatusTableEntry 14 }
+
+ptpStatusClockAccuracy                          OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the PTP clock accuracy."
+    ::= { ptpStatusTableEntry 15 }
+
+ptpStatusProtocolGmClockClass                   OBJECT-TYPE
+    SYNTAX                                      INTEGER { sync(6),
+                                                          holdoverInSpec(7),
+                                                          holdoverOutSpec1(52),
+                                                          holdoverOutSpec2(187),
+                                                          nosync(248),
+                                                          unknown(255) }
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the clock class of the domain's GrandMaster.
+         6:   Time and 1pps references are synchronized with the host
+              references.
+         7:   Time and 1pps references are in holdover state, within
+              specifications.
+         52:  Time and 1pps references are in holdover state, not within
+              specifications.
+         187: Time and 1pps references are in holdover state, not within
+              specifications.
+         255: Slave Only class.
+         248: Unknown class."
+    ::= { ptpStatusTableEntry 16 }
+
+ptpStatusProtocolGmClockAccuracy                OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This indicates the clock accuracy of the domain's GrandMaster."
+    ::= { ptpStatusTableEntry 17 }
+
+
+ptpStatusProtocolOneStep                        OBJECT-TYPE
+    SYNTAX                                      INTEGER { enabled(1),
+                                                          disabled(2) }
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This specifies whether the PTP clock is in one-step mode
+         (enabled) or in two-steps mode (disabled)."
+    ::= { ptpStatusTableEntry 18 }
+
+ptpStatusProtocolAnnounceReceptionTimeOut       OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is the announce receipt timeout."
+    ::= { ptpStatusTableEntry 19 }
+
+ptpStatusProtocolLogAnnounceInterval            OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is the announce interval."
+    ::= { ptpStatusTableEntry 20 }
+
+ptpStatusProtocolLogSyncInterval                OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is the sync interval."
+    ::= { ptpStatusTableEntry 21 }
+
+ptpStatusProtocolLogDelayRequestInterval        OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is the Delay Request Interval."
+    ::= { ptpStatusTableEntry 22 }
+
+ptpStatusProtocolLogPeerDelayRequestInterval    OBJECT-TYPE
+    SYNTAX                                      INTEGER
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This is the Peer Delay Request Interval."
+    ::= { ptpStatusTableEntry 23 }
+
+ptpStatusProtocolDelayMechanism                 OBJECT-TYPE
+    SYNTAX                                      DisplayString(SIZE(20))
+    MAX-ACCESS                                  read-only
+    STATUS                                      current
+    DESCRIPTION
+        "This specifies the delay-mechanism used by the PTP port
+         (Either E2E, P2P, or Disabled)."
+    ::= { ptpStatusTableEntry 24 }
+
+--******************************************************************************
+-- Conformance Section [enterprises.18837.3.4.90.x]
+--..............................................................................
+
+-- OEM
+ptpConformance    OBJECT IDENTIFIER ::= { ptpSnmpObjs 90 }
+ptpCompliances    OBJECT IDENTIFIER ::= { ptpConformance 1 }
+ptpGroups         OBJECT IDENTIFIER ::= { ptpConformance 2 }
+
+ptpCompliance     MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for SNMP entities which implement version 2
+         of the Spectracom PTP MIB."
+    MODULE -- this module
+        MANDATORY-GROUPS { ptpObjectsGroup }
+    ::= { ptpCompliances 1 }
+
+-- CONFORMANCE_OEM
+ptpObjectsGroup   OBJECT-GROUP
+    OBJECTS       { ptpStatusInstance,
+                    ptpStatusReference,
+                    ptpStatusNetworkIp,
+                    ptpStatusNetworkNetmask,
+                    ptpStatusNetworkGateway,
+                    ptpStatusNetworkTransportProtocol,
+                    ptpStatusNetworkTtl,
+                    ptpStatusNetworkDomainNumber,
+                    ptpStatusPortNumber,
+                    ptpStatusPortState,
+                    ptpStatusClockIdentity,
+                    ptpStatusClockMode,
+                    ptpStatusClockClass,
+                    ptpStatusClockAccuracy,
+                    ptpStatusProtocolOneStep,
+                    ptpStatusProtocolGmClockClass,
+                    ptpStatusProtocolGmClockAccuracy,
+                    ptpStatusProtocolAnnounceReceptionTimeOut,
+                    ptpStatusProtocolLogAnnounceInterval,
+                    ptpStatusProtocolLogSyncInterval,
+                    ptpStatusProtocolLogDelayRequestInterval,
+                    ptpStatusProtocolLogPeerDelayRequestInterval,
+                    ptpStatusProtocolDelayMechanism }
+    STATUS        current
+    DESCRIPTION
+        "The collection of objects for the Spectracom PTP MIB"
+    ::= { ptpGroups 1 }
+
+END

@@ -1,0 +1,102 @@
+-- This module defines enterprise MIBs for email notification
+-- setting
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-EMAIL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetEmailMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         the email notification setting"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct wrong title"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 7 }
+
+nsSetEmail OBJECT IDENTIFIER ::= { netscreenSetting 7 }
+
+nsSetEmailEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable E-mail Notification for Alarms"
+    ::= { nsSetEmail 1 }
+
+nsSetEmailSMTP OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SMTP server name"
+    ::= { nsSetEmail 2 }
+
+nsSetEmailLog OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Include Traffic Log in email"
+    ::= { nsSetEmail 3 }
+
+nsSetEmailAddr1 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "E-mail receiver address one"
+    ::= { nsSetEmail 4 }
+
+nsSetEmailAddr2 OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..64))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "E-mail receiver address two"
+    ::= { nsSetEmail 5 }
+
+END
+
+

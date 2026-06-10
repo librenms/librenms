@@ -1,0 +1,185 @@
+WESTERMO-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString,
+    TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+
+    Integer32,
+    OBJECT-TYPE,
+    MODULE-IDENTITY
+    FROM SNMPv2-SMI
+
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+    FROM SNMPv2-CONF
+
+    common
+    FROM WESTERMO-OID-MIB
+
+    InterfaceIndex
+    FROM IF-MIB
+
+    IANAifType
+    FROM IANAifType-MIB;
+
+
+-- module
+
+wmoInterface MODULE-IDENTITY
+    LAST-UPDATED "201908300000Z"
+    ORGANIZATION "Westermo"
+    CONTACT-INFO
+    "Copyright (c) 2019:
+    Westermo Network Technologies AB
+    640 40 Stora Sundby
+    Sweden
+    url: http://www.westermo.com
+
+    Contact:  support@westermo.se
+    Description: Westermo Common Interfaces MIB-file"
+
+    DESCRIPTION
+    "Westermo Common Interfaces MIB-file. The Interface MIB lists all ports
+    and interfaces and their reference index. The purpose of reference index
+    is to have a predictable index for ports and interfaces."
+
+
+    REVISION "201908300000Z"
+    DESCRIPTION
+    "Initial version."
+
+
+::= { common 4 }
+
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+IfaceRefIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS       current
+    DESCRIPTION
+            "A unique value, greater than zero, for each interface or
+            interface sub-layer in the managed system. "
+    SYNTAX       Integer32 (1..1000)
+
+-- ---------------------------------------------------------- --
+-- subtrees in the WESTERMO-FRNT-MIB
+-- ---------------------------------------------------------- --
+
+wmoInterfaceObjects       OBJECT IDENTIFIER ::= { wmoInterface 1 }
+wmoInterfaceConformance   OBJECT IDENTIFIER ::= { wmoInterface 2 }
+
+-- -------------------------------------------------------------
+-- the ifRefTable
+-- -------------------------------------------------------------
+
+ifRefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of interface entries."
+    ::= { wmoInterfaceObjects 1 }
+
+ifRefEntry OBJECT-TYPE
+    SYNTAX      IfRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Interface entry"
+    INDEX   { ifRefIndex }
+    ::= { ifRefTable 1 }
+
+    IfRefEntry ::=
+    SEQUENCE {
+        ifRefIndex      IfaceRefIndex,
+        ifRefifIndex    InterfaceIndex,
+        ifRefifName     DisplayString,
+        ifRefifDescr    DisplayString,
+        ifRefifType     IANAifType
+    }
+
+ifRefIndex OBJECT-TYPE
+    SYNTAX      IfaceRefIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A unique value, greater than zero, for each interface.
+    The values are assigned contiguously starting from 1."
+    ::= { ifRefEntry 1 }
+
+ifRefifIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The interface index corresponding to the value of ifIndex in
+    the Internet Standard MIB."
+    ::= { ifRefEntry 2 }
+
+ifRefifName OBJECT-TYPE
+   SYNTAX      DisplayString (SIZE (0..255))
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+   "Name of the interface"
+::= { ifRefEntry 3 }
+
+ifRefifDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Description to the interface"
+    ::= { ifRefEntry 4 }
+
+ifRefifType OBJECT-TYPE
+    SYNTAX      IANAifType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "The IANAifType of the interface"
+    ::= { ifRefEntry 5 }
+
+
+-- ---------------------------------------------------------- --
+-- Conformance Information
+-- ---------------------------------------------------------- --
+
+wmoInterfaceGroups      OBJECT IDENTIFIER ::= { wmoInterfaceConformance 1 }
+wmoInterfaceCompliances OBJECT IDENTIFIER ::= { wmoInterfaceConformance 2 }
+
+-- ---------------------------------------------------------- --
+-- Units of conformance
+-- ---------------------------------------------------------- --
+
+wmoInterfaceGroup OBJECT-GROUP
+    OBJECTS {
+    ifRefifIndex,
+    ifRefifName,
+    ifRefifDescr,
+    ifRefifType
+    }
+    STATUS  current
+    DESCRIPTION
+    "The wmoInterfaceGroup"
+    ::= { wmoInterfaceGroups 1 }
+
+-- ---------------------------------------------------------- --
+-- Compliance statements
+-- ---------------------------------------------------------- --
+
+wmoInterfaceCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+    "The compliance statement"
+    MODULE
+    MANDATORY-GROUPS {
+    wmoInterfaceGroup
+    }
+    ::= { wmoInterfaceCompliances 1 }
+
+END

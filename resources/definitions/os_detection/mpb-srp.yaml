@@ -1,0 +1,15 @@
+os: mpb-srp
+text: 'MPB SRP'
+type: network
+icon: mpb
+mib_dir: mpb
+over:
+  - { graph: device_temperature, text: 'Case Temperature' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.4464.2.2.12.2.4.0
+            op: 'contains'
+            value: 'MPBC_SNMP'

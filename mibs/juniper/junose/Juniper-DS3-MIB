@@ -1,0 +1,802 @@
+
+-- *****************************************************************************
+-- Juniper-DS3-MIB
+--
+-- Juniper Networks Enterprise MIB
+-- DS3 MIB
+--
+-- Copyright (c) 1998, 1999 Redstone Communications, Inc.
+-- Copyright (c) 1999, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All Rights Reserved.
+-- *****************************************************************************
+
+Juniper-DS3-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    TruthValue, RowStatus, DisplayString
+        FROM SNMPv2-TC
+    JuniNextIfIndex
+        FROM Juniper-TC
+    juniMibs
+        FROM Juniper-MIBs
+    PerfCurrentCount, PerfIntervalCount, PerfTotalCount
+        FROM PerfHist-TC-MIB
+    dsx3FarEndCurrentEntry, dsx3FarEndIntervalEntry, dsx3FarEndTotalEntry,
+    dsx3FarEndConfigEntry
+        FROM DS3-MIB;
+
+juniDs3MIB  MODULE-IDENTITY
+    LAST-UPDATED "200309301211Z"  -- 30-Sep-03 08:11 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The DS3 MIB for the Juniper Networks enterprise.  This MIB contains
+        managed objects for DS3/E3 interfaces.  Management objects are provided
+        to supplement those found in the standard DS3-MIB (RFC 2496)."
+    -- Revision History
+    REVISION    "200410120651Z"  -- 12-Oct-04 01:51 AM EST  - RX 5.0.4
+    DESCRIPTION
+        "Changed the upper bound value of juniDsx3LineLength from 64000 to 137 
+         meters."
+    REVISION    "200309301211Z"  -- 30-Sep-03 08:11 AM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Changed the standard MIB support from the RFC1407-MIB (SMIv1) to the
+        DS3-MIB (SMIv2)."
+    REVISION    "200209162144Z"  -- 16-Sep-02 05:44 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200209121659Z"  -- 12-Sep-02 12:59 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added support for far end MDL generator number and port number.
+         Added support for far end MDL carrier."
+    REVISION    "200204041407Z"  -- 04-Apr-02 09:07 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added invalid seconds objects to the far end statistics tables and more
+        configuration objects."
+    REVISION    "200202222121Z"  -- 22-Feb-02 04:21 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Modified the valid range for juniDsx3Ds3Channel"
+    REVISION    "200104271949Z"  -- 27-Apr-01 03:49 PM EDT  - JUNOSe 3.0
+    DESCRIPTION
+        "Added dynamic DS3 interface support."
+    REVISION    "200102050000Z"  -- 05-Feb-01               - JUNOSe 2.6
+    DESCRIPTION
+        "Added following objects:
+             juniDsx3Ds3DsuMode
+             juniDsx3Ds3BandwidthLimit
+             juniDsx3Ds3DsuScrambleMode"
+    REVISION      "9907270000Z"  -- 27-Jul-99               - JUNOSe 1.1
+    DESCRIPTION
+        "Added juniDsx3LineType and juniDsx3CellScramblerConfig."
+    REVISION      "9811130000Z"  -- 13-Nov-98               - JUNOSe 1.0
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { juniMibs 4 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDs3Objects     OBJECT IDENTIFIER ::= { juniDs3MIB 1 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- DS3 Interfaces
+--
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The DS3 Configuration Table
+--
+juniDsx3ConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDsx3ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for DS3/E3 interfaces present in the
+        system."
+    ::= { juniDs3Objects 1 }
+
+juniDsx3ConfigEntry  OBJECT-TYPE
+    SYNTAX      JuniDsx3ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an DS3/E3 interface."
+    INDEX     { ifIndex }
+    ::= { juniDsx3ConfigTable 1 }
+
+JuniDsx3ConfigEntry ::= SEQUENCE {
+    juniDsx3LineLength           Integer32,
+    juniDsx3LineType             INTEGER,
+    juniDsx3CellScramblerConfig  INTEGER,
+    juniDsx3Channelization       TruthValue,
+    juniDsx3InterfaceType        INTEGER,
+    juniDsx3Application          INTEGER,
+    juniDsx3Ds3Channel           INTEGER,
+    juniDsx3LowerIfIndex         InterfaceIndexOrZero,
+    juniDsx3RowStatus            RowStatus,
+    juniDsx3Ds3DsuMode           INTEGER,
+    juniDsx3Ds3BandwidthLimit    INTEGER,
+    juniDsx3Ds3DsuScrambleMode   INTEGER,
+    juniDsx3MdlCarrier           INTEGER,
+    juniDsx3MdlTransmit          INTEGER,
+    juniDsx3MdlEic               DisplayString,
+    juniDsx3MdlLic               DisplayString,
+    juniDsx3MdlFic               DisplayString,
+    juniDsx3MdlUnit              DisplayString,
+    juniDsx3MdlPfi               DisplayString,
+    juniDsx3MdlPort              DisplayString,
+    juniDsx3MdlGenerator         DisplayString }
+
+juniDsx3LineLength  OBJECT-TYPE
+    SYNTAX      Integer32 (0..137)
+    UNITS       "meters"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The length of the DS3/E3 line in meters.  This objects provides
+        information for line build out circuitry.  This object is only useful if
+        the interface has configurable line build out circuitry."
+    ::= { juniDsx3ConfigEntry 1 }
+
+juniDsx3LineType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    juniDsx3other(1),
+                    juniDsx3M23(2),
+                    juniDsx3SYNTRAN(3),
+                    juniDsx3CbitParity(4),
+                    juniDsx3ClearChannel(5),
+                    juniE3G832(6),
+                    juniE3Framed(7),
+                    juniE3Plcp(8),
+                    juniDsx3M23Plcp(18),
+                    juniDsx3CbitParityPlcp(20) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the variety of DS3 C-bit or E3 application
+        implementing this interface.  The type of interface affects the
+        interpretation of the usage and error statistics.  The rate of DS3 is
+        44.736 Mbps and E3 is 34.368 Mbps.  The dsx3ClearChannel value means
+        that the C-bits are not used except for sending/receiving AIS.  Note
+        that this object represents the actual line type when the corresponding
+        value of dsx3LineType is dsx3other(1).
+
+        The values, in sequence, describe:
+             TITLE:              SPECIFICATION:
+             dsx3M23             ANSI T1.107-1988
+             dsx3SYNTRAN         ANSI T1.107-1988
+             dsx3CbitParity      ANSI T1.107a-1989
+             dsx3ClearChannel    ANSI T1.102-1987
+             e3G832              ITU-T G.832
+             e3Framed            ITU-T G.751
+             e3Plcp              ETSI T/NA(91)18.
+             dsx3M23Plcp         ATM Forum af-phy-0054.000
+             dsx3CbitParityPlcp  ATM Forum af-phy-0054.000 "
+    ::= { juniDsx3ConfigEntry 2 }
+
+juniDsx3CellScramblerConfig  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    scramblerOn(1),
+                    scramblerOff(2),
+                    notSupported(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the state of the ATM cell scrambler for
+        interfaces which support ATM over DS3 or E3.  For interfaces which do
+        not support ATM, this object returns the value notSupported(3)."
+    ::= { juniDsx3ConfigEntry 3 }
+
+juniDsx3Channelization  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The channelization setting for this DS3 interface; true(1) indicates
+        channelization, false(2) indicates no channelization."
+    ::= { juniDsx3ConfigEntry 4 }
+
+juniDsx3InterfaceType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ds3T3(0),
+                    ds3E3(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DS3 interface type setting."
+    ::= { juniDsx3ConfigEntry 5 }
+
+juniDsx3Application  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ds3FrameOverDs3(0),
+                    ds3AtmOverDs3(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The interface application setting."
+    ::= { juniDsx3ConfigEntry 6 }
+
+juniDsx3Ds3Channel  OBJECT-TYPE
+    SYNTAX      INTEGER (1..28)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DS3 channel setting.  The range of channel settings depends on the
+        line rate of the underlying interface."
+    ::= { juniDsx3ConfigEntry 7 }
+
+juniDsx3LowerIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the interface over which this DS3 interface is to be
+        layered.  A value of zero indicates no layering.  An implementation may
+        choose to require that a nonzero value be configured at entry creation."
+    ::= { juniDsx3ConfigEntry 8 }
+
+juniDsx3RowStatus  OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table according to the
+        RowStatus textual convention, constrained to support setting the
+        following values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be
+        explicitly configured:
+            juniDsx3RowStatus
+            juniDsx3LowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+
+            A value for ifIndex must have been determined previously, by reading
+            juniDsx3NextIfIndex.
+
+            The interface identified by juniDsx3LowerIfIndex must exist.
+
+        A corresponding entry in ifTable/ifXTable/juniIfTable is created/
+        destroyed as a result of creating/destroying an entry in this table."
+    ::= { juniDsx3ConfigEntry 9 }
+
+juniDsx3Ds3DsuMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ds3DsuModeNone(0),
+                    ds3DsuLarsCom(2),
+                    ds3DsuDigitalLink(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DSU configuration setting for this entry."
+    DEFVAL    { ds3DsuModeNone }
+    ::= { juniDsx3ConfigEntry 10 }
+
+juniDsx3Ds3BandwidthLimit  OBJECT-TYPE
+    SYNTAX      INTEGER (0..44210)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DSU bandwidth configuration for this entry."
+    DEFVAL    { 0 }
+    ::= { juniDsx3ConfigEntry 11 }
+
+juniDsx3Ds3DsuScrambleMode  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    ds3DsuScrambleDisabled(0),
+                    ds3DsuScrambleEnable(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The DSU scramble mode setting for this entry."
+    DEFVAL    { ds3DsuScrambleDisabled }
+    ::= { juniDsx3ConfigEntry 12 }
+
+juniDsx3MdlCarrier  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "Specifies the interface is used in carrier environment."
+    DEFVAL    { disabled }
+    ::= { juniDsx3ConfigEntry 13 }
+
+juniDsx3MdlTransmit  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    path(1),
+                    idlesignal(2),
+                    pathIdlesignal(3),
+                    testsignal(4),
+                    pathTestsignal(5),
+                    idlesignalTestsignal(6),
+                    pathIdlesignalTestsignal(7),
+                    none(8) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+         "Specifies transmission enabling."
+    DEFVAL    { none }
+    ::= { juniDsx3ConfigEntry 14 }
+
+juniDsx3MdlEic  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the equipment identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx3ConfigEntry 15 }
+
+juniDsx3MdlLic  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..11))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the location identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx3ConfigEntry 16 }
+
+juniDsx3MdlFic  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the frame identification code."
+    DEFVAL    { "" }
+    ::= { juniDsx3ConfigEntry 17 }
+
+juniDsx3MdlUnit  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..6))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the unit identification code."
+    ::= { juniDsx3ConfigEntry 18 }
+
+juniDsx3MdlPfi  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..38))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the facility identification code to send in the MDL path
+        message."
+    DEFVAL    { "" }
+    ::= { juniDsx3ConfigEntry 19 }
+
+juniDsx3MdlPort  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..38))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the equipment port number to send in the MDL idle signal
+        message."
+    ::= { juniDsx3ConfigEntry 20 }
+
+juniDsx3MdlGenerator  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..38))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This is the generator number to send in the MDL test signal message."
+    ::= { juniDsx3ConfigEntry 21 }
+
+
+juniDs3NextIfIndex  OBJECT-TYPE
+    SYNTAX      JuniNextIfIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in juniDsx3ConfigTable.
+
+        A GET of this object returns the next available ifIndex value to be used
+        to create an entry in the associated interface table; or zero, if no
+        valid ifIndex value is available.  This object also returns a value of
+        zero when it is the lexicographic successor of a varbind presented in an
+        SNMP GETNEXT or GETBULK request, for which circumstance it is assumed
+        that ifIndex allocation is unintended.
+
+        Successive GETs will typically return different values, thus avoiding
+        collisions among cooperating management clients seeking to create table
+        entries simultaneously."
+    ::= { juniDs3Objects 2 }
+
+
+--
+-- The DS3 Far End Current
+--
+-- The DS3 Far End current table contains statistics being
+-- collected for the current 15 minute interval.
+--
+juniDsx3FarEndCurrentTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDsx3FarEndCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for DS3/E3 interfaces present in the
+        system."
+    ::= { juniDs3Objects 3 }
+
+juniDsx3FarEndCurrentEntry  OBJECT-TYPE
+    SYNTAX      JuniDsx3FarEndCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an DS3/E3 interface."
+    AUGMENTS  { dsx3FarEndCurrentEntry }
+    ::= { juniDsx3FarEndCurrentTable 1 }
+
+JuniDsx3FarEndCurrentEntry ::= SEQUENCE {
+    juniDsx3FarEndCurrentInvalidSeconds     PerfCurrentCount }
+
+juniDsx3FarEndCurrentInvalidSeconds  OBJECT-TYPE
+    SYNTAX      PerfCurrentCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The counter associated with the number of Invalid Seconds encountered
+        by a DS3/E3 interface in the current 15 minute interval."
+    ::= { juniDsx3FarEndCurrentEntry 1 }
+
+
+--
+-- the DS3 Far End Interval
+-- The DS3 Far End Interval Table contains statistics collected by each DS3
+-- Interface over the previous 24 hours of operation.  The past 24 hours are
+-- broken into 96 completed 15 minute intervals.
+--
+juniDsx3FarEndIntervalTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDsx3FarEndIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for DS3/E3 interfaces present in the
+        system."
+    ::= { juniDs3Objects 4 }
+
+juniDsx3FarEndIntervalEntry  OBJECT-TYPE
+    SYNTAX      JuniDsx3FarEndIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an DS3/E3 interface."
+    AUGMENTS  { dsx3FarEndIntervalEntry }
+    ::= { juniDsx3FarEndIntervalTable 1 }
+
+JuniDsx3FarEndIntervalEntry ::= SEQUENCE {
+    juniDsx3FarEndIntervalInvalidSeconds    PerfIntervalCount }
+
+juniDsx3FarEndIntervalInvalidSeconds  OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The counter associated with the number of Invalid Seconds encountered
+        by a DS3/E3 interface in one of the previous 96 individual 15 minute
+        intervals."
+    ::= { juniDsx3FarEndIntervalEntry 1 }
+
+
+--
+-- the DS3 Far End Total
+-- The DS3 Far End Total Table contains the cumulative sum of the
+-- statistics for the 24 hour period preceding the current interval.
+--
+juniDsx3FarEndTotalTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDsx3FarEndTotalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for DS3/E3 interfaces present in the
+        system."
+    ::= { juniDs3Objects 5 }
+
+juniDsx3FarEndTotalEntry  OBJECT-TYPE
+    SYNTAX      JuniDsx3FarEndTotalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of an DS3/E3 interface."
+    AUGMENTS  { dsx3FarEndTotalEntry }
+    ::= { juniDsx3FarEndTotalTable 1 }
+
+JuniDsx3FarEndTotalEntry ::= SEQUENCE {
+    juniDsx3FarEndTotalInvalidSeconds   PerfTotalCount }
+
+juniDsx3FarEndTotalInvalidSeconds  OBJECT-TYPE
+    SYNTAX      PerfTotalCount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The counter associated with the number of Invalid Seconds encountered
+        by a DS3/E3 interface in the previous 24 hour interval."
+    ::= { juniDsx3FarEndTotalEntry 1 }
+
+
+--
+-- The DS3 Far End Configuration Table
+--
+-- The DS3 Far End Configuration Table contains
+-- configuration information
+-- reported in the C-bits from the remote end.
+
+juniDsx3FarEndConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JuniDsx3FarEndConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for DS3/E3 interfaces present in the
+        system."
+    ::= { juniDs3Objects 6 }
+
+juniDsx3FarEndConfigEntry  OBJECT-TYPE
+    SYNTAX      JuniDsx3FarEndConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the far end configuration characteristics of an
+        DS3/E3 interface."
+    AUGMENTS  { dsx3FarEndConfigEntry }
+    ::= { juniDsx3FarEndConfigTable 1 }
+
+JuniDsx3FarEndConfigEntry ::= SEQUENCE {
+    juniDsx3FarEndPortNumber        DisplayString,
+    juniDsx3FarEndGeneratorNumber   DisplayString,
+    juniDsx3FarEndCarrier           INTEGER }
+
+juniDsx3FarEndPortNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..38))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This code identifies the port number of the Far End DS3.  It is sent
+        within the Idle Signal Message."
+    ::= { juniDsx3FarEndConfigEntry 1 }
+
+juniDsx3FarEndGeneratorNumber  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..38))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This code identifies the Far End DS3 Generator Number.  It is sent
+        within the Test Signal Message."
+    ::= { juniDsx3FarEndConfigEntry 2 }
+
+juniDsx3FarEndCarrier  OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled(0),
+                    enabled(1) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the interface is used in carrier environment.  It is sent
+        with MDL messages."
+    ::= { juniDsx3FarEndConfigEntry 3 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Notifications
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- No notifications are defined in this MIB.  Placeholders follow.
+-- juniDs3TrapControl      OBJECT IDENTIFIER ::= { juniDs3MIB 2 }
+-- juniDs3Traps            OBJECT IDENTIFIER ::= { juniDs3MIB 3 }
+-- juniDs3TrapPrefix       OBJECT IDENTIFIER ::= { juniDs3Traps 0 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Conformance information
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+juniDs3Conformance OBJECT IDENTIFIER ::= { juniDs3MIB 4 }
+juniDs3Compliances OBJECT IDENTIFIER ::= { juniDs3Conformance 1 }
+juniDs3Groups      OBJECT IDENTIFIER ::= { juniDs3Conformance 2 }
+
+--
+-- compliance statements
+--
+juniDs3Compliance  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS3/E3 MIB.  This statement became obsolete when support was added for
+        line type and cell scrambler objects."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs3Group }
+    ::= { juniDs3Compliances 1 }                                   -- JUNOSe 1.0
+
+juniDs3Compliance2  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS3/E3 MIB.  This statement became obsolete when support was added for
+        DSU objects."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs3Group2 }
+    ::= { juniDs3Compliances 2 }                                   -- JUNOSe 1.1
+
+juniDs3Compliance3  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS3/E3 MIB.  This statement became obsolete when support was added for
+        dynamic DS3 interface objects."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs3Group3 }
+    ::= { juniDs3Compliances 3 }                                   -- JUNOSe 2.6
+
+juniDs3Compliance4  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS3/E3 MIB.  This statement became obsolete when far end invalid seconds
+        objects and more configuration objects were added."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs3Group4 }
+    ::= { juniDs3Compliances 4 }                                   -- JUNOSe 3.0
+
+juniDs3Compliance5  MODULE-COMPLIANCE
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete compliance statement for entities which implement the Juniper
+        DS3/E3 MIB.  This statement became obsolete when support was added for
+        far end generator number, port number and carrier."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs3Group5,
+            juniDs3FarEndGroup }
+    ::= { juniDs3Compliances 5 }                                   -- JUNOSe 4.0
+
+juniDs3Compliance6  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Juniper
+        DS3/E3 MIB."
+    MODULE   -- this module
+        MANDATORY-GROUPS {
+            juniDs3Group5,
+            juniDs3FarEndGroup2 }
+    ::= { juniDs3Compliances 6 }                                   -- JUNOSe 4.1
+
+--
+-- units of conformance
+--
+juniDs3Group  OBJECT-GROUP
+    OBJECTS {
+        juniDsx3LineLength }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS3/E3
+        interfaces in a Juniper product.  This group became obsolete when
+        support was added for line type and cell scrambler objects."
+    ::= { juniDs3Groups 1 }
+
+juniDs3Group2  OBJECT-GROUP
+    OBJECTS {
+        juniDsx3LineLength,
+        juniDsx3LineType,
+        juniDsx3CellScramblerConfig }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS3/E3
+        interfaces in a Juniper product.  This group became obsolete when
+        support was added for DSU configuration objects."
+    ::= { juniDs3Groups 2 }
+
+juniDs3Group3  OBJECT-GROUP
+    OBJECTS {
+        juniDsx3LineLength,
+        juniDsx3LineType,
+        juniDsx3CellScramblerConfig,
+        juniDsx3Ds3DsuMode,
+        juniDsx3Ds3BandwidthLimit,
+        juniDsx3Ds3DsuScrambleMode }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS3/E3
+        interfaces in a Juniper product.  This group became obsolete when
+        support was added for dynamic DS3 interface objects."
+    ::= { juniDs3Groups 3 }
+
+juniDs3Group4  OBJECT-GROUP
+    OBJECTS {
+        juniDsx3LineLength,
+        juniDsx3LineType,
+        juniDsx3CellScramblerConfig,
+        juniDsx3Channelization,
+        juniDsx3InterfaceType,
+        juniDsx3Application,
+        juniDsx3Ds3Channel,
+        juniDsx3LowerIfIndex,
+        juniDsx3RowStatus,
+        juniDsx3Ds3DsuMode,
+        juniDsx3Ds3BandwidthLimit,
+        juniDsx3Ds3DsuScrambleMode,
+
+        juniDs3NextIfIndex }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing management of DS3/E3
+        interfaces in a Juniper product.  This group became obsolete when more
+        configuration objects were added."
+    ::= { juniDs3Groups 4 }
+
+juniDs3Group5  OBJECT-GROUP
+    OBJECTS {
+        juniDsx3LineLength,
+        juniDsx3LineType,
+        juniDsx3CellScramblerConfig,
+        juniDsx3Channelization,
+        juniDsx3InterfaceType,
+        juniDsx3Application,
+        juniDsx3Ds3Channel,
+        juniDsx3LowerIfIndex,
+        juniDsx3RowStatus,
+        juniDsx3Ds3DsuMode,
+        juniDsx3Ds3BandwidthLimit,
+        juniDsx3Ds3DsuScrambleMode,
+        juniDsx3MdlCarrier,
+        juniDsx3MdlTransmit,
+        juniDsx3MdlEic,
+        juniDsx3MdlLic,
+        juniDsx3MdlFic,
+        juniDsx3MdlUnit,
+        juniDsx3MdlPfi,
+        juniDsx3MdlPort,
+        juniDsx3MdlGenerator,
+
+        juniDs3NextIfIndex }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing management of DS3/E3 interfaces in a
+        Juniper product."
+    ::= { juniDs3Groups 5 }
+
+juniDs3FarEndGroup  OBJECT-GROUP
+    OBJECTS {
+        juniDsx3FarEndCurrentInvalidSeconds,
+        juniDsx3FarEndIntervalInvalidSeconds,
+        juniDsx3FarEndTotalInvalidSeconds }
+    STATUS      obsolete
+    DESCRIPTION
+        "Obsolete collection of objects providing remote statistics information
+        applicable to DS3 interfaces in a Juniper product.  This group became
+        obsolete when remote port number, generator number and carrier objects
+        were added."
+    ::= { juniDs3Groups 6 }
+
+juniDs3FarEndGroup2  OBJECT-GROUP
+    OBJECTS {
+        juniDsx3FarEndCurrentInvalidSeconds,
+        juniDsx3FarEndIntervalInvalidSeconds,
+        juniDsx3FarEndTotalInvalidSeconds,
+        juniDsx3FarEndPortNumber,
+        juniDsx3FarEndGeneratorNumber,
+        juniDsx3FarEndCarrier }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects providing remote statistics information
+        applicable to DS3 interfaces in a Juniper product."
+    ::= { juniDs3Groups 7 }
+
+END

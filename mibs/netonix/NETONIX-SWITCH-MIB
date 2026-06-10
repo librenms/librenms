@@ -1,0 +1,242 @@
+NETONIX-SWITCH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises FROM SNMPv2-SMI 
+    OBJECT-GROUP, MODULE-COMPLIANCE FROM SNMPv2-CONF
+    snmpMIBGroups FROM SNMPv2-MIB
+    DisplayString,TEXTUAL-CONVENTION FROM SNMPv2-TC;
+
+netonixSwitch MODULE-IDENTITY
+     LAST-UPDATED "9803231800Z"
+     ORGANIZATION "Netonix"
+     CONTACT-INFO "eric@netonix.com"
+     DESCRIPTION "The MIB Module for Netonix Switches."
+     REVISION "9803231800Z"
+     DESCRIPTION "The MIB Module for Netonix Switches."
+    ::= { enterprises 46242 }
+
+netonixSwitchGroup OBJECT-GROUP
+    OBJECTS { firmwareVersion,
+	fanSpeed,
+	tempDescription,
+	temp,
+	voltageDescription,
+	voltage,
+	poeStatus,
+	totalPowerConsumption,
+	dcdcInputCurrent,
+	dcdcEfficiency
+    }
+    STATUS  current
+    DESCRIPTION "A collection of objects providing basic instrumentation and control of an SNMPv2 entity."
+    ::= { snmpMIBGroups 8 }
+
+netonixSwitchConformance OBJECT IDENTIFIER ::= { netonixSwitch 99 }
+netonixSwitchGroups      OBJECT IDENTIFIER ::= { netonixSwitchConformance 1 }
+netonixSwitchCompliances OBJECT IDENTIFIER ::= { netonixSwitchConformance 2 }
+
+netonixSwitchCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION "The compliance statement for switches which implement the Netonix Switch MIB."
+    MODULE MANDATORY-GROUPS { netonixSwitchGroup }
+    ::= { netonixSwitchCompliances 1 }
+
+VoltageTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION  "A voltage with 2 decimal places"
+    SYNTAX       Integer32
+
+PowerTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "Power consumption in watts with 1 decimal place"
+    SYNTAX       Integer32
+
+CurrentTC ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION  "Current in amps with 1 decimal place"
+    SYNTAX       Integer32
+
+firmwareVersion OBJECT-TYPE
+     SYNTAX     DisplayString (SIZE (0..255))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "The version of the firmware running on the switch"
+     ::= { netonixSwitch 1 }
+
+totalPowerConsumption OBJECT-TYPE
+     SYNTAX	PowerTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "Total power being consumed by the switch, in Watts"
+     ::= { netonixSwitch 6 }
+
+dcdcInputCurrent OBJECT-TYPE
+     SYNTAX	CurrentTC
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "DCDC Input Current in amps"
+     ::= { netonixSwitch 7 }
+
+dcdcEfficiency OBJECT-TYPE
+     SYNTAX	Integer32
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "DCDC power supply efficiency, percentage"
+     ::= { netonixSwitch 8 }
+
+fanTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF FanEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Fan watching information."
+    ::= { netonixSwitch 2 }
+
+fanEntry OBJECT-TYPE
+    SYNTAX     FanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "An entry containing a disk and its statistics."
+    INDEX      { fanIndex }
+    ::= { fanTable  1 }
+
+FanEntry ::= SEQUENCE {
+    fanIndex		Integer32,
+    fanSpeed		Integer32
+}
+
+fanIndex OBJECT-TYPE
+    SYNTAX	Integer32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Integer reference number (row number) for the fan mib."
+    ::= { fanEntry 1 }
+
+fanSpeed OBJECT-TYPE
+    SYNTAX	Integer32 (0..65535)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION "Integer reference number (row number) for the fan mib."
+    ::= { fanEntry 2 }
+
+poeStatusTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF PoEStatusEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "PoE Status per port."
+    ::= { netonixSwitch 5 }
+
+poeStatusEntry OBJECT-TYPE
+    SYNTAX     PoEStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "An entry containing poe status."
+    INDEX      { poeStatusIndex }
+    ::= { poeStatusTable  1 }
+
+PoEStatusEntry ::= SEQUENCE {
+    poeStatusIndex		Integer32,
+    poeStatus		DisplayString
+}
+
+poeStatusIndex OBJECT-TYPE
+    SYNTAX	Integer32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Integer reference number (row number) for the poe status."
+    ::= { poeStatusEntry 1 }
+
+poeStatus OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION "poe status."
+    ::= { poeStatusEntry 2 }
+
+tempTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF TempEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Temperature watching information."
+    ::= { netonixSwitch 3 }
+
+tempEntry OBJECT-TYPE
+    SYNTAX     TempEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "An entry containing a temperature sensor."
+    INDEX      { tempIndex }
+    ::= { tempTable  1 }
+
+TempEntry ::= SEQUENCE {
+    tempIndex		Integer32,
+    tempDescription           DisplayString,
+    temp     		Integer32
+}
+
+tempIndex OBJECT-TYPE
+    SYNTAX	Integer32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Integer reference number (row number) for the temp mib."
+    ::= { tempEntry 1 }
+
+tempDescription OBJECT-TYPE
+     SYNTAX     DisplayString (SIZE (0..255))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "Description of this temperature sensor"
+     ::= { tempEntry 2 }
+
+temp OBJECT-TYPE
+    SYNTAX	Integer32 (0..65535)
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION "The current temperature for this sensor"
+    ::= { tempEntry 3 }
+
+voltageTable OBJECT-TYPE
+    SYNTAX	SEQUENCE OF VoltageEntry
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Voltage watching information."
+    ::= { netonixSwitch 4 }
+
+voltageEntry OBJECT-TYPE
+    SYNTAX     VoltageEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION "An entry containing a voltage sensor."
+    INDEX      { voltageIndex }
+    ::= { voltageTable  1 }
+
+VoltageEntry ::= SEQUENCE {
+    voltageIndex		Integer32,
+    voltageDescription           DisplayString,
+    voltage     		VoltageTC
+}
+
+voltageIndex OBJECT-TYPE
+    SYNTAX	Integer32 (0..65535)
+    MAX-ACCESS	not-accessible
+    STATUS	current
+    DESCRIPTION "Integer reference number (row number) for the voltage mib."
+    ::= { voltageEntry 1 }
+
+voltageDescription OBJECT-TYPE
+     SYNTAX     DisplayString (SIZE (0..255))
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION "Description of this voltage sensor"
+     ::= { voltageEntry 2 }
+
+voltage OBJECT-TYPE
+    SYNTAX	VoltageTC
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION "The current voltage for this sensor"
+    ::= { voltageEntry 3 }
+
+END

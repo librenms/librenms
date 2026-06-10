@@ -1,0 +1,1443 @@
+TROPIC-ACCESSPORT-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      IpAddress,
+      Unsigned32, Integer32,
+      TimeTicks                               FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      MacAddress, TruthValue                  FROM SNMPv2-TC
+      InterfaceIndex,
+      ifIndex,
+      ifEntry,
+      InterfaceIndexOrZero                    FROM IF-MIB
+      TropicOperationalCapabilityType,
+      TropicStateQualifierType,
+      TropicLEDColorType,
+      TropicLEDStateType,
+      TnCommand, AluWdmTnIfType,
+      AluWdmFecMode                           FROM TROPIC-TC
+      tnPortModules, tnAccessPortMIB          FROM TROPIC-GLOBAL-REG;
+
+  tnAccessPortMibModules MODULE-IDENTITY
+      LAST-UPDATED    "202207081200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "DWDM system port MIB attributes."
+
+      REVISION    "202207081200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortSummaryStatusLEDColor
+                   tnAccessPortSummaryStatusLEDState."
+
+      REVISION    "202112031200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortFacilityDesCustLifeCycleState."
+
+      REVISION    "202012111200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   tengigelaneth2g5ce(95)."
+
+      REVISION    "202011271200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortModuleReset."
+
+      REVISION    "202005011200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   cpri4(94),      -- cpri4."
+
+      REVISION    "202004031200Z"
+      DESCRIPTION "1) Added the following to tnAccessPortTable:
+                      tnAccessPortAlienWavebank.
+                   2) Added the following to tnIfSupportedTypes:
+                      equipment(93)."
+
+      REVISION    "202003271200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortRole
+                   tnAccessPortFacilityDescriptorName
+                   tnAccessPortFacilityDescriptorDesc
+                   tnAccessPortFacilityDescriptorCirId."
+
+      REVISION    "202003201200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortAseMode."
+
+      REVISION    "202002281200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   fc32g(91),
+                   otuc4mld(92)."
+
+      REVISION    "202002211200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortCpriRole."
+
+      REVISION    "202001241200Z"
+      DESCRIPTION "1) Changed SYNTAX of the following from OCTET STRING to
+                      OCTET STRING (SIZE(1..40)):
+                      tnAccessPortAlmProfName
+                      tnIfAlmProfName.
+                   2) Marked the following in tnAccessPortCpriMappingType as
+                      obsolete:
+                      tunneling(1)
+                      to
+                      nomapping(4).
+                   3) Added the following to tnAccessPortCpriMappingType:
+                      tunneling(6),
+                      to
+                      nomapping(10).
+                   4) Changed DESCRIPTION and DEFVAL of the following:
+                      tnAccessPortCpriMappingType."
+
+      REVISION    "201912271200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   cauiV2(90)."
+
+      REVISION    "201910181200Z"
+      DESCRIPTION "1) Added the following to tnAccessPortCpriMappingType:
+                      nomapping(4).
+                   2) Updated description for the following:
+                      tnAccessPortFecBypassInd
+                      tnAccessPortFecType.
+                   3) Added the following to tnIfSupportedTypes:
+                      cpri3(81)
+                      to
+                      tfgige(89)."
+
+      REVISION    "201909061200Z"
+      DESCRIPTION "Added the following to tnIfTable:
+                   tnIfAlmProfName."
+
+      REVISION    "201908091200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   fourHundredGige(80)."
+
+      REVISION    "201905171200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortFecBypassInd."
+
+      REVISION    "201903081200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortCpriMappingType
+                   tnAccessPortFecType."
+
+      REVISION    "201901111200Z"
+      DESCRIPTION "Renamed the following in tnIfSupportedTypes from
+                   otsig(79)
+                   to
+                   otsi(79)."
+
+      REVISION    "201811021200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otsig(79)."
+
+      REVISION    "201808031200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otu4x2waneth(78)."
+
+      REVISION    "201807201200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   twentyFiveGbeLaneth(77)."
+
+      REVISION    "201806081200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otu2eNimEth(76)."
+
+      REVISION    "201805111200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   feed(75)."
+
+      REVISION    "201804201200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   ilkpif(74)."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201801051200Z"
+      DESCRIPTION "Added the following to tnIfTable:
+                   tnIfnumofTimeSlots."
+
+      REVISION    "201712291200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   ethman(73)."
+
+      REVISION    "201710061200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortDirectionCapability."
+
+      REVISION    "201704071200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   gigelaneth(71)
+                   felaneth(72)."
+
+      REVISION    "201701131200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable :
+                   tnAccessPortL2FarEndIfIndex
+                   tnAccessPortL2FarEndMacAddress."
+
+      REVISION    "201612281200Z"
+      DESCRIPTION " Added the following to tnIfSupportedTypes:
+                    otu2eeth(70)."
+
+      REVISION    "201611221200Z"
+      DESCRIPTION " Added the following to tnIfSupportedTypes:
+                    gigeConv(69)."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION "1) Changed syntax of the following from Unsigned32
+                      to TimeTicks:
+                      tnAccessFilterRecordTime
+                      tnAccessFilterCalibrateTime
+                      tnAccessFilterScheduledTime
+                   2) Added the following to tnIfSupportedTypes:
+                      hundredGigeLaneth(68)
+                   3) Updated the contact info."
+
+      REVISION    "201610191200Z"
+      DESCRIPTION "1) Added the following to tnAccessPortTable:
+                      tnAccessFilterAmbientTemperature
+                      tnAccessFilterPressure
+                      tnAccessFilterRecorded
+                      tnAccessFilterCalibrated
+                      tnAccessFilterAltitude
+                      tnAccessFilterRecordTime.
+                   2) Added the following from tnAccessPortTable:
+                      tnAccessFilterCalibrateTime
+                      tnAccessFilterScheduledTime."
+
+      REVISION    "201608241200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otu2ewaneth(65),
+                   otu4waneth(66),
+                   tengigelaneth(67)."
+
+      REVISION    "201605111200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   xfi(63),
+                   caui(64)."
+
+      REVISION    "201510051200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortmfcTemperature,
+                   tnAccessPortmfcNominalPressure,
+                   tnAccessPortmfcDifferentialPressure."
+
+      REVISION    "201509281200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   sensor(62)."
+
+      REVISION    "201507031200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otu4x4(59),
+                   otu4Half(60),
+                   otu4Halfx5(61)."
+
+      REVISION    "201505181200Z"
+      DESCRIPTION "Added the following to tnAccessPortFarEndType
+                   and tnAccessPortFarEndTypeConnFrom:
+                   cluster(6)."
+
+      REVISION    "201505151200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortAlmProfName."
+
+      REVISION    "201501221200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortMonOcmConnAddress."
+
+      REVISION    "201411241200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   interLaken(57),
+                   otl410(58)."
+
+      REVISION    "201405181200Z"
+      DESCRIPTION "Added tnAccessPortIsMpo to tnAccessPortTable."
+
+      REVISION    "201403181200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortHasMpoConnector
+                   tnAccessPortMpoConnectorPortOutIfIndex
+                   tnAccessPortMpoConnectorPortInIfIndex."
+
+      REVISION    "201402261200Z"
+      DESCRIPTION "1) Updated range and DEFVAL of tnAccessPortWtDomainNumber.
+                   2) Added DEFVAL to attributes."
+
+      REVISION    "201306131200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otu1f(54),
+                   cbr10g3(55),
+                   fortyGigeMLD(56)."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otu4x2(53)."
+
+      REVISION    "201304121200Z"
+      DESCRIPTION "1) Added the following to tnAccessPortTable:
+                      tnAccessPortWtDomainNumber.
+                   2) Marked the following as obsolete:
+                      tnAccessPortEvents."
+
+      REVISION    "201303151200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   oneTru(52)."
+
+      REVISION    "201212171200Z"
+      DESCRIPTION "Changed SYNTAX of the following from InterfaceIndex
+                   to InterfaceIndexOrZero:
+                   tnAccessPortFarEndIfIndex
+                   tnAccessPortFarEndIfIndexConnFrom
+                   tnAccessPortWtocmConnAddress
+                   tnAccessPortOppDirectionPortAddress."
+
+      REVISION    "201209271200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortIsValidInternalOTSXcEndpoint."
+
+      REVISION    "201209061200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   fc16g(49),
+                   to
+                   bits(51)."
+
+      REVISION    "201208061200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   tod(46),
+                   to
+                   otl44(48)."
+
+      REVISION    "201204251200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   sdr(44),
+                   ddr(45)."
+
+      REVISION    "201202281200Z"
+      DESCRIPTION "Renamed the following in tnAccessPortFarEndType and
+                   tnAccessPortFarEndTypeConnFrom from
+                   ocs(5)
+                   to
+                   interCompound(5)."
+
+      REVISION    "201111161200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   dcn(36),
+                   to
+                   fortyGige(43)."
+
+      REVISION    "201109301200Z"
+      DESCRIPTION "1) Marked opticalSplitter(4) in tnAccessPortFarEndType
+                      as obsolete.
+                   2) Added the following enum to tnAccessPortFarEndType
+                      and tnAccessPortFarEndTypeConnFrom:
+                      ocs(5)."
+
+      REVISION    "201010191200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   sdi3g(35)."
+
+      REVISION    "201009201200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortOppDirectionPortAddress."
+
+      REVISION    "201006281200Z"
+      DESCRIPTION "Updated tnAccessPortWtocmConnLoss with range of 0
+                   to 1500 and default value to 0."
+
+      REVISION    "201006041200Z"
+      DESCRIPTION "1) Added the following to tnAccessPortTable:
+                      tnAccessPortWtocmConnAddress.
+                   2) Added the following to tnIfSupportedTypes:
+                      e1(34)."
+
+      REVISION    "201005101200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortWtocmConnLoss."
+
+      REVISION    "201001151200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   sdsdi(33)."
+
+      REVISION    "201001041200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes.
+                   otu4(30),
+                   fc8g(31),
+                   hundredGige(32)."
+
+      REVISION    "200911011200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   oc768(28),
+                   stm256(29)."
+
+      REVISION    "200907101200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortExtAmpIpAddressIn
+                   tnAccessPortExtAmpIpAddressOut."
+
+      REVISION    "200907081200Z"
+      DESCRIPTION "Updated description for AINS MIB attributes."
+
+      REVISION    "200906071200Z"
+      DESCRIPTION "Removed eVoa from tnIfSupportedTypes and renumbered
+                   list."
+
+      REVISION    "200903311200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   otu3(27),
+                   oc768(28)."
+
+      REVISION    "200903221200Z"
+      DESCRIPTION "Used AluWdmTnIfType common enum in TROPIC-TC."
+
+      REVISION    "200903101200Z"
+      DESCRIPTION "Added the following to tnIfSupportedTypes:
+                   anyRate(20),
+                   fddi(23),
+                   esCon(24),
+                   dvbAsi(25),
+                   dvi6000(26)."
+
+      REVISION    "200903031200Z"
+      DESCRIPTION "1) Marked opticalSplitter(4) as deprecated.
+                   2) Added the following to tnAccessPortTable:
+                      tnAccessPortFarEndAddressConnFrom
+                      tnAccessPortFarEndIfIndexConnFrom
+                      tnAccessPortFarEndTypeConnFrom.
+                   3) Added the following to tnIfSupportedTypes:
+                      hdSdi(21),
+                      fe(22)."
+
+      REVISION    "200902111200Z"
+      DESCRIPTION "Added the following to tnAccessPortTable:
+                   tnAccessPortIsDomainEdgePort."
+
+      REVISION    "200803201200Z"
+      DESCRIPTION "1) Removed tnIfType and tnIfSupportedTypes values
+                      fc100, fc200 and fc400.
+                   2) Added the following to tnIfSupportedTypes:
+                      fc4g(16)."
+
+      REVISION    "200803101200Z"
+      DESCRIPTION "1) Updated the MIB file description.
+                   2) Added the following values to tnIfType and
+                      tnIfSupportedTypes: fc10g, fc100, fc200, fc400,
+                      cbr2g5, cbr10g."
+
+      ::= { tnPortModules 1}
+
+  tnAccessPortConf        OBJECT IDENTIFIER ::= { tnAccessPortMIB  1 }
+  tnAccessPortGroups      OBJECT IDENTIFIER ::= { tnAccessPortConf 1 }
+  tnAccessPortCompliances OBJECT IDENTIFIER ::= { tnAccessPortConf 2 }
+  tnAccessPortObjs        OBJECT IDENTIFIER ::= { tnAccessPortMIB  2 }
+  tnAccessPortScalarObjs  OBJECT IDENTIFIER ::= { tnAccessPortObjs 3 }
+  tnSysTopology           OBJECT IDENTIFIER ::= { tnAccessPortScalarObjs 1 }
+--  obsolete
+--  tnAccessPortEvents      OBJECT IDENTIFIER ::= { tnAccessPortMIB  3 }
+
+---------------------------------------------------------------
+-- Textual Conventions
+---------------------------------------------------------------
+
+---------------------------------------------------------------
+-- Access Port Table
+---------------------------------------------------------------
+    tnAccessPortTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnAccessPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The 1696R/1830 NE port table."
+        ::= { tnAccessPortObjs 1 }
+
+    tnAccessPortEntry OBJECT-TYPE
+        SYNTAX         TnAccessPortEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The ports on a card."
+        INDEX { ifIndex }
+        ::= { tnAccessPortTable 1 }
+
+    TnAccessPortEntry ::= SEQUENCE {
+        tnAccessPortDescr                             SnmpAdminString,
+        tnAccessPortStatusLEDColor                    TropicLEDColorType,
+        tnAccessPortStatusLEDState                    TropicLEDStateType,
+        tnAccessPortOperationalCapability             TropicOperationalCapabilityType,
+        tnAccessPortStateQualifier                    TropicStateQualifierType,
+        tnAccessPortFarEndAddress                     SnmpAdminString,
+        tnAccessPortFarEndIfIndex                     InterfaceIndexOrZero,
+        tnAccessPortFarEndType                        INTEGER,
+        tnAccessPortDirection                         INTEGER,
+        tnAccessPortAINS                              TruthValue,
+        tnAccessPortAINSDebounceTime                  Integer32,
+        tnAccessPortUsingSysAINSDebounceTime          TruthValue,
+        tnAccessPortAINSDebounceTimeRemaining         Unsigned32,
+        tnAccessPortIsDomainEdgePort                  TruthValue,
+        tnAccessPortFarEndAddressConnFrom             SnmpAdminString,
+        tnAccessPortFarEndIfIndexConnFrom             InterfaceIndexOrZero,
+        tnAccessPortFarEndTypeConnFrom                INTEGER,
+        tnAccessPortExtAmpIpAddressIn                 IpAddress,
+        tnAccessPortExtAmpIpAddressOut                IpAddress,
+        tnAccessPortWtocmConnLoss                     Integer32,
+        tnAccessPortWtocmConnAddress                  InterfaceIndexOrZero,
+        tnAccessPortOppDirectionPortAddress           InterfaceIndexOrZero,
+        tnAccessPortIsValidInternalOTSXcEndpoint      TruthValue,
+        tnAccessPortWtDomainNumber                    Integer32,
+        tnAccessPortHasMpoConnector                   TruthValue,
+        tnAccessPortMpoConnectorPortOutIfIndex        InterfaceIndexOrZero,
+        tnAccessPortMpoConnectorPortInIfIndex         InterfaceIndexOrZero,
+        tnAccessPortIsMpo                             TruthValue,
+        tnAccessPortMonOcmConnAddress                 InterfaceIndexOrZero,
+        tnAccessPortAlmProfName                       OCTET STRING,
+        tnAccessPortmfcTemperature                    Integer32,
+        tnAccessPortmfcNominalPressure                Integer32,
+        tnAccessPortmfcDifferentialPressure           Integer32,
+        tnAccessFilterAmbientTemperature              Integer32,
+        tnAccessFilterPressure                        Integer32,
+        tnAccessFilterRecorded                        Integer32,
+        tnAccessFilterCalibrated                      Integer32,
+        tnAccessFilterAltitude                        Integer32,
+        tnAccessFilterRecordTime                      TimeTicks,
+        tnAccessFilterCalibrateTime                   TimeTicks,
+        tnAccessFilterScheduledTime                   TimeTicks,
+        tnAccessPortL2FarEndIfIndex                   InterfaceIndexOrZero,
+        tnAccessPortL2FarEndMacAddress                MacAddress,
+        tnAccessPortDirectionCapability               INTEGER,
+        tnAccessPortCpriMappingType                   INTEGER,
+        tnAccessPortFecType                           AluWdmFecMode,
+        tnAccessPortFecBypassInd                      TruthValue,
+        tnAccessPortCpriRole                          INTEGER,
+        tnAccessPortAseMode                           INTEGER,
+        tnAccessPortRole                              INTEGER,
+        tnAccessPortFacilityDescriptorName            SnmpAdminString,
+        tnAccessPortFacilityDescriptorDesc            SnmpAdminString,
+        tnAccessPortFacilityDescriptorCirId           SnmpAdminString,
+        tnAccessPortAlienWavebank                     TruthValue,
+        tnAccessPortModuleReset                       INTEGER,
+        tnAccessPortFacilityDesCustLifeCycleState     SnmpAdminString,
+        tnAccessPortSummaryStatusLEDColor             INTEGER,
+        tnAccessPortSummaryStatusLEDState             INTEGER
+    }
+
+    tnAccessPortDescr OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port description."
+        DEFVAL         { "" }
+        ::= { tnAccessPortEntry 1 }
+
+    tnAccessPortStatusLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the status LED."
+        ::= { tnAccessPortEntry 2 }
+
+    tnAccessPortStatusLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the status LED."
+        ::= { tnAccessPortEntry 3 }
+
+    tnAccessPortOperationalCapability OBJECT-TYPE
+        SYNTAX         TropicOperationalCapabilityType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { disabled }
+        ::= { tnAccessPortEntry 4 }
+
+    tnAccessPortStateQualifier OBJECT-TYPE
+        SYNTAX         TropicStateQualifierType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { {} }
+        ::= { tnAccessPortEntry 5 }
+
+    tnAccessPortFarEndAddress OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port far end address."
+        DEFVAL         { "" }
+        ::= { tnAccessPortEntry 6 }
+
+    tnAccessPortFarEndIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port far end interface index."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 7 }
+
+    tnAccessPortFarEndType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notConnected(1),
+                         internal(2),
+                         external(3),
+--                         obsolete
+--                         opticalSplitter(4),
+                         interCompound(5),
+                         cluster(6)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port far end type."
+        DEFVAL         { notConnected }
+        ::= { tnAccessPortEntry 8 }
+
+    tnAccessPortDirection OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         bidirectional(1),
+                         unidirectionalTx(2),
+                         unidirectionalRx(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port direction.  Setting the direction
+                        to unidirectionalRx will turn off the Tx laser,
+                        and suppress Tx alarms (including out Wavelength
+                        Tracker alarms).  Setting the direction to
+                        unidirectionalTx will suppress Rx alarms
+                        (including in Wavelength Tracker alarms)."
+        DEFVAL         { bidirectional }
+        ::= { tnAccessPortEntry 9 }
+
+    tnAccessPortAINS OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "If the user has set Port AINS to true, the port
+                        admin state is set to up by the system.
+
+                        If the port admin state has been set up or down,
+                        Port AINS is set to false by the system, unless
+                        the user had specified admin up and Port AINS
+                        true.
+
+                        Disabling Port AINS against a client port of an
+                        OT card may result in disabling Port AINS against
+                        the line port of that OT card."
+        DEFVAL         { false }
+        ::= { tnAccessPortEntry 10 }
+
+    tnAccessPortAINSDebounceTime OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "seconds"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "This attribute must be set in multiples of 60s.
+                        It is equal to System AINS Debounce Time when
+                        Port AINS Use System Default is true.  Setting
+                        the Port AINS Debounce Time and Port AINS Use
+                        System Default to true in the same set request
+                        is restricted.
+
+                        Current configurable range: 1m to 96h 0m."
+        DEFVAL         { -1 }
+        ::= { tnAccessPortEntry 11 }
+
+    tnAccessPortUsingSysAINSDebounceTime OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Using System AINS Debounce Time.  Sets with a
+                        value of false are restricted.  The network
+                        operator must set Port AINS Debounce Time to
+                        some valid value to disable the use of System
+                        AINS Debounce Time.  Setting the Port AINS
+                        Debounce Time and Port AINS Use System Default
+                        to true in the same set request is restricted."
+        ::= { tnAccessPortEntry 12 }
+
+    tnAccessPortAINSDebounceTimeRemaining OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "seconds"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Number of seconds until the Port AINS DebounceTime
+                        expires.  If Port AINS is false or Port AINS
+                        Debounce Time is 0, the value of this attribute
+                        will be 0."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 13 }
+
+    tnAccessPortIsDomainEdgePort OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "For discriminating between ports that are internal
+                        to a network composed of 1830 and 1696R network
+                        elements and the ports that are at the edge of the
+                        network so that the user knows where it is correct
+                        to terminate end-to-end connections."
+        DEFVAL         { true }
+        ::= { tnAccessPortEntry 14 }
+
+    tnAccessPortFarEndAddressConnFrom OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..64))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port far end address that points to this
+                        port."
+        DEFVAL         { "" }
+        ::= { tnAccessPortEntry 15 }
+
+    tnAccessPortFarEndIfIndexConnFrom OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port far end interface that points to
+                        this port."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 16 }
+
+    tnAccessPortFarEndTypeConnFrom OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notConnected(1),
+                         internal(2),
+                         external(3),
+                         interCompound(5),  -- to be consistent with tnAccessPortFarEndType
+                         cluster(6)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Access port far end type."
+        DEFVAL         { notConnected }
+        ::= { tnAccessPortEntry 17 }
+
+    tnAccessPortExtAmpIpAddressIn OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The IP address of an external amplifier
+                        connected to this port.  This attribute is
+                        applicable to the line port of an LD card
+                        and is reserved for use with a RAMAN module."
+        DEFVAL         { '00000000'H }
+        ::= { tnAccessPortEntry 18 }
+
+    tnAccessPortExtAmpIpAddressOut OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The IP address of an external amplifier
+                        connected from this port.  This attribute is
+                        applicable to the line port of an LD card
+                        and is reserved for use with an EDFA module."
+        DEFVAL         { '00000000'H }
+        ::= { tnAccessPortEntry 19 }
+
+    tnAccessPortWtocmConnLoss OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "mB"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The insertion loss between the LD card MON port
+                        and the WTOCM input port.
+
+                        Current configurable range: 0 to 1500."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 20 }
+
+    tnAccessPortWtocmConnAddress OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "LD card port connected to WTOCM input port in
+                        transmit direction."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 21 }
+
+    tnAccessPortOppDirectionPortAddress OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Address of opposite direction port when the TX
+                        and RX directions are split between two ports."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 22 }
+
+    tnAccessPortIsValidInternalOTSXcEndpoint OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates if this is an end point of internal
+                        OT cross connect."
+        DEFVAL         { false }
+        ::= { tnAccessPortEntry 23 }
+
+    tnAccessPortWtDomainNumber OBJECT-TYPE
+        SYNTAX         Integer32 (-1..19)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The numbered domain used for WT key selection
+                        for add XCs to this port; applies to external
+                        line facing ports.
+
+                        Current configurable range: -1 to 19."
+        DEFVAL         { -1 }
+        ::= { tnAccessPortEntry 24 }
+
+    tnAccessPortHasMpoConnector OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates if the logical port underlies a
+                        multi-fiber connector."
+        ::= { tnAccessPortEntry 25 }
+
+    tnAccessPortMpoConnectorPortOutIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Provides the shelf/slot/port of the multi-fiber
+                        connector interface corresponding to this
+                        logical port in the out direction.  Value of 0
+                        indicates no MPO port."
+        ::= { tnAccessPortEntry 26 }
+
+    tnAccessPortMpoConnectorPortInIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Provides the shelf/slot/port of the multi-fiber
+                        connector interface corresponding to this
+                        logical port in the in direction.  Value of 0
+                        indicates no MPO port."
+        ::= { tnAccessPortEntry 27 }
+
+    tnAccessPortIsMpo  OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates if the port is itself a MPO port.
+                        Retrievable through SNMP for all ports,
+                        managed and MPO.
+
+                        True: The port is the port for the MPO
+                        connector.
+                        False: The port is not a port for a MPO
+                        connector, it is a managed port."
+        ::= { tnAccessPortEntry 28 }
+
+    tnAccessPortMonOcmConnAddress OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Port monitored by input or connected from output."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 29 }
+
+    tnAccessPortAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortEntry 30 }
+
+    tnAccessPortmfcTemperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The Ambient temperature applies to the
+                        sensor port of the MultiFunctional card."
+        ::= { tnAccessPortEntry 31 }
+
+    tnAccessPortmfcNominalPressure OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The nominal pressure applies to the
+                        sensor port of the MultiFunctional card."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 32 }
+
+    tnAccessPortmfcDifferentialPressure OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The differential pressure applies to the
+                        sensor port of the MultiFunctional card."
+        DEFVAL         { 0 }
+        ::= { tnAccessPortEntry 33 }
+
+    tnAccessFilterAmbientTemperature OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Celsius"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current Ambient Temperature."
+        ::= { tnAccessPortEntry 34 }
+
+    tnAccessFilterPressure OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Pa"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Current Pressure Value."
+        ::= { tnAccessPortEntry 35 }
+
+    tnAccessFilterRecorded OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Pa"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Recorded calibration on clean filter."
+        ::= { tnAccessPortEntry 36 }
+
+    tnAccessFilterCalibrated OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "Pa"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Recent filter calibration value."
+        ::= { tnAccessPortEntry 37 }
+
+    tnAccessFilterAltitude OBJECT-TYPE
+        SYNTAX         Integer32
+        UNITS          "kilometers"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Altitude used in above calibration."
+        ::= { tnAccessPortEntry 38 }
+
+    tnAccessFilterRecordTime OBJECT-TYPE
+        SYNTAX         TimeTicks
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Recorded calibration time."
+        ::= { tnAccessPortEntry 39 }
+
+    tnAccessFilterCalibrateTime OBJECT-TYPE
+        SYNTAX         TimeTicks
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Recent calibration time."
+        ::= { tnAccessPortEntry 40 }
+
+    tnAccessFilterScheduledTime OBJECT-TYPE
+        SYNTAX         TimeTicks
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Next scheduled time for calibration."
+        ::= { tnAccessPortEntry 41 }
+
+    tnAccessPortL2FarEndIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndexOrZero
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Access port Layer 2 far end interface index."
+        ::= { tnAccessPortEntry 42 }
+
+    tnAccessPortL2FarEndMacAddress OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Access port Layer 2 far end MAC address."
+        ::= { tnAccessPortEntry 43 }
+
+    tnAccessPortDirectionCapability OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notInstalled(0),
+                         singleBidi(1),
+                         dualBidi(2),
+                         rxOnly(3),
+                         txOnly(4),
+                         rxAndTx(5)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Access port direction capabilities."
+        ::= { tnAccessPortEntry 44 }
+
+     tnAccessPortCpriMappingType OBJECT-TYPE
+        SYNTAX         INTEGER {
+--                         obsolete
+--                         tunneling(1),
+--                         structure-agnostic(2),
+--                         structure-aware(3),
+--                         nomapping(4)
+                         tunneling(6),
+                         linecodeAware(7),
+                         structureAware(8),
+                         structureAwareControl(9),
+                         nomapping(10)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the mapping type to map CPRI signals into
+                        Ethernet packets.
+                          tunneling             - map CPRI 10B or 66B line codes
+                                                  are encapsulted into  RoE packets.
+                          structureAware        - map CPRI basic frames in 8B or
+                                                  64B  symbols removing the line
+                                                  coding and (if any) scrambling
+                                                  and FEC, are encapsulated into
+                                                  RoE packets.
+                          structureAwareControl - map CPRI/OBSAI AxC and Control
+                                                  signals are extracted and
+                                                  excapsulated into separate flows
+                                                  of RoE packets."
+        DEFVAL         { tunneling }
+       ::= { tnAccessPortEntry 45 }
+
+    tnAccessPortFecType OBJECT-TYPE
+        SYNTAX         AluWdmFecMode
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the Forward Error Correction type on the
+                        interface port. Enter this keyword without option to
+                        display the current value. fectype = rsfec is allowed
+                        only for 25gbe, 100gbe, CPRI-8, CPRI-10 with 64B/66B
+                        line coding."
+        DEFVAL         { 1 }
+       ::= { tnAccessPortEntry 46 }
+
+    tnAccessPortFecBypassInd OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Parameter FecBypassInd (FEC Bypass Indication) determines
+                        whether the corresponding option as defined in IEEE 802.3
+                        is set or not.
+                        If enabled, this implies:
+                          - dHISER defect detection based on the number of RS-FEC
+                            symbol errors is enabled
+                          - LFI is inserted as a consequent action if dHISER is
+                            present.
+                        If fectype=nofec is provisioned then this parameter has
+                        no effect/impact.  It is applied for 25gbe, 100gbe, CPRI-8,
+                        CPRI-10 with 64B/66B line coding."
+        DEFVAL         { false }
+        ::= { tnAccessPortEntry 47 }
+
+    tnAccessPortCpriRole OBJECT-TYPE
+        SYNTAX         INTEGER{
+                         master(1),
+                         slave(2),
+                         none(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The master/slave role for CPRI interface."
+        ::= { tnAccessPortEntry 48 }
+
+    tnAccessPortAseMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         unconfigured(1),
+                         noNoise(2),
+                         low(3),
+                         standard(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { unconfigured }
+        ::= { tnAccessPortEntry 49 }
+
+    tnAccessPortRole OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         undetermined(1),
+                         in(2),
+                         out(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortEntry 50 }
+
+    tnAccessPortFacilityDescriptorName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortEntry 51 }
+
+    tnAccessPortFacilityDescriptorDesc OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortEntry 52 }
+
+    tnAccessPortFacilityDescriptorCirId OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortEntry 53 }
+
+    tnAccessPortAlienWavebank OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { false }
+        ::= { tnAccessPortEntry 54 }
+
+    tnAccessPortModuleReset  OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         warmReset(2),
+                         coldReset(3),
+                         forceReset(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortEntry 55 }
+
+    tnAccessPortFacilityDesCustLifeCycleState OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..45))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Customer life cycle state."
+        ::= { tnAccessPortEntry 56 }
+
+    tnAccessPortSummaryStatusLEDColor OBJECT-TYPE
+        SYNTAX         TropicLEDColorType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The color of the summary status LED."
+        ::= { tnAccessPortEntry 57 }
+
+    tnAccessPortSummaryStatusLEDState OBJECT-TYPE
+        SYNTAX         TropicLEDStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state of the summary status LED."
+        ::= { tnAccessPortEntry 58 }
+
+---------------------------------------------------------------
+-- Interface Table
+---------------------------------------------------------------
+    tnIfTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortObjs 2 }
+
+    tnIfEntry OBJECT-TYPE
+        SYNTAX         TnIfEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        AUGMENTS    { ifEntry }
+        ::= { tnIfTable 1 }
+
+    TnIfEntry ::= SEQUENCE {
+        tnIfPhysicalLocation        InterfaceIndex,
+        tnIfType                    AluWdmTnIfType,
+        tnIfSupportedTypes          BITS,
+        tnIfSupportedTypesAlternate OCTET STRING,
+        tnIfForceAdminStatus        TnCommand,
+        tnIfnumofTimeSlots          Unsigned32,
+        tnIfAlmProfName             OCTET STRING
+    }
+
+    tnIfPhysicalLocation OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIfEntry 1 }
+
+    tnIfType OBJECT-TYPE
+        SYNTAX         AluWdmTnIfType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "In a set request, value default indicates that
+                        the NE assigns the port automatically, if
+                        possible.  A value of default will not be
+                        returned to the network operator.  If tnIfType
+                        is set to unassigned and ifAdminStatus has also
+                        been set, the set request will be failed back
+                        to the network operator."
+        ::= { tnIfEntry 2 }
+
+    tnIfSupportedTypes OBJECT-TYPE
+        SYNTAX         BITS {
+                         oc3(0),
+                         oc12(1),
+                         oc48(2),
+                         oc192(3),
+                         ots(4),
+                         och(5),
+                         otu1(6),
+                         otu2(7),
+                         gige(8),
+                         tenGige(9),
+                         stm1(10),
+                         stm4(11),
+                         stm16(12),
+                         stm64(13),
+                         fc1g(14),
+                         fc2g(15),
+                         fc4g(16),
+                         fc10g(17),
+                         cbr2g5(18),
+                         cbr10g(19),
+                         anyRate(20),
+                         hdSdi(21),
+                         fe(22),
+                         fddi(23),
+                         esCon(24),
+                         dvbAsi(25),
+                         dvi6000(26),
+                         otu3(27),
+                         oc768(28),
+                         stm256(29),
+                         otu4(30),
+                         fc8g(31),
+                         hundredGige(32),
+                         sdsdi(33),
+                         e1(34),
+                         sdi3g(35),
+                         dcn(36),
+                         evoa(37),
+                         fee(38),
+                         oduptf(39),
+                         ds1(40),
+                         otu3e2(41),
+                         otu2e(42),
+                         fortyGige(43),
+                         sdr(44),
+                         ddr(45),
+                         tod(46),
+                         lagGroup(47),
+                         otl44(48),
+                         fc16g(49),
+                         qdr(50),
+                         bits(51),
+                         oneTru(52),
+                         otu4x2(53),
+                         otu1f(54),
+                         cbr10g3(55),
+                         fortyGigeMLD(56),
+                         interLaken(57),
+                         otl410(58),
+                         otu4x4(59),
+                         otu4Half(60),
+                         otu4Halfx5(61),
+                         sensor(62),
+                         xfi(63),
+                         caui(64),
+                         otu2ewaneth(65),
+                         otu4waneth(66),
+                         tengigelaneth(67),
+                         hundredGigeLaneth(68),
+                         gigeConv(69),
+                         otu2eeth(70),
+                         gigelaneth(71),
+                         felaneth(72),
+                         ethman(73),
+                         ilkpif(74),
+                         feed(75),
+                         otu2eNimEth(76),
+                         twentyFiveGbeLaneth(77),
+                         otu4x2waneth(78),
+                         otsi(79),
+                         fourHundredGige(80),
+                         cpri3(81),      -- cpri3
+                         cpri5(82),      -- cpri5
+                         cpri6(83),      -- cpri6
+                         cpri7(84),      -- cpri7
+                         cpri8(85),      -- cpri8
+                         cpri10(86),     -- cpri10
+                         obsai8(87),     -- obsai8
+                         obsai4(88),     -- obsai4
+                         tfgige(89),     -- Twenty-five Giga Ethernet
+                         cauiV2(90),
+                         fc32g(91),
+                         otuc4mld(92),
+                         equipment(93),
+                         cpri4(94),      -- cpri4
+                         tengigelaneth2g5ce(95)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The supported types."
+        ::= { tnIfEntry 3 }
+
+    tnIfSupportedTypesAlternate OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(8))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The supported types as an octet string."
+        ::= { tnIfEntry 4 }
+
+    tnIfForceAdminStatus OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Setting this attribute to execute will force an
+                        ifAdminStatus change.  This works only for an
+                        ifAdminStatus of down.  When queried, this
+                        attribute returns a value of noCmd."
+        ::= { tnIfEntry 5 }
+
+    tnIfnumofTimeSlots OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..80)
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The number of time slot if tnIfType is oduflex.  If
+                        tnIfType is non-Oduflex, tnIfnumofTimeSlots is always
+                        zero."
+        ::= { tnIfEntry 6 }
+
+    tnIfAlmProfName OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(1..40))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnIfEntry 7 }
+
+---------------------------------------------------------------
+-- Access Port Scalars
+---------------------------------------------------------------
+    tnSysTopologyAudit OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..255))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "When read, this attribute will return the result
+                        of an audit of the physical topology of the
+                        network element.  It will have the following
+                        format:
+
+                        <n>:<ifIndex 1>:<ifIndex 2>: ... <ifIndex n>
+
+                        For example, if there is bad topology info
+                        associated with locations 1/3A/1 and 1/5A/2,
+                        the value of this attribute will be as follows:
+
+                        2:16974080:17105408
+
+                        If there are no topology issues, the value of
+                        this attribute will be as follows:
+
+                        0"
+        ::= { tnSysTopology 1 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+    tnAccessPortGroup OBJECT-GROUP
+        OBJECTS {
+            tnAccessPortDescr,
+            tnAccessPortStatusLEDColor,
+            tnAccessPortStatusLEDState,
+            tnAccessPortOperationalCapability,
+            tnAccessPortStateQualifier,
+            tnAccessPortFarEndAddress,
+            tnAccessPortFarEndIfIndex,
+            tnAccessPortFarEndType,
+            tnAccessPortDirection,
+            tnAccessPortAINS,
+            tnAccessPortAINSDebounceTime,
+            tnAccessPortUsingSysAINSDebounceTime,
+            tnAccessPortAINSDebounceTimeRemaining,
+            tnAccessPortIsDomainEdgePort,
+            tnAccessPortFarEndAddressConnFrom,
+            tnAccessPortFarEndIfIndexConnFrom,
+            tnAccessPortFarEndTypeConnFrom,
+            tnAccessPortExtAmpIpAddressIn,
+            tnAccessPortExtAmpIpAddressOut,
+            tnAccessPortWtocmConnLoss,
+            tnAccessPortWtocmConnAddress,
+            tnAccessPortOppDirectionPortAddress,
+            tnAccessPortIsValidInternalOTSXcEndpoint,
+            tnAccessPortWtDomainNumber,
+            tnAccessPortHasMpoConnector,
+            tnAccessPortMpoConnectorPortOutIfIndex,
+            tnAccessPortMpoConnectorPortInIfIndex,
+            tnAccessPortIsMpo,
+            tnAccessPortMonOcmConnAddress,
+            tnAccessPortAlmProfName,
+            tnAccessPortmfcTemperature,
+            tnAccessPortmfcNominalPressure,
+            tnAccessPortmfcDifferentialPressure,
+            tnAccessFilterAmbientTemperature,
+            tnAccessFilterPressure,
+            tnAccessFilterRecorded,
+            tnAccessFilterCalibrated,
+            tnAccessFilterAltitude,
+            tnAccessFilterRecordTime,
+            tnAccessFilterCalibrateTime,
+            tnAccessFilterScheduledTime,
+            tnAccessPortL2FarEndIfIndex,
+            tnAccessPortL2FarEndMacAddress,
+            tnAccessPortDirectionCapability,
+            tnAccessPortCpriMappingType,
+            tnAccessPortFecType,
+            tnAccessPortFecBypassInd,
+            tnAccessPortCpriRole,
+            tnAccessPortAseMode,
+            tnAccessPortRole,
+            tnAccessPortFacilityDescriptorName,
+            tnAccessPortFacilityDescriptorDesc,
+            tnAccessPortFacilityDescriptorCirId,
+            tnAccessPortAlienWavebank,
+            tnAccessPortModuleReset,
+            tnAccessPortFacilityDesCustLifeCycleState,
+            tnAccessPortSummaryStatusLEDColor,
+            tnAccessPortSummaryStatusLEDState
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortGroups 1 }
+
+    tnIfGroup OBJECT-GROUP
+        OBJECTS {
+            tnIfPhysicalLocation,
+            tnIfType,
+            tnIfSupportedTypes,
+            tnIfSupportedTypesAlternate,
+            tnIfForceAdminStatus,
+            tnIfnumofTimeSlots,
+            tnIfAlmProfName
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortGroups 2 }
+
+    tnSysTopologyGroup OBJECT-GROUP
+        OBJECTS {
+            tnSysTopologyAudit
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnAccessPortGroups 3 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnAccessPortCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+            tnAccessPortGroup,
+            tnIfGroup,
+            tnSysTopologyGroup
+        }
+        ::= { tnAccessPortCompliances 1 }
+
+END -- DEFINITION OF TROPIC-ACCESSPORT-MIB

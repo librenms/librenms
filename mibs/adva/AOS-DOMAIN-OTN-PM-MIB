@@ -1,0 +1,1789 @@
+AOS-DOMAIN-OTN-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks
+             FROM SNMPv2-SMI
+    ifIndex
+             FROM IF-MIB
+    aosCommon
+             FROM ADVA-MIB;
+
+aosDomainOtnPmMIB MODULE-IDENTITY
+    LAST-UPDATED    "201904240000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+                    "ADVA Optical Networking, Inc."
+    DESCRIPTION     "This module defines the OTN PM MIB definitions.
+                     Copyright (C) ADVA Optical Networking."
+
+    REVISION        "201904240000Z"
+    DESCRIPTION     "First release."
+    ::= {aosCommon 5}
+
+--
+-- OID definitions
+--
+
+aosDomainOtnPmObjects          OBJECT IDENTIFIER ::= {aosDomainOtnPmMIB 1}
+aosDomainOtnPmStatsObjects     OBJECT IDENTIFIER ::= {aosDomainOtnPmMIB 2}
+aosDomainOtnPmConformance      OBJECT IDENTIFIER ::= {aosDomainOtnPmMIB 3}
+
+--
+-- Textual conventions.
+--
+
+--
+-- Scalar definitions.
+--
+
+--
+-- Live monitored values.
+
+aosDomainOtnPmOscOptPowerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPmOscOptPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the monitored points
+             collected on the OSC."
+    ::= { aosDomainOtnPmStatsObjects 1 }
+
+aosDomainOtnPmOscOptPowerEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPmOscOptPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to the OSC layer."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPmOscOptPowerTable 1 }
+    
+AosDomainOtnPmOscOptPowerEntry ::= SEQUENCE {
+    aosDomainOtnPmOscOptPowerRx Integer32,
+    aosDomainOtnPmOscOptPowerTx Integer32
+}
+
+aosDomainOtnPmOscOptPowerRx OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "OSC optical power received."
+     ::= { aosDomainOtnPmOscOptPowerEntry 1 }
+
+aosDomainOtnPmOscOptPowerTx OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "OSC optical power transmitted."
+     ::= { aosDomainOtnPmOscOptPowerEntry 2 }
+--
+
+aosDomainOtnPmOscLaserTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPmOscLaserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the optical laser."
+    ::= { aosDomainOtnPmStatsObjects 2 }
+
+aosDomainOtnPmOscLaserEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPmOscLaserEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing a laser data."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPmOscLaserTable 1 }
+    
+AosDomainOtnPmOscLaserEntry ::= SEQUENCE {
+    aosDomainOtnPmOscLaserBiasCurr Integer32,
+    aosDomainOtnPmOscLaserTemp     Integer32
+}
+
+aosDomainOtnPmOscLaserBiasCurr OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "mA"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical laser bias current."
+     ::= { aosDomainOtnPmOscLaserEntry 1 }
+
+aosDomainOtnPmOscLaserTemp OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 C"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical laser temperature."
+     ::= { aosDomainOtnPmOscLaserEntry 2 }
+--
+
+aosDomainOtnPmSpanLossTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPmSpanLossEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the span loss fiber data."
+    ::= { aosDomainOtnPmStatsObjects 3 }
+
+aosDomainOtnPmSpanLossEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPmSpanLossEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing span loss on Rx and Tx fibers."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPmSpanLossTable 1 }
+    
+AosDomainOtnPmSpanLossEntry ::= SEQUENCE {
+    aosDomainOtnPmSpanLossRx Integer32,
+    aosDomainOtnPmSpanLossTx Integer32
+}
+
+aosDomainOtnPmSpanLossRx OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Span loss on Rx fiber."
+     ::= { aosDomainOtnPmSpanLossEntry 1 }
+
+aosDomainOtnPmSpanLossTx OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Span loss on Tx fiber."
+     ::= { aosDomainOtnPmSpanLossEntry 2 }
+--
+
+aosDomainOtnPmAmpTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPmAmpEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the optical 
+             amplifier monitored data."
+    ::= { aosDomainOtnPmStatsObjects 4 }
+
+aosDomainOtnPmAmpEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPmAmpEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing amplifier's monitored data."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPmAmpTable 1 }
+    
+AosDomainOtnPmAmpEntry ::= SEQUENCE {
+    aosDomainOtnPmAmpOperTime  Integer32,
+    aosDomainOtnPmAmpTotalGain Integer32,
+    aosDomainOtnPmAmpTotalLase Integer32
+}
+
+aosDomainOtnPmAmpOperTime OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "h"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Operation hours."
+     ::= { aosDomainOtnPmAmpEntry 1 }
+
+aosDomainOtnPmAmpTotalGain OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Monitored total gain of an amplifier stage."
+     ::= { aosDomainOtnPmAmpEntry 2 }
+
+aosDomainOtnPmAmpTotalLase OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Calculated total lase contribution port to port of an amplifier."
+     ::= { aosDomainOtnPmAmpEntry 3 }
+--
+
+aosDomainOtnPmQualityTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPmQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the optical facilities
+             with monitored data."
+    ::= { aosDomainOtnPmStatsObjects 5 }
+
+aosDomainOtnPmQualityEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPmQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing facility's monitored data."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPmQualityTable 1 }
+    
+AosDomainOtnPmQualityEntry ::= SEQUENCE {
+    aosDomainOtnPmQualityCdc        Integer32,
+    aosDomainOtnPmQualityCfo 	    Integer32,
+    aosDomainOtnPmQualitySnr        Integer32,
+    aosDomainOtnPmQualityDgd        Integer32,
+    aosDomainOtnPmQualityQFactor    Integer32	
+}
+
+aosDomainOtnPmQualityCdc OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Chromatic dispersion compensation."
+     ::= { aosDomainOtnPmQualityEntry 1 }
+
+aosDomainOtnPmQualityCfo OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.001 GHz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Carrier frequency offset."
+     ::= { aosDomainOtnPmQualityEntry 2 }
+
+aosDomainOtnPmQualitySnr OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Signal to noise ration computed by the receiver DSP
+         from the constellation map."
+     ::= { aosDomainOtnPmQualityEntry 3 }
+
+aosDomainOtnPmQualityDgd OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Differential Group Delay is related to Polarization Mode Dispersion (PMD).
+	 PMD monitors the performance of dual polarization  modulation signals 
+	 operating on a single wavelength. PMD introduces frequency dependent pulse
+	 spreading, statistically applied over the length of the fiber connection.
+         PMD is caused by slight imperfections or asymmetries in the fiber
+         core and causes light in one polarization axis to travel at a
+         different rate than light in the orthogonal axis."
+     ::= { aosDomainOtnPmQualityEntry 4 }
+    
+aosDomainOtnPmQualityQFactor OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Q-Factor measured by the receiver."
+     ::= { aosDomainOtnPmQualityEntry 5 }
+--
+
+aosDomainOtnPmQualityEnhancedTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPmQualityEnhancedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Table with enhanced quality monitoring points."
+    ::= { aosDomainOtnPmStatsObjects 6 }
+
+aosDomainOtnPmQualityEnhancedEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPmQualityEnhancedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in the table."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPmQualityEnhancedTable 1 }
+    
+AosDomainOtnPmQualityEnhancedEntry ::= SEQUENCE {
+    aosDomainOtnPmQualityEnhancedSopt    Integer32,
+    aosDomainOtnPmQualityEnhancedOsnr 	 Integer32,
+    aosDomainOtnPmQualityEnhancedPdl     Integer32	
+}
+
+aosDomainOtnPmQualityEnhancedSopt OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "rad/sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "State of polarization tracking rate."
+     ::= { aosDomainOtnPmQualityEnhancedEntry 1 }
+
+aosDomainOtnPmQualityEnhancedOsnr OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical signal-to-noise ratio."
+     ::= { aosDomainOtnPmQualityEnhancedEntry 2 }
+
+aosDomainOtnPmQualityEnhancedPdl OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Polarization differential delay."
+     ::= { aosDomainOtnPmQualityEnhancedEntry 3 }
+
+--
+-- Statistics - historical (15 minutes interval) monitored values.
+--
+
+aosDomainOtnPm15MinOscOptPowerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm15MinOscOptPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the monitored points
+             collected on the OSC."
+    ::= { aosDomainOtnPmStatsObjects 20 }
+
+aosDomainOtnPm15MinOscOptPowerEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm15MinOscOptPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to the OSC layer."
+    INDEX { ifIndex, aosDomainOtnPm15MinOscOptPowerSample }
+    ::= { aosDomainOtnPm15MinOscOptPowerTable 1 }
+    
+AosDomainOtnPm15MinOscOptPowerEntry ::= SEQUENCE {
+    aosDomainOtnPm15MinOscOptPowerSample      Integer32,
+    aosDomainOtnPm15MinOscOptPowerSampleTime  TimeTicks,
+    aosDomainOtnPm15MinOscOptPowerRxLow       Integer32,
+    aosDomainOtnPm15MinOscOptPowerRxMean      Integer32,
+    aosDomainOtnPm15MinOscOptPowerRxHigh      Integer32,
+    aosDomainOtnPm15MinOscOptPowerTxLow       Integer32,
+    aosDomainOtnPm15MinOscOptPowerTxMean      Integer32,
+    aosDomainOtnPm15MinOscOptPowerTxHigh      Integer32
+}
+
+aosDomainOtnPm15MinOscOptPowerSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..99)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 1 }
+
+aosDomainOtnPm15MinOscOptPowerSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 2 }
+
+aosDomainOtnPm15MinOscOptPowerRxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest OSC optical power received in monitored interval."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 3 }
+
+aosDomainOtnPm15MinOscOptPowerRxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean OSC optical power received in monitored interval."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 4 }
+
+aosDomainOtnPm15MinOscOptPowerRxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest OSC optical power received in monitored interval."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 5 }
+
+aosDomainOtnPm15MinOscOptPowerTxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest OSC optical power transmitted in monitored interval."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 6 }
+
+aosDomainOtnPm15MinOscOptPowerTxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean OSC optical power transmitted in monitored interval."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 7 }
+
+aosDomainOtnPm15MinOscOptPowerTxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest OSC optical power transmitted in monitored interval."
+     ::= { aosDomainOtnPm15MinOscOptPowerEntry 8 }
+--
+
+aosDomainOtnPm15MinSpanLossTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm15MinSpanLossEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the span loss fiber data."
+    ::= { aosDomainOtnPmStatsObjects 21 }
+
+aosDomainOtnPm15MinSpanLossEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm15MinSpanLossEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing the Rx/Tx fiber."
+    INDEX { ifIndex, aosDomainOtnPm15MinSpanLossSample }
+    ::= { aosDomainOtnPm15MinSpanLossTable 1 }
+    
+AosDomainOtnPm15MinSpanLossEntry ::= SEQUENCE {
+    aosDomainOtnPm15MinSpanLossSample      Integer32,
+    aosDomainOtnPm15MinSpanLossSampleTime  TimeTicks,
+    aosDomainOtnPm15MinSpanLossRxLow       Integer32,
+    aosDomainOtnPm15MinSpanLossRxMean      Integer32,
+    aosDomainOtnPm15MinSpanLossRxHigh      Integer32,
+    aosDomainOtnPm15MinSpanLossTxLow       Integer32,
+    aosDomainOtnPm15MinSpanLossTxMean      Integer32,
+    aosDomainOtnPm15MinSpanLossTxHigh      Integer32
+}
+
+aosDomainOtnPm15MinSpanLossSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..99)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 1 }
+
+aosDomainOtnPm15MinSpanLossSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 2 }
+
+aosDomainOtnPm15MinSpanLossRxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest span loss on Rx fiber in monitored interval."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 3 }
+
+aosDomainOtnPm15MinSpanLossRxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean span loss on Rx fiber in monitored interval."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 4 }
+
+aosDomainOtnPm15MinSpanLossRxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest span loss on Rx fiber in monitored interval."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 5 }
+
+aosDomainOtnPm15MinSpanLossTxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest span loss on Tx fiber in monitored interval."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 6 }
+
+aosDomainOtnPm15MinSpanLossTxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean span loss on Tx fiber in monitored interval."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 7 }
+
+aosDomainOtnPm15MinSpanLossTxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest span loss on Tx fiber in monitored interval."
+     ::= { aosDomainOtnPm15MinSpanLossEntry 8 }
+--
+
+aosDomainOtnPm15MinDefectTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm15MinDefectEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the OTN facility defects."
+    ::= { aosDomainOtnPmStatsObjects 22 }
+
+aosDomainOtnPm15MinDefectEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm15MinDefectEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing the OTN facility."
+    INDEX { ifIndex, aosDomainOtnPm15MinDefectSample }
+    ::= { aosDomainOtnPm15MinDefectTable 1 }
+    
+AosDomainOtnPm15MinDefectEntry ::= SEQUENCE {
+    aosDomainOtnPm15MinDefectSample        Integer32,
+    aosDomainOtnPm15MinDefectSampleTime    TimeTicks,
+    aosDomainOtnPm15MinDefectSes           Integer32,
+    aosDomainOtnPm15MinDefectSesInPayload  Integer32,
+    aosDomainOtnPm15MinDefectSesInOverhead Integer32,
+    aosDomainOtnPm15MinDefectUas           Integer32,
+    aosDomainOtnPm15MinDefectUasInPayload  Integer32,
+    aosDomainOtnPm15MinDefectUasInOverhead Integer32,
+    aosDomainOtnPm15MinDefectBbe           Integer32,
+    aosDomainOtnPm15MinDefectEs            Integer32
+}
+
+aosDomainOtnPm15MinDefectSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..99)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm15MinDefectEntry 1 }
+
+aosDomainOtnPm15MinDefectSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm15MinDefectEntry 2 }
+
+aosDomainOtnPm15MinDefectSes OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of severely defect seconds."
+     ::= { aosDomainOtnPm15MinDefectEntry 3 }
+
+aosDomainOtnPm15MinDefectSesInPayload OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of ses in payload."
+     ::= { aosDomainOtnPm15MinDefectEntry 4 }
+
+aosDomainOtnPm15MinDefectSesInOverhead OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of ses in overhead."
+     ::= { aosDomainOtnPm15MinDefectEntry 5 }
+
+aosDomainOtnPm15MinDefectUas OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of unavailable seconds."
+     ::= { aosDomainOtnPm15MinDefectEntry 6 }
+
+aosDomainOtnPm15MinDefectUasInPayload OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of uas in payload."
+     ::= { aosDomainOtnPm15MinDefectEntry 7 }
+
+aosDomainOtnPm15MinDefectUasInOverhead OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of uas in overhead."
+     ::= { aosDomainOtnPm15MinDefectEntry 8 }
+
+aosDomainOtnPm15MinDefectBbe OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of background block errors."
+     ::= { aosDomainOtnPm15MinDefectEntry 9 }
+
+aosDomainOtnPm15MinDefectEs OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of defect seconds."
+     ::= { aosDomainOtnPm15MinDefectEntry 10 }
+--
+
+aosDomainOtnPm15MinQualityTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm15MinQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the OTN facilities."
+    ::= { aosDomainOtnPmStatsObjects 23 }
+
+aosDomainOtnPm15MinQualityEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm15MinQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing the OTN facility."
+    INDEX { ifIndex, aosDomainOtnPm15MinQualitySample }
+    ::= { aosDomainOtnPm15MinQualityTable 1 }
+    
+AosDomainOtnPm15MinQualityEntry ::= SEQUENCE {
+    aosDomainOtnPm15MinQualitySample        Integer32,
+    aosDomainOtnPm15MinQualitySampleTime    TimeTicks,
+    aosDomainOtnPm15MinQualityCdcLow        Integer32,
+    aosDomainOtnPm15MinQualityCdcMean       Integer32,
+    aosDomainOtnPm15MinQualityCdcHigh       Integer32,
+    aosDomainOtnPm15MinQualityCfoLow        Integer32,
+    aosDomainOtnPm15MinQualityCfoMean       Integer32,
+    aosDomainOtnPm15MinQualityCfoHigh       Integer32,
+    aosDomainOtnPm15MinQualitySnrLow        Integer32,
+    aosDomainOtnPm15MinQualitySnrMean       Integer32,
+    aosDomainOtnPm15MinQualitySnrHigh       Integer32,
+    aosDomainOtnPm15MinQualityDgdLow        Integer32,
+    aosDomainOtnPm15MinQualityDgdMean       Integer32,
+    aosDomainOtnPm15MinQualityDgdHigh       Integer32,
+    aosDomainOtnPm15MinQualityQFactorLow    Integer32,
+    aosDomainOtnPm15MinQualityQFactorMean   Integer32,
+    aosDomainOtnPm15MinQualityQFactorHigh   Integer32
+}
+
+aosDomainOtnPm15MinQualitySample OBJECT-TYPE
+    SYNTAX     Integer32 (1..99)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm15MinQualityEntry 1 }
+
+aosDomainOtnPm15MinQualitySampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm15MinQualityEntry 2 }
+
+aosDomainOtnPm15MinQualityCdcLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest cdc (chromatic dispersion compensation) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 3 }
+
+aosDomainOtnPm15MinQualityCdcMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean cdc (chromatic dispersion compensation) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 4 }
+
+aosDomainOtnPm15MinQualityCdcHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest cdc (chromatic dispersion compensation) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 5 }
+
+aosDomainOtnPm15MinQualityCfoLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.001 GHz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest cfo (carrier frequency offset) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 6 }
+
+aosDomainOtnPm15MinQualityCfoMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.001 GHz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean cfo (carrier frequency offset) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 7 }
+
+aosDomainOtnPm15MinQualityCfoHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.001 GHz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest cfo (carrier frequency offset) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 8 }
+
+aosDomainOtnPm15MinQualitySnrLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest snr (signal-to-noise ratio) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 9 }
+
+aosDomainOtnPm15MinQualitySnrMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean snr (signal-to-noise ratio) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 10 }
+
+aosDomainOtnPm15MinQualitySnrHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest snr (signal-to-noise ratio) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 11 }
+
+aosDomainOtnPm15MinQualityDgdLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest dgd (diff group delay) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 12 }
+
+aosDomainOtnPm15MinQualityDgdMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean dgd (diff group delay) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 13 }
+
+aosDomainOtnPm15MinQualityDgdHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest dgd (diff group delay) in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 14 }
+
+aosDomainOtnPm15MinQualityQFactorLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest QFactor in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 15 }
+
+aosDomainOtnPm15MinQualityQFactorMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean QFactor in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 16 }
+
+aosDomainOtnPm15MinQualityQFactorHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest QFactor in monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEntry 17 }
+
+--
+
+aosDomainOtnPm15MinQualityEnhancedTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm15MinQualityEnhancedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Enhanced quality monitored points for 15-minute interval."
+    ::= { aosDomainOtnPmStatsObjects 24 }
+
+aosDomainOtnPm15MinQualityEnhancedEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm15MinQualityEnhancedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A row entry in the table."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPm15MinQualityEnhancedTable 1 }
+    
+AosDomainOtnPm15MinQualityEnhancedEntry ::= SEQUENCE {
+    aosDomainOtnPm15MinQualityEnhancedSample     Integer32,
+    aosDomainOtnPm15MinQualityEnhancedSampleTime TimeTicks,
+    aosDomainOtnPm15MinQualityEnhancedSoptLow    Integer32,
+    aosDomainOtnPm15MinQualityEnhancedSoptMean   Integer32,
+    aosDomainOtnPm15MinQualityEnhancedSoptHigh   Integer32,
+    aosDomainOtnPm15MinQualityEnhancedOsnrLow 	 Integer32,
+    aosDomainOtnPm15MinQualityEnhancedOsnrMean   Integer32,
+    aosDomainOtnPm15MinQualityEnhancedOsnrHigh   Integer32,
+    aosDomainOtnPm15MinQualityEnhancedPdlLow     Integer32,
+    aosDomainOtnPm15MinQualityEnhancedPdlMean    Integer32,
+    aosDomainOtnPm15MinQualityEnhancedPdlHigh    Integer32
+}
+
+aosDomainOtnPm15MinQualityEnhancedSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..99)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 1 }
+
+aosDomainOtnPm15MinQualityEnhancedSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 2 }
+
+aosDomainOtnPm15MinQualityEnhancedSoptLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "rad/sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "State of polarization tracking rate - the lowest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 3 }
+	 
+aosDomainOtnPm15MinQualityEnhancedSoptMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "rad/sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "State of polarization tracking rate - the mean value in
+		  monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 4 }
+	 
+aosDomainOtnPm15MinQualityEnhancedSoptHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "rad/sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "State of polarization tracking rate - the highest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 5 }
+
+aosDomainOtnPm15MinQualityEnhancedOsnrLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical signal-to-noise ratio - the lowest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 6 }
+	 
+aosDomainOtnPm15MinQualityEnhancedOsnrMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical signal-to-noise ratio - the mean value in
+		  monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 7 }
+	 
+aosDomainOtnPm15MinQualityEnhancedOsnrHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical signal-to-noise ratio - the highest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 8 }
+
+aosDomainOtnPm15MinQualityEnhancedPdlLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Polarization differential delay - the lowest value in
+		 monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 9 }
+
+aosDomainOtnPm15MinQualityEnhancedPdlMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Polarization differential delay - the mean value in
+		 monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 10 }
+
+aosDomainOtnPm15MinQualityEnhancedPdlHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Polarization differential delay - the highest value in
+		 monitored interval."
+     ::= { aosDomainOtnPm15MinQualityEnhancedEntry 11 }
+
+--
+-- Statistics - historical (1 day interval) monitored values.
+--
+
+aosDomainOtnPm1DayOscOptPowerTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm1DayOscOptPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the monitored points
+             collected on the OSC."
+    ::= { aosDomainOtnPmStatsObjects 40 }
+
+aosDomainOtnPm1DayOscOptPowerEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm1DayOscOptPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to the OSC layer."
+    INDEX { ifIndex, aosDomainOtnPm1DayOscOptPowerSample }
+    ::= { aosDomainOtnPm1DayOscOptPowerTable 1 }
+    
+AosDomainOtnPm1DayOscOptPowerEntry ::= SEQUENCE {
+    aosDomainOtnPm1DayOscOptPowerSample      Integer32,
+    aosDomainOtnPm1DayOscOptPowerSampleTime  TimeTicks,
+    aosDomainOtnPm1DayOscOptPowerRxLow       Integer32,
+    aosDomainOtnPm1DayOscOptPowerRxMean      Integer32,
+    aosDomainOtnPm1DayOscOptPowerRxHigh      Integer32,
+    aosDomainOtnPm1DayOscOptPowerTxLow       Integer32,
+    aosDomainOtnPm1DayOscOptPowerTxMean      Integer32,
+    aosDomainOtnPm1DayOscOptPowerTxHigh      Integer32
+}
+
+aosDomainOtnPm1DayOscOptPowerSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..31)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 1 }
+
+aosDomainOtnPm1DayOscOptPowerSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 2 }
+
+aosDomainOtnPm1DayOscOptPowerRxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest OSC optical power received in monitored interval."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 3 }
+
+aosDomainOtnPm1DayOscOptPowerRxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean OSC optical power received in monitored interval."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 4 }
+
+aosDomainOtnPm1DayOscOptPowerRxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest OSC optical power received in monitored interval."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 5 }
+
+aosDomainOtnPm1DayOscOptPowerTxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest OSC optical power transmitted in monitored interval."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 6 }
+
+aosDomainOtnPm1DayOscOptPowerTxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean OSC optical power transmitted in monitored interval."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 7 }
+
+aosDomainOtnPm1DayOscOptPowerTxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dBm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest OSC optical power transmitted in monitored interval."
+     ::= { aosDomainOtnPm1DayOscOptPowerEntry 8 }
+--
+
+aosDomainOtnPm1DaySpanLossTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm1DaySpanLossEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to span loss fiber data."
+    ::= { aosDomainOtnPmStatsObjects 41 }
+
+aosDomainOtnPm1DaySpanLossEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm1DaySpanLossEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing the Rx/Tx fiber."
+    INDEX { ifIndex, aosDomainOtnPm1DaySpanLossSample }
+    ::= { aosDomainOtnPm1DaySpanLossTable 1 }
+    
+AosDomainOtnPm1DaySpanLossEntry ::= SEQUENCE {
+    aosDomainOtnPm1DaySpanLossSample      Integer32,
+    aosDomainOtnPm1DaySpanLossSampleTime  TimeTicks,
+    aosDomainOtnPm1DaySpanLossRxLow       Integer32,
+    aosDomainOtnPm1DaySpanLossRxMean      Integer32,
+    aosDomainOtnPm1DaySpanLossRxHigh      Integer32,
+    aosDomainOtnPm1DaySpanLossTxLow       Integer32,
+    aosDomainOtnPm1DaySpanLossTxMean      Integer32,
+    aosDomainOtnPm1DaySpanLossTxHigh      Integer32
+}
+
+aosDomainOtnPm1DaySpanLossSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..31)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 1 }
+
+aosDomainOtnPm1DaySpanLossSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 2 }
+
+aosDomainOtnPm1DaySpanLossRxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest span loss on Rx fiber in monitored interval."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 3 }
+
+aosDomainOtnPm1DaySpanLossRxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean span loss on Rx fiber in monitored interval."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 4 }
+
+aosDomainOtnPm1DaySpanLossRxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest span loss on Rx fiber in monitored interval."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 5 }
+
+aosDomainOtnPm1DaySpanLossTxLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest span loss on Tx fiber in monitored interval."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 6 }
+
+aosDomainOtnPm1DaySpanLossTxMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean span loss on Tx fiber in monitored interval."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 7 }
+
+aosDomainOtnPm1DaySpanLossTxHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest span loss on Tx fiber in monitored interval."
+     ::= { aosDomainOtnPm1DaySpanLossEntry 8 }
+--
+
+aosDomainOtnPm1DayDefectTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm1DayDefectEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the OTN facility defects."
+    ::= { aosDomainOtnPmStatsObjects 42 }
+
+aosDomainOtnPm1DayDefectEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm1DayDefectEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing the OTN facility."
+    INDEX { ifIndex, aosDomainOtnPm1DayDefectSample }
+    ::= { aosDomainOtnPm1DayDefectTable 1 }
+    
+AosDomainOtnPm1DayDefectEntry ::= SEQUENCE {
+    aosDomainOtnPm1DayDefectSample        Integer32,
+    aosDomainOtnPm1DayDefectSampleTime    TimeTicks,
+    aosDomainOtnPm1DayDefectSes           Integer32,
+    aosDomainOtnPm1DayDefectSesInPayload  Integer32,
+    aosDomainOtnPm1DayDefectSesInOverhead Integer32,
+    aosDomainOtnPm1DayDefectUas           Integer32,
+    aosDomainOtnPm1DayDefectUasInPayload  Integer32,
+    aosDomainOtnPm1DayDefectUasInOverhead Integer32,
+    aosDomainOtnPm1DayDefectBbe           Integer32,
+    aosDomainOtnPm1DayDefectEs            Integer32
+}
+
+aosDomainOtnPm1DayDefectSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..99)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm1DayDefectEntry 1 }
+
+aosDomainOtnPm1DayDefectSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm1DayDefectEntry 2 }
+
+aosDomainOtnPm1DayDefectSes OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of severely defect seconds."
+     ::= { aosDomainOtnPm1DayDefectEntry 3 }
+
+aosDomainOtnPm1DayDefectSesInPayload OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of ses in payload."
+     ::= { aosDomainOtnPm1DayDefectEntry 4 }
+
+aosDomainOtnPm1DayDefectSesInOverhead OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of ses in overhead."
+     ::= { aosDomainOtnPm1DayDefectEntry 5 }
+
+aosDomainOtnPm1DayDefectUas OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of unavailable seconds."
+     ::= { aosDomainOtnPm1DayDefectEntry 6 }
+
+aosDomainOtnPm1DayDefectUasInPayload OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of uas in payload."
+     ::= { aosDomainOtnPm1DayDefectEntry 7 }
+
+aosDomainOtnPm1DayDefectUasInOverhead OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of uas in overhead."
+     ::= { aosDomainOtnPm1DayDefectEntry 8 }
+
+aosDomainOtnPm1DayDefectBbe OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of background block errors."
+     ::= { aosDomainOtnPm1DayDefectEntry 9 }
+
+aosDomainOtnPm1DayDefectEs OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Count of the number of defect seconds."
+     ::= { aosDomainOtnPm1DayDefectEntry 10 }
+
+--
+
+aosDomainOtnPm1DayQualityTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm1DayQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the OTN facilities."
+    ::= { aosDomainOtnPmStatsObjects 43 }
+
+aosDomainOtnPm1DayQualityEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm1DayQualityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry representing the OTN facility."
+    INDEX { ifIndex, aosDomainOtnPm1DayQualitySample }
+    ::= { aosDomainOtnPm1DayQualityTable 1 }
+    
+AosDomainOtnPm1DayQualityEntry ::= SEQUENCE {
+    aosDomainOtnPm1DayQualitySample        Integer32,
+    aosDomainOtnPm1DayQualitySampleTime    TimeTicks,
+    aosDomainOtnPm1DayQualityCdcLow        Integer32,
+    aosDomainOtnPm1DayQualityCdcMean       Integer32,
+    aosDomainOtnPm1DayQualityCdcHigh       Integer32,
+    aosDomainOtnPm1DayQualityCfoLow        Integer32,
+    aosDomainOtnPm1DayQualityCfoMean       Integer32,
+    aosDomainOtnPm1DayQualityCfoHigh       Integer32,
+    aosDomainOtnPm1DayQualitySnrLow        Integer32,
+    aosDomainOtnPm1DayQualitySnrMean       Integer32,
+    aosDomainOtnPm1DayQualitySnrHigh       Integer32,
+    aosDomainOtnPm1DayQualityDgdLow        Integer32,
+    aosDomainOtnPm1DayQualityDgdMean       Integer32,
+    aosDomainOtnPm1DayQualityDgdHigh       Integer32,
+    aosDomainOtnPm1DayQualityQFactorLow    Integer32,
+    aosDomainOtnPm1DayQualityQFactorMean   Integer32,
+    aosDomainOtnPm1DayQualityQFactorHigh   Integer32
+}
+
+aosDomainOtnPm1DayQualitySample OBJECT-TYPE
+    SYNTAX     Integer32 (1..31)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm1DayQualityEntry 1 }
+
+aosDomainOtnPm1DayQualitySampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm1DayQualityEntry 2 }
+
+aosDomainOtnPm1DayQualityCdcLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest cdc (chromatic dispersion compensation) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 3 }
+
+aosDomainOtnPm1DayQualityCdcMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean cdc (chromatic dispersion compensation) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 4 }
+
+aosDomainOtnPm1DayQualityCdcHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps/nm"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest cdc (chromatic dispersion compensation) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 5 }
+
+aosDomainOtnPm1DayQualityCfoLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.001 GHz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest cfo (carrier frequency offset) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 6 }
+
+aosDomainOtnPm1DayQualityCfoMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.001 GHz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean cfo (carrier frequency offset) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 7 }
+
+aosDomainOtnPm1DayQualityCfoHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.001 GHz"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest cfo (carrier frequency offset) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 8 }
+
+aosDomainOtnPm1DayQualitySnrLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest snr (signal-to-noise ratio) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 9 }
+
+aosDomainOtnPm1DayQualitySnrMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean snr (signal-to-noise ratio) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 10 }
+
+aosDomainOtnPm1DayQualitySnrHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest snr (signal-to-noise ratio) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 11 }
+
+aosDomainOtnPm1DayQualityDgdLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest dgd (diff group delay) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 12 }
+
+aosDomainOtnPm1DayQualityDgdMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean dgd (diff group delay) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 13 }
+
+aosDomainOtnPm1DayQualityDgdHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "ps"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest dgd (diff group delay) in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 14 }
+
+aosDomainOtnPm1DayQualityQFactorLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Lowest QFactor in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 15 }
+
+aosDomainOtnPm1DayQualityQFactorMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Mean QFactor in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 16 }
+
+aosDomainOtnPm1DayQualityQFactorHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Highest QFactor in monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEntry 17 }
+
+--
+
+aosDomainOtnPm1DayQualityEnhancedTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF AosDomainOtnPm1DayQualityEnhancedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Enhanced quality monitored points for 1-day interval."
+    ::= { aosDomainOtnPmStatsObjects 44 }
+
+aosDomainOtnPm1DayQualityEnhancedEntry  OBJECT-TYPE
+    SYNTAX     AosDomainOtnPm1DayQualityEnhancedEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry in the table."
+    INDEX { ifIndex }
+    ::= { aosDomainOtnPm1DayQualityEnhancedTable 1 }
+    
+AosDomainOtnPm1DayQualityEnhancedEntry ::= SEQUENCE {
+    aosDomainOtnPm1DayQualityEnhancedSample     Integer32,
+    aosDomainOtnPm1DayQualityEnhancedSampleTime TimeTicks,
+    aosDomainOtnPm1DayQualityEnhancedSoptLow    Integer32,
+    aosDomainOtnPm1DayQualityEnhancedSoptMean   Integer32,
+    aosDomainOtnPm1DayQualityEnhancedSoptHigh   Integer32,
+    aosDomainOtnPm1DayQualityEnhancedOsnrLow 	Integer32,
+    aosDomainOtnPm1DayQualityEnhancedOsnrMean   Integer32,
+    aosDomainOtnPm1DayQualityEnhancedOsnrHigh   Integer32,
+    aosDomainOtnPm1DayQualityEnhancedPdlLow     Integer32,
+    aosDomainOtnPm1DayQualityEnhancedPdlMean    Integer32,
+    aosDomainOtnPm1DayQualityEnhancedPdlHigh    Integer32
+}
+
+aosDomainOtnPm1DayQualityEnhancedSample OBJECT-TYPE
+    SYNTAX     Integer32 (1..99)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Sample number for given time period."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 1 }
+
+aosDomainOtnPm1DayQualityEnhancedSampleTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "Time since the sample was collected."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 2 }
+
+aosDomainOtnPm1DayQualityEnhancedSoptLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "rad/sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "State of polarization tracking rate - the lowest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 3 }
+	 
+aosDomainOtnPm1DayQualityEnhancedSoptMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "rad/sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "State of polarization tracking rate - the mean value in
+		  monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 4 }
+	 
+aosDomainOtnPm1DayQualityEnhancedSoptHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "rad/sec"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "State of polarization tracking rate - the highest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 5 }
+
+aosDomainOtnPm1DayQualityEnhancedOsnrLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical signal-to-noise ratio - the lowest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 6 }
+	 
+aosDomainOtnPm1DayQualityEnhancedOsnrMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical signal-to-noise ratio - the mean value in
+		  monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 7 }
+	 
+aosDomainOtnPm1DayQualityEnhancedOsnrHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "Optical signal-to-noise ratio - the highest value in
+		  monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 8 }
+
+aosDomainOtnPm1DayQualityEnhancedPdlLow OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Polarization differential delay - the lowest value in
+		 monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 9 }
+
+aosDomainOtnPm1DayQualityEnhancedPdlMean OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Polarization differential delay - the mean value in
+		 monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 10 }
+
+aosDomainOtnPm1DayQualityEnhancedPdlHigh OBJECT-TYPE
+    SYNTAX     Integer32
+    UNITS      "0.1 dB"
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Polarization differential delay - the highest value in
+		 monitored interval."
+     ::= { aosDomainOtnPm1DayQualityEnhancedEntry 11 }
+
+--
+-- Conformance
+--
+
+aosDomainOtnPmCompliances      OBJECT IDENTIFIER ::= {aosDomainOtnPmConformance 1}
+aosDomainOtnPmGroups           OBJECT IDENTIFIER ::= {aosDomainOtnPmConformance 2}
+
+aosDomainOtnPmCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the OtnPm Services."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              aosDomainOtnPmStatsObjectGroup
+        }
+    ::= { aosDomainOtnPmCompliances 1 }
+
+aosDomainOtnPmStatsObjectGroup OBJECT-GROUP
+    OBJECTS {
+        aosDomainOtnPmOscOptPowerRx,
+        aosDomainOtnPmOscOptPowerTx,
+        
+        aosDomainOtnPmOscLaserBiasCurr,
+        aosDomainOtnPmOscLaserTemp,
+
+        aosDomainOtnPmSpanLossRx,
+        aosDomainOtnPmSpanLossTx,
+
+        aosDomainOtnPmAmpOperTime,
+        aosDomainOtnPmAmpTotalGain,
+        aosDomainOtnPmAmpTotalLase,
+
+        aosDomainOtnPmQualityCdc,
+        aosDomainOtnPmQualityCfo,
+        aosDomainOtnPmQualitySnr,
+        aosDomainOtnPmQualityDgd,
+        aosDomainOtnPmQualityQFactor,
+		
+        aosDomainOtnPmQualityEnhancedSopt,
+        aosDomainOtnPmQualityEnhancedOsnr,
+        aosDomainOtnPmQualityEnhancedPdl,
+--        
+        aosDomainOtnPm15MinOscOptPowerRxLow,
+        aosDomainOtnPm15MinOscOptPowerRxMean,
+        aosDomainOtnPm15MinOscOptPowerRxHigh,
+        aosDomainOtnPm15MinOscOptPowerTxLow,
+        aosDomainOtnPm15MinOscOptPowerTxMean,
+        aosDomainOtnPm15MinOscOptPowerTxHigh,
+
+        aosDomainOtnPm15MinSpanLossRxLow,
+        aosDomainOtnPm15MinSpanLossRxMean,
+        aosDomainOtnPm15MinSpanLossRxHigh,
+        aosDomainOtnPm15MinSpanLossTxLow,
+        aosDomainOtnPm15MinSpanLossTxMean,
+        aosDomainOtnPm15MinSpanLossTxHigh,
+
+        aosDomainOtnPm15MinDefectSes,
+        aosDomainOtnPm15MinDefectSesInPayload,
+        aosDomainOtnPm15MinDefectSesInOverhead,
+        aosDomainOtnPm15MinDefectUas,
+        aosDomainOtnPm15MinDefectUasInPayload,
+        aosDomainOtnPm15MinDefectUasInOverhead,
+        aosDomainOtnPm15MinDefectBbe,
+        aosDomainOtnPm15MinDefectEs,
+
+        aosDomainOtnPm15MinQualityCdcLow,
+        aosDomainOtnPm15MinQualityCdcMean,
+        aosDomainOtnPm15MinQualityCdcHigh,
+        aosDomainOtnPm15MinQualityCfoLow,
+        aosDomainOtnPm15MinQualityCfoMean,
+        aosDomainOtnPm15MinQualityCfoHigh,
+        aosDomainOtnPm15MinQualitySnrLow,
+        aosDomainOtnPm15MinQualitySnrMean,
+        aosDomainOtnPm15MinQualitySnrHigh,
+        aosDomainOtnPm15MinQualityDgdLow,
+        aosDomainOtnPm15MinQualityDgdMean,
+        aosDomainOtnPm15MinQualityDgdHigh,
+        aosDomainOtnPm15MinQualityQFactorLow,
+        aosDomainOtnPm15MinQualityQFactorMean,
+        aosDomainOtnPm15MinQualityQFactorHigh,
+		
+        aosDomainOtnPm15MinQualityEnhancedSoptLow,
+        aosDomainOtnPm15MinQualityEnhancedSoptMean,
+        aosDomainOtnPm15MinQualityEnhancedSoptHigh,
+        aosDomainOtnPm15MinQualityEnhancedOsnrLow,
+        aosDomainOtnPm15MinQualityEnhancedOsnrMean,
+        aosDomainOtnPm15MinQualityEnhancedOsnrHigh,
+        aosDomainOtnPm15MinQualityEnhancedPdlLow,
+        aosDomainOtnPm15MinQualityEnhancedPdlMean,
+        aosDomainOtnPm15MinQualityEnhancedPdlHigh,
+--
+        aosDomainOtnPm1DayOscOptPowerRxLow,
+        aosDomainOtnPm1DayOscOptPowerRxMean,
+        aosDomainOtnPm1DayOscOptPowerRxHigh,
+        aosDomainOtnPm1DayOscOptPowerTxLow,
+        aosDomainOtnPm1DayOscOptPowerTxMean,
+        aosDomainOtnPm1DayOscOptPowerTxHigh,
+
+        aosDomainOtnPm1DaySpanLossRxLow,
+        aosDomainOtnPm1DaySpanLossRxMean,
+        aosDomainOtnPm1DaySpanLossRxHigh,
+        aosDomainOtnPm1DaySpanLossTxLow,
+        aosDomainOtnPm1DaySpanLossTxMean,
+        aosDomainOtnPm1DaySpanLossTxHigh,
+
+        aosDomainOtnPm1DayDefectSes,
+        aosDomainOtnPm1DayDefectSesInPayload,
+        aosDomainOtnPm1DayDefectSesInOverhead,
+        aosDomainOtnPm1DayDefectUas,
+        aosDomainOtnPm1DayDefectUasInPayload,
+        aosDomainOtnPm1DayDefectUasInOverhead,
+        aosDomainOtnPm1DayDefectBbe,
+        aosDomainOtnPm1DayDefectEs,
+
+        aosDomainOtnPm1DayQualityCdcLow,
+        aosDomainOtnPm1DayQualityCdcMean,
+        aosDomainOtnPm1DayQualityCdcHigh,
+        aosDomainOtnPm1DayQualityCfoLow,
+        aosDomainOtnPm1DayQualityCfoMean,
+        aosDomainOtnPm1DayQualityCfoHigh,
+        aosDomainOtnPm1DayQualitySnrLow,
+        aosDomainOtnPm1DayQualitySnrMean,
+        aosDomainOtnPm1DayQualitySnrHigh,
+        aosDomainOtnPm1DayQualityDgdLow,
+        aosDomainOtnPm1DayQualityDgdMean,
+        aosDomainOtnPm1DayQualityDgdHigh,
+        aosDomainOtnPm1DayQualityQFactorLow,
+        aosDomainOtnPm1DayQualityQFactorMean,
+        aosDomainOtnPm1DayQualityQFactorHigh,
+		
+        aosDomainOtnPm1DayQualityEnhancedSoptLow,
+        aosDomainOtnPm1DayQualityEnhancedSoptMean,
+        aosDomainOtnPm1DayQualityEnhancedSoptHigh,
+        aosDomainOtnPm1DayQualityEnhancedOsnrLow,
+        aosDomainOtnPm1DayQualityEnhancedOsnrMean,
+        aosDomainOtnPm1DayQualityEnhancedOsnrHigh,
+        aosDomainOtnPm1DayQualityEnhancedPdlLow,
+        aosDomainOtnPm1DayQualityEnhancedPdlMean,
+        aosDomainOtnPm1DayQualityEnhancedPdlHigh
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the OtnPm Stats Services."
+    ::= { aosDomainOtnPmGroups 1 }
+
+END

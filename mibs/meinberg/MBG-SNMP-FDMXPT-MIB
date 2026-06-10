@@ -1,0 +1,292 @@
+MBG-SNMP-FDMXPT-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the MBG FDMXPT-SNMP project enterprise MIB tree
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
+    DisplayString                           FROM SNMPv2-TC
+
+   mbgSnmpRoot FROM MBG-SNMP-ROOT-MIB;
+
+mbgFDM MODULE-IDENTITY
+    LAST-UPDATED "201201250000Z"
+    ORGANIZATION "www.meinberg.de"
+    CONTACT-INFO
+	 "postal:   Meinberg Funkuhren
+                    Auf der Landwehr 22
+                    31812 Bad Pyrmont
+	            Germany
+
+          email:    info@meinberg.de"
+    DESCRIPTION
+	"Top-level infrastructure of the MBG-SNMP project enterprise MIB tree"
+    REVISION     "201201250000Z"
+    DESCRIPTION
+       "Update to new format using MBG-SNMP-ROOT-MIB"
+    REVISION     "200601200000Z"
+    DESCRIPTION
+       "Covering FDMXPT modules from Meinberg"
+    ::= { mbgSnmpRoot 15 }
+
+
+--
+--  MBG-SNMP enterprise-specific management objects
+--
+-- 
+-- Copy everything from here into your MBG-SNMP-MIB.txt file, if you are using several different SNMP-supporting Meinberg systems 
+--
+
+mbgFDMData		OBJECT IDENTIFIER ::= {mbgFDM 2}
+mbgFDMTraps             OBJECT IDENTIFIER ::= {mbgFDM 3}
+
+
+
+mbgFDMMode OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Mode of FDM"
+    ::= { mbgFDMData 1 }
+
+mbgFDMModeVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current Mode of FDM as value"
+    --- " 0: Normal Operation"
+    --- " 1: Direct Mode (no automatic monitoring)"
+    --- " 2: Timeout Error (no communication with FDM)"
+    --- " 3: Error (check error bits)"
+    DEFVAL { 0 }
+    ::= { mbgFDMData 2 }
+
+mbgFDMFrequency OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current powerline frequency in Hz as measured by FDM"
+    --- Example: "49.997" represents 49.997 Hz
+    ::= { mbgFDMData 3 }
+
+mbgFDMFrequencyVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current powerline frequency in Hz*1000 as value"
+    --- Example: 50034 represents 50.034 Hz
+    DEFVAL { 0 }
+    ::= { mbgFDMData 4 }
+
+
+mbgFDMRefTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current reference time of FDM"
+    --- Example: "15:35:01", is provided by the reference clock (e.g. GPS)
+    ::= { mbgFDMData 5 }
+
+mbgFDMPLTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current powerline time of FDM"
+    --- Example: "15:35:01", is initially read from the reference clock and then 
+    --- the powerline frequency is used as a clock frequency 
+    ::= { mbgFDMData 6 }
+
+mbgFDMFreqDev OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Frequency Devidation in Hz"
+    --- Example: "-00.002" represents a difference of -0.002 Hz 
+    --- (current powerline frequency compared to nominal powerline frequency)
+    ::= { mbgFDMData 7 }
+
+mbgFDMFreqDevVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current frequency deviation in Hz*1000 as value"
+    --- Example: -22 represents -0.022 Hz
+    DEFVAL { 0 }
+    ::= { mbgFDMData 8 }
+
+mbgFDMTimeDev OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Time Devidation in seconds"
+    --- Example: "-00.102" represents a time difference of -102 ms or -0.102 seconds" 
+    --- (reftime compared to pltime)
+    ::= { mbgFDMData 9 }
+
+mbgFDMTimeDevVal OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "current time deviation in ms"
+    --- Example: -22 represents -22 ms
+    DEFVAL { 0 }
+    ::= { mbgFDMData 10 }
+
+mbgFDMErrorStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The 8 error bits of the FDM in string format"
+    --- Example: "00000000" says "no error bits set" 
+    --- and "00000101" says Error bits 1 and 3 set
+    ::= { mbgFDMData 11 }
+
+--
+-- SNMP trap definitions
+--
+
+mbgFDMTrapInternalError NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when an internal error occurs (see error bits)"
+    ::= { mbgFDMTraps 1 }
+
+mbgFDMTrapNoTimeString NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when no time string can be read from reference clock"
+    ::= { mbgFDMTraps 2 }
+
+mbgFDMTrapNo10Mhz NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when the reference frequency is not available"
+    ::= { mbgFDMTraps 3 }
+
+mbgFDMTrapNoPPS NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when the reference Pulse Per Second is not available"
+    ::= { mbgFDMTraps 4 }
+    
+mbgFDMTrapNoPowerline NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when powerline frequency could not be detected"
+	-- is the powerline connected?
+    ::= { mbgFDMTraps 5 }
+
+mbgFDMTrapTimeDeviationOverflow NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when a time deviation overflow happens"
+    ::= { mbgFDMTraps 6 }
+    
+mbgFDMTrapA1Overflow NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when Analog1 overflows"
+    ::= { mbgFDMTraps 7 }
+
+mbgFDMTrapA2Overflow NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when Analog2 overflows"
+    ::= { mbgFDMTraps 8 }
+
+mbgFDMTrapFreqLimitExceeded NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when the current frequency exceeds the valid frequency range"
+    ::= { mbgFDMTraps 9 }
+
+mbgFDMXPTReboot NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when the FDMXPT module starts up"
+	-- happens at system startup and if the FDMXPT module reboots
+    ::= { mbgFDMTraps 10 }
+
+mbgFDMNormalOperation NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "trap to be sent when the FDM status is OK (Normal Operation)"
+	-- happens at system startup and as soon as all error conditions have been cleared
+    ::= { mbgFDMTraps 99 }
+
+--
+-- Conformance Statements
+--
+
+
+mbgFDMConformance		OBJECT IDENTIFIER ::= { mbgFDM 90 }
+mbgFDMCompliances		OBJECT IDENTIFIER ::= { mbgFDMConformance 1 }
+mbgFDMGroups			OBJECT IDENTIFIER ::= { mbgFDMConformance 2 }
+
+mbgFDMCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+	"The compliance statement for SNMP entities which implement version 2
+        of the XPT MIB"
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+                mbgFDMObjectsGroup,
+                mbgFDMTrapsGroup
+        }
+    ::= { mbgFDMCompliances 1 }
+
+
+mbgFDMObjectsGroup	OBJECT-GROUP
+    OBJECTS {
+	mbgFDMMode,
+	mbgFDMModeVal,
+	mbgFDMFrequency,
+	mbgFDMFrequencyVal,
+	mbgFDMRefTime,
+	mbgFDMPLTime,
+	mbgFDMFreqDev,
+	mbgFDMFreqDevVal,
+	mbgFDMTimeDev,
+	mbgFDMTimeDevVal,
+	mbgFDMErrorStatus
+    }			
+    STATUS	current
+    DESCRIPTION
+	"The collection of objects for the MBG FDMXPT MIB"
+	
+    ::= { mbgFDMGroups 1 }
+    
+mbgFDMTrapsGroup 	NOTIFICATION-GROUP
+    NOTIFICATIONS {
+	mbgFDMTrapInternalError,
+	mbgFDMTrapNoTimeString,
+        mbgFDMTrapNo10Mhz,
+        mbgFDMTrapNoPPS,
+        mbgFDMTrapNoPowerline,
+        mbgFDMTrapTimeDeviationOverflow,
+        mbgFDMTrapA1Overflow,
+        mbgFDMTrapA2Overflow,
+        mbgFDMTrapFreqLimitExceeded,
+        mbgFDMXPTReboot,
+        mbgFDMNormalOperation
+    }																
+    STATUS	current
+    DESCRIPTION
+	"The collection of traps for the MBG FDMXPT MIB"
+	
+    ::= { mbgFDMGroups 2 }
+
+END

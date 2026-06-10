@@ -1,0 +1,357 @@
+--  =================================================================
+-- Copyright (C) 2018 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI Inner Link MIB File for inner links between 
+--                frames
+-- Reference:   
+-- Version:     V2.01
+-- History: 
+-- 
+--           V1.00   2007-10-24, Create 
+-- =================================================================
+
+    HUAWEI-INNER-LINK-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS          
+            hwDatacomm            
+                FROM HUAWEI-MIB
+            PhysicalIndex
+                FROM ENTITY-MIB    
+            SnmpAdminString            
+                FROM SNMP-FRAMEWORK-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP                          
+                FROM SNMPv2-CONF            
+            Unsigned32, BITS, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            TEXTUAL-CONVENTION, DisplayString           
+                FROM SNMPv2-TC;
+    
+    
+        hwInnerLinkMIB MODULE-IDENTITY 
+            LAST-UPDATED "201801151430Z"
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+            DESCRIPTION 
+                "The private mib file includes the general  
+                information of inner links between frames
+                in cluster system."
+
+                REVISION "201801151430Z"
+                DESCRIPTION "V2.01, Modify the description "
+
+            ::= { hwDatacomm 158 }
+
+
+--
+-- Node definitions 
+--      
+        hwInnerLinkMIBObjects OBJECT IDENTIFIER ::= { hwInnerLinkMIB 1 }
+        
+        hwInnerLinkMIBObjPrefix OBJECT IDENTIFIER ::= { hwInnerLinkMIBObjects 1 }
+        hwInnerLinkLeftPortPhysicalIndex OBJECT-TYPE
+            SYNTAX PhysicalIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe physical entity index of left port of 
+                 the physical link which is part of the corresponding
+                 inner logical link."
+            ::= { hwInnerLinkMIBObjPrefix 1 }
+            
+        hwInnerLinkLeftPortPhysicalName OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe physical entity name of left port of 
+                 the physical link which is part of the corresponding
+                 inner logical link."
+            ::= { hwInnerLinkMIBObjPrefix 2 }
+            
+        hwInnerLinkRightPortPhysicalIndex OBJECT-TYPE
+            SYNTAX PhysicalIndex
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe physical entity index of right port of 
+                 the physical link which is part of the corresponding
+                 inner logical link."
+            ::= { hwInnerLinkMIBObjPrefix 3 }
+            
+        hwInnerLinkRightPortPhysicalName OBJECT-TYPE
+            SYNTAX SnmpAdminString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe physical entity name of right port of 
+                 the physical link which is part of the corresponding
+                 inner logical link."
+            ::= { hwInnerLinkMIBObjPrefix 4 }
+            
+        hwInnerLinkTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwInnerLinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes the status of inter-chassis logical links, 
+                including the information about the left and right chassis and ports, 
+                management status, operation status, and alarm status."
+            ::= { hwInnerLinkMIBObjects 2 }
+        
+        hwInnerLinkEntry OBJECT-TYPE
+            SYNTAX HwInnerLinkEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Information about a particular inner link entity.
+                Each entry provides left and right vitural port and status
+                of the link to NMS to manage the links."
+            INDEX { hwInnerLinkIndex }
+            ::= { hwInnerLinkTable 1 }
+    
+        HwInnerLinkEntry ::=
+            SEQUENCE { 
+                hwInnerLinkIndex
+                    Unsigned32,
+                hwInnerLinkLeftFrameType
+                    INTEGER,
+                hwInnerLinkLeftFrameId
+                    Unsigned32,             
+                hwInnerLinkLeftPortId
+                    Unsigned32,
+                hwInnerLinkRightFrameType
+                    INTEGER,
+                hwInnerLinkRightFrameId
+                    Unsigned32,
+                hwInnerLinkRightPortId
+                    Unsigned32,            
+                hwInnerLinkType
+                    INTEGER,
+                hwInnerLinkAdminState
+                    INTEGER,
+                hwInnerLinkOperState
+                    INTEGER,
+                hwInnerLinkAlarmLight
+                    BITS
+                 }
+             
+        hwInnerLinkIndex OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the index of an inter-chassis logical link."
+            ::= { hwInnerLinkEntry 1 }
+        
+        hwInnerLinkLeftFrameType OBJECT-TYPE
+            SYNTAX INTEGER{
+                unknown(1),
+                centralChassis (2),
+                lineChassis (3)
+                }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the type of the chassis where the left port resides. Available options:
+                unknown(1)
+                centralChassis (2)
+                lineChassis (3)"
+            ::= { hwInnerLinkEntry 2 }
+            
+        hwInnerLinkLeftFrameId OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the ID of the chassis where the left port resides."
+            ::= { hwInnerLinkEntry 3 }
+            
+        hwInnerLinkLeftPortId OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the left (virtual) port ID."
+            ::= { hwInnerLinkEntry 4 }
+            
+        hwInnerLinkRightFrameType OBJECT-TYPE
+            SYNTAX INTEGER{
+                unknown(1),
+                centralChassis (2),
+                lineChassis (3)
+                }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the type of the chassis where the right port resides. Available options:
+                unknown(1)
+                centralChassis (2)
+                lineChassis (3)"
+            ::= { hwInnerLinkEntry 5 }
+            
+        hwInnerLinkRightFrameId OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the ID of the chassis where the right port resides."
+            ::= { hwInnerLinkEntry 6 }
+            
+        hwInnerLinkRightPortId OBJECT-TYPE
+            SYNTAX      Unsigned32
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the right (virtual) port ID."
+            ::= { hwInnerLinkEntry 7 }
+            
+        hwInnerLinkType OBJECT-TYPE
+            SYNTAX INTEGER{
+                unknown(1),
+                controlChannel(2),
+                monitorChannel(3),
+                forwardChannel(4)
+                }
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "This object indicates the type of an inter-chassis logical link. Available options:
+                unknown(1)
+                controlChannel(2)
+                monitorChannel(3)
+                dataChannel(4)"
+            ::= { hwInnerLinkEntry 8 }
+            
+        hwInnerLinkAdminState OBJECT-TYPE
+            SYNTAX INTEGER{
+                notSupported(1),
+                locked(2),
+                shuttingDown(3),
+                unlocked(4)
+                }
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION
+                "This object indicates the management status of an inter-chassis logical link. Available options:
+                notSupported (1)
+                locked(2)
+                shuttingDown(3)
+                unlocked(4)"
+            ::= { hwInnerLinkEntry 9 }
+        
+        hwInnerLinkOperState OBJECT-TYPE
+            SYNTAX INTEGER{
+                unknown(1),
+                mostPhyChannelUp(2),
+                partPhyChannelUp(3),
+                mostPhyChannelDown(4)
+                }
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "This object indicates the operation status of an inter-chassis logical link. Available options:
+                notSupported (1)
+                mostPhyChannelUp(2)
+                partPhyChannelUp(3)
+                mostPhyChannelDown(4)"
+            ::= { hwInnerLinkEntry 10 }        
+        
+        hwInnerLinkAlarmLight OBJECT-TYPE
+            SYNTAX BITS{
+                notSupported(0),
+                underRepair(1),
+                critical(2),
+                major(3),
+                minor(4),
+                alarmOutstanding(5),
+                warning(6),
+                indeterminate(7)
+                }
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "This object indicates the alarm status of an inter-chassis logical link. Available options:
+                notSupported(0)
+                underRepair(1)
+                critical(2)
+                major(3)
+                minor(4)
+                alarmOutstanding(5)
+                warning(6)
+                indeterminate(7)"
+            ::= { hwInnerLinkEntry 11 } 
+
+       hwInnerLinkTraps OBJECT IDENTIFIER ::= { hwInnerLinkMIB 2 }
+       hwInnerLinkTrapsPrefix OBJECT IDENTIFIER ::= { hwInnerLinkTraps 1 }
+       
+       hwInnerLinkOnePhysicalLinkUp NOTIFICATION-TYPE
+            OBJECTS { hwInnerLinkLeftPortPhysicalIndex, hwInnerLinkLeftPortPhysicalName, 
+                       hwInnerLinkRightPortPhysicalIndex, hwInnerLinkRightPortPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "One physical link of the corrresponding inner logical link is available."
+            ::= { hwInnerLinkTrapsPrefix 1 }
+            
+       hwInnerLinkOnePhysicalLinkDown NOTIFICATION-TYPE
+            OBJECTS { hwInnerLinkLeftPortPhysicalIndex, hwInnerLinkLeftPortPhysicalName, 
+                       hwInnerLinkRightPortPhysicalIndex, hwInnerLinkRightPortPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "One physical link of the corrresponding inner logical link is unavailable."
+            ::= { hwInnerLinkTrapsPrefix 2 }
+             
+            
+--     Conformance and Compliance
+-- 
+        hwInnerLinkConformance OBJECT IDENTIFIER ::= { hwInnerLinkMIB 3 }
+        
+        hwInnerLinkCompliances OBJECT IDENTIFIER ::= { hwInnerLinkConformance 1 }   
+       
+--  this module
+        hwInnerLinkCompliance MODULE-COMPLIANCE
+            STATUS              current
+            DESCRIPTION 
+                "The compliance statement for systems supporting
+                the HUAWEI Inner Link MIB."
+            MODULE -- this module
+            MANDATORY-GROUPS { hwInnerLinkGroup }
+            OBJECT hwInnerLinkAdminState
+                MIN-ACCESS read-only
+                DESCRIPTION 
+                    "Write access is not required."
+            ::= { hwInnerLinkCompliances 1 }   
+            
+        hwInnerLinkGroups OBJECT IDENTIFIER ::= { hwInnerLinkConformance 2 }
+        
+        hwInnerLinkGroup OBJECT-GROUP
+            OBJECTS { hwInnerLinkLeftPortPhysicalIndex, hwInnerLinkLeftPortPhysicalName,
+            hwInnerLinkRightPortPhysicalIndex, hwInnerLinkRightPortPhysicalName,
+            hwInnerLinkLeftFrameType, hwInnerLinkLeftFrameId,
+            hwInnerLinkLeftPortId, hwInnerLinkRightFrameType, hwInnerLinkRightFrameId,
+            hwInnerLinkRightPortId, hwInnerLinkType, hwInnerLinkAdminState,
+            hwInnerLinkOperState, hwInnerLinkAlarmLight
+          }
+            STATUS current
+            DESCRIPTION 
+                "HUAWEI Inner Link group."
+            ::= { hwInnerLinkGroups 1 }
+            
+        hwInnerLinkNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwInnerLinkOnePhysicalLinkUp, hwInnerLinkOnePhysicalLinkDown }
+            STATUS current
+            DESCRIPTION 
+                "Inner Link Notification group."
+            ::= { hwInnerLinkGroups 2 }
+    END
+
+--
+-- HUAWEI-INNER-LINK-MIB.mib
+--

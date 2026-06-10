@@ -1,0 +1,841 @@
+B100-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, Counter32, Counter64
+        FROM SNMPv2-SMI
+ 
+    TimeInterval, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    InetAddress, InetAddressType, InetPortNumber
+	FROM INET-ADDRESS-MIB
+
+    one4net 
+	FROM ONE4NET-MIB;
+
+b100 MODULE-IDENTITY
+	LAST-UPDATED "202106250909Z"
+	ORGANIZATION "Kemp Technologies"
+	CONTACT-INFO "email: supportteam@kemptechnologies.com"
+	DESCRIPTION "LoadMaster configuration."
+	REVISION "202106250909Z"
+	DESCRIPTION "Version 1.26"
+	::= { one4net 13 }
+
+b100VSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing Virtual Service(s) specific information."
+	::= { b100 1 }
+
+b100RSTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"A table containing Virtual Service(s) specific information."
+	::= { b100 2 }
+
+b100NotificationsPrefix OBJECT IDENTIFIER
+	::= { b100 3 }
+
+-- BEGIN VSdesc --
+
+version OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The version of the netfilter modules"
+        ::= { b100 0 1 }
+
+numServices OBJECT-TYPE
+        SYNTAX          Integer32 (0..1024)
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The current number of Virtual Services"
+        ::= { b100 0 2 }
+
+hashTableSize OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The size of hash table for L4 connection contexts"
+        ::= { b100 0 3 }
+
+tcpTimeOut OBJECT-TYPE
+        SYNTAX          TimeInterval
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The L4 TCP Timeout(s) for established connections"
+        ::= { b100 0 4 }
+
+tcpFinTimeOut OBJECT-TYPE
+        SYNTAX          TimeInterval
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The L4 TCP Timeout(s) for connections in FIN wait state"
+        ::= { b100 0 5 }
+
+udpTimeOut OBJECT-TYPE
+        SYNTAX          TimeInterval
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The L4 UDP Timeout(s)"
+        ::= { b100 0 6 }
+
+daemonState OBJECT-TYPE
+        SYNTAX          INTEGER {
+                          none(0),
+                          master(1),
+                          backup(2)
+                        }   
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The state of daemon for synchronisation of L4 connection contexts"
+        ::= { b100 0 7 }
+
+mcastInterface OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..16))
+        MAX-ACCESS	read-only
+        STATUS	current
+        DESCRIPTION "The multicast interface used by L4 inter machine update daemon"
+        ::= { b100 0 8 }
+
+haState OBJECT-TYPE
+        SYNTAX          INTEGER {
+                          none(0),
+                          master(1),
+                          standby(2),
+			  passive(3)
+                        }   
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The HA status of the current machine"
+        ::= { b100 0 9 }
+
+patchVersion OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..64))
+        MAX-ACCESS	read-only
+        STATUS	current
+        DESCRIPTION "The installed software patch version"
+        ::= { b100 0 10 }
+
+totalTps OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The current total TPS"
+        ::= { b100 0 11 }
+
+sslTps OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS	read-only
+        STATUS          current
+        DESCRIPTION     "The current SSL TPS"
+        ::= { b100 0 12 }
+
+-- END VSdesc --
+
+-- BEGIN VSentry --
+
+vsEntry OBJECT-TYPE
+	SYNTAX		VSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information about a Virtual Service"
+	INDEX   { 	vSIdx }
+	::= { b100VSTable 1 }
+
+VSEntry ::= SEQUENCE {
+	vSIdx			Integer32,
+	vSIp			InetAddress,
+	vSPort			InetPortNumber,
+	vSAddrtype		InetAddressType,
+	vSProtocol		INTEGER,
+	vSSchedulingMethod	OCTET STRING,
+	vSPersistenceTimeout	TimeInterval,
+	vSCheckerType		OCTET STRING,
+	vSAdaptiveMethod	OCTET STRING,
+	vSNumDests              Integer32,
+	vSL7persist             OCTET STRING,
+	vSL7cookieId            OCTET STRING,
+	vSName                  OCTET STRING,
+	vSState                 INTEGER,
+	vSFollow                InetPortNumber,
+	vSConns         	Counter32,
+	vSInPkts        	Counter32,
+	vSOutPkts       	Counter32,
+	vSInBytes       	Counter64,
+	vSOutBytes      	Counter64,
+	vSActiveConns   	Gauge32,
+
+	vSCurrentAvgRequest      Integer32,
+	vSCurrentAvgResponse     Integer32,
+	vSCurrentMaxRequest      Integer32,
+	vSCurrentMaxResponse     Integer32,
+	vSCurrentMinRequest      Integer32,
+	vSCurrentMinResponse     Integer32,
+
+	vSLongTermAvgRequest     Integer32,
+	vSLongTermAvgResponse    Integer32,
+	vSLongTermMaxRequest     Integer32,
+	vSLongTermMaxResponse    Integer32,
+	vSLongTermMinRequest     Integer32,
+	vSLongTermMinResponse    Integer32,
+
+	vSCurrentAvgRTTTimes   Integer32,
+	vSCurrentMaxRTTTimes   Integer32,
+	vSCurrentMinRTTTimes   Integer32,
+	vSLongTermAvgRTTTimes  Integer32,
+	vSLongTermMaxRTTTimes  Integer32,
+	vSLongTermMinRTTTimes  Integer32 }
+
+vSIdx OBJECT-TYPE
+	SYNTAX		Integer32 (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service index"
+	::= { vsEntry 1 }
+    
+vSIp OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The IP address of the Virtual Service"
+	::= { vsEntry 2 }
+
+vSPort OBJECT-TYPE
+	SYNTAX		InetPortNumber
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service port number"
+	::= { vsEntry 3 }
+
+vSAddrtype OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service address type"
+	::= { vsEntry 4 }
+
+vSProtocol  OBJECT-TYPE
+	SYNTAX		INTEGER {
+		tcp(6),
+		udp(17)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service protocol (TCP/UDP)"
+	::= { vsEntry 5 }
+
+vSSchedulingMethod OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE(0..16))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service scheduling method"
+	::= { vsEntry 6 } 
+
+vSPersistenceTimeout OBJECT-TYPE
+	SYNTAX          TimeInterval
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service timeout for persistent connections"
+	::= { vsEntry 7 } 
+
+vSCheckerType OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE(0..32))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The type of checker associated with the Virtual Service"
+	::= { vsEntry 8 } 
+
+vSAdaptiveMethod OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE(0..32))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The type of adaptive method used with the Virtual Service"
+	::= { vsEntry 9 } 
+
+vSNumDests  OBJECT-TYPE
+	SYNTAX		Integer32 (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of destinations (Real Servers) for this Virtual Service"
+	::= { vsEntry 10 }
+
+vSL7persist OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE(0..16))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The type of persistence used with the Virtual Service"
+	::= { vsEntry 11 } 
+
+vSL7cookieId OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE(0..128))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the cookie associated with the Virtual Service"
+	::= { vsEntry 12 } 
+
+vSName OBJECT-TYPE
+	SYNTAX          OCTET STRING (SIZE(0..16))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the Virtual Service"
+	::= { vsEntry 13 } 
+
+vSState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		inService(1),
+		outOfService(2),
+		disabled(4),
+		sorry(5),
+		redirect(6),
+		errormsg(7),
+		securityDown(8)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The status of the Virtual Service"
+	::= { vsEntry 14 }    
+
+vSFollow OBJECT-TYPE
+	SYNTAX		InetPortNumber
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Virtual Service follow port number"
+	::= { vsEntry 15 }
+
+vSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of connections for this Virtual Service"
+	::= { vsEntry 16 }
+
+vSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incomming packets to this Virtual Service"
+	::= { vsEntry 17 }
+
+vSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing packets from this Virtual Service"
+	::= { vsEntry 18 }
+
+vSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incomming bytes to this Virtual Service"
+	::= { vsEntry 19 }
+
+vSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of outgoing bytes from this Virtual Service"
+	::= { vsEntry 20 }
+
+vSActiveConns OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of active connections for this Virtual Service"
+	::= { vsEntry 21 }
+
+vSCurrentAvgRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Current Average (ms)"
+	::= { vsEntry 22 }
+
+vSCurrentAvgResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Current Average (ms)"
+	::= { vsEntry 23 }
+
+vSCurrentMaxRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Current Max (ms)"
+	::= { vsEntry 24 }
+
+vSCurrentMaxResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Current Max (ms)"
+	::= { vsEntry 25 }
+
+vSCurrentMinRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Current Min (ms)"
+	::= { vsEntry 26 }
+
+vSCurrentMinResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Current Min (ms)"
+	::= { vsEntry 27 }
+
+vSLongTermAvgRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Long Term Average (ms)"
+	::= { vsEntry 28 }
+
+vSLongTermAvgResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Long Term Average (ms)"
+	::= { vsEntry 29 }
+
+vSLongTermMaxRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Long Term Max (ms)"
+	::= { vsEntry 30 }
+
+vSLongTermMaxResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Long Term Max (ms)"
+	::= { vsEntry 31 }
+
+vSLongTermMinRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Long Term Min (ms)"
+	::= { vsEntry 32 }
+
+vSLongTermMinResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Long Term Min (ms)"
+	::= { vsEntry 33 }
+
+vSCurrentAvgRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Current Average (ms)"
+	::= { vsEntry 34 }
+
+vSCurrentMaxRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Current Max (ms)"
+	::= { vsEntry 35 }
+
+vSCurrentMinRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Current Min (ms)"
+	::= { vsEntry 36 }
+
+vSLongTermAvgRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Long Term Average (ms)"
+	::= { vsEntry 37 }
+
+vSLongTermMaxRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Long Term Max (ms)"
+	::= { vsEntry 38 }
+
+vSLongTermMinRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Long Term Min (ms)"
+	::= { vsEntry 39 }
+
+-- END VSentry --
+
+-- BEGIN RSentry --
+
+rsEntry OBJECT-TYPE
+	SYNTAX		RSEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION	"Information about a Real Server on a Virtual Service"
+	INDEX   { 	rSIdx }
+	::= { b100RSTable 1 }
+
+RSEntry ::= SEQUENCE {
+	rSVsIdx             Integer32,
+	rSIp                InetAddress,
+	rSPort              InetPortNumber,
+	rSAddrType          InetAddressType,
+	rSIdx               Integer32,
+	rSForwardingMethod  OCTET STRING,
+	rSWeight            Integer32,
+	rSState             INTEGER,
+	rSConns             Counter32,
+	rSInPkts            Counter32,
+	rSOutPkts           Counter32,
+	rSInBytes           Counter64,
+	rSOutBytes          Counter64,
+	rSActiveConns       Gauge32,
+	rSInactiveConns     Counter32,
+
+	rSCurrentAvgRequest      Integer32,
+	rSCurrentAvgResponse     Integer32,
+	rSCurrentMaxRequest      Integer32,
+	rSCurrentMaxResponse     Integer32,
+	rSCurrentMinRequest      Integer32,
+	rSCurrentMinResponse     Integer32,
+
+	rSLongTermAvgRequest     Integer32,
+	rSLongTermAvgResponse    Integer32,
+	rSLongTermMaxRequest     Integer32,
+	rSLongTermMaxResponse    Integer32,
+	rSLongTermMinRequest     Integer32,
+	rSLongTermMinResponse    Integer32,
+
+	rSCurrentAvgRTTTimes   Integer32,
+	rSCurrentMaxRTTTimes   Integer32,
+	rSCurrentMinRTTTimes   Integer32,
+	rSLongTermAvgRTTTimes  Integer32,
+	rSLongTermMaxRTTTimes  Integer32,
+	rSLongTermMinRTTTimes  Integer32 }
+
+
+rSVsIdx OBJECT-TYPE
+	SYNTAX		Integer32 (0..1024)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The id of the associated Virtual Service"
+	::= { rsEntry 1 }
+    
+rSIp OBJECT-TYPE
+	SYNTAX		InetAddress
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The IP address of the Real Server"
+	::= { rsEntry 2 }
+
+rSPort OBJECT-TYPE
+	SYNTAX		InetPortNumber
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Real Server port number"
+	::= { rsEntry 3 }    
+
+rSAddrType OBJECT-TYPE
+	SYNTAX		InetAddressType
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Real Server address type"
+	::= { rsEntry 4 }
+
+rSIdx OBJECT-TYPE
+	SYNTAX		Integer32 (0..8192)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The Real Server index"
+	::= { rsEntry 5 }
+    
+rSForwardingMethod OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..32))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The forwarding method used for Real Server"
+	::= { rsEntry 6 }
+
+rSWeight OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The configured weight of the Real Server"
+	::= { rsEntry 7 }    
+
+rSState OBJECT-TYPE
+	SYNTAX		INTEGER {
+		inService(1),
+		outOfService(2),
+		disabled(4)
+	}
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The current status of the Real Server"
+	::= { rsEntry 8 }    
+
+rSConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of connections for this Real Server"
+	::= { rsEntry 12 }
+
+rSInPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming packets to this Real Server"
+	::= { rsEntry 13 }
+
+rSOutPkts OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing packets from this Real Server"
+	::= { rsEntry 14 }
+
+rSInBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of incoming bytes to this Real Server"
+	::= { rsEntry 15 }
+
+rSOutBytes OBJECT-TYPE
+	SYNTAX		Counter64
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of outgoing bytes from this Real Server"
+	::= { rsEntry 16 }
+
+rSActiveConns OBJECT-TYPE
+	SYNTAX		Gauge32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of active connections for this Real Server"
+	::= { rsEntry 17 }
+
+rSInactiveConns OBJECT-TYPE
+	SYNTAX		Counter32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inactive connections for this Real Server"
+	::= { rsEntry 18 }
+
+rSCurrentAvgRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Current Average (ms)"
+	::= { rsEntry 19 }
+
+rSCurrentAvgResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Current Average (ms)"
+	::= { rsEntry 20 }
+
+rSCurrentMaxRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Current Max (ms)"
+	::= { rsEntry 21 }
+
+rSCurrentMaxResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Current Max (ms)"
+	::= { rsEntry 22 }
+
+rSCurrentMinRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Current Min (ms)"
+	::= { rsEntry 23 }
+
+rSCurrentMinResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Current Min (ms)"
+	::= { rsEntry 24 }
+
+rSLongTermAvgRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Long Term Average (ms)"
+	::= { rsEntry 25 }
+
+rSLongTermAvgResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Long Term Average (ms)"
+	::= { rsEntry 26 }
+
+rSLongTermMaxRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Long Term Max (ms)"
+	::= { rsEntry 27 }
+
+rSLongTermMaxResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Long Term Max (ms)"
+	::= { rsEntry 28 }
+
+rSLongTermMinRequest OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Request Long Term Min (ms)"
+	::= { rsEntry 29 }
+
+rSLongTermMinResponse OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Response Long Term Min (ms)"
+	::= { rsEntry 30 }
+
+rSCurrentAvgRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Current Average (ms)"
+	::= { rsEntry 31 }
+
+rSCurrentMaxRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Current Max (ms)"
+	::= { rsEntry 32 }
+
+rSCurrentMinRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Current Min (ms)"
+	::= { rsEntry 33 }
+
+rSLongTermAvgRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Long Term Average (ms)"
+	::= { rsEntry 34 }
+
+rSLongTermMaxRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Long Term Max (ms)"
+	::= { rsEntry 35 }
+
+rSLongTermMinRTTTimes OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Round Trip Times Long Term Min (ms)"
+	::= { rsEntry 36 }
+
+-- END RSentry --
+
+adaptiveInterval OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The adaptive scheduling: interval(s)"
+	::= { b100 13 }
+
+adaptiveUrl OBJECT-TYPE
+	SYNTAX		OCTET STRING (SIZE(0..1023))
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The adaptive scheduling: URL with Real Server load"
+	::= { b100 14 }
+
+adaptiveCtrlMinP OBJECT-TYPE
+	SYNTAX		Integer32 (0..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The adaptive scheduling: minimum (%) of ctrl variable"
+	::= { b100 15 }
+
+adaptiveMinWeight OBJECT-TYPE
+	SYNTAX		Integer32 (1..65535)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The adaptive scheduling: min bound (>0) for adaptive weight"
+	::= { b100 16 }
+
+--
+
+b100Notifications OBJECT IDENTIFIER
+	::= { b100NotificationsPrefix 1 }
+
+vSstateChange NOTIFICATION-TYPE
+	OBJECTS {
+		vSState,
+		vSIp,
+		vSPort,
+		vSAddrtype,
+		vSName,
+		vSIdx
+	}
+	STATUS  current
+	DESCRIPTION "The notification sent when a Virtual Service changes state."
+	::= { b100Notifications 1 }
+
+rSstateChange  NOTIFICATION-TYPE
+	OBJECTS {
+		rSState,
+		rSIp,
+		rSPort,
+		rSAddrType,
+		rSIdx,
+		vSIp,
+		vSPort,
+		vSAddrtype,
+		vSName,
+		vSIdx
+	}
+	STATUS  current
+	DESCRIPTION "The notification sent when a Real Server changes state."
+	::= { b100Notifications 2 }
+
+hAstateChange NOTIFICATION-TYPE
+	OBJECTS {
+		haState
+	}
+	STATUS  current
+	DESCRIPTION "The notification sent when a failover occurs."
+	::= { b100Notifications 3 }
+
+licenseExceeded NOTIFICATION-TYPE
+	STATUS  current
+	DESCRIPTION "The notification sent when a timed license has expired."
+	::= { b100Notifications 4 }
+
+END

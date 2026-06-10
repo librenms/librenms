@@ -1,0 +1,22 @@
+os: morningstar-pwm
+text: MorningStar PWM
+over:
+    - { graph: device_temperature, text: Temperatures }
+    - { graph: device_voltage, text: Voltages }
+    - { graph: device_current, text: Currents }
+type: appliance
+icon: morningstar
+mib_dir: morningstar
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.33333
+        snmpget:
+            oid: PROSTAR-PWM::subModel.0
+            op: 'contains'
+            value: 'PWM'
+    -
+        sysObjectID: .1.3.6.1.4.1.33333
+        snmpget:
+            oid: TRISTAR::subModel.0
+            op: 'contains'
+            value: 'PWM'

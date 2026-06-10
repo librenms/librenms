@@ -1,0 +1,12 @@
+os: deltaorion
+group: delta
+text: 'Delta Orion Controller'
+type: environment
+icon: delta
+over:
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.20246

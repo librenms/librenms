@@ -1,0 +1,419 @@
+--  *****************************************************************
+--  DLINKSW-ERROR-DISABLE-MIB.mib : Error Disable MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+DLINKSW-ERROR-DISABLE-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Unsigned32
+                FROM SNMPv2-SMI     
+        TEXTUAL-CONVENTION,
+        TruthValue
+                FROM SNMPv2-TC  
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+		        FROM SNMPv2-CONF       
+        InterfaceIndex
+                FROM IF-MIB
+        VlanId,
+        VlanIdOrNone
+                FROM Q-BRIDGE-MIB                 
+        dlinkIndustrialCommon			
+				FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwErrDisableMIB MODULE-IDENTITY
+        LAST-UPDATED "201307080000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "         D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:    +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for error disabled."
+        REVISION "201305020000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."           
+
+        REVISION "201307080000Z" 
+        DESCRIPTION
+            "Modified the object dErrDisIfStatusDisReason to
+            dErrDisIfStatusDisReasonIndex, make this object to be the third
+            index of dErrDisIfStatusEntry, to display more than one reason on
+            a port or vlan interface if more than one reason is recocovering
+            on the port or vlan interface."
+
+        REVISION "201404110000Z" 
+        DESCRIPTION
+            "Add scheduledShutdown and scheduledHibernation into DErrDisReasonID.
+	    Modify description of dErrDisIfStatusTimeLeft, using 0xFFFFFFFF to
+	    indicates no automatic recovery."
+    ::= { dlinkIndustrialCommon 45 }
+    
+--
+-- Textual conventions
+--    
+
+    DErrDisReasonID ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "An integer-value assigned to various conditions
+            that can error disable a system entity.
+            loopbackDetect:  Loopback Detection
+            l2ptGuard: L2 Protocol Tunneling. 
+            psecureViolation: Port Security violation.
+            stormControl: (broadcast/multicast/unicast)storm control. 
+            bpduProtect: BPDU protected. 
+            arpRateLimit: ARP rate limit.
+            dhcpRateLimit: DHCP rate limit.
+            ddm: Digital Diagnostics Monitoring
+            scheduledShutdown: Scheduled Port-shutdown by Power Saving
+            scheduledHibernation:Scheduled Hibernation by Power Saving
+            "
+        SYNTAX  INTEGER  
+            {   loopbackDetect(1), 
+                l2ptGuard(2), 
+                psecureViolation(3), 
+                stormControl(4), 
+                bpduProtect(5), 
+                arpRateLimit(6),
+                dhcpRateLimit(7),
+                ddm(8),
+                scheduledShutdown(9),
+                scheduledHibernation(10)
+            }
+-- -----------------------------------------------------------------------------
+    dErrDisableMIBNotifications     OBJECT IDENTIFIER ::= { dlinkSwErrDisableMIB 0 }
+    dErrDisableMIBObjects           OBJECT IDENTIFIER ::= { dlinkSwErrDisableMIB 1 }
+    dErrDisableMIBConformance       OBJECT IDENTIFIER ::= { dlinkSwErrDisableMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dErrDisRecoveryTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DErrDisRecoveryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "This table contains the recovery mechanism for the features with 
+            error-disable functionality.
+            Transceiver monitoring module (the DErrDisReasonID is 'ddm') can also
+            put a SFP port which is in abnormal status in error disabled state. 
+            This error disable cannot be auto recovered but can only be manually
+            recovered. As a result, there is no entry for error cause is 'ddm'
+            in this table. 
+            "
+        ::= { dErrDisableMIBObjects 1 }
+
+    dErrDisRecoveryEntry OBJECT-TYPE
+        SYNTAX          DErrDisRecoveryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry is created for each feature which has error-disable 
+             functionality."
+        INDEX    { dErrDisRecoveryIndex }
+        ::= { dErrDisRecoveryTable 1 }
+
+    DErrDisRecoveryEntry ::= SEQUENCE {
+        dErrDisRecoveryIndex        DErrDisReasonID,
+        dErrDisRecoveryEnable       TruthValue,
+        dErrDisRecoveryInterval     Integer32
+    }
+
+    dErrDisRecoveryIndex OBJECT-TYPE
+        SYNTAX          DErrDisReasonID
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the cause of error-disable."
+        ::= { dErrDisRecoveryEntry 1 }
+
+    dErrDisRecoveryEnable OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION           
+            "This object specifies whether the system can
+            automatically recover a system entity that has been
+            disabled by the cause."
+        DEFVAL      { false }
+        ::= { dErrDisRecoveryEntry 2 }
+
+    dErrDisRecoveryInterval OBJECT-TYPE
+        SYNTAX          Integer32 (5..86400)
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specifies the error-recovery time interval on specific cause 
+            to recover the port/interface from the error disabled situation."
+        DEFVAL      { 300 }
+        ::= { dErrDisRecoveryEntry 3 }
+
+-- -----------------------------------------------------------------------------
+    dErrDisIfStatusTableNum  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in the dErrDisIfStatusTable."
+        ::= { dErrDisableMIBObjects 2 }
+
+    dErrDisIfStatusTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DErrDisIfStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "This table provides next recovery timeout information about an interface 
+             disabled by a feature."           
+        ::= { dErrDisableMIBObjects 3 }
+
+    dErrDisIfStatusEntry OBJECT-TYPE
+        SYNTAX          DErrDisIfStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates next recovery timeout information about an interface 
+            or (interface, vlan) disabled by a feature."    
+        INDEX    
+            {   dErrDisIfStatusIfIndex,
+                dErrDisIfStatusVlanIndex,
+                dErrDisIfStatusDisReasonIndex }
+        ::= { dErrDisIfStatusTable 1 }
+
+    DErrDisIfStatusEntry ::= SEQUENCE {
+        dErrDisIfStatusIfIndex      InterfaceIndex,
+        dErrDisIfStatusVlanIndex    VlanIdOrNone,
+        dErrDisIfStatusDisReasonIndex   DErrDisReasonID,
+        dErrDisIfStatusTimeLeft     Unsigned32
+    }
+
+    dErrDisIfStatusIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION           
+            "This object is the interface index of the interface disabled by a feature."
+        ::= { dErrDisIfStatusEntry 1 }
+
+    dErrDisIfStatusVlanIndex OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION                      
+            "This object indicates the VLAN in the given interface
+            that has been error-disabled. If the physical interface is
+            error-disabled then the value of this object is 0." 
+        ::= { dErrDisIfStatusEntry 2 }
+        
+    dErrDisIfStatusDisReasonIndex OBJECT-TYPE
+        SYNTAX          DErrDisReasonID
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the reason which cause the interface disabled."
+        ::= { dErrDisIfStatusEntry 3 }
+
+    dErrDisIfStatusTimeLeft OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the time left that the interface will be 
+            automatically recovered. Value 0xFFFFFFFF indicates the interface
+	    won't be automatically recovered."
+        ::= { dErrDisIfStatusEntry 4 }
+
+-- -----------------------------------------------------------------------------             
+     dErrDisNotificationEnable OBJECT-TYPE
+        SYNTAX          BITS {
+            errDisableAsserted(0),
+            errDisableCleared(1)            
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+         "This object indicates whether a specified notification is enabled or not.
+         If a bit corresponding to a notification is set to 1, then 
+         the specified notification can be generated.
+
+         errDisableAsserted(0) - Controls the notifications for a port/vlan
+                            entering into error disabled state.
+
+         errDisableCleared(1) - Controls the notifications for a port/vlan 
+                            exiting from error disabled state. 
+            
+         "
+    ::= { dErrDisableMIBObjects 4 }   
+    
+    dErrDisNotifRate OBJECT-TYPE
+        SYNTAX        Unsigned32 (0..1000)
+        UNITS         "notifications per minute"
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   
+            "Expressed in the number of notifications can be generated 
+            per minute. 
+            This object configures the rate-limit of  SNMP Notification for
+            errDisable feature. 
+            A value of 0 indicates that an SNMP Notification is generated
+            for every error disabled event."        
+        DEFVAL      { 0 }              
+        ::= { dErrDisableMIBObjects 5 }
+        
+-- -----------------------------------------------------------------------------         
+    dErrDisNotifyInfo        OBJECT IDENTIFIER ::= { dErrDisableMIBObjects 6 }
+   
+    dErrDisNotifyInfoPortIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex 
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the port number of error disabled port."
+        ::= { dErrDisNotifyInfo 1 }    
+        
+    dErrDisNotifyInfoLoopDetectedVID OBJECT-TYPE
+        SYNTAX          VlanId 
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN ID that has detected a loopback."
+        ::= { dErrDisNotifyInfo 2 }
+
+    dErrDisNotifyInfoReasonID OBJECT-TYPE
+        SYNTAX          DErrDisReasonID
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the condition which cause a port/vlan enter
+            into error disabled state."
+        ::= { dErrDisNotifyInfo 3 }               
+        
+--  ***************************************************************************	
+--  Notifications
+--  ***************************************************************************                                
+    dErrDisNotifyPortDisabledAssert  NOTIFICATION-TYPE
+        OBJECTS   {
+            dErrDisNotifyInfoPortIfIndex,
+            dErrDisNotifyInfoReasonID
+        }
+        STATUS  current
+        DESCRIPTION
+               "The trap is sent when a port enters into error disabled state."
+        ::= { dErrDisableMIBNotifications 1 }
+
+    dErrDisNotifyPortDisabledClear  NOTIFICATION-TYPE
+        OBJECTS {
+            dErrDisNotifyInfoPortIfIndex,
+            dErrDisNotifyInfoReasonID
+        }
+        STATUS  current
+        DESCRIPTION
+              "The trap is sent when a port loop restarts after the interval time."
+        ::= { dErrDisableMIBNotifications 2 }
+
+    dErrDisNotifyVlanDisabledAssert  NOTIFICATION-TYPE
+        OBJECTS   {
+            dErrDisNotifyInfoPortIfIndex,
+            dErrDisNotifyInfoReasonID,
+            dErrDisNotifyInfoLoopDetectedVID
+        }
+        STATUS  current
+        DESCRIPTION
+               "The trap is sent when a Port with a VID loop occurs."
+        ::= { dErrDisableMIBNotifications 3 }
+
+    dErrDisNotifyVlanDisabledClear NOTIFICATION-TYPE
+        OBJECTS  {
+            dErrDisNotifyInfoPortIfIndex,
+            dErrDisNotifyInfoReasonID,
+            dErrDisNotifyInfoLoopDetectedVID
+        }
+        STATUS  current
+        DESCRIPTION
+               "The trap is sent when a Port with a VID restarts after the interval time."
+        ::= { dErrDisableMIBNotifications 4 }
+                
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************
+    dErrDisMIBCompliances  OBJECT IDENTIFIER
+        ::= { dErrDisableMIBConformance 1 }
+
+    dErrDisMIBGroups  OBJECT IDENTIFIER
+        ::= { dErrDisableMIBConformance 2 } 
+    
+    dErrDisMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the 
+			DLINKSW-ERROR-DISABLE-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS 
+            {   dErrDisRecoveryCfgGroup,
+                dErrDisIfStatusGroup,
+                dErrDisNotifyCfgGroup,
+                dErrDisNotificationGroup
+            }
+        ::= { dErrDisMIBCompliances 1 }
+
+    dErrDisRecoveryCfgGroup OBJECT-GROUP
+		OBJECTS 
+		    {   dErrDisRecoveryEnable, 
+		        dErrDisRecoveryInterval 
+		    }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects to configure the error recovery of the 
+			error-disable feature."
+		::= { dErrDisMIBGroups 1 }
+		
+    dErrDisIfStatusGroup OBJECT-GROUP
+		OBJECTS 
+		    {   dErrDisIfStatusTableNum, 
+		        dErrDisIfStatusTimeLeft 
+		    }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects which indicate error-disable interface 
+			status."
+		::= { dErrDisMIBGroups 2 }
+    
+    dErrDisNotifyCfgGroup OBJECT-GROUP
+		OBJECTS 
+		    {   dErrDisNotificationEnable, 
+		        dErrDisNotifRate,
+		        dErrDisNotifyInfoPortIfIndex, 
+		        dErrDisNotifyInfoReasonID,
+		        dErrDisNotifyInfoLoopDetectedVID
+		    }
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects to configure the error recovery of the 
+			error-disable feature."
+		::= { dErrDisMIBGroups 3 }
+		
+    dErrDisNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { 
+            dErrDisNotifyPortDisabledAssert,
+            dErrDisNotifyPortDisabledClear,
+            dErrDisNotifyVlanDisabledAssert,
+            dErrDisNotifyVlanDisabledClear
+        }
+        STATUS current
+        DESCRIPTION
+            "The collection of notifications used for monitoring ErrDisable status"
+        ::= { dErrDisMIBGroups 4 }   
+
+END
+

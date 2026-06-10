@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.534.6.6.6",
+                    "sysDescr": "",
+                    "sysContact": "<private>",
+                    "version": "01.01.01",
+                    "hardware": "DBQ145412",
+                    "features": null,
+                    "location": "<private>",
+                    "os": "eatonpdu",
+                    "type": "power",
+                    "serial": "ADO3051266",
+                    "icon": "eaton.svg"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,0 +1,247 @@
+
+-- *****************************************************************************
+-- Juniper-PPP-Profile-CONF
+--
+-- SNMP Agent Capabilities definitions for the PPP Profile MIB.
+--
+-- Copyright (c) 2001, 2002 Unisphere Networks, Inc.
+-- Copyright (c) 2002-2009 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-PPP-Profile-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniProfileAgents
+        FROM Juniper-Agents;
+
+juniPppProfileAgent  MODULE-IDENTITY
+    LAST-UPDATED  "200909180724Z"  -- 18-Sep-09 03:24 AM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the PPP Profile component of the
+        SNMP agent in the Juniper E-series family of products."
+    -- Revision History
+    REVISION    "200909180724Z"  -- 18-Sep-09 03:24 AM EDT  - JUNOSe 11.1
+    DESCRIPTION
+        "Added new multiclass multilink objects. Added new traffic class
+	mapping for multiclasses.juniPppProfileAgentV11 was added."
+    REVISION    "200908101423Z"  -- 10-Aug-09 07:53 PM EST  - JUNOSe 11.0
+    DESCRIPTION
+        "Added new IPCP prompt option DNS object"
+    REVISION    "200707121215Z"  -- 12-Jul-07 08:15 AM EDT  - JUNOSe 7.3
+    DESCRIPTION
+        "Added new ignore magic number mismatch object
+         Added juniPppProfileLcpAuthentication2 object."
+    REVISION    "200510191626Z"  -- 19-Oct-05 12:26 PM EDT  - JUNOSe 7.2
+    DESCRIPTION
+	"Juniper-PPP-PROFILE-MIB:
+	 Added hash-based link selection option for MLPPP."
+    REVISION    "200311032132Z"  -- 03-Nov-03 04:32 PM EST  - JUNOSe 5.3
+    DESCRIPTION
+        "Juniper-PPP-PROFILE-MIB:
+         Added MLPPP fragmentation and reassembly parameters."
+    REVISION    "200303131647Z"  -- 13-Mar-03 11:47 AM EST  - JUNOSe 5.1
+    DESCRIPTION
+        "Added juniPppProfileInitiateIp and juniPppProfileInitiateIpv6 objects."
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200209032238Z"  -- 03-Sep-02 06:38 PM EDT  - JUNOSe 4.1
+    DESCRIPTION
+        "Added the AAA profile ID object."
+    REVISION    "200201251410Z"  -- 25-Jan-02 09:10 AM EST  - JUNOSe 4.0
+    DESCRIPTION
+        "Added the authenticator virtual router object."
+    REVISION    "200201161758Z"  -- 16-Jan-02 12:58 PM EST  - JUNOSe 3.4
+    DESCRIPTION
+        "Added the IPCP netmask option object."
+    REVISION    "200201081943Z"  -- 08-Jan-02 02:43 PM EST  - JUNOSe 3.3
+    DESCRIPTION
+        "Added support for dynamic multi-link PPP (MLPPP) interfaces."
+    REVISION    "200110171710Z"  -- 17-Oct-01 01:10 PM EDT  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniProfileAgents 3 }
+
+
+-- *****************************************************************************
+-- PPP Profile SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniPppProfileAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component was supported in JUNOSe 3.0 through
+        3.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when the dynamic multilink
+        PPP object was added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup }
+    ::= { juniPppProfileAgent 1 }
+
+juniPppProfileAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component was supported in JUNOSe 3.3 system
+        release."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when the IPCP netmask option
+        object was added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup2 }
+    ::= { juniPppProfileAgent 2 }
+
+juniPppProfileAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component was supported in JUNOSe 3.4 and
+        subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when the authenticator
+        virtual router object was added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup3 }
+    ::= { juniPppProfileAgent 3 }
+
+juniPppProfileAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component was supported in JUNOSe 4.0 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when the AAA profile ID
+        object was added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup4 }
+    ::= { juniPppProfileAgent 4 }
+
+juniPppProfileAgentV5 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 5 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component was supported in JUNOSe 4.1 through
+        5.0 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when the Initiate IP and
+        Initiate IPv6 objects were added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup5 }
+    ::= { juniPppProfileAgent 5 }
+
+juniPppProfileAgentV6 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 6 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component was supported in JUNOSe 5.1 and 5.2
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when the MLPPP fragmentation
+        and reassembly parameters were added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup6 }
+    ::= { juniPppProfileAgent 6 }
+
+juniPppProfileAgentV7 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 7 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component is supported in JUNOSe 5.3 through
+        7.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe. These capabilities became obsolete when the hash-based link
+	selction option was added to MLPPP."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup7 }
+    ::= { juniPppProfileAgent 7 }
+
+juniPppProfileAgentV8 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 8 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component is supported in JUNOSe 7.2 system
+        releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when object
+        rsPppProfileLcpAuthentication2 was added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup8 }
+    ::= { juniPppProfileAgent 8 }
+
+juniPppProfileAgentV9 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 9 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component is supported in JUNOSe 7.3 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.  These capabilities became obsolete when object 
+        rsPppProfileIpcpDnsOption and rsPppProfileIpcpLockout was added"
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup10 }
+    ::= { juniPppProfileAgent 9 }
+
+juniPppProfileAgentV10 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 10 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component is supported in JUNOSe 11.0 and
+        subsequent system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe.These capabilities became obsolete when support for Multiclass
+        MLPPP was added."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup11 }
+    ::= { juniPppProfileAgent 10 }
+
+juniPppProfileAgentV11 AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 11 of the PPP Profile component of the JUNOSe SNMP agent.  This
+        version of the PPP Profile component is supported in JUNOSe 11.1 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the PPP Profile application in
+        JUNOSe."
+    SUPPORTS    Juniper-PPP-PROFILE-MIB
+        INCLUDES {
+            juniPppProfileGroup12,
+            juniPppProfileMulticlassTrafficClassGroup1 }
+    ::= { juniPppProfileAgent 11 }
+
+END

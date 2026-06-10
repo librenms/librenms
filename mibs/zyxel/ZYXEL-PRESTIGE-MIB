@@ -1,0 +1,1338 @@
+--
+-- $Id: zyxel-prestige.mib version 1.00 2001/10/05
+--
+
+--	Copyright (C) 1994 - 2001 Zyxel Communications, Inc.
+--	All Rights Reserved.
+--
+-- Stagecoach Confidential; Need to Know only.
+-- Protected as an unpublished work.
+--
+-- The computer program listings, specifications and documentation
+-- herein are the property of Stagecoach Communications, Inc. and
+-- shall not be reproduced, copied, disclosed, or used in whole or
+-- in part for any reason without the prior express written permission of
+-- Stagecoach Communications, Inc.
+
+-- ZyXEL Communications Corporation
+-- Private Enterprise MIB definition
+
+ZYXEL-PRESTIGE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+           enterprises, Counter, Gauge, IpAddress,
+           NetworkAddress, TimeTicks
+	           FROM RFC1155-SMI
+            ifIndex, ipRouteDest, ipAdEntAddr, egpNeighAddr
+	           FROM RFC1213-MIB
+            atportIndex
+					FROM APPLETALK-MIB
+            OBJECT-TYPE
+               FROM RFC-1212        
+			TRAP-TYPE				
+			   FROM RFC-1215
+			prestigeCommon
+				FROM ZYXEL-MIB;
+
+
+	-- PRESTIGE common managed objects
+	prestigeSystem			OBJECT IDENTIFIER ::= { prestigeCommon 1 }
+	prestigeDynDns			OBJECT IDENTIFIER ::= { prestigeCommon 2 }
+	prestigeLAN				OBJECT IDENTIFIER ::= { prestigeCommon 3 }
+	prestigeStaticRoute		OBJECT IDENTIFIER ::= { prestigeCommon 4 }
+	prestigeFilterConfig	OBJECT IDENTIFIER ::= { prestigeCommon 5 }
+	prestigeXDSL			OBJECT IDENTIFIER ::= { prestigeCommon 6 }
+	prestigeTraps			OBJECT IDENTIFIER ::= { prestigeCommon 99 }
+	
+	
+
+	-- The system group
+	sysRasFWVersion OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Current ras firmware version, N/A means information 
+			not available."
+		::= { prestigeSystem 1 }
+
+	sysHWVersion OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Current hardware version, N/A means information 
+			not available."
+		::= { prestigeSystem 2 }
+
+	sysModemVersion OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Current modem code version, N/A means information 
+			not available."
+		::= { prestigeSystem 3 }
+
+	sysSysName OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Choose a descriptive name for identification purposes. 
+			This name can be up to 30 alphanumeric characters long. 
+			Spaces are not allowed, but dashes '-' and underscores 
+			'_' are accepted."
+		::= { prestigeSystem 4 }
+	
+	sysLocation OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The geographic location (up to 30 characters) of your 
+			Prestige."
+		::= { prestigeSystem 5 }
+
+	sysConatctPersion OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The name (up to 30 characters) of the person in charge 
+			of this Prestige."
+		::= { prestigeSystem 6 }
+
+	sysProtocolRouteIp OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Set this object to Yes to enable IP routing.  You must 
+			enable IP routing for Internet access."
+		::= { prestigeSystem 7 }
+
+	sysProtocolBridge OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Turn on/off bridging for protocols not supported (e.g., 
+			SNA) or not turned on in the previous Route fields."
+		::= { prestigeSystem 8 }
+	
+
+	sysDomainName OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The domain name of the LAN. If this object is empty,
+			the ISP may assign a domain name via DHCP."
+		::= { prestigeSystem 9 }
+
+	sysReset OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"If yes reset prestige."
+		::= { prestigeSystem 10 }
+
+	-- The DynDns group
+	-- Dynamic DNS allows you to update your current dynamic
+	-- IP address with one or many dynamic DNS services so 
+	-- that any one can conatct you (in NetMeeting, CU-SeeMe,
+	-- etc.) or access your FTP server or Web site on your own
+	-- computer using a DNS-like address (e.g. myhost.dnynds.org
+	-- where myhost is a name of your choice) which will never 
+	-- change instead of using your IP address that changes each
+	-- time you reconnect.
+	
+	ddnsActiveStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Enable or disable the Dynamic DNS service."
+		::= { prestigeDynDns 1 }
+
+	ddnsServiceProvider OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			dyndns(2)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The choice of your dynamic DNS client."
+		::= { prestigeDynDns 2 }
+
+	ddnsHost OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The domain name assigned to your prestige by
+			your Dyanmic DNS provider."
+		::= { prestigeDynDns 3 }
+
+	ddnsEmail OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Your e-mail address."
+		::= { prestigeDynDns 4 }
+
+	ddnsUser OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The user name assigned to you."
+		::= { prestigeDynDns 5 }
+
+	ddnsPassword OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..29))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The password assigned to you."
+		::= { prestigeDynDns 6 }
+
+	ddnsEnableWildcard OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Enabling the wildcard feature for your host 
+			causes *.yourhost.dyndns.org to be aliased to 
+			the same IP address as yourhost.dyndns.org.
+			This feature is useful if you want to be able
+			to use for example www.yourhost.dyndns.org
+			and still reach your hostname."
+		::= { prestigeDynDns 7 }
+
+
+	-- the LAN group
+	lanFilter		OBJECT IDENTIFIER ::= { prestigeLAN 1 }
+	lanDHCP			OBJECT IDENTIFIER ::= { prestigeLAN 2 }
+	lanTcpIp		OBJECT IDENTIFIER ::= { prestigeLAN 3 }
+	lanWireless		OBJECT IDENTIFIER ::= { prestigeLAN 4 }
+
+	-- the LAN filter group
+	-- This group allows you to specify filter set(s) that you 
+	-- wish to apply to the Ethernet traffic. You seldom need to 
+	-- filter Ethernet traffic; however, the filter sets may be 
+	-- useful to block certain packets, reduce traffic and 
+	-- prevent security breaches. 
+
+	-- If you need to define filters, please read the Filter Config Group
+	-- description first, then return to this group to define the filter sets.
+	
+	inProtocolFilterSet OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..8))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specified the protocol filter set for
+			incoming ethernet traffic."
+		::= { lanFilter 1 }
+	
+	inDeviceFilterSet OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..8))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specified the device filter set for
+			incoming ethernet traffic."
+		::= { lanFilter 2 }
+	
+	outProtocolFilterSet OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..8))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specified the protocol filter set for
+			outgoing ethernet traffic."
+		::= { lanFilter 3 }
+	
+	outDeviceFilterSet OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..8))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specified the device filter set for
+			outgoing ethernet traffic."
+		::= { lanFilter 4 }
+	
+	
+	-- the LAN DHCP group
+	-- DHCP (Dynamic Host Configuration Protocol) allows the 
+	-- individual clients (workstations) to obtain the TCP/IP
+	-- configuration at start-up from a centralized DHCP server. 
+	-- The Prestige has built-in DHCP server capability, 
+	-- enabled by default, which means it can assign IP 
+	-- addresses, an IP default gateway and DNS servers to 
+	-- Windows 95, Windows NT and other systems that support 
+	-- the DHCP client. The Prestige can also act as a surrogate 
+	-- DHCP server where it relays IP address assignment from 
+	-- the actual DHCP server to the clients.
+
+	-- IP Pool Setup
+	-- The Prestige is pre-configured with a pool of 32 IP addresses 
+	-- starting from 192.168.1.33 to 192.168.1.64 for the client 
+	-- machines. This leaves 31 IP addresses, 192.168.1.2 to 
+	-- 192.168.1.32 (excluding the Prestige itself which has a 
+	-- default IP of 192.168.1.1) for other server machines, e.g., 
+	-- server for mail, FTP, telnet, web, etc., that you may have.
+
+	dhcpStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(1),          -- none of the following
+			server(2),
+			relay(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"If it is set to Server, your Prestige can assign 
+			IP addresses, an IP default gateway and DNS servers 
+			to Windows 95, Windows NT and other systems that 
+			support the DHCP client. If set to None, the DHCP 
+			server will be disabled. If set to Relay, the 
+			Prestige acts as a surrogate DHCP server and relays 
+			DHCP requests and responses between the remote 
+			server and the clients. Enter the IP address of the 
+			actual, remote DHCP server in the Remote DHCP 
+			Server in this case."
+		::= { lanDHCP 1 }
+
+
+	dhcpStartIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specifies the first of the contiguous 
+			addresses in the IP address pool."
+		::= { lanDHCP 2 }
+
+	dhcpPoolSize OBJECT-TYPE
+		SYNTAX  INTEGER 
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specifies the size, or count, of the IP 
+			address pool."
+		::= { lanDHCP 3 }
+
+	dhcpPrimaryDnsServer OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The DNS server addresses that you enter in this
+			object are passed to the client machines along 
+			with the assigned IP address and subnet mask."
+		::= { lanDHCP 4 }
+
+	dhcpSecondaryDnsServer OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The DNS server addresses that you enter in this
+			object are passed to the client machines along 
+			with the assigned IP address and subnet mask."
+		::= { lanDHCP 5 }
+
+
+	dhcpRemoteDhcpServer OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"If Relay is selected in the dhcpStatus pbject above, 
+			then this object should be the IP address of the 
+			actual, remote DHCP server."
+		::= { lanDHCP 6 }
+
+
+	-- the LAN TCP/IP group
+	lanIpAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"IP address of your Prestige in dotted decimal notation"
+		::= { lanTcpIp 1 }
+
+	lanIpSubnetMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The subnet mask specifies the network number 
+			portion of the LAN IP address."
+		::= { lanTcpIp 2 }
+
+	lanIpRipDirection OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(1),          -- none of the following
+			both(2),
+			in(3),
+			out(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"RIP (Routing Information Protocol) allows a router 
+			to exchange routing information with other routers. 
+			This object controls the sending and receiving of 
+			RIP packets. When set to Both, the Prestige will 
+			broadcast its routing table periodically and 
+			incorporate the RIP information that it receives; 
+			when set to None, it will not send any RIP packets 
+			and will ignore any RIP packets received."
+		::= { lanTcpIp 3 }
+
+	lanIpRipVersion OBJECT-TYPE
+		SYNTAX  INTEGER {
+			ohter(1),          -- none of the following
+			rip1(2),
+			rip2B(3),
+			rip2M(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object controls the format and the broadcasting 
+			method of the RIP packets that the Prestige sends (it 
+			recognizes both formats when receiving). RIP-1 is 
+			universally supported; but RIP-2 carries more 
+			information. RIP-1 is probably adequate for most 
+			networks, unless you have a unusual network topology.
+			Both RIP-2B and RIP-2M sends the routing data in 
+			RIP-2 format; the difference being that RIP-2B uses
+			subnet broadcasting while RIP-2M uses multicasting."
+		::= { lanTcpIp 4 }
+
+	lanIpMulticast OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(1),          -- none of the following
+			igmpv1(2),
+			igmpv2(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The Prestige supports both IGMP version 1 (IGMP-v1) 
+			and version 2 (IGMP-v2). At start up, the Prestige
+			queries all directly connected networks to gather 
+			group membership. After that, the Prestige periodically
+			updates this information. Select None to disable IP 
+			Multicasting."
+		::= { lanTcpIp 5 }
+
+	-- the Wireless LAN group
+	-- the Wireless LAN table
+ 	wlanTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF LanWirelessEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of ip static route entries."
+		::= { lanWireless 1 }
+
+	wlanEntry OBJECT-TYPE
+		SYNTAX  LanWirelessEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"An wireless lan entry containing comment 
+        	object for a particular ESS."
+		INDEX   { wlanCardID, wlanESSID}
+		::= { wlanTable 1 }
+
+	LanWirelessEntry ::=
+		SEQUENCE {
+			wlanEssStatus
+				INTEGER,
+			wlanCardID
+				INTEGER,
+			wlanESSID
+				DisplayString,
+			wlanHideESSID
+				INTEGER,
+			wlanChannelID
+				INTEGER,
+			wlanRTSThreshold
+				INTEGER,
+			wlanFragThreshold
+				INTEGER,
+			wlanWEPStatus
+				INTEGER,
+			wlanDefaultKey
+				INTEGER,
+			wlanWepKey1
+				DisplayString,
+			wlanWepKey2
+				DisplayString,
+			wlanWepKey3
+				DisplayString,
+			wlanWepKey4
+				DisplayString
+		}	
+
+	wlanEssStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			active(2),
+			inactive(3)			
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object allows you to activate/deactivate this 
+			ESS."
+		::= { wlanEntry 1 }
+						
+	wlanCardID OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The Card ID indicates the wireless lan card number."
+		::= { wlanEntry 2 }
+		
+	wlanESSID OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..31))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The ESSID(Extended Service Set Identification) is a 
+			unique name to identify the Prestige in the wireless LAN. 
+			Wireless clients associating to the Prestige must have 
+			the same ESSID. "
+		::= { wlanEntry 3 }
+
+	wlanHideESSID OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Select Yes to hide the ESSID in so a station can not obtain 
+			the ESSID through passive scanning. Select No to make the 
+			ESSID visible so a station can obtain the ESSID through
+			 passive scanning. "
+		::= { wlanEntry 4 }
+
+	wlanChannelID OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The range of radio frequencies used by IEEE 802.11b wireless 
+			devices is called a channel."
+		::= { wlanEntry 5 }
+
+	wlanRTSThreshold OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"Select this option to enable RTS/CTS handshake. Data with its 
+			rame size larger than this value will perform the RTS/CTS handshake.
+			 Setting this attribute to be larger than the maximum MSDU 
+			 (MAC service data unit) size turns off the RTS/CTS handshake. 
+			 Setting this attribute to zero turns on the RTS/CTS handshake. "
+		::= { wlanEntry 6 }
+		
+	wlanFragThreshold OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The threshold (number of bytes) for the fragmentation boundary for
+			 directed messages. It is the maximum data fragment size that can be sent."
+		::= { wlanEntry 7 }
+
+	wlanWEPStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			disable(2),
+			WEP-64-bit(3),
+			WEP-128-bit(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"WEP (Wired Equivalent Privacy) encrypts data frames before transmitting 
+			over the wireless network. Select Disable allows all wireless computers 
+			to communicate with the access points without any data encryption. 
+			Select 64-bit WEP or 128-bit WEP to allow data encryption. "
+		::= { wlanEntry 8 }
+		
+	wlanDefaultKey OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The default transmit WEP key."
+		::= { wlanEntry 9 }
+		
+	wlanWepKey1 OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..26))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The WEP key #1 value for WEP encryption.  If you chose WepKey-64-bit, 
+			then enter any 10 hexadecimal digits ('0-9', 'A-F') or 5 ASCII characters.  
+			If you chose WepKey-128-bit, then enter 26 hexadecimal 
+			digits ('0-9', 'AF') or 10 ASCII characters. "
+		::= { wlanEntry 10 }
+
+	wlanWepKey2 OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..26))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The WEP key #2 value for WEP encryption. If you chose WepKey-64-bit, 
+			then enter any 10 hexadecimal digits ('0-9', 'A-F') or 5 ASCII characters.  
+			If you chose WepKey-128-bit, then enter 26 hexadecimal 
+			digits ('0-9', 'AF') or 10 ASCII characters. "
+		::= { wlanEntry 11 }
+
+	wlanWepKey3 OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..26))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The WEP key #3 value for WEP encryption.If you chose WepKey-64-bit, 
+			then enter any 10 hexadecimal digits ('0-9', 'A-F') or 5 ASCII characters.  
+			If you chose WepKey-128-bit, then enter 26 hexadecimal 
+			digits ('0-9', 'AF') or 10 ASCII characters. "
+		::= { wlanEntry 12 }										
+
+	wlanWepKey4 OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..26))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The WEP key #4 value for WEP encryption. If you chose WepKey-64-bit, 
+			then enter any 10 hexadecimal digits ('0-9', 'A-F') or 5 ASCII characters.  
+			If you chose WepKey-128-bit, then enter 26 hexadecimal 
+			digits ('0-9', 'AF') or 10 ASCII characters. "
+		::= { wlanEntry 13 }										
+
+
+
+
+	-- the static route group
+	-- Static routes tell the Prestige routing information that it 
+	-- cannot learn automatically through other means. This can 
+	-- arise in cases where RIP is disabled on the LAN or a remote 
+	-- network is beyond the one that is directly connected to a 
+	-- remote node. Each remote node specifies only the network to 
+	-- which the gateway is directly connected and the Prestige 
+	-- has no knowledge of the networks beyond it.  The static 
+	-- routes are for you to tell the Prestige about the networks 
+	-- beyond the remote nodes.
+	
+	-- the IP static route group
+	-- the IP static table
+	ipStaticRouteTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF IpStaticRouteEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of ip static route entries."
+		::= { prestigeStaticRoute 1 }
+
+	ipStaticRouteEntry OBJECT-TYPE
+		SYNTAX  IpStaticRouteEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"An ip static route entry containing comment object for a 
+        	particular ip static route."
+		INDEX   { ipStaticRouteIndex }
+		::= { ipStaticRouteTable 1 }
+
+	IpStaticRouteEntry ::=
+		SEQUENCE {
+			ipStaticRouteIndex
+				INTEGER,
+			ipStaticRouteName
+				DisplayString,
+			ipStaticRouteActiveStatus
+				INTEGER,
+			ipStaticRouteDestIpAddr
+				IpAddress,
+			ipStaticRouteSubnetMask
+				IpAddress,
+			ipStaticRouteGatewayIpAddr
+				IpAddress,
+			ipStaticRouteMetric
+				INTEGER,
+			ipStaticRoutePirvate
+				INTEGER
+		}
+	ipStaticRouteIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of ip static route entry."
+		::= { ipStaticRouteEntry 1 }
+	
+	ipStaticRouteName OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..10))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The descriptive name for this route. This is for 
+			identification purpose only."
+		::= { ipStaticRouteEntry 2 }
+
+	ipStaticRouteActiveStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object allows you to activate/deactivate this 
+			static route."
+		::= { ipStaticRouteEntry 3 }
+
+	ipStaticRouteDestIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specifies the IP network address of the 
+			final destination. Routing is always based on network 
+			number. If you need to specify a route to a single 
+			host, use a subnet mask of 255.255.255.255 in the 
+			ipStaticRouteSubnetMask object to force the network 
+			number to be identical to the host ID."
+		::= { ipStaticRouteEntry 4 }
+
+	ipStaticRouteSubnetMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The subnet mask specifies the network number 
+			portion of the ipStaticRouteDestIpAddr."
+		::= { ipStaticRouteEntry 5 }
+
+	ipStaticRouteGatewayIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The gateway is an immediate neighbor of your Prestige 
+			that will forward the packet to the destination. On 
+			the LAN, the gateway must be a router on the same 
+			segment as your Prestige; over WAN, the gateway must 
+			be the IP address of one of the remote nodes."
+		::= { ipStaticRouteEntry 6 }
+
+	ipStaticRouteMetric OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Metric represents the 'cost' of transmission for 
+			routing purposes. IP routing uses hop count as 
+			the measurement of cost, with a minimum of 1 for 
+			directly connected networks. Enter a number that 
+			approximates the cost for this link. The number 
+			need not be precise, but it must be between 1 and 
+			15. In practice, 2 or 3 is usually a good number."
+		::= { ipStaticRouteEntry 7 }
+
+	ipStaticRoutePirvate OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"This parameter determines if the Prestige will 
+			include the route to this remote node in its RIP 
+			broadcasts. If set to Yes, this route is kept 
+			private and is not included in RIP broadcast. 
+			If No, the route to this remote node will be 
+			propagated to other hosts through RIP broadcasts."
+		::= { ipStaticRouteEntry 8 }
+			
+
+	-- the Bridge static route group
+	-- Similar to network layer static routes, a bridging static 
+	-- route tells the Prestige the route to a node before a 
+	-- connection is established.
+
+	-- the Bridge static table
+	bridgeStaticRouteTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF BridgeStaticRouteEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of bridge static route entries."
+		::= { prestigeStaticRoute 2 }
+
+	bridgeStaticRouteEntry OBJECT-TYPE
+		SYNTAX  BridgeStaticRouteEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"An bridge static route entry containing comment 
+        	object for a particular bridge static route."
+		INDEX   { bridgeStaticRouteIndex }
+		::= { bridgeStaticRouteTable 1 }
+
+	BridgeStaticRouteEntry ::=
+		SEQUENCE {
+			bridgeStaticRouteIndex
+				INTEGER,
+			bridgeStaticRouteName
+				DisplayString,
+			bridgeStaticRouteActiveStatus
+				INTEGER,
+			bridgeStaticRouteEtherAddr
+				PhysAddress,
+			bridgeStaticRouteIpAddr
+				IpAddress,
+			bridgeStaticRouteGatewayNode
+				INTEGER
+		}
+
+	bridgeStaticRouteIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of bridge static route entry."
+		::= { bridgeStaticRouteEntry 1 }
+	
+	bridgeStaticRouteName OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..10))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The descriptive name for this route. This is for 
+			identification purpose only."
+		::= { bridgeStaticRouteEntry 2 }
+
+	bridgeStaticRouteActiveStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object allows you to activate/deactivate this 
+			static route."
+		::= { bridgeStaticRouteEntry 3 }
+
+	bridgeStaticRouteEtherAddr OBJECT-TYPE
+		SYNTAX  PhysAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specifies the the MAC address of the 
+			destination machine that you wish to bridge the 
+			packets to."
+		::= { bridgeStaticRouteEntry 4 }
+
+	bridgeStaticRouteIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"If available, this object specifies the IP address 
+			of the destination machine that you wish to bridge 
+			the packets to."
+		::= { bridgeStaticRouteEntry 5 }
+
+	bridgeStaticRouteGatewayNode OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object specifies the number of the remote node 
+			that is the gateway of this static route."
+		::= { bridgeStaticRouteEntry 6 }
+
+
+	-- the filter config group
+	-- Your Prestige uses filters to decide whether or not to allow 
+	-- passage of a packet. Data filters are divided into incoming 
+	-- and outgoing filters, depending on the direction of the 
+	-- packet relative to a port. These filters are further 
+	-- subdivided into device and protocol filters.
+
+	-- the filter set table
+	filterSetTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF FilterSetEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of filter set entries.  The number of
+			entries is 12"
+		::= { prestigeFilterConfig 1 }
+
+	filterSetEntry OBJECT-TYPE
+		SYNTAX  FilterSetEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"An filter set entry containing comment object for a 
+        	particular filter set."
+		INDEX   { filterSetIndex }
+		::= { filterSetTable 1 }
+
+	FilterSetEntry ::=
+		SEQUENCE {
+			filterSetIndex
+				INTEGER,
+			filterSetComment
+				DisplayString
+		}
+	
+	filterSetIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of filter set."
+		::= { filterSetEntry 1 }
+
+	filterSetComment OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..15))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"The descriptive name or comment of filter set"
+		::= { filterSetEntry 2 }
+
+
+	-- the filter rule table
+	filterRuleTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF FilterRuleEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A list of filter rule entries.  The number of
+			entries is (number of filter set) * 
+			(number of rule set per filter set)"
+		::= { prestigeFilterConfig 2 }
+
+	filterRuleEntry OBJECT-TYPE
+		SYNTAX  FilterRuleEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+        	"An filter rule entry containing TCP/IP and/or generic
+        	filter rules for a particular filter set."
+		INDEX   { filterSetIndex, filterRuleIndex }
+		::= { filterRuleTable 1 }
+
+	FilterRuleEntry ::=
+		SEQUENCE {
+			filterRuleIndex
+				INTEGER,
+			filterRuleActiveStatus
+				INTEGER,
+			filterRuleType
+				INTEGER,
+			filterRuleIpProtocol
+				INTEGER,
+			filterRuleIpSourceRoute
+				INTEGER,
+			filterRuleDestIpAddr
+				IpAddress,
+			filterRuleDestIpMask
+				IpAddress,
+			filterRuleDestPort
+				INTEGER,
+			filterRuleDestPortComp
+				INTEGER,
+			filterRuleSourceIpAddr
+				IpAddress,
+			filterRuleSourceIpMask
+				IpAddress,
+			filterRuleSourcePort
+				INTEGER,
+			filterRuleSourcePortComp
+				INTEGER,
+			filterRuleTcpEstab
+				INTEGER,
+			filterRuleGenericOffset
+				INTEGER,
+			filterRuleGenericLength
+				INTEGER,
+			filterRuleGenericMask
+				OCTET STRING,
+			filterRuleGenericValue
+				OCTET STRING,
+			filterRuleMore
+				INTEGER,
+			filterRuleLog
+				INTEGER,
+			filterRuleActMatched
+				INTEGER,
+			filterRuleActNotMatched
+				INTEGER
+		}
+
+	filterRuleIndex OBJECT-TYPE
+		SYNTAX  INTEGER
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The index of rule set."
+		::= { filterRuleEntry 1 }
+
+	filterRuleActiveStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object activates/deactivates the filter rule."
+		::= { filterRuleEntry 2 }
+
+	filterRuleType OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			tcpIp(2),
+			generic(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"There are two types of filter rules: TCP/IP and Generic.
+			TCP/IP rules allow you to base the rule on the fields in 
+			the IP and the upper layer protocol, e.g., UDP and TCP, 
+			headers. 
+			The purpose of generic rules is to allow you to filter 
+			non-IP packets. For IP, it is generally easier to use the 
+			IP rules directly. For generic rules, the Prestige treats 
+			a packet as a byte stream as opposed to an IP packet. You
+			specify the portion of the packet to check with the Offset 
+			(from 0) and the Length fields, both in bytes. The Prestige 
+			applies the Mask (bit-wise ANDing) to the data portion 
+			before comparing the result against the Value to determine 
+			a match. The Mask and Value are specified in hexadecimal 
+			numbers. Note that it takes two hexadecimal digits to 
+			represent a byte, so if the length is 4, the value in 
+			either field will take 8 digits, e.g., FFFFFFFF."
+		::= { filterRuleEntry 3 }
+
+	filterRuleIpProtocol OBJECT-TYPE
+		SYNTAX  INTEGER (0..255)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, protocol refers to the upper layer 
+			protocol, e.g., TCP is 6, UDP is 17 and ICMP is 1. 
+			For	generic filter this object is disregarded."
+		::= { filterRuleEntry 4 }
+
+	filterRuleIpSourceRoute OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, If Yes, the rule applies to packet 
+			with IP source route option; else the packet must not 
+			have source route option. The majority of IP packets 
+			do not have source route. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 5 }
+
+	filterRuleDestIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, it's the destination IP Address of 
+			the packet you wish to filter. This object is 
+			disregarded if it is 0.0.0.0. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 6 }
+
+	filterRuleDestIpMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, it's the IP mask apply to the 
+			Destination IP Addr. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 7 }
+
+	filterRuleDestPort OBJECT-TYPE
+		SYNTAX  INTEGER (0..65535)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, it's the destination port of 
+			the packets that you wish to filter. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 8 }
+
+	filterRuleDestPortComp OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(1),          -- none of the following
+			equal(2),
+			notequal(3),
+			less(4),
+			greater(5)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, this object select the comparison
+			to apply to the filterRuleDestPortComp in the packet 
+			against the value given in filterRuleDestPortComp. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 9 }
+
+	filterRuleSourceIpAddr OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, it's the source IP Address of 
+			the packet you wish to filter. This object is 
+			disregarded if it is 0.0.0.0. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 10 }
+
+	filterRuleSourceIpMask OBJECT-TYPE
+		SYNTAX  IpAddress
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, it's the IP mask apply to the 
+			source IP Addr. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 11 }
+
+	filterRuleSourcePort OBJECT-TYPE
+		SYNTAX  INTEGER (0..65535)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, it's the source port of the 
+			packets that you wish to filter.
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 12 }
+
+	filterRuleSourcePortComp OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(1),          -- none of the following
+			equal(2),
+			notequal(3),
+			less(4),
+			greater(5)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, this object select the comparison
+			to apply to the filterRuleSourcePort in the packet 
+			against the value given in filterRuleSourcePort. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 13 }
+
+	filterRuleTcpEstab OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For TCP/IP filter, this object is applicable only when 
+			filterRuleIpProtocol is 6, TCP. If yes, the rule matches 
+			only established TCP connections; else the rule matches 
+			all TCP packets. 
+			For generic filter this object is disregarded."
+		::= { filterRuleEntry 14 }
+
+	filterRuleGenericOffset OBJECT-TYPE
+		SYNTAX  INTEGER (0..255)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For generic filter, this object is the starting byte of 
+			the data portion in the packet that you wish to compare. 
+			For TCP/IP filter this object is disregarded."
+		::= { filterRuleEntry 15 }
+
+	filterRuleGenericLength OBJECT-TYPE
+		SYNTAX  INTEGER (0..8)
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For generic filter, this object is byte count of the data 
+			portion in the packet that you wish to compare. 
+			For TCP/IP filter this object is disregarded."
+		::= { filterRuleEntry 16 }
+
+	filterRuleGenericMask OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (6))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For generic filter, this object is the Mask apply to the 
+			data portion before comparison. 
+			For TCP/IP filter this object is disregarded."
+		::= { filterRuleEntry 17 }
+
+	filterRuleGenericValue OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (6))
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"For generic filter, this object is the value to compare 
+			with the data portion. 
+			For TCP/IP filter this object is disregarded."
+		::= { filterRuleEntry 18 }
+
+	filterRuleMore OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			yes(2),
+			no(3)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"If yes, a matching packet is passed to the next filter 
+			rule before an action is taken; if no, the packet is 
+			disposed of according to the action fields."
+		::= { filterRuleEntry 19 }
+
+	filterRuleLog OBJECT-TYPE
+		SYNTAX  INTEGER {
+			none(1),          -- none of the following
+			actMatched(2),
+			atcNotMatch(3),
+			both(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"* None : 
+				No packets will be logged.
+  			 * Action Matched : 
+  			 	Only packets that match the rule parameters will be logged.
+			 * Action Not Matched : 
+			 	Only packets that do not match the rule parameters 
+			 	will be logged.
+			 * Both : 
+			 	All packets will be logged."
+		::= { filterRuleEntry 20 }
+
+	filterRuleActMatched OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			checkNextRule(2),
+			forward(3),
+			drop(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object select the action for a matching packet. If 
+			filterRuleMore is Yes, this object is disregarded.
+			"
+		::= { filterRuleEntry 21 }
+
+	filterRuleActNotMatched OBJECT-TYPE
+		SYNTAX  INTEGER {
+			other(1),          -- none of the following
+			checkNextRule(2),
+			forward(3),
+			drop(4)
+		}
+		ACCESS  read-write
+		STATUS  mandatory
+		DESCRIPTION
+			"This object select the action for a packet not matching
+			the rule. If filterRuleMore is Yes, this object is 
+			disregarded."
+		::= { filterRuleEntry 22 }
+
+
+	-- Prestige common traps related managed objects
+	
+	whyReboot       OBJECT-TYPE
+		SYNTAX	DisplayString 
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"Send a message to the manager that the system is going to reboot.
+			The variable is the reason of rebooting."
+		::= { prestigeTraps 1 }
+    	
+
+   -- Prestige common traps
+   
+ 	reboot	TRAP-TYPE
+	ENTERPRISE	prestigeCommon
+        VARIABLES       { 
+                        whyReboot
+                        }
+	DESCRIPTION	"Send a message to the manager that the system is going to reboot.
+	                 The variable is the reason why the system reboots."
+	::= 1
+		
+END

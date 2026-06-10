@@ -1,0 +1,320 @@
+-- *****************************************************************
+-- DLINKSW-POWER-SAVING-MIB.mib : D-Link Power Saving MIB
+--
+-- Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+DLINKSW-POWER-SAVING-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-GROUP, MODULE-COMPLIANCE			
+            FROM SNMPv2-CONF
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        DisplayString, TruthValue
+            FROM SNMPv2-TC
+        ifIndex
+            FROM IF-MIB			
+        dlinkIndustrialCommon
+	    FROM DLINK-ID-REC-MIB;
+
+    dlinkSwPowerSavingMIB MODULE-IDENTITY
+        LAST-UPDATED "201307080000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+                "The Structure of Power Saving Information for the
+                 proprietary enterprise."
+      
+        REVISION "201301310000Z"
+        DESCRIPTION
+            "Initial version of this MIB module."
+        REVISION "201307080000Z"
+        DESCRIPTION
+            "1.Modify the MIB file and object name,
+               DLINK-POWER-SAVING-MIB to DLINKSW-POWER-SAVING-MIB,
+               dlinkPowerSavingMIB to dlinkSwPowerSavingMIB."
+        ::= { dlinkIndustrialCommon 16 }
+
+-- -----------------------------------------------------------------------------
+    dPowerSavingMIBNotifications OBJECT IDENTIFIER ::= { dlinkSwPowerSavingMIB 0 }		
+    dPowerSavingMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwPowerSavingMIB 1 }
+    dPowerSavingMIBConformance   OBJECT IDENTIFIER ::= { dlinkSwPowerSavingMIB 2 }
+    
+--------------------------------------------------------------------------------
+    dPowerSavingGeneral          OBJECT IDENTIFIER ::= { dPowerSavingMIBObjects 1 }
+    
+	dpsLinkDetectionEnabled OBJECT-TYPE
+       	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+        STATUS          current
+    	DESCRIPTION      	   
+    	    "This object indicates the state of power saving by link status."    	            
+    	DEFVAL { false }
+    	::= { dPowerSavingGeneral 1 }
+ 		
+    dpsLengthDetectionEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+        STATUS          current
+    	DESCRIPTION  
+    	    "This object indicates the state of power saving by cable length detection."
+        DEFVAL { false }
+    	::= { dPowerSavingGeneral 2 }
+    		
+ 	dpsHibernationEnabled OBJECT-TYPE
+		SYNTAX          TruthValue
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+            "This object indicates the state of powre saving by scheduled system 
+            hibernation.
+            Note:
+			For stackable devices, the hibernation function only can be supported
+			on the standalone mode.
+			"
+		DEFVAL { false }
+		::= { dPowerSavingGeneral 3 }
+	
+	dpsDimLedEnabled OBJECT-TYPE
+		SYNTAX         TruthValue
+		MAX-ACCESS     read-write
+		STATUS         current
+		DESCRIPTION
+			"This object indicates the state of power saving by scheduled dimming LED."
+		DEFVAL { false }
+		::= { dPowerSavingGeneral 4 }
+
+	dpsLedAdminEnabled OBJECT-TYPE
+		SYNTAX          TruthValue 
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+			"This object indicates the administrative state of LED of all ports."
+		DEFVAL { true}
+		::= { dPowerSavingGeneral 5 }
+				
+	dpsPortShutdownEnabled OBJECT-TYPE
+		SYNTAX          TruthValue 
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+			"This object indicates the state of power saving by scheduled port shutdown."
+		DEFVAL { false }
+		::= { dPowerSavingGeneral 6 }	
+
+--------------------------------------------------------------------------------	
+    dPowerSavingIfObjects        OBJECT IDENTIFIER ::= { dPowerSavingMIBObjects 2 }
+    	
+    dpsIfEeeTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DpsIfEeeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of EEE (Energy-Efficient Ethernet)
+            state information for ports."
+        ::= { dPowerSavingIfObjects 1}       	
+
+	dpsIfEeeEntry OBJECT-TYPE
+		SYNTAX          DpsIfEeeEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+			"An entry contains EEE configuration on a port."
+		INDEX       { ifIndex }
+		::= { dpsIfEeeTable 1 }
+
+	DpsIfEeeEntry ::= 		SEQUENCE {
+	    dpsIfEeeStatus	INTEGER
+	}               	
+
+	dpsIfEeeStatus OBJECT-TYPE
+		SYNTAX  INTEGER {
+			enabled(1),
+			disabled(2),
+			notAvailable(3)
+		}
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+			"This object indicates the EEE status on an interface.
+            To set dpsIfEeeStatus to notAvailable has no effect.
+			When read the value of 'notAvailable' means EEE is not supported 
+			on the port."
+		::= { dpsIfEeeEntry 2 }		
+				
+-- -----------------------------------------------------------------------------  	
+	dpsScheduleCtrl OBJECT IDENTIFIER ::= { dPowerSavingMIBObjects 3 }
+
+	dpsHibernationTimeRange OBJECT-TYPE
+		SYNTAX          DisplayString (SIZE (0..32))
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+			"This object indicates the time-range profile for system hibernation
+			schedule.
+			A zero length string indicates the schedule is not specified.
+			"		
+		::= { dpsScheduleCtrl 1 }
+			
+	dpsDimLedTimeRange OBJECT-TYPE
+		SYNTAX          DisplayString (SIZE (0..32))
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION
+			"This object indicates the time-range profile for dimming LED schedule.
+			A zero length string indicates the schedule is not specified.
+			"		
+		::= { dpsScheduleCtrl 2 }	
+				 
+	dpsPortShutdownScheduleTable OBJECT-TYPE
+		SYNTAX          SEQUENCE OF DpsPortShutdownScheduleEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION
+			"A list of the shutdown configurations of the power saving."
+		::= { dpsScheduleCtrl 3 }
+
+	dpsPortShutdownScheduleEntry OBJECT-TYPE
+		SYNTAX          DpsPortShutdownScheduleEntry
+		MAX-ACCESS      not-accessible
+		STATUS  current
+		DESCRIPTION
+			"An entry contains the time-range profile for port-shutdown schedule
+			on a port. "
+		INDEX   { ifIndex }
+		::= { dpsPortShutdownScheduleTable 1 }
+
+	DpsPortShutdownScheduleEntry ::= 		SEQUENCE {
+		dpsPortShutdownTimeRange	DisplayString				
+	}
+				
+	dpsPortShutdownTimeRange  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..32))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+             "This object indicates the name of time-range profile.
+             A zero length string indicates the schedule is not specified."
+        ::= { dpsPortShutdownScheduleEntry 1 }
+           		   
+
+-- *****************************************************************************
+-- MIB Conformance statements
+-- *****************************************************************************
+    dpsMIBCompliances  OBJECT IDENTIFIER  ::= { dPowerSavingMIBConformance 1 }
+
+    dpsMIBGroups  OBJECT IDENTIFIER  ::= { dPowerSavingMIBConformance 2 }
+
+    dpsMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+			DLINKSW-POWER-SAVING-MIB."
+        MODULE          -- this module
+
+		GROUP dpsLinkCfgGroup
+        DESCRIPTION
+            "This group does not need to be implemented if link down
+            auto power saving is not supported."
+		
+		GROUP dpsLenCfgGroup
+        DESCRIPTION
+            "This group does not need to be implemented if cable diagnosis is
+            not supported."
+        
+		GROUP dpsHiberCfgGroup
+        DESCRIPTION
+            "This group is mandatory if power saving schedule function
+             is supported."
+        
+		GROUP dpsDimLedCfgGroup
+        DESCRIPTION
+            "This group is mandatory if power saving schedule function
+             is supported."
+        
+		GROUP dpsShutdownCfgGroup
+        DESCRIPTION
+            "This group is mandatory if power saving schedule function
+             is supported."
+        
+		GROUP dpsIfEeeCfgGroup
+        DESCRIPTION
+            "This group does not need to be implemented if EEE function
+            is not supported."
+        
+        ::= { dpsMIBCompliances 1 }
+		
+-------------------------------------------------------------------------------
+	dpsLinkCfgGroup OBJECT-GROUP
+	    OBJECTS {
+	        dpsLinkDetectionEnabled
+	    }
+	    STATUS current
+	    DESCRIPTION
+		    "A collection of objects to configure or display the link status
+		    detection state."
+	    ::= { dpsMIBGroups 1 }
+	
+	dpsLenCfgGroup OBJECT-GROUP
+	    OBJECTS {
+	        dpsLengthDetectionEnabled
+	    }
+	    STATUS current
+	    DESCRIPTION
+		    "A collection of objects to configure or display the
+            cable length detection state."
+	    ::= { dpsMIBGroups 2 }  		
+	
+    dpsHiberCfgGroup OBJECT-GROUP
+	    OBJECTS {
+	        dpsHibernationEnabled,
+	 	    dpsHibernationTimeRange
+	    }
+	    STATUS current
+	    DESCRIPTION
+		    "A collection of objects to configure or display the
+            system hibernation schedule information."
+	    ::= { dpsMIBGroups 3 }
+	
+    dpsDimLedCfgGroup OBJECT-GROUP
+	    OBJECTS {
+	        dpsDimLedEnabled,
+		    dpsLedAdminEnabled,
+		    dpsDimLedTimeRange
+	    }
+	    STATUS current
+	    DESCRIPTION
+		    "A collection of objects to configure or display the
+            dimming LED schedule or LED administrative state information."
+	    ::= { dpsMIBGroups 4 }
+
+    dpsShutdownCfgGroup OBJECT-GROUP
+	    OBJECTS {
+	        dpsPortShutdownEnabled,
+		    dpsPortShutdownTimeRange
+	    }
+	    STATUS current
+	    DESCRIPTION
+		    "A collection of objects to configure or display the
+            port shutdown schedule information."
+	    ::= { dpsMIBGroups 5 }
+
+    dpsIfEeeCfgGroup OBJECT-GROUP
+	    OBJECTS {
+	        dpsIfEeeStatus
+	    }
+	    STATUS current
+	    DESCRIPTION
+		    "A collection of objects to configure or display the
+            EEE state of ports."
+	    ::= { dpsMIBGroups 6 }
+                   	
+	
+END

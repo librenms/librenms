@@ -1,0 +1,293 @@
+-- =====================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--      This MIB module is for the management of N_Port Virtualization or
+--      NPV within the framework of N_Port virtualization(NPV) architecture.
+-- Reference:
+-- Version: V1.1
+-- History:
+--      V1.0 Initial version created by wangxu 2013-04-02
+--      V1.1 Added hh3cNPVLoadBalanceTable by liukui 2014-07-21
+-- =====================================================================
+HH3C-NPV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32                  FROM SNMPv2-SMI         -- [RFC2578]
+    RowStatus, TimeStamp,
+    TruthValue,
+    TEXTUAL-CONVENTION          FROM SNMPv2-TC          -- [RFC2578]
+    ifIndex, InterfaceIndex
+        FROM IF-MIB
+    Hh3cFcVsanIndex
+        FROM HH3C-FC-TC-MIB
+    hh3cSan, hh3cVsanIndex
+        FROM HH3C-VSAN-MIB;
+
+hh3cNpv  MODULE-IDENTITY
+    LAST-UPDATED "201407210000Z"
+    ORGANIZATION "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB module is for the management of N_Port Virtualization
+         or NPV within the framework of N_Port virtualization(NPV)
+         architecture.
+
+         N_Port virtualization reduces the number of Fibre Channel
+         domain IDs in SANs(Storage Area Network).  Switches operating
+         in the NPV mode do not join a fabric; rather, they pass traffic
+         between NPV core switch links and end-devices, which eliminates
+         the domain IDs for these edge switches.  NPV core switch is a
+         fibre channel edge switch connected to one or more NPV devices."
+    REVISION       "201407210000Z"
+    DESCRIPTION
+        "Added hh3cNPVLoadBalanceTable."
+    REVISION "201304020000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { hh3cSan 6 }
+
+Hh3cNpvIfIndexList ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This textual convention defines a list of 'ifIndex'.
+
+        Each 4 octets within this value are combined together
+        to represent the 'ifIndex' of a particular port in the
+        module.
+
+        For example, the first 4 octets (byte 1, byte 2, byte 3
+        and byte 4) represent the 'ifIndex' of one interface, while
+        the second 4 octets (byte 5, byte 6, byte 7 and byte 8)
+        represent the 'ifIndex' for another interface in the module,
+        and so on."
+    SYNTAX          OCTET STRING (SIZE (4..65535))
+
+hh3cNpvMibObjects             OBJECT IDENTIFIER
+    ::= { hh3cNpv 1 }
+hh3cNpvConfiguration          OBJECT IDENTIFIER
+    ::= { hh3cNpvMibObjects 1 }
+hh3cNpvGlobalObjects          OBJECT IDENTIFIER
+    ::= { hh3cNpvConfiguration 1 }
+
+-- NPV Traffic Load balance
+
+hh3cNpvLoadbalanceVsan OBJECT-TYPE
+    SYNTAX          Hh3cFcVsanIndex
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Used to trigger a load-balancing in the specified VSAN (Virtual
+         Storage Area Network).
+
+         When the hh3cNpvLoadbalanceVsan is set to a specific VSAN, a
+         disruptive load-balancing process will be initiated in the VSAN
+         so that all nodes in the VSAN will re-login to the core switch.
+
+         This load-balancing process redistributes downlink traffic across
+         all uplink interfaces for better load balancing, but it causes
+         traffic interruption."
+    ::= { hh3cNpvGlobalObjects 1 }
+
+-- NPV Traffic Map configuration
+
+hh3cNpvTrafficMapConfigTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cNpvTrafficMapConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table containing information on the assignment of
+        traffic map interfaces to an interface."
+    ::= { hh3cNpvConfiguration 2 }
+
+hh3cNpvTrafficMapConfigEntry OBJECT-TYPE
+    SYNTAX          Hh3cNpvTrafficMapConfigEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the hh3cNpvTrafficMapConfigTable.
+
+        This table contains entries for each of the interfaces
+        which has been assigned a set of interfaces for traffic
+        mapping in the VSAN.
+
+        Traffic mapping is a technique used in NPV device to
+        restrict the usage of external interface(s) for forwarding
+        the traffic from server interface to the fibre channel fabric.
+
+        If an interface comes up as a server interface and finds
+        a corresponding entry in this table, then the switch
+        software will assign a valid external interface from
+        this list, if any.  Once assigned, that assigned external
+        interface will be used for forwarding the traffic from
+        the server interface to the fibre channel fabric.
+
+        If an interface comes up as a server interface and
+        finds an entry in this table, but with no valid list of
+        external interfaces, then the switch software keeps the
+        server interface in operationally down state until
+        at least one of the interface in the list becomes a
+        valid external interface.
+
+        If an interface comes up as a server interface and it
+        cannot find an entry in this table, then any of the
+        available external interfaces can be assigned to that
+        server interface.
+
+        Entries in this table can be created or destroyed via
+        hh3cNpvTrafficMapRowStatus object.  Columnar objects can be
+        modified when the corresponding hh3cNpvTrafficMapRowStatus
+        is 'active'."
+    INDEX           { ifIndex,
+                      hh3cVsanIndex }
+    ::= { hh3cNpvTrafficMapConfigTable 1 }
+
+Hh3cNpvTrafficMapConfigEntry ::= SEQUENCE {
+    hh3cNpvTrafficMapExternalIfIndexList Hh3cNpvIfIndexList,
+    hh3cNpvTrafficMapLastChange          TimeStamp,
+    hh3cNpvTrafficMapRowStatus           RowStatus
+}
+
+hh3cNpvTrafficMapExternalIfIndexList OBJECT-TYPE
+    SYNTAX          Hh3cNpvIfIndexList
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The list of external interfaces which the traffic needs
+         to be mapped to.
+
+         This object is a list of interfaces presented as
+         an octet string of interface indices or ifindex-es.
+
+         The list should contain at least one interface and at most
+         all the interfaces in the switch up to 16384 interfaces.
+         The 16384 interfaces max-limit is due to the size of this
+         object.
+
+         Specifying this object is mandatory for the creation of a
+         row in hh3cNpvTrafficMapConfigTable."
+    ::= { hh3cNpvTrafficMapConfigEntry 1 }
+
+hh3cNpvTrafficMapLastChange OBJECT-TYPE
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The value of sysUpTime at the time of the latest
+        change to this traffic map entry.
+
+        When there has not been any change to the traffic
+        map entry, the value of this field will be that
+        of the entry creation time."
+    ::= { hh3cNpvTrafficMapConfigEntry 2 }
+
+hh3cNpvTrafficMapRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this conceptual row.
+
+         The row can be made 'active' only if value of corresponding
+         instance of hh3cNpvTrafficMapExternalIfIndexList is provided."
+    ::= { hh3cNpvTrafficMapConfigEntry 3 }
+
+-- Per Server Interface NPV Information
+
+hh3cNpvServerIfTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cNpvServerIfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains, one entry for each server
+        interface(FC-port configured in F-port mode) in
+        this VSAN in the Fabric element.
+
+        Each entry contains NPV related information like
+        external interface assigned for the server interface
+        in the VSAN."
+
+    ::= { hh3cNpvConfiguration 3 }
+
+hh3cNpvServerIfEntry OBJECT-TYPE
+    SYNTAX          Hh3cNpvServerIfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry in the hh3cNpvServerIfTable, containing NPV
+        related parameters established by a server interface
+        indicated by ifIndex."
+    INDEX           { ifIndex,
+                      hh3cVsanIndex }
+    ::= { hh3cNpvServerIfTable 1 }
+
+Hh3cNpvServerIfEntry ::= SEQUENCE {
+    hh3cNpvExternalIfIndex  InterfaceIndex
+}
+
+hh3cNpvExternalIfIndex OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This value of this object is the external interface assigned
+        for the server interface associated with the server interface."
+    ::= { hh3cNpvServerIfEntry 1 }
+
+-- NPV Auto Load Balance Configuration
+
+hh3cNpvLoadBalanceTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF Hh3cNpvLoadBalanceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+           "This table contains NPV load balancing parameters of each VSAN."
+    ::= { hh3cNpvConfiguration 4 }
+
+hh3cNpvLoadBalanceEntry  OBJECT-TYPE
+    SYNTAX          Hh3cNpvLoadBalanceEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+           "An entry provides NPV load balancing parameters for a VSAN."
+    INDEX           {
+                        hh3cVsanIndex
+                    }
+    ::= { hh3cNpvLoadBalanceTable 1 }
+
+Hh3cNpvLoadBalanceEntry ::= SEQUENCE {
+       hh3cNpvAutoLoadBalanceEnable                 TruthValue,
+       hh3cNpvAutoLoadBalanceInterval               Unsigned32
+}
+
+hh3cNpvAutoLoadBalanceEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable or disable NPV auto load balance
+         on this VSAN to equalize server login distribution when server
+         logins are not evenly distributed across uplinks."
+    DEFVAL { false }
+    ::= { hh3cNpvLoadBalanceEntry 1 }
+
+hh3cNpvAutoLoadBalanceInterval OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..300)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+           "This object is used to start an auto load balance timer
+            on this VSAN when the failed uplink is up.  A NPV auto
+            load balance will be triggered when the timer expires.
+
+           If this object is not configured, the default value is 30."
+    DEFVAL { 30 }
+    ::= { hh3cNpvLoadBalanceEntry 2 }
+
+END

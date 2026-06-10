@@ -1,0 +1,95 @@
+<?php
+
+/*
+ * LibreNMS module to display graphing for Nagios Service
+ *
+ * Copyright (c) 2016 Aaron Daniels <aaron@daniels.id.au>
+ *
+ * This program is free software: you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the
+ * Free Software Foundation, either version 3 of the License, or (at your
+ * option) any later version.  Please see LICENSE.txt at the top level of
+ * the source code distribution for details.
+ */
+
+// Get a list of all services for this device.
+require_once 'includes/services.inc.php';
+$services = service_get($device['device_id']);
+
+// Determine which key is the service we want to show.
+if (isset($vars['id'])) {
+    // Service is set, find its key.
+    foreach ($services as $key => $service) {
+        if ($service['service_id'] == $vars['id']) {
+            // We have found the service we want.
+            $vars['service'] = $key;
+        }
+    }
+} else {
+    // No service set, set the first one.
+    if (isset($services[0])) {
+        $vars['service'] = 0;
+    }
+}
+
+// We know our service. build the filename.
+$rrd_filename = Rrd::name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
+
+// if we have a script for this check, use it.
+$check_script = \App\Facades\LibrenmsConfig::get('install_dir') . '/includes/services/check_' . strtolower((string) $services[$vars['service']]['service_type']) . '.inc.php';
+if (is_file($check_script)) {
+    include $check_script;
+
+    // If we have a replacement DS use it.
+    if (isset($check_ds)) {
+        $services[$vars['service']]['service_ds'] = $check_ds;
+    }
+}
+
+include 'includes/html/graphs/common.inc.php';
+$graph_params->scale_min = 0;
+
+$rrd_options[] = 'COMMENT:                      Now     Avg      Max\\n';
+
+// Remove encoded characters
+$services[$vars['service']]['service_ds'] = htmlspecialchars_decode((string) $services[$vars['service']]['service_ds']);
+
+if ($services[$vars['service']]['service_ds'] != '') {
+    $graphinfo = json_decode($services[$vars['service']]['service_ds'], true);
+
+    // Do we have a DS set
+    if (! isset($graphinfo[$vars['ds']])) {
+        foreach ($graphinfo as $k => $v) {
+            // Select a DS to display.
+            $vars['ds'] = $k;
+        }
+    }
+
+    // Need: DS name, Label
+    $ds = $vars['ds'];
+    // use is_array for backwards compatibility
+    $label = (is_array($graphinfo[$vars['ds']]) ? $graphinfo[$vars['ds']]['uom'] : $graphinfo[$vars['ds']]);
+
+    if (Rrd::checkRrdExists($rrd_filename)) {
+        if (isset($check_graph)) {
+            $rrd_options = $check_graph[$ds];
+        } else {
+            // Build the graph ourselves
+            if (preg_match('/loss/i', (string) $ds)) {
+                $tint = 'pinks';
+            } else {
+                $tint = 'blues';
+            }
+            $color_avg = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.2");
+            $color_max = \App\Facades\LibrenmsConfig::get("graph_colours.$tint.0");
+
+            $rrd_options[] = 'DEF:DS=' . $rrd_filename . ':' . $ds . ':AVERAGE';
+            $rrd_options[] = 'DEF:DS_MAX=' . $rrd_filename . ':' . $ds . ':MAX';
+            $rrd_options[] = 'AREA:DS_MAX#' . $color_max . ':';
+            $rrd_options[] = 'AREA:DS#' . $color_avg . ':' . str_pad(substr(ucfirst((string) $ds) . ' (' . $label . ')', 0, 15), 15);
+            $rrd_options[] = 'GPRINT:DS:LAST:%5.2lf%s';
+            $rrd_options[] = 'GPRINT:DS:AVERAGE:%5.2lf%s';
+            $rrd_options[] = 'GPRINT:DS_MAX:MAX:%5.2lf%s\\l';
+        }
+    }
+}

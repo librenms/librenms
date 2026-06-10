@@ -1,0 +1,12 @@
+modules:
+    os:
+        sysDescr_regex: '/_SWV(?<version>.*)$/'
+        hardware:
+            - UPS-MIB::upsIdentManufacturer.0
+            - UPS-MIB::upsIdentModel.0
+        hardware_template: '{{ UPS-MIB::upsIdentManufacturer.0 }} {{ UPS-MIB::upsIdentModel.0 }}'
+        version:
+            - UPS-MIB::upsIdentAgentSoftwareVersion.0
+            - UPS-MIB::upsIdentUPSSoftwareVersion.0
+        version_template: '{{ UPS-MIB::upsIdentAgentSoftwareVersion.0 }} {{ UPS-MIB::upsIdentUPSSoftwareVersion.0 }}'
+        features: UPS-MIB::upsIdentAttachedDevices.0

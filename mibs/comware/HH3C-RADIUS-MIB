@@ -1,0 +1,1640 @@
+-- =================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:
+--
+-- A configuration management and statistical MIB, includes configuration of
+-- RADIUS Server, and statistics about accounting server which complements
+-- the IETF standard MIB as described in RFC2620.  In addition, there are four
+-- traps supported to notify client the RADIUS Server's down and up state.
+--
+-- Reference: RFC2866, RADIUS-AUTH-CLIENT-MIB, RADIUS-ACC-CLIENT-MIB
+-- Version: V2.6
+-- History:
+--  V1.0 Initial version 2004-07-13
+--  V1.1 2004-10-12 updated by gaolong
+--       Set size of DisplayString from 0 to 255.
+--  V1.2 2005-03-10 updated by xulei
+--       Modified description of this MIB
+--       Modified MAX-ACCESS of nodes in hh3cRdInfoTable
+--       Modified description of nodes in hh3cRdInfoTable
+--       Added nodes of hh3cRdInfoTable
+--       Added hh3cRdAccInfoTable
+--       Added hh3cRadiusAccServerTable
+--       Added Traps
+--  V1.3 2005-05-08 updated by xulei
+--       Modified MAX-ACCESS of hh3cRdPrimAccState and hh3cRdSecAccState
+--  V1.4 2005-06-03 updated by xulei
+--       Modified SYNTAX and DESCRIPTION of hh3cRdAccPacketUnit
+--  V1.5 2008-05-19 updated by yangxu
+--       Added nodes of hh3cRdAccInfoTable
+--       Added node of hh3cRdAcctOnEnable
+--       Added node of hh3cRdAcctOnSendTimes
+--       Added node of hh3cRdAcctOnSendInterval
+--  V1.6 2008-07-18 updated by d04528
+--       Added nodes of hh3cRadiusAuthenticating
+--       Added node of hh3cRadiusAuthClient
+--       Added node of hh3cRadiusAuthServerTable
+--       Added node of hh3cRadiusAuthServerEntry
+--       Added node of hh3cRadiusAuthFailureTimes
+--       Added node of hh3cRadiusAuthTimeoutTimes
+--       Added node of hh3cRadiusAuthRejectTimes
+--  V1.7 2009-04-30 update by h02978
+--       Added node of hh3cRdSecKey
+--       Added node of hh3cRdSecAccKey
+--       Added node of hh3cRadiusAuthServerUpTrap
+--       Added node of hh3cRadiusAccServerUpTrap
+--  V1.8 2009-08-05 update by h02978
+--       Added node of hh3cRadiusAuthErrThreshold
+--       Added node of hh3cRadiusAuthErrTrap
+--  V1.9 2010-03-29 Modifyed by x04730
+--       Modify SYNTAX of hh3cRdAccRealTime
+--       2010-07-14 Modifyed by x04730
+--       Modify SYNTAX of hh3cRdQuietTime
+--       Modify SYNTAX of hh3cRdAccQuietTime
+--       2010-08-26 update by y06401
+--       Added hh3cRadiusSchAuthTable
+--       Added hh3cRadiusSchAccTable
+--  V2.0 2010-03-29 Modifyed by y07111
+--       Added nodes of hh3cRadiusStatistic
+--       Added node of hh3cRadiusStatAccReq
+--       Added node of hh3cRadiusStatAccAck
+--       Added node of hh3cRadiusStatLogoutReq
+--       Added node of hh3cRadiusStatLogoutAck
+--  V2.1 2011-11-28, Added by xuyonggang
+--       Added node of hh3cRadiusServerTrapVarObjects
+--       2012-02-28 Modifyed by y002965
+--       Added table of hh3cRdSecondaryAuthServerTable
+--       Added table of hh3cRdSecondaryAcctServerTable
+--       Added node of hh3cRdPrimVpnName
+--       Added node of hh3cRdSecVpnName
+--       Added node of hh3cRdAuthNasIpAddrType
+--       Added node of hh3cRdAuthNasIpAddr
+--       Added node of hh3cRdPrimAccVpnName
+--       Added node of hh3cRdSecAccVpnName
+--       Added node of hh3cRdAccNasIpAddrType
+--       Added node of hh3cRdAccNasIpAddr
+--       Change the length of hh3cRdSecAccKey
+--       Change the length of hh3cRdAccKey
+--       Change the length of hh3cRdSecKey
+--       Change the length of hh3cRdKey
+--  V2.2 2012-10-11, Added by liubo
+--       Added node of hh3cRdAuthNasIpv6Addr
+--       Added node of hh3cRdAccNasIpv6Addr
+--       Modified the length of hh3cRdSecAccKey
+--       Modified the length of hh3cRdAccKey
+--       Modified the length of hh3cRdSecKey
+--       Modified the length of hh3cRdKey
+--       Modified the length of hh3cRdPrimVpnName
+--       Modified the length of hh3cRdSecVpnName
+--       Modified the length of hh3cRdPrimAccVpnName
+--       Modified the length of hh3cRdSecAccVpnName
+--       Modified the length of hh3cRdSecondaryAuthVpnName
+--       Modified the length of hh3cRdSecondaryAccVpnName
+--       Modified the length of hh3cRdSecondaryAuthKey
+--       Modified the length of hh3cRdSecondaryAccKey
+--       Modified the default value and description of hh3cRdAcctOnSendTimes
+--  V2.3 2013-03-30, Modified by luyu
+--       Modified description of hh3cRdSecondaryAccUdpPort
+--       Modified the default value and description of hh3cRadiusSchAccPrimUdpPort
+--       Modified the default value and description of hh3cRadiusSchAccSecUdpPort
+--  V2.4 2014-06-07, Modified by liubo
+--       Modified description of hh3cRdSecondaryAuthRowStatus
+--       Modified description of hh3cRdSecondaryAccRowStatus
+--  V2.5 2016-11-03, Modified by yemingxia
+--       Modified the value range of hh3cRdAccRealTime
+--       Added node of hh3cRdAccRealTimeUnit
+--  V2.6 2019-01-12, Modified by yuhua
+--       Added node of hh3cRadiusAuthenticationServerUpTrap
+--       Added node of hh3cRadiusAccountingServerUpTrap
+--       Added node of hh3cRadiusAuthenticationServerDownTrap
+--       Added node of hh3cRadiusAccountingServerDownTrap
+-- =================================================================
+HH3C-RADIUS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        IpAddress, Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+        Unsigned32,Counter64, TimeTicks
+            FROM SNMPv2-SMI
+        RowStatus, TruthValue, DisplayString
+            FROM SNMPv2-TC
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        Ipv6Address
+            FROM IPV6-TC
+        radiusAuthServerIndex, radiusAuthServerAddress, radiusAuthClientServerPortNumber
+            FROM RADIUS-AUTH-CLIENT-MIB
+        radiusAccServerIndex, radiusAccServerAddress, radiusAccClientServerPortNumber
+            FROM RADIUS-ACC-CLIENT-MIB;
+
+    hh3cRadius MODULE-IDENTITY
+    LAST-UPDATED "201901121800Z"            -- January 12, 2019 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The HH3C-RADIUS-MIB contains objects to
+        Manage configuration and Monitor running state
+        for RADIUS feature."
+    REVISION "201901121800Z"        -- January 12, 2019 at 18:00 GMT
+    DESCRIPTION
+        "Added node of hh3cRadiusAuthenticationServerUpTrap.
+         Added node of hh3cRadiusAccountingServerUpTrap.
+         Added node of hh3cRadiusAuthenticationServerDownTrap.
+         Added node of hh3cRadiusAccountingServerDownTrap"
+    REVISION "201611031800Z"        -- November 3, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified the value range of hh3cRdAccRealTime.
+        Added node of hh3cRdAccRealTimeUnit"
+    REVISION "201406071800Z"        -- June 7, 2014 at 18:00 GMT
+    DESCRIPTION
+        "Modified description of hh3cRdSecondaryAuthRowStatus.
+        Modified description of hh3cRdSecondaryAccRowStatus"
+    ::= { hh3cCommon 13 }
+
+    hh3cRdObjects OBJECT IDENTIFIER ::= { hh3cRadius 1 }
+
+    hh3cRdInfoTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRdInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The (conceptual) table listing RADIUS authentication servers."
+    ::= { hh3cRdObjects 1 }
+
+    hh3cRdInfoEntry OBJECT-TYPE
+        SYNTAX Hh3cRdInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS authentication server."
+        INDEX { hh3cRdGroupName }
+    ::= { hh3cRdInfoTable 1 }
+
+    Hh3cRdInfoEntry ::= SEQUENCE {
+        hh3cRdGroupName          DisplayString,
+        hh3cRdPrimAuthIp         IpAddress,
+        hh3cRdPrimUdpPort        Integer32,
+        hh3cRdPrimState          INTEGER,
+        hh3cRdSecAuthIp          IpAddress,
+        hh3cRdSecUdpPort         Integer32,
+        hh3cRdSecState           INTEGER,
+        hh3cRdKey                DisplayString,
+        hh3cRdRetry              Integer32,
+        hh3cRdTimeout            Integer32,
+        hh3cRdPrimAuthIpAddrType InetAddressType,
+        hh3cRdPrimAuthIpAddr     InetAddress,
+        hh3cRdSecAuthIpAddrType  InetAddressType,
+        hh3cRdSecAuthIpAddr      InetAddress,
+        hh3cRdServerType         INTEGER,
+        hh3cRdQuietTime          Integer32,
+        hh3cRdUserNameFormat     INTEGER,
+        hh3cRdRowStatus          RowStatus,
+        hh3cRdSecKey             DisplayString,
+        hh3cRdPrimVpnName        DisplayString,
+        hh3cRdSecVpnName         DisplayString,
+        hh3cRdAuthNasIpAddrType  InetAddressType,
+        hh3cRdAuthNasIpAddr      IpAddress,
+        hh3cRdAuthNasIpv6Addr    Ipv6Address
+        }
+
+    hh3cRdGroupName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The name of the RADIUS authentication group referred to in this table
+        entry."
+    ::= { hh3cRdInfoEntry 1 }
+
+
+    hh3cRdPrimAuthIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS deprecated
+        DESCRIPTION
+        "The IP address of primary RADIUS authentication server."
+    ::= { hh3cRdInfoEntry 2 }
+
+    hh3cRdPrimUdpPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to
+        primary RADIUS authentication server.  Default value is 1812."
+    ::= { hh3cRdInfoEntry 3 }
+
+    hh3cRdPrimState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            active(1),
+            block(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The state of the primary RADIUS authentication server.
+        1 (active) The primary authentication server is in active state.
+        2 (block)  The primary authentication server is in block state."
+    ::= { hh3cRdInfoEntry 4 }
+
+    hh3cRdSecAuthIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS deprecated
+        DESCRIPTION
+        "The IP address of secondary RADIUS authentication server."
+    ::= { hh3cRdInfoEntry 5 }
+
+    hh3cRdSecUdpPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to
+        secondary RADIUS authentication server.  Default value is 1812."
+    ::= { hh3cRdInfoEntry 6 }
+
+    hh3cRdSecState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            active(1),
+            block(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The state of the secondary RADIUS authentication server.
+        1 (active) The secondary authentication server is in active state.
+        2 (block)  The secondary authentication server is in block state."
+    ::= { hh3cRdInfoEntry 7 }
+
+    hh3cRdKey OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and RADIUS
+        authentication server used in encoding and decoding
+        sensitive data.
+        When read, hh3cRdKey always returns an Octet String of length zero."
+    ::= { hh3cRdInfoEntry 8 }
+
+    hh3cRdRetry OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The number of attempts the client will make when trying to send
+        requests to a server before it will consider the attempt failed.
+        Default value is 3."
+    ::= { hh3cRdInfoEntry 9 }
+
+    hh3cRdTimeout OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The timeout value the client will use when sending requests to a server.
+        The unit is second.  Default value is 3."
+    ::= { hh3cRdInfoEntry 10 }
+
+    hh3cRdPrimAuthIpAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The IP addresses type (IPv4 or IPv6) of primary RADIUS authentication
+        server."
+    ::= { hh3cRdInfoEntry 11 }
+
+    hh3cRdPrimAuthIpAddr OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The IP address of primary RADIUS authentication server."
+    ::= { hh3cRdInfoEntry 12 }
+
+    hh3cRdSecAuthIpAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The IP addresses type (IPv4 or IPv6) of secondary RADIUS authentication
+        server."
+    ::= { hh3cRdInfoEntry 13 }
+
+    hh3cRdSecAuthIpAddr OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The IP address of secondary RADIUS authentication server."
+    ::= { hh3cRdInfoEntry 14 }
+
+    hh3cRdServerType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            standard(1),
+            iphotel(2),
+            portal(3),
+            extended(4)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Specify the type of RADIUS server.
+        1 (standard) - Server based on RFC protocol(s).
+        2 (iphotel) - Server for IP-Hotel or 201+ system.
+        3 (portal) - Server for iTellin Portal system.
+        4 (extended) - Server based on RADIUS extensions.
+        Default type is standard."
+    ::= { hh3cRdInfoEntry 15 }
+
+    hh3cRdQuietTime OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The time for server returning active.  The unit is minute.
+         When the value is 0, the server state retains active.  Default value is 5."
+    ::= { hh3cRdInfoEntry 16 }
+
+    hh3cRdUserNameFormat OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            withoutdomain(1),
+            withdomain(2),
+            keeporignal(3)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Specify the user-name format that is sent to RADIUS server.
+        1 (withoutdomain) - send the user-name without domain.
+        2 (withdomain) - send the user-name with domain.
+        3 (keeporignal) - send the user-name as it is entered.
+        Default format is withdomain."
+    ::= { hh3cRdInfoEntry 17 }
+
+
+    hh3cRdRowStatus   OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS   current
+        DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.  To create a new row, hh3cRdGroupName must be specified.
+        To destroy an existent row, the hh3cRdGroupName MUST NOT be referred by
+        hh3cDomainTable in hh3cDomainRadiusGroupName column."
+    ::= { hh3cRdInfoEntry 18 }
+
+
+    hh3cRdSecKey OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the secondary RADIUS
+        authentication server used in encoding and decoding
+        sensitive data.
+        When read, hh3cRdSecKey always returns an Octet String of length zero."
+    ::= { hh3cRdInfoEntry 19 }
+
+    hh3cRdPrimVpnName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..31))
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+        "The human-readable name of the VPN in which the primary RADIUS
+        authentication server is placed."
+    ::= { hh3cRdInfoEntry 20 }
+
+    hh3cRdSecVpnName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..31))
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+        "The human-readable name of the VPN in which the secondary RADIUS
+        authentication server is placed."
+    ::= { hh3cRdInfoEntry 21 }
+
+    hh3cRdAuthNasIpAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The type (IPv4 or IPv6) of the source IP used to communicate with
+        RADIUS authentication server."
+    ::= { hh3cRdInfoEntry 22 }
+
+    hh3cRdAuthNasIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The source IPv4 address used to communicate with the RADIUS authentication
+        server."
+    ::= { hh3cRdInfoEntry 23 }
+
+    hh3cRdAuthNasIpv6Addr OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The source IPv6 address used to communicate with the RADIUS authentication
+        server."
+    ::= { hh3cRdInfoEntry 24 }
+
+-- ***********************************************************************
+--
+--  Accounting Server Table
+--
+-- ***********************************************************************
+    hh3cRdAccInfoTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRdAccInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The (conceptual) table listing RADIUS accounting servers."
+    ::= { hh3cRdObjects 2 }
+
+    hh3cRdAccInfoEntry OBJECT-TYPE
+        SYNTAX Hh3cRdAccInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS accounting server."
+        INDEX { hh3cRdAccGroupName }
+    ::= { hh3cRdAccInfoTable 1 }
+
+
+    Hh3cRdAccInfoEntry ::= SEQUENCE {
+        hh3cRdAccGroupName           DisplayString,
+        hh3cRdPrimAccIpAddrType      InetAddressType,
+        hh3cRdPrimAccIpAddr          InetAddress,
+        hh3cRdPrimAccUdpPort         Integer32,
+        hh3cRdPrimAccState           INTEGER,
+        hh3cRdSecAccIpAddrType       InetAddressType,
+        hh3cRdSecAccIpAddr           InetAddress,
+        hh3cRdSecAccUdpPort          Integer32,
+        hh3cRdSecAccState            INTEGER,
+        hh3cRdAccKey                 DisplayString,
+        hh3cRdAccRetry               Integer32,
+        hh3cRdAccTimeout             Integer32,
+        hh3cRdAccServerType          INTEGER,
+        hh3cRdAccQuietTime           Integer32,
+        hh3cRdAccFailureAction       INTEGER,
+        hh3cRdAccRealTime            Integer32,
+        hh3cRdAccRealTimeRetry       Integer32,
+        hh3cRdAccSaveStopPktEnable   TruthValue,
+        hh3cRdAccStopRetry           Integer32,
+        hh3cRdAccDataFlowUnit        INTEGER,
+        hh3cRdAccPacketUnit          INTEGER,
+        hh3cRdAccRowStatus           RowStatus,
+        hh3cRdAcctOnEnable           TruthValue,
+        hh3cRdAcctOnSendTimes        Integer32,
+        hh3cRdAcctOnSendInterval     Integer32,
+        hh3cRdSecAccKey              DisplayString,
+        hh3cRdPrimAccVpnName         DisplayString,
+        hh3cRdSecAccVpnName          DisplayString,
+        hh3cRdAccNasIpAddrType       InetAddressType,
+        hh3cRdAccNasIpAddr           IpAddress,
+        hh3cRdAccNasIpv6Addr         Ipv6Address,
+        hh3cRdAccRealTimeUnit        INTEGER
+        }
+
+    hh3cRdAccGroupName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (1..32))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The name of the RADIUS group referred to in this table entry."
+    ::= { hh3cRdAccInfoEntry 1 }
+
+    hh3cRdPrimAccIpAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP addresses type (IPv4 or IPv6) of primary RADIUS accounting server."
+    ::= { hh3cRdAccInfoEntry 2 }
+
+    hh3cRdPrimAccIpAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP address of primary RADIUS accounting server."
+    ::= { hh3cRdAccInfoEntry 3 }
+
+    hh3cRdPrimAccUdpPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to primary
+        RADIUS accounting server.  Default value is 1813."
+    ::= { hh3cRdAccInfoEntry 4 }
+
+    hh3cRdPrimAccState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            active(1),
+            block(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The state of the primary RADIUS accounting server.
+        1 (active) The primary accounting server is in active state.
+        2 (block)  The primary accounting server is in block state."
+    ::= { hh3cRdAccInfoEntry 5 }
+
+    hh3cRdSecAccIpAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP addresses type (IPv4 or IPv6) of secondary RADIUS accounting
+        server."
+    ::= { hh3cRdAccInfoEntry 6 }
+
+    hh3cRdSecAccIpAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP address of secondary RADIUS accounting server."
+    ::= { hh3cRdAccInfoEntry 7 }
+
+    hh3cRdSecAccUdpPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to secondary
+        RADIUS accounting server.  Default value is 1813."
+    ::= { hh3cRdAccInfoEntry 8 }
+
+    hh3cRdSecAccState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            active(1),
+            block(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The state of the secondary RADIUS accounting server.
+        1 (active) The secondary accounting server is in active state.
+        2 (block)  The secondary accounting server is in block state."
+    ::= { hh3cRdAccInfoEntry 9 }
+
+    hh3cRdAccKey OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and RADIUS
+        accounting server used in encoding and decoding sensitive data.
+        When read, hh3cRdAccKey always returns an Octet String of length zero."
+    ::= { hh3cRdAccInfoEntry 10 }
+
+
+    hh3cRdAccRetry OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The number of attempt the client will make when trying to send
+        requests to a server before it will consider the attempt failed.
+        Default value is 3."
+    ::= { hh3cRdAccInfoEntry 11 }
+
+    hh3cRdAccTimeout OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The timeout value the client will use when sending requests to a server.
+        The unit is second.  Default value is 3."
+    ::= { hh3cRdAccInfoEntry 12 }
+
+    hh3cRdAccServerType OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            standard(1),
+            iphotel(2),
+            portal(3),
+            extended(4)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Specify the type of RADIUS server.
+        1 (standard) - Server based on RFC protocol(s).
+        2 (iphotel) - Server for IP-Hotel or 201+ system.
+        3 (portal) - Server for iTellin Portal system.
+        4 (extended) - Server based on RADIUS extensions.
+        Default type is standard."
+    ::= { hh3cRdAccInfoEntry 13 }
+
+    hh3cRdAccQuietTime OBJECT-TYPE
+        SYNTAX Integer32 (0..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The time for server returning active.  The unit is minute.
+         When the value is 0, the server state retains active.  Default value is 5."
+    ::= { hh3cRdAccInfoEntry 14 }
+
+    hh3cRdAccFailureAction OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            ignore(1),
+            reject(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Defines the action that authentication should take if
+        authentication succeeds but the associated accounting start
+        fails.
+        1 (ignore) - treat as authentication success; ignore
+            accounting start failure.
+        2 (reject) - treat as authentication failed if
+            corresponding accounting start fails.
+        Default value is 1(reject)."
+    ::= { hh3cRdAccInfoEntry 15 }
+
+    hh3cRdAccRealTime OBJECT-TYPE
+        SYNTAX Integer32 (0..71582)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Interval of realtime-accounting packets.
+        The unit is defined by hh3cRdAccRealTimeUnit.
+        When the value is 0, the device doesn't send realtime-accounting
+        packets.  Default value is 12 minutes."
+    ::= { hh3cRdAccInfoEntry 16 }
+
+    hh3cRdAccRealTimeRetry OBJECT-TYPE
+        SYNTAX Integer32 (1..255)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The number of attempt the client will make when trying to send
+        realtime-accounting packet to accounting server before it will
+        consider the attempt failed.  Default value is 5."
+        DEFVAL { 5 }
+    ::= { hh3cRdAccInfoEntry 17 }
+
+    hh3cRdAccSaveStopPktEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The control of whether save stop-accounting packet in local buffer
+        and resend later when the accounting server doesn't respond.  When
+        SaveStopPktEnable is set to false, the value of AccStopRetry will be
+        ignored.  Default value is true."
+    ::= { hh3cRdAccInfoEntry 18 }
+
+    hh3cRdAccStopRetry OBJECT-TYPE
+        SYNTAX Integer32 (10..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The number of attempt the client will make when trying to send
+        stop-accounting packet to accounting server.  Default value is 500."
+    ::= { hh3cRdAccInfoEntry 19 }
+
+    hh3cRdAccDataFlowUnit OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            byte(1),
+            kiloByte(2),
+            megaByte(3),
+            gigaByte(4)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Specify data flow format that is sent to RADIUS server.  The value
+        SHOULD be set the same as the value of corresponding server.
+        1 (byte) -  Specify 'byte' as the unit of data flow.
+        2 (kiloByte) - Specify 'kilo-byte' as the unit of data flow.
+        3 (megaByte) - Specify 'mega-byte' as the unit of data flow.
+        4 (gigaByte) - Specify 'giga-byte' as the unit of data flow.
+        Default value is 1."
+    ::= { hh3cRdAccInfoEntry 20 }
+
+    hh3cRdAccPacketUnit OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            onePacket(1),
+            kiloPacket(2),
+            megaPacket(3),
+            gigaPacket(4)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Specify packet format that is sent to RADIUS server.  The value
+        SHOULD be set the same as the value of corresponding server.
+        1 (onePacket)  - Specify 'one-packet' as the unit of packet.
+        2 (kiloPacket) - Specify 'kilo-packet' as the unit of packet.
+        3 (megaPacket) - Specify 'mega-packet' as the unit of packet.
+        4 (gigaPacket) - Specify 'giga-packet' as the unit of packet.
+        Default value is 1."
+    ::= { hh3cRdAccInfoEntry 21 }
+
+    hh3cRdAccRowStatus   OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS   current
+        DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.  To create a new row, hh3cRdAccGroupName must be specified.
+        To destroy an existent row, the hh3cRdAccGroupName MUST NOT be referred by
+        hh3cDomainTable in hh3cDomainRadiusGroupName column."
+    ::= { hh3cRdAccInfoEntry 22 }
+
+    hh3cRdAcctOnEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The control of Accounting-On function.  The Accounting-On function is
+        used by the client to mark the start of accounting (for example, upon
+        booting) by sending Accounting-On packets and to mark the end of
+        accounting (for example, just before a scheduled reboot) by sending
+        Accounting-Off packets.  Default value is false."
+    ::= { hh3cRdAccInfoEntry 23 }
+
+    hh3cRdAcctOnSendTimes OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The number of Accounting-On packets the client will send before it
+        considers the accounting server failed.  Default value is 50."
+        DEFVAL { 50 }
+    ::= { hh3cRdAccInfoEntry 24 }
+
+    hh3cRdAcctOnSendInterval OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Interval of Accounting-On packets.  The unit is second.
+        Default value is 3."
+        DEFVAL { 3 }
+    ::= { hh3cRdAccInfoEntry 25 }
+
+
+    hh3cRdSecAccKey OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the secondary RADIUS
+        accounting server used in encoding and decoding sensitive data.
+        When read, hh3cRdSecAccKey always returns an Octet String of length zero."
+    ::= { hh3cRdAccInfoEntry 26 }
+
+    hh3cRdPrimAccVpnName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..31))
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+        "The human-readable name of the VPN in which the primary RADIUS
+        accounting server is placed."
+    ::= { hh3cRdAccInfoEntry 27 }
+
+    hh3cRdSecAccVpnName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..31))
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+        "The human-readable name of the VPN in which the secondary RADIUS
+        accounting server is placed."
+    ::= { hh3cRdAccInfoEntry 28 }
+
+    hh3cRdAccNasIpAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The type (IPv4 or IPv6) of the source IP used to communicate with
+        RADIUS accounting server."
+    ::= { hh3cRdAccInfoEntry 29 }
+
+    hh3cRdAccNasIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The source IPv4 address used to communicate with the RADIUS accounting
+        server."
+    ::= { hh3cRdAccInfoEntry 30 }
+
+    hh3cRdAccNasIpv6Addr OBJECT-TYPE
+        SYNTAX Ipv6Address
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The source IPv6 address used to communicate with the RADIUS accounting
+        server."
+    ::= { hh3cRdAccInfoEntry 31 }
+
+    hh3cRdAccRealTimeUnit OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            minute(0),
+            second(1)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The interval unit of realtime-accounting packets.
+        0  - minute.
+        1  - second."
+        DEFVAL { minute }
+    ::= { hh3cRdAccInfoEntry 32 }
+
+-- ***********************************************************************
+--
+--  Global configurations
+--
+-- ***********************************************************************
+    hh3cRadiusGlobalConfig OBJECT IDENTIFIER ::= { hh3cRdObjects 3 }
+
+    hh3cRadiusAuthErrThreshold OBJECT-TYPE
+        SYNTAX Unsigned32 (1..100)
+        UNITS "percentage"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The threshold of authentication failure trap.  A trap will be sent
+            when the percent of the unsuccessful authentication exceeds this threshold."
+        DEFVAL { 30 }
+        ::= { hh3cRadiusGlobalConfig 1 }
+
+
+-- ***********************************************************************
+--
+--  Secondary Authentication Server Table
+--
+-- ***********************************************************************
+    hh3cRdSecondaryAuthServerTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRdSecondaryAuthServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The (conceptual) table listing RADIUS secondary authentication servers."
+    ::= { hh3cRdObjects 4 }
+
+    hh3cRdSecondaryAuthServerEntry OBJECT-TYPE
+        SYNTAX Hh3cRdSecondaryAuthServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS secondary authentication server."
+        INDEX { hh3cRdGroupName, hh3cRdSecondaryAuthIpAddrType, hh3cRdSecondaryAuthIpAddr,
+                hh3cRdSecondaryAuthVpnName, hh3cRdSecondaryAuthUdpPort }
+    ::= { hh3cRdSecondaryAuthServerTable 1 }
+
+    Hh3cRdSecondaryAuthServerEntry ::= SEQUENCE {
+        hh3cRdSecondaryAuthIpAddrType       InetAddressType,
+        hh3cRdSecondaryAuthIpAddr           InetAddress,
+        hh3cRdSecondaryAuthVpnName          DisplayString,
+        hh3cRdSecondaryAuthUdpPort          Integer32,
+        hh3cRdSecondaryAuthState            INTEGER,
+        hh3cRdSecondaryAuthKey              DisplayString,
+        hh3cRdSecondaryAuthRowStatus        RowStatus
+        }
+
+    hh3cRdSecondaryAuthIpAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The IP addresses type (IPv4 or IPv6) of secondary RADIUS authentication server."
+    ::= { hh3cRdSecondaryAuthServerEntry 1 }
+
+    hh3cRdSecondaryAuthIpAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The IP address of secondary RADIUS authentication server."
+    ::= { hh3cRdSecondaryAuthServerEntry 2 }
+
+    hh3cRdSecondaryAuthVpnName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..31))
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "The human-readable name of the VPN in which the secondary RADIUS
+        authentication server is placed."
+    ::= { hh3cRdSecondaryAuthServerEntry 3 }
+
+    hh3cRdSecondaryAuthUdpPort OBJECT-TYPE
+        SYNTAX      Integer32(1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to secondary
+        RADIUS authentication server.  Default value is 1812."
+    ::= { hh3cRdSecondaryAuthServerEntry 4 }
+
+    hh3cRdSecondaryAuthState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            active(1),
+            block(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The state of the secondary RADIUS authentication server.
+        1 (active) The secondary authentication server is in active state.
+        2 (block)  The secondary authentication server is in block state."
+    ::= { hh3cRdSecondaryAuthServerEntry 5 }
+
+    hh3cRdSecondaryAuthKey OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the secondary RADIUS
+        authentication server used in encoding and decoding sensitive data.
+        When read, hh3cRdSecondaryAuthKey always returns an Octet String of length zero."
+    ::= { hh3cRdSecondaryAuthServerEntry 6 }
+
+    hh3cRdSecondaryAuthRowStatus   OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS   current
+        DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.  To create a new row, hh3cRdGroupName must be specified.
+        The number of rows with the same hh3cRdGroupName can't be more than 16."
+    ::= { hh3cRdSecondaryAuthServerEntry 7 }
+
+-- ***********************************************************************
+--
+--  Secondary Accounting Server Table
+--
+-- ***********************************************************************
+    hh3cRdSecondaryAccServerTable  OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRdSecondaryAccServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The (conceptual) table listing RADIUS secondary accounting servers."
+    ::= { hh3cRdObjects 5 }
+
+    hh3cRdSecondaryAccServerEntry OBJECT-TYPE
+        SYNTAX Hh3cRdSecondaryAccServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS secondary accounting server."
+        INDEX { hh3cRdAccGroupName, hh3cRdSecondaryAccIpAddrType, hh3cRdSecondaryAccIpAddr,
+                hh3cRdSecondaryAccVpnName, hh3cRdSecondaryAccUdpPort }
+    ::= { hh3cRdSecondaryAccServerTable 1 }
+
+    Hh3cRdSecondaryAccServerEntry ::= SEQUENCE {
+        hh3cRdSecondaryAccIpAddrType       InetAddressType,
+        hh3cRdSecondaryAccIpAddr           InetAddress,
+        hh3cRdSecondaryAccVpnName          DisplayString,
+        hh3cRdSecondaryAccUdpPort          Integer32,
+        hh3cRdSecondaryAccState            INTEGER,
+        hh3cRdSecondaryAccKey              DisplayString,
+        hh3cRdSecondaryAccRowStatus        RowStatus
+        }
+
+    hh3cRdSecondaryAccIpAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The IP addresses type (IPv4 or IPv6) of secondary RADIUS accounting server."
+    ::= { hh3cRdSecondaryAccServerEntry 1 }
+
+    hh3cRdSecondaryAccIpAddr OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The IP address of secondary RADIUS accounting server."
+    ::= { hh3cRdSecondaryAccServerEntry 2 }
+
+    hh3cRdSecondaryAccVpnName OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..31))
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+        "The human-readable name of the VPN in which the secondary RADIUS
+        accounting server is placed."
+    ::= { hh3cRdSecondaryAccServerEntry 3 }
+
+    hh3cRdSecondaryAccUdpPort OBJECT-TYPE
+        SYNTAX      Integer32(1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to secondary
+        RADIUS accounting server.  Default value is 1813."
+    ::= { hh3cRdSecondaryAccServerEntry 4 }
+
+    hh3cRdSecondaryAccState OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            active(1),
+            block(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The state of the secondary RADIUS accounting server.
+        1 (active) The secondary accounting server is in active state.
+        2 (block)  The secondary accounting server is in block state."
+    ::= { hh3cRdSecondaryAccServerEntry 5 }
+
+    hh3cRdSecondaryAccKey OBJECT-TYPE
+        SYNTAX DisplayString(SIZE (0..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the secondary RADIUS
+        accounting server used in encoding and decoding sensitive data.
+        When read, hh3cRdSecondaryAccKey always returns an Octet String of length zero."
+    ::= { hh3cRdSecondaryAccServerEntry 6 }
+
+    hh3cRdSecondaryAccRowStatus   OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS   current
+        DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.  To create a new row, hh3cRdAccGroupName must be specified.
+        The number of rows with the same hh3cRdAccGroupName can't be more than 16."
+    ::= { hh3cRdSecondaryAccServerEntry 7 }
+
+
+-- ***********************************************************************
+--
+--  Supplement to RFC2620 RADIUS-ACC-CLIENT-MIB
+--
+-- ***********************************************************************
+
+    hh3cRadiusAccounting OBJECT IDENTIFIER ::= { hh3cRadius 2 }
+
+    hh3cRadiusAccClient OBJECT IDENTIFIER ::= { hh3cRadiusAccounting 1 }
+
+    hh3cRadiusAccServerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cRadiusAccServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The (conceptual) table listing the RADIUS accounting
+        servers with which the client shares a secret."
+    ::= { hh3cRadiusAccClient 1 }
+
+    hh3cRadiusAccServerEntry OBJECT-TYPE
+        SYNTAX  Hh3cRadiusAccServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS accounting
+        server with which a client shares a secret."
+        INDEX { radiusAccServerIndex }
+    ::= { hh3cRadiusAccServerTable 1 }
+
+    Hh3cRadiusAccServerEntry ::= SEQUENCE {
+        hh3cRadiusAccClientStartRequests         Counter32,
+        hh3cRadiusAccClientStartResponses        Counter32,
+        hh3cRadiusAccClientInterimRequests       Counter32,
+        hh3cRadiusAccClientInterimResponses      Counter32,
+        hh3cRadiusAccClientStopRequests          Counter32,
+        hh3cRadiusAccClientStopResponses         Counter32 }
+
+    hh3cRadiusAccClientStartRequests   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS accounting start request sent to this
+        server."
+    ::= { hh3cRadiusAccServerEntry  1 }
+
+    hh3cRadiusAccClientStartResponses   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS accounting start response received
+        from this server."
+    ::= { hh3cRadiusAccServerEntry  2 }
+
+    hh3cRadiusAccClientInterimRequests   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS interim accounting request sent to
+        this server."
+    ::= { hh3cRadiusAccServerEntry  3 }
+
+    hh3cRadiusAccClientInterimResponses   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS interim accounting response received
+        from this server."
+    ::= { hh3cRadiusAccServerEntry  4 }
+
+    hh3cRadiusAccClientStopRequests   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS stop accounting request sent to
+        this RADIUS server."
+    ::= { hh3cRadiusAccServerEntry  5 }
+
+    hh3cRadiusAccClientStopResponses   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS stop accounting response received
+        from this server."
+    ::= { hh3cRadiusAccServerEntry  6 }
+
+--------------------------------------------------------------
+-- Traps
+--------------------------------------------------------------
+
+-- All trap definitions should be placed under this object.
+    hh3cRadiusServerTrap OBJECT IDENTIFIER ::= { hh3cRadius 3 }
+
+    hh3cRadiusAuthServerDownTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAuthServerAddress,
+                     radiusAuthClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime}
+        STATUS      obsolete
+        DESCRIPTION
+        "This trap is generated when the authentication RADIUS server
+        does not respond to the client's requests for a period of time.
+        This node is replaced by hh3cRadiusAuthenticationServerDownTrap."
+    ::= { hh3cRadiusServerTrap 1 }
+
+    hh3cRadiusAccServerDownTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAccServerAddress,
+                     radiusAccClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime}
+        STATUS      obsolete
+        DESCRIPTION
+        "This trap is generated when the accounting RADIUS server
+        does not respond to the client's requests for a period of time.
+        This node is replaced by hh3cRadiusAccountingServerDownTrap."
+    ::= { hh3cRadiusServerTrap 2 }
+
+    hh3cRadiusServerTrapPrefix OBJECT IDENTIFIER ::= { hh3cRadiusServerTrap 0 }
+
+    hh3cRadiusAuthServerUpTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAuthServerAddress,
+                     radiusAuthClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime }
+        STATUS      obsolete
+        DESCRIPTION
+        "This trap is generated when the device finds that the state of the
+        RADIUS authentication server changes from unreachable to reachable.
+        This node is replaced by hh3cRadiusAuthenticationServerUpTrap."
+    ::= { hh3cRadiusServerTrapPrefix 1 }
+
+    hh3cRadiusAccServerUpTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAccServerAddress,
+                     radiusAccClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime }
+        STATUS      obsolete
+        DESCRIPTION
+        "This trap is generated when the device finds that the state of the
+        RADIUS accounting server changes from unreachable to unreachable.
+        This node is replaced by hh3cRadiusAccountingServerUpTrap."
+    ::= { hh3cRadiusServerTrapPrefix 2 }
+
+    hh3cRadiusAuthErrTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAuthServerAddress,
+                      radiusAuthClientServerPortNumber }
+        STATUS      current
+        DESCRIPTION
+        "This trap is generated when the device finds that the percent of
+        unsuccessful authentication exceeds a threshold, and the threshold
+        is the value of node hh3cRadiusAuthErrThreshold."
+    ::= { hh3cRadiusServerTrapPrefix 3 }
+
+    hh3cRadiusAuthenticationServerUpTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAuthServerAddress,
+                     radiusAuthClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime }
+        STATUS      current
+        DESCRIPTION
+        "This trap is generated when the device finds that the state of the
+        RADIUS authentication server changes from unreachable to reachable.
+        The node replaces hh3cRadiusAuthServerUpTrap."
+    ::= { hh3cRadiusServerTrapPrefix 4 }
+
+    hh3cRadiusAccountingServerUpTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAccServerAddress,
+                     radiusAccClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime }
+        STATUS      current
+        DESCRIPTION
+        "This trap is generated when the device finds that the state of the
+        RADIUS accounting server changes from unreachable to reachable.
+        The node replaces hh3cRadiusAccServerUpTrap."
+    ::= { hh3cRadiusServerTrapPrefix 5 }
+
+    hh3cRadiusAuthenticationServerDownTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAuthServerAddress,
+                     radiusAuthClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime}
+        STATUS      current
+        DESCRIPTION
+        "This trap is generated when the authentication RADIUS server
+        does not respond to the client's requests for a period of time.
+        The node replaces hh3cRadiusAuthServerDownTrap."
+    ::= { hh3cRadiusServerTrapPrefix 6 }
+
+    hh3cRadiusAccountingServerDownTrap NOTIFICATION-TYPE
+        OBJECTS     { radiusAccServerAddress,
+                     radiusAccClientServerPortNumber,
+                     hh3cRadiusServerFirstTrapTime}
+        STATUS      current
+        DESCRIPTION
+        "This trap is generated when the accounting RADIUS server
+        does not respond to the client's requests for a period of time.
+        The node replaces hh3cRadiusAccServerDownTrap."
+    ::= { hh3cRadiusServerTrapPrefix 7 }
+
+-- ***********************************************************************
+--
+--  Supplement to RFC2618 RADIUS-AUTH-CLIENT-MIB
+--
+-- ***********************************************************************
+
+    hh3cRadiusAuthenticating OBJECT IDENTIFIER ::= { hh3cRadius 4 }
+
+    hh3cRadiusAuthClient OBJECT IDENTIFIER ::= { hh3cRadiusAuthenticating 1 }
+
+    hh3cRadiusAuthServerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cRadiusAuthServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "The (conceptual) table listing the RADIUS authenticating
+        servers with which the client shares a secret."
+    ::= { hh3cRadiusAuthClient 1 }
+
+    hh3cRadiusAuthServerEntry OBJECT-TYPE
+        SYNTAX  Hh3cRadiusAuthServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "An entry (conceptual row) representing a RADIUS authenticating
+        server with which a client shares a secret."
+        INDEX { radiusAuthServerIndex }
+    ::= { hh3cRadiusAuthServerTable 1 }
+
+    Hh3cRadiusAuthServerEntry ::= SEQUENCE {
+        hh3cRadiusAuthFailureTimes         Counter32,
+        hh3cRadiusAuthTimeoutTimes        Counter32,
+        hh3cRadiusAuthRejectTimes       Counter32}
+
+    hh3cRadiusAuthFailureTimes   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS authenticating failed to this server."
+    ::= { hh3cRadiusAuthServerEntry  1 }
+
+    hh3cRadiusAuthTimeoutTimes   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS authenticating timeout to this server."
+    ::= { hh3cRadiusAuthServerEntry  2 }
+
+    hh3cRadiusAuthRejectTimes   OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The number of RADIUS authenticating rejected to this server."
+    ::= { hh3cRadiusAuthServerEntry  3 }
+
+
+-- ***********************************************************************
+--
+--  Radius Extend
+--
+-- ***********************************************************************
+    hh3cRadiusExtend OBJECT IDENTIFIER ::= { hh3cRadius 5 }
+
+    hh3cRadiusExtendObjects OBJECT IDENTIFIER ::= { hh3cRadiusExtend 1 }
+    hh3cRadiusExtendTables OBJECT IDENTIFIER ::= { hh3cRadiusExtend 2 }
+    hh3cRadiusExtendTraps OBJECT IDENTIFIER ::= { hh3cRadiusExtend 3 }
+
+-- ***********************************************************************
+--
+--  Radius Scheme Authentication Table
+--
+-- ***********************************************************************
+    hh3cRadiusSchAuthTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRadiusSchAuthEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The (conceptual) table listing RADIUS authentication servers."
+    ::= { hh3cRadiusExtendTables 1 }
+
+    hh3cRadiusSchAuthEntry OBJECT-TYPE
+        SYNTAX Hh3cRadiusSchAuthEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An entry (conceptual row) representing RADIUS authentication servers."
+        INDEX { hh3cRadiusSchAuthGroupName}
+    ::= { hh3cRadiusSchAuthTable 1 }
+
+    Hh3cRadiusSchAuthEntry ::= SEQUENCE {
+        hh3cRadiusSchAuthGroupName           DisplayString,
+        hh3cRadiusSchAuthPrimIpAddr          IpAddress,
+        hh3cRadiusSchAuthPrimUdpPort         Integer32,
+        hh3cRadiusSchAuthPrimKey             DisplayString,
+        hh3cRadiusSchAuthSecIpAddr           IpAddress,
+        hh3cRadiusSchAuthSecUdpPort          Integer32,
+        hh3cRadiusSchAuthSecKey              DisplayString,
+        hh3cRadiusSchAuthRowStatus           RowStatus
+        }
+
+    hh3cRadiusSchAuthGroupName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The name of the RADIUS authentication server group referred to in this table entry."
+    ::= { hh3cRadiusSchAuthEntry 1 }
+
+    hh3cRadiusSchAuthPrimIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP address of primary RADIUS authenticaiton server."
+    ::= { hh3cRadiusSchAuthEntry 2 }
+
+    hh3cRadiusSchAuthPrimUdpPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to primary
+        RADIUS authentication server.  Default value is 1812."
+        DEFVAL { 1812 }
+    ::= { hh3cRadiusSchAuthEntry 3 }
+
+    hh3cRadiusSchAuthPrimKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the primary RADIUS
+        authentication server used in encoding and decoding sensitive data."
+    ::= { hh3cRadiusSchAuthEntry 4 }
+
+    hh3cRadiusSchAuthSecIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP address of secondary RADIUS authenticaiton server."
+    ::= { hh3cRadiusSchAuthEntry 5 }
+
+    hh3cRadiusSchAuthSecUdpPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to secondary
+        RADIUS authentication server.  Default value is 1812."
+        DEFVAL { 1812 }
+    ::= { hh3cRadiusSchAuthEntry 6 }
+
+    hh3cRadiusSchAuthSecKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the secondary RADIUS
+        authentication server used in encoding and decoding sensitive data."
+    ::= { hh3cRadiusSchAuthEntry 7 }
+
+    hh3cRadiusSchAuthRowStatus   OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS   current
+        DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.
+        To create a new row, hh3cRadiusSchAuthGroupName must be specified,
+        and this action will create a corresponding domain that
+        hh3cDomainRadiusGroupName is the same as hh3cRadiusSchAuthGroupName.
+        To destroy an existent row, the hh3cRadiusSchAuthGroupName MUST NOT be
+        referred by hh3cDomainTable in hh3cDomainRadiusGroupName column."
+    ::= { hh3cRadiusSchAuthEntry 8 }
+
+
+-- ***********************************************************************
+--
+--  Radius Scheme Accounting Table
+--
+-- ***********************************************************************
+    hh3cRadiusSchAccTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRadiusSchAccEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The (conceptual) table listing RADIUS accounting servers."
+    ::= { hh3cRadiusExtendTables 2 }
+
+    hh3cRadiusSchAccEntry OBJECT-TYPE
+        SYNTAX Hh3cRadiusSchAccEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "An entry (conceptual row) representing RADIUS accounting servers."
+        INDEX { hh3cRadiusSchAccGroupName}
+    ::= { hh3cRadiusSchAccTable 1 }
+
+    Hh3cRadiusSchAccEntry ::= SEQUENCE {
+        hh3cRadiusSchAccGroupName           DisplayString,
+        hh3cRadiusSchAccPrimIpAddr          IpAddress,
+        hh3cRadiusSchAccPrimUdpPort         Integer32,
+        hh3cRadiusSchAccPrimKey             DisplayString,
+        hh3cRadiusSchAccSecIpAddr           IpAddress,
+        hh3cRadiusSchAccSecUdpPort          Integer32,
+        hh3cRadiusSchAccSecKey              DisplayString,
+        hh3cRadiusSchAccRowStatus           RowStatus
+        }
+
+    hh3cRadiusSchAccGroupName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+        "The name of the RADIUS accounting server group referred to in this table entry."
+    ::= { hh3cRadiusSchAccEntry 1 }
+
+    hh3cRadiusSchAccPrimIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP address of primary RADIUS accounting server."
+    ::= { hh3cRadiusSchAccEntry 2 }
+
+    hh3cRadiusSchAccPrimUdpPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to primary
+        RADIUS accounting server.  Default value is 1813."
+        DEFVAL { 1813 }
+    ::= { hh3cRadiusSchAccEntry 3 }
+
+    hh3cRadiusSchAccPrimKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the primary RADIUS
+        accounting server used in encoding and decoding sensitive data."
+    ::= { hh3cRadiusSchAccEntry 4 }
+
+    hh3cRadiusSchAccSecIpAddr OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The IP address of secondary RADIUS accounting server."
+    ::= { hh3cRadiusSchAccEntry 5 }
+
+    hh3cRadiusSchAccSecUdpPort OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+        "The UDP port the client is using to send requests to secondary
+        RADIUS accounting server.  Default value is 1813."
+        DEFVAL { 1813 }
+    ::= { hh3cRadiusSchAccEntry 6 }
+
+    hh3cRadiusSchAccSecKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "The secret shared between the RADIUS client and the secondary RADIUS
+        accounting server used in encoding and decoding sensitive data."
+    ::= { hh3cRadiusSchAccEntry 7 }
+
+    hh3cRadiusSchAccRowStatus   OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS  read-create
+        STATUS   current
+        DESCRIPTION
+        "This object is responsible for managing the creation, deletion and
+        modification of rows, which support active status and CreateAndGo,
+        Destroy operation.
+        To create a new row, hh3cRadiusSchAccGroupName must be specified,
+        and this action will create a corresponding domain that
+        hh3cDomainRadiusGroupName is the same as hh3cRadiusSchAccGroupName.
+        To destroy an existent row, the hh3cRadiusSchAccGroupName MUST NOT be
+        referred by hh3cDomainTable in hh3cDomainRadiusGroupName column."
+    ::= { hh3cRadiusSchAccEntry 8 }
+-- ***********************************************************************
+--
+-- RADIUS ACCOUNT STATISTIC
+--
+-- ***********************************************************************
+hh3cRadiusStatistic OBJECT IDENTIFIER ::= { hh3cRadius 6 }
+
+hh3cRadiusStatAccReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of radius account request to the
+        radius server."
+    ::= { hh3cRadiusStatistic 1 }
+
+hh3cRadiusStatAccAck OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of radius account response from the
+         radius server."
+    ::= { hh3cRadiusStatistic 2 }
+
+hh3cRadiusStatLogoutReq OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of logout request to the radius server."
+    ::= { hh3cRadiusStatistic 3 }
+
+hh3cRadiusStatLogoutAck OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "It shows the number of logout response from the radius server."
+    ::= { hh3cRadiusStatistic 4 }
+
+hh3cRadiusServerTrapVarObjects OBJECT IDENTIFIER ::= { hh3cRadius 7 }
+
+hh3cRadiusServerFirstTrapTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the first trap time."
+    ::= { hh3cRadiusServerTrapVarObjects 1 }
+
+END

@@ -1,0 +1,4158 @@
+ALCATEL-IND1-UDP-RELAY-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+
+            IpAddress,
+            MODULE-IDENTITY,
+            OBJECT-TYPE,
+            OBJECT-IDENTITY,
+            Integer32, Unsigned32,
+            NOTIFICATION-TYPE, 
+            Counter32  FROM SNMPv2-SMI
+           InetAddress, InetAddressType
+               FROM INET-ADDRESS-MIB
+            MacAddress, DisplayString, RowStatus,
+                  TEXTUAL-CONVENTION     FROM SNMPv2-TC
+                  SnmpAdminString        FROM SNMP-FRAMEWORK-MIB
+
+                  MODULE-COMPLIANCE,
+                  NOTIFICATION-GROUP,
+                  OBJECT-GROUP          FROM SNMPv2-CONF
+                  routingIND1UdpRelay   FROM ALCATEL-IND1-BASE
+                  InterfaceIndex   FROM IF-MIB
+                  AluServiceId	 
+                    FROM ALCATEL-IND1-SERVICE-MGR-MIB
+                  TmnxPortID, TmnxEncapVal,SdpBindId
+                    FROM ALCATEL-IND1-TIMETRA-TC-MIB;
+
+             alcatelIND1UDPRelayMIB MODULE-IDENTITY
+                 LAST-UPDATED "201911270000Z"
+                 ORGANIZATION "ALE USA Inc."
+                 CONTACT-INFO
+                  "Please consult with Customer Service to ensure the most appropriate
+                   version of this document is used with the products in question:
+
+                                   Alcatel-Lucent Enterprise
+                                     26801 West Agoura Road
+                                  Agoura Hills, CA  91301-5122
+                                    United States Of America
+
+                  Telephone:          +1 800 995 2696
+
+                  Electronic Mail:    ebg_global_supportcenter@al-enterprise.com
+                  World Wide Web:     https://www.al-enterprise.com"
+
+
+
+                DESCRIPTION
+             "This module describes an authoritative enterprise-specific Simple
+             Network Management Protocol (SNMP) Management Information Base (MIB):
+
+             For the OmniSwitch Product Line
+             UDP Relay to forward BOOTP/DHCP requests across VLANs
+
+             The right to make changes in specification and other information
+             contained in this document without prior notice is reserved.
+
+             No liability shall be assumed for any incidental, indirect, special, or
+             consequential damages whatsoever arising from or related to this
+             document or the information contained herein.
+
+             Vendors, end-users, and other interested parties are granted
+             non-exclusive license to use this specification in connection with
+             management of the products for which it is intended to be used.
+
+                   Copyright (C) ALE USA Inc. 2014-2019
+                   Copyright (C) 1995-2013 Alcatel-Lucent
+                       ALL RIGHTS RESERVED WORLDWIDE"
+
+            REVISION      "201911270000Z"
+            DESCRIPTION
+                "Updated the latest contact and Copyright information for ALE USA Inc."
+
+            REVISION      "201307150000Z"
+            DESCRIPTION
+                "The latest version of this MIB Module."
+                      ::= {routingIND1UdpRelay 1}
+
+
+        alcatelIND1UDPRelayNotificationObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For UDP Relay Notification Objects."
+        ::= { alcatelIND1UDPRelayMIB 0 }
+
+
+        alcatelIND1UDPRelayMIBObjects OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For UDP Relay
+            Subsystem Managed Objects."
+        ::= { alcatelIND1UDPRelayMIB 1 }
+
+
+        alcatelIND1UDPRelayMIBConformance OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For UDP Relay
+            Subsystem Conformance Information."
+        ::= { alcatelIND1UDPRelayMIB 2 }
+
+        alcatelIND1UDPRelayMIBGroups OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Branch For UDP Relay
+             Subsystem Units Of Conformance."
+        ::= { alcatelIND1UDPRelayMIBConformance 1 }
+
+        alcatelIND1UDPRelayMIBCompliances OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "Branch For UDP Relay
+              Subsystem Compliance Statements."
+          ::= { alcatelIND1UDPRelayMIBConformance 2 }
+
+       IphelpereOption82ASCIIFieldType ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+            "Ip helper Option 82 Format ASCII field type"
+            SYNTAX  INTEGER {
+                none(0),
+                macAddress(1),
+                systemName(2),
+                userString(3),
+                interfaceAlias(4),
+                vlan(5),
+                interface(6),
+                cvlan(7)
+            }
+
+       DhcpSnoopingOption82ASCIIFieldType ::= TEXTUAL-CONVENTION
+       STATUS        current
+       DESCRIPTION
+            "DHCP Snooping Option 82 Format ASCII field type"
+            SYNTAX  INTEGER {
+                none(0),
+                macAddress(1),
+                systemName(2),
+                userString(3),
+                interfaceAlias(4),
+                vlan(5),
+                interface(6),
+                cvlan(7)
+            }
+
+        DhcpSnoopingOption82CircuitOrRemoteId ::= TEXTUAL-CONVENTION
+            STATUS        current
+            DESCRIPTION
+            "Circuit Id or Remote Id for Option 82 Format ASCII field."
+            SYNTAX  INTEGER {
+                circuitid(1),
+                remoteid(2)
+            }
+
+        AlaDhcpRelayOption82ASCIIFieldType ::= TEXTUAL-CONVENTION
+            STATUS        current
+            DESCRIPTION
+                "DHCP relay Option-82 format ASCII field type"
+            SYNTAX  INTEGER {
+                none(0),
+                macAddress(1),
+                systemName(2),
+                userString(3),
+                interfaceAlias(4),
+                vlan(5),
+                interface(6),
+                cvlan(7)
+            }
+
+-- iphelperMIB has been deprecated and replaced by alaDhcpRelayGlobalConfig.
+
+   iphelperMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 1 }  
+   genericUdpServiceMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 2 }
+   alaDhcpClientTrapsObj OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 3 }
+   dhcpSnoopingMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 4 }
+   dhcpOption82MIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 5 }
+   alaDhcpRelayMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 6 }
+   alaGenericUdpv6ServiceMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 7 }
+   alaDhcpVsoTrapMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 9 }
+   alaDhcpSnoopingCountersMIB OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 10 }
+
+--
+-- This table has been deprecated and replaced by alaDhcpRelayInterfaceTable.
+--
+
+   iphelperTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IphelperEntry
+      MAX-ACCESS not-accessible
+      STATUS deprecated
+      DESCRIPTION
+                "A list of next hop IP Address for the DHCP Relay Agent."
+  ::= { iphelperMIB 1 }
+
+
+  iphelperEntry  OBJECT-TYPE
+    SYNTAX      IphelperEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+                " An entry in the ip helper table"
+    INDEX { iphelperVlan, iphelperNextHopIpAddress }
+    ::= { iphelperTable 1 }
+
+    IphelperEntry ::= SEQUENCE {
+      iphelperVlan
+                Unsigned32,
+      iphelperNextHopIpAddress
+                IpAddress,
+      iphelperResetSrvStats
+                Unsigned32,
+      iphelperRowStatus
+                RowStatus
+   }
+
+  iphelperVlan OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                "This object is applicable when iphelperForwardOption is
+                 equal to perVlan (2).  On Per VLAN mod the next hop
+                 IP Address corresponds to specific source VLAN.  Based on
+                 the VLAN that the DHCP packet comes to the DHCP Relay
+                 Agent the packet is forwarded to the next hop defined
+                 for that VLAN.  When iphelperForwardOption is standard (1),
+                 this field will be zero (0)."
+  ::= { iphelperEntry 1 }
+
+  iphelperNextHopIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                "This specifies the next hop IP Address of the
+                 DHCP Relay Agent is to forward the DHCP packet."
+  ::= { iphelperEntry 2 }
+
+  iphelperResetSrvStats OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-create
+        STATUS deprecated
+        DESCRIPTION
+            "When set to 1, will reset all the statistic for this
+             server.  On standard mode vlan will be zero.  After the
+             reset operation, system will change this back to a zero (0).
+             Subsystem will always return zero (0)."
+  ::= { iphelperEntry 3 }
+
+  iphelperRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS deprecated
+        DESCRIPTION
+            "Row Status for creating/deleting"
+  ::= { iphelperEntry 4 }
+
+--
+-- This table has been deprecated and replaced by alaDhcpRelayStatTable.
+--
+
+iphelperStatTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF IphelperStatEntry
+        MAX-ACCESS      not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+                "This keeps statistics for each next hop IP Address."
+::= { iphelperMIB 2 }
+
+iphelperStatEntry  OBJECT-TYPE
+        SYNTAX  IphelperStatEntry
+        MAX-ACCESS  not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+                "An entry in the stat table."
+        INDEX { iphelperStatsVlan, iphelperStatsNextHopIpAddr}
+::= { iphelperStatTable 1 }
+
+
+IphelperStatEntry ::= SEQUENCE {
+        iphelperStatsVlan
+                Unsigned32,
+        iphelperStatsNextHopIpAddr
+                IpAddress,
+        iphelperTxToNextHop
+                Counter32,
+        iphelperInvalidAgentInfoOptFrmSrver
+                Counter32
+        }
+
+  iphelperStatsVlan OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                "This object is zero (0) when iphelperForwardOption is
+                 equal to standard (1).  On Per VLAN mod the next hop
+                 IP Address corresponds to specific source VLAN.  Based on
+                 the VLAN that the DHCP packet comes to the DHCP Relay
+                 Agent the packet is forwarded to the next hop defined
+                 for that VLAN.  When iphelperForwardOption is standard (1),
+                 this field will be zero (0)."
+  ::= { iphelperStatEntry 1 }
+
+iphelperStatsNextHopIpAddr  OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS not-accessible
+        STATUS  deprecated
+        DESCRIPTION
+               "This specifies the unique server address."
+::= { iphelperStatEntry 2 }
+
+
+iphelperTxToNextHop  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS deprecated
+        DESCRIPTION
+              " This keeps track of the number of packets transmitted  to the server."
+::= { iphelperStatEntry  3}
+
+
+iphelperInvalidAgentInfoOptFrmSrver  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS deprecated
+        DESCRIPTION
+              "This keeps track of the number of packets dropped due to
+               invalid from DHCP server with Relay Agent Information option
+               in the DHCP packet."
+::= { iphelperStatEntry  4}
+
+
+iphelperRxFromClient OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "This keeps track of the number of packets recieved from the client."
+::= { iphelperMIB 3 }
+
+
+iphelperMaxHopsViolation  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS deprecated
+        DESCRIPTION
+              "This keeps track of the number of packets dropped due to
+               max hops violation."
+::= { iphelperMIB  4}
+
+iphelperForwDelayViolation  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS deprecated
+        DESCRIPTION
+              "This keeps track of the number of packets dropped due to
+               forward delay violation."
+::= { iphelperMIB  5}
+
+iphelperAgentInfoViolation  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS deprecated
+        DESCRIPTION
+              "This keeps track of the number of packets dropped due to
+               DHCP packet with giaddr field not equal to zero and
+               Relay Agent Information option is present and also the
+               Relay Agent Information Policy is set to DROP."
+::= { iphelperMIB  6}
+
+iphelperInvalidGatewayIP  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS deprecated
+        DESCRIPTION
+              "This keeps track of the number of packets dropped due to
+               giaddr matching a local subnet and Relay Agent Information
+               option is present in the DHCP packet."
+::= { iphelperMIB  7}
+
+iphelperForwDelay  OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "This sets the BOOTP/DHCP relay's forwarding delay and
+                is only used by the BOOTP/DHCP service. It is typically
+                set as seconds, but the value is totally client dependent.
+                This relay will not forward frames until client frames
+                have 'secs' field set to atleast the value iphelperForwDelay."
+::= { iphelperMIB 8 }
+
+iphelperMaxHops OBJECT-TYPE
+        SYNTAX Integer32 (1..16)
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "This sets the BOOTP/DHCP relay's maximum hops
+                 forwarding limit and is only used by the BOOTP/DHCP service.
+                 If a frame arrives with hopcount greater than or equal
+                 to iphelperMaxHops, it will be dropped."
+::= { iphelperMIB  9 }
+
+iphelperForwardOption OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  standard(1),
+                  perVlan(2)
+                }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "This is the forwarding option for the BOOTP/DHCP Relay Agent.
+                 Default value is standard (1)."
+            DEFVAL { standard }
+::= { iphelperMIB 10 }
+
+iphelperResetAllStats  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  noOperation        (0),
+                  resetAllStats      (1),
+                  resetAllGlbStats   (2),
+                  resetAllSrvStats   (3)
+        }
+        MAX-ACCESS      read-write
+        STATUS deprecated
+        DESCRIPTION
+            "This parameter resets all the ip helper statistics.
+             1 - reset all stats.  Both Global and server stats.
+             2 - reset all global statistics.
+             3 - reset all server statistics.
+             When the reset operation is done, subsystem will
+             change the value to zero (0).
+             Subsystem will always return zero (0)."
+::= { iphelperMIB 11}
+
+iphelperBootupOption OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  enable(1),
+                  disable(2)
+                }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "This object allows the user to enable or disable the
+                 functionality of the relay to get an IP address at the
+                 time of system boot-up and assign that IP address for
+                 the ip interface of the default VLAN.  When this is diabled
+                 and then enable, the object iphelperBootupPacketOption is
+                 reset to its default value.
+                 Default of this option is Disable (2)."
+            DEFVAL { disable }
+::= {iphelperMIB 12}
+
+
+iphelperBootupPacketOption OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  bootp(1),
+                  dhcp(2)
+                }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "This object is used in conjunction with iphelperBootupOption.
+                 This specify the packet format with the choices of BOOTP or DHCP
+                 to be used to get an IP address at the time of system boot-up.
+                 Default option is DHCP"
+            DEFVAL { dhcp }
+::= {iphelperMIB 13}
+
+iphelperAgentInformation OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  enable(1),
+                  disable(2)
+                }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "This object allows user to enable or disable the functionality
+                 of inserting the relay agent information option to the DHCP
+                 option field according to RFC 3046.  When is is disbled and then
+                 enabled, the iphelperAgentInformationPolicy will be reset to its
+                 default value."
+            DEFVAL { disable }
+::= {iphelperMIB 14}
+
+
+iphelperAgentInformationPolicy OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                  drop(1),
+                  keep(2),
+                  replace(3)
+                }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+                "This object allows the user to select the policy of either
+                 drop, keep or replace the relay agent information option if
+                 this option is already present in the DHCP packet."
+            DEFVAL { drop }
+::= {iphelperMIB 15}
+
+iphelperPXESupport OBJECT-TYPE
+            SYNTAX  INTEGER {
+                enabled(1),
+                disabled(2)
+            }
+            MAX-ACCESS read-write
+            STATUS deprecated
+            DESCRIPTION
+                "When enabled the relay agent will replace the source IP address
+                 of the packet with the gateway IP address from the DHCP packet.
+                 The default value is disabled."
+            DEFVAL { disabled }
+::= { iphelperMIB 16 }
+
+    iphelperDhcpOption82FormatType OBJECT-TYPE
+        SYNTAX  INTEGER {
+        macAddress(1),
+        systemName(2),
+        userString(3),
+        interfaceAlias(4),
+        autoInterfaceAlias(5),
+        ascii(6)
+        }
+        MAX-ACCESS  read-write
+        STATUS  deprecated
+        DESCRIPTION
+        "DHCP option-82 defines the type of information carried in circuit id 
+        and remote id sub option fields. If the type selected is string the actual
+        value of the string can be found in iphelperDhcpOption82StringValue.
+        Format type ASCII will insert the configured fields in ASCII format."
+        DEFVAL { macAddress }
+     ::= { iphelperMIB 17 }
+
+    iphelperDhcpOption82StringValue OBJECT-TYPE
+        SYNTAX    SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+        "The value of the string that will be used in the circuit id and remote id
+        sub options."
+     ::= { iphelperMIB 18 }
+
+    iphelperDhcpOption82FormatASCIIField1 OBJECT-TYPE
+            SYNTAX IphelpereOption82ASCIIFieldType
+            MAX-ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "The type of the first field in the Option 82 string in ASCII format,
+                 which will be copied to Option-82 circuit id of the DHCP packet.
+            This Field is applicable only, if the option 82 format type is ASCII"
+            DEFVAL { none }
+     ::= { iphelperMIB 19 }
+
+    iphelperDhcpOption82FormatASCIIField1StringValue OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS deprecated
+            DESCRIPTION
+                "The string value of the first field in the Option 82 string in ASCII 
+                 format, which will be copied to Option-82 circuit id of the DHCP packet.
+                 This Field is applicable only, if the option 82 format type is ASCII.
+                 If the option 82 format type is not ASCII or if this field is not used or 
+                 if the string value is port specific, this field returns an ASCII string -."
+     ::= { iphelperMIB 20 }
+
+    iphelperDhcpOption82FormatASCIIField2 OBJECT-TYPE
+            SYNTAX IphelpereOption82ASCIIFieldType 
+            MAX-ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "The type of the second field in the Option 82 string in ASCII format,
+                 which will be copied to Option-82 circuit id of the DHCP packet.
+            This Field is applicable only, if the option 82 format type is ASCII"
+            DEFVAL { none }
+     ::= { iphelperMIB 21 }
+
+    iphelperDhcpOption82FormatASCIIField2StringValue OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS deprecated 
+            DESCRIPTION
+                "The string value of the second field in the Option 82 string in ASCII 
+                 format, which will be copied to Option-82 circuit id of the DHCP packet.
+                 This Field is applicable only, if the option 82 format type is ASCII.
+                 If the option 82 format type is not ASCII or if this field is not used or 
+                 if the string value is port specific, this field returns an ASCII string -."
+     ::= { iphelperMIB 22 }
+
+    iphelperDhcpOption82FormatASCIIField3 OBJECT-TYPE
+            SYNTAX IphelpereOption82ASCIIFieldType
+            MAX-ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "The type of the third field in the Option 82 string in ASCII format,
+                 which will be copied to Option-82 circuit id of the DHCP packet.
+            This Field is applicable only, if the option 82 format type is ASCII"
+            DEFVAL { none }
+     ::= { iphelperMIB 23 }
+
+    iphelperDhcpOption82FormatASCIIField3StringValue OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS deprecated
+            DESCRIPTION
+                "The string value of the third field in the Option 82 string in ASCII 
+                 format, which will be copied to Option-82 circuit id of the DHCP packet.
+                 This Field is applicable only, if the option 82 format type is ASCII.
+                 If the option 82 format type is not ASCII or if this field is not used or 
+                 if the string value is port specific, this field returns an ASCII string -."
+     ::= { iphelperMIB 24 }
+
+
+    iphelperDhcpOption82FormatASCIIField4 OBJECT-TYPE
+            SYNTAX IphelpereOption82ASCIIFieldType
+            MAX-ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "The type of the fourth field in the Option 82 string in ASCII format,
+                 which will be copied to Option-82 circuit id of the DHCP packet.
+            This Field is applicable only, if the option 82 format type is ASCII"
+            DEFVAL { none }
+     ::= { iphelperMIB 25 }
+
+    iphelperDhcpOption82FormatASCIIField4StringValue OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS deprecated
+            DESCRIPTION
+                "The string value of the fourth field in the Option 82 string in ASCII 
+                 format, which will be copied to Option-82 circuit id of the DHCP packet.
+                 This Field is applicable only, if the option 82 format type is ASCII.
+                 If the option 82 format type is not ASCII or if this field is not used or 
+                 if the string value is port specific, this field returns an ASCII string -."
+     ::= { iphelperMIB 26 }
+
+
+    iphelperDhcpOption82FormatASCIIField5 OBJECT-TYPE
+            SYNTAX IphelpereOption82ASCIIFieldType
+            MAX-ACCESS  read-write
+            STATUS  deprecated
+            DESCRIPTION
+                "The type of the fifth field in the Option 82 string in ASCII format,
+                 which will be copied to Option-82 circuit id of the DHCP packet.
+            This Field is applicable only, if the option 82 format type is ASCII"
+            DEFVAL { none }
+     ::= { iphelperMIB 27 }
+
+    iphelperDhcpOption82FormatASCIIField5StringValue OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS deprecated 
+            DESCRIPTION
+                "The string value of the fifth field in the Option 82 string in ASCII 
+                 format, which will be copied to Option-82 circuit id of the DHCP packet.
+                 This Field is applicable only, if the option 82 format type is ASCII.
+                 If the option 82 format type is not ASCII or if this field is not used or 
+                 if the string value is port specific, this field returns an ASCII string -."
+     ::= { iphelperMIB 28 }
+
+
+    iphelperDhcpOption82FormatASCIIDelimiter OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS deprecated 
+            DESCRIPTION
+                "The value of the delimiter that is inserted between the fields in the  
+                 Option 82 string in ASCII format, which will be copied to Option-82 
+            circuit id of the DHCP packet. This value is applicable only, if the  
+            option 82 format type is ASCII"
+     ::= { iphelperMIB 29 }
+
+  iphelperResetAllOpt82ErrStats  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  noOperation        (0),
+                  resetAllStats      (1)
+        }
+        MAX-ACCESS      read-write
+        STATUS deprecated
+        DESCRIPTION
+            "This parameter resets all the ip helper Option 82 error statistics.
+             When the reset operation is done, subsystem will
+             change the value to zero (0).
+             Subsystem will always return zero (0)."
+  ::= { iphelperMIB 30}
+
+--
+-- This table has been deprecated and replaced by alaDhcpRelayOpt82ErrStatsTable.
+--
+
+  iphelperOption82ErrStatsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IphelperOption82ErrStatsEntry
+      MAX-ACCESS not-accessible
+      STATUS deprecated
+      DESCRIPTION
+                "A list of Option 82 related error statistic count per port and per vlan."
+  ::= { iphelperMIB 31 }
+
+
+  iphelperOption82ErrStatsEntry  OBJECT-TYPE
+    SYNTAX      IphelperOption82ErrStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      deprecated
+    DESCRIPTION
+                " An entry in the ip helper Option 82 error statistics table"
+    INDEX { iphelperOpt82ifIndex, iphelperOpt82vlan }
+    ::= { iphelperOption82ErrStatsTable 1 }
+
+    IphelperOption82ErrStatsEntry ::= SEQUENCE {
+      iphelperOpt82ifIndex
+                InterfaceIndex,
+      iphelperOpt82vlan
+                Unsigned32,
+      iphelperOpt82agentInfoViolationCnt
+                Counter32,
+      iphelperOpt82invalidGatewayIPAddrCnt
+                Counter32,
+      iphelperOpt82resetErrStats
+                INTEGER
+   }
+
+  iphelperOpt82ifIndex OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                "The interface where the DHCP packet ingress the switch that  
+                 caused the Agent Info Violation or the Invalid Gateway 
+                 IP Address error."
+  ::= { iphelperOption82ErrStatsEntry 1 }
+
+  iphelperOpt82vlan OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS deprecated
+        DESCRIPTION
+                "The vlan where the DHCP packet ingress the switch that  
+                 caused the Agent Info Violation or the Invalid Gateway 
+                 IP Address error."
+  ::= { iphelperOption82ErrStatsEntry 2 }
+
+  iphelperOpt82agentInfoViolationCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS deprecated
+        DESCRIPTION
+            "The number of Agent Info Violation seen on this interface and vlan."
+  ::= { iphelperOption82ErrStatsEntry 3 }
+
+  iphelperOpt82invalidGatewayIPAddrCnt OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS deprecated
+        DESCRIPTION
+            "The number of Invalid Gateway IP Address seen on this interface and vlan."
+  ::= { iphelperOption82ErrStatsEntry 4 }
+
+  iphelperOpt82resetErrStats OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  noOperation        (0),
+                  resetErrStats      (1)
+        }
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+            "This parameter resets the ip helper Option 82 error statistics
+             on this interface and vlan.  When the reset operation is done, 
+             subsystem will change the value to zero (0).  Subsystem will always return
+             zero (0)."
+  ::= { iphelperOption82ErrStatsEntry 5 }
+
+    dhcpSnoopingVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of vlans that have DHCP Snooping enabled."
+        ::= { dhcpSnoopingMIB 1 }
+
+    dhcpSnoopingVlanEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping VLAN entry."
+        INDEX { dhcpSnoopingVlanNumber }
+        ::= { dhcpSnoopingVlanTable 1 }
+
+    DhcpSnoopingVlanEntry ::= SEQUENCE {
+        dhcpSnoopingVlanNumber                    Integer32,
+        dhcpSnoopingVlanOpt82DataInsertionStatus  INTEGER,
+        dhcpSnoopingVlanMacAddrVerificationStatus INTEGER,
+        dhcpSnoopingVlanStatus                    RowStatus,
+        dhcpSnoopingVlanAdminState                INTEGER
+    }
+
+    dhcpSnoopingVlanNumber  OBJECT-TYPE
+        SYNTAX  Integer32 (1..4094)
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The VLAN number identifying this instance. Valid
+            range from 1 to 4094."
+        ::= { dhcpSnoopingVlanEntry 1 }
+
+    dhcpSnoopingVlanOpt82DataInsertionStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Option-82 data insertion status. Default value is enabled,
+            which means once the VLAN is enabled for DHCP snooping, the
+            Option-82 field will be inserted in the DHCP packets between the
+            Relay Agent and the DHCP Server, on all the ports belong to the
+            VLAN."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingVlanEntry 2 }
+
+    dhcpSnoopingVlanMacAddrVerificationStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping MAC Address verification status. Default value is
+            enabled. Once enabled, for all the incoming DHCP traffic to those
+            DHCP Snooping enabled vlan port, it compares the source MAC address
+            and the client Hardware Address in the DHCP packet. If mismatch, the
+            packet will be dropped."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingVlanEntry 3 }
+
+    dhcpSnoopingVlanStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row Status for creating/deleting"
+        ::= { dhcpSnoopingVlanEntry 4 }
+
+    dhcpSnoopingVlanAdminState OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Admin status for enabling/disabling."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingVlanEntry 5 }
+
+    dhcpSnoopingPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of ports that have DHCP Snooping trust status."
+        ::= { dhcpSnoopingMIB 2 }
+
+    dhcpSnoopingPortEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping Port entry."
+        INDEX { dhcpSnoopingPortIfIndex }
+        ::= { dhcpSnoopingPortTable 1 }
+
+    DhcpSnoopingPortEntry ::= SEQUENCE {
+        dhcpSnoopingPortIfIndex             InterfaceIndex,
+        dhcpSnoopingPortTrustMode           INTEGER,
+        dhcpSnoopingPortMacAddrViolation    Counter32,
+        dhcpSnoopingPortDhcpServerViolation Counter32,
+        dhcpSnoopingPortOption82Violation   Counter32,
+        dhcpSnoopingPortRelayAgentViolation Counter32,
+        dhcpSnoopingPortBindingViolation    Counter32,
+        dhcpSnoopingPortIpSourceFiltering   INTEGER
+    }
+
+    dhcpSnoopingPortIfIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The ifIndex subindex identifying this instance."
+        ::= { dhcpSnoopingPortEntry 1 }
+
+    dhcpSnoopingPortTrustMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+            blocked(1),
+            clientOnly(2),
+            trusted(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping's VLAN port's trust mode. Default value
+            is client-only, which means once the VLAN is enabled for DHCP
+            snooping, the vlan ports only allow DHCP client packets. Blocked
+            means all DHCP traffic is block on the port. Trusted means all
+            DHCP traffic is allowed on the port"
+        DEFVAL { clientOnly }
+        ::= { dhcpSnoopingPortEntry 2 }
+
+    dhcpSnoopingPortMacAddrViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to DHCPi
+            packet with the source MAC Address not equal the client DHCP
+            Hardware address in the DHCP packet."
+        ::= { dhcpSnoopingPortEntry 3 }
+
+    dhcpSnoopingPortDhcpServerViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP server packet on a DHCP Snooping enabled port."
+        ::= { dhcpSnoopingPortEntry 4 }
+
+    dhcpSnoopingPortOption82Violation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to a relay
+            agent forards a packet that includes option 82 info to an untrusted
+            port."
+        ::= { dhcpSnoopingPortEntry 5 }
+
+    dhcpSnoopingPortRelayAgentViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to an DHCP
+            relay agent forwards a DHCP packate includes an relay agent ip
+            address that is not 0.0.0.0."
+        ::= { dhcpSnoopingPortEntry 6 }
+
+    dhcpSnoopingPortBindingViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP Relase or DHCP Decline message that contains a MAC address
+            in the DHCP snooping binding table, but the interface information in
+            the binding table does not match the interface on which the message
+            was received."
+        ::= { dhcpSnoopingPortEntry 7 }
+
+    dhcpSnoopingPortIpSourceFiltering OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping IP Source filtering  status. Default value
+            is disabled. Once enabled, only the incoming traffic with the proper
+            client IP address, MAC address and port will be allowed."
+        DEFVAL { disabled }
+        ::= { dhcpSnoopingPortEntry 8 }
+
+
+    dhcpSnoopingBindingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingBindingEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DHCP Snooping binding table."
+        ::= { dhcpSnoopingMIB 3 }
+
+
+    dhcpSnoopingBindingEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingBindingEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping binding entry."
+        INDEX { dhcpSnoopingBindingMacAddress, dhcpSnoopingBindingIfIndex }
+        ::= { dhcpSnoopingBindingTable 1 }
+
+
+    DhcpSnoopingBindingEntry ::= SEQUENCE {
+        dhcpSnoopingBindingMacAddress MacAddress,
+        dhcpSnoopingBindingIfIndex    InterfaceIndex,
+        dhcpSnoopingBindingIpAddress  IpAddress,
+        dhcpSnoopingBindingVlan       Unsigned32,
+        dhcpSnoopingBindingLeaseTime  Unsigned32,
+        dhcpSnoopingBindingType       INTEGER,
+        dhcpSnoopingBindingRowStatus  RowStatus
+    }
+
+    dhcpSnoopingBindingMacAddress  OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "The MAC Address subindex identifying this instance."
+        ::= { dhcpSnoopingBindingEntry 1 }
+
+    dhcpSnoopingBindingIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  accessible-for-notify
+        STATUS  current
+        DESCRIPTION
+            "The IfIndex subindex identifying this instance. It is the
+            the interface where the DHCP request is coming in from."
+        ::= { dhcpSnoopingBindingEntry 2 }
+
+
+    dhcpSnoopingBindingIpAddress  OBJECT-TYPE
+        SYNTAX    IpAddress
+        MAX-ACCESS    read-create
+        STATUS current
+        DESCRIPTION
+            "The Ip Address offered by the DHCP Server to the Client."
+        ::= { dhcpSnoopingBindingEntry 3 }
+
+
+    dhcpSnoopingBindingVlan OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "It is the VLAN Id where the DHCP client belongs to."
+        ::= { dhcpSnoopingBindingEntry 4 }
+
+
+    dhcpSnoopingBindingLeaseTime  OBJECT-TYPE
+        SYNTAX    Unsigned32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "The lease time of the client's IP Address."
+        ::= { dhcpSnoopingBindingEntry 5 }
+
+    dhcpSnoopingBindingType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            dynamic(1),
+            static(2)
+        }
+        MAX-ACCESS    read-create
+        STATUS current
+        DESCRIPTION
+            "The learning/configuration nature of the binding entry.
+            Normally, the entries are learned dynamically, while it
+            also can be statically/manually configured."
+        DEFVAL { dynamic }
+        ::= { dhcpSnoopingBindingEntry 6 }
+
+
+    dhcpSnoopingBindingRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row Status for creating/deleting"
+        ::= { dhcpSnoopingBindingEntry 7 }
+
+
+    dhcpSnoopingMode OBJECT-TYPE
+        SYNTAX INTEGER {
+            switchLevel(1),
+            disabled(2),
+            vlanLevel(3),   -- read-only state
+            deleted(4),
+            serviceLevel(5),
+            vlanAndServiceLevel(6)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Enabling DHCP Snooping at the switch level. For the vlan level,
+            it is enabled implicitly when an individual vlan's DHCP Snooping
+            is enabled; and, mode is implicitly disabled until all vlan's 
+            DHCP Snooping are disabled. If mode is set to vlan level, the
+            operation will be of no effect."
+        ::= {dhcpSnoopingMIB 4 }
+
+
+    dhcpSnoopingOpt82DataInsertionStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Option-82 data insertion status at switch level.  Default
+            value is enabled, the Option-82 field will be inserted in the DHCP
+            packets between the Relay Agent and the DHCP Server, on all the
+            ports belong to the switch."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingMIB 5 }
+
+    dhcpSnoopingMacAddrVerificationStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping MAC Address verification status at switch level.
+            Default value is enabled. Once enabled, for all the incoming DHCP
+            traffic to the port, it compares the source MAC address and the
+            client Hardware Address in the DHCP packet. If mismatch, the packet
+            will be dropped."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingMIB 6 }
+
+
+    dhcpSnoopingBindingStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object specifies if the capability of building the DHCP
+            Snooping Binding Table/Database is enable or not. By default, it is
+            enabled.  It is applicable for both switch-level or vlan-level DHCP
+            Snooping."
+        DEFVAL { enabled }
+        ::= { dhcpSnoopingMIB 7 }
+
+    dhcpSnoopingBindingDatabaseSyncTimeout OBJECT-TYPE
+        SYNTAX    Unsigned32 (1..600)
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping Binding Database synchronization timeout value.
+            It is used to specify the synchronization frequency, in seconds,
+            between the binding table in memory and the binding file in flash."
+        DEFVAL { 1 }
+        ::= { dhcpSnoopingMIB 8 }
+
+    dhcpSnoopingBindingDatabaseLastSyncTime OBJECT-TYPE
+        SYNTAX    DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The time stamp of the last successuful DHCP Snooping Binding
+            Database synchronization."
+        ::= { dhcpSnoopingMIB 9 }
+
+    dhcpSnoopingBindingDatabaseAction OBJECT-TYPE
+        SYNTAX INTEGER {
+            noaction(0),
+            purge(1),
+            renew(2),
+            save(3)
+        }
+        MAX-ACCESS    read-create
+        STATUS    current
+        DESCRIPTION
+            "This object identifies the action to be performed.
+             Purge: means to clear the binding table entries in the memory.
+             Renew: means to populate the binding table entries from the flash file.
+             Save: means to save the binding table entries to the flash file."
+        ::= { dhcpSnoopingMIB 10 }
+
+
+    dhcpSnoopingBypassOpt82CheckStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DHCP bypass option-82 check status. By default, it is disabled.
+            Once enabled, it will no longer enforce the check of option-82 field
+            in the incoming DHCP Packets on those untrusted ports."
+        DEFVAL { disabled }
+        ::= { dhcpSnoopingMIB 11 }
+
+    dhcpSnoopingBindingPersistencyStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DHCP Snooping binding table persistency check status. By default,
+            it is disabled.  Once enabled, the binding entries expiry will be
+            solely depend on Lease time"
+        DEFVAL { disabled }
+        ::= { dhcpSnoopingMIB 12 }
+
+    dhcpSnoopingSourceFilterVlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingSourceFilterVlanEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of vlans that have ip-source-filtering enabled."
+        ::= { dhcpSnoopingMIB 13 }
+
+    dhcpSnoopingSourceFilterVlanEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingSourceFilterVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A Source Filtering enabled VLAN entry."
+        INDEX { dhcpSnoopingSourceFilterVlanNumber }
+        ::= { dhcpSnoopingSourceFilterVlanTable 1 }
+
+    DhcpSnoopingSourceFilterVlanEntry ::= SEQUENCE {
+        dhcpSnoopingSourceFilterVlanNumber
+            Integer32,
+        dhcpSnoopingSourceFilterVlanFilteringStatus
+            RowStatus
+        }
+
+    dhcpSnoopingSourceFilterVlanNumber  OBJECT-TYPE
+        SYNTAX  Integer32 (1..4094)
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The VLAN number identifying this instance. Valid
+            range from 1 to 4094."
+        ::= { dhcpSnoopingSourceFilterVlanEntry 1 }
+
+    dhcpSnoopingSourceFilterVlanFilteringStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping IP Source filtering row status. Default value
+            is disabled. Once enabled, only the incoming traffic with the proper
+            client IP address, MAC address , port and vlan will be allowed."
+        ::= { dhcpSnoopingSourceFilterVlanEntry 2 }
+
+    dhcpSnoopingClearCounters OBJECT-TYPE
+        SYNTAX  INTEGER {
+            clear(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to clear all DHCP snooping statistics counters."
+        ::= { dhcpSnoopingMIB 14 }
+
+    dhcpSnoopingClearIsfStatistics OBJECT-TYPE
+        SYNTAX  INTEGER {
+            clear(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to clear all DHCP isf statistics."
+        ::= { dhcpSnoopingMIB 15 }
+
+    dhcpSnoopingClearViolationTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingClearViolationEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table is defined to clear DHCP snooping violation counters
+             on specific interface."
+        ::= { dhcpSnoopingMIB 16 }
+
+    dhcpSnoopingClearViolationEntry OBJECT-TYPE
+        SYNTAX  DhcpSnoopingClearViolationEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "Each entry defines variables used to clear violation statistics for given
+             interface index"
+        INDEX { dhcpSnoopingClearViolationIfIndex }
+        ::= { dhcpSnoopingClearViolationTable 1 }
+
+    DhcpSnoopingClearViolationEntry ::= SEQUENCE {
+        dhcpSnoopingClearViolationIfIndex
+            InterfaceIndex,
+        dhcpSnoopingClearViolationAction
+            INTEGER
+    }
+
+    dhcpSnoopingClearViolationIfIndex  OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The interface of which DHCP snooping violation counters are cleared.
+             The maximum value 2147483647 means all interfaces."
+        ::= { dhcpSnoopingClearViolationEntry 1 }
+
+    dhcpSnoopingClearViolationAction OBJECT-TYPE
+        SYNTAX  INTEGER {
+            clear(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Used to clear DHCP snooping violation statistics."
+        ::= { dhcpSnoopingClearViolationEntry 2 }
+
+    dhcpSnoopingIpSourceFilterAdminState OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "The global DHCP snooping IP source filtering admin state."
+        ::= { dhcpSnoopingMIB 17 }
+
+    dhcpSnoopingDynamicArpInspectionAdminState OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable/disable DHCP snooping IP source filtering dynamic arp inspection."
+        ::= {dhcpSnoopingMIB 18 }
+
+    dhcpSnoopingServiceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingServiceEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "DHCP snooping service table."
+        ::= {dhcpSnoopingMIB 19 }
+
+    dhcpSnoopingServiceEntry OBJECT-TYPE
+        SYNTAX  DhcpSnoopingServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "An entry in DHCP snooping service table."
+        INDEX { dhcpSnoopingServiceID }
+        ::= { dhcpSnoopingServiceTable 1 }
+
+    DhcpSnoopingServiceEntry ::= SEQUENCE {
+        dhcpSnoopingServiceID                           Unsigned32,
+        dhcpSnoopingServiceAdminState                   INTEGER,
+        dhcpSnoopingServiceMacAddrVerificationStatus    INTEGER,
+        dhcpSnoopingServiceOpt82DataInsertionStatus     INTEGER,
+        dhcpSnoopingServiceRowStatus                    RowStatus
+    }
+
+    dhcpSnoopingServiceID  OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "DHCP snooping service ID."
+        ::= { dhcpSnoopingServiceEntry 1 }
+
+    dhcpSnoopingServiceAdminState OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Enable/disable DHCP snooping service admin state."
+        ::= { dhcpSnoopingServiceEntry 2 }
+
+    dhcpSnoopingServiceMacAddrVerificationStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Enable/disable DHCP snooping service mac address verification admin state."
+        ::= { dhcpSnoopingServiceEntry 3 }
+
+    dhcpSnoopingServiceOpt82DataInsertionStatus OBJECT-TYPE
+        SYNTAX  INTEGER {
+            enabled(1),
+            disabled(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Enable/disable DHCP snooping service option 82 data insertion admin state."
+        ::= { dhcpSnoopingServiceEntry 4 }
+
+    dhcpSnoopingServiceRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Row status of this entry."
+        ::= { dhcpSnoopingServiceEntry 5 }
+
+
+    dhcpSnoopingBindingServiceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingBindingServiceEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "DHCP Snooping binding service table."
+        ::= { dhcpSnoopingMIB 20 }
+
+    dhcpSnoopingBindingServiceEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingBindingServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping binding service entry."
+        INDEX { dhcpSnoopingBindingServiceMacAddress, dhcpSnoopingBindingServiceIfIndex, dhcpSnoopingBindingServiceEncapId }
+        ::= { dhcpSnoopingBindingServiceTable 1 }
+
+
+    DhcpSnoopingBindingServiceEntry ::= SEQUENCE {
+        dhcpSnoopingBindingServiceMacAddress MacAddress,
+        dhcpSnoopingBindingServiceIfIndex    InterfaceIndex,
+        dhcpSnoopingBindingServiceEncapId    Unsigned32,
+        dhcpSnoopingBindingServiceIpAddressType  InetAddressType,
+        dhcpSnoopingBindingServiceIpAddress  InetAddress,
+        dhcpSnoopingBindingServiceId         Unsigned32,
+        dhcpSnoopingBindingServiceRowStatus  RowStatus,
+        dhcpSnoopingBindingServiceLeaseTime  Unsigned32,
+        dhcpSnoopingBindingServiceType       INTEGER
+    }
+
+    dhcpSnoopingBindingServiceMacAddress  OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The MAC Address subindex identifying this instance."
+        ::= { dhcpSnoopingBindingServiceEntry 1 }
+
+    dhcpSnoopingBindingServiceIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The IfIndex subindex identifying this instance. It is the
+            the interface where the DHCP request is coming in from."
+        ::= { dhcpSnoopingBindingServiceEntry 2 }
+
+    dhcpSnoopingBindingServiceEncapId OBJECT-TYPE
+        SYNTAX  Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The Encap Id to be used for the connecting to the service."
+        ::= { dhcpSnoopingBindingServiceEntry 3 }
+
+    dhcpSnoopingBindingServiceIpAddressType  OBJECT-TYPE
+        SYNTAX    InetAddressType { ipv4(1) }
+        MAX-ACCESS    read-create
+        STATUS current
+        DESCRIPTION
+            "The Ip Address offered by the DHCP Server to the Client."
+        ::= { dhcpSnoopingBindingServiceEntry 4 }
+
+    dhcpSnoopingBindingServiceIpAddress  OBJECT-TYPE
+        SYNTAX    InetAddress
+        MAX-ACCESS    read-create
+        STATUS current
+        DESCRIPTION
+            "The Ip Address offered by the DHCP Server to the Client."
+        ::= { dhcpSnoopingBindingServiceEntry 5 }
+
+    dhcpSnoopingBindingServiceId  OBJECT-TYPE
+        SYNTAX    Unsigned32
+        MAX-ACCESS    read-create
+        STATUS current
+        DESCRIPTION
+            "Service ID where the DHCP client belongs to."
+        ::= { dhcpSnoopingBindingServiceEntry 6 }
+
+    dhcpSnoopingBindingServiceRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row Status for creating/deleting"
+        ::= { dhcpSnoopingBindingServiceEntry 7 }
+
+    dhcpSnoopingBindingServiceLeaseTime OBJECT-TYPE
+        SYNTAX Unsigned32
+        UNITS  "minutes"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The lease time in minutes of the client's IP Address."
+        ::= { dhcpSnoopingBindingServiceEntry 8 }
+
+    dhcpSnoopingBindingServiceType  OBJECT-TYPE
+        SYNTAX  INTEGER {
+            dynamic(1),
+            static(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The learning/configuration nature of the binding entry.
+            Normally, the entries are learned dynamically, while it
+            also can be statically/manually configured."
+        DEFVAL { dynamic }
+        ::= { dhcpSnoopingBindingServiceEntry 9 }
+
+    dhcpSnoopingSapPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingSapPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of DHCP Snooping SAP ports."
+        ::= { dhcpSnoopingMIB 21 }
+
+    dhcpSnoopingSapPortEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingSapPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping SAP Port entry."
+        INDEX { dhcpSnoopingServiceID,
+                dhcpSnoopingSapPortId,
+                dhcpSnoopingSapEncap
+              }
+        ::= { dhcpSnoopingSapPortTable 1 }
+
+    DhcpSnoopingSapPortEntry ::= SEQUENCE {
+        dhcpSnoopingSapPortId                  TmnxPortID,
+        dhcpSnoopingSapEncap                   TmnxEncapVal,
+        dhcpSnoopingSapPortTrustMode           INTEGER,
+        dhcpSnoopingSapPortMacAddrViolation    Counter32,
+        dhcpSnoopingSapPortDhcpServerViolation Counter32,
+        dhcpSnoopingSapPortOption82Violation   Counter32,
+        dhcpSnoopingSapPortRelayAgentViolation Counter32,
+        dhcpSnoopingSapPortBindingViolation    Counter32
+    }
+
+    dhcpSnoopingSapPortId  OBJECT-TYPE
+        SYNTAX  TmnxPortID
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The ID of the access port where this SAP is defined."
+        ::= { dhcpSnoopingSapPortEntry 1 }
+
+    dhcpSnoopingSapEncap  OBJECT-TYPE
+        SYNTAX  TmnxEncapVal
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The value of the label used to identify this
+            SAP on the access port specified by dhcpSnoopingSapPortId."
+        ::= { dhcpSnoopingSapPortEntry 2 }
+
+    dhcpSnoopingSapPortTrustMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+            blocked(1),
+            clientOnly(2),
+            trusted(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping's Service SAP port's trust mode. Default value
+            is client-only, which means once the Service is enabled for DHCP
+            snooping, the Service SAP ports only allow DHCP client packets.
+            Blocked  means all DHCP traffic is block on the port.
+            Trusted means all DHCP traffic is allowed on the port"
+        DEFVAL { clientOnly }
+        ::= { dhcpSnoopingSapPortEntry 3 }
+
+    dhcpSnoopingSapPortMacAddrViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to DHCPi
+            packet with the source MAC Address not equal the client DHCP
+            Hardware address in the DHCP packet."
+        ::= { dhcpSnoopingSapPortEntry 4 }
+
+    dhcpSnoopingSapPortDhcpServerViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP server packet on a DHCP Snooping enabled port."
+        ::= { dhcpSnoopingSapPortEntry 5 }
+
+    dhcpSnoopingSapPortOption82Violation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to a relay
+            agent forards a packet that includes option 82 info to an untrusted
+            port."
+        ::= { dhcpSnoopingSapPortEntry 6 }
+
+    dhcpSnoopingSapPortRelayAgentViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to an DHCP
+            relay agent forwards a DHCP packate includes an relay agent ip
+            address that is not 0.0.0.0."
+        ::= { dhcpSnoopingSapPortEntry 7 }
+
+    dhcpSnoopingSapPortBindingViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP Relase or DHCP Decline message that contains a MAC address
+            in the DHCP snooping binding table, but the interface information in
+            the binding table does not match the interface on which the message
+            was received."
+        ::= { dhcpSnoopingSapPortEntry 8 }
+
+    dhcpSnoopingSdpPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingSdpPortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of DHCP Snooping SDP ports."
+        ::= { dhcpSnoopingMIB 22 }
+
+    dhcpSnoopingSdpPortEntry  OBJECT-TYPE
+        SYNTAX  DhcpSnoopingSdpPortEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A DHCP Snooping SDP Port entry."
+        INDEX { dhcpSnoopingServiceID,
+                dhcpSnoopingSdpBindId }
+        ::= { dhcpSnoopingSdpPortTable 1 }
+
+    DhcpSnoopingSdpPortEntry ::= SEQUENCE {
+        dhcpSnoopingSdpBindId                  SdpBindId,
+        dhcpSnoopingSdpPortTrustMode           INTEGER,
+        dhcpSnoopingSdpPortMacAddrViolation    Counter32,
+        dhcpSnoopingSdpPortDhcpServerViolation Counter32,
+        dhcpSnoopingSdpPortOption82Violation   Counter32,
+        dhcpSnoopingSdpPortRelayAgentViolation Counter32,
+        dhcpSnoopingSdpPortBindingViolation    Counter32
+    }
+
+    dhcpSnoopingSdpBindId  OBJECT-TYPE
+        SYNTAX  SdpBindId
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "SDP Binding identifier."
+        ::= { dhcpSnoopingSdpPortEntry 1 }
+
+    dhcpSnoopingSdpPortTrustMode OBJECT-TYPE
+        SYNTAX  INTEGER {
+            blocked(1),
+            clientOnly(2),
+            trusted(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The DHCP Snooping's Service SDP port's trust mode. Default value
+            is trusted, which means all DHCP traffic is allowed on the port
+            Blocked  means all DHCP traffic is block on the port.
+            Client-only means once the Service is enabled for DHCP
+            snooping, the Service SDP ports only allow DHCP client packets."
+        DEFVAL { trusted }
+        ::= { dhcpSnoopingSdpPortEntry 2 }
+
+    dhcpSnoopingSdpPortMacAddrViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to DHCPi
+            packet with the source MAC Address not equal the client DHCP
+            Hardware address in the DHCP packet."
+        ::= { dhcpSnoopingSdpPortEntry 3 }
+
+    dhcpSnoopingSdpPortDhcpServerViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP server packet on a DHCP Snooping enabled port."
+        ::= { dhcpSnoopingSdpPortEntry 4 }
+
+    dhcpSnoopingSdpPortOption82Violation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to a relay
+            agent forards a packet that includes option 82 info to an untrusted
+            port."
+        ::= { dhcpSnoopingSdpPortEntry 5 }
+
+    dhcpSnoopingSdpPortRelayAgentViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to an DHCP
+            relay agent forwards a DHCP packate includes an relay agent ip
+            address that is not 0.0.0.0."
+        ::= { dhcpSnoopingSdpPortEntry 6 }
+
+    dhcpSnoopingSdpPortBindingViolation  OBJECT-TYPE
+        SYNTAX    Counter32
+        MAX-ACCESS    read-only
+        STATUS current
+        DESCRIPTION
+            "This keeps track of the number of packets dropped due to receiving
+            an DHCP Relase or DHCP Decline message that contains a MAC address
+            in the DHCP snooping binding table, but the interface information in
+            the binding table does not match the interface on which the message
+            was received."
+        ::= { dhcpSnoopingSdpPortEntry 7 }
+
+    dhcpSnoopingSourceFilterServiceTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingSourceFilterServiceEntry
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "ISF service table."
+        ::= {dhcpSnoopingMIB 23 }
+
+    dhcpSnoopingSourceFilterServiceEntry OBJECT-TYPE
+        SYNTAX  DhcpSnoopingSourceFilterServiceEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " A Source Filtering enabled Service entry."
+        INDEX { dhcpSnoopingSourceFilterServiceID }
+        ::= { dhcpSnoopingSourceFilterServiceTable 1 }
+
+    DhcpSnoopingSourceFilterServiceEntry::= SEQUENCE {
+        dhcpSnoopingSourceFilterServiceID               Unsigned32,
+        dhcpSnoopingSourceFilterServiceFilteringStatus  RowStatus
+    }
+
+    dhcpSnoopingSourceFilterServiceID OBJECT-TYPE
+        SYNTAX  Unsigned32(1..32767)
+        MAX-ACCESS not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The service identifying this instance.
+             Valid range from 1 to 32767(Static Service ID)."
+        ::= { dhcpSnoopingSourceFilterServiceEntry 1 }
+
+    dhcpSnoopingSourceFilterServiceFilteringStatus OBJECT-TYPE
+        SYNTAX  RowStatus 
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Enable/disable ISF service admin state."
+        ::= { dhcpSnoopingSourceFilterServiceEntry 2 }
+
+    dhcpSnoopingOption82FormatType OBJECT-TYPE
+            SYNTAX  INTEGER {
+                macAddress(1),
+                systemName(2),
+                userString(3),
+                interfaceAlias(4),
+                autoInterfaceAlias(5),
+                ascii(6)
+            }
+            MAX-ACCESS  read-write
+            STATUS  current
+            DESCRIPTION
+                "DHCP option-82 defines the type of information carried in circuit id
+                 and remote id sub option fields. If the type selected is string the actual
+                 value of the string can be found in iphelperDhcpOption82StringValue.
+                 Format type ASCII will insert the configured fields in ASCII format."
+            DEFVAL { macAddress }
+     ::= { iphelperMIB 45 }
+
+    dhcpSnoopingOption82StringValue OBJECT-TYPE
+            SYNTAX      SnmpAdminString (SIZE (0..63))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of the string that will be used in the circuit id and remote id
+                 sub options."
+     ::= { iphelperMIB 46 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpSnoopingOption82FormatASCIIConfigurableEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of ascii fields used for Circuit ID or Remote ID."
+        ::= { iphelperMIB 47 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableEntry OBJECT-TYPE
+        SYNTAX    DhcpSnoopingOption82FormatASCIIConfigurableEntry
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "An ascii field entry for Circuit ID or Remote ID."
+        INDEX { dhcpSnoopingOption82FormatASCIIConfigurableIndex }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableTable 1 }
+
+        DhcpSnoopingOption82FormatASCIIConfigurableEntry ::= SEQUENCE {
+            dhcpSnoopingOption82FormatASCIIConfigurableIndex
+                DhcpSnoopingOption82CircuitOrRemoteId,
+            dhcpSnoopingOption82FormatASCIIConfigurableField1
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField1StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField2
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField2StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField3
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField3StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField4
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField4StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableField5
+                DhcpSnoopingOption82ASCIIFieldType,
+            dhcpSnoopingOption82FormatASCIIConfigurableField5StrVal
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableDelimiter
+                SnmpAdminString,
+            dhcpSnoopingOption82FormatASCIIConfigurableStatus
+                RowStatus
+        }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableIndex OBJECT-TYPE
+        SYNTAX DhcpSnoopingOption82CircuitOrRemoteId
+        MAX-ACCESS  not-accessible
+        STATUS current
+        DESCRIPTION
+            "This object specifies the either circuit id or remote id for option82."
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 1 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField1 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the first field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII."
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 2 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField1StrVal OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The string value of the first field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 3 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField2 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the second field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 4 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField2StrVal OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the second field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 5 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField3 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the third field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 6 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField3StrVal OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the third field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 7 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField4 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the fourth  field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 8 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField4StrVal OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the fourth field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+    ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 9 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField5 OBJECT-TYPE
+        SYNTAX        DhcpSnoopingOption82ASCIIFieldType
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "The type of the fifth field in the Option 82 string in ASCII
+            format, which will be copied to Option-82 circuit id or remote id of
+            the DHCP packet.  This Field is applicable only, if the option 82
+            format type is ASCII"
+        DEFVAL { none }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 10 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableField5StrVal OBJECT-TYPE
+        SYNTAX        SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The string value of the fifth field in the Option 82 string in
+            ASCII format, which will be copied to Option-82 circuit id or remote
+            id of the DHCP packet.  This Field is applicable only, if the option
+            82 format type is ASCII"
+        DEFVAL { " - " }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 11 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableDelimiter OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (0..63))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The value of the delimiter that is inserted between the fields in
+            the Option 82 string in ASCII format, which will be copied to
+            Option-82 circuit id or remote id of the DHCP packet. This value is
+            applicable only, if the option 82 format type is ASCII"
+        DEFVAL { "" }
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 12 }
+
+    dhcpSnoopingOption82FormatASCIIConfigurableStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object specifies the status of the entry."
+        ::= { dhcpSnoopingOption82FormatASCIIConfigurableEntry 13 }
+
+-- MDNS Relay --
+                            
+    alaMdnsAdminStatus OBJECT-TYPE
+        SYNTAX    INTEGER {
+                  enable(1),
+                  disable(2)
+      }
+        MAX-ACCESS  read-write
+        STATUS    deprecated
+  DESCRIPTION
+      "MDNS global admin status."
+  DEFVAL { disable }
+  ::= { iphelperMIB 48 }
+
+    alaMdnsGreTunnelName OBJECT-TYPE
+        SYNTAX    SnmpAdminString(SIZE (0..32))
+        MAX-ACCESS  read-write
+  STATUS    deprecated
+  DESCRIPTION
+      "Specifies the tunnel name for the MDNS feature."
+  ::= { iphelperMIB 49 }
+
+    alaMdnsOperStatus OBJECT-TYPE
+        SYNTAX    INTEGER {
+                  up(1),
+                  down(2)
+      }
+        MAX-ACCESS  read-only
+        STATUS    deprecated
+  DESCRIPTION
+      "MDNS operational status"
+  DEFVAL { down }
+  ::= { iphelperMIB 50 }
+-- SSDP Relay --
+               
+ alaSsdpGreTunnelName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS deprecated
+    DESCRIPTION
+               "Specifies the GRE tunnel IP interface name associated with the SSDP Relay feature."
+   ::= { iphelperMIB 51 }
+                
+ alaSsdpAdminStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+            enabled(1),
+          disabled(2)
+            }
+     MAX-ACCESS read-write
+     STATUS deprecated
+     DESCRIPTION
+                 "SSDP Relay global status"
+     DEFVAL { disabled }
+     ::= { iphelperMIB 52 }
+                
+
+ alaSsdpOperStatus OBJECT-TYPE
+     SYNTAX INTEGER {
+            up(1),
+            down(2)
+            }
+     MAX-ACCESS      read-only
+     STATUS          deprecated
+     DESCRIPTION
+       "SSDP operational status"
+     DEFVAL { down }
+     ::= { iphelperMIB 53 }
+
+ dhcpSnoopingOption82Policy OBJECT-TYPE
+     SYNTAX  INTEGER {
+            drop(1),
+            keep(2),
+            replace(3)
+            }
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+        "DHCP option-82 policy"
+     ::= { iphelperMIB 54 }
+
+  genericUdpServiceTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF GenericUdpServiceEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                "This table defines the Generic UDP Relay Service."
+  ::= { genericUdpServiceMIB 1 }
+
+  genericUdpServiceEntry  OBJECT-TYPE
+    SYNTAX      GenericUdpServiceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "An entry in Generic UDP Relay table"
+    INDEX { genericUdpServiceUdpPort}
+    ::= { genericUdpServiceTable 1 }
+
+    GenericUdpServiceEntry ::= SEQUENCE {
+      genericUdpServiceUdpPort
+                Unsigned32,
+      genericUdpServiceDescription
+                SnmpAdminString,
+      genericUdpServiceStatRxFromClient
+                Counter32,
+      genericUdpServiceRowStatus
+                RowStatus
+   }
+
+  genericUdpServiceUdpPort OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "UDP port for the service."
+  ::= { genericUdpServiceEntry 1 }
+
+  genericUdpServiceDescription OBJECT-TYPE
+        SYNTAX  SnmpAdminString (SIZE (0..30))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The name and/or description of the service. If null string is passed
+        the default name will be used."
+  ::= { genericUdpServiceEntry 2 }
+
+  genericUdpServiceStatRxFromClient OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS      read-only
+        STATUS  current
+        DESCRIPTION
+                "This keeps track of the number of packets received from the
+                 client with UDP destination port matching genericUdpServiceUdpPort."
+  ::= { genericUdpServiceEntry 3 }
+
+  genericUdpServiceRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row Status for creating/deleting"
+  ::= { genericUdpServiceEntry 4 }
+
+  
+  genericUdpServiceDstTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF GenericUdpServiceDstEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                "This table defines the destination VLAN for the
+                 Generic UDP Relay Service.  UDP packet with destination port
+                 genericUdpServiceUdpPort are forwarded to VLAN defined in
+                 genericUdpServiceDstVlan."
+  ::= { genericUdpServiceMIB 2 }
+
+  genericUdpServiceDstEntry  OBJECT-TYPE
+    SYNTAX      GenericUdpServiceDstEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+                "An entry in Generic UDP Relay table"
+    INDEX { genericUdpServicePort, genericUdpServiceDstVlan}
+    ::= { genericUdpServiceDstTable 1 }
+
+    GenericUdpServiceDstEntry ::= SEQUENCE {
+      genericUdpServicePort
+                Unsigned32,
+      genericUdpServiceDstVlan
+                Unsigned32,
+      genericUdpServiceStatTxToVlan
+                Counter32,
+      genericUdpServiceDstTblRowStatus
+                RowStatus
+   }
+
+  genericUdpServicePort OBJECT-TYPE
+        SYNTAX Unsigned32 (0..65535)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "UDP port for the service."
+  ::= { genericUdpServiceDstEntry 1 }
+
+  genericUdpServiceDstVlan OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4096)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "Destination VLAN that the UPD port is to be forwarded to."
+  ::= { genericUdpServiceDstEntry 2 }
+
+  genericUdpServiceStatTxToVlan  OBJECT-TYPE
+        SYNTAX  Counter32
+
+        MAX-ACCESS      read-only
+
+        STATUS current
+        DESCRIPTION
+                    "This keeps track of the number of packets transmitted to the
+                     destination VLAN with UDP destination port matching
+                     genericUdpServicePort."
+  ::= { genericUdpServiceDstEntry  3}
+  
+  genericUdpServiceDstTblRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Row Status for creating/deleting the Generic Service Destination Table"
+  ::= { genericUdpServiceDstEntry 4 }
+
+  genericUdpServiceStatReset OBJECT-TYPE
+        SYNTAX  INTEGER {
+                  noOperation        (0),
+                  resetAllStats      (1)
+        }
+        MAX-ACCESS      read-write
+        STATUS current
+        DESCRIPTION
+            "This parameter resets all the Generic UDP Relay related
+             statistics.  Subsystem always returns zero (0)."
+  ::= { genericUdpServiceMIB 3 }
+
+  alaGenericUdpServiceDstIpTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF GenericUdpServiceDstIpEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                "This table defines the destination IP for the
+                 Generic UDP Relay Service.  UDP packet with destination port
+                 alaGenericUdpServiceDstUdpPort are forwarded to IP defined in
+                 alaGenericUdpServiceDstIpAddress."
+      ::= { genericUdpServiceMIB 4 }
+
+  alaGenericUdpServiceDstIpEntry  OBJECT-TYPE
+      SYNTAX      GenericUdpServiceDstIpEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An entry in Generic UDP Relay destination Ip table."
+      INDEX {
+         alaGenericUdpServiceDstUdpPort,
+         alaGenericUdpServiceDstIpType,
+         alaGenericUdpServiceDstIpAddress
+      }
+      ::= { alaGenericUdpServiceDstIpTable 1 }
+
+  GenericUdpServiceDstIpEntry ::= SEQUENCE {
+      alaGenericUdpServiceDstUdpPort
+                Unsigned32,
+      alaGenericUdpServiceDstIpType
+                InetAddressType,
+      alaGenericUdpServiceDstIpAddress
+                InetAddress,
+      alaGenericUdpServiceDstStatTxToIp
+                Counter32,
+      alaGenericUdpServiceDstIpRowStatus
+                RowStatus
+  }
+
+  alaGenericUdpServiceDstUdpPort OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65535)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "UDP port for the service."
+      ::= { alaGenericUdpServiceDstIpEntry 1 }
+
+  alaGenericUdpServiceDstIpType OBJECT-TYPE
+      SYNTAX InetAddressType { ipv4(1), ipv6(2) }
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This specifies the IP Address type of the
+           UDP Relay Server to forward the UDP packet."
+      ::= { alaGenericUdpServiceDstIpEntry 2 }
+
+  alaGenericUdpServiceDstIpAddress OBJECT-TYPE
+      SYNTAX InetAddress (SIZE(4|16))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This specifies the IP Address of the
+           UDP Relay Server to forward the UDP packet."
+      ::= { alaGenericUdpServiceDstIpEntry 3 }
+
+  alaGenericUdpServiceDstStatTxToIp  OBJECT-TYPE
+      SYNTAX  Counter32
+      MAX-ACCESS      read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets transmitted to the
+           destination IP with UDP destination port matching
+           alaGenericUdpServiceDstUdpPort."
+      ::= { alaGenericUdpServiceDstIpEntry  4}
+
+  alaGenericUdpServiceDstIpRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "Row Status for creating/deleting the Generic Service Destination IP Table"
+      ::= { alaGenericUdpServiceDstIpEntry 5 }    
+
+--
+-- Alcatel UDP Service SVC Table
+--
+
+  alaGenericUdpServiceSvcTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AlaGenericUdpServiceSvcEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This table defines the destination SVC for the
+          generic UDP service. UDP packet with destination port
+          alaGenericUdpServiceSvcPort are forwarded to SVC defined in
+          alaGenericUdpServiceDstSvc."
+      ::= { genericUdpServiceMIB 5 }
+
+  alaGenericUdpServiceSvcEntry  OBJECT-TYPE
+      SYNTAX      AlaGenericUdpServiceSvcEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An entry in generic UDP service SVC table."
+      INDEX { alaGenericUdpServiceSvcPort, alaGenericUdpServiceDstSvc}
+      ::= { alaGenericUdpServiceSvcTable 1 }
+
+  AlaGenericUdpServiceSvcEntry ::= SEQUENCE {
+           alaGenericUdpServiceSvcPort
+                Unsigned32,
+           alaGenericUdpServiceDstSvc
+                AluServiceId,
+           alaGenericUdpServiceStatTxToSvc
+                Counter32,
+           alaGenericUdpServiceSvcRowStatus 
+                RowStatus
+   }
+
+  alaGenericUdpServiceSvcPort OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65535)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "UDP port for the service."
+      ::= { alaGenericUdpServiceSvcEntry 1 }
+
+  alaGenericUdpServiceDstSvc OBJECT-TYPE
+      SYNTAX          AluServiceId
+      MAX-ACCESS      not-accessible
+      STATUS          current
+      DESCRIPTION    
+          "Destination SVC that the UDP port is to be forwarded to."
+      ::= { alaGenericUdpServiceSvcEntry 2 }
+  
+  alaGenericUdpServiceStatTxToSvc  OBJECT-TYPE
+      SYNTAX  Counter32
+      MAX-ACCESS      read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets transmitted to the
+          destination SVC with UDP destination port matching alaGenericUdpServiceSvcPort."
+      ::= { alaGenericUdpServiceSvcEntry  3}
+  
+  alaGenericUdpServiceSvcRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "Row status for creating/deleting the generic service destination SVC table."
+      ::= { alaGenericUdpServiceSvcEntry 4 }
+	  
+-- -----------------------------------------------------------------------------
+--          DHCP RELAY GLOBAL CONFIGURATION
+-- -----------------------------------------------------------------------------
+  alaDhcpRelayGlobalConfig  OBJECT IDENTIFIER ::= { alaDhcpRelayMIB 1 }
+
+  alaDhcpRelayStatisticsClear    OBJECT-TYPE
+      SYNTAX      INTEGER {
+                              default(1),
+                              reset(2)
+                            }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+            "This object defines DHCP Relay statistics information clear or reset."
+      ::= { alaDhcpRelayGlobalConfig 1 }
+
+  alaDhcpRelayAdminStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+            "Global DHCP administrative status. This object provides a
+            means to globally enable or disable."
+      ::= { alaDhcpRelayGlobalConfig 2 }
+
+  alaDhcpRelayForwardDelay OBJECT-TYPE
+      SYNTAX      Unsigned32 (0 .. 65535)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+            "DHCP relay forward delay value in seconds."
+      ::= { alaDhcpRelayGlobalConfig 3 }
+
+  alaDhcpRelayMaximumHops  OBJECT-TYPE
+      SYNTAX      Unsigned32 (1..16)
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+            "DHCP relay maximum hops."
+      ::= { alaDhcpRelayGlobalConfig 4 }
+
+  alaDhcpRelayPxeSupport OBJECT-TYPE
+      SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+            "This object provides a means to globally enable or disable 
+            the DHCP pxe-support."
+      ::= { alaDhcpRelayGlobalConfig 5 }
+
+  alaDhcpRelayInsertAgentInformation  OBJECT-TYPE
+      SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+            "Global DHCP insert-agent-information state. This object provides a
+            means to globally enable or disable the DHCP insert-agent-information."
+      ::= { alaDhcpRelayGlobalConfig 6 }
+
+  alaDhcpRelayInsertAgentInformationPolicy OBJECT-TYPE
+      SYNTAX INTEGER {
+                    drop(1),
+                    keep(2),
+                    replace(3)
+                }
+      MAX-ACCESS    read-write
+      STATUS    current
+      DESCRIPTION
+            "The policy of DHCP relay insert agent information."
+      ::= { alaDhcpRelayGlobalConfig 7 }
+
+  alaDhcpRelayPerInterfaceMode OBJECT-TYPE
+      SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+            "This object provides a means to globally enable or disable 
+            the DHCP per interface mode."
+      ::= { alaDhcpRelayGlobalConfig 8 }
+
+  alaDhcpRelayOption82FormatType OBJECT-TYPE
+      SYNTAX  INTEGER {
+                  macAddress(1),
+                  systemName(2),
+                  userString(3),
+                  interfaceAlias(4),
+                  autoInterfaceAlias(5),
+                  ascii(6)
+              }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+          "DHCP option-82 defines the type of information carried in circuit ID
+          and remote ID sub option fields. If the type selected is string the actual
+          value of the string can be found in iphelperDhcpOption82StringValue.
+          Format type ASCII will insert the configured fields in ASCII format."
+      DEFVAL { macAddress }
+      ::= { alaDhcpRelayGlobalConfig 9 }
+
+  alaDhcpRelayOption82StringValue OBJECT-TYPE
+      SYNTAX    SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "The value of the string that will be used in the circuit ID and remote ID
+          sub options."
+      ::= { alaDhcpRelayGlobalConfig 10 }
+
+  alaDhcpRelayOption82FormatASCIIConfTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AlaDhcpRelayOption82FormatASCIIConfEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "A list of ascii fields used for circuit ID or remote ID."
+      ::= { alaDhcpRelayGlobalConfig 11 }
+
+
+  alaDhcpRelayOption82FormatASCIIConfEntry OBJECT-TYPE
+      SYNTAX    AlaDhcpRelayOption82FormatASCIIConfEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+          "An ascii field entry for circuit ID or remote ID."
+      INDEX { alaDhcpRelayOption82FormatASCIIConfIndex }
+      ::= { alaDhcpRelayOption82FormatASCIIConfTable 1 }
+
+      AlaDhcpRelayOption82FormatASCIIConfEntry ::= SEQUENCE {
+          alaDhcpRelayOption82FormatASCIIConfIndex
+              INTEGER,
+          alaDhcpRelayOption82FormatASCIIConfField1
+              AlaDhcpRelayOption82ASCIIFieldType,
+          alaDhcpRelayOption82FormatASCIIConfField1StrVal
+              SnmpAdminString,
+          alaDhcpRelayOption82FormatASCIIConfField2
+              AlaDhcpRelayOption82ASCIIFieldType,
+          alaDhcpRelayOption82FormatASCIIConfField2StrVal
+              SnmpAdminString,
+          alaDhcpRelayOption82FormatASCIIConfField3
+              AlaDhcpRelayOption82ASCIIFieldType,
+          alaDhcpRelayOption82FormatASCIIConfField3StrVal
+              SnmpAdminString,
+          alaDhcpRelayOption82FormatASCIIConfField4
+              AlaDhcpRelayOption82ASCIIFieldType,
+          alaDhcpRelayOption82FormatASCIIConfField4StrVal
+              SnmpAdminString,
+          alaDhcpRelayOption82FormatASCIIConfField5
+              AlaDhcpRelayOption82ASCIIFieldType,
+          alaDhcpRelayOption82FormatASCIIConfField5StrVal
+              SnmpAdminString,
+          alaDhcpRelayOption82FormatASCIIConfDelimiter
+              SnmpAdminString,
+          alaDhcpRelayOption82FormatASCIIConfStatus
+              RowStatus
+      }
+
+  alaDhcpRelayOption82FormatASCIIConfIndex OBJECT-TYPE
+      SYNTAX  INTEGER {
+                  circuitid(1),
+                  remoteid(2)
+              }
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+          "This object specifies the either circuit ID or remote ID for option82."
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 1 }
+
+  alaDhcpRelayOption82FormatASCIIConfField1 OBJECT-TYPE
+      SYNTAX AlaDhcpRelayOption82ASCIIFieldType
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+          "The type of the first field in the Option 82 string in ASCII format,
+          which will be copied to Option-82 circuit ID or remote ID of the DHCP packet.
+          This field is applicable only, if the option 82 format type is ASCII"
+      DEFVAL { none }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 2 }
+
+  alaDhcpRelayOption82FormatASCIIConfField1StrVal OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "The string value of the first field in the Option 82 string in ASCII
+          format, which will be copied to Option-82 circuit ID or remote ID of
+          the DHCP packet. This field is applicable only,if the option 82
+          format type is ASCII."
+      DEFVAL { " - " }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 3 }
+
+  alaDhcpRelayOption82FormatASCIIConfField2 OBJECT-TYPE
+      SYNTAX AlaDhcpRelayOption82ASCIIFieldType
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+          "The type of the second field in the Option 82 string in ASCII format,
+          which will be copied to Option-82 circuit ID or remote ID of the DHCP packet.
+          This field is applicable only, if the option 82 format type is ASCII"
+      DEFVAL { none }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 4 }
+
+  alaDhcpRelayOption82FormatASCIIConfField2StrVal OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "The string value of the second field in the Option 82 string in ASCII
+          format, which will be copied to Option-82 circuit ID or remote ID of
+          the DHCP packet. This field is applicable only, if the option 82
+          format type is ASCII."
+      DEFVAL { " - " }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 5 }
+
+  alaDhcpRelayOption82FormatASCIIConfField3 OBJECT-TYPE
+      SYNTAX AlaDhcpRelayOption82ASCIIFieldType
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+          "The type of the third field in the Option 82 string in ASCII format,
+          which will be copied to Option-82 circuit ID or remote ID of the DHCP packet.
+          This field is applicable only, if the option 82 format type is ASCII"
+      DEFVAL { none }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 6 }
+
+  alaDhcpRelayOption82FormatASCIIConfField3StrVal OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "The string value of the third field in the Option 82 string in ASCII
+          format, which will be copied to Option-82 circuit ID or remote ID of
+          the DHCP packet. This field is applicable only, if the option 82
+          format type is ASCII."
+      DEFVAL { " - " }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 7 }
+
+
+  alaDhcpRelayOption82FormatASCIIConfField4 OBJECT-TYPE
+      SYNTAX AlaDhcpRelayOption82ASCIIFieldType
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+          "The type of the fourth field in the Option 82 string in ASCII format,
+          which will be copied to Option-82 circuit ID or remote ID of the DHCP packet.
+          This field is applicable only, if the option 82 format type is ASCII"
+      DEFVAL { none }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 8 }
+
+  alaDhcpRelayOption82FormatASCIIConfField4StrVal OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "The string value of the fourth field in the Option 82 string in ASCII
+          format, which will be copied to Option-82 circuit ID or remote ID of
+          the DHCP packet. This field is applicable only, if the option 82
+          format type is ASCII."
+      DEFVAL { " - " }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 9 }
+
+  alaDhcpRelayOption82FormatASCIIConfField5 OBJECT-TYPE
+      SYNTAX AlaDhcpRelayOption82ASCIIFieldType
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+          "The type of the fifth field in the Option 82 string in ASCII format,
+          which will be copied to Option-82 circuit ID or remote ID of the DHCP packet.
+          This field is applicable only, if the option 82 format type is ASCII"
+      DEFVAL { none }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 10 }
+
+  alaDhcpRelayOption82FormatASCIIConfField5StrVal OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "The string value of the fifth field in the Option 82 string in ASCII
+          format, which will be copied to Option-82 circuit ID or remote ID of
+          the DHCP packet. This field is applicable only, if the option 82
+          format type is ASCII."
+      DEFVAL { " - " }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 11 }
+
+  alaDhcpRelayOption82FormatASCIIConfDelimiter OBJECT-TYPE
+      SYNTAX      SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+          "The value of the delimiter that is inserted between the fields in the
+          option 82 string in ASCII format, which will be copied to Option-82
+          circuit ID or remote ID of the DHCP packet. This value is
+          applicable only, if the option 82 format type is ASCII"
+      DEFVAL { "" }
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 12 }
+
+  alaDhcpRelayOption82FormatASCIIConfStatus OBJECT-TYPE
+      SYNTAX        RowStatus
+      MAX-ACCESS  read-create
+      STATUS  current
+      DESCRIPTION
+          "This object specifies the status of the entry."
+      ::= { alaDhcpRelayOption82FormatASCIIConfEntry 13 }
+
+
+  alaDhcpRelayOpt82ErrStatsTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AlaDhcpRelayOpt82ErrStatsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "A list of Option 82 related error statistic count per port and per interface."
+      ::= { alaDhcpRelayGlobalConfig 12 }
+
+  alaDhcpRelayOpt82ErrStatsEntry  OBJECT-TYPE
+      SYNTAX      AlaDhcpRelayOpt82ErrStatsEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An entry in the ip dhcp relay Option 82 error statistics table"
+      INDEX { alaDhcpRelayOpt82ErrStatsIfIndex, alaDhcpRelayOpt82ErrStatsIfName }
+      ::= { alaDhcpRelayOpt82ErrStatsTable 1 }
+
+  AlaDhcpRelayOpt82ErrStatsEntry ::= SEQUENCE {
+      alaDhcpRelayOpt82ErrStatsIfIndex
+          InterfaceIndex,
+      alaDhcpRelayOpt82ErrStatsIfName
+          SnmpAdminString,
+      alaDhcpRelayOpt82ErrStatsAgentInfoViolation
+          Counter32,
+      alaDhcpRelayOpt82ErrStatsInvalidGatewayIPAddr
+          Counter32,
+      alaDhcpRelayOpt82ErrStatsReset
+          INTEGER
+   }
+
+  alaDhcpRelayOpt82ErrStatsIfIndex OBJECT-TYPE
+      SYNTAX InterfaceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "The interface index where the DHCP packet ingress the switch that
+          caused the agent info violation or the invalid gateway
+          IP address error."
+      ::= { alaDhcpRelayOpt82ErrStatsEntry 1 }
+
+  alaDhcpRelayOpt82ErrStatsIfName OBJECT-TYPE
+      SYNTAX SnmpAdminString (SIZE (0..63))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "The interface name where the DHCP packet ingress the switch that
+          caused the agent info violation or the invalid gateway
+          IP address error."
+      ::= { alaDhcpRelayOpt82ErrStatsEntry 2 }
+
+  alaDhcpRelayOpt82ErrStatsAgentInfoViolation OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The number of agent info violation seen on this interface."
+      ::= { alaDhcpRelayOpt82ErrStatsEntry 3 }
+
+  alaDhcpRelayOpt82ErrStatsInvalidGatewayIPAddr OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The number of invalid gateway IP address seen on this interface."
+      ::= { alaDhcpRelayOpt82ErrStatsEntry 4 }
+
+  alaDhcpRelayOpt82ErrStatsReset OBJECT-TYPE
+      SYNTAX  INTEGER {
+                  noOpt        (1),
+                  reset        (2)
+              }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+          "This parameter resets the ip dhcp relay Option 82 error statistics
+          on this interface. When the reset operation is done,
+          subsystem will change the value to noOpt (1). Subsystem will always return
+          noOpt (1)."
+      ::= { alaDhcpRelayOpt82ErrStatsEntry 5 }
+
+  alaDhcpRelayRxFromClient OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets received from the client."
+      ::= { alaDhcpRelayGlobalConfig 13 }
+
+  alaDhcpRelayMaxHopsViolation OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets dropped due to
+           max hops violation."
+      ::= { alaDhcpRelayGlobalConfig 14 }
+
+  alaDhcpRelayForwardDelayViolation OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets dropped due to
+           forward delay violation."
+      ::= { alaDhcpRelayGlobalConfig 15 }
+
+  alaDhcpRelayAgentInfoViolation OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets dropped due to
+           DHCP packet with giaddr field not equal to zero and
+           Relay Agent Information option is present and also the
+           Relay Agent Information Policy is set to DROP."
+      ::= { alaDhcpRelayGlobalConfig 16 }
+
+  alaDhcpRelayInvalidGatewayIp OBJECT-TYPE
+      SYNTAX Counter32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "This keeps track of the number of packets dropped due to
+           giaddr matching a local subnet and Relay Agent Information
+           option is present in the DHCP packet."
+      ::= { alaDhcpRelayGlobalConfig 17 }
+
+-- -----------------------------------------------------------------------------
+--           DHCP RELAYTABLE CONFIGURATION
+-- -----------------------------------------------------------------------------
+  alaDhcpRelayInterfaceTable OBJECT-TYPE    
+      SYNTAX SEQUENCE OF AlaDhcpRelayInterfaceEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "An IP DHCP Relay interface table."
+      ::= { alaDhcpRelayMIB 2 }
+
+  alaDhcpRelayInterfaceEntry OBJECT-TYPE
+      SYNTAX    AlaDhcpRelayInterfaceEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+           "An IP DHCP interface entry."
+      INDEX { alaDhcpRelayInterfaceName , alaDhcpRelayInterfaceIpAddressType, alaDhcpRelayInterfaceIpAddress}
+      ::= { alaDhcpRelayInterfaceTable 1 }
+
+  AlaDhcpRelayInterfaceEntry ::= SEQUENCE {
+           alaDhcpRelayInterfaceName            SnmpAdminString,
+           alaDhcpRelayInterfaceIpAddressType    InetAddressType,
+           alaDhcpRelayInterfaceIpAddress        InetAddress,
+           alaDhcpRelayInterfaceStatus           RowStatus          
+          }
+
+  alaDhcpRelayInterfaceName OBJECT-TYPE
+      SYNTAX SnmpAdminString(SIZE (1..63))
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+             "IP interface name for which DHCP Relay is applicable."
+      ::= { alaDhcpRelayInterfaceEntry 1 }
+
+  alaDhcpRelayInterfaceIpAddressType OBJECT-TYPE
+      SYNTAX InetAddressType { ipv4(1), ipv6(2) }
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+         "Server IP address for DHCP Relay type."
+      ::= { alaDhcpRelayInterfaceEntry 2 }
+
+  alaDhcpRelayInterfaceIpAddress OBJECT-TYPE
+      SYNTAX InetAddress (SIZE(4|16))
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+         "Server IP address for DHCP Relay."
+      ::= { alaDhcpRelayInterfaceEntry 3 }
+
+	  
+  alaDhcpRelayInterfaceStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS  read-create
+      STATUS current
+      DESCRIPTION
+          "This object specifies the status of the entry."
+      ::= { alaDhcpRelayInterfaceEntry 4 }
+      
+--
+-- Alcatel DHCP Relay Server Destination Table
+--
+
+  alaDhcpRelayServerDestinationTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF AlaDhcpRelayServerDestinationEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "Table allowing the creation and removal of DHCP
+          relay server destinations."
+      ::= { alaDhcpRelayMIB 3 }
+
+  alaDhcpRelayServerDestinationEntry OBJECT-TYPE
+      SYNTAX      AlaDhcpRelayServerDestinationEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "A DHCP relay server destination entry."
+      INDEX       {
+           alaDhcpRelayServerDestinationAddressType,
+           alaDhcpRelayServerDestinationAddress 
+                }
+      ::= { alaDhcpRelayServerDestinationTable 1 }
+
+  AlaDhcpRelayServerDestinationEntry ::= SEQUENCE {
+           alaDhcpRelayServerDestinationAddressType InetAddressType,
+           alaDhcpRelayServerDestinationAddress     InetAddress,
+           alaDhcpRelayServerDestinationRowStatus   RowStatus
+          }
+
+  alaDhcpRelayServerDestinationAddressType OBJECT-TYPE
+      SYNTAX      InetAddressType {ipv4(1)} 
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The address type of a DHCP relay server destination."
+      ::= { alaDhcpRelayServerDestinationEntry 1 }
+
+  alaDhcpRelayServerDestinationAddress OBJECT-TYPE
+      SYNTAX      InetAddress (SIZE(4))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "The address of a DHCP relay server destination."
+      ::= { alaDhcpRelayServerDestinationEntry 2 }
+
+  alaDhcpRelayServerDestinationRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "Used to control the addition and removal of DHCP
+          relay server destinations."
+      ::= { alaDhcpRelayServerDestinationEntry 3 }
+
+
+--
+-- Alcatel DHCP Relay Interface Admin state table 
+--    
+
+  alaDhcpRelayInterfaceAdminStateTable OBJECT-TYPE    
+      SYNTAX SEQUENCE OF AlaDhcpRelayInterfaceAdminStateEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+             "An IP DHCP relay interface status table."
+      ::= { alaDhcpRelayMIB 4 }
+
+  alaDhcpRelayInterfaceAdminStateEntry OBJECT-TYPE
+      SYNTAX    AlaDhcpRelayInterfaceAdminStateEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+           "An IP DHCP interface status entry."
+      INDEX { alaDhcpRelayInterfaceName }
+      ::= { alaDhcpRelayInterfaceAdminStateTable 1 }
+
+  AlaDhcpRelayInterfaceAdminStateEntry ::= SEQUENCE {
+           alaDhcpRelayInterfaceAdminStatus           INTEGER
+          }  
+          
+  alaDhcpRelayInterfaceAdminStatus OBJECT-TYPE
+      SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                }
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION
+          "DHCP relay administrative status on the interface."
+      ::= { alaDhcpRelayInterfaceAdminStateEntry 1 }
+
+-- 
+-- Alcatel DHCP Relay Clear Interface Statistics Table
+-- 
+
+  alaDhcpRelayClearStatisticsTable OBJECT-TYPE    
+      SYNTAX SEQUENCE OF AlaDhcpRelayClearStatisticsEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "An IP DHCP relay clear interface statistics table."
+      ::= { alaDhcpRelayMIB 5 }
+
+ alaDhcpRelayClearStatisticsEntry OBJECT-TYPE
+      SYNTAX    AlaDhcpRelayClearStatisticsEntry
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+        "An IP DHCP clear interface statistics entry."
+      INDEX { 
+           alaDhcpRelayClearStatisticsInterfaceName,
+           alaDhcpRelayClearStatisticsIpAddressType,
+           alaDhcpRelayClearStatisticsIpAddress
+          }
+      ::= { alaDhcpRelayClearStatisticsTable 1 }
+
+  AlaDhcpRelayClearStatisticsEntry ::= SEQUENCE {
+           alaDhcpRelayClearStatisticsInterfaceName            SnmpAdminString,
+           alaDhcpRelayClearStatisticsIpAddressType            InetAddressType,
+           alaDhcpRelayClearStatisticsIpAddress                InetAddress,
+           alaDhcpRelayClearStatisticsAction                   INTEGER
+           }
+
+  alaDhcpRelayClearStatisticsInterfaceName  OBJECT-TYPE
+      SYNTAX SnmpAdminString(SIZE (0..63))
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+        "IP interface statistics name for which DHCP relay is applicable."
+      ::= { alaDhcpRelayClearStatisticsEntry 1 }
+
+  alaDhcpRelayClearStatisticsIpAddressType OBJECT-TYPE
+      SYNTAX InetAddressType { ipv4(1) }
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+        "Server IP address for DHCP relay type."
+      ::= { alaDhcpRelayClearStatisticsEntry 2 }
+
+  alaDhcpRelayClearStatisticsIpAddress OBJECT-TYPE
+      SYNTAX InetAddress (SIZE(4))
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+        "Server IP address for DHCP relay."
+      ::= { alaDhcpRelayClearStatisticsEntry 3 }
+
+  alaDhcpRelayClearStatisticsAction OBJECT-TYPE
+      SYNTAX  INTEGER {
+          none(1),
+          clear(2)
+      }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+          "Clears the DHCP relay lease statistics."
+      ::= { alaDhcpRelayClearStatisticsEntry 4 }
+
+-- 
+-- Alcatel DHCP Relay Statistics Table
+-- 
+
+  alaDhcpRelayStatTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AlaDhcpRelayStatEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+          "This keeps statistics for each next hop IP address"
+      ::= { alaDhcpRelayMIB 6 }
+
+  alaDhcpRelayStatEntry  OBJECT-TYPE
+      SYNTAX      AlaDhcpRelayStatEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+          "An entry in the stat table."
+      INDEX { alaDhcpRelayStatInterfaceName, alaDhcpRelayStatNextHopIpAddrType, alaDhcpRelayStatNextHopIpAddr }
+      ::= { alaDhcpRelayStatTable 1 }
+
+  AlaDhcpRelayStatEntry ::= SEQUENCE {
+      alaDhcpRelayStatInterfaceName           SnmpAdminString,
+      alaDhcpRelayStatNextHopIpAddrType       InetAddressType,
+      alaDhcpRelayStatNextHopIpAddr           InetAddress,
+      alaDhcpRelayStatTxToNextHop                Counter32,
+      alaDhcpRelayStatInvalidAgentInfoOptFromServer  Counter32
+   }
+
+  alaDhcpRelayStatInterfaceName OBJECT-TYPE
+      SYNTAX SnmpAdminString(SIZE (1..63))
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+             "IP interface name for which IP DHCP Relay is applicable."
+      ::= { alaDhcpRelayStatEntry 1 }
+
+  alaDhcpRelayStatNextHopIpAddrType OBJECT-TYPE
+      SYNTAX InetAddressType { ipv4(1) }
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+         "This specifies the server address type."
+      ::= { alaDhcpRelayStatEntry 2 }
+
+  alaDhcpRelayStatNextHopIpAddr OBJECT-TYPE
+      SYNTAX InetAddress (SIZE(4|16))
+      MAX-ACCESS  not-accessible
+      STATUS current
+      DESCRIPTION
+         "This specifies the unique server address."
+      ::= { alaDhcpRelayStatEntry 3 }
+
+  alaDhcpRelayStatTxToNextHop  OBJECT-TYPE
+      SYNTAX  Counter32
+      MAX-ACCESS  read-only
+      STATUS current
+      DESCRIPTION
+         " This keeps track of the number of packets transmitted  to the server."
+      ::= { alaDhcpRelayStatEntry 4 }
+
+  alaDhcpRelayStatInvalidAgentInfoOptFromServer  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+              "This keeps track of the number of packets dropped due to
+               invalid from DHCP server with Relay Agent Information option
+               in the DHCP packet."
+      ::= { alaDhcpRelayStatEntry 5 }
+
+--	 
+--   Alcatel Generic IPv6 UDP Service Table
+--	 
+
+  alaGenericUdpv6ServiceTable OBJECT-TYPE 
+      SYNTAX SEQUENCE OF AlaGenericUdpv6ServiceEntry
+      MAX-ACCESS not-accessible
+      STATUS current 
+      DESCRIPTION
+                 "This table defines the IPv6 UDP relay service."	 
+      ::= { alaGenericUdpv6ServiceMIB 1 }
+ 
+  alaGenericUdpv6ServiceEntry  OBJECT-TYPE
+      SYNTAX      AlaGenericUdpv6ServiceEntry 
+      MAX-ACCESS  not-accessible	 
+      STATUS      current	 
+      DESCRIPTION	 
+                 "An entry in IPv6 UDP relay service table."	 
+      INDEX { alaGenericUdpv6ServiceUdpPort }	 
+     ::= { alaGenericUdpv6ServiceTable 1 }	 
+ 
+  AlaGenericUdpv6ServiceEntry ::= SEQUENCE {	 
+      alaGenericUdpv6ServiceUdpPort	 
+                 Unsigned32,	 
+      alaGenericUdpv6ServiceDescription	 
+                 SnmpAdminString,	 
+      alaGenericUdpv6ServiceStatRxFromClient	 
+                 Counter32,	 
+      alaGenericUdpv6ServiceRowStatus	 
+                 RowStatus	 
+    }	  
+
+  alaGenericUdpv6ServiceUdpPort OBJECT-TYPE	 
+      SYNTAX Unsigned32 (0..65535)	 
+      MAX-ACCESS not-accessible	 
+      STATUS current	 
+      DESCRIPTION	 
+                 "UDP port for the service."	 
+      ::= { alaGenericUdpv6ServiceEntry 1 }	 
+ 	 
+  alaGenericUdpv6ServiceDescription OBJECT-TYPE	 
+      SYNTAX  SnmpAdminString (SIZE (0..30))	 
+      MAX-ACCESS read-create	 
+      STATUS current	 
+      DESCRIPTION	 
+                 "The name and/or description of the service. If null string is passed	 
+                  the default name will be used."	 
+     ::= { alaGenericUdpv6ServiceEntry 2 }	 
+
+  alaGenericUdpv6ServiceStatRxFromClient OBJECT-TYPE	 
+      SYNTAX      Counter32	 
+      MAX-ACCESS  read-only	 
+      STATUS      current	 
+      DESCRIPTION	 
+                 "This keeps track of the number of packets received from the	 
+                  client with IPv6 UDP destination port matching alaGenericUdpv6ServiceUdpPort."	 
+     ::= { alaGenericUdpv6ServiceEntry 3 }	 
+
+  alaGenericUdpv6ServiceRowStatus OBJECT-TYPE	 
+      SYNTAX RowStatus	 
+      MAX-ACCESS read-create	 
+      STATUS current	 
+      DESCRIPTION	 
+                 "Row status for creating/deleting."	 
+     ::= { alaGenericUdpv6ServiceEntry 4 }	  	 
+
+--	 
+--   Alcatel Generic IPv6 UDP Service Destination Table	 
+--	 
+
+  alaGenericUdpv6ServiceDstTable OBJECT-TYPE	 
+      SYNTAX SEQUENCE OF AlaGenericUdpv6ServiceDstEntry	 
+      MAX-ACCESS not-accessible	 
+      STATUS current	 
+      DESCRIPTION	 
+                 "This table defines the destination for the	 
+                  IPv6 UDP relay service. IPv6 UDP packet with destination port	 
+                  alaGenericUdpv6ServiceDstPort are forwarded to defined in	 
+                  alaGenericUDPv6ServiceDstType."	 
+      ::= { alaGenericUdpv6ServiceMIB 2 }	 
+ 	 
+  alaGenericUdpv6ServiceDstEntry  OBJECT-TYPE	 
+      SYNTAX      AlaGenericUdpv6ServiceDstEntry	 
+      MAX-ACCESS  not-accessible	 
+      STATUS      current	 
+      DESCRIPTION	 
+                 "An entry in IPv6 UDP relay table."	 
+      INDEX { alaGenericUdpv6ServiceDstType, alaGenericUdpv6ServiceDstPort , alaGenericUdpv6ServiceDstId}	 
+      ::= { alaGenericUdpv6ServiceDstTable 1 }	 
+ 	 
+  AlaGenericUdpv6ServiceDstEntry ::= SEQUENCE {	 
+      alaGenericUdpv6ServiceDstType 	 
+                 INTEGER,
+      alaGenericUdpv6ServiceDstPort	 
+                 Unsigned32,	 
+      alaGenericUdpv6ServiceDstId	 
+                 Unsigned32,	 
+      alaGenericUdpv6ServiceDstStatTxToDst	 
+                 Counter32,	 
+      alaGenericUdpv6ServiceDstRowStatus	 
+                 RowStatus	 
+    }	 
+
+  alaGenericUdpv6ServiceDstType OBJECT-TYPE	 
+      SYNTAX INTEGER { 
+                    vlan(1), 
+                    service(2)
+                }
+      MAX-ACCESS not-accessible	 
+      STATUS current	 
+      DESCRIPTION	 
+                  "This specifies the IPv6 UDP relay destination type to forward the UDP packet."	 
+      ::= { alaGenericUdpv6ServiceDstEntry 1 }	  	 
+	 
+  alaGenericUdpv6ServiceDstPort OBJECT-TYPE	 
+      SYNTAX Unsigned32 (0..65535)	 
+      MAX-ACCESS not-accessible	 
+      STATUS current	 
+      DESCRIPTION	 
+                  "UDP port for the service."	 
+      ::= { alaGenericUdpv6ServiceDstEntry 2 }	 
+	  
+  alaGenericUdpv6ServiceDstId  OBJECT-TYPE	 
+      SYNTAX  Unsigned32
+      MAX-ACCESS      not-accessible
+      STATUS current	 
+      DESCRIPTION	 
+                  "Identifier of the destination where the UDP packet is to be forwarded."
+      ::= { alaGenericUdpv6ServiceDstEntry  3}	    	 
+	  
+  alaGenericUdpv6ServiceDstStatTxToDst  OBJECT-TYPE	 
+      SYNTAX  Counter32	 
+      MAX-ACCESS      read-only	 
+      STATUS current	 
+      DESCRIPTION	 
+                 "This keeps track of the number of packets transmitted to the	 
+                  destination with IPv6 UDP relay destination port matching	 
+                  alaGenericUdpv6ServiceDstPort."	 
+      ::= { alaGenericUdpv6ServiceDstEntry  4}	    	 
+	  
+  alaGenericUdpv6ServiceDstRowStatus OBJECT-TYPE	 
+      SYNTAX RowStatus	 
+      MAX-ACCESS read-create	 
+      STATUS current	 
+      DESCRIPTION	 
+                  "Row status for creating/deleting the IPv6 UDP relay service table."	 
+      ::= { alaGenericUdpv6ServiceDstEntry 5 }	 
+
+--	 
+-- Alcatel Generic IPv6 UDP Service Destination IP Table	 
+--	 
+
+  alaGenericUdpv6ServiceDstIpTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF AlaGenericUdpv6ServiceDstIpEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                 "This table defines the destination IPv6 for the
+                  IPv6 UDP relay service. UDP packet with destination port
+                  alaGenericUdpv6ServiceDstUdpPort are forwarded to IPv6 UDP defined in
+                  alaGenericUdpv6ServiceDstIpAddress."
+      ::= { alaGenericUdpv6ServiceMIB 3 }
+
+  alaGenericUdpv6ServiceDstIpEntry  OBJECT-TYPE
+      SYNTAX      AlaGenericUdpv6ServiceDstIpEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+                 "An entry in IPv6 UDP relay destination IPv6 table."
+      INDEX {
+         alaGenericUdpv6ServiceDstUdpPort,
+         alaGenericUdpv6ServiceDstIpType,
+         alaGenericUdpv6ServiceDstIpAddress
+      }
+      ::= { alaGenericUdpv6ServiceDstIpTable 1 }
+
+  AlaGenericUdpv6ServiceDstIpEntry ::= SEQUENCE {
+      alaGenericUdpv6ServiceDstUdpPort
+                Unsigned32,
+      alaGenericUdpv6ServiceDstIpType
+                InetAddressType,
+      alaGenericUdpv6ServiceDstIpAddress
+                InetAddress,
+      alaGenericUdpv6ServiceDstStatTxToIp
+                Counter32,
+      alaGenericUdpv6ServiceDstIpRowStatus
+                RowStatus
+  }
+  
+  alaGenericUdpv6ServiceDstUdpPort OBJECT-TYPE
+      SYNTAX Unsigned32 (0..65535)
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                 "UDP port for the service."
+      ::= { alaGenericUdpv6ServiceDstIpEntry 1 }
+
+  alaGenericUdpv6ServiceDstIpType OBJECT-TYPE
+      SYNTAX InetAddressType { ipv6(2) }
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                 "This specifies the IPv6 address type of the
+                  IPv6 UDP relay server to forward the UDP packet."
+      ::= { alaGenericUdpv6ServiceDstIpEntry 2 }
+
+  alaGenericUdpv6ServiceDstIpAddress OBJECT-TYPE
+      SYNTAX InetAddress (SIZE(16))
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+                 "This specifies the IPv6 address of the
+                  IPv6 UDP relay server to forward the UDP packet."
+      ::= { alaGenericUdpv6ServiceDstIpEntry 3 }
+	  
+  alaGenericUdpv6ServiceDstStatTxToIp  OBJECT-TYPE
+      SYNTAX  Counter32
+      MAX-ACCESS      read-only
+      STATUS current
+      DESCRIPTION
+                 "This keeps track of the number of packets transmitted to the
+                  destination IPv6 with IPv6 UDP destination port matching
+                  alaGenericUdpv6ServiceDstUdpPort."
+      ::= { alaGenericUdpv6ServiceDstIpEntry  4}
+	  
+  alaGenericUdpv6ServiceDstIpRowStatus OBJECT-TYPE
+      SYNTAX RowStatus
+      MAX-ACCESS read-create
+      STATUS current
+      DESCRIPTION
+                 "Row status for creating/deleting the alaGeneric service destination IPv6 table"
+      ::= { alaGenericUdpv6ServiceDstIpEntry 5 }  
+
+--	 
+  alaGenericUdpv6ServiceGlobal OBJECT IDENTIFIER ::= { alcatelIND1UDPRelayMIBObjects 8 }	 
+--	 
+
+  alaGenericUdpv6ServiceStatReset OBJECT-TYPE
+      SYNTAX  INTEGER {
+                  noOperation        (1),
+                  resetAllStats      (2)
+                }
+      MAX-ACCESS      read-write
+      STATUS current
+      DESCRIPTION
+                 "This parameter resets all the IPv6 UDP relay related
+                  statistics. Subsystem always returns zero (1)."
+      ::= { alaGenericUdpv6ServiceGlobal 1 } 
+
+-- --------------------------------------------------------------
+-- Trap Description
+-- --------------------------------------------------------------
+
+
+-- Notifications
+
+     alaDhcpClientAddressAddTrap NOTIFICATION-TYPE
+     OBJECTS  {
+               alaDhcpClientAddress
+              }
+     STATUS   current
+     DESCRIPTION
+                "When  new IP address is assigned to DHCP Client interface."
+     ::= { alcatelIND1UDPRelayNotificationObjects 1 }
+
+     alaDhcpClientAddressExpiryTrap NOTIFICATION-TYPE
+     OBJECTS  {
+               alaDhcpClientAddress
+              }
+     STATUS   current
+     DESCRIPTION
+                "When the lease time expires or when DHCP client not
+                 able to renew/rebind an IP address."
+     ::= { alcatelIND1UDPRelayNotificationObjects 2 }
+
+     alaDhcpClientAddressModifyTrap NOTIFICATION-TYPE
+     OBJECTS  {
+               alaDhcpClientAddress,
+               alaDhcpClientNewAddress
+              }
+     STATUS   current
+     DESCRIPTION
+                "When the dhcp client not able to obtain the existing
+                IP address and new IP address is assigned to the DHCP client."
+     ::= { alcatelIND1UDPRelayNotificationObjects 3 }
+
+     alaDhcpBindingDuplicateEntry NOTIFICATION-TYPE
+     OBJECTS {
+                dhcpSnoopingBindingMacAddress,
+                dhcpSnoopingBindingVlan,
+                dhcpSnoopingBindingIfIndex,
+                dhcpSnoopingBindingIfIndex
+             }
+     STATUS   current
+     DESCRIPTION
+                "Trap to notify MAC Movement in DHCP-Binding Table
+                 Mac Address, Vlan, Previous ifIndex, Current ifIndex"
+
+      ::= { alcatelIND1UDPRelayNotificationObjects 4 }
+
+     alaDhcpIsfDrop NOTIFICATION-TYPE
+     OBJECTS {
+                alaDhcpIsfDropInfo
+             }
+     STATUS   current
+     DESCRIPTION
+                "Trap to notify DHCP ISF drop."
+      ::= { alcatelIND1UDPRelayNotificationObjects 5 }
+
+     alaDhcpBindingTcamFail NOTIFICATION-TYPE 
+     OBJECTS {
+               alaDhcpTcamFailMsg
+             }
+     STATUS   current
+     DESCRIPTION
+        "Binding entry creation fail due to TCAM resource failure."  
+     ::= { alcatelIND1UDPRelayNotificationObjects 6 }
+
+    alaDhcpVsoBrokerIpAddress NOTIFICATION-TYPE
+        OBJECTS {
+            alaDhcpVsoBrokerIpType,
+            alaDhcpVsoBrokerIp,
+            alaDhcpVsoL4Port,
+            alaDhcpVsoBrokerData,
+            alaDhcpVsoId
+        }
+        STATUS        current
+        DESCRIPTION
+        "This trap is sent after receiving the DHCP option 43 from DHCP server."
+    ::= { alcatelIND1UDPRelayNotificationObjects 7 }
+
+-- Notification Objects
+
+     alaDhcpClientAddress OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS  accessible-for-notify
+     STATUS  current
+     DESCRIPTION
+                "This object specifies the current IP address of the DHCP client."
+     ::= { alaDhcpClientTrapsObj 1 }
+
+     alaDhcpClientNewAddress OBJECT-TYPE
+     SYNTAX IpAddress
+     MAX-ACCESS  accessible-for-notify
+     STATUS  current
+     DESCRIPTION
+                "This object specifies the new IP address assigned for the DHCP client."
+     ::= { alaDhcpClientTrapsObj 2 }
+
+     alaDhcpIsfDropInfo OBJECT-TYPE
+     SYNTAX SnmpAdminString (SIZE (1..255))
+     MAX-ACCESS  accessible-for-notify
+     STATUS  current
+     DESCRIPTION
+                "This object specifies drop information including starting time,
+                ending time, number of dropped packets, chassis, slot and VLAN (optional)."
+     ::= { alaDhcpClientTrapsObj 3 }
+
+     alaDhcpTcamFailMsg OBJECT-TYPE
+     SYNTAX SnmpAdminString (SIZE (1..255))
+     MAX-ACCESS accessible-for-notify
+     STATUS current
+     DESCRIPTION
+     "This object specifies binding entry creation fail due to TCAM resource failure."
+     ::= { alaDhcpClientTrapsObj 4 }
+
+    alaDhcpVsoBrokerIpType OBJECT-TYPE
+        SYNTAX       InetAddressType { ipv4(1), ipv6(2), dns(16) }
+        MAX-ACCESS   accessible-for-notify
+        STATUS       current
+        DESCRIPTION
+                "Broker IP address type."
+        ::= { alaDhcpVsoTrapMIB 1}
+
+    alaDhcpVsoBrokerIp OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Broker IP address."
+        ::= { alaDhcpVsoTrapMIB 2 }
+
+    alaDhcpVsoL4Port OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Broker L4 port."
+        ::= { alaDhcpVsoTrapMIB 3 }
+
+    alaDhcpVsoBrokerData OBJECT-TYPE
+        SYNTAX      SnmpAdminString (SIZE (0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "Broker data."
+        ::= { alaDhcpVsoTrapMIB 4 }
+
+    alaDhcpVsoId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+                "VSO ID."
+        ::= { alaDhcpVsoTrapMIB 5 }
+
+------ DHCP Snooping Counters
+
+    alaDhcpSnoopingGlobalCounters  OBJECT IDENTIFIER ::= { alaDhcpSnoopingCountersMIB 1 }
+
+    alaDhcpSnoopingDiscoverPackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Discover packets "
+    ::= { alaDhcpSnoopingGlobalCounters 1 }
+
+    alaDhcpSnoopingOfferPackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Offer packets "
+    ::= { alaDhcpSnoopingGlobalCounters 2 }
+
+    alaDhcpSnoopingRequestPackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Request packets "
+    ::= { alaDhcpSnoopingGlobalCounters 3 }
+
+    alaDhcpSnoopingAckPackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Ack packets "
+    ::= { alaDhcpSnoopingGlobalCounters 4 }
+
+    alaDhcpSnoopingNackPackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Nack packets "
+    ::= { alaDhcpSnoopingGlobalCounters 5 }
+
+    alaDhcpSnoopingReleasePackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Release packets "
+    ::= { alaDhcpSnoopingGlobalCounters 6 }
+
+    alaDhcpSnoopingDeclinePackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Decline packets "
+    ::= { alaDhcpSnoopingGlobalCounters 7 }
+
+    alaDhcpSnoopingInformPackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Inform packets "
+    ::= { alaDhcpSnoopingGlobalCounters 8 }
+
+    alaDhcpSnoopingRenewPackets      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of Renew packets"
+    ::= { alaDhcpSnoopingGlobalCounters 9 }
+
+    alaDhcpSnoopingBindingError      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number error when binding when TCAM Unavailable"
+    ::= { alaDhcpSnoopingGlobalCounters 10 }
+
+    alaDhcpSnoopingPacketsDrop      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of unknown/Malformed packets dropped"
+    ::= { alaDhcpSnoopingGlobalCounters 11 }
+
+    alaDhcpSnoopingPacketsReceiveCmm      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of packets received in CMM"
+    ::= { alaDhcpSnoopingGlobalCounters 12 }
+    
+    alaDhcpSnoopingPacketsTrasmitCmm      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of packets transmitted from CMM"
+    ::= { alaDhcpSnoopingGlobalCounters 13 }
+    
+    alaDhcpSnoopingTotalISFPacketsDrop      OBJECT-TYPE
+        SYNTAX       Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+                " This show the number of total ISF packets drop"
+    ::= { alaDhcpSnoopingGlobalCounters 14 }
+--
+-- COMPLIANCE
+--
+
+    alcatelIND1UDPRelayMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            "Compliance statement for UDP Relay"
+        MODULE
+                MANDATORY-GROUPS
+                {
+                    iphelperGroup,
+                    iphelperStatGroup,
+                    iphelperMiscGroup,
+                    genericUdpServiceGroup,
+                    genericUdpServiceDstGroup,
+                    genericUdpServiceMiscGroup,
+                    alaDhcpClientTrapsGroup,
+                    dhcpSnoopingGroup,
+                    dhcpSnoopingGroup2,
+                    alaGenericUdpServiceDstIpGroup,
+                    alaDhcpRelayInterfaceGroup,
+                    alaDhcpRelayGlobalConfigGroup,
+                    alaDhcpRelayServerDestinationGroup, 
+                    alaGenericUdpServiceSvcGroup,
+                    alaGenericUdpv6ServiceGroup,
+                    alaGenericUdpv6ServiceDstGroup,
+                    alaGenericUdpv6ServiceGlobalGroup,
+                    alaGenericUdpv6ServiceDstIpGroup,
+                    alaDhcpRelayClearStatisticsGroup,
+                    alaDhcpRelayOpt82ErrStatsGroup,
+                    alaDhcpRelayStatGroup,
+                    alaDhcpSnoopingGlobalCountersGroup,
+                    alaDhcpSnoopingServiceGroup,
+                    dhcpSnoopingBindingServiceGroup,
+                    dhcpSnoopingSourceFilterServiceGroup
+                }
+
+            ::={ alcatelIND1UDPRelayMIBCompliances 1}
+
+
+   iphelperGroup  OBJECT-GROUP
+        OBJECTS
+        {
+           iphelperResetSrvStats,
+           iphelperRowStatus
+
+        }
+        STATUS deprecated
+        DESCRIPTION
+             " Collection of objects for the management of parameters of UDP Relay."
+        ::= {  alcatelIND1UDPRelayMIBGroups 1}
+
+
+    iphelperStatGroup  OBJECT-GROUP
+        OBJECTS
+        {
+            iphelperTxToNextHop,
+            iphelperInvalidAgentInfoOptFrmSrver
+        }
+        STATUS deprecated
+        DESCRIPTION
+             " Collection of objects for management of statistics for DHCP Relay Agent."
+        ::= {  alcatelIND1UDPRelayMIBGroups 2}
+
+     iphelperMiscGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            iphelperRxFromClient,
+            iphelperMaxHopsViolation,
+            iphelperForwDelayViolation,
+            iphelperAgentInfoViolation,
+            iphelperInvalidGatewayIP,
+            iphelperForwDelay,
+            iphelperMaxHops,
+            iphelperForwardOption,
+            iphelperResetAllStats,
+            iphelperBootupOption,
+            iphelperBootupPacketOption,
+            iphelperAgentInformation,
+            iphelperAgentInformationPolicy,
+            iphelperPXESupport,
+            iphelperDhcpOption82FormatType, 
+            iphelperDhcpOption82StringValue, 
+            iphelperDhcpOption82FormatASCIIField1, 
+            iphelperDhcpOption82FormatASCIIField1StringValue,
+            iphelperDhcpOption82FormatASCIIField2,
+            iphelperDhcpOption82FormatASCIIField2StringValue,
+            iphelperDhcpOption82FormatASCIIField3,
+            iphelperDhcpOption82FormatASCIIField3StringValue,
+            iphelperDhcpOption82FormatASCIIField4,
+            iphelperDhcpOption82FormatASCIIField4StringValue,
+            iphelperDhcpOption82FormatASCIIField5 ,
+            iphelperDhcpOption82FormatASCIIField5StringValue,
+            iphelperDhcpOption82FormatASCIIDelimiter,
+            iphelperResetAllOpt82ErrStats,
+            alaMdnsAdminStatus,
+            alaMdnsGreTunnelName,
+            alaMdnsOperStatus,
+            alaSsdpGreTunnelName,
+            alaSsdpAdminStatus,
+            alaSsdpOperStatus
+        }
+        STATUS deprecated
+        DESCRIPTION
+                " Other independent objects of UDP Relay."
+        ::= {  alcatelIND1UDPRelayMIBGroups 3}
+
+     genericUdpServiceGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            genericUdpServiceDescription,
+            genericUdpServiceStatRxFromClient,
+            genericUdpServiceRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+                "Objects for Generic UDP Service table"
+        ::= {  alcatelIND1UDPRelayMIBGroups 4}
+
+     genericUdpServiceDstGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            genericUdpServiceStatTxToVlan,
+            genericUdpServiceDstTblRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+                "Objects for Generic UDP Service Destination table"
+        ::= {  alcatelIND1UDPRelayMIBGroups 5}
+
+  genericUdpServiceMiscGroup   OBJECT-GROUP
+  OBJECTS
+  {
+           genericUdpServiceStatReset
+  }
+  STATUS current
+  DESCRIPTION
+    "Objects for Generic UDP Service Misc Group."
+  ::= {  alcatelIND1UDPRelayMIBGroups 6}
+
+  alaDhcpClientTrapsGroup NOTIFICATION-GROUP
+  NOTIFICATIONS
+  {
+    alaDhcpClientAddressAddTrap,
+    alaDhcpClientAddressExpiryTrap,
+    alaDhcpClientAddressModifyTrap,
+    alaDhcpBindingDuplicateEntry,
+    alaDhcpIsfDrop,
+    alaDhcpBindingTcamFail
+  }
+  STATUS current
+  DESCRIPTION
+    "Collection of traps for management of DHCP Client "
+  ::= {  alcatelIND1UDPRelayMIBGroups 7}
+
+  alaDhcpClientTrapsObjectGroup OBJECT-GROUP
+  OBJECTS
+  {
+    alaDhcpClientAddress,
+    alaDhcpClientNewAddress,
+    alaDhcpIsfDropInfo,
+    alaDhcpTcamFailMsg
+  }
+  STATUS current
+  DESCRIPTION
+    "Collection of trap objects for management of DHCP Client "
+  ::= {  alcatelIND1UDPRelayMIBGroups 8}
+
+    iphelperOpt82ErrorStatGroup  OBJECT-GROUP
+        OBJECTS
+        {
+            iphelperOpt82agentInfoViolationCnt,
+            iphelperOpt82invalidGatewayIPAddrCnt,
+            iphelperOpt82resetErrStats
+        }
+        STATUS deprecated
+        DESCRIPTION
+             " Collection of objects for Option 82 error statistics."
+        ::= {  alcatelIND1UDPRelayMIBGroups 9}
+
+    dhcpSnoopingGroup  OBJECT-GROUP
+        OBJECTS
+        {
+      dhcpSnoopingBindingDatabaseAction,
+      dhcpSnoopingBindingDatabaseLastSyncTime, 
+      dhcpSnoopingBindingDatabaseSyncTimeout,
+      dhcpSnoopingBindingIfIndex,
+      dhcpSnoopingBindingIpAddress,
+      dhcpSnoopingBindingLeaseTime,
+      dhcpSnoopingBindingMacAddress,
+      dhcpSnoopingBindingPersistencyStatus,
+      dhcpSnoopingBindingRowStatus,
+      dhcpSnoopingBindingStatus,
+      dhcpSnoopingBindingType,
+      dhcpSnoopingBindingVlan,
+      dhcpSnoopingBypassOpt82CheckStatus,
+      dhcpSnoopingMacAddrVerificationStatus,
+      dhcpSnoopingMode,
+      dhcpSnoopingOpt82DataInsertionStatus,
+      dhcpSnoopingOption82FormatASCIIConfigurableDelimiter,
+      dhcpSnoopingOption82FormatASCIIConfigurableField1,
+      dhcpSnoopingOption82FormatASCIIConfigurableField1StrVal,
+      dhcpSnoopingOption82FormatASCIIConfigurableField2,
+      dhcpSnoopingOption82FormatASCIIConfigurableField2StrVal,
+      dhcpSnoopingOption82FormatASCIIConfigurableField3,
+      dhcpSnoopingOption82FormatASCIIConfigurableField3StrVal,
+      dhcpSnoopingOption82FormatASCIIConfigurableField4,
+      dhcpSnoopingOption82FormatASCIIConfigurableField4StrVal,
+      dhcpSnoopingOption82FormatASCIIConfigurableField5,
+      dhcpSnoopingOption82FormatASCIIConfigurableField5StrVal,
+      dhcpSnoopingOption82FormatASCIIConfigurableStatus,
+      dhcpSnoopingOption82FormatType,
+      dhcpSnoopingPortIpSourceFiltering,
+      dhcpSnoopingPortMacAddrViolation,
+      dhcpSnoopingOption82StringValue,
+      dhcpSnoopingClearCounters,
+      dhcpSnoopingClearIsfStatistics,
+      dhcpSnoopingOption82Policy,
+      dhcpSnoopingIpSourceFilterAdminState,
+      dhcpSnoopingDynamicArpInspectionAdminState
+        }
+        STATUS current
+        DESCRIPTION
+             " Collection of objects for DHCP Snooping."
+        ::= {  alcatelIND1UDPRelayMIBGroups 10}
+
+    dhcpSnoopingGroup2  OBJECT-GROUP
+        OBJECTS
+        {
+             dhcpSnoopingPortBindingViolation,
+             dhcpSnoopingPortOption82Violation,
+             dhcpSnoopingPortRelayAgentViolation,
+             dhcpSnoopingPortTrustMode,
+             dhcpSnoopingSourceFilterVlanFilteringStatus,
+             dhcpSnoopingVlanMacAddrVerificationStatus, 
+             dhcpSnoopingPortDhcpServerViolation,
+             dhcpSnoopingVlanOpt82DataInsertionStatus,
+             dhcpSnoopingVlanStatus,
+             dhcpSnoopingClearViolationAction,
+             dhcpSnoopingVlanAdminState
+        }
+        STATUS current
+        DESCRIPTION
+             " Collection of objects for DHCP Snooping."
+        ::= {  alcatelIND1UDPRelayMIBGroups 11}
+
+     alaGenericUdpServiceDstIpGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            alaGenericUdpServiceDstStatTxToIp,
+            alaGenericUdpServiceDstIpRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+                "Objects for Generic UDP Service Destination IP table"
+        ::= {  alcatelIND1UDPRelayMIBGroups 12}
+        
+    alaDhcpRelayInterfaceGroup   OBJECT-GROUP
+        OBJECTS
+        {
+             alaDhcpRelayInterfaceStatus
+        }
+        STATUS current
+        DESCRIPTION
+             " Objects for IP DHCP interface table."
+        ::= {  alcatelIND1UDPRelayMIBGroups 13}
+
+     alaDhcpRelayGlobalConfigGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            alaDhcpRelayStatisticsClear,
+            alaDhcpRelayAdminStatus,
+            alaDhcpRelayForwardDelay,
+            alaDhcpRelayMaximumHops,
+            alaDhcpRelayPxeSupport,
+            alaDhcpRelayInsertAgentInformation,
+            alaDhcpRelayInsertAgentInformationPolicy,
+            alaDhcpRelayPerInterfaceMode,
+            alaDhcpRelayOption82FormatType,
+            alaDhcpRelayOption82StringValue,
+            alaDhcpRelayOption82FormatASCIIConfField1,
+            alaDhcpRelayOption82FormatASCIIConfField1StrVal,
+            alaDhcpRelayOption82FormatASCIIConfField2,
+            alaDhcpRelayOption82FormatASCIIConfField2StrVal,
+            alaDhcpRelayOption82FormatASCIIConfField3,
+            alaDhcpRelayOption82FormatASCIIConfField3StrVal,
+            alaDhcpRelayOption82FormatASCIIConfField4,
+            alaDhcpRelayOption82FormatASCIIConfField4StrVal,
+            alaDhcpRelayOption82FormatASCIIConfField5,
+            alaDhcpRelayOption82FormatASCIIConfField5StrVal,
+            alaDhcpRelayOption82FormatASCIIConfDelimiter,
+            alaDhcpRelayOption82FormatASCIIConfStatus,
+            alaDhcpRelayRxFromClient,
+            alaDhcpRelayMaxHopsViolation,
+            alaDhcpRelayForwardDelayViolation,
+            alaDhcpRelayAgentInfoViolation,
+            alaDhcpRelayInvalidGatewayIp
+        }
+        STATUS current
+        DESCRIPTION
+             " Objects for IP DHCP statistics."
+        ::= {  alcatelIND1UDPRelayMIBGroups 14}
+
+
+    alaDhcpRelayServerDestinationGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            alaDhcpRelayServerDestinationRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+             " Objects for IP DHCP relay server destination."
+        ::= {  alcatelIND1UDPRelayMIBGroups 15}
+        
+    alaDhcpRelayInterfaceAdminStateGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            alaDhcpRelayInterfaceAdminStatus 
+        }
+        STATUS current
+        DESCRIPTION
+             " Objects for IP DHCP relay interface admin status ."
+        ::= {  alcatelIND1UDPRelayMIBGroups 16}
+
+    alaGenericUdpServiceSvcGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            alaGenericUdpServiceStatTxToSvc,
+            alaGenericUdpServiceSvcRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+             " Objects for IP DHCP service SVC."
+        ::= {  alcatelIND1UDPRelayMIBGroups 17}
+
+    alaGenericUdpv6ServiceGroup OBJECT-GROUP	 
+        OBJECTS	 
+        {	 
+            alaGenericUdpv6ServiceDescription,	 
+            alaGenericUdpv6ServiceStatRxFromClient,	 
+            alaGenericUdpv6ServiceRowStatus	 
+        }	 
+        STATUS  current	 
+        DESCRIPTION	 
+             "A collection of objects to support management of IPv6 UDP relay."	 
+        ::= { alcatelIND1UDPRelayMIBGroups 18 } 
+
+    alaGenericUdpv6ServiceDstGroup OBJECT-GROUP	
+        OBJECTS	 
+         {	 
+            alaGenericUdpv6ServiceDstStatTxToDst,
+            alaGenericUdpv6ServiceDstRowStatus	 
+         }	 
+        STATUS  current	 
+        DESCRIPTION	 
+             "A collection of objects to support management of IPv6 UDP relay destination."	 
+        ::= { alcatelIND1UDPRelayMIBGroups 19 }
+
+    alaGenericUdpv6ServiceGlobalGroup   OBJECT-GROUP
+        OBJECTS
+         {
+            alaGenericUdpv6ServiceStatReset
+         }
+        STATUS current
+        DESCRIPTION
+             "Objects for IPv6 UDP relay service group."
+        ::= { alcatelIND1UDPRelayMIBGroups 20 }
+ 
+    alaGenericUdpv6ServiceDstIpGroup   OBJECT-GROUP
+        OBJECTS
+         {
+            alaGenericUdpv6ServiceDstStatTxToIp,
+            alaGenericUdpv6ServiceDstIpRowStatus
+         }
+        STATUS current
+        DESCRIPTION
+             "Objects for IPv6 UDP service destination IPv6 table."
+        ::= { alcatelIND1UDPRelayMIBGroups 21 }
+
+    alaDhcpRelayClearStatisticsGroup   OBJECT-GROUP
+        OBJECTS
+        {
+            alaDhcpRelayClearStatisticsAction
+        }
+        STATUS current
+        DESCRIPTION
+            "Objects for DHCP relay clear group."
+        ::= {  alcatelIND1UDPRelayMIBGroups 22}
+
+    alaDhcpRelayOpt82ErrStatsGroup  OBJECT-GROUP
+        OBJECTS
+        {
+            alaDhcpRelayOpt82ErrStatsAgentInfoViolation,
+            alaDhcpRelayOpt82ErrStatsInvalidGatewayIPAddr,
+            alaDhcpRelayOpt82ErrStatsReset
+        }
+        STATUS current
+        DESCRIPTION
+            "Collection of objects for dhcp relay Option 82 error statistics."
+        ::= {  alcatelIND1UDPRelayMIBGroups 23}
+
+    alaDhcpRelayStatGroup  OBJECT-GROUP
+        OBJECTS
+        {
+            alaDhcpRelayStatInvalidAgentInfoOptFromServer,
+            alaDhcpRelayStatTxToNextHop
+        }
+        STATUS current
+        DESCRIPTION
+            "Collection of objects for management of statistics for IP DHCP Relay Agent."
+        ::= {  alcatelIND1UDPRelayMIBGroups 24}
+        
+    alaDhcpVsoTrapGroup NOTIFICATION-GROUP
+        NOTIFICATIONS
+        {
+            alaDhcpVsoBrokerIpAddress
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of traps for management of DHCP option 43 "
+        ::= {  alcatelIND1UDPRelayMIBGroups 25}
+    
+    alaDhcpVsoTrapObjectGroup OBJECT-GROUP
+        OBJECTS
+        {
+            alaDhcpVsoBrokerIpType,
+            alaDhcpVsoBrokerIp,
+            alaDhcpVsoL4Port,
+            alaDhcpVsoBrokerData,
+            alaDhcpVsoId
+        }
+        STATUS current
+        DESCRIPTION
+        "Collection of trap objects for management of DHCP option 43 "
+        ::= {  alcatelIND1UDPRelayMIBGroups 26}
+
+    alaDhcpSnoopingGlobalCountersGroup OBJECT-GROUP
+        OBJECTS
+        {
+             alaDhcpSnoopingDiscoverPackets,
+             alaDhcpSnoopingOfferPackets,
+             alaDhcpSnoopingRequestPackets,
+             alaDhcpSnoopingAckPackets,
+             alaDhcpSnoopingNackPackets,
+             alaDhcpSnoopingReleasePackets,
+             alaDhcpSnoopingDeclinePackets,
+             alaDhcpSnoopingInformPackets,
+             alaDhcpSnoopingRenewPackets,
+             alaDhcpSnoopingBindingError,
+             alaDhcpSnoopingPacketsDrop,
+             alaDhcpSnoopingPacketsReceiveCmm,
+             alaDhcpSnoopingPacketsTrasmitCmm,
+             alaDhcpSnoopingTotalISFPacketsDrop
+        }
+        STATUS current
+        DESCRIPTION
+             " Objects for IP DHCP statistics."
+        ::= {  alcatelIND1UDPRelayMIBGroups 27}
+
+    alaDhcpSnoopingServiceGroup OBJECT-GROUP
+        OBJECTS
+        {
+             dhcpSnoopingServiceAdminState,
+             dhcpSnoopingServiceMacAddrVerificationStatus,
+             dhcpSnoopingServiceOpt82DataInsertionStatus,
+             dhcpSnoopingServiceRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+             "Collection of objects for dhcp snooping service."
+        ::= {  alcatelIND1UDPRelayMIBGroups 28}
+
+    dhcpSnoopingBindingServiceGroup OBJECT-GROUP
+        OBJECTS
+        {
+             dhcpSnoopingBindingServiceIpAddressType,
+             dhcpSnoopingBindingServiceIpAddress,
+             dhcpSnoopingBindingServiceId,
+             dhcpSnoopingBindingServiceRowStatus,
+             dhcpSnoopingBindingServiceLeaseTime,
+             dhcpSnoopingBindingServiceType
+        }
+        STATUS current
+        DESCRIPTION
+             "Collection of objects for dhcp snooping binding service."
+        ::= {  alcatelIND1UDPRelayMIBGroups 29}
+
+    dhcpSnoopingSapPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+            dhcpSnoopingSapPortTrustMode,
+            dhcpSnoopingSapPortMacAddrViolation,
+            dhcpSnoopingSapPortDhcpServerViolation,
+            dhcpSnoopingSapPortOption82Violation,
+            dhcpSnoopingSapPortRelayAgentViolation,
+            dhcpSnoopingSapPortBindingViolation
+        }
+        STATUS current
+        DESCRIPTION
+             "Collection of objects for dhcp snooping SAP port."
+        ::= {  alcatelIND1UDPRelayMIBGroups 30}
+
+    dhcpSnoopingSdpPortGroup OBJECT-GROUP
+        OBJECTS
+        {
+            dhcpSnoopingSdpPortTrustMode,
+            dhcpSnoopingSdpPortMacAddrViolation,
+            dhcpSnoopingSdpPortDhcpServerViolation,
+            dhcpSnoopingSdpPortOption82Violation,
+            dhcpSnoopingSdpPortRelayAgentViolation,
+            dhcpSnoopingSdpPortBindingViolation
+        }
+        STATUS current
+        DESCRIPTION
+             "Collection of objects for dhcp snooping SDP port."
+        ::= {  alcatelIND1UDPRelayMIBGroups 31}
+
+    dhcpSnoopingSourceFilterServiceGroup OBJECT-GROUP
+        OBJECTS
+        {
+             dhcpSnoopingSourceFilterServiceFilteringStatus
+        }
+        STATUS current
+        DESCRIPTION
+             "Collection of objects for dhcp snooping source filter service."
+        ::= {  alcatelIND1UDPRelayMIBGroups 32}
+
+END
+

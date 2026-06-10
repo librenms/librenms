@@ -1,0 +1,459 @@
+NETGEAR-TIMERANGE-MIB  DEFINITIONS ::= BEGIN
+
+-- Netgear Inc NETGEAR Time Range  MIB
+-- Copyright Netgear Inc (2009) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+  MODULE-IDENTITY, OBJECT-TYPE,
+  Integer32                            FROM SNMPv2-SMI
+  Unsigned32                           FROM SNMPv2-SMI
+  DisplayString                        FROM RFC1213-MIB
+  RowStatus                            FROM SNMPv2-TC
+  TEXTUAL-CONVENTION                   FROM SNMPv2-TC
+  lb6m                             FROM QUANTA-LB6M-REF-MIB;
+  fastPathTimeRange                      MODULE-IDENTITY
+
+        LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The Netgear Private MIB for NETGEAR Time Ranges"
+
+        -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200909240000Z" -- 24 September 2009 12:00:00 GMT
+        DESCRIPTION
+          "Initial version."
+
+    ::= { lb6m 53 }
+
+fastPathTimeRangeGroup   OBJECT IDENTIFIER ::=  {fastPathTimeRange 1}
+
+--**************************************************************************************
+  TimeRangeAbsoluteDateAndTime ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT 
+      "2d-1d-1d,1d:1d"
+    STATUS current
+    DESCRIPTION
+      "A date-time specification for absolute time entry in a time range.
+      
+      field  octets  contents                  range
+      -----  ------  --------                  -----
+        1      1-2   year                      0..65536
+        2       3    month                     1..12
+        3       4    day                       1..31
+        4       5    hour                      0..23
+        5       6    minutes                   0..59
+              
+      For example, Oct 9, 2009 at 1:30 PM would be
+      displayed as:
+      
+                      2009-10-9,13:30."
+    SYNTAX OCTET STRING (SIZE (6))
+
+  TimeRangePeriodicTime ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT 
+      "1d:1d"
+    STATUS current
+    DESCRIPTION
+      "A time specification for periodic time entry in a time range.
+      
+      field  octets  contents                  range
+      -----  ------  --------                  -----
+        1       1    hour                      0..23
+        1       1    minutes                   0..59
+              
+      For example,1:30 PM would be
+      displayed as: 13:30."
+    SYNTAX OCTET STRING (SIZE (2))
+
+  TimeRangePeriodicDate ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2d-1d-1d"
+    STATUS current
+    DESCRIPTION
+      "A date specification for periodic time entry in a time range.
+      
+      field  octets  contents                  range
+      -----  ------  --------                  -----
+        1      1-2   year                      1993..2035
+        2       3    month                     1..12
+        3       4    day                       1..31
+              
+      For example, Oct 9, 2009 would be displayed as:
+                      2009-10-9"
+    SYNTAX OCTET STRING (SIZE (4))
+
+    timeRangeAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "TimeRange admin mode:
+                     enable - enable TimeRange
+                     disable - disable TimeRange."
+         DEFVAL { disable }
+    ::= { fastPathTimeRangeGroup 1 }
+
+    timeRangeIndexNextFree OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+                     "This object contains an unused value for the timeRangeIndex
+                      to be used when creating a new TimeRange.  A value of zero
+                      indicates the TimeRange table is full."
+    ::= { fastPathTimeRangeGroup 2 }  
+
+    --**************************************************************************************
+
+    timeRangeTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF TimeRangeEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of TimeRange instances."
+         ::= { fastPathTimeRangeGroup 3 }  
+
+    timeRangeEntry OBJECT-TYPE
+         SYNTAX      TimeRangeEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "timeRangeIndex and timeRangeName must be set to 
+                      complete a new timeRangeEntry  instance"
+         INDEX       { timeRangeIndex }
+         ::= { timeRangeTable 1 }
+
+    TimeRangeEntry ::= SEQUENCE {
+           timeRangeIndex
+               Unsigned32,
+           timeRangeName
+               DisplayString,
+           timeRangeOperState
+               INTEGER,
+           timeRangeStatus
+               RowStatus               
+           }
+
+    timeRangeIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The TimeRange table index this instance is associated with."
+         ::= { timeRangeEntry 1 }
+
+    timeRangeName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..31))
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The name of this TimeRange entry, which must consist of
+                      1 to 31 alphanumeric characters and uniquely identify
+                      this TimeRange.
+
+                      This object must be set to complete a new TimeRange
+                      row instance."
+         ::= { timeRangeEntry 2 }
+
+    timeRangeOperState OBJECT-TYPE
+         SYNTAX      INTEGER {
+                               active(0),
+                               inactive(1)
+                             }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Operating status of the time-range. It depends on the current time
+                      and the periodic and absolute time entries defined in the time-range" 
+         ::= { timeRangeEntry 3 }
+
+    timeRangeStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+
+                     active(1)      - this TimeRange instance is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { timeRangeEntry 4 }
+
+
+    --**************************************************************************************
+
+
+    --**************************************************************************************
+    -- Time Range Entry tables
+    --
+    --**************************************************************************************
+
+    timeRangeAbsoluteEntryTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF TimeRangeAbsoluteEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of absolute entries for  time ranges"
+         ::= { fastPathTimeRangeGroup 4 }  
+
+    timeRangeAbsoluteEntry OBJECT-TYPE
+         SYNTAX      TimeRangeAbsoluteEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                   "A table of absolute entries for time ranges. Atleast one of 
+                    timeRangeAbsoluteStartDateAndTime and timeRangeAbsoluteEndDateAndTime 
+                    must be set to complete a new Absolute entry instance."
+
+         INDEX       { timeRangeIndex, timeRangeAbsoluteEntryIndex }
+         ::= { timeRangeAbsoluteEntryTable 1 }
+
+    TimeRangeAbsoluteEntry ::= SEQUENCE {
+           timeRangeAbsoluteEntryIndex
+                    Integer32,
+           timeRangeAbsoluteStartDateAndTime
+                    TimeRangeAbsoluteDateAndTime,
+           timeRangeAbsoluteEndDateAndTime
+                    TimeRangeAbsoluteDateAndTime,
+            timeRangeAbsoluteStatus
+                    RowStatus
+           }
+    timeRangeAbsoluteEntryIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..10)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of this absolute time entry within time range."
+         ::= { timeRangeAbsoluteEntry 1 }    
+    
+   timeRangeAbsoluteStartDateAndTime OBJECT-TYPE
+         SYNTAX      TimeRangeAbsoluteDateAndTime
+         MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                     "The start time for an absolute entry in the time range"
+         ::= { timeRangeAbsoluteEntry 2 }
+
+   timeRangeAbsoluteEndDateAndTime OBJECT-TYPE
+         SYNTAX      TimeRangeAbsoluteDateAndTime
+         MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                     " The end time for an absolute entry in the time range."
+         ::= { timeRangeAbsoluteEntry 3 }
+         
+    timeRangeAbsoluteStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+
+                     active(1)      - this timeRangeAbsoluteEntry is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { timeRangeAbsoluteEntry  4}
+         
+   timeRangePeriodicEntryTable OBJECT-TYPE
+          SYNTAX      SEQUENCE OF TimeRangePeriodicEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                      "A table periodic entries for  time ranges"
+          ::= { fastPathTimeRangeGroup 5 }  
+    
+   timeRangePeriodicEntry OBJECT-TYPE
+          SYNTAX      TimeRangePeriodicEntry
+          MAX-ACCESS  not-accessible
+          STATUS      current
+          DESCRIPTION
+                     "A table periodic entries for  time ranges. All the objects
+                      in the periodic entry must be set to complete a new periodic 
+                      entry instance. Objects timeRangePeriodicStartDay and  
+                      timeRangePeriodicStartTime together forms the start dayandtime 
+                      and  objects timeRangePeriodicEndDay and timeRangePeriodicEndTime 
+                      toghetehr forms end dayandtime. The time range to which the 
+                      periodic entry belongs is active between start dayandtime and
+                      end dayandtime. If more than one day is specified in the 
+                      timeRangePeriodicStartDay, then the same days should be specified 
+                      in the  timeRangePeriodicEndDay "
+
+          INDEX       {timeRangeIndex, timeRangePeriodicEntryIndex}
+          ::= { timeRangePeriodicEntryTable 1 } 
+    
+   TimeRangePeriodicEntry ::= SEQUENCE {
+          timeRangePeriodicEntryIndex
+                  Integer32,
+          timeRangePeriodicFrequency
+	          Integer32,
+          timeRangePeriodicPattern
+                  Integer32,
+          timeRangePeriodicDayMask
+                  Integer32,
+          timeRangePeriodicStartDate
+	          TimeRangePeriodicDate,
+          timeRangePeriodicStartDay
+                  BITS,
+          timeRangePeriodicStartTime
+                  TimeRangePeriodicTime,                   
+          timeRangePeriodicEndDate
+	          TimeRangePeriodicDate,
+          timeRangePeriodicEndDay
+                  BITS,
+          timeRangePeriodicEndTime
+                  TimeRangePeriodicTime,
+          timeRangePeriodicStatus
+                    RowStatus
+    }
+    
+   timeRangePeriodicEntryIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..10)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The index of this periodic entry within time range."
+         ::= { timeRangePeriodicEntry 1 }   
+         
+   timeRangePeriodicFrequency OBJECT-TYPE
+         SYNTAX      Integer32 (0..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The frequency of this periodic entry within the time range."
+         ::= { timeRangePeriodicEntry 2 }
+
+   timeRangePeriodicPattern OBJECT-TYPE
+        SYNTAX      Integer32 (0..2)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                     "The pattern for a periodic entry in the time range.
+                     Can be one of the following:
+                       0 - weekly,
+                       1 - daily,
+                       2 - monthly."
+        ::= { timeRangePeriodicEntry 3 }
+
+   timeRangePeriodicDayMask OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                    "Depending on the value of the timeRangeEntryPattern 
+                    this field can have different meanings. In case 
+                    timeRangeEntryPattern is set to 'daily' or 'weekly' 
+                    the field contains a bitmap where each bit presents 
+                    a day of week. Structure of the bitmap is the following :
+                      bit 0 - sunday,
+                      bit 1 - monday,
+                      bit 2 - tuesday,
+                      bit 3 - wednesday,
+                      bit 4 - thursday,
+                      bit 5 - friday,
+                      bit 6 - saturday. 
+                    In case timeRangeEntryPattern is set to 'monthly' 
+                    the field contains a day of month (1..31)."
+        ::= { timeRangePeriodicEntry 4 }
+
+   timeRangePeriodicStartDate OBJECT-TYPE
+        SYNTAX      TimeRangePeriodicDate
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                    "The start date for a periodic entry in the time range"
+        ::= { timeRangePeriodicEntry 5 }
+
+  timeRangePeriodicStartDay OBJECT-TYPE
+         SYNTAX      BITS {
+         sunday(1),
+         monday(2),
+         tuesday(3),
+         wednesday(4),
+         thursday(5),
+         friday(6),
+         saturday(7)
+         }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The starting day or days on which the configuration that
+                     referenced the time range starts going into effect. 
+                     Same day can be set for both timeRangePeriodicStartDay and 
+                     timeRangePeriodicEndDay objects "
+         ::= { timeRangePeriodicEntry 6 }
+         
+   timeRangePeriodicStartTime OBJECT-TYPE
+        SYNTAX      TimeRangePeriodicTime
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                     "The starting time for an periodic entry in the time range."
+         ::= { timeRangePeriodicEntry 7 }
+
+   timeRangePeriodicEndDate OBJECT-TYPE
+        SYNTAX      TimeRangePeriodicDate
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                    "The end date for a periodic entry in the time range"
+        ::= { timeRangePeriodicEntry 8 }
+
+   timeRangePeriodicEndDay OBJECT-TYPE
+         SYNTAX      BITS {
+         sunday(1),
+         monday(2),
+         tuesday(3),
+         wednesday(4),
+         thursday(5),
+         friday(6),
+         saturday(7)
+         }
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The ending day or days on which the configuration that 
+                     referenced the  time range is no longer in efect. 
+                     Same day can be set for both timeRangePeriodicStartDay 
+                     and timeRangePeriodicEndDay objects"
+         ::= { timeRangePeriodicEntry  9 }
+         
+   timeRangePeriodicEndTime OBJECT-TYPE
+        SYNTAX      TimeRangePeriodicTime
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+                     "The end time for an periodic entry in the time range.
+                      Use end time 00:00 to specify last minute of the day."
+         ::= { timeRangePeriodicEntry 10 }
+         
+   timeRangePeriodicStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "Status of this instance.
+
+                     active(1)      - this timeRangePeriodicEntry is active
+                     createAndGo(4) - set to this value to create an instance
+                     destroy(6)     - set to this value to delete an instance"
+         ::= { timeRangePeriodicEntry 11 }
+END

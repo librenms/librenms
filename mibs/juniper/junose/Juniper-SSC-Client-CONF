@@ -1,0 +1,114 @@
+
+-- *****************************************************************************
+-- Juniper-SSC-Client-CONF
+--
+-- SNMP Agent Capabilities definitions for the SSC Client MIB.
+--
+-- Copyright (c) 2001 Unisphere Networks, Inc.
+-- Copyright (c) 2002, 2003 Juniper Networks, Inc.
+--   All rights reserved.
+-- *****************************************************************************
+
+Juniper-SSC-Client-CONF  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    AGENT-CAPABILITIES
+        FROM SNMPv2-CONF
+    juniAgents
+        FROM Juniper-Agents;
+
+juniSscClientAgent  MODULE-IDENTITY
+    LAST-UPDATED "200311182111Z"  -- 18-Nov-03 05:11 PM EDT
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        E-mail: mib@Juniper.net"
+    DESCRIPTION
+        "The agent capabilities definitions for the Service Selection Center
+        (SSC) Client component of the SNMP agent in the Juniper E-series family
+        of products."
+    -- Revision History
+    REVISION    "200311182111Z"  -- 18-Nov-03 05:11 PM EDT  - JUNOSe 5.3
+    DESCRIPTION
+        "Obsoleted token and added discover scalar statistics."
+    REVISION    "200209061654Z"  -- 06-Sep-02 12:54 PM EDT  - JUNOSe 5.0
+    DESCRIPTION
+        "Replaced Unisphere names with Juniper names."
+    REVISION    "200109192029Z"  -- 19-Sep-01 04:29 PM EDT  - JUNOSe 4.0
+    DESCRIPTION
+        "Add version number object."
+    REVISION    "200103301518Z"  -- 30-Mar-01 10:18 AM EST  - JUNOSe 3.2
+    DESCRIPTION
+        "The initial release of this management information module."
+    ::= { juniAgents 41 }
+
+
+-- *****************************************************************************
+-- SSC Client SNMP Agent Capabilities definitions
+-- *****************************************************************************
+juniSscClientAgentV1  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 1 of the SSC Client component of the JUNOSe SNMP agent.  This
+        version of the SSC Client component was supported in JUNOSe 2.0 thru 3.0
+        system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the SSC Client application in
+        JUNOSe.  These capabilities became obsolete when DHCP-LS, Web and SSC
+        support objects were added to the MIB."
+    SUPPORTS    Juniper-SSC-CLIENT-MIB
+        INCLUDES {
+            juniSscClientGroup }
+    ::= { juniSscClientAgent 1 }
+
+juniSscClientAgentV2  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 2 of the SSC Client component of the JUNOSe SNMP agent.  This
+        version of the SSC Client component was supported in JUNOSe 3.1 and
+        subsequent 3.x system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the SSC Client application in
+        JUNOSe.  These capabilities became obsolete when the version number
+        object was added to the MIB."
+    SUPPORTS    Juniper-SSC-CLIENT-MIB
+        INCLUDES {
+            juniSscClientGroup2 }
+    ::= { juniSscClientAgent 2 }
+
+juniSscClientAgentV3  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 3 of the SSC Client component of the JUNOSe SNMP agent.  This
+        version of the SSC Client component was supported in JUNOSe 4.0 through
+        5.2 system releases."
+    STATUS      obsolete
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the SSC Client application in
+        JUNOSe.  These capabilities became obsolete when token scalar statistics
+        were obsoleted and discover scalar statistics were added."
+    SUPPORTS    Juniper-SSC-CLIENT-MIB
+        INCLUDES {
+            juniSscClientGroup3 }
+    ::= { juniSscClientAgent 3 }
+
+juniSscClientAgentV4  AGENT-CAPABILITIES
+    PRODUCT-RELEASE
+        "Version 4 of the SSC Client component of the JUNOSe SNMP agent.  This
+        version of the SSC Client component is supported in JUNOSe 5.3 and
+        subsequent system releases."
+    STATUS      current
+    DESCRIPTION
+        "The MIB supported by the SNMP agent for the SSC Client application in
+        JUNOSe."
+    SUPPORTS    Juniper-SSC-CLIENT-MIB
+        INCLUDES {
+            juniSscClientGroup4 }
+    ::= { juniSscClientAgent 4 }
+
+END

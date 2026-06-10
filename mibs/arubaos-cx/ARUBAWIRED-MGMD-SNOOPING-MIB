@@ -1,0 +1,1447 @@
+--**MOD+***********************************************************************
+--* Module:    ARUBAWIRED-MGMD-SNOOPING-MIB.mib
+--*
+--* (c) Copyright 2017 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--*
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett-Packard Development Company, L.P.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett-Packard Development Company, L.P.
+--*
+--* Purpose: This file contains MIB definition of AURBAWIRED-MGMD-SNOOPING-MIB
+--*
+--**MOD-***********************************************************************
+
+ARUBAWIRED-MGMD-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,
+        Counter32, Unsigned32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, TruthValue, RowStatus
+            FROM SNMPv2-TC
+        wndFeatures
+            FROM ARUBAWIRED-NETWORKING-OID
+        TimeTicks
+            FROM SNMPv2-SMI
+        InetAddress, InetAddressType
+            FROM INET-ADDRESS-MIB
+        PortList
+            FROM Q-BRIDGE-MIB;
+
+    arubaWiredMgmdSnoopingMIB MODULE-IDENTITY
+        LAST-UPDATED "201711020000Z" -- November 02, 2017
+        ORGANIZATION "HPE/Aruba Networking Division"
+        CONTACT-INFO "Hewlett Packard Company
+                       8000 Foothills Blvd.
+                       Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HPE proprietary
+                      mib definitions for managing MGMD Snooping
+                      services."
+        REVISION     "201711020000Z" -- November 02, 2017
+        DESCRIPTION  "Initial revision."
+
+        ::= { wndFeatures 3 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+    MgmdSnoopingGroupTypeDefinition ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION "This type distinguishes the different ways of
+                     tracking groups on this device having
+                     multicast joins. The method of tracking is primarily
+                     determined by the MGMD Snooping feature configuration.
+                     In particular if the snooping feature is enabled then
+                     port level tracking is the default, which results in
+                     Filtered groups. When users create static groups
+                     these groups will be categorized as static and
+                     groups will exist till user unconfigure them."
+        SYNTAX       INTEGER { filtered(1), static(2)}
+
+    MgmdSnoopingConfigPortModeType ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+             "Mode in auto means MGMD Snooping will be working
+              as per specs on these ports that is when a join comes for
+              a group on this port data packets sent to that group
+              will be forwarded on that port. Blocked means all
+              outgoing data packets and incoming joins will be blocked
+              on that port.Forward means all the packets irrespective
+              of whether the join is received for a group or not
+              packets will be sent or received on these ports in
+              other wording forwarded ports acts like router detected
+              ports."
+        SYNTAX       INTEGER {auto (1), blocked (2), forward (3)}
+
+-- **********************************************************************
+-- The MGMD Snooping MIB Groups
+-- **********************************************************************
+    arubaWiredMgmdSnoopingObjects     OBJECT IDENTIFIER ::= { arubaWiredMgmdSnoopingMIB 1 }
+
+    arubaWiredMgmdSnoopingConformance OBJECT IDENTIFIER ::= { arubaWiredMgmdSnoopingMIB 2 }
+    arubaWiredMgmdSnoopingGroups      OBJECT IDENTIFIER ::= { arubaWiredMgmdSnoopingConformance 1 }
+    arubaWiredMgmdSnoopingCompliances OBJECT IDENTIFIER ::= { arubaWiredMgmdSnoopingConformance 2 }
+
+
+-- **********************************************************************
+-- Start of MIB objects - IGMP Snooping scalars
+-- **********************************************************************
+
+    arubaWiredMgmdIgmpSnoopingControlDropUnknownMulticast OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When enabled along with IGMP Snooping, any
+                     IP Multicast packets that are not joined by an
+                     IGMP host will be restricted to ports that have
+                     detected a multicast router or ports that are configured
+                     to always forward IP multicast.  When set to disabled
+                     or when IGMP Snooping is disabled, the unjoined IP
+                     multicast packets will be flooded out all ports in the
+                     VLAN. Permanently assigned multicast addresses are always
+                     flooded and so are not impacted by this object."
+        DEFVAL      {true}
+        ::= { arubaWiredMgmdSnoopingObjects 1 }
+
+    arubaWiredMgmdIgmpSnoopingEnabledVLANCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of VLANs with IGMP Snooping
+                     enabled."
+        ::= { arubaWiredMgmdSnoopingObjects 2 }
+
+    arubaWiredMgmdIgmpSnoopingMcastGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of Multicast groups joined."
+        ::= { arubaWiredMgmdSnoopingObjects 3 }
+
+   arubaWiredMgmdIgmpSnoopingMcastFilteredGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of groups being traced across all
+                     VLANs on a per port basis. Traffic for these groups
+                     will be filtered to flow only to ports with active joins,
+                     subject to hardware resource limitations such as the
+                     maximum number of groups supported by the hardware."
+        ::= { arubaWiredMgmdSnoopingObjects 4 }
+
+    arubaWiredMgmdIgmpSnoopingMcastExcludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  "Number of multicast groups in the EXCLUDE mode."
+        ::= { arubaWiredMgmdSnoopingObjects 5 }
+
+    arubaWiredMgmdIgmpSnoopingMcastIncludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION  "Number of multicast groups in the INCLUDE mode."
+        ::= { arubaWiredMgmdSnoopingObjects 6 }
+
+-- **********************************************************************
+-- MLD Snooping scalars
+-- **********************************************************************
+
+    arubaWiredMgmdMldSnoopingControlDropUnknownMulticast OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "When enabled along with MLD Snooping, any IPv6
+                     Multicast packets that are not joined by an MLD host
+                     will be restricted to ports that have detected a
+                     multicast router or ports that are configured to
+                     always forward IPv6 multicast.  When set to disabled
+                     or when MLD Snooping is disabled, the unjoined IPv6
+                     multicast packets will be flooded out all ports in the
+                     VLAN. Permanently assigned multicast addresses are always
+                     flooded and so are not impacted by this object."
+        DEFVAL      { true }
+        ::= { arubaWiredMgmdSnoopingObjects 7 }
+
+    arubaWiredMgmdMldSnoopingEnabledVLANCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of VLANs with MLD Snooping
+                     enabled."
+        ::= { arubaWiredMgmdSnoopingObjects 8 }
+
+    arubaWiredMgmdMldSnoopingMcastGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of Multicast groups joined."
+        ::= { arubaWiredMgmdSnoopingObjects 9 }
+
+    arubaWiredMgmdMldSnoopingMcastExcludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of  multicast groups in EXCLUDE mode."
+        ::= { arubaWiredMgmdSnoopingObjects 10 }
+
+    arubaWiredMgmdMldSnoopingMcastIncludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of  multicast groups in INCLUDE mode."
+        ::= { arubaWiredMgmdSnoopingObjects 11 }
+
+   arubaWiredMgmdMldSnoopingMcastFilteredGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of groups being traced across all
+                     VLANs on a per port basis. Traffic for these groups
+                     will be filtered to flow only to ports with active joins,
+                     subject to hardware resource limitations such as the
+                     maximum number of groups supported by the hardware."
+        ::= { arubaWiredMgmdSnoopingObjects 12  }
+
+    arubaWiredMgmdMldSnoopingSendRouterAlertPaddingOption OBJECT-TYPE
+        SYNTAX          INTEGER { default(1), alternativePadding(2), disabled(3)}
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This enumerated value indicates whether the router alert
+                         option has to include padding after option type (1),
+                         include padding before option type (2) or should not
+                         be sent(3)."
+        ::= { arubaWiredMgmdSnoopingObjects 13 }
+
+-- **********************************************************************
+-- The arubaWiredMgmd Snooping VLAN table
+-- **********************************************************************
+
+    arubaWiredMgmdSnoopingVlanTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ArubaWiredMgmdSnoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table object contains the MGMD Snooping VLAN information."
+        ::= { arubaWiredMgmdSnoopingObjects 14 }
+
+    arubaWiredMgmdSnoopingVlanEntry OBJECT-TYPE
+        SYNTAX      ArubaWiredMgmdSnoopingVlanEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the mgmdSnoopingVlanTable."
+        INDEX    {
+                   arubaWiredMgmdSnoopingVlanEntryVid,
+                   arubaWiredMgmdSnoopingVlanEntryType
+                 }
+        ::= { arubaWiredMgmdSnoopingVlanTable 1 }
+
+    ArubaWiredMgmdSnoopingVlanEntry ::=
+        SEQUENCE {
+            arubaWiredMgmdSnoopingVlanEntryVid                                 Unsigned32,
+            arubaWiredMgmdSnoopingVlanEntryType                                InetAddressType,
+            arubaWiredMgmdSnoopingVlanEntrySnoopingFeature                     TruthValue,
+            arubaWiredMgmdSnoopingVlanEntryControlDropUnknownMulticastStatus   TruthValue,
+            arubaWiredMgmdSnoopingVlanEntryQuerierPort                         Unsigned32,
+            arubaWiredMgmdSnoopingVlanEntryFilteredJoins                       Unsigned32,
+            arubaWiredMgmdSnoopingVlanEntryPortsWithMcastRouter                PortList,
+            arubaWiredMgmdSnoopingVlanEntryStatGeneralQueryRx                  Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatGSQRx                           Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV1ReportRx                      Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV2ReportRx                      Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV3ReportRx                      Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV2LeaveRx                       Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatUnknownTypeRx                   Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatForwardToRoutersTx              Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatForwardToAllPortsTx             Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatJoinTimeouts                    Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStaticJoins                         Unsigned32,
+            arubaWiredMgmdSnoopingVlanEntryOtherQuerierInterval                Unsigned32,
+            arubaWiredMgmdSnoopingVlanEntryOtherQuerierExpiryTime              TimeTicks,
+            arubaWiredMgmdSnoopingVlanEntryOtherQuerierRobustness              Unsigned32,
+            arubaWiredMgmdSnoopingVlanEntryStatExcludeGroupJoinsCount          Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatIncludeGroupJoinsCount          Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatFilteredExcludeGroupJoinsCount  Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatFilteredIncludeGroupJoinsCount  Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV1QueryRx                       Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV2QueryRx                       Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV3QueryRx                       Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatGSSQRx                          Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatMalformedPktRx                  Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatBadCheckSumRx                   Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatMartianSourceRx                 Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatPacketsRxOnDisabled             Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV2GSQRx                         Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatV3GSQRx                         Counter32,
+            arubaWiredMgmdSnoopingVlanEntryStatWrongVersionQueries             Counter32
+        }
+
+    arubaWiredMgmdSnoopingVlanEntryVid OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "The vid value of the VLAN for which MGMD Snooping
+                     is enabled.  The table is indexed by the vid value and
+                     the InetAddressType to allow for VLANs that may be
+                     configured in both IPv4 and IPv6 modes."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 1 }
+
+    arubaWiredMgmdSnoopingVlanEntryType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address type of this VLAN.  This entry along with
+             the vid value acts as the index to the mgmdSnoopingVlanTable.
+             A VLAN may be configured in multiple modes concurrently,
+             e.g., in IPv4 and IPv6 modes connected to the
+             same VLAN; however, the traffic is considered to be
+             logically separate."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 2 }
+
+    arubaWiredMgmdSnoopingVlanEntrySnoopingFeature OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Turns MGMD Snooping feature on and off."
+        DEFVAL      { false }
+        ::= { arubaWiredMgmdSnoopingVlanEntry 3 }
+
+    arubaWiredMgmdSnoopingVlanEntryControlDropUnknownMulticastStatus OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The operational status of the MGMD Snooping Control
+                     Unknown Multicast mode. A value of true indicates the
+                     mgmdSnoopingVlanEntryControlDropUnknownMulticastStatus setting
+                     is operational. A value of false indicates the
+                     mgmdSnoopingVlanEntryControlDropUnknownMulticastStatus setting
+                     is not operational."
+        DEFVAL      {false}
+        ::= { arubaWiredMgmdSnoopingVlanEntry 4 }
+
+    arubaWiredMgmdSnoopingVlanEntryQuerierPort OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Logical port which the querier is connected to. This is
+                     determined by the presence of querier packets on this port."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 5 }
+
+    arubaWiredMgmdSnoopingVlanEntryFilteredJoins OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Current total count of groups on this VLAN being
+                     tracked on a per port basis. Traffic for these groups
+                     will be filtered to flow only to ports with active joins,
+                     subject to hardware resource limitations such as the
+                     maximum number of groups supported by the hardware."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 6 }
+
+    arubaWiredMgmdSnoopingVlanEntryPortsWithMcastRouter OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "List of multicast router detected ports on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 7 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatGeneralQueryRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of General Queries received by this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 8 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatGSQRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Number of Group Specific Queries received by this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  9 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV1ReportRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of MGMD v1 reports received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  10 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV2ReportRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of MGMD v2 reports received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  11 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV3ReportRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of MGMD v3 reports received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  12 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV2LeaveRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+              "Number of MGMD V2 Leave Messages received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  13 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatUnknownTypeRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Number of Unknown type MGMD packets received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  14 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatForwardToRoutersTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of packets forwarded to router detected
+                     ports on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  15 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatForwardToAllPortsTx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of packets sent out on all ports of this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  16 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatJoinTimeouts OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of times joins got timed out on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  17 }
+
+    arubaWiredMgmdSnoopingVlanEntryStaticJoins OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Total count of user created static groups on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 18 }
+
+    arubaWiredMgmdSnoopingVlanEntryOtherQuerierInterval    OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..255)
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The length of time that must pass before a multicast router
+              decides that there is no longer another multicast router
+              which should be the querier.  This value MUST be ((the
+              Robustness Variable) times (the Query Interval)) plus
+              (one half of one Query Response Interval)."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  19 }
+
+    arubaWiredMgmdSnoopingVlanEntryOtherQuerierExpiryTime  OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The minimum amount of time remaining before a multicast router
+              decides that there is no longer another multicast router
+              which should be the querier."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  20 }
+
+    arubaWiredMgmdSnoopingVlanEntryOtherQuerierRobustness OBJECT-TYPE
+        SYNTAX     Unsigned32 (1..255)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The Robustness Variable allows tuning for the expected
+             packet loss on a subnet.  If a subnet is expected to be
+             lossy, the Robustness Variable may be increased. MGMD
+             is robust to (Robustness Variable-1) packet losses."
+        DEFVAL     { 2 }
+        ::= { arubaWiredMgmdSnoopingVlanEntry  21 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatExcludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Current  number of groups on this VLAN which are
+              in EXCLUDE mode "
+        ::= { arubaWiredMgmdSnoopingVlanEntry 22 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatIncludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current  number of groups on this VLAN which are
+             in INCLUDE mode "
+        ::= { arubaWiredMgmdSnoopingVlanEntry 23 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatFilteredExcludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Current  number of filtered groups on this VLAN
+             which are in EXCLUDE mode "
+        ::= { arubaWiredMgmdSnoopingVlanEntry 24 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatFilteredIncludeGroupJoinsCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "Current  number of filtered groups on this VLAN
+              which are in INCLUDE mode "
+        ::= { arubaWiredMgmdSnoopingVlanEntry 25 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV1QueryRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of V1 Queries received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 26 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV2QueryRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of V2 Queries received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 27 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV3QueryRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of V3 Queries received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 28 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatGSSQRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of Group Source Specific Queries received
+              on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 29 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatMalformedPktRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of malformed packets received on this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 30 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatBadCheckSumRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of bad checksum packets received on this
+              VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 31 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatMartianSourceRx   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of packets received on this VLAN from
+              Martian source. Martian source are the packets with
+              invalid source address, e.g 255.255.255.255"
+        ::= { arubaWiredMgmdSnoopingVlanEntry 32 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatPacketsRxOnDisabled OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of MGMD packets received on this VLAN
+              when MGMD is disabled."
+        ::= { arubaWiredMgmdSnoopingVlanEntry 33 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV2GSQRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The number of MGMD V2 group specific queries received on
+              this VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  34 }
+
+    arubaWiredMgmdSnoopingVlanEntryStatV3GSQRx OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of MGMD V2 group specific queries received on this
+             VLAN."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  35 }
+
+     arubaWiredMgmdSnoopingVlanEntryStatWrongVersionQueries OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The number of general queries received whose MGMD
+                     version does not match the equivalent VLAN Version."
+        ::= { arubaWiredMgmdSnoopingVlanEntry  36 }
+
+-- **********************************************************************
+-- The MGMD Snooping Cache Table
+-- **********************************************************************
+
+    arubaWiredMgmdSnoopingCacheTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MgmdSnoopingCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The table listing the IP multicast groups for
+                     which there are members on a particular VLAN."
+        ::= { arubaWiredMgmdSnoopingObjects 15 }
+
+    arubaWiredMgmdSnoopingCacheEntry OBJECT-TYPE
+        SYNTAX      MgmdSnoopingCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the arubaWiredMgmdSnoopingCacheTable."
+        INDEX      {
+                     arubaWiredMgmdSnoopingCacheVid,
+                     arubaWiredMgmdSnoopingCacheAddressType,
+                     arubaWiredMgmdSnoopingCacheAddress
+                   }
+        ::= { arubaWiredMgmdSnoopingCacheTable 1 }
+
+    MgmdSnoopingCacheEntry ::=
+        SEQUENCE {
+            arubaWiredMgmdSnoopingCacheVid                     Unsigned32,
+            arubaWiredMgmdSnoopingCacheAddressType             InetAddressType,
+            arubaWiredMgmdSnoopingCacheAddress                 InetAddress,
+            arubaWiredMgmdSnoopingCacheSelf                    TruthValue,
+            arubaWiredMgmdSnoopingCacheLastReporter            InetAddress,
+            arubaWiredMgmdSnoopingCacheUpTime                  TimeTicks,
+            arubaWiredMgmdSnoopingCacheExpiryTime              TimeTicks,
+            arubaWiredMgmdSnoopingCacheGroupType               MgmdSnoopingGroupTypeDefinition,
+            arubaWiredMgmdSnoopingCacheJoinedPorts             PortList,
+            arubaWiredMgmdSnoopingCacheStatus                  RowStatus,
+            arubaWiredMgmdSnoopingCacheQueriesRcvd             Counter32,
+            arubaWiredMgmdSnoopingCacheJoinsRcvd               Counter32,
+            arubaWiredMgmdSnoopingCacheFilterMode              INTEGER,
+            arubaWiredMgmdSnoopingCacheExcludeModeExpiryTimer  TimeTicks,
+            arubaWiredMgmdSnoopingCacheVersion1HostTimer       TimeTicks,
+            arubaWiredMgmdSnoopingCacheVersion2HostTimer       TimeTicks,
+            arubaWiredMgmdSnoopingCacheSrcCount                Counter32
+        }
+
+    arubaWiredMgmdSnoopingCacheVid OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "The VLAN for which this entry contains information
+                     for an IP multicast group address."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 1 }
+
+    arubaWiredMgmdSnoopingCacheAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address type of the InetAddress variables in this
+             table."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 2 }
+
+    arubaWiredMgmdSnoopingCacheAddress OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION "The IP multicast group address for which this entry
+                     contains information."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 3 }
+
+    arubaWiredMgmdSnoopingCacheSelf OBJECT-TYPE
+        SYNTAX     TruthValue
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION "An indication of whether the local system is a member of
+                     this group address on this VLAN."
+        DEFVAL       {true}
+       ::= { arubaWiredMgmdSnoopingCacheEntry 4 }
+
+    arubaWiredMgmdSnoopingCacheLastReporter OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The IP address of the source of the last membership
+                     report received for this IP Multicast group address on
+                     this VLAN.  If no membership report has been received,
+                     this object has the value 0.0.0.0. or 0::0"
+        ::= { arubaWiredMgmdSnoopingCacheEntry 5 }
+
+    arubaWiredMgmdSnoopingCacheUpTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The time elapsed since this entry was created."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 6 }
+
+    arubaWiredMgmdSnoopingCacheExpiryTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The minimum amount of time remaining before this entry
+                     will be aged out. A value of 0 indicates that the entry
+                     is only present because arubaWiredMgmdSnoopingCacheSelf is true and
+                     that if the router left the group, this entry would be aged
+                     out immediately. Note that some implementations may process
+                     Membership Reports from the local system in the same way
+                     as reports from other hosts, so a value of 0 is not
+                     required."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 7 }
+
+
+    arubaWiredMgmdSnoopingCacheGroupType OBJECT-TYPE
+        SYNTAX     MgmdSnoopingGroupTypeDefinition
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Reference MgmdSnoopingGroupTypeDefinition will
+                     indicate  the type of group."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 8 }
+
+    arubaWiredMgmdSnoopingCacheJoinedPorts OBJECT-TYPE
+        SYNTAX      PortList
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Logical ports with active MGMD joins on them for
+                     this entry. For Filtered groups this will be the
+                     logical ports which have active joins.  For static
+                     groups this will include all logical ports on the VLAN
+                     running MGMD Snooping."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 9 }
+
+    arubaWiredMgmdSnoopingCacheStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION "The status of this row, by which new entries may be
+                     created, or existing entries deleted from this table."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 10 }
+
+    arubaWiredMgmdSnoopingCacheQueriesRcvd OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "This represents the number of MGMD queries received for
+                     this group."
+         ::= { arubaWiredMgmdSnoopingCacheEntry 11 }
+
+    arubaWiredMgmdSnoopingCacheJoinsRcvd OBJECT-TYPE
+        SYNTAX   Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "This represents the number of MGMD Reports received for
+                     this group."
+         ::= { arubaWiredMgmdSnoopingCacheEntry 12 }
+
+    arubaWiredMgmdSnoopingCacheFilterMode OBJECT-TYPE
+        SYNTAX     INTEGER {
+                             include (1),
+                             exclude (2)
+                           }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The value indicates whether the group state is the
+                     INCLUDE(1)/ EXCLUDE(2)."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 13 }
+
+    arubaWiredMgmdSnoopingCacheExcludeModeExpiryTimer OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The time remaining before the group in EXCLUDE
+                     state expires and transitions to INCLUDE mode."
+       ::= { arubaWiredMgmdSnoopingCacheEntry 14 }
+
+    arubaWiredMgmdSnoopingCacheVersion1HostTimer OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The time remaining after which the local router
+                     will assume that there are no longer any MGMD
+                     version 1 members on the IP subnet
+                     attached to this VLAN."
+       ::= { arubaWiredMgmdSnoopingCacheEntry 15 }
+
+    arubaWiredMgmdSnoopingCacheVersion2HostTimer OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The time remaining after which the local router will
+                     assume that there are no longer any MGMD version 2
+                     members on the IP subnet attached to this VLAN."
+       ::= { arubaWiredMgmdSnoopingCacheEntry 16 }
+
+    arubaWiredMgmdSnoopingCacheSrcCount OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION "The number of sources either included or excluded
+                     from this group. If V1 host timer
+                     (arubaWiredMgmdSnoopingCacheVersion1HostTimer) or V2 host timer
+                     (arubaWiredMgmdSnoopingCacheVersion2HostTimer) is Active,
+                     this value will be zero."
+        ::= { arubaWiredMgmdSnoopingCacheEntry 17 }
+
+-- **********************************************************************
+-- The MGMD Snooping Port Configuration table
+-- **********************************************************************
+
+    arubaWiredMgmdSnoopingPortConfigTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MgmdSnoopingPortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains information about the MGMD Snooping
+                     port configurations on this switch."
+        ::= { arubaWiredMgmdSnoopingObjects 16 }
+
+    arubaWiredMgmdSnoopingPortConfigEntry OBJECT-TYPE
+        SYNTAX      MgmdSnoopingPortConfigEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the arubaWiredMgmdSnoopingPortConfigEntry."
+        INDEX       {
+                      arubaWiredMgmdSnoopingPortConfigEntryVid,
+                      arubaWiredMgmdSnoopingPortConfigEntryIndex
+                    }
+        ::= { arubaWiredMgmdSnoopingPortConfigTable 1 }
+
+    MgmdSnoopingPortConfigEntry ::=
+        SEQUENCE {
+            arubaWiredMgmdSnoopingPortConfigEntryVid              Unsigned32,
+            arubaWiredMgmdSnoopingPortConfigEntryIndex            Unsigned32,
+            arubaWiredMgmdSnoopingPortConfigEntryPortModeFeature  MgmdSnoopingConfigPortModeType
+        }
+
+    arubaWiredMgmdSnoopingPortConfigEntryVid OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The vid value of the VLAN for which MGMD Snooping is enabled."
+        ::= { arubaWiredMgmdSnoopingPortConfigEntry 1 }
+
+    arubaWiredMgmdSnoopingPortConfigEntryIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index value which uniquely identifies a row in the
+                     VLAN Table for a port or trunk."
+        ::= { arubaWiredMgmdSnoopingPortConfigEntry 2 }
+
+    arubaWiredMgmdSnoopingPortConfigEntryPortModeFeature OBJECT-TYPE
+        SYNTAX      MgmdSnoopingConfigPortModeType
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the MGMD Snooping feature for
+                     this port or trunk. 1 implies that all IP Multicast traffic
+                     will be monitored on the port, 2 implies that
+                     IP Multicast traffic will be dropped on the port, and
+                     3 implies that all IP Multicast traffic will be
+                     forwarded without the switch examining it."
+        ::= { arubaWiredMgmdSnoopingPortConfigEntry 3 }
+
+-- **********************************************************************
+-- The MGMD Snooping Filtered Group Port Cache Table
+-- **********************************************************************
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCacheTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MgmdSnoopingFilteredGroupPortCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table contains information about the MGMD Snooping
+                     port configurations on this switch."
+        ::= { arubaWiredMgmdSnoopingObjects 17 }
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCacheEntry OBJECT-TYPE
+        SYNTAX      MgmdSnoopingFilteredGroupPortCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the arubaWiredMgmdSnoopingFilteredGroupPortCacheEntry."
+        INDEX       {
+                      arubaWiredMgmdSnoopingFilteredGroupPortCacheVid,
+                      arubaWiredMgmdSnoopingFilteredGroupPortCacheGroupAddressType,
+                      arubaWiredMgmdSnoopingFilteredGroupPortCacheGroupAddress,
+                      arubaWiredMgmdSnoopingFilteredGroupPortCachePortIndex
+                    }
+        ::= { arubaWiredMgmdSnoopingFilteredGroupPortCacheTable 1 }
+
+    MgmdSnoopingFilteredGroupPortCacheEntry ::=
+        SEQUENCE {
+            arubaWiredMgmdSnoopingFilteredGroupPortCacheVid              Unsigned32,
+            arubaWiredMgmdSnoopingFilteredGroupPortCacheGroupAddressType InetAddressType,
+            arubaWiredMgmdSnoopingFilteredGroupPortCacheGroupAddress     InetAddress,
+            arubaWiredMgmdSnoopingFilteredGroupPortCachePortIndex        Unsigned32,
+            arubaWiredMgmdSnoopingFilteredGroupPortCacheExpiryTime       TimeTicks
+        }
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCacheVid OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The vid value of the VLAN for which MGMD Snooping
+                     is enabled and for which this filtered group exists."
+        ::= { arubaWiredMgmdSnoopingFilteredGroupPortCacheEntry 1 }
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCacheGroupAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address type of the InetAddress variables in this
+             table."
+        ::= { arubaWiredMgmdSnoopingFilteredGroupPortCacheEntry 2 }
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCacheGroupAddress OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The IP multicast group address for which this
+                     entry contains information."
+        ::= { arubaWiredMgmdSnoopingFilteredGroupPortCacheEntry 3 }
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCachePortIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The index value which uniquely identifies a row in the
+                     VLAN Table for a port or trunk."
+        ::= { arubaWiredMgmdSnoopingFilteredGroupPortCacheEntry 4 }
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCacheExpiryTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "The minimum amount of time remaining before this entry
+                     will be aged out."
+        ::= { arubaWiredMgmdSnoopingFilteredGroupPortCacheEntry 5 }
+
+-- *********************************************************************
+-- The MGMD Snooping Source table
+-- *********************************************************************
+
+    arubaWiredMgmdSnoopingSrcListTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MgmdSnoopingSrcListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table provides MGMD Snooping information for
+                     each Source entry."
+        ::= { arubaWiredMgmdSnoopingObjects 18 }
+
+    arubaWiredMgmdSnoopingSrcListEntry OBJECT-TYPE
+        SYNTAX      MgmdSnoopingSrcListEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the arubaWiredMgmdSnoopingSrcListEntry."
+        INDEX      {
+                     arubaWiredMgmdSnoopingSrcListVid,
+                     arubaWiredMgmdSnoopingSrcListAddressType,
+                     arubaWiredMgmdSnoopingSrcListAddress,
+                     arubaWiredMgmdSnoopingSrcListHostAddress
+                   }
+        ::= { arubaWiredMgmdSnoopingSrcListTable 1 }
+
+    MgmdSnoopingSrcListEntry ::=
+        SEQUENCE {
+            arubaWiredMgmdSnoopingSrcListVid                     Unsigned32,
+            arubaWiredMgmdSnoopingSrcListAddressType             InetAddressType,
+            arubaWiredMgmdSnoopingSrcListAddress                 InetAddress,
+            arubaWiredMgmdSnoopingSrcListHostAddress             InetAddress,
+            arubaWiredMgmdSnoopingSrcListPorts                   PortList,
+            arubaWiredMgmdSnoopingSrcListExpiry                  TimeTicks,
+            arubaWiredMgmdSnoopingSrcListUpTime                  TimeTicks,
+            arubaWiredMgmdSnoopingSrcListType                    MgmdSnoopingGroupTypeDefinition
+        }
+
+    arubaWiredMgmdSnoopingSrcListVid OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+           "The vid value of the VLAN for which this entry contains
+            information for an IPv4 or IPv6 multicast group address."
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 1 }
+
+    arubaWiredMgmdSnoopingSrcListAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address type of the InetAddress variables in this table."
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 2 }
+
+    arubaWiredMgmdSnoopingSrcListAddress OBJECT-TYPE
+        SYNTAX     InetAddress (SIZE(4|16))
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+           "The IPv4 or IPv6 multicast group address for which this entry contains
+            information."
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 3 }
+
+    arubaWiredMgmdSnoopingSrcListHostAddress OBJECT-TYPE
+        SYNTAX     InetAddress (SIZE(4|16))
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION   "The source address to which this entry corresponds."
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 4 }
+
+    arubaWiredMgmdSnoopingSrcListPorts  OBJECT-TYPE
+        SYNTAX         PortList
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION   "List of ports for which this source entry is either
+                       excluded or included."
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 5 }
+
+    arubaWiredMgmdSnoopingSrcListExpiry OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+           "This value indicates the relevance of the SrcList entry, whereby
+            a non-zero value indicates that is an INCLUDE state value, and a
+            zero value indicates this to be an EXCLUDE state value."
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 6 }
+
+    arubaWiredMgmdSnoopingSrcListUpTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION   "The time elapsed since this entry was created."
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 7 }
+
+
+    arubaWiredMgmdSnoopingSrcListType OBJECT-TYPE
+        SYNTAX     MgmdSnoopingGroupTypeDefinition
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION   "See MgmdSnoopingGroupTypeDefinition description. "
+        ::= { arubaWiredMgmdSnoopingSrcListEntry 8 }
+
+-- *********************************************************************
+-- The MGMD Snooping Port Source table
+-- *********************************************************************
+
+    arubaWiredMgmdSnoopingPortSrcTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MgmdSnoopingPortSrcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+             "This table  contains information about the MGMD Snooping
+              PortSrc configurations on this switch."
+        ::= { arubaWiredMgmdSnoopingObjects 19 }
+
+    arubaWiredMgmdSnoopingPortSrcEntry OBJECT-TYPE
+        SYNTAX      MgmdSnoopingPortSrcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the arubaWiredMgmdSnoopingPortSrcTable."
+        INDEX      {
+                     arubaWiredMgmdSnoopingPortSrcVid,
+                     arubaWiredMgmdSnoopingPortSrcAddressType,
+                     arubaWiredMgmdSnoopingPortSrcAddress,
+                     arubaWiredMgmdSnoopingPortSrcHostAddress,
+                     arubaWiredMgmdSnoopingPortSrcPortIndex
+                   }
+        ::= { arubaWiredMgmdSnoopingPortSrcTable 1 }
+
+    MgmdSnoopingPortSrcEntry ::=
+        SEQUENCE {
+            arubaWiredMgmdSnoopingPortSrcVid                       Unsigned32,
+            arubaWiredMgmdSnoopingPortSrcAddressType               InetAddressType,
+            arubaWiredMgmdSnoopingPortSrcAddress                   InetAddress,
+            arubaWiredMgmdSnoopingPortSrcHostAddress               InetAddress,
+            arubaWiredMgmdSnoopingPortSrcPortIndex                 Unsigned32,
+            arubaWiredMgmdSnoopingPortSrcExpiry                    TimeTicks,
+            arubaWiredMgmdSnoopingPortSrcUpTime                    TimeTicks,
+            arubaWiredMgmdSnoopingPortSrcFilterMode                INTEGER
+       }
+
+    arubaWiredMgmdSnoopingPortSrcVid OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+           "The vid value of the VLAN for which this entry contains
+            information for an IPv4 or IPv6 multicast group address."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 1 }
+
+    arubaWiredMgmdSnoopingPortSrcAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address type of the InetAddress variables in this
+             table."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 2 }
+
+    arubaWiredMgmdSnoopingPortSrcAddress OBJECT-TYPE
+        SYNTAX     InetAddress  (SIZE(4|16))
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+           "The IPv4 or IPv6 multicast group address for which this entry
+            contains information."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 3 }
+
+    arubaWiredMgmdSnoopingPortSrcHostAddress OBJECT-TYPE
+        SYNTAX     InetAddress (SIZE(4|16))
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION   "The host address to which this entry corresponds."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 4 }
+
+    arubaWiredMgmdSnoopingPortSrcPortIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The index value that uniquely identifies a row in the PortSrc
+             table for a port or trunk."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 5 }
+
+    arubaWiredMgmdSnoopingPortSrcExpiry OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+           "This value indicates the relevance of the SrcList entry,
+            whereby a non-zero value indicates this is an INCLUDE state value,
+            and a zero value indicates this to be an
+            EXCLUDE state value."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 6 }
+
+    arubaWiredMgmdSnoopingPortSrcUpTime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION    "The time elapsed since this entry was created."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 7 }
+
+    arubaWiredMgmdSnoopingPortSrcFilterMode OBJECT-TYPE
+        SYNTAX     INTEGER { include (1), exclude (2) }
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The value indicates whether the port state is the
+             INCLUDE(1)/ EXCLUDE(2)."
+        ::= { arubaWiredMgmdSnoopingPortSrcEntry 8 }
+
+-- *********************************************************************
+-- The MGMD Snooping Group Port Cache table
+-- *********************************************************************
+
+    arubaWiredMgmdSnoopingGroupPortCacheTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF MgmdSnoopingGroupPortCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "This table  contains information about the MGMD Snooping
+                     port configurations on this switch."
+        ::= { arubaWiredMgmdSnoopingObjects 20 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheEntry OBJECT-TYPE
+        SYNTAX      MgmdSnoopingGroupPortCacheEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "An entry in the arubaWiredMgmdSnoopingGroupPortCacheTable."
+        INDEX       {
+                      arubaWiredMgmdSnoopingGroupPortCacheVid,
+                      arubaWiredMgmdSnoopingGroupPortCacheGroupAddressType,
+                      arubaWiredMgmdSnoopingGroupPortCacheGroupAddress,
+                      arubaWiredMgmdSnoopingGroupPortCachePortIndex
+                    }
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheTable 1 }
+
+    MgmdSnoopingGroupPortCacheEntry ::=
+        SEQUENCE {
+            arubaWiredMgmdSnoopingGroupPortCacheVid                    Unsigned32,
+            arubaWiredMgmdSnoopingGroupPortCacheGroupAddressType       InetAddressType,
+            arubaWiredMgmdSnoopingGroupPortCacheGroupAddress           InetAddress,
+            arubaWiredMgmdSnoopingGroupPortCachePortIndex              Unsigned32,
+            arubaWiredMgmdSnoopingGroupPortCacheUpTime                 TimeTicks,
+            arubaWiredMgmdSnoopingGroupPortCacheVersion1Timer          TimeTicks,
+            arubaWiredMgmdSnoopingGroupPortCacheVersion2Timer          TimeTicks,
+            arubaWiredMgmdSnoopingGroupPortCacheFilterTimer            TimeTicks,
+            arubaWiredMgmdSnoopingGroupPortCacheFilterMode             INTEGER,
+            arubaWiredMgmdSnoopingGroupPortCacheExcludeSrcCount        Counter32,
+            arubaWiredMgmdSnoopingGroupPortCacheRequestedSrcCount      Counter32,
+            arubaWiredMgmdSnoopingGroupPortCacheExpiryTime             TimeTicks
+          }
+    arubaWiredMgmdSnoopingGroupPortCacheVid OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The vid  value of the VLAN for which MGMD Snooping
+                 is enabled and for which this group exists."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 1 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheGroupAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The address type of the InetAddress variables in this table."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 2 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheGroupAddress OBJECT-TYPE
+        SYNTAX      InetAddress (SIZE(4|16))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The IPv4 or IPv6 multicast group address for which this entry
+                 contains information."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 3 }
+
+    arubaWiredMgmdSnoopingGroupPortCachePortIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The index value which uniquely identifies a row in
+                 the VLAN Table for a port or trunk."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 4 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheUpTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION   "The time elapsed since this entry was created."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 5 }
+
+   arubaWiredMgmdSnoopingGroupPortCacheVersion1Timer OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "The time remaining until the local router will assume that
+              there are no longer any MGMD version 1 members on this port."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 6 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheVersion2Timer OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The time remaining until the local router will assume that
+             there are no longer any MGMD version 2 members on this port."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 7 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheFilterTimer OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The time remaining before the port in EXCLUDE state expires and
+             transitions to INCLUDE mode."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 8 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheFilterMode OBJECT-TYPE
+        SYNTAX      INTEGER { include (1), exclude (2) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value indicates whether the port state is the
+             INCLUDE(1)/ EXCLUDE(2)."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 9 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheExcludeSrcCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION   "Current number of sources excluded from this port."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 10 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheRequestedSrcCount  OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION   "Current number of sources requested from this port."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 11 }
+
+    arubaWiredMgmdSnoopingGroupPortCacheExpiryTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The minimum amount of time remaining before this entry
+                 will be aged out."
+        ::= { arubaWiredMgmdSnoopingGroupPortCacheEntry 12 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    arubaWiredMgmdSnoopingBaseGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredMgmdIgmpSnoopingControlDropUnknownMulticast,
+                      arubaWiredMgmdIgmpSnoopingEnabledVLANCount,
+                      arubaWiredMgmdIgmpSnoopingMcastGroupJoinsCount,
+                      arubaWiredMgmdIgmpSnoopingMcastFilteredGroupJoinsCount,
+                      arubaWiredMgmdIgmpSnoopingMcastExcludeGroupJoinsCount,
+                      arubaWiredMgmdIgmpSnoopingMcastIncludeGroupJoinsCount,
+                      arubaWiredMgmdMldSnoopingControlDropUnknownMulticast,
+                      arubaWiredMgmdMldSnoopingEnabledVLANCount,
+                      arubaWiredMgmdMldSnoopingMcastGroupJoinsCount,
+                      arubaWiredMgmdMldSnoopingMcastExcludeGroupJoinsCount,
+                      arubaWiredMgmdMldSnoopingMcastIncludeGroupJoinsCount,
+                      arubaWiredMgmdMldSnoopingMcastFilteredGroupJoinsCount,
+                      arubaWiredMgmdMldSnoopingSendRouterAlertPaddingOption
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support MGMD Snooping feature."
+        ::= { arubaWiredMgmdSnoopingGroups 1 }
+
+    arubaWiredMgmdSnoopingVlanEntryGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredMgmdSnoopingVlanEntrySnoopingFeature,
+                      arubaWiredMgmdSnoopingVlanEntryControlDropUnknownMulticastStatus,
+                      arubaWiredMgmdSnoopingVlanEntryQuerierPort,
+                      arubaWiredMgmdSnoopingVlanEntryFilteredJoins,
+                      arubaWiredMgmdSnoopingVlanEntryPortsWithMcastRouter,
+                      arubaWiredMgmdSnoopingVlanEntryStatGeneralQueryRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatGSQRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatV1ReportRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatV2ReportRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatV3ReportRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatV2LeaveRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatUnknownTypeRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatForwardToRoutersTx,
+                      arubaWiredMgmdSnoopingVlanEntryStatForwardToAllPortsTx,
+                      arubaWiredMgmdSnoopingVlanEntryStatJoinTimeouts,
+                      arubaWiredMgmdSnoopingVlanEntryStaticJoins,
+                      arubaWiredMgmdSnoopingVlanEntryOtherQuerierInterval,
+                      arubaWiredMgmdSnoopingVlanEntryOtherQuerierExpiryTime,
+                      arubaWiredMgmdSnoopingVlanEntryOtherQuerierRobustness,
+                      arubaWiredMgmdSnoopingVlanEntryStatExcludeGroupJoinsCount,
+                      arubaWiredMgmdSnoopingVlanEntryStatIncludeGroupJoinsCount,
+                      arubaWiredMgmdSnoopingVlanEntryStatFilteredExcludeGroupJoinsCount,
+                      arubaWiredMgmdSnoopingVlanEntryStatFilteredIncludeGroupJoinsCount,
+                      arubaWiredMgmdSnoopingVlanEntryStatV1QueryRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatV2QueryRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatV3QueryRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatGSSQRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatMalformedPktRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatBadCheckSumRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatMartianSourceRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatPacketsRxOnDisabled,
+                      arubaWiredMgmdSnoopingVlanEntryStatV2GSQRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatV3GSQRx,
+                      arubaWiredMgmdSnoopingVlanEntryStatWrongVersionQueries
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support management of
+                     VLAN with MGMD Snooping enabled."
+        ::= { arubaWiredMgmdSnoopingGroups 2 }
+
+    arubaWiredMgmdSnoopingCacheGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredMgmdSnoopingCacheSelf,
+                      arubaWiredMgmdSnoopingCacheLastReporter,
+                      arubaWiredMgmdSnoopingCacheUpTime,
+                      arubaWiredMgmdSnoopingCacheExpiryTime,
+                      arubaWiredMgmdSnoopingCacheGroupType,
+                      arubaWiredMgmdSnoopingCacheJoinedPorts,
+                      arubaWiredMgmdSnoopingCacheStatus,
+                      arubaWiredMgmdSnoopingCacheQueriesRcvd,
+                      arubaWiredMgmdSnoopingCacheJoinsRcvd,
+                      arubaWiredMgmdSnoopingCacheFilterMode,
+                      arubaWiredMgmdSnoopingCacheExcludeModeExpiryTimer,
+                      arubaWiredMgmdSnoopingCacheVersion1HostTimer,
+                      arubaWiredMgmdSnoopingCacheVersion2HostTimer,
+                      arubaWiredMgmdSnoopingCacheSrcCount
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support management of
+                     VLAN with MGMD Snooping enabled."
+        ::= { arubaWiredMgmdSnoopingGroups 3 }
+
+    arubaWiredMgmdSnoopingPortGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredMgmdSnoopingPortConfigEntryPortModeFeature
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support management of
+                     VLAN with MGMD Snooping enabled."
+        ::= { arubaWiredMgmdSnoopingGroups 4 }
+
+    arubaWiredMgmdSnoopingFilteredGroupPortCacheGroup OBJECT-GROUP
+        OBJECTS     { arubaWiredMgmdSnoopingFilteredGroupPortCacheExpiryTime
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support management of
+                     VLAN with MGMD Snooping enabled."
+        ::= { arubaWiredMgmdSnoopingGroups 5 }
+
+    arubaWiredMgmdSnoopingSrcListGroup OBJECT-GROUP
+        OBJECTS       { arubaWiredMgmdSnoopingSrcListPorts,
+                        arubaWiredMgmdSnoopingSrcListExpiry,
+                        arubaWiredMgmdSnoopingSrcListUpTime,
+                        arubaWiredMgmdSnoopingSrcListType
+                      }
+        STATUS      current
+        DESCRIPTION
+             "A collection of objects to support Source entries corresponding
+              to each VLAN and multicast group pair."
+        ::= { arubaWiredMgmdSnoopingGroups 6 }
+
+    arubaWiredMgmdSnoopingPortSrcGroup OBJECT-GROUP
+           OBJECTS        { arubaWiredMgmdSnoopingPortSrcExpiry,
+                            arubaWiredMgmdSnoopingPortSrcUpTime,
+                            arubaWiredMgmdSnoopingPortSrcFilterMode
+                          }
+           STATUS      current
+           DESCRIPTION   "A collection objects for an entry in the MGMD
+                          PortSrc Table."
+        ::= { arubaWiredMgmdSnoopingGroups 7 }
+
+    arubaWiredMgmdSnoopingGruoupPortCacheGroup OBJECT-GROUP
+          OBJECTS        { arubaWiredMgmdSnoopingGroupPortCacheUpTime,
+                           arubaWiredMgmdSnoopingGroupPortCacheVersion1Timer,
+                           arubaWiredMgmdSnoopingGroupPortCacheVersion2Timer,
+                           arubaWiredMgmdSnoopingGroupPortCacheFilterTimer,
+                           arubaWiredMgmdSnoopingGroupPortCacheFilterMode,
+                           arubaWiredMgmdSnoopingGroupPortCacheExcludeSrcCount,
+                           arubaWiredMgmdSnoopingGroupPortCacheRequestedSrcCount,
+                           arubaWiredMgmdSnoopingGroupPortCacheExpiryTime
+                        }
+        STATUS      current
+        DESCRIPTION "A collection of objects associated with each MGMD Snooping
+                     port configuration."
+        ::= { arubaWiredMgmdSnoopingGroups 8 }
+
+-- **********************************************************************
+-- Compliance statements
+-- **********************************************************************
+
+    arubaWiredMgmdMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HPE routers running
+                     MGMD Snooping and implementing the MGMD Snooping MIB."
+        MODULE  -- this module
+        MANDATORY-GROUPS { arubaWiredMgmdSnoopingBaseGroup,
+                           arubaWiredMgmdSnoopingVlanEntryGroup,
+                           arubaWiredMgmdSnoopingCacheGroup,
+                           arubaWiredMgmdSnoopingPortGroup,
+                           arubaWiredMgmdSnoopingFilteredGroupPortCacheGroup,
+                           arubaWiredMgmdSnoopingGruoupPortCacheGroup,
+                           arubaWiredMgmdSnoopingSrcListGroup,
+                           arubaWiredMgmdSnoopingPortSrcGroup
+                         }
+        ::= { arubaWiredMgmdSnoopingCompliances 1 }
+END

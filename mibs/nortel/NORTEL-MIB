@@ -1,0 +1,18 @@
+NORTEL-MIB DEFINITIONS ::= BEGIN
+   IMPORTS 
+       enterprises, MODULE-IDENTITY
+	   FROM SNMPv2-SMI;
+
+   nortel MODULE-IDENTITY
+       LAST-UPDATED "200704160000Z"
+       ORGANIZATION "Northern Telecom Ltd."
+       CONTACT-INFO
+               "   Nortel 
+
+                   1-800-4Nortel 
+                   www.nortel.com"
+       DESCRIPTION
+               "The Nortel top-level MIB definition."
+       ::= { enterprises 562 } 
+END
+

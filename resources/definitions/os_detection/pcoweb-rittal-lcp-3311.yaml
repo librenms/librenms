@@ -1,0 +1,12 @@
+os: pcoweb-rittal-lcp-3311
+text: 'Rittal LCP DX Chiller'
+type: environment
+icon: rittal
+over:
+    - { graph: device_cooling, text: 'Cooling Capacity' }
+    - { graph: device_temperature, text: Temperatures }
+    - { graph: device_fanspeed, text: 'Fan Speed' }
+mib_dir: carel
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.9839.2606.3311

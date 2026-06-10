@@ -1,0 +1,14 @@
+os: sharp
+group: printer
+text: 'Sharp Printer'
+type: printer
+icon: sharp
+over:
+    - { graph: device_toner, text: Toner }
+discovery:
+    -
+         sysDescr_regex: '/SHARP (BP|MX)-/'
+discovery_modules:
+    printer-supplies:   true
+poller_modules:
+    printer-supplies:   true

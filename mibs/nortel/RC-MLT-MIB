@@ -1,0 +1,2222 @@
+
+RC-MLT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Gauge32, Counter32, Counter64,
+    IpAddress, TimeTicks
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue, RowStatus, MacAddress
+        FROM SNMPv2-TC
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    rcMlt, rcStat, rcLinkFlapDetect, rcL2Redundancy,
+    PortSet, IdList, EnableValue
+        FROM RAPID-CITY;
+
+
+rcMltMib MODULE-IDENTITY
+       LAST-UPDATED     "201509040000Z"
+       ORGANIZATION     "Bay Networks, Rapid-City Group"
+       CONTACT-INFO     "Yu-Ten Lee
+                         Postal:        Nortel Networks
+ 		    4655 Great America Parkway
+                                               Santa Clara, CA 95052-8185
+
+                         Tel:              408-495-2560
+                         Fax:              408-495-6680
+                         E-mail:        ylee@nortelnetworks.com"
+
+       DESCRIPTION      "Enterprise MIB for the Accelar product family."
+	   
+       REVISION         "201509040000Z" -- 04 Sept. 2015
+       DESCRIPTION      "Version 39: changed rcMltMefUniEnable to rcMltFlexUniEnable.
+	                 Request by Shang Chang (malok)"
+
+       REVISION         "201507210000Z" -- 21 Jul 2015
+       DESCRIPTION      "Version 38: Changed the syntax of rcMltMefUniEnable
+	   		 from EnableValue to TruthValue (Prem)"
+
+       REVISION         "201502250000Z" -- 25 Feb 2015
+       DESCRIPTION      "Version 37: Added rcMltMefUniEnable.
+			 Request by Zuyan Wang. (Prem)"
+	   
+       REVISION "201501190000Z" -- 19 Jan 2015
+       DESCRIPTION "Version 36: Added rcMltPeerMembersList to
+	                        deprecate/obsoltete rcMltPeerMembers"	   
+	   
+       REVISION "201406180000Z" -- 18 June 2014
+       DESCRIPTION "Version 35: remove rcMltVirtualIstEnable and add
+	                        virtualIstMlt to the rcMltMltType"	   
+
+       REVISION "201406120000Z" -- 12 June 2014
+       DESCRIPTION "Version 34: Added rcMltVirtualIstEnable"
+	   
+       REVISION "201403010000Z" -- 01 March 2014
+       DESCRIPTION "Version 33: Added rcStatSmltPortTblSyncReqTxMsgCnt
+	   			      rcStatSmltPortTblSyncReqRxMsgCnt 
+				      rcStatSmltPortTblSyncTxMsgCnt	
+				      rcStatSmltPortTblSyncRxMsgCnt
+				      rcStatSmltPortUpdateTxMsgCnt
+				      rcStatSmltPortUpdateRxMsgCnt
+				      rcStatSmltEntryUpdateTxMsgCnt 
+				      rcStatSmltEntryUpdateRxMsgCnt
+				      rcStatSmltDialectNegotiateTxMsgCnt
+				      rcStatSmltDialectNegotiateRxMsgCnt
+				      rcStatSmltUpdateRespTxMsgCnt
+				      rcStatSmltUpdateRespRxMsgCnt
+				      rcStatSmltTransQHighWaterMarkMsgCnt
+				      rcStatSmltPollCountHighWaterMarkCnt"
+
+       REVISION "201307150000Z" -- 15 July 2013
+       DESCRIPTION "Version 32: Added rcMltBpduMode."
+
+       REVISION "201305280000Z" -- 28 May 2013
+       DESCRIPTION "Version 31: Added rcStatSmltSpbmInfoTxMsgCnt,
+                                      rcStatSmltSpbmInfoFailTxMsgCnt,
+                                      rcStatSmltSpbmInfoRxMsgCnt,
+                                      rcStatSmltSpbmLearnMacRxMsgCnt,
+                                      rcStatSmltSpbmLearnMacTxMsgCnt,
+                                      rcStatSmltSpbmDelMacRxMsgCnt,
+                                      rcStatSmltSpbmDelMacTxMsgCnt,
+                                      rcStatSmltSpbmMacAgeOutRxMsgCnt,
+                                      rcStatSmltSpbmMacAgeOutTxMsgCnt,
+                                      rcStatSmltSpbmMacTblRxMsgCnt."
+
+       REVISION "201303180000Z" -- 18 Mar 2013
+       DESCRIPTION "Version 30: Added enum value - none, changed normal
+				to trunk and changed DEFVAL to none under
+				rcMltPrivateVlanType"
+
+       REVISION "201212210000Z" -- 21 Dec 2012
+       DESCRIPTION "Version 29: added rcMltPrivateVlanType"
+	   
+       REVISION "201210240000Z" -- 24 October 2012
+       DESCRIPTION "Version 28: Renamed enumeration rtag7(4) in rcMltDistributionAlgorithm
+                                to enhanced(4)."
+
+       REVISION "201210040000Z" -- 04 October 2012
+       DESCRIPTION "Version 27: Added enumeration rtag7(4) to rcMltDistributionAlgorithm."       
+
+       REVISION "201208030000Z" -- 03 August 2012
+       DESCRIPTION "Version 26: Changed the range of rcMltIstVlanId from
+	                        1..4095 to 0..4095. 0 was added in ERS 7.2.
+				Vlan id of 0 indicates deletion of the vlan"
+
+       REVISION "201103150000Z" -- 15 March 2011
+       DESCRIPTION "Version 25: Added rcMltL4Hash."
+
+       REVISION "201101270000Z" -- 27 January 2011
+       DESCRIPTION "Version 24: Added rcStatMltIfExtnIfHCInLsmPkts,
+                                      rcStatMltIfExtnIfHCOutLsmPkts."
+
+       REVISION "201101060000Z" -- 06 January 2011
+       DESCRIPTION "Version 23: Added rcMltIstStpEnable."
+
+       REVISION "201010200000Z" -- 20 October 2010
+       DESCRIPTION "Version 22: Added rcStatMltUtilTable."
+
+       REVISION "201009210000Z" -- 21 September 2010
+       DESCRIPTION "Version 21: Added rcMltEntryOwner,
+                                      rcMltDatapathProgrammingState
+                                        to rcMltTable." 
+
+       REVISION "201009140000Z" -- 14 September 2010
+       DESCRIPTION "Version 20: Increased MLT ID range for
+                                    rcStatMltIfExtnMltId,
+                                    rcStatMltEtherMltId.
+                                    rcMltId, rcMltSmltId.
+                                Added:
+                                    rcMltPeerPortMembers,
+                                    rcMltCpLimitPktRate,
+                                    rcMltCpLimitShutDownEnable,
+                                    rcMltVlanIdList to rcMltTable.
+                                Added:
+                                    synchronizeInProgress(11)
+                                       to rcL2RedundancyHaCpuState."
+
+       REVISION "200912160000Z" -- 16 December 2009
+       DESCRIPTION "Version 19: Added rcMltDisablePortsOnShutdown."
+
+       REVISION "200911160000Z" -- 16 November 2009
+       DESCRIPTION "Version 18: Added rcStatSmltLacpInfoRxMsgCnt,
+                                      rcStatSmltLacpInfoTxMsgCnt."
+
+       REVISION "200903200000Z" -- 20 March 2009
+       DESCRIPTION "Version 17: Added rcMltMtu, rcMltInterfaceType, 
+                                rcMltConfiguredMembers, rcMltMtuAdminState."
+
+       REVISION "200712200000Z" -- 20 December 2007
+       DESCRIPTION "Version 16:  Added rcMltAggMinLink,
+                                 rcMltNotificationObjects, rcMltAggTrapEvent"
+
+       REVISION "200704160000Z" -- 16 April 2007
+       DESCRIPTION "Version 15:  Added rcMltEgressCosProfileName,
+                                 rcMltEgressPolicerAdminState,
+                                 rcMltAggrEgressBandwidth,
+                                 rcMltAggrIngressBandwidth,
+		                 rcMltAggrMacAlloc
+                                 Modified rcMltLoadDistributionOption and
+                                           rcMltUniAggrMacIdx"
+
+       REVISION "200607050000Z" -- 05 July 2006
+       DESCRIPTION "Version 14:  Added rcMltLoadDistributionOption, rcMltUniAggrMacIdx,
+ 				 rcMltUniAggrMacAddress and rcMltQinqEtherType to rcMltTable.
+				 Added rcMltBvidPortTable"
+
+       REVISION "200512060000Z" -- 06 Dec 2005
+       DESCRIPTION "Version 13:  Changed range of rcMltSmltId to 0..256."
+
+       REVISION "200509010000Z" -- 01 Sep 2005
+       DESCRIPTION "Version 12:  Changed rcMltEnable from read-only to read-create.
+                                 Changed all read-write objects in rcMltTable
+                                 to read-create."
+
+       REVISION "200508100000Z" -- 10 Aug 2005
+       DESCRIPTION "Version 11:  Increased to rcMltId & rcMltSmltId from 32 to 256"
+
+       REVISION "200507110000Z" -- 11 July 2005
+       DESCRIPTION "Version 10:  Added enumerations to rcMltDistributionAlgorithm."
+
+       REVISION "200505270000Z" -- 05 Apr 2005
+       DESCRIPTION "Version 9:  Fixed range of rcMltVlanIds, allow rcMltIfIndex to be 0."
+
+       REVISION "200502020000Z" -- 02 Feb 2005
+       DESCRIPTION "Version 8:  Changed the SYNTAX for rcStatMltIfUtilIfHCInUtil &
+                                rcStatMltIfUtilIfHCOutUtil  to Gauge32"
+       REVISION "200501040000Z" -- 04 Jan 2005 
+       DESCRIPTION "Version 7:  Made Index rcStatMltIfUtilMltId as not-accessible"
+       REVISION "200412210000Z" -- 21 Dec 2004 
+       DESCRIPTION "Version 6:  Added rcStatMltIfUtilTable"
+       REVISION "200409300000Z" -- 30 Sept 2004 
+       DESCRIPTION "Version 5:  Import MacAddress type"
+       REVISION "200409230000Z" -- 23 Sept 2004 
+       DESCRIPTION "Version 4:  Added  rcMltVlacpTable"
+       REVISION "200407130000Z" -- 13 July 2004 
+       DESCRIPTION "Version 3:  Added  rcMltVlacpTable"
+       ::= { rcMlt 0 }
+
+-- rcStatMlt Group
+
+rcStatMlt      OBJECT IDENTIFIER ::= { rcStat 6 }
+ 
+rcStatMltIfExtnTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcStatMltIfExtnEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A table used to store Mlt interface
+                      statistics."
+        ::= { rcStatMlt 1 }
+ 
+rcStatMltIfExtnEntry OBJECT-TYPE
+        SYNTAX        RcStatMltIfExtnEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Mlt interface statistics"
+        INDEX         { rcStatMltIfExtnMltId }
+        ::= { rcStatMltIfExtnTable 1 }
+ 
+RcStatMltIfExtnEntry ::= SEQUENCE {
+                rcStatMltIfExtnMltId                  Integer32,
+                rcStatMltIfExtnIfInMulticastPkts      Counter32,
+                rcStatMltIfExtnIfInBroadcastPkts      Counter32,
+                rcStatMltIfExtnIfOutMulticastPkts     Counter32,
+                rcStatMltIfExtnIfOutBroadcastPkts     Counter32,
+                rcStatMltIfExtnIfHCInOctets           Counter64,
+                rcStatMltIfExtnIfHCInUcastPkts        Counter64,
+                rcStatMltIfExtnIfHCInMulticastPkt     Counter64,
+                rcStatMltIfExtnIfHCInBroadcastPkt     Counter64,
+                rcStatMltIfExtnIfHCOutOctets          Counter64,
+                rcStatMltIfExtnIfHCOutUcastPkts       Counter64,
+                rcStatMltIfExtnIfHCOutMulticast       Counter64,
+                rcStatMltIfExtnIfHCOutBroadcast       Counter64,
+                rcStatMltIfExtnIfHCInLsmPkts          Counter64,
+                rcStatMltIfExtnIfHCOutLsmPkts         Counter64
+
+        }
+ 
+rcStatMltIfExtnMltId OBJECT-TYPE
+        SYNTAX        Integer32 (1..512)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Mlt Id"
+        ::= { rcStatMltIfExtnEntry 1 }
+ 
+rcStatMltIfExtnIfInMulticastPkts OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "multi-pkts to upper"
+        ::= { rcStatMltIfExtnEntry 2 }
+
+rcStatMltIfExtnIfInBroadcastPkts OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "broad-pkts to upper"
+        ::= { rcStatMltIfExtnEntry 3 }
+ 
+rcStatMltIfExtnIfOutMulticastPkts OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "multi-pkts from upper"
+        ::= { rcStatMltIfExtnEntry 4 }
+ 
+rcStatMltIfExtnIfOutBroadcastPkts OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "broad-pkts from upper"
+        ::= { rcStatMltIfExtnEntry 5 }
+ 
+rcStatMltIfExtnIfHCInOctets OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The total number of octets received 
+                       on the MLT interface, including framing 
+                       characters."
+        ::= { rcStatMltIfExtnEntry 6 }
+ 
+rcStatMltIfExtnIfHCInUcastPkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The number of packets delivered by this
+                       MLT to a higher MLT that were not addressed
+                       to a nulticast or broadcase address at this
+                       sublayer."
+        ::= { rcStatMltIfExtnEntry 7 }
+ 
+rcStatMltIfExtnIfHCInMulticastPkt OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The number of packets delivered to this MLT that
+                       were addressed to a nulticast address at this
+                       sublayer.  For a MAC layer protocol, this number
+                       includes both Group and Functional addresses."
+        ::= { rcStatMltIfExtnEntry 8 }
+ 
+rcStatMltIfExtnIfHCInBroadcastPkt OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The number of packets delivered to this MLT that
+ 		       were addressed to a broadcast address at this
+ 		       sublayer."
+        ::= { rcStatMltIfExtnEntry 9 }
+ 
+rcStatMltIfExtnIfHCOutOctets OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The total number of octets transmitted 
+                       out of the MLT interface, including 
+                       framing characters."
+        ::= { rcStatMltIfExtnEntry 10 }
+ 
+rcStatMltIfExtnIfHCOutUcastPkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The number of packets that hight-level protocols
+                       requested be transmitted that were not addressed 
+                       to a multicast address at this MLT.  This total
+                       number includes those packets discarded or unsent."
+        ::= { rcStatMltIfExtnEntry 11 }
+
+rcStatMltIfExtnIfHCOutMulticast OBJECT-TYPE 
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The total number of packets that hight-level
+                       protocols requested be transmitted, and that 
+                       were addressed to a multicast address at this
+                       MLT, including those that were discarded or 
+                       not sent.  For a MAC layer protocol, this
+                       number includes both Group and Functional
+                       addresses."
+        ::= { rcStatMltIfExtnEntry 12 }
+
+rcStatMltIfExtnIfHCOutBroadcast OBJECT-TYPE 
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The total number of packets that hight-level
+		       protocols requested be transmitted, and that
+		       were addressed to a broadcase address at this	
+		       MLT, including those that were discarded or 
+		       not sent."
+        ::= { rcStatMltIfExtnEntry 13 }
+
+rcStatMltIfExtnIfHCInLsmPkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The total number of Link State Messaging (LSM)
+                       packets delivered to this MLT."
+
+        ::= { rcStatMltIfExtnEntry 14 }
+
+rcStatMltIfExtnIfHCOutLsmPkts OBJECT-TYPE
+        SYNTAX        Counter64
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The total number of Link State Messaging (LSM)
+                       packets trasmitted on this MLT."
+
+        ::= { rcStatMltIfExtnEntry 15 }
+
+
+
+-- Mlt Ether table
+
+rcStatMltEtherTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcStatMltEtherEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A table used to store Mlt Ethernet
+                      statistics."
+        ::= { rcStatMlt 2 }
+ 
+rcStatMltEtherEntry OBJECT-TYPE
+        SYNTAX        RcStatMltEtherEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Mlt enternet statistics"
+        INDEX         { rcStatMltEtherMltId }
+        ::= { rcStatMltEtherTable 1 }
+ 
+RcStatMltEtherEntry ::= SEQUENCE {
+                rcStatMltEtherMltId              Integer32,
+                rcStatMltEtherAlignmentErrors    Counter32,
+                rcStatMltEtherFCSErrors          Counter32,
+                rcStatMltEtherSingleCollFrames   Counter32,
+                rcStatMltEtherMultipleCollFrames Counter32,
+                rcStatMltEtherSQETestError       Counter32,
+                rcStatMltEtherDeferredTransmiss  Counter32,
+                rcStatMltEtherLateCollisions     Counter32,
+                rcStatMltEtherExcessiveCollis    Counter32,
+                rcStatMltEtherIMacTransmitError  Counter32,
+                rcStatMltEtherCarrierSenseError  Counter32,
+                rcStatMltEtherFrameTooLong       Counter32,
+                rcStatMltEtherIMacReceiveError   Counter32
+        }
+ 
+rcStatMltEtherMltId OBJECT-TYPE
+        SYNTAX        Integer32 (1..512)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A value that uniquely identifies the Multi-Link 
+                       Trunk associated with this entry."
+        ::= { rcStatMltEtherEntry 1 }
+ 
+rcStatMltEtherAlignmentErrors OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of frames received on a particular MLT
+ 		       that are not an integral number of octets in
+		       length and do not pass the FCS check.  The count
+		       represented by an instance of this object is
+		       incremented when the alignmentError status is
+		       returned by the MAC service to the LLC (or other
+		       MAC user).  Received frames for which multiple
+	 	       error conditions occur are, according to the 
+		       conventions of IEEE 802.3 Layer Management, 
+		       counted exclusively according to the error status
+		       presented to the LLC."
+        ::= { rcStatMltEtherEntry 2 }
+
+rcStatMltEtherFCSErrors OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of frames received on an MLT that are an
+	               integral number of octets in length but do not pass
+                       the FCS check.  The count represented by an instance
+                       of this object is incremented when the frameCheckError
+                       status is returned by the MAC service to the LLC
+                       (or other MAC user).  Received frames for which
+		       multiple error conditions occur are, according to 
+                       the conventions of IEEE 802.3 Layer Management, 
+		       counted exclusively according to the error status
+		       presented to the LLC."
+        ::= { rcStatMltEtherEntry 3 }
+ 
+rcStatMltEtherSingleCollFrames OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of successfully transmitted frames on 
+                       a particular MLT for which transmission is 
+                       inhibited by exactly one collision.  A frame 
+                       that is counted by an instance of this objects 
+                       is also counted by the corresponding instance 
+                       of either the ifOutUcastPkts, ifOutMulticastPkts, 
+                       or ifOutBroadcastPkts, and it not counted by the 
+                       corresponding instance of the MultipleCollisionFrames 
+                       object."
+        ::= { rcStatMltEtherEntry 4 }
+ 
+rcStatMltEtherMultipleCollFrames OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of successfully transmitted frames on 
+                       a particular MLT for which transmission is 
+                       inhibited by more than one collision.  A frame 
+                       that is counted by an instance of this object 
+                       is also counted by the corresponding instance 
+                       of either the ifOutUcastPkts, ifOutMulticastPkts, 
+                       or ifOutBroadcastPkts, and is not counted by the 
+                       corresponding instance of the SingleCollisionFrames 
+                       objects."
+        ::= { rcStatMltEtherEntry 5 }
+ 
+rcStatMltEtherSQETestError OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of times that the SQE TEST ERROR message
+		       is generated by the PLS sublayer for a particular
+	               MLT. SQE stands for Signal Quality Error."
+        ::= { rcStatMltEtherEntry 6 }
+ 
+rcStatMltEtherDeferredTransmiss OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of frames for which the first transmission
+	               attempt on a particular MLT is delayed because the
+                       medium is busy.  The count represented by an 
+	               instance of this object does not include frames
+		       involved in collisions."
+        ::= { rcStatMltEtherEntry 7 }
+ 
+rcStatMltEtherLateCollisions OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The number of times that a collision is detected 
+                       on a particular MLT later than 512 bit-times 
+                       (64 octets) into the transmission of a packet. 
+                       Five hundred and twelve bit-times corresponds to 
+                       51.2 microseconds on a 10 mb/s system.  A (late) 
+                       collision included in a count represented by an 
+                       instance of this object is also considered as a
+                       (generic) collision for purposes of other 
+                       collision-related statistics."
+        ::= { rcStatMltEtherEntry 8 }
+ 
+rcStatMltEtherExcessiveCollis OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of frames for which transmission on a 
+	               particular MLT fails due to excessive collisions."
+        ::= { rcStatMltEtherEntry 9 }
+ 
+rcStatMltEtherIMacTransmitError OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of frames for which transmission on a 
+	               particular MLT fails due to an internal MAC 
+                       sublayer transmit error.  A frame is only counted 
+                       by an instance of this object if it is not counted
+                       by the corresponding instance of either the 
+		       LateCollisions object, the ExcessiveCollisions
+		       object, or the CarrierSenseError object."
+        ::= { rcStatMltEtherEntry 10 }
+ 
+rcStatMltEtherCarrierSenseError OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The number of times that the carrier sense 
+                       condition was lost or never asserted when 
+                       attempting to transmit a frame on a particular
+                       MLT.  The count represented by an instance of
+	               this object is incremented at most once per
+		       transmission attempt, even if the carrier
+		       sense condition fluctuates during a 
+		       transmission attempt."
+        ::= { rcStatMltEtherEntry 11 }
+
+rcStatMltEtherFrameTooLong OBJECT-TYPE 
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of frames received on a particular MLT
+                       that exceed the maximum permitted size (1518 
+                       octets).  The count represented by an instance
+		       os this object is incremented when the frame
+	               TooLong status is returned by the MAC service
+		       to the LLC (or other MAC user).  Received frames
+		       for which multiple error conditions occur are, 
+		       according to the conventions of IEEE 802.3 
+                       Layer Management, counted exclusively according
+		       to the error status presented to the LLC."
+        ::= { rcStatMltEtherEntry 12 }
+
+rcStatMltEtherIMacReceiveError OBJECT-TYPE 
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "A count of frames for which reception on a 
+		       particular MLT fails due to an internal MAC
+		       sublayer receive error.  A frame is only
+		       counted by an instance of this object if it 
+		       is not counted by the corresponding instance 
+		       of either the FrameTooLongs object, the
+	               AlignmentErrors object, of the FCSErrors
+	               objects.
+                       The precise meaning of the count represented
+		       by an instance of this object is implementation
+	               specific.  In particular, an instance of this
+	               object may represent a count of receive errors
+                       on a particular interface that are not otherwise
+		       counted."
+        ::= { rcStatMltEtherEntry 13 }
+
+
+-- Mlt Ip table
+
+rcStatMltIpTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcStatMltIpEntry
+        MAX-ACCESS    not-accessible
+        STATUS        deprecated
+        DESCRIPTION   "A table used to store Mlt Ip statistics."
+        ::= { rcStatMlt 3 }
+
+rcStatMltIpEntry OBJECT-TYPE
+        SYNTAX        RcStatMltIpEntry
+        MAX-ACCESS    not-accessible
+        STATUS        deprecated
+        DESCRIPTION   "Mlt enternet statistics"
+        INDEX         { rcStatMltIpMltId }
+        ::= { rcStatMltIpTable 1 }
+
+RcStatMltIpEntry ::= SEQUENCE {
+                rcStatMltIpMltId            Integer32,
+                rcStatMltIpInReceives       Counter32,
+                rcStatMltIpInHdrErrors      Counter32,
+                rcStatMltIpInAddrErrors     Counter32,
+                rcStatMltIpForwDatagrams    Counter32,
+                rcStatMltIpInUnknownProtos  Counter32,
+                rcStatMltIpInDiscards       Counter32,
+                rcStatMltIpInDelivers       Counter32,
+                rcStatMltIpOutRequest       Counter32,
+                rcStatMltIpOutDiscards      Counter32,
+                rcStatMltIpOutNoRoutes      Counter32,
+                rcStatMltIpReasmReqds       Counter32,
+                rcStatMltIpReasmOKs         Counter32,
+                rcStatMltIpReasmFails       Counter32,
+                rcStatMltIpFragOKs          Counter32,
+                rcStatMltIpFragFails        Counter32,
+                rcStatMltIpFragCreates      Counter32,
+                rcStatMltIpRoutingDiscards  Counter32
+        }
+
+rcStatMltIpMltId OBJECT-TYPE
+        SYNTAX        Integer32 (1..8)
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "Mlt Id"
+        ::= { rcStatMltIpEntry 1 }
+
+rcStatMltIpInReceives OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "all incoming packets"
+        ::= { rcStatMltIpEntry 2 }
+
+rcStatMltIpInHdrErrors OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "hdr errors detected"
+        ::= { rcStatMltIpEntry 3 }
+
+rcStatMltIpInAddrErrors OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "bad dest. ip addr"
+        ::= { rcStatMltIpEntry 4 }
+
+rcStatMltIpForwDatagrams OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "packets forwarded"
+        ::= { rcStatMltIpEntry 5 }
+
+rcStatMltIpInUnknownProtos OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "unsupported protocol"
+        ::= { rcStatMltIpEntry 6 }
+
+rcStatMltIpInDiscards OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "good, but no buffer"
+        ::= { rcStatMltIpEntry 7 }
+
+rcStatMltIpInDelivers OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "pkts delivered to upper"
+        ::= { rcStatMltIpEntry 8 }
+
+rcStatMltIpOutRequest OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "pkts received from upper"
+        ::= { rcStatMltIpEntry 9 }
+
+rcStatMltIpOutDiscards OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "good, but no buffer"
+        ::= { rcStatMltIpEntry 10 }
+
+rcStatMltIpOutNoRoutes OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "no route to destination"
+        ::= { rcStatMltIpEntry 11 }
+
+rcStatMltIpReasmReqds OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "fragments to reassem"
+        ::= { rcStatMltIpEntry 12 }
+
+rcStatMltIpReasmOKs OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "reassembled successfully"
+        ::= { rcStatMltIpEntry 13 }
+
+rcStatMltIpReasmFails OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "reassembly failures"
+        ::= { rcStatMltIpEntry 14 }
+
+rcStatMltIpFragOKs OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "fragment successfully"
+        ::= { rcStatMltIpEntry 15 }
+
+rcStatMltIpFragFails OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "fragment failure"
+        ::= { rcStatMltIpEntry 16 }
+
+rcStatMltIpFragCreates OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "pkts due to fragmenting"
+        ::= { rcStatMltIpEntry 17 }
+
+rcStatMltIpRoutingDiscards OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        deprecated
+        DESCRIPTION   "Route entries removed"
+        ::= { rcStatMltIpEntry 18 }
+
+-- SMLT IST
+
+rcStatSmltIstDownCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts how the session between the
+                       two peering switches has done down since last boot."
+        ::= { rcStatMlt 4 } 
+
+rcStatSmltHelloTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx hello msg."
+        ::= { rcStatMlt 5 } 
+
+rcStatSmltHelloRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx hello msg."
+        ::= { rcStatMlt 6 } 
+
+rcStatSmltLearnMacAddrTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx learn Mac Address msg."
+        ::= { rcStatMlt 7 } 
+
+rcStatSmltLearnMacAddrRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx learn Mac Address msg."
+        ::= { rcStatMlt 8 } 
+
+rcStatSmltMacAddrAgeOutTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx Mac Address Aging Out msg."
+        ::= { rcStatMlt 9 } 
+
+rcStatSmltMacAddrAgeOutRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx Mac Address Aging Out msg."
+        ::= { rcStatMlt 10 } 
+
+rcStatSmltMacAddrAgeExpTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx Mac Address age expired msg."
+        ::= { rcStatMlt 11 } 
+
+rcStatSmltMacAddrAgeExpRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx Mac Address age expired msg."
+        ::= { rcStatMlt 12 } 
+
+rcStatSmltStgInfoTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx Stg information msg."
+        ::= { rcStatMlt 13 } 
+
+rcStatSmltStgInfoRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx Stg information msg."
+        ::= { rcStatMlt 14 } 
+
+rcStatSmltDelMacAddrTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx deleted MAC address msg."
+        ::= { rcStatMlt 15 } 
+
+rcStatSmltDelMacAddrRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx deleted MAC address msg."
+        ::= { rcStatMlt 16 } 
+
+rcStatSmltSmltDownTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx Smlt Down msg."
+        ::= { rcStatMlt 17 } 
+
+rcStatSmltSmltDownRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx Smlt Down msg."
+        ::= { rcStatMlt 18 } 
+
+rcStatSmltSmltUpTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx Smlt Up msg."
+        ::= { rcStatMlt 19 }
+
+rcStatSmltSmltUpRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx Smlt Up msg."
+        ::= { rcStatMlt 20 }
+
+rcStatSmltSendMacTblTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx Send Mac Table msg."
+        ::= { rcStatMlt 21 } 
+
+rcStatSmltSendMacTblRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx Send Mac Table msg."
+        ::= { rcStatMlt 22 } 
+
+rcStatSmltIgmpTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx Igmp msg."
+        ::= { rcStatMlt 23 } 
+
+rcStatSmltIgmpRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx Igmp msg."
+        ::= { rcStatMlt 24 } 
+
+rcStatSmltPortDownTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx port down msg."
+        ::= { rcStatMlt 25 } 
+
+rcStatSmltPortDownRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx port down msg."
+        ::= { rcStatMlt 26 } 
+
+rcStatSmltReqMacTblTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the tx request Mac table msg."
+        ::= { rcStatMlt 27 } 
+
+rcStatSmltReqMacTblRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx request Mac table msg."
+        ::= { rcStatMlt 28 } 
+
+rcStatSmltRxUnknownMsgTypeCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Counters that counts the rx unknown msg type."
+        ::= { rcStatMlt 29 } 
+
+rcStatMltIfUtilTable OBJECT-TYPE
+         SYNTAX        SEQUENCE OF RcStatMltIfUtilEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "A table used to store Mlt interface utilization."
+         ::= { rcStatMlt 30 }
+ 
+rcStatMltIfUtilEntry OBJECT-TYPE
+         SYNTAX        RcStatMltIfUtilEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "Mlt interface utilization"
+         INDEX         { rcStatMltIfUtilMltId }
+         ::= { rcStatMltIfUtilTable 1 }
+ 
+RcStatMltIfUtilEntry ::= SEQUENCE {
+         rcStatMltIfUtilMltId           Integer32,
+         rcStatMltIfUtilIfHCInOctets    Counter64,
+         rcStatMltIfUtilIfHCInUtil      Gauge32,
+         rcStatMltIfUtilIfHCOutOctets   Counter64,
+         rcStatMltIfUtilIfHCOutUtil     Gauge32
+         }
+ 
+rcStatMltIfUtilMltId OBJECT-TYPE
+         SYNTAX        Integer32 (1..32)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION   "To assign an Id within the range specified to the  
+                        Mlt created "
+         ::= { rcStatMltIfUtilEntry 1 }
+ 
+rcStatMltIfUtilIfHCInOctets OBJECT-TYPE
+         SYNTAX         Counter64
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION    "The total number of octets received
+                         on the MLT interface, including framing characters."
+        ::= { rcStatMltIfUtilEntry 2 }
+        
+rcStatMltIfUtilIfHCInUtil OBJECT-TYPE
+         SYNTAX         Gauge32
+         MAX-ACCESS     read-only
+         STATUS         current
+         DESCRIPTION    "The best estimate of the mean physical layer network
+                        utilization on this interface during this interval, 
+                        in percent."
+        ::= { rcStatMltIfUtilEntry 3}
+ 
+rcStatMltIfUtilIfHCOutOctets OBJECT-TYPE
+         SYNTAX          Counter64
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION     "The total number of octets transmitted out of the
+                          MLT interface, including framing characters."
+       ::= { rcStatMltIfUtilEntry 4 }
+ 
+ 
+rcStatMltIfUtilIfHCOutUtil OBJECT-TYPE
+         SYNTAX           Gauge32
+         MAX-ACCESS       read-only
+         STATUS           current
+         DESCRIPTION      "The best estimate of the mean physical layer network
+                           utilization on this interface during this interval, 
+                           in percent."
+         ::= { rcStatMltIfUtilEntry 5 }
+
+
+
+
+
+
+rcStatSmltLacpInfoRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "LACP info msgs received."
+        ::= { rcStatMlt 31 } 
+
+rcStatSmltLacpInfoTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "LACP info msgs transmitted."
+        ::= { rcStatMlt 32 } 
+
+-- MLT utilization statistics per port
+
+rcStatMltUtilTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcStatMltUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A table used to store statistics for MLT members utilization."
+        ::= { rcStatMlt 33 }
+ 
+rcStatMltUtilEntry OBJECT-TYPE
+        SYNTAX        RcStatMltUtilEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "An entry for MLT members utilization statistics table."
+        INDEX         { rcMltId,
+                        rcStatMltUtilPortIfIndex,
+                        rcStatMltUtilTrafficType }
+        ::= { rcStatMltUtilTable 1 }
+ 
+RcStatMltUtilEntry ::= SEQUENCE {
+        rcStatMltUtilPortIfIndex           InterfaceIndex,
+        rcStatMltUtilTrafficType           INTEGER,
+        rcStatMltUtilTrafficLast5Min       Gauge32,
+        rcStatMltUtilTrafficLast30Min      Gauge32,
+        rcStatMltUtilTrafficLast1Hour      Gauge32
+        }
+
+rcStatMltUtilPortIfIndex OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Port ifIndex, member of rcMltId."
+        ::= { rcStatMltUtilEntry 1 }
+
+rcStatMltUtilTrafficType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                              rx(1),
+                              tx(2),
+                              rxTx(3)
+                      }
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Type of traffic for one MLT port interface."
+        ::= { rcStatMltUtilEntry 2 }
+
+rcStatMltUtilTrafficLast5Min OBJECT-TYPE
+        SYNTAX        Gauge32 (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the percentage of traffic on one MLT port interface for the last 5 minutes."
+        ::= { rcStatMltUtilEntry 3 }
+
+rcStatMltUtilTrafficLast30Min OBJECT-TYPE
+        SYNTAX        Gauge32 (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the percentage of traffic on one MLT port interface for the last 30 minutes."
+        ::= { rcStatMltUtilEntry 4 }
+
+rcStatMltUtilTrafficLast1Hour OBJECT-TYPE
+        SYNTAX        Gauge32 (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the percentage of traffic on one MLT port interface for the last hour."
+        ::= { rcStatMltUtilEntry 5 }
+
+rcStatSmltSpbmInfoTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM information tx messages."
+        ::= { rcStatMlt 34 } 
+
+rcStatSmltSpbmInfoFailTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM information Fail tx messages."
+        ::= { rcStatMlt 35 } 
+
+rcStatSmltSpbmInfoRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM information rx messages."
+        ::= { rcStatMlt 36 } 
+
+rcStatSmltSpbmLearnMacRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM learn Mac rx messages."
+        ::= { rcStatMlt 37 }
+
+rcStatSmltSpbmLearnMacTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM learn Mac tx messages."
+        ::= { rcStatMlt 38 }
+
+rcStatSmltSpbmDelMacRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM delete Mac rx messages."
+        ::= { rcStatMlt 39 }
+
+rcStatSmltSpbmDelMacTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM delete Mac tx messages."
+        ::= { rcStatMlt 40 }
+
+rcStatSmltSpbmMacAgeOutRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM Mac Aging Out rx messages."
+        ::= { rcStatMlt 41 }
+
+rcStatSmltSpbmMacAgeOutTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM Mac Aging Out tx messages."
+        ::= { rcStatMlt 42 }
+
+rcStatSmltSpbmMacTblRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This object returns the number of SPBM Mac Table rx messages."
+        ::= { rcStatMlt 43 }
+
+rcStatSmltPortTblSyncReqTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt table sync request tx msg counter"
+        ::= { rcStatMlt 44 }
+	
+rcStatSmltPortTblSyncReqRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt table sync request rx msg counter"
+        ::= { rcStatMlt 45 }
+
+rcStatSmltPortTblSyncTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt table sync tx msg counter"
+        ::= { rcStatMlt 46}
+	
+rcStatSmltPortTblSyncRxMsgCnt  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt table sync rx msg counter" 
+        ::= { rcStatMlt 47 }
+	
+rcStatSmltPortUpdateTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt port update tx msg counter" 
+        ::= { rcStatMlt 48 }	
+
+rcStatSmltPortUpdateRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt port update rx msg counter" 
+        ::= { rcStatMlt 49 }
+	
+rcStatSmltEntryUpdateTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt Entry update tx msg counter" 
+        ::= { rcStatMlt 50 }
+	
+rcStatSmltEntryUpdateRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt Entry update rx msg counter" 
+        ::= { rcStatMlt 51 }
+	
+rcStatSmltDialectNegotiateTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt protocol ID tx msg counter" 
+        ::= { rcStatMlt 52 }
+
+rcStatSmltDialectNegotiateRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt protocol ID rx msg counter" 
+        ::= { rcStatMlt 53 }
+
+rcStatSmltUpdateRespTxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt update response tx msg counter" 
+        ::= { rcStatMlt 54 }
+
+rcStatSmltUpdateRespRxMsgCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt update response rx msg counter" 
+        ::= { rcStatMlt 55 }
+	
+rcStatSmltTransQHighWaterMarkMsgCnt  OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt transaction Queue high watermark msg count" 
+        ::= { rcStatMlt 56 }
+	
+rcStatSmltPollCountHighWaterMarkCnt OBJECT-TYPE
+        SYNTAX        Counter32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Smlt poll count high watermark count" 
+        ::= { rcStatMlt 57 }
+    
+-- Multi-Link Trunking Table
+
+rcMltNumMlts OBJECT-TYPE
+        SYNTAX        	Integer32
+        MAX-ACCESS        	read-only
+        STATUS        	current
+        DESCRIPTION   	"The number of MLTs currently defined in the switch."
+        ::= { rcMlt 1 }
+
+rcMltPotentialMembers OBJECT-TYPE
+        SYNTAX        	PortSet
+        MAX-ACCESS        	read-only
+        STATUS        	current
+        DESCRIPTION   	"The set of ports that are not members of any MLT."
+        ::= { rcMlt 2 }
+
+rcMltIstSessionEnable OBJECT-TYPE
+        SYNTAX        EnableValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Used to enable/disable mlt functionality."
+        ::= { rcMlt 3 }
+
+rcMltIstSessionStatus OBJECT-TYPE
+        SYNTAX        INTEGER {
+                           up(1),
+                           down(2)
+                        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Used to enable/disable mlt functionality."
+        ::= { rcMlt 4 }
+
+rcMltIstPeerIp OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "IST mlt Peer Ip address."
+        ::= { rcMlt 5 }
+
+rcMltIstVlanId OBJECT-TYPE
+        SYNTAX        Integer32 (0..4095)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "IST mlt Vlan Id."
+        ::= { rcMlt 6 }
+
+rcMltDisablePortsOnShutdown OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "When true(1), the port members of an MLT will be
+                       automatically shutdown when the MLT becomes disabled."
+        ::= { rcMlt 7 }
+
+
+rcMltTable OBJECT-TYPE
+        SYNTAX        	SEQUENCE OF RcMltEntry
+        MAX-ACCESS        	not-accessible
+        STATUS        	current
+        DESCRIPTION   	"A list of Multi-Link Trunk entries. The number of 
+                      	entries is given by rcMltNumMlts."
+        ::= { rcMlt 10 }
+
+rcMltEntry OBJECT-TYPE
+        SYNTAX        	RcMltEntry
+        MAX-ACCESS        	not-accessible
+        STATUS        	current
+        DESCRIPTION   	"Entry containing configuration information for a 
+                      	particular Multi-Link Trunk."
+        INDEX         	{ rcMltId }
+        ::= { rcMltTable 1 }
+
+RcMltEntry ::= SEQUENCE {
+                rcMltId	                    Integer32,
+                rcMltName                   DisplayString,
+                rcMltPortMembers            PortSet,
+		rcMltPortType               INTEGER,	
+		rcMltNumVlanIds             Integer32,
+		rcMltVlanIds                IdList,
+                rcMltRowStatus              RowStatus,
+		rcMltEnable                 TruthValue,
+		rcMltLoadBalance            TruthValue,
+		rcMltDistributionAlgorithm  INTEGER,
+		rcMltIfIndex		    InterfaceIndexOrZero,
+		rcMltMltType   		    INTEGER,
+		rcMltSmltId		    Integer32,
+		rcMltRunningType            INTEGER,
+		rcMltSvlanPortType          INTEGER,
+		rcMltMulticastDistribution  EnableValue,
+                rcMltLacp10gBackup          EnableValue,
+		rcMltAggregatable           EnableValue,
+		rcMltClearLinkAggregate     INTEGER,
+                rcMltNtStgEnable            TruthValue,
+                rcMltDesignatedPort         InterfaceIndex,
+                rcMltAggOperState           EnableValue,
+                rcMltAggTimeOfLastOperChange TimeTicks,
+                rcMltVplsMgmtVlan           EnableValue,
+		rcMltLoadDistributionOption INTEGER,
+		rcMltUniAggrMacIdx	    Integer32,
+		rcMltUniAggrMacAddress	    MacAddress,
+		rcMltQinqEtherType	    Integer32,
+                rcMltEgressCosProfileName   DisplayString,
+                rcMltEgressPolicerAdminState  EnableValue,
+                rcMltAggrEgressBandwidth    EnableValue,
+                rcMltAggrIngressBandwidth   EnableValue,
+		rcMltAggrMacAlloc 	    EnableValue,
+                rcMltAggMinLink             Integer32,
+                rcMltMtu                    Integer32,
+                rcMltInterfaceType          INTEGER,
+                rcMltConfiguredMembers      PortSet,
+                rcMltMtuAdminState          EnableValue,
+                rcMltPeerPortMembers        PortSet,
+                rcMltCpLimitPktRate         Integer32,
+                rcMltCpLimitShutDownEnable  TruthValue,
+                rcMltVlanIdList               OCTET STRING,
+                rcMltEntryOwner               INTEGER,
+                rcMltDatapathProgrammingState INTEGER,
+		rcMltL4Hash                   EnableValue,
+	        rcMltPrivateVlanType         INTEGER,
+                rcMltBpduMode                INTEGER,
+		rcMltPeerPortMembersList     DisplayString,
+		rcMltFlexUniEnable	     TruthValue
+        }
+
+rcMltId OBJECT-TYPE
+        SYNTAX        	Integer32 (1..512)
+        MAX-ACCESS        	read-only
+        STATUS        	current
+        DESCRIPTION   	"A value that uniquely identifies the Multi-Link 
+                      	Trunk associated with this entry."
+        ::= { rcMltEntry 1 }
+
+rcMltName OBJECT-TYPE
+        SYNTAX        	DisplayString (SIZE (0..20))
+        MAX-ACCESS        	read-create
+        STATUS        	current
+        DESCRIPTION   	"An administratively-assigned name for this MLT."
+        ::= { rcMltEntry 2 }
+
+rcMltPortMembers OBJECT-TYPE
+        SYNTAX        	PortSet
+        MAX-ACCESS        	read-create
+        STATUS        	current
+        DESCRIPTION   	"The set of ports that are members of this MLT." 
+        ::= { rcMltEntry 3 }
+
+rcMltPortType OBJECT-TYPE
+        SYNTAX        	INTEGER {
+                        	access(1),     -- access port type
+                         	trunk(2)       -- trunk port type
+                      	}
+        MAX-ACCESS        	read-create
+        STATUS        	current
+        DESCRIPTION   	"The type of MLT port: access(1) or trunk(2)."
+	DEFVAL 		{ access }
+        ::= { rcMltEntry 4 }
+ 
+rcMltNumVlanIds OBJECT-TYPE
+        SYNTAX        	Integer32
+        MAX-ACCESS        	read-only
+        STATUS        	current
+        DESCRIPTION   	"Used to indicate the number of VLAN IDs that
+                      	are stored in the rcMltVlanIds variable."
+        ::= { rcMltEntry 5 }
+
+rcMltVlanIds OBJECT-TYPE
+        SYNTAX        	IdList (SIZE (0..8192))
+        MAX-ACCESS      read-create
+        STATUS        	current
+        DESCRIPTION   	"An array used to identify which VLANs this MLT 
+                      	is associated with.  Each VLAN ID is stored as a 
+		      	two octet value. The first octet in the pair holds
+                      	bits 15-8 of the VLAN ID, while the second octet
+                      	holds bits 7-0 of the VLAN ID."
+        ::= { rcMltEntry 6 }
+
+rcMltRowStatus OBJECT-TYPE
+        SYNTAX        	RowStatus
+        MAX-ACCESS      read-create
+        STATUS        	current
+        DESCRIPTION   	"Used to create/delete entries in the rcMltTable."
+        ::= { rcMltEntry 7 }
+
+rcMltEnable OBJECT-TYPE
+        SYNTAX        	TruthValue
+        MAX-ACCESS      read-create
+        STATUS        	current
+        DESCRIPTION   	"Enable the entry."
+	DEFVAL 		{ true }
+        ::= { rcMltEntry 8 }
+
+rcMltLoadBalance OBJECT-TYPE
+        SYNTAX        	TruthValue
+        MAX-ACCESS      read-create
+        STATUS        	current
+        DESCRIPTION   	"Perform load balance?"
+	DEFVAL	{ false }
+        ::= { rcMltEntry 9 }
+
+rcMltDistributionAlgorithm OBJECT-TYPE
+        SYNTAX        	INTEGER {
+                            none(1),
+                            basic(2),
+                            advanced(3),
+                            enhanced(4)
+                      	}
+        MAX-ACCESS      read-create
+        STATUS        	current
+        DESCRIPTION   	"The load balancing algorithm."
+	DEFVAL		{ none }
+        ::= { rcMltEntry 10 }
+
+rcMltIfIndex OBJECT-TYPE
+        SYNTAX        InterfaceIndexOrZero
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Used to indicate the 'logical' ifIndex assigned to
+                      this MLT."
+        ::= { rcMltEntry 11 }
+
+rcMltMltType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        	normalMLT(1),
+                        	istMLT(2),
+                        	splitMLT(3),
+				virtualIstMlt(4)
+                      } 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "MLT type. virtaulIstMlt(4) to Enable/Disable Virtual IST
+	               on an MLT. Virtual IST on an MLT can only be enabled when
+		       spbm-config-mode boot flag is disabled"
+        ::= { rcMltEntry 12 }
+
+rcMltSmltId OBJECT-TYPE
+        SYNTAX        Integer32 (0..512)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Split MLT id."
+        ::= { rcMltEntry 13 }
+
+rcMltRunningType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        	normalMLT(1),
+                        	istMLT(2),
+                        	splitMLT(3),
+				virtualIstMlt(4)	
+                      } 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Split MLT running type."
+        ::= { rcMltEntry 14 } 
+
+rcMltSvlanPortType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        	normal(1),
+                        	uni(2),
+                        	nni(3)
+                      } 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Set MLT port type."
+        DEFVAL   { normal }
+        ::= { rcMltEntry 15 }
+
+rcMltMulticastDistribution OBJECT-TYPE           
+        SYNTAX        EnableValue
+	MAX-ACCESS    read-create            
+	STATUS        current             
+	DESCRIPTION   "Enable/Disable multicast distribution per mlt."
+	DEFVAL        { disable }
+        ::= { rcMltEntry 16 }
+
+rcMltLacp10gBackup OBJECT-TYPE
+        SYNTAX        EnableValue
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Enable/Disable 10G Mlt reliance backup mode."
+        DEFVAL        { disable }
+        ::= { rcMltEntry 17 }
+
+rcMltAggregatable OBJECT-TYPE
+        SYNTAX        EnableValue
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Enable/Disable link aggregation on a MLT."
+        DEFVAL        { disable }
+        ::= { rcMltEntry 18 }
+
+rcMltClearLinkAggregate OBJECT-TYPE
+        SYNTAX        INTEGER {
+                        	clear(1),
+                        	none(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "clear link aggregate, equivalent to disable and 
+                       re-enable aggregatable on the MLT."
+        ::= { rcMltEntry 19 }
+
+rcMltNtStgEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+               MAX-ACCESS    read-create
+               STATUS        current
+        DESCRIPTION     "Indicates whether this MLT is operating in
+                         Nortel Mode or in Cisco Mode.
+                         true = Nortel Mode
+                         false = Cisco Mode."
+        DEFVAL         { true }
+        ::= { rcMltEntry 20 }
+
+rcMltDesignatedPort OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+               MAX-ACCESS    read-only
+               STATUS        current
+        DESCRIPTION     "Indicates the Designated port for the MLT."
+        ::= { rcMltEntry 21 }
+
+rcMltAggOperState OBJECT-TYPE
+        SYNTAX        EnableValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Link aggregation state on a MLT."
+        ::= { rcMltEntry 22 }
+
+rcMltAggTimeOfLastOperChange OBJECT-TYPE
+        SYNTAX        TimeTicks
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The time value since the interface entered its
+                       current operational state."
+        ::= { rcMltEntry 23 }
+
+rcMltVplsMgmtVlan      OBJECT-TYPE
+        SYNTAX          EnableValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Management Vlan is configured on this mlt"
+        DEFVAL          { disable }
+        ::= { rcMltEntry 24 }
+
+rcMltLoadDistributionOption OBJECT-TYPE
+        SYNTAX        INTEGER {
+                           bmac(1),
+                           cmac(2),
+                           bvid(3),
+                           isid(4)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Used to specify the Load Balancing option for MLT in UNI"
+        DEFVAL  { bmac }
+        ::= { rcMltEntry 25 }
+
+rcMltUniAggrMacIdx  OBJECT-TYPE
+        SYNTAX	    Integer32 (0..448)
+        MAX-ACCESS  read-create
+        STATUS	    current
+        DESCRIPTION "Used to specify the index of the mac address pool reserved for MLT uni"
+        DEFVAL  { 0 }
+        ::= { rcMltEntry 26 }
+
+rcMltUniAggrMacAddress	OBJECT-TYPE
+        SYNTAX		MacAddress
+        MAX-ACCESS	read-only
+        STATUS		current
+        DESCRIPTION	"Used to display the mac address reserved for this MLT"
+        ::= { rcMltEntry 27 }
+
+rcMltQinqEtherType  OBJECT-TYPE
+        SYNTAX        Integer32 (1..'FFFF'h) 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "The qinq ether type value. It should be displayed 
+		       and input as Hex value. It would only be used when 
+		       MLT is associated with QnQ service UNI. Otherwise, 
+		       it would be ignored"
+        DEFVAL        { '8020'h }
+        ::= { rcMltEntry 28 }
+rcMltEgressCosProfileName   OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE (1..20))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Mlt Egress COS Profile Name, which is defined by
+                        rcCosProfileTable"
+        DEFVAL          { "DEFAULT_PORT_PROFILE"  }
+        ::= { rcMltEntry 29 }
+
+rcMltEgressPolicerAdminState        OBJECT-TYPE
+        SYNTAX          EnableValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Enable/disable Mlt Egress Policer"
+        DEFVAL          { disable }
+        ::= { rcMltEntry 30 }
+
+rcMltAggrEgressBandwidth        OBJECT-TYPE
+        SYNTAX          EnableValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION    "Aggregated Egress Bandwidth Policer is used."
+        DEFVAL        { enable }
+        ::= { rcMltEntry 31 }
+
+rcMltAggrIngressBandwidth        OBJECT-TYPE
+        SYNTAX          EnableValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION    "Aggregated Ingress Bandwidth Policer is used."
+        DEFVAL        { enable }
+        ::= { rcMltEntry 32 }
+
+rcMltAggrMacAlloc   OBJECT-TYPE
+	SYNTAX          EnableValue
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION     "Aggregated Mac Allocation is used"
+	DEFVAL        { disable }
+        ::= { rcMltEntry 33 }
+
+rcMltAggMinLink OBJECT-TYPE
+        SYNTAX        Integer32 (1..8)
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "If number of active links goes below configured
+                       minimum-link number, the entire LAG is declared
+                       down."
+        ::= { rcMltEntry 34 }
+
+rcMltMtu   OBJECT-TYPE
+        SYNTAX          Integer32 (1518..9600)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "MTU for ports in Mlt"
+        DEFVAL        { 1518 }
+        ::= { rcMltEntry 35 }
+
+rcMltInterfaceType   OBJECT-TYPE
+        SYNTAX INTEGER {
+                        normal(1),
+                        silent(2),
+                        uni(3)
+                        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "This value indicates whether ports in the mlt are of type
+                        <normal/silent/uni>. A port can be included in any EVPN
+                        service only if this attribute is set to uni. If the port
+                        is not part of any VLAN the interface-type is set to silent.
+                        Before adding a port to a VLAN the interface type should
+                        be changed to normal."
+        DEFVAL          { silent }
+        ::= { rcMltEntry 36 }
+
+rcMltConfiguredMembers OBJECT-TYPE
+        SYNTAX          PortSet
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "The set of ports that are configured members of this MLT.
+                         Toronto release allows us to add a port to a LACP enabled
+                         MLT. These port get added as ConfiguredMembers"
+        ::= { rcMltEntry 37 }
+
+rcMltMtuAdminState   OBJECT-TYPE
+        SYNTAX          EnableValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Set Mlt MTU enable or disable"
+        DEFVAL        { disable }
+        ::= { rcMltEntry 38 }
+
+rcMltPeerPortMembers OBJECT-TYPE
+        SYNTAX          PortSet
+        MAX-ACCESS      read-only
+        STATUS          obsolete
+        DESCRIPTION     "The set of Peer ports which are connected to local
+                         ports (rcMltPortMember) of this MLT.
+			 This object has been deprecated/obsolete by object rcMltPeerPortMembersList"
+        ::= { rcMltEntry 39 }
+
+rcMltCpLimitPktRate OBJECT-TYPE
+        SYNTAX          Integer32(1000..20000)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Used to limit Control packets on the
+                         port to qos-levels 6 and 7.
+                         Sets the limit in packets per second."
+        DEFVAL          { 8000 }
+        ::= { rcMltEntry 40 }
+
+rcMltCpLimitShutDownEnable OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Used to indicate if the mlt-ports should  be
+                         shutdown when the CpLimitPktRate is exceeded."
+        DEFVAL          { false }
+        ::= { rcMltEntry 41 }
+
+rcMltVlanIdList OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..512))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "This bitfield is used to identify which VLANs this MLT
+                        is associated with. Each VLAN ID is stored as a bit.
+                        The most-significant (left-most) bit represents
+                        Vlan Id 1."
+        ::= { rcMltEntry 42 }
+
+rcMltEntryOwner OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                none(1),
+                                local(2),
+                                remote(3),
+                                localAndRemote(4)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Defines the owner of the MLT."
+        ::= { rcMltEntry 43 }
+
+rcMltDatapathProgrammingState OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                none(1),
+                                local(2),
+                                remote(3),
+                                localAndRemote(4)                         }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Defines the datapath programming state of
+                         the MLT."
+        ::= { rcMltEntry 44 }
+
+rcMltL4Hash OBJECT-TYPE
+        SYNTAX 		EnableValue
+	MAX-ACCESS 	read-create
+	STATUS 		current
+	DESCRIPTION     "If enabled all the non fragmented L4 packets will
+	                take L4 hashing and all the fragmented L4 packets
+			and L3 packets will take L3 hashing. If disabled
+			then both L3 and L4 packets will take L3 hashing.
+			It is introduce by release 5.1.6.0"
+	DEFVAL        	{ disable } 
+	::= { rcMltEntry 45 }
+    
+rcMltPrivateVlanType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                         trunk(1),    
+                         isolated(2),
+                         promiscuous(3),
+                         none(4)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "The mode used when private VLAN is associated with MLT.
+                      If the VLAN is not private then this is ignored.
+                      If the VLAN is private then the value must be
+                      either trunk, isolated, or promiscuous.  Setting
+                      the value to trunk will enable tagging.  Setting
+                      the value to isolated or promiscuous will remove
+                      non-private VLANs from the mlt."
+        DEFVAL        { none } 
+        ::= { rcMltEntry 46 }
+
+rcMltBpduMode OBJECT-TYPE
+        SYNTAX        INTEGER {
+                         all-ports(1),
+                         single-port(2)
+                      }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "This object specifies the BPDU send/receive mode:
+                       send/receive BPDUs on all trunk ports (1) or
+                       on a single trunk port (2)."
+        DEFVAL        { all-ports }
+        ::= { rcMltEntry 47 }
+    
+rcMltPeerPortMembersList  OBJECT-TYPE
+        SYNTAX        	DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only 
+        STATUS        	current
+        DESCRIPTION   	"A list of peer ports in the display format slot/port,slot/port/sub-port.
+	                 A port display format cannot be always hardcoded as slot/port. It depends
+			 on the dynamic setting of the port, such as channelized.
+	                 This object is used to deprecate/obsolete the object of rcMltPeerPortMembers."
+        ::= { rcMltEntry 48} 
+
+rcMltFlexUniEnable   OBJECT-TYPE
+    	SYNTAX		TruthValue
+	MAX-ACCESS	read-create
+	STATUS		current
+	DESCRIPTION	"Used to set Flex UNI 
+	    		 enable/disable on MLT"
+	DEFVAL		{ false }
+	::= { rcMltEntry 49 }   
+    
+rcMltMcastDistribution OBJECT IDENTIFIER       ::= { rcMlt 11 }
+
+rcMltMcastDistributionEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Used to enable/disable this feature to
+                       distribute multicast traffic on MLT ports. All
+                       the cards in the system must be E-Tickets.
+                       Cannot perform distribution in a mixed mode."
+        ::= { rcMltMcastDistribution 1 }
+
+rcMltMcastDistributionGrpMask OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Group Mask. Create a MLT abstraction layer to
+                       distribute traffic basd on (source, group) information
+                       of the multicast packet. The algorithm to pick
+                       the actual port nedds to generate a fairly random
+                       number for different combinations but a lways generate
+                       the same number for a given (source, group) pair. By
+                       default, the number of active ports of the MLT is used
+                       to MOD the pseudo-random number generated by the XOR
+                       of each byte of the masked group address with the
+                       masked source address."
+        ::= { rcMltMcastDistribution 2 }
+
+rcMltMcastDistributionSrcMask OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Source Mask."
+        ::= { rcMltMcastDistribution 3 }
+
+rcMltMcastDistributionRedistributionEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Enable redistribution."
+        ::= { rcMltMcastDistribution 4 }
+
+-- Single Link Trunk Port Table
+
+rcSltPortTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF RcSltPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Table containing config info for SLT"
+        ::= { rcMlt 12 }
+
+rcSltPortEntry OBJECT-TYPE
+        SYNTAX          RcSltPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entry containing configuration information for a 
+                        particular Multi-Link Trunk."
+        INDEX           { rcSltPortIfIndex }
+        ::= { rcSltPortTable 1 }
+
+RcSltPortEntry ::= SEQUENCE {
+        rcSltPortIfIndex               InterfaceIndex,
+        rcSltPortSmltId                Integer32,
+        rcSltPortOperType              INTEGER,
+        rcSltPortRowStatus             RowStatus
+        }
+
+rcSltPortIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "An interface for this SLT."
+        ::= { rcSltPortEntry 1 }
+
+rcSltPortSmltId OBJECT-TYPE
+        SYNTAX          Integer32 (1..512)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "A uniquely identifies the Single-Link
+                        Trunk associated with this entry."
+        ::= { rcSltPortEntry 2 }
+
+rcSltPortOperType OBJECT-TYPE
+        SYNTAX        INTEGER {
+                           normal(1),
+                           smlt(2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "The current operate type of the port normal
+                       or smlt."
+        ::= { rcSltPortEntry 3 }
+
+rcSltPortRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION     "Used to create/delete entries of the Table."
+        ::= { rcSltPortEntry 4 }
+
+-- rcMltVlacpTable
+
+rcMltVlacpTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcMltVlacpEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Mlt Virtual LACP table"
+        ::= { rcMlt 13 }
+
+rcMltVlacpEntry OBJECT-TYPE
+        SYNTAX        RcMltVlacpEntry
+        MAX-ACCESS    not-accessible         
+        STATUS        current
+        DESCRIPTION   "Entry containing info. for a particular port"
+        INDEX         { rcMltId }
+        ::= { rcMltVlacpTable 1 }
+
+RcMltVlacpEntry ::= SEQUENCE {
+        rcMltVlacpAdminEnable                  TruthValue,
+        rcMltVlacpFastPeriodicTimer            Integer32,
+        rcMltVlacpTimeoutScale                 Integer32,
+        rcMltVlacpEtherMacAddress              MacAddress,
+        rcMltVlacpDualHomingEnable             TruthValue
+        }
+
+rcMltVlacpAdminEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Administratively enable/disable Virtual LACP on a MLT"
+        DEFVAL        { false }
+        ::= { rcMltVlacpEntry 1 }
+
+rcMltVlacpFastPeriodicTimer OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-write
+        STATUS        current 
+        DESCRIPTION   "The number of miliseconds between periodic transmissions
+                       using Short Timeouts"
+        DEFVAL        { 250 }                                               
+        ::= { rcMltVlacpEntry 2 }
+
+rcMltVlacpTimeoutScale OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Scalar value used to calculate timeout time from
+                       periodic time. Timeout = PeriodicTime * TimeoutScale"
+        DEFVAL        { 3 }
+        ::= { rcMltVlacpEntry 3 }
+
+rcMltVlacpEtherMacAddress OBJECT-TYPE
+        SYNTAX         MacAddress
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Multicast Mac Address exclusively used for VLACPDU's"
+        ::= { rcMltVlacpEntry 4 }
+
+rcMltVlacpDualHomingEnable OBJECT-TYPE
+         SYNTAX        TruthValue
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION   "Enable/Disable Dual homing on Virtual LACP on a MLT"
+         DEFVAL        { false }
+         ::= { rcMltVlacpEntry 5 }
+
+-- rcMltBvidPortTable related information starts here
+
+rcMltBvidPortTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF RcMltBvidPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Table contains Bridge Vlan configured information for 
+		       Primary and Secondary ports for MLT-UNI"
+        ::= { rcMlt 14 }
+
+rcMltBvidPortEntry OBJECT-TYPE
+        SYNTAX        RcMltBvidPortEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "Entry with Info about VLAN with its Primary and secondary ports for MLT-UNI"
+        INDEX { rcMltBvidMltId, rcMltBvidVlanId}
+        ::= { rcMltBvidPortTable 1 }
+
+RcMltBvidPortEntry ::= SEQUENCE {
+        rcMltBvidMltId   Integer32,
+        rcMltBvidVlanId Integer32,
+        rcMltBvidPrimaryPort InterfaceIndex,
+        rcMltBvidSecondaryPort InterfaceIndex,
+        rcMltBvidRowStatus  RowStatus
+        }
+
+rcMltBvidMltId OBJECT-TYPE
+        SYNTAX        Integer32 (1..256)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "VLAN ID of the Port List"
+        ::= { rcMltBvidPortEntry 1 }
+
+rcMltBvidVlanId OBJECT-TYPE
+        SYNTAX        Integer32 (1..4096)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "VLAN ID of the Port List"
+        ::= { rcMltBvidPortEntry 2 }
+
+rcMltBvidPrimaryPort OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Primary port of the MLT for the VLAN when load distribution option is b-vid"
+        ::= { rcMltBvidPortEntry 3 }
+
+rcMltBvidSecondaryPort OBJECT-TYPE
+        SYNTAX        InterfaceIndex
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Secondary port of the MLT for the VLAN when load distribution option is b-vid "
+        ::= { rcMltBvidPortEntry 4 }
+
+rcMltBvidRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION   "Used to Add/delete entries in the table"
+        ::= { rcMltBvidPortEntry 5 }
+
+-- rcMltBvidPortTable related information ends here
+
+rcMltNotificationObjects OBJECT IDENTIFIER ::= { rcMlt 15 }
+
+rcMltAggTrapEvent OBJECT-TYPE
+        SYNTAX        INTEGER {
+                                     localdown(1),
+                                     remotedown(2),
+                                     up(3)
+                                }
+        MAX-ACCESS    accessible-for-notify
+        STATUS        current
+        DESCRIPTION   "Three trap events type: local down(1),
+                       remote down(2), up(3)."
+        ::= { rcMltNotificationObjects 1 }
+
+rcMltIstStpEnable OBJECT-TYPE
+        SYNTAX        EnableValue
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Used to enable/disable mlt ist stp functionality."
+        DEFVAL        { disable }
+        ::= { rcMlt 16 }
+
+-- Link Flap Detect Group
+
+rcLinkFlapDetectAutoPortDownEnable OBJECT-TYPE
+        SYNTAX        	TruthValue
+        MAX-ACCESS      	read-write
+        STATUS        	current
+        DESCRIPTION   	"Used to enable/disable the Link Flap Detect
+			feature.  When enabled this feature will monitor
+			the number of times a port goes down during a
+			certain interval.  If the number exceeds a given
+			bound the port will be forced out-of-service." 
+        ::= { rcLinkFlapDetect 1 }
+
+rcLinkFlapDetectSendTrap OBJECT-TYPE
+        SYNTAX        	TruthValue
+        MAX-ACCESS      	read-write
+        STATUS        	current
+        DESCRIPTION   	"Used to configure whether a trap should be
+			sent if the port is forced out-of-service."	
+        ::= { rcLinkFlapDetect 2 }
+
+rcLinkFlapDetectFrequency OBJECT-TYPE
+        SYNTAX        	Integer32 (1..9999)
+        MAX-ACCESS      	read-write
+        STATUS        	current
+        DESCRIPTION   	"Used to configure the number of times the port
+			can go down." 
+        ::= { rcLinkFlapDetect 3 }
+
+rcLinkFlapDetectInterval OBJECT-TYPE
+        SYNTAX        	Integer32 (2..600)
+        MAX-ACCESS     	read-write
+        STATUS        	current
+        DESCRIPTION   	"Used to configure the interval (in minutes)."
+        ::= { rcLinkFlapDetect 4 }
+
+-- rcL2Redundancy Group
+
+rcL2RedundancyHaCpuState OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                            initialization(0),
+                            oneWayActive(1),
+                            twoWayActive(2),
+                            synchronized(3),
+                            remoteIncompatible(4),
+                            error(5),
+                            disabled(6),
+                            peerNotConnected(7),
+                            peerConnected(8),
+                            lostPeerConnection(9),
+                            notSynchronized(10),
+                            synchronizeInProgress(11)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicate the Ha-CPU state. 
+                         initialization - indicate the CPU is in this state. 
+                         oneWayActive - Modules that need to be 
+                         synchronized have registered with the framework (either 
+                         locally or a message was received from remote CPU (1). 
+                         twoWayActive - Modules that need to be synchronized have 
+                         registered with the framework (either locally or a message 
+                         was received from remote CPU (2). 
+                         synchronized  - Table based synchroniztion was completed 
+                         on the current CPU (3).  
+                         remoteIncompatible - CPUs framework version is incompatible 
+                         with the remote CPU (4). 
+                         error  - If an invalid event is generated in a given state the 
+                         CPU enters Error state (5). 
+                         disabled - High Availability is not enabled (6).
+                         peerNotConnected - no peer connection is established (7).
+                         peerConnected - peer connection is established (8).
+                         lostPeerConnection - lost connection to peer/Standby CPU (9).
+                         notSynchronized - Table Sync is not complete (10).
+                         synchronizeInProgress - Table Sync is in progress (11)."
+        ::= { rcL2Redundancy 1 }
+
+rcL2RedundancyHaEvent OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                            restart(0),
+                            systemRegistrationDone(1),
+                            tableSynchronizationDone(2),
+                            versionIncompatible(3),
+                            noEvent(4)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicate the Ha event status. 
+                         restart (0) - Causes the state machine to restart 
+                         systemRegistrationDone (1)- Causes the CPU to transfer to 
+                         One Way or Two Way Active state. Locally or message received 
+                         from remote CPU.  
+                         tableSynchronizationDone (2) - Causes the CPU to 
+                         transfer to Synchronized state. 
+                         versionIncompatible (3) - Causes the CPU to go to Remote 
+                         Incompatible state 
+                         noEvent (4) - Means no event has occured uptill now. "
+        ::= { rcL2Redundancy 2 }
+
+rcL2RedundancyEnable OBJECT-TYPE
+        SYNTAX          EnableValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Indicate the feature enable/disable."
+        ::= { rcL2Redundancy 3 }
+
+rcL2RedundancyStandbyCpu OBJECT-TYPE
+        SYNTAX          INTEGER {
+                           hotStandbyCPU(1),
+                           warmStandbyCPU(2),
+                           standbyCPUNotPresent(3)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicate if the L2 Redundancy is enabled on the standby CPU."
+        ::= { rcL2Redundancy 4 }
+
+END
+

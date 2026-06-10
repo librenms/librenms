@@ -1,0 +1,936 @@
+     DELL-NETWORKING-BPSTATS-MIB DEFINITIONS ::= BEGIN
+      --  This module provides authoritative definitions for Dell 
+      --  Networking OS back plane statistics MIB.
+      --  This Module is for the hiGig backplane interfaces present in
+      --  leaf-spine architectured DELL Networking OS switches.
+      --  This module will be extended, as needed.
+      --
+      --  Front End port(user port) statistics is being handled by 
+      --  dellNet-ifextention.mib
+      -- 
+      --  As an example platform with above mentioned
+      --  architecture - Z9000 core switch has 2 spine and 4 leaf BCM trident+ chips,
+      --  connected with 32 back plane links(total 64 BP ports )
+      --         |----------------------------------------| <- StackUnit(Card)
+      --         |                                        |
+      --         |  |----||----|                          |
+      --         |  |____||____|<-SpinePortPipe           |
+      --         |   |  /                                 |
+      --         |   | /  <-bp links                     |
+      --         |   |/                                   |
+      --         |  |----| |----| |----| |----|<-Leaf     |
+      --         |  |____| |____| |____| |____|  PortPipe |
+      --         |________________________________________|
+      --
+      --  
+
+     IMPORTS
+          MODULE-IDENTITY, OBJECT-TYPE,
+          Counter32, Counter64, Integer32, Unsigned32, Gauge32
+              FROM SNMPv2-SMI
+          TimeStamp
+              FROM SNMPv2-TC
+          dellNetMgmt
+              FROM DELL-NETWORKING-SMI;
+
+     dellNetBpStatsMib MODULE-IDENTITY
+     LAST-UPDATED "201309181248Z" -- Sep 18,2013 12:48:00 GMT
+     ORGANIZATION
+        "Dell Inc"
+     CONTACT-INFO
+        "http://www.dell.com/support"
+
+     DESCRIPTION
+        "Dell Networking OS Back plane statistics mib.
+         This is MIB shall use for all back plane statistics related
+         activities.
+         This includes the BP ports traffic statistics.
+         BP link bundle monitoring based on BP port statistics.
+         Queue statistics and buffer utilization on BP ports etc .."
+
+     REVISION   "201305221248Z"
+     DESCRIPTION
+        "Initial version of this mib."
+        ::= { dellNetMgmt 24 }
+
+      -- ### Groups ###
+
+     dellNetBpStatsLinkBundleObjects OBJECT IDENTIFIER ::={ dellNetBpStatsMib 1 }
+     dellNetBpStatsObjects           OBJECT IDENTIFIER ::={ dellNetBpStatsMib 2 }
+     dellNetBpStatsAlarms            OBJECT IDENTIFIER ::={ dellNetBpStatsMib 3 }
+
+      -- ### Link Bundle Definitions ###
+
+     bpLinkBundleObjects        OBJECT IDENTIFIER
+       ::= { dellNetBpStatsLinkBundleObjects 1 }
+
+     bpLinkBundleRateInterval  OBJECT-TYPE
+         SYNTAX        INTEGER (10..299)
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "The rate interval for polling the
+          Bp link bundle Monitoring."
+         ::= { bpLinkBundleObjects 1 }
+
+     bpLinkBundleTriggerThreshold  OBJECT-TYPE
+         SYNTAX        INTEGER(1..90)
+         UNITS         "percent"
+         MAX-ACCESS    read-write
+         STATUS        current
+         DESCRIPTION
+         "The traffic distribution trigger threshold
+          for Bp link bundle Monitoring.In percentage of
+          total bandwidth of the link Bundle"
+         ::= { bpLinkBundleObjects 2 }
+ 
+      -- ### Backplane Statistic Definitions ###
+
+     bpStatsObjects   OBJECT IDENTIFIER ::={ dellNetBpStatsObjects 1 }
+
+     bpDropsTable  OBJECT-TYPE
+          SYNTAX        SEQUENCE OF BpDropsEntry
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "The back plane drops table contains the list of various drops
+           per BP higig port per BCM unit in a stack unit(card type)."
+          ::= { bpStatsObjects 1 }
+
+     bpDropsEntry  OBJECT-TYPE
+          SYNTAX        BpDropsEntry
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "Each drops entry is being indexed by StackUnit(card Type)
+           BCM unit ID and local Port Id"
+          INDEX         { bpDropsStackUnitIndex,
+                          bpDropsPortPipe,
+                          bpDropsPortIndex }
+          ::= { bpDropsTable 1 }
+
+     BpDropsEntry ::=
+     SEQUENCE {
+          bpDropsStackUnitIndex            INTEGER,
+          bpDropsPortPipe                  INTEGER,
+          bpDropsPortIndex                 INTEGER,
+          bpDropsInDrops                   Counter64,  
+          bpDropsInUnKnownHgHdr            Counter64,
+          bpDropsInUnKnownHgOpcode         Counter64,
+          bpDropsInMTUExceeds              Counter64,
+          bpDropsInMacDrops                Counter64,
+          bpDropsMMUHOLDrops               Counter64,
+          bpDropsEgMacDrops                Counter64,
+          bpDropsEgTxAgedCounter           Counter64,
+          bpDropsEgTxErrCounter            Counter64,
+          bpDropsEgTxMACUnderflow          Counter64,
+          bpDropsEgTxErrPktCounter         Counter64
+     }
+
+     bpDropsStackUnitIndex OBJECT-TYPE
+          SYNTAX        INTEGER (1..12)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "Stack unit(Card Type Id) number where this port present
+           Each card shall contain more than one BCM units"
+          ::= { bpDropsEntry 1 }
+
+     bpDropsPortPipe OBJECT-TYPE
+          SYNTAX        INTEGER (1..6)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+    	  DESCRIPTION
+    	  "bpPortPipe denotes the BCM unit in the stack unit(card Type)
+          Each BCM unit shall contain 1-128 local ports, which includes
+          BP as well as front end ports"
+          ::= { bpDropsEntry 2 }
+
+     bpDropsPortIndex OBJECT-TYPE
+         SYNTAX        INTEGER (1..128)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+    	 DESCRIPTION
+    	 "BP port number.
+          Maximum ports shall support by Trident2 BCM npu is 128.
+          This address space includes FE ports also, which are 
+          invalid ports as far as BP is concern.
+          For Z9000 leaf BCM units, 34 to 41 are the valid BP port numbers and
+          for spine BCM units, 1 to 16 are the valid BP ports "
+         ::= { bpDropsEntry 3 }
+
+     bpDropsInDrops OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The No of Ingress packet Drops"
+         ::= { bpDropsEntry 4 }
+
+     bpDropsInUnKnownHgHdr  OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The No of Unknown hiGig header Ingress packet Drops"
+         ::= { bpDropsEntry 5 }
+
+     bpDropsInUnKnownHgOpcode OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The No of Unknown hiGig Opcode Ingress packet Drops"
+         ::= { bpDropsEntry 6 }
+
+     bpDropsInMTUExceeds OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of packets dropped on Ingress because of
+          MTUExceeds"
+         ::= { bpDropsEntry 7 }
+
+     bpDropsInMacDrops  OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of packets dropped on Ingress MAC"
+         ::= { bpDropsEntry 8 }
+
+     bpDropsMMUHOLDrops OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of packets dropped in MMU because of
+          MMU HOL Drops"
+         ::= { bpDropsEntry 9 }
+
+      bpDropsEgMacDrops OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of packets dropped on Egress MAC"
+         ::= { bpDropsEntry 10 }
+   
+      bpDropsEgTxAgedCounter OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of Aged packets dropped on Egress"
+         ::= { bpDropsEntry 11 }
+
+      bpDropsEgTxErrCounter OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of Error packets dropped on Egress"
+         ::= { bpDropsEntry 12 }
+
+      bpDropsEgTxMACUnderflow OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of MAC underflow packets dropped on Egress"
+         ::= { bpDropsEntry 13 }
+
+     bpDropsEgTxErrPktCounter OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "No of total packets dropped in Egress" 
+         ::= { bpDropsEntry 14 }
+
+     bpIfStatsTable  OBJECT-TYPE
+         SYNTAX        SEQUENCE OF BpIfStatsEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "The back plane counter statistics table contains the
+          list of various counters per BP higig port per BCM unit
+          in a stack unit(card type)."
+         ::= { bpStatsObjects 2 }
+
+     bpIfStatsEntry OBJECT-TYPE
+         SYNTAX        BpIfStatsEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "Each Stats entry is being indexed by StackUnit(card Type)
+                 BCM unit ID and local Port Id"
+         INDEX         { bpIfStatsStackUnitIndex,
+                         bpIfStatsPortPipe,
+                         bpIfStatsPortIndex}
+         ::= { bpIfStatsTable 1 }
+
+     BpIfStatsEntry    ::=
+         SEQUENCE {
+            bpIfStatsStackUnitIndex            INTEGER,
+            bpIfStatsPortPipe                  INTEGER,
+            bpIfStatsPortIndex                 INTEGER,
+            bpIfStatsIn64BytePkts              Counter64,
+            bpIfStatsIn65To127BytePkts         Counter64,
+            bpIfStatsIn128To255BytePkts        Counter64,
+            bpIfStatsIn256To511BytePkts        Counter64,
+            bpIfStatsIn512To1023BytePkts       Counter64,
+            bpIfStatsInOver1023BytePkts        Counter64,
+            bpIfStatsInThrottles               Counter64,
+            bpIfStatsInRunts                   Counter64,
+            bpIfStatsInGiants                  Counter64,
+            bpIfStatsInCRC                     Counter64,
+            bpIfStatsInOverruns                Counter64,
+            bpIfStatsOutUnderruns              Counter64,
+            bpIfStatsOutUnicasts               Counter64,
+            bpIfStatsOutCollisions             Counter64,
+            bpIfStatsOutWredDrops              Counter64,
+            bpIfStatsOut64BytePkts             Counter64,
+            bpIfStatsOut65To127BytePkts        Counter64,
+            bpIfStatsOut128To255BytePkts       Counter64,
+            bpIfStatsOut256To511BytePkts       Counter64,
+            bpIfStatsOut512To1023BytePkts      Counter64,
+            bpIfStatsOutOver1023BytePkts       Counter64,
+            bpIfStatsOutThrottles              Counter64,
+            bpIfStatsLastDiscontinuityTime     TimeStamp,
+            bpIfStatsInCentRate                Integer32,
+            bpIfStatsOutCentRate               Integer32,
+            bpIfStatsLastChange                TimeStamp 
+         }
+
+     bpIfStatsStackUnitIndex OBJECT-TYPE
+          SYNTAX        INTEGER (1..12)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "Stack unit(Card Type Id) number where this port present
+           Each card shall contain more than one BCM units"
+          ::= { bpIfStatsEntry 1 }
+
+     bpIfStatsPortPipe OBJECT-TYPE
+          SYNTAX        INTEGER (1..6)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "bpPortPipe denotes the BCM unit in the stack unit(card Type)
+          Each BCM unit shall contain 1-128 local ports, which includes
+          BP as well as front end ports"
+          ::= { bpIfStatsEntry 2 }
+
+     bpIfStatsPortIndex OBJECT-TYPE
+         SYNTAX        INTEGER (1..128)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "BP port number.
+          Maximum ports shall support by Trident2 BCM npu is 128.
+          This address space includes FE ports also, which are
+          invalid ports as far as BP is concern.
+          For Z9000 leaf BCM units, 34 to 41 are the valid BP port numbers and
+          for spine BCM units, 1 to 16 are the valid BP ports "
+         ::= { bpIfStatsEntry 3 }
+
+     bpIfStatsIn64BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames (including bad
+          frames) received that were 64 octets in length
+          (excluding framing bits but including FCS octets)."
+         ::= { bpIfStatsEntry 4 }
+
+     bpIfStatsIn65To127BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames (including bad
+          frames) received that were between 65 and 127
+          octets in length inclusive (excluding framing
+          bits but including FCS octets)."
+         ::= { bpIfStatsEntry 5 }
+
+     bpIfStatsIn128To255BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames (including bad
+          frames) received that were between 128 and 255
+          octets in length inclusive (excluding framing
+          bits but including FCS octets)."
+         ::= { bpIfStatsEntry 6 }
+
+     bpIfStatsIn256To511BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames (including bad
+          frames) received that were between 256 and 511
+          octets in length inclusive (excluding framing
+          bits but including FCS octets)."
+         ::= { bpIfStatsEntry 7 }
+
+     bpIfStatsIn512To1023BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames (including bad
+          frames) received that were between 512 and 1023
+          octets in length inclusive (excluding framing
+          bits but including FCS octets)."
+         ::= { bpIfStatsEntry 8 }
+
+     bpIfStatsInOver1023BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames received that
+          were longer than 1023 (1025 Bytes in case of
+          VLAN Tag) octets (excluding framing bits, but
+          including FCS octets) and were otherwise
+          well formed. This counter is not incremented
+          for too long frames."
+         ::= { bpIfStatsEntry 9 }
+
+     bpIfStatsInThrottles OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "This counter is incremented when a valid
+          frame with a length or type field value equal
+          to 0x8808 (Control Frame) is received."
+         ::= { bpIfStatsEntry 10 }
+
+     bpIfStatsInRunts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames received that were
+          less than 64 octets long (excluding framing bits,
+          but including FCS octets) and were otherwise
+          well formed."
+         ::= { bpIfStatsEntry 11 }
+
+     bpIfStatsInGiants OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames received that were
+          longer than 1518 (1522 Bytes in case of VLAN Tag)
+          octets (excluding framing bits, but including FCS
+          octets) and were otherwise well formed. This counter
+          is not incremented for too long frames."
+         ::= { bpIfStatsEntry 12 }
+
+     bpIfStatsInCRC OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames received that had
+          a length (excluding framing bits, but including
+          FCS octets) of between 64 and 1518 octets,
+          inclusive, but had a bad CRC."
+         ::= { bpIfStatsEntry 13 }
+
+     bpIfStatsInOverruns OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames has been chosen to be
+          dropped by detecting the buffer issue"
+         ::= { bpIfStatsEntry 14 }
+
+     bpIfStatsOutUnderruns OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames dropped because
+          of buffer underrun."
+         ::= { bpIfStatsEntry 15 }
+
+     bpIfStatsOutUnicasts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of Unicast frames are transmitted
+          out of the interface"
+         ::= { bpIfStatsEntry 16 }
+ 
+     bpIfStatsOutCollisions OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "A count of the frames that due to excessive
+          or late collisions are not transmitted successfully."
+         ::= { bpIfStatsEntry 17 }
+
+     bpIfStatsOutWredDrops OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of frames are dropped by using
+          WRED policy due to excessive traffic."
+         ::= { bpIfStatsEntry 18 }
+
+     bpIfStatsOut64BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total number of valid frames with the 
+          block of 64 byte size is transmitted"
+         ::= { bpIfStatsEntry 19 }
+
+     bpIfStatsOut65To127BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total of valid frame with the block size of 
+          range between 65 and 127 bytes are transmitted."
+         ::= { bpIfStatsEntry 20 }
+
+     bpIfStatsOut128To255BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total of valid frame with the block size of 
+          range between 128 and 255 bytes are transmitted"
+         ::= { bpIfStatsEntry 21 }
+
+     bpIfStatsOut256To511BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total of valid frame with the block size of 
+          range between 256 and 511 bytes are transmitted"
+         ::= { bpIfStatsEntry 22 }
+ 
+     bpIfStatsOut512To1023BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total of valid frame with the block size of 
+          range between 512 and 1023 bytes are transmitted"
+         ::= { bpIfStatsEntry 23 }
+
+     bpIfStatsOutOver1023BytePkts OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The total of valid frame with the block size of 
+          greater than 1023 bytes are transmitted."
+         ::= { bpIfStatsEntry 24 }
+
+     bpIfStatsOutThrottles OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "This counter is incremented when a valid
+          frame with a length or type field value equal
+          to 0x8808 (Control Frame) is sent."
+         ::= { bpIfStatsEntry 25 }
+
+     bpIfStatsLastDiscontinuityTime OBJECT-TYPE
+         SYNTAX        TimeStamp
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The value of sysUpTime on the most recent occasion
+          at which this interface's counters suffered a
+          discontinuity via a reset. If no such discontinuities
+          have occurred since the last reinitialization of
+          the local management subsystem, then this object
+          contains a zero value."
+         ::= { bpIfStatsEntry 26 }
+
+     bpIfStatsInCentRate OBJECT-TYPE
+         SYNTAX        Integer32 (0..100)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "This is the percentage of maximum line rate
+          at which data is receiving on the Interface.
+          For Z9000 - BP hiGig line rate is 42G.
+          This is an integer value which can go from 0% to 100%."
+         ::= { bpIfStatsEntry 27 }
+
+     bpIfStatsOutCentRate OBJECT-TYPE
+         SYNTAX        Integer32 (0..100)
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "This is the percentage of maximum line rate
+          at which data is sending on the Interface.
+          For Z9000 - BP hiGig line rate is 42G.
+          This is an integer value which can go from 0% to 100%."
+         ::= { bpIfStatsEntry 28 }
+
+     bpIfStatsLastChange OBJECT-TYPE
+         SYNTAX        TimeStamp
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "The value of sysUpTime, on which all the counters are
+          updated recently"
+         ::= { bpIfStatsEntry 29 }
+
+     bpPacketBufferTable  OBJECT-TYPE
+         SYNTAX        SEQUENCE OF BpPacketBufferEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "The packet buffer table contains the modular packet buffers details
+         per stack unit and the mode of allocation."
+         ::= { bpStatsObjects 3 }
+
+     bpPacketBufferEntry  OBJECT-TYPE
+         SYNTAX        BpPacketBufferEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "Packet buffer details per NPU unit."
+         INDEX        { bpPacketBufferStackUnitIndex,
+                        bpPacketBufferPortPipe}
+         ::= { bpPacketBufferTable 1 }
+
+     BpPacketBufferEntry ::=
+         SEQUENCE {
+             bpPacketBufferStackUnitIndex     INTEGER,
+             bpPacketBufferPortPipe           INTEGER,
+             bpPacketBufferTotalPacketBuffer  Counter32,
+             bpPacketBufferCurrentAvailBuffer Counter32,
+             bpPacketBufferPacketBufferAlloc  Counter32
+         }
+
+     bpPacketBufferStackUnitIndex OBJECT-TYPE
+          SYNTAX        INTEGER (1..12)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "Stack unit(Card Type Id) number where this port present
+           Each card shall contain more than one BCM units"
+          ::= { bpPacketBufferEntry 1 }
+
+     bpPacketBufferPortPipe OBJECT-TYPE
+          SYNTAX        INTEGER (1..6)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "bpPortPipe denotes the BCM unit in the stack unit(card Type)
+          Each BCM unit shall contain 1-128 local ports, which includes
+          BP as well as front end ports"
+          ::= { bpPacketBufferEntry 2 }
+
+     bpPacketBufferTotalPacketBuffer OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Total packet buffer in this NPU unit."
+         ::= { bpPacketBufferEntry 3 }
+
+     bpPacketBufferCurrentAvailBuffer OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Current available buffer in this NPU unit."
+         ::= { bpPacketBufferEntry 4 }
+
+     bpPacketBufferPacketBufferAlloc  OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Static or Dynamic allocation."
+         ::= { bpPacketBufferEntry 5 }
+
+     bpBufferStatsTable  OBJECT-TYPE
+         SYNTAX        SEQUENCE OF BpBufferStatsEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "The back plane stats per port table  contains
+          the packet buffer usage per bp port per NPU unit."
+         ::= { bpStatsObjects 4}
+
+     bpBufferStatsEntry  OBJECT-TYPE
+         SYNTAX        BpBufferStatsEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "Per bp port buffer stats "
+         INDEX         { bpBufferStatsStackUnitIndex,
+                         bpBufferStatsPortPipe,
+                         bpBufferStatsPortIndex}
+         ::= { bpBufferStatsTable 1 }
+
+     BpBufferStatsEntry ::=
+     SEQUENCE {
+         bpBufferStatsStackUnitIndex         INTEGER,
+         bpBufferStatsPortPipe               INTEGER,
+         bpBufferStatsPortIndex              INTEGER,
+         bpBufferStatsCurrentUsagePerPort    Counter32,
+         bpBufferStatsDefaultPacketBuffAlloc Counter32,
+         bpBufferStatsMaxLimitPerPort        Counter32
+     }
+
+     bpBufferStatsStackUnitIndex OBJECT-TYPE
+          SYNTAX        INTEGER (1..12)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "Stack unit(Card Type Id) number where this port present
+           Each card shall contain more than one BCM units"
+          ::= { bpBufferStatsEntry 1 }
+
+     bpBufferStatsPortPipe OBJECT-TYPE
+          SYNTAX        INTEGER (1..6)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "bpPortPipe denotes the BCM unit in the stack unit(card Type)
+          Each BCM unit shall contain 1-128 local ports, which includes
+          BP as well as front end ports"
+          ::= { bpBufferStatsEntry 2 }
+
+     bpBufferStatsPortIndex OBJECT-TYPE
+         SYNTAX        INTEGER (1..128)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "BP port number.
+          Maximum ports shall support by Trident2 BCM npu is 128.
+          This address space includes FE ports also, which are
+          invalid ports as far as BP is concern.
+          For Z9000 leaf BCM units, 34 to 41 are the valid BP port numbers and
+          for spine BCM units, 1 to 16 are the valid BP ports "
+         ::= { bpBufferStatsEntry 3 }
+
+     bpBufferStatsCurrentUsagePerPort  OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Current buffer usage per bp port."
+         ::= { bpBufferStatsEntry 4 }
+
+     bpBufferStatsDefaultPacketBuffAlloc OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Default packet buffer allocated."
+         ::= { bpBufferStatsEntry 5 }
+
+     bpBufferStatsMaxLimitPerPort OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Max buffer limit per bp port."
+         ::= { bpBufferStatsEntry 6 }
+
+     bpCosStatsTable  OBJECT-TYPE
+         SYNTAX        SEQUENCE OF BpCosStatsEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "The back plane statistics per COS table gives
+          packet buffer statistics per COS per bp port."
+         ::=  { bpStatsObjects 5 }
+
+     bpCosStatsEntry  OBJECT-TYPE
+         SYNTAX        BpCosStatsEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "Per bp port buffer stats and per COS buffer stats."
+         INDEX         { bpCosStatsStackUnitIndex,
+                         bpCosStatsPortPipe,
+                         bpCosStatsPortIndex,
+                         bpCosStatsCOSNumber }
+         ::= { bpCosStatsTable 1 }
+
+     BpCosStatsEntry ::=
+     SEQUENCE {
+         bpCosStatsStackUnitIndex         INTEGER,
+         bpCosStatsPortPipe               INTEGER,
+         bpCosStatsPortIndex              INTEGER,
+         bpCosStatsCOSNumber              INTEGER,
+         bpCosStatsCurrentUsage           Counter32,
+         bpCosStatsDefaultPacketBuffAlloc Counter32,
+         bpCosStatsMaxLimit               Counter32,
+         bpCosStatsHOLDDrops              Counter64
+     }
+
+     bpCosStatsStackUnitIndex OBJECT-TYPE
+          SYNTAX        INTEGER (1..12)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "Stack unit(Card Type Id) number where this port present
+           Each card shall contain more than one BCM units"
+          ::= { bpCosStatsEntry 1 }
+
+     bpCosStatsPortPipe OBJECT-TYPE
+          SYNTAX        INTEGER (1..6)
+          MAX-ACCESS    not-accessible
+          STATUS        current
+          DESCRIPTION
+          "bpPortPipe denotes the BCM unit in the stack unit(card Type)
+          Each BCM unit shall contain 1-128 local ports, which includes
+          BP as well as front end ports"
+          ::= { bpCosStatsEntry 2 }
+
+     bpCosStatsPortIndex OBJECT-TYPE
+         SYNTAX        INTEGER (1..128)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "BP port number.
+          Maximum ports shall support by Trident2 BCM npu is 128.
+          This address space includes FE ports also, which are
+          invalid ports as far as BP is concern.
+          For Z9000 leaf BCM units, 34 to 41 are the valid BP port numbers and
+          for spine BCM units, 1 to 16 are the valid BP ports "
+         ::= { bpCosStatsEntry 3 }
+
+     bpCosStatsCOSNumber OBJECT-TYPE
+         SYNTAX        INTEGER (1..21)
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+         "COS queue number, There shall 12 unicast and 9 multicast
+          queues per port in Trident2"
+         ::= { bpCosStatsEntry 4 }
+
+     bpCosStatsCurrentUsage  OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Current buffer usage per COS per bp port."
+         ::= { bpCosStatsEntry 5 }
+
+     bpCosStatsDefaultPacketBuffAlloc OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Default packet buffer allocated per COS queue"
+         ::= { bpCosStatsEntry 6 }
+
+     bpCosStatsMaxLimit OBJECT-TYPE
+         SYNTAX        Counter32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "Max buffer utilization limit per bp port."
+         ::= { bpCosStatsEntry 7 }
+
+     bpCosStatsHOLDDrops OBJECT-TYPE
+         SYNTAX        Counter64
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+         "HOLD Drops Per Queue."
+         ::= { bpCosStatsEntry 8 }
+
+      -- ### Notification Objects information ###
+
+      bpLinkBundleNotifications        OBJECT IDENTIFIER
+         ::= { dellNetBpStatsAlarms 1 }
+
+      bpLinkBundleAlarmVariable        OBJECT IDENTIFIER
+         ::= { dellNetBpStatsAlarms 2 }
+
+      bpLinkBundleType OBJECT-TYPE
+         SYNTAX       INTEGER {
+                          unknown(1),
+                          bpHgBundle(2)
+         }
+         MAX-ACCESS   accessible-for-notify
+         STATUS       current
+         DESCRIPTION
+         "Indicates Type of Back plane HiGig link bundle"
+         ::= { bpLinkBundleAlarmVariable 1 }
+
+      bpLinkBundleSlot OBJECT-TYPE
+         SYNTAX       INTEGER
+         MAX-ACCESS   accessible-for-notify
+         STATUS       current
+         DESCRIPTION
+         "The SlotId on which Link Bundle is overloaded"
+         ::= { bpLinkBundleAlarmVariable 2 }
+
+      bpLinkBundleNpuUnit OBJECT-TYPE
+         SYNTAX       INTEGER
+         MAX-ACCESS   accessible-for-notify
+         STATUS       current
+         DESCRIPTION
+         "The npuUnitId(BCM unit Id) on which Link Bundle is overloaded"
+         ::= { bpLinkBundleAlarmVariable 3 }
+
+      bpLinkBundleLocalId OBJECT-TYPE
+         SYNTAX       INTEGER
+         MAX-ACCESS   accessible-for-notify
+         STATUS       current
+         DESCRIPTION
+         "The local linkBundle Id which is overloaded"
+         ::= { bpLinkBundleAlarmVariable 4 }
+
+      bpLinkBundleImbalance NOTIFICATION-TYPE
+          OBJECTS        {   bpLinkBundleType,
+                             bpLinkBundleSlot,
+                             bpLinkBundleNpuUnit,
+                             bpLinkBundleLocalId
+                         }
+          STATUS          current
+          DESCRIPTION
+         "Trap generated when traffic imbalance
+          observed in BP Link Bundles"
+          ::= { bpLinkBundleNotifications 1 }
+
+      bpLinkBundleImbalanceClear NOTIFICATION-TYPE
+         OBJECTS         {   bpLinkBundleType,
+                             bpLinkBundleSlot,
+                             bpLinkBundleNpuUnit,
+                             bpLinkBundleLocalId
+                         }
+         STATUS          current
+         DESCRIPTION
+         "Trap generated when traffic imbalance
+          is no longer observed on Bp Link bundles"
+         ::= { bpLinkBundleNotifications 2 }
+
+
+    END
+
+

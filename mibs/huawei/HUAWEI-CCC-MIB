@@ -1,0 +1,615 @@
+--  ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI CCC Management MIB
+-- Reference:
+-- Version:     V2.02
+-- History:
+--              V1.0 PanJun, 2006-05-11, publish
+-- ==================================================================
+
+    HUAWEI-CCC-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm          
+                FROM HUAWEI-MIB         
+            HWL2VpnVcEncapsType, HWEnableValue, HWL2VpnStateChangeReason            
+                FROM HUAWEI-VPLS-EXT-MIB            
+            InterfaceIndexOrZero,InterfaceIndex, ifName         
+                FROM IF-MIB         
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         
+                FROM SNMPv2-CONF            
+            IpAddress, Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE           
+                FROM SNMPv2-SMI         
+            DisplayString, RowStatus            
+                FROM SNMPv2-TC;
+    
+    
+        hwL2VpnCCC MODULE-IDENTITY 
+            LAST-UPDATED "201701230900Z"        -- Jan 23, 2017 at 09:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "The HUAWEI-CCC-MIB contains objects to
+                manage KOMPELLA."
+
+           REVISION "201701230900Z" --Jan 23, 2017 at 09:00 GMT
+           DESCRIPTION
+           "ModifySINGLE CCC MIB Trap(hwSingleCCCVcDown, hwSingleCCCVcUp)."
+
+           REVISION "201701120900Z" --Jan 11, 2017 at 09:00 GMT
+           DESCRIPTION
+           "Add SINGLE CCC MIB Trap(hwSingleCCCVcDown, hwSingleCCCVcUp)."
+
+            ::= { hwL2Vpn 3 }   
+--
+-- Node definitions
+--
+    
+        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+        
+        hwCCCMIBObjects OBJECT IDENTIFIER ::= { hwL2VpnCCC 1 }
+        
+--         
+-- The CCC's VC Table
+-- 
+        hwCCCVcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWCCCVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the CCC's configuration table. Users can 
+                create or delete the CCC by it."
+            ::= { hwCCCMIBObjects 1 }
+        
+        hwCCCVcEntry OBJECT-TYPE
+            SYNTAX HWCCCVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a CCC entry."
+                INDEX { hwCCCVcName }
+            ::= { hwCCCVcTable 1 }
+        
+        HWCCCVcEntry ::=
+            SEQUENCE { 
+                hwCCCVcName
+                    DisplayString, 
+                hwCCCVcConnectionType
+                    INTEGER,
+                hwCCCVcEncapType
+                    HWL2VpnVcEncapsType,
+                hwCCCVcIfIndex
+                    InterfaceIndexOrZero,
+                hwCCCVcInboundlabel
+                    Unsigned32,
+                hwCCCVcOutboundlabel
+                    Unsigned32,
+                hwCCCVcOutIfIndex
+                    InterfaceIndexOrZero,
+                hwCCCVcNextHop
+                    IpAddress,
+                hwCCCVcCtrlWord
+                    HWEnableValue,
+                hwCCCVcOperStatus
+                    INTEGER,
+                hwCCCVcUpStartTime
+                    DisplayString,
+                hwCCCVcUpSumTime
+                    Unsigned32, 
+                hwCCCVcMaxAtmCells
+                    Unsigned32, 
+                hwCCCVcAtmPackOvertime
+                    Unsigned32,
+                hwCCCVcPwJitterBufferDepth
+                    Unsigned32, 
+                hwCCCVcPwTdmEncapsulationNum
+                    Unsigned32, 
+                hwCCCVcPwIdleCode
+                    Unsigned32, 
+                hwCCCVcPwRtpHeader
+                    Unsigned32, 
+                hwCCCVcIpInterworking
+                    HWEnableValue,
+                hwCCCVcRawOrTagged1
+                    INTEGER,
+                hwCCCVcRawOrTagged2
+                    INTEGER,
+                hwCCCVcRowStatus
+                    RowStatus
+            }
+
+        hwCCCVcName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..20))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The human-readable name of this CCC."
+            ::= { hwCCCVcEntry 1 }  
+
+
+        hwCCCVcConnectionType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                local(1),
+                remote(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VC connection type."
+            ::= { hwCCCVcEntry 2 }
+
+
+        hwCCCVcEncapType OBJECT-TYPE
+            SYNTAX HWL2VpnVcEncapsType
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the service to be carried."
+            ::= { hwCCCVcEntry 3 }
+
+
+        hwCCCVcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the AC ifIndex.
+                0 is invalid ifIndex."
+            ::= { hwCCCVcEntry 4 }
+
+
+        hwCCCVcInboundlabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the static inbound label.
+                This value need not be designated if the CCC is local."
+            ::= { hwCCCVcEntry 5 }
+
+
+        hwCCCVcOutboundlabel OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the static outbound label.
+                This value need not be designated if the CCC is local."
+            ::= { hwCCCVcEntry 6 }
+
+
+        hwCCCVcOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ifIndex of the out interface
+                in the side of PSN, or the ifIndex of the out interface
+                in the side of AC if the CCC is local cross.
+                0 is invalid ifIndex."
+            ::= { hwCCCVcEntry 7 }
+
+
+        hwCCCVcNextHop OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the next hop IP address of the out
+                interface in the side of PSN.
+                For the interface of ATM or FR or Ethernet, the next hop
+                address must be used. Don't use the out interface in this
+                case."
+            ::= { hwCCCVcEntry 8 }
+
+
+        hwCCCVcCtrlWord OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the control word capability.
+                This value need not be designated if the CCC is local."
+            ::= { hwCCCVcEntry 9 }
+
+
+        hwCCCVcOperStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the operation status."
+            ::= { hwCCCVcEntry 10 }
+
+
+        hwCCCVcUpStartTime OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..63))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the time this VC status was Up(1)."
+            ::= { hwCCCVcEntry 11 }
+
+
+        hwCCCVcUpSumTime OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the cumulate time this VC status has been Up(1)."
+            ::= { hwCCCVcEntry 12 }
+
+
+        hwCCCVcMaxAtmCells OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the MaxAtmCells."
+            ::= { hwCCCVcEntry 13 }
+
+
+        hwCCCVcAtmPackOvertime OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the AtmPackOvertime."
+            ::= { hwCCCVcEntry 14 }
+
+
+        hwCCCVcPwJitterBufferDepth OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwJitterBufferDepth."
+            ::= { hwCCCVcEntry 15 }   
+
+
+        hwCCCVcPwTdmEncapsulationNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwTdmEncapsulationNum."
+            ::= { hwCCCVcEntry 16 }
+
+
+        hwCCCVcPwIdleCode OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwIdleCode."
+            ::= { hwCCCVcEntry 17 }
+
+
+        hwCCCVcPwRtpHeader OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies the PwRtpHeader."
+            ::= { hwCCCVcEntry 18 }
+
+
+        hwCCCVcIpInterworking OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of the IP interworking."
+            ::= { hwCCCVcEntry 19 }
+
+
+        hwCCCVcRawOrTagged1 OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            raw(1),
+            tagged(2),
+            rawTagNotConfiged(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies whether the VLAN tag of the VC entry is attached or stripped."
+            ::= { hwCCCVcEntry 20 }
+
+
+        hwCCCVcRawOrTagged2 OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            raw(1),
+            tagged(2),
+            rawTagNotConfiged(3)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Specifies whether the VLAN tag of the VC entry is attached or stripped."
+            ::= { hwCCCVcEntry 21 }
+
+
+        hwCCCVcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table."
+            ::= { hwCCCVcEntry 51 }
+
+
+--         
+-- The CCC's VC Statistics Table
+-- 
+        hwCCCVcStatisticsTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWCCCVcStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the CCC's VC packets statistics."
+            ::= { hwCCCMIBObjects 2 }
+        
+        hwCCCVcStatisticsEntry OBJECT-TYPE
+            SYNTAX HWCCCVcStatisticsEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of the CCC's VC packets
+                Statistics."
+            INDEX { hwCCCVcName, hwCCCVcStatisticsIfIndex }
+            ::= { hwCCCVcStatisticsTable 1 }
+        
+        HWCCCVcStatisticsEntry ::=
+            SEQUENCE { 
+                hwCCCVcStatisticsIfIndex
+                    InterfaceIndex,
+                hwCCCVcStatisticsRcvPkts
+                    Counter64,
+                hwCCCVcStatisticsRcvBytes
+                    Counter64,
+                hwCCCVcStatisticsSndPkts
+                    Counter64,
+                hwCCCVcStatisticsSndBytes
+                    Counter64
+             }
+
+        hwCCCVcStatisticsIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the AC ifIndex.
+                The CCC will have two AC which need to be displayed
+                if the CCC is local cross."
+            ::= { hwCCCVcStatisticsEntry 1 }
+        
+        hwCCCVcStatisticsRcvPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets received on this VC."
+            ::= { hwCCCVcStatisticsEntry 2 }
+        
+        hwCCCVcStatisticsRcvBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes received on this VC."
+            ::= { hwCCCVcStatisticsEntry 3 }
+        
+        hwCCCVcStatisticsSndPkts OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of packets sent on this VC."
+            ::= { hwCCCVcStatisticsEntry 4 }
+        
+        hwCCCVcStatisticsSndBytes OBJECT-TYPE
+            SYNTAX Counter64
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total number of bytes sent on the VC."
+            ::= { hwCCCVcStatisticsEntry 5 }
+        
+--         
+-- The Leaf Nodes of hwCCCMIBObjects
+-- 
+        hwCCCVcUpDownNotifEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of CCC
+                VC state change notification. 
+                The default value is disable (2)."
+            ::= { hwCCCMIBObjects 3 }
+        
+        hwCCCVcDeletedNotifEnable OBJECT-TYPE
+            SYNTAX HWEnableValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the enable sign of CCC
+                VC deletion notification. 
+                The default value is disable (2)."
+            ::= { hwCCCMIBObjects 4 }
+        
+        hwCCCVcStateChangeReason OBJECT-TYPE
+            SYNTAX HWL2VpnStateChangeReason
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the reason of CCC VC
+                state change."
+            ::= { hwCCCMIBObjects 5 }
+
+			
+--         
+-- The Single CCC's VC Table
+-- 
+        hwSingleCCCVcTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HWSingleCCCVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the CCC's configuration table. Users can 
+                create or delete the CCC by it."
+            ::= { hwCCCMIBObjects 6 }
+        
+        hwSingleCCCVcEntry  OBJECT-TYPE
+            SYNTAX HWSingleCCCVcEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a CCC entry."
+                INDEX { hwSingleCCCVcIfIndex,hwSingleCCCVcOutIfIndex }
+            ::= { hwSingleCCCVcTable 1 }
+        
+        HWSingleCCCVcEntry ::=
+            SEQUENCE { 
+                hwSingleCCCVcIfIndex
+                    InterfaceIndexOrZero,
+                hwSingleCCCVcOutIfIndex
+                    InterfaceIndexOrZero
+            }
+
+        hwSingleCCCVcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the AC ifIndex.
+                0 is invalid ifIndex."
+            ::= { hwSingleCCCVcEntry  1 }
+
+        hwSingleCCCVcOutIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ifIndex of the out interface
+                in the side of PSN, or the ifIndex of the out interface
+                in the side of AC if the CCC is local cross.
+                0 is invalid ifIndex."
+            ::= { hwSingleCCCVcEntry  2 }
+        
+--         
+-- CCC MIB Trap Definitions
+-- 
+        hwCCCMIBTraps OBJECT IDENTIFIER ::= { hwL2VpnCCC 2 }
+        
+        hwCCCVcDown NOTIFICATION-TYPE
+            OBJECTS { hwCCCVcIfIndex, hwCCCVcStateChangeReason, ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC's state changes to down."
+            ::= { hwCCCMIBTraps 1 }
+        
+        hwCCCVcUp NOTIFICATION-TYPE
+            OBJECTS { hwCCCVcIfIndex, hwCCCVcStateChangeReason, ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC's state changes to up."
+            ::= { hwCCCMIBTraps 2 }
+        
+        hwCCCVcDeleted NOTIFICATION-TYPE
+            OBJECTS { hwCCCVcIfIndex }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the VC is deleted."
+            ::= { hwCCCMIBTraps 3 }
+
+        hwSingleCCCVcDown NOTIFICATION-TYPE
+            OBJECTS { hwSingleCCCVcIfIndex, hwSingleCCCVcOutIfIndex , hwCCCVcStateChangeReason, ifName, ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the single VC's state changes to down."
+            ::= { hwCCCMIBTraps 4}
+        
+        hwSingleCCCVcUp NOTIFICATION-TYPE
+            OBJECTS {  hwSingleCCCVcIfIndex, hwSingleCCCVcOutIfIndex , hwCCCVcStateChangeReason, ifName , ifName }
+            STATUS current
+            DESCRIPTION 
+                "This notification indicates the single VC's state changes to up."
+            ::= { hwCCCMIBTraps 5 }
+        
+--  Conformance information
+-- 
+        hwCCCMIBConformance OBJECT IDENTIFIER ::= { hwL2VpnCCC 3 }
+        
+        hwCCCMIBCompliances OBJECT IDENTIFIER ::= { hwCCCMIBConformance 1 }
+        
+--  this module
+        hwCCCMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-KOMPELLA-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwCCCVcGroup, hwCCCVcStatisticsGroup, hwCCCNotificationControlGroup, hwCCCVcStateChangeReasonGroup, hwCCCNotificationGroup
+                     }
+            ::= { hwCCCMIBCompliances 1 }
+        
+        hwCCCMIBGroups OBJECT IDENTIFIER ::= { hwCCCMIBConformance 2 }
+        
+        hwCCCVcGroup OBJECT-GROUP
+            OBJECTS { hwCCCVcConnectionType, hwCCCVcEncapType, hwCCCVcIfIndex, hwCCCVcInboundlabel, hwCCCVcOutboundlabel, hwCCCVcOutIfIndex, 
+                        hwCCCVcNextHop, hwCCCVcCtrlWord, hwCCCVcOperStatus, hwCCCVcUpStartTime, hwCCCVcUpSumTime, hwCCCVcMaxAtmCells, hwCCCVcAtmPackOvertime, 
+                        hwCCCVcPwJitterBufferDepth, hwCCCVcPwTdmEncapsulationNum, hwCCCVcPwIdleCode, hwCCCVcPwRtpHeader, hwCCCVcIpInterworking, hwCCCVcRawOrTagged1, 
+                        hwCCCVcRawOrTagged2, hwCCCVcRowStatus }
+        STATUS current
+        DESCRIPTION 
+            "The CCC's VC group."
+        ::= { hwCCCMIBGroups 1 }
+        
+        hwCCCVcStatisticsGroup OBJECT-GROUP
+            OBJECTS { hwCCCVcStatisticsRcvPkts, hwCCCVcStatisticsRcvBytes, hwCCCVcStatisticsSndPkts, hwCCCVcStatisticsSndBytes }
+            STATUS current
+            DESCRIPTION 
+                "The CCC's VC Statistics group."
+            ::= { hwCCCMIBGroups 2 }
+        
+        hwCCCNotificationControlGroup OBJECT-GROUP
+            OBJECTS { hwCCCVcUpDownNotifEnable, hwCCCVcDeletedNotifEnable }
+            STATUS current
+            DESCRIPTION 
+                "The CCC's Notification Control group."
+            ::= { hwCCCMIBGroups 3 }
+        
+        hwCCCVcStateChangeReasonGroup OBJECT-GROUP
+            OBJECTS { hwCCCVcStateChangeReason }
+            STATUS current
+            DESCRIPTION 
+                "The CCC's Vc State Change Reason group."
+            ::= { hwCCCMIBGroups 4 }
+        
+        hwCCCNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwCCCVcDown, hwCCCVcUp, hwCCCVcDeleted,  hwSingleCCCVcDown, hwSingleCCCVcUp }
+            STATUS current
+            DESCRIPTION 
+                "The CCC Notification group."
+            ::= { hwCCCMIBGroups 5 }
+        
+    
+    END

@@ -1,0 +1,12 @@
+os: netbsd
+type: server
+group: unix
+text: NetBSD
+processor_stacked: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysDescr_regex:
+            - '/^NetBSD/'

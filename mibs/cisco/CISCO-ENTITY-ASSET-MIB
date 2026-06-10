@@ -1,0 +1,526 @@
+-- *****************************************************************
+-- Extension to the ENTITY-MIB supporting entity asset information.
+--
+-- November 1997, Cliff L. Sojourner
+--
+-- Copyright (c) 1996-1999, 2002, 2003  by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+ 
+CISCO-ENTITY-ASSET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE                         FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP                        FROM SNMPv2-CONF
+    TruthValue                          FROM SNMPv2-TC
+    entPhysicalIndex                    FROM ENTITY-MIB
+    ciscoMgmt                           FROM CISCO-SMI
+    SnmpAdminString                     FROM SNMP-FRAMEWORK-MIB;
+
+ciscoEntityAssetMIB MODULE-IDENTITY
+    LAST-UPDATED   "200309180000Z" 
+    ORGANIZATION   "Cisco Systems, Inc."
+    CONTACT-INFO   "Cisco Systems
+                    Customer Service
+
+                    Postal: Cisco Systems, Inc.
+                    170 West Tasman Drive
+                    San Jose, CA 95134-1706
+                    USA
+
+                    Tel: +1 408 526 4000
+
+                    E-mail: cs-snmp@cisco.com"
+
+    DESCRIPTION
+        "Monitor the asset information of items in the ENTITY-MIB
+        (RFC 2037) entPhysical table."
+
+    REVISION        "200309180000Z"
+    DESCRIPTION
+       "Some of the Objects have been deprecated since
+       these are available in ENTITY-MIB(RFC 2737).
+
+      1. Following Objects have been deprecated.
+
+        ceAssetOEMString         : superceded by entPhysicalMfgName
+        ceAssetSerialNumber      : superceded by entPhysicalSerialNum
+        ceAssetOrderablePartNumber: superceded by entPhysicalModelName
+        ceAssetHardwareRevision  : superceded by entPhysicalHardwareRev
+        ceAssetFirmwareID        : superceded by entPhysicalFirmwareRev
+        ceAssetFirmwareRevision  : superceded by entPhysicalFirmwareRev
+        ceAssetSoftwareID        : superceded by entPhysicalSoftwareRev
+        ceAssetSoftwareRevision  : superceded by entPhysicalSoftwareRev
+        ceAssetAlias             : superceded by entPhysicalAlias
+        ceAssetTag               : superceded by entPhysicalAssetID
+        ceAssetIsFRU             : superceded by entPhysicalIsFRU.
+
+      2. ceAssetEntityGroup has been deprecated."
+          
+    REVISION        "200207231600Z"
+    DESCRIPTION
+        "Split the MIB objects of this MIB into two object groups."
+
+    REVISION        "199906021600Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+
+    ::= { ciscoMgmt 92 }
+
+-- MIB Object Definitions
+
+ciscoEntityAssetMIBObjects OBJECT IDENTIFIER ::=
+    { ciscoEntityAssetMIB 1 }
+
+-- Physical Entity Asset Table
+
+ceAssetTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CeAssetEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION
+        "This table lists the orderable part number, serial number,
+        hardware revision, manufacturing assembly number and revision, 
+        firmwareID and revision if any, and softwareID and revision if
+        any, of relevant entities listed in the ENTITY-MIB
+        entPhysicalTable.
+
+        Entities for which none of this data is available are not
+        listed in this table.  This is a sparse table so some of these
+        variables may not exist for a particular entity at a particular
+        time.  For example, a powered-off module does not have
+        softwareID and revision; a power-supply would probably never
+        have firmware or software information.
+        
+        Although the data may have other items encoded in it (for
+        example manufacturing-date in the serial number) please treat
+        all data items as monolithic.  Do not decompose them or parse
+        them.  Use only string equals and unequals operations on them."
+    ::= { ciscoEntityAssetMIBObjects 1 }
+
+ceAssetEntry OBJECT-TYPE
+    SYNTAX      CeAssetEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current 
+    DESCRIPTION   
+        "An entAssetEntry entry describes the asset-tracking related
+        data for an entity."
+    INDEX       { entPhysicalIndex }
+    ::= { ceAssetTable 1 }
+
+CeAssetEntry ::= SEQUENCE {
+    ceAssetOEMString            SnmpAdminString,
+    ceAssetSerialNumber         SnmpAdminString,
+    ceAssetOrderablePartNumber  SnmpAdminString,
+    ceAssetHardwareRevision     SnmpAdminString,
+    ceAssetMfgAssyNumber        SnmpAdminString,
+    ceAssetMfgAssyRevision      SnmpAdminString,
+    ceAssetFirmwareID           SnmpAdminString,
+    ceAssetFirmwareRevision     SnmpAdminString,
+    ceAssetSoftwareID           SnmpAdminString,
+    ceAssetSoftwareRevision     SnmpAdminString,
+    ceAssetCLEI                 SnmpAdminString,
+    ceAssetAlias                SnmpAdminString,
+    ceAssetTag                  SnmpAdminString,
+    ceAssetIsFRU                TruthValue
+}
+
+ceAssetOEMString OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+        "This variable indicates the Original Equipment Manufacturer 
+        of the entity."
+    ::= { ceAssetEntry 1 }
+
+ceAssetSerialNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "This variable indicates the serial number of the entity."
+    ::= { ceAssetEntry 2 }
+
+ceAssetOrderablePartNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+        "This variable indicates the part number you can use to order
+        the entity."
+    ::= { ceAssetEntry 3 }
+
+ceAssetHardwareRevision OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "This variable indicates the engineering design revision of the
+        hardware of the entity."
+    ::= { ceAssetEntry 4 }
+
+ceAssetMfgAssyNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION
+        "This variable indicates the manufacturing assembly number,
+        which is the 'hardware' identification."
+    ::= { ceAssetEntry 5 }
+
+ceAssetMfgAssyRevision OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current 
+    DESCRIPTION
+        "This variable indicates the revision of the entity, within
+        the ceAssetMfgAssyNumber."
+    ::= { ceAssetEntry 6 }
+
+ceAssetFirmwareID OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+    "This variable indicates the firmware installed on this entity.  
+
+    For IOS devices, this variable's value is in the IOS Image 
+    Naming Convention format.
+            
+            IOS Image Naming Convention
+
+    Software images are named according to a scheme that identifies
+    what's in the image and what platform it runs on. The names have
+    three parts, separated by dashes: e.g. xxxx-yyyy-ww.  
+    xxxx = Platform
+    yyyy = Features
+    ww   = Where it executes from and if compressed 
+    "
+    ::= { ceAssetEntry 7 }
+
+ceAssetFirmwareRevision OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+    "This variable indicates the revision of firmware installed on this
+    entity.
+
+    For IOS devices, this variable's value is in the NGRP external
+    customer-visible format.  
+
+    NGRP external customer-visible revision strings have this format:
+            'x.y (z [p] )  [A] [ [ u ( v [ p ] ) ] ] [ q ]', 
+    where:
+    - x.y   Combination of two 1-2 digit numerics separated by a 
+            '.' that identify the Software major release 
+    - z     1-3 digit numeric that identifies the maintenance release
+            of x.y
+    - A     1-3 alpha letters, designator of the release train.
+    - u     1-2 digit numeric that identifies the version of the 
+            ED-specific code
+    - v     1-2 digit numeric that identifies the maintenance release of
+            the ED-specific code
+    - v     1-2 digit numeric that identifies the maintenance release of
+            the ED-specific code
+    - p     1 alpha letter that identifies the unusual special case SW
+            Line Stop Fast Re-build by the Release Ops team to replace
+            the posted/shipping release in CCO and Mfg with a version
+            containing a critical catastrophic defect fix that cannot
+            wait until the next maintenance release
+    - q     3 alphanumeric optional suffix used as an indicator in the
+            image banner by the SW Line Stop Re-build process used
+            unusual special case situation when the renumber build has
+            occurred but the images have not been released (value always
+            blank unless these special circumstances require 
+            its use).
+    "
+    ::= { ceAssetEntry 8 }
+
+ceAssetSoftwareID OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+    "This variable indicates the software installed on this entity.
+
+    For IOS devices, this variable's value is in the IOS Image Naming
+    Convention format.
+            
+            IOS Image Naming Convention
+            ---------------------------
+    Software images are named according to a scheme that identifies
+    what's in the image and what platform it runs on. The names have
+    three parts, separated by dashes: e.g. xxxx-yyyy-ww.  
+    xxxx = Platform
+    yyyy = Features
+    ww   = Where it executes from and if compressed 
+    "
+    ::= { ceAssetEntry 9 }
+
+ceAssetSoftwareRevision OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+    "This variable indicates the revision of software installed on this
+    entity.
+
+    For IOS devices, this variable's value is in the NGRP external
+    customer-visible format.  
+
+    NGRP external customer-visible revision strings have this format:
+            'x.y (z [p] )  [A] [ [ u ( v [ p ] ) ] ] [ q ]', 
+    where:
+    - x.y   Combination of two 1-2 digit numerics separated by a 
+            '.' that identify the Software major release 
+    - z     1-3 digit numeric that identifies the maintenance release
+            of x.y
+    - A     1-3 alpha letters, designator of the release train.
+    - u     1-2 digit numeric that identifies the version of the 
+            ED-specific code
+    - v     1-2 digit numeric that identifies the maintenance release of
+            the ED-specific code
+    - p     1 alpha letter that identifies the unusual special case SW
+            Line Stop Fast Re-build by the Release Ops team to replace
+            the posted/shipping release in CCO and Mfg with a version
+            containing a critical catastrophic defect fix that cannot
+            wait until the next maintenance release
+    - q     3 alphanumeric optional suffix used as an indicator in the
+            image banner by the SW Line Stop Re-build process used
+            unusual special case situation when the renumber build has
+            occurred but the images have not been released (value always
+            blank unless these special circumstances require 
+            its use).
+    "
+    ::= { ceAssetEntry 10 }
+
+ceAssetCLEI OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0|10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the CLEI (Common Language Equipment
+        Identifier) code for the physical entity.
+
+        If the physical entity is not present in the system, or does
+        not have an associated CLEI code, then the value of this
+        object will be a zero-length string."
+    REFERENCE
+        "Bellcore Technical reference GR-485-CORE, COMMON LANGUAGE
+        Equipment Processes and Guidelines, Issue 2, October, 1995."
+    ::= { ceAssetEntry 11 }
+
+ceAssetAlias    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "This object is an 'alias' name for the physical entity as
+        specified by a network manager, and provides a non-volatile
+        'handle' for the physical entity.
+
+        On the first instantiation of an physical entity, the value
+        of entPhysicalAlias associated with that entity is set to
+        the zero-length string. However, agent may set the value to
+        a locally unique default value, instead of a zero-length
+        string.
+
+        If write access is implemented for an instance of
+        entPhysicalAlias, and a value is written into the instance,
+        the agent must retain the supplied value in the
+        entPhysicalAlias instance associated with the same physical
+        entity for as long as that entity remains instantiated. This
+        includes instantiations across all re-initializations/reboots
+        of the network management system, including those which result
+        in a change of the physical entity's entPhysicalIndex value."
+    ::= { ceAssetEntry 12 }
+
+ceAssetTag OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      deprecated
+    DESCRIPTION
+        "This object is a user-assigned asset tracking identifier
+        for the physical entity as specified by a network manager,
+        and provides non-volatile storage of this information.
+
+        On the first instantiation of an physical entity, the value
+        of ceasAssetID associated with that entity is set to the
+        zero-length string.
+
+        Not every physical component will have a asset tracking
+        identifier, or even need one. Physical entities for which
+        the associated value of the ceAssetIsFRU object is equal to
+        'false' (e.g., the repeater ports within a repeater module),
+        do not need their own unique asset tracking identifier. An
+        agent does not have to provide write access for such
+        entities, and may instead return a zero-length string.
+
+        If write access is implemented for an instance of
+        ceasAssetID, and a value is written into the instance, the
+        agent must retain the supplied value in the ceasAssetID
+        instance associated with the same physical entity for as
+        long as that entity remains instantiated.  This includes
+        instantiations across all re-initializations/reboots of
+        the network management system, including those which result
+        in a change of the physical entity's entPhysicalIndex value.
+
+        If no asset tracking information is associated with the
+        physical component, then this object will contain a zero-
+        length string."
+    ::= { ceAssetEntry 13 }
+
+ceAssetIsFRU OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "This object indicates whether or not this physical entity
+        is considered a 'field replaceable unit' by the vendor.  If
+        this object contains the value 'true' then the corresponding
+        entPhysicalEntry identifies a field replaceable unit.  For
+        all entPhysicalEntries which represent components that are
+        permanently contained within a field replaceable unit, the
+        value 'false' should be returned for this object."
+    ::= { ceAssetEntry 14 }
+
+-- Notifications
+
+ciscoEntityAssetMIBNotificationsPrefix OBJECT IDENTIFIER ::=
+    { ciscoEntityAssetMIB 2 }
+
+ciscoEntityAssetMIBNotifications OBJECT IDENTIFIER ::=
+    { ciscoEntityAssetMIBNotificationsPrefix 0 }
+
+-- Conformance
+
+ciscoEntityAssetMIBConformance OBJECT IDENTIFIER ::=
+    { ciscoEntityAssetMIB 3 }
+
+ciscoEntityAssetMIBCompliances OBJECT IDENTIFIER ::=
+    { ciscoEntityAssetMIBConformance 1 }
+
+ciscoEntityAssetMIBGroups OBJECT IDENTIFIER ::=
+    { ciscoEntityAssetMIBConformance 2 }
+
+-- Compliance
+
+ciscoEntityAssetMIBCompliance MODULE-COMPLIANCE
+    STATUS  deprecated -- superceded by 
+                       -- ciscoEntityAssetMIBComplianceRev1
+    DESCRIPTION
+        "An ENTITY-MIB implementation that lists entities with asset
+        information in its entPhysicalTable must implement this group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            ceAssetGroup
+        }
+    ::= { ciscoEntityAssetMIBCompliances 1 }
+
+ciscoEntityAssetMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS  deprecated -- superceded by 
+                       -- ciscoEntityAssetMIBComplianceRev2
+    DESCRIPTION
+        "An ENTITY-MIB implementation that lists entities with asset
+        information in its entPhysicalTable must implement this group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            ceAssetGroupRev1
+    }
+    GROUP ceAssetEntityGroup
+    DESCRIPTION
+        "This group is mandatory only for the systems that support
+        ENTITY-MIB Version 1 (rfc2037)." 
+
+    ::= { ciscoEntityAssetMIBCompliances 2 }
+
+ciscoEntityAssetMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "An ENTITY-MIB implementation that lists entities with asset
+        information in its entPhysicalTable must implement this group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            ceAssetGroupRev2
+    }
+    ::= { ciscoEntityAssetMIBCompliances 3 }
+
+-- Units of Conformance
+
+ceAssetGroup OBJECT-GROUP
+    OBJECTS {
+        ceAssetOEMString,
+        ceAssetSerialNumber,
+        ceAssetOrderablePartNumber,
+        ceAssetHardwareRevision,
+        ceAssetMfgAssyNumber,
+        ceAssetMfgAssyRevision,
+        ceAssetFirmwareID,
+        ceAssetFirmwareRevision,
+        ceAssetSoftwareID,
+        ceAssetSoftwareRevision,
+        ceAssetCLEI,
+        ceAssetAlias,
+        ceAssetTag,
+        ceAssetIsFRU
+        }
+    STATUS      deprecated -- superceded by ceAssetGroupRev1   
+    DESCRIPTION
+        "The collection of objects which are used to describe and
+        monitor asset-related data of ENTITY-MIB 
+        entPhysicalTable items."
+    ::= { ciscoEntityAssetMIBGroups 1 }
+
+ceAssetGroupRev1 OBJECT-GROUP
+    OBJECTS {
+        ceAssetOEMString,
+        ceAssetMfgAssyNumber,
+        ceAssetMfgAssyRevision,
+        ceAssetFirmwareID,
+        ceAssetSoftwareID,
+        ceAssetCLEI
+        }
+    STATUS      deprecated -- superceded by ceAssetGroupRev2   
+    DESCRIPTION
+        "The collection of objects which are used to describe and
+        monitor asset-related extension data of ENTITY-MIB (RFC 2737)
+        entPhysicalTable items."
+    ::= { ciscoEntityAssetMIBGroups 2 }
+
+ceAssetEntityGroup OBJECT-GROUP
+    OBJECTS {
+        ceAssetOrderablePartNumber,
+        ceAssetSerialNumber,
+        ceAssetHardwareRevision,
+        ceAssetFirmwareRevision,
+        ceAssetSoftwareRevision,
+        ceAssetAlias,
+        ceAssetTag,
+        ceAssetIsFRU
+        }
+    STATUS  deprecated
+    DESCRIPTION
+        "The collection of objects which are duplicated from the 
+        objects in the entPhysicalTable of ENTITY-MIB (RFC 2737)."
+    ::= { ciscoEntityAssetMIBGroups 3 }
+
+ceAssetGroupRev2 OBJECT-GROUP
+    OBJECTS {
+        ceAssetMfgAssyNumber,
+        ceAssetMfgAssyRevision,
+        ceAssetCLEI
+        }
+    STATUS      current 
+    DESCRIPTION
+        "The collection of objects which are used to describe and
+        monitor asset-related extension data of ENTITY-MIB (RFC 2737)
+        entPhysicalTable items."
+    ::= { ciscoEntityAssetMIBGroups 4 }
+
+END
+

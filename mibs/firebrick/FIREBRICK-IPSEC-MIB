@@ -1,0 +1,165 @@
+-- *------------------------------------------------
+-- * Firebrick IPsec MIB
+-- *
+-- * June 2020, Cliff Hones
+-- *
+-- * Copyright (c) 2020 by Andrews & Arnold
+-- *------------------------------------------------
+
+FIREBRICK-IPSEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    enterprises,
+    TimeTicks
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InetAddressType,
+    InetAddress
+        FROM INET-ADDRESS-MIB
+    firebrickNewStyle
+        FROM FIREBRICK-MIB
+        ;
+
+fbIPsecMib MODULE-IDENTITY
+    LAST-UPDATED "202207150000Z"
+    ORGANIZATION "Andrews & Arnold Limited"
+    CONTACT-INFO
+        "Andrews & Arnold
+        Unit 1&2, Enterprise Court
+        Bracknell, Berkshire, RG12 1QS
+        United Kingdom
+
+        Tel: +44 3333 400 999
+        Email: support@aa.net.uk"
+    DESCRIPTION
+        "Firebrick-specific structures for IPSec"
+    REVISION "202207150000Z"
+    DESCRIPTION "Additional validation"
+    REVISION "202006160000Z"
+    DESCRIPTION "Initial version of this MIB module"
+    ::= { firebrickNewStyle 500 }
+
+fbIPsecGeneral    OBJECT IDENTIFIER ::= { fbIPsecMib 1 }
+
+fbIPsecEstablished OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The count of currently established IKE connections."
+    ::= { fbIPsecGeneral 1 }
+
+fbIPsecHalfOpen OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The count of incoming IKE connections which have not yet authorized."
+    ::= { fbIPsecGeneral 2 }
+
+fbIPsecConnectionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FbIPsecConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of IPsec connections for this Firebrick"
+    ::= { fbIPsecMib 2 }
+
+fbIPsecConnectionEntry OBJECT-TYPE
+    SYNTAX FbIPsecConnectionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the IPsec connection table"
+    INDEX { fbIPsecConnectionIndex }
+    ::= { fbIPsecConnectionTable 1 }
+
+FbIPsecConnectionEntry ::= SEQUENCE {
+    fbIPsecConnectionIndex        Integer32,
+    fbIPsecConnectionName         DisplayString,
+    fbIPsecConnectionState        FbIPsecConState,
+    fbIPsecConnectionUptime       TimeTicks,
+    fbIPsecConnectionLocalID      DisplayString,
+    fbIPsecConnectionPeerID       DisplayString,
+    fbIPsecConnectionPeerAddress  DisplayString
+}
+
+fbIPsecConnectionIndex OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "The index for the connection table"
+    ::= { fbIPsecConnectionEntry 1 }
+
+fbIPsecConnectionName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The config name for this connection"
+    ::= { fbIPsecConnectionEntry 2 }
+
+fbIPsecConnectionState OBJECT-TYPE
+    SYNTAX  FbIPsecConState
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The current state for this connection"
+    ::= { fbIPsecConnectionEntry 3 }
+
+fbIPsecConnectionUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The uptime for this connection"
+    ::= { fbIPsecConnectionEntry 4 }
+
+fbIPsecConnectionLocalID OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The local IKE ID for this connection"
+    ::= { fbIPsecConnectionEntry 5 }
+
+fbIPsecConnectionPeerID OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The peer IKE ID for this connection"
+    ::= { fbIPsecConnectionEntry 6 }
+
+fbIPsecConnectionPeerAddress OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The peer's IP address for this connection"
+    ::= { fbIPsecConnectionEntry 7 }
+
+FbIPsecConState ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION "The state of an IPsec connection"
+    SYNTAX  INTEGER {
+        badConfig(0),   -- Bad config (item ignored)
+        profileOff(1),  -- disabled by profile
+        awaitPeer(2),   -- Not up (waiting for peer to initiate)
+        awaitDemand(3), -- Not up (on-demand connection)
+        lingering(4),   -- Lingering (old connection waiting to be cleared)
+        awaitRecon(5),  -- Waiting to reconnect after failure
+        down(6),        -- Down
+        initEAP(7),     -- Initiating - processing EAP
+        initAuth(8),    -- Initiating - processing authorization
+        initNeg(9),     -- Initiating - initial negotiation
+        closing(10),    -- Closing
+        childless(11),  -- Childless - IKE connection established but no data channel present
+        connected(12)   -- Connected
+    }
+
+END

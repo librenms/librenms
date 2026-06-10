@@ -1,0 +1,3834 @@
+-- Mib files packaged on  Tue Mar 17 11:28:59 EDT 2015 for Storage Array Firmware V7.1.5 (R408054)
+
+--  
+--  Appliances that equallogic firmware supports
+EQLAPPLIANCE-MIB DEFINITIONS  ::= BEGIN   
+IMPORTS  
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64, Integer32,TimeTicks,  enterprises, IpAddress, Counter32, Counter64, Gauge32
+            FROM SNMPv2-SMI  
+	 DateAndTime, RowPointer       
+				FROM SNMPv2-TC
+    TruthValue, RowStatus, DisplayString    
+            FROM SNMPv2-TC
+    InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB       -- RFC2851
+    UTFString
+            FROM EQLGROUP-MIB
+    equalLogic
+            FROM EQUALLOGIC-SMI
+    eqliscsiVolumeEntry
+            FROM EQLVOLUME-MIB
+    eqliscsiVolumeTargetIscsiName
+            FROM EQLVOLUME-MIB
+    eqlMemberIndex           FROM EQLMEMBER-MIB
+    eqlGroupId               FROM EQLGROUP-MIB;
+
+eqlApplianceModule MODULE-IDENTITY      
+	LAST-UPDATED "201503171528Z"
+    ORGANIZATION  "EqualLogic Inc."
+    CONTACT-INFO      
+        "Contact: Customer Support
+         Postal:  Dell Inc
+                  300 Innovative Way, Suite 301, Nashua, NH 03062
+         Tel:     +1 603-579-9762
+         E-mail:  US-NH-CS-TechnicalSupport@dell.com
+         WEB:     www.equallogic.com"
+
+    DESCRIPTION          
+        "Appliances information.
+
+        Copyright (c) 2004-2013 by Dell Inc. 
+        
+        All rights reserved.  This software may not be copied, disclosed, 
+        transferred, or used except in accordance with a license granted 
+        by Dell, Inc.  This software embodies proprietary information 
+        and trade secrets of Dell Inc. 
+        "
+
+    -- Revision history, in reverse chronological order
+    REVISION    "201302210800Z"         -- 21-Feb-2013
+    DESCRIPTION "New eqlApplianceDnsServerTable, eqlApplianceDnsSuffixTable"
+    REVISION    "201203051000Z"         -- 05-Mar-2012
+    DESCRIPTION "New eqlApplianceMultiStateOpsState rename-cluster"
+    REVISION    "200907130000Z"         -- 02-Sep-06
+    DESCRIPTION "Initial revision"    
+    ::= { enterprises equalLogic(12740) 17 }     
+
+
+eqlApplianceObjects OBJECT IDENTIFIER ::=  { eqlApplianceModule 1 }   
+
+
+
+
+eqlApplianceTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Appliance Table.
+                     This table contains a list of appliances that this group is managing.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 1 }     
+
+
+eqlApplianceEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing appliance information."
+    INDEX           { eqlApplianceIndex }
+
+    ::=   { eqlApplianceTable 1}     
+
+EqlApplianceEntry ::= 
+    SEQUENCE { 
+        eqlApplianceIndex               Unsigned32,   
+        eqlApplianceRowStatus           RowStatus,
+        eqlApplianceName                OCTET STRING,
+        eqlApplianceType                INTEGER,
+        eqlApplianceState               INTEGER,
+        eqlApplianceDescription         DisplayString,
+        eqlApplianceMgmtAddressType     InetAddressType,
+        eqlApplianceMgmtAddress         InetAddress,
+        eqlApplianceMgmtPort            Unsigned32,
+        eqlApplianceMajorVersion        Unsigned32,
+        eqlApplianceMinorVersion        Unsigned32,
+        eqlApplianceMaintVersion        Unsigned32,
+        eqlApplianceVendorId            OCTET STRING,
+        eqlApplianceSharedSecret        OCTET STRING,
+        eqlApplianceUserName            UTFString,
+        eqlApplianceNumberOfNodes       Unsigned32,
+        eqlApplianceUniqueID            Unsigned32,
+        eqlApplianceConfigStatus        Unsigned32,
+        eqlApplianceAction              INTEGER,
+        eqlApplianceAdminStatus         INTEGER,
+        eqlApplianceGatewayAddrType     InetAddressType,
+        eqlApplianceGatewayAddr         InetAddress,
+        eqlApplianceLastScheduleIndex   Unsigned32,
+        eqlApplianceMPV                 Unsigned32,
+        eqlApplianceEnableFTP           INTEGER,
+        eqlApplianceDesiredServiceMode  INTEGER,
+        eqlApplianceServiceModeStatus   INTEGER,
+        eqlApplianceRequestId           Counter64
+    }
+
+eqlApplianceIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      not-accessible     
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifing a Appliance."  
+    ::=   { eqlApplianceEntry 1}     
+
+eqlApplianceRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlApplianceEntry 2 }  
+
+eqlApplianceName OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "EQL-SECONDARY-KEY
+                     This field specifies a user friendly name for an appliance. Allowed characters are alphanumeric and underscore for spartan."
+    ::=  {  eqlApplianceEntry 3 }  
+
+eqlApplianceType OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                    nas(1),
+		    blade-chassis(2)
+    }     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 4}    
+
+eqlApplianceState OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                    unconfigured(0),
+                    -- following are spartan specific states
+                    --- state 1000 to 1100 are for create spartan group states
+                    node-setup(1000),                 --deprecated
+                    internal-network(1001),
+                    san-network(1002),
+                    client-network(1003),
+                    configure-gateway(1004),
+                    start-nodes-validation(1005),      --deprecated
+                    nodes-validation-inprogress(1006), --deprecated
+                    make-cluster(1007),                --deprecated
+                    send-eql-group-ip(1008),
+                    create-volume-acls(1009),
+                    start-format(1010),
+                    format-in-progress(1011),
+                    start-system(1012),                --deprecated
+                    start-system-in-progress(1013),    --deprecated
+                    configured(1014),
+                    cluster-name(1015),
+                    start-nas-appliance-create(1016),
+                    nas-appliance-create-in-progress(1017),
+                    start-volume-discovery(1018)
+    }     
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     ""
+    DEFVAL          {unconfigured}
+    ::=   { eqlApplianceEntry 5}    
+
+eqlApplianceDescription OBJECT-TYPE      
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 6}    
+
+eqlApplianceMgmtAddressType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 7}    
+
+
+eqlApplianceMgmtAddress OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 8}    
+
+
+eqlApplianceMgmtPort OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     ""
+    DEFVAL          {3004}
+    ::=   { eqlApplianceEntry 9}    
+
+
+eqlApplianceMajorVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 10}    
+
+
+eqlApplianceMinorVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 11}    
+
+
+eqlApplianceMaintVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 12}    
+
+
+eqlApplianceVendorId OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (0..64))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     ""
+    ::=   { eqlApplianceEntry 13}    
+
+eqlApplianceSharedSecret OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (0..255))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used for shared secret authentication."  
+    --DEFAULT       cookie "secure"
+    ::=   { eqlApplianceEntry 14}    
+
+eqlApplianceUserName OBJECT-TYPE      
+    SYNTAX	    UTFString (SIZE (0..64))
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used for authentication."  
+    --DEFAULT       cookie "secure"
+    ::=   { eqlApplianceEntry 15}    
+
+eqlApplianceNumberOfNodes OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "Number of nodes in this appliance."
+    ::=   { eqlApplianceEntry 16}    
+
+eqlApplianceUniqueID OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "Unique ID used by this appliance."
+    ::=   { eqlApplianceEntry 17}    
+
+
+eqlApplianceConfigStatus OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "status of this appliance configuration"
+    ::=   { eqlApplianceEntry 18}    
+
+eqlApplianceAction OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    none(0),
+                    start(1),
+                    retry(2),
+                    abort(3),
+                    continue(4)
+    }
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "Action on this appliance."
+    ::=   { eqlApplianceEntry 19}    
+
+eqlApplianceAdminStatus OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    down(0),
+                    up(1),
+                    maintenance(2),
+                    delete(3)
+    }
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "Admin status used to manage this appliance."
+    ::=   { eqlApplianceEntry 20}    
+
+
+eqlApplianceGatewayAddrType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field specifies the type of address (v4/v6) of the default gateway address for this appliance."
+    ::= { eqlApplianceEntry  21 }
+
+
+eqlApplianceGatewayAddr OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the address specification of the default gateway address for this appliance."
+    ::= { eqlApplianceEntry 22 }    
+
+
+eqlApplianceLastScheduleIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "Last used snapshot schedule index. Every time a new schedule is created for the appliance, the new idex is the last used index value from this field plus one, and the field itself is updated with  the new value. This way the schedule index will never repeat (reused) for the appliance."
+    DEFVAL          { 0 }
+    ::=   { eqlApplianceEntry 23}
+
+eqlApplianceMPV OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "Management Protocol Version (MPV) of this appliance."
+    DEFVAL          { 0 }
+    ::=   { eqlApplianceEntry 24}
+
+eqlApplianceEnableFTP      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enabled  (0),
+                        disabled (1)
+    }     
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not to allow ftp access to the appliance.
+                     The default is disabled."
+    DEFVAL          { enabled }
+    ::=  {  eqlApplianceEntry 25 }
+
+eqlApplianceDesiredServiceMode      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        normal      (0),
+                        maintenance (1)
+    }     
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Desired service mode of the appliance."
+    DEFVAL          { normal }
+    ::=  {  eqlApplianceEntry 26 }
+
+eqlApplianceServiceModeStatus      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        normal               (0),
+                        maintenance          (1),
+                        transition-to-maint  (2), --Transitioning to Maintenance mode
+                        transition-to-normal (3)  --Transitioning to Normal mode
+    }     
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field specifies the service mode status of the appliance."
+    DEFVAL          { normal }
+    ::=  {  eqlApplianceEntry 27 }
+
+eqlApplianceRequestId OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the operation request identifier."
+    ::= { eqlApplianceEntry 28 }
+
+--------------------------------------------------------------------------------------------
+eqlApplianceUniqueIDTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceUniqueIDEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Unique ID table.
+                     This table is used to retrieve Unique ID values when creating new objects.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 2 }     
+
+eqlApplianceUniqueIDEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceUniqueIDEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing unique ID information."
+    INDEX           { eqlApplianceIndex, eqlApplianceUniqueIDType }
+
+    ::=   { eqlApplianceUniqueIDTable 1}     
+
+EqlApplianceUniqueIDEntry ::= 
+    SEQUENCE { 
+	eqlApplianceUniqueIDType         INTEGER,
+	eqlApplianceUniqueIDValueLen     Unsigned32,
+	eqlApplianceUniqueIDValue        OCTET STRING
+    }
+
+eqlApplianceUniqueIDType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    fsid(1),
+                    userid(2),
+                    nfsexportname(3),
+                    partnershipid(4),
+                    replicationid(5)
+    }
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     ""  
+    ::= {eqlApplianceUniqueIDEntry  1 }  
+
+eqlApplianceUniqueIDValueLen OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Length of the value represented by column eqlApplianceUniqueIDValue"  
+    ::= {eqlApplianceUniqueIDEntry  2 }  
+
+eqlApplianceUniqueIDValue OBJECT-TYPE      
+-- agent doesn't seem to handle variable length 1..255 here
+    SYNTAX          OCTET STRING(SIZE(255)) 
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "Value of eqlApplianceUniqueIDType represented in network byte order."  
+    ::= {eqlApplianceUniqueIDEntry  3 }  
+--------------------------------------------------------------------------------------------
+eqlApplianceUnInitNodesTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceUnInitNodesEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Uninitialized Nodes Table.
+                     This table contains information relating to uninitialized appliances
+		     discovered during the device discovery process.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 3 }     
+
+eqlApplianceUnInitNodesEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceUnInitNodesEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing uninitialized appliance information."
+    INDEX           { eqlApplianceUnInitNodeProductType, eqlApplianceUnInitNodeServiceTag }
+
+    ::=   { eqlApplianceUnInitNodesTable 1 }     
+
+EqlApplianceUnInitNodesEntry ::= 
+    SEQUENCE { 
+        eqlApplianceUnInitNodeProductType        INTEGER,
+        eqlApplianceUnInitNodeServiceTag         OCTET STRING,
+        eqlApplianceUnInitNodeState              INTEGER, 
+        eqlApplianceUnInitNodeModel              OCTET STRING,
+        eqlApplianceUnInitNodeVendor             OCTET STRING,
+        eqlApplianceUnInitNodeLinkLocalIPType    InetAddressType,
+        eqlApplianceUnInitNodeLinkLocalIP        InetAddress,
+        eqlApplianceUnInitNodeMajorVersion       Unsigned32,
+        eqlApplianceUnInitNodeMinorVersion       Unsigned32,
+        eqlApplianceUnInitNodeMaintVersion       Unsigned32,
+        eqlApplianceUnInitNodeRowStatus          RowStatus,
+        eqlApplianceUnInitNodeClusterMPV         Unsigned32,
+        eqlApplianceUnInitNodeChassisTag         OCTET STRING
+    }
+
+eqlApplianceUnInitNodeProductType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    nas(1)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the type of device that has been discovered"  
+    ::= { eqlApplianceUnInitNodesEntry  1 }  
+
+eqlApplianceUnInitNodeServiceTag OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..32))
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the service tag of the discovered device"  
+    ::= { eqlApplianceUnInitNodesEntry  2 }  
+
+eqlApplianceUnInitNodeState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    discover(1),
+		    found(2)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the current state of the device (discover or found)"  
+    ::= { eqlApplianceUnInitNodesEntry  3 }  
+
+eqlApplianceUnInitNodeModel OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the model of the discovered device."  
+    ::= { eqlApplianceUnInitNodesEntry  4 }  
+
+eqlApplianceUnInitNodeVendor OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the vendor of the discovered device"  
+    ::= { eqlApplianceUnInitNodesEntry  5 }  
+
+eqlApplianceUnInitNodeLinkLocalIPType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the address type (v4/v6) of the link-local IP associated with the discovered device"
+    ::= { eqlApplianceUnInitNodesEntry  6 }    
+
+
+eqlApplianceUnInitNodeLinkLocalIP OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the link-local IP of the device, as returned during the device-discover process"
+    ::= { eqlApplianceUnInitNodesEntry  7 }    
+
+eqlApplianceUnInitNodeMajorVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the major version of the device discovered"
+    ::= { eqlApplianceUnInitNodesEntry  8 }    
+
+eqlApplianceUnInitNodeMinorVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the minor version of the device discovered"
+    ::= { eqlApplianceUnInitNodesEntry  9 }    
+
+eqlApplianceUnInitNodeMaintVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the maintenance version of the device discovered"
+    ::= { eqlApplianceUnInitNodesEntry 10 }    
+
+eqlApplianceUnInitNodeRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This is used only for support purpose to delete rows in this table."
+    ::= { eqlApplianceUnInitNodesEntry 11 }    
+
+eqlApplianceUnInitNodeClusterMPV OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Management Protocol Version (MPV) the Appliance Cluster."
+    ::=   { eqlApplianceUnInitNodesEntry 12}
+
+eqlApplianceUnInitNodeChassisTag OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This field indicates the service tag of the discovered device chassis"
+    DEFVAL        {"-"}
+    ::= { eqlApplianceUnInitNodesEntry  13 }
+
+--------------------------------------------------------------------------------------------
+eqlApplianceNodeTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceNodeEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Appliance Node Table
+                     This table is used to store information about Appliance nodes.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 4 }     
+
+eqlApplianceNodeEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceNodeEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an node-specific configuration."
+    INDEX           { eqlApplianceIndex, eqlApplianceNodeIndex}
+
+    ::=   { eqlApplianceNodeTable 1 }     
+
+EqlApplianceNodeEntry ::= 
+    SEQUENCE { 
+        eqlApplianceNodeIndex                  Unsigned32,
+        eqlApplianceNodeRowStatus              RowStatus,
+        eqlApplianceNodeProductType            INTEGER,
+        eqlApplianceNodeServiceTag             OCTET STRING,
+        eqlApplianceNodeModel                  OCTET STRING,
+        eqlApplianceNodeVendor                 OCTET STRING,
+        eqlApplianceNodeLinkLocalIPType        InetAddressType,
+        eqlApplianceNodeLinkLocalIP            InetAddress,
+        eqlApplianceNodeMajorVersion           Unsigned32,
+        eqlApplianceNodeMinorVersion           Unsigned32,
+        eqlApplianceNodeMaintVersion           Unsigned32,
+        eqlApplianceNodeName                   DisplayString,
+        eqlApplianceNodePeerIndex              Unsigned32,
+        eqlApplianceNodeConfigState            INTEGER,
+        eqlApplianceNodeConfigStatus           Unsigned32,
+        eqlApplianceNodeGatewayAddrType        InetAddressType,
+        eqlApplianceNodeGatewayAddr            InetAddress,
+        eqlApplianceNodeInitiatorName          OCTET STRING,
+        eqlApplianceNodeAdminStatus            INTEGER,
+        eqlApplianceNodeChassisTag             OCTET STRING,
+        eqlApplianceNodeChassisName            OCTET STRING,
+        eqlApplianceNodeOpsRequestId           Counter64
+    }
+eqlApplianceNodeIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "A unique identifier for each configured node within an appliance"
+    ::= { eqlApplianceNodeEntry  1 }    
+
+
+eqlApplianceNodeRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlApplianceNodeEntry  2 }  
+
+eqlApplianceNodeProductType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    fs7500(1),
+                    fs7600(2),
+                    fs7610(3)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the type of device that has been discovered"  
+    ::= { eqlApplianceNodeEntry  3 }  
+
+eqlApplianceNodeServiceTag OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..32))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the service tag of the discovered device"  
+    ::= { eqlApplianceNodeEntry  4 }  
+
+eqlApplianceNodeModel OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the model of the discovered device."  
+    ::= { eqlApplianceNodeEntry  5 }  
+
+eqlApplianceNodeVendor OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the vendor of the discovered device"  
+    ::= { eqlApplianceNodeEntry  6 }  
+
+eqlApplianceNodeLinkLocalIPType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the address type (v4/v6) of the link-local IP associated with the discovered device"
+    ::= { eqlApplianceNodeEntry  7 }    
+
+
+eqlApplianceNodeLinkLocalIP OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the link-local IP of the device, as returned during the device-discover process"
+    ::= { eqlApplianceNodeEntry  8 }    
+
+eqlApplianceNodeMajorVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the major version of the device discovered"
+    ::= { eqlApplianceNodeEntry  9 }    
+
+eqlApplianceNodeMinorVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the minor version of the device discovered"
+    ::= { eqlApplianceNodeEntry  10 }    
+
+eqlApplianceNodeMaintVersion OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the maintenance version of the device discovered"
+    ::= { eqlApplianceNodeEntry 11 }    
+
+eqlApplianceNodeName OBJECT-TYPE      
+    SYNTAX          DisplayString (SIZE (1..64))     
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the name used to manage this node."
+    ::= { eqlApplianceNodeEntry 12 }    
+
+eqlApplianceNodePeerIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the NodeIndex value of peer node if any."
+    ::= { eqlApplianceNodeEntry 13 }    
+
+eqlApplianceNodeConfigState OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    unconfigured(0),
+                    node-setup-complete(1001),
+                    internal-network-complete(1002),
+                    san-network-complete(1003),
+                    client-network-complete(1004),
+                    gateway-config-complete(1005),
+                    configured(1006),
+                    detached(1007)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field specifies what configuration state the node is in."
+    ::= { eqlApplianceNodeEntry 14 }    
+
+eqlApplianceNodeConfigStatus OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Status of current config state.If not zero, then an error occured in configuration"
+    ::= { eqlApplianceNodeEntry 15 }    
+
+eqlApplianceNodeGatewayAddrType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of address (v4/v6) of the default gateway address for this node"
+    ::= { eqlApplianceNodeEntry  16 }    
+
+eqlApplianceNodeGatewayAddr OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field contains the address specification of the default gateway address for this node."
+    ::= { eqlApplianceNodeEntry 17 }    
+
+eqlApplianceNodeInitiatorName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..223))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The iSCSI name of this node."
+    ::= { eqlApplianceNodeEntry 18 }    
+
+eqlApplianceNodeAdminStatus OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    on(0),
+                    detach(1),
+                    attach(2),
+                    reset(3)
+    }
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "Start node detach operation or attach operation."
+    ::= { eqlApplianceNodeEntry 19 } 
+
+eqlApplianceNodeChassisTag OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..32))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the service tag of the discovered device chasis"
+    ::= { eqlApplianceNodeEntry  20 }
+
+eqlApplianceNodeChassisName OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..32))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the configured chassis name the discovered device chasis"
+    ::= { eqlApplianceNodeEntry  21 }
+
+eqlApplianceNodeOpsRequestId OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the the operation request identifier."
+    ::= { eqlApplianceNodeEntry 22 }
+
+--------------------------------------------------------------------------------------------
+eqlApplianceNetworksTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceNetworksEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic(semi) Appliance Networks Table 
+                     EqualLogic-DoNotGroupRequest 
+                     This table is used to retrieve network configuration information for an appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 5 }     
+
+eqlApplianceNetworksEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceNetworksEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing a description of network configurations of an appliance."
+    INDEX           { eqlApplianceIndex, eqlApplianceNetworkType, eqlApplianceNetworkID }
+
+    ::=   { eqlApplianceNetworksTable 1 }     
+
+EqlApplianceNetworksEntry ::= 
+    SEQUENCE { 
+        eqlApplianceNetworkRowStatus             RowStatus,
+        eqlApplianceNetworkType                  INTEGER,
+        eqlApplianceNetworkID                    Unsigned32,
+        eqlApplianceNetworkName                  OCTET STRING,
+	eqlApplianceNetworkBlockIPAddressType    InetAddressType,
+	eqlApplianceNetworkBlockIPAddress        InetAddress,
+	eqlApplianceNetworkBlockNetmaskAddrType  InetAddressType,
+	eqlApplianceNetworkBlockNetmaskAddr      InetAddress,
+        eqlApplianceNetworkVLANTag               Unsigned32,
+        eqlApplianceNetworkAdminState            INTEGER,
+        eqlApplianceNetworkMTUSize               Unsigned32,
+        eqlApplianceNetworkBondingMode           INTEGER
+    }
+
+eqlApplianceNetworkRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlApplianceNetworksEntry  1 }  
+
+eqlApplianceNetworkType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    internal(1),
+		            san(2),
+		            client(3),
+                    backplane(4)
+    }
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the type of network being described by this entry"  
+    ::= { eqlApplianceNetworksEntry  2 }  
+
+eqlApplianceNetworkID OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "A unique identifier for each configured network within a network type and appliance"
+    ::= { eqlApplianceNetworksEntry  3 }    
+
+eqlApplianceNetworkName OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..64))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a user friendly name for a network."
+    ::= { eqlApplianceNetworksEntry  4 }  
+
+eqlApplianceNetworkBlockIPAddressType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of address (v4/v6) of the block IP address"
+    ::= { eqlApplianceNetworksEntry  5 }    
+
+eqlApplianceNetworkBlockIPAddress OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field contains the address specification for the block of IPs describing this network"
+    ::= { eqlApplianceNetworksEntry  6 }    
+
+eqlApplianceNetworkBlockNetmaskAddrType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of address (v4/v6) of the netmask address for this network"
+    ::= { eqlApplianceNetworksEntry  7 }    
+
+eqlApplianceNetworkBlockNetmaskAddr OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field contains the address specification of the netmask describing this network"
+    ::= { eqlApplianceNetworksEntry  8 }    
+
+eqlApplianceNetworkVLANTag OBJECT-TYPE      
+    SYNTAX          Unsigned32(0..4095)
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field specifies the VLAN tag applicable to this network."
+    ::= { eqlApplianceNetworksEntry 9 }  
+
+eqlApplianceNetworkAdminState OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    creating(1),
+		    modifying(2),
+		    done(3)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the current administrative state of this network entry"  
+    ::= { eqlApplianceNetworksEntry 10 }  
+
+eqlApplianceNetworkMTUSize OBJECT-TYPE      
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the MTU size supported by this network."  
+    ::= { eqlApplianceNetworksEntry 11 }  
+
+eqlApplianceNetworkBondingMode OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    alb(0),
+                    lacp(1)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the bonding mode supported by this network. 
+                     For spartan, only client network supports modifying the bonding mode.Default mode is ALB (adaptive load balancing) for client network. User can change this mode to LACP(802.3 ad) later."  
+    ::= { eqlApplianceNetworksEntry 12 }  
+
+--------------------------------------------------------------------------------------------
+eqlApplianceIPTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceIPEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic(semi) Appliance IP Table
+                     This table is used to retrieve appliance-wide IP addresses
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 6 }     
+
+eqlApplianceIPEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceIPEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an appliance-wide IP address configured for an appliance network."
+    INDEX           { eqlApplianceIndex, eqlApplianceNetworkType, eqlApplianceNetworkID, eqlApplianceIPAddressType, eqlApplianceIPAddress }
+
+    ::=   { eqlApplianceIPTable 1 }     
+
+EqlApplianceIPEntry ::= 
+    SEQUENCE { 
+        eqlApplianceIPRowStatus                  RowStatus,
+        eqlApplianceIPAddressType                InetAddressType,
+        eqlApplianceIPAddress                    InetAddress
+    }
+
+eqlApplianceIPRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlApplianceIPEntry  1 }  
+
+eqlApplianceIPAddressType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of address (v4/v6) of this IP address entry"
+    ::= { eqlApplianceIPEntry  2 }    
+
+eqlApplianceIPAddress OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "This field contains the address specification of this IP address entry"
+    ::= { eqlApplianceIPEntry 3 }    
+--------------------------------------------------------------------------------------------
+eqlApplianceNodeIPTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceNodeIPEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic(semi) Appliance Node IP Table
+                     This table is used to retrieve node-specific IP addresses configured with a specific appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 7 }     
+
+eqlApplianceNodeIPEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceNodeIPEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an node-specific IP address configured for an appliance network."
+    INDEX           { eqlApplianceIndex, eqlApplianceNetworkType, eqlApplianceNetworkID, 
+                      eqlApplianceNodeIndex, eqlApplianceNodeIPAddressType, eqlApplianceNodeIPAddress }
+
+    ::=   { eqlApplianceNodeIPTable 1 }     
+
+EqlApplianceNodeIPEntry ::= 
+    SEQUENCE { 
+        eqlApplianceNodeIPRowStatus              RowStatus,
+        eqlApplianceNodeIPAddressType            InetAddressType,
+        eqlApplianceNodeIPAddress                InetAddress
+    }
+
+eqlApplianceNodeIPRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlApplianceNodeIPEntry  1 }  
+
+eqlApplianceNodeIPAddressType OBJECT-TYPE      
+    SYNTAX          InetAddressType
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of address (v4/v6) of this node-specific IP address entry"
+    ::= { eqlApplianceNodeIPEntry  2 }    
+
+eqlApplianceNodeIPAddress OBJECT-TYPE      
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "This field contains the address specification of this node-specific IP address entry"
+    ::= { eqlApplianceNodeIPEntry 3 }    
+
+--------------------------------------------------------------------------------------------
+eqlApplianceOpsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic(semi) Appliance operations table
+                     This table is used to manage operations on appliances. 
+                     For example: In Spartan, operations include validation,format etc.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 8 }     
+
+eqlApplianceOpsEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceOpsType, eqlApplianceOpsIndex}
+
+    ::=   { eqlApplianceOpsTable 1 }     
+
+EqlApplianceOpsEntry ::= 
+    SEQUENCE {   
+        eqlApplianceOpsIndex                  Unsigned32,
+        eqlApplianceOpsRowStatus              RowStatus,
+        eqlApplianceOpsType                   INTEGER,
+        eqlApplianceOpsStatus                 Unsigned32,
+        eqlApplianceOpsPercentage             Unsigned32,
+        eqlApplianceOpsRequestId              Counter64
+    }
+
+eqlApplianceOpsIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      not-accessible     
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifing an operation."  
+    ::=   { eqlApplianceOpsEntry 1}     
+
+eqlApplianceOpsRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."  
+    ::= { eqlApplianceOpsEntry  2 }  
+
+eqlApplianceOpsType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    none(0),
+                    validation(1),
+                    format(2),
+                    start(3),
+                    stop(4),
+                    attach(5),
+                    expand(6),
+                    incrementalformat(7),
+                    detach(8),
+                    add-pair(9),
+                    delete(10),
+                    create-nas-appliance(11),
+                    discover(12),
+                    add-nas-appliance(13),
+                    join-nas-appliance(14),
+                    diagnostics(15),
+                    nas-cluster-update(16),
+                    restore-config(17),
+                    service-mode-change(18),
+                    container-cfg-modify(19)
+    }
+    MAX-ACCESS      not-accessible        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of operation."
+    ::= { eqlApplianceOpsEntry  3 }    
+
+eqlApplianceOpsStatus OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the current status of this operation. In case of errors, this value will represent the error number."
+    ::= { eqlApplianceOpsEntry 4 }    
+
+eqlApplianceOpsPercentage OBJECT-TYPE      
+    SYNTAX          Unsigned32(0..100)
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the % of completion for this operation."
+    ::= { eqlApplianceOpsEntry 5 }    
+
+eqlApplianceOpsRequestId OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the operation request identifier."
+    ::= { eqlApplianceOpsEntry 6 }
+      
+--------------------------------------------------------------------------------------------
+eqlVolumeApplianceTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlVolumeApplianceEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Appliance Volumes table
+                     This table is used to store what volumes are accessed by which appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 9 }     
+
+eqlVolumeApplianceEntry OBJECT-TYPE      
+    SYNTAX          EqlVolumeApplianceEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing the appliance information."
+    AUGMENTS        { eqliscsiVolumeEntry }
+    ::=   { eqlVolumeApplianceTable 1 }     
+
+EqlVolumeApplianceEntry ::= 
+    SEQUENCE { 
+        eqlVolumeApplianceRowStatus              RowStatus,
+        eqlVolumeApplianceIndex                  Unsigned32,
+        eqlVolumeApplianceNodeIndex              Unsigned32,
+        eqlVolumeApplianceState                  INTEGER
+    }
+
+eqlVolumeApplianceRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage the rows in this table."  
+    ::= { eqlVolumeApplianceEntry  1 }  
+
+eqlVolumeApplianceIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the appliance index this volume is associated with. This value will never be zero."  
+    ::=   { eqlVolumeApplianceEntry 2}     
+
+eqlVolumeApplianceNodeIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the node index this volume is associated with. This value will be zero if this volume is not associated with a particular node."  
+    ::=   { eqlVolumeApplianceEntry 3}     
+
+eqlVolumeApplianceState OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    formatpending(0),
+                    formatted(1),
+                    expansionpending(2)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the state of this volume as seen by the appliance."
+    ::= { eqlVolumeApplianceEntry  4}
+
+--------------------------------------------------------------------------------------------
+eqlApplianceOpsFailureTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceOpsFailureEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance operations failures table
+                     This table is used to retrieve failure information related to an appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 10 }     
+
+eqlApplianceOpsFailureEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceOpsFailureEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceOpsType, eqlApplianceOpsIndex, eqlApplianceOpsFailureIndex}
+
+    ::=   { eqlApplianceOpsFailureTable 1 }     
+
+EqlApplianceOpsFailureEntry ::= 
+    SEQUENCE { 
+        eqlApplianceOpsFailureIndex                  Unsigned32,
+        eqlApplianceOpsFailureType                   INTEGER,
+        eqlApplianceOpsFailureScope                  Unsigned32,
+        eqlApplianceOpsFailureCode                   Unsigned32,
+        eqlApplianceOpsFailureComponent              INTEGER,
+        eqlApplianceOpsFailureSubComponent           OCTET STRING,
+        eqlApplianceOpsFailureMessage                OCTET STRING
+    }
+
+eqlApplianceOpsFailureIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      not-accessible     
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifing an operation failure."  
+    ::=   { eqlApplianceOpsFailureEntry 1}     
+
+eqlApplianceOpsFailureType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    error(1),
+                    warning(2)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of operation."
+    ::= { eqlApplianceOpsFailureEntry  2 }    
+
+eqlApplianceOpsFailureScope OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the scope of this failure. For spartan, 0 indicates scope of cluster. Non zero indicates the node index this failure is related to."
+    ::= { eqlApplianceOpsFailureEntry 3 }    
+
+eqlApplianceOpsFailureCode OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "Error code related to this failure."
+    ::= { eqlApplianceOpsFailureEntry 4 }    
+
+eqlApplianceOpsFailureComponent OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    unknown(0),
+                    fans(1),
+                    psus(2),
+                    cpus(3),
+                    fc(4),
+                    monitor(5),
+                    nics(6),
+                    ipmi(7),
+                    ups(8),
+                    temperatures(9),
+                    raid(10),
+                    memory(11),
+                    connectivity(12),
+                    network(13)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "Component related to this failure."
+    ::= { eqlApplianceOpsFailureEntry 5 }    
+
+eqlApplianceOpsFailureSubComponent  OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..128))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a user friendly name for the sub-components, e.g. eth32, eth33."
+    ::= { eqlApplianceOpsFailureEntry 6 }
+
+eqlApplianceOpsFailureMessage  OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..256))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field contains the error message sent by the NAS cluster or controllers."
+    ::= { eqlApplianceOpsFailureEntry 7 }
+
+
+-------------------------------------------------------------------------------
+eqlApplianceNodeHealthFailureTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceNodeHealthFailureEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance operations failures table
+                     This table is used to retrieve failure information related to an appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 11 }     
+
+eqlApplianceNodeHealthFailureEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceNodeHealthFailureEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceNodeIndex, eqlApplianceNodeHealthFailureIndex}
+
+    ::=   { eqlApplianceNodeHealthFailureTable 1 }     
+
+EqlApplianceNodeHealthFailureEntry ::= 
+    SEQUENCE { 
+        eqlApplianceNodeHealthFailureIndex                  Unsigned32,
+        eqlApplianceNodeHealthFailureType                   INTEGER,
+        eqlApplianceNodeHealthFailureCode                   Unsigned32,
+        eqlApplianceNodeHealthFailureComponent              INTEGER,
+        eqlApplianceNodeHealthFailureSubComponent           OCTET STRING,
+        eqlApplianceNodeHealthFailureMessage                OCTET STRING
+    }
+
+eqlApplianceNodeHealthFailureIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      not-accessible     
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifing an operation failure."  
+    ::=   { eqlApplianceNodeHealthFailureEntry 1}     
+
+eqlApplianceNodeHealthFailureType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    error(1),
+                    warning(2)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of operation."
+    ::= { eqlApplianceNodeHealthFailureEntry  2 }    
+
+eqlApplianceNodeHealthFailureCode OBJECT-TYPE      
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "Error code related to this failure."
+    ::= { eqlApplianceNodeHealthFailureEntry 3 }    
+
+eqlApplianceNodeHealthFailureComponent OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    unknown(0),
+                    power(1),
+                    network(2),
+                    internalhw(3)
+
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "Component related to this failure."
+    ::= { eqlApplianceNodeHealthFailureEntry 4 }    
+
+eqlApplianceNodeHealthFailureSubComponent  OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..128))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field specifies a user friendly name for the sub-component, e.g. eth32."
+    ::= { eqlApplianceNodeHealthFailureEntry 5 }
+
+eqlApplianceNodeHealthFailureMessage  OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..256))    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field contains the error message sent by the NAS cluster or controllers."
+    ::= { eqlApplianceNodeHealthFailureEntry 6 }
+
+--------------------------------------------------------------------------------------------
+eqlApplianceServiceStatusTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceServiceStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance service status table
+                     This table is used to retrieve service health status information related to an appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 12 }     
+
+eqlApplianceServiceStatusEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceServiceStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing service status of an appliance."
+    INDEX           { eqlApplianceIndex }
+
+    ::=   { eqlApplianceServiceStatusTable 1 }     
+
+EqlApplianceServiceStatusEntry ::= 
+    SEQUENCE { 
+        eqlApplianceOverallState                            INTEGER,
+        eqlApplianceServiceStatus                           INTEGER,
+        eqlApplianceServiceCriticalConditions               BITS,
+        eqlApplianceServiceWarningConditions                BITS,
+	eqlApplianceServiceAction                           INTEGER
+    }
+
+eqlApplianceOverallState OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    on(1),
+                    off(2),
+                    stopping(3)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the overall status of the appliance."
+    ::= { eqlApplianceServiceStatusEntry  1 }    
+
+eqlApplianceServiceStatus OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    error(1),
+                    warning(2),
+                    normal(3)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the service health status of the appliance."
+    ::= { eqlApplianceServiceStatusEntry  2 }    
+
+eqlApplianceServiceCriticalConditions OBJECT-TYPE      
+    SYNTAX          BITS {
+                        exaStoreServiceFaultCacheLoss          (0),
+                        exaStoreServiceFaultServers            (1),
+                        exaStoreServiceNoService               (2),
+                        exaStoreServersFault                   (3),
+                        exaStoreStorageSubsysFault             (4),
+                        eqlNASChassisClientNetworkCritical     (5),
+                        eqlNASChassisBackplaneNetworkCritical  (6),
+                        eqlNASChassisInternalNetworkCritical   (7),
+                        eqlNASChassisSanNetworkCritical        (8),
+                        eqlNASChassisFanCritical               (9),
+                        eqlNASControllerAmbientTempCritical    (10),
+                        eqlNASControllerBPSCritical            (11),
+                        eqlNASControllerCPUCritical            (12),
+                        eqlNASControllerFanCritical            (13),
+                        eqlNASControllerLocalDiskCritical      (14),
+                        eqlNASControllerRaidControllerCritical (15),
+                        eqlNASControllerMemoryCritical         (16),
+                        eqlNASControllerVirtualDiskCritical    (17)
+                    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the current critical conditions associated with the appliance"
+    ::= { eqlApplianceServiceStatusEntry 3 }    
+
+eqlApplianceServiceWarningConditions OBJECT-TYPE      
+    SYNTAX          BITS {
+                        exaStoreServiceFSCheckerFailed           (0),
+                        exaStoreServicejournal                   (1),
+                        exaStoreServersSomeDown                  (2),
+                        exaStoreServersSomeDetached              (3),
+                        exaStoreServersNotOptimal                (4),
+                        exaStoreStorageSubsysNotOptimal          (5),
+                        eqlNASChassisClientNetworkNotOptimal     (6),
+                        eqlNASChassisBackplaneNetworkNotOptimal  (7),
+                        eqlNASChassisInternalNetworkNotOptimal   (8),
+                        eqlNASChassisSanNetworkNotOptimal        (9),
+                        eqlNASChassisFanNotOptimal               (10),
+                        eqlNASChassisPowerSupplyPartial          (11),
+                        eqlNASControllerAmbientTempNotOptimal    (12),
+                        eqlNASControllerBPSNotOptimal            (13),
+                        eqlNASControllerCPUNotOptimal            (14),
+                        eqlNASControllerFanNotOptimal            (15),
+                        eqlNASControllerLocalDiskNotOptimal      (16),
+                        eqlNASControllerRaidControllerNotOptimal (17),
+                        eqlNASControllerMemoryNotOptimal         (18),
+                        eqlNASControllerVirtualDiskNotOptimal    (19),
+                        eqlNASControllerPowerSupplyPartial       (20)
+                    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the current warning conditions associated with the appliance"
+    ::= { eqlApplianceServiceStatusEntry 4 }    
+
+
+eqlApplianceServiceAction   OBJECT-TYPE
+    SYNTAX            INTEGER {
+		      massFailback(1),
+		      massRebalance(2)
+    }
+    MAX-ACCESS        read-write  
+    STATUS          current      
+    DESCRIPTION     "This field indicates the type of load balancing being requested"  
+    ::= { eqlApplianceServiceStatusEntry  5 }
+--------------------------------------------------------------------------------------------
+eqlApplianceStatsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceStatsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance operations failures table
+                     This table is used to retrieve failure information related to an appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 13 }     
+
+eqlApplianceStatsEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceStatsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex }
+
+    ::=   { eqlApplianceStatsTable 1 }     
+
+EqlApplianceStatsEntry ::= 
+    SEQUENCE { 
+
+        eqlApplianceStatsTotalCapacity          Counter64,
+        eqlApplianceStatsTotalAllocated         Counter64,
+        eqlApplianceStatsTotalUsed              Counter64,
+        eqlApplianceStatsTotalFree              Counter64,
+        eqlApplianceStatsTotalSnapshots         Counter64,
+        eqlApplianceStatsNumberOfContainers     Counter64,
+        eqlApplianceStatsNumberOfNfsExports     Counter64,
+        eqlApplianceStatsNumberOfCifsShares     Counter64,
+        eqlApplianceStatsNumberOfSnapshots      Counter64,
+        eqlApplianceStatsTotalOptimizationSpaceSavings        Counter64
+    }
+
+
+eqlApplianceStatsTotalCapacity OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field represents the total capacity in MB. This is the space reserved for NAS i.e. the size of the NAS pool minus the size reserved by system for metadata. 
+		     This represents the eqlNASAppliancePoolSize - MetaData size."
+    ::= { eqlApplianceStatsEntry 1 }  
+
+eqlApplianceStatsTotalAllocated OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the total allocated space in mega bytes. This is the sum of the virtual volume (container) sizes. 
+		     If there are 2 containers: container1 which is 10MB and container2 which is 30MB. The value of this field will be 40MB."  
+    ::= { eqlApplianceStatsEntry 2 }  
+
+
+eqlApplianceStatsTotalUsed OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the total mega bytes in use. It represents the total space used by all the containers and snapshots.
+		     If we are using 2MB of container1, 10MB of container2 and 1MB of the container2 space is used by snapshots.
+ 		     In that case, the value of this field will be 2+10+1=13MB."  
+
+    ::= { eqlApplianceStatsEntry 3 }  
+
+
+eqlApplianceStatsTotalFree OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the total mega bytes free. This field is the difference between the allocated space and used space i.e. TotalAllocatedSpace-TotalUsedSpace."  
+    ::= { eqlApplianceStatsEntry 4 }  
+
+
+eqlApplianceStatsTotalSnapshots OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the total mega bytes used by snapshots. This field represents the space used only by snapshots for all the containers in the NAS pool.
+		     If 1MB of container1 and 2MB of container2 is used by snapshots, and we have only 2 containers in the NAS pool, the value of this field is 1+2 = 3MB."  
+    ::= { eqlApplianceStatsEntry 5 }  
+
+
+eqlApplianceStatsNumberOfContainers OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the number containers."  
+    ::= { eqlApplianceStatsEntry 6 }  
+
+
+eqlApplianceStatsNumberOfNfsExports OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the number of Nfs exports on the appliance."  
+    ::= { eqlApplianceStatsEntry 7 }  
+
+
+eqlApplianceStatsNumberOfCifsShares OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the number of Cifs exports on the appliance."
+    ::= { eqlApplianceStatsEntry 8 }  
+
+
+eqlApplianceStatsNumberOfSnapshots OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the number Snapshots for the appliance."  
+    ::= { eqlApplianceStatsEntry 9 }  
+
+eqlApplianceStatsTotalOptimizationSpaceSavings OBJECT-TYPE
+    SYNTAX          Counter64    
+    MAX-ACCESS      read-only      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the total mega bytes saved across all file systems due to optimization."  
+    ::= { eqlApplianceStatsEntry 10 }  
+
+
+--------------------------------------------------------------------------------------------
+eqlApplianceNodeStatusTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceNodeStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance operations failures table
+                     This table is used to retrieve failure information related to an appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 14 }     
+
+eqlApplianceNodeStatusEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceNodeStatusEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceNodeIndex }
+
+    ::=   { eqlApplianceNodeStatusTable 1 }     
+
+EqlApplianceNodeStatusEntry ::= 
+    SEQUENCE { 
+        eqlApplianceNodeStatusNodeState              INTEGER
+    }
+
+
+eqlApplianceNodeStatusNodeState OBJECT-TYPE      
+    SYNTAX          INTEGER{
+                    unknown(0),
+                    on(1),
+                    off(2),
+                    detached(3)
+    }
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the state of the node indexed by eqlApplianceNodeIndex"
+    ::= { eqlApplianceNodeStatusEntry 1 }    
+
+
+--------------------------------------------------------------------------------------------
+eqlApplianceMultiStateOpsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceMultiStateOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Appliance Multi-state Operations table.
+                     This table is used to maintain state information for a multi-state operation for an appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 15 }     
+
+eqlApplianceMultiStateOpsEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceMultiStateOpsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing state information for a mult-state operation for an appliance."
+    INDEX          { eqlApplianceIndex, eqlApplianceMultiStateOpsType, eqlApplianceMultiStateOpsIndex }
+
+    ::=   { eqlApplianceMultiStateOpsTable 1}     
+
+EqlApplianceMultiStateOpsEntry ::= 
+    SEQUENCE { 
+        eqlApplianceMultiStateOpsIndex Unsigned32,
+        eqlApplianceMultiStateOpsRowStatus RowStatus,
+        eqlApplianceMultiStateOpsType INTEGER,
+        eqlApplianceMultiStateOpsStatus Unsigned32,
+        eqlApplianceMultiStateOpsServiceTag OCTET STRING,
+        eqlApplianceMultiStateOpsServiceTag2 OCTET STRING,
+        eqlApplianceMultiStateOpsNodeIndex Unsigned32,
+        eqlApplianceMultiStateOpsNodeIndex2 Unsigned32,
+        eqlApplianceMultiStateOpsState INTEGER,
+        eqlApplianceMultiStateOpsPercentage Unsigned32,
+        eqlApplianceMultiStateOpsAction INTEGER,
+        eqlApplianceMultiStateOpsCurNodeIndex Unsigned32,
+        eqlApplianceMultiStateOpsLongRunningOp TruthValue,
+        eqlApplianceMultiStateOpsRequestId Counter64
+}
+
+eqlApplianceMultiStateOpsIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies a unique index for identifing a multi-state operation."
+    ::=   { eqlApplianceMultiStateOpsEntry 1}
+
+eqlApplianceMultiStateOpsRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceMultiStateOpsEntry  2 }
+
+eqlApplianceMultiStateOpsType OBJECT-TYPE
+    SYNTAX INTEGER{
+         unknown(0),
+         attach-node(1),
+         add-pair(2),
+         resize(3),
+         detach(4),
+         start(5),
+         stop(6),
+         delete(7),
+         long-running-blocking-config(8),
+         diagnostics(9),
+         nas-cluster-update(10),
+         restore(11),
+         service-mode-change(12),
+         container-cfg-modify(13)
+    }
+    MAX-ACCESS      not-accessible
+    STATUS          current      
+    DESCRIPTION     "This field specifies the type of multi-state operation."
+    ::= { eqlApplianceMultiStateOpsEntry  3 }
+
+eqlApplianceMultiStateOpsStatus OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field represents the current status of this operation. In case of errors, this value will represent the error number."
+    ::= { eqlApplianceMultiStateOpsEntry 4 }
+
+eqlApplianceMultiStateOpsServiceTag OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..32))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the service tag of the attaching node, or the first of the nodes being added"  
+    ::= { eqlApplianceMultiStateOpsEntry  5 }  
+
+eqlApplianceMultiStateOpsServiceTag2 OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..32))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the service tag of the second of the nodes being added"  
+    ::= { eqlApplianceMultiStateOpsEntry  6 }  
+
+eqlApplianceMultiStateOpsNodeIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field represents the index of a node pertaining to this operation."
+    ::= { eqlApplianceMultiStateOpsEntry 7 }
+
+eqlApplianceMultiStateOpsNodeIndex2 OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field represents the index of a second node pertaining to this operation."
+    ::= { eqlApplianceMultiStateOpsEntry 8 }
+
+eqlApplianceMultiStateOpsState OBJECT-TYPE      
+    SYNTAX INTEGER{
+        unknown(0),
+        -- 1001 to 1099 are for attach-node operation
+        attach-node-setup(1001),
+        attach-internal-network(1002),
+        attach-san-network(1003),
+        attach-client-network(1004),
+        attach-configure-gateway(1005),
+        attach-start-nodes-validation(1006),
+        attach-nodes-validation-inprogress(1007),
+        attach-action(1008),
+        attach-action-inprogress(1009),
+        attach-completed(1010),
+        -- 1101 to 1199 are for resize operation
+        resize-expand(1101),
+        resize-expand-inprogress(1102),
+        resize-format(1103),
+        resize-format-inprogress(1104),
+        resize-completed(1105),
+        resize-nas-volumes(1106),
+	    resize-discover-volumes(1107),
+        -- 1201 to 1299 are for detach operation
+        detach-inprogress(1201),
+        -- 1301 to 1399 are for start operation
+        start-inprogress(1301),
+        -- 1401 to 1499 are for stop operation
+        stop-inprogress(1401),
+        -- 1501 to 1599 are for add-pair operation
+        add-pair-node-setup(1501),                     --deprecated
+        add-pair-node-count(1502),
+        add-pair-cluster-internal-network(1503),       --deprecated
+        add-pair-reset-node-count(1504),               --deprecated
+        add-pair-nodes-internal-network(1505),         --deprecated
+        add-pair-cluster-san-network(1506),
+        add-pair-nodes-san-network(1507),              --deprecated
+        add-pair-cluster-client-network(1508),
+        add-pair-nodes-client-network(1509),           --deprecated
+        add-pair-configure-gateway(1510),              --deprecated
+        add-pair-start-nodes-validation(1511),         --deprecated
+        add-pair-nodes-validation-inprogress(1512),    --deprecated
+        add-pair-prepare(1513),                        --deprecated
+        add-pair-create-volume-acls(1514),
+        add-pair-start-attach(1515),                   --deprecated
+        add-pair-attach-inprogress(1516),              --deprecated
+        add-pair-start-action(1517),                   --deprecated
+        add-pair-action-inprogress(1518),              --deprecated
+        add-pair-completed(1519),
+        add-pair-start-nas-appliance-add(1520),
+        add-pair-nas-appliance-add-inprogress(1521),
+        add-pair-start-volume-discovery(1522),
+        add-pair-start-nas-appliance-join(1523),
+        add-pair-nas-appliance-join-inprogress(1524),
+        -- 1601 to 1699 are for delete operation
+        delete-inprogress(1601),
+        local-delete-inprogress(1602),
+        -- 1701 to 1799 are for long running operations that block communication to appliance for longer duration
+        modify-internal-network(1701),
+        modify-san-network(1702),
+        modify-client-network(1703),
+        configure-credential-no-external(1704),
+        configure-credential-ldap(1705),
+        configure-credential-nis(1706),
+        configure-credential-unknown(1707),
+        configure-active-directory(1708),
+        max-keep-set(1709),
+        grp-inet-addr-set(1710),
+        delete-container-host-access(1711),
+        rename-cluster(1712),
+        cifs-operation(1713),
+        nas-cluster-update-start(1714),
+        -- 1801 to 1899 are for NAS Diagnostics
+        nas-diags-init(1801),
+        nas-diags-start-general(1802),
+        nas-diags-check-general-started(1803),
+        nas-diags-check-general-finished(1804),
+        nas-diags-start-file(1805),
+        nas-diags-check-file-started(1806),
+        nas-diags-check-file-finished(1807),
+        nas-diags-finalize(1808),
+        nas-diags-done(1809),
+        -- 1901 to 1999 are for NAS Cluster Firmware Update
+        nas-cluster-update-inprogress(1901),
+        -- 2001 to 2099 are for NAS cluster restore
+        restore-start                            (2001),
+        restore-service-mode-to-maintenance      (2002),
+        restore-transitioning-to-maintenance     (2003),
+        restore-internal-network                 (2004),
+        restore-cluster-name                     (2005),
+        restore-start-nas-appliance-create       (2006),
+        restore-nas-appliance-create-in-progress (2007),
+        restore-san-network                      (2008),
+        restore-send-eql-group-ip                (2009),
+        restore-create-volume-acls               (2010),
+        restore-start-volume-discovery           (2011),
+        restore-start-format                     (2012),
+        restore-format-in-progress               (2013),
+        restore-start-config-restore             (2014),
+        restore-config-restore-in-progress       (2015),
+        restore-done                             (2016),
+        -- 2101 to 2199 for service mode change operation
+        service-mode-change-inprogress           (2101),
+        container-cfg-modify-inprogress          (2200)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field represents the state during the attach state machine."
+    ::= { eqlApplianceMultiStateOpsEntry 9 }
+
+eqlApplianceMultiStateOpsPercentage OBJECT-TYPE      
+    SYNTAX          Unsigned32(0..100)
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field represents the % of completion for this operation."
+    ::= { eqlApplianceMultiStateOpsEntry 10 }
+
+eqlApplianceMultiStateOpsAction OBJECT-TYPE
+    SYNTAX          INTEGER{
+                    none(0),
+                    retry(1),
+                    continue(2),
+                    delete(3),
+                    start(4)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used to either retry or continue the currently active operation."
+    ::=   { eqlApplianceMultiStateOpsEntry 11}
+
+eqlApplianceMultiStateOpsCurNodeIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field represents the index of a node that is being operated on for this operation. 0 means VIP."
+    ::= { eqlApplianceMultiStateOpsEntry 12 }
+
+eqlApplianceMultiStateOpsLongRunningOp OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "True if a long running nas operation is in progress."
+    DEFVAL          { false }
+    ::= { eqlApplianceMultiStateOpsEntry 13 }
+
+eqlApplianceMultiStateOpsRequestId OBJECT-TYPE      
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only        
+    STATUS          current      
+    DESCRIPTION     "This field represents the the operation request identifier."
+    ::= { eqlApplianceMultiStateOpsEntry 14 }
+
+--------------------------------------------------------------------------------------------
+eqlApplianceNdmpTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlApplianceNdmpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Appliance Ndmp Table.
+                     TimeoutAll:60"
+    ::=  {  eqlApplianceObjects 16}
+
+
+eqlApplianceNdmpEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceNdmpEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing ndmp information."
+    INDEX           { eqlApplianceIndex}
+    ::=    { eqlApplianceNdmpTable 1 }
+
+EqlApplianceNdmpEntry ::=
+    SEQUENCE {
+        eqlApplianceNdmpRowStatus           RowStatus,
+        eqlApplianceNdmpUserName            DisplayString,
+        eqlApplianceNdmpPasswd              DisplayString,
+        eqlApplianceNdmpDesiredState        INTEGER,
+        eqlApplianceNdmpClientPort          INTEGER
+        }
+
+eqlApplianceNdmpRowStatus   OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Rowstatus"
+    ::=  {  eqlApplianceNdmpEntry 1 }
+
+eqlApplianceNdmpUserName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..128))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "User name to allow DMA Servers to connect to NDMPD.
+                    This name must be used for user authentication by NDMPD."
+    DEFVAL          { "backup_user" }
+    ::=   { eqlApplianceNdmpEntry 2 }
+
+eqlApplianceNdmpPasswd     OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..32))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "An octet string containing the password to authenticate
+                    DMA servers connecting to NDMPD.
+                    If written, it changes the password for
+                    the account.  If read, it returns a zero-length string."
+    --DEFAULT       cookie "secure"
+    ::=  {  eqlApplianceNdmpEntry 3 }
+
+eqlApplianceNdmpDesiredState OBJECT-TYPE
+    SYNTAX          INTEGER{
+                    stop(0),
+                    start(1)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used to either stop or start NDMP."
+    ::=   { eqlApplianceNdmpEntry 4}
+
+eqlApplianceNdmpClientPort  OBJECT-TYPE
+    SYNTAX          INTEGER ( 0..65535)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The listening port number of the Ndmp. Ndmp will listen on this port on all available client IP addresses."
+    DEFVAL          { 10000 }
+    ::= { eqlApplianceNdmpEntry 5 }
+
+--------------------------------------------------------------------------------------------
+
+eqlApplianceNdmpDmaServerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlApplianceNdmpDmaServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Appliance NDMP DMA Server Table.
+                     TimeoutAll:60"
+    ::=  {  eqlApplianceObjects 17}
+
+eqlApplianceNdmpDmaServerEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceNdmpDmaServerEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing group ndmp dma server information."
+    INDEX           { eqlApplianceIndex, eqlApplianceNdmpDmaServerIPAddressType, eqlApplianceNdmpDmaServerIPAddress }
+    ::=    { eqlApplianceNdmpDmaServerTable 1 }
+
+EqlApplianceNdmpDmaServerEntry ::=
+    SEQUENCE {
+        eqlApplianceNdmpDmaServerRowStatus        RowStatus,
+        eqlApplianceNdmpDmaServerIPAddressType    InetAddressType,
+        eqlApplianceNdmpDmaServerIPAddress        InetAddress,
+        eqlApplianceNdmpDmaServerTransactionState INTEGER
+        }
+
+
+eqlApplianceNdmpDmaServerRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "row status"
+    ::= { eqlApplianceNdmpDmaServerEntry 1 }
+
+eqlApplianceNdmpDmaServerIPAddressType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP Address, in network byte order for the NTP server."
+    ::=  {  eqlApplianceNdmpDmaServerEntry 2 }
+
+eqlApplianceNdmpDmaServerIPAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP Address, in network byte order for the NTP server."
+    ::=  {  eqlApplianceNdmpDmaServerEntry 3 }
+
+eqlApplianceNdmpDmaServerTransactionState  OBJECT-TYPE
+    SYNTAX          INTEGER     {
+                    configNone        (0),
+                    configStart       (1),
+                    configInProgress  (2),
+                    configCommit      (3),
+                    configStartCommit (4)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field denotes the transaction state of the operations on the eqlApplianceNdmpDmaServerTable."
+    DEFVAL          {configNone}
+    ::=  {  eqlApplianceNdmpDmaServerEntry 4 }
+
+-------------------------------------------------------------------------------
+
+eqlApplianceLocalUserAccessTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceLocalUserAccessEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance User access table
+                     This table is used to manage user accounts on the Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 18 }     
+
+eqlApplianceLocalUserAccessEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceLocalUserAccessEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex,eqlApplianceLocalUserName }
+
+    ::=   { eqlApplianceLocalUserAccessTable 1 }     
+
+EqlApplianceLocalUserAccessEntry ::= 
+    SEQUENCE { 
+        eqlApplianceLocalUserAccessRowStatus                  RowStatus,
+        eqlApplianceLocalUserName                         OCTET STRING,
+        eqlApplianceLocalUserPassword                     OCTET STRING,
+        eqlApplianceLocalUserUid                          Unsigned32,
+        eqlApplianceLocalUserPrimaryGroup                 OCTET STRING,
+        eqlApplianceLocalUserRealName                     OCTET STRING,
+        eqlApplianceLocalUserSid                          OCTET STRING,
+        eqlApplianceLocalUserRemarks                      OCTET STRING,
+        eqlApplianceLocalUserAdditionalGroups             OCTET STRING,
+        eqlApplianceLocalUserAccess                       INTEGER
+    }
+
+eqlApplianceLocalUserAccessRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceLocalUserAccessEntry  1 }
+
+eqlApplianceLocalUserName  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The users name"
+    ::= { eqlApplianceLocalUserAccessEntry  2 }  
+
+eqlApplianceLocalUserPassword  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..240))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The user password"
+    ::= { eqlApplianceLocalUserAccessEntry  3 }  
+
+eqlApplianceLocalUserUid OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "The numeric Unix user ID of the user referenced by this row"
+    ::= { eqlApplianceLocalUserAccessEntry 4 }
+
+eqlApplianceLocalUserPrimaryGroup  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The name of the group that sets the group quota for this user"
+    ::= { eqlApplianceLocalUserAccessEntry  5 }  
+
+
+eqlApplianceLocalUserRealName  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..128))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The real name associated with this user"
+    ::= { eqlApplianceLocalUserAccessEntry  6 }  
+
+
+eqlApplianceLocalUserSid OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          deprecated      
+    DESCRIPTION     "The SID of this user presented as a hyphen separated alpha numeric string"
+    ::= { eqlApplianceLocalUserAccessEntry  7 }  
+
+eqlApplianceLocalUserRemarks  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The administrator remarks associated with this user"
+    ::= { eqlApplianceLocalUserAccessEntry  8 }  
+
+
+eqlApplianceLocalUserAdditionalGroups  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..1023))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "A comma separated list of the group names used to determine access permissions for this user"
+    ::= { eqlApplianceLocalUserAccessEntry  9 }  
+
+eqlApplianceLocalUserAccess      OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        enabled   (0),
+                        disabled  (1)
+    }     
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "This field specifies whether or not access is enabled for the local user in this appliance.
+                     The default is enabled."
+    DEFVAL          { enabled }
+    ::=  {  eqlApplianceLocalUserAccessEntry 10 }
+
+-------------------------------------------------------------------------------
+
+eqlApplianceLocalGroupAccessTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceLocalGroupAccessEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance local group access table
+                     This table is used to manage local group accounts on the Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 19 }     
+
+eqlApplianceLocalGroupAccessEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceLocalGroupAccessEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceLocalGroupName}
+
+    ::=   { eqlApplianceLocalGroupAccessTable 1 }     
+
+EqlApplianceLocalGroupAccessEntry ::= 
+    SEQUENCE { 
+        eqlApplianceLocalGroupAccessRowStatus                  RowStatus,
+        eqlApplianceLocalGroupName                         OCTET STRING,
+        eqlApplianceLocalGroupGid                          Unsigned32,
+        eqlApplianceLocalGroupGsid                         OCTET STRING
+    }
+
+eqlApplianceLocalGroupAccessRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceLocalGroupAccessEntry  1 }
+
+eqlApplianceLocalGroupName  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The name of the group referenced by this row"
+    ::= { eqlApplianceLocalGroupAccessEntry  2 }  
+
+eqlApplianceLocalGroupGid  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "The numeric Unix group ID of the group referenced by this row"
+    ::= { eqlApplianceLocalGroupAccessEntry 3 }
+
+eqlApplianceLocalGroupGsid  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The GSID of this group presented as a hyphen separated alpha numeric string"
+    ::= { eqlApplianceLocalGroupAccessEntry  4 }  
+
+----------------------
+eqlApplianceCredentialsDatabaseTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceCredentialsDatabaseEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance credentials access table
+                     This table is used to manage the credential databases on the Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 20 }     
+
+eqlApplianceCredentialsDatabaseEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceCredentialsDatabaseEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation "
+    INDEX           { eqlApplianceIndex }
+
+    ::=   { eqlApplianceCredentialsDatabaseTable 1 }     
+
+EqlApplianceCredentialsDatabaseEntry ::= 
+    SEQUENCE { 
+        eqlApplianceCredentialsDatabaseRowStatus                RowStatus,
+        eqlApplianceCredentialsDatabaseType                     INTEGER,
+        eqlApplianceCredentialsDatabaseLdapBaseDn               OCTET STRING,
+        eqlApplianceCredentialsDatabaseLdapServerAddress        OCTET STRING,
+        eqlApplianceCredentialsDatabaseNisDomain                OCTET STRING,
+        eqlApplianceCredentialsDatabaseNisServerAddress         OCTET STRING
+    }
+
+ 
+eqlApplianceCredentialsDatabaseRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceCredentialsDatabaseEntry  1 }
+
+
+eqlApplianceCredentialsDatabaseType OBJECT-TYPE       
+    SYNTAX          INTEGER{ 
+                    noexternal(0), 
+                    ldap(1), 
+                    nis(2), 
+                    unknown(3) 
+    } 
+    MAX-ACCESS      read-create
+    STATUS          current       
+    DESCRIPTION     "This field represents the type of user data base on the apppliance"
+    ::= { eqlApplianceCredentialsDatabaseEntry 2 }
+
+eqlApplianceCredentialsDatabaseLdapBaseDn  OBJECT-TYPE      
+--- per http://technet.microsoft.com/en-us/library/active-directory-maximum-limits-scalability(WS.10).aspx  max baseDN is 255 chars
+    SYNTAX          OCTET STRING(SIZE(1..255))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     ""
+    ::= { eqlApplianceCredentialsDatabaseEntry  3 }  
+
+eqlApplianceCredentialsDatabaseLdapServerAddress  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The IP address as a string"
+    ::= { eqlApplianceCredentialsDatabaseEntry  4 }  
+
+eqlApplianceCredentialsDatabaseNisDomain  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The NIS Domain"
+    ::= { eqlApplianceCredentialsDatabaseEntry  5 }  
+
+eqlApplianceCredentialsDatabaseNisServerAddress  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..512))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "A comma separated list of NIS server IP addresses"
+    ::= { eqlApplianceCredentialsDatabaseEntry 6 }  
+
+----------------------
+eqlApplianceActiveDirectoryAccessTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceActiveDirectoryAccessEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance User access table
+                     This table is used to manage access to Active Directory by the Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 21 }     
+
+eqlApplianceActiveDirectoryAccessEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceActiveDirectoryAccessEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation "
+    INDEX           { eqlApplianceIndex }
+
+    ::=   { eqlApplianceActiveDirectoryAccessTable 1 }     
+
+EqlApplianceActiveDirectoryAccessEntry ::= 
+    SEQUENCE { 
+        eqlApplianceActiveDirectoryRowStatus               RowStatus,
+        eqlApplianceActiveDirectoryAdvancedSettings        INTEGER,
+        eqlApplianceActiveDirectoryNetBiosName             OCTET STRING,
+        eqlApplianceActiveDirectoryDomain                  OCTET STRING,
+        eqlApplianceActiveDirectoryUserName                OCTET STRING,
+        eqlApplianceActiveDirectoryPassword                OCTET STRING,
+        eqlApplianceActiveDirectoryDescription             OCTET STRING,
+        eqlApplianceActiveDirectoryFunctionalLevel         OCTET STRING,
+        eqlApplianceActiveDirectoryWinsServer              OCTET STRING,
+        eqlApplianceActiveDirectoryWorkGroup               OCTET STRING,
+        eqlApplianceActiveDirectoryDomainControllers       OCTET STRING,
+        eqlApplianceActiveDirectoryMemberOfDomain          OCTET STRING,
+        eqlApplianceActiveDirectoryStatus                  INTEGER,
+        eqlApplianceActiveDirectoryAccessibleControllers   OCTET STRING,
+        eqlApplianceActiveDirectoryPreferredControllers    OCTET STRING
+    }
+
+ 
+eqlApplianceActiveDirectoryRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceActiveDirectoryAccessEntry  1 }
+
+
+eqlApplianceActiveDirectoryAdvancedSettings OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    no(1),
+                    yes(2)
+                    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Yes/No; Allows for advanced configuration by support personel; Leave as No"
+    DEFVAL          { no }
+    ::= { eqlApplianceActiveDirectoryAccessEntry  2 }
+
+
+eqlApplianceActiveDirectoryNetBiosName OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This is the NetBIOS name that will appear in network neighborhood"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  3 }  
+
+
+eqlApplianceActiveDirectoryDomain  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The Active Directory full qualified domain name the appliance belongs to"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  4 }  
+
+
+eqlApplianceActiveDirectoryUserName  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "A username with permissions to join the AD"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  5 }  
+
+
+eqlApplianceActiveDirectoryPassword  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Password for user who can join the AD"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  6 }  
+
+eqlApplianceActiveDirectoryDescription  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..1023))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Description field"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  7 }
+
+eqlApplianceActiveDirectoryFunctionalLevel OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..7))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Mode of the AD server either Native or Mixed"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  8 }  
+
+
+eqlApplianceActiveDirectoryWinsServer OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "IP addr of WINS server if netowrk has one"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  9 }  
+
+
+eqlApplianceActiveDirectoryWorkGroup  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Name of the workgroup to join"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  10 }  
+
+
+eqlApplianceActiveDirectoryDomainControllers OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..128))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Commma separated list of ipv4 addresses "
+    ::= { eqlApplianceActiveDirectoryAccessEntry  11 }  
+
+ eqlApplianceActiveDirectoryMemberOfDomain OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..10))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Truth value if it's member of domain"
+    ::= { eqlApplianceActiveDirectoryAccessEntry  12 }  
+
+eqlApplianceActiveDirectoryStatus OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    enabled(1),
+                    disabled(2)
+                    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Indicates if the Appliance is able to access the Active Directory domain."
+    DEFVAL          { unused }
+    ::= { eqlApplianceActiveDirectoryAccessEntry  13 }
+
+eqlApplianceActiveDirectoryAccessibleControllers OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..128))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Commma separated list of controllers that are accessible."
+    ::= { eqlApplianceActiveDirectoryAccessEntry  14 }
+
+eqlApplianceActiveDirectoryPreferredControllers OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..128))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Comman separated list of preferred Active Directory controllers."
+    ::= { eqlApplianceActiveDirectoryAccessEntry  15 }
+
+--------------
+eqlApplianceManualMappingTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceManualMappingEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance User access table
+                     This table is used to manage manualmapping of user access to the  Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 22 }     
+
+eqlApplianceManualMappingEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceManualMappingEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation "
+    INDEX           { eqlApplianceIndex, eqlApplianceManualMappingUserName}
+
+    ::=   { eqlApplianceManualMappingTable 1 }     
+
+EqlApplianceManualMappingEntry ::= 
+    SEQUENCE { 
+        eqlApplianceManualMappingRowStatus              RowStatus,
+        eqlApplianceManualMappingUserName               OCTET STRING,
+        eqlApplianceManualMappingMappedToUserName       OCTET STRING,
+        eqlApplianceManualMappingDirection              INTEGER
+ }
+
+eqlApplianceManualMappingRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::=   { eqlApplianceManualMappingEntry 1 }     
+
+eqlApplianceManualMappingUserName OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The username to be mapped. The increased size is required should an AD name be used"
+    ::=   { eqlApplianceManualMappingEntry 2 }
+
+eqlApplianceManualMappingMappedToUserName OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The username to which the name in eqlApplianceManualMappingUserName is to be mapped. The increased size is required should an AD name be used"
+    ::=   { eqlApplianceManualMappingEntry 3 }
+
+eqlApplianceManualMappingDirection OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    none(1),
+                    unixtowindows(2),
+                    windowstounix(3)
+                    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The direction of the mapping either none or  windows to unix or unix to windows"
+    ::=   { eqlApplianceManualMappingEntry 4 }
+
+-----------
+
+eqlApplianceMappingPolicyTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceMappingPolicyEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance User access table
+                     This table is used to manage manualmapping of user access to the  Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 23 }     
+
+eqlApplianceMappingPolicyEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceMappingPolicyEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation "
+    INDEX           { eqlApplianceIndex }
+
+    ::=   { eqlApplianceMappingPolicyTable 1 }     
+
+EqlApplianceMappingPolicyEntry ::= 
+    SEQUENCE { 
+        eqlApplianceMappingPolicyRowStatus        RowStatus,
+        eqlApplianceMappingPolicyAcquireMapping   INTEGER,
+        eqlApplianceMappingPolicyAllowNotMapped   INTEGER
+}
+
+eqlApplianceMappingPolicyRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::=   { eqlApplianceMappingPolicyEntry 1 }     
+
+eqlApplianceMappingPolicyAcquireMapping OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    enable(1),
+                    disable(2)
+                    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "Indicated if mapping policy is enabled"
+    DEFVAL          { disable }
+    ::=   { eqlApplianceMappingPolicyEntry 2 }
+
+eqlApplianceMappingPolicyAllowNotMapped OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    enable(1),
+                    disable(2)
+                    }
+    MAX-ACCESS      read-create        
+    STATUS          deprecated      
+    DESCRIPTION     "Indicates if guest mapping is allowed for unmapped users. The value is always enabled."
+    DEFVAL          { enable }
+    ::=   { eqlApplianceMappingPolicyEntry 3 }
+
+-----------
+
+eqlApplianceAllGroupsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceAllGroupsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance User access table
+                     This table is used to manage non-local group accounts on the Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 24 }     
+
+eqlApplianceAllGroupsEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceAllGroupsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceAllGroupsName}
+
+    ::=   { eqlApplianceAllGroupsTable 1 }     
+
+EqlApplianceAllGroupsEntry ::= 
+    SEQUENCE { 
+        eqlApplianceAllGroupsRowStatus                 RowStatus,
+        eqlApplianceAllGroupsName                      OCTET STRING,
+        eqlApplianceAllGroupsId                        OCTET STRING,
+        eqlApplianceAllGroupsType                      INTEGER,
+        eqlApplianceAllGroupsSource                    INTEGER
+    }
+
+eqlApplianceAllGroupsRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceAllGroupsEntry  1 }
+
+eqlApplianceAllGroupsName  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The name of the group referenced by this row. The length is to support the maximum length of an AD groupname including the domain"
+    ::= { eqlApplianceAllGroupsEntry  2 }  
+
+eqlApplianceAllGroupsId  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The id of the group referenced by this row"
+    ::= { eqlApplianceAllGroupsEntry  3 }
+  
+eqlApplianceAllGroupsType  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    ad(1),
+                    unix(2)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The type of the group referenced by this row"
+    ::= { eqlApplianceAllGroupsEntry  4 }  
+  
+eqlApplianceAllGroupsSource  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    local(1),
+                    external(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "The credential source of the group referenced by this row"
+    ::= { eqlApplianceAllGroupsEntry  5 }
+
+-----------
+
+eqlApplianceAllUsersTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceAllUsersEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance User access table
+                     This table is used to manage non-local user accounts on the Appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 25 }     
+
+eqlApplianceAllUsersEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceAllUsersEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing an operation."
+    INDEX           { eqlApplianceIndex, eqlApplianceAllUsersName}
+
+    ::=   { eqlApplianceAllUsersTable 1 }     
+
+EqlApplianceAllUsersEntry ::= 
+    SEQUENCE { 
+        eqlApplianceAllUsersRowStatus                 RowStatus,
+        eqlApplianceAllUsersName                      OCTET STRING,
+        eqlApplianceAllUsersId                        OCTET STRING,
+        eqlApplianceAllUsersType                      INTEGER,
+        eqlApplianceAllUsersSource                    INTEGER
+    }
+
+
+eqlApplianceAllUsersRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceAllUsersEntry  1 }
+
+eqlApplianceAllUsersName  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The name of the user referenced by this row"
+    ::= { eqlApplianceAllUsersEntry  2 }  
+
+eqlApplianceAllUsersId  OBJECT-TYPE      
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The id of the user referenced by this row"
+    ::= { eqlApplianceAllUsersEntry  3 }
+  
+eqlApplianceAllUsersType  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    ad(1),
+                    unix(2)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The type of the user referenced by this row"
+    ::= { eqlApplianceAllUsersEntry  4 }  
+
+eqlApplianceAllUsersSource  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    local(1),
+                    external(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "The credential source of the user referenced by this row"
+    ::= { eqlApplianceAllUsersEntry  5 }
+  
+-----------------------------------------------------------------------
+
+eqlApplianceEQLMemberMPVTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceEQLMemberMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated      
+    DESCRIPTION     "EqualLogic-Persistent table used to obtain the Management Protocol Version
+		     (MPV) of each EQL Member in the Group. This table is deprecated now.
+                     A new table eqlApplianceTypeEQLMemberMPVTable based on groupId, memberIndex
+                     and ApplianceType will be instead.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 26 }   
+    
+eqlApplianceEQLMemberMPVEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceEQLMemberMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          deprecated      
+    DESCRIPTION     "An entry contains the Management Protocol Version (MPV) of the Member."
+    INDEX          { eqlApplianceIndex, eqlGroupId, eqlMemberIndex }
+    ::=   { eqlApplianceEQLMemberMPVTable 1}     
+
+EqlApplianceEQLMemberMPVEntry ::= 
+    SEQUENCE { 
+        eqlApplianceEQLMemberMPV Unsigned32
+}
+
+eqlApplianceEQLMemberMPV OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION     "The Management Protocol Version (MPV)of this EQL member."
+    ::=   { eqlApplianceEQLMemberMPVEntry 1}
+
+
+--------------------------------------------------------------------------
+eqlApplianceMPVTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic table holding the EQL Group MPV and the Appliance Cluster MPV.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 27 }     
+
+eqlApplianceMPVEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry contains the Management Protocol Version (MPV) of the EQL Group and of the Appliance Cluster."
+    INDEX          { eqlApplianceIndex }
+    ::=   { eqlApplianceMPVTable 1}     
+
+EqlApplianceMPVEntry ::= 
+    SEQUENCE { 
+        eqlApplianceEQLGroupMPV Unsigned32,
+        eqlApplianceClusterMPV Unsigned32,
+        eqlApplianceClusterMajorVersion Unsigned32,
+        eqlApplianceClusterMinorVersion Unsigned32,
+        eqlApplianceClusterMaintVersion Unsigned32
+}
+
+eqlApplianceEQLGroupMPV OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Management Protocol Version (MPV) of the EQL Group."
+    ::=   { eqlApplianceMPVEntry 1}
+
+eqlApplianceClusterMPV OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " The Management Protocol Version (MPV) of the Appliance Cluster."
+    ::=   { eqlApplianceMPVEntry 2}
+
+eqlApplianceClusterMajorVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " The Major firmware version of the Appliance Cluster."
+    ::=   { eqlApplianceMPVEntry 3}
+
+eqlApplianceClusterMinorVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " The Minor firmware version of the Appliance Cluster."
+    ::=   { eqlApplianceMPVEntry 4}
+  
+eqlApplianceClusterMaintVersion OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " The Maintenance firmware version of the Appliance Cluster."
+    ::=   { eqlApplianceMPVEntry 5}
+-----------
+eqlApplianceSyncedDataTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceSyncedDataEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent Appliance Unsynced data table
+                     This table is used to maintain a list of unsynced data between EQL and the appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 28 }
+
+eqlApplianceSyncedDataEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceSyncedDataEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing Synced data."
+    INDEX           { eqlApplianceIndex, eqlApplianceSyncedDataType, eqlApplianceSyncedDataIndex }
+
+    ::=   { eqlApplianceSyncedDataTable 1 }
+
+EqlApplianceSyncedDataEntry ::= 
+    SEQUENCE { 
+        eqlApplianceSyncedDataRowStatus       RowStatus,
+        eqlApplianceSyncedDataType            INTEGER,
+        eqlApplianceSyncedDataIndex           Unsigned32,
+        eqlApplianceSyncedDataIndexPayload    OCTET STRING,
+        eqlApplianceSyncedDataEntryPayload    OCTET STRING,
+        eqlApplianceSyncedDataState           INTEGER
+    }
+
+eqlApplianceSyncedDataRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceSyncedDataEntry  1 }
+
+eqlApplianceSyncedDataType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    grpadminpswd(1),
+                    grpip(2),
+                    timezone(3),
+                    traprecipient(4),
+                    trapcommunity(5),
+                    cluster-san-vip(6)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field represents the type of the data to be synced to the appliance"
+    ::= { eqlApplianceSyncedDataEntry 2 }
+
+eqlApplianceSyncedDataIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      read-only     
+    STATUS          current      
+    DESCRIPTION     "This field specifies a unique index for identifing the SyncedData."  
+    ::=   { eqlApplianceSyncedDataEntry 3 }
+
+eqlApplianceSyncedDataIndexPayload OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..1500))
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field represents the payload form of the object index that needs to be synced to the appliance"
+    ::= { eqlApplianceSyncedDataEntry 4 }
+
+eqlApplianceSyncedDataEntryPayload OBJECT-TYPE      
+    SYNTAX          OCTET STRING (SIZE (1..1500))
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field represents the payload form of the object entry that needs to be synced to the appliance"
+    ::= { eqlApplianceSyncedDataEntry 5 }
+
+eqlApplianceSyncedDataState OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    sync-pending(0),
+                    sync-initiated(1),
+                    synced(2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field represents the state of the data to be synced to the appliance"
+    ::= { eqlApplianceSyncedDataEntry 6 }
+--
+
+eqlApplianceCIFSProtocolTable OBJECT-TYPE
+    SYNTAX	    SEQUENCE OF EqlApplianceCIFSProtocolEntry
+    MAX-ACCESS	    not-accessible
+    STATUS	    current
+    DESCRIPTION	    "Equallogic-Dynamic NAS CIFS Table.
+		    This table contains a list of CIFS protocol entry."
+    ::= { eqlApplianceObjects 29 }
+
+eqlApplianceCIFSProtocolEntry OBJECT-TYPE
+    SYNTAX	    EqlApplianceCIFSProtocolEntry
+    MAX-ACCESS	    not-accessible
+    STATUS	    current
+    DESCRIPTION	    "An entry (row) containing CIFS protocal configuration."
+    INDEX	    { eqlApplianceIndex }
+    ::= { eqlApplianceCIFSProtocolTable 1 }
+
+EqlApplianceCIFSProtocolEntry ::=
+    SEQUENCE {
+	eqlApplianceCIFSProtocolRowStatus               RowStatus,
+	eqlApplianceCIFSProtocolAuthenticationEnabled   TruthValue,
+	eqlApplianceCIFSProtocolAuthenticationType      INTEGER,
+	eqlApplianceCIFSProtocolAllowGuests             TruthValue,
+    eqlApplianceCIFSProtocolMaxConnections          Unsigned32,
+	eqlApplianceCIFSProtocolUnixCharacterSet		INTEGER,
+	eqlApplianceCIFSProtocolDosCodePage             INTEGER
+    }
+eqlApplianceCIFSProtocolRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceCIFSProtocolEntry  1 }
+
+eqlApplianceCIFSProtocolAuthenticationEnabled OBJECT-TYPE      
+    SYNTAX          TruthValue    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "If true authentication is enabled on this appliance"  
+    ::= { eqlApplianceCIFSProtocolEntry  2 }
+
+eqlApplianceCIFSProtocolAuthenticationType OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    activedirectory(1),
+                    localuser(2),
+                    guestsonly(3)                   -- deprecated 
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "Indicates the type of authentication in effect on the appliance - guestsonly is deprecated"
+    ::= { eqlApplianceCIFSProtocolEntry  3 }
+
+eqlApplianceCIFSProtocolAllowGuests   OBJECT-TYPE      
+    SYNTAX          TruthValue    
+    MAX-ACCESS      read-create      
+    STATUS          deprecated      
+    DESCRIPTION     "This is a deprecated field which is still requred in the exastore xml"  
+    DEFVAL          { false }
+    ::= { eqlApplianceCIFSProtocolEntry  4 }
+
+eqlApplianceCIFSProtocolMaxConnections OBJECT-TYPE      
+    SYNTAX          Unsigned32     
+    MAX-ACCESS      read-create     
+    STATUS          current      
+    DESCRIPTION     "This field specifies the maxium CIFS connection per node for this appliance"
+    ::=  { eqlApplianceCIFSProtocolEntry  5 }
+
+eqlApplianceCIFSProtocolUnixCharacterSet OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    utf8(1),
+                    utf8jp(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "Indicates the Unix character sets supported by CIFS on the appliance"
+    ::= { eqlApplianceCIFSProtocolEntry  6 }
+
+eqlApplianceCIFSProtocolDosCodePage
+OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    cp850(1),
+                    cp437(2),
+                    cp737(3),
+                    cp775(4),
+                    cp852(5),
+                    cp857(6),
+                    cp860(7),
+                    cp861(8),
+                    cp862(9),
+                    cp863(10),
+                    cp864(11),
+                    cp865(12),
+                    cp866(13),
+                    cp874(14),
+                    cp932(15),
+                    cp936(16),
+                    cp949(17),
+                    cp950(18),
+                    eucjp(19)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "Indicates the DOS code page supported by CIFS on the appliance"
+    ::= { eqlApplianceCIFSProtocolEntry  7 }
+
+--------------------------------------------------------------------------------------------
+eqlApplianceOptimizationScheduleTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EqlApplianceOptimizationScheduleEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Appliance Optimization Scheduler Table.
+                     TimeoutAll:60"
+    ::=  {  eqlApplianceObjects 30}
+
+
+eqlApplianceOptimizationScheduleEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceOptimizationScheduleEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing ndmp information."
+    INDEX           { eqlApplianceIndex}
+    ::=    { eqlApplianceOptimizationScheduleTable 1 }
+
+EqlApplianceOptimizationScheduleEntry ::=
+    SEQUENCE {
+        eqlApplianceOptimizationScheduleRowStatus           RowStatus,
+        eqlApplianceOptimizationScheduleStatus              TruthValue,
+        eqlApplianceOptimizationContainerIndex              Unsigned32,
+        eqlApplianceOptimizationPolicyIndex                 Integer32
+        }
+
+eqlApplianceOptimizationScheduleRowStatus   OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Rowstatus"
+    ::=  {  eqlApplianceOptimizationScheduleEntry 1 }
+
+eqlApplianceOptimizationScheduleStatus OBJECT-TYPE      
+    SYNTAX          TruthValue    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "If true optimization schedule is enabled on this appliance"  
+    DEFVAL          { false }
+    ::= { eqlApplianceOptimizationScheduleEntry  2 }
+
+eqlApplianceOptimizationContainerIndex OBJECT-TYPE      
+    SYNTAX          Unsigned32    
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "Unique Identifier used to manage NAS Containers. 0 in this case."  
+    DEFVAL          { 0 } 
+    ::= { eqlApplianceOptimizationScheduleEntry 3 }  
+
+eqlApplianceOptimizationPolicyIndex  OBJECT-TYPE      
+    SYNTAX          Integer32    
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This value identifies the snapshot policy for this snapshot."
+    DEFVAL          { 0 } 
+    ::=  { eqlApplianceOptimizationScheduleEntry 4 }
+
+--------------------------------------------------------------------------------------------
+
+eqlApplianceAdminAccountTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlApplianceAdminAccountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Appliance Administration account table."
+    ::= { eqlApplianceObjects 31 }
+
+eqlApplianceAdminAccountEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceAdminAccountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing administration account settings."
+    INDEX           {  eqlApplianceIndex, eqlApplianceAdminAccountName }
+    ::=   { eqlApplianceAdminAccountTable 1 }
+
+EqlApplianceAdminAccountEntry ::=
+    SEQUENCE {
+        eqlApplianceAdminAccountName          DisplayString,
+        eqlApplianceAdminAccountRowStatus     RowStatus,
+        eqlApplianceAdminAccountPassword      OCTET STRING
+    }
+
+eqlApplianceAdminAccountName OBJECT-TYPE
+    SYNTAX          DisplayString (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "The name of the administration account."
+    ::=   { eqlApplianceAdminAccountEntry 1 }
+
+eqlApplianceAdminAccountRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlApplianceAdminAccountEntry 2 }
+
+
+eqlApplianceAdminAccountPassword OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (1..64))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     " An octet string containing the (crypt cipher) password for this
+                      account.  If written, it changes the password for
+                      the account.  If read, it returns a zero-length string."
+    ::=   { eqlApplianceAdminAccountEntry 3 }
+
+--------------------------------------------------------------------------------------------
+
+eqlApplianceLicenseTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlApplianceLicenseEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Appliance License table."
+    ::= { eqlApplianceObjects 32 }
+
+eqlApplianceLicenseEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceLicenseEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing license settings."
+    INDEX           {  eqlApplianceIndex, eqlApplianceLicenseFeatureId }
+    ::=   { eqlApplianceLicenseTable 1 }
+
+EqlApplianceLicenseEntry ::=
+    SEQUENCE {
+        eqlApplianceLicenseRowStatus          RowStatus,
+        eqlApplianceLicenseFeatureId          INTEGER,
+        eqlApplianceLicenseEntitlementId      OCTET STRING,
+        eqlApplianceLicenseState              INTEGER,
+        eqlApplianceLicenseExpiry             Counter32,
+        eqlApplianceLicenseUsed               TruthValue,
+        eqlApplianceLicenseType               INTEGER
+    }
+
+eqlApplianceLicenseRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlApplianceLicenseEntry 1 }
+
+
+eqlApplianceLicenseFeatureId OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    basic-dedupe(1),
+                    advanced-dedupe(2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " An enumeration defining the licensed feature."
+    DEFVAL { basic-dedupe }
+    ::=   { eqlApplianceLicenseEntry 2 }
+
+eqlApplianceLicenseEntitlementId OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (1..80))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " Entitlement id of the license."
+    ::=   { eqlApplianceLicenseEntry 3 }
+
+eqlApplianceLicenseState OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    enabled(0),
+                    disabled(1),
+                    expired(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     " License state."
+    DEFVAL { enabled }
+    ::=   { eqlApplianceLicenseEntry 4 }
+
+eqlApplianceLicenseExpiry OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " Expiration date of the license. This field specifies the expiration date for the license.
+                     Time is represented as the time in seconds since 00:00:00 UTC, 1970-01-01. 0 for perpetual licenses. 
+                     If the license type is perpetual this field will be ignored"
+    ::=   { eqlApplianceLicenseEntry 5 }
+
+eqlApplianceLicenseUsed OBJECT-TYPE
+    SYNTAX          TruthValue 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " Set to True if the license is in use"
+    DEFVAL          { false } 
+    ::=     { eqlApplianceLicenseEntry 6 }
+
+eqlApplianceLicenseType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    evaluation(0),
+                    perpetual(1)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " License type."
+    DEFVAL { perpetual }
+    ::=   { eqlApplianceLicenseEntry 7 }
+
+
+--------------------------------------------------------------------------------------------
+
+eqlApplianceLicenseFileTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlApplianceLicenseFileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "EqualLogic-Dynamic Appliance License File table."
+    ::= { eqlApplianceObjects 33 }
+
+eqlApplianceLicenseFileEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceLicenseFileEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing license settings."
+    INDEX           {  eqlApplianceIndex }
+    ::=   { eqlApplianceLicenseFileTable 1 }
+
+EqlApplianceLicenseFileEntry ::=
+    SEQUENCE {
+        eqlApplianceLicenseFileRowStatus          RowStatus,
+        eqlApplianceLicenseFileName               OCTET STRING
+    }
+
+eqlApplianceLicenseFileRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This value is used to manage the conceptual row."
+    ::=   { eqlApplianceLicenseFileEntry 1 }
+
+eqlApplianceLicenseFileName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (1..256))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     " File name of the license."
+    ::=   { eqlApplianceLicenseFileEntry 2 }
+
+-----------------------------------------------------------------------
+
+eqlApplianceTypeEQLMemberMPVTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceTypeEQLMemberMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Persistent table used to obtain the Management Protocol Version
+		     (MPV) of each EQL Member in the Group for a particular appliance type.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 34 }   
+    
+eqlApplianceTypeEQLMemberMPVEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceTypeEQLMemberMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry contains the Management Protocol Version (MPV) of the Member."
+    INDEX          { eqlGroupId, eqlMemberIndex, eqlApplianceType }
+    ::=   { eqlApplianceTypeEQLMemberMPVTable 1}     
+
+EqlApplianceTypeEQLMemberMPVEntry ::= 
+    SEQUENCE { 
+        eqlApplianceTypeEQLMemberMPV Unsigned32
+}
+
+eqlApplianceTypeEQLMemberMPV OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Management Protocol Version (MPV) of this EQL member."
+    ::=   { eqlApplianceTypeEQLMemberMPVEntry 1}
+
+-----------------------------------------------------------------------
+
+eqlApplianceTypeEQLGroupMPVTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceTypeEQLGroupMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic table holding the EQL Group MPV for a give type of Appliance Cluster.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 35 }     
+
+eqlApplianceTypeEQLGroupMPVEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceTypeEQLGroupMPVEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry contains the Management Protocol Version (MPV) of the EQL Group for a given type of Appliance Cluster."
+    INDEX          { eqlGroupId, eqlApplianceType }
+    ::=   { eqlApplianceTypeEQLGroupMPVTable 1}
+
+EqlApplianceTypeEQLGroupMPVEntry ::= 
+    SEQUENCE { 
+        eqlApplianceTypeEQLGroupMPV Unsigned32
+}
+
+eqlApplianceTypeEQLGroupMPV OBJECT-TYPE
+    SYNTAX          Unsigned32
+MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "The Management Protocol Version (MPV) of the EQL Group."
+    ::=   { eqlApplianceTypeEQLGroupMPVEntry 1}
+
+
+
+
+
+--------------------------------------------------------------------------------------------
+eqlApplianceVolumeDiscoveryTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceVolumeDiscoveryEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic Appliance volume discovery operation status table
+                     This table is used to manage volume discovery operations on appliances. 
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 36 }     
+
+eqlApplianceVolumeDiscoveryEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceVolumeDiscoveryEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing volume discovery status."
+    INDEX           { eqlApplianceIndex, eqlApplianceNodeIndex, eqliscsiVolumeTargetIscsiName }
+
+    ::=   { eqlApplianceVolumeDiscoveryTable 1 }
+
+
+EqlApplianceVolumeDiscoveryEntry ::= 
+    SEQUENCE {   
+        eqlApplianceVolumeDiscoveryRowStatus                     RowStatus,
+        eqlApplianceVolumeDiscoveryVolumeNodeAccessibleStatus    INTEGER,
+        eqlApplianceVolumeDiscoveryVolumeStatus                  INTEGER,
+	eqlApplianceVolumeDiscoveryVolumeLunNumber                   Unsigned32 
+    }
+
+eqlApplianceVolumeDiscoveryRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage volume discovery operation."
+    ::= { eqlApplianceVolumeDiscoveryEntry  1 }  
+
+eqlApplianceVolumeDiscoveryVolumeNodeAccessibleStatus OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    not-optimal(0),
+		    optimal(1),
+		    fault(2)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current      
+    DESCRIPTION     "This field specifies the Volume accessible status by the specified Appliance and Controller."
+    DEFVAL          {not-optimal}
+    ::= { eqlApplianceVolumeDiscoveryEntry 2 }
+
+
+eqlApplianceVolumeDiscoveryVolumeStatus OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    unknown(0),
+                    expanding(1),
+                    formatted(2),
+                    expandable(3),
+		    new(4),
+		    formatting(5)
+    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " This field specifies the volume status."
+    DEFVAL          { unknown }
+    ::=   { eqlApplianceVolumeDiscoveryEntry 3 }
+
+
+
+eqlApplianceVolumeDiscoveryVolumeLunNumber OBJECT-TYPE
+    SYNTAX          Unsigned32 
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     " This field specifies the volume LUN number."
+    DEFVAL          { 0 }
+    ::=   { eqlApplianceVolumeDiscoveryEntry 4 }
+
+-----------------------------------------------------------------------
+eqlApplianceInitiatorsTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceInitiatorsEntry
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic table holding the list of Initiators for a given NAS Cluster.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 37 }     
+
+eqlApplianceInitiatorsEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceInitiatorsEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry (row) containing the initiators information."
+    INDEX           { eqlApplianceIndex, eqlApplianceNodeIndex}
+
+    ::=   { eqlApplianceInitiatorsTable 1}     
+
+EqlApplianceInitiatorsEntry ::= 
+    SEQUENCE {
+        eqlApplianceInitiatorRowStatus           RowStatus,
+        eqlApplianceInitiatorName                OCTET STRING
+    }
+
+eqlApplianceInitiatorRowStatus OBJECT-TYPE      
+    SYNTAX          RowStatus    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "This field is used indicate the status of this entry."  
+    ::= { eqlApplianceInitiatorsEntry  1 }  
+
+eqlApplianceInitiatorName OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE (0..223))    
+    MAX-ACCESS      read-create      
+    STATUS          current      
+    DESCRIPTION     "The iSCSI initiator name for a particular NAS controller."
+    ::= { eqlApplianceInitiatorsEntry 2 }    
+
+
+-----------------------------------------------------------------------
+eqlApplianceUserQueryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlApplianceUserQueryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Equallogic-Dynamic Appliance User search Table.
+                     This table provides the ability to search for a particular
+                     user in any of the 3 DBs provided, LocalUser, AD User, NIS/LDAP User.
+		     TimeoutAll:60"
+
+   ::= { eqlApplianceObjects  38 }
+
+eqlApplianceUserQueryEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceUserQueryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the Appliance User search information."
+    INDEX           { eqlApplianceIndex, eqlApplianceUserQuerySearchString, eqlApplianceUserQueryDBType, 
+                      eqlApplianceUserQueryPageSize, eqlApplianceUserQueryPageNumber, eqlApplianceUserQueryUserDomain,
+                      eqlApplianceUserQueryUserName }
+    ::= { eqlApplianceUserQueryTable 1 }
+
+EqlApplianceUserQueryEntry ::=
+   SEQUENCE {
+	eqlApplianceUserQuerySearchString       OCTET STRING,
+	eqlApplianceUserQueryDBType             INTEGER,
+	eqlApplianceUserQueryPageSize           Unsigned32,
+	eqlApplianceUserQueryPageNumber         Unsigned32,
+	eqlApplianceUserQueryUserDomain         OCTET STRING,
+	eqlApplianceUserQueryUserName           OCTET STRING,
+	eqlApplianceUserQueryRowStatus          RowStatus,
+	eqlApplianceUserQueryTotalUsers         Unsigned32,
+	eqlApplianceUserQueryUserId             OCTET STRING,
+	eqlApplianceUserQueryUserPrimaryGroup   OCTET STRING,
+	eqlApplianceUserQueryUserType           INTEGER,
+	eqlApplianceUserQueryUserSource         INTEGER
+    }
+
+eqlApplianceUserQuerySearchString  OBJECT-TYPE    
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The search string used for the query."
+    ::= { eqlApplianceUserQueryEntry  1 }
+
+eqlApplianceUserQueryDBType OBJECT-TYPE
+    SYNTAX          INTEGER         {
+                    unused(0),
+                    ad(1),
+                    unix(2),
+                    all(3),
+                    local(4)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates on which database to perform the query."
+    ::= { eqlApplianceUserQueryEntry 2 }
+
+eqlApplianceUserQueryPageSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the page size for the query result."
+    ::= { eqlApplianceUserQueryEntry 3 }
+
+eqlApplianceUserQueryPageNumber OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the page number for the query."
+    ::= { eqlApplianceUserQueryEntry 4 }
+
+eqlApplianceUserQueryUserDomain  OBJECT-TYPE  
+    SYNTAX          OCTET STRING(SIZE(1..255))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The domain name of the user referenced by this row."
+    ::= { eqlApplianceUserQueryEntry  5 }  
+
+eqlApplianceUserQueryUserName  OBJECT-TYPE  
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The name of the user referenced by this row."
+    ::= { eqlApplianceUserQueryEntry  6 }  
+
+eqlApplianceUserQueryRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceUserQueryEntry 7 }
+
+eqlApplianceUserQueryTotalUsers OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the total number of users returned by the query."
+    ::= { eqlApplianceUserQueryEntry 8 }
+
+eqlApplianceUserQueryUserId  OBJECT-TYPE  
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The ID of the user referenced by this row."
+    ::= { eqlApplianceUserQueryEntry  9 }  
+
+eqlApplianceUserQueryUserPrimaryGroup  OBJECT-TYPE  
+    SYNTAX          OCTET STRING(SIZE(1..184))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The domain name of the user referenced by this row."
+    ::= { eqlApplianceUserQueryEntry  10 }  
+  
+eqlApplianceUserQueryUserType  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    ad(1),
+                    unix(2)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The type of the user referenced by this row."
+    ::= { eqlApplianceUserQueryEntry  11 }
+
+eqlApplianceUserQueryUserSource  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    local(1),
+                    external(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "The credential source of the user referenced by this row."
+    ::= {  eqlApplianceUserQueryEntry 12 }
+
+-----------------------------------------------------------------------------------------------
+
+eqlApplianceDnsServerTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceDnsServerEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic table used to store DNS servers for a NAS appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 39 }
+
+eqlApplianceDnsServerEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceDnsServerEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry contains the antivirus host information for a NAS appliance."
+    INDEX          { eqlApplianceIndex, eqlApplianceDnsServerIndex }
+    ::=   { eqlApplianceDnsServerTable 1 }
+
+EqlApplianceDnsServerEntry ::=
+    SEQUENCE {
+        eqlApplianceDnsServerIndex               Unsigned32,
+        eqlApplianceDnsServerRowStatus           RowStatus,
+        eqlApplianceDnsServerInetAddressType     InetAddressType,
+        eqlApplianceDnsServerInetAddress         InetAddress,
+        eqlApplianceDnsServerTransactionState    INTEGER  
+    }
+
+eqlApplianceDnsServerIndex  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the DNS server entry."
+    ::=  {  eqlApplianceDnsServerEntry 1 }
+
+eqlApplianceDnsServerRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used to manage the conceptual row entry."
+    ::= { eqlApplianceDnsServerEntry  2 }
+
+eqlApplianceDnsServerInetAddressType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address type for the DNS server."
+	DEFVAL { ipv4 }
+    ::=  {  eqlApplianceDnsServerEntry 3 }
+
+eqlApplianceDnsServerInetAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains the IP address, in network byte order, for the DNS server."
+    ::=  {  eqlApplianceDnsServerEntry 4 }
+
+eqlApplianceDnsServerTransactionState OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                    singleOp(0),
+                    configStart(1),
+                    configInProgress (2),
+                    configCommit  (3),
+		    configStartCommit (4)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current 
+    DESCRIPTION     "This field denotes the transaction state of the operations on the eqlApplianceDnsServerTable.
+                     To accumulate multiple create/destroy op into a single transaction, the TransactionState
+                     in the first row should be configStart and the TransactionState of the last row should be
+                     configCommit and middle rows should be configInProgress.  configStartCommit would indicate
+                     a single row in the transaction.  singleOp is the same as configStartCommit but comes from
+                     an SNMP manager that didn't use TransactionState"
+    DEFVAL          { singleOp }
+    ::=  {  eqlApplianceDnsServerEntry 5 }    
+
+-----------------------------------------------------------------------------------------------
+
+eqlApplianceDnsSuffixTable OBJECT-TYPE      
+    SYNTAX          SEQUENCE OF EqlApplianceDnsSuffixEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "EqualLogic-Dynamic table used to store DNS suffixes for a NAS appliance.
+                     TimeoutAll:60"
+    ::=    { eqlApplianceObjects 40 }
+
+eqlApplianceDnsSuffixEntry OBJECT-TYPE      
+    SYNTAX          EqlApplianceDnsSuffixEntry      
+    MAX-ACCESS      not-accessible      
+    STATUS          current      
+    DESCRIPTION     "An entry contains the antivirus host information for a NAS appliance."
+    INDEX          { eqlApplianceIndex, eqlApplianceDnsSuffixIndex }
+    ::=   { eqlApplianceDnsSuffixTable 1 }
+
+EqlApplianceDnsSuffixEntry ::=
+    SEQUENCE {
+        eqlApplianceDnsSuffixIndex               Unsigned32,
+        eqlApplianceDnsSuffixRowStatus           RowStatus,
+        eqlApplianceDnsSuffixString              DisplayString,
+        eqlApplianceDnsSuffixTransactionState    INTEGER  
+    }
+
+eqlApplianceDnsSuffixIndex  OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This field specifies an index that uniquely identifies the DNS suffix entry."
+    ::=  {  eqlApplianceDnsSuffixEntry 1 }
+
+eqlApplianceDnsSuffixRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field is used to manage the conceptual row entry."
+    ::= { eqlApplianceDnsSuffixEntry  2 }
+
+eqlApplianceDnsSuffixString  OBJECT-TYPE
+    SYNTAX          DisplayString  (SIZE (0..127))
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field contains a domain suffix for DNS lookup."
+    ::=  {  eqlApplianceDnsSuffixEntry 3 }
+
+eqlApplianceDnsSuffixTransactionState OBJECT-TYPE      
+    SYNTAX          INTEGER     {
+                    singleOp(0),
+                    configStart(1),
+                    configInProgress (2),
+                    configCommit  (3),
+		    configStartCommit (4)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current 
+    DESCRIPTION     "This field denotes the transaction state of the operations on the eqlApplianceDnsSuffixTable.
+                     To accumulate multiple create/destroy op into a single transaction, the TransactionState
+                     in the first row should be configStart and the TransactionState of the last row should be
+                     configCommit and middle rows should be configInProgress.  configStartCommit would indicate
+                     a single row in the transaction.  singleOp is the same as configStartCommit but comes from
+                     an SNMP manager that didn't use TransactionState"
+    DEFVAL          { singleOp }
+    ::=  {  eqlApplianceDnsSuffixEntry 4 }    
+
+-----------------------------------------------------------------------
+eqlApplianceDomainListTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlApplianceDomainListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Equallogic-Dynamic Appliance Domain list Table.
+                     This table provides the ability to list all of the Domains for a particular
+                     Appliance.
+		     TimeoutAll:60"
+
+   ::= { eqlApplianceObjects  41 }
+
+eqlApplianceDomainListEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceDomainListEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the domain information."
+    INDEX           { eqlApplianceIndex, eqlApplianceDomainName }
+    ::= { eqlApplianceDomainListTable 1 }
+
+EqlApplianceDomainListEntry ::=
+   SEQUENCE {
+        eqlApplianceDomainName       OCTET STRING,
+        eqlApplianceDomainType       INTEGER
+	}
+
+eqlApplianceDomainName  OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "This field indicates the domain name."
+	::= { eqlApplianceDomainListEntry 1 }
+
+eqlApplianceDomainType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                    unused(0),
+                    ad(1),
+                    unix(2),
+                    local(3)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "this field indicates the domain type."
+	::= { eqlApplianceDomainListEntry 2 }
+
+
+
+-----------------------------------------------------------------------
+eqlApplianceGroupQueryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF EqlApplianceGroupQueryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Equallogic-Dynamic Appliance User search Table.
+                     This table provides the ability to search for a particular
+                     user in any of the 3 DBs provided, LocalUser, AD User, NIS/LDAP User.
+		     TimeoutAll:60"
+
+   ::= { eqlApplianceObjects  42 }
+
+eqlApplianceGroupQueryEntry OBJECT-TYPE
+    SYNTAX          EqlApplianceGroupQueryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry (row) containing the Appliance User search information."
+    INDEX           { eqlApplianceIndex, eqlApplianceGroupQuerySearchString, eqlApplianceGroupQueryDBType, 
+                      eqlApplianceGroupQueryPageSize, eqlApplianceGroupQueryPageNumber, eqlApplianceGroupQueryDomain,
+                      eqlApplianceGroupQueryGroupName }
+    ::= { eqlApplianceGroupQueryTable 1 }
+
+EqlApplianceGroupQueryEntry ::=
+   SEQUENCE {
+	eqlApplianceGroupQuerySearchString       OCTET STRING,
+	eqlApplianceGroupQueryDBType             INTEGER,
+	eqlApplianceGroupQueryPageSize           Unsigned32,
+	eqlApplianceGroupQueryPageNumber         Unsigned32,
+	eqlApplianceGroupQueryDomain             OCTET STRING,
+	eqlApplianceGroupQueryGroupName          OCTET STRING,
+	eqlApplianceGroupQueryRowStatus          RowStatus,
+	eqlApplianceGroupQueryTotalGroups        Unsigned32,
+	eqlApplianceGroupQueryGroupId            OCTET STRING,
+	eqlApplianceGroupQueryGroupType          INTEGER,
+	eqlApplianceGroupQueryGroupSource        INTEGER
+    }
+
+eqlApplianceGroupQuerySearchString  OBJECT-TYPE    
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The search string used for the query."
+    ::= { eqlApplianceGroupQueryEntry  1 }
+
+eqlApplianceGroupQueryDBType OBJECT-TYPE
+    SYNTAX          INTEGER         {
+                    unused(0),
+                    ad(1),
+                    unix(2),
+                    all(3),
+                    local(4)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates on which database to perform the query."
+    ::= { eqlApplianceGroupQueryEntry 2 }
+
+eqlApplianceGroupQueryPageSize OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the page size for the query result."
+    ::= { eqlApplianceGroupQueryEntry 3 }
+
+eqlApplianceGroupQueryPageNumber OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the page number for the query."
+    ::= { eqlApplianceGroupQueryEntry 4 }
+
+eqlApplianceGroupQueryDomain  OBJECT-TYPE  
+    SYNTAX          OCTET STRING(SIZE(1..255))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The domain name of the group referenced by this row."
+    ::= { eqlApplianceGroupQueryEntry  5 }  
+
+eqlApplianceGroupQueryGroupName  OBJECT-TYPE  
+    SYNTAX          OCTET STRING(SIZE(1..129))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The name of the group referenced by this row."
+    ::= { eqlApplianceGroupQueryEntry  6 }  
+
+eqlApplianceGroupQueryRowStatus  OBJECT-TYPE
+    SYNTAX          RowStatus  
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "This field is used to manage operations."
+    ::= { eqlApplianceGroupQueryEntry 7 }
+
+eqlApplianceGroupQueryTotalGroups OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This field indicates the total number of groups returned by the query."
+    ::= { eqlApplianceGroupQueryEntry 8 }
+
+eqlApplianceGroupQueryGroupId  OBJECT-TYPE  
+    SYNTAX          OCTET STRING(SIZE(1..64))
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The ID of the group referenced by this row."
+    ::= { eqlApplianceGroupQueryEntry  9 }  
+
+eqlApplianceGroupQueryGroupType  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    ad(1),
+                    unix(2)
+    }
+    MAX-ACCESS      read-create        
+    STATUS          current      
+    DESCRIPTION     "The type of the group referenced by this row."
+    ::= { eqlApplianceGroupQueryEntry  10 }
+
+eqlApplianceGroupQueryGroupSource  OBJECT-TYPE      
+    SYNTAX          INTEGER {
+                    unused(0),
+                    local(1),
+                    external(2)
+    }
+    MAX-ACCESS      read-create
+    STATUS          current      
+    DESCRIPTION     "The credential source of the group referenced by this row."
+    ::= {  eqlApplianceGroupQueryEntry 11 }
+
+
+END
+

@@ -1,0 +1,1147 @@
+
+
+                -- Teldat, S.A.
+
+                -- Parque Tecnológico de Madrid
+
+                -- 28760, Tres Cantos (Madrid)
+
+                -- Tlf: +34-918076565
+
+                -- Fax: +34-918076521
+
+                -- e-mail: id@teldat.com
+
+
+            -- Teldat private MIB
+
+            -- WLAN interface monitoring
+
+
+    -- History:
+    --      02-11-15    P. Nogueira            Client table          
+    --      19/05/14    Fernando Hernández     XH 3740. WLAN Monitoring MIB
+--------------------------------------------------------------------------------
+
+TELDAT-MON-INTERF-WLAN-MIB
+
+    DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE
+        FROM RFC-1212
+    MacAddress, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    telProdNpMonInterfRouter
+        FROM TELDAT-SW-STRUCTURE-MIB;
+
+-- **********************************************************************
+-- *  Textual conventions
+-- **********************************************************************
+    WlanRSSI ::= TEXTUAL-CONVENTION
+  STATUS mandatory
+  DESCRIPTION
+      "This type is used to represent receiver input levels in dBm."
+  SYNTAX INTEGER (-110..0)
+
+    WlanRate ::= TEXTUAL-CONVENTION
+  STATUS mandatory
+  DESCRIPTION
+      "This type is used to represent WLAN data rates in 500 Kbps units."
+  SYNTAX INTEGER (0..600)
+
+-- Private monitoring of WLAN interface
+
+telProdNpMonInterfWlan OBJECT IDENTIFIER ::= { telProdNpMonInterfRouter 24 }
+
+
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  Radio table
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+telProdNpMonInterfWlanRadioTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TelProdNpMonInterfWlanRadioEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+                "The telProdNpMonInterfWlanRadioTable contains information relating to the 
+                interfaces available on the system. Each entry corresponds to
+                an available WLAN interface. Entries cannot be added or 
+                deleted by the user. 
+
+                Creating entries: Entries are created by the system
+                automatically when a new WLAN module is installed.
+
+                Deleting entries: Entries are removed by the system
+                after the appropriate WLAN module is removed."
+    ::= { telProdNpMonInterfWlan 1 }
+
+telProdNpMonInterfWlanRadioEntry OBJECT-TYPE
+    SYNTAX  TelProdNpMonInterfWlanRadioEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A base list of objects that are information about Wlan radio data.
+        The index is the number of the interface"
+    INDEX   { telProdNpMonInterfWlanRadioIfIndex }
+    ::= { telProdNpMonInterfWlanRadioTable 1 }
+
+TelProdNpMonInterfWlanRadioEntry ::= SEQUENCE
+{
+    telProdNpMonInterfWlanRadioIfIndex                          INTEGER,
+    telProdNpMonInterfWlanRadioIfMode                            INTEGER,
+    telProdNpMonInterfWlanRadioIfSpeed                           INTEGER,
+    telProdNpMonInterfWlanRadioIfChannel                         INTEGER,
+    telProdNpMonInterfWlanRadioIfRtsThreshold                    INTEGER,
+    telProdNpMonInterfWlanRadioIfTxPower                        INTEGER,
+    telProdNpMonInterfWlanRadioIfBand                            INTEGER,
+    telProdNpMonInterfWlanRadioIfCountry                        DisplayString, 
+    telProdNpMonInterfWlanRadioIfAddress                        MacAddress,
+    telProdNpMonInterfWlanRadioIfRealChannel                     INTEGER,
+    telProdNpMonInterfWlanRadioIfFragmentThreshold               INTEGER
+}
+
+telProdNpMonInterfWlanRadioIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Unique radio index."
+    ::= { telProdNpMonInterfWlanRadioEntry 1 }
+    
+telProdNpMonInterfWlanRadioIfMode OBJECT-TYPE
+    SYNTAX  INTEGER { 
+      mode-11a(1), 
+      mode-11b(2), 
+      mode-11g(4),
+      mode-11b-11g(6),
+      mode-11n(8),
+      mode-11a-11n(9),
+      mode-11g-11n(12),
+      mode-11b-11g-11n(14),
+      mode-11a-11b-11g-11n(15)
+      }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Mixed and compatibility modes between various 802.11 substandards."
+    ::= { telProdNpMonInterfWlanRadioEntry 2 }
+
+telProdNpMonInterfWlanRadioIfSpeed OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The value defines the bitrate or the coding scheme to use for data frames."
+    ::= { telProdNpMonInterfWlanRadioEntry 3 }
+    
+telProdNpMonInterfWlanRadioIfChannel OBJECT-TYPE
+    SYNTAX  INTEGER (-1..256)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The physical channel "
+    ::= { telProdNpMonInterfWlanRadioEntry 4 }
+
+telProdNpMonInterfWlanRadioIfRtsThreshold OBJECT-TYPE
+    SYNTAX  INTEGER (-1..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute shall indicate the number of octets in an
+        MPDU, below which an RTS/CTS handshake shall not be
+        performed, except as RTS/CTS is used as a cross modulation
+        protection mechanism. An RTS/CTS
+        handshake shall be performed at the beginning of any frame
+        exchange sequence where the MPDU is of type Data or
+        Management, the MPDU has an individual address in the
+        Address1 field, and the length of the MPDU is greater than
+        this threshold. Setting this attribute to be larger than the
+        maximum MSDU size shall have the effect of turning off the
+        RTS/CTS handshake for frames of Data or Management type
+        transmitted by this STA. Setting this attribute to one 
+        shall have the effect of turning on the RTS/CTS handshake
+        for all frames of Data or Management type transmitted by
+        this STA."
+    ::= { telProdNpMonInterfWlanRadioEntry 5 }
+    
+telProdNpMonInterfWlanRadioIfTxPower OBJECT-TYPE
+    SYNTAX  INTEGER (0..63)
+    UNITS "dBm"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "Transmitter output power in dBm."
+    ::= { telProdNpMonInterfWlanRadioEntry 6 }
+    
+telProdNpMonInterfWlanRadioIfBand OBJECT-TYPE  
+    SYNTAX INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Frequency band."
+    ::= { telProdNpMonInterfWlanRadioEntry 7 }
+    
+telProdNpMonInterfWlanRadioIfCountry OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..3))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute identifies the country in which the station is operating.
+        The first two octets of this string is the two character country code as
+        described in document ISO/IEC 3166-1. The third octet shall be one of the
+        following:
+        1. an ASCII space character, if the regulations under which the
+        station is operating encompass all environments in the country,
+        2. an ASCII 'O' character, if the regulations under which the
+        station is operating are for an Outdoor environment only, or
+        3. an ASCII 'I' character, if the regulations under which the
+        station is operating are for an Indoor environment only."
+    ::= { telProdNpMonInterfWlanRadioEntry 8 }
+
+telProdNpMonInterfWlanRadioIfAddress OBJECT-TYPE  
+    SYNTAX MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The MAC Address."
+    ::= { telProdNpMonInterfWlanRadioEntry 9 }
+    
+telProdNpMonInterfWlanRadioIfRealChannel OBJECT-TYPE
+    SYNTAX  INTEGER (0..256)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The actually selected channel for transmit and receive.
+         In most cases this is the same value as wlanIfChannel,
+         except if automatic channel selection is active. In this 
+         case, this variable shows the channel in use."
+    ::= { telProdNpMonInterfWlanRadioEntry 10 }
+    
+telProdNpMonInterfWlanRadioIfFragmentThreshold OBJECT-TYPE
+    SYNTAX  INTEGER (256..8000)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute shall specify the mandatory maximum size, in
+        octets, of the PSDU that may be delivered to the PHY.
+        This maximum size does not apply in the case of A-MPDU. An
+        MSDU, A-MSDU or MMPDU shall be broken into fragments if its
+        size exceeds the value of this attribute after adding MAC
+        headers and trailers. An MSDU, A-MSDU or MMPDU shall be
+        fragmented when the resulting frame has an individual address
+        in the Address1 field, and the length of the frame is larger
+        than this threshold. The default value for this attribute
+        shall be the lesser of 8000 or the aMPDUMaxLength or the
+        aPSDUMaxLength of the attached PHY and shall never exceed the
+        lesser of 8000 or the aMPDUMaxLength or the
+        aPSDUMaxLength of the attached PHY. The value of this
+        attribute shall never be less than 256."
+    ::= { telProdNpMonInterfWlanRadioEntry 11 }
+    
+    
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  BSS table
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+telProdNpMonInterfWlanBSSTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TelProdNpMonInterfWlanBSSEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        " Describes a WLAN VSS and the corresponding settings"
+    ::= { telProdNpMonInterfWlan 2 }
+    
+telProdNpMonInterfWlanBSSEntry OBJECT-TYPE
+    SYNTAX  TelProdNpMonInterfWlanBSSEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "A base list of objects that are information about BSS data.
+        The index is the number of the interface"
+    INDEX   { telProdNpMonInterfWlanBSSIfIndex }
+    ::= { telProdNpMonInterfWlanBSSTable 1 }
+    
+TelProdNpMonInterfWlanBSSEntry ::= SEQUENCE
+{
+    telProdNpMonInterfWlanBSSIfIndex                            INTEGER,
+    telProdNpMonInterfWlanBSSId                                	DisplayString,
+    telProdNpMonInterfWlanBSSPrivInvoked                        INTEGER,
+    telProdNpMonInterfWlanBSSRsn                                INTEGER,
+    telProdNpMonInterfWlanBSSAkm                                INTEGER,
+    telProdNpMonInterfWlanBSSCipher                             INTEGER,
+    telProdNpMonInterfWlanBSSDefaultKey                         INTEGER,
+    telProdNpMonInterfWlanBSSKey1                               OCTET STRING,
+    telProdNpMonInterfWlanBSSKey2                               OCTET STRING,
+    telProdNpMonInterfWlanBSSKey3                               OCTET STRING,
+    telProdNpMonInterfWlanBSSKey4                               OCTET STRING,
+    telProdNpMonInterfWlanBSSMaxAsoc                            INTEGER,
+    telProdNpMonInterfWlanBSSAcl                                INTEGER,
+    telProdNpMonInterfWlanBSSClientIsolation                    INTEGER,
+    telProdNpMonInterfWlanBSSHidden                             INTEGER,
+    telProdNpMonInterfWlanBSSBssId                              MacAddress,
+    telProdNpMonInterfWlanBSSBeaconPeriod                       INTEGER,
+    telProdNpMonInterfWlanBSSDTIMPeriod                         INTEGER,
+    telProdNpMonInterfWlanBSSMSDUTx                             Counter32,
+    telProdNpMonInterfWlanBSSMSDURx                             Counter32,
+    telProdNpMonInterfWlanBSSBytesTx                            Counter32,
+    telProdNpMonInterfWlanBSSBytesRx                            Counter32,
+    telProdNpMonInterfWlanBSSCurrent                            INTEGER,
+    telProdNpMonInterfWlanBSSOpMode                             INTEGER,
+	telProdNpMonInterfwlanBSSPassPhrase							OCTET STRING
+}
+
+telProdNpMonInterfWlanBSSIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Unique BSS index."
+    ::= { telProdNpMonInterfWlanBSSEntry 1 }
+    
+telProdNpMonInterfWlanBSSId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute reflects the SSID."
+    ::= { telProdNpMonInterfWlanBSSEntry 2 }
+    
+telProdNpMonInterfWlanBSSPrivInvoked OBJECT-TYPE
+    SYNTAX  INTEGER { none(1), enable(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Privacy invoked. If enabled, some level of security is invoked
+        when transmitting data frames."
+    ::= { telProdNpMonInterfWlanBSSEntry 3 }
+    
+telProdNpMonInterfWlanBSSRsn OBJECT-TYPE
+    SYNTAX  INTEGER { wpa(0), wpa2(1), none(2), wpa-wpa2(3) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Robust Security Network setting."
+    ::= { telProdNpMonInterfWlanBSSEntry 4 }
+
+telProdNpMonInterfWlanBSSAkm OBJECT-TYPE
+    SYNTAX  INTEGER { dot1x(0), psk(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Authenticated Key Management setting."
+    ::= { telProdNpMonInterfWlanBSSEntry 5 }
+
+telProdNpMonInterfWlanBSSCipher OBJECT-TYPE
+    SYNTAX  INTEGER { none(0), auto(1), wep(2), tkip(3), aes-ccm(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The ciphers in use for WPA or WPA2.
+         auto(1) is used for TKIP and AES"
+    ::= { telProdNpMonInterfWlanBSSEntry 6 }
+    
+telProdNpMonInterfWlanBSSDefaultKey OBJECT-TYPE
+    SYNTAX  INTEGER { key1(1), key2(2), key3(3), key4(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Default key for WEP encryption. This is the key used
+        to transmit data frames if WEP is enabled"
+    ::= { telProdNpMonInterfWlanBSSEntry 7 }
+
+telProdNpMonInterfWlanBSSKey1 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..64))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 1."
+    ::= { telProdNpMonInterfWlanBSSEntry 8 }
+
+telProdNpMonInterfWlanBSSKey2 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..33))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 2."
+    ::= { telProdNpMonInterfWlanBSSEntry 9 }
+
+telProdNpMonInterfWlanBSSKey3 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..33))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 3."
+    ::= { telProdNpMonInterfWlanBSSEntry 10 }
+
+telProdNpMonInterfWlanBSSKey4 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..33))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 4."
+    ::= { telProdNpMonInterfWlanBSSEntry 11 }
+
+telProdNpMonInterfWlanBSSMaxAsoc OBJECT-TYPE
+    SYNTAX  INTEGER (1..256)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of allowed clients of the requested BSS."
+    ::= { telProdNpMonInterfWlanBSSEntry 12 }
+
+telProdNpMonInterfWlanBSSAcl OBJECT-TYPE
+    SYNTAX  INTEGER { disable(0), deny-entries(1), allow-entries(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "MAC Media Access Control via MAC Address."
+    ::= { telProdNpMonInterfWlanBSSEntry 13 }
+    
+telProdNpMonInterfWlanBSSClientIsolation OBJECT-TYPE
+    SYNTAX  INTEGER { disable(0), enable(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Client isolation setting."
+    ::= { telProdNpMonInterfWlanBSSEntry 14 }
+    
+telProdNpMonInterfWlanBSSHidden OBJECT-TYPE
+    SYNTAX  INTEGER { yes(2), no(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Define whether SSID is hidden (yes(2)) or not (no(1))."
+    ::= { telProdNpMonInterfWlanBSSEntry 15 }
+    
+telProdNpMonInterfWlanBSSBssId OBJECT-TYPE
+    SYNTAX MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This object contains the actual current BSSID for the service set."
+    ::= { telProdNpMonInterfWlanBSSEntry 16 }
+    
+telProdNpMonInterfWlanBSSBeaconPeriod OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    ACCESS  read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This attribute shall specify the number of TU that a
+         station shall use for scheduling Beacon transmissions.
+         This value is transmitted in Beacon and Probe Response
+         frames."
+    ::= { telProdNpMonInterfWlanBSSEntry 17 }
+
+telProdNpMonInterfWlanBSSDTIMPeriod OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    ACCESS  read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This attribute shall specify the number of beacon
+         intervals that shall elapse between transmission of
+         Beacons frames containing a TIM element whose DTIM
+         Count field is 0. This value is transmitted in
+         the DTIM Period field of Beacon frames."
+    ::= { telProdNpMonInterfWlanBSSEntry 18 }
+    
+telProdNpMonInterfWlanBSSMSDUTx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "This attribute counts the total number of 
+        packets transmitted on this BSS."
+    ::= { telProdNpMonInterfWlanBSSEntry 19 }
+
+telProdNpMonInterfWlanBSSMSDURx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "This attribute counts the total number of 
+       packets received by this BSS."
+    ::= { telProdNpMonInterfWlanBSSEntry 20 }
+
+telProdNpMonInterfWlanBSSBytesTx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Transmitted Bytes."
+    ::= { telProdNpMonInterfWlanBSSEntry 21 }
+
+telProdNpMonInterfWlanBSSBytesRx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Received Bytes."
+    ::= { telProdNpMonInterfWlanBSSEntry 22 }
+    
+telProdNpMonInterfWlanBSSCurrent OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Count of current associated stations"
+    ::= { telProdNpMonInterfWlanBSSEntry 23 }
+
+telProdNpMonInterfWlanBSSOpMode OBJECT-TYPE
+    SYNTAX INTEGER { access-point(0), station(1), wbr(2), repeater(3) }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+      "This value specify that the scan properties is used for AP,
+       client or wds."
+    ::= { telProdNpMonInterfWlanBSSEntry 24 }
+
+telProdNpMonInterfwlanBSSPassPhrase OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..64))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Passphrase string for WPA-PSK and WPA2-PSK."
+    ::= { telProdNpMonInterfWlanBSSEntry 25 }
+    
+    
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  Station table
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+
+telProdNpMonInterfWlanStationTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TelProdNpMonInterfWlanStationEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The telProdNpMonInterfWlanStation contains information relating to the 
+        clients currently associated to our access points.
+        Each entry corresponds to
+        an associated client station (STA). 
+        Entries cannot be added or deleted by the user. 
+
+        Creating entries: Entries are created by the system
+        automatically when a new STA ia associated.
+
+        Deleting entries: Entries are removed by the system
+        whenever an associated STA is removed."
+    ::= { telProdNpMonInterfWlan 3 }
+    
+telProdNpMonInterfWlanStationEntry OBJECT-TYPE
+    SYNTAX  TelProdNpMonInterfWlanStationEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A base list of objects that are information about stations.
+        The index is the number of the interface and the MAC address of the station"
+    INDEX   { telProdNpMonInterfWlanStationIfIndex, telProdNpMonInterfWlanStationAddress }
+    ::= { telProdNpMonInterfWlanStationTable 1 }
+    
+TelProdNpMonInterfWlanStationEntry ::= SEQUENCE
+{
+    telProdNpMonInterfWlanStationIfIndex                  INTEGER,
+    telProdNpMonInterfWlanStationAddress                  MacAddress,
+    telProdNpMonInterfWlanStationState                    INTEGER,
+    telProdNpMonInterfWlanStationSecurity                  INTEGER,
+    telProdNpMonInterfWlanStationNode                      INTEGER,
+    telProdNpMonInterfWlanStationMSDUTx                    Counter32,
+    telProdNpMonInterfWlanStationMSDURx                    Counter32,
+    telProdNpMonInterfWlanStationBytesRx                  Counter32,
+    telProdNpMonInterfWlanStationBytesTx                  Counter32,
+    telProdNpMonInterfWlanStationRate                     WlanRate,
+    telProdNpMonInterfWlanStationSignal                    WlanRSSI,
+    telProdNpMonInterfWlanStationNoise                    WlanRSSI,
+    telProdNpMonInterfWlanStationConnectTime              Counter32
+}
+
+telProdNpMonInterfWlanStationIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Interface number."
+    ::= { telProdNpMonInterfWlanStationEntry 1 }
+    
+telProdNpMonInterfWlanStationAddress OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "MAC Address of the Assigned STA."
+    ::= { telProdNpMonInterfWlanStationEntry 2 }
+    
+telProdNpMonInterfWlanStationState OBJECT-TYPE
+    SYNTAX  INTEGER 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Station state."
+    ::= { telProdNpMonInterfWlanStationEntry 3 }
+    
+telProdNpMonInterfWlanStationSecurity OBJECT-TYPE
+    SYNTAX  INTEGER {
+        none(1), 
+        wep40(2),
+        wep104(3),
+        wpa-psk(4),
+        wpa(5),
+        wpa2(6),
+        wpa2-psk(7)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Security Option of the Station."
+    ::= { telProdNpMonInterfWlanStationEntry 4 }
+
+telProdNpMonInterfWlanStationNode OBJECT-TYPE
+    SYNTAX  INTEGER { unknown(1), access-point(2), client(3) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Node type of the Station."
+    ::= { telProdNpMonInterfWlanStationEntry 5 }
+
+telProdNpMonInterfWlanStationMSDUTx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute counts the total number of 
+        packets transmitted to this station."
+    ::= { telProdNpMonInterfWlanStationEntry 6 }
+    
+telProdNpMonInterfWlanStationMSDURx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute counts the total number of 
+        packets received from this station."
+    ::= { telProdNpMonInterfWlanStationEntry 7 }
+
+telProdNpMonInterfWlanStationBytesTx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute counts the total number of 
+        octets transmitted to this station."
+    ::= { telProdNpMonInterfWlanStationEntry 8 }
+
+telProdNpMonInterfWlanStationBytesRx OBJECT-TYPE
+    SYNTAX  Counter32
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute counts the total number of 
+        octets received from this station."
+    ::= { telProdNpMonInterfWlanStationEntry 9 }
+    
+telProdNpMonInterfWlanStationRate OBJECT-TYPE
+    SYNTAX  WlanRate
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute reflects the data rate of the latest 
+        packet received from this station, in 500 kbps units."
+    ::= { telProdNpMonInterfWlanStationEntry 10 }
+    
+telProdNpMonInterfWlanStationSignal OBJECT-TYPE
+    SYNTAX  WlanRSSI
+    UNITS "dBm"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute shows the received signal strength in dBm."
+    ::= { telProdNpMonInterfWlanStationEntry 11 }
+    
+telProdNpMonInterfWlanStationNoise OBJECT-TYPE
+    SYNTAX  WlanRSSI
+    UNITS "dBm"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute shows the measured noise level in dBm, or 
+         0 if no connection can be established."
+    ::= { telProdNpMonInterfWlanStationEntry 12 }
+
+telProdNpMonInterfWlanStationConnectTime OBJECT-TYPE
+    SYNTAX Counter32
+    UNITS "s"
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This attribute records the system uptime at the moment 
+        the client successfully finished association."
+  ::= { telProdNpMonInterfWlanStationEntry 13 }
+  
+  
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  ACL table
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+
+telProdNpMonInterfWlanACLTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TelProdNpMonInterfWlanACLEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The WLAN Access List based on MAC Addresses"
+    ::= { telProdNpMonInterfWlan 4 }
+    
+telProdNpMonInterfWlanACLEntry OBJECT-TYPE
+    SYNTAX   TelProdNpMonInterfWlanACLEntry
+    ACCESS   not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The WLAN Access List based on MAC Addresses entry.
+        Index: telProdNpMonInterfWlanACLIfIndex telProdNpMonInterfWlanACLAddress."
+    INDEX { telProdNpMonInterfWlanACLIfIndex, telProdNpMonInterfWlanACLAddress }
+    ::= { telProdNpMonInterfWlanACLTable 1 }
+
+TelProdNpMonInterfWlanACLEntry ::= SEQUENCE 
+{
+    telProdNpMonInterfWlanACLIfIndex      INTEGER,
+     telProdNpMonInterfWlanACLAddress      MacAddress
+}
+
+telProdNpMonInterfWlanACLIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Interface the MAC Address belongs."
+    ::= { telProdNpMonInterfWlanACLEntry 1 }
+
+telProdNpMonInterfWlanACLAddress OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The MAC Address for the accepted client"
+    ::= { telProdNpMonInterfWlanACLEntry 2 }
+    
+    
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  Scan results table
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+
+telProdNpMonInterfWlanScanResultsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TelProdNpMonInterfWlanScanResultsEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "This table contains the list of BSS entries found by foreground 
+         or background scanning in client mode."
+    ::= { telProdNpMonInterfWlan 5 }
+    
+telProdNpMonInterfWlanScanResultsEntry OBJECT-TYPE
+    SYNTAX  TelProdNpMonInterfWlanScanResultsEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A entry of the table. 
+        Index: telProdNpMonInterfWlanScanResultsIfIndex, telProdNpMonInterfWlanScanResultsIndex"
+    INDEX  { telProdNpMonInterfWlanScanResultsIfIndex, telProdNpMonInterfWlanScanResultsIndex }
+    ::= { telProdNpMonInterfWlanScanResultsTable 1 }
+    
+TelProdNpMonInterfWlanScanResultsEntry ::= SEQUENCE
+{
+  telProdNpMonInterfWlanScanResultsIfIndex            INTEGER,
+  telProdNpMonInterfWlanScanResultsIndex              INTEGER,
+  telProdNpMonInterfWlanScanResultsBSSID              MacAddress,
+  telProdNpMonInterfWlanScanResultsSSID                DisplayString,
+  telProdNpMonInterfWlanScanResultsChannel            INTEGER,
+  telProdNpMonInterfWlanScanResultsSignal              WlanRSSI,
+  telProdNpMonInterfWlanScanResultsNoise              WlanRSSI,
+  telProdNpMonInterfWlanScanResultsBeaconPeriod        INTEGER,
+  telProdNpMonInterfWlanScanResultsRates              DisplayString,
+  telProdNpMonInterfWlanScanResultsBasicRates          DisplayString,
+  telProdNpMonInterfWlanScanResultsExtendedRates      DisplayString
+}
+
+telProdNpMonInterfWlanScanResultsIfIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "ifIndex of the WLAN Interface the scan results belong to."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 1 }
+
+telProdNpMonInterfWlanScanResultsIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Auxiliary index for different BSS entries."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 2 }
+    
+telProdNpMonInterfWlanScanResultsBSSID OBJECT-TYPE
+    SYNTAX  MacAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "BSSID of this BSS."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 3 }
+
+telProdNpMonInterfWlanScanResultsSSID OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "SSID aka network name of this BSS. 
+         If broadcasting of SSID is disabled on this 
+         BSS, this string may be empty."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 4 }
+    
+telProdNpMonInterfWlanScanResultsChannel OBJECT-TYPE
+    SYNTAX  INTEGER (1..256)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The channel this BSS was received on."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 5 }
+    
+telProdNpMonInterfWlanScanResultsSignal OBJECT-TYPE
+    SYNTAX  WlanRSSI
+    UNITS "dBm"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Receive signal strength of this BSS."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 6 }
+
+telProdNpMonInterfWlanScanResultsNoise OBJECT-TYPE
+    SYNTAX  WlanRSSI
+    UNITS "dBm"
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+      "This attribute shows the measured noise level in dBm, or 
+       0 when this value is not available.
+       It's the value measured during the last reception of data."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 7 }
+
+telProdNpMonInterfWlanScanResultsBeaconPeriod OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute contains the number of TU that this 
+         BSS uses for scheduling Beacon transmissions."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 8 }
+    
+telProdNpMonInterfWlanScanResultsRates OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute contains one octet for each 
+         supported rate in this BSS, in Mbps units."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 9 }
+
+telProdNpMonInterfWlanScanResultsBasicRates OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute contains one octet for each required 
+         basic rate in this BSS, in Mbps units."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 10 }
+    
+telProdNpMonInterfWlanScanResultsExtendedRates OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This attribute contains one octet for each supported 
+         extended rate in this BSS, in Mbps units."
+    ::= { telProdNpMonInterfWlanScanResultsEntry 11 }
+    
+
+
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+--  WMM table
+--  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =  
+
+telProdNpMonInterfWlanWMMTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TelProdNpMonInterfWlanWMMEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Describes a WLAN WMM Access category settings"
+    ::= { telProdNpMonInterfWlan 6 }
+    
+telProdNpMonInterfWlanWMMEntry OBJECT-TYPE
+    SYNTAX  TelProdNpMonInterfWlanWMMEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A entry of the table.
+         Index: telProdNpMonInterfWlanWMMAccCat, telProdNpMonInterfWlanWMMwlanIf, telProdNpMonInterfWlanWMMType "
+    INDEX   { telProdNpMonInterfWlanWMMAccCat, telProdNpMonInterfWlanWMMwlanIf, telProdNpMonInterfWlanWMMType }
+    ::= { telProdNpMonInterfWlanWMMTable 1 }
+
+TelProdNpMonInterfWlanWMMEntry ::= SEQUENCE 
+{
+    telProdNpMonInterfWlanWMMAccCat        INTEGER,
+    telProdNpMonInterfWlanWMMwlanIf        INTEGER,
+    telProdNpMonInterfWlanWMMaCWmin        INTEGER,
+    telProdNpMonInterfWlanWMMaCWmax        INTEGER,
+    telProdNpMonInterfWlanWMMAifsn        INTEGER,
+    telProdNpMonInterfWlanWMMTxopLimit    INTEGER,
+    telProdNpMonInterfWlanWMMAckPolicy    INTEGER,
+    telProdNpMonInterfWlanWMMACM          INTEGER,
+    telProdNpMonInterfWlanWMMType         INTEGER
+}
+
+telProdNpMonInterfWlanWMMwlanIf OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Radio index the AC belongs to."
+    ::= { telProdNpMonInterfWlanWMMEntry 1 }
+    
+telProdNpMonInterfWlanWMMAccCat OBJECT-TYPE
+    SYNTAX  INTEGER  { besteffort(1), background(2), video(3), voice(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Access category type, each category is mandatory for a wlanIf.
+
+         An access category (AC) is a label for the common set of enhanced
+         distributed channel access (EDCA) parameters that are used by a 
+         quality of service (QoS) station (QSTA) to contend for the channel
+         in order to transmit medium access control (MAC) service data 
+         units (MSDUs) with certain priorities.
+
+         (More info in '802.11E / 3.123 access category (AC)').
+
+         besteffort(1): standard/default priority
+         background(2): low priority
+         video(3): medium priority (higher than 'besteffort')
+         voice(4): high priority"
+    ::= { telProdNpMonInterfWlanWMMEntry 2 }
+    
+telProdNpMonInterfWlanWMMType OBJECT-TYPE
+    SYNTAX  INTEGER { access-point(1), station(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Type to which this telProdNpMonInterfWlanWMMEntry corresponds.
+         Type access-point means the own parameters for WMM are changed.
+         The entries with type station will be provided to the connected 
+         stations via WMM-IE."
+    ::= { telProdNpMonInterfWlanWMMEntry 3 }
+
+telProdNpMonInterfWlanWMMaCWmin OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Minimum size of contention window. 
+         for AC_BK and AC_BE telProdNpMonInterfWlanWMMaCWmin = telProdNpMonInterfWlanIfCWmin,
+         for AC_VI telProdNpMonInterfWlanWMMaCWmin = (telProdNpMonInterfWlanIfCWmin-1)/2,
+          for AC_VO telProdNpMonInterfWlanWMMaCWmin = (telProdNpMonInterfWlanIfCWmin-3)/4."
+    ::= { telProdNpMonInterfWlanWMMEntry 4 }
+
+telProdNpMonInterfWlanWMMaCWmax OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Maximum size of contention window. 
+         for AC_BK telProdNpMonInterfWlanWMMaCWmax = telProdNpMonInterfWlanIfCWmax,
+         for AC_BE telProdNpMonInterfWlanWMMaCWmax = 4*telProdNpMonInterfWlanIfCWmin + 3,
+         for AC_VI telProdNpMonInterfWlanWMMaCWmax = telProdNpMonInterfWlanIfCWmin,
+         for AC_VO telProdNpMonInterfWlanWMMaCWmax = (telProdNpMonInterfWlanIfCWmin-1)/2."
+    ::= { telProdNpMonInterfWlanWMMEntry 5 }
+    
+telProdNpMonInterfWlanWMMAifsn OBJECT-TYPE
+    SYNTAX  INTEGER (0..99)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Arbitration Inter-Frame Space Number (AIFSN)
+         for this Access category."
+    ::= { telProdNpMonInterfWlanWMMEntry 6 }
+    
+telProdNpMonInterfWlanWMMTxopLimit OBJECT-TYPE
+    SYNTAX  INTEGER (0..9999)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "802.11 mode Transmit Opportunity Limit. The TxopLimit
+          value is given in units of 32 microseconds."
+    ::= { telProdNpMonInterfWlanWMMEntry 7 }
+    
+telProdNpMonInterfWlanWMMAckPolicy OBJECT-TYPE
+    SYNTAX  INTEGER { ack(1), noAck(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Ack policy for this Access category (default value is 'ack(1)')."
+    ::= { telProdNpMonInterfWlanWMMEntry 8 }
+    
+telProdNpMonInterfWlanWMMACM OBJECT-TYPE
+    SYNTAX  INTEGER { enabled(1), disabled(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "ACM (admission control) policy for this Access category i
+                (default value is 'disabled(2)')."
+    ::= { telProdNpMonInterfWlanWMMEntry 9 }
+
+
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+-- Client table
+-- = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+telProdNpMonInterfWlanClientTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TelProdNpMonInterfWlanClientEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	" Describes a WLAN Client and the corresponding
+	settings"
+    ::= { telProdNpMonInterfWlan 7 }
+
+telProdNpMonInterfwlanClientEntry OBJECT-TYPE
+    SYNTAX  TelProdNpMonInterfWlanClientEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "A base list of objects with information about the networks the
+         WLAN can connect to when acting as a client.
+         The indexes are the number of the WLAN interface and the network
+         index"
+    INDEX   { telProdNpMonInterfWlanClientIfIndex,  telProdNpMonInterfWlanClientSSID}
+    ::= { telProdNpMonInterfWlanClientTable 1 }
+
+TelProdNpMonInterfWlanClientEntry ::= SEQUENCE
+{
+    telProdNpMonInterfWlanClientIfIndex				INTEGER,
+    telProdNpMonInterfWlanClientSSID                DisplayString,
+    telProdNpMonInterfWlanClientPriority            INTEGER,
+    telProdNpMonInterfWlanClientPrivInvoked         INTEGER,
+    telProdNpMonInterfWlanClientRsn                 INTEGER,
+    telProdNpMonInterfWlanClientAkm                 INTEGER,
+    telProdNpMonInterfWlanClientCipher              INTEGER,
+    telProdNpMonInterfWlanClientDefaultKey          INTEGER,
+    telProdNpMonInterfWlanClientKey1                OCTET STRING,
+    telProdNpMonInterfWlanClientKey2                OCTET STRING,
+    telProdNpMonInterfWlanClientKey3                OCTET STRING,
+    telProdNpMonInterfWlanClientKey4                OCTET STRING,
+	telProdNpMonInterfwlanClientPassPhrase		    OCTET STRING
+}
+
+telProdNpMonInterfWlanClientIfIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+	DESCRIPTION
+	    "WLAN interface index."
+	DEFVAL { 0 }
+    ::= { telProdNpMonInterfwlanClientEntry 1 }
+
+telProdNpMonInterfWlanClientSSID OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Service Set Name"
+    ::= { telProdNpMonInterfwlanClientEntry 2 }
+    
+telProdNpMonInterfWlanClientPriority OBJECT-TYPE
+    SYNTAX  INTEGER { none(1), enable(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Priority of the network. The higher the priority,
+         the sooner the client tries to associate with it."
+    ::= { telProdNpMonInterfwlanClientEntry 3 }
+    
+telProdNpMonInterfWlanClientPrivInvoked OBJECT-TYPE
+    SYNTAX  INTEGER { none(1), enable(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Privacy invoked. If enabled, some level of security is invoked
+        when transmitting data frames."
+    ::= { telProdNpMonInterfwlanClientEntry 4 }
+
+telProdNpMonInterfWlanClientRsn OBJECT-TYPE
+    SYNTAX  INTEGER { wpa(0), wpa2(1), none(2), wpa-wpa2(3) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Robust Security Network settings."
+    ::= { telProdNpMonInterfwlanClientEntry 5 }
+
+telProdNpMonInterfWlanClientAkm OBJECT-TYPE
+    SYNTAX  INTEGER { dot1x(0), psk(1) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The Authenticated Key Management setting."
+    ::= { telProdNpMonInterfwlanClientEntry 6 }
+
+telProdNpMonInterfWlanClientCipher OBJECT-TYPE
+    SYNTAX  INTEGER { none(0), auto(1), wep(2), tkip(3), aes-ccm(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+         "The ciphers in use for WPA or WPA2.
+         auto(1) is used for TKIP and AES"
+    ::= { telProdNpMonInterfwlanClientEntry 7 }
+    
+telProdNpMonInterfWlanClientDefaultKey OBJECT-TYPE
+    SYNTAX  INTEGER { key1(1), key2(2), key3(3), key4(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Default key for WEP encryption. This is the key used
+        to transmit data frames if WEP is enabled"
+    ::= { telProdNpMonInterfwlanClientEntry 8 }
+
+telProdNpMonInterfWlanClientKey1 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..33))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 1."
+    ::= { telProdNpMonInterfwlanClientEntry 9 }
+
+telProdNpMonInterfWlanClientKey2 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..33))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 2."
+    ::= { telProdNpMonInterfwlanClientEntry 10 }
+
+telProdNpMonInterfWlanClientKey3 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..33))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 3."
+    ::= { telProdNpMonInterfwlanClientEntry 11 }
+
+telProdNpMonInterfWlanClientKey4 OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..33))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Key string for WEP key number 4."
+    ::= { telProdNpMonInterfwlanClientEntry 12 }
+
+telProdNpMonInterfwlanClientPassPhrase OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE(0..64))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Passphrase string for WPA-PSK and WPA2-PSK."
+    ::= { telProdNpMonInterfwlanClientEntry 13 }
+
+END

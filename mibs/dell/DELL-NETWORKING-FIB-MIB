@@ -1,0 +1,536 @@
+DELL-NETWORKING-FIB-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE,
+		Unsigned32, Gauge32, Integer32, IpAddress, Counter64
+			FROM SNMPv2-SMI
+                InterfaceIndexOrZero               
+                        FROM IF-MIB
+	        InetAddressType, InetAddress, InetAddressPrefixLength
+	                FROM INET-ADDRESS-MIB
+		MacAddress
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		dellNetMgmt
+			FROM DELL-NETWORKING-SMI;
+    
+	dellNetIpForwardMib MODULE-IDENTITY
+		LAST-UPDATED "200709141200Z"   -- Sep 14, 2007 12:00:00 GMT
+		ORGANIZATION "Dell Inc"
+		CONTACT-INFO
+                             "http://www.dell.com/support"   
+		DESCRIPTION
+			"This MIB module is used to display CIDR multipath IP Routes." 
+		REVISION     "201107081200Z"   -- Jul 08, 2011 12:00:00 GMT
+		DESCRIPTION
+			"This version of MIB module deprecates the dellNetIpForwardTable
+                   and replaces it with dellNetInetCidrRouteTable which adds the
+                   IP Protocol Independance "
+		REVISION     "200709141200Z"   -- Sep 14, 2007 12:00:00 GMT
+		DESCRIPTION
+			"Initial version of this MIB module." 
+	::= { dellNetMgmt 9 }
+	
+
+-- ****************************************************************************
+--
+--  Top-Level Object Identifier Assignments for the FIB MIB
+--
+-- ****************************************************************************
+
+dellNetIpForwardMibObjects       OBJECT IDENTIFIER ::= { dellNetIpForwardMib 1 }
+dellNetIpForwardMibConformance   OBJECT IDENTIFIER ::= { dellNetIpForwardMib 2 }
+dellNetIpForwardVariable         OBJECT IDENTIFIER ::= { dellNetIpForwardMib 3 }
+--*****************************************************************************
+--
+-- Data Types
+--
+--*****************************************************************************
+
+chSysCardNumber    OBJECT-TYPE
+        SYNTAX        Integer32
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This is the card number assigned to the line
+            cards and the RPM cards in the chassis.
+            The line cards number are from 0 to 13 and the
+            RPM are from 0 to 1."
+        ::= { dellNetIpForwardVariable 1 }
+
+-- ****************************************************************************
+--
+--  IP Forward Version Table
+--
+-- ****************************************************************************
+
+dellNetIpForwardVersionTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF DellNetIpForwardVersionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"This entity's IP forward version table."
+	::= { dellNetIpForwardMibObjects 1 }
+
+dellNetIpForwardVersionEntry OBJECT-TYPE
+	SYNTAX     DellNetIpForwardVersionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"The row definition for the ip forward version Table."
+	INDEX {
+		chSysCardNumber,
+                dellNetIpForwardAddrFamily
+              }
+	::= { dellNetIpForwardVersionTable 1 }
+
+DellNetIpForwardVersionEntry ::=
+	SEQUENCE {
+                dellNetIpForwardAddrFamily
+                        InetAddressType,
+		dellNetIpForwardVersion
+			Counter64
+	}
+
+dellNetIpForwardAddrFamily OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+             "Address Family of the IP Forwarding Table for which this entry
+              provides the Version information. "
+
+	::= { dellNetIpForwardVersionEntry 1}
+
+dellNetIpForwardVersion OBJECT-TYPE
+	SYNTAX     Counter64 
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"A version number on the Forwarding Table. 
+		 This is always fetched from one line card."
+	::= { dellNetIpForwardVersionEntry 2 }
+		
+	
+-- ****************************************************************************
+--
+--  IP Forwarding Table
+--
+--  The IP Forwarding Table obsoletes and replaces the ipRoute Table current 
+--  in MIB-I and MIB-II.  It adds knowledge of the autonomous system of 
+--  the next hop, multiple next hop support, and policy routing support.
+--
+-- ****************************************************************************
+
+dellNetIpForwardTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF DellNetIpForwardEntry
+	MAX-ACCESS not-accessible
+	STATUS     deprecated
+	DESCRIPTION
+		"This entity's IP Routing table."
+	::= { dellNetIpForwardMibObjects 2 }
+
+dellNetIpForwardEntry OBJECT-TYPE
+	SYNTAX     DellNetIpForwardEntry
+	MAX-ACCESS not-accessible
+	STATUS     deprecated
+	DESCRIPTION
+		"A particular route to a particular  destination,
+		 under a particular policy."
+	INDEX {
+		chSysCardNumber,
+		dellNetIpforwardDest,
+		dellNetIpforwardMask,
+		dellNetIpforwardNextHop,
+		dellNetIpforwardFirstHop
+	}
+	::= { dellNetIpForwardTable 1 }
+
+DellNetIpForwardEntry ::=
+	SEQUENCE {
+		dellNetIpforwardDest
+			IpAddress,
+		dellNetIpforwardMask
+			IpAddress,
+		dellNetIpforwardNextHop
+			IpAddress,
+		dellNetIpforwardFirstHop
+			IpAddress,
+		dellNetIpforwardIfIndex
+			Integer32,
+		dellNetIpforwardMacAddress
+			MacAddress,
+		dellNetIpforwardEgressPort
+			OCTET STRING,
+		dellNetIpforwardCamIndex
+			Integer32
+	}
+
+dellNetIpforwardDest OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"The destination IP address of this route. An
+		 entry  with  a value of 0.0.0.0 is considered a
+		 default route."
+	::= { dellNetIpForwardEntry 1 }
+
+dellNetIpforwardMask OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"Indicate the mask to be logical-ANDed with the destination
+		 address  before  being compared to the value in 
+		 the dellNetIpforwardDest field."
+	::= { dellNetIpForwardEntry 2 }
+
+dellNetIpforwardNextHop OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"On remote routes, the address of the next system
+		 en route; Otherwise, 0.0.0.0."
+	::= { dellNetIpForwardEntry 3 }
+
+dellNetIpforwardFirstHop OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"On remote routes, the address of the Gateway 
+		 to the nexthop; 0.0.0.0 if the Nexthop itself is a Gateway
+                 to the Destination"
+	::= { dellNetIpForwardEntry 4 }
+
+dellNetIpforwardIfIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"The ifIndex value which identifies  the  local
+		 interface  through  which  the next hop of this
+		 route should be reached."
+	::= { dellNetIpForwardEntry 5 }
+
+dellNetIpforwardMacAddress OBJECT-TYPE
+	SYNTAX     MacAddress 
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"The Mac address of the NextHop."
+	::= { dellNetIpForwardEntry 6 }
+
+dellNetIpforwardEgressPort OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"The name of the egress port to which the packets will be
+		 forwarded."
+	::= { dellNetIpForwardEntry 7 }
+
+dellNetIpforwardCamIndex OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     deprecated
+	DESCRIPTION
+		"Cam Entry corresponding to a row."
+	::= { dellNetIpForwardEntry 8 }
+
+-- ****************************************************************************
+
+-- dellNet scalar objects which provide the number of current dellNetInetCidrRouteTable entries 
+-- each per destination type
+
+-- ****************************************************************************
+
+dellNetInetCidrIpv4RouteNumber OBJECT-TYPE
+	SYNTAX     Gauge32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The number of current dellNetInetCidrRouteTable entries that are not
+                 Invalid and whose dellNetInetCidrRouteDestType is ipv4(1)"
+	::= { dellNetIpForwardMibObjects 3 }
+
+dellNetInetCidrIpv6RouteNumber OBJECT-TYPE
+	SYNTAX     Gauge32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The number of current dellNetInetCidrRouteTable entries that are not
+                 Invalid and whose dellNetInetCidrRouteDestType is ipv6(2)"
+	::= { dellNetIpForwardMibObjects 4 }
+
+dellNetInetCidrECMPGrpMax OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of maximum entries"
+    ::= { dellNetIpForwardMibObjects 6 }
+
+dellNetInetCidrECMPGrpUsed OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of current entries that are not invalid"
+    ::= { dellNetIpForwardMibObjects 7 }
+
+dellNetInetCidrECMPGrpAvl OBJECT-TYPE
+    SYNTAX          Gauge32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of available cam entries"
+    ::= { dellNetIpForwardMibObjects 8 }
+
+-- ****************************************************************************
+-- dellNet Inet Cidr Route Table
+
+-- The dellNet Inet Cidr Route Table deprecates and replaces the dellNetIpForwardTable.
+-- It adds IP Protocol Independence.
+
+-- ****************************************************************************
+
+
+dellNetInetCidrRouteTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF DellNetInetCidrRouteTableEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"This entity's IP Routing table."
+	::= { dellNetIpForwardMibObjects 5 }
+
+dellNetInetCidrRouteTableEntry OBJECT-TYPE
+	SYNTAX     DellNetInetCidrRouteTableEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"A particular route to a particular  destination
+
+                 Implementers need to be aware that if the total number
+                 of elements (octets or sub-identifiers) in
+                 inetCidrRouteDest, inetCidrRoutePolicy, and
+                 inetCidrRouteNextHop exceeds 111, then OIDs of column
+                 instances in this table will have more than 128 sub-
+                 identifiers and cannot be accessed using SNMPv1,
+                 SNMPv2c, or SNMPv3.
+
+                 For S-Series Platform, Value of chSysCardNumber will always
+                 be zero"
+
+	INDEX {
+		chSysCardNumber,
+		dellNetInetCidrRouteDestType,
+		dellNetInetCidrRouteDest,
+		dellNetInetCidrRoutePfxLen,
+		dellNetInetCidrRouteNextHopType,
+		dellNetInetCidrRouteNextHop,
+		dellNetInetCidrRouteFirstHopType,
+		dellNetInetCidrRouteFirstHop
+	}
+	::= { dellNetInetCidrRouteTable 1 }
+
+DellNetInetCidrRouteTableEntry ::=
+	SEQUENCE {
+		dellNetInetCidrRouteDestType
+			InetAddressType,
+		dellNetInetCidrRouteDest
+			InetAddress,
+		dellNetInetCidrRoutePfxLen
+			InetAddressPrefixLength,
+		dellNetInetCidrRouteNextHopType
+			InetAddressType,
+		dellNetInetCidrRouteNextHop
+			InetAddress,
+		dellNetInetCidrRouteFirstHopType
+			InetAddressType,
+		dellNetInetCidrRouteFirstHop
+			InetAddress,
+		dellNetInetCidrRouteIfIndex
+			InterfaceIndexOrZero,
+		dellNetInetCidrRouteMacAddress
+			MacAddress,
+		dellNetInetCidrRouteEgressPort
+			OCTET STRING,
+		dellNetInetCidrRouteCamIndex
+			Unsigned32
+	}
+
+dellNetInetCidrRouteDestType OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"The type of the inetCidrRouteDest address, as defined
+                 in the InetAddress MIB.
+
+                 Only those address types that may appear in an actual
+                 routing table are allowed as values of this object."
+
+	::= { dellNetInetCidrRouteTableEntry 1 }
+
+dellNetInetCidrRouteDest OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"The destination IP address of this route.
+                 The type of this address is determined by the value of
+                 the inetCidrRouteDestType object."
+
+	::= { dellNetInetCidrRouteTableEntry 2 }
+
+dellNetInetCidrRoutePfxLen OBJECT-TYPE
+	SYNTAX     InetAddressPrefixLength
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"Indicates the number of leading one bits that form the
+                 mask to be logical-ANDed with the destination address
+                 before being compared to the value in the inetCidrRouteDest field."
+
+	::= { dellNetInetCidrRouteTableEntry 3 }
+
+dellNetInetCidrRouteNextHopType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The type of the inetCidrRouteNextHop address, as
+                 defined in the InetAddress MIB.
+
+                 Value should be set to unknown(0) for non-remote
+                 routes.
+
+                 Only those address types that may appear in an actual
+                 routing table are allowed as values of this object."
+        ::= { dellNetInetCidrRouteTableEntry 4 }
+
+dellNetInetCidrRouteNextHop OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "On remote routes, the address of the next system en
+                 route.  For non-remote routes, a zero length string.
+
+                 The type of this address is determined by the value of
+                 the inetCidrRouteNextHopType object."
+        ::= { dellNetInetCidrRouteTableEntry 5 }
+
+dellNetInetCidrRouteFirstHopType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The type of the inetCidrRouteFirstHop address, as
+                 defined in the InetAddress MIB.
+
+                 Value should be set to unknown(0) for non-remote
+                 routes.
+
+                 Only those address types that may appear in an actual
+                 routing table are allowed as values of this object."
+        ::= { dellNetInetCidrRouteTableEntry 6 }
+
+dellNetInetCidrRouteFirstHop OBJECT-TYPE
+        SYNTAX     InetAddress
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "The address of the gateway to the Nexthop.
+                 If the nexthop itself is the gateway, a zero length string.
+  
+                 The type of this address is determined by the value of
+                 the inetCidrRouteFirstHopType object."
+        ::= { dellNetInetCidrRouteTableEntry 7 }
+
+dellNetInetCidrRouteIfIndex OBJECT-TYPE
+        SYNTAX     InterfaceIndexOrZero
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The ifIndex value that identifies the local interface
+                 through which the next hop of this route should be
+                 reached.  A value of 0 is valid and represents the
+                 scenario where no interface is specified."
+        ::= { dellNetInetCidrRouteTableEntry 8 }
+
+dellNetInetCidrRouteMacAddress OBJECT-TYPE
+	SYNTAX     MacAddress 
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The Mac address of the NextHop."
+	::= { dellNetInetCidrRouteTableEntry 9 }
+
+dellNetInetCidrRouteEgressPort OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE (0..255))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"The name of the egress port to which the packets will be
+		 forwarded."
+	::= { dellNetInetCidrRouteTableEntry 10 }
+
+dellNetInetCidrRouteCamIndex OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION
+		"Cam Entry corresponding to a row."
+	::= { dellNetInetCidrRouteTableEntry 11 }
+
+
+-- ****************************************************************************
+--
+-- Module Conformance Statement
+--
+-- DESCRIPTION: This module conformance statement includes the compliance 
+--    statements and the units of conformance section.
+--
+-- ****************************************************************************
+
+dellNetIpForwardMibCompliances OBJECT IDENTIFIER ::= { dellNetIpForwardMibConformance 1 }
+dellNetIpForwardMibGroups      OBJECT IDENTIFIER ::= { dellNetIpForwardMibConformance 2 }
+
+-- ****************************************************************************
+-- Compliance Statement
+-- ****************************************************************************
+
+dellNetIpForwardMibCompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION 
+		"The basic implementation requirements for the 
+		 Dell Networking OS Ip Forward MIB."
+	MODULE    -- this module
+	MANDATORY-GROUPS { 
+		dellNetIpForwardObjectGroup
+	}
+	::= { dellNetIpForwardMibCompliances 1 }
+
+-- ****************************************************************************
+-- Units of Conformance
+-- ****************************************************************************
+
+dellNetIpForwardObjectGroup OBJECT-GROUP
+	OBJECTS {
+		dellNetIpForwardVersion,
+		dellNetInetCidrRouteIfIndex,
+		dellNetInetCidrRouteMacAddress,
+		dellNetInetCidrRouteEgressPort,
+		dellNetInetCidrRouteCamIndex
+        }
+        STATUS current
+        DESCRIPTION 
+                "Objects for the IP aware Route Table."
+        ::= { dellNetIpForwardMibGroups 1 }
+
+END

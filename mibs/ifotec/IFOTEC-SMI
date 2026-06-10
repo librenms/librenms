@@ -1,0 +1,291 @@
+-- *****************************************************************
+-- IFOTEC-SMI.mib:  IFOTEC Enterprise Structure of Management Information
+--   
+-- Jully 2020, MARMONIER Cedric
+--   
+-- Copyright (c) 1998-2020 by IFOTEC.
+-- All rights reserved.
+--   
+-- ****************************************************************
+
+IFOTEC-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, enterprises, TimeTicks   FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString                            			FROM SNMPv2-TC;
+ 
+
+ifotec MODULE-IDENTITY
+    LAST-UPDATED    "202007280000Z"
+    ORGANIZATION    "IFOTEC"
+    CONTACT-INFO    "contact@ifotec.com"
+    DESCRIPTION
+        "The Structure of Management Information for the
+        IFOTEC enterprise."
+     ::= { enterprises 21362 }
+
+	 
+IfotecDataStatus ::= TEXTUAL-CONVENTION
+	STATUS             current
+	DESCRIPTION   "Represents the data status."
+	SYNTAX  INTEGER {
+		noData(1),
+		ok(2),
+		warning(3),
+		warningLowThreshold(4),
+		warningHighThreshold(5),
+		error(6),
+		errorLowThreshold(7),
+		errorHighThreshold(8),
+		errorWrongData(9),
+		errorLowDataOverflow(10),
+		errorHighDataOverflow(11)
+	}
+
+
+-- ****************************************************************
+ifotecGeneral OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "General informations about the IFOTEC product."
+    ::= { ifotec 101 }
+
+-- *****************************************
+ifotecSystem OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION     "IFOTEC System informations."
+     ::= { ifotecGeneral 1 }
+
+ 
+ifoSysProductIndex OBJECT-TYPE
+	 SYNTAX Integer32	 MAX-ACCESS read-only	 STATUS current
+	 DESCRIPTION "The ifoSysIndex of the product."    ::= { ifotecSystem 1 }
+	 
+	 
+-- ******************	 
+ifoSysTable OBJECT-TYPE 
+	 SYNTAX SEQUENCE OF IfoSysEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "list of systems present."
+ 	::= { ifotecSystem 2 }	 
+
+ifoSysEntry OBJECT-TYPE 
+	 SYNTAX IfoSysEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "An entry containing system informations."
+	 INDEX { ifoSysIndex } 
+ 	::= { ifoSysTable 1  }
+
+IfoSysEntry ::= SEQUENCE {
+	ifoSysIndex        		Integer32,
+	ifoSysRef         		DisplayString,
+	ifoSysInfo        		DisplayString,
+	ifoSysFamilly			DisplayString,
+	ifoSysSerialNumber		DisplayString,
+	ifoSysDateCode			DisplayString,
+	ifoSysFirmware			DisplayString,
+	ifoSysBootloader		DisplayString,
+	ifoSysDescr  			DisplayString,
+	ifoSysLocation			DisplayString,
+	ifoSysContact			DisplayString,
+	ifoSysUpTime			TimeTicks
+}	
+
+ifoSysIndex OBJECT-TYPE 
+	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
+	 DESCRIPTION "A unique value, greater than zero, for each product."
+											    ::= { ifoSysEntry 1 }
+ifoSysRef          
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Product reference"           ::= { ifoSysEntry 2 }
+ifoSysInfo
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Product information"         ::= { ifoSysEntry 3 }
+ifoSysFamilly
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Product familly"             ::= { ifoSysEntry 4 }  
+ifoSysSerialNumber  
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Serial number"               ::= { ifoSysEntry 5 }
+ifoSysDateCode
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Date code"                   ::= { ifoSysEntry 6 }
+ifoSysFirmware
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Firmware version"            ::= { ifoSysEntry 7 }
+ifoSysBootloader
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Bootloader version"          ::= { ifoSysEntry 8 }
+ifoSysDescr
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Administratively-assigned name (sysName)"         ::= { ifoSysEntry 9 }
+ifoSysLocation
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Physical location (sysLocation)"                  ::= { ifoSysEntry 10 }
+ifoSysContact
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Physical location (sysContact)"                   ::= { ifoSysEntry 11 }
+ifoSysUpTime
+  OBJECT-TYPE	  SYNTAX TimeTicks	            MAX-ACCESS read-only   STATUS current
+  DESCRIPTION "The time (in hundredths of a second) since the 
+               network management portion of the system was last 
+               re-initialized (sysUpTime)."
+ 	::= { ifoSysEntry 12 }
+
+  
+-- ******************  
+
+ifoSysMibTable OBJECT-TYPE
+	 SYNTAX SEQUENCE OF IfoSysMibEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "list of mibs presents in the system."
+ 	::= { ifotecSystem 3 }	 
+
+ifoSysMibEntry OBJECT-TYPE 
+	 SYNTAX IfoSysMibEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "An entry containing mib informations."
+	 INDEX { ifoSysORIfoSysIndex, ifoSysORIndex } 
+ 	::= { ifoSysMibTable 1  }
+
+IfoSysMibEntry ::= SEQUENCE {
+	ifoSysORIfoSysIndex   		Integer32,
+	ifoSysORIndex        		Integer32,
+	ifoSysORID         		    OBJECT IDENTIFIER,
+	ifoSysORDescr        		DisplayString
+}
+
+ifoSysORIfoSysIndex OBJECT-TYPE 
+	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable. It is the same value used by ifoSysIndex."
+											    ::= { ifoSysMibEntry 1 }
+ifoSysORIndex OBJECT-TYPE 
+	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
+	 DESCRIPTION "A unique value, greater than zero, for each mib presents in the system."
+											    ::= { ifoSysMibEntry 2 }
+ifoSysORID          
+  OBJECT-TYPE     SYNTAX OBJECT IDENTIFIER           MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "An unique identifier to designate the mib."           ::= { ifoSysMibEntry 3 }
+ifoSysORDescr          
+  OBJECT-TYPE     SYNTAX DisplayString          MAX-ACCESS read-only   STATUS current
+  DESCRIPTION     "Description of the mib."                              ::= { ifoSysMibEntry 4 }
+
+  
+  
+-- *****************************************  
+ifotecTemperatures OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION     "IFOTEC Temperature Sensors."
+     ::= { ifotecGeneral 2 }
+
+  
+ifoTemperatureTable OBJECT-TYPE 
+	 SYNTAX SEQUENCE OF IfoTemperatureEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "A list of sensors."
+ 	::= { ifotecTemperatures 1  }
+	 
+ifoTemperatureEntry OBJECT-TYPE 
+	 SYNTAX IfoTemperatureEntry
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "An entry containing sensor informations."
+	 INDEX { ifoTempIfoSysIndex, ifoTempIndex } 
+ 	::= { ifoTemperatureTable 1  }
+
+IfoTemperatureEntry ::= SEQUENCE {
+	ifoTempIfoSysIndex     Integer32,
+	ifoTempIndex           Integer32,
+	ifoTempName            DisplayString,
+	ifoTempDescr           DisplayString,
+	ifoTempValue		   Integer32,
+	ifoTempAlarmStatus	   IfotecDataStatus,
+	ifoTempLowThldAlarm    Integer32,
+	ifoTempHighThldAlarm   Integer32,
+	ifoTempLowThldWarning  Integer32,
+	ifoTempHighThldWarning  Integer32
+}	
+
+ifoTempIfoSysIndex OBJECT-TYPE 
+	 SYNTAX Integer32	 MAX-ACCESS not-accessible	 STATUS current
+	 DESCRIPTION "The index value which uniquely identifies the system in ifoSysMibTable. It is the same value used by ifoSysIndex."
+											    ::= { ifoTemperatureEntry 1 }
+ifoTempIndex OBJECT-TYPE 
+	 SYNTAX Integer32
+	 MAX-ACCESS not-accessible
+	 STATUS current
+	 DESCRIPTION "A unique value, greater than zero, for each temperature sensor."
+ 	::= { ifoTemperatureEntry 2  }
+	
+ifoTempName OBJECT-TYPE 
+	 SYNTAX DisplayString
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The name of the temperature sensor."
+ 	::= { ifoTemperatureEntry 3  }
+
+ifoTempDescr OBJECT-TYPE 
+	 SYNTAX DisplayString
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "The description of the temeprature sensor."
+ 	::= { ifoTemperatureEntry 4 }
+
+ifoTempValue OBJECT-TYPE 
+	 SYNTAX Integer32
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "the value of the sensor in 0.1 degree Celsius."
+ 	::= { ifoTemperatureEntry 5  }
+	
+ifoTempAlarmStatus OBJECT-TYPE 
+	 SYNTAX IfotecDataStatus
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "Indicates the sensor alarm status."
+ 	::= { ifoTemperatureEntry 6  }
+
+ifoTempLowThldAlarm OBJECT-TYPE
+	 SYNTAX Integer32
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "the value in 0.1 degree Celsius of the low threshold alarm."
+ 	::= { ifoTemperatureEntry 7  }
+	
+ifoTempHighThldAlarm OBJECT-TYPE
+	 SYNTAX Integer32
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "the value in 0.1 degree Celsius of the high threshold alarm."
+ 	::= { ifoTemperatureEntry 8  }
+
+ifoTempLowThldWarning OBJECT-TYPE
+	 SYNTAX Integer32
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "the value in 0.1 degree Celsius of the low threshold warning."
+ 	::= { ifoTemperatureEntry 9  }
+	
+ifoTempHighThldWarning OBJECT-TYPE
+	 SYNTAX Integer32
+	 MAX-ACCESS read-only
+	 STATUS current
+	 DESCRIPTION "the value in 0.1 degree Celsius of the high threshold warning."
+ 	::= { ifoTemperatureEntry 10  }
+
+	
+	
+-- ****************************************************************
+ifotecModules OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "ifotecModules provides a root object identifier
+        from which MODULE-IDENTITY values may be assigned."
+    ::= { ifotec 102 }
+
+END

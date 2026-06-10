@@ -1,0 +1,678 @@
+IBMHPRNCL-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+          enterprises, Counter, TimeTicks, Gauge
+                 FROM RFC1155-SMI
+
+
+          DisplayString
+                 FROM RFC1213-MIB
+
+          OBJECT-TYPE
+                 FROM RFC-1212;
+
+
+-- IMPORTS
+--    MODULE-IDENTITY, Unsigned32, Counter32, TimeTicks, OBJECT-TYPE,
+--    enterprises
+--          FROM SNMPv2-SMI
+--    OBJECT-GROUP, MODULE-COMPLIANCE
+--          FROM SNMPv2-CONF
+--    DisplayString
+--          FROM SNMPv2-TC;
+
+-- ibmHprNcl MODULE-IDENTITY
+--    LAST-UPDATED "9611080000Z"
+--    ORGANIZATION "IBM"
+--    CONTACT-INFO "Bob Moore (remoore @ ralvm6)
+--                  IBM Corporation
+--                  800 Park Offices Drive
+--                  RHJA/664
+--                  P.O. Box 12195
+--                  Research Triangle Park, NC 27709, USA
+--                  Tel:    1 919 254 4436
+--                  E-mail: remoore@ralvm6.vnet.ibm.com"
+
+--    DESCRIPTION
+--        "This MIB module represents the HPR NCL group from the original
+--        IBM version of the HPR MIB, updated to SNMPv2 SMI.  It is set
+--        up to use as its anchor point the same OID that identified the
+--        group in the IBM-HPR-MIB, so that existing manager applications
+--        will not need to change."
+
+--    ::= { hpr 3 }
+
+-- The following OID assignments result in the same OIDs for the
+-- objects in the port DLC trace group as those in the IBM-6611-APPN-MIB.
+ibm                     OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmArchitecture         OBJECT IDENTIFIER ::= { ibm 5 }
+hpr                     OBJECT IDENTIFIER ::= { ibmArchitecture 10 }
+
+ibmHprNcl               OBJECT IDENTIFIER ::= {hpr     3}
+
+-- **********************************************************************
+ibmHprNclGlobe          OBJECT IDENTIFIER ::= { ibmHprNcl 1 }
+-- **********************************************************************
+
+ibmHprNclGlobeCtrState  OBJECT-TYPE
+      SYNTAX INTEGER {
+                        notActive(1),
+                        active(2)
+                       }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION
+          "This object is used for a network management station to turn
+          on/off the optional counters in the ibmHprNclTable.
+
+              notActive(1) - these counters are not being incremented;
+                             their values are always zero
+              active(2)    - these counters are being incremented"
+
+      ::= { ibmHprNclGlobe 1 }
+
+ibmHprNclGlobeCtrStateTime OBJECT-TYPE
+      SYNTAX TimeTicks
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The timestamp (i.e., the Agent's appnNodeUpTime value) when
+          the ibmHprNclGlobeCtrState object was last changed.  This time
+          is in hundredths of a second."
+
+      ::= { ibmHprNclGlobe 2 }
+
+ibmHprNclGlobeAssignAnrs   OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of ANR's assigned by this node since it was
+          last re-initialized."
+
+      ::= { ibmHprNclGlobe 3 }
+
+-- **********************************************************************
+-- The HPR NCL Table
+-- This table contains the counters for ANR routing
+-- **********************************************************************
+
+ibmHprNclTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF IbmHprNclEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The HPR NCL table"
+
+      ::= { ibmHprNcl 2 }
+
+ibmHprNclEntry OBJECT-TYPE
+      SYNTAX IbmHprNclEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION
+          "The EnvId is used as the index to this table."
+
+      INDEX { ibmHprNclEnvId }
+
+      ::= { ibmHprNclTable 1}
+
+IbmHprNclEntry ::= SEQUENCE {
+   ibmHprNclEnvId               Gauge,        -- environ id (slot)
+     -- receive frame/byte counters from DLC by priority
+   ibmHprNclDlcRecvNetFrames    Counter,      -- dcl recv network frames
+   ibmHprNclDlcRecvHiFrames     Counter,      -- dcl recv high    frames
+   ibmHprNclDlcRecvMedFrames    Counter,      -- dcl recv medium  frames
+   ibmHprNclDlcRecvLoFrames     Counter,      -- dcl recv low     frames
+   ibmHprNclDlcRecvNetBytes     Counter,      -- dcl recv network bytes
+   ibmHprNclDlcRecvHiBytes      Counter,      -- dcl recv high    bytes
+   ibmHprNclDlcRecvMedBytes     Counter,      -- dcl recv medium  bytes
+   ibmHprNclDlcRecvLoBytes      Counter,      -- dcl recv low     bytes
+   ibmHprNclDlcRecvAnrErrors    Counter,      -- dcl recv ANR errors
+     -- send frame/byte counters to DLC by priority
+   ibmHprNclDlcSendNetFrames    Counter,      -- dcl send network frames
+   ibmHprNclDlcSendHiFrames     Counter,      -- dcl send high    frames
+   ibmHprNclDlcSendMedFrames    Counter,      -- dcl send medium  frames
+   ibmHprNclDlcSendLoFrames     Counter,      -- dcl send low     frames
+   ibmHprNclDlcSendNetBytes     Counter,      -- dcl send network bytes
+   ibmHprNclDlcSendHiBytes      Counter,      -- dcl send high    bytes
+   ibmHprNclDlcSendMedBytes     Counter,      -- dcl send medium  bytes
+   ibmHprNclDlcSendLoBytes      Counter,      -- dcl send low     bytes
+     -- receive frame/byte counters from RTP by priority
+   ibmHprNclRtpRecvNetFrames    Counter,      -- RTP recv network frames
+   ibmHprNclRtpRecvHiFrames     Counter,      -- RTP recv high    frames
+   ibmHprNclRtpRecvMedFrames    Counter,      -- RTP recv medium  frames
+   ibmHprNclRtpRecvLoFrames     Counter,      -- RTP recv low     frames
+   ibmHprNclRtpRecvNetBytes     Counter,      -- RTP recv network bytes
+   ibmHprNclRtpRecvHiBytes      Counter,      -- RTP recv high    bytes
+   ibmHprNclRtpRecvMedBytes     Counter,      -- RTP recv medium  bytes
+   ibmHprNclRtpRecvLoBytes      Counter,      -- RTP recv low     bytes
+   ibmHprNclRtpRecvAnrErrors    Counter,      -- RTP recv ANR errors
+     -- send frame/byte counters to RTP by priority
+   ibmHprNclRtpSendNetFrames    Counter,      -- dcl send network frames
+   ibmHprNclRtpSendHiFrames     Counter,      -- dcl send high    frames
+   ibmHprNclRtpSendMedFrames    Counter,      -- dcl send medium  frames
+   ibmHprNclRtpSendLoFrames     Counter,      -- dcl send low     frames
+   ibmHprNclRtpSendNetBytes     Counter,      -- dcl send network bytes
+   ibmHprNclRtpSendHiBytes      Counter,      -- dcl send high    bytes
+   ibmHprNclRtpSendMedBytes     Counter,      -- dcl send medium  bytes
+   ibmHprNclRtpSendLoBytes      Counter,      -- dcl send low     bytes
+     -- send frame/byte counters to another local routing ncl
+   ibmHprNclInterSendNetFrames  Counter,      -- int send network frames
+   ibmHprNclInterSendHiFrames   Counter,      -- int send high    frames
+   ibmHprNclInterSendMedFrames  Counter,      -- int send medium  frames
+   ibmHprNclInterSendLoFrames   Counter,      -- int send low     frames
+   ibmHprNclInterSendNetBytes   Counter,      -- int send network bytes
+   ibmHprNclInterSendHiBytes    Counter,      -- int send high    bytes
+   ibmHprNclInterSendMedBytes   Counter,      -- int send medium  bytes
+   ibmHprNclInterSendLoBytes    Counter       -- int send low     bytes
+        }
+
+ibmHprNclEnvId OBJECT-TYPE
+      SYNTAX Gauge
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The product's internal environment id for this NCL, e.g.,
+          adapter number, address space number."
+
+      ::= { ibmHprNclEntry  1 }
+
+ibmHprNclDlcRecvNetFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority frames received from the
+          data control layer (DLC)."
+
+      ::= { ibmHprNclEntry  2 }
+
+ibmHprNclDlcRecvHiFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority frames received from the
+          data control layer (DLC)."
+
+      ::= { ibmHprNclEntry  3 }
+
+ibmHprNclDlcRecvMedFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority frames received from the
+          data control layer (DLC)."
+
+      ::= { ibmHprNclEntry  4 }
+
+ibmHprNclDlcRecvLoFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority frames received from the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry  5 }
+
+ibmHprNclDlcRecvNetBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority bytes received from the
+          data control layer (DLC)."
+
+      ::= { ibmHprNclEntry  6 }
+
+ibmHprNclDlcRecvHiBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority bytes received from the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry  7 }
+
+ibmHprNclDlcRecvMedBytes  OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority bytes received from the
+          data control layer (DLC)."
+
+      ::= { ibmHprNclEntry  8 }
+
+ibmHprNclDlcRecvLoBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority bytes received from the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry  9 }
+
+ibmHprNclDlcRecvAnrErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of frames containing ANR errors which were
+          received from the data control layer (DLC)."
+
+      ::= { ibmHprNclEntry 10 }
+
+ibmHprNclDlcSendNetFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority sent to the data control
+          layer (DLC)."
+
+      ::= { ibmHprNclEntry 11 }
+
+ibmHprNclDlcSendHiFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority frames sent to the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry 12 }
+
+ibmHprNclDlcSendMedFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority frames sent to the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry 13 }
+
+ibmHprNclDlcSendLoFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority frames sent to
+              the data control layer (DLC)."
+
+      ::= { ibmHprNclEntry 14 }
+
+ibmHprNclDlcSendNetBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority bytes sent to the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry 15 }
+
+ibmHprNclDlcSendHiBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority bytes sent to
+              the data control layer (DLC)."
+
+
+      ::= { ibmHprNclEntry 16 }
+
+ibmHprNclDlcSendMedBytes  OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority bytes sent to the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry 17 }
+
+ibmHprNclDlcSendLoBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority bytes sent to the data
+          control layer (DLC)."
+
+      ::= { ibmHprNclEntry 18 }
+
+ibmHprNclRtpRecvNetFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority frames received from a
+          local RTP connection."
+
+      ::= { ibmHprNclEntry 19 }
+
+ibmHprNclRtpRecvHiFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority frames received from a local
+          RTP connection."
+
+      ::= { ibmHprNclEntry 20 }
+
+ibmHprNclRtpRecvMedFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority frames received from a
+          local RTP connection."
+
+
+      ::= { ibmHprNclEntry 21 }
+
+ibmHprNclRtpRecvLoFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority frames received from a local
+          RTP connection."
+
+      ::= { ibmHprNclEntry 22 }
+
+ibmHprNclRtpRecvNetBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority bytes received from a
+          local RTP connection."
+
+      ::= { ibmHprNclEntry 23 }
+
+ibmHprNclRtpRecvHiBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority bytes received from a local
+          RTP connection."
+
+      ::= { ibmHprNclEntry 24 }
+
+ibmHprNclRtpRecvMedBytes  OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority bytes received from a
+          local RTP connection."
+
+      ::= { ibmHprNclEntry 25 }
+
+ibmHprNclRtpRecvLoBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority bytes received from a local
+          RTP connection."
+
+      ::= { ibmHprNclEntry 26 }
+
+
+ibmHprNclRtpRecvAnrErrors OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of frames containing ANR errors which were
+          received from a local RTP connection."
+
+      ::= { ibmHprNclEntry 27 }
+
+ibmHprNclRtpSendNetFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 28 }
+
+ibmHprNclRtpSendHiFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority frames sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 29 }
+
+ibmHprNclRtpSendMedFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority frames sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 30 }
+
+ibmHprNclRtpSendLoFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority frames sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 31 }
+
+ibmHprNclRtpSendNetBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority bytes sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 32 }
+
+ibmHprNclRtpSendHiBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority bytes sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 33 }
+
+ibmHprNclRtpSendMedBytes  OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority bytes sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 34 }
+
+ibmHprNclRtpSendLoBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority bytes sent to a local RTP
+          connection."
+
+      ::= { ibmHprNclEntry 35 }
+
+ibmHprNclInterSendNetFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority sent to another local
+          routing NCL."
+
+      ::= { ibmHprNclEntry 36 }
+
+ibmHprNclInterSendHiFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority frames sent to another local
+          routing NCL."
+
+      ::= { ibmHprNclEntry 37 }
+
+ibmHprNclInterSendMedFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority frames sent to another
+          local routing NCL."
+
+      ::= { ibmHprNclEntry 38 }
+
+ibmHprNclInterSendLoFrames OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority frames sent to another local
+          routing NCL."
+
+      ::= { ibmHprNclEntry 39 }
+
+ibmHprNclInterSendNetBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of network priority bytes sent to another
+          local routing NCL."
+
+      ::= { ibmHprNclEntry 40 }
+
+ibmHprNclInterSendHiBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of high priority bytes sent to another local
+          routing NCL."
+
+      ::= { ibmHprNclEntry 41 }
+
+ibmHprNclInterSendMedBytes  OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of medium priority bytes sent to another
+          local routing NCL."
+
+      ::= { ibmHprNclEntry 42 }
+
+ibmHprNclInterSendLoBytes OBJECT-TYPE
+      SYNTAX Counter
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "The total number of low priority bytes sent to another local
+          routing NCL."
+
+      ::= { ibmHprNclEntry 43 }
+
+-- ******************************************************************
+-- IBM HPR NCL conformance
+-- ******************************************************************
+
+ibmHprNclCompliances OBJECT IDENTIFIER ::= { ibmHprNcl 3 }
+ibmHprNclConfGroups OBJECT IDENTIFIER ::=  { ibmHprNcl 4 }
+
+-- ibmHprNclCompliance MODULE-COMPLIANCE
+--    STATUS mandatory
+--    DESCRIPTION
+--        "The compliance statement for the SNMPv2 entities that
+--        implement the IBM HPR NCL function."
+
+--    MODULE
+
+--    MANDATORY-GROUPS
+--           { ibmHprNclObjectsConfGroup }
+
+--    ::= { ibmHprNclCompliances 1 }
+
+-- ibmHprNclObjectsConfGroup OBJECT-GROUP
+--    OBJECTS {
+--             ibmHprNclGlobeCtrState,
+--             ibmHprNclGlobeCtrStateTime,
+--             ibmHprNclGlobeAssignAnrs,
+--             ibmHprNclDlcRecvNetFrames,
+--             ibmHprNclDlcRecvHiFrames,
+--             ibmHprNclDlcRecvMedFrames,
+--             ibmHprNclDlcRecvLoFrames,
+--             ibmHprNclDlcRecvNetBytes,
+--             ibmHprNclDlcRecvHiBytes,
+--             ibmHprNclDlcRecvMedBytes,
+--             ibmHprNclDlcRecvLoBytes,
+--             ibmHprNclDlcRecvAnrErrors,
+--             ibmHprNclDlcSendNetFrames,
+--             ibmHprNclDlcSendHiFrames,
+--             ibmHprNclDlcSendMedFrames,
+--             ibmHprNclDlcSendLoFrames,
+--             ibmHprNclDlcSendNetBytes,
+--             ibmHprNclDlcSendHiBytes,
+--             ibmHprNclDlcSendMedBytes,
+--             ibmHprNclDlcSendLoBytes,
+--             ibmHprNclRtpRecvNetFrames,
+--             ibmHprNclRtpRecvHiFrames,
+--             ibmHprNclRtpRecvMedFrames,
+--             ibmHprNclRtpRecvLoFrames,
+--             ibmHprNclRtpRecvNetBytes,
+--             ibmHprNclRtpRecvHiBytes,
+--             ibmHprNclRtpRecvMedBytes,
+--             ibmHprNclRtpRecvLoBytes,
+--             ibmHprNclRtpRecvAnrErrors,
+--             ibmHprNclRtpSendNetFrames,
+--             ibmHprNclRtpSendHiFrames,
+--             ibmHprNclRtpSendMedFrames,
+--             ibmHprNclRtpSendLoFrames,
+--             ibmHprNclRtpSendNetBytes,
+--             ibmHprNclRtpSendHiBytes,
+--             ibmHprNclRtpSendMedBytes,
+--             ibmHprNclRtpSendLoBytes,
+--             ibmHprNclInterSendNetFrames,
+--             ibmHprNclInterSendHiFrames,
+--             ibmHprNclInterSendMedFrames,
+--             ibmHprNclInterSendLoFrames,
+--             ibmHprNclInterSendNetBytes,
+--             ibmHprNclInterSendHiBytes,
+--             ibmHprNclInterSendMedBytes,
+--             ibmHprNclInterSendLoBytes
+--            }
+--    STATUS mandatory
+--    DESCRIPTION
+--        "All of the accessible objects in this module."
+
+--    ::= { ibmHprNclConfGroups 1 }
+
+END

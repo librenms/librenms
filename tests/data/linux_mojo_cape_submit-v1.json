@@ -1,0 +1,100 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "mojo_cape_submit",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": null,
+                    "deleted_at": null
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "mojo_cape_submit",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": "",
+                    "data": "{\"slugs\":[]}",
+                    "deleted_at": null
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "app_proto",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "app_protos",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "hash_changed",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "size_max",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "size_mean",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "size_median",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "size_min",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "size_mode",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "size_stddev",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "size_sum",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                },
+                {
+                    "metric": "sub_count",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "mojo_cape_submit"
+                }
+            ]
+        }
+    }
+}

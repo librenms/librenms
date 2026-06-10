@@ -1,0 +1,731 @@
+-- ===========================================================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Mdc MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+--  revision 1.0 2013-03-05 created by c08124
+--  revision 1.1 2014-03-12 Modified hh3cMDCAllocateGroupIndex
+--                          from (1..2147483647) to (-2147483648..2147483647)
+--                          by j08116
+--
+-- ============================================================================================================
+HH3C-MDC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    entPhysicalIndex
+        FROM ENTITY-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+hh3cMDC MODULE-IDENTITY
+    LAST-UPDATED "201303051448Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "This MIB contains objects to manage MDC (Multitenant Device Context) operations.
+
+        Such as:
+        1. Configure MDCs for a device and display MDCs and their status.
+        2. Assign CPU, storage space, and memory space resources to the MDC, and display their status.
+        3. Authorize the MDC to use the interface cards, and assign physical interfaces to an MDC.
+
+        Default MDC: A device supporting MDCs is an MDC itself, and it is called the default MDC.
+        From the default MDC, administrators can manage the entire physical device, create and delete non-default MDCs,
+        and assign interfaces, CPU resources, storage space, and memory space to non-default MDCs.
+
+        Non-default MDC: No MDCs can be created on a non-default MDC.
+        Administrators of non-default MDCs can only manage and maintain their respective MDCs.
+        A non-default MDC can use only the resources assigned to it."
+    REVISION "201303051448Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 136 }
+
+
+-- Scalar MIB objects, which are considered as global variables
+-- Global Level Configuration
+Hh3cMdcActionValue ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "start: start the MDC
+         stop: stop the MDC"
+    SYNTAX INTEGER
+        {
+            start(1),
+            stop(2)
+        }
+
+Hh3cMdcRunStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Status of the MDC:
+        inactive: The MDC is stopped or not started yet.
+        starting: The device is executing the mdc start command to start the MDC.
+        active: The MDC is operating properly.
+        stopping: The device is executing the undo mdc start command to stop the MDC.
+        updating: The device is executing the location command to authorize the MDC to use an interface card."
+    SYNTAX INTEGER
+        {
+            inactive(1),
+            starting(2),
+            active(3),
+            stopping(4),
+            updating(5)
+        }
+
+
+-- Node definitions
+
+hh3cMDCScalarObjects OBJECT IDENTIFIER ::= { hh3cMDC 1 }
+
+hh3cMDCMaxMDCNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The maximum number of MDCs which the system supported to create."
+    ::= { hh3cMDCScalarObjects 1 }
+
+
+hh3cMDCCurrentMDCNum OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current number of MDCs which the system has created."
+    ::= { hh3cMDCScalarObjects 2 }
+
+hh3cMDCTables OBJECT IDENTIFIER ::= { hh3cMDC 2 }
+
+-- The operation and information for MDC.
+hh3cMDCControl OBJECT IDENTIFIER ::= { hh3cMDCTables 1 }
+
+
+hh3cMDCControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMDCControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to configure MDCs for a device and show MDC's status."
+    ::= { hh3cMDCControl 1 }
+
+
+hh3cMDCControlEntry OBJECT-TYPE
+    SYNTAX Hh3cMDCControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cMDCControlTable, every entry is corresponding with an MDC."
+    INDEX { hh3cMDCIndex }
+    ::= { hh3cMDCControlTable 1 }
+
+
+Hh3cMDCControlEntry ::=
+    SEQUENCE
+        {
+            hh3cMDCIndex
+                Integer32,
+            hh3cMDCName
+                DisplayString,
+            hh3cMDCAction
+                Hh3cMdcActionValue,
+            hh3cMDCStatus
+                Hh3cMdcRunStatus,
+            hh3cMDCRowStatus
+                RowStatus
+        }
+
+hh3cMDCIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "MDC ID is used as MDCIndex, the value range of MDC ID depends on the device model.
+         MDCIndex cannot be modified after creation."
+    ::= { hh3cMDCControlEntry 1 }
+
+
+hh3cMDCName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..15))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Specifies the MDC name, a case-sensitive string of 1 to 15 characters.
+        The MDC name cannot be modified after creation."
+    ::= { hh3cMDCControlEntry 2 }
+
+
+hh3cMDCAction OBJECT-TYPE
+    SYNTAX Hh3cMdcActionValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "State of MDC action: start/stop.
+        After an MDC is started, administrators of the MDC can log in to
+        the MDC for MDC configuration and maintenance.
+        Stopping an MDC interrupts all services on the MDC and logs out
+        all users of the MDC.
+
+        Non-default MDC cannot operate."
+    DEFVAL { stop }
+    ::= { hh3cMDCControlEntry 3 }
+
+
+hh3cMDCStatus OBJECT-TYPE
+    SYNTAX Hh3cMdcRunStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Status of MDCs."
+    ::= { hh3cMDCControlEntry 4 }
+
+
+hh3cMDCRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The status of this table entry.
+        Only support active, createAndGo and destroy."
+    ::= { hh3cMDCControlEntry 5 }
+
+
+hh3cMDCResource OBJECT IDENTIFIER ::= { hh3cMDCTables 2 }
+
+
+hh3cMDCDISKResourceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMDCDISKResourceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is for disk resource management:
+        Specify a disk space percentage for an MDC and display the disk space usage.
+
+        Default: All MDCs share the disk space in the system,
+        and an MDC can use all free disk space in the system.
+
+        Non-default MDC can only query the disk space usage."
+    ::= { hh3cMDCResource 1 }
+
+
+hh3cMDCDISKResourceEntry OBJECT-TYPE
+    SYNTAX Hh3cMDCDISKResourceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cMDCDISKResourceTable, every entry is corresponding to
+        disk resource of an MDC.
+
+        Note that only entPhysicalIndex values that represent
+        physical boards (i.e., associated entPhysicalClass value is
+        'module(9)') are permitted to exist in this table."
+    INDEX { entPhysicalIndex, hh3cMDCIndex, hh3cMDCDISKResourceInstance }
+    ::= { hh3cMDCDISKResourceTable 1 }
+
+
+Hh3cMDCDISKResourceEntry ::=
+    SEQUENCE {
+        hh3cMDCDISKResourceInstance
+            Integer32,
+        hh3cMDCDISKResourceInstanceName
+            DisplayString,
+        hh3cMDCDISKResourceMinLimit
+            Integer32,
+        hh3cMDCDISKResourceMaxLimit
+            Integer32,
+        hh3cMDCDISKResourceReserve
+            Unsigned32,
+        hh3cMDCDISKResourceQuota
+            Unsigned32,
+        hh3cMDCDISKResourceUsage
+            Unsigned32,
+        hh3cMDCDISKResourceAvailable
+            Unsigned32
+     }
+
+hh3cMDCDISKResourceInstance OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Instance index of disk resource.
+         Different instances for disk: Flash, CF cards."
+    ::= { hh3cMDCDISKResourceEntry 1 }
+
+
+hh3cMDCDISKResourceInstanceName OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Instance name of disk resource.
+
+        Such as: Flash, CF cards."
+    ::= { hh3cMDCDISKResourceEntry 2 }
+
+
+hh3cMDCDISKResourceMinLimit OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Limit minimum (reserve resources, must be all 0)."
+    ::= { hh3cMDCDISKResourceEntry 3 }
+
+
+hh3cMDCDISKResourceMaxLimit OBJECT-TYPE
+    SYNTAX Integer32 (1..100)
+    UNITS       "percent"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Maximum of available resources of disk.
+        Make sure the disk space amount assigned to an MDC is
+        greater than the disk space amount the MDC is using.
+        Non-default MDC cannot set"
+    ::= { hh3cMDCDISKResourceEntry 4 }
+
+hh3cMDCDISKResourceReserve OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The reserve limit resources of disk."
+    ::= { hh3cMDCDISKResourceEntry 5 }
+
+hh3cMDCDISKResourceQuota OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total limit resources of disk according to hh3cMDCDiskResourceMaxLimit."
+    ::= { hh3cMDCDISKResourceEntry 6 }
+
+
+hh3cMDCDISKResourceUsage OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current usage of disk resources."
+    ::= { hh3cMDCDISKResourceEntry 7 }
+
+
+hh3cMDCDISKResourceAvailable OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current available resources of disk."
+    ::= { hh3cMDCDISKResourceEntry 8 }
+
+hh3cMDCMemoryResourceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMDCMemoryResourceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is for memory resource management:
+         Specify a memory space percentage for an MDC and display the memory space usage.
+         Default: All MDCs share the memory space in the system, and an MDC can use all free memory.
+
+         Non-default MDC can only query resource message of memory."
+    ::= { hh3cMDCResource 2 }
+
+
+hh3cMDCMemoryResourceEntry OBJECT-TYPE
+    SYNTAX Hh3cMDCMemoryResourceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cMDCMemoryResourceTable, every entry is corresponding
+        with memory resource of an MDC.
+
+        Note that only entPhysicalIndex values that represent
+        physical boards (i.e., associated entPhysicalClass value is
+        'module(9)') are permitted to exist in this table."
+    INDEX { entPhysicalIndex, hh3cMDCIndex }
+    ::= { hh3cMDCMemoryResourceTable 1 }
+
+
+Hh3cMDCMemoryResourceEntry ::=
+    SEQUENCE {
+        hh3cMDCMemoryResourceMinLimit
+            Integer32,
+        hh3cMDCMemoryResourceMaxLimit
+            Integer32,
+        hh3cMDCMemoryResourceReserve
+            Unsigned32,
+        hh3cMDCMemoryResourceQuota
+            Unsigned32,
+        hh3cMDCMemoryResourceUsage
+            Unsigned32,
+        hh3cMDCMemoryResourceAvailable
+            Unsigned32
+     }
+
+hh3cMDCMemoryResourceMinLimit OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    UNITS       "percent"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Limit minimum(reserve resources, must be all 0).
+
+        Non-default MDC cannot set."
+    ::= { hh3cMDCMemoryResourceEntry 1 }
+
+
+hh3cMDCMemoryResourceMaxLimit OBJECT-TYPE
+    SYNTAX Integer32 (1..100)
+    UNITS       "percent"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Maximum of available resources of memory,
+        it specifies the ratio of the memory space that an MDC can use.
+        Make sure this amount is sufficient for the MDC to operate properly.
+        Non-default MDC cannot set."
+    ::= { hh3cMDCMemoryResourceEntry 2 }
+
+hh3cMDCMemoryResourceReserve OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The reserve limit resources of memory."
+    ::= { hh3cMDCMemoryResourceEntry 3 }
+
+hh3cMDCMemoryResourceQuota OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total limit resources of memory."
+    ::= { hh3cMDCMemoryResourceEntry 4 }
+
+hh3cMDCMemoryResourceUsage OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current usage of memory resources."
+    ::= { hh3cMDCMemoryResourceEntry 5 }
+
+hh3cMDCMemoryResourceAvailable OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS       "KB"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Current available value of memory resources."
+    ::= { hh3cMDCMemoryResourceEntry 6 }
+
+hh3cMDCCPUResourceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMDCCPUResourceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is for CPU resource management:
+        Specify a CPU weight for an MDC and display the CPU usage.
+        The amount of CPU resources an MDC can use depends on the CPU weight
+        settings for all MDCs that share the same CPU.
+
+        Non-default MDC can only query CPU resources."
+    ::= { hh3cMDCResource 3 }
+
+
+hh3cMDCCPUResourceEntry OBJECT-TYPE
+    SYNTAX Hh3cMDCCPUResourceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cMDCCPUResourceTable, every entry is corresponding
+        with CPU resources of an MDC.
+
+        Note that only entPhysicalIndex values that represent
+        physical boards (i.e., associated entPhysicalClass value is
+        'module(9)') are permitted to exist in this table."
+    INDEX {entPhysicalIndex, hh3cMDCIndex }
+    ::= { hh3cMDCCPUResourceTable 1 }
+
+
+Hh3cMDCCPUResourceEntry ::=
+    SEQUENCE {
+        hh3cMDCCPUResourceLimit
+            Integer32,
+        hh3cMDCCPUResourceUsage
+            Integer32
+     }
+
+hh3cMDCCPUResourceLimit OBJECT-TYPE
+    SYNTAX Integer32 (1..10)
+    UNITS     "weight"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "CPU weight-maximum of available resources of CPU,
+        this number specifies a CPU weight for an MDC.
+        Non-default MDC cannot set."
+    ::= { hh3cMDCCPUResourceEntry 1 }
+
+
+hh3cMDCCPUResourceUsage OBJECT-TYPE
+    SYNTAX Integer32 (0..100)
+    UNITS    "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "the CPU usage"
+    ::= { hh3cMDCCPUResourceEntry 2 }
+
+
+-- The MDC location status.
+hh3cMDCLocation OBJECT IDENTIFIER ::= { hh3cMDCTables 3 }
+
+hh3cMDCLocationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMDCLocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is for location management:
+        Authorize an MDC to use an interface card and query state of location.
+        To assign physical interfaces to an MDC, administrators must authorize the MDC
+        to use the interface cards to which the physical interfaces belong.
+
+        Default: All interface cards of the device belong to the default MDC,
+        and a non-default MDC cannot use any interface card.
+        Non-default MDC can only query location state."
+    ::= { hh3cMDCLocation 1 }
+
+
+hh3cMDCLocationEntry OBJECT-TYPE
+    SYNTAX Hh3cMDCLocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cMDCLocationTable, every entry is the status
+        whether an MDC has been Authorized to use the interface cards.
+
+        Note that only entPhysicalIndex values that represent
+        physical boards (i.e., associated entPhysicalClass value is
+        'module(9)') are permitted to exist in this table."
+    INDEX { entPhysicalIndex, hh3cMDCIndex }
+    ::= { hh3cMDCLocationTable 1 }
+
+
+Hh3cMDCLocationEntry ::=
+    SEQUENCE {
+        hh3cMDCLocationStatus
+            TruthValue
+     }
+
+hh3cMDCLocationStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "To authorize the MDC to use the interface cards, set the value
+        of this object to 'true (1)'.  To cancel the authorization, set this
+        value to 'false (2)'.
+
+        Note that the return noError means the command is being executed.
+        For the execution result, check hh3cMDCLocationStatus."
+    ::= { hh3cMDCLocationEntry 1 }
+
+
+-- The interfaces allocate information.
+hh3cMDCAllocate OBJECT IDENTIFIER ::= { hh3cMDCTables 4 }
+
+hh3cMDCGroupIfTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMDCGroupIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table indication of relation between interfaces and groups,
+        which helps to realize the allocation, together with hh3cMDCAllocateTable.
+
+        Non-default MDC cannot operate."
+    ::= { hh3cMDCAllocate 1 }
+
+
+hh3cMDCGroupIfEntry OBJECT-TYPE
+    SYNTAX Hh3cMDCGroupIfEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cMDCGroupIfTable, every entry is the relationship
+        between interfaces and groups.
+
+        Due to hardware restrictions, the interfaces on some interface cards are grouped.
+        The interfaces in a group must be assigned to the same MDC at the same time or
+        removed from an MDC at the same time. Interface grouping depends on the device model.
+
+        This table is used for hh3cMDCAllocateTable to show interfae group lists.
+
+        Note that only entPhysicalIndex values that represent
+        physical ports (i.e., associated entPhysicalClass value is
+        'port(10)') are permitted to exist in this table."
+    INDEX { entPhysicalIndex }
+    ::= { hh3cMDCGroupIfTable 1 }
+
+
+Hh3cMDCGroupIfEntry ::=
+    SEQUENCE {
+        hh3cMDCGroupIdentity
+            Integer32
+     }
+
+hh3cMDCGroupIdentity OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The interface group ID. There are two parts for this id
+         depicted as follows:
+
+         31                  7                  0
+         +++++++++++++++++++++++++++++++++++++++++
+         +   entity index    +    group index    +
+         +   ( bit 8..31 )       ( bit 0..7 )    +
+         +++++++++++++++++++++++++++++++++++++++++
+
+         From bit0 to bit7 (one byte), it is interfaces group index.
+
+         From bit8 to bit31 (three bytes), it is the physical index
+         the same as the entPhysicalIndex specified in ENTITY-MIB.
+         Note that only entPhysicalIndex values that represent
+         physical boards (i.e., associated entPhysicalClass value is
+         'module(9)') are permitted to exist in this table."
+    ::= { hh3cMDCGroupIfEntry 2 }
+
+hh3cMDCAllocateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMDCAllocateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table is used to assigning a physical interface to an MDC.
+        It is allowed that allocate interfaces to a non-default MDC from the default MDC,
+        and allocate interfaces back to the default MDC from a non-default MDC.
+
+        All physical interfaces on the device belong to the default MDC,
+        and a non-default MDC has no physical interfaces to use.
+        Multiple physical interfaces can be assigned to a non-default MDC.
+        A physical interface must meet the following conditions to be assigned to a non-default MDC:
+        1. Belongs to the default MDC.
+        2. Not the console or AUX port.
+        3. Not the management Ethernet interface.
+        4. Not in an interface group with an interface assigned to another MDC.
+        5. The default MDC uses only the physical interfaces that are not assigned to a non-default MDC.
+
+        Non-default MDC cannot set this table."
+    ::= { hh3cMDCAllocate 2 }
+
+
+hh3cMDCAllocateEntry OBJECT-TYPE
+    SYNTAX Hh3cMDCAllocateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry of the hh3cMDCAllocateTable, every entry is the status
+        whether physical interfaces have been assigned to an MDC."
+    INDEX { hh3cMDCAllocateGroupIndex }
+    ::= { hh3cMDCAllocateTable 1 }
+
+
+Hh3cMDCAllocateEntry ::=
+    SEQUENCE {
+        hh3cMDCAllocateGroupIndex
+            Integer32,
+        hh3cMDCAllocateGroupDescription
+            DisplayString,
+        hh3cMDCAllocateMDCId
+            Integer32
+     }
+
+hh3cMDCAllocateGroupIndex OBJECT-TYPE
+    SYNTAX Integer32 (-2147483648..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The interface group ID, the same as hh3cMDCGroupIdentity.
+         There are two parts for this id.
+
+         depicted as follows:
+         31                  7                  0
+         +++++++++++++++++++++++++++++++++++++++++
+         +   entity index    +    group index    +
+         +   ( bit 8..31 )       ( bit 0..7 )    +
+         +++++++++++++++++++++++++++++++++++++++++
+
+         From bit0 to bit7 (one byte), it is interfaces group index.
+
+         From bit8 to bit31 (three bytes), it is the physical index
+         the same as the entPhysicalIndex specified in ENTITY-MIB.
+         Note that only entPhysicalIndex values that represent
+         physical boards (i.e., associated entPhysicalClass value is
+         'module(9)') are permitted to exist in this table."
+    ::= { hh3cMDCAllocateEntry 1 }
+
+hh3cMDCAllocateGroupDescription OBJECT-TYPE
+    SYNTAX DisplayString (SIZE (1..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Interfaces list
+        Such as:
+        GigabitEthernet4/5/0/1 to GigabitEthernet4/5/0/24,
+        GigabitEthernet4/5/0/48"
+    ::= { hh3cMDCAllocateEntry 2 }
+
+
+hh3cMDCAllocateMDCId OBJECT-TYPE
+    SYNTAX Integer32 (1..2147483647)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "MDC ID is used as hh3cMDCAllocateMDCId.
+        Default MDC: It is allowed that allocate interfaces to non-default MDC from
+        the default MDC, and allocate interfaces back to the default MDC from
+        a non-default MDC.
+        Non-default MDC cannot set allocation, can only query grouping of own MDC."
+    ::= { hh3cMDCAllocateEntry 3 }
+
+
+hh3cMDCNotification OBJECT IDENTIFIER ::= { hh3cMDC 3 }
+
+hh3cMDCNotificationObjects OBJECT IDENTIFIER ::= { hh3cMDCNotification 0 }
+
+hh3cMDCStateChangeToActive NOTIFICATION-TYPE
+    OBJECTS {hh3cMDCIndex, hh3cMDCName}
+    STATUS current
+    DESCRIPTION
+        "The hh3cMDCStateChangeToActive trap indicates that the MDC status has changed to active."
+    ::= { hh3cMDCNotificationObjects 1 }
+
+hh3cMDCStateChangeToInactive NOTIFICATION-TYPE
+    OBJECTS {hh3cMDCIndex, hh3cMDCName}
+    STATUS current
+    DESCRIPTION
+        "The hh3cMDCStateChangeToInactive trap indicates that the MDC status has changed to inactive."
+    ::= { hh3cMDCNotificationObjects 2 }
+
+END

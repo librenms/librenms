@@ -1,0 +1,3075 @@
+
+
+--
+-- Juniper Enterprise Specifics MIB
+-- 
+-- Copyright (c) 2010-2012, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+--
+
+JNX-PPP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, IpAddress, TimeTicks, Unsigned32   
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue, RowStatus
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex, InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    Ipv6AddressIfIdentifier
+        FROM IPV6-TC
+    jnxPppMibRoot
+        FROM JUNIPER-SMI ;                                  
+
+
+jnxPppMIB  MODULE-IDENTITY
+    LAST-UPDATED "201309190942Z"  -- 19-Sept-13 03:12 PM EST
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+        "       Juniper Networks, Inc.
+        Postal: 10 Technology Park Drive
+                Westford, MA  01886-3146
+                USA
+        Tel:    +1 978 589 5800
+        Email:  mib@Juniper.net"
+    DESCRIPTION
+        "The Point-to-Point Protocol (PPP) MIB for the Juniper enterprise."
+    -- Revision History
+
+    REVISION    "201309190000Z"  -- 19-Sept-13 03:12 PM EST - JUNOS 13.1 
+    DESCRIPTION 
+        "Updated the revision history and LAST-UPDATED field." 
+
+    REVISION    "201306130000Z"  -- 13-Jun-13 05:32 AM EST - JUNOS 13.1
+    DESCRIPTION
+        "Deprecated InterfaceIndex type and added InterfaceIndexOrZero type
+         for jnxPppNextIfIndex, jnxPppMlPppNextLinkIfIndex and
+         jnxPppMlPppNextNetworkIfIndex."
+     
+      REVISION    "201206080000Z"  -- 08-Jun-12 03:12 PM EST  - JUNOS 12.1 
+      DESCRIPTION 
+        "Changes are done to change all Data packet/octet counters from 
+         32 to 64 bit counter. 32 bit counters were too small for data 
+         packets/octects and were consumed too early. All old counters are 
+         deprecated and new counters are added." 
+
+    REVISION    "201111290000Z"  -- 29-Nov-11 03:12 PM EST  - JUNOS 11.4
+    DESCRIPTION
+        "Deprecated Integer32 type jnxPppLinkStatusLocalMagicNumber, 
+         jnxPppLinkStatusRemoteMagicNumber and added Unsigned32 type
+         jnxPppLinkStatusLocalMagicNumber1, jnxPppLinkStatusLocalMagicNumber1
+         under jnxPppLinkStatusTable"
+    
+    REVISION    "201007220942Z"  -- 22-Jul-10 03:12 PM EST  - JUNOS 11.0
+    DESCRIPTION
+        "Initial version."
+    ::= { jnxPppMibRoot 1 }
+
+
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Textual conventions
+-- +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+JnxPppAuthentication ::= TEXTUAL-CONVENTION
+    STATUS      deprecated
+    DESCRIPTION
+        "Specifies the type(s) of PPP authentication used, if any:
+          none      No authentication is negotiated.
+          pap       PAP negotiation only.
+          chap      CHAP negotiation only.
+          papChap   PAP negotiation is attempted first; if fails, attempt CHAP.
+          chapPap   CHAP negotiation is attempted first; if fails, attempt PAP."
+    SYNTAX      INTEGER {
+                    none (0),
+                    pap (1),
+                    chap (2),
+                    papChap (3),
+                    chapPap (4) }
+
+--+++++++++
+
+JnxPppMlPppBundleName ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "MLPPP Bundle name.  The bundle name is a characteristic of a MLPPP
+        network interface."
+    SYNTAX OCTET STRING (SIZE(1..60))
+
+
+--+++++
+
+JnxPppAuthentication2 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type(s) of PPP authentication used, if any:
+          none      No authentication is negotiated.
+          pap       PAP negotiation.
+          chap      CHAP negotiation.
+          eap       EAP negotiation." 
+
+    SYNTAX      INTEGER {
+                    none (0),
+                    pap (1),
+                    chap (2),
+                    eap (3) }
+
+
+JnxNibbleConfig ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A configuration variable comprised of nibbles i.e. 4 bits, such that 
+         a client can supply a list of 0 to 8 selections.  The least 
+         significant nibble is the first value of the list, and the most 
+         significant nibble is the last value.  The value in each field 
+         ranges from 0 to 15, however the first nibble with value 0 indicates
+         the end of the list.  Repetition of values is not allowed. 
+         Segregation of values in not allowed.
+
+         Example valid encoding:
+         0x00000321
+         0x00083E12
+
+         Not a valid encoding:
+         0x00000121 will return an error
+         0x01002001 will return an error."
+    SYNTAX INTEGER
+
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+-- Managed objects
+-- ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+jnxPPPObjects        OBJECT IDENTIFIER ::= { jnxPppMIB 1 }
+
+--
+-- This MIB contains managed objects for PPP interfaces. Management objects are
+-- provided to query for an available interface index, and to create/delete 
+-- interfaces of this type. Creating/deleting this interface type using this 
+-- MIB has the side effect of creating/deleting corresponding entries in the
+-- Interface MIB ifTable/ifXTable, and in the Jnxper Enterprise Interface MIB
+-- jnxIfTable. 
+--This MIB acts as a supplement to IETF MIBs RFC1471 PPP-LCP-MIB .
+
+-- MIB object definitions are organized into the following
+-- Functional sections:
+--
+jnxPppLcp 	                OBJECT IDENTIFIER   ::= { jnxPPPObjects 1 }
+jnxPppSec            	        OBJECT IDENTIFIER   ::= { jnxPPPObjects 2 }     
+jnxPppIp                        OBJECT IDENTIFIER   ::= { jnxPPPObjects 3 }
+jnxPppOsi                       OBJECT IDENTIFIER   ::= { jnxPPPObjects 4 }
+jnxPppSession                   OBJECT IDENTIFIER   ::= { jnxPPPObjects 5 }
+jnxPppMlPpp                     OBJECT IDENTIFIER   ::= { jnxPPPObjects 6 }
+jnxPppSummary                   OBJECT IDENTIFIER   ::= { jnxPPPObjects 7 }
+jnxPppIpv6                      OBJECT IDENTIFIER   ::= { jnxPPPObjects 8 }
+jnxPppGlobalConfig              OBJECT IDENTIFIER   ::= { jnxPPPObjects 9 }
+
+
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- PPP LCP
+-- This section defines objects used to manage the PPP Link / LCP layer of PPP.
+-- The jnxPppLinkStatusTable complements RFC1471 pppLinkStatusTable, providing 
+--status indications regarding the operation of network protocols over each
+-- link. The addition/removal of a network protocol service is accomplished 
+-- outside this MIB. The jnxPppLinkConfigTable complements RFC1471 
+-- providing the ability to create/delete instances of PPP links and providing 
+-- for configuration of option parameter values (if any) not found in the 
+-- standard MIB, to be used during LCP negotiation.
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- The PPP Link Status Table
+--
+jnxPppLinkStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppLinkStatusEntry
+    MAX-ACCESS                        not-accessible
+    STATUS                                   current
+    DESCRIPTION
+        "This table contains entries for PPP interfaces present in the system."
+    ::= { jnxPppLcp 1 }
+
+jnxPppLinkStatusEntry OBJECT-TYPE
+    SYNTAX                                JnxPppLinkStatusEntry
+    MAX-ACCESS                      not-accessible
+    STATUS                                 current
+    DESCRIPTION
+        "Each entry describes the characteristics of a PPP interface."
+    INDEX     { ifIndex }
+    ::= { jnxPppLinkStatusTable 1 }
+
+JnxPppLinkStatusEntry ::= SEQUENCE {
+    jnxPppLinkStatusTerminateReason               INTEGER,
+    jnxPppLinkStatusTerminateNegFailOption        INTEGER,
+    jnxPppLinkStatusInKeepaliveRequests           Counter32,                  
+    jnxPppLinkStatusOutKeepaliveRequests          Counter32,
+    jnxPppLinkStatusInKeepaliveReplies            Counter32,
+    jnxPppLinkStatusOutKeepaliveReplies           Counter32,
+    jnxPppLinkStatusKeepaliveFailures             Counter32,
+    jnxPppLinkStatusLocalMagicNumber              Integer32,
+    jnxPppLinkStatusRemoteMagicNumber             Integer32,
+    jnxPppLinkStatusLocalAuthentication           JnxPppAuthentication2,
+    jnxPppLinkStatusTunnelIfIndex                 InterfaceIndexOrZero,
+    jnxPppLinkStatuslcpRenegoTerminates           Counter32,
+    jnxPppLinkStatusLocalMagicNumber1             Unsigned32,
+    jnxPppLinkStatusRemoteMagicNumber1            Unsigned32}
+
+jnxPppLinkStatusTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    adminDisable(2),
+                    lowerLayerDown(3),
+                    noUpperInterface(4),
+                    authenticationFailure(5),
+                    peerTerminated(6),
+                    peerRenegotiated(7),
+                    maxRetriesExceeded(8),
+                    negotiationFailure(9),
+                    keepaliveFailure(10),
+                    sessionTimeout(11),
+                    inactivityTimeout(12),
+                    addressLeaseExpired(13),
+                    adminLogout(14),
+                    tunnelFailed(15),
+                    tunnelDisconnected(16),
+                    loopback(17) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the PPP link was terminated:
+            none                    None.
+            other                   Not specified.
+            adminDisable            Interface administratively disabled.
+            lowerLayerDown          Underlying interface is down.
+            noUpperInterface        No interface above PPP.
+            authenticationFailure   Authentication failed.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate LCP option.                    
+            keepaliveFailure        Keepalive failed.
+            sessionTimeout          Maximum session period expired.
+            inactivityTimeout       Maximum inactivity period expired.
+            addressLeaseExpired     Lease for network address expired.
+            adminLogout             Session administratively terminated.
+            tunnelFailed            Associated tunnel failed.
+            tunnelDisconnected      Associated tunnel disconnected.
+            loopback                Loopback detected."
+    ::= { jnxPppLinkStatusEntry 1 }
+
+jnxPppLinkStatusTerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localMru(2),
+                    remoteMru(3),
+                    localMagicNumber(4),
+                    remoteMagicNumber(5),
+                    localAuthentication(6),
+                    localToRemoteProtocolCompression(7),
+                    localToRemoteACCompression(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP LCP option for which negotiation failed, 
+        when jnxPppLinkStatusTerminateReason has the value negotiationFailure."
+    ::= { jnxPppLinkStatusEntry 2 }
+
+jnxPppLinkStatusInKeepaliveRequests OBJECT-TYPE
+    SYNTAX            Counter32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Number of keepalive requests received."
+    ::= { jnxPppLinkStatusEntry 3 }
+
+jnxPppLinkStatusOutKeepaliveRequests OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of keepalive requests transmitted."
+    ::= { jnxPppLinkStatusEntry 4 }
+
+jnxPppLinkStatusInKeepaliveReplies OBJECT-TYPE
+    SYNTAX            Counter32
+    MAX-ACCESS   read-only
+    STATUS             current
+    DESCRIPTION
+        "Number of keepalive replies received."
+    ::= { jnxPppLinkStatusEntry 5 }
+
+jnxPppLinkStatusOutKeepaliveReplies OBJECT-TYPE
+    SYNTAX            Counter32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Number of keepalive replies transmitted."
+    ::= { jnxPppLinkStatusEntry 6 }
+
+jnxPppLinkStatusKeepaliveFailures OBJECT-TYPE
+    SYNTAX            Counter32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Number of keepalive failures detected."
+    ::= { jnxPppLinkStatusEntry 7 }
+
+jnxPppLinkStatusLocalMagicNumber OBJECT-TYPE
+    SYNTAX            Integer32
+    MAX-ACCESS         read-only
+    STATUS             deprecated
+    DESCRIPTION
+        "Magic number negotiated for the local side.
+         This has been deprecated and replaced by 
+         jnxPppLinkStatusLocalMagicNumber1"
+    ::= { jnxPppLinkStatusEntry 8 }
+
+jnxPppLinkStatusRemoteMagicNumber OBJECT-TYPE
+    SYNTAX            Integer32
+    MAX-ACCESS         read-only
+    STATUS             deprecated
+    DESCRIPTION
+        "Magic number negotiated for the remote side.
+         This has been deprecated and replaced by
+         jnxPppLinkStatusRemoteMagicNumber1"
+    ::= { jnxPppLinkStatusEntry 9 }
+
+jnxPppLinkStatusLocalAuthentication OBJECT-TYPE
+    SYNTAX            JnxPppAuthentication2
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Authentication protocol negotiated for the local side."
+    ::= { jnxPppLinkStatusEntry 10 }
+
+jnxPppLinkStatusTunnelIfIndex OBJECT-TYPE
+    SYNTAX            InterfaceIndexOrZero
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The ifIndex of an associated interface pertaining to a tunneling 
+        protocol, or zero if no such interface exists.The type of tunneling
+        interface can be identified from information in the entries in 
+        ifTable and jnxIfTable for this tunnel interface."
+    ::= { jnxPppLinkStatusEntry 11 }
+
+jnxPppLinkStatuslcpRenegoTerminates OBJECT-TYPE
+    SYNTAX            Counter32
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "Number of times lcp terminated due to peer exceeding max renegotiation 
+         attempts."
+    ::= { jnxPppLinkStatusEntry 12 }
+
+
+jnxPppLinkStatusLocalMagicNumber1 OBJECT-TYPE
+    SYNTAX             Unsigned32
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "Magic number negotiated for the local side."
+    ::= { jnxPppLinkStatusEntry 13 }
+
+jnxPppLinkStatusRemoteMagicNumber1 OBJECT-TYPE
+    SYNTAX             Unsigned32
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "Magic number negotiated for the remote side."
+    ::= { jnxPppLinkStatusEntry 14 }
+
+--
+-- The PPP Link Configuration Table
+--
+jnxPppLinkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppLinkConfigEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table contains entries for PPP interfaces present in the system."
+    ::= { jnxPppLcp 2 }
+
+jnxPppLinkConfigEntry OBJECT-TYPE
+    SYNTAX             JnxPppLinkConfigEntry
+    MAX-ACCESS         not-accessible
+    STATUS             current
+    DESCRIPTION
+        "Each entry describes the characteristics of a PPP interface.
+        Creating or deleting entries in this table causes corresponding entries 
+        for be created or deleted in ifTable,ifXTable,jnxIfTable."
+   INDEX     { jnxPppLinkConfigIfIndex }
+    ::= { jnxPppLinkConfigTable 1 }
+
+JnxPppLinkConfigEntry ::= SEQUENCE {
+    jnxPppLinkConfigIfIndex                             InterfaceIndex,
+    jnxPppLinkConfigRowStatus                           RowStatus,
+    jnxPppLinkConfigLowerIfIndex                        InterfaceIndexOrZero,
+    jnxPppLinkConfigKeepalive                           Integer32,
+    jnxPppLinkConfigAuthentication                      JnxPppAuthentication,
+    jnxPppLinkConfigMaxAuthenRetries                    Integer32,
+    jnxPppLinkConfigStandardIfIndex                     InterfaceIndex,
+    jnxPppLinkConfigChapMinChallengeLength              Integer32,
+    jnxPppLinkConfigChapMaxChallengeLength              Integer32,
+    jnxPppLinkConfigPassiveMode                         INTEGER,
+    jnxPppLinkConfigAuthenticatorLogicalSystem          OCTET STRING,
+    jnxPppLinkConfigAuthenticatorRoutingInstance        OCTET STRING,
+    jnxPppLinkConfigAaaProfile                          OCTET STRING,
+    jnxPppLinkConfigAuthentication2                     JnxNibbleConfig,
+    jnxPppLinkConfigIgnoreMagicNumberMismatch           INTEGER,
+    jnxPppLinkConfigMaxLcpRenegotiation                 Integer32}
+
+jnxPppLinkConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the PPP interface.  When creating entries in this
+         table, suitable values for this object are determined by reading 
+         jnxPppNextIfIndex."
+    ::= { jnxPppLinkConfigEntry 1 }
+
+jnxPppLinkConfigRowStatus OBJECT-TYPE
+    SYNTAX            RowStatus
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+       "Controls creation or deletion of entries in this table with READ-CREATE
+        maximum access according to the RowStatus textual convention,
+        constrained to support the following values only:
+            createAndGo
+            destroy
+        To create an entry in this table, the following entry objects MUST be
+         explicitly configured:
+            jnxPppLinkConfigRowStatus
+            jnxPppLinkConfigLowerIfIndex
+
+        In addition, when creating an entry the following conditions must hold:
+            A value for jnxPppLinkConfigIndex must have been determined 
+            previously, by reading jnxPppNextIfIndex.The interface identified 
+            by jnxPppLinkConfigLowerIfIndex must exist. A corresponding entry  
+           in Table or ifXTable or jnxIfTable is created or destroyed as a 
+             result of creating or destroying an entry in this table.
+
+         The following values can be read from this object:
+             active(1)"
+    ::= { jnxPppLinkConfigEntry 2 }
+
+jnxPppLinkConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX            InterfaceIndexOrZero
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+       "The ifIndex of an interface over which this PPP interface is to be 
+       layered.A value of zero indicates no layering.  An implementation may
+      choose to require that a non-zero value be configured at entry creation."
+    ::= { jnxPppLinkConfigEntry 3 }
+
+jnxPppLinkConfigKeepalive OBJECT-TYPE
+    SYNTAX             Integer32 (0..64800)
+    UNITS               "seconds"
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "Keepalive interval in seconds.  A value of zero disables keepalive. 
+        Keepalive is performed using LCP Echo."
+    DEFVAL    { 30 }
+    ::= { jnxPppLinkConfigEntry 4 }
+
+jnxPppLinkConfigAuthentication OBJECT-TYPE
+    SYNTAX      JnxPppAuthentication
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Specifies the type(s) of authentication, if any, to be negotiated
+         with the peer:
+          none      No authentication is negotiated.
+          pap       PAP negotiation only.
+          chap      CHAP negotiation only.
+          papChap   PAP negotiation is attempted first; if fails, attempt CHAP.
+          chapPap   CHAP negotiation is attempted first; if fails, attempt PAP.
+
+        If authentication negotiation is not supported for this PPP interface, 
+        then any attempt to explicitely set this object if READ-CREATE maximum
+        access is supported will result in a notWritable error and it will be
+        implicitily set to the DEFVAL on row creation. Setting this object to
+        none(0) will set jnxPppLinkConfigAuthenticatorRouting Instance object
+        to an empty string.
+ This object returns a null(0) value on the get operation. New object 
+ jnxPppLinkConfigAuthentication2 will reflect the configured values. Setting
+ this object along with the jnxPppLinkConfigAuthentication2 object will return  
+ an inconsistentValue error."
+    DEFVAL    { none }
+    ::= { jnxPppLinkConfigEntry 5 }
+
+jnxPppLinkConfigMaxAuthenRetries OBJECT-TYPE
+    SYNTAX            Integer32 (0..7)
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "The number of authentication retries permitted, in addition to a
+         failed initial attempt.  If all retries fail, the link is reset. 
+         If authentication negotiation is not supported for this PPP interface,
+         then any attempt to explicitely set this object  if READ-CREATE 
+         maximum access is supported will result in a notWritable error and
+         it will be implicitily set to the DEFVAL on row creation."
+    DEFVAL    { 0 }
+    ::= { jnxPppLinkConfigEntry 6 }
+
+jnxPppLinkConfigStandardIfIndex OBJECT-TYPE
+    SYNTAX            InterfaceIndex
+    MAX-ACCESS        read-only
+    STATUS            current
+    DESCRIPTION
+        "The ifIndex value for this interface in the standard PPP MIBs. 
+         The ifIndex value for PPP interfaces is not the same for both 
+         proprietary and standard MIB tables pertaining to PPP interface.
+        Therefore this value is provide to simply cross referencing 
+        standard PPP and proprietary PPP MIB information."
+    ::= { jnxPppLinkConfigEntry 7 }
+
+jnxPppLinkConfigChapMinChallengeLength OBJECT-TYPE
+    SYNTAX            Integer32 (8..63)
+    MAX-ACCESS        read-only
+    STATUS             current
+    DESCRIPTION
+        "Minimum value of the CHAP authenticator challenge length value.
+         This value is never greater than
+         jnxPppLinkConfigChapMaxChallengeLength."
+    DEFVAL    { 16 }
+    ::= { jnxPppLinkConfigEntry 8 }
+
+jnxPppLinkConfigChapMaxChallengeLength OBJECT-TYPE
+    SYNTAX            Integer32 (8..63)
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "Maximum value of the CHAP authenticator challenge length value. 
+        This value is never less than  jnxPppLinkConfigChapMinChallengeLength."
+    DEFVAL    { 32 }
+    ::= { jnxPppLinkConfigEntry 9 }
+
+jnxPppLinkConfigPassiveMode OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS        read-only
+    STATUS             current
+    DESCRIPTION
+    "When enabled, LCP state machine is forced into passive mode on lower layer
+         UP message.  It adds compatibility with slow and buggy clients."
+    DEFVAL    { disable }
+    ::= { jnxPppLinkConfigEntry 10 }
+
+jnxPppLinkConfigAuthenticatorLogicalSystem OBJECT-TYPE
+    SYNTAX            OCTET STRING
+    MAX-ACCESS        read-only
+    STATUS             current
+    DESCRIPTION
+        "The name of the logical system to  be used for authentication on the
+         PPP interface.With READ-CREATE maximum access , setting this object 
+         statically binds the authenticating logical system with the PPP
+         interface.  If this object is not explicitly set or it is set to null
+         string, then this object is ignored and the virtual router used for
+         authentication is determined by other means. 
+         On a Set operation, if the value of this object is not null and does 
+         not correspond to an existing virtual router, then an
+         inconsistentValue error is returned. Setting this object to a non-null
+        string returns inconsistentValue error if jnxPppLinkConfigAuthentication
+        object is none(0) or not configured."
+    ::= { jnxPppLinkConfigEntry 11 }
+
+jnxPppLinkConfigAuthenticatorRoutingInstance OBJECT-TYPE
+    SYNTAX             OCTET STRING
+    MAX-ACCESS         read-only
+    STATUS             current
+    DESCRIPTION
+        "The name of the routing instancebe used for authentication on the 
+        PPP interface. With READ-CREATE maximum access, setting this object 
+        statically binds the authenticating routing instance with the PPP 
+        interface.If this object is not explicitly set or it is set to null
+        string, then this object is ignored and the virtual router used for
+        authentication is determined by other means.  On a Set operation,
+        if the value of this object is not null and does not correspond to
+       an existing virtual router, then an inconsistentValue error is returned.
+       Setting this object to a non-null string returns inconsistentValue error
+       if jnxPppLinkConfigAuthentication object is
+          none(0) or not configured."
+    ::= { jnxPppLinkConfigEntry 12 }
+
+
+jnxPppLinkConfigAaaProfile OBJECT-TYPE
+    SYNTAX            OCTET STRING
+    MAX-ACCESS        read-only
+    STATUS             current
+    DESCRIPTION
+        "The name of the AAA profile to be used for authentication on the
+         PPP interface. With READ-CREATE maximum access, setting this 
+         object statically binds the AAA profile with the PPP interface.
+         If this object is not explicitly set or it is set to null string, 
+         then this object is ignored.  On a Set operation, if the value of 
+         this object is not null and does not correspond to an existing
+         AAA profile, then an inconsistentValue error is returned."
+    ::= { jnxPppLinkConfigEntry 13 }
+
+jnxPppLinkConfigAuthentication2 OBJECT-TYPE
+    SYNTAX         JnxNibbleConfig
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "A configuration variable comprised of nibbles i.e. 4 bits, such
+         that a client can supply a list of 0 to 8 selections.  The least
+          significant nibble is the first value of the list, and the most
+          significant nibble is the last value.  The value in each field 
+          ranges from 0 to 15, however the first nibble with value 0 
+          indicates the end of the list.  Repetition of values is not allowed.
+          Segregation
+           of values is not allowed.
+
+         Valid Values are:
+         none - 0
+         pap  - 1
+         chap - 2
+         eap  - 3
+
+         Example valid encoding:
+         0x00000321
+         0x00000012
+
+         Not a valid encoding:
+         0x00000121
+         0x01002001
+
+         If authentication negotiation is not supported for this PPP interface
+        and with READ-CREATE maximum access ,any attempt to explicitly set this
+         object will result in a notWritable error and it will be implicitly 
+        set to the DEFVAL on row creation. Setting this object to null will set
+        jnxPppLinkConfigAuthenticatorRoutingInstance object to an empty string.
+        Setting this object along with the jnxPppLinkConfigAuthentication object
+         will return an inconsistentValue error."
+    DEFVAL    { 0 }
+    ::= { jnxPppLinkConfigEntry 14 }
+    
+jnxPppLinkConfigIgnoreMagicNumberMismatch OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION
+        "The ignore magic number mismatch option of the PPP interface determines
+         the action to be taken, when the peer has not negotiated any value yet 
+         sent null or invalid magic number in the LCP echo packets.
+         The two actions
+         that can be configured are:
+            1)	Ignore the mismatch and retain connection
+            2)	Disallow the mismatch and terminate connection"
+    DEFVAL    { disable }
+    ::= { jnxPppLinkConfigEntry 15 }
+
+jnxPppLinkConfigMaxLcpRenegotiation OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowed lcp renegotiation attempts from peer."
+    DEFVAL    { 30 }
+    ::= { jnxPppLinkConfigEntry 16 }
+
+
+--
+-- IfIndex selection for creating new PPP interfaces in jnxPppLinkConfigTable.
+--
+-- NOTE: This object is placed after jnxPppLinkConfigTable so
+-- that jnxPppLinkStatusTable and jnxPppLinkConfigTable have the
+-- same relative MIB node positions below the jnxPppLcp node
+-- (jnxPppLcp.1 and jnxPppLcp.2, respectively) as their counterpart
+-- Status and Config tables in RFC1471.
+--
+jnxPppNextIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in the 
+       jnxPppLinkConfigTable. A GET of this object returns the next available
+       ifIndex value to be used to create an entry in the associated interface
+       table; or zero, if no valid ifIndex value is available.This object
+       also returns a value of zero when it is the lexicographic successor
+       of a varbind presented in an SNMP GETNEXT or GETBULK request, for which
+       circumstance it is assumed that ifIndex allocation is unintended.
+       Successive GETs will typically return different values, thus avoiding
+       collisions among cooperating management clients seeking to create table
+       entries simultaneously."
+    ::= { jnxPppLcp 3 }
+
+
+
+
+-- ////////////////////////////////////////////////////////////////////////////
+-- PPP Security
+-- This section defines objects used to manage the PPP Security
+-- functionality of PPP.
+-- ////////////////////////////////////////////////////////////////////////////
+-- No objects are currently defined.
+-- ////////////////////////////////////////////////////////////////////////////
+-- PPP IP NCP
+-- This section defines objects used to manage the PPP Network Control Protocol
+-- for IP protocol operation (IPCP).
+-- /////////////////////////////////////////////////////////////////////////////
+-- The PPP IP Table
+jnxPppIpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppIpEntry
+    MAX-ACCESS   not-accessible
+    STATUS             current
+    DESCRIPTION
+        "Table containing the IP parameters for the local PPP entity."
+    ::= { jnxPppIp 1 }
+
+jnxPppIpEntry OBJECT-TYPE
+    SYNTAX      JnxPppIpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPCP status information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { jnxPppIpTable 1 }
+
+JnxPppIpEntry ::= SEQUENCE {
+    jnxPppIpServiceStatus                      INTEGER,
+    jnxPppIpTerminateReason                    INTEGER,
+    jnxPppIpTerminateNegFailOption             INTEGER,
+    jnxPppIpLocalIpAddress                     IpAddress,
+    jnxPppIpRemoteIpAddress                    IpAddress,
+    jnxPppIpRemotePrimaryDnsAddress            IpAddress,
+    jnxPppIpRemoteSecondaryDnsAddress          IpAddress,
+    jnxPppIpRemotePrimaryWinsAddress           IpAddress,
+    jnxPppIpRemoteSecondaryWinsAddress         IpAddress,
+    jnxPppIpNetworkStatusIpcpRenegoTerminates  Counter32}
+
+jnxPppIpServiceStatus OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether IP protocol service is operating over this PPP link.
+         Service is established on this link through means outside this MIB."
+    ::= { jnxPppIpEntry 1 }
+
+jnxPppIpTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    noService(2),
+                    admin(3),
+                    linkDown(4),
+                    peerTerminated(5),
+                    peerRenegotiated(6),
+                    maxRetriesExceeded(7),
+                    negotiationFailure(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the IPCP link was terminated:
+            none                    None.
+            other                   Not specified.
+            noService               No IP service configured on this PPP link.
+            admin                   Administratively disabled.
+            linkDown                Underlying link is down.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate IPCP option.  See                                
+             jnxPppIpTerminateNegFailOption."
+    ::= { jnxPppIpEntry 2 }
+
+jnxPppIpTerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localIpAddress(2),
+                    remoteIpAddress(3),
+                    remotePrimaryDnsAddress(4),
+                    remoteSecondaryDnsAddress(5),
+                    remotePrimaryWinsAddress(6),
+                    remoteSecondaryWinsAddress(7),
+                    localIpAddressMask(8),
+                    remoteIpAddressMask(9) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP IPCP option for which negotiation failed, when 
+        jnxPppIpTerminateReason has the value 'negotiationFailure'."
+    ::= { jnxPppIpEntry 3 }
+
+jnxPppIpLocalIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address used by the local side."
+    ::= { jnxPppIpEntry 4 }
+
+jnxPppIpRemoteIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address used by the remote side."
+    ::= { jnxPppIpEntry 5 }
+
+jnxPppIpRemotePrimaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary DNS server used by the remote side."
+    ::= { jnxPppIpEntry 6 }
+
+jnxPppIpRemoteSecondaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Secondary DNS server used by the remote side."
+    ::= { jnxPppIpEntry 7 }
+
+jnxPppIpRemotePrimaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary WINS server used by the remote side."
+    ::= { jnxPppIpEntry 8 }
+
+jnxPppIpRemoteSecondaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Secondary WINS server used by the remote side."
+    ::= { jnxPppIpEntry 9 }
+
+jnxPppIpNetworkStatusIpcpRenegoTerminates OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times ipcp terminated due to peer exceeding max 
+        renegotiation attempts."
+    ::= { jnxPppIpEntry 10 }
+
+--
+-- The PPP IP Config Table
+--
+jnxPppIpConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppIpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the IP parameters for the local PPP entity."
+    ::= { jnxPppIp 2 }
+
+jnxPppIpConfigEntry OBJECT-TYPE
+    SYNTAX      JnxPppIpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPCP configuration information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { jnxPppIpConfigTable 1 }
+
+JnxPppIpConfigEntry ::= SEQUENCE {
+    jnxPppIpConfigPeerDnsPriority      INTEGER,
+    jnxPppIpConfigPeerWinsPriority     INTEGER,
+    jnxPppIpConfigIpcpNetmask          INTEGER,
+    jnxPppIpConfigInitiateIp           INTEGER,
+    jnxPppIpConfigMaxIpcpRenegotiation Integer32,
+    jnxPppIpConfigPromptIpcpDnsOption  INTEGER,
+    jnxPppIpConfigIpcpLockout          INTEGER}
+
+jnxPppIpConfigPeerDnsPriority OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows peer's DNS address to prevail in the event of a 
+        negotiation conflict; when disabled, the local PPP interface's DNS 
+        address prevails."
+    ::= { jnxPppIpConfigEntry 1 }
+
+jnxPppIpConfigPeerWinsPriority OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When enabled, allows peer's WINS address to prevail in the event of a 
+        negotiation conflict; when disabled, the local PPP interface's WINS
+         address prevails."
+    ::= { jnxPppIpConfigEntry 2 }
+
+jnxPppIpConfigIpcpNetmask OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables the negotiation of the IPCP option netmask (0x90) during 
+        IPCP negotiation."
+    DEFVAL    { disable }
+    ::= { jnxPppIpConfigEntry 3 }
+
+jnxPppIpConfigInitiateIp OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables the initiation of negotiation of the IPCP."
+    DEFVAL    { disable }
+    ::= { jnxPppIpConfigEntry 4 }
+
+jnxPppIpConfigMaxIpcpRenegotiation OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowed ipcp renegotiation attempts from peer."
+    DEFVAL    { 30 }
+    ::= { jnxPppIpConfigEntry 5 }
+
+jnxPppIpConfigPromptIpcpDnsOption OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Control prompting of IPCP DNS option to remote peer."
+    DEFVAL    { disable }
+    ::= { jnxPppIpConfigEntry 6 }
+
+jnxPppIpConfigIpcpLockout OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables IPCP lockout. It determines whether this NCP can be negotiated
+         when the interface is already running a different NCP. On enabling 
+         this option, the IPCP negotiation will be blocked after a different 
+         NCP service is up and waited for 10 seconds for IPCP initiation 
+         from peer."
+    DEFVAL    { disable }
+    ::= { jnxPppIpConfigEntry 7 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- PPP OSI NCP
+-- This section defines objects used to manage the PPP Network Control Protocol
+-- for OSI protocol operation (OSICP). The IETF does not define a standard MIB
+-- for managing an OSI NCP. For consistency, this MIB follows the model of 
+--- RFC1473 for IP NCP: 
+-- A status table reports the condition of the NCP state machine, and the outcome 
+--of option parameter negotiation (if any) when the OperStatus object has the
+-- value 'opened(1)'; a configuration table provides administrative control over
+-- the NCP state machine, and permits configuration of proposed option parameter
+-- values (if any) to be used during NCP negotiation.
+-- /////////////////////////////////////////////////////////////////////////////
+-- PPP OSI Status Table
+--
+jnxPppOsiTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppOsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the OSI parameters for the local PPP entity."
+    ::= { jnxPppOsi 1 }
+
+jnxPppOsiEntry OBJECT-TYPE
+    SYNTAX      JnxPppOsiEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "OSICP status information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { jnxPppOsiTable 1 }
+
+JnxPppOsiEntry ::= SEQUENCE {
+    jnxPppOsiServiceStatus          INTEGER,
+    jnxPppOsiOperStatus             INTEGER,
+    jnxPppOsiTerminateReason        INTEGER,
+    jnxPppOsiTerminateNegFailOption INTEGER,
+    jnxPppOsiLocalAlignNpdu         INTEGER,
+    jnxPppOsiRemoteAlignNpdu        INTEGER }
+
+jnxPppOsiServiceStatus OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether OSI protocol service is operating over this PPP link.
+         Service is established on this link through means outside this MIB."
+    ::= { jnxPppOsiEntry 1 }
+
+jnxPppOsiOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    opened(1),
+                    notOpened(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of the OSI network protocol.  If the value of
+         this object is up then the finite state machine for the OSI network
+          protocol has reached the Opened state."
+    ::= { jnxPppOsiEntry 2 }
+
+jnxPppOsiTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    noService(2),
+                    admin(3),
+                    linkDown(4),
+                    peerTerminated(5),
+                    peerRenegotiated(6),
+                    maxRetriesExceeded(7),
+                    negotiationFailure(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the OSICP link was terminated:
+            none                    None.
+            other                   Not specified.
+            noService               No OSI service configured on this PPP link.
+            admin                   Administratively disabled.
+            linkDown                Underlying link is down.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate IPCP option.  See
+                                    jnxPppOsiTerminateNegFailOption."
+    ::= { jnxPppOsiEntry 3 }
+
+jnxPppOsiTerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localAlignNpdu(2),
+                    remoteAlignNpdu(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP OSICP option for which negotiation failed, when 
+        jnxPppOsiTerminateReason has the value 'negotiationFailure'."
+    ::= { jnxPppOsiEntry 4 }
+
+jnxPppOsiLocalAlignNpdu OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    oneModulo4(1),
+                    twoModulo4(2),
+                    threeModulo4(3),
+                    fourModulo4(4),
+                    even(254),
+                    odd(255) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local alignment of network PDU:
+            none            No alignment specified.
+            oneModulo4      Alignment on first octet (out of four).
+            twoModulo4      Alignment on second octet (out of four).
+            threeModulo4    Alignment on third octet (out of four).
+            fourModulo4     Alignment on fourth octet (out of four).
+            even            Alignment on even-octet boundary.
+            odd             Alignment on odd-octet boundary."
+    ::= { jnxPppOsiEntry 5 }
+
+jnxPppOsiRemoteAlignNpdu OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    oneModulo4(1),
+                    twoModulo4(2),
+                    threeModulo4(3),
+                    fourModulo4(4),
+                    even(254),
+                    odd(255) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote alignment of network PDU.
+            none            No alignment specified.
+            oneModulo4      Alignment on first octet (out of four).
+            twoModulo4      Alignment on second octet (out of four).
+            threeModulo4    Alignment on third octet (out of four).
+            fourModulo4     Alignment on fourth octet (out of four).
+            even            Alignment on even-octet boundary.
+            odd             Alignment on odd-octet boundary."
+    ::= { jnxPppOsiEntry 6 }
+
+--
+-- The PPP OSI Configuration Table
+--
+jnxPppOsiConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppOsiConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing configuration variables for the OSICP for the 
+        local PPP entity."
+    ::= { jnxPppOsi 2 }
+
+jnxPppOsiConfigEntry   OBJECT-TYPE
+    SYNTAX      JnxPppOsiConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "OSICP information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { jnxPppOsiConfigTable 1 }
+
+JnxPppOsiConfigEntry ::= SEQUENCE {
+    jnxPppOsiConfigAdminStatus  INTEGER }
+
+jnxPppOsiConfigAdminStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    open(1),
+                    close(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The immediate desired status of the OSI network protocol. 
+         Setting this object to open will inject an administrative open event
+          into the OSI network protocol's finite state machine.  Setting this
+           object to close will inject an administrative close event into the
+            OSI network protocol's finite state machine."
+    ::= { jnxPppOsiConfigEntry 1 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- PPP Session
+-- This section defines objects used to manage the PPP sessions.
+-- The jnxPppSessionTable provides status of each PPP session.
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- The PPP Session Table
+--
+jnxPppSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for PPP interfaces present in the system."
+    ::= { jnxPppSession 1 }
+
+jnxPppSessionEntry OBJECT-TYPE
+    SYNTAX      JnxPppSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a PPP interface."
+    INDEX     { ifIndex }
+    ::= { jnxPppSessionTable 1 }
+
+JnxPppSessionEntry ::= SEQUENCE {
+    jnxPppSessionGrant                         TruthValue,
+    jnxPppSessionTerminateReason               INTEGER,
+    jnxPppSessionStartTime                     TimeTicks,
+    jnxPppSessionInOctets                      Counter32,
+    jnxPppSessionOutOctets                     Counter32,
+    jnxPppSessionInPackets                     Counter32,
+    jnxPppSessionOutPackets                    Counter32,
+    jnxPppSessionSessionTimeout                Integer32,
+    jnxPppSessionInactivityTimeout             Integer32,
+    jnxPppSessionAccountingInterval            Integer32,
+    jnxPppSessionRemoteIpAddress               IpAddress,
+    jnxPppSessionRemotePrimaryDnsAddress       IpAddress,
+    jnxPppSessionRemoteSecondaryDnsAddress     IpAddress,
+    jnxPppSessionRemotePrimaryWinsAddress      IpAddress,
+    jnxPppSessionRemoteSecondaryWinsAddress    IpAddress,
+    jnxPppSessionRemoteIpv6AddressIfIdentifier Ipv6AddressIfIdentifier,
+    jnxPppSessionInhibitIp                     INTEGER,
+    jnxPppSessionInhibitIpv6                   INTEGER,
+    jnxPppSessionInOctets64                    Counter64,
+    jnxPppSessionOutOctets64                   Counter64,
+    jnxPppSessionInPackets64                   Counter64,
+    jnxPppSessionOutPackets64                  Counter64}
+
+jnxPppSessionGrant OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a session has been granted via the authentication
+        mechanism."
+    ::= { jnxPppSessionEntry 1 }
+
+jnxPppSessionTerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    unknown(1),
+                    userRequest(2),
+                    keepaliveFailure(3),
+                    sessionTimeout(4),
+                    inactivityTimeout(5),
+                    adminDisable(6),
+                    lowerLayerDown(7),
+                    noUpperInterface(8),
+                    deny(9),
+                    noHardware(10),
+                    noResources(11),
+                    noInterface(12),
+                    challengeTimeout(13),
+                    requestTimeout(14),
+                    authenticatorTimeout(15),
+                    addressLeaseExpired(16),
+                    adminLogout(17),
+                    tunnelFailed(18) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason the session was terminated."
+    ::= { jnxPppSessionEntry 2 }
+
+jnxPppSessionStartTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime when this session last became active."
+    ::= { jnxPppSessionEntry 3 }
+
+jnxPppSessionInOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      deprecated 
+    DESCRIPTION
+        "Number of octets received since this session last became active, as 
+        denoted by jnxPppSessionStartTime. This has been deprecated and 
+        replaced by jnxPppSessionInOctets64"
+    ::= { jnxPppSessionEntry 4 }
+
+jnxPppSessionOutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of octets sent since this session last became active, as 
+        denoted by jnxPppSessionStartTime. This has been deprecated and
+        replaced by jnxPppSessionOutOctets64"
+    ::= { jnxPppSessionEntry 5 }
+
+jnxPppSessionInPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of packets received since this session last became active, as
+         denoted by jnxPppSessionStartTime. This has been deprecated and
+         replaced by jnxPppSessionInPackets64"
+    ::= { jnxPppSessionEntry 6 }
+
+jnxPppSessionOutPackets OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Number of packets sent since this session last became active, as 
+        denoted by jnxPppSessionStartTime. This has been deprecated and
+        replaced by jnxPppSessionOutPackets64"
+    ::= { jnxPppSessionEntry 7 }
+
+jnxPppSessionSessionTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum duration for the session, after which the session terminates
+         automatically."
+    ::= { jnxPppSessionEntry 8 }
+
+jnxPppSessionInactivityTimeout OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum inactivity duration for the session, after which the session
+         terminates automatically."
+    ::= { jnxPppSessionEntry 9 }
+
+jnxPppSessionAccountingInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Interval that must elapse between generation of accounting records
+         for this session."
+    ::= { jnxPppSessionEntry 10 }
+
+jnxPppSessionRemoteIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote IP address, obtained from the authentication service, to be 
+        used during IPCP negotiation with the remote side."
+    ::= { jnxPppSessionEntry 11 }
+
+jnxPppSessionRemotePrimaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote primary DNS IP address, obtained from the authentication 
+        service, to be used during IPCP negotiation with the remote side."
+    ::= { jnxPppSessionEntry 12 }
+
+jnxPppSessionRemoteSecondaryDnsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote secondary DNS IP address, obtained from the authentication 
+        service, to be used during IPCP negotiation with the remote side."
+    ::= { jnxPppSessionEntry 13 }
+
+jnxPppSessionRemotePrimaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote primary WINS IP address, obtained from the authentication
+         service, to be used during IPCP negotiation with the remote side."
+    ::= { jnxPppSessionEntry 14 }
+
+jnxPppSessionRemoteSecondaryWinsAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote secondary WINS IP address, obtained from the authentication
+         service, to be used during IPCP negotiation with the remote side."
+    ::= { jnxPppSessionEntry 15 }
+
+jnxPppSessionRemoteIpv6AddressIfIdentifier OBJECT-TYPE
+    SYNTAX      Ipv6AddressIfIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPV6 Address Interface Identifier obtained from the authentication
+         service, to be used during IPCP negotiation with the remote side."
+    ::= { jnxPppSessionEntry 16 }
+
+jnxPppSessionInhibitIp OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a session has had its IP service inhibited by the
+         authentication mechanism."
+    ::= { jnxPppSessionEntry 17 }
+
+jnxPppSessionInhibitIpv6 OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether a session has had its IPv6 service inhibited by the
+         authentication mechanism."
+    ::= { jnxPppSessionEntry 18 }
+
+jnxPppSessionInOctets64 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received since this session last became active, as 
+        denoted by jnxPppSessionStartTime."
+    ::= { jnxPppSessionEntry 19 }
+
+jnxPppSessionOutOctets64 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets sent since this session last became active, as 
+        denoted by jnxPppSessionStartTime."
+    ::= { jnxPppSessionEntry 20 }
+
+jnxPppSessionInPackets64 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received since this session last became active, as
+         denoted by jnxPppSessionStartTime."
+    ::= { jnxPppSessionEntry 21 }
+
+jnxPppSessionOutPackets64 OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets sent since this session last became active, as 
+        denoted by jnxPppSessionStartTime."
+    ::= { jnxPppSessionEntry 22 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- Multi-Link PPP  (MLPPP)
+-- This section defines objects used to manage the MLPPP.
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- The MLPPP BundleTable
+--
+jnxPppMlPppBundleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppMlPppBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP bundles present in the system."
+    ::= { jnxPppMlPpp 1 }
+
+jnxPppMlPppBundleEntry OBJECT-TYPE
+    SYNTAX      JnxPppMlPppBundleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of a MLPPP bundle."
+    INDEX     { jnxPppMlPppBundleName }
+    ::= { jnxPppMlPppBundleTable 1 }
+
+JnxPppMlPppBundleEntry ::= SEQUENCE {
+    jnxPppMlPppBundleName           JnxPppMlPppBundleName,
+    jnxPppMlPppBundleRowStatus      RowStatus,
+    jnxPppMlPppBundleNetworkIfIndex InterfaceIndex }
+
+jnxPppMlPppBundleName OBJECT-TYPE
+    SYNTAX      JnxPppMlPppBundleName
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The administrative name of the MLPPP bundle associated with this
+         MLPPP network interface."
+    ::= { jnxPppMlPppBundleEntry 1 }
+
+jnxPppMlPppBundleRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rowStatus for this entry.  The following sets are supported 
+        with read-create maximum access:
+             createAndGo(4),
+             destroy(6)
+
+         The following values can be read from this object:
+             active(1) "
+    ::= { jnxPppMlPppBundleEntry 2 }
+
+jnxPppMlPppBundleNetworkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of this MLPPP network interface.  It is a valid ifIndex
+         even if there is no corresponding network interface instance in 
+         the jnxPppMlPppLinkConfigTable."
+    ::= { jnxPppMlPppBundleEntry 3 }
+
+--
+-- IfIndex selection for creating new MLPPP Link interfaces in
+-- jnxPppLinkConfigTable.
+--
+-- NOTE: This object is placed after jnxPppLinkConfigTable so that jnxPppLinkStatusTable and jnxPppLinkConfigTable have the same relative MIB node positions below the jnxPppLcp node (jnxPppLcp.1 and jnxPppLcp.2, respectively) as their counterpart Status and Config tables in RFC1471.
+
+jnxPppMlPppNextLinkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in 
+        jnxPppMlPppLinkConfigTable. A GET of this object returns the next 
+        available ifIndex value to be used to create an entry in the 
+        associated interface table; or zero, if no valid ifIndex value is
+        available.  This object also returns a value of zero when it is the
+        lexicographic successor of a varbind presented in an SNMP GETNEXT 
+        or GETBULK request, for which circumstance it is assumed that ifIndex
+        allocation is unintended. Successive GETs will typically return 
+        different values, thus avoiding collisions among cooperating management
+        clients seeking to create table entries simultaneously."
+    ::= { jnxPppMlPpp 2 }
+
+--
+-- The MLPPP Link Configuration Table
+--
+jnxPppMlPppLinkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppMlPppLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP interfaces present in the system."
+    ::= { jnxPppMlPpp 3 }
+
+jnxPppMlPppLinkConfigEntry OBJECT-TYPE
+    SYNTAX      JnxPppMlPppLinkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of MLPPP interface. 
+        With read-create maximum access,creating/deleting entries in this
+        table causes corresponding entries for be created/deleted in
+       ifTable/ifXTable/jnxIfTable."
+    INDEX     { jnxPppMlPppLinkConfigIfIndex }
+    ::= { jnxPppMlPppLinkConfigTable 1 }
+
+JnxPppMlPppLinkConfigEntry ::= SEQUENCE {
+    jnxPppMlPppLinkConfigIfIndex                      InterfaceIndex,
+    jnxPppMlPppLinkConfigLowerIfIndex                 InterfaceIndexOrZero,
+    jnxPppMlPppLinkConfigKeepalive                    Integer32,
+    jnxPppMlPppLinkConfigAuthentication               JnxPppAuthentication,
+    jnxPppMlPppLinkConfigMaxAuthenRetries             Integer32,
+    jnxPppMlPppLinkConfigRowStatus                    RowStatus,
+    jnxPppMlPppLinkConfigAaaProfile                   OCTET STRING,
+    jnxPppMlPppLinkConfigChapMinChallengeLength       Integer32,
+    jnxPppMlPppLinkConfigChapMaxChallengeLength       Integer32,
+    jnxPppMlPppLinkConfigPassiveMode                  INTEGER,
+    jnxPppMlPppLinkConfigAuthenticatorLogicalSystem   OCTET STRING,
+    jnxPppMlPppLinkConfigAuthenticatorRoutingInstance OCTET STRING,
+    jnxPppMlPppLinkConfigFragmentation                INTEGER,
+    jnxPppMlPppLinkConfigReassembly                   INTEGER,
+    jnxPppMlPppLinkConfigMaxReceiveReconstructedUnit  Integer32,
+    jnxPppMlPppLinkConfigFragmentSize                 Integer32,
+    jnxPppMlPppLinkConfigHashLinkSelection            INTEGER,
+    jnxPppMlPppLinkConfigAuthentication2              JnxNibbleConfig,
+    jnxPppMlPppLinkConfigIgnoreMagicNumberMismatch    INTEGER,
+    jnxPppMlPppLinkConfigMultilinkMulticlass          INTEGER,
+    jnxPppMlPppLinkConfigMultilinkMaxMultiClasses     INTEGER}
+
+jnxPppMlPppLinkConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP interface.  When creating entries in this 
+        table, suitable values for this object are determined by reading 
+        jnxPppMlPppNextLinkIfIndex."
+    ::= { jnxPppMlPppLinkConfigEntry 1 }
+
+jnxPppMlPppLinkConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of an interface over which this PPP interface is to be 
+        layered.  A value of zero indicates no layering.  An implementation 
+        may choose to require that a non-zero value be configured at entry
+         creation."
+    ::= { jnxPppMlPppLinkConfigEntry 2 }
+
+jnxPppMlPppLinkConfigKeepalive OBJECT-TYPE
+    SYNTAX      Integer32 (0|10..64800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Keepalive interval in seconds.  A value of zero disables keepalive.
+         Keepalive is performed using LCP Echo."
+    DEFVAL    { 30 }
+    ::= { jnxPppMlPppLinkConfigEntry 4 }
+
+jnxPppMlPppLinkConfigAuthentication OBJECT-TYPE
+    SYNTAX      JnxPppAuthentication
+    MAX-ACCESS  read-only
+    STATUS      deprecated
+    DESCRIPTION
+        "Specifies the type(s) of authentication, if any, to be 
+        negotiated with the peer:
+          none      No authentication is negotiated.
+          pap       PAP negotiation only.
+          chap      CHAP negotiation only.
+          papChap   PAP negotiation is attempted first; if fails, attempt CHAP.
+          chapPap   CHAP negotiation is attempted first; if fails, attempt PAP.
+
+       If authentication negotiation is not supported for this MLPPP interface,
+       then any attempt to explicitely set this object will result in a 
+       notWritable error and it will be implicitily set to the DEFVAL on
+       row creation. 
+       This object returns a none (0) value on the get operation.
+       New object jnxPppMlPppLinkConfigAuthentication2 will reflect the configured 
+       values. Setting this object along with the jnxPppMlPppLinkConfigAuthentication2
+        object will return an inconsistentValue error."
+    DEFVAL    { none }
+    ::= { jnxPppMlPppLinkConfigEntry 5 }
+
+jnxPppMlPppLinkConfigMaxAuthenRetries OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of authentication retries permitted, in addition to a
+         failed initial attempt.  If all retries fail, the link is reset."
+    DEFVAL    { 0 }
+    ::= { jnxPppMlPppLinkConfigEntry 6 }
+
+jnxPppMlPppLinkConfigRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with read-carete 
+        maximum access,according to the RowStatus textual convention, 
+        constrained to support the following values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST be 
+        explicitly configured:
+            jnxPppMlPppLinkConfigRowStatus
+            jnxPppMlPppLinkConfigLowerIfIndex
+        In addition, when creating an entry the following conditions must hold:
+            A value for jnxPppMlPppLinkConfigIndex must have been
+             determined previously, by reading jnxPppMlPppNextIfIndex. 
+             The interface identified by jnxPppMlPppLinkConfigLowerIfIndex
+             must exist.
+            A corresponding entry in ifTable/ifXTable/jnxIfTable is 
+            created/destroyed as a result of creating/destroying an entry in 
+            this table.
+
+        The following values can be read from this object:
+             active(1) "
+    ::= { jnxPppMlPppLinkConfigEntry 7 }
+
+jnxPppMlPppLinkConfigAaaProfile OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the AAA profile to be used for authentication on the 
+        PPP interface.Setting this object statically binds the AAA profile
+        with the PPP interface. If this object is not explicitly set or it
+        is set to null string, then this object is ignored. On a Set operation,
+        if the value of this object is not null and does not correspond to an
+         existin AAA profile, then an inconsistentValue error is returned."
+    ::= { jnxPppMlPppLinkConfigEntry 8 }
+
+jnxPppMlPppLinkConfigChapMinChallengeLength OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Minimum value of the CHAP authenticator challenge length value.
+       This value is never allowed to be set to a value greater than 
+       jnxPppMlPppLinkConfigChapMaxChallengeLength."
+    DEFVAL    { 16 }
+    ::= { jnxPppMlPppLinkConfigEntry 9 }
+
+jnxPppMlPppLinkConfigChapMaxChallengeLength OBJECT-TYPE
+    SYNTAX      Integer32 (8..63)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum value of the CHAP authenticator challenge length value."
+    DEFVAL    { 32 }
+    ::= { jnxPppMlPppLinkConfigEntry 10 }
+
+jnxPppMlPppLinkConfigPassiveMode OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When enabled, LCP state machine is forced into passive mode on lower 
+        layer UP message.  It adds compatibility with slow and buggy clients."
+    DEFVAL    { disable }
+    ::= { jnxPppMlPppLinkConfigEntry 11 }
+
+jnxPppMlPppLinkConfigAuthenticatorLogicalSystem OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Logical System (Jnxper-ROUTER-MIB.jnxRouterName) to 
+        be used for authentication on the PPP interface.  Setting this object
+         statically binds the authenticating virtual router with the link interface.
+         With read-create maximum access, if this object is not explicitly set or 
+         it is set to null string, then this object is ignored and the
+          virtual router used for     authentication is determined by other means.
+            On a Set operation, if the value of this object is not null and does not
+             correspond to an existing virtual router, then an inconsistentValue
+              error is returned."
+    ::= { jnxPppMlPppLinkConfigEntry 12 }
+
+ jnxPppMlPppLinkConfigAuthenticatorRoutingInstance OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the Routing Instance (Jnxper-ROUTER-MIB.jnxRouterName) 
+        to be used for authentication on the PPP interface.  Setting this 
+        object statically binds the authenticating virtual router with the 
+        link interface. With read-create maximum access, if this object is
+         not explicitly set or it is set to null string, then this object is
+          ignored and the virtual router used for     authentication is
+           determined by other means.  On a Set operation, if the value of
+            this object is not null and does not correspond to an existing
+             virtual router, then an inconsistentValue error is returned."
+    ::= { jnxPppMlPppLinkConfigEntry 13 }
+
+jnxPppMlPppLinkConfigFragmentation OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP fragmentation.With read-create maximum access,
+        changing this object has an effect when the link is next restarted."
+    DEFVAL    { disable }
+    ::= { jnxPppMlPppLinkConfigEntry 14 }
+
+jnxPppMlPppLinkConfigReassembly OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP reassembly. With read-create maximum access,
+         changing this object has an effect when the link is next restarted."
+    DEFVAL    { disable }
+    ::= { jnxPppMlPppLinkConfigEntry 15 }
+
+jnxPppMlPppLinkConfigMaxReceiveReconstructedUnit OBJECT-TYPE
+    SYNTAX      Integer32 (1|64..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Maximum Receive Reconstructed Unit (MRRU) that the local 
+        PPP entity will advertise to the remote entity.  If the value of
+        this variable is 1, then the MRRU is set to the local MRU value. 
+        With read-create maximum access, changing this object has an effect
+        when the link is next restarted."
+    DEFVAL    { 1 }
+    ::= { jnxPppMlPppLinkConfigEntry 16 }
+
+jnxPppMlPppLinkConfigFragmentSize OBJECT-TYPE
+    SYNTAX      Integer32 (1|128..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The size of fragments transmitted by the local PPP entity.
+        If the value of this variable is 1, then the fragment size is set to 
+        the link's MTU value. With read-create maximum access, 
+        changing this object has an effect when the link is next restarted."
+    DEFVAL    { 1 }
+    ::= { jnxPppMlPppLinkConfigEntry 17 }
+
+jnxPppMlPppLinkConfigHashLinkSelection OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables MLPPP hash-based link selection for non-best-effort traffic.
+        With read-create maximum access,changing this object has an effect
+         when the link is next restarted."
+    DEFVAL    { disable }
+    ::= { jnxPppMlPppLinkConfigEntry 18 }
+
+jnxPppMlPppLinkConfigAuthentication2 OBJECT-TYPE
+    SYNTAX      JnxNibbleConfig
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A configuration variable comprised of nibbles i.e. 4 bits, such 
+        that a client can supply a list of 0 to 8 selections.  The least
+         significant nibble is the first value of the list, and the most 
+         significant nibble is the last value.  The value in each field
+         ranges from 0 to 15, however the first nibble with value 0 indicates
+          the end of the list.  Repetition of values is not allowed. 
+          Segregation of values is not allowed.
+
+         Valid Values are:
+         none - 0
+         pap  - 1
+         chap - 2
+         eap  - 3
+
+         Example valid encoding:
+         0x00000321
+         0x00000012
+
+         Not a valid encoding:
+         0x00000121
+         0x01002001
+
+         If authentication negotiation is not supported for this PPP interface
+         and With read-create maximum access, then any attempt to explicitly 
+         set this object will result in a notWritable error and it will be 
+         implicitly set to the DEFVAL on row creation. Setting this object to 
+         null will set jnxPppMlPppLinkConfigAuthenticatorVirtualRouter object 
+         to an empty string.Setting this object along with the 
+         jnxPppMlPppLinkConfigAuthentication object will return an i
+         nconsistentValue error."
+    DEFVAL    { 0 }
+    ::= { jnxPppMlPppLinkConfigEntry 19 }
+    
+jnxPppMlPppLinkConfigIgnoreMagicNumberMismatch OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The ignore magic number mismatch option of the PPP interface determines
+         the action to be taken, when the peer has not negotiated any value yet
+          sent null or invalid magic number in the LCP echo packets. The two 
+          actions that can be configured are:
+            1)	Ignore the mismatch and retain connection
+            2)	Disallow the mismatch and terminate connection"
+    DEFVAL    { disable }
+    ::= { jnxPppMlPppLinkConfigEntry 20 }
+
+jnxPppMlPppLinkConfigMultilinkMulticlass OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables Multiclass Multilink PPP (MCML). With read-create maximum
+         access,changing this object has an effect when the link is next
+          restarted."
+    DEFVAL    {disable}
+    ::= { jnxPppMlPppLinkConfigEntry 21 }
+
+jnxPppMlPppLinkConfigMultilinkMaxMultiClasses OBJECT-TYPE
+    SYNTAX      INTEGER (0..8)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of MCML classes to be negotiated.With read-create
+         maximum access,changing this object has an effect when the link
+          is next restarted."
+    DEFVAL    {0}
+    ::= { jnxPppMlPppLinkConfigEntry 22 }
+
+jnxPppMlPppNextNetworkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Coordinate ifIndex value allocation for entries in
+        jnxPppMlPppNetworkConfigTable. A GET of this object returns the next
+        available ifIndex value to be used to create an entry in the associated
+        interface table; or zero, if no        valid ifIndex value is available.
+        This object also returns a value of zero when it is the lexicographic
+        successor of a varbind presented in an SNMP GETNEXT or GETBULK request,
+        for which circumstance it is assumed that ifIndex allocation 
+        is unintended. Successive GETs will typically return different values,
+         thus avoiding collisions among cooperating management clients seeking 
+         to create table entries simultaneously."
+    ::= { jnxPppMlPpp 4 }
+
+
+--
+-- The MLPPP Network Configuration Table
+--
+jnxPppMlPppNetworkConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppMlPppNetworkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP network interfaces 
+        present in the system."
+    ::= { jnxPppMlPpp 5 }
+
+jnxPppMlPppNetworkConfigEntry OBJECT-TYPE
+    SYNTAX      JnxPppMlPppNetworkConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the characteristics of MLPPP interface.
+         With read-create maximum access,creating/deleting entries in 
+         this table causes corresponding entries for be created/deleted 
+         in ifTable/ifXTable/jnxIfTable."
+    INDEX     { jnxPppMlPppNetworkConfigIfIndex }
+    ::= { jnxPppMlPppNetworkConfigTable 1 }
+
+JnxPppMlPppNetworkConfigEntry ::= SEQUENCE {
+    jnxPppMlPppNetworkConfigIfIndex         InterfaceIndex,
+    jnxPppMlPppNetworkConfigLowerIfIndex    InterfaceIndex,
+    jnxPppMlPppNetworkBundleName            JnxPppMlPppBundleName,
+    jnxPppMlPppNetworkRowStatus             RowStatus }
+
+jnxPppMlPppNetworkConfigIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP network interface.  When creating entries
+         in this table, suitable values for this object are determined by 
+         reading jnxPppMlPppNextNetworkIfIndex."
+    ::= { jnxPppMlPppNetworkConfigEntry 1 }
+
+jnxPppMlPppNetworkConfigLowerIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a PPP link interface over which this PPP network 
+        interface is to be layered.  On sets, the value of this object must 
+        equal on of the previously created PPP link interfaces created in 
+        the jnxPppMlPppLinkConfigTable.  On gets, the value of this object 
+        is the lexicographically least PPP link interface in a potential
+         bundle of PPP link interfaces."
+    ::= { jnxPppMlPppNetworkConfigEntry 2 }
+
+jnxPppMlPppNetworkBundleName OBJECT-TYPE
+    SYNTAX     JnxPppMlPppBundleName
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The MLPPP bundle name administratively assigned."
+    ::= { jnxPppMlPppNetworkConfigEntry 3 }
+
+jnxPppMlPppNetworkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with read-create
+         maximum access , according to the RowStatus textual convention,
+          constrained to support the following values only:
+            createAndGo
+            destroy
+        To create an entry in this table, the following entry objects MUST be 
+        explicitly configured:
+
+            jnxPppMlPppNetworkConfigLowerIfIndex
+            jnxPppMlPppNetworkBundleName
+            jnxPppMlPppNetworkConfigRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+           A value for jnxPppMlPppNetworkConfigIndex must have been determined
+            previously, by reading jnxPppMlPppNextNetworkIfIndex. The 
+            interface identified by jnxPppMlPppNetworkConfigLowerIfInde must 
+            exist by a creation request to the jnxPppMlPppLinkConfigTable.
+           The bundleName specified in jnxPppMlPppNetworkBundleName must have
+            been created first in the jnxPppMlPppBundleTable. A corresponding
+             entry in ifTable/ifXTable/jnxIfTable is created/destroyed as a 
+             result of creating/destroying an entry in this table.
+
+        The following values can be read from this object:
+             active(1) "
+    ::= { jnxPppMlPppNetworkConfigEntry 4 }
+
+
+--
+-- The MLPPP Link Bind Table
+--
+jnxPppMlPppLinkBindTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppMlPppLinkBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains entries for MLPPP Link interface to MLPPP 
+        network interfaces bindings."
+    ::= { jnxPppMlPpp 6 }
+
+jnxPppMlPppLinkBindEntry OBJECT-TYPE
+    SYNTAX      JnxPppMlPppLinkBindEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry describes the MLPPP link interface to MLPPP network 
+        interface bindings."
+    INDEX     { jnxPppMlPppBindNetworkIfIndex,
+                jnxPppMlPppBindLinkIfIndex }
+    ::= { jnxPppMlPppLinkBindTable 1 }
+
+JnxPppMlPppLinkBindEntry ::= SEQUENCE {
+    jnxPppMlPppBindNetworkIfIndex   InterfaceIndex,
+    jnxPppMlPppBindLinkIfIndex      InterfaceIndex,
+    jnxPppMlPppBindRowStatus        RowStatus }
+
+jnxPppMlPppBindNetworkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the MLPPP network interface."
+    ::= { jnxPppMlPppLinkBindEntry 1 }
+
+jnxPppMlPppBindLinkIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of a MLPPP link interface bound by the MLPPP network
+         interface defined by jnxPppMlPppBindNetworkIfIndex."
+    ::= { jnxPppMlPppLinkBindEntry 2 }
+
+jnxPppMlPppBindRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Controls creation/deletion of entries in this table with read-create
+         maximum access, according to the RowStatus textual convention, 
+         constrained to support the following values only:
+            createAndGo
+            destroy
+
+        To create an entry in this table, the following entry objects MUST
+        be explicitly configured:
+            jnxPppMlPppBindRowStatus
+
+        In addition, when creating an entry the following conditions must hold:
+        The interfaces identified by jnxPppMlPppBindNetworkIfIndex and 
+        jnxPppMlPppBindLinkIfIndex must be created in the 
+        jnxPppMlPppNetworkConfigTable and jnxPppMlPppLinkConfigTable 
+        respectively. A MLPPP bundle must be associated with the 
+        jnxPppMlPppNetworkIfIndex and exist in the jnxPppMibPppBundleTable. 
+        A corresponding entry in ifStackTable is created/destroyed as a result
+         of creating/destroying an entry in this table.
+
+        The following values can be read from this object:
+             active(1) "
+    ::= { jnxPppMlPppLinkBindEntry 3 }
+
+-- /////////////////////////////////////////////////////////////////////////////
+-- PPP Interface Summary Counts
+-- /////////////////////////////////////////////////////////////////////////////
+
+jnxPppSummaryPppInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces configured in the system."
+    ::= { jnxPppSummary 1 }
+
+jnxPppSummaryPppIpNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IP NCPs configured in the system."
+    ::= { jnxPppSummary 2 }
+
+jnxPppSummaryPppOsiNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs configured in the system."
+    ::= { jnxPppSummary 3 }
+
+jnxPppSummaryPppIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system that are
+         administratively configured to up(1)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { jnxPppSummary 4 }
+
+jnxPppSummaryPppIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system that are
+         administrateively configued to down(2)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { jnxPppSummary 5 }
+
+jnxPppSummaryPppIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an 
+        operational state of up(1)."
+    REFERENCE
+        "IF-MIB.ifOperstatus"
+    ::= { jnxPppSummary 7 }
+
+jnxPppSummaryPppIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an 
+        operational state of down(2)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 8 }
+
+jnxPppSummaryPppIfOperDormant OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an
+         operational state of dormant(5)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 9 }
+
+jnxPppSummaryPppIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an 
+        operational state of notPresent(6)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 10 }
+
+jnxPppSummaryPppIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP interfaces in the system with an 
+        operational state of lowerLayerDown(7)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 11 }
+
+jnxPppSummaryPppIpNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an
+         operational state of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 12 }
+
+jnxPppSummaryPppIpNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an 
+        operational state of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 13 }
+
+jnxPppSummaryPppOsiNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an 
+        operational state of opened."
+    ::= { jnxPppSummary 14 }
+
+jnxPppSummaryPppOsiNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an 
+        operational state of closed."
+    ::= { jnxPppSummary 15 }
+
+jnxPppSummaryPppIfLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the sysUpTime at the time of the last PPP interface
+         creation or deletion in the system.  If the number of PPP interfaces has been unchanged since the last re-initialization of the system, then this object contains a zero value. "
+    ::= { jnxPppSummary 16 }
+
+jnxPppSummaryPppLinkInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces configured in the system."
+    ::= { jnxPppSummary 17 }
+
+jnxPppSummaryPppLinkIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system that are
+         administratively configured to up(1)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { jnxPppSummary 18 }
+
+jnxPppSummaryPppLinkIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system that are
+         administrateively configued to down(2)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { jnxPppSummary 19 }
+
+jnxPppSummaryPppLinkIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an 
+        operational state of up(1)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 20 }
+
+jnxPppSummaryPppLinkIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an
+         operational state of down(2)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 21 }
+
+jnxPppSummaryPppLinkIfOperDormant OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an 
+        operational state of dormant(5)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 22 }
+
+jnxPppSummaryPppLinkIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP link interfaces in the system with an
+         operational state of notPresent(6)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 23 }
+
+jnxPppSummaryPppLinkIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP Link interfaces in the system with an 
+        operational state of lowerLayerDown(7)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 24 }
+
+jnxPppSummaryPppLinkIfLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the sysUpTime at the time of the last PPP Link interface
+         creation or deletion in the system.  If the number of PPP interfaces has been unchanged since the last re-initialization of the system, then this object contains a zero value. "
+    ::= { jnxPppSummary 25 }
+
+jnxPppSummaryPppNetworkInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces configured in the system."
+    ::= { jnxPppSummary 26 }
+
+jnxPppSummaryPppNetworkIpNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IP NCPs in the system configured on 
+        PPP network interfaces."
+    ::= { jnxPppSummary 27 }
+
+jnxPppSummaryPppNetworkOsiNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on 
+        PPP network interfaces."
+    ::= { jnxPppSummary 28 }
+
+jnxPppSummaryPppNetworkIfAdminUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system that are
+         administratively configured to up(1)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { jnxPppSummary 29 }
+
+jnxPppSummaryPppNetworkIfAdminDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system that are 
+        administrateively configued to down(2)."
+    REFERENCE
+        "IF-MIB.ifAdminStatus"
+    ::= { jnxPppSummary 30 }
+
+jnxPppSummaryPppNetworkIfOperUp OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+         operational state of up(1)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 31 }
+
+jnxPppSummaryPppNetworkIfOperDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an 
+        operational state of down(2)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 32 }
+
+jnxPppSummaryPppNetworkIfOperDormant OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS   read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+         operational state of dormant(5)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 33 }
+
+jnxPppSummaryPppNetworkIfNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+         operational state of notPresent(6)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 34 }
+
+jnxPppSummaryPppNetworkIfLowerLayerDown OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP network interfaces in the system with an
+         operational state of lowerLayerDown(7)."
+    REFERENCE
+        "IF-MIB.ifOperStatus"
+    ::= { jnxPppSummary 35 }
+
+jnxPppSummaryPppNetworkIpNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational 
+        state of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 36 }
+
+jnxPppSummaryPppNetworkIpNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational 
+        state of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 37 }
+
+jnxPppSummaryPppNetworkOsiNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational 
+        state of opened."
+    ::= { jnxPppSummary 38 }
+
+jnxPppSummaryPppNetworkOsiNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational
+        state of closed."
+    ::= { jnxPppSummary 39 }
+
+jnxPppSummaryPppNetworkIfLastChangeTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the sysUpTime at the time of the last PPP network
+        interface creation or deletion in the system.  If the number of PPP
+        network interfaces has been unchanged since the last re-initialization
+        of the system, then this object contains a zero value. "
+    ::= { jnxPppSummary 40 }
+
+jnxPppSummaryPppIpv6NCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IPv6 NCPs configured in the system."
+    ::= { jnxPppSummary 41 }
+
+jnxPppSummaryPppIpv6NcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 42 }
+
+jnxPppSummaryPppIpv6NcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 43 }
+
+jnxPppSummaryPppNetworkIpv6NCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number IPv6 NCPs configured in the system."
+    ::= { jnxPppSummary 44 }
+
+jnxPppSummaryPppNetworkIpv6NcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of opened(1)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 45 }
+
+jnxPppSummaryPppNetworkIpv6NcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPv6 NCPs in the system with an operational
+        state of not-opened(2)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 46 }
+
+jnxPppSummaryPppStaticInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of static PPP interfaces configured in the system."
+    ::= { jnxPppSummary 47 }
+
+jnxPppSummaryPppMplsNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number MPLS NCPs configured in the system."
+    ::= { jnxPppSummary 48 }
+
+jnxPppSummaryPppIpAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { jnxPppSummary 49 }
+
+jnxPppSummaryPppIpAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { jnxPppSummary 50 }
+
+jnxPppSummaryPppIpv6AdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { jnxPppSummary 51 }
+
+jnxPppSummaryPppIpv6AdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { jnxPppSummary 52 }
+
+jnxPppSummaryPppOsiAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { jnxPppSummary 53 }
+
+jnxPppSummaryPppOsiAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { jnxPppSummary 54 }
+
+jnxPppSummaryPppMplsAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system that are
+        administratively configured to open(1)."
+    ::= { jnxPppSummary 55 }
+
+jnxPppSummaryPppMplsAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system that are
+        administratively configured to close(2)."
+    ::= { jnxPppSummary 56 }
+
+jnxPppSummaryPppIpNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational state
+        of notPresent(3)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 57}
+
+jnxPppSummaryPppIpNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IP NCPs in the system with an operational
+        state of noResources(4)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 58 }
+
+jnxPppSummaryPppIpv6NcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPV6 NCPs in the system with an operational state
+        of notPresent(3)."
+    ::= { jnxPppSummary 59 }
+
+jnxPppSummaryPppIpv6NcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP IPV6 NCPs in the system with an operational
+        state of noResources(4)."
+    ::= { jnxPppSummary 60 }
+
+jnxPppSummaryPppOsiNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational state
+        of notPresent(3)."
+    ::= { jnxPppSummary 61 }
+
+jnxPppSummaryPppOsiNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP OSI NCPs in the system with an operational
+        state of noResources(4)."
+    ::= { jnxPppSummary 62 }
+
+jnxPppSummaryPppMplsNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational state
+        of opened(1)."
+    ::= { jnxPppSummary 63 }
+
+jnxPppSummaryPppMplsNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational
+        state of not-opened(2)."
+    ::= { jnxPppSummary 64 }
+
+jnxPppSummaryPppMplsNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational state
+        of notPresent(3)."
+    ::= { jnxPppSummary 65 }
+
+jnxPppSummaryPppMplsNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of PPP MPLS NCPs in the system with an operational
+        state of noResources(4)."
+    ::= { jnxPppSummary 66 }
+
+jnxPppSummaryPppLinkStaticInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of static PPP Link interfaces configured in the system."
+    ::= { jnxPppSummary 67 }
+
+jnxPppSummaryPppNetworkStaticInterfaceCount OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of static PPP network interfaces configured in the system."
+    ::= { jnxPppSummary 68 }
+
+jnxPppSummaryPppNetworkMplsNCPs OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces."
+    ::= { jnxPppSummary 69 }
+
+jnxPppSummaryPppNetworkIpAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { jnxPppSummary 70 }
+
+jnxPppSummaryPppNetworkIpAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { jnxPppSummary 71 }
+
+jnxPppSummaryPppNetworkIpv6AdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { jnxPppSummary 72 }
+
+jnxPppSummaryPppNetworkIpv6AdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { jnxPppSummary 73 }
+
+jnxPppSummaryPppNetworkOsiAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { jnxPppSummary 74 }
+
+jnxPppSummaryPppNetworkOsiAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { jnxPppSummary 75 }
+
+jnxPppSummaryPppNetworkMplsAdminOpen OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+         interfaces that are administratively configured to open(1)."
+    ::= { jnxPppSummary 76 }
+
+jnxPppSummaryPppNetworkMplsAdminClose OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+         interfaces that are administratively configured to close(2)."
+    ::= { jnxPppSummary 77 }
+
+jnxPppSummaryPppNetworkIpNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 78 }
+
+jnxPppSummaryPppNetworkIpNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IP NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    REFERENCE
+        "PPP-IP-NCP-MIB.pppIpOperStatus"
+    ::= { jnxPppSummary 79 }
+
+jnxPppSummaryPppNetworkIpv6NcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    ::= { jnxPppSummary 80 }
+
+jnxPppSummaryPppNetworkIpv6NcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of IPV6 NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    ::= { jnxPppSummary 81 }
+
+jnxPppSummaryPppNetworkOsiNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    ::= { jnxPppSummary 82 }
+
+jnxPppSummaryPppNetworkOsiNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of OSI NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    ::= { jnxPppSummary 83 }
+
+jnxPppSummaryPppNetworkMplsNcpOpened OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of opened(1)."
+    ::= { jnxPppSummary 84 }
+
+jnxPppSummaryPppNetworkMplsNcpClosed OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of not-opened(2)."
+    ::= { jnxPppSummary 85 }
+
+jnxPppSummaryPppNetworkMplsNcpNotPresent OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of notPresent(3)."
+    ::= { jnxPppSummary 86 }
+
+jnxPppSummaryPppNetworkMplsNcpNoResources OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of MPLS NCPs in the system configured on PPP network
+        interfaces with an operational state of noResources(4)."
+    ::= { jnxPppSummary 87 }
+
+-- ////////////////////////////////////////////////////////////////////////////
+--
+-- PPP IPv6 NCP
+--
+-- This section defines objects used to manage the PPP Network
+-- Control Protocol for IPv6 protocol operation (IPV6CP).
+--
+-- ////////////////////////////////////////////////////////////////////////////
+--
+-- The PPP IPv6 Table
+--
+jnxPppIpv6Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the IPv6 parameters for the local PPP entity."
+    ::= { jnxPppIpv6 1 }
+
+jnxPppIpv6Entry OBJECT-TYPE
+    SYNTAX      JnxPppIpv6Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPV6CP status information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { jnxPppIpv6Table 1 }
+
+JnxPppIpv6Entry ::= SEQUENCE {
+    jnxPppIpv6ServiceStatus                       INTEGER,
+    jnxPppIpv6OperStatus                          INTEGER,
+    jnxPppIpv6TerminateReason                     INTEGER,
+    jnxPppIpv6TerminateNegFailOption              INTEGER,
+    jnxPppIpv6LocalIpv6AddressIfIdentifier        Ipv6AddressIfIdentifier,
+    jnxPppIpv6RemoteIpv6AddressIfIdentifier       Ipv6AddressIfIdentifier,
+    jnxPppIpv6NetworkStatusIpv6cpRenegoTerminates Counter32}
+
+jnxPppIpv6ServiceStatus OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether IPv6 protocol service is operating over this PPP
+        link.  Service is established on this link through means outside this
+        MIB."
+    ::= { jnxPppIpv6Entry 1 }
+
+jnxPppIpv6OperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    opened(1),
+                    notOpened(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of the IPv6 network protocol.  If the value of
+        this object is up then the finite state machine for the IPv6 network
+        protocol has reached the Opened state."
+    ::= { jnxPppIpv6Entry 2 }
+
+jnxPppIpv6TerminateReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    noService(2),
+                    admin(3),
+                    linkDown(4),
+                    peerTerminated(5),
+                    peerRenegotiated(6),
+                    maxRetriesExceeded(7),
+                    negotiationFailure(8) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason the IPV6CP link was terminated:
+            none                    None.
+            other                   Not specified.
+            noService              No IPv6 service configured on this PPP link.
+            admin                   Administratively disabled.
+            linkDown                Underlying link is down.
+            peerTerminated          Peer initiated termination.
+            peerRenegotiated        Peer initiated renegotiation.
+            maxRetriesExceeded      Maximum number of config retries exceeded.
+            negotiationFailure      Failed to negotiate IPV6CP option.  See
+                                    jnxPppIpv6TerminateNegFailOption."
+    ::= { jnxPppIpv6Entry 3 }
+
+jnxPppIpv6TerminateNegFailOption OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    other(1),
+                    localIpv6AddressIfIdentifier(2),
+                    remoteIpv6AddressIfIdentifier(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reports the PPP IPV6CP option for which negotiation failed, when
+        jnxPppIpv6TerminateReason has the value 'negotiationFailure'."
+    ::= { jnxPppIpv6Entry 4 }
+
+jnxPppIpv6LocalIpv6AddressIfIdentifier OBJECT-TYPE
+    SYNTAX      Ipv6AddressIfIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Address Interface Identifier used by the local side."
+    ::= { jnxPppIpv6Entry 5 }
+
+jnxPppIpv6RemoteIpv6AddressIfIdentifier OBJECT-TYPE
+    SYNTAX      Ipv6AddressIfIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Address Interface Identifier used by the remote side."
+    ::= { jnxPppIpv6Entry 6 }
+
+jnxPppIpv6NetworkStatusIpv6cpRenegoTerminates OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times ipv6cp terminated due to peer exceeding max
+        renegotiation attempts."
+    ::= { jnxPppIpv6Entry 7 }
+
+--
+-- The PPP IPv6 Config Table
+--
+jnxPppIpv6ConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxPppIpv6ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table containing the IPv6 parameters for the local PPP entity."
+    ::= { jnxPppIpv6 2 }
+
+jnxPppIpv6ConfigEntry OBJECT-TYPE
+    SYNTAX      JnxPppIpv6ConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IPV6CP configuration information for a particular PPP link."
+    INDEX     { ifIndex }
+    ::= { jnxPppIpv6ConfigTable 1 }
+
+JnxPppIpv6ConfigEntry ::= SEQUENCE {
+    jnxPppIpv6ConfigAdminStatus            INTEGER,
+    jnxPppIpv6ConfigInitiateIpv6           INTEGER,
+    jnxPppIpv6ConfigMaxIpv6cpRenegotiation Integer32 }
+
+jnxPppIpv6ConfigAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    open(1),
+                    close(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The immediate desired status of the IPv6 network protocol.  Setting
+        this object to open will inject an administrative open event into the
+        IPv6 network protocol's finite state machine.  Setting this object to
+        close will inject an administrative close event into the IPv6 network
+        protocol's finite state machine."
+    ::= { jnxPppIpv6ConfigEntry 1 }
+
+jnxPppIpv6ConfigInitiateIpv6 OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enables the initiation of negotiation of the IPv6CP."
+    DEFVAL { disable }
+    ::= { jnxPppIpv6ConfigEntry 2 }
+
+jnxPppIpv6ConfigMaxIpv6cpRenegotiation OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum number of allowed ipv6cp renegotiation attempts from peer."
+    DEFVAL { 30 }
+    ::= { jnxPppIpv6ConfigEntry 3 }
+
+
+-- /////////////////////////////////////////////////////////////////////////////
+--
+-- PPP Globals
+--
+--  The globals are non interface based objects
+--
+-- /////////////////////////////////////////////////////////////////////////////
+jnxPppPeerIpAddressOptional OBJECT-TYPE
+    SYNTAX          INTEGER  { enable(1), disable(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This option is used to ignore the conflicts between ppp client's  
+         requested IP address and radius/local pool returned address in server 
+         during IPNCP  negotiation. Enabling this will ensure the IPNCP  
+         negotiation to succeed even though the client does not include 
+         IP address option in the  IPNCP configure request."    
+    ::= { jnxPppGlobalConfig 1 }
+
+
+
+END

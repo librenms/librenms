@@ -1,0 +1,153 @@
+--
+-- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+--
+-- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
+-- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
+-- fully protected under copyright and trade secret laws. You may not view, 
+-- use, disclose, copy, or distribute this file or any information contained 
+-- herein except pursuant to a valid license from Ruckus. 
+--
+
+RUCKUS-UNLEASHED-WLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusUnleashedWLANModule
+        FROM RUCKUS-ROOT-MIB
+    DisplayString,
+    MacAddress,
+    RowStatus,
+    PhysAddress,
+    TruthValue
+        FROM SNMPv2-TC
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    IANAifType
+        FROM IANAifType-MIB
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Integer32,
+    Unsigned32,
+    IpAddress
+        FROM SNMPv2-SMI;
+
+ruckusUnleashedWLANMIB MODULE-IDENTITY
+    LAST-UPDATED "201510150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless, Inc.
+
+        Postal:
+        350 West Java Dr.
+        Sunnyvale, CA 94089
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus Unleashed WLAN mib"
+    ::= { ruckusUnleashedWLANModule 1 }
+
+ruckusUnleashedWLANObjects OBJECT IDENTIFIER     ::= { ruckusUnleashedWLANMIB 1 }
+
+ruckusUnleashedWLANInfo OBJECT IDENTIFIER    ::= { ruckusUnleashedWLANObjects 1 }
+
+ruckusUnleashedWLANAPInfo OBJECT IDENTIFIER    ::= { ruckusUnleashedWLANObjects 2 }
+
+
+ruckusUnleashedWLANAPEthStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RuckusUnleashedWLANAPEthStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Unleashed WLAN AP Ethernet Interface status table per each AP."
+    ::= { ruckusUnleashedWLANAPInfo 8 }
+
+ruckusUnleashedWLANAPEthStatusEntry OBJECT-TYPE
+    SYNTAX  RuckusUnleashedWLANAPEthStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Specifies each Unleashed WLAN AP ethernet interface status entry."
+    INDEX {
+        ruckusUnleashedWLANAPMacAddress,
+        ruckusUnleashedWLANAPEthPortId }
+    ::= { ruckusUnleashedWLANAPEthStatusTable 1 }
+    
+RuckusUnleashedWLANAPEthStatusEntry ::= SEQUENCE {  
+  ruckusUnleashedWLANAPMacAddress                 MacAddress,
+  ruckusUnleashedWLANAPEthPortId               INTEGER,
+  ruckusUnleashedWLANAPEthIfname               OCTET STRING,
+  ruckusUnleashedWLANAPEthPhyStatus            INTEGER,
+  ruckusUnleashedWLANAPEthPhyIfSpeed           INTEGER,
+  ruckusUnleashedWLANAPEthPhyLinkStatus        INTEGER,
+  ruckusUnleashedWLANAPEthLabel                OCTET STRING  
+}
+
+ruckusUnleashedWLANAPMacAddress OBJECT-TYPE
+    SYNTAX  MacAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The AP's Mac Address."
+    ::= { ruckusUnleashedWLANAPEthStatusEntry 1 }
+    
+ruckusUnleashedWLANAPEthPortId   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port id."
+    ::= { ruckusUnleashedWLANAPEthStatusEntry 2 }
+    
+ruckusUnleashedWLANAPEthIfname  OBJECT-TYPE
+    SYNTAX   OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of interface."
+    ::= { ruckusUnleashedWLANAPEthStatusEntry 5 }  
+
+    
+ruckusUnleashedWLANAPEthPhyStatus   OBJECT-TYPE
+    SYNTAX   INTEGER {
+            up(1),
+            down(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port physical status."
+    ::= { ruckusUnleashedWLANAPEthStatusEntry 8 }    
+    
+    
+ruckusUnleashedWLANAPEthPhyIfSpeed   OBJECT-TYPE
+    SYNTAX   INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet interface's current bandwidth in Mbits,."
+    ::= { ruckusUnleashedWLANAPEthStatusEntry 9 }         
+
+ruckusUnleashedWLANAPEthPhyLinkStatus   OBJECT-TYPE
+    SYNTAX   INTEGER {
+            full(1),
+            half(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port physical link status."
+    ::= { ruckusUnleashedWLANAPEthStatusEntry 10 }  
+         
+ruckusUnleashedWLANAPEthLabel  OBJECT-TYPE
+    SYNTAX   OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ap ethernet port label."
+    ::= { ruckusUnleashedWLANAPEthStatusEntry 11 }  
+                    
+END

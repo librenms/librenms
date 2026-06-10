@@ -1,0 +1,2095 @@
+TROPIC-OCH-MIB DEFINITIONS ::= BEGIN
+
+-- (c) Copyright 2023 Nokia Networks.  All rights reserved.
+-- This software is the confidential and proprietary property of
+-- Nokia and may only be used in accordance with the terms of the
+-- license agreement provided with this software.
+
+IMPORTS
+      SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+      OBJECT-TYPE, MODULE-IDENTITY,
+      IpAddress,
+      Unsigned32, Integer32, Counter64        FROM SNMPv2-SMI
+      MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+      TEXTUAL-CONVENTION,
+      TruthValue, RowStatus                   FROM SNMPv2-TC
+      InterfaceIndex                          FROM IF-MIB
+      AluWdmDisabledEnabled,
+      AluWdmOtuBitRate,
+      AluWdmOtuEncoding,
+      TnCommand                               FROM TROPIC-TC
+      tnPortModules, tnOchMIB                 FROM TROPIC-GLOBAL-REG;
+
+  tnOchMibModule MODULE-IDENTITY
+      LAST-UPDATED    "202302241200Z"
+      ORGANIZATION    "Nokia"
+      CONTACT-INFO    "Nokia
+                       Attn: Jeff Donnelly
+                       600 Mountain Avenue
+                       New Providence, NJ 07974
+
+                       Phone: +1 732 221 6408
+                       Email: jeff.donnelly@nokia.com"
+
+      DESCRIPTION "."
+
+      REVISION    "202302241200Z"
+      DESCRIPTION "Added the following to tnOchXcItuTable:
+                   tnOchXcItuAsonId."
+
+      REVISION    "202208261200Z"
+      DESCRIPTION "Added the following to tnOchXcItuTable:
+                   tnOchXcItuAseGuardBandMHz
+                   tnOchXcItuPurpose."
+
+      REVISION    "202102051200Z"
+      DESCRIPTION "Added the following to tnOchXcItuTable:
+                   tnOchXcItuRxBlkByLOSAtoZ
+                   tnOchXcItuAseFilledAtoZ
+                   tnOchXcItuRxBlkByLOSZtoA
+                   tnOchXcItuAseFilledZtoA."
+
+      REVISION    "202012041200Z"
+      DESCRIPTION "Added the following to tnOchXcItuTable:
+                   tnOchXcItuAseControlMode."
+
+      REVISION    "202001101200Z"
+      DESCRIPTION "Added the following to tnOchXcItuAutoWaveKeySelect:
+                   manualDnd(6)
+                   unkeyManualDnd(7)."
+
+      REVISION    "201803091200Z"
+      DESCRIPTION "Changed SYNTAX of the following from (SIZE(0..80)) to (SIZE(0..276)):
+                   tnOchTrailName
+                   tnOchXcItuName
+                   tnOchGroupXcItuName."
+
+      REVISION    "201802231200Z"
+      DESCRIPTION "Updated the contact info."
+
+      REVISION    "201707071200Z"
+      DESCRIPTION "Fixed MIB compile issues."
+
+      REVISION    "201706091200Z"
+      DESCRIPTION "Added the following to tnOchGroupXcItuAutoWaveKeySelect:
+                   unkeyAuto(4)
+                   unkeyManual(5)."
+
+      REVISION    "201701171200Z"
+      DESCRIPTION "Added the following to tnOchXcItuAutoWaveKeySelect:
+                   unkeyAuto(4)
+                   unkeyManual(5)."
+
+      REVISION    "201611161200Z"
+      DESCRIPTION  "Updated the contact info."
+
+      REVISION    "201609231200Z"
+      DESCRIPTION "Added the following to tnOchGroupXcItuTable:
+                   tnOchGroupXcItuPortIsInUseBySap."
+
+      REVISION    "201512151200Z"
+      DESCRIPTION "Added the following to tnOchTrailTable:
+                   tnOchTrailifIndex."
+
+      REVISION    "201506111200Z"
+      DESCRIPTION "1) Added the following to tnOchXcItuTable:
+                      tnOchXcItuSpectralWidth.
+                   2) Added the following to tnOchTrailTable:
+                      tnOchTrailItuSpectralWidth."
+
+      REVISION    "201306191200Z"
+      DESCRIPTION "1) Changed the range of tnOchTrailEncoderDomain
+                      from (0, 19) to (-1 to 19).
+                   2) Added the following to tnOchTrailTable:
+                      tnOchTrailEncoderDomainProt
+                      tnOchTrailWaveKeyDupsUnlockedProt.
+                   3) Added the following to tnOchXcItuTable:
+                      tnOchXcItuEncoderDomainProtectAZ
+                      tnOchXcItuEncoderDomainProtectZA
+                      tnOchXcItuWaveKeyDupsUnlockedProtectAZ
+                      tnOchXcItuWaveKeyDupsUnlockedProtectZA."
+
+      REVISION    "201305211200Z"
+      DESCRIPTION "Marked the following as obsolete:
+                   tnOchEvents."
+
+      REVISION    "201304121200Z"
+      DESCRIPTION "1) Added the following to tnOchTrailTable:
+                      tnOchTrailEncoderDomain
+                      tnOchTrailWaveKeyDupsUnlocked.
+                   2) Added the following to tnOchXcItuTable:
+                      tnOchXcItuWaveKeySelectPreference
+                      tnOchXcItuEncoderDomainAZ
+                      tnOchXcItuEncoderDomainZA
+                      tnOchXcItuWaveKeyDupsUnlockedAZ
+                      tnOchXcItuWaveKeyDupsUnlockedZA
+                      tnOchXcItuRekeyWithDuplicatesAllowed."
+
+      REVISION    "201302221200Z"
+      DESCRIPTION "Added the following to tnOchGroupXcItuTable:
+                   tnOchGroupXcItuBitRateAZ
+                   tnOchGroupXcItuBitRateZA
+                   tnOchGroupXcItuEncodingAZ
+                   tnOchGroupXcItuEncodingZA."
+
+      REVISION    "201210221200Z"
+      DESCRIPTION "Added the following tables:
+                   tnOchGroupXcItuTable
+                   tnOchGroupXcItuIdTable."
+
+      REVISION    "201104031200Z"
+      DESCRIPTION "1) Added the following to tnOchTrailTable:
+                      tnOchTrailItuBitRate
+                      tnOchTrailItuEncoding
+                      tnOchTrailItuSrcOTType.
+                   2) Added the following to tnOchXcItuTable:
+                      tnOchXcItuBitRateAZ
+                      tnOchXcItuBitRateZA
+                      tnOchXcItuEncodingAZ
+                      tnOchXcItuEncodingZA
+                      tnOchXcItuUserBitRateAZ
+                      tnOchXcItuUserBitRateZA
+                      tnOchXcItuUserEncodingAZ
+                      tnOchXcItuUserEncodingZA."
+
+      REVISION    "200909091200Z"
+      DESCRIPTION "Changed SYNTAX of tnOchXcItuAutoWaveKeySelect from
+                   TruthValue to INTEGER."
+
+      REVISION    "200905311200Z"
+      DESCRIPTION "Added tnOchXcItuTopologyZA."
+
+      REVISION    "200904071200Z"
+      DESCRIPTION "Changed upper range of Wave Key MIB attributes to 4096
+                   for 88 channels."
+
+      REVISION    "200903031200Z"
+      DESCRIPTION "Used AluWdmDisabledEnabled common enum in TROPIC-TC."
+
+      REVISION    "200902271200Z"
+      DESCRIPTION "Used AluWdmDisabledEnabled common enum in SNMPv2-TC."
+
+      ::= { tnPortModules 2 }
+
+  tnOchConf        OBJECT IDENTIFIER ::= { tnOchMIB 1 }
+  tnOchGroups      OBJECT IDENTIFIER ::= { tnOchConf 1 }
+  tnOchCompliances OBJECT IDENTIFIER ::= { tnOchConf 2 }
+  tnOchObjs        OBJECT IDENTIFIER ::= { tnOchMIB 2 }
+  tnOchBasics      OBJECT IDENTIFIER ::= { tnOchObjs 1 }
+--  obsolete
+--  tnOchEvents      OBJECT IDENTIFIER ::= { tnOchMIB 3 }
+
+---------------------------------------------------------------
+-- Textual Conventions
+---------------------------------------------------------------
+    TropicOchXcStateType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         INTEGER {
+                         up(1),
+                         down(2),
+                         unknown(3)
+                       }
+
+    TropicOchXcStateQualifierType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "."
+        SYNTAX         BITS {
+                         maskAlarmsZA(0), -- obsolete
+                         maskAlarmsAZ(1), -- obsolete
+                         unknownWaveKeyZA(2),
+                         unknownWaveKeyAZ(3),
+                         portDown(4),
+                         manualOverride(5),
+                         invalidTopology(6),
+                         inProgress(7),
+                         misMatchedKeysZA(8),
+                         misMatchedKeysAZ(9),
+                         fdiAZ(10),
+                         fdiZA(11)
+                       }
+
+--    obsolete
+--    tnOchCrossConnectTable OBJECT-TYPE ::= { tnOchBasics 1 }
+
+--------------------------------------------------------------------------------
+-- OCH Trail Table
+--------------------------------------------------------------------------------
+    tnOchTrailTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOchTrailEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table provides a complete list of all the
+                        OCH trails in a 1696R/1830 NE network."
+        ::= { tnOchBasics 2 }
+
+    tnOchTrailEntry OBJECT-TYPE
+        SYNTAX         TnOchTrailEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOchTrailIpAddress,
+                tnOchTrailifIndex }
+        ::= { tnOchTrailTable 1 }
+
+    TnOchTrailEntry ::=
+        SEQUENCE {
+            tnOchTrailIpAddress                IpAddress,
+            tnOchTrailifIndex                  InterfaceIndex,
+            tnOchTrailName                     SnmpAdminString,
+            tnOchTrailWaveKey1                 Unsigned32,
+            tnOchTrailWaveKey2                 Unsigned32,
+            tnOchTrailITUChannel               Unsigned32,
+            tnOchTrailItuBitRate               AluWdmOtuBitRate,
+            tnOchTrailItuEncoding              AluWdmOtuEncoding,
+            tnOchTrailItuSrcOTType             Unsigned32,
+            tnOchTrailEncoderDomain            Integer32,
+            tnOchTrailWaveKeyDupsUnlocked      TruthValue,
+            tnOchTrailEncoderDomainProt        Integer32,
+            tnOchTrailWaveKeyDupsUnlockedProt  TruthValue,
+            tnOchTrailItuSpectralWidth         Unsigned32
+        }
+
+    tnOchTrailIpAddress OBJECT-TYPE
+        SYNTAX         IpAddress
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchTrailEntry 1 }
+
+    tnOchTrailifIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchTrailEntry 2 }
+
+    tnOchTrailName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..276))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchTrailEntry 3 }
+
+    tnOchTrailWaveKey1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchTrailEntry 4 }
+
+    tnOchTrailWaveKey2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchTrailEntry 5 }
+
+    tnOchTrailITUChannel OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchTrailEntry 6 }
+
+    tnOchTrailItuBitRate OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ITU bit rate for the trail.  10000 is
+                        unknown."
+        DEFVAL         { 10000 }
+        ::= { tnOchTrailEntry 7 }
+
+    tnOchTrailItuEncoding OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The modulation type for the trail.  10000 is
+                        unknown."
+        DEFVAL         { 10000 }
+        ::= { tnOchTrailEntry 8 }
+
+    tnOchTrailItuSrcOTType OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The source node OT type for the trail"
+        DEFVAL         { 2 }
+        ::= { tnOchTrailEntry 9 }
+
+    tnOchTrailEncoderDomain OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The domain number for the degree the encoder
+                        launches out of.  Advertised in opaque type 10
+                        LSA.
+
+                        Current range: -1 to 19."
+        DEFVAL         { -1 }
+        ::= { tnOchTrailEntry 10 }
+
+    tnOchTrailWaveKeyDupsUnlocked OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Whether the OCH frequency of the channel is
+                        unlocked for use of duplicate wavekey pairs for
+                        its domain.  Advertised in opaque type 10 LSA."
+        DEFVAL         { false }
+        ::= { tnOchTrailEntry 11 }
+
+    tnOchTrailEncoderDomainProt OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The domain number for the degree the encoder
+                        launches out of for the protect XC of OPS
+                        protected demand.  Advertised in opaque type 10
+                        LSA.
+
+                        Current range: -1 to 19."
+        DEFVAL         { -1 }
+        ::= { tnOchTrailEntry 12 }
+
+    tnOchTrailWaveKeyDupsUnlockedProt OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Whether the OCH frequency of the channel is
+                        unlocked for use of duplicate wavekey pairs for
+                        its domain for the protect XC of OPS protected
+                        demand.  Advertised in opaque type 10 LSA."
+        DEFVAL         { false }
+        ::= { tnOchTrailEntry 13 }
+
+    tnOchTrailItuSpectralWidth OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS        "MHz"
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The channel spectral width allocation for the trail in MHz."
+        ::= { tnOchTrailEntry 14 }
+
+--------------------------------------------------------------------------------
+-- OCH XC ITU Table
+--------------------------------------------------------------------------------
+    tnOchXcItuTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOchXcItuEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchBasics 3 }
+
+    tnOchXcItuEntry OBJECT-TYPE
+        SYNTAX         TnOchXcItuEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOchXcItuSrcIfIndex,
+                tnOchXcItuSrcChannel,
+                tnOchXcItuDestIfIndex,
+                tnOchXcItuDestChannel }
+        ::= { tnOchXcItuTable 1 }
+
+    TnOchXcItuEntry ::=
+        SEQUENCE {
+            tnOchXcItuSrcIfIndex                    InterfaceIndex,
+            tnOchXcItuSrcChannel                    Unsigned32,
+            tnOchXcItuDestIfIndex                   InterfaceIndex,
+            tnOchXcItuDestChannel                   Unsigned32,
+            tnOchXcItuId                            Unsigned32,
+            tnOchXcItuName                          SnmpAdminString,
+            tnOchXcItuBidirectional                 TruthValue,
+            tnOchXcItuEncodedWaveKey1AZ             Unsigned32,
+            tnOchXcItuEncodedWaveKey2AZ             Unsigned32,
+            tnOchXcItuEncodedWaveKey1ZA             Unsigned32,
+            tnOchXcItuEncodedWaveKey2ZA             Unsigned32,
+            tnOchXcItuAutoWaveKeySelect             INTEGER,
+            tnOchXcItuAdminState                    TropicOchXcStateType,
+            tnOchXcItuOperState                     TropicOchXcStateType,
+            tnOchXcItuStateQualifier                TropicOchXcStateQualifierType,
+            tnOchXcItuProtectionState               INTEGER,
+            tnOchXcItuForceDeletion                 TruthValue,
+            tnOchXcItuRowStatus                     RowStatus,
+            tnOchXcItuAcceptPowers                  INTEGER,
+            tnOchXcItuOperCapability                AluWdmDisabledEnabled,
+            tnOchXcItuType                          INTEGER,
+            tnOchXcItuPowerMgmtType                 INTEGER,
+            tnOchXcItuTopology                      OCTET STRING,
+            tnOchXcItuTopologyZA                    OCTET STRING,
+            tnOchXcItuBitRateAZ                     AluWdmOtuBitRate,
+            tnOchXcItuBitRateZA                     AluWdmOtuBitRate,
+            tnOchXcItuEncodingAZ                    AluWdmOtuEncoding,
+            tnOchXcItuEncodingZA                    AluWdmOtuEncoding,
+            tnOchXcItuUserBitRateAZ                 AluWdmOtuBitRate,
+            tnOchXcItuUserBitRateZA                 AluWdmOtuBitRate,
+            tnOchXcItuUserEncodingAZ                AluWdmOtuEncoding,
+            tnOchXcItuUserEncodingZA                AluWdmOtuEncoding,
+            tnOchXcItuWaveKeySelectPreference       INTEGER,
+            tnOchXcItuEncoderDomainAZ               Integer32,
+            tnOchXcItuEncoderDomainZA               Integer32,
+            tnOchXcItuWaveKeyDupsUnlockedAZ         INTEGER,
+            tnOchXcItuWaveKeyDupsUnlockedZA         INTEGER,
+            tnOchXcItuRekeyWithDuplicatesAllowed    TnCommand,
+            tnOchXcItuEncoderDomainProtectAZ        Integer32,
+            tnOchXcItuEncoderDomainProtectZA        Integer32,
+            tnOchXcItuWaveKeyDupsUnlockedProtectAZ  INTEGER,
+            tnOchXcItuWaveKeyDupsUnlockedProtectZA  INTEGER,
+            tnOchXcItuSpectralWidth                 Unsigned32,
+            tnOchXcItuAseControlMode                INTEGER,
+            tnOchXcItuRxBlkByLOSAtoZ                TruthValue,
+            tnOchXcItuAseFilledAtoZ                 TruthValue,
+            tnOchXcItuRxBlkByLOSZtoA                TruthValue,
+            tnOchXcItuAseFilledZtoA                 TruthValue,
+            tnOchXcItuAseGuardBandMHz               Integer32,
+            tnOchXcItuPurpose                       INTEGER,
+            tnOchXcItuAsonId                        Counter64
+        }
+
+    tnOchXcItuSrcIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The ifIndex of the connection source."
+        ::= { tnOchXcItuEntry 1 }
+
+    tnOchXcItuSrcChannel OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The channel of the connection source."
+        ::= { tnOchXcItuEntry 2 }
+
+    tnOchXcItuDestIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The ifIndex of the connection destination."
+        ::= { tnOchXcItuEntry 3 }
+
+    tnOchXcItuDestChannel OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The channel of the connection destination."
+        ::= { tnOchXcItuEntry 4 }
+
+    tnOchXcItuId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ID of the connection.  It is used as the
+                        object ID value in traps, alarms and logs."
+        ::= { tnOchXcItuEntry 5 }
+
+    tnOchXcItuName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..276))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description of the connection.  Sets are
+                        restricted to a length of 60 characters."
+        DEFVAL         { "" }
+        ::= { tnOchXcItuEntry 6 }
+
+    tnOchXcItuBidirectional OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this
+                        connection is bidirectional or unidirectional."
+        DEFVAL         { true }
+        ::= { tnOchXcItuEntry 7 }
+
+    tnOchXcItuEncodedWaveKey1AZ OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        forward direction.
+
+                        If, without setting any other attributes and
+                        tnOchXcItuWaveKeyAutoSelect is true,
+                        tnOchXcItuEncodedWaveKey1AZ and
+                        tnOchXcItuEncodedWaveKey2AZ have been set and
+                        their values have been set to 0, or
+                        tnOchXcItuEncodedWaveKey1ZA and
+                        tnOchXcItuEncodedWaveKey2ZA have been set and
+                        their values have been set to 0, a rekey will
+                        be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchXcItuEntry 8 }
+
+    tnOchXcItuEncodedWaveKey2AZ OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected in the forward
+                        direction.
+
+                        If, without setting any other attributes and
+                        tnOchXcItuWaveKeyAutoSelect is true,
+                        tnOchXcItuEncodedWaveKey1AZ and
+                        tnOchXcItuEncodedWaveKey2AZ have been set and
+                        their values have been set to 0, or
+                        tnOchXcItuEncodedWaveKey1ZA and
+                        tnOchXcItuEncodedWaveKey2ZA have been set and
+                        their values have been set to 0, a rekey will
+                        be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchXcItuEntry 9 }
+
+    tnOchXcItuEncodedWaveKey1ZA OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchXcItuWaveKeyAutoSelect is true,
+                        tnOchXcItuEncodedWaveKey1AZ and
+                        tnOchXcItuEncodedWaveKey2AZ have been set and
+                        their values have been set to 0, or
+                        tnOchXcItuEncodedWaveKey1ZA and
+                        tnOchXcItuEncodedWaveKey2ZA have been set and
+                        their values have been set to 0, a rekey will
+                        be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchXcItuEntry 10 }
+
+    tnOchXcItuEncodedWaveKey2ZA OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchXcItuWaveKeyAutoSelect is true,
+                        tnOchXcItuEncodedWaveKey1AZ and
+                        tnOchXcItuEncodedWaveKey2AZ have been set and
+                        their values have been set to 0, or
+                        tnOchXcItuEncodedWaveKey1ZA and
+                        tnOchXcItuEncodedWaveKey2ZA have been set and
+                        their values have been set to 0, a rekey will
+                        be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchXcItuEntry 11 }
+
+    tnOchXcItuAutoWaveKeySelect OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         manual(2),
+                         unkey(3),
+                         unkeyAuto(4),
+                         unkeyManual(5),
+                         manualDnd(6),
+                         unkeyManualDnd(7)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates how the OCH XC's Wave Keys are selected
+                        and distributed to other nodes."
+        DEFVAL         { auto }
+        ::= { tnOchXcItuEntry 12 }
+
+    tnOchXcItuAdminState OBJECT-TYPE
+        SYNTAX         TropicOchXcStateType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The administrative state of the connection.
+                        Setting this attribute to a value of unknown is
+                        restricted."
+        DEFVAL         { down }
+        ::= { tnOchXcItuEntry 13 }
+
+    tnOchXcItuOperState OBJECT-TYPE
+        SYNTAX         TropicOchXcStateType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The operational state of the connection."
+        ::= { tnOchXcItuEntry 14 }
+
+    tnOchXcItuStateQualifier OBJECT-TYPE
+        SYNTAX         TropicOchXcStateQualifierType
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The state qualifier of the connection."
+        ::= { tnOchXcItuEntry 15 }
+
+    tnOchXcItuProtectionState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         working(2),
+                         protection(3),
+                         dropContinue(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protection state of the connection."
+        DEFVAL         { none }
+        ::= { tnOchXcItuEntry 16 }
+
+    tnOchXcItuForceDeletion OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When read, this attribute always returns a value
+                        of false."
+        DEFVAL         { false }
+        ::= { tnOchXcItuEntry 17 }
+
+    tnOchXcItuRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of
+                        active.  Sets are permitted with values of
+                        createAndGo and destroy, exclusively."
+        ::= { tnOchXcItuEntry 18 }
+
+    tnOchXcItuAcceptPowers OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         azIngress(2), -- obsolete
+                         azEgress(3), -- obsolete
+                         zaIngress(4), -- obsolete
+                         zaEgress(5), -- obsolete
+                         azBoth(6),
+                         zaBoth(7)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Synchronize the expected powers to the observed
+                        values."
+        DEFVAL         { noCmd }
+        ::= { tnOchXcItuEntry 19 }
+
+    tnOchXcItuOperCapability OBJECT-TYPE
+        SYNTAX         AluWdmDisabledEnabled
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The operational capability of the connection."
+        ::= { tnOchXcItuEntry 20 }
+
+    tnOchXcItuType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         add(1),
+                         drop(2),
+                         thru(3),
+                         addDrop(4),
+                         continue(5)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The type of connection."
+        ::= { tnOchXcItuEntry 21 }
+
+    tnOchXcItuPowerMgmtType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         manual(2),
+                         hybrid(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The type of power management."
+        ::= { tnOchXcItuEntry 22 }
+
+    tnOchXcItuTopology OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(256))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The topology used by the cross connection,
+                        including the ifIndex of each point in the
+                        topology.  Each ifIndex is represented by 4
+                        bytes of the octet string.  All points are
+                        concatenated."
+        ::= { tnOchXcItuEntry 23 }
+
+    tnOchXcItuTopologyZA OBJECT-TYPE
+        SYNTAX         OCTET STRING (SIZE(256))
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The topology used by the cross connection from
+                        Z to A, including the ifIndex of each point in
+                        the topology.  Each ifIndex is represented by 4
+                        bytes of the octet string.  All points are
+                        concatenated."
+        ::= { tnOchXcItuEntry 24 }
+
+    tnOchXcItuBitRateAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received ITU bit rate from opaque LSA for this
+                        XC in AZ direction.  9998 means it's unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 25 }
+
+    tnOchXcItuBitRateZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received ITU bit rate from opaque LSA for this
+                        XC in ZA direction.  9998 means it's unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 26 }
+
+    tnOchXcItuEncodingAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received source modulation type from opaque LSA
+                        for this XC in AZ direction.  9998 means it's
+                        unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 27 }
+
+    tnOchXcItuEncodingZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received source modulation type from opaque LSA
+                        for this XC in ZA direction.  9998 means it's
+                        unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 28 }
+
+    tnOchXcItuUserBitRateAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned ITU bit rate for this XC in AZ
+                        direction.  Valid range to be set by user is 1
+                        to 9000, and 9998. Setting 9998 clears.  Must
+                        be set with tnOchXcItuUserEncodingAZ."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 29 }
+
+    tnOchXcItuUserBitRateZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned ITU bit rate for this XC in ZA
+                        direction. Valid range to be set by user is 1
+                        to 9000, and 9998. Setting 9998 clears.  Must
+                        be set with tnOchXcItuUserEncodingZA."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 30 }
+
+    tnOchXcItuUserEncodingAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned modulation type set for this XC
+                        in AZ direction. Valid range to be set by user
+                        is 1 to 9000, and 9998.  Setting 9998 clears.
+                        Must be set with tnOchXcItuUserBitRateAZ."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 31 }
+
+    tnOchXcItuUserEncodingZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned modulation type set for this XC
+                        in AZ direction. Valid range to be set by user
+                        is 1 to 9000, and 9998.  Setting 9998 clears.
+                        Must be set with tnOchXcItuUserBitRateZA."
+        DEFVAL         { 9998 }
+        ::= { tnOchXcItuEntry 32 }
+
+    tnOchXcItuWaveKeySelectPreference OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notApplicable(1),
+                         none(2),
+                         dupsOk(3),
+                         forceNoDups(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Encoder key selection preference for add XC.
+                        Setting DupsOk allows use of duplicated key
+                        pairs in the domain for this OCH frequency
+                        throughout domain.  Can be entered at XC
+                        creation time or altered via rekey with
+                        duplicates command."
+        DEFVAL         { notApplicable }
+        ::= { tnOchXcItuEntry 33 }
+
+    tnOchXcItuEncoderDomainAZ OBJECT-TYPE
+        SYNTAX         Integer32 (-1..19)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays originating domain number of encoder
+                        for AZ direction. -1 indicates not yet received
+                        via LSA.
+
+                        Current configurable range: -1 to 19."
+        DEFVAL         { -1 }
+        ::= { tnOchXcItuEntry 34 }
+
+    tnOchXcItuEncoderDomainZA OBJECT-TYPE
+        SYNTAX         Integer32 (-1..19)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays originating domain number of encoder
+                        for ZA direction. -1 indicates not yet received
+                        via LSA.
+
+                        Current configurable range: -1 to 19."
+        DEFVAL         { -1 }
+        ::= { tnOchXcItuEntry 35 }
+
+    tnOchXcItuWaveKeyDupsUnlockedAZ OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notReceived(1),
+                         true(2),
+                         false(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays whether WT key pair re-use is unlocked
+                        for this OCh frequency in AZ direction.
+                        notReceived(1) indicates not yet received via LSA."
+        DEFVAL         { notReceived }
+        ::= { tnOchXcItuEntry 36 }
+
+    tnOchXcItuWaveKeyDupsUnlockedZA OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notReceived(1),
+                         true(2),
+                         false(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays whether WT key pair re-use is unlocked
+                        for this OCh frequency in ZA direction.
+                        notReceived(1) indicates not yet received via LSA."
+        DEFVAL         { notReceived }
+        ::= { tnOchXcItuEntry 37 }
+
+    tnOchXcItuRekeyWithDuplicatesAllowed OBJECT-TYPE
+        SYNTAX         TnCommand
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Can only be executed for add XC.  Set execute(2)
+                        to rekey the encoder with WT key pair re-use
+                        allowed.  When read this attribute always returns
+                        noCmd(1)."
+        DEFVAL         { noCmd }
+        ::= { tnOchXcItuEntry 38 }
+
+    tnOchXcItuEncoderDomainProtectAZ OBJECT-TYPE
+        SYNTAX         Integer32 (-1..19)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays originating domain number of encoder
+                        for AZ direction for protection XC of OPS
+                        protected source.  -1 indicates not yet received
+                        via LSA.
+
+                        Current configurable range: -1 to 19."
+        DEFVAL         { -1 }
+        ::= { tnOchXcItuEntry 39 }
+
+    tnOchXcItuEncoderDomainProtectZA OBJECT-TYPE
+        SYNTAX         Integer32 (-1..19)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays originating domain number of encoder
+                        for ZA direction for protection XC of OPS
+                        protected source.  -1 indicates not yet received
+                        via LSA.
+
+                        Current configurable range: -1 to 19."
+        DEFVAL         { -1 }
+        ::= { tnOchXcItuEntry 40 }
+
+    tnOchXcItuWaveKeyDupsUnlockedProtectAZ OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notReceived(1),
+                         true(2),
+                         false(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays whether WT key pair re-use is unlocked
+                        for this OCh frequency in AZ direction for the
+                        protection XC of OPS protected source.
+                        notReceived(1) indicates not yet received via
+                        LSA."
+        DEFVAL         { notReceived }
+        ::= { tnOchXcItuEntry 41 }
+
+    tnOchXcItuWaveKeyDupsUnlockedProtectZA OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         notReceived(1),
+                         true(2),
+                         false(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Displays whether WT key pair re-use is unlocked
+                        for this OCh frequency in ZA direction.
+                        notReceived(1) indicates not yet received via
+                        LSA."
+        DEFVAL         { notReceived }
+        ::= { tnOchXcItuEntry 42 }
+
+    tnOchXcItuSpectralWidth OBJECT-TYPE
+        SYNTAX         Unsigned32
+        UNITS          "MHz"
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The channel spectral width allocation in MHz."
+        DEFVAL         { 50000 }
+        ::= { tnOchXcItuEntry 43 }
+
+    tnOchXcItuAseControlMode OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         aseDisabled(1),
+                         aseEnabled(2),
+                         autoAseOnFailure(3),
+                         autoAseFailureAndRestore(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "."
+        DEFVAL         { aseDisabled }
+        ::= { tnOchXcItuEntry 44 }
+
+    tnOchXcItuRxBlkByLOSAtoZ OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether a channel failed and was switched
+                        to block on ingress line by the line loading feature."
+        ::= { tnOchXcItuEntry 45 }
+
+    tnOchXcItuAseFilledAtoZ OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether a channel failed and was ASE filled
+                        on egress line by the line loading feature."
+        ::= { tnOchXcItuEntry 46 }
+
+    tnOchXcItuRxBlkByLOSZtoA OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether a channel failed and was switched
+                        to block on ingress line by the line loading feature."
+        ::= { tnOchXcItuEntry 47 }
+
+    tnOchXcItuAseFilledZtoA OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether a channel failed and was ASE filled
+                        on egress line by the line loading feature."
+        ::= { tnOchXcItuEntry 48 }
+
+    tnOchXcItuAseGuardBandMHz OBJECT-TYPE
+        SYNTAX         Integer32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the guard band to be applied per edge of the
+                        frequency slot of the cross-connection when ASE noise is
+                        injected for the cross-connect. This region will not be
+                        filled with ASE noise."
+        DEFVAL         { 6250 }
+        ::= { tnOchXcItuEntry 49 }
+
+    tnOchXcItuPurpose OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         payload(1),
+                         alien(2),
+                         blocked(3),
+                         aseFill(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Specifies the purpose for which the cross-connect is used.
+                        For advanced users understanding how the network management
+                        system uses this parameter. There is no cross-connect
+                        behavior depending on the value of this parameter."
+        DEFVAL         { payload }
+        ::= { tnOchXcItuEntry 50 }
+
+    tnOchXcItuAsonId OBJECT-TYPE
+        SYNTAX         Counter64
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchXcItuEntry 51 }
+
+--------------------------------------------------------------------------------
+-- OCH XC ID Table
+--------------------------------------------------------------------------------
+    tnOchXcItuIdTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOchXcItuIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table may be used as a lookup for the full
+                        OCH XC index given an OCH XC ID.  The OCH XC ID
+                        may be found in the object ID of traps, alarms,
+                        and logs.  Get next requests are not supported
+                        in this table."
+        ::= { tnOchBasics 4 }
+
+    tnOchXcItuIdEntry OBJECT-TYPE
+        SYNTAX         TnOchXcItuIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOchXcItuId }
+        ::= { tnOchXcItuIdTable 1 }
+
+    TnOchXcItuIdEntry ::=
+        SEQUENCE {
+            tnOchXcItuIdSrcIfIndex  InterfaceIndex,
+            tnOchXcItuIdSrcChannel  Unsigned32,
+            tnOchXcItuIdDestIfIndex InterfaceIndex,
+            tnOchXcItuIdDestChannel Unsigned32
+        }
+
+    tnOchXcItuIdSrcIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ifIndex of the connection source."
+        ::= { tnOchXcItuIdEntry 1 }
+
+    tnOchXcItuIdSrcChannel OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The channel of the connection source."
+        ::= { tnOchXcItuIdEntry 2 }
+
+    tnOchXcItuIdDestIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ifIndex of the connection destination."
+        ::= { tnOchXcItuIdEntry 3 }
+
+    tnOchXcItuIdDestChannel OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The channel of the connection destination."
+        ::= { tnOchXcItuIdEntry 4 }
+
+--------------------------------------------------------------------------------
+-- OCH GROUP XC ITU Table
+--------------------------------------------------------------------------------
+    tnOchGroupXcItuTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOchGroupXcItuEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchBasics 5 }
+
+    tnOchGroupXcItuEntry OBJECT-TYPE
+        SYNTAX         TnOchGroupXcItuEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOchGroupXcItuSrcIfIndex,
+                tnOchGroupXcItuSrcChannel1,
+                tnOchGroupXcItuDestIfIndex,
+                tnOchGroupXcItuDestChannel1 }
+        ::= { tnOchGroupXcItuTable 1 }
+
+    TnOchGroupXcItuEntry ::=
+        SEQUENCE {
+            tnOchGroupXcItuSrcIfIndex            InterfaceIndex,
+            tnOchGroupXcItuSrcChannel1           Unsigned32,
+            tnOchGroupXcItuDestIfIndex           InterfaceIndex,
+            tnOchGroupXcItuDestChannel1          Unsigned32,
+            tnOchGroupXcItuSrcChannel2           Unsigned32,
+            tnOchGroupXcItuDestChannel2          Unsigned32,
+            tnOchGroupXcItuSrcChannel3           Unsigned32,
+            tnOchGroupXcItuDestChannel3          Unsigned32,
+            tnOchGroupXcItuSrcChannel4           Unsigned32,
+            tnOchGroupXcItuDestChannel4          Unsigned32,
+            tnOchGroupXcItuGroupId               Unsigned32,
+            tnOchGroupXcItuId1                   Unsigned32,
+            tnOchGroupXcItuId2                   Unsigned32,
+            tnOchGroupXcItuId3                   Unsigned32,
+            tnOchGroupXcItuId4                   Unsigned32,
+            tnOchGroupXcItuName                  SnmpAdminString,
+            tnOchGroupXcItuBidirectional         TruthValue,
+            tnOchGroupXcItuEncodedWaveKey1AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey2AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey3AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey4AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey5AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey6AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey7AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey8AZ     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey1ZA     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey2ZA     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey3ZA     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey4ZA     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey5ZA     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey6ZA     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey7ZA     Unsigned32,
+            tnOchGroupXcItuEncodedWaveKey8ZA     Unsigned32,
+            tnOchGroupXcItuAutoWaveKeySelect     INTEGER,
+            tnOchGroupXcItuAdminState            TropicOchXcStateType,
+            tnOchGroupXcItuProtectionState       INTEGER,
+            tnOchGroupXcItuForceDeletion         TruthValue,
+            tnOchGroupXcItuRowStatus             RowStatus,
+            tnOchGroupXcItuAcceptPowers          INTEGER,
+            tnOchGroupXcItuType                  INTEGER,
+            tnOchGroupXcItuPowerMgmtType         INTEGER,
+            tnOchGroupXcItuUserBitRateAZ         AluWdmOtuBitRate,
+            tnOchGroupXcItuUserBitRateZA         AluWdmOtuBitRate,
+            tnOchGroupXcItuUserEncodingAZ        AluWdmOtuEncoding,
+            tnOchGroupXcItuUserEncodingZA        AluWdmOtuEncoding,
+            tnOchGroupXcItuBitRateAZ             AluWdmOtuBitRate,
+            tnOchGroupXcItuBitRateZA             AluWdmOtuBitRate,
+            tnOchGroupXcItuEncodingAZ            AluWdmOtuEncoding,
+            tnOchGroupXcItuEncodingZA            AluWdmOtuEncoding,
+            tnOchGroupXcItuPortIsInUseBySap      TruthValue
+        }
+
+    tnOchGroupXcItuSrcIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The first interface index for the L1 port of
+                        the connection group sources ."
+        ::= { tnOchGroupXcItuEntry 1 }
+
+    tnOchGroupXcItuSrcChannel1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The first channel of the connection source."
+        ::= { tnOchGroupXcItuEntry 2 }
+
+    tnOchGroupXcItuDestIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The first interface index of the connection
+                        destination."
+        ::= { tnOchGroupXcItuEntry 3 }
+
+    tnOchGroupXcItuDestChannel1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The first channel of the connection destination."
+        ::= { tnOchGroupXcItuEntry 4 }
+
+    tnOchGroupXcItuSrcChannel2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The second channel of the connection source."
+        ::= { tnOchGroupXcItuEntry 5 }
+
+    tnOchGroupXcItuDestChannel2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The second channel of the connection destination."
+        ::= { tnOchGroupXcItuEntry 6 }
+
+    tnOchGroupXcItuSrcChannel3 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The third channel of the connection source."
+        ::= { tnOchGroupXcItuEntry 7 }
+
+    tnOchGroupXcItuDestChannel3 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The third channel of the connection destination."
+        ::= { tnOchGroupXcItuEntry 8 }
+
+    tnOchGroupXcItuSrcChannel4 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The fourth channel of the connection source."
+        ::= { tnOchGroupXcItuEntry 9 }
+
+    tnOchGroupXcItuDestChannel4 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The fourth channel of the connection destination."
+        ::= { tnOchGroupXcItuEntry 10 }
+
+    tnOchGroupXcItuGroupId OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ID of the connection group.  It is used as the
+                        object ID value in traps, alarms and logs."
+        ::= { tnOchGroupXcItuEntry 11 }
+
+    tnOchGroupXcItuId1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ID of the first connection in the group. "
+        ::= { tnOchGroupXcItuEntry 12 }
+
+    tnOchGroupXcItuId2 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ID of the second connection in the group.  "
+        ::= { tnOchGroupXcItuEntry 13 }
+
+    tnOchGroupXcItuId3 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ID of the third connection in the group.  "
+        ::= { tnOchGroupXcItuEntry 14 }
+
+    tnOchGroupXcItuId4 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The ID of the fourth connection in the group.  "
+        ::= { tnOchGroupXcItuEntry 15 }
+
+    tnOchGroupXcItuName OBJECT-TYPE
+        SYNTAX         SnmpAdminString (SIZE(0..276))
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The description of the connection.  Sets are
+                        restricted to a length of 60 characters."
+        DEFVAL         { "" }
+        ::= { tnOchGroupXcItuEntry 16 }
+
+    tnOchGroupXcItuBidirectional OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "An indication as to whether or not this connection
+                        is bidirectional or unidirectional."
+        DEFVAL         { true }
+        ::= { tnOchGroupXcItuEntry 17 }
+
+    tnOchGroupXcItuEncodedWaveKey1AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        forward direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 18 }
+
+    tnOchGroupXcItuEncodedWaveKey2AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected in the forward
+                        direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set and
+                        their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set and
+                        their values have been set to 0, a rekey will
+                        be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 19 }
+
+    tnOchGroupXcItuEncodedWaveKey3AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        forward direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 20 }
+
+    tnOchGroupXcItuEncodedWaveKey4AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected in the forward
+                        direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 21 }
+
+    tnOchGroupXcItuEncodedWaveKey5AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        forward direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 22 }
+
+    tnOchGroupXcItuEncodedWaveKey6AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected in the forward
+                        direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 23 }
+
+    tnOchGroupXcItuEncodedWaveKey7AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        forward direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 24 }
+
+    tnOchGroupXcItuEncodedWaveKey8AZ OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of zero
+                        indicates no Wave Key expected in the forward
+                        direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 25 }
+
+    tnOchGroupXcItuEncodedWaveKey1ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 26 }
+
+    tnOchGroupXcItuEncodedWaveKey2ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 27 }
+
+    tnOchGroupXcItuEncodedWaveKey3ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 28 }
+
+    tnOchGroupXcItuEncodedWaveKey4ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 29 }
+
+    tnOchGroupXcItuEncodedWaveKey5ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 30 }
+
+    tnOchGroupXcItuEncodedWaveKey6ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 31 }
+
+    tnOchGroupXcItuEncodedWaveKey7ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 32 }
+
+    tnOchGroupXcItuEncodedWaveKey8ZA OBJECT-TYPE
+        SYNTAX         Unsigned32 (0..4096)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "One of many possible Wave Keys expected to be
+                        riding on a particular channel.  A value of
+                        zero indicates no Wave Key expected in the
+                        reverse direction.
+
+                        If, without setting any other attributes and
+                        tnOchGroupXcItuWaveKeyAutoSelect is true,
+                        tnOchGroupXcItuEncodedWaveKey1AZ and
+                        tnOchGroupXcItuEncodedWaveKey2AZ have been set
+                        and their values have been set to 0, or
+                        tnOchGroupXcItuEncodedWaveKey1ZA and
+                        tnOchGroupXcItuEncodedWaveKey2ZA have been set
+                        and their values have been set to 0, a rekey
+                        will be performed in the AZ or ZA directions.
+
+                        Current configurable range: 0 to 4096."
+        DEFVAL         { 0 }
+        ::= { tnOchGroupXcItuEntry 33 }
+
+    tnOchGroupXcItuAutoWaveKeySelect OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         manual(2),
+                         unkey(3),
+                         unkeyAuto(4),
+                         unkeyManual(5)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Indicates how the OCH XC's Wave Keys are selected
+                        and distributed to other nodes."
+        DEFVAL         { auto }
+        ::= { tnOchGroupXcItuEntry 34 }
+
+    tnOchGroupXcItuAdminState OBJECT-TYPE
+        SYNTAX         TropicOchXcStateType
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The administrative state of the connection group.
+                        Setting this attribute to a value of unknown is
+                        restricted."
+        DEFVAL         { down }
+        ::= { tnOchGroupXcItuEntry 35 }
+
+    tnOchGroupXcItuProtectionState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         none(1),
+                         working(2),
+                         protection(3),
+                         dropContinue(4)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "The protection state of the connection group."
+        DEFVAL         { none }
+        ::= { tnOchGroupXcItuEntry 36 }
+
+    tnOchGroupXcItuForceDeletion OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "When read, this attribute always returns a value
+                        of false."
+        DEFVAL         { false }
+        ::= { tnOchGroupXcItuEntry 37 }
+
+    tnOchGroupXcItuRowStatus OBJECT-TYPE
+        SYNTAX         RowStatus
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Currently all entries have a row status of active.
+                        Sets are permitted with values of createAndGo
+                        and destroy, exclusively."
+        ::= { tnOchGroupXcItuEntry 38 }
+
+    tnOchGroupXcItuAcceptPowers OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         noCmd(1),
+                         azBoth(2),
+                         zaBoth(3)
+                       }
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "Synchronize the expected powers to the observed
+                        values."
+        DEFVAL         { noCmd }
+        ::= { tnOchGroupXcItuEntry 39 }
+
+    tnOchGroupXcItuType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         add(1),
+                         drop(2),
+                         thru(3),
+                         addDrop(4),
+                         continue(5)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The type of connection group."
+        ::= { tnOchGroupXcItuEntry 40 }
+
+    tnOchGroupXcItuPowerMgmtType OBJECT-TYPE
+        SYNTAX         INTEGER {
+                         auto(1),
+                         manual(2),
+                         hybrid(3)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The type of power management."
+        ::= { tnOchGroupXcItuEntry 41 }
+
+    tnOchGroupXcItuUserBitRateAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned ITU bit rate for this XC in AZ
+                        direction.  Setting it to 9998 clears.  It must
+                        be set with tnOchGroupXcItuUserEncodingAZ.
+
+                        Current configurable range: 1 to 9000 and 9998."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 42 }
+
+    tnOchGroupXcItuUserBitRateZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned ITU bit rate for this XC in ZA
+                        direction.  Setting it to 9998 clears.  It must
+                        be set with tnOchGroupXcItuUserEncodingZA.
+
+                        Current configurable range: 1 to 9000 and 9998."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 43 }
+
+    tnOchGroupXcItuUserEncodingAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned modulation type set for this XC
+                        in AZ direction.  Setting it to 9998 clears.  It
+                        must be set with tnOchGroupXcItuUserBitRateAZ.
+
+                        Current configurable range: 1 to 9000 and 9998."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 44 }
+
+    tnOchGroupXcItuUserEncodingZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION    "User assigned modulation type set for this XC
+                        in AZ direction.  Setting it to 9998 clears.  It
+                        must be set with tnOchGroupXcItuUserBitRateZA.
+
+                        Current configurable range: 1 to 9000 and 9998."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 45 }
+
+    tnOchGroupXcItuBitRateAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received ITU bit rate from opaque LSA for this
+                        XC Group in AZ direction.  9998 means it's
+                        unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 46 }
+
+    tnOchGroupXcItuBitRateZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuBitRate
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received ITU bit rate from opaque LSA for this
+                        XC Group in ZA direction.  9998 means it's
+                        unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 47 }
+
+    tnOchGroupXcItuEncodingAZ OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received source modulation type from opaque LSA
+                        for this XC Group in AZ direction.  9998 means it's
+                        unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 48 }
+
+    tnOchGroupXcItuEncodingZA OBJECT-TYPE
+        SYNTAX         AluWdmOtuEncoding
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Received source modulation type from opaque LSA
+                        for this XC Group in ZA direction.  9998 means it's
+                        unassigned."
+        DEFVAL         { 9998 }
+        ::= { tnOchGroupXcItuEntry 49 }
+
+    tnOchGroupXcItuPortIsInUseBySap OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "Indicates whether the port is in use by SAP"
+        DEFVAL         { false }
+        ::= { tnOchGroupXcItuEntry 50 }
+
+--------------------------------------------------------------------------------
+-- OCH GROUP XC ID Table
+--------------------------------------------------------------------------------
+    tnOchGroupXcItuIdTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF TnOchGroupXcItuIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This table may be used as a lookup for the full
+                        OCH Group XC index with an OCH GroupXC ID.  The
+                        OCH Group XC ID may be found in the object ID
+                        of traps, alarms,and logs.  Get next requests
+                        are not supported in this table."
+        ::= { tnOchBasics 6 }
+
+    tnOchGroupXcItuIdEntry OBJECT-TYPE
+        SYNTAX         TnOchGroupXcItuIdEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "."
+        INDEX { tnOchGroupXcItuGroupId }
+        ::= { tnOchGroupXcItuIdTable 1 }
+
+    TnOchGroupXcItuIdEntry ::=
+        SEQUENCE {
+            tnOchGroupXcItuIdSrcIfIndex       InterfaceIndex,
+            tnOchGroupXcItuIdSrcChannel1      Unsigned32,
+            tnOchGroupXcItuIdDestIfIndex      InterfaceIndex,
+            tnOchGroupXcItuIdDestChannel1     Unsigned32
+        }
+
+    tnOchGroupXcItuIdSrcIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The first ifIndex of the connection group source."
+        ::= { tnOchGroupXcItuIdEntry 1 }
+
+    tnOchGroupXcItuIdSrcChannel1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The first channel of the connection group source."
+        ::= { tnOchGroupXcItuIdEntry 2 }
+
+    tnOchGroupXcItuIdDestIfIndex OBJECT-TYPE
+        SYNTAX         InterfaceIndex
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The first ifIndex of the connection group
+                        destination."
+        ::= { tnOchGroupXcItuIdEntry 3 }
+
+    tnOchGroupXcItuIdDestChannel1 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "The first channel of the connection group
+                        destination."
+        ::= { tnOchGroupXcItuIdEntry 4 }
+
+--------------------------------------------------------------------------------
+-- Conformance Group Definitions
+--------------------------------------------------------------------------------
+--    obsolete
+--    tnOchCrossConnectGroup OBJECT-GROUP ::= { tnOchGroups 1 }
+
+    tnOchTrailGroup OBJECT-GROUP
+        OBJECTS {
+            tnOchTrailName,
+            tnOchTrailWaveKey1,
+            tnOchTrailWaveKey2,
+            tnOchTrailITUChannel,
+            tnOchTrailItuBitRate,
+            tnOchTrailItuEncoding,
+            tnOchTrailItuSrcOTType,
+            tnOchTrailEncoderDomain,
+            tnOchTrailWaveKeyDupsUnlocked,
+            tnOchTrailEncoderDomainProt,
+            tnOchTrailWaveKeyDupsUnlockedProt,
+            tnOchTrailItuSpectralWidth
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchGroups 2 }
+
+    tnOchXcItuGroup OBJECT-GROUP
+        OBJECTS {
+            tnOchXcItuId,
+            tnOchXcItuName,
+            tnOchXcItuBidirectional,
+            tnOchXcItuEncodedWaveKey1AZ,
+            tnOchXcItuEncodedWaveKey2AZ,
+            tnOchXcItuEncodedWaveKey1ZA,
+            tnOchXcItuEncodedWaveKey2ZA,
+            tnOchXcItuAutoWaveKeySelect,
+            tnOchXcItuAdminState,
+            tnOchXcItuOperState,
+            tnOchXcItuStateQualifier,
+            tnOchXcItuProtectionState,
+            tnOchXcItuForceDeletion,
+            tnOchXcItuRowStatus,
+            tnOchXcItuAcceptPowers,
+            tnOchXcItuOperCapability,
+            tnOchXcItuType,
+            tnOchXcItuPowerMgmtType,
+            tnOchXcItuTopology,
+            tnOchXcItuTopologyZA,
+            tnOchXcItuBitRateAZ,
+            tnOchXcItuBitRateZA,
+            tnOchXcItuEncodingAZ,
+            tnOchXcItuEncodingZA,
+            tnOchXcItuUserBitRateAZ,
+            tnOchXcItuUserBitRateZA,
+            tnOchXcItuUserEncodingAZ,
+            tnOchXcItuUserEncodingZA,
+            tnOchXcItuWaveKeySelectPreference,
+            tnOchXcItuEncoderDomainAZ,
+            tnOchXcItuEncoderDomainZA,
+            tnOchXcItuWaveKeyDupsUnlockedAZ,
+            tnOchXcItuWaveKeyDupsUnlockedZA,
+            tnOchXcItuRekeyWithDuplicatesAllowed,
+            tnOchXcItuEncoderDomainProtectAZ,
+            tnOchXcItuEncoderDomainProtectZA,
+            tnOchXcItuWaveKeyDupsUnlockedProtectAZ,
+            tnOchXcItuWaveKeyDupsUnlockedProtectZA,
+            tnOchXcItuSpectralWidth,
+            tnOchXcItuAseControlMode,
+            tnOchXcItuRxBlkByLOSAtoZ,
+            tnOchXcItuAseFilledAtoZ,
+            tnOchXcItuRxBlkByLOSZtoA,
+            tnOchXcItuAseFilledZtoA,
+            tnOchXcItuAseGuardBandMHz,
+            tnOchXcItuPurpose,
+            tnOchXcItuAsonId
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchGroups 3 }
+
+    tnOchXcItuIdGroup OBJECT-GROUP
+        OBJECTS {
+            tnOchXcItuIdSrcIfIndex,
+            tnOchXcItuIdSrcChannel,
+            tnOchXcItuIdDestIfIndex,
+            tnOchXcItuIdDestChannel
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchGroups 4 }
+
+    tnOchGroupXcItuGroup OBJECT-GROUP
+        OBJECTS {
+            tnOchGroupXcItuSrcChannel2,
+            tnOchGroupXcItuDestChannel2,
+            tnOchGroupXcItuSrcChannel3,
+            tnOchGroupXcItuDestChannel3,
+            tnOchGroupXcItuSrcChannel4,
+            tnOchGroupXcItuDestChannel4,
+            tnOchGroupXcItuGroupId,
+            tnOchGroupXcItuId1,
+            tnOchGroupXcItuId2,
+            tnOchGroupXcItuId3,
+            tnOchGroupXcItuId4,
+            tnOchGroupXcItuName,
+            tnOchGroupXcItuBidirectional,
+            tnOchGroupXcItuEncodedWaveKey1AZ,
+            tnOchGroupXcItuEncodedWaveKey2AZ,
+            tnOchGroupXcItuEncodedWaveKey3AZ,
+            tnOchGroupXcItuEncodedWaveKey4AZ,
+            tnOchGroupXcItuEncodedWaveKey5AZ,
+            tnOchGroupXcItuEncodedWaveKey6AZ,
+            tnOchGroupXcItuEncodedWaveKey7AZ,
+            tnOchGroupXcItuEncodedWaveKey8AZ,
+            tnOchGroupXcItuEncodedWaveKey1ZA,
+            tnOchGroupXcItuEncodedWaveKey2ZA,
+            tnOchGroupXcItuEncodedWaveKey3ZA,
+            tnOchGroupXcItuEncodedWaveKey4ZA,
+            tnOchGroupXcItuEncodedWaveKey5ZA,
+            tnOchGroupXcItuEncodedWaveKey6ZA,
+            tnOchGroupXcItuEncodedWaveKey7ZA,
+            tnOchGroupXcItuEncodedWaveKey8ZA,
+            tnOchGroupXcItuAutoWaveKeySelect,
+            tnOchGroupXcItuAdminState,
+            tnOchGroupXcItuProtectionState,
+            tnOchGroupXcItuForceDeletion,
+            tnOchGroupXcItuRowStatus,
+            tnOchGroupXcItuAcceptPowers,
+            tnOchGroupXcItuType,
+            tnOchGroupXcItuPowerMgmtType,
+            tnOchGroupXcItuUserBitRateAZ,
+            tnOchGroupXcItuUserBitRateZA,
+            tnOchGroupXcItuUserEncodingAZ,
+            tnOchGroupXcItuUserEncodingZA,
+            tnOchGroupXcItuBitRateAZ,
+            tnOchGroupXcItuBitRateZA,
+            tnOchGroupXcItuEncodingAZ,
+            tnOchGroupXcItuEncodingZA,
+            tnOchGroupXcItuPortIsInUseBySap
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchGroups 5 }
+
+    tnOchGroupXcItuIdGroup OBJECT-GROUP
+        OBJECTS {
+            tnOchGroupXcItuIdSrcIfIndex,
+            tnOchGroupXcItuIdSrcChannel1,
+            tnOchGroupXcItuIdDestIfIndex,
+            tnOchGroupXcItuIdDestChannel1
+        }
+        STATUS         current
+        DESCRIPTION    "."
+        ::= { tnOchGroups 6 }
+
+--------------------------------------------------------------------------------
+-- Compliance Statements (mandatory)
+--------------------------------------------------------------------------------
+    tnOchCompliance MODULE-COMPLIANCE
+        STATUS         current
+        DESCRIPTION    "."
+        MODULE
+        MANDATORY-GROUPS  {
+--            obsolete
+--            tnOchCrossConnectGroup,
+            tnOchTrailGroup,
+            tnOchXcItuGroup,
+            tnOchXcItuIdGroup,
+            tnOchGroupXcItuGroup,
+            tnOchGroupXcItuIdGroup
+        }
+        ::= { tnOchCompliances 1 }
+
+END -- DEFINITION OF TROPIC-OCH-MIB

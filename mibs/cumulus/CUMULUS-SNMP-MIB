@@ -1,0 +1,37 @@
+CUMULUS-SNMP-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Top-level infrastructure of the Cumulus enterprise MIB tree
+--
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, enterprises              FROM SNMPv2-SMI
+    InterfaceIndex, ifIndex             FROM IF-MIB
+    DateAndTime, DisplayString,
+    TEXTUAL-CONVENTION                  FROM SNMPv2-TC;
+
+
+cumulusMib MODULE-IDENTITY
+    LAST-UPDATED "201207230000Z"
+    ORGANIZATION "www.cumulusnetworks.com"
+    CONTACT-INFO
+         "postal:   Dinesh Dutt
+                    650 Castro Street,
+                    suite 120-245
+                    Mountain View, CA 94041
+
+          email:    ddutt@cumulusnetworks.com"
+    DESCRIPTION
+        "Top-level infrastructure of the Cumulus enterprise MIB tree"
+    REVISION     "201207230000Z"
+    DESCRIPTION
+        "Second version with new Enterprise number and discard counters"
+    ::= { enterprises 40310 }
+
+--
+-- This is just the placeholder for the cumulusMib definition.
+-- The actual objects are defined in separate, appropriately named files.
+-- This way, we keep an overall MIB definition and add extensions as needed.
+--
+END

@@ -1,0 +1,40 @@
+IBM-CPS-MIB DEFINITIONS ::= BEGIN
+
+-- IBM
+-- Converged Power Systems
+-- Endicott, NY
+
+-- This MIB contains the necessary definitions for
+-- Converged Power Systems from IBM.
+
+IMPORTS
+        enterprises
+                FROM RFC1155-SMI
+        TRAP-TYPE
+                FROM RFC1215
+        DisplayString
+                FROM RFC1213-MIB;
+
+ibm    		OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd         OBJECT IDENTIFIER ::= { ibm 6 }
+cps             OBJECT IDENTIFIER ::= { ibmProd 201 }
+
+cpsSystemSendTrap OBJECT-TYPE
+    SYNTAX      DisplayString
+    ACCESS      read-only
+    STATUS      optional
+    DESCRIPTION "This variable contains a textual represenation
+                of all the trap data."
+    ::= { cps 3 }
+
+problemTrap TRAP-TYPE
+                ENTERPRISE cps
+                VARIABLES {
+                    cpsSystemSendTrap
+                    }
+                DESCRIPTION
+                    "This trap is sent whenever a Problem Log Entry is created."
+                ::= 3
+
+
+END

@@ -1,0 +1,398 @@
+--  *****************************************************************
+--  DLINKSW-DOS-PREVENT-MIB.mib : DoS (Denial of Service) Prevention MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+    DLINKSW-DOS-PREVENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,Counter64,IpAddress
+            FROM SNMPv2-SMI
+        TruthValue
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF   
+        InterfaceIndexOrZero
+            FROM IF-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;  
+
+    dlinkSwDosPrevMIB MODULE-IDENTITY
+		LAST-UPDATED "201305300000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+           "This MIB contains managed objects for the DOS Protection 
+            application of the device."
+	    REVISION        "201305300000Z"
+        DESCRIPTION
+            "Initial version of this MIB module."
+        ::= { dlinkIndustrialCommon 59 }
+
+--
+-- Textual conventions
+--
+
+    DosAttackType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "This data type indicates a well-known DoS type which can be detected.
+            Note that a particular agent may support only certain DoS attack
+            types. Thus, the valid values of this object are project
+            dependent. An agent may respond with an error 
+            (e.g., 'inconsistentValue ') to a management SET operation which
+            attempts to modify the value to one which is not supported by the
+            managed device."
+            SYNTAX INTEGER{   
+            landAttack(1),
+            blatAttack(2),
+            smurfAttack(3),
+            tcpNullScan(4),
+            tcpXmasScan(5),
+            tcpSynFin(6),
+            tcpSynSrcPortLess1024(7),
+            arpMacSaMismatch(8),
+            fraggleAttack(9),
+            icmpRedirectAttack(10),
+            icmpUnreachableAttack(11),
+            ipRouteRecordAttack(12),
+            ipSourceRouteAttack(13),
+            pingDeathAttack(14),
+            tcpFlagSynRst(15),
+            tcpOverMacMcbc(16),
+            tcpSynWithData(17),
+            tcpTinyFragAttack(18),
+            tcpUdpPortZero(19),
+            tracertAttack(20),
+            winNukeAttack(21),
+            pingFlood(22),
+            synFlood(23),
+            teardrop(24),
+            all(999) }
+
+-- ***************************************************************************
+-- Node definitions
+-- ***************************************************************************
+    dDosPrevMIBNotifications OBJECT IDENTIFIER ::= { dlinkSwDosPrevMIB 0 }
+    dDosPrevMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwDosPrevMIB 1 }
+    dDosPrevMIBConformance   OBJECT IDENTIFIER ::= { dlinkSwDosPrevMIB 2 }
+        
+-- ***************************************************************************
+-- dDosPrevMIBObjects
+-- ***************************************************************************
+    dDosPrevGlobalNotifsEnabled  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION   
+            "Set to 'true' to enable global SNMP notification
+            for DoS prevention feature.  Setting the object to
+            'false' will disable SNMP notifications."
+        DEFVAL      { false }              
+        ::= { dDosPrevMIBObjects 1}
+        
+    dDosPrevNotifyInfo  OBJECT IDENTIFIER ::= { dDosPrevMIBObjects 2 }
+    
+    dDosPrevNotiInfoDropFramesCount OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the total dropped packets due to DoS attack
+            in the past 5 minutes."
+        ::= { dDosPrevNotifyInfo 1 }
+
+    dDosPrevNotiInfoDropIpAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "If the DoS packet is from the end station, represent the IP address of attacker;
+            otherwise represent the router's IP."
+        ::= { dDosPrevNotifyInfo 2 }
+
+    dDosPrevNotiInfoDropPortNumber OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the attacked port number."
+        ::= { dDosPrevNotifyInfo 3 }
+                       
+    dDosPrevCtrlTable  OBJECT-TYPE
+        SYNTAX  SEQUENCE OF DDosPrevCtrlEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A table includes the settings of all DoS prevention 
+            types supported by the Switch.             
+            Note: the special attack type 'all' is not included
+            in this table."             
+        ::= { dDosPrevMIBObjects 3 }
+           
+    dDosPrevCtrlEntry OBJECT-TYPE
+        SYNTAX          DDosPrevCtrlEntry                         
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A single entry in the DoS prevention control table."             
+        INDEX   { dDoSPrevCtrlAttackType }
+        ::= { dDosPrevCtrlTable 1 }
+               
+    DDosPrevCtrlEntry ::=   SEQUENCE {
+        dDoSPrevCtrlAttackType          DosAttackType,
+        dDoSPrevCtrlEnabled             TruthValue,
+        dDoSPrevCtrlActionType          INTEGER,
+        dDoSPrevCtrlRedirectPort        InterfaceIndexOrZero,
+        dDoSPrevCtrlRedirectPriority    INTEGER,
+        dDoSPrevCtrlRedirectRateLimit   Unsigned32
+    }
+        
+    dDoSPrevCtrlAttackType OBJECT-TYPE
+        SYNTAX          DosAttackType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DoS attack type."
+        ::= { dDosPrevCtrlEntry 1 }
+    
+    dDoSPrevCtrlEnabled OBJECT-TYPE
+        SYNTAX TruthValue 
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the state of the DoS attack type.
+            Setting this object to 'false' will reset other columnar
+            objects in the same row."
+        DEFVAL      { false }      
+        ::= { dDosPrevCtrlEntry 2 }
+       
+    dDoSPrevCtrlActionType OBJECT-TYPE
+        SYNTAX  INTEGER    {   
+            drop(1),
+            redirect(2)      
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the action for the DoS prevention type. 
+            If this object is set to 'redirect' and dDoSPrevCtrlEnabled is
+            'true', the configuration will not take effect until a valid
+            redirect port (dDoSPrevCtrlRedirectPort) is specified. If redirect
+            port is not valid, the switch behaves same as 'drop' is set."
+        DEFVAL      { drop }    
+        ::= { dDosPrevCtrlEntry 3 }     
+        
+    dDoSPrevCtrlRedirectPort OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the port to which the attacking packet will 
+            be redirected. A value of 0 means redirect port is unspecified. 
+            This object can only be modified for entries whose value of
+            dDoSPrevCtrlEnabled is 'true' and dDoSPrevCtrlActionType is 
+            'redirect'. Otherwise, inconsistentValue error will be returned." 
+        DEFVAL      { 0 }            
+        ::= { dDosPrevCtrlEntry 4 }
+    
+    dDoSPrevCtrlRedirectPriority OBJECT-TYPE
+        SYNTAX          INTEGER (0..8)
+        MAX-ACCESS      read-write
+        STATUS current
+        DESCRIPTION
+            "This object configures the priority for the redirected attacking 
+            packets. Valid priority values are from 0 to 7. 
+            A value of 8 indicates that the original priority will not be 
+            changed when the packet is redirected.
+            This object can only be modified for entries whose value of
+            dDoSPrevCtrlEnabled is 'true', dDoSPrevCtrlActionType is 
+            'redirect' and dDoSPrevCtrlRedirectPort is specified. 
+            Otherwise, inconsistentValue error will be returned."
+        DEFVAL      { 8 }     
+        ::= { dDosPrevCtrlEntry 5 }
+    
+    dDoSPrevCtrlRedirectRateLimit  OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..100000000)
+        UNITS           "kbps"
+        MAX-ACCESS      read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the rate-limit (kilobit per second) for 
+            redirecting DoS attacking packets.
+            The valid range and granularity is project dependent.             
+            A value of 0 indicates that there is no limit for redirecting
+            DoS attacking packets.
+            This object can only be modified for entries whose value of
+            dDoSPrevCtrlEnabled is 'true', dDoSPrevCtrlActionType is 
+            'redirect' and dDoSPrevCtrlRedirectPort is specified.
+            Otherwise, inconsistentValue error will be returned."           
+        DEFVAL      { 0 }      
+        ::= { dDosPrevCtrlEntry 6 }           
+
+    dDoSPrevCounterTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DDoSPrevCounterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The table contains the counters of DoS prevention 
+            types supported by the Switch. 
+            This table only contains one entry of attack type is 'all' if per
+            DoS-type counters is not supported." 
+       ::= { dDosPrevMIBObjects 4 }
+
+    dDoSPrevCounterEntry OBJECT-TYPE
+        SYNTAX      DDoSPrevCounterEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A single entry in the DoS prevention counter table." 
+       INDEX   { dDoSPrevCounterAttackType }
+       ::= { dDoSPrevCounterTable 1 }
+
+    DDoSPrevCounterEntry ::=    SEQUENCE {
+        dDoSPrevCounterAttackType       DosAttackType, 
+        dDoSPrevCounterFrameCount       Counter64,
+        dDoSPrevCounterClearCounter     INTEGER
+    } 
+    
+    dDoSPrevCounterAttackType OBJECT-TYPE
+        SYNTAX          DosAttackType 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DoS attack type."
+        ::= { dDoSPrevCounterEntry 1 }
+    
+    dDoSPrevCounterFrameCount OBJECT-TYPE
+        SYNTAX          Counter64
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of frames detected for 
+            the DoS attack prevention type."
+        ::= { dDoSPrevCounterEntry 2 } 
+
+    dDoSPrevCounterClearCounter OBJECT-TYPE
+        SYNTAX      INTEGER   {   
+            clear(1),
+            noOp(2)
+        }
+        MAX-ACCESS  read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to reset the counter of the specific 
+            attack type when set to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        DEFVAL      { noOp }
+        ::= { dDoSPrevCounterEntry 3 }
+
+--  ***************************************************************************	
+--  Notifications
+--  ***************************************************************************               
+    dDosPreveAttackDetected NOTIFICATION-TYPE
+        OBJECTS { dDosPrevNotiInfoDropFramesCount }
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent when dDosPrevGlobalNotifsEnabled is 'true' and 
+            the DoS attack occurs in the past 5 minutes."
+        ::= { dDosPrevMIBNotifications 1 }
+
+     dDosPreveAttackDetectedPacket NOTIFICATION-TYPE
+        OBJECTS { 
+                  dDoSPrevCtrlAttackType,
+                  dDosPrevNotiInfoDropIpAddr,
+                  dDosPrevNotiInfoDropPortNumber
+                }
+        STATUS  current
+        DESCRIPTION
+            "This trap is sent when dDosPrevGlobalNotifsEnabled is 'true' and 
+            the DoS attack occurs to detect the dropped attack packets."
+        ::= { dDosPrevMIBNotifications 2 }
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************
+    dDosPrevMIBCompliances 
+        OBJECT IDENTIFIER ::= { dDosPrevMIBConformance 1 }
+    dDosPrevMIBGroups
+        OBJECT IDENTIFIER ::= { dDosPrevMIBConformance 2 }
+
+    dDosPrevMIBCompliance MODULE-COMPLIANCE
+        STATUS          current   
+        DESCRIPTION
+            "The compliance statement for the DoS Prevention MIB."
+        MODULE -- this module
+        MANDATORY-GROUPS { 
+            dDosPrevBasicGroup,
+            dDosPrevNotifyObjectGroup,
+            dDosPrevNotificationsGroup                     
+        }                       
+        GROUP dDosPrevActionRedirectCtrlGroup
+        DESCRIPTION
+            "This group need not be implemented if only support 'drop' for DoS
+            attack."
+        ::= { dDosPrevMIBCompliances 1 }
+        
+    dDosPrevBasicGroup OBJECT-GROUP
+        OBJECTS    {                       
+            dDoSPrevCtrlEnabled,
+            dDoSPrevCounterFrameCount,
+            dDoSPrevCounterClearCounter
+        }
+        STATUS          current
+        DESCRIPTION
+            "The collection of objects provides basic control for DoS
+            Prevention."
+        ::= { dDosPrevMIBGroups 1 }
+    
+    dDosPrevActionRedirectCtrlGroup OBJECT-GROUP
+        OBJECTS    {              
+            dDoSPrevCtrlActionType,          
+            dDoSPrevCtrlRedirectPort,
+            dDoSPrevCtrlRedirectPriority,
+            dDoSPrevCtrlRedirectRateLimit            
+        }
+        STATUS          current
+        DESCRIPTION
+           "The collection of objects provides the advanced action control for
+           DoS Prevention."
+        ::= { dDosPrevMIBGroups 2 }
+                        
+    dDosPrevNotifyObjectGroup OBJECT-GROUP
+        OBJECTS         { 
+            dDosPrevGlobalNotifsEnabled, 
+            dDosPrevNotiInfoDropFramesCount,
+            dDosPrevNotiInfoDropIpAddr,
+            dDosPrevNotiInfoDropPortNumber
+        }           
+        STATUS          current
+        DESCRIPTION
+            "The collection of objects provides the control and information of
+            DoS notifications."
+        ::= { dDosPrevMIBGroups 3 }
+                        
+    dDosPrevNotificationsGroup NOTIFICATION-GROUP
+        NOTIFICATIONS   { 
+                          dDosPreveAttackDetected,
+                          dDosPreveAttackDetectedPacket
+                        }            
+        STATUS          current
+        DESCRIPTION
+            "The collection of objects provides DoS notifications."           
+        ::= { dDosPrevMIBGroups 4 }
+            
+END
+

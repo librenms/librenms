@@ -1,0 +1,356 @@
+WRI-MEMORY-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE,Unsigned32                        
+							FROM SNMPv2-SMI       
+			TEXTUAL-CONVENTION,RowStatus
+							FROM SNMPv2-TC
+			wri,wriProducts			
+							FROM WRI-SMI;	
+
+	-- MEMORY monitor       
+	msppMemory			MODULE-IDENTITY
+        LAST-UPDATED    "201001110000Z"
+        ORGANIZATION    "Wuhan FiberHome Networks Co.,Ltd."
+        CONTACT-INFO
+                "  FHN Customer Service
+                   Tel: 027-87693784"
+        DESCRIPTION
+                "The MIB module to describe the monitor for memory."
+        REVISION        "201001110000Z" 
+        DESCRIPTION
+                "Add some attributes for memory table."
+        REVISION        "200901110000Z" 
+        DESCRIPTION
+                "Init version for memory monitor."
+        ::=   {msppChassis 5}
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+	
+--	msppMemory			OBJECT IDENTIFIER ::=   {msppChassis 5}
+		
+		memoryTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF MemoryEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "NULL."
+			::= { msppMemory 1 }
+
+		memoryEntry OBJECT-TYPE
+			SYNTAX MemoryEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"NULL."
+			INDEX {memoryIndex }
+			::= { memoryTable 1 }
+		
+		MemoryEntry ::=
+		    SEQUENCE {
+		    memoryIndex          		INTEGER,
+		    memorySdramSize        		Counter32,
+		    memorySdramUsed	       		Counter32,
+		    memoryFlashSize        		Counter32,
+		    memoryFlashUsed	       		Counter32,
+		    memorySdramHThreshold		Counter32
+			}
+		-- The following section describes the components of the
+		-- table.
+
+			memoryIndex OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Memory index."
+				::= { memoryEntry 1 }
+
+
+			memorySdramSize OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Memory Sdram size."
+				::= { memoryEntry 2 }
+				
+			memorySdramUsed OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Sdram used."
+				::= { memoryEntry 3 }
+				
+			memoryFlashSize OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Flash size"
+				::= { memoryEntry 4 }
+				
+			memoryFlashUsed OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Flash used."
+				::= { memoryEntry 5 }
+				
+			memorySdramHThreshold OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Sdram high threshold."
+				::= { memoryEntry 6 }
+			
+		memoryGeneral			OBJECT IDENTIFIER ::=   {msppMemory 2}
+					
+		memoryTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable memory trap or not."
+				::= { memoryGeneral 1 }    
+		
+		memoryMonitorEnable OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable memory monitor or not."
+				::= { memoryGeneral 2 }
+								
+		memoryTrap			OBJECT IDENTIFIER ::=   {msppMemory 3}		
+		
+		memoryOverThreshold NOTIFICATION-TYPE
+       		OBJECTS {memoryPoolCurrUsage,memoryPoolHighThreshold,memoryPoolLowThreshold}
+       		STATUS  current
+       		DESCRIPTION
+               	"memory over Threshold trap."
+			::= { memoryTrap 1}     
+		
+		memoryUnderThreshold NOTIFICATION-TYPE
+       		OBJECTS {memoryPoolCurrUsage,memoryPoolHighThreshold,memoryPoolLowThreshold}
+       		STATUS  current
+       		DESCRIPTION
+               	"memory under Threshold."
+			::= { memoryTrap 2}     
+		
+		memoryRecoverThreshold NOTIFICATION-TYPE
+       		OBJECTS {memoryPoolCurrUsage,memoryPoolHighThreshold,memoryPoolLowThreshold}
+       		STATUS  current
+       		DESCRIPTION
+               	"memory recover Threshold trap."
+			::= { memoryTrap 3}   
+
+		memoryPoolTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF MemoryPoolEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Memory pool information table."
+			::= { msppMemory 4 }
+
+		memoryPoolEntry OBJECT-TYPE
+			SYNTAX MemoryPoolEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the memory pool table."
+			INDEX {memoryPoolIndex }
+			::= { memoryPoolTable 1 }
+		
+		MemoryPoolEntry ::=
+		    SEQUENCE {
+		    memoryPoolIndex         	Unsigned32,      
+		    memoryPoolDescr				OCTET STRING,
+		    memoryPoolFreeBytesNum		Counter32, 
+		    memoryPoolFreeBlocksNum		Counter32,
+		    memoryPoolFreeMaxBlockSize	Counter32,
+		    memoryPoolMinBlockWords		Counter32,
+		    memoryPoolAllocBytesNum		Counter32, 
+		    memoryPoolAllocBlocksNum	Counter32,
+		    memoryPoolAllocBytesCumulate	Counter32, 
+		    memoryPoolAllocBlocksCumulate	Counter32,
+		    memoryPoolTotalBytes		Counter32,		    
+		    memoryPoolHighThreshold		INTEGER,
+		    memoryPoolTrapEnable		INTEGER,
+		    memoryPoolStatus			INTEGER,  
+		    memoryPoolAllSetting		OCTET STRING,
+		    memoryPoolAllocMaxBytesNum	INTEGER,
+			memoryPoolLowThreshold      INTEGER,
+			memoryPoolCurrUsage         Counter32,
+			-- xf add 2014-7-2
+			memoryPoolIndexDescr		OCTET STRING
+			
+		    }
+		-- The following section describes the components of the table.
+
+			memoryPoolIndex OBJECT-TYPE
+				SYNTAX  Unsigned32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Memory pool index."
+				::= { memoryPoolEntry 1 }    
+			
+			memoryPoolDescr OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Memory pool description."
+				::= { memoryPoolEntry 2 } 				
+							
+			memoryPoolFreeBytesNum OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Free bytes number of the memory pool."
+				::= { memoryPoolEntry 3 }
+				
+			memoryPoolFreeBlocksNum OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Free blocks number of the memory pool."
+				::= { memoryPoolEntry 4 }
+				
+			memoryPoolFreeMaxBlockSize OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Free max block size of the memory pool."
+				::= { memoryPoolEntry 5 }
+				
+			memoryPoolMinBlockWords OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Min block words number of the memory pool."
+				::= { memoryPoolEntry 6 }
+				
+			memoryPoolAllocBytesNum OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Allocated bytes number of the memory pool."
+				::= { memoryPoolEntry 7 }
+				
+			memoryPoolAllocBlocksNum OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Allocated blocks number of the memory pool."
+				::= { memoryPoolEntry 8 }
+				
+			memoryPoolAllocBytesCumulate OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Cumulate allocated bytes of the memory pool."
+				::= { memoryPoolEntry 9 }
+				
+			memoryPoolAllocBlocksCumulate OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Cumulate allocated blocks of the memory pool."
+				::= { memoryPoolEntry 10 }
+				
+			memoryPoolTotalBytes OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Total bytes of the memory pool."
+				::= { memoryPoolEntry 11 }			
+				
+			memoryPoolHighThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write				
+				STATUS  current
+				DESCRIPTION
+						"High threshold of the memory pool."
+				::= { memoryPoolEntry 12 }
+				
+			memoryPoolTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write				
+				STATUS  current
+				DESCRIPTION
+						"Trap enable or not of the memory pool."
+				::= { memoryPoolEntry 13 }
+				
+			memoryPoolStatus OBJECT-TYPE
+				SYNTAX  INTEGER{
+					normal(0),
+					highoverflow(1)
+				}
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Status of the memory pool."
+				::= { memoryPoolEntry 14 }	
+				
+			memoryPoolAllSetting OBJECT-TYPE
+				SYNTAX OCTET STRING
+				MAX-ACCESS read-write
+				STATUS		current
+				DESCRIPTION
+						"All operation of memeory pool."
+				::= { memoryPoolEntry 15}			
+				
+			memoryPoolAllocMaxBytesNum OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"Max bytes number the memory pool."
+				::= { memoryPoolEntry 16 }
+			
+			memoryPoolLowThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write				
+				STATUS  current
+				DESCRIPTION
+						"Low threshold of the memory pool."
+				::= { memoryPoolEntry 17 }
+				
+			memoryPoolCurrUsage OBJECT-TYPE
+				SYNTAX  Counter32
+				MAX-ACCESS  read-only				
+				STATUS  current
+				DESCRIPTION
+						"The current used memory pool."
+				::= { memoryPoolEntry 18 }
+				
+			-- xf add 2014-7-2
+			memoryPoolIndexDescr OBJECT-TYPE
+				SYNTAX OCTET STRING
+				MAX-ACCESS read-only
+				STATUS		current
+				DESCRIPTION
+						"Memeory pool index descrption."
+				::= { memoryPoolEntry 19}		
+  
+END
+
